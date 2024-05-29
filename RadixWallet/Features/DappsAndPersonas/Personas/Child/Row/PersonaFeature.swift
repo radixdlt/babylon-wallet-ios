@@ -7,13 +7,14 @@ public struct PersonaFeature: Sendable, FeatureReducer {
 		public let id: Persona.ID
 		public let thumbnail: URL?
 		public let displayName: String
-		public var shouldWriteDownMnemonic: Bool
+		public var entitySecurity: EntitySecurity.State
 
 		public init(persona: AuthorizedPersonaDetailed) {
 			self.init(
 				id: persona.id,
 				thumbnail: nil,
-				displayName: persona.displayName.rawValue
+				displayName: persona.displayName.rawValue,
+				identityAddress: persona.identityAddress
 			)
 		}
 
@@ -22,7 +23,7 @@ public struct PersonaFeature: Sendable, FeatureReducer {
 				id: persona.id,
 				thumbnail: nil,
 				displayName: persona.displayName.rawValue,
-				shouldWriteDownMnemonic: persona.shouldWriteDownMnemonic
+				identityAddress: persona.address
 			)
 		}
 
@@ -30,33 +31,51 @@ public struct PersonaFeature: Sendable, FeatureReducer {
 			id: Persona.ID,
 			thumbnail: URL?,
 			displayName: String,
-			shouldWriteDownMnemonic: Bool = false
+			identityAddress: IdentityAddress
 		) {
 			self.id = id
 			self.thumbnail = thumbnail
 			self.displayName = displayName
-			self.shouldWriteDownMnemonic = shouldWriteDownMnemonic
+			self.entitySecurity = .init(kind: .persona(identityAddress))
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case tapped
-		case writeDownSeedPhrasePromptTapped
+	}
+
+	@CasePathable
+	public enum ChildAction: Sendable, Equatable {
+		case entitySecurity(EntitySecurity.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case openDetails
-		case writeDownSeedPhrase
+		case openSecurityCenter
 	}
 
 	public init() {}
+
+	public var body: some ReducerOf<Self> {
+		Scope(state: \.entitySecurity, action: /Action.child .. ChildAction.entitySecurity) {
+			EntitySecurity()
+		}
+		Reduce(core)
+	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .tapped:
 			.send(.delegate(.openDetails))
-		case .writeDownSeedPhrasePromptTapped:
-			.send(.delegate(.writeDownSeedPhrase))
+		}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+		switch childAction {
+		case .entitySecurity(.delegate(.openSecurityCenter)):
+			.send(.delegate(.openSecurityCenter))
+		default:
+			.none
 		}
 	}
 }

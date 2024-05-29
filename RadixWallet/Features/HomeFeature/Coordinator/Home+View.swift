@@ -4,7 +4,6 @@ import SwiftUI
 extension Home.State {
 	var viewState: Home.ViewState {
 		.init(
-			hasNotification: shouldWriteDownPersonasSeedPhrase,
 			showRadixBanner: showRadixBanner,
 			totalFiatWorth: showFiatWorth ? totalFiatWorth : nil
 		)
@@ -14,7 +13,6 @@ extension Home.State {
 // MARK: - Home.View
 extension Home {
 	public struct ViewState: Equatable {
-		let hasNotification: Bool
 		let showRadixBanner: Bool
 		let totalFiatWorth: Loadable<FiatWorth>?
 	}
@@ -81,8 +79,10 @@ extension Home {
 				.animation(.default, value: viewStore.showRadixBanner)
 				.toolbar {
 					ToolbarItem(placement: .navigationBarTrailing) {
-						SettingsButton(shouldShowNotification: viewStore.hasNotification) {
+						Button {
 							store.send(.view(.settingsButtonTapped))
+						} label: {
+							Image(.homeHeaderSettings)
 						}
 					}
 				}
@@ -117,18 +117,6 @@ extension Home {
 				}
 				.padding(.leading, .medium1)
 				.padding(.top, .small3)
-			}
-		}
-
-		private struct SettingsButton: SwiftUI.View {
-			let shouldShowNotification: Bool
-			let action: () -> Void
-
-			var body: some SwiftUI.View {
-				Button(action: action) {
-					Image(asset: AssetResource.homeHeaderSettings)
-						.badged(shouldShowNotification)
-				}
 			}
 		}
 	}

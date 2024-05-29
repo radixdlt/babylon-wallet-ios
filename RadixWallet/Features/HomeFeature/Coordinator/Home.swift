@@ -9,7 +9,6 @@ public struct Home: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		// MARK: - Components
 		public var accountRows: IdentifiedArrayOf<Home.AccountRow.State> = []
-		public var shouldWriteDownPersonasSeedPhrase: Bool = false
 
 		public var showRadixBanner: Bool = false
 		public var showFiatWorth: Bool = true
@@ -57,7 +56,6 @@ public struct Home: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		public typealias HasAccessToMnemonic = Bool
 		case accountsLoadedResult(TaskResult<Accounts>)
-		case loadedShouldWriteDownPersonasSeedPhrase(Bool)
 		case currentGatewayChanged(to: Gateway)
 		case shouldShowNPSSurvey(Bool)
 		case accountsResourcesLoaded(Loadable<[OnLedgerEntity.OnLedgerAccount]>)
@@ -166,7 +164,6 @@ public struct Home: Sendable, FeatureReducer {
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
-			.merge(with: loadShouldWriteDownPersonasSeedPhrase())
 			.merge(with: loadGateways())
 			.merge(with: loadNPSSurveyStatus())
 			.merge(with: loadAccountResources())
@@ -232,10 +229,6 @@ public struct Home: Sendable, FeatureReducer {
 					row.accountWithResources.refresh(from: accountResources)
 				}
 			}
-			return .none
-
-		case let .loadedShouldWriteDownPersonasSeedPhrase(shouldBackup):
-			state.shouldWriteDownPersonasSeedPhrase = shouldBackup
 			return .none
 
 		case let .currentGatewayChanged(gateway):
@@ -338,16 +331,6 @@ public struct Home: Sendable, FeatureReducer {
 
 		state.showNextDestination()
 		return effect ?? .none
-	}
-
-	private func loadShouldWriteDownPersonasSeedPhrase() -> Effect<Action> {
-		.run { send in
-			@Dependency(\.personasClient) var personasClient
-			for try await shouldBackup in await personasClient.shouldWriteDownSeedPhraseForSomePersonaSequence() {
-				guard !Task.isCancelled else { return }
-				await send(.internal(.loadedShouldWriteDownPersonasSeedPhrase(shouldBackup)))
-			}
-		}
 	}
 
 	public func loadGateways() -> Effect<Action> {
