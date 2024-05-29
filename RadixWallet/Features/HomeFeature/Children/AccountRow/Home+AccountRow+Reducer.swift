@@ -41,6 +41,7 @@ extension Home {
 			case openDetails
 			case exportMnemonic
 			case importMnemonics
+			case openSecurityCenter
 		}
 
 		@CasePathable
@@ -94,6 +95,15 @@ extension Home {
 			case let .fiatWorthUpdated(fiatWorth):
 				state.totalFiatWorth.refresh(from: fiatWorth)
 				return .none
+			}
+		}
+
+		public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+			switch childAction {
+			case .entitySecurity(.delegate(.openSecurityCenter)):
+				.send(.delegate(.openSecurityCenter))
+			default:
+				.none
 			}
 		}
 

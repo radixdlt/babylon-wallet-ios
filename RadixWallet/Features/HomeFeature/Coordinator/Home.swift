@@ -84,6 +84,7 @@ public struct Home: Sendable, FeatureReducer {
 			case acknowledgeJailbreakAlert(AlertState<Action.AcknowledgeJailbreakAlert>)
 			case npsSurvey(NPSSurvey.State)
 			case relinkConnector(NewConnection.State)
+			case securityCenter(SecurityCenter.State)
 		}
 
 		public enum Action: Sendable, Equatable {
@@ -94,6 +95,7 @@ public struct Home: Sendable, FeatureReducer {
 			case acknowledgeJailbreakAlert(AcknowledgeJailbreakAlert)
 			case npsSurvey(NPSSurvey.Action)
 			case relinkConnector(NewConnection.Action)
+			case securityCenter(SecurityCenter.Action)
 
 			public enum AcknowledgeJailbreakAlert: Sendable, Hashable {}
 		}
@@ -116,6 +118,9 @@ public struct Home: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.relinkConnector, action: /Action.relinkConnector) {
 				NewConnection()
+			}
+			Scope(state: /State.securityCenter, action: /Action.securityCenter) {
+				SecurityCenter()
 			}
 		}
 	}
@@ -315,6 +320,9 @@ public struct Home: Sendable, FeatureReducer {
 				return exportMnemonic(controlling: account, state: &state)
 			case .importMnemonics:
 				return importMnemonics(state: &state)
+			case .openSecurityCenter:
+				state.destination = .securityCenter(.init())
+				return .none
 			}
 
 		default:

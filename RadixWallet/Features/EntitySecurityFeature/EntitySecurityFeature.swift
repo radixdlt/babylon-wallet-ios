@@ -23,6 +23,10 @@ public struct EntitySecurity: Sendable, FeatureReducer {
 		case setSecurityProblems([SecurityProblem])
 	}
 
+	public enum DelegateAction: Sendable, Equatable {
+		case openSecurityCenter
+	}
+
 	@Dependency(\.securityCenterClient) var securityCenterClient
 
 	public init() {}
@@ -32,7 +36,7 @@ public struct EntitySecurity: Sendable, FeatureReducer {
 		case .onFirstTask:
 			securityProblemsEffect()
 		case .rowTapped:
-			.none
+			.send(.delegate(.openSecurityCenter))
 		}
 	}
 

@@ -154,6 +154,7 @@ private extension View {
 			.acknowledgeJailbreakAlert(with: destinationStore)
 			.userFeedback(with: destinationStore)
 			.relinkConnector(with: destinationStore)
+			.securityCenter(with: destinationStore)
 	}
 
 	private func accountDetails(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
@@ -216,6 +217,16 @@ private extension View {
 			action: Home.Destination.Action.relinkConnector,
 			content: { NewConnection.View(store: $0) }
 		)
+	}
+
+	private func securityCenter(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /Home.Destination.State.securityCenter,
+			action: Home.Destination.Action.securityCenter
+		) {
+			SecurityCenter.View(store: $0)
+		}
 	}
 }
 
