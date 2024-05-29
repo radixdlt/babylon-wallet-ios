@@ -7,7 +7,6 @@ extension AccountDetails.State {
 			accountAddress: account.address,
 			appearanceID: account.appearanceID,
 			displayName: account.displayName.rawValue,
-			mnemonicHandlingCallToAction: mnemonicHandlingCallToAction,
 			isLedgerAccount: account.isLedgerControlled,
 			totalFiatWorth: showFiatWorth ? assets.totalFiatWorth : nil,
 			account: account
@@ -21,7 +20,6 @@ extension AccountDetails {
 		let accountAddress: AccountAddress
 		let appearanceID: AppearanceID
 		let displayName: String
-		let mnemonicHandlingCallToAction: MnemonicHandling?
 		let isLedgerAccount: Bool
 		let totalFiatWorth: Loadable<FiatWorth>?
 		let account: Account
@@ -98,26 +96,8 @@ extension AccountDetails {
 			.padding(.top, .small1)
 			.padding([.horizontal, .bottom], .medium1)
 
-			prompts(
-				mnemonicHandlingCallToAction: viewStore.mnemonicHandlingCallToAction
-			)
-			.padding([.horizontal, .bottom], .medium1)
-		}
-
-		@ViewBuilder
-		func prompts(mnemonicHandlingCallToAction: MnemonicHandling?) -> some SwiftUI.View {
-			if let mnemonicHandlingCallToAction {
-				switch mnemonicHandlingCallToAction {
-				case .mustBeImported:
-					importMnemonicPromptView {
-						store.send(.view(.importMnemonicButtonTapped))
-					}
-				case .shouldBeExported:
-					exportMnemonicPromptView {
-						store.send(.view(.exportMnemonicButtonTapped))
-					}
-				}
-			}
+			EntitySecurity.View(store: store.entitySecurity)
+				.padding([.horizontal, .bottom], .medium1)
 		}
 
 		func assetsView() -> some SwiftUI.View {
@@ -173,6 +153,10 @@ private extension StoreOf<AccountDetails> {
 		}
 		return scope(state: scopeState, action: Action.destination)
 	}
+
+	var entitySecurity: StoreOf<EntitySecurity> {
+		scope(state: \.entitySecurity, action: \.child.entitySecurity)
+	}
 }
 
 @MainActor
@@ -187,6 +171,7 @@ private extension View {
 			.stakeUnitDetails(with: destinationStore)
 			.stakeClaimDetails(with: destinationStore)
 			.poolUnitDetails(with: destinationStore)
+			.securityCenter(with: destinationStore)
 	}
 
 	private func preferences(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
@@ -234,6 +219,12 @@ private extension View {
 	private func poolUnitDetails(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
 		sheet(store: destinationStore.scope(state: \.poolUnitDetails, action: \.poolUnitDetails)) {
 			PoolUnitDetails.View(store: $0)
+		}
+	}
+
+	private func securityCenter(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.securityCenter, action: \.securityCenter)) {
+			SecurityCenter.View(store: $0)
 		}
 	}
 }

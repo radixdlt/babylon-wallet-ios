@@ -149,8 +149,6 @@ private extension View {
 		let destinationStore = store.destination
 		return accountDetails(with: destinationStore)
 			.createAccount(with: destinationStore)
-			.exportMnemonic(with: destinationStore)
-			.importMnemonics(with: destinationStore)
 			.acknowledgeJailbreakAlert(with: destinationStore)
 			.userFeedback(with: destinationStore)
 			.relinkConnector(with: destinationStore)
@@ -172,24 +170,6 @@ private extension View {
 			state: /Home.Destination.State.createAccount,
 			action: Home.Destination.Action.createAccount,
 			content: { CreateAccountCoordinator.View(store: $0) }
-		)
-	}
-
-	private func exportMnemonic(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /Home.Destination.State.exportMnemonic,
-			action: Home.Destination.Action.exportMnemonic,
-			content: { ExportMnemonic.View(store: $0).inNavigationStack }
-		)
-	}
-
-	private func importMnemonics(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /Home.Destination.State.importMnemonics,
-			action: Home.Destination.Action.importMnemonics,
-			content: { ImportMnemonicsFlowCoordinator.View(store: $0) }
 		)
 	}
 

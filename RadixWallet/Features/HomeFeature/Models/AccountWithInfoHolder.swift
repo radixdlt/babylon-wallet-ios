@@ -72,13 +72,6 @@ extension AccountWithInfo {
 }
 
 extension AccountWithInfoHolder {
-	mutating func checkAccountAccessToMnemonic(portfolio: OnLedgerEntity.OnLedgerAccount? = nil) {
-		if let portfolio, account.address != portfolio.address {
-			assertionFailure("Discrepancy, wrong owner")
-		}
-		checkAccountAccessToMnemonic(xrdResource: portfolio?.fungibleResources.xrdResource)
-	}
-
 	mutating func checkAccountAccessToMnemonic(xrdResource: OnLedgerEntity.OwnedFungibleResource? = nil) {
 		accountWithInfo.checkAccountAccessToMnemonic(xrdResource: xrdResource)
 	}
