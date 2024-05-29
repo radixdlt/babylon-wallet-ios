@@ -129,6 +129,7 @@ extension Home.AccountRow {
 					ownedResourcesList(viewStore)
 
 					prompts(mnemonicHandlingCallToAction: viewStore.mnemonicHandlingCallToAction)
+					EntitySecurity.View(store: store.entitySecurity)
 				}
 				.padding(.horizontal, .medium1)
 				.padding(.vertical, .medium2)
@@ -402,6 +403,12 @@ extension Home.AccountRow.ViewState.AccountTag {
 		case .ledgerBabylon:
 			L10n.HomePage.AccountsTag.ledgerBabylon
 		}
+	}
+}
+
+private extension StoreOf<Home.AccountRow> {
+	var entitySecurity: StoreOf<EntitySecurity> {
+		scope(state: \.entitySecurity, action: \.child.entitySecurity)
 	}
 }
 

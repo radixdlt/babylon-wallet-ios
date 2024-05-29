@@ -12,6 +12,7 @@ extension Home {
 			public var accountWithResources: Loadable<OnLedgerEntity.OnLedgerAccount>
 			public var showFiatWorth: Bool = true
 			public var totalFiatWorth: Loadable<FiatWorth>
+			public var entitySecurity: EntitySecurity.State
 
 			public init(
 				account: Account
@@ -19,6 +20,7 @@ extension Home {
 				self.accountWithInfo = .init(account: account)
 				self.accountWithResources = .loading
 				self.totalFiatWorth = .loading
+				self.entitySecurity = .init(kind: .account(account.address))
 			}
 		}
 
@@ -41,9 +43,21 @@ extension Home {
 			case importMnemonics
 		}
 
+		@CasePathable
+		public enum ChildAction: Sendable, Equatable {
+			case entitySecurity(EntitySecurity.Action)
+		}
+
 		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.userDefaults) var userDefaults
+
+		public var body: some ReducerOf<Self> {
+			Scope(state: \.entitySecurity, action: /Action.child .. ChildAction.entitySecurity) {
+				EntitySecurity()
+			}
+			Reduce(core)
+		}
 
 		public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
