@@ -10,6 +10,7 @@ extension BackupsClient: DependencyKey {
 		@Dependency(\.userDefaults) var userDefaults
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
+		@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 		@Sendable
 		func importFor(

@@ -1167,6 +1167,8 @@
 		E7AE2D052BF7844300830BAA /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = E695F2DD2BECDD7C00761ACE /* Sargon */; };
 		E7AE2D0A2C05F39800830BAA /* ClaimWallet+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7AE2D092C05F39800830BAA /* ClaimWallet+Reducer.swift */; };
 		E7AE2D0C2C05F39E00830BAA /* ClaimWallet+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7AE2D0B2C05F39E00830BAA /* ClaimWallet+View.swift */; };
+		E7AE2D0E2C07359500830BAA /* FullScreenOverlayCoordinator+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7AE2D0D2C07359500830BAA /* FullScreenOverlayCoordinator+Reducer.swift */; };
+		E7AE2D102C07371C00830BAA /* FullScreenOverlayCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7AE2D0F2C07371C00830BAA /* FullScreenOverlayCoordinator+View.swift */; };
 		E7B7A0FD2BBBFB6100EEE900 /* HeaderListViewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7B7A0FC2BBBFB6100EEE900 /* HeaderListViewContainer.swift */; };
 		E7B7A1052BC904E800EEE900 /* NewConnectionApproval+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7B7A1042BC904E800EEE900 /* NewConnectionApproval+Reducer.swift */; };
 		E7B7A1072BC904EE00EEE900 /* NewConnectionApproval+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7B7A1062BC904EE00EEE900 /* NewConnectionApproval+View.swift */; };
@@ -2311,6 +2313,8 @@
 		E713204B2BCD372600AE6B3C /* UnknownCaseDecodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnknownCaseDecodable.swift; sourceTree = "<group>"; };
 		E7AE2D092C05F39800830BAA /* ClaimWallet+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ClaimWallet+Reducer.swift"; sourceTree = "<group>"; };
 		E7AE2D0B2C05F39E00830BAA /* ClaimWallet+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ClaimWallet+View.swift"; sourceTree = "<group>"; };
+		E7AE2D0D2C07359500830BAA /* FullScreenOverlayCoordinator+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FullScreenOverlayCoordinator+Reducer.swift"; sourceTree = "<group>"; };
+		E7AE2D0F2C07371C00830BAA /* FullScreenOverlayCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FullScreenOverlayCoordinator+View.swift"; sourceTree = "<group>"; };
 		E7B7A0FC2BBBFB6100EEE900 /* HeaderListViewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderListViewContainer.swift; sourceTree = "<group>"; };
 		E7B7A1042BC904E800EEE900 /* NewConnectionApproval+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NewConnectionApproval+Reducer.swift"; sourceTree = "<group>"; };
 		E7B7A1062BC904EE00EEE900 /* NewConnectionApproval+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NewConnectionApproval+View.swift"; sourceTree = "<group>"; };
@@ -2808,8 +2812,10 @@
 			children = (
 				48CFBCCA2ADC10D800E77A5C /* HUD+Reducer.swift */,
 				48CFBCCB2ADC10D800E77A5C /* Overlay+Reducer.swift */,
+				E7AE2D0D2C07359500830BAA /* FullScreenOverlayCoordinator+Reducer.swift */,
 				48CFBCCC2ADC10D800E77A5C /* HUD+View.swift */,
 				48CFBCCD2ADC10D800E77A5C /* Overlay+View.swift */,
+				E7AE2D0F2C07371C00830BAA /* FullScreenOverlayCoordinator+View.swift */,
 			);
 			path = Overlay;
 			sourceTree = "<group>";
@@ -6902,6 +6908,7 @@
 				E713204C2BCD372600AE6B3C /* UnknownCaseDecodable.swift in Sources */,
 				48CFC27A2ADC10D900E77A5C /* App+View.swift in Sources */,
 				48CFC6152ADC10DA00E77A5C /* ResetRequestItem.swift in Sources */,
+				E7AE2D0E2C07359500830BAA /* FullScreenOverlayCoordinator+Reducer.swift in Sources */,
 				48CFC3ED2ADC10D900E77A5C /* DataChannelMessage+Codable.swift in Sources */,
 				48CFC5DA2ADC10DA00E77A5C /* PresentationDetentIntrinsicHeight.swift in Sources */,
 				48CFC2F52ADC10D900E77A5C /* IntroductionToPersonas.swift in Sources */,
@@ -7590,6 +7597,7 @@
 				48CFC2902ADC10D900E77A5C /* TransactionReviewAccount.swift in Sources */,
 				83EE5ED42BE3C16F00B1531D /* PackageBlueprintCollectionItem.swift in Sources */,
 				48CFC4632ADC10DA00E77A5C /* OverlayWindowClient+Test.swift in Sources */,
+				E7AE2D102C07371C00830BAA /* FullScreenOverlayCoordinator+View.swift in Sources */,
 				A462B5C32B95212600C26D20 /* TransactionHistoryFilters+View.swift in Sources */,
 				E62449D52AFBA61100272C67 /* Home+AccountRow+Reducer.swift in Sources */,
 				E6A2D9E32AFA6C0D001857EC /* AccountWithInfo.swift in Sources */,
