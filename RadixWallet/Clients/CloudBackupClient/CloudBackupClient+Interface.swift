@@ -54,6 +54,7 @@ extension CloudBackupClient {
 	}
 
 	public struct ProfileMetadata: Hashable, Sendable {
+		public let id: ProfileID
 		public let snapshotVersion: ProfileSnapshotVersion
 		public let creatingDeviceID: UUID
 		public let lastUsedOnDeviceID: UUID
@@ -61,7 +62,16 @@ extension CloudBackupClient {
 		public let numberOfPersonas: UInt16
 		public let numberOfAccounts: UInt16
 
-		public init(snapshotVersion: ProfileSnapshotVersion, creatingDeviceID: UUID, lastUsedOnDeviceID: UUID, lastModified: Date, numberOfPersonas: UInt16, numberOfAccounts: UInt16) {
+		public init(
+			id: ProfileID,
+			snapshotVersion: ProfileSnapshotVersion,
+			creatingDeviceID: UUID,
+			lastUsedOnDeviceID: UUID,
+			lastModified: Date,
+			numberOfPersonas: UInt16,
+			numberOfAccounts: UInt16
+		) {
+			self.id = id
 			self.snapshotVersion = snapshotVersion
 			self.creatingDeviceID = creatingDeviceID
 			self.lastUsedOnDeviceID = lastUsedOnDeviceID

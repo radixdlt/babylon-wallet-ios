@@ -62,7 +62,8 @@ extension CloudBackupClient {
 
 		@Sendable
 		func getMetadata(_ record: CKRecord) throws -> ProfileMetadata {
-			guard let snapshotVersion = (record[.snapshotVersion] as? UInt16).flatMap(ProfileSnapshotVersion.init(rawValue:)),
+			guard let id = UUID(uuidString: record.recordID.recordName),
+			      let snapshotVersion = (record[.snapshotVersion] as? UInt16).flatMap(ProfileSnapshotVersion.init(rawValue:)),
 			      let creatingDeviceID = (record[.creatingDeviceID] as? String).flatMap(UUID.init),
 			      let lastUsedOnDeviceID = (record[.lastUsedOnDeviceID] as? String).flatMap(UUID.init),
 			      let lastModified = record[.lastModified] as? Date,
@@ -73,6 +74,7 @@ extension CloudBackupClient {
 			}
 
 			return .init(
+				id: id,
 				snapshotVersion: snapshotVersion,
 				creatingDeviceID: creatingDeviceID,
 				lastUsedOnDeviceID: lastUsedOnDeviceID,
@@ -115,23 +117,17 @@ extension CloudBackupClient {
 
 		@discardableResult
 		@Sendable
-		func uploadProfileToICloud(_ profile: Profile, existingRecord: CKRecord?) async throws -> CKRecord {
-			try await uploadProfileSnapshotToICloud(profile.profileSnapshot(), header: profile.header, existingRecord: existingRecord)
-		}
-
-		@discardableResult
-		@Sendable
-		func uploadProfileSnapshotToICloud(_ profileSnapshot: Data, header: Profile.Header, existingRecord: CKRecord?) async throws -> CKRecord {
+		func uploadProfileSnapshotToICloud(_ profileSnapshot: Data, metadata: ProfileMetadata, existingRecord: CKRecord?) async throws -> CKRecord {
 			let fileManager = FileManager.default
 			let tempDirectoryURL = fileManager.temporaryDirectory
 			let fileURL = tempDirectoryURL.appendingPathComponent(UUID().uuidString)
 			try profileSnapshot.write(to: fileURL)
 
-			let id = header.id
+			let id = metadata.id
 			let record = existingRecord ?? .init(recordType: .profile, recordID: .init(recordName: id.uuidString))
 			record[.content] = CKAsset(fileURL: fileURL)
 
-			setMetadata(header.metadata, on: record)
+			setMetadata(metadata, on: record)
 
 			let savedRecord = try await container.privateCloudDatabase.save(record)
 			try fileManager.removeItem(at: fileURL)
@@ -144,7 +140,11 @@ extension CloudBackupClient {
 			let existingRecord = try? await fetchProfileRecord(.init(recordName: profile.id.uuidString))
 			let result: BackupResult.Result
 			do {
-				try await uploadProfileToICloud(profile, existingRecord: existingRecord)
+				try await uploadProfileSnapshotToICloud(
+					profile.profileSnapshot(),
+					metadata: profile.header.metadata,
+					existingRecord: existingRecord
+				)
 				result = .success
 			} catch CKError.accountTemporarilyUnavailable {
 				result = .temporarilyUnavailable
@@ -204,7 +204,7 @@ extension CloudBackupClient {
 						return nil
 					}
 
-					return try await uploadProfileSnapshotToICloud(profileSnapshot, header: header, existingRecord: backedUpRecord)
+					return try await uploadProfileSnapshotToICloud(profileSnapshot, metadata: header.metadata, existingRecord: backedUpRecord)
 				}
 			},
 			deleteProfileBackup: { id in
@@ -236,6 +236,7 @@ private extension Profile.Header {
 
 	var metadata: CloudBackupClient.ProfileMetadata {
 		.init(
+			id: id,
 			snapshotVersion: snapshotVersion,
 			creatingDeviceID: creatingDevice.id,
 			lastUsedOnDeviceID: lastUsedOnDevice.id,
