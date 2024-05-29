@@ -87,7 +87,7 @@ extension VerifyMnemonic {
 				}
 				.scrollIndicators(.hidden)
 			}
-			.navigationTitle(L10n.ConfirmMnemonicBackedUp.title)
+			.radixToolbar(title: L10n.ConfirmMnemonicBackedUp.title)
 		}
 
 		@ViewBuilder

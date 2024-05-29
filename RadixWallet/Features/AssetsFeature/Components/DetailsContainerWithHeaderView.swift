@@ -103,10 +103,7 @@ struct DetailsContainer<Contents: View>: View {
 			ScrollView {
 				contents
 			}
-			.navigationBarTitle(titleString)
-			.navigationBarTitleColor(.app.gray1)
-			.navigationBarTitleDisplayMode(.inline)
-			.navigationBarInlineTitleFont(.app.secondaryHeader)
+			.radixToolbar(title: titleString)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					CloseButton(action: closeButtonAction)

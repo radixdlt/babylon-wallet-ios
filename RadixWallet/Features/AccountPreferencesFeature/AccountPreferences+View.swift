@@ -72,12 +72,7 @@ extension AccountPreferences {
 				}
 				.destination(store: store)
 				.background(.app.gray5)
-				.navigationTitle(L10n.AccountSettings.title)
-				.navigationBarTitleColor(.app.gray1)
-				.navigationBarTitleDisplayMode(.inline)
-				.navigationBarInlineTitleFont(.app.secondaryHeader)
-				.toolbarBackground(.app.background, for: .navigationBar)
-				.toolbarBackground(.visible, for: .navigationBar)
+				.radixToolbar(title: L10n.AccountSettings.title)
 			}
 		}
 	}

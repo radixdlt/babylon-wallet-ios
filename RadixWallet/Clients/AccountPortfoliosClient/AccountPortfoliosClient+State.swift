@@ -18,7 +18,7 @@ extension AccountPortfoliosClient {
 	actor State {
 		typealias TokenPrices = [ResourceAddress: Decimal192]
 		let portfoliosSubject: AsyncCurrentValueSubject<Loadable<[AccountAddress: AccountPortfolio]>> = .init(.loading)
-		var tokenPrices: TokenPrices = [:]
+		var tokenPrices: Result<TokenPrices, Error> = .success([:])
 
 		var selectedCurrency: FiatCurrency = .usd
 		var isCurrencyAmountVisible: Bool = true
@@ -58,7 +58,7 @@ extension AccountPortfoliosClient.State {
 	}
 
 	private func setOrUpdateAccountPortfolios(_ portfolios: [AccountPortfoliosClient.AccountPortfolio]) {
-		var newValue: [AccountAddress: AccountPortfoliosClient.AccountPortfolio] = [:]
+		var newValue: [AccountAddress: AccountPortfoliosClient.AccountPortfolio] = portfoliosSubject.value.wrappedValue ?? [:]
 		for portfolio in portfolios {
 			newValue[portfolio.account.address] = portfolio
 		}
@@ -74,7 +74,7 @@ extension AccountPortfoliosClient.State {
 		applyFiatCurrency(to: &portfolio)
 	}
 
-	func setTokenPrices(_ tokenPrices: TokenPrices) {
+	func setTokenPrices(_ tokenPrices: Result<TokenPrices, Error>) {
 		self.tokenPrices = tokenPrices
 		if var existingPortfolios = portfoliosSubject.value.values.wrappedValue.map({ Array($0) }) {
 			applyTokenPrices(to: &existingPortfolios)
@@ -129,26 +129,33 @@ extension AccountPortfoliosClient.State {
 extension AccountPortfoliosClient.State {
 	func calculateWorth(_ gateway: Gateway) -> (ResourceAddress, ResourceAmount) -> FiatWorth? {
 		{ resourceAddress, amount in
-			let price = {
-				#if DEBUG
-				if gateway != .mainnet {
-					if resourceAddress == .mainnetXRD {
-						return self.tokenPrices[resourceAddress]
-					} else {
-						return self.tokenPrices.values.randomElement()
-					}
-				} else {
-					return self.tokenPrices[resourceAddress]
+			let worth: FiatWorth.Worth? = {
+				guard case let .success(tokenPrices) = self.tokenPrices else {
+					return .unknown
 				}
-				#else
-				return self.tokenPrices[resourceAddress]
-				#endif
+
+				let price = {
+					#if DEBUG
+					if gateway != .mainnet {
+						if resourceAddress == .mainnetXRD {
+							return tokenPrices[resourceAddress]
+						} else {
+							return tokenPrices.values.randomElement()
+						}
+					} else {
+						return tokenPrices[resourceAddress]
+					}
+					#else
+					return tokenPrices[resourceAddress]
+					#endif
+				}()
+				return price.map { .known($0 * amount.nominalAmount) }
 			}()
 
-			return price.map {
+			return worth.map {
 				.init(
 					isVisible: self.isCurrencyAmountVisible,
-					worth: .known($0 * amount.nominalAmount),
+					worth: $0,
 					currency: self.selectedCurrency
 				)
 			}

@@ -34,7 +34,7 @@ struct SettingsRow<Feature: FeatureReducer>: View {
 
 // MARK: SettingsRow.Kind
 extension SettingsRow {
-	enum Kind: Identifiable {
+	enum Kind {
 		/// A standard tappable row with the details specified on the `Model`
 		case model(Model)
 
@@ -43,17 +43,6 @@ extension SettingsRow {
 
 		/// Similar to the `.header`, but with no title.
 		case separator
-
-		var id: String {
-			switch self {
-			case let .model(model):
-				model.id
-			case .separator:
-				"separator"
-			case let .header(value):
-				value
-			}
-		}
 	}
 }
 

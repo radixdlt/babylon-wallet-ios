@@ -605,10 +605,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.destination = nil
 			return delayedShortEffect(for: .delegate(.dismiss))
 
-		case .fungibleTokenDetails(.delegate(.dismiss)):
-			state.destination = nil
-			return .none
-
 		default:
 			return .none
 		}

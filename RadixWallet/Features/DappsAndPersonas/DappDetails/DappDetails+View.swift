@@ -53,7 +53,7 @@ extension DappDetails.View {
 						.padding(.bottom, .large2)
 					}
 				}
-				.navigationTitle(viewStore.title)
+				.radixToolbar(title: viewStore.title)
 			}
 		}
 		.onAppear {

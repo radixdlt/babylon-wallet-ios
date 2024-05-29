@@ -90,7 +90,7 @@ actor DataChannelClient {
 
 	func sendMessage(_ data: Data) async throws {
 		let id = messageIDBuilder()
-		let assembledMessage = try AssembledMessage(
+		let assembledMessage = AssembledMessage(
 			message: data,
 			id: id
 		)

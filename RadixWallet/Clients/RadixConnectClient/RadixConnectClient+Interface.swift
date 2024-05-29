@@ -21,11 +21,11 @@ extension P2P {
 
 // MARK: - RadixConnectClient
 public struct RadixConnectClient: DependencyKey, Sendable {
-	/// Connects to the p2p links stored in the current profile
-	public var loadFromProfileAndConnectAll: LoadFromProfileAndConnectAll
+	/// Connects to the p2p links stored in secure storage.
+	public var loadP2PLinksAndConnectAll: LoadFromProfileAndConnectAll
 	public var disconnectAll: DisconnectAll
 
-	/// Connects to a given list of p2p links, those will not be stored in profile.
+	/// Connects to a given list of p2p links, those will not be stored in secure storage.
 	public var connectToP2PLinks: ConnectToP2PLinks
 
 	public var getLocalNetworkAccess: GetLocalNetworkAccess
@@ -33,9 +33,9 @@ public struct RadixConnectClient: DependencyKey, Sendable {
 	public var getP2PLinks: GetP2PLinks
 	public var getP2PLinksWithConnectionStatusUpdates: GetP2PLinksWithConnectionStatusUpdates
 	public var idsOfConnectedPeerConnections: IDsOfConnectedPeerConnections
-	public var storeP2PLink: StoreP2PLink
+	public var updateOrAddP2PLink: UpdateOrAddP2PLink
 	public var deleteP2PLinkByPassword: DeleteP2PLinkByPassword
-	public var addP2PWithPassword: AddP2PWithPassword
+	public var connectP2PLink: ConnectP2PLink
 
 	public var receiveMessages: ReceiveMessages
 
@@ -55,9 +55,9 @@ extension RadixConnectClient {
 	public typealias GetP2PLinksWithConnectionStatusUpdates = @Sendable () async -> AnyAsyncSequence<[P2P.LinkConnectionUpdate]>
 	public typealias IDsOfConnectedPeerConnections = @Sendable () async -> [PeerConnectionID]
 
-	public typealias StoreP2PLink = @Sendable (P2PLink) async throws -> Void
+	public typealias UpdateOrAddP2PLink = @Sendable (P2PLink) async throws -> Void
 
-	public typealias AddP2PWithPassword = @Sendable (RadixConnectPassword) async throws -> Void
+	public typealias ConnectP2PLink = @Sendable (P2PLink) async throws -> Void
 	public typealias DeleteP2PLinkByPassword = @Sendable (RadixConnectPassword) async throws -> Void
 
 	public typealias ReceiveMessages = @Sendable () async -> AnyAsyncSequence<P2P.RTCIncomingMessage>

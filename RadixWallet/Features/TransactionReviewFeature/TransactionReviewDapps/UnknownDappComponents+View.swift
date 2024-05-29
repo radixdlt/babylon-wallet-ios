@@ -14,9 +14,8 @@ extension UnknownDappComponents {
 						row(address, heading: state.rowHeading)
 					}
 				}
-				.navigationTitle(state.title)
+				.radixToolbar(title: state.title, alwaysVisible: false)
 			}
-			.navigationBarTitleDisplayMode(.inline)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					CloseButton { store.send(.view(.closeButtonTapped)) }

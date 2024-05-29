@@ -80,7 +80,7 @@ private extension View {
 	func destinations(with store: StoreOf<TransferAccountList>) -> some View {
 		let destinationStore = store.destination
 		return chooseAccount(with: destinationStore)
-			.addAsset(with: destinationStore)
+			.addAsset(with: destinationStore, store: store)
 	}
 
 	private func chooseAccount(with destinationStore: PresentationStoreOf<TransferAccountList.Destination>) -> some View {
@@ -89,13 +89,12 @@ private extension View {
 		}
 	}
 
-	private func addAsset(with destinationStore: PresentationStoreOf<TransferAccountList.Destination>) -> some View {
+	private func addAsset(with destinationStore: PresentationStoreOf<TransferAccountList.Destination>, store: StoreOf<TransferAccountList>) -> some View {
 		sheet(store: destinationStore.scope(state: \.state.addAsset, action: \.addAsset)) { assetsStore in
 			AssetsView.View(store: assetsStore)
-				.navigationTitle(L10n.AssetTransfer.AddAssets.navigationTitle)
-				.navigationBarTitleDisplayMode(.inline)
+				.radixToolbar(title: L10n.AssetTransfer.AddAssets.navigationTitle)
 				.withNavigationBar {
-					assetsStore.send(.view(.closeButtonTapped))
+					store.send(.view(.addAssetCloseButtonTapped))
 				}
 		}
 	}

@@ -14,6 +14,7 @@ extension SecureStorageClient: TestDependencyKey {
 		loadProfileSnapshotData: { _ in nil },
 		loadProfileSnapshot: { _ in nil },
 		loadProfile: { _ in nil },
+		deleteProfile: { _ in },
 		saveMnemonicForFactorSource: { _ in },
 		loadMnemonicByFactorSourceID: { _ in nil },
 		containsMnemonicIdentifiedByFactorSourceID: { _ in false },
@@ -27,6 +28,10 @@ extension SecureStorageClient: TestDependencyKey {
 		saveDeviceInfo: { _ in },
 		deprecatedLoadDeviceID: { nil },
 		deleteDeprecatedDeviceID: {},
+		loadP2PLinks: { nil },
+		saveP2PLinks: { _ in },
+		loadP2PLinksPrivateKey: { nil },
+		saveP2PLinksPrivateKey: { _ in },
 		getAllMnemonics: { [] }
 	)
 	#else
@@ -35,6 +40,7 @@ extension SecureStorageClient: TestDependencyKey {
 		loadProfileSnapshotData: { _ in nil },
 		loadProfileSnapshot: { _ in nil },
 		loadProfile: { _ in nil },
+		deleteProfile: { _ in },
 		saveMnemonicForFactorSource: { _ in },
 		loadMnemonicByFactorSourceID: { _ in nil },
 		containsMnemonicIdentifiedByFactorSourceID: { _ in false },
@@ -47,7 +53,11 @@ extension SecureStorageClient: TestDependencyKey {
 		loadDeviceInfo: { nil },
 		saveDeviceInfo: { _ in },
 		deprecatedLoadDeviceID: { nil },
-		deleteDeprecatedDeviceID: {}
+		deleteDeprecatedDeviceID: {},
+		loadP2PLinks: { nil },
+		saveP2PLinks: { _ in },
+		loadP2PLinksPrivateKey: { nil },
+		saveP2PLinksPrivateKey: { _ in }
 	)
 	#endif // DEBUG
 
@@ -59,6 +69,7 @@ extension SecureStorageClient: TestDependencyKey {
 		loadProfileSnapshotData: unimplemented("\(Self.self).loadProfileSnapshotData"),
 		loadProfileSnapshot: unimplemented("\(Self.self).loadProfileSnapshot"),
 		loadProfile: unimplemented("\(Self.self).loadProfile"),
+		deleteProfile: unimplemented("\(Self.self).deleteProfile"),
 		saveMnemonicForFactorSource: unimplemented("\(Self.self).saveMnemonicForFactorSource"),
 		loadMnemonicByFactorSourceID: unimplemented("\(Self.self).loadMnemonicByFactorSourceID"),
 		containsMnemonicIdentifiedByFactorSourceID: unimplemented("\(Self.self).containsMnemonicIdentifiedByFactorSourceID"),
@@ -72,6 +83,10 @@ extension SecureStorageClient: TestDependencyKey {
 		saveDeviceInfo: unimplemented("\(Self.self).saveDeviceInfo"),
 		deprecatedLoadDeviceID: unimplemented("\(Self.self).deprecatedLoadDeviceID"),
 		deleteDeprecatedDeviceID: unimplemented("\(Self.self).deleteDeprecatedDeviceID"),
+		loadP2PLinks: unimplemented("\(Self.self).loadP2PLinks"),
+		saveP2PLinks: unimplemented("\(Self.self).saveP2PLinks"),
+		loadP2PLinksPrivateKey: unimplemented("\(Self.self).loadP2PLinksPrivateKey"),
+		saveP2PLinksPrivateKey: unimplemented("\(Self.self).saveP2PLinksPrivateKey"),
 		getAllMnemonics: unimplemented("\(Self.self).getAllMnemonics")
 	)
 	#else
@@ -80,6 +95,7 @@ extension SecureStorageClient: TestDependencyKey {
 		loadProfileSnapshotData: unimplemented("\(Self.self).loadProfileSnapshotData"),
 		loadProfileSnapshot: unimplemented("\(Self.self).loadProfileSnapshot"),
 		loadProfile: unimplemented("\(Self.self).loadProfile"),
+		deleteProfile: unimplemented("\(Self.self).deleteProfile"),
 		saveMnemonicForFactorSource: unimplemented("\(Self.self).saveMnemonicForFactorSource"),
 		loadMnemonicByFactorSourceID: unimplemented("\(Self.self).loadMnemonicByFactorSourceID"),
 		containsMnemonicIdentifiedByFactorSourceID: unimplemented("\(Self.self).containsMnemonicIdentifiedByFactorSourceID"),
@@ -92,7 +108,11 @@ extension SecureStorageClient: TestDependencyKey {
 		loadDeviceInfo: unimplemented("\(Self.self).loadDeviceInfo"),
 		saveDeviceInfo: unimplemented("\(Self.self).saveDeviceInfo"),
 		deprecatedLoadDeviceID: unimplemented("\(Self.self).deprecatedLoadDeviceID"),
-		deleteDeprecatedDeviceID: unimplemented("\(Self.self).deleteDeprecatedDeviceID")
+		deleteDeprecatedDeviceID: unimplemented("\(Self.self).deleteDeprecatedDeviceID"),
+		loadP2PLinks: unimplemented("\(Self.self).loadP2PLinks"),
+		saveP2PLinks: unimplemented("\(Self.self).saveP2PLinks"),
+		loadP2PLinksPrivateKey: unimplemented("\(Self.self).loadP2PLinksPrivateKey"),
+		saveP2PLinksPrivateKey: unimplemented("\(Self.self).saveP2PLinksPrivateKey")
 	)
 	#endif
 }

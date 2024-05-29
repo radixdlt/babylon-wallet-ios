@@ -64,16 +64,28 @@ extension BackupsClient: DependencyKey {
 				}
 			},
 			lookupProfileSnapshotByHeader: { header in
-				try secureStorageClient.loadProfileSnapshot(header.id)
+				let containsP2PLinks = if let profileSnapshotData = try? secureStorageClient.loadProfileSnapshotData(header.id) {
+					Profile.checkIfProfileJsonContainsLegacyP2PLinks(contents: profileSnapshotData)
+				} else {
+					false
+				}
+				let profileSnapshot = try secureStorageClient.loadProfileSnapshot(header.id)
+
+				return (profileSnapshot, containsP2PLinks)
 			},
-			importProfileSnapshot: { snapshot, factorSourceIDs in
+			importProfileSnapshot: { snapshot, factorSourceIDs, containsP2PLinks in
 				try await importFor(factorSourceIDs: factorSourceIDs) {
 					try await profileStore.importProfileSnapshot(snapshot)
+					userDefaults.setShowRelinkConnectorsAfterProfileRestore(containsP2PLinks)
 				}
 			},
-			importCloudProfile: { header, factorSourceIDs in
+			didExportProfileSnapshot: { profile in
+				try userDefaults.setLastManualBackup(of: profile)
+			},
+			importCloudProfile: { header, factorSourceIDs, containsP2PLinks in
 				try await importFor(factorSourceIDs: factorSourceIDs) {
 					try await profileStore.importCloudProfileSnapshot(header)
+					userDefaults.setShowRelinkConnectorsAfterProfileRestore(containsP2PLinks)
 				}
 			},
 			loadDeviceID: {

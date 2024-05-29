@@ -29,7 +29,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		public var newMainBDFS: DeviceFactorSource?
 
 		public enum Context: Sendable, Hashable {
-			case fromOnboarding(profileSnapshot: Profile)
+			case fromOnboarding(profile: Profile)
 			case notOnboarding
 
 			var profileSnapshotFromOnboarding: Profile? {
@@ -255,20 +255,16 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 			return .none
 		} else {
 			state.destination = nil
-			guard let newMainBDFS = state.newMainBDFS else {
-				return .send(.delegate(.finishedImportingMnemonics(skipped: state.skipped, imported: state.imported, notYetSavedNewMainBDFS: nil)))
-			}
-			if state.context.isFromOnboarding {
-				return .send(.delegate(.finishedImportingMnemonics(skipped: state.skipped, imported: state.imported, notYetSavedNewMainBDFS: state.newMainBDFS)))
-			} else {
-				return .run { [skipped = state.skipped, imported = state.imported] send in
+			return .run { [skipped = state.skipped, imported = state.imported, newMainBDFS = state.newMainBDFS, context = state.context] send in
+				if let newMainBDFS, !context.isFromOnboarding {
 					try await factorSourcesClient.saveNewMainBDFS(newMainBDFS)
-					return await send(.delegate(.finishedImportingMnemonics(
-						skipped: skipped,
-						imported: imported,
-						notYetSavedNewMainBDFS: nil
-					)))
 				}
+
+				return await send(.delegate(.finishedImportingMnemonics(
+					skipped: skipped,
+					imported: imported,
+					notYetSavedNewMainBDFS: newMainBDFS
+				)))
 			}
 		}
 	}

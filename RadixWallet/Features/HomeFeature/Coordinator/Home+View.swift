@@ -153,6 +153,7 @@ private extension View {
 			.importMnemonics(with: destinationStore)
 			.acknowledgeJailbreakAlert(with: destinationStore)
 			.userFeedback(with: destinationStore)
+			.relinkConnector(with: destinationStore)
 	}
 
 	private func accountDetails(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
@@ -205,6 +206,15 @@ private extension View {
 			state: /Home.Destination.State.npsSurvey,
 			action: Home.Destination.Action.npsSurvey,
 			content: { NPSSurvey.View(store: $0) }
+		)
+	}
+
+	private func relinkConnector(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /Home.Destination.State.relinkConnector,
+			action: Home.Destination.Action.relinkConnector,
+			content: { NewConnection.View(store: $0) }
 		)
 	}
 }

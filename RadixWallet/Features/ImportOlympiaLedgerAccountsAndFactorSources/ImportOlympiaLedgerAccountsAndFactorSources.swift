@@ -95,7 +95,6 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.importLegacyWalletClient) var importLegacyWalletClient
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
-	@Dependency(\.p2pLinksClient) var p2pLinksClient
 
 	public init() {}
 
@@ -197,15 +196,11 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 				state.destination = nil
 
 				return .run { _ in
-					try await p2pLinksClient.addP2PLink(connectedClient)
+					try await radixConnectClient.updateOrAddP2PLink(connectedClient)
 				} catch: { error, _ in
 					loggerGlobal.error("Failed P2PLink, error \(error)")
 					errorQueue.schedule(error)
 				}
-
-			case .dismiss:
-				state.destination = nil
-				return .none
 			}
 
 		case let .nameLedger(.delegate(delegateAction)):

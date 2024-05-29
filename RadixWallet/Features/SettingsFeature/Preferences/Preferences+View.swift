@@ -42,7 +42,7 @@ public extension Preferences {
 
 		public var body: some SwiftUI.View {
 			content
-				.setUpNavigationBar(title: L10n.Preferences.title)
+				.radixToolbar(title: L10n.Preferences.title)
 				.tint(.app.gray1)
 				.foregroundColor(.app.gray1)
 				.presentsLoadingViewOverlay()
@@ -57,7 +57,7 @@ extension Preferences.View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(spacing: .zero) {
-					ForEach(rows) { kind in
+					ForEachStatic(rows) { kind in
 						SettingsRow(kind: kind, store: store)
 					}
 
@@ -68,7 +68,7 @@ extension Preferences.View {
 					#endif
 				}
 			}
-			.background(Color.app.gray4)
+			.background(Color.app.gray5)
 			.onAppear {
 				viewStore.send(.appeared)
 			}

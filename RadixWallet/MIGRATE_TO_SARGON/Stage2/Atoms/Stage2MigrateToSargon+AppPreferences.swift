@@ -11,15 +11,6 @@ extension AppPreferences {
 	public mutating func changeCurrentToMainnetIfNeeded() {
 		gateways.changeCurrentToMainnetIfNeeded()
 	}
-
-	/// Appends a new `P2PLink`, returns `nil` if it was not inserted (because already present).
-	@discardableResult
-	public mutating func appendP2PLink(_ p2pLink: P2PLink) -> P2PLink? {
-		var identifiedP2PLinks = p2pLinks.asIdentified()
-		let appended = identifiedP2PLinks.appendP2PLink(p2pLink)
-		p2pLinks = identifiedP2PLinks.elements
-		return appended
-	}
 }
 
 extension P2PLinks {
@@ -43,7 +34,6 @@ extension AppPreferences {
 				"transaction": transaction,
 				"security": security,
 				"display": display,
-				"p2pLinks": p2pLinks,
 				"gateways": gateways,
 			],
 			displayStyle: .struct
@@ -55,7 +45,6 @@ extension AppPreferences {
 		transaction: \(transaction),
 		security: \(security),
 		display: \(display),
-		p2pLinks: \(p2pLinks),
 		gateways: \(gateways)
 		"""
 	}
