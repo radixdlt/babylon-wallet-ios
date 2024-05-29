@@ -101,6 +101,11 @@ extension CloudBackupClient {
 				throw NoProfileInRecordError()
 			}
 
+			let data_ = try String(contentsOf: fileURL, encoding: .utf8)
+			print("••• READ \(data_)")
+			let profile_ = try Profile(jsonString: data_)
+			//			print("••• \(profile == profile_)")
+
 			let data = try Data(contentsOf: fileURL)
 			let containsLegacyP2PLinks = Profile.checkIfProfileJsonContainsLegacyP2PLinks(contents: data)
 			let profile = try Profile(jsonData: data)
