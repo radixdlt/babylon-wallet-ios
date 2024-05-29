@@ -71,12 +71,17 @@ extension DeviceFactorSourceClient: DependencyKey {
 			)
 		}
 
-		let isSeedPhraseNeededToRecoverAccounts: @Sendable () async throws -> Bool = {
+		let mnemonicMissingEntities: @Sendable () async throws -> (accounts: [AccountAddress], personas: [IdentityAddress]) = {
 			let deviceFactorSources = try await factorSourcesClient.getFactorSources(type: DeviceFactorSource.self)
 			let entities = try await deviceFactorSources.asyncMap {
 				try await entitiesControlledByFactorSource($0, nil)
 			}
-			return entities.contains(where: { !$0.isMnemonicPresentInKeychain })
+			.filter { !$0.isMnemonicPresentInKeychain }
+
+			let accounts = entities.flatMap { $0.accounts + $0.hiddenAccounts }.map(\.address)
+			let personas = entities.flatMap { $0.personas + $0.hiddenPersonas }.map(\.address)
+
+			return (accounts, personas)
 		}
 
 		let unrecoverableEntities: @Sendable () async throws -> (accounts: [AccountAddress], personas: [IdentityAddress]) = {
@@ -84,14 +89,11 @@ extension DeviceFactorSourceClient: DependencyKey {
 			let entities = try await deviceFactorSources.asyncMap {
 				try await entitiesControlledByFactorSource($0, nil)
 			}
-			var accounts: [AccountAddress] = []
-			var personas: [IdentityAddress] = []
-			for entity in entities {
-				if !entity.isMnemonicMarkedAsBackedUp {
-					accounts.append(contentsOf: entity.accounts.map(\.address))
-					personas.append(contentsOf: entity.personas.map(\.address))
-				}
-			}
+			.filter { !$0.isMnemonicMarkedAsBackedUp }
+
+			let accounts = entities.flatMap { $0.accounts + $0.hiddenAccounts }.map(\.address)
+			let personas = entities.flatMap { $0.personas + $0.hiddenPersonas }.map(\.address)
+
 			return (accounts, personas)
 		}
 
@@ -155,7 +157,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 					try await entitiesControlledByFactorSource($0, maybeOverridingSnapshot)
 				})
 			},
-			isSeedPhraseNeededToRecoverAccounts: isSeedPhraseNeededToRecoverAccounts,
+			mnemonicMissingEntities: mnemonicMissingEntities,
 			unrecoverableEntities: unrecoverableEntities
 		)
 	}()
