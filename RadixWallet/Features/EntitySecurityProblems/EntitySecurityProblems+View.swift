@@ -1,13 +1,13 @@
-// MARK: - EntitySecurity.View
+// MARK: - EntitySecurityProblems.View
 
-public extension EntitySecurity {
+public extension EntitySecurityProblems {
 	typealias ViewState = State
 
 	@MainActor
 	struct View: SwiftUI.View {
-		private let store: StoreOf<EntitySecurity>
+		private let store: StoreOf<EntitySecurityProblems>
 
-		public init(store: StoreOf<EntitySecurity>) {
+		public init(store: StoreOf<EntitySecurityProblems>) {
 			self.store = store
 		}
 

@@ -125,7 +125,7 @@ extension Home.AccountRow {
 
 					ownedResourcesList(viewStore)
 
-					EntitySecurity.View(store: store.entitySecurity)
+					EntitySecurityProblems.View(store: store.entitySecurityProblems)
 				}
 				.padding(.horizontal, .medium1)
 				.padding(.vertical, .medium2)
@@ -384,8 +384,8 @@ extension Home.AccountRow.ViewState.AccountTag {
 }
 
 private extension StoreOf<Home.AccountRow> {
-	var entitySecurity: StoreOf<EntitySecurity> {
-		scope(state: \.entitySecurity, action: \.child.entitySecurity)
+	var entitySecurityProblems: StoreOf<EntitySecurityProblems> {
+		scope(state: \.entitySecurityProblems, action: \.child.entitySecurityProblems)
 	}
 }
 

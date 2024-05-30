@@ -6,7 +6,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, AccountWithInfoHolder {
 		public var accountWithInfo: AccountWithInfo
 		var assets: AssetsView.State
-		var entitySecurity: EntitySecurity.State
+		var entitySecurityProblems: EntitySecurityProblems.State
 		var showFiatWorth: Bool
 
 		@PresentationState
@@ -22,7 +22,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 				account: accountWithInfo.account,
 				mode: .normal
 			)
-			self.entitySecurity = .init(kind: .account(accountWithInfo.account.address))
+			self.entitySecurityProblems = .init(kind: .account(accountWithInfo.account.address))
 		}
 	}
 
@@ -38,7 +38,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case assets(AssetsView.Action)
-		case entitySecurity(EntitySecurity.Action)
+		case entitySecurityProblems(EntitySecurityProblems.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -120,8 +120,8 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		Scope(state: \.assets, action: /Action.child .. ChildAction.assets) {
 			AssetsView()
 		}
-		Scope(state: \.entitySecurity, action: /Action.child .. ChildAction.entitySecurity) {
-			EntitySecurity()
+		Scope(state: \.entitySecurityProblems, action: /Action.child .. ChildAction.entitySecurityProblems) {
+			EntitySecurityProblems()
 		}
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
@@ -221,7 +221,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			}
 			return .none
 
-		case .entitySecurity(.delegate(.openSecurityCenter)):
+		case .entitySecurityProblems(.delegate(.openSecurityCenter)):
 			state.destination = .securityCenter(.init())
 			return .none
 

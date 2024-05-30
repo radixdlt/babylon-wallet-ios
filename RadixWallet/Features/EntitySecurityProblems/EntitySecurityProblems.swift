@@ -1,5 +1,5 @@
-// MARK: - EntitySecurity
-public struct EntitySecurity: Sendable, FeatureReducer {
+// MARK: - EntitySecurityProblems
+public struct EntitySecurityProblems: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Kind: Sendable, Hashable {
 			case account(AccountAddress)
@@ -49,7 +49,7 @@ public struct EntitySecurity: Sendable, FeatureReducer {
 	}
 }
 
-private extension EntitySecurity {
+private extension EntitySecurityProblems {
 	func securityProblemsEffect() -> Effect<Action> {
 		.run { send in
 			for try await problems in await securityCenterClient.problems() {

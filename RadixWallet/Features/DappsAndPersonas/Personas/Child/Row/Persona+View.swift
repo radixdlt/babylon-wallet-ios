@@ -26,7 +26,7 @@ extension PersonaFeature {
 								Thumbnail(.persona, url: viewStore.thumbnail)
 							}
 							if showShield {
-								EntitySecurity.View(store: store.entitySecurity)
+								EntitySecurityProblems.View(store: store.entitySecurityProblems)
 									.padding(.horizontal, .medium3)
 									.padding(.vertical, .small2)
 							}
@@ -45,8 +45,8 @@ extension PersonaFeature {
 }
 
 private extension StoreOf<PersonaFeature> {
-	var entitySecurity: StoreOf<EntitySecurity> {
-		scope(state: \.entitySecurity, action: \.child.entitySecurity)
+	var entitySecurityProblems: StoreOf<EntitySecurityProblems> {
+		scope(state: \.entitySecurityProblems, action: \.child.entitySecurityProblems)
 	}
 }
 

@@ -12,7 +12,7 @@ extension Home {
 			public var accountWithResources: Loadable<OnLedgerEntity.OnLedgerAccount>
 			public var showFiatWorth: Bool = true
 			public var totalFiatWorth: Loadable<FiatWorth>
-			public var entitySecurity: EntitySecurity.State
+			public var entitySecurityProblems: EntitySecurityProblems.State
 
 			public init(
 				account: Account
@@ -20,7 +20,7 @@ extension Home {
 				self.accountWithInfo = .init(account: account)
 				self.accountWithResources = .loading
 				self.totalFiatWorth = .loading
-				self.entitySecurity = .init(kind: .account(account.address))
+				self.entitySecurityProblems = .init(kind: .account(account.address))
 			}
 		}
 
@@ -40,7 +40,7 @@ extension Home {
 
 		@CasePathable
 		public enum ChildAction: Sendable, Equatable {
-			case entitySecurity(EntitySecurity.Action)
+			case entitySecurityProblems(EntitySecurityProblems.Action)
 		}
 
 		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
@@ -48,8 +48,8 @@ extension Home {
 		@Dependency(\.userDefaults) var userDefaults
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: \.entitySecurity, action: /Action.child .. ChildAction.entitySecurity) {
-				EntitySecurity()
+			Scope(state: \.entitySecurityProblems, action: /Action.child .. ChildAction.entitySecurityProblems) {
+				EntitySecurityProblems()
 			}
 			Reduce(core)
 		}
@@ -79,7 +79,7 @@ extension Home {
 
 		public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 			switch childAction {
-			case .entitySecurity(.delegate(.openSecurityCenter)):
+			case .entitySecurityProblems(.delegate(.openSecurityCenter)):
 				.send(.delegate(.openSecurityCenter))
 			default:
 				.none

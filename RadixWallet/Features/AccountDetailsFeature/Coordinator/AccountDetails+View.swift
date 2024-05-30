@@ -96,7 +96,7 @@ extension AccountDetails {
 			.padding(.top, .small1)
 			.padding([.horizontal, .bottom], .medium1)
 
-			EntitySecurity.View(store: store.entitySecurity)
+			EntitySecurityProblems.View(store: store.entitySecurityProblems)
 				.padding([.horizontal, .bottom], .medium1)
 		}
 
@@ -154,8 +154,8 @@ private extension StoreOf<AccountDetails> {
 		return scope(state: scopeState, action: Action.destination)
 	}
 
-	var entitySecurity: StoreOf<EntitySecurity> {
-		scope(state: \.entitySecurity, action: \.child.entitySecurity)
+	var entitySecurityProblems: StoreOf<EntitySecurityProblems> {
+		scope(state: \.entitySecurityProblems, action: \.child.entitySecurityProblems)
 	}
 }
 

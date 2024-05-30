@@ -7,7 +7,7 @@ public struct PersonaFeature: Sendable, FeatureReducer {
 		public let id: Persona.ID
 		public let thumbnail: URL?
 		public let displayName: String
-		public var entitySecurity: EntitySecurity.State
+		public var entitySecurityProblems: EntitySecurityProblems.State
 
 		public init(persona: AuthorizedPersonaDetailed) {
 			self.init(
@@ -36,7 +36,7 @@ public struct PersonaFeature: Sendable, FeatureReducer {
 			self.id = id
 			self.thumbnail = thumbnail
 			self.displayName = displayName
-			self.entitySecurity = .init(kind: .persona(identityAddress))
+			self.entitySecurityProblems = .init(kind: .persona(identityAddress))
 		}
 	}
 
@@ -46,7 +46,7 @@ public struct PersonaFeature: Sendable, FeatureReducer {
 
 	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
-		case entitySecurity(EntitySecurity.Action)
+		case entitySecurityProblems(EntitySecurityProblems.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -57,8 +57,8 @@ public struct PersonaFeature: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.entitySecurity, action: /Action.child .. ChildAction.entitySecurity) {
-			EntitySecurity()
+		Scope(state: \.entitySecurityProblems, action: /Action.child .. ChildAction.entitySecurityProblems) {
+			EntitySecurityProblems()
 		}
 		Reduce(core)
 	}
@@ -72,7 +72,7 @@ public struct PersonaFeature: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case .entitySecurity(.delegate(.openSecurityCenter)):
+		case .entitySecurityProblems(.delegate(.openSecurityCenter)):
 			.send(.delegate(.openSecurityCenter))
 		default:
 			.none

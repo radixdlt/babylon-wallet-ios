@@ -925,8 +925,8 @@
 		5BBC43A92BBAC6B0005747B1 /* AppTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC43A82BBAC6B0005747B1 /* AppTextEditor.swift */; };
 		5BC82B6C2BED18A1009AC162 /* FactoryReset+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC82B6A2BED18A1009AC162 /* FactoryReset+View.swift */; };
 		5BC82B6D2BED18A1009AC162 /* FactoryReset+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC82B6B2BED18A1009AC162 /* FactoryReset+Reducer.swift */; };
-		5BDEAA5A2C075C7400D0680A /* EntitySecurityFeature+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDEAA582C075C7400D0680A /* EntitySecurityFeature+View.swift */; };
-		5BDEAA5B2C075C7400D0680A /* EntitySecurityFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDEAA592C075C7400D0680A /* EntitySecurityFeature.swift */; };
+		5BDEAA5A2C075C7400D0680A /* EntitySecurityProblems+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDEAA582C075C7400D0680A /* EntitySecurityProblems+View.swift */; };
+		5BDEAA5B2C075C7400D0680A /* EntitySecurityProblems.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDEAA592C075C7400D0680A /* EntitySecurityProblems.swift */; };
 		830818482B9F1621002D8351 /* HTTPClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830818472B9F1621002D8351 /* HTTPClient+Live.swift */; };
 		8308184A2B9F162B002D8351 /* HTTPClient+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830818492B9F162B002D8351 /* HTTPClient+Mock.swift */; };
 		8308184C2B9F169B002D8351 /* TokenPriceClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8308184B2B9F169B002D8351 /* TokenPriceClient+Live.swift */; };
@@ -2058,8 +2058,8 @@
 		5BBC43A82BBAC6B0005747B1 /* AppTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTextEditor.swift; sourceTree = "<group>"; };
 		5BC82B6A2BED18A1009AC162 /* FactoryReset+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactoryReset+View.swift"; sourceTree = "<group>"; };
 		5BC82B6B2BED18A1009AC162 /* FactoryReset+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactoryReset+Reducer.swift"; sourceTree = "<group>"; };
-		5BDEAA582C075C7400D0680A /* EntitySecurityFeature+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EntitySecurityFeature+View.swift"; sourceTree = "<group>"; };
-		5BDEAA592C075C7400D0680A /* EntitySecurityFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitySecurityFeature.swift; sourceTree = "<group>"; };
+		5BDEAA582C075C7400D0680A /* EntitySecurityProblems+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EntitySecurityProblems+View.swift"; sourceTree = "<group>"; };
+		5BDEAA592C075C7400D0680A /* EntitySecurityProblems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitySecurityProblems.swift; sourceTree = "<group>"; };
 		830818472B9F1621002D8351 /* HTTPClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPClient+Live.swift"; sourceTree = "<group>"; };
 		830818492B9F162B002D8351 /* HTTPClient+Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPClient+Mock.swift"; sourceTree = "<group>"; };
 		8308184B2B9F169B002D8351 /* TokenPriceClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TokenPriceClient+Live.swift"; sourceTree = "<group>"; };
@@ -2510,7 +2510,7 @@
 		48CFBC602ADC10D800E77A5C /* Features */ = {
 			isa = PBXGroup;
 			children = (
-				5BDEAA572C075C4B00D0680A /* EntitySecurityFeature */,
+				5BDEAA572C075C4B00D0680A /* EntitySecurityProblems */,
 				A43F1E242BC96EF2001DD3FA /* SecurityCenterFeature */,
 				48D5F3972BD8DE0A000DE964 /* DebugInspectProfile */,
 				5B45E2F32BC45706007C4C84 /* FactorSourceAccess */,
@@ -5723,13 +5723,13 @@
 			path = SensitiveInfoClient;
 			sourceTree = "<group>";
 		};
-		5BDEAA572C075C4B00D0680A /* EntitySecurityFeature */ = {
+		5BDEAA572C075C4B00D0680A /* EntitySecurityProblems */ = {
 			isa = PBXGroup;
 			children = (
-				5BDEAA582C075C7400D0680A /* EntitySecurityFeature+View.swift */,
-				5BDEAA592C075C7400D0680A /* EntitySecurityFeature.swift */,
+				5BDEAA582C075C7400D0680A /* EntitySecurityProblems+View.swift */,
+				5BDEAA592C075C7400D0680A /* EntitySecurityProblems.swift */,
 			);
-			path = EntitySecurityFeature;
+			path = EntitySecurityProblems;
 			sourceTree = "<group>";
 		};
 		830EA9D42AE94014004C8051 /* AccountAndPersonaHidingFeature */ = {
@@ -7436,8 +7436,8 @@
 				48CFC3222ADC10D900E77A5C /* NewConnection+View.swift in Sources */,
 				48CFC4462ADC10DA00E77A5C /* OnboardingClient+Interface.swift in Sources */,
 				5B758D5C2BCEC3B200348722 /* Troubleshooting+View.swift in Sources */,
-				5BDEAA5A2C075C7400D0680A /* EntitySecurityFeature+View.swift in Sources */,
-				5BDEAA5B2C075C7400D0680A /* EntitySecurityFeature.swift in Sources */,
+				5BDEAA5A2C075C7400D0680A /* EntitySecurityProblems+View.swift in Sources */,
+				5BDEAA5B2C075C7400D0680A /* EntitySecurityProblems.swift in Sources */,
 				5B758D5D2BCEC3B200348722 /* Troubleshooting.swift in Sources */,
 				48CFC60A2ADC10DA00E77A5C /* PersonaDataRequestResponseItem.swift in Sources */,
 				83EE5EDB2BE3C16F00B1531D /* RoyaltyAmount.swift in Sources */,
