@@ -101,9 +101,9 @@ extension CloudBackupClient {
 				throw NoProfileInRecordError()
 			}
 
-			let data = try Data(contentsOf: fileURL)
-			let containsLegacyP2PLinks = Profile.checkIfProfileJsonContainsLegacyP2PLinks(contents: data)
-			let profile = try Profile(jsonData: data)
+			let json = try String(contentsOf: fileURL, encoding: .utf8)
+			let containsLegacyP2PLinks = Profile.checkIfProfileJsonStringContainsLegacyP2PLinks(jsonString: json)
+			let profile = try Profile(jsonString: json)
 			try FileManager.default.removeItem(at: fileURL)
 
 			guard try getMetadata(record) == profile.header.metadata else {
