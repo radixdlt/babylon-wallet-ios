@@ -42,8 +42,8 @@ extension DisplayMnemonics {
 				}
 				.background(.app.gray5)
 				.radixToolbar(title: L10n.SeedPhrases.title)
-				.onFirstTask { @MainActor in
-					await viewStore.send(.onFirstTask).finish()
+				.onAppear {
+					viewStore.send(.appeared)
 				}
 			}
 			.destinations(with: store)
