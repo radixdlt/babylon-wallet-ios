@@ -112,12 +112,12 @@ extension SelectBackup.View {
 
 	@MainActor
 	private func cloudBackupDataCard(
-		_ item: SelectionItem<CloudBackupClient.ProfileMetadata>,
+		_ item: SelectionItem<Profile.Header>,
 		viewStore: ViewStoreOf<SelectBackup>
 	) -> some View {
-		let metadata = item.value
+		let header = item.value
 		let isVersionCompatible = header.isVersionCompatible()
-		let creatingDevice = metadata.creatingDeviceID == viewStore.thisDeviceID ? L10n.IOSProfileBackup.thisDevice : "header.creatingDevice.description" // FIXME: GK
+		let creatingDevice = header.creatingDevice.id == viewStore.thisDeviceID ? L10n.IOSProfileBackup.thisDevice : header.creatingDevice.description
 		return Card(action: item.action) {
 			HStack {
 				VStack(alignment: .leading, spacing: 0) {
