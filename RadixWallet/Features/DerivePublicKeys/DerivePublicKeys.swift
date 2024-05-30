@@ -89,8 +89,6 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 						.device
 					case let .ledger(ledger):
 						.ledger(ledger)
-					default:
-						fatalError("Implement")
 					}
 				case .specificPrivateHDFactorSource:
 					.device
@@ -99,7 +97,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 		}
 
 		public let purpose: Purpose
-		public var factorSourceAccess: FactorSourceAccess.State
+		public var factorSourceAccess: FactorSourceAccess.State?
 
 		public init(
 			derivationPathOption: DerivationPathOption,
@@ -109,7 +107,12 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 			self.derivationsPathOption = derivationPathOption
 			self.factorSourceOption = factorSourceOption
 			self.purpose = purpose
-			self.factorSourceAccess = .init(kind: factorSourceOption.factorSourceAccessKind, purpose: purpose.factorSourceAccessPurpose)
+			switch factorSourceOption {
+			case .device, .specific:
+				self.factorSourceAccess = .init(kind: factorSourceOption.factorSourceAccessKind, purpose: purpose.factorSourceAccessPurpose)
+			case .specificPrivateHDFactorSource:
+				self.factorSourceAccess = nil
+			}
 		}
 	}
 
@@ -144,10 +147,10 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.factorSourceAccess, action: /Action.child .. ChildAction.factorSourceAccess) {
-			FactorSourceAccess()
-		}
 		Reduce(core)
+			.ifLet(\.factorSourceAccess, action: /Action.child .. ChildAction.factorSourceAccess) {
+				FactorSourceAccess()
+			}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
@@ -155,7 +158,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 		case .start:
 			switch state.factorSourceOption {
 			case .device:
-				return .run { send in
+				.run { send in
 					let babylonFactorSource = try await factorSourcesClient.getMainDeviceFactorSource()
 					await send(.internal(.loadedDeviceFactorSource(babylonFactorSource)))
 				} catch: { error, send in
@@ -164,12 +167,12 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 				}
 
 			case let .specificPrivateHDFactorSource(privateHD):
-				return deriveWith(source: .privateHDFactorSource(privateHD), state)
+				deriveWith(source: .privateHDFactorSource(privateHD), state)
 
 			case let .specific(factorSource):
 				switch factorSource {
 				case let .device(deviceFactorSource):
-					return deriveWith(
+					deriveWith(
 						source: .loadMnemonicFor(
 							deviceFactorSource,
 							purpose: state.purpose.loadMnemonicPurpose
@@ -177,15 +180,12 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 						state
 					)
 				case let .ledger(ledgerFactorSource):
-					return deriveWith(ledgerFactorSource: ledgerFactorSource, state)
-				default:
-					loggerGlobal.critical("Unsupported factor source: \(factorSource)")
-					return .send(.delegate(.failedToDerivePublicKey))
+					deriveWith(ledgerFactorSource: ledgerFactorSource, state)
 				}
 			}
 
 		case let .loadedDeviceFactorSource(factorSource):
-			return deriveWith(
+			deriveWith(
 				source: .loadMnemonicFor(
 					factorSource,
 					purpose: state.purpose.loadMnemonicPurpose
@@ -194,7 +194,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 			)
 
 		case let .deriveWithDeviceFactor(derivationPath, networkID, source):
-			return deriveWith(
+			deriveWith(
 				derivationPaths: [derivationPath],
 				networkID: networkID,
 				source: source,
@@ -202,7 +202,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 			)
 
 		case let .deriveWithLedgerFactor(ledger, derivationPath, networkID):
-			return deriveWith(
+			deriveWith(
 				ledger: ledger,
 				derivationPaths: [derivationPath],
 				networkID: networkID,
@@ -401,7 +401,7 @@ extension DerivePublicKeys {
 			derivationPathScheme: derivationPathScheme,
 			networkID: maybeNetworkID
 		)
-		return try DerivationPath.forEntity(
+		return DerivationPath.forEntity(
 			kind: entityKind,
 			networkID: networkID,
 			index: index
