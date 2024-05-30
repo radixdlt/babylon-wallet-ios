@@ -36,6 +36,8 @@ public struct FullScreenOverlayCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
+
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
@@ -47,10 +49,15 @@ public struct FullScreenOverlayCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case .root(.claimWallet(.delegate(.dismiss))):
-			.send(.delegate(.dismiss))
+		case .root(.claimWallet(.delegate(.didClearWallet))):
+			overlayWindowClient.sendDelegateAction(.didClearWallet)
+			return .send(.delegate(.dismiss))
+
+		case .root(.claimWallet(.delegate(.didTransferBack))):
+			return .send(.delegate(.dismiss))
+
 		default:
-			.none
+			return .none
 		}
 	}
 }
