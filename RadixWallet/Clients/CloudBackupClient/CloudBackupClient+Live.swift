@@ -259,14 +259,20 @@ extension CloudBackupClient {
 	private static func setProfileHeader(_ header: Profile.Header, on record: CKRecord) {
 		record[.snapshotVersion] = header.snapshotVersion.rawValue
 		record[.creatingDeviceID] = header.creatingDevice.id.uuidString
-		record[.creatingDeviceDate] = header.creatingDevice.date
+		record[.creatingDeviceDate] = header.creatingDevice.date.roundedToMS
 		record[.creatingDeviceDescription] = header.creatingDevice.description
 		record[.lastUsedOnDeviceID] = header.lastUsedOnDevice.id.uuidString
-		record[.lastUsedOnDeviceDate] = header.lastUsedOnDevice.date
+		record[.lastUsedOnDeviceDate] = header.lastUsedOnDevice.date.roundedToMS
 		record[.lastUsedOnDeviceDescription] = header.lastUsedOnDevice.description
-		record[.lastModified] = header.lastModified
+		record[.lastModified] = header.lastModified.roundedToMS
 		record[.numberOfAccounts] = header.contentHint.numberOfAccountsOnAllNetworksInTotal
 		record[.numberOfPersonas] = header.contentHint.numberOfPersonasOnAllNetworksInTotal
 		record[.numberOfNetworks] = header.contentHint.numberOfNetworks
+	}
+}
+
+private extension Date {
+	var roundedToMS: Date {
+		Date(timeIntervalSince1970: 0.001 * (1000 * timeIntervalSince1970).rounded())
 	}
 }
