@@ -275,7 +275,6 @@ public struct Home: Sendable, FeatureReducer {
 		switch childAction {
 		case let .account(id, action: .delegate(delegateAction)):
 			guard let accountRow = state.accountRows[id: id] else { return .none }
-			let account = accountRow.account
 			switch delegateAction {
 			case .openDetails:
 				state.destination = .accountDetails(.init(accountWithInfo: accountRow.accountWithInfo, showFiatWorth: state.showFiatWorth))
