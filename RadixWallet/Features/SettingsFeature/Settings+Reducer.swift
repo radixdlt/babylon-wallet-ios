@@ -15,6 +15,7 @@ public struct Settings: Sendable, FeatureReducer {
 
 		public var userHasNoP2PLinks: Bool? = nil
 		public var securityProblems: [SecurityProblem] = []
+		fileprivate var personas: [IdentityAddress] = []
 
 		public init() {}
 	}
@@ -36,6 +37,7 @@ public struct Settings: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case setP2PLinks(P2PLinks)
 		case setSecurityProblems([SecurityProblem])
+		case setPersonas([IdentityAddress])
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -97,6 +99,7 @@ public struct Settings: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.p2pLinksClient) var p2pLinksClient
 	@Dependency(\.securityCenterClient) var securityCenterClient
+	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.userDefaults) var userDefaults
 
@@ -114,6 +117,7 @@ public struct Settings: Sendable, FeatureReducer {
 		case .appeared:
 			return p2pLinksEffect()
 				.merge(with: securityProblemsEffect())
+				.merge(with: personasEffect())
 
 		case .addConnectorButtonTapped:
 			state.destination = .manageP2PLinks(.init(destination: .newConnection(.init())))
@@ -157,6 +161,9 @@ public struct Settings: Sendable, FeatureReducer {
 		case let .setSecurityProblems(problems):
 			state.securityProblems = problems
 			return .none
+		case let .setPersonas(personas):
+			state.personas = personas
+			return .none
 		}
 	}
 
@@ -196,6 +203,28 @@ extension Settings {
 			for try await problems in await securityCenterClient.problems() {
 				guard !Task.isCancelled else { return }
 				await send(.internal(.setSecurityProblems(problems)))
+			}
+		}
+	}
+
+	private func personasEffect() -> Effect<Action> {
+		.run { send in
+			for try await personas in await personasClient.personas() {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.setPersonas(personas.map(\.address))))
+			}
+		}
+	}
+}
+
+extension Settings.State {
+	public var personasSecurityProblems: [SecurityProblem] {
+		securityProblems.filter {
+			switch $0 {
+			case .problem5, .problem6, .problem7:
+				!personas.isEmpty
+			case let .problem3(_, problematicPersonas), let .problem9(_, problematicPersonas):
+				!Set(problematicPersonas).isDisjoint(with: personas)
 			}
 		}
 	}

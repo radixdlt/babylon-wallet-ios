@@ -18,6 +18,7 @@ extension Settings {
 		#endif
 		let shouldShowAddP2PLinkButton: Bool
 		let securityProblems: [SecurityProblem]
+		let personasSecurityProblems: [SecurityProblem]
 		let appVersion: String
 
 		init(state: Settings.State) {
@@ -40,6 +41,7 @@ extension Settings {
 
 			self.shouldShowAddP2PLinkButton = state.userHasNoP2PLinks ?? false
 			self.securityProblems = state.securityProblems
+			self.personasSecurityProblems = state.personasSecurityProblems
 		}
 	}
 }
@@ -75,7 +77,7 @@ extension Settings.View {
 						}
 					}
 
-					ForEachStatic(rows(securityProblems: viewStore.securityProblems)) { kind in
+					ForEachStatic(rows(securityProblems: viewStore.securityProblems, personasProblems: viewStore.personasSecurityProblems)) { kind in
 						SettingsRow(kind: kind, store: store)
 					}
 				}
@@ -106,8 +108,8 @@ extension Settings.View {
 	}
 
 	@MainActor
-	private func rows(securityProblems: [SecurityProblem]) -> [SettingsRow<Settings>.Kind] {
-		var visibleRows = normalRows(securityProblems: securityProblems)
+	private func rows(securityProblems: [SecurityProblem], personasProblems: [SecurityProblem]) -> [SettingsRow<Settings>.Kind] {
+		var visibleRows = normalRows(securityProblems: securityProblems, personasProblems: personasProblems)
 		#if DEBUG
 		visibleRows.append(.separator)
 		visibleRows.append(.model(
@@ -120,7 +122,7 @@ extension Settings.View {
 	}
 
 	@MainActor
-	private func normalRows(securityProblems: [SecurityProblem]) -> [SettingsRow<Settings>.Kind] {
+	private func normalRows(securityProblems: [SecurityProblem], personasProblems: [SecurityProblem]) -> [SettingsRow<Settings>.Kind] {
 		[
 			.model(
 				title: L10n.WalletSettings.SecurityCenter.title,
@@ -133,6 +135,7 @@ extension Settings.View {
 			.model(
 				title: L10n.WalletSettings.Personas.title,
 				subtitle: L10n.WalletSettings.Personas.subtitle,
+				hints: personasHints(problems: personasProblems),
 				icon: .asset(AssetResource.personas),
 				action: .personasButtonTapped
 			),
@@ -169,6 +172,13 @@ extension Settings.View {
 	private func securityCenterHints(problems: [SecurityProblem]) -> [Hint.ViewState] {
 		problems.map { problem in
 			.init(kind: .warning, text: problem.walletSettingsSecurityCenter)
+		}
+	}
+
+	@MainActor
+	private func personasHints(problems: [SecurityProblem]) -> [Hint.ViewState] {
+		problems.map { problem in
+			.init(kind: .warning, text: problem.walletSettingsPersonas)
 		}
 	}
 }
