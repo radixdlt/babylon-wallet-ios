@@ -12,7 +12,7 @@ public struct CloudBackupClient: DependencyKey, Sendable {
 	public let checkAccountStatus: CheckAccountStatus
 	public let lastBackup: LastBackup
 	public let loadProfile: LoadProfile
-	public let loadAllProfiles: LoadAllProfiles
+	public let loadProfileHeaders: LoadProfileHeaders
 
 	public init(
 		startAutomaticBackups: @escaping StartAutomaticBackups,
@@ -22,7 +22,7 @@ public struct CloudBackupClient: DependencyKey, Sendable {
 		checkAccountStatus: @escaping CheckAccountStatus,
 		lastBackup: @escaping LastBackup,
 		loadProfile: @escaping LoadProfile,
-		loadAllProfiles: @escaping LoadAllProfiles
+		loadProfileHeaders: @escaping LoadProfileHeaders
 	) {
 		self.startAutomaticBackups = startAutomaticBackups
 		self.loadDeviceID = loadDeviceID
@@ -31,7 +31,7 @@ public struct CloudBackupClient: DependencyKey, Sendable {
 		self.checkAccountStatus = checkAccountStatus
 		self.lastBackup = lastBackup
 		self.loadProfile = loadProfile
-		self.loadAllProfiles = loadAllProfiles
+		self.loadProfileHeaders = loadProfileHeaders
 	}
 }
 
@@ -42,33 +42,15 @@ extension CloudBackupClient {
 	public typealias DeleteProfileBackup = @Sendable (ProfileID) async throws -> Void
 	public typealias CheckAccountStatus = @Sendable () async throws -> CKAccountStatus
 	public typealias LastBackup = @Sendable (ProfileID) -> AnyAsyncSequence<BackupResult?>
-	public typealias LoadProfile = @Sendable (ProfileID) async throws -> BackedupProfile?
-	public typealias LoadAllProfiles = @Sendable () async throws -> [BackedupProfile]
+	public typealias LoadProfile = @Sendable (ProfileID) async throws -> BackedUpProfile
+	public typealias LoadProfileHeaders = @Sendable () async throws -> [Profile.Header]
 }
 
-// MARK: CloudBackupClient.BackedupProfile
+// MARK: CloudBackupClient.BackedUpProfile
 extension CloudBackupClient {
-	public struct BackedupProfile: Hashable, Sendable {
+	public struct BackedUpProfile: Hashable, Sendable {
 		public let profile: Profile
 		public let containsLegacyP2PLinks: Bool
-	}
-
-	public struct ProfileMetadata: Hashable, Sendable {
-		public let snapshotVersion: ProfileSnapshotVersion
-		public let creatingDeviceID: UUID
-		public let lastUsedOnDeviceID: UUID
-		public let lastModified: Date
-		public let numberOfPersonas: UInt16
-		public let numberOfAccounts: UInt16
-
-		public init(snapshotVersion: ProfileSnapshotVersion, creatingDeviceID: UUID, lastUsedOnDeviceID: UUID, lastModified: Date, numberOfPersonas: UInt16, numberOfAccounts: UInt16) {
-			self.snapshotVersion = snapshotVersion
-			self.creatingDeviceID = creatingDeviceID
-			self.lastUsedOnDeviceID = lastUsedOnDeviceID
-			self.lastModified = lastModified.roundedToMS
-			self.numberOfPersonas = numberOfPersonas
-			self.numberOfAccounts = numberOfAccounts
-		}
 	}
 }
 

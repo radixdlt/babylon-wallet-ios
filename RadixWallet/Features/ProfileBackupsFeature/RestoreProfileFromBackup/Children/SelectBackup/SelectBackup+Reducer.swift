@@ -14,9 +14,9 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 		public var status: Status = .start
 
-		public var backedUpProfiles: [CloudBackupClient.BackedupProfile]? = nil
+		public var backedUpProfiles: [Profile.Header]? = nil
 
-		public var selectedProfile: CloudBackupClient.BackedupProfile? = nil
+		public var selectedProfile: Profile.Header? = nil
 
 		public var isDisplayingFileImporter: Bool
 		public var thisDeviceID: UUID?
@@ -60,18 +60,18 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case task
-		case selectedProfile(CloudBackupClient.BackedupProfile?)
+		case selectedProfile(Profile.Header?)
 		case importFromFileInstead
 		case dismissFileImporter
 		case otherRestoreOptionsTapped
 		case profileImportResult(Result<URL, NSError>)
-		case tappedUseCloudBackup(CloudBackupClient.BackedupProfile)
+		case tappedUseCloudBackup(ProfileID)
 		case closeButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case setStatus(State.Status)
-		case loadedCloudBackupProfiles([CloudBackupClient.BackedupProfile]?)
+		case loadedProfileHeadersFromCloudBackup([Profile.Header]?)
 		case loadedThisDeviceID(UUID?)
 	}
 
@@ -119,8 +119,11 @@ public struct SelectBackup: Sendable, FeatureReducer {
 			state.selectedProfile = profile
 			return .none
 
-		case let .tappedUseCloudBackup(backedupProfile):
-			return .send(.delegate(.selectedProfile(backedupProfile.profile, isInCloud: true, containsLegacyP2PLinks: backedupProfile.containsLegacyP2PLinks)))
+		case let .tappedUseCloudBackup(profileID):
+			return .run { send in
+				let backedupProfile = try await cloudBackupClient.loadProfile(profileID)
+				await send(.delegate(.selectedProfile(backedupProfile.profile, isInCloud: true, containsLegacyP2PLinks: backedupProfile.containsLegacyP2PLinks)))
+			}
 
 		case .dismissFileImporter:
 			state.isDisplayingFileImporter = false
@@ -166,8 +169,8 @@ public struct SelectBackup: Sendable, FeatureReducer {
 			state.status = status
 			return .none
 
-		case let .loadedCloudBackupProfiles(profiles):
-			state.backedUpProfiles = profiles?.sorted(by: \.profile.header.lastModified).reversed()
+		case let .loadedProfileHeadersFromCloudBackup(headers):
+			state.backedUpProfiles = headers?.sorted(by: \.lastModified).reversed()
 			return .none
 
 		case let .loadedThisDeviceID(identifier):
@@ -233,8 +236,8 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 				await send(.internal(.setStatus(.loading)))
 
-				try await send(.internal(.loadedCloudBackupProfiles(
-					cloudBackupClient.loadAllProfiles()
+				try await send(.internal(.loadedProfileHeadersFromCloudBackup(
+					cloudBackupClient.loadProfileHeaders()
 				)))
 
 				await send(.internal(.setStatus(.loaded)))
