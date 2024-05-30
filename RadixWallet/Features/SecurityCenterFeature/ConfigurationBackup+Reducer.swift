@@ -179,7 +179,6 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .didDeleteOutdatedBackup(id):
-			// FIXME: GK - show toast?
 			return .none
 
 		case let .setCloudBackupEnabled(isEnabled):
