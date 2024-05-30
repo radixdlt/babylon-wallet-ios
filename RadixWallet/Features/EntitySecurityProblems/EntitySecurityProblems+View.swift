@@ -13,12 +13,19 @@ public extension EntitySecurityProblems {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: identity, send: FeatureAction.view) { viewStore in
-				VStack(spacing: .small2) {
+				VStack(alignment: .leading, spacing: .small2) {
 					ForEach(viewStore.problems) { problem in
 						Button {
 							viewStore.send(.rowTapped)
 						} label: {
-							row(text: text(problem: problem, kind: viewStore.kind))
+							switch viewStore.kind {
+							case .account:
+								account(problem: problem)
+							case .persona:
+								WarningErrorView(text: problem.personas, type: .warning, useNarrowSpacing: true)
+									.frame(maxWidth: .infinity, alignment: .leading)
+									.padding(.bottom, .small3)
+							}
 						}
 					}
 				}
@@ -28,13 +35,13 @@ public extension EntitySecurityProblems {
 			}
 		}
 
-		private func row(text: String) -> some SwiftUI.View {
+		private func account(problem: SecurityProblem) -> some SwiftUI.View {
 			HStack(spacing: .zero) {
 				Image(.error)
 					.resizable()
 					.frame(width: .medium3, height: .medium3)
 
-				Text(text)
+				Text(problem.accountCard)
 					.textStyle(.body2HighImportance)
 					.padding(.leading, .small2)
 					.multilineTextAlignment(.leading)
@@ -45,15 +52,6 @@ public extension EntitySecurityProblems {
 			.padding(.small1)
 			.background(.app.whiteTransparent2)
 			.cornerRadius(.small2)
-		}
-
-		private func text(problem: SecurityProblem, kind: State.Kind) -> String {
-			switch kind {
-			case .account:
-				problem.accountCard
-			case .persona:
-				problem.personas
-			}
 		}
 	}
 }
