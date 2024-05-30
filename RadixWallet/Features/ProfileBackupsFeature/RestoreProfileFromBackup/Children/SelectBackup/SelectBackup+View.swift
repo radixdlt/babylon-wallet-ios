@@ -25,7 +25,7 @@ extension SelectBackup {
 					.footer {
 						WithControlRequirements(
 							viewStore.selectedProfile,
-							forAction: { viewStore.send(.tappedUseCloudBackup($0)) },
+							forAction: { viewStore.send(.tappedUseCloudBackup($0.id)) },
 							control: { action in
 								Button(L10n.IOSProfileBackup.useICloudBackup, action: action)
 									.buttonStyle(.primaryRectangular)
@@ -111,10 +111,13 @@ extension SelectBackup.View {
 	}
 
 	@MainActor
-	private func cloudBackupDataCard(_ item: SelectionItem<CloudBackupClient.BackedupProfile>, viewStore: ViewStoreOf<SelectBackup>) -> some View {
-		let header = item.value.profile.header
+	private func cloudBackupDataCard(
+		_ item: SelectionItem<CloudBackupClient.ProfileMetadata>,
+		viewStore: ViewStoreOf<SelectBackup>
+	) -> some View {
+		let metadata = item.value
 		let isVersionCompatible = header.isVersionCompatible()
-		let creatingDevice = header.creatingDevice.id == viewStore.thisDeviceID ? L10n.IOSProfileBackup.thisDevice : header.creatingDevice.description
+		let creatingDevice = metadata.creatingDeviceID == viewStore.thisDeviceID ? L10n.IOSProfileBackup.thisDevice : "header.creatingDevice.description" // FIXME: GK
 		return Card(action: item.action) {
 			HStack {
 				VStack(alignment: .leading, spacing: 0) {
