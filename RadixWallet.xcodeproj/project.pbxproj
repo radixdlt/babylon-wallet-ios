@@ -2105,6 +2105,7 @@
 		83B07C1B2BC565DE00F3FFA7 /* RadixConnectRelayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadixConnectRelayTests.swift; sourceTree = "<group>"; };
 		83D663AF2B271D0100D1AB9E /* TruncationMask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TruncationMask.swift; sourceTree = "<group>"; };
 		83DFAF2D2B4E8A51008B70CE /* View+Extra.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "View+Extra.swift"; sourceTree = "<group>"; };
+		83E3DF902C08695500F8CD7A /* RadixWalletBeta.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RadixWalletBeta.entitlements; sourceTree = "<group>"; };
 		83EA887D2B7E68EE00FF8424 /* TotalCurrencyWorthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TotalCurrencyWorthView.swift; sourceTree = "<group>"; };
 		83EE474F2AF027DF00155F03 /* AssetTransferDepositRuleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetTransferDepositRuleTests.swift; sourceTree = "<group>"; };
 		83EE47512AF0DE8E00155F03 /* TransactionPayloadGatewayHandlingStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionPayloadGatewayHandlingStatus.swift; sourceTree = "<group>"; };
@@ -2502,6 +2503,7 @@
 		48CFBC512ADC106300E77A5C /* RadixWallet */ = {
 			isa = PBXGroup;
 			children = (
+				83E3DF902C08695500F8CD7A /* RadixWalletBeta.entitlements */,
 				A468D7DF2BF743CF00AFED2E /* RadixWalletRelease.entitlements */,
 				A4A1379A2BE4630200D84B50 /* RadixWalletDebug-PreAlpha.entitlements */,
 				A473079A2BD9B0FA0077B5E2 /* RadixWalletDebug-Dev.entitlements */,
@@ -8338,6 +8340,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 48CFC6A02ADC110800E77A5C /* iOS-beta.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = RadixWallet/RadixWalletBeta.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_KEY_CFBundleDisplayName = "Radix Wallet";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
