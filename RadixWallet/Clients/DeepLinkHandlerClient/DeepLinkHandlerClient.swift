@@ -15,7 +15,7 @@ extension DeepLinkHandlerClient {
 }
 
 extension DeepLinkHandlerClient {
-	static let m2mDeepLinkHost = "d1rxdfxrfmemlj.cloudfront.net"
+	static let m2mDeepLinkHost = "dr6vsuukf8610.cloudfront.net"
 
 	public enum Error: LocalizedError {
 		case emptyQuery
@@ -76,7 +76,7 @@ extension DeepLinkHandlerClient {
 
 			let browser = queryItems.first(where: { $0.name == "browser" })?.value ?? "safari"
 
-			let publicKey = try Exactly33Bytes(hex: publicKeyItem)
+			let publicKey = try Exactly32Bytes(hex: publicKeyItem)
 
 			return try .linking(.init(origin: .webDapp(oringURL), sessionId: .init(sessionId), publicKey: .init(rawRepresentation: publicKey.data.data), browser: browser))
 		}
@@ -85,6 +85,7 @@ extension DeepLinkHandlerClient {
 			handleDeepLink: {
 				if let url = state.bufferedDeepLink {
 					state.bufferedDeepLink = nil
+					loggerGlobal.error("\(url.absoluteString)")
 					if url.host() == m2mDeepLinkHost {
 						do {
 							let request = try extractWalletConnectRequest(url)
