@@ -19,20 +19,28 @@ public struct ClaimWallet: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case dismiss
+		case didClearWallet
+		case didTransferBack
 	}
+
+	@Dependency(\.cacheClient) var cacheClient
+	@Dependency(\.radixConnectClient) var radixConnectClient
+	@Dependency(\.userDefaults) var userDefaults
 
 	public init() {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .clearWalletButtonTapped:
-			// TODO: clear wallet
-			.send(.delegate(.dismiss))
-
+			.run { send in
+				cacheClient.removeAll()
+				await radixConnectClient.disconnectAll()
+				userDefaults.removeAll()
+				await send(.delegate(.didClearWallet))
+			}
 		case .transferBackButtonTapped:
 			// TODO: transfer back
-			.send(.delegate(.dismiss))
+			.send(.delegate(.didTransferBack))
 		}
 	}
 }
