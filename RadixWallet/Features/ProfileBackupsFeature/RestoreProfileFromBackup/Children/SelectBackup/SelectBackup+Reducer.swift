@@ -14,9 +14,9 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 		public var status: Status = .start
 
-		public var backedUpProfiles: [CloudBackupClient.ProfileMetadata]? = nil
+		public var backedUpProfiles: [Profile.Header]? = nil
 
-		public var selectedProfile: CloudBackupClient.ProfileMetadata? = nil
+		public var selectedProfile: Profile.Header? = nil
 
 		public var isDisplayingFileImporter: Bool
 		public var thisDeviceID: UUID?
@@ -60,7 +60,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case task
-		case selectedProfile(CloudBackupClient.ProfileMetadata?)
+		case selectedProfile(Profile.Header?)
 		case importFromFileInstead
 		case dismissFileImporter
 		case otherRestoreOptionsTapped
@@ -71,7 +71,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case setStatus(State.Status)
-		case loadedCloudBackupProfileMetadata([CloudBackupClient.ProfileMetadata]?)
+		case loadedProfileHeadersFromCloudBackup([Profile.Header]?)
 		case loadedThisDeviceID(UUID?)
 	}
 
@@ -119,11 +119,9 @@ public struct SelectBackup: Sendable, FeatureReducer {
 			state.selectedProfile = profile
 			return .none
 
-		case let .tappedUseCloudBackup(backedupProfile):
+		case let .tappedUseCloudBackup(profileID):
 			return .run { send in
-
-				let backedupProfile: CloudBackupClient.BackedupProfile = { fatalError() }()
-
+				let backedupProfile = try await cloudBackupClient.loadProfile(profileID)
 				await send(.delegate(.selectedProfile(backedupProfile.profile, isInCloud: true, containsLegacyP2PLinks: backedupProfile.containsLegacyP2PLinks)))
 			}
 
@@ -171,8 +169,8 @@ public struct SelectBackup: Sendable, FeatureReducer {
 			state.status = status
 			return .none
 
-		case let .loadedCloudBackupProfileMetadata(metadata):
-			state.backedUpProfiles = metadata?.sorted(by: \.lastModified).reversed()
+		case let .loadedProfileHeadersFromCloudBackup(headers):
+			state.backedUpProfiles = headers?.sorted(by: \.lastModified).reversed()
 			return .none
 
 		case let .loadedThisDeviceID(identifier):
@@ -238,8 +236,8 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 				await send(.internal(.setStatus(.loading)))
 
-				try await send(.internal(.loadedCloudBackupProfileMetadata(
-					cloudBackupClient.loadMetaDataForAllProfiles()
+				try await send(.internal(.loadedProfileHeadersFromCloudBackup(
+					cloudBackupClient.loadProfileHeaders()
 				)))
 
 				await send(.internal(.setStatus(.loaded)))
