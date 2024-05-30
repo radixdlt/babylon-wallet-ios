@@ -95,7 +95,7 @@ extension CloudBackupClient {
 		}
 
 		@Sendable
-		func extractProfile(_ record: CKRecord) throws -> BackedupProfile {
+		func getProfile(_ record: CKRecord) throws -> BackedupProfile {
 			guard record.recordType == .profile else {
 				throw IncorrectRecordTypeError()
 			}
@@ -200,7 +200,7 @@ extension CloudBackupClient {
 					}
 					let backedUpRecord = backedUpRecords.first { $0.recordID.recordName == id.uuidString }
 
-					if let backedUpRecord, try extractProfile(backedUpRecord).profile.header.lastModified >= profile.header.lastModified {
+					if let backedUpRecord, try getProfile(backedUpRecord).profile.header.lastModified >= profile.header.lastModified {
 						return nil
 					}
 
@@ -218,12 +218,12 @@ extension CloudBackupClient {
 				userDefaults.lastCloudBackupValues(for: id)
 			},
 			loadProfile: { id in
-				try await extractProfile(fetchProfileRecord(.init(recordName: id.uuidString)))
+				try await getProfile(fetchProfileRecord(.init(recordName: id.uuidString)))
 			},
-			loadAllProfiles: {
-				try await fetchAllProfileRecords()
-					.map(extractProfile)
-					.filter(\.profile.header.isNonEmpty)
+			loadMetaDataForAllProfiles: {
+				try await fetchAllProfileRecords(metadataOnly: true)
+					.map(getMetadata)
+//					.filter(\.isNonEmpty)
 			}
 		)
 	}
