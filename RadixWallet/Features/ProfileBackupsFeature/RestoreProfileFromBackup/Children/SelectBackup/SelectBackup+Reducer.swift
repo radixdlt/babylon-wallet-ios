@@ -71,8 +71,8 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case setStatus(State.Status)
-		case loadCloudBackupProfiles([CloudBackupClient.BackedupProfile]?)
-		case loadThisDeviceIDResult(UUID?)
+		case loadedCloudBackupProfiles([CloudBackupClient.BackedupProfile]?)
+		case loadedThisDeviceID(UUID?)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -105,8 +105,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			return migrateEffect()
-				.concatenate(with: loadEffect())
+			return migrateAndLoadEffect()
 
 		case .importFromFileInstead:
 			state.isDisplayingFileImporter = true
@@ -167,11 +166,11 @@ public struct SelectBackup: Sendable, FeatureReducer {
 			state.status = status
 			return .none
 
-		case let .loadCloudBackupProfiles(profiles):
+		case let .loadedCloudBackupProfiles(profiles):
 			state.backedUpProfiles = profiles?.sorted(by: \.profile.header.lastModified).reversed()
 			return .none
 
-		case let .loadThisDeviceIDResult(identifier):
+		case let .loadedThisDeviceID(identifier):
 			state.thisDeviceID = identifier
 			return .none
 		}
@@ -215,38 +214,33 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		return .none
 	}
 
-	public func migrateEffect() -> Effect<Action> {
+	public func migrateAndLoadEffect() -> Effect<Action> {
 		.run { send in
-			if !userDefaults.getDidMigrateKeychainProfiles {
-				await send(.internal(.setStatus(.migrating)))
-				do {
+			do {
+				if !userDefaults.getDidMigrateKeychainProfiles {
+					await send(.internal(.setStatus(.migrating)))
+
 					let profilesInKeychain = try secureStorageClient.loadProfileHeaderList()?.count ?? 0
 					if profilesInKeychain > 0 {
 						_ = try await cloudBackupClient.migrateProfilesFromKeychain()
-						userDefaults.setDidMigrateKeychainProfiles(true)
+						// userDefaults.setDidMigrateKeychainProfiles(true)
 					}
-				} catch {
-					await send(.internal(.setStatus(.failed)))
 				}
-			}
-		}
-	}
 
-	public func loadEffect() -> Effect<Action> {
-		.run { send in
-			do {
-				await send(.internal(.loadThisDeviceIDResult(
+				await send(.internal(.loadedThisDeviceID(
 					cloudBackupClient.loadDeviceID()
 				)))
 
 				await send(.internal(.setStatus(.loading)))
 
-				try await send(.internal(.loadCloudBackupProfiles(
+				try await send(.internal(.loadedCloudBackupProfiles(
 					cloudBackupClient.loadAllProfiles()
 				)))
 
 				await send(.internal(.setStatus(.loaded)))
 			} catch {
+				errorQueue.schedule(error)
+				loggerGlobal.error("Failed to migrate or load backed up profiles, error: \(error)")
 				await send(.internal(.setStatus(.failed)))
 			}
 		}
