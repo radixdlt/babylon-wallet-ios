@@ -61,11 +61,13 @@ extension SecurityCenterClient {
 				return combineLatest(profiles, cloudBackups, manualBackups).map { profile, cloudBackup, manualBackup in
 					let isCloudProfileSyncEnabled = profile.appPreferences.security.isCloudProfileSyncEnabled
 
-					func hasProblem3() async -> (accounts: [AccountAddress], personas: [IdentityAddress])? {
-						guard let result = try? await deviceFactorSourceClient.unrecoverableEntities(),
-						      result.accounts.count + result.personas.count > 0
-						else { return nil }
-						return result
+					func hasProblem3or9() async -> (problem3: ProblematicAddresses?, problem9: ProblematicAddresses?) {
+						guard let result = try? await deviceFactorSourceClient.problematicEntities() else {
+							return (nil, nil)
+						}
+						let problem3 = result.unrecoverable.isEmpty ? nil : result.unrecoverable
+						let problem9 = result.mnemonicMissing.isEmpty ? nil : result.mnemonicMissing
+						return (problem3, problem9)
 					}
 
 					func hasProblem5() -> Bool {
@@ -84,22 +86,15 @@ extension SecurityCenterClient {
 						!isCloudProfileSyncEnabled && manualBackup?.upToDate == false
 					}
 
-					func hasProblem9() async -> (accounts: [AccountAddress], personas: [IdentityAddress])? {
-						guard let result = try? await deviceFactorSourceClient.mnemonicMissingEntities(),
-						      result.accounts.count + result.personas.count > 0
-						else { return nil }
-						return result
-					}
-
 					var result: [SecurityProblem] = []
 
 					if type == nil || type == .securityFactors {
-						if let (accounts, personas) = await hasProblem3() {
-							result.append(.problem3(accounts: accounts, personas: personas))
+						let (problem3, problem9) = await hasProblem3or9()
+						if let problem3 {
+							result.append(.problem3(accounts: problem3.accounts, personas: problem3.personas))
 						}
-
-						if let (accounts, personas) = await hasProblem9() {
-							result.append(.problem9(accounts: accounts, personas: personas))
+						if let problem9 {
+							result.append(.problem9(accounts: problem9.accounts, personas: problem9.personas))
 						}
 					}
 
@@ -116,5 +111,11 @@ extension SecurityCenterClient {
 			lastManualBackup: manualBackups,
 			lastCloudBackup: cloudBackups
 		)
+	}
+}
+
+private extension ProblematicAddresses {
+	var isEmpty: Bool {
+		(accounts.count + personas.count) == 0
 	}
 }

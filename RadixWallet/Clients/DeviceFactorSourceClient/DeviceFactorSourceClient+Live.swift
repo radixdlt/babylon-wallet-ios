@@ -71,30 +71,16 @@ extension DeviceFactorSourceClient: DependencyKey {
 			)
 		}
 
-		let mnemonicMissingEntities: @Sendable () async throws -> (accounts: [AccountAddress], personas: [IdentityAddress]) = {
+		let problematicEntities: @Sendable () async throws -> (mnemonicMissing: ProblematicAddresses, unrecoverable: ProblematicAddresses) = {
 			let deviceFactorSources = try await factorSourcesClient.getFactorSources(type: DeviceFactorSource.self)
 			let entities = try await deviceFactorSources.asyncMap {
 				try await entitiesControlledByFactorSource($0, nil)
 			}
-			.filter { !$0.isMnemonicPresentInKeychain }
 
-			let accounts = entities.flatMap { $0.accounts + $0.hiddenAccounts }.map(\.address)
-			let personas = entities.flatMap { $0.personas + $0.hiddenPersonas }.map(\.address)
+			let mnemonicMissing = entities.filter { !$0.isMnemonicPresentInKeychain }
+			let unrecoverable = entities.filter { !mnemonicMissing.contains($0) && !$0.isMnemonicMarkedAsBackedUp }
 
-			return (accounts, personas)
-		}
-
-		let unrecoverableEntities: @Sendable () async throws -> (accounts: [AccountAddress], personas: [IdentityAddress]) = {
-			let deviceFactorSources = try await factorSourcesClient.getFactorSources(type: DeviceFactorSource.self)
-			let entities = try await deviceFactorSources.asyncMap {
-				try await entitiesControlledByFactorSource($0, nil)
-			}
-			.filter { !$0.isMnemonicMarkedAsBackedUp }
-
-			let accounts = entities.flatMap { $0.accounts + $0.hiddenAccounts }.map(\.address)
-			let personas = entities.flatMap { $0.personas + $0.hiddenPersonas }.map(\.address)
-
-			return (accounts, personas)
+			return (mnemonicMissing: mnemonicMissing.problematicAddresses, unrecoverable: unrecoverable.problematicAddresses)
 		}
 
 		return Self(
@@ -157,8 +143,15 @@ extension DeviceFactorSourceClient: DependencyKey {
 					try await entitiesControlledByFactorSource($0, maybeOverridingSnapshot)
 				})
 			},
-			mnemonicMissingEntities: mnemonicMissingEntities,
-			unrecoverableEntities: unrecoverableEntities
+			problematicEntities: problematicEntities
 		)
 	}()
+}
+
+private extension [EntitiesControlledByFactorSource] {
+	var problematicAddresses: ProblematicAddresses {
+		let accounts = flatMap { $0.accounts + $0.hiddenAccounts }.map(\.address)
+		let personas = flatMap { $0.personas + $0.hiddenPersonas }.map(\.address)
+		return .init(accounts: accounts, personas: personas)
+	}
 }
