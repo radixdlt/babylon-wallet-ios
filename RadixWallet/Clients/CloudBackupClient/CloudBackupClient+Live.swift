@@ -8,7 +8,7 @@ extension CKRecord.RecordType {
 }
 
 extension CKRecord.FieldKey {
-	static let content = "content"
+	static let content = "profileJSON"
 
 	static let snapshotVersion = "snapshotVersion"
 
@@ -78,14 +78,12 @@ extension CloudBackupClient {
 			guard record.recordType == .profile else {
 				throw IncorrectRecordTypeError()
 			}
-			guard let asset = record[.content] as? CKAsset, let fileURL = asset.fileURL else {
+			guard let json = record[.content] as? String else {
 				throw NoProfileInRecordError()
 			}
 
-			let json = try String(contentsOf: fileURL, encoding: .utf8)
 			let containsLegacyP2PLinks = Profile.checkIfProfileJsonStringContainsLegacyP2PLinks(jsonString: json)
 			let profile = try Profile(jsonString: json)
-			try FileManager.default.removeItem(at: fileURL)
 
 			guard try getProfileHeader(record) == profile.header else {
 				throw HeaderAndMetadataMismatchError()
@@ -96,22 +94,12 @@ extension CloudBackupClient {
 
 		@discardableResult
 		@Sendable
-		func uploadProfileSnapshotToICloud(_ snapshot: Data, header: Profile.Header, existingRecord: CKRecord?) async throws -> CKRecord {
-			let fileManager = FileManager.default
-			let tempDirectoryURL = fileManager.temporaryDirectory
-			let fileURL = tempDirectoryURL.appendingPathComponent(UUID().uuidString)
-			try snapshot.write(to: fileURL)
-
-			let id = header.id
+		func uploadProfileToICloud(_ profile: Profile, existingRecord: CKRecord?) async throws -> CKRecord {
+			let id = profile.id
 			let record = existingRecord ?? .init(recordType: .profile, recordID: .init(recordName: id.uuidString))
-			record[.content] = CKAsset(fileURL: fileURL)
-
-			setProfileHeader(header, on: record)
-
-			let savedRecord = try await container.privateCloudDatabase.save(record)
-			try fileManager.removeItem(at: fileURL)
-
-			return savedRecord
+			record[.content] = profile.toJSONString()
+			setProfileHeader(profile.header, on: record)
+			return try await container.privateCloudDatabase.save(record)
 		}
 
 		@Sendable
@@ -119,11 +107,7 @@ extension CloudBackupClient {
 			let existingRecord = try? await fetchProfileRecord(.init(recordName: profile.id.uuidString))
 			let result: BackupResult.Result
 			do {
-				try await uploadProfileSnapshotToICloud(
-					profile.profileSnapshot(),
-					header: profile.header,
-					existingRecord: existingRecord
-				)
+				try await uploadProfileToICloud(profile, existingRecord: existingRecord)
 				result = .success
 			} catch CKError.accountTemporarilyUnavailable {
 				result = .temporarilyUnavailable
@@ -179,11 +163,11 @@ extension CloudBackupClient {
 					}
 					let backedUpRecord = backedUpRecords.first { $0.recordID.recordName == id.uuidString }
 
-					if let backedUpRecord, let header = try? getProfileHeader(backedUpRecord), header.lastModified >= profile.header.lastModified {
+					if let backedUpRecord, try getProfileHeader(backedUpRecord).lastModified >= profile.header.lastModified {
 						return nil
 					}
 
-					return try await uploadProfileSnapshotToICloud(profileSnapshot, header: header, existingRecord: backedUpRecord)
+					return try await uploadProfileToICloud(profile, existingRecord: backedUpRecord)
 				}
 			},
 			deleteProfileBackup: { id in
