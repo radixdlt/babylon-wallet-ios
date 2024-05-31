@@ -4,7 +4,6 @@ extension OverlayWindowClient: DependencyKey {
 		let items = AsyncPassthroughSubject<Item>()
 		let alertActions = AsyncPassthroughSubject<(action: Item.AlertAction, id: Item.AlertState.ID)>()
 		let isUserInteractionEnabled = AsyncPassthroughSubject<Bool>()
-		let delegateActions = AsyncPassthroughSubject<DelegateAction>()
 
 		@Dependency(\.errorQueue) var errorQueue
 		@Dependency(\.pasteboardClient) var pasteBoardClient
@@ -38,9 +37,7 @@ extension OverlayWindowClient: DependencyKey {
 			scheduleFullScreenIgnoreAction: scheduleFullScreenIgnoreAction,
 			sendAlertAction: { action, id in alertActions.send((action, id)) },
 			setIsUserIteractionEnabled: { isUserInteractionEnabled.send($0) },
-			isUserInteractionEnabled: { isUserInteractionEnabled.eraseToAnyAsyncSequence() },
-			sendDelegateAction: { delegateActions.send($0) },
-			delegateActions: { delegateActions.eraseToAnyAsyncSequence() }
+			isUserInteractionEnabled: { isUserInteractionEnabled.eraseToAnyAsyncSequence() }
 		)
 	}()
 }
