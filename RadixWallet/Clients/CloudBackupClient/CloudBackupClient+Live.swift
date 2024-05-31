@@ -8,7 +8,7 @@ extension CKRecord.RecordType {
 }
 
 extension CKRecord.FieldKey {
-	static let content = "profileJSON"
+	static let content = "content"
 
 	static let snapshotVersion = "snapshotVersion"
 
@@ -78,12 +78,14 @@ extension CloudBackupClient {
 			guard record.recordType == .profile else {
 				throw IncorrectRecordTypeError()
 			}
-			guard let json = record[.content] as? String else {
+			guard let asset = record[.content] as? CKAsset, let fileURL = asset.fileURL else {
 				throw NoProfileInRecordError()
 			}
 
+			let json = try String(contentsOf: fileURL, encoding: .utf8)
 			let containsLegacyP2PLinks = Profile.checkIfProfileJsonStringContainsLegacyP2PLinks(jsonString: json)
 			let profile = try Profile(jsonString: json)
+			try FileManager.default.removeItem(at: fileURL)
 
 			guard try getProfileHeader(record) == profile.header else {
 				throw HeaderAndMetadataMismatchError()
@@ -95,11 +97,20 @@ extension CloudBackupClient {
 		@discardableResult
 		@Sendable
 		func uploadProfileToICloud(_ profile: Profile, existingRecord: CKRecord?) async throws -> CKRecord {
+			let fileManager = FileManager.default
+			let tempDirectoryURL = fileManager.temporaryDirectory
+			let fileURL = tempDirectoryURL.appendingPathComponent(UUID().uuidString)
+			let json = profile.toJSONString()
+			try json.write(to: fileURL, atomically: true, encoding: .utf8)
+
 			let id = profile.id
 			let record = existingRecord ?? .init(recordType: .profile, recordID: .init(recordName: id.uuidString))
-			record[.content] = profile.toJSONString()
+			record[.content] = CKAsset(fileURL: fileURL)
 			setProfileHeader(profile.header, on: record)
-			return try await container.privateCloudDatabase.save(record)
+			let savedRecord = try await container.privateCloudDatabase.save(record)
+			try fileManager.removeItem(at: fileURL)
+
+			return savedRecord
 		}
 
 		@Sendable
