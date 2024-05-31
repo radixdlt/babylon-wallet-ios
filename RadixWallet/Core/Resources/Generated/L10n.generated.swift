@@ -1260,9 +1260,9 @@ public enum L10n {
       public static func subtitleAtLeastZero(_ p1: Any) -> String {
         return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleAtLeastZero", String(describing: p1), fallback: "**%@** is making a one-time request for any number of accounts.")
       }
-      /// *%@* is making a one-time request for at least %d accounts.
+      /// **%@** is making a one-time request for %d accounts.
       public static func subtitleExactly(_ p1: Any, _ p2: Int) -> String {
-        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleExactly", String(describing: p1), p2, fallback: "*%@* is making a one-time request for at least %d accounts.")
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleExactly", String(describing: p1), p2, fallback: "**%@** is making a one-time request for %d accounts.")
       }
       /// **%@** is making a one-time request for 1 account.
       public static func subtitleExactlyOne(_ p1: Any) -> String {

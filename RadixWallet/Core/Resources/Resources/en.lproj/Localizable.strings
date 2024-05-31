@@ -344,7 +344,7 @@
 "dAppRequest_chooseAccountsOneTime_subtitleAtLeast" = "**%@** is making a one-time request for at least %d accounts.";
 "dAppRequest_chooseAccountsOneTime_subtitleAtLeastZero" = "**%@** is making a one-time request for any number of accounts.";
 "dAppRequest_chooseAccountsOneTime_subtitleAtLeastOne" = "**%@** is making a one-time request for at least 1 account.";
-"dAppRequest_chooseAccountsOneTime_subtitleExactly" = "*%@* is making a one-time request for at least %d accounts.";
+"dAppRequest_chooseAccountsOneTime_subtitleExactly" = "**%@** is making a one-time request for %d accounts.";
 "dAppRequest_chooseAccountsOneTime_subtitleExactlyOne" = "**%@** is making a one-time request for 1 account.";
 "dAppRequest_chooseAccountsOngoing_title" = "Account Permission";
 "dAppRequest_chooseAccountsOngoing_subtitleAtLeast" = "Choose at least %d accounts you wish to use with **%@**.";
