@@ -134,10 +134,10 @@ extension CacheClient {
 				case let .address(address):
 					return address.filesystemFilePath(folderPath: filesystemFolderPath)
 				case let .nonFungibleData(nonFungibleGlobalId):
-					return "\(nonFungibleGlobalId.description)"
+					return nonFungibleGlobalId.description
 				case let .nonFungibleIdPage(_, resourceAddress, pageCursor):
 					let file = "nonFungibleIds-" + resourceAddress.address + (pageCursor.map { "-\($0)" } ?? "")
-					return "\(file)"
+					return file
 				}
 			}
 
