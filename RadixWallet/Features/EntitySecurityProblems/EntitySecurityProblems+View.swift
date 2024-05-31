@@ -29,6 +29,7 @@ public extension EntitySecurityProblems {
 						}
 					}
 				}
+				.padding(.vertical, viewStore.verticalPadding)
 				.onAppear {
 					viewStore.send(.appeared)
 				}
@@ -52,6 +53,17 @@ public extension EntitySecurityProblems {
 			.padding(.small1)
 			.background(.app.whiteTransparent2)
 			.cornerRadius(.small2)
+		}
+	}
+}
+
+private extension EntitySecurityProblems.State {
+	var verticalPadding: CGFloat {
+		switch kind {
+		case .account:
+			.zero
+		case .persona:
+			problems.isEmpty ? .zero : .small2
 		}
 	}
 }

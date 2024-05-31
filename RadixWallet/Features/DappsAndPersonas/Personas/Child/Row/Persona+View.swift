@@ -28,7 +28,6 @@ extension PersonaFeature {
 							if showShield {
 								EntitySecurityProblems.View(store: store.entitySecurityProblems)
 									.padding(.horizontal, .medium3)
-									.padding(.vertical, .small2)
 							}
 						}
 					}
