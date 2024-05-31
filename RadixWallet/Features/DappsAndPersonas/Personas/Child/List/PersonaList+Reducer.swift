@@ -41,6 +41,7 @@ public struct PersonaList: Sendable, FeatureReducer {
 		case createNewPersonaButtonTapped
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case persona(id: Persona.ID, action: PersonaFeature.Action)
 	}
