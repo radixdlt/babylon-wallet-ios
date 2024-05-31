@@ -48,7 +48,7 @@ extension Home {
 		@Dependency(\.userDefaults) var userDefaults
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: \.entitySecurityProblems, action: /Action.child .. ChildAction.entitySecurityProblems) {
+			Scope(state: \.entitySecurityProblems, action: \.child.entitySecurityProblems) {
 				EntitySecurityProblems()
 			}
 			Reduce(core)

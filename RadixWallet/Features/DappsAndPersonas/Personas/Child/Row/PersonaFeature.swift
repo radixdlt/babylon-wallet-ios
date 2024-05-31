@@ -57,7 +57,7 @@ public struct PersonaFeature: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.entitySecurityProblems, action: /Action.child .. ChildAction.entitySecurityProblems) {
+		Scope(state: \.entitySecurityProblems, action: \.child.entitySecurityProblems) {
 			EntitySecurityProblems()
 		}
 		Reduce(core)

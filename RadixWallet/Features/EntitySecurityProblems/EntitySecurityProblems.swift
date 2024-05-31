@@ -43,7 +43,7 @@ public struct EntitySecurityProblems: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .setSecurityProblems(problems):
-			state.problems = filterProblems(problems, kind: state.kind)
+			state.problems = problems.filter(kind: state.kind)
 			return .none
 		}
 	}
@@ -58,9 +58,11 @@ private extension EntitySecurityProblems {
 			}
 		}
 	}
+}
 
-	func filterProblems(_ problems: [SecurityProblem], kind: State.Kind) -> [SecurityProblem] {
-		problems.filter {
+private extension [SecurityProblem] {
+	func filter(kind: EntitySecurityProblems.State.Kind) -> Self {
+		filter {
 			switch $0 {
 			case .problem5, .problem6, .problem7:
 				true

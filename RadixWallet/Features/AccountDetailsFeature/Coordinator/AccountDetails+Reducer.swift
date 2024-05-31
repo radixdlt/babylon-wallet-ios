@@ -117,10 +117,10 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.assets, action: /Action.child .. ChildAction.assets) {
+		Scope(state: \.assets, action: \.child.assets) {
 			AssetsView()
 		}
-		Scope(state: \.entitySecurityProblems, action: /Action.child .. ChildAction.entitySecurityProblems) {
+		Scope(state: \.entitySecurityProblems, action: \.child.entitySecurityProblems) {
 			EntitySecurityProblems()
 		}
 		Reduce(core)
