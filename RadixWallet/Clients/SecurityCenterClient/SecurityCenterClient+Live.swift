@@ -61,13 +61,11 @@ extension SecurityCenterClient {
 				return combineLatest(profiles, cloudBackups, manualBackups).map { profile, cloudBackup, manualBackup in
 					let isCloudProfileSyncEnabled = profile.appPreferences.security.isCloudProfileSyncEnabled
 
-					func hasProblem3or9() async -> (problem3: ProblematicAddresses?, problem9: ProblematicAddresses?) {
-						guard let result = try? await deviceFactorSourceClient.problematicEntities() else {
-							return (nil, nil)
-						}
-						let problem3 = result.unrecoverable.isEmpty ? nil : result.unrecoverable
-						let problem9 = result.mnemonicMissing.isEmpty ? nil : result.mnemonicMissing
-						return (problem3, problem9)
+					let problematic = try? await deviceFactorSourceClient.problematicEntities()
+
+					func hasProblem3() async -> ProblematicAddresses? {
+						guard let problematic, !problematic.unrecoverable.isEmpty else { return nil }
+						return problematic.unrecoverable
 					}
 
 					func hasProblem5() -> Bool {
@@ -86,15 +84,20 @@ extension SecurityCenterClient {
 						!isCloudProfileSyncEnabled && manualBackup?.upToDate == false
 					}
 
+					func hasProblem9() async -> ProblematicAddresses? {
+						guard let problematic, !problematic.mnemonicMissing.isEmpty else { return nil }
+						return problematic.mnemonicMissing
+					}
+
 					var result: [SecurityProblem] = []
 
 					if type == nil || type == .securityFactors {
-						let (problem3, problem9) = await hasProblem3or9()
-						if let problem3 {
-							result.append(.problem3(accounts: problem3.accounts, personas: problem3.personas))
+						if let addresses = await hasProblem3() {
+							result.append(.problem3(accounts: addresses.accounts, personas: addresses.personas))
 						}
-						if let problem9 {
-							result.append(.problem9(accounts: problem9.accounts, personas: problem9.personas))
+
+						if let addresses = await hasProblem9() {
+							result.append(.problem9(accounts: addresses.accounts, personas: addresses.personas))
 						}
 					}
 
@@ -116,6 +119,6 @@ extension SecurityCenterClient {
 
 private extension ProblematicAddresses {
 	var isEmpty: Bool {
-		(accounts.count + personas.count) == 0
+		accounts.count + personas.count == 0
 	}
 }

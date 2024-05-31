@@ -78,7 +78,8 @@ extension DeviceFactorSourceClient: DependencyKey {
 			}
 
 			let mnemonicMissing = entities.filter { !$0.isMnemonicPresentInKeychain }
-			let unrecoverable = entities.filter { !mnemonicMissing.contains($0) && !$0.isMnemonicMarkedAsBackedUp }
+			let mnemonicPresent = entities.filter(\.isMnemonicPresentInKeychain)
+			let unrecoverable = mnemonicPresent.filter { !$0.isMnemonicMarkedAsBackedUp }
 
 			return (mnemonicMissing: mnemonicMissing.problematicAddresses, unrecoverable: unrecoverable.problematicAddresses)
 		}

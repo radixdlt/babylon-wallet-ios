@@ -72,6 +72,7 @@ public struct Home: Sendable, FeatureReducer {
 	}
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case accountDetails(AccountDetails.State)
 			case createAccount(CreateAccountCoordinator.State)
@@ -81,6 +82,7 @@ public struct Home: Sendable, FeatureReducer {
 			case securityCenter(SecurityCenter.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case accountDetails(AccountDetails.Action)
 			case createAccount(CreateAccountCoordinator.Action)
@@ -93,19 +95,19 @@ public struct Home: Sendable, FeatureReducer {
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.accountDetails, action: /Action.accountDetails) {
+			Scope(state: \.accountDetails, action: \.accountDetails) {
 				AccountDetails()
 			}
-			Scope(state: /State.createAccount, action: /Action.createAccount) {
+			Scope(state: \.createAccount, action: \.createAccount) {
 				CreateAccountCoordinator()
 			}
-			Scope(state: /State.npsSurvey, action: /Action.npsSurvey) {
+			Scope(state: \.npsSurvey, action: \.npsSurvey) {
 				NPSSurvey()
 			}
-			Scope(state: /State.relinkConnector, action: /Action.relinkConnector) {
+			Scope(state: \.relinkConnector, action: \.relinkConnector) {
 				NewConnection()
 			}
-			Scope(state: /State.securityCenter, action: /Action.securityCenter) {
+			Scope(state: \.securityCenter, action: \.securityCenter) {
 				SecurityCenter()
 			}
 		}

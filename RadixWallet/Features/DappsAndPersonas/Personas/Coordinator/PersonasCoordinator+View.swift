@@ -42,30 +42,21 @@ private extension View {
 	}
 
 	private func createPersonaCoordinator(with destinationStore: PresentationStoreOf<PersonasCoordinator.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /PersonasCoordinator.Destination.State.createPersonaCoordinator,
-			action: PersonasCoordinator.Destination.Action.createPersonaCoordinator,
-			content: { CreatePersonaCoordinator.View(store: $0) }
-		)
+		sheet(store: destinationStore.scope(state: \.createPersonaCoordinator, action: \.createPersonaCoordinator)) {
+			CreatePersonaCoordinator.View(store: $0)
+		}
 	}
 
 	private func personaDetails(with destinationStore: PresentationStoreOf<PersonasCoordinator.Destination>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /PersonasCoordinator.Destination.State.personaDetails,
-			action: PersonasCoordinator.Destination.Action.personaDetails,
-			destination: { PersonaDetails.View(store: $0) }
-		)
+		navigationDestination(store: destinationStore.scope(state: \.personaDetails, action: \.personaDetails)) {
+			PersonaDetails.View(store: $0)
+		}
 	}
 
 	private func securityCenter(with destinationStore: PresentationStoreOf<PersonasCoordinator.Destination>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /PersonasCoordinator.Destination.State.securityCenter,
-			action: PersonasCoordinator.Destination.Action.securityCenter,
-			destination: { SecurityCenter.View(store: $0) }
-		)
+		navigationDestination(store: destinationStore.scope(state: \.securityCenter, action: \.securityCenter)) {
+			SecurityCenter.View(store: $0)
+		}
 	}
 }
 

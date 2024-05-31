@@ -43,12 +43,14 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 	// MARK: - Destination
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case createPersonaCoordinator(CreatePersonaCoordinator.State)
 			case personaDetails(PersonaDetails.State)
 			case securityCenter(SecurityCenter.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case createPersonaCoordinator(CreatePersonaCoordinator.Action)
 			case personaDetails(PersonaDetails.Action)
@@ -56,13 +58,13 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.createPersonaCoordinator, action: /Action.createPersonaCoordinator) {
+			Scope(state: \.createPersonaCoordinator, action: \.createPersonaCoordinator) {
 				CreatePersonaCoordinator()
 			}
-			Scope(state: /State.personaDetails, action: /Action.personaDetails) {
+			Scope(state: \.personaDetails, action: \.personaDetails) {
 				PersonaDetails()
 			}
-			Scope(state: /State.securityCenter, action: /Action.securityCenter) {
+			Scope(state: \.securityCenter, action: \.securityCenter) {
 				SecurityCenter()
 			}
 		}
