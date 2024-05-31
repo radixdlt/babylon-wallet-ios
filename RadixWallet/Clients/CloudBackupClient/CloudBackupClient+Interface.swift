@@ -53,9 +53,3 @@ extension CloudBackupClient {
 		public let containsLegacyP2PLinks: Bool
 	}
 }
-
-private extension Date {
-	var roundedToMS: Date {
-		Date(timeIntervalSince1970: 0.001 * (1000 * timeIntervalSince1970).rounded())
-	}
-}

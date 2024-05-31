@@ -96,18 +96,17 @@ extension CloudBackupClient {
 
 		@discardableResult
 		@Sendable
-		func uploadProfileSnapshotToICloud(_ snapshot: Data, header: Profile.Header, existingRecord: CKRecord?) async throws -> CKRecord {
+		func uploadProfileToICloud(_ profile: Profile, existingRecord: CKRecord?) async throws -> CKRecord {
 			let fileManager = FileManager.default
 			let tempDirectoryURL = fileManager.temporaryDirectory
 			let fileURL = tempDirectoryURL.appendingPathComponent(UUID().uuidString)
-			try snapshot.write(to: fileURL)
+			let json = profile.toJSONString()
+			try json.write(to: fileURL, atomically: true, encoding: .utf8)
 
-			let id = header.id
+			let id = profile.id
 			let record = existingRecord ?? .init(recordType: .profile, recordID: .init(recordName: id.uuidString))
 			record[.content] = CKAsset(fileURL: fileURL)
-
-			setProfileHeader(header, on: record)
-
+			setProfileHeader(profile.header, on: record)
 			let savedRecord = try await container.privateCloudDatabase.save(record)
 			try fileManager.removeItem(at: fileURL)
 
@@ -119,11 +118,7 @@ extension CloudBackupClient {
 			let existingRecord = try? await fetchProfileRecord(.init(recordName: profile.id.uuidString))
 			let result: BackupResult.Result
 			do {
-				try await uploadProfileSnapshotToICloud(
-					profile.profileSnapshot(),
-					header: profile.header,
-					existingRecord: existingRecord
-				)
+				try await uploadProfileToICloud(profile, existingRecord: existingRecord)
 				result = .success
 			} catch CKError.accountTemporarilyUnavailable {
 				result = .temporarilyUnavailable
@@ -179,11 +174,11 @@ extension CloudBackupClient {
 					}
 					let backedUpRecord = backedUpRecords.first { $0.recordID.recordName == id.uuidString }
 
-					if let backedUpRecord, let header = try? getProfileHeader(backedUpRecord), header.lastModified >= profile.header.lastModified {
+					if let backedUpRecord, try getProfileHeader(backedUpRecord).lastModified >= profile.header.lastModified {
 						return nil
 					}
 
-					return try await uploadProfileSnapshotToICloud(profileSnapshot, header: header, existingRecord: backedUpRecord)
+					return try await uploadProfileToICloud(profile, existingRecord: backedUpRecord)
 				}
 			},
 			deleteProfileBackup: { id in
@@ -259,14 +254,20 @@ extension CloudBackupClient {
 	private static func setProfileHeader(_ header: Profile.Header, on record: CKRecord) {
 		record[.snapshotVersion] = header.snapshotVersion.rawValue
 		record[.creatingDeviceID] = header.creatingDevice.id.uuidString
-		record[.creatingDeviceDate] = header.creatingDevice.date
+		record[.creatingDeviceDate] = header.creatingDevice.date.roundedToMS
 		record[.creatingDeviceDescription] = header.creatingDevice.description
 		record[.lastUsedOnDeviceID] = header.lastUsedOnDevice.id.uuidString
-		record[.lastUsedOnDeviceDate] = header.lastUsedOnDevice.date
+		record[.lastUsedOnDeviceDate] = header.lastUsedOnDevice.date.roundedToMS
 		record[.lastUsedOnDeviceDescription] = header.lastUsedOnDevice.description
-		record[.lastModified] = header.lastModified
+		record[.lastModified] = header.lastModified.roundedToMS
 		record[.numberOfAccounts] = header.contentHint.numberOfAccountsOnAllNetworksInTotal
 		record[.numberOfPersonas] = header.contentHint.numberOfPersonasOnAllNetworksInTotal
 		record[.numberOfNetworks] = header.contentHint.numberOfNetworks
+	}
+}
+
+private extension Date {
+	var roundedToMS: Date {
+		Date(timeIntervalSince1970: 0.001 * (1000 * timeIntervalSince1970).rounded())
 	}
 }

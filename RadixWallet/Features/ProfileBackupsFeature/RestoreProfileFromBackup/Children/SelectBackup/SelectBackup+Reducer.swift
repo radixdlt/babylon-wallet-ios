@@ -121,8 +121,12 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 		case let .tappedUseCloudBackup(profileID):
 			return .run { send in
-				let backedupProfile = try await cloudBackupClient.loadProfile(profileID)
-				await send(.delegate(.selectedProfile(backedupProfile.profile, isInCloud: true, containsLegacyP2PLinks: backedupProfile.containsLegacyP2PLinks)))
+				do {
+					let backedupProfile = try await cloudBackupClient.loadProfile(profileID)
+					await send(.delegate(.selectedProfile(backedupProfile.profile, isInCloud: true, containsLegacyP2PLinks: backedupProfile.containsLegacyP2PLinks)))
+				} catch {
+					errorQueue.schedule(error)
+				}
 			}
 
 		case .dismissFileImporter:
