@@ -99,6 +99,9 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 		public let purpose: Purpose
 		public var factorSourceAccess: FactorSourceAccess.State?
 
+		@PresentationState
+		var destination: Destination.State? = nil
+
 		public init(
 			derivationPathOption: DerivationPathOption,
 			factorSourceOption: FactorSourceOption,
@@ -121,6 +124,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 		case loadedDeviceFactorSource(DeviceFactorSource)
 		case deriveWithDeviceFactor(DerivationPath, NetworkID, PublicKeysFromOnDeviceHDRequest.Source)
 		case deriveWithLedgerFactor(LedgerHardwareWalletFactorSource, DerivationPath, NetworkID)
+		case failedToFindFactorSource
 	}
 
 	public enum DelegateAction: Sendable, Hashable {
@@ -138,6 +142,26 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 		case factorSourceAccess(FactorSourceAccess.Action)
 	}
 
+	public struct Destination: DestinationReducer {
+		@CasePathable
+		public enum State: Sendable, Hashable {
+			case alert(AlertState<Action.AlertAction>)
+		}
+
+		@CasePathable
+		public enum Action: Sendable, Hashable {
+			case alert(AlertAction)
+
+			public enum AlertAction: Sendable {
+				case ok
+			}
+		}
+
+		public var body: some ReducerOf<Self> {
+			EmptyReducer()
+		}
+	}
+
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
@@ -151,14 +175,19 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 			.ifLet(\.factorSourceAccess, action: /Action.child .. ChildAction.factorSourceAccess) {
 				FactorSourceAccess()
 			}
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
+			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case .start:
 			switch state.factorSourceOption {
 			case .device:
-				.run { send in
+				return .run { send in
 					let babylonFactorSource = try await factorSourcesClient.getMainDeviceFactorSource()
 					await send(.internal(.loadedDeviceFactorSource(babylonFactorSource)))
 				} catch: { error, send in
@@ -167,12 +196,12 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 				}
 
 			case let .specificPrivateHDFactorSource(privateHD):
-				deriveWith(source: .privateHDFactorSource(privateHD), state)
+				return deriveWith(source: .privateHDFactorSource(privateHD), state)
 
 			case let .specific(factorSource):
 				switch factorSource {
 				case let .device(deviceFactorSource):
-					deriveWith(
+					return deriveWith(
 						source: .loadMnemonicFor(
 							deviceFactorSource,
 							purpose: state.purpose.loadMnemonicPurpose
@@ -180,12 +209,12 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 						state
 					)
 				case let .ledger(ledgerFactorSource):
-					deriveWith(ledgerFactorSource: ledgerFactorSource, state)
+					return deriveWith(ledgerFactorSource: ledgerFactorSource, state)
 				}
 			}
 
 		case let .loadedDeviceFactorSource(factorSource):
-			deriveWith(
+			return deriveWith(
 				source: .loadMnemonicFor(
 					factorSource,
 					purpose: state.purpose.loadMnemonicPurpose
@@ -194,7 +223,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 			)
 
 		case let .deriveWithDeviceFactor(derivationPath, networkID, source):
-			deriveWith(
+			return deriveWith(
 				derivationPaths: [derivationPath],
 				networkID: networkID,
 				source: source,
@@ -202,12 +231,16 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 			)
 
 		case let .deriveWithLedgerFactor(ledger, derivationPath, networkID):
-			deriveWith(
+			return deriveWith(
 				ledger: ledger,
 				derivationPaths: [derivationPath],
 				networkID: networkID,
 				state: state
 			)
+
+		case .failedToFindFactorSource:
+			state.destination = .alert(.failedToFindFactorSourceAlert)
+			return .none
 		}
 	}
 
@@ -219,6 +252,13 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 			.send(.delegate(.cancel))
 		default:
 			.none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .alert(.ok):
+			.send(.delegate(.failedToDerivePublicKey))
 		}
 	}
 }
@@ -285,13 +325,17 @@ extension DerivePublicKeys {
 		state: State
 	) async throws -> Action {
 		loggerGlobal.debug("Starting derivation of #\(derivationPaths.count) keys")
-		let hdKeys = try await deviceFactorSourceClient.publicKeysFromOnDeviceHD(.init(derivationPaths: derivationPaths, source: source))
-		loggerGlobal.debug("Finish deriving of #\(hdKeys.count) keys ✅ => delegating `derivedPublicKeys`")
-		return .delegate(.derivedPublicKeys(
-			hdKeys,
-			factorSourceID: source.deviceFactorSource.id.asGeneral,
-			networkID: networkID
-		))
+		do {
+			let hdKeys = try await deviceFactorSourceClient.publicKeysFromOnDeviceHD(.init(derivationPaths: derivationPaths, source: source))
+			loggerGlobal.debug("Finish deriving of #\(hdKeys.count) keys ✅ => delegating `derivedPublicKeys`")
+			return .delegate(.derivedPublicKeys(
+				hdKeys,
+				factorSourceID: source.deviceFactorSource.id.asGeneral,
+				networkID: networkID
+			))
+		} catch is FailedToFindFactorSource {
+			return .internal(.failedToFindFactorSource)
+		}
 	}
 
 	private func deriveWith(
@@ -436,4 +480,20 @@ extension SLIP10Curve {
 			.secp256k1
 		}
 	}
+}
+
+private extension AlertState<DerivePublicKeys.Destination.Action.AlertAction> {
+	static let failedToFindFactorSourceAlert: AlertState = .init(
+		title: {
+			TextState(L10n.TransactionReview.NoMnemonicError.title)
+		},
+		actions: {
+			ButtonState(action: .ok) {
+				TextState(L10n.Common.ok)
+			}
+		},
+		message: {
+			TextState(L10n.TransactionReview.NoMnemonicError.text)
+		}
+	)
 }

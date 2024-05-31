@@ -65,7 +65,7 @@ public struct PublicKeysFromOnDeviceHDRequest: Sendable, Hashable {
 		case let .loadMnemonicFor(deviceFactorSource, loadMnemonicPurpose):
 			let factorSourceID = deviceFactorSource.id
 			guard
-				let mnemonicWithPassphrase = try secureStorageClient.loadMnemonic(factorSourceID: factorSourceID)
+				let mnemonicWithPassphrase = try secureStorageClient.loadMnemonic(factorSourceID: factorSourceID, notifyIfMissing: false)
 			else {
 				loggerGlobal.critical("Failed to find factor source with ID: '\(factorSourceID)'")
 				throw FailedToFindFactorSource()
