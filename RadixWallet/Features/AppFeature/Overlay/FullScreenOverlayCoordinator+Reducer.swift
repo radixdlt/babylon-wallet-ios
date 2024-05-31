@@ -10,6 +10,7 @@ public struct FullScreenOverlayCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case root(Root.Action)
 	}
@@ -39,7 +40,7 @@ public struct FullScreenOverlayCoordinator: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.root, action: /Action.child .. ChildAction.root) {
+		Scope(state: \.root, action: \.child.root) {
 			Root()
 		}
 		Reduce(core)
