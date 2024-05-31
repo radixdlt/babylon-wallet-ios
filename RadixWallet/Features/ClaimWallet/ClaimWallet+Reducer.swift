@@ -23,9 +23,7 @@ public struct ClaimWallet: Sendable, FeatureReducer {
 		case didTransferBack
 	}
 
-	@Dependency(\.cacheClient) var cacheClient
-	@Dependency(\.radixConnectClient) var radixConnectClient
-	@Dependency(\.userDefaults) var userDefaults
+	@Dependency(\.resetWalletClient) var resetWalletClient
 
 	public init() {}
 
@@ -33,9 +31,7 @@ public struct ClaimWallet: Sendable, FeatureReducer {
 		switch viewAction {
 		case .clearWalletButtonTapped:
 			.run { send in
-				cacheClient.removeAll()
-				await radixConnectClient.disconnectAll()
-				userDefaults.removeAll()
+				await resetWalletClient.resetWallet()
 				await send(.delegate(.didClearWallet))
 			}
 		case .transferBackButtonTapped:

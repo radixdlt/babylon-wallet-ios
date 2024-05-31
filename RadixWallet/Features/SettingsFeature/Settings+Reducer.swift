@@ -38,10 +38,6 @@ public struct Settings: Sendable, FeatureReducer {
 		case setSecurityProblems([SecurityProblem])
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
-		case didResetWallet
-	}
-
 	public struct Destination: DestinationReducer {
 		@CasePathable
 		public enum State: Sendable, Hashable {
@@ -164,8 +160,6 @@ public struct Settings: Sendable, FeatureReducer {
 		switch presentedAction {
 		case .troubleshooting(.delegate(.goToAccountList)):
 			.run { _ in await dismiss() }
-		case .troubleshooting(.delegate(.didResetWallet)):
-			.send(.delegate(.didResetWallet))
 		default:
 			.none
 		}

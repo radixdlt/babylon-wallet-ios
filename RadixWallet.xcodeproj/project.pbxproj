@@ -1164,6 +1164,9 @@
 		E6FA984B2B04B9AC00748F20 /* ConfirmSkippingBDFS.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA98492B04B9AC00748F20 /* ConfirmSkippingBDFS.swift */; };
 		E6FA984E2B04E3D500748F20 /* NoContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA984D2B04E3D500748F20 /* NoContentView.swift */; };
 		E713204C2BCD372600AE6B3C /* UnknownCaseDecodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = E713204B2BCD372600AE6B3C /* UnknownCaseDecodable.swift */; };
+		E7A5AC962C09F447006CB6EC /* ResetWalletClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A5AC952C09F447006CB6EC /* ResetWalletClient+Interface.swift */; };
+		E7A5AC982C09F44C006CB6EC /* ResetWalletClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A5AC972C09F44C006CB6EC /* ResetWalletClient+Live.swift */; };
+		E7A5AC9A2C09F453006CB6EC /* ResetWalletClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A5AC992C09F453006CB6EC /* ResetWalletClient+Test.swift */; };
 		E7AE2D052BF7844300830BAA /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = E695F2DD2BECDD7C00761ACE /* Sargon */; };
 		E7AE2D0A2C05F39800830BAA /* ClaimWallet+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7AE2D092C05F39800830BAA /* ClaimWallet+Reducer.swift */; };
 		E7AE2D0C2C05F39E00830BAA /* ClaimWallet+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7AE2D0B2C05F39E00830BAA /* ClaimWallet+View.swift */; };
@@ -2312,6 +2315,9 @@
 		E6FA98492B04B9AC00748F20 /* ConfirmSkippingBDFS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmSkippingBDFS.swift; sourceTree = "<group>"; };
 		E6FA984D2B04E3D500748F20 /* NoContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoContentView.swift; sourceTree = "<group>"; };
 		E713204B2BCD372600AE6B3C /* UnknownCaseDecodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnknownCaseDecodable.swift; sourceTree = "<group>"; };
+		E7A5AC952C09F447006CB6EC /* ResetWalletClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ResetWalletClient+Interface.swift"; sourceTree = "<group>"; };
+		E7A5AC972C09F44C006CB6EC /* ResetWalletClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ResetWalletClient+Live.swift"; sourceTree = "<group>"; };
+		E7A5AC992C09F453006CB6EC /* ResetWalletClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ResetWalletClient+Test.swift"; sourceTree = "<group>"; };
 		E7AE2D092C05F39800830BAA /* ClaimWallet+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ClaimWallet+Reducer.swift"; sourceTree = "<group>"; };
 		E7AE2D0B2C05F39E00830BAA /* ClaimWallet+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ClaimWallet+View.swift"; sourceTree = "<group>"; };
 		E7AE2D0D2C07359500830BAA /* FullScreenOverlayCoordinator+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FullScreenOverlayCoordinator+Reducer.swift"; sourceTree = "<group>"; };
@@ -4277,6 +4283,7 @@
 		48CFBF522ADC10D900E77A5C /* Clients */ = {
 			isa = PBXGroup;
 			children = (
+				E7A5AC942C09F428006CB6EC /* ResetWalletClient */,
 				A4ECE2782BEEB01800468BF6 /* CloudBackupClient */,
 				A4ECE2712BEEAFFC00468BF6 /* SecurityCenterClient */,
 				5B2A45002BD667FB00AEC8AD /* ContactSupportClient */,
@@ -6482,6 +6489,16 @@
 			path = ConfirmSkippingBDFS;
 			sourceTree = "<group>";
 		};
+		E7A5AC942C09F428006CB6EC /* ResetWalletClient */ = {
+			isa = PBXGroup;
+			children = (
+				E7A5AC952C09F447006CB6EC /* ResetWalletClient+Interface.swift */,
+				E7A5AC972C09F44C006CB6EC /* ResetWalletClient+Live.swift */,
+				E7A5AC992C09F453006CB6EC /* ResetWalletClient+Test.swift */,
+			);
+			path = ResetWalletClient;
+			sourceTree = "<group>";
+		};
 		E7AE2D082C05F22700830BAA /* ClaimWallet */ = {
 			isa = PBXGroup;
 			children = (
@@ -7335,6 +7352,7 @@
 				48CFC4652ADC10DA00E77A5C /* AccountPortfoliosClient+Live.swift in Sources */,
 				48CFC5832ADC10DA00E77A5C /* SecureStorageClient+Test.swift in Sources */,
 				83FDF7EC2AF260D600D9AA8B /* ProgrammaticScryptoSborValue.swift in Sources */,
+				E7A5AC962C09F447006CB6EC /* ResetWalletClient+Interface.swift in Sources */,
 				482752182BDB9032007854E0 /* DisplayName+NonEmptyString.swift in Sources */,
 				A462B5BF2B9382BC00C26D20 /* OnLedgerEntitiesClient+ComplexTypes.swift in Sources */,
 				48CFC5DC2ADC10DA00E77A5C /* Modifier.swift in Sources */,
@@ -7357,6 +7375,7 @@
 				48CFC2B32ADC10D900E77A5C /* ProfileBackupSettings+View.swift in Sources */,
 				48CFC2962ADC10D900E77A5C /* NormalFeesCustomization.swift in Sources */,
 				48CFC3172ADC10D900E77A5C /* Settings+Reducer.swift in Sources */,
+				E7A5AC982C09F44C006CB6EC /* ResetWalletClient+Live.swift in Sources */,
 				48CFC3042ADC10D900E77A5C /* DebugKeychainTest.swift in Sources */,
 				48CFC41A2ADC10DA00E77A5C /* BigUInt+Extra.swift in Sources */,
 				A462B5952B837CA800C26D20 /* CoreAPI.swift in Sources */,
@@ -7549,6 +7568,7 @@
 				48CFC4302ADC10DA00E77A5C /* Collection+Extra.swift in Sources */,
 				83EE47832AF0EE3C00155F03 /* ProgrammaticScryptoSborValuePreciseDecimal.swift in Sources */,
 				48CFC2D62ADC10D900E77A5C /* ChooseAccountsRow.swift in Sources */,
+				E7A5AC9A2C09F453006CB6EC /* ResetWalletClient+Test.swift in Sources */,
 				A462B5BB2B90C5E800C26D20 /* ResourceBalance+Helpers.swift in Sources */,
 				48AE39EC2B0CCA7600813CF3 /* RecoverWalletControlWithBDFSComplete+View.swift in Sources */,
 				48CFC3612ADC10D900E77A5C /* LedgerHardwareDevices+View.swift in Sources */,

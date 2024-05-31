@@ -24,9 +24,6 @@ public struct OverlayWindowClient: Sendable {
 	public var setIsUserIteractionEnabled: SetIsUserIteractionEnabled
 	public var isUserInteractionEnabled: IsUserInteractionEnabled
 
-	public var sendDelegateAction: SendDelegateAction
-	public var delegateActions: DelegateActions
-
 	public init(
 		scheduledItems: @escaping ScheduledItems,
 		scheduleAlertIgnoreAction: @escaping ScheduleAlertIgnoreAction,
@@ -35,9 +32,7 @@ public struct OverlayWindowClient: Sendable {
 		scheduleFullScreenIgnoreAction: @escaping ScheduleFullScreenIgnoreAction,
 		sendAlertAction: @escaping SendAlertAction,
 		setIsUserIteractionEnabled: @escaping SetIsUserIteractionEnabled,
-		isUserInteractionEnabled: @escaping IsUserInteractionEnabled,
-		sendDelegateAction: @escaping SendDelegateAction,
-		delegateActions: @escaping DelegateActions
+		isUserInteractionEnabled: @escaping IsUserInteractionEnabled
 	) {
 		self.scheduledItems = scheduledItems
 		self.scheduleAlertIgnoreAction = scheduleAlertIgnoreAction
@@ -47,8 +42,6 @@ public struct OverlayWindowClient: Sendable {
 		self.sendAlertAction = sendAlertAction
 		self.setIsUserIteractionEnabled = setIsUserIteractionEnabled
 		self.isUserInteractionEnabled = isUserInteractionEnabled
-		self.sendDelegateAction = sendDelegateAction
-		self.delegateActions = delegateActions
 	}
 }
 
@@ -62,9 +55,6 @@ extension OverlayWindowClient {
 
 	public typealias SetIsUserIteractionEnabled = @Sendable (Bool) -> Void
 	public typealias IsUserInteractionEnabled = @Sendable () -> AnyAsyncSequence<Bool>
-
-	public typealias SendDelegateAction = @Sendable (DelegateAction) -> Void
-	public typealias DelegateActions = @Sendable () -> AnyAsyncSequence<DelegateAction>
 }
 
 // MARK: OverlayWindowClient.Item
@@ -115,10 +105,6 @@ extension OverlayWindowClient {
 		case hud(HUD)
 		case alert(AlertState)
 		case fullScreen(FullScreenOverlayCoordinator.State)
-	}
-
-	public enum DelegateAction {
-		case didClearWallet
 	}
 }
 

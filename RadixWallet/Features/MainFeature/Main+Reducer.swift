@@ -31,7 +31,6 @@ public struct Main: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case currentGatewayChanged(to: Gateway)
-		case didResetWallet
 	}
 
 	public struct Destination: DestinationReducer {
@@ -54,7 +53,7 @@ public struct Main: Sendable, FeatureReducer {
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.cloudBackupClient) var cloudBackupClient
-	@Dependency(\.overlayWindowClient) var overlayWindowClient
+	@Dependency(\.resetWalletClient) var resetWalletClient
 
 	public init() {}
 
@@ -101,10 +100,13 @@ public struct Main: Sendable, FeatureReducer {
 
 	private func didResetWalletEffect() -> Effect<Action> {
 		.run { send in
-			for try await action in overlayWindowClient.delegateActions() {
-				guard !Task.isCancelled, case .didClearWallet = action else { return }
-				await send(.internal(.didResetWallet))
+			for try await _ in resetWalletClient.walletDidReset() {
+				guard !Task.isCancelled else { return }
+				try await appPreferencesClient.deleteProfileAndFactorSources(true)
+				await send(.delegate(.removedWallet))
 			}
+		} catch: { error, _ in
+			loggerGlobal.error("Failed to delete profile: \(error)")
 		}
 	}
 
@@ -124,24 +126,6 @@ public struct Main: Sendable, FeatureReducer {
 		case let .currentGatewayChanged(currentGateway):
 			state.isOnMainnet = currentGateway.network.id == .mainnet
 			return .none
-
-		case .didResetWallet:
-			return .run { send in
-				try await appPreferencesClient.deleteProfileAndFactorSources(true)
-				await send(.delegate(.removedWallet))
-			} catch: { error, _ in
-				loggerGlobal.error("Failed to delete profile: \(error)")
-			}
-		}
-	}
-
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
-		switch presentedAction {
-		case .settings(.delegate(.didResetWallet)):
-			.send(.internal(.didResetWallet))
-
-		default:
-			.none
 		}
 	}
 }
