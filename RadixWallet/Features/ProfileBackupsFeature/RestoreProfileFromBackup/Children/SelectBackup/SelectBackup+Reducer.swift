@@ -122,8 +122,8 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		case let .tappedUseCloudBackup(profileID):
 			return .run { send in
 				do {
-					let backedupProfile = try await cloudBackupClient.loadProfile(profileID)
-					await send(.delegate(.selectedProfile(backedupProfile.profile, isInCloud: true, containsLegacyP2PLinks: backedupProfile.containsLegacyP2PLinks)))
+					let backedUpProfile = try await cloudBackupClient.loadProfile(profileID)
+					await send(.delegate(.selectedProfile(backedUpProfile.profile, isInCloud: true, containsLegacyP2PLinks: backedUpProfile.containsLegacyP2PLinks)))
 				} catch {
 					errorQueue.schedule(error)
 				}
@@ -226,12 +226,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 			do {
 				if !userDefaults.getDidMigrateKeychainProfiles {
 					await send(.internal(.setStatus(.migrating)))
-
-					let profilesInKeychain = try secureStorageClient.loadProfileHeaderList()?.count ?? 0
-					if profilesInKeychain > 0 {
-						_ = try await cloudBackupClient.migrateProfilesFromKeychain()
-						// userDefaults.setDidMigrateKeychainProfiles(true)
-					}
+					try await cloudBackupClient.migrateProfilesFromKeychain()
 				}
 
 				await send(.internal(.loadedThisDeviceID(

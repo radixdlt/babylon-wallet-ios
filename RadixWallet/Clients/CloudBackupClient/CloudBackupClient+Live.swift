@@ -96,17 +96,21 @@ extension CloudBackupClient {
 
 		@discardableResult
 		@Sendable
-		func uploadProfileToICloud(_ profile: Profile, existingRecord: CKRecord?) async throws -> CKRecord {
+		func uploadProfileToICloud(_ profile: Either<Data, String>, header: Profile.Header, existingRecord: CKRecord?) async throws -> CKRecord {
 			let fileManager = FileManager.default
 			let tempDirectoryURL = fileManager.temporaryDirectory
 			let fileURL = tempDirectoryURL.appendingPathComponent(UUID().uuidString)
-			let json = profile.toJSONString()
-			try json.write(to: fileURL, atomically: true, encoding: .utf8)
+			switch profile {
+			case let .left(data):
+				try data.write(to: fileURL)
+			case let .right(json):
+				try json.write(to: fileURL, atomically: true, encoding: .utf8)
+			}
 
-			let id = profile.id
+			let id = header.id
 			let record = existingRecord ?? .init(recordType: .profile, recordID: .init(recordName: id.uuidString))
 			record[.content] = CKAsset(fileURL: fileURL)
-			setProfileHeader(profile.header, on: record)
+			setProfileHeader(header, on: record)
 			let savedRecord = try await container.privateCloudDatabase.save(record)
 			try fileManager.removeItem(at: fileURL)
 
@@ -118,7 +122,8 @@ extension CloudBackupClient {
 			let existingRecord = try? await fetchProfileRecord(.init(recordName: profile.id.uuidString))
 			let result: BackupResult.Result
 			do {
-				try await uploadProfileToICloud(profile, existingRecord: existingRecord)
+				let json = profile.toJSONString()
+				try await uploadProfileToICloud(.right(json), header: profile.header, existingRecord: existingRecord)
 				result = .success
 			} catch CKError.accountTemporarilyUnavailable {
 				result = .temporarilyUnavailable
@@ -156,30 +161,39 @@ extension CloudBackupClient {
 				let backedUpRecords = try await fetchAllProfileRecords()
 				guard let headerList = try secureStorageClient.loadProfileHeaderList() else { return [] }
 
-				return try await headerList.elements.asyncCompactMap { header -> CKRecord? in
+				let migratable = try headerList.compactMap { header -> (Data, Profile.Header)? in
 					let id = header.id
-					guard id != activeProfile else {
-						// No need to migrate the currently active profile
-						return nil
-					}
+					guard header.id != activeProfile else { return nil }
 
-					guard let profileSnapshot = try secureStorageClient.loadProfileSnapshotData(id) else {
+					guard let profileData = try secureStorageClient.loadProfileSnapshotData(id) else {
 						throw ProfileMissingFromKeychainError(id: id)
 					}
 
-					let profile = try Profile(jsonData: profileSnapshot)
+					let profile = try Profile(jsonData: profileData)
+					guard !profile.networks.isEmpty else { return nil }
+					guard profile.appPreferences.security.isCloudProfileSyncEnabled else { return nil }
 
-					guard !profile.networks.isEmpty, profile.appPreferences.security.isCloudProfileSyncEnabled else {
-						return nil
-					}
-					let backedUpRecord = backedUpRecords.first { $0.recordID.recordName == id.uuidString }
-
-					if let backedUpRecord, try getProfileHeader(backedUpRecord).lastModified >= profile.header.lastModified {
-						return nil
-					}
-
-					return try await uploadProfileToICloud(profile, existingRecord: backedUpRecord)
+					return (profileData, header)
 				}
+
+				let migrated = try await migratable.asyncMap { profileData, header in
+					let backedUpRecord = backedUpRecords.first { $0.recordID.recordName == header.id.uuidString }
+
+					if let backedUpRecord, try getProfileHeader(backedUpRecord).lastModified >= header.lastModified {
+						// We already have a more recent version backed up on iCloud, so we return that
+						return backedUpRecord
+					}
+
+					let uploadedRecord = try await uploadProfileToICloud(.left(profileData), header: header, existingRecord: backedUpRecord)
+					try secureStorageClient.updateIsCloudProfileSyncEnabled(header.id, .disable)
+
+					return uploadedRecord
+				}
+
+				// We probably want to set this to false if we find migratable profiles that we could't migrate
+				userDefaults.setDidMigrateKeychainProfiles(migrated.count == migratable.count)
+
+				return migrated
 			},
 			deleteProfileBackup: { id in
 				try await container.privateCloudDatabase.deleteRecord(withID: .init(recordName: id.uuidString))
