@@ -13,7 +13,7 @@ extension FullScreenOverlayCoordinator {
 
 		public var body: some SwiftUI.View {
 			NavigationStack {
-				root(for: store.scope(state: \.root, action: { .child(.root($0)) }))
+				root(for: store.scope(state: \.root, action: \.child.root))
 			}
 		}
 
