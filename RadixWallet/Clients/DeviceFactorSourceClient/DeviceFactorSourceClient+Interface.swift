@@ -242,7 +242,9 @@ extension SigningPurpose {
 struct FactorInstanceDoesNotHaveADerivationPathUnableToSign: Swift.Error {}
 
 // MARK: - ProblematicAddresses
-public struct ProblematicAddresses {
+public struct ProblematicAddresses: Sendable, Hashable {
 	let accounts: [AccountAddress]
+	let hiddenAccounts: [AccountAddress]
 	let personas: [IdentityAddress]
+	let hiddenPersonas: [IdentityAddress]
 }

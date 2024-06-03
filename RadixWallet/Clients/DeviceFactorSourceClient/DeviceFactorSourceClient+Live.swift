@@ -151,8 +151,10 @@ extension DeviceFactorSourceClient: DependencyKey {
 
 private extension [EntitiesControlledByFactorSource] {
 	var problematicAddresses: ProblematicAddresses {
-		let accounts = flatMap { $0.accounts + $0.hiddenAccounts }.map(\.address)
-		let personas = flatMap { $0.personas + $0.hiddenPersonas }.map(\.address)
-		return .init(accounts: accounts, personas: personas)
+		let accounts = flatMap(\.accounts).map(\.address)
+		let hiddenAccounts = flatMap(\.hiddenAccounts).map(\.address)
+		let personas = flatMap(\.personas).map(\.address)
+		let hiddenPersonas = flatMap(\.hiddenPersonas).map(\.address)
+		return .init(accounts: accounts, hiddenAccounts: hiddenAccounts, personas: personas, hiddenPersonas: hiddenPersonas)
 	}
 }

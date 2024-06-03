@@ -93,11 +93,11 @@ extension SecurityCenterClient {
 
 					if type == nil || type == .securityFactors {
 						if let addresses = await hasProblem3() {
-							result.append(.problem3(accounts: addresses.accounts, personas: addresses.personas))
+							result.append(.problem3(addresses: addresses))
 						}
 
 						if let addresses = await hasProblem9() {
-							result.append(.problem9(accounts: addresses.accounts, personas: addresses.personas))
+							result.append(.problem9(addresses: addresses))
 						}
 					}
 

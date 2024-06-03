@@ -22,7 +22,7 @@ extension SecurityCenterClient {
 public enum SecurityProblem: Hashable, Sendable, Identifiable {
 	/// The given addresses of `accounts` and `personas` are unrecoverable if the user loses their phone, since their corresponding seed phrase has not been written down.
 	/// NOTE: This definition differs from the one at Confluence since we don't have shields implemented yet.
-	case problem3(accounts: [AccountAddress], personas: [IdentityAddress])
+	case problem3(addresses: ProblematicAddresses)
 	/// Wallet backups to the cloud aren’t working (wallet tried to do a backup and it didn’t work within, say, 5 minutes.)
 	/// This means that currently all accounts and personas are at risk of being practically unrecoverable if the user loses their phone.
 	/// Also they would lose all of their other non-security wallet settings and data.
@@ -36,7 +36,7 @@ public enum SecurityProblem: Hashable, Sendable, Identifiable {
 	case problem7
 	/// User has gotten a new phone (and restored their wallet from backup) and the wallet sees that there are accounts without shields using a phone key,
 	/// meaning they can only be recovered with the seed phrase. (See problem 2) This would also be the state if a user disabled their PIN (and reenabled it), clearing phone keys.
-	case problem9(accounts: [AccountAddress], personas: [IdentityAddress])
+	case problem9(addresses: ProblematicAddresses)
 
 	public var id: Int { number }
 
@@ -66,7 +66,7 @@ public enum SecurityProblem: Hashable, Sendable, Identifiable {
 
 	public var securityCenterTitle: String {
 		switch self {
-		case let .problem3(accounts, personas): problem3(accounts: accounts.count, personas: personas.count)
+		case let .problem3(addresses): problem3(addresses: addresses)
 		case .problem5: L10n.SecurityProblems.No5.securityCenterTitle
 		case .problem6: L10n.SecurityProblems.No6.securityCenterTitle
 		case .problem7: L10n.SecurityProblems.No7.securityCenterTitle
@@ -76,11 +76,15 @@ public enum SecurityProblem: Hashable, Sendable, Identifiable {
 
 	private typealias Common = L10n.SecurityProblems.Common
 
-	private func problem3(accounts: Int, personas: Int) -> String {
-		L10n.SecurityProblems.No3.securityCenterTitle(
-			accounts == 1 ? Common.accountSingular : Common.accountPlural(accounts),
-			personas == 1 ? Common.personaSingular : Common.personaPlural(personas)
-		)
+	private func problem3(addresses: ProblematicAddresses) -> String {
+		let totalHidden = addresses.hiddenAccounts.count + addresses.hiddenPersonas.count
+		let accounts = addresses.accounts.count == 1 ? Common.accountSingular : Common.accountPlural(addresses.accounts.count)
+		let personas = addresses.personas.count == 1 ? Common.personaSingular : Common.personaPlural(addresses.personas.count)
+		if totalHidden == 0 {
+			return L10n.SecurityProblems.No3.securityCenterTitle(accounts, personas)
+		} else {
+			return "\(accounts) and \(personas) and some hidden are not recoverable"
+		}
 	}
 
 	public var securityCenterBody: String {

@@ -66,12 +66,12 @@ private extension [SecurityProblem] {
 			switch $0 {
 			case .problem5, .problem6, .problem7:
 				true
-			case let .problem3(accounts, personas), let .problem9(accounts, personas):
+			case let .problem3(addresses), let .problem9(addresses):
 				switch kind {
 				case let .account(address):
-					accounts.contains(address)
+					addresses.accounts.contains(address) || addresses.hiddenAccounts.contains(address)
 				case let .persona(address):
-					personas.contains(address)
+					addresses.personas.contains(address) || addresses.hiddenPersonas.contains(address)
 				}
 			}
 		}

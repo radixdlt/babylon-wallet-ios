@@ -108,8 +108,8 @@ private extension [SecurityProblem] {
 	func isMnemonicMarkedAsBackedUp(accounts: [Account]) -> Bool {
 		allSatisfy { problem in
 			switch problem {
-			case let .problem3(problematicAccounts, _):
-				Set(problematicAccounts).isDisjoint(with: accounts.map(\.address))
+			case let .problem3(addresses):
+				addresses.problematicAccounts.isDisjoint(with: accounts.map(\.address))
 			default:
 				true
 			}
@@ -119,11 +119,17 @@ private extension [SecurityProblem] {
 	func isMnemonicPresentInKeychain(accounts: [Account]) -> Bool {
 		allSatisfy { problem in
 			switch problem {
-			case let .problem9(problematicAccounts, _):
-				Set(problematicAccounts).isDisjoint(with: accounts.map(\.address))
+			case let .problem9(addresses):
+				addresses.problematicAccounts.isDisjoint(with: accounts.map(\.address))
 			default:
 				true
 			}
 		}
+	}
+}
+
+private extension ProblematicAddresses {
+	var problematicAccounts: Set<AccountAddress> {
+		Set(accounts + hiddenAccounts)
 	}
 }
