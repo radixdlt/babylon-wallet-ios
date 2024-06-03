@@ -53,6 +53,7 @@ public struct Main: Sendable, FeatureReducer {
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.cloudBackupClient) var cloudBackupClient
+	@Dependency(\.resetWalletClient) var resetWalletClient
 
 	public init() {}
 
@@ -73,6 +74,7 @@ public struct Main: Sendable, FeatureReducer {
 		case .task:
 			startAutomaticBackupsEffect()
 				.merge(with: gatewayValuesEffect())
+				.merge(with: didResetWalletEffect())
 		}
 	}
 
@@ -96,6 +98,18 @@ public struct Main: Sendable, FeatureReducer {
 		}
 	}
 
+	private func didResetWalletEffect() -> Effect<Action> {
+		.run { send in
+			for try await _ in resetWalletClient.walletDidReset() {
+				guard !Task.isCancelled else { return }
+				try await appPreferencesClient.deleteProfileAndFactorSources(true)
+				await send(.delegate(.removedWallet))
+			}
+		} catch: { error, _ in
+			loggerGlobal.error("Failed to delete profile: \(error)")
+		}
+	}
+
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .home(.delegate(.displaySettings)):
@@ -112,21 +126,6 @@ public struct Main: Sendable, FeatureReducer {
 		case let .currentGatewayChanged(currentGateway):
 			state.isOnMainnet = currentGateway.network.id == .mainnet
 			return .none
-		}
-	}
-
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
-		switch presentedAction {
-		case .settings(.delegate(.didResetWallet)):
-			.run { send in
-				try await appPreferencesClient.deleteProfileAndFactorSources(true)
-				await send(.delegate(.removedWallet))
-			} catch: { error, _ in
-				loggerGlobal.error("Failed to delete profile: \(error)")
-			}
-
-		default:
-			.none
 		}
 	}
 }
