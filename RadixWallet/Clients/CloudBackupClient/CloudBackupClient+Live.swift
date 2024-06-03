@@ -4,7 +4,7 @@ import DependenciesAdditions
 import os
 
 extension CKRecord.RecordType {
-	static let profile = "Profile"
+	static let profile = "ProfileV2"
 }
 
 extension CKRecord.FieldKey {
@@ -47,6 +47,7 @@ extension CloudBackupClient {
 	struct NoProfileInRecordError: Error {}
 	struct MissingMetadataError: Error {}
 	struct HeaderAndMetadataMismatchError: Error {}
+	struct WrongRecordTypeError: Error { let type: CKRecord.RecordType }
 	struct ProfileMissingFromKeychainError: Error { let id: ProfileID }
 
 	public static let liveValue: Self = .live()
@@ -61,7 +62,11 @@ extension CloudBackupClient {
 
 		@Sendable
 		func fetchProfileRecord(_ id: CKRecord.ID) async throws -> CKRecord {
-			try await container.privateCloudDatabase.record(for: id)
+			let record = try await container.privateCloudDatabase.record(for: id)
+			guard record.recordType == .profile else {
+				throw WrongRecordTypeError(type: record.recordType)
+			}
+			return record
 		}
 
 		@Sendable
@@ -181,7 +186,6 @@ extension CloudBackupClient {
 
 				let migrated = try await migratable.asyncMap { profileData, header in
 					let backedUpRecord = backedUpRecords.first { $0.recordID.recordName == header.id.uuidString }
-
 					if let backedUpRecord, try getProfileHeader(backedUpRecord).lastModified >= header.lastModified {
 						// We already have a more recent version backed up on iCloud, so we return that
 						return backedUpRecord
