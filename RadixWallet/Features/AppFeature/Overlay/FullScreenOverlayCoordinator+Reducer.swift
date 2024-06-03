@@ -36,7 +36,7 @@ public struct FullScreenOverlayCoordinator: Sendable, FeatureReducer {
 			Scope(state: \.claimWallet, action: \.claimWallet) {
 				ClaimWallet()
 			}
-			Scope(state: /State.relinkConnector, action: /Action.relinkConnector) {
+			Scope(state: \.relinkConnector, action: \.relinkConnector) {
 				NewConnection()
 			}
 		}
