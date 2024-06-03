@@ -224,10 +224,8 @@ public struct SelectBackup: Sendable, FeatureReducer {
 	public func migrateAndLoadEffect() -> Effect<Action> {
 		.run { send in
 			do {
-				if !userDefaults.getDidMigrateKeychainProfiles {
-					await send(.internal(.setStatus(.migrating)))
-					try await cloudBackupClient.migrateProfilesFromKeychain()
-				}
+				await send(.internal(.setStatus(.migrating)))
+				_ = try await cloudBackupClient.migrateProfilesFromKeychain()
 
 				await send(.internal(.loadedThisDeviceID(
 					cloudBackupClient.loadDeviceID()

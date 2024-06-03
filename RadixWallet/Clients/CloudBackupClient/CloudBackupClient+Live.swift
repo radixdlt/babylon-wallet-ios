@@ -161,9 +161,12 @@ extension CloudBackupClient {
 				let backedUpRecords = try await fetchAllProfileRecords()
 				guard let headerList = try secureStorageClient.loadProfileHeaderList() else { return [] }
 
+				let previouslyMigrated = userDefaults.getMigratedKeychainProfiles
+
 				let migratable = try headerList.compactMap { header -> (Data, Profile.Header)? in
 					let id = header.id
-					guard header.id != activeProfile else { return nil }
+
+					guard !previouslyMigrated.contains(id), header.id != activeProfile else { return nil }
 
 					guard let profileData = try secureStorageClient.loadProfileSnapshotData(id) else {
 						throw ProfileMissingFromKeychainError(id: id)
@@ -190,8 +193,8 @@ extension CloudBackupClient {
 					return uploadedRecord
 				}
 
-				// We probably want to set this to false if we find migratable profiles that we could't migrate
-				userDefaults.setDidMigrateKeychainProfiles(migrated.count == migratable.count)
+				let migratedIDs = migrated.compactMap { ProfileID(uuidString: $0.recordID.recordName) }
+				try userDefaults.appendMigratedKeychainProfiles(migratedIDs)
 
 				return migrated
 			},
