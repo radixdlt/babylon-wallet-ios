@@ -278,7 +278,7 @@
 "editPersona_closeConfirmationDialog_keepEditing" = "Keep Editing";
 "editPersona_closeConfirmationDialog_message" = "Are you sure you want to discard changes to this Persona?";
 "personas_title" = "Personas";
-"personas_subtitle" = "Here are all of your current Personas.";
+"personas_subtitle" = "Here are all of your current Personas in your Radix Wallet.";
 "personas_whatIsPersona" = "What is a Persona?";
 "personas_createNewPersona" = "Create a New Persona";
 "personas_writeSeedPhrase" = "Write down main seed phrase";
@@ -406,7 +406,7 @@
 "transactionReview_poolUnits" = "Pool Units";
 "transactionReview_slideToSign" = "Slide to Sign";
 "transactionReview_xrdAmount" = "%@ XRD";
-"transactionReview_insufficientBalance" = "Insufficient Balance";
+"transactionReview_insufficientBalance" = "Not enough XRD for transaction fee";
 "transactionReview_feePayerRequiredMessage" = "Fee payer account required";
 "transactionReview_withdrawalsHeading" = "Withdrawing From";
 "transactionReview_depositsHeading" = "Depositing To";
