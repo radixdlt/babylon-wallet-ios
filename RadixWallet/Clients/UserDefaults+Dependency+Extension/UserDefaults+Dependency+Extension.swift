@@ -10,7 +10,7 @@ public enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
 	case transactionsCompletedCounter
 	case dateOfLastSubmittedNPSSurvey
 	case npsSurveyUserID
-	case didMigrateKeychainProfiles
+	case migratedKeychainProfiles
 	case lastCloudBackups
 	case lastManualBackups
 	case lastSyncedAccountsWithCE
@@ -164,12 +164,14 @@ extension UserDefaults.Dependency {
 		bool(forKey: Key.dAppLinkingAutoContinueEnabled.rawValue) ?? false
 	}
 
-	public var getDidMigrateKeychainProfiles: Bool {
-		bool(key: .didMigrateKeychainProfiles)
+	public var getMigratedKeychainProfiles: Set<ProfileID> {
+		(try? loadCodable(key: .migratedKeychainProfiles)) ?? []
 	}
 
-	public func setDidMigrateKeychainProfiles(_ value: Bool) {
-		set(value, forKey: Key.didMigrateKeychainProfiles.rawValue)
+	public func appendMigratedKeychainProfiles(_ value: some Collection<ProfileID>) throws {
+		var migrated = getMigratedKeychainProfiles
+		migrated.append(contentsOf: value)
+		try save(codable: migrated, forKey: .migratedKeychainProfiles)
 	}
 
 	public var getLastCloudBackups: [ProfileID: BackupResult] {

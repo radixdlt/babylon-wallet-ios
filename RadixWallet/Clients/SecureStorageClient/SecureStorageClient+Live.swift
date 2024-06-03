@@ -345,12 +345,7 @@ extension SecureStorageClient: DependencyKey {
 		}
 
 		let updateIsCloudProfileSyncEnabled: UpdateIsCloudProfileSyncEnabled = { profileId, change in
-			guard
-				let profileSnapshotData = try loadProfileSnapshotData(profileId),
-				let headerList = try loadProfileHeaderList()
-			else {
-				return
-			}
+			guard let profileSnapshotData = try loadProfileSnapshotData(profileId) else { return }
 
 			switch change {
 			case .disable:

@@ -8178,7 +8178,6 @@
 			baseConfigurationReference = 48CFC69E2ADC110800E77A5C /* iOS-alpha.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "RadixWallet/RadixWalletDebug-Alpha.entitlements";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CURRENT_PROJECT_VERSION = 1;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = MDH99V28LM;
 				INFOPLIST_KEY_CFBundleDisplayName = "Radix Wallet";
@@ -8679,7 +8678,7 @@
 			repositoryURL = "https://github.com/radixdlt/sargon";
 			requirement = {
 				kind = exactVersion;
-				version = 1.0.4;
+				version = 1.0.7;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

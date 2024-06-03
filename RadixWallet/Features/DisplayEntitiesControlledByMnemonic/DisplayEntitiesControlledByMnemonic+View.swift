@@ -9,14 +9,12 @@ extension DisplayEntitiesControlledByMnemonic.State {
 				case .mnemonicCanBeDisplayed:
 					.init(
 						title: L10n.SeedPhrases.SeedPhrase.headingReveal,
-						imageAsset: AssetResource.signingKey,
 						type: .standard,
 						isError: false
 					)
 				case .mnemonicNeedsImport:
 					.init(
-						title: L10n.SeedPhrases.SeedPhrase.headingNeedsImport,
-						imageAsset: AssetResource.error,
+						title: L10n.SecurityProblems.No9.seedPhrases,
 						type: .standard,
 						isError: true
 					)
@@ -26,7 +24,7 @@ extension DisplayEntitiesControlledByMnemonic.State {
 			}(),
 			promptUserToBackUpMnemonic: mode == .mnemonicCanBeDisplayed && !isMnemonicMarkedAsBackedUp,
 			accounts: accounts.elements,
-			hasHiddenAccounts: hasHiddenAccounts
+			hiddenAccountsCount: hiddenAccountsCount
 		)
 	}
 }
@@ -36,11 +34,10 @@ extension DisplayEntitiesControlledByMnemonic {
 	public struct ViewState: Equatable {
 		public struct HeadingState: Equatable {
 			public let title: String
-			public let imageAsset: ImageAsset
 			public let type: HeadingType
 			public let isError: Bool
 			var foregroundColor: Color {
-				isError ? .app.red1 : .black
+				isError ? .app.gray2 : .app.gray1
 			}
 
 			public enum HeadingType: Equatable {
@@ -73,7 +70,11 @@ extension DisplayEntitiesControlledByMnemonic {
 		public let headingState: HeadingState?
 		public let promptUserToBackUpMnemonic: Bool
 		public let accounts: [Account]
-		public let hasHiddenAccounts: Bool
+		public let hiddenAccountsCount: Int
+
+		var totalAccountsCount: Int {
+			accounts.count + hiddenAccountsCount
+		}
 	}
 }
 
@@ -120,8 +121,8 @@ extension DisplayEntitiesControlledByMnemonic {
 
 				if viewState.promptUserToBackUpMnemonic {
 					WarningErrorView(
-						text: L10n.SeedPhrases.backupWarning,
-						type: .error,
+						text: L10n.SecurityProblems.No3.seedPhrases,
+						type: .warning,
 						useNarrowSpacing: true
 					)
 				}
@@ -133,7 +134,7 @@ extension DisplayEntitiesControlledByMnemonic {
 								.cornerRadius(.small1)
 						}
 					}
-				} else if viewState.hasHiddenAccounts {
+				} else if viewState.hiddenAccountsCount > 0 {
 					NoContentView(L10n.SeedPhrases.hiddenAccountsOnly)
 						.frame(maxWidth: .infinity)
 						.frame(height: .huge2)
@@ -144,7 +145,7 @@ extension DisplayEntitiesControlledByMnemonic {
 
 		private func heading(_ headingState: ViewState.HeadingState) -> some SwiftUI.View {
 			HStack {
-				Image(asset: headingState.imageAsset)
+				Image(.signingKey)
 					.resizable()
 					.renderingMode(.template)
 					.frame(.smallest)
@@ -155,7 +156,7 @@ extension DisplayEntitiesControlledByMnemonic {
 						.textStyle(.body1Header)
 						.foregroundColor(headingState.foregroundColor)
 
-					Text(headingState.connectedAccountsLabel(accounts: viewState.accounts.count))
+					Text(headingState.connectedAccountsLabel(accounts: viewState.totalAccountsCount))
 						.textStyle(.body2Regular)
 						.foregroundColor(.app.gray2)
 				}
@@ -164,7 +165,8 @@ extension DisplayEntitiesControlledByMnemonic {
 
 				switch headingState.type {
 				case .standard:
-					Image(asset: AssetResource.chevronRight)
+					Image(.chevronRight)
+						.foregroundColor(headingState.foregroundColor)
 				case let .scanning(isSelected):
 					RadioButton(appearance: .dark, state: isSelected ? .selected : .unselected)
 				}

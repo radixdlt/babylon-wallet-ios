@@ -84,8 +84,11 @@ extension SecurityCenterClient {
 						!isCloudProfileSyncEnabled && manualBackup?.upToDate == false
 					}
 
-					func hasProblem9() async -> Bool {
-						await (try? deviceFactorSourceClient.isSeedPhraseNeededToRecoverAccounts()) ?? false
+					func hasProblem9() async -> (accounts: [AccountAddress], personas: [IdentityAddress])? {
+						guard let result = try? await deviceFactorSourceClient.mnemonicMissingEntities(),
+						      result.accounts.count + result.personas.count > 0
+						else { return nil }
+						return result
 					}
 
 					var result: [SecurityProblem] = []
@@ -95,7 +98,9 @@ extension SecurityCenterClient {
 							result.append(.problem3(accounts: accounts, personas: personas))
 						}
 
-						if await hasProblem9() { result.append(.problem9) }
+						if let (accounts, personas) = await hasProblem9() {
+							result.append(.problem9(accounts: accounts, personas: personas))
+						}
 					}
 
 					if type == nil || type == .configurationBackup {
