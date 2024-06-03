@@ -25,7 +25,10 @@ extension OverlayReducer {
 
 private extension StoreOf<OverlayReducer> {
 	var destination: PresentationStoreOf<OverlayReducer.Destination> {
-		scope(state: \.$destination, action: \.destination)
+		func scopeState(state: State) -> PresentationState<OverlayReducer.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 
@@ -38,12 +41,7 @@ private extension View {
 	}
 
 	private func alert(with destinationStore: PresentationStoreOf<OverlayReducer.Destination>) -> some View {
-		alert(
-			store: destinationStore.scope(
-				state: \.alert,
-				action: \.alert
-			)
-		)
+		alert(store: destinationStore.scope(state: \.alert, action: \.alert))
 	}
 
 	private func fullScreenCover(with destinationStore: PresentationStoreOf<OverlayReducer.Destination>) -> some View {

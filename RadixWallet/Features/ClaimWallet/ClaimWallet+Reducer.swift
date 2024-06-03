@@ -6,6 +6,10 @@ public struct ClaimWallet: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var isLoading: Bool
 
+		public var screenState: ControlState {
+			isLoading ? .loading(.global(text: nil)) : .enabled
+		}
+
 		public init(
 			isLoading: Bool = false
 		) {
