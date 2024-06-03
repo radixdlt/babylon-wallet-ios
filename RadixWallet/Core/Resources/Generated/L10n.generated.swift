@@ -2239,8 +2239,8 @@ public enum L10n {
   public enum Personas {
     /// Create a New Persona
     public static let createNewPersona = L10n.tr("Localizable", "personas_createNewPersona", fallback: "Create a New Persona")
-    /// Here are all of your current Personas.
-    public static let subtitle = L10n.tr("Localizable", "personas_subtitle", fallback: "Here are all of your current Personas.")
+    /// Here are all of your current Personas in your Radix Wallet.
+    public static let subtitle = L10n.tr("Localizable", "personas_subtitle", fallback: "Here are all of your current Personas in your Radix Wallet.")
     /// Personas
     public static let title = L10n.tr("Localizable", "personas_title", fallback: "Personas")
     /// What is a Persona?
@@ -2895,8 +2895,8 @@ public enum L10n {
     public static let feePayerRequiredMessage = L10n.tr("Localizable", "transactionReview_feePayerRequiredMessage", fallback: "Fee payer account required")
     /// Guaranteed
     public static let guaranteed = L10n.tr("Localizable", "transactionReview_guaranteed", fallback: "Guaranteed")
-    /// Insufficient Balance
-    public static let insufficientBalance = L10n.tr("Localizable", "transactionReview_insufficientBalance", fallback: "Insufficient Balance")
+    /// Not enough XRD for transaction fee
+    public static let insufficientBalance = L10n.tr("Localizable", "transactionReview_insufficientBalance", fallback: "Not enough XRD for transaction fee")
     /// Message
     public static let messageHeading = L10n.tr("Localizable", "transactionReview_messageHeading", fallback: "Message")
     /// Contributing to pools
