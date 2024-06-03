@@ -278,7 +278,7 @@
 "editPersona_closeConfirmationDialog_keepEditing" = "Keep Editing";
 "editPersona_closeConfirmationDialog_message" = "Are you sure you want to discard changes to this Persona?";
 "personas_title" = "Personas";
-"personas_subtitle" = "Here are all of your current Personas.";
+"personas_subtitle" = "Here are all of your current Personas in your Radix Wallet.";
 "personas_whatIsPersona" = "What is a Persona?";
 "personas_createNewPersona" = "Create a New Persona";
 "personas_writeSeedPhrase" = "Write down main seed phrase";
@@ -344,7 +344,7 @@
 "dAppRequest_chooseAccountsOneTime_subtitleAtLeast" = "**%@** is making a one-time request for at least %d accounts.";
 "dAppRequest_chooseAccountsOneTime_subtitleAtLeastZero" = "**%@** is making a one-time request for any number of accounts.";
 "dAppRequest_chooseAccountsOneTime_subtitleAtLeastOne" = "**%@** is making a one-time request for at least 1 account.";
-"dAppRequest_chooseAccountsOneTime_subtitleExactly" = "*%@* is making a one-time request for at least %d accounts.";
+"dAppRequest_chooseAccountsOneTime_subtitleExactly" = "**%@** is making a one-time request for %d accounts.";
 "dAppRequest_chooseAccountsOneTime_subtitleExactlyOne" = "**%@** is making a one-time request for 1 account.";
 "dAppRequest_chooseAccountsOngoing_title" = "Account Permission";
 "dAppRequest_chooseAccountsOngoing_subtitleAtLeast" = "Choose at least %d accounts you wish to use with **%@**.";
@@ -406,7 +406,7 @@
 "transactionReview_poolUnits" = "Pool Units";
 "transactionReview_slideToSign" = "Slide to Sign";
 "transactionReview_xrdAmount" = "%@ XRD";
-"transactionReview_insufficientBalance" = "Insufficient Balance";
+"transactionReview_insufficientBalance" = "Not enough XRD for transaction fee";
 "transactionReview_feePayerRequiredMessage" = "Fee payer account required";
 "transactionReview_withdrawalsHeading" = "Withdrawing From";
 "transactionReview_depositsHeading" = "Depositing To";

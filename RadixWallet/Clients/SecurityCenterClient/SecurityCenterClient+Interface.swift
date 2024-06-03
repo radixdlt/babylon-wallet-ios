@@ -36,7 +36,7 @@ public enum SecurityProblem: Hashable, Sendable, Identifiable {
 	case problem7
 	/// User has gotten a new phone (and restored their wallet from backup) and the wallet sees that there are accounts without shields using a phone key,
 	/// meaning they can only be recovered with the seed phrase. (See problem 2) This would also be the state if a user disabled their PIN (and reenabled it), clearing phone keys.
-	case problem9
+	case problem9(accounts: [AccountAddress], personas: [IdentityAddress])
 
 	public var id: Int { number }
 

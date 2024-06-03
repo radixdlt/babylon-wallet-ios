@@ -12,8 +12,8 @@ public struct DeviceFactorSourceClient: Sendable {
 	/// Fetched accounts and personas on current network that are controlled by a device factor source, for every factor source in current profile
 	public var controlledEntities: GetControlledEntities
 
-	/// Checks if there is any account for which the wallet doesn't have its seed phrase.
-	public var isSeedPhraseNeededToRecoverAccounts: IsSeedPhraseNeededToRecoverAccounts
+	/// The `Accounts` & `Personas` for which the wallet doesn't have its mnmemonic.
+	public var mnemonicMissingEntities: MnemonicMissingEntities
 
 	/// The `Accounts` & `Personas` the user wouldn't be able to recover if they loose their phone,
 	/// since they haven't been backed up (seed phrase not written).
@@ -25,7 +25,7 @@ public struct DeviceFactorSourceClient: Sendable {
 		isAccountRecoveryNeeded: @escaping IsAccountRecoveryNeeded,
 		entitiesControlledByFactorSource: @escaping GetEntitiesControlledByFactorSource,
 		controlledEntities: @escaping GetControlledEntities,
-		isSeedPhraseNeededToRecoverAccounts: @escaping IsSeedPhraseNeededToRecoverAccounts,
+		mnemonicMissingEntities: @escaping MnemonicMissingEntities,
 		unrecoverableEntities: @escaping UnrecoverableEntities
 	) {
 		self.publicKeysFromOnDeviceHD = publicKeysFromOnDeviceHD
@@ -33,7 +33,7 @@ public struct DeviceFactorSourceClient: Sendable {
 		self.isAccountRecoveryNeeded = isAccountRecoveryNeeded
 		self.entitiesControlledByFactorSource = entitiesControlledByFactorSource
 		self.controlledEntities = controlledEntities
-		self.isSeedPhraseNeededToRecoverAccounts = isSeedPhraseNeededToRecoverAccounts
+		self.mnemonicMissingEntities = mnemonicMissingEntities
 		self.unrecoverableEntities = unrecoverableEntities
 	}
 }
@@ -46,7 +46,7 @@ extension DeviceFactorSourceClient {
 	public typealias PublicKeysFromOnDeviceHD = @Sendable (PublicKeysFromOnDeviceHDRequest) async throws -> [HierarchicalDeterministicPublicKey]
 	public typealias SignatureFromOnDeviceHD = @Sendable (SignatureFromOnDeviceHDRequest) async throws -> SignatureWithPublicKey
 	public typealias IsAccountRecoveryNeeded = @Sendable () async throws -> Bool
-	public typealias IsSeedPhraseNeededToRecoverAccounts = @Sendable () async throws -> Bool
+	public typealias MnemonicMissingEntities = @Sendable () async throws -> (accounts: [AccountAddress], personas: [IdentityAddress])
 	public typealias UnrecoverableEntities = @Sendable () async throws -> (accounts: [AccountAddress], personas: [IdentityAddress])
 }
 
@@ -65,7 +65,7 @@ public struct PublicKeysFromOnDeviceHDRequest: Sendable, Hashable {
 		case let .loadMnemonicFor(deviceFactorSource, loadMnemonicPurpose):
 			let factorSourceID = deviceFactorSource.id
 			guard
-				let mnemonicWithPassphrase = try secureStorageClient.loadMnemonic(factorSourceID: factorSourceID)
+				let mnemonicWithPassphrase = try secureStorageClient.loadMnemonic(factorSourceID: factorSourceID, notifyIfMissing: false)
 			else {
 				loggerGlobal.critical("Failed to find factor source with ID: '\(factorSourceID)'")
 				throw FailedToFindFactorSource()

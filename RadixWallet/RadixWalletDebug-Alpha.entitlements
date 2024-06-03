@@ -6,7 +6,7 @@
 	<string>development</string>
 	<key>com.apple.developer.icloud-container-identifiers</key>
 	<array>
-		<string>iCloud.com.radixpublishing.radixwallet.ios.pre-alpha</string>
+		<string>iCloud.com.radixpublishing.radixwallet.ios.alpha</string>
 	</array>
 	<key>com.apple.developer.icloud-services</key>
 	<array>

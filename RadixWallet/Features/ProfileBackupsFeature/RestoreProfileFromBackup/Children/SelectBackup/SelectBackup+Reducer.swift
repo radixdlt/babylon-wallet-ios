@@ -14,9 +14,9 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 		public var status: Status = .start
 
-		public var backedUpProfiles: [CloudBackupClient.BackedupProfile]? = nil
+		public var backedUpProfiles: [Profile.Header]? = nil
 
-		public var selectedProfile: CloudBackupClient.BackedupProfile? = nil
+		public var selectedProfile: Profile.Header? = nil
 
 		public var isDisplayingFileImporter: Bool
 		public var thisDeviceID: UUID?
@@ -60,19 +60,19 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case task
-		case selectedProfile(CloudBackupClient.BackedupProfile?)
+		case selectedProfile(Profile.Header?)
 		case importFromFileInstead
 		case dismissFileImporter
 		case otherRestoreOptionsTapped
 		case profileImportResult(Result<URL, NSError>)
-		case tappedUseCloudBackup(CloudBackupClient.BackedupProfile)
+		case tappedUseCloudBackup(ProfileID)
 		case closeButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case setStatus(State.Status)
-		case loadCloudBackupProfiles([CloudBackupClient.BackedupProfile]?)
-		case loadThisDeviceIDResult(UUID?)
+		case loadedProfileHeadersFromCloudBackup([Profile.Header]?)
+		case loadedThisDeviceID(UUID?)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -105,8 +105,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			return migrateEffect()
-				.concatenate(with: loadEffect())
+			return migrateAndLoadEffect()
 
 		case .importFromFileInstead:
 			state.isDisplayingFileImporter = true
@@ -120,8 +119,15 @@ public struct SelectBackup: Sendable, FeatureReducer {
 			state.selectedProfile = profile
 			return .none
 
-		case let .tappedUseCloudBackup(backedupProfile):
-			return .send(.delegate(.selectedProfile(backedupProfile.profile, isInCloud: true, containsLegacyP2PLinks: backedupProfile.containsLegacyP2PLinks)))
+		case let .tappedUseCloudBackup(profileID):
+			return .run { send in
+				do {
+					let backedUpProfile = try await cloudBackupClient.loadProfile(profileID)
+					await send(.delegate(.selectedProfile(backedUpProfile.profile, isInCloud: true, containsLegacyP2PLinks: backedUpProfile.containsLegacyP2PLinks)))
+				} catch {
+					errorQueue.schedule(error)
+				}
+			}
 
 		case .dismissFileImporter:
 			state.isDisplayingFileImporter = false
@@ -167,11 +173,11 @@ public struct SelectBackup: Sendable, FeatureReducer {
 			state.status = status
 			return .none
 
-		case let .loadCloudBackupProfiles(profiles):
-			state.backedUpProfiles = profiles?.sorted(by: \.profile.header.lastModified).reversed()
+		case let .loadedProfileHeadersFromCloudBackup(headers):
+			state.backedUpProfiles = headers?.sorted(by: \.lastModified).reversed()
 			return .none
 
-		case let .loadThisDeviceIDResult(identifier):
+		case let .loadedThisDeviceID(identifier):
 			state.thisDeviceID = identifier
 			return .none
 		}
@@ -215,38 +221,26 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		return .none
 	}
 
-	public func migrateEffect() -> Effect<Action> {
-		.run { send in
-			if !userDefaults.getDidMigrateKeychainProfiles {
-				await send(.internal(.setStatus(.migrating)))
-				do {
-					let profilesInKeychain = try secureStorageClient.loadProfileHeaderList()?.count ?? 0
-					if profilesInKeychain > 0 {
-						_ = try await cloudBackupClient.migrateProfilesFromKeychain()
-						userDefaults.setDidMigrateKeychainProfiles(true)
-					}
-				} catch {
-					await send(.internal(.setStatus(.failed)))
-				}
-			}
-		}
-	}
-
-	public func loadEffect() -> Effect<Action> {
+	public func migrateAndLoadEffect() -> Effect<Action> {
 		.run { send in
 			do {
-				await send(.internal(.loadThisDeviceIDResult(
+				await send(.internal(.setStatus(.migrating)))
+				_ = try await cloudBackupClient.migrateProfilesFromKeychain()
+
+				await send(.internal(.loadedThisDeviceID(
 					cloudBackupClient.loadDeviceID()
 				)))
 
 				await send(.internal(.setStatus(.loading)))
 
-				try await send(.internal(.loadCloudBackupProfiles(
-					cloudBackupClient.loadAllProfiles()
+				try await send(.internal(.loadedProfileHeadersFromCloudBackup(
+					cloudBackupClient.loadProfileHeaders()
 				)))
 
 				await send(.internal(.setStatus(.loaded)))
 			} catch {
+				errorQueue.schedule(error)
+				loggerGlobal.error("Failed to migrate or load backed up profiles, error: \(error)")
 				await send(.internal(.setStatus(.failed)))
 			}
 		}

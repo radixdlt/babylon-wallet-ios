@@ -25,7 +25,7 @@ extension SelectBackup {
 					.footer {
 						WithControlRequirements(
 							viewStore.selectedProfile,
-							forAction: { viewStore.send(.tappedUseCloudBackup($0)) },
+							forAction: { viewStore.send(.tappedUseCloudBackup($0.id)) },
 							control: { action in
 								Button(L10n.IOSProfileBackup.useICloudBackup, action: action)
 									.buttonStyle(.primaryRectangular)
@@ -65,7 +65,14 @@ extension SelectBackup.View {
 				Text(L10n.IOSRecoverProfileBackup.Choose.title)
 					.textStyle(.body1Header)
 
-				backupsList(with: viewStore)
+				switch viewStore.status {
+				case .start, .migrating, .loading:
+					ProgressView()
+				case .loaded:
+					backupsList(with: viewStore)
+				case .failed:
+					EmptyView()
+				}
 
 				VStack(alignment: .center, spacing: .small1) {
 					selectFileInsteadButton(with: store)
@@ -91,12 +98,7 @@ extension SelectBackup.View {
 		VStack(spacing: .medium1) {
 			if let backedUpProfiles = viewStore.backedUpProfiles {
 				Selection(
-					viewStore.binding(
-						get: \.selectedProfile,
-						send: {
-							.selectedProfile($0)
-						}
-					),
+					viewStore.binding(get: \.selectedProfile) { .selectedProfile($0) },
 					from: backedUpProfiles
 				) { item in
 					cloudBackupDataCard(item, viewStore: viewStore)
@@ -109,8 +111,11 @@ extension SelectBackup.View {
 	}
 
 	@MainActor
-	private func cloudBackupDataCard(_ item: SelectionItem<CloudBackupClient.BackedupProfile>, viewStore: ViewStoreOf<SelectBackup>) -> some View {
-		let header = item.value.profile.header
+	private func cloudBackupDataCard(
+		_ item: SelectionItem<Profile.Header>,
+		viewStore: ViewStoreOf<SelectBackup>
+	) -> some View {
+		let header = item.value
 		let isVersionCompatible = header.isVersionCompatible()
 		let creatingDevice = header.creatingDevice.id == viewStore.thisDeviceID ? L10n.IOSProfileBackup.thisDevice : header.creatingDevice.description
 		return Card(action: item.action) {
@@ -196,22 +201,20 @@ private extension View {
 
 	private func inputEncryptionPassword(with destinationStore: PresentationStoreOf<SelectBackup.Destination>) -> some View {
 		sheet(
-			store: destinationStore.scope(
-				state: \.inputEncryptionPassword,
-				action: \.inputEncryptionPassword
-			)) { store in
-				EncryptOrDecryptProfile.View(store: store)
-					.inNavigationView
-			}
+			store: destinationStore.scope(state: \.inputEncryptionPassword, action: \.inputEncryptionPassword))
+		{
+			EncryptOrDecryptProfile.View(store: $0)
+				.withNavigationBar {
+					destinationStore.send(.dismiss)
+				}
+		}
 	}
 
 	private func recoverWalletWithoutProfileCoordinator(with destinationStore: PresentationStoreOf<SelectBackup.Destination>) -> some View {
 		fullScreenCover(
-			store: destinationStore.scope(
-				state: \.recoverWalletWithoutProfileCoordinator,
-				action: \.recoverWalletWithoutProfileCoordinator
-			)) { store in
-				RecoverWalletWithoutProfileCoordinator.View(store: store)
-			}
+			store: destinationStore.scope(state: \.recoverWalletWithoutProfileCoordinator, action: \.recoverWalletWithoutProfileCoordinator))
+		{
+			RecoverWalletWithoutProfileCoordinator.View(store: $0)
+		}
 	}
 }
