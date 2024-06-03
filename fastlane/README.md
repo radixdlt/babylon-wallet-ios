@@ -91,14 +91,6 @@ Installs development certificates
 
 Generate new dev certificates
 
-### ios generate_new_pre_alpha_certificates
-
-```sh
-[bundle exec] fastlane ios generate_new_pre_alpha_certificates
-```
-
-Generate new preAlpha certificates
-
 ### ios generate_new_appstore_certificates
 
 ```sh
