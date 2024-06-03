@@ -22,7 +22,6 @@ extension PoolUnitsList {
 					}
 				}
 			}
-			.destinations(with: store)
 		}
 	}
 }
@@ -30,24 +29,5 @@ extension PoolUnitsList {
 private extension PoolUnitsList.State.PoolUnitState {
 	var viewState: ResourceBalance.ViewState.PoolUnit {
 		.init(poolUnit: poolUnit, details: resourceDetails)
-	}
-}
-
-private extension StoreOf<PoolUnitsList> {
-	var destination: PresentationStoreOf<PoolUnitsList.Destination> {
-		func scopeState(state: State) -> PresentationState<PoolUnitsList.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
-	}
-}
-
-@MainActor
-private extension View {
-	func destinations(with store: StoreOf<PoolUnitsList>) -> some View {
-		let destinationStore = store.destination
-		return sheet(store: destinationStore.scope(state: \.details, action: \.details)) {
-			PoolUnitDetails.View(store: $0)
-		}
 	}
 }

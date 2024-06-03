@@ -6,6 +6,15 @@ import SwiftUI
 struct WalletApp: SwiftUI.App {
 	@UIApplicationDelegateAdaptor var delegate: AppDelegate
 
+	init() {
+		#if DEBUG
+		// MUST NOT be called twice (panics...)
+		// MUST NOT be enabled in PROD (not ensured that secrets are omitted)
+		// This is VERY VERY verbose, so mosly useful for debugging.
+		enableLoggingFromRust()
+		#endif
+	}
+
 	var body: some SwiftUI.Scene {
 		WindowGroup {
 			if !_XCTIsTesting {

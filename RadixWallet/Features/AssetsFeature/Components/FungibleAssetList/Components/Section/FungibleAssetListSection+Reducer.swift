@@ -40,8 +40,8 @@ extension FungibleAssetList {
 
 		public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 			switch childAction {
-			case let .row(_, .delegate(.selected(token))):
-				.send(.delegate(.selected(token)))
+			case let .row(_, .delegate(.selected(resource))):
+				.send(.delegate(.selected(resource)))
 			case .row:
 				.none
 			}

@@ -9,7 +9,7 @@ extension DappInteractionClient: DependencyKey {
 		@Dependency(\.radixConnectClient) var radixConnectClient
 
 		Task {
-			_ = await radixConnectClient.loadFromProfileAndConnectAll()
+			_ = await radixConnectClient.loadP2PLinksAndConnectAll()
 
 			for try await incomingRequest in await radixConnectClient.receiveRequests(/P2P.RTCMessageFromPeer.Request.dapp) {
 				guard !Task.isCancelled else {

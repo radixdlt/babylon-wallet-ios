@@ -109,6 +109,8 @@ extension Address {
 
 extension CacheClient {
 	public enum Entry: Equatable {
+		static let root: String = "RadixWallet"
+
 		public init(address: some AddressProtocol) {
 			self = .onLedgerEntity(.init(address: address))
 		}
@@ -132,10 +134,10 @@ extension CacheClient {
 				case let .address(address):
 					return address.filesystemFilePath(folderPath: filesystemFolderPath)
 				case let .nonFungibleData(nonFungibleGlobalId):
-					return "\(filesystemFolderPath)/\(nonFungibleGlobalId.description)"
+					return nonFungibleGlobalId.description
 				case let .nonFungibleIdPage(_, resourceAddress, pageCursor):
 					let file = "nonFungibleIds-" + resourceAddress.address + (pageCursor.map { "-\($0)" } ?? "")
-					return "\(filesystemFolderPath)/\(file)"
+					return file
 				}
 			}
 
@@ -163,7 +165,7 @@ extension CacheClient {
 		var filesystemFilePath: String {
 			switch self {
 			case let .onLedgerEntity(entity):
-				entity.filesystemFilePath
+				"\(filesystemFolderPath)/\(entity.filesystemFilePath)"
 			case let .networkName(url):
 				"\(filesystemFolderPath)/networkName-\(url)"
 			case let .dAppRequestMetadata(definitionAddress):
@@ -180,7 +182,7 @@ extension CacheClient {
 		}
 
 		var filesystemFolderPath: String {
-			switch self {
+			let path = switch self {
 			case let .onLedgerEntity(entity):
 				entity.filesystemFolderPath
 			case .networkName:
@@ -196,6 +198,8 @@ extension CacheClient {
 			case .dateOfFirstTransaction:
 				"DateOfFirstTransaction"
 			}
+
+			return "\(Self.root)/\(path)"
 		}
 
 		var expirationDateFilePath: String {

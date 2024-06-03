@@ -90,7 +90,7 @@ extension RadixConnectClient {
 		}
 
 		return Self(
-			loadFromProfileAndConnectAll: {
+			loadP2PLinksAndConnectAll: {
 				Task {
 					loggerGlobal.info("🔌 Loading and connecting all P2P connections")
 					try await connectToP2PLinks(p2pLinksClient.getP2PLinks())

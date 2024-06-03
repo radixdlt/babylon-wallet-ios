@@ -71,27 +71,29 @@ extension DeviceFactorSourceClient: DependencyKey {
 			)
 		}
 
-		let isSeedPhraseNeededToRecoverAccounts: @Sendable () async throws -> Bool = {
+		let mnemonicMissingEntities: @Sendable () async throws -> (accounts: [AccountAddress], personas: [IdentityAddress]) = {
 			let deviceFactorSources = try await factorSourcesClient.getFactorSources(type: DeviceFactorSource.self)
 			let entities = try await deviceFactorSources.asyncMap {
 				try await entitiesControlledByFactorSource($0, nil)
 			}
-			return entities.contains(where: { !$0.isMnemonicPresentInKeychain })
+			.filter { !$0.isMnemonicPresentInKeychain }
+
+			let accounts = entities.flatMap { $0.accounts + $0.hiddenAccounts }.map(\.address)
+			let personas = entities.flatMap { $0.personas + $0.hiddenPersonas }.map(\.address)
+
+			return (accounts, personas)
 		}
 
-		let unrecoverableEntitiesCount: @Sendable () async throws -> (accounts: Int, personas: Int) = {
+		let unrecoverableEntities: @Sendable () async throws -> (accounts: [AccountAddress], personas: [IdentityAddress]) = {
 			let deviceFactorSources = try await factorSourcesClient.getFactorSources(type: DeviceFactorSource.self)
 			let entities = try await deviceFactorSources.asyncMap {
 				try await entitiesControlledByFactorSource($0, nil)
 			}
-			var accounts = 0
-			var personas = 0
-			for entity in entities {
-				if !entity.isMnemonicMarkedAsBackedUp {
-					accounts += entity.accounts.count
-					personas += entity.personas.count
-				}
-			}
+			.filter { !$0.isMnemonicMarkedAsBackedUp }
+
+			let accounts = entities.flatMap { $0.accounts + $0.hiddenAccounts }.map(\.address)
+			let personas = entities.flatMap { $0.personas + $0.hiddenPersonas }.map(\.address)
+
 			return (accounts, personas)
 		}
 
@@ -155,8 +157,8 @@ extension DeviceFactorSourceClient: DependencyKey {
 					try await entitiesControlledByFactorSource($0, maybeOverridingSnapshot)
 				})
 			},
-			isSeedPhraseNeededToRecoverAccounts: isSeedPhraseNeededToRecoverAccounts,
-			unrecoverableEntitiesCount: unrecoverableEntitiesCount
+			mnemonicMissingEntities: mnemonicMissingEntities,
+			unrecoverableEntities: unrecoverableEntities
 		)
 	}()
 }

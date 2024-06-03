@@ -178,8 +178,8 @@ public struct Home: Sendable, FeatureReducer {
 			.merge(with: loadGateways())
 			.merge(with: loadAccountResources())
 			.merge(with: loadFiatValues())
-			.merge(with: .send(.internal(.showLinkConnectorIfNeeded)))
 			.merge(with: showNpsSurveyEffect())
+			.merge(with: delayedMediumEffect(for: .internal(.showLinkConnectorIfNeeded)))
 
 		case .createAccountButtonTapped:
 			state.destination = .createAccount(

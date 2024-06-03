@@ -6,9 +6,6 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		var poolUnits: IdentifiedArrayOf<PoolUnitState>
 
-		@PresentationState
-		var destination: Destination.State?
-
 		public struct PoolUnitState: Sendable, Hashable, Identifiable {
 			public var id: PoolAddress { poolUnit.resourcePoolAddress }
 			public let poolUnit: OnLedgerEntity.OnLedgerAccount.PoolUnit
@@ -21,48 +18,25 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 		case poolUnitWasTapped(PoolAddress)
 	}
 
-	public struct Destination: DestinationReducer {
-		@CasePathable
-		public enum State: Sendable, Hashable {
-			case details(PoolUnitDetails.State)
-		}
-
-		@CasePathable
-		public enum Action: Sendable, Equatable {
-			case details(PoolUnitDetails.Action)
-		}
-
-		public var body: some ReducerOf<Self> {
-			Scope(state: /State.details, action: /Action.details) {
-				PoolUnitDetails()
-			}
-		}
+	public enum DelegateAction: Sendable, Equatable {
+		case selected(OnLedgerEntitiesClient.OwnedResourcePoolDetails)
 	}
 
 	public init() {}
-
-	public var body: some ReducerOf<Self> {
-		Reduce(core)
-			.ifLet(destinationPath, action: /Action.destination) {
-				Destination()
-			}
-	}
-
-	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .poolUnitWasTapped(id):
 			if let isSelected = state.poolUnits[id: id]?.isSelected {
 				state.poolUnits[id: id]?.isSelected = !isSelected
+				return .none
 			} else {
 				guard let poolUnit = state.poolUnits[id: id], case let .success(details) = poolUnit.resourceDetails else {
 					return .none
 				}
-				state.destination = .details(.init(resourcesDetails: details))
-			}
 
-			return .none
+				return .send(.delegate(.selected(details)))
+			}
 		}
 	}
 }

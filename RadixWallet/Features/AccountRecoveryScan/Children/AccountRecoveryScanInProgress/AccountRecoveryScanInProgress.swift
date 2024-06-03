@@ -178,7 +178,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 			}
 
 			/// A temporary hack to fix ABW-2657. When the deriving public keys slide up will not show
-			return delayedShortEffect(for: .internal(.initiate))
+			return delayedMediumEffect(for: .internal(.initiate))
 
 		case .scanMore:
 			loggerGlobal.debug("Scan more requested.")

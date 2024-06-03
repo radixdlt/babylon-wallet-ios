@@ -18,15 +18,15 @@ extension GatewayAPI {
 public struct ProgrammaticScryptoSborValueEnum: Codable, Hashable {
 
     public private(set) var kind: ProgrammaticScryptoSborValueKind
-    /** Object type name; available only when a schema is present and the type has a name. */
+    /** The name of the type of this value. This is only output when a schema is present and the type has a name. This property is ignored when the value is used as an input to the API.  */
     public private(set) var typeName: String?
-    /** Field name; available only when the value is a child of a `Tuple` or `Enum`, which has a type with named fields. */
+    /** The name of the field which hosts this value. This property is only included if this value is a child of a `Tuple` or `Enum` with named fields. This property is ignored when the value is used as an input to the API.  */
     public private(set) var fieldName: String?
-    public private(set) var variantId: Int
+    public private(set) var variantId: String
     public private(set) var variantName: String?
     public private(set) var fields: [ProgrammaticScryptoSborValue]
 
-    public init(kind: ProgrammaticScryptoSborValueKind, typeName: String? = nil, fieldName: String? = nil, variantId: Int, variantName: String? = nil, fields: [ProgrammaticScryptoSborValue]) {
+    public init(kind: ProgrammaticScryptoSborValueKind, typeName: String? = nil, fieldName: String? = nil, variantId: String, variantName: String? = nil, fields: [ProgrammaticScryptoSborValue]) {
         self.kind = kind
         self.typeName = typeName
         self.fieldName = fieldName
@@ -44,8 +44,22 @@ public struct ProgrammaticScryptoSborValueEnum: Codable, Hashable {
         case fields
     }
 
-    // Encodable protocol methods
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.kind = try container.decode(ProgrammaticScryptoSborValueKind.self, forKey: .kind)
+        self.typeName = try container.decodeIfPresent(String.self, forKey: .typeName)
+        self.fieldName = try container.decodeIfPresent(String.self, forKey: .fieldName)
+        // For backward compatibility, since 1.5.1 the variant_id is returned as String instead of Int
+        self.variantId = if let string_variant_id = try? container.decode(String.self, forKey: .variantId) {
+            string_variant_id
+        } else {
+            try String(container.decode(Int.self, forKey: .variantId))
+        }
+        self.variantName = try container.decodeIfPresent(String.self, forKey: .variantName)
+        self.fields = try container.decode([GatewayAPI.ProgrammaticScryptoSborValue].self, forKey: .fields)
+    }
 
+    // Encodable protocol methods
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(kind, forKey: .kind)

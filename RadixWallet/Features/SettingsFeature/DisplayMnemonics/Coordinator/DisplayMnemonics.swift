@@ -12,6 +12,8 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 		public var destination: Destination.State? = nil
 
 		public var deviceFactorSources: IdentifiedArrayOf<DisplayEntitiesControlledByMnemonic.State> = []
+		fileprivate var problems: [SecurityProblem]?
+		fileprivate var entities: IdentifiedArrayOf<EntitiesControlledByFactorSource>?
 
 		public init() {}
 	}
@@ -21,7 +23,9 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadedDeviceFactorSources(TaskResult<IdentifiedArrayOf<DisplayEntitiesControlledByMnemonic.State>>)
+		case setSecurityProblems([SecurityProblem])
+		case setEntities(TaskResult<IdentifiedArrayOf<EntitiesControlledByFactorSource>>)
+		case setDeviceFactorSources(IdentifiedArrayOf<DisplayEntitiesControlledByMnemonic.State>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -55,6 +59,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 	@Dependency(\.keychainClient) var keychainClient
 	@Dependency(\.backupsClient) var backupsClient
+	@Dependency(\.securityCenterClient) var securityCenterClient
 
 	public init() {}
 
@@ -73,46 +78,28 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onFirstTask:
-			.run { send in
-				let result = await TaskResult {
-					let entitiesForDeviceFactorSources = try await deviceFactorSourceClient.controlledEntities(
-						// `nil` means read profile in ProfileStore, instead of using an overriding profile
-						nil
-					)
-					let deviceFactorSources: [DisplayEntitiesControlledByMnemonic.State] = entitiesForDeviceFactorSources.flatMap { ents in
-
-						let states = [ents.babylon, ents.olympia]
-							.compactMap { $0 }
-							.map {
-								DisplayEntitiesControlledByMnemonic.State(
-									accountsControlledByKeysOnSameCurve: $0,
-									isMnemonicMarkedAsBackedUp: ents.isMnemonicMarkedAsBackedUp,
-									isMnemonicPresentInKeychain: ents.isMnemonicPresentInKeychain,
-									mode: ents.isMnemonicPresentInKeychain ? .mnemonicCanBeDisplayed : .mnemonicNeedsImport
-								)
-							}
-
-						return states
-					}
-					return deviceFactorSources.asIdentified()
-				}
-
-				await send(
-					.internal(.loadedDeviceFactorSources(result))
-				)
-			}
+			securityProblemsEffect()
+				.merge(with: entitiesEffect())
 		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .loadedDeviceFactorSources(.success(deviceFactorSources)):
-			state.deviceFactorSources = deviceFactorSources
-			return .none
+		case let .setSecurityProblems(problems):
+			state.problems = problems
+			return deviceFactorSourcesEffect(state: state)
 
-		case let .loadedDeviceFactorSources(.failure(error)):
+		case let .setEntities(.success(entities)):
+			state.entities = entities
+			return deviceFactorSourcesEffect(state: state)
+
+		case let .setEntities(.failure(error)):
 			loggerGlobal.error("Failed to load device factor sources, error: \(error)")
 			errorQueue.schedule(error)
+			return .none
+
+		case let .setDeviceFactorSources(deviceFactorSources):
+			state.deviceFactorSources = deviceFactorSources
 			return .none
 		}
 	}
@@ -177,6 +164,50 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 			return .none
 		}
 	}
+
+	private func securityProblemsEffect() -> Effect<Action> {
+		.run { send in
+			for try await problems in await securityCenterClient.problems(.securityFactors) {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.setSecurityProblems(problems)))
+			}
+		}
+	}
+
+	private func entitiesEffect() -> Effect<Action> {
+		.run { send in
+			let result = await TaskResult {
+				try await deviceFactorSourceClient.controlledEntities(
+					// `nil` means read profile in ProfileStore, instead of using an overriding profile
+					nil
+				)
+			}
+			await send(.internal(.setEntities(result)))
+		}
+	}
+
+	private func deviceFactorSourcesEffect(state: State) -> Effect<Action> {
+		guard let problems = state.problems, let entities = state.entities else {
+			return .none
+		}
+		return .run { send in
+			let comparableEntities = entities.flatMap { ents in
+				[ents.babylon, ents.olympia]
+					.compactMap { $0 }
+					.map {
+						ComparableEntities(
+							state: .init(accountsControlledByKeysOnSameCurve: $0, problems: problems),
+							deviceFactorSource: ents.deviceFactorSource
+						)
+					}
+			}
+			let result = comparableEntities
+				.sorted()
+				.map(\.state)
+				.asIdentified()
+			await send(.internal(.setDeviceFactorSources(result)))
+		}
+	}
 }
 
 extension DisplayEntitiesControlledByMnemonic.State {
@@ -188,5 +219,33 @@ extension DisplayEntitiesControlledByMnemonic.State {
 
 	mutating func backedUp() {
 		self.isMnemonicMarkedAsBackedUp = true
+	}
+}
+
+// MARK: - DisplayMnemonics.ComparableEntities
+private extension DisplayMnemonics {
+	/// A helper struct to sort mnemonics using the following criteria:
+	/// 1) First should be the one associated with main device factor source.
+	/// 2) Last should be those with Olympia device factor source.
+	/// 3) In the middle will show those with babylon device factor source sorted by date added.
+	struct ComparableEntities: Comparable {
+		let state: DisplayEntitiesControlledByMnemonic.State
+		let deviceFactorSource: DeviceFactorSource
+
+		static func < (lhs: Self, rhs: Self) -> Bool {
+			let lhs = lhs.deviceFactorSource
+			let rhs = rhs.deviceFactorSource
+			if lhs.isExplicitMain {
+				return true
+			} else if rhs.isExplicitMain {
+				return false
+			} else {
+				if lhs.isBDFS, rhs.isBDFS {
+					return lhs.common.addedOn < rhs.common.addedOn
+				} else {
+					return lhs.isBDFS
+				}
+			}
+		}
 	}
 }

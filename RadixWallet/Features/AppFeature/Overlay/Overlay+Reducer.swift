@@ -23,19 +23,26 @@ struct OverlayReducer: Sendable, FeatureReducer {
 	}
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case hud(HUD.State)
 			case alert(OverlayWindowClient.Item.AlertState)
+			case fullScreen(FullScreenOverlayCoordinator.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case hud(HUD.Action)
 			case alert(OverlayWindowClient.Item.AlertAction)
+			case fullScreen(FullScreenOverlayCoordinator.Action)
 		}
 
 		public var body: some Reducer<State, Action> {
-			Scope(state: /State.hud, action: /Action.hud) {
+			Scope(state: \.hud, action: \.hud) {
 				HUD()
+			}
+			Scope(state: \.fullScreen, action: \.fullScreen) {
+				FullScreenOverlayCoordinator()
 			}
 		}
 	}
@@ -83,6 +90,9 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		case .hud(.delegate(.dismiss)):
 			return dismiss(&state)
 
+		case .fullScreen(.delegate(.dismiss)):
+			return dismiss(&state)
+
 		default:
 			return .none
 		}
@@ -124,6 +134,9 @@ struct OverlayReducer: Sendable, FeatureReducer {
 			return .none
 		case let .alert(alert):
 			state.destination = .alert(alert)
+			return setIsUserInteractionEnabled(&state, isEnabled: true)
+		case let .fullScreen(fullScreen):
+			state.destination = .fullScreen(fullScreen)
 			return setIsUserInteractionEnabled(&state, isEnabled: true)
 		}
 	}

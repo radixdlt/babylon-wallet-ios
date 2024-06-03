@@ -18,30 +18,7 @@ extension NonFungibleAssetList {
 					NonFungibleAssetList.Row.View(store: $0)
 				}
 			)
-			.destinations(with: store)
 		}
-	}
-}
-
-private extension StoreOf<NonFungibleAssetList> {
-	var destination: PresentationStoreOf<NonFungibleAssetList.Destination> {
-		func scopeState(state: State) -> PresentationState<NonFungibleAssetList.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
-	}
-}
-
-@MainActor
-private extension View {
-	func destinations(with store: StoreOf<NonFungibleAssetList>) -> some View {
-		let destinationStore = store.destination
-		return sheet(
-			store: destinationStore,
-			state: /NonFungibleAssetList.Destination.State.details,
-			action: NonFungibleAssetList.Destination.Action.details,
-			content: { NonFungibleTokenDetails.View(store: $0) }
-		)
 	}
 }
 

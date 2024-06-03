@@ -19,7 +19,7 @@ extension GatewayAPI {
 public struct StateEntityDetailsResponsePackageDetails: Codable, Hashable {
 
     public private(set) var type: StateEntityDetailsResponseItemDetailsType
-    public private(set) var codes: StateEntityDetailsResponsePackageDetailsCodeCollection
+    public private(set) var codes: PackageCodeCollection
     public private(set) var vmType: PackageVmType
     /** Hex-encoded binary blob. */
     public private(set) var codeHashHex: String
@@ -27,10 +27,11 @@ public struct StateEntityDetailsResponsePackageDetails: Codable, Hashable {
     public private(set) var codeHex: String
     /** String-encoded decimal representing the amount of a related fungible resource. */
     public private(set) var royaltyVaultBalance: String?
-    public private(set) var blueprints: StateEntityDetailsResponsePackageDetailsBlueprintCollection?
-    public private(set) var schemas: StateEntityDetailsResponsePackageDetailsSchemaCollection?
+    public private(set) var blueprints: PackageBlueprintCollection?
+    public private(set) var schemas: EntitySchemaCollection?
+    public private(set) var roleAssignments: ComponentEntityRoleAssignments?
 
-    public init(type: StateEntityDetailsResponseItemDetailsType, codes: StateEntityDetailsResponsePackageDetailsCodeCollection, vmType: PackageVmType, codeHashHex: String, codeHex: String, royaltyVaultBalance: String? = nil, blueprints: StateEntityDetailsResponsePackageDetailsBlueprintCollection? = nil, schemas: StateEntityDetailsResponsePackageDetailsSchemaCollection? = nil) {
+    public init(type: StateEntityDetailsResponseItemDetailsType, codes: PackageCodeCollection, vmType: PackageVmType, codeHashHex: String, codeHex: String, royaltyVaultBalance: String? = nil, blueprints: PackageBlueprintCollection? = nil, schemas: EntitySchemaCollection? = nil, roleAssignments: ComponentEntityRoleAssignments? = nil) {
         self.type = type
         self.codes = codes
         self.vmType = vmType
@@ -39,6 +40,7 @@ public struct StateEntityDetailsResponsePackageDetails: Codable, Hashable {
         self.royaltyVaultBalance = royaltyVaultBalance
         self.blueprints = blueprints
         self.schemas = schemas
+        self.roleAssignments = roleAssignments
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
@@ -50,6 +52,7 @@ public struct StateEntityDetailsResponsePackageDetails: Codable, Hashable {
         case royaltyVaultBalance = "royalty_vault_balance"
         case blueprints
         case schemas
+        case roleAssignments = "role_assignments"
     }
 
     // Encodable protocol methods
@@ -64,6 +67,7 @@ public struct StateEntityDetailsResponsePackageDetails: Codable, Hashable {
         try container.encodeIfPresent(royaltyVaultBalance, forKey: .royaltyVaultBalance)
         try container.encodeIfPresent(blueprints, forKey: .blueprints)
         try container.encodeIfPresent(schemas, forKey: .schemas)
+        try container.encodeIfPresent(roleAssignments, forKey: .roleAssignments)
     }
 }
 

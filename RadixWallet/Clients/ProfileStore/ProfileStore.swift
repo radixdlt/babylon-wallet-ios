@@ -561,7 +561,8 @@ extension ProfileStore {
 		@Dependency(\.userDefaults) var userDefaults
 
 		guard
-			let profileId = userDefaults.getActiveProfileID()
+			let profileId = userDefaults.getActiveProfileID(),
+			let profile = try secureStorageClient.loadProfile(profileId)
 		else {
 			return nil
 		}
@@ -569,9 +570,15 @@ extension ProfileStore {
 		if let profileSnapshotData = try? secureStorageClient.loadProfileSnapshotData(profileId) {
 			let containsLegacyP2PLinks = Profile.checkIfProfileJsonContainsLegacyP2PLinks(contents: profileSnapshotData)
 			userDefaults.setShowRelinkConnectorsAfterUpdate(containsLegacyP2PLinks)
+
+			/// If a profile contains legacy P2P links, we replace it with a newly decoded profile.
+			/// Since the new profile does not store P2P links, this operation will remove the legacy P2P links.
+			if containsLegacyP2PLinks {
+				try? _save(profile: profile)
+			}
 		}
 
-		return try secureStorageClient.loadProfile(profileId)
+		return profile
 	}
 
 	private static func _tryGenerateAndSaveNewProfile(

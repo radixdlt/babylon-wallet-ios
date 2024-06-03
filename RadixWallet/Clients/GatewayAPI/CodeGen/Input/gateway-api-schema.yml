@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: v1.4.0
+  version: v1.5.1
   title: Radix Gateway API - Babylon
   license:
     name: The Radix License, Version 1.0
@@ -148,6 +148,8 @@ tags:
       - `next_cursor` *(optional)* if present indicates that the next chunk (page) exists and can be fetched using collection-specific endpoint and cursor value,
       - `items` a chunk (page) of underlying collection items.
 
+      To provide consistent reads when querying for the next pages, it's required to provide the `at_ledger_state` parameter. It will enforce that data returned for all pages is generated using the same ledger state.
+
       ## State consistency and versioning
 
       Each response from a state endpoint returns data from a single "snapshot" of the ledger. By default, the latest available ledger version is used.
@@ -193,6 +195,115 @@ tags:
         }
       }
       ```
+
+      ## Consistent reads
+
+      As described in [Browsing historical data](#section/Browsing-historical-data) it is possible to specify the exact ledger state by providing the `at_ledger_state` parameter.
+
+      It can be used to browse historical data but it also allows consistent reads when making multiple requests (either when paginating or when collecting data from multiple endpoints).
+
+      Imagine a situation when your key value store contains 128 keys. To fetch all the keys and it is data you would need to make at least 4 requests (2 to paginate through all keys and 2 to fetch all the data). Using the same `at_ledger_state` parameter value it is guaranteed that you are fetching all the data from exactly the same ledger state.
+
+      Example requests:
+
+      First page of keys:
+      ```
+      /state/key-value-store/keys
+
+      {
+        "key_value_store_address": "internal_keyvaluestore_rdx1kprq4hx5892fuezay6tyajyu0gr2jeu8j7alauxen46xu8ufzvecph"
+      }
+      ```
+
+      Response:
+      ```
+      {
+        "ledger_state": {
+          "network": "mainnet",
+          "state_version": 50576725,
+          "proposer_round_timestamp": "2024-02-20T16:46:22.343Z",
+          "epoch": 74324,
+          "round": 84
+        },
+        "total_count": 128,
+        "next_cursor": "eyJvIjoxMDB9",
+        "items": [...]
+      }
+      ```
+
+      Second page of keys:
+      ```
+      /state/key-value-store/keys
+
+      {
+        "key_value_store_address": "internal_keyvaluestore_rdx1kprq4hx5892fuezay6tyajyu0gr2jeu8j7alauxen46xu8ufzvecph",
+        "cursor": "eyJvIjoxMDB9",
+        "at_ledger_state": {
+          "state_version": 50576725
+        }
+      }
+      ```
+
+      Response:
+      ```
+      {
+        "ledger_state": {
+          "network": "mainnet",
+          "state_version": 50576725,
+          "proposer_round_timestamp": "2024-02-20T16:46:22.343Z",
+          "epoch": 74324,
+          "round": 84
+        },
+        "total_count": 128,
+        "items": []
+      }
+      ```
+
+      Get data for one of the keys:
+      ```
+      /state/key-value-store/data
+
+      {
+        "key_value_store_address": "internal_keyvaluestore_rdx1kprq4hx5892fuezay6tyajyu0gr2jeu8j7alauxen46xu8ufzvecph",
+        "keys": [
+          {
+            "key_hex": "5c80c0c72cd2cbca7263e84e9ec83a6c9cee2121d466bf3cc8640d4d06909af6"
+          }
+        ],
+        "at_ledger_state": {
+          "state_version": 50576725
+        }
+      }
+      ```
+
+      Response:
+      ```
+      {
+        "ledger_state": {
+          "network": "mainnet",
+          "state_version": 50577454,
+          "proposer_round_timestamp": "2024-02-20T16:49:22.861Z",
+          "epoch": 74324,
+          "round": 795
+        },
+        "key_value_store_address": "internal_keyvaluestore_rdx1kprq4hx5892fuezay6tyajyu0gr2jeu8j7alauxen46xu8ufzvecph",
+        "entries": [
+          {
+            "key": {
+                ...
+              }
+            },
+            "value": {
+              ...
+            },
+            "last_updated_at_state_version": 1351581,
+            "is_locked": false
+          }
+        ]
+      }
+      ```
+
+      All the above requests were executed against exactly the same ledger snapshot (state version `50577454`).
 
       ## Using endpoints with opt-in features
 
@@ -339,6 +450,8 @@ tags:
 
       * `/state/entity/page/metadata` &rarr; returns entity metadata, and can be used as entry point for further pagination with the cursor returned from `/state/entity/details`
 
+      * `/state/entity/page/schemas` &rarr; returns entity schemas, and can be used as an entry point for further pagination from a cursor returned from `/state/entity/details`
+
       * `/state/entity/page/fungibles/` &rarr; can be used as an entry point to fetch fungible resources under a given global entity or for further pagination with the cursor returned from `/state/entity/details`
 
       * `/state/entity/page/fungible-vaults/` &rarr; can be used as an entry point to fetch fungible vaults of a given resource under a given global entity or for further pagination with a cursor returned from `/state/entity/details`
@@ -347,7 +460,11 @@ tags:
 
       * `/state/entity/page/non-fungible-vaults/` &rarr; can be used as an entry point to fetch non-fungible vaults of a given resource under a given global entity or for further pagination with a cursor returned from `/state/entity/details`
 
-      * `/state/entity/page/non-fungible-vault/ids` &rarr; can be used as  an entry point to fetch non fungible-ids in a given vault or for further pagination from a cursor returned from `/state/entity/details`
+      * `/state/entity/page/non-fungible-vault/ids` &rarr; can be used as an entry point to fetch non fungible-ids in a given vault or for further pagination from a cursor returned from `/state/entity/details`
+
+      * `/state/package/page/blueprints` &rarr; can be used as an entry point to fetch blueprints of a given package entity or for further pagination with a cursor returned from `/state/entity/details`
+
+      * `/state/package/page/codes` &rarr; can be used as an entry point to fetch codes of a given package entity or for further pagination with a cursor returned from `/state/entity/details`
 
       ### Metadata
 
@@ -502,6 +619,8 @@ tags:
 
       * `manifest_resources_filter` - allows specifying array of resource addresses. If specified, the response will contain only transactions containing the given resources in the manifest (regardless of their usage).
 
+      * `manifest_badges_presented_filter` - allows specifying array of badge resource addresses. If specified, the response will contain only transactions where the given badges were presented.
+
       * `accounts_with_manifest_owner_method_calls` - allows specifying an array of account addresses. If specified, the response will contain only transactions that, for all specified accounts, contain manifest method calls to that account which require the owner role. See the [account docs](https://docs.radixdlt.com/docs/account) for more information.
 
       * `accounts_without_manifest_owner_method_calls` - allows specifying an array of account addresses. If specified, the response will contain only transactions that, for all specified accounts, do NOT contain manifest method calls to that account which require owner role. See the [account docs](https://docs.radixdlt.com/docs/account) for more information.
@@ -538,9 +657,33 @@ tags:
       }
       ```
 
+      #### Request Validation
+
+      The overall number of the applied filters can be limited. In a case of collection-based filters every item counts as a separate filter. By default up to 10 filters can be specified.
+      The sample query below uses 5 filters in total: 1 `kind_filter`, 3 `manifest_resources_filter`s and 1 `events_filter`.
+
+      ```
+      {
+        "kind_filter": "All",
+        "manifest_resources_filter": [
+          "resource_rdx1t5l4s99hpc6vvskktu2uy9egk86tszjnnez62zfu9t7z7tsqqtvpvp",
+          "resource_rdx1t4w8ds79tkdjpq26z9v4w0tnv78jaxmy5vvrumdh3qeqzwqkgj6lvs",
+          "resource_rdx1t5ha0254q4j5t0rxnev9f9vdt8jx6ud6caavrhcvvehg28ny90ku3x",
+        ],
+        "events_filter": [
+          {
+            "event": "Deposit",
+            "emitter_address": "account_rdx12x5vk07qcez6xj0zt8ve0x2g20mrssk0vrest3vf0qljd76r6zfvsx",
+            "resource_address": "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"
+          }
+        ]
+      }
+      ```
+
       ### Pagination
 
-      If the `limit_per_page` request parameter is lower than the number of transactions to be returned, a `next_cursor` will be returned. It can be used in subsequent requests as the `cursor` parameter to fetch further pages.
+      If the `limit_per_page` request hint parameter is lower than the overall number of transactions to be returned or the internal limiter kick in, a `next_cursor` will be returned.
+      It can be used in subsequent requests as the `cursor` parameter to fetch further pages.
 
       For example, the following request will return a cursor:
       ```
@@ -881,8 +1024,8 @@ tags:
 
       ### Iterating over all `KeyValueStore` keys
 
-      You can use `/state/key-value-store/keys` endpoint to iterate over all keys in certain `KeyValueStore`.
-      If the queried `KeyValueStore` contains more than one page of keys, a `next_cursor` will be returned, which can be used as `cursor` in the request to fetch further pages.
+      You can use the `/state/key-value-store/keys` endpoint to iterate over all the keys in a certain key value store.
+      If the queried key value store contains more than one page of keys, a `next_cursor` will be returned, which can be used as a cursor in the request to fetch further pages.
 
       i.e:
       ```
@@ -893,7 +1036,7 @@ tags:
       }
       ```
 
-      Will respond with list of all keys (in both `hex` and `programmatic_json` form) and state version when they were last updated.
+      Will respond with a first page of the keys of the current entries of the key value store. This collection is ordered by the entry first appearance on the network, descending. Each item includes the entry's key (in both `hex` and `programmatic_json` form) and the state version when it was last updated.
 
       ```
       {
@@ -918,11 +1061,11 @@ tags:
 
       ### Querying for the content under specific keys
 
-      You can either rely on keys returned from `/state/key-value-store/keys` endpoint or construct keys in json form on your own. It's possible if you created that `KeyValueStore` and you know what is the form of keys.
+      You can either use the keys returned from the `/state/key-value-store/keys` endpoint or construct keys in json form on your own, if you know the key type of the `KeyValueStore`.
 
       #### Querying using hex keys
 
-      Simply grab `raw_hex` key returned from `/state/key-value-store/keys` endpoint and call `/state/key-value-store/data` with it as parameter.
+      Simply grab the `raw_hex` key returned from the `/state/key-value-store/keys` endpoint and call `/state/key-value-store/data` with it as a parameter.
 
       i.e:
       ```
@@ -1194,6 +1337,30 @@ paths:
         "4XX":
           $ref: "#/components/responses/ErrorResponse"
 
+  "/transaction/account-deposit-pre-validation":
+    post:
+      operationId: AccountDepositPreValidation
+      summary: PreValidate deposit of resources to an account
+      description: |
+        Helper endpoint that allows pre-validation if a deposit of certain resources to a given account can succeed or not. It is only meant for pre-validation usage, it does not guarantee that execution will succeed.
+      tags:
+        - Transaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AccountDepositPreValidationRequest"
+      responses:
+        "200":
+          description: Pre-validation response, including all deciding factors that were used to generate that response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountDepositPreValidationResponse"
+        "4XX":
+          $ref: "#/components/responses/ErrorResponse"
+
   "/stream/transactions":
     post:
       operationId: StreamTransactions
@@ -1265,6 +1432,31 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/StateEntityMetadataPageResponse"
+        "4XX":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /state/entity/page/schemas:
+    post:
+      operationId: EntitySchemaPage
+      summary: Get Entity Schema Page
+      description: |
+        Returns all the schemas associated with a given global entity.
+        The returned response is in a paginated format, ordered by first appearance on the ledger.
+      tags:
+        - State
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StateEntitySchemaPageRequest"
+      responses:
+        "200":
+          description: Entity Schemas (paginated)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StateEntitySchemaPageResponse"
         "4XX":
           $ref: "#/components/responses/ErrorResponse"
 
@@ -1470,8 +1662,7 @@ paths:
     post:
       operationId: KeyValueStoreKeys
       summary: Get KeyValueStore Keys
-      description: |
-        Allows to iterate over key value store keys.
+      description: Allows to iterate over key value store keys.
       tags:
         - State
       requestBody:
@@ -1489,7 +1680,6 @@ paths:
                 $ref: "#/components/schemas/StateKeyValueStoreKeysResponse"
         "4XX":
           $ref: "#/components/responses/ErrorResponse"
-
   /state/key-value-store/data:
     post:
       operationId: KeyValueStoreData
@@ -1534,6 +1724,103 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/StateValidatorsListResponse"
+        "4XX":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /state/account/page/resource-preferences:
+    post:
+      operationId: AccountResourcePreferencesPage
+      summary: Get Account resource preferences
+      description: |
+        Returns paginable collection of resource preference rules for given account.
+      tags:
+        - State
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StateAccountResourcePreferencesPageRequest"
+      responses:
+        "200":
+          description: Account resource preferences page
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StateAccountResourcePreferencesPageResponse"
+        "4XX":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /state/account/page/authorized-depositors:
+    post:
+      operationId: AccountAuthorizedDepositorsPage
+      summary: Get Account authorized depositors
+      description: |
+        Returns paginable collection of authorized depositors for given account.
+      tags:
+        - State
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StateAccountAuthorizedDepositorsPageRequest"
+      responses:
+        "200":
+          description: Account resource preferences page
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StateAccountAuthorizedDepositorsPageResponse"
+        "4XX":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /state/package/page/blueprints:
+    post:
+      operationId: PackageBlueprintPage
+      summary: Get Package Blueprints Page
+      description: |
+        Returns all the blueprints associated with a given package entity.
+        The returned response is in a paginated format, ordered by first appearance on the ledger.
+      tags:
+        - State
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StatePackageBlueprintPageRequest"
+      responses:
+        "200":
+          description: Package Blueprints (paginated)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatePackageBlueprintPageResponse"
+        "4XX":
+          $ref: "#/components/responses/ErrorResponse"
+  /state/package/page/codes:
+    post:
+      operationId: PackageCodePage
+      summary: Get Package Codes Page
+      description: |
+        Returns all the codes associated with a given package entity.
+        The returned response is in a paginated format, ordered by first appearance on the ledger.
+      tags:
+        - State
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StatePackageCodePageRequest"
+      responses:
+        "200":
+          description: Package Blueprints (paginated)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatePackageCodePageResponse"
         "4XX":
           $ref: "#/components/responses/ErrorResponse"
 
@@ -1931,6 +2218,97 @@ components:
             typed:
               $ref: "#/components/schemas/MetadataTypedValue"
 
+    EntitySchemaCollection:
+      allOf:
+        - $ref: "#/components/schemas/ResultSetCursorMixin"
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/EntitySchemaCollectionItem"
+    EntitySchemaCollectionItem:
+      type: object
+      required:
+        - schema_hash_hex
+        - schema_hex
+      properties:
+        schema_hash_hex:
+          $ref: "#/components/schemas/HexString"
+        schema_hex:
+          $ref: "#/components/schemas/HexString"
+
+    PackageBlueprintCollection:
+      description: Package blueprint collection.
+      allOf:
+        - $ref: "#/components/schemas/ResultSetCursorMixin"
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/PackageBlueprintCollectionItem"
+    PackageBlueprintCollectionItem:
+      type: object
+      required:
+        - name
+        - version
+        - definition
+      properties:
+        name:
+          type: string
+        version:
+          type: string
+        definition:
+          type: object
+          description: |
+            This type is defined in the Core API as `BlueprintDefinition`. See the Core API documentation for more details.
+        dependant_entities:
+          type: array
+          items:
+            $ref: "#/components/schemas/Address"
+        auth_template:
+          type: object
+          description: |
+            This type is defined in the Core API as `AuthConfig`. See the Core API documentation for more details.
+        auth_template_is_locked:
+          type: boolean
+          nullable: true
+        royalty_config:
+          $ref: "#/components/schemas/BlueprintRoyaltyConfig"
+        royalty_config_is_locked:
+          type: boolean
+          nullable: true
+    PackageCodeCollection:
+      description: Package code collection.
+      allOf:
+        - $ref: "#/components/schemas/ResultSetCursorMixin"
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/PackageCodeCollectionItem"
+    PackageCodeCollectionItem:
+      type: object
+      required:
+        - vm_type
+        - code_hash_hex
+        - code_hex
+      properties:
+        vm_type:
+          $ref: "#/components/schemas/PackageVmType"
+        code_hash_hex:
+          $ref: "#/components/schemas/HexString"
+        code_hex:
+          $ref: "#/components/schemas/HexString"
+
     ComponentEntityRoleAssignments:
       type: object
       required:
@@ -2154,6 +2532,184 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/NonFungibleId"
+
+    AccountResourcePreferencesCollection:
+      description: Account resource preferences collection
+      allOf:
+        - $ref: "#/components/schemas/ResultSetCursorMixin"
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/AccountResourcePreferencesResponseItem"
+
+    AccountResourcePreferenceRule:
+      type: string
+      enum:
+        - Allowed
+        - Disallowed
+
+    AccountResourcePreferencesResponseItem:
+      type: object
+      required:
+        - resource_address
+        - resource_preference_rule
+        - last_updated_at_state_version
+      properties:
+        resource_address:
+          $ref: "#/components/schemas/Address"
+        resource_preference_rule:
+          $ref: "#/components/schemas/AccountResourcePreferenceRule"
+        last_updated_at_state_version:
+          $ref: "#/components/schemas/LastUpdatedAtStateVersion"
+
+    AccountAuthorizedDepositorsCollection:
+      description: Account resource preferences collection
+      allOf:
+        - $ref: "#/components/schemas/ResultSetCursorMixin"
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/AccountAuthorizedDepositorsResponseItem"
+
+    AccountAuthorizedDepositorBadgeType:
+      type: string
+      enum:
+        - ResourceBadge
+        - NonFungibleBadge
+
+    AccountDefaultDepositRule:
+      type: string
+      description: Default deposit rule set to an account.
+      enum:
+        - Accept
+        - Reject
+        - AllowExisting
+
+    AccountDepositPreValidationDecidingFactors:
+      description: Deciding factors used to calculate response.
+      type: object
+      required:
+        - default_deposit_rule
+      properties:
+        is_badge_authorized_depositor:
+          description: Whether the input badge belongs to the account's set of authorized depositors. This field will only be present if any badge was passed in the request.
+          type: boolean
+          nullable: true
+        default_deposit_rule:
+          $ref: "#/components/schemas/AccountDefaultDepositRule"
+        resource_specific_details:
+          description: Returns deciding factors for each resource. Contains only information about resources presented in the request, not all resource preference rules for queried account.
+          type: array
+          items:
+            $ref: "#/components/schemas/AccountDepositPreValidationDecidingFactorsResourceSpecificDetailsItem"
+
+    AccountDepositPreValidationDecidingFactorsResourceSpecificDetailsItem:
+      type: object
+      required:
+        - resource_address
+        - vault_exists
+        - is_xrd
+      properties:
+        resource_address:
+          $ref: "#/components/schemas/Address"
+        vault_exists:
+          type: boolean
+        is_xrd:
+          type: boolean
+        resource_preference_rule:
+          $ref: "#/components/schemas/AccountResourcePreferenceRule"
+
+    AccountDepositPreValidationResourceSpecificBehaviourItem:
+      type: object
+      required:
+        - resource_address
+        - allows_try_deposit
+      properties:
+        resource_address:
+          $ref: "#/components/schemas/Address"
+        allows_try_deposit:
+          type: boolean
+
+    TransactionAccountDepositPreValidationAuthorizedDepositorBadge:
+      type: object
+      required:
+        - badge_type
+        - resource_address
+      properties:
+        badge_type:
+          $ref: "#/components/schemas/AccountAuthorizedDepositorBadgeType"
+        resource_address:
+          # That is part of parent type because moving it to child broke OpenAPI generator and removed some other types:
+          # MetadataNonFungibleGlobalIdValueAllOf StateNonFungibleIdsRequestAllOf  MetadataNonFungibleGlobalIdArrayValueAllOf and MetadataNonFungibleGlobalIdArrayValue were affected
+          $ref: "#/components/schemas/Address"
+      discriminator:
+        propertyName: badge_type
+        mapping:
+          # Must match AccountDepositPreValidationBadgeType
+          ResourceBadge: "#/components/schemas/AccountDepositPreValidationResourceBadge"
+          NonFungibleBadge: "#/components/schemas/AccountDepositPreValidationNonFungibleBadge"
+    AccountDepositPreValidationResourceBadge:
+      allOf:
+        - $ref: "#/components/schemas/TransactionAccountDepositPreValidationAuthorizedDepositorBadge"
+        - type: object
+    AccountDepositPreValidationNonFungibleBadge:
+      allOf:
+        - $ref: "#/components/schemas/TransactionAccountDepositPreValidationAuthorizedDepositorBadge"
+        - type: object
+          required:
+            - non_fungible_id
+          properties:
+            non_fungible_id:
+              $ref: "#/components/schemas/NonFungibleId"
+
+    AccountAuthorizedDepositorsResponseItem:
+      type: object
+      required:
+        - badge_type
+      properties:
+        badge_type:
+          $ref: "#/components/schemas/AccountAuthorizedDepositorBadgeType"
+      discriminator:
+        propertyName: badge_type
+        mapping:
+          # Must match AccountAuthorizedDepositorBadgeType
+          ResourceBadge: "#/components/schemas/AccountAuthorizedDepositorsResourceBadge"
+          NonFungibleBadge: "#/components/schemas/AccountAuthorizedDepositorsNonFungibleBadge"
+    AccountAuthorizedDepositorsResourceBadge:
+      allOf:
+        - $ref: "#/components/schemas/AccountAuthorizedDepositorsResponseItem"
+        - type: object
+          required:
+            - resource_address
+            - last_updated_at_state_version
+          properties:
+            resource_address:
+              $ref: "#/components/schemas/Address"
+            last_updated_at_state_version:
+              $ref: "#/components/schemas/LastUpdatedAtStateVersion"
+    AccountAuthorizedDepositorsNonFungibleBadge:
+      allOf:
+        - $ref: "#/components/schemas/AccountAuthorizedDepositorsResponseItem"
+        - type: object
+          required:
+            - resource_address
+            - non_fungible_id
+            - last_updated_at_state_version
+          properties:
+            resource_address:
+              $ref: "#/components/schemas/Address"
+            non_fungible_id:
+              $ref: "#/components/schemas/NonFungibleId"
+            last_updated_at_state_version:
+              $ref: "#/components/schemas/LastUpdatedAtStateVersion"
 
     NonFungibleIdsCollection:
       description: Non-fungible resource IDs collection.
@@ -2556,7 +3112,7 @@ components:
             royalty_module_package:
               $ref: "#/components/schemas/Address"
             access_rules_package:
-              description: "Obsolete! Use `role_assignment_module_package` instead."
+              description: "**Obsolete!** Use `role_assignment_module_package` instead."
               deprecated: true
               $ref: "#/components/schemas/Address"
             role_assignment_module_package:
@@ -2735,6 +3291,44 @@ components:
         duplicate:
           type: boolean
           description: Is true if the transaction is a duplicate of an existing pending transaction.
+
+    AccountDepositPreValidationRequest:
+      allOf:
+        - type: object
+          required:
+            - account_address
+            - resource_addresses
+          properties:
+            account_address:
+              $ref: "#/components/schemas/Address"
+            resource_addresses:
+              type: array
+              items:
+                $ref: "#/components/schemas/Address"
+            badge:
+              $ref: "#/components/schemas/TransactionAccountDepositPreValidationAuthorizedDepositorBadge"
+          example:
+            account_address: "<account-address>"
+            resource_addresses: ["<resource-address>"]
+
+    AccountDepositPreValidationResponse:
+      allOf:
+        - $ref: "#/components/schemas/LedgerStateMixin"
+        - type: object
+          required:
+            - allows_try_deposit_batch
+            - resource_specific
+            - deciding_factors
+          properties:
+            allows_try_deposit_batch:
+              type: boolean
+            resource_specific_behaviour:
+              description: The fully resolved try_deposit_* ability of each resource (which takes all the inputs into account, including the authorized depositor badge, the default deposit rule and the resource-specific details).
+              type: array
+              items:
+                $ref: "#/components/schemas/AccountDepositPreValidationResourceSpecificBehaviourItem"
+            deciding_factors:
+              $ref: "#/components/schemas/AccountDepositPreValidationDecidingFactors"
 
     TransactionStatusRequest:
       allOf:
@@ -3037,6 +3631,10 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/Address"
+            manifest_badges_presented_filter:
+              type: array
+              items:
+                $ref: "#/components/schemas/Address"
             manifest_resources_filter:
               type: array
               items:
@@ -3131,6 +3729,7 @@ components:
         aggregation_level: "Vault"
         opt_ins:
           ancestor_identities: true
+          component_royalty_config: true
           component_royalty_vault_balance: true
           package_royalty_vault_balance: true
           non_fungible_include_nfids: true
@@ -3143,6 +3742,10 @@ components:
       properties:
         ancestor_identities:
           description: if set to `true`, ancestor addresses - `parent_address`, `owner_address` and `global_address` for entities are returned.
+          type: boolean
+          default: false
+        component_royalty_config:
+          description: if set to `true`, `royalty_config` for component entities is returned.
           type: boolean
           default: false
         component_royalty_vault_balance:
@@ -3308,114 +3911,27 @@ components:
             - code_hex
           properties:
             codes:
-              $ref: "#/components/schemas/StateEntityDetailsResponsePackageDetailsCodeCollection"
+              $ref: "#/components/schemas/PackageCodeCollection"
             vm_type:
-              description: "Obsolete! Use `codes` collection instead."
+              description: "**Obsolete!** Use `codes` collection instead."
               deprecated: true
               $ref: "#/components/schemas/PackageVmType"
             code_hash_hex:
-              description: "Obsolete! Use `codes` collection instead."
+              description: "**Obsolete!** Use `codes` collection instead."
               deprecated: true
               $ref: "#/components/schemas/HexString"
             code_hex:
-              description: "Obsolete! Use `codes` collection instead."
+              description: "**Obsolete!** Use `codes` collection instead."
               deprecated: true
               $ref: "#/components/schemas/HexString"
             royalty_vault_balance:
               $ref: "#/components/schemas/BigDecimal"
             blueprints:
-              $ref: "#/components/schemas/StateEntityDetailsResponsePackageDetailsBlueprintCollection"
+              $ref: "#/components/schemas/PackageBlueprintCollection"
             schemas:
-              $ref: "#/components/schemas/StateEntityDetailsResponsePackageDetailsSchemaCollection"
-    StateEntityDetailsResponsePackageDetailsCodeCollection:
-      allOf:
-        - $ref: "#/components/schemas/ResultSetCursorMixin"
-        - type: object
-          required:
-            - items
-          properties:
-            items:
-              type: array
-              items:
-                $ref: "#/components/schemas/PackageCodeCollectionItem"
-    PackageCodeCollectionItem:
-      type: object
-      required:
-        - vm_type
-        - code_hash_hex
-        - code_hex
-      properties:
-        vm_type:
-          $ref: "#/components/schemas/PackageVmType"
-        code_hash_hex:
-          $ref: "#/components/schemas/HexString"
-        code_hex:
-          $ref: "#/components/schemas/HexString"
-    StateEntityDetailsResponsePackageDetailsBlueprintCollection:
-      allOf:
-        - $ref: "#/components/schemas/ResultSetCursorMixin"
-        - type: object
-          required:
-            - items
-          properties:
-            items:
-              type: array
-              items:
-                $ref: "#/components/schemas/StateEntityDetailsResponsePackageDetailsBlueprintItem"
-    StateEntityDetailsResponsePackageDetailsBlueprintItem:
-      type: object
-      required:
-        - name
-        - version
-        - definition
-      properties:
-        name:
-          type: string
-        version:
-          type: string
-        definition:
-          type: object
-          description: |
-            This type is defined in the Core API as `BlueprintDefinition`. See the Core API documentation for more details.
-        dependant_entities:
-          type: array
-          items:
-            $ref: "#/components/schemas/Address"
-        auth_template:
-          type: object
-          description: |
-            This type is defined in the Core API as `AuthConfig`. See the Core API documentation for more details.
-        auth_template_is_locked:
-          type: boolean
-          nullable: true
-        royalty_config:
-          type: object
-          description: |
-            This type is defined in the Core API as `BlueprintRoyaltyConfig`. See the Core API documentation for more details.
-        royalty_config_is_locked:
-          type: boolean
-          nullable: true
-    StateEntityDetailsResponsePackageDetailsSchemaCollection:
-      allOf:
-        - $ref: "#/components/schemas/ResultSetCursorMixin"
-        - type: object
-          required:
-            - items
-          properties:
-            items:
-              type: array
-              items:
-                $ref: "#/components/schemas/StateEntityDetailsResponsePackageDetailsSchemaItem"
-    StateEntityDetailsResponsePackageDetailsSchemaItem:
-      type: object
-      required:
-        - schema_hash_hex
-        - schema_hex
-      properties:
-        schema_hash_hex:
-          $ref: "#/components/schemas/HexString"
-        schema_hex:
-          $ref: "#/components/schemas/HexString"
+              $ref: "#/components/schemas/EntitySchemaCollection"
+            role_assignments:
+              $ref: "#/components/schemas/ComponentEntityRoleAssignments"
     StateEntityDetailsResponseComponentDetails:
       allOf:
         - $ref: "#/components/schemas/StateEntityDetailsResponseItemDetails"
@@ -3441,6 +3957,102 @@ components:
               $ref: "#/components/schemas/ComponentEntityRoleAssignments"
             royalty_vault_balance:
               $ref: "#/components/schemas/BigDecimal"
+            royalty_config:
+              $ref: "#/components/schemas/ComponentRoyaltyConfig"
+
+    StateAccountResourcePreferencesPageRequest:
+      allOf:
+        - $ref: "#/components/schemas/AtLedgerStateMixin"
+        - $ref: "#/components/schemas/CursorLimitMixin"
+        - type: object
+          required:
+            - account_address
+          properties:
+            account_address:
+              $ref: "#/components/schemas/Address"
+      example:
+        account_address: null
+
+    StateAccountResourcePreferencesPageResponse:
+      allOf:
+        - $ref: "#/components/schemas/LedgerStateMixin"
+        - $ref: "#/components/schemas/AccountResourcePreferencesCollection"
+        - type: object
+          required:
+            - account_address
+          properties:
+            account_address:
+              $ref: "#/components/schemas/Address"
+
+    StateAccountAuthorizedDepositorsPageRequest:
+      allOf:
+        - $ref: "#/components/schemas/AtLedgerStateMixin"
+        - $ref: "#/components/schemas/CursorLimitMixin"
+        - type: object
+          required:
+            - account_address
+          properties:
+            account_address:
+              $ref: "#/components/schemas/Address"
+      example:
+        account_address: null
+
+    StateAccountAuthorizedDepositorsPageResponse:
+      allOf:
+        - $ref: "#/components/schemas/LedgerStateMixin"
+        - $ref: "#/components/schemas/AccountAuthorizedDepositorsCollection"
+        - type: object
+          required:
+            - account_address
+          properties:
+            account_address:
+              $ref: "#/components/schemas/Address"
+
+    StatePackageBlueprintPageRequest:
+      allOf:
+        - $ref: "#/components/schemas/AtLedgerStateMixin"
+        - $ref: "#/components/schemas/CursorLimitMixin"
+        - type: object
+          required:
+            - package_address
+          properties:
+            package_address:
+              $ref: "#/components/schemas/Address"
+      example:
+        package_address: "<package-address>"
+    StatePackageBlueprintPageResponse:
+      allOf:
+        - $ref: "#/components/schemas/LedgerStateMixin"
+        - $ref: "#/components/schemas/PackageBlueprintCollection"
+        - type: object
+          required:
+            - package_address
+          properties:
+            package_address:
+              $ref: "#/components/schemas/Address"
+
+    StatePackageCodePageRequest:
+      allOf:
+        - $ref: "#/components/schemas/AtLedgerStateMixin"
+        - $ref: "#/components/schemas/CursorLimitMixin"
+        - type: object
+          required:
+            - package_address
+          properties:
+            package_address:
+              $ref: "#/components/schemas/Address"
+      example:
+        package_address: "<package-address>"
+    StatePackageCodePageResponse:
+      allOf:
+        - $ref: "#/components/schemas/LedgerStateMixin"
+        - $ref: "#/components/schemas/PackageCodeCollection"
+        - type: object
+          required:
+            - package_address
+          properties:
+            package_address:
+              $ref: "#/components/schemas/Address"
 
     StateEntityMetadataPageRequest:
       allOf:
@@ -3458,6 +4070,29 @@ components:
       allOf:
         - $ref: "#/components/schemas/LedgerStateMixin"
         - $ref: "#/components/schemas/EntityMetadataCollection"
+        - type: object
+          required:
+            - address
+          properties:
+            address:
+              $ref: "#/components/schemas/Address"
+
+    StateEntitySchemaPageRequest:
+      allOf:
+        - $ref: "#/components/schemas/AtLedgerStateMixin"
+        - $ref: "#/components/schemas/CursorLimitMixin"
+        - type: object
+          required:
+            - address
+          properties:
+            address:
+              $ref: "#/components/schemas/Address"
+      example:
+        address: "<package-address>"
+    StateEntitySchemaPageResponse:
+      allOf:
+        - $ref: "#/components/schemas/LedgerStateMixin"
+        - $ref: "#/components/schemas/EntitySchemaCollection"
         - type: object
           required:
             - address
@@ -3515,7 +4150,7 @@ components:
               $ref: "#/components/schemas/Address"
       example:
         address: "<component-entity-address>"
-        resource_address: "<resource_address>"
+        resource_address: "<resource-address>"
     StateEntityFungibleResourceVaultsPageResponse:
       allOf:
         - $ref: "#/components/schemas/LedgerStateMixin"
@@ -3587,7 +4222,7 @@ components:
               $ref: "#/components/schemas/StateEntityNonFungibleResourceVaultsPageOptIns"
       example:
         address: "<component-entity-address>"
-        resource_address: "<resource_address>"
+        resource_address: "<resource-address>"
     StateEntityNonFungibleResourceVaultsPageOptIns:
       type: object
       description: Check detailed [OptIns](#section/Using-endpoints-with-opt-in-features) documentation for more details
@@ -3710,12 +4345,19 @@ components:
       type: object
       required:
         - non_fungible_id
-        - last_updated_at_state_version
         - is_burned
+        - last_updated_at_state_version
       properties:
         non_fungible_id:
           $ref: "#/components/schemas/NonFungibleId"
         owning_vault_address:
+          description: The address of the Vault containing (owning) this NFID.
+          $ref: "#/components/schemas/Address"
+        owning_vault_parent_ancestor_address:
+          description: The address of the parent ancestor of the Vault containing (owning) this NFID.
+          $ref: "#/components/schemas/Address"
+        owning_vault_global_ancestor_address:
+          description: The address of the global ancestor of the Vault containing (owning) this NFID.
           $ref: "#/components/schemas/Address"
         is_burned:
           type: boolean
@@ -4259,9 +4901,21 @@ components:
         - type: object
           required:
             - value
+            - unix_timestamp_seconds
           properties:
             value:
               type: string
+              description: |
+                The RFC 3339 / ISO 8601 string representation of the timestamp. Will always use "Z" (denoting UTC) and omits milliseconds. E.g.: `2023-01-26T18:30:09Z`.
+
+                Note: This field will return clamped value if the actual on-ledger `unix_timestamp_seconds` value is outside the basic range supported by the RFC 3339 / ISO 8601 standard,
+                which starts at year 1583 (i.e. the beginning of the Gregorian calendar) and ends at year 9999 (inclusive).
+            unix_timestamp_seconds:
+              type: string
+              description: |
+                A decimal string-encoded 64-bit signed integer, marking the unix timestamp in seconds.
+
+                Note: this field accurately represents the full range of possible on-ledger values (i.e. `-2^63 <= seconds < 2^63`).
     MetadataUrlValue:
       allOf:
         - $ref: "#/components/schemas/MetadataTypedValue"
@@ -4431,10 +5085,17 @@ components:
       allOf:
         - $ref: "#/components/schemas/MetadataTypedValue"
         - type: object
+          description: |
+            See documentation of `MetadataInstantValue` for detailed description of `values` vs `values_unix_timestamp_seconds`.
           required:
             - values
+            - values_unix_timestamp_seconds
           properties:
             values:
+              type: array
+              items:
+                type: string
+            values_unix_timestamp_seconds:
               type: array
               items:
                 type: string
@@ -4543,11 +5204,17 @@ components:
         kind:
           $ref: "#/components/schemas/ProgrammaticScryptoSborValueKind"
         type_name:
-          description: Object type name; available only when a schema is present and the type has a name.
+          description: |
+            The name of the type of this value.
+            This is only output when a schema is present and the type has a name.
+            This property is ignored when the value is used as an input to the API.
           type: string
           nullable: true
         field_name:
-          description: Field name; available only when the value is a child of a `Tuple` or `Enum`, which has a type with named fields.
+          description: |
+            The name of the field which hosts this value.
+            This property is only included if this value is a child of a `Tuple` or `Enum` with named fields.
+            This property is ignored when the value is used as an input to the API.
           type: string
           nullable: true
       discriminator:
@@ -4692,9 +5359,7 @@ components:
             - fields
           properties:
             variant_id:
-              type: integer
-              minimum: 0
-              maximum: 255
+              type: string
             variant_name:
               type: string
             fields:
@@ -4723,7 +5388,6 @@ components:
         - type: object
           required:
             - element_kind
-            - elements
             - hex
           properties:
             element_kind:
@@ -4782,7 +5446,7 @@ components:
             - value
           properties:
             value:
-              type: string
+              $ref: "#/components/schemas/Address"
     ProgrammaticScryptoSborValueOwn:
       allOf:
         - $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
@@ -4791,7 +5455,7 @@ components:
             - value
           properties:
             value:
-              type: string
+              $ref: "#/components/schemas/Address"
     ProgrammaticScryptoSborValueDecimal:
       allOf:
         - $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
@@ -4819,3 +5483,65 @@ components:
           properties:
             value:
               type: string
+
+    #
+    # Royalties (partially copied from Core API)
+    #
+
+    BlueprintRoyaltyConfig:
+      type: object
+      required:
+        - is_enabled
+      properties:
+        is_enabled:
+          type: boolean
+        method_rules:
+          description: The royalty rules by method. The array is only present if royalties are enabled.
+          type: array
+          items:
+            $ref: "#/components/schemas/BlueprintMethodRoyalty"
+    BlueprintMethodRoyalty:
+      type: object
+      required:
+        - method_name
+      properties:
+        method_name:
+          type: string
+        royalty_amount:
+          description: The due royalty; missing field denotes a free method.
+          $ref: "#/components/schemas/RoyaltyAmount"
+    ComponentRoyaltyConfig:
+      type: object
+      required:
+        - is_enabled
+      properties:
+        is_enabled:
+          type: boolean
+        method_rules:
+          description: The royalty rules by method. The array is only present if royalties are enabled.
+          type: array
+          items:
+            $ref: "#/components/schemas/ComponentMethodRoyalty"
+    ComponentMethodRoyalty:
+      type: object
+      required:
+        - method_name
+      properties:
+        method_name:
+          type: string
+        royalty_amount:
+          description: The due royalty; missing field denotes a free method.
+          $ref: "#/components/schemas/RoyaltyAmount"
+    RoyaltyAmount:
+      type: object
+      required:
+        - amount
+        - unit
+      properties:
+        amount:
+          $ref: "#/components/schemas/BigDecimal"
+        unit:
+          type: string
+          enum:
+            - XRD
+            - USD

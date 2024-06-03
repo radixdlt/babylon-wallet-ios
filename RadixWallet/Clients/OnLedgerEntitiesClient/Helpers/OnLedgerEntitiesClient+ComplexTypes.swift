@@ -34,6 +34,7 @@ extension OnLedgerEntitiesClient {
 			let guaranteedAmount = defaultDepositGuarantee * predictedAmount.value
 			return .init(
 				amount: guaranteedAmount,
+				percentage: defaultDepositGuarantee,
 				instructionIndex: predictedAmount.instructionIndex,
 				resourceAddress: resourceAddress,
 				resourceDivisibility: resource.divisibility

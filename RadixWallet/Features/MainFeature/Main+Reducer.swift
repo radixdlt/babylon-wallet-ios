@@ -52,6 +52,8 @@ public struct Main: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.personasClient) var personasClient
+	@Dependency(\.cloudBackupClient) var cloudBackupClient
+	@Dependency(\.resetWalletClient) var resetWalletClient
 
 	public init() {}
 
@@ -70,13 +72,41 @@ public struct Main: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			.run { send in
-				for try await gateway in await gatewaysClient.currentGatewayValues() {
-					guard !Task.isCancelled else { return }
-					loggerGlobal.notice("Changed network to: \(gateway)")
-					await send(.internal(.currentGatewayChanged(to: gateway)))
-				}
+			startAutomaticBackupsEffect()
+				.merge(with: gatewayValuesEffect())
+				.merge(with: didResetWalletEffect())
+		}
+	}
+
+	private func startAutomaticBackupsEffect() -> Effect<Action> {
+		.run { _ in
+			do {
+				try await cloudBackupClient.startAutomaticBackups()
+			} catch {
+				loggerGlobal.notice("cloudBackupClient.startAutomaticBackups failed: \(error)")
 			}
+		}
+	}
+
+	private func gatewayValuesEffect() -> Effect<Action> {
+		.run { send in
+			for try await gateway in await gatewaysClient.currentGatewayValues() {
+				guard !Task.isCancelled else { return }
+				loggerGlobal.notice("Changed network to: \(gateway)")
+				await send(.internal(.currentGatewayChanged(to: gateway)))
+			}
+		}
+	}
+
+	private func didResetWalletEffect() -> Effect<Action> {
+		.run { send in
+			for try await _ in resetWalletClient.walletDidReset() {
+				guard !Task.isCancelled else { return }
+				try await appPreferencesClient.deleteProfileAndFactorSources(true)
+				await send(.delegate(.removedWallet))
+			}
+		} catch: { error, _ in
+			loggerGlobal.error("Failed to delete profile: \(error)")
 		}
 	}
 
@@ -96,21 +126,6 @@ public struct Main: Sendable, FeatureReducer {
 		case let .currentGatewayChanged(currentGateway):
 			state.isOnMainnet = currentGateway.network.id == .mainnet
 			return .none
-		}
-	}
-
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
-		switch presentedAction {
-		case .settings(.delegate(.didResetWallet)):
-			.run { send in
-				try await appPreferencesClient.deleteProfileAndFactorSources(true)
-				await send(.delegate(.removedWallet))
-			} catch: { error, _ in
-				loggerGlobal.error("Failed to delete profile: \(error)")
-			}
-
-		default:
-			.none
 		}
 	}
 }

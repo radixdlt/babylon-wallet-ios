@@ -61,7 +61,7 @@ extension CacheClient: DependencyKey {
 			@Dependency(\.diskPersistenceClient) var diskPersistenceClient
 
 			do {
-				try diskPersistenceClient.removeAll()
+				try diskPersistenceClient.remove(Entry.root)
 				loggerGlobal.debug("💾 Data successfully cleared from disk")
 			} catch {
 				loggerGlobal.debug("💾❌ Could not clear cached data from disk: \(error.localizedDescription)")

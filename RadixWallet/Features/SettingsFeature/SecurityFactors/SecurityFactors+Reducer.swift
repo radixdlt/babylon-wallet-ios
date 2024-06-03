@@ -2,9 +2,9 @@
 
 public struct SecurityFactors: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		var seedPhrasesCount: Int?
-		var ledgerWalletsCount: Int?
-		var isSeedPhraseRequiredToRecoverAccounts = false
+		public var seedPhrasesCount: Int?
+		public var ledgerWalletsCount: Int?
+		public var securityProblems: [SecurityProblem] = []
 
 		@PresentationState
 		public var destination: Destination.State?
@@ -13,7 +13,7 @@ public struct SecurityFactors: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case onFirstTask
+		case appeared
 		case seedPhrasesButtonTapped
 		case ledgerWalletsButtonTapped
 	}
@@ -21,32 +21,34 @@ public struct SecurityFactors: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case loadedSeedPhrasesCount(Int)
 		case loadedLedgerWalletsCount(Int)
-		case loadedIsSeedPhraseRequiredToRecoverAccounts(Bool)
+		case setSecurityProblems([SecurityProblem])
 	}
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case seedPhrases(DisplayMnemonics.State)
 			case ledgerWallets(LedgerHardwareDevices.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case seedPhrases(DisplayMnemonics.Action)
 			case ledgerWallets(LedgerHardwareDevices.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.seedPhrases, action: /Action.seedPhrases) {
+			Scope(state: \.seedPhrases, action: \.seedPhrases) {
 				DisplayMnemonics()
 			}
-			Scope(state: /State.ledgerWallets, action: /Action.ledgerWallets) {
+			Scope(state: \.ledgerWallets, action: \.ledgerWallets) {
 				LedgerHardwareDevices()
 			}
 		}
 	}
 
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
-	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
+	@Dependency(\.securityCenterClient) var securityCenterClient
 
 	public init() {}
 
@@ -61,10 +63,10 @@ public struct SecurityFactors: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .onFirstTask:
+		case .appeared:
 			return loadSeedPhrasesCount()
 				.merge(with: loadLedgerWalletsCount())
-				.merge(with: loadIsSeedPhraseRequiredToRecoverAccounts())
+				.merge(with: securityProblemsEffect())
 
 		case .seedPhrasesButtonTapped:
 			state.destination = .seedPhrases(.init())
@@ -86,8 +88,8 @@ public struct SecurityFactors: Sendable, FeatureReducer {
 			state.ledgerWalletsCount = count
 			return .none
 
-		case let .loadedIsSeedPhraseRequiredToRecoverAccounts(isRequired):
-			state.isSeedPhraseRequiredToRecoverAccounts = isRequired
+		case let .setSecurityProblems(problems):
+			state.securityProblems = problems
 			return .none
 		}
 	}
@@ -108,11 +110,12 @@ public struct SecurityFactors: Sendable, FeatureReducer {
 		}
 	}
 
-	private func loadIsSeedPhraseRequiredToRecoverAccounts() -> Effect<Action> {
+	private func securityProblemsEffect() -> Effect<Action> {
 		.run { send in
-			try await send(.internal(.loadedIsSeedPhraseRequiredToRecoverAccounts(
-				deviceFactorSourceClient.isSeedPhraseNeededToRecoverAccounts()
-			)))
+			for try await problems in await securityCenterClient.problems(.securityFactors) {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.setSecurityProblems(problems)))
+			}
 		}
 	}
 }

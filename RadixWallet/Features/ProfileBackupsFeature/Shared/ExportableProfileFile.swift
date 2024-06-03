@@ -44,7 +44,7 @@ extension ExportableProfileFile {
 	}
 
 	public init(data: Data) throws {
-		switch Profile.analyzeFile(contents: data) {
+		switch Profile.analyzeContents(data: data) {
 		case .encryptedProfile:
 			self = .encrypted(data)
 		case .notProfile:

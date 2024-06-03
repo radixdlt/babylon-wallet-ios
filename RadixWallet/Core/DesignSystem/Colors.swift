@@ -83,17 +83,19 @@ extension Color.App {
 	public var orange1: Color { .init(hex: .orange1) }
 	public var orange2: Color { .init(hex: .orange2) }
 
+	public var red1: Color { .init(hex: .error) }
+
 	// alert
 	public var alert: Color { .init(hex: .alert) }
-	public var red1: Color { .init(hex: .red1) }
+	public var lightAlert: Color { .init(hex: .lightAlert) }
+	public var error: Color { .init(hex: .error) }
+	public var notification: Color { .init(hex: .notification) }
 
 	public var background: Color { .dynamic(light: .white, dark: .black) }
 	@available(*, deprecated, message: "Use dynamic 'background' color instead")
 	public var backgroundDark: Color { .black }
 	@available(*, deprecated, message: "Use dynamic 'background' color instead")
 	public var backgroundLight: Color { .white }
-
-	public var notification: Color { .init(hex: .red1) }
 
 	public var buttonTextBlack: Color { .black }
 	public var buttonTextBlackTransparent: Color { .black.opacity(0.6) }
@@ -159,8 +161,11 @@ extension Color {
 
 		case alert = 0xE59700
 
-		// alert
-		case red1 = 0xC82020
+		case lightAlert = 0xFFF4DF
+
+		case error = 0xC82020
+
+		case notification = 0xF81B1B
 
 		// gradient
 		case account0green = 0x01E2A0

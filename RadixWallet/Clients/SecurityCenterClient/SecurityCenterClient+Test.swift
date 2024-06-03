@@ -15,7 +15,7 @@ extension SecurityCenterClient: TestDependencyKey {
 	public static let previewValue: Self = .noop
 
 	public static let noop = Self(
-		problems: { AsyncLazySequence([[]]).eraseToAnyAsyncSequence() },
+		problems: { _ in AsyncLazySequence([[]]).eraseToAnyAsyncSequence() },
 		lastManualBackup: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		lastCloudBackup: { AsyncLazySequence([]).eraseToAnyAsyncSequence() }
 	)

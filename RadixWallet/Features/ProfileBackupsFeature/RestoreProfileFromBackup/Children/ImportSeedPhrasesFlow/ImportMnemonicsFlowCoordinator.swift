@@ -29,7 +29,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		public var newMainBDFS: DeviceFactorSource?
 
 		public enum Context: Sendable, Hashable {
-			case fromOnboarding(profileSnapshot: Profile)
+			case fromOnboarding(profile: Profile)
 			case notOnboarding
 
 			var profileSnapshotFromOnboarding: Profile? {
@@ -259,9 +259,6 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 				if let newMainBDFS, !context.isFromOnboarding {
 					try await factorSourcesClient.saveNewMainBDFS(newMainBDFS)
 				}
-
-				/// A small delay is needed after dismissal in order to not break Home screen modal presentations
-				try? await Task.sleep(for: .milliseconds(250))
 
 				return await send(.delegate(.finishedImportingMnemonics(
 					skipped: skipped,
