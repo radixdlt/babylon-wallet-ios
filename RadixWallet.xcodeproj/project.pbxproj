@@ -917,6 +917,8 @@
 		5B758D582BCE7AEC00348722 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B758D562BCE7AEC00348722 /* Preferences.swift */; };
 		5B758D5C2BCEC3B200348722 /* Troubleshooting+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B758D5A2BCEC3B200348722 /* Troubleshooting+View.swift */; };
 		5B758D5D2BCEC3B200348722 /* Troubleshooting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B758D5B2BCEC3B200348722 /* Troubleshooting.swift */; };
+		5B77D7B32C0DFE8300F5F215 /* EntitySecurityProblems.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B77D7B02C0DFE8300F5F215 /* EntitySecurityProblems.swift */; };
+		5B77D7B42C0DFE8300F5F215 /* EntitySecurityProblems+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B77D7B12C0DFE8300F5F215 /* EntitySecurityProblems+View.swift */; };
 		5B9846BD2BBD5C8800E814F3 /* SensitiveInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B9846BC2BBD5C8800E814F3 /* SensitiveInfo.plist */; };
 		5B9846C02BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9846BF2BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift */; };
 		5B9846C22BBD5F7600E814F3 /* SensitiveInfoClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9846C12BBD5F7600E814F3 /* SensitiveInfoClient+Live.swift */; };
@@ -925,8 +927,6 @@
 		5BBC43A92BBAC6B0005747B1 /* AppTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC43A82BBAC6B0005747B1 /* AppTextEditor.swift */; };
 		5BC82B6C2BED18A1009AC162 /* FactoryReset+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC82B6A2BED18A1009AC162 /* FactoryReset+View.swift */; };
 		5BC82B6D2BED18A1009AC162 /* FactoryReset+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC82B6B2BED18A1009AC162 /* FactoryReset+Reducer.swift */; };
-		5BDEAA5A2C075C7400D0680A /* EntitySecurityProblems+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDEAA582C075C7400D0680A /* EntitySecurityProblems+View.swift */; };
-		5BDEAA5B2C075C7400D0680A /* EntitySecurityProblems.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDEAA592C075C7400D0680A /* EntitySecurityProblems.swift */; };
 		830818482B9F1621002D8351 /* HTTPClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830818472B9F1621002D8351 /* HTTPClient+Live.swift */; };
 		8308184A2B9F162B002D8351 /* HTTPClient+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830818492B9F162B002D8351 /* HTTPClient+Mock.swift */; };
 		8308184C2B9F169B002D8351 /* TokenPriceClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8308184B2B9F169B002D8351 /* TokenPriceClient+Live.swift */; };
@@ -2050,6 +2050,8 @@
 		5B758D562BCE7AEC00348722 /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
 		5B758D5A2BCEC3B200348722 /* Troubleshooting+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Troubleshooting+View.swift"; sourceTree = "<group>"; };
 		5B758D5B2BCEC3B200348722 /* Troubleshooting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Troubleshooting.swift; sourceTree = "<group>"; };
+		5B77D7B02C0DFE8300F5F215 /* EntitySecurityProblems.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EntitySecurityProblems.swift; sourceTree = "<group>"; };
+		5B77D7B12C0DFE8300F5F215 /* EntitySecurityProblems+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "EntitySecurityProblems+View.swift"; sourceTree = "<group>"; };
 		5B9846BC2BBD5C8800E814F3 /* SensitiveInfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = SensitiveInfo.plist; sourceTree = "<group>"; };
 		5B9846BF2BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SensitiveInfoClient+Interface.swift"; sourceTree = "<group>"; };
 		5B9846C12BBD5F7600E814F3 /* SensitiveInfoClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SensitiveInfoClient+Live.swift"; sourceTree = "<group>"; };
@@ -2058,8 +2060,6 @@
 		5BBC43A82BBAC6B0005747B1 /* AppTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTextEditor.swift; sourceTree = "<group>"; };
 		5BC82B6A2BED18A1009AC162 /* FactoryReset+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactoryReset+View.swift"; sourceTree = "<group>"; };
 		5BC82B6B2BED18A1009AC162 /* FactoryReset+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactoryReset+Reducer.swift"; sourceTree = "<group>"; };
-		5BDEAA582C075C7400D0680A /* EntitySecurityProblems+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EntitySecurityProblems+View.swift"; sourceTree = "<group>"; };
-		5BDEAA592C075C7400D0680A /* EntitySecurityProblems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitySecurityProblems.swift; sourceTree = "<group>"; };
 		830818472B9F1621002D8351 /* HTTPClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPClient+Live.swift"; sourceTree = "<group>"; };
 		830818492B9F162B002D8351 /* HTTPClient+Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPClient+Mock.swift"; sourceTree = "<group>"; };
 		8308184B2B9F169B002D8351 /* TokenPriceClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TokenPriceClient+Live.swift"; sourceTree = "<group>"; };
@@ -2510,7 +2510,7 @@
 		48CFBC602ADC10D800E77A5C /* Features */ = {
 			isa = PBXGroup;
 			children = (
-				5BDEAA572C075C4B00D0680A /* EntitySecurityProblems */,
+				5B77D7B22C0DFE8300F5F215 /* EntitySecurityProblems */,
 				A43F1E242BC96EF2001DD3FA /* SecurityCenterFeature */,
 				48D5F3972BD8DE0A000DE964 /* DebugInspectProfile */,
 				5B45E2F32BC45706007C4C84 /* FactorSourceAccess */,
@@ -5714,6 +5714,15 @@
 			path = Troubleshooting;
 			sourceTree = "<group>";
 		};
+		5B77D7B22C0DFE8300F5F215 /* EntitySecurityProblems */ = {
+			isa = PBXGroup;
+			children = (
+				5B77D7B02C0DFE8300F5F215 /* EntitySecurityProblems.swift */,
+				5B77D7B12C0DFE8300F5F215 /* EntitySecurityProblems+View.swift */,
+			);
+			path = EntitySecurityProblems;
+			sourceTree = "<group>";
+		};
 		5B9846BE2BBD5EF600E814F3 /* SensitiveInfoClient */ = {
 			isa = PBXGroup;
 			children = (
@@ -5721,15 +5730,6 @@
 				5B9846C12BBD5F7600E814F3 /* SensitiveInfoClient+Live.swift */,
 			);
 			path = SensitiveInfoClient;
-			sourceTree = "<group>";
-		};
-		5BDEAA572C075C4B00D0680A /* EntitySecurityProblems */ = {
-			isa = PBXGroup;
-			children = (
-				5BDEAA582C075C7400D0680A /* EntitySecurityProblems+View.swift */,
-				5BDEAA592C075C7400D0680A /* EntitySecurityProblems.swift */,
-			);
-			path = EntitySecurityProblems;
 			sourceTree = "<group>";
 		};
 		830EA9D42AE94014004C8051 /* AccountAndPersonaHidingFeature */ = {
@@ -7234,6 +7234,7 @@
 				48CFC4442ADC10DA00E77A5C /* DappInteractionClient+Live.swift in Sources */,
 				48CFC5D22ADC10DA00E77A5C /* OnSizeChanged.swift in Sources */,
 				48CFC4202ADC10DA00E77A5C /* RandomBytes.swift in Sources */,
+				5B77D7B42C0DFE8300F5F215 /* EntitySecurityProblems+View.swift in Sources */,
 				A462B58C2B83673000C26D20 /* StateKeyValueStoreKeysCollection.swift in Sources */,
 				48CFC5AB2ADC10DA00E77A5C /* InertButtonStyle.swift in Sources */,
 				48CFC4412ADC10DA00E77A5C /* RadixConnectClient+Test.swift in Sources */,
@@ -7436,8 +7437,6 @@
 				48CFC3222ADC10D900E77A5C /* NewConnection+View.swift in Sources */,
 				48CFC4462ADC10DA00E77A5C /* OnboardingClient+Interface.swift in Sources */,
 				5B758D5C2BCEC3B200348722 /* Troubleshooting+View.swift in Sources */,
-				5BDEAA5A2C075C7400D0680A /* EntitySecurityProblems+View.swift in Sources */,
-				5BDEAA5B2C075C7400D0680A /* EntitySecurityProblems.swift in Sources */,
 				5B758D5D2BCEC3B200348722 /* Troubleshooting.swift in Sources */,
 				48CFC60A2ADC10DA00E77A5C /* PersonaDataRequestResponseItem.swift in Sources */,
 				83EE5EDB2BE3C16F00B1531D /* RoyaltyAmount.swift in Sources */,
@@ -7544,6 +7543,7 @@
 				48CFC4FB2ADC10DA00E77A5C /* LedgerState.swift in Sources */,
 				48CFC55E2ADC10DA00E77A5C /* ComponentEntityRoleAssignments.swift in Sources */,
 				48CFC3502ADC10D900E77A5C /* PersonaRow.swift in Sources */,
+				5B77D7B32C0DFE8300F5F215 /* EntitySecurityProblems.swift in Sources */,
 				48CFC5F02ADC10DA00E77A5C /* UserDefaultsClient+AccountRecovery.swift in Sources */,
 				48CFC3562ADC10D900E77A5C /* ImportOlympiaLedgerAccountsAndFactorSources.swift in Sources */,
 				48CFC5782ADC10DA00E77A5C /* GatewayError.swift in Sources */,
@@ -8019,9 +8019,7 @@
 			baseConfigurationReference = 48CFC69C2ADC110800E77A5C /* iOS-dev.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "RadixWallet/RadixWalletDebug-Dev.entitlements";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = MDH99V28LM;
 				INFOPLIST_KEY_CFBundleDisplayName = "Radix Wallet";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_NSCameraUsageDescription = "\"This lets you scan QR codes for Radix Connect linking.\"";
@@ -8032,7 +8030,6 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.radixpublishing.radixwallet.ios.dev";
 				SWIFT_VERSION = 5.0;
 			};
 			name = "Debug-Dev";
@@ -8126,9 +8123,7 @@
 			baseConfigurationReference = 48CFC69E2ADC110800E77A5C /* iOS-alpha.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "RadixWallet/RadixWalletDebug-Alpha.entitlements";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CURRENT_PROJECT_VERSION = 1;
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = MDH99V28LM;
 				INFOPLIST_KEY_CFBundleDisplayName = "Radix Wallet";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_NSCameraUsageDescription = "\"This lets you scan QR codes for Radix Connect linking.\"";
@@ -8139,7 +8134,6 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore com.radixpublishing.radixwallet.ios.alpha";
 				SWIFT_VERSION = 5.0;
 			};
 			name = "Debug-Alpha";
