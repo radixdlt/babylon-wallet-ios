@@ -64,44 +64,26 @@ private extension StoreOf<DappInteractor> {
 private extension View {
 	func destinations(with store: StoreOf<DappInteractor>) -> some View {
 		let destinationStore = store.destination
-		return dappInteractionCompletion(with: destinationStore)
+		return dappInteractionCompletion(with: destinationStore, store: store)
 			.invalidRequestAlert(with: destinationStore)
 			.responseFailureAlert(with: destinationStore)
-			.npsSurvey(with: destinationStore)
 	}
 
-	private func dappInteractionCompletion(with destinationStore: PresentationStoreOf<DappInteractor.Destination>) -> some View {
+	private func dappInteractionCompletion(with destinationStore: PresentationStoreOf<DappInteractor.Destination>, store: StoreOf<DappInteractor>) -> some View {
 		sheet(
-			store: destinationStore,
-			state: /DappInteractor.Destination.State.dappInteractionCompletion,
-			action: DappInteractor.Destination.Action.dappInteractionCompletion,
-			content: { Completion.View(store: $0) }
-		)
+			store: destinationStore.scope(state: \.dappInteractionCompletion, action: \.dappInteractionCompletion),
+			onDismiss: { store.send(.view(.completionDismissed)) }
+		) {
+			Completion.View(store: $0)
+		}
 	}
 
 	private func invalidRequestAlert(with destinationStore: PresentationStoreOf<DappInteractor.Destination>) -> some View {
-		alert(
-			store: destinationStore,
-			state: /DappInteractor.Destination.State.invalidRequest,
-			action: DappInteractor.Destination.Action.invalidRequest
-		)
+		alert(store: destinationStore.scope(state: \.invalidRequest, action: \.invalidRequest))
 	}
 
 	private func responseFailureAlert(with destinationStore: PresentationStoreOf<DappInteractor.Destination>) -> some View {
-		alert(
-			store: destinationStore,
-			state: /DappInteractor.Destination.State.responseFailure,
-			action: DappInteractor.Destination.Action.responseFailure
-		)
-	}
-
-	private func npsSurvey(with destinationStore: PresentationStoreOf<DappInteractor.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /DappInteractor.Destination.State.npsSurvey,
-			action: DappInteractor.Destination.Action.npsSurvey,
-			content: { NPSSurvey.View(store: $0) }
-		)
+		alert(store: destinationStore.scope(state: \.responseFailure, action: \.responseFailure))
 	}
 }
 

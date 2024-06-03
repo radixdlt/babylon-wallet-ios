@@ -44,6 +44,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case task
 		case moveToBackground
 		case moveToForeground
+		case completionDismissed
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -73,24 +74,23 @@ struct DappInteractor: Sendable, FeatureReducer {
 			route: P2P.Route,
 			isDeveloperModeEnabled: Bool
 		)
-		case shouldShowNpsSurvey(Bool)
 	}
 
 	struct Destination: Sendable, DestinationReducer {
+		@CasePathable
 		enum State: Sendable, Hashable {
 			case dappInteraction(DappInteractionCoordinator.State)
 			case dappInteractionCompletion(Completion.State)
 			case responseFailure(AlertState<Action.ResponseFailure>)
 			case invalidRequest(AlertState<Action.InvalidRequest>)
-			case npsSurvey(NPSSurvey.State)
 		}
 
+		@CasePathable
 		enum Action: Sendable, Equatable {
 			case dappInteraction(DappInteractionCoordinator.Action)
 			case dappInteractionCompletion(Completion.Action)
 			case responseFailure(ResponseFailure)
 			case invalidRequest(InvalidRequest)
-			case npsSurvey(NPSSurvey.Action)
 
 			enum ResponseFailure: Sendable, Hashable {
 				case cancelButtonTapped(RequestEnvelope)
@@ -103,14 +103,11 @@ struct DappInteractor: Sendable, FeatureReducer {
 		}
 
 		var body: some ReducerOf<Self> {
-			Scope(state: /State.dappInteraction, action: /Action.dappInteraction) {
+			Scope(state: \.dappInteraction, action: \.dappInteraction) {
 				DappInteractionCoordinator()
 			}
-			Scope(state: /State.dappInteractionCompletion, action: /Action.dappInteractionCompletion) {
+			Scope(state: \.dappInteractionCompletion, action: \.dappInteractionCompletion) {
 				Completion()
-			}
-			Scope(state: /State.npsSurvey, action: /Action.npsSurvey) {
-				NPSSurvey()
 			}
 		}
 	}
@@ -124,7 +121,6 @@ struct DappInteractor: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.dappInteractionClient) var dappInteractionClient
 	@Dependency(\.npsSurveyClient) var npsSurveyClient
-	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -138,17 +134,20 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			handleIncomingRequests()
-				.merge(with: showNpsSurveyEffect())
+			return handleIncomingRequests()
 
 		case .moveToBackground:
-			.run { _ in
+			return .run { _ in
 				await radixConnectClient.disconnectAll()
 			}
 		case .moveToForeground:
-			.run { _ in
+			return .run { _ in
 				_ = await radixConnectClient.loadFromProfileAndConnectAll()
 			}
+
+		case .completionDismissed:
+			npsSurveyClient.incrementTransactionCompleteCounter()
+			return .none
 		}
 	}
 
@@ -240,12 +239,6 @@ struct DappInteractor: Sendable, FeatureReducer {
 				)
 			))
 			return .none
-
-		case let .shouldShowNpsSurvey(show):
-			if show {
-				state.addDestination(.npsSurvey(.init()))
-			}
-			return .none
 		}
 	}
 
@@ -271,7 +264,6 @@ struct DappInteractor: Sendable, FeatureReducer {
 			case let .dismiss(dappMetadata, txID):
 				dismissCurrentModalAndRequest(request, for: &state)
 				return .send(.internal(.presentResponseSuccessView(dappMetadata, txID)))
-					.concatenate(with: incrementTransactionCompleteCounterEffect())
 			case .dismissSilently:
 				dismissCurrentModalAndRequest(request, for: &state)
 				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
@@ -303,26 +295,14 @@ struct DappInteractor: Sendable, FeatureReducer {
 				}
 			}
 
-		case let .npsSurvey(.delegate(.feedbackFilled(userFeedback))):
-			state.destination = nil
-			return uploadUserFeedbackEffect(userFeedback)
-
 		default:
 			return .none
 		}
 	}
 
 	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
-		var effect: Effect<Action>?
-		switch state.destination {
-		case .npsSurvey:
-			effect = uploadUserFeedbackEffect(nil)
-		default:
-			break
-		}
-
 		state.showNextDestination()
-		return effect ?? .none
+		return .none
 	}
 
 	func presentQueuedRequestIfNeededEffect(
@@ -523,30 +503,6 @@ private extension DappInteractor {
 			}
 		} catch: { error, _ in
 			errorQueue.schedule(error)
-		}
-	}
-
-	func incrementTransactionCompleteCounterEffect() -> Effect<Action> {
-		npsSurveyClient.incrementTransactionCompleteCounter()
-		return .none
-	}
-
-	func showNpsSurveyEffect() -> Effect<Action> {
-		.run { send in
-			for try await shouldShow in await npsSurveyClient.shouldAskForUserFeedback() {
-				guard !Task.isCancelled else { return }
-				await send(.internal(.shouldShowNpsSurvey(shouldShow)))
-			}
-		}
-	}
-
-	private func uploadUserFeedbackEffect(_ feedback: NPSSurveyClient.UserFeedback?) -> Effect<Action> {
-		if feedback != nil {
-			overlayWindowClient.scheduleHUD(.thankYou)
-		}
-
-		return .run { _ in
-			await npsSurveyClient.uploadUserFeedback(feedback)
 		}
 	}
 }
