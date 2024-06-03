@@ -1,0 +1,7 @@
+id: fc45d181-10fe-4e7e-b41c-b9f10a9def7d
+name: babylon-wallet-ios
+created_at: 2024-06-03T09:02:53.288236+02:00
+group_name: Wallet
+depfiles:
+- path: ./Gemfile.lock
+  type: gem

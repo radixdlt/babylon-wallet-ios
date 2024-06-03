@@ -15,6 +15,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  phylum_analyze:
+    uses: radixdlt/public-iac-resuable-artifacts/.github/workflows/phylum-analyze.yml@main
+    secrets:
+      phylum_api_key: ${{ secrets.PHYLUM_API_KEY }}
+
   snyk_scan:
     if: >
       ( github.event.action == 'opened' && github.event.pull_request.draft == false ) ||
