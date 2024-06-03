@@ -23,19 +23,28 @@ public struct FullScreenOverlayCoordinator: Sendable, FeatureReducer {
 		@CasePathable
 		public enum State: Sendable, Hashable {
 			case claimWallet(ClaimWallet.State)
+			case relinkConnector(NewConnection.State)
 		}
 
 		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case claimWallet(ClaimWallet.Action)
+			case relinkConnector(NewConnection.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
 			Scope(state: \.claimWallet, action: \.claimWallet) {
 				ClaimWallet()
 			}
+			Scope(state: /State.relinkConnector, action: /Action.relinkConnector) {
+				NewConnection()
+			}
 		}
 	}
+
+	@Dependency(\.userDefaults) var userDefaults
+	@Dependency(\.radixConnectClient) var radixConnectClient
+	@Dependency(\.errorQueue) var errorQueue
 
 	public init() {}
 
@@ -49,10 +58,21 @@ public struct FullScreenOverlayCoordinator: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .root(.claimWallet(.delegate)):
-			.send(.delegate(.dismiss))
+			return .send(.delegate(.dismiss))
+
+		case let .root(.relinkConnector(.delegate(.newConnection(connectedClient)))):
+			userDefaults.setShowRelinkConnectorsAfterProfileRestore(false)
+			userDefaults.setShowRelinkConnectorsAfterUpdate(false)
+			return .run { send in
+				try await radixConnectClient.updateOrAddP2PLink(connectedClient)
+				await send(.delegate(.dismiss))
+			} catch: { error, _ in
+				loggerGlobal.error("Failed P2PLink, error \(error)")
+				errorQueue.schedule(error)
+			}
 
 		default:
-			.none
+			return .none
 		}
 	}
 }

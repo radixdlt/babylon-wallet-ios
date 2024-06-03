@@ -64,7 +64,6 @@ public struct Home: Sendable, FeatureReducer {
 		case shouldShowNPSSurvey(Bool)
 		case accountsResourcesLoaded(Loadable<[OnLedgerEntity.OnLedgerAccount]>)
 		case accountsFiatWorthLoaded([AccountAddress: Loadable<FiatWorth>])
-		case showLinkConnectorIfNeeded
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -83,7 +82,6 @@ public struct Home: Sendable, FeatureReducer {
 			case exportMnemonic(ExportMnemonic.State)
 			case acknowledgeJailbreakAlert(AlertState<Action.AcknowledgeJailbreakAlert>)
 			case npsSurvey(NPSSurvey.State)
-			case relinkConnector(NewConnection.State)
 		}
 
 		public enum Action: Sendable, Equatable {
@@ -93,7 +91,6 @@ public struct Home: Sendable, FeatureReducer {
 			case exportMnemonic(ExportMnemonic.Action)
 			case acknowledgeJailbreakAlert(AcknowledgeJailbreakAlert)
 			case npsSurvey(NPSSurvey.Action)
-			case relinkConnector(NewConnection.Action)
 
 			public enum AcknowledgeJailbreakAlert: Sendable, Hashable {}
 		}
@@ -114,9 +111,6 @@ public struct Home: Sendable, FeatureReducer {
 			Scope(state: /State.npsSurvey, action: /Action.npsSurvey) {
 				NPSSurvey()
 			}
-			Scope(state: /State.relinkConnector, action: /Action.relinkConnector) {
-				NewConnection()
-			}
 		}
 	}
 
@@ -130,7 +124,6 @@ public struct Home: Sendable, FeatureReducer {
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.npsSurveyClient) var npsSurveyClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
-	@Dependency(\.radixConnectClient) var radixConnectClient
 
 	public init() {}
 
@@ -179,7 +172,7 @@ public struct Home: Sendable, FeatureReducer {
 			.merge(with: loadNPSSurveyStatus())
 			.merge(with: loadAccountResources())
 			.merge(with: loadFiatValues())
-			.merge(with: delayedMediumEffect(for: .internal(.showLinkConnectorIfNeeded)))
+			.merge(with: showLinkConnectorIfNeeded())
 
 		case .createAccountButtonTapped:
 			state.destination = .createAccount(
@@ -276,20 +269,6 @@ public struct Home: Sendable, FeatureReducer {
 			}
 			state.totalFiatWorth = state.accountRows.map(\.totalFiatWorth).reduce(+) ?? .loading
 			return .none
-		case .showLinkConnectorIfNeeded:
-			let purpose: NewConnectionApproval.State.Purpose? = if userDefaults.showRelinkConnectorsAfterProfileRestore {
-				.approveRelinkAfterProfileRestore
-			} else if userDefaults.showRelinkConnectorsAfterUpdate {
-				.approveRelinkAfterUpdate
-			} else {
-				nil
-			}
-			if let purpose {
-				state.addDestination(
-					.relinkConnector(.init(root: .connectionApproval(.init(purpose: purpose))))
-				)
-			}
-			return .none
 		}
 	}
 
@@ -361,17 +340,6 @@ public struct Home: Sendable, FeatureReducer {
 			state.destination = nil
 			return uploadUserFeedback(userFeedback)
 
-		case let .relinkConnector(.delegate(.newConnection(connectedClient))):
-			state.destination = nil
-			userDefaults.setShowRelinkConnectorsAfterProfileRestore(false)
-			userDefaults.setShowRelinkConnectorsAfterUpdate(false)
-			return .run { _ in
-				try await radixConnectClient.updateOrAddP2PLink(connectedClient)
-			} catch: { error, _ in
-				loggerGlobal.error("Failed P2PLink, error \(error)")
-				errorQueue.schedule(error)
-			}
-
 		default:
 			return .none
 		}
@@ -383,9 +351,6 @@ public struct Home: Sendable, FeatureReducer {
 		switch state.destination {
 		case .npsSurvey:
 			effect = uploadUserFeedback(nil)
-		case .relinkConnector:
-			userDefaults.setShowRelinkConnectorsAfterProfileRestore(false)
-			userDefaults.setShowRelinkConnectorsAfterUpdate(false)
 		default:
 			break
 		}
@@ -487,6 +452,21 @@ public struct Home: Sendable, FeatureReducer {
 				await send(.internal(.accountsFiatWorthLoaded(accountsTotalFiatWorth)))
 			}
 		}
+	}
+
+	private func showLinkConnectorIfNeeded() -> Effect<Action> {
+		let purpose: NewConnectionApproval.State.Purpose? = if userDefaults.showRelinkConnectorsAfterProfileRestore {
+			.approveRelinkAfterProfileRestore
+		} else if userDefaults.showRelinkConnectorsAfterUpdate {
+			.approveRelinkAfterUpdate
+		} else {
+			nil
+		}
+		if let purpose {
+			overlayWindowClient.scheduleFullScreenIgnoreAction(.init(root: .relinkConnector(.init(root: .connectionApproval(.init(purpose: purpose))))))
+		}
+
+		return .none
 	}
 }
 

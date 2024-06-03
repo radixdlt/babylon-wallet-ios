@@ -49,6 +49,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.continuousClock) var clock
+	@Dependency(\.userDefaults) var userDefaults
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -99,7 +100,16 @@ struct OverlayReducer: Sendable, FeatureReducer {
 	}
 
 	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
-		dismissAlert(state: &state, withAction: .dismissed)
+		switch state.destination {
+		case let .fullScreen(state):
+			guard case .relinkConnector = state.root else { break }
+			userDefaults.setShowRelinkConnectorsAfterProfileRestore(false)
+			userDefaults.setShowRelinkConnectorsAfterUpdate(false)
+		default:
+			break
+		}
+
+		return dismissAlert(state: &state, withAction: .dismissed)
 	}
 
 	private func showItemIfPossible(state: inout State) -> Effect<Action> {

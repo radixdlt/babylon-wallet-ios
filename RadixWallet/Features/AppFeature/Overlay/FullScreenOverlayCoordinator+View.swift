@@ -30,6 +30,12 @@ extension FullScreenOverlayCoordinator {
 						action: FullScreenOverlayCoordinator.Root.Action.claimWallet,
 						then: { ClaimWallet.View(store: $0) }
 					)
+				case .relinkConnector:
+					CaseLet(
+						/FullScreenOverlayCoordinator.Root.State.relinkConnector,
+						action: FullScreenOverlayCoordinator.Root.Action.relinkConnector,
+						then: { NewConnection.View(store: $0) }
+					)
 				}
 			}
 		}
