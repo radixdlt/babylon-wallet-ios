@@ -218,7 +218,7 @@ extension Settings.State {
 			case .problem5, .problem6, .problem7:
 				!personas.isEmpty
 			case let .problem3(addresses), let .problem9(addresses):
-				// Note: we don't care about `addresses.problematicPersonas` as the state.personas will only have the visible ones.
+				// Note: we don't care about `addresses.hiddenPersonas` as the `state.personas` will only have the visible ones.
 				!Set(addresses.personas).isDisjoint(with: personas)
 			}
 		}

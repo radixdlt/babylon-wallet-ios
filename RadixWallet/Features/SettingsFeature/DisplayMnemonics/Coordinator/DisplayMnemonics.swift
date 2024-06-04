@@ -196,7 +196,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 					.compactMap { $0 }
 					.map {
 						ComparableEntities(
-							state: .init(accountsControlledByKeysOnSameCurve: $0, problems: problems),
+							state: .init(entitiesControlledByKeysOnSameCurve: $0, problems: problems),
 							deviceFactorSource: ents.deviceFactorSource
 						)
 					}
