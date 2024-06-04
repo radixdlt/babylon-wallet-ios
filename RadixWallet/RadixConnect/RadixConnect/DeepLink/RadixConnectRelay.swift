@@ -42,7 +42,7 @@ extension RadixConnectRelay {
 		@Dependency(\.httpClient) var httpClient
 		@Dependency(\.secureStorageClient) var secureStorageClient
 
-		let serviceURL = URL(string: "http://radix-connect-relay.radixdlt.com/api/v1")!
+		let serviceURL = URL(string: "https://radix-connect-relay.radixdlt.com/api/v1")!
 		let encryptionScheme = EncryptionScheme.version1
 
 		return .init(
