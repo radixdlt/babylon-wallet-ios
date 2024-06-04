@@ -49,11 +49,11 @@ public struct Main: Sendable, FeatureReducer {
 		}
 	}
 
-	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.cloudBackupClient) var cloudBackupClient
 	@Dependency(\.resetWalletClient) var resetWalletClient
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 	public init() {}
 
@@ -75,6 +75,12 @@ public struct Main: Sendable, FeatureReducer {
 			startAutomaticBackupsEffect()
 				.merge(with: gatewayValuesEffect())
 				.merge(with: didResetWalletEffect())
+				.merge(with: overlayActionEffect())
+		}
+	}
+
+	private func overlayActionEffect() -> Effect<Action> {
+		.run { _ in
 		}
 	}
 

@@ -11,12 +11,9 @@ extension OverlayReducer {
 		}
 
 		var body: some SwiftUI.View {
-			IfLetStore(
-				store.destination,
-				state: /OverlayReducer.Destination.State.hud,
-				action: OverlayReducer.Destination.Action.hud,
-				then: { HUD.View(store: $0) }
-			)
+			IfLetStore(store.destination.scope(state: \.hud, action: \.hud)) {
+				HUD.View(store: $0)
+			}
 			.destinations(with: store)
 			.task { store.send(.view(.task)) }
 		}

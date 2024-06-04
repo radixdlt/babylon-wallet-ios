@@ -22,22 +22,23 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 	}
 
 	public struct Path: Sendable, Hashable, Reducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case selectBackup(SelectBackup.State)
 			case importMnemonicsFlow(ImportMnemonicsFlowCoordinator.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case selectBackup(SelectBackup.Action)
 			case importMnemonicsFlow(ImportMnemonicsFlowCoordinator.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.selectBackup, action: /Action.selectBackup) {
+			Scope(state: \.selectBackup, action: \.selectBackup) {
 				SelectBackup()
 			}
-
-			Scope(state: /State.importMnemonicsFlow, action: /Action.importMnemonicsFlow) {
+			Scope(state: \.importMnemonicsFlow, action: \.importMnemonicsFlow) {
 				ImportMnemonicsFlowCoordinator()
 			}
 		}
@@ -47,6 +48,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 		case delayedAppendToPath(RestoreProfileFromBackupCoordinator.Path.State)
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case root(Path.Action)
 		case path(StackActionOf<Path>)
@@ -68,12 +70,12 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.root, action: /Action.child .. ChildAction.root) {
+		Scope(state: \.root, action: \.child.root) {
 			Path()
 		}
 
 		Reduce(core)
-			.forEach(\.path, action: /Action.child .. ChildAction.path) {
+			.forEach(\.path, action: \.child.path) {
 				Path()
 			}
 	}

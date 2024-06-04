@@ -90,6 +90,10 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		case .hud(.delegate(.dismiss)):
 			return dismiss(&state)
 
+		case let .fullScreen(.child(.root(fullScreenAction))):
+			print("•• fullScreenAction: \(fullScreenAction)")
+			return .none
+
 		case .fullScreen(.delegate(.dismiss)):
 			return dismiss(&state)
 
