@@ -30,8 +30,8 @@ public extension EntitySecurityProblems {
 					}
 				}
 				.padding(.vertical, viewStore.verticalPadding)
-				.onAppear {
-					viewStore.send(.appeared)
+				.task {
+					viewStore.send(.task)
 				}
 			}
 		}

@@ -42,8 +42,8 @@ extension DisplayMnemonics {
 				}
 				.background(.app.gray5)
 				.radixToolbar(title: L10n.SeedPhrases.title)
-				.onAppear {
-					viewStore.send(.appeared)
+				.task {
+					viewStore.send(.task)
 				}
 			}
 			.destinations(with: store)

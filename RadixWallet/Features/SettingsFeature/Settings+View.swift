@@ -97,8 +97,8 @@ extension Settings.View {
 				.frame(minHeight: .huge1)
 			}
 			.background(Color.app.gray5)
-			.onAppear {
-				store.send(.view(.appeared))
+			.task {
+				store.send(.view(.task))
 			}
 		}
 	}

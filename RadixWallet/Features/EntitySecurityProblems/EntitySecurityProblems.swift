@@ -15,7 +15,7 @@ public struct EntitySecurityProblems: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case appeared
+		case task
 		case rowTapped
 	}
 
@@ -33,7 +33,7 @@ public struct EntitySecurityProblems: Sendable, FeatureReducer {
 
 	public func reduce(into _: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .appeared:
+		case .task:
 			securityProblemsEffect()
 		case .rowTapped:
 			.send(.delegate(.openSecurityCenter))

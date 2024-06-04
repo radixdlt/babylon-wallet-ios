@@ -23,7 +23,7 @@ public struct Settings: Sendable, FeatureReducer {
 	// MARK: Action
 
 	public enum ViewAction: Sendable, Equatable {
-		case appeared
+		case task
 		case addConnectorButtonTapped
 		case securityCenterButtonTapped
 		case personasButtonTapped
@@ -110,7 +110,7 @@ public struct Settings: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .appeared:
+		case .task:
 			return p2pLinksEffect()
 				.merge(with: securityProblemsEffect())
 				.merge(with: personasEffect())
