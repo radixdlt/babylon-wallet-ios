@@ -28,7 +28,7 @@ public struct EntitiesControlledByFactorSource: Sendable, Hashable, Identifiable
 }
 
 extension EntitiesControlledByFactorSource {
-	public struct AccountsControlledByKeysOnSameCurve: Equatable, Sendable {
+	public struct EntitiesControlledByKeysOnSameCurve: Equatable, Sendable {
 		public struct ID: Sendable, Hashable {
 			public let factorSourceID: FactorSourceIdFromHash
 			public let isOlympia: Bool
@@ -37,23 +37,26 @@ extension EntitiesControlledByFactorSource {
 		public let id: ID
 		public let accounts: IdentifiedArrayOf<Account>
 		public let hiddenAccounts: IdentifiedArrayOf<Account>
+		public let personas: [Persona]
 	}
 
-	public var olympia: AccountsControlledByKeysOnSameCurve? {
+	public var olympia: EntitiesControlledByKeysOnSameCurve? {
 		guard deviceFactorSource.supportsOlympia else { return nil }
-		return AccountsControlledByKeysOnSameCurve(
+		return EntitiesControlledByKeysOnSameCurve(
 			id: .init(factorSourceID: deviceFactorSource.id, isOlympia: true),
 			accounts: olympiaAccounts,
-			hiddenAccounts: olympiaAccountsHidden
+			hiddenAccounts: olympiaAccountsHidden,
+			personas: personas
 		)
 	}
 
-	public var babylon: AccountsControlledByKeysOnSameCurve? {
+	public var babylon: EntitiesControlledByKeysOnSameCurve? {
 		guard deviceFactorSource.isBDFS else { return nil }
-		return AccountsControlledByKeysOnSameCurve(
+		return EntitiesControlledByKeysOnSameCurve(
 			id: .init(factorSourceID: deviceFactorSource.id, isOlympia: false),
 			accounts: babylonAccounts,
-			hiddenAccounts: babylonAccountsHidden
+			hiddenAccounts: babylonAccountsHidden,
+			personas: personas
 		)
 	}
 
