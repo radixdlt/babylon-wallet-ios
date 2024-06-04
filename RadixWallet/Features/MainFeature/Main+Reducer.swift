@@ -100,13 +100,14 @@ public struct Main: Sendable, FeatureReducer {
 
 	private func didResetWalletEffect() -> Effect<Action> {
 		.run { send in
-			for try await _ in resetWalletClient.walletDidReset() {
-				guard !Task.isCancelled else { return }
-				try await appPreferencesClient.deleteProfileAndFactorSources(true)
-				await send(.delegate(.removedWallet))
+			do {
+				for try await _ in resetWalletClient.walletDidReset() {
+					guard !Task.isCancelled else { return }
+					await send(.delegate(.removedWallet))
+				}
+			} catch {
+				loggerGlobal.error("Failed to iterate over walletDidReset: \(error)")
 			}
-		} catch: { error, _ in
-			loggerGlobal.error("Failed to delete profile: \(error)")
 		}
 	}
 
