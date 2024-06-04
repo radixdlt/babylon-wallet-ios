@@ -121,6 +121,8 @@ public struct PersonaList: Sendable, FeatureReducer {
 				.run { send in
 					let persona = try await personasClient.getPersona(id: id)
 					await send(.delegate(.openDetails(persona)))
+				} catch: { error, _ in
+					errorQueue.schedule(error)
 				}
 			case .openSecurityCenter:
 				.send(.delegate(.openSecurityCenter))
