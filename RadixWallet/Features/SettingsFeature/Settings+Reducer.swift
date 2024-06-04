@@ -15,6 +15,7 @@ public struct Settings: Sendable, FeatureReducer {
 
 		public var userHasNoP2PLinks: Bool? = nil
 		public var securityProblems: [SecurityProblem] = []
+		fileprivate var personas: [IdentityAddress] = []
 
 		public init() {}
 	}
@@ -22,7 +23,7 @@ public struct Settings: Sendable, FeatureReducer {
 	// MARK: Action
 
 	public enum ViewAction: Sendable, Equatable {
-		case appeared
+		case task
 		case addConnectorButtonTapped
 		case securityCenterButtonTapped
 		case personasButtonTapped
@@ -36,6 +37,7 @@ public struct Settings: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case setP2PLinks(P2PLinks)
 		case setSecurityProblems([SecurityProblem])
+		case setPersonas([IdentityAddress])
 	}
 
 	public struct Destination: DestinationReducer {
@@ -93,6 +95,7 @@ public struct Settings: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.p2pLinksClient) var p2pLinksClient
 	@Dependency(\.securityCenterClient) var securityCenterClient
+	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.userDefaults) var userDefaults
 
@@ -107,9 +110,10 @@ public struct Settings: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .appeared:
+		case .task:
 			return p2pLinksEffect()
 				.merge(with: securityProblemsEffect())
+				.merge(with: personasEffect())
 
 		case .addConnectorButtonTapped:
 			state.destination = .manageP2PLinks(.init(destination: .newConnection(.init())))
@@ -153,6 +157,9 @@ public struct Settings: Sendable, FeatureReducer {
 		case let .setSecurityProblems(problems):
 			state.securityProblems = problems
 			return .none
+		case let .setPersonas(personas):
+			state.personas = personas
+			return .none
 		}
 	}
 
@@ -190,6 +197,29 @@ extension Settings {
 			for try await problems in await securityCenterClient.problems() {
 				guard !Task.isCancelled else { return }
 				await send(.internal(.setSecurityProblems(problems)))
+			}
+		}
+	}
+
+	private func personasEffect() -> Effect<Action> {
+		.run { send in
+			for try await personas in await personasClient.personas() {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.setPersonas(personas.map(\.address))))
+			}
+		}
+	}
+}
+
+extension Settings.State {
+	public var personasSecurityProblems: [SecurityProblem] {
+		securityProblems.filter {
+			switch $0 {
+			case .problem5, .problem6, .problem7:
+				!personas.isEmpty
+			case let .problem3(addresses), let .problem9(addresses):
+				// Note: we don't care about `addresses.problematicPersonas` as the state.personas will only have the visible ones.
+				!Set(addresses.personas).isDisjoint(with: personas)
 			}
 		}
 	}

@@ -19,7 +19,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case onFirstTask
+		case task
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -77,7 +77,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .onFirstTask:
+		case .task:
 			securityProblemsEffect()
 				.merge(with: entitiesEffect())
 		}

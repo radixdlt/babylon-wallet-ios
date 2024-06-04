@@ -134,6 +134,7 @@ private extension ManualAccountRecoverySeedPhrase.View {
 							isError: false
 						),
 						promptUserToBackUpMnemonic: false,
+						promptUserToImportMnemonic: false,
 						accounts: item.value.accounts.filter {
 							switch $0.securityState {
 							case let .unsecured(unsecuredEntityControl):

@@ -6,23 +6,18 @@ extension DisplayEntitiesControlledByMnemonic.State {
 		.init(
 			headingState: {
 				switch mode {
-				case .mnemonicCanBeDisplayed:
+				case .mnemonicCanBeDisplayed, .mnemonicNeedsImport:
 					.init(
 						title: L10n.SeedPhrases.SeedPhrase.headingReveal,
 						type: .standard,
-						isError: false
-					)
-				case .mnemonicNeedsImport:
-					.init(
-						title: L10n.SecurityProblems.No9.seedPhrases,
-						type: .standard,
-						isError: true
+						isError: mode == .mnemonicNeedsImport
 					)
 				case .displayAccountListOnly:
 					nil
 				}
 			}(),
 			promptUserToBackUpMnemonic: mode == .mnemonicCanBeDisplayed && !isMnemonicMarkedAsBackedUp,
+			promptUserToImportMnemonic: mode == .mnemonicNeedsImport,
 			accounts: accounts.elements,
 			hiddenAccountsCount: hiddenAccountsCount
 		)
@@ -69,6 +64,7 @@ extension DisplayEntitiesControlledByMnemonic {
 
 		public let headingState: HeadingState?
 		public let promptUserToBackUpMnemonic: Bool
+		public let promptUserToImportMnemonic: Bool
 		public let accounts: [Account]
 		public let hiddenAccountsCount: Int
 
@@ -122,6 +118,12 @@ extension DisplayEntitiesControlledByMnemonic {
 				if viewState.promptUserToBackUpMnemonic {
 					WarningErrorView(
 						text: L10n.SecurityProblems.No3.seedPhrases,
+						type: .warning,
+						useNarrowSpacing: true
+					)
+				} else if viewState.promptUserToImportMnemonic {
+					WarningErrorView(
+						text: L10n.SecurityProblems.No9.seedPhrases,
 						type: .warning,
 						useNarrowSpacing: true
 					)
