@@ -22,6 +22,10 @@ extension OverlayWindowClient: DependencyKey {
 			items.send(.alert(alert))
 		}
 
+		let scheduleFullScreenIgnoreAction: ScheduleFullScreenIgnoreAction = { fullScreen in
+			items.send(.fullScreen(fullScreen))
+		}
+
 		return .init(
 			scheduledItems: { items.eraseToAnyAsyncSequence() },
 			scheduleAlertIgnoreAction: scheduleAlertIgnoreAction,
@@ -30,6 +34,7 @@ extension OverlayWindowClient: DependencyKey {
 				return await alertActions.first { $0.id == alert.id }?.action ?? .dismissed
 			},
 			scheduleHUD: { items.send(.hud($0)) },
+			scheduleFullScreenIgnoreAction: scheduleFullScreenIgnoreAction,
 			sendAlertAction: { action, id in alertActions.send((action, id)) },
 			setIsUserIteractionEnabled: { isUserInteractionEnabled.send($0) },
 			isUserInteractionEnabled: { isUserInteractionEnabled.eraseToAnyAsyncSequence() }

@@ -4,7 +4,7 @@ import DependenciesAdditions
 import os
 
 extension CKRecord.RecordType {
-	static let profile = "Profile"
+	static let profile = "ProfileV2"
 }
 
 extension CKRecord.FieldKey {
@@ -47,6 +47,7 @@ extension CloudBackupClient {
 	struct NoProfileInRecordError: Error {}
 	struct MissingMetadataError: Error {}
 	struct HeaderAndMetadataMismatchError: Error {}
+	struct WrongRecordTypeError: Error { let type: CKRecord.RecordType }
 	struct ProfileMissingFromKeychainError: Error { let id: ProfileID }
 
 	public static let liveValue: Self = .live()
@@ -61,7 +62,11 @@ extension CloudBackupClient {
 
 		@Sendable
 		func fetchProfileRecord(_ id: CKRecord.ID) async throws -> CKRecord {
-			try await container.privateCloudDatabase.record(for: id)
+			let record = try await container.privateCloudDatabase.record(for: id)
+			guard record.recordType == .profile else {
+				throw WrongRecordTypeError(type: record.recordType)
+			}
+			return record
 		}
 
 		@Sendable
@@ -87,7 +92,7 @@ extension CloudBackupClient {
 			let profile = try Profile(jsonString: json)
 			try FileManager.default.removeItem(at: fileURL)
 
-			guard try getProfileHeader(record) == profile.header else {
+			guard try getProfileHeader(record).isEquivalent(to: profile.header) else {
 				throw HeaderAndMetadataMismatchError()
 			}
 
@@ -181,7 +186,6 @@ extension CloudBackupClient {
 
 				let migrated = try await migratable.asyncMap { profileData, header in
 					let backedUpRecord = backedUpRecords.first { $0.recordID.recordName == header.id.uuidString }
-
 					if let backedUpRecord, try getProfileHeader(backedUpRecord).lastModified >= header.lastModified {
 						// We already have a more recent version backed up on iCloud, so we return that
 						return backedUpRecord
@@ -223,6 +227,30 @@ extension CloudBackupClient {
 private extension Profile.Header {
 	var isNonEmpty: Bool {
 		contentHint.numberOfAccountsOnAllNetworksInTotal + contentHint.numberOfPersonasOnAllNetworksInTotal > 0
+	}
+
+	func isEquivalent(to other: Self) -> Bool {
+		snapshotVersion.rawValue == other.snapshotVersion.rawValue &&
+			creatingDevice.isEquivalent(to: other.creatingDevice) &&
+			lastUsedOnDevice.isEquivalent(to: other.lastUsedOnDevice) &&
+			lastModified.isEquivalent(to: other.lastModified) &&
+			contentHint.numberOfAccountsOnAllNetworksInTotal == other.contentHint.numberOfAccountsOnAllNetworksInTotal &&
+			contentHint.numberOfPersonasOnAllNetworksInTotal == other.contentHint.numberOfPersonasOnAllNetworksInTotal &&
+			contentHint.numberOfNetworks == other.contentHint.numberOfNetworks
+	}
+}
+
+private extension DeviceInfo {
+	func isEquivalent(to other: Self) -> Bool {
+		id.uuidString == other.id.uuidString &&
+			date.isEquivalent(to: other.date) &&
+			description == other.description
+	}
+}
+
+private extension Date {
+	func isEquivalent(to other: Self) -> Bool {
+		abs(timeIntervalSince(other)) < 0.001
 	}
 }
 
@@ -271,20 +299,14 @@ extension CloudBackupClient {
 	private static func setProfileHeader(_ header: Profile.Header, on record: CKRecord) {
 		record[.snapshotVersion] = header.snapshotVersion.rawValue
 		record[.creatingDeviceID] = header.creatingDevice.id.uuidString
-		record[.creatingDeviceDate] = header.creatingDevice.date.roundedToMS
+		record[.creatingDeviceDate] = header.creatingDevice.date
 		record[.creatingDeviceDescription] = header.creatingDevice.description
 		record[.lastUsedOnDeviceID] = header.lastUsedOnDevice.id.uuidString
-		record[.lastUsedOnDeviceDate] = header.lastUsedOnDevice.date.roundedToMS
+		record[.lastUsedOnDeviceDate] = header.lastUsedOnDevice.date
 		record[.lastUsedOnDeviceDescription] = header.lastUsedOnDevice.description
-		record[.lastModified] = header.lastModified.roundedToMS
+		record[.lastModified] = header.lastModified
 		record[.numberOfAccounts] = header.contentHint.numberOfAccountsOnAllNetworksInTotal
 		record[.numberOfPersonas] = header.contentHint.numberOfPersonasOnAllNetworksInTotal
 		record[.numberOfNetworks] = header.contentHint.numberOfNetworks
-	}
-}
-
-private extension Date {
-	var roundedToMS: Date {
-		Date(timeIntervalSince1970: 0.001 * (1000 * timeIntervalSince1970).rounded())
 	}
 }
