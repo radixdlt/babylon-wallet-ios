@@ -44,20 +44,12 @@ extension DisplayEntitiesControlledByMnemonic {
 			public func connectedAccountsLabel(accounts: Int, personas: Int) -> String {
 				switch type {
 				case .standard:
-					if personas == 0 {
-						if accounts == 0 {
-							L10n.SeedPhrases.SeedPhrase.noConnectedAccountsReveal
-						} else if accounts == 1 {
-							L10n.SeedPhrases.SeedPhrase.oneConnectedAccountReveal
-						} else {
-							L10n.SeedPhrases.SeedPhrase.multipleConnectedAccountsReveal(accounts)
-						}
-					} else {
-						if accounts == 1 {
-							L10n.DisplayMnemonics.ConnectedAccountsPersonasLabel.one(accounts)
-						} else {
-							L10n.DisplayMnemonics.ConnectedAccountsPersonasLabel.many(accounts)
-						}
+					switch (personas, accounts) {
+					case (0, 0): L10n.SeedPhrases.SeedPhrase.noConnectedAccountsReveal
+					case (0, 1): L10n.SeedPhrases.SeedPhrase.oneConnectedAccountReveal
+					case (0, _): L10n.SeedPhrases.SeedPhrase.multipleConnectedAccountsReveal(accounts)
+					case (_, 1): L10n.DisplayMnemonics.ConnectedAccountsPersonasLabel.one(accounts)
+					case (_, _): L10n.DisplayMnemonics.ConnectedAccountsPersonasLabel.many(accounts)
 					}
 				case .scanning:
 					if accounts == 0 {
