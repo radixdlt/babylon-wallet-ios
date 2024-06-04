@@ -55,6 +55,7 @@ extension CloudBackupClient {
 	public static func live(
 		profileStore: ProfileStore = .shared
 	) -> CloudBackupClient {
+		@Dependency(\.overlayWindowClient) var overlayWindowClient
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.userDefaults) var userDefaults
 
@@ -144,11 +145,31 @@ extension CloudBackupClient {
 
 		return .init(
 			startAutomaticBackups: {
-				let timer = AsyncTimerSequence(every: .seconds(60))
+				let ticks = AsyncTimerSequence(every: .seconds(1))
 				let profiles = await profileStore.values()
+				var lastClaimCheck: Date = .now // .distantPast
 
-				for try await (profile, _) in combineLatest(profiles, timer) {
-					guard !Task.isCancelled else { return }
+				print("•• START automaticBackups")
+				for try await (profile, tick) in combineLatest(profiles, ticks) {
+					guard !Task.isCancelled else { print("•• CANCEL automaticBackups"); return }
+
+					print("•• tick")
+
+					if tick.timeIntervalSince(lastClaimCheck) > 15 {
+						print("•• time to check claims")
+						lastClaimCheck = tick
+
+						let backedUpHeader = try? await getProfileHeader(fetchProfileRecord(.init(recordName: profile.id.uuidString)))
+
+						if true /* let backedUpHeader, await !profileStore.isThisDevice(deviceID: backedUpHeader.lastUsedOnDevice.id) */ {
+							print("•• different IDs")
+							// TODO: Cancel/pause task?
+							overlayWindowClient.scheduleFullScreenIgnoreAction(.init(root: .claimWallet(.init())))
+						} else {
+							print("•• same IDs")
+						}
+					}
+
 					guard profile.appPreferences.security.isCloudProfileSyncEnabled else { continue }
 					guard profile.header.isNonEmpty else { continue }
 

@@ -253,6 +253,10 @@ extension ProfileStore {
 		try importProfile(profile)
 	}
 
+	public func isThisDevice(deviceID: DeviceID) -> Bool {
+		deviceID == deviceInfo.id
+	}
+
 	public func unlockedApp() async -> Profile {
 		loggerGlobal.notice("Unlocking app")
 		let buffered = bufferedOwnershipConflictWhileAppLocked
