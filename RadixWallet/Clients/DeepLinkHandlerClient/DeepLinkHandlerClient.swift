@@ -16,6 +16,7 @@ extension DeepLinkHandlerClient {
 
 extension DeepLinkHandlerClient {
 	static let m2mDeepLinkHost = "dr6vsuukf8610.cloudfront.net"
+	static let deepLinkScheme = "radixwallet"
 
 	public enum Error: LocalizedError {
 		case emptyQuery
@@ -86,7 +87,7 @@ extension DeepLinkHandlerClient {
 				if let url = state.bufferedDeepLink {
 					state.bufferedDeepLink = nil
 					loggerGlobal.error("\(url.absoluteString)")
-					if url.host() == m2mDeepLinkHost {
+					if url.host() == m2mDeepLinkHost || url.scheme == deepLinkScheme {
 						do {
 							let request = try extractWalletConnectRequest(url)
 							Task {
