@@ -87,14 +87,16 @@ struct OverlayReducer: Sendable, FeatureReducer {
 				overlayWindowClient.sendAlertAction(action, state.id)
 			}
 			return dismiss(&state)
+
 		case .hud(.delegate(.dismiss)):
 			return dismiss(&state)
 
 		case let .fullScreen(.child(.root(fullScreenAction))):
-			print("•• fullScreenAction: \(fullScreenAction)")
+			print("•• OverlayReducer: fullScreenAction: \(fullScreenAction)")
 			return .none
 
 		case .fullScreen(.delegate(.dismiss)):
+			print("•• OverlayReducer: .fullScreen(.delegate(.dismiss))")
 			return dismiss(&state)
 
 		default:
@@ -103,19 +105,21 @@ struct OverlayReducer: Sendable, FeatureReducer {
 	}
 
 	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
-		dismissAlert(state: &state, withAction: .dismissed)
+		print("•• OverlayReducer: .reduceDismissedDestination \(state.destination)")
+
+		if let item = state.itemsQueue.first, case let .alert(state) = item {
+			overlayWindowClient.sendAlertAction(.dismissed, state.id)
+		}
+
+		return dismiss(&state)
 	}
 
 	private func showItemIfPossible(state: inout State) -> Effect<Action> {
-		guard !state.itemsQueue.isEmpty else {
+		guard let presentedItem = state.itemsQueue.first else {
 			return .none
 		}
 
 		if state.isPresenting {
-			guard let presentedItem = state.itemsQueue.first else {
-				return .none
-			}
-
 			if case .hud = presentedItem {
 				// A HUD is force dismissed when next item comes in, AKA it is a lower priority.
 				state.destination = nil
@@ -130,9 +134,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 			}
 		}
 
-		let nextItem = state.itemsQueue[0]
-
-		switch nextItem {
+		switch presentedItem {
 		case let .hud(hud):
 			state.destination = .hud(.init(content: hud))
 			return .none
@@ -143,15 +145,6 @@ struct OverlayReducer: Sendable, FeatureReducer {
 			state.destination = .fullScreen(fullScreen)
 			return setIsUserInteractionEnabled(&state, isEnabled: true)
 		}
-	}
-
-	private func dismissAlert(state: inout State, withAction action: OverlayWindowClient.Item.AlertAction) -> Effect<Action> {
-		let item = state.itemsQueue[0]
-		if case let .alert(state) = item {
-			overlayWindowClient.sendAlertAction(action, state.id)
-		}
-
-		return dismiss(&state)
 	}
 
 	private func dismiss(_ state: inout State) -> Effect<Action> {

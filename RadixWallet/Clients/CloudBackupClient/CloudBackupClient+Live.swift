@@ -163,8 +163,13 @@ extension CloudBackupClient {
 
 						if true /* let backedUpHeader, await !profileStore.isThisDevice(deviceID: backedUpHeader.lastUsedOnDevice.id) */ {
 							print("•• different IDs")
-							// TODO: Cancel/pause task?
-							overlayWindowClient.scheduleFullScreenIgnoreAction(.init(root: .claimWallet(.init())))
+
+							print("•• show fullscreen")
+
+							let action = await overlayWindowClient.scheduleFullScreen(.init(root: .claimWallet(.init())))
+
+							print("•• got fullscreen action \(action)")
+
 						} else {
 							print("•• same IDs")
 						}

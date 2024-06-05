@@ -19,6 +19,7 @@ extension ResetWalletClient: DependencyKey {
 					cacheClient.removeAll()
 					await radixConnectClient.disconnectAll()
 					userDefaults.removeAll()
+					print("•• send walletDidResetSubject")
 					walletDidResetSubject.send(())
 				} catch {
 					loggerGlobal.error("Failed to delete profile: \(error)")
