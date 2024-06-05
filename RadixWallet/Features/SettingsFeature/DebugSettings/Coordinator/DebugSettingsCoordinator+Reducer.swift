@@ -121,7 +121,7 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 			state.destination = .debugUserDefaultsContents(.init())
 			return .none
 		case .dappLinkingDelayTapped:
-			state.destination = .dappLinkingDelay(.init(delayInSeconds: userDefaults.getDappLinkingDelay()))
+			state.destination = .dappLinkingDelay(.init())
 			return .none
 		}
 	}

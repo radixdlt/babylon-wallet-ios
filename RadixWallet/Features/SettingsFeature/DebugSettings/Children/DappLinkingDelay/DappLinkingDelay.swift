@@ -3,10 +3,13 @@ import Foundation
 // MARK: - DappLinkingDelay
 public struct DappLinkingDelay: FeatureReducer {
 	public struct State: Hashable, Sendable {
-		public var delayInSeconds: Double
+		public var isEnabled: Bool = false
+		public var delayInSeconds: Double = 1.0
 	}
 
 	public enum ViewAction: Equatable, Sendable {
+		case task
+		case isEnabled(Bool)
 		case delayChanged(Double)
 		case saveTapped
 	}
@@ -16,12 +19,20 @@ public struct DappLinkingDelay: FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
+		case .task:
+			state.isEnabled = userDefaults.getDappLinkingAutoContinueEnabled()
+			state.delayInSeconds = userDefaults.getDappLinkingDelay()
+			return .none
+		case let .isEnabled(value):
+			state.isEnabled = value
+			return .none
 		case let .delayChanged(double):
 			state.delayInSeconds = double
 			return .none
 		case .saveTapped:
+			userDefaults.setDappLinkingAutoContinueEnabled(state.isEnabled)
 			userDefaults.setDappLinkingDelay(state.delayInSeconds)
-			overlayWindowClient.scheduleHUD(.copied)
+			overlayWindowClient.scheduleHUD(.init(text: "Saved"))
 			return .none
 		}
 	}
@@ -35,6 +46,13 @@ extension DappLinkingDelay {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				VStack {
+					Toggle(isOn: .init(
+						get: { viewStore.isEnabled },
+						set: { viewStore.send(.isEnabled($0)) }
+					), label: {
+						Text("Automatically verify dApps")
+					})
+
 					Text("Select Time: \(viewStore.delayInSeconds, specifier: "%.2f") seconds")
 						.padding()
 
@@ -56,6 +74,9 @@ extension DappLinkingDelay {
 					.cornerRadius(8)
 				}
 				.padding()
+			}
+			.task {
+				store.send(.view(.task))
 			}
 		}
 	}
