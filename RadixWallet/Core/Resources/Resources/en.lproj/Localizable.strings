@@ -1161,6 +1161,7 @@
 "factoryReset_dialog_message" = "Return wallet to factory settings? You cannot undo this.";
 "securityProblems_no3_accountCard" = "You need to write down a seed phrase";
 "securityProblems_no3_securityCenterTitle" = "%@ and %@ are not recoverable.";
+"securityProblems_no3_securityCenterTitleHidden" = "%@ and %@ (plus some hidden) are not recoverable.";
 "securityProblems_no3_securityCenterBody" = "View and write down your seed phrase so Accounts and Personas are recoverable.";
 "securityProblems_no3_securityFactors" = "View and write down seed phrase";
 "securityProblems_no3_seedPhrases" = "View and write down seed phrase";

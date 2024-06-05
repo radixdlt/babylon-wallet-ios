@@ -48,7 +48,7 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case didAppear
+		case task
 		case problemTapped(SecurityProblem)
 		case cardTapped(SecurityProblem.ProblemType)
 	}
@@ -70,7 +70,7 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .didAppear:
+		case .task:
 			return securityProblemsEffect()
 
 		case let .problemTapped(problem):

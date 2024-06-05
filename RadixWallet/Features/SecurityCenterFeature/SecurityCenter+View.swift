@@ -49,8 +49,8 @@ extension SecurityCenter {
 				}
 				.background(.app.gray5)
 			}
-			.onAppear {
-				store.send(.view(.didAppear))
+			.task {
+				store.send(.view(.task))
 			}
 			.destinations(with: store)
 		}

@@ -13,27 +13,24 @@ extension PersonaList {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-				VStack(spacing: 0) {
-					ScrollView {
+				ScrollView {
+					VStack(alignment: .leading, spacing: .medium3) {
 						Text(L10n.Personas.subtitle)
-							.sectionHeading
-							.flushedLeft
-							.padding([.horizontal, .top], .medium3)
-							.padding(.bottom, .small2)
-
-						Separator()
-							.padding(.bottom, .small2)
+							.textStyle(.body1Link)
+							.foregroundColor(.app.gray2)
 
 						PersonaListCoreView(store: store, tappable: true, showShield: true)
-					}
 
-					Button(L10n.Personas.createNewPersona) {
-						viewStore.send(.createNewPersonaButtonTapped)
+						Button(L10n.Personas.createNewPersona) {
+							viewStore.send(.createNewPersonaButtonTapped)
+						}
+						.buttonStyle(.secondaryRectangular(shouldExpand: false))
+						.padding(.vertical, .medium2)
+						.centered
 					}
-					.buttonStyle(.secondaryRectangular(shouldExpand: true))
-					.padding(.horizontal, .medium3)
-					.padding(.vertical, .large1)
+					.padding(.medium3)
 				}
+				.background(Color.app.gray5)
 				.radixToolbar(title: L10n.Personas.title)
 			}
 		}
@@ -54,14 +51,8 @@ public struct PersonaListCoreView: View {
 
 	public var body: some View {
 		VStack(spacing: .medium3) {
-			ForEachStore(
-				store.scope(
-					state: \.personas,
-					action: { .child(.persona(id: $0, action: $1)) }
-				)
-			) {
+			ForEachStore(store.scope(state: \.personas, action: \.child.persona)) {
 				PersonaFeature.View(store: $0, tappable: tappable, showShield: showShield)
-					.padding(.horizontal, .medium3)
 			}
 		}
 		.task {

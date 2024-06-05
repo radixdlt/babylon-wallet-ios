@@ -284,6 +284,7 @@ extension DappDetails.View {
 						.padding(.bottom, .small2)
 
 					PersonaListCoreView(store: store, tappable: tappablePersonas, showShield: false)
+						.padding(.horizontal, .medium3)
 				} else {
 					Text(L10n.AuthorizedDapps.DAppDetails.noPersonasHeading)
 						.sectionHeading

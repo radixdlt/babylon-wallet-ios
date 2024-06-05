@@ -50,6 +50,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 				isMnemonicPresentInKeychain: ents.isMnemonicPresentInKeychain,
 				accounts: accounts,
 				hiddenAccountsCount: hiddenAccountsCount,
+				personasCount: ents.personas.count,
 				mode: .displayAccountListOnly
 			)
 		}

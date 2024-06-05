@@ -2588,6 +2588,10 @@ public enum L10n {
       public static func securityCenterTitle(_ p1: Any, _ p2: Any) -> String {
         return L10n.tr("Localizable", "securityProblems_no3_securityCenterTitle", String(describing: p1), String(describing: p2), fallback: "%@ and %@ are not recoverable.")
       }
+      /// %@ and %@ (plus some hidden) are not recoverable.
+      public static func securityCenterTitleHidden(_ p1: Any, _ p2: Any) -> String {
+        return L10n.tr("Localizable", "securityProblems_no3_securityCenterTitleHidden", String(describing: p1), String(describing: p2), fallback: "%@ and %@ (plus some hidden) are not recoverable.")
+      }
       /// View and write down seed phrase
       public static let securityFactors = L10n.tr("Localizable", "securityProblems_no3_securityFactors", fallback: "View and write down seed phrase")
       /// View and write down seed phrase

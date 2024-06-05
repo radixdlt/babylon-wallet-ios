@@ -30,7 +30,6 @@ extension Home.AccountRow {
 		let tag: AccountTag?
 
 		let isLedgerAccount: Bool
-		let mnemonicHandlingCallToAction: MnemonicHandling?
 
 		let fungibleResourceIcons: [Thumbnail.TokenContent]
 		let nonFungibleResourcesCount: Int
@@ -51,8 +50,6 @@ extension Home.AccountRow {
 
 			self.tag = .init(state: state)
 			self.isLedgerAccount = state.isLedgerAccount
-
-			self.mnemonicHandlingCallToAction = state.mnemonicHandlingCallToAction
 
 			// Resources
 			guard let accountWithResources = state.accountWithResources.wrappedValue?.nonEmptyVaults else {
@@ -128,7 +125,7 @@ extension Home.AccountRow {
 
 					ownedResourcesList(viewStore)
 
-					prompts(mnemonicHandlingCallToAction: viewStore.mnemonicHandlingCallToAction)
+					EntitySecurityProblems.View(store: store.entitySecurityProblems)
 				}
 				.padding(.horizontal, .medium1)
 				.padding(.vertical, .medium2)
@@ -136,9 +133,6 @@ extension Home.AccountRow {
 				.cornerRadius(.small1)
 				.onTapGesture {
 					viewStore.send(.tapped)
-				}
-				.task {
-					await store.send(.view(.task)).finish()
 				}
 			}
 		}
@@ -153,22 +147,6 @@ extension Home.AccountRow.View {
 
 		static var diameter: CGFloat {
 			iconSize.rawValue + 2 * borderWidth
-		}
-	}
-
-	@ViewBuilder
-	func prompts(mnemonicHandlingCallToAction: MnemonicHandling?) -> some SwiftUI.View {
-		if let mnemonicHandlingCallToAction {
-			switch mnemonicHandlingCallToAction {
-			case .mustBeImported:
-				importMnemonicPromptView {
-					store.send(.view(.importMnemonicButtonTapped))
-				}
-			case .shouldBeExported:
-				exportMnemonicPromptView {
-					store.send(.view(.exportMnemonicButtonTapped))
-				}
-			}
 		}
 	}
 
@@ -402,6 +380,12 @@ extension Home.AccountRow.ViewState.AccountTag {
 		case .ledgerBabylon:
 			L10n.HomePage.AccountsTag.ledgerBabylon
 		}
+	}
+}
+
+private extension StoreOf<Home.AccountRow> {
+	var entitySecurityProblems: StoreOf<EntitySecurityProblems> {
+		scope(state: \.entitySecurityProblems, action: \.child.entitySecurityProblems)
 	}
 }
 

@@ -12,6 +12,7 @@ extension Home {
 			public var accountWithResources: Loadable<OnLedgerEntity.OnLedgerAccount>
 			public var showFiatWorth: Bool = true
 			public var totalFiatWorth: Loadable<FiatWorth>
+			public var entitySecurityProblems: EntitySecurityProblems.State
 
 			public init(
 				account: Account
@@ -19,47 +20,44 @@ extension Home {
 				self.accountWithInfo = .init(account: account)
 				self.accountWithResources = .loading
 				self.totalFiatWorth = .loading
+				self.entitySecurityProblems = .init(kind: .account(account.address))
 			}
 		}
 
 		public enum ViewAction: Sendable, Equatable {
 			case tapped
-			case task
-			case importMnemonicButtonTapped
-			case exportMnemonicButtonTapped
 		}
 
 		public enum InternalAction: Sendable, Equatable {
 			case accountUpdated(OnLedgerEntity.OnLedgerAccount)
 			case fiatWorthUpdated(Loadable<FiatWorth>)
-			case checkAccountAccessToMnemonic
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
 			case openDetails
-			case exportMnemonic
-			case importMnemonics
+			case openSecurityCenter
+		}
+
+		@CasePathable
+		public enum ChildAction: Sendable, Equatable {
+			case entitySecurityProblems(EntitySecurityProblems.Action)
 		}
 
 		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.userDefaults) var userDefaults
 
+		public var body: some ReducerOf<Self> {
+			Scope(state: \.entitySecurityProblems, action: \.child.entitySecurityProblems) {
+				EntitySecurityProblems()
+			}
+			Reduce(core)
+		}
+
 		public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
-			case .task:
-				self.checkAccountAccessToMnemonic(state: &state)
-
-				return .none
-
-			case .exportMnemonicButtonTapped:
-				return .send(.delegate(.exportMnemonic))
-
-			case .importMnemonicButtonTapped:
-				return .send(.delegate(.importMnemonics))
-
 			case .tapped:
-				return .send(.delegate(.openDetails))
+				.send(.delegate(.openDetails))
 			}
 		}
 
@@ -71,10 +69,6 @@ extension Home {
 				state.isDappDefinitionAccount = account.metadata.accountType == .dappDefinition
 				state.accountWithResources.refresh(from: .success(account))
 
-				return .send(.internal(.checkAccountAccessToMnemonic))
-
-			case .checkAccountAccessToMnemonic:
-				checkAccountAccessToMnemonic(state: &state)
 				return .none
 
 			case let .fiatWorthUpdated(fiatWorth):
@@ -83,8 +77,13 @@ extension Home {
 			}
 		}
 
-		private func checkAccountAccessToMnemonic(state: inout State) {
-			state.checkAccountAccessToMnemonic(portfolio: state.accountWithResources.wrappedValue)
+		public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+			switch childAction {
+			case .entitySecurityProblems(.delegate(.openSecurityCenter)):
+				.send(.delegate(.openSecurityCenter))
+			default:
+				.none
+			}
 		}
 	}
 }

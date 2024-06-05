@@ -134,6 +134,7 @@ private extension ManualAccountRecoverySeedPhrase.View {
 							isError: false
 						),
 						promptUserToBackUpMnemonic: false,
+						promptUserToImportMnemonic: false,
 						accounts: item.value.accounts.filter {
 							switch $0.securityState {
 							case let .unsecured(unsecuredEntityControl):
@@ -141,7 +142,8 @@ private extension ManualAccountRecoverySeedPhrase.View {
 								return viewStore.isOlympia && curve == .secp256k1 || !viewStore.isOlympia && curve == .curve25519
 							}
 						},
-						hiddenAccountsCount: item.value.hiddenAccounts.count
+						hiddenAccountsCount: item.value.hiddenAccounts.count,
+						personasCount: item.value.personas.count
 					)
 				)
 				.padding(.medium3)
