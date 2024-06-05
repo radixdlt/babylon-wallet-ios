@@ -31,7 +31,8 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 		public var isMnemonicMarkedAsBackedUp: Bool
 		public var isMnemonicPresentInKeychain: Bool
 		public let accounts: IdentifiedArrayOf<Account>
-		public let hasHiddenAccounts: Bool
+		public let hiddenAccountsCount: Int
+		public let personasCount: Int
 		public var mode: Mode
 
 		public enum Mode: Sendable, Hashable {
@@ -45,30 +46,34 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 			isMnemonicMarkedAsBackedUp: Bool,
 			isMnemonicPresentInKeychain: Bool,
 			accounts: IdentifiedArrayOf<Account>,
-			hasHiddenAccounts: Bool,
+			hiddenAccountsCount: Int,
+			personasCount: Int,
 			mode: Mode
 		) {
 			self.id = id
 			self.isMnemonicMarkedAsBackedUp = isMnemonicMarkedAsBackedUp
 			self.isMnemonicPresentInKeychain = isMnemonicPresentInKeychain
 			self.accounts = accounts
-			self.hasHiddenAccounts = hasHiddenAccounts
+			self.hiddenAccountsCount = hiddenAccountsCount
+			self.personasCount = personasCount
 			self.mode = mode
 		}
 
 		public init(
-			accountsControlledByKeysOnSameCurve accountSet: EntitiesControlledByFactorSource.AccountsControlledByKeysOnSameCurve,
-			isMnemonicMarkedAsBackedUp: Bool,
-			isMnemonicPresentInKeychain: Bool,
-			mode: Mode
+			entitiesControlledByKeysOnSameCurve entitiesSet: EntitiesControlledByFactorSource.EntitiesControlledByKeysOnSameCurve,
+			problems: [SecurityProblem]
 		) {
+			let accounts = entitiesSet.accounts.elements + entitiesSet.hiddenAccounts.elements
+			let isMnemonicMarkedAsBackedUp = problems.isMnemonicMarkedAsBackedUp(accounts: accounts, personas: entitiesSet.personas)
+			let isMnemonicPresentInKeychain = problems.isMnemonicPresentInKeychain(accounts: accounts, personas: entitiesSet.personas)
 			self.init(
-				id: .singleCurve(accountSet.id.factorSourceID, isOlympia: accountSet.id.isOlympia),
+				id: .singleCurve(entitiesSet.id.factorSourceID, isOlympia: entitiesSet.id.isOlympia),
 				isMnemonicMarkedAsBackedUp: isMnemonicMarkedAsBackedUp,
 				isMnemonicPresentInKeychain: isMnemonicPresentInKeychain,
-				accounts: accountSet.accounts,
-				hasHiddenAccounts: !accountSet.hiddenAccounts.isEmpty,
-				mode: mode
+				accounts: entitiesSet.accounts,
+				hiddenAccountsCount: entitiesSet.hiddenAccounts.count,
+				personasCount: entitiesSet.personas.count,
+				mode: isMnemonicPresentInKeychain ? .mnemonicCanBeDisplayed : .mnemonicNeedsImport
 			)
 		}
 	}
@@ -100,5 +105,37 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 				return .none
 			}
 		}
+	}
+}
+
+private extension [SecurityProblem] {
+	func isMnemonicMarkedAsBackedUp(accounts: [Account], personas: [Persona]) -> Bool {
+		allSatisfy { problem in
+			switch problem {
+			case let .problem3(addresses):
+				addresses.problematicAccounts.isDisjoint(with: accounts.map(\.address)) &&
+					Set(addresses.personas).isDisjoint(with: personas.map(\.address))
+			default:
+				true
+			}
+		}
+	}
+
+	func isMnemonicPresentInKeychain(accounts: [Account], personas: [Persona]) -> Bool {
+		allSatisfy { problem in
+			switch problem {
+			case let .problem9(addresses):
+				addresses.problematicAccounts.isDisjoint(with: accounts.map(\.address)) &&
+					Set(addresses.personas).isDisjoint(with: personas.map(\.address))
+			default:
+				true
+			}
+		}
+	}
+}
+
+private extension ProblematicAddresses {
+	var problematicAccounts: Set<AccountAddress> {
+		Set(accounts + hiddenAccounts)
 	}
 }

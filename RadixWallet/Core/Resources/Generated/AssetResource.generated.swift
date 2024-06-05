@@ -88,6 +88,7 @@ public enum AssetResource {
   public static let radioButtonLightUnselected = ImageAsset(name: "radioButton-light-unselected")
   public static let signingKey = ImageAsset(name: "signing-key")
   public static let trash = ImageAsset(name: "trash")
+  public static let walletAppIcon = ImageAsset(name: "wallet-app-icon")
   public static let homeAccountSecurity = ImageAsset(name: "home-account-security")
   public static let homeAggregatedValueHidden = ImageAsset(name: "home-aggregatedValue-hidden")
   public static let homeAggregatedValueShown = ImageAsset(name: "home-aggregatedValue-shown")

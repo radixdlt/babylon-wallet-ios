@@ -130,11 +130,11 @@ private extension ManualAccountRecoverySeedPhrase.View {
 					viewState: .init(
 						headingState: .init(
 							title: L10n.SeedPhrases.SeedPhrase.headingScan,
-							imageAsset: AssetResource.signingKey,
 							type: .scanning(selected: item.isSelected),
 							isError: false
 						),
 						promptUserToBackUpMnemonic: false,
+						promptUserToImportMnemonic: false,
 						accounts: item.value.accounts.filter {
 							switch $0.securityState {
 							case let .unsecured(unsecuredEntityControl):
@@ -142,7 +142,8 @@ private extension ManualAccountRecoverySeedPhrase.View {
 								return viewStore.isOlympia && curve == .secp256k1 || !viewStore.isOlympia && curve == .curve25519
 							}
 						},
-						hasHiddenAccounts: !item.value.hiddenAccounts.isEmpty
+						hiddenAccountsCount: item.value.hiddenAccounts.count,
+						personasCount: item.value.personas.count
 					)
 				)
 				.padding(.medium3)

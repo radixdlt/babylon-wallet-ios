@@ -24,17 +24,22 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 			self.isMainBDFS = isMainBDFS
 			self.entitiesControlledByFactorSource = ents
 
-			let accounts: IdentifiedArrayOf<Account> = switch (ents.babylonAccounts.isEmpty, ents.olympiaAccounts.isEmpty) {
+			let accounts: IdentifiedArrayOf<Account>
+			let hiddenAccountsCount: Int
+			switch (ents.babylonAccounts.isEmpty, ents.olympiaAccounts.isEmpty) {
 			case (false, _):
 				// We prefer Babylon, always.
-				ents.babylonAccounts
+				accounts = ents.babylonAccounts
+				hiddenAccountsCount = ents.babylonAccountsHidden.count
 			case (true, false):
-				ents.olympiaAccounts
+				accounts = ents.olympiaAccounts
+				hiddenAccountsCount = ents.olympiaAccountsHidden.count
 			case (true, true):
 				// no accounts... still possible! i.e. Profile -> Create HARDWARE Account ->
 				// delete passcode -> import missing Mnemonic, which... does not control any
 				// accounts
-				[]
+				accounts = []
+				hiddenAccountsCount = 0
 			}
 
 			self.entities = .init(
@@ -44,7 +49,8 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 				isMnemonicMarkedAsBackedUp: ents.isMnemonicMarkedAsBackedUp,
 				isMnemonicPresentInKeychain: ents.isMnemonicPresentInKeychain,
 				accounts: accounts,
-				hasHiddenAccounts: !ents.hiddenAccounts.isEmpty,
+				hiddenAccountsCount: hiddenAccountsCount,
+				personasCount: ents.personas.count,
 				mode: .displayAccountListOnly
 			)
 		}

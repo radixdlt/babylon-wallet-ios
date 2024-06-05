@@ -4,7 +4,6 @@ import SwiftUI
 extension Home.State {
 	var viewState: Home.ViewState {
 		.init(
-			hasNotification: shouldWriteDownPersonasSeedPhrase,
 			showRadixBanner: showRadixBanner,
 			totalFiatWorth: showFiatWorth ? totalFiatWorth : nil
 		)
@@ -14,7 +13,6 @@ extension Home.State {
 // MARK: - Home.View
 extension Home {
 	public struct ViewState: Equatable {
-		let hasNotification: Bool
 		let showRadixBanner: Bool
 		let totalFiatWorth: Loadable<FiatWorth>?
 	}
@@ -81,8 +79,10 @@ extension Home {
 				.animation(.default, value: viewStore.showRadixBanner)
 				.toolbar {
 					ToolbarItem(placement: .navigationBarTrailing) {
-						SettingsButton(shouldShowNotification: viewStore.hasNotification) {
+						Button {
 							store.send(.view(.settingsButtonTapped))
+						} label: {
+							Image(.homeHeaderSettings)
 						}
 					}
 				}
@@ -119,18 +119,6 @@ extension Home {
 				.padding(.top, .small3)
 			}
 		}
-
-		private struct SettingsButton: SwiftUI.View {
-			let shouldShowNotification: Bool
-			let action: () -> Void
-
-			var body: some SwiftUI.View {
-				Button(action: action) {
-					Image(asset: AssetResource.homeHeaderSettings)
-						.badged(shouldShowNotification)
-				}
-			}
-		}
 	}
 }
 
@@ -149,73 +137,44 @@ private extension View {
 		let destinationStore = store.destination
 		return accountDetails(with: destinationStore)
 			.createAccount(with: destinationStore)
-			.exportMnemonic(with: destinationStore)
-			.importMnemonics(with: destinationStore)
 			.acknowledgeJailbreakAlert(with: destinationStore)
 			.userFeedback(with: destinationStore)
 			.relinkConnector(with: destinationStore)
+			.securityCenter(with: destinationStore)
 	}
 
 	private func accountDetails(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /Home.Destination.State.accountDetails,
-			action: Home.Destination.Action.accountDetails,
-			destination: { AccountDetails.View(store: $0) }
-		)
+		navigationDestination(store: destinationStore.scope(state: \.accountDetails, action: \.accountDetails)) {
+			AccountDetails.View(store: $0)
+		}
 	}
 
 	private func createAccount(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /Home.Destination.State.createAccount,
-			action: Home.Destination.Action.createAccount,
-			content: { CreateAccountCoordinator.View(store: $0) }
-		)
-	}
-
-	private func exportMnemonic(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /Home.Destination.State.exportMnemonic,
-			action: Home.Destination.Action.exportMnemonic,
-			content: { ExportMnemonic.View(store: $0).inNavigationStack }
-		)
-	}
-
-	private func importMnemonics(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /Home.Destination.State.importMnemonics,
-			action: Home.Destination.Action.importMnemonics,
-			content: { ImportMnemonicsFlowCoordinator.View(store: $0) }
-		)
+		sheet(store: destinationStore.scope(state: \.createAccount, action: \.createAccount)) {
+			CreateAccountCoordinator.View(store: $0)
+		}
 	}
 
 	private func acknowledgeJailbreakAlert(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
-		alert(
-			store: destinationStore,
-			state: /Home.Destination.State.acknowledgeJailbreakAlert,
-			action: Home.Destination.Action.acknowledgeJailbreakAlert
-		)
+		alert(store: destinationStore.scope(state: \.acknowledgeJailbreakAlert, action: \.acknowledgeJailbreakAlert))
 	}
 
 	private func userFeedback(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /Home.Destination.State.npsSurvey,
-			action: Home.Destination.Action.npsSurvey,
-			content: { NPSSurvey.View(store: $0) }
-		)
+		sheet(store: destinationStore.scope(state: \.npsSurvey, action: \.npsSurvey)) {
+			NPSSurvey.View(store: $0)
+		}
 	}
 
 	private func relinkConnector(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /Home.Destination.State.relinkConnector,
-			action: Home.Destination.Action.relinkConnector,
-			content: { NewConnection.View(store: $0) }
-		)
+		sheet(store: destinationStore.scope(state: \.relinkConnector, action: \.relinkConnector)) {
+			NewConnection.View(store: $0)
+		}
+	}
+
+	private func securityCenter(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.securityCenter, action: \.securityCenter)) {
+			SecurityCenter.View(store: $0)
+		}
 	}
 }
 

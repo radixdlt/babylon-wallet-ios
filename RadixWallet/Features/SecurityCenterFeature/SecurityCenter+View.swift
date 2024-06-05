@@ -49,8 +49,8 @@ extension SecurityCenter {
 				}
 				.background(.app.gray5)
 			}
-			.onAppear {
-				store.send(.view(.didAppear))
+			.task {
+				store.send(.view(.task))
 			}
 			.destinations(with: store)
 		}
@@ -232,11 +232,8 @@ private extension View {
 	}
 
 	private func importMnemonics(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /SecurityCenter.Destination.State.importMnemonics,
-			action: SecurityCenter.Destination.Action.importMnemonics,
-			content: { ImportMnemonicsFlowCoordinator.View(store: $0) }
-		)
+		sheet(store: destinationStore.scope(state: \.importMnemonics, action: \.importMnemonics)) {
+			ImportMnemonicsFlowCoordinator.View(store: $0)
+		}
 	}
 }

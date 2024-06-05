@@ -41,6 +41,7 @@ public struct PersonaList: Sendable, FeatureReducer {
 		case createNewPersonaButtonTapped
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case persona(id: Persona.ID, action: PersonaFeature.Action)
 	}
@@ -48,7 +49,7 @@ public struct PersonaList: Sendable, FeatureReducer {
 	public enum DelegateAction: Sendable, Equatable {
 		case createNewPersona
 		case openDetails(Persona)
-		case exportMnemonic(Persona)
+		case openSecurityCenter
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -114,17 +115,19 @@ public struct PersonaList: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case .persona(id: let id, action: .delegate(.openDetails)):
-			.run { send in
-				let persona = try await personasClient.getPersona(id: id)
-				await send(.delegate(.openDetails(persona)))
+		case let .persona(id, action: .delegate(delegateAction)):
+			switch delegateAction {
+			case .openDetails:
+				.run { send in
+					let persona = try await personasClient.getPersona(id: id)
+					await send(.delegate(.openDetails(persona)))
+				} catch: { error, _ in
+					errorQueue.schedule(error)
+				}
+			case .openSecurityCenter:
+				.send(.delegate(.openSecurityCenter))
 			}
 
-		case .persona(id: let id, action: .delegate(.writeDownSeedPhrase)):
-			.run { send in
-				let persona = try await personasClient.getPersona(id: id)
-				await send(.delegate(.exportMnemonic(persona)))
-			}
 		case .persona:
 			.none
 		}

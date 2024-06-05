@@ -1260,9 +1260,9 @@ public enum L10n {
       public static func subtitleAtLeastZero(_ p1: Any) -> String {
         return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleAtLeastZero", String(describing: p1), fallback: "**%@** is making a one-time request for any number of accounts.")
       }
-      /// *%@* is making a one-time request for at least %d accounts.
+      /// **%@** is making a one-time request for %d accounts.
       public static func subtitleExactly(_ p1: Any, _ p2: Int) -> String {
-        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleExactly", String(describing: p1), p2, fallback: "*%@* is making a one-time request for at least %d accounts.")
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleExactly", String(describing: p1), p2, fallback: "**%@** is making a one-time request for %d accounts.")
       }
       /// **%@** is making a one-time request for 1 account.
       public static func subtitleExactlyOne(_ p1: Any) -> String {
@@ -2239,8 +2239,8 @@ public enum L10n {
   public enum Personas {
     /// Create a New Persona
     public static let createNewPersona = L10n.tr("Localizable", "personas_createNewPersona", fallback: "Create a New Persona")
-    /// Here are all of your current Personas.
-    public static let subtitle = L10n.tr("Localizable", "personas_subtitle", fallback: "Here are all of your current Personas.")
+    /// Here are all of your current Personas in your Radix Wallet.
+    public static let subtitle = L10n.tr("Localizable", "personas_subtitle", fallback: "Here are all of your current Personas in your Radix Wallet.")
     /// Personas
     public static let title = L10n.tr("Localizable", "personas_title", fallback: "Personas")
     /// What is a Persona?
@@ -2588,6 +2588,10 @@ public enum L10n {
       public static func securityCenterTitle(_ p1: Any, _ p2: Any) -> String {
         return L10n.tr("Localizable", "securityProblems_no3_securityCenterTitle", String(describing: p1), String(describing: p2), fallback: "%@ and %@ are not recoverable.")
       }
+      /// %@ and %@ (plus some hidden) are not recoverable.
+      public static func securityCenterTitleHidden(_ p1: Any, _ p2: Any) -> String {
+        return L10n.tr("Localizable", "securityProblems_no3_securityCenterTitleHidden", String(describing: p1), String(describing: p2), fallback: "%@ and %@ (plus some hidden) are not recoverable.")
+      }
       /// View and write down seed phrase
       public static let securityFactors = L10n.tr("Localizable", "securityProblems_no3_securityFactors", fallback: "View and write down seed phrase")
       /// View and write down seed phrase
@@ -2895,8 +2899,8 @@ public enum L10n {
     public static let feePayerRequiredMessage = L10n.tr("Localizable", "transactionReview_feePayerRequiredMessage", fallback: "Fee payer account required")
     /// Guaranteed
     public static let guaranteed = L10n.tr("Localizable", "transactionReview_guaranteed", fallback: "Guaranteed")
-    /// Insufficient Balance
-    public static let insufficientBalance = L10n.tr("Localizable", "transactionReview_insufficientBalance", fallback: "Insufficient Balance")
+    /// Not enough XRD for transaction fee
+    public static let insufficientBalance = L10n.tr("Localizable", "transactionReview_insufficientBalance", fallback: "Not enough XRD for transaction fee")
     /// Message
     public static let messageHeading = L10n.tr("Localizable", "transactionReview_messageHeading", fallback: "Message")
     /// Contributing to pools

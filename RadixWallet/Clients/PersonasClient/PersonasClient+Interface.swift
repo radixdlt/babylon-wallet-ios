@@ -70,16 +70,4 @@ extension PersonasClient {
 			firstOnCurrent: isFirstPersonaOnCurrentNetwork
 		)
 	}
-
-	public func shouldWriteDownSeedPhraseForSomePersona() async throws -> Bool {
-		try await getPersonas().contains(where: \.shouldWriteDownMnemonic)
-	}
-
-	public func shouldWriteDownSeedPhraseForSomePersonaSequence() async -> AnyAsyncSequence<Bool> {
-		await personas().map { personas in
-			personas.contains(where: \.shouldWriteDownMnemonic)
-		}
-		.share()
-		.eraseToAnyAsyncSequence()
-	}
 }
