@@ -140,8 +140,6 @@ extension CloudBackupClient {
 				result = .failure
 			}
 
-			print("•• CloudBackupClient: backup result \(result == .success ? "OK" : "fail")")
-
 			try? userDefaults.setLastCloudBackup(result, of: profile)
 		}
 
@@ -153,8 +151,6 @@ extension CloudBackupClient {
 
 			let shouldBackUp = needsBackUp && !lastBackupSucceeded
 			let shouldCheckClaim = shouldBackUp || timeToCheckIfClaimed
-
-			print("•• perform, lastOK: \(lastBackupSucceeded), shouldBackUp: \(shouldBackUp), timeToCheck, \(timeToCheckIfClaimed)")
 
 			guard shouldBackUp || shouldCheckClaim else { return }
 
@@ -175,22 +171,22 @@ extension CloudBackupClient {
 			await backupProfileAndSaveResult(existingRecord: existingRecord)
 		}
 
+		let retryBackupInterval: DispatchTimeInterval = .seconds(60)
+		let checkClaimedProfileInterval: TimeInterval = 15 * 60
+
 		return .init(
 			startAutomaticBackups: {
-				let ticks = AsyncTimerSequence(every: .seconds(2))
+				let ticks = AsyncTimerSequence(every: retryBackupInterval)
 				let profiles = await profileStore.values()
-					.map {
-						print("•••••• profile changed LM: \($0.header.lastModified.formatted(date: .omitted, time: .standard)) LU: \($0.header.lastUsedOnDevice.date.formatted(date: .omitted, time: .standard))")
-						return $0
-					}
-				var lastClaimCheck: Date = .now // .distantPast
+				var lastClaimCheck: Date = .distantPast
 
 				for try await (profile, tick) in combineLatest(profiles, ticks) {
 					guard !Task.isCancelled else { return }
-					guard tick > lastClaimCheck else { continue }
+					try secureStorageClient.updateIsCloudProfileSyncEnabled(profile.id, .disable)
 
-					await print("•• tick \(Int(tick.timeIntervalSince(lastClaimCheck)))")
-					if tick.timeIntervalSince(lastClaimCheck) > 10 {
+					// This will skip the ticks that get backed up while we are awaiting performAutomaticBackup
+					guard tick > lastClaimCheck else { continue }
+					if tick.timeIntervalSince(lastClaimCheck) > checkClaimedProfileInterval {
 						await performAutomaticBackup(profile, timeToCheckIfClaimed: true)
 						lastClaimCheck = .now
 					} else {
@@ -210,7 +206,6 @@ extension CloudBackupClient {
 
 				let migratable = try headerList.compactMap { header -> (Data, Profile.Header)? in
 					let id = header.id
-
 					guard !previouslyMigrated.contains(id), header.id != activeProfile else { return nil }
 
 					guard let profileData = try secureStorageClient.loadProfileSnapshotData(id) else {
@@ -231,10 +226,7 @@ extension CloudBackupClient {
 						return backedUpRecord
 					}
 
-					let uploadedRecord = try await uploadProfileToICloud(.left(profileData), header: header, existingRecord: backedUpRecord)
-					try secureStorageClient.updateIsCloudProfileSyncEnabled(header.id, .disable)
-
-					return uploadedRecord
+					return try await uploadProfileToICloud(.left(profileData), header: header, existingRecord: backedUpRecord)
 				}
 
 				let migratedIDs = migrated.compactMap { ProfileID(uuidString: $0.recordID.recordName) }
