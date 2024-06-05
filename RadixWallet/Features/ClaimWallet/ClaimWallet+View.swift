@@ -38,6 +38,12 @@ extension ClaimWallet {
 					Spacer()
 
 					VStack {
+						if viewStore.failedToReclaim {
+							Text("Failed to transfer ownership")
+								.foregroundColor(.app.error)
+								.textStyle(.secondaryHeader)
+						}
+
 						Button(L10n.ConfigurationBackup.Automated.walletTransferredClearButton) {
 							store.send(.view(.clearWalletButtonTapped))
 						}
@@ -50,8 +56,6 @@ extension ClaimWallet {
 						.buttonStyle(.primaryText())
 						.overlay {
 							if viewStore.isLoading {
-								Color.red.opacity(0.2)
-
 								ProgressView()
 							}
 						}

@@ -392,7 +392,7 @@ extension ProfileStore {
 	/// then saves this profile and emits an update.
 	/// - Parameter profile: Profile to update `lastUsedOnDevice` of and
 	/// save on this device.
-	private func claimOwnershipOfProfile() throws {
+	public func claimOwnershipOfProfile() throws {
 		var copy = profile
 		try _claimOwnership(of: &copy)
 	}

@@ -124,25 +124,23 @@ extension CloudBackupClient {
 		}
 
 		@Sendable
-		func backupProfileAndSaveResult(_ profile: Profile, existingRecord: CKRecord?) async {
+		func backupProfileAndSaveResult(existingRecord: CKRecord?) async {
+			let profile = await profileStore.profile
 			let result: BackupResult.Result
 			do {
 				let json = profile.toJSONString()
 				try await uploadProfileToICloud(.right(json), header: profile.header, existingRecord: existingRecord)
 				result = .success
-				print("•• CloudBackupClient: backup success")
 			} catch CKError.accountTemporarilyUnavailable {
 				result = .temporarilyUnavailable
-				print("•• CloudBackupClient: backup failed temporarilyUnavailable")
-
 			} catch CKError.notAuthenticated {
 				result = .notAuthenticated
-				print("•• CloudBackupClient: backup failed notAuthenticated")
 			} catch {
 				loggerGlobal.error("Automatic cloud backup failed with error \(error)")
 				result = .failure
-				print("•• CloudBackupClient: backup failed \(error)")
 			}
+
+			print("•• CloudBackupClient: backup result \(result == .success ? "OK" : "fail")")
 
 			try? userDefaults.setLastCloudBackup(result, of: profile)
 		}
@@ -151,56 +149,54 @@ extension CloudBackupClient {
 		func performAutomaticBackup(_ profile: Profile, timeToCheckIfClaimed: Bool) async {
 			let needsBackUp = profile.appPreferences.security.isCloudProfileSyncEnabled && profile.header.isNonEmpty
 			let lastBackup = userDefaults.getLastCloudBackups[profile.id]
-			let lastBackupSucceeded = lastBackup?.result == .success && lastBackup?.profileHash == profile.hashValue
+			let lastBackupSucceeded = lastBackup?.result == .success && lastBackup?.saveHash == profile.saveHash
 
-			let shouldBackUp = false && needsBackUp && !lastBackupSucceeded
+			let shouldBackUp = needsBackUp && !lastBackupSucceeded
 			let shouldCheckClaim = shouldBackUp || timeToCheckIfClaimed
 
-			guard shouldBackUp || shouldCheckClaim else { return }
+			print("•• perform, lastOK: \(lastBackupSucceeded), shouldBackUp: \(shouldBackUp), timeToCheck, \(timeToCheckIfClaimed)")
 
-			print("•• performAutomaticBackup, shouldBackUp: \(shouldBackUp), timeToCheckIfClaimed, \(timeToCheckIfClaimed)")
+			guard shouldBackUp || shouldCheckClaim else { return }
 
 			let existingRecord = try? await fetchProfileRecord(.init(recordName: profile.id.uuidString))
 
 			let backedUpID = { try? existingRecord.map(getProfileHeader)?.lastUsedOnDevice.id }
 
-			if shouldCheckClaim { // }, let id = backedUpID(), await !profileStore.isThisDevice(deviceID: id) {
-				print("•• CloudBackupClient: different IDs, show claims screen")
+			let didTransferBackProfile: Bool
+			if shouldCheckClaim, let id = backedUpID(), await !profileStore.isThisDevice(deviceID: id) {
 				let action = await overlayWindowClient.scheduleFullScreen(.init(root: .claimWallet(.init())))
-				print("•• CloudBackupClient: got fullscreen action \(action)")
+				didTransferBackProfile = action == .claimWallet(.didTransferBack)
+			} else {
+				didTransferBackProfile = false
 			}
 
-			guard shouldBackUp else {
-				print("•• CloudBackupClient: no need to back up")
-				return
-			}
-			print("•• CloudBackupClient: going to back up")
-			await backupProfileAndSaveResult(profile, existingRecord: existingRecord)
+			guard shouldBackUp || didTransferBackProfile else { return }
+
+			await backupProfileAndSaveResult(existingRecord: existingRecord)
 		}
 
 		return .init(
 			startAutomaticBackups: {
-				let ticks = AsyncTimerSequence(every: .seconds(1))
+				let ticks = AsyncTimerSequence(every: .seconds(2))
 				let profiles = await profileStore.values()
+					.map {
+						print("•••••• profile changed LM: \($0.header.lastModified.formatted(date: .omitted, time: .standard)) LU: \($0.header.lastUsedOnDevice.date.formatted(date: .omitted, time: .standard))")
+						return $0
+					}
 				var lastClaimCheck: Date = .now // .distantPast
 
-				print("•• START automaticBackups")
 				for try await (profile, tick) in combineLatest(profiles, ticks) {
-					guard !Task.isCancelled else { print("•• CANCEL automaticBackups"); return }
+					guard !Task.isCancelled else { return }
 					guard tick > lastClaimCheck else { continue }
 
-					print("•• tick \(tick.formatted(date: .omitted, time: .standard)) \(tick.timeIntervalSince(lastClaimCheck))")
+					await print("•• tick \(Int(tick.timeIntervalSince(lastClaimCheck)))")
 					if tick.timeIntervalSince(lastClaimCheck) > 10 {
-						print("•• time to check claims")
 						await performAutomaticBackup(profile, timeToCheckIfClaimed: true)
 						lastClaimCheck = .now
-						print("•• did backup and check claims")
 					} else {
 						await performAutomaticBackup(profile, timeToCheckIfClaimed: false)
 					}
 				}
-
-				print("•• FINISH automaticBackups")
 			},
 			loadDeviceID: {
 				try? secureStorageClient.loadDeviceInfo()?.id
@@ -263,6 +259,9 @@ extension CloudBackupClient {
 				try await fetchAllProfileRecords(headerOnly: true)
 					.map(getProfileHeader)
 					.filter(\.isNonEmpty)
+			},
+			reclaimProfile: {
+				try await profileStore.claimOwnershipOfProfile()
 			}
 		)
 	}
