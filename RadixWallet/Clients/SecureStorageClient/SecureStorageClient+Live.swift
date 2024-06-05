@@ -203,7 +203,7 @@ extension SecureStorageClient: DependencyKey {
 				authenticationPrompt: authenticationPrompt
 			) else {
 				if notifyIfMissing {
-					overlayWindowClient.scheduleAlertIgnoreAction(.missingMnemonicAlert)
+					overlayWindowClient.scheduleAlertAndIgnoreAction(.missingMnemonicAlert)
 				}
 				return nil
 			}

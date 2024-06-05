@@ -2,7 +2,8 @@ import ComposableArchitecture
 import SwiftUI
 
 public struct FullScreenOverlayCoordinator: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
+	public struct State: Sendable, Hashable, Identifiable {
+		public let id: UUID = .init()
 		public var root: Root.State
 
 		public init(root: Root.State) {
@@ -27,6 +28,7 @@ public struct FullScreenOverlayCoordinator: Sendable, FeatureReducer {
 
 		@CasePathable
 		public enum Action: Sendable, Equatable {
+			case dismiss
 			case claimWallet(ClaimWallet.Action)
 		}
 
@@ -48,11 +50,19 @@ public struct FullScreenOverlayCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case .root(.claimWallet(.delegate)):
-			.send(.delegate(.dismiss))
+		case .root(.dismiss):
+			print("•• FULLSCREEN COORD root(.dismiss)")
+			return .send(.delegate(.dismiss))
+
+		case .root(.claimWallet(.delegate(.dismiss))):
+			print("•• FULLSCREEN COORD claimWallet(.delegate(.dismiss))")
+			return .send(.delegate(.dismiss))
+
+//		case .root(.dismiss), .root(.claimWallet(.delegate(.dismiss))):
+//			return .send(.delegate(.dismiss))
 
 		default:
-			.none
+			return .none
 		}
 	}
 }

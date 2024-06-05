@@ -480,7 +480,7 @@ extension ProfileStore {
 		// We present an alert to user where they must choice if they wanna keep using Profile
 		// on this device or delete it. If they delete a new one will be created and we will
 		// onboard user...
-		let choiceByUser = await overlayWindowClient.scheduleAlertAwaitAction(.profileUsedOnAnotherDeviceAlert(
+		let choiceByUser = await overlayWindowClient.scheduleAlert(.profileUsedOnAnotherDeviceAlert(
 			conflictingOwners: conflictingOwners
 		))
 

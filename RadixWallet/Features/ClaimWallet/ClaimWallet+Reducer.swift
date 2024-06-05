@@ -25,6 +25,7 @@ public struct ClaimWallet: Sendable, FeatureReducer {
 	public enum DelegateAction: Sendable, Equatable {
 		case didClearWallet
 		case didTransferBack
+		case dismiss
 	}
 
 	@Dependency(\.resetWalletClient) var resetWalletClient
@@ -34,13 +35,18 @@ public struct ClaimWallet: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .clearWalletButtonTapped:
-			.run { send in
+			return .run { send in
+				print("•• CLAIMWALLET will do resetWalletClient.resetWallet")
 				await resetWalletClient.resetWallet()
+//				await send(.delegate(.dismiss))
+				print("•• CLAIMWALLET will send delegate(.didClearWallet)")
 				await send(.delegate(.didClearWallet))
 			}
 		case .transferBackButtonTapped:
 			// TODO: transfer back
-			.send(.delegate(.didTransferBack))
+			print("•• CLAIMWALLET will send delegate(.dismiss)")
+			return .send(.delegate(.dismiss))
+//			.send(.delegate(.didTransferBack))
 		}
 	}
 }

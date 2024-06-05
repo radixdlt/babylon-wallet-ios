@@ -3,6 +3,7 @@ extension OverlayWindowClient: DependencyKey {
 	public static let liveValue: Self = {
 		let items = AsyncPassthroughSubject<Item>()
 		let alertActions = AsyncPassthroughSubject<(action: Item.AlertAction, id: Item.AlertState.ID)>()
+		let fullScreenActions = AsyncPassthroughSubject<(action: FullScreenAction, id: FullScreenID)>()
 		let isUserInteractionEnabled = AsyncPassthroughSubject<Bool>()
 
 		@Dependency(\.errorQueue) var errorQueue
@@ -18,24 +19,24 @@ extension OverlayWindowClient: DependencyKey {
 
 		pasteBoardClient.copyEvents().map { _ in Item.hud(.copied) }.subscribe(items)
 
-		let scheduleAlertIgnoreAction: ScheduleAlertIgnoreAction = { alert in
+		let scheduleAlertAndIgnoreAction: ScheduleAlertAndIgnoreAction = { alert in
 			items.send(.alert(alert))
-		}
-
-		let scheduleFullScreenIgnoreAction: ScheduleFullScreenIgnoreAction = { fullScreen in
-			items.send(.fullScreen(fullScreen))
 		}
 
 		return .init(
 			scheduledItems: { items.eraseToAnyAsyncSequence() },
-			scheduleAlertIgnoreAction: scheduleAlertIgnoreAction,
-			scheduleAlertAwaitAction: { alert in
-				scheduleAlertIgnoreAction(alert)
+			scheduleAlert: { alert in
+				scheduleAlertAndIgnoreAction(alert)
 				return await alertActions.first { $0.id == alert.id }?.action ?? .dismissed
 			},
+			scheduleAlertAndIgnoreAction: scheduleAlertAndIgnoreAction,
 			scheduleHUD: { items.send(.hud($0)) },
-			scheduleFullScreenIgnoreAction: scheduleFullScreenIgnoreAction,
+			scheduleFullScreen: { fullScreen in
+				items.send(.fullScreen(fullScreen))
+				return await fullScreenActions.first { $0.id == fullScreen.id }?.action ?? .dismiss
+			},
 			sendAlertAction: { action, id in alertActions.send((action, id)) },
+			sendFullScreenAction: { action, id in fullScreenActions.send((action, id)) },
 			setIsUserIteractionEnabled: { isUserInteractionEnabled.send($0) },
 			isUserInteractionEnabled: { isUserInteractionEnabled.eraseToAnyAsyncSequence() }
 		)

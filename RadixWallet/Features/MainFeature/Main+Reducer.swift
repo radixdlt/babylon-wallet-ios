@@ -17,33 +17,34 @@ public struct Main: Sendable, FeatureReducer {
 		}
 	}
 
+	@CasePathable
 	public enum ViewAction: Sendable, Equatable {
 		case task
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case home(Home.Action)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
-		case removedWallet
-	}
-
+	@CasePathable
 	public enum InternalAction: Sendable, Equatable {
 		case currentGatewayChanged(to: Gateway)
 	}
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case settings(Settings.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case settings(Settings.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.settings, action: /Action.settings) {
+			Scope(state: \.settings, action: \.settings) {
 				Settings()
 			}
 		}
@@ -52,13 +53,11 @@ public struct Main: Sendable, FeatureReducer {
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.cloudBackupClient) var cloudBackupClient
-	@Dependency(\.resetWalletClient) var resetWalletClient
-	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.home, action: /Action.child .. ChildAction.home) {
+		Scope(state: \.home, action: \.child.home) {
 			Home()
 		}
 		Reduce(core)
@@ -74,13 +73,6 @@ public struct Main: Sendable, FeatureReducer {
 		case .task:
 			startAutomaticBackupsEffect()
 				.merge(with: gatewayValuesEffect())
-				.merge(with: didResetWalletEffect())
-				.merge(with: overlayActionEffect())
-		}
-	}
-
-	private func overlayActionEffect() -> Effect<Action> {
-		.run { _ in
 		}
 	}
 
@@ -100,19 +92,6 @@ public struct Main: Sendable, FeatureReducer {
 				guard !Task.isCancelled else { return }
 				loggerGlobal.notice("Changed network to: \(gateway)")
 				await send(.internal(.currentGatewayChanged(to: gateway)))
-			}
-		}
-	}
-
-	private func didResetWalletEffect() -> Effect<Action> {
-		.run { send in
-			do {
-				for try await _ in resetWalletClient.walletDidReset() {
-					guard !Task.isCancelled else { return }
-					await send(.delegate(.removedWallet))
-				}
-			} catch {
-				loggerGlobal.error("Failed to iterate over walletDidReset: \(error)")
 			}
 		}
 	}
