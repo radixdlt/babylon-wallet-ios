@@ -23,19 +23,26 @@ public struct FullScreenOverlayCoordinator: Sendable, FeatureReducer {
 		@CasePathable
 		public enum State: Sendable, Hashable {
 			case claimWallet(ClaimWallet.State)
+			case verifyDapp(LinkingToDapp.State)
 		}
 
 		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case claimWallet(ClaimWallet.Action)
+			case verifyDapp(LinkingToDapp.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
 			Scope(state: \.claimWallet, action: \.claimWallet) {
 				ClaimWallet()
 			}
+			Scope(state: \.verifyDapp, action: \.verifyDapp) {
+				LinkingToDapp()
+			}
 		}
 	}
+
+	@Dependency(\.openURL) var openURL
 
 	public init() {}
 
@@ -49,10 +56,26 @@ public struct FullScreenOverlayCoordinator: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .root(.claimWallet(.delegate)):
-			.send(.delegate(.dismiss))
+			dismiss()
+
+		case let .root(.verifyDapp(.delegate(.continueFlow(url)))):
+			openUrl(url).merge(with: dismiss())
+
+		case .root(.verifyDapp(.delegate(.cancel))):
+			dismiss()
 
 		default:
 			.none
+		}
+	}
+
+	private func dismiss() -> Effect<Action> {
+		.send(.delegate(.dismiss))
+	}
+
+	private func openUrl(_ url: URL) -> Effect<Action> {
+		.run { _ in
+			await openURL(url)
 		}
 	}
 }

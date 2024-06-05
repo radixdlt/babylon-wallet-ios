@@ -27,7 +27,6 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		public enum State: Sendable, Hashable {
 			case hud(HUD.State)
 			case alert(OverlayWindowClient.Item.AlertState)
-			case linkDappSheet(LinkingToDapp.State)
 			case fullScreen(FullScreenOverlayCoordinator.State)
 		}
 
@@ -35,17 +34,12 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		public enum Action: Sendable, Equatable {
 			case hud(HUD.Action)
 			case alert(OverlayWindowClient.Item.AlertAction)
-			case linkDappSheet(LinkingToDapp.Action)
 			case fullScreen(FullScreenOverlayCoordinator.Action)
 		}
 
 		public var body: some Reducer<State, Action> {
 			Scope(state: \.hud, action: \.hud) {
 				HUD()
-			}
-
-			Scope(state: /State.linkDappSheet, action: /Action.linkDappSheet) {
-				LinkingToDapp()
 			}
 
 			Scope(state: \.fullScreen, action: \.fullScreen) {
@@ -56,7 +50,6 @@ struct OverlayReducer: Sendable, FeatureReducer {
 
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.continuousClock) var clock
-	var userDefaults = UserDefaults.Dependency.radix
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -96,19 +89,6 @@ struct OverlayReducer: Sendable, FeatureReducer {
 			}
 			return dismiss(&state)
 		case .hud(.delegate(.dismiss)):
-			return dismiss(&state)
-
-		case .linkDappSheet(.delegate(.continueFlow)):
-			if let item = state.itemsQueue.first, case let .autodismissSheet(id, _) = item {
-				overlayWindowClient.sendAlertAction(.primaryButtonTapped, id)
-			}
-
-			return dismiss(&state)
-
-		case .linkDappSheet(.delegate(.cancel)):
-			if let item = state.itemsQueue.first, case let .autodismissSheet(id, _) = item {
-				overlayWindowClient.sendAlertAction(.dismissed, id)
-			}
 			return dismiss(&state)
 
 		case .fullScreen(.delegate(.dismiss)):
@@ -155,15 +135,6 @@ struct OverlayReducer: Sendable, FeatureReducer {
 			return .none
 		case let .alert(alert):
 			state.destination = .alert(alert)
-			return setIsUserInteractionEnabled(&state, isEnabled: true)
-
-		case let .autodismissSheet(_, dAppMetadata):
-			state.destination = .linkDappSheet(.init(
-				dismissDelay: userDefaults.getDappLinkingDelay(),
-				autoDismissEnabled: userDefaults.getDappLinkingAutoContinueEnabled(),
-				dAppMetadata: dAppMetadata
-			))
-
 			return setIsUserInteractionEnabled(&state, isEnabled: true)
 
 		case let .fullScreen(fullScreen):

@@ -6,7 +6,6 @@ public actor Mobile2Mobile {
 	let serviceURL = URL(string: "https://radix-connect-relay-dev.rdx-works-main.extratools.works/api/v1")!
 	let encryptionScheme = EncryptionScheme.version1
 	@Dependency(\.httpClient) var httpClient
-	@Dependency(\.openURL) var openURL
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.radixConnectRelay) var radixConnectRelay
 	@Dependency(\.errorQueue) var errorQueue
@@ -14,6 +13,7 @@ public actor Mobile2Mobile {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.cacheClient) var cacheClient
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+	@Dependency(\.userDefaults) var userDefaults
 
 	private let incomingMessagesSubject: AsyncPassthroughSubject<P2P.RTCIncomingMessage> = .init()
 
@@ -113,25 +113,26 @@ extension Mobile2Mobile {
 				)
 			)
 
-			let result = await overlayWindowClient.scheduleLinkingDapp(dAppMetadata)
-
-			guard case .primaryButtonTapped = result else {
-				return
-			}
-
-			let returnURL = dappReturnURL.appending(queryItems: [
+			let url = dappReturnURL.appending(queryItems: [
 				.init(name: "sessionId", value: request.sessionId.rawValue),
 				.init(name: "publicKey", value: walletPublicKey.rawRepresentation.hex()),
 			])
-
-			switch request.browser.lowercased() {
+			let returnUrl: URL = switch request.browser.lowercased() {
 			case "chrome":
-				await openURL(URL(string: returnURL.absoluteString.replacingOccurrences(of: "https://", with: "googlechromes://"))!)
+				URL(string: url.absoluteString.replacingOccurrences(of: "https://", with: "googlechromes://"))!
 			case "firefox":
-				await openURL(URL(string: "firefox://open-url?url=\(returnURL.absoluteString)")!)
+				URL(string: "firefox://open-url?url=\(url.absoluteString)")!
 			default:
-				await openURL(returnURL)
+				url
 			}
+
+			let state = LinkingToDapp.State(
+				dismissDelay: userDefaults.getDappLinkingDelay(),
+				autoDismissEnabled: userDefaults.getDappLinkingAutoContinueEnabled(),
+				dAppMetadata: dAppMetadata,
+				returnUrl: returnUrl
+			)
+			overlayWindowClient.scheduleFullScreenIgnoreAction(.init(root: .verifyDapp(state)))
 		}
 	}
 
