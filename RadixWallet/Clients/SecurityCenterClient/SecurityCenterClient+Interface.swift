@@ -76,15 +76,11 @@ public enum SecurityProblem: Hashable, Sendable, Identifiable {
 
 	private func problem3(addresses: ProblematicAddresses) -> String {
 		typealias Common = L10n.SecurityProblems.Common
-		let totalHidden = addresses.hiddenAccounts.count + addresses.hiddenPersonas.count
+		typealias Problem = L10n.SecurityProblems.No3
+		let hasHidden = addresses.hiddenAccounts.count + addresses.hiddenPersonas.count > 0
 		let accounts = addresses.accounts.count == 1 ? Common.accountSingular : Common.accountPlural(addresses.accounts.count)
 		let personas = addresses.personas.count == 1 ? Common.personaSingular : Common.personaPlural(addresses.personas.count)
-		if totalHidden == 0 {
-			return L10n.SecurityProblems.No3.securityCenterTitle(accounts, personas)
-		} else {
-			// TODO: MB - Replace once Matt has defined final Strings
-			return "\(accounts) and \(personas) and some hidden are not recoverable"
-		}
+		return hasHidden ? Problem.securityCenterTitleHidden(accounts, personas) : Problem.securityCenterTitle(accounts, personas)
 	}
 
 	public var securityCenterBody: String {
