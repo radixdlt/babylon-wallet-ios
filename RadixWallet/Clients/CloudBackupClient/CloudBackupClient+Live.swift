@@ -124,7 +124,7 @@ extension CloudBackupClient {
 		}
 
 		@Sendable
-		func backupProfileAndSaveResult(_ profile: Profile) async {
+		func periodic(_ profile: Profile, checkIfClaimed: Bool) async {
 			let existingRecord = try? await fetchProfileRecord(.init(recordName: profile.id.uuidString))
 			let result: BackupResult.Result
 			do {
@@ -154,35 +154,60 @@ extension CloudBackupClient {
 					guard !Task.isCancelled else { print("•• CANCEL automaticBackups"); return }
 
 					print("•• tick")
-
+					var timeToCheckClaim = false
 					if tick.timeIntervalSince(lastClaimCheck) > 15 {
 						print("•• time to check claims")
 						lastClaimCheck = tick
+						timeToCheckClaim = true
 
-						let backedUpHeader = try? await getProfileHeader(fetchProfileRecord(.init(recordName: profile.id.uuidString)))
-
-						if true /* let backedUpHeader, await !profileStore.isThisDevice(deviceID: backedUpHeader.lastUsedOnDevice.id) */ {
-							print("•• different IDs")
-
-							print("•• show fullscreen")
-
-							let action = await overlayWindowClient.scheduleFullScreen(.init(root: .claimWallet(.init())))
-
-							print("•• got fullscreen action \(action)")
-
-						} else {
-							print("•• same IDs")
-						}
+						await periodic(profile, checkIfClaimed: true)
+					} else {
+						await periodic(profile, checkIfClaimed: false)
 					}
 
-					guard profile.appPreferences.security.isCloudProfileSyncEnabled else { continue }
-					guard profile.header.isNonEmpty else { continue }
+					let needsBackUp = profile.appPreferences.security.isCloudProfileSyncEnabled && profile.header.isNonEmpty
+					let lastBackup = userDefaults.getLastCloudBackups[profile.id]
+					let lastBackupSucceeded = lastBackup?.result == .success && lastBackup?.profileHash == profile.hashValue
 
-					let last = userDefaults.getLastCloudBackups[profile.id]
-					if let last, last.result == .success, last.profileHash == profile.hashValue { continue }
+					let shouldBackUp = needsBackUp && !lastBackupSucceeded
+					let shouldCheckClaim = shouldBackUp || timeToCheckClaim
 
-					await backupProfileAndSaveResult(profile)
+					guard shouldBackUp || shouldCheckClaim else { continue }
+
+					let existingRecord = try? await fetchProfileRecord(.init(recordName: profile.id.uuidString))
+
+					let backedUpID = { try? existingRecord.map(getProfileHeader)?.lastUsedOnDevice.id }
+
+					if shouldCheckClaim, let id = backedUpID(), await !profileStore.isThisDevice(deviceID: id) {
+						print("•• CloudBackupClient: different IDs, show claims screen")
+						let action = await overlayWindowClient.scheduleFullScreen(.init(root: .claimWallet(.init())))
+						print("•• CloudBackupClient: got fullscreen action \(action)")
+					}
+
+					guard shouldBackUp else {
+						print("•• CloudBackupClient: no need to back up")
+						continue
+					}
+					print("•• CloudBackupClient: going to back up")
+
+					let result: BackupResult.Result
+					do {
+						let json = profile.toJSONString()
+						try await uploadProfileToICloud(.right(json), header: profile.header, existingRecord: existingRecord)
+						result = .success
+					} catch CKError.accountTemporarilyUnavailable {
+						result = .temporarilyUnavailable
+					} catch CKError.notAuthenticated {
+						result = .notAuthenticated
+					} catch {
+						loggerGlobal.error("Automatic cloud backup failed with error \(error)")
+						result = .failure
+					}
+
+					try? userDefaults.setLastCloudBackup(result, of: profile)
 				}
+
+				print("•• FINISH automaticBackups")
 			},
 			loadDeviceID: {
 				try? secureStorageClient.loadDeviceInfo()?.id
