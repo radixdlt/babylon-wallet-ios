@@ -32,7 +32,7 @@ extension FullScreenOverlayCoordinator {
 					CaseLet(
 						/FullScreenOverlayCoordinator.Root.State.verifyDapp,
 						action: FullScreenOverlayCoordinator.Root.Action.verifyDapp,
-						then: { LinkingToDapp.View(store: $0) }
+						then: { VerifyDapp.View(store: $0) }
 					)
 				}
 			}

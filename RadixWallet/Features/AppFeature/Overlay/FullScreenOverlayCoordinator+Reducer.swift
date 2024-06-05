@@ -23,13 +23,13 @@ public struct FullScreenOverlayCoordinator: Sendable, FeatureReducer {
 		@CasePathable
 		public enum State: Sendable, Hashable {
 			case claimWallet(ClaimWallet.State)
-			case verifyDapp(LinkingToDapp.State)
+			case verifyDapp(VerifyDapp.State)
 		}
 
 		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case claimWallet(ClaimWallet.Action)
-			case verifyDapp(LinkingToDapp.Action)
+			case verifyDapp(VerifyDapp.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
@@ -37,7 +37,7 @@ public struct FullScreenOverlayCoordinator: Sendable, FeatureReducer {
 				ClaimWallet()
 			}
 			Scope(state: \.verifyDapp, action: \.verifyDapp) {
-				LinkingToDapp()
+				VerifyDapp()
 			}
 		}
 	}

@@ -126,12 +126,7 @@ extension Mobile2Mobile {
 				url
 			}
 
-			let state = LinkingToDapp.State(
-				dismissDelay: userDefaults.getDappLinkingDelay(),
-				autoDismissEnabled: userDefaults.getDappLinkingAutoContinueEnabled(),
-				dAppMetadata: dAppMetadata,
-				returnUrl: returnUrl
-			)
+			let state = VerifyDapp.State(dAppMetadata: dAppMetadata, returnUrl: returnUrl)
 			overlayWindowClient.scheduleFullScreenIgnoreAction(.init(root: .verifyDapp(state)))
 		}
 	}
