@@ -119,6 +119,6 @@ extension SecurityCenterClient {
 
 private extension ProblematicAddresses {
 	var isEmpty: Bool {
-		accounts.count + personas.count == 0
+		accounts.count + hiddenAccounts.count + personas.count == 0
 	}
 }
