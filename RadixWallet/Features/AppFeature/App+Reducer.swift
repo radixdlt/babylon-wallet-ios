@@ -116,12 +116,10 @@ public struct App: Sendable, FeatureReducer {
 	private func didResetWalletEffect() -> Effect<Action> {
 		.run { send in
 			do {
-				print("•• STARTED didResetWalletEffect")
 				for try await _ in resetWalletClient.walletDidReset() {
 					guard !Task.isCancelled else { return }
 					await send(.internal(.didResetWallet))
 				}
-				print("•• ENDED didResetWalletEffect")
 			} catch {
 				loggerGlobal.error("Failed to iterate over walletDidReset: \(error)")
 			}

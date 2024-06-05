@@ -17,6 +17,7 @@ public struct FullScreenOverlayCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
+		case claimWallet(ClaimWallet.DelegateAction)
 		case dismiss
 	}
 
@@ -28,7 +29,6 @@ public struct FullScreenOverlayCoordinator: Sendable, FeatureReducer {
 
 		@CasePathable
 		public enum Action: Sendable, Equatable {
-			case dismiss
 			case claimWallet(ClaimWallet.Action)
 		}
 
@@ -50,19 +50,12 @@ public struct FullScreenOverlayCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case .root(.dismiss):
-			print("•• FULLSCREEN COORD root(.dismiss)")
-			return .send(.delegate(.dismiss))
-
-		case .root(.claimWallet(.delegate(.dismiss))):
-			print("•• FULLSCREEN COORD claimWallet(.delegate(.dismiss))")
-			return .send(.delegate(.dismiss))
-
-//		case .root(.dismiss), .root(.claimWallet(.delegate(.dismiss))):
-//			return .send(.delegate(.dismiss))
+		// Forward all delegate actions, re-wrapped
+		case let .root(.claimWallet(.delegate(action))):
+			.send(.delegate(.claimWallet(action)))
 
 		default:
-			return .none
+			.none
 		}
 	}
 }

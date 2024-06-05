@@ -52,7 +52,7 @@ public struct OverlayWindowClient: Sendable {
 }
 
 extension OverlayWindowClient {
-	public typealias FullScreenAction = FullScreenOverlayCoordinator.Root.Action
+	public typealias FullScreenAction = FullScreenOverlayCoordinator.DelegateAction
 	public typealias FullScreenID = FullScreenOverlayCoordinator.State.ID
 
 	public typealias ScheduleAlert = @Sendable (Item.AlertState) async -> Item.AlertAction

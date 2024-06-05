@@ -33,7 +33,10 @@ extension OverlayWindowClient: DependencyKey {
 			scheduleHUD: { items.send(.hud($0)) },
 			scheduleFullScreen: { fullScreen in
 				items.send(.fullScreen(fullScreen))
-				return await fullScreenActions.first { $0.id == fullScreen.id }?.action ?? .dismiss
+				let action = await fullScreenActions.first { $0.id == fullScreen.id }?.action ?? .dismiss
+				print("•• OverlayWindowClient got fullscreen action")
+				return action
+//				return await fullScreenActions.first { $0.id == fullScreen.id }?.action ?? .dismiss
 			},
 			sendAlertAction: { action, id in alertActions.send((action, id)) },
 			sendFullScreenAction: { action, id in fullScreenActions.send((action, id)) },

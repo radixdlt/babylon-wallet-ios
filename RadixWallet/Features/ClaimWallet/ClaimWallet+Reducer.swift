@@ -36,17 +36,19 @@ public struct ClaimWallet: Sendable, FeatureReducer {
 		switch viewAction {
 		case .clearWalletButtonTapped:
 			return .run { send in
-				print("•• CLAIMWALLET will do resetWalletClient.resetWallet")
+				print("•• CLAIMWALLET clearWalletButtonTapped")
 				await resetWalletClient.resetWallet()
-//				await send(.delegate(.dismiss))
 				print("•• CLAIMWALLET will send delegate(.didClearWallet)")
 				await send(.delegate(.didClearWallet))
 			}
 		case .transferBackButtonTapped:
-			// TODO: transfer back
-			print("•• CLAIMWALLET will send delegate(.dismiss)")
-			return .send(.delegate(.dismiss))
-//			.send(.delegate(.didTransferBack))
+			state.isLoading = true
+			return .run { send in
+				print("•• CLAIMWALLET transferBackButtonTapped")
+				try await Task.sleep(for: .seconds(2))
+				print("•• CLAIMWALLET will send delegate(.didTransferBack)")
+				await send(.delegate(.didTransferBack))
+			}
 		}
 	}
 }

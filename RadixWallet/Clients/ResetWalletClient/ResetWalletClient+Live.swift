@@ -13,13 +13,10 @@ extension ResetWalletClient: DependencyKey {
 		return Self(
 			resetWallet: {
 				do {
-					print("•• resetWallet")
-					// TODO: Is this the best order?
 					try await appPreferencesClient.deleteProfileAndFactorSources(true)
 					cacheClient.removeAll()
 					await radixConnectClient.disconnectAll()
 					userDefaults.removeAll()
-					print("•• send walletDidResetSubject")
 					walletDidResetSubject.send(())
 				} catch {
 					loggerGlobal.error("Failed to delete profile: \(error)")
