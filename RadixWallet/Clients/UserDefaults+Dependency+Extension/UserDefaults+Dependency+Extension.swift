@@ -169,7 +169,7 @@ extension UserDefaults.Dependency {
 		var backups: [UUID: BackupResult] = getLastCloudBackups
 		backups[profile.id] = .init(
 			backupDate: .now,
-			profileHash: profile.hashValue,
+			saveHash: profile.saveHash,
 			result: result
 		)
 
@@ -189,7 +189,7 @@ extension UserDefaults.Dependency {
 		var backups: [ProfileID: BackupResult] = getLastManualBackups
 		backups[profile.id] = .init(
 			backupDate: .now,
-			profileHash: profile.hashValue,
+			saveHash: profile.saveHash,
 			result: .success
 		)
 
@@ -234,7 +234,7 @@ extension UserDefaults.Dependency {
 // MARK: - BackupResult
 public struct BackupResult: Codable, Sendable {
 	public let backupDate: Date
-	public let profileHash: Int
+	public let saveHash: String
 	public let result: Result
 
 	public enum Result: Codable, Sendable {
@@ -242,5 +242,11 @@ public struct BackupResult: Codable, Sendable {
 		case temporarilyUnavailable
 		case notAuthenticated
 		case failure
+	}
+}
+
+extension Profile {
+	public var saveHash: String {
+		"\(header.lastModified.timeIntervalSince1970)-\(header.lastUsedOnDevice.id.uuidString)"
 	}
 }

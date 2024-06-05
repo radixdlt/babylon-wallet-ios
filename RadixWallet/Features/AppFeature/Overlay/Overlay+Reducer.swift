@@ -92,7 +92,6 @@ struct OverlayReducer: Sendable, FeatureReducer {
 			return dismiss(&state)
 
 		case let .fullScreen(.delegate(action)):
-			print("•• OverlayReducer: fullScreenAction: \(action)")
 			if case let .fullScreen(state) = state.itemsQueue.first {
 				overlayWindowClient.sendFullScreenAction(action, state.id)
 			}
@@ -145,7 +144,6 @@ struct OverlayReducer: Sendable, FeatureReducer {
 	}
 
 	private func dismiss(_ state: inout State) -> Effect<Action> {
-		print("•• OverlayReducer: dismiss")
 		state.destination = nil
 		state.itemsQueue.removeFirst()
 		return setIsUserInteractionEnabled(&state, isEnabled: false)
