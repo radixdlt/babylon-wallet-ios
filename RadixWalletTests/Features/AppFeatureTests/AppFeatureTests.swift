@@ -21,7 +21,7 @@ final class AppFeatureTests: TestCase {
 			$0.gatewaysClient.gatewaysValues = { AsyncLazySequence([.init(current: .mainnet)]).eraseToAnyAsyncSequence() }
 		}
 		// when
-		await store.send(.child(.main(.delegate(.removedWallet)))) {
+		await store.send(.internal(.didResetWallet)) {
 			$0.root = .onboardingCoordinator(.init())
 		}
 	}
