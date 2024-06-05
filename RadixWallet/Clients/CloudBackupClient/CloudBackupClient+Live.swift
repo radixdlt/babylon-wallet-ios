@@ -130,13 +130,18 @@ extension CloudBackupClient {
 				let json = profile.toJSONString()
 				try await uploadProfileToICloud(.right(json), header: profile.header, existingRecord: existingRecord)
 				result = .success
+				print("•• CloudBackupClient: backup success")
 			} catch CKError.accountTemporarilyUnavailable {
 				result = .temporarilyUnavailable
+				print("•• CloudBackupClient: backup failed temporarilyUnavailable")
+
 			} catch CKError.notAuthenticated {
 				result = .notAuthenticated
+				print("•• CloudBackupClient: backup failed notAuthenticated")
 			} catch {
 				loggerGlobal.error("Automatic cloud backup failed with error \(error)")
 				result = .failure
+				print("•• CloudBackupClient: backup failed \(error)")
 			}
 
 			try? userDefaults.setLastCloudBackup(result, of: profile)
@@ -148,16 +153,18 @@ extension CloudBackupClient {
 			let lastBackup = userDefaults.getLastCloudBackups[profile.id]
 			let lastBackupSucceeded = lastBackup?.result == .success && lastBackup?.profileHash == profile.hashValue
 
-			let shouldBackUp = needsBackUp && !lastBackupSucceeded
+			let shouldBackUp = false && needsBackUp && !lastBackupSucceeded
 			let shouldCheckClaim = shouldBackUp || timeToCheckIfClaimed
 
 			guard shouldBackUp || shouldCheckClaim else { return }
+
+			print("•• performAutomaticBackup, shouldBackUp: \(shouldBackUp), timeToCheckIfClaimed, \(timeToCheckIfClaimed)")
 
 			let existingRecord = try? await fetchProfileRecord(.init(recordName: profile.id.uuidString))
 
 			let backedUpID = { try? existingRecord.map(getProfileHeader)?.lastUsedOnDevice.id }
 
-			if shouldCheckClaim, let id = backedUpID(), await !profileStore.isThisDevice(deviceID: id) {
+			if shouldCheckClaim { // }, let id = backedUpID(), await !profileStore.isThisDevice(deviceID: id) {
 				print("•• CloudBackupClient: different IDs, show claims screen")
 				let action = await overlayWindowClient.scheduleFullScreen(.init(root: .claimWallet(.init())))
 				print("•• CloudBackupClient: got fullscreen action \(action)")
@@ -180,12 +187,14 @@ extension CloudBackupClient {
 				print("•• START automaticBackups")
 				for try await (profile, tick) in combineLatest(profiles, ticks) {
 					guard !Task.isCancelled else { print("•• CANCEL automaticBackups"); return }
+					guard tick > lastClaimCheck else { continue }
 
-					print("•• tick")
-					if tick.timeIntervalSince(lastClaimCheck) > 15 {
+					print("•• tick \(tick.formatted(date: .omitted, time: .standard)) \(tick.timeIntervalSince(lastClaimCheck))")
+					if tick.timeIntervalSince(lastClaimCheck) > 10 {
 						print("•• time to check claims")
-						lastClaimCheck = tick
 						await performAutomaticBackup(profile, timeToCheckIfClaimed: true)
+						lastClaimCheck = .now
+						print("•• did backup and check claims")
 					} else {
 						await performAutomaticBackup(profile, timeToCheckIfClaimed: false)
 					}

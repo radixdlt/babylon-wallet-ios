@@ -83,7 +83,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .alert(action):
-			if let item = state.itemsQueue.first, case let .alert(state) = item {
+			if case let .alert(state) = state.itemsQueue.first {
 				overlayWindowClient.sendAlertAction(action, state.id)
 			}
 			return dismiss(&state)
@@ -91,12 +91,11 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		case .hud(.delegate(.dismiss)):
 			return dismiss(&state)
 
-		case let .fullScreen(.child(.root(fullScreenAction))):
-			print("•• OverlayReducer: fullScreenAction: \(fullScreenAction)")
-			return .none
-
-		case .fullScreen(.delegate(.dismiss)):
-			print("•• OverlayReducer: .fullScreen(.delegate(.dismiss))")
+		case let .fullScreen(.delegate(action)):
+			print("•• OverlayReducer: fullScreenAction: \(action)")
+			if case let .fullScreen(state) = state.itemsQueue.first {
+				overlayWindowClient.sendFullScreenAction(action, state.id)
+			}
 			return dismiss(&state)
 
 		default:
@@ -105,9 +104,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 	}
 
 	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
-		print("•• OverlayReducer: .reduceDismissedDestination \(state.destination)")
-
-		if let item = state.itemsQueue.first, case let .alert(state) = item {
+		if case let .alert(state) = state.itemsQueue.first {
 			overlayWindowClient.sendAlertAction(.dismissed, state.id)
 		}
 
@@ -148,6 +145,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 	}
 
 	private func dismiss(_ state: inout State) -> Effect<Action> {
+		print("•• OverlayReducer: dismiss")
 		state.destination = nil
 		state.itemsQueue.removeFirst()
 		return setIsUserInteractionEnabled(&state, isEnabled: false)

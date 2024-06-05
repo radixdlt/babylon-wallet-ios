@@ -48,6 +48,13 @@ extension ClaimWallet {
 							store.send(.view(.transferBackButtonTapped))
 						}
 						.buttonStyle(.primaryText())
+						.overlay {
+							if viewStore.isLoading {
+								Color.red.opacity(0.2)
+
+								ProgressView()
+							}
+						}
 					}
 				}
 				.padding(.horizontal, .large1)
