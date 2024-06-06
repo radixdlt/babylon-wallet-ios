@@ -47,16 +47,6 @@ extension BackupsClient: DependencyKey {
 					return nil
 				}
 			},
-			lookupProfileSnapshotByHeader: { header in
-				let containsP2PLinks = if let profileSnapshotData = try? secureStorageClient.loadProfileSnapshotData(header.id) {
-					Profile.checkIfProfileJsonContainsLegacyP2PLinks(contents: profileSnapshotData)
-				} else {
-					false
-				}
-				let profileSnapshot = try secureStorageClient.loadProfileSnapshot(header.id)
-
-				return (profileSnapshot, containsP2PLinks)
-			},
 			importProfileSnapshot: { snapshot, factorSourceIDs, containsP2PLinks in
 				do {
 					try await profileStore.importProfileSnapshot(snapshot)
