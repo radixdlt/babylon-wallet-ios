@@ -13,7 +13,6 @@ public struct CloudBackupClient: DependencyKey, Sendable {
 	public let lastBackup: LastBackup
 	public let loadProfile: LoadProfile
 	public let loadProfileHeaders: LoadProfileHeaders
-	public let reclaimProfile: ReclaimProfile
 
 	public init(
 		startAutomaticBackups: @escaping StartAutomaticBackups,
@@ -23,8 +22,7 @@ public struct CloudBackupClient: DependencyKey, Sendable {
 		checkAccountStatus: @escaping CheckAccountStatus,
 		lastBackup: @escaping LastBackup,
 		loadProfile: @escaping LoadProfile,
-		loadProfileHeaders: @escaping LoadProfileHeaders,
-		reclaimProfile: @escaping ReclaimProfile
+		loadProfileHeaders: @escaping LoadProfileHeaders
 	) {
 		self.startAutomaticBackups = startAutomaticBackups
 		self.loadDeviceID = loadDeviceID
@@ -34,7 +32,6 @@ public struct CloudBackupClient: DependencyKey, Sendable {
 		self.lastBackup = lastBackup
 		self.loadProfile = loadProfile
 		self.loadProfileHeaders = loadProfileHeaders
-		self.reclaimProfile = reclaimProfile
 	}
 }
 
@@ -47,7 +44,6 @@ extension CloudBackupClient {
 	public typealias LastBackup = @Sendable (ProfileID) -> AnyAsyncSequence<BackupResult?>
 	public typealias LoadProfile = @Sendable (ProfileID) async throws -> BackedUpProfile
 	public typealias LoadProfileHeaders = @Sendable () async throws -> [Profile.Header]
-	public typealias ReclaimProfile = @Sendable () async throws -> Void
 }
 
 // MARK: CloudBackupClient.BackedUpProfile
