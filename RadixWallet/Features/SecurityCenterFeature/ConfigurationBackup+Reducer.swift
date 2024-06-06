@@ -29,8 +29,16 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			return !cloudBackupsEnabled && !lastCloudBackup.upToDate
 		}
 
+		public var showLastBackupLabel: Bool {
+			if let lastCloudBackup, lastCloudBackup.success, !lastCloudBackup.upToDate {
+				true
+			} else {
+				false
+			}
+		}
+
 		public var actionsRequired: [Item] {
-			problems.isEmpty ? [] : Item.allCases
+			showLastBackupLabel ? Item.allCases : []
 		}
 
 		public init() {}
