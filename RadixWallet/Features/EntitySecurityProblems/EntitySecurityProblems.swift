@@ -7,7 +7,7 @@ public struct EntitySecurityProblems: Sendable, FeatureReducer {
 		}
 
 		let kind: Kind
-		var problems: [SecurityProblem] = []
+		fileprivate(set) var problems: [SecurityProblem] = []
 		fileprivate let loadProblems: Bool
 
 		public init(kind: Kind, problems: [SecurityProblem]? = nil) {
@@ -18,6 +18,10 @@ public struct EntitySecurityProblems: Sendable, FeatureReducer {
 			} else {
 				self.loadProblems = true
 			}
+		}
+
+		public mutating func update(problems: [SecurityProblem]) {
+			self.problems = problems.filter(kind: kind)
 		}
 	}
 

@@ -210,14 +210,6 @@ public struct Home: Sendable, FeatureReducer {
 		}
 	}
 
-	private func fetchAccountPortfolios(addresses: [AccountAddress]) -> Effect<Action> {
-		.run { _ in
-			_ = try await accountPortfoliosClient.fetchAccountPortfolios(addresses, false)
-		} catch: { error, _ in
-			errorQueue.schedule(error)
-		}
-	}
-
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .accountsLoadedResult(.success(accounts)):
@@ -227,7 +219,11 @@ public struct Home: Sendable, FeatureReducer {
 
 			state.accountRows = accounts.map { Home.AccountRow.State(account: $0, problems: state.problems) }.asIdentified()
 
-			return fetchAccountPortfolios(addresses: state.accountAddresses)
+			return .run { [addresses = state.accountAddresses] _ in
+				_ = try await accountPortfoliosClient.fetchAccountPortfolios(addresses, false)
+			} catch: { error, _ in
+				errorQueue.schedule(error)
+			}
 
 		case let .accountsLoadedResult(.failure(error)):
 			errorQueue.schedule(error)
@@ -282,7 +278,7 @@ public struct Home: Sendable, FeatureReducer {
 		case let .setSecurityProblems(problems):
 			state.problems = problems
 			state.accountRows.mutateAll { row in
-				row.entitySecurityProblems = .init(kind: .account(row.account.address), problems: problems)
+				row.entitySecurityProblems.update(problems: problems)
 			}
 			return .none
 		}
