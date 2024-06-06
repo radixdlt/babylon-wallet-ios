@@ -21,7 +21,6 @@ public struct ClaimWallet: Sendable, FeatureReducer {
 	public enum DelegateAction: Sendable, Equatable {
 		case didClearWallet
 		case transferBack
-		case dismiss
 	}
 
 	@Dependency(\.resetWalletClient) var resetWalletClient
