@@ -16,7 +16,6 @@ extension CloudBackupClient: TestDependencyKey {
 
 	public static let noop = Self(
 		startAutomaticBackups: {},
-		loadDeviceID: { nil },
 		migrateProfilesFromKeychain: { throw NoopError() },
 		deleteProfileBackup: { _ in },
 		checkAccountStatus: { throw NoopError() },
@@ -27,7 +26,6 @@ extension CloudBackupClient: TestDependencyKey {
 
 	public static let testValue = Self(
 		startAutomaticBackups: unimplemented("\(Self.self).startAutomaticBackups"),
-		loadDeviceID: unimplemented("\(Self.self).loadDeviceID"),
 		migrateProfilesFromKeychain: unimplemented("\(Self.self).migrateProfilesFromKeychain"),
 		deleteProfileBackup: unimplemented("\(Self.self).deleteProfileBackup"),
 		checkAccountStatus: unimplemented("\(Self.self).checkAccountStatus"),

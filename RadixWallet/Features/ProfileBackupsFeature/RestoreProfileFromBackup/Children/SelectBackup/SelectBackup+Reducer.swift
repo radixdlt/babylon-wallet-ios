@@ -228,8 +228,8 @@ public struct SelectBackup: Sendable, FeatureReducer {
 				await send(.internal(.setStatus(.migrating)))
 				_ = try await cloudBackupClient.migrateProfilesFromKeychain()
 
-				await send(.internal(.loadedThisDeviceID(
-					cloudBackupClient.loadDeviceID()
+				try await send(.internal(.loadedThisDeviceID(
+					secureStorageClient.loadDeviceInfo()?.id
 				)))
 
 				await send(.internal(.setStatus(.loading)))

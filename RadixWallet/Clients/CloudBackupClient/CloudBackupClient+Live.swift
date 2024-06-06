@@ -196,9 +196,6 @@ extension CloudBackupClient {
 					}
 				}
 			},
-			loadDeviceID: {
-				try? secureStorageClient.loadDeviceInfo()?.id
-			},
 			migrateProfilesFromKeychain: {
 				let activeProfile = await profileStore.profile.id
 				let backedUpRecords = try await fetchAllProfileRecords()
