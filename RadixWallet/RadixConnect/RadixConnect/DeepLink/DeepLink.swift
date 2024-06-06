@@ -113,6 +113,11 @@ extension Mobile2Mobile {
 				)
 			)
 
+			let state = VerifyDapp.State(dAppMetadata: dAppMetadata)
+
+			// TODO: MB- Change here to not ignore action and make the handling here.
+			overlayWindowClient.scheduleFullScreenIgnoreAction(.init(root: .verifyDapp(state)))
+
 			let url = dappReturnURL.appending(queryItems: [
 				.init(name: "sessionId", value: request.sessionId.rawValue),
 				.init(name: "publicKey", value: walletPublicKey.rawRepresentation.hex()),
@@ -126,8 +131,7 @@ extension Mobile2Mobile {
 				url
 			}
 
-			let state = VerifyDapp.State(dAppMetadata: dAppMetadata, returnUrl: returnUrl)
-			overlayWindowClient.scheduleFullScreenIgnoreAction(.init(root: .verifyDapp(state)))
+			// Open the URL after
 		}
 	}
 
