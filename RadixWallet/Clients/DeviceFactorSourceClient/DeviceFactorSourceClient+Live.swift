@@ -72,16 +72,67 @@ extension DeviceFactorSourceClient: DependencyKey {
 		}
 
 		let problematicEntities: @Sendable () async throws -> (mnemonicMissing: ProblematicAddresses, unrecoverable: ProblematicAddresses) = {
-			let deviceFactorSources = try await factorSourcesClient.getFactorSources(type: DeviceFactorSource.self)
-			let entities = try await deviceFactorSources.asyncMap {
-				try await entitiesControlledByFactorSource($0, nil)
+			let factorSources = try await factorSourcesClient.getFactorSources(type: DeviceFactorSource.self)
+			let accounts = try await accountsClient.getAccountsOnCurrentNetwork().elements
+			let hiddenAccounts = try await accountsClient.getHiddenAccountsOnCurrentNetwork().elements
+			let personas = try await personasClient.getPersonas().elements
+			let hiddenPersonas = try await personasClient.getHiddenPersonasOnCurrentNetwork().elements
+
+			let mnemonicMissingFactorSources = factorSources.filter {
+				!secureStorageClient.containsMnemonicIdentifiedByFactorSourceID($0.id)
+			}.map(\.id)
+
+			let mnemonicPresentFactorSources = factorSources.filter {
+				secureStorageClient.containsMnemonicIdentifiedByFactorSourceID($0.id)
 			}
 
-			let mnemonicMissing = entities.filter(not(\.isMnemonicPresentInKeychain))
-			let mnemonicPresent = entities.filter(\.isMnemonicPresentInKeychain)
-			let unrecoverable = mnemonicPresent.filter(not(\.isMnemonicMarkedAsBackedUp))
+			let unrecoverableFactorSources = mnemonicPresentFactorSources.filter {
+				!userDefaults.getFactorSourceIDOfBackedUpMnemonics().contains($0.id)
+			}.map(\.id)
 
-			return (mnemonicMissing: mnemonicMissing.problematicAddresses, unrecoverable: unrecoverable.problematicAddresses)
+			func mnemonicMissing(_ account: Account) -> Bool {
+				switch account.securityState {
+				case let .unsecured(value):
+					mnemonicMissingFactorSources.contains(value.transactionSigning.factorSourceId)
+				}
+			}
+
+			func mnemonicMissing(_ persona: Persona) -> Bool {
+				switch persona.securityState {
+				case let .unsecured(value):
+					mnemonicMissingFactorSources.contains(value.transactionSigning.factorSourceId)
+				}
+			}
+
+			func unrecoverable(_ account: Account) -> Bool {
+				switch account.securityState {
+				case let .unsecured(value):
+					unrecoverableFactorSources.contains(value.transactionSigning.factorSourceId)
+				}
+			}
+
+			func unrecoverable(_ persona: Persona) -> Bool {
+				switch persona.securityState {
+				case let .unsecured(value):
+					unrecoverableFactorSources.contains(value.transactionSigning.factorSourceId)
+				}
+			}
+
+			let mnemonicMissing = ProblematicAddresses(
+				accounts: accounts.filter(mnemonicMissing(_:)).map(\.address),
+				hiddenAccounts: hiddenAccounts.filter(mnemonicMissing(_:)).map(\.address),
+				personas: personas.filter(mnemonicMissing(_:)).map(\.address),
+				hiddenPersonas: hiddenPersonas.filter(mnemonicMissing(_:)).map(\.address)
+			)
+
+			let unrecoverable = ProblematicAddresses(
+				accounts: accounts.filter(unrecoverable(_:)).map(\.address),
+				hiddenAccounts: hiddenAccounts.filter(unrecoverable(_:)).map(\.address),
+				personas: personas.filter(unrecoverable(_:)).map(\.address),
+				hiddenPersonas: hiddenPersonas.filter(unrecoverable(_:)).map(\.address)
+			)
+
+			return (mnemonicMissing: mnemonicMissing, unrecoverable: unrecoverable)
 		}
 
 		return Self(
@@ -147,14 +198,4 @@ extension DeviceFactorSourceClient: DependencyKey {
 			problematicEntities: problematicEntities
 		)
 	}()
-}
-
-private extension [EntitiesControlledByFactorSource] {
-	var problematicAddresses: ProblematicAddresses {
-		let accounts = flatMap(\.accounts).map(\.address)
-		let hiddenAccounts = flatMap(\.hiddenAccounts).map(\.address)
-		let personas = flatMap(\.personas).map(\.address)
-		let hiddenPersonas = flatMap(\.hiddenPersonas).map(\.address)
-		return .init(accounts: accounts, hiddenAccounts: hiddenAccounts, personas: personas, hiddenPersonas: hiddenPersonas)
-	}
 }
