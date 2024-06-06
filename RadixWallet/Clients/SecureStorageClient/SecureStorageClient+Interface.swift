@@ -20,7 +20,7 @@ public struct SecureStorageClient: Sendable {
 	public var deleteMnemonicByFactorSourceID: DeleteMnemonicByFactorSourceID
 	public var deleteProfileAndMnemonicsByFactorSourceIDs: DeleteProfileAndMnemonicsByFactorSourceIDs
 
-	public var updateIsCloudProfileSyncEnabled: UpdateIsCloudProfileSyncEnabled
+	public var disableCloudProfileSync: DisableCloudProfileSync
 
 	public var loadProfileHeaderList: LoadProfileHeaderList
 	public var saveProfileHeaderList: SaveProfileHeaderList
@@ -56,7 +56,7 @@ public struct SecureStorageClient: Sendable {
 		containsMnemonicIdentifiedByFactorSourceID: @escaping ContainsMnemonicIdentifiedByFactorSourceID,
 		deleteMnemonicByFactorSourceID: @escaping DeleteMnemonicByFactorSourceID,
 		deleteProfileAndMnemonicsByFactorSourceIDs: @escaping DeleteProfileAndMnemonicsByFactorSourceIDs,
-		updateIsCloudProfileSyncEnabled: @escaping UpdateIsCloudProfileSyncEnabled,
+		disableCloudProfileSync: @escaping DisableCloudProfileSync,
 		loadProfileHeaderList: @escaping LoadProfileHeaderList,
 		saveProfileHeaderList: @escaping SaveProfileHeaderList,
 		deleteProfileHeaderList: @escaping DeleteProfileHeaderList,
@@ -80,7 +80,7 @@ public struct SecureStorageClient: Sendable {
 		self.containsMnemonicIdentifiedByFactorSourceID = containsMnemonicIdentifiedByFactorSourceID
 		self.deleteMnemonicByFactorSourceID = deleteMnemonicByFactorSourceID
 		self.deleteProfileAndMnemonicsByFactorSourceIDs = deleteProfileAndMnemonicsByFactorSourceIDs
-		self.updateIsCloudProfileSyncEnabled = updateIsCloudProfileSyncEnabled
+		self.disableCloudProfileSync = disableCloudProfileSync
 		self.loadProfileHeaderList = loadProfileHeaderList
 		self.saveProfileHeaderList = saveProfileHeaderList
 		self.deleteProfileHeaderList = deleteProfileHeaderList
@@ -107,7 +107,7 @@ public struct SecureStorageClient: Sendable {
 		containsMnemonicIdentifiedByFactorSourceID: @escaping ContainsMnemonicIdentifiedByFactorSourceID,
 		deleteMnemonicByFactorSourceID: @escaping DeleteMnemonicByFactorSourceID,
 		deleteProfileAndMnemonicsByFactorSourceIDs: @escaping DeleteProfileAndMnemonicsByFactorSourceIDs,
-		updateIsCloudProfileSyncEnabled: @escaping UpdateIsCloudProfileSyncEnabled,
+		disableCloudProfileSync: @escaping DisableCloudProfileSync,
 		loadProfileHeaderList: @escaping LoadProfileHeaderList,
 		saveProfileHeaderList: @escaping SaveProfileHeaderList,
 		deleteProfileHeaderList: @escaping DeleteProfileHeaderList,
@@ -130,7 +130,7 @@ public struct SecureStorageClient: Sendable {
 		self.containsMnemonicIdentifiedByFactorSourceID = containsMnemonicIdentifiedByFactorSourceID
 		self.deleteMnemonicByFactorSourceID = deleteMnemonicByFactorSourceID
 		self.deleteProfileAndMnemonicsByFactorSourceIDs = deleteProfileAndMnemonicsByFactorSourceIDs
-		self.updateIsCloudProfileSyncEnabled = updateIsCloudProfileSyncEnabled
+		self.disableCloudProfileSync = disableCloudProfileSync
 		self.loadProfileHeaderList = loadProfileHeaderList
 		self.saveProfileHeaderList = saveProfileHeaderList
 		self.deleteProfileHeaderList = deleteProfileHeaderList
@@ -153,7 +153,7 @@ public struct LoadMnemonicByFactorSourceIDRequest: Sendable, Hashable {
 }
 
 extension SecureStorageClient {
-	public typealias UpdateIsCloudProfileSyncEnabled = @Sendable (ProfileID, CloudProfileSyncActivation) throws -> Void
+	public typealias DisableCloudProfileSync = @Sendable (ProfileID) throws -> Void
 	public typealias SaveProfileSnapshot = @Sendable (Profile) throws -> Void
 	public typealias LoadProfileSnapshotData = @Sendable (ProfileID) throws -> Data?
 	public typealias LoadProfileSnapshot = @Sendable (ProfileID) throws -> Profile?
@@ -244,15 +244,6 @@ extension SecureStorageClient {
 	public func deleteProfileAndMnemonicsByFactorSourceIDs(profileID: Profile.ID, keepInICloudIfPresent: Bool) throws {
 		try deleteProfileAndMnemonicsByFactorSourceIDs(profileID, keepInICloudIfPresent)
 	}
-}
-
-// MARK: - CloudProfileSyncActivation
-public enum CloudProfileSyncActivation: Sendable, Hashable {
-	/// iCloud sync was enabled, user request to disable it.
-	case disable
-
-	/// iCloud sync was disabled, user request to enable it.
-	case enable
 }
 
 #if DEBUG

@@ -29,10 +29,6 @@ extension AppPreferencesClient: DependencyKey {
 				try await profileStore.updating { profile in
 					profile.appPreferences.security.isCloudProfileSyncEnabled = isEnabled
 				}
-				try secureStorageClient.updateIsCloudProfileSyncEnabled(
-					profile.id,
-					isEnabled ? .enable : .disable
-				)
 			},
 			setIsCloudBackupEnabled: { isEnabled in
 				let profile = await profileStore.profile
