@@ -69,24 +69,18 @@ public final actor ProfileStore {
 
 	private enum Mode {
 		case appIsUnlocked
-		case appIsLocked(bufferedProfileOwnershipConflict: ConflictingOwners?)
+		case appIsLocked
 	}
 
 	init() {
 		let metaDeviceInfo = Self._deviceInfo()
-		let (deviceInfo, profile, conflictingOwners) = Self._loadSavedElseNewProfile(metaDeviceInfo: metaDeviceInfo)
+		let (deviceInfo, profile) = Self._loadSavedElseNewProfile(metaDeviceInfo: metaDeviceInfo)
 		loggerGlobal.info("profile.id: \(profile.id)")
 		loggerGlobal.info("device.id: \(deviceInfo.id)")
 		self.deviceInfo = deviceInfo
 		self.profileSubject = AsyncCurrentValueSubject(profile)
-		self.mode = .appIsLocked(bufferedProfileOwnershipConflict: conflictingOwners)
+		self.mode = .appIsLocked
 	}
-}
-
-// MARK: - ConflictingOwners
-public struct ConflictingOwners: Sendable, Hashable {
-	public let ownerOfCurrentProfile: DeviceInfo
-	public let thisDevice: DeviceInfo
 }
 
 // MARK: Public
@@ -259,21 +253,8 @@ extension ProfileStore {
 
 	public func unlockedApp() async -> Profile {
 		loggerGlobal.notice("Unlocking app")
-		let buffered = bufferedOwnershipConflictWhileAppLocked
 		self.mode = .appIsUnlocked
-		if let buffered {
-			loggerGlobal.notice("We had a buffered Profile ownership conflict, emitting it now.")
-			do {
-				try await doEmit(conflictingOwners: buffered)
-				return profile // might be a new one! if user selected "delete"
-			} catch {
-				logAssertionFailure("Failure during Profile ownership resolution, error: \(error)")
-				// Not import enough to prevent app from being used
-				return profile
-			}
-		} else {
-			return profile
-		}
+		return profile
 	}
 }
 
@@ -372,18 +353,6 @@ extension ProfileStore {
 		case .appIsLocked: false
 		}
 	}
-
-	private var bufferedOwnershipConflictWhileAppLocked: ConflictingOwners? {
-		switch mode {
-		case .appIsUnlocked: nil
-		case let .appIsLocked(buffered): buffered
-		}
-	}
-
-	private func buffer(conflictingOwners: ConflictingOwners?) {
-		loggerGlobal.info("App is locked, buffering conflicting profle owner")
-		self.mode = .appIsLocked(bufferedProfileOwnershipConflict: conflictingOwners)
-	}
 }
 
 // MARK: Helpers
@@ -456,48 +425,15 @@ extension ProfileStore {
 
 		guard deviceInfo.id == header.lastUsedOnDevice.id else {
 			loggerGlobal.error("Device ID mismatch, profile might have been used on another device. Last used in header was: \(String(describing: header.lastUsedOnDevice)) and info of this device: \(String(describing: deviceInfo))")
-			Task {
-				let conflictingOwners = ConflictingOwners(
-					ownerOfCurrentProfile: header.lastUsedOnDevice,
-					thisDevice: deviceInfo
-				)
-
-				guard appIsUnlocked else {
-					return buffer(conflictingOwners: conflictingOwners)
-				}
-
-				try await doEmit(conflictingOwners: conflictingOwners)
-			}
 			throw Error.profileUsedOnAnotherDevice
 		}
 		// All good
-	}
-
-	private func doEmit(conflictingOwners: ConflictingOwners) async throws {
-		@Dependency(\.overlayWindowClient) var overlayWindowClient
-		assert(appIsUnlocked)
-
-		// We present an alert to user where they must choice if they wanna keep using Profile
-		// on this device or delete it. If they delete a new one will be created and we will
-		// onboard user...
-		let choiceByUser = await overlayWindowClient.scheduleAlert(.profileUsedOnAnotherDeviceAlert(
-			conflictingOwners: conflictingOwners
-		))
-
-		if choiceByUser == .claimAndContinueUseOnThisPhone {
-			try self.claimOwnershipOfProfile()
-		} else if choiceByUser == .deleteProfileFromThisPhone {
-			try self._deleteProfile(
-				keepInICloudIfPresent: true, // local resolution should not affect iCloud
-				assertOwnership: false // duh.. we know we had a conflict, ownership check will fail.
-			)
-		}
 	}
 }
 
 // MARK: Private Static
 extension ProfileStore {
-	typealias NewProfileTuple = (deviceInfo: DeviceInfo, profile: Profile, conflictingOwners: ConflictingOwners?)
+	typealias NewProfileTuple = (deviceInfo: DeviceInfo, profile: Profile)
 
 	private static func _loadSavedElseNewProfile(
 		metaDeviceInfo: MetaDeviceInfo
@@ -508,8 +444,7 @@ extension ProfileStore {
 		func newProfile() throws -> NewProfileTuple {
 			try (
 				deviceInfo: metaDeviceInfo.deviceInfo,
-				profile: _tryGenerateAndSaveNewProfile(deviceInfo: deviceInfo),
-				conflictingOwners: nil
+				profile: _tryGenerateAndSaveNewProfile(deviceInfo: deviceInfo)
 			)
 		}
 
@@ -546,11 +481,7 @@ extension ProfileStore {
 				}
 				return (
 					deviceInfo: deviceInfo,
-					profile: existing,
-					conflictingOwners: matchingIDs ? nil : .init(
-						ownerOfCurrentProfile: existing.header.lastUsedOnDevice,
-						thisDevice: deviceInfo
-					)
+					profile: existing
 				)
 			} else {
 				return try newProfile()
