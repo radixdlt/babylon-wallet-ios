@@ -140,6 +140,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		case let .profileImportResult(.success(profileURL)):
 			do {
 				guard profileURL.startAccessingSecurityScopedResource() else {
+					struct LackedPermissionToAccessSecurityScopedResource: Error {}
 					throw LackedPermissionToAccessSecurityScopedResource()
 				}
 				defer { profileURL.stopAccessingSecurityScopedResource() }
