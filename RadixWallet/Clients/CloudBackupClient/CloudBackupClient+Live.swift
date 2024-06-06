@@ -158,15 +158,15 @@ extension CloudBackupClient {
 
 			let backedUpID = { try? existingRecord.map(getProfileHeader)?.lastUsedOnDevice.id }
 
-			let didTransferBackProfile: Bool
+			let shouldReclaim: Bool
 			if shouldCheckClaim, let id = backedUpID(), await !profileStore.isThisDevice(deviceID: id) {
 				let action = await overlayWindowClient.scheduleFullScreen(.init(root: .claimWallet(.init())))
-				didTransferBackProfile = action == .claimWallet(.didTransferBack)
+				shouldReclaim = action == .claimWallet(.transferBack)
 			} else {
-				didTransferBackProfile = false
+				shouldReclaim = false
 			}
 
-			guard shouldBackUp || didTransferBackProfile else { return }
+			guard shouldBackUp || shouldReclaim else { return }
 
 			await backupProfileAndSaveResult(existingRecord: existingRecord)
 		}
@@ -251,9 +251,6 @@ extension CloudBackupClient {
 				try await fetchAllProfileRecords(headerOnly: true)
 					.map(getProfileHeader)
 					.filter(\.isNonEmpty)
-			},
-			reclaimProfile: {
-				try await profileStore.claimOwnershipOfProfile()
 			}
 		)
 	}
