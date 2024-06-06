@@ -166,8 +166,6 @@
 		48CFC2AC2ADC10D900E77A5C /* Home+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD112ADC10D800E77A5C /* Home+View.swift */; };
 		48CFC2B12ADC10D900E77A5C /* DerivePublicKeys+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD1A2ADC10D800E77A5C /* DerivePublicKeys+View.swift */; };
 		48CFC2B22ADC10D900E77A5C /* DerivePublicKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD1B2ADC10D800E77A5C /* DerivePublicKeys.swift */; };
-		48CFC2B32ADC10D900E77A5C /* ProfileBackupSettings+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD1E2ADC10D800E77A5C /* ProfileBackupSettings+View.swift */; };
-		48CFC2B42ADC10D900E77A5C /* ProfileBackupSettings+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD1F2ADC10D800E77A5C /* ProfileBackupSettings+Reducer.swift */; };
 		48CFC2B52ADC10D900E77A5C /* EncryptOrDecryptProfile+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD212ADC10D800E77A5C /* EncryptOrDecryptProfile+View.swift */; };
 		48CFC2B62ADC10D900E77A5C /* EncryptOrDecryptProfile+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD222ADC10D800E77A5C /* EncryptOrDecryptProfile+Reducer.swift */; };
 		48CFC2B72ADC10D900E77A5C /* ExportableProfileFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD232ADC10D800E77A5C /* ExportableProfileFile.swift */; };
@@ -1338,8 +1336,6 @@
 		48CFBD112ADC10D800E77A5C /* Home+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+View.swift"; sourceTree = "<group>"; };
 		48CFBD1A2ADC10D800E77A5C /* DerivePublicKeys+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DerivePublicKeys+View.swift"; sourceTree = "<group>"; };
 		48CFBD1B2ADC10D800E77A5C /* DerivePublicKeys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DerivePublicKeys.swift; sourceTree = "<group>"; };
-		48CFBD1E2ADC10D800E77A5C /* ProfileBackupSettings+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ProfileBackupSettings+View.swift"; sourceTree = "<group>"; };
-		48CFBD1F2ADC10D800E77A5C /* ProfileBackupSettings+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ProfileBackupSettings+Reducer.swift"; sourceTree = "<group>"; };
 		48CFBD212ADC10D800E77A5C /* EncryptOrDecryptProfile+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "EncryptOrDecryptProfile+View.swift"; sourceTree = "<group>"; };
 		48CFBD222ADC10D800E77A5C /* EncryptOrDecryptProfile+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "EncryptOrDecryptProfile+Reducer.swift"; sourceTree = "<group>"; };
 		48CFBD232ADC10D800E77A5C /* ExportableProfileFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExportableProfileFile.swift; sourceTree = "<group>"; };
@@ -3083,20 +3079,10 @@
 		48CFBD1C2ADC10D800E77A5C /* ProfileBackupsFeature */ = {
 			isa = PBXGroup;
 			children = (
-				48CFBD1D2ADC10D800E77A5C /* ProfileBackupSettings */,
 				48CFBD202ADC10D800E77A5C /* Shared */,
 				48CFBD242ADC10D800E77A5C /* RestoreProfileFromBackup */,
 			);
 			path = ProfileBackupsFeature;
-			sourceTree = "<group>";
-		};
-		48CFBD1D2ADC10D800E77A5C /* ProfileBackupSettings */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBD1E2ADC10D800E77A5C /* ProfileBackupSettings+View.swift */,
-				48CFBD1F2ADC10D800E77A5C /* ProfileBackupSettings+Reducer.swift */,
-			);
-			path = ProfileBackupSettings;
 			sourceTree = "<group>";
 		};
 		48CFBD202ADC10D800E77A5C /* Shared */ = {
@@ -7382,7 +7368,6 @@
 				48CFC2842ADC10D900E77A5C /* TransactionReview.swift in Sources */,
 				48CFC5142ADC10DA00E77A5C /* MetadataNonFungibleLocalIdArrayValue.swift in Sources */,
 				48CFC4782ADC10DA00E77A5C /* LocalAuthenticationConfig.swift in Sources */,
-				48CFC2B32ADC10D900E77A5C /* ProfileBackupSettings+View.swift in Sources */,
 				48CFC2962ADC10D900E77A5C /* NormalFeesCustomization.swift in Sources */,
 				48CFC3172ADC10D900E77A5C /* Settings+Reducer.swift in Sources */,
 				E7A5AC982C09F44C006CB6EC /* ResetWalletClient+Live.swift in Sources */,
@@ -7726,7 +7711,6 @@
 				48CFC4E22ADC10DA00E77A5C /* InvalidEntityError.swift in Sources */,
 				A41557552B7645F70040AD4E /* TransactionHistory+View.swift in Sources */,
 				48CFC47D2ADC10DA00E77A5C /* BackupsClient+Interface.swift in Sources */,
-				48CFC2B42ADC10D900E77A5C /* ProfileBackupSettings+Reducer.swift in Sources */,
 				48CFC5792ADC10DA00E77A5C /* FungibleResourcesCollectionItem.swift in Sources */,
 				48CFC4AF2ADC10DA00E77A5C /* NonFungibleResourcesCollectionItemGloballyAggregated.swift in Sources */,
 				48CFC54D2ADC10DA00E77A5C /* StateEntityDetailsResponseNonFungibleResourceDetails.swift in Sources */,
