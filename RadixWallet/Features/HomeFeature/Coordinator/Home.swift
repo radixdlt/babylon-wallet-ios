@@ -8,9 +8,8 @@ public struct Home: Sendable, FeatureReducer {
 
 	public struct State: Sendable, Hashable {
 		// MARK: - Components
-		fileprivate var problems: [SecurityProblem] = []
-		fileprivate var accounts: IdentifiedArrayOf<Account> = []
 		public var accountRows: IdentifiedArrayOf<Home.AccountRow.State> = []
+		fileprivate var problems: [SecurityProblem] = []
 
 		public var showRadixBanner: Bool = false
 		public var showFiatWorth: Bool = true
@@ -226,10 +225,9 @@ public struct Home: Sendable, FeatureReducer {
 				return .none
 			}
 
-			state.accounts = accounts
 			state.accountRows = accounts.map { Home.AccountRow.State(account: $0, problems: state.problems) }.asIdentified()
 
-			return fetchAccountPortfolios(addresses: accounts.map(\.address))
+			return fetchAccountPortfolios(addresses: state.accountAddresses)
 
 		case let .accountsLoadedResult(.failure(error)):
 			errorQueue.schedule(error)
@@ -424,6 +422,10 @@ public struct Home: Sendable, FeatureReducer {
 }
 
 extension Home.State {
+	public var accounts: IdentifiedArrayOf<Account> {
+		accountRows.map(\.account).asIdentified()
+	}
+
 	public var accountAddresses: [AccountAddress] {
 		accounts.map(\.address)
 	}
