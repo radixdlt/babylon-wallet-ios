@@ -11,22 +11,6 @@ extension BackupsClient: DependencyKey {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
-		@Sendable
-		func importFor(
-			factorSourceIDs: Set<FactorSourceIDFromHash>,
-			operation: () async throws -> Void
-		) async throws {
-			do {
-				try await operation()
-			} catch {
-				// revert the saved mnemonic
-				for factorSourceID in factorSourceIDs {
-					try? secureStorageClient.deleteMnemonicByFactorSourceID(factorSourceID)
-				}
-				throw error
-			}
-		}
-
 		return Self(
 			snapshotOfProfileForExport: {
 				await profileStore.profile
@@ -74,9 +58,15 @@ extension BackupsClient: DependencyKey {
 				return (profileSnapshot, containsP2PLinks)
 			},
 			importProfileSnapshot: { snapshot, factorSourceIDs, containsP2PLinks in
-				try await importFor(factorSourceIDs: factorSourceIDs) {
+				do {
 					try await profileStore.importProfileSnapshot(snapshot)
 					userDefaults.setShowRelinkConnectorsAfterProfileRestore(containsP2PLinks)
+				} catch {
+					// Revert the saved mnemonic
+					for factorSourceID in factorSourceIDs {
+						try? secureStorageClient.deleteMnemonicByFactorSourceID(factorSourceID)
+					}
+					throw error
 				}
 			},
 			didExportProfileSnapshot: { profile in
