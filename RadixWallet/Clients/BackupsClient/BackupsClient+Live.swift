@@ -82,12 +82,6 @@ extension BackupsClient: DependencyKey {
 			didExportProfileSnapshot: { profile in
 				try userDefaults.setLastManualBackup(of: profile)
 			},
-			importCloudProfile: { header, factorSourceIDs, containsP2PLinks in
-				try await importFor(factorSourceIDs: factorSourceIDs) {
-					try await profileStore.importCloudProfileSnapshot(header)
-					userDefaults.setShowRelinkConnectorsAfterProfileRestore(containsP2PLinks)
-				}
-			},
 			loadDeviceID: {
 				try? secureStorageClient.loadDeviceInfo()?.id
 			}
