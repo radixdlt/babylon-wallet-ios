@@ -62,8 +62,9 @@ extension CloudBackupClient {
 		let container: CKContainer = .default()
 
 		@Sendable
-		func fetchProfileRecord(_ id: CKRecord.ID) async throws -> CKRecord {
-			let record = try await container.privateCloudDatabase.record(for: id)
+		func fetchProfileRecord(_ id: ProfileID) async throws -> CKRecord {
+			let recordID = CKRecord.ID(recordName: id.uuidString)
+			let record = try await container.privateCloudDatabase.record(for: recordID)
 			guard record.recordType == .profile else {
 				throw WrongRecordTypeError(type: record.recordType)
 			}
@@ -102,7 +103,7 @@ extension CloudBackupClient {
 
 		@discardableResult
 		@Sendable
-		func uploadProfileToICloud(_ profile: Either<Data, String>, header: Profile.Header, existingRecord: CKRecord?) async throws -> CKRecord {
+		func backupProfile(_ profile: Either<Data, String>, header: Profile.Header, existingRecord: CKRecord?) async throws -> CKRecord {
 			let fileManager = FileManager.default
 			let tempDirectoryURL = fileManager.temporaryDirectory
 			let fileURL = tempDirectoryURL.appendingPathComponent(UUID().uuidString)
@@ -124,22 +125,27 @@ extension CloudBackupClient {
 		}
 
 		@Sendable
-		func backupProfileAndSaveResult(_ profile: Profile, existingRecord: CKRecord?) async {
-			let result: BackupResult.Result
+		func backupProfileAndSaveResult(_ profile: Profile, existingRecord: CKRecord?) async throws {
 			do {
 				let json = profile.toJSONString()
-				try await uploadProfileToICloud(.right(json), header: profile.header, existingRecord: existingRecord)
-				result = .success
-			} catch CKError.accountTemporarilyUnavailable {
-				result = .temporarilyUnavailable
-			} catch CKError.notAuthenticated {
-				result = .notAuthenticated
+				try await backupProfile(.right(json), header: profile.header, existingRecord: existingRecord)
 			} catch {
-				loggerGlobal.error("Automatic cloud backup failed with error \(error)")
-				result = .failure
+				let result: BackupResult.Result
+				switch error {
+				case CKError.accountTemporarilyUnavailable:
+					result = .temporarilyUnavailable
+				case CKError.notAuthenticated:
+					result = .notAuthenticated
+				default:
+					loggerGlobal.error("Automatic cloud backup failed with error \(error)")
+					result = .failure
+				}
+
+				try? userDefaults.setLastCloudBackup(result, of: profile)
+				throw error
 			}
 
-			try? userDefaults.setLastCloudBackup(result, of: profile)
+			try? userDefaults.setLastCloudBackup(.success, of: profile)
 		}
 
 		@Sendable
@@ -153,7 +159,7 @@ extension CloudBackupClient {
 
 			guard shouldBackUp || shouldCheckClaim else { return }
 
-			let existingRecord = try? await fetchProfileRecord(.init(recordName: profile.id.uuidString))
+			let existingRecord = try? await fetchProfileRecord(profile.id)
 
 			let backedUpID = { try? existingRecord.map(getProfileHeader)?.lastUsedOnDevice.id }
 
@@ -167,7 +173,7 @@ extension CloudBackupClient {
 
 			guard shouldBackUp || shouldReclaim else { return }
 
-			await backupProfileAndSaveResult(profile, existingRecord: existingRecord)
+			try? await backupProfileAndSaveResult(profile, existingRecord: existingRecord)
 		}
 
 		let retryBackupInterval: DispatchTimeInterval = .seconds(60)
@@ -225,7 +231,7 @@ extension CloudBackupClient {
 						return backedUpRecord
 					}
 
-					return try await uploadProfileToICloud(.left(profileData), header: header, existingRecord: backedUpRecord)
+					return try await backupProfile(.left(profileData), header: header, existingRecord: backedUpRecord)
 				}
 
 				let migratedIDs = migrated.compactMap { ProfileID(uuidString: $0.recordID.recordName) }
@@ -244,12 +250,16 @@ extension CloudBackupClient {
 				userDefaults.lastCloudBackupValues(for: id)
 			},
 			loadProfile: { id in
-				try await getProfile(fetchProfileRecord(.init(recordName: id.uuidString)))
+				try await getProfile(fetchProfileRecord(id))
 			},
 			loadProfileHeaders: {
 				try await fetchAllProfileRecords(headerOnly: true)
 					.map(getProfileHeader)
 					.filter(\.isNonEmpty)
+			},
+			claimProfile: { profile in
+				let existingRecord = try? await fetchProfileRecord(profile.id)
+				try await backupProfileAndSaveResult(profile, existingRecord: existingRecord)
 			}
 		)
 	}
