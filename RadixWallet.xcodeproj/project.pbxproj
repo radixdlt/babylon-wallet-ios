@@ -472,8 +472,8 @@
 		48CFC4792ADC10DA00E77A5C /* LocalAuthenticationClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBFAB2ADC10D900E77A5C /* LocalAuthenticationClient+Live.swift */; };
 		48CFC47A2ADC10DA00E77A5C /* LocalAuthenticationClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBFAC2ADC10D900E77A5C /* LocalAuthenticationClient+Interface.swift */; };
 		48CFC47B2ADC10DA00E77A5C /* LocalAuthenticationClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBFAD2ADC10D900E77A5C /* LocalAuthenticationClient+Test.swift */; };
-		48CFC47C2ADC10DA00E77A5C /* BackupsClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBFAF2ADC10D900E77A5C /* BackupsClient+Test.swift */; };
-		48CFC47D2ADC10DA00E77A5C /* BackupsClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBFB02ADC10D900E77A5C /* BackupsClient+Interface.swift */; };
+		48CFC47C2ADC10DA00E77A5C /* TransportProfileClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBFAF2ADC10D900E77A5C /* TransportProfileClient+Test.swift */; };
+		48CFC47D2ADC10DA00E77A5C /* TransportProfileClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBFB02ADC10D900E77A5C /* TransportProfileClient+Interface.swift */; };
 		48CFC47E2ADC10DA00E77A5C /* OverlayWindowClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBFB22ADC10D900E77A5C /* OverlayWindowClient+Live.swift */; };
 		48CFC47F2ADC10DA00E77A5C /* ROLAClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBFB42ADC10D900E77A5C /* ROLAClient+Interface.swift */; };
 		48CFC4802ADC10DA00E77A5C /* ROLAClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBFB52ADC10D900E77A5C /* ROLAClient+Live.swift */; };
@@ -665,7 +665,7 @@
 		48CFC57D2ADC10DA00E77A5C /* StateEntityDetailsResponseItemDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC0C02ADC10D900E77A5C /* StateEntityDetailsResponseItemDetails.swift */; };
 		48CFC57E2ADC10DA00E77A5C /* ValidatorState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC0C12ADC10D900E77A5C /* ValidatorState.swift */; };
 		48CFC57F2ADC10DA00E77A5C /* GatewayAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC0C22ADC10D900E77A5C /* GatewayAPI.swift */; };
-		48CFC5802ADC10DA00E77A5C /* BackupsClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC0C42ADC10D900E77A5C /* BackupsClient+Live.swift */; };
+		48CFC5802ADC10DA00E77A5C /* TransportProfileClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC0C42ADC10D900E77A5C /* TransportProfileClient+Live.swift */; };
 		48CFC5812ADC10DA00E77A5C /* URLFormatterClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC0C62ADC10D900E77A5C /* URLFormatterClient+Test.swift */; };
 		48CFC5822ADC10DA00E77A5C /* URLFormatterClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC0C72ADC10D900E77A5C /* URLFormatterClient+Interface.swift */; };
 		48CFC5832ADC10DA00E77A5C /* SecureStorageClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC0C92ADC10D900E77A5C /* SecureStorageClient+Test.swift */; };
@@ -1642,8 +1642,8 @@
 		48CFBFAB2ADC10D900E77A5C /* LocalAuthenticationClient+Live.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "LocalAuthenticationClient+Live.swift"; sourceTree = "<group>"; };
 		48CFBFAC2ADC10D900E77A5C /* LocalAuthenticationClient+Interface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "LocalAuthenticationClient+Interface.swift"; sourceTree = "<group>"; };
 		48CFBFAD2ADC10D900E77A5C /* LocalAuthenticationClient+Test.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "LocalAuthenticationClient+Test.swift"; sourceTree = "<group>"; };
-		48CFBFAF2ADC10D900E77A5C /* BackupsClient+Test.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BackupsClient+Test.swift"; sourceTree = "<group>"; };
-		48CFBFB02ADC10D900E77A5C /* BackupsClient+Interface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BackupsClient+Interface.swift"; sourceTree = "<group>"; };
+		48CFBFAF2ADC10D900E77A5C /* TransportProfileClient+Test.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TransportProfileClient+Test.swift"; sourceTree = "<group>"; };
+		48CFBFB02ADC10D900E77A5C /* TransportProfileClient+Interface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TransportProfileClient+Interface.swift"; sourceTree = "<group>"; };
 		48CFBFB22ADC10D900E77A5C /* OverlayWindowClient+Live.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "OverlayWindowClient+Live.swift"; sourceTree = "<group>"; };
 		48CFBFB42ADC10D900E77A5C /* ROLAClient+Interface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ROLAClient+Interface.swift"; sourceTree = "<group>"; };
 		48CFBFB52ADC10D900E77A5C /* ROLAClient+Live.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ROLAClient+Live.swift"; sourceTree = "<group>"; };
@@ -1835,7 +1835,7 @@
 		48CFC0C02ADC10D900E77A5C /* StateEntityDetailsResponseItemDetails.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StateEntityDetailsResponseItemDetails.swift; sourceTree = "<group>"; };
 		48CFC0C12ADC10D900E77A5C /* ValidatorState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValidatorState.swift; sourceTree = "<group>"; };
 		48CFC0C22ADC10D900E77A5C /* GatewayAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GatewayAPI.swift; sourceTree = "<group>"; };
-		48CFC0C42ADC10D900E77A5C /* BackupsClient+Live.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BackupsClient+Live.swift"; sourceTree = "<group>"; };
+		48CFC0C42ADC10D900E77A5C /* TransportProfileClient+Live.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TransportProfileClient+Live.swift"; sourceTree = "<group>"; };
 		48CFC0C62ADC10D900E77A5C /* URLFormatterClient+Test.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "URLFormatterClient+Test.swift"; sourceTree = "<group>"; };
 		48CFC0C72ADC10D900E77A5C /* URLFormatterClient+Interface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "URLFormatterClient+Interface.swift"; sourceTree = "<group>"; };
 		48CFC0C92ADC10D900E77A5C /* SecureStorageClient+Test.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SecureStorageClient+Test.swift"; sourceTree = "<group>"; };
@@ -4287,7 +4287,7 @@
 				48CFBF622ADC10D900E77A5C /* AccountsClient */,
 				48CFBF6C2ADC10D900E77A5C /* AppPreferencesClient */,
 				48CFBF652ADC10D900E77A5C /* AuthorizedDappsClient */,
-				48CFBFAE2ADC10D900E77A5C /* BackupsClient */,
+				48CFBFAE2ADC10D900E77A5C /* TransportProfileClient */,
 				48CFBF772ADC10D900E77A5C /* CacheClient */,
 				48CFC0D62ADC10D900E77A5C /* CameraPermissionClient */,
 				48CFBF562ADC10D900E77A5C /* DappInteractionClient */,
@@ -4539,14 +4539,14 @@
 			path = LocalAuthenticationClient;
 			sourceTree = "<group>";
 		};
-		48CFBFAE2ADC10D900E77A5C /* BackupsClient */ = {
+		48CFBFAE2ADC10D900E77A5C /* TransportProfileClient */ = {
 			isa = PBXGroup;
 			children = (
-				48CFBFAF2ADC10D900E77A5C /* BackupsClient+Test.swift */,
-				48CFC0C42ADC10D900E77A5C /* BackupsClient+Live.swift */,
-				48CFBFB02ADC10D900E77A5C /* BackupsClient+Interface.swift */,
+				48CFBFAF2ADC10D900E77A5C /* TransportProfileClient+Test.swift */,
+				48CFC0C42ADC10D900E77A5C /* TransportProfileClient+Live.swift */,
+				48CFBFB02ADC10D900E77A5C /* TransportProfileClient+Interface.swift */,
 			);
-			path = BackupsClient;
+			path = TransportProfileClient;
 			sourceTree = "<group>";
 		};
 		48CFBFB32ADC10D900E77A5C /* ROLAClient */ = {
@@ -7084,7 +7084,7 @@
 				48CFC3142ADC10D900E77A5C /* CompletionMigrateOlympiaAccountsToBabylon.swift in Sources */,
 				8308184E2B9F16AD002D8351 /* TokenPriceClient+Mock.swift in Sources */,
 				48CFC2852ADC10D900E77A5C /* SubmitTransaction+View.swift in Sources */,
-				48CFC47C2ADC10DA00E77A5C /* BackupsClient+Test.swift in Sources */,
+				48CFC47C2ADC10DA00E77A5C /* TransportProfileClient+Test.swift in Sources */,
 				48CFC28D2ADC10D900E77A5C /* TransactionReviewRawTransaction+View.swift in Sources */,
 				83EE47882AF0EE3C00155F03 /* ProgrammaticScryptoSborValueBytes.swift in Sources */,
 				48CFC2C92ADC10D900E77A5C /* FungibleResourceAsset+View.swift in Sources */,
@@ -7685,7 +7685,7 @@
 				48CFC2A22ADC10D900E77A5C /* Persona+View.swift in Sources */,
 				48CFC5582ADC10DA00E77A5C /* NonFungibleIdType.swift in Sources */,
 				48CFC57D2ADC10DA00E77A5C /* StateEntityDetailsResponseItemDetails.swift in Sources */,
-				48CFC5802ADC10DA00E77A5C /* BackupsClient+Live.swift in Sources */,
+				48CFC5802ADC10DA00E77A5C /* TransportProfileClient+Live.swift in Sources */,
 				48CFC6082ADC10DA00E77A5C /* AccountsRequestResponseItem.swift in Sources */,
 				48AE39E82B0CBEA800813CF3 /* SelectInactiveAccountsToAdd.swift in Sources */,
 				48CFC59A2ADC10DA00E77A5C /* HitTargetSize.swift in Sources */,
@@ -7710,7 +7710,7 @@
 				48CFC5352ADC10DA00E77A5C /* StateEntityDetailsResponseItemAncestorIdentities.swift in Sources */,
 				48CFC4E22ADC10DA00E77A5C /* InvalidEntityError.swift in Sources */,
 				A41557552B7645F70040AD4E /* TransactionHistory+View.swift in Sources */,
-				48CFC47D2ADC10DA00E77A5C /* BackupsClient+Interface.swift in Sources */,
+				48CFC47D2ADC10DA00E77A5C /* TransportProfileClient+Interface.swift in Sources */,
 				48CFC5792ADC10DA00E77A5C /* FungibleResourcesCollectionItem.swift in Sources */,
 				48CFC4AF2ADC10DA00E77A5C /* NonFungibleResourcesCollectionItemGloballyAggregated.swift in Sources */,
 				48CFC54D2ADC10DA00E77A5C /* StateEntityDetailsResponseNonFungibleResourceDetails.swift in Sources */,
