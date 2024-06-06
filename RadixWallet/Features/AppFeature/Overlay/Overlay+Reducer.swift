@@ -103,8 +103,13 @@ struct OverlayReducer: Sendable, FeatureReducer {
 	}
 
 	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
-		if case let .alert(state) = state.itemsQueue.first {
+		switch state.itemsQueue.first {
+		case let .alert(state):
 			overlayWindowClient.sendAlertAction(.dismissed, state.id)
+		case let .fullScreen(state):
+			overlayWindowClient.sendFullScreenAction(.dismiss, state.id)
+		default:
+			break
 		}
 
 		return dismiss(&state)
