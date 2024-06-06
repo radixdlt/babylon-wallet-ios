@@ -175,13 +175,16 @@ extension CloudBackupClient {
 
 		return .init(
 			startAutomaticBackups: {
+				// The active profile should not be synced to iCloud keychain
+				let profileID = await profileStore.profile.id
+				try secureStorageClient.updateIsCloudProfileSyncEnabled(profileID, .disable)
+
 				let ticks = AsyncTimerSequence(every: retryBackupInterval)
 				let profiles = await profileStore.values()
 				var lastClaimCheck: Date = .distantPast
 
 				for try await (profile, tick) in combineLatest(profiles, ticks) {
 					guard !Task.isCancelled else { return }
-					try secureStorageClient.updateIsCloudProfileSyncEnabled(profile.id, .disable)
 
 					// This will skip the ticks that get backed up while we are awaiting performAutomaticBackup
 					guard tick > lastClaimCheck else { continue }
