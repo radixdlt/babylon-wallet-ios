@@ -22,7 +22,6 @@ import Sargon
 /// 	func unlockedApp() async -> Profile
 ///	 	func finishedOnboarding() async
 ///     func finishOnboarding(with _: AccountsRecoveredFromScanningUsingMnemonic) async throws
-///		func importCloudProfileSnapshot(_ h: Profile.Header) throws
 ///	 	func importProfileSnapshot(_ s: Profile) throws
 ///	 	func deleteProfile(keepInICloudIfPresent: Bool) throws
 /// 	func updating<T>(_ t: (inout Profile) async throws -> T) async throws -> T
@@ -116,27 +115,6 @@ extension ProfileStore {
 			var network = try await network()
 			try await update(&network)
 			try profile.updateOnNetwork(network)
-		}
-	}
-
-	/// Looks up a Profile for the given `header` and tries to import it,
-	/// updates `headerList` (Keychain),  `activeProfileID` (UserDefaults)
-	/// and saves the snapshot of the profile into Keychain.
-	/// - Parameter profile: Imported Profile to use and save.
-	public func importCloudProfileSnapshot(
-		_ header: Profile.Header
-	) throws {
-		do {
-			// Load the snapshot, also this will validate if the snapshot actually exist
-			let profileSnapshot = try secureStorageClient.loadProfileSnapshot(header.id)
-			guard let profileSnapshot else {
-				struct FailedToLoadProfile: Swift.Error {}
-				throw FailedToLoadProfile()
-			}
-			try importProfileSnapshot(profileSnapshot)
-		} catch {
-			logAssertionFailure("Critical failure, unable to save imported profile snapshot: \(String(describing: error))", severity: .critical)
-			throw error
 		}
 	}
 

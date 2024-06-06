@@ -114,11 +114,11 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 			}
 			return .run { send in
 				loggerGlobal.notice("Importing snapshot...")
-				try await backupsClient.importSnapshot(
-					profileSelection.profile,
-					fromCloud: profileSelection.isInCloud,
-					containsP2PLinks: profileSelection.containsP2PLinks
+
+				let factorSourceIDs: Set<FactorSourceIDFromHash> = .init(
+					profileSelection.profile.factorSources.compactMap { $0.extract(DeviceFactorSource.self) }.map(\.id)
 				)
+				try await backupsClient.importProfileSnapshot(profileSelection.profile, factorSourceIDs, profileSelection.containsP2PLinks)
 
 				if let notYetSavedNewMainBDFS {
 					try await factorSourcesClient.saveNewMainBDFS(notYetSavedNewMainBDFS)
