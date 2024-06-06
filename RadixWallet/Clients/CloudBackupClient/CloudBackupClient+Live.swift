@@ -146,7 +146,7 @@ extension CloudBackupClient {
 		func performAutomaticBackup(_ profile: Profile, timeToCheckIfClaimed: Bool) async {
 			let needsBackUp = profile.appPreferences.security.isCloudProfileSyncEnabled && profile.header.isNonEmpty
 			let lastBackup = userDefaults.getLastCloudBackups[profile.id]
-			let lastBackupSucceeded = lastBackup?.result == .success && lastBackup?.saveHash == profile.saveHash
+			let lastBackupSucceeded = lastBackup?.result == .success && lastBackup?.saveIdentifier == profile.saveIdentifier
 
 			let shouldBackUp = needsBackUp && !lastBackupSucceeded
 			let shouldCheckClaim = shouldBackUp || timeToCheckIfClaimed
