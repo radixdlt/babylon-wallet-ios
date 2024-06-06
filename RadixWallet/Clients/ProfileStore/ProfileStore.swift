@@ -118,14 +118,6 @@ extension ProfileStore {
 		}
 	}
 
-	/// Change current profile to new imported profle snapshot and saves it, by
-	/// updates `headerList` (Keychain),  `activeProfileID` (UserDefaults)
-	/// and saves the snapshot of the profile into Keychain.
-	/// - Parameter profile: Imported Profile to use and save.
-	public func importProfileSnapshot(_ snapshot: Profile) throws {
-		try importProfile(snapshot)
-	}
-
 	/// Change current profile to new importedProfile and saves it, by
 	/// updates `headerList` (Keychain),  `activeProfileID` (UserDefaults)
 	/// and saves a snapshot of the profile into Keychain.
