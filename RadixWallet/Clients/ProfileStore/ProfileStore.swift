@@ -259,21 +259,8 @@ extension ProfileStore {
 
 	public func unlockedApp() async -> Profile {
 		loggerGlobal.notice("Unlocking app")
-		let buffered = bufferedOwnershipConflictWhileAppLocked
 		self.mode = .appIsUnlocked
-		if let buffered {
-			loggerGlobal.notice("We had a buffered Profile ownership conflict, emitting it now.")
-			do {
-				try await doEmit(conflictingOwners: buffered)
-				return profile // might be a new one! if user selected "delete"
-			} catch {
-				logAssertionFailure("Failure during Profile ownership resolution, error: \(error)")
-				// Not import enough to prevent app from being used
-				return profile
-			}
-		} else {
-			return profile
-		}
+		return profile
 	}
 }
 
@@ -465,33 +452,10 @@ extension ProfileStore {
 				guard appIsUnlocked else {
 					return buffer(conflictingOwners: conflictingOwners)
 				}
-
-				try await doEmit(conflictingOwners: conflictingOwners)
 			}
 			throw Error.profileUsedOnAnotherDevice
 		}
 		// All good
-	}
-
-	private func doEmit(conflictingOwners: ConflictingOwners) async throws {
-		@Dependency(\.overlayWindowClient) var overlayWindowClient
-		assert(appIsUnlocked)
-
-		// We present an alert to user where they must choice if they wanna keep using Profile
-		// on this device or delete it. If they delete a new one will be created and we will
-		// onboard user...
-		let choiceByUser = await overlayWindowClient.scheduleAlert(.profileUsedOnAnotherDeviceAlert(
-			conflictingOwners: conflictingOwners
-		))
-
-		if choiceByUser == .claimAndContinueUseOnThisPhone {
-			try self.claimOwnershipOfProfile()
-		} else if choiceByUser == .deleteProfileFromThisPhone {
-			try self._deleteProfile(
-				keepInICloudIfPresent: true, // local resolution should not affect iCloud
-				assertOwnership: false // duh.. we know we had a conflict, ownership check will fail.
-			)
-		}
 	}
 }
 
