@@ -108,7 +108,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.cloudBackupClient) var cloudBackupClient
-	@Dependency(\.backupsClient) var backupsClient
+	@Dependency(\.transportProfileClient) var transportProfileClient
 	@Dependency(\.securityCenterClient) var securityCenterClient
 	@Dependency(\.userDefaults) var userDefaults
 
@@ -150,7 +150,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			overlayWindowClient.scheduleHUD(.exportedProfile(encrypted: didEncryptIt))
 			loggerGlobal.notice("Profile successfully exported to: \(exportedProfileURL)")
 			if let profile {
-				try? backupsClient.didExportProfileSnapshot(profile)
+				try? transportProfileClient.didExportProfile(profile)
 			}
 			return .none
 

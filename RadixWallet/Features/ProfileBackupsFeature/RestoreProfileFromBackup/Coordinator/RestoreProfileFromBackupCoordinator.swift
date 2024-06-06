@@ -60,7 +60,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 		case profileCreatedFromImportedBDFS
 	}
 
-	@Dependency(\.backupsClient) var backupsClient
+	@Dependency(\.transportProfileClient) var transportProfileClient
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.continuousClock) var clock
@@ -117,7 +117,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 				let factorSourceIDs: Set<FactorSourceIDFromHash> = .init(
 					profileSelection.profile.factorSources.compactMap { $0.extract(DeviceFactorSource.self) }.map(\.id)
 				)
-				try await backupsClient.importProfileSnapshot(profileSelection.profile, factorSourceIDs, profileSelection.containsP2PLinks)
+				try await transportProfileClient.importProfile(profileSelection.profile, factorSourceIDs, profileSelection.containsP2PLinks)
 
 				if let notYetSavedNewMainBDFS {
 					try await factorSourcesClient.saveNewMainBDFS(notYetSavedNewMainBDFS)

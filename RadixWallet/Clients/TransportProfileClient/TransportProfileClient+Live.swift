@@ -1,5 +1,5 @@
 
-extension BackupsClient: DependencyKey {
+extension TransportProfileClient: DependencyKey {
 	public static let liveValue = Self.live()
 
 	public static func live(
@@ -9,10 +9,7 @@ extension BackupsClient: DependencyKey {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 
 		return Self(
-			snapshotOfProfileForExport: {
-				await profileStore.profile
-			},
-			importProfileSnapshot: { snapshot, factorSourceIDs, containsP2PLinks in
+			importProfile: { snapshot, factorSourceIDs, containsP2PLinks in
 				do {
 					try await profileStore.importProfileSnapshot(snapshot)
 					userDefaults.setShowRelinkConnectorsAfterProfileRestore(containsP2PLinks)
@@ -24,7 +21,10 @@ extension BackupsClient: DependencyKey {
 					throw error
 				}
 			},
-			didExportProfileSnapshot: { profile in
+			profileForExport: {
+				await profileStore.profile
+			},
+			didExportProfile: { profile in
 				try userDefaults.setLastManualBackup(of: profile)
 			},
 			loadDeviceID: {

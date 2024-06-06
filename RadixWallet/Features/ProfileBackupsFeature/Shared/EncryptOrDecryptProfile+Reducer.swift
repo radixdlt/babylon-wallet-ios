@@ -94,7 +94,7 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 
 	@Dependency(\.jsonEncoder) var jsonEncoder
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.backupsClient) var backupsClient
+	@Dependency(\.transportProfileClient) var transportProfileClient
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -112,7 +112,7 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 				await send(.internal(.focusTextField(.encryptionPassword)))
 				switch mode {
 				case .loadThenEncrypt:
-					let result = await TaskResult { try await backupsClient.snapshotOfProfileForExport() }
+					let result = await TaskResult { try await transportProfileClient.profileForExport() }
 
 					await send(.internal(.loadProfileSnapshotToEncryptResult(
 						result
