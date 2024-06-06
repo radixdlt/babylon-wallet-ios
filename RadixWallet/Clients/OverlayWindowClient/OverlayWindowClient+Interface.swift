@@ -8,7 +8,7 @@ public struct OverlayWindowClient: Sendable {
 	/// Usually to be called from the Main Window.
 	public var scheduleAlert: ScheduleAlert
 
-	/// Schedule an Alert to be shown in the Overlay Window, but don't want for any action
+	/// Schedule an Alert to be shown in the Overlay Window, but don't wait for any action
 	public var scheduleAlertAndIgnoreAction: ScheduleAlertAndIgnoreAction
 
 	/// Schedule a HUD to be shown in the Overlay Window.
