@@ -5,7 +5,6 @@ import SwiftUI
 // MARK: - ProfileSelection
 public struct ProfileSelection: Sendable, Hashable {
 	public let profile: Profile
-	public let isInCloud: Bool
 	public let containsP2PLinks: Bool
 }
 
@@ -90,8 +89,8 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .root(.selectBackup(.delegate(.selectedProfile(profile, isInCloud, containsLegacyP2PLinks)))):
-			state.profileSelection = .init(profile: profile, isInCloud: isInCloud, containsP2PLinks: containsLegacyP2PLinks)
+		case let .root(.selectBackup(.delegate(.selectedProfile(profile, containsLegacyP2PLinks)))):
+			state.profileSelection = .init(profile: profile, containsP2PLinks: containsLegacyP2PLinks)
 
 			return .run { send in
 				try? await clock.sleep(for: .milliseconds(300))
