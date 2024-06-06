@@ -405,6 +405,6 @@ struct Row_Preview: PreviewProvider {
 }
 
 extension Home.AccountRow.State {
-	public static let previewValue = Self(account: .previewValue0)
+	public static let previewValue = Self(account: .previewValue0, problems: [])
 }
 #endif

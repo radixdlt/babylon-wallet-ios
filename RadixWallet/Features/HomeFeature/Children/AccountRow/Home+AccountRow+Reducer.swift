@@ -15,12 +15,13 @@ extension Home {
 			public var entitySecurityProblems: EntitySecurityProblems.State
 
 			public init(
-				account: Account
+				account: Account,
+				problems: [SecurityProblem]
 			) {
 				self.accountWithInfo = .init(account: account)
 				self.accountWithResources = .loading
 				self.totalFiatWorth = .loading
-				self.entitySecurityProblems = .init(kind: .account(account.address))
+				self.entitySecurityProblems = .init(kind: .account(account.address), problems: problems)
 			}
 		}
 

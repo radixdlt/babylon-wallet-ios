@@ -8,9 +8,16 @@ public struct EntitySecurityProblems: Sendable, FeatureReducer {
 
 		let kind: Kind
 		var problems: [SecurityProblem] = []
+		fileprivate let loadProblems: Bool
 
-		public init(kind: Kind) {
+		public init(kind: Kind, problems: [SecurityProblem]? = nil) {
 			self.kind = kind
+			if let problems {
+				self.problems = problems.filter(kind: kind)
+				self.loadProblems = false
+			} else {
+				self.loadProblems = true
+			}
 		}
 	}
 
@@ -31,10 +38,11 @@ public struct EntitySecurityProblems: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public func reduce(into _: inout State, viewAction: ViewAction) -> Effect<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			securityProblemsEffect()
+			state.loadProblems ? securityProblemsEffect() : .none
+
 		case .rowTapped:
 			.send(.delegate(.openSecurityCenter))
 		}
