@@ -9,9 +9,9 @@ extension TransportProfileClient: DependencyKey {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 
 		return Self(
-			importProfile: { snapshot, factorSourceIDs, containsP2PLinks in
+			importProfile: { profile, factorSourceIDs, containsP2PLinks in
 				do {
-					try await profileStore.importProfileSnapshot(snapshot)
+					try await profileStore.importProfile(profile)
 					userDefaults.setShowRelinkConnectorsAfterProfileRestore(containsP2PLinks)
 				} catch {
 					// Revert the saved mnemonic
@@ -26,9 +26,6 @@ extension TransportProfileClient: DependencyKey {
 			},
 			didExportProfile: { profile in
 				try userDefaults.setLastManualBackup(of: profile)
-			},
-			loadDeviceID: {
-				try? secureStorageClient.loadDeviceInfo()?.id
 			}
 		)
 	}
