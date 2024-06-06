@@ -12,7 +12,6 @@ extension BackupsClient: TestDependencyKey {
 
 	public static let testValue = Self(
 		snapshotOfProfileForExport: unimplemented("\(Self.self).snapshotOfProfileForExport"),
-		loadProfileBackups: unimplemented("\(Self.self).loadProfile"),
 		importProfileSnapshot: unimplemented("\(Self.self).importProfileSnapshot"),
 		didExportProfileSnapshot: unimplemented("\(Self.self).didExportProfileSnapshot"),
 		loadDeviceID: unimplemented("\(Self.self).loadDeviceID")
@@ -20,7 +19,6 @@ extension BackupsClient: TestDependencyKey {
 
 	public static let noop = Self(
 		snapshotOfProfileForExport: { throw NoopError() },
-		loadProfileBackups: { nil },
 		importProfileSnapshot: { _, _, _ in throw NoopError() },
 		didExportProfileSnapshot: { _ in throw NoopError() },
 		loadDeviceID: { nil }
