@@ -45,7 +45,7 @@ extension SecurityCenterClient {
 		func statusValues(results: AnyAsyncSequence<BackupResult?>) async -> AnyAsyncSequence<BackupStatus?> {
 			await combineLatest(profileStore.values(), results.prepend(nil)).map { profile, backup in
 				guard let backup else { return nil }
-				let upToDate = backup.saveHash == profile.saveHash
+				let upToDate = backup.saveIdentifier == profile.saveIdentifier
 				let success = backup.result == .success
 				return .init(backupDate: backup.backupDate, upToDate: upToDate, success: success)
 			}
