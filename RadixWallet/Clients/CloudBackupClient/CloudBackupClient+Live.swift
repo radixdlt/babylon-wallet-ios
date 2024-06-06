@@ -124,8 +124,7 @@ extension CloudBackupClient {
 		}
 
 		@Sendable
-		func backupProfileAndSaveResult(existingRecord: CKRecord?) async {
-			let profile = await profileStore.profile
+		func backupProfileAndSaveResult(_ profile: Profile, existingRecord: CKRecord?) async {
 			let result: BackupResult.Result
 			do {
 				let json = profile.toJSONString()
@@ -168,7 +167,7 @@ extension CloudBackupClient {
 
 			guard shouldBackUp || shouldReclaim else { return }
 
-			await backupProfileAndSaveResult(existingRecord: existingRecord)
+			await backupProfileAndSaveResult(profile, existingRecord: existingRecord)
 		}
 
 		let retryBackupInterval: DispatchTimeInterval = .seconds(60)
