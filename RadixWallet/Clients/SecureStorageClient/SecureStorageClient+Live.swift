@@ -274,7 +274,7 @@ extension SecureStorageClient: DependencyKey {
 			try saveProfile(
 				snapshotData: profile.profileSnapshot(),
 				key: profile.header.id.keychainKey,
-				iCloudSyncEnabled: profile.appPreferences.security.isCloudProfileSyncEnabled
+				iCloudSyncEnabled: false
 			)
 		}
 
