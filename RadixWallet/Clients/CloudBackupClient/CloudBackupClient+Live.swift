@@ -177,7 +177,7 @@ extension CloudBackupClient {
 			startAutomaticBackups: {
 				// The active profile should not be synced to iCloud keychain
 				let profileID = await profileStore.profile.id
-				try secureStorageClient.updateIsCloudProfileSyncEnabled(profileID, .disable)
+				try secureStorageClient.disableCloudProfileSync(profileID)
 
 				let ticks = AsyncTimerSequence(every: retryBackupInterval)
 				let profiles = await profileStore.values()
