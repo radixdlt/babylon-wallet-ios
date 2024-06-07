@@ -12,7 +12,7 @@ extension Home {
 			public var accountWithResources: Loadable<OnLedgerEntity.OnLedgerAccount>
 			public var showFiatWorth: Bool = true
 			public var totalFiatWorth: Loadable<FiatWorth>
-			public var entitySecurityProblems: EntitySecurityProblems.State
+			public var securityProblemsConfig: EntitySecurityProblemsView.Config
 
 			public init(
 				account: Account,
@@ -21,12 +21,13 @@ extension Home {
 				self.accountWithInfo = .init(account: account)
 				self.accountWithResources = .loading
 				self.totalFiatWorth = .loading
-				self.entitySecurityProblems = .init(kind: .account(account.address), problems: problems)
+				self.securityProblemsConfig = .init(kind: .account(account.address), problems: problems)
 			}
 		}
 
 		public enum ViewAction: Sendable, Equatable {
 			case tapped
+			case securityProblemsTapped
 		}
 
 		public enum InternalAction: Sendable, Equatable {
@@ -39,26 +40,16 @@ extension Home {
 			case openSecurityCenter
 		}
 
-		@CasePathable
-		public enum ChildAction: Sendable, Equatable {
-			case entitySecurityProblems(EntitySecurityProblems.Action)
-		}
-
 		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.userDefaults) var userDefaults
-
-		public var body: some ReducerOf<Self> {
-			Scope(state: \.entitySecurityProblems, action: \.child.entitySecurityProblems) {
-				EntitySecurityProblems()
-			}
-			Reduce(core)
-		}
 
 		public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
 			case .tapped:
 				.send(.delegate(.openDetails))
+			case .securityProblemsTapped:
+				.send(.delegate(.openSecurityCenter))
 			}
 		}
 
@@ -75,15 +66,6 @@ extension Home {
 			case let .fiatWorthUpdated(fiatWorth):
 				state.totalFiatWorth.refresh(from: fiatWorth)
 				return .none
-			}
-		}
-
-		public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-			switch childAction {
-			case .entitySecurityProblems(.delegate(.openSecurityCenter)):
-				.send(.delegate(.openSecurityCenter))
-			default:
-				.none
 			}
 		}
 	}

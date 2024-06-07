@@ -6,7 +6,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, AccountWithInfoHolder {
 		public var accountWithInfo: AccountWithInfo
 		var assets: AssetsView.State
-		var entitySecurityProblems: EntitySecurityProblems.State
+		var problems: [SecurityProblem] = []
 		var showFiatWorth: Bool
 
 		@PresentationState
@@ -22,7 +22,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
 				account: accountWithInfo.account,
 				mode: .normal
 			)
-			self.entitySecurityProblems = .init(kind: .account(accountWithInfo.account.address))
 		}
 	}
 
@@ -33,12 +32,12 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case transferButtonTapped
 		case historyButtonTapped
 		case showFiatWorthToggled
+		case securityProblemsTapped
 	}
 
 	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case assets(AssetsView.Action)
-		case entitySecurityProblems(EntitySecurityProblems.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -47,6 +46,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case accountUpdated(Account)
+		case setSecurityProblems([SecurityProblem])
 	}
 
 	public struct Destination: DestinationReducer {
@@ -113,15 +113,13 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.dappInteractionClient) var dappInteractionClient
+	@Dependency(\.securityCenterClient) var securityCenterClient
 
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
 		Scope(state: \.assets, action: \.child.assets) {
 			AssetsView()
-		}
-		Scope(state: \.entitySecurityProblems, action: \.child.entitySecurityProblems) {
-			EntitySecurityProblems()
 		}
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
@@ -140,6 +138,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 					await send(.internal(.accountUpdated(accountUpdate)))
 				}
 			}
+			.merge(with: securityProblemsEffect())
 
 		case .backButtonTapped:
 			return .send(.delegate(.dismiss))
@@ -167,6 +166,10 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			return .run { _ in
 				try await appPreferencesClient.toggleIsCurrencyAmountVisible()
 			}
+
+		case .securityProblemsTapped:
+			state.destination = .securityCenter(.init())
+			return .none
 		}
 	}
 
@@ -174,6 +177,9 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .accountUpdated(account):
 			state.account = account
+			return .none
+		case let .setSecurityProblems(problems):
+			state.problems = problems
 			return .none
 		}
 	}
@@ -221,10 +227,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			}
 			return .none
 
-		case .entitySecurityProblems(.delegate(.openSecurityCenter)):
-			state.destination = .securityCenter(.init())
-			return .none
-
 		default:
 			return .none
 		}
@@ -261,6 +263,15 @@ public struct AccountDetails: Sendable, FeatureReducer {
 				.transaction(.init(send: .init(transactionManifest: manifest))),
 				.accountTransfer
 			)
+		}
+	}
+
+	private func securityProblemsEffect() -> Effect<Action> {
+		.run { send in
+			for try await problems in await securityCenterClient.problems() {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.setSecurityProblems(problems)))
+			}
 		}
 	}
 }

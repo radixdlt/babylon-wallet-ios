@@ -26,8 +26,10 @@ extension PersonaFeature {
 								Thumbnail(.persona, url: viewStore.thumbnail)
 							}
 							if showShield {
-								EntitySecurityProblems.View(store: store.entitySecurityProblems)
-									.padding(.horizontal, .medium3)
+								EntitySecurityProblemsView(config: viewStore.securityProblemsConfig) {
+									viewStore.send(.securityProblemsTapped)
+								}
+								.padding(.horizontal, .medium3)
 							}
 						}
 					}
@@ -40,12 +42,6 @@ extension PersonaFeature {
 				}
 			}
 		}
-	}
-}
-
-private extension StoreOf<PersonaFeature> {
-	var entitySecurityProblems: StoreOf<EntitySecurityProblems> {
-		scope(state: \.entitySecurityProblems, action: \.child.entitySecurityProblems)
 	}
 }
 
@@ -70,6 +66,6 @@ struct Persona_Preview: PreviewProvider {
 }
 
 extension PersonaFeature.State {
-	public static let previewValue: Self = .init(persona: .previewValue0)
+	public static let previewValue: Self = .init(persona: .previewValue0, problems: [])
 }
 #endif

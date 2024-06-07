@@ -278,7 +278,7 @@ public struct Home: Sendable, FeatureReducer {
 		case let .setSecurityProblems(problems):
 			state.problems = problems
 			state.accountRows.mutateAll { row in
-				row.entitySecurityProblems.update(problems: problems)
+				row.securityProblemsConfig.update(problems: problems)
 			}
 			return .none
 		}

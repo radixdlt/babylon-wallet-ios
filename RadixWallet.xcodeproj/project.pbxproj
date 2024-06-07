@@ -917,8 +917,7 @@
 		5B758D582BCE7AEC00348722 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B758D562BCE7AEC00348722 /* Preferences.swift */; };
 		5B758D5C2BCEC3B200348722 /* Troubleshooting+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B758D5A2BCEC3B200348722 /* Troubleshooting+View.swift */; };
 		5B758D5D2BCEC3B200348722 /* Troubleshooting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B758D5B2BCEC3B200348722 /* Troubleshooting.swift */; };
-		5B77D7B32C0DFE8300F5F215 /* EntitySecurityProblems.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B77D7B02C0DFE8300F5F215 /* EntitySecurityProblems.swift */; };
-		5B77D7B42C0DFE8300F5F215 /* EntitySecurityProblems+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B77D7B12C0DFE8300F5F215 /* EntitySecurityProblems+View.swift */; };
+		5B77D7B42C0DFE8300F5F215 /* EntitySecurityProblemsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B77D7B12C0DFE8300F5F215 /* EntitySecurityProblemsView.swift */; };
 		5B9846BD2BBD5C8800E814F3 /* SensitiveInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B9846BC2BBD5C8800E814F3 /* SensitiveInfo.plist */; };
 		5B9846C02BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9846BF2BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift */; };
 		5B9846C22BBD5F7600E814F3 /* SensitiveInfoClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9846C12BBD5F7600E814F3 /* SensitiveInfoClient+Live.swift */; };
@@ -2057,8 +2056,7 @@
 		5B758D562BCE7AEC00348722 /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
 		5B758D5A2BCEC3B200348722 /* Troubleshooting+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Troubleshooting+View.swift"; sourceTree = "<group>"; };
 		5B758D5B2BCEC3B200348722 /* Troubleshooting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Troubleshooting.swift; sourceTree = "<group>"; };
-		5B77D7B02C0DFE8300F5F215 /* EntitySecurityProblems.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EntitySecurityProblems.swift; sourceTree = "<group>"; };
-		5B77D7B12C0DFE8300F5F215 /* EntitySecurityProblems+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "EntitySecurityProblems+View.swift"; sourceTree = "<group>"; };
+		5B77D7B12C0DFE8300F5F215 /* EntitySecurityProblemsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EntitySecurityProblemsView.swift; sourceTree = "<group>"; };
 		5B9846BC2BBD5C8800E814F3 /* SensitiveInfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = SensitiveInfo.plist; sourceTree = "<group>"; };
 		5B9846BF2BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SensitiveInfoClient+Interface.swift"; sourceTree = "<group>"; };
 		5B9846C12BBD5F7600E814F3 /* SensitiveInfoClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SensitiveInfoClient+Live.swift"; sourceTree = "<group>"; };
@@ -2526,7 +2524,6 @@
 		48CFBC602ADC10D800E77A5C /* Features */ = {
 			isa = PBXGroup;
 			children = (
-				5B77D7B22C0DFE8300F5F215 /* EntitySecurityProblems */,
 				E7AE2D082C05F22700830BAA /* ClaimWallet */,
 				A43F1E242BC96EF2001DD3FA /* SecurityCenterFeature */,
 				48D5F3972BD8DE0A000DE964 /* DebugInspectProfile */,
@@ -5053,6 +5050,7 @@
 				A4CFB55E2BAA821E00778BDD /* HScrollBar.swift */,
 				A4CFB5602BAA826E00778BDD /* Measure+Position.swift */,
 				E7B7A0FC2BBBFB6100EEE900 /* HeaderListViewContainer.swift */,
+				5B77D7B12C0DFE8300F5F215 /* EntitySecurityProblemsView.swift */,
 			);
 			path = DesignSystem;
 			sourceTree = "<group>";
@@ -5732,15 +5730,6 @@
 				5B2F2DCE2BED1641009FBFA3 /* FactoryReset */,
 			);
 			path = Troubleshooting;
-			sourceTree = "<group>";
-		};
-		5B77D7B22C0DFE8300F5F215 /* EntitySecurityProblems */ = {
-			isa = PBXGroup;
-			children = (
-				5B77D7B02C0DFE8300F5F215 /* EntitySecurityProblems.swift */,
-				5B77D7B12C0DFE8300F5F215 /* EntitySecurityProblems+View.swift */,
-			);
-			path = EntitySecurityProblems;
 			sourceTree = "<group>";
 		};
 		5B9846BE2BBD5EF600E814F3 /* SensitiveInfoClient */ = {
@@ -7276,7 +7265,7 @@
 				48CFC4442ADC10DA00E77A5C /* DappInteractionClient+Live.swift in Sources */,
 				48CFC5D22ADC10DA00E77A5C /* OnSizeChanged.swift in Sources */,
 				48CFC4202ADC10DA00E77A5C /* RandomBytes.swift in Sources */,
-				5B77D7B42C0DFE8300F5F215 /* EntitySecurityProblems+View.swift in Sources */,
+				5B77D7B42C0DFE8300F5F215 /* EntitySecurityProblemsView.swift in Sources */,
 				A462B58C2B83673000C26D20 /* StateKeyValueStoreKeysCollection.swift in Sources */,
 				48CFC5AB2ADC10DA00E77A5C /* InertButtonStyle.swift in Sources */,
 				48CFC4412ADC10DA00E77A5C /* RadixConnectClient+Test.swift in Sources */,
@@ -7588,7 +7577,6 @@
 				48CFC4FB2ADC10DA00E77A5C /* LedgerState.swift in Sources */,
 				48CFC55E2ADC10DA00E77A5C /* ComponentEntityRoleAssignments.swift in Sources */,
 				48CFC3502ADC10D900E77A5C /* PersonaRow.swift in Sources */,
-				5B77D7B32C0DFE8300F5F215 /* EntitySecurityProblems.swift in Sources */,
 				48CFC5F02ADC10DA00E77A5C /* UserDefaultsClient+AccountRecovery.swift in Sources */,
 				48CFC3562ADC10D900E77A5C /* ImportOlympiaLedgerAccountsAndFactorSources.swift in Sources */,
 				48CFC5782ADC10DA00E77A5C /* GatewayError.swift in Sources */,

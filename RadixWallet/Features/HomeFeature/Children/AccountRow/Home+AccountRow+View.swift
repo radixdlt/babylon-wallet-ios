@@ -9,6 +9,7 @@ extension Home.AccountRow {
 		let fiatWorth: Loadable<FiatWorth>
 		let appearanceID: AppearanceID
 		let isLoadingResources: Bool
+		let securityProblemsConfig: EntitySecurityProblemsView.Config
 
 		public enum AccountTag: Int, Hashable, Identifiable, Sendable {
 			case ledgerBabylon
@@ -47,6 +48,7 @@ extension Home.AccountRow {
 			self.showFiatWorth = state.showFiatWorth
 			self.fiatWorth = state.totalFiatWorth
 			self.isLoadingResources = state.accountWithResources.isLoading
+			self.securityProblemsConfig = state.securityProblemsConfig
 
 			self.tag = .init(state: state)
 			self.isLedgerAccount = state.isLedgerAccount
@@ -125,7 +127,9 @@ extension Home.AccountRow {
 
 					ownedResourcesList(viewStore)
 
-					EntitySecurityProblems.View(store: store.entitySecurityProblems)
+					EntitySecurityProblemsView(config: viewStore.securityProblemsConfig) {
+						viewStore.send(.securityProblemsTapped)
+					}
 				}
 				.padding(.horizontal, .medium1)
 				.padding(.vertical, .medium2)
@@ -380,12 +384,6 @@ extension Home.AccountRow.ViewState.AccountTag {
 		case .ledgerBabylon:
 			L10n.HomePage.AccountsTag.ledgerBabylon
 		}
-	}
-}
-
-private extension StoreOf<Home.AccountRow> {
-	var entitySecurityProblems: StoreOf<EntitySecurityProblems> {
-		scope(state: \.entitySecurityProblems, action: \.child.entitySecurityProblems)
 	}
 }
 
