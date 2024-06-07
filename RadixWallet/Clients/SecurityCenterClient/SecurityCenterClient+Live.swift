@@ -52,64 +52,73 @@ extension SecurityCenterClient {
 			.eraseToAnyAsyncSequence()
 		}
 
-		return .init(
-			problems: { type in
-				let profiles = await profileStore.values()
-				let cloudBackups = await cloudBackups()
-				let manualBackups = await manualBackups()
+		let problemsSubject = AsyncCurrentValueSubject<[SecurityProblem]>([])
 
-				return combineLatest(profiles, cloudBackups, manualBackups).map { profile, cloudBackup, manualBackup in
-					let isCloudProfileSyncEnabled = profile.appPreferences.security.isCloudProfileSyncEnabled
+		@Sendable
+		func startMonitoringProblems() async throws {
+			let profileValues = await profileStore.values()
+			let cloudBackupValues = await cloudBackups()
+			let manualBackupValues = await manualBackups()
+			let problematicValues = try await deviceFactorSourceClient.problematicEntities()
 
-					let problematic = try? await deviceFactorSourceClient.problematicEntities()
+			let first = combineLatest(profileValues, problematicValues)
+			let second = combineLatest(cloudBackupValues, manualBackupValues)
+			for try await (profileProblematic, backups) in combineLatest(first, second) {
+				let isCloudProfileSyncEnabled = profileProblematic.0.appPreferences.security.isCloudProfileSyncEnabled
+				let problematic = profileProblematic.1
+				let cloudBackup = backups.0
+				let manualBackup = backups.1
 
-					func hasProblem3() async -> ProblematicAddresses? {
-						guard let problematic, !problematic.unrecoverable.isEmpty else { return nil }
-						return problematic.unrecoverable
-					}
-
-					func hasProblem5() -> Bool {
-						if isCloudProfileSyncEnabled, let cloudBackup {
-							!cloudBackup.success
-						} else {
-							false // FIXME: GK - is this what we want?
-						}
-					}
-
-					func hasProblem6() -> Bool {
-						!isCloudProfileSyncEnabled && manualBackup == nil
-					}
-
-					func hasProblem7() -> Bool {
-						!isCloudProfileSyncEnabled && manualBackup?.upToDate == false
-					}
-
-					func hasProblem9() async -> ProblematicAddresses? {
-						guard let problematic, !problematic.mnemonicMissing.isEmpty else { return nil }
-						return problematic.mnemonicMissing
-					}
-
-					var result: [SecurityProblem] = []
-
-					if type == nil || type == .securityFactors {
-						if let addresses = await hasProblem3() {
-							result.append(.problem3(addresses: addresses))
-						}
-
-						if let addresses = await hasProblem9() {
-							result.append(.problem9(addresses: addresses))
-						}
-					}
-
-					if type == nil || type == .configurationBackup {
-						if hasProblem5() { result.append(.problem5) }
-						if hasProblem6() { result.append(.problem6) }
-						if hasProblem7() { result.append(.problem7) }
-					}
-
-					return result
+				func hasProblem3() async -> ProblematicAddresses? {
+					problematic.unrecoverable.isEmpty ? nil : problematic.unrecoverable
 				}
-				.eraseToAnyAsyncSequence()
+
+				func hasProblem5() -> Bool {
+					if isCloudProfileSyncEnabled, let cloudBackup {
+						!cloudBackup.success
+					} else {
+						false // FIXME: GK - is this what we want?
+					}
+				}
+
+				func hasProblem6() -> Bool {
+					!isCloudProfileSyncEnabled && manualBackup == nil
+				}
+
+				func hasProblem7() -> Bool {
+					!isCloudProfileSyncEnabled && manualBackup?.upToDate == false
+				}
+
+				func hasProblem9() async -> ProblematicAddresses? {
+					problematic.mnemonicMissing.isEmpty ? nil : problematic.mnemonicMissing
+				}
+
+				var result: [SecurityProblem] = []
+
+				if let addresses = await hasProblem3() {
+					result.append(.problem3(addresses: addresses))
+				}
+
+				if let addresses = await hasProblem9() {
+					result.append(.problem9(addresses: addresses))
+				}
+				if hasProblem5() { result.append(.problem5) }
+				if hasProblem6() { result.append(.problem6) }
+				if hasProblem7() { result.append(.problem7) }
+
+				print("M- Sending result: \(result.map(\.number))")
+
+				problemsSubject.send(result)
+			}
+		}
+
+		return .init(
+			startMonitoring: startMonitoringProblems,
+			problems: { type in
+				problemsSubject
+					.share()
+					.map { $0.filter { type == nil || $0.type == type } }
+					.eraseToAnyAsyncSequence()
 			},
 			lastManualBackup: manualBackups,
 			lastCloudBackup: cloudBackups
