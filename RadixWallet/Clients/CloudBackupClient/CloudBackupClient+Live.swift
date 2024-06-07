@@ -222,11 +222,11 @@ extension CloudBackupClient {
 					return (profileData, header)
 				}
 
-				let migrated = try await migratable.asyncMap { profileData, header in
+				let migrated: [CKRecord] = try await migratable.asyncCompactMap { profileData, header in
 					let backedUpRecord = backedUpRecords.first { $0.recordID.recordName == header.id.uuidString }
 					if let backedUpRecord, try getProfileHeader(backedUpRecord).lastModified >= header.lastModified {
-						// We already have a more recent version backed up on iCloud, so we return that
-						return backedUpRecord
+						// We already have a more recent version backed up on iCloud
+						return nil
 					}
 
 					return try await backupProfile(.left(profileData), header: header, existingRecord: backedUpRecord)
