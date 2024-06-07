@@ -12,4 +12,10 @@ extension UserDefaults.Dependency {
 	public func removeAllFactorSourceIDsOfBackedUpMnemonics() {
 		remove(.mnemonicsUserClaimsToHaveBackedUp)
 	}
+
+	public func factorSourceIDOfBackedUpMnemonics() -> AnyAsyncSequence<OrderedSet<FactorSourceIDFromHash>> {
+		codableValues(key: .mnemonicsUserClaimsToHaveBackedUp, codable: OrderedSet<FactorSourceIDFromHash>.self)
+			.map { (try? $0.get()) ?? [] }
+			.eraseToAnyAsyncSequence()
+	}
 }

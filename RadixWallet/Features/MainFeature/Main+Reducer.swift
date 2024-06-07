@@ -53,6 +53,7 @@ public struct Main: Sendable, FeatureReducer {
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.cloudBackupClient) var cloudBackupClient
+	@Dependency(\.securityCenterClient) var securityCenterClient
 
 	public init() {}
 
@@ -72,6 +73,7 @@ public struct Main: Sendable, FeatureReducer {
 		switch viewAction {
 		case .task:
 			startAutomaticBackupsEffect()
+				.merge(with: startMonitoringSecurityCenterEffect())
 				.merge(with: gatewayValuesEffect())
 		}
 	}
@@ -82,6 +84,16 @@ public struct Main: Sendable, FeatureReducer {
 				try await cloudBackupClient.startAutomaticBackups()
 			} catch {
 				loggerGlobal.notice("cloudBackupClient.startAutomaticBackups failed: \(error)")
+			}
+		}
+	}
+
+	private func startMonitoringSecurityCenterEffect() -> Effect<Action> {
+		.run { _ in
+			do {
+				try await securityCenterClient.startMonitoring()
+			} catch {
+				loggerGlobal.notice("securityCenterClient.startMonitoring failed: \(error)")
 			}
 		}
 	}
