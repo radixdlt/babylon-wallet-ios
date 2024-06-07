@@ -122,8 +122,6 @@ extension CloudBackupClient {
 		@Sendable
 		func backupProfileAndSaveResult(_ profile: Profile, existingRecord: CKRecord?) async throws {
 			try? userDefaults.setLastCloudBackup(.started(.now), of: profile)
-			print("•• start backup \(Date.now.formatted(date: .omitted, time: .standard))]")
-			try await Task.sleep(nanoseconds: 5_000_000_000)
 
 			do {
 				let json = profile.toJSONString()
@@ -145,7 +143,6 @@ extension CloudBackupClient {
 			}
 
 			try? userDefaults.setLastCloudBackup(.success, of: profile)
-			print("•• saved backup \(Date.now.formatted(date: .omitted, time: .standard))]")
 		}
 
 		@Sendable
@@ -174,8 +171,6 @@ extension CloudBackupClient {
 			guard shouldBackUp || shouldReclaim else { return }
 
 			try? await backupProfileAndSaveResult(profile, existingRecord: existingRecord)
-
-			print("•• backed up")
 		}
 
 		let retryBackupInterval: DispatchTimeInterval = .seconds(60)

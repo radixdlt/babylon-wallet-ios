@@ -27,21 +27,22 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			return !cloudBackupsEnabled && !lastCloudBackup.upToDate
 		}
 
-		public var showActionsRequiredAndLastBackup: Bool {
-			guard let lastCloudBackup else { return false }
+		public var actionsRequired: [Item] {
+			guard let lastCloudBackup else { return [] }
 			if lastCloudBackup.upToDate, !lastCloudBackup.result.failed {
-				return false
+				return []
 			} else {
-				return true
+				return Item.allCases
 			}
 		}
 
-		public var actionsRequired: [Item] {
-			showActionsRequiredAndLastBackup ? Item.allCases : []
-		}
-
 		public var displayedLastBackup: Date? {
-			showActionsRequiredAndLastBackup ? lastCloudBackup?.result.backupDate : nil
+			guard let lastCloudBackup else { return nil }
+			if lastCloudBackup.result.succeeded {
+				return lastCloudBackup.upToDate ? nil : lastCloudBackup.result.backupDate
+			} else {
+				return lastCloudBackup.result.lastSuccess
+			}
 		}
 
 		public init() {}
