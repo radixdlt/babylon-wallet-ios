@@ -74,19 +74,17 @@ extension DeviceFactorSourceClient: DependencyKey {
 		}
 
 		let problematicEntities: @Sendable () async throws -> AnyAsyncSequence<(mnemonicMissing: ProblematicAddresses, unrecoverable: ProblematicAddresses)> = {
-			let factorSources = try await factorSourcesClient.getFactorSources(type: DeviceFactorSource.self)
-
-			return await combineLatest(userDefaults.factorSourceIDOfBackedUpMnemonics(), userDefaults.aux(), profileStore.values()).map { backedUpFactorSources, aux, profile in
+			await combineLatest(factorSourcesClient.gustaf(), userDefaults.factorSourceIDOfBackedUpMnemonics(), profileStore.values()).map { factorSources, backedUpFactorSources, profile in
 				let mnemonicMissingFactorSources = factorSources
-					.filter { !aux.contains($0.id) }
-					.map(\.id)
+					.filter(not(\.value))
+					.map(\.key)
 
-				let mnemonicPresentFactorSources = factorSources
-					.filter { aux.contains($0.id) }
+				let mnemomincPresentFactorSources = factorSources
+					.filter(\.value)
+					.map(\.key)
 
-				let unrecoverableFactorSources = mnemonicPresentFactorSources
-					.filter { !backedUpFactorSources.contains($0.id) }
-					.map(\.id)
+				let unrecoverableFactorSources = mnemomincPresentFactorSources
+					.filter { !backedUpFactorSources.contains($0) }
 
 				let network = try profile.network(id: profile.networkID)
 				let accounts = network.getAccounts()
