@@ -30,7 +30,7 @@ extension ConfigurationBackup {
 						let backupsEnabled = viewStore.binding(get: \.cloudBackupsEnabled) { .view(.cloudBackupsToggled($0)) }
 						AutomatedBackupView(
 							backupsEnabled: backupsEnabled,
-							lastBackedUp: viewStore.lastCloudBackup,
+							displayedLastBackup: viewStore.displayedLastBackup,
 							actionsRequired: viewStore.actionsRequired,
 							outdatedBackupPresent: viewStore.outdatedBackupPresent,
 							deleteOutdatedAction: { store.send(.view(.deleteOutdatedTapped)) }
@@ -138,7 +138,7 @@ extension ConfigurationBackup {
 
 	struct AutomatedBackupView: SwiftUI.View {
 		@Binding var backupsEnabled: Bool
-		let lastBackedUp: BackupStatus?
+		let displayedLastBackup: Date?
 		let actionsRequired: [Item]
 		let outdatedBackupPresent: Bool
 		let deleteOutdatedAction: () -> Void
@@ -210,8 +210,9 @@ extension ConfigurationBackup {
 		}
 
 		private var lastBackedUpString: String? {
-			guard let lastBackedUp, lastBackedUp.result.succeeded, !lastBackedUp.upToDate else { return nil }
-			return L10n.ConfigurationBackup.Automated.lastBackup(RadixDateFormatter.string(from: lastBackedUp.result.backupDate))
+			displayedLastBackup.map { date in
+				L10n.ConfigurationBackup.Automated.lastBackup(RadixDateFormatter.string(from: date))
+			}
 		}
 
 		struct ItemView: SwiftUI.View {

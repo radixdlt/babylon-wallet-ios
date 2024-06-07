@@ -27,16 +27,21 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			return !cloudBackupsEnabled && !lastCloudBackup.upToDate
 		}
 
-		public var showLastBackupLabel: Bool {
-			if let lastCloudBackup, lastCloudBackup.result.succeeded, !lastCloudBackup.upToDate {
-				true
+		public var showActionsRequiredAndLastBackup: Bool {
+			guard let lastCloudBackup else { return false }
+			if lastCloudBackup.upToDate, !lastCloudBackup.result.failed {
+				return false
 			} else {
-				false
+				return true
 			}
 		}
 
 		public var actionsRequired: [Item] {
-			showLastBackupLabel ? Item.allCases : []
+			showActionsRequiredAndLastBackup ? Item.allCases : []
+		}
+
+		public var displayedLastBackup: Date? {
+			showActionsRequiredAndLastBackup ? lastCloudBackup?.result.backupDate : nil
 		}
 
 		public init() {}
@@ -64,7 +69,6 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		case setProblems([SecurityProblem])
 		case setLastManualBackup(Date?)
 		case setLastCloudBackup(BackupStatus?)
-		case didDeleteOutdatedBackup(ProfileID)
 		case exportProfile(Profile)
 	}
 
@@ -133,11 +137,10 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			return .none
 
 		case .deleteOutdatedTapped:
-			return .run { send in
+			return .run { _ in
 				let profile = await ProfileStore.shared.profile
 				do {
 					try await cloudBackupClient.deleteProfileBackup(profile.id)
-					await send(.internal(.didDeleteOutdatedBackup(profile.id)))
 				} catch {
 					loggerGlobal.error("Failed to delete outdate backup \(profile.id.uuidString): \(error)")
 				}
@@ -184,9 +187,6 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .didDeleteOutdatedBackup(id):
-			return .none
-
 		case let .setCloudBackupEnabled(isEnabled):
 			state.cloudBackupsEnabled = isEnabled
 			return .none

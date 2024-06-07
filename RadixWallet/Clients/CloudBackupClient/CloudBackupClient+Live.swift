@@ -121,6 +121,10 @@ extension CloudBackupClient {
 
 		@Sendable
 		func backupProfileAndSaveResult(_ profile: Profile, existingRecord: CKRecord?) async throws {
+			try? userDefaults.setLastCloudBackup(.started(.now), of: profile)
+			print("•• start backup \(Date.now.formatted(date: .omitted, time: .standard))]")
+			try await Task.sleep(nanoseconds: 5_000_000_000)
+
 			do {
 				let json = profile.toJSONString()
 				try await backupProfile(.right(json), header: profile.header, existingRecord: existingRecord)
@@ -141,6 +145,7 @@ extension CloudBackupClient {
 			}
 
 			try? userDefaults.setLastCloudBackup(.success, of: profile)
+			print("•• saved backup \(Date.now.formatted(date: .omitted, time: .standard))]")
 		}
 
 		@Sendable
@@ -169,6 +174,8 @@ extension CloudBackupClient {
 			guard shouldBackUp || shouldReclaim else { return }
 
 			try? await backupProfileAndSaveResult(profile, existingRecord: existingRecord)
+
+			print("•• backed up")
 		}
 
 		let retryBackupInterval: DispatchTimeInterval = .seconds(60)
@@ -186,9 +193,6 @@ extension CloudBackupClient {
 
 				for try await (profile, tick) in combineLatest(profiles, ticks) {
 					guard !Task.isCancelled else { return }
-
-					// This will skip the ticks that get backed up while we are awaiting performAutomaticBackup
-					guard tick > lastClaimCheck else { continue }
 					if tick.timeIntervalSince(lastClaimCheck) > checkClaimedProfileInterval {
 						await performAutomaticBackup(profile, timeToCheckIfClaimed: true)
 						lastClaimCheck = .now
