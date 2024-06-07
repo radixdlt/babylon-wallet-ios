@@ -22,7 +22,7 @@ extension CloudBackupClient: TestDependencyKey {
 		lastBackup: { _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		loadProfile: { _ in throw NoopError() },
 		loadProfileHeaders: { throw NoopError() },
-		claimProfile: { _ in throw NoopError() }
+		claimProfileOnICloud: { _ in throw NoopError() }
 	)
 
 	public static let testValue = Self(
@@ -33,6 +33,6 @@ extension CloudBackupClient: TestDependencyKey {
 		lastBackup: unimplemented("\(Self.self).lastBackup"),
 		loadProfile: unimplemented("\(Self.self).loadProfile"),
 		loadProfileHeaders: unimplemented("\(Self.self).loadProfileHeaders"),
-		claimProfile: unimplemented("\(Self.self).claimProfile")
+		claimProfileOnICloud: unimplemented("\(Self.self).claimProfileOnICloud")
 	)
 }

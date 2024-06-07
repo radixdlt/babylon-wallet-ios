@@ -121,6 +121,8 @@ extension ProfileStore {
 	/// Change current profile to new importedProfile and saves it, by
 	/// updates `headerList` (Keychain),  `activeProfileID` (UserDefaults)
 	/// and saves a snapshot of the profile into Keychain.
+	///
+	/// NB: The profile should be claimed locally before calling this function
 	/// - Parameter profile: Imported Profile to use and save.
 	public func importProfile(_ profileToImport: Profile) throws {
 		// The software design of ProfileStore is to always have a profile at end
@@ -134,8 +136,8 @@ extension ProfileStore {
 
 		var profileToImport = profileToImport
 
-		// Before saving it we must claim ownership of it!
-		try _claimOwnership(of: &profileToImport)
+		// We need to save before calling `updateHeaderOfThenSave`
+		try _saveProfileAndEmitUpdate(profileToImport)
 
 		profileToImport.changeCurrentToMainnetIfNeeded()
 
@@ -345,24 +347,12 @@ extension ProfileStore {
 
 // MARK: Helpers
 extension ProfileStore {
-	/// Updates the `lastUsedOnDevice` to use this device, on `profile`,
-	/// then saves this profile and emits an update.
-	/// - Parameter profile: Profile to update `lastUsedOnDevice` of and
-	/// save on this device.
-	private func claimOwnershipOfProfile() throws {
-		var copy = profile
-		try _claimOwnership(of: &copy)
-	}
-
-	/// Updates the `lastUsedOnDevice` to use this device, on `profile`,
-	/// then saves this profile and emits an update.
-	/// - Parameter profile: Profile to update `lastUsedOnDevice` of and
-	/// save on this device.
-	private func _claimOwnership(of profile: inout Profile) throws {
+	/// Updates the `lastUsedOnDevice` to use this device, on `profile`
+	/// - Parameter profile: Profile to update `lastUsedOnDevice` of
+	public func claimOwnership(of profile: inout Profile) {
 		@Dependency(\.date) var date
 		profile.header.lastUsedOnDevice = deviceInfo
 		profile.header.lastUsedOnDevice.date = date()
-		try _saveProfileAndEmitUpdate(profile)
 	}
 
 	/// Updates the header of a Profile, lastModified date, contentHint etc.
