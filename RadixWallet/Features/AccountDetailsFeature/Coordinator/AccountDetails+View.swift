@@ -10,7 +10,7 @@ extension AccountDetails.State {
 			isLedgerAccount: account.isLedgerControlled,
 			totalFiatWorth: showFiatWorth ? assets.totalFiatWorth : nil,
 			account: account,
-			securityProblemsConfig: .init(kind: .account(account.address), problems: problems)
+			securityProblemsConfig: securityProblemsConfig
 		)
 	}
 }

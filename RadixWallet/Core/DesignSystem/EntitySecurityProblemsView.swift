@@ -58,7 +58,10 @@ extension EntitySecurityProblemsView {
 		}
 
 		public mutating func update(problems: [SecurityProblem]) {
-			self.problems = problems.filter(kind: kind)
+			let filtered = problems.filter(kind: kind)
+			if self.problems != filtered {
+				self.problems = filtered
+			}
 		}
 	}
 }

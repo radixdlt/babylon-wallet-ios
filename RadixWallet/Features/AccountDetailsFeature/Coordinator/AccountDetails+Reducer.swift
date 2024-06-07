@@ -6,7 +6,8 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, AccountWithInfoHolder {
 		public var accountWithInfo: AccountWithInfo
 		var assets: AssetsView.State
-		var problems: [SecurityProblem] = []
+		var securityProblemsConfig: EntitySecurityProblemsView.Config
+		fileprivate var problems: [SecurityProblem] = []
 		var showFiatWorth: Bool
 
 		@PresentationState
@@ -22,6 +23,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 				account: accountWithInfo.account,
 				mode: .normal
 			)
+			self.securityProblemsConfig = .init(kind: .account(accountWithInfo.account.address), problems: problems)
 		}
 	}
 
@@ -180,6 +182,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			return .none
 		case let .setSecurityProblems(problems):
 			state.problems = problems
+			state.securityProblemsConfig.update(problems: problems)
 			return .none
 		}
 	}
