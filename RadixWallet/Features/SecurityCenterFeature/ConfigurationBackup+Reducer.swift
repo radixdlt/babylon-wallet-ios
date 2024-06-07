@@ -23,12 +23,12 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		public var exportable: Exportable? = nil
 
 		public var outdatedBackupPresent: Bool {
-			guard let lastCloudBackup, lastCloudBackup.succeeded else { return false }
+			guard let lastCloudBackup, lastCloudBackup.result.succeeded else { return false }
 			return !cloudBackupsEnabled && !lastCloudBackup.upToDate
 		}
 
 		public var showLastBackupLabel: Bool {
-			if let lastCloudBackup, lastCloudBackup.succeeded, !lastCloudBackup.upToDate {
+			if let lastCloudBackup, lastCloudBackup.result.succeeded, !lastCloudBackup.upToDate {
 				true
 			} else {
 				false
@@ -217,7 +217,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		.run { send in
 			for try await lastBackup in await securityCenterClient.lastManualBackup() {
 				guard !Task.isCancelled else { return }
-				await send(.internal(.setLastManualBackup(lastBackup?.backupDate)))
+				await send(.internal(.setLastManualBackup(lastBackup?.result.backupDate)))
 			}
 		}
 	}

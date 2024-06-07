@@ -44,16 +44,10 @@ extension SecurityCenterClient {
 		@Sendable
 		func statusValues(results: AnyAsyncSequence<BackupResult?>) async -> AnyAsyncSequence<BackupStatus?> {
 			await combineLatest(profileStore.values(), results.prepend(nil))
-				.map { profile, backup -> BackupStatus? in
-					guard let backup else { return nil }
-					return .init(result: backup, upToDate: backup.saveIdentifier == profile.saveIdentifier)
+				.map { profile, backup in
+					backup.map { BackupStatus(result: $0, upToDate: $0.saveIdentifier == profile.saveIdentifier) }
 				}
 				.eraseToAnyAsyncSequence()
-		}
-
-		@Sendable
-		func backupStatus(of result: BackupResult, profile: Profile) async -> BackupStatus {
-			.init(result: result, upToDate: result.saveIdentifier == profile.saveIdentifier)
 		}
 
 		let problemsSubject = AsyncCurrentValueSubject<[SecurityProblem]>([])
