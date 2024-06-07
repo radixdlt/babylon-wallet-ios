@@ -162,10 +162,9 @@ public enum SecurityProblem: Hashable, Sendable, Identifiable {
 public struct BackupStatus: Hashable, Codable, Sendable {
 	public let result: BackupResult
 	public let upToDate: Bool
-}
 
-extension BackupResult {
-	public func status(profile: Profile) -> BackupStatus {
-		.init(result: self, upToDate: saveIdentifier == profile.saveIdentifier)
+	public init(result: BackupResult, profile: Profile) {
+		self.result = result
+		self.upToDate = result.saveIdentifier == profile.saveIdentifier
 	}
 }

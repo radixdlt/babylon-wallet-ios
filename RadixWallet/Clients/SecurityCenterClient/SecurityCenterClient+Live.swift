@@ -45,7 +45,7 @@ extension SecurityCenterClient {
 		func statusValues(results: AnyAsyncSequence<BackupResult?>) async -> AnyAsyncSequence<BackupStatus?> {
 			await combineLatest(profileStore.values(), results.prepend(nil))
 				.map { profile, backup in
-					backup.map { BackupStatus(result: $0, upToDate: $0.saveIdentifier == profile.saveIdentifier) }
+					backup.map { BackupStatus(result: $0, profile: profile) }
 				}
 				.eraseToAnyAsyncSequence()
 		}
