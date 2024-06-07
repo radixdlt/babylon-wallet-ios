@@ -100,8 +100,6 @@ extension SecurityCenterClient {
 				if hasProblem6() { result.append(.problem6) }
 				if hasProblem7() { result.append(.problem7) }
 
-				print("M- Sending result: \(result.map(\.number))")
-
 				problemsSubject.send(result)
 			}
 		}

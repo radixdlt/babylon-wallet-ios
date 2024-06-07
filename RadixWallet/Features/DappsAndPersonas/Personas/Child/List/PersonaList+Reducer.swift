@@ -97,6 +97,11 @@ public struct PersonaList: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .personasLoaded(personas):
 			state.personas = personas
+			state.personas.mutateAll { persona in
+				// MB: Quick fix for concurrency issue caused by the await on the personasEffect.
+				// Will work on better fix after release
+				persona.securityProblemsConfig.update(problems: state.problems)
+			}
 			return .none
 
 		case let .setSecurityProblems(problems):
