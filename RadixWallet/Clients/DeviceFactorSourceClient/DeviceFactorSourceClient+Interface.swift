@@ -42,7 +42,7 @@ extension DeviceFactorSourceClient {
 	public typealias PublicKeysFromOnDeviceHD = @Sendable (PublicKeysFromOnDeviceHDRequest) async throws -> [HierarchicalDeterministicPublicKey]
 	public typealias SignatureFromOnDeviceHD = @Sendable (SignatureFromOnDeviceHDRequest) async throws -> SignatureWithPublicKey
 	public typealias IsAccountRecoveryNeeded = @Sendable () async throws -> Bool
-	public typealias ProblematicEntities = @Sendable () async throws -> (mnemonicMissing: ProblematicAddresses, unrecoverable: ProblematicAddresses)
+	public typealias ProblematicEntities = @Sendable () async throws -> AnyAsyncSequence<(mnemonicMissing: ProblematicAddresses, unrecoverable: ProblematicAddresses)>
 }
 
 // MARK: - DiscrepancyUnsupportedCurve

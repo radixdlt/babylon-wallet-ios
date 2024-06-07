@@ -59,14 +59,18 @@ extension SecurityCenterClient {
 			let profileValues = await profileStore.values()
 			let cloudBackupValues = await cloudBackups()
 			let manualBackupValues = await manualBackups()
+			let problematicValues = try await deviceFactorSourceClient.problematicEntities()
 
-			for try await (profile, cloudBackup, manualBackup) in combineLatest(profileValues, cloudBackupValues, manualBackupValues) {
-				let isCloudProfileSyncEnabled = profile.appPreferences.security.isCloudProfileSyncEnabled
-				let problematic = try? await deviceFactorSourceClient.problematicEntities()
+			let first = combineLatest(profileValues, problematicValues)
+			let second = combineLatest(cloudBackupValues, manualBackupValues)
+			for try await (profileProblematic, backups) in combineLatest(first, second) {
+				let isCloudProfileSyncEnabled = profileProblematic.0.appPreferences.security.isCloudProfileSyncEnabled
+				let problematic = profileProblematic.1
+				let cloudBackup = backups.0
+				let manualBackup = backups.1
 
 				func hasProblem3() async -> ProblematicAddresses? {
-					guard let problematic, !problematic.unrecoverable.isEmpty else { return nil }
-					return problematic.unrecoverable
+					problematic.unrecoverable.isEmpty ? nil : problematic.unrecoverable
 				}
 
 				func hasProblem5() -> Bool {
@@ -86,8 +90,7 @@ extension SecurityCenterClient {
 				}
 
 				func hasProblem9() async -> ProblematicAddresses? {
-					guard let problematic, !problematic.mnemonicMissing.isEmpty else { return nil }
-					return problematic.mnemonicMissing
+					problematic.mnemonicMissing.isEmpty ? nil : problematic.mnemonicMissing
 				}
 
 				var result: [SecurityProblem] = []

@@ -16,7 +16,7 @@ extension DeviceFactorSourceClient: TestDependencyKey {
 		isAccountRecoveryNeeded: { false },
 		entitiesControlledByFactorSource: { _, _ in throw NoopError() },
 		controlledEntities: { _ in [] },
-		problematicEntities: { (mnemonicMissing: .empty, unrecoverable: .empty) }
+		problematicEntities: { throw NoopError() }
 	)
 
 	public static let testValue = Self(
