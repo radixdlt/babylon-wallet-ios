@@ -7,10 +7,14 @@ extension TransportProfileClient: DependencyKey {
 	) -> Self {
 		@Dependency(\.userDefaults) var userDefaults
 		@Dependency(\.secureStorageClient) var secureStorageClient
+		@Dependency(\.cloudBackupClient) var cloudBackupClient
 
 		return Self(
 			importProfile: { profile, factorSourceIDs, containsP2PLinks in
 				do {
+					var profile = profile
+					await profileStore.claimOwnership(of: &profile)
+					try await cloudBackupClient.claimProfileOnICloud(profile)
 					try await profileStore.importProfile(profile)
 					userDefaults.setShowRelinkConnectorsAfterProfileRestore(containsP2PLinks)
 				} catch {

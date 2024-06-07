@@ -49,6 +49,7 @@ extension CloudBackupClient {
 	struct HeaderAndMetadataMismatchError: Error {}
 	struct WrongRecordTypeError: Error { let type: CKRecord.RecordType }
 	struct ProfileMissingFromKeychainError: Error { let id: ProfileID }
+	struct FailedToClaimProfileError: Error { let error: Error }
 
 	public static let liveValue: Self = .live()
 
@@ -161,10 +162,10 @@ extension CloudBackupClient {
 
 			let existingRecord = try? await fetchProfileRecord(profile.id)
 
-			let backedUpID = { try? existingRecord.map(getProfileHeader)?.lastUsedOnDevice.id }
+			let backedUpID = try? existingRecord.map(getProfileHeader)?.lastUsedOnDevice.id
 
 			let shouldReclaim: Bool
-			if shouldCheckClaim, let id = backedUpID(), await !profileStore.isThisDevice(deviceID: id) {
+			if shouldCheckClaim, let backedUpID, await !profileStore.isThisDevice(deviceID: backedUpID) {
 				let action = await overlayWindowClient.scheduleFullScreen(.init(root: .claimWallet(.init())))
 				shouldReclaim = action == .claimWallet(.transferBack)
 			} else {
@@ -257,9 +258,13 @@ extension CloudBackupClient {
 					.map(getProfileHeader)
 					.filter(\.isNonEmpty)
 			},
-			claimProfile: { profile in
+			claimProfileOnICloud: { profile in
 				let existingRecord = try? await fetchProfileRecord(profile.id)
-				try await backupProfileAndSaveResult(profile, existingRecord: existingRecord)
+				do {
+					try await backupProfileAndSaveResult(profile, existingRecord: existingRecord)
+				} catch {
+					throw FailedToClaimProfileError(error: error)
+				}
 			}
 		)
 	}

@@ -12,7 +12,7 @@ public struct CloudBackupClient: DependencyKey, Sendable {
 	public let lastBackup: LastBackup
 	public let loadProfile: LoadProfile
 	public let loadProfileHeaders: LoadProfileHeaders
-	public let claimProfile: ClaimProfile
+	public let claimProfileOnICloud: ClaimProfileOnICloud
 
 	public init(
 		startAutomaticBackups: @escaping StartAutomaticBackups,
@@ -22,7 +22,7 @@ public struct CloudBackupClient: DependencyKey, Sendable {
 		lastBackup: @escaping LastBackup,
 		loadProfile: @escaping LoadProfile,
 		loadProfileHeaders: @escaping LoadProfileHeaders,
-		claimProfile: @escaping ClaimProfile
+		claimProfileOnICloud: @escaping ClaimProfileOnICloud
 	) {
 		self.startAutomaticBackups = startAutomaticBackups
 		self.migrateProfilesFromKeychain = migrateProfilesFromKeychain
@@ -31,7 +31,7 @@ public struct CloudBackupClient: DependencyKey, Sendable {
 		self.lastBackup = lastBackup
 		self.loadProfile = loadProfile
 		self.loadProfileHeaders = loadProfileHeaders
-		self.claimProfile = claimProfile
+		self.claimProfileOnICloud = claimProfileOnICloud
 	}
 }
 
@@ -43,7 +43,7 @@ extension CloudBackupClient {
 	public typealias LastBackup = @Sendable (ProfileID) -> AnyAsyncSequence<BackupResult?>
 	public typealias LoadProfile = @Sendable (ProfileID) async throws -> BackedUpProfile
 	public typealias LoadProfileHeaders = @Sendable () async throws -> [Profile.Header]
-	public typealias ClaimProfile = @Sendable (Profile) async throws -> Void
+	public typealias ClaimProfileOnICloud = @Sendable (Profile) async throws -> Void
 }
 
 // MARK: CloudBackupClient.BackedUpProfile
