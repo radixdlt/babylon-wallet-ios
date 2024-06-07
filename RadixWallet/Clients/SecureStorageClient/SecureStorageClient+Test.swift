@@ -32,6 +32,7 @@ extension SecureStorageClient: TestDependencyKey {
 		saveP2PLinks: { _ in },
 		loadP2PLinksPrivateKey: { nil },
 		saveP2PLinksPrivateKey: { _ in },
+		keychainChanged: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		getAllMnemonics: { [] }
 	)
 	#else
@@ -57,7 +58,8 @@ extension SecureStorageClient: TestDependencyKey {
 		loadP2PLinks: { nil },
 		saveP2PLinks: { _ in },
 		loadP2PLinksPrivateKey: { nil },
-		saveP2PLinksPrivateKey: { _ in }
+		saveP2PLinksPrivateKey: { _ in },
+		keychainChanged: { AsyncLazySequence([]).eraseToAnyAsyncSequence() }
 	)
 	#endif // DEBUG
 
@@ -87,6 +89,7 @@ extension SecureStorageClient: TestDependencyKey {
 		saveP2PLinks: unimplemented("\(Self.self).saveP2PLinks"),
 		loadP2PLinksPrivateKey: unimplemented("\(Self.self).loadP2PLinksPrivateKey"),
 		saveP2PLinksPrivateKey: unimplemented("\(Self.self).saveP2PLinksPrivateKey"),
+		keychainChanged: unimplemented("\(Self.self).keychainChanged"),
 		getAllMnemonics: unimplemented("\(Self.self).getAllMnemonics")
 	)
 	#else
@@ -112,7 +115,8 @@ extension SecureStorageClient: TestDependencyKey {
 		loadP2PLinks: unimplemented("\(Self.self).loadP2PLinks"),
 		saveP2PLinks: unimplemented("\(Self.self).saveP2PLinks"),
 		loadP2PLinksPrivateKey: unimplemented("\(Self.self).loadP2PLinksPrivateKey"),
-		saveP2PLinksPrivateKey: unimplemented("\(Self.self).saveP2PLinksPrivateKey")
+		saveP2PLinksPrivateKey: unimplemented("\(Self.self).saveP2PLinksPrivateKey"),
+		keychainChanged: unimplemented("\(Self.self).keychainChanged")
 	)
 	#endif
 }

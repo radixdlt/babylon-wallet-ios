@@ -391,6 +391,8 @@ extension SecureStorageClient: DependencyKey {
 			loggerGlobal.notice("Saved p2pLinksPrivateKeyKey")
 		}
 
+		let keychainChanged = keychainClient.keychainChanged
+
 		#if DEBUG
 		return Self(
 			saveProfileSnapshot: saveProfileSnapshot,
@@ -415,6 +417,7 @@ extension SecureStorageClient: DependencyKey {
 			saveP2PLinks: saveP2PLinks,
 			loadP2PLinksPrivateKey: loadP2PLinksPrivateKey,
 			saveP2PLinksPrivateKey: saveP2PLinksPrivateKey,
+			keychainChanged: keychainChanged,
 			getAllMnemonics: getAllMnemonics
 		)
 		#else
@@ -440,7 +443,8 @@ extension SecureStorageClient: DependencyKey {
 			loadP2PLinks: loadP2PLinks,
 			saveP2PLinks: saveP2PLinks,
 			loadP2PLinksPrivateKey: loadP2PLinksPrivateKey,
-			saveP2PLinksPrivateKey: saveP2PLinksPrivateKey
+			saveP2PLinksPrivateKey: saveP2PLinksPrivateKey,
+			keychainChanged: keychainChanged
 		)
 		#endif
 	}()

@@ -71,6 +71,21 @@ extension DeviceFactorSourceClient: DependencyKey {
 			)
 		}
 
+		let profileStore = ProfileStore.shared
+
+		@Sendable
+		func factorSourcesMnemonicPresence() async -> AnyAsyncSequence<[(FactorSourceIDFromHash, present: Bool)]> {
+			await combineLatest(profileStore.factorSourcesValues(), secureStorageClient.keychainChanged())
+				.map { factorSources, _ in
+					factorSources
+						.compactMap { $0.extract(DeviceFactorSource.self)?.id }
+						.map { id in
+							(id, secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(id))
+						}
+				}
+				.eraseToAnyAsyncSequence()
+		}
+
 		let problematicEntities: @Sendable () async throws -> (mnemonicMissing: ProblematicAddresses, unrecoverable: ProblematicAddresses) = {
 			let factorSources = try await factorSourcesClient.getFactorSources(type: DeviceFactorSource.self)
 			let accounts = try await accountsClient.getAccountsOnCurrentNetwork().elements
@@ -85,10 +100,12 @@ extension DeviceFactorSourceClient: DependencyKey {
 			let mnemonicPresentFactorSources = factorSources.filter {
 				secureStorageClient.containsMnemonicIdentifiedByFactorSourceID($0.id)
 			}
+			.map(\.id)
 
-			let unrecoverableFactorSources = mnemonicPresentFactorSources.filter {
-				!userDefaults.getFactorSourceIDOfBackedUpMnemonics().contains($0.id)
-			}.map(\.id)
+			let unrecoverableFactorSources = mnemonicPresentFactorSources
+				.filter {
+					!userDefaults.getFactorSourceIDOfBackedUpMnemonics().contains($0)
+				}
 
 			func mnemonicMissing(_ account: Account) -> Bool {
 				switch account.securityState {

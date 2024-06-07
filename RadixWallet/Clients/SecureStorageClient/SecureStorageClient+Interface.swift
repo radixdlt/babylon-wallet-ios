@@ -39,6 +39,7 @@ public struct SecureStorageClient: Sendable {
 
 	public var loadP2PLinksPrivateKey: LoadP2PLinksPrivateKey
 	public var saveP2PLinksPrivateKey: SaveP2PLinksPrivateKey
+	public var keychainChanged: KeychainChanged
 
 	#if DEBUG
 	public var getAllMnemonics: GetAllMnemonics
@@ -68,6 +69,7 @@ public struct SecureStorageClient: Sendable {
 		saveP2PLinks: @escaping SaveP2PLinks,
 		loadP2PLinksPrivateKey: @escaping LoadP2PLinksPrivateKey,
 		saveP2PLinksPrivateKey: @escaping SaveP2PLinksPrivateKey,
+		keychainChanged: @escaping KeychainChanged,
 		getAllMnemonics: @escaping GetAllMnemonics
 	) {
 		self.saveProfileSnapshot = saveProfileSnapshot
@@ -93,6 +95,7 @@ public struct SecureStorageClient: Sendable {
 		self.loadP2PLinksPrivateKey = loadP2PLinksPrivateKey
 		self.saveP2PLinksPrivateKey = saveP2PLinksPrivateKey
 		self.getAllMnemonics = getAllMnemonics
+		self.keychainChanged = keychainChanged
 	}
 	#else
 
@@ -118,7 +121,8 @@ public struct SecureStorageClient: Sendable {
 		loadP2PLinks: @escaping LoadP2PLinks,
 		saveP2PLinks: @escaping SaveP2PLinks,
 		loadP2PLinksPrivateKey: @escaping LoadP2PLinksPrivateKey,
-		saveP2PLinksPrivateKey: @escaping SaveP2PLinksPrivateKey
+		saveP2PLinksPrivateKey: @escaping SaveP2PLinksPrivateKey,
+		keychainChanged: @escaping KeychainChanged
 	) {
 		self.saveProfileSnapshot = saveProfileSnapshot
 		self.loadProfileSnapshotData = loadProfileSnapshotData
@@ -142,6 +146,7 @@ public struct SecureStorageClient: Sendable {
 		self.saveP2PLinks = saveP2PLinks
 		self.loadP2PLinksPrivateKey = loadP2PLinksPrivateKey
 		self.saveP2PLinksPrivateKey = saveP2PLinksPrivateKey
+		self.keychainChanged = keychainChanged
 	}
 	#endif // DEBUG
 }
@@ -188,6 +193,8 @@ extension SecureStorageClient {
 
 	public typealias LoadP2PLinksPrivateKey = @Sendable () throws -> Curve25519.PrivateKey?
 	public typealias SaveP2PLinksPrivateKey = @Sendable (Curve25519.PrivateKey) throws -> Void
+
+	public typealias KeychainChanged = @Sendable () -> AnyAsyncSequence<Void>
 
 	public enum LoadMnemonicPurpose: Sendable, Hashable, CustomStringConvertible {
 		case signTransaction
