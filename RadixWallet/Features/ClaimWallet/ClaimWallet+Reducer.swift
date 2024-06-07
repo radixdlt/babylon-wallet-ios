@@ -30,12 +30,12 @@ public struct ClaimWallet: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .clearWalletButtonTapped:
+			state.isLoading = true
 			return .run { send in
 				await resetWalletClient.resetWallet()
 				await send(.delegate(.didClearWallet))
 			}
 		case .transferBackButtonTapped:
-			state.isLoading = true
 			return .send(.delegate(.transferBack))
 		}
 	}
