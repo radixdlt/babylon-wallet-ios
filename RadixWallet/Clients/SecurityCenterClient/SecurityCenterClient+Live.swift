@@ -57,24 +57,18 @@ extension SecurityCenterClient {
 		@Sendable
 		func startMonitoring() async throws {
 			let profileValues = await profileStore.values()
-			let cloudBackupValues = await cloudBackups()
-			let manualBackupValues = await manualBackups()
 			let problematicValues = try await deviceFactorSourceClient.problematicEntities()
+			let backupValues = await combineLatest(cloudBackups(), manualBackups()).map { (cloud: $0, manual: $1) }
 
-			let first = combineLatest(profileValues, problematicValues)
-			let second = combineLatest(cloudBackupValues, manualBackupValues)
-			for try await (profileProblematic, backups) in combineLatest(first, second) {
-				let isCloudProfileSyncEnabled = profileProblematic.0.appPreferences.security.isCloudProfileSyncEnabled
-				let problematic = profileProblematic.1
-				let cloudBackup = backups.0
-				let manualBackup = backups.1
+			for try await (profile, problematic, backups) in combineLatest(profileValues, problematicValues, backupValues) {
+				let isCloudProfileSyncEnabled = profile.appPreferences.security.isCloudProfileSyncEnabled
 
 				func hasProblem3() async -> ProblematicAddresses? {
 					problematic.unrecoverable.isEmpty ? nil : problematic.unrecoverable
 				}
 
 				func hasProblem5() -> Bool {
-					if isCloudProfileSyncEnabled, let cloudBackup {
+					if isCloudProfileSyncEnabled, let cloudBackup = backups.cloud {
 						!cloudBackup.success
 					} else {
 						false // FIXME: GK - is this what we want?
@@ -82,11 +76,11 @@ extension SecurityCenterClient {
 				}
 
 				func hasProblem6() -> Bool {
-					!isCloudProfileSyncEnabled && manualBackup == nil
+					!isCloudProfileSyncEnabled && backups.manual == nil
 				}
 
 				func hasProblem7() -> Bool {
-					!isCloudProfileSyncEnabled && manualBackup?.upToDate == false
+					!isCloudProfileSyncEnabled && backups.manual?.upToDate == false
 				}
 
 				func hasProblem9() async -> ProblematicAddresses? {
