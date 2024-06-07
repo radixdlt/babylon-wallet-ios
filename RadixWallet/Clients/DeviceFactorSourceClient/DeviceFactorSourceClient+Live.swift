@@ -80,7 +80,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 
 		@Sendable
 		func factorSourcesMnemonicPresence() async -> AnyAsyncSequence<[FactorSourceHasMnemonic]> {
-			await combineLatest(profileStore.factorSourcesValues(), secureStorageClient.keychainChanged())
+			await combineLatest(profileStore.factorSourcesValues(), secureStorageClient.keychainChanged().prepend(()))
 				.map { factorSources, _ in
 					factorSources
 						.compactMap { $0.extract(DeviceFactorSource.self)?.id }
