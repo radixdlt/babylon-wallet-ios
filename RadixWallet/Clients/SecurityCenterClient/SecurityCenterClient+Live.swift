@@ -55,7 +55,7 @@ extension SecurityCenterClient {
 		let problemsSubject = AsyncCurrentValueSubject<[SecurityProblem]>([])
 
 		@Sendable
-		func startMonitoringProblems() async throws {
+		func startMonitoring() async throws {
 			let profileValues = await profileStore.values()
 			let cloudBackupValues = await cloudBackups()
 			let manualBackupValues = await manualBackups()
@@ -113,7 +113,7 @@ extension SecurityCenterClient {
 		}
 
 		return .init(
-			startMonitoring: startMonitoringProblems,
+			startMonitoring: startMonitoring,
 			problems: { type in
 				problemsSubject
 					.share()

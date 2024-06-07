@@ -5,7 +5,7 @@ import os
 
 // MARK: - SecurityCenterClient
 public struct SecurityCenterClient: DependencyKey, Sendable {
-	public let startMonitoring: StartMonitoringProblems
+	public let startMonitoring: StartMonitoring
 	public let problems: Problems
 	public let lastManualBackup: LastManualBackup
 	public let lastCloudBackup: LastCloudBackup
@@ -13,7 +13,7 @@ public struct SecurityCenterClient: DependencyKey, Sendable {
 
 // MARK: SecurityCenterClient.Problems
 extension SecurityCenterClient {
-	public typealias StartMonitoringProblems = @Sendable () async throws -> Void
+	public typealias StartMonitoring = @Sendable () async throws -> Void
 	public typealias Problems = @Sendable (SecurityProblem.ProblemType?) async -> AnyAsyncSequence<[SecurityProblem]>
 	public typealias LastManualBackup = @Sendable () async -> AnyAsyncSequence<BackupStatus?>
 	public typealias LastCloudBackup = @Sendable () async -> AnyAsyncSequence<BackupStatus?>
