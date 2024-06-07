@@ -232,16 +232,34 @@ extension UserDefaults.Dependency {
 }
 
 // MARK: - BackupResult
-public struct BackupResult: Codable, Sendable {
+public struct BackupResult: Hashable, Codable, Sendable {
+	private static let timeoutInterval: TimeInterval = 5 * 60
+
 	public let backupDate: Date
 	public let saveIdentifier: String
 	public let result: Result
 
-	public enum Result: Equatable, Codable, Sendable {
+	public var succeeded: Bool {
+		result == .success
+	}
+
+	public var failed: Bool {
+		switch result {
+		case .failure:
+			true
+		case let .started(date):
+			Date.now.timeIntervalSince(date) > Self.timeoutInterval
+		case .success:
+			false
+		}
+	}
+
+	public enum Result: Hashable, Codable, Sendable {
+		case started(Date)
 		case success
 		case failure(Failure)
 
-		public enum Failure: Equatable, Codable, Sendable {
+		public enum Failure: Hashable, Codable, Sendable {
 			case temporarilyUnavailable
 			case notAuthenticated
 			case other
