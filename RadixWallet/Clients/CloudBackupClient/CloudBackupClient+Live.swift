@@ -46,7 +46,6 @@ extension CloudBackupClient {
 	struct IncorrectRecordTypeError: Error {}
 	struct NoProfileInRecordError: Error {}
 	struct MissingMetadataError: Error {}
-	struct HeaderAndMetadataMismatchError: Error {}
 	struct WrongRecordTypeError: Error { let type: CKRecord.RecordType }
 	struct FailedToClaimProfileError: Error { let error: Error }
 
@@ -93,10 +92,6 @@ extension CloudBackupClient {
 			let containsLegacyP2PLinks = Profile.checkIfProfileJsonStringContainsLegacyP2PLinks(jsonString: json)
 			let profile = try Profile(jsonString: json)
 			try FileManager.default.removeItem(at: fileURL)
-
-			guard try getProfileHeader(record).isEquivalent(to: profile.header) else {
-				throw HeaderAndMetadataMismatchError()
-			}
 
 			return BackedUpProfile(profile: profile, containsLegacyP2PLinks: containsLegacyP2PLinks)
 		}
@@ -270,30 +265,6 @@ extension CloudBackupClient {
 private extension Profile.Header {
 	var isNonEmpty: Bool {
 		contentHint.numberOfAccountsOnAllNetworksInTotal + contentHint.numberOfPersonasOnAllNetworksInTotal > 0
-	}
-
-	func isEquivalent(to other: Self) -> Bool {
-		snapshotVersion.rawValue == other.snapshotVersion.rawValue &&
-			creatingDevice.isEquivalent(to: other.creatingDevice) &&
-			lastUsedOnDevice.isEquivalent(to: other.lastUsedOnDevice) &&
-			lastModified.isEquivalent(to: other.lastModified) &&
-			contentHint.numberOfAccountsOnAllNetworksInTotal == other.contentHint.numberOfAccountsOnAllNetworksInTotal &&
-			contentHint.numberOfPersonasOnAllNetworksInTotal == other.contentHint.numberOfPersonasOnAllNetworksInTotal &&
-			contentHint.numberOfNetworks == other.contentHint.numberOfNetworks
-	}
-}
-
-private extension DeviceInfo {
-	func isEquivalent(to other: Self) -> Bool {
-		id.uuidString == other.id.uuidString &&
-			date.isEquivalent(to: other.date) &&
-			description == other.description
-	}
-}
-
-private extension Date {
-	func isEquivalent(to other: Self) -> Bool {
-		abs(timeIntervalSince(other)) < 0.001
 	}
 }
 
