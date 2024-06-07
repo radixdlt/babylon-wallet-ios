@@ -73,16 +73,22 @@ extension DeviceFactorSourceClient: DependencyKey {
 
 		let profileStore = ProfileStore.shared
 
+		struct FactorSourceHasMnemonic: Sendable, Equatable {
+			let id: FactorSourceIDFromHash
+			let present: Bool
+		}
+
 		@Sendable
-		func factorSourcesMnemonicPresence() async -> AnyAsyncSequence<[(FactorSourceIDFromHash, present: Bool)]> {
+		func factorSourcesMnemonicPresence() async -> AnyAsyncSequence<[FactorSourceHasMnemonic]> {
 			await combineLatest(profileStore.factorSourcesValues(), secureStorageClient.keychainChanged())
 				.map { factorSources, _ in
 					factorSources
 						.compactMap { $0.extract(DeviceFactorSource.self)?.id }
 						.map { id in
-							(id, secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(id))
+							FactorSourceHasMnemonic(id: id, present: secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(id))
 						}
 				}
+				.removeDuplicates()
 				.eraseToAnyAsyncSequence()
 		}
 
