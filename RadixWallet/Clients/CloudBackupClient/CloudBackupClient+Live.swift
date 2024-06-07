@@ -48,7 +48,6 @@ extension CloudBackupClient {
 	struct MissingMetadataError: Error {}
 	struct HeaderAndMetadataMismatchError: Error {}
 	struct WrongRecordTypeError: Error { let type: CKRecord.RecordType }
-	struct ProfileMissingFromKeychainError: Error { let id: ProfileID }
 	struct FailedToClaimProfileError: Error { let error: Error }
 
 	public static let liveValue: Self = .live()
@@ -214,9 +213,7 @@ extension CloudBackupClient {
 					let id = header.id
 					guard !previouslyMigrated.contains(id), header.id != activeProfile else { return nil }
 
-					guard let profileData = try secureStorageClient.loadProfileSnapshotData(id) else {
-						throw ProfileMissingFromKeychainError(id: id)
-					}
+					guard let profileData = try? secureStorageClient.loadProfileSnapshotData(id) else { return nil }
 
 					let profile = try Profile(jsonData: profileData)
 					guard !profile.networks.isEmpty else { return nil }
