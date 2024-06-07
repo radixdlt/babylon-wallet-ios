@@ -43,13 +43,17 @@ extension SecurityCenterClient {
 
 		@Sendable
 		func statusValues(results: AnyAsyncSequence<BackupResult?>) async -> AnyAsyncSequence<BackupStatus?> {
-			await combineLatest(profileStore.values(), results.prepend(nil)).map { profile, backup in
-				guard let backup else { return nil }
-				let upToDate = backup.saveIdentifier == profile.saveIdentifier
-				let success = backup.result == .success
-				return .init(backupDate: backup.backupDate, upToDate: upToDate, success: success)
-			}
-			.eraseToAnyAsyncSequence()
+			await combineLatest(profileStore.values(), results.prepend(nil))
+				.map { profile, backup -> BackupStatus? in
+					guard let backup else { return nil }
+					let upToDate = backup.saveIdentifier == profile.saveIdentifier
+					return .init(
+						backupDate: backup.backupDate,
+						upToDate: upToDate,
+						status: backup.result == .success ? .success : .failed
+					)
+				}
+				.eraseToAnyAsyncSequence()
 		}
 
 		let problemsSubject = AsyncCurrentValueSubject<[SecurityProblem]>([])
@@ -69,7 +73,7 @@ extension SecurityCenterClient {
 
 				func hasProblem5() -> Bool {
 					if isCloudProfileSyncEnabled, let cloudBackup = backups.cloud {
-						!cloudBackup.success
+						cloudBackup.failed
 					} else {
 						false // FIXME: GK - is this what we want?
 					}

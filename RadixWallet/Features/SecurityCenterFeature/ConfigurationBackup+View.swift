@@ -210,7 +210,7 @@ extension ConfigurationBackup {
 		}
 
 		private var lastBackedUpString: String? {
-			guard let lastBackedUp, lastBackedUp.success, !lastBackedUp.upToDate else { return nil }
+			guard let lastBackedUp, lastBackedUp.succeeded, !lastBackedUp.upToDate else { return nil }
 			return L10n.ConfigurationBackup.Automated.lastBackup(RadixDateFormatter.string(from: lastBackedUp.backupDate))
 		}
 

@@ -158,12 +158,32 @@ public enum SecurityProblem: Hashable, Sendable, Identifiable {
 	}
 }
 
-// MARK: - SecurityCenterClient.BackupStatus
-extension SecurityCenterClient {
-	// MARK: - BackupStatus
-	public struct BackupStatus: Hashable, Codable, Sendable {
-		public let backupDate: Date
-		public let upToDate: Bool
-		public let success: Bool
+// MARK: - BackupStatus
+public struct BackupStatus: Hashable, Codable, Sendable {
+	private let timeoutInterval: TimeInterval = 5 * 60
+
+	public let backupDate: Date
+	public let upToDate: Bool
+	public let status: Status
+
+	public var succeeded: Bool {
+		status == .success
+	}
+
+	public var failed: Bool {
+		switch status {
+		case .failed:
+			true
+		case let .started(date):
+			Date.now.timeIntervalSince(date) > timeoutInterval
+		case .success:
+			false
+		}
+	}
+
+	public enum Status: Hashable, Codable, Sendable {
+		case started(Date)
+		case success
+		case failed
 	}
 }

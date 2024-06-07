@@ -237,11 +237,15 @@ public struct BackupResult: Codable, Sendable {
 	public let saveIdentifier: String
 	public let result: Result
 
-	public enum Result: Codable, Sendable {
+	public enum Result: Equatable, Codable, Sendable {
 		case success
-		case temporarilyUnavailable
-		case notAuthenticated
-		case failure
+		case failure(Failure)
+
+		public enum Failure: Equatable, Codable, Sendable {
+			case temporarilyUnavailable
+			case notAuthenticated
+			case other
+		}
 	}
 }
 

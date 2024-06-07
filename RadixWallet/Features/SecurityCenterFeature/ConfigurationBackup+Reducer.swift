@@ -3,8 +3,6 @@ import ComposableArchitecture
 
 // MARK: - ConfigurationBackup
 public struct ConfigurationBackup: Sendable, FeatureReducer {
-	public typealias BackupStatus = SecurityCenterClient.BackupStatus
-
 	public struct Exportable: Sendable, Hashable {
 		public let profile: Profile
 		public let file: ExportableProfileFile
@@ -25,12 +23,12 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		public var exportable: Exportable? = nil
 
 		public var outdatedBackupPresent: Bool {
-			guard let lastCloudBackup, lastCloudBackup.success else { return false }
+			guard let lastCloudBackup, lastCloudBackup.succeeded else { return false }
 			return !cloudBackupsEnabled && !lastCloudBackup.upToDate
 		}
 
 		public var showLastBackupLabel: Bool {
-			if let lastCloudBackup, lastCloudBackup.success, !lastCloudBackup.upToDate {
+			if let lastCloudBackup, lastCloudBackup.succeeded, !lastCloudBackup.upToDate {
 				true
 			} else {
 				false

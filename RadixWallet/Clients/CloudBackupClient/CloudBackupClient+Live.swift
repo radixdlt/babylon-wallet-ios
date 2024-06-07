@@ -125,18 +125,18 @@ extension CloudBackupClient {
 				let json = profile.toJSONString()
 				try await backupProfile(.right(json), header: profile.header, existingRecord: existingRecord)
 			} catch {
-				let result: BackupResult.Result
+				let failure: BackupResult.Result.Failure
 				switch error {
 				case CKError.accountTemporarilyUnavailable:
-					result = .temporarilyUnavailable
+					failure = .temporarilyUnavailable
 				case CKError.notAuthenticated:
-					result = .notAuthenticated
+					failure = .notAuthenticated
 				default:
 					loggerGlobal.error("Automatic cloud backup failed with error \(error)")
-					result = .failure
+					failure = .other
 				}
 
-				try? userDefaults.setLastCloudBackup(result, of: profile)
+				try? userDefaults.setLastCloudBackup(.failure(failure), of: profile)
 				throw error
 			}
 
