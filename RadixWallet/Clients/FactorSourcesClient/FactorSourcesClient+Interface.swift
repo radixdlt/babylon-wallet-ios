@@ -184,10 +184,6 @@ extension FactorSourcesClient {
 	) async throws -> IdentifiedArrayOf<Source> {
 		try await IdentifiedArrayOf(uniqueElements: getFactorSources().compactMap { $0.extract(Source.self) })
 	}
-
-	public func gustaf() -> AnyAsyncSequence<[FactorSourceIDFromHash: Bool]> {
-		fatalError()
-	}
 }
 
 // MARK: - UpdateFactorSourceLastUsedRequest

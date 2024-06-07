@@ -73,15 +73,34 @@ extension DeviceFactorSourceClient: DependencyKey {
 			)
 		}
 
+		struct FactorSourceHasMnemonic: Sendable, Equatable {
+			let id: FactorSourceIDFromHash
+			let present: Bool
+		}
+
+		@Sendable
+		func factorSourcesMnemonicPresence() async -> AnyAsyncSequence<[FactorSourceHasMnemonic]> {
+			await combineLatest(profileStore.factorSourcesValues(), secureStorageClient.keychainChanged())
+				.map { factorSources, _ in
+					factorSources
+						.compactMap { $0.extract(DeviceFactorSource.self)?.id }
+						.map { id in
+							FactorSourceHasMnemonic(id: id, present: secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(id))
+						}
+				}
+				.removeDuplicates()
+				.eraseToAnyAsyncSequence()
+		}
+
 		let problematicEntities: @Sendable () async throws -> AnyAsyncSequence<(mnemonicMissing: ProblematicAddresses, unrecoverable: ProblematicAddresses)> = {
-			await combineLatest(factorSourcesClient.gustaf(), userDefaults.factorSourceIDOfBackedUpMnemonics(), profileStore.values()).map { factorSources, backedUpFactorSources, profile in
+			await combineLatest(factorSourcesMnemonicPresence(), userDefaults.factorSourceIDOfBackedUpMnemonics(), profileStore.values()).map { factorSources, backedUpFactorSources, profile in
 				let mnemonicMissingFactorSources = factorSources
-					.filter(not(\.value))
-					.map(\.key)
+					.filter(not(\.present))
+					.map(\.id)
 
 				let mnemomincPresentFactorSources = factorSources
-					.filter(\.value)
-					.map(\.key)
+					.filter(\.present)
+					.map(\.id)
 
 				let unrecoverableFactorSources = mnemomincPresentFactorSources
 					.filter { !backedUpFactorSources.contains($0) }
