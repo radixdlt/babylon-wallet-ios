@@ -96,12 +96,10 @@ public struct PersonaList: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .personasLoaded(personas):
-			print("M- Did set personas")
 			state.personas = personas
 			return .none
 
 		case let .setSecurityProblems(problems):
-			print("M- Did set \(problems.count) problems")
 			state.problems = problems
 			state.personas.mutateAll { persona in
 				persona.securityProblemsConfig.update(problems: problems)
@@ -131,12 +129,11 @@ public struct PersonaList: Sendable, FeatureReducer {
 	}
 
 	private func personasEffect(state: State) -> Effect<Action> {
-		.run { [strategy = state.strategy] send in
+		.run { [strategy = state.strategy, problems = state.problems] send in
 			for try await personas in await personasClient.personas() {
 				guard !Task.isCancelled else { return }
 				let ids = try await personaIDs(strategy) ?? OrderedSet(validating: personas.ids)
-				print("M- Will set personas with \(state.problems.count) problems")
-				let result = ids.compactMap { personas[id: $0] }.map { PersonaFeature.State(persona: $0, problems: state.problems) }
+				let result = ids.compactMap { personas[id: $0] }.map { PersonaFeature.State(persona: $0, problems: problems) }
 				guard result.count == ids.count else {
 					throw UpdatePersonaError.personasMissingFromClient(ids.subtracting(result.map(\.id)))
 				}
