@@ -1032,7 +1032,6 @@ extension ProfileStoreExistingProfileTests {
 				then(&$0)
 			} operation: { [self] in
 				let sut = ProfileStore.init()
-				await sut.unlockedApp() // must unlock to allow alert to be displayed
 				// The scheduling of the alert needs some time...
 				await nearFutureFulfillment(of: alertScheduled)
 				return await sut.profile
