@@ -341,7 +341,9 @@ final class ProfileStoreNewProfileTests: TestCase {
 			} operation: {
 				let sut = ProfileStore()
 				// WHEN import profile
-				try await sut.importProfile(Profile.withOneAccountsDeviceInfo_BEEF_mnemonic_ABANDON_ART)
+				var profile = Profile.withOneAccountsDeviceInfo_BEEF_mnemonic_ABANDON_ART
+				await sut.claimOwnership(of: &profile)
+				try await sut.importProfile(profile)
 				return await sut.profile
 			}
 
@@ -746,40 +748,6 @@ final class ProfileStoreExistingProfileTests: TestCase {
 		}
 	}
 
-//	func test__GIVEN__saved_profile_mismatch_deviceID__WHEN__claimAndContinueUseOnThisPhone__THEN__profile_uses_claimed_device() async throws {
-//		try await doTestMismatch(
-//			savedProfile: Profile.withOneAccount,
-//			action: .claimAndContinueUseOnThisPhone
-//		) { claimed in
-//			// THEN profile uses claimed device
-//			XCTAssertNoDifference(
-//				claimed.header.lastUsedOnDevice.id,
-//				DeviceInfo.testValueBEEF.id
-//			)
-//		}
-//	}
-
-//	func test__GIVEN__saved_profile_mismatch_deviceID__WHEN__deleteProfile__THEN__profile_got_deleted() async throws {
-//		let uuidOfNewProfile = UUID()
-//		let savedProfile = Profile.withOneAccount
-//		let userDefaults = UserDefaults.Dependency.ephemeral()
-//		try await doTestMismatch(
-//			savedProfile: savedProfile,
-//			userDefaults: userDefaults,
-//			action: .deleteProfileFromThisPhone,
-//			then: {
-//				$0.uuid = .constant(uuidOfNewProfile)
-//				XCTAssertNoDifference(userDefaults.string(key: .activeProfileID), savedProfile.header.id.uuidString)
-//				$0.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { idToDelete, _ in
-//					XCTAssertNoDifference(idToDelete, savedProfile.header.id)
-//				}
-//			}
-//		)
-//
-//		// New active profile
-//		XCTAssertNoDifference(userDefaults.string(key: .activeProfileID), uuidOfNewProfile.uuidString)
-//	}
-
 	func test__GIVEN__mismatch__WHEN__app_is_not_yet_unlocked__THEN__no_alert_is_displayed() async throws {
 		let alertNotScheduled = expectation(
 			description: "overlayWindowClient did NOT scheduled alert"
@@ -955,62 +923,6 @@ final class ProfileStoreExistingProfileTests: TestCase {
 			}
 		}
 	}
-
-	func test__GIVEN__saved_profile__WHEN__we_update_profile_without_ownership__THEN__ownership_conflict_alert_is_shown() async throws {
-		try await withTimeLimit(.normal) {
-			// GIVEN saved profile
-			let saved = Profile.withOneAccountsDeviceInfo_ABBA_mnemonic_ABANDON_ART
-			let profileHasBeenUpdated = LockIsolated<Bool>(false)
-			let ownership_conflict_alert_is_shown = self.expectation(description: "ownership conflict alert is shown")
-
-			try await withTestClients {
-				$0.savedProfile(saved)
-				when(&$0)
-				then(&$0)
-			} operation: {
-				let sut = ProfileStore()
-				await sut.unlockedApp()
-				// WHEN we update profile...
-				do {
-					try await sut.updating {
-						$0.header.lastModified = Date()
-						profileHasBeenUpdated.setValue(true)
-					}
-					return XCTFail("Expected to throw")
-				} catch {
-					// expected to throw
-				}
-			}
-
-			func when(_ d: inout DependencyValues) {
-				d.secureStorageClient.loadProfileSnapshot = { _ in
-					profileHasBeenUpdated.withValue { hasBeenUpdated in
-						if hasBeenUpdated {
-							var modified = saved
-							modified.header.lastUsedOnDevice = .testValueBEEF // 0xBEEF != 0xABBA
-							// WHEN ... without ownership
-							return modified
-						} else {
-							return saved
-						}
-					}
-				}
-			}
-
-			func then(_ d: inout DependencyValues) {
-				d.overlayWindowClient.scheduleAlert = { alert in
-					XCTAssertNoDifference(
-						alert.message, TextState(overlayClientProfileStoreOwnershipConflictTextState)
-					)
-					// THEN ownership conflict alert is shown
-					ownership_conflict_alert_is_shown.fulfill()
-					return .dismissed
-				}
-			}
-
-			await self.nearFutureFulfillment(of: ownership_conflict_alert_is_shown)
-		}
-	}
 }
 
 // MARK: - ProfileStoreAsyncSequenceTests
@@ -1103,7 +1015,7 @@ extension ProfileStoreExistingProfileTests {
 	private func doTestMismatch(
 		savedProfile: Profile,
 		userDefaults: UserDefaults.Dependency = .ephemeral(),
-		action: OverlayWindowClient.Item.AlertAction,
+		action: OverlayWindowClient.FullScreenAction,
 		then: @escaping @Sendable (inout DependencyValues) -> Void = { _ in },
 		result assertResult: @escaping @Sendable (Profile) -> Void = { _ in }
 	) async throws {
@@ -1127,9 +1039,9 @@ extension ProfileStoreExistingProfileTests {
 			}
 
 			func when(_ d: inout DependencyValues) {
-				d.overlayWindowClient.scheduleAlert = { alert in
+				d.overlayWindowClient.scheduleFullScreen = { screen in
 					XCTAssertNoDifference(
-						alert.message, TextState(overlayClientProfileStoreOwnershipConflictTextState)
+						screen, .init(root: .claimWallet(.init()))
 					)
 					alertScheduled.fulfill()
 					return action

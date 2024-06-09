@@ -32,6 +32,7 @@ final class MainFeatureTests: TestCase {
 				.dependency(\.cloudBackupClient, .noop)
 				.dependency(\.gatewaysClient.currentGatewayValues) { AsyncLazySequence([.stokenet]).eraseToAnyAsyncSequence() }
 				.dependency(\.resetWalletClient, .noop)
+				.dependency(\.securityCenterClient, .noop)
 		}
 
 		XCTAssertFalse(store.state.showIsUsingTestnetBanner)
