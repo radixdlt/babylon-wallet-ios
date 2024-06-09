@@ -117,13 +117,13 @@ extension SelectBackup.View {
 	) -> some View {
 		let header = item.value
 		let isVersionCompatible = header.isVersionCompatible()
-		let creatingDevice = header.creatingDevice.id == viewStore.thisDeviceID ? L10n.IOSProfileBackup.thisDevice : header.creatingDevice.description
+		let lastDevice = header.lastUsedOnDevice.id == viewStore.thisDeviceID ? L10n.IOSProfileBackup.thisDevice : header.lastUsedOnDevice.description
 		return Card(action: item.action) {
 			HStack {
 				VStack(alignment: .leading, spacing: 0) {
 					Group {
 						// Contains bold text segments.
-						Text(LocalizedStringKey(L10n.RecoverProfileBackup.backupFrom(creatingDevice)))
+						Text(LocalizedStringKey(L10n.RecoverProfileBackup.backupFrom(lastDevice)))
 						Text(L10n.IOSProfileBackup.lastModifedDateLabel(formatDate(header.lastModified)))
 
 						Text(L10n.IOSProfileBackup.totalAccountsNumberLabel(Int(header.contentHint.numberOfAccountsOnAllNetworksInTotal)))
