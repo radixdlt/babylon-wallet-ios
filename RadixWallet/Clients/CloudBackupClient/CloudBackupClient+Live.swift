@@ -71,10 +71,10 @@ extension CloudBackupClient {
 		}
 
 		@Sendable
-		func fetchAllProfileRecords(headerOnly: Bool = false) async throws -> [CKRecord] {
+		func fetchAllProfileHeaders() async throws -> [CKRecord] {
 			let records = try await container.privateCloudDatabase.records(
 				matching: .init(recordType: .profile, predicate: .init(value: true)),
-				desiredKeys: headerOnly ? .header : nil
+				desiredKeys: .header
 			)
 			return try records.matchResults.map { try $0.1.get() }
 		}
@@ -198,7 +198,6 @@ extension CloudBackupClient {
 			},
 			migrateProfilesFromKeychain: {
 				let activeProfile = await profileStore.profile.id
-				let backedUpRecords = try await fetchAllProfileRecords()
 				guard let headerList = try secureStorageClient.loadProfileHeaderList() else { return [] }
 
 				let previouslyMigrated = userDefaults.getMigratedKeychainProfiles
@@ -215,6 +214,8 @@ extension CloudBackupClient {
 
 					return (profileData, header)
 				}
+
+				let backedUpRecords = try await fetchAllProfileHeaders()
 
 				let migrated: [CKRecord] = try await migratable.asyncCompactMap { profileData, header in
 					let backedUpRecord = backedUpRecords.first { $0.recordID.recordName == header.id.uuidString }
@@ -245,7 +246,7 @@ extension CloudBackupClient {
 				try await getProfile(fetchProfileRecord(id))
 			},
 			loadProfileHeaders: {
-				try await fetchAllProfileRecords(headerOnly: true)
+				try await fetchAllProfileHeaders()
 					.map(getProfileHeader)
 					.filter(\.isNonEmpty)
 			},
