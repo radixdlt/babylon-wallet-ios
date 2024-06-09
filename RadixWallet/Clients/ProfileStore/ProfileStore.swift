@@ -22,9 +22,10 @@ import Sargon
 /// 	func unlockedApp() async -> Profile
 ///	 	func finishedOnboarding() async
 ///     func finishOnboarding(with _: AccountsRecoveredFromScanningUsingMnemonic) async throws
-///	 	func importProfileSnapshot(_ s: Profile) throws
+///	 	func importProfile(_ s: Profile) throws
 ///	 	func deleteProfile(keepInICloudIfPresent: Bool) throws
 /// 	func updating<T>(_ t: (inout Profile) async throws -> T) async throws -> T
+///     func claimOwnership(of profile: inout Profile)
 ///
 /// The app is suppose to call `unlockedApp` after user has authenticated from `Splash`, which
 /// will emit any Profile ownership conflict if needed, and returns the newly claimed Profile that had
@@ -68,24 +69,18 @@ public final actor ProfileStore {
 
 	private enum Mode {
 		case appIsUnlocked
-		case appIsLocked(bufferedProfileOwnershipConflict: ConflictingOwners?)
+		case appIsLocked
 	}
 
 	init() {
 		let metaDeviceInfo = Self._deviceInfo()
-		let (deviceInfo, profile, conflictingOwners) = Self._loadSavedElseNewProfile(metaDeviceInfo: metaDeviceInfo)
+		let (deviceInfo, profile) = Self._loadSavedElseNewProfile(metaDeviceInfo: metaDeviceInfo)
 		loggerGlobal.info("profile.id: \(profile.id)")
 		loggerGlobal.info("device.id: \(deviceInfo.id)")
 		self.deviceInfo = deviceInfo
 		self.profileSubject = AsyncCurrentValueSubject(profile)
-		self.mode = .appIsLocked(bufferedProfileOwnershipConflict: conflictingOwners)
+		self.mode = .appIsLocked
 	}
-}
-
-// MARK: - ConflictingOwners
-public struct ConflictingOwners: Sendable, Hashable {
-	public let ownerOfCurrentProfile: DeviceInfo
-	public let thisDevice: DeviceInfo
 }
 
 // MARK: Public
@@ -331,18 +326,6 @@ extension ProfileStore {
 		case .appIsLocked: false
 		}
 	}
-
-	private var bufferedOwnershipConflictWhileAppLocked: ConflictingOwners? {
-		switch mode {
-		case .appIsUnlocked: nil
-		case let .appIsLocked(buffered): buffered
-		}
-	}
-
-	private func buffer(conflictingOwners: ConflictingOwners?) {
-		loggerGlobal.info("App is locked, buffering conflicting profle owner")
-		self.mode = .appIsLocked(bufferedProfileOwnershipConflict: conflictingOwners)
-	}
 }
 
 // MARK: Helpers
@@ -403,16 +386,6 @@ extension ProfileStore {
 
 		guard deviceInfo.id == header.lastUsedOnDevice.id else {
 			loggerGlobal.error("Device ID mismatch, profile might have been used on another device. Last used in header was: \(String(describing: header.lastUsedOnDevice)) and info of this device: \(String(describing: deviceInfo))")
-			Task {
-				let conflictingOwners = ConflictingOwners(
-					ownerOfCurrentProfile: header.lastUsedOnDevice,
-					thisDevice: deviceInfo
-				)
-
-				guard appIsUnlocked else {
-					return buffer(conflictingOwners: conflictingOwners)
-				}
-			}
 			throw Error.profileUsedOnAnotherDevice
 		}
 		// All good
@@ -421,7 +394,7 @@ extension ProfileStore {
 
 // MARK: Private Static
 extension ProfileStore {
-	typealias NewProfileTuple = (deviceInfo: DeviceInfo, profile: Profile, conflictingOwners: ConflictingOwners?)
+	typealias NewProfileTuple = (deviceInfo: DeviceInfo, profile: Profile)
 
 	private static func _loadSavedElseNewProfile(
 		metaDeviceInfo: MetaDeviceInfo
@@ -432,8 +405,7 @@ extension ProfileStore {
 		func newProfile() throws -> NewProfileTuple {
 			try (
 				deviceInfo: metaDeviceInfo.deviceInfo,
-				profile: _tryGenerateAndSaveNewProfile(deviceInfo: deviceInfo),
-				conflictingOwners: nil
+				profile: _tryGenerateAndSaveNewProfile(deviceInfo: deviceInfo)
 			)
 		}
 
@@ -470,11 +442,7 @@ extension ProfileStore {
 				}
 				return (
 					deviceInfo: deviceInfo,
-					profile: existing,
-					conflictingOwners: matchingIDs ? nil : .init(
-						ownerOfCurrentProfile: existing.header.lastUsedOnDevice,
-						thisDevice: deviceInfo
-					)
+					profile: existing
 				)
 			} else {
 				return try newProfile()
