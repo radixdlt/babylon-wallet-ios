@@ -19,7 +19,6 @@ import Sargon
 ///
 /// 	var profile: Profile { get }
 ///		func values() -> AnyAsyncSequence<Profile>
-/// 	func unlockedApp() async -> Profile
 ///	 	func finishedOnboarding() async
 ///     func finishOnboarding(with _: AccountsRecoveredFromScanningUsingMnemonic) async throws
 ///	 	func importProfile(_ s: Profile) throws
@@ -60,18 +59,6 @@ public final actor ProfileStore {
 	/// device model and name is async.
 	private var deviceInfo: DeviceInfo
 
-	/// After user has pass keychain auth prompt in Splash this becomes
-	/// `appIsUnlocked`. The idea is that we buffer ownership conflicts until UI
-	/// is ready to display it, reason being we dont wanna display the
-	/// OverlayClient UI for ownership conflict simultaneously as
-	/// unlock app keychain auth prompt.
-	private var mode: Mode
-
-	private enum Mode {
-		case appIsUnlocked
-		case appIsLocked
-	}
-
 	init() {
 		let metaDeviceInfo = Self._deviceInfo()
 		let (deviceInfo, profile) = Self._loadSavedElseNewProfile(metaDeviceInfo: metaDeviceInfo)
@@ -79,7 +66,6 @@ public final actor ProfileStore {
 		loggerGlobal.info("device.id: \(deviceInfo.id)")
 		self.deviceInfo = deviceInfo
 		self.profileSubject = AsyncCurrentValueSubject(profile)
-		self.mode = .appIsLocked
 	}
 }
 
@@ -223,12 +209,6 @@ extension ProfileStore {
 	public func isThisDevice(deviceID: DeviceID) -> Bool {
 		deviceID == deviceInfo.id
 	}
-
-	public func unlockedApp() async -> Profile {
-		loggerGlobal.notice("Unlocking app")
-		self.mode = .appIsUnlocked
-		return profile
-	}
 }
 
 extension DeviceInfo {
@@ -318,13 +298,6 @@ extension ProfileStore {
 		var toSave = toSave
 		try _updateHeader(of: &toSave)
 		try _saveProfileAndEmitUpdate(toSave)
-	}
-
-	private var appIsUnlocked: Bool {
-		switch mode {
-		case .appIsUnlocked: true
-		case .appIsLocked: false
-		}
 	}
 }
 
