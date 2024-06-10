@@ -9,7 +9,8 @@ extension AccountDetails.State {
 			displayName: account.displayName.rawValue,
 			isLedgerAccount: account.isLedgerControlled,
 			totalFiatWorth: showFiatWorth ? assets.totalFiatWorth : nil,
-			account: account
+			account: account,
+			securityProblemsConfig: securityProblemsConfig
 		)
 	}
 }
@@ -23,6 +24,7 @@ extension AccountDetails {
 		let isLedgerAccount: Bool
 		let totalFiatWorth: Loadable<FiatWorth>?
 		let account: Account
+		let securityProblemsConfig: EntitySecurityProblemsView.Config
 	}
 
 	@MainActor
@@ -96,8 +98,10 @@ extension AccountDetails {
 			.padding(.top, .small1)
 			.padding([.horizontal, .bottom], .medium1)
 
-			EntitySecurityProblems.View(store: store.entitySecurityProblems)
-				.padding([.horizontal, .bottom], .medium1)
+			EntitySecurityProblemsView(config: viewStore.securityProblemsConfig) {
+				viewStore.send(.securityProblemsTapped)
+			}
+			.padding([.horizontal, .bottom], .medium1)
 		}
 
 		func assetsView() -> some SwiftUI.View {
@@ -152,10 +156,6 @@ private extension StoreOf<AccountDetails> {
 			state.$destination
 		}
 		return scope(state: scopeState, action: Action.destination)
-	}
-
-	var entitySecurityProblems: StoreOf<EntitySecurityProblems> {
-		scope(state: \.entitySecurityProblems, action: \.child.entitySecurityProblems)
 	}
 }
 

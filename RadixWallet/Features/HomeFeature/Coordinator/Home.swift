@@ -9,6 +9,7 @@ public struct Home: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		// MARK: - Components
 		public var accountRows: IdentifiedArrayOf<Home.AccountRow.State> = []
+		fileprivate var problems: [SecurityProblem] = []
 
 		public var showRadixBanner: Bool = false
 		public var showFiatWorth: Bool = true
@@ -61,6 +62,7 @@ public struct Home: Sendable, FeatureReducer {
 		case accountsResourcesLoaded(Loadable<[OnLedgerEntity.OnLedgerAccount]>)
 		case accountsFiatWorthLoaded([AccountAddress: Loadable<FiatWorth>])
 		case showLinkConnectorIfNeeded
+		case setSecurityProblems([SecurityProblem])
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -124,6 +126,7 @@ public struct Home: Sendable, FeatureReducer {
 	@Dependency(\.npsSurveyClient) var npsSurveyClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.radixConnectClient) var radixConnectClient
+	@Dependency(\.securityCenterClient) var securityCenterClient
 
 	public init() {}
 
@@ -170,6 +173,7 @@ public struct Home: Sendable, FeatureReducer {
 			.merge(with: loadAccountResources())
 			.merge(with: loadFiatValues())
 			.merge(with: showNpsSurveyEffect())
+			.merge(with: securityProblemsEffect())
 			.merge(with: delayedMediumEffect(for: .internal(.showLinkConnectorIfNeeded)))
 
 		case .createAccountButtonTapped:
@@ -213,7 +217,7 @@ public struct Home: Sendable, FeatureReducer {
 				return .none
 			}
 
-			state.accountRows = accounts.map { Home.AccountRow.State(account: $0) }.asIdentified()
+			state.accountRows = accounts.map { Home.AccountRow.State(account: $0, problems: state.problems) }.asIdentified()
 
 			return .run { [addresses = state.accountAddresses] _ in
 				_ = try await accountPortfoliosClient.fetchAccountPortfolios(addresses, false)
@@ -271,6 +275,13 @@ public struct Home: Sendable, FeatureReducer {
 				state.addDestination(
 					.relinkConnector(.init(root: .connectionApproval(.init(purpose: purpose))))
 				)
+			}
+			return .none
+
+		case let .setSecurityProblems(problems):
+			state.problems = problems
+			state.accountRows.mutateAll { row in
+				row.securityProblemsConfig.update(problems: problems)
 			}
 			return .none
 		}
@@ -400,6 +411,16 @@ public struct Home: Sendable, FeatureReducer {
 			await npsSurveyClient.uploadUserFeedback(feedback)
 		}
 	}
+
+	private func securityProblemsEffect() -> Effect<Action> {
+		.run { send in
+			for try await problems in await securityCenterClient.problems() {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.setSecurityProblems(problems)))
+			}
+		}
+	}
+
 }
 
 extension Home.State {
