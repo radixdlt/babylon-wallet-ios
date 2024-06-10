@@ -3,7 +3,7 @@ import SwiftUI
 
 extension ConfigurationBackup.State {
 	var lastCloudBackupString: String? {
-		if actionsRequired.isEmpty {
+		if let lastCloudBackup, lastCloudBackup.isCurrent, lastCloudBackup.result.succeeded {
 			nil
 		} else {
 			L10n.ConfigurationBackup.Automated.lastBackup(
