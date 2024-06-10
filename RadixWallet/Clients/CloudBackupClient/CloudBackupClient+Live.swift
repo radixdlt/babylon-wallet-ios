@@ -80,6 +80,23 @@ extension CloudBackupClient {
 		}
 
 		@Sendable
+		func DEBUG_REMOVE_deleteProfileRecords() async throws {
+			let oldRecords = try await container.privateCloudDatabase.records(
+				matching: .init(recordType: "Profile", predicate: .init(value: true)),
+				desiredKeys: .header
+			)
+			.matchResults
+			.map { try $0.1.get().recordID }
+
+			for oldRecord in oldRecords {
+				try await container.privateCloudDatabase.deleteRecord(withID: oldRecord)
+			}
+
+			@Dependency(\.overlayWindowClient) var overlayWindowClient
+			overlayWindowClient.scheduleAlertAndIgnoreAction(.init(title: TextState("Deleted \(oldRecords.count) old Profile records")))
+		}
+
+		@Sendable
 		func getProfile(_ record: CKRecord) throws -> BackedUpProfile {
 			guard record.recordType == .profile else {
 				throw IncorrectRecordTypeError()
@@ -178,6 +195,13 @@ extension CloudBackupClient {
 
 		return .init(
 			startAutomaticBackups: {
+				do {
+					try await DEBUG_REMOVE_deleteProfileRecords()
+				} catch {
+					@Dependency(\.errorQueue) var errorQueue
+					errorQueue.schedule(error)
+				}
+
 				// The active profile should not be synced to iCloud keychain
 				let profileID = await profileStore.profile.id
 				try secureStorageClient.disableCloudProfileSync(profileID)
