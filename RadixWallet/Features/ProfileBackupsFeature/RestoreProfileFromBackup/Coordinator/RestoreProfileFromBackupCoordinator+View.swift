@@ -13,6 +13,7 @@ extension RestoreProfileFromBackupCoordinator {
 
 		public var body: some SwiftUI.View {
 			SelectBackup.View(store: store.selectBackup)
+				.inNavigationStack
 				.destinations(with: store)
 		}
 	}
