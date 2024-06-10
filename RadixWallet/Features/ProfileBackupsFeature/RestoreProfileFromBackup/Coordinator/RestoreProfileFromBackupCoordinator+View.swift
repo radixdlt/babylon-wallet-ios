@@ -12,34 +12,35 @@ extension RestoreProfileFromBackupCoordinator {
 		}
 
 		public var body: some SwiftUI.View {
-			NavigationStackStore(
-				store.scope(state: \.path, action: { .child(.path($0)) })
-			) {
-				path(for: store.scope(state: \.root, action: { .child(.root($0)) }))
-			} destination: {
-				path(for: $0)
-			}
+			SelectBackup.View(store: store.selectBackup)
+				.destinations(with: store)
 		}
+	}
+}
 
-		private func path(
-			for store: StoreOf<RestoreProfileFromBackupCoordinator.Path>
-		) -> some SwiftUI.View {
-			SwitchStore(store) { state in
-				switch state {
-				case .selectBackup:
-					CaseLet(
-						/RestoreProfileFromBackupCoordinator.Path.State.selectBackup,
-						action: RestoreProfileFromBackupCoordinator.Path.Action.selectBackup,
-						then: { SelectBackup.View(store: $0) }
-					)
-				case .importMnemonicsFlow:
-					CaseLet(
-						/RestoreProfileFromBackupCoordinator.Path.State.importMnemonicsFlow,
-						action: RestoreProfileFromBackupCoordinator.Path.Action.importMnemonicsFlow,
-						then: { ImportMnemonicsFlowCoordinator.View(store: $0) }
-					)
-				}
-			}
+private extension StoreOf<RestoreProfileFromBackupCoordinator> {
+	var selectBackup: StoreOf<SelectBackup> {
+		scope(state: \.selectBackup, action: \.child.selectBackup)
+	}
+
+	var destination: PresentationStoreOf<RestoreProfileFromBackupCoordinator.Destination> {
+		func scopeState(state: State) -> PresentationState<RestoreProfileFromBackupCoordinator.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<RestoreProfileFromBackupCoordinator>) -> some View {
+		let destinationStore = store.destination
+		return importMnemonics(with: destinationStore)
+	}
+
+	private func importMnemonics(with destinationStore: PresentationStoreOf<RestoreProfileFromBackupCoordinator.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.importMnemonicsFlow, action: \.importMnemonicsFlow)) {
+			ImportMnemonicsFlowCoordinator.View(store: $0)
 		}
 	}
 }
