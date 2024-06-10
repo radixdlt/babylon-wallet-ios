@@ -161,10 +161,10 @@ public enum SecurityProblem: Hashable, Sendable, Identifiable {
 // MARK: - BackupStatus
 public struct BackupStatus: Hashable, Codable, Sendable {
 	public let result: BackupResult
-	public let upToDate: Bool
+	public let isCurrent: Bool
 
 	public init(result: BackupResult, profile: Profile) {
 		self.result = result
-		self.upToDate = result.saveIdentifier == profile.saveIdentifier
+		self.isCurrent = result.saveIdentifier == profile.saveIdentifier
 	}
 }

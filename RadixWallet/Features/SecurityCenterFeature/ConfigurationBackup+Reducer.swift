@@ -24,24 +24,14 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 
 		public var outdatedBackupPresent: Bool {
 			guard let lastCloudBackup, lastCloudBackup.result.succeeded else { return false }
-			return !cloudBackupsEnabled && !lastCloudBackup.upToDate
+			return !cloudBackupsEnabled && !lastCloudBackup.isCurrent
 		}
 
 		public var actionsRequired: [Item] {
-			guard let lastCloudBackup else { return [] }
-			if lastCloudBackup.upToDate, !lastCloudBackup.result.failed {
-				return []
+			if let lastCloudBackup, lastCloudBackup.isCurrent, !lastCloudBackup.result.failed {
+				[]
 			} else {
-				return Item.allCases
-			}
-		}
-
-		public var displayedLastBackup: Date? {
-			guard let lastCloudBackup else { return nil }
-			if lastCloudBackup.result.succeeded {
-				return lastCloudBackup.upToDate ? nil : lastCloudBackup.result.backupDate
-			} else {
-				return lastCloudBackup.result.lastSuccess
+				Item.allCases
 			}
 		}
 
@@ -218,7 +208,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		.run { send in
 			for try await lastBackup in await securityCenterClient.lastManualBackup() {
 				guard !Task.isCancelled else { return }
-				await send(.internal(.setLastManualBackup(lastBackup?.result.backupDate)))
+				await send(.internal(.setLastManualBackup(lastBackup?.result.date)))
 			}
 		}
 	}

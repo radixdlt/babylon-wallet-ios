@@ -170,7 +170,7 @@ extension UserDefaults.Dependency {
 		let now = Date.now
 		let lastSuccess = result == .success ? now : backups[profile.id]?.lastSuccess
 		backups[profile.id] = .init(
-			backupDate: now,
+			date: now,
 			saveIdentifier: profile.saveIdentifier,
 			result: result,
 			lastSuccess: lastSuccess
@@ -192,7 +192,7 @@ extension UserDefaults.Dependency {
 		var backups: [ProfileID: BackupResult] = getLastManualBackups
 		let now = Date.now
 		backups[profile.id] = .init(
-			backupDate: now,
+			date: now,
 			saveIdentifier: profile.saveIdentifier,
 			result: .success,
 			lastSuccess: now
@@ -240,7 +240,7 @@ extension UserDefaults.Dependency {
 public struct BackupResult: Hashable, Codable, Sendable {
 	private static let timeoutInterval: TimeInterval = 5 * 60
 
-	public let backupDate: Date
+	public let date: Date
 	public let saveIdentifier: String
 	public let result: Result
 	public let lastSuccess: Date?

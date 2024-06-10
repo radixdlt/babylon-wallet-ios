@@ -65,26 +65,11 @@ extension SecurityCenterClient {
 					problematic.unrecoverable.isEmpty ? nil : problematic.unrecoverable
 				}
 
-				switch backups.cloud?.result.result {
-				case .success:
-					if backups.cloud?.upToDate == true {
-						print("•• CLOUD SUCCESS")
-					} else {
-						print("•• CLOUD old but success")
-					}
-				case let .started(date):
-					print("•• CLOUD STARTED \(Date.now.timeIntervalSince(date))")
-				case .failure:
-					print("•• CLOUD FAILURE")
-				case .none:
-					print("•• CLOUD nil")
-				}
-
 				func hasProblem5() -> Bool {
 					if isCloudProfileSyncEnabled, let cloudBackup = backups.cloud {
 						cloudBackup.result.failed
 					} else {
-						false // FIXME: GK - is this what we want?
+						false
 					}
 				}
 
@@ -93,7 +78,7 @@ extension SecurityCenterClient {
 				}
 
 				func hasProblem7() -> Bool {
-					!isCloudProfileSyncEnabled && backups.manual?.upToDate == false
+					!isCloudProfileSyncEnabled && backups.manual?.isCurrent == false
 				}
 
 				func hasProblem9() async -> ProblematicAddresses? {
@@ -114,8 +99,6 @@ extension SecurityCenterClient {
 				if hasProblem7() { result.append(.problem7) }
 
 				problemsSubject.send(result)
-
-				print("•• -> \(result.map(\.number))")
 			}
 		}
 
