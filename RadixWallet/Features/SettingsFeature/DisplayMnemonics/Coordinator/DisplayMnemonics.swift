@@ -33,11 +33,13 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 	}
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case displayMnemonic(ImportMnemonic.State)
 			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case displayMnemonic(DisplayMnemonic.Action)
 			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)

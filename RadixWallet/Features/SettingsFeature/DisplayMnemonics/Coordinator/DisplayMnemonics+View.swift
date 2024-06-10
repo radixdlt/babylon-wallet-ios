@@ -69,21 +69,15 @@ private extension View {
 	}
 
 	private func displayMnemonicSheet(with destinationStore: PresentationStoreOf<DisplayMnemonics.Destination>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /DisplayMnemonics.Destination.State.displayMnemonic,
-			action: DisplayMnemonics.Destination.Action.displayMnemonic,
-			destination: { DisplayMnemonic.View(store: $0) }
-		)
+		navigationDestination(store: destinationStore.scope(state: \.displayMnemonic, action: \.displayMnemonic)) {
+			DisplayMnemonic.View(store: $0)
+		}
 	}
 
 	private func importMnemonicsSheet(with destinationStore: PresentationStoreOf<DisplayMnemonics.Destination>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /DisplayMnemonics.Destination.State.importMnemonics,
-			action: DisplayMnemonics.Destination.Action.importMnemonics,
-			destination: { ImportMnemonicsFlowCoordinator.View(store: $0).inNavigationView }
-		)
+		fullScreenCover(store: destinationStore.scope(state: \.importMnemonics, action: \.importMnemonics)) {
+			ImportMnemonicsFlowCoordinator.View(store: $0).inNavigationView
+		}
 	}
 }
 

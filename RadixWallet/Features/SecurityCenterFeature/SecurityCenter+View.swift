@@ -232,7 +232,7 @@ private extension View {
 	}
 
 	private func importMnemonics(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
-		sheet(store: destinationStore.scope(state: \.importMnemonics, action: \.importMnemonics)) {
+		fullScreenCover(store: destinationStore.scope(state: \.importMnemonics, action: \.importMnemonics)) {
 			ImportMnemonicsFlowCoordinator.View(store: $0)
 		}
 	}

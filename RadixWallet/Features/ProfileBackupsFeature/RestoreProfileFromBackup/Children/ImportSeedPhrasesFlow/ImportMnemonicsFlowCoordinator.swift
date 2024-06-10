@@ -27,6 +27,8 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		public var imported: OrderedSet<SkippedOrImported> = []
 		public var skipped: OrderedSet<SkippedOrImported> = []
 		public var newMainBDFS: DeviceFactorSource?
+		public var root: Path.State
+		public var path: StackState<Path.State> = .init()
 
 		public enum Context: Sendable, Hashable {
 			case fromOnboarding(profile: Profile)
@@ -49,16 +51,15 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 
 		public let context: Context
 
-		@PresentationState
-		public var destination: Destination.State?
-
 		public init(context: Context = .notOnboarding) {
 			self.context = context
+			self.root = .loading
 		}
 	}
 
-	public struct Destination: DestinationReducer {
+	public struct Path: Sendable, Hashable, Reducer {
 		public enum State: Sendable, Hashable {
+			case loading
 			case importMnemonicControllingAccounts(ImportMnemonicControllingAccounts.State)
 		}
 
@@ -67,13 +68,15 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(
-				state: /State.importMnemonicControllingAccounts,
-				action: /Action.importMnemonicControllingAccounts
-			) {
+			Scope(state: /State.importMnemonicControllingAccounts, action: /Action.importMnemonicControllingAccounts) {
 				ImportMnemonicControllingAccounts()
 			}
 		}
+	}
+
+	public enum ChildAction: Sendable, Equatable {
+		case root(Path.Action)
+		case path(StackActionOf<Path>)
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -117,13 +120,14 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
+		Scope(state: \.root, action: /Action.child .. ChildAction.root) {
+			Path()
+		}
 		Reduce(core)
-			.ifLet(destinationPath, action: /Action.destination) {
-				Destination()
+			.forEach(\.path, action: /Action.child .. ChildAction.path) {
+				Path()
 			}
 	}
-
-	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -199,9 +203,10 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
-		switch presentedAction {
-		case let .importMnemonicControllingAccounts(.delegate(delegateAction)):
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+		switch childAction {
+		case let .root(.importMnemonicControllingAccounts(.delegate(delegateAction))),
+		     let .path(.element(_, action: .importMnemonicControllingAccounts(.delegate(delegateAction)))):
 			switch delegateAction {
 			case let .createdNewMainBDFS(skipped, newMainBDFS):
 				state.newMainBDFS = newMainBDFS
@@ -226,21 +231,22 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
-		guard let destination = state.destination else {
-			return nextMnemonicIfNeeded(state: &state)
-		}
-
-		switch destination {
-		case let .importMnemonicControllingAccounts(substate):
-			if !substate.isMainBDFS {
-				return nextMnemonicIfNeeded(state: &state)
-			} else {
-				// Skipped a main bdfs by use of OS level gestures (thus bypassing warning)
-				return .send(.delegate(.finishedEarly(dueToFailure: true)))
-			}
-		}
-	}
+	// TODO: What to do about this?
+//	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+//		guard let destination = state.destination else {
+//			return nextMnemonicIfNeeded(state: &state)
+//		}
+//
+//		switch destination {
+//		case let .importMnemonicControllingAccounts(substate):
+//			if !substate.isMainBDFS {
+//				return nextMnemonicIfNeeded(state: &state)
+//			} else {
+//				// Skipped a main bdfs by use of OS level gestures (thus bypassing warning)
+//				return .send(.delegate(.finishedEarly(dueToFailure: true)))
+//			}
+//		}
+//	}
 
 	private func finishedWith(factorSourceID: FactorSourceIDFromHash, state: inout State) -> Effect<Action> {
 		state.mnemonicsLeftToImport.removeAll(where: { $0.id == factorSourceID.asGeneral })
@@ -249,12 +255,14 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 
 	private func nextMnemonicIfNeeded(state: inout State) -> Effect<Action> {
 		if let next = state.mnemonicsLeftToImport.first {
-			state.destination = .importMnemonicControllingAccounts(
-				next
-			)
+			let path = Path.State.importMnemonicControllingAccounts(next)
+			if state.root == .loading {
+				state.root = path
+			} else {
+				state.path.append(.importMnemonicControllingAccounts(next))
+			}
 			return .none
 		} else {
-			state.destination = nil
 			return .run { [skipped = state.skipped, imported = state.imported, newMainBDFS = state.newMainBDFS, context = state.context] send in
 				if let newMainBDFS, !context.isFromOnboarding {
 					try await factorSourcesClient.saveNewMainBDFS(newMainBDFS)

@@ -40,7 +40,7 @@ private extension View {
 	}
 
 	private func importMnemonics(with destinationStore: PresentationStoreOf<RestoreProfileFromBackupCoordinator.Destination>) -> some View {
-		sheet(store: destinationStore.scope(state: \.importMnemonicsFlow, action: \.importMnemonicsFlow)) {
+		fullScreenCover(store: destinationStore.scope(state: \.importMnemonicsFlow, action: \.importMnemonicsFlow)) {
 			ImportMnemonicsFlowCoordinator.View(store: $0)
 		}
 	}
