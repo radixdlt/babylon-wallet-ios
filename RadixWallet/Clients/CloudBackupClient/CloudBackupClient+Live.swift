@@ -149,21 +149,28 @@ extension CloudBackupClient {
 		func performAutomaticBackup(_ profile: Profile, timeToCheckIfClaimed: Bool) async {
 			let needsBackUp = profile.appPreferences.security.isCloudProfileSyncEnabled && profile.header.isNonEmpty
 			let lastBackup = userDefaults.getLastCloudBackups[profile.id]
-			let lastBackupSucceeded = lastBackup?.result == .success && lastBackup?.saveIdentifier == profile.saveIdentifier
+			let isBackedUp = lastBackup?.result == .success && lastBackup?.saveIdentifier == profile.saveIdentifier
 
-			let shouldBackUp = needsBackUp && !lastBackupSucceeded
+			let shouldBackUp = needsBackUp && !isBackedUp
 			let shouldCheckClaim = shouldBackUp || timeToCheckIfClaimed
 
 			guard shouldBackUp || shouldCheckClaim else { return }
 
 			let existingRecord = try? await fetchProfileRecord(profile.id)
-
 			let backedUpID = try? existingRecord.map(getProfileHeader)?.lastUsedOnDevice.id
 
 			let shouldReclaim: Bool
 			if shouldCheckClaim, let backedUpID, await !profileStore.isThisDevice(deviceID: backedUpID) {
 				let action = await overlayWindowClient.scheduleFullScreen(.init(root: .claimWallet(.init())))
-				shouldReclaim = action == .claimWallet(.transferBack)
+				switch action {
+				case .claimWallet(.transferBack):
+					shouldReclaim = true
+				case .claimWallet(.didClearWallet):
+					return
+				case .dismiss:
+					assertionFailure(".dismiss should never be sent from claimWallet")
+					return
+				}
 			} else {
 				shouldReclaim = false
 			}
