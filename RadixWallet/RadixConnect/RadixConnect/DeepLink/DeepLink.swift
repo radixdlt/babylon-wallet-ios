@@ -13,7 +13,6 @@ public actor Mobile2Mobile {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.cacheClient) var cacheClient
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
-	@Dependency(\.userDefaults) var userDefaults
 	@Dependency(\.dappInteractionClient) var dappInteractionClient
 
 	private let incomingMessagesSubject: AsyncPassthroughSubject<P2P.RTCIncomingMessage> = .init()
@@ -78,6 +77,7 @@ extension Mobile2Mobile {
 		case let .webDapp(dAppOrigin):
 			let dAppPublicKey = request.publicKey
 
+			// Move this to view/reducer
 			let wellKnown = await (try? fetchWellKnown(dAppOrigin: dAppOrigin)) ?? HTTPClient.WellKnownFileResponse(dApps: [.init(dAppDefinitionAddress: .wallet)], callbackPath: nil)
 			let dappReturnURL = getDappReturnURL(dAppOrigin, wellKnownFile: wellKnown)
 

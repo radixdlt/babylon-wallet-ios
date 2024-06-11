@@ -14,7 +14,6 @@ public struct VerifyDapp: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case cancel
 		case continueFlow
 	}
 
