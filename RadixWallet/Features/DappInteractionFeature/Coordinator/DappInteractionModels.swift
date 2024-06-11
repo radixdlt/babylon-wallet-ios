@@ -126,7 +126,7 @@ extension P2P.Dapp.Request {
 		case send(SendTransactionItem)
 
 		// verify
-		case verify(DappMetadata)
+		case verify(VerifyItems)
 
 		var priority: some Comparable {
 			switch self {
@@ -178,9 +178,9 @@ extension P2P.Dapp.Request {
 				.send(items.send),
 			]
 			.compactMap { $0 }
-		case let .verify(dappMetadata):
+		case let .verify(items):
 			[
-				.verify(dappMetadata),
+				.verify(items),
 			]
 		}
 	}

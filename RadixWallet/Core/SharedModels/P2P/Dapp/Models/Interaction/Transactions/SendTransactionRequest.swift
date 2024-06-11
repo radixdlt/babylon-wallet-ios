@@ -83,3 +83,11 @@ public typealias TXVersion = Tagged<TXVersionTag, UInt8>
 extension TXVersion {
 	public static let `default`: Self = 1
 }
+
+// MARK: - P2P.Dapp.Request.VeirfyItem
+extension P2P.Dapp.Request {
+	public struct VeirfyItem: Sendable, Hashable {
+		public let dappMetadata: DappMetadata
+		public let returnUrl: URL
+	}
+}

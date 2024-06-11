@@ -114,23 +114,23 @@ extension Mobile2Mobile {
 				)
 			)
 
-			let response = await dappInteractionClient.addWalletInteraction(.verify(dAppMetadata), .dappVerification)
+			let url = dappReturnURL.appending(queryItems: [
+				.init(name: "sessionId", value: request.sessionId.rawValue),
+				.init(name: "publicKey", value: walletPublicKey.rawRepresentation.hex()),
+			])
+			let returnUrl: URL = switch request.browser.lowercased() {
+			case "chrome":
+				URL(string: url.absoluteString.replacingOccurrences(of: "https://", with: "googlechromes://"))!
+			case "firefox":
+				URL(string: "firefox://open-url?url=\(url.absoluteString)")!
+			default:
+				url
+			}
 
-			// Open the URL after
-			/*
-			 let url = dappReturnURL.appending(queryItems: [
-			 	.init(name: "sessionId", value: request.sessionId.rawValue),
-			 	.init(name: "publicKey", value: walletPublicKey.rawRepresentation.hex()),
-			 ])
-			 let returnUrl: URL = switch request.browser.lowercased() {
-			 case "chrome":
-			 	URL(string: url.absoluteString.replacingOccurrences(of: "https://", with: "googlechromes://"))!
-			 case "firefox":
-			 	URL(string: "firefox://open-url?url=\(url.absoluteString)")!
-			 default:
-			 	url
-			 }
-			  */
+			_ = await dappInteractionClient.addWalletInteraction(
+				.verify(.init(dappMetadata: dAppMetadata, returnUrl: returnUrl)),
+				.dappVerification
+			)
 		}
 	}
 

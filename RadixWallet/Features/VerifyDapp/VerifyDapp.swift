@@ -10,7 +10,6 @@ public struct VerifyDapp: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case closeTapped
 		case continueTapped
 	}
 
@@ -21,9 +20,6 @@ public struct VerifyDapp: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .closeTapped:
-			.send(.delegate(.cancel))
-
 		case .continueTapped:
 			.send(.delegate(.continueFlow))
 		}

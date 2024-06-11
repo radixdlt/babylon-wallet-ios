@@ -13,7 +13,7 @@ extension P2P.Dapp.Request {
 
 		case request(RequestItems)
 		case transaction(TransactionItems)
-		case verify(DappMetadata)
+		case verify(VerifyItems)
 
 		public init(from decoder: Decoder) throws {
 			let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -82,6 +82,19 @@ extension P2P.Dapp.Request {
 
 		public init(send: SendTransactionItem) {
 			self.send = send
+		}
+	}
+}
+
+// MARK: - P2P.Dapp.Request.VerifyItems
+extension P2P.Dapp.Request {
+	public struct VerifyItems: Sendable, Hashable {
+		public let dappMetadata: DappMetadata
+		public let returnUrl: URL
+
+		public init(dappMetadata: DappMetadata, returnUrl: URL) {
+			self.dappMetadata = dappMetadata
+			self.returnUrl = returnUrl
 		}
 	}
 }

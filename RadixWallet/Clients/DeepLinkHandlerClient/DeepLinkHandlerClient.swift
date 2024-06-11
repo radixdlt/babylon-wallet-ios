@@ -96,8 +96,9 @@ extension DeepLinkHandlerClient {
 						} catch {
 							errorQueue.schedule(error)
 						}
-					} catch {
-						errorQueue.schedule(error)
+					} else {
+						struct UnknownDeepLinkURL: Swift.Error {}
+						errorQueue.schedule(UnknownDeepLinkURL())
 					}
 				}
 			},

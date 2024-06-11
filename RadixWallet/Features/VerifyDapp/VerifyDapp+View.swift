@@ -25,9 +25,6 @@ public extension VerifyDapp {
 					.buttonStyle(.primaryRectangular)
 				}
 			}
-			.withNavigationBar {
-				store.send(.view(.closeTapped))
-			}
 		}
 	}
 }
