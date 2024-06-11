@@ -37,8 +37,6 @@ public struct FullScreenOverlayCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	@Dependency(\.openURL) var openURL
-
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
@@ -51,20 +49,10 @@ public struct FullScreenOverlayCoordinator: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .root(.claimWallet(.delegate)):
-			dismiss()
+			.send(.delegate(.dismiss))
 
 		default:
 			.none
-		}
-	}
-
-	private func dismiss() -> Effect<Action> {
-		.send(.delegate(.dismiss))
-	}
-
-	private func openUrl(_ url: URL) -> Effect<Action> {
-		.run { _ in
-			await openURL(url)
 		}
 	}
 }
