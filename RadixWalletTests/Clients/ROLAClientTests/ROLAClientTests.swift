@@ -17,7 +17,7 @@ final class ROLAClientTests: TestCase {
 	private func metadata(
 		origin: String,
 		dAppDefinitionAddress: DappDefinitionAddress
-	) -> P2P.Dapp.Request.Metadata {
+	) -> DappToWalletInteractionMetadata {
 		try! .init(
 			version: 1, networkId: NetworkID.mainnet,
 			origin: .init(string: origin),
@@ -82,7 +82,7 @@ final class ROLAClientTests: TestCase {
 	}
 
 	func omit_test_generate_rola_payload_hash_vectors() throws {
-		let origins: [P2P.Dapp.Request.Metadata.Origin] = try [
+		let origins: [DappToWalletInteractionMetadata.Origin] = try [
 			"https://dashboard.rdx.works",
 			"https://stella.swap",
 			"https://rola.xrd",

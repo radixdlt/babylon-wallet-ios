@@ -8,13 +8,13 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 			case flow(DappInteractionFlow.State)
 		}
 
-		let interaction: P2P.Dapp.Request
+		let interaction: DappToWalletInteraction
 		var childState: ChildState
 
 		@PresentationState
 		var errorAlert: AlertState<ViewAction.MalformedInteractionErrorAlertAction>? = nil
 
-		init(interaction: P2P.Dapp.Request) {
+		init(interaction: DappToWalletInteraction) {
 			self.interaction = interaction
 			self.childState = .loading(.init(interaction: interaction))
 		}
@@ -38,7 +38,7 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case submit(P2P.Dapp.Response, DappMetadata)
+		case submit(WalletToDappInteractionResponse, DappMetadata)
 		case dismiss(DappMetadata, IntentHash)
 		case dismissSilently
 	}
@@ -62,8 +62,8 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 			switch action {
 			case .okButtonTapped:
 				.send(.delegate(.submit(.failure(.init(
-					interactionId: state.interaction.id,
-					errorType: .rejectedByUser,
+					interactionId: state.interaction.interactionId,
+					error: .rejectedByUser,
 					message: nil
 				)), .request(state.interaction.metadata))))
 			}
@@ -93,8 +93,8 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 
 		case .loading(.delegate(.dismiss)):
 			return .send(.delegate(.submit(.failure(.init(
-				interactionId: state.interaction.id,
-				errorType: .rejectedByUser,
+				interactionId: state.interaction.interactionId,
+				error: .rejectedByUser,
 				message: nil
 			)), .request(state.interaction.metadata))))
 

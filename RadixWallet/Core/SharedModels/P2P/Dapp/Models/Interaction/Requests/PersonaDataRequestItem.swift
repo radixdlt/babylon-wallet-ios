@@ -1,64 +1,51 @@
 import Sargon
 
-// MARK: - P2P.Dapp.Request.PersonaDataRequestItem
-extension P2P.Dapp.Request {
-	public struct PersonaDataRequestItem: Sendable, Hashable, Decodable {
-		public let isRequestingName: Bool?
-		public let numberOfRequestedEmailAddresses: RequestedQuantity?
-		public let numberOfRequestedPhoneNumbers: RequestedQuantity?
+// MARK: - DappToWalletInteraction.RequestValidation
+// DappToWalletInteractionPersonaDataRequestItem
 
-		public init(
-			isRequestingName: Bool?,
-			numberOfRequestedEmailAddresses: RequestedQuantity? = nil,
-			numberOfRequestedPhoneNumbers: RequestedQuantity? = nil
-		) {
-			self.isRequestingName = isRequestingName
-			self.numberOfRequestedEmailAddresses = numberOfRequestedEmailAddresses
-			self.numberOfRequestedPhoneNumbers = numberOfRequestedPhoneNumbers
-		}
+// extension P2P.Dapp.Request {
+//	public struct PersonaDataRequestItem: Sendable, Hashable, Decodable {
+//		public let isRequestingName: Bool?
+//		public let numberOfRequestedEmailAddresses: RequestedQuantity?
+//		public let numberOfRequestedPhoneNumbers: RequestedQuantity?
+//
+//		public init(
+//			isRequestingName: Bool?,
+//			numberOfRequestedEmailAddresses: RequestedQuantity? = nil,
+//			numberOfRequestedPhoneNumbers: RequestedQuantity? = nil
+//		) {
+//			self.isRequestingName = isRequestingName
+//			self.numberOfRequestedEmailAddresses = numberOfRequestedEmailAddresses
+//			self.numberOfRequestedPhoneNumbers = numberOfRequestedPhoneNumbers
+//		}
+//
+//		public var kindRequests: [PersonaData.Entry.Kind: KindRequest] {
+//			var result: [PersonaData.Entry.Kind: KindRequest] = [:]
+//			if isRequestingName == true {
+//				result[.fullName] = .entry
+//			}
+//			if let numberOfRequestedPhoneNumbers, numberOfRequestedPhoneNumbers.isValid {
+//				result[.phoneNumber] = .number(numberOfRequestedPhoneNumbers)
+//			}
+//			if let numberOfRequestedEmailAddresses, numberOfRequestedEmailAddresses.isValid {
+//				result[.emailAddress] = .number(numberOfRequestedEmailAddresses)
+//			}
+//			return result
+//		}
+//	}
+// }
 
-		public var kindRequests: [PersonaData.Entry.Kind: KindRequest] {
-			var result: [PersonaData.Entry.Kind: KindRequest] = [:]
-			if isRequestingName == true {
-				result[.fullName] = .entry
-			}
-			if let numberOfRequestedPhoneNumbers, numberOfRequestedPhoneNumbers.isValid {
-				result[.phoneNumber] = .number(numberOfRequestedPhoneNumbers)
-			}
-			if let numberOfRequestedEmailAddresses, numberOfRequestedEmailAddresses.isValid {
-				result[.emailAddress] = .number(numberOfRequestedEmailAddresses)
-			}
-			return result
-		}
-	}
-}
-
-extension P2P.Dapp.Request {
-	public typealias Response = P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem
-
-	public enum MissingEntry: Sendable, Hashable {
-		case missingEntry
-		case missing(Int)
-	}
-
-	public enum KindRequest: Sendable, Hashable {
-		case entry
-		case number(RequestedQuantity)
-	}
-}
-
-// MARK: - P2P.Dapp.Request.RequestValidation
-extension P2P.Dapp.Request {
+extension DappToWalletInteraction {
 	public struct RequestValidation: Sendable, Hashable {
 		public var missingEntries: [PersonaData.Entry.Kind: MissingEntry] = [:]
 		public var existingRequestedEntries: [PersonaData.Entry.Kind: [PersonaData.Entry]] = [:]
 
-		public var response: P2P.Dapp.Request.Response? {
+		public var response: WalletToDappInteractionPersonaDataRequestResponseItem? {
 			guard missingEntries.isEmpty else { return nil }
 			return try? .init(
 				name: existingRequestedEntries.extract(.fullName),
-				emailAddresses: existingRequestedEntries.extract(.emailAddress),
-				phoneNumbers: existingRequestedEntries.extract(.phoneNumber)
+				emailAddresses: existingRequestedEntries.extract(.emailAddress)?.elements,
+				phoneNumbers: existingRequestedEntries.extract(.phoneNumber)?.elements
 			)
 		}
 	}

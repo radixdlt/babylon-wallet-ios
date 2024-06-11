@@ -46,9 +46,7 @@ struct DappInteractionCoordinator_Previews: PreviewProvider {
 		DappInteractionCoordinator.View(
 			store: .init(
 				initialState: .init(
-					interaction: .previewValueAllRequests(
-						auth: .login(.withoutChallenge)
-					)
+					interaction: .previewValueAllRequests()
 				)
 			) {
 				DappInteractionCoordinator()

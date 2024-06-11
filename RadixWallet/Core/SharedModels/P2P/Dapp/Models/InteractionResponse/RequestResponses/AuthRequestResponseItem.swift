@@ -1,71 +1,74 @@
 // MARK: - P2P.Dapp.Response.WalletInteractionSuccessResponse.AuthRequestResponseItem
-extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
-	public enum AuthRequestResponseItem: Sendable, Hashable, Encodable {
-		case login(AuthLoginRequestResponseItem)
-		case usePersona(AuthUsePersonaRequestResponseItem)
 
-		public func encode(to encoder: Encoder) throws {
-			switch self {
-			case let .login(item):
-				try item.encode(to: encoder)
-			case let .usePersona(item):
-				try item.encode(to: encoder)
-			}
-		}
-	}
-}
+// DappToWalletInteractionAuthRequestItem
+
+// extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
+//	public enum AuthRequestResponseItem: Sendable, Hashable, Encodable {
+//		case login(AuthLoginRequestResponseItem)
+//		case usePersona(AuthUsePersonaRequestResponseItem)
+//
+//		public func encode(to encoder: Encoder) throws {
+//			switch self {
+//			case let .login(item):
+//				try item.encode(to: encoder)
+//			case let .usePersona(item):
+//				try item.encode(to: encoder)
+//			}
+//		}
+//	}
+// }
 
 // MARK: - P2P.Dapp.Request.AuthLoginRequestItem
-extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
-	public enum AuthLoginRequestResponseItem: Sendable, Hashable, Encodable {
-		case withoutChallenge(AuthLoginWithoutChallengeRequestResponseItem)
-		case withChallenge(AuthLoginWithChallengeRequestResponseItem)
+// extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
+//	public enum AuthLoginRequestResponseItem: Sendable, Hashable, Encodable {
+//		case withoutChallenge(AuthLoginWithoutChallengeRequestResponseItem)
+//		case withChallenge(AuthLoginWithChallengeRequestResponseItem)
+//
+//		public func encode(to encoder: Encoder) throws {
+//			switch self {
+//			case let .withoutChallenge(item):
+//				try item.encode(to: encoder)
+//			case let .withChallenge(item):
+//				try item.encode(to: encoder)
+//			}
+//		}
+//	}
 
-		public func encode(to encoder: Encoder) throws {
-			switch self {
-			case let .withoutChallenge(item):
-				try item.encode(to: encoder)
-			case let .withChallenge(item):
-				try item.encode(to: encoder)
-			}
-		}
-	}
+//	public struct AuthLoginWithoutChallengeRequestResponseItem: Sendable, Hashable, Encodable {
+//		public let discriminator = P2P.Dapp.Request.AuthRequestItem.Discriminator.loginWithoutChallenge.rawValue
+//		public let persona: P2P.Dapp.Response.PersonaResponse
+//
+//		public init(persona: P2P.Dapp.Response.PersonaResponse) {
+//			self.persona = persona
+//		}
+//	}
 
-	public struct AuthLoginWithoutChallengeRequestResponseItem: Sendable, Hashable, Encodable {
-		public let discriminator = P2P.Dapp.Request.AuthRequestItem.Discriminator.loginWithoutChallenge.rawValue
-		public let persona: P2P.Dapp.Response.PersonaResponse
-
-		public init(persona: P2P.Dapp.Response.PersonaResponse) {
-			self.persona = persona
-		}
-	}
-
-	public struct AuthLoginWithChallengeRequestResponseItem: Sendable, Hashable, Encodable {
-		public let discriminator = P2P.Dapp.Request.AuthRequestItem.Discriminator.loginWithChallenge.rawValue
-		public let persona: P2P.Dapp.Response.PersonaResponse
-		public let challenge: P2P.Dapp.Request.AuthChallengeNonce
-		public let proof: P2P.Dapp.Response.AuthProof
-
-		public init(
-			persona: P2P.Dapp.Response.PersonaResponse,
-			challenge: P2P.Dapp.Request.AuthChallengeNonce,
-			proof: P2P.Dapp.Response.AuthProof
-		) {
-			self.persona = persona
-			self.challenge = challenge
-			self.proof = proof
-		}
-	}
-}
+//	public struct AuthLoginWithChallengeRequestResponseItem: Sendable, Hashable, Encodable {
+//		public let discriminator = P2P.Dapp.Request.AuthRequestItem.Discriminator.loginWithChallenge.rawValue
+//		public let persona: P2P.Dapp.Response.PersonaResponse
+//		public let challenge: DappToWalletInteraction.AuthChallengeNonce
+//		public let proof: P2P.Dapp.Response.AuthProof
+//
+//		public init(
+//			persona: P2P.Dapp.Response.PersonaResponse,
+//			challenge: DappToWalletInteraction.AuthChallengeNonce,
+//			proof: P2P.Dapp.Response.AuthProof
+//		) {
+//			self.persona = persona
+//			self.challenge = challenge
+//			self.proof = proof
+//		}
+//	}
+// }
 
 // MARK: - P2P.Dapp.Response.WalletInteractionSuccessResponse.AuthUsePersonaRequestResponseItem
-extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
-	public struct AuthUsePersonaRequestResponseItem: Sendable, Hashable, Encodable {
-		public let discriminator = P2P.Dapp.Request.AuthRequestItem.Discriminator.usePersona.rawValue
-		public let persona: P2P.Dapp.Response.PersonaResponse
-
-		public init(persona: P2P.Dapp.Response.PersonaResponse) {
-			self.persona = persona
-		}
-	}
-}
+// extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
+//	public struct AuthUsePersonaRequestResponseItem: Sendable, Hashable, Encodable {
+//		public let discriminator = P2P.Dapp.Request.AuthRequestItem.Discriminator.usePersona.rawValue
+//		public let persona: P2P.Dapp.Response.PersonaResponse
+//
+//		public init(persona: P2P.Dapp.Response.PersonaResponse) {
+//			self.persona = persona
+//		}
+//	}
+// }

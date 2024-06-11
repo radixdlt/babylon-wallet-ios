@@ -6,7 +6,7 @@ import SwiftUI
 struct Login: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		let dappMetadata: DappMetadata
-		let loginRequest: P2P.Dapp.Request.AuthLoginRequestItem
+		let loginRequest: DappToWalletInteractionAuthRequestItem // P2P.Dapp.Request.AuthLoginRequestItem
 
 		var personaPrimacy: PersonaPrimacy? = nil
 
@@ -21,7 +21,7 @@ struct Login: Sendable, FeatureReducer {
 
 		init(
 			dappMetadata: DappMetadata,
-			loginRequest: P2P.Dapp.Request.AuthLoginRequestItem,
+			loginRequest: DappToWalletInteractionAuthRequestItem, // P2P.Dapp.Request.AuthLoginRequestItem
 			personaPrimacy: PersonaPrimacy? = nil
 		) {
 			self.dappMetadata = dappMetadata
@@ -91,7 +91,7 @@ struct Login: Sendable, FeatureReducer {
 
 		case let .continueButtonTapped(persona):
 			let authorizedPersona = state.authorizedDapp?.referencesToAuthorizedPersonas.first(where: { $0.id == persona.id })
-			guard case let .withChallenge(loginWithChallenge) = state.loginRequest else {
+			guard case let .loginWithChallenge(loginWithChallenge) = state.loginRequest else {
 				return .send(.delegate(.continueButtonTapped(persona, state.authorizedDapp, authorizedPersona, nil)))
 			}
 

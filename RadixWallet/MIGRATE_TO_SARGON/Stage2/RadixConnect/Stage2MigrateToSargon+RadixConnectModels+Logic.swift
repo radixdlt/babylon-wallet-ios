@@ -2,9 +2,9 @@ import Foundation
 import OrderedCollections
 import Sargon
 
-extension P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem {
+extension WalletToDappInteractionPersonaDataRequestResponseItem {
 	init(
-		personaDataRequested requested: P2P.Dapp.Request.PersonaDataRequestItem,
+		personaDataRequested requested: DappToWalletInteractionPersonaDataRequestItem,
 		personaData: PersonaData
 	) throws {
 		try self.init(
@@ -14,7 +14,7 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestR
 				guard let personaDataEntry = personaData[keyPath: \.name] else { return nil }
 				return personaDataEntry.value
 			}(),
-			emailAddresses: { () -> OrderedSet<PersonaDataEntryEmailAddress>? in
+			emailAddresses: { () -> [PersonaDataEntryEmailAddress]? in
 				// Check if incoming Dapp requests the persona data entry kind
 				guard
 					let numberOfRequestedElements = requested[keyPath: \.numberOfRequestedEmailAddresses],
@@ -29,11 +29,11 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestR
 				guard personaDataEntriesOrderedSet.satisfies(numberOfRequestedElements) else {
 					return nil
 				}
-				return personaDataEntriesOrderedSet
+				return personaDataEntriesOrderedSet.elements
 			}(),
 			// OH NOOOOOES! TERRIBLE COPY PASTE, alas, we are gonna migrate this into Sargon very soon.
 			// so please do forgive me.
-			phoneNumbers: { () -> OrderedSet<PersonaDataEntryPhoneNumber>? in
+			phoneNumbers: { () -> [PersonaDataEntryPhoneNumber]? in
 				// Check if incoming Dapp requests the persona data entry kind
 				guard
 					let numberOfRequestedElements = requested[keyPath: \.numberOfRequestedPhoneNumbers],
@@ -48,7 +48,7 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestR
 				guard personaDataEntriesOrderedSet.satisfies(numberOfRequestedElements) else {
 					return nil
 				}
-				return personaDataEntriesOrderedSet
+				return personaDataEntriesOrderedSet.elements
 			}()
 		)
 	}

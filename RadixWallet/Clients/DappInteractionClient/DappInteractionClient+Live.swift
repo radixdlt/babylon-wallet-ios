@@ -24,19 +24,19 @@ extension DappInteractionClient: DependencyKey {
 			addWalletInteraction: { items, interaction in
 				@Dependency(\.gatewaysClient) var gatewaysClient
 
-				let id: P2P.Dapp.Request.ID = .walletInteractionID(for: interaction)
+				let interactionId: WalletInteractionId = .walletInteractionID(for: interaction)
 
 				let request = await ValidatedDappRequest(
 					route: .wallet,
 					request: .valid(
 						.init(
-							id: id,
+							interactionId: interactionId,
 							items: items,
 							metadata: .init(
 								version: P2P.Dapp.currentVersion,
 								networkId: gatewaysClient.getCurrentNetworkID(),
-								origin: DappOrigin.wallet,
-								dAppDefinitionAddress: .wallet
+								origin: DappToWalletInteractionMetadata.Origin.wallet,
+								dappDefinitionAddress: .wallet
 							)
 						))
 				)
@@ -46,7 +46,7 @@ extension DappInteractionClient: DependencyKey {
 				return await interactionResponsesSubject.first(where: {
 					switch $0 {
 					case let .dapp(response):
-						response.id == id
+						response.interactionId == interactionId
 					}
 				})
 			},
@@ -66,7 +66,7 @@ extension DappInteractionClient: DependencyKey {
 extension DappInteractionClient {
 	/// Validates a received request from Dapp.
 	static func validate(
-		_ message: P2P.RTCIncomingMessageContainer<P2P.Dapp.RequestUnvalidated>
+		_ message: P2P.RTCIncomingMessageContainer<DappToWalletInteractionUnvalidated>
 	) async -> Result<ValidatedDappRequest, Error> {
 		@Dependency(\.appPreferencesClient) var appPreferencesClient
 		@Dependency(\.gatewaysClient) var gatewaysClient
@@ -74,7 +74,7 @@ extension DappInteractionClient {
 
 		let route = message.route
 
-		let nonValidated: P2P.Dapp.RequestUnvalidated
+		let nonValidated: DappToWalletInteractionUnvalidated
 
 		do {
 			nonValidated = try message.result.get()
@@ -98,37 +98,53 @@ extension DappInteractionClient {
 		let dappDefinitionAddress: DappDefinitionAddress
 		do {
 			dappDefinitionAddress = try DappDefinitionAddress(
-				validatingAddress: nonValidated.metadata.dAppDefinitionAddress
+				validatingAddress: nonValidated.metadata.dappDefinitionAddress
 			)
 		} catch {
-			return invalidRequest(.invalidDappDefinitionAddress(gotStringWhichIsAnInvalidAccountAddress: nonvalidatedMeta.dAppDefinitionAddress))
+			return invalidRequest(.invalidDappDefinitionAddress(gotStringWhichIsAnInvalidAccountAddress: nonvalidatedMeta.dappDefinitionAddress))
 		}
 
-		if case let .request(readRequest) = nonValidated.items {
-			switch readRequest {
-			case let .authorized(authorized):
-				if authorized.oneTimeAccounts?.numberOfAccounts.isValid == false {
-					return invalidRequest(.badContent(.numberOfAccountsInvalid))
-				}
-				if authorized.ongoingAccounts?.numberOfAccounts.isValid == false {
-					return invalidRequest(.badContent(.numberOfAccountsInvalid))
-				}
-			case let .unauthorized(unauthorized):
-				if unauthorized.oneTimeAccounts?.numberOfAccounts.isValid == false {
-					return invalidRequest(.badContent(.numberOfAccountsInvalid))
-				}
+		switch nonValidated.items {
+		case let .authorizedRequest(authorized):
+			if authorized.oneTimeAccounts?.numberOfAccounts.isValid == false {
+				return invalidRequest(.badContent(.numberOfAccountsInvalid))
 			}
+			if authorized.ongoingAccounts?.numberOfAccounts.isValid == false {
+				return invalidRequest(.badContent(.numberOfAccountsInvalid))
+			}
+		case let .unauthorizedRequest(unauthorized):
+			if unauthorized.oneTimeAccounts?.numberOfAccounts.isValid == false {
+				return invalidRequest(.badContent(.numberOfAccountsInvalid))
+			}
+		default:
+			break
 		}
 
-		guard let origin = try? DappOrigin(string: nonvalidatedMeta.origin) else {
-			return invalidRequest(.invalidOrigin(invalidURLString: nonvalidatedMeta.origin))
-		}
+//		if case let .request(readRequest) = nonValidated.items {
+//			switch readRequest {
+//			case let .authorized(authorized):
+//				if authorized.oneTimeAccounts?.numberOfAccounts.isValid == false {
+//					return invalidRequest(.badContent(.numberOfAccountsInvalid))
+//				}
+//				if authorized.ongoingAccounts?.numberOfAccounts.isValid == false {
+//					return invalidRequest(.badContent(.numberOfAccountsInvalid))
+//				}
+//			case let .unauthorized(unauthorized):
+//				if unauthorized.oneTimeAccounts?.numberOfAccounts.isValid == false {
+//					return invalidRequest(.badContent(.numberOfAccountsInvalid))
+//				}
+//			}
+//		}
 
-		let metadataValidDappDefAddress = P2P.Dapp.Request.Metadata(
+		//        guard let origin = try? DappOrigin(string: nonvalidatedMeta.origin.absoluteString) else {
+		//            return invalidRequest(.invalidOrigin(invalidURLString: nonvalidatedMeta.origin.absoluteString))
+//		}
+
+		let metadataValidDappDefAddress = DappToWalletInteractionMetadata(
 			version: nonvalidatedMeta.version,
 			networkId: nonvalidatedMeta.networkId,
-			origin: origin,
-			dAppDefinitionAddress: dappDefinitionAddress
+			origin: nonvalidatedMeta.origin,
+			dappDefinitionAddress: dappDefinitionAddress
 		)
 
 		let isDeveloperModeEnabled = await appPreferencesClient.isDeveloperModeEnabled()
@@ -146,7 +162,7 @@ extension DappInteractionClient {
 			.init(
 				route: route,
 				request: .valid(.init(
-					id: nonValidated.id,
+					interactionId: nonValidated.interactionId,
 					items: nonValidated.items,
 					metadata: metadataValidDappDefAddress
 				))
