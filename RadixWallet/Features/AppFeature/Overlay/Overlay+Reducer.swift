@@ -23,25 +23,33 @@ struct OverlayReducer: Sendable, FeatureReducer {
 	}
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case hud(HUD.State)
 			case alert(OverlayWindowClient.Item.AlertState)
 			case linkDappSheet(LinkingToDapp.State)
+			case fullScreen(FullScreenOverlayCoordinator.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case hud(HUD.Action)
 			case alert(OverlayWindowClient.Item.AlertAction)
 			case linkDappSheet(LinkingToDapp.Action)
+			case fullScreen(FullScreenOverlayCoordinator.Action)
 		}
 
 		public var body: some Reducer<State, Action> {
-			Scope(state: /State.hud, action: /Action.hud) {
+			Scope(state: \.hud, action: \.hud) {
 				HUD()
 			}
 
 			Scope(state: /State.linkDappSheet, action: /Action.linkDappSheet) {
 				LinkingToDapp()
+			}
+
+			Scope(state: \.fullScreen, action: \.fullScreen) {
+				FullScreenOverlayCoordinator()
 			}
 		}
 	}
@@ -101,7 +109,9 @@ struct OverlayReducer: Sendable, FeatureReducer {
 			if let item = state.itemsQueue.first, case let .autodismissSheet(id, _) = item {
 				overlayWindowClient.sendAlertAction(.dismissed, id)
 			}
+			return dismiss(&state)
 
+		case .fullScreen(.delegate(.dismiss)):
 			return dismiss(&state)
 
 		default:
@@ -146,12 +156,18 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		case let .alert(alert):
 			state.destination = .alert(alert)
 			return setIsUserInteractionEnabled(&state, isEnabled: true)
+
 		case let .autodismissSheet(_, dAppMetadata):
 			state.destination = .linkDappSheet(.init(
 				dismissDelay: userDefaults.getDappLinkingDelay(),
 				autoDismissEnabled: userDefaults.getDappLinkingAutoContinueEnabled(),
 				dAppMetadata: dAppMetadata
 			))
+
+			return setIsUserInteractionEnabled(&state, isEnabled: true)
+
+		case let .fullScreen(fullScreen):
+			state.destination = .fullScreen(fullScreen)
 			return setIsUserInteractionEnabled(&state, isEnabled: true)
 		}
 	}

@@ -16,8 +16,7 @@ extension DeviceFactorSourceClient: TestDependencyKey {
 		isAccountRecoveryNeeded: { false },
 		entitiesControlledByFactorSource: { _, _ in throw NoopError() },
 		controlledEntities: { _ in [] },
-		mnemonicMissingEntities: { (accounts: [], personas: []) },
-		unrecoverableEntities: { (accounts: [], personas: []) }
+		problematicEntities: { (mnemonicMissing: .empty, unrecoverable: .empty) }
 	)
 
 	public static let testValue = Self(
@@ -26,7 +25,12 @@ extension DeviceFactorSourceClient: TestDependencyKey {
 		isAccountRecoveryNeeded: unimplemented("\(Self.self).isAccountRecoveryNeeded"),
 		entitiesControlledByFactorSource: unimplemented("\(Self.self).entitiesControlledByFactorSource"),
 		controlledEntities: unimplemented("\(Self.self).controlledEntities"),
-		mnemonicMissingEntities: unimplemented("\(Self.self).mnemonicMissingEntities"),
-		unrecoverableEntities: unimplemented("\(Self.self).unrecoverableEntities")
+		problematicEntities: unimplemented("\(Self.self).problematicEntities")
 	)
+}
+
+private extension ProblematicAddresses {
+	static var empty: Self {
+		.init(accounts: [], hiddenAccounts: [], personas: [], hiddenPersonas: [])
+	}
 }

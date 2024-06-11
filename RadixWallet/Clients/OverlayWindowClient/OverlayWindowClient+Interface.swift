@@ -13,6 +13,10 @@ public struct OverlayWindowClient: Sendable {
 	/// Usually to be called from the Main Window.
 	public var scheduleHUD: ScheduleHUD
 
+	/// Schedule a FullScreen to be shown in the Overlay Window.
+	/// Usually to be called from the Main Window.
+	public var scheduleFullScreenIgnoreAction: ScheduleFullScreenIgnoreAction
+
 	/// This is meant to be used by the Overlay Window to send
 	/// back the actions from an Alert to the Main Window.
 	public var sendAlertAction: SendAlertAction
@@ -27,6 +31,7 @@ public struct OverlayWindowClient: Sendable {
 		scheduleAlertIgnoreAction: @escaping ScheduleAlertIgnoreAction,
 		scheduleAlertAwaitAction: @escaping ScheduleAlertAwaitAction,
 		scheduleHUD: @escaping ScheduleHUD,
+		scheduleFullScreenIgnoreAction: @escaping ScheduleFullScreenIgnoreAction,
 		sendAlertAction: @escaping SendAlertAction,
 		setIsUserIteractionEnabled: @escaping SetIsUserIteractionEnabled,
 		isUserInteractionEnabled: @escaping IsUserInteractionEnabled,
@@ -36,6 +41,7 @@ public struct OverlayWindowClient: Sendable {
 		self.scheduleAlertIgnoreAction = scheduleAlertIgnoreAction
 		self.scheduleAlertAwaitAction = scheduleAlertAwaitAction
 		self.scheduleHUD = scheduleHUD
+		self.scheduleFullScreenIgnoreAction = scheduleFullScreenIgnoreAction
 		self.sendAlertAction = sendAlertAction
 		self.setIsUserIteractionEnabled = setIsUserIteractionEnabled
 		self.isUserInteractionEnabled = isUserInteractionEnabled
@@ -47,6 +53,7 @@ extension OverlayWindowClient {
 	public typealias ScheduleAlertIgnoreAction = @Sendable (Item.AlertState) -> Void
 	public typealias ScheduleAlertAwaitAction = @Sendable (Item.AlertState) async -> Item.AlertAction
 	public typealias ScheduleHUD = @Sendable (Item.HUD) -> Void
+	public typealias ScheduleFullScreenIgnoreAction = @Sendable (FullScreenOverlayCoordinator.State) -> Void
 	public typealias SendAlertAction = @Sendable (Item.AlertAction, Item.AlertState.ID) -> Void
 	public typealias ScheduledItems = @Sendable () -> AnyAsyncSequence<Item>
 
@@ -103,6 +110,7 @@ extension OverlayWindowClient {
 		case hud(HUD)
 		case alert(AlertState)
 		case autodismissSheet(UUID, DappMetadata)
+		case fullScreen(FullScreenOverlayCoordinator.State)
 	}
 }
 

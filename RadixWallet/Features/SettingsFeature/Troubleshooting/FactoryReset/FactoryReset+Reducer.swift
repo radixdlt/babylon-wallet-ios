@@ -18,10 +18,6 @@ public struct FactoryReset: Sendable, FeatureReducer {
 		case setIsRecoverable(Bool)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
-		case didResetWallet
-	}
-
 	public struct Destination: DestinationReducer {
 		@CasePathable
 		public enum State: Sendable, Hashable {
@@ -42,10 +38,8 @@ public struct FactoryReset: Sendable, FeatureReducer {
 		}
 	}
 
-	@Dependency(\.cacheClient) var cacheClient
-	@Dependency(\.radixConnectClient) var radixConnectClient
-	@Dependency(\.userDefaults) var userDefaults
 	@Dependency(\.securityCenterClient) var securityCenterClient
+	@Dependency(\.resetWalletClient) var resetWalletClient
 
 	public init() {}
 
@@ -79,11 +73,8 @@ public struct FactoryReset: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .confirmReset(.confirm):
-			.run { send in
-				cacheClient.removeAll()
-				await radixConnectClient.disconnectAll()
-				userDefaults.removeAll()
-				await send(.delegate(.didResetWallet))
+			.run { _ in
+				await resetWalletClient.resetWallet()
 			}
 		}
 	}

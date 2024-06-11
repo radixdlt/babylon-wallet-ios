@@ -36,12 +36,9 @@ private extension StoreOf<OverlayReducer> {
 private extension View {
 	func destinations(with store: StoreOf<OverlayReducer>) -> some View {
 		let destinationStore = store.destination
-		return alert(
-			store: destinationStore,
-			state: /OverlayReducer.Destination.State.alert,
-			action: OverlayReducer.Destination.Action.alert
-		)
-		.linkingDapp(with: store)
+		return alert(with: destinationStore)
+			.fullScreenCover(with: destinationStore)
+			.linkingDapp(with: store)
 	}
 
 	func linkingDapp(with store: StoreOf<OverlayReducer>) -> some View {
@@ -54,5 +51,15 @@ private extension View {
 				LinkingToDapp.View(store: $0)
 			}
 		)
+	}
+
+	private func alert(with destinationStore: PresentationStoreOf<OverlayReducer.Destination>) -> some View {
+		alert(store: destinationStore.scope(state: \.alert, action: \.alert))
+	}
+
+	private func fullScreenCover(with destinationStore: PresentationStoreOf<OverlayReducer.Destination>) -> some View {
+		fullScreenCover(store: destinationStore.scope(state: \.fullScreen, action: \.fullScreen)) {
+			FullScreenOverlayCoordinator.View(store: $0)
+		}
 	}
 }

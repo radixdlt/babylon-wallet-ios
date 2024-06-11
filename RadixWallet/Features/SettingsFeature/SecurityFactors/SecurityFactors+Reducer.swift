@@ -13,7 +13,7 @@ public struct SecurityFactors: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case appeared
+		case task
 		case seedPhrasesButtonTapped
 		case ledgerWalletsButtonTapped
 	}
@@ -63,7 +63,7 @@ public struct SecurityFactors: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .appeared:
+		case .task:
 			return loadSeedPhrasesCount()
 				.merge(with: loadLedgerWalletsCount())
 				.merge(with: securityProblemsEffect())
