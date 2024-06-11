@@ -13,6 +13,7 @@ extension P2P.Dapp.Request {
 
 		case request(RequestItems)
 		case transaction(TransactionItems)
+		case verify(DappMetadata)
 
 		public init(from decoder: Decoder) throws {
 			let container = try decoder.container(keyedBy: CodingKeys.self)

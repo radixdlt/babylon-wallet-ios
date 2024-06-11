@@ -902,6 +902,9 @@ extension DappInteractionFlow.Path.State {
 				isWalletTransaction: interaction.id.isWalletInteraction,
 				proposingDappMetadata: dappMetadata.onLedger
 			))
+
+		case let .remote(.verify(dappMetadata)):
+			self.state = .verify(.init(dAppMetadata: dappMetadata))
 		}
 	}
 }

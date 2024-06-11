@@ -114,25 +114,23 @@ extension Mobile2Mobile {
 				)
 			)
 
-			let state = VerifyDapp.State(dAppMetadata: dAppMetadata)
-
-			// TODO: MB- Change here to call addInteraction
-			// overlayWindowClient.scheduleFullScreenIgnoreAction(.init(root: .verifyDapp(state)))
-
-			let url = dappReturnURL.appending(queryItems: [
-				.init(name: "sessionId", value: request.sessionId.rawValue),
-				.init(name: "publicKey", value: walletPublicKey.rawRepresentation.hex()),
-			])
-			let returnUrl: URL = switch request.browser.lowercased() {
-			case "chrome":
-				URL(string: url.absoluteString.replacingOccurrences(of: "https://", with: "googlechromes://"))!
-			case "firefox":
-				URL(string: "firefox://open-url?url=\(url.absoluteString)")!
-			default:
-				url
-			}
+			let response = await dappInteractionClient.addWalletInteraction(.verify(dAppMetadata), .dappVerification)
 
 			// Open the URL after
+			/*
+			 let url = dappReturnURL.appending(queryItems: [
+			 	.init(name: "sessionId", value: request.sessionId.rawValue),
+			 	.init(name: "publicKey", value: walletPublicKey.rawRepresentation.hex()),
+			 ])
+			 let returnUrl: URL = switch request.browser.lowercased() {
+			 case "chrome":
+			 	URL(string: url.absoluteString.replacingOccurrences(of: "https://", with: "googlechromes://"))!
+			 case "firefox":
+			 	URL(string: "firefox://open-url?url=\(url.absoluteString)")!
+			 default:
+			 	url
+			 }
+			  */
 		}
 	}
 

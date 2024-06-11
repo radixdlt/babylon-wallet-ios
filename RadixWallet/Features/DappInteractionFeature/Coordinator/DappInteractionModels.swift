@@ -125,6 +125,9 @@ extension P2P.Dapp.Request {
 		// transactions
 		case send(SendTransactionItem)
 
+		// verify
+		case verify(DappMetadata)
+
 		var priority: some Comparable {
 			switch self {
 			// requests
@@ -141,6 +144,10 @@ extension P2P.Dapp.Request {
 
 			// transactions
 			case .send:
+				0
+
+			// verify
+			case .verify:
 				0
 			}
 		}
@@ -171,6 +178,10 @@ extension P2P.Dapp.Request {
 				.send(items.send),
 			]
 			.compactMap { $0 }
+		case let .verify(dappMetadata):
+			[
+				.verify(dappMetadata),
+			]
 		}
 	}
 }
@@ -263,6 +274,12 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 			self.init(
 				interactionId: interaction.id,
 				items: .transaction(.init(send: send))
+			)
+
+		case .verify:
+			self.init(
+				interactionId: interaction.id,
+				items: .verify
 			)
 		}
 	}

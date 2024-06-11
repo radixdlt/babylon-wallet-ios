@@ -3,6 +3,7 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 	public enum Items: Sendable, Hashable, Encodable {
 		case request(RequestResponseItems)
 		case transaction(TransactionResponseItems)
+		case verify
 
 		public func encode(to encoder: Encoder) throws {
 			switch self {
@@ -10,6 +11,8 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 				try items.encode(to: encoder)
 			case let .transaction(items):
 				try items.encode(to: encoder)
+			case .verify:
+				break
 			}
 		}
 	}

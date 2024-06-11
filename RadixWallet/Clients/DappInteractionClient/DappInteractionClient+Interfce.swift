@@ -19,6 +19,7 @@ extension DappInteractionClient {
 	public enum WalletInteraction: String, Sendable, Hashable {
 		case accountDepositSettings
 		case accountTransfer
+		case dappVerification
 	}
 
 	public typealias AddWalletInteraction = @Sendable (_ items: P2P.Dapp.Request.Items, _ interaction: WalletInteraction) async -> P2P.RTCOutgoingMessage.Response?
