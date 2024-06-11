@@ -200,7 +200,7 @@ extension DappMetadata {
 		switch self {
 		case let .ledger(metadata): metadata.dAppDefinintionAddress
 		case let .request(metadata): metadata.dAppDefinitionAddress
-		case let .deepLink(metadata): metadata.dAppDefAddress
+		case let .deepLink(metadata): metadata.dappDefinitionAddress
 		case .wallet: .wallet
 		}
 	}

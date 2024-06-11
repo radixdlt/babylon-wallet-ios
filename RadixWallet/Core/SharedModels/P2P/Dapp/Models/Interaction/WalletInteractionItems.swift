@@ -89,12 +89,16 @@ extension P2P.Dapp.Request {
 // MARK: - P2P.Dapp.Request.VerifyItems
 extension P2P.Dapp.Request {
 	public struct VerifyItems: Sendable, Hashable {
-		public let dappMetadata: DappMetadata
-		public let returnUrl: URL
+		public let dappOrigin: URL
+		public let publicKeyHex: String
+		public let sessionId: String
+		public let browser: String
 
-		public init(dappMetadata: DappMetadata, returnUrl: URL) {
-			self.dappMetadata = dappMetadata
-			self.returnUrl = returnUrl
+		public init(dappOrigin: URL, publicKeyHex: String, sessionId: String, browser: String) {
+			self.dappOrigin = dappOrigin
+			self.publicKeyHex = publicKeyHex
+			self.sessionId = sessionId
+			self.browser = browser
 		}
 	}
 }

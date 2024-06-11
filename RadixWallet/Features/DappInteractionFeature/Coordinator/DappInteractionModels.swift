@@ -28,9 +28,13 @@ public enum DappMetadata: Sendable, Hashable {
 
 // MARK: DappMetadata.DeepLink
 extension DappMetadata {
-	public struct DeepLink: Sendable, Hashable {
-		public let origin: URL
-		public let dAppDefAddress: DappDefinitionAddress
+	public struct DeepLink: Sendable, Hashable, Codable {
+		let origin: URL
+		let dappDefinitionAddress: DappDefinitionAddress
+		let wellKnownFile: HTTPClient.WellKnownFileResponse
+		let name: String?
+		let description: String?
+		let thumbnail: URL?
 	}
 }
 
@@ -84,10 +88,14 @@ extension DappMetadata {
 	}
 
 	public var thumbnail: URL? {
-		guard case let .ledger(fromLedgerDappMetadata) = self else {
-			return nil
+		switch self {
+		case let .ledger(metadata):
+			metadata.thumbnail
+		case let .deepLink(metadata):
+			metadata.thumbnail
+		default:
+			nil
 		}
-		return fromLedgerDappMetadata.thumbnail
 	}
 
 	public var onLedger: Ledger? {

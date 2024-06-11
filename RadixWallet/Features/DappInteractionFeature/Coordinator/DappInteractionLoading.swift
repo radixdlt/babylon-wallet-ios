@@ -38,6 +38,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	@Dependency(\.cacheClient) var cacheClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
+	@Dependency(\.httpClient) var httpClient
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -65,16 +66,23 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 	func metadataLoadingEffect(with state: inout State) -> Effect<Action> {
 		state.isLoading = true
 
-		if state.interaction.metadata.origin == .wallet {
+		if state.interaction.metadata.origin == .wallet, !state.interaction.id.isDappVerification {
 			return .send(.internal(.dappMetadataLoadingResult(.success(.wallet(.init())))))
 		}
+		let metadata = state.interaction.metadata
+		switch state.interaction.items {
+		case let .verify(items):
+			return deeplinkMetadataEffect(items: items, metadata: metadata)
+		default:
+			return ledgerMetadataEffect(metadata: metadata)
+		}
+	}
 
-		return .run { [request = state.interaction.metadata] send in
-
+	private func ledgerMetadataEffect(metadata: P2P.Dapp.Request.Metadata) -> Effect<Action> {
+		.run { send in
 			let result: TaskResult<DappMetadata> = await {
 				let isDeveloperModeEnabled = await appPreferencesClient.getPreferences().security.isDeveloperModeEnabled
-				let dappDefinitionAddress = request.dAppDefinitionAddress
-
+				let dappDefinitionAddress = metadata.dAppDefinitionAddress
 				do {
 					let cachedMetadata = try await cacheClient.withCaching(
 						cacheEntry: .dAppRequestMetadata(dappDefinitionAddress.address),
@@ -96,7 +104,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 							return DappMetadata.Ledger(
 								entityMetadataForDapp: entityMetadataForDapp,
 								dAppDefinintionAddress: dappDefinitionAddress,
-								origin: request.origin
+								origin: metadata.origin
 							)
 						}
 					)
@@ -106,7 +114,60 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 						return .failure(error)
 					}
 					loggerGlobal.warning("Failed to fetch Dapps metadata, but since 'isDeveloperModeEnabled' is enabled we surpress the error and allow continuation. Error: \(error)")
-					return .success(.request(request))
+					return .success(.request(metadata))
+				}
+
+			}()
+
+			await send(.internal(.dappMetadataLoadingResult(result)))
+		}
+	}
+
+	private func deeplinkMetadataEffect(items: P2P.Dapp.Request.VerifyItems, metadata: P2P.Dapp.Request.Metadata) -> Effect<Action> {
+		.run { send in
+			guard
+				let wellKnownFile = try? await httpClient.fetchDappWellKnownFile(items.dappOrigin),
+				let dappDefinitionAddress = wellKnownFile.dApps.first?.dAppDefinitionAddress
+			else {
+				struct MissingDappDefinitionAddress: Error {}
+				throw MissingDappDefinitionAddress()
+			}
+
+			let result: TaskResult<DappMetadata> = await {
+				let isDeveloperModeEnabled = await appPreferencesClient.getPreferences().security.isDeveloperModeEnabled
+				do {
+					let cachedMetadata = try await cacheClient.withCaching(
+						cacheEntry: .dAppRequestMetadata(dappDefinitionAddress.address),
+						invalidateCached: { (cached: DappMetadata.DeepLink) in
+							guard
+								cached.name != nil,
+								cached.description != nil,
+								cached.thumbnail != nil
+							else {
+								/// Some of these fields were not set, fetch and see if they
+								/// have been updated since last time...
+								return .cachedIsInvalid
+							}
+							// All relevant fields are set, the cached metadata is valid.
+							return .cachedIsValid
+						},
+						request: {
+							let entityMetadataForDapp = try await gatewayAPIClient.getEntityMetadata(dappDefinitionAddress.address, .dappMetadataKeys)
+							return .init(
+								entityMetadataForDapp: entityMetadataForDapp,
+								dAppDefinintionAddress: dappDefinitionAddress,
+								origin: items.dappOrigin,
+								wellKnownFile: wellKnownFile
+							)
+						}
+					)
+					return .success(.deepLink(cachedMetadata))
+				} catch {
+					guard isDeveloperModeEnabled else {
+						return .failure(error)
+					}
+					loggerGlobal.warning("Failed to fetch Dapps metadata, but since 'isDeveloperModeEnabled' is enabled we surpress the error and allow continuation. Error: \(error)")
+					return .success(.request(metadata))
 				}
 
 			}()
@@ -167,6 +228,25 @@ extension DappMetadata.Ledger {
 			origin: origin,
 			dAppDefinintionAddress: dAppDefinintionAddress,
 			name: name,
+			description: items[.description]?.value.asString,
+			thumbnail: items[.iconURL]?.value.asURL
+		)
+	}
+}
+
+extension DappMetadata.DeepLink {
+	init(
+		entityMetadataForDapp: GatewayAPI.EntityMetadataCollection,
+		dAppDefinintionAddress: DappDefinitionAddress,
+		origin: URL,
+		wellKnownFile: HTTPClient.WellKnownFileResponse
+	) {
+		let items = entityMetadataForDapp.items
+		self.init(
+			origin: origin,
+			dappDefinitionAddress: dAppDefinintionAddress,
+			wellKnownFile: wellKnownFile,
+			name: items[.name]?.value.asString,
 			description: items[.description]?.value.asString,
 			thumbnail: items[.iconURL]?.value.asURL
 		)

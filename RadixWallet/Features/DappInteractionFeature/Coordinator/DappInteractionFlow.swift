@@ -467,17 +467,8 @@ extension DappInteractionFlow {
 		case let .reviewTransaction(.delegate(.failed(error))):
 			return handleSignAndSubmitTXFailed(error)
 
-		case .verify(.delegate(.continueFlow)):
-			switch item {
-			case let .remote(.verify(data)):
-				@Dependency(\.openURL) var openURL
-				return .run { send in
-					await openURL(data.returnUrl)
-					await send(.delegate(.dismiss))
-				}
-			default:
-				fatalError("Unexpected item")
-			}
+		case .verify(.delegate(.dismiss)):
+			return .send(.delegate(.dismiss))
 
 		default:
 			return .none
@@ -916,7 +907,7 @@ extension DappInteractionFlow.Path.State {
 			))
 
 		case let .remote(.verify(items)):
-			self.state = .verify(.init(dAppMetadata: items.dappMetadata))
+			self.state = .verify(.init(dAppMetadata: dappMetadata, items: items))
 		}
 	}
 }

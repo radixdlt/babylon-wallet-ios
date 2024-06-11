@@ -13,11 +13,11 @@ extension HTTPClient {
 		static let wellKnownFilePath = ".well-known/radix.json"
 	}
 
-	struct WellKnownFileResponse: Decodable {
+	struct WellKnownFileResponse: Sendable, Hashable, Codable {
 		let dApps: [Item]
 		let callbackPath: String?
 
-		struct Item: Decodable {
+		struct Item: Sendable, Hashable, Codable {
 			let dAppDefinitionAddress: DappDefinitionAddress
 		}
 	}

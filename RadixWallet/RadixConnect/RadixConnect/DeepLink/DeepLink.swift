@@ -5,7 +5,6 @@ import Foundation
 public actor Mobile2Mobile {
 	let serviceURL = URL(string: "https://radix-connect-relay-dev.rdx-works-main.extratools.works/api/v1")!
 	let encryptionScheme = EncryptionScheme.version1
-	@Dependency(\.httpClient) var httpClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.radixConnectRelay) var radixConnectRelay
 	@Dependency(\.errorQueue) var errorQueue
@@ -33,77 +32,15 @@ public actor Mobile2Mobile {
 }
 
 extension Mobile2Mobile {
-	func getDappReturnURL(_ dAppOrigin: URL, wellKnownFile: HTTPClient.WellKnownFileResponse) -> URL {
-		let callbackPath: String = wellKnownFile.callbackPath ?? "connect"
-
-		return dAppOrigin.appendingPathComponent(callbackPath)
-	}
-
-	func getDAppMetadata(_ dappDefinitionAddress: DappDefinitionAddress, origin: URL) async throws -> DappMetadata {
-		let ledgerMetadata = try await cacheClient.withCaching(
-			cacheEntry: .dAppRequestMetadata(dappDefinitionAddress.address),
-			invalidateCached: { (cached: DappMetadata.Ledger) in
-				guard
-					cached.name != nil,
-					cached.description != nil,
-					cached.thumbnail != nil
-				else {
-					/// Some of these fields were not set, fetch and see if they
-					/// have been updated since last time...
-					return .cachedIsInvalid
-				}
-				// All relevant fields are set, the cached metadata is valid.
-				return .cachedIsValid
-			},
-			request: {
-				let entityMetadataForDapp = try await gatewayAPIClient.getEntityMetadata(dappDefinitionAddress.address, .dappMetadataKeys)
-				return try DappMetadata.Ledger(
-					entityMetadataForDapp: entityMetadataForDapp,
-					dAppDefinintionAddress: dappDefinitionAddress,
-					origin: .init(string: origin.absoluteString)
-				)
-			}
-		)
-
-		return .ledger(ledgerMetadata)
-	}
-
-	func fetchWellKnown(dAppOrigin: URL) async throws -> HTTPClient.WellKnownFileResponse {
-		try await httpClient.fetchDappWellKnownFile(dAppOrigin)
-	}
-
 	func linkDapp(_ request: Request.DappLinking) async throws {
 		switch request.origin {
 		case let .webDapp(dAppOrigin):
-			let dAppPublicKey = request.publicKey
-
-			// Move this to view/reducer
-			let wellKnown = await (try? fetchWellKnown(dAppOrigin: dAppOrigin)) ?? HTTPClient.WellKnownFileResponse(dApps: [.init(dAppDefinitionAddress: .wallet)], callbackPath: nil)
-			let dappReturnURL = getDappReturnURL(dAppOrigin, wellKnownFile: wellKnown)
-
-			let dAppMetadata: DappMetadata = try await {
-				guard let dappDefinitionAddress = wellKnown.dApps.first?.dAppDefinitionAddress else {
-					struct MissingDappDefinitionAddress: Error {}
-					throw MissingDappDefinitionAddress()
-				}
-
-				do {
-					return try await getDAppMetadata(dappDefinitionAddress, origin: dAppOrigin)
-				} catch {
-					if await appPreferencesClient.isDeveloperModeEnabled() {
-						return DappMetadata.deepLink(.init(origin: dAppOrigin, dAppDefAddress: dappDefinitionAddress))
-					}
-
-					throw error
-				}
-			}()
-
 			loggerGlobal.critical("Creating the Wallet Private/Public key pair")
 
 			let walletPrivateKey = Curve25519.KeyAgreement.PrivateKey()
-			let walletPublicKey = walletPrivateKey.publicKey
+			let walletPublicKeyHex = walletPrivateKey.publicKey.rawRepresentation.hex()
 
-			let sharedSecret = try walletPrivateKey.sharedSecretFromKeyAgreement(with: dAppPublicKey)
+			let sharedSecret = try walletPrivateKey.sharedSecretFromKeyAgreement(with: request.publicKey)
 			let encryptionKey = SymmetricKey(data: sharedSecret.data)
 
 			try secureStorageClient.saveRadixConnectRelaySession(
@@ -114,21 +51,13 @@ extension Mobile2Mobile {
 				)
 			)
 
-			let url = dappReturnURL.appending(queryItems: [
-				.init(name: "sessionId", value: request.sessionId.rawValue),
-				.init(name: "publicKey", value: walletPublicKey.rawRepresentation.hex()),
-			])
-			let returnUrl: URL = switch request.browser.lowercased() {
-			case "chrome":
-				URL(string: url.absoluteString.replacingOccurrences(of: "https://", with: "googlechromes://"))!
-			case "firefox":
-				URL(string: "firefox://open-url?url=\(url.absoluteString)")!
-			default:
-				url
-			}
-
 			_ = await dappInteractionClient.addWalletInteraction(
-				.verify(.init(dappMetadata: dAppMetadata, returnUrl: returnUrl)),
+				.verify(.init(
+					dappOrigin: dAppOrigin,
+					publicKeyHex: walletPublicKeyHex,
+					sessionId: request.sessionId.rawValue,
+					browser: request.browser
+				)),
 				.dappVerification
 			)
 		}
