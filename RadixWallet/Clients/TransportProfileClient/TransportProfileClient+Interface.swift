@@ -20,7 +20,7 @@ public struct TransportProfileClient: Sendable {
 }
 
 extension TransportProfileClient {
-	public typealias ImportProfile = @Sendable (Profile, Set<FactorSourceIDFromHash>, Bool) async throws -> Void
+	public typealias ImportProfile = @Sendable (Profile, Set<FactorSourceIDFromHash>, _ containsP2PLinks: Bool) async throws -> Void
 	public typealias ProfileForExport = @Sendable () async throws -> Profile
 	public typealias DidExportProfile = @Sendable (Profile) throws -> Void
 }
