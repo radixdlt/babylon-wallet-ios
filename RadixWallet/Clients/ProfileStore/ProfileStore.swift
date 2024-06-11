@@ -309,6 +309,7 @@ extension ProfileStore {
 		@Dependency(\.date) var date
 		profile.header.lastUsedOnDevice = deviceInfo
 		profile.header.lastUsedOnDevice.date = date()
+		profile.header.lastModified = date()
 	}
 
 	/// Updates the header of a Profile, lastModified date, contentHint etc.

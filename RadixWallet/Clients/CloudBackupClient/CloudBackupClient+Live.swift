@@ -165,10 +165,7 @@ extension CloudBackupClient {
 				switch action {
 				case .claimWallet(.transferBack):
 					shouldReclaim = true
-				case .claimWallet(.didClearWallet):
-					return
-				case .dismiss:
-					assertionFailure(".dismiss should never be sent from claimWallet")
+				case .claimWallet(.didClearWallet), .dismiss:
 					return
 				}
 			} else {
@@ -177,7 +174,13 @@ extension CloudBackupClient {
 
 			guard shouldBackUp || shouldReclaim else { return }
 
-			try? await backupProfileAndSaveResult(profile, existingRecord: existingRecord)
+			var profileToUpload = profile
+			if shouldReclaim {
+				// The profile will already be locally claimed, but we want to update the lastUsedOnDevice date
+				await profileStore.claimOwnership(of: &profileToUpload)
+			}
+
+			try? await backupProfileAndSaveResult(profileToUpload, existingRecord: existingRecord)
 		}
 
 		let retryBackupInterval: DispatchTimeInterval = .seconds(60)
