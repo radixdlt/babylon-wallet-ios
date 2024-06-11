@@ -19,13 +19,12 @@ import Sargon
 ///
 /// 	var profile: Profile { get }
 ///		func values() -> AnyAsyncSequence<Profile>
-/// 	func unlockedApp() async -> Profile
 ///	 	func finishedOnboarding() async
 ///     func finishOnboarding(with _: AccountsRecoveredFromScanningUsingMnemonic) async throws
-///		func importCloudProfileSnapshot(_ h: Profile.Header) throws
-///	 	func importProfileSnapshot(_ s: Profile) throws
+///	 	func importProfile(_ s: Profile) throws
 ///	 	func deleteProfile(keepInICloudIfPresent: Bool) throws
 /// 	func updating<T>(_ t: (inout Profile) async throws -> T) async throws -> T
+///     func claimOwnership(of profile: inout Profile)
 ///
 /// The app is suppose to call `unlockedApp` after user has authenticated from `Splash`, which
 /// will emit any Profile ownership conflict if needed, and returns the newly claimed Profile that had
@@ -60,33 +59,14 @@ public final actor ProfileStore {
 	/// device model and name is async.
 	private var deviceInfo: DeviceInfo
 
-	/// After user has pass keychain auth prompt in Splash this becomes
-	/// `appIsUnlocked`. The idea is that we buffer ownership conflicts until UI
-	/// is ready to display it, reason being we dont wanna display the
-	/// OverlayClient UI for ownership conflict simultaneously as
-	/// unlock app keychain auth prompt.
-	private var mode: Mode
-
-	private enum Mode {
-		case appIsUnlocked
-		case appIsLocked(bufferedProfileOwnershipConflict: ConflictingOwners?)
-	}
-
 	init() {
 		let metaDeviceInfo = Self._deviceInfo()
-		let (deviceInfo, profile, conflictingOwners) = Self._loadSavedElseNewProfile(metaDeviceInfo: metaDeviceInfo)
+		let (deviceInfo, profile) = Self._loadSavedElseNewProfile(metaDeviceInfo: metaDeviceInfo)
 		loggerGlobal.info("profile.id: \(profile.id)")
 		loggerGlobal.info("device.id: \(deviceInfo.id)")
 		self.deviceInfo = deviceInfo
 		self.profileSubject = AsyncCurrentValueSubject(profile)
-		self.mode = .appIsLocked(bufferedProfileOwnershipConflict: conflictingOwners)
 	}
-}
-
-// MARK: - ConflictingOwners
-public struct ConflictingOwners: Sendable, Hashable {
-	public let ownerOfCurrentProfile: DeviceInfo
-	public let thisDevice: DeviceInfo
 }
 
 // MARK: Public
@@ -119,38 +99,11 @@ extension ProfileStore {
 		}
 	}
 
-	/// Looks up a Profile for the given `header` and tries to import it,
-	/// updates `headerList` (Keychain),  `activeProfileID` (UserDefaults)
-	/// and saves the snapshot of the profile into Keychain.
-	/// - Parameter profile: Imported Profile to use and save.
-	public func importCloudProfileSnapshot(
-		_ header: Profile.Header
-	) throws {
-		do {
-			// Load the snapshot, also this will validate if the snapshot actually exist
-			let profileSnapshot = try secureStorageClient.loadProfileSnapshot(header.id)
-			guard let profileSnapshot else {
-				struct FailedToLoadProfile: Swift.Error {}
-				throw FailedToLoadProfile()
-			}
-			try importProfileSnapshot(profileSnapshot)
-		} catch {
-			logAssertionFailure("Critical failure, unable to save imported profile snapshot: \(String(describing: error))", severity: .critical)
-			throw error
-		}
-	}
-
-	/// Change current profile to new imported profle snapshot and saves it, by
-	/// updates `headerList` (Keychain),  `activeProfileID` (UserDefaults)
-	/// and saves the snapshot of the profile into Keychain.
-	/// - Parameter profile: Imported Profile to use and save.
-	public func importProfileSnapshot(_ snapshot: Profile) throws {
-		try importProfile(snapshot)
-	}
-
 	/// Change current profile to new importedProfile and saves it, by
 	/// updates `headerList` (Keychain),  `activeProfileID` (UserDefaults)
 	/// and saves a snapshot of the profile into Keychain.
+	///
+	/// NB: The profile should be claimed locally before calling this function
 	/// - Parameter profile: Imported Profile to use and save.
 	public func importProfile(_ profileToImport: Profile) throws {
 		// The software design of ProfileStore is to always have a profile at end
@@ -164,8 +117,8 @@ extension ProfileStore {
 
 		var profileToImport = profileToImport
 
-		// Before saving it we must claim ownership of it!
-		try _claimOwnership(of: &profileToImport)
+		// We need to save before calling `updateHeaderOfThenSave`
+		try _saveProfileAndEmitUpdate(profileToImport)
 
 		profileToImport.changeCurrentToMainnetIfNeeded()
 
@@ -208,6 +161,7 @@ extension ProfileStore {
 		with accountsRecoveredFromScanningUsingMnemonic: AccountsRecoveredFromScanningUsingMnemonic
 	) async throws {
 		@Dependency(\.uuid) var uuid
+		@Dependency(\.date) var date
 		loggerGlobal.notice("Finish onboarding with accounts recovered from scanning using menmonic")
 		let (creatingDevice, model, name) = await updateDeviceInfo()
 		var bdfs = accountsRecoveredFromScanningUsingMnemonic.deviceFactorSource
@@ -229,12 +183,15 @@ extension ProfileStore {
 			authorizedDapps: []
 		)
 
+		var lastUsedOnDevice = creatingDevice
+		lastUsedOnDevice.date = date()
+
 		let profile = Profile(
 			header: Header(
 				snapshotVersion: .v100,
 				id: uuid(),
 				creatingDevice: creatingDevice,
-				lastUsedOnDevice: creatingDevice,
+				lastUsedOnDevice: lastUsedOnDevice,
 				lastModified: bdfs.addedOn,
 				contentHint: .init(
 					numberOfAccountsOnAllNetworksInTotal: UInt16(
@@ -253,23 +210,8 @@ extension ProfileStore {
 		try importProfile(profile)
 	}
 
-	public func unlockedApp() async -> Profile {
-		loggerGlobal.notice("Unlocking app")
-		let buffered = bufferedOwnershipConflictWhileAppLocked
-		self.mode = .appIsUnlocked
-		if let buffered {
-			loggerGlobal.notice("We had a buffered Profile ownership conflict, emitting it now.")
-			do {
-				try await doEmit(conflictingOwners: buffered)
-				return profile // might be a new one! if user selected "delete"
-			} catch {
-				logAssertionFailure("Failure during Profile ownership resolution, error: \(error)")
-				// Not import enough to prevent app from being used
-				return profile
-			}
-		} else {
-			return profile
-		}
+	public func isThisDevice(deviceID: DeviceID) -> Bool {
+		deviceID == deviceInfo.id
 	}
 }
 
@@ -307,6 +249,7 @@ extension ProfileStore {
 	@discardableResult
 	private func updateDeviceInfo() async -> (info: DeviceInfo, model: String, name: String) {
 		@Dependency(\.device) var device
+		@Dependency(\.date) var date
 		let model = await device.model
 		let name = await device.name
 		let deviceDescription = DeviceInfo.deviceDescription(
@@ -318,6 +261,7 @@ extension ProfileStore {
 		try? secureStorageClient.saveDeviceInfo(lastUsedOnDevice)
 		try? await updating {
 			$0.header.lastUsedOnDevice = lastUsedOnDevice
+			$0.header.lastUsedOnDevice.date = date()
 			$0.header.creatingDevice.description = deviceDescription
 		}
 		return (info: lastUsedOnDevice, model: model, name: name)
@@ -361,47 +305,17 @@ extension ProfileStore {
 		try _updateHeader(of: &toSave)
 		try _saveProfileAndEmitUpdate(toSave)
 	}
-
-	private var appIsUnlocked: Bool {
-		switch mode {
-		case .appIsUnlocked: true
-		case .appIsLocked: false
-		}
-	}
-
-	private var bufferedOwnershipConflictWhileAppLocked: ConflictingOwners? {
-		switch mode {
-		case .appIsUnlocked: nil
-		case let .appIsLocked(buffered): buffered
-		}
-	}
-
-	private func buffer(conflictingOwners: ConflictingOwners?) {
-		loggerGlobal.info("App is locked, buffering conflicting profle owner")
-		self.mode = .appIsLocked(bufferedProfileOwnershipConflict: conflictingOwners)
-	}
 }
 
 // MARK: Helpers
 extension ProfileStore {
-	/// Updates the `lastUsedOnDevice` to use this device, on `profile`,
-	/// then saves this profile and emits an update.
-	/// - Parameter profile: Profile to update `lastUsedOnDevice` of and
-	/// save on this device.
-	private func claimOwnershipOfProfile() throws {
-		var copy = profile
-		try _claimOwnership(of: &copy)
-	}
-
-	/// Updates the `lastUsedOnDevice` to use this device, on `profile`,
-	/// then saves this profile and emits an update.
-	/// - Parameter profile: Profile to update `lastUsedOnDevice` of and
-	/// save on this device.
-	private func _claimOwnership(of profile: inout Profile) throws {
+	/// Updates the `lastUsedOnDevice` to use this device, on `profile`
+	/// - Parameter profile: Profile to update `lastUsedOnDevice` of
+	public func claimOwnership(of profile: inout Profile) {
 		@Dependency(\.date) var date
 		profile.header.lastUsedOnDevice = deviceInfo
 		profile.header.lastUsedOnDevice.date = date()
-		try _saveProfileAndEmitUpdate(profile)
+		profile.header.lastModified = date()
 	}
 
 	/// Updates the header of a Profile, lastModified date, contentHint etc.
@@ -452,48 +366,15 @@ extension ProfileStore {
 
 		guard deviceInfo.id == header.lastUsedOnDevice.id else {
 			loggerGlobal.error("Device ID mismatch, profile might have been used on another device. Last used in header was: \(String(describing: header.lastUsedOnDevice)) and info of this device: \(String(describing: deviceInfo))")
-			Task {
-				let conflictingOwners = ConflictingOwners(
-					ownerOfCurrentProfile: header.lastUsedOnDevice,
-					thisDevice: deviceInfo
-				)
-
-				guard appIsUnlocked else {
-					return buffer(conflictingOwners: conflictingOwners)
-				}
-
-				try await doEmit(conflictingOwners: conflictingOwners)
-			}
 			throw Error.profileUsedOnAnotherDevice
 		}
 		// All good
-	}
-
-	private func doEmit(conflictingOwners: ConflictingOwners) async throws {
-		@Dependency(\.overlayWindowClient) var overlayWindowClient
-		assert(appIsUnlocked)
-
-		// We present an alert to user where they must choice if they wanna keep using Profile
-		// on this device or delete it. If they delete a new one will be created and we will
-		// onboard user...
-		let choiceByUser = await overlayWindowClient.scheduleAlertAwaitAction(.profileUsedOnAnotherDeviceAlert(
-			conflictingOwners: conflictingOwners
-		))
-
-		if choiceByUser == .claimAndContinueUseOnThisPhone {
-			try self.claimOwnershipOfProfile()
-		} else if choiceByUser == .deleteProfileFromThisPhone {
-			try self._deleteProfile(
-				keepInICloudIfPresent: true, // local resolution should not affect iCloud
-				assertOwnership: false // duh.. we know we had a conflict, ownership check will fail.
-			)
-		}
 	}
 }
 
 // MARK: Private Static
 extension ProfileStore {
-	typealias NewProfileTuple = (deviceInfo: DeviceInfo, profile: Profile, conflictingOwners: ConflictingOwners?)
+	typealias NewProfileTuple = (deviceInfo: DeviceInfo, profile: Profile)
 
 	private static func _loadSavedElseNewProfile(
 		metaDeviceInfo: MetaDeviceInfo
@@ -504,8 +385,7 @@ extension ProfileStore {
 		func newProfile() throws -> NewProfileTuple {
 			try (
 				deviceInfo: metaDeviceInfo.deviceInfo,
-				profile: _tryGenerateAndSaveNewProfile(deviceInfo: deviceInfo),
-				conflictingOwners: nil
+				profile: _tryGenerateAndSaveNewProfile(deviceInfo: deviceInfo)
 			)
 		}
 
@@ -542,11 +422,7 @@ extension ProfileStore {
 				}
 				return (
 					deviceInfo: deviceInfo,
-					profile: existing,
-					conflictingOwners: matchingIDs ? nil : .init(
-						ownerOfCurrentProfile: existing.header.lastUsedOnDevice,
-						thisDevice: deviceInfo
-					)
+					profile: existing
 				)
 			} else {
 				return try newProfile()
@@ -609,12 +485,15 @@ extension ProfileStore {
 		@Dependency(\.date) var date
 		@Dependency(\.mnemonicClient) var mnemonicClient
 
+		var lastUsedOnDevice = creatingDevice
+		lastUsedOnDevice.date = date()
+
 		let profileID = uuid()
 		let header = Profile.Header(
 			snapshotVersion: .v100,
 			id: profileID,
 			creatingDevice: creatingDevice,
-			lastUsedOnDevice: creatingDevice,
+			lastUsedOnDevice: lastUsedOnDevice,
 			lastModified: date.now,
 			contentHint: .init(
 				numberOfAccountsOnAllNetworksInTotal: 0,

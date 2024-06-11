@@ -167,10 +167,13 @@ extension UserDefaults.Dependency {
 
 	public func setLastCloudBackup(_ result: BackupResult.Result, of profile: Profile) throws {
 		var backups: [UUID: BackupResult] = getLastCloudBackups
+		let now = Date.now
+		let lastSuccess = result == .success ? now : backups[profile.id]?.lastSuccess
 		backups[profile.id] = .init(
-			backupDate: .now,
-			profileHash: profile.hashValue,
-			result: result
+			date: now,
+			saveIdentifier: profile.header.saveIdentifier,
+			result: result,
+			lastSuccess: lastSuccess
 		)
 
 		try save(codable: backups, forKey: .lastCloudBackups)
@@ -187,10 +190,12 @@ extension UserDefaults.Dependency {
 	/// Only call this on successful manual backups
 	public func setLastManualBackup(of profile: Profile) throws {
 		var backups: [ProfileID: BackupResult] = getLastManualBackups
+		let now = Date.now
 		backups[profile.id] = .init(
-			backupDate: .now,
-			profileHash: profile.hashValue,
-			result: .success
+			date: now,
+			saveIdentifier: profile.header.saveIdentifier,
+			result: .success,
+			lastSuccess: now
 		)
 
 		try save(codable: backups, forKey: .lastManualBackups)
@@ -232,15 +237,44 @@ extension UserDefaults.Dependency {
 }
 
 // MARK: - BackupResult
-public struct BackupResult: Codable, Sendable {
-	public let backupDate: Date
-	public let profileHash: Int
-	public let result: Result
+public struct BackupResult: Hashable, Codable, Sendable {
+	private static let timeoutInterval: TimeInterval = 5 * 60
 
-	public enum Result: Codable, Sendable {
+	public let date: Date
+	public let saveIdentifier: String
+	public let result: Result
+	public let lastSuccess: Date?
+
+	public var succeeded: Bool {
+		result == .success
+	}
+
+	public var failed: Bool {
+		switch result {
+		case .failure:
+			true
+		case let .started(date):
+			Date.now.timeIntervalSince(date) > Self.timeoutInterval
+		case .success:
+			false
+		}
+	}
+
+	public enum Result: Hashable, Codable, Sendable {
+		case started(Date)
 		case success
-		case temporarilyUnavailable
-		case notAuthenticated
-		case failure
+		case failure(Failure)
+
+		public enum Failure: Hashable, Codable, Sendable {
+			case temporarilyUnavailable
+			case notAuthenticated
+			case other
+		}
+	}
+}
+
+extension Profile.Header {
+	public var saveIdentifier: String {
+		"\(lastModified.timeIntervalSince1970)-\(lastUsedOnDevice.id.uuidString)"
 	}
 }

@@ -9,18 +9,23 @@ extension View {
 			}
 	}
 
-	func radixToolbar(title: String, alwaysVisible: Bool = true) -> some View {
-		self
-			.toolbar {
-				ToolbarItem(placement: .principal) {
-					Text(title)
-						.foregroundColor(.app.gray1)
-						.textStyle(.body1Header)
+	func radixToolbar(title: String, alwaysVisible: Bool = true, closeAction: (() -> Void)? = nil) -> some View {
+		toolbar {
+			ToolbarItem(placement: .principal) {
+				Text(title)
+					.foregroundColor(.app.gray1)
+					.textStyle(.body1Header)
+			}
+
+			if let closeAction {
+				ToolbarItem(placement: .navigationBarLeading) {
+					CloseButton(action: closeAction)
 				}
 			}
-			.navigationBarTitleDisplayMode(.inline)
-			.toolbarBackground(.app.background, for: .navigationBar)
-			.toolbarBackground(alwaysVisible ? .visible : .automatic, for: .navigationBar)
+		}
+		.navigationBarTitleDisplayMode(.inline)
+		.toolbarBackground(.app.background, for: .navigationBar)
+		.toolbarBackground(alwaysVisible ? .visible : .automatic, for: .navigationBar)
 	}
 
 	func eraseToAnyView() -> AnyView {
