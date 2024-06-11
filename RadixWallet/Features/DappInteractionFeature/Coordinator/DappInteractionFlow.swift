@@ -139,6 +139,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case personaDataPermission(PersonaDataPermission.State)
 			case oneTimePersonaData(OneTimePersonaData.State)
 			case reviewTransaction(TransactionReview.State)
+			case verify(VerifyDapp.State)
 		}
 
 		@CasePathable
@@ -149,6 +150,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case personaDataPermission(PersonaDataPermission.Action)
 			case oneTimePersonaData(OneTimePersonaData.Action)
 			case reviewTransaction(TransactionReview.Action)
+			case verify(VerifyDapp.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -170,6 +172,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				}
 				Scope(state: \.reviewTransaction, action: \.reviewTransaction) {
 					TransactionReview()
+				}
+				Scope(state: \.verify, action: \.verify) {
+					VerifyDapp()
 				}
 			}
 		}

@@ -93,6 +93,13 @@ extension DappInteractionFlow {
 						action: DappInteractionFlow.Path.Action.reviewTransaction,
 						then: { TransactionReview.View(store: $0) }
 					)
+
+				case .verify:
+					CaseLet(
+						/DappInteractionFlow.Path.MainState.verify,
+						action: DappInteractionFlow.Path.Action.verify,
+						then: { VerifyDapp.View(store: $0) }
+					)
 				}
 			}
 		}

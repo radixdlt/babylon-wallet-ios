@@ -14,6 +14,7 @@ public actor Mobile2Mobile {
 	@Dependency(\.cacheClient) var cacheClient
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	@Dependency(\.userDefaults) var userDefaults
+	@Dependency(\.dappInteractionClient) var dappInteractionClient
 
 	private let incomingMessagesSubject: AsyncPassthroughSubject<P2P.RTCIncomingMessage> = .init()
 
@@ -115,8 +116,8 @@ extension Mobile2Mobile {
 
 			let state = VerifyDapp.State(dAppMetadata: dAppMetadata)
 
-			// TODO: MB- Change here to not ignore action and make the handling here.
-			overlayWindowClient.scheduleFullScreenIgnoreAction(.init(root: .verifyDapp(state)))
+			// TODO: MB- Change here to call addInteraction
+			// overlayWindowClient.scheduleFullScreenIgnoreAction(.init(root: .verifyDapp(state)))
 
 			let url = dappReturnURL.appending(queryItems: [
 				.init(name: "sessionId", value: request.sessionId.rawValue),

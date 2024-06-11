@@ -28,12 +28,6 @@ extension FullScreenOverlayCoordinator {
 						action: FullScreenOverlayCoordinator.Root.Action.claimWallet,
 						then: { ClaimWallet.View(store: $0) }
 					)
-				case .verifyDapp:
-					CaseLet(
-						/FullScreenOverlayCoordinator.Root.State.verifyDapp,
-						action: FullScreenOverlayCoordinator.Root.Action.verifyDapp,
-						then: { VerifyDapp.View(store: $0) }
-					)
 				}
 			}
 		}
