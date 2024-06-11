@@ -60,7 +60,7 @@ extension Mobile2Mobile {
 				return try DappMetadata.Ledger(
 					entityMetadataForDapp: entityMetadataForDapp,
 					dAppDefinintionAddress: dappDefinitionAddress,
-					origin: .init(string: origin.absoluteString)
+					origin: .init(string: origin.absoluteString)!
 				)
 			}
 		)
