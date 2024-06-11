@@ -4,19 +4,18 @@ import SwiftUI
 // MARK: - DappInteraction
 enum DappInteraction {}
 
-// MARK: DappInteraction.NumberOfAccounts
-extension DappInteraction {
-	typealias NumberOfAccounts = P2P.Dapp.Request.NumberOfAccounts
-}
-
 // MARK: - DappMetadata
+// extension DappInteraction {
+//	typealias NumberOfAccounts = P2P.Dapp.Request.NumberOfAccounts
+// }
+
 /// Metadata for a dapp, either from a request or fetched from ledger.
-/// not to be confused with `P2P.Dapp.Request.Metadata` which is the
+/// not to be confused with `DappToWalletInteractionMetadata` which is the
 /// associated value of one of the cases of this enum.
 public enum DappMetadata: Sendable, Hashable {
 	/// The metadata sent with the request from the Dapp.
 	/// We only allow this case `request` to be passed around if `isDeveloperModeEnabled` is `true`.
-	case request(P2P.Dapp.Request.Metadata)
+	case request(DappToWalletInteractionMetadata)
 
 	/// A detailed DappMetaData fetched from Ledger.
 	case ledger(Ledger)
@@ -27,7 +26,7 @@ public enum DappMetadata: Sendable, Hashable {
 extension DappMetadata {
 	static let wallet: Wallet = .init()
 	public struct Wallet: Sendable, Hashable {
-		let origin: DappOrigin = .wallet
+		let origin: DappToWalletInteractionMetadata.Origin = .wallet
 		let name: NonEmptyString = "Radix Wallet"
 		let description: String? = nil
 		let thumbnail: URL? = nil
@@ -40,7 +39,7 @@ extension DappMetadata {
 	public struct Ledger: Sendable, Hashable, Codable {
 		static let defaultName = NonEmptyString(rawValue: L10n.DAppRequest.Metadata.unknownName)!
 
-		let origin: P2P.Dapp.Request.Metadata.Origin
+		let origin: DappToWalletInteractionMetadata.Origin
 
 		let dAppDefinintionAddress: DappDefinitionAddress
 		let name: NonEmptyString?
@@ -48,7 +47,7 @@ extension DappMetadata {
 		let thumbnail: URL?
 
 		init(
-			origin: P2P.Dapp.Request.Metadata.Origin,
+			origin: DappToWalletInteractionMetadata.Origin,
 			dAppDefinintionAddress: DappDefinitionAddress,
 			name: NonEmptyString?,
 			description: String? = nil,
@@ -64,7 +63,7 @@ extension DappMetadata {
 }
 
 extension DappMetadata {
-	public var origin: DappOrigin {
+	public var origin: DappToWalletInteractionMetadata.Origin {
 		switch self {
 		case let .ledger(metadata): metadata.origin
 		case let .request(metadata): metadata.origin
@@ -90,7 +89,7 @@ extension DappMetadata {
 #if DEBUG
 extension DappMetadata {
 	static let previewValue: Self = try! .ledger(.init(
-		origin: .init(string: "https://radfi.com"),
+		origin: .wallet, // .init(string: "https://radfi.com"),
 		dAppDefinintionAddress: .init(validatingAddress: "account_tdx_b_1p95nal0nmrqyl5r4phcspg8ahwnamaduzdd3kaklw3vqeavrwa"),
 		name: "Collabo.Fi",
 		description: "A very collaby finance dapp",
@@ -101,18 +100,18 @@ extension DappMetadata {
 #endif
 
 // MARK: - P2P.Dapp.Request.WalletRequestItem
-extension P2P.Dapp.Request {
+extension DappToWalletInteraction {
 	/// A union type containing all request items allowed in a `WalletInteraction`, for app handling purposes.
 	enum AnyInteractionItem: Sendable, Hashable {
 		// requests
-		case auth(AuthRequestItem)
-		case oneTimeAccounts(AccountsRequestItem)
-		case ongoingAccounts(AccountsRequestItem)
-		case oneTimePersonaData(PersonaDataRequestItem)
-		case ongoingPersonaData(PersonaDataRequestItem)
+		case auth(DappToWalletInteractionAuthRequestItem)
+		case oneTimeAccounts(DappToWalletInteractionAccountsRequestItem)
+		case ongoingAccounts(DappToWalletInteractionAccountsRequestItem)
+		case oneTimePersonaData(DappToWalletInteractionPersonaDataRequestItem)
+		case ongoingPersonaData(DappToWalletInteractionPersonaDataRequestItem)
 
 		// transactions
-		case send(SendTransactionItem)
+		case send(DappToWalletInteractionSendTransactionItem)
 
 		var priority: some Comparable {
 			switch self {
@@ -140,7 +139,7 @@ extension P2P.Dapp.Request {
 	// implementation simpler and with no need to keep it manually synced up.
 	var erasedItems: [AnyInteractionItem] {
 		switch items {
-		case let .request(.authorized(items)):
+		case let .authorizedRequest(items):
 			[
 				.auth(items.auth),
 				items.oneTimeAccounts.map(AnyInteractionItem.oneTimeAccounts),
@@ -149,7 +148,7 @@ extension P2P.Dapp.Request {
 				items.ongoingPersonaData.map(AnyInteractionItem.ongoingPersonaData),
 			]
 			.compactMap { $0 }
-		case let .request(.unauthorized(items)):
+		case let .unauthorizedRequest(items):
 			[
 				items.oneTimeAccounts.map(AnyInteractionItem.oneTimeAccounts),
 				items.oneTimePersonaData.map(AnyInteractionItem.oneTimePersonaData),
@@ -165,31 +164,31 @@ extension P2P.Dapp.Request {
 }
 
 // MARK: - P2P.Dapp.Response.WalletInteractionSuccessResponse.AnyInteractionResponseItem
-extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
+extension WalletToDappInteractionSuccessResponse {
 	enum AnyInteractionResponseItem: Sendable, Hashable {
 		// request responses
-		case auth(AuthRequestResponseItem)
-		case oneTimeAccounts(AccountsRequestResponseItem)
-		case ongoingAccounts(AccountsRequestResponseItem)
-		case oneTimePersonaData(PersonaDataRequestResponseItem)
-		case ongoingPersonaData(PersonaDataRequestResponseItem)
+		case auth(WalletToDappInteractionAuthRequestResponseItem)
+		case oneTimeAccounts(WalletToDappInteractionAccountsRequestResponseItem)
+		case ongoingAccounts(WalletToDappInteractionAccountsRequestResponseItem)
+		case oneTimePersonaData(WalletToDappInteractionPersonaDataRequestResponseItem)
+		case ongoingPersonaData(WalletToDappInteractionPersonaDataRequestResponseItem)
 
 		// transaction responses
-		case send(SendTransactionResponseItem)
+		case send(WalletToDappInteractionSendTransactionResponseItem)
 	}
 
 	init?(
-		for interaction: P2P.Dapp.Request,
-		with items: some Collection<P2P.Dapp.Response.WalletInteractionSuccessResponse.AnyInteractionResponseItem>
+		for interaction: DappToWalletInteraction,
+		with items: some Collection<WalletToDappInteractionSuccessResponse.AnyInteractionResponseItem>
 	) {
 		switch interaction.items {
-		case .request:
+		case .authorizedRequest, .unauthorizedRequest:
 			// NB: variadic generics + native case paths should greatly help to simplify this "picking" logic
-			var auth: AuthRequestResponseItem? = nil
-			var oneTimeAccounts: AccountsRequestResponseItem? = nil
-			var ongoingAccounts: AccountsRequestResponseItem? = nil
-			var oneTimePersonaData: PersonaDataRequestResponseItem? = nil
-			var ongoingPersonaData: PersonaDataRequestResponseItem? = nil
+			var auth: WalletToDappInteractionAuthRequestResponseItem? = nil
+			var oneTimeAccounts: WalletToDappInteractionAccountsRequestResponseItem? = nil
+			var ongoingAccounts: WalletToDappInteractionAccountsRequestResponseItem? = nil
+			var oneTimePersonaData: WalletToDappInteractionPersonaDataRequestResponseItem? = nil
+			var ongoingPersonaData: WalletToDappInteractionPersonaDataRequestResponseItem? = nil
 
 			for item in items {
 				switch item {
@@ -210,31 +209,31 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 
 			if let auth {
 				self.init(
-					interactionId: interaction.id,
-					items: .request(
-						.authorized(.init(
+					interactionId: interaction.interactionId,
+					items: .authorizedRequest(
+						.init(
 							auth: auth,
 							ongoingAccounts: ongoingAccounts,
 							ongoingPersonaData: ongoingPersonaData,
 							oneTimeAccounts: oneTimeAccounts,
 							oneTimePersonaData: oneTimePersonaData
-						))
+						)
 					)
 				)
 			} else {
 				self.init(
-					interactionId: interaction.id,
-					items: .request(
-						.unauthorized(.init(
+					interactionId: interaction.interactionId,
+					items: .unauthorizedRequest(
+						.init(
 							oneTimeAccounts: oneTimeAccounts,
 							oneTimePersonaData: oneTimePersonaData
-						))
+						)
 					)
 				)
 			}
 
 		case .transaction:
-			var send: SendTransactionResponseItem? = nil
+			var send: WalletToDappInteractionSendTransactionResponseItem? = nil
 			for item in items {
 				switch item {
 				case .auth, .ongoingAccounts, .ongoingPersonaData, .oneTimeAccounts, .oneTimePersonaData:
@@ -250,7 +249,7 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 			}
 
 			self.init(
-				interactionId: interaction.id,
+				interactionId: interaction.interactionId,
 				items: .transaction(.init(send: send))
 			)
 		}

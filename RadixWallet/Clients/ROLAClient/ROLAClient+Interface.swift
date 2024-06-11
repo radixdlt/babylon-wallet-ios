@@ -13,8 +13,8 @@ public struct ROLAClient: Sendable, DependencyKey {
 
 // MARK: ROLAClient.PerformWellKnownFileCheck
 extension ROLAClient {
-	public typealias PerformDappDefinitionVerification = @Sendable (P2P.Dapp.Request.Metadata) async throws -> Void
-	public typealias PerformWellKnownFileCheck = @Sendable (P2P.Dapp.Request.Metadata) async throws -> Void
+	public typealias PerformDappDefinitionVerification = @Sendable (DappToWalletInteractionMetadata) async throws -> Void
+	public typealias PerformWellKnownFileCheck = @Sendable (DappToWalletInteractionMetadata) async throws -> Void
 	public typealias ManifestForAuthKeyCreation = @Sendable (ManifestForAuthKeyCreationRequest) async throws -> TransactionManifest
 	public typealias AuthenticationDataToSignForChallenge = @Sendable (AuthenticationDataToSignForChallengeRequest) throws -> AuthenticationDataToSignForChallengeResponse
 }
@@ -28,13 +28,13 @@ extension DependencyValues {
 
 // MARK: - AuthenticationDataToSignForChallengeRequest
 public struct AuthenticationDataToSignForChallengeRequest: Sendable, Hashable {
-	public let challenge: P2P.Dapp.Request.AuthChallengeNonce
-	public let origin: P2P.Dapp.Request.Metadata.Origin
+	public let challenge: DappToWalletInteractionAuthChallengeNonce
+	public let origin: DappToWalletInteractionMetadata.Origin
 	public let dAppDefinitionAddress: DappDefinitionAddress
 
 	public init(
-		challenge: P2P.Dapp.Request.AuthChallengeNonce,
-		origin: P2P.Dapp.Request.Metadata.Origin,
+		challenge: DappToWalletInteractionAuthChallengeNonce,
+		origin: DappToWalletInteractionMetadata.Origin,
 		dAppDefinitionAddress: DappDefinitionAddress
 	) {
 		self.challenge = challenge

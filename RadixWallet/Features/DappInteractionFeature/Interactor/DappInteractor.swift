@@ -6,9 +6,9 @@ typealias RequestEnvelope = DappInteractionClient.RequestEnvelope
 
 // MARK: Identifiable
 extension RequestEnvelope: Identifiable {
-	public typealias ID = P2P.Dapp.Request.ID
+	public typealias ID = WalletInteractionId
 	public var id: ID {
-		request.id
+		request.interactionId
 	}
 }
 
@@ -36,7 +36,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 		enum ResponseFailureAlertAction: Sendable, Hashable {
 			case cancelButtonTapped(RequestEnvelope)
-			case retryButtonTapped(P2P.Dapp.Response, for: RequestEnvelope, DappMetadata)
+			case retryButtonTapped(WalletToDappInteractionResponse, for: RequestEnvelope, DappMetadata)
 		}
 
 		enum InvalidRequestAlertAction: Sendable, Hashable {
@@ -48,25 +48,25 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case receivedRequestFromDapp(RequestEnvelope)
 		case presentQueuedRequestIfNeeded
 		case sentResponseToDapp(
-			P2P.Dapp.Response,
+			WalletToDappInteractionResponse,
 			for: RequestEnvelope,
 			DappMetadata,
 			IntentHash?
 		)
 		case failedToSendResponseToDapp(
-			P2P.Dapp.Response,
+			WalletToDappInteractionResponse,
 			for: RequestEnvelope,
 			DappMetadata,
 			reason: String
 		)
 		case presentResponseFailureAlert(
-			P2P.Dapp.Response,
+			WalletToDappInteractionResponse,
 			for: RequestEnvelope,
 			DappMetadata, reason: String
 		)
 		case presentResponseSuccessView(DappMetadata, IntentHash?)
 		case presentInvalidRequest(
-			P2P.Dapp.RequestUnvalidated,
+			DappToWalletInteractionUnvalidated,
 			reason: DappInteractionClient.ValidatedDappRequest.InvalidRequestReason,
 			route: P2P.Route,
 			isDeveloperModeEnabled: Bool
@@ -217,9 +217,9 @@ struct DappInteractor: Sendable, FeatureReducer {
 			return .none
 
 		case let .presentInvalidRequest(invalidRequest, reason, route, isDeveloperModeEnabled):
-			let response = P2P.Dapp.Response.WalletInteractionFailureResponse(
-				interactionId: invalidRequest.id,
-				errorType: reason.interactionResponseError,
+			let response = WalletToDappInteractionFailureResponse(
+				interactionId: invalidRequest.interactionId,
+				error: reason.interactionResponseError,
 				message: reason.responseMessage()
 			)
 
@@ -257,7 +257,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 				loggerGlobal.error(.init(stringLiteral: message))
 				return .none
 			}
-			guard let request = state.requestQueue[id: dappInteraction.interaction.id] else {
+			guard let request = state.requestQueue[id: dappInteraction.interaction.interactionId] else {
 				let message = "The request for this interaction is missing"
 				assertionFailure(message)
 				loggerGlobal.error(.init(stringLiteral: message))
@@ -300,7 +300,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	}
 
 	func sendResponseToDappEffect(
-		_ responseToDapp: P2P.Dapp.Response,
+		_ responseToDapp: WalletToDappInteractionResponse,
 		for request: RequestEnvelope,
 		dappMetadata: DappMetadata
 	) -> Effect<Action> {
@@ -356,7 +356,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 }
 
 extension DappInteractionClient.ValidatedDappRequest.InvalidRequestReason {
-	var interactionResponseError: P2P.Dapp.Response.WalletInteractionFailureResponse.ErrorType {
+	var interactionResponseError: DappWalletInteractionErrorType {
 		switch self {
 		case .incompatibleVersion:
 			.incompatibleVersion
@@ -365,7 +365,7 @@ extension DappInteractionClient.ValidatedDappRequest.InvalidRequestReason {
 		case .invalidDappDefinitionAddress:
 			.unknownDappDefinitionAddress
 		case .invalidOrigin:
-			.invalidOriginURL
+			.invalidOriginUrl
 		case .dAppValidationError:
 			.unknownDappDefinitionAddress
 		case .badContent:

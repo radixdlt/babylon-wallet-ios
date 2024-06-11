@@ -57,15 +57,15 @@ public struct SignTransactionWithLedgerRequest: Sendable, Hashable {
 public struct SignAuthChallengeWithLedgerRequest: Sendable, Hashable {
 	public let signers: NonEmpty<IdentifiedArrayOf<Signer>>
 	public let ledger: LedgerHardwareWalletFactorSource
-	public let challenge: P2P.Dapp.Request.AuthChallengeNonce
-	public let origin: P2P.Dapp.Request.Metadata.Origin
+	public let challenge: DappToWalletInteractionAuthChallengeNonce
+	public let origin: DappToWalletInteractionMetadata.Origin
 	public let dAppDefinitionAddress: AccountAddress
 
 	public init(
 		ledger: LedgerHardwareWalletFactorSource,
 		signers: NonEmpty<IdentifiedArrayOf<Signer>>,
-		challenge: P2P.Dapp.Request.AuthChallengeNonce,
-		origin: P2P.Dapp.Request.Metadata.Origin,
+		challenge: DappToWalletInteractionAuthChallengeNonce,
+		origin: DappToWalletInteractionMetadata.Origin,
 		dAppDefinitionAddress: AccountAddress
 	) {
 		self.ledger = ledger

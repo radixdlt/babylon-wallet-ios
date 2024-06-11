@@ -21,34 +21,16 @@ extension DappInteractionClient {
 		case accountTransfer
 	}
 
-	public typealias AddWalletInteraction = @Sendable (_ items: P2P.Dapp.Request.Items, _ interaction: WalletInteraction) async -> P2P.RTCOutgoingMessage.Response?
+	public typealias AddWalletInteraction = @Sendable (_ items: DappToWalletInteractionItems, _ interaction: WalletInteraction) async -> P2P.RTCOutgoingMessage.Response?
 	public typealias CompleteInteraction = @Sendable (P2P.RTCOutgoingMessage) async throws -> Void
-}
-
-extension P2P.Dapp.Request.ID {
-	public static func walletInteractionID(for interaction: DappInteractionClient.WalletInteraction) -> Self {
-		"\(interaction.rawValue)_\(UUID().uuidString)"
-	}
-
-	public var isWalletAccountDepositSettingsInteraction: Bool {
-		rawValue.hasPrefix(DappInteractionClient.WalletInteraction.accountDepositSettings.rawValue)
-	}
-
-	public var isWalletAccountTransferInteraction: Bool {
-		rawValue.hasPrefix(DappInteractionClient.WalletInteraction.accountTransfer.rawValue)
-	}
-
-	public var isWalletInteraction: Bool {
-		isWalletAccountTransferInteraction || isWalletAccountDepositSettingsInteraction
-	}
 }
 
 extension DappInteractionClient {
 	public struct RequestEnvelope: Sendable, Hashable {
 		public let route: P2P.Route
-		public let request: P2P.Dapp.Request
+		public let request: DappToWalletInteraction
 
-		public init(route: P2P.Route, request: P2P.Dapp.Request) {
+		public init(route: P2P.Route, request: DappToWalletInteraction) {
 			self.route = route
 			self.request = request
 		}
@@ -64,12 +46,12 @@ extension DappInteractionClient {
 		}
 
 		public enum Request: Sendable, Hashable {
-			case valid(P2P.Dapp.Request)
-			case invalid(request: P2P.Dapp.RequestUnvalidated, reason: InvalidRequestReason)
+			case valid(DappToWalletInteraction)
+			case invalid(request: DappToWalletInteractionUnvalidated, reason: InvalidRequestReason)
 		}
 
 		public enum InvalidRequestReason: Sendable, Hashable {
-			case incompatibleVersion(connectorExtensionSent: P2P.Dapp.Version, walletUses: P2P.Dapp.Version)
+			case incompatibleVersion(connectorExtensionSent: WalletInteractionVersion, walletUses: WalletInteractionVersion)
 			case wrongNetworkID(connectorExtensionSent: NetworkID, walletUses: NetworkID)
 			case invalidDappDefinitionAddress(gotStringWhichIsAnInvalidAccountAddress: String)
 			case invalidOrigin(invalidURLString: String)

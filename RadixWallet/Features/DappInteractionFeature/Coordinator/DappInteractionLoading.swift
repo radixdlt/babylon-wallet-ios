@@ -4,13 +4,13 @@ import SwiftUI
 // MARK: - DappInteractionLoading
 struct DappInteractionLoading: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
-		let interaction: P2P.Dapp.Request
+		let interaction: DappToWalletInteraction
 		var isLoading: Bool = false
 
 		@PresentationState
 		var errorAlert: AlertState<ViewAction.ErrorAlertAction>?
 
-		init(interaction: P2P.Dapp.Request) {
+		init(interaction: DappToWalletInteraction) {
 			self.interaction = interaction
 		}
 	}
@@ -65,7 +65,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 	func metadataLoadingEffect(with state: inout State) -> Effect<Action> {
 		state.isLoading = true
 
-		if state.interaction.metadata.origin == .wallet {
+		if state.interaction.metadata.origin == DappToWalletInteractionMetadata.Origin.wallet {
 			return .send(.internal(.dappMetadataLoadingResult(.success(.wallet(.init())))))
 		}
 
@@ -73,7 +73,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 
 			let result: TaskResult<DappMetadata> = await {
 				let isDeveloperModeEnabled = await appPreferencesClient.getPreferences().security.isDeveloperModeEnabled
-				let dappDefinitionAddress = request.dAppDefinitionAddress
+				let dappDefinitionAddress = request.dappDefinitionAddress
 
 				do {
 					let cachedMetadata = try await cacheClient.withCaching(
@@ -153,7 +153,7 @@ extension DappMetadata.Ledger {
 	init(
 		entityMetadataForDapp: GatewayAPI.EntityMetadataCollection,
 		dAppDefinintionAddress: AccountAddress,
-		origin: P2P.Dapp.Request.Metadata.Origin
+		origin: DappToWalletInteractionMetadata.Origin
 	) {
 		let items = entityMetadataForDapp.items
 		let maybeName: String? = items[.name]?.value.asString
