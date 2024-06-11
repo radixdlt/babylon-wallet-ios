@@ -165,6 +165,6 @@ public struct BackupStatus: Hashable, Codable, Sendable {
 
 	public init(result: BackupResult, profile: Profile) {
 		self.result = result
-		self.isCurrent = result.saveIdentifier == profile.saveIdentifier
+		self.isCurrent = result.saveIdentifier == profile.header.saveIdentifier
 	}
 }

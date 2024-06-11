@@ -148,19 +148,15 @@ extension CloudBackupClient {
 		@Sendable
 		func performAutomaticBackup(_ profile: Profile, timeToCheckIfClaimed: Bool) async {
 			let needsBackUp = profile.appPreferences.security.isCloudProfileSyncEnabled && profile.header.isNonEmpty
-			let lastBackup = userDefaults.getLastCloudBackups[profile.id]
-			let isBackedUp = lastBackup?.result == .success && lastBackup?.saveIdentifier == profile.saveIdentifier
-
-			let shouldBackUp = needsBackUp && !isBackedUp
-			let shouldCheckClaim = shouldBackUp || timeToCheckIfClaimed
-
-			guard shouldBackUp || shouldCheckClaim else { return }
-
 			let existingRecord = try? await fetchProfileRecord(profile.id)
-			let backedUpID = try? existingRecord.map(getProfileHeader)?.lastUsedOnDevice.id
+			let backedUpHeader = try? existingRecord.map(getProfileHeader)
+			let isBackedUp = backedUpHeader?.saveIdentifier == profile.header.saveIdentifier
+			let shouldBackUp = needsBackUp && !isBackedUp
+
+			guard shouldBackUp || timeToCheckIfClaimed else { return }
 
 			let shouldReclaim: Bool
-			if shouldCheckClaim, let backedUpID, await !profileStore.isThisDevice(deviceID: backedUpID) {
+			if let backedUpID = backedUpHeader?.lastUsedOnDevice.id, await !profileStore.isThisDevice(deviceID: backedUpID) {
 				let action = await overlayWindowClient.scheduleFullScreen(.init(root: .claimWallet(.init())))
 				switch action {
 				case .claimWallet(.transferBack):

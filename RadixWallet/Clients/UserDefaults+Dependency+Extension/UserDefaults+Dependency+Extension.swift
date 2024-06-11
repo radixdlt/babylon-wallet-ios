@@ -171,7 +171,7 @@ extension UserDefaults.Dependency {
 		let lastSuccess = result == .success ? now : backups[profile.id]?.lastSuccess
 		backups[profile.id] = .init(
 			date: now,
-			saveIdentifier: profile.saveIdentifier,
+			saveIdentifier: profile.header.saveIdentifier,
 			result: result,
 			lastSuccess: lastSuccess
 		)
@@ -193,7 +193,7 @@ extension UserDefaults.Dependency {
 		let now = Date.now
 		backups[profile.id] = .init(
 			date: now,
-			saveIdentifier: profile.saveIdentifier,
+			saveIdentifier: profile.header.saveIdentifier,
 			result: .success,
 			lastSuccess: now
 		)
@@ -273,8 +273,8 @@ public struct BackupResult: Hashable, Codable, Sendable {
 	}
 }
 
-extension Profile {
+extension Profile.Header {
 	public var saveIdentifier: String {
-		"\(header.lastModified.timeIntervalSince1970)-\(header.lastUsedOnDevice.id.uuidString)"
+		"\(lastModified.timeIntervalSince1970)-\(lastUsedOnDevice.id.uuidString)"
 	}
 }
