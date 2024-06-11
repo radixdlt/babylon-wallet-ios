@@ -161,6 +161,7 @@ extension ProfileStore {
 		with accountsRecoveredFromScanningUsingMnemonic: AccountsRecoveredFromScanningUsingMnemonic
 	) async throws {
 		@Dependency(\.uuid) var uuid
+		@Dependency(\.date) var date
 		loggerGlobal.notice("Finish onboarding with accounts recovered from scanning using menmonic")
 		let (creatingDevice, model, name) = await updateDeviceInfo()
 		var bdfs = accountsRecoveredFromScanningUsingMnemonic.deviceFactorSource
@@ -182,12 +183,15 @@ extension ProfileStore {
 			authorizedDapps: []
 		)
 
+		var lastUsedOnDevice = creatingDevice
+		lastUsedOnDevice.date = date()
+
 		let profile = Profile(
 			header: Header(
 				snapshotVersion: .v100,
 				id: uuid(),
 				creatingDevice: creatingDevice,
-				lastUsedOnDevice: creatingDevice,
+				lastUsedOnDevice: lastUsedOnDevice,
 				lastModified: bdfs.addedOn,
 				contentHint: .init(
 					numberOfAccountsOnAllNetworksInTotal: UInt16(
@@ -245,6 +249,7 @@ extension ProfileStore {
 	@discardableResult
 	private func updateDeviceInfo() async -> (info: DeviceInfo, model: String, name: String) {
 		@Dependency(\.device) var device
+		@Dependency(\.date) var date
 		let model = await device.model
 		let name = await device.name
 		let deviceDescription = DeviceInfo.deviceDescription(
@@ -256,6 +261,7 @@ extension ProfileStore {
 		try? secureStorageClient.saveDeviceInfo(lastUsedOnDevice)
 		try? await updating {
 			$0.header.lastUsedOnDevice = lastUsedOnDevice
+			$0.header.lastUsedOnDevice.date = date()
 			$0.header.creatingDevice.description = deviceDescription
 		}
 		return (info: lastUsedOnDevice, model: model, name: name)
@@ -309,6 +315,7 @@ extension ProfileStore {
 		@Dependency(\.date) var date
 		profile.header.lastUsedOnDevice = deviceInfo
 		profile.header.lastUsedOnDevice.date = date()
+		profile.header.lastModified = date()
 	}
 
 	/// Updates the header of a Profile, lastModified date, contentHint etc.
@@ -478,12 +485,15 @@ extension ProfileStore {
 		@Dependency(\.date) var date
 		@Dependency(\.mnemonicClient) var mnemonicClient
 
+		var lastUsedOnDevice = creatingDevice
+		lastUsedOnDevice.date = date()
+
 		let profileID = uuid()
 		let header = Profile.Header(
 			snapshotVersion: .v100,
 			id: profileID,
 			creatingDevice: creatingDevice,
-			lastUsedOnDevice: creatingDevice,
+			lastUsedOnDevice: lastUsedOnDevice,
 			lastModified: date.now,
 			contentHint: .init(
 				numberOfAccountsOnAllNetworksInTotal: 0,
