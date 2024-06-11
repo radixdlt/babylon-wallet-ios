@@ -55,14 +55,14 @@ extension SecurityCenterClient {
 		@Sendable
 		func startMonitoring() async throws {
 			let profileValues = await profileStore.values()
-			let problematicValues = try await deviceFactorSourceClient.problematicEntities()
+			let entitiesInBadState = try await deviceFactorSourceClient.entitiesInBadState()
 			let backupValues = await combineLatest(cloudBackups(), manualBackups()).map { (cloud: $0, manual: $1) }
 
-			for try await (profile, problematic, backups) in combineLatest(profileValues, problematicValues, backupValues) {
+			for try await (profile, entitiesInBadState, backups) in combineLatest(profileValues, entitiesInBadState, backupValues) {
 				let isCloudProfileSyncEnabled = profile.appPreferences.security.isCloudProfileSyncEnabled
 
-				func hasProblem3() async -> ProblematicAddresses? {
-					problematic.unrecoverable.isEmpty ? nil : problematic.unrecoverable
+				func hasProblem3() async -> AddressesOfEntitiesInBadState? {
+					entitiesInBadState.unrecoverable.isEmpty ? nil : entitiesInBadState.unrecoverable
 				}
 
 				func hasProblem5() -> Bool {
@@ -81,8 +81,8 @@ extension SecurityCenterClient {
 					!isCloudProfileSyncEnabled && backups.manual?.isCurrent == false
 				}
 
-				func hasProblem9() async -> ProblematicAddresses? {
-					problematic.mnemonicMissing.isEmpty ? nil : problematic.mnemonicMissing
+				func hasProblem9() async -> AddressesOfEntitiesInBadState? {
+					entitiesInBadState.withoutControl.isEmpty ? nil : entitiesInBadState.withoutControl
 				}
 
 				var result: [SecurityProblem] = []
@@ -117,7 +117,7 @@ extension SecurityCenterClient {
 	}
 }
 
-private extension ProblematicAddresses {
+private extension AddressesOfEntitiesInBadState {
 	var isEmpty: Bool {
 		accounts.count + hiddenAccounts.count + personas.count == 0
 	}

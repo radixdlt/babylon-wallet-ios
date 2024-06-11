@@ -73,33 +73,33 @@ extension DeviceFactorSourceClient: DependencyKey {
 			)
 		}
 
-		struct FactorSourceHasMnemonic: Sendable, Equatable {
+		struct KeychainPresenceOfMnemonic: Sendable, Equatable {
 			let id: FactorSourceIDFromHash
 			let present: Bool
 		}
 
 		@Sendable
-		func factorSourcesMnemonicPresence() async -> AnyAsyncSequence<[FactorSourceHasMnemonic]> {
+		func factorSourcesMnemonicPresence() async -> AnyAsyncSequence<[KeychainPresenceOfMnemonic]> {
 			await combineLatest(profileStore.factorSourcesValues(), secureStorageClient.keychainChanged().prepend(()))
 				.map { factorSources, _ in
 					factorSources
 						.compactMap { $0.extract(DeviceFactorSource.self)?.id }
 						.map { id in
-							FactorSourceHasMnemonic(id: id, present: secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(id))
+							KeychainPresenceOfMnemonic(id: id, present: secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(id))
 						}
 				}
 				.removeDuplicates()
 				.eraseToAnyAsyncSequence()
 		}
 
-		let problematicEntities: @Sendable () async throws -> AnyAsyncSequence<(mnemonicMissing: ProblematicAddresses, unrecoverable: ProblematicAddresses)> = {
-			await combineLatest(factorSourcesMnemonicPresence(), userDefaults.factorSourceIDOfBackedUpMnemonics(), profileStore.values()).map { factorSources, backedUpFactorSources, profile in
+		let entitiesInBadState: @Sendable () async throws -> AnyAsyncSequence<(withoutControl: AddressesOfEntitiesInBadState, unrecoverable: AddressesOfEntitiesInBadState)> = {
+			await combineLatest(factorSourcesMnemonicPresence(), userDefaults.factorSourceIDOfBackedUpMnemonics(), profileStore.values()).map { presencesOfMnemonics, backedUpFactorSources, profile in
 
-				let mnemonicMissingFactorSources = factorSources
+				let mnemonicMissingFactorSources = presencesOfMnemonics
 					.filter(not(\.present))
 					.map(\.id)
 
-				let mnemomincPresentFactorSources = factorSources
+				let mnemomincPresentFactorSources = presencesOfMnemonics
 					.filter(\.present)
 					.map(\.id)
 
@@ -112,49 +112,35 @@ extension DeviceFactorSourceClient: DependencyKey {
 				let personas = network.getPersonas()
 				let hiddenPersonas = network.getHiddenPersonas()
 
-				func mnemonicMissing(_ account: Account) -> Bool {
-					switch account.securityState {
+				func withoutControl(_ entity: some EntityProtocol) -> Bool {
+					switch entity.securityState {
 					case let .unsecured(value):
 						mnemonicMissingFactorSources.contains(value.transactionSigning.factorSourceId)
 					}
 				}
 
-				func mnemonicMissing(_ persona: Persona) -> Bool {
-					switch persona.securityState {
-					case let .unsecured(value):
-						mnemonicMissingFactorSources.contains(value.transactionSigning.factorSourceId)
-					}
-				}
-
-				func unrecoverable(_ account: Account) -> Bool {
-					switch account.securityState {
+				func unrecoverable(_ entity: some EntityProtocol) -> Bool {
+					switch entity.securityState {
 					case let .unsecured(value):
 						unrecoverableFactorSources.contains(value.transactionSigning.factorSourceId)
 					}
 				}
 
-				func unrecoverable(_ persona: Persona) -> Bool {
-					switch persona.securityState {
-					case let .unsecured(value):
-						unrecoverableFactorSources.contains(value.transactionSigning.factorSourceId)
-					}
-				}
-
-				let mnemonicMissing = ProblematicAddresses(
-					accounts: accounts.filter(mnemonicMissing(_:)).map(\.address),
-					hiddenAccounts: hiddenAccounts.filter(mnemonicMissing(_:)).map(\.address),
-					personas: personas.filter(mnemonicMissing(_:)).map(\.address),
-					hiddenPersonas: hiddenPersonas.filter(mnemonicMissing(_:)).map(\.address)
+				let withoutControl = AddressesOfEntitiesInBadState(
+					accounts: accounts.filter(withoutControl(_:)).map(\.address),
+					hiddenAccounts: hiddenAccounts.filter(withoutControl(_:)).map(\.address),
+					personas: personas.filter(withoutControl(_:)).map(\.address),
+					hiddenPersonas: hiddenPersonas.filter(withoutControl(_:)).map(\.address)
 				)
 
-				let unrecoverable = ProblematicAddresses(
+				let unrecoverable = AddressesOfEntitiesInBadState(
 					accounts: accounts.filter(unrecoverable(_:)).map(\.address),
 					hiddenAccounts: hiddenAccounts.filter(unrecoverable(_:)).map(\.address),
 					personas: personas.filter(unrecoverable(_:)).map(\.address),
 					hiddenPersonas: hiddenPersonas.filter(unrecoverable(_:)).map(\.address)
 				)
 
-				return (mnemonicMissing: mnemonicMissing, unrecoverable: unrecoverable)
+				return (withoutControl: withoutControl, unrecoverable: unrecoverable)
 			}
 			.eraseToAnyAsyncSequence()
 		}
@@ -219,7 +205,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 					try await entitiesControlledByFactorSource($0, maybeOverridingSnapshot)
 				})
 			},
-			problematicEntities: problematicEntities
+			entitiesInBadState: entitiesInBadState
 		)
 	}
 }

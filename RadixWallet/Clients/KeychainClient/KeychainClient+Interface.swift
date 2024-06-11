@@ -18,6 +18,10 @@ public struct KeychainClient: Sendable {
 	public var _getAllKeysMatchingAttributes: GetAllKeysMatchingAttributes
 	public var _keychainChanged: KeychainChanged
 
+	/// This a _best effort_ publisher that will emit a change every time the Keychain is changed due to actions inside the Wallet app.
+	/// However, we cannot detect external changes (e.g. Keychain getting wiped when passcode is deleted).
+	public var _keychainChanged: KeychainChanged
+
 	public init(
 		getServiceAndAccessGroup: @escaping GetServiceAndAccessGroup,
 		containsDataForKey: @escaping ContainsDataForKey,
