@@ -65,11 +65,6 @@ extension DebugSettingsCoordinator.View {
 				icon: .systemImage("key"),
 				action: .debugKeychainContentsButtonTapped
 			),
-			.model(
-				title: "Dapp linking delay",
-				icon: .systemImage("cloud"),
-				action: .dappLinkingDelayTapped
-			),
 		]
 	}
 }
@@ -96,7 +91,6 @@ private extension View {
 			.debugKeychainContents(with: destinationStore)
 		#endif
 			.debugInspectProfile(with: destinationStore)
-			.dappLinkingDelay(with: destinationStore)
 	}
 
 	private func debugUserDefaultsContents(
@@ -153,17 +147,6 @@ private extension View {
 			state: /DebugSettingsCoordinator.Destination.State.debugInspectProfile,
 			action: DebugSettingsCoordinator.Destination.Action.debugInspectProfile,
 			destination: { DebugInspectProfile.View(store: $0) }
-		)
-	}
-
-	private func dappLinkingDelay(
-		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
-	) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /DebugSettingsCoordinator.Destination.State.dappLinkingDelay,
-			action: DebugSettingsCoordinator.Destination.Action.dappLinkingDelay,
-			destination: { DappLinkingDelay.View(store: $0) }
 		)
 	}
 }
