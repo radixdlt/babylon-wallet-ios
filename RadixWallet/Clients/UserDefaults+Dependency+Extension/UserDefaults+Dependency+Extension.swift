@@ -165,13 +165,12 @@ extension UserDefaults.Dependency {
 		try save(codable: backups, forKey: .lastCloudBackups)
 	}
 
-	public func setLastCloudBackup(_ result: BackupResult.Result, of profile: Profile) throws {
+	public func setLastCloudBackup(_ result: BackupResult.Result, of header: Profile.Header, at date: Date = .now) throws {
 		var backups: [UUID: BackupResult] = getLastCloudBackups
-		let now = Date.now
-		let lastSuccess = result == .success ? now : backups[profile.id]?.lastSuccess
-		backups[profile.id] = .init(
-			date: now,
-			saveIdentifier: profile.header.saveIdentifier,
+		let lastSuccess = result == .success ? date : backups[header.id]?.lastSuccess
+		backups[header.id] = .init(
+			date: date,
+			saveIdentifier: header.saveIdentifier,
 			result: result,
 			lastSuccess: lastSuccess
 		)
