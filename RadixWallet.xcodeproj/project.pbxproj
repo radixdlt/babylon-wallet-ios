@@ -2540,7 +2540,6 @@
 		48CFBC602ADC10D800E77A5C /* Features */ = {
 			isa = PBXGroup;
 			children = (
-				5BBB197D2C1080B100AA69B2 /* VerifyDapp */,
 				5B77D7B22C0DFE8300F5F215 /* EntitySecurityProblems */,
 				E7AE2D082C05F22700830BAA /* ClaimWallet */,
 				A43F1E242BC96EF2001DD3FA /* SecurityCenterFeature */,
@@ -2836,7 +2835,6 @@
 			isa = PBXGroup;
 			children = (
 				48CFBCCA2ADC10D800E77A5C /* HUD+Reducer.swift */,
-				48CFBCCB2ADC10D800E77A5C /* Overlay+Reducer.swift */,
 				E7AE2D0D2C07359500830BAA /* FullScreenOverlayCoordinator+Reducer.swift */,
 				48CFBCCC2ADC10D800E77A5C /* HUD+View.swift */,
 				48CFBCCB2ADC10D800E77A5C /* Overlay+Reducer.swift */,
@@ -3729,6 +3727,7 @@
 				48CFBE072ADC10D800E77A5C /* PersonaDataPermission */,
 				48CFBE0C2ADC10D800E77A5C /* OneTimePersonaData */,
 				48CFBE0F2ADC10D800E77A5C /* Login */,
+				5BBB197D2C1080B100AA69B2 /* VerifyDapp */,
 			);
 			path = Children;
 			sourceTree = "<group>";
