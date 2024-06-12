@@ -3,6 +3,10 @@ public struct VerifyDapp: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		let dAppMetadata: DappMetadata
 		let items: P2P.Dapp.Request.VerifyItems
+		var autoContinueEnabled = false
+		var autoContinueSelection = true
+
+		fileprivate let cancellationId = UUID()
 
 		init(dAppMetadata: DappMetadata, items: P2P.Dapp.Request.VerifyItems) {
 			self.dAppMetadata = dAppMetadata
@@ -11,7 +15,14 @@ public struct VerifyDapp: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
+		case task
+		case autoContinueSelection(Bool)
 		case continueTapped
+		case willDisappear
+	}
+
+	public enum InternalAction: Sendable, Equatable {
+		case openUrl
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -19,10 +30,35 @@ public struct VerifyDapp: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.openURL) var openURL
+	@Dependency(\.userDefaults) var userDefaults
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
+		case .task:
+			state.autoContinueEnabled = userDefaults.getDappLinkingAutoContinueEnabled()
+			if state.autoContinueEnabled {
+				return delayedEffect(delay: .seconds(2), for: .internal(.openUrl))
+					.cancellable(id: state.cancellationId)
+			} else {
+				return .none
+			}
+
+		case let .autoContinueSelection(value):
+			state.autoContinueSelection = value
+			return .none
+
 		case .continueTapped:
+			userDefaults.setDappLinkingAutoContinueEnabled(state.autoContinueSelection)
+			return .send(.internal(.openUrl))
+
+		case .willDisappear:
+			return .cancel(id: state.cancellationId)
+		}
+	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case .openUrl:
 			.run { [returnUrl = state.returnUrl] send in
 				if let returnUrl {
 					await openURL(returnUrl)

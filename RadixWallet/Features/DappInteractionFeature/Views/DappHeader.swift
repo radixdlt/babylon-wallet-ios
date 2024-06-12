@@ -5,7 +5,7 @@ struct DappHeader: View {
 	let thumbnail: URL?
 	let title: String
 	/// If given as markdown, italics will be shown as plain text in the color `.app.gray1`
-	let subtitle: String
+	let subtitle: String?
 
 	var body: some View {
 		VStack(spacing: .medium3) {
@@ -16,9 +16,11 @@ struct DappHeader: View {
 				.lineSpacing(0)
 				.textStyle(.sheetTitle)
 
-			Text(markdown: subtitle, italicsColor: .app.gray1)
-				.foregroundColor(.app.gray2)
-				.textStyle(.secondaryHeader)
+			if let subtitle {
+				Text(markdown: subtitle, italicsColor: .app.gray1)
+					.foregroundColor(.app.gray2)
+					.textStyle(.secondaryHeader)
+			}
 		}
 		.multilineTextAlignment(.center)
 		.padding(.bottom, .small2)
