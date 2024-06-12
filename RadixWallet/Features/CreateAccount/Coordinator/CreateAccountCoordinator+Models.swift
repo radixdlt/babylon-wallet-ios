@@ -52,7 +52,6 @@ extension CreateAccountConfig {
 				navigationButtonCTA: .goBackToChooseAccounts,
 				specificNetworkID: nil
 			)
-
 		case .newAccountFromHome:
 			self.init(
 				isFirstAccount: false,

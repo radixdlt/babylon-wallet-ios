@@ -124,6 +124,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return .none
+
 		case .inputMnemonicButtonTapped:
 			state.destination = .importMnemonic(.init(
 				warning: L10n.RevealSeedPhrase.warning,

@@ -96,6 +96,7 @@ public struct App: Sendable, FeatureReducer {
 			} else {
 				goToMain(state: &state)
 			}
+
 		default:
 			.none
 		}
