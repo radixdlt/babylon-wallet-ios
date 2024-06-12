@@ -1,13 +1,13 @@
 
 public struct ToggleView: SwiftUI.View {
-	public let icon: ImageAsset?
+	public let icon: AssetIcon.Content?
 	public let title: String
 	public let subtitle: String
 	public let minHeight: CGFloat
 	public let isOn: Binding<Bool>
 
 	public init(
-		icon: ImageAsset? = nil,
+		icon: AssetIcon.Content? = nil,
 		title: String,
 		subtitle: String,
 		minHeight: CGFloat = .largeButtonHeight,
@@ -26,7 +26,7 @@ public struct ToggleView: SwiftUI.View {
 			label: {
 				HStack(spacing: .zero) {
 					if let icon {
-						AssetIcon(.asset(icon))
+						AssetIcon(icon)
 							.padding(.trailing, .medium3)
 					}
 

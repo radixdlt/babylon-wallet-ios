@@ -3,6 +3,7 @@
 public struct Preferences: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var appPreferences: AppPreferences?
+		var dappLinkingAutoContinueEnabled = false
 		var exportLogsUrl: URL?
 
 		@PresentationState
@@ -16,6 +17,7 @@ public struct Preferences: Sendable, FeatureReducer {
 		case depositGuaranteesButtonTapped
 		case hiddenEntitiesButtonTapped
 		case gatewaysButtonTapped
+		case dappLinkingAutoContinueToggled(Bool)
 		case developerModeToogled(Bool)
 		case exportLogsButtonTapped
 		case exportLogsDismissed
@@ -52,6 +54,7 @@ public struct Preferences: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
+	@Dependency(\.userDefaults) var userDefaults
 
 	public init() {}
 
@@ -67,6 +70,7 @@ public struct Preferences: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
+			state.dappLinkingAutoContinueEnabled = userDefaults.getDappLinkingAutoContinueEnabled()
 			return .run { send in
 				let appPreferences = await appPreferencesClient.getPreferences()
 				await send(.internal(.loadedAppPreferences(appPreferences)))
@@ -83,6 +87,11 @@ public struct Preferences: Sendable, FeatureReducer {
 
 		case .gatewaysButtonTapped:
 			state.destination = .gateways(.init())
+			return .none
+
+		case let .dappLinkingAutoContinueToggled(isEnabled):
+			state.dappLinkingAutoContinueEnabled = isEnabled
+			userDefaults.setDappLinkingAutoContinueEnabled(isEnabled)
 			return .none
 
 		case let .developerModeToogled(isEnabled):

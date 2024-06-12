@@ -149,7 +149,7 @@ struct PlainListRowCore: View {
 			if let title = viewState.title {
 				Text(title)
 					.lineSpacing(-6)
-					.lineLimit(1)
+					.lineLimit(2)
 					.textStyle(viewState.titleTextStyle)
 					.foregroundColor(.app.gray1)
 			}
