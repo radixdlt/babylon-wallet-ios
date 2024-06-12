@@ -27,7 +27,8 @@ public struct VerifyDapp: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.openURL) var openURL
-	@Dependency(\.userDefaults) var userDefaults
+	// We need to manually set it since using `@Dependency(\.userDefaults)` would use `UserDefaults.standard`
+	var userDefaults = UserDefaults.Dependency.radix
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
