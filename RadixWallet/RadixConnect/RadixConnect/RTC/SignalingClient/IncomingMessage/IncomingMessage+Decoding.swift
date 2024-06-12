@@ -49,7 +49,6 @@ extension SignalingClient.IncomingMessage: Decodable {
 			let message = try container.decode(SignalingClient.ClientMessage.self, forKey: .message)
 			let remoteClientId = try container.decode(RemoteClientID.self, forKey: .remoteClientId)
 			self = .fromRemoteClient(.init(remoteClientId: remoteClientId, message: message))
-
 		case .remoteClientJustConnected:
 			let clientId = try container.decode(RemoteClientID.self, forKey: .remoteClientId)
 			self = .fromSignalingServer(.notification(.remoteClientJustConnected(clientId)))
@@ -59,7 +58,6 @@ extension SignalingClient.IncomingMessage: Decodable {
 		case .remoteClientDisconnected:
 			let clientId = try container.decode(RemoteClientID.self, forKey: .remoteClientId)
 			self = .fromSignalingServer(.notification(.remoteClientDisconnected(clientId)))
-
 		case .missingRemoteClientError:
 			let requestId = try container.decode(SignalingClient.ClientMessage.RequestID.self, forKey: .requestId)
 
@@ -70,7 +68,6 @@ extension SignalingClient.IncomingMessage: Decodable {
 					)
 				)
 			)
-
 		case .validationError:
 			let error = try container.decode(JSONValue.self, forKey: .error)
 			let requestId = try container.decode(SignalingClient.ClientMessage.RequestID.self, forKey: .requestId)

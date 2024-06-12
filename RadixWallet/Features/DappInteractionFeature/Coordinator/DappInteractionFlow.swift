@@ -839,6 +839,7 @@ extension DappInteractionFlow.Path.State {
 		switch anyItem {
 		case .remote(.auth(.usePersona)):
 			return nil
+
 		case let .remote(.auth(.login(loginRequest))):
 			self.state = .login(.init(
 				dappMetadata: dappMetadata,

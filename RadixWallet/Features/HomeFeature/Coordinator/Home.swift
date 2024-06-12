@@ -183,6 +183,7 @@ public struct Home: Sendable, FeatureReducer {
 				))
 			)
 			return .none
+
 		case .pullToRefreshStarted:
 			let accountAddresses = state.accounts.map(\.address)
 			return .run { _ in
@@ -190,6 +191,7 @@ public struct Home: Sendable, FeatureReducer {
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
+
 		case .radixBannerButtonTapped:
 			return .run { _ in
 				await openURL(Home.radixBannerURL)
@@ -247,11 +249,13 @@ public struct Home: Sendable, FeatureReducer {
 			}
 			#endif
 			return .none
+
 		case let .shouldShowNPSSurvey(shouldShow):
 			if shouldShow {
 				state.addDestination(.npsSurvey(.init()))
 			}
 			return .none
+
 		case let .accountsFiatWorthLoaded(fiatWorths):
 			state.accountRows.mutateAll {
 				if let fiatWorth = fiatWorths[$0.id] {
@@ -260,6 +264,7 @@ public struct Home: Sendable, FeatureReducer {
 			}
 			state.totalFiatWorth = state.accountRows.map(\.totalFiatWorth).reduce(+) ?? .loading
 			return .none
+
 		case .showLinkConnectorIfNeeded:
 			let purpose: NewConnectionApproval.State.Purpose? = if userDefaults.showRelinkConnectorsAfterProfileRestore {
 				.approveRelinkAfterProfileRestore
