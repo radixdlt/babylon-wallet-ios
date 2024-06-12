@@ -121,7 +121,7 @@ extension CloudBackupClient {
 
 		@Sendable
 		func backupProfileAndSaveResult(_ profile: Profile, existingRecord: CKRecord?) async throws {
-			try? userDefaults.setLastCloudBackup(.started(.now), of: profile)
+			try? userDefaults.setLastCloudBackup(.started(.now), of: profile.header)
 
 			do {
 				let json = profile.toJSONString()
@@ -138,18 +138,25 @@ extension CloudBackupClient {
 					failure = .other
 				}
 
-				try? userDefaults.setLastCloudBackup(.failure(failure), of: profile)
+				try? userDefaults.setLastCloudBackup(.failure(failure), of: profile.header)
 				throw error
 			}
 
-			try? userDefaults.setLastCloudBackup(.success, of: profile)
+			try? userDefaults.setLastCloudBackup(.success, of: profile.header)
 		}
 
 		@Sendable
 		func performAutomaticBackup(_ profile: Profile, timeToCheckIfClaimed: Bool) async {
-			let needsBackUp = profile.appPreferences.security.isCloudProfileSyncEnabled && profile.header.isNonEmpty
 			let existingRecord = try? await fetchProfileRecord(profile.id)
 			let backedUpHeader = try? existingRecord.map(getProfileHeader)
+
+			if let backedUpHeader, let backupDate = existingRecord?.modificationDate {
+				try? userDefaults.setLastCloudBackup(.success, of: backedUpHeader, at: backupDate)
+			} else {
+				try? userDefaults.removeLastCloudBackup(for: profile.id)
+			}
+
+			let needsBackUp = profile.appPreferences.security.isCloudProfileSyncEnabled && profile.header.isNonEmpty
 			let isBackedUp = backedUpHeader?.saveIdentifier == profile.header.saveIdentifier
 			let shouldBackUp = needsBackUp && !isBackedUp
 

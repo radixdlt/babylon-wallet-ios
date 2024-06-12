@@ -159,6 +159,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 
 				return .none
 			}
+
 		default:
 			return .none
 		}

@@ -421,7 +421,6 @@ extension FactorSourceKind: Comparable {
 		case .offDeviceMnemonic: 1
 		case .securityQuestions: 2
 		case .trustedContact: 3
-
 		// we want to sign with device last, since it would allow for us to stop using
 		// ephemeral notary and allow us to implement a AutoPurgingMnemonicCache which
 		// deletes items after 1 sec, thus `device` must come last.

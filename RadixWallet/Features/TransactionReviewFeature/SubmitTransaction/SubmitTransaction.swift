@@ -106,7 +106,6 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 			}
 
 			return .send(.delegate(.manuallyDismiss))
-
 		case .dismissTransactionAlert(.presented(.confirm)):
 			return .concatenate(.cancel(id: CancellableId.transactionStatus), .send(.delegate(.manuallyDismiss)))
 		case .dismissTransactionAlert(.presented(.cancel)):

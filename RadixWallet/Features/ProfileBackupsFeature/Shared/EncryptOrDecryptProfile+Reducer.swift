@@ -120,6 +120,7 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 
 				case .encryptSpecific:
 					break
+
 				case .decrypt:
 					break
 				}
