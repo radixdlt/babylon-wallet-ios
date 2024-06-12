@@ -6,8 +6,6 @@ public struct VerifyDapp: Sendable, FeatureReducer {
 		var autoContinueEnabled = false
 		var autoContinueSelection = true
 
-		fileprivate let cancellationId = UUID()
-
 		init(dAppMetadata: DappMetadata, items: P2P.Dapp.Request.VerifyItems) {
 			self.dAppMetadata = dAppMetadata
 			self.items = items
@@ -18,7 +16,6 @@ public struct VerifyDapp: Sendable, FeatureReducer {
 		case task
 		case autoContinueSelection(Bool)
 		case continueTapped
-		case willDisappear
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -38,7 +35,6 @@ public struct VerifyDapp: Sendable, FeatureReducer {
 			state.autoContinueEnabled = userDefaults.getDappLinkingAutoContinueEnabled()
 			if state.autoContinueEnabled {
 				return delayedEffect(delay: .seconds(2), for: .internal(.openUrl))
-					.cancellable(id: state.cancellationId)
 			} else {
 				return .none
 			}
@@ -50,9 +46,6 @@ public struct VerifyDapp: Sendable, FeatureReducer {
 		case .continueTapped:
 			userDefaults.setDappLinkingAutoContinueEnabled(state.autoContinueSelection)
 			return .send(.internal(.openUrl))
-
-		case .willDisappear:
-			return .cancel(id: state.cancellationId)
 		}
 	}
 

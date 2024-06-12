@@ -17,9 +17,6 @@ public extension VerifyDapp {
 			.task { @MainActor in
 				await store.send(.view(.task)).finish()
 			}
-			.onWillDisappear {
-				store.send(.view(.willDisappear))
-			}
 		}
 
 		private func automatic(metadata: DappMetadata) -> some SwiftUI.View {
