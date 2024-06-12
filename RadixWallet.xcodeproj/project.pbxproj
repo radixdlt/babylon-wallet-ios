@@ -950,7 +950,6 @@
 		8370FC5C2B99C780007AD882 /* NPSSurveyClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8370FC5B2B99C780007AD882 /* NPSSurveyClient+Interface.swift */; };
 		8381C8B02BBD2CD400A470B4 /* TokenPriceCientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8381C8AF2BBD2CD400A470B4 /* TokenPriceCientTests.swift */; };
 		8381C8B32BC0619100A470B4 /* DeepLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8381C8B22BC0619100A470B4 /* DeepLink.swift */; };
-		8381C8B52BC061AE00A470B4 /* RadixConnectRelay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8381C8B42BC061AE00A470B4 /* RadixConnectRelay.swift */; };
 		8381C8B72BC3DB4100A470B4 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 8381C8B62BC3D80100A470B4 /* PrivacyInfo.xcprivacy */; };
 		83823EA72B722DB000827211 /* HTTPClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83823EA62B722DB000827211 /* HTTPClient+Interface.swift */; };
 		83823EAA2B72365000827211 /* TokenPriceClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83823EA92B72365000827211 /* TokenPriceClient+Interface.swift */; };
@@ -961,6 +960,7 @@
 		839B6C542B21D28400402651 /* ExpandableTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 839B6C532B21D28400402651 /* ExpandableTextView.swift */; };
 		83AAAC6D2B483D1B00222B64 /* StakeSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83AAAC6B2B483D1B00222B64 /* StakeSummaryView.swift */; };
 		83B07C1C2BC565DE00F3FFA7 /* RadixConnectRelayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83B07C1B2BC565DE00F3FFA7 /* RadixConnectRelayTests.swift */; };
+		83B783562C1764AE00AA7930 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 83B783552C1764AE00AA7930 /* Sargon */; };
 		83D663B02B271D0100D1AB9E /* TruncationMask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D663AF2B271D0100D1AB9E /* TruncationMask.swift */; };
 		83DFAF2E2B4E8A51008B70CE /* View+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83DFAF2D2B4E8A51008B70CE /* View+Extra.swift */; };
 		83EA887E2B7E68EE00FF8424 /* TotalCurrencyWorthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EA887D2B7E68EE00FF8424 /* TotalCurrencyWorthView.swift */; };
@@ -2097,7 +2097,6 @@
 		8370FC5B2B99C780007AD882 /* NPSSurveyClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NPSSurveyClient+Interface.swift"; sourceTree = "<group>"; };
 		8381C8AF2BBD2CD400A470B4 /* TokenPriceCientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenPriceCientTests.swift; sourceTree = "<group>"; };
 		8381C8B22BC0619100A470B4 /* DeepLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepLink.swift; sourceTree = "<group>"; };
-		8381C8B42BC061AE00A470B4 /* RadixConnectRelay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadixConnectRelay.swift; sourceTree = "<group>"; };
 		8381C8B62BC3D80100A470B4 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		83823EA62B722DB000827211 /* HTTPClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPClient+Interface.swift"; sourceTree = "<group>"; };
 		83823EA92B72365000827211 /* TokenPriceClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TokenPriceClient+Interface.swift"; sourceTree = "<group>"; };
@@ -2378,6 +2377,7 @@
 				48FFFB032ADC6F8100B2B213 /* Builders in Frameworks */,
 				48FFFAB72ADC207B00B2B213 /* NavigationTransitions in Frameworks */,
 				48FFFA992ADC1EEC00B2B213 /* AsyncExtensions in Frameworks */,
+				83B783562C1764AE00AA7930 /* Sargon in Frameworks */,
 				E63D123D2ADD1FC00001CBB1 /* SwiftUIIntrospect in Frameworks */,
 				E6A0B04B2BF23C7000617DAC /* IdentifiedCollections in Frameworks */,
 				48FFFABC2ADC209100B2B213 /* NukeExtensions in Frameworks */,
@@ -5849,7 +5849,6 @@
 			isa = PBXGroup;
 			children = (
 				8381C8B22BC0619100A470B4 /* DeepLink.swift */,
-				8381C8B42BC061AE00A470B4 /* RadixConnectRelay.swift */,
 			);
 			path = DeepLink;
 			sourceTree = "<group>";
@@ -6663,6 +6662,7 @@
 				5B1C4FD42BBB0B0C00B9436F /* AppsFlyerLib-Strict */,
 				E695F2DD2BECDD7C00761ACE /* Sargon */,
 				E6A0B04A2BF23C7000617DAC /* IdentifiedCollections */,
+				83B783552C1764AE00AA7930 /* Sargon */,
 			);
 			productName = RadixWallet;
 			productReference = 48CFBC4F2ADC106300E77A5C /* Radix Wallet Dev.app */;
@@ -7082,7 +7082,6 @@
 				48CFC4212ADC10DA00E77A5C /* Swift.DecodingError+Equatable.swift in Sources */,
 				48CFC59E2ADC10DA00E77A5C /* TextInputAutocapitalization+Extra.swift in Sources */,
 				48CFC2D52ADC10D900E77A5C /* ChooseAccountsRow+View.swift in Sources */,
-				8381C8B52BC061AE00A470B4 /* RadixConnectRelay.swift in Sources */,
 				48CFC57C2ADC10DA00E77A5C /* NonFungibleResourcesCollectionItem.swift in Sources */,
 				48CFC3F92ADC10D900E77A5C /* SignalingClientFactory.swift in Sources */,
 				48CFC3192ADC10D900E77A5C /* CreateAccountCoordinator+View.swift in Sources */,
@@ -8925,6 +8924,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5B1C4FD32BBB0B0C00B9436F /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Strict" */;
 			productName = "AppsFlyerLib-Strict";
+		};
+		83B783552C1764AE00AA7930 /* Sargon */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Sargon;
 		};
 		A415574F2B757C5E0040AD4E /* ComposableArchitecture */ = {
 			isa = XCSwiftPackageProductDependency;

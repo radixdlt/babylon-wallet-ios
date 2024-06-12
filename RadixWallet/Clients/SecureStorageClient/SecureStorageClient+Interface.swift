@@ -189,8 +189,8 @@ extension SecureStorageClient {
 	public typealias LoadDeviceInfo = @Sendable () throws -> DeviceInfo?
 	public typealias SaveDeviceInfo = @Sendable (DeviceInfo) throws -> Void
 
-	public typealias SaveRadixConnectRelaySession = @Sendable (RadixConnectRelay.Session) throws -> Void
-	public typealias LoadRadixConnectRelaySession = @Sendable (RadixConnectRelay.Session.ID) throws -> RadixConnectRelay.Session?
+	public typealias SaveRadixConnectRelaySession = @Sendable (SessionId, BagOfBytes) throws -> Void
+	public typealias LoadRadixConnectRelaySession = @Sendable (SessionId) throws -> BagOfBytes?
 
 	/// See https://radixdlt.atlassian.net/l/cp/fmoH9KcN
 	public typealias DeprecatedLoadDeviceID = @Sendable () throws -> DeviceID?

@@ -1,19 +1,19 @@
 import CryptoKit
 import Foundation
+import SargonUniFFI
 
 // MARK: - Mobile2Mobile
 public actor Mobile2Mobile {
-	let serviceURL = URL(string: "https://radix-connect-relay-dev.rdx-works-main.extratools.works/api/v1")!
-	let encryptionScheme = EncryptionScheme.version1
 	@Dependency(\.httpClient) var httpClient
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
-	@Dependency(\.radixConnectRelay) var radixConnectRelay
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.secureStorageClient) var secureStorageClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.cacheClient) var cacheClient
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+
+	private let radixConnectMobile = RadixConnectMobile.live(sessionStorage: SecureSessionStorage())
 
 	private let incomingMessagesSubject: AsyncPassthroughSubject<P2P.RTCIncomingMessage> = .init()
 
@@ -22,23 +22,19 @@ public actor Mobile2Mobile {
 		incomingMessagesSubject.share().eraseToAnyAsyncSequence()
 	}
 
-	func handleRequest(_ request: Request) async throws {
+	func handleRequest(_ request: RadixConnectMobileConnectRequest) async throws {
 		switch request {
-		case let .linking(linkingRequest):
+		case let .link(linkingRequest):
 			try await linkDapp(linkingRequest)
-		case let .request(request):
+		case let .dappInteraction(request):
 			try await handleDeepLinkRequest(request)
+		case let .dappInteractionContained(request):
+			incomingMessagesSubject.send(.init(result: .success(.request(.dapp(request.request))), route: .deepLink(request.sessionId)))
 		}
 	}
 }
 
 extension Mobile2Mobile {
-	func getDappReturnURL(_ dAppOrigin: URL, wellKnownFile: HTTPClient.WellKnownFileResponse) -> URL {
-		let callbackPath: String = wellKnownFile.callbackPath ?? "connect"
-
-		return dAppOrigin.appendingPathComponent(callbackPath)
-	}
-
 	func getDAppMetadata(_ dappDefinitionAddress: DappDefinitionAddress, origin: URL) async throws -> DappMetadata {
 		let ledgerMetadata = try await cacheClient.withCaching(
 			cacheEntry: .dAppRequestMetadata(dappDefinitionAddress.address),
@@ -72,119 +68,76 @@ extension Mobile2Mobile {
 		try await httpClient.fetchDappWellKnownFile(dAppOrigin)
 	}
 
-	func linkDapp(_ request: Request.DappLinking) async throws {
-		switch request.origin {
-		case let .webDapp(dAppOrigin):
-			let dAppPublicKey = request.publicKey
+	func linkDapp(_ request: RadixConnectMobileLinkRequest) async throws {
+		let dAppOrigin = request.origin
+		let wellKnown = await (try? fetchWellKnown(dAppOrigin: dAppOrigin)) ?? HTTPClient.WellKnownFileResponse(dApps: [.init(dAppDefinitionAddress: .wallet)], callbackPath: nil)
 
-			let wellKnown = await (try? fetchWellKnown(dAppOrigin: dAppOrigin)) ?? HTTPClient.WellKnownFileResponse(dApps: [.init(dAppDefinitionAddress: .wallet)], callbackPath: nil)
-			let dappReturnURL = getDappReturnURL(dAppOrigin, wellKnownFile: wellKnown)
-
-			let dAppMetadata: DappMetadata = try await {
-				guard let dappDefinitionAddress = wellKnown.dApps.first?.dAppDefinitionAddress else {
-					struct MissingDappDefinitionAddress: Error {}
-					throw MissingDappDefinitionAddress()
-				}
-
-				do {
-					return try await getDAppMetadata(dappDefinitionAddress, origin: dAppOrigin)
-				} catch {
-					if await appPreferencesClient.isDeveloperModeEnabled() {
-						return DappMetadata.deepLink(.init(origin: dAppOrigin, dAppDefAddress: dappDefinitionAddress))
-					}
-
-					throw error
-				}
-			}()
-
-			loggerGlobal.critical("Creating the Wallet Private/Public key pair")
-
-			let walletPrivateKey = Curve25519.KeyAgreement.PrivateKey()
-			let walletPublicKey = walletPrivateKey.publicKey
-
-			let sharedSecret = try walletPrivateKey.sharedSecretFromKeyAgreement(with: dAppPublicKey)
-			let encryptionKey = SymmetricKey(data: sharedSecret.data)
-
-			try secureStorageClient.saveRadixConnectRelaySession(
-				.init(
-					id: request.sessionId,
-					origin: request.origin,
-					encryptionKey: .init(hex: encryptionKey.hex)
-				)
-			)
-
-			let result = await overlayWindowClient.scheduleLinkingDapp(dAppMetadata)
-
-			guard case .primaryButtonTapped = result else {
-				return
+		let dAppMetadata: DappMetadata = try await {
+			guard let dappDefinitionAddress = wellKnown.dApps.first?.dAppDefinitionAddress else {
+				struct MissingDappDefinitionAddress: Error {}
+				throw MissingDappDefinitionAddress()
 			}
 
-			let returnURL = dappReturnURL.appending(queryItems: [
-				.init(name: "sessionId", value: request.sessionId.rawValue),
-				.init(name: "publicKey", value: walletPublicKey.rawRepresentation.hex()),
-			])
+			do {
+				return try await getDAppMetadata(dappDefinitionAddress, origin: dAppOrigin)
+			} catch {
+				if await appPreferencesClient.isDeveloperModeEnabled() {
+					return DappMetadata.deepLink(.init(origin: dAppOrigin, dAppDefAddress: dappDefinitionAddress))
+				}
 
-			switch request.browser.lowercased() {
-			case "chrome":
-				await openURL(URL(string: returnURL.absoluteString.replacingOccurrences(of: "https://", with: "googlechromes://"))!)
-			case "firefox":
-				await openURL(URL(string: "firefox://open-url?url=\(returnURL.absoluteString)")!)
-			default:
-				await openURL(returnURL)
+				throw error
 			}
+		}()
+
+		let result = await overlayWindowClient.scheduleLinkingDapp(dAppMetadata)
+
+		guard case .primaryButtonTapped = result else {
+			return
+		}
+
+		let returnURL = try await radixConnectMobile.handleLinkingRequest(request: request, devMode: true)
+
+		switch request.browser.lowercased() {
+		case "chrome":
+			await openURL(URL(string: returnURL.absoluteString.replacingOccurrences(of: "https://", with: "googlechromes://"))!)
+		case "firefox":
+			await openURL(URL(string: "firefox://open-url?url=\(returnURL.absoluteString)")!)
+		default:
+			await openURL(returnURL)
 		}
 	}
 
 	func sendResponse(
 		_ response: P2P.RTCOutgoingMessage.Response,
-		sessionId: RadixConnectRelay.Session.ID
+		sessionId: SessionId
 	) async throws {
-		guard let session = try secureStorageClient.loadRadixConnectRelaySession(sessionId) else {
-			return
+		switch response {
+		case let .dapp(walletToDappInteractionResponse):
+			try await radixConnectMobile.sendDappInteractionResponse(
+				walletResponse: .init(
+					sessionId: sessionId,
+					response: walletToDappInteractionResponse
+				)
+			)
 		}
-
-		try await radixConnectRelay.sendResponse(response, session)
 	}
 
-	func handleDeepLinkRequest(_ request: Request.DappRequest) async throws {
-		guard let session = try secureStorageClient.loadRadixConnectRelaySession(request.sessionId) else {
-			return
-		}
+	func handleDeepLinkRequest(_ request: RadixConnectMobileDappRequest) async throws {
+		let receivedRequest = try await radixConnectMobile.handleDappInteractionRequest(dappRequest: request)
 
-		let receivedRequest = try await radixConnectRelay
-			.getRequests(session)
-			.first {
-				switch $0 {
-				case let .dapp(dApp):
-					dApp.id == .init(rawValue: request.interactionId)
-				}
-			}
-
-		guard let receivedRequest else {
-			return
-		}
-
-		incomingMessagesSubject.send(.init(result: .success(.request(receivedRequest)), route: .deepLink(request.sessionId)))
+		incomingMessagesSubject.send(.init(result: .success(.request(.dapp(receivedRequest.interaction))), route: .deepLink(request.sessionId)))
 	}
 }
 
-extension Mobile2Mobile {
-	public enum Request: Sendable {
-		case linking(DappLinking)
-		case request(DappRequest)
+// MARK: - SecureSessionStorage
+final class SecureSessionStorage: SessionStorage {
+	@Dependency(\.secureStorageClient) var secureStorageClient
 
-		public struct DappLinking: Sendable {
-			public let origin: RadixConnectRelay.Session.Origin
-			public let sessionId: RadixConnectRelay.Session.ID
-			public let publicKey: Curve25519.KeyAgreement.PublicKey
-			public let browser: String
-		}
-
-		public struct DappRequest: Sendable {
-			public let sessionId: RadixConnectRelay.Session.ID
-			public let interactionId: String
-		}
+	func saveSession(sessionId: SessionId, encodedSession: BagOfBytes) async throws {
+		try secureStorageClient.saveRadixConnectRelaySession(sessionId, encodedSession)
 	}
 
-	public typealias HandleRequest = (Request) async throws -> Void
+	func loadSession(sessionId: SessionId) async throws -> BagOfBytes? {
+		try secureStorageClient.loadRadixConnectRelaySession(sessionId)
+	}
 }
