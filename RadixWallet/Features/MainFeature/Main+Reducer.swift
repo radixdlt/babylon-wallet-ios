@@ -17,48 +17,48 @@ public struct Main: Sendable, FeatureReducer {
 		}
 	}
 
+	@CasePathable
 	public enum ViewAction: Sendable, Equatable {
 		case task
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case home(Home.Action)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
-		case removedWallet
-	}
-
+	@CasePathable
 	public enum InternalAction: Sendable, Equatable {
 		case currentGatewayChanged(to: Gateway)
 	}
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case settings(Settings.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case settings(Settings.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.settings, action: /Action.settings) {
+			Scope(state: \.settings, action: \.settings) {
 				Settings()
 			}
 		}
 	}
 
-	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.cloudBackupClient) var cloudBackupClient
-	@Dependency(\.resetWalletClient) var resetWalletClient
+	@Dependency(\.securityCenterClient) var securityCenterClient
 
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.home, action: /Action.child .. ChildAction.home) {
+		Scope(state: \.home, action: \.child.home) {
 			Home()
 		}
 		Reduce(core)
@@ -73,8 +73,8 @@ public struct Main: Sendable, FeatureReducer {
 		switch viewAction {
 		case .task:
 			startAutomaticBackupsEffect()
+				.merge(with: startMonitoringSecurityCenterEffect())
 				.merge(with: gatewayValuesEffect())
-				.merge(with: didResetWalletEffect())
 		}
 	}
 
@@ -88,6 +88,16 @@ public struct Main: Sendable, FeatureReducer {
 		}
 	}
 
+	private func startMonitoringSecurityCenterEffect() -> Effect<Action> {
+		.run { _ in
+			do {
+				try await securityCenterClient.startMonitoring()
+			} catch {
+				loggerGlobal.notice("securityCenterClient.startMonitoring failed: \(error)")
+			}
+		}
+	}
+
 	private func gatewayValuesEffect() -> Effect<Action> {
 		.run { send in
 			for try await gateway in await gatewaysClient.currentGatewayValues() {
@@ -95,18 +105,6 @@ public struct Main: Sendable, FeatureReducer {
 				loggerGlobal.notice("Changed network to: \(gateway)")
 				await send(.internal(.currentGatewayChanged(to: gateway)))
 			}
-		}
-	}
-
-	private func didResetWalletEffect() -> Effect<Action> {
-		.run { send in
-			for try await _ in resetWalletClient.walletDidReset() {
-				guard !Task.isCancelled else { return }
-				try await appPreferencesClient.deleteProfileAndFactorSources(true)
-				await send(.delegate(.removedWallet))
-			}
-		} catch: { error, _ in
-			loggerGlobal.error("Failed to delete profile: \(error)")
 		}
 	}
 

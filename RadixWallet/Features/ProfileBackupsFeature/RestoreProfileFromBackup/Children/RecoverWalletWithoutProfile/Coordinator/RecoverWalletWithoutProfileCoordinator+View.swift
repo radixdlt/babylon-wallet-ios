@@ -46,7 +46,6 @@ public extension RecoverWalletWithoutProfileCoordinator {
 						action: RecoverWalletWithoutProfileCoordinator.Path.Action.importMnemonic,
 						then: { ImportMnemonic.View(store: $0) }
 					)
-
 				case .recoveryComplete:
 					CaseLet(
 						/RecoverWalletWithoutProfileCoordinator.Path.State.recoveryComplete,

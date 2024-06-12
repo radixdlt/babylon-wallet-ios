@@ -9,6 +9,7 @@ public struct Home: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		// MARK: - Components
 		public var accountRows: IdentifiedArrayOf<Home.AccountRow.State> = []
+		fileprivate var problems: [SecurityProblem] = []
 
 		public var showRadixBanner: Bool = false
 		public var showFiatWorth: Bool = true
@@ -61,6 +62,7 @@ public struct Home: Sendable, FeatureReducer {
 		case accountsResourcesLoaded(Loadable<[OnLedgerEntity.OnLedgerAccount]>)
 		case accountsFiatWorthLoaded([AccountAddress: Loadable<FiatWorth>])
 		case showLinkConnectorIfNeeded
+		case setSecurityProblems([SecurityProblem])
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -124,6 +126,7 @@ public struct Home: Sendable, FeatureReducer {
 	@Dependency(\.npsSurveyClient) var npsSurveyClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.radixConnectClient) var radixConnectClient
+	@Dependency(\.securityCenterClient) var securityCenterClient
 
 	public init() {}
 
@@ -170,6 +173,7 @@ public struct Home: Sendable, FeatureReducer {
 			.merge(with: loadNPSSurveyStatus())
 			.merge(with: loadAccountResources())
 			.merge(with: loadFiatValues())
+			.merge(with: securityProblemsEffect())
 			.merge(with: delayedMediumEffect(for: .internal(.showLinkConnectorIfNeeded)))
 
 		case .createAccountButtonTapped:
@@ -179,6 +183,7 @@ public struct Home: Sendable, FeatureReducer {
 				))
 			)
 			return .none
+
 		case .pullToRefreshStarted:
 			let accountAddresses = state.accounts.map(\.address)
 			return .run { _ in
@@ -186,6 +191,7 @@ public struct Home: Sendable, FeatureReducer {
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
+
 		case .radixBannerButtonTapped:
 			return .run { _ in
 				await openURL(Home.radixBannerURL)
@@ -213,7 +219,7 @@ public struct Home: Sendable, FeatureReducer {
 				return .none
 			}
 
-			state.accountRows = accounts.map { Home.AccountRow.State(account: $0) }.asIdentified()
+			state.accountRows = accounts.map { Home.AccountRow.State(account: $0, problems: state.problems) }.asIdentified()
 
 			return .run { [addresses = state.accountAddresses] _ in
 				_ = try await accountPortfoliosClient.fetchAccountPortfolios(addresses, false)
@@ -243,11 +249,13 @@ public struct Home: Sendable, FeatureReducer {
 			}
 			#endif
 			return .none
+
 		case let .shouldShowNPSSurvey(shouldShow):
 			if shouldShow {
 				state.addDestination(.npsSurvey(.init()))
 			}
 			return .none
+
 		case let .accountsFiatWorthLoaded(fiatWorths):
 			state.accountRows.mutateAll {
 				if let fiatWorth = fiatWorths[$0.id] {
@@ -256,6 +264,7 @@ public struct Home: Sendable, FeatureReducer {
 			}
 			state.totalFiatWorth = state.accountRows.map(\.totalFiatWorth).reduce(+) ?? .loading
 			return .none
+
 		case .showLinkConnectorIfNeeded:
 			let purpose: NewConnectionApproval.State.Purpose? = if userDefaults.showRelinkConnectorsAfterProfileRestore {
 				.approveRelinkAfterProfileRestore
@@ -268,6 +277,13 @@ public struct Home: Sendable, FeatureReducer {
 				state.addDestination(
 					.relinkConnector(.init(root: .connectionApproval(.init(purpose: purpose))))
 				)
+			}
+			return .none
+
+		case let .setSecurityProblems(problems):
+			state.problems = problems
+			state.accountRows.mutateAll { row in
+				row.securityProblemsConfig.update(problems: problems)
 			}
 			return .none
 		}
@@ -392,6 +408,15 @@ public struct Home: Sendable, FeatureReducer {
 			for try await accountsTotalFiatWorth in accountsTotalFiatWorth.removeDuplicates() {
 				guard !Task.isCancelled else { return }
 				await send(.internal(.accountsFiatWorthLoaded(accountsTotalFiatWorth)))
+			}
+		}
+	}
+
+	private func securityProblemsEffect() -> Effect<Action> {
+		.run { send in
+			for try await problems in await securityCenterClient.problems() {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.setSecurityProblems(problems)))
 			}
 		}
 	}

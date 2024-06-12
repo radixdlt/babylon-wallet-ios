@@ -77,27 +77,18 @@ extension SecureStorageClient: DependencyKey {
 
 		@Sendable func saveProfile(
 			snapshotData data: Data,
-			key: KeychainClient.Key,
-			iCloudSyncEnabled: Bool
+			key: KeychainClient.Key
 		) throws {
 			try keychainClient.setDataWithoutAuth(
 				data,
 				forKey: key,
 				attributes: .init(
-					iCloudSyncEnabled: iCloudSyncEnabled,
+					iCloudSyncEnabled: false,
 					accessibility: .whenUnlocked, // do not delete the Profile if passcode gets deleted.
 					label: importantKeychainIdentifier("Radix Wallet Data"),
 					comment: "Contains your accounts, personas, authorizedDapps, linked connector extensions and wallet app preferences."
 				)
 			)
-		}
-
-		@Sendable func saveProfile(
-			snapshot profile: Profile,
-			iCloudSyncEnabled: Bool
-		) throws {
-			let data = profile.profileSnapshot()
-			try saveProfile(snapshotData: data, key: profile.header.id.keychainKey, iCloudSyncEnabled: iCloudSyncEnabled)
 		}
 
 		@Sendable func loadProfileHeaderList() throws -> Profile.HeaderList? {
@@ -203,7 +194,7 @@ extension SecureStorageClient: DependencyKey {
 				authenticationPrompt: authenticationPrompt
 			) else {
 				if notifyIfMissing {
-					overlayWindowClient.scheduleAlertIgnoreAction(.missingMnemonicAlert)
+					overlayWindowClient.scheduleAlertAndIgnoreAction(.missingMnemonicAlert)
 				}
 				return nil
 			}
@@ -292,8 +283,7 @@ extension SecureStorageClient: DependencyKey {
 		let saveProfileSnapshot: SaveProfileSnapshot = { profile in
 			try saveProfile(
 				snapshotData: profile.profileSnapshot(),
-				key: profile.header.id.keychainKey,
-				iCloudSyncEnabled: profile.appPreferences.security.isCloudProfileSyncEnabled
+				key: profile.header.id.keychainKey
 			)
 		}
 
@@ -340,25 +330,14 @@ extension SecureStorageClient: DependencyKey {
 			}
 		}
 
-		let updateIsCloudProfileSyncEnabled: UpdateIsCloudProfileSyncEnabled = { profileId, change in
+		let disableCloudProfileSync: DisableCloudProfileSync = { profileId in
 			guard let profileSnapshotData = try loadProfileSnapshotData(profileId) else { return }
 
-			switch change {
-			case .disable:
-				loggerGlobal.notice("Disabling iCloud sync of Profile snapshot (which should also delete it from iCloud)")
-				try saveProfile(
-					snapshotData: profileSnapshotData,
-					key: profileId.keychainKey,
-					iCloudSyncEnabled: false
-				)
-			case .enable:
-				loggerGlobal.notice("Enabling iCloud sync of Profile snapshot")
-				try saveProfile(
-					snapshotData: profileSnapshotData,
-					key: profileId.keychainKey,
-					iCloudSyncEnabled: true
-				)
-			}
+			loggerGlobal.notice("Disabling iCloud sync of Profile snapshot (which should also delete it from iCloud)")
+			try saveProfile(
+				snapshotData: profileSnapshotData,
+				key: profileId.keychainKey
+			)
 		}
 
 		let deprecatedLoadDeviceID: DeprecatedLoadDeviceID = {
@@ -431,6 +410,8 @@ extension SecureStorageClient: DependencyKey {
 			loggerGlobal.notice("Saved p2pLinksPrivateKeyKey")
 		}
 
+		let keychainChanged = keychainClient.keychainChanged
+
 		#if DEBUG
 		return Self(
 			saveProfileSnapshot: saveProfileSnapshot,
@@ -443,7 +424,7 @@ extension SecureStorageClient: DependencyKey {
 			containsMnemonicIdentifiedByFactorSourceID: containsMnemonicIdentifiedByFactorSourceID,
 			deleteMnemonicByFactorSourceID: deleteMnemonicByFactorSourceID,
 			deleteProfileAndMnemonicsByFactorSourceIDs: deleteProfileAndMnemonicsByFactorSourceIDs,
-			updateIsCloudProfileSyncEnabled: updateIsCloudProfileSyncEnabled,
+			disableCloudProfileSync: disableCloudProfileSync,
 			loadProfileHeaderList: loadProfileHeaderList,
 			saveProfileHeaderList: saveProfileHeaderList,
 			deleteProfileHeaderList: deleteProfileHeaderList,
@@ -457,6 +438,7 @@ extension SecureStorageClient: DependencyKey {
 			saveP2PLinks: saveP2PLinks,
 			loadP2PLinksPrivateKey: loadP2PLinksPrivateKey,
 			saveP2PLinksPrivateKey: saveP2PLinksPrivateKey,
+			keychainChanged: keychainChanged,
 			getAllMnemonics: getAllMnemonics
 		)
 		#else
@@ -471,7 +453,7 @@ extension SecureStorageClient: DependencyKey {
 			containsMnemonicIdentifiedByFactorSourceID: containsMnemonicIdentifiedByFactorSourceID,
 			deleteMnemonicByFactorSourceID: deleteMnemonicByFactorSourceID,
 			deleteProfileAndMnemonicsByFactorSourceIDs: deleteProfileAndMnemonicsByFactorSourceIDs,
-			updateIsCloudProfileSyncEnabled: updateIsCloudProfileSyncEnabled,
+			disableCloudProfileSync: disableCloudProfileSync,
 			loadProfileHeaderList: loadProfileHeaderList,
 			saveProfileHeaderList: saveProfileHeaderList,
 			deleteProfileHeaderList: deleteProfileHeaderList,
@@ -484,7 +466,8 @@ extension SecureStorageClient: DependencyKey {
 			loadP2PLinks: loadP2PLinks,
 			saveP2PLinks: saveP2PLinks,
 			loadP2PLinksPrivateKey: loadP2PLinksPrivateKey,
-			saveP2PLinksPrivateKey: saveP2PLinksPrivateKey
+			saveP2PLinksPrivateKey: saveP2PLinksPrivateKey,
+			keychainChanged: keychainChanged
 		)
 		#endif
 	}()

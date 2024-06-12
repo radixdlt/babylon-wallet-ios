@@ -20,7 +20,7 @@ public struct SecureStorageClient: Sendable {
 	public var deleteMnemonicByFactorSourceID: DeleteMnemonicByFactorSourceID
 	public var deleteProfileAndMnemonicsByFactorSourceIDs: DeleteProfileAndMnemonicsByFactorSourceIDs
 
-	public var updateIsCloudProfileSyncEnabled: UpdateIsCloudProfileSyncEnabled
+	public var disableCloudProfileSync: DisableCloudProfileSync
 
 	public var loadProfileHeaderList: LoadProfileHeaderList
 	public var saveProfileHeaderList: SaveProfileHeaderList
@@ -42,6 +42,7 @@ public struct SecureStorageClient: Sendable {
 
 	public var loadP2PLinksPrivateKey: LoadP2PLinksPrivateKey
 	public var saveP2PLinksPrivateKey: SaveP2PLinksPrivateKey
+	public var keychainChanged: KeychainChanged
 
 	#if DEBUG
 	public var getAllMnemonics: GetAllMnemonics
@@ -59,7 +60,7 @@ public struct SecureStorageClient: Sendable {
 		containsMnemonicIdentifiedByFactorSourceID: @escaping ContainsMnemonicIdentifiedByFactorSourceID,
 		deleteMnemonicByFactorSourceID: @escaping DeleteMnemonicByFactorSourceID,
 		deleteProfileAndMnemonicsByFactorSourceIDs: @escaping DeleteProfileAndMnemonicsByFactorSourceIDs,
-		updateIsCloudProfileSyncEnabled: @escaping UpdateIsCloudProfileSyncEnabled,
+		disableCloudProfileSync: @escaping DisableCloudProfileSync,
 		loadProfileHeaderList: @escaping LoadProfileHeaderList,
 		saveProfileHeaderList: @escaping SaveProfileHeaderList,
 		deleteProfileHeaderList: @escaping DeleteProfileHeaderList,
@@ -73,6 +74,7 @@ public struct SecureStorageClient: Sendable {
 		saveP2PLinks: @escaping SaveP2PLinks,
 		loadP2PLinksPrivateKey: @escaping LoadP2PLinksPrivateKey,
 		saveP2PLinksPrivateKey: @escaping SaveP2PLinksPrivateKey,
+		keychainChanged: @escaping KeychainChanged,
 		getAllMnemonics: @escaping GetAllMnemonics
 	) {
 		self.saveProfileSnapshot = saveProfileSnapshot
@@ -85,7 +87,7 @@ public struct SecureStorageClient: Sendable {
 		self.containsMnemonicIdentifiedByFactorSourceID = containsMnemonicIdentifiedByFactorSourceID
 		self.deleteMnemonicByFactorSourceID = deleteMnemonicByFactorSourceID
 		self.deleteProfileAndMnemonicsByFactorSourceIDs = deleteProfileAndMnemonicsByFactorSourceIDs
-		self.updateIsCloudProfileSyncEnabled = updateIsCloudProfileSyncEnabled
+		self.disableCloudProfileSync = disableCloudProfileSync
 		self.loadProfileHeaderList = loadProfileHeaderList
 		self.saveProfileHeaderList = saveProfileHeaderList
 		self.deleteProfileHeaderList = deleteProfileHeaderList
@@ -100,6 +102,7 @@ public struct SecureStorageClient: Sendable {
 		self.getAllMnemonics = getAllMnemonics
 		self.saveRadixConnectRelaySession = saveRadixConnectRelaySession
 		self.loadRadixConnectRelaySession = loadRadixConnectRelaySession
+		self.keychainChanged = keychainChanged
 	}
 	#else
 
@@ -114,7 +117,7 @@ public struct SecureStorageClient: Sendable {
 		containsMnemonicIdentifiedByFactorSourceID: @escaping ContainsMnemonicIdentifiedByFactorSourceID,
 		deleteMnemonicByFactorSourceID: @escaping DeleteMnemonicByFactorSourceID,
 		deleteProfileAndMnemonicsByFactorSourceIDs: @escaping DeleteProfileAndMnemonicsByFactorSourceIDs,
-		updateIsCloudProfileSyncEnabled: @escaping UpdateIsCloudProfileSyncEnabled,
+		disableCloudProfileSync: @escaping DisableCloudProfileSync,
 		loadProfileHeaderList: @escaping LoadProfileHeaderList,
 		saveProfileHeaderList: @escaping SaveProfileHeaderList,
 		deleteProfileHeaderList: @escaping DeleteProfileHeaderList,
@@ -127,7 +130,8 @@ public struct SecureStorageClient: Sendable {
 		loadP2PLinks: @escaping LoadP2PLinks,
 		saveP2PLinks: @escaping SaveP2PLinks,
 		loadP2PLinksPrivateKey: @escaping LoadP2PLinksPrivateKey,
-		saveP2PLinksPrivateKey: @escaping SaveP2PLinksPrivateKey
+		saveP2PLinksPrivateKey: @escaping SaveP2PLinksPrivateKey,
+		keychainChanged: @escaping KeychainChanged
 	) {
 		self.saveProfileSnapshot = saveProfileSnapshot
 		self.loadProfileSnapshotData = loadProfileSnapshotData
@@ -139,7 +143,7 @@ public struct SecureStorageClient: Sendable {
 		self.containsMnemonicIdentifiedByFactorSourceID = containsMnemonicIdentifiedByFactorSourceID
 		self.deleteMnemonicByFactorSourceID = deleteMnemonicByFactorSourceID
 		self.deleteProfileAndMnemonicsByFactorSourceIDs = deleteProfileAndMnemonicsByFactorSourceIDs
-		self.updateIsCloudProfileSyncEnabled = updateIsCloudProfileSyncEnabled
+		self.disableCloudProfileSync = disableCloudProfileSync
 		self.loadProfileHeaderList = loadProfileHeaderList
 		self.saveProfileHeaderList = saveProfileHeaderList
 		self.deleteProfileHeaderList = deleteProfileHeaderList
@@ -153,6 +157,7 @@ public struct SecureStorageClient: Sendable {
 		self.saveP2PLinks = saveP2PLinks
 		self.loadP2PLinksPrivateKey = loadP2PLinksPrivateKey
 		self.saveP2PLinksPrivateKey = saveP2PLinksPrivateKey
+		self.keychainChanged = keychainChanged
 	}
 	#endif // DEBUG
 }
@@ -164,7 +169,7 @@ public struct LoadMnemonicByFactorSourceIDRequest: Sendable, Hashable {
 }
 
 extension SecureStorageClient {
-	public typealias UpdateIsCloudProfileSyncEnabled = @Sendable (ProfileID, CloudProfileSyncActivation) throws -> Void
+	public typealias DisableCloudProfileSync = @Sendable (ProfileID) throws -> Void
 	public typealias SaveProfileSnapshot = @Sendable (Profile) throws -> Void
 	public typealias LoadProfileSnapshotData = @Sendable (ProfileID) throws -> Data?
 	public typealias LoadProfileSnapshot = @Sendable (ProfileID) throws -> Profile?
@@ -202,6 +207,8 @@ extension SecureStorageClient {
 
 	public typealias LoadP2PLinksPrivateKey = @Sendable () throws -> Curve25519.PrivateKey?
 	public typealias SaveP2PLinksPrivateKey = @Sendable (Curve25519.PrivateKey) throws -> Void
+
+	public typealias KeychainChanged = @Sendable () -> AnyAsyncSequence<Void>
 
 	public enum LoadMnemonicPurpose: Sendable, Hashable, CustomStringConvertible {
 		case signTransaction
@@ -258,15 +265,6 @@ extension SecureStorageClient {
 	public func deleteProfileAndMnemonicsByFactorSourceIDs(profileID: Profile.ID, keepInICloudIfPresent: Bool) throws {
 		try deleteProfileAndMnemonicsByFactorSourceIDs(profileID, keepInICloudIfPresent)
 	}
-}
-
-// MARK: - CloudProfileSyncActivation
-public enum CloudProfileSyncActivation: Sendable, Hashable {
-	/// iCloud sync was enabled, user request to disable it.
-	case disable
-
-	/// iCloud sync was disabled, user request to enable it.
-	case enable
 }
 
 #if DEBUG

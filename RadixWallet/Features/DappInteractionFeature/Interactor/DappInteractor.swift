@@ -120,6 +120,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		switch viewAction {
 		case .task:
 			return handleIncomingRequests()
+
 		case let .responseFailureAlert(action):
 			switch action {
 			case .dismiss:
@@ -150,6 +151,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			return .run { _ in
 				await radixConnectClient.disconnectAll()
 			}
+
 		case .moveToForeground:
 			return .run { _ in
 				_ = await radixConnectClient.loadP2PLinksAndConnectAll()

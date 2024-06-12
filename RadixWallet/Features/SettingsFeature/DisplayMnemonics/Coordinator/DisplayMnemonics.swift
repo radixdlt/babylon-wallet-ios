@@ -58,7 +58,6 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 	@Dependency(\.keychainClient) var keychainClient
-	@Dependency(\.backupsClient) var backupsClient
 	@Dependency(\.securityCenterClient) var securityCenterClient
 
 	public init() {}
@@ -160,6 +159,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 
 				return .none
 			}
+
 		default:
 			return .none
 		}

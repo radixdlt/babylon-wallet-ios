@@ -137,7 +137,6 @@ extension DappToWalletInteraction {
 				3
 			case .oneTimePersonaData:
 				4
-
 			// transactions
 			case .send:
 				0

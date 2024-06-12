@@ -5,6 +5,7 @@ import os
 
 // MARK: - SecurityCenterClient
 public struct SecurityCenterClient: DependencyKey, Sendable {
+	public let startMonitoring: StartMonitoring
 	public let problems: Problems
 	public let lastManualBackup: LastManualBackup
 	public let lastCloudBackup: LastCloudBackup
@@ -12,6 +13,7 @@ public struct SecurityCenterClient: DependencyKey, Sendable {
 
 // MARK: SecurityCenterClient.Problems
 extension SecurityCenterClient {
+	public typealias StartMonitoring = @Sendable () async throws -> Void
 	public typealias Problems = @Sendable (SecurityProblem.ProblemType?) async -> AnyAsyncSequence<[SecurityProblem]>
 	public typealias LastManualBackup = @Sendable () async -> AnyAsyncSequence<BackupStatus?>
 	public typealias LastCloudBackup = @Sendable () async -> AnyAsyncSequence<BackupStatus?>
@@ -22,7 +24,7 @@ extension SecurityCenterClient {
 public enum SecurityProblem: Hashable, Sendable, Identifiable {
 	/// The given addresses of `accounts` and `personas` are unrecoverable if the user loses their phone, since their corresponding seed phrase has not been written down.
 	/// NOTE: This definition differs from the one at Confluence since we don't have shields implemented yet.
-	case problem3(addresses: ProblematicAddresses)
+	case problem3(addresses: AddressesOfEntitiesInBadState)
 	/// Wallet backups to the cloud aren’t working (wallet tried to do a backup and it didn’t work within, say, 5 minutes.)
 	/// This means that currently all accounts and personas are at risk of being practically unrecoverable if the user loses their phone.
 	/// Also they would lose all of their other non-security wallet settings and data.
@@ -36,7 +38,7 @@ public enum SecurityProblem: Hashable, Sendable, Identifiable {
 	case problem7
 	/// User has gotten a new phone (and restored their wallet from backup) and the wallet sees that there are accounts without shields using a phone key,
 	/// meaning they can only be recovered with the seed phrase. (See problem 2) This would also be the state if a user disabled their PIN (and reenabled it), clearing phone keys.
-	case problem9(addresses: ProblematicAddresses)
+	case problem9(addresses: AddressesOfEntitiesInBadState)
 
 	public var id: Int { number }
 
@@ -74,7 +76,7 @@ public enum SecurityProblem: Hashable, Sendable, Identifiable {
 		}
 	}
 
-	private func problem3(addresses: ProblematicAddresses) -> String {
+	private func problem3(addresses: AddressesOfEntitiesInBadState) -> String {
 		typealias Common = L10n.SecurityProblems.Common
 		typealias Problem = L10n.SecurityProblems.No3
 		let hasHidden = addresses.hiddenAccounts.count + addresses.hiddenPersonas.count > 0
@@ -156,12 +158,13 @@ public enum SecurityProblem: Hashable, Sendable, Identifiable {
 	}
 }
 
-// MARK: - SecurityCenterClient.BackupStatus
-extension SecurityCenterClient {
-	// MARK: - BackupStatus
-	public struct BackupStatus: Hashable, Codable, Sendable {
-		public let backupDate: Date
-		public let upToDate: Bool
-		public let success: Bool
+// MARK: - BackupStatus
+public struct BackupStatus: Hashable, Codable, Sendable {
+	public let result: BackupResult
+	public let isCurrent: Bool
+
+	public init(result: BackupResult, profile: Profile) {
+		self.result = result
+		self.isCurrent = result.saveIdentifier == profile.header.saveIdentifier
 	}
 }
