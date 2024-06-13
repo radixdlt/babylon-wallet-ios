@@ -22,7 +22,17 @@ extension P2P {
 
 extension P2P.RTCMessageFromPeer.Request {
 	public init(from decoder: Decoder) throws {
-		self = try .dapp(.init(from: decoder))
+		@Dependency(\.jsonEncoder) var jsonEncoder
+
+		let container = try decoder.singleValueContainer()
+		let jsonValue = try container.decode(JSONValue.self)
+		let jsonData = try jsonEncoder().encode(jsonValue.dictionary ?? [:])
+
+		guard let jsonString = String(data: jsonData, encoding: .utf8) else {
+			throw DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid data")
+		}
+
+		self = try .dapp(.init(jsonString: jsonString))
 	}
 }
 
