@@ -7541,7 +7541,6 @@
 				48CFC5582ADC10DA00E77A5C /* NonFungibleIdType.swift in Sources */,
 				48CFC57D2ADC10DA00E77A5C /* StateEntityDetailsResponseItemDetails.swift in Sources */,
 				48CFC5802ADC10DA00E77A5C /* TransportProfileClient+Live.swift in Sources */,
-				48CFC6082ADC10DA00E77A5C /* AccountsRequestResponseItem.swift in Sources */,
 				48AE39E82B0CBEA800813CF3 /* SelectInactiveAccountsToAdd.swift in Sources */,
 				48CFC59A2ADC10DA00E77A5C /* HitTargetSize.swift in Sources */,
 				48CFC2C12ADC10D900E77A5C /* AssetTransfer+Reducer.swift in Sources */,

@@ -113,24 +113,6 @@ extension DappWalletInteractionPersona {
 	}
 }
 
-extension WalletInteractionId {
-	public static func walletInteractionID(for interaction: DappInteractionClient.WalletInteraction) -> Self {
-		"\(interaction.rawValue)_\(UUID().uuidString)"
-	}
-
-	public var isWalletAccountDepositSettingsInteraction: Bool {
-		hasPrefix(DappInteractionClient.WalletInteraction.accountDepositSettings.rawValue)
-	}
-
-	public var isWalletAccountTransferInteraction: Bool {
-		hasPrefix(DappInteractionClient.WalletInteraction.accountTransfer.rawValue)
-	}
-
-	public var isWalletInteraction: Bool {
-		isWalletAccountTransferInteraction || isWalletAccountDepositSettingsInteraction
-	}
-}
-
 extension DappToWalletInteraction {
 	public enum MissingEntry: Sendable, Hashable {
 		case missingEntry

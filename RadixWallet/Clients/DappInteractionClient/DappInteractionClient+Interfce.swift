@@ -25,6 +25,24 @@ extension DappInteractionClient {
 	public typealias CompleteInteraction = @Sendable (P2P.RTCOutgoingMessage) async throws -> Void
 }
 
+extension WalletInteractionId {
+	public static func walletInteractionID(for interaction: DappInteractionClient.WalletInteraction) -> Self {
+		"\(interaction.rawValue)_\(UUID().uuidString)"
+	}
+
+	public var isWalletAccountDepositSettingsInteraction: Bool {
+		hasPrefix(DappInteractionClient.WalletInteraction.accountDepositSettings.rawValue)
+	}
+
+	public var isWalletAccountTransferInteraction: Bool {
+		hasPrefix(DappInteractionClient.WalletInteraction.accountTransfer.rawValue)
+	}
+
+	public var isWalletInteraction: Bool {
+		isWalletAccountTransferInteraction || isWalletAccountDepositSettingsInteraction
+	}
+}
+
 extension DappInteractionClient {
 	public struct RequestEnvelope: Sendable, Hashable {
 		public let route: P2P.Route
