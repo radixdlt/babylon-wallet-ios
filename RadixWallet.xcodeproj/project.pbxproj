@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -6540,7 +6540,7 @@
 				5B1C4FD32BBB0B0C00B9436F /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Strict" */,
 				8318BB172BC8403800057BCB /* XCRemoteSwiftPackageReference "swift-custom-dump" */,
 				E6A0B0492BF23C7000617DAC /* XCRemoteSwiftPackageReference "swift-identified-collections" */,
-				E7A5AC9B2C0F3EBA006CB6EC /* XCLocalSwiftPackageReference "../sargon" */,
+				E76645A02C1C6C9C00065D9A /* XCRemoteSwiftPackageReference "sargon" */,
 			);
 			productRefGroup = 48CFBC502ADC106300E77A5C /* Products */;
 			projectDirPath = "";
@@ -8225,13 +8225,6 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		E7A5AC9B2C0F3EBA006CB6EC /* XCLocalSwiftPackageReference "../sargon" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../sargon;
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCRemoteSwiftPackageReference section */
 		48FFFA972ADC1EEC00B2B213 /* XCRemoteSwiftPackageReference "AsyncExtensions" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -8503,6 +8496,14 @@
 			requirement = {
 				kind = exactVersion;
 				version = 1.0.2;
+			};
+		};
+		E76645A02C1C6C9C00065D9A /* XCRemoteSwiftPackageReference "sargon" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/radixdlt/sargon";
+			requirement = {
+				kind = exactVersion;
+				version = 1.0.11;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
