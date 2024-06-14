@@ -64,7 +64,7 @@ struct DappInteractionLoading_Preview: PreviewProvider {
 
 extension DappInteractionLoading.State {
 	static let previewValue: Self = .init(
-		interaction: .previewValueAllRequests() // .previewValueOneTimeAccount
+		interaction: .previewValueOneTimeAccount
 	)
 }
 #endif

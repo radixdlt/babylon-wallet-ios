@@ -33,7 +33,7 @@ extension DappInteractionClient: DependencyKey {
 							interactionId: interactionId,
 							items: items,
 							metadata: .init(
-								version: P2P.Dapp.currentVersion,
+								version: .current,
 								networkId: gatewaysClient.getCurrentNetworkID(),
 								origin: DappToWalletInteractionMetadata.Origin.wallet,
 								dappDefinitionAddress: .wallet
@@ -89,8 +89,8 @@ extension DappInteractionClient {
 		}
 
 		let nonvalidatedMeta = nonValidated.metadata
-		guard P2P.Dapp.currentVersion == nonvalidatedMeta.version else {
-			return invalidRequest(.incompatibleVersion(connectorExtensionSent: nonvalidatedMeta.version, walletUses: P2P.Dapp.currentVersion))
+		guard WalletInteractionVersion.current == nonvalidatedMeta.version else {
+			return invalidRequest(.incompatibleVersion(connectorExtensionSent: nonvalidatedMeta.version, walletUses: .current))
 		}
 		let currentNetworkID = await gatewaysClient.getCurrentNetworkID()
 		guard currentNetworkID == nonValidated.metadata.networkId else {

@@ -16,6 +16,10 @@ extension TxVersion {
 	public static let `default`: Self = 1
 }
 
+extension WalletInteractionVersion {
+	public static let current: Self = 2
+}
+
 public typealias NumberOfAccounts = RequestedQuantity
 
 extension WalletToDappInteractionResponse {

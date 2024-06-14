@@ -95,7 +95,7 @@ extension DappMetadata {
 }
 #endif
 
-// MARK: - P2P.Dapp.Request.WalletRequestItem
+// MARK: - DappToWalletInteraction
 extension DappToWalletInteraction {
 	/// A union type containing all request items allowed in a `WalletInteraction`, for app handling purposes.
 	enum AnyInteractionItem: Sendable, Hashable {
@@ -158,7 +158,7 @@ extension DappToWalletInteraction {
 	}
 }
 
-// MARK: - P2P.Dapp.Response.WalletInteractionSuccessResponse.AnyInteractionResponseItem
+// MARK: - WalletToDappInteractionSuccessResponse.AnyInteractionResponseItem
 extension WalletToDappInteractionSuccessResponse {
 	enum AnyInteractionResponseItem: Sendable, Hashable {
 		// request responses
