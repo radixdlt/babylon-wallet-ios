@@ -18,7 +18,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		typealias RemoteInteractionResponseItem = WalletToDappInteractionSuccessResponse.AnyInteractionResponseItem
 
 		enum LocalInteractionItem: Sendable, Hashable {
-			case accountPermissionRequested(NumberOfAccounts)
+			case accountPermissionRequested(DappInteractionNumberOfAccounts)
 		}
 
 		enum LocalInteractionResponseItem: Sendable, Hashable {
@@ -97,7 +97,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		struct AutofillOngoingResponseItemsPayload: Sendable, Equatable {
 			struct AccountsPayload: Sendable, Equatable {
 				var requestItem: DappInteractionFlow.State.AnyInteractionItem
-				var numberOfAccountsRequested: NumberOfAccounts
+				var numberOfAccountsRequested: DappInteractionNumberOfAccounts
 				var accounts: [Account]
 			}
 
@@ -688,7 +688,7 @@ extension DappInteractionFlow {
 			referencesToAuthorizedPersonas: []
 		)
 		// This extraction is really verbose right now, but it should become a lot simpler with native case paths
-		let sharedAccountsInfo: (NumberOfAccounts, [WalletInteractionWalletAccount])? = unwrap(
+		let sharedAccountsInfo: (DappInteractionNumberOfAccounts, [WalletInteractionWalletAccount])? = unwrap(
 			// request
 			{
 				switch state.remoteInteraction.items {

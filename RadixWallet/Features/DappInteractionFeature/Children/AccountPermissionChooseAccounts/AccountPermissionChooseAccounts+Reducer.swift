@@ -39,7 +39,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 			challenge: DappToWalletInteractionAuthChallengeNonce?,
 			accessKind: AccessKind,
 			dappMetadata: DappMetadata,
-			numberOfAccounts: NumberOfAccounts
+			numberOfAccounts: DappInteractionNumberOfAccounts
 		) {
 			self.init(
 				challenge: challenge,
