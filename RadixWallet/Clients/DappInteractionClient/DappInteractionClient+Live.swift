@@ -35,7 +35,7 @@ extension DappInteractionClient: DependencyKey {
 							metadata: .init(
 								version: .current,
 								networkId: gatewaysClient.getCurrentNetworkID(),
-								origin: DappToWalletInteractionMetadata.Origin.wallet,
+								origin: .wallet,
 								dappDefinitionAddress: .wallet
 							)
 						))
