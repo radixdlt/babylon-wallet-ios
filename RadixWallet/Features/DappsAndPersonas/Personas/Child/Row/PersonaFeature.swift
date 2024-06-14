@@ -7,22 +7,25 @@ public struct PersonaFeature: Sendable, FeatureReducer {
 		public let id: Persona.ID
 		public let thumbnail: URL?
 		public let displayName: String
-		public var shouldWriteDownMnemonic: Bool
+		public var securityProblemsConfig: EntitySecurityProblemsView.Config
 
-		public init(persona: AuthorizedPersonaDetailed) {
-			self.init(
-				id: persona.id,
-				thumbnail: nil,
-				displayName: persona.displayName.rawValue
-			)
-		}
-
-		public init(persona: Persona) {
+		public init(persona: AuthorizedPersonaDetailed, problems: [SecurityProblem]) {
 			self.init(
 				id: persona.id,
 				thumbnail: nil,
 				displayName: persona.displayName.rawValue,
-				shouldWriteDownMnemonic: persona.shouldWriteDownMnemonic
+				identityAddress: persona.identityAddress,
+				problems: problems
+			)
+		}
+
+		public init(persona: Persona, problems: [SecurityProblem]) {
+			self.init(
+				id: persona.id,
+				thumbnail: nil,
+				displayName: persona.displayName.rawValue,
+				identityAddress: persona.address,
+				problems: problems
 			)
 		}
 
@@ -30,23 +33,24 @@ public struct PersonaFeature: Sendable, FeatureReducer {
 			id: Persona.ID,
 			thumbnail: URL?,
 			displayName: String,
-			shouldWriteDownMnemonic: Bool = false
+			identityAddress: IdentityAddress,
+			problems: [SecurityProblem]
 		) {
 			self.id = id
 			self.thumbnail = thumbnail
 			self.displayName = displayName
-			self.shouldWriteDownMnemonic = shouldWriteDownMnemonic
+			self.securityProblemsConfig = .init(kind: .persona(identityAddress), problems: problems)
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case tapped
-		case writeDownSeedPhrasePromptTapped
+		case securityProblemsTapped
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case openDetails
-		case writeDownSeedPhrase
+		case openSecurityCenter
 	}
 
 	public init() {}
@@ -55,8 +59,8 @@ public struct PersonaFeature: Sendable, FeatureReducer {
 		switch viewAction {
 		case .tapped:
 			.send(.delegate(.openDetails))
-		case .writeDownSeedPhrasePromptTapped:
-			.send(.delegate(.writeDownSeedPhrase))
+		case .securityProblemsTapped:
+			.send(.delegate(.openSecurityCenter))
 		}
 	}
 }

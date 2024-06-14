@@ -9,6 +9,7 @@ extension Home.AccountRow {
 		let fiatWorth: Loadable<FiatWorth>
 		let appearanceID: AppearanceID
 		let isLoadingResources: Bool
+		let securityProblemsConfig: EntitySecurityProblemsView.Config
 
 		public enum AccountTag: Int, Hashable, Identifiable, Sendable {
 			case ledgerBabylon
@@ -30,7 +31,6 @@ extension Home.AccountRow {
 		let tag: AccountTag?
 
 		let isLedgerAccount: Bool
-		let mnemonicHandlingCallToAction: MnemonicHandling?
 
 		let fungibleResourceIcons: [Thumbnail.TokenContent]
 		let nonFungibleResourcesCount: Int
@@ -48,11 +48,10 @@ extension Home.AccountRow {
 			self.showFiatWorth = state.showFiatWorth
 			self.fiatWorth = state.totalFiatWorth
 			self.isLoadingResources = state.accountWithResources.isLoading
+			self.securityProblemsConfig = state.securityProblemsConfig
 
 			self.tag = .init(state: state)
 			self.isLedgerAccount = state.isLedgerAccount
-
-			self.mnemonicHandlingCallToAction = state.mnemonicHandlingCallToAction
 
 			// Resources
 			guard let accountWithResources = state.accountWithResources.wrappedValue?.nonEmptyVaults else {
@@ -128,7 +127,9 @@ extension Home.AccountRow {
 
 					ownedResourcesList(viewStore)
 
-					prompts(mnemonicHandlingCallToAction: viewStore.mnemonicHandlingCallToAction)
+					EntitySecurityProblemsView(config: viewStore.securityProblemsConfig) {
+						viewStore.send(.securityProblemsTapped)
+					}
 				}
 				.padding(.horizontal, .medium1)
 				.padding(.vertical, .medium2)
@@ -136,9 +137,6 @@ extension Home.AccountRow {
 				.cornerRadius(.small1)
 				.onTapGesture {
 					viewStore.send(.tapped)
-				}
-				.task {
-					await store.send(.view(.task)).finish()
 				}
 			}
 		}
@@ -153,22 +151,6 @@ extension Home.AccountRow.View {
 
 		static var diameter: CGFloat {
 			iconSize.rawValue + 2 * borderWidth
-		}
-	}
-
-	@ViewBuilder
-	func prompts(mnemonicHandlingCallToAction: MnemonicHandling?) -> some SwiftUI.View {
-		if let mnemonicHandlingCallToAction {
-			switch mnemonicHandlingCallToAction {
-			case .mustBeImported:
-				importMnemonicPromptView {
-					store.send(.view(.importMnemonicButtonTapped))
-				}
-			case .shouldBeExported:
-				exportMnemonicPromptView {
-					store.send(.view(.exportMnemonicButtonTapped))
-				}
-			}
 		}
 	}
 
@@ -421,6 +403,6 @@ struct Row_Preview: PreviewProvider {
 }
 
 extension Home.AccountRow.State {
-	public static let previewValue = Self(account: .previewValue0)
+	public static let previewValue = Self(account: .previewValue0, problems: [])
 }
 #endif

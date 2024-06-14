@@ -19,7 +19,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case onFirstTask
+		case task
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -58,7 +58,6 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 	@Dependency(\.keychainClient) var keychainClient
-	@Dependency(\.backupsClient) var backupsClient
 	@Dependency(\.securityCenterClient) var securityCenterClient
 
 	public init() {}
@@ -77,7 +76,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .onFirstTask:
+		case .task:
 			securityProblemsEffect()
 				.merge(with: entitiesEffect())
 		}
@@ -160,6 +159,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 
 				return .none
 			}
+
 		default:
 			return .none
 		}
@@ -196,7 +196,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 					.compactMap { $0 }
 					.map {
 						ComparableEntities(
-							state: .init(accountsControlledByKeysOnSameCurve: $0, problems: problems),
+							state: .init(entitiesControlledByKeysOnSameCurve: $0, problems: problems),
 							deviceFactorSource: ents.deviceFactorSource
 						)
 					}

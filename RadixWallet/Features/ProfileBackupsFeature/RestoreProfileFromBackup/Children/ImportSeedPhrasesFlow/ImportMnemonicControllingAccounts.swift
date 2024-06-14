@@ -50,6 +50,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 				isMnemonicPresentInKeychain: ents.isMnemonicPresentInKeychain,
 				accounts: accounts,
 				hiddenAccountsCount: hiddenAccountsCount,
+				personasCount: ents.personas.count,
 				mode: .displayAccountListOnly
 			)
 		}
@@ -79,11 +80,13 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	// MARK: - Destination
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case importMnemonic(ImportMnemonic.State)
 			case confirmSkippingBDFS(ConfirmSkippingBDFS.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case importMnemonic(ImportMnemonic.Action)
 			/// **B**abylon **D**evice **F**actor **S**ource
@@ -91,10 +94,10 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.importMnemonic, action: /Action.importMnemonic) {
+			Scope(state: \.importMnemonic, action: \.importMnemonic) {
 				ImportMnemonic()
 			}
-			Scope(state: /State.confirmSkippingBDFS, action: /Action.confirmSkippingBDFS) {
+			Scope(state: \.confirmSkippingBDFS, action: \.confirmSkippingBDFS) {
 				ConfirmSkippingBDFS()
 			}
 		}
@@ -121,6 +124,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return .none
+
 		case .inputMnemonicButtonTapped:
 			state.destination = .importMnemonic(.init(
 				warning: L10n.RevealSeedPhrase.warning,

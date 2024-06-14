@@ -89,12 +89,9 @@ private extension StoreOf<ManualAccountRecoverySeedPhrase> {
 private extension View {
 	func destinations(with store: StoreOf<ManualAccountRecoverySeedPhrase>) -> some View {
 		let destinationStore = store.destination
-		return navigationDestination(
-			store: destinationStore,
-			state: /ManualAccountRecoverySeedPhrase.Destination.State.importMnemonic,
-			action: ManualAccountRecoverySeedPhrase.Destination.Action.importMnemonic,
-			destination: { ImportMnemonic.View(store: $0) }
-		)
+		return navigationDestination(store: destinationStore.scope(state: \.importMnemonic, action: \.importMnemonic)) {
+			ImportMnemonic.View(store: $0)
+		}
 	}
 }
 
@@ -134,6 +131,7 @@ private extension ManualAccountRecoverySeedPhrase.View {
 							isError: false
 						),
 						promptUserToBackUpMnemonic: false,
+						promptUserToImportMnemonic: false,
 						accounts: item.value.accounts.filter {
 							switch $0.securityState {
 							case let .unsecured(unsecuredEntityControl):
@@ -141,7 +139,8 @@ private extension ManualAccountRecoverySeedPhrase.View {
 								return viewStore.isOlympia && curve == .secp256k1 || !viewStore.isOlympia && curve == .curve25519
 							}
 						},
-						hiddenAccountsCount: item.value.hiddenAccounts.count
+						hiddenAccountsCount: item.value.hiddenAccounts.count,
+						personasCount: item.value.personas.count
 					)
 				)
 				.padding(.medium3)

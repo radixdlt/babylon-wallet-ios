@@ -3,11 +3,12 @@
 extension OverlayWindowClient: TestDependencyKey {
 	public static let testValue = Self(
 		scheduledItems: unimplemented("\(Self.self).scheduledItems"),
-		scheduleAlertIgnoreAction: unimplemented("\(Self.self).scheduleAlertIgnoreAction"),
-		scheduleAlertAwaitAction: unimplemented("\(Self.self).scheduleAlertAwaitAction"),
+		scheduleAlert: unimplemented("\(Self.self).scheduleAlert"),
+		scheduleAlertAndIgnoreAction: unimplemented("\(Self.self).scheduleAlertAndIgnoreAction"),
 		scheduleHUD: unimplemented("\(Self.self).scheduleHUD"),
-		scheduleFullScreenIgnoreAction: unimplemented("\(Self.self).scheduleFullScreenIgnoreAction"),
+		scheduleFullScreen: unimplemented("\(Self.self).scheduleFullScreen"),
 		sendAlertAction: unimplemented("\(Self.self).sendAlertAction"),
+		sendFullScreenAction: unimplemented("\(Self.self).sendFullScreenAction"),
 		setIsUserIteractionEnabled: unimplemented("\(Self.self).setIsUserIteractionEnabled"),
 		isUserInteractionEnabled: unimplemented("\(Self.self).isUserInteractionEnabled")
 	)

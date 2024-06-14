@@ -12,33 +12,32 @@ extension Home {
 			public var accountWithResources: Loadable<OnLedgerEntity.OnLedgerAccount>
 			public var showFiatWorth: Bool = true
 			public var totalFiatWorth: Loadable<FiatWorth>
+			public var securityProblemsConfig: EntitySecurityProblemsView.Config
 
 			public init(
-				account: Account
+				account: Account,
+				problems: [SecurityProblem]
 			) {
 				self.accountWithInfo = .init(account: account)
 				self.accountWithResources = .loading
 				self.totalFiatWorth = .loading
+				self.securityProblemsConfig = .init(kind: .account(account.address), problems: problems)
 			}
 		}
 
 		public enum ViewAction: Sendable, Equatable {
 			case tapped
-			case task
-			case importMnemonicButtonTapped
-			case exportMnemonicButtonTapped
+			case securityProblemsTapped
 		}
 
 		public enum InternalAction: Sendable, Equatable {
 			case accountUpdated(OnLedgerEntity.OnLedgerAccount)
 			case fiatWorthUpdated(Loadable<FiatWorth>)
-			case checkAccountAccessToMnemonic
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
 			case openDetails
-			case exportMnemonic
-			case importMnemonics
+			case openSecurityCenter
 		}
 
 		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
@@ -47,19 +46,10 @@ extension Home {
 
 		public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
-			case .task:
-				self.checkAccountAccessToMnemonic(state: &state)
-
-				return .none
-
-			case .exportMnemonicButtonTapped:
-				return .send(.delegate(.exportMnemonic))
-
-			case .importMnemonicButtonTapped:
-				return .send(.delegate(.importMnemonics))
-
 			case .tapped:
-				return .send(.delegate(.openDetails))
+				.send(.delegate(.openDetails))
+			case .securityProblemsTapped:
+				.send(.delegate(.openSecurityCenter))
 			}
 		}
 
@@ -71,20 +61,12 @@ extension Home {
 				state.isDappDefinitionAccount = account.metadata.accountType == .dappDefinition
 				state.accountWithResources.refresh(from: .success(account))
 
-				return .send(.internal(.checkAccountAccessToMnemonic))
-
-			case .checkAccountAccessToMnemonic:
-				checkAccountAccessToMnemonic(state: &state)
 				return .none
 
 			case let .fiatWorthUpdated(fiatWorth):
 				state.totalFiatWorth.refresh(from: fiatWorth)
 				return .none
 			}
-		}
-
-		private func checkAccountAccessToMnemonic(state: inout State) {
-			state.checkAccountAccessToMnemonic(portfolio: state.accountWithResources.wrappedValue)
 		}
 	}
 }

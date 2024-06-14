@@ -11,6 +11,7 @@ public struct PersonaList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var personas: IdentifiedArrayOf<PersonaFeature.State>
 		public let strategy: ReloadingStrategy
+		var problems: [SecurityProblem] = []
 
 		public init(
 			personas: IdentifiedArrayOf<PersonaFeature.State> = [],
@@ -20,13 +21,9 @@ public struct PersonaList: Sendable, FeatureReducer {
 			self.strategy = strategy
 		}
 
-		public init(
-			dApp: AuthorizedDappDetailed
-		) {
-			self.init(
-				personas: dApp.detailedAuthorizedPersonas.map(PersonaFeature.State.init).asIdentified(),
-				strategy: .dApp(dApp.dAppDefinitionAddress)
-			)
+		public init(dApp: AuthorizedDappDetailed) {
+			let personas = dApp.detailedAuthorizedPersonas.map { PersonaFeature.State(persona: $0, problems: []) }.asIdentified()
+			self.init(personas: personas, strategy: .dApp(dApp.dAppDefinitionAddress))
 		}
 
 		public enum ReloadingStrategy: Sendable, Hashable {
@@ -41,6 +38,7 @@ public struct PersonaList: Sendable, FeatureReducer {
 		case createNewPersonaButtonTapped
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case persona(id: Persona.ID, action: PersonaFeature.Action)
 	}
@@ -48,12 +46,15 @@ public struct PersonaList: Sendable, FeatureReducer {
 	public enum DelegateAction: Sendable, Equatable {
 		case createNewPersona
 		case openDetails(Persona)
-		case exportMnemonic(Persona)
+		case openSecurityCenter
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case personasLoaded(IdentifiedArrayOf<PersonaFeature.State>)
+		case setSecurityProblems([SecurityProblem])
 	}
+
+	@Dependency(\.securityCenterClient) var securityCenterClient
 
 	public init() {}
 
@@ -67,20 +68,8 @@ public struct PersonaList: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			.run { [strategy = state.strategy] send in
-				for try await personas in await personasClient.personas() {
-					guard !Task.isCancelled else { return }
-					let ids = try await personaIDs(strategy) ?? OrderedSet(validating: personas.ids)
-					let result = ids.compactMap { personas[id: $0] }.map(PersonaFeature.State.init)
-					guard result.count == ids.count else {
-						throw UpdatePersonaError.personasMissingFromClient(ids.subtracting(result.map(\.id)))
-					}
-					await send(.internal(.personasLoaded(result.asIdentified())))
-				}
-			} catch: { error, _ in
-				loggerGlobal.error("Failed to update personas from client, error: \(error)")
-				errorQueue.schedule(error)
-			}
+			personasEffect(state: state)
+				.merge(with: securityProblemsEffect())
 
 		case .createNewPersonaButtonTapped:
 			.send(.delegate(.createNewPersona))
@@ -106,27 +95,66 @@ public struct PersonaList: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .personasLoaded(personas):
+		case var .personasLoaded(personas):
+			personas.mutateAll { persona in
+				persona.securityProblemsConfig.update(problems: state.problems)
+			}
+
 			state.personas = personas
+			return .none
+
+		case let .setSecurityProblems(problems):
+			state.problems = problems
+			state.personas.mutateAll { persona in
+				persona.securityProblemsConfig.update(problems: problems)
+			}
 			return .none
 		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case .persona(id: let id, action: .delegate(.openDetails)):
-			.run { send in
-				let persona = try await personasClient.getPersona(id: id)
-				await send(.delegate(.openDetails(persona)))
+		case let .persona(id, action: .delegate(delegateAction)):
+			switch delegateAction {
+			case .openDetails:
+				.run { send in
+					let persona = try await personasClient.getPersona(id: id)
+					await send(.delegate(.openDetails(persona)))
+				} catch: { error, _ in
+					errorQueue.schedule(error)
+				}
+			case .openSecurityCenter:
+				.send(.delegate(.openSecurityCenter))
 			}
 
-		case .persona(id: let id, action: .delegate(.writeDownSeedPhrase)):
-			.run { send in
-				let persona = try await personasClient.getPersona(id: id)
-				await send(.delegate(.exportMnemonic(persona)))
-			}
 		case .persona:
 			.none
+		}
+	}
+
+	private func personasEffect(state: State) -> Effect<Action> {
+		.run { [strategy = state.strategy, problems = state.problems] send in
+			for try await personas in await personasClient.personas() {
+				guard !Task.isCancelled else { return }
+				let ids = try await personaIDs(strategy) ?? OrderedSet(validating: personas.ids)
+				let result = ids.compactMap { personas[id: $0] }.map { PersonaFeature.State(persona: $0, problems: problems) }
+				guard result.count == ids.count else {
+					throw UpdatePersonaError.personasMissingFromClient(ids.subtracting(result.map(\.id)))
+				}
+				await send(.internal(.personasLoaded(result.asIdentified())))
+			}
+		} catch: { error, _ in
+			loggerGlobal.error("Failed to update personas from client, error: \(error)")
+			errorQueue.schedule(error)
+		}
+	}
+
+	private func securityProblemsEffect() -> Effect<Action> {
+		.run { send in
+			for try await problems in await securityCenterClient.problems() {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.setSecurityProblems(problems)))
+			}
 		}
 	}
 }

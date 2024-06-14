@@ -9,7 +9,7 @@ public struct Home: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		// MARK: - Components
 		public var accountRows: IdentifiedArrayOf<Home.AccountRow.State> = []
-		public var shouldWriteDownPersonasSeedPhrase: Bool = false
+		fileprivate var problems: [SecurityProblem] = []
 
 		public var showRadixBanner: Bool = false
 		public var showFiatWorth: Bool = true
@@ -57,14 +57,12 @@ public struct Home: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		public typealias HasAccessToMnemonic = Bool
 		case accountsLoadedResult(TaskResult<Accounts>)
-		case exportMnemonic(account: Account)
-		case importMnemonic
-		case loadedShouldWriteDownPersonasSeedPhrase(Bool)
 		case currentGatewayChanged(to: Gateway)
 		case shouldShowNPSSurvey(Bool)
 		case accountsResourcesLoaded(Loadable<[OnLedgerEntity.OnLedgerAccount]>)
 		case accountsFiatWorthLoaded([AccountAddress: Loadable<FiatWorth>])
 		case showLinkConnectorIfNeeded
+		case setSecurityProblems([SecurityProblem])
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -76,46 +74,43 @@ public struct Home: Sendable, FeatureReducer {
 	}
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case accountDetails(AccountDetails.State)
 			case createAccount(CreateAccountCoordinator.State)
-			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
-			case exportMnemonic(ExportMnemonic.State)
 			case acknowledgeJailbreakAlert(AlertState<Action.AcknowledgeJailbreakAlert>)
 			case npsSurvey(NPSSurvey.State)
 			case relinkConnector(NewConnection.State)
+			case securityCenter(SecurityCenter.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case accountDetails(AccountDetails.Action)
 			case createAccount(CreateAccountCoordinator.Action)
-			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
-			case exportMnemonic(ExportMnemonic.Action)
 			case acknowledgeJailbreakAlert(AcknowledgeJailbreakAlert)
 			case npsSurvey(NPSSurvey.Action)
 			case relinkConnector(NewConnection.Action)
+			case securityCenter(SecurityCenter.Action)
 
 			public enum AcknowledgeJailbreakAlert: Sendable, Hashable {}
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.accountDetails, action: /Action.accountDetails) {
+			Scope(state: \.accountDetails, action: \.accountDetails) {
 				AccountDetails()
 			}
-			Scope(state: /State.createAccount, action: /Action.createAccount) {
+			Scope(state: \.createAccount, action: \.createAccount) {
 				CreateAccountCoordinator()
 			}
-			Scope(state: /State.importMnemonics, action: /Action.importMnemonics) {
-				ImportMnemonicsFlowCoordinator()
-			}
-			Scope(state: /State.exportMnemonic, action: /Action.exportMnemonic) {
-				ExportMnemonic()
-			}
-			Scope(state: /State.npsSurvey, action: /Action.npsSurvey) {
+			Scope(state: \.npsSurvey, action: \.npsSurvey) {
 				NPSSurvey()
 			}
-			Scope(state: /State.relinkConnector, action: /Action.relinkConnector) {
+			Scope(state: \.relinkConnector, action: \.relinkConnector) {
 				NewConnection()
+			}
+			Scope(state: \.securityCenter, action: \.securityCenter) {
+				SecurityCenter()
 			}
 		}
 	}
@@ -131,6 +126,7 @@ public struct Home: Sendable, FeatureReducer {
 	@Dependency(\.npsSurveyClient) var npsSurveyClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.radixConnectClient) var radixConnectClient
+	@Dependency(\.securityCenterClient) var securityCenterClient
 
 	public init() {}
 
@@ -173,12 +169,11 @@ public struct Home: Sendable, FeatureReducer {
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
-			.merge(with: checkAccountsAccessToMnemonic(state: state))
-			.merge(with: loadShouldWriteDownPersonasSeedPhrase())
 			.merge(with: loadGateways())
 			.merge(with: loadNPSSurveyStatus())
 			.merge(with: loadAccountResources())
 			.merge(with: loadFiatValues())
+			.merge(with: securityProblemsEffect())
 			.merge(with: delayedMediumEffect(for: .internal(.showLinkConnectorIfNeeded)))
 
 		case .createAccountButtonTapped:
@@ -188,6 +183,7 @@ public struct Home: Sendable, FeatureReducer {
 				))
 			)
 			return .none
+
 		case .pullToRefreshStarted:
 			let accountAddresses = state.accounts.map(\.address)
 			return .run { _ in
@@ -195,6 +191,7 @@ public struct Home: Sendable, FeatureReducer {
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
+
 		case .radixBannerButtonTapped:
 			return .run { _ in
 				await openURL(Home.radixBannerURL)
@@ -222,14 +219,13 @@ public struct Home: Sendable, FeatureReducer {
 				return .none
 			}
 
-			state.accountRows = accounts.map { Home.AccountRow.State(account: $0) }.asIdentified()
+			state.accountRows = accounts.map { Home.AccountRow.State(account: $0, problems: state.problems) }.asIdentified()
 
 			return .run { [addresses = state.accountAddresses] _ in
 				_ = try await accountPortfoliosClient.fetchAccountPortfolios(addresses, false)
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
-			.merge(with: checkAccountsAccessToMnemonic(state: state))
 
 		case let .accountsLoadedResult(.failure(error)):
 			errorQueue.schedule(error)
@@ -243,16 +239,6 @@ public struct Home: Sendable, FeatureReducer {
 			}
 			return .none
 
-		case let .loadedShouldWriteDownPersonasSeedPhrase(shouldBackup):
-			state.shouldWriteDownPersonasSeedPhrase = shouldBackup
-			return .none
-
-		case let .exportMnemonic(account):
-			return exportMnemonic(controlling: account, state: &state)
-
-		case .importMnemonic:
-			return importMnemonics(state: &state)
-
 		case let .currentGatewayChanged(gateway):
 			#if DEBUG
 			state.showFiatWorth = true
@@ -263,11 +249,13 @@ public struct Home: Sendable, FeatureReducer {
 			}
 			#endif
 			return .none
+
 		case let .shouldShowNPSSurvey(shouldShow):
 			if shouldShow {
 				state.addDestination(.npsSurvey(.init()))
 			}
 			return .none
+
 		case let .accountsFiatWorthLoaded(fiatWorths):
 			state.accountRows.mutateAll {
 				if let fiatWorth = fiatWorths[$0.id] {
@@ -276,6 +264,7 @@ public struct Home: Sendable, FeatureReducer {
 			}
 			state.totalFiatWorth = state.accountRows.map(\.totalFiatWorth).reduce(+) ?? .loading
 			return .none
+
 		case .showLinkConnectorIfNeeded:
 			let purpose: NewConnectionApproval.State.Purpose? = if userDefaults.showRelinkConnectorsAfterProfileRestore {
 				.approveRelinkAfterProfileRestore
@@ -290,31 +279,27 @@ public struct Home: Sendable, FeatureReducer {
 				)
 			}
 			return .none
-		}
-	}
 
-	private func checkAccountsAccessToMnemonic(state: State) -> Effect<Action> {
-		.merge(state.accountRows.map {
-			.send(.child(.account(
-				id: $0.id,
-				action: .internal(.checkAccountAccessToMnemonic)
-			)))
-		})
+		case let .setSecurityProblems(problems):
+			state.problems = problems
+			state.accountRows.mutateAll { row in
+				row.securityProblemsConfig.update(problems: problems)
+			}
+			return .none
+		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .account(id, action: .delegate(delegateAction)):
 			guard let accountRow = state.accountRows[id: id] else { return .none }
-			let account = accountRow.account
 			switch delegateAction {
 			case .openDetails:
 				state.destination = .accountDetails(.init(accountWithInfo: accountRow.accountWithInfo, showFiatWorth: state.showFiatWorth))
 				return .none
-			case .exportMnemonic:
-				return exportMnemonic(controlling: account, state: &state)
-			case .importMnemonics:
-				return importMnemonics(state: &state)
+			case .openSecurityCenter:
+				state.destination = .securityCenter(.init())
+				return .none
 			}
 
 		default:
@@ -324,37 +309,8 @@ public struct Home: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case let .accountDetails(.delegate(.exportMnemonic(controlledAccount))):
-			return dismissAccountDetails(then: .exportMnemonic(account: controlledAccount), &state)
-
-		case .accountDetails(.delegate(.importMnemonics)):
-			return dismissAccountDetails(then: .importMnemonic, &state)
-
 		case .accountDetails(.delegate(.dismiss)):
 			state.destination = nil
-			return .none
-
-		case let .exportMnemonic(.delegate(delegateAction)):
-			state.destination = nil
-			switch delegateAction {
-			case .doneViewing:
-				return checkAccountsAccessToMnemonic(state: state)
-
-			case .notPersisted, .persistedMnemonicInKeychainOnly, .persistedNewFactorSourceInProfile:
-				assertionFailure("Expected 'doneViewing' action")
-				return .none
-			}
-
-		case let .importMnemonics(.delegate(delegateAction)):
-			state.destination = nil
-			switch delegateAction {
-			case .finishedEarly: break
-			case let .finishedImportingMnemonics(_, imported, notYetSavedNewMainBDFS):
-				assert(notYetSavedNewMainBDFS == nil, "Discrepancy, new Main BDFS should already have been saved.")
-				if !imported.isEmpty {
-					return checkAccountsAccessToMnemonic(state: state)
-				}
-			}
 			return .none
 
 		case let .npsSurvey(.delegate(.feedbackFilled(userFeedback))):
@@ -392,39 +348,6 @@ public struct Home: Sendable, FeatureReducer {
 
 		state.showNextDestination()
 		return effect ?? .none
-	}
-
-	private func dismissAccountDetails(then internalAction: InternalAction, _ state: inout State) -> Effect<Action> {
-		state.destination = nil
-		return delayedMediumEffect(internal: internalAction)
-	}
-
-	private func importMnemonics(state: inout State) -> Effect<Action> {
-		state.destination = .importMnemonics(.init())
-		return .none
-	}
-
-	private func exportMnemonic(controlling account: Account, state: inout State) -> Effect<Action> {
-		exportMnemonic(
-			controlling: account,
-			onSuccess: {
-				state.destination = .exportMnemonic(.export(
-					$0,
-					title: L10n.RevealSeedPhrase.title,
-					context: .fromBackupPrompt
-				))
-			}
-		)
-	}
-
-	private func loadShouldWriteDownPersonasSeedPhrase() -> Effect<Action> {
-		.run { send in
-			@Dependency(\.personasClient) var personasClient
-			for try await shouldBackup in await personasClient.shouldWriteDownSeedPhraseForSomePersonaSequence() {
-				guard !Task.isCancelled else { return }
-				await send(.internal(.loadedShouldWriteDownPersonasSeedPhrase(shouldBackup)))
-			}
-		}
 	}
 
 	public func loadGateways() -> Effect<Action> {
@@ -485,6 +408,15 @@ public struct Home: Sendable, FeatureReducer {
 			for try await accountsTotalFiatWorth in accountsTotalFiatWorth.removeDuplicates() {
 				guard !Task.isCancelled else { return }
 				await send(.internal(.accountsFiatWorthLoaded(accountsTotalFiatWorth)))
+			}
+		}
+	}
+
+	private func securityProblemsEffect() -> Effect<Action> {
+		.run { send in
+			for try await problems in await securityCenterClient.problems() {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.setSecurityProblems(problems)))
 			}
 		}
 	}

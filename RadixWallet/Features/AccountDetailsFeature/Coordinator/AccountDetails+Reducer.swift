@@ -6,6 +6,8 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, AccountWithInfoHolder {
 		public var accountWithInfo: AccountWithInfo
 		var assets: AssetsView.State
+		var securityProblemsConfig: EntitySecurityProblemsView.Config
+		fileprivate var problems: [SecurityProblem] = []
 		var showFiatWorth: Bool
 
 		@PresentationState
@@ -21,6 +23,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 				account: accountWithInfo.account,
 				mode: .normal
 			)
+			self.securityProblemsConfig = .init(kind: .account(accountWithInfo.account.address), problems: problems)
 		}
 	}
 
@@ -30,11 +33,8 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case preferencesButtonTapped
 		case transferButtonTapped
 		case historyButtonTapped
-
-		case exportMnemonicButtonTapped
-		case importMnemonicButtonTapped
-
 		case showFiatWorthToggled
+		case securityProblemsTapped
 	}
 
 	@CasePathable
@@ -44,17 +44,11 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
-		case exportMnemonic(controlling: Account)
-		case importMnemonics
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case accountUpdated(Account)
-	}
-
-	public struct MnemonicWithPassphraseAndFactorSourceInfo: Sendable, Hashable {
-		public let mnemonicWithPassphrase: MnemonicWithPassphrase
-		public let factorSourceKind: FactorSourceKind
+		case setSecurityProblems([SecurityProblem])
 	}
 
 	public struct Destination: DestinationReducer {
@@ -68,6 +62,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			case stakeUnitDetails(LSUDetails.State)
 			case stakeClaimDetails(NonFungibleTokenDetails.State)
 			case poolUnitDetails(PoolUnitDetails.State)
+			case securityCenter(SecurityCenter.State)
 		}
 
 		@CasePathable
@@ -80,6 +75,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			case stakeUnitDetails(LSUDetails.Action)
 			case stakeClaimDetails(NonFungibleTokenDetails.Action)
 			case poolUnitDetails(PoolUnitDetails.Action)
+			case securityCenter(SecurityCenter.Action)
 		}
 
 		public var body: some Reducer<State, Action> {
@@ -107,6 +103,9 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			Scope(state: \.poolUnitDetails, action: \.poolUnitDetails) {
 				PoolUnitDetails()
 			}
+			Scope(state: \.securityCenter, action: \.securityCenter) {
+				SecurityCenter()
+			}
 		}
 	}
 
@@ -116,11 +115,12 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.dappInteractionClient) var dappInteractionClient
+	@Dependency(\.securityCenterClient) var securityCenterClient
 
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.assets, action: /Action.child .. ChildAction.assets) {
+		Scope(state: \.assets, action: \.child.assets) {
 			AssetsView()
 		}
 		Reduce(core)
@@ -140,6 +140,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 					await send(.internal(.accountUpdated(accountUpdate)))
 				}
 			}
+			.merge(with: securityProblemsEffect())
 
 		case .backButtonTapped:
 			return .send(.delegate(.dismiss))
@@ -163,16 +164,14 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 			return .none
 
-		case .exportMnemonicButtonTapped:
-			return .send(.delegate(.exportMnemonic(controlling: state.account)))
-
-		case .importMnemonicButtonTapped:
-			return .send(.delegate(.importMnemonics))
-
 		case .showFiatWorthToggled:
 			return .run { _ in
 				try await appPreferencesClient.toggleIsCurrencyAmountVisible()
 			}
+
+		case .securityProblemsTapped:
+			state.destination = .securityCenter(.init())
+			return .none
 		}
 	}
 
@@ -180,17 +179,16 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .accountUpdated(account):
 			state.account = account
-			checkAccountAccessToMnemonic(state: &state)
+			return .none
+		case let .setSecurityProblems(problems):
+			state.problems = problems
+			state.securityProblemsConfig.update(problems: problems)
 			return .none
 		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case .assets(.internal(.portfolioUpdated)):
-			checkAccountAccessToMnemonic(state: &state)
-			return .none
-
 		case let .assets(.delegate(.selected(selection))):
 			switch selection {
 			case let .fungible(resource, isXrd):
@@ -255,11 +253,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	private func checkAccountAccessToMnemonic(state: inout State) {
-		let xrdResource = state.assets.resources.fungibleTokenList?.sections[id: .xrd]?.rows.first?.token
-		state.checkAccountAccessToMnemonic(xrdResource: xrdResource)
-	}
-
 	private func sendStakeClaimTransaction(
 		_ acccountAddress: AccountAddress,
 		stakeClaims: [StakeClaim]
@@ -273,6 +266,15 @@ public struct AccountDetails: Sendable, FeatureReducer {
 				.transaction(.init(send: .init(transactionManifest: manifest))),
 				.accountTransfer
 			)
+		}
+	}
+
+	private func securityProblemsEffect() -> Effect<Action> {
+		.run { send in
+			for try await problems in await securityCenterClient.problems() {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.setSecurityProblems(problems)))
+			}
 		}
 	}
 }

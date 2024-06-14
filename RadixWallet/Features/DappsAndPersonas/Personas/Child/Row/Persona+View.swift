@@ -21,21 +21,15 @@ extension PersonaFeature {
 					Card {
 						viewStore.send(.tapped)
 					} contents: {
-						VStack {
+						VStack(spacing: .zero) {
 							PlainListRow(title: viewStore.displayName) {
 								Thumbnail(.persona, url: viewStore.thumbnail)
 							}
-							if showShield, viewStore.shouldWriteDownMnemonic {
-								shieldPromptView(
-									text: L10n.Personas.writeSeedPhrase,
-									action: {
-										viewStore.send(.writeDownSeedPhrasePromptTapped)
-									}
-								)
-								.background(.app.gray2)
-								.cornerRadius(.small2)
+							if showShield {
+								EntitySecurityProblemsView(config: viewStore.securityProblemsConfig) {
+									viewStore.send(.securityProblemsTapped)
+								}
 								.padding(.horizontal, .medium3)
-								.padding(.vertical, .small2)
 							}
 						}
 					}
@@ -72,6 +66,6 @@ struct Persona_Preview: PreviewProvider {
 }
 
 extension PersonaFeature.State {
-	public static let previewValue: Self = .init(persona: .previewValue0)
+	public static let previewValue: Self = .init(persona: .previewValue0, problems: [])
 }
 #endif

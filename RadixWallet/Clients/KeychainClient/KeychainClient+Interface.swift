@@ -17,6 +17,10 @@ public struct KeychainClient: Sendable {
 	public var _removeAllItems: RemoveAllItems
 	public var _getAllKeysMatchingAttributes: GetAllKeysMatchingAttributes
 
+	/// This a _best effort_ publisher that will emit a change every time the Keychain is changed due to actions inside the Wallet app.
+	/// However, we cannot detect external changes (e.g. Keychain getting wiped when passcode is deleted).
+	public var _keychainChanged: KeychainChanged
+
 	public init(
 		getServiceAndAccessGroup: @escaping GetServiceAndAccessGroup,
 		containsDataForKey: @escaping ContainsDataForKey,
@@ -28,7 +32,8 @@ public struct KeychainClient: Sendable {
 		getDataWithAuthForKey: @escaping GetDataWithAuthForKey,
 		removeDataForKey: @escaping RemoveDataForKey,
 		removeAllItems: @escaping RemoveAllItems,
-		getAllKeysMatchingAttributes: @escaping GetAllKeysMatchingAttributes
+		getAllKeysMatchingAttributes: @escaping GetAllKeysMatchingAttributes,
+		keychainChanged: @escaping KeychainChanged
 	) {
 		self._getServiceAndAccessGroup = getServiceAndAccessGroup
 		self._containsDataForKey = containsDataForKey
@@ -41,6 +46,7 @@ public struct KeychainClient: Sendable {
 		self._removeDataForKey = removeDataForKey
 		self._removeAllItems = removeAllItems
 		self._getAllKeysMatchingAttributes = getAllKeysMatchingAttributes
+		self._keychainChanged = keychainChanged
 	}
 }
 
@@ -86,6 +92,8 @@ extension KeychainClient {
 		(synchronizable: Bool?,
 		 accessibility: KeychainAccess.Accessibility?)
 	) -> [Key]
+
+	public typealias KeychainChanged = @Sendable () -> AnyAsyncSequence<Void>
 }
 
 // MARK: - KeychainAttributes
@@ -140,6 +148,10 @@ extension KeychainClient {
 }
 
 extension KeychainClient {
+	public func keychainChanged() -> AnyAsyncSequence<Void> {
+		_keychainChanged()
+	}
+
 	public func serviceAndAccessGroup() -> KeychainServiceAndAccessGroup {
 		_getServiceAndAccessGroup()
 	}
