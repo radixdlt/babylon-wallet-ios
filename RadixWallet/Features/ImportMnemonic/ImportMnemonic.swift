@@ -299,16 +299,18 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 	}
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case backupConfirmation(AlertState<Action.BackupConfirmation>)
 			case onContinueWarning(AlertState<Action.OnContinueWarning>)
 			case verifyMnemonic(VerifyMnemonic.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case backupConfirmation(BackupConfirmation)
-			case verifyMnemonic(VerifyMnemonic.Action)
 			case onContinueWarning(OnContinueWarning)
+			case verifyMnemonic(VerifyMnemonic.Action)
 
 			public enum BackupConfirmation: Sendable, Hashable {
 				case userHasBackedUp
@@ -321,7 +323,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		}
 
 		public var body: some Reducer<State, Action> {
-			Scope(state: /State.verifyMnemonic, action: /Action.verifyMnemonic) {
+			Scope(state: \.verifyMnemonic, action: \.verifyMnemonic) {
 				VerifyMnemonic()
 			}
 		}

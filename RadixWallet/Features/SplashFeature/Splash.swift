@@ -145,12 +145,9 @@ public struct Splash: Sendable, FeatureReducer {
 
 	func delegateCompleted() -> Effect<Action> {
 		.run { send in
-			let profile = await onboardingClient.unlockApp()
 			await send(.delegate(
-				.completed(
-					profile
-				))
-			)
+				.completed(ProfileStore.shared.profile)
+			))
 		}
 	}
 

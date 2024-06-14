@@ -5,7 +5,6 @@ import SwiftUI
 // MARK: - ProfileSelection
 public struct ProfileSelection: Sendable, Hashable {
 	public let profile: Profile
-	public let isInCloud: Bool
 	public let containsP2PLinks: Bool
 }
 
@@ -22,22 +21,23 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 	}
 
 	public struct Path: Sendable, Hashable, Reducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case selectBackup(SelectBackup.State)
 			case importMnemonicsFlow(ImportMnemonicsFlowCoordinator.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case selectBackup(SelectBackup.Action)
 			case importMnemonicsFlow(ImportMnemonicsFlowCoordinator.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.selectBackup, action: /Action.selectBackup) {
+			Scope(state: \.selectBackup, action: \.selectBackup) {
 				SelectBackup()
 			}
-
-			Scope(state: /State.importMnemonicsFlow, action: /Action.importMnemonicsFlow) {
+			Scope(state: \.importMnemonicsFlow, action: \.importMnemonicsFlow) {
 				ImportMnemonicsFlowCoordinator()
 			}
 		}
@@ -47,6 +47,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 		case delayedAppendToPath(RestoreProfileFromBackupCoordinator.Path.State)
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case root(Path.Action)
 		case path(StackActionOf<Path>)
@@ -59,7 +60,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 		case profileCreatedFromImportedBDFS
 	}
 
-	@Dependency(\.backupsClient) var backupsClient
+	@Dependency(\.transportProfileClient) var transportProfileClient
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.continuousClock) var clock
@@ -68,12 +69,12 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.root, action: /Action.child .. ChildAction.root) {
+		Scope(state: \.root, action: \.child.root) {
 			Path()
 		}
 
 		Reduce(core)
-			.forEach(\.path, action: /Action.child .. ChildAction.path) {
+			.forEach(\.path, action: \.child.path) {
 				Path()
 			}
 	}
@@ -88,8 +89,8 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .root(.selectBackup(.delegate(.selectedProfile(profile, isInCloud, containsLegacyP2PLinks)))):
-			state.profileSelection = .init(profile: profile, isInCloud: isInCloud, containsP2PLinks: containsLegacyP2PLinks)
+		case let .root(.selectBackup(.delegate(.selectedProfile(profile, containsLegacyP2PLinks)))):
+			state.profileSelection = .init(profile: profile, containsP2PLinks: containsLegacyP2PLinks)
 
 			return .run { send in
 				try? await clock.sleep(for: .milliseconds(300))
@@ -112,11 +113,11 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 			}
 			return .run { send in
 				loggerGlobal.notice("Importing snapshot...")
-				try await backupsClient.importSnapshot(
-					profileSelection.profile,
-					fromCloud: profileSelection.isInCloud,
-					containsP2PLinks: profileSelection.containsP2PLinks
+
+				let factorSourceIDs: Set<FactorSourceIDFromHash> = .init(
+					profileSelection.profile.factorSources.compactMap { $0.extract(DeviceFactorSource.self) }.map(\.id)
 				)
+				try await transportProfileClient.importProfile(profileSelection.profile, factorSourceIDs, profileSelection.containsP2PLinks)
 
 				if let notYetSavedNewMainBDFS {
 					try await factorSourcesClient.saveNewMainBDFS(notYetSavedNewMainBDFS)

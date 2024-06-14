@@ -8,7 +8,6 @@ extension AppPreferencesClient: TestDependencyKey {
 		updatePreferences: unimplemented("\(Self.self).updatePreferences"),
 		extractProfile: unimplemented("\(Self.self).extractProfile"),
 		deleteProfileAndFactorSources: unimplemented("\(Self.self).deleteProfileAndFactorSources"),
-		setIsCloudProfileSyncEnabled: unimplemented("\(Self.self).setIsCloudProfileSyncEnabled"),
 		setIsCloudBackupEnabled: unimplemented("\(Self.self).setIsCloudBackupEnabled")
 	)
 }
@@ -20,7 +19,6 @@ extension AppPreferencesClient {
 		updatePreferences: { _ in },
 		extractProfile: { fatalError() },
 		deleteProfileAndFactorSources: { _ in },
-		setIsCloudProfileSyncEnabled: { _ in },
 		setIsCloudBackupEnabled: { _ in }
 	)
 }

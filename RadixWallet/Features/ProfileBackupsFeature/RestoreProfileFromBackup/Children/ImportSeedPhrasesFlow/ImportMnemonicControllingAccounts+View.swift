@@ -107,28 +107,18 @@ private extension View {
 	}
 
 	private func importMnemonic(with destinationStore: PresentationStoreOf<ImportMnemonicControllingAccounts.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /ImportMnemonicControllingAccounts.Destination.State.importMnemonic,
-			action: ImportMnemonicControllingAccounts.Destination.Action.importMnemonic,
-			content: {
-				ImportMnemonic.View(store: $0)
-					.radixToolbar(title: L10n.EnterSeedPhrase.Header.title, alwaysVisible: false)
-					.inNavigationView
-			}
-		)
+		sheet(store: destinationStore.scope(state: \.importMnemonic, action: \.importMnemonic)) { store in
+			ImportMnemonic.View(store: store)
+				.radixToolbar(title: L10n.EnterSeedPhrase.Header.title, alwaysVisible: false)
+				.inNavigationStack
+		}
 	}
 
 	private func confirmSkippingBDFS(with destinationStore: PresentationStoreOf<ImportMnemonicControllingAccounts.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /ImportMnemonicControllingAccounts.Destination.State.confirmSkippingBDFS,
-			action: ImportMnemonicControllingAccounts.Destination.Action.confirmSkippingBDFS,
-			content: {
-				ConfirmSkippingBDFS.View(store: $0)
-					.inNavigationStack
-			}
-		)
+		sheet(store: destinationStore.scope(state: \.confirmSkippingBDFS, action: \.confirmSkippingBDFS)) {
+			ConfirmSkippingBDFS.View(store: $0)
+				.inNavigationStack
+		}
 	}
 }
 

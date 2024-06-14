@@ -44,7 +44,7 @@ private extension StoreOf<Main> {
 	}
 
 	var home: StoreOf<Home> {
-		scope(state: \.home) { .child(.home($0)) }
+		scope(state: \.home, action: \.child.home)
 	}
 }
 
@@ -52,12 +52,9 @@ private extension StoreOf<Main> {
 private extension View {
 	func destinations(with store: StoreOf<Main>) -> some View {
 		let destinationStore = store.destination
-		return navigationDestination(
-			store: destinationStore,
-			state: /Main.Destination.State.settings,
-			action: Main.Destination.Action.settings,
-			destination: { Settings.View(store: $0) }
-		)
+		return navigationDestination(store: destinationStore.scope(state: \.settings, action: \.settings)) {
+			Settings.View(store: $0)
+		}
 	}
 }
 

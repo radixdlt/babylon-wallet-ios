@@ -134,7 +134,7 @@ private extension [SecurityProblem] {
 	}
 }
 
-private extension ProblematicAddresses {
+private extension AddressesOfEntitiesInBadState {
 	var problematicAccounts: Set<AccountAddress> {
 		Set(accounts + hiddenAccounts)
 	}

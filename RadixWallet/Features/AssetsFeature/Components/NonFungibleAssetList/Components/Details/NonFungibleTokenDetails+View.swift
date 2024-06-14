@@ -315,7 +315,6 @@ private extension GatewayAPI.ProgrammaticScryptoSborValue {
 		switch self {
 		case .array, .map, .mapEntry, .tuple:
 			.complex
-
 		case let .bool(content):
 			.primitive(String(content.value))
 		case let .bytes(content):

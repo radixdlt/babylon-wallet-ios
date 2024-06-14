@@ -157,6 +157,7 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 				candidate,
 				fromPartial: state.value.text
 			)))
+
 		case let .textFieldFocused(field):
 			state.focusedField = field
 			return field == nil ? .send(.delegate(.lostFocus(displayText: state.value.text))) : .none

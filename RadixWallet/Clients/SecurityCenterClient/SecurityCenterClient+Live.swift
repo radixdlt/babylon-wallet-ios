@@ -43,73 +43,73 @@ extension SecurityCenterClient {
 
 		@Sendable
 		func statusValues(results: AnyAsyncSequence<BackupResult?>) async -> AnyAsyncSequence<BackupStatus?> {
-			await combineLatest(profileStore.values(), results.prepend(nil)).map { profile, backup in
-				guard let backup else { return nil }
-				let upToDate = backup.profileHash == profile.hashValue
-				let success = backup.result == .success
-				return .init(backupDate: backup.backupDate, upToDate: upToDate, success: success)
+			await combineLatest(profileStore.values(), results.prepend(nil))
+				.map { profile, backup in
+					backup.map { BackupStatus(result: $0, profile: profile) }
+				}
+				.eraseToAnyAsyncSequence()
+		}
+
+		let problemsSubject = AsyncCurrentValueSubject<[SecurityProblem]>([])
+
+		@Sendable
+		func startMonitoring() async throws {
+			let profileValues = await profileStore.values()
+			let entitiesInBadState = try await deviceFactorSourceClient.entitiesInBadState()
+			let backupValues = await combineLatest(cloudBackups(), manualBackups()).map { (cloud: $0, manual: $1) }
+
+			for try await (profile, entitiesInBadState, backups) in combineLatest(profileValues, entitiesInBadState, backupValues) {
+				let isCloudProfileSyncEnabled = profile.appPreferences.security.isCloudProfileSyncEnabled
+
+				func hasProblem3() async -> AddressesOfEntitiesInBadState? {
+					entitiesInBadState.unrecoverable.isEmpty ? nil : entitiesInBadState.unrecoverable
+				}
+
+				func hasProblem5() -> Bool {
+					if isCloudProfileSyncEnabled, let cloudBackup = backups.cloud {
+						cloudBackup.result.failed
+					} else {
+						false
+					}
+				}
+
+				func hasProblem6() -> Bool {
+					!isCloudProfileSyncEnabled && backups.manual == nil
+				}
+
+				func hasProblem7() -> Bool {
+					!isCloudProfileSyncEnabled && backups.manual?.isCurrent == false
+				}
+
+				func hasProblem9() async -> AddressesOfEntitiesInBadState? {
+					entitiesInBadState.withoutControl.isEmpty ? nil : entitiesInBadState.withoutControl
+				}
+
+				var result: [SecurityProblem] = []
+
+				if let addresses = await hasProblem3() {
+					result.append(.problem3(addresses: addresses))
+				}
+
+				if let addresses = await hasProblem9() {
+					result.append(.problem9(addresses: addresses))
+				}
+				if hasProblem5() { result.append(.problem5) }
+				if hasProblem6() { result.append(.problem6) }
+				if hasProblem7() { result.append(.problem7) }
+
+				problemsSubject.send(result)
 			}
-			.eraseToAnyAsyncSequence()
 		}
 
 		return .init(
+			startMonitoring: startMonitoring,
 			problems: { type in
-				let profiles = await profileStore.values()
-				let cloudBackups = await cloudBackups()
-				let manualBackups = await manualBackups()
-
-				return combineLatest(profiles, cloudBackups, manualBackups).map { profile, cloudBackup, manualBackup in
-					let isCloudProfileSyncEnabled = profile.appPreferences.security.isCloudProfileSyncEnabled
-
-					let problematic = try? await deviceFactorSourceClient.problematicEntities()
-
-					func hasProblem3() async -> ProblematicAddresses? {
-						guard let problematic, !problematic.unrecoverable.isEmpty else { return nil }
-						return problematic.unrecoverable
-					}
-
-					func hasProblem5() -> Bool {
-						if isCloudProfileSyncEnabled, let cloudBackup {
-							!cloudBackup.success
-						} else {
-							false // FIXME: GK - is this what we want?
-						}
-					}
-
-					func hasProblem6() -> Bool {
-						!isCloudProfileSyncEnabled && manualBackup == nil
-					}
-
-					func hasProblem7() -> Bool {
-						!isCloudProfileSyncEnabled && manualBackup?.upToDate == false
-					}
-
-					func hasProblem9() async -> ProblematicAddresses? {
-						guard let problematic, !problematic.mnemonicMissing.isEmpty else { return nil }
-						return problematic.mnemonicMissing
-					}
-
-					var result: [SecurityProblem] = []
-
-					if type == nil || type == .securityFactors {
-						if let addresses = await hasProblem3() {
-							result.append(.problem3(addresses: addresses))
-						}
-
-						if let addresses = await hasProblem9() {
-							result.append(.problem9(addresses: addresses))
-						}
-					}
-
-					if type == nil || type == .configurationBackup {
-						if hasProblem5() { result.append(.problem5) }
-						if hasProblem6() { result.append(.problem6) }
-						if hasProblem7() { result.append(.problem7) }
-					}
-
-					return result
-				}
-				.eraseToAnyAsyncSequence()
+				problemsSubject
+					.share()
+					.map { $0.filter { type == nil || $0.type == type } }
+					.removeDuplicates()
+					.eraseToAnyAsyncSequence()
 			},
 			lastManualBackup: manualBackups,
 			lastCloudBackup: cloudBackups
@@ -117,7 +117,7 @@ extension SecurityCenterClient {
 	}
 }
 
-private extension ProblematicAddresses {
+private extension AddressesOfEntitiesInBadState {
 	var isEmpty: Bool {
 		accounts.count + hiddenAccounts.count + personas.count == 0
 	}

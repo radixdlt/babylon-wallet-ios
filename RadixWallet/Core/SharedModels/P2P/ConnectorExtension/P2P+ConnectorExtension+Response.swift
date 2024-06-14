@@ -163,7 +163,6 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 			self.response = try decodeResponse {
 				Success.signChallenge($0)
 			}
-
 		case .deriveAndDisplayAddress:
 			self.response = try decodeResponse {
 				Success.deriveAndDisplayAddress($0)

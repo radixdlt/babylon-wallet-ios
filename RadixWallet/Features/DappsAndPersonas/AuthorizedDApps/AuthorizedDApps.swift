@@ -113,9 +113,11 @@ public struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 		case let .loadedDapps(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
+
 		case let .presentDappDetails(presentedDappState):
 			state.destination = .presentedDapp(presentedDappState)
 			return .none
+
 		case let .loadedThumbnail(thumbnail, dApp: id):
 			state.thumbnails[id] = thumbnail
 			return .none

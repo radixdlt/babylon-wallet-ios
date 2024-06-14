@@ -243,28 +243,17 @@ private extension View {
 	}
 
 	private func backupConfirmation(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination>) -> some View {
-		alert(
-			store: destinationStore,
-			state: /ImportMnemonic.Destination.State.backupConfirmation,
-			action: ImportMnemonic.Destination.Action.backupConfirmation
-		)
-	}
-
-	private func verifyMnemonic(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /ImportMnemonic.Destination.State.verifyMnemonic,
-			action: ImportMnemonic.Destination.Action.verifyMnemonic,
-			destination: { VerifyMnemonic.View(store: $0) }
-		)
+		alert(store: destinationStore.scope(state: \.backupConfirmation, action: \.backupConfirmation))
 	}
 
 	private func onContinueWarning(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination>) -> some View {
-		alert(
-			store: destinationStore,
-			state: /ImportMnemonic.Destination.State.onContinueWarning,
-			action: ImportMnemonic.Destination.Action.onContinueWarning
-		)
+		alert(store: destinationStore.scope(state: \.onContinueWarning, action: \.onContinueWarning))
+	}
+
+	private func verifyMnemonic(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.verifyMnemonic, action: \.verifyMnemonic)) {
+			VerifyMnemonic.View(store: $0)
+		}
 	}
 }
 

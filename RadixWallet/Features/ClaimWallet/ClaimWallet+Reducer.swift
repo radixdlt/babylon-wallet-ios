@@ -4,17 +4,13 @@ import SwiftUI
 // MARK: - NewConnectionApproval
 public struct ClaimWallet: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var isLoading: Bool
+		public var isLoading: Bool = false
 
 		public var screenState: ControlState {
 			isLoading ? .loading(.global(text: nil)) : .enabled
 		}
 
-		public init(
-			isLoading: Bool = false
-		) {
-			self.isLoading = isLoading
-		}
+		public init() {}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -24,7 +20,7 @@ public struct ClaimWallet: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case didClearWallet
-		case didTransferBack
+		case transferBack
 	}
 
 	@Dependency(\.resetWalletClient) var resetWalletClient
@@ -34,13 +30,13 @@ public struct ClaimWallet: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .clearWalletButtonTapped:
-			.run { send in
+			state.isLoading = true
+			return .run { send in
 				await resetWalletClient.resetWallet()
 				await send(.delegate(.didClearWallet))
 			}
 		case .transferBackButtonTapped:
-			// TODO: transfer back
-			.send(.delegate(.didTransferBack))
+			return .send(.delegate(.transferBack))
 		}
 	}
 }

@@ -47,6 +47,7 @@ extension TransactionFailure {
 			case .failedToSignIntentWithAccountSigners, .failedToSignSignedCompiledIntentWithNotarySigner, .failedToConvertNotarySignature, .failedToConvertAccountSignatures:
 				(errorKind: .failedToSignTransaction, message: nil)
 			}
+
 		case .failedToSubmit:
 			(errorKind: .failedToSubmitTransaction, message: nil)
 

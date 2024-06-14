@@ -61,6 +61,7 @@ extension TransactionReview {
 		switch summary.detailedManifestClass {
 		case nil:
 			return nil
+
 		case .general, .transfer:
 			if summary.detailedManifestClass == .general {
 				guard !summary.deposits.isEmpty || !summary.withdrawals.isEmpty else { return nil }

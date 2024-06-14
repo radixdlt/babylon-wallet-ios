@@ -95,7 +95,11 @@ public struct PersonaList: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .personasLoaded(personas):
+		case var .personasLoaded(personas):
+			personas.mutateAll { persona in
+				persona.securityProblemsConfig.update(problems: state.problems)
+			}
+
 			state.personas = personas
 			return .none
 

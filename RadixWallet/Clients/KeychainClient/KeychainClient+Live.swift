@@ -63,9 +63,13 @@ extension KeychainClient: DependencyKey {
 				)
 				.compactMap {
 					NonEmptyString(rawValue: $0)
-				}.compactMap {
+				}
+				.compactMap {
 					Key(rawValue: $0)
 				}
+			},
+			keychainChanged: {
+				keychainHolder.keychainChanged
 			}
 		)
 	}

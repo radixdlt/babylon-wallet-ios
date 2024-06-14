@@ -12,6 +12,7 @@ final class KeychainHolder: @unchecked Sendable {
 	private let keychain: Keychain
 	private let service: String
 	private let accessGroup: String?
+	private let keychainChangedSubject = AsyncPassthroughSubject<Void>()
 
 	private init() {
 		self.keychain = Keychain(service: keychainService)
@@ -25,6 +26,10 @@ extension KeychainHolder {
 	typealias Label = KeychainClient.Label
 	typealias Comment = KeychainClient.Comment
 	typealias AuthenticationPrompt = KeychainClient.AuthenticationPrompt
+
+	public var keychainChanged: AnyAsyncSequence<Void> {
+		keychainChangedSubject.eraseToAnyAsyncSequence()
+	}
 
 	public func getServiceAndAccessGroup() -> (service: String, accessGroup: String?) {
 		(service, accessGroup)
@@ -70,6 +75,7 @@ extension KeychainHolder {
 	) throws {
 		try withAttributes(of: attributes)
 			.set(data, key: key.rawValue.rawValue)
+		keychainChangedSubject.send(())
 	}
 
 	func setDataWithAuth(
@@ -79,6 +85,7 @@ extension KeychainHolder {
 	) throws {
 		try withAttributes(of: attributes)
 			.set(data, key: key.rawValue.rawValue)
+		keychainChangedSubject.send(())
 	}
 
 	func getDataWithoutAuth(
@@ -130,10 +137,12 @@ extension KeychainHolder {
 		forKey key: Key
 	) throws {
 		try keychain.remove(key.rawValue.rawValue)
+		keychainChangedSubject.send(())
 	}
 
 	func removeAllItems() throws {
 		try keychain.removeAll()
+		keychainChangedSubject.send(())
 	}
 }
 

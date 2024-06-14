@@ -4,9 +4,6 @@ public struct AppPreferencesClient: Sendable {
 	public var getPreferences: GetPreferences
 	public var updatePreferences: UpdatePreferences
 
-	/// Needs special treatment since this setting involves Keychain and iCloud
-	public var setIsCloudProfileSyncEnabled: SetIsCloudProfileSyncEnabled
-
 	/// Sets the flag on the profile, does not delete old backups
 	public var setIsCloudBackupEnabled: SetIsCloudBackupEnabled
 
@@ -21,7 +18,6 @@ public struct AppPreferencesClient: Sendable {
 		updatePreferences: @escaping UpdatePreferences,
 		extractProfile: @escaping ExtractProfile,
 		deleteProfileAndFactorSources: @escaping DeleteProfile,
-		setIsCloudProfileSyncEnabled: @escaping SetIsCloudProfileSyncEnabled,
 		setIsCloudBackupEnabled: @escaping SetIsCloudBackupEnabled
 	) {
 		self.appPreferenceUpdates = appPreferenceUpdates
@@ -29,7 +25,6 @@ public struct AppPreferencesClient: Sendable {
 		self.updatePreferences = updatePreferences
 		self.extractProfile = extractProfile
 		self.deleteProfileAndFactorSources = deleteProfileAndFactorSources
-		self.setIsCloudProfileSyncEnabled = setIsCloudProfileSyncEnabled
 		self.setIsCloudBackupEnabled = setIsCloudBackupEnabled
 	}
 }
@@ -37,7 +32,6 @@ public struct AppPreferencesClient: Sendable {
 // MARK: - Typealias
 extension AppPreferencesClient {
 	public typealias AppPreferenceUpdates = @Sendable () async -> AnyAsyncSequence<AppPreferences>
-	public typealias SetIsCloudProfileSyncEnabled = @Sendable (Bool) async throws -> Void
 	public typealias SetIsCloudBackupEnabled = @Sendable (Bool) async throws -> Void
 	public typealias GetPreferences = @Sendable () async -> AppPreferences
 	public typealias UpdatePreferences = @Sendable (AppPreferences) async throws -> Void

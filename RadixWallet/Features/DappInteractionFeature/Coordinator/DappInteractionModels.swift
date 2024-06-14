@@ -127,7 +127,6 @@ extension P2P.Dapp.Request {
 				3
 			case .oneTimePersonaData:
 				4
-
 			// transactions
 			case .send:
 				0

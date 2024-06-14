@@ -219,6 +219,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		case let .canCreateAuthSigningKey(canCreateAuthSigningKey):
 			state.canCreateAuthSigningKey = canCreateAuthSigningKey
 			return .none
+
 		case let .canTurnIntoDappDefAccountType(canTurnIntoDappDefAccountType):
 			state.canTurnIntoDappDefinitionAccountType = canTurnIntoDappDefAccountType
 			return .none

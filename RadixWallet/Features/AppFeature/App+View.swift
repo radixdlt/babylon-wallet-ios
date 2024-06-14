@@ -12,7 +12,7 @@ extension App {
 		}
 
 		public var body: some SwiftUI.View {
-			SwitchStore(store.scope(state: \.root, action: Action.child)) { state in
+			SwitchStore(store.scope(state: \.root, action: \.child)) { state in
 				switch state {
 				case .main:
 					CaseLet(
@@ -38,6 +38,9 @@ extension App {
 			}
 			.tint(.app.gray1)
 			.presentsLoadingViewOverlay()
+			.task { @MainActor in
+				await store.send(.view(.task)).finish()
+			}
 		}
 	}
 }

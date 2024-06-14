@@ -89,12 +89,9 @@ private extension StoreOf<ManualAccountRecoverySeedPhrase> {
 private extension View {
 	func destinations(with store: StoreOf<ManualAccountRecoverySeedPhrase>) -> some View {
 		let destinationStore = store.destination
-		return navigationDestination(
-			store: destinationStore,
-			state: /ManualAccountRecoverySeedPhrase.Destination.State.importMnemonic,
-			action: ManualAccountRecoverySeedPhrase.Destination.Action.importMnemonic,
-			destination: { ImportMnemonic.View(store: $0) }
-		)
+		return navigationDestination(store: destinationStore.scope(state: \.importMnemonic, action: \.importMnemonic)) {
+			ImportMnemonic.View(store: $0)
+		}
 	}
 }
 

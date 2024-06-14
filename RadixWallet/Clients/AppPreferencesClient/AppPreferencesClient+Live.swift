@@ -20,20 +20,6 @@ extension AppPreferencesClient: DependencyKey {
 			deleteProfileAndFactorSources: { keepInICloudIfPresent in
 				try await profileStore.deleteProfile(keepInICloudIfPresent: keepInICloudIfPresent)
 			},
-			setIsCloudProfileSyncEnabled: { isEnabled in
-				@Dependency(\.secureStorageClient) var secureStorageClient
-				let profile = await profileStore.profile
-				let wasEnabled = profile.appPreferences.security.isCloudProfileSyncEnabled
-				guard wasEnabled != isEnabled else { return }
-
-				try await profileStore.updating { profile in
-					profile.appPreferences.security.isCloudProfileSyncEnabled = isEnabled
-				}
-				try secureStorageClient.updateIsCloudProfileSyncEnabled(
-					profile.id,
-					isEnabled ? .enable : .disable
-				)
-			},
 			setIsCloudBackupEnabled: { isEnabled in
 				let profile = await profileStore.profile
 				let wasEnabled = profile.appPreferences.security.isCloudProfileSyncEnabled
@@ -46,6 +32,5 @@ extension AppPreferencesClient: DependencyKey {
 		)
 	}
 
-	public typealias Value = AppPreferencesClient
 	public static let liveValue: Self = .live()
 }

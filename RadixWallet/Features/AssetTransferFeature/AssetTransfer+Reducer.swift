@@ -268,7 +268,6 @@ func needsSignatureForDepositting(
 		return false
 	case (.acceptAll, .deny):
 		return true
-
 	// Accept Known
 	case (.acceptKnown, .allow):
 		return false
@@ -283,7 +282,6 @@ func needsSignatureForDepositting(
 		return !hasResource
 	case (.acceptKnown, .deny):
 		return true
-
 	// DenyAll
 	case (.denyAll, .none):
 		return true

@@ -52,6 +52,7 @@ extension P2P.RTCIncomingMessageContainer {
 		case let (.failure(lhsFailure), .failure(rhsFailure)):
 			// FIXME: strongly type messages? to an Error type which is Hashable?
 			return String(describing: lhsFailure) == String(describing: rhsFailure)
+
 		case let (.success(lhsSuccess), .success(rhsSuccess)):
 			return lhsSuccess == rhsSuccess
 

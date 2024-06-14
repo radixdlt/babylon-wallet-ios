@@ -11,14 +11,12 @@ extension OnboardingClient: TestDependencyKey {
 	public static let previewValue = Self.noop
 
 	public static let testValue = Self(
-		unlockApp: unimplemented("\(Self.self).unlockApp"),
 		loadProfile: unimplemented("\(Self.self).loadProfile"),
 		finishOnboarding: unimplemented("\(Self.self).finishOnboarding"),
 		finishOnboardingWithRecoveredAccountAndBDFS: unimplemented("\(Self.self).finishOnboardingWithRecoveredAccountAndBDFS")
 	)
 
 	public static let noop = Self(
-		unlockApp: { fatalError("noop") },
 		loadProfile: { fatalError("noop") },
 		finishOnboarding: { EqVoid.instance },
 		finishOnboardingWithRecoveredAccountAndBDFS: { _ in EqVoid.instance }

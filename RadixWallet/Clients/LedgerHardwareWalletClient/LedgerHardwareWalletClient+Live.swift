@@ -50,7 +50,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					switch errorFromConnectorExtension.code {
 					case .generic: break
 					case .blindSigningNotEnabledButRequired:
-						overlayWindowClient.scheduleAlertIgnoreAction(
+						overlayWindowClient.scheduleAlertAndIgnoreAction(
 							.init(
 								title: {
 									TextState(L10n.LedgerHardwareDevices.CouldNotSign.title)
