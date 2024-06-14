@@ -122,26 +122,6 @@ extension DappInteractionClient {
 			break
 		}
 
-//		if case let .request(readRequest) = nonValidated.items {
-//			switch readRequest {
-//			case let .authorized(authorized):
-//				if authorized.oneTimeAccounts?.numberOfAccounts.isValid == false {
-//					return invalidRequest(.badContent(.numberOfAccountsInvalid))
-//				}
-//				if authorized.ongoingAccounts?.numberOfAccounts.isValid == false {
-//					return invalidRequest(.badContent(.numberOfAccountsInvalid))
-//				}
-//			case let .unauthorized(unauthorized):
-//				if unauthorized.oneTimeAccounts?.numberOfAccounts.isValid == false {
-//					return invalidRequest(.badContent(.numberOfAccountsInvalid))
-//				}
-//			}
-//		}
-
-		//        guard let origin = try? DappOrigin(string: nonvalidatedMeta.origin.absoluteString) else {
-		//            return invalidRequest(.invalidOrigin(invalidURLString: nonvalidatedMeta.origin.absoluteString))
-//		}
-
 		let metadataValidDappDefAddress = DappToWalletInteractionMetadata(
 			version: nonvalidatedMeta.version,
 			networkId: nonvalidatedMeta.networkId,

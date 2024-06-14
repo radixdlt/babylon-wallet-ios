@@ -5,10 +5,6 @@ import SwiftUI
 enum DappInteraction {}
 
 // MARK: - DappMetadata
-// extension DappInteraction {
-//	typealias NumberOfAccounts = P2P.Dapp.Request.NumberOfAccounts
-// }
-
 /// Metadata for a dapp, either from a request or fetched from ledger.
 /// not to be confused with `DappToWalletInteractionMetadata` which is the
 /// associated value of one of the cases of this enum.
@@ -89,7 +85,7 @@ extension DappMetadata {
 #if DEBUG
 extension DappMetadata {
 	static let previewValue: Self = try! .ledger(.init(
-		origin: .wallet, // .init(string: "https://radfi.com"),
+		origin: .init(string: "https://radfi.com")!,
 		dAppDefinintionAddress: .init(validatingAddress: "account_tdx_b_1p95nal0nmrqyl5r4phcspg8ahwnamaduzdd3kaklw3vqeavrwa"),
 		name: "Collabo.Fi",
 		description: "A very collaby finance dapp",
