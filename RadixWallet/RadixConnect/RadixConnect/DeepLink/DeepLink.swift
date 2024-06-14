@@ -22,15 +22,39 @@ public actor Mobile2Mobile {
 		incomingMessagesSubject.share().eraseToAnyAsyncSequence()
 	}
 
-	func handleRequest(_ request: RadixConnectMobileConnectRequest) async throws {
-		switch request {
-		case let .link(linkingRequest):
-			try await linkDapp(linkingRequest)
-		case let .dappInteraction(request):
-			try await handleDeepLinkRequest(request)
-		case let .dappInteractionContained(request):
-			incomingMessagesSubject.send(.init(result: .success(.request(.dapp(request.request))), route: .deepLink(request.sessionId)))
+	func handleRequest(_ request: URL) async throws {
+		let result = try await radixConnectMobile.handleDeepLink(url: request.absoluteString)
+
+		if result.originRequiresValidation {
+			let dAppOrigin = result.origin
+			let wellKnown = await (try? fetchWellKnown(dAppOrigin: result.origin)) ?? HTTPClient.WellKnownFileResponse(dApps: [.init(dAppDefinitionAddress: .wallet)], callbackPath: nil)
+			let dAppMetadata: DappMetadata = try await {
+				guard let dappDefinitionAddress = wellKnown.dApps.first?.dAppDefinitionAddress else {
+					struct MissingDappDefinitionAddress: Error {}
+					throw MissingDappDefinitionAddress()
+				}
+
+				do {
+					return try await getDAppMetadata(dappDefinitionAddress, origin: dAppOrigin)
+				} catch {
+					if await appPreferencesClient.isDeveloperModeEnabled() {
+						return DappMetadata.deepLink(.init(origin: dAppOrigin, dAppDefAddress: dappDefinitionAddress))
+					}
+
+					throw error
+				}
+			}()
+
+			let userAction = await overlayWindowClient.scheduleLinkingDapp(dAppMetadata)
+
+			guard case .primaryButtonTapped = userAction else {
+				return
+			}
+
+			try await radixConnectMobile.requestOriginVerified(sessionId: result.sessionId)
 		}
+
+		incomingMessagesSubject.send(.init(result: .success(.request(.dapp(result.interaction))), route: .deepLink(result.sessionId)))
 	}
 }
 
@@ -68,45 +92,6 @@ extension Mobile2Mobile {
 		try await httpClient.fetchDappWellKnownFile(dAppOrigin)
 	}
 
-	func linkDapp(_ request: RadixConnectMobileLinkRequest) async throws {
-		let dAppOrigin = request.origin
-		let wellKnown = await (try? fetchWellKnown(dAppOrigin: dAppOrigin)) ?? HTTPClient.WellKnownFileResponse(dApps: [.init(dAppDefinitionAddress: .wallet)], callbackPath: nil)
-
-		let dAppMetadata: DappMetadata = try await {
-			guard let dappDefinitionAddress = wellKnown.dApps.first?.dAppDefinitionAddress else {
-				struct MissingDappDefinitionAddress: Error {}
-				throw MissingDappDefinitionAddress()
-			}
-
-			do {
-				return try await getDAppMetadata(dappDefinitionAddress, origin: dAppOrigin)
-			} catch {
-				if await appPreferencesClient.isDeveloperModeEnabled() {
-					return DappMetadata.deepLink(.init(origin: dAppOrigin, dAppDefAddress: dappDefinitionAddress))
-				}
-
-				throw error
-			}
-		}()
-
-		let result = await overlayWindowClient.scheduleLinkingDapp(dAppMetadata)
-
-		guard case .primaryButtonTapped = result else {
-			return
-		}
-
-		let returnURL = try await radixConnectMobile.handleLinkingRequest(request: request, devMode: true)
-
-		switch request.browser.lowercased() {
-		case "chrome":
-			await openURL(URL(string: returnURL.absoluteString.replacingOccurrences(of: "https://", with: "googlechromes://"))!)
-		case "firefox":
-			await openURL(URL(string: "firefox://open-url?url=\(returnURL.absoluteString)")!)
-		default:
-			await openURL(returnURL)
-		}
-	}
-
 	func sendResponse(
 		_ response: P2P.RTCOutgoingMessage.Response,
 		sessionId: SessionId
@@ -120,12 +105,6 @@ extension Mobile2Mobile {
 				)
 			)
 		}
-	}
-
-	func handleDeepLinkRequest(_ request: RadixConnectMobileDappRequest) async throws {
-		let receivedRequest = try await radixConnectMobile.handleDappInteractionRequest(dappRequest: request)
-
-		incomingMessagesSubject.send(.init(result: .success(.request(.dapp(receivedRequest.interaction))), route: .deepLink(request.sessionId)))
 	}
 }
 

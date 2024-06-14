@@ -22,7 +22,8 @@ extension P2P {
 
 extension P2P.RTCMessageFromPeer.Request {
 	public init(from decoder: Decoder) throws {
-		self = try .dapp(.init(from: decoder))
+		let str = try decoder.singleValueContainer().decode(String.self)
+		self = try .dapp(.init(jsonString: str))
 	}
 }
 

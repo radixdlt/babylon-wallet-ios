@@ -34,6 +34,7 @@ public struct App: Sendable, FeatureReducer {
 	@CasePathable
 	public enum ViewAction: Sendable, Equatable {
 		case task
+		case urlOpened(URL)
 	}
 
 	@CasePathable
@@ -49,10 +50,6 @@ public struct App: Sendable, FeatureReducer {
 		case main(Main.Action)
 		case onboardingCoordinator(OnboardingCoordinator.Action)
 		case splash(Splash.Action)
-	}
-
-	public enum ViewAction: Sendable, Equatable {
-		case urlOpened(URL)
 	}
 
 	@Dependency(\.continuousClock) var clock
@@ -90,13 +87,13 @@ public struct App: Sendable, FeatureReducer {
 				deepLinkHandlerClient.addDeepLink(url)
 			case .onboardingCoordinator:
 				deepLinkHandlerClient.addDeepLink(url)
-				overlayWindowClient.scheduleAlertIgnoreAction(.init(title: { TextState("dApp Request") }, message: {
+				overlayWindowClient.scheduleAlertAndIgnoreAction(.init(title: { TextState("dApp Request") }, message: {
 					TextState("You can proceed with this request after you create or restore your Radix Wallet.")
 				}))
 			}
 			return .none
 		case .task:
-			didResetWalletEffect()
+			return didResetWalletEffect()
 		}
 	}
 
@@ -142,7 +139,7 @@ public struct App: Sendable, FeatureReducer {
 	private func goToOnboarding(state: inout State) -> Effect<Action> {
 		state.root = .onboardingCoordinator(.init())
 		if deepLinkHandlerClient.hasDeepLink() {
-			overlayWindowClient.scheduleAlertIgnoreAction(.init(title: { TextState("dApp Request") }, message: {
+			overlayWindowClient.scheduleAlertAndIgnoreAction(.init(title: { TextState("dApp Request") }, message: {
 				TextState("You can proceed with this request after you create or restore your Radix Wallet.")
 			}))
 		}

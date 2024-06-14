@@ -42,15 +42,7 @@ struct LinkingToDapp: FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			guard state.autoDismissEnabled else {
-				return .none
-			}
-			return .run { send in
-				for await tick in continuousClock.timer(interval: .milliseconds(100)) {
-					await send(.internal(.timerTick))
-				}
-			}
-			.cancellable(id: state.cancellationId, cancelInFlight: true)
+			return .none
 
 		case .continueTapped:
 			userDefaults.setDappLinkingAutoContinueEnabled(state.autoDismissSelection)
@@ -96,27 +88,15 @@ extension LinkingToDapp {
 						subtitle: "\(viewStore.dAppMetadata.name) is requesting verification"
 					)
 
-					Text("**\(viewStore.dAppMetadata.name)** wants to make requests to your Radix Wallet. Click Continue to verify the identity of this dApp and proceed with the request.")
+					Text("**\(viewStore.dAppMetadata.name)** from **\(viewStore.dAppMetadata.origin.absoluteString)** wants to make requests to your Radix Wallet. Click Continue to confirm the identity of this dApp and proceed with the request.")
 						.textStyle(.body1HighImportance)
 
 					Spacer()
 
-					if !viewStore.autoDismissEnabled {
-						ToggleView(
-							title: "Auto Confirm",
-							subtitle: "Auto confirm next dApp verification requests",
-							isOn: viewStore.binding(
-								get: \.autoDismissSelection,
-								send: { .autoDismissEnabled($0) }
-							)
-						)
-						.textStyle(.body1HighImportance)
-
-						Button(L10n.DAppRequest.Login.continue) {
-							viewStore.send(.continueTapped)
-						}
-						.buttonStyle(.primaryRectangular)
+					Button(L10n.DAppRequest.Login.continue) {
+						viewStore.send(.continueTapped)
 					}
+					.buttonStyle(.primaryRectangular)
 				}
 				.padding(.horizontal, .medium1)
 				.padding(.vertical, .medium1)

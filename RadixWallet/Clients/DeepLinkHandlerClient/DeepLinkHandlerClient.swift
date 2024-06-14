@@ -32,9 +32,8 @@ extension DeepLinkHandlerClient {
 					state.bufferedDeepLink = nil
 					loggerGlobal.error("\(url.absoluteString)")
 					do {
-						let request = try newMobileConnectRequest(url: url.absoluteString)
 						Task {
-							try await radixConnectClient.handleDappDeepLink(request)
+							try await radixConnectClient.handleDappDeepLink(url)
 						}
 					} catch {
 						errorQueue.schedule(error)

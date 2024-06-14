@@ -168,9 +168,9 @@ extension RadixConnectClient {
 			sendRequest: { request, strategy in
 				try await rtcClients.sendRequest(request, strategy: strategy)
 			},
-			handleDappDeepLink: { request in
+			handleDappDeepLink: { url in
 				do {
-					try await m2m.handleRequest(request)
+					try await m2m.handleRequest(url)
 				} catch {
 					loggerGlobal.error("Failed to handle deep link \(error)")
 					errorQueue.schedule(error)

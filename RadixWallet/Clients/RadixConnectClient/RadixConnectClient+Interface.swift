@@ -69,5 +69,5 @@ extension RadixConnectClient {
 	public typealias SendResponse = @Sendable (_ response: P2P.RTCOutgoingMessage.Response, _ origin: P2P.Route) async throws -> Void
 
 	public typealias ConnectToP2PLinks = @Sendable (P2PLinks) async throws -> Void
-	public typealias HandleDappDeepLink = @Sendable (RadixConnectMobileConnectRequest) async throws -> Void
+	public typealias HandleDappDeepLink = @Sendable (URL) async throws -> Void
 }
