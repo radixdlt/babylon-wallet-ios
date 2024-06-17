@@ -42,7 +42,10 @@ extension AppDelegate: AppsFlyerLibDelegate {
 // MARK: DeepLinkDelegate
 extension AppDelegate: DeepLinkDelegate {
 	public func didResolveDeepLink(_ result: DeepLinkResult) {
-		print("M- did resolve deep link: \(String(describing: result.deepLink))")
-		DebugInfo.shared.add("did resolve deep link: \(String(describing: result.deepLink))")
+		if let deepLink = result.deepLink {
+			DebugInfo.shared.add("did resolve deep link: \(deepLink)")
+		} else {
+			DebugInfo.shared.add("fail to resolve deep link: \(result.error?.localizedDescription ?? "no error")")
+		}
 	}
 }
