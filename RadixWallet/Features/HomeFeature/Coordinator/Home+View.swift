@@ -50,6 +50,7 @@ extension Home {
 						}
 
 						VStack(spacing: .medium3) {
+							Text(DebugInfo.shared.content)
 							ForEachStore(
 								store.scope(
 									state: \.accountRows,
