@@ -8503,7 +8503,7 @@
 			repositoryURL = "https://github.com/radixdlt/sargon";
 			requirement = {
 				kind = exactVersion;
-				version = 1.0.11;
+				version = 1.0.12;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

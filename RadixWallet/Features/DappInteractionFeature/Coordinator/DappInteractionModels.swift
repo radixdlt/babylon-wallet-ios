@@ -22,7 +22,7 @@ public enum DappMetadata: Sendable, Hashable {
 extension DappMetadata {
 	static let wallet: Wallet = .init()
 	public struct Wallet: Sendable, Hashable {
-		let origin: DappToWalletInteractionMetadata.Origin = .wallet
+		let origin: DappOrigin = .wallet
 		let name: NonEmptyString = "Radix Wallet"
 		let description: String? = nil
 		let thumbnail: URL? = nil
@@ -35,7 +35,7 @@ extension DappMetadata {
 	public struct Ledger: Sendable, Hashable, Codable {
 		static let defaultName = NonEmptyString(rawValue: L10n.DAppRequest.Metadata.unknownName)!
 
-		let origin: DappToWalletInteractionMetadata.Origin
+		let origin: DappOrigin
 
 		let dAppDefinintionAddress: DappDefinitionAddress
 		let name: NonEmptyString?
@@ -43,7 +43,7 @@ extension DappMetadata {
 		let thumbnail: URL?
 
 		init(
-			origin: DappToWalletInteractionMetadata.Origin,
+			origin: DappOrigin,
 			dAppDefinintionAddress: DappDefinitionAddress,
 			name: NonEmptyString?,
 			description: String? = nil,
@@ -59,7 +59,7 @@ extension DappMetadata {
 }
 
 extension DappMetadata {
-	public var origin: DappToWalletInteractionMetadata.Origin {
+	public var origin: DappOrigin {
 		switch self {
 		case let .ledger(metadata): metadata.origin
 		case let .request(metadata): metadata.origin
@@ -85,7 +85,7 @@ extension DappMetadata {
 #if DEBUG
 extension DappMetadata {
 	static let previewValue: Self = try! .ledger(.init(
-		origin: .init(string: "https://radfi.com")!,
+		origin: "https://radfi.com",
 		dAppDefinintionAddress: .init(validatingAddress: "account_tdx_b_1p95nal0nmrqyl5r4phcspg8ahwnamaduzdd3kaklw3vqeavrwa"),
 		name: "Collabo.Fi",
 		description: "A very collaby finance dapp",

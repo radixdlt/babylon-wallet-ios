@@ -21,7 +21,7 @@ final class ROLAClientTests: TestCase {
 		.init(
 			version: 1,
 			networkId: NetworkID.mainnet,
-			origin: .init(string: origin)!,
+			origin: origin,
 			dappDefinitionAddress: dAppDefinitionAddress
 		)
 	}
@@ -73,7 +73,7 @@ final class ROLAClientTests: TestCase {
 				let payload = try ROLAClient.payloadToHash(
 					challenge: .init(hex: vector.challenge),
 					dAppDefinitionAddress: .init(validatingAddress: vector.dAppDefinitionAddress),
-					origin: .init(string: vector.origin)!
+					origin: vector.origin
 				)
 				XCTAssertEqual(payload.hex, vector.payloadToHash)
 				let blakeHashOfPayload = payload.hash()
@@ -83,11 +83,11 @@ final class ROLAClientTests: TestCase {
 	}
 
 	func omit_test_generate_rola_payload_hash_vectors() throws {
-		let origins: [DappToWalletInteractionMetadata.Origin] = try [
+		let origins: [DappOrigin] = [
 			"https://dashboard.rdx.works",
 			"https://stella.swap",
 			"https://rola.xrd",
-		].map { try .init(string: $0)! }
+		]
 		let accounts: [DappDefinitionAddress] = try [
 			"account_sim1cyvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve475w0q",
 			"account_sim1cyzfj6p254jy6lhr237s7pcp8qqz6c8ahq9mn6nkdjxxxat5syrgz9",
@@ -97,15 +97,15 @@ final class ROLAClientTests: TestCase {
 			try accounts.flatMap { dAppDefinitionAddress -> [TestVector] in
 				try (UInt8.zero ..< 10).map { seed -> TestVector in
 					/// deterministic derivation of a challenge, this is not `blakeHashOfPayload`
-					let challenge = (Data((origin.absoluteString + dAppDefinitionAddress.address).utf8) + [seed]).hash()
-					let payload = try ROLAClient.payloadToHash(
+					let challenge = (Data((origin + dAppDefinitionAddress.address).utf8) + [seed]).hash()
+					let payload = ROLAClient.payloadToHash(
 						challenge: challenge.bytes,
 						dAppDefinitionAddress: dAppDefinitionAddress,
 						origin: origin
 					)
 					let blakeHashOfPayload = payload.hash()
 					return TestVector(
-						origin: origin.absoluteString,
+						origin: origin,
 						challenge: challenge.hex,
 						dAppDefinitionAddress: dAppDefinitionAddress.address,
 						payloadToHash: payload.hex,
@@ -130,7 +130,7 @@ final class ROLAClientTests: TestCase {
 			let payload = try ROLAClient.payloadToHash(
 				challenge: Exactly32Bytes(hex: "2596b7902d56a32d17ca90ce2a1ee0a18a9cac6a82fb9f186d904e4a3eeeb627"),
 				dAppDefinitionAddress: .init(validatingAddress: "account_rdx168fghy4kapzfnwpmq7t7753425lwklk65r82ys7pz2xzleehk2ap0k"),
-				origin: .init(string: "https://radix-dapp-toolkit-dev.rdx-works-main.extratools.works")!
+				origin: "https://radix-dapp-toolkit-dev.rdx-works-main.extratools.works"
 			)
 			return payload.hash()
 		}()

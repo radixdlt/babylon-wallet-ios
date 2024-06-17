@@ -1,15 +1,21 @@
 import Sargon
 
-// MARK: - DappToWalletInteractionMetadata.Origin
-extension DappToWalletInteractionMetadata {
-	public typealias Origin = URL
-}
+// MARK: - DappOrigin
+// extension DappToWalletInteractionMetadata {
+//	public typealias Origin = URL
+// }
 
-extension DappToWalletInteractionMetadata.Origin {
-	public static let wallet: Self = {
-		let walletAppScheme = "com.radixpublishing.radixwallet.ios"
-		return .init(string: walletAppScheme)!
-	}()
+extension DappOrigin {
+	public static let wallet = "com.radixpublishing.radixwallet.ios"
+
+	public struct InvalidOriginURL: Error {}
+
+	public func url() throws -> URL {
+		guard let url = URL(string: self) else {
+			throw InvalidOriginURL()
+		}
+		return url
+	}
 }
 
 // MARK: - DappInteractionNumberOfAccounts
