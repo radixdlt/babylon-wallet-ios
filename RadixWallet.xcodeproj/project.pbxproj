@@ -1075,6 +1075,8 @@
 		A4CFB55D2BA8CA3200778BDD /* TransactionHistory+TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4CFB55C2BA8CA3200778BDD /* TransactionHistory+TableView.swift */; };
 		A4CFB55F2BAA821E00778BDD /* HScrollBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4CFB55E2BAA821E00778BDD /* HScrollBar.swift */; };
 		A4CFB5612BAA826E00778BDD /* Measure+Position.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4CFB5602BAA826E00778BDD /* Measure+Position.swift */; };
+		A4DBBEB32C20305000D0A59E /* CardCarousel+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4DBBEB22C20305000D0A59E /* CardCarousel+Reducer.swift */; };
+		A4DBBEB52C20305700D0A59E /* CardCarousel+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4DBBEB42C20305700D0A59E /* CardCarousel+View.swift */; };
 		A4EB37C82B6272F3003FE31D /* TrackedValidatorInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4EB37C72B6272F3003FE31D /* TrackedValidatorInteraction.swift */; };
 		A4EBB5D62BD0777C00D05FDE /* ConfigurationBackup+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4EBB5D52BD0777C00D05FDE /* ConfigurationBackup+Reducer.swift */; };
 		A4EBB5D82BD0777F00D05FDE /* ConfigurationBackup+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4EBB5D72BD0777F00D05FDE /* ConfigurationBackup+View.swift */; };
@@ -2207,6 +2209,8 @@
 		A4CFB55C2BA8CA3200778BDD /* TransactionHistory+TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionHistory+TableView.swift"; sourceTree = "<group>"; };
 		A4CFB55E2BAA821E00778BDD /* HScrollBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HScrollBar.swift; sourceTree = "<group>"; };
 		A4CFB5602BAA826E00778BDD /* Measure+Position.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Measure+Position.swift"; sourceTree = "<group>"; };
+		A4DBBEB22C20305000D0A59E /* CardCarousel+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CardCarousel+Reducer.swift"; sourceTree = "<group>"; };
+		A4DBBEB42C20305700D0A59E /* CardCarousel+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CardCarousel+View.swift"; sourceTree = "<group>"; };
 		A4EB37C72B6272F3003FE31D /* TrackedValidatorInteraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackedValidatorInteraction.swift; sourceTree = "<group>"; };
 		A4EBB5D52BD0777C00D05FDE /* ConfigurationBackup+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConfigurationBackup+Reducer.swift"; sourceTree = "<group>"; };
 		A4EBB5D72BD0777F00D05FDE /* ConfigurationBackup+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConfigurationBackup+View.swift"; sourceTree = "<group>"; };
@@ -2506,6 +2510,7 @@
 		48CFBC602ADC10D800E77A5C /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				A4DBBEB12C20302B00D0A59E /* CardCarousel */,
 				E7AE2D082C05F22700830BAA /* ClaimWallet */,
 				A43F1E242BC96EF2001DD3FA /* SecurityCenterFeature */,
 				48D5F3972BD8DE0A000DE964 /* DebugInspectProfile */,
@@ -5880,6 +5885,15 @@
 			path = TransactionReviewDepositSetting;
 			sourceTree = "<group>";
 		};
+		A4DBBEB12C20302B00D0A59E /* CardCarousel */ = {
+			isa = PBXGroup;
+			children = (
+				A4DBBEB22C20305000D0A59E /* CardCarousel+Reducer.swift */,
+				A4DBBEB42C20305700D0A59E /* CardCarousel+View.swift */,
+			);
+			path = CardCarousel;
+			sourceTree = "<group>";
+		};
 		A4ECE2712BEEAFFC00468BF6 /* SecurityCenterClient */ = {
 			isa = PBXGroup;
 			children = (
@@ -6953,6 +6967,7 @@
 				48CFC57C2ADC10DA00E77A5C /* NonFungibleResourcesCollectionItem.swift in Sources */,
 				48CFC3F92ADC10D900E77A5C /* SignalingClientFactory.swift in Sources */,
 				48CFC3192ADC10D900E77A5C /* CreateAccountCoordinator+View.swift in Sources */,
+				A4DBBEB32C20305000D0A59E /* CardCarousel+Reducer.swift in Sources */,
 				48CFC4CA2ADC10DA00E77A5C /* OpenISO8601DateFormatter.swift in Sources */,
 				48CFC2492ADC10D900E77A5C /* ResourcesList+View.swift in Sources */,
 				4813AFE22BC9A9AD0046BCAD /* Stage1MigrateToSargon+NetworkDefinition.swift in Sources */,
@@ -6987,6 +7002,7 @@
 				48CFC2C22ADC10D900E77A5C /* ChooseReceivingAccount+View.swift in Sources */,
 				48CFC3862ADC10D900E77A5C /* DetailsContainerWithHeaderView.swift in Sources */,
 				48CFC2862ADC10D900E77A5C /* SubmitTransaction.swift in Sources */,
+				A4DBBEB52C20305700D0A59E /* CardCarousel+View.swift in Sources */,
 				48CFC53B2ADC10DA00E77A5C /* ValidatorCollectionItemActiveInEpoch.swift in Sources */,
 				E6A98FA82AE15324003953E2 /* BuildConfiguration.swift in Sources */,
 				48CFC2C62ADC10D900E77A5C /* MessageMode+Reducer.swift in Sources */,
