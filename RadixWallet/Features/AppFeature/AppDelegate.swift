@@ -1,6 +1,8 @@
+import AppsFlyerLib
 import ComposableArchitecture
 import SwiftUI
 
+// MARK: - AppDelegate
 public final class AppDelegate: NSObject, UIApplicationDelegate {
 	public func application(
 		_ application: UIApplication,
@@ -14,8 +16,33 @@ public final class AppDelegate: NSObject, UIApplicationDelegate {
 
 	public func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
 		@Dependency(\.appsFlyerClient) var appsFlyerClient
+
+		AppsFlyerLib.shared().delegate = self
+		AppsFlyerLib.shared().deepLinkDelegate = self
+
 		appsFlyerClient.start()
 
 		return true
+	}
+}
+
+// MARK: AppsFlyerLibDelegate
+extension AppDelegate: AppsFlyerLibDelegate {
+	public func onConversionDataSuccess(_ conversionInfo: [AnyHashable: Any]) {
+		// Invoked when conversion data resolution succeeds
+		DebugInfo.shared.add("onConversionDataSuccess \(conversionInfo)")
+	}
+
+	public func onConversionDataFail(_ error: any Error) {
+		// Invoked when conversion data resolution fails
+		DebugInfo.shared.add("onConversionDataFail")
+	}
+}
+
+// MARK: DeepLinkDelegate
+extension AppDelegate: DeepLinkDelegate {
+	public func didResolveDeepLink(_ result: DeepLinkResult) {
+		print("M- did resolve deep link: \(String(describing: result.deepLink))")
+		DebugInfo.shared.add("did resolve deep link: \(String(describing: result.deepLink))")
 	}
 }
