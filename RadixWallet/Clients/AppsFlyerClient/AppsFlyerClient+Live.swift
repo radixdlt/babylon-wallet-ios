@@ -1,5 +1,6 @@
 import AppsFlyerLib
 
+// MARK: - AppsFlyerClient + DependencyKey
 extension AppsFlyerClient: DependencyKey {
 	static var liveValue: AppsFlyerClient {
 		@Dependency(\.sensitiveInfoClient) var sensitiveInfoClient
@@ -22,5 +23,13 @@ extension AppsFlyerClient: DependencyKey {
 				AppsFlyerLib.shared().start()
 			}
 		)
+	}
+}
+
+extension URL {
+	// TODO: Implement better solution
+	var isAppsFlyerUrl: Bool {
+		guard let host = host() else { return false }
+		return host.contains("onelink.me")
 	}
 }

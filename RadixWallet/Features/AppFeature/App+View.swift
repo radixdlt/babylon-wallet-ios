@@ -1,3 +1,4 @@
+import AppsFlyerLib
 import ComposableArchitecture
 import SwiftUI
 
@@ -42,8 +43,12 @@ extension App {
 				await store.send(.view(.task)).finish()
 			}
 			.onOpenURL { url in
-				print("M- Url: \(url.absoluteString)")
-				DebugInfo.shared.add("onOpenUrl: \(url.absoluteString)")
+				if url.isAppsFlyerUrl {
+					DebugInfo.shared.add("Will resolve url with AF")
+					AppsFlyerLib.shared().handleOpen(url)
+				} else {
+					// Handle deeplinks that don't come from AppsFlyer
+				}
 			}
 		}
 	}

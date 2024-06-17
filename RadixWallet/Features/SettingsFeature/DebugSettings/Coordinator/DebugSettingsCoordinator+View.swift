@@ -9,8 +9,7 @@ class DebugInfo {
 	private init() {}
 
 	func add(_ msg: String) {
-		content.append(msg)
-		content.append("\n")
+		content.append("\n🆕 \(msg)")
 	}
 }
 
