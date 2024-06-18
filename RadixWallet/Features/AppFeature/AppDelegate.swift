@@ -36,6 +36,12 @@ public final class AppDelegate: NSObject, UIApplicationDelegate {
 		AppsFlyerLib.shared().handleOpen(url, options: options)
 		return true
 	}
+
+	public func application(_ application: UIApplication, open url: URL, sourceApplication: String?, annotation: Any) -> Bool {
+		DebugInfo.shared.add("AppsFlyierLib.handleOpen called \(url.absoluteString)")
+		AppsFlyerLib.shared().handleOpen(url, sourceApplication: sourceApplication, withAnnotation: annotation)
+		return true
+	}
 }
 
 // MARK: AppsFlyerLibDelegate
@@ -57,7 +63,7 @@ extension AppDelegate: DeepLinkDelegate {
 		if let deepLink = result.deepLink {
 			DebugInfo.shared.add("did resolve deep link: \(deepLink)\nClick events: \(deepLink.clickEvent)")
 		} else if let error = result.error {
-			DebugInfo.shared.add("fail to resolve deep link: \(error.localizedDescription)")
+			DebugInfo.shared.add("fail to resolve deep link. Status: \(result.status), Error: \(error)")
 		}
 	}
 }

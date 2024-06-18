@@ -11,14 +11,15 @@ extension AppsFlyerClient: DependencyKey {
 					let devKey = sensitiveInfoClient.read(.appsFlyerDevKey),
 					let appId = sensitiveInfoClient.read(.appsFlyerAppId)
 				else {
+					loggerGlobal.info("Skipping AppsFlyer start as keys are missing")
 					return
 				}
 				AppsFlyerLib.shared().appsFlyerDevKey = devKey
 				AppsFlyerLib.shared().appleAppID = appId
 
-				#if DEBUG
+//				#if DEBUG
 				AppsFlyerLib.shared().isDebug = true
-				#endif
+//				#endif
 
 				DebugInfo.shared.add("AppsFlyerLib started")
 				AppsFlyerLib.shared().start()

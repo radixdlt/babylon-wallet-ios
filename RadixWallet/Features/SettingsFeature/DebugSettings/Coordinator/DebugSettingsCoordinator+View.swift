@@ -10,6 +10,7 @@ class DebugInfo {
 
 	func add(_ msg: String) {
 		content.append("\n🆕 \(msg)")
+		loggerGlobal.info("🆕 \(msg)")
 	}
 }
 
