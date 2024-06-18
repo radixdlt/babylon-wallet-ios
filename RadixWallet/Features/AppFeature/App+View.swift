@@ -1,4 +1,3 @@
-import AppsFlyerLib
 import ComposableArchitecture
 import SwiftUI
 
@@ -41,14 +40,6 @@ extension App {
 			.presentsLoadingViewOverlay()
 			.task { @MainActor in
 				await store.send(.view(.task)).finish()
-			}
-			.onOpenURL { url in
-				if url.isAppsFlyerUrl {
-					DebugInfo.shared.add("Will resolve url with AF")
-					AppsFlyerLib.shared().handleOpen(url)
-				} else {
-					// Handle deeplinks that don't come from AppsFlyer
-				}
 			}
 		}
 	}

@@ -27,11 +27,3 @@ extension AppsFlyerClient: DependencyKey {
 		)
 	}
 }
-
-extension URL {
-	// TODO: Implement better solution
-	var isAppsFlyerUrl: Bool {
-		guard let host = host() else { return false }
-		return host.contains("onelink.me")
-	}
-}

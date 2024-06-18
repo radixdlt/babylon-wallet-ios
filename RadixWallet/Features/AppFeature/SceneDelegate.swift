@@ -1,3 +1,4 @@
+import AppsFlyerLib
 import ComposableArchitecture
 import SwiftUI
 
@@ -17,6 +18,20 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 			!_XCTIsTesting
 		{
 			overlayWindow(in: windowScene)
+		}
+	}
+
+	public func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+		DebugInfo.shared.add("[SceneDelegate] AppsFlyerLib.continue called")
+		AppsFlyerLib.shared().continue(userActivity, restorationHandler: nil)
+	}
+
+	public func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+		if let url = URLContexts.first?.url {
+			DebugInfo.shared.add("[SceneDelegate] AppsFlyierLib.handleOpen called \(url.absoluteString)")
+			AppsFlyerLib.shared().handleOpen(url)
+		} else {
+			DebugInfo.shared.add("[SceneDelegate] openURLContexts without url")
 		}
 	}
 
