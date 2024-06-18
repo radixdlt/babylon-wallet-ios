@@ -24,6 +24,17 @@ public final class AppDelegate: NSObject, UIApplicationDelegate {
 
 		return true
 	}
+
+	public func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([any UIUserActivityRestoring]?) -> Void) -> Bool {
+		AppsFlyerLib.shared().continue(userActivity, restorationHandler: nil)
+		return true
+	}
+
+	public func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
+		DebugInfo.shared.add("app open \(url.absoluteString)")
+		AppsFlyerLib.shared().handleOpen(url, options: options)
+		return true
+	}
 }
 
 // MARK: AppsFlyerLibDelegate
