@@ -20,6 +20,7 @@ extension AppsFlyerClient: DependencyKey {
 				AppsFlyerLib.shared().isDebug = true
 				#endif
 
+				DebugInfo.shared.add("AppsFlyerLib started")
 				AppsFlyerLib.shared().start()
 			}
 		)
