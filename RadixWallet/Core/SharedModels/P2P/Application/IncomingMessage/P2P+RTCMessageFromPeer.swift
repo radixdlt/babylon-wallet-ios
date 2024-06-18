@@ -14,16 +14,9 @@ extension P2P {
 			case connectorExtension(P2P.ConnectorExtension.Response)
 		}
 
-		public enum Request: Sendable, Hashable, Equatable, Decodable {
+		public enum Request: Sendable, Hashable, Equatable {
 			case dapp(DappToWalletInteractionUnvalidated)
 		}
-	}
-}
-
-extension P2P.RTCMessageFromPeer.Request {
-	public init(from decoder: Decoder) throws {
-		let str = try decoder.singleValueContainer().decode(String.self)
-		self = try .dapp(.init(jsonString: str))
 	}
 }
 

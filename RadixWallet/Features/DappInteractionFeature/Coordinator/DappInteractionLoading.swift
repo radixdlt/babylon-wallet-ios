@@ -65,7 +65,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 	func metadataLoadingEffect(with state: inout State) -> Effect<Action> {
 		state.isLoading = true
 
-		if state.interaction.metadata.origin == DappToWalletInteractionMetadata.Origin.wallet {
+		if state.interaction.metadata.origin == DappOrigin.wallet {
 			return .send(.internal(.dappMetadataLoadingResult(.success(.wallet(.init())))))
 		}
 
@@ -153,7 +153,7 @@ extension DappMetadata.Ledger {
 	init(
 		entityMetadataForDapp: GatewayAPI.EntityMetadataCollection,
 		dAppDefinintionAddress: AccountAddress,
-		origin: DappToWalletInteractionMetadata.Origin
+		origin: DappOrigin
 	) {
 		let items = entityMetadataForDapp.items
 		let maybeName: String? = items[.name]?.value.asString

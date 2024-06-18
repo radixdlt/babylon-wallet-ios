@@ -94,14 +94,14 @@ extension P2P.ConnectorExtension.Request {
 				public let signers: [P2P.LedgerHardwareWallet.KeyParameters]
 				public let ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
 				public let challenge: DappToWalletInteractionAuthChallengeNonce
-				public let origin: DappToWalletInteractionMetadata.Origin
+				public let origin: DappOrigin
 				public let dAppDefinitionAddress: AccountAddress
 
 				public init(
 					signers: [P2P.LedgerHardwareWallet.KeyParameters],
 					ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice,
 					challenge: DappToWalletInteractionAuthChallengeNonce,
-					origin: DappToWalletInteractionMetadata.Origin,
+					origin: DappOrigin,
 					dAppDefinitionAddress: AccountAddress
 				) {
 					self.signers = signers

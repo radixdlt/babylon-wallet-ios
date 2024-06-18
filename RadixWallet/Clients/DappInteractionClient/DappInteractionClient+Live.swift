@@ -33,9 +33,9 @@ extension DappInteractionClient: DependencyKey {
 							interactionId: interactionId,
 							items: items,
 							metadata: .init(
-								version: P2P.Dapp.currentVersion,
+								version: .current,
 								networkId: gatewaysClient.getCurrentNetworkID(),
-								origin: DappToWalletInteractionMetadata.Origin.wallet,
+								origin: .wallet,
 								dappDefinitionAddress: .wallet
 							)
 						))
@@ -87,8 +87,8 @@ extension DappInteractionClient {
 		}
 
 		let nonvalidatedMeta = nonValidated.metadata
-		guard P2P.Dapp.currentVersion == nonvalidatedMeta.version else {
-			return invalidRequest(.incompatibleVersion(connectorExtensionSent: nonvalidatedMeta.version, walletUses: P2P.Dapp.currentVersion))
+		guard WalletInteractionVersion.current == nonvalidatedMeta.version else {
+			return invalidRequest(.incompatibleVersion(connectorExtensionSent: nonvalidatedMeta.version, walletUses: .current))
 		}
 		let currentNetworkID = await gatewaysClient.getCurrentNetworkID()
 		guard currentNetworkID == nonValidated.metadata.networkId else {
@@ -119,26 +119,6 @@ extension DappInteractionClient {
 		default:
 			break
 		}
-
-//		if case let .request(readRequest) = nonValidated.items {
-//			switch readRequest {
-//			case let .authorized(authorized):
-//				if authorized.oneTimeAccounts?.numberOfAccounts.isValid == false {
-//					return invalidRequest(.badContent(.numberOfAccountsInvalid))
-//				}
-//				if authorized.ongoingAccounts?.numberOfAccounts.isValid == false {
-//					return invalidRequest(.badContent(.numberOfAccountsInvalid))
-//				}
-//			case let .unauthorized(unauthorized):
-//				if unauthorized.oneTimeAccounts?.numberOfAccounts.isValid == false {
-//					return invalidRequest(.badContent(.numberOfAccountsInvalid))
-//				}
-//			}
-//		}
-
-		//        guard let origin = try? DappOrigin(string: nonvalidatedMeta.origin.absoluteString) else {
-		//            return invalidRequest(.invalidOrigin(invalidURLString: nonvalidatedMeta.origin.absoluteString))
-//		}
 
 		let metadataValidDappDefAddress = DappToWalletInteractionMetadata(
 			version: nonvalidatedMeta.version,

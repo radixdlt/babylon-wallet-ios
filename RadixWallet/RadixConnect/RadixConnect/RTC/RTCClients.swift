@@ -438,11 +438,10 @@ func decode(
 		let jsonData = message.messageContent
 		// print(jsonData.prettyPrintedJSONString)
 		do {
-			let request = try jsonDecoder.decode(
-				P2P.RTCMessageFromPeer.Request.self,
-				from: jsonData
-			)
-			return .success(.request(request))
+			guard let jsonString = String(data: jsonData, encoding: .utf8) else {
+				throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Unable to convert data to UTF-8 string"))
+			}
+			return try .success(.request(.dapp(.init(jsonString: jsonString))))
 		} catch let decodeRequestError {
 			do {
 				let response = try jsonDecoder.decode(

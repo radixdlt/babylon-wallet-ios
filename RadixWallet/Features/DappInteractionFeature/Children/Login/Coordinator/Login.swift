@@ -6,7 +6,7 @@ import SwiftUI
 struct Login: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		let dappMetadata: DappMetadata
-		let loginRequest: DappToWalletInteractionAuthRequestItem // P2P.Dapp.Request.AuthLoginRequestItem
+		let loginRequest: DappToWalletInteractionAuthRequestItem
 
 		var personaPrimacy: PersonaPrimacy? = nil
 
@@ -21,7 +21,7 @@ struct Login: Sendable, FeatureReducer {
 
 		init(
 			dappMetadata: DappMetadata,
-			loginRequest: DappToWalletInteractionAuthRequestItem, // P2P.Dapp.Request.AuthLoginRequestItem
+			loginRequest: DappToWalletInteractionAuthRequestItem,
 			personaPrimacy: PersonaPrimacy? = nil
 		) {
 			self.dappMetadata = dappMetadata

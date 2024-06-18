@@ -28,7 +28,7 @@ extension P2P {
 
 	/// An incoming Dapp Request over RTC from some `route`, might have failed
 	/// or succeeded to receive and decode, which is why this contains a
-	/// `result` and not an `P2P.Dapp.Request` directly.
+	/// `result` and not an `DappToWalletInteraction` directly.
 	public typealias RTCIncomingDappNonValidatedRequest = RTCIncomingMessageContainer<DappToWalletInteractionUnvalidated>
 
 	/// An incoming message over RTC from some `route`, might have failed

@@ -29,12 +29,12 @@ extension DependencyValues {
 // MARK: - AuthenticationDataToSignForChallengeRequest
 public struct AuthenticationDataToSignForChallengeRequest: Sendable, Hashable {
 	public let challenge: DappToWalletInteractionAuthChallengeNonce
-	public let origin: DappToWalletInteractionMetadata.Origin
+	public let origin: DappOrigin
 	public let dAppDefinitionAddress: DappDefinitionAddress
 
 	public init(
 		challenge: DappToWalletInteractionAuthChallengeNonce,
-		origin: DappToWalletInteractionMetadata.Origin,
+		origin: DappOrigin,
 		dAppDefinitionAddress: DappDefinitionAddress
 	) {
 		self.challenge = challenge

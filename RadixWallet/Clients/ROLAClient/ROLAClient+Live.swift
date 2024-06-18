@@ -37,13 +37,13 @@ extension ROLAClient {
 			performDappDefinitionVerification: { metadata async throws in
 				_ = try await onLedgerEntitiesClient.getDappMetadata(
 					metadata.dappDefinitionAddress,
-					validatingWebsite: metadata.origin
+					validatingWebsite: metadata.origin.url()
 				)
 			},
 			performWellKnownFileCheck: { metadata async throws in
 				@Dependency(\.urlSession) var urlSession
 
-				let originURL = metadata.origin
+				let originURL = try metadata.origin.url()
 
 				let url = originURL.appending(path: Constants.wellKnownFilePath)
 
@@ -117,11 +117,10 @@ extension ROLAClient {
 	static func payloadToHash(
 		challenge: DappToWalletInteractionAuthChallengeNonce,
 		dAppDefinitionAddress accountAddress: AccountAddress,
-		origin metadataOrigin: DappToWalletInteractionMetadata.Origin
+		origin metadataOrigin: DappOrigin
 	) -> Data {
 		let rPrefix: UInt8 = 0x52
 		let dAppDefinitionAddress = accountAddress.address
-		let origin = metadataOrigin.absoluteString
 		precondition(dAppDefinitionAddress.count <= UInt8.max)
 		let challengeBytes = [UInt8](challenge.data.data)
 		let lengthDappDefinitionAddress = UInt8(dAppDefinitionAddress.count)
@@ -130,7 +129,7 @@ extension ROLAClient {
 		data.append(contentsOf: challengeBytes)
 		data.append(contentsOf: [lengthDappDefinitionAddress])
 		data.append(contentsOf: [UInt8](dAppDefinitionAddress.utf8))
-		data.append(contentsOf: [UInt8](origin.utf8))
+		data.append(contentsOf: [UInt8](metadataOrigin.utf8))
 
 		return Data(data)
 	}
