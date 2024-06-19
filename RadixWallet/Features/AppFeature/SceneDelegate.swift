@@ -11,7 +11,6 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 		options connectionOptions: UIScene.ConnectionOptions
 	) {
 		windowScene = scene as? UIWindowScene
-
 		if
 			let windowScene,
 			// avoids unimplemented("OverlayWindowClient.isUserInteractionEnabled")
