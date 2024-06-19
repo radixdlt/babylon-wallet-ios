@@ -4,6 +4,11 @@ import AppsFlyerLib
 extension AppsFlyerClient: DependencyKey {
 	static var liveValue: AppsFlyerClient {
 		@Dependency(\.sensitiveInfoClient) var sensitiveInfoClient
+		let state = State()
+
+		actor State {
+			let delegate = Delegate()
+		}
 
 		return .init(
 			start: {
@@ -17,13 +22,27 @@ extension AppsFlyerClient: DependencyKey {
 				AppsFlyerLib.shared().appsFlyerDevKey = devKey
 				AppsFlyerLib.shared().appleAppID = appId
 
-//				#if DEBUG
-				AppsFlyerLib.shared().isDebug = true
-//				#endif
+				AppsFlyerLib.shared().deepLinkDelegate = state.delegate
 
-				DebugInfo.shared.add("AppsFlyerLib started")
+				#if DEBUG
+				AppsFlyerLib.shared().isDebug = true
+				#endif
+
 				AppsFlyerLib.shared().start()
+			},
+			continue: { userActivity in
+				AppsFlyerLib.shared().continue(userActivity)
 			}
 		)
+	}
+
+	private class Delegate: NSObject, DeepLinkDelegate, @unchecked Sendable {
+		func didResolveDeepLink(_ result: DeepLinkResult) {
+			if let deepLink = result.deepLink {
+				print("M- did resolve deep link. Is deferred: \(deepLink.isDeferred). Click events: \(deepLink.clickEvent)")
+			} else if let error = result.error {
+				print("M- failed to resolve deep link. Status: \(result.status), Error: \(error)")
+			}
+		}
 	}
 }
