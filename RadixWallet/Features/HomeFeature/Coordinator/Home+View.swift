@@ -29,7 +29,7 @@ extension Home {
 			WithViewStore(store, observe: \.viewState) { viewStore in
 				ScrollView {
 					VStack(spacing: .medium1) {
-						HeaderView()
+						HeaderView(store: store)
 
 						if let fiatWorth = viewStore.totalFiatWorth {
 							VStack(spacing: .small2) {
@@ -99,21 +99,16 @@ extension Home {
 			}
 		}
 
-		private struct HeaderView: SwiftUI.View {
+		struct HeaderView: SwiftUI.View {
+			let store: StoreOf<Home>
+
 			var body: some SwiftUI.View {
 				VStack(alignment: .leading, spacing: .small2) {
 					Text(L10n.HomePage.title)
 						.foregroundColor(.app.gray1)
 						.textStyle(.sheetTitle)
 
-					HStack {
-						Text(L10n.HomePage.subtitle)
-							.foregroundColor(.app.gray2)
-							.textStyle(.body1HighImportance)
-							.lineLimit(2)
-
-						Spacer(minLength: 2 * .large1)
-					}
+					CardCarousel.View(store: store.scope(state: \.carousel, action: \.child.carousel))
 				}
 				.padding(.leading, .medium1)
 				.padding(.top, .small3)

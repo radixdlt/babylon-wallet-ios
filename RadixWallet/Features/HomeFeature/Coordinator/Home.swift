@@ -8,6 +8,8 @@ public struct Home: Sendable, FeatureReducer {
 
 	public struct State: Sendable, Hashable {
 		// MARK: - Components
+		public var carousel: CardCarousel.State = .init(cards: [.threeSixtyDegrees, .connect])
+
 		public var accountRows: IdentifiedArrayOf<Home.AccountRow.State> = []
 		fileprivate var problems: [SecurityProblem] = []
 
@@ -55,7 +57,6 @@ public struct Home: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		public typealias HasAccessToMnemonic = Bool
 		case accountsLoadedResult(TaskResult<Accounts>)
 		case currentGatewayChanged(to: Gateway)
 		case shouldShowNPSSurvey(Bool)
@@ -65,7 +66,9 @@ public struct Home: Sendable, FeatureReducer {
 		case setSecurityProblems([SecurityProblem])
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
+		case carousel(CardCarousel.Action)
 		case account(id: Home.AccountRow.State.ID, action: Home.AccountRow.Action)
 	}
 
@@ -131,6 +134,10 @@ public struct Home: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
+		Scope(state: \.carousel, action: \.child.carousel) {
+			CardCarousel()
+		}
+
 		Reduce(core)
 			.forEach(\.accountRows, action: /Action.child .. ChildAction.account) {
 				Home.AccountRow()
