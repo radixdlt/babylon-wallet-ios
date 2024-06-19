@@ -17,42 +17,39 @@ extension OnboardingStartup {
 extension OnboardingStartup.View {
 	public var body: some View {
 		NavigationStack {
-			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { _ in
-				ScrollView {
-					Text(DebugInfo.shared.content)
+			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+				VStack(spacing: 0) {
+					Text(L10n.Onboarding.Step1.title)
+						.foregroundColor(.app.gray1)
+						.textStyle(.sheetTitle)
+						.padding(.top, .large1)
+						.padding(.horizontal, .large1)
+						.padding(.bottom, .medium3)
+
+					Text(L10n.Onboarding.Step1.subtitle)
+						.foregroundColor(.app.gray2)
+						.textStyle(.secondaryHeader)
+						.padding(.horizontal, .huge3)
+
+					Spacer(minLength: 0)
+
+					SplashGraphic()
+
+					Spacer(minLength: 0)
 				}
-//				VStack(spacing: 0) {
-//					Text(L10n.Onboarding.Step1.title)
-//						.foregroundColor(.app.gray1)
-//						.textStyle(.sheetTitle)
-//						.padding(.top, .large1)
-//						.padding(.horizontal, .large1)
-//						.padding(.bottom, .medium3)
-//
-//					Text(L10n.Onboarding.Step1.subtitle)
-//						.foregroundColor(.app.gray2)
-//						.textStyle(.secondaryHeader)
-//						.padding(.horizontal, .huge3)
-//
-//					Spacer(minLength: 0)
-//
-//					SplashGraphic()
-//
-//					Spacer(minLength: 0)
-//				}
-//				.multilineTextAlignment(.center)
-//				.footer {
-//					Button(L10n.Onboarding.newUser) {
-//						viewStore.send(.selectedNewWalletUser)
-//					}
-//					.buttonStyle(.primaryRectangular)
-//					.padding(.bottom, .small2)
-//
-//					Button(L10n.Onboarding.restoreFromBackup) {
-//						viewStore.send(.selectedRestoreFromBackup)
-//					}
-//					.buttonStyle(.primaryText())
-//				}
+				.multilineTextAlignment(.center)
+				.footer {
+					Button(L10n.Onboarding.newUser) {
+						viewStore.send(.selectedNewWalletUser)
+					}
+					.buttonStyle(.primaryRectangular)
+					.padding(.bottom, .small2)
+
+					Button(L10n.Onboarding.restoreFromBackup) {
+						viewStore.send(.selectedRestoreFromBackup)
+					}
+					.buttonStyle(.primaryText())
+				}
 			}
 			.destinations(with: store)
 		}

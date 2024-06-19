@@ -1,19 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - DebugInfo
-class DebugInfo {
-	static let shared = DebugInfo()
-
-	private(set) var content = ""
-	private init() {}
-
-	func add(_ msg: String) {
-		content.append("\n🆕 \(msg)")
-		loggerGlobal.info("🆕 \(msg)")
-	}
-}
-
 // MARK: - DebugSettingsCoordinator.View
 extension DebugSettingsCoordinator {
 	public struct ViewState: Equatable {}
@@ -32,7 +19,6 @@ extension DebugSettingsCoordinator.View {
 	public var body: some View {
 		ScrollView {
 			VStack(spacing: .zero) {
-				Text(DebugInfo.shared.content)
 				ForEachStatic(rows) { kind in
 					SettingsRow(kind: kind, store: store)
 				}

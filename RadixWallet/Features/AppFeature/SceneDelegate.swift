@@ -1,4 +1,3 @@
-import AppsFlyerLib
 import ComposableArchitecture
 import SwiftUI
 
@@ -12,12 +11,6 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 		options connectionOptions: UIScene.ConnectionOptions
 	) {
 		windowScene = scene as? UIWindowScene
-
-		if let userActivity = connectionOptions.userActivities.first {
-			AppsFlyerLib.shared().continue(userActivity, restorationHandler: nil)
-		} else if let url = connectionOptions.urlContexts.first?.url {
-			AppsFlyerLib.shared().handleOpen(url, options: nil)
-		}
 
 		if
 			let windowScene,
