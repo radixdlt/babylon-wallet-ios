@@ -61,7 +61,7 @@ extension AppDelegate: AppsFlyerLibDelegate {
 extension AppDelegate: DeepLinkDelegate {
 	public func didResolveDeepLink(_ result: DeepLinkResult) {
 		if let deepLink = result.deepLink {
-			DebugInfo.shared.add("did resolve deep link: \(deepLink)\nClick events: \(deepLink.clickEvent)")
+			DebugInfo.shared.add("did resolve deep link: \(deepLink). Is deferred: \(deepLink.isDeferred)\nClick events: \(deepLink.clickEvent)")
 		} else if let error = result.error {
 			DebugInfo.shared.add("fail to resolve deep link. Status: \(result.status), Error: \(error)")
 		}
