@@ -166,8 +166,6 @@ struct OverlayReducer: Sendable, FeatureReducer {
 
 		case let .autodismissSheet(_, dAppMetadata):
 			state.destination = .linkDappSheet(.init(
-				dismissDelay: userDefaults.getDappLinkingDelay(),
-				autoDismissEnabled: userDefaults.getDappLinkingAutoContinueEnabled(),
 				dAppMetadata: dAppMetadata
 			))
 

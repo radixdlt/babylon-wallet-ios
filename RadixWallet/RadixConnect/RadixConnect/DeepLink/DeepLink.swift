@@ -26,8 +26,8 @@ public actor Mobile2Mobile {
 		let result = try await radixConnectMobile.handleDeepLink(url: request.absoluteString)
 
 		if result.originRequiresValidation {
-			let dAppOrigin = result.origin
-			let wellKnown = await (try? fetchWellKnown(dAppOrigin: result.origin)) ?? HTTPClient.WellKnownFileResponse(dApps: [.init(dAppDefinitionAddress: .wallet)], callbackPath: nil)
+			let dAppOrigin = URL(string: result.origin)!
+			let wellKnown = await (try? fetchWellKnown(dAppOrigin: dAppOrigin)) ?? HTTPClient.WellKnownFileResponse(dApps: [.init(dAppDefinitionAddress: .wallet)], callbackPath: nil)
 			let dAppMetadata: DappMetadata = try await {
 				guard let dappDefinitionAddress = wellKnown.dApps.first?.dAppDefinitionAddress else {
 					struct MissingDappDefinitionAddress: Error {}
@@ -80,7 +80,7 @@ extension Mobile2Mobile {
 				return try DappMetadata.Ledger(
 					entityMetadataForDapp: entityMetadataForDapp,
 					dAppDefinintionAddress: dappDefinitionAddress,
-					origin: .init(string: origin.absoluteString)!
+					origin: origin.absoluteString
 				)
 			}
 		)

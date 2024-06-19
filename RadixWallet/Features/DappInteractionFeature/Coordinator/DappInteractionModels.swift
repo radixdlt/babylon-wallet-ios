@@ -74,7 +74,7 @@ extension DappMetadata {
 		case let .ledger(metadata): metadata.origin
 		case let .request(metadata): metadata.origin
 		case let .wallet(metadata): metadata.origin
-		case let .deepLink(metadata): (try! .init(string: metadata.origin.absoluteString))!
+		case let .deepLink(metadata): .init(metadata.origin.absoluteString)
 		}
 	}
 
