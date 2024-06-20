@@ -48,12 +48,15 @@ extension CardCarousel {
 		let store: StoreOf<CardCarousel>
 
 		public var body: some SwiftUI.View {
-			HStack {
-				ForEachStatic(store.cards) { card in
-					Button {
-						store.send(.view(.didTap(card)))
-					} label: {
-						Text("\(card.title)")
+			WithPerceptionTracking {
+				VStack {
+					Text("\(store.taps) taps")
+					ForEachStatic(store.cards) { card in
+						Button {
+							store.send(.view(.didTap(card)))
+						} label: {
+							Text("\(card.title)")
+						}
 					}
 				}
 			}
