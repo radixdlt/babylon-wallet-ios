@@ -19,10 +19,11 @@ extension OverlayWindowClient: DependencyKey {
 				return Item.alert(.init(
 					title: { TextState(L10n.Common.errorAlertTitle) },
 					actions: {
-						return [
+						let buttons: [ButtonState<OverlayWindowClient.Item.AlertAction>] = [
 							.init(role: .cancel, action: .dismissed, label: { TextState(L10n.Common.cancel) }),
 							.init(action: .emailSupport(additionalInfo: error.localizedDescription), label: { TextState(L10n.Error.emailSupportButtonTitle) }),
 						]
+						return buttons
 					},
 					message: { TextState(message) }
 				))
