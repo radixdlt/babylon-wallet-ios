@@ -14,8 +14,8 @@ extension TransportProfileClient: DependencyKey {
 				do {
 					var profile = profile
 					await profileStore.claimOwnership(of: &profile)
-					if profile.appSettings.security.isCloudProfileSyncEnabled {
-						try await cloudBackupClient.claimProfileOnICloud(profile)
+					if profile.appPreferences.security.isCloudProfileSyncEnabled {
+						try? await cloudBackupClient.claimProfileOnICloud(profile)
 					}
 					try await profileStore.importProfile(profile)
 					userDefaults.setShowRelinkConnectorsAfterProfileRestore(containsP2PLinks)
