@@ -17,9 +17,12 @@ extension ContactSupportClient: DependencyKey {
 		}
 
 		return .init(
-			openEmail: {
+			openEmail: { additionalBodyInfo in
 				let uiApplicaition = await UIApplication.shared
-				let body = await buildBody()
+				var body = await buildBody()
+				if let additionalBodyInfo {
+					body.append("\n\(additionalBodyInfo)")
+				}
 
 				for app in EmailApp.allCases {
 					if let url = app.build(body: body), await uiApplicaition.canOpenURL(url) {

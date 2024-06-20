@@ -83,7 +83,7 @@ public struct Troubleshooting: Sendable, FeatureReducer {
 
 		case .contactSupportButtonTapped:
 			return .run { _ in
-				await contactSupport.openEmail()
+				await contactSupport.openEmail(nil)
 			}
 
 		case .discordButtonTapped:
