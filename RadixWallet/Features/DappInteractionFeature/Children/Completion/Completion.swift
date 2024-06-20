@@ -6,13 +6,16 @@ struct Completion: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		let txID: IntentHash?
 		let dappMetadata: DappMetadata
+		let isDeepLinkRequest: Bool
 
 		init(
 			txID: IntentHash?,
-			dappMetadata: DappMetadata
+			dappMetadata: DappMetadata,
+			isDeepLinkRequest: Bool
 		) {
 			self.txID = txID
 			self.dappMetadata = dappMetadata
+			self.isDeepLinkRequest = isDeepLinkRequest
 		}
 	}
 

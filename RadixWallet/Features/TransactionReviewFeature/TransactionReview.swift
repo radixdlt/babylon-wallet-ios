@@ -698,7 +698,7 @@ extension TransactionReview {
 			)
 		}
 
-		return manifest.modify(addGuarantees: state.allGuarantees)
+		return try manifest.modify(addGuarantees: state.allGuarantees)
 	}
 
 	func determineFeePayer(_ state: State, reviewedTransaction: ReviewedTransaction) -> Effect<Action> {

@@ -4,6 +4,13 @@ extension P2P {
 		case wallet
 		case rtc(RTCRoute)
 		case deepLink(SessionId)
+
+		var isDeepLink: Bool {
+			if case .deepLink = self {
+				return true
+			}
+			return false
+		}
 	}
 
 	/// Recipient of sender of an RTC message
@@ -37,9 +44,11 @@ extension P2P {
 	public struct RTCIncomingMessageContainer<Success: Sendable & Hashable>: Sendable, Hashable {
 		public let result: Result<Success, Error>
 		public let route: Route
-		public init(result: Result<Success, Error>, route: Route) {
+		public let requiresOriginVerfication: Bool
+		public init(result: Result<Success, Error>, route: Route, requiresOriginVerfication: Bool) {
 			self.result = result
 			self.route = route
+			self.requiresOriginVerfication = requiresOriginVerfication
 		}
 	}
 }
@@ -75,12 +84,12 @@ extension P2P.RTCIncomingMessageContainer {
 		_ transform: (Success) -> NewSuccess?
 	) -> P2P.RTCIncomingMessageContainer<NewSuccess>? {
 		switch result {
-		case let .failure(error): return .init(result: .failure(error), route: route)
+		case let .failure(error): return .init(result: .failure(error), route: route, requiresOriginVerfication: requiresOriginVerfication)
 		case let .success(value):
 			guard let transformed = transform(value) else {
 				return nil
 			}
-			return .init(result: .success(transformed), route: route)
+			return .init(result: .success(transformed), route: route, requiresOriginVerfication: requiresOriginVerfication)
 		}
 	}
 }

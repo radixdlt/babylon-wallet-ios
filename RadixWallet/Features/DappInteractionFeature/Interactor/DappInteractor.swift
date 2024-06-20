@@ -64,7 +64,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			for: RequestEnvelope,
 			DappMetadata, reason: String
 		)
-		case presentResponseSuccessView(DappMetadata, IntentHash?)
+		case presentResponseSuccessView(DappMetadata, IntentHash?, Bool)
 		case presentInvalidRequest(
 			DappToWalletInteractionUnvalidated,
 			reason: DappInteractionClient.ValidatedDappRequest.InvalidRequestReason,
@@ -171,7 +171,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			default: break
 			}
 
-			if request.route == .wallet {
+			if case .deepLink = request.route {
 				// dismiss current request, wallet request takes precedence
 				state.currentModal = nil
 				state.requestQueue.insert(request, at: 0)
@@ -188,7 +188,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			dismissCurrentModalAndRequest(request, for: &state)
 			switch response {
 			case .success:
-				return .send(.internal(.presentResponseSuccessView(dappMetadata, txID)))
+				return .send(.internal(.presentResponseSuccessView(dappMetadata, txID, request.route.isDeepLink)))
 			case .failure:
 				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
 			}
@@ -239,11 +239,12 @@ struct DappInteractor: Sendable, FeatureReducer {
 			)
 			return .none
 
-		case let .presentResponseSuccessView(dappMetadata, txID):
+		case let .presentResponseSuccessView(dappMetadata, txID, isDeepLinkRequest):
 			state.currentModal = .dappInteractionCompletion(
 				.init(
 					txID: txID,
-					dappMetadata: dappMetadata
+					dappMetadata: dappMetadata,
+					isDeepLinkRequest: isDeepLinkRequest
 				)
 			)
 			return .none
@@ -271,7 +272,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 				return sendResponseToDappEffect(responseToDapp, for: request, dappMetadata: dappMetadata)
 			case let .dismiss(dappMetadata, txID):
 				dismissCurrentModalAndRequest(request, for: &state)
-				return .send(.internal(.presentResponseSuccessView(dappMetadata, txID)))
+				return .send(.internal(.presentResponseSuccessView(dappMetadata, txID, request.route.isDeepLink)))
 			case .dismissSilently:
 				dismissCurrentModalAndRequest(request, for: &state)
 				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
@@ -296,7 +297,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			return .none
 		}
 
-		state.currentModal = .dappInteraction(.init(interaction: next.request))
+		state.currentModal = .dappInteraction(.init(interaction: next.request, requiresOriginValidation: next.requiresOriginValidation))
 
 		return .none
 	}
@@ -467,7 +468,11 @@ extension DappInteractor {
 					let validatedRequest = try incomingRequest.get()
 					switch validatedRequest.request {
 					case let .valid(request):
-						await send(.internal(.receivedRequestFromDapp(.init(route: validatedRequest.route, request: request))))
+						await send(.internal(.receivedRequestFromDapp(.init(
+							route: validatedRequest.route,
+							request: request,
+							requiresOriginValidation: validatedRequest.requiresOriginVerification
+						))))
 					case let .invalid(invalidRequest, reason):
 						let isDeveloperModeEnabled = await appPreferencesClient.isDeveloperModeEnabled()
 						await send(.internal(.presentInvalidRequest(

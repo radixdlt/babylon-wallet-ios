@@ -5,17 +5,20 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		enum ChildState: Sendable, Hashable {
 			case loading(DappInteractionLoading.State)
+			case originVerification(LinkingToDapp.State)
 			case flow(DappInteractionFlow.State)
 		}
 
 		let interaction: DappToWalletInteraction
+		let requiresOriginValidation: Bool
 		var childState: ChildState
 
 		@PresentationState
 		var errorAlert: AlertState<ViewAction.MalformedInteractionErrorAlertAction>? = nil
 
-		init(interaction: DappToWalletInteraction) {
+		init(interaction: DappToWalletInteraction, requiresOriginValidation: Bool) {
 			self.interaction = interaction
+			self.requiresOriginValidation = requiresOriginValidation
 			self.childState = .loading(.init(interaction: interaction))
 		}
 	}
@@ -34,6 +37,7 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 
 	enum ChildAction: Sendable, Equatable {
 		case loading(DappInteractionLoading.Action)
+		case originVerification(LinkingToDapp.Action)
 		case flow(DappInteractionFlow.Action)
 	}
 
@@ -47,6 +51,9 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 		Scope(state: \.childState, action: /.self) {
 			Scope(state: /State.ChildState.loading, action: /Action.child .. ChildAction.loading) {
 				DappInteractionLoading()
+			}
+			Scope(state: /State.ChildState.originVerification, action: /Action.child .. ChildAction.originVerification) {
+				LinkingToDapp()
 			}
 			Scope(state: /State.ChildState.flow, action: /Action.child .. ChildAction.flow) {
 				DappInteractionFlow()
@@ -76,6 +83,10 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .loading(.delegate(.dappMetadataLoaded(dappMetadata))):
+			if state.requiresOriginValidation {
+				state.childState = .originVerification(.init(dAppMetadata: dappMetadata))
+				return .none
+			}
 			if let flowState = DappInteractionFlow.State(dappMetadata: dappMetadata, interaction: state.interaction) {
 				state.childState = .flow(flowState)
 			} else {
@@ -97,6 +108,29 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 				error: .rejectedByUser,
 				message: nil
 			)), .request(state.interaction.metadata))))
+
+		case .originVerification(.delegate(.cancel)):
+			return .send(.delegate(.submit(.failure(.init(
+				interactionId: state.interaction.interactionId,
+				error: .rejectedByUser,
+				message: nil
+			)), .request(state.interaction.metadata))))
+
+		case let .originVerification(.delegate(.continueFlow(dappMetadata))):
+			if let flowState = DappInteractionFlow.State(dappMetadata: dappMetadata, interaction: state.interaction) {
+				state.childState = .flow(flowState)
+			} else {
+				state.errorAlert = .init(
+					title: { TextState(L10n.Common.errorAlertTitle) },
+					actions: {
+						ButtonState(role: .cancel, action: .send(.okButtonTapped)) {
+							TextState(L10n.Common.ok)
+						}
+					},
+					message: { TextState(L10n.DAppRequest.RequestMalformedAlert.message) }
+				)
+			}
+			return .none
 
 		case let .flow(.delegate(.dismissWithFailure(error))):
 			return .send(.delegate(.submit(.failure(error), .request(state.interaction.metadata))))

@@ -17,14 +17,14 @@ struct LinkingToDapp: FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case continueFlow
+		case continueFlow(DappMetadata)
 		case cancel
 	}
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .continueTapped:
-			.send(.delegate(.continueFlow))
+			.send(.delegate(.continueFlow(state.dAppMetadata)))
 		case .cancel:
 			.send(.delegate(.cancel))
 		}
@@ -37,30 +37,46 @@ extension LinkingToDapp {
 		let store: StoreOf<LinkingToDapp>
 
 		var body: some SwiftUI.View {
-			CloseButton {
-				store.send(.view(.cancel))
-			}
-			.flushedLeft
-
 			VStack(spacing: .medium1) {
-				DappHeader(
-					thumbnail: store.dAppMetadata.thumbnail,
-					title: "Verifying dApp",
-					subtitle: "\(store.dAppMetadata.name) is requesting verification"
-				)
+				CloseButton {
+					store.send(.view(.cancel))
+				}
+				.flushedLeft
 
-				Text("**\(store.dAppMetadata.name)** from **\(store.dAppMetadata.origin)** wants to make requests to your Radix Wallet. Click Continue to confirm the identity of this dApp and proceed with the request.")
-					.textStyle(.body1HighImportance)
+				VStack(spacing: .medium3) {
+					Thumbnail(.dapp, url: store.dAppMetadata.thumbnail, size: .medium)
+
+					Text("Have you come from a genuine website?")
+						.foregroundColor(.app.gray1)
+						.lineSpacing(0)
+						.textStyle(.sheetTitle)
+
+					Text("Before you connect to **\(store.dAppMetadata.name)**, you should be confident the site is safe.")
+						.foregroundColor(.app.gray1)
+						.textStyle(.body1Regular)
+				}
+				.multilineTextAlignment(.center)
+				.padding(.bottom, .small2)
+
+				VStack {
+					Text("- Check the website address to see if it matches what you are expecting")
+					Text("- If you came from a social media ad, make sure it's legitimate")
+				}
+				.textStyle(.body1Regular)
+				.padding()
+				.background(.app.gray3)
 
 				Spacer()
-
+			}
+			.padding(.horizontal, .medium1)
+			.padding(.vertical, .medium1)
+			.background(.app.background)
+			.footer {
 				Button(L10n.DAppRequest.Login.continue) {
 					store.send(.view(.continueTapped))
 				}
 				.buttonStyle(.primaryRectangular)
 			}
-			.padding(.horizontal, .medium1)
-			.padding(.vertical, .medium1)
 		}
 	}
 }

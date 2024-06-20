@@ -38,7 +38,9 @@ extension DappInteractionClient: DependencyKey {
 								origin: .wallet,
 								dappDefinitionAddress: .wallet
 							)
-						))
+						)
+					),
+					requiresOriginVerification: false
 				)
 
 				interactionsSubject.send(.success(request))
@@ -83,7 +85,7 @@ extension DappInteractionClient {
 		}
 
 		func invalidRequest(_ reason: ValidatedDappRequest.InvalidRequestReason) -> Result<ValidatedDappRequest, Error> {
-			.success(.init(route: route, request: .invalid(request: nonValidated, reason: reason)))
+			.success(.init(route: route, request: .invalid(request: nonValidated, reason: reason), requiresOriginVerification: message.requiresOriginVerfication))
 		}
 
 		let nonvalidatedMeta = nonValidated.metadata
@@ -145,7 +147,8 @@ extension DappInteractionClient {
 					interactionId: nonValidated.interactionId,
 					items: nonValidated.items,
 					metadata: metadataValidDappDefAddress
-				))
+				)),
+				requiresOriginVerification: message.requiresOriginVerfication
 			)
 		)
 	}
