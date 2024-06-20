@@ -1527,6 +1527,13 @@ public enum L10n {
     }
   }
   public enum Error {
+    /// Email Support
+    public static let emailSupportButtonTitle = L10n.tr("Localizable", "error_emailSupportButtonTitle", fallback: "Email Support")
+    /// Please email support to automatically provide debugging info, and get assistance.
+    /// Code: %@
+    public static func emailSupportMessage(_ p1: Any) -> String {
+      return L10n.tr("Localizable", "error_emailSupportMessage", String(describing: p1), fallback: "Please email support to automatically provide debugging info, and get assistance.\nCode: %@")
+    }
     public enum AccountLabel {
       /// Account label required
       public static let missing = L10n.tr("Localizable", "error_accountLabel_missing", fallback: "Account label required")

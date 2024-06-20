@@ -552,6 +552,9 @@
 "error_accountLabel_tooLong" = "Account label too long";
 "error_accountLabel_missing" = "Account label required";
 "error_transactionFailure_doesNotAllowThirdPartyDeposits" = "One of the receiving accounts does not allow Third-Party deposits";
+"error_emailSupportButtonTitle" = "Email Support";
+"error_emailSupportMessage" = "Please email support to automatically provide debugging info, and get assistance.
+Code: %@";
 "importOlympiaAccounts_scanQR_title" = "Import Legacy Olympia Accounts";
 "importOlympiaAccounts_scanQR_instructions" = "Scan the QR code shown in the Export section of the Radix Desktop Wallet for Olympia.";
 "importOlympiaAccounts_scanQR_scannedLabel" = "Scanned: %d/%d";
