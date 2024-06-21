@@ -73,11 +73,11 @@ extension SelectBackup.View {
 				case let .failed(reason):
 					let text = switch reason {
 					case .accountTemporarilyUnavailable, .notAuthenticated:
-						"Not logged in to iCloud" // FIXME: Strings
+						L10n.IOSRecoverProfileBackup.notLoggedInToICloud
 					case .networkUnavailable:
-						"Network unavailable" // FIXME: Strings
+						L10n.IOSRecoverProfileBackup.networkUnavailable
 					case .other:
-						"Could not load list of backups" // FIXME: Strings
+						L10n.IOSRecoverProfileBackup.couldNotLoadBackups
 					}
 					NoContentView(text)
 				}
