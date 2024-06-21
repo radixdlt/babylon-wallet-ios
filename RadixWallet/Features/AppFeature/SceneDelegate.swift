@@ -21,38 +21,11 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 		{
 			overlayWindow(in: windowScene)
 		}
-
-		for userActivity in connectionOptions.userActivities {
-			if let universalLink = userActivity.webpageURL {
-				deepLinkHandlerClient.addDeepLink(universalLink)
-//				loggerGlobal.error("did open from unviersal link \(universalLink), referral: \(userActivity.referrerURL), info: \(userActivity.userInfo)")
-			}
-		}
 	}
 
 	public func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
 		debugPrint(userActivity.webpageURL)
 	}
-
-//	public func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
-//		debugPrint(URLContexts)
-//	}
-//
-//	public func scene(_ scene: UIScene, didUpdate userActivity: NSUserActivity) {
-//		debugPrint(userActivity)
-//	}
-//
-//	public func scene(_ scene: UIScene, restoreInteractionStateWith stateRestorationActivity: NSUserActivity) {
-//		debugPrint(stateRestorationActivity)
-//	}
-
-//	public func scene(_ scene: UIScene, willContinueUserActivityWithType userActivityType: String) {
-//		debugPrint(userActivityType)
-//	}
-//
-//	public func sceneWillEnterForeground(_ scene: UIScene) {
-//		debugPrint("Hola")
-//	}
 
 	func overlayWindow(in scene: UIWindowScene) {
 		let overlayView = OverlayReducer.View(
