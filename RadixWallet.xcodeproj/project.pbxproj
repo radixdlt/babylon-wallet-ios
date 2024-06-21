@@ -920,7 +920,6 @@
 		831F0CEF2C25728E00D6F5BF /* RadixConnectMobileSessionStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831F0CEE2C25728E00D6F5BF /* RadixConnectMobileSessionStorage.swift */; };
 		831F0CF22C25897500D6F5BF /* DappInteractionVerifyDappOrigin+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831F0CF12C25897500D6F5BF /* DappInteractionVerifyDappOrigin+View.swift */; };
 		832868652BE2641800902126 /* DappInteractionVerifyDappOrigin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832868642BE2641800902126 /* DappInteractionVerifyDappOrigin.swift */; };
-		832868682BE28A1D00902126 /* DappLinkingDelay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832868672BE28A1D00902126 /* DappLinkingDelay.swift */; };
 		8328806C2AE6725F0014FBF3 /* AccountPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */; };
 		8329ACE42BBAB9E7005FD9DC /* DeepLinkHandlerClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8329ACE32BBAB9E7005FD9DC /* DeepLinkHandlerClient.swift */; };
 		83377A032B9DDAF000D8AA36 /* NPSSurvey+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83377A022B9DDAF000D8AA36 /* NPSSurvey+View.swift */; };
@@ -2049,7 +2048,6 @@
 		831F0CEE2C25728E00D6F5BF /* RadixConnectMobileSessionStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadixConnectMobileSessionStorage.swift; sourceTree = "<group>"; };
 		831F0CF12C25897500D6F5BF /* DappInteractionVerifyDappOrigin+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DappInteractionVerifyDappOrigin+View.swift"; sourceTree = "<group>"; };
 		832868642BE2641800902126 /* DappInteractionVerifyDappOrigin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DappInteractionVerifyDappOrigin.swift; sourceTree = "<group>"; };
-		832868672BE28A1D00902126 /* DappLinkingDelay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DappLinkingDelay.swift; sourceTree = "<group>"; };
 		8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountPreferencesTests.swift; sourceTree = "<group>"; };
 		8329ACE32BBAB9E7005FD9DC /* DeepLinkHandlerClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepLinkHandlerClient.swift; sourceTree = "<group>"; };
 		83377A022B9DDAF000D8AA36 /* NPSSurvey+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NPSSurvey+View.swift"; sourceTree = "<group>"; };
@@ -3362,7 +3360,6 @@
 		48CFBD982ADC10D800E77A5C /* Children */ = {
 			isa = PBXGroup;
 			children = (
-				832868662BE28A0D00902126 /* DappLinkingDelay */,
 				E634CA2C2AFD259000C43DB7 /* DebugKeychainContents */,
 				48CFBD9C2ADC10D800E77A5C /* DebugKeychainTest */,
 				48CFBD9F2ADC10D800E77A5C /* DebugUserDefaultsContents */,
@@ -5669,14 +5666,6 @@
 			path = DappOriginVerification;
 			sourceTree = "<group>";
 		};
-		832868662BE28A0D00902126 /* DappLinkingDelay */ = {
-			isa = PBXGroup;
-			children = (
-				832868672BE28A1D00902126 /* DappLinkingDelay.swift */,
-			);
-			path = DappLinkingDelay;
-			sourceTree = "<group>";
-		};
 		8328806A2AE6724B0014FBF3 /* AccountPreferencesTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -6854,7 +6843,6 @@
 				48CFC5912ADC10DA00E77A5C /* ProfileStore.swift in Sources */,
 				48CFC3FB2ADC10D900E77A5C /* AsyncWebSocket.swift in Sources */,
 				48CFC3712ADC10D900E77A5C /* PoolUnitsList.swift in Sources */,
-				832868682BE28A1D00902126 /* DappLinkingDelay.swift in Sources */,
 				48CFC58B2ADC10DA00E77A5C /* SubmitTransactionClient+Test.swift in Sources */,
 				48CFC5642ADC10DA00E77A5C /* MetadataU32ArrayValue.swift in Sources */,
 				48CFC3082ADC10D900E77A5C /* DisplayMnemonics+View.swift in Sources */,

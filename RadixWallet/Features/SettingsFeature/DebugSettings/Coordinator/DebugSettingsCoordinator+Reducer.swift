@@ -23,7 +23,6 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 		case debugUserDefaultsContentsButtonTapped
 		case debugTestKeychainButtonTapped
 		case debugKeychainContentsButtonTapped
-		case dappLinkingDelayTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -39,7 +38,6 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 			case debugKeychainTest(DebugKeychainTest.State)
 			case debugKeychainContents(DebugKeychainContents.State)
 			#endif // DEBUG
-			case dappLinkingDelay(DappLinkingDelay.State)
 		}
 
 		public enum Action: Sendable, Equatable {
@@ -50,7 +48,6 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 			case debugKeychainContents(DebugKeychainContents.Action)
 			#endif // DEBUG
 			case debugManageFactorSources(DebugManageFactorSources.Action)
-			case dappLinkingDelay(DappLinkingDelay.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
@@ -70,9 +67,6 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 			#endif // DEBUG
 			Scope(state: /State.debugManageFactorSources, action: /Action.debugManageFactorSources) {
 				DebugManageFactorSources()
-			}
-			Scope(state: /State.dappLinkingDelay, action: /Action.dappLinkingDelay) {
-				DappLinkingDelay()
 			}
 		}
 	}
@@ -119,9 +113,6 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 
 		case .debugUserDefaultsContentsButtonTapped:
 			state.destination = .debugUserDefaultsContents(.init())
-			return .none
-		case .dappLinkingDelayTapped:
-			state.destination = .dappLinkingDelay(.init(delayInSeconds: userDefaults.getDappLinkingDelay()))
 			return .none
 		}
 	}

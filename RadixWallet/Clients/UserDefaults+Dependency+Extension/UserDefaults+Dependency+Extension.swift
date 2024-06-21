@@ -20,9 +20,6 @@ public enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
 	/// DO NOT CHANGE THIS KEY
 	case activeProfileID
 
-	case dappLinkingDelay
-	case dAppLinkingAutoContinueEnabled
-
 	case mnemonicsUserClaimsToHaveBackedUp
 }
 
@@ -146,22 +143,6 @@ extension UserDefaults.Dependency {
 
 	public func setNPSSurveyUserId(_ id: UUID) {
 		set(id.uuidString, forKey: Key.npsSurveyUserID.rawValue)
-	}
-
-	public func setDappLinkingDelay(_ seconds: Double) {
-		set(seconds, forKey: Key.dappLinkingDelay.rawValue)
-	}
-
-	public func getDappLinkingDelay() -> Double {
-		double(forKey: Key.dappLinkingDelay.rawValue) ?? 1
-	}
-
-	public func setDappLinkingAutoContinueEnabled(_ isEnabled: Bool) {
-		set(isEnabled, forKey: Key.dAppLinkingAutoContinueEnabled.rawValue)
-	}
-
-	public func getDappLinkingAutoContinueEnabled() -> Bool {
-		bool(forKey: Key.dAppLinkingAutoContinueEnabled.rawValue) ?? false
 	}
 
 	public var getMigratedKeychainProfiles: Set<ProfileID> {

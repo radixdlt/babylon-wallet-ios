@@ -108,10 +108,6 @@ extension UserDefaults.Dependency.Key {
 			return userDefaults.getDateOfLastSubmittedNPSSurvey().map(String.init(describing:)).asArray(\.self)
 		case .npsSurveyUserID:
 			return userDefaults.getNPSSurveyUserId().map(String.init(describing:)).asArray(\.self)
-		case .dappLinkingDelay:
-			return [String(userDefaults.getDappLinkingDelay())]
-		case .dAppLinkingAutoContinueEnabled:
-			return [String(userDefaults.getDappLinkingAutoContinueEnabled())]
 		case .migratedKeychainProfiles:
 			return userDefaults.getMigratedKeychainProfiles.map(\.uuidString)
 		case .lastCloudBackups:
