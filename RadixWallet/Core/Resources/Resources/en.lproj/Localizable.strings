@@ -552,6 +552,9 @@
 "error_accountLabel_tooLong" = "Account label too long";
 "error_accountLabel_missing" = "Account label required";
 "error_transactionFailure_doesNotAllowThirdPartyDeposits" = "One of the receiving accounts does not allow Third-Party deposits";
+"error_emailSupportButtonTitle" = "Email Support";
+"error_emailSupportMessage" = "Please email support to automatically provide debugging info, and get assistance.
+Code: %@";
 "importOlympiaAccounts_scanQR_title" = "Import Legacy Olympia Accounts";
 "importOlympiaAccounts_scanQR_instructions" = "Scan the QR code shown in the Export section of the Radix Desktop Wallet for Olympia.";
 "importOlympiaAccounts_scanQR_scannedLabel" = "Scanned: %d/%d";
@@ -854,6 +857,9 @@
 "androidRecoverProfileBackup_choose_title" = "Choose a backup";
 "iOSRecoverProfileBackup_choose_title" = "Choose a backup on iCloud";
 "iOSRecoverProfileBackup_noBackupsAvailable" = "No wallet backups available on current iCloud account";
+"iOSRecoverProfileBackup_notLoggedInToICloud" = "Not logged in to iCloud";
+"iOSRecoverProfileBackup_networkUnavailable" = "Network unavailable";
+"iOSRecoverProfileBackup_couldNotLoadBackups" = "Could not load backups";
 "androidRecoverProfileBackup_noBackupsAvailable" = "No wallet backups available";
 "recoverProfileBackup_backupFrom" = "**Backup from:** %@";
 "recoverProfileBackup_lastModified" = "**Last modified:** %@";

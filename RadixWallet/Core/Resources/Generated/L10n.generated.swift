@@ -1527,6 +1527,13 @@ public enum L10n {
     }
   }
   public enum Error {
+    /// Email Support
+    public static let emailSupportButtonTitle = L10n.tr("Localizable", "error_emailSupportButtonTitle", fallback: "Email Support")
+    /// Please email support to automatically provide debugging info, and get assistance.
+    /// Code: %@
+    public static func emailSupportMessage(_ p1: Any) -> String {
+      return L10n.tr("Localizable", "error_emailSupportMessage", String(describing: p1), fallback: "Please email support to automatically provide debugging info, and get assistance.\nCode: %@")
+    }
     public enum AccountLabel {
       /// Account label required
       public static let missing = L10n.tr("Localizable", "error_accountLabel_missing", fallback: "Account label required")
@@ -1853,8 +1860,14 @@ public enum L10n {
     }
   }
   public enum IOSRecoverProfileBackup {
+    /// Could not load backups
+    public static let couldNotLoadBackups = L10n.tr("Localizable", "iOSRecoverProfileBackup_couldNotLoadBackups", fallback: "Could not load backups")
+    /// Network unavailable
+    public static let networkUnavailable = L10n.tr("Localizable", "iOSRecoverProfileBackup_networkUnavailable", fallback: "Network unavailable")
     /// No wallet backups available on current iCloud account
     public static let noBackupsAvailable = L10n.tr("Localizable", "iOSRecoverProfileBackup_noBackupsAvailable", fallback: "No wallet backups available on current iCloud account")
+    /// Not logged in to iCloud
+    public static let notLoggedInToICloud = L10n.tr("Localizable", "iOSRecoverProfileBackup_notLoggedInToICloud", fallback: "Not logged in to iCloud")
     public enum Choose {
       /// Choose a backup on iCloud
       public static let title = L10n.tr("Localizable", "iOSRecoverProfileBackup_choose_title", fallback: "Choose a backup on iCloud")

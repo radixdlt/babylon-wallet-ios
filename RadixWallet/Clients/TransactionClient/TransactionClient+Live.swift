@@ -93,16 +93,15 @@ extension TransactionClient {
 		func getAllFeePayerCandidates(refreshingBalances: Bool) async throws -> NonEmpty<IdentifiedArrayOf<FeePayerCandidate>> {
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 			let allAccounts = try await accountsClient.getAccountsOnNetwork(networkID)
+			let entities = try await onLedgerEntitiesClient.getAccounts(allAccounts.map(\.address), cachingStrategy: .forceUpdate)
 
-			let allFeePayerCandidates = try await onLedgerEntitiesClient.getAccounts(allAccounts.map(\.address), cachingStrategy: .forceUpdate).compactMap { portfolio -> FeePayerCandidate? in
-				guard
-					let account = allAccounts.first(where: { account in account.address == portfolio.address })
-				else {
+			let allFeePayerCandidates = allAccounts.compactMap { account -> FeePayerCandidate? in
+				guard let entity = entities.first(where: { $0.address == account.address }) else {
 					assertionFailure("Failed to find account or no balance, this should never happen.")
 					return nil
 				}
 
-				guard let xrdBalance = portfolio.fungibleResources.xrdResource?.amount else {
+				guard let xrdBalance = entity.fungibleResources.xrdResource?.amount else {
 					return nil
 				}
 
