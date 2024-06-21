@@ -52,7 +52,7 @@ struct DappInteractionCoordinator_Previews: PreviewProvider {
 		DappInteractionCoordinator.View(
 			store: .init(
 				initialState: .init(
-					interaction: .previewValueAllRequests(), requiresOriginValidation: false
+					request: RequestEnvelope(route: .wallet, interaction: .previewValueAllRequests(), requiresOriginValidation: false)
 				)
 			) {
 				DappInteractionCoordinator()

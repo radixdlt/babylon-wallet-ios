@@ -29,6 +29,7 @@ extension DeepLinkHandlerClient {
 		return DeepLinkHandlerClient(
 			handleDeepLink: {
 				if let url = state.bufferedDeepLink {
+					// fatalError()
 					state.bufferedDeepLink = nil
 					loggerGlobal.error("\(url.absoluteString)")
 					do {

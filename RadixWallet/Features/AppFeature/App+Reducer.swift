@@ -132,7 +132,6 @@ public struct App: Sendable, FeatureReducer {
 			home: .init())
 		)
 
-		deepLinkHandlerClient.handleDeepLink()
 		return .none
 	}
 

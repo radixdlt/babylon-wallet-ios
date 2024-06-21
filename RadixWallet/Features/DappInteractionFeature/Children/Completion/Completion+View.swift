@@ -23,13 +23,13 @@ extension Completion {
 		let txID: IntentHash?
 		let title: String
 		let subtitle: String
-		let isDeepLinkRequest: Bool
+		let showSwitchBackToBrowserMessage: Bool
 
 		init(state: Completion.State) {
 			self.txID = state.txID
 			self.title = L10n.DAppRequest.Completion.title
 			self.subtitle = L10n.DAppRequest.Completion.subtitle(state.dappMetadata.name)
-			self.isDeepLinkRequest = state.isDeepLinkRequest
+			self.showSwitchBackToBrowserMessage = state.p2pRoute.isDeepLink
 		}
 	}
 
@@ -49,12 +49,10 @@ extension Completion {
 							.foregroundColor(.app.gray1)
 							.textStyle(.sheetTitle)
 
-						if !viewStore.isDeepLinkRequest {
-							Text(viewStore.subtitle)
-								.foregroundColor(.app.gray1)
-								.textStyle(.body1Regular)
-								.multilineTextAlignment(.center)
-						}
+						Text(viewStore.subtitle)
+							.foregroundColor(.app.gray1)
+							.textStyle(.body1Regular)
+							.multilineTextAlignment(.center)
 
 						if let txID = viewStore.txID {
 							HStack {
@@ -66,11 +64,12 @@ extension Completion {
 							.textStyle(.body1Header)
 						}
 
-						if viewStore.isDeepLinkRequest {
+						if viewStore.showSwitchBackToBrowserMessage {
 							Text("Switch back to your browser to continue")
 								.foregroundColor(.app.gray1)
 								.textStyle(.body1Regular)
 								.multilineTextAlignment(.center)
+								.padding(.top, .small2)
 						}
 					}
 					.padding(.horizontal, .medium2)
@@ -114,7 +113,7 @@ struct Completion_Preview: PreviewProvider {
 extension Completion.State {
 	static let previewValue: Self = .init(
 		txID: nil,
-		dappMetadata: .previewValue, isDeepLinkRequest: false
+		dappMetadata: .previewValue, p2pRoute: .wallet
 	)
 }
 #endif

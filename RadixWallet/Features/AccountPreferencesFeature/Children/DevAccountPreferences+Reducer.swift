@@ -212,7 +212,8 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 				signTransactionPurpose: .internalManifest(.debugModifyAccount),
 				message: .none,
 				isWalletTransaction: true,
-				proposingDappMetadata: nil
+				proposingDappMetadata: nil,
+				p2pRoute: .wallet
 			))
 			return .none
 

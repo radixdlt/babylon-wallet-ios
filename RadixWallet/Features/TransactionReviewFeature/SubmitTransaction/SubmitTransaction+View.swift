@@ -6,7 +6,8 @@ extension SubmitTransaction.State {
 		.init(
 			txID: notarizedTX.txID,
 			status: status,
-			dismissalDisabled: inProgressDismissalDisabled && status.isInProgress
+			dismissalDisabled: inProgressDismissalDisabled && status.isInProgress,
+			showSwitchBackToBrowserMessage: route.isDeepLink
 		)
 	}
 }
@@ -50,6 +51,7 @@ extension SubmitTransaction {
 		let txID: IntentHash
 		let status: State.TXStatus
 		let dismissalDisabled: Bool
+		let showSwitchBackToBrowserMessage: Bool
 	}
 
 	@MainActor
@@ -102,6 +104,13 @@ extension SubmitTransaction {
 								.foregroundColor(.app.blue1)
 						}
 						.textStyle(.body1Header)
+
+						if viewStore.status.failed, viewStore.showSwitchBackToBrowserMessage {
+							Text("Switch back to your browser to continue")
+								.foregroundColor(.app.gray1)
+								.textStyle(.body1Regular)
+								.multilineTextAlignment(.center)
+						}
 					}
 					.padding(.horizontal, .medium2)
 					.padding(.bottom, .medium3)

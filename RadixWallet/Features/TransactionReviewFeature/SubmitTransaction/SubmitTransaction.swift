@@ -23,6 +23,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 		public let notarizedTX: NotarizeTransactionResponse
 		public var status: TXStatus
 		public let inProgressDismissalDisabled: Bool
+		public let route: P2P.Route
 
 		@PresentationState
 		var dismissTransactionAlert: AlertState<ViewAction.DismissAlertAction>?
@@ -30,11 +31,13 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 		public init(
 			notarizedTX: NotarizeTransactionResponse,
 			status: TXStatus = .notYetSubmitted,
-			inProgressDismissalDisabled: Bool = false
+			inProgressDismissalDisabled: Bool = false,
+			route: P2P.Route
 		) {
 			self.notarizedTX = notarizedTX
 			self.status = status
 			self.inProgressDismissalDisabled = inProgressDismissalDisabled
+			self.route = route
 		}
 	}
 

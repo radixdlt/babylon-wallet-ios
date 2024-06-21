@@ -940,7 +940,6 @@
 		8397D82D2B46ACB50016365A /* StakeUnitList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8397D82B2B46ACB50016365A /* StakeUnitList.swift */; };
 		839B6C542B21D28400402651 /* ExpandableTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 839B6C532B21D28400402651 /* ExpandableTextView.swift */; };
 		83AAAC6D2B483D1B00222B64 /* StakeSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83AAAC6B2B483D1B00222B64 /* StakeSummaryView.swift */; };
-		83B07C1C2BC565DE00F3FFA7 /* RadixConnectRelayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83B07C1B2BC565DE00F3FFA7 /* RadixConnectRelayTests.swift */; };
 		83B783562C1764AE00AA7930 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 83B783552C1764AE00AA7930 /* Sargon */; };
 		83D663B02B271D0100D1AB9E /* TruncationMask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D663AF2B271D0100D1AB9E /* TruncationMask.swift */; };
 		83DFAF2E2B4E8A51008B70CE /* View+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83DFAF2D2B4E8A51008B70CE /* View+Extra.swift */; };
@@ -2068,7 +2067,6 @@
 		8397D82B2B46ACB50016365A /* StakeUnitList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StakeUnitList.swift; sourceTree = "<group>"; };
 		839B6C532B21D28400402651 /* ExpandableTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpandableTextView.swift; sourceTree = "<group>"; };
 		83AAAC6B2B483D1B00222B64 /* StakeSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StakeSummaryView.swift; sourceTree = "<group>"; };
-		83B07C1B2BC565DE00F3FFA7 /* RadixConnectRelayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadixConnectRelayTests.swift; sourceTree = "<group>"; };
 		83D663AF2B271D0100D1AB9E /* TruncationMask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TruncationMask.swift; sourceTree = "<group>"; };
 		83DFAF2D2B4E8A51008B70CE /* View+Extra.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "View+Extra.swift"; sourceTree = "<group>"; };
 		83EA887D2B7E68EE00FF8424 /* TotalCurrencyWorthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TotalCurrencyWorthView.swift; sourceTree = "<group>"; };
@@ -5756,14 +5754,6 @@
 			path = StakeUnitList;
 			sourceTree = "<group>";
 		};
-		83B07C1A2BC565CD00F3FFA7 /* RadixConnectRelayTests */ = {
-			isa = PBXGroup;
-			children = (
-				83B07C1B2BC565DE00F3FFA7 /* RadixConnectRelayTests.swift */,
-			);
-			path = RadixConnectRelayTests;
-			sourceTree = "<group>";
-		};
 		83DFAF2C2B4D48E2008B70CE /* Components */ = {
 			isa = PBXGroup;
 			children = (
@@ -6246,7 +6236,6 @@
 		E6DBA2E02ADEBFB300A38425 /* Clients */ = {
 			isa = PBXGroup;
 			children = (
-				83B07C1A2BC565CD00F3FFA7 /* RadixConnectRelayTests */,
 				8381C8AE2BBD2CC100A470B4 /* TokenPriceCientTests */,
 				48FF43132AE4364000C568B9 /* KeychainClientTests */,
 				E6DBA2E32ADEBFB300A38425 /* OnLedgerEntitiesClientTests */,
@@ -6698,7 +6687,6 @@
 				E6DBA3222ADEBFB300A38425 /* RadixConnectJSONValues.swift in Sources */,
 				4827520A2BDA5A2B007854E0 /* ImportLegacyWalletClientTests.swift in Sources */,
 				E6DBA31E2ADEBFB300A38425 /* DataChannelMocks.swift in Sources */,
-				83B07C1C2BC565DE00F3FFA7 /* RadixConnectRelayTests.swift in Sources */,
 				E6DBA3412ADEBFB300A38425 /* ValidationTests.swift in Sources */,
 				4827520C2BDA5CA5007854E0 /* GatewaySettingsFeatureTests.swift in Sources */,
 				4827520E2BDA5E50007854E0 /* TransactionClientTests.swift in Sources */,
