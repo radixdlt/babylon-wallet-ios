@@ -1860,8 +1860,14 @@ public enum L10n {
     }
   }
   public enum IOSRecoverProfileBackup {
+    /// Could not load backups
+    public static let couldNotLoadBackups = L10n.tr("Localizable", "iOSRecoverProfileBackup_couldNotLoadBackups", fallback: "Could not load backups")
+    /// Network unavailable
+    public static let networkUnavailable = L10n.tr("Localizable", "iOSRecoverProfileBackup_networkUnavailable", fallback: "Network unavailable")
     /// No wallet backups available on current iCloud account
     public static let noBackupsAvailable = L10n.tr("Localizable", "iOSRecoverProfileBackup_noBackupsAvailable", fallback: "No wallet backups available on current iCloud account")
+    /// Not logged in to iCloud
+    public static let notLoggedInToICloud = L10n.tr("Localizable", "iOSRecoverProfileBackup_notLoggedInToICloud", fallback: "Not logged in to iCloud")
     public enum Choose {
       /// Choose a backup on iCloud
       public static let title = L10n.tr("Localizable", "iOSRecoverProfileBackup_choose_title", fallback: "Choose a backup on iCloud")
