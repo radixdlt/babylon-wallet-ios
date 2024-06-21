@@ -251,12 +251,16 @@ extension OnLedgerEntitiesClient {
 					ledgerState: response.ledgerState
 				)
 
+				var updatedMetadataItems = Set(item.metadata.items)
+				let all = try await gatewayAPIClient.fetchEntityMetadata(item.address)
+				updatedMetadataItems.append(contentsOf: all)
+
 				let updatedItem = GatewayAPI.StateEntityDetailsResponseItem(
 					address: item.address,
 					fungibleResources: .init(items: allFungibles),
 					nonFungibleResources: .init(items: allNonFungibles),
 					ancestorIdentities: item.ancestorIdentities,
-					metadata: item.metadata,
+					metadata: .init(totalCount: Int64(updatedMetadataItems.count), items: Array(updatedMetadataItems)),
 					explicitMetadata: item.explicitMetadata,
 					details: item.details
 				)

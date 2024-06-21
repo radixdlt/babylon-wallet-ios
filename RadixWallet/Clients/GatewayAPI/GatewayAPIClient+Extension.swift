@@ -1,6 +1,14 @@
 
 extension GatewayAPIClient {
 	@Sendable
+	public func fetchEntityMetadata(_ address: String) async throws -> [GatewayAPI.EntityMetadataItem] {
+		try await fetchAllPaginatedItems(
+			cursor: nil,
+			fetchEntityMetadataPage(address)
+		)
+	}
+
+	@Sendable
 	public func fetchAllFungibleResources(
 		_ entityDetails: GatewayAPI.StateEntityDetailsResponseItem,
 		ledgerState: GatewayAPI.LedgerState
@@ -57,6 +65,28 @@ extension GatewayAPIClient {
 				optIns: .init(explicitMetadata: Array(Set<EntityMetadataKey>.resourceMetadataKeys.map(\.rawValue)))
 			)
 			let response = try await gatewayAPIClient.getEntityFungiblesPage(request)
+
+			return .init(
+				loadedItems: response.items,
+				totalCount: response.totalCount,
+				cursor: response.nextCursor.map {
+					PageCursor(ledgerState: response.ledgerState, nextPageCursor: $0)
+				}
+			)
+		}
+	}
+
+	public func fetchEntityMetadataPage(
+		_ address: String
+	) -> @Sendable (PageCursor?) async throws -> PaginatedResourceResponse<GatewayAPI.EntityMetadataItem> {
+		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+		return { _ in
+			let request = GatewayAPI.StateEntityMetadataPageRequest(
+				atLedgerState: nil,
+				cursor: nil,
+				address: address
+			)
+			let response = try await gatewayAPIClient.getEntityMetadataPage(request)
 
 			return .init(
 				loadedItems: response.items,
