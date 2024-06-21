@@ -44,11 +44,12 @@ extension P2P {
 	public struct RTCIncomingMessageContainer<Success: Sendable & Hashable>: Sendable, Hashable {
 		public let result: Result<Success, Error>
 		public let route: Route
-		public let requiresOriginVerfication: Bool
-		public init(result: Result<Success, Error>, route: Route, requiresOriginVerfication: Bool) {
+		public let originRequiresValidation: Bool
+
+		public init(result: Result<Success, Error>, route: Route, originRequiresValidation: Bool) {
 			self.result = result
 			self.route = route
-			self.requiresOriginVerfication = requiresOriginVerfication
+			self.originRequiresValidation = originRequiresValidation
 		}
 	}
 }
@@ -84,12 +85,12 @@ extension P2P.RTCIncomingMessageContainer {
 		_ transform: (Success) -> NewSuccess?
 	) -> P2P.RTCIncomingMessageContainer<NewSuccess>? {
 		switch result {
-		case let .failure(error): return .init(result: .failure(error), route: route, requiresOriginVerfication: requiresOriginVerfication)
+		case let .failure(error): return .init(result: .failure(error), route: route, originRequiresValidation: originRequiresValidation)
 		case let .success(value):
 			guard let transformed = transform(value) else {
 				return nil
 			}
-			return .init(result: .success(transformed), route: route, requiresOriginVerfication: requiresOriginVerfication)
+			return .init(result: .success(transformed), route: route, originRequiresValidation: originRequiresValidation)
 		}
 	}
 }

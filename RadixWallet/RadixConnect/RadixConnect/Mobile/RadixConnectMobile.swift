@@ -1,13 +1,13 @@
-import CryptoKit
-import Foundation
 import SargonUniFFI
 
-// MARK: - Mobile2Mobile
-public actor Mobile2Mobile {
-	private let radixConnectMobile = RadixConnectMobile.live(sessionStorage: SecureSessionStorage())
+// MARK: - RadixConnectMobile
+struct RadixConnectMobile {
+	private let radixConnectMobile = Sargon.RadixConnectMobile.live(sessionStorage: SecureSessionStorage())
 	private let incomingMessagesSubject: AsyncPassthroughSubject<P2P.RTCIncomingMessage> = .init()
+}
 
-	public func incomingMessages() async -> AnyAsyncSequence<P2P.RTCIncomingMessage> {
+extension RadixConnectMobile {
+	func incomingMessages() async -> AnyAsyncSequence<P2P.RTCIncomingMessage> {
 		incomingMessagesSubject.share().eraseToAnyAsyncSequence()
 	}
 
@@ -17,7 +17,7 @@ public actor Mobile2Mobile {
 			.init(
 				result: .success(.request(.dapp(result.interaction))),
 				route: .deepLink(result.sessionId),
-				requiresOriginVerfication: result.originRequiresValidation
+				originRequiresValidation: result.originRequiresValidation
 			)
 		)
 	}
@@ -35,18 +35,5 @@ public actor Mobile2Mobile {
 				)
 			)
 		}
-	}
-}
-
-// MARK: - SecureSessionStorage
-final class SecureSessionStorage: SessionStorage {
-	@Dependency(\.secureStorageClient) var secureStorageClient
-
-	func saveSession(sessionId: SessionId, encodedSession: BagOfBytes) async throws {
-		try secureStorageClient.saveRadixConnectRelaySession(sessionId, encodedSession)
-	}
-
-	func loadSession(sessionId: SessionId) async throws -> BagOfBytes? {
-		try secureStorageClient.loadRadixConnectRelaySession(sessionId)
 	}
 }

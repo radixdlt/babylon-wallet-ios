@@ -403,7 +403,7 @@ extension RTCClient {
 				return P2P.RTCIncomingMessage(
 					result: decode(messageResult),
 					route: .rtc(route),
-					requiresOriginVerfication: false
+					originRequiresValidation: false
 				)
 			}
 			.subscribe(self.incomingMessagesContinuation)

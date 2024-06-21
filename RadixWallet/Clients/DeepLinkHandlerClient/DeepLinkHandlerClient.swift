@@ -2,7 +2,7 @@ import Foundation
 import SargonUniFFI
 
 // MARK: - DeepLinkHandlerClient
-public struct DeepLinkHandlerClient: DependencyKey {
+public struct DeepLinkHandlerClient: Sendable, DependencyKey {
 	public var handleDeepLink: HandleDeepLink
 	public var addDeepLink: AddDeepLink
 	public var hasDeepLink: HasDeepLink

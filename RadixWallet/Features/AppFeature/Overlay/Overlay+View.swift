@@ -35,19 +35,6 @@ private extension View {
 		let destinationStore = store.destination
 		return alert(with: destinationStore)
 			.fullScreenCover(with: destinationStore)
-			.linkingDapp(with: store)
-	}
-
-	func linkingDapp(with store: StoreOf<OverlayReducer>) -> some View {
-		let destinationStore = store.destination
-		return fullScreenCover(
-			store: destinationStore,
-			state: /OverlayReducer.Destination.State.linkDappSheet,
-			action: OverlayReducer.Destination.Action.linkDappSheet,
-			content: {
-				LinkingToDapp.View(store: $0)
-			}
-		)
 	}
 
 	private func alert(with destinationStore: PresentationStoreOf<OverlayReducer.Destination>) -> some View {

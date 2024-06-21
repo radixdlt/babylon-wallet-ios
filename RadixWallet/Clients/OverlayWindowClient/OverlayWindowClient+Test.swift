@@ -10,7 +10,6 @@ extension OverlayWindowClient: TestDependencyKey {
 		sendAlertAction: unimplemented("\(Self.self).sendAlertAction"),
 		sendFullScreenAction: unimplemented("\(Self.self).sendFullScreenAction"),
 		setIsUserIteractionEnabled: unimplemented("\(Self.self).setIsUserIteractionEnabled"),
-		isUserInteractionEnabled: unimplemented("\(Self.self).isUserInteractionEnabled"),
-		scheduleLinkingDapp: unimplemented("\(Self.self).scheduleLinkingDapp")
+		isUserInteractionEnabled: unimplemented("\(Self.self).isUserInteractionEnabled")
 	)
 }

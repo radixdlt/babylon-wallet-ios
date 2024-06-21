@@ -21,7 +21,7 @@ extension DappInteractionCoordinator {
 						CaseLet(
 							/DappInteractionCoordinator.State.ChildState.originVerification,
 							action: { DappInteractionCoordinator.Action.child(.originVerification($0)) },
-							then: { LinkingToDapp.View(store: $0) }
+							then: { DappInteractionVerifyDappOrigin.View(store: $0) }
 						)
 					case .flow:
 						CaseLet(

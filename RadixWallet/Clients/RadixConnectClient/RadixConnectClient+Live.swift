@@ -7,7 +7,7 @@ extension RadixConnectClient {
 		@Dependency(\.p2pLinksClient) var p2pLinksClient
 		@Dependency(\.errorQueue) var errorQueue
 
-		let m2m = Mobile2Mobile()
+		let m2m = RadixConnectMobile()
 
 		@Dependency(\.accountsClient) var accountsClient
 		@Dependency(\.jsonEncoder) var jsonEncoder

@@ -28,8 +28,6 @@ public struct OverlayWindowClient: Sendable {
 	public var setIsUserIteractionEnabled: SetIsUserIteractionEnabled
 	public var isUserInteractionEnabled: IsUserInteractionEnabled
 
-	public var scheduleLinkingDapp: ScheduleLinkingDapp
-
 	public init(
 		scheduledItems: @escaping ScheduledItems,
 		scheduleAlert: @escaping ScheduleAlert,
@@ -39,8 +37,7 @@ public struct OverlayWindowClient: Sendable {
 		sendAlertAction: @escaping SendAlertAction,
 		sendFullScreenAction: @escaping SendFullScreenAction,
 		setIsUserIteractionEnabled: @escaping SetIsUserIteractionEnabled,
-		isUserInteractionEnabled: @escaping IsUserInteractionEnabled,
-		scheduleLinkingDapp: @escaping ScheduleLinkingDapp
+		isUserInteractionEnabled: @escaping IsUserInteractionEnabled
 	) {
 		self.scheduledItems = scheduledItems
 		self.scheduleAlert = scheduleAlert
@@ -51,7 +48,6 @@ public struct OverlayWindowClient: Sendable {
 		self.sendFullScreenAction = sendFullScreenAction
 		self.setIsUserIteractionEnabled = setIsUserIteractionEnabled
 		self.isUserInteractionEnabled = isUserInteractionEnabled
-		self.scheduleLinkingDapp = scheduleLinkingDapp
 	}
 }
 
@@ -69,7 +65,6 @@ extension OverlayWindowClient {
 
 	public typealias SetIsUserIteractionEnabled = @Sendable (Bool) -> Void
 	public typealias IsUserInteractionEnabled = @Sendable () -> AnyAsyncSequence<Bool>
-	public typealias ScheduleLinkingDapp = @Sendable (DappMetadata) async -> Item.AlertAction
 }
 
 // MARK: OverlayWindowClient.Item
@@ -119,7 +114,6 @@ extension OverlayWindowClient {
 
 		case hud(HUD)
 		case alert(AlertState)
-		case autodismissSheet(UUID, DappMetadata)
 		case fullScreen(FullScreenOverlayCoordinator.State)
 	}
 }

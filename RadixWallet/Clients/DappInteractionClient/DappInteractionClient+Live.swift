@@ -85,7 +85,7 @@ extension DappInteractionClient {
 		}
 
 		func invalidRequest(_ reason: ValidatedDappRequest.InvalidRequestReason) -> Result<ValidatedDappRequest, Error> {
-			.success(.init(route: route, request: .invalid(request: nonValidated, reason: reason), requiresOriginVerification: message.requiresOriginVerfication))
+			.success(.init(route: route, request: .invalid(request: nonValidated, reason: reason), requiresOriginVerification: message.originRequiresValidation))
 		}
 
 		let nonvalidatedMeta = nonValidated.metadata
@@ -148,7 +148,7 @@ extension DappInteractionClient {
 					items: nonValidated.items,
 					metadata: metadataValidDappDefAddress
 				)),
-				requiresOriginVerification: message.requiresOriginVerfication
+				requiresOriginVerification: message.originRequiresValidation
 			)
 		)
 	}

@@ -5,7 +5,7 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		enum ChildState: Sendable, Hashable {
 			case loading(DappInteractionLoading.State)
-			case originVerification(LinkingToDapp.State)
+			case originVerification(DappInteractionVerifyDappOrigin.State)
 			case flow(DappInteractionFlow.State)
 		}
 
@@ -37,7 +37,7 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 
 	enum ChildAction: Sendable, Equatable {
 		case loading(DappInteractionLoading.Action)
-		case originVerification(LinkingToDapp.Action)
+		case originVerification(DappInteractionVerifyDappOrigin.Action)
 		case flow(DappInteractionFlow.Action)
 	}
 
@@ -53,7 +53,7 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 				DappInteractionLoading()
 			}
 			Scope(state: /State.ChildState.originVerification, action: /Action.child .. ChildAction.originVerification) {
-				LinkingToDapp()
+				DappInteractionVerifyDappOrigin()
 			}
 			Scope(state: /State.ChildState.flow, action: /Action.child .. ChildAction.flow) {
 				DappInteractionFlow()
