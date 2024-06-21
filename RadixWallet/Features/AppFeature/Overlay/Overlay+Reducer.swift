@@ -50,7 +50,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.continuousClock) var clock
-	var userDefaults = UserDefaults.Dependency.radix
+	@Dependency(\.contactSupportClient) var contactSupport
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -87,6 +87,12 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		case let .alert(action):
 			if case let .alert(state) = state.itemsQueue.first {
 				overlayWindowClient.sendAlertAction(action, state.id)
+			}
+			if case let .emailSupport(additionalInfo) = action {
+				return .run { _ in
+					await contactSupport.openEmail(additionalInfo)
+				}
+				.concatenate(with: dismiss(&state))
 			}
 			return dismiss(&state)
 
