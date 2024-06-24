@@ -454,8 +454,6 @@ extension DappInteractionClient.ValidatedDappRequest.InvalidRequestReason {
 extension DappInteractor {
 	func handleIncomingRequests() -> Effect<Action> {
 		.run { send in
-			@Dependency(\.deepLinkHandlerClient) var deepLinkHandlerClient
-			deepLinkHandlerClient.handleDeepLink()
 			for try await incomingRequest in dappInteractionClient.interactions {
 				guard !Task.isCancelled else {
 					return

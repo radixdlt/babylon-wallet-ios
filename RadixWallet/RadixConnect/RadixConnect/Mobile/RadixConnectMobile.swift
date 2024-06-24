@@ -3,7 +3,7 @@ import SargonUniFFI
 // MARK: - RadixConnectMobile
 struct RadixConnectMobile: Sendable {
 	private let radixConnectMobile = Sargon.RadixConnectMobile.live(sessionStorage: SecureSessionStorage())
-	private let incomingMessagesSubject: AsyncPassthroughSubject<P2P.RTCIncomingMessage> = .init()
+	private let incomingMessagesSubject: AsyncReplaySubject<P2P.RTCIncomingMessage> = .init(bufferSize: 1)
 }
 
 extension RadixConnectMobile {

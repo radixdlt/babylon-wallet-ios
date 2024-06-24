@@ -66,11 +66,7 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 		case let .malformedInteractionErrorAlert(.presented(action)):
 			switch action {
 			case .okButtonTapped:
-				.send(.delegate(.submit(.failure(.init(
-					interactionId: state.request.interaction.interactionId,
-					error: .rejectedByUser,
-					message: nil
-				)), .request(state.request.interaction.metadata))))
+				sendRequestRejected(state)
 			}
 
 		case .malformedInteractionErrorAlert:
@@ -85,54 +81,17 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 				state.childState = .originVerification(.init(dAppMetadata: dappMetadata))
 				return .none
 			}
-			if let flowState = DappInteractionFlow.State(dappMetadata: dappMetadata, interaction: state.request.interaction, p2pRoute: state.request.route) {
-				state.childState = .flow(flowState)
-			} else {
-				state.errorAlert = .init(
-					title: { TextState(L10n.Common.errorAlertTitle) },
-					actions: {
-						ButtonState(role: .cancel, action: .send(.okButtonTapped)) {
-							TextState(L10n.Common.ok)
-						}
-					},
-					message: { TextState(L10n.DAppRequest.RequestMalformedAlert.message) }
-				)
-			}
-			return .none
+
+			return startFlow(&state, dappMetadata: dappMetadata)
 
 		case .loading(.delegate(.dismiss)):
-			return .send(.delegate(.submit(.failure(.init(
-				interactionId: state.request.interaction.interactionId,
-				error: .rejectedByUser,
-				message: nil
-			)), .request(state.request.interaction.metadata))))
+			return sendRequestRejected(state)
 
 		case .originVerification(.delegate(.cancel)):
-			return .send(.delegate(.submit(.failure(.init(
-				interactionId: state.request.interaction.interactionId,
-				error: .rejectedByUser,
-				message: nil
-			)), .request(state.request.interaction.metadata))))
+			return sendRequestRejected(state)
 
 		case let .originVerification(.delegate(.continueFlow(dappMetadata))):
-			if let flowState = DappInteractionFlow.State(
-				dappMetadata: dappMetadata,
-				interaction: state.request.interaction,
-				p2pRoute: state.request.route
-			) {
-				state.childState = .flow(flowState)
-			} else {
-				state.errorAlert = .init(
-					title: { TextState(L10n.Common.errorAlertTitle) },
-					actions: {
-						ButtonState(role: .cancel, action: .send(.okButtonTapped)) {
-							TextState(L10n.Common.ok)
-						}
-					},
-					message: { TextState(L10n.DAppRequest.RequestMalformedAlert.message) }
-				)
-			}
-			return .none
+			return startFlow(&state, dappMetadata: dappMetadata)
 
 		case let .flow(.delegate(.dismissWithFailure(error))):
 			return .send(.delegate(.submit(.failure(error), .request(state.request.interaction.metadata))))
@@ -149,5 +108,39 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 		default:
 			return .none
 		}
+	}
+
+	private func startFlow(_ state: inout State, dappMetadata: DappMetadata) -> Effect<Action> {
+		if let flowState = DappInteractionFlow.State(
+			dappMetadata: dappMetadata,
+			interaction: state.request.interaction,
+			p2pRoute: state.request.route
+		) {
+			state.childState = .flow(flowState)
+		} else {
+			state.errorAlert = .init(
+				title: { TextState(L10n.Common.errorAlertTitle) },
+				actions: {
+					ButtonState(role: .cancel, action: .send(.okButtonTapped)) {
+						TextState(L10n.Common.ok)
+					}
+				},
+				message: { TextState(L10n.DAppRequest.RequestMalformedAlert.message) }
+			)
+		}
+		return .none
+	}
+
+	private func sendRequestRejected(_ state: State) -> Effect<Action> {
+		.send(.delegate(.submit(
+			.failure(
+				.init(
+					interactionId: state.request.interaction.interactionId,
+					error: .rejectedByUser,
+					message: nil
+				)
+			),
+			.request(state.request.interaction.metadata)
+		)))
 	}
 }

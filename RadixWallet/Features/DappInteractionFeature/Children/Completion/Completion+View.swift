@@ -63,6 +63,7 @@ extension Completion {
 						}
 
 						if viewStore.showSwitchBackToBrowserMessage {
+							// FIXME: Strings
 							Text("Switch back to your browser to continue")
 								.foregroundColor(.app.gray1)
 								.textStyle(.body1Regular)
@@ -111,7 +112,8 @@ struct Completion_Preview: PreviewProvider {
 extension Completion.State {
 	static let previewValue: Self = .init(
 		txID: nil,
-		dappMetadata: .previewValue, p2pRoute: .wallet
+		dappMetadata: .previewValue,
+		p2pRoute: .wallet
 	)
 }
 #endif

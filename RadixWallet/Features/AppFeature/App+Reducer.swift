@@ -133,6 +133,9 @@ public struct App: Sendable, FeatureReducer {
 			home: .init())
 		)
 
+		// At fresh app start, handle deepLink only when app goes to main state.
+		// While splash screen is shown, or during the onboarding, the deepLink is buffered.
+		deepLinkHandlerClient.handleDeepLink()
 		return .none
 	}
 

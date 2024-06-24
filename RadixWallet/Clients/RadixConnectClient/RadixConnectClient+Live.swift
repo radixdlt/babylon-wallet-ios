@@ -6,15 +6,13 @@ extension RadixConnectClient {
 	public static let liveValue: Self = {
 		@Dependency(\.p2pLinksClient) var p2pLinksClient
 		@Dependency(\.errorQueue) var errorQueue
-
-		let radixConnectMobile = RadixConnectMobile()
-
 		@Dependency(\.accountsClient) var accountsClient
 		@Dependency(\.jsonEncoder) var jsonEncoder
 
 		let userDefaults = UserDefaults.Dependency.radix // FIXME: find a better way to ensure we use the same userDefaults everywhere
 
 		let rtcClients = RTCClients()
+		let radixConnectMobile = RadixConnectMobile()
 		let localNetworkAuthorization = LocalNetworkAuthorization()
 
 		Task {
