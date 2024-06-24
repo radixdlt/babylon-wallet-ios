@@ -111,6 +111,7 @@ public struct Signing: Sendable, FeatureReducer {
 			loggerGlobal.error("Failed to notarize transaction, error: \(error)")
 			errorQueue.schedule(error)
 			return .none
+
 		case let .notarizeResult(.success(notarized)):
 			switch state.signingPurposeWithPayload {
 			case .signAuth:
@@ -135,6 +136,7 @@ public struct Signing: Sendable, FeatureReducer {
 
 		case .signWithFactorSource(.delegate(.cancel)):
 			return .send(.delegate(.cancelSigning))
+
 		default:
 			return .none
 		}

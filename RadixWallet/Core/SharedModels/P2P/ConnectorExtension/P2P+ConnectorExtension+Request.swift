@@ -93,15 +93,15 @@ extension P2P.ConnectorExtension.Request {
 			public struct SignAuthChallenge: Sendable, Hashable, Encodable {
 				public let signers: [P2P.LedgerHardwareWallet.KeyParameters]
 				public let ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
-				public let challenge: P2P.Dapp.Request.AuthChallengeNonce
-				public let origin: P2P.Dapp.Request.Metadata.Origin
+				public let challenge: DappToWalletInteractionAuthChallengeNonce
+				public let origin: DappOrigin
 				public let dAppDefinitionAddress: AccountAddress
 
 				public init(
 					signers: [P2P.LedgerHardwareWallet.KeyParameters],
 					ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice,
-					challenge: P2P.Dapp.Request.AuthChallengeNonce,
-					origin: P2P.Dapp.Request.Metadata.Origin,
+					challenge: DappToWalletInteractionAuthChallengeNonce,
+					origin: DappOrigin,
 					dAppDefinitionAddress: AccountAddress
 				) {
 					self.signers = signers
@@ -163,6 +163,6 @@ extension P2P.ConnectorExtension.Request {
 		}
 
 		public let discriminator: Discriminator
-		public let accounts: [P2P.Dapp.Response.WalletAccount]
+		public let accounts: [WalletInteractionWalletAccount]
 	}
 }

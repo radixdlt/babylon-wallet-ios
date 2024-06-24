@@ -3,8 +3,6 @@ import ComposableArchitecture
 
 // MARK: - ConfigurationBackup
 public struct ConfigurationBackup: Sendable, FeatureReducer {
-	public typealias BackupStatus = SecurityCenterClient.BackupStatus
-
 	public struct Exportable: Sendable, Hashable {
 		public let profile: Profile
 		public let file: ExportableProfileFile
@@ -25,12 +23,16 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		public var exportable: Exportable? = nil
 
 		public var outdatedBackupPresent: Bool {
-			guard let lastCloudBackup, lastCloudBackup.success else { return false }
-			return !cloudBackupsEnabled && !lastCloudBackup.upToDate
+			guard let lastCloudBackup, lastCloudBackup.result.succeeded else { return false }
+			return !cloudBackupsEnabled && !lastCloudBackup.isCurrent
 		}
 
 		public var actionsRequired: [Item] {
-			problems.isEmpty ? [] : Item.allCases
+			if let lastCloudBackup, lastCloudBackup.isCurrent, !lastCloudBackup.result.failed {
+				[]
+			} else {
+				Item.allCases
+			}
 		}
 
 		public init() {}
@@ -58,7 +60,6 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		case setProblems([SecurityProblem])
 		case setLastManualBackup(Date?)
 		case setLastCloudBackup(BackupStatus?)
-		case didDeleteOutdatedBackup(ProfileID)
 		case exportProfile(Profile)
 	}
 
@@ -100,7 +101,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.cloudBackupClient) var cloudBackupClient
-	@Dependency(\.backupsClient) var backupsClient
+	@Dependency(\.transportProfileClient) var transportProfileClient
 	@Dependency(\.securityCenterClient) var securityCenterClient
 	@Dependency(\.userDefaults) var userDefaults
 
@@ -127,11 +128,10 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			return .none
 
 		case .deleteOutdatedTapped:
-			return .run { send in
+			return .run { _ in
 				let profile = await ProfileStore.shared.profile
 				do {
 					try await cloudBackupClient.deleteProfileBackup(profile.id)
-					await send(.internal(.didDeleteOutdatedBackup(profile.id)))
 				} catch {
 					loggerGlobal.error("Failed to delete outdate backup \(profile.id.uuidString): \(error)")
 				}
@@ -142,7 +142,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			overlayWindowClient.scheduleHUD(.exportedProfile(encrypted: didEncryptIt))
 			loggerGlobal.notice("Profile successfully exported to: \(exportedProfileURL)")
 			if let profile {
-				try? backupsClient.didExportProfileSnapshot(profile)
+				try? transportProfileClient.didExportProfile(profile)
 			}
 			return .none
 
@@ -178,9 +178,6 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .didDeleteOutdatedBackup(id):
-			return .none
-
 		case let .setCloudBackupEnabled(isEnabled):
 			state.cloudBackupsEnabled = isEnabled
 			return .none
@@ -211,7 +208,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		.run { send in
 			for try await lastBackup in await securityCenterClient.lastManualBackup() {
 				guard !Task.isCancelled else { return }
-				await send(.internal(.setLastManualBackup(lastBackup?.backupDate)))
+				await send(.internal(.setLastManualBackup(lastBackup?.result.date)))
 			}
 		}
 	}

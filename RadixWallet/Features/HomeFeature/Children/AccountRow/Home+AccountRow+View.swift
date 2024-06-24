@@ -9,6 +9,7 @@ extension Home.AccountRow {
 		let fiatWorth: Loadable<FiatWorth>
 		let appearanceID: AppearanceID
 		let isLoadingResources: Bool
+		let securityProblemsConfig: EntitySecurityProblemsView.Config
 
 		public enum AccountTag: Int, Hashable, Identifiable, Sendable {
 			case ledgerBabylon
@@ -47,6 +48,7 @@ extension Home.AccountRow {
 			self.showFiatWorth = state.showFiatWorth
 			self.fiatWorth = state.totalFiatWorth
 			self.isLoadingResources = state.accountWithResources.isLoading
+			self.securityProblemsConfig = state.securityProblemsConfig
 
 			self.tag = .init(state: state)
 			self.isLedgerAccount = state.isLedgerAccount
@@ -125,7 +127,9 @@ extension Home.AccountRow {
 
 					ownedResourcesList(viewStore)
 
-					EntitySecurityProblems.View(store: store.entitySecurityProblems)
+					EntitySecurityProblemsView(config: viewStore.securityProblemsConfig) {
+						viewStore.send(.securityProblemsTapped)
+					}
 				}
 				.padding(.horizontal, .medium1)
 				.padding(.vertical, .medium2)
@@ -383,12 +387,6 @@ extension Home.AccountRow.ViewState.AccountTag {
 	}
 }
 
-private extension StoreOf<Home.AccountRow> {
-	var entitySecurityProblems: StoreOf<EntitySecurityProblems> {
-		scope(state: \.entitySecurityProblems, action: \.child.entitySecurityProblems)
-	}
-}
-
 #if DEBUG
 import ComposableArchitecture
 import SwiftUI
@@ -405,6 +403,6 @@ struct Row_Preview: PreviewProvider {
 }
 
 extension Home.AccountRow.State {
-	public static let previewValue = Self(account: .previewValue0)
+	public static let previewValue = Self(account: .previewValue0, problems: [])
 }
 #endif

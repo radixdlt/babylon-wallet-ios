@@ -21,7 +21,8 @@ extension KeychainClient: TestDependencyKey {
 		getDataWithAuthForKey: unimplemented("\(Self.self).getDataWithAuthForKey"),
 		removeDataForKey: unimplemented("\(Self.self).removeDataForKey"),
 		removeAllItems: unimplemented("\(Self.self).removeAllItems"),
-		getAllKeysMatchingAttributes: unimplemented("\(Self.self).getAllKeysMatchingAttributes")
+		getAllKeysMatchingAttributes: unimplemented("\(Self.self).getAllKeysMatchingAttributes"),
+		keychainChanged: unimplemented("\(Self.self).keychainChanged")
 	)
 
 	public static let noop: Self = .init(
@@ -35,6 +36,7 @@ extension KeychainClient: TestDependencyKey {
 		getDataWithAuthForKey: { _, _ in throw NoopError() },
 		removeDataForKey: { _ in throw NoopError() },
 		removeAllItems: {},
-		getAllKeysMatchingAttributes: { _ in [] }
+		getAllKeysMatchingAttributes: { _ in [] },
+		keychainChanged: { AsyncLazySequence([]).eraseToAnyAsyncSequence() }
 	)
 }

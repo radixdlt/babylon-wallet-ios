@@ -6,8 +6,10 @@ public struct OverlayWindowClient: Sendable {
 
 	/// Schedule an Alert to be shown in the Overlay Window.
 	/// Usually to be called from the Main Window.
-	public var scheduleAlertIgnoreAction: ScheduleAlertIgnoreAction
-	public var scheduleAlertAwaitAction: ScheduleAlertAwaitAction
+	public var scheduleAlert: ScheduleAlert
+
+	/// Schedule an Alert to be shown in the Overlay Window, but don't wait for any action
+	public var scheduleAlertAndIgnoreAction: ScheduleAlertAndIgnoreAction
 
 	/// Schedule a HUD to be shown in the Overlay Window.
 	/// Usually to be called from the Main Window.
@@ -15,42 +17,50 @@ public struct OverlayWindowClient: Sendable {
 
 	/// Schedule a FullScreen to be shown in the Overlay Window.
 	/// Usually to be called from the Main Window.
-	public var scheduleFullScreenIgnoreAction: ScheduleFullScreenIgnoreAction
+	public var scheduleFullScreen: ScheduleFullScreen
 
-	/// This is meant to be used by the Overlay Window to send
-	/// back the actions from an Alert to the Main Window.
+	/// Used by the Overlay Window to send actions from an Alert back to the client
 	public var sendAlertAction: SendAlertAction
+
+	/// Used by the Overlay Window to send actions from an FullScreenOverlay back to the client
+	public var sendFullScreenAction: SendFullScreenAction
 
 	public var setIsUserIteractionEnabled: SetIsUserIteractionEnabled
 	public var isUserInteractionEnabled: IsUserInteractionEnabled
 
 	public init(
 		scheduledItems: @escaping ScheduledItems,
-		scheduleAlertIgnoreAction: @escaping ScheduleAlertIgnoreAction,
-		scheduleAlertAwaitAction: @escaping ScheduleAlertAwaitAction,
+		scheduleAlert: @escaping ScheduleAlert,
+		scheduleAlertAndIgnoreAction: @escaping ScheduleAlertAndIgnoreAction,
 		scheduleHUD: @escaping ScheduleHUD,
-		scheduleFullScreenIgnoreAction: @escaping ScheduleFullScreenIgnoreAction,
+		scheduleFullScreen: @escaping ScheduleFullScreen,
 		sendAlertAction: @escaping SendAlertAction,
+		sendFullScreenAction: @escaping SendFullScreenAction,
 		setIsUserIteractionEnabled: @escaping SetIsUserIteractionEnabled,
 		isUserInteractionEnabled: @escaping IsUserInteractionEnabled
 	) {
 		self.scheduledItems = scheduledItems
-		self.scheduleAlertIgnoreAction = scheduleAlertIgnoreAction
-		self.scheduleAlertAwaitAction = scheduleAlertAwaitAction
+		self.scheduleAlert = scheduleAlert
+		self.scheduleAlertAndIgnoreAction = scheduleAlertAndIgnoreAction
 		self.scheduleHUD = scheduleHUD
-		self.scheduleFullScreenIgnoreAction = scheduleFullScreenIgnoreAction
+		self.scheduleFullScreen = scheduleFullScreen
 		self.sendAlertAction = sendAlertAction
+		self.sendFullScreenAction = sendFullScreenAction
 		self.setIsUserIteractionEnabled = setIsUserIteractionEnabled
 		self.isUserInteractionEnabled = isUserInteractionEnabled
 	}
 }
 
 extension OverlayWindowClient {
-	public typealias ScheduleAlertIgnoreAction = @Sendable (Item.AlertState) -> Void
-	public typealias ScheduleAlertAwaitAction = @Sendable (Item.AlertState) async -> Item.AlertAction
+	public typealias FullScreenAction = FullScreenOverlayCoordinator.DelegateAction
+	public typealias FullScreenID = FullScreenOverlayCoordinator.State.ID
+
+	public typealias ScheduleAlert = @Sendable (Item.AlertState) async -> Item.AlertAction
+	public typealias ScheduleAlertAndIgnoreAction = @Sendable (Item.AlertState) -> Void
 	public typealias ScheduleHUD = @Sendable (Item.HUD) -> Void
-	public typealias ScheduleFullScreenIgnoreAction = @Sendable (FullScreenOverlayCoordinator.State) -> Void
+	public typealias ScheduleFullScreen = @Sendable (FullScreenOverlayCoordinator.State) async -> FullScreenAction
 	public typealias SendAlertAction = @Sendable (Item.AlertAction, Item.AlertState.ID) -> Void
+	public typealias SendFullScreenAction = @Sendable (FullScreenAction, FullScreenID) -> Void
 	public typealias ScheduledItems = @Sendable () -> AnyAsyncSequence<Item>
 
 	public typealias SetIsUserIteractionEnabled = @Sendable (Bool) -> Void
@@ -61,10 +71,11 @@ extension OverlayWindowClient {
 extension OverlayWindowClient {
 	public enum Item: Sendable, Hashable {
 		public typealias AlertState = ComposableArchitecture.AlertState<AlertAction>
-		public enum AlertAction: Sendable, Equatable {
+		public enum AlertAction: Sendable, Hashable {
 			case primaryButtonTapped
 			case secondaryButtonTapped
 			case dismissed
+			case emailSupport(additionalInfo: String)
 		}
 
 		public struct HUD: Sendable, Hashable, Identifiable {

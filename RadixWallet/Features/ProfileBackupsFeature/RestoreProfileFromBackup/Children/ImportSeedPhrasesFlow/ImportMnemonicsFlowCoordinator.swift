@@ -112,7 +112,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.secureStorageClient) var secureStorageClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
-	@Dependency(\.backupsClient) var backupsClient
+	@Dependency(\.transportProfileClient) var transportProfileClient
 
 	public init() {}
 
@@ -133,7 +133,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 					let snapshot = if let fromOnboarding = context.profileSnapshotFromOnboarding {
 						fromOnboarding
 					} else {
-						try await backupsClient.snapshotOfProfileForExport()
+						try await transportProfileClient.profileForExport()
 					}
 					let ents = try await deviceFactorSourceClient.controlledEntities(snapshot)
 					let hasAnyBDFSExplicitlyMarkedMain = ents.contains(where: \.isExplicitMain)

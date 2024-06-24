@@ -4,6 +4,7 @@ import SwiftUI
 // MARK: - App
 public struct App: Sendable, FeatureReducer {
 	public struct State: Hashable {
+		@CasePathable
 		public enum Root: Hashable {
 			case main(Main.State)
 			case onboardingCoordinator(OnboardingCoordinator.State)
@@ -22,12 +23,20 @@ public struct App: Sendable, FeatureReducer {
 		}
 	}
 
+	@CasePathable
+	public enum ViewAction: Sendable, Equatable {
+		case task
+	}
+
+	@CasePathable
 	public enum InternalAction: Sendable, Equatable {
 		case incompatibleProfileDeleted
 		case toMain(isAccountRecoveryNeeded: Bool)
 		case toOnboarding
+		case didResetWallet
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case main(Main.Action)
 		case onboardingCoordinator(OnboardingCoordinator.Action)
@@ -37,23 +46,30 @@ public struct App: Sendable, FeatureReducer {
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
+	@Dependency(\.resetWalletClient) var resetWalletClient
 
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.root, action: /Action.child) {
-			EmptyReducer()
-				.ifCaseLet(/State.Root.main, action: /ChildAction.main) {
-					Main()
-				}
-				.ifCaseLet(/State.Root.onboardingCoordinator, action: /ChildAction.onboardingCoordinator) {
-					OnboardingCoordinator()
-				}
-				.ifCaseLet(/State.Root.splash, action: /ChildAction.splash) {
-					Splash()
-				}
+		Scope(state: \.root, action: \.child) {
+			Scope(state: \.main, action: \.main) {
+				Main()
+			}
+			Scope(state: \.onboardingCoordinator, action: \.onboardingCoordinator) {
+				OnboardingCoordinator()
+			}
+			Scope(state: \.splash, action: \.splash) {
+				Splash()
+			}
 		}
 		Reduce(core)
+	}
+
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+		switch viewAction {
+		case .task:
+			didResetWalletEffect()
+		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
@@ -64,16 +80,13 @@ public struct App: Sendable, FeatureReducer {
 		case .toMain:
 			goToMain(state: &state)
 
-		case .toOnboarding:
+		case .toOnboarding, .didResetWallet:
 			goToOnboarding(state: &state)
 		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case .main(.delegate(.removedWallet)):
-			goToOnboarding(state: &state)
-
 		case .onboardingCoordinator(.delegate(.completed)):
 			goToMain(state: &state)
 
@@ -83,21 +96,35 @@ public struct App: Sendable, FeatureReducer {
 			} else {
 				goToMain(state: &state)
 			}
+
 		default:
 			.none
 		}
 	}
 
-	func goToMain(state: inout State) -> Effect<Action> {
+	private func goToMain(state: inout State) -> Effect<Action> {
 		state.root = .main(.init(
 			home: .init())
 		)
 		return .none
 	}
 
-	func goToOnboarding(state: inout State) -> Effect<Action> {
+	private func goToOnboarding(state: inout State) -> Effect<Action> {
 		state.root = .onboardingCoordinator(.init())
 		return .none
+	}
+
+	private func didResetWalletEffect() -> Effect<Action> {
+		.run { send in
+			do {
+				for try await _ in resetWalletClient.walletDidReset() {
+					guard !Task.isCancelled else { return }
+					await send(.internal(.didResetWallet))
+				}
+			} catch {
+				loggerGlobal.error("Failed to iterate over walletDidReset: \(error)")
+			}
+		}
 	}
 }
 
