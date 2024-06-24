@@ -17,7 +17,7 @@ extension OnLedgerEntity.Metadata {
 			accountType: raw?.accountType,
 			ownerKeys: raw?.ownerKeys,
 			ownerBadge: raw?.ownerBadge,
-			others: raw?.others
+			arbitraryFields: raw?.others
 		)
 	}
 }
@@ -202,15 +202,12 @@ extension GatewayAPI.EntityMetadataCollection {
 		items[.ownerBadge]?.map(\.asNonFungibleLocalID)
 	}
 
-	public var others: [ProgrammaticScryptoSborValue] {
-		var result: [ProgrammaticScryptoSborValue] = []
-		let knownKeys = EntityMetadataKey.allCases.map(\.rawValue)
-		for item in items {
-			if !knownKeys.contains(item.key) {
-				result.append(item.value.programmaticJson)
-			}
-		}
-		return result
+	public var arbitraryFields: [OnLedgerEntity.Metadata.ArbitraryField] {
+		let standardKeys = EntityMetadataKey.allCases.map(\.rawValue)
+		return items
+			.filter {
+				!standardKeys.contains($0.key)
+			}.map(\.value.programmaticJson)
 	}
 
 	public var validator: ValidatorAddress? {

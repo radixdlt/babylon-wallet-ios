@@ -139,8 +139,7 @@ extension OnLedgerEntity {
 		public let accountType: AccountType?
 		public let ownerKeys: PublicKeyHashesWithStateVersion?
 		public let ownerBadge: OwnerBadgeWithStateVersion?
-		// TODO: Rename variable and use typealias
-		public let others: [ProgrammaticScryptoSborValue]?
+		public let arbitraryFields: [ArbitraryField]?
 
 		public struct ValueAtStateVersion<Value>: Codable where Value: Codable {
 			public let value: Value
@@ -171,6 +170,7 @@ extension OnLedgerEntity {
 
 		public typealias OwnerBadgeWithStateVersion = ValueAtStateVersion<NonFungibleLocalId>
 		public typealias PublicKeyHashesWithStateVersion = ValueAtStateVersion<[PublicKeyHash]>
+		public typealias ArbitraryField = GatewayAPI.ProgrammaticScryptoSborValue
 
 		public init(
 			name: String? = nil,
@@ -188,7 +188,7 @@ extension OnLedgerEntity {
 			accountType: AccountType? = nil,
 			ownerKeys: PublicKeyHashesWithStateVersion? = nil,
 			ownerBadge: OwnerBadgeWithStateVersion? = nil,
-			others: [ProgrammaticScryptoSborValue]? = nil
+			arbitraryFields: [ArbitraryField]? = nil
 		) {
 			self.name = name
 			self.symbol = symbol
@@ -205,7 +205,7 @@ extension OnLedgerEntity {
 			self.accountType = accountType
 			self.ownerKeys = ownerKeys
 			self.ownerBadge = ownerBadge
-			self.others = others
+			self.arbitraryFields = arbitraryFields
 		}
 	}
 
