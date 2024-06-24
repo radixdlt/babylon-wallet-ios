@@ -5,9 +5,6 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 	public weak var windowScene: UIWindowScene?
 	public var overlayWindow: UIWindow?
 
-	@Dependency(\.radixConnectClient) var radixConnectionClient
-	@Dependency(\.deepLinkHandlerClient) var deepLinkHandlerClient
-
 	public func scene(
 		_ scene: UIScene,
 		willConnectTo session: UISceneSession,

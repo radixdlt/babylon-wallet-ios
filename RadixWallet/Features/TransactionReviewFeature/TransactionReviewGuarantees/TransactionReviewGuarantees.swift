@@ -109,7 +109,7 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 			guard let guarantee = transfer.fungibleGuarantee, guarantee.amount >= 0 else { return nil }
 			self.guarantee = guarantee
 
-			self.percentageStepper = .init(value: 100)
+			self.percentageStepper = .init(value: 100 * guarantee.percentage)
 
 			self.updateAmount()
 		}
@@ -152,6 +152,6 @@ extension TransactionReviewGuarantee.State {
 		let newMinimumDecimal = value * (try! Decimal192(0.01))
 		let divisibility: UInt8 = resource.divisibility ?? Decimal192.maxDivisibility
 		guarantee.amount = (newMinimumDecimal * amount).rounded(decimalPlaces: divisibility)
-		// guarantee.percentage = newMinimumDecimal
+		guarantee.percentage = newMinimumDecimal
 	}
 }
