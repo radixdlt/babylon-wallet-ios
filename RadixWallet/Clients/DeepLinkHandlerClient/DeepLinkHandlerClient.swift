@@ -4,7 +4,7 @@ import SargonUniFFI
 // MARK: - DeepLinkHandlerClient
 public struct DeepLinkHandlerClient: Sendable, DependencyKey {
 	public var handleDeepLink: HandleDeepLink
-	public var addDeepLink: AddDeepLink
+	public var setDeepLink: AddDeepLink
 	public var hasDeepLink: HasDeepLink
 }
 
@@ -29,9 +29,8 @@ extension DeepLinkHandlerClient {
 		return DeepLinkHandlerClient(
 			handleDeepLink: {
 				if let url = state.bufferedDeepLink {
-					// fatalError()
+					loggerGlobal.debug("Handling deepLink url \($0.absoluteString)")
 					state.bufferedDeepLink = nil
-					loggerGlobal.error("\(url.absoluteString)")
 					do {
 						Task {
 							try await radixConnectClient.handleDappDeepLink(url)
@@ -41,7 +40,8 @@ extension DeepLinkHandlerClient {
 					}
 				}
 			},
-			addDeepLink: {
+			setDeepLink: {
+				loggerGlobal.debug("Received deepLink url \($0.absoluteString)")
 				state.bufferedDeepLink = $0
 			},
 			hasDeepLink: {

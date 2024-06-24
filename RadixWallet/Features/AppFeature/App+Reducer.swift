@@ -81,12 +81,13 @@ public struct App: Sendable, FeatureReducer {
 		case let .urlOpened(url):
 			switch state.root {
 			case .main:
-				deepLinkHandlerClient.addDeepLink(url)
+				deepLinkHandlerClient.setDeepLink(url)
 				deepLinkHandlerClient.handleDeepLink()
 			case .splash:
-				deepLinkHandlerClient.addDeepLink(url)
+				deepLinkHandlerClient.setDeepLink(url)
 			case .onboardingCoordinator:
-				deepLinkHandlerClient.addDeepLink(url)
+				deepLinkHandlerClient.setDeepLink(url)
+				// FIXME: Strings
 				overlayWindowClient.scheduleAlertAndIgnoreAction(.init(title: { TextState("dApp Request") }, message: {
 					TextState("You can proceed with this request after you create or restore your Radix Wallet.")
 				}))
@@ -138,6 +139,7 @@ public struct App: Sendable, FeatureReducer {
 	private func goToOnboarding(state: inout State) -> Effect<Action> {
 		state.root = .onboardingCoordinator(.init())
 		if deepLinkHandlerClient.hasDeepLink() {
+			// FIXME: Strings
 			overlayWindowClient.scheduleAlertAndIgnoreAction(.init(title: { TextState("dApp Request") }, message: {
 				TextState("You can proceed with this request after you create or restore your Radix Wallet.")
 			}))
