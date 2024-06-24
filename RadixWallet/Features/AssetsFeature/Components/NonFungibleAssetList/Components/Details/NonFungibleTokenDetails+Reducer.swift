@@ -31,7 +31,6 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case closeButtonTapped
 		case task
-		case arbitraryDataField(ArbitraryDataFieldView.Action)
 		case tappedClaimStake
 	}
 
@@ -44,7 +43,6 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
-	@Dependency(\.openURL) var openURL
 	@Dependency(\.dismiss) var dismiss
 
 	public init() {}
@@ -63,13 +61,6 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 		case .closeButtonTapped:
 			return .run { _ in
 				await dismiss()
-			}
-		case let .arbitraryDataField(action):
-			switch action {
-			case let .urlTapped(url):
-				return .run { _ in
-					await openURL(url)
-				}
 			}
 		case .tappedClaimStake:
 			guard let stakeClaim = state.stakeClaim else {

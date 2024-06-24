@@ -4,7 +4,6 @@ import SwiftUI
 /// These can be found inside a resource metadata or in NFTs.
 public struct ArbitraryDataFieldView: View {
 	let field: Field
-	let action: (Action) -> Void
 
 	public var body: some View {
 		switch field.kind {
@@ -33,7 +32,7 @@ public struct ArbitraryDataFieldView: View {
 					.textStyle(.body1Regular)
 					.foregroundColor(.app.gray2)
 				Button(url.absoluteString) {
-					action(.urlTapped(url))
+					openUrl(url)
 				}
 				.buttonStyle(.url)
 			}
@@ -52,8 +51,16 @@ public struct ArbitraryDataFieldView: View {
 
 		case let .id(id):
 			KeyValueView(key: field.name, value: id.toRawString()) // use `id.formatted()` instead?
+
 		case let .instant(date):
 			KeyValueView(key: field.name, value: date.formatted())
+		}
+	}
+
+	private func openUrl(_ url: URL) {
+		@Dependency(\.openURL) var openURL
+		Task {
+			await openURL(url)
 		}
 	}
 }

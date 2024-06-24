@@ -55,7 +55,7 @@ struct AssetResourceDetailsSection: View {
 
 				loadable(viewState.arbitraryDataFields) { arbitraryDataFields in
 					ForEachStatic(arbitraryDataFields) { field in
-						ArbitraryDataFieldView(field: field) { _ in }
+						ArbitraryDataFieldView(field: field)
 					}
 				}
 

@@ -95,9 +95,7 @@ extension NonFungibleTokenDetails {
 								}
 
 								ForEachStatic(tokenDetails.dataFields) { field in
-									ArbitraryDataFieldView(field: field) { action in
-										viewStore.send(.arbitraryDataField(action))
-									}
+									ArbitraryDataFieldView(field: field)
 								}
 							}
 							.lineLimit(1)
