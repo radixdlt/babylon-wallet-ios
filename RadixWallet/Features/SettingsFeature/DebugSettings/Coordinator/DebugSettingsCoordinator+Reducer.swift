@@ -76,7 +76,6 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.dismiss) var dismiss
-	@Dependency(\.userDefaults) var userDefaults
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)

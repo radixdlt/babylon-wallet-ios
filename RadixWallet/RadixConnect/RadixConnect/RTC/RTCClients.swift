@@ -370,7 +370,6 @@ extension RTCClient {
 			throw PeerConnectionDidCloseError()
 		}
 		let data = try JSONEncoder().encode(response)
-		// print(data.prettyPrintedJSONString)
 		try await anyConnection.sendData(data)
 	}
 
@@ -437,7 +436,6 @@ func decode(
 
 	return messageResult.flatMap { (message: DataChannelClient.AssembledMessage) in
 		let jsonData = message.messageContent
-		// print(jsonData.prettyPrintedJSONString)
 		do {
 			guard let jsonString = String(data: jsonData, encoding: .utf8) else {
 				throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Unable to convert data to UTF-8 string"))
