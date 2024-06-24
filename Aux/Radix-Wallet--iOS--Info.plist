@@ -6,7 +6,9 @@
 	<array>
 		<dict>
 			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
+			<string>Viewer</string>
+			<key>CFBundleURLIconFile</key>
+			<string></string>
 			<key>CFBundleURLName</key>
 			<string>com.radixpublishing.radixwallet.ios.dev</string>
 			<key>CFBundleURLSchemes</key>
@@ -16,9 +18,41 @@
 		</dict>
 		<dict>
 			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
+			<string>Viewer</string>
+			<key>CFBundleURLIconFile</key>
+			<string></string>
 			<key>CFBundleURLName</key>
 			<string>com.radixpublishing.radixwallet.ios.beta</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>radixwallet</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>CFBundleURLName</key>
+			<string>com.radixpublishing.radixwallet.ios.alpha</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>radixwallet</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>CFBundleURLName</key>
+			<string>com.radixpublishing.radixwallet.ios.pre-alpha</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>radixwallet</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.radixpublishing.radixwallet.ios</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>radixwallet</string>
