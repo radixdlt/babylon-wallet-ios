@@ -17,16 +17,6 @@ public enum DappMetadata: Sendable, Hashable {
 	case ledger(Ledger)
 
 	case wallet(Wallet)
-
-	case deepLink(DeepLink)
-}
-
-// MARK: DappMetadata.DeepLink
-extension DappMetadata {
-	public struct DeepLink: Sendable, Hashable {
-		public let origin: URL
-		public let dAppDefAddress: DappDefinitionAddress
-	}
 }
 
 extension DappMetadata {
@@ -74,7 +64,6 @@ extension DappMetadata {
 		case let .ledger(metadata): metadata.origin
 		case let .request(metadata): metadata.origin
 		case let .wallet(metadata): metadata.origin
-		case let .deepLink(metadata): .init(metadata.origin.absoluteString)
 		}
 	}
 

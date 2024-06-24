@@ -23,10 +23,6 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 		}
 	}
 
-	public func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
-		debugPrint(userActivity.webpageURL)
-	}
-
 	func overlayWindow(in scene: UIWindowScene) {
 		let overlayView = OverlayReducer.View(
 			store: .init(
@@ -50,15 +46,4 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 
 		self.overlayWindow = overlayWindow
 	}
-
-//	public func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
-//		let connectionPassword = URLComponents(url: URLContexts.first!.url, resolvingAgainstBaseURL: true)?.queryItems?.first?.value
-//		loggerGlobal.error("has urlContext: \(connectionPassword)")
-//		if let connectionPassword {
-//			let cp = try! ConnectionPassword(.init(hex: connectionPassword))
-//			Task {
-//				try await radixConnectionClient.handleDappDeepLink(cp)
-//			}
-//		}
-//	}
 }

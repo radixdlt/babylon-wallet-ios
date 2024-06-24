@@ -7,7 +7,7 @@ extension RadixConnectClient {
 		@Dependency(\.p2pLinksClient) var p2pLinksClient
 		@Dependency(\.errorQueue) var errorQueue
 
-		let m2m = RadixConnectMobile()
+		let radixConnectMobile = RadixConnectMobile()
 
 		@Dependency(\.accountsClient) var accountsClient
 		@Dependency(\.jsonEncoder) var jsonEncoder
@@ -149,7 +149,7 @@ extension RadixConnectClient {
 			receiveMessages: {
 				await AsyncAlgorithms.merge(
 					rtcClients.incomingMessages(),
-					m2m.incomingMessages()
+					radixConnectMobile.incomingMessages()
 				)
 				.share()
 				.eraseToAnyAsyncSequence()
@@ -157,7 +157,7 @@ extension RadixConnectClient {
 			sendResponse: { response, route in
 				switch route {
 				case let .deepLink(sessionId):
-					try await m2m.sendResponse(response, sessionId: sessionId)
+					try await radixConnectMobile.sendResponse(response, sessionId: sessionId)
 				case let .rtc(route):
 					try await rtcClients.sendResponse(response, to: route)
 				case .wallet:
@@ -170,7 +170,7 @@ extension RadixConnectClient {
 			},
 			handleDappDeepLink: { url in
 				do {
-					try await m2m.handleRequest(url)
+					try await radixConnectMobile.handleRequest(url)
 				} catch {
 					loggerGlobal.error("Failed to handle deep link \(error)")
 					errorQueue.schedule(error)
