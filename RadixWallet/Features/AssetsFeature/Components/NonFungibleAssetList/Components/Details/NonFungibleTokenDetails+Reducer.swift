@@ -31,7 +31,7 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case closeButtonTapped
 		case task
-		case openURLTapped(URL)
+		case arbitraryDataField(ArbitraryDataFieldView.Action)
 		case tappedClaimStake
 	}
 
@@ -64,9 +64,12 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 			return .run { _ in
 				await dismiss()
 			}
-		case let .openURLTapped(url):
-			return .run { _ in
-				await openURL(url)
+		case let .arbitraryDataField(action):
+			switch action {
+			case let .urlTapped(url):
+				return .run { _ in
+					await openURL(url)
+				}
 			}
 		case .tappedClaimStake:
 			guard let stakeClaim = state.stakeClaim else {
