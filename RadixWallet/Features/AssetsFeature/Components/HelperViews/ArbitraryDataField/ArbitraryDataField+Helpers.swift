@@ -1,5 +1,64 @@
 import Foundation
 
+extension [GatewayAPI.EntityMetadataItem] {
+	var asDataFields: [ArbitraryDataField] {
+		compactMap { item in
+			let kind: ArbitraryDataField.Kind? = switch item.value.typed {
+			case let .boolValue(content):
+				.primitive(String(content.value))
+			case let .stringValue(content):
+				content.value.asDataField
+			case let .u8Value(content):
+				content.value.asPrimitiveDataField
+			case let .u32Value(content):
+				content.value.asPrimitiveDataField
+			case let .u64Value(content):
+				content.value.asPrimitiveDataField
+			case let .i32Value(content):
+				content.value.asPrimitiveDataField
+			case let .i64Value(content):
+				content.value.asPrimitiveDataField
+			case let .decimalValue(content):
+				content.value.asDecimalDataField
+			case let .globalAddressValue(content):
+				content.value.asLedgerAddressDataField
+			case let .publicKeyValue(content):
+				switch content.value {
+				case let .ecdsaSecp256k1(key):
+					.primitive(key.keyHex)
+				case let .eddsaEd25519(key):
+					.primitive(key.keyHex)
+				}
+			case let .nonFungibleLocalIdValue(content):
+				.primitive(content.value)
+			case let .instantValue(content):
+				if let date = OpenISO8601DateFormatter.withoutSeconds.date(from: content.value) {
+					.instant(date)
+				} else {
+					nil
+				}
+			case let .urlValue(content):
+				content.value.asDataField
+			case let .originValue(content):
+				content.value.asDataField
+			case let .publicKeyHashValue(content):
+				switch content.value {
+				case let .ecdsaSecp256k1(hash):
+					.primitive(hash.hashHex)
+				case let .eddsaEd25519(hash):
+					.primitive(hash.hashHex)
+				}
+			case .u8ArrayValue, .i32ArrayValue, .i64ArrayValue, .u32ArrayValue, .u64ArrayValue, .urlArrayValue, .boolArrayValue, .originArrayValue, .stringArrayValue, .decimalArrayValue, .instantArrayValue, .publicKeyArrayValue, .globalAddressArrayValue, .publicKeyHashArrayValue, .nonFungibleLocalIdArrayValue, .nonFungibleGlobalIdArrayValue, .nonFungibleGlobalIdValue:
+				nil
+			}
+			guard let kind else {
+				return nil
+			}
+			return .init(kind: kind, name: item.key)
+		}
+	}
+}
+
 extension GatewayAPI.ProgrammaticScryptoSborValue {
 	enum TypeName: String {
 		case instant = "Instant"

@@ -15,6 +15,7 @@ extension NonFungibleTokenDetails.State {
 				validatorAddress: nil,
 				resourceName: resourceDetails.metadata.title,
 				currentSupply: resourceDetails.totalSupply.map { $0?.formatted() },
+				arbitraryDataFields: resourceDetails.metadata.arbitraryItems.asDataFields,
 				behaviors: resourceDetails.behaviors,
 				tags: ownedResource.map { .success($0.metadata.tags) } ?? resourceDetails.metadata.tags
 			)

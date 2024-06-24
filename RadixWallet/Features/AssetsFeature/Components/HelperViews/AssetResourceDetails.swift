@@ -12,6 +12,7 @@ struct AssetResourceDetailsSection: View {
 		let validatorAddress: ValidatorAddress?
 		let resourceName: Loadable<String?>?
 		let currentSupply: Loadable<String?>
+		let arbitraryDataFields: Loadable<[ArbitraryDataField]>
 		let behaviors: Loadable<[AssetBehavior]>
 		let tags: Loadable<[AssetTag]>
 	}
@@ -50,6 +51,12 @@ struct AssetResourceDetailsSection: View {
 
 				loadable(viewState.currentSupply) { supply in
 					KeyValueView(key: L10n.AssetDetails.currentSupply, value: supply ?? "")
+				}
+
+				loadable(viewState.arbitraryDataFields) { arbitraryDataFields in
+					ForEachStatic(arbitraryDataFields) { field in
+						ArbitraryDataFieldView(field: field) { _ in }
+					}
 				}
 
 				loadable(viewState.behaviors) { value in

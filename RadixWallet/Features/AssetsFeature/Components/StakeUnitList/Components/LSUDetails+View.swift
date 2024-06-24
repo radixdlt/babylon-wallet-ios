@@ -20,6 +20,7 @@ extension LSUDetails.State {
 				validatorAddress: validator.address,
 				resourceName: .success(stakeUnitResource.resource.metadata.title),
 				currentSupply: .success(validator.xrdVaultBalance.formatted()),
+				arbitraryDataFields: .success(stakeUnitResource.resource.metadata.arbitraryItems.asDataFields),
 				behaviors: .success(stakeUnitResource.resource.behaviors),
 				tags: .success(stakeUnitResource.resource.metadata.tags)
 			)

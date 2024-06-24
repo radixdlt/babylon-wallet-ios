@@ -139,7 +139,7 @@ extension OnLedgerEntity {
 		public let accountType: AccountType?
 		public let ownerKeys: PublicKeyHashesWithStateVersion?
 		public let ownerBadge: OwnerBadgeWithStateVersion?
-		public let arbitraryFields: [ArbitraryField]?
+		public let arbitraryItems: [ArbitraryItem]
 
 		public struct ValueAtStateVersion<Value>: Codable where Value: Codable {
 			public let value: Value
@@ -170,7 +170,7 @@ extension OnLedgerEntity {
 
 		public typealias OwnerBadgeWithStateVersion = ValueAtStateVersion<NonFungibleLocalId>
 		public typealias PublicKeyHashesWithStateVersion = ValueAtStateVersion<[PublicKeyHash]>
-		public typealias ArbitraryField = GatewayAPI.ProgrammaticScryptoSborValue
+		public typealias ArbitraryItem = GatewayAPI.EntityMetadataItem
 
 		public init(
 			name: String? = nil,
@@ -188,7 +188,7 @@ extension OnLedgerEntity {
 			accountType: AccountType? = nil,
 			ownerKeys: PublicKeyHashesWithStateVersion? = nil,
 			ownerBadge: OwnerBadgeWithStateVersion? = nil,
-			arbitraryFields: [ArbitraryField]? = nil
+			arbitraryItems: [GatewayAPI.EntityMetadataItem] = []
 		) {
 			self.name = name
 			self.symbol = symbol
@@ -205,7 +205,7 @@ extension OnLedgerEntity {
 			self.accountType = accountType
 			self.ownerKeys = ownerKeys
 			self.ownerBadge = ownerBadge
-			self.arbitraryFields = arbitraryFields
+			self.arbitraryItems = arbitraryItems
 		}
 	}
 

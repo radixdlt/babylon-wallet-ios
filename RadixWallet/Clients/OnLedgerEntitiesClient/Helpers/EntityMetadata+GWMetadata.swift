@@ -17,7 +17,7 @@ extension OnLedgerEntity.Metadata {
 			accountType: raw?.accountType,
 			ownerKeys: raw?.ownerKeys,
 			ownerBadge: raw?.ownerBadge,
-			arbitraryFields: raw?.others
+			arbitraryItems: raw?.arbitraryItems ?? []
 		)
 	}
 }
@@ -202,12 +202,9 @@ extension GatewayAPI.EntityMetadataCollection {
 		items[.ownerBadge]?.map(\.asNonFungibleLocalID)
 	}
 
-	public var arbitraryFields: [OnLedgerEntity.Metadata.ArbitraryField] {
+	public var arbitraryItems: [OnLedgerEntity.Metadata.ArbitraryItem] {
 		let standardKeys = EntityMetadataKey.allCases.map(\.rawValue)
-		return items
-			.filter {
-				!standardKeys.contains($0.key)
-			}.map(\.value.programmaticJson)
+		return items.filter { !standardKeys.contains($0.key) }
 	}
 
 	public var validator: ValidatorAddress? {

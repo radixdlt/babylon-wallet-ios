@@ -16,6 +16,7 @@ extension FungibleTokenDetails.State {
 				validatorAddress: nil,
 				resourceName: nil,
 				currentSupply: resource.totalSupply.map { $0?.formatted() ?? L10n.AssetDetails.supplyUnkown },
+				arbitraryDataFields: resource.metadata.arbitraryItems.asDataFields,
 				behaviors: resource.behaviors,
 				tags: {
 					let tags = resource.metadata.get(\.tags, prefetched: ownedFungibleResource?.metadata)
