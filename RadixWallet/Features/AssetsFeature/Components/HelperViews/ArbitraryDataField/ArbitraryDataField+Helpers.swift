@@ -35,7 +35,7 @@ extension [GatewayAPI.EntityMetadataItem] {
 				if let date = OpenISO8601DateFormatter.withoutSeconds.date(from: content.value) {
 					.instant(date)
 				} else {
-					nil
+					.primitive(content.value)
 				}
 			case let .urlValue(content):
 				content.value.asDataField
@@ -48,8 +48,10 @@ extension [GatewayAPI.EntityMetadataItem] {
 				case let .eddsaEd25519(hash):
 					.primitive(hash.hashHex)
 				}
-			case .u8ArrayValue, .i32ArrayValue, .i64ArrayValue, .u32ArrayValue, .u64ArrayValue, .urlArrayValue, .boolArrayValue, .originArrayValue, .stringArrayValue, .decimalArrayValue, .instantArrayValue, .publicKeyArrayValue, .globalAddressArrayValue, .publicKeyHashArrayValue, .nonFungibleLocalIdArrayValue, .nonFungibleGlobalIdArrayValue, .nonFungibleGlobalIdValue:
-				nil
+			case .u8ArrayValue, .i32ArrayValue, .i64ArrayValue, .u32ArrayValue, .u64ArrayValue, .urlArrayValue, .boolArrayValue, .originArrayValue,
+			     .stringArrayValue, .decimalArrayValue, .instantArrayValue, .publicKeyArrayValue, .globalAddressArrayValue, .publicKeyHashArrayValue,
+			     .nonFungibleLocalIdArrayValue, .nonFungibleGlobalIdArrayValue, .nonFungibleGlobalIdValue:
+				.complex
 			}
 			guard let kind else {
 				return nil
