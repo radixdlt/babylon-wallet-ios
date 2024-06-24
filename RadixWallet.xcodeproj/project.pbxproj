@@ -919,9 +919,11 @@
 		831F0CED2C21819000D6F5BF /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 831F0CEC2C21819000D6F5BF /* Sargon */; };
 		831F0CEF2C25728E00D6F5BF /* RadixConnectMobileSessionStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831F0CEE2C25728E00D6F5BF /* RadixConnectMobileSessionStorage.swift */; };
 		831F0CF22C25897500D6F5BF /* DappInteractionVerifyDappOrigin+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831F0CF12C25897500D6F5BF /* DappInteractionVerifyDappOrigin+View.swift */; };
+		831F0CF42C294BAA00D6F5BF /* DeepLinkHandlerClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831F0CF32C294BAA00D6F5BF /* DeepLinkHandlerClient+Live.swift */; };
+		831F0CF62C294C0D00D6F5BF /* DeepLinkHandlerClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831F0CF52C294C0D00D6F5BF /* DeepLinkHandlerClient+Test.swift */; };
 		832868652BE2641800902126 /* DappInteractionVerifyDappOrigin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832868642BE2641800902126 /* DappInteractionVerifyDappOrigin.swift */; };
 		8328806C2AE6725F0014FBF3 /* AccountPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */; };
-		8329ACE42BBAB9E7005FD9DC /* DeepLinkHandlerClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8329ACE32BBAB9E7005FD9DC /* DeepLinkHandlerClient.swift */; };
+		8329ACE42BBAB9E7005FD9DC /* DeepLinkHandlerClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8329ACE32BBAB9E7005FD9DC /* DeepLinkHandlerClient+Interface.swift */; };
 		83377A032B9DDAF000D8AA36 /* NPSSurvey+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83377A022B9DDAF000D8AA36 /* NPSSurvey+View.swift */; };
 		83377A052B9DDB5C00D8AA36 /* NPSSurveyClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83377A042B9DDB5C00D8AA36 /* NPSSurveyClient+Live.swift */; };
 		8338B9E52AFAB20700D1D8EA /* TransactionFee.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8338B9E42AFAB20700D1D8EA /* TransactionFee.swift */; };
@@ -2046,9 +2048,11 @@
 		830EA9E82AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EntitiesVisibilityClient+Test.swift"; sourceTree = "<group>"; };
 		831F0CEE2C25728E00D6F5BF /* RadixConnectMobileSessionStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadixConnectMobileSessionStorage.swift; sourceTree = "<group>"; };
 		831F0CF12C25897500D6F5BF /* DappInteractionVerifyDappOrigin+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DappInteractionVerifyDappOrigin+View.swift"; sourceTree = "<group>"; };
+		831F0CF32C294BAA00D6F5BF /* DeepLinkHandlerClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeepLinkHandlerClient+Live.swift"; sourceTree = "<group>"; };
+		831F0CF52C294C0D00D6F5BF /* DeepLinkHandlerClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeepLinkHandlerClient+Test.swift"; sourceTree = "<group>"; };
 		832868642BE2641800902126 /* DappInteractionVerifyDappOrigin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DappInteractionVerifyDappOrigin.swift; sourceTree = "<group>"; };
 		8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountPreferencesTests.swift; sourceTree = "<group>"; };
-		8329ACE32BBAB9E7005FD9DC /* DeepLinkHandlerClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepLinkHandlerClient.swift; sourceTree = "<group>"; };
+		8329ACE32BBAB9E7005FD9DC /* DeepLinkHandlerClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeepLinkHandlerClient+Interface.swift"; sourceTree = "<group>"; };
 		83377A022B9DDAF000D8AA36 /* NPSSurvey+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NPSSurvey+View.swift"; sourceTree = "<group>"; };
 		83377A042B9DDB5C00D8AA36 /* NPSSurveyClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NPSSurveyClient+Live.swift"; sourceTree = "<group>"; };
 		8338B9E42AFAB20700D1D8EA /* TransactionFee.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionFee.swift; sourceTree = "<group>"; };
@@ -5675,7 +5679,9 @@
 		8329ACE22BBAB9CD005FD9DC /* DeepLinkHandlerClient */ = {
 			isa = PBXGroup;
 			children = (
-				8329ACE32BBAB9E7005FD9DC /* DeepLinkHandlerClient.swift */,
+				8329ACE32BBAB9E7005FD9DC /* DeepLinkHandlerClient+Interface.swift */,
+				831F0CF32C294BAA00D6F5BF /* DeepLinkHandlerClient+Live.swift */,
+				831F0CF52C294C0D00D6F5BF /* DeepLinkHandlerClient+Test.swift */,
 			);
 			path = DeepLinkHandlerClient;
 			sourceTree = "<group>";
@@ -7393,13 +7399,14 @@
 				48CFC2952ADC10D900E77A5C /* FeesView.swift in Sources */,
 				83EE47842AF0EE3C00155F03 /* ProgrammaticScryptoSborValueTuple.swift in Sources */,
 				48CFC4472ADC10DA00E77A5C /* AccountsClient+Interface.swift in Sources */,
-				8329ACE42BBAB9E7005FD9DC /* DeepLinkHandlerClient.swift in Sources */,
+				8329ACE42BBAB9E7005FD9DC /* DeepLinkHandlerClient+Interface.swift in Sources */,
 				830EA9DB2AEA8770004C8051 /* EntitiesVisibilityClient+Interface.swift in Sources */,
 				48CFC2682ADC10D900E77A5C /* EditPersonaField+View.swift in Sources */,
 				48CFC3672ADC10D900E77A5C /* NonFungbileAssetRow+Reducer.swift in Sources */,
 				48CFC25C2ADC10D900E77A5C /* OnboardingStartup+View.swift in Sources */,
 				48CFC2642ADC10D900E77A5C /* EditPersona.swift in Sources */,
 				48CFC54F2ADC10DA00E77A5C /* RoleKey.swift in Sources */,
+				831F0CF62C294C0D00D6F5BF /* DeepLinkHandlerClient+Test.swift in Sources */,
 				48CFC5AD2ADC10DA00E77A5C /* WarningView.swift in Sources */,
 				48CFC5982ADC10DA00E77A5C /* ControlState.swift in Sources */,
 				A41266F92B160F4C00EA38E9 /* ManualAccountRecoveryCoordinator+View.swift in Sources */,
@@ -7440,6 +7447,7 @@
 				48CFC36E2ADC10D900E77A5C /* FungibleAssetList+Row+View.swift in Sources */,
 				830EA9E52AEB9088004C8051 /* DefaultValueDecodable.swift in Sources */,
 				48CFC59F2ADC10DA00E77A5C /* Label+Extra.swift in Sources */,
+				831F0CF42C294BAA00D6F5BF /* DeepLinkHandlerClient+Live.swift in Sources */,
 				48CFC5602ADC10DA00E77A5C /* ValidationErrorsAtPath.swift in Sources */,
 				48CFC4452ADC10DA00E77A5C /* OnboardingClient+Test.swift in Sources */,
 				48CFC32C2ADC10D900E77A5C /* DoScanQR+Reducer.swift in Sources */,
