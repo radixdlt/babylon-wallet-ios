@@ -94,7 +94,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 			enum ResponseFailure: Sendable, Hashable {
 				case cancelButtonTapped(RequestEnvelope)
-				case retryButtonTapped(P2P.Dapp.Response, for: RequestEnvelope, DappMetadata)
+				case retryButtonTapped(WalletToDappInteractionResponse, for: RequestEnvelope, DappMetadata)
 			}
 
 			enum InvalidRequest: Sendable, Hashable {
