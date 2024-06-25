@@ -7,6 +7,7 @@ extension ArbitraryDataFieldView {
 	struct Field: Hashable, Sendable {
 		let kind: Kind
 		let name: String
+		let isLocked: Bool
 	}
 }
 

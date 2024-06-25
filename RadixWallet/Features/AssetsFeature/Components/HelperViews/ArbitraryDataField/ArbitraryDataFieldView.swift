@@ -9,7 +9,7 @@ public struct ArbitraryDataFieldView: View {
 		switch field.kind {
 		case let .primitive(value):
 			ViewThatFits(in: .horizontal) {
-				KeyValueView(key: field.name, value: value)
+				KeyValueView(key: field.name, value: value, isLocked: field.isLocked)
 				VStack(alignment: .leading, spacing: .small3) {
 					Text(field.name)
 						.textStyle(.body1Regular)
@@ -24,37 +24,30 @@ public struct ArbitraryDataFieldView: View {
 			}
 
 		case let .truncated(value):
-			KeyValueTruncatedView(key: field.name, value: value)
+			KeyValueTruncatedView(key: field.name, value: value, isLocked: field.isLocked)
 
 		case .complex:
-			KeyValueView(key: field.name, value: L10n.AssetDetails.NFTDetails.complexData)
+			KeyValueView(key: field.name, value: L10n.AssetDetails.NFTDetails.complexData, isLocked: field.isLocked)
 
 		case let .url(url):
-			KeyValueUrlView(key: field.name, url: url)
+			KeyValueUrlView(key: field.name, url: url, isLocked: field.isLocked)
 
 		case let .address(address):
-			KeyValueView(key: field.name) {
+			KeyValueView(key: field.name, isLocked: field.isLocked) {
 				AddressView(.address(address), imageColor: .app.gray2)
 			}
 
 		case let .decimal(value):
-			KeyValueView(key: field.name, value: value.formatted())
+			KeyValueView(key: field.name, value: value.formatted(), isLocked: field.isLocked)
 
 		case let .enum(variant):
-			KeyValueView(key: field.name, value: variant)
+			KeyValueView(key: field.name, value: variant, isLocked: field.isLocked)
 
 		case let .id(id):
-			KeyValueView(key: field.name, value: id.toRawString()) // use `id.formatted()` instead?
+			KeyValueView(key: field.name, value: id.toRawString(), isLocked: field.isLocked) // use `id.formatted()` instead?
 
 		case let .instant(date):
-			KeyValueView(key: field.name, value: date.formatted())
-		}
-	}
-
-	private func openUrl(_ url: URL) {
-		@Dependency(\.openURL) var openURL
-		Task {
-			await openURL(url)
+			KeyValueView(key: field.name, value: date.formatted(), isLocked: field.isLocked)
 		}
 	}
 }

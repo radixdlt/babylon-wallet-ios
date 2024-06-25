@@ -62,7 +62,7 @@ extension [GatewayAPI.EntityMetadataItem] {
 			guard let kind else {
 				return nil
 			}
-			return .init(kind: kind, name: item.key)
+			return .init(kind: kind, name: item.key, isLocked: item.isLocked)
 		}
 	}
 }

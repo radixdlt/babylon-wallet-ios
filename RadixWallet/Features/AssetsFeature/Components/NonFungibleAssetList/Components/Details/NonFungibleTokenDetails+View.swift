@@ -171,7 +171,7 @@ extension OnLedgerEntity.NonFungibleToken.NFTData {
 			else {
 				return nil
 			}
-			return .init(kind: kind, name: fieldName)
+			return .init(kind: kind, name: fieldName, isLocked: false)
 		}
 	}
 }

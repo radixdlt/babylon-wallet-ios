@@ -49,13 +49,14 @@ struct AssetResourceDetailsSection: View {
 					loadable(resourceName) { value in
 						KeyValueView(
 							key: L10n.AssetDetails.NFTDetails.resourceName,
-							value: value ?? ""
+							value: value ?? "",
+							isLocked: false
 						)
 					}
 				}
 
 				loadable(viewState.currentSupply) { supply in
-					KeyValueView(key: L10n.AssetDetails.currentSupply, value: supply ?? "")
+					KeyValueView(key: L10n.AssetDetails.currentSupply, value: supply ?? "", isLocked: false)
 				}
 
 				loadable(viewState.arbitraryDataFields) { arbitraryDataFields in

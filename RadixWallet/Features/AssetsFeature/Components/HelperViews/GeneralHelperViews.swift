@@ -5,40 +5,41 @@ import SwiftUI
 struct KeyValueView<Content: View>: View {
 	let key: String
 	let content: Content
+	let isLocked: Bool
 
 	init(resourceAddress: ResourceAddress, imageColor: Color? = .app.gray2) where Content == AddressView {
-		self.init(key: L10n.AssetDetails.resourceAddress) {
+		self.init(key: L10n.AssetDetails.resourceAddress, isLocked: false) { // TODO: MB: Confirm if locked
 			AddressView(.address(.resource(resourceAddress)), imageColor: imageColor)
 		}
 	}
 
 	init(validatorAddress: ValidatorAddress, imageColor: Color? = .app.gray2) where Content == AddressView {
-		self.init(key: L10n.AssetDetails.validator) {
+		self.init(key: L10n.AssetDetails.validator, isLocked: false) { // TODO: MB: Confirm if locked
 			AddressView(.address(.validator(validatorAddress)), imageColor: imageColor)
 		}
 	}
 
 	init(nonFungibleGlobalID: NonFungibleGlobalId, imageColor: Color? = .app.gray2) where Content == AddressView {
-		self.init(key: L10n.AssetDetails.NFTDetails.id) {
+		self.init(key: L10n.AssetDetails.NFTDetails.id, isLocked: true) { // TODO: MB: Confirm global ids will be locked
 			AddressView(.identifier(.nonFungibleGlobalID(nonFungibleGlobalID)), imageColor: imageColor)
 		}
 	}
 
-	init(key: String, value: String) where Content == Text {
+	init(key: String, value: String, isLocked: Bool) where Content == Text {
 		self.key = key
+		self.isLocked = isLocked
 		self.content = Text(value)
 	}
 
-	init(key: String, @ViewBuilder content: () -> Content) {
+	init(key: String, isLocked: Bool, @ViewBuilder content: () -> Content) {
 		self.key = key
+		self.isLocked = isLocked
 		self.content = content()
 	}
 
 	var body: some View {
 		HStack(alignment: .top, spacing: .medium3) {
-			Text(key)
-				.textStyle(.body1Regular)
-				.foregroundColor(.app.gray2)
+			KeyText(key: key, isLocked: isLocked)
 			Spacer(minLength: 0)
 			content
 				.multilineTextAlignment(.trailing)
@@ -53,14 +54,13 @@ struct KeyValueView<Content: View>: View {
 struct KeyValueTruncatedView: View {
 	let key: String
 	let value: String
+	let isLocked: Bool
 
 	@Dependency(\.pasteboardClient) var pasteboardClient
 
 	var body: some View {
 		HStack(alignment: .top, spacing: .medium3) {
-			Text(key)
-				.textStyle(.body1Regular)
-				.foregroundColor(.app.gray2)
+			KeyText(key: key, isLocked: isLocked)
 
 			Spacer(minLength: 0)
 
@@ -80,14 +80,13 @@ struct KeyValueTruncatedView: View {
 struct KeyValueUrlView: View {
 	let key: String
 	let url: URL
+	let isLocked: Bool
 
 	@Dependency(\.openURL) var openURL
 
 	var body: some View {
 		VStack(alignment: .leading, spacing: .small3) {
-			Text(key)
-				.textStyle(.body1Regular)
-				.foregroundColor(.app.gray2)
+			KeyText(key: key, isLocked: isLocked)
 
 			Button(url.absoluteString) {
 				openUrl(url)
@@ -101,5 +100,23 @@ struct KeyValueUrlView: View {
 		Task {
 			await openURL(url)
 		}
+	}
+}
+
+// MARK: - KeyText
+private struct KeyText: View {
+	let key: String
+	let isLocked: Bool
+
+	var body: some View {
+		HStack(spacing: .zero) {
+			Text(key)
+				.textStyle(.body1Regular)
+
+			if isLocked {
+				Image(systemName: "lock")
+			}
+		}
+		.foregroundColor(.app.gray2)
 	}
 }
