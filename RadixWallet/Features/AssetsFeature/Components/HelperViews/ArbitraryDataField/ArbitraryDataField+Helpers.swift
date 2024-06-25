@@ -48,9 +48,15 @@ extension [GatewayAPI.EntityMetadataItem] {
 				case let .eddsaEd25519(hash):
 					.truncated(hash.hashHex)
 				}
+			case let .nonFungibleGlobalIdValue(content):
+				if let resourceAddress = try? ResourceAddress(validatingAddress: content.resourceAddress), let localId = try? NonFungibleLocalId(content.nonFungibleId) {
+					.address(.nonFungibleGlobalID(.init(resourceAddress: resourceAddress, nonFungibleLocalId: localId)))
+				} else {
+					.complex
+				}
 			case .u8ArrayValue, .i32ArrayValue, .i64ArrayValue, .u32ArrayValue, .u64ArrayValue, .urlArrayValue, .boolArrayValue, .originArrayValue,
 			     .stringArrayValue, .decimalArrayValue, .instantArrayValue, .publicKeyArrayValue, .globalAddressArrayValue, .publicKeyHashArrayValue,
-			     .nonFungibleLocalIdArrayValue, .nonFungibleGlobalIdArrayValue, .nonFungibleGlobalIdValue:
+			     .nonFungibleLocalIdArrayValue, .nonFungibleGlobalIdArrayValue:
 				.complex
 			}
 			guard let kind else {
