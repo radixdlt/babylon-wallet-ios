@@ -80,10 +80,10 @@ extension GatewayAPIClient {
 		_ address: String
 	) -> @Sendable (PageCursor?) async throws -> PaginatedResourceResponse<GatewayAPI.EntityMetadataItem> {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
-		return { _ in
+		return { pageCursor in
 			let request = GatewayAPI.StateEntityMetadataPageRequest(
-				atLedgerState: nil,
-				cursor: nil,
+				atLedgerState: pageCursor?.ledgerState.selector,
+				cursor: pageCursor?.nextPageCursor,
 				address: address
 			)
 			let response = try await gatewayAPIClient.getEntityMetadataPage(request)
