@@ -15,10 +15,22 @@ extension AddressDetails.State {
 public extension AddressDetails {
 	struct ViewState: Equatable {
 		let address: LedgerIdentifiable.Address
+		let colorisedAddress: AttributedString
+		let enlargedAddress: AttributedString
 		let title: Loadable<String?>
 		let qrImage: Loadable<CGImage>
 		let showEnlarged: Bool
 		let showShare: Bool
+
+		init(address: LedgerIdentifiable.Address, title: Loadable<String?>, qrImage: Loadable<CGImage>, showEnlarged: Bool, showShare: Bool) {
+			self.address = address
+			self.colorisedAddress = Self.colorised(address: address)
+			self.enlargedAddress = Self.enlarged(address: address)
+			self.title = title
+			self.qrImage = qrImage
+			self.showEnlarged = showEnlarged
+			self.showShare = showShare
+		}
 	}
 
 	@MainActor
@@ -62,7 +74,7 @@ public extension AddressDetails {
 			.overlay(alignment: .top) {
 				Group {
 					if viewStore.showEnlarged {
-						enlargedView(text: viewStore.enlargedText)
+						enlargedView(text: viewStore.enlargedAddress)
 					}
 				}
 				.animation(.easeInOut, value: viewStore.showEnlarged)
@@ -195,7 +207,7 @@ private extension AddressDetails.View {
 }
 
 private extension AddressDetails.ViewState {
-	var colorisedAddress: AttributedString {
+	static func colorised(address: LedgerIdentifiable.Address) -> AttributedString {
 		let raw = address.formatted(.raw)
 		var result = AttributedString(raw, foregroundColor: .app.gray2)
 
@@ -220,7 +232,7 @@ private extension AddressDetails.ViewState {
 		return result
 	}
 
-	var enlargedText: AttributedString {
+	static func enlarged(address: LedgerIdentifiable.Address) -> AttributedString {
 		let attributes = [NSAttributedString.Key.foregroundColor: UIColor(Color.app.green3)]
 		let result = NSMutableAttributedString()
 		for letter in address.address.unicodeScalars {
