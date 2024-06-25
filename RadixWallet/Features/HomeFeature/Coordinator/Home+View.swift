@@ -138,9 +138,9 @@ private extension View {
 		return accountDetails(with: destinationStore)
 			.createAccount(with: destinationStore)
 			.acknowledgeJailbreakAlert(with: destinationStore)
-			.userFeedback(with: destinationStore)
 			.relinkConnector(with: destinationStore)
 			.securityCenter(with: destinationStore)
+			.npsSurvey(with: destinationStore)
 	}
 
 	private func accountDetails(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
@@ -159,12 +159,6 @@ private extension View {
 		alert(store: destinationStore.scope(state: \.acknowledgeJailbreakAlert, action: \.acknowledgeJailbreakAlert))
 	}
 
-	private func userFeedback(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
-		sheet(store: destinationStore.scope(state: \.npsSurvey, action: \.npsSurvey)) {
-			NPSSurvey.View(store: $0)
-		}
-	}
-
 	private func relinkConnector(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
 		sheet(store: destinationStore.scope(state: \.relinkConnector, action: \.relinkConnector)) {
 			NewConnection.View(store: $0)
@@ -174,6 +168,12 @@ private extension View {
 	private func securityCenter(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.securityCenter, action: \.securityCenter)) {
 			SecurityCenter.View(store: $0)
+		}
+	}
+
+	private func npsSurvey(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.npsSurvey, action: \.npsSurvey)) {
+			NPSSurvey.View(store: $0)
 		}
 	}
 }

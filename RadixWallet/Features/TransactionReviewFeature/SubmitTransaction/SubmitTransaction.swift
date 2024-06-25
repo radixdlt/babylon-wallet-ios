@@ -64,7 +64,6 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 	@Dependency(\.submitTXClient) var submitTXClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
-	@Dependency(\.npsSurveyClient) var npsSurveyClient
 
 	public init() {}
 
@@ -160,7 +159,6 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 	private func transactionCommittedSuccesfully(_ state: State) -> Effect<Action> {
 		// TODO: Could probably be moved in other place. TransactionClient? AccountPortfolio?
 		accountPortfoliosClient.updateAfterCommittedTransaction(state.notarizedTX.intent)
-		npsSurveyClient.incrementTransactionCompleteCounter()
 		return .send(.delegate(.committedSuccessfully(state.notarizedTX.txID)))
 	}
 }

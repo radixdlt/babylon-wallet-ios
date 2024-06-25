@@ -3641,13 +3641,13 @@
 		48CFBDF52ADC10D800E77A5C /* Coordinator */ = {
 			isa = PBXGroup;
 			children = (
-				48CFBDF62ADC10D800E77A5C /* DappInteractionFlow.swift */,
 				48CFBDF72ADC10D800E77A5C /* DappInteractionLoading.swift */,
 				48CFBDF82ADC10D800E77A5C /* DappInteractionLoading+View.swift */,
 				48CFBDF92ADC10D800E77A5C /* DappInteractionCoordinator.swift */,
+				48CFBDFC2ADC10D800E77A5C /* DappInteractionCoordinator+View.swift */,
+				48CFBDF62ADC10D800E77A5C /* DappInteractionFlow.swift */,
 				48CFBDFA2ADC10D800E77A5C /* DappInteractionFlow+View.swift */,
 				48CFBDFB2ADC10D800E77A5C /* DappInteractionModels.swift */,
-				48CFBDFC2ADC10D800E77A5C /* DappInteractionCoordinator+View.swift */,
 			);
 			path = Coordinator;
 			sourceTree = "<group>";

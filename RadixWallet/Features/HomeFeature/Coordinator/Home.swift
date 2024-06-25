@@ -58,7 +58,7 @@ public struct Home: Sendable, FeatureReducer {
 		public typealias HasAccessToMnemonic = Bool
 		case accountsLoadedResult(TaskResult<Accounts>)
 		case currentGatewayChanged(to: Gateway)
-		case shouldShowNPSSurvey(Bool)
+		case shouldShowNpsSurvey(Bool)
 		case accountsResourcesLoaded(Loadable<[OnLedgerEntity.OnLedgerAccount]>)
 		case accountsFiatWorthLoaded([AccountAddress: Loadable<FiatWorth>])
 		case showLinkConnectorIfNeeded
@@ -170,9 +170,9 @@ public struct Home: Sendable, FeatureReducer {
 				errorQueue.schedule(error)
 			}
 			.merge(with: loadGateways())
-			.merge(with: loadNPSSurveyStatus())
 			.merge(with: loadAccountResources())
 			.merge(with: loadFiatValues())
+			.merge(with: showNpsSurveyEffect())
 			.merge(with: securityProblemsEffect())
 			.merge(with: delayedMediumEffect(for: .internal(.showLinkConnectorIfNeeded)))
 
@@ -250,7 +250,7 @@ public struct Home: Sendable, FeatureReducer {
 			#endif
 			return .none
 
-		case let .shouldShowNPSSurvey(shouldShow):
+		case let .shouldShowNpsSurvey(shouldShow):
 			if shouldShow {
 				state.addDestination(.npsSurvey(.init()))
 			}
@@ -315,7 +315,7 @@ public struct Home: Sendable, FeatureReducer {
 
 		case let .npsSurvey(.delegate(.feedbackFilled(userFeedback))):
 			state.destination = nil
-			return uploadUserFeedback(userFeedback)
+			return uploadUserFeedbackEffect(userFeedback)
 
 		case let .relinkConnector(.delegate(.newConnection(connectedClient))):
 			state.destination = nil
@@ -338,7 +338,7 @@ public struct Home: Sendable, FeatureReducer {
 
 		switch state.destination {
 		case .npsSurvey:
-			effect = uploadUserFeedback(nil)
+			effect = uploadUserFeedbackEffect(nil)
 		case .relinkConnector:
 			userDefaults.setShowRelinkConnectorsAfterProfileRestore(false)
 			userDefaults.setShowRelinkConnectorsAfterUpdate(false)
@@ -356,23 +356,6 @@ public struct Home: Sendable, FeatureReducer {
 				guard !Task.isCancelled else { return }
 				await send(.internal(.currentGatewayChanged(to: gateway)))
 			}
-		}
-	}
-
-	private func loadNPSSurveyStatus() -> Effect<Action> {
-		.run { send in
-			for try await shouldAsk in await npsSurveyClient.shouldAskForUserFeedback() {
-				guard !Task.isCancelled else { return }
-				await send(.internal(.shouldShowNPSSurvey(shouldAsk)))
-			}
-		}
-	}
-
-	private func uploadUserFeedback(_ feedback: NPSSurveyClient.UserFeedback?) -> Effect<Action> {
-		overlayWindowClient.scheduleHUD(.thankYou)
-
-		return .run { _ in
-			await npsSurveyClient.uploadUserFeedback(feedback)
 		}
 	}
 
@@ -409,6 +392,25 @@ public struct Home: Sendable, FeatureReducer {
 				guard !Task.isCancelled else { return }
 				await send(.internal(.accountsFiatWorthLoaded(accountsTotalFiatWorth)))
 			}
+		}
+	}
+
+	private func showNpsSurveyEffect() -> Effect<Action> {
+		.run { send in
+			for try await shouldShow in await npsSurveyClient.shouldAskForUserFeedback() {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.shouldShowNpsSurvey(shouldShow)))
+			}
+		}
+	}
+
+	private func uploadUserFeedbackEffect(_ feedback: NPSSurveyClient.UserFeedback?) -> Effect<Action> {
+		if feedback != nil {
+			overlayWindowClient.scheduleHUD(.thankYou)
+		}
+
+		return .run { _ in
+			await npsSurveyClient.uploadUserFeedback(feedback)
 		}
 	}
 
