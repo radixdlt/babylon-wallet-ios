@@ -106,6 +106,7 @@ extension SubmitTransaction {
 						.textStyle(.body1Header)
 
 						if viewStore.status.failed, viewStore.showSwitchBackToBrowserMessage {
+							// FIXME: Strings
 							Text("Switch back to your browser to continue")
 								.foregroundColor(.app.gray1)
 								.textStyle(.body1Regular)

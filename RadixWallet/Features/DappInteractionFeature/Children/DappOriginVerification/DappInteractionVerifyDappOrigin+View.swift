@@ -3,52 +3,73 @@ extension DappInteractionVerifyDappOrigin {
 		let store: StoreOf<DappInteractionVerifyDappOrigin>
 
 		var body: some SwiftUI.View {
-			VStack(spacing: .medium1) {
+			VStack(spacing: .large2) {
 				CloseButton {
 					store.send(.view(.cancel))
 				}
 				.flushedLeft
 
-				VStack(spacing: .medium3) {
-					Thumbnail(.dapp, url: store.dAppMetadata.thumbnail, size: .medium)
-
-					Text("Have you come from a genuine website?")
-						.foregroundColor(.app.gray1)
-						.lineSpacing(0)
-						.textStyle(.sheetTitle)
-
-					Text("Before you connect to **\(store.dAppMetadata.name)**, you should be confident the site is safe.")
-						.foregroundColor(.app.gray1)
-						.textStyle(.body1Regular)
-				}
-				.multilineTextAlignment(.center)
-				.padding(.bottom, .large1)
-
-				VStack(alignment: .leading, spacing: .small3) {
-					HStack(alignment: .top) {
-						Text("•")
-						Text("Check the website address to see if it matches what you are expecting")
-					}
-					HStack(alignment: .top) {
-						Text("•")
-						Text("If you came from a social media ad, make sure it's legitimate")
-					}
-				}
-				.textStyle(.body1Regular)
-				.padding()
-				.background(.app.gray4)
-				.roundedCorners(radius: 5.0)
+				headerView()
+				infoPointsView()
 
 				Spacer()
 			}
-			.padding(.horizontal, .medium1)
-			.padding(.vertical, .medium1)
+			.padding(.medium1)
 			.background(.app.background)
 			.footer {
 				Button(L10n.DAppRequest.Login.continue) {
 					store.send(.view(.continueTapped))
 				}
 				.buttonStyle(.primaryRectangular)
+			}
+		}
+
+		private func headerView() -> some SwiftUI.View {
+			VStack(spacing: .zero) {
+				Thumbnail(.dapp, url: store.dAppMetadata.thumbnail, size: .medium)
+					.padding(.bottom, .small1)
+
+				Text("Have you come from a genuine website?")
+					.foregroundColor(.app.gray1)
+					.kerning(-0.5)
+					.textStyle(.sheetTitle)
+					.padding(.bottom, .large2)
+
+				Text("Before you connect to **\(store.dAppMetadata.name)**, you might want to check:")
+					.foregroundColor(.app.gray1)
+					.textStyle(.body1Link)
+			}
+			.multilineTextAlignment(.center)
+		}
+
+		private func infoPointsView() -> some SwiftUI.View {
+			VStack(alignment: .leading, spacing: .small1) {
+				infoPointView(1, info: "Does the website address match what you’re expecting?")
+				Divider()
+				infoPointView(2, info: "If you came from a social media ad, is the website legitimate?")
+			}
+			.padding()
+			.background(.app.gray5)
+			.roundedCorners(radius: 10)
+		}
+
+		private func infoPointView(_ index: Int, info: String) -> some SwiftUI.View {
+			HStack(spacing: .medium3) {
+				Text("\(index)")
+					.textStyle(.body1HighImportance)
+					.foregroundColor(.app.gray1)
+					.frame(.smallest)
+					.background(.clear)
+					.clipShape(Circle())
+					.overlay(
+						Circle()
+							.stroke(.app.gray1, lineWidth: 1)
+					)
+
+				Text(info)
+					.lineSpacing(-4)
+					.foregroundStyle(.app.gray1)
+					.textStyle(.body1Regular)
 			}
 		}
 	}

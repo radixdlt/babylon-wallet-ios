@@ -68,7 +68,7 @@ extension Completion {
 								.foregroundColor(.app.gray1)
 								.textStyle(.body1Regular)
 								.multilineTextAlignment(.center)
-								.padding(.top, .small2)
+								.padding(.top, .small1)
 						}
 					}
 					.padding(.horizontal, .medium2)
