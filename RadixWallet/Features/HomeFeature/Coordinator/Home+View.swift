@@ -103,14 +103,15 @@ extension Home {
 			let store: StoreOf<Home>
 
 			var body: some SwiftUI.View {
-				VStack(alignment: .leading, spacing: .small2) {
+				VStack(spacing: .small2) {
 					Text(L10n.HomePage.title)
 						.foregroundColor(.app.gray1)
 						.textStyle(.sheetTitle)
+						.flushedLeft
+						.padding(.horizontal, .medium1)
 
 					CardCarousel.View(store: store.scope(state: \.carousel, action: \.child.carousel))
 				}
-				.padding(.leading, .medium1)
 				.padding(.top, .small3)
 			}
 		}
