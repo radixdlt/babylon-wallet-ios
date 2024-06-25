@@ -9,7 +9,6 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 	}
 
 	public struct State: Sendable, Hashable {
-		public var iCloudAccountStatus: CKAccountStatus? = nil
 		public var cloudBackupsEnabled: Bool = true
 		public var lastManualBackup: Date? = nil
 		public var lastCloudBackup: BackupStatus? = nil
@@ -56,7 +55,6 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case setCloudBackupEnabled(Bool)
-		case setICloudAccountStatus(CKAccountStatus)
 		case setProblems([SecurityProblem])
 		case setLastManualBackup(Date?)
 		case setLastCloudBackup(BackupStatus?)
@@ -108,8 +106,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .didAppear:
-			return checkCloudAccountStatusEffect()
-				.merge(with: problemsEffect())
+			return problemsEffect()
 				.merge(with: lastManualBackupEffect())
 				.merge(with: lastCloudBackupEffect())
 				.merge(with: isCloudBackupEnabledEffect())
@@ -181,10 +178,6 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			state.cloudBackupsEnabled = isEnabled
 			return .none
 
-		case let .setICloudAccountStatus(status):
-			state.iCloudAccountStatus = status
-			return .none
-
 		case let .setProblems(problems):
 			state.problems = problems
 			return .none
@@ -226,17 +219,6 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			for try await problems in await securityCenterClient.problems(.configurationBackup) {
 				guard !Task.isCancelled else { return }
 				await send(.internal(.setProblems(problems)))
-			}
-		}
-	}
-
-	private func checkCloudAccountStatusEffect() -> Effect<Action> {
-		.run { send in
-			do {
-				let status = try await cloudBackupClient.checkAccountStatus()
-				await send(.internal(.setICloudAccountStatus(status)))
-			} catch {
-				loggerGlobal.error("Failed to get iCloud account status: \(error)")
 			}
 		}
 	}
