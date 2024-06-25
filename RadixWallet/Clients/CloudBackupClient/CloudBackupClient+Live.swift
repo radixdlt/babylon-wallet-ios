@@ -167,13 +167,11 @@ extension CloudBackupClient {
 				try? userDefaults.removeLastCloudBackup(for: profile.id)
 			}
 
-			let isSyncEnabled = profile.appPreferences.security.isCloudProfileSyncEnabled
-			let needsBackingUp = isSyncEnabled && profile.header.isNonEmpty
+			guard profile.appPreferences.security.isCloudProfileSyncEnabled else { return }
 			let isBackedUp = backedUpHeader?.saveIdentifier == profile.header.saveIdentifier
-			let shouldBackUp = needsBackingUp && !isBackedUp
-			let shouldCheckIfClaimed = isSyncEnabled && timeToCheckIfClaimed
+			let shouldBackUp = profile.header.isNonEmpty && !isBackedUp
 
-			guard shouldBackUp || shouldCheckIfClaimed else { return }
+			guard shouldBackUp || timeToCheckIfClaimed else { return }
 
 			let shouldReclaim: Bool
 			if let backedUpID = backedUpHeader?.lastUsedOnDevice.id, await !profileStore.isThisDevice(deviceID: backedUpID) {
