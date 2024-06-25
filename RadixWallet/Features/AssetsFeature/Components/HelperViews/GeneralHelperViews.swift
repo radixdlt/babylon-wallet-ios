@@ -49,8 +49,8 @@ struct KeyValueView<Content: View>: View {
 	}
 }
 
-// MARK: - TruncatedValueView
-struct TruncatedValueView: View {
+// MARK: - KeyValueTruncatedView
+struct KeyValueTruncatedView: View {
 	let key: String
 	let value: String
 

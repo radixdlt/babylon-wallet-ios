@@ -24,7 +24,7 @@ public struct ArbitraryDataFieldView: View {
 			}
 
 		case let .truncated(value):
-			TruncatedValueView(key: field.name, value: value)
+			KeyValueTruncatedView(key: field.name, value: value)
 
 		case .complex:
 			KeyValueView(key: field.name, value: L10n.AssetDetails.NFTDetails.complexData)
