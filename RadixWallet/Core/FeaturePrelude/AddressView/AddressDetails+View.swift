@@ -196,11 +196,27 @@ private extension AddressDetails.View {
 
 private extension AddressDetails.ViewState {
 	var colorisedAddress: AttributedString {
-		let middle = address.formatted(.middle)
-		var result = AttributedString(address.address, foregroundColor: .app.gray1)
-		if let range = result.range(of: middle) {
-			result[range].foregroundColor = .app.gray2
+		let raw = address.formatted(.raw)
+		var result = AttributedString(raw, foregroundColor: .app.gray2)
+
+		let truncatedParts: [String] =
+			switch address {
+			case let .nonFungibleGlobalID(globalId):
+				[globalId.resourceAddress.formatted(.default), globalId.localID.formatted(.default)]
+			default:
+				[address.formatted(.default)]
+			}
+
+		for part in truncatedParts {
+			let boldChars = part.split(separator: "...")
+			if let range = result.range(of: boldChars[0]) {
+				result[range].foregroundColor = .app.gray1
+			}
+			if boldChars.count == 2, let range = result.range(of: boldChars[1], options: .backwards) {
+				result[range].foregroundColor = .app.gray1
+			}
 		}
+
 		return result
 	}
 
