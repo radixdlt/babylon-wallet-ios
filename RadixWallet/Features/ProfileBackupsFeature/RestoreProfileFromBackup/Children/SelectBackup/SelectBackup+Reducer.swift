@@ -1,3 +1,4 @@
+import CloudKit
 import ComposableArchitecture
 import SwiftUI
 
@@ -9,7 +10,14 @@ public struct SelectBackup: Sendable, FeatureReducer {
 			case migrating
 			case loading
 			case loaded
-			case failed
+			case failed(FailureReason)
+
+			public enum FailureReason: Sendable {
+				case networkUnavailable
+				case accountTemporarilyUnavailable
+				case notAuthenticated
+				case other
+			}
 		}
 
 		public var status: Status = .start
@@ -240,9 +248,21 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 				await send(.internal(.setStatus(.loaded)))
 			} catch {
-				errorQueue.schedule(error)
+				let reason: State.Status.FailureReason
+				switch error {
+				case CKError.accountTemporarilyUnavailable:
+					reason = .accountTemporarilyUnavailable
+				case CKError.notAuthenticated:
+					reason = .notAuthenticated
+				case CKError.networkUnavailable, CKError.networkFailure:
+					reason = .networkUnavailable
+				default:
+					reason = .other
+					errorQueue.schedule(error)
+				}
+
 				loggerGlobal.error("Failed to migrate or load backed up profiles, error: \(error)")
-				await send(.internal(.setStatus(.failed)))
+				await send(.internal(.setStatus(.failed(reason))))
 			}
 		}
 	}
