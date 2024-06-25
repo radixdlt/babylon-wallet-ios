@@ -1,9 +1,9 @@
 
 extension GatewayAPIClient {
 	@Sendable
-	public func fetchEntityMetadata(_ address: String) async throws -> [GatewayAPI.EntityMetadataItem] {
+	public func fetchEntityMetadata(_ address: String, ledgerState: GatewayAPI.LedgerState, nextCursor: String) async throws -> [GatewayAPI.EntityMetadataItem] {
 		try await fetchAllPaginatedItems(
-			cursor: nil,
+			cursor: .init(ledgerState: ledgerState, nextPageCursor: nextCursor),
 			fetchEntityMetadataPage(address)
 		)
 	}
