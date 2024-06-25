@@ -48,3 +48,30 @@ struct KeyValueView<Content: View>: View {
 		}
 	}
 }
+
+// MARK: - TruncatedValueView
+struct TruncatedValueView: View {
+	let key: String
+	let value: String
+
+	@Dependency(\.pasteboardClient) var pasteboardClient
+
+	var body: some View {
+		HStack(alignment: .top, spacing: .medium3) {
+			Text(key)
+				.textStyle(.body1Regular)
+				.foregroundColor(.app.gray2)
+
+			Spacer(minLength: 0)
+
+			Text(value)
+				.multilineTextAlignment(.trailing)
+				.textStyle(.body1HighImportance)
+				.foregroundColor(.app.gray1)
+				.lineLimit(1)
+				.onTapGesture {
+					pasteboardClient.copyString(value)
+				}
+		}
+	}
+}

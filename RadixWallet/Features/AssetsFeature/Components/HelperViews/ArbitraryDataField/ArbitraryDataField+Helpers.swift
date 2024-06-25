@@ -25,9 +25,9 @@ extension [GatewayAPI.EntityMetadataItem] {
 			case let .publicKeyValue(content):
 				switch content.value {
 				case let .ecdsaSecp256k1(key):
-					.primitive(key.keyHex)
+					.truncated(key.keyHex)
 				case let .eddsaEd25519(key):
-					.primitive(key.keyHex)
+					.truncated(key.keyHex)
 				}
 			case let .nonFungibleLocalIdValue(content):
 				.primitive(content.value)
@@ -44,9 +44,9 @@ extension [GatewayAPI.EntityMetadataItem] {
 			case let .publicKeyHashValue(content):
 				switch content.value {
 				case let .ecdsaSecp256k1(hash):
-					.primitive(hash.hashHex)
+					.truncated(hash.hashHex)
 				case let .eddsaEd25519(hash):
-					.primitive(hash.hashHex)
+					.truncated(hash.hashHex)
 				}
 			case .u8ArrayValue, .i32ArrayValue, .i64ArrayValue, .u32ArrayValue, .u64ArrayValue, .urlArrayValue, .boolArrayValue, .originArrayValue,
 			     .stringArrayValue, .decimalArrayValue, .instantArrayValue, .publicKeyArrayValue, .globalAddressArrayValue, .publicKeyHashArrayValue,

@@ -14,6 +14,7 @@ extension ArbitraryDataFieldView {
 extension ArbitraryDataFieldView.Field {
 	enum Kind: Hashable, Sendable {
 		case primitive(String)
+		case truncated(String)
 		case complex
 		case url(URL)
 		case address(LedgerIdentifiable.Address)
