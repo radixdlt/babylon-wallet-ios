@@ -254,7 +254,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 					reason = .accountTemporarilyUnavailable
 				case CKError.notAuthenticated:
 					reason = .notAuthenticated
-				case CKError.networkUnavailable:
+				case CKError.networkUnavailable, CKError.networkFailure:
 					reason = .networkUnavailable
 				default:
 					reason = .other

@@ -43,6 +43,12 @@ extension [CKRecord.FieldKey] {
 }
 
 extension CloudBackupClient {
+	public func deleteProfileBackup() async throws {
+		try await deleteProfileBackup(nil)
+	}
+}
+
+extension CloudBackupClient {
 	struct IncorrectRecordTypeError: Error {}
 	struct NoProfileInRecordError: Error {}
 	struct MissingMetadataError: Error {}
@@ -54,6 +60,7 @@ extension CloudBackupClient {
 	public static func live(
 		profileStore: ProfileStore = .shared
 	) -> CloudBackupClient {
+		@Dependency(\.appPreferencesClient) var appPreferencesClient
 		@Dependency(\.overlayWindowClient) var overlayWindowClient
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.userDefaults) var userDefaults
@@ -127,6 +134,10 @@ extension CloudBackupClient {
 				let json = profile.toJSONString()
 				try await backupProfile(.right(json), header: profile.header, existingRecord: existingRecord)
 			} catch {
+				if await (try? container.accountStatus()) == .restricted {
+					try await appPreferencesClient.setIsCloudBackupEnabled(false)
+				}
+
 				let failure: BackupResult.Result.Failure
 				switch error {
 				case CKError.accountTemporarilyUnavailable:
@@ -134,7 +145,7 @@ extension CloudBackupClient {
 				case CKError.notAuthenticated:
 					failure = .notAuthenticated
 				default:
-					loggerGlobal.error("Automatic cloud backup failed with error \(error)")
+					loggerGlobal.error("Cloud backup failed with error \(error)")
 					failure = .other
 				}
 
@@ -156,11 +167,11 @@ extension CloudBackupClient {
 				try? userDefaults.removeLastCloudBackup(for: profile.id)
 			}
 
-			let isSynced = profile.appPreferences.security.isCloudProfileSyncEnabled
-			let needsBackUp = isSynced && profile.header.isNonEmpty
+			let isSyncEnabled = profile.appPreferences.security.isCloudProfileSyncEnabled
+			let needsBackingUp = isSyncEnabled && profile.header.isNonEmpty
 			let isBackedUp = backedUpHeader?.saveIdentifier == profile.header.saveIdentifier
-			let shouldBackUp = needsBackUp && !isBackedUp
-			let shouldCheckIfClaimed = isSynced && timeToCheckIfClaimed
+			let shouldBackUp = needsBackingUp && !isBackedUp
+			let shouldCheckIfClaimed = isSyncEnabled && timeToCheckIfClaimed
 
 			guard shouldBackUp || shouldCheckIfClaimed else { return }
 
@@ -192,6 +203,12 @@ extension CloudBackupClient {
 		let checkClaimedProfileInterval: TimeInterval = 15 * 60
 
 		return .init(
+			isCloudProfileSyncEnabled: {
+				await profileStore.appPreferencesValues()
+					.map(\.security.isCloudProfileSyncEnabled)
+					.removeDuplicates()
+					.eraseToAnyAsyncSequence()
+			},
 			startAutomaticBackups: {
 				// The active profile should not be synced to iCloud keychain
 				let profileID = await profileStore.profile.id
@@ -201,7 +218,14 @@ extension CloudBackupClient {
 				let profiles = await profileStore.values()
 				var lastClaimCheck: Date = .distantPast
 
-				for try await (profile, tick) in combineLatest(profiles, ticks) {
+				let iCloudAvailability = NotificationCenter.default.notifications(named: .NSUbiquityIdentityDidChange)
+					.map { _ in () }.prepend(())
+				let cloudKitStatus = NotificationCenter.default.notifications(named: .CKAccountChanged)
+					.map { _ in () }.prepend(())
+				let iCloudStatus = combineLatest(iCloudAvailability, cloudKitStatus)
+					.map { _, _ in () }
+
+				for try await (profile, tick, _) in combineLatest(profiles, ticks, iCloudStatus) {
 					guard !Task.isCancelled else { return }
 					if tick.timeIntervalSince(lastClaimCheck) > checkClaimedProfileInterval {
 						await performAutomaticBackup(profile, timeToCheckIfClaimed: true)
@@ -247,7 +271,9 @@ extension CloudBackupClient {
 
 				return migrated
 			},
-			deleteProfileBackup: { id in
+			deleteProfileBackup: { optionalID in
+				let activeProfileID = await profileStore.profile.id
+				let id = optionalID ?? activeProfileID
 				try await container.privateCloudDatabase.deleteRecord(withID: .init(recordName: id.uuidString))
 				try userDefaults.removeLastCloudBackup(for: id)
 			},
@@ -270,6 +296,7 @@ extension CloudBackupClient {
 				do {
 					try await backupProfileAndSaveResult(profile, existingRecord: existingRecord)
 				} catch {
+					loggerGlobal.error("Failed to claim profile on iCloud \(error)")
 					throw FailedToClaimProfileError(error: error)
 				}
 			}
