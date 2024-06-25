@@ -18,7 +18,7 @@ extension PersonaDataPermission {
 		let thumbnail: URL?
 		let title: String
 		let subtitle: String
-		let output: P2P.Dapp.Request.Response?
+		let output: WalletToDappInteractionPersonaDataRequestResponseItem?
 	}
 
 	@MainActor

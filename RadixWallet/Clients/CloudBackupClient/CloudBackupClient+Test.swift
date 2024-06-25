@@ -15,6 +15,7 @@ extension CloudBackupClient: TestDependencyKey {
 	public static let previewValue: Self = .noop
 
 	public static let noop = Self(
+		isCloudProfileSyncEnabled: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		startAutomaticBackups: {},
 		migrateProfilesFromKeychain: { throw NoopError() },
 		deleteProfileBackup: { _ in },
@@ -26,6 +27,7 @@ extension CloudBackupClient: TestDependencyKey {
 	)
 
 	public static let testValue = Self(
+		isCloudProfileSyncEnabled: unimplemented("\(Self.self).isCloudProfileSyncEnabled"),
 		startAutomaticBackups: unimplemented("\(Self.self).startAutomaticBackups"),
 		migrateProfilesFromKeychain: unimplemented("\(Self.self).migrateProfilesFromKeychain"),
 		deleteProfileBackup: unimplemented("\(Self.self).deleteProfileBackup"),

@@ -5,11 +5,11 @@ import SwiftUI
 struct AccountPermission: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		let dappMetadata: DappMetadata
-		let numberOfAccounts: DappInteraction.NumberOfAccounts
+		let numberOfAccounts: DappInteractionNumberOfAccounts
 
 		init(
 			dappMetadata: DappMetadata,
-			numberOfAccounts: DappInteraction.NumberOfAccounts
+			numberOfAccounts: DappInteractionNumberOfAccounts
 		) {
 			self.dappMetadata = dappMetadata
 			self.numberOfAccounts = numberOfAccounts

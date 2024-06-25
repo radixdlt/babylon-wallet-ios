@@ -9,7 +9,7 @@ extension OneTimePersonaData {
 		let shouldShowChooseDataToProvideTitle: Bool
 		let availablePersonas: IdentifiedArrayOf<PersonaDataPermissionBox.State>
 		let selectedPersona: PersonaDataPermissionBox.State?
-		let output: P2P.Dapp.Request.Response?
+		let output: WalletToDappInteractionPersonaDataRequestResponseItem?
 
 		init(state: OneTimePersonaData.State) {
 			self.thumbnail = state.dappMetadata.thumbnail

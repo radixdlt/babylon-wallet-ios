@@ -48,15 +48,15 @@ extension SharedPersonaData {
 
 extension SharedPersonaData {
 	init(
-		requested: P2P.Dapp.Request.PersonaDataRequestItem,
+		requested: DappToWalletInteractionPersonaDataRequestItem,
 		persona: Persona,
-		provided: P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem
+		provided: WalletToDappInteractionPersonaDataRequestResponseItem
 	) throws {
 		func extractSharedCollection<IdentifiedElement: PersonaDataCollectionElement>(
-			requestedKeyPath: KeyPath<P2P.Dapp.Request.PersonaDataRequestItem, RequestedQuantity?>,
+			requestedKeyPath: KeyPath<DappToWalletInteractionPersonaDataRequestItem, RequestedQuantity?>,
 			personaDataKeyPath: KeyPath<PersonaData, [IdentifiedElement]>,
 			personaDataEntryKind: PersonaData.Entry.Kind,
-			providedKeyPath: KeyPath<P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem, OrderedSet<IdentifiedElement.Value>?>
+			providedKeyPath: KeyPath<WalletToDappInteractionPersonaDataRequestResponseItem, [IdentifiedElement.Value]?>
 		) throws -> SharedToDappWithPersonaIDsOfPersonaDataEntries? {
 			// Check if incoming Dapp requests the persona data entry kind
 			guard
@@ -70,13 +70,13 @@ extension SharedPersonaData {
 			let entriesSavedInPersona: [IdentifiedElement] = persona.personaData[keyPath: personaDataKeyPath]
 
 			// Ensure the response we plan to send back to Dapp contains the persona data entries as well (else discrepancy in DappInteractionFlow)
-			guard let providedEntries: OrderedSet<IdentifiedElement.Value> = provided[keyPath: providedKeyPath] else {
+			guard let providedEntries: [IdentifiedElement.Value] = provided[keyPath: providedKeyPath] else {
 				throw SavedPersonaDataInPersonaDoesNotContainRequestedPersonaData(kind: personaDataEntryKind)
 			}
 
 			// Check all entries in response are found in persona
 			let valuesInPersona: Set<IdentifiedElement.Value> = Set(entriesSavedInPersona.map(\.value))
-			let providedValues = Set(providedEntries.elements)
+			let providedValues = Set(providedEntries)
 			let allEntriesInResponseWasFoundInPersona = valuesInPersona.isSuperset(of: providedValues)
 			guard allEntriesInResponseWasFoundInPersona else {
 				throw SavedPersonaDataInPersonaDoesNotMatchWalletInteractionResponseItem(

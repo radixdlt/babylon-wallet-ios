@@ -71,10 +71,11 @@ extension OverlayWindowClient {
 extension OverlayWindowClient {
 	public enum Item: Sendable, Hashable {
 		public typealias AlertState = ComposableArchitecture.AlertState<AlertAction>
-		public enum AlertAction: Sendable, Equatable {
+		public enum AlertAction: Sendable, Hashable {
 			case primaryButtonTapped
 			case secondaryButtonTapped
 			case dismissed
+			case emailSupport(additionalInfo: String)
 		}
 
 		public struct HUD: Sendable, Hashable, Identifiable {

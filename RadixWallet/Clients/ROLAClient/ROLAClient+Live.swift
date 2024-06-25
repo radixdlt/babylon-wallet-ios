@@ -36,14 +36,14 @@ extension ROLAClient {
 		return Self(
 			performDappDefinitionVerification: { metadata async throws in
 				_ = try await onLedgerEntitiesClient.getDappMetadata(
-					metadata.dAppDefinitionAddress,
-					validatingWebsite: metadata.origin.url
+					metadata.dappDefinitionAddress,
+					validatingWebsite: metadata.origin.url()
 				)
 			},
 			performWellKnownFileCheck: { metadata async throws in
 				@Dependency(\.urlSession) var urlSession
 
-				let originURL = metadata.origin.url
+				let originURL = try metadata.origin.url()
 
 				let url = originURL.appending(path: Constants.wellKnownFilePath)
 
@@ -73,7 +73,7 @@ extension ROLAClient {
 				let response = try await fetchWellKnownFile()
 
 				let dAppDefinitionAddresses = response.dApps.map(\.dAppDefinitionAddress)
-				guard dAppDefinitionAddresses.contains(metadata.dAppDefinitionAddress) else {
+				guard dAppDefinitionAddresses.contains(metadata.dappDefinitionAddress) else {
 					throw ROLAFailure.unknownDappDefinitionAddress
 				}
 			},
@@ -115,13 +115,12 @@ extension ROLAClient {
 extension ROLAClient {
 	/// `0x52 || challenge(32) || L_dda(1) || dda_utf8(L_dda) || origin_utf8`
 	static func payloadToHash(
-		challenge: P2P.Dapp.Request.AuthChallengeNonce,
+		challenge: DappToWalletInteractionAuthChallengeNonce,
 		dAppDefinitionAddress accountAddress: AccountAddress,
-		origin metadataOrigin: P2P.Dapp.Request.Metadata.Origin
+		origin metadataOrigin: DappOrigin
 	) -> Data {
 		let rPrefix: UInt8 = 0x52
 		let dAppDefinitionAddress = accountAddress.address
-		let origin = metadataOrigin.urlString.rawValue
 		precondition(dAppDefinitionAddress.count <= UInt8.max)
 		let challengeBytes = [UInt8](challenge.data.data)
 		let lengthDappDefinitionAddress = UInt8(dAppDefinitionAddress.count)
@@ -130,7 +129,7 @@ extension ROLAClient {
 		data.append(contentsOf: challengeBytes)
 		data.append(contentsOf: [lengthDappDefinitionAddress])
 		data.append(contentsOf: [UInt8](dAppDefinitionAddress.utf8))
-		data.append(contentsOf: [UInt8](origin.utf8))
+		data.append(contentsOf: [UInt8](metadataOrigin.utf8))
 
 		return Data(data)
 	}

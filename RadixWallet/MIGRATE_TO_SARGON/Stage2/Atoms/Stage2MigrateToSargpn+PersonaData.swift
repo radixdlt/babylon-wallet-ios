@@ -3,11 +3,11 @@ import Sargon
 
 extension PersonaData {
 	public func responseValidation(
-		for request: P2P.Dapp.Request.PersonaDataRequestItem
-	) -> P2P.Dapp.Request.RequestValidation {
+		for request: DappToWalletInteractionPersonaDataRequestItem
+	) -> DappToWalletInteraction.RequestValidation {
 		let allExisting = Dictionary(grouping: entries.map(\.value), by: \.discriminator)
 
-		var result = P2P.Dapp.Request.RequestValidation()
+		var result = DappToWalletInteraction.RequestValidation()
 		for (kind, kindRequest) in request.kindRequests {
 			let values = allExisting[kind] ?? []
 			switch validate(values, for: kindRequest) {
@@ -23,9 +23,9 @@ extension PersonaData {
 
 	private func validate(
 		_ entries: [PersonaData.Entry],
-		for request: P2P.Dapp.Request.KindRequest
+		for request: DappToWalletInteraction.KindRequest
 	) -> Either<
-		P2P.Dapp.Request.MissingEntry,
+		DappToWalletInteraction.MissingEntry,
 		[Entry]
 	> {
 		switch request {

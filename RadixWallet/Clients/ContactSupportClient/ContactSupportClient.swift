@@ -11,7 +11,7 @@ struct ContactSupportClient: Sendable {
 
 // MARK: ContactSupportClient.OpenEmail
 extension ContactSupportClient {
-	typealias OpenEmail = @Sendable () async -> Void
+	typealias OpenEmail = @Sendable (_ additionalBodyInfo: String?) async -> Void
 }
 
 extension DependencyValues {

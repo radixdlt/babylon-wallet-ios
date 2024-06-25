@@ -7,7 +7,7 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 		let dappMetadata: DappMetadata
 		let personaID: Persona.ID
 		var persona: PersonaDataPermissionBox.State?
-		let requested: P2P.Dapp.Request.PersonaDataRequestItem
+		let requested: DappToWalletInteractionPersonaDataRequestItem
 
 		@PresentationState
 		var destination: Destination.State?
@@ -15,7 +15,7 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 		init(
 			dappMetadata: DappMetadata,
 			personaID: Persona.ID,
-			requested: P2P.Dapp.Request.PersonaDataRequestItem
+			requested: DappToWalletInteractionPersonaDataRequestItem
 		) {
 			self.dappMetadata = dappMetadata
 			self.personaID = personaID
@@ -25,7 +25,7 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 
 	enum ViewAction: Sendable, Equatable {
 		case task
-		case continueButtonTapped(P2P.Dapp.Request.Response)
+		case continueButtonTapped(WalletToDappInteractionPersonaDataRequestResponseItem)
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -38,7 +38,7 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case personaUpdated(Persona)
-		case continueButtonTapped(P2P.Dapp.Request.Response)
+		case continueButtonTapped(WalletToDappInteractionPersonaDataRequestResponseItem)
 	}
 
 	public struct Destination: DestinationReducer {

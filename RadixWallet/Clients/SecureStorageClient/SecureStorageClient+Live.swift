@@ -95,9 +95,11 @@ extension SecureStorageClient: DependencyKey {
 			try keychainClient
 				.getDataWithoutAuth(forKey: profileHeaderListKeychainKey)
 				.map {
-					try jsonDecoder().decode([Profile.Header].self, from: $0)
+					try jsonDecoder().decode([Throwable<Profile.Header>].self, from: $0)
 				}
-				.flatMap(Profile.HeaderList.init)
+				.flatMap {
+					.init($0.compactMap { try? $0.result.get() })
+				}
 		}
 
 		@Sendable func saveProfileHeaderList(_ headers: Profile.HeaderList) throws {
