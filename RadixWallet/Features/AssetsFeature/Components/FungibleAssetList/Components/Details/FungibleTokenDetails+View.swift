@@ -11,6 +11,7 @@ extension FungibleTokenDetails.State {
 			}(),
 			details: .init(
 				description: resource.metadata.get(\.description, prefetched: ownedFungibleResource?.metadata),
+				infoUrl: resource.metadata.infoURL,
 				resourceAddress: resourceAddress,
 				isXRD: isXRD,
 				validatorAddress: nil,

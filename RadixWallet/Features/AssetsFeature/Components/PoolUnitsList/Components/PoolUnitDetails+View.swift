@@ -10,6 +10,7 @@ extension PoolUnitDetails.State {
 			resources: .init(resources: resourcesDetails),
 			resourceDetails: .init(
 				description: .success(resource.metadata.description),
+				infoUrl: .success(resource.metadata.infoURL),
 				resourceAddress: resource.resourceAddress,
 				isXRD: false,
 				validatorAddress: nil,

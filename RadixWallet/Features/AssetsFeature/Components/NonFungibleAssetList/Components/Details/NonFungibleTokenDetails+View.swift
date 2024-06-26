@@ -10,6 +10,7 @@ extension NonFungibleTokenDetails.State {
 			resourceThumbnail: ownedResource.map { .success($0.metadata.iconURL) } ?? resourceDetails.metadata.iconURL,
 			resourceDetails: .init(
 				description: resourceDetails.metadata.description,
+				infoUrl: resourceDetails.metadata.infoURL,
 				resourceAddress: resourceAddress,
 				isXRD: false,
 				validatorAddress: nil,

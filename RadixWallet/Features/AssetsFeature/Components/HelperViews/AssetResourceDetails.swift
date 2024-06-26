@@ -7,6 +7,7 @@ struct AssetResourceDetailsSection: View {
 
 	struct ViewState: Equatable {
 		let description: Loadable<String?>
+		let infoUrl: Loadable<URL?>
 		let resourceAddress: ResourceAddress
 		let isXRD: Bool
 		let validatorAddress: ValidatorAddress?
@@ -26,6 +27,10 @@ struct AssetResourceDetailsSection: View {
 					Text(description)
 						.textStyle(.body1Regular)
 						.flushedLeft
+
+					if let wrappedValue = viewState.infoUrl.wrappedValue, let infoUrl = wrappedValue {
+						KeyValueUrlView(key: "For more info:", url: infoUrl)
+					}
 
 					AssetDetailsSeparator()
 						.padding(.horizontal, -.large2)

@@ -15,6 +15,7 @@ extension LSUDetails.State {
 			redeemableTokenAmount: .xrd(balance: xrdRedemptionValue, network: validator.address.networkID),
 			resourceDetails: .init(
 				description: .success(stakeUnitResource.resource.metadata.description),
+				infoUrl: .success(stakeUnitResource.resource.metadata.infoURL),
 				resourceAddress: stakeUnitResource.resource.resourceAddress,
 				isXRD: false,
 				validatorAddress: validator.address,

@@ -75,3 +75,31 @@ struct KeyValueTruncatedView: View {
 		}
 	}
 }
+
+// MARK: - KeyValueUrlView
+struct KeyValueUrlView: View {
+	let key: String
+	let url: URL
+
+	@Dependency(\.openURL) var openURL
+
+	var body: some View {
+		VStack(alignment: .leading, spacing: .small3) {
+			Text(key)
+				.textStyle(.body1Regular)
+				.foregroundColor(.app.gray2)
+
+			Button(url.absoluteString) {
+				openUrl(url)
+			}
+			.buttonStyle(.url)
+		}
+		.flushedLeft
+	}
+
+	private func openUrl(_ url: URL) {
+		Task {
+			await openURL(url)
+		}
+	}
+}

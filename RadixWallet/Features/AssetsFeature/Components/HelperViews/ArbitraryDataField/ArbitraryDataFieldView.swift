@@ -30,16 +30,7 @@ public struct ArbitraryDataFieldView: View {
 			KeyValueView(key: field.name, value: L10n.AssetDetails.NFTDetails.complexData)
 
 		case let .url(url):
-			VStack(alignment: .leading, spacing: .small3) {
-				Text(field.name)
-					.textStyle(.body1Regular)
-					.foregroundColor(.app.gray2)
-				Button(url.absoluteString) {
-					openUrl(url)
-				}
-				.buttonStyle(.url)
-			}
-			.flushedLeft
+			KeyValueUrlView(key: field.name, url: url)
 
 		case let .address(address):
 			KeyValueView(key: field.name) {

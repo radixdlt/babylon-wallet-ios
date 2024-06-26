@@ -128,6 +128,7 @@ extension OnLedgerEntity {
 		public let symbol: String?
 		public let description: String?
 		public let iconURL: URL?
+		public let infoURL: URL?
 		public let tags: [AssetTag]
 		public let dappDefinitions: [AccountAddress]?
 		public let dappDefinition: AccountAddress?
@@ -177,6 +178,7 @@ extension OnLedgerEntity {
 			symbol: String? = nil,
 			description: String? = nil,
 			iconURL: URL? = nil,
+			infoURL: URL? = nil,
 			tags: [AssetTag] = [],
 			dappDefinitions: [AccountAddress]? = nil,
 			dappDefinition: AccountAddress? = nil,
@@ -194,6 +196,7 @@ extension OnLedgerEntity {
 			self.symbol = symbol
 			self.description = description
 			self.iconURL = iconURL
+			self.infoURL = infoURL
 			self.tags = tags
 			self.dappDefinitions = dappDefinitions
 			self.dappDefinition = dappDefinition
