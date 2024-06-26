@@ -47,6 +47,7 @@
 "assetDetails_validator" = "Validator";
 "assetDetails_name" = "Name";
 "assetDetails_currentSupply" = "Current Supply";
+"assetDetails_moreInfo" = "For more info";
 "assetDetails_supplyUnkown" = "Unknown";
 "assetDetails_behavior" = "Behavior";
 "assetDetails_staking_unstaking" = "Ready to claim in about %d minutes or less.";
