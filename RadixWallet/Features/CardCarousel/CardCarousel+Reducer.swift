@@ -168,24 +168,17 @@ public struct CarouselView: UIViewRepresentable {
 
 	private static var cellIdentifier: String { "CarouselCardCell" }
 
-	public func makeUIView(context: Context) -> UICollectionView {
-		let layout = UICollectionViewFlowLayout()
-		layout.scrollDirection = .vertical
-		layout.minimumInteritemSpacing = .small1
-		layout.itemSize.width = width
-		layout.itemSize.height = 200
-		let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-		collectionView.backgroundColor = .clear
-		collectionView.isPagingEnabled = true
-		collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: Self.cellIdentifier)
-		collectionView.delegate = context.coordinator
-		collectionView.dataSource = context.coordinator
+	public func makeUIView(context: Context) -> UIScrollView {
+		let scrollView = UIScrollView()
+		scrollView.backgroundColor = .clear
+		scrollView.isPagingEnabled = true
+		scrollView.delegate = context.coordinator
 
-		return collectionView
+		return scrollView
 	}
 
-	public func updateUIView(_ uiView: UICollectionView, context: Context) {
-		uiView.reloadData()
+	public func updateUIView(_ uiView: UIScrollView, context: Context) {
+		print("•• updateUIView: \(uiView.frame.size.width)")
 //		if let scrollTarget = scrollTarget.value, let indexPath = context.coordinator.sections.indexPath(for: scrollTarget) {
 //			uiView.scrollToRow(at: indexPath, at: .top, animated: false)
 //			context.coordinator.didSelectMonth = true
@@ -193,46 +186,16 @@ public struct CarouselView: UIViewRepresentable {
 	}
 
 	public func makeCoordinator() -> Coordinator {
-		Coordinator(width: width, cards: cards, action: action)
+		Coordinator(width: width, cardCount: cards.count)
 	}
 
-	public class Coordinator: NSObject, UICollectionViewDelegate, UICollectionViewDataSource {
+	public class Coordinator: NSObject, UIScrollViewDelegate {
 		let width: CGFloat
-		let cards: [CarouselCard]
-		let action: (CarouselCard) -> Void
+		let cardCount: Int
 
-		init(width: CGFloat, cards: [CarouselCard], action: @escaping (CarouselCard) -> Void) {
+		public init(width: CGFloat, cardCount: Int) {
 			self.width = width
-			self.cards = cards
-			self.action = action
-		}
-
-		public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-			cards.count
-		}
-
-		public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-			let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CarouselView.cellIdentifier, for: indexPath)
-			let card = cards[indexPath.item]
-
-			cell.backgroundColor = .init(.app.gray5)
-//			cell.contentView.backgroundColor = .cyan
-
-			cell.contentConfiguration = UIHostingConfiguration {
-				CarouselCardView(card: card)
-					.border(.yellow)
-//				Button {
-//					self?.action(.transactionTapped(item.id))
-//				} label: {
-//					TransactionHistory.TransactionView(transaction: item)
-//				}
-			}
-
-			return cell
-		}
-
-		func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-			CGSize(width: 300, height: 300)
+			self.cardCount = cardCount
 		}
 
 		// UIScrollViewDelegate
