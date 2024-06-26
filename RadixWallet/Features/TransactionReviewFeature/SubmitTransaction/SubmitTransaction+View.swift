@@ -69,7 +69,8 @@ extension SubmitTransaction {
 				WithNavigationBar {
 					viewStore.send(.closeButtonTapped)
 				} content: {
-					VStack(spacing: .medium2) {
+					VStack(spacing: .medium3) {
+						Spacer()
 						if viewStore.status.failed {
 							Image(.errorLarge)
 							Text(viewStore.status.errorTitle)
@@ -105,7 +106,9 @@ extension SubmitTransaction {
 						}
 						.textStyle(.body1Header)
 
+						Spacer()
 						if viewStore.status.failed, viewStore.showSwitchBackToBrowserMessage {
+							Divider()
 							// FIXME: Strings
 							Text("Switch back to your browser to continue")
 								.foregroundColor(.app.gray1)

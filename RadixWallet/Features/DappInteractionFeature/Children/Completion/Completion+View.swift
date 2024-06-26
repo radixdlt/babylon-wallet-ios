@@ -41,6 +41,8 @@ extension Completion {
 					store.send(.view(.dismissTapped))
 				} content: {
 					VStack(spacing: .small3) {
+						Spacer()
+
 						Image(asset: AssetResource.successCheckmark)
 
 						Text(viewStore.title)
@@ -63,6 +65,9 @@ extension Completion {
 						}
 
 						if viewStore.showSwitchBackToBrowserMessage {
+							Spacer()
+
+							Divider()
 							// FIXME: Strings
 							Text("Switch back to your browser to continue")
 								.foregroundColor(.app.gray1)
@@ -76,7 +81,7 @@ extension Completion {
 				}
 			}
 			.presentationDragIndicator(.visible)
-			.presentationDetents([.height(.smallDetent)])
+			.presentationDetents([.fraction(0.66)])
 			.presentationBackground(.blur)
 		}
 	}

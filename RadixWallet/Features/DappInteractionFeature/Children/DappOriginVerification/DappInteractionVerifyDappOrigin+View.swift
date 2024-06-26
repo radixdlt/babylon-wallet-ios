@@ -3,24 +3,28 @@ extension DappInteractionVerifyDappOrigin {
 		let store: StoreOf<DappInteractionVerifyDappOrigin>
 
 		var body: some SwiftUI.View {
-			VStack(spacing: .large2) {
-				CloseButton {
-					store.send(.view(.cancel))
-				}
-				.flushedLeft
+			NavigationStack {
+				VStack(spacing: .large2) {
+					headerView()
+					infoPointsView()
 
-				headerView()
-				infoPointsView()
-
-				Spacer()
-			}
-			.padding(.medium1)
-			.background(.app.background)
-			.footer {
-				Button(L10n.DAppRequest.Login.continue) {
-					store.send(.view(.continueTapped))
+					Spacer()
 				}
-				.buttonStyle(.primaryRectangular)
+				.padding(.medium1)
+				.background(.app.background)
+				.toolbar {
+					ToolbarItem(placement: .cancellationAction) {
+						CloseButton {
+							store.send(.view(.cancel))
+						}
+					}
+				}
+				.footer {
+					Button(L10n.DAppRequest.Login.continue) {
+						store.send(.view(.continueTapped))
+					}
+					.buttonStyle(.primaryRectangular)
+				}
 			}
 		}
 

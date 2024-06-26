@@ -1,7 +1,7 @@
 import SargonUniFFI
 
 // MARK: - SecureSessionStorage
-final class SecureSessionStorage: SessionStorage {
+final class SecureSessionStorage: RadixConnectMobileSessionStorage {
 	@Dependency(\.secureStorageClient) var secureStorageClient
 
 	func saveSession(sessionId: SessionId, encodedSession: Data) async throws {
