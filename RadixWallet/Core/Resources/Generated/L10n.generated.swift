@@ -2197,6 +2197,26 @@ public enum L10n {
       public static let vectorImageFailure = L10n.tr("Localizable", "misc_remoteThumbnails_vectorImageFailure", fallback: "Can't displays image of vector type")
     }
   }
+  public enum MobileConnect {
+    /// Switch back to your browser to continue
+    public static let interactionSuccess = L10n.tr("Localizable", "mobileConnect_interactionSuccess", fallback: "Switch back to your browser to continue")
+    /// Does the website address match what you’re expecting?
+    public static let linkBody1 = L10n.tr("Localizable", "mobileConnect_linkBody1", fallback: "Does the website address match what you’re expecting?")
+    /// If you came from a social media ad, is the website legitimate?
+    public static let linkBody2 = L10n.tr("Localizable", "mobileConnect_linkBody2", fallback: "If you came from a social media ad, is the website legitimate?")
+    /// Before you connect to %@, you might want to check:
+    public static func linkSubtitle(_ p1: Any) -> String {
+      return L10n.tr("Localizable", "mobileConnect_linkSubtitle", String(describing: p1), fallback: "Before you connect to %@, you might want to check:")
+    }
+    /// Have you come from a genuine website?
+    public static let linkTitle = L10n.tr("Localizable", "mobileConnect_linkTitle", fallback: "Have you come from a genuine website?")
+    public enum NoProfileDialog {
+      /// You can proceed with this request after you create or restore your Radix Wallet.
+      public static let subtitle = L10n.tr("Localizable", "mobileConnect_noProfileDialog_subtitle", fallback: "You can proceed with this request after you create or restore your Radix Wallet.")
+      /// dApp Request
+      public static let title = L10n.tr("Localizable", "mobileConnect_noProfileDialog_title", fallback: "dApp Request")
+    }
+  }
   public enum Onboarding {
     /// I'm a New Radix Wallet User
     public static let newUser = L10n.tr("Localizable", "onboarding_newUser", fallback: "I'm a New Radix Wallet User")
