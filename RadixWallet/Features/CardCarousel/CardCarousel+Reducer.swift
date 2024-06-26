@@ -74,6 +74,17 @@ extension CardCarousel {
 						.frame(height: 120)
 						.border(.green)
 						.padding(.horizontal, .medium2)
+
+					Divider()
+
+					GeometryReader { proxy in
+						CarouselView(width: proxy.size.width, cards: store.cards, action: { _ in print("Tap") })
+							.frame(height: CarouselCardView.height)
+							.border(.red)
+							.padding(.horizontal, .large3)
+					}
+
+					Divider()
 				}
 			}
 			.padding(.vertical, .small1)
@@ -111,6 +122,141 @@ extension CarouselCard {
 //		public var image: ImageAsset
 }
 
+// MARK: - CarouselCardView
+public struct CarouselCardView: View {
+	public static let height: CGFloat = 105
+	let card: CarouselCard
+
+	public var body: some SwiftUI.View {
+		Text("\(title)")
+			.padding(.large2)
+			.background(.app.gray5)
+			.cornerRadius(.small1)
+			.frame(maxWidth: .infinity, alignment: .center)
+			.padding(.medium2)
+			.border(.blue)
+	}
+
+	private var title: String {
+		switch card {
+		case .threeSixtyDegrees:
+			"360 Degrees of Security"
+		case .connect:
+			"Link to connector"
+		case .somethingElse:
+			"Something Lorem Ipsum"
+		}
+	}
+
+	private var message: String {
+		switch card {
+		case .threeSixtyDegrees:
+			"Secure your Accounts and Personas with Security shields"
+		case .connect:
+			"Do it now"
+		case .somethingElse:
+			"Blabbely bla"
+		}
+	}
+}
+
+// MARK: - CarouselView
+public struct CarouselView: UIViewRepresentable {
+	let width: CGFloat
+	let cards: [CarouselCard]
+	let action: (CarouselCard) -> Void
+
+	private static var cellIdentifier: String { "CarouselCardCell" }
+
+	public func makeUIView(context: Context) -> UICollectionView {
+		let layout = UICollectionViewFlowLayout()
+		layout.scrollDirection = .vertical
+		layout.minimumInteritemSpacing = .small1
+		layout.itemSize.width = width
+		layout.itemSize.height = 200
+		let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+		collectionView.backgroundColor = .clear
+		collectionView.isPagingEnabled = true
+		collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: Self.cellIdentifier)
+		collectionView.delegate = context.coordinator
+		collectionView.dataSource = context.coordinator
+
+		return collectionView
+	}
+
+	public func updateUIView(_ uiView: UICollectionView, context: Context) {
+		uiView.reloadData()
+//		if let scrollTarget = scrollTarget.value, let indexPath = context.coordinator.sections.indexPath(for: scrollTarget) {
+//			uiView.scrollToRow(at: indexPath, at: .top, animated: false)
+//			context.coordinator.didSelectMonth = true
+//		}
+	}
+
+	public func makeCoordinator() -> Coordinator {
+		Coordinator(width: width, cards: cards, action: action)
+	}
+
+	public class Coordinator: NSObject, UICollectionViewDelegate, UICollectionViewDataSource {
+		let width: CGFloat
+		let cards: [CarouselCard]
+		let action: (CarouselCard) -> Void
+
+		init(width: CGFloat, cards: [CarouselCard], action: @escaping (CarouselCard) -> Void) {
+			self.width = width
+			self.cards = cards
+			self.action = action
+		}
+
+		public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+			cards.count
+		}
+
+		public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+			let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CarouselView.cellIdentifier, for: indexPath)
+			let card = cards[indexPath.item]
+
+			cell.backgroundColor = .init(.app.gray5)
+//			cell.contentView.backgroundColor = .cyan
+
+			cell.contentConfiguration = UIHostingConfiguration {
+				CarouselCardView(card: card)
+					.border(.yellow)
+//				Button {
+//					self?.action(.transactionTapped(item.id))
+//				} label: {
+//					TransactionHistory.TransactionView(transaction: item)
+//				}
+			}
+
+			return cell
+		}
+
+		func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+			CGSize(width: 300, height: 300)
+		}
+
+		// UIScrollViewDelegate
+
+		public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+			guard let collectionView = scrollView as? UICollectionView else {
+				assertionFailure("This should be a UICollectionView")
+				return
+			}
+
+			let offset = scrollView.contentOffset.y
+		}
+
+		public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {}
+
+		public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+			guard let tableView = scrollView as? UITableView else {
+				assertionFailure("This should be a UITableView")
+				return
+			}
+		}
+	}
+}
+
 // MARK: - CardCarouselView
 struct CardCarouselView<Page: View>: UIViewControllerRepresentable {
 	let pages: [Page]
@@ -121,6 +267,7 @@ struct CardCarouselView<Page: View>: UIViewControllerRepresentable {
 
 		pageViewController.dataSource = context.coordinator
 		pageViewController.delegate = context.coordinator
+		pageViewController.view.clipsToBounds = false
 
 		return pageViewController
 	}
@@ -143,14 +290,15 @@ struct CardCarouselView<Page: View>: UIViewControllerRepresentable {
 	}
 
 	class Coordinator: NSObject, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
-		var parent: CardCarouselView
-		var controllers: [UIViewController]
+		let parent: CardCarouselView
+		let controllers: [UIViewController]
 
 		init(parent: CardCarouselView, pages: [Page]) {
 			self.parent = parent
 			self.controllers = pages.map {
 				let hostingController = UIHostingController(rootView: $0)
 				hostingController.view.backgroundColor = .clear
+				hostingController.view.clipsToBounds = false
 				return hostingController
 			}
 		}
