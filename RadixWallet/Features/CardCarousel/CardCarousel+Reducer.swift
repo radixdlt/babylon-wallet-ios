@@ -145,13 +145,28 @@ public struct CarouselCardView: View {
 
 	public var body: some View {
 		Button(action: action) {
-			Text("\(title)")
-				.padding(.large2)
-				.padding(.medium2)
-				.frame(maxWidth: .infinity, alignment: .center)
-				.frame(height: Self.height)
-				.background(.app.gray3)
-				.cornerRadius(.small1)
+			VStack(alignment: .leading, spacing: .small2) {
+				Text(title)
+					.textStyle(.body1Header)
+				Text(message)
+					.lineSpacing(-20)
+					.lineLimit(nil)
+					.minimumScaleFactor(0.7)
+					.textStyle(.body2Regular)
+			}
+			.multilineTextAlignment(.leading)
+			.foregroundStyle(.app.gray1)
+			.padding([.top, .leading], .medium2)
+			.padding(.trailing, 110)
+			.padding(.bottom, .small1)
+			.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+			.frame(height: Self.height)
+			.background(alignment: .trailing) {
+				Image(.cardBackgroundTEMPORARY)
+					.border(.red)
+			}
+			.background(.app.gray5)
+			.cornerRadius(.small1)
 		}
 		.overlay(alignment: .topTrailing) {
 			CloseButton(action: closeAction)
