@@ -24,12 +24,13 @@ struct AssetResourceDetailsSection: View {
 
 			loadable(viewState.description) { description in
 				if let description {
-					Text(description)
-						.textStyle(.body1Regular)
-						.flushedLeft
+					VStack(alignment: .leading, spacing: .medium2) {
+						Text(description)
+							.textStyle(.body1Regular)
 
-					if let wrappedValue = viewState.infoUrl.wrappedValue, let infoUrl = wrappedValue {
-						KeyValueUrlView(key: "For more info:", url: infoUrl)
+						if let wrappedValue = viewState.infoUrl.wrappedValue, let infoUrl = wrappedValue {
+							KeyValueUrlView(key: L10n.AssetDetails.moreInfo, url: infoUrl, isLocked: false)
+						}
 					}
 
 					AssetDetailsSeparator()
@@ -47,22 +48,14 @@ struct AssetResourceDetailsSection: View {
 
 				if let resourceName = viewState.resourceName {
 					loadable(resourceName) { value in
-						KeyValueView(
-							key: L10n.AssetDetails.NFTDetails.resourceName,
-							value: value ?? "",
-							isLocked: false
-						)
+						if let value {
+							KeyValueView(key: L10n.AssetDetails.NFTDetails.resourceName, value: value)
+						}
 					}
 				}
 
 				loadable(viewState.currentSupply) { supply in
-					KeyValueView(key: L10n.AssetDetails.currentSupply, value: supply ?? "", isLocked: false)
-				}
-
-				loadable(viewState.arbitraryDataFields) { arbitraryDataFields in
-					ForEachStatic(arbitraryDataFields) { field in
-						ArbitraryDataFieldView(field: field)
-					}
+					KeyValueView(key: L10n.AssetDetails.currentSupply, value: supply ?? "")
 				}
 
 				loadable(viewState.behaviors) { value in
@@ -71,6 +64,18 @@ struct AssetResourceDetailsSection: View {
 
 				loadable(viewState.tags) { _ in
 					AssetTagsView(tags: viewState.tags.wrappedValue ?? [])
+				}
+
+				loadable(viewState.arbitraryDataFields) { arbitraryDataFields in
+					if !arbitraryDataFields.isEmpty {
+						AssetDetailsSeparator()
+							.padding(.vertical, .small2)
+							.padding(.horizontal, -.large2)
+
+						ForEachStatic(arbitraryDataFields) { field in
+							ArbitraryDataFieldView(field: field)
+						}
+					}
 				}
 			}
 			.padding(.horizontal, .large2)

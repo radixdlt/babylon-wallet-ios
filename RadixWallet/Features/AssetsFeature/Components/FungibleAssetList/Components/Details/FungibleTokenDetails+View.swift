@@ -15,7 +15,7 @@ extension FungibleTokenDetails.State {
 				resourceAddress: resourceAddress,
 				isXRD: isXRD,
 				validatorAddress: nil,
-				resourceName: nil,
+				resourceName: resource.metadata.name,
 				currentSupply: resource.totalSupply.map { $0?.formatted() ?? L10n.AssetDetails.supplyUnkown },
 				arbitraryDataFields: resource.metadata.arbitraryItems.asDataFields,
 				behaviors: resource.behaviors,

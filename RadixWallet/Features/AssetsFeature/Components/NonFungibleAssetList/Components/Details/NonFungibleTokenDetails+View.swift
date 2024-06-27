@@ -84,6 +84,10 @@ extension NonFungibleTokenDetails {
 
 								KeyValueView(nonFungibleGlobalID: tokenDetails.nonFungibleGlobalID)
 
+								if let name = tokenDetails.name {
+									KeyValueView(key: L10n.AssetDetails.NFTDetails.name, value: name)
+								}
+
 								if let stakeClaim = tokenDetails.stakeClaim {
 									stakeClaimView(stakeClaim) {
 										viewStore.send(.tappedClaimStake)
@@ -93,10 +97,10 @@ extension NonFungibleTokenDetails {
 								if !tokenDetails.dataFields.isEmpty {
 									AssetDetailsSeparator()
 										.padding(.horizontal, -.large2)
-								}
 
-								ForEachStatic(tokenDetails.dataFields) { field in
-									ArbitraryDataFieldView(field: field)
+									ForEachStatic(tokenDetails.dataFields) { field in
+										ArbitraryDataFieldView(field: field)
+									}
 								}
 							}
 							.lineLimit(1)

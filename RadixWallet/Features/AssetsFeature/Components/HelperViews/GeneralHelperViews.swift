@@ -8,30 +8,30 @@ struct KeyValueView<Content: View>: View {
 	let isLocked: Bool
 
 	init(resourceAddress: ResourceAddress, imageColor: Color? = .app.gray2) where Content == AddressView {
-		self.init(key: L10n.AssetDetails.resourceAddress, isLocked: false) { // TODO: MB: Confirm if locked
+		self.init(key: L10n.AssetDetails.resourceAddress, isLocked: false) {
 			AddressView(.address(.resource(resourceAddress)), imageColor: imageColor)
 		}
 	}
 
 	init(validatorAddress: ValidatorAddress, imageColor: Color? = .app.gray2) where Content == AddressView {
-		self.init(key: L10n.AssetDetails.validator, isLocked: false) { // TODO: MB: Confirm if locked
+		self.init(key: L10n.AssetDetails.validator, isLocked: false) {
 			AddressView(.address(.validator(validatorAddress)), imageColor: imageColor)
 		}
 	}
 
 	init(nonFungibleGlobalID: NonFungibleGlobalId, imageColor: Color? = .app.gray2) where Content == AddressView {
-		self.init(key: L10n.AssetDetails.NFTDetails.id, isLocked: true) { // TODO: MB: Confirm global ids will be locked
+		self.init(key: L10n.AssetDetails.NFTDetails.id, isLocked: false) {
 			AddressView(.identifier(.nonFungibleGlobalID(nonFungibleGlobalID)), imageColor: imageColor)
 		}
 	}
 
-	init(key: String, value: String, isLocked: Bool) where Content == Text {
+	init(key: String, value: String, isLocked: Bool = false) where Content == Text {
 		self.key = key
 		self.isLocked = isLocked
 		self.content = Text(value)
 	}
 
-	init(key: String, isLocked: Bool, @ViewBuilder content: () -> Content) {
+	init(key: String, isLocked: Bool = false, @ViewBuilder content: () -> Content) {
 		self.key = key
 		self.isLocked = isLocked
 		self.content = content()
