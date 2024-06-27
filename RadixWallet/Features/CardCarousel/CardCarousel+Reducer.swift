@@ -14,7 +14,8 @@ public struct CardCarousel: FeatureReducer {
 	@CasePathable
 	public enum ViewAction: Equatable, Sendable {
 		case didAppear
-		case didTap(CarouselCard)
+		case cardTapped(CarouselCard)
+		case closeTapped(CarouselCard)
 	}
 
 	public var body: some ReducerOf<Self> {
@@ -26,9 +27,13 @@ public struct CardCarousel: FeatureReducer {
 		case .didAppear:
 			print("•• didAppear")
 			return .none
-		case let .didTap(card):
+		case let .cardTapped(card):
 			state.taps += 1
 			print("•• didTap \(state.taps)")
+			return .none
+		case let .closeTapped(card):
+			guard let index = state.cards.firstIndex(where: { $0 == card }) else { return .none }
+			state.cards.remove(at: index)
 			return .none
 		}
 	}
@@ -46,95 +51,102 @@ import SwiftUI
 // MARK: - CardCarousel.View
 extension CardCarousel {
 	public struct View: SwiftUI.View {
-		let store: StoreOf<CardCarousel>
-		@SwiftUI.State private var currentPage: Int = 0
+		private static let coordSpace: String = "CardCarousel"
 
-		private var pages: [some SwiftUI.View] {
-			store.cards.map { card in
-				Button {
-					store.send(.view(.didTap(card)))
-				} label: {
-					Text("\(card.title)")
-						.padding(.large2)
-						.background(.app.gray5)
-						.cornerRadius(.small1)
-						.frame(maxWidth: .infinity, alignment: .center)
-						.border(.blue)
-						.padding(.medium2)
-				}
-			}
-		}
+		private let margin: CGFloat = 3 * .medium1
+		private let spacing: CGFloat = 3 * .small1
+
+		let store: StoreOf<CardCarousel>
+		@SwiftUI.State private var card: CarouselCard? = nil
 
 		public var body: some SwiftUI.View {
 			WithPerceptionTracking {
-				VStack {
-					Text("\(store.taps) taps")
-
-					CardCarouselView(pages: pages, currentPage: $currentPage)
-						.frame(height: 120)
-						.border(.green)
-						.padding(.horizontal, .medium2)
-
-					Divider()
-
-					GeometryReader { proxy in
-						CarouselView(width: proxy.size.width, cards: store.cards, action: { _ in print("Tap") })
-							.frame(height: CarouselCardView.height)
-							.border(.red)
-							.padding(.horizontal, .large3)
+				GeometryReader { proxy in
+					TabView {
+						ForEach(store.cards, id: \.self) { card in
+							CarouselCardView(card: card)
+								.measurePosition(card, coordSpace: Self.coordSpace)
+								.overlay(alignment: .topTrailing) {
+									CloseButton {
+										store.send(.view(.closeTapped(card)), animation: .default)
+									}
+								}
+								.padding(.horizontal, 0.5 * spacing)
+								.transition(.scale(scale: 0.8).combined(with: .opacity))
+								.border(.red)
+						}
 					}
+					.tabViewStyle(.page(indexDisplayMode: .never))
+					.coordinateSpace(name: Self.coordSpace)
+					.border(.black)
+					.overlayPreferenceValue(PositionsPreferenceKey.self) { positions in
+						let frame = proxy.frame(in: .named(Self.coordSpace))
+						let neighbours = neighbours(positions, frame: frame, cards: store.cards)
+						ForEach(neighbours, id: \.card) { _, pos in
+							Rectangle()
+								.stroke(.red, lineWidth: 4)
+								.frame(width: pos.width, height: pos.height)
+								.offset(x: pos.minX - margin)
+						}
 
-					Divider()
+//						Rectangle()
+//							.stroke(.orange, lineWidth: 5)
+//							.frame(width: frame.width, height: frame.height)
+//							.offset(x: frame.minX - margin)
+					}
 				}
+				.padding(.horizontal, margin - 0.5 * spacing)
+				.frame(height: 105)
 			}
-			.padding(.vertical, .small1)
 			.onAppear {
 				store.send(.view(.didAppear))
 			}
 		}
+
+		private func neighbours(_ positions: [AnyHashable: CGRect], frame: CGRect, cards: [CarouselCard]) -> [(card: CarouselCard, pos: CGRect)] {
+			guard let width = positions.first?.value.width else { return [] }
+
+			print("•• POSITIONS in \(frame)")
+			for (x, y) in positions {
+				print("•• \(x): \(Int(y.minX.rounded())) - \(Int(y.maxX.rounded()))")
+			}
+
+			let current = positions.mapValues { abs($0.midX - frame.midX) }.min { $0.value < $1.value }
+			guard let current, let card = current.key.base as? CarouselCard else { return [] }
+			guard let currentIndex = cards.firstIndex(of: card), let rect = positions[card] else { return [] }
+			var result: [(CarouselCard, CGRect)] = []
+			if cards.indices.contains(currentIndex - 1) {
+				result.append((cards[currentIndex - 1], rect.offsetBy(dx: -(width + spacing), dy: 0)))
+			}
+			let nextRect = rect.offsetBy(dx: width + spacing, dy: 0)
+
+			if cards.indices.contains(currentIndex + 1) {
+				result.append((cards[currentIndex + 1], nextRect))
+			}
+
+			return result
+		}
 	}
 }
 
-extension CarouselCard {
-	public var title: String {
-		switch self {
-		case .threeSixtyDegrees:
-			"360 Degrees of Security"
-		case .connect:
-			"Link to connector"
-		case .somethingElse:
-			"Something Lorem Ipsum"
-		}
+extension CGRect {
+	var center: CGPoint {
+		.init(x: midX, y: midY)
 	}
-
-	public var body: String {
-		switch self {
-		case .threeSixtyDegrees:
-			"Secure your Accounts and Personas with Security shields"
-		case .connect:
-			"Do it now"
-		case .somethingElse:
-			"Blabbely bla"
-		}
-	}
-
-//		public var button: String
-//		public var image: ImageAsset
 }
 
 // MARK: - CarouselCardView
 public struct CarouselCardView: View {
-	public static let height: CGFloat = 105
 	let card: CarouselCard
 
 	public var body: some SwiftUI.View {
 		Text("\(title)")
 			.padding(.large2)
-			.background(.app.gray5)
-			.cornerRadius(.small1)
-			.frame(maxWidth: .infinity, alignment: .center)
 			.padding(.medium2)
-			.border(.blue)
+			.frame(maxWidth: .infinity, alignment: .center)
+			.frame(height: 105)
+			.background(.app.gray3)
+			.cornerRadius(.small1)
 	}
 
 	private var title: String {
@@ -156,140 +168,6 @@ public struct CarouselCardView: View {
 			"Do it now"
 		case .somethingElse:
 			"Blabbely bla"
-		}
-	}
-}
-
-// MARK: - CarouselView
-public struct CarouselView: UIViewRepresentable {
-	let width: CGFloat
-	let cards: [CarouselCard]
-	let action: (CarouselCard) -> Void
-
-	private static var cellIdentifier: String { "CarouselCardCell" }
-
-	public func makeUIView(context: Context) -> UIScrollView {
-		let scrollView = UIScrollView()
-		scrollView.backgroundColor = .clear
-		scrollView.isPagingEnabled = true
-		scrollView.delegate = context.coordinator
-
-		return scrollView
-	}
-
-	public func updateUIView(_ uiView: UIScrollView, context: Context) {
-		print("•• updateUIView: \(uiView.frame.size.width)")
-//		if let scrollTarget = scrollTarget.value, let indexPath = context.coordinator.sections.indexPath(for: scrollTarget) {
-//			uiView.scrollToRow(at: indexPath, at: .top, animated: false)
-//			context.coordinator.didSelectMonth = true
-//		}
-	}
-
-	public func makeCoordinator() -> Coordinator {
-		Coordinator(width: width, cardCount: cards.count)
-	}
-
-	public class Coordinator: NSObject, UIScrollViewDelegate {
-		let width: CGFloat
-		let cardCount: Int
-
-		public init(width: CGFloat, cardCount: Int) {
-			self.width = width
-			self.cardCount = cardCount
-		}
-
-		// UIScrollViewDelegate
-
-		public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-			guard let collectionView = scrollView as? UICollectionView else {
-				assertionFailure("This should be a UICollectionView")
-				return
-			}
-
-			let offset = scrollView.contentOffset.y
-		}
-
-		public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {}
-
-		public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-			guard let tableView = scrollView as? UITableView else {
-				assertionFailure("This should be a UITableView")
-				return
-			}
-		}
-	}
-}
-
-// MARK: - CardCarouselView
-struct CardCarouselView<Page: View>: UIViewControllerRepresentable {
-	let pages: [Page]
-	@Binding var currentPage: Int
-
-	func makeUIViewController(context: Context) -> UIPageViewController {
-		let pageViewController = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal)
-
-		pageViewController.dataSource = context.coordinator
-		pageViewController.delegate = context.coordinator
-		pageViewController.view.clipsToBounds = false
-
-		return pageViewController
-	}
-
-	func updateUIViewController(_ pageViewController: UIPageViewController, context: Context) {
-		var direction: UIPageViewController.NavigationDirection = .forward
-		var animated = false
-
-		if let previous = pageViewController.viewControllers?.first, let previousPage = context.coordinator.controllers.firstIndex(of: previous) {
-			direction = currentPage >= previousPage ? .forward : .reverse
-			animated = currentPage != previousPage
-		}
-
-		let currentViewController = context.coordinator.controllers[currentPage]
-		pageViewController.setViewControllers([currentViewController], direction: direction, animated: animated)
-	}
-
-	func makeCoordinator() -> Coordinator {
-		Coordinator(parent: self, pages: pages)
-	}
-
-	class Coordinator: NSObject, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
-		let parent: CardCarouselView
-		let controllers: [UIViewController]
-
-		init(parent: CardCarouselView, pages: [Page]) {
-			self.parent = parent
-			self.controllers = pages.map {
-				let hostingController = UIHostingController(rootView: $0)
-				hostingController.view.backgroundColor = .clear
-				hostingController.view.clipsToBounds = false
-				return hostingController
-			}
-		}
-
-		func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
-			guard let index = controllers.firstIndex(of: viewController) else {
-				return nil
-			}
-			if index == 0 {
-				return nil
-			}
-			return controllers[index - 1]
-		}
-
-		func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
-			guard let index = controllers.firstIndex(of: viewController) else {
-				return nil
-			}
-			if index + 1 == controllers.count {
-				return nil
-			}
-			return controllers[index + 1]
-		}
-
-		func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
-			if completed, let currentViewController = pageViewController.viewControllers?.first, let currentIndex = controllers.firstIndex(of: currentViewController) {
-				parent.currentPage = currentIndex
-			}
 		}
 	}
 }
