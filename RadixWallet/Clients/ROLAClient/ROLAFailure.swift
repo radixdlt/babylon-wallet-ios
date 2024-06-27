@@ -1,3 +1,4 @@
+import Sargon
 
 public enum ROLAFailure: Sendable, LocalizedError, Equatable {
 	case wrongAccountType
@@ -21,7 +22,7 @@ public enum ROLAFailure: Sendable, LocalizedError, Equatable {
 		}
 	}
 
-	public var errorKindAndMessage: (errorKind: P2P.Dapp.Response.WalletInteractionFailureResponse.ErrorType, message: String?) {
+	public var errorKindAndMessage: (errorKind: DappWalletInteractionErrorType, message: String?) {
 		switch self {
 		case .wrongAccountType:
 			(errorKind: .wrongAccountType, message: errorDescription)

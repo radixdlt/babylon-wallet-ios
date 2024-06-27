@@ -529,6 +529,8 @@ public enum L10n {
     public static let behavior = L10n.tr("Localizable", "assetDetails_behavior", fallback: "Behavior")
     /// Current Supply
     public static let currentSupply = L10n.tr("Localizable", "assetDetails_currentSupply", fallback: "Current Supply")
+    /// For more info
+    public static let moreInfo = L10n.tr("Localizable", "assetDetails_moreInfo", fallback: "For more info")
     /// Name
     public static let name = L10n.tr("Localizable", "assetDetails_name", fallback: "Name")
     /// Address
@@ -624,6 +626,12 @@ public enum L10n {
       public static let whatArePoolUnits = L10n.tr("Localizable", "assetDetails_poolUnitDetails_whatArePoolUnits", fallback: "What are Pool units?")
     }
     public enum Staking {
+      /// Ready to Claim in
+      public static let readyToClaim = L10n.tr("Localizable", "assetDetails_staking_readyToClaim", fallback: "Ready to Claim in")
+      /// %d minutes or less
+      public static func readyToClaimMinutes(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "assetDetails_staking_readyToClaimMinutes", p1, fallback: "%d minutes or less")
+      }
       /// Ready to claim in about %d minutes or less.
       public static func unstaking(_ p1: Int) -> String {
         return L10n.tr("Localizable", "assetDetails_staking_unstaking", p1, fallback: "Ready to claim in about %d minutes or less.")
@@ -1860,8 +1868,14 @@ public enum L10n {
     }
   }
   public enum IOSRecoverProfileBackup {
+    /// Could not load backups
+    public static let couldNotLoadBackups = L10n.tr("Localizable", "iOSRecoverProfileBackup_couldNotLoadBackups", fallback: "Could not load backups")
+    /// Network unavailable
+    public static let networkUnavailable = L10n.tr("Localizable", "iOSRecoverProfileBackup_networkUnavailable", fallback: "Network unavailable")
     /// No wallet backups available on current iCloud account
     public static let noBackupsAvailable = L10n.tr("Localizable", "iOSRecoverProfileBackup_noBackupsAvailable", fallback: "No wallet backups available on current iCloud account")
+    /// Not logged in to iCloud
+    public static let notLoggedInToICloud = L10n.tr("Localizable", "iOSRecoverProfileBackup_notLoggedInToICloud", fallback: "Not logged in to iCloud")
     public enum Choose {
       /// Choose a backup on iCloud
       public static let title = L10n.tr("Localizable", "iOSRecoverProfileBackup_choose_title", fallback: "Choose a backup on iCloud")
@@ -2189,6 +2203,26 @@ public enum L10n {
       public static let loadingFailure = L10n.tr("Localizable", "misc_remoteThumbnails_loadingFailure", fallback: "Can't load image")
       /// Can't displays image of vector type
       public static let vectorImageFailure = L10n.tr("Localizable", "misc_remoteThumbnails_vectorImageFailure", fallback: "Can't displays image of vector type")
+    }
+  }
+  public enum MobileConnect {
+    /// Switch back to your browser to continue
+    public static let interactionSuccess = L10n.tr("Localizable", "mobileConnect_interactionSuccess", fallback: "Switch back to your browser to continue")
+    /// Does the website address match what you’re expecting?
+    public static let linkBody1 = L10n.tr("Localizable", "mobileConnect_linkBody1", fallback: "Does the website address match what you’re expecting?")
+    /// If you came from a social media ad, is the website legitimate?
+    public static let linkBody2 = L10n.tr("Localizable", "mobileConnect_linkBody2", fallback: "If you came from a social media ad, is the website legitimate?")
+    /// Before you connect to %@, you might want to check:
+    public static func linkSubtitle(_ p1: Any) -> String {
+      return L10n.tr("Localizable", "mobileConnect_linkSubtitle", String(describing: p1), fallback: "Before you connect to %@, you might want to check:")
+    }
+    /// Have you come from a genuine website?
+    public static let linkTitle = L10n.tr("Localizable", "mobileConnect_linkTitle", fallback: "Have you come from a genuine website?")
+    public enum NoProfileDialog {
+      /// You can proceed with this request after you create or restore your Radix Wallet.
+      public static let subtitle = L10n.tr("Localizable", "mobileConnect_noProfileDialog_subtitle", fallback: "You can proceed with this request after you create or restore your Radix Wallet.")
+      /// dApp Request
+      public static let title = L10n.tr("Localizable", "mobileConnect_noProfileDialog_title", fallback: "dApp Request")
     }
   }
   public enum Onboarding {
