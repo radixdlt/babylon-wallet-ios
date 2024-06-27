@@ -51,6 +51,8 @@
 "assetDetails_supplyUnkown" = "Unknown";
 "assetDetails_behavior" = "Behavior";
 "assetDetails_staking_unstaking" = "Ready to claim in about %d minutes or less.";
+"assetDetails_staking_readyToClaim" = "Ready to Claim in";
+"assetDetails_staking_readyToClaimMinutes" = "%d minutes or less";
 "assetDetails_tags" = "Tags";
 "assetDetails_tags_officialRadix" = "Official Radix";
 "assetDetails_associatedDapps" = "Associated dApps";
