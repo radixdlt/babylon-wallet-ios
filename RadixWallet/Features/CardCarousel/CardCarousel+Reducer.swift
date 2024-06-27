@@ -102,7 +102,7 @@ extension CardCarousel {
 			WithPerceptionTracking {
 				let dummyPositions = dummyPositions(positions, frame: frame, cards: store.cards)
 				ForEach(dummyPositions, id: \.card) { card, pos in
-					CarouselCardView(card: card)
+					CarouselCardView.Dummy(card: card)
 						.frame(width: pos.width, height: pos.height)
 						.offset(x: pos.minX - margin)
 				}
@@ -138,35 +138,32 @@ extension CGRect {
 
 // MARK: - CarouselCardView
 public struct CarouselCardView: View {
-	let card: CarouselCard
-	var action: (() -> Void)? = nil
-	var closeAction: (() -> Void)? = nil
+	public let card: CarouselCard
+	public let action: () -> Void
+	public let closeAction: () -> Void
 
-	public var body: some SwiftUI.View {
-		if let action {
-			Button(action: action) {
-				content
-			}
-		} else {
-			content
+	public var body: some View {
+		Button(action: action) {
+			Text("\(title)")
+				.padding(.large2)
+				.padding(.medium2)
+				.frame(maxWidth: .infinity, alignment: .center)
+				.frame(height: 105)
+				.background(.app.gray3)
+				.cornerRadius(.small1)
+		}
+		.overlay(alignment: .topTrailing) {
+			CloseButton(action: closeAction)
 		}
 	}
 
-	private var content: some SwiftUI.View {
-		Text("\(title)")
-			.padding(.large2)
-			.padding(.medium2)
-			.frame(maxWidth: .infinity, alignment: .center)
-			.frame(height: 105)
-			.background(.app.gray3)
-			.cornerRadius(.small1)
-			.overlay(alignment: .topTrailing) {
-				if let closeAction {
-					CloseButton(action: closeAction)
-				} else {
-					CloseButton.Dummy()
-				}
-			}
+	public struct Dummy: View {
+		let card: CarouselCard
+
+		public var body: some SwiftUI.View {
+			CarouselCardView(card: card, action: {}, closeAction: {})
+				.disabled(true)
+		}
 	}
 
 	private var title: String {
