@@ -144,6 +144,7 @@ public enum AssetResource {
   public static let transactionReviewDepositSetting = ImageAsset(name: "transactionReview_depositSetting")
   public static let transactionReviewDepositing = ImageAsset(name: "transactionReview_depositing")
   public static let transactionReviewWithdrawing = ImageAsset(name: "transactionReview_withdrawing")
+  public static let cardBackgroundTEMPORARY = ImageAsset(name: "card_background_TEMPORARY")
   public static let checkCircle = ImageAsset(name: "check_circle")
   public static let cloud = ImageAsset(name: "cloud")
   public static let configurationBackup = ImageAsset(name: "configuration_backup")
