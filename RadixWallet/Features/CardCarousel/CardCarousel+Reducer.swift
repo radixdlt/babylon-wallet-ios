@@ -2,11 +2,10 @@ import ComposableArchitecture
 
 // MARK: - CardCarousel
 @Reducer
-public struct CardCarousel: FeatureReducer {
+public struct CardCarousel: FeatureReducer, Sendable {
 	@ObservableState
 	public struct State: Hashable, Sendable {
 		public var cards: [CarouselCard]
-		public var taps: Int = 0
 	}
 
 	public typealias Action = FeatureAction<Self>
@@ -18,6 +17,13 @@ public struct CardCarousel: FeatureReducer {
 		case closeTapped(CarouselCard)
 	}
 
+	@CasePathable
+	public enum InternalAction: Equatable, Sendable {
+		case setCards([CarouselCard])
+	}
+
+	@Dependency(\.cardCarouselClient) var cardCarouselClient
+
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
 	}
@@ -25,23 +31,26 @@ public struct CardCarousel: FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .didAppear:
-			print("•• didAppear")
-			return .none
+			return .run { send in
+				do {
+					for try await cards in cardCarouselClient.cards() {
+						await send(.internal(.setCards(cards)))
+					}
+				} catch {}
+			}
 		case let .cardTapped(card):
-			state.taps += 1
-			print("•• didTap \(state.taps)")
 			return .none
 		case let .closeTapped(card):
-			guard let index = state.cards.firstIndex(where: { $0 == card }) else { return .none }
-			state.cards.remove(at: index)
+			cardCarouselClient.closeCard(card)
 			return .none
 		}
 	}
-}
 
-// MARK: - CarouselCard
-public enum CarouselCard: Hashable, Sendable {
-	case threeSixtyDegrees
-	case connect
-	case somethingElse
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case let .setCards(cards):
+			state.cards = cards
+			return .none
+		}
+	}
 }
