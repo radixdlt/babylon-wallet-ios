@@ -529,6 +529,8 @@ public enum L10n {
     public static let behavior = L10n.tr("Localizable", "assetDetails_behavior", fallback: "Behavior")
     /// Current Supply
     public static let currentSupply = L10n.tr("Localizable", "assetDetails_currentSupply", fallback: "Current Supply")
+    /// For more info
+    public static let moreInfo = L10n.tr("Localizable", "assetDetails_moreInfo", fallback: "For more info")
     /// Name
     public static let name = L10n.tr("Localizable", "assetDetails_name", fallback: "Name")
     /// Address
@@ -624,6 +626,12 @@ public enum L10n {
       public static let whatArePoolUnits = L10n.tr("Localizable", "assetDetails_poolUnitDetails_whatArePoolUnits", fallback: "What are Pool units?")
     }
     public enum Staking {
+      /// Ready to Claim in
+      public static let readyToClaim = L10n.tr("Localizable", "assetDetails_staking_readyToClaim", fallback: "Ready to Claim in")
+      /// %d minutes or less
+      public static func readyToClaimMinutes(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "assetDetails_staking_readyToClaimMinutes", p1, fallback: "%d minutes or less")
+      }
       /// Ready to claim in about %d minutes or less.
       public static func unstaking(_ p1: Int) -> String {
         return L10n.tr("Localizable", "assetDetails_staking_unstaking", p1, fallback: "Ready to claim in about %d minutes or less.")
