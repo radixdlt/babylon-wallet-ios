@@ -9,7 +9,6 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 	}
 
 	public struct State: Sendable, Hashable {
-		public var iCloudAccountStatus: CKAccountStatus? = nil
 		public var cloudBackupsEnabled: Bool = true
 		public var lastManualBackup: Date? = nil
 		public var lastCloudBackup: BackupStatus? = nil
@@ -56,7 +55,6 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case setCloudBackupEnabled(Bool)
-		case setICloudAccountStatus(CKAccountStatus)
 		case setProblems([SecurityProblem])
 		case setLastManualBackup(Date?)
 		case setLastCloudBackup(BackupStatus?)
@@ -108,11 +106,10 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .didAppear:
-			return checkCloudAccountStatusEffect()
-				.merge(with: checkCloudBackupEnabledEffect())
-				.merge(with: problemsEffect())
+			return problemsEffect()
 				.merge(with: lastManualBackupEffect())
 				.merge(with: lastCloudBackupEffect())
+				.merge(with: isCloudBackupEnabledEffect())
 
 		case let .cloudBackupsToggled(isEnabled):
 			return updateCloudBackupsSettingEffect(isEnabled: isEnabled)
@@ -129,11 +126,10 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 
 		case .deleteOutdatedTapped:
 			return .run { _ in
-				let profile = await ProfileStore.shared.profile
 				do {
-					try await cloudBackupClient.deleteProfileBackup(profile.id)
+					try await cloudBackupClient.deleteProfileBackup()
 				} catch {
-					loggerGlobal.error("Failed to delete outdate backup \(profile.id.uuidString): \(error)")
+					loggerGlobal.error("Failed to delete outdated backup: \(error)")
 				}
 			}
 
@@ -182,10 +178,6 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			state.cloudBackupsEnabled = isEnabled
 			return .none
 
-		case let .setICloudAccountStatus(status):
-			state.iCloudAccountStatus = status
-			return .none
-
 		case let .setProblems(problems):
 			state.problems = problems
 			return .none
@@ -231,31 +223,25 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		}
 	}
 
-	private func checkCloudAccountStatusEffect() -> Effect<Action> {
-		.run { send in
+	private func updateCloudBackupsSettingEffect(isEnabled: Bool) -> Effect<Action> {
+		.run { _ in
 			do {
-				let status = try await cloudBackupClient.checkAccountStatus()
-				await send(.internal(.setICloudAccountStatus(status)))
+				try await appPreferencesClient.setIsCloudBackupEnabled(isEnabled)
 			} catch {
-				loggerGlobal.error("Failed to get iCloud account status: \(error)")
+				loggerGlobal.error("Failed to toggle cloud backups \(isEnabled ? "on" : "off"): \(error)")
 			}
 		}
 	}
 
-	private func checkCloudBackupEnabledEffect() -> Effect<Action> {
-		.run { send in
-			let isEnabled = await ProfileStore.shared.profile.appPreferences.security.isCloudProfileSyncEnabled
-			await send(.internal(.setCloudBackupEnabled(isEnabled)))
-		}
-	}
-
-	private func updateCloudBackupsSettingEffect(isEnabled: Bool) -> Effect<Action> {
+	private func isCloudBackupEnabledEffect() -> Effect<Action> {
 		.run { send in
 			do {
-				try await appPreferencesClient.setIsCloudBackupEnabled(isEnabled)
-				await send(.internal(.setCloudBackupEnabled(isEnabled)))
+				for try await isSyncEnabled in await cloudBackupClient.isCloudProfileSyncEnabled() {
+					guard !Task.isCancelled else { return }
+					await send(.internal(.setCloudBackupEnabled(isSyncEnabled)))
+				}
 			} catch {
-				loggerGlobal.error("Failed toggle cloud backups \(isEnabled ? "on" : "off"): \(error)")
+				loggerGlobal.error("cloudBackupClient.isCloudProfileSyncEnabled failed: \(error)")
 			}
 		}
 	}

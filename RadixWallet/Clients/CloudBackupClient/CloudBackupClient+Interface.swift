@@ -5,6 +5,7 @@ import os
 
 // MARK: - CloudBackupClient
 public struct CloudBackupClient: DependencyKey, Sendable {
+	public let isCloudProfileSyncEnabled: IsCloudProfileSyncEnabled
 	public let startAutomaticBackups: StartAutomaticBackups
 	public let migrateProfilesFromKeychain: MigrateProfilesFromKeychain
 	public let deleteProfileBackup: DeleteProfileBackup
@@ -15,6 +16,7 @@ public struct CloudBackupClient: DependencyKey, Sendable {
 	public let claimProfileOnICloud: ClaimProfileOnICloud
 
 	public init(
+		isCloudProfileSyncEnabled: @escaping IsCloudProfileSyncEnabled,
 		startAutomaticBackups: @escaping StartAutomaticBackups,
 		migrateProfilesFromKeychain: @escaping MigrateProfilesFromKeychain,
 		deleteProfileBackup: @escaping DeleteProfileBackup,
@@ -24,6 +26,7 @@ public struct CloudBackupClient: DependencyKey, Sendable {
 		loadProfileHeaders: @escaping LoadProfileHeaders,
 		claimProfileOnICloud: @escaping ClaimProfileOnICloud
 	) {
+		self.isCloudProfileSyncEnabled = isCloudProfileSyncEnabled
 		self.startAutomaticBackups = startAutomaticBackups
 		self.migrateProfilesFromKeychain = migrateProfilesFromKeychain
 		self.deleteProfileBackup = deleteProfileBackup
@@ -36,9 +39,10 @@ public struct CloudBackupClient: DependencyKey, Sendable {
 }
 
 extension CloudBackupClient {
+	public typealias IsCloudProfileSyncEnabled = @Sendable () async -> AnyAsyncSequence<Bool>
 	public typealias StartAutomaticBackups = @Sendable () async throws -> Void
 	public typealias MigrateProfilesFromKeychain = @Sendable () async throws -> [CKRecord]
-	public typealias DeleteProfileBackup = @Sendable (ProfileID) async throws -> Void
+	public typealias DeleteProfileBackup = @Sendable (ProfileID?) async throws -> Void
 	public typealias CheckAccountStatus = @Sendable () async throws -> CKAccountStatus
 	public typealias LastBackup = @Sendable (ProfileID) -> AnyAsyncSequence<BackupResult?>
 	public typealias LoadProfile = @Sendable (ProfileID) async throws -> BackedUpProfile
