@@ -31,6 +31,13 @@ extension CloseButton {
 		}
 		.frame(.small)
 	}
+
+	public struct Dummy: View {
+		public var body: some View {
+			Image(asset: AssetResource.close).tint(.app.gray1)
+				.frame(.small)
+		}
+	}
 }
 
 // MARK: - CloseButton_Previews

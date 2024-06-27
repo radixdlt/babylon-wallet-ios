@@ -53,75 +53,76 @@ extension CardCarousel {
 	public struct View: SwiftUI.View {
 		private static let coordSpace: String = "CardCarousel"
 
-		private let margin: CGFloat = 3 * .medium1
-		private let spacing: CGFloat = 3 * .small1
+		private let margin: CGFloat = .medium1
+		private let spacing: CGFloat = .small1
 
 		let store: StoreOf<CardCarousel>
-		@SwiftUI.State private var card: CarouselCard? = nil
 
 		public var body: some SwiftUI.View {
 			WithPerceptionTracking {
-				GeometryReader { proxy in
-					TabView {
-						ForEach(store.cards, id: \.self) { card in
-							CarouselCardView(card: card)
-								.measurePosition(card, coordSpace: Self.coordSpace)
-								.overlay(alignment: .topTrailing) {
-									CloseButton {
-										store.send(.view(.closeTapped(card)), animation: .default)
-									}
-								}
-								.padding(.horizontal, 0.5 * spacing)
-								.transition(.scale(scale: 0.8).combined(with: .opacity))
-								.border(.red)
-						}
-					}
-					.tabViewStyle(.page(indexDisplayMode: .never))
-					.coordinateSpace(name: Self.coordSpace)
-					.border(.black)
-					.overlayPreferenceValue(PositionsPreferenceKey.self) { positions in
-						let frame = proxy.frame(in: .named(Self.coordSpace))
-						let neighbours = neighbours(positions, frame: frame, cards: store.cards)
-						ForEach(neighbours, id: \.card) { _, pos in
-							Rectangle()
-								.stroke(.red, lineWidth: 4)
-								.frame(width: pos.width, height: pos.height)
-								.offset(x: pos.minX - margin)
-						}
-
-//						Rectangle()
-//							.stroke(.orange, lineWidth: 5)
-//							.frame(width: frame.width, height: frame.height)
-//							.offset(x: frame.minX - margin)
-					}
+				if !store.cards.isEmpty {
+					core
 				}
-				.padding(.horizontal, margin - 0.5 * spacing)
-				.frame(height: 105)
-			}
-			.onAppear {
-				store.send(.view(.didAppear))
 			}
 		}
 
-		private func neighbours(_ positions: [AnyHashable: CGRect], frame: CGRect, cards: [CarouselCard]) -> [(card: CarouselCard, pos: CGRect)] {
+		@MainActor
+		private var core: some SwiftUI.View {
+			GeometryReader { proxy in
+				WithPerceptionTracking {
+					TabView {
+						ForEach(store.cards, id: \.self) { card in
+							CarouselCardView(card: card) {
+								store.send(.view(.cardTapped(card)))
+							} closeAction: {
+								store.send(.view(.closeTapped(card)), animation: .default)
+							}
+							.measurePosition(card, coordSpace: Self.coordSpace)
+							.padding(.horizontal, 0.5 * spacing)
+							.transition(.scale(scale: 0.8).combined(with: .opacity))
+						}
+					}
+				}
+				.tabViewStyle(.page(indexDisplayMode: .never))
+				.coordinateSpace(name: Self.coordSpace)
+				.backgroundPreferenceValue(PositionsPreferenceKey.self) { positions in
+					dummyCards(positions, in: proxy.frame(in: .named(Self.coordSpace)))
+				}
+			}
+			.padding(.horizontal, margin - 0.5 * spacing)
+			.frame(height: 105)
+			.onAppear {
+				store.send(.view(.didAppear))
+			}
+			.transition(.scale(scale: 0.8).combined(with: .opacity))
+		}
+
+		@MainActor
+		private func dummyCards(_ positions: [AnyHashable: CGRect], in frame: CGRect) -> some SwiftUI.View {
+			WithPerceptionTracking {
+				let dummyPositions = dummyPositions(positions, frame: frame, cards: store.cards)
+				ForEach(dummyPositions, id: \.card) { card, pos in
+					CarouselCardView(card: card)
+						.frame(width: pos.width, height: pos.height)
+						.offset(x: pos.minX - margin)
+				}
+			}
+		}
+
+		private func dummyPositions(_ positions: [AnyHashable: CGRect], frame: CGRect, cards: [CarouselCard]) -> [(card: CarouselCard, pos: CGRect)] {
 			guard let width = positions.first?.value.width else { return [] }
 
-			print("•• POSITIONS in \(frame)")
-			for (x, y) in positions {
-				print("•• \(x): \(Int(y.minX.rounded())) - \(Int(y.maxX.rounded()))")
-			}
-
-			let current = positions.mapValues { abs($0.midX - frame.midX) }.min { $0.value < $1.value }
-			guard let current, let card = current.key.base as? CarouselCard else { return [] }
-			guard let currentIndex = cards.firstIndex(of: card), let rect = positions[card] else { return [] }
+			let thisCard = positions.mapValues { abs($0.midX - frame.midX) }.min { $0.value < $1.value }?.key.base as? CarouselCard
+			guard let thisCard, let currentIndex = cards.firstIndex(of: thisCard), let rect = positions[thisCard] else { return [] }
 			var result: [(CarouselCard, CGRect)] = []
 			if cards.indices.contains(currentIndex - 1) {
 				result.append((cards[currentIndex - 1], rect.offsetBy(dx: -(width + spacing), dy: 0)))
 			}
-			let nextRect = rect.offsetBy(dx: width + spacing, dy: 0)
-
+			if !frame.contains(rect) {
+				result.append((thisCard, rect))
+			}
 			if cards.indices.contains(currentIndex + 1) {
-				result.append((cards[currentIndex + 1], nextRect))
+				result.append((cards[currentIndex + 1], rect.offsetBy(dx: width + spacing, dy: 0)))
 			}
 
 			return result
@@ -138,8 +139,20 @@ extension CGRect {
 // MARK: - CarouselCardView
 public struct CarouselCardView: View {
 	let card: CarouselCard
+	var action: (() -> Void)? = nil
+	var closeAction: (() -> Void)? = nil
 
 	public var body: some SwiftUI.View {
+		if let action {
+			Button(action: action) {
+				content
+			}
+		} else {
+			content
+		}
+	}
+
+	private var content: some SwiftUI.View {
 		Text("\(title)")
 			.padding(.large2)
 			.padding(.medium2)
@@ -147,6 +160,13 @@ public struct CarouselCardView: View {
 			.frame(height: 105)
 			.background(.app.gray3)
 			.cornerRadius(.small1)
+			.overlay(alignment: .topTrailing) {
+				if let closeAction {
+					CloseButton(action: closeAction)
+				} else {
+					CloseButton.Dummy()
+				}
+			}
 	}
 
 	private var title: String {
