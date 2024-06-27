@@ -51,50 +51,50 @@ import SwiftUI
 // MARK: - CardCarousel.View
 extension CardCarousel {
 	public struct View: SwiftUI.View {
+		public let store: StoreOf<CardCarousel>
+
 		private static let coordSpace: String = "CardCarousel"
 
 		private let margin: CGFloat = .medium1
 		private let spacing: CGFloat = .small1
 
-		let store: StoreOf<CardCarousel>
-
 		public var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				if !store.cards.isEmpty {
-					core
+					GeometryReader { proxy in
+						coreView
+							.backgroundPreferenceValue(PositionsPreferenceKey.self) { positions in
+								dummyCards(positions, in: proxy.frame(in: .named(Self.coordSpace)))
+							}
+					}
+					.padding(.horizontal, margin - 0.5 * spacing)
+					.frame(height: CarouselCardView.height)
+					.onAppear {
+						store.send(.view(.didAppear))
+					}
+					.transition(.scale(scale: 0.8).combined(with: .opacity))
 				}
 			}
 		}
 
 		@MainActor
-		private var core: some SwiftUI.View {
-			GeometryReader { proxy in
-				WithPerceptionTracking {
-					TabView {
-						ForEach(store.cards, id: \.self) { card in
-							CarouselCardView(card: card) {
-								store.send(.view(.cardTapped(card)))
-							} closeAction: {
-								store.send(.view(.closeTapped(card)), animation: .default)
-							}
-							.measurePosition(card, coordSpace: Self.coordSpace)
-							.padding(.horizontal, 0.5 * spacing)
-							.transition(.scale(scale: 0.8).combined(with: .opacity))
+		private var coreView: some SwiftUI.View {
+			WithPerceptionTracking {
+				TabView {
+					ForEach(store.cards, id: \.self) { card in
+						CarouselCardView(card: card) {
+							store.send(.view(.cardTapped(card)))
+						} closeAction: {
+							store.send(.view(.closeTapped(card)), animation: .default)
 						}
+						.measurePosition(card, coordSpace: Self.coordSpace)
+						.padding(.horizontal, 0.5 * spacing)
+						.transition(.scale(scale: 0.8).combined(with: .opacity))
 					}
 				}
 				.tabViewStyle(.page(indexDisplayMode: .never))
-				.coordinateSpace(name: Self.coordSpace)
-				.backgroundPreferenceValue(PositionsPreferenceKey.self) { positions in
-					dummyCards(positions, in: proxy.frame(in: .named(Self.coordSpace)))
-				}
 			}
-			.padding(.horizontal, margin - 0.5 * spacing)
-			.frame(height: 105)
-			.onAppear {
-				store.send(.view(.didAppear))
-			}
-			.transition(.scale(scale: 0.8).combined(with: .opacity))
+			.coordinateSpace(name: Self.coordSpace)
 		}
 
 		@MainActor
@@ -106,6 +106,7 @@ extension CardCarousel {
 						.frame(width: pos.width, height: pos.height)
 						.offset(x: pos.minX - margin)
 				}
+				.animation(nil, value: store.cards)
 			}
 		}
 
@@ -148,7 +149,7 @@ public struct CarouselCardView: View {
 				.padding(.large2)
 				.padding(.medium2)
 				.frame(maxWidth: .infinity, alignment: .center)
-				.frame(height: 105)
+				.frame(height: Self.height)
 				.background(.app.gray3)
 				.cornerRadius(.small1)
 		}
@@ -156,6 +157,8 @@ public struct CarouselCardView: View {
 			CloseButton(action: closeAction)
 		}
 	}
+
+	public static let height: CGFloat = 105
 
 	public struct Dummy: View {
 		let card: CarouselCard
