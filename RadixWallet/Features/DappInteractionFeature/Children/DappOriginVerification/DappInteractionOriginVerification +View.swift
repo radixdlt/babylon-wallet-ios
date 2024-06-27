@@ -1,6 +1,6 @@
-extension DappInteractionVerifyDappOrigin {
+extension DappInteractionOriginVerification {
 	struct View: SwiftUI.View {
-		let store: StoreOf<DappInteractionVerifyDappOrigin>
+		let store: StoreOf<DappInteractionOriginVerification>
 
 		var body: some SwiftUI.View {
 			NavigationStack {

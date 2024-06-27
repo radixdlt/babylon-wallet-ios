@@ -1,5 +1,5 @@
 extension DeepLinkHandlerClient {
-	public static var liveValue: DeepLinkHandlerClient {
+	public static let liveValue: DeepLinkHandlerClient = {
 		@Dependency(\.radixConnectClient) var radixConnectClient
 		@Dependency(\.errorQueue) var errorQueue
 
@@ -35,5 +35,5 @@ extension DeepLinkHandlerClient {
 				state.bufferedDeepLink != nil
 			}
 		)
-	}
+	}()
 }

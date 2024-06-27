@@ -909,6 +909,7 @@
 		8308184A2B9F162B002D8351 /* HTTPClient+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830818492B9F162B002D8351 /* HTTPClient+Mock.swift */; };
 		8308184C2B9F169B002D8351 /* TokenPriceClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8308184B2B9F169B002D8351 /* TokenPriceClient+Live.swift */; };
 		8308184E2B9F16AD002D8351 /* TokenPriceClient+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8308184D2B9F16AD002D8351 /* TokenPriceClient+Mock.swift */; };
+		830E43AF2C2D8B5100B6E95F /* SessionStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830E43AE2C2D8B5100B6E95F /* SessionStorageTests.swift */; };
 		830EA9D62AE94033004C8051 /* AccountAndPersonaHiding+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9D52AE94033004C8051 /* AccountAndPersonaHiding+Reducer.swift */; };
 		830EA9DB2AEA8770004C8051 /* EntitiesVisibilityClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9DA2AEA8770004C8051 /* EntitiesVisibilityClient+Interface.swift */; };
 		830EA9DD2AEB8197004C8051 /* AccountAndPersonaHiding+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9DC2AEB8197004C8051 /* AccountAndPersonaHiding+View.swift */; };
@@ -918,10 +919,10 @@
 		830EA9E92AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9E82AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift */; };
 		831F0CED2C21819000D6F5BF /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 831F0CEC2C21819000D6F5BF /* Sargon */; };
 		831F0CEF2C25728E00D6F5BF /* RadixConnectMobileSessionStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831F0CEE2C25728E00D6F5BF /* RadixConnectMobileSessionStorage.swift */; };
-		831F0CF22C25897500D6F5BF /* DappInteractionVerifyDappOrigin+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831F0CF12C25897500D6F5BF /* DappInteractionVerifyDappOrigin+View.swift */; };
+		831F0CF22C25897500D6F5BF /* DappInteractionOriginVerification +View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831F0CF12C25897500D6F5BF /* DappInteractionOriginVerification +View.swift */; };
 		831F0CF42C294BAA00D6F5BF /* DeepLinkHandlerClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831F0CF32C294BAA00D6F5BF /* DeepLinkHandlerClient+Live.swift */; };
 		831F0CF62C294C0D00D6F5BF /* DeepLinkHandlerClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831F0CF52C294C0D00D6F5BF /* DeepLinkHandlerClient+Test.swift */; };
-		832868652BE2641800902126 /* DappInteractionVerifyDappOrigin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832868642BE2641800902126 /* DappInteractionVerifyDappOrigin.swift */; };
+		832868652BE2641800902126 /* DappInteractionOriginVerification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832868642BE2641800902126 /* DappInteractionOriginVerification.swift */; };
 		8328806C2AE6725F0014FBF3 /* AccountPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */; };
 		8329ACE42BBAB9E7005FD9DC /* DeepLinkHandlerClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8329ACE32BBAB9E7005FD9DC /* DeepLinkHandlerClient+Interface.swift */; };
 		83377A032B9DDAF000D8AA36 /* NPSSurvey+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83377A022B9DDAF000D8AA36 /* NPSSurvey+View.swift */; };
@@ -2038,6 +2039,7 @@
 		830818492B9F162B002D8351 /* HTTPClient+Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPClient+Mock.swift"; sourceTree = "<group>"; };
 		8308184B2B9F169B002D8351 /* TokenPriceClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TokenPriceClient+Live.swift"; sourceTree = "<group>"; };
 		8308184D2B9F16AD002D8351 /* TokenPriceClient+Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TokenPriceClient+Mock.swift"; sourceTree = "<group>"; };
+		830E43AE2C2D8B5100B6E95F /* SessionStorageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStorageTests.swift; sourceTree = "<group>"; };
 		830EA9D52AE94033004C8051 /* AccountAndPersonaHiding+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountAndPersonaHiding+Reducer.swift"; sourceTree = "<group>"; };
 		830EA9DA2AEA8770004C8051 /* EntitiesVisibilityClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EntitiesVisibilityClient+Interface.swift"; sourceTree = "<group>"; };
 		830EA9DC2AEB8197004C8051 /* AccountAndPersonaHiding+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountAndPersonaHiding+View.swift"; sourceTree = "<group>"; };
@@ -2047,10 +2049,10 @@
 		830EA9E62AEBA793004C8051 /* EntitiesVisibilityClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EntitiesVisibilityClient+Live.swift"; sourceTree = "<group>"; };
 		830EA9E82AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EntitiesVisibilityClient+Test.swift"; sourceTree = "<group>"; };
 		831F0CEE2C25728E00D6F5BF /* RadixConnectMobileSessionStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadixConnectMobileSessionStorage.swift; sourceTree = "<group>"; };
-		831F0CF12C25897500D6F5BF /* DappInteractionVerifyDappOrigin+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DappInteractionVerifyDappOrigin+View.swift"; sourceTree = "<group>"; };
+		831F0CF12C25897500D6F5BF /* DappInteractionOriginVerification +View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DappInteractionOriginVerification +View.swift"; sourceTree = "<group>"; };
 		831F0CF32C294BAA00D6F5BF /* DeepLinkHandlerClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeepLinkHandlerClient+Live.swift"; sourceTree = "<group>"; };
 		831F0CF52C294C0D00D6F5BF /* DeepLinkHandlerClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeepLinkHandlerClient+Test.swift"; sourceTree = "<group>"; };
-		832868642BE2641800902126 /* DappInteractionVerifyDappOrigin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DappInteractionVerifyDappOrigin.swift; sourceTree = "<group>"; };
+		832868642BE2641800902126 /* DappInteractionOriginVerification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DappInteractionOriginVerification.swift; sourceTree = "<group>"; };
 		8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountPreferencesTests.swift; sourceTree = "<group>"; };
 		8329ACE32BBAB9E7005FD9DC /* DeepLinkHandlerClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeepLinkHandlerClient+Interface.swift"; sourceTree = "<group>"; };
 		83377A022B9DDAF000D8AA36 /* NPSSurvey+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NPSSurvey+View.swift"; sourceTree = "<group>"; };
@@ -5632,6 +5634,14 @@
 			path = SensitiveInfoClient;
 			sourceTree = "<group>";
 		};
+		830E43AD2C2D8B3800B6E95F /* Mobile */ = {
+			isa = PBXGroup;
+			children = (
+				830E43AE2C2D8B5100B6E95F /* SessionStorageTests.swift */,
+			);
+			path = Mobile;
+			sourceTree = "<group>";
+		};
 		830EA9D42AE94014004C8051 /* AccountAndPersonaHidingFeature */ = {
 			isa = PBXGroup;
 			children = (
@@ -5662,8 +5672,8 @@
 		831F0CF02C2576AE00D6F5BF /* DappOriginVerification */ = {
 			isa = PBXGroup;
 			children = (
-				832868642BE2641800902126 /* DappInteractionVerifyDappOrigin.swift */,
-				831F0CF12C25897500D6F5BF /* DappInteractionVerifyDappOrigin+View.swift */,
+				832868642BE2641800902126 /* DappInteractionOriginVerification.swift */,
+				831F0CF12C25897500D6F5BF /* DappInteractionOriginVerification +View.swift */,
 			);
 			path = DappOriginVerification;
 			sourceTree = "<group>";
@@ -6022,6 +6032,7 @@
 		E6DBA2582ADEBFB200A38425 /* RadixConnectTests */ = {
 			isa = PBXGroup;
 			children = (
+				830E43AD2C2D8B3800B6E95F /* Mobile */,
 				E6DBA2592ADEBFB200A38425 /* DataChannel */,
 				E6DBA25C2ADEBFB200A38425 /* SignalingServerClient */,
 				E6DBA25E2ADEBFB200A38425 /* Negotiation */,
@@ -6722,6 +6733,7 @@
 				E6DBA3272ADEBFB300A38425 /* MockURLProtocol.swift in Sources */,
 				8328806C2AE6725F0014FBF3 /* AccountPreferencesTests.swift in Sources */,
 				E6DBA3192ADEBFB300A38425 /* PackagesEncodingDecodingTests.swift in Sources */,
+				830E43AF2C2D8B5100B6E95F /* SessionStorageTests.swift in Sources */,
 				482752052BD99606007854E0 /* FactorSourcesClientLiveTests.swift in Sources */,
 				8381C8B02BBD2CD400A470B4 /* TokenPriceCientTests.swift in Sources */,
 				E6DBA3472ADEBFB300A38425 /* HexStringToDataTests.swift in Sources */,
@@ -7111,7 +7123,7 @@
 				48CFC3822ADC10D900E77A5C /* AssetBehaviorsView.swift in Sources */,
 				83EE5EE52BE3C16F00B1531D /* StatePackageBlueprintPageResponse.swift in Sources */,
 				48CFC5652ADC10DA00E77A5C /* MetadataNonFungibleGlobalIdValue.swift in Sources */,
-				832868652BE2641800902126 /* DappInteractionVerifyDappOrigin.swift in Sources */,
+				832868652BE2641800902126 /* DappInteractionOriginVerification.swift in Sources */,
 				48CFC4B02ADC10DA00E77A5C /* MetadataStringValue.swift in Sources */,
 				48CFC5362ADC10DA00E77A5C /* StateEntityDetailsResponse.swift in Sources */,
 				48CFC5372ADC10DA00E77A5C /* StateEntityNonFungibleResourceVaultsPageOptIns.swift in Sources */,
@@ -7568,7 +7580,7 @@
 				48CFC3382ADC10D900E77A5C /* PreviewResult.swift in Sources */,
 				48CFC2C82ADC10D900E77A5C /* ResourceAsset+Reducer.swift in Sources */,
 				83856D632B0279080026452A /* VerifyMnemonic.swift in Sources */,
-				831F0CF22C25897500D6F5BF /* DappInteractionVerifyDappOrigin+View.swift in Sources */,
+				831F0CF22C25897500D6F5BF /* DappInteractionOriginVerification +View.swift in Sources */,
 				48CFC5332ADC10DA00E77A5C /* StateEntityNonFungibleResourceVaultsPageRequest.swift in Sources */,
 				48CFC48A2ADC10DA00E77A5C /* OnLedgerEntitiesClient+CreateEntity.swift in Sources */,
 				A4ECE27A2BEEB01800468BF6 /* CloudBackupClient+Live.swift in Sources */,

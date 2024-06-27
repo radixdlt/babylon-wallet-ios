@@ -1,4 +1,4 @@
-struct DappInteractionVerifyDappOrigin: FeatureReducer {
+struct DappInteractionOriginVerification: FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable, Equatable {
 		let dAppMetadata: DappMetadata
