@@ -109,12 +109,12 @@ private struct KeyText: View {
 	let isLocked: Bool
 
 	var body: some View {
-		HStack(spacing: .zero) {
+		HStack(spacing: .small3) {
 			Text(key)
 				.textStyle(.body1Regular)
 
 			if isLocked {
-				Image(systemName: "lock")
+				Image(.lockMetadata)
 			}
 		}
 		.foregroundColor(.app.gray2)
