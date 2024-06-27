@@ -33,13 +33,13 @@ extension DappInteractionVerifyDappOrigin {
 				Thumbnail(.dapp, url: store.dAppMetadata.thumbnail, size: .medium)
 					.padding(.bottom, .small1)
 
-				Text("Have you come from a genuine website?")
+				Text(L10n.MobileConnect.linkTitle)
 					.foregroundColor(.app.gray1)
 					.kerning(-0.5)
 					.textStyle(.sheetTitle)
 					.padding(.bottom, .large2)
 
-				Text("Before you connect to **\(store.dAppMetadata.name)**, you might want to check:")
+				Text(L10n.MobileConnect.linkSubtitle(store.dAppMetadata.name))
 					.foregroundColor(.app.gray1)
 					.textStyle(.body1Link)
 			}
@@ -48,9 +48,9 @@ extension DappInteractionVerifyDappOrigin {
 
 		private func infoPointsView() -> some SwiftUI.View {
 			VStack(alignment: .leading, spacing: .small1) {
-				infoPointView(1, info: "Does the website address match what you’re expecting?")
+				infoPointView(1, info: L10n.MobileConnect.linkBody1)
 				Divider()
-				infoPointView(2, info: "If you came from a social media ad, is the website legitimate?")
+				infoPointView(2, info: L10n.MobileConnect.linkBody2)
 			}
 			.padding()
 			.background(.app.gray5)

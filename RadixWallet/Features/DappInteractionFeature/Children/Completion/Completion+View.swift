@@ -40,19 +40,20 @@ extension Completion {
 				WithNavigationBar {
 					store.send(.view(.dismissTapped))
 				} content: {
-					VStack(spacing: .small3) {
-						Spacer()
-
+					VStack(spacing: .zero) {
 						Image(asset: AssetResource.successCheckmark)
+							.padding(.top, .large1)
 
 						Text(viewStore.title)
 							.foregroundColor(.app.gray1)
 							.textStyle(.sheetTitle)
+							.padding([.top, .horizontal], .medium3)
 
 						Text(viewStore.subtitle)
 							.foregroundColor(.app.gray1)
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)
+							.padding([.top, .horizontal], .medium3)
 
 						if let txID = viewStore.txID {
 							HStack {
@@ -62,22 +63,22 @@ extension Completion {
 									.foregroundColor(.app.blue1)
 							}
 							.textStyle(.body1Header)
+							.padding(.top, .medium3)
 						}
 
-						if viewStore.showSwitchBackToBrowserMessage {
-							Spacer()
+						Spacer()
 
-							Divider()
-							// FIXME: Strings
-							Text("Switch back to your browser to continue")
+						if viewStore.showSwitchBackToBrowserMessage {
+							Text(L10n.MobileConnect.interactionSuccess)
 								.foregroundColor(.app.gray1)
 								.textStyle(.body1Regular)
 								.multilineTextAlignment(.center)
-								.padding(.top, .small1)
+								.padding(.vertical, .medium1)
+								.frame(maxWidth: .infinity)
+								.background(.app.gray5)
 						}
 					}
-					.padding(.horizontal, .medium2)
-					.padding(.bottom, .small3)
+					.frame(maxWidth: .infinity)
 				}
 			}
 			.presentationDragIndicator(.visible)
