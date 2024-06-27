@@ -87,10 +87,7 @@ public struct App: Sendable, FeatureReducer {
 				deepLinkHandlerClient.setDeepLink(url)
 			case .onboardingCoordinator:
 				deepLinkHandlerClient.setDeepLink(url)
-				// FIXME: Strings
-				overlayWindowClient.scheduleAlertAndIgnoreAction(.init(title: { TextState("dApp Request") }, message: {
-					TextState("You can proceed with this request after you create or restore your Radix Wallet.")
-				}))
+				presentDeepLinkNoProfileDialog()
 			}
 			return .none
 		case .task:
@@ -132,20 +129,13 @@ public struct App: Sendable, FeatureReducer {
 		state.root = .main(.init(
 			home: .init())
 		)
-
-		// At fresh app start, handle deepLink only when app goes to main state.
-		// While splash screen is shown, or during the onboarding, the deepLink is buffered.
-		deepLinkHandlerClient.handleDeepLink()
 		return .none
 	}
 
 	private func goToOnboarding(state: inout State) -> Effect<Action> {
 		state.root = .onboardingCoordinator(.init())
 		if deepLinkHandlerClient.hasDeepLink() {
-			// FIXME: Strings
-			overlayWindowClient.scheduleAlertAndIgnoreAction(.init(title: { TextState("dApp Request") }, message: {
-				TextState("You can proceed with this request after you create or restore your Radix Wallet.")
-			}))
+			presentDeepLinkNoProfileDialog()
 		}
 		return .none
 	}
@@ -161,6 +151,15 @@ public struct App: Sendable, FeatureReducer {
 				loggerGlobal.error("Failed to iterate over walletDidReset: \(error)")
 			}
 		}
+	}
+
+	private func presentDeepLinkNoProfileDialog() {
+		overlayWindowClient.scheduleAlertAndIgnoreAction(
+			.init(
+				title: { TextState(L10n.MobileConnect.NoProfileDialog.title) },
+				message: { TextState(L10n.MobileConnect.NoProfileDialog.subtitle) }
+			)
+		)
 	}
 }
 
