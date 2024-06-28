@@ -44,8 +44,8 @@ public struct AddressDetails: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			return loadTitle(state: &state)
-				.merge(with: loadQrCode(state: &state))
+			return loadTitleEffect(state: &state)
+				.merge(with: loadQrCodeEffect(state: &state))
 		case .closeButtonTapped:
 			return .run { _ in
 				await dismiss()
@@ -99,51 +99,42 @@ public struct AddressDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	private func loadTitle(state: inout State) -> Effect<Action> {
+	private func loadTitleEffect(state: inout State) -> Effect<Action> {
 		state.title = .loading
 		return .run { [address = state.address] send in
-			let result: TaskResult<String?> = switch address {
-			case let .account(address, _):
-				await TaskResult {
-					let account = try await accountsClient.getAccountByAddress(address)
-					return account.displayName.rawValue
-				}
-			case let .resource(address):
-				await TaskResult {
-					let resource = try await onLedgerEntitiesClient.getResource(address)
-					return resource.resourceTitle
-				}
-			case let .validator(address):
-				await TaskResult {
-					let entity = try await onLedgerEntitiesClient.getEntity(address.asGeneral, metadataKeys: .resourceMetadataKeys)
-					return entity.metadata?.name
-				}
-			case let .package(address):
-				await TaskResult {
-					let entity = try await onLedgerEntitiesClient.getEntity(address.asGeneral, metadataKeys: .resourceMetadataKeys)
-					return entity.metadata?.name
-				}
-			case let .resourcePool(address):
-				await TaskResult {
-					let entity = try await onLedgerEntitiesClient.getEntity(address.asGeneral, metadataKeys: .resourceMetadataKeys)
-					return entity.metadata?.name
-				}
-			case let .component(address):
-				await TaskResult {
-					let entity = try await onLedgerEntitiesClient.getEntity(address.asGeneral, metadataKeys: .resourceMetadataKeys)
-					return entity.metadata?.name
-				}
-			case let .nonFungibleGlobalID(globalId):
-				await TaskResult {
-					let resource = try await onLedgerEntitiesClient.getResource(globalId.resourceAddress)
-					return resource.resourceTitle
-				}
-			}
-			await send(.internal(.loadedTitle(result)))
+			await send(.internal(.loadedTitle(TaskResult {
+				try await loadTitle(address: address)
+			})))
 		}
 	}
 
-	private func loadQrCode(state: inout State) -> Effect<Action> {
+	private func loadTitle(address: LedgerIdentifiable.Address) async throws -> String? {
+		switch address {
+		case let .account(address, _):
+			let account = try await accountsClient.getAccountByAddress(address)
+			return account.displayName.rawValue
+		case let .resource(address):
+			let resource = try await onLedgerEntitiesClient.getResource(address)
+			return resource.resourceTitle
+		case let .validator(address):
+			let entity = try await onLedgerEntitiesClient.getEntity(address.asGeneral, metadataKeys: .resourceMetadataKeys)
+			return entity.metadata?.name
+		case let .package(address):
+			let entity = try await onLedgerEntitiesClient.getEntity(address.asGeneral, metadataKeys: .resourceMetadataKeys)
+			return entity.metadata?.name
+		case let .resourcePool(address):
+			let entity = try await onLedgerEntitiesClient.getEntity(address.asGeneral, metadataKeys: .resourceMetadataKeys)
+			return entity.metadata?.name
+		case let .component(address):
+			let entity = try await onLedgerEntitiesClient.getEntity(address.asGeneral, metadataKeys: .resourceMetadataKeys)
+			return entity.metadata?.name
+		case let .nonFungibleGlobalID(globalId):
+			let resource = try await onLedgerEntitiesClient.getResource(globalId.resourceAddress)
+			return resource.resourceTitle
+		}
+	}
+
+	private func loadQrCodeEffect(state: inout State) -> Effect<Action> {
 		state.qrImage = .loading
 		let content = QR.addressPrefix + state.address.address
 		return .run { send in
