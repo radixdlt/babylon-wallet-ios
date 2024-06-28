@@ -138,7 +138,7 @@ extension NonFungibleTokenDetails.View {
 			AssetDetailsSeparator()
 				.padding(.horizontal, -.large2)
 
-			Text("Current Redeemable Value")
+			Text(L10n.AssetDetails.Staking.currentRedeemableValue)
 				.textStyle(.secondaryHeader)
 				.foregroundColor(.app.gray1)
 
@@ -151,10 +151,10 @@ extension NonFungibleTokenDetails.View {
 			.roundedCorners(strokeColor: .app.gray4)
 
 			if stakeClaim.isReadyToBeClaimed {
-				Button("Ready to Claim", action: onClaimTap)
+				Button(L10n.AssetDetails.Staking.readyToClaim, action: onClaimTap)
 					.buttonStyle(.primaryRectangular)
 			} else if let unstakingDurationDescription = stakeClaim.unstakingDurationDescription {
-				KeyValueView(key: "Ready to Claim in", value: unstakingDurationDescription)
+				KeyValueView(key: L10n.AssetDetails.Staking.readyToClaimIn, value: unstakingDurationDescription)
 			}
 		}
 		.padding(.top, .small2)
@@ -166,7 +166,7 @@ extension OnLedgerEntitiesClient.StakeClaim {
 		guard let reamainingEpochsUntilClaim, isUnstaking else {
 			return nil
 		}
-		return L10n.AssetDetails.Staking.readyToClaimMinutes(
+		return L10n.AssetDetails.Staking.readyToClaimInMinutes(
 			reamainingEpochsUntilClaim * epochDurationInMinutes
 		)
 	}
