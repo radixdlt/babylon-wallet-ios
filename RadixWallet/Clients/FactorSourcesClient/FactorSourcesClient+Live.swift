@@ -201,12 +201,12 @@ extension FactorSourcesClient: DependencyKey {
 
 				loggerGlobal.info("Creating new main BDFS")
 
-				let deviceInfo = try secureStorageClient.loadDeviceInfo()
+				let deviceInfo = secureStorageClient.loadDeviceInfoOrFallback()
 
 				var newBDFS = DeviceFactorSource.babylon(
 					mnemonicWithPassphrase: mnemonicWithPassphrase,
 					isMain: true,
-					deviceInfo: deviceInfo ?? .init(id: .init(), date: .now, description: "\(model) (\(name))", systemVersion: nil, hostAppVersion: nil, hostVendor: nil)
+					deviceInfo: deviceInfo
 				)
 
 				newBDFS.hint.model = model

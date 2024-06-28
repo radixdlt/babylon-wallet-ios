@@ -135,7 +135,7 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 				let mainBDFS = DeviceFactorSource.babylon(
 					mnemonicWithPassphrase: mnemonicWithPassphrase,
 					isMain: true,
-					deviceInfo: (try? secureStorageClient.loadDeviceInfo()) ?? .init(id: .init(), date: .now, description: "iPhone", systemVersion: nil, hostAppVersion: nil, hostVendor: "Apple")
+					deviceInfo: secureStorageClient.loadDeviceInfoOrFallback()
 				)
 
 				let privateHD = PrivateHierarchicalDeterministicFactorSource(

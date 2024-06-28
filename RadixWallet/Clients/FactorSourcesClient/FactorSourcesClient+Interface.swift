@@ -267,15 +267,7 @@ extension FactorSourcesClient {
 	) async throws -> DeviceFactorSource {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 
-		let deviceInfo = try secureStorageClient.loadDeviceInfo() ?? DeviceInfo(
-			id: .init(),
-			date: .now,
-			description: "iPhone",
-			systemVersion: nil,
-			hostAppVersion: nil,
-			hostVendor: "Apple"
-		)
-
+		let deviceInfo = secureStorageClient.loadDeviceInfoOrFallback()
 		let factorSource = switch onDeviceMnemonicKind {
 		case let .babylon(isMain):
 			DeviceFactorSource.babylon(

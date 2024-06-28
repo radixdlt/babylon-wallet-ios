@@ -404,11 +404,11 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 				of: progress.softwareAccountsToMigrate
 			)
 
-			let privateHDFactorSource = try PrivateHierarchicalDeterministicFactorSource.olympia(
+			let privateHDFactorSource = PrivateHierarchicalDeterministicFactorSource.olympia(
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
 				// Should never fail to load device info, but sure, we
 				// can provide some fall back. Non of this is really important.
-				deviceInfo: secureStorageClient.loadDeviceInfo() ?? .init(id: .init(), date: .now, description: "iPhone", systemVersion: nil, hostAppVersion: nil, hostVendor: "Apple")
+				deviceInfo: secureStorageClient.loadDeviceInfoOrFallback()
 			)
 
 			return migrateSoftwareAccountsToBabylon(

@@ -334,17 +334,11 @@ extension CloudBackupClient {
 				id: creatingDeviceID,
 				date: creatingDeviceDate,
 				description: creatingDeviceDescription,
-				systemVersion: nil,
-				hostAppVersion: nil,
-				hostVendor: "Apple"
 			),
 			lastUsedOnDevice: DeviceInfo(
 				id: lastUsedOnDeviceID,
 				date: lastUsedOnDeviceDate,
 				description: lastUsedOnDeviceDescription,
-				systemVersion: nil,
-				hostAppVersion: nil,
-				hostVendor: "Apple"
 			),
 			lastModified: lastModified,
 			contentHint: .init(

@@ -540,12 +540,8 @@ extension ProfileStore {
 		func createNew(deviceID: DeviceID? = nil) -> DeviceInfo {
 			// FIXME! Use the HostInfoDriver instead! Or RATHER delete this whole file... SargonOS is gonna do this...
 			DeviceInfo(
-				id: deviceID ?? uuid(),
-				date: .now,
-				description: "iPhone",
-				systemVersion: nil,
-				hostAppVersion: nil,
-				hostVendor: "Apple"
+				id: deviceID ?? uuid()
+				date: date()
 			)
 		}
 
