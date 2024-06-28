@@ -272,7 +272,7 @@ extension SecureStorageClient {
 			loaded
 		} else {
 			DeviceInfo(
-				id: .init(),
+				id: .init()
 			)
 		}
 	}
@@ -280,7 +280,7 @@ extension SecureStorageClient {
 
 extension DeviceInfo {
 	public init(id: UUID, date: Date = .now, description: String? = nil) {
-		Self(
+        self.init(
 			id: id,
 			date: date,
 			description: description ?? "iPhone",

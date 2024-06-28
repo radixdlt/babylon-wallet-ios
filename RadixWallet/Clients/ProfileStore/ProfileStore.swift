@@ -540,7 +540,7 @@ extension ProfileStore {
 		func createNew(deviceID: DeviceID? = nil) -> DeviceInfo {
 			// FIXME! Use the HostInfoDriver instead! Or RATHER delete this whole file... SargonOS is gonna do this...
 			DeviceInfo(
-				id: deviceID ?? uuid()
+				id: deviceID ?? uuid(),
 				date: date.now
 			)
 		}
