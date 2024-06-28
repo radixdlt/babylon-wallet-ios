@@ -41,8 +41,9 @@ extension Completion {
 					store.send(.view(.dismissTapped))
 				} content: {
 					VStack(spacing: .zero) {
+						Spacer()
+
 						Image(asset: AssetResource.successCheckmark)
-							.padding(.top, .large1)
 
 						Text(viewStore.title)
 							.foregroundColor(.app.gray1)
