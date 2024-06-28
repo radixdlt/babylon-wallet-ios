@@ -265,14 +265,29 @@ extension FactorSourcesClient {
 		onMnemonicExistsStrategy: ImportMnemonic.State.PersistStrategy.OnMnemonicExistsStrategy,
 		saveIntoProfile: Bool
 	) async throws -> DeviceFactorSource {
+		@Dependency(\.secureStorageClient) var secureStorageClient
+
+		let deviceInfo = try secureStorageClient.loadDeviceInfo() ?? DeviceInfo(
+			id: .init(),
+			date: .now,
+			description: "iPhone",
+			systemVersion: nil,
+			hostAppVersion: nil,
+			hostVendor: "Apple"
+		)
+
 		let factorSource = switch onDeviceMnemonicKind {
 		case let .babylon(isMain):
 			DeviceFactorSource.babylon(
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
-				isMain: isMain
+				isMain: isMain,
+				deviceInfo: deviceInfo
 			)
 		case .olympia:
-			DeviceFactorSource.olympia(mnemonicWithPassphrase: mnemonicWithPassphrase)
+			DeviceFactorSource.olympia(
+				mnemonicWithPassphrase: mnemonicWithPassphrase,
+				deviceInfo: deviceInfo
+			)
 		}
 
 		try await self.addOnDeviceFactorSource(
