@@ -20,6 +20,11 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 		}
 	}
 
+	public func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+		@Dependency(\.appsFlyerClient) var appsFlyerClient
+		appsFlyerClient.continue(userActivity)
+	}
+
 	func overlayWindow(in scene: UIWindowScene) {
 		let overlayView = OverlayReducer.View(
 			store: .init(
