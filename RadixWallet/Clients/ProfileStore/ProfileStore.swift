@@ -541,7 +541,7 @@ extension ProfileStore {
 			// FIXME! Use the HostInfoDriver instead! Or RATHER delete this whole file... SargonOS is gonna do this...
 			DeviceInfo(
 				id: deviceID ?? uuid()
-				date: date()
+				date: date.now
 			)
 		}
 
