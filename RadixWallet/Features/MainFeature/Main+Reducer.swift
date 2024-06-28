@@ -54,6 +54,7 @@ public struct Main: Sendable, FeatureReducer {
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.cloudBackupClient) var cloudBackupClient
 	@Dependency(\.securityCenterClient) var securityCenterClient
+	@Dependency(\.deepLinkHandlerClient) var deepLinkHandlerClient
 
 	public init() {}
 
@@ -72,7 +73,11 @@ public struct Main: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			startAutomaticBackupsEffect()
+			// At fresh app start, handle deepLink only when app goes to main state.
+			// While splash screen is shown, or during the onboarding, the deepLink is buffered.
+			deepLinkHandlerClient.handleDeepLink()
+
+			return startAutomaticBackupsEffect()
 				.merge(with: startMonitoringSecurityCenterEffect())
 				.merge(with: gatewayValuesEffect())
 		}

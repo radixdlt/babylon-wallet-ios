@@ -27,6 +27,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 		let dappMetadata: DappMetadata
 		let remoteInteraction: RemoteInteraction
+		let p2pRoute: P2P.Route
 		var persona: Persona?
 		var authorizedDapp: AuthorizedDapp?
 		var authorizedPersona: AuthorizedPersonaSimple?
@@ -53,10 +54,12 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 		init?(
 			dappMetadata: DappMetadata,
-			interaction remoteInteraction: RemoteInteraction
+			interaction remoteInteraction: RemoteInteraction,
+			p2pRoute: P2P.Route
 		) {
 			self.dappMetadata = dappMetadata
 			self.remoteInteraction = remoteInteraction
+			self.p2pRoute = p2pRoute
 
 			if let interactionItems = NonEmpty(rawValue: OrderedSet<AnyInteractionItem>(for: remoteInteraction.erasedItems)) {
 				self.interactionItems = interactionItems
@@ -64,7 +67,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 					for: interactionItems.first,
 					interaction: remoteInteraction,
 					dappMetadata: dappMetadata,
-					persona: nil
+					persona: nil,
+					p2pRoute: p2pRoute
 				)
 			} else {
 				return nil
@@ -621,7 +625,8 @@ extension DappInteractionFlow {
 				for: nextRequest,
 				interaction: state.remoteInteraction,
 				dappMetadata: state.dappMetadata,
-				persona: state.persona
+				persona: state.persona,
+				p2pRoute: state.p2pRoute
 			)
 		{
 			if state.root == nil {
@@ -833,7 +838,8 @@ extension DappInteractionFlow.Path.State {
 		for anyItem: DappInteractionFlow.State.AnyInteractionItem,
 		interaction: DappInteractionFlow.State.RemoteInteraction,
 		dappMetadata: DappMetadata,
-		persona: Persona?
+		persona: Persona?,
+		p2pRoute: P2P.Route
 	) {
 		self.item = anyItem
 		switch anyItem {
@@ -898,7 +904,8 @@ extension DappInteractionFlow.Path.State {
 				} ?? Message.none,
 				waitsForTransactionToBeComitted: interaction.interactionId.isWalletAccountDepositSettingsInteraction,
 				isWalletTransaction: interaction.interactionId.isWalletInteraction,
-				proposingDappMetadata: dappMetadata.onLedger
+				proposingDappMetadata: dappMetadata.onLedger,
+				p2pRoute: p2pRoute
 			))
 		}
 	}

@@ -626,11 +626,15 @@ public enum L10n {
       public static let whatArePoolUnits = L10n.tr("Localizable", "assetDetails_poolUnitDetails_whatArePoolUnits", fallback: "What are Pool units?")
     }
     public enum Staking {
+      /// Current Redeemable Value
+      public static let currentRedeemableValue = L10n.tr("Localizable", "assetDetails_staking_currentRedeemableValue", fallback: "Current Redeemable Value")
+      /// Ready to Claim
+      public static let readyToClaim = L10n.tr("Localizable", "assetDetails_staking_readyToClaim", fallback: "Ready to Claim")
       /// Ready to Claim in
-      public static let readyToClaim = L10n.tr("Localizable", "assetDetails_staking_readyToClaim", fallback: "Ready to Claim in")
+      public static let readyToClaimIn = L10n.tr("Localizable", "assetDetails_staking_readyToClaimIn", fallback: "Ready to Claim in")
       /// %d minutes or less
-      public static func readyToClaimMinutes(_ p1: Int) -> String {
-        return L10n.tr("Localizable", "assetDetails_staking_readyToClaimMinutes", p1, fallback: "%d minutes or less")
+      public static func readyToClaimInMinutes(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "assetDetails_staking_readyToClaimInMinutes", p1, fallback: "%d minutes or less")
       }
       /// Ready to claim in about %d minutes or less.
       public static func unstaking(_ p1: Int) -> String {

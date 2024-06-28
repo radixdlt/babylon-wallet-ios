@@ -912,6 +912,7 @@
 		8308184A2B9F162B002D8351 /* HTTPClient+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830818492B9F162B002D8351 /* HTTPClient+Mock.swift */; };
 		8308184C2B9F169B002D8351 /* TokenPriceClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8308184B2B9F169B002D8351 /* TokenPriceClient+Live.swift */; };
 		8308184E2B9F16AD002D8351 /* TokenPriceClient+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8308184D2B9F16AD002D8351 /* TokenPriceClient+Mock.swift */; };
+		830E43AF2C2D8B5100B6E95F /* SessionStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830E43AE2C2D8B5100B6E95F /* SessionStorageTests.swift */; };
 		830EA9D62AE94033004C8051 /* AccountAndPersonaHiding+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9D52AE94033004C8051 /* AccountAndPersonaHiding+Reducer.swift */; };
 		830EA9DB2AEA8770004C8051 /* EntitiesVisibilityClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9DA2AEA8770004C8051 /* EntitiesVisibilityClient+Interface.swift */; };
 		830EA9DD2AEB8197004C8051 /* AccountAndPersonaHiding+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9DC2AEB8197004C8051 /* AccountAndPersonaHiding+View.swift */; };
@@ -919,7 +920,14 @@
 		830EA9E52AEB9088004C8051 /* DefaultValueDecodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9E42AEB9088004C8051 /* DefaultValueDecodable.swift */; };
 		830EA9E72AEBA793004C8051 /* EntitiesVisibilityClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9E62AEBA793004C8051 /* EntitiesVisibilityClient+Live.swift */; };
 		830EA9E92AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9E82AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift */; };
+		831F0CED2C21819000D6F5BF /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 831F0CEC2C21819000D6F5BF /* Sargon */; };
+		831F0CEF2C25728E00D6F5BF /* RadixConnectMobileSessionStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831F0CEE2C25728E00D6F5BF /* RadixConnectMobileSessionStorage.swift */; };
+		831F0CF22C25897500D6F5BF /* DappInteractionOriginVerification +View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831F0CF12C25897500D6F5BF /* DappInteractionOriginVerification +View.swift */; };
+		831F0CF42C294BAA00D6F5BF /* DeepLinkHandlerClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831F0CF32C294BAA00D6F5BF /* DeepLinkHandlerClient+Live.swift */; };
+		831F0CF62C294C0D00D6F5BF /* DeepLinkHandlerClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831F0CF52C294C0D00D6F5BF /* DeepLinkHandlerClient+Test.swift */; };
+		832868652BE2641800902126 /* DappInteractionOriginVerification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832868642BE2641800902126 /* DappInteractionOriginVerification.swift */; };
 		8328806C2AE6725F0014FBF3 /* AccountPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */; };
+		8329ACE42BBAB9E7005FD9DC /* DeepLinkHandlerClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8329ACE32BBAB9E7005FD9DC /* DeepLinkHandlerClient+Interface.swift */; };
 		83377A032B9DDAF000D8AA36 /* NPSSurvey+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83377A022B9DDAF000D8AA36 /* NPSSurvey+View.swift */; };
 		83377A052B9DDB5C00D8AA36 /* NPSSurveyClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83377A042B9DDB5C00D8AA36 /* NPSSurveyClient+Live.swift */; };
 		8338B9E52AFAB20700D1D8EA /* TransactionFee.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8338B9E42AFAB20700D1D8EA /* TransactionFee.swift */; };
@@ -928,6 +936,7 @@
 		836878612B4551910029C808 /* UnknownDappComponents+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 836878602B4551910029C808 /* UnknownDappComponents+Reducer.swift */; };
 		8370FC5C2B99C780007AD882 /* NPSSurveyClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8370FC5B2B99C780007AD882 /* NPSSurveyClient+Interface.swift */; };
 		8381C8B02BBD2CD400A470B4 /* TokenPriceCientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8381C8AF2BBD2CD400A470B4 /* TokenPriceCientTests.swift */; };
+		8381C8B32BC0619100A470B4 /* RadixConnectMobile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8381C8B22BC0619100A470B4 /* RadixConnectMobile.swift */; };
 		8381C8B72BC3DB4100A470B4 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 8381C8B62BC3D80100A470B4 /* PrivacyInfo.xcprivacy */; };
 		83823EA72B722DB000827211 /* HTTPClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83823EA62B722DB000827211 /* HTTPClient+Interface.swift */; };
 		83823EAA2B72365000827211 /* TokenPriceClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83823EA92B72365000827211 /* TokenPriceClient+Interface.swift */; };
@@ -937,6 +946,7 @@
 		8397D82D2B46ACB50016365A /* StakeUnitList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8397D82B2B46ACB50016365A /* StakeUnitList.swift */; };
 		839B6C542B21D28400402651 /* ExpandableTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 839B6C532B21D28400402651 /* ExpandableTextView.swift */; };
 		83AAAC6D2B483D1B00222B64 /* StakeSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83AAAC6B2B483D1B00222B64 /* StakeSummaryView.swift */; };
+		83B783562C1764AE00AA7930 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 83B783552C1764AE00AA7930 /* Sargon */; };
 		83D663B02B271D0100D1AB9E /* TruncationMask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D663AF2B271D0100D1AB9E /* TruncationMask.swift */; };
 		83DFAF2E2B4E8A51008B70CE /* View+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83DFAF2D2B4E8A51008B70CE /* View+Extra.swift */; };
 		83EA887E2B7E68EE00FF8424 /* TotalCurrencyWorthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EA887D2B7E68EE00FF8424 /* TotalCurrencyWorthView.swift */; };
@@ -2035,6 +2045,7 @@
 		830818492B9F162B002D8351 /* HTTPClient+Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPClient+Mock.swift"; sourceTree = "<group>"; };
 		8308184B2B9F169B002D8351 /* TokenPriceClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TokenPriceClient+Live.swift"; sourceTree = "<group>"; };
 		8308184D2B9F16AD002D8351 /* TokenPriceClient+Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TokenPriceClient+Mock.swift"; sourceTree = "<group>"; };
+		830E43AE2C2D8B5100B6E95F /* SessionStorageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStorageTests.swift; sourceTree = "<group>"; };
 		830EA9D52AE94033004C8051 /* AccountAndPersonaHiding+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountAndPersonaHiding+Reducer.swift"; sourceTree = "<group>"; };
 		830EA9DA2AEA8770004C8051 /* EntitiesVisibilityClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EntitiesVisibilityClient+Interface.swift"; sourceTree = "<group>"; };
 		830EA9DC2AEB8197004C8051 /* AccountAndPersonaHiding+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountAndPersonaHiding+View.swift"; sourceTree = "<group>"; };
@@ -2043,7 +2054,13 @@
 		830EA9E42AEB9088004C8051 /* DefaultValueDecodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultValueDecodable.swift; sourceTree = "<group>"; };
 		830EA9E62AEBA793004C8051 /* EntitiesVisibilityClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EntitiesVisibilityClient+Live.swift"; sourceTree = "<group>"; };
 		830EA9E82AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EntitiesVisibilityClient+Test.swift"; sourceTree = "<group>"; };
+		831F0CEE2C25728E00D6F5BF /* RadixConnectMobileSessionStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadixConnectMobileSessionStorage.swift; sourceTree = "<group>"; };
+		831F0CF12C25897500D6F5BF /* DappInteractionOriginVerification +View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DappInteractionOriginVerification +View.swift"; sourceTree = "<group>"; };
+		831F0CF32C294BAA00D6F5BF /* DeepLinkHandlerClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeepLinkHandlerClient+Live.swift"; sourceTree = "<group>"; };
+		831F0CF52C294C0D00D6F5BF /* DeepLinkHandlerClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeepLinkHandlerClient+Test.swift"; sourceTree = "<group>"; };
+		832868642BE2641800902126 /* DappInteractionOriginVerification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DappInteractionOriginVerification.swift; sourceTree = "<group>"; };
 		8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountPreferencesTests.swift; sourceTree = "<group>"; };
+		8329ACE32BBAB9E7005FD9DC /* DeepLinkHandlerClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeepLinkHandlerClient+Interface.swift"; sourceTree = "<group>"; };
 		83377A022B9DDAF000D8AA36 /* NPSSurvey+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NPSSurvey+View.swift"; sourceTree = "<group>"; };
 		83377A042B9DDB5C00D8AA36 /* NPSSurveyClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NPSSurveyClient+Live.swift"; sourceTree = "<group>"; };
 		8338B9E42AFAB20700D1D8EA /* TransactionFee.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionFee.swift; sourceTree = "<group>"; };
@@ -2052,6 +2069,7 @@
 		836878602B4551910029C808 /* UnknownDappComponents+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UnknownDappComponents+Reducer.swift"; sourceTree = "<group>"; };
 		8370FC5B2B99C780007AD882 /* NPSSurveyClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NPSSurveyClient+Interface.swift"; sourceTree = "<group>"; };
 		8381C8AF2BBD2CD400A470B4 /* TokenPriceCientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenPriceCientTests.swift; sourceTree = "<group>"; };
+		8381C8B22BC0619100A470B4 /* RadixConnectMobile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadixConnectMobile.swift; sourceTree = "<group>"; };
 		8381C8B62BC3D80100A470B4 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		83823EA62B722DB000827211 /* HTTPClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPClient+Interface.swift"; sourceTree = "<group>"; };
 		83823EA92B72365000827211 /* TokenPriceClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TokenPriceClient+Interface.swift"; sourceTree = "<group>"; };
@@ -2321,6 +2339,7 @@
 				48FFFADE2ADC21F500B2B213 /* FileLogging in Frameworks */,
 				48FFFACF2ADC216400B2B213 /* CollectionConcurrencyKit in Frameworks */,
 				48FFFAB12ADC203700B2B213 /* WebRTC in Frameworks */,
+				831F0CED2C21819000D6F5BF /* Sargon in Frameworks */,
 				48FFFB0D2ADC744700B2B213 /* TextBuilder in Frameworks */,
 				48FFFB0A2ADC721800B2B213 /* Atomics in Frameworks */,
 				48FFFB002ADC25A200B2B213 /* BigInt in Frameworks */,
@@ -2332,6 +2351,7 @@
 				48FFFB032ADC6F8100B2B213 /* Builders in Frameworks */,
 				48FFFAB72ADC207B00B2B213 /* NavigationTransitions in Frameworks */,
 				48FFFA992ADC1EEC00B2B213 /* AsyncExtensions in Frameworks */,
+				83B783562C1764AE00AA7930 /* Sargon in Frameworks */,
 				E63D123D2ADD1FC00001CBB1 /* SwiftUIIntrospect in Frameworks */,
 				E6A0B04B2BF23C7000617DAC /* IdentifiedCollections in Frameworks */,
 				48FFFABC2ADC209100B2B213 /* NukeExtensions in Frameworks */,
@@ -2786,9 +2806,9 @@
 			isa = PBXGroup;
 			children = (
 				48CFBCCA2ADC10D800E77A5C /* HUD+Reducer.swift */,
-				48CFBCCB2ADC10D800E77A5C /* Overlay+Reducer.swift */,
 				E7AE2D0D2C07359500830BAA /* FullScreenOverlayCoordinator+Reducer.swift */,
 				48CFBCCC2ADC10D800E77A5C /* HUD+View.swift */,
+				48CFBCCB2ADC10D800E77A5C /* Overlay+Reducer.swift */,
 				48CFBCCD2ADC10D800E77A5C /* Overlay+View.swift */,
 				E7AE2D0F2C07371C00830BAA /* FullScreenOverlayCoordinator+View.swift */,
 			);
@@ -3661,6 +3681,7 @@
 		48CFBDFD2ADC10D800E77A5C /* Children */ = {
 			isa = PBXGroup;
 			children = (
+				831F0CF02C2576AE00D6F5BF /* DappOriginVerification */,
 				48CFBDFE2ADC10D800E77A5C /* AccountPermissionChooseAccounts */,
 				48CFBE012ADC10D800E77A5C /* AccountPermission */,
 				48CFBE042ADC10D800E77A5C /* Completion */,
@@ -3988,6 +4009,7 @@
 		48CFBEE72ADC10D900E77A5C /* RadixConnect */ = {
 			isa = PBXGroup;
 			children = (
+				8381C8B12BC0610400A470B4 /* Mobile */,
 				48CFBEE82ADC10D900E77A5C /* Utils */,
 				48CFBEEC2ADC10D900E77A5C /* RTC */,
 			);
@@ -4242,6 +4264,7 @@
 		48CFBF522ADC10D900E77A5C /* Clients */ = {
 			isa = PBXGroup;
 			children = (
+				8329ACE22BBAB9CD005FD9DC /* DeepLinkHandlerClient */,
 				E7A5AC942C09F428006CB6EC /* ResetWalletClient */,
 				A4ECE2782BEEB01800468BF6 /* CloudBackupClient */,
 				A4ECE2712BEEAFFC00468BF6 /* SecurityCenterClient */,
@@ -5628,6 +5651,14 @@
 			path = SensitiveInfoClient;
 			sourceTree = "<group>";
 		};
+		830E43AD2C2D8B3800B6E95F /* Mobile */ = {
+			isa = PBXGroup;
+			children = (
+				830E43AE2C2D8B5100B6E95F /* SessionStorageTests.swift */,
+			);
+			path = Mobile;
+			sourceTree = "<group>";
+		};
 		830EA9D42AE94014004C8051 /* AccountAndPersonaHidingFeature */ = {
 			isa = PBXGroup;
 			children = (
@@ -5655,12 +5686,31 @@
 			path = AccountAndPersonaHidingTests;
 			sourceTree = "<group>";
 		};
+		831F0CF02C2576AE00D6F5BF /* DappOriginVerification */ = {
+			isa = PBXGroup;
+			children = (
+				832868642BE2641800902126 /* DappInteractionOriginVerification.swift */,
+				831F0CF12C25897500D6F5BF /* DappInteractionOriginVerification +View.swift */,
+			);
+			path = DappOriginVerification;
+			sourceTree = "<group>";
+		};
 		8328806A2AE6724B0014FBF3 /* AccountPreferencesTests */ = {
 			isa = PBXGroup;
 			children = (
 				8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */,
 			);
 			path = AccountPreferencesTests;
+			sourceTree = "<group>";
+		};
+		8329ACE22BBAB9CD005FD9DC /* DeepLinkHandlerClient */ = {
+			isa = PBXGroup;
+			children = (
+				8329ACE32BBAB9E7005FD9DC /* DeepLinkHandlerClient+Interface.swift */,
+				831F0CF32C294BAA00D6F5BF /* DeepLinkHandlerClient+Live.swift */,
+				831F0CF52C294C0D00D6F5BF /* DeepLinkHandlerClient+Test.swift */,
+			);
+			path = DeepLinkHandlerClient;
 			sourceTree = "<group>";
 		};
 		834B651D2B972E3A00B7E1E8 /* NPSSurvey */ = {
@@ -5687,6 +5737,15 @@
 				8381C8AF2BBD2CD400A470B4 /* TokenPriceCientTests.swift */,
 			);
 			path = TokenPriceCientTests;
+			sourceTree = "<group>";
+		};
+		8381C8B12BC0610400A470B4 /* Mobile */ = {
+			isa = PBXGroup;
+			children = (
+				8381C8B22BC0619100A470B4 /* RadixConnectMobile.swift */,
+				831F0CEE2C25728E00D6F5BF /* RadixConnectMobileSessionStorage.swift */,
+			);
+			path = Mobile;
 			sourceTree = "<group>";
 		};
 		83823EA52B722D9000827211 /* HTTPClient */ = {
@@ -5990,6 +6049,7 @@
 		E6DBA2582ADEBFB200A38425 /* RadixConnectTests */ = {
 			isa = PBXGroup;
 			children = (
+				830E43AD2C2D8B3800B6E95F /* Mobile */,
 				E6DBA2592ADEBFB200A38425 /* DataChannel */,
 				E6DBA25C2ADEBFB200A38425 /* SignalingServerClient */,
 				E6DBA25E2ADEBFB200A38425 /* Negotiation */,
@@ -6490,6 +6550,8 @@
 				5B1C4FD42BBB0B0C00B9436F /* AppsFlyerLib-Strict */,
 				E695F2DD2BECDD7C00761ACE /* Sargon */,
 				E6A0B04A2BF23C7000617DAC /* IdentifiedCollections */,
+				83B783552C1764AE00AA7930 /* Sargon */,
+				831F0CEC2C21819000D6F5BF /* Sargon */,
 			);
 			productName = RadixWallet;
 			productReference = 48CFBC4F2ADC106300E77A5C /* Radix Wallet Dev.app */;
@@ -6560,7 +6622,7 @@
 				5B1C4FD32BBB0B0C00B9436F /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Strict" */,
 				8318BB172BC8403800057BCB /* XCRemoteSwiftPackageReference "swift-custom-dump" */,
 				E6A0B0492BF23C7000617DAC /* XCRemoteSwiftPackageReference "swift-identified-collections" */,
-				E76645A02C1C6C9C00065D9A /* XCRemoteSwiftPackageReference "sargon" */,
+				830E43B02C2DBC2000B6E95F /* XCRemoteSwiftPackageReference "sargon" */,
 			);
 			productRefGroup = 48CFBC502ADC106300E77A5C /* Products */;
 			projectDirPath = "";
@@ -6688,6 +6750,7 @@
 				E6DBA3272ADEBFB300A38425 /* MockURLProtocol.swift in Sources */,
 				8328806C2AE6725F0014FBF3 /* AccountPreferencesTests.swift in Sources */,
 				E6DBA3192ADEBFB300A38425 /* PackagesEncodingDecodingTests.swift in Sources */,
+				830E43AF2C2D8B5100B6E95F /* SessionStorageTests.swift in Sources */,
 				482752052BD99606007854E0 /* FactorSourcesClientLiveTests.swift in Sources */,
 				8381C8B02BBD2CD400A470B4 /* TokenPriceCientTests.swift in Sources */,
 				E6DBA3472ADEBFB300A38425 /* HexStringToDataTests.swift in Sources */,
@@ -6876,6 +6939,7 @@
 				48CFC3252ADC10D900E77A5C /* LocalNetworkPermission+View.swift in Sources */,
 				48CFC5D82ADC10DA00E77A5C /* TextStyleModifier.swift in Sources */,
 				48CFC6942ADC10DB00E77A5C /* MigratedSoftwareAccounts.swift in Sources */,
+				8381C8B32BC0619100A470B4 /* RadixConnectMobile.swift in Sources */,
 				48CFC4772ADC10DA00E77A5C /* GatewaysClient+Interface.swift in Sources */,
 				48CFC59D2ADC10DA00E77A5C /* UIKeyboardType+Extra.swift in Sources */,
 				48CFC5292ADC10DA00E77A5C /* TransactionSubmitResponse.swift in Sources */,
@@ -7079,6 +7143,7 @@
 				48CFC3822ADC10D900E77A5C /* AssetBehaviorsView.swift in Sources */,
 				83EE5EE52BE3C16F00B1531D /* StatePackageBlueprintPageResponse.swift in Sources */,
 				48CFC5652ADC10DA00E77A5C /* MetadataNonFungibleGlobalIdValue.swift in Sources */,
+				832868652BE2641800902126 /* DappInteractionOriginVerification.swift in Sources */,
 				48CFC4B02ADC10DA00E77A5C /* MetadataStringValue.swift in Sources */,
 				48CFC5362ADC10DA00E77A5C /* StateEntityDetailsResponse.swift in Sources */,
 				48CFC5372ADC10DA00E77A5C /* StateEntityNonFungibleResourceVaultsPageOptIns.swift in Sources */,
@@ -7366,12 +7431,14 @@
 				48CFC2952ADC10D900E77A5C /* FeesView.swift in Sources */,
 				83EE47842AF0EE3C00155F03 /* ProgrammaticScryptoSborValueTuple.swift in Sources */,
 				48CFC4472ADC10DA00E77A5C /* AccountsClient+Interface.swift in Sources */,
+				8329ACE42BBAB9E7005FD9DC /* DeepLinkHandlerClient+Interface.swift in Sources */,
 				830EA9DB2AEA8770004C8051 /* EntitiesVisibilityClient+Interface.swift in Sources */,
 				48CFC2682ADC10D900E77A5C /* EditPersonaField+View.swift in Sources */,
 				48CFC3672ADC10D900E77A5C /* NonFungbileAssetRow+Reducer.swift in Sources */,
 				48CFC25C2ADC10D900E77A5C /* OnboardingStartup+View.swift in Sources */,
 				48CFC2642ADC10D900E77A5C /* EditPersona.swift in Sources */,
 				48CFC54F2ADC10DA00E77A5C /* RoleKey.swift in Sources */,
+				831F0CF62C294C0D00D6F5BF /* DeepLinkHandlerClient+Test.swift in Sources */,
 				48CFC5AD2ADC10DA00E77A5C /* WarningView.swift in Sources */,
 				48CFC5982ADC10DA00E77A5C /* ControlState.swift in Sources */,
 				A41266F92B160F4C00EA38E9 /* ManualAccountRecoveryCoordinator+View.swift in Sources */,
@@ -7412,6 +7479,7 @@
 				48CFC36E2ADC10D900E77A5C /* FungibleAssetList+Row+View.swift in Sources */,
 				830EA9E52AEB9088004C8051 /* DefaultValueDecodable.swift in Sources */,
 				48CFC59F2ADC10DA00E77A5C /* Label+Extra.swift in Sources */,
+				831F0CF42C294BAA00D6F5BF /* DeepLinkHandlerClient+Live.swift in Sources */,
 				48CFC5602ADC10DA00E77A5C /* ValidationErrorsAtPath.swift in Sources */,
 				48CFC4452ADC10DA00E77A5C /* OnboardingClient+Test.swift in Sources */,
 				48CFC32C2ADC10D900E77A5C /* DoScanQR+Reducer.swift in Sources */,
@@ -7522,6 +7590,7 @@
 				48D5F3992BD8DE0A000DE964 /* DebugInspectProfile+View.swift in Sources */,
 				83EE47992AF0EE3C00155F03 /* ProgrammaticScryptoSborValueEnum.swift in Sources */,
 				48CFC4222ADC10DA00E77A5C /* BitArray+Extra.swift in Sources */,
+				831F0CEF2C25728E00D6F5BF /* RadixConnectMobileSessionStorage.swift in Sources */,
 				48CFC5872ADC10DA00E77A5C /* FaucetClient+Live.swift in Sources */,
 				48CFC2912ADC10D900E77A5C /* TransactionReviewNetworkFee+View.swift in Sources */,
 				83EE47982AF0EE3C00155F03 /* ProgrammaticScryptoSborValueI64.swift in Sources */,
@@ -7531,6 +7600,7 @@
 				48CFC3382ADC10D900E77A5C /* PreviewResult.swift in Sources */,
 				48CFC2C82ADC10D900E77A5C /* ResourceAsset+Reducer.swift in Sources */,
 				83856D632B0279080026452A /* VerifyMnemonic.swift in Sources */,
+				831F0CF22C25897500D6F5BF /* DappInteractionOriginVerification +View.swift in Sources */,
 				48CFC5332ADC10DA00E77A5C /* StateEntityNonFungibleResourceVaultsPageRequest.swift in Sources */,
 				48CFC48A2ADC10DA00E77A5C /* OnLedgerEntitiesClient+CreateEntity.swift in Sources */,
 				A4ECE27A2BEEB01800468BF6 /* CloudBackupClient+Live.swift in Sources */,
@@ -7925,7 +7995,9 @@
 			baseConfigurationReference = 48CFC69C2ADC110800E77A5C /* iOS-dev.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "RadixWallet/RadixWalletDebug-Dev.entitlements";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = MDH99V28LM;
 				INFOPLIST_KEY_CFBundleDisplayName = "Radix Wallet";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_NSCameraUsageDescription = "\"This lets you scan QR codes for Radix Connect linking.\"";
@@ -7936,6 +8008,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.radixpublishing.radixwallet.ios.dev";
 				SWIFT_VERSION = 5.0;
 			};
 			name = "Debug-Dev";
@@ -8030,6 +8103,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "RadixWallet/RadixWalletDebug-Alpha.entitlements";
 				CURRENT_PROJECT_VERSION = 1;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = MDH99V28LM;
 				INFOPLIST_KEY_CFBundleDisplayName = "Radix Wallet";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_NSCameraUsageDescription = "\"This lets you scan QR codes for Radix Connect linking.\"";
@@ -8040,6 +8114,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore com.radixpublishing.radixwallet.ios.alpha";
 				SWIFT_VERSION = 5.0;
 			};
 			name = "Debug-Alpha";
@@ -8490,6 +8565,14 @@
 				version = 6.13.2;
 			};
 		};
+		830E43B02C2DBC2000B6E95F /* XCRemoteSwiftPackageReference "sargon" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/radixdlt/sargon";
+			requirement = {
+				kind = exactVersion;
+				version = 1.0.20;
+			};
+		};
 		8318BB172BC8403800057BCB /* XCRemoteSwiftPackageReference "swift-custom-dump" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swift-custom-dump";
@@ -8520,14 +8603,6 @@
 			requirement = {
 				kind = exactVersion;
 				version = 1.0.2;
-			};
-		};
-		E76645A02C1C6C9C00065D9A /* XCRemoteSwiftPackageReference "sargon" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/radixdlt/sargon";
-			requirement = {
-				kind = exactVersion;
-				version = 1.0.18;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -8725,6 +8800,14 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5B1C4FD32BBB0B0C00B9436F /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Strict" */;
 			productName = "AppsFlyerLib-Strict";
+		};
+		831F0CEC2C21819000D6F5BF /* Sargon */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Sargon;
+		};
+		83B783552C1764AE00AA7930 /* Sargon */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Sargon;
 		};
 		A415574F2B757C5E0040AD4E /* ComposableArchitecture */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -46,21 +46,25 @@ extension WalletInteractionId {
 extension DappInteractionClient {
 	public struct RequestEnvelope: Sendable, Hashable {
 		public let route: P2P.Route
-		public let request: DappToWalletInteraction
+		public let interaction: DappToWalletInteraction
+		public let requiresOriginValidation: Bool
 
-		public init(route: P2P.Route, request: DappToWalletInteraction) {
+		public init(route: P2P.Route, interaction: DappToWalletInteraction, requiresOriginValidation: Bool) {
 			self.route = route
-			self.request = request
+			self.interaction = interaction
+			self.requiresOriginValidation = requiresOriginValidation
 		}
 	}
 
 	public struct ValidatedDappRequest: Sendable, Hashable {
 		public let route: P2P.Route
 		public let request: Request
+		public let requiresOriginVerification: Bool
 
-		public init(route: P2P.Route, request: Request) {
+		public init(route: P2P.Route, request: Request, requiresOriginVerification: Bool) {
 			self.route = route
 			self.request = request
+			self.requiresOriginVerification = requiresOriginVerification
 		}
 
 		public enum Request: Sendable, Hashable {
