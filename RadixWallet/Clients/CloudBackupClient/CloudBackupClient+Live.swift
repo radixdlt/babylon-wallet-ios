@@ -333,12 +333,12 @@ extension CloudBackupClient {
 			creatingDevice: DeviceInfo(
 				id: creatingDeviceID,
 				date: creatingDeviceDate,
-				description: creatingDeviceDescription,
+				description: creatingDeviceDescription
 			),
 			lastUsedOnDevice: DeviceInfo(
 				id: lastUsedOnDeviceID,
 				date: lastUsedOnDeviceDate,
-				description: lastUsedOnDeviceDescription,
+				description: lastUsedOnDeviceDescription
 			),
 			lastModified: lastModified,
 			contentHint: .init(
