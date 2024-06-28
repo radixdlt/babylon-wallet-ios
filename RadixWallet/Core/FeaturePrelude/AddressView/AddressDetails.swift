@@ -1,11 +1,13 @@
 // MARK: - AddressDetails
 public struct AddressDetails: Sendable, FeatureReducer {
+	@ObservableState
 	public struct State: Sendable, Hashable {
 		let address: LedgerIdentifiable.Address
 
 		var title: Loadable<String?> = .idle
 		var qrImage: Loadable<CGImage> = .idle
 		var showEnlarged = false
+
 		var showShare = false
 
 		public init(address: LedgerIdentifiable.Address) {
@@ -13,6 +15,7 @@ public struct AddressDetails: Sendable, FeatureReducer {
 		}
 	}
 
+	@CasePathable
 	public enum ViewAction: Sendable, Equatable {
 		case task
 		case closeButtonTapped
@@ -23,6 +26,7 @@ public struct AddressDetails: Sendable, FeatureReducer {
 		case viewOnDashboardButtonTapped
 		case verifyOnLedgerButtonTapped
 		case shareDismissed
+		case showShareChanged(Bool)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -78,6 +82,9 @@ public struct AddressDetails: Sendable, FeatureReducer {
 			return .none
 		case .shareDismissed:
 			state.showShare = false
+			return .none
+		case let .showShareChanged(value):
+			state.showShare = value
 			return .none
 		}
 	}
