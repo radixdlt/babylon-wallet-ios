@@ -44,7 +44,6 @@ extension Completion {
 						Spacer()
 
 						Image(asset: AssetResource.successCheckmark)
-							.padding(.top, .large1)
 
 						Text(viewStore.title)
 							.foregroundColor(.app.gray1)
