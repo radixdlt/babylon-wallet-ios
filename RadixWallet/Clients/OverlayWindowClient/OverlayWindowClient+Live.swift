@@ -10,10 +10,29 @@ extension OverlayWindowClient: DependencyKey {
 		@Dependency(\.pasteboardClient) var pasteBoardClient
 
 		errorQueue.errors().map { error in
-			Item.alert(.init(
-				title: { TextState(L10n.Common.errorAlertTitle) },
-				message: { TextState(error.localizedDescription) }
-			))
+			if let sargonError = error as? SargonError {
+				#if DEBUG
+				let message = error.localizedDescription
+				#else
+				let message = L10n.Error.emailSupportMessage(sargonError.errorCode)
+				#endif
+				return Item.alert(.init(
+					title: { TextState(L10n.Common.errorAlertTitle) },
+					actions: {
+						let buttons: [ButtonState<OverlayWindowClient.Item.AlertAction>] = [
+							.init(role: .cancel, action: .dismissed, label: { TextState(L10n.Common.cancel) }),
+							.init(action: .emailSupport(additionalInfo: error.localizedDescription), label: { TextState(L10n.Error.emailSupportButtonTitle) }),
+						]
+						return buttons
+					},
+					message: { TextState(message) }
+				))
+			} else {
+				return Item.alert(.init(
+					title: { TextState(L10n.Common.errorAlertTitle) },
+					message: { TextState(error.localizedDescription) }
+				))
+			}
 		}
 		.subscribe(items)
 

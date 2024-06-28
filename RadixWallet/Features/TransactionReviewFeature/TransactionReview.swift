@@ -15,6 +15,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public let waitsForTransactionToBeComitted: Bool
 		public let isWalletTransaction: Bool
 		public let proposingDappMetadata: DappMetadata.Ledger?
+		public let p2pRoute: P2P.Route
 
 		public var networkID: NetworkID? { reviewedTransaction?.networkID }
 
@@ -80,7 +81,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey = .init(),
 			waitsForTransactionToBeComitted: Bool = false,
 			isWalletTransaction: Bool,
-			proposingDappMetadata: DappMetadata.Ledger?
+			proposingDappMetadata: DappMetadata.Ledger?,
+			p2pRoute: P2P.Route
 		) {
 			self.nonce = nonce
 			self.unvalidatedManifest = unvalidatedManifest
@@ -90,6 +92,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			self.waitsForTransactionToBeComitted = waitsForTransactionToBeComitted
 			self.isWalletTransaction = isWalletTransaction
 			self.proposingDappMetadata = proposingDappMetadata
+			self.p2pRoute = p2pRoute
 		}
 
 		public enum DisplayMode: Sendable, Hashable {
@@ -518,7 +521,11 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .notarizeResult(.success(notarizedTX)):
-			state.destination = .submitting(.init(notarizedTX: notarizedTX, inProgressDismissalDisabled: state.waitsForTransactionToBeComitted))
+			state.destination = .submitting(.init(
+				notarizedTX: notarizedTX,
+				inProgressDismissalDisabled: state.waitsForTransactionToBeComitted,
+				route: state.p2pRoute
+			))
 			return .none
 
 		case let .buildTransactionItentResult(.failure(error)),
@@ -581,7 +588,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case let .signing(.delegate(.finishedSigning(.signTransaction(notarizedTX, origin: _)))):
 			state.destination = .submitting(.init(
 				notarizedTX: notarizedTX,
-				inProgressDismissalDisabled: state.waitsForTransactionToBeComitted
+				inProgressDismissalDisabled: state.waitsForTransactionToBeComitted,
+				route: state.p2pRoute
 			))
 			return .none
 
@@ -698,7 +706,7 @@ extension TransactionReview {
 			)
 		}
 
-		return manifest.modify(addGuarantees: state.allGuarantees)
+		return try manifest.modify(addGuarantees: state.allGuarantees)
 	}
 
 	func determineFeePayer(_ state: State, reviewedTransaction: ReviewedTransaction) -> Effect<Action> {

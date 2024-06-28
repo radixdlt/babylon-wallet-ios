@@ -17,6 +17,12 @@ extension DappInteractionCoordinator {
 							action: { DappInteractionCoordinator.Action.child(.loading($0)) },
 							then: { DappInteractionLoading.View(store: $0) }
 						)
+					case .originVerification:
+						CaseLet(
+							/DappInteractionCoordinator.State.ChildState.originVerification,
+							action: { DappInteractionCoordinator.Action.child(.originVerification($0)) },
+							then: { DappInteractionOriginVerification.View(store: $0) }
+						)
 					case .flow:
 						CaseLet(
 							/DappInteractionCoordinator.State.ChildState.flow,
@@ -46,9 +52,7 @@ struct DappInteractionCoordinator_Previews: PreviewProvider {
 		DappInteractionCoordinator.View(
 			store: .init(
 				initialState: .init(
-					interaction: .previewValueAllRequests(
-						auth: .login(.withoutChallenge)
-					)
+					request: RequestEnvelope(route: .wallet, interaction: .previewValueAllRequests(), requiresOriginValidation: false)
 				)
 			) {
 				DappInteractionCoordinator()
