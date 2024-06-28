@@ -10,6 +10,7 @@ extension CardCarousel {
 
 		private let margin: CGFloat = .medium1
 		private let spacing: CGFloat = .small1
+		@ScaledMetric private var height: CGFloat = 105
 
 		public var body: some SwiftUI.View {
 			WithPerceptionTracking {
@@ -21,7 +22,7 @@ extension CardCarousel {
 							}
 					}
 					.padding(.horizontal, margin - 0.5 * spacing)
-					.frame(height: CarouselCardView.height)
+					.frame(height: height)
 					.onAppear {
 						store.send(.view(.didAppear))
 					}
@@ -87,6 +88,8 @@ extension CardCarousel {
 
 // MARK: - CarouselCardView
 public struct CarouselCardView: View {
+	private let trailingPadding: CGFloat = 100
+
 	public let card: CarouselCard
 	public let action: () -> Void
 	public let closeAction: () -> Void
@@ -99,19 +102,19 @@ public struct CarouselCardView: View {
 				Text(message)
 					.lineSpacing(-20)
 					.lineLimit(nil)
-					.minimumScaleFactor(0.7)
+					.minimumScaleFactor(0.8)
 					.textStyle(.body2Regular)
 			}
 			.multilineTextAlignment(.leading)
 			.foregroundStyle(.app.gray1)
 			.padding([.top, .leading], .medium2)
-			.padding(.trailing, 110)
+			.padding(.trailing, trailingPadding)
 			.padding(.bottom, .small1)
 			.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-			.frame(height: Self.height)
 			.background(alignment: .trailing) {
 				Image(.cardBackgroundTEMPORARY)
-					.border(.red)
+					.resizable()
+					.aspectRatio(contentMode: .fill)
 			}
 			.background(.app.gray5)
 			.cornerRadius(.small1)
@@ -120,8 +123,6 @@ public struct CarouselCardView: View {
 			CloseButton(action: closeAction)
 		}
 	}
-
-	public static let height: CGFloat = 105
 
 	public struct Dummy: View {
 		let card: CarouselCard
