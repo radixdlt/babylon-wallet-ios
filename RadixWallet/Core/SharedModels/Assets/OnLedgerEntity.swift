@@ -112,7 +112,8 @@ extension OnLedgerEntity.Metadata {
 			symbol: newlyCreated.symbol,
 			description: newlyCreated.description,
 			iconURL: newlyCreated.iconUrl.map { URL(string: $0) } ?? nil,
-			tags: newlyCreated.tags.compactMap(NonEmptyString.init(rawValue:)).map(AssetTag.custom)
+			tags: newlyCreated.tags.compactMap(NonEmptyString.init(rawValue:)).map(AssetTag.custom),
+			isComplete: false
 		)
 	}
 }
@@ -141,6 +142,9 @@ extension OnLedgerEntity {
 		public let ownerKeys: PublicKeyHashesWithStateVersion?
 		public let ownerBadge: OwnerBadgeWithStateVersion?
 		public let arbitraryItems: [ArbitraryItem]
+
+		/// Indicates whether all the metadata has been downloaded, or if there is still more info to fetch.
+		public let isComplete: Bool
 
 		public struct ValueAtStateVersion<Value>: Codable where Value: Codable {
 			public let value: Value
@@ -190,7 +194,8 @@ extension OnLedgerEntity {
 			accountType: AccountType? = nil,
 			ownerKeys: PublicKeyHashesWithStateVersion? = nil,
 			ownerBadge: OwnerBadgeWithStateVersion? = nil,
-			arbitraryItems: [GatewayAPI.EntityMetadataItem] = []
+			arbitraryItems: [GatewayAPI.EntityMetadataItem] = [],
+			isComplete: Bool
 		) {
 			self.name = name
 			self.symbol = symbol
@@ -209,6 +214,7 @@ extension OnLedgerEntity {
 			self.ownerKeys = ownerKeys
 			self.ownerBadge = ownerBadge
 			self.arbitraryItems = arbitraryItems
+			self.isComplete = isComplete
 		}
 	}
 

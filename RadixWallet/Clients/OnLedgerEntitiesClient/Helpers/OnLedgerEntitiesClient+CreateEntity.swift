@@ -247,7 +247,8 @@ extension OnLedgerEntitiesClient {
 			for: Array(stakeAndPoolAddresses),
 			.resourceMetadataKeys,
 			ledgerState: ledgerState,
-			cachingStrategy: cachingStrategy
+			cachingStrategy: cachingStrategy,
+			fetchMetadata: false
 		)
 		let validators = entities.compactMap(\.validator)
 		let resourcesPools = entities.compactMap(\.resourcePool)
@@ -362,7 +363,8 @@ extension OnLedgerEntitiesClient {
 			ownedStakes.map(\.validatorAddress).map(\.asGeneral),
 			.resourceMetadataKeys,
 			account.atLedgerState,
-			cachingStrategy
+			cachingStrategy,
+			false
 		).compactMap(\.validator)
 
 		let resourceAddresses = ownedStakes.flatMap {

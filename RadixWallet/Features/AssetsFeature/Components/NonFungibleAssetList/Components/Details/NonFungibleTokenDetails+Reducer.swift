@@ -55,7 +55,7 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 			}
 			state.resourceDetails = .loading
 			return .run { [resourceAddress = state.resourceAddress, ledgerState = state.ledgerState] send in
-				let result = await TaskResult { try await onLedgerEntitiesClient.getResource(resourceAddress, atLedgerState: ledgerState) }
+				let result = await TaskResult { try await onLedgerEntitiesClient.getResource(resourceAddress, atLedgerState: ledgerState, fetchMetadata: true) }
 				await send(.internal(.resourceLoadResult(result)))
 			}
 		case .closeButtonTapped:

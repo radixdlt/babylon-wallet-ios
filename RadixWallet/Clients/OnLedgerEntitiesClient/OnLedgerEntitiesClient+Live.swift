@@ -26,12 +26,14 @@ extension OnLedgerEntitiesClient {
 		for addresses: [Address],
 		_ explicitMetadata: Set<EntityMetadataKey>,
 		ledgerState: AtLedgerState?,
-		cachingStrategy: CachingStrategy
+		cachingStrategy: CachingStrategy,
+		fetchMetadata: Bool
 	) async throws -> [OnLedgerEntity] {
 		try await fetchEntitiesWithCaching(
 			for: addresses.map(\.cachingIdentifier),
 			cachingStrategy: cachingStrategy,
-			refresh: fetchEntites(explicitMetadata, ledgerState: ledgerState)
+			fetchMetadata: fetchMetadata,
+			refresh: fetchEntites(explicitMetadata, ledgerState: ledgerState, fetchMetadata: fetchMetadata)
 		)
 	}
 
@@ -40,6 +42,7 @@ extension OnLedgerEntitiesClient {
 		try await fetchEntitiesWithCaching(
 			for: request.nonFungibleIds.map { .nonFungibleData($0) },
 			cachingStrategy: .useCache,
+			fetchMetadata: false,
 			refresh: { identifiers in
 				try await fetchNonFungibleData(.init(
 					atLedgerState: request.atLedgerState,
@@ -191,6 +194,7 @@ extension OnLedgerEntitiesClient {
 	static func fetchEntitiesWithCaching(
 		for identifiers: [CacheClient.Entry.OnLedgerEntity],
 		cachingStrategy: CachingStrategy,
+		fetchMetadata: Bool,
 		refresh: (_ identifiers: [CacheClient.Entry.OnLedgerEntity]) async throws -> [OnLedgerEntity]
 	) async throws -> [OnLedgerEntity] {
 		@Dependency(\.cacheClient) var cacheClient
@@ -208,9 +212,19 @@ extension OnLedgerEntitiesClient {
 			return freshEntities
 		}
 
-		let cachedEntities = identifiers.compactMap {
-			try? cacheClient.load(OnLedgerEntity.self, .onLedgerEntity($0)) as? OnLedgerEntity
-		}
+		let cachedEntities = identifiers
+			.compactMap {
+				try? cacheClient.load(OnLedgerEntity.self, .onLedgerEntity($0)) as? OnLedgerEntity
+			}
+			.filter { entity in
+				guard fetchMetadata else {
+					return true
+				}
+				guard let metadata = entity.metadata else {
+					return false
+				}
+				return metadata.isComplete
+			}
 
 		let notCachedEntities = Set(identifiers).subtracting(Set(cachedEntities.map(\.cachingIdentifier)))
 		guard !notCachedEntities.isEmpty else {
@@ -226,7 +240,8 @@ extension OnLedgerEntitiesClient {
 	static func fetchEntites(
 		_ explicitMetadata: Set<EntityMetadataKey>,
 		ledgerState: AtLedgerState?,
-		forceRefresh: Bool = false
+		forceRefresh: Bool = false,
+		fetchMetadata: Bool
 	) -> (_ entities: [CacheClient.Entry.OnLedgerEntity]) async throws -> [OnLedgerEntity] {
 		{ entities in
 			guard !entities.isEmpty else {
@@ -252,8 +267,8 @@ extension OnLedgerEntitiesClient {
 				)
 
 				var allMetadataItems = Set(item.metadata.items)
-				if let nextCursor = item.metadata.nextCursor {
-					// Only fetch metadata if there is more after the first page returned.
+				if fetchMetadata, let nextCursor = item.metadata.nextCursor {
+					// Only fetch metadata if explicitly requested and there is more after the first page returned.
 					let remaining = try await gatewayAPIClient.fetchEntityMetadata(item.address, ledgerState: response.ledgerState, nextCursor: nextCursor)
 					allMetadataItems.append(contentsOf: remaining)
 				}

@@ -18,7 +18,8 @@ extension OnLedgerEntity.Metadata {
 			accountType: raw?.accountType,
 			ownerKeys: raw?.ownerKeys,
 			ownerBadge: raw?.ownerBadge,
-			arbitraryItems: raw?.arbitraryItems ?? []
+			arbitraryItems: raw?.arbitraryItems ?? [],
+			isComplete: raw?.isComplete ?? false
 		)
 	}
 }
@@ -265,6 +266,10 @@ extension GatewayAPI.EntityMetadataCollection {
 			loggerGlobal.error("Failed to extract metadata \(error.localizedDescription)")
 			return nil
 		}
+	}
+
+	var isComplete: Bool {
+		nextCursor == nil
 	}
 }
 
