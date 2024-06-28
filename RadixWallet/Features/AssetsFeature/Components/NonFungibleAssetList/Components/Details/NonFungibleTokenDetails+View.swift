@@ -134,22 +134,30 @@ extension NonFungibleTokenDetails.View {
 		_ stakeClaim: OnLedgerEntitiesClient.StakeClaim,
 		onClaimTap: @escaping () -> Void
 	) -> some SwiftUI.View {
-		VStack(alignment: .leading, spacing: .small3) {
-			ResourceBalanceView.StakeClaimNFT.Tokens(
-				viewState: .init(
-					canClaimTokens: true,
-					stakeClaims: [stakeClaim]
-				),
-				background: .app.white,
-				onClaimAllTapped: onClaimTap
-			)
+		VStack(spacing: .medium3) {
+			AssetDetailsSeparator()
+				.padding(.horizontal, -.large2)
 
-			if let unstakingDurationDescription = stakeClaim.unstakingDurationDescription {
-				Text(unstakingDurationDescription)
-					.textStyle(.body2HighImportance)
-					.foregroundColor(.app.gray2)
+			Text("Current Redeemable Value")
+				.textStyle(.secondaryHeader)
+				.foregroundColor(.app.gray1)
+
+			ResourceBalanceView(
+				.fungible(.xrd(balance: stakeClaim.claimAmount, network: stakeClaim.validatorAddress.networkID)),
+				appearance: .standard
+			)
+			.padding(.horizontal, .medium3)
+			.padding(.vertical, .medium2)
+			.roundedCorners(strokeColor: .app.gray4)
+
+			if stakeClaim.isReadyToBeClaimed {
+				Button("Ready to Claim", action: onClaimTap)
+					.buttonStyle(.primaryRectangular)
+			} else if let unstakingDurationDescription = stakeClaim.unstakingDurationDescription {
+				KeyValueView(key: "Ready to Claim in", value: unstakingDurationDescription)
 			}
 		}
+		.padding(.top, .small2)
 	}
 }
 
@@ -158,7 +166,7 @@ extension OnLedgerEntitiesClient.StakeClaim {
 		guard let reamainingEpochsUntilClaim, isUnstaking else {
 			return nil
 		}
-		return L10n.AssetDetails.Staking.unstaking(
+		return L10n.AssetDetails.Staking.readyToClaimMinutes(
 			reamainingEpochsUntilClaim * epochDurationInMinutes
 		)
 	}
