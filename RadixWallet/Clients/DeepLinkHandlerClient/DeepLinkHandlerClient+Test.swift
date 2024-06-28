@@ -13,6 +13,6 @@ extension DeepLinkHandlerClient {
 	public static let noop = Self(
 		handleDeepLink: {},
 		setDeepLink: { _ in },
-		hasDeepLink: { true }
+		hasDeepLink: { false }
 	)
 }
