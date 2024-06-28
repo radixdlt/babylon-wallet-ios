@@ -2,16 +2,14 @@
 public struct AddressDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		let address: LedgerIdentifiable.Address
-		let closeAction: (() -> Void)?
 
 		var title: Loadable<String?> = .idle
 		var qrImage: Loadable<CGImage> = .idle
 		var showEnlarged = false
 		var showShare = false
 
-		public init(address: LedgerIdentifiable.Address, closeAction: (() -> Void)? = nil) {
+		public init(address: LedgerIdentifiable.Address) {
 			self.address = address
-			self.closeAction = closeAction
 		}
 	}
 
@@ -32,10 +30,6 @@ public struct AddressDetails: Sendable, FeatureReducer {
 		case loadedQrImage(TaskResult<CGImage>)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
-		case dismiss
-	}
-
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.qrGeneratorClient) var qrGeneratorClient
@@ -43,6 +37,7 @@ public struct AddressDetails: Sendable, FeatureReducer {
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
+	@Dependency(\.dismiss) var dismiss
 
 	public init() {}
 
@@ -52,11 +47,8 @@ public struct AddressDetails: Sendable, FeatureReducer {
 			return loadTitle(state: &state)
 				.merge(with: loadQrCode(state: &state))
 		case .closeButtonTapped:
-			if let action = state.closeAction {
-				action()
-				return .none
-			} else {
-				return .send(.delegate(.dismiss))
+			return .run { _ in
+				await dismiss()
 			}
 		case .copyButtonTapped:
 			pasteboardClient.copyString(state.address.address)

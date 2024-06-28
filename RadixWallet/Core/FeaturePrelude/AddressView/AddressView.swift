@@ -42,10 +42,7 @@ extension AddressView {
 			case let .address(address):
 				addressView
 					.onTapGesture {
-						let state = AddressDetails.State(address: address) {
-							self.sheet = nil
-						}
-						let store: StoreOf<AddressDetails> = .init(initialState: state) {
+						let store: StoreOf<AddressDetails> = .init(initialState: .init(address: address)) {
 							AddressDetails()
 						}
 						sheet = .details(store)
