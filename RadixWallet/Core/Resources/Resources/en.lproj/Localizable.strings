@@ -1210,7 +1210,7 @@ Code: %@";
 "mobileConnect_noProfileDialog_title" = "dApp Request";
 "mobileConnect_noProfileDialog_subtitle" = "You can proceed with this request after you create or restore your Radix Wallet.";
 "mobileConnect_linkTitle" = "Have you come from a genuine website?";
-"mobileConnect_linkSubtitle" = "Before you connect to %@, you might want to check:";
+"mobileConnect_linkSubtitle" = "Before you connect to **%@**, you might want to check:";
 "mobileConnect_linkBody1" = "Does the website address match what you’re expecting?";
 "mobileConnect_linkBody2" = "If you came from a social media ad, is the website legitimate?";
 "mobileConnect_interactionSuccess" = "Switch back to your browser to continue";
