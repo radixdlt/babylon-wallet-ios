@@ -110,7 +110,8 @@ struct DappInteraction_Preview: PreviewProvider {
 			store: .init(
 				initialState: .init(
 					dappMetadata: .previewValue,
-					interaction: .previewValueAllRequests()
+					interaction: .previewValueAllRequests(),
+					p2pRoute: .wallet
 				)!
 			) {
 				DappInteractionFlow()

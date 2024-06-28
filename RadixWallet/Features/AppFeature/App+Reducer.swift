@@ -9,9 +9,17 @@ public struct App: Sendable, FeatureReducer {
 			case main(Main.State)
 			case onboardingCoordinator(OnboardingCoordinator.State)
 			case splash(Splash.State)
+
+			var isMain: Bool {
+				if case .main = self {
+					return true
+				}
+				return false
+			}
 		}
 
 		public var root: Root
+		public var deferredDeepLink: URL?
 
 		public init(
 			root: Root = .splash(.init())
@@ -26,6 +34,7 @@ public struct App: Sendable, FeatureReducer {
 	@CasePathable
 	public enum ViewAction: Sendable, Equatable {
 		case task
+		case urlOpened(URL)
 	}
 
 	@CasePathable
@@ -46,6 +55,8 @@ public struct App: Sendable, FeatureReducer {
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
+	@Dependency(\.deepLinkHandlerClient) var deepLinkHandlerClient
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.resetWalletClient) var resetWalletClient
 
 	public init() {}
@@ -67,8 +78,20 @@ public struct App: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
+		case let .urlOpened(url):
+			switch state.root {
+			case .main:
+				deepLinkHandlerClient.setDeepLink(url)
+				deepLinkHandlerClient.handleDeepLink()
+			case .splash:
+				deepLinkHandlerClient.setDeepLink(url)
+			case .onboardingCoordinator:
+				deepLinkHandlerClient.setDeepLink(url)
+				presentDeepLinkNoProfileDialog()
+			}
+			return .none
 		case .task:
-			didResetWalletEffect()
+			return didResetWalletEffect()
 		}
 	}
 
@@ -111,6 +134,9 @@ public struct App: Sendable, FeatureReducer {
 
 	private func goToOnboarding(state: inout State) -> Effect<Action> {
 		state.root = .onboardingCoordinator(.init())
+		if deepLinkHandlerClient.hasDeepLink() {
+			presentDeepLinkNoProfileDialog()
+		}
 		return .none
 	}
 
@@ -125,6 +151,15 @@ public struct App: Sendable, FeatureReducer {
 				loggerGlobal.error("Failed to iterate over walletDidReset: \(error)")
 			}
 		}
+	}
+
+	private func presentDeepLinkNoProfileDialog() {
+		overlayWindowClient.scheduleAlertAndIgnoreAction(
+			.init(
+				title: { TextState(L10n.MobileConnect.NoProfileDialog.title) },
+				message: { TextState(L10n.MobileConnect.NoProfileDialog.subtitle) }
+			)
+		)
 	}
 }
 

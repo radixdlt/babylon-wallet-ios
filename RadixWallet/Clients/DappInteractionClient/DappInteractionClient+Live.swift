@@ -38,7 +38,9 @@ extension DappInteractionClient: DependencyKey {
 								origin: .wallet,
 								dappDefinitionAddress: .wallet
 							)
-						))
+						)
+					),
+					requiresOriginVerification: false
 				)
 
 				interactionsSubject.send(.success(request))
@@ -54,9 +56,7 @@ extension DappInteractionClient: DependencyKey {
 				switch message {
 				case let .response(response, route):
 					interactionResponsesSubject.send(response)
-					if case let .rtc(rtcRoute) = route {
-						try await radixConnectClient.sendResponse(response, rtcRoute)
-					}
+					try await radixConnectClient.sendResponse(response, route)
 				default:
 					break
 				}
@@ -85,7 +85,7 @@ extension DappInteractionClient {
 		}
 
 		func invalidRequest(_ reason: ValidatedDappRequest.InvalidRequestReason) -> Result<ValidatedDappRequest, Error> {
-			.success(.init(route: route, request: .invalid(request: nonValidated, reason: reason)))
+			.success(.init(route: route, request: .invalid(request: nonValidated, reason: reason), requiresOriginVerification: message.originRequiresValidation))
 		}
 
 		let nonvalidatedMeta = nonValidated.metadata
@@ -147,7 +147,8 @@ extension DappInteractionClient {
 					interactionId: nonValidated.interactionId,
 					items: nonValidated.items,
 					metadata: metadataValidDappDefAddress
-				))
+				)),
+				requiresOriginVerification: message.originRequiresValidation
 			)
 		)
 	}
