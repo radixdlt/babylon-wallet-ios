@@ -406,8 +406,6 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 			let privateHDFactorSource = PrivateHierarchicalDeterministicFactorSource.olympia(
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
-				// Should never fail to load device info, but sure, we
-				// can provide some fall back. Non of this is really important.
 				deviceInfo: secureStorageClient.loadDeviceInfoOrFallback()
 			)
 
