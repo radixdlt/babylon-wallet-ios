@@ -2216,9 +2216,9 @@ public enum L10n {
     public static let linkBody1 = L10n.tr("Localizable", "mobileConnect_linkBody1", fallback: "Does the website address match what you’re expecting?")
     /// If you came from a social media ad, is the website legitimate?
     public static let linkBody2 = L10n.tr("Localizable", "mobileConnect_linkBody2", fallback: "If you came from a social media ad, is the website legitimate?")
-    /// Before you connect to %@, you might want to check:
+    /// Before you connect to **%@**, you might want to check:
     public static func linkSubtitle(_ p1: Any) -> String {
-      return L10n.tr("Localizable", "mobileConnect_linkSubtitle", String(describing: p1), fallback: "Before you connect to %@, you might want to check:")
+      return L10n.tr("Localizable", "mobileConnect_linkSubtitle", String(describing: p1), fallback: "Before you connect to **%@**, you might want to check:")
     }
     /// Have you come from a genuine website?
     public static let linkTitle = L10n.tr("Localizable", "mobileConnect_linkTitle", fallback: "Have you come from a genuine website?")
