@@ -50,7 +50,7 @@ public struct PersonaList: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case personasLoaded(IdentifiedArrayOf<PersonaFeature.State>)
+		case setPersonas([Persona])
 		case setSecurityProblems([SecurityProblem])
 	}
 
@@ -80,27 +80,12 @@ public struct PersonaList: Sendable, FeatureReducer {
 		case personasMissingFromClient(OrderedSet<Persona.ID>)
 	}
 
-	/// Returns the ids of personas to include under the given strategy. nil means that all ids should be included
-	private func personaIDs(_ strategy: State.ReloadingStrategy) async throws -> OrderedSet<Persona.ID>? {
-		switch strategy {
-		case .all:
-			return nil
-		case let .ids(ids):
-			return ids
-		case let .dApp(dAppID):
-			guard let dApp = try? await authorizedDappsClient.getDetailedDapp(dAppID) else { return [] }
-			return OrderedSet(dApp.detailedAuthorizedPersonas.map(\.id))
-		}
-	}
-
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case var .personasLoaded(personas):
-			personas.mutateAll { persona in
-				persona.securityProblemsConfig.update(problems: state.problems)
-			}
-
+		case let .setPersonas(personas):
 			state.personas = personas
+				.map { PersonaFeature.State(persona: $0, problems: state.problems) }
+				.asIdentified()
 			return .none
 
 		case let .setSecurityProblems(problems):
@@ -133,15 +118,15 @@ public struct PersonaList: Sendable, FeatureReducer {
 	}
 
 	private func personasEffect(state: State) -> Effect<Action> {
-		.run { [strategy = state.strategy, problems = state.problems] send in
+		.run { [strategy = state.strategy] send in
 			for try await personas in await personasClient.personas() {
 				guard !Task.isCancelled else { return }
 				let ids = try await personaIDs(strategy) ?? OrderedSet(validating: personas.ids)
-				let result = ids.compactMap { personas[id: $0] }.map { PersonaFeature.State(persona: $0, problems: problems) }
+				let result = ids.compactMap { personas[id: $0] }
 				guard result.count == ids.count else {
 					throw UpdatePersonaError.personasMissingFromClient(ids.subtracting(result.map(\.id)))
 				}
-				await send(.internal(.personasLoaded(result.asIdentified())))
+				await send(.internal(.setPersonas(result)))
 			}
 		} catch: { error, _ in
 			loggerGlobal.error("Failed to update personas from client, error: \(error)")
@@ -155,6 +140,19 @@ public struct PersonaList: Sendable, FeatureReducer {
 				guard !Task.isCancelled else { return }
 				await send(.internal(.setSecurityProblems(problems)))
 			}
+		}
+	}
+
+	/// Returns the ids of personas to include under the given strategy. nil means that all ids should be included
+	private func personaIDs(_ strategy: State.ReloadingStrategy) async throws -> OrderedSet<Persona.ID>? {
+		switch strategy {
+		case .all:
+			return nil
+		case let .ids(ids):
+			return ids
+		case let .dApp(dAppID):
+			guard let dApp = try? await authorizedDappsClient.getDetailedDapp(dAppID) else { return [] }
+			return OrderedSet(dApp.detailedAuthorizedPersonas.map(\.id))
 		}
 	}
 }
