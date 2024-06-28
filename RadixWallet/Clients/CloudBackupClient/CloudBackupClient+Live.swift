@@ -330,12 +330,12 @@ extension CloudBackupClient {
 		return .init(
 			snapshotVersion: snapshotVersion,
 			id: id,
-			creatingDevice: DeviceInfo(
+			creatingDevice: .init(
 				id: creatingDeviceID,
 				date: creatingDeviceDate,
 				description: creatingDeviceDescription
 			),
-			lastUsedOnDevice: DeviceInfo(
+			lastUsedOnDevice: .init(
 				id: lastUsedOnDeviceID,
 				date: lastUsedOnDeviceDate,
 				description: lastUsedOnDeviceDescription
