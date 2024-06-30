@@ -23,11 +23,11 @@ extension CardCarousel {
 					}
 					.padding(.horizontal, margin - 0.5 * spacing)
 					.frame(height: height)
-					.onAppear {
-						store.send(.view(.didAppear))
-					}
 					.transition(.scale(scale: 0.8).combined(with: .opacity))
 				}
+			}
+			.onAppear {
+				store.send(.view(.didAppear))
 			}
 		}
 
@@ -112,16 +112,14 @@ public struct CarouselCardView: View {
 			.padding(.bottom, .small1)
 			.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
 			.background(alignment: .trailing) {
-				Image(.cardBackgroundTEMPORARY)
-					.resizable()
-					.aspectRatio(contentMode: .fill)
+				background
 			}
 			.background(.app.gray5)
 			.cornerRadius(.small1)
 		}
-		.overlay(alignment: .topTrailing) {
-			CloseButton(action: closeAction)
-		}
+//		.overlay(alignment: .topTrailing) {
+//			CloseButton(action: closeAction)
+//		}
 	}
 
 	public struct Dummy: View {
@@ -135,23 +133,73 @@ public struct CarouselCardView: View {
 
 	private var title: String {
 		switch card {
+		case .rejoinRadQuest:
+			"360 Degrees of Security"
+		case .discoverRadix:
+			""
+		case .continueOnDapp:
+			""
+		case .useDappsOnDesktop:
+			""
 		case .threeSixtyDegrees:
 			"360 Degrees of Security"
-		case .connect:
-			"Link to connector"
-		case .somethingElse:
-			"Something Lorem Ipsum"
 		}
 	}
 
 	private var message: String {
 		switch card {
+		case .rejoinRadQuest:
+			"360 Degrees of Security"
+		case .discoverRadix:
+			""
+		case .continueOnDapp:
+			""
+		case .useDappsOnDesktop:
+			""
 		case .threeSixtyDegrees:
 			"Secure your Accounts and Personas with Security shields"
-		case .connect:
-			"Do it now"
-		case .somethingElse:
-			"Blabbely bla"
 		}
+	}
+
+	private var background: some View {
+		switch card {
+		case .rejoinRadQuest:
+			cardBackground(.carouselBackgroundRadquest, type: .gradient)
+		case .discoverRadix:
+			cardBackground(.carouselBackgroundRadquest, type: .gradient)
+		case .continueOnDapp:
+			cardBackground(.carouselIconContinueOnDapp, type: .icon)
+		case .useDappsOnDesktop:
+			cardBackground(.carouselBackgroundConnect, type: .gradient)
+		case .threeSixtyDegrees:
+			cardBackground(.carouselFullBackground360, type: .full)
+		}
+	}
+
+	@ViewBuilder
+	private func cardBackground(_ imageResource: ImageResource, type: BackgroundType) -> some View {
+		switch type {
+		case .icon:
+			Image(imageResource)
+				.padding(.trailing, .medium2)
+				.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
+		case .gradient:
+			Image(imageResource)
+				.resizable()
+				.aspectRatio(contentMode: .fill)
+				.mask {
+					LinearGradient(colors: [.clear, .white, .white], startPoint: .leading, endPoint: .trailing)
+				}
+		case .full:
+			Image(imageResource)
+				.resizable()
+				.aspectRatio(contentMode: .fill)
+		}
+	}
+
+	private enum BackgroundType {
+		case icon
+		case gradient
+		case full
 	}
 }

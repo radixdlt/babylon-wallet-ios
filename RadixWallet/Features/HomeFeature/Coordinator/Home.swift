@@ -8,7 +8,7 @@ public struct Home: Sendable, FeatureReducer {
 
 	public struct State: Sendable, Hashable {
 		// MARK: - Components
-		public var carousel: CardCarousel.State = .init(cards: [.threeSixtyDegrees, .connect, .somethingElse])
+		public var carousel: CardCarousel.State = .init()
 
 		public var accountRows: IdentifiedArrayOf<Home.AccountRow.State> = []
 		fileprivate var problems: [SecurityProblem] = []

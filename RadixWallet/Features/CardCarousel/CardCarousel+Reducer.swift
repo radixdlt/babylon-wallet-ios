@@ -5,7 +5,7 @@ import ComposableArchitecture
 public struct CardCarousel: FeatureReducer, Sendable {
 	@ObservableState
 	public struct State: Hashable, Sendable {
-		public var cards: [CarouselCard]
+		public var cards: [CarouselCard] = [.continueOnDapp]
 	}
 
 	public typealias Action = FeatureAction<Self>
@@ -39,6 +39,19 @@ public struct CardCarousel: FeatureReducer, Sendable {
 				} catch {}
 			}
 		case let .cardTapped(card):
+			switch card {
+			case .rejoinRadQuest:
+				break
+			case .discoverRadix:
+				break
+			case .continueOnDapp:
+				break
+			case .useDappsOnDesktop:
+				break
+			case .threeSixtyDegrees:
+				break
+			}
+			cardCarouselClient.tappedCard(card)
 			return .none
 		case let .closeTapped(card):
 			cardCarouselClient.closeCard(card)
