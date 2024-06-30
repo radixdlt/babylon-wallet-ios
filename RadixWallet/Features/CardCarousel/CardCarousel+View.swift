@@ -35,11 +35,11 @@ extension CardCarousel {
 		private var coreView: some SwiftUI.View {
 			WithPerceptionTracking {
 				TabView {
-					ForEach(store.cards, id: \.self) { card in
+					ForEach(store.cards) { card in
 						CarouselCardView(card: card) {
 							store.send(.view(.cardTapped(card)))
 						} closeAction: {
-							store.send(.view(.closeTapped(card)), animation: .default)
+							store.send(.view(.closeTapped(card.id)), animation: .default)
 						}
 						.measurePosition(card, coordSpace: Self.coordSpace)
 						.padding(.horizontal, 0.5 * spacing)
@@ -98,8 +98,16 @@ public struct CarouselCardView: View {
 		ZStack(alignment: .topTrailing) {
 			Button(action: action) {
 				VStack(alignment: .leading, spacing: .small2) {
-					Text(title)
-						.textStyle(.body1Header)
+					HStack {
+						Text(title)
+							.textStyle(.body1Header)
+
+						if case .openURL = card.action {
+							Image(.iconLinkOut)
+								.foregroundStyle(.app.gray2)
+						}
+					}
+
 					Text(text)
 						.lineSpacing(-20)
 						.lineLimit(nil)
@@ -133,7 +141,7 @@ public struct CarouselCardView: View {
 	}
 
 	private var title: String {
-		switch card {
+		switch card.id {
 		case .rejoinRadQuest:
 			L10n.HomePageCarousel.RejoinRadquest.title
 		case .discoverRadix:
@@ -148,7 +156,7 @@ public struct CarouselCardView: View {
 	}
 
 	private var text: String {
-		switch card {
+		switch card.id {
 		case .rejoinRadQuest:
 			L10n.HomePageCarousel.RejoinRadquest.text
 		case .discoverRadix:
@@ -163,7 +171,7 @@ public struct CarouselCardView: View {
 	}
 
 	private var background: some View {
-		switch card {
+		switch card.id {
 		case .rejoinRadQuest:
 			cardBackground(.carouselBackgroundRadquest, type: .gradient)
 		case .discoverRadix:

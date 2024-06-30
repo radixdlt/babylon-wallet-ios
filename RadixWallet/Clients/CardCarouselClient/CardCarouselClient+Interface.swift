@@ -16,18 +16,28 @@ public struct CardCarouselClient: Sendable {
 }
 
 // MARK: - CarouselCard
-public enum CarouselCard: Hashable, Sendable {
-	case rejoinRadQuest
-	case discoverRadix
-	case continueOnDapp
-	case useDappsOnDesktop
-	case threeSixtyDegrees
+public struct CarouselCard: Hashable, Sendable, Identifiable {
+	public let id: CardID
+	public let action: Action
+
+	public enum CardID: Sendable {
+		case rejoinRadQuest
+		case discoverRadix
+		case continueOnDapp
+		case useDappsOnDesktop
+		case threeSixtyDegrees
+	}
+
+	public enum Action: Hashable, Sendable {
+		case openURL(URL)
+		case dismiss
+	}
 }
 
 extension CardCarouselClient {
 	public typealias Cards = @Sendable () -> AnyAsyncSequence<[CarouselCard]>
-	public typealias TappedCard = @Sendable (CarouselCard) -> Void
-	public typealias CloseCard = @Sendable (CarouselCard) -> Void
+	public typealias TappedCard = @Sendable (CarouselCard.ID) -> Void
+	public typealias CloseCard = @Sendable (CarouselCard.ID) -> Void
 }
 
 extension DependencyValues {

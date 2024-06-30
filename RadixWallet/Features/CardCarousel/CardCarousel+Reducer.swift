@@ -5,7 +5,7 @@ import ComposableArchitecture
 public struct CardCarousel: FeatureReducer, Sendable {
 	@ObservableState
 	public struct State: Hashable, Sendable {
-		public var cards: [CarouselCard] = [.continueOnDapp]
+		public var cards: [CarouselCard] = [.init(id: .continueOnDapp, action: .dismiss)]
 	}
 
 	public typealias Action = FeatureAction<Self>
@@ -14,7 +14,7 @@ public struct CardCarousel: FeatureReducer, Sendable {
 	public enum ViewAction: Equatable, Sendable {
 		case didAppear
 		case cardTapped(CarouselCard)
-		case closeTapped(CarouselCard)
+		case closeTapped(CarouselCard.ID)
 	}
 
 	@CasePathable
@@ -23,6 +23,7 @@ public struct CardCarousel: FeatureReducer, Sendable {
 	}
 
 	@Dependency(\.cardCarouselClient) var cardCarouselClient
+	@Dependency(\.openURL) var openURL
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -39,22 +40,17 @@ public struct CardCarousel: FeatureReducer, Sendable {
 				} catch {}
 			}
 		case let .cardTapped(card):
-			switch card {
-			case .rejoinRadQuest:
-				break
-			case .discoverRadix:
-				break
-			case .continueOnDapp:
-				break
-			case .useDappsOnDesktop:
-				break
-			case .threeSixtyDegrees:
-				break
+			cardCarouselClient.tappedCard(card.id)
+			switch card.action {
+			case let .openURL(url):
+				return .run { _ in
+					await openURL(url)
+				}
+			case .dismiss:
+				return .none
 			}
-			cardCarouselClient.tappedCard(card)
-			return .none
-		case let .closeTapped(card):
-			cardCarouselClient.closeCard(card)
+		case let .closeTapped(id):
+			cardCarouselClient.closeCard(id)
 			return .none
 		}
 	}
