@@ -14,17 +14,14 @@ extension CardCarousel {
 
 		public var body: some SwiftUI.View {
 			WithPerceptionTracking {
-				if !store.cards.isEmpty {
-					GeometryReader { proxy in
-						coreView
-							.backgroundPreferenceValue(PositionsPreferenceKey.self) { positions in
-								dummyCards(positions, in: proxy.frame(in: .named(Self.coordSpace)))
-							}
-					}
-					.padding(.horizontal, margin - 0.5 * spacing)
-					.frame(height: height)
-					.transition(.scale(scale: 0.8).combined(with: .opacity))
+				GeometryReader { proxy in
+					coreView
+						.backgroundPreferenceValue(PositionsPreferenceKey.self) { positions in
+							dummyCards(positions, in: proxy.frame(in: .named(Self.coordSpace)))
+						}
 				}
+				.padding(.horizontal, margin - 0.5 * spacing)
+				.frame(height: store.cards.isEmpty ? 0 : height)
 			}
 			.onAppear {
 				store.send(.view(.didAppear))

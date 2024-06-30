@@ -5,7 +5,7 @@ import ComposableArchitecture
 public struct CardCarousel: FeatureReducer, Sendable {
 	@ObservableState
 	public struct State: Hashable, Sendable {
-		public var cards: [CarouselCard] = [.init(id: .continueOnDapp, action: .dismiss)]
+		public var cards: [CarouselCard] = []
 	}
 
 	public typealias Action = FeatureAction<Self>
