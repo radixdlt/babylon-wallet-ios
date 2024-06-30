@@ -88,38 +88,39 @@ extension CardCarousel {
 
 // MARK: - CarouselCardView
 public struct CarouselCardView: View {
-	private let trailingPadding: CGFloat = 100
+	private let trailingPadding: CGFloat = 115
 
 	public let card: CarouselCard
 	public let action: () -> Void
 	public let closeAction: () -> Void
 
 	public var body: some View {
-		Button(action: action) {
-			VStack(alignment: .leading, spacing: .small2) {
-				Text(title)
-					.textStyle(.body1Header)
-				Text(message)
-					.lineSpacing(-20)
-					.lineLimit(nil)
-					.minimumScaleFactor(0.8)
-					.textStyle(.body2Regular)
+		ZStack(alignment: .topTrailing) {
+			Button(action: action) {
+				VStack(alignment: .leading, spacing: .small2) {
+					Text(title)
+						.textStyle(.body1Header)
+					Text(text)
+						.lineSpacing(-20)
+						.lineLimit(nil)
+						.minimumScaleFactor(0.8)
+						.textStyle(.body2Regular)
+				}
+				.multilineTextAlignment(.leading)
+				.foregroundStyle(.app.gray1)
+				.padding([.top, .leading], .medium2)
+				.padding(.trailing, trailingPadding)
+				.padding(.bottom, .small1)
+				.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+				.background(alignment: .trailing) {
+					background
+				}
+				.background(.app.gray5)
+				.cornerRadius(.small1)
 			}
-			.multilineTextAlignment(.leading)
-			.foregroundStyle(.app.gray1)
-			.padding([.top, .leading], .medium2)
-			.padding(.trailing, trailingPadding)
-			.padding(.bottom, .small1)
-			.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-			.background(alignment: .trailing) {
-				background
-			}
-			.background(.app.gray5)
-			.cornerRadius(.small1)
+
+			CloseButton(action: closeAction)
 		}
-//		.overlay(alignment: .topTrailing) {
-//			CloseButton(action: closeAction)
-//		}
 	}
 
 	public struct Dummy: View {
@@ -134,30 +135,30 @@ public struct CarouselCardView: View {
 	private var title: String {
 		switch card {
 		case .rejoinRadQuest:
-			"360 Degrees of Security"
+			L10n.HomePageCarousel.RejoinRadquest.title
 		case .discoverRadix:
-			""
+			L10n.HomePageCarousel.DiscoverRadix.title
 		case .continueOnDapp:
-			""
+			L10n.HomePageCarousel.ContinueOnDapp.title
 		case .useDappsOnDesktop:
-			""
+			L10n.HomePageCarousel.UseDappsOnDesktop.title
 		case .threeSixtyDegrees:
-			"360 Degrees of Security"
+			L10n.HomePageCarousel.ThreesixtyDegrees.title
 		}
 	}
 
-	private var message: String {
+	private var text: String {
 		switch card {
 		case .rejoinRadQuest:
-			"360 Degrees of Security"
+			L10n.HomePageCarousel.RejoinRadquest.text
 		case .discoverRadix:
-			""
+			L10n.HomePageCarousel.DiscoverRadix.text
 		case .continueOnDapp:
-			""
+			L10n.HomePageCarousel.ContinueOnDapp.text
 		case .useDappsOnDesktop:
-			""
+			L10n.HomePageCarousel.UseDappsOnDesktop.text
 		case .threeSixtyDegrees:
-			"Secure your Accounts and Personas with Security shields"
+			L10n.HomePageCarousel.ThreesixtyDegrees.text
 		}
 	}
 
