@@ -803,7 +803,8 @@ extension TransactionReview.State {
 		signTransactionPurpose: .manifestFromDapp,
 		message: .none,
 		isWalletTransaction: false,
-		proposingDappMetadata: nil
+		proposingDappMetadata: nil,
+		p2pRoute: .wallet
 	)
 }
 #endif

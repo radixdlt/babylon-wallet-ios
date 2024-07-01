@@ -70,8 +70,16 @@ extension SelectBackup.View {
 					ProgressView()
 				case .loaded:
 					backupsList(with: viewStore)
-				case .failed:
-					EmptyView()
+				case let .failed(reason):
+					let text = switch reason {
+					case .accountTemporarilyUnavailable, .notAuthenticated:
+						L10n.IOSRecoverProfileBackup.notLoggedInToICloud
+					case .networkUnavailable:
+						L10n.IOSRecoverProfileBackup.networkUnavailable
+					case .other:
+						L10n.IOSRecoverProfileBackup.couldNotLoadBackups
+					}
+					NoContentView(text)
 				}
 
 				VStack(alignment: .center, spacing: .small1) {

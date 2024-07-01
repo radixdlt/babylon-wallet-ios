@@ -1,8 +1,7 @@
-
 extension Text {
 	/// Shows a markdown string, where any italics sections are shown in the provided color
-	public init(markdown: String, italicsColor: Color) {
-		let attributed = AttributedString(markdown: markdown, replaceItalicsWith: italicsColor)
+	public init(markdown: String, emphasizedColor: Color) {
+		let attributed = AttributedString(markdown: markdown, replaceEmphasizedWith: emphasizedColor)
 		self.init(attributed)
 	}
 }
@@ -12,19 +11,19 @@ extension AttributedString {
 		self = update(AttributedString(string)) { $0.foregroundColor = foregroundColor }
 	}
 
-	public init(markdown: some StringProtocol, replaceItalicsWith italicsColor: Color) {
+	public init(markdown: some StringProtocol, replaceEmphasizedWith emphasizedColor: Color) {
 		let string = String(markdown)
 		guard let attributed = try? AttributedString(markdown: string) else {
 			self.init(string)
 			return
 		}
 
-		self = attributed.replacingAttributes(.italics, with: .foregroundColor(italicsColor))
+		self = attributed.replacingAttributes(.emphasized, with: .foregroundColor(emphasizedColor))
 	}
 }
 
 extension AttributeContainer {
-	public static let italics: AttributeContainer = intent(.emphasized)
+	public static let emphasized: AttributeContainer = intent(.emphasized)
 
 	public static func intent(_ intent: InlinePresentationIntent) -> AttributeContainer {
 		var result = AttributeContainer()

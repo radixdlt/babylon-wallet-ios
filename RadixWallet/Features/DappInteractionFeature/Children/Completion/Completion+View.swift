@@ -21,11 +21,13 @@ extension Completion {
 		let txID: IntentHash?
 		let title: String
 		let subtitle: String
+		let showSwitchBackToBrowserMessage: Bool
 
 		init(state: Completion.State) {
 			self.txID = state.txID
 			self.title = L10n.DAppRequest.Completion.title
 			self.subtitle = L10n.DAppRequest.Completion.subtitle(state.dappMetadata.name)
+			self.showSwitchBackToBrowserMessage = state.p2pRoute.isDeepLink
 		}
 	}
 
@@ -38,17 +40,21 @@ extension Completion {
 				WithNavigationBar {
 					store.send(.view(.dismissTapped))
 				} content: {
-					VStack(spacing: .small3) {
+					VStack(spacing: .zero) {
+						Spacer()
+
 						Image(asset: AssetResource.successCheckmark)
 
 						Text(viewStore.title)
 							.foregroundColor(.app.gray1)
 							.textStyle(.sheetTitle)
+							.padding([.top, .horizontal], .medium3)
 
 						Text(viewStore.subtitle)
 							.foregroundColor(.app.gray1)
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)
+							.padding([.top, .horizontal], .medium3)
 
 						if let txID = viewStore.txID {
 							HStack {
@@ -58,14 +64,26 @@ extension Completion {
 									.foregroundColor(.app.blue1)
 							}
 							.textStyle(.body1Header)
+							.padding(.top, .medium3)
+						}
+
+						Spacer()
+
+						if viewStore.showSwitchBackToBrowserMessage {
+							Text(L10n.MobileConnect.interactionSuccess)
+								.foregroundColor(.app.gray1)
+								.textStyle(.body1Regular)
+								.multilineTextAlignment(.center)
+								.padding(.vertical, .medium1)
+								.frame(maxWidth: .infinity)
+								.background(.app.gray5)
 						}
 					}
-					.padding(.horizontal, .medium2)
-					.padding(.bottom, .small3)
+					.frame(maxWidth: .infinity)
 				}
 			}
 			.presentationDragIndicator(.visible)
-			.presentationDetents([.height(.smallDetent)])
+			.presentationDetents([.fraction(0.66)])
 			.presentationBackground(.blur)
 		}
 	}
@@ -101,7 +119,8 @@ struct Completion_Preview: PreviewProvider {
 extension Completion.State {
 	static let previewValue: Self = .init(
 		txID: nil,
-		dappMetadata: .previewValue
+		dappMetadata: .previewValue,
+		p2pRoute: .wallet
 	)
 }
 #endif

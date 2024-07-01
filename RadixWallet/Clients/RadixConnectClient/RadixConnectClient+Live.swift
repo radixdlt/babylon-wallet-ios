@@ -1,14 +1,18 @@
+import AsyncAlgorithms
 import ComposableArchitecture // actually CasePaths... but CI fails if we do `import CasePaths` 🤷‍♂️
 import Network
 
 extension RadixConnectClient {
 	public static let liveValue: Self = {
 		@Dependency(\.p2pLinksClient) var p2pLinksClient
+		@Dependency(\.errorQueue) var errorQueue
 		@Dependency(\.accountsClient) var accountsClient
 		@Dependency(\.jsonEncoder) var jsonEncoder
 
 		let userDefaults = UserDefaults.Dependency.radix // FIXME: find a better way to ensure we use the same userDefaults everywhere
+
 		let rtcClients = RTCClients()
+		let radixConnectMobile = RadixConnectMobile()
 		let localNetworkAuthorization = LocalNetworkAuthorization()
 
 		Task {
@@ -140,12 +144,36 @@ extension RadixConnectClient {
 				/// Clear `lastSyncedAccountsWithCE` after a new connection is made, in order to send `AccountListMessage` to CE
 				userDefaults.remove(.lastSyncedAccountsWithCE)
 			},
-			receiveMessages: { await rtcClients.incomingMessages() },
+			receiveMessages: {
+				await AsyncAlgorithms.merge(
+					rtcClients.incomingMessages(),
+					radixConnectMobile.incomingMessages()
+				)
+				.share()
+				.eraseToAnyAsyncSequence()
+			},
 			sendResponse: { response, route in
-				try await rtcClients.sendResponse(response, to: route)
+				switch route {
+				case let .deepLink(sessionId):
+					try await radixConnectMobile.sendResponse(response, sessionId: sessionId)
+				case let .rtc(route):
+					try await rtcClients.sendResponse(response, to: route)
+				case .wallet:
+					break
+				}
+
 			},
 			sendRequest: { request, strategy in
 				try await rtcClients.sendRequest(request, strategy: strategy)
+			},
+			handleDappDeepLink: { url in
+				do {
+					try await radixConnectMobile.handleRequest(url)
+				} catch {
+					loggerGlobal.error("Failed to handle deep link \(error)")
+					errorQueue.schedule(error)
+					throw error
+				}
 			}
 		)
 	}()

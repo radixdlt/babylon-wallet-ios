@@ -8,7 +8,7 @@ typealias RequestEnvelope = DappInteractionClient.RequestEnvelope
 extension RequestEnvelope: Identifiable {
 	public typealias ID = WalletInteractionId
 	public var id: ID {
-		request.interactionId
+		interaction.interactionId
 	}
 }
 
@@ -64,7 +64,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			for: RequestEnvelope,
 			DappMetadata, reason: String
 		)
-		case presentResponseSuccessView(DappMetadata, IntentHash?)
+		case presentResponseSuccessView(DappMetadata, IntentHash?, P2P.Route)
 		case presentInvalidRequest(
 			DappToWalletInteractionUnvalidated,
 			reason: DappInteractionClient.ValidatedDappRequest.InvalidRequestReason,
@@ -171,13 +171,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			default: break
 			}
 
-			if request.route == .wallet {
-				// dismiss current request, wallet request takes precedence
-				state.currentModal = nil
-				state.requestQueue.insert(request, at: 0)
-			} else {
-				state.requestQueue.append(request)
-			}
+			state.requestQueue.append(request)
 
 			return presentQueuedRequestIfNeededEffect(for: &state)
 
@@ -188,7 +182,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			dismissCurrentModalAndRequest(request, for: &state)
 			switch response {
 			case .success:
-				return .send(.internal(.presentResponseSuccessView(dappMetadata, txID)))
+				return .send(.internal(.presentResponseSuccessView(dappMetadata, txID, request.route)))
 			case .failure:
 				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
 			}
@@ -239,11 +233,12 @@ struct DappInteractor: Sendable, FeatureReducer {
 			)
 			return .none
 
-		case let .presentResponseSuccessView(dappMetadata, txID):
+		case let .presentResponseSuccessView(dappMetadata, txID, p2pRoute):
 			state.currentModal = .dappInteractionCompletion(
 				.init(
 					txID: txID,
-					dappMetadata: dappMetadata
+					dappMetadata: dappMetadata,
+					p2pRoute: p2pRoute
 				)
 			)
 			return .none
@@ -259,19 +254,14 @@ struct DappInteractor: Sendable, FeatureReducer {
 				loggerGlobal.error(.init(stringLiteral: message))
 				return .none
 			}
-			guard let request = state.requestQueue[id: dappInteraction.interaction.interactionId] else {
-				let message = "The request for this interaction is missing"
-				assertionFailure(message)
-				loggerGlobal.error(.init(stringLiteral: message))
-				return .none
-			}
+			let request = dappInteraction.request
 
 			switch delegateAction {
 			case let .submit(responseToDapp, dappMetadata):
 				return sendResponseToDappEffect(responseToDapp, for: request, dappMetadata: dappMetadata)
 			case let .dismiss(dappMetadata, txID):
 				dismissCurrentModalAndRequest(request, for: &state)
-				return .send(.internal(.presentResponseSuccessView(dappMetadata, txID)))
+				return .send(.internal(.presentResponseSuccessView(dappMetadata, txID, request.route)))
 			case .dismissSilently:
 				dismissCurrentModalAndRequest(request, for: &state)
 				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
@@ -296,7 +286,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			return .none
 		}
 
-		state.currentModal = .dappInteraction(.init(interaction: next.request))
+		state.currentModal = .dappInteraction(.init(request: next))
 
 		return .none
 	}
@@ -467,7 +457,11 @@ extension DappInteractor {
 					let validatedRequest = try incomingRequest.get()
 					switch validatedRequest.request {
 					case let .valid(request):
-						await send(.internal(.receivedRequestFromDapp(.init(route: validatedRequest.route, request: request))))
+						await send(.internal(.receivedRequestFromDapp(.init(
+							route: validatedRequest.route,
+							interaction: request,
+							requiresOriginValidation: validatedRequest.requiresOriginVerification
+						))))
 					case let .invalid(invalidRequest, reason):
 						let isDeveloperModeEnabled = await appPreferencesClient.isDeveloperModeEnabled()
 						await send(.internal(.presentInvalidRequest(
