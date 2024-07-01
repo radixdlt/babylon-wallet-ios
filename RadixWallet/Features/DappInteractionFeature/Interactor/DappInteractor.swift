@@ -171,8 +171,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 			default: break
 			}
 
-			if request.route.isDeepLink {
-				// dismiss current request, wallet request takes precedence
+			// Dismiss current request is not already from deepLink, deep link request takes precedence
+			if request.route.isDeepLink, state.requestQueue.first?.route.isDeepLink == false {
 				state.currentModal = nil
 				state.requestQueue.insert(request, at: 0)
 			} else {

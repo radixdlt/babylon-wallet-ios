@@ -142,7 +142,7 @@ extension Profile {
 		let dapp = try validateAuthorizedPersonas(of: unvalidatedAuthorizedDapp)
 		let networkID = dapp.networkID
 		let network = try network(id: networkID)
-		if network.authorizedDapps.contains(dapp) {
+		if network.authorizedDapps.contains(where: { $0.dAppDefinitionAddress == dapp.dAppDefinitionAddress }) {
 			try updateAuthorizedDapp(dapp)
 		} else {
 			try addAuthorizedDapp(dapp)
