@@ -2,6 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - KeyValueView
+@MainActor
 struct KeyValueView<Content: View>: View {
 	let key: String
 	let content: Content
@@ -18,9 +19,9 @@ struct KeyValueView<Content: View>: View {
 		}
 	}
 
-	init(nonFungibleGlobalID: NonFungibleGlobalId, imageColor: Color? = .app.gray2) where Content == AddressView {
+	init(nonFungibleGlobalID: NonFungibleGlobalId, showLocalIdOnly: Bool, imageColor: Color? = .app.gray2) where Content == AddressView {
 		self.init(key: L10n.AssetDetails.NFTDetails.id) {
-			AddressView(.identifier(.nonFungibleGlobalID(nonFungibleGlobalID)), imageColor: imageColor)
+			AddressView(.address(.nonFungibleGlobalID(nonFungibleGlobalID)), showLocalIdOnly: showLocalIdOnly, imageColor: imageColor)
 		}
 	}
 

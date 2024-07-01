@@ -70,6 +70,7 @@ public enum AssetResource {
   public static let create = ImageAsset(name: "create")
   public static let ellipsis = ImageAsset(name: "ellipsis")
   public static let error = ImageAsset(name: "error")
+  public static let fullScreen = ImageAsset(name: "full-screen")
   public static let iconHardwareLedger = ImageAsset(name: "icon-hardware-ledger")
   public static let iconHistory = ImageAsset(name: "icon-history")
   public static let iconLinkOut = ImageAsset(name: "icon-link-out")

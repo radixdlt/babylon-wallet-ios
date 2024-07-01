@@ -31,6 +31,21 @@ extension Gradient {
 	]
 }
 
+extension LinearGradient.App {
+	public var brand1: LinearGradient {
+		.init(
+			colors: [
+				.app.account11green,
+				.app.account11blue1,
+				.app.gradientPurple,
+				.app.blue1,
+			],
+			startPoint: .bottomLeading,
+			endPoint: .topTrailing
+		)
+	}
+}
+
 #if DEBUG
 struct LinearGradients_Previews: PreviewProvider {
 	static var previews: some View {

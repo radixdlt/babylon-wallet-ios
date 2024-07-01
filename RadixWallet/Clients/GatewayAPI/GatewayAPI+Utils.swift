@@ -42,7 +42,7 @@ extension GatewayAPI.StateEntityDetailsResponseItemDetails {
 }
 
 // MARK: - EntityMetadataKey
-public enum EntityMetadataKey: String, CaseIterable {
+public enum EntityMetadataKey: String, CaseIterable, Sendable {
 	case name
 	case symbol
 	case description

@@ -1,4 +1,5 @@
 extension UnknownDappComponents {
+	@MainActor
 	public struct View: SwiftUI.View {
 		public let store: StoreOf<UnknownDappComponents>
 

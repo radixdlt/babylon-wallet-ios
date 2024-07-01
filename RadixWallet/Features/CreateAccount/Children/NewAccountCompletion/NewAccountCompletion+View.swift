@@ -40,6 +40,7 @@ extension NewAccountCompletion {
 		}
 	}
 
+	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<NewAccountCompletion>
 

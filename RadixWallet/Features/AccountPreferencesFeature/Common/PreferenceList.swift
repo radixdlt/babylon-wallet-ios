@@ -111,7 +111,7 @@ struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 }
 
 // MARK: - PreferencesList
-struct PreferencesList<SectionId: Hashable, RowId: Hashable, Footer: View>: View {
+struct PreferencesList<SectionId: Hashable, RowId: Hashable, Header: View, Footer: View>: View {
 	struct ViewState: Equatable {
 		let sections: [PreferenceSection<SectionId, RowId>.ViewState]
 	}
@@ -119,30 +119,46 @@ struct PreferencesList<SectionId: Hashable, RowId: Hashable, Footer: View>: View
 	let viewState: ViewState
 
 	var onRowSelected: (SectionId, RowId) -> Void
+	let header: Header
 	let footer: Footer
 
 	init(
 		viewState: ViewState,
 		onRowSelected: @escaping (SectionId, RowId) -> Void,
+		@ViewBuilder header: () -> Header = { EmptyView() },
 		@ViewBuilder footer: () -> Footer = { EmptyView() }
 	) {
 		self.viewState = viewState
 		self.onRowSelected = onRowSelected
+		self.header = header()
 		self.footer = footer()
 	}
 
 	var body: some View {
 		List {
+			section(for: header)
+
 			ForEach(viewState.sections, id: \.id) { section in
 				PreferenceSection(viewState: section, onRowSelected: onRowSelected)
 			}
 
-			footer
-				.listRowSeparator(.hidden)
-				.listRowBackground(Color.clear)
+			section(for: footer)
 		}
 		.scrollContentBackground(.hidden)
 		.listStyle(.grouped)
 		.environment(\.defaultMinListHeaderHeight, 0)
+	}
+
+	private func section(for content: some View) -> some View {
+		Section {
+			content
+		} header: {
+			Rectangle().frame(height: 0)
+		} footer: {
+			Rectangle().frame(height: 0)
+		}
+		.listRowSeparator(.hidden)
+		.listRowBackground(Color.clear)
+		.listRowInsets(EdgeInsets(top: .small2, leading: .medium3, bottom: .zero, trailing: .medium3))
 	}
 }
