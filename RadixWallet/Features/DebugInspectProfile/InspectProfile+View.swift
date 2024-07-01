@@ -181,6 +181,7 @@ extension DebugInspectFactorSourceView {
 				DeviceFactorSouceView(deviceFactorSource: deviceFactorSource)
 			case let .ledger(ledgerFactorSource):
 				LedgerFactorSourceView(ledgerFactorSource: ledgerFactorSource)
+			default: fatalError("DISCREPANCY: Found non .device | .ledger factor source. A real world user cannot possible have this.")
 			}
 			FactorSourceCommonView(common: factorSource.common)
 		}
@@ -460,7 +461,7 @@ public struct DappAuthorizedPersonaView: IndentedView {
 			if let simpleAccounts = detailedAuthorizedPersona.simpleAccounts {
 				if !simpleAccounts.isEmpty {
 					ForEach(simpleAccounts) { simpleAccount in
-						Labeled("displayName", value: simpleAccount.label.rawValue)
+						Labeled("displayName", value: simpleAccount.displayName.rawValue)
 						Labeled("address", value: simpleAccount.address.address)
 						Labeled("appearanceID", value: simpleAccount.appearanceId.description)
 					}

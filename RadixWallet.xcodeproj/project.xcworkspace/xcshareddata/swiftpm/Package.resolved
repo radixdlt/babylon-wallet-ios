@@ -1,5 +1,5 @@
 {
-  "originHash" : "4eb650ade57061cd1cf989ce8f615547774e9303f591ff57a76f3f2c04cdbd07",
+  "originHash" : "4caef75e93972cd7fcfc04fb043483ffd37f359726f1c0b8a224575436977ca3",
   "pins" : [
     {
       "identity" : "anycodable",
@@ -107,15 +107,6 @@
       "state" : {
         "revision" : "33f7e93be5d4ec027d42af77a8ec4680d1862ad2",
         "version" : "11.6.4"
-      }
-    },
-    {
-      "identity" : "sargon",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/radixdlt/sargon",
-      "state" : {
-        "revision" : "7c63f588761857ec1068401d66215909ee9e4208",
-        "version" : "1.0.20"
       }
     },
     {
@@ -420,8 +411,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/xctest-dynamic-overlay",
       "state" : {
-        "revision" : "b58e6627149808b40634c4552fcf2f44d0b3ca87",
-        "version" : "1.1.0"
+        "revision" : "6f30bdba373bbd7fbfe241dddd732651f2fbd1e2",
+        "version" : "1.1.2"
       }
     }
   ],
