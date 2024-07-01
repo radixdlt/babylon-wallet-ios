@@ -3,6 +3,7 @@ public extension AddressDetails {
 	@MainActor
 	struct View: SwiftUI.View {
 		@Perception.Bindable var store: StoreOf<AddressDetails>
+		@Environment(\.dismiss) var dismiss
 
 		public init(store: StoreOf<AddressDetails>) {
 			self.store = store
@@ -12,7 +13,7 @@ public extension AddressDetails {
 			WithPerceptionTracking {
 				content
 					.withNavigationBar {
-						store.send(.view(.closeButtonTapped))
+						dismiss()
 					}
 					.presentationDetents([.large])
 					.presentationDragIndicator(.visible)
@@ -63,15 +64,15 @@ public extension AddressDetails {
 						.textStyle(.secondaryHeader)
 						.foregroundColor(.app.gray1)
 
-					qrCode(qrImage: store.qrImage)
+					qrCode
 						.padding(.horizontal, .large2)
 				}
 			}
 		}
 
-		private func qrCode(qrImage: Loadable<CGImage>) -> some SwiftUI.View {
-			ZStack {
-				switch qrImage {
+		private var qrCode: some SwiftUI.View {
+			Group {
+				switch store.qrImage {
 				case let .success(value):
 					Image(decorative: value, scale: 1)
 						.resizable()
@@ -87,7 +88,7 @@ public extension AddressDetails {
 					EmptyView()
 				}
 			}
-			.animation(.easeInOut, value: qrImage.isSuccess)
+			.animation(.easeInOut, value: store.qrImage.isSuccess)
 		}
 
 		private var actions: some SwiftUI.View {
@@ -175,26 +176,23 @@ private extension AddressDetails.View {
 // MARK: - Enlarged view
 private extension AddressDetails.View {
 	var enlargedView: some SwiftUI.View {
-		Group {
-			Text(enlargedText)
-				.textStyle(.enlarged)
-				.foregroundColor(.app.white)
-		}
-		.multilineTextAlignment(.center)
-		.padding(.small1)
-		.background(.app.gray1.opacity(0.8))
-		.cornerRadius(.small1)
-		.padding(.horizontal, .large2)
-		.onTapGesture {
-			store.send(.view(.hideEnlargedView))
-		}
-		.background(enlargedViewBackrgound)
+		Text(enlargedText)
+			.textStyle(.enlarged)
+			.foregroundColor(.app.white)
+			.multilineTextAlignment(.center)
+			.padding(.small1)
+			.background(.app.gray1.opacity(0.8))
+			.cornerRadius(.small1)
+			.padding(.horizontal, .large2)
+			.onTapGesture {
+				store.send(.view(.hideEnlargedView))
+			}
+			.background(enlargedViewBackrgound)
 	}
 
 	private var enlargedViewBackrgound: some View {
 		Color.black.opacity(0.2)
 			.frame(width: UIScreen.main.bounds.width * 2, height: UIScreen.main.bounds.height * 2)
-			.contentShape(Rectangle())
 			.onTapGesture {
 				store.send(.view(.hideEnlargedView))
 			}

@@ -18,7 +18,6 @@ public struct AddressDetails: Sendable, FeatureReducer {
 	@CasePathable
 	public enum ViewAction: Sendable, Equatable {
 		case task
-		case closeButtonTapped
 		case copyButtonTapped
 		case enlargeButtonTapped
 		case hideEnlargedView
@@ -41,7 +40,6 @@ public struct AddressDetails: Sendable, FeatureReducer {
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
-	@Dependency(\.dismiss) var dismiss
 
 	public init() {}
 
@@ -50,10 +48,6 @@ public struct AddressDetails: Sendable, FeatureReducer {
 		case .task:
 			return loadTitleEffect(state: &state)
 				.merge(with: loadQrCodeEffect(state: &state))
-		case .closeButtonTapped:
-			return .run { _ in
-				await dismiss()
-			}
 		case .copyButtonTapped:
 			pasteboardClient.copyString(state.address.address)
 			return .none
@@ -118,26 +112,19 @@ public struct AddressDetails: Sendable, FeatureReducer {
 	private func loadTitle(address: LedgerIdentifiable.Address) async throws -> String? {
 		switch address {
 		case let .account(address, _):
-			let account = try await accountsClient.getAccountByAddress(address)
-			return account.displayName.rawValue
+			try await accountsClient.getAccountByAddress(address).displayName.rawValue
 		case let .resource(address):
-			let resource = try await onLedgerEntitiesClient.getResource(address)
-			return resource.resourceTitle
+			try await onLedgerEntitiesClient.getResource(address).resourceTitle
 		case let .validator(address):
-			let entity = try await onLedgerEntitiesClient.getEntity(address.asGeneral, metadataKeys: .resourceMetadataKeys)
-			return entity.metadata?.name
+			try await onLedgerEntitiesClient.getEntity(address.asGeneral, metadataKeys: .resourceMetadataKeys).metadata?.name
 		case let .package(address):
-			let entity = try await onLedgerEntitiesClient.getEntity(address.asGeneral, metadataKeys: .resourceMetadataKeys)
-			return entity.metadata?.name
+			try await onLedgerEntitiesClient.getEntity(address.asGeneral, metadataKeys: .resourceMetadataKeys).metadata?.name
 		case let .resourcePool(address):
-			let entity = try await onLedgerEntitiesClient.getEntity(address.asGeneral, metadataKeys: .resourceMetadataKeys)
-			return entity.metadata?.name
+			try await onLedgerEntitiesClient.getEntity(address.asGeneral, metadataKeys: .resourceMetadataKeys).metadata?.name
 		case let .component(address):
-			let entity = try await onLedgerEntitiesClient.getEntity(address.asGeneral, metadataKeys: .resourceMetadataKeys)
-			return entity.metadata?.name
+			try await onLedgerEntitiesClient.getEntity(address.asGeneral, metadataKeys: .resourceMetadataKeys).metadata?.name
 		case let .nonFungibleGlobalID(globalId):
-			let resource = try await onLedgerEntitiesClient.getResource(globalId.resourceAddress)
-			return resource.resourceTitle
+			try await onLedgerEntitiesClient.getResource(globalId.resourceAddress).resourceTitle
 		}
 	}
 
