@@ -80,7 +80,7 @@ extension NonFungibleTokenDetails {
 										.padding(.horizontal, -.large2)
 								}
 
-								KeyValueView(nonFungibleGlobalID: tokenDetails.nonFungibleGlobalID)
+								KeyValueView(nonFungibleGlobalID: tokenDetails.nonFungibleGlobalID, showLocalIdOnly: true)
 
 								if let stakeClaim = tokenDetails.stakeClaim {
 									stakeClaimView(stakeClaim) {

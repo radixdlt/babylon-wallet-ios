@@ -4,7 +4,7 @@ public struct AddressView: View {
 	let identifiable: LedgerIdentifiable
 	let isTappable: Bool
 	let imageColor: Color?
-	private let showFull: Bool
+	private let showLocalIdOnly: Bool
 
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.openURL) var openURL
@@ -15,12 +15,12 @@ public struct AddressView: View {
 
 	public init(
 		_ identifiable: LedgerIdentifiable,
-		showFull: Bool = false,
+		showLocalIdOnly: Bool = false,
 		isTappable: Bool = true,
 		imageColor: Color? = nil
 	) {
 		self.identifiable = identifiable
-		self.showFull = showFull
+		self.showLocalIdOnly = showLocalIdOnly
 		self.isTappable = isTappable
 		self.imageColor = imageColor
 	}
@@ -69,23 +69,15 @@ extension AddressView {
 		}
 	}
 
-	@ViewBuilder
 	private var addressView: some View {
-		if showFull {
-			Text("\(identifiable.formatted(.full))\(image)")
-				.lineLimit(nil)
-				.multilineTextAlignment(.leading)
-				.minimumScaleFactor(0.5)
-		} else {
-			HStack(spacing: .small3) {
-				Text(compactedText)
-					.lineLimit(1)
-				if let imageColor {
-					image
-						.foregroundStyle(imageColor)
-				} else {
-					image
-				}
+		HStack(spacing: .small3) {
+			Text(formattedText)
+				.lineLimit(1)
+			if let imageColor {
+				image
+					.foregroundStyle(imageColor)
+			} else {
+				image
 			}
 		}
 	}
@@ -94,11 +86,11 @@ extension AddressView {
 		Image(.copy)
 	}
 
-	private var compactedText: String {
-		switch identifiable {
-		case let .address(.nonFungibleGlobalID(globalId)):
-			globalId.nonFungibleLocalId.toUserFacingString()
-		case .address, .transaction:
+	private var formattedText: String {
+		switch (showLocalIdOnly, identifiable) {
+		case (true, let .address(.nonFungibleGlobalID(globalId))):
+			globalId.nonFungibleLocalId.formatted(.default)
+		default:
 			identifiable.formatted(.default)
 		}
 	}
