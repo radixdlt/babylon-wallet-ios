@@ -3,41 +3,33 @@ import SwiftUI
 
 // MARK: - ScanQR
 public struct ScanQR: Sendable, FeatureReducer {
+	@ObservableState
 	public struct State: Sendable, Hashable {
-		public let scanInstructions: String
-		public let scanMode: Mode
-		public let disclosure: Disclosure?
+		public let kind: Kind
 		#if targetEnvironment(simulator)
 		public var manualQRContent: String
 
 		public init(
-			scanInstructions: String,
-			scanMode: QRScanMode = .default,
-			disclosure: Disclosure? = nil,
+			kind: Kind,
 			manualQRContent: String = ""
 		) {
-			self.scanInstructions = scanInstructions
-			self.scanMode = scanMode
-			self.disclosure = disclosure
+			self.kind = kind
 			self.manualQRContent = manualQRContent
 		}
 		#else
 		public init(
-			scanInstructions: String,
-			scanMode: Mode = .default,
-			disclosure: Disclosure? = nil
+			kind: Kind
 		) {
-			self.scanInstructions = scanInstructions
-			self.scanMode = scanMode
-			self.disclosure = disclosure
+			self.kind = kind
 		}
 		#endif // sim
 	}
 
+	@CasePathable
 	public enum ViewAction: Sendable, Equatable {
 		case scanned(TaskResult<String>)
 		#if targetEnvironment(simulator)
-		case macInputQRContentChanged(String)
+		case manualQRContentChanged(String)
 		case macConnectButtonTapped
 		#endif // sim
 	}
@@ -53,7 +45,7 @@ public struct ScanQR: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		#if targetEnvironment(simulator)
-		case let .macInputQRContentChanged(manualQRContent):
+		case let .manualQRContentChanged(manualQRContent):
 			state.manualQRContent = manualQRContent
 			return .none
 
@@ -71,24 +63,11 @@ public struct ScanQR: Sendable, FeatureReducer {
 	}
 }
 
+// MARK: ScanQR.Kind
 extension ScanQR {
-	public enum Mode: Sendable, Hashable {
-		/// Scan exactly one code, then stop.
-		case once
-
-		/// Scan each code no more than once.
-		case oncePerCode
-
-		/// Keep scanning all codes until dismissed.
-		case continuous
-
-		/// Scan only when capture button is tapped.
-		case manual
-
-		public static let `default`: Self = .oncePerCode
-	}
-
-	public enum Disclosure: Sendable, Hashable {
-		case connector
+	public enum Kind: Sendable, Hashable {
+		case connectorExtension
+		case account
+		case importOlympia
 	}
 }

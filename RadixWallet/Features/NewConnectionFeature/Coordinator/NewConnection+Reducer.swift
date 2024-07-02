@@ -204,8 +204,7 @@ public struct NewConnection: Sendable, FeatureReducer {
 		switch childAction {
 		case let .root(.localNetworkPermission(.delegate(.permissionResponse(allowed)))):
 			if allowed {
-				let string = L10n.LinkedConnectors.NewConnection.subtitle
-				state.root = .scanQR(.init(scanInstructions: string, disclosure: .connector))
+				state.root = .scanQR(.init(kind: .connectorExtension))
 				return .none
 			} else {
 				return .run { _ in
@@ -235,8 +234,7 @@ public struct NewConnection: Sendable, FeatureReducer {
 			case let .approveExisitingConnection(connectionName):
 				return .send(.internal(.establishConnection(connectionName)))
 			case .approveRelinkAfterProfileRestore, .approveRelinkAfterUpdate:
-				let string = L10n.LinkedConnectors.NewConnection.subtitle
-				state.root = .scanQR(.init(scanInstructions: string, disclosure: .connector))
+				state.root = .scanQR(.init(kind: .connectorExtension))
 				return .none
 			}
 

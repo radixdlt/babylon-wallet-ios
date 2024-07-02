@@ -2,46 +2,23 @@ import CodeScanner
 import ComposableArchitecture
 import SwiftUI
 
-extension ScanQR.State {
-	var viewState: ScanQR.ViewState {
-		.init(state: self)
-	}
-}
-
 // MARK: - ScanQR.View
 extension ScanQR {
-	public struct ViewState: Equatable {
-		public let scanMode: Mode
-		public let disclosure: Disclosure?
-		#if targetEnvironment(simulator)
-		public var manualQRContent: String
-		#endif // sim
-		public let instructions: String
-		init(state: ScanQR.State) {
-			self.scanMode = state.scanMode
-			self.instructions = state.scanInstructions
-			self.disclosure = state.disclosure
-			#if targetEnvironment(simulator)
-			self.manualQRContent = state.manualQRContent
-			#endif // sim
-		}
-	}
-
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<ScanQR>
+		@Perception.Bindable var store: StoreOf<ScanQR>
 
 		public init(store: StoreOf<ScanQR>) {
 			self.store = store
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			WithPerceptionTracking {
 				VStack(spacing: .medium1) {
 					#if !targetEnvironment(simulator)
-					scanQRCode(viewStore: viewStore)
+					scanQRCode
 					#else
-					simulatorInputView(viewStore: viewStore)
+					simulatorInputView
 					Spacer()
 					#endif
 				}
@@ -55,31 +32,29 @@ extension ScanQR {
 
 extension ScanQR.View {
 	@ViewBuilder
-	private func scanQRCode(
-		viewStore: ViewStoreOf<ScanQR>
-	) -> some View {
+	private var scanQRCode: some View {
 		#if !targetEnvironment(simulator)
 
-		Text(viewStore.instructions)
+		Text(store.kind.instructions)
 			.foregroundColor(.app.gray1)
 			.textStyle(.body1Regular)
 			.multilineTextAlignment(.center)
 
 		CodeScannerView(
 			codeTypes: [.qr],
-			scanMode: viewStore.scanMode.forCodeScannerView()
+			scanMode: store.kind.scanMode
 		) { response in
 			switch response {
 			case let .failure(error):
-				viewStore.send(.scanned(.failure(error)))
+				store.send(.view(.scanned(.failure(error))))
 			case let .success(result):
-				viewStore.send(.scanned(.success(result.string)))
+				store.send(.view(.scanned(.success(result.string))))
 			}
 		}
 		.aspectRatio(1, contentMode: .fit)
 		.cornerRadius(.small2)
 
-		if let disclosure = viewStore.disclosure {
+		if let disclosure = store.kind.disclosure {
 			bottomView(disclosure)
 		} else {
 			Spacer()
@@ -90,7 +65,7 @@ extension ScanQR.View {
 		#endif // !TARGET_OS_SIMULATOR
 	}
 
-	private func bottomView(_ disclosure: ScanQR.Disclosure) -> some View {
+	private func bottomView(_ disclosure: ScanQR.Kind.Disclosure) -> some View {
 		VStack(alignment: .leading, spacing: .small1) {
 			Text(disclosure.title)
 				.font(.app.body2Header)
@@ -110,22 +85,17 @@ extension ScanQR.View {
 	}
 
 	@ViewBuilder
-	private func simulatorInputView(
-		viewStore: ViewStoreOf<ScanQR>
-	) -> some View {
+	private var simulatorInputView: some View {
 		#if targetEnvironment(simulator)
 		VStack(alignment: .center) {
 			Text("Manually input QR string content")
 			TextField(
 				"QR String content",
-				text: viewStore.binding(
-					get: \.manualQRContent,
-					send: { .macInputQRContentChanged($0) }
-				)
+				text: $store.manualQRContent.sending(\.view.manualQRContentChanged)
 			)
 			.textFieldStyle(.roundedBorder)
 			Button("Emulate QR scan") {
-				viewStore.send(.macConnectButtonTapped)
+				store.send(.view(.macConnectButtonTapped))
 			}.buttonStyle(.primaryRectangular)
 		}
 		#else
@@ -134,33 +104,40 @@ extension ScanQR.View {
 	}
 }
 
-private extension ScanQR.Mode {
-	func forCodeScannerView() -> ScanMode {
+private extension ScanQR.Kind {
+	var instructions: String {
 		switch self {
-		case .continuous: .continuous
-		case .manual: .manual
-		case .oncePerCode: .oncePerCode
-		case .once: .once
-		}
-	}
-}
-
-private extension ScanQR.Disclosure {
-	var title: String {
-		switch self {
-		case .connector:
-			"Don't have the Radix Connector browser extension?"
+		case .connectorExtension: "Scan the QR code in the Radix Connector browser extension."
+		case .account: L10n.AssetTransfer.qrScanInstructions
+		case .importOlympia: L10n.ImportOlympiaAccounts.ScanQR.instructions
 		}
 	}
 
-	var items: [String] {
+	var scanMode: ScanMode {
 		switch self {
-		case .connector:
-			[
-				"Go to **wallet.radixdlt.com** in your desktop browser.",
-				"Follow the instructions there to install the Radix Connector.",
-			]
+		case .connectorExtension, .account, .importOlympia:
+			.oncePerCode
 		}
+	}
+
+	var disclosure: Disclosure? {
+		switch self {
+		case .account, .importOlympia:
+			nil
+		case .connectorExtension:
+			.init(
+				title: "Don't have the Radix Connector browser extension?",
+				items: [
+					"Go to **wallet.radixdlt.com** in your desktop browser.",
+					"Follow the instructions there to install the Radix Connector.",
+				]
+			)
+		}
+	}
+
+	struct Disclosure {
+		let title: String
+		let items: [String]
 	}
 }
 
@@ -180,6 +157,6 @@ struct ScanQR_Preview: PreviewProvider {
 }
 
 extension ScanQR.State {
-	public static let previewValue: Self = .init(scanInstructions: "Preview")
+	public static let previewValue: Self = .init(kind: .account)
 }
 #endif
