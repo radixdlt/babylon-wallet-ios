@@ -5,26 +5,31 @@ import SwiftUI
 public struct ScanQR: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let scanInstructions: String
-		public let scanMode: QRScanMode
+		public let scanMode: Mode
+		public let disclosure: Disclosure?
 		#if targetEnvironment(simulator)
 		public var manualQRContent: String
 
 		public init(
 			scanInstructions: String,
 			scanMode: QRScanMode = .default,
+			disclosure: Disclosure? = nil,
 			manualQRContent: String = ""
 		) {
 			self.scanInstructions = scanInstructions
 			self.scanMode = scanMode
+			self.disclosure = disclosure
 			self.manualQRContent = manualQRContent
 		}
 		#else
 		public init(
 			scanInstructions: String,
-			scanMode: QRScanMode = .default
+			scanMode: Mode = .default,
+			disclosure: Disclosure? = nil
 		) {
 			self.scanInstructions = scanInstructions
 			self.scanMode = scanMode
+			self.disclosure = disclosure
 		}
 		#endif // sim
 	}
@@ -63,5 +68,27 @@ public struct ScanQR: Sendable, FeatureReducer {
 			errorQueue.schedule(error)
 			return .none
 		}
+	}
+}
+
+extension ScanQR {
+	public enum Mode: Sendable, Hashable {
+		/// Scan exactly one code, then stop.
+		case once
+
+		/// Scan each code no more than once.
+		case oncePerCode
+
+		/// Keep scanning all codes until dismissed.
+		case continuous
+
+		/// Scan only when capture button is tapped.
+		case manual
+
+		public static let `default`: Self = .oncePerCode
+	}
+
+	public enum Disclosure: Sendable, Hashable {
+		case connector
 	}
 }

@@ -15,11 +15,14 @@ public struct ScanQRCoordinator: Sendable, FeatureReducer {
 
 		public var step: Step
 		public let scanInstructions: String
+		public let disclosure: ScanQR.Disclosure?
 		public init(
 			scanInstructions: String,
+			disclosure: ScanQR.Disclosure? = nil,
 			step: Step = .init()
 		) {
 			self.scanInstructions = scanInstructions
+			self.disclosure = disclosure
 			self.step = step
 		}
 	}
@@ -57,7 +60,7 @@ public struct ScanQRCoordinator: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case .proceedWithScan:
-			state.step = .scanQR(.init(scanInstructions: state.scanInstructions))
+			state.step = .scanQR(.init(scanInstructions: state.scanInstructions, disclosure: state.disclosure))
 			return .none
 		}
 	}

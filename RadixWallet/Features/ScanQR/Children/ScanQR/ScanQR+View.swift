@@ -11,7 +11,8 @@ extension ScanQR.State {
 // MARK: - ScanQR.View
 extension ScanQR {
 	public struct ViewState: Equatable {
-		public let scanMode: QRScanMode
+		public let scanMode: Mode
+		public let disclosure: Disclosure?
 		#if targetEnvironment(simulator)
 		public var manualQRContent: String
 		#endif // sim
@@ -19,6 +20,7 @@ extension ScanQR {
 		init(state: ScanQR.State) {
 			self.scanMode = state.scanMode
 			self.instructions = state.scanInstructions
+			self.disclosure = state.disclosure
 			#if targetEnvironment(simulator)
 			self.manualQRContent = state.manualQRContent
 			#endif // sim
@@ -40,37 +42,13 @@ extension ScanQR {
 					scanQRCode(viewStore: viewStore)
 					#else
 					simulatorInputView(viewStore: viewStore)
-					#endif
 					Spacer()
+					#endif
 				}
-				.padding(.all, .large3)
+				.padding(.horizontal, .large3)
+				.padding(.top, .small2)
+				.padding(.bottom, .medium3)
 			}
-		}
-	}
-}
-
-// MARK: - QRScanMode
-public enum QRScanMode: Sendable, Hashable {
-	/// Scan exactly one code, then stop.
-	case once
-
-	/// Scan each code no more than once.
-	case oncePerCode
-
-	/// Keep scanning all codes until dismissed.
-	case continuous
-
-	/// Scan only when capture button is tapped.
-	case manual
-
-	public static let `default`: Self = .oncePerCode
-
-	func forCodeScannerView() -> ScanMode {
-		switch self {
-		case .continuous: .continuous
-		case .manual: .manual
-		case .oncePerCode: .oncePerCode
-		case .once: .once
 		}
 	}
 }
@@ -101,9 +79,34 @@ extension ScanQR.View {
 		.aspectRatio(1, contentMode: .fit)
 		.cornerRadius(.small2)
 
+		if let disclosure = viewStore.disclosure {
+			bottomView(disclosure)
+		} else {
+			Spacer()
+		}
+
 		#else
 		EmptyView()
 		#endif // !TARGET_OS_SIMULATOR
+	}
+
+	private func bottomView(_ disclosure: ScanQR.Disclosure) -> some View {
+		VStack(alignment: .leading, spacing: .small1) {
+			Text(disclosure.title)
+				.font(.app.body2Header)
+				.foregroundColor(.app.gray1)
+			VStack(alignment: .leading, spacing: .small3) {
+				ForEach(Array(disclosure.items.enumerated()), id: \.0) { index, message in
+					HStack(alignment: .top, spacing: .small3) {
+						Text("\(index + 1).")
+						Text(markdown: message, emphasizedColor: .app.gray1)
+					}
+					.multilineTextAlignment(.leading)
+					.font(.app.body2Regular)
+					.foregroundColor(.app.gray1)
+				}
+			}
+		}
 	}
 
 	@ViewBuilder
@@ -128,6 +131,36 @@ extension ScanQR.View {
 		#else
 		EmptyView()
 		#endif // sim
+	}
+}
+
+private extension ScanQR.Mode {
+	func forCodeScannerView() -> ScanMode {
+		switch self {
+		case .continuous: .continuous
+		case .manual: .manual
+		case .oncePerCode: .oncePerCode
+		case .once: .once
+		}
+	}
+}
+
+private extension ScanQR.Disclosure {
+	var title: String {
+		switch self {
+		case .connector:
+			"Don't have the Radix Connector browser extension?"
+		}
+	}
+
+	var items: [String] {
+		switch self {
+		case .connector:
+			[
+				"Go to **wallet.radixdlt.com** in your desktop browser.",
+				"Follow the instructions there to install the Radix Connector.",
+			]
+		}
 	}
 }
 
