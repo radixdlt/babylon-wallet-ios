@@ -67,7 +67,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case task
+		case onFirstTask
 		case pullToRefreshStarted
 		case didSelectList(State.AssetKind)
 		case chooseButtonTapped(State.Mode.SelectedAssets)
@@ -121,7 +121,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .task:
+		case .onFirstTask:
 			state.isLoadingResources = true
 			state.accountPortfolio = .loading
 			return .run { [state] send in
@@ -132,16 +132,16 @@ public struct AssetsView: Sendable, FeatureReducer {
 			} catch: { error, _ in
 				loggerGlobal.error("AssetsView portfolioForAccount failed: \(error)")
 			}
+			.merge(with: fetchAccountPortfolio(state))
+
 		case let .didSelectList(kind):
 			state.activeAssetKind = kind
 			return .none
+
 		case .pullToRefreshStarted:
 			state.isRefreshing = true
-			return .run { [address = state.account.address] _ in
-				_ = try await accountPortfoliosClient.fetchAccountPortfolio(address, true)
-			} catch: { error, _ in
-				loggerGlobal.error("AssetsView fetch failed: \(error)")
-			}
+			return fetchAccountPortfolio(state)
+
 		case let .chooseButtonTapped(items):
 			return .send(.delegate(.handleSelectedAssets(items)))
 		}
@@ -181,6 +181,14 @@ public struct AssetsView: Sendable, FeatureReducer {
 			.none
 		}
 	}
+
+	public func fetchAccountPortfolio(_ state: State) -> Effect<Action> {
+		.run { [address = state.account.address] _ in
+			_ = try await accountPortfoliosClient.fetchAccountPortfolio(address, true)
+		} catch: { error, _ in
+			loggerGlobal.error("AssetsView fetch failed: \(error)")
+		}
+	}
 }
 
 extension AssetsView {
@@ -190,22 +198,27 @@ extension AssetsView {
 	) {
 		let mode = state.mode
 		let xrd = portfolio.account.fungibleResources.xrdResource.map { token in
-			FungibleAssetList.Section.Row.State(
+			let updatedRow = state.resources.fungibleTokenList?.update(token: token, for: .xrd)
+
+			return updatedRow ?? FungibleAssetList.Section.Row.State(
 				xrdToken: token,
 				isSelected: mode.xrdRowSelected
 			)
 		}
-		let nonXrd = portfolio.account.fungibleResources.nonXrdResources
-			.map { token in
-				FungibleAssetList.Section.Row.State(
-					nonXRDToken: token,
-					isSelected: mode.nonXrdRowSelected(token.resourceAddress)
-				)
-			}
-			.asIdentified()
+		let nonXrd = portfolio.account.fungibleResources.nonXrdResources.map { token in
+			let updatedRow = state.resources.fungibleTokenList?.update(token: token, for: .nonXrd)
+
+			return updatedRow ?? FungibleAssetList.Section.Row.State(
+				nonXRDToken: token,
+				isSelected: mode.nonXrdRowSelected(token.resourceAddress)
+			)
+		}
+		.asIdentified()
 
 		let nfts = portfolio.account.nonFungibleResources.map { resource in
-			NonFungibleAssetList.Row.State(
+			let updatedRow = state.resources.nonFungibleTokenList?.update(resource: resource)
+
+			return updatedRow ?? NonFungibleAssetList.Row.State(
 				accountAddress: portfolio.account.address,
 				resource: resource,
 				disabled: mode.selectedAssets?.disabledNFTs ?? [],
@@ -235,11 +248,14 @@ extension AssetsView {
 		let poolUnits = portfolio.account.poolUnitResources.poolUnits
 		let poolUnitList: PoolUnitsList.State? = poolUnits.isEmpty ? nil : .init(
 			poolUnits: poolUnits.map { poolUnit in
-				PoolUnitsList.State.PoolUnitState(
+				let resourceDetails = state.accountPortfolio.poolUnitDetails.flatten().flatMap {
+					$0.first { poolUnit.resourcePoolAddress == $0.address }.map(Loadable.success) ?? .loading
+				}
+				let updatedPoolUnit = state.resources.poolUnitsList?.update(poolUnit: poolUnit, resourceDetails: resourceDetails)
+
+				return updatedPoolUnit ?? PoolUnitsList.State.PoolUnitState(
 					poolUnit: poolUnit,
-					resourceDetails: state.accountPortfolio.poolUnitDetails.flatten().flatMap {
-						$0.first { poolUnit.resourcePoolAddress == $0.address }.map(Loadable.success) ?? .loading
-					},
+					resourceDetails: resourceDetails,
 					isSelected: mode.nonXrdRowSelected(poolUnit.resource.resourceAddress)
 				)
 			}.asIdentified()
@@ -247,27 +263,41 @@ extension AssetsView {
 
 		let stakes = portfolio.account.poolUnitResources.radixNetworkStakes
 
-		let stakeUnitList: StakeUnitList.State? = stakes.isEmpty ? nil : .init(
-			account: portfolio.account,
-			selectedLiquidStakeUnits: mode.selectedAssets.map { assets in
-				let stakeUnitResources = stakes.map(\.stakeUnitResource)
-				return assets
-					.fungibleResources
-					.nonXrdResources
-					.filter(stakeUnitResources.contains)
-					.asIdentified()
-			},
-			selectedStakeClaimTokens:
-			mode.isSelection ?
-				stakes
-				.compactMap(\.stakeClaimResource)
-				.reduce(into: StakeUnitList.SelectedStakeClaimTokens()) { dict, resource in
-					if let selectedtokens = mode.nftRowSelectedAssets(resource.resourceAddress)?.elements.asIdentified() {
-						dict[resource] = selectedtokens
-					}
-				} : nil,
-			stakeUnitDetails: state.accountPortfolio.stakeUnitDetails.flatten()
-		)
+		let stakeUnitList: StakeUnitList.State? = {
+			guard !stakes.isEmpty else { return nil }
+
+			let stakeUnitDetails = state.accountPortfolio.stakeUnitDetails.flatten()
+			if let stakeUnitList = state.resources.stakeUnitList {
+				return .init(
+					account: stakeUnitList.account,
+					selectedLiquidStakeUnits: stakeUnitList.selectedLiquidStakeUnits,
+					selectedStakeClaimTokens: stakeUnitList.selectedStakeClaimTokens,
+					stakeUnitDetails: stakeUnitDetails
+				)
+			} else {
+				return .init(
+					account: portfolio.account,
+					selectedLiquidStakeUnits: mode.selectedAssets.map { assets in
+						let stakeUnitResources = stakes.map(\.stakeUnitResource)
+						return assets
+							.fungibleResources
+							.nonXrdResources
+							.filter(stakeUnitResources.contains)
+							.asIdentified()
+					},
+					selectedStakeClaimTokens:
+					mode.isSelection ?
+						stakes
+						.compactMap(\.stakeClaimResource)
+						.reduce(into: StakeUnitList.SelectedStakeClaimTokens()) { dict, resource in
+							if let selectedtokens = mode.nftRowSelectedAssets(resource.resourceAddress)?.elements.asIdentified() {
+								dict[resource] = selectedtokens
+							}
+						} : nil,
+					stakeUnitDetails: stakeUnitDetails
+				)
+			}
+		}()
 
 		state.totalFiatWorth.refresh(from: portfolio.totalFiatWorth)
 		state.resources = .init(
