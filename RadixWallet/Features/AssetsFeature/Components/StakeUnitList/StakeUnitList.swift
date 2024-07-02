@@ -93,7 +93,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 				)
 
 				self.stakedValidators = validatorStakes
-			case let .failure(error):
+			case .failure:
 				self.stakeSummary = .init(
 					staked: .loading,
 					unstaking: .loading,

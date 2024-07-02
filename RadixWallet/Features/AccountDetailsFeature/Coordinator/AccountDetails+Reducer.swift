@@ -3,6 +3,10 @@ import SwiftUI
 
 // MARK: - AccountDetails
 public struct AccountDetails: Sendable, FeatureReducer {
+	private enum CancellableId: Hashable {
+		case fetchAccountPortfolio
+	}
+
 	public struct State: Sendable, Hashable, AccountWithInfoHolder {
 		public var accountWithInfo: AccountWithInfo
 		var assets: AssetsView.State
@@ -29,6 +33,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case task
+		case onDisappear
 		case backButtonTapped
 		case preferencesButtonTapped
 		case transferButtonTapped
@@ -116,6 +121,9 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.dappInteractionClient) var dappInteractionClient
 	@Dependency(\.securityCenterClient) var securityCenterClient
+	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
+
+	private let accountPortfolioRefreshIntervalInSeconds = 60
 
 	public init() {}
 
@@ -141,6 +149,10 @@ public struct AccountDetails: Sendable, FeatureReducer {
 				}
 			}
 			.merge(with: securityProblemsEffect())
+			.merge(with: scheduleFetchAccountPortfolioTimer(state))
+
+		case .onDisappear:
+			return .cancel(id: CancellableId.fetchAccountPortfolio)
 
 		case .backButtonTapped:
 			return .send(.delegate(.dismiss))
@@ -274,6 +286,20 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			for try await problems in await securityCenterClient.problems() {
 				guard !Task.isCancelled else { return }
 				await send(.internal(.setSecurityProblems(problems)))
+			}
+		}
+	}
+
+	private func scheduleFetchAccountPortfolioTimer(_ state: State) -> Effect<Action> {
+		.run { [address = state.account.address] _ in
+			await withTaskCancellation(id: CancellableId.fetchAccountPortfolio, cancelInFlight: true) {
+				for await _ in clock.timer(interval: .seconds(accountPortfolioRefreshIntervalInSeconds)) {
+					do {
+						_ = try await accountPortfoliosClient.fetchAccountPortfolio(address, true)
+					} catch {
+						loggerGlobal.error("AccountDetails fetch account portfolio failed: \(error)")
+					}
+				}
 			}
 		}
 	}

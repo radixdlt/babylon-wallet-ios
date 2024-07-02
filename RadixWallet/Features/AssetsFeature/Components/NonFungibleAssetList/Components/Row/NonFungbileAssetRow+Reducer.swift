@@ -9,7 +9,7 @@ extension NonFungibleAssetList {
 			public var id: ResourceAddress { resource.resourceAddress }
 			public typealias AssetID = OnLedgerEntity.NonFungibleToken.ID
 
-			public let resource: OnLedgerEntity.OwnedNonFungibleResource
+			public var resource: OnLedgerEntity.OwnedNonFungibleResource
 			public let accountAddress: AccountAddress
 
 			/// The loaded pages of tokens
