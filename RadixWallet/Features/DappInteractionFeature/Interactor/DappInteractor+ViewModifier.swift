@@ -41,6 +41,7 @@ extension DappInteractor {
 				store: store.scope(state: \.$currentModal, action: { .child(.modal($0)) }),
 				state: /DappInteractor.Modal.State.dappInteractionCompletion,
 				action: DappInteractor.Modal.Action.dappInteractionCompletion,
+				onDismiss: { store.send(.view(.completionDismissed)) },
 				content: { Completion.View(store: $0) }
 			)
 			.alert(

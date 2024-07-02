@@ -31,6 +31,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case task
 		case moveToBackground
 		case moveToForeground
+		case completionDismissed
 		case responseFailureAlert(PresentationAction<ResponseFailureAlertAction>)
 		case invalidRequestAlert(PresentationAction<InvalidRequestAlertAction>)
 
@@ -106,6 +107,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	@Dependency(\.rolaClient) var rolaClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.dappInteractionClient) var dappInteractionClient
+	@Dependency(\.npsSurveyClient) var npsSurveyClient
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -156,6 +158,10 @@ struct DappInteractor: Sendable, FeatureReducer {
 			return .run { _ in
 				_ = await radixConnectClient.loadP2PLinksAndConnectAll()
 			}
+
+		case .completionDismissed:
+			npsSurveyClient.incrementTransactionCompleteCounter()
+			return .none
 		}
 	}
 
