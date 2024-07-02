@@ -10,11 +10,13 @@ extension PoolUnitDetails.State {
 			resources: .init(resources: resourcesDetails),
 			resourceDetails: .init(
 				description: .success(resource.metadata.description),
+				infoUrl: .success(resource.metadata.infoURL),
 				resourceAddress: resource.resourceAddress,
 				isXRD: false,
 				validatorAddress: nil,
 				resourceName: .success(resource.metadata.name),
 				currentSupply: .success(resource.totalSupply?.formatted() ?? L10n.AssetDetails.supplyUnkown),
+				arbitraryDataFields: .success(resource.metadata.arbitraryItems.asDataFields),
 				behaviors: .success(resource.behaviors),
 				tags: .success(resource.metadata.tags)
 			)

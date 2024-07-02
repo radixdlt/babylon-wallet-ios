@@ -12,6 +12,7 @@ public struct GatewayAPIClient: Sendable, DependencyKey {
 	// MARK: Entity
 	public var getEntityDetails: GetEntityDetails
 	public var getEntityMetadata: GetEntityMetdata
+	public var getEntityMetadataPage: GetEntityMetdataPage
 
 	// MARK: Fungible Resources
 	public var getEntityFungiblesPage: GetEntityFungiblesPage
@@ -37,6 +38,7 @@ extension GatewayAPIClient {
 	// MARK: - Entity
 	public typealias GetEntityDetails = @Sendable (_ addresses: [String], _ explicitMetadata: Set<EntityMetadataKey>, _ ledgerState: GatewayAPI.LedgerStateSelector?) async throws -> GatewayAPI.StateEntityDetailsResponse
 	public typealias GetEntityMetdata = @Sendable (_ address: String, _ explicitMetadata: Set<EntityMetadataKey>) async throws -> GatewayAPI.EntityMetadataCollection
+	public typealias GetEntityMetdataPage = @Sendable (GatewayAPI.StateEntityMetadataPageRequest) async throws -> GatewayAPI.StateEntityMetadataPageResponse
 
 	// MARK: - Fungible
 	public typealias GetEntityFungiblesPage = @Sendable (GatewayAPI.StateEntityFungiblesPageRequest) async throws -> GatewayAPI.StateEntityFungiblesPageResponse

@@ -11,11 +11,13 @@ extension FungibleTokenDetails.State {
 			}(),
 			details: .init(
 				description: resource.metadata.get(\.description, prefetched: ownedFungibleResource?.metadata),
+				infoUrl: resource.metadata.infoURL,
 				resourceAddress: resourceAddress,
 				isXRD: isXRD,
 				validatorAddress: nil,
-				resourceName: nil,
+				resourceName: resource.metadata.name,
 				currentSupply: resource.totalSupply.map { $0?.formatted() ?? L10n.AssetDetails.supplyUnkown },
+				arbitraryDataFields: resource.metadata.arbitraryItems.asDataFields,
 				behaviors: resource.behaviors,
 				tags: {
 					let tags = resource.metadata.get(\.tags, prefetched: ownedFungibleResource?.metadata)

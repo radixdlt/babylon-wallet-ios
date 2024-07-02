@@ -180,7 +180,7 @@ final class AssetTransferDepositRuleTests: TestCase {
 	private func assertSignatureIsRequired(for account: Account, isRequired: Bool, onLedgerAccounts: [OnLedgerEntity.OnLedgerAccount]) async throws {
 		try await withTimeLimit(.fast) {
 			await withDependencies { d in
-				d.onLedgerEntitiesClient.getEntities = { _, _, _, _ in
+				d.onLedgerEntitiesClient.getEntities = { _, _, _, _, _ in
 					onLedgerAccounts.map { .account($0) }
 				}
 			} operation: {
