@@ -6,6 +6,7 @@ extension OnLedgerEntity.Metadata {
 			symbol: raw?.symbol,
 			description: raw?.description,
 			iconURL: raw?.iconURL,
+			infoURL: raw?.infoURL,
 			tags: raw?.extractTags() ?? [],
 			dappDefinitions: raw?.dappDefinitions?.compactMap { try? DappDefinitionAddress(validatingAddress: $0) },
 			dappDefinition: raw?.dappDefinition.flatMap { try? DappDefinitionAddress(validatingAddress: $0) },
@@ -16,7 +17,9 @@ extension OnLedgerEntity.Metadata {
 			claimedWebsites: raw?.claimedWebsites,
 			accountType: raw?.accountType,
 			ownerKeys: raw?.ownerKeys,
-			ownerBadge: raw?.ownerBadge
+			ownerBadge: raw?.ownerBadge,
+			arbitraryItems: raw?.arbitraryItems ?? [],
+			isComplete: raw?.isComplete ?? false
 		)
 	}
 }
@@ -173,6 +176,10 @@ extension GatewayAPI.EntityMetadataCollection {
 		value(.iconURL)?.asURL
 	}
 
+	public var infoURL: URL? {
+		value(.infoURL)?.asURL
+	}
+
 	public var dappDefinition: String? {
 		value(.dappDefinition)?.asGlobalAddress
 	}
@@ -199,6 +206,11 @@ extension GatewayAPI.EntityMetadataCollection {
 
 	public var ownerBadge: OnLedgerEntity.Metadata.OwnerBadgeWithStateVersion? {
 		items[.ownerBadge]?.map(\.asNonFungibleLocalID)
+	}
+
+	public var arbitraryItems: [OnLedgerEntity.Metadata.ArbitraryItem] {
+		let standardKeys = EntityMetadataKey.allCases.map(\.rawValue)
+		return items.filter { !standardKeys.contains($0.key) }
 	}
 
 	public var validator: ValidatorAddress? {
@@ -254,6 +266,10 @@ extension GatewayAPI.EntityMetadataCollection {
 			loggerGlobal.error("Failed to extract metadata \(error.localizedDescription)")
 			return nil
 		}
+	}
+
+	var isComplete: Bool {
+		nextCursor == nil
 	}
 }
 

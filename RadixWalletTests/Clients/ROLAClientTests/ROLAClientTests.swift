@@ -180,7 +180,7 @@ final class ROLAClientTests: TestCase {
 
 		// when
 		try await withDependencies {
-			$0.onLedgerEntitiesClient.getEntities = { _, _, _, _ in
+			$0.onLedgerEntitiesClient.getEntities = { _, _, _, _, _ in
 				[.account(.withMetadata(.init(metadataCollection)))]
 			}
 			$0.cacheClient.load = { _, _ in throw CacheClient.Error.dataLoadingFailed }
@@ -201,7 +201,7 @@ final class ROLAClientTests: TestCase {
 
 		// when
 		await withDependencies {
-			$0.onLedgerEntitiesClient.getEntities = { _, _, _, _ in
+			$0.onLedgerEntitiesClient.getEntities = { _, _, _, _, _ in
 				[.account(.withMetadata(.init(metadataCollection)))]
 			}
 			$0.cacheClient.load = { _, _ in throw CacheClient.Error.dataLoadingFailed }
@@ -228,7 +228,7 @@ final class ROLAClientTests: TestCase {
 
 		// when
 		await withDependencies {
-			$0.onLedgerEntitiesClient.getEntities = { _, _, _, _ in
+			$0.onLedgerEntitiesClient.getEntities = { _, _, _, _, _ in
 				[.account(.withMetadata(.init(metadataCollection)))]
 			}
 			$0.cacheClient.load = { _, _ in throw CacheClient.Error.dataLoadingFailed }
