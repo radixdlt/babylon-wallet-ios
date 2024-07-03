@@ -293,6 +293,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	private func scheduleFetchAccountPortfolioTimer(_ state: State) -> Effect<Action> {
 		.run { [address = state.account.address] _ in
 			for await _ in clock.timer(interval: .seconds(accountPortfolioRefreshIntervalInSeconds)) {
+				guard !Task.isCancelled else { return }
 				_ = try? await accountPortfoliosClient.fetchAccountPortfolio(address, true)
 			}
 		}

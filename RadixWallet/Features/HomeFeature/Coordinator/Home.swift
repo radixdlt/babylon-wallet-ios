@@ -233,6 +233,7 @@ public struct Home: Sendable, FeatureReducer {
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
+			.merge(with: scheduleFetchAccountPortfoliosTimer(state))
 
 		case let .accountsLoadedResult(.failure(error)):
 			errorQueue.schedule(error)
@@ -440,6 +441,7 @@ public struct Home: Sendable, FeatureReducer {
 	public func scheduleFetchAccountPortfoliosTimer(_ state: State) -> Effect<Action> {
 		.run { _ in
 			for await _ in clock.timer(interval: .seconds(accountPortfoliosRefreshIntervalInSeconds)) {
+				guard !Task.isCancelled else { return }
 				let accountAddresses = state.accounts.map(\.address)
 				_ = try? await accountPortfoliosClient.fetchAccountPortfolios(accountAddresses, true)
 			}

@@ -8,7 +8,7 @@ extension AssetsView {
 	) {
 		let mode = state.mode
 		let xrd = portfolio.account.fungibleResources.xrdResource.map { token in
-			let updatedRow = state.resources.fungibleTokenList?.update(token: token, for: .xrd)
+			let updatedRow = state.resources.fungibleTokenList?.updatedRow(token: token, for: .xrd)
 
 			return updatedRow ?? FungibleAssetList.Section.Row.State(
 				xrdToken: token,
@@ -16,7 +16,7 @@ extension AssetsView {
 			)
 		}
 		let nonXrd = portfolio.account.fungibleResources.nonXrdResources.map { token in
-			let updatedRow = state.resources.fungibleTokenList?.update(token: token, for: .nonXrd)
+			let updatedRow = state.resources.fungibleTokenList?.updatedRow(token: token, for: .nonXrd)
 
 			return updatedRow ?? FungibleAssetList.Section.Row.State(
 				nonXRDToken: token,
@@ -26,7 +26,7 @@ extension AssetsView {
 		.asIdentified()
 
 		let nfts = portfolio.account.nonFungibleResources.map { resource in
-			let updatedRow = state.resources.nonFungibleTokenList?.update(resource: resource)
+			let updatedRow = state.resources.nonFungibleTokenList?.updatedRow(resource: resource)
 
 			return updatedRow ?? NonFungibleAssetList.Row.State(
 				accountAddress: portfolio.account.address,
@@ -61,7 +61,7 @@ extension AssetsView {
 				let resourceDetails = state.accountPortfolio.poolUnitDetails.flatten().flatMap {
 					$0.first { poolUnit.resourcePoolAddress == $0.address }.map(Loadable.success) ?? .loading
 				}
-				let updatedPoolUnit = state.resources.poolUnitsList?.update(poolUnit: poolUnit, resourceDetails: resourceDetails)
+				let updatedPoolUnit = state.resources.poolUnitsList?.updatedPoolUnit(poolUnit: poolUnit, resourceDetails: resourceDetails)
 
 				return updatedPoolUnit ?? PoolUnitsList.State.PoolUnitState(
 					poolUnit: poolUnit,
@@ -140,7 +140,7 @@ extension Loadable where Value == AccountPortfoliosClient.AccountPortfolio {
 }
 
 extension FungibleAssetList.State {
-	public mutating func update(
+	public mutating func updatedRow(
 		token: OnLedgerEntity.OwnedFungibleResource,
 		for sectionID: FungibleAssetList.Section.State.ID
 	) -> FungibleAssetList.Section.Row.State? {
@@ -156,7 +156,7 @@ extension FungibleAssetList.State {
 }
 
 extension NonFungibleAssetList.State {
-	public mutating func update(resource: OnLedgerEntity.OwnedNonFungibleResource) -> NonFungibleAssetList.Row.State? {
+	public mutating func updatedRow(resource: OnLedgerEntity.OwnedNonFungibleResource) -> NonFungibleAssetList.Row.State? {
 		guard var row = rows.first(where: { $0.id == resource.resourceAddress }) else { return nil }
 		row.resource = resource
 		return row
@@ -164,7 +164,7 @@ extension NonFungibleAssetList.State {
 }
 
 extension PoolUnitsList.State {
-	public mutating func update(
+	public mutating func updatedPoolUnit(
 		poolUnit: OnLedgerEntity.OnLedgerAccount.PoolUnit,
 		resourceDetails: Loadable<OnLedgerEntitiesClient.OwnedResourcePoolDetails>
 	) -> PoolUnitsList.State.PoolUnitState? {
