@@ -100,6 +100,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
+	@Dependency(\.errorQueue) var errorQueue
 
 	public init() {}
 
@@ -187,6 +188,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 			_ = try await accountPortfoliosClient.fetchAccountPortfolio(address, true)
 		} catch: { error, _ in
 			loggerGlobal.error("AssetsView fetch failed: \(error)")
+			errorQueue.schedule(error)
 		}
 	}
 }
