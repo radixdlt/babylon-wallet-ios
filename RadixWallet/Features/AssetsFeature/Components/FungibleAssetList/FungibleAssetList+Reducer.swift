@@ -5,20 +5,6 @@ import SwiftUI
 public struct FungibleAssetList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var sections: IdentifiedArrayOf<FungibleAssetList.Section.State> = []
-
-		public mutating func update(
-			token: OnLedgerEntity.OwnedFungibleResource,
-			for sectionID: Section.State.ID
-		) -> FungibleAssetList.Section.Row.State? {
-			guard
-				let xrdSection = sections.first(where: { $0.id == sectionID }),
-				var row = xrdSection.rows.first(where: { $0.id == token.resourceAddress })
-			else { return nil }
-
-			row.token = token
-
-			return row
-		}
 	}
 
 	@CasePathable

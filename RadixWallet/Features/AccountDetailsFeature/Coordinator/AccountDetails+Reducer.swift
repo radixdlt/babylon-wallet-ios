@@ -292,15 +292,10 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	private func scheduleFetchAccountPortfolioTimer(_ state: State) -> Effect<Action> {
 		.run { [address = state.account.address] _ in
-			await withTaskCancellation(id: CancellableId.fetchAccountPortfolio, cancelInFlight: true) {
-				for await _ in clock.timer(interval: .seconds(accountPortfolioRefreshIntervalInSeconds)) {
-					do {
-						_ = try await accountPortfoliosClient.fetchAccountPortfolio(address, true)
-					} catch {
-						loggerGlobal.error("AccountDetails fetch account portfolio failed: \(error)")
-					}
-				}
+			for await _ in clock.timer(interval: .seconds(accountPortfolioRefreshIntervalInSeconds)) {
+				_ = try? await accountPortfoliosClient.fetchAccountPortfolio(address, true)
 			}
 		}
+		.cancellable(id: CancellableId.fetchAccountPortfolio, cancelInFlight: true)
 	}
 }

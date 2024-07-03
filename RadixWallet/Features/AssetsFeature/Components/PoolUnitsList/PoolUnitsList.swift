@@ -12,18 +12,6 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 			public var resourceDetails: Loadable<OnLedgerEntitiesClient.OwnedResourcePoolDetails> = .idle
 			public var isSelected: Bool? = nil
 		}
-
-		public mutating func update(
-			poolUnit: OnLedgerEntity.OnLedgerAccount.PoolUnit,
-			resourceDetails: Loadable<OnLedgerEntitiesClient.OwnedResourcePoolDetails>
-		) -> PoolUnitsList.State.PoolUnitState? {
-			guard var poolUnitState = poolUnits.first(where: { $0.id == poolUnit.resourcePoolAddress }) else { return nil }
-
-			poolUnitState.poolUnit = poolUnit
-			poolUnitState.resourceDetails = resourceDetails
-
-			return poolUnitState
-		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {

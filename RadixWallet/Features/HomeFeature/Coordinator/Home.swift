@@ -68,7 +68,6 @@ public struct Home: Sendable, FeatureReducer {
 		case accountsFiatWorthLoaded([AccountAddress: Loadable<FiatWorth>])
 		case showLinkConnectorIfNeeded
 		case setSecurityProblems([SecurityProblem])
-		case fetchAccountPortfolios
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -294,9 +293,6 @@ public struct Home: Sendable, FeatureReducer {
 				row.securityProblemsConfig.update(problems: problems)
 			}
 			return .none
-
-		case .fetchAccountPortfolios:
-			return fetchAccountPortfolios(state)
 		}
 	}
 
@@ -442,13 +438,13 @@ public struct Home: Sendable, FeatureReducer {
 	}
 
 	public func scheduleFetchAccountPortfoliosTimer(_ state: State) -> Effect<Action> {
-		.run { send in
-			await withTaskCancellation(id: CancellableId.fetchAccountPortfolios, cancelInFlight: true) {
-				for await _ in clock.timer(interval: .seconds(accountPortfoliosRefreshIntervalInSeconds)) {
-					await send(.internal(.fetchAccountPortfolios))
-				}
+		.run { _ in
+			for await _ in clock.timer(interval: .seconds(accountPortfoliosRefreshIntervalInSeconds)) {
+				let accountAddresses = state.accounts.map(\.address)
+				_ = try? await accountPortfoliosClient.fetchAccountPortfolios(accountAddresses, true)
 			}
 		}
+		.cancellable(id: CancellableId.fetchAccountPortfolios, cancelInFlight: true)
 	}
 }
 

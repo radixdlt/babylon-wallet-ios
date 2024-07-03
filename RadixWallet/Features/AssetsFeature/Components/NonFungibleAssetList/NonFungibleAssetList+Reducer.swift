@@ -4,12 +4,6 @@ import SwiftUI
 public struct NonFungibleAssetList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var rows: IdentifiedArrayOf<NonFungibleAssetList.Row.State>
-
-		public mutating func update(resource: OnLedgerEntity.OwnedNonFungibleResource) -> NonFungibleAssetList.Row.State? {
-			guard var row = rows.first(where: { $0.id == resource.resourceAddress }) else { return nil }
-			row.resource = resource
-			return row
-		}
 	}
 
 	public enum ChildAction: Sendable, Equatable {
