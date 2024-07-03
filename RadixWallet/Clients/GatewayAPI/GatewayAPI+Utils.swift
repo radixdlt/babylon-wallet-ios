@@ -25,6 +25,9 @@ extension GatewayAPI.FungibleResourcesCollectionItemVaultAggregated: @unchecked 
 // MARK: - GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregated + Sendable
 extension GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregated: @unchecked Sendable {}
 
+// MARK: - GatewayAPI.EntityMetadataItem + Sendable
+extension GatewayAPI.EntityMetadataItem: @unchecked Sendable {}
+
 extension GatewayAPI.StateEntityDetailsResponseItemDetails {
 	public var fungible: GatewayAPI.StateEntityDetailsResponseFungibleResourceDetails? {
 		if case let .fungibleResource(details) = self {
@@ -48,6 +51,7 @@ public enum EntityMetadataKey: String, CaseIterable, Sendable {
 	case description
 	case tags
 	case iconURL = "icon_url"
+	case infoURL = "info_url"
 	case dappDefinition = "dapp_definition"
 	case validator
 	case pool
@@ -61,12 +65,12 @@ public enum EntityMetadataKey: String, CaseIterable, Sendable {
 	case ownerBadge = "owner_badge"
 
 	// The GW limits the number of metadata keys we can ask for
-	static let maxAllowedKeys = 10
+	static let maxAllowedKeys = 11
 }
 
 extension Set<EntityMetadataKey> {
 	public static var resourceMetadataKeys: Set<EntityMetadataKey> {
-		let keys: Set<EntityMetadataKey> = [.name, .symbol, .description, .iconURL, .validator, .pool, .accountType, .tags, .dappDefinition, .dappDefinitions]
+		let keys: Set<EntityMetadataKey> = [.name, .symbol, .description, .iconURL, .infoURL, .validator, .pool, .accountType, .tags, .dappDefinition, .dappDefinitions]
 		assert(keys.count <= EntityMetadataKey.maxAllowedKeys)
 		return keys
 	}
