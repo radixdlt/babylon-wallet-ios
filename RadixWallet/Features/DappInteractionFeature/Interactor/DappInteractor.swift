@@ -19,6 +19,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 		@PresentationState
 		public var destination: Destination.State?
+
+		fileprivate var shouldIncrementOnCompletionDismiss = false
 	}
 
 	enum ViewAction: Sendable, Equatable {
@@ -128,7 +130,9 @@ struct DappInteractor: Sendable, FeatureReducer {
 			}
 
 		case .completionDismissed:
-			npsSurveyClient.incrementTransactionCompleteCounter()
+			if state.shouldIncrementOnCompletionDismiss {
+				npsSurveyClient.incrementTransactionCompleteCounter()
+			}
 			return .none
 		}
 	}
@@ -209,6 +213,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			return .none
 
 		case let .presentResponseSuccessView(dappMetadata, txID, p2pRoute):
+			state.shouldIncrementOnCompletionDismiss = txID != nil
 			state.destination = .dappInteractionCompletion(
 				.init(
 					txID: txID,
