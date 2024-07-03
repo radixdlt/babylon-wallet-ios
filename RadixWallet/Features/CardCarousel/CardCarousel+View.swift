@@ -85,8 +85,6 @@ extension CardCarousel {
 
 // MARK: - CarouselCardView
 public struct CarouselCardView: View {
-	private let trailingPadding: CGFloat = 96
-
 	public let card: CarouselCard
 	public let action: () -> Void
 	public let closeAction: () -> Void
@@ -98,6 +96,7 @@ public struct CarouselCardView: View {
 					HStack {
 						Text(title)
 							.textStyle(.body1Header)
+							.minimumScaleFactor(0.8)
 
 						if case .openURL = card.action {
 							Image(.iconLinkOut)
@@ -124,7 +123,15 @@ public struct CarouselCardView: View {
 				.cornerRadius(.small1)
 			}
 
-			CloseButton(action: closeAction)
+			// CloseButton(action: closeAction)
+			Button(action: closeAction) {
+				Image(asset: AssetResource.close)
+					.resizable()
+					.frame(width: .medium3, height: .medium3)
+					.tint(.app.gray1)
+					.padding(.small2)
+			}
+			.frame(.small, alignment: .topTrailing)
 		}
 	}
 
@@ -134,6 +141,17 @@ public struct CarouselCardView: View {
 		public var body: some SwiftUI.View {
 			CarouselCardView(card: card, action: {}, closeAction: {})
 				.disabled(true)
+		}
+	}
+
+	private var trailingPadding: CGFloat {
+		switch card.id {
+		case .rejoinRadQuest, .discoverRadix:
+			95
+		case .continueOnDapp:
+			85
+		case .useDappsOnDesktop:
+			106
 		}
 	}
 
@@ -147,8 +165,6 @@ public struct CarouselCardView: View {
 			L10n.HomePageCarousel.ContinueOnDapp.title
 		case .useDappsOnDesktop:
 			L10n.HomePageCarousel.UseDappsOnDesktop.title
-		case .threeSixtyDegrees:
-			L10n.HomePageCarousel.ThreesixtyDegrees.title
 		}
 	}
 
@@ -162,50 +178,41 @@ public struct CarouselCardView: View {
 			L10n.HomePageCarousel.ContinueOnDapp.text
 		case .useDappsOnDesktop:
 			L10n.HomePageCarousel.UseDappsOnDesktop.text
-		case .threeSixtyDegrees:
-			L10n.HomePageCarousel.ThreesixtyDegrees.text
 		}
 	}
 
 	private var background: some View {
 		switch card.id {
 		case .rejoinRadQuest:
-			cardBackground(.carouselBackgroundRadquest, type: .gradient)
+			cardBackground(.gradient(.carouselBackgroundRadquest))
 		case .discoverRadix:
-			cardBackground(.carouselBackgroundRadquest, type: .gradient)
+			cardBackground(.gradient(.carouselBackgroundRadquest))
 		case .continueOnDapp:
-			cardBackground(.carouselIconContinueOnDapp, type: .icon)
+			cardBackground(.thumbnail(.dapp, .init(string: "https://assets.caviarnine.com/tokens/caviar_babylon.png")))
 		case .useDappsOnDesktop:
-			cardBackground(.carouselBackgroundConnect, type: .gradient)
-		case .threeSixtyDegrees:
-			cardBackground(.carouselFullBackground360, type: .full)
+			cardBackground(.gradient(.carouselBackgroundConnect))
 		}
 	}
 
 	@ViewBuilder
-	private func cardBackground(_ imageResource: ImageResource, type: BackgroundType) -> some View {
+	private func cardBackground(_ type: BackgroundType) -> some View {
 		switch type {
-		case .icon:
-			Image(imageResource)
+		case let .thumbnail(type, url):
+			Thumbnail(type, url: url, size: .smallish)
 				.padding(.trailing, .medium2)
 				.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
-		case .gradient:
+		case let .gradient(imageResource):
 			Image(imageResource)
 				.resizable()
 				.aspectRatio(contentMode: .fill)
 				.mask {
 					LinearGradient(colors: [.clear, .white, .white], startPoint: .leading, endPoint: .trailing)
 				}
-		case .full:
-			Image(imageResource)
-				.resizable()
-				.aspectRatio(contentMode: .fill)
 		}
 	}
 
 	private enum BackgroundType {
-		case icon
-		case gradient
-		case full
+		case thumbnail(Thumbnail.ContentType, URL?)
+		case gradient(ImageResource)
 	}
 }

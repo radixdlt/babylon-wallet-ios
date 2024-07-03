@@ -11,7 +11,6 @@ extension CardCarouselClient: DependencyKey {
 			.init(id: .discoverRadix, action: .openURL(.init(string: "https://www.radixdlt.com/blog")!)),
 			.init(id: .continueOnDapp, action: .dismiss),
 			.init(id: .useDappsOnDesktop, action: .dismiss),
-			.init(id: .threeSixtyDegrees, action: .dismiss),
 		]
 
 		let cardSubject = AsyncCurrentValueSubject(allCards)

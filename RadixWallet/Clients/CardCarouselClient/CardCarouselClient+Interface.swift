@@ -25,7 +25,6 @@ public struct CarouselCard: Hashable, Sendable, Identifiable {
 		case discoverRadix
 		case continueOnDapp
 		case useDappsOnDesktop
-		case threeSixtyDegrees
 	}
 
 	public enum Action: Hashable, Sendable {
