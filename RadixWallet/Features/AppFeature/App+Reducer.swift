@@ -58,6 +58,7 @@ public struct App: Sendable, FeatureReducer {
 	@Dependency(\.deepLinkHandlerClient) var deepLinkHandlerClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.resetWalletClient) var resetWalletClient
+	@Dependency(\.cardCarouselClient) var cardCarouselClient
 
 	public init() {}
 
@@ -126,6 +127,7 @@ public struct App: Sendable, FeatureReducer {
 	}
 
 	private func goToMain(state: inout State) -> Effect<Action> {
+		cardCarouselClient.startForNewWallet()
 		state.root = .main(.init(
 			home: .init())
 		)

@@ -1,38 +1,61 @@
 import ComposableArchitecture
 
+// MARK: - CardCarouselClient + DependencyKey
 extension CardCarouselClient: DependencyKey {
 	public static let liveValue: Self = {
-		// Delete if not needed
-		@Dependency(\.userDefaults) var userDefaults
-
-		// Just for testing
-		let allCards: [CarouselCard] = [
-			.init(id: .rejoinRadQuest, action: .dismiss),
-			.init(id: .discoverRadix, action: .openURL(.init(string: "https://www.radixdlt.com/blog")!)),
-			.init(id: .continueOnDapp, action: .dismiss),
-			.init(id: .useDappsOnDesktop, action: .dismiss),
-		]
-
-		let cardSubject = AsyncCurrentValueSubject(allCards)
-
-		@Sendable
-		func closeCard(id: CarouselCard.ID) {
-			guard let index = cardSubject.value.map(\.id).firstIndex(of: id) else { return }
-			cardSubject.value.remove(at: index)
-		}
+		let observer = HomeCardsObserver()
+		// TODO: where to get networkId
+		let manager = HomeCardsManager(networkAntenna: URLSession.shared, networkId: .mainnet, cardsStorage: HomeCardsStorage(), observer: observer)
 
 		return Self(
 			cards: {
-				cardSubject.eraseToAnyAsyncSequence()
+				observer.subject.eraseToAnyAsyncSequence()
 			},
-			tappedCard: { id in
-				closeCard(id: id)
-				// TODO: Store the fact that we have tapped this card somewhere
+			removeCard: { card in
+				Task {
+					try? await manager.removeCard(card: card)
+				}
 			},
-			closeCard: { id in
-				closeCard(id: id)
-				// TODO: Store the fact that we have closed this card somewhere
+			start: {
+				Task {
+					try? await manager.initCards()
+				}
+			},
+			startForNewWallet: {
+				Task {
+					try? await manager.initCardsForNewWallet()
+				}
+			},
+			handleDeferredDeepLink: { value in
+				Task {
+					try? await manager.handleDeferredDeepLink(encodedValue: value)
+				}
 			}
 		)
 	}()
+}
+
+// MARK: - HomeCardsManager + Sendable
+extension HomeCardsManager: @unchecked Sendable {}
+
+// MARK: - HomeCardsStorage
+private final class HomeCardsStorage: Sargon.HomeCardsStorage {
+	@Dependency(\.userDefaults) var userDefaults
+
+	func saveCards(encodedCards: Data) async throws {
+		userDefaults.setHomeCards(encodedCards)
+	}
+
+	func loadCards() async throws -> Data? {
+		userDefaults.getHomeCards()
+	}
+}
+
+// MARK: - HomeCardsObserver
+private final class HomeCardsObserver: Sargon.HomeCardsObserver, Sendable {
+	let subject: AsyncCurrentValueSubject<[HomeCard]> = .init([])
+
+	func handleCardsUpdate(cards: [HomeCard]) {
+		subject.send(cards)
+	}
 }

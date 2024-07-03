@@ -1,42 +1,32 @@
 // MARK: - CardCarouselClient
 public struct CardCarouselClient: Sendable {
 	public var cards: Cards
-	public var tappedCard: TappedCard
-	public var closeCard: CloseCard
+	public var removeCard: RemoveCard
+	public var start: Start
+	public var startForNewWallet: StartForNewWallet
+	public var handleDeferredDeepLink: HandleDeferredDeepLink
 
 	init(
 		cards: @escaping Cards,
-		tappedCard: @escaping TappedCard,
-		closeCard: @escaping CloseCard
+		removeCard: @escaping RemoveCard,
+		start: @escaping Start,
+		startForNewWallet: @escaping StartForNewWallet,
+		handleDeferredDeepLink: @escaping HandleDeferredDeepLink
 	) {
 		self.cards = cards
-		self.tappedCard = tappedCard
-		self.closeCard = closeCard
-	}
-}
-
-// MARK: - CarouselCard
-public struct CarouselCard: Hashable, Sendable, Identifiable {
-	public let id: CardID
-	public let action: Action
-
-	public enum CardID: Sendable {
-		case rejoinRadQuest
-		case discoverRadix
-		case continueOnDapp
-		case useDappsOnDesktop
-	}
-
-	public enum Action: Hashable, Sendable {
-		case openURL(URL)
-		case dismiss
+		self.removeCard = removeCard
+		self.start = start
+		self.startForNewWallet = startForNewWallet
+		self.handleDeferredDeepLink = handleDeferredDeepLink
 	}
 }
 
 extension CardCarouselClient {
-	public typealias Cards = @Sendable () -> AnyAsyncSequence<[CarouselCard]>
-	public typealias TappedCard = @Sendable (CarouselCard.ID) -> Void
-	public typealias CloseCard = @Sendable (CarouselCard.ID) -> Void
+	public typealias Cards = @Sendable () -> AnyAsyncSequence<[HomeCard]>
+	public typealias RemoveCard = @Sendable (HomeCard) -> Void
+	public typealias Start = @Sendable () -> Void
+	public typealias StartForNewWallet = @Sendable () -> Void
+	public typealias HandleDeferredDeepLink = @Sendable (String) -> Void
 }
 
 extension DependencyValues {

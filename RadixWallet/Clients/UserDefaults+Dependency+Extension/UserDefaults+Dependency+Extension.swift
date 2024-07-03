@@ -16,6 +16,7 @@ public enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
 	case lastSyncedAccountsWithCE
 	case showRelinkConnectorsAfterUpdate
 	case showRelinkConnectorsAfterProfileRestore
+	case homeCards
 
 	/// DO NOT CHANGE THIS KEY
 	case activeProfileID
@@ -232,6 +233,14 @@ extension UserDefaults.Dependency {
 
 	public func setShowRelinkConnectorsAfterProfileRestore(_ value: Bool) {
 		set(value, forKey: Key.showRelinkConnectorsAfterProfileRestore.rawValue)
+	}
+
+	public func getHomeCards() -> Data? {
+		data(key: .homeCards)
+	}
+
+	public func setHomeCards(_ value: Data) {
+		set(data: value, key: .homeCards)
 	}
 }
 

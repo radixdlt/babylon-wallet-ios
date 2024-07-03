@@ -5,7 +5,7 @@ import ComposableArchitecture
 public struct CardCarousel: FeatureReducer, Sendable {
 	@ObservableState
 	public struct State: Hashable, Sendable {
-		public var cards: [CarouselCard] = []
+		public var cards: [HomeCard] = []
 	}
 
 	public typealias Action = FeatureAction<Self>
@@ -13,13 +13,13 @@ public struct CardCarousel: FeatureReducer, Sendable {
 	@CasePathable
 	public enum ViewAction: Equatable, Sendable {
 		case didAppear
-		case cardTapped(CarouselCard)
-		case closeTapped(CarouselCard.ID)
+		case cardTapped(HomeCard)
+		case closeTapped(HomeCard)
 	}
 
 	@CasePathable
 	public enum InternalAction: Equatable, Sendable {
-		case setCards([CarouselCard])
+		case setCards([HomeCard])
 	}
 
 	@Dependency(\.cardCarouselClient) var cardCarouselClient
@@ -32,7 +32,7 @@ public struct CardCarousel: FeatureReducer, Sendable {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .didAppear:
-			return .run { send in
+			.run { send in
 				do {
 					for try await cards in cardCarouselClient.cards() {
 						await send(.internal(.setCards(cards)))
@@ -40,18 +40,10 @@ public struct CardCarousel: FeatureReducer, Sendable {
 				} catch {}
 			}
 		case let .cardTapped(card):
-			cardCarouselClient.tappedCard(card.id)
-			switch card.action {
-			case let .openURL(url):
-				return .run { _ in
-					await openURL(url)
-				}
-			case .dismiss:
-				return .none
-			}
-		case let .closeTapped(id):
-			cardCarouselClient.closeCard(id)
-			return .none
+			cardTappedEffect(card)
+				.merge(with: removeCardEffect(card))
+		case let .closeTapped(card):
+			removeCardEffect(card)
 		}
 	}
 
@@ -60,6 +52,26 @@ public struct CardCarousel: FeatureReducer, Sendable {
 		case let .setCards(cards):
 			state.cards = cards
 			return .none
+		}
+	}
+
+	private func removeCardEffect(_ card: HomeCard) -> Effect<Action> {
+		cardCarouselClient.removeCard(card)
+		return .none
+	}
+
+	private func cardTappedEffect(_ card: HomeCard) -> Effect<Action> {
+		switch card {
+		case .continueRadQuest, .dapp:
+			.none
+		case .startRadQuest:
+			.run { _ in
+				// TODO: Define RadQuest URL
+				await openURL(.init(string: "https://radixdlt.com")!)
+			}
+		case .connector:
+			// TODO: Ask delegate to open link connector view
+			.none
 		}
 	}
 }

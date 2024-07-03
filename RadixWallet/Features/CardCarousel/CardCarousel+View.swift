@@ -32,11 +32,11 @@ extension CardCarousel {
 		private var coreView: some SwiftUI.View {
 			WithPerceptionTracking {
 				TabView {
-					ForEach(store.cards) { card in
+					ForEachStatic(store.cards) { card in
 						CarouselCardView(card: card) {
 							store.send(.view(.cardTapped(card)))
 						} closeAction: {
-							store.send(.view(.closeTapped(card.id)), animation: .default)
+							store.send(.view(.closeTapped(card)), animation: .default)
 						}
 						.measurePosition(card, coordSpace: Self.coordSpace)
 						.padding(.horizontal, 0.5 * spacing)
@@ -62,12 +62,12 @@ extension CardCarousel {
 			}
 		}
 
-		private func dummyPositions(_ positions: [AnyHashable: CGRect], frame: CGRect, cards: [CarouselCard]) -> [(card: CarouselCard, pos: CGRect)] {
+		private func dummyPositions(_ positions: [AnyHashable: CGRect], frame: CGRect, cards: [HomeCard]) -> [(card: HomeCard, pos: CGRect)] {
 			guard let width = positions.first?.value.width else { return [] }
 
-			let thisCard = positions.mapValues { abs($0.midX - frame.midX) }.min { $0.value < $1.value }?.key.base as? CarouselCard
+			let thisCard = positions.mapValues { abs($0.midX - frame.midX) }.min { $0.value < $1.value }?.key.base as? HomeCard
 			guard let thisCard, let currentIndex = cards.firstIndex(of: thisCard), let rect = positions[thisCard] else { return [] }
-			var result: [(CarouselCard, CGRect)] = []
+			var result: [(HomeCard, CGRect)] = []
 			if cards.indices.contains(currentIndex - 1) {
 				result.append((cards[currentIndex - 1], rect.offsetBy(dx: -(width + spacing), dy: 0)))
 			}
@@ -85,7 +85,7 @@ extension CardCarousel {
 
 // MARK: - CarouselCardView
 public struct CarouselCardView: View {
-	public let card: CarouselCard
+	public let card: HomeCard
 	public let action: () -> Void
 	public let closeAction: () -> Void
 
@@ -98,7 +98,7 @@ public struct CarouselCardView: View {
 							.textStyle(.body1Header)
 							.minimumScaleFactor(0.8)
 
-						if case .openURL = card.action {
+						if showLinkIcon {
 							Image(.iconLinkOut)
 								.foregroundStyle(.app.gray2)
 						}
@@ -136,7 +136,7 @@ public struct CarouselCardView: View {
 	}
 
 	public struct Dummy: View {
-		let card: CarouselCard
+		let card: HomeCard
 
 		public var body: some SwiftUI.View {
 			CarouselCardView(card: card, action: {}, closeAction: {})
@@ -145,52 +145,61 @@ public struct CarouselCardView: View {
 	}
 
 	private var trailingPadding: CGFloat {
-		switch card.id {
-		case .rejoinRadQuest, .discoverRadix:
+		switch card {
+		case .continueRadQuest, .startRadQuest:
 			95
-		case .continueOnDapp:
+		case .dapp:
 			85
-		case .useDappsOnDesktop:
+		case .connector:
 			106
 		}
 	}
 
 	private var title: String {
-		switch card.id {
-		case .rejoinRadQuest:
+		switch card {
+		case .continueRadQuest:
 			L10n.HomePageCarousel.RejoinRadquest.title
-		case .discoverRadix:
+		case .startRadQuest:
 			L10n.HomePageCarousel.DiscoverRadix.title
-		case .continueOnDapp:
+		case .dapp:
 			L10n.HomePageCarousel.ContinueOnDapp.title
-		case .useDappsOnDesktop:
+		case .connector:
 			L10n.HomePageCarousel.UseDappsOnDesktop.title
 		}
 	}
 
 	private var text: String {
-		switch card.id {
-		case .rejoinRadQuest:
+		switch card {
+		case .continueRadQuest:
 			L10n.HomePageCarousel.RejoinRadquest.text
-		case .discoverRadix:
+		case .startRadQuest:
 			L10n.HomePageCarousel.DiscoverRadix.text
-		case .continueOnDapp:
+		case .dapp:
 			L10n.HomePageCarousel.ContinueOnDapp.text
-		case .useDappsOnDesktop:
+		case .connector:
 			L10n.HomePageCarousel.UseDappsOnDesktop.text
 		}
 	}
 
 	private var background: some View {
-		switch card.id {
-		case .rejoinRadQuest:
+		switch card {
+		case .continueRadQuest:
 			cardBackground(.gradient(.carouselBackgroundRadquest))
-		case .discoverRadix:
+		case .startRadQuest:
 			cardBackground(.gradient(.carouselBackgroundRadquest))
-		case .continueOnDapp:
-			cardBackground(.thumbnail(.dapp, .init(string: "https://assets.caviarnine.com/tokens/caviar_babylon.png")))
-		case .useDappsOnDesktop:
+		case let .dapp(url):
+			cardBackground(.thumbnail(.dapp, url))
+		case .connector:
 			cardBackground(.gradient(.carouselBackgroundConnect))
+		}
+	}
+
+	private var showLinkIcon: Bool {
+		switch card {
+		case .startRadQuest:
+			true
+		case .continueRadQuest, .dapp, .connector:
+			false
 		}
 	}
 
