@@ -85,7 +85,7 @@ extension CardCarousel {
 
 // MARK: - CarouselCardView
 public struct CarouselCardView: View {
-	private let trailingPadding: CGFloat = 115
+	private let trailingPadding: CGFloat = 96
 
 	public let card: CarouselCard
 	public let action: () -> Void
