@@ -97,7 +97,7 @@ platform :ios do
     end
 
     desc "Installs distribution certificates"
-    desc "Usage `bundle exec fastlane ios install_distribution_certificate --env ios.<specific env>`"
+    desc "Usage `bundle exec fastlane ios install_distribution_certificates --env ios.<specific env>`"
     lane :install_distribution_certificates do
         code_signing(type: "appstore")
     end

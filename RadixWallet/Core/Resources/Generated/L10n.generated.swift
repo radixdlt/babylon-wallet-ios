@@ -1795,6 +1795,38 @@ public enum L10n {
       public static let title = L10n.tr("Localizable", "homePage_visitDashboard_title", fallback: "Visit the Radix Dashboard")
     }
   }
+  public enum HomePageCarousel {
+    public enum ContinueOnDapp {
+      /// You can now connect with your Radix Wallet. Tap to dismiss.
+      public static let text = L10n.tr("Localizable", "homePageCarousel_continueOnDapp_text", fallback: "You can now connect with your Radix Wallet. Tap to dismiss.")
+      /// Continue on dApp in browser
+      public static let title = L10n.tr("Localizable", "homePageCarousel_continueOnDapp_title", fallback: "Continue on dApp in browser")
+    }
+    public enum DiscoverRadix {
+      /// Start RadQuest, learn about Radix, earn XRD and collectibles.
+      public static let text = L10n.tr("Localizable", "homePageCarousel_discoverRadix_text", fallback: "Start RadQuest, learn about Radix, earn XRD and collectibles.")
+      /// Discover Radix. Get XRD
+      public static let title = L10n.tr("Localizable", "homePageCarousel_discoverRadix_title", fallback: "Discover Radix. Get XRD")
+    }
+    public enum RejoinRadquest {
+      /// Continue your Radix journey in your browser. Tap to dismiss.
+      public static let text = L10n.tr("Localizable", "homePageCarousel_rejoinRadquest_text", fallback: "Continue your Radix journey in your browser. Tap to dismiss.")
+      /// Rejoin Radquest
+      public static let title = L10n.tr("Localizable", "homePageCarousel_rejoinRadquest_title", fallback: "Rejoin Radquest")
+    }
+    public enum ThreesixtyDegrees {
+      /// Secure your Accounts and Personas with Security shields
+      public static let text = L10n.tr("Localizable", "homePageCarousel_threesixtyDegrees_text", fallback: "Secure your Accounts and Personas with Security shields")
+      /// 360 Degrees of Security
+      public static let title = L10n.tr("Localizable", "homePageCarousel_threesixtyDegrees_title", fallback: "360 Degrees of Security")
+    }
+    public enum UseDappsOnDesktop {
+      /// Connect to dApps on the big screen with Radix Connector.
+      public static let text = L10n.tr("Localizable", "homePageCarousel_useDappsOnDesktop_text", fallback: "Connect to dApps on the big screen with Radix Connector.")
+      /// Use dApps on Desktop
+      public static let title = L10n.tr("Localizable", "homePageCarousel_useDappsOnDesktop_title", fallback: "Use dApps on Desktop")
+    }
+  }
   public enum IOSProfileBackup {
     /// Available backups:
     public static let cloudBackupWallet = L10n.tr("Localizable", "iOSProfileBackup_cloudBackupWallet", fallback: "Available backups:")
@@ -2216,9 +2248,9 @@ public enum L10n {
     public static let linkBody1 = L10n.tr("Localizable", "mobileConnect_linkBody1", fallback: "Does the website address match what you’re expecting?")
     /// If you came from a social media ad, is the website legitimate?
     public static let linkBody2 = L10n.tr("Localizable", "mobileConnect_linkBody2", fallback: "If you came from a social media ad, is the website legitimate?")
-    /// Before you connect to %@, you might want to check:
+    /// Before you connect to **%@**, you might want to check:
     public static func linkSubtitle(_ p1: Any) -> String {
-      return L10n.tr("Localizable", "mobileConnect_linkSubtitle", String(describing: p1), fallback: "Before you connect to %@, you might want to check:")
+      return L10n.tr("Localizable", "mobileConnect_linkSubtitle", String(describing: p1), fallback: "Before you connect to **%@**, you might want to check:")
     }
     /// Have you come from a genuine website?
     public static let linkTitle = L10n.tr("Localizable", "mobileConnect_linkTitle", fallback: "Have you come from a genuine website?")

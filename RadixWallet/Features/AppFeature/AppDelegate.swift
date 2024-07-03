@@ -1,7 +1,10 @@
 import ComposableArchitecture
 import SwiftUI
 
+// MARK: - AppDelegate
 public final class AppDelegate: NSObject, UIApplicationDelegate {
+	@Dependency(\.appsFlyerClient) var appsFlyerClient
+
 	public func application(
 		_ application: UIApplication,
 		configurationForConnecting connectingSceneSession: UISceneSession,
@@ -13,9 +16,12 @@ public final class AppDelegate: NSObject, UIApplicationDelegate {
 	}
 
 	public func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
-		@Dependency(\.appsFlyerClient) var appsFlyerClient
 		appsFlyerClient.start()
+		return true
+	}
 
+	public func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([any UIUserActivityRestoring]?) -> Void) -> Bool {
+		appsFlyerClient.continue(userActivity)
 		return true
 	}
 }
