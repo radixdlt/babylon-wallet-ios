@@ -148,28 +148,34 @@ private extension AddressDetails.View {
 
 	private var colorisedText: AttributedString {
 		let address = store.address
-		let raw = address.formatted(.raw)
-		var result = AttributedString(raw, foregroundColor: .app.gray2)
-
-		let truncatedParts: [String] =
+		let parts: [(raw: String, trimmed: String)] =
 			switch address {
 			case let .nonFungibleGlobalID(globalId):
-				[globalId.resourceAddress.formatted(.default), globalId.localID.formatted(.default)]
+				[
+					(globalId.resourceAddress.formatted(.raw), globalId.resourceAddress.formatted(.default)),
+					(globalId.localID.formatted(.raw), globalId.localID.formatted(.default)),
+				]
 			default:
-				[address.formatted(.default)]
+				[(address.formatted(.raw), address.formatted(.default))]
 			}
 
-		for part in truncatedParts {
-			let boldChars = part.split(separator: "...")
-			if let range = result.range(of: boldChars[0]) {
-				result[range].foregroundColor = .app.gray1
+		let result = NSMutableAttributedString()
+		for (index, part) in parts.enumerated() {
+			var attributed = AttributedString(part.raw, foregroundColor: .app.gray2)
+			let boldChars = part.trimmed.split(separator: "...")
+			if let range = attributed.range(of: boldChars[0]) {
+				attributed[range].foregroundColor = .app.gray1
 			}
-			if boldChars.count == 2, let range = result.range(of: boldChars[1], options: .backwards) {
-				result[range].foregroundColor = .app.gray1
+			if boldChars.count == 2, let range = attributed.range(of: boldChars[1], options: .backwards) {
+				attributed[range].foregroundColor = .app.gray1
+			}
+			result.append(.init(attributed))
+			if (index + 1) != parts.count {
+				result.append(.init(AttributedString(":", foregroundColor: .app.gray2)))
 			}
 		}
 
-		return result
+		return .init(result)
 	}
 }
 
