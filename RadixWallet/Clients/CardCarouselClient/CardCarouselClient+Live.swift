@@ -4,7 +4,9 @@ import ComposableArchitecture
 extension CardCarouselClient: DependencyKey {
 	public static let liveValue: Self = {
 		let observer = HomeCardsObserver()
-		// TODO: where to get networkId
+
+		// We are hardcoding to `.mainnet` because the cards are currently gateway agnostic. In the future, when Profile is integrated into Sargon, it will be Sargon
+		// observing the current gateway and defining the networkId to use.
 		let manager = HomeCardsManager(networkAntenna: URLSession.shared, networkId: .mainnet, cardsStorage: HomeCardsStorage(), observer: observer)
 
 		return Self(
