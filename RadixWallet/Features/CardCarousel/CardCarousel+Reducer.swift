@@ -22,6 +22,10 @@ public struct CardCarousel: FeatureReducer, Sendable {
 		case setCards([HomeCard])
 	}
 
+	public enum DelegateAction: Sendable, Equatable {
+		case addConnector
+	}
+
 	@Dependency(\.cardCarouselClient) var cardCarouselClient
 	@Dependency(\.openURL) var openURL
 
@@ -70,8 +74,7 @@ public struct CardCarousel: FeatureReducer, Sendable {
 				await openURL(.init(string: "https://radixdlt.com")!)
 			}
 		case .connector:
-			// TODO: Ask delegate to open link connector view
-			.none
+			.send(.delegate(.addConnector))
 		}
 	}
 }
