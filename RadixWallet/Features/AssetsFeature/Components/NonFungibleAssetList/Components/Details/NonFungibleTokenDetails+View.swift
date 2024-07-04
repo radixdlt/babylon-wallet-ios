@@ -14,7 +14,7 @@ extension NonFungibleTokenDetails.State {
 				resourceAddress: resourceAddress,
 				isXRD: false,
 				validatorAddress: nil,
-				resourceName: resourceDetails.metadata.title,
+				resourceName: resourceDetails.metadata.name,
 				currentSupply: resourceDetails.totalSupply.map { $0?.formatted() },
 				arbitraryDataFields: resourceDetails.metadata.arbitraryItems.asDataFields,
 				behaviors: resourceDetails.behaviors,
