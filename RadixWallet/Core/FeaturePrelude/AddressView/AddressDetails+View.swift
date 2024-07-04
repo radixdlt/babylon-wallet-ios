@@ -74,10 +74,14 @@ public extension AddressDetails {
 			Group {
 				switch store.qrImage {
 				case let .success(value):
-					Image(decorative: value, scale: 1)
-						.resizable()
-						.aspectRatio(1, contentMode: .fit)
-						.transition(.scale(scale: 0.95).combined(with: .opacity))
+					GeometryReader { proxy in
+						Image(decorative: value, scale: 1)
+							.resizable()
+							.frame(width: proxy.size.height, height: proxy.size.height)
+							.frame(maxWidth: .infinity)
+							.transition(.scale(scale: 0.95).combined(with: .opacity))
+					}
+
 				case .failure:
 					Text(L10n.AddressDetails.qrCodeFailure)
 						.textStyle(.body1HighImportance)
