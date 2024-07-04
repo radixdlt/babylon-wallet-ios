@@ -5,9 +5,9 @@ extension CardCarouselClient: TestDependencyKey {
 	public static let testValue = Self(
 		cards: unimplemented("\(Self.self).cards"),
 		removeCard: unimplemented("\(Self.self).removeCard"),
-		start: unimplemented("\(Self.self).start"),
-		startForNewWallet: unimplemented("\(Self.self).startForNewWallet"),
-		handleDeferredDeepLink: unimplemented("\(Self.self).handleDeferredDeepLink")
+		walletStarted: unimplemented("\(Self.self).walletStarted"),
+		walletCreated: unimplemented("\(Self.self).walletCreated"),
+		deepLinkReceived: unimplemented("\(Self.self).deepLinkReceived")
 	)
 }
 
@@ -15,8 +15,8 @@ extension CardCarouselClient {
 	public static let noop = Self(
 		cards: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		removeCard: { _ in },
-		start: {},
-		startForNewWallet: {},
-		handleDeferredDeepLink: { _ in }
+		walletStarted: {},
+		walletCreated: {},
+		deepLinkReceived: { _ in }
 	)
 }

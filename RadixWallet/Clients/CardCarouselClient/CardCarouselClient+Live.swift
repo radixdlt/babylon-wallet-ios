@@ -13,22 +13,22 @@ extension CardCarouselClient: DependencyKey {
 			},
 			removeCard: { card in
 				Task {
-					try? await manager.removeCard(card: card)
+					try? await manager.cardDismissed(card: card)
 				}
 			},
-			start: {
+			walletStarted: {
 				Task {
-					try? await manager.initCards()
+					try? await manager.walletStarted()
 				}
 			},
-			startForNewWallet: {
+			walletCreated: {
 				Task {
-					try? await manager.initCardsForNewWallet()
+					try? await manager.walletCreated()
 				}
 			},
-			handleDeferredDeepLink: { value in
+			deepLinkReceived: { value in
 				Task {
-					try? await manager.handleDeferredDeepLink(encodedValue: value)
+					try? await manager.deepLinkReceived(encodedValue: value)
 				}
 			}
 		)

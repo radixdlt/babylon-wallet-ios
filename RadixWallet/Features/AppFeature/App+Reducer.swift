@@ -92,6 +92,7 @@ public struct App: Sendable, FeatureReducer {
 			}
 			return .none
 		case .task:
+			cardCarouselClient.walletStarted()
 			return didResetWalletEffect()
 		}
 	}
@@ -127,7 +128,6 @@ public struct App: Sendable, FeatureReducer {
 	}
 
 	private func goToMain(state: inout State) -> Effect<Action> {
-		cardCarouselClient.startForNewWallet()
 		state.root = .main(.init(
 			home: .init())
 		)
