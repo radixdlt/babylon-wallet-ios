@@ -220,15 +220,6 @@ private extension AddressDetails.View {
 }
 
 private extension AddressDetails.State {
-	var showQrCode: Bool {
-		switch address {
-		case .account:
-			true
-		default:
-			false
-		}
-	}
-
 	var showVerifyOnLedger: Bool {
 		switch address {
 		case let .account(_, isLedgerHWAccount):
