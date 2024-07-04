@@ -18,7 +18,7 @@ public extension AddressDetails {
 					.presentationDetents([.large])
 					.presentationDragIndicator(.visible)
 					.task {
-						store.send(.view(.task))
+						await store.send(.view(.task)).finish()
 					}
 					.sheet(isPresented: $store.showShare.sending(\.view.showShareChanged)) {
 						ShareView(items: [store.address.address])
