@@ -1,7 +1,7 @@
 import ComposableArchitecture
 
-// MARK: - CardCarouselClient + DependencyKey
-extension CardCarouselClient: DependencyKey {
+// MARK: - HomeCardsClient + DependencyKey
+extension HomeCardsClient: DependencyKey {
 	public static let liveValue: Self = {
 		let observer = HomeCardsObserver()
 

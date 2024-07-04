@@ -26,7 +26,7 @@ public struct CardCarousel: FeatureReducer, Sendable {
 		case addConnector
 	}
 
-	@Dependency(\.cardCarouselClient) var cardCarouselClient
+	@Dependency(\.homeCardsClient) var homeCardsClient
 	@Dependency(\.openURL) var openURL
 
 	public var body: some ReducerOf<Self> {
@@ -38,7 +38,7 @@ public struct CardCarousel: FeatureReducer, Sendable {
 		case .didAppear:
 			.run { send in
 				do {
-					for try await cards in cardCarouselClient.cards() {
+					for try await cards in homeCardsClient.cards() {
 						await send(.internal(.setCards(cards)))
 					}
 				} catch {}
@@ -60,7 +60,7 @@ public struct CardCarousel: FeatureReducer, Sendable {
 	}
 
 	private func removeCardEffect(_ card: HomeCard) -> Effect<Action> {
-		cardCarouselClient.removeCard(card)
+		homeCardsClient.removeCard(card)
 		return .none
 	}
 

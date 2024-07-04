@@ -1,5 +1,5 @@
-// MARK: - CardCarouselClient
-public struct CardCarouselClient: Sendable {
+// MARK: - HomeCardsClient
+public struct HomeCardsClient: Sendable {
 	public var cards: Cards
 	public var removeCard: RemoveCard
 	public var walletStarted: WalletStarted
@@ -21,7 +21,7 @@ public struct CardCarouselClient: Sendable {
 	}
 }
 
-extension CardCarouselClient {
+extension HomeCardsClient {
 	public typealias Cards = @Sendable () -> AnyAsyncSequence<[HomeCard]>
 	public typealias RemoveCard = @Sendable (HomeCard) -> Void
 	public typealias WalletStarted = @Sendable () -> Void
@@ -30,8 +30,8 @@ extension CardCarouselClient {
 }
 
 extension DependencyValues {
-	public var cardCarouselClient: CardCarouselClient {
-		get { self[CardCarouselClient.self] }
-		set { self[CardCarouselClient.self] = newValue }
+	public var homeCardsClient: HomeCardsClient {
+		get { self[HomeCardsClient.self] }
+		set { self[HomeCardsClient.self] = newValue }
 	}
 }

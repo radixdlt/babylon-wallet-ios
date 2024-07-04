@@ -1078,9 +1078,9 @@
 		A4DBBEB32C20305000D0A59E /* CardCarousel+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4DBBEB22C20305000D0A59E /* CardCarousel+Reducer.swift */; };
 		A4DBBEB52C20305700D0A59E /* CardCarousel+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4DBBEB42C20305700D0A59E /* CardCarousel+View.swift */; };
 		A4DCCC4B2C2DA08000438A7B /* GeometryExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4DCCC4A2C2DA08000438A7B /* GeometryExtensions.swift */; };
-		A4DCCC502C2DA32C00438A7B /* CardCarouselClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4DCCC4D2C2DA26100438A7B /* CardCarouselClient+Interface.swift */; };
-		A4DCCC512C2DA33100438A7B /* CardCarouselClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4DCCC4E2C2DA26100438A7B /* CardCarouselClient+Live.swift */; };
-		A4DCCC522C2DA33300438A7B /* CardCarouselClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4DCCC4F2C2DA26200438A7B /* CardCarouselClient+Test.swift */; };
+		A4DCCC502C2DA32C00438A7B /* HomeCardsClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4DCCC4D2C2DA26100438A7B /* HomeCardsClient+Interface.swift */; };
+		A4DCCC512C2DA33100438A7B /* HomeCardsClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4DCCC4E2C2DA26100438A7B /* HomeCardsClient+Live.swift */; };
+		A4DCCC522C2DA33300438A7B /* HomeCardsClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4DCCC4F2C2DA26200438A7B /* HomeCardsClient+Test.swift */; };
 		A4EB37C82B6272F3003FE31D /* TrackedValidatorInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4EB37C72B6272F3003FE31D /* TrackedValidatorInteraction.swift */; };
 		A4EBB5D62BD0777C00D05FDE /* ConfigurationBackup+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4EBB5D52BD0777C00D05FDE /* ConfigurationBackup+Reducer.swift */; };
 		A4EBB5D82BD0777F00D05FDE /* ConfigurationBackup+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4EBB5D72BD0777F00D05FDE /* ConfigurationBackup+View.swift */; };
@@ -2216,9 +2216,9 @@
 		A4DBBEB22C20305000D0A59E /* CardCarousel+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CardCarousel+Reducer.swift"; sourceTree = "<group>"; };
 		A4DBBEB42C20305700D0A59E /* CardCarousel+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CardCarousel+View.swift"; sourceTree = "<group>"; };
 		A4DCCC4A2C2DA08000438A7B /* GeometryExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeometryExtensions.swift; sourceTree = "<group>"; };
-		A4DCCC4D2C2DA26100438A7B /* CardCarouselClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CardCarouselClient+Interface.swift"; sourceTree = "<group>"; };
-		A4DCCC4E2C2DA26100438A7B /* CardCarouselClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CardCarouselClient+Live.swift"; sourceTree = "<group>"; };
-		A4DCCC4F2C2DA26200438A7B /* CardCarouselClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CardCarouselClient+Test.swift"; sourceTree = "<group>"; };
+		A4DCCC4D2C2DA26100438A7B /* HomeCardsClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HomeCardsClient+Interface.swift"; sourceTree = "<group>"; };
+		A4DCCC4E2C2DA26100438A7B /* HomeCardsClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HomeCardsClient+Live.swift"; sourceTree = "<group>"; };
+		A4DCCC4F2C2DA26200438A7B /* HomeCardsClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HomeCardsClient+Test.swift"; sourceTree = "<group>"; };
 		A4EB37C72B6272F3003FE31D /* TrackedValidatorInteraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackedValidatorInteraction.swift; sourceTree = "<group>"; };
 		A4EBB5D52BD0777C00D05FDE /* ConfigurationBackup+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConfigurationBackup+Reducer.swift"; sourceTree = "<group>"; };
 		A4EBB5D72BD0777F00D05FDE /* ConfigurationBackup+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConfigurationBackup+View.swift"; sourceTree = "<group>"; };
@@ -4270,7 +4270,7 @@
 		48CFBF522ADC10D900E77A5C /* Clients */ = {
 			isa = PBXGroup;
 			children = (
-				A4DCCC4C2C2DA23E00438A7B /* CardCarouselClient */,
+				A4DCCC4C2C2DA23E00438A7B /* HomeCardsClient */,
 				8329ACE22BBAB9CD005FD9DC /* DeepLinkHandlerClient */,
 				E7A5AC942C09F428006CB6EC /* ResetWalletClient */,
 				A4ECE2782BEEB01800468BF6 /* CloudBackupClient */,
@@ -5904,14 +5904,14 @@
 			path = CardCarousel;
 			sourceTree = "<group>";
 		};
-		A4DCCC4C2C2DA23E00438A7B /* CardCarouselClient */ = {
+		A4DCCC4C2C2DA23E00438A7B /* HomeCardsClient */ = {
 			isa = PBXGroup;
 			children = (
-				A4DCCC4D2C2DA26100438A7B /* CardCarouselClient+Interface.swift */,
-				A4DCCC4E2C2DA26100438A7B /* CardCarouselClient+Live.swift */,
-				A4DCCC4F2C2DA26200438A7B /* CardCarouselClient+Test.swift */,
+				A4DCCC4D2C2DA26100438A7B /* HomeCardsClient+Interface.swift */,
+				A4DCCC4E2C2DA26100438A7B /* HomeCardsClient+Live.swift */,
+				A4DCCC4F2C2DA26200438A7B /* HomeCardsClient+Test.swift */,
 			);
-			path = CardCarouselClient;
+			path = HomeCardsClient;
 			sourceTree = "<group>";
 		};
 		A4ECE2712BEEAFFC00468BF6 /* SecurityCenterClient */ = {
@@ -6854,7 +6854,7 @@
 				48CFC2872ADC10D900E77A5C /* MinimumPercentageStepper+View.swift in Sources */,
 				E76645A42C23138300065D9A /* Throwable.swift in Sources */,
 				48CFC2A12ADC10D900E77A5C /* PersonaFeature.swift in Sources */,
-				A4DCCC502C2DA32C00438A7B /* CardCarouselClient+Interface.swift in Sources */,
+				A4DCCC502C2DA32C00438A7B /* HomeCardsClient+Interface.swift in Sources */,
 				48CFC4162ADC10DA00E77A5C /* PasteboardClient+Test.swift in Sources */,
 				48CFC34E2ADC10D900E77A5C /* Login+View.swift in Sources */,
 				48CFC3122ADC10D900E77A5C /* AccountsToImport.swift in Sources */,
@@ -7137,7 +7137,7 @@
 				48CFC5732ADC10DA00E77A5C /* Configuration.swift in Sources */,
 				48CFC5A42ADC10DA00E77A5C /* PrimaryTextButtonStyle.swift in Sources */,
 				83EE47862AF0EE3C00155F03 /* ProgrammaticScryptoSborValueMap.swift in Sources */,
-				A4DCCC522C2DA33300438A7B /* CardCarouselClient+Test.swift in Sources */,
+				A4DCCC522C2DA33300438A7B /* HomeCardsClient+Test.swift in Sources */,
 				A462B57D2B83656900C26D20 /* MetadataNonFungibleGlobalIdArrayValueAllOfValues.swift in Sources */,
 				48CFC2A92ADC10D900E77A5C /* DappDetails+View.swift in Sources */,
 				48CFC52B2ADC10DA00E77A5C /* MetadataU64Value.swift in Sources */,
@@ -7283,7 +7283,7 @@
 				48CFC5562ADC10DA00E77A5C /* GatewayInfoResponseReleaseInfo.swift in Sources */,
 				48CFC47F2ADC10DA00E77A5C /* ROLAClient+Interface.swift in Sources */,
 				48CFC46B2ADC10DA00E77A5C /* ImportLegacyWalletClient+Interface.swift in Sources */,
-				A4DCCC512C2DA33100438A7B /* CardCarouselClient+Live.swift in Sources */,
+				A4DCCC512C2DA33100438A7B /* HomeCardsClient+Live.swift in Sources */,
 				48CFC4D82ADC10DA00E77A5C /* TransactionStatusResponseKnownPayloadItem.swift in Sources */,
 				48CFC4522ADC10DA00E77A5C /* NetworkSwitchingClient+Interface.swift in Sources */,
 				83AAAC6D2B483D1B00222B64 /* StakeSummaryView.swift in Sources */,

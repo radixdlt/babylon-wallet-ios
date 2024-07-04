@@ -58,7 +58,7 @@ public struct App: Sendable, FeatureReducer {
 	@Dependency(\.deepLinkHandlerClient) var deepLinkHandlerClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.resetWalletClient) var resetWalletClient
-	@Dependency(\.cardCarouselClient) var cardCarouselClient
+	@Dependency(\.homeCardsClient) var homeCardsClient
 
 	public init() {}
 
@@ -92,7 +92,7 @@ public struct App: Sendable, FeatureReducer {
 			}
 			return .none
 		case .task:
-			cardCarouselClient.walletStarted()
+			homeCardsClient.walletStarted()
 			return didResetWalletEffect()
 		}
 	}

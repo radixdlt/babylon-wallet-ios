@@ -1,5 +1,5 @@
-// MARK: - CardCarouselClient + TestDependencyKey
-extension CardCarouselClient: TestDependencyKey {
+// MARK: - HomeCardsClient + TestDependencyKey
+extension HomeCardsClient: TestDependencyKey {
 	public static let previewValue = Self.noop
 
 	public static let testValue = Self(
@@ -11,7 +11,7 @@ extension CardCarouselClient: TestDependencyKey {
 	)
 }
 
-extension CardCarouselClient {
+extension HomeCardsClient {
 	public static let noop = Self(
 		cards: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		removeCard: { _ in },
