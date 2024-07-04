@@ -11,4 +11,10 @@ extension Button where Label == SwiftUI.Label<Text, Image> {
 			SwiftUI.Label(title, asset: asset)
 		}
 	}
+
+	init(_ title: some StringProtocol, image: ImageResource, action: @escaping () -> Void) {
+		self.init(action: action) {
+			SwiftUI.Label(title, image: image)
+		}
+	}
 }

@@ -6,6 +6,10 @@ extension SwiftUI.Font {
 }
 
 extension SwiftUI.Font.App {
+	public var enlarged: SwiftUI.Font {
+		.custom(FontFamily.IBMPlexSans.semiBold, size: 50)
+	}
+
 	public var sheetTitle: SwiftUI.Font {
 		.custom(FontFamily.IBMPlexSans.bold, size: 32)
 	}

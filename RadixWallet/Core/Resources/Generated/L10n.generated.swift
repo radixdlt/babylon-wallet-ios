@@ -1811,14 +1811,8 @@ public enum L10n {
     public enum RejoinRadquest {
       /// Continue your Radix journey in your browser. Tap to dismiss.
       public static let text = L10n.tr("Localizable", "homePageCarousel_rejoinRadquest_text", fallback: "Continue your Radix journey in your browser. Tap to dismiss.")
-      /// Rejoin Radquest
-      public static let title = L10n.tr("Localizable", "homePageCarousel_rejoinRadquest_title", fallback: "Rejoin Radquest")
-    }
-    public enum ThreesixtyDegrees {
-      /// Secure your Accounts and Personas with Security shields
-      public static let text = L10n.tr("Localizable", "homePageCarousel_threesixtyDegrees_text", fallback: "Secure your Accounts and Personas with Security shields")
-      /// 360 Degrees of Security
-      public static let title = L10n.tr("Localizable", "homePageCarousel_threesixtyDegrees_title", fallback: "360 Degrees of Security")
+      /// Rejoin RadQuest
+      public static let title = L10n.tr("Localizable", "homePageCarousel_rejoinRadquest_title", fallback: "Rejoin RadQuest")
     }
     public enum UseDappsOnDesktop {
       /// Connect to dApps on the big screen with Radix Connector.
@@ -2207,8 +2201,8 @@ public enum L10n {
       public static let linking = L10n.tr("Localizable", "linkedConnectors_newConnection_linking", fallback: "Linking…")
       /// Open your Radix Connector extension's menu by clicking its icon in your list of browser extensions, and scan the QR code shown.
       public static let subtitle = L10n.tr("Localizable", "linkedConnectors_newConnection_subtitle", fallback: "Open your Radix Connector extension's menu by clicking its icon in your list of browser extensions, and scan the QR code shown.")
-      /// Link New Connector
-      public static let title = L10n.tr("Localizable", "linkedConnectors_newConnection_title", fallback: "Link New Connector")
+      /// Link Connector
+      public static let title = L10n.tr("Localizable", "linkedConnectors_newConnection_title", fallback: "Link Connector")
     }
     public enum RelinkConnectors {
       /// Any Connectors you had linked to this wallet using a different phone have been disconnected
@@ -2561,6 +2555,26 @@ public enum L10n {
       public static let subtitle = L10n.tr("Localizable", "revealSeedPhrase_warningDialog_subtitle", fallback: "Are you sure you have written down your seed phrase?")
       /// Use Caution
       public static let title = L10n.tr("Localizable", "revealSeedPhrase_warningDialog_title", fallback: "Use Caution")
+    }
+  }
+  public enum ScanQR {
+    public enum Account {
+      /// Scan a QR code of a Radix Account address from another wallet or an exchange.
+      public static let instructions = L10n.tr("Localizable", "scanQR_account_instructions", fallback: "Scan a QR code of a Radix Account address from another wallet or an exchange.")
+    }
+    public enum ConnectorExtension {
+      /// Go to **wallet.radixdlt.com** in your desktop browser.
+      public static let disclosureItem1 = L10n.tr("Localizable", "scanQR_connectorExtension_disclosureItem1", fallback: "Go to **wallet.radixdlt.com** in your desktop browser.")
+      /// Follow the instructions there to install the Radix Connector.
+      public static let disclosureItem2 = L10n.tr("Localizable", "scanQR_connectorExtension_disclosureItem2", fallback: "Follow the instructions there to install the Radix Connector.")
+      /// Don't have the Radix Connector browser extension?
+      public static let disclosureTitle = L10n.tr("Localizable", "scanQR_connectorExtension_disclosureTitle", fallback: "Don't have the Radix Connector browser extension?")
+      /// Scan the QR code in the Radix Connector browser extension.
+      public static let instructions = L10n.tr("Localizable", "scanQR_connectorExtension_instructions", fallback: "Scan the QR code in the Radix Connector browser extension.")
+    }
+    public enum ImportOlympia {
+      /// Scan the QR code shown in the Export section of the Radix Desktop Wallet for Olympia.
+      public static let instructions = L10n.tr("Localizable", "scanQR_importOlympia_instructions", fallback: "Scan the QR code shown in the Export section of the Radix Desktop Wallet for Olympia.")
     }
   }
   public enum SecurityCenter {
