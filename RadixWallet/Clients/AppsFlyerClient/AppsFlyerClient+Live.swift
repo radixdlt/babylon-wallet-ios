@@ -37,13 +37,13 @@ extension AppsFlyerClient: DependencyKey {
 	}
 
 	private class Delegate: NSObject, DeepLinkDelegate, @unchecked Sendable {
-		@Dependency(\.homeCardsClient) var homeCardsClient
+		@Dependency(\.appEventsClient) var appEventsClient
 
 		func didResolveDeepLink(_ result: DeepLinkResult) {
 			if let deepLink = result.deepLink {
 				loggerGlobal.info("did resolve deep link. Is deferred: \(deepLink.isDeferred). Click events: \(deepLink.clickEvent)")
 				if deepLink.isDeferred, let value = deepLink.clickEvent["deep_link_value"] as? String {
-					homeCardsClient.deepLinkReceived(value)
+					appEventsClient.handleEvent(.deepLinkReceived(value))
 				}
 			} else if let error = result.error {
 				loggerGlobal.info("failed to resolve deep link. Status: \(result.status), Error: \(error.localizedDescription)")

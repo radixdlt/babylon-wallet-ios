@@ -46,12 +46,12 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	@Dependency(\.userDefaults) var userDefaults
-	@Dependency(\.homeCardsClient) var homeCardsClient
+	@Dependency(\.appEventsClient) var appEventsClient
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .selectedNewWalletUser:
-			homeCardsClient.walletCreated()
+			appEventsClient.handleEvent(.walletCreated)
 			userDefaults.setShowRadixBanner(true)
 			return .send(.delegate(.setupNewUser))
 
