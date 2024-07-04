@@ -108,7 +108,6 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.isPresented) var isPresented
 	@Dependency(\.dismiss) var dismiss
-	@Dependency(\.cardCarouselClient) var cardCarouselClient
 
 	public init() {}
 
@@ -197,9 +196,6 @@ extension CreateAccountCoordinator {
 				account: account,
 				config: state.config
 			)))
-			if state.config.isFirstAccount {
-				cardCarouselClient.walletCreated()
-			}
 			return .none
 		}
 	}
