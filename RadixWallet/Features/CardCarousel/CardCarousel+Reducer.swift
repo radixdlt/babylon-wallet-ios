@@ -70,11 +70,14 @@ public struct CardCarousel: FeatureReducer, Sendable {
 			.none
 		case .startRadQuest:
 			.run { _ in
-				// TODO: Define RadQuest URL
-				await openURL(.init(string: "https://radixdlt.com")!)
+				await openURL(Constants.radquestURL)
 			}
 		case .connector:
 			.send(.delegate(.addConnector))
 		}
+	}
+
+	private enum Constants {
+		static let radquestURL = URL(string: "https://radquest.io")!
 	}
 }
