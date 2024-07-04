@@ -1,5 +1,6 @@
 import SwiftUI
 
+// MARK: - ArbitraryDataFieldView
 /// A view used to represent arbitrary data, which is a key/value pair that isn't standarized by the Wallet.
 /// These can be found inside a resource metadata or in NFTs.
 public struct ArbitraryDataFieldView: View {
@@ -33,7 +34,7 @@ public struct ArbitraryDataFieldView: View {
 			KeyValueUrlView(key: field.name, url: url, isLocked: field.isLocked)
 
 		case let .address(address):
-			KeyValueView(key: field.name, isLocked: field.isLocked) {
+			KeyValueView(axis: address.axis, key: field.name, isLocked: field.isLocked) {
 				AddressView(.address(address), imageColor: .app.gray2)
 			}
 
@@ -48,6 +49,15 @@ public struct ArbitraryDataFieldView: View {
 
 		case let .instant(date):
 			KeyValueView(key: field.name, value: date.formatted(), isLocked: field.isLocked)
+		}
+	}
+}
+
+private extension LedgerIdentifiable.Address {
+	var axis: Axis {
+		switch self {
+		case .nonFungibleGlobalID: .vertical
+		default: .horizontal
 		}
 	}
 }

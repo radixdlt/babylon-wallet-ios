@@ -2,7 +2,9 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - KeyValueView
+@MainActor
 struct KeyValueView<Content: View>: View {
+	let axis: Axis
 	let key: String
 	let content: Content
 	let isLocked: Bool
@@ -19,33 +21,49 @@ struct KeyValueView<Content: View>: View {
 		}
 	}
 
-	init(nonFungibleGlobalID: NonFungibleGlobalId, imageColor: Color? = .app.gray2) where Content == AddressView {
+	init(nonFungibleGlobalID: NonFungibleGlobalId, showLocalIdOnly: Bool, imageColor: Color? = .app.gray2) where Content == AddressView {
 		self.init(key: L10n.AssetDetails.NFTDetails.id, isLocked: false) {
-			AddressView(.identifier(.nonFungibleGlobalID(nonFungibleGlobalID)), imageColor: imageColor)
+			AddressView(.address(.nonFungibleGlobalID(nonFungibleGlobalID)), showLocalIdOnly: showLocalIdOnly, imageColor: imageColor)
 		}
 	}
 
-	init(key: String, value: String, isLocked: Bool = false) where Content == Text {
+	init(axis: Axis = .horizontal, key: String, value: String, isLocked: Bool = false) where Content == Text {
+		self.axis = axis
 		self.key = key
 		self.isLocked = isLocked
 		self.content = Text(value)
 	}
 
-	init(key: String, isLocked: Bool = false, @ViewBuilder content: () -> Content) {
+	init(axis: Axis = .horizontal, key: String, isLocked: Bool = false, @ViewBuilder content: () -> Content) {
+		self.axis = axis
 		self.key = key
 		self.isLocked = isLocked
 		self.content = content()
 	}
 
 	var body: some View {
-		HStack(alignment: .top, spacing: .medium3) {
-			KeyText(key: key, isLocked: isLocked)
-			Spacer(minLength: 0)
-			content
-				.multilineTextAlignment(.trailing)
-				.textStyle(.body1HighImportance)
-				.foregroundColor(.app.gray1)
-				.lineLimit(nil)
+		switch axis {
+		case .horizontal:
+			HStack(alignment: .top, spacing: .medium3) {
+				KeyText(key: key, isLocked: isLocked)
+				Spacer(minLength: 0)
+				content
+					.multilineTextAlignment(.trailing)
+					.textStyle(.body1HighImportance)
+					.foregroundColor(.app.gray1)
+					.lineLimit(nil)
+			}
+		case .vertical:
+			VStack(alignment: .leading, spacing: .small3) {
+				KeyText(key: key, isLocked: isLocked)
+
+				content
+					.multilineTextAlignment(.trailing)
+					.textStyle(.body1HighImportance)
+					.foregroundColor(.app.gray1)
+					.lineLimit(nil)
+			}
+			.flushedLeft
 		}
 	}
 }
@@ -85,15 +103,12 @@ struct KeyValueUrlView: View {
 	@Dependency(\.openURL) var openURL
 
 	var body: some View {
-		VStack(alignment: .leading, spacing: .small3) {
-			KeyText(key: key, isLocked: isLocked)
-
+		KeyValueView(axis: .vertical, key: key, isLocked: isLocked) {
 			Button(url.absoluteString) {
 				openUrl(url)
 			}
 			.buttonStyle(.url)
 		}
-		.flushedLeft
 	}
 
 	private func openUrl(_ url: URL) {
