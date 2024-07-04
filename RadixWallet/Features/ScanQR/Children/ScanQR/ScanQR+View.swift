@@ -107,9 +107,9 @@ extension ScanQR.View {
 private extension ScanQR.Kind {
 	var instructions: String {
 		switch self {
-		case .connectorExtension: "Scan the QR code in the Radix Connector browser extension."
-		case .account: L10n.AssetTransfer.qrScanInstructions
-		case .importOlympia: L10n.ImportOlympiaAccounts.ScanQR.instructions
+		case .connectorExtension: L10n.ScanQR.ConnectorExtension.instructions
+		case .account: L10n.ScanQR.Account.instructions
+		case .importOlympia: L10n.ScanQR.ImportOlympia.instructions
 		}
 	}
 
@@ -126,10 +126,10 @@ private extension ScanQR.Kind {
 			nil
 		case .connectorExtension:
 			.init(
-				title: "Don't have the Radix Connector browser extension?",
+				title: L10n.ScanQR.ConnectorExtension.disclosureTitle,
 				items: [
-					"Go to **wallet.radixdlt.com** in your desktop browser.",
-					"Follow the instructions there to install the Radix Connector.",
+					L10n.ScanQR.ConnectorExtension.disclosureItem1,
+					L10n.ScanQR.ConnectorExtension.disclosureItem2,
 				]
 			)
 		}
