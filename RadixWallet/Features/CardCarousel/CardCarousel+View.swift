@@ -123,7 +123,6 @@ public struct CarouselCardView: View {
 				.cornerRadius(.small1)
 			}
 
-			// CloseButton(action: closeAction)
 			Button(action: closeAction) {
 				Image(asset: AssetResource.close)
 					.resizable()
