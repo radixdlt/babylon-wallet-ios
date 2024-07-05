@@ -27,7 +27,9 @@ public struct CloseButton: View {
 extension CloseButton {
 	public var body: some View {
 		Button(action: action) {
-			Image(asset: AssetResource.close).tint(.app.gray1)
+			Image(.close)
+				.foregroundColor(.app.gray1)
+				.tint(.app.gray1)
 		}
 		.frame(.small)
 	}

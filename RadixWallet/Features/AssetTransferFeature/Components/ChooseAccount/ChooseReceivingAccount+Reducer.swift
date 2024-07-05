@@ -110,7 +110,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .scanQRCode:
-			state.destination = .scanAccountAddress(.init(scanInstructions: L10n.AssetTransfer.qrScanInstructions))
+			state.destination = .scanAccountAddress(.init(kind: .account))
 			return .none
 
 		case .closeButtonTapped:

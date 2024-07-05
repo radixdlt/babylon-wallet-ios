@@ -179,6 +179,11 @@ extension GatewayAPIClient {
 			getEntityMetadata: { address, explicitMetadata in
 				try await getSingleEntityDetails(address, explictMetadata: explicitMetadata).details.metadata
 			},
+			getEntityMetadataPage: { request in
+				try await post(
+					request: request
+				) { $0.appendingPathComponent("state/entity/page/metadata/") }
+			},
 			getEntityFungiblesPage: { request in
 				try await post(
 					request: request

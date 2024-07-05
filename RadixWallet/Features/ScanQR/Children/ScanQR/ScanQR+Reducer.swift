@@ -3,36 +3,33 @@ import SwiftUI
 
 // MARK: - ScanQR
 public struct ScanQR: Sendable, FeatureReducer {
+	@ObservableState
 	public struct State: Sendable, Hashable {
-		public let scanInstructions: String
-		public let scanMode: QRScanMode
+		public let kind: Kind
 		#if targetEnvironment(simulator)
 		public var manualQRContent: String
 
 		public init(
-			scanInstructions: String,
-			scanMode: QRScanMode = .default,
+			kind: Kind,
 			manualQRContent: String = ""
 		) {
-			self.scanInstructions = scanInstructions
-			self.scanMode = scanMode
+			self.kind = kind
 			self.manualQRContent = manualQRContent
 		}
 		#else
 		public init(
-			scanInstructions: String,
-			scanMode: QRScanMode = .default
+			kind: Kind
 		) {
-			self.scanInstructions = scanInstructions
-			self.scanMode = scanMode
+			self.kind = kind
 		}
 		#endif // sim
 	}
 
+	@CasePathable
 	public enum ViewAction: Sendable, Equatable {
 		case scanned(TaskResult<String>)
 		#if targetEnvironment(simulator)
-		case macInputQRContentChanged(String)
+		case manualQRContentChanged(String)
 		case macConnectButtonTapped
 		#endif // sim
 	}
@@ -48,7 +45,7 @@ public struct ScanQR: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		#if targetEnvironment(simulator)
-		case let .macInputQRContentChanged(manualQRContent):
+		case let .manualQRContentChanged(manualQRContent):
 			state.manualQRContent = manualQRContent
 			return .none
 
@@ -63,5 +60,14 @@ public struct ScanQR: Sendable, FeatureReducer {
 			errorQueue.schedule(error)
 			return .none
 		}
+	}
+}
+
+// MARK: ScanQR.Kind
+extension ScanQR {
+	public enum Kind: Sendable, Hashable {
+		case connectorExtension
+		case account
+		case importOlympia
 	}
 }
