@@ -2,6 +2,7 @@ import SwiftUI
 
 // MARK: - TextStyle
 public enum TextStyle {
+	case enlarged
 	case sheetTitle
 	case sectionHeader
 	case secondaryHeader
@@ -23,6 +24,7 @@ public enum TextStyle {
 extension TextStyle {
 	var font: SwiftUI.Font {
 		switch self {
+		case .enlarged: .app.enlarged
 		case .sheetTitle: .app.sheetTitle
 		case .sectionHeader: .app.sectionHeader
 		case .secondaryHeader: .app.secondaryHeader
@@ -46,6 +48,8 @@ extension TextStyle {
 		switch self {
 		case .sheetTitle, .resourceLabel:
 			0
+		case .enlarged:
+			2
 		case .sectionHeader, .secondaryHeader, .body1Header,
 		     .body1HighImportance, .body1Regular, .body1StandaloneLink, .body1Link:
 			23 / 4

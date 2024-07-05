@@ -17,4 +17,13 @@ extension Label where Title == Text, Icon == Image {
 				.renderingMode(.template)
 		}
 	}
+
+	init(_ title: some StringProtocol, image: ImageResource) {
+		self.init {
+			Text(title)
+		} icon: {
+			Image(image)
+				.renderingMode(.template)
+		}
+	}
 }

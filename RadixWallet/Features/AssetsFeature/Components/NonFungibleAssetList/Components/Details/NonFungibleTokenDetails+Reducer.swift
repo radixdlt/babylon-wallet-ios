@@ -31,7 +31,6 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case closeButtonTapped
 		case task
-		case openURLTapped(URL)
 		case tappedClaimStake
 	}
 
@@ -44,7 +43,6 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
-	@Dependency(\.openURL) var openURL
 	@Dependency(\.dismiss) var dismiss
 
 	public init() {}
@@ -57,16 +55,12 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 			}
 			state.resourceDetails = .loading
 			return .run { [resourceAddress = state.resourceAddress, ledgerState = state.ledgerState] send in
-				let result = await TaskResult { try await onLedgerEntitiesClient.getResource(resourceAddress, atLedgerState: ledgerState) }
+				let result = await TaskResult { try await onLedgerEntitiesClient.getResource(resourceAddress, atLedgerState: ledgerState, fetchMetadata: true) }
 				await send(.internal(.resourceLoadResult(result)))
 			}
 		case .closeButtonTapped:
 			return .run { _ in
 				await dismiss()
-			}
-		case let .openURLTapped(url):
-			return .run { _ in
-				await openURL(url)
 			}
 		case .tappedClaimStake:
 			guard let stakeClaim = state.stakeClaim else {
