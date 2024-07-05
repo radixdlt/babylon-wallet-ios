@@ -6,6 +6,10 @@ import SwiftUI
 public struct Home: Sendable, FeatureReducer {
 	public static let radixBannerURL = URL(string: "https://wallet.radixdlt.com/?wallet=downloaded")!
 
+	private enum CancellableId: Hashable {
+		case fetchAccountPortfolios
+	}
+
 	public struct State: Sendable, Hashable {
 		// MARK: - Components
 		public var accountRows: IdentifiedArrayOf<Home.AccountRow.State> = []
@@ -46,6 +50,7 @@ public struct Home: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case onFirstAppear
 		case task
+		case onDisappear
 		case pullToRefreshStarted
 		case createAccountButtonTapped
 		case settingsButtonTapped
@@ -127,6 +132,9 @@ public struct Home: Sendable, FeatureReducer {
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.securityCenterClient) var securityCenterClient
+	@Dependency(\.continuousClock) var clock
+
+	private let accountPortfoliosRefreshIntervalInSeconds = 300 // 5 minutes
 
 	public init() {}
 
@@ -175,6 +183,10 @@ public struct Home: Sendable, FeatureReducer {
 			.merge(with: loadFiatValues())
 			.merge(with: securityProblemsEffect())
 			.merge(with: delayedMediumEffect(for: .internal(.showLinkConnectorIfNeeded)))
+			.merge(with: scheduleFetchAccountPortfoliosTimer(state))
+
+		case .onDisappear:
+			return .cancel(id: CancellableId.fetchAccountPortfolios)
 
 		case .createAccountButtonTapped:
 			state.destination = .createAccount(
@@ -185,12 +197,7 @@ public struct Home: Sendable, FeatureReducer {
 			return .none
 
 		case .pullToRefreshStarted:
-			let accountAddresses = state.accounts.map(\.address)
-			return .run { _ in
-				_ = try await accountPortfoliosClient.fetchAccountPortfolios(accountAddresses, true)
-			} catch: { error, _ in
-				errorQueue.schedule(error)
-			}
+			return fetchAccountPortfolios(state)
 
 		case .radixBannerButtonTapped:
 			return .run { _ in
@@ -226,6 +233,7 @@ public struct Home: Sendable, FeatureReducer {
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
+			.merge(with: scheduleFetchAccountPortfoliosTimer(state))
 
 		case let .accountsLoadedResult(.failure(error)):
 			errorQueue.schedule(error)
@@ -419,6 +427,26 @@ public struct Home: Sendable, FeatureReducer {
 				await send(.internal(.setSecurityProblems(problems)))
 			}
 		}
+	}
+
+	public func fetchAccountPortfolios(_ state: State) -> Effect<Action> {
+		let accountAddresses = state.accounts.map(\.address)
+		return .run { _ in
+			_ = try await accountPortfoliosClient.fetchAccountPortfolios(accountAddresses, true)
+		} catch: { error, _ in
+			errorQueue.schedule(error)
+		}
+	}
+
+	public func scheduleFetchAccountPortfoliosTimer(_ state: State) -> Effect<Action> {
+		.run { _ in
+			for await _ in clock.timer(interval: .seconds(accountPortfoliosRefreshIntervalInSeconds)) {
+				guard !Task.isCancelled else { return }
+				let accountAddresses = state.accounts.map(\.address)
+				_ = try? await accountPortfoliosClient.fetchAccountPortfolios(accountAddresses, true)
+			}
+		}
+		.cancellable(id: CancellableId.fetchAccountPortfolios, cancelInFlight: true)
 	}
 }
 
