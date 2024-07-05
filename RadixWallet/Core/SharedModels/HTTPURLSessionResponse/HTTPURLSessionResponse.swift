@@ -34,11 +34,11 @@ public struct ResponseDecodingError: Swift.Error {
 
 // MARK: - HTTPStatusCode
 public enum HTTPStatusCode: Int, Error {
-    /// - ok: Standard response for successful HTTP requests.
-    case ok = 200
-    
-    /// - accepted: The request has been accepted for processing, but the processing has not been completed.
-    case accepted = 202
+	/// - ok: Standard response for successful HTTP requests.
+	case ok = 200
+
+	/// - accepted: The request has been accepted for processing, but the processing has not been completed.
+	case accepted = 202
 }
 
 extension HTTPURLResponse {
