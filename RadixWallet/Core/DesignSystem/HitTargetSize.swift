@@ -65,6 +65,11 @@ extension View {
 	public func frame(_ size: HitTargetSize, alignment: Alignment = .center) -> some View {
 		frame(width: size.frame.width, height: size.frame.height, alignment: alignment)
 	}
+
+	@inlinable
+	public func frame(_ size: CGFloat, alignment: Alignment = .center) -> some View {
+		frame(width: size, height: size, alignment: alignment)
+	}
 }
 
 // MARK: - Screen

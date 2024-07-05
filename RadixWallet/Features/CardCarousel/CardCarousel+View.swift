@@ -6,22 +6,21 @@ extension CardCarousel {
 	public struct View: SwiftUI.View {
 		public let store: StoreOf<CardCarousel>
 
-		private static let coordSpace: String = "CardCarousel"
-
 		private let margin: CGFloat = .medium1
-		private let spacing: CGFloat = .small1
+		private let spacing: CGFloat = .small1 * 0.5
 		@ScaledMetric private var height: CGFloat = 105
+		@SwiftUI.State private var selectedCardIndex = 0
 
 		public var body: some SwiftUI.View {
 			WithPerceptionTracking {
-				GeometryReader { proxy in
-					coreView
-						.backgroundPreferenceValue(PositionsPreferenceKey.self) { positions in
-							dummyCards(positions, in: proxy.frame(in: .named(Self.coordSpace)))
-						}
+				VStack(spacing: 8) {
+					GeometryReader { _ in
+						coreView
+					}
+					.frame(height: store.cards.isEmpty ? 0 : height)
+
+					positionIndicator
 				}
-				.padding(.horizontal, margin - 0.5 * spacing)
-				.frame(height: store.cards.isEmpty ? 0 : height)
 			}
 			.onAppear {
 				store.send(.view(.didAppear))
@@ -30,55 +29,33 @@ extension CardCarousel {
 
 		@MainActor
 		private var coreView: some SwiftUI.View {
-			WithPerceptionTracking {
-				TabView {
-					ForEachStatic(store.cards) { card in
-						CarouselCardView(card: card) {
-							store.send(.view(.cardTapped(card)))
-						} closeAction: {
-							store.send(.view(.closeTapped(card)), animation: .default)
-						}
-						.measurePosition(card, coordSpace: Self.coordSpace)
-						.padding(.horizontal, 0.5 * spacing)
-						.transition(.scale(scale: 0.8).combined(with: .opacity))
+			TabView(selection: $selectedCardIndex) {
+				ForEach(Array(store.cards.enumerated()), id: \.1) { index, card in
+					CarouselCardView(card: card) {
+						store.send(.view(.cardTapped(card)))
+					} closeAction: {
+						store.send(.view(.closeTapped(card)), animation: .default)
+					}
+					.tag(index)
+					.padding(.horizontal, margin - spacing)
+					.transition(.scale(scale: 0.8).combined(with: .opacity))
+				}
+			}
+			.tabViewStyle(.page(indexDisplayMode: .never))
+			.animation(.default, value: store.cards)
+		}
+
+		private var positionIndicator: some SwiftUI.View {
+			HStack(spacing: spacing) {
+				if store.cards.count > 1 {
+					ForEach(0 ..< store.cards.count, id: \.self) { index in
+						let isSelected = selectedCardIndex == index
+						Capsule()
+							.fill(isSelected ? .app.gray4 : .app.gray2)
+							.frame(isSelected ? spacing : .small3)
 					}
 				}
-				.tabViewStyle(.page(indexDisplayMode: .never))
-				.animation(.default, value: store.cards)
 			}
-			.coordinateSpace(name: Self.coordSpace)
-		}
-
-		@MainActor
-		private func dummyCards(_ positions: [AnyHashable: CGRect], in frame: CGRect) -> some SwiftUI.View {
-			WithPerceptionTracking {
-				let dummyPositions = dummyPositions(positions, frame: frame, cards: store.cards)
-				ForEach(dummyPositions, id: \.card) { card, pos in
-					CarouselCardView.Dummy(card: card)
-						.frame(width: pos.width, height: pos.height)
-						.offset(x: pos.minX - margin)
-				}
-				.animation(nil, value: store.cards)
-			}
-		}
-
-		private func dummyPositions(_ positions: [AnyHashable: CGRect], frame: CGRect, cards: [HomeCard]) -> [(card: HomeCard, pos: CGRect)] {
-			guard let width = positions.first?.value.width else { return [] }
-
-			let thisCard = positions.mapValues { abs($0.midX - frame.midX) }.min { $0.value < $1.value }?.key.base as? HomeCard
-			guard let thisCard, let currentIndex = cards.firstIndex(of: thisCard), let rect = positions[thisCard] else { return [] }
-			var result: [(HomeCard, CGRect)] = []
-			if cards.indices.contains(currentIndex - 1) {
-				result.append((cards[currentIndex - 1], rect.offsetBy(dx: -(width + spacing), dy: 0)))
-			}
-			if !frame.contains(rect) {
-				result.append((thisCard, rect))
-			}
-			if cards.indices.contains(currentIndex + 1) {
-				result.append((cards[currentIndex + 1], rect.offsetBy(dx: width + spacing, dy: 0)))
-			}
-
-			return result
 		}
 	}
 }
@@ -131,15 +108,6 @@ public struct CarouselCardView: View {
 					.padding(.small2)
 			}
 			.frame(.small, alignment: .topTrailing)
-		}
-	}
-
-	public struct Dummy: View {
-		let card: HomeCard
-
-		public var body: some SwiftUI.View {
-			CarouselCardView(card: card, action: {}, closeAction: {})
-				.disabled(true)
 		}
 	}
 
