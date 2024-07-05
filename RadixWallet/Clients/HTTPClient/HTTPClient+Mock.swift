@@ -8,7 +8,7 @@ extension HTTPClient: TestDependencyKey {
 
 	private static func noop() -> Self {
 		.init(
-			executeRequest: { _ in Data() }
+			executeRequest: { _, _ in Data() }
 		)
 	}
 }

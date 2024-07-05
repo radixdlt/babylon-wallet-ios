@@ -19,7 +19,7 @@ extension TokenPricesClient {
 				"Content-Type": "application/json",
 			]
 
-			let data = try await httpClient.executeRequest(urlRequest)
+			let data = try await httpClient.executeRequest(urlRequest, nil)
 			let decodedResponse = try jsonDecoder().decode(TokensPriceResponse.self, from: data)
 			return .init(decodedResponse)
 		}
