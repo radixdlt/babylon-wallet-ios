@@ -51,7 +51,7 @@ extension CardCarousel {
 					ForEach(0 ..< store.cards.count, id: \.self) { index in
 						let isSelected = selectedCardIndex == index
 						Capsule()
-							.fill(isSelected ? .app.gray4 : .app.gray2)
+							.fill(isSelected ? .app.gray2 : .app.gray4)
 							.frame(isSelected ? spacing : .small3)
 					}
 				}
@@ -70,13 +70,15 @@ public struct CarouselCardView: View {
 		ZStack(alignment: .topTrailing) {
 			Button(action: action) {
 				VStack(alignment: .leading, spacing: .small2) {
-					HStack {
+					HStack(spacing: .small3 * 0.5) {
 						Text(title)
 							.textStyle(.body1Header)
 							.minimumScaleFactor(0.8)
 
 						if showLinkIcon {
 							Image(.iconLinkOut)
+								.resizable()
+								.frame(.icon)
 								.foregroundStyle(.app.gray2)
 						}
 					}
@@ -104,7 +106,7 @@ public struct CarouselCardView: View {
 				Image(asset: AssetResource.close)
 					.resizable()
 					.frame(width: .medium3, height: .medium3)
-					.tint(.app.gray1)
+					.tint(.app.gray2)
 					.padding(.small2)
 			}
 			.frame(.small, alignment: .topTrailing)

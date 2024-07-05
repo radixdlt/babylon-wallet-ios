@@ -1,5 +1,8 @@
 // MARK: - HitTargetSize
 public enum HitTargetSize: CGFloat {
+	//// 18
+	case icon = 18
+
 	/// 24
 	case smallest = 24
 
@@ -36,6 +39,8 @@ public enum HitTargetSize: CGFloat {
 
 	public var cornerRadius: CGFloat {
 		switch self {
+		case .icon:
+			.small3
 		case .smallest:
 			.small3
 		case .verySmall:
