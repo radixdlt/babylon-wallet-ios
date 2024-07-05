@@ -6,22 +6,21 @@ extension CardCarousel {
 	public struct View: SwiftUI.View {
 		public let store: StoreOf<CardCarousel>
 
-		private static let coordSpace: String = "CardCarousel"
-
 		private let margin: CGFloat = .medium1
-		private let spacing: CGFloat = .small1
+		private let spacing: CGFloat = .small1 * 0.5
 		@ScaledMetric private var height: CGFloat = 105
+		@SwiftUI.State private var selectedCardIndex = 0
 
 		public var body: some SwiftUI.View {
 			WithPerceptionTracking {
-				GeometryReader { proxy in
-					coreView
-						.backgroundPreferenceValue(PositionsPreferenceKey.self) { positions in
-							dummyCards(positions, in: proxy.frame(in: .named(Self.coordSpace)))
-						}
+				VStack(spacing: 8) {
+					GeometryReader { _ in
+						coreView
+					}
+					.frame(height: store.cards.isEmpty ? 0 : height)
+
+					positionIndicator
 				}
-				.padding(.horizontal, margin - 0.5 * spacing)
-				.frame(height: store.cards.isEmpty ? 0 : height)
 			}
 			.onAppear {
 				store.send(.view(.didAppear))
@@ -30,64 +29,40 @@ extension CardCarousel {
 
 		@MainActor
 		private var coreView: some SwiftUI.View {
-			WithPerceptionTracking {
-				TabView {
-					ForEach(store.cards) { card in
-						CarouselCardView(card: card) {
-							store.send(.view(.cardTapped(card)))
-						} closeAction: {
-							store.send(.view(.closeTapped(card.id)), animation: .default)
-						}
-						.measurePosition(card, coordSpace: Self.coordSpace)
-						.padding(.horizontal, 0.5 * spacing)
-						.transition(.scale(scale: 0.8).combined(with: .opacity))
+			TabView(selection: $selectedCardIndex) {
+				ForEach(Array(store.cards.enumerated()), id: \.1) { index, card in
+					CarouselCardView(card: card) {
+						store.send(.view(.cardTapped(card)))
+					} closeAction: {
+						store.send(.view(.closeTapped(card)), animation: .default)
+					}
+					.tag(index)
+					.padding(.horizontal, margin - spacing)
+					.transition(.scale(scale: 0.8).combined(with: .opacity))
+				}
+			}
+			.tabViewStyle(.page(indexDisplayMode: .never))
+			.animation(.default, value: store.cards)
+		}
+
+		private var positionIndicator: some SwiftUI.View {
+			HStack(spacing: spacing) {
+				if store.cards.count > 1 {
+					ForEach(0 ..< store.cards.count, id: \.self) { index in
+						let isSelected = selectedCardIndex == index
+						Capsule()
+							.fill(isSelected ? .app.gray4 : .app.gray2)
+							.frame(isSelected ? spacing : .small3)
 					}
 				}
-				.tabViewStyle(.page(indexDisplayMode: .never))
-				.animation(.default, value: store.cards)
 			}
-			.coordinateSpace(name: Self.coordSpace)
-		}
-
-		@MainActor
-		private func dummyCards(_ positions: [AnyHashable: CGRect], in frame: CGRect) -> some SwiftUI.View {
-			WithPerceptionTracking {
-				let dummyPositions = dummyPositions(positions, frame: frame, cards: store.cards)
-				ForEach(dummyPositions, id: \.card) { card, pos in
-					CarouselCardView.Dummy(card: card)
-						.frame(width: pos.width, height: pos.height)
-						.offset(x: pos.minX - margin)
-				}
-				.animation(nil, value: store.cards)
-			}
-		}
-
-		private func dummyPositions(_ positions: [AnyHashable: CGRect], frame: CGRect, cards: [CarouselCard]) -> [(card: CarouselCard, pos: CGRect)] {
-			guard let width = positions.first?.value.width else { return [] }
-
-			let thisCard = positions.mapValues { abs($0.midX - frame.midX) }.min { $0.value < $1.value }?.key.base as? CarouselCard
-			guard let thisCard, let currentIndex = cards.firstIndex(of: thisCard), let rect = positions[thisCard] else { return [] }
-			var result: [(CarouselCard, CGRect)] = []
-			if cards.indices.contains(currentIndex - 1) {
-				result.append((cards[currentIndex - 1], rect.offsetBy(dx: -(width + spacing), dy: 0)))
-			}
-			if !frame.contains(rect) {
-				result.append((thisCard, rect))
-			}
-			if cards.indices.contains(currentIndex + 1) {
-				result.append((cards[currentIndex + 1], rect.offsetBy(dx: width + spacing, dy: 0)))
-			}
-
-			return result
 		}
 	}
 }
 
 // MARK: - CarouselCardView
 public struct CarouselCardView: View {
-	private let trailingPadding: CGFloat = 115
-
-	public let card: CarouselCard
+	public let card: HomeCard
 	public let action: () -> Void
 	public let closeAction: () -> Void
 
@@ -98,8 +73,9 @@ public struct CarouselCardView: View {
 					HStack {
 						Text(title)
 							.textStyle(.body1Header)
+							.minimumScaleFactor(0.8)
 
-						if case .openURL = card.action {
+						if showLinkIcon {
 							Image(.iconLinkOut)
 								.foregroundStyle(.app.gray2)
 						}
@@ -124,88 +100,95 @@ public struct CarouselCardView: View {
 				.cornerRadius(.small1)
 			}
 
-			CloseButton(action: closeAction)
+			Button(action: closeAction) {
+				Image(asset: AssetResource.close)
+					.resizable()
+					.frame(width: .medium3, height: .medium3)
+					.tint(.app.gray1)
+					.padding(.small2)
+			}
+			.frame(.small, alignment: .topTrailing)
 		}
 	}
 
-	public struct Dummy: View {
-		let card: CarouselCard
-
-		public var body: some SwiftUI.View {
-			CarouselCardView(card: card, action: {}, closeAction: {})
-				.disabled(true)
+	private var trailingPadding: CGFloat {
+		switch card {
+		case .continueRadQuest, .startRadQuest:
+			95
+		case .dapp:
+			85
+		case .connector:
+			106
 		}
 	}
 
 	private var title: String {
-		switch card.id {
-		case .rejoinRadQuest:
+		switch card {
+		case .continueRadQuest:
 			L10n.HomePageCarousel.RejoinRadquest.title
-		case .discoverRadix:
+		case .startRadQuest:
 			L10n.HomePageCarousel.DiscoverRadix.title
-		case .continueOnDapp:
+		case .dapp:
 			L10n.HomePageCarousel.ContinueOnDapp.title
-		case .useDappsOnDesktop:
+		case .connector:
 			L10n.HomePageCarousel.UseDappsOnDesktop.title
-		case .threeSixtyDegrees:
-			L10n.HomePageCarousel.ThreesixtyDegrees.title
 		}
 	}
 
 	private var text: String {
-		switch card.id {
-		case .rejoinRadQuest:
+		switch card {
+		case .continueRadQuest:
 			L10n.HomePageCarousel.RejoinRadquest.text
-		case .discoverRadix:
+		case .startRadQuest:
 			L10n.HomePageCarousel.DiscoverRadix.text
-		case .continueOnDapp:
+		case .dapp:
 			L10n.HomePageCarousel.ContinueOnDapp.text
-		case .useDappsOnDesktop:
+		case .connector:
 			L10n.HomePageCarousel.UseDappsOnDesktop.text
-		case .threeSixtyDegrees:
-			L10n.HomePageCarousel.ThreesixtyDegrees.text
 		}
 	}
 
 	private var background: some View {
-		switch card.id {
-		case .rejoinRadQuest:
-			cardBackground(.carouselBackgroundRadquest, type: .gradient)
-		case .discoverRadix:
-			cardBackground(.carouselBackgroundRadquest, type: .gradient)
-		case .continueOnDapp:
-			cardBackground(.carouselIconContinueOnDapp, type: .icon)
-		case .useDappsOnDesktop:
-			cardBackground(.carouselBackgroundConnect, type: .gradient)
-		case .threeSixtyDegrees:
-			cardBackground(.carouselFullBackground360, type: .full)
+		switch card {
+		case .continueRadQuest:
+			cardBackground(.gradient(.carouselBackgroundRadquest))
+		case .startRadQuest:
+			cardBackground(.gradient(.carouselBackgroundRadquest))
+		case let .dapp(url):
+			cardBackground(.thumbnail(.dapp, url))
+		case .connector:
+			cardBackground(.gradient(.carouselBackgroundConnect))
+		}
+	}
+
+	private var showLinkIcon: Bool {
+		switch card {
+		case .startRadQuest:
+			true
+		case .continueRadQuest, .dapp, .connector:
+			false
 		}
 	}
 
 	@ViewBuilder
-	private func cardBackground(_ imageResource: ImageResource, type: BackgroundType) -> some View {
+	private func cardBackground(_ type: BackgroundType) -> some View {
 		switch type {
-		case .icon:
-			Image(imageResource)
+		case let .thumbnail(type, url):
+			Thumbnail(type, url: url, size: .smallish)
 				.padding(.trailing, .medium2)
 				.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
-		case .gradient:
+		case let .gradient(imageResource):
 			Image(imageResource)
 				.resizable()
 				.aspectRatio(contentMode: .fill)
 				.mask {
 					LinearGradient(colors: [.clear, .white, .white], startPoint: .leading, endPoint: .trailing)
 				}
-		case .full:
-			Image(imageResource)
-				.resizable()
-				.aspectRatio(contentMode: .fill)
 		}
 	}
 
 	private enum BackgroundType {
-		case icon
-		case gradient
-		case full
+		case thumbnail(Thumbnail.ContentType, URL?)
+		case gradient(ImageResource)
 	}
 }

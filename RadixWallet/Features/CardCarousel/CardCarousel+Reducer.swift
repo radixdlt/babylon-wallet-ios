@@ -5,7 +5,7 @@ import ComposableArchitecture
 public struct CardCarousel: FeatureReducer, Sendable {
 	@ObservableState
 	public struct State: Hashable, Sendable {
-		public var cards: [CarouselCard] = []
+		public var cards: [HomeCard] = []
 	}
 
 	public typealias Action = FeatureAction<Self>
@@ -13,16 +13,20 @@ public struct CardCarousel: FeatureReducer, Sendable {
 	@CasePathable
 	public enum ViewAction: Equatable, Sendable {
 		case didAppear
-		case cardTapped(CarouselCard)
-		case closeTapped(CarouselCard.ID)
+		case cardTapped(HomeCard)
+		case closeTapped(HomeCard)
 	}
 
 	@CasePathable
 	public enum InternalAction: Equatable, Sendable {
-		case setCards([CarouselCard])
+		case setCards([HomeCard])
 	}
 
-	@Dependency(\.cardCarouselClient) var cardCarouselClient
+	public enum DelegateAction: Sendable, Equatable {
+		case addConnector
+	}
+
+	@Dependency(\.homeCardsClient) var homeCardsClient
 	@Dependency(\.openURL) var openURL
 
 	public var body: some ReducerOf<Self> {
@@ -32,26 +36,18 @@ public struct CardCarousel: FeatureReducer, Sendable {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .didAppear:
-			return .run { send in
+			.run { send in
 				do {
-					for try await cards in cardCarouselClient.cards() {
+					for try await cards in homeCardsClient.cards() {
 						await send(.internal(.setCards(cards)))
 					}
 				} catch {}
 			}
 		case let .cardTapped(card):
-			cardCarouselClient.tappedCard(card.id)
-			switch card.action {
-			case let .openURL(url):
-				return .run { _ in
-					await openURL(url)
-				}
-			case .dismiss:
-				return .none
-			}
-		case let .closeTapped(id):
-			cardCarouselClient.closeCard(id)
-			return .none
+			cardTappedEffect(card)
+				.merge(with: removeCardEffect(card))
+		case let .closeTapped(card):
+			removeCardEffect(card)
 		}
 	}
 
@@ -61,5 +57,27 @@ public struct CardCarousel: FeatureReducer, Sendable {
 			state.cards = cards
 			return .none
 		}
+	}
+
+	private func removeCardEffect(_ card: HomeCard) -> Effect<Action> {
+		homeCardsClient.removeCard(card)
+		return .none
+	}
+
+	private func cardTappedEffect(_ card: HomeCard) -> Effect<Action> {
+		switch card {
+		case .continueRadQuest, .dapp:
+			.none
+		case .startRadQuest:
+			.run { _ in
+				await openURL(Constants.radquestURL)
+			}
+		case .connector:
+			.send(.delegate(.addConnector))
+		}
+	}
+
+	private enum Constants {
+		static let radquestURL = URL(string: "https://radquest.io")!
 	}
 }

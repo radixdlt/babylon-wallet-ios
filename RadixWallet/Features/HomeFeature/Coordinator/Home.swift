@@ -85,6 +85,7 @@ public struct Home: Sendable, FeatureReducer {
 			case npsSurvey(NPSSurvey.State)
 			case relinkConnector(NewConnection.State)
 			case securityCenter(SecurityCenter.State)
+			case p2pLinks(P2PLinksFeature.State)
 		}
 
 		@CasePathable
@@ -95,6 +96,7 @@ public struct Home: Sendable, FeatureReducer {
 			case npsSurvey(NPSSurvey.Action)
 			case relinkConnector(NewConnection.Action)
 			case securityCenter(SecurityCenter.Action)
+			case p2pLinks(P2PLinksFeature.Action)
 
 			public enum AcknowledgeJailbreakAlert: Sendable, Hashable {}
 		}
@@ -114,6 +116,9 @@ public struct Home: Sendable, FeatureReducer {
 			}
 			Scope(state: \.securityCenter, action: \.securityCenter) {
 				SecurityCenter()
+			}
+			Scope(state: \.p2pLinks, action: \.p2pLinks) {
+				P2PLinksFeature()
 			}
 		}
 	}
@@ -308,6 +313,10 @@ public struct Home: Sendable, FeatureReducer {
 				state.destination = .securityCenter(.init())
 				return .none
 			}
+
+		case .carousel(.delegate(.addConnector)):
+			state.destination = .p2pLinks(.init(destination: .newConnection(.init())))
+			return .none
 
 		default:
 			return .none

@@ -120,6 +120,8 @@ extension UserDefaults.Dependency.Key {
 			return [userDefaults.showRelinkConnectorsAfterUpdate].map(String.init(describing:))
 		case .showRelinkConnectorsAfterProfileRestore:
 			return [userDefaults.showRelinkConnectorsAfterProfileRestore].map(String.init(describing:))
+		case .homeCards:
+			return []
 		}
 	}
 }
