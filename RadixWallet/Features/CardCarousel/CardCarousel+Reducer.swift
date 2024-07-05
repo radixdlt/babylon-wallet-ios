@@ -12,7 +12,7 @@ public struct CardCarousel: FeatureReducer, Sendable {
 
 	@CasePathable
 	public enum ViewAction: Equatable, Sendable {
-		case didAppear
+		case task
 		case cardTapped(HomeCard)
 		case closeTapped(HomeCard)
 	}
@@ -35,7 +35,7 @@ public struct CardCarousel: FeatureReducer, Sendable {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .didAppear:
+		case .task:
 			.run { send in
 				do {
 					for try await cards in homeCardsClient.cards() {

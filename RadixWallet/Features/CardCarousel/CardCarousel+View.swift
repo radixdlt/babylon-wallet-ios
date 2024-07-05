@@ -13,24 +13,22 @@ extension CardCarousel {
 
 		public var body: some SwiftUI.View {
 			WithPerceptionTracking {
-				VStack(spacing: 8) {
-					GeometryReader { _ in
-						coreView
-					}
-					.frame(height: store.cards.isEmpty ? 0 : height)
+				VStack(spacing: .small2) {
+					coreView
+						.frame(height: store.cards.isEmpty ? 0 : height)
 
 					positionIndicator
 				}
 			}
-			.onAppear {
-				store.send(.view(.didAppear))
+			.task {
+				store.send(.view(.task))
 			}
 		}
 
 		@MainActor
 		private var coreView: some SwiftUI.View {
 			TabView(selection: $selectedCardIndex) {
-				ForEach(Array(store.cards.enumerated()), id: \.1) { index, card in
+				ForEach(Array(store.cards.enumerated()), id: \.element) { index, card in
 					CarouselCardView(card: card) {
 						store.send(.view(.cardTapped(card)))
 					} closeAction: {

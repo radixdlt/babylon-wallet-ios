@@ -121,7 +121,7 @@ extension UserDefaults.Dependency.Key {
 		case .showRelinkConnectorsAfterProfileRestore:
 			return [userDefaults.showRelinkConnectorsAfterProfileRestore].map(String.init(describing:))
 		case .homeCards:
-			return []
+			return [userDefaults.getHomeCards() == nil ? "No Data available" : "Data available"]
 		}
 	}
 }
