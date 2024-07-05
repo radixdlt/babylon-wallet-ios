@@ -54,7 +54,7 @@ extension ROLAClient {
 						throw ExpectedHTTPURLResponse()
 					}
 
-					guard httpURLResponse.statusCode == BadHTTPResponseCode.expected else {
+					guard httpURLResponse.status == .ok else {
 						throw BadHTTPResponseCode(got: httpURLResponse.statusCode)
 					}
 

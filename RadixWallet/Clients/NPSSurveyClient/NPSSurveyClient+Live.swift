@@ -129,9 +129,7 @@ extension NPSSurveyClient {
 		urlRequest.httpBody = try? JSONSerialization.data(withJSONObject: feedbackParams)
 
 		do {
-			_ = try await httpClient.executeRequest(urlRequest) { statusCode in
-				[200, 202].contains(statusCode)
-			}
+			_ = try await httpClient.executeRequest(urlRequest, [.ok, .accepted])
 		} catch {
 			loggerGlobal.info("Failed to submit nps survey feedback \(error)")
 		}

@@ -70,7 +70,7 @@ extension GatewayAPIClient {
 				urlRequest.timeoutInterval = timeoutInterval
 			}
 
-			let data = try await httpClient.executeRequest(urlRequest, nil)
+			let data = try await httpClient.executeRequest(urlRequest)
 
 			do {
 				return try jsonDecoder.decode(Response.self, from: data)

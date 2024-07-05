@@ -5,5 +5,11 @@ public struct HTTPClient: Sendable, DependencyKey {
 
 // MARK: HTTPClient.ExecuteRequest
 extension HTTPClient {
-	public typealias ExecuteRequest = @Sendable (_ request: URLRequest, _ isStatusCodeValid: ((Int) -> Bool)?) async throws -> Data
+	public typealias ExecuteRequest = @Sendable (_ request: URLRequest, _ acceptedStatusCodes: [HTTPStatusCode]) async throws -> Data
+}
+
+extension HTTPClient {
+	func executeRequest(_ request: URLRequest) async throws -> Data {
+		try await executeRequest(request, [.ok])
+	}
 }
