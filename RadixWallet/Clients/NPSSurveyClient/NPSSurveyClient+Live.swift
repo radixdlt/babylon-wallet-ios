@@ -70,11 +70,13 @@ extension NPSSurveyClient {
 extension NPSSurveyClient {
 	#if DEBUG
 	static let rootURL = "https://dev-wallet-net-promoter-score.radixdlt.com/v1/responses"
+	static let formUUID = "281622a0-dc6b-11ee-8fd1-23c96056fbd2"
 	#else
 	static let rootURL = "https://wallet-net-promoter-score.radixdlt.com/v1/responses"
+	static let formUUID = "3432b6e0-dfad-11ee-a53c-95167f067d9c"
 	#endif
 
-	enum QueryItem: String {
+	enum BodyParam: String {
 		case id
 		case formUuid = "form_uuid"
 		case nps
@@ -101,8 +103,7 @@ extension NPSSurveyClient {
 			}
 		}()
 
-		var urlComponents = URLComponents(string: Self.rootURL)!
-		urlComponents.queryItems = [.userId(userId), .formUUID] + (feedback.map(\.queryItems) ?? [])
+		let urlComponents = URLComponents(string: Self.rootURL)!
 
 		guard let url = urlComponents.url else {
 			return
@@ -110,42 +111,27 @@ extension NPSSurveyClient {
 
 		var urlRequest = URLRequest(url: url)
 		urlRequest.httpMethod = "POST"
+		urlRequest.allHTTPHeaderFields = [
+			"accept": "application/json",
+			"Content-Type": "application/json",
+		]
+
+		var feedbackParams: [String: Any] = [
+			BodyParam.id.rawValue: userId.uuidString,
+			BodyParam.formUuid.rawValue: formUUID,
+		]
+		if let feedback {
+			feedbackParams[BodyParam.nps.rawValue] = feedback.npsScore
+		}
+		if let reason = feedback?.reason {
+			feedbackParams[BodyParam.feedbackReason.rawValue] = reason
+		}
+		urlRequest.httpBody = try? JSONSerialization.data(withJSONObject: feedbackParams)
 
 		do {
-			_ = try await httpClient.executeRequest(urlRequest)
+			_ = try await httpClient.executeRequest(urlRequest, [.ok, .accepted])
 		} catch {
 			loggerGlobal.info("Failed to submit nps survey feedback \(error)")
 		}
-	}
-}
-
-private extension URLQueryItem {
-	static func userId(_ id: UUID) -> Self {
-		.init(name: "id", value: id.uuidString)
-	}
-
-	#if DEBUG
-	static let formUUID: Self = .init(name: "form_uuid", value: "281622a0-dc6b-11ee-8fd1-23c96056fbd2")
-	#else
-	static let formUUID: Self = .init(name: "form_uuid", value: "3432b6e0-dfad-11ee-a53c-95167f067d9c")
-	#endif
-
-	static func npsScore(_ score: Int) -> Self {
-		.init(name: NPSSurveyClient.QueryItem.nps.rawValue, value: "\(score)")
-	}
-
-	static func npsFeedbackReason(_ reason: String) -> Self {
-		.init(name: NPSSurveyClient.QueryItem.feedbackReason.rawValue, value: reason)
-	}
-}
-
-extension NPSSurveyClient.UserFeedback {
-	var queryItems: [URLQueryItem] {
-		var queryItems: [URLQueryItem] = []
-		queryItems.append(.npsScore(npsScore))
-		if let reason {
-			queryItems.append(.npsFeedbackReason(reason))
-		}
-		return queryItems
 	}
 }
