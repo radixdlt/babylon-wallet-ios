@@ -81,7 +81,6 @@ public extension AddressDetails {
 							.frame(maxWidth: .infinity)
 							.transition(.scale(scale: 0.95).combined(with: .opacity))
 					}
-
 				case .failure:
 					Text(L10n.AddressDetails.qrCodeFailure)
 						.textStyle(.body1HighImportance)
