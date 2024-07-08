@@ -129,6 +129,9 @@ public struct AddressDetails: Sendable, FeatureReducer {
 	}
 
 	private func loadQrCodeEffect(state: inout State) -> Effect<Action> {
+		guard state.showQrCode else {
+			return .none
+		}
 		state.qrImage = .loading
 		let content = QR.addressPrefix + state.address.address
 		return .run { send in
@@ -141,6 +144,17 @@ public struct AddressDetails: Sendable, FeatureReducer {
 }
 
 // MARK: - Helpers
+
+extension AddressDetails.State {
+	var showQrCode: Bool {
+		switch address {
+		case .account:
+			true
+		default:
+			false
+		}
+	}
+}
 
 private extension OnLedgerEntity.Resource {
 	var resourceTitle: String? {

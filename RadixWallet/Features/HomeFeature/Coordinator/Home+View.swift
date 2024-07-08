@@ -97,6 +97,9 @@ extension Home {
 			.onFirstAppear {
 				store.send(.view(.onFirstAppear))
 			}
+			.onDisappear {
+				store.send(.view(.onDisappear))
+			}
 		}
 
 		struct HeaderView: SwiftUI.View {
