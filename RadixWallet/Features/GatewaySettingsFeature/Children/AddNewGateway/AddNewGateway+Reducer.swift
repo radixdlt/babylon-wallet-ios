@@ -56,9 +56,8 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 			guard let url = URL(string: state.inputtedURL)?.httpsURL else { return .none }
 
 			return .run { send in
-				let gateways = await gatewaysClient.getAllGateways()
-				let duplicate = gateways.first(where: { $0.url == url })
-				if let _ = duplicate {
+				let hasGateway = await gatewaysClient.hasGateway(url)
+				if hasGateway {
 					await send(.internal(.showDuplicateURLError))
 				} else {
 					await send(.internal(.validateNewGateway(url)))
