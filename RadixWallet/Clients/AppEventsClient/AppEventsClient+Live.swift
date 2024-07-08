@@ -1,17 +1,13 @@
 extension AppEventsClient: DependencyKey {
 	public static let liveValue: AppEventsClient = {
-		@Dependency(\.homeCardsClient) var homeCardsClient
+		let eventsSubject = AsyncReplaySubject<AppEvent>(bufferSize: 10)
 
 		return .init(
 			handleEvent: { event in
-				switch event {
-				case .appStarted:
-					homeCardsClient.walletStarted()
-				case .walletCreated:
-					homeCardsClient.walletCreated()
-				case let .deepLinkReceived(value):
-					homeCardsClient.deepLinkReceived(value)
-				}
+				eventsSubject.send(event)
+			},
+			events: {
+				eventsSubject.eraseToAnyAsyncSequence()
 			}
 		)
 	}()

@@ -1,15 +1,18 @@
 // MARK: - AppEventsClient
 public struct AppEventsClient: Sendable {
 	public var handleEvent: HandleEvent
+	public var events: Events
 
-	init(handleEvent: @escaping HandleEvent) {
+	init(handleEvent: @escaping HandleEvent, events: @escaping Events) {
 		self.handleEvent = handleEvent
+		self.events = events
 	}
 }
 
 // MARK: AppEventsClient.HandleEvent
 extension AppEventsClient {
 	public typealias HandleEvent = @Sendable (AppEvent) -> Void
+	public typealias Events = @Sendable () -> AnyAsyncSequence<AppEvent>
 }
 
 extension DependencyValues {
