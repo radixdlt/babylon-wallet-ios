@@ -43,9 +43,10 @@ extension CardCarousel {
 			.animation(.default, value: store.cards)
 		}
 
+		@ViewBuilder
 		private var positionIndicator: some SwiftUI.View {
-			HStack(spacing: spacing) {
-				if store.cards.count > 1 {
+			if store.cards.count > 1 {
+				HStack(spacing: spacing) {
 					ForEach(0 ..< store.cards.count, id: \.self) { index in
 						let isSelected = selectedCardIndex == index
 						Capsule()
@@ -100,14 +101,7 @@ public struct CarouselCardView: View {
 				.cornerRadius(.small1)
 			}
 
-			Button(action: closeAction) {
-				Image(asset: AssetResource.close)
-					.resizable()
-					.frame(width: .medium3, height: .medium3)
-					.tint(.app.gray2)
-					.padding(.small2)
-			}
-			.frame(.small, alignment: .topTrailing)
+			CloseButton(kind: .homeCard, action: closeAction)
 		}
 	}
 
