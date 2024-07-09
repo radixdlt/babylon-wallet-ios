@@ -22,11 +22,11 @@ extension HomeCardsClient: DependencyKey {
 		func handle(event: AppEvent) async {
 			switch event {
 			case .appStarted:
-				try? await manager.walletStarted()
+				try? await manager.bootstrap()
 			case .walletCreated:
 				try? await manager.walletCreated()
-			case let .deepLinkReceived(value):
-				try? await manager.deepLinkReceived(encodedValue: value)
+			case let .deferredDeepLinkReceived(value):
+				try? await manager.deferredDeepLinkReceived(encodedValue: value)
 			}
 		}
 

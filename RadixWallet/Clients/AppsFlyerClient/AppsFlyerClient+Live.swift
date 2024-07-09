@@ -43,7 +43,7 @@ extension AppsFlyerClient: DependencyKey {
 			if let deepLink = result.deepLink {
 				loggerGlobal.info("did resolve deep link. Is deferred: \(deepLink.isDeferred). Click events: \(deepLink.clickEvent)")
 				if deepLink.isDeferred, let value = deepLink.clickEvent["deep_link_value"] as? String {
-					appEventsClient.handleEvent(.deepLinkReceived(value))
+					appEventsClient.handleEvent(.deferredDeepLinkReceived(value))
 				}
 			} else if let error = result.error {
 				loggerGlobal.info("failed to resolve deep link. Status: \(result.status), Error: \(error.localizedDescription)")
