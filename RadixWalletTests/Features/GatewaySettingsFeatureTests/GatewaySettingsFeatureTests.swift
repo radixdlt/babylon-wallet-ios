@@ -212,12 +212,12 @@ final class GatewaySettingsFeatureTests: TestCase {
 			initialState: initialState,
 			reducer: AddNewGateway.init
 		) {
-			$0.networkSwitchingClient.validateGatewayURL = { _ in .sample }
-			$0.gatewaysClient.addGateway = { _ in }
 			$0.gatewaysClient.getAllGateways = {
 				allGateways
 			}
-			$0.gatewaysClient.hasGateway = { _ in true }
+			$0.gatewaysClient.hasGateway = { url in
+				url.absoluteString == validURL
+			}
 		}
 		store.exhaustivity = .off
 
