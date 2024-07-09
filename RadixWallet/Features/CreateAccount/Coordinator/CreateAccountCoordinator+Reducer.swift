@@ -108,6 +108,7 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.isPresented) var isPresented
 	@Dependency(\.dismiss) var dismiss
+	@Dependency(\.appEventsClient) var appEventsClient
 
 	public init() {}
 
@@ -191,6 +192,9 @@ extension CreateAccountCoordinator {
 			return .none
 
 		case let .handleAccountCreated(.success(account)):
+			if state.config.shouldSendWalletCreatedEvent {
+				appEventsClient.handleEvent(.walletCreated)
+			}
 			state.destination = nil
 			state.path.append(.completion(.init(
 				account: account,
