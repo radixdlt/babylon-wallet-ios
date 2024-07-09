@@ -897,10 +897,10 @@
 		5B758D5C2BCEC3B200348722 /* Troubleshooting+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B758D5A2BCEC3B200348722 /* Troubleshooting+View.swift */; };
 		5B758D5D2BCEC3B200348722 /* Troubleshooting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B758D5B2BCEC3B200348722 /* Troubleshooting.swift */; };
 		5B77D7B42C0DFE8300F5F215 /* EntitySecurityProblemsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B77D7B12C0DFE8300F5F215 /* EntitySecurityProblemsView.swift */; };
-		5B96DD372BD917B300722882 /* Text+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B96DD362BD917B300722882 /* Text+Extra.swift */; };
 		5B80FCC42C298E68008444F5 /* ArbitraryDataFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B80FCC32C298E68008444F5 /* ArbitraryDataFieldView.swift */; };
 		5B80FCC72C298F13008444F5 /* ArbitraryDataField+Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B80FCC62C298F13008444F5 /* ArbitraryDataField+Models.swift */; };
 		5B80FCC92C299159008444F5 /* ArbitraryDataField+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B80FCC82C299159008444F5 /* ArbitraryDataField+Helpers.swift */; };
+		5B96DD372BD917B300722882 /* Text+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B96DD362BD917B300722882 /* Text+Extra.swift */; };
 		5B9846BD2BBD5C8800E814F3 /* SensitiveInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B9846BC2BBD5C8800E814F3 /* SensitiveInfo.plist */; };
 		5B9846C02BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9846BF2BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift */; };
 		5B9846C22BBD5F7600E814F3 /* SensitiveInfoClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9846C12BBD5F7600E814F3 /* SensitiveInfoClient+Live.swift */; };
@@ -2033,10 +2033,10 @@
 		5B758D5A2BCEC3B200348722 /* Troubleshooting+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Troubleshooting+View.swift"; sourceTree = "<group>"; };
 		5B758D5B2BCEC3B200348722 /* Troubleshooting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Troubleshooting.swift; sourceTree = "<group>"; };
 		5B77D7B12C0DFE8300F5F215 /* EntitySecurityProblemsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EntitySecurityProblemsView.swift; sourceTree = "<group>"; };
-		5B96DD362BD917B300722882 /* Text+Extra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Text+Extra.swift"; sourceTree = "<group>"; };
 		5B80FCC32C298E68008444F5 /* ArbitraryDataFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArbitraryDataFieldView.swift; sourceTree = "<group>"; };
 		5B80FCC62C298F13008444F5 /* ArbitraryDataField+Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ArbitraryDataField+Models.swift"; sourceTree = "<group>"; };
 		5B80FCC82C299159008444F5 /* ArbitraryDataField+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ArbitraryDataField+Helpers.swift"; sourceTree = "<group>"; };
+		5B96DD362BD917B300722882 /* Text+Extra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Text+Extra.swift"; sourceTree = "<group>"; };
 		5B9846BC2BBD5C8800E814F3 /* SensitiveInfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = SensitiveInfo.plist; sourceTree = "<group>"; };
 		5B9846BF2BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SensitiveInfoClient+Interface.swift"; sourceTree = "<group>"; };
 		5B9846C12BBD5F7600E814F3 /* SensitiveInfoClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SensitiveInfoClient+Live.swift"; sourceTree = "<group>"; };
@@ -8574,7 +8574,7 @@
 			repositoryURL = "https://github.com/radixdlt/sargon";
 			requirement = {
 				kind = exactVersion;
-				version = 1.0.22;
+				version = 1.0.23;
 			};
 		};
 		8318BB172BC8403800057BCB /* XCRemoteSwiftPackageReference "swift-custom-dump" */ = {
