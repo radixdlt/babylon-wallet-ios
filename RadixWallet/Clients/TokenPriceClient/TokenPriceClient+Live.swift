@@ -13,11 +13,7 @@ extension TokenPricesClient {
 			var urlRequest = URLRequest(url: pricesEndpoint)
 			urlRequest.httpMethod = "POST"
 			urlRequest.httpBody = try jsonEncoder().encode(fetchRequest)
-
-			urlRequest.allHTTPHeaderFields = [
-				"accept": "application/json",
-				"Content-Type": "application/json",
-			]
+			urlRequest.setHttpHeaderFields()
 
 			let data = try await httpClient.executeRequest(urlRequest)
 			let decodedResponse = try jsonDecoder().decode(TokensPriceResponse.self, from: data)
