@@ -190,6 +190,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 			$0.gatewaysClient.getAllGateways = {
 				allGateways
 			}
+			$0.gatewaysClient.hasGateway = { _ in false }
 		}
 		store.exhaustivity = .off
 
@@ -198,6 +199,31 @@ final class GatewaySettingsFeatureTests: TestCase {
 		await store.receive(.internal(.gatewayValidationResult(.success(.sample))))
 		await store.receive(.internal(.addGatewayResult(.success(.instance))))
 		await store.receive(.delegate(.dismiss))
+	}
+
+	func test_whenNewAddGatewayButtonIsTapped_duplicateGatewayIsRejected() async throws {
+		// given
+		let allGateways: Gateways = [.nebunet, .hammunet, .enkinet, .mardunet]
+		let validURL = URL.previewValue.absoluteString
+		var initialState = AddNewGateway.State()
+		initialState.inputtedURL = validURL
+
+		let store = TestStore(
+			initialState: initialState,
+			reducer: AddNewGateway.init
+		) {
+			$0.networkSwitchingClient.validateGatewayURL = { _ in .sample }
+			$0.gatewaysClient.addGateway = { _ in }
+			$0.gatewaysClient.getAllGateways = {
+				allGateways
+			}
+			$0.gatewaysClient.hasGateway = { _ in true }
+		}
+		store.exhaustivity = .off
+
+		// when
+		await store.send(.view(.addNewGatewayButtonTapped))
+		await store.receive(.internal(.showDuplicateURLError))
 	}
 }
 
