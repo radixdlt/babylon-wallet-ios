@@ -158,13 +158,18 @@ extension AddressDetails.State {
 
 private extension OnLedgerEntity.Resource {
 	var resourceTitle: String? {
-		guard let name = metadata.name else {
-			return metadata.symbol
+		switch fungibility {
+		case .nonFungible:
+			return metadata.name
+		case .fungible:
+			guard let name = metadata.name else {
+				return metadata.symbol
+			}
+			guard let symbol = metadata.symbol else {
+				return name
+			}
+			return "\(name) (\(symbol))"
 		}
-		guard let symbol = metadata.symbol else {
-			return name
-		}
-		return "\(name) (\(symbol))"
 	}
 }
 
