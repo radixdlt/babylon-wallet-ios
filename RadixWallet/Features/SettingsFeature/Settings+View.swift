@@ -16,7 +16,6 @@ extension Settings {
 		#if DEBUG
 		let debugAppInfo: String
 		#endif
-		let shouldShowAddP2PLinkButton: Bool
 		let securityProblems: [SecurityProblem]
 		let personasSecurityProblems: [SecurityProblem]
 		let appVersion: String
@@ -39,7 +38,6 @@ extension Settings {
 			self.appVersion = L10n.WalletSettings.appVersion(bundleInfo.shortVersion)
 			#endif
 
-			self.shouldShowAddP2PLinkButton = state.userHasNoP2PLinks ?? false
 			self.securityProblems = state.securityProblems
 			self.personasSecurityProblems = state.personasSecurityProblems
 		}
@@ -71,12 +69,6 @@ extension Settings.View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(spacing: .zero) {
-					if viewStore.shouldShowAddP2PLinkButton {
-						ConnectExtensionView {
-							viewStore.send(.addConnectorButtonTapped)
-						}
-					}
-
 					ForEachStatic(rows(securityProblems: viewStore.securityProblems, personasProblems: viewStore.personasSecurityProblems)) { kind in
 						SettingsRow(kind: kind, store: store)
 					}
@@ -250,40 +242,4 @@ private extension View {
 		}
 	}
 	#endif
-}
-
-// MARK: - Settings.View.ConnectExtensionView
-extension Settings.View {
-	// MARK: - ConnectExtensionView
-	struct ConnectExtensionView: View {
-		let action: () -> Void
-
-		var body: some View {
-			VStack(spacing: .medium2) {
-				Image(asset: AssetResource.connectorBrowsersIcon)
-
-				VStack(spacing: .medium3) {
-					Text(L10n.WalletSettings.LinkToConnectorHeader.title)
-						.textStyle(.body1Header)
-						.foregroundColor(.app.gray1)
-
-					Text(L10n.WalletSettings.LinkToConnectorHeader.subtitle)
-						.foregroundColor(.app.gray2)
-						.textStyle(.body2Regular)
-						.multilineTextAlignment(.center)
-						.padding(.horizontal, .large3)
-				}
-
-				Button(L10n.WalletSettings.LinkToConnectorHeader.button, action: action)
-					.buttonStyle(.secondaryRectangular(
-						backgroundColor: .app.gray3,
-						shouldExpand: true,
-						image: .init(asset: AssetResource.qrCodeScanner)
-					))
-			}
-			.padding(.vertical, .large3)
-			.padding(.horizontal, .large2)
-			.background(Color.clear)
-		}
-	}
 }
