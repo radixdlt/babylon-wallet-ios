@@ -78,9 +78,9 @@ public extension AddressDetails {
 						Image(decorative: value, scale: 1)
 							.resizable()
 							.frame(width: proxy.size.height, height: proxy.size.height)
-							.frame(maxWidth: .infinity)
-							.transition(.scale(scale: 0.95).combined(with: .opacity))
+							.position(x: proxy.frame(in: .local).midX, y: proxy.frame(in: .local).midY)
 					}
+					.transition(.scale(scale: 0.95).combined(with: .opacity))
 				case .failure:
 					Text(L10n.AddressDetails.qrCodeFailure)
 						.textStyle(.body1HighImportance)
