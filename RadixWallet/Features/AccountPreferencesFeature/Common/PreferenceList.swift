@@ -5,21 +5,20 @@ import SwiftUI
 struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 	struct Row: Equatable {
 		var id: RowId
-		let title: String
-		let subtitle: String?
+		let rowCoreViewState: PlainListRowCore.ViewState
 		let hint: String?
 		let icon: AssetIcon.Content?
 
 		init(
 			id: RowId,
+			context: PlainListRowCore.ViewState.Context = .general,
 			title: String,
 			subtitle: String? = nil,
 			hint: String? = nil,
 			icon: AssetIcon.Content? = nil
 		) {
 			self.id = id
-			self.title = title
-			self.subtitle = subtitle
+			self.rowCoreViewState = .init(context: context, title: title, subtitle: subtitle)
 			self.hint = hint
 			self.icon = icon
 		}
@@ -52,47 +51,7 @@ struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 	var body: some View {
 		SwiftUI.Section {
 			ForEach(viewState.rows, id: \.id) { row in
-				HStack {
-					VStack(alignment: .leading) {
-						HStack(spacing: .medium3) {
-							if let icon = row.icon {
-								AssetIcon(icon)
-							}
-							PlainListRowCore(title: row.title, subtitle: row.subtitle)
-						}
-
-						if let hint = row.hint {
-							// Align hint with the PlainListRowCore
-							Text(hint)
-								.textStyle(.body2Regular)
-								.foregroundColor(.app.alert)
-								.lineSpacing(-4)
-								.padding(.leading, HitTargetSize.verySmall.frame.width + .medium3)
-								.padding(.top, .medium3)
-						}
-					}
-					.padding(.vertical, .small1)
-					.frame(minHeight: .plainListRowMinHeight)
-
-					Spacer(minLength: 0)
-
-					if case let .selection(selection) = viewState.mode {
-						if row.id == selection {
-							Image(asset: AssetResource.check)
-						} else {
-							/// Put a placeholder for unselected items.
-							FixedSpacer(width: .medium1)
-						}
-					} else {
-						Image(asset: AssetResource.chevronRight)
-					}
-				}
-				.padding(.horizontal, .medium3)
-				.contentShape(Rectangle())
-				.tappable {
-					onRowSelected(viewState.id, row.id)
-				}
-				.listRowInsets(EdgeInsets())
+				rowView(row)
 			}
 		} header: {
 			if let title = viewState.title {
@@ -107,6 +66,50 @@ struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 		}
 		.listSectionSeparator(.hidden)
 		.textCase(nil)
+	}
+
+	private func rowView(_ row: Row) -> some SwiftUI.View {
+		HStack {
+			VStack(alignment: .leading) {
+				HStack(spacing: .medium3) {
+					if let icon = row.icon {
+						AssetIcon(icon)
+					}
+					PlainListRowCore(viewState: row.rowCoreViewState)
+				}
+
+				if let hint = row.hint {
+					// Align hint with the PlainListRowCore
+					Text(hint)
+						.textStyle(.body2Regular)
+						.foregroundColor(.app.alert)
+						.lineSpacing(-4)
+						.padding(.leading, HitTargetSize.verySmall.frame.width + .medium3)
+						.padding(.top, .medium3)
+				}
+			}
+			.padding(.vertical, .medium3)
+			.frame(minHeight: .plainListRowMinHeight)
+
+			Spacer(minLength: 0)
+
+			if case let .selection(selection) = viewState.mode {
+				if row.id == selection {
+					Image(asset: AssetResource.check)
+				} else {
+					/// Put a placeholder for unselected items.
+					FixedSpacer(width: .medium1)
+				}
+			} else {
+				Image(asset: AssetResource.chevronRight)
+			}
+		}
+		.padding(.horizontal, .medium3)
+		.contentShape(Rectangle())
+		.tappable {
+			onRowSelected(viewState.id, row.id)
+		}
+		.listRowInsets(EdgeInsets())
 	}
 }
 

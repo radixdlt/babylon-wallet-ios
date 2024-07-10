@@ -113,7 +113,7 @@ struct PlainListRow<Icon: View>: View {
 
 // MARK: - PlainListRowCore
 struct PlainListRowCore: View {
-	struct ViewState {
+	struct ViewState: Equatable {
 		let context: Context
 		let title: String?
 		let subtitle: String?

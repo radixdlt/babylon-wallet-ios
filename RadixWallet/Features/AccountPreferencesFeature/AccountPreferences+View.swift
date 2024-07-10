@@ -10,7 +10,7 @@ extension AccountPreferences.State {
 					.init(
 						id: .personalize,
 						title: L10n.AccountSettings.personalizeHeading,
-						rows: [.accountLabel(account)]
+						rows: [.accountLabel]
 					),
 					.init(
 						id: .onLedgerBehaviour,
@@ -36,7 +36,7 @@ extension AccountPreferences.State {
 		sections.append(.init(
 			id: .development,
 			title: L10n.AccountSettings.developmentHeading,
-			rows: [.devAccountPreferences()]
+			rows: [.devAccountPreferences]
 		))
 	}
 }
@@ -131,7 +131,7 @@ extension AccountPreferences.View {
 		Button(L10n.AccountSettings.HideAccount.button) {
 			store.send(.view(.hideAccountTapped))
 		}
-		.buttonStyle(.primaryRectangular(isDestructive: true))
+		.buttonStyle(.secondaryRectangular(shouldExpand: true))
 	}
 }
 
@@ -208,11 +208,12 @@ extension AccountPreferences {
 }
 
 extension PreferenceSection.Row where RowId == AccountPreferences.Section.SectionRow {
-	static func accountLabel(_ account: Account) -> Self {
+	static var accountLabel: Self {
 		.init(
 			id: .personalize(.accountLabel),
+			context: .settings,
 			title: L10n.AccountSettings.accountLabel,
-			subtitle: account.displayName.rawValue,
+			subtitle: "MISSING STRINGS",
 			icon: .asset(AssetResource.create)
 		)
 	}
@@ -220,15 +221,17 @@ extension PreferenceSection.Row where RowId == AccountPreferences.Section.Sectio
 	static func thirdPartyDeposits(_ rule: DepositRule) -> Self {
 		.init(
 			id: .onLedger(.thirdPartyDeposits),
+			context: .settings,
 			title: L10n.AccountSettings.thirdPartyDeposits,
-			subtitle: rule.text,
-			icon: .asset(AssetResource.iconAcceptAirdrop)
+			subtitle: "MISSING STRINGS",
+			icon: .asset(rule.icon)
 		)
 	}
 
-	static func devAccountPreferences() -> Self {
+	static var devAccountPreferences: Self {
 		.init(
 			id: .dev(.devPreferences),
+			context: .settings,
 			title: L10n.AccountSettings.devPreferences,
 			subtitle: nil,
 			icon: .asset(AssetResource.appSettings)
@@ -237,14 +240,14 @@ extension PreferenceSection.Row where RowId == AccountPreferences.Section.Sectio
 }
 
 extension DepositRule {
-	var text: String {
+	var icon: ImageAsset {
 		switch self {
 		case .acceptAll:
-			L10n.AccountSettings.ThirdPartyDeposits.acceptAll
+			AssetResource.iconAcceptAirdrop
 		case .acceptKnown:
-			L10n.AccountSettings.ThirdPartyDeposits.onlyKnown
+			AssetResource.iconAcceptKnownAirdrop
 		case .denyAll:
-			L10n.AccountSettings.ThirdPartyDeposits.denyAll
+			AssetResource.iconDeclineAirdrop
 		}
 	}
 }
