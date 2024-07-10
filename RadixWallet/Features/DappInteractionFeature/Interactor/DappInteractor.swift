@@ -143,9 +143,9 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 			switch state.destination {
 			case .some(.dappInteractionCompletion):
-				// FIXME: this is a temporary hack, to solve bug where incoming requests
-				// are ignored since completion is believed to be shown, but is not.
-				state.destination = nil
+				if state.requestQueue.isEmpty {
+					state.destination = nil
+				}
 			default: break
 			}
 

@@ -95,7 +95,7 @@ public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case dismissed
-		case completed
+		case completed(Persona)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -152,9 +152,9 @@ extension CreatePersonaCoordinator {
 
 			return .send(.internal(.derivePublicKey))
 
-		case .path(.element(_, action: .step2_completion(.delegate(.completed)))):
+		case let .path(.element(_, action: .step2_completion(.delegate(.completed(persona))))):
 			return .run { send in
-				await send(.delegate(.completed))
+				await send(.delegate(.completed(persona)))
 				await dismiss()
 			}
 

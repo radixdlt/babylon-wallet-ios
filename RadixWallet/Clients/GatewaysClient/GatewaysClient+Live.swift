@@ -26,6 +26,9 @@ extension GatewaysClient: DependencyKey {
 				try await profileStore.updating { profile in
 					try profile.changeGateway(to: gateway)
 				}
+			},
+			hasGateway: { url in
+				await appPreferencesClient.getPreferences().hasGateway(with: url)
 			}
 		)
 	}

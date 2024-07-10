@@ -17,7 +17,8 @@ extension GatewaysClient: TestDependencyKey {
 		getCurrentGateway: unimplemented("\(Self.self).getCurrentGateway"),
 		addGateway: unimplemented("\(Self.self).addGateway"),
 		removeGateway: unimplemented("\(Self.self).removeGateway"),
-		changeGateway: unimplemented("\(Self.self).changeGateway")
+		changeGateway: unimplemented("\(Self.self).changeGateway"),
+		hasGateway: unimplemented("\(Self.self).hasGateway")
 	)
 
 	public static let noop = Self(
@@ -27,6 +28,7 @@ extension GatewaysClient: TestDependencyKey {
 		getCurrentGateway: { .nebunet },
 		addGateway: { _ in },
 		removeGateway: { _ in },
-		changeGateway: { _ in }
+		changeGateway: { _ in },
+		hasGateway: { _ in false }
 	)
 }
