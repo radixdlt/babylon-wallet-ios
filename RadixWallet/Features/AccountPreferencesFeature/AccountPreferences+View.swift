@@ -26,7 +26,8 @@ extension AccountPreferences.State {
 				return sections
 			}(),
 			faucetButtonState: faucetButtonState,
-			isOnMainnet: isOnMainnet
+			isOnMainnet: isOnMainnet,
+			showHideAccount: showHideAccount
 		)
 	}
 
@@ -46,9 +47,10 @@ extension AccountPreferences {
 	public struct ViewState: Equatable {
 		typealias Section = PreferenceSection<AccountPreferences.Section, AccountPreferences.Section.SectionRow>.ViewState
 		let account: Account
-		var sections: [Section]
-		var faucetButtonState: ControlState
-		var isOnMainnet: Bool
+		let sections: [Section]
+		let faucetButtonState: ControlState
+		let isOnMainnet: Bool
+		let showHideAccount: Bool
 	}
 
 	@MainActor
@@ -71,6 +73,11 @@ extension AccountPreferences {
 					viewStore.send(.task)
 				}
 				.destination(store: store)
+				.sheet(isPresented: viewStore.binding(get: \.showHideAccount, send: .hideAccount(.cancel))) {
+					HideAccountView { action in
+						viewStore.send(.hideAccount(action))
+					}
+				}
 				.background(.app.gray5)
 				.radixToolbar(title: L10n.AccountSettings.title)
 			}
@@ -151,7 +158,6 @@ private extension View {
 		return updateAccountLabel(with: destinationStore)
 			.thirdPartyDeposits(with: destinationStore)
 			.devAccountPreferences(with: destinationStore)
-			.confirmHideAccountAlert(with: destinationStore)
 	}
 
 	private func updateAccountLabel(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
@@ -170,10 +176,6 @@ private extension View {
 		navigationDestination(store: destinationStore.scope(state: \.devPreferences, action: \.devPreferences)) {
 			DevAccountPreferences.View(store: $0)
 		}
-	}
-
-	private func confirmHideAccountAlert(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
-		alert(store: destinationStore.scope(state: \.confirmHideAccount, action: \.confirmHideAccount))
 	}
 }
 

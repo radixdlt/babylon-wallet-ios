@@ -8,6 +8,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		public var faucetButtonState: ControlState
 		public var address: AccountAddress { account.address }
 		public var isOnMainnet: Bool { account.networkID == .mainnet }
+		public var showHideAccount = false
 
 		@PresentationState
 		var destination: Destination.State? = nil
@@ -28,6 +29,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		case rowTapped(AccountPreferences.Section.SectionRow)
 		case hideAccountTapped
 		case faucetButtonTapped
+		case hideAccount(HideAccountAction)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -49,7 +51,6 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			case updateAccountLabel(UpdateAccountLabel.State)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.State)
 			case devPreferences(DevAccountPreferences.State)
-			case confirmHideAccount(AlertState<Action.ConfirmHideAccountAlert>)
 		}
 
 		@CasePathable
@@ -57,18 +58,9 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			case updateAccountLabel(UpdateAccountLabel.Action)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.Action)
 			case devPreferences(DevAccountPreferences.Action)
-			case confirmHideAccount(ConfirmHideAccountAlert)
-
-			public enum ConfirmHideAccountAlert: Hashable, Sendable {
-				case confirmTapped
-				case cancelTapped
-			}
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.updateAccountLabel, action: /Action.updateAccountLabel) {
-				UpdateAccountLabel()
-			}
 			Scope(state: /State.thirdPartyDeposits, action: /Action.thirdPartyDeposits) {
 				ManageThirdPartyDeposits()
 			}
@@ -112,20 +104,21 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			return destination(for: row, &state)
 
 		case .hideAccountTapped:
-			state.destination = .confirmHideAccount(.init(
-				title: .init(L10n.AccountSettings.hideThisAccount),
-				message: .init(L10n.AccountSettings.hideAccountConfirmation),
-				buttons: [
-					.default(.init(L10n.Common.continue), action: .send(.confirmTapped)),
-					.cancel(.init(L10n.Common.cancel), action: .send(.cancelTapped)),
-				]
-			))
+			state.showHideAccount = true
 			return .none
 
 		case .faucetButtonTapped:
 			return call(buttonState: \.faucetButtonState, into: &state) {
 				try await faucetClient.getFreeXRD(.init(recipientAccountAddress: $0))
 			}
+
+		case .hideAccount(.confirm):
+			state.showHideAccount = false
+			return hideAccountEffect(state: state)
+
+		case .hideAccount(.cancel):
+			state.showHideAccount = false
+			return .none
 		}
 	}
 
@@ -179,20 +172,16 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		#endif
 		case .devPreferences:
 			return .none
-		case let .confirmHideAccount(action):
-			switch action {
-			case .confirmTapped:
-				return .run { [account = state.account] send in
-					try await entitiesVisibilityClient.hide(account: account)
-					overlayWindowClient.scheduleHUD(.accountHidden)
-					await send(.delegate(.accountHidden))
-				} catch: { error, _ in
-					errorQueue.schedule(error)
-				}
-			case .cancelTapped:
-				break
-			}
-			return .none
+		}
+	}
+
+	private func hideAccountEffect(state: State) -> Effect<Action> {
+		.run { [account = state.account] send in
+			try await entitiesVisibilityClient.hide(account: account)
+			overlayWindowClient.scheduleHUD(.accountHidden)
+			await send(.delegate(.accountHidden))
+		} catch: { error, _ in
+			errorQueue.schedule(error)
 		}
 	}
 }

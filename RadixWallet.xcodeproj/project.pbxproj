@@ -908,6 +908,7 @@
 		5BB7C1782BC81F61001216EB /* ImportOlympiaNameLedger+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB7C1772BC81F61001216EB /* ImportOlympiaNameLedger+View.swift */; };
 		5BBC43A92BBAC6B0005747B1 /* AppTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC43A82BBAC6B0005747B1 /* AppTextEditor.swift */; };
 		5BBC7DA42C3D442800B04BD6 /* URLRequest+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC7DA32C3D442800B04BD6 /* URLRequest+Extra.swift */; };
+		5BBC7DA62C3EFA9700B04BD6 /* HideAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC7DA52C3EFA9700B04BD6 /* HideAccountView.swift */; };
 		5BC82B6C2BED18A1009AC162 /* FactoryReset+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC82B6A2BED18A1009AC162 /* FactoryReset+View.swift */; };
 		5BC82B6D2BED18A1009AC162 /* FactoryReset+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC82B6B2BED18A1009AC162 /* FactoryReset+Reducer.swift */; };
 		830818482B9F1621002D8351 /* HTTPClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830818472B9F1621002D8351 /* HTTPClient+Live.swift */; };
@@ -2045,6 +2046,7 @@
 		5BB7C1772BC81F61001216EB /* ImportOlympiaNameLedger+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ImportOlympiaNameLedger+View.swift"; sourceTree = "<group>"; };
 		5BBC43A82BBAC6B0005747B1 /* AppTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTextEditor.swift; sourceTree = "<group>"; };
 		5BBC7DA32C3D442800B04BD6 /* URLRequest+Extra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URLRequest+Extra.swift"; sourceTree = "<group>"; };
+		5BBC7DA52C3EFA9700B04BD6 /* HideAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HideAccountView.swift; sourceTree = "<group>"; };
 		5BC82B6A2BED18A1009AC162 /* FactoryReset+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactoryReset+View.swift"; sourceTree = "<group>"; };
 		5BC82B6B2BED18A1009AC162 /* FactoryReset+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactoryReset+Reducer.swift"; sourceTree = "<group>"; };
 		830818472B9F1621002D8351 /* HTTPClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPClient+Live.swift"; sourceTree = "<group>"; };
@@ -2588,6 +2590,7 @@
 				48CFBC742ADC10D800E77A5C /* ThirdPartyDeposits */,
 				48CFBC722ADC10D800E77A5C /* UpdateAccountLabel+Reducer.swift */,
 				48CFBC732ADC10D800E77A5C /* UpdateAccountLabel+View.swift */,
+				5BBC7DA52C3EFA9700B04BD6 /* HideAccountView.swift */,
 			);
 			path = Children;
 			sourceTree = "<group>";
@@ -6859,6 +6862,7 @@
 				48CFC4F72ADC10DA00E77A5C /* PublicKeyHashType.swift in Sources */,
 				48CFC4AD2ADC10DA00E77A5C /* FungibleResourcesCollectionItemVaultAggregatedVaultItem.swift in Sources */,
 				83856D622B0279080026452A /* VerifyMnemonic+View.swift in Sources */,
+				5BBC7DA62C3EFA9700B04BD6 /* HideAccountView.swift in Sources */,
 				48CFC4332ADC10DA00E77A5C /* Either+Extra.swift in Sources */,
 				48CFC2C72ADC10D900E77A5C /* MessageMode+View.swift in Sources */,
 				E6FA984A2B04B9AC00748F20 /* ConfirmSkippingBDFS+View.swift in Sources */,
