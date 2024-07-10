@@ -7,20 +7,17 @@ public struct CreateAccountConfig: Sendable, Hashable {
 	public let isFirstAccount: Bool
 	public let canBeDismissed: Bool
 	public let navigationButtonCTA: CreateAccountNavigationButtonCTA
-	public let shouldSendWalletCreatedEvent: Bool
 
 	fileprivate init(
 		isFirstAccount: Bool,
 		canBeDismissed: Bool,
 		navigationButtonCTA: CreateAccountNavigationButtonCTA,
-		specificNetworkID: NetworkID? = nil,
-		shouldSendWalletCreatedEvent: Bool = false
+		specificNetworkID: NetworkID? = nil
 	) {
 		self.specificNetworkID = specificNetworkID
 		self.isFirstAccount = isFirstAccount
 		self.canBeDismissed = canBeDismissed
 		self.navigationButtonCTA = navigationButtonCTA
-		self.shouldSendWalletCreatedEvent = shouldSendWalletCreatedEvent
 	}
 }
 
@@ -38,8 +35,7 @@ extension CreateAccountConfig {
 			self.init(
 				isFirstAccount: true,
 				canBeDismissed: false,
-				navigationButtonCTA: .goHome,
-				shouldSendWalletCreatedEvent: true
+				navigationButtonCTA: .goHome
 			)
 		case let .firstAccountOnNewNetwork(specificNetworkID):
 			self.init(

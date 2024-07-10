@@ -31,6 +31,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 
 	@Dependency(\.onboardingClient) var onboardingClient
 	@Dependency(\.radixConnectClient) var radixConnectClient
+	@Dependency(\.appEventsClient) var appEventsClient
 
 	public init() {}
 
@@ -72,6 +73,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 			return sendDelegateCompleted(state: state)
 
 		case .createAccountCoordinator(.delegate(.completed)):
+			appEventsClient.handleEvent(.walletCreated)
 			return .run { send in
 				_ = await onboardingClient.finishOnboarding()
 				_ = await radixConnectClient.loadP2PLinksAndConnectAll()
