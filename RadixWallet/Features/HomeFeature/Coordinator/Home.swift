@@ -4,8 +4,6 @@ import SwiftUI
 
 // MARK: - Home
 public struct Home: Sendable, FeatureReducer {
-	public static let radixBannerURL = URL(string: "https://wallet.radixdlt.com/?wallet=downloaded")!
-
 	private enum CancellableId: Hashable {
 		case fetchAccountPortfolios
 	}
@@ -17,7 +15,6 @@ public struct Home: Sendable, FeatureReducer {
 		public var accountRows: IdentifiedArrayOf<Home.AccountRow.State> = []
 		fileprivate var problems: [SecurityProblem] = []
 
-		public var showRadixBanner: Bool = false
 		public var showFiatWorth: Bool = true
 
 		public var totalFiatWorth: Loadable<FiatWorth> = .idle
@@ -56,8 +53,6 @@ public struct Home: Sendable, FeatureReducer {
 		case pullToRefreshStarted
 		case createAccountButtonTapped
 		case settingsButtonTapped
-		case radixBannerButtonTapped
-		case radixBannerDismissButtonTapped
 		case showFiatWorthToggled
 	}
 
@@ -128,7 +123,6 @@ public struct Home: Sendable, FeatureReducer {
 		}
 	}
 
-	@Dependency(\.openURL) var openURL
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.userDefaults) var userDefaults
 	@Dependency(\.accountsClient) var accountsClient
@@ -179,8 +173,6 @@ public struct Home: Sendable, FeatureReducer {
 			return .none
 
 		case .task:
-			state.showRadixBanner = userDefaults.showRadixBanner
-
 			return .run { send in
 				for try await accounts in await accountsClient.accountsOnCurrentNetwork() {
 					guard !Task.isCancelled else { return }
@@ -210,16 +202,6 @@ public struct Home: Sendable, FeatureReducer {
 
 		case .pullToRefreshStarted:
 			return fetchAccountPortfolios(state)
-
-		case .radixBannerButtonTapped:
-			return .run { _ in
-				await openURL(Home.radixBannerURL)
-			}
-
-		case .radixBannerDismissButtonTapped:
-			userDefaults.setShowRadixBanner(false)
-			state.showRadixBanner = false
-			return .none
 
 		case .settingsButtonTapped:
 			return .send(.delegate(.displaySettings))

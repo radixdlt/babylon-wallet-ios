@@ -5,7 +5,6 @@ import Sargon
 // MARK: - UserDefaultsKey
 public enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
 	case hideMigrateOlympiaButton
-	case showRadixBanner
 	case epochForWhenLastUsedByAccountAddress
 	case transactionsCompletedCounter
 	case dateOfLastSubmittedNPSSurvey
@@ -96,14 +95,6 @@ extension UserDefaults.Dependency {
 
 	public func setHideMigrateOlympiaButton(_ value: Bool) {
 		set(value, forKey: Key.hideMigrateOlympiaButton.rawValue)
-	}
-
-	public var showRadixBanner: Bool {
-		bool(key: .showRadixBanner)
-	}
-
-	public func setShowRadixBanner(_ value: Bool) {
-		set(value, forKey: Key.showRadixBanner.rawValue)
 	}
 
 	public func getActiveProfileID() -> ProfileID? {

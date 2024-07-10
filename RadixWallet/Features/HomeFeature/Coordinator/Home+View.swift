@@ -3,17 +3,13 @@ import SwiftUI
 
 extension Home.State {
 	var viewState: Home.ViewState {
-		.init(
-			showRadixBanner: showRadixBanner,
-			totalFiatWorth: showFiatWorth ? totalFiatWorth : nil
-		)
+		.init(totalFiatWorth: showFiatWorth ? totalFiatWorth : nil)
 	}
 }
 
 // MARK: - Home.View
 extension Home {
 	public struct ViewState: Equatable {
-		let showRadixBanner: Bool
 		let totalFiatWorth: Loadable<FiatWorth>?
 	}
 
@@ -64,19 +60,9 @@ extension Home {
 							store.send(.view(.createAccountButtonTapped))
 						}
 						.buttonStyle(.secondaryRectangular())
-
-						if viewStore.showRadixBanner {
-							RadixBanner {
-								store.send(.view(.radixBannerButtonTapped))
-							} dismiss: {
-								store.send(.view(.radixBannerDismissButtonTapped))
-							}
-							.transition(.scale(scale: 0.8).combined(with: .opacity))
-						}
 					}
 					.padding(.bottom, .medium3)
 				}
-				.animation(.default, value: viewStore.showRadixBanner)
 				.toolbar {
 					ToolbarItem(placement: .navigationBarTrailing) {
 						Button {
@@ -194,45 +180,6 @@ extension View {
 					.offset(x: .small3, y: -.small3)
 			}
 		}
-	}
-}
-
-// MARK: - RadixBanner
-struct RadixBanner: View {
-	let action: () -> Void
-	let dismiss: () -> Void
-
-	var body: some View {
-		VStack(spacing: 0) {
-			Image(asset: AssetResource.radixBanner)
-				.padding(.top, .medium1)
-
-			Text(L10n.HomePage.RadixBanner.title)
-				.textStyle(.body1Header)
-				.foregroundColor(.app.gray1)
-				.padding(.bottom, .small2)
-
-			Text(L10n.HomePage.RadixBanner.subtitle)
-				.multilineTextAlignment(.center)
-				.textStyle(.body2Regular)
-				.foregroundColor(.app.gray2)
-				.padding(.horizontal, .huge3)
-				.padding(.bottom, .medium3)
-
-			Button(L10n.HomePage.RadixBanner.action, action: action)
-				.buttonStyle(.secondaryRectangular(
-					shouldExpand: true,
-					trailingImage: .init(asset: AssetResource.iconLinkOut)
-				))
-				.padding([.horizontal, .bottom], .medium3)
-		}
-		.background(Color.app.gray5)
-		.cornerRadius(.medium3)
-		.overlay(alignment: .topTrailing) {
-			CloseButton(action: dismiss)
-				.padding(.small3)
-		}
-		.padding([.horizontal, .bottom], .medium3)
 	}
 }
 
