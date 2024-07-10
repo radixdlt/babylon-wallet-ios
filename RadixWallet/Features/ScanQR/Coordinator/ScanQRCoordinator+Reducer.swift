@@ -14,12 +14,12 @@ public struct ScanQRCoordinator: Sendable, FeatureReducer {
 		}
 
 		public var step: Step
-		public let scanInstructions: String
+		public let kind: ScanQR.Kind
 		public init(
-			scanInstructions: String,
+			kind: ScanQR.Kind,
 			step: Step = .init()
 		) {
-			self.scanInstructions = scanInstructions
+			self.kind = kind
 			self.step = step
 		}
 	}
@@ -57,7 +57,7 @@ public struct ScanQRCoordinator: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case .proceedWithScan:
-			state.step = .scanQR(.init(scanInstructions: state.scanInstructions))
+			state.step = .scanQR(.init(kind: state.kind))
 			return .none
 		}
 	}

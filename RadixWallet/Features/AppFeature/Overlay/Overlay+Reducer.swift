@@ -41,6 +41,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 			Scope(state: \.hud, action: \.hud) {
 				HUD()
 			}
+
 			Scope(state: \.fullScreen, action: \.fullScreen) {
 				FullScreenOverlayCoordinator()
 			}
@@ -49,6 +50,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.continuousClock) var clock
+	@Dependency(\.contactSupportClient) var contactSupport
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -85,6 +87,12 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		case let .alert(action):
 			if case let .alert(state) = state.itemsQueue.first {
 				overlayWindowClient.sendAlertAction(action, state.id)
+			}
+			if case let .emailSupport(additionalInfo) = action {
+				return .run { _ in
+					await contactSupport.openEmail(additionalInfo)
+				}
+				.concatenate(with: dismiss(&state))
 			}
 			return dismiss(&state)
 
@@ -139,9 +147,11 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		case let .hud(hud):
 			state.destination = .hud(.init(content: hud))
 			return .none
+
 		case let .alert(alert):
 			state.destination = .alert(alert)
 			return setIsUserInteractionEnabled(&state, isEnabled: true)
+
 		case let .fullScreen(fullScreen):
 			state.destination = .fullScreen(fullScreen)
 			return setIsUserInteractionEnabled(&state, isEnabled: true)

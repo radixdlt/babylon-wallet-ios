@@ -798,12 +798,13 @@ struct TransactionReview_Previews: PreviewProvider {
 
 extension TransactionReview.State {
 	public static let previewValue: Self = .init(
-		unvalidatedManifest: try! .init(manifest: .previewValue),
+		unvalidatedManifest: .sample,
 		nonce: .secureRandom(),
 		signTransactionPurpose: .manifestFromDapp,
 		message: .none,
 		isWalletTransaction: false,
-		proposingDappMetadata: nil
+		proposingDappMetadata: nil,
+		p2pRoute: .wallet
 	)
 }
 #endif

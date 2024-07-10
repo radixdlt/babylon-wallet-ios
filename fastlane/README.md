@@ -73,7 +73,7 @@ Archive and export the iOS app
 
 Installs distribution certificates
 
-Usage `bundle exec fastlane ios install_distribution_certificate --env ios.<specific env>`
+Usage `bundle exec fastlane ios install_distribution_certificates --env ios.<specific env>`
 
 ### ios install_development_certificates
 

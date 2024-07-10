@@ -401,7 +401,8 @@ extension RTCClient {
 				let route = P2P.RTCRoute(p2pLink: self.p2pLink, peerConnectionId: connection.id)
 				return P2P.RTCIncomingMessage(
 					result: decode(messageResult),
-					route: .rtc(route)
+					route: .rtc(route),
+					originRequiresValidation: false
 				)
 			}
 			.subscribe(self.incomingMessagesContinuation)
@@ -436,11 +437,10 @@ func decode(
 	return messageResult.flatMap { (message: DataChannelClient.AssembledMessage) in
 		let jsonData = message.messageContent
 		do {
-			let request = try jsonDecoder.decode(
-				P2P.RTCMessageFromPeer.Request.self,
-				from: jsonData
-			)
-			return .success(.request(request))
+			guard let jsonString = String(data: jsonData, encoding: .utf8) else {
+				throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Unable to convert data to UTF-8 string"))
+			}
+			return try .success(.request(.dapp(.init(jsonString: jsonString))))
 		} catch let decodeRequestError {
 			do {
 				let response = try jsonDecoder.decode(

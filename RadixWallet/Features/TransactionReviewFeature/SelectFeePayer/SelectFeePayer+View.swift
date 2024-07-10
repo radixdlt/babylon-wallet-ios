@@ -56,27 +56,33 @@ extension SelectFeePayer {
 						.padding(.horizontal, .large3)
 						.padding(.bottom, .small1)
 
-					ScrollView {
-						loadable(viewStore.feePayerCandidates) {
-							ProgressView()
-						} successContent: { candidates in
-							VStack(spacing: .small1) {
-								Selection(
-									viewStore.binding(
-										get: \.selectedPayer,
-										send: { .selectedPayer($0) }
-									),
-									from: candidates
-								) { item in
-									SelectAccountToPayForFeeRow.View(
-										viewState: .init(candidate: item.value),
-										isSelected: item.isSelected,
-										action: item.action
-									)
+					ScrollViewReader { proxy in
+						ScrollView {
+							loadable(viewStore.feePayerCandidates) {
+								ProgressView()
+							} successContent: { candidates in
+								VStack(spacing: .small1) {
+									Selection(
+										viewStore.binding(
+											get: \.selectedPayer,
+											send: { .selectedPayer($0) }
+										),
+										from: candidates
+									) { item in
+										SelectAccountToPayForFeeRow.View(
+											viewState: .init(candidate: item.value),
+											isSelected: item.isSelected,
+											action: item.action
+										)
+										.id(item.value.id)
+									}
+								}
+								.padding(.horizontal, .medium1)
+								.padding(.bottom, .medium2)
+								.onFirstAppear {
+									proxy.scrollTo(viewStore.selectedPayer?.id, anchor: .center)
 								}
 							}
-							.padding(.horizontal, .medium1)
-							.padding(.bottom, .medium2)
 						}
 					}
 					.refreshable { @MainActor in

@@ -95,9 +95,11 @@ extension SecureStorageClient: DependencyKey {
 			try keychainClient
 				.getDataWithoutAuth(forKey: profileHeaderListKeychainKey)
 				.map {
-					try jsonDecoder().decode([Profile.Header].self, from: $0)
+					try jsonDecoder().decode([Throwable<Profile.Header>].self, from: $0)
 				}
-				.flatMap(Profile.HeaderList.init)
+				.flatMap {
+					.init($0.compactMap { try? $0.result.get() })
+				}
 		}
 
 		@Sendable func saveProfileHeaderList(_ headers: Profile.HeaderList) throws {
@@ -233,6 +235,25 @@ extension SecureStorageClient: DependencyKey {
 					comment: .init("Created on \(factorSource.hint.name) \(factorSource.supportsOlympia ? " (Olympia)" : "")")
 				)
 			)
+		}
+
+		let saveRadixConnectMobileSession: SaveRadixConnectMobileSession = { sessionId, encodedSession in
+			let mostSecureAccesibilityAndAuthenticationPolicy = try queryMostSecureAccesibilityAndAuthenticationPolicy()
+
+			try keychainClient.setDataWithoutAuth(
+				encodedSession,
+				forKey: .init(.init(rawValue: sessionId.uuidString)!),
+				attributes: .init(
+					iCloudSyncEnabled: false,
+					accessibility: mostSecureAccesibilityAndAuthenticationPolicy.accessibility,
+					label: importantKeychainIdentifier("Radix Wallet Mobile2Mobile session secret")!,
+					comment: .init("Created for \(sessionId)")
+				)
+			)
+		}
+
+		let loadRadixConnectMobileSession: LoadRadixConnectMobileSession = { id in
+			try keychainClient.getDataWithoutAuth(forKey: .init(.init(rawValue: id.uuidString)!))
 		}
 
 		#if DEBUG
@@ -413,6 +434,8 @@ extension SecureStorageClient: DependencyKey {
 			saveDeviceInfo: saveDeviceInfo,
 			deprecatedLoadDeviceID: deprecatedLoadDeviceID,
 			deleteDeprecatedDeviceID: deleteDeprecatedDeviceID,
+			saveRadixConnectMobileSession: saveRadixConnectMobileSession,
+			loadRadixConnectMobileSession: loadRadixConnectMobileSession,
 			loadP2PLinks: loadP2PLinks,
 			saveP2PLinks: saveP2PLinks,
 			loadP2PLinksPrivateKey: loadP2PLinksPrivateKey,
@@ -440,6 +463,8 @@ extension SecureStorageClient: DependencyKey {
 			saveDeviceInfo: saveDeviceInfo,
 			deprecatedLoadDeviceID: deprecatedLoadDeviceID,
 			deleteDeprecatedDeviceID: deleteDeprecatedDeviceID,
+			saveRadixConnectMobileSession: saveRadixConnectMobileSession,
+			loadRadixConnectMobileSession: loadRadixConnectMobileSession,
 			loadP2PLinks: loadP2PLinks,
 			saveP2PLinks: saveP2PLinks,
 			loadP2PLinksPrivateKey: loadP2PLinksPrivateKey,

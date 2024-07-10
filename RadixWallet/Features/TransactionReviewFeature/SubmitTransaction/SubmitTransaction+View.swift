@@ -6,7 +6,8 @@ extension SubmitTransaction.State {
 		.init(
 			txID: notarizedTX.txID,
 			status: status,
-			dismissalDisabled: inProgressDismissalDisabled && status.isInProgress
+			dismissalDisabled: inProgressDismissalDisabled && status.isInProgress,
+			showSwitchBackToBrowserMessage: route.isDeepLink
 		)
 	}
 }
@@ -50,6 +51,7 @@ extension SubmitTransaction {
 		let txID: IntentHash
 		let status: State.TXStatus
 		let dismissalDisabled: Bool
+		let showSwitchBackToBrowserMessage: Bool
 	}
 
 	@MainActor
@@ -67,13 +69,15 @@ extension SubmitTransaction {
 				WithNavigationBar {
 					viewStore.send(.closeButtonTapped)
 				} content: {
-					VStack(spacing: .medium2) {
+					VStack(spacing: .medium3) {
+						Spacer()
 						if viewStore.status.failed {
 							Image(.errorLarge)
 							Text(viewStore.status.errorTitle)
 								.foregroundColor(.app.gray1)
 								.textStyle(.sheetTitle)
 								.multilineTextAlignment(.center)
+								.padding(.horizontal, .medium2)
 						} else {
 							Image(asset: AssetResource.transactionInProgress)
 								.opacity(opacity)
@@ -94,17 +98,29 @@ extension SubmitTransaction {
 							.foregroundColor(.app.gray1)
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)
+							.padding(.horizontal, .medium2)
 
 						HStack {
 							Text(L10n.TransactionReview.SubmitTransaction.txID)
 								.foregroundColor(.app.gray1)
-							AddressView(.identifier(.transaction(viewStore.txID)))
+							AddressView(.transaction(viewStore.txID))
 								.foregroundColor(.app.blue1)
 						}
 						.textStyle(.body1Header)
+						.padding(.horizontal, .medium2)
+
+						Spacer()
+						if viewStore.status.failed, viewStore.showSwitchBackToBrowserMessage {
+							Text(L10n.MobileConnect.interactionSuccess)
+								.foregroundColor(.app.gray1)
+								.textStyle(.body1Regular)
+								.multilineTextAlignment(.center)
+								.padding(.vertical, .medium1)
+								.frame(maxWidth: .infinity)
+								.background(.app.gray5)
+						}
 					}
-					.padding(.horizontal, .medium2)
-					.padding(.bottom, .medium3)
+					.frame(maxWidth: .infinity)
 				}
 				.onFirstTask { @MainActor in
 					viewStore.send(.appeared)
