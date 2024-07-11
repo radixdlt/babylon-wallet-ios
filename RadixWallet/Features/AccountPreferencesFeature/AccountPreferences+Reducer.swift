@@ -61,6 +61,9 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		}
 
 		public var body: some ReducerOf<Self> {
+			Scope(state: /State.updateAccountLabel, action: /Action.updateAccountLabel) {
+				UpdateAccountLabel()
+			}
 			Scope(state: /State.thirdPartyDeposits, action: /Action.thirdPartyDeposits) {
 				ManageThirdPartyDeposits()
 			}
