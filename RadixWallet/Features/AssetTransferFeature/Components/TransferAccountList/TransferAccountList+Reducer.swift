@@ -209,10 +209,7 @@ extension TransferAccountList {
 		assets += selectedAssets.nonFungibleResources.flatMap { resource in
 			resource.tokens.map {
 				ResourceAsset.State(kind: .nonFungibleAsset(.init(
-					resourceImage: resource.resourceImage,
-					resourceName: resource.resourceName,
-					resourceAddress: resource.resourceAddress,
-					atLedgerState: resource.atLedgerState,
+					resource: resource.resource,
 					token: $0
 				)))
 			}
@@ -265,10 +262,7 @@ extension TransferAccountList {
 			.nonFungibleAssets
 			.reduce(into: IdentifiedArrayOf<AssetsView.State.Mode.SelectedAssets.NonFungibleTokensPerResource>()) { partialResult, asset in
 				var resource = partialResult[id: asset.resourceAddress] ?? .init(
-					resourceAddress: asset.resourceAddress,
-					resourceImage: asset.resourceImage,
-					resourceName: asset.resourceName,
-					atLedgerState: asset.atLedgerState,
+					resource: asset.resource,
 					tokens: []
 				)
 				resource.tokens.append(asset.token)

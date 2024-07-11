@@ -5,10 +5,10 @@ public struct NonFungibleResourceAsset: Sendable, FeatureReducer {
 		public typealias ID = String
 		public var id: ID { token.id.toRawString() }
 
-		public let resourceImage: URL?
-		public let resourceName: String?
-		public let resourceAddress: ResourceAddress
-		public let atLedgerState: AtLedgerState
+		public let resource: OnLedgerEntity.OwnedNonFungibleResource
+
+		var resourceAddress: ResourceAddress { resource.resourceAddress }
+
 		public let token: OnLedgerEntity.NonFungibleToken
 		public var nftGlobalID: NonFungibleGlobalId {
 			token.id
@@ -53,9 +53,10 @@ public struct NonFungibleResourceAsset: Sendable, FeatureReducer {
 		switch viewAction {
 		case .resourceTapped:
 			state.destination = .details(.init(
-				resourceAddress: state.resourceAddress,
+				resourceAddress: state.resource.resourceAddress,
+				ownedResource: state.resource,
 				token: state.token,
-				ledgerState: state.atLedgerState
+				ledgerState: state.resource.atLedgerState
 			))
 			return .none
 		}

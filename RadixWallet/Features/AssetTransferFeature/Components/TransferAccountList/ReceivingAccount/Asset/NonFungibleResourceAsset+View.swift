@@ -20,8 +20,8 @@ extension NonFungibleResourceAsset.ViewState {
 	var resourceBalance: ResourceBalance.ViewState {
 		.nonFungible(.init(
 			id: token.id,
-			resourceImage: resourceImage,
-			resourceName: resourceName,
+			resourceImage: resource.metadata.iconURL,
+			resourceName: resource.metadata.name,
 			nonFungibleName: token.data?.name
 		))
 	}
