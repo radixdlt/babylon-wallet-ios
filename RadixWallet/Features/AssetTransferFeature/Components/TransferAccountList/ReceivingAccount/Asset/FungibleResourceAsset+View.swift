@@ -37,24 +37,26 @@ extension FungibleResourceAsset.View {
 	public var body: some View {
 		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 			VStack(alignment: .trailing) {
-				ResourceBalanceView(viewStore.resourceBalance, appearance: .compact)
-					.withAuxiliary(spacing: .small2) {
-						TextField(
-							Decimal192.zero.formatted(),
-							text: viewStore.binding(
-								get: \.transferAmountStr,
-								send: { .amountChanged($0) }
-							)
+				ResourceBalanceView(viewStore.resourceBalance, appearance: .compact) {
+					viewStore.send(.resourceTapped)
+				}
+				.withAuxiliary(spacing: .small2) {
+					TextField(
+						Decimal192.zero.formatted(),
+						text: viewStore.binding(
+							get: \.transferAmountStr,
+							send: { .amountChanged($0) }
 						)
-						.keyboardType(.decimalPad)
-						.multilineTextAlignment(.trailing)
-						.lineLimit(1)
-						.minimumScaleFactor(0.7)
-						.foregroundColor(.app.gray1)
-						.textStyle(.sectionHeader)
-						.focused($focused)
-						.bind(viewStore.focusedBinding, to: $focused)
-					}
+					)
+					.keyboardType(.decimalPad)
+					.multilineTextAlignment(.trailing)
+					.lineLimit(1)
+					.minimumScaleFactor(0.7)
+					.foregroundColor(.app.gray1)
+					.textStyle(.sectionHeader)
+					.focused($focused)
+					.bind(viewStore.focusedBinding, to: $focused)
+				}
 
 				if viewStore.totalExceedsBalance {
 					// TODO: Add better style
@@ -84,13 +86,51 @@ extension FungibleResourceAsset.View {
 				}
 			}
 			.padding(.medium3)
-			.alert(store: store.alert)
+			.destinations(with: store)
 		}
 	}
 }
 
 private extension StoreOf<FungibleResourceAsset> {
-	var alert: AlertPresentationStore<FungibleResourceAsset.ViewAction.Alert> {
-		scope(state: \.$alert, action: { .view(.alert($0)) })
+	var destination: PresentationStoreOf<FungibleResourceAsset.Destination> {
+		func scopeState(state: State) -> PresentationState<FungibleResourceAsset.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<FungibleResourceAsset>) -> some View {
+		let destinationStore = store.destination
+		return fungibleTokenDetails(with: destinationStore)
+			.chooseXRDAmount(with: destinationStore)
+			.needsToPayFeeFromOtherAccount(with: destinationStore)
+	}
+
+	private func fungibleTokenDetails(with destinationStore: PresentationStoreOf<FungibleResourceAsset.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /FungibleResourceAsset.Destination.State.details,
+			action: FungibleResourceAsset.Destination.Action.details,
+			content: { FungibleTokenDetails.View(store: $0) }
+		)
+	}
+
+	private func chooseXRDAmount(with destinationStore: PresentationStoreOf<FungibleResourceAsset.Destination>) -> some View {
+		alert(
+			store: destinationStore,
+			state: /FungibleResourceAsset.Destination.State.chooseXRDAmount,
+			action: FungibleResourceAsset.Destination.Action.chooseXRDAmount
+		)
+	}
+
+	private func needsToPayFeeFromOtherAccount(with destinationStore: PresentationStoreOf<FungibleResourceAsset.Destination>) -> some View {
+		alert(
+			store: destinationStore,
+			state: /FungibleResourceAsset.Destination.State.needsToPayFeeFromOtherAccount,
+			action: FungibleResourceAsset.Destination.Action.needsToPayFeeFromOtherAccount
+		)
 	}
 }
