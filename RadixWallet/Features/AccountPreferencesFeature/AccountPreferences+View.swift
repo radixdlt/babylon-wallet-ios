@@ -215,7 +215,7 @@ extension PreferenceSection.Row where RowId == AccountPreferences.Section.Sectio
 			id: .personalize(.accountLabel),
 			context: .settings,
 			title: L10n.AccountSettings.accountLabel,
-			subtitle: "MISSING STRINGS",
+			subtitle: L10n.AccountSettings.accountLabelSubtitle,
 			icon: .asset(AssetResource.create)
 		)
 	}
@@ -225,7 +225,7 @@ extension PreferenceSection.Row where RowId == AccountPreferences.Section.Sectio
 			id: .onLedger(.thirdPartyDeposits),
 			context: .settings,
 			title: L10n.AccountSettings.thirdPartyDeposits,
-			subtitle: "MISSING STRINGS",
+			subtitle: L10n.AccountSettings.thirdPartyDepositsSubtitle,
 			icon: .asset(rule.icon)
 		)
 	}
