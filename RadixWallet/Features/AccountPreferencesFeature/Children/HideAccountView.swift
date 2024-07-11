@@ -24,7 +24,7 @@ public struct HideAccountView: View {
 					.resizable()
 					.scaledToFit()
 					.frame(.small)
-					.tint(.app.gray3)
+					.foregroundColor(.app.gray3)
 
 				Text(L10n.AccountSettings.HideAccount.title)
 					.textStyle(.sheetTitle)
