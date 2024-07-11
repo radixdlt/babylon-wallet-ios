@@ -212,6 +212,7 @@ extension TransferAccountList {
 					resourceImage: resource.resourceImage,
 					resourceName: resource.resourceName,
 					resourceAddress: resource.resourceAddress,
+					atLedgerState: resource.atLedgerState,
 					token: $0
 				)))
 			}
@@ -267,6 +268,7 @@ extension TransferAccountList {
 					resourceAddress: asset.resourceAddress,
 					resourceImage: asset.resourceImage,
 					resourceName: asset.resourceName,
+					atLedgerState: asset.atLedgerState,
 					tokens: []
 				)
 				resource.tokens.append(asset.token)

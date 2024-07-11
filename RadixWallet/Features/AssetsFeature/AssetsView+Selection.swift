@@ -77,17 +77,20 @@ extension AssetsView.State {
 				public let resourceAddress: ResourceAddress
 				public let resourceImage: URL?
 				public let resourceName: String?
+				public let atLedgerState: AtLedgerState
 				public var tokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>
 
 				public init(
 					resourceAddress: ResourceAddress,
 					resourceImage: URL?,
 					resourceName: String?,
+					atLedgerState: AtLedgerState,
 					tokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>
 				) {
 					self.resourceAddress = resourceAddress
 					self.resourceImage = resourceImage
 					self.resourceName = resourceName
+					self.atLedgerState = atLedgerState
 					self.tokens = tokens
 				}
 			}
@@ -190,6 +193,7 @@ private struct NonFungibleTokensPerResourceProvider {
 				resourceAddress: resource.resourceAddress,
 				resourceImage: resource.metadata.iconURL,
 				resourceName: resource.metadata.title,
+				atLedgerState: resource.atLedgerState,
 				tokens: .init(uncheckedUniqueElements: selectedAssets)
 			)
 		}
