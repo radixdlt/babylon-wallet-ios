@@ -23,10 +23,12 @@ public struct NonFungibleResourceAsset: Sendable, FeatureReducer {
 	}
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case details(NonFungibleTokenDetails.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case details(NonFungibleTokenDetails.Action)
 		}

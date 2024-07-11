@@ -56,11 +56,8 @@ private extension View {
 	}
 
 	private func fungibleTokenDetails(with destinationStore: PresentationStoreOf<NonFungibleResourceAsset.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /NonFungibleResourceAsset.Destination.State.details,
-			action: NonFungibleResourceAsset.Destination.Action.details,
-			content: { NonFungibleTokenDetails.View(store: $0) }
-		)
+		sheet(store: destinationStore.scope(state: \.details, action: \.details)) {
+			NonFungibleTokenDetails.View(store: $0)
+		}
 	}
 }
