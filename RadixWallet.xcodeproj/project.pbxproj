@@ -913,6 +913,7 @@
 		5BBC7D9E2C3D390E00B04BD6 /* BootstrapClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC7D9B2C3D390D00B04BD6 /* BootstrapClient+Interface.swift */; };
 		5BBC7D9F2C3D390E00B04BD6 /* BootstrapClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC7D9C2C3D390D00B04BD6 /* BootstrapClient+Live.swift */; };
 		5BBC7DA42C3D442800B04BD6 /* URLRequest+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC7DA32C3D442800B04BD6 /* URLRequest+Extra.swift */; };
+		5BBC7DAA2C403F3400B04BD6 /* AccountCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC7DA92C403F3400B04BD6 /* AccountCard.swift */; };
 		5BC82B6C2BED18A1009AC162 /* FactoryReset+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC82B6A2BED18A1009AC162 /* FactoryReset+View.swift */; };
 		5BC82B6D2BED18A1009AC162 /* FactoryReset+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC82B6B2BED18A1009AC162 /* FactoryReset+Reducer.swift */; };
 		830818482B9F1621002D8351 /* HTTPClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830818472B9F1621002D8351 /* HTTPClient+Live.swift */; };
@@ -2061,6 +2062,7 @@
 		5BBC7D9B2C3D390D00B04BD6 /* BootstrapClient+Interface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BootstrapClient+Interface.swift"; sourceTree = "<group>"; };
 		5BBC7D9C2C3D390D00B04BD6 /* BootstrapClient+Live.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BootstrapClient+Live.swift"; sourceTree = "<group>"; };
 		5BBC7DA32C3D442800B04BD6 /* URLRequest+Extra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URLRequest+Extra.swift"; sourceTree = "<group>"; };
+		5BBC7DA92C403F3400B04BD6 /* AccountCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountCard.swift; sourceTree = "<group>"; };
 		5BC82B6A2BED18A1009AC162 /* FactoryReset+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactoryReset+View.swift"; sourceTree = "<group>"; };
 		5BC82B6B2BED18A1009AC162 /* FactoryReset+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactoryReset+Reducer.swift"; sourceTree = "<group>"; };
 		830818472B9F1621002D8351 /* HTTPClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPClient+Live.swift"; sourceTree = "<group>"; };
@@ -5174,6 +5176,7 @@
 				48CFC1482ADC10D900E77A5C /* SmallAccountCard.swift */,
 				48CFC1492ADC10D900E77A5C /* UserDefaultsClient+AccountRecovery.swift */,
 				A47809072BDBDB4C006B68C0 /* RadixDateFormatter.swift */,
+				5BBC7DA92C403F3400B04BD6 /* AccountCard.swift */,
 			);
 			path = FeaturePrelude;
 			sourceTree = "<group>";
@@ -6914,6 +6917,7 @@
 				E62449D62AFBA61100272C67 /* Home+AccountRow+View.swift in Sources */,
 				48CFC5FE2ADC10DA00E77A5C /* Account+PreviewValues.swift in Sources */,
 				48CFC5522ADC10DA00E77A5C /* StateEntityNonFungiblesPageResponse.swift in Sources */,
+				5BBC7DAA2C403F3400B04BD6 /* AccountCard.swift in Sources */,
 				48CFC5672ADC10DA00E77A5C /* AtLedgerStateMixin.swift in Sources */,
 				A462B5B02B84078D00C26D20 /* CoreAPI_StringPlaintextMessageContent.swift in Sources */,
 				48CFC4172ADC10DA00E77A5C /* PasteboardClient+Live.swift in Sources */,
