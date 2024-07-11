@@ -35,8 +35,7 @@ extension CreateAccountConfig {
 			self.init(
 				isFirstAccount: true,
 				canBeDismissed: false,
-				navigationButtonCTA: .goHome,
-				specificNetworkID: nil
+				navigationButtonCTA: .goHome
 			)
 		case let .firstAccountOnNewNetwork(specificNetworkID):
 			self.init(
@@ -49,15 +48,13 @@ extension CreateAccountConfig {
 			self.init(
 				isFirstAccount: false,
 				canBeDismissed: true,
-				navigationButtonCTA: .goBackToChooseAccounts,
-				specificNetworkID: nil
+				navigationButtonCTA: .goBackToChooseAccounts
 			)
 		case .newAccountFromHome:
 			self.init(
 				isFirstAccount: false,
 				canBeDismissed: true,
-				navigationButtonCTA: .goHome,
-				specificNetworkID: nil
+				navigationButtonCTA: .goHome
 			)
 		}
 	}
