@@ -197,8 +197,10 @@ public enum L10n {
     public static let accountColorSubtitle = L10n.tr("Localizable", "accountSettings_accountColorSubtitle", fallback: "Select from a list of unique colors")
     /// Account Hidden
     public static let accountHidden = L10n.tr("Localizable", "accountSettings_accountHidden", fallback: "Account Hidden")
-    /// Account Label
-    public static let accountLabel = L10n.tr("Localizable", "accountSettings_accountLabel", fallback: "Account Label")
+    /// Account Name
+    public static let accountLabel = L10n.tr("Localizable", "accountSettings_accountLabel", fallback: "Account Name")
+    /// Name your account
+    public static let accountLabelSubtitle = L10n.tr("Localizable", "accountSettings_accountLabelSubtitle", fallback: "Name your account")
     /// Set development preferences
     public static let developmentHeading = L10n.tr("Localizable", "accountSettings_developmentHeading", fallback: "Set development preferences")
     /// Dev Preferences
@@ -227,6 +229,8 @@ public enum L10n {
     public static let specificAssetsDeposits = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits", fallback: "Allow/Deny Specific Assets")
     /// Third-party Deposits
     public static let thirdPartyDeposits = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits", fallback: "Third-party Deposits")
+    /// Choose who can deposit into your Account
+    public static let thirdPartyDepositsSubtitle = L10n.tr("Localizable", "accountSettings_thirdPartyDepositsSubtitle", fallback: "Choose who can deposit into your Account")
     /// Account Settings
     public static let title = L10n.tr("Localizable", "accountSettings_title", fallback: "Account Settings")
     /// Updated
@@ -1324,13 +1328,13 @@ public enum L10n {
       public static func lastLoginWasOn(_ p1: Any) -> String {
         return L10n.tr("Localizable", "dAppRequest_login_lastLoginWasOn", String(describing: p1), fallback: "Your last login was on %@")
       }
-      /// %@ is requesting that you login with a Persona.
+      /// **%@** is requesting that you login with a Persona.
       public static func subtitleKnownDapp(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dAppRequest_login_subtitleKnownDapp", String(describing: p1), fallback: "%@ is requesting that you login with a Persona.")
+        return L10n.tr("Localizable", "dAppRequest_login_subtitleKnownDapp", String(describing: p1), fallback: "**%@** is requesting that you login with a Persona.")
       }
-      /// %@ is requesting that you login for the **first time** with a Persona.
+      /// **%@** is requesting that you login for the first time with a Persona.
       public static func subtitleNewDapp(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dAppRequest_login_subtitleNewDapp", String(describing: p1), fallback: "%@ is requesting that you login for the **first time** with a Persona.")
+        return L10n.tr("Localizable", "dAppRequest_login_subtitleNewDapp", String(describing: p1), fallback: "**%@** is requesting that you login for the first time with a Persona.")
       }
       /// Login Request
       public static let titleKnownDapp = L10n.tr("Localizable", "dAppRequest_login_titleKnownDapp", fallback: "Login Request")
