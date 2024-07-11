@@ -26,8 +26,7 @@ extension AccountPreferences.State {
 				return sections
 			}(),
 			faucetButtonState: faucetButtonState,
-			isOnMainnet: isOnMainnet,
-			showHideAccount: showHideAccount
+			isOnMainnet: isOnMainnet
 		)
 	}
 
@@ -50,7 +49,6 @@ extension AccountPreferences {
 		let sections: [Section]
 		let faucetButtonState: ControlState
 		let isOnMainnet: Bool
-		let showHideAccount: Bool
 	}
 
 	@MainActor
@@ -73,11 +71,6 @@ extension AccountPreferences {
 					viewStore.send(.task)
 				}
 				.destination(store: store)
-				.sheet(isPresented: viewStore.binding(get: \.showHideAccount, send: .hideAccount(.cancel))) {
-					HideAccountView { action in
-						viewStore.send(.hideAccount(action))
-					}
-				}
 				.background(.app.gray5)
 				.radixToolbar(title: L10n.AccountSettings.title)
 			}
@@ -158,6 +151,7 @@ private extension View {
 		return updateAccountLabel(with: destinationStore)
 			.thirdPartyDeposits(with: destinationStore)
 			.devAccountPreferences(with: destinationStore)
+			.hideAccount(with: destinationStore, store: store)
 	}
 
 	private func updateAccountLabel(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
@@ -175,6 +169,14 @@ private extension View {
 	private func devAccountPreferences(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.devPreferences, action: \.devPreferences)) {
 			DevAccountPreferences.View(store: $0)
+		}
+	}
+
+	private func hideAccount(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>, store: StoreOf<AccountPreferences>) -> some View {
+		sheet(store: destinationStore.scope(state: \.hideAccount, action: \.hideAccount)) { _ in
+			HideAccountView { action in
+				store.send(.destination(.presented(.hideAccount(action))))
+			}
 		}
 	}
 }

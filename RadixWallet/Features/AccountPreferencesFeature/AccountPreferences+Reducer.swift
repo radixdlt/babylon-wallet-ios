@@ -8,7 +8,6 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		public var faucetButtonState: ControlState
 		public var address: AccountAddress { account.address }
 		public var isOnMainnet: Bool { account.networkID == .mainnet }
-		public var showHideAccount = false
 
 		@PresentationState
 		var destination: Destination.State? = nil
@@ -29,7 +28,6 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		case rowTapped(AccountPreferences.Section.SectionRow)
 		case hideAccountTapped
 		case faucetButtonTapped
-		case hideAccount(HideAccountAction)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -51,6 +49,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			case updateAccountLabel(UpdateAccountLabel.State)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.State)
 			case devPreferences(DevAccountPreferences.State)
+			case hideAccount
 		}
 
 		@CasePathable
@@ -58,6 +57,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			case updateAccountLabel(UpdateAccountLabel.Action)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.Action)
 			case devPreferences(DevAccountPreferences.Action)
+			case hideAccount(HideAccountAction)
 		}
 
 		public var body: some ReducerOf<Self> {
@@ -107,21 +107,13 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			return destination(for: row, &state)
 
 		case .hideAccountTapped:
-			state.showHideAccount = true
+			state.destination = .hideAccount
 			return .none
 
 		case .faucetButtonTapped:
 			return call(buttonState: \.faucetButtonState, into: &state) {
 				try await faucetClient.getFreeXRD(.init(recipientAccountAddress: $0))
 			}
-
-		case .hideAccount(.confirm):
-			state.showHideAccount = false
-			return hideAccountEffect(state: state)
-
-		case .hideAccount(.cancel):
-			state.showHideAccount = false
-			return .none
 		}
 	}
 
@@ -165,15 +157,17 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		     .thirdPartyDeposits(.delegate(.accountUpdated)):
 			state.destination = nil
 			return .none
-		case .updateAccountLabel:
-			return .none
-		case .thirdPartyDeposits:
-			return .none
 		#if DEBUG
 		case .devPreferences(DevAccountPreferences.Action.delegate(.debugOnlyAccountWasDeleted)):
 			return .send(.delegate(.accountHidden))
 		#endif
-		case .devPreferences:
+		case .hideAccount(.confirm):
+			state.destination = nil
+			return hideAccountEffect(state: state)
+		case .hideAccount(.cancel):
+			state.destination = nil
+			return .none
+		default:
 			return .none
 		}
 	}
