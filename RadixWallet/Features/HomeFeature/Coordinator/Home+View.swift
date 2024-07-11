@@ -3,17 +3,13 @@ import SwiftUI
 
 extension Home.State {
 	var viewState: Home.ViewState {
-		.init(
-			showRadixBanner: showRadixBanner,
-			totalFiatWorth: showFiatWorth ? totalFiatWorth : nil
-		)
+		.init(totalFiatWorth: showFiatWorth ? totalFiatWorth : nil)
 	}
 }
 
 // MARK: - Home.View
 extension Home {
 	public struct ViewState: Equatable {
-		let showRadixBanner: Bool
 		let totalFiatWorth: Loadable<FiatWorth>?
 	}
 
@@ -29,7 +25,7 @@ extension Home {
 			WithViewStore(store, observe: \.viewState) { viewStore in
 				ScrollView {
 					VStack(spacing: .medium1) {
-						HeaderView()
+						HeaderView(store: store)
 
 						if let fiatWorth = viewStore.totalFiatWorth {
 							VStack(spacing: .small2) {
@@ -64,19 +60,9 @@ extension Home {
 							store.send(.view(.createAccountButtonTapped))
 						}
 						.buttonStyle(.secondaryRectangular())
-
-						if viewStore.showRadixBanner {
-							RadixBanner {
-								store.send(.view(.radixBannerButtonTapped))
-							} dismiss: {
-								store.send(.view(.radixBannerDismissButtonTapped))
-							}
-							.transition(.scale(scale: 0.8).combined(with: .opacity))
-						}
 					}
 					.padding(.bottom, .medium3)
 				}
-				.animation(.default, value: viewStore.showRadixBanner)
 				.toolbar {
 					ToolbarItem(placement: .navigationBarTrailing) {
 						Button {
@@ -102,23 +88,19 @@ extension Home {
 			}
 		}
 
-		private struct HeaderView: SwiftUI.View {
+		struct HeaderView: SwiftUI.View {
+			let store: StoreOf<Home>
+
 			var body: some SwiftUI.View {
-				VStack(alignment: .leading, spacing: .small2) {
+				VStack(spacing: .small2) {
 					Text(L10n.HomePage.title)
 						.foregroundColor(.app.gray1)
 						.textStyle(.sheetTitle)
+						.flushedLeft
+						.padding(.horizontal, .medium1)
 
-					HStack {
-						Text(L10n.HomePage.subtitle)
-							.foregroundColor(.app.gray2)
-							.textStyle(.body1HighImportance)
-							.lineLimit(2)
-
-						Spacer(minLength: 2 * .large1)
-					}
+					CardCarousel.View(store: store.scope(state: \.carousel, action: \.child.carousel))
 				}
-				.padding(.leading, .medium1)
 				.padding(.top, .small3)
 			}
 		}
@@ -144,6 +126,7 @@ private extension View {
 			.userFeedback(with: destinationStore)
 			.relinkConnector(with: destinationStore)
 			.securityCenter(with: destinationStore)
+			.p2pLinks(with: destinationStore)
 	}
 
 	private func accountDetails(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
@@ -179,6 +162,12 @@ private extension View {
 			SecurityCenter.View(store: $0)
 		}
 	}
+
+	private func p2pLinks(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.p2pLinks, action: \.p2pLinks)) {
+			P2PLinksFeature.View(store: $0)
+		}
+	}
 }
 
 extension View {
@@ -191,45 +180,6 @@ extension View {
 					.offset(x: .small3, y: -.small3)
 			}
 		}
-	}
-}
-
-// MARK: - RadixBanner
-struct RadixBanner: View {
-	let action: () -> Void
-	let dismiss: () -> Void
-
-	var body: some View {
-		VStack(spacing: 0) {
-			Image(asset: AssetResource.radixBanner)
-				.padding(.top, .medium1)
-
-			Text(L10n.HomePage.RadixBanner.title)
-				.textStyle(.body1Header)
-				.foregroundColor(.app.gray1)
-				.padding(.bottom, .small2)
-
-			Text(L10n.HomePage.RadixBanner.subtitle)
-				.multilineTextAlignment(.center)
-				.textStyle(.body2Regular)
-				.foregroundColor(.app.gray2)
-				.padding(.horizontal, .huge3)
-				.padding(.bottom, .medium3)
-
-			Button(L10n.HomePage.RadixBanner.action, action: action)
-				.buttonStyle(.secondaryRectangular(
-					shouldExpand: true,
-					trailingImage: .init(asset: AssetResource.iconLinkOut)
-				))
-				.padding([.horizontal, .bottom], .medium3)
-		}
-		.background(Color.app.gray5)
-		.cornerRadius(.medium3)
-		.overlay(alignment: .topTrailing) {
-			CloseButton(action: dismiss)
-				.padding(.small3)
-		}
-		.padding([.horizontal, .bottom], .medium3)
 	}
 }
 

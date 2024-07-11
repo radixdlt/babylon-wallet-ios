@@ -99,7 +99,8 @@
 "assetDetails_behaviors_nftDataChangeableByAnyone" = "Anyone can change data that is set on these NFTs.";
 "accountSettings_title" = "Account Settings";
 "accountSettings_personalizeHeading" = "Personalize this Account";
-"accountSettings_accountLabel" = "Account Label";
+"accountSettings_accountLabel" = "Account Name";
+"accountSettings_accountLabelSubtitle" = "Name your account";
 "accountSettings_accountColor" = "Account Color";
 "accountSettings_accountColorSubtitle" = "Select from a list of unique colors";
 "accountSettings_showAssets" = "Show Assets with Tags";
@@ -108,6 +109,7 @@
 "accountSettings_showAssetsSubtitle" = "Select which tags to show for assets in this Account";
 "accountSettings_setBehaviorHeading" = "Set how you want this Account to work";
 "accountSettings_thirdPartyDeposits" = "Third-party Deposits";
+"accountSettings_thirdPartyDepositsSubtitle" = "Choose who can deposit into your Account";
 "accountSettings_hideAccount" = "Hide Account";
 "accountSettings_accountHidden" = "Account Hidden";
 "accountSettings_getXrdTestTokens" = "Get XRD Test Tokens";
@@ -326,9 +328,9 @@
 "createPersona_requiredField" = "Required field";
 "createPersona_saveAndContinueButtonTitle" = "Save and Continue";
 "dAppRequest_login_titleKnownDapp" = "Login Request";
-"dAppRequest_login_subtitleKnownDapp" = "%@ is requesting that you login with a Persona.";
+"dAppRequest_login_subtitleKnownDapp" = "**%@** is requesting that you login with a Persona.";
 "dAppRequest_login_titleNewDapp" = "New Login Request";
-"dAppRequest_login_subtitleNewDapp" = "%@ is requesting that you login for the **first time** with a Persona.";
+"dAppRequest_login_subtitleNewDapp" = "**%@** is requesting that you login for the first time with a Persona.";
 "dAppRequest_login_choosePersona" = "Choose a Persona";
 "dAppRequest_login_lastLoginWasOn" = "Your last login was on %@";
 "dAppRequest_login_continue" = "Continue";

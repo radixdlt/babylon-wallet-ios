@@ -3,6 +3,7 @@ import SwiftUI
 
 // MARK: - AppDelegate
 public final class AppDelegate: NSObject, UIApplicationDelegate {
+	@Dependency(\.bootstrapClient) var bootstrapClient
 	@Dependency(\.appsFlyerClient) var appsFlyerClient
 
 	public func application(
@@ -16,7 +17,7 @@ public final class AppDelegate: NSObject, UIApplicationDelegate {
 	}
 
 	public func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
-		appsFlyerClient.start()
+		bootstrapClient.bootstrap()
 		return true
 	}
 

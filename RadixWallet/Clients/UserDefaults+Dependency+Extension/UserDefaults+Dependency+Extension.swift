@@ -5,7 +5,6 @@ import Sargon
 // MARK: - UserDefaultsKey
 public enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
 	case hideMigrateOlympiaButton
-	case showRadixBanner
 	case epochForWhenLastUsedByAccountAddress
 	case transactionsCompletedCounter
 	case dateOfLastSubmittedNPSSurvey
@@ -16,6 +15,7 @@ public enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
 	case lastSyncedAccountsWithCE
 	case showRelinkConnectorsAfterUpdate
 	case showRelinkConnectorsAfterProfileRestore
+	case homeCards
 
 	/// DO NOT CHANGE THIS KEY
 	case activeProfileID
@@ -95,14 +95,6 @@ extension UserDefaults.Dependency {
 
 	public func setHideMigrateOlympiaButton(_ value: Bool) {
 		set(value, forKey: Key.hideMigrateOlympiaButton.rawValue)
-	}
-
-	public var showRadixBanner: Bool {
-		bool(key: .showRadixBanner)
-	}
-
-	public func setShowRadixBanner(_ value: Bool) {
-		set(value, forKey: Key.showRadixBanner.rawValue)
 	}
 
 	public func getActiveProfileID() -> ProfileID? {
@@ -232,6 +224,14 @@ extension UserDefaults.Dependency {
 
 	public func setShowRelinkConnectorsAfterProfileRestore(_ value: Bool) {
 		set(value, forKey: Key.showRelinkConnectorsAfterProfileRestore.rawValue)
+	}
+
+	public func getHomeCards() -> Data? {
+		data(key: .homeCards)
+	}
+
+	public func setHomeCards(_ value: Data) {
+		set(data: value, key: .homeCards)
 	}
 }
 

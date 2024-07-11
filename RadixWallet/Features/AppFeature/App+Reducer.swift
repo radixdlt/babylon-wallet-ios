@@ -58,6 +58,8 @@ public struct App: Sendable, FeatureReducer {
 	@Dependency(\.deepLinkHandlerClient) var deepLinkHandlerClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.resetWalletClient) var resetWalletClient
+	@Dependency(\.homeCardsClient) var homeCardsClient
+	@Dependency(\.appEventsClient) var appEventsClient
 
 	public init() {}
 
@@ -91,6 +93,7 @@ public struct App: Sendable, FeatureReducer {
 			}
 			return .none
 		case .task:
+			appEventsClient.handleEvent(.appStarted)
 			return didResetWalletEffect()
 		}
 	}

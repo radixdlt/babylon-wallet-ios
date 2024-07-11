@@ -53,6 +53,8 @@ public enum AssetResource {
   public static let supplyFlexible = ImageAsset(name: "supply-flexible")
   public static let supplyIncreasableByAnyone = ImageAsset(name: "supply-increasable-by-anyone")
   public static let supplyIncreasable = ImageAsset(name: "supply-increasable")
+  public static let carouselBackgroundConnect = ImageAsset(name: "carousel_background_connect")
+  public static let carouselBackgroundRadquest = ImageAsset(name: "carousel_background_radquest")
   public static let arrowBack = ImageAsset(name: "arrow-back")
   public static let check = ImageAsset(name: "check")
   public static let checkmarkBig = ImageAsset(name: "checkmark-big")
