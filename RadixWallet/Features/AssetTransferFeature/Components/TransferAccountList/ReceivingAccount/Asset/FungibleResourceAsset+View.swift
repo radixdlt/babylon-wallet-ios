@@ -104,18 +104,8 @@ private extension StoreOf<FungibleResourceAsset> {
 private extension View {
 	func destinations(with store: StoreOf<FungibleResourceAsset>) -> some View {
 		let destinationStore = store.destination
-		return fungibleTokenDetails(with: destinationStore)
-			.chooseXRDAmount(with: destinationStore)
+		return chooseXRDAmount(with: destinationStore)
 			.needsToPayFeeFromOtherAccount(with: destinationStore)
-	}
-
-	private func fungibleTokenDetails(with destinationStore: PresentationStoreOf<FungibleResourceAsset.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /FungibleResourceAsset.Destination.State.details,
-			action: FungibleResourceAsset.Destination.Action.details,
-			content: { FungibleTokenDetails.View(store: $0) }
-		)
 	}
 
 	private func chooseXRDAmount(with destinationStore: PresentationStoreOf<FungibleResourceAsset.Destination>) -> some View {

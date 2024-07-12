@@ -51,24 +51,21 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 		case amountChanged(String)
 		case maxAmountTapped
 		case focusChanged(Bool)
-		case removeTapped
 		case resourceTapped
 	}
 
 	public enum DelegateAction: Equatable, Sendable {
-		case removed
 		case amountChanged
+		case resourceTapped
 	}
 
 	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
-			case details(FungibleTokenDetails.State)
 			case chooseXRDAmount(AlertState<Action.ChooseXRDAmount>)
 			case needsToPayFeeFromOtherAccount(AlertState<Action.NeedsToPayFeeFromOtherAccount>)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case details(FungibleTokenDetails.Action)
 			case chooseXRDAmount(ChooseXRDAmount)
 			case needsToPayFeeFromOtherAccount(NeedsToPayFeeFromOtherAccount)
 
@@ -85,9 +82,7 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.details, action: /Action.details) {
-				FungibleTokenDetails()
-			}
+			EmptyReducer()
 		}
 	}
 
@@ -139,16 +134,8 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 			state.focused = focused
 			return .none
 
-		case .removeTapped:
-			return .send(.delegate(.removed))
-
 		case .resourceTapped:
-			state.destination = .details(.init(
-				resourceAddress: state.resource.resourceAddress,
-				ownedFungibleResource: state.resource,
-				isXRD: state.isXRD
-			))
-			return .none
+			return .send(.delegate(.resourceTapped))
 		}
 	}
 

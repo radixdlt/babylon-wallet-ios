@@ -35,29 +35,5 @@ extension NonFungibleResourceAsset.View {
 			}
 			.padding(.medium3)
 		}
-		.destinations(with: store)
-	}
-}
-
-private extension StoreOf<NonFungibleResourceAsset> {
-	var destination: PresentationStoreOf<NonFungibleResourceAsset.Destination> {
-		func scopeState(state: State) -> PresentationState<NonFungibleResourceAsset.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
-	}
-}
-
-@MainActor
-private extension View {
-	func destinations(with store: StoreOf<NonFungibleResourceAsset>) -> some View {
-		let destinationStore = store.destination
-		return fungibleTokenDetails(with: destinationStore)
-	}
-
-	private func fungibleTokenDetails(with destinationStore: PresentationStoreOf<NonFungibleResourceAsset.Destination>) -> some View {
-		sheet(store: destinationStore.scope(state: \.details, action: \.details)) {
-			NonFungibleTokenDetails.View(store: $0)
-		}
 	}
 }

@@ -120,7 +120,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 				}
 				return .none
 
-			case let .child(.row(resourceAddress, child: .delegate(.fungibleAsset(.amountChanged)))),
+			case let .child(.row(resourceAddress, child: .delegate(.amountChanged))),
 			     let .child(.row(resourceAddress, child: .delegate(.removed))):
 				updateTotalSum(&state, resourceId: resourceAddress)
 				return .none
