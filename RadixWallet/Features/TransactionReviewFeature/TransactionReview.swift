@@ -398,7 +398,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 					resourceDetails: .success(transfer.resource),
 					token: token,
 					ledgerState: transfer.resource.atLedgerState,
-					stakeClaim: details.stakeClaimTokens.stakeClaims.first
+					stakeClaim: details.stakeClaimTokens.stakeClaims.first,
+					isClaimStakeEnabled: false
 				))
 			}
 

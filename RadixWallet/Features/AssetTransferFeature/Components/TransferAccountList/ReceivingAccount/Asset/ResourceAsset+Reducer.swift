@@ -188,7 +188,8 @@ public struct ResourceAsset: Sendable, FeatureReducer {
 					ownedResource: state.kind.nonFungible?.resource,
 					token: token,
 					ledgerState: details.stakeClaimResource.atLedgerState,
-					stakeClaim: details.stakeClaimTokens.stakeClaims.first
+					stakeClaim: details.stakeClaimTokens.stakeClaims.first,
+					isClaimStakeEnabled: false
 				))
 			}
 			return .none
