@@ -289,6 +289,41 @@ extension SecureStorageClient: DependencyKey {
 			)
 		}
 
+		let saveProfileSnapshotData: SaveProfileSnapshotData = { id, data in
+			try saveProfile(snapshotData: data, key: id.keychainKey)
+		}
+
+		let loadMnemonicDataByFactorSourceID: LoadMnemonicDataByFactorSourceID = { request in
+			let key = key(factorSourceID: request.factorSourceID)
+
+			let authenticationPrompt: KeychainClient.AuthenticationPrompt = NonEmptyString(rawValue: L10n.Biometrics.Prompt.title).map { KeychainClient.AuthenticationPrompt($0) } ?? "Authenticate to continue."
+			guard let data = try keychainClient.getDataWithAuth(
+				forKey: key,
+				authenticationPrompt: authenticationPrompt
+			) else {
+				return nil
+			}
+
+			return data
+		}
+
+		let saveMnemonicForFactorSourceData: SaveMnemonicForFactorSourceData = { id, data in
+			let mostSecureAccesibilityAndAuthenticationPolicy = try queryMostSecureAccesibilityAndAuthenticationPolicy()
+			let key = key(factorSourceID: id)
+
+			try keychainClient.setDataWithAuth(
+				data,
+				forKey: key,
+				attributes: .init(
+					iCloudSyncEnabled: false,
+					accessibility: mostSecureAccesibilityAndAuthenticationPolicy.accessibility,
+					authenticationPolicy: mostSecureAccesibilityAndAuthenticationPolicy.authenticationPolicy,
+					label: importantKeychainIdentifier("Radix Wallet Factor Secret")!,
+					comment: .init("mnemonic")
+				)
+			)
+		}
+
 		let loadProfile: LoadProfile = { id in
 			try loadProfileSnapshot(id)
 		}
@@ -441,7 +476,10 @@ extension SecureStorageClient: DependencyKey {
 			loadP2PLinksPrivateKey: loadP2PLinksPrivateKey,
 			saveP2PLinksPrivateKey: saveP2PLinksPrivateKey,
 			keychainChanged: keychainChanged,
-			getAllMnemonics: getAllMnemonics
+			getAllMnemonics: getAllMnemonics,
+			saveProfileSnapshotData: saveProfileSnapshotData,
+			loadMnemonicDataByFactorSourceID: loadMnemonicDataByFactorSourceID,
+			saveMnemonicForFactorSourceData: saveMnemonicForFactorSourceData
 		)
 		#else
 		return Self(
@@ -469,7 +507,10 @@ extension SecureStorageClient: DependencyKey {
 			saveP2PLinks: saveP2PLinks,
 			loadP2PLinksPrivateKey: loadP2PLinksPrivateKey,
 			saveP2PLinksPrivateKey: saveP2PLinksPrivateKey,
-			keychainChanged: keychainChanged
+			keychainChanged: keychainChanged,
+			saveProfileSnapshotData: saveProfileSnapshotData,
+			loadMnemonicDataByFactorSourceID: loadMnemonicDataByFactorSourceID,
+			saveMnemonicForFactorSourceData: saveMnemonicForFactorSourceData
 		)
 		#endif
 	}()

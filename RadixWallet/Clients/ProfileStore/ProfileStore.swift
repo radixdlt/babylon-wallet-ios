@@ -47,25 +47,19 @@ import Sargon
 /// And similar async sequences.
 ///
 public final actor ProfileStore {
-	@Dependency(\.secureStorageClient) var secureStorageClient
-	@Dependency(\.userDefaults) var userDefaults
-
 	public static let shared = ProfileStore()
 
 	/// Holds an in-memory copy of the Profile, the source of truth is Keychain.
 	private let profileSubject: AsyncCurrentValueSubject<Profile>
 
-	/// Only mutable since we need to update the description with async, since reading
-	/// device model and name is async.
-	private var deviceInfo: DeviceInfo
-
 	init() {
-		let metaDeviceInfo = Self._deviceInfo()
-		let (deviceInfo, profile) = Self._loadSavedElseNewProfile(metaDeviceInfo: metaDeviceInfo)
-		loggerGlobal.info("profile.id: \(profile.id)")
-		loggerGlobal.info("device.id: \(deviceInfo.id)")
-		self.deviceInfo = deviceInfo
+		let profile = SargonOS.shared.profile()
 		self.profileSubject = AsyncCurrentValueSubject(profile)
+		Task {
+			for await profile in await ProfileChangeBus.shared.profile_change_stream() {
+				self.profileSubject.send(profile)
+			}
+		}
 	}
 }
 
@@ -85,7 +79,7 @@ extension ProfileStore {
 	) async throws -> T {
 		var updated = profile
 		let result = try await transform(&updated)
-		try updateHeaderOfThenSave(profile: updated)
+		try await Self._save(profile: updated)
 		return result // in many cases `Void`.
 	}
 
@@ -105,30 +99,8 @@ extension ProfileStore {
 	///
 	/// NB: The profile should be claimed locally before calling this function
 	/// - Parameter profile: Imported Profile to use and save.
-	public func importProfile(_ profileToImport: Profile) throws {
-		// The software design of ProfileStore is to always have a profile at end
-		// of `ProfileStore.init`, which happens upon app launch since `ProfileStore`
-		// is a GlobalActor (`static let shared = ProfileStore`), this means that
-		// a user which does RESTORE from backup will have a new empty Profile in
-		// memory `self.profile` in ProfileStore - and in keychain. We call this
-		// ephemeral profile and we should delete it after the importing of the
-		// profile to import was successful, if it was empty (which it will be).
-		let idOfEphemeralProfileToDelete = self.profile.networks.isEmpty ? self.profile.id : nil
-
-		var profileToImport = profileToImport
-
-		// We need to save before calling `updateHeaderOfThenSave`
-		try _saveProfileAndEmitUpdate(profileToImport)
-
-		profileToImport.changeCurrentToMainnetIfNeeded()
-
-		try updateHeaderOfThenSave(
-			profile: profileToImport
-		)
-
-		if let idOfEphemeralProfileToDelete {
-			Self.deleteEphemeralProfile(id: idOfEphemeralProfileToDelete)
-		}
+	public func importProfile(_ profileToImport: Profile) async throws {
+		try await SargonOS.shared.importProfile(profile: profileToImport)
 	}
 
 	private static func deleteEphemeralProfile(id: ProfileID) {
@@ -146,16 +118,14 @@ extension ProfileStore {
 
 	public func deleteProfile(
 		keepInICloudIfPresent: Bool
-	) throws {
-		try _deleteProfile(
+	) async throws {
+		try await _deleteProfile(
 			keepInICloudIfPresent: keepInICloudIfPresent,
 			assertOwnership: true
 		)
 	}
 
-	public func finishedOnboarding() async {
-		await updateDeviceInfo()
-	}
+	public func finishedOnboarding() async {}
 
 	public func finishOnboarding(
 		with accountsRecoveredFromScanningUsingMnemonic: AccountsRecoveredFromScanningUsingMnemonic
@@ -163,10 +133,10 @@ extension ProfileStore {
 		@Dependency(\.uuid) var uuid
 		@Dependency(\.date) var date
 		loggerGlobal.notice("Finish onboarding with accounts recovered from scanning using menmonic")
-		let (creatingDevice, model, name) = await updateDeviceInfo()
+		let deviceInfo = Self._deviceInfo().deviceInfo
 		var bdfs = accountsRecoveredFromScanningUsingMnemonic.deviceFactorSource
-		bdfs.hint.name = name
-		bdfs.hint.model = .init(model)
+		bdfs.hint.name = deviceInfo.description
+		bdfs.hint.model = deviceInfo.description
 
 		let accounts = accountsRecoveredFromScanningUsingMnemonic.accounts
 
@@ -183,14 +153,14 @@ extension ProfileStore {
 			authorizedDapps: []
 		)
 
-		var lastUsedOnDevice = creatingDevice
+		var lastUsedOnDevice = deviceInfo
 		lastUsedOnDevice.date = date()
 
 		let profile = Profile(
 			header: Header(
 				snapshotVersion: .v100,
 				id: uuid(),
-				creatingDevice: creatingDevice,
+				creatingDevice: lastUsedOnDevice,
 				lastUsedOnDevice: lastUsedOnDevice,
 				lastModified: bdfs.addedOn,
 				contentHint: .init(
@@ -207,11 +177,12 @@ extension ProfileStore {
 		)
 
 		// We can "piggyback" on importProfile! Same logic applies!
-		try importProfile(profile)
+		try await importProfile(profile)
 	}
 
 	public func isThisDevice(deviceID: DeviceID) -> Bool {
-		deviceID == deviceInfo.id
+		// TODO: fix
+		true
 	}
 }
 
@@ -246,129 +217,11 @@ extension ProfileStore {
 
 // MARK: Private
 extension ProfileStore {
-	@discardableResult
-	private func updateDeviceInfo() async -> (info: DeviceInfo, model: String, name: String) {
-		@Dependency(\.device) var device
-		@Dependency(\.date) var date
-		let model = await device.model
-		let name = await device.name
-		let deviceDescription = DeviceInfo.deviceDescription(
-			name: name,
-			model: model
-		)
-		deviceInfo.description = deviceDescription
-		let lastUsedOnDevice = deviceInfo
-		try? secureStorageClient.saveDeviceInfo(lastUsedOnDevice)
-		try? await updating {
-			$0.header.lastUsedOnDevice = lastUsedOnDevice
-			$0.header.lastUsedOnDevice.date = date()
-			$0.header.creatingDevice.description = deviceDescription
-		}
-		return (info: lastUsedOnDevice, model: model, name: name)
-	}
-
 	private func _deleteProfile(
 		keepInICloudIfPresent: Bool,
 		assertOwnership: Bool = true
-	) throws {
-		if assertOwnership {
-			// Assert that this device is allowed to make changes on Profile
-			try _assertOwnership()
-		}
-
-		do {
-			userDefaults.removeActiveProfileID()
-			try secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs(profile.header.id, keepInICloudIfPresent)
-		} catch {
-			logAssertionFailure("Error, failed to delete profile or factor source, failure: \(String(describing: error))")
-		}
-
-		let profile = try! Self._tryGenerateAndSaveNewProfile(deviceInfo: deviceInfo)
-		self.profileSubject.send(profile)
-	}
-
-	/// Asserts identity and ownership of a profile, then updates its header, saves it and emits an update.
-	/// - Parameter updated: Profile to save (after updating its header).
-	private func updateHeaderOfThenSave(
-		profile toSave: Profile
-	) throws {
-		guard toSave != profile else {
-			// prevent duplicates
-			loggerGlobal.info("Same profile, nothing to update.")
-			return
-		}
-
-		try _assertIdentity(of: toSave)
-		try _assertOwnership()
-
-		var toSave = toSave
-		try _updateHeader(of: &toSave)
-		try _saveProfileAndEmitUpdate(toSave)
-	}
-}
-
-// MARK: Helpers
-extension ProfileStore {
-	/// Updates the `lastUsedOnDevice` to use this device, on `profile`
-	/// - Parameter profile: Profile to update `lastUsedOnDevice` of
-	public func claimOwnership(of profile: inout Profile) {
-		@Dependency(\.date) var date
-		profile.header.lastUsedOnDevice = deviceInfo
-		profile.header.lastUsedOnDevice.date = date()
-		profile.header.lastModified = date()
-	}
-
-	/// Updates the header of a Profile, lastModified date, contentHint etc.
-	/// - Parameter profile: Profile with a header to update
-	private func _updateHeader(of profile: inout Profile) throws {
-		@Dependency(\.date) var date
-		let networks = profile.networks
-
-		profile.header.lastModified = date.now
-		profile.header.contentHint.numberOfNetworks = UInt16(networks.count)
-		profile.header.contentHint.numberOfAccountsOnAllNetworksInTotal = UInt16(networks.map { $0.getAccounts().count }.reduce(0, +))
-		profile.header.contentHint.numberOfPersonasOnAllNetworksInTotal = UInt16(networks.map { $0.getPersonas().count }.reduce(0, +))
-	}
-
-	/// Updates the in-memory copy of profile in ProfileStores and saves it, by
-	/// updates `headerList` (Keychain),  `activeProfileID` (UserDefaults)
-	/// and saves a snapshot of the profile into Keychain.
-	/// - Parameter profile: Profile to save
-	private func _saveProfileAndEmitUpdate(_ profile: Profile) throws {
-		try Self._save(profile: profile)
-		profileSubject.send(profile)
-	}
-
-	/// Asserts that the **identity** of `profile` matches that of `self.profile`, which
-	/// is not using Equality but rather a UUID check.
-	///
-	/// This does NOT check ownership, for that see: `_assertOwnership:of`
-	///
-	/// - Parameter profile: The other profile to verify has same ID as `self.profile`.
-	private func _assertIdentity(of profile: Profile) throws {
-		guard profile.header.id == self.profile.header.id else {
-			logAssertionFailure("Incorrect implementation: `\(#function)` was called with a Profile which UUID does not match the current one. This should never happen.", severity: .critical)
-			throw Error.profileIDMismatch
-		}
-		// All good
-	}
-
-	private func _assertOwnership() throws {
-		loggerGlobal.debug("asserting ownership")
-
-		// We don't use in memory version of profile header, but rather read from keychain, this protects
-		// from corner case scenario where user is running app on iPhone `A` with Profile `P` then edit the
-		// very same profile `P` on iPhone `B` and then going back to iPhone `A` still running and trying
-		// to edit Profile `P` again. If we do not read profile header from keychain - which might have
-		// synced over iCloud - then iPhone `A` will never have detected that iPhone `B` made changes, so
-		// by reading from keychain we might pick up that change.
-		let header = (try? secureStorageClient.loadProfileSnapshot(profile.id)?.header) ?? profile.header
-
-		guard deviceInfo.id == header.lastUsedOnDevice.id else {
-			loggerGlobal.error("Device ID mismatch, profile might have been used on another device. Last used in header was: \(String(describing: header.lastUsedOnDevice)) and info of this device: \(String(describing: deviceInfo))")
-			throw Error.profileUsedOnAnotherDevice
-		}
-		// All good
+	) async throws {
+		try await SargonOS.shared.deleteProfileThenCreateNewWithBdfs()
 	}
 }
 
@@ -376,103 +229,11 @@ extension ProfileStore {
 extension ProfileStore {
 	typealias NewProfileTuple = (deviceInfo: DeviceInfo, profile: Profile)
 
-	private static func _loadSavedElseNewProfile(
-		metaDeviceInfo: MetaDeviceInfo
-	) -> NewProfileTuple {
-		@Dependency(\.secureStorageClient) var secureStorageClient
-		let deviceInfo = metaDeviceInfo.deviceInfo
-
-		func newProfile() throws -> NewProfileTuple {
-			try (
-				deviceInfo: metaDeviceInfo.deviceInfo,
-				profile: _tryGenerateAndSaveNewProfile(deviceInfo: deviceInfo)
-			)
-		}
-
-		do {
-			if var existing = try _tryLoadSavedProfile() {
-				if
-					case let bdfs = existing.factorSources.asIdentified().babylonDevice,
-					!secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(bdfs.id),
-					existing.networks.isEmpty
-				{
-					// Unlikely corner case, but possible. The Profile does not contain any accounts and
-					// the BDFS mnemonic is missing => treat this scenario as if there is no Profile ->
-					// let user start fresh. It is possible for users to end up in this corner case scenario
-					// if the do this:
-					// 1. Start wallet without any Profile => a new Profile and BDFS is saved into keychain (and BDFS mnemonic)
-					// 2. Before they create the first account, they delete the passcode from their device and re-enabling it, this
-					// 		will delete the mnemonic from keychain, but not the Profile.
-					// 3. Start wallet again, and they are met with onboarding screen to create their first acocunt into the empty
-					// 		Profile created in step 1. HOWEVER, they user is now stuck in a bad state. The account creation will
-					// 		try to use a missing mnemonic which silently fails and user gets back to the screen where they are asked
-					//		to name the account.
-					//
-					//	The solution is simple, this Profile has no value! It has no accounts! So we just toss it and generate a new
-					//	(Profile, BDFS) pair, with the mnemonic of this new BDFS intact in keychain.
-					Self.deleteEphemeralProfile(id: existing.header.id)
-					return try newProfile()
-				}
-
-				// Read: https://radixdlt.atlassian.net/l/cp/fmoH9KcN
-				let matchingIDs = existing.header.lastUsedOnDevice.id == deviceInfo.id
-				if metaDeviceInfo.fromDeprecatedDeviceID, matchingIDs {
-					// Same ID => migrate
-					existing.header.lastUsedOnDevice = deviceInfo
-				}
-				return (
-					deviceInfo: deviceInfo,
-					profile: existing
-				)
-			} else {
-				return try newProfile()
-			}
-		} catch {
-			fatalError("Unable to use app. error: \(error)")
-		}
-	}
-
-	private static func _tryLoadSavedProfile() throws -> Profile? {
-		@Dependency(\.secureStorageClient) var secureStorageClient
-		@Dependency(\.userDefaults) var userDefaults
-
-		guard
-			let profileId = userDefaults.getActiveProfileID(),
-			let profile = try secureStorageClient.loadProfile(profileId)
-		else {
-			return nil
-		}
-
-		if let profileSnapshotData = try? secureStorageClient.loadProfileSnapshotData(profileId) {
-			let containsLegacyP2PLinks = Profile.checkIfProfileJsonContainsLegacyP2PLinks(contents: profileSnapshotData)
-			userDefaults.setShowRelinkConnectorsAfterUpdate(containsLegacyP2PLinks)
-
-			/// If a profile contains legacy P2P links, we replace it with a newly decoded profile.
-			/// Since the new profile does not store P2P links, this operation will remove the legacy P2P links.
-			if containsLegacyP2PLinks {
-				try? _save(profile: profile)
-			}
-		}
-
-		return profile
-	}
-
-	private static func _tryGenerateAndSaveNewProfile(
-		deviceInfo: DeviceInfo
-	) throws -> Profile {
-		let (profile, bdfsMnemonic) = _newProfileAndBDFSMnemonic(deviceInfo: deviceInfo)
-		try _persist(bdfsMnemonic: bdfsMnemonic)
-		try _save(profile: profile)
-		return profile
-	}
-
 	/// Updates `headerList` (Keychain),  `activeProfileID` (UserDefaults) and saves a
 	/// snapshot of the profile into Keychain.
 	/// - Parameter profile: Profile to save
-	private static func _save(profile: Profile) throws {
-		try _updateHeaderList(with: profile.header)
-		_setActiveProfile(to: profile.header)
-		try _persist(profile: profile)
+	private static func _save(profile: Profile) async throws {
+		try await SargonOS.shared.setProfile(profile: profile)
 	}
 
 	private static func _newProfileAndBDFSMnemonic(

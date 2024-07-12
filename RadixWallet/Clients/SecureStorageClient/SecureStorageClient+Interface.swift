@@ -44,6 +44,11 @@ public struct SecureStorageClient: Sendable {
 	public var saveP2PLinksPrivateKey: SaveP2PLinksPrivateKey
 	public var keychainChanged: KeychainChanged
 
+	public var saveProfileSnapshotData: SaveProfileSnapshotData
+
+	public var loadMnemonicDataByFactorSourceID: LoadMnemonicDataByFactorSourceID
+	public var saveMnemonicForFactorSourceData: SaveMnemonicForFactorSourceData
+
 	#if DEBUG
 	public var getAllMnemonics: GetAllMnemonics
 	#endif
@@ -75,7 +80,11 @@ public struct SecureStorageClient: Sendable {
 		loadP2PLinksPrivateKey: @escaping LoadP2PLinksPrivateKey,
 		saveP2PLinksPrivateKey: @escaping SaveP2PLinksPrivateKey,
 		keychainChanged: @escaping KeychainChanged,
-		getAllMnemonics: @escaping GetAllMnemonics
+		getAllMnemonics: @escaping GetAllMnemonics,
+		saveProfileSnapshotData: @escaping SaveProfileSnapshotData,
+
+		loadMnemonicDataByFactorSourceID: @escaping LoadMnemonicDataByFactorSourceID,
+		saveMnemonicForFactorSourceData: @escaping SaveMnemonicForFactorSourceData
 	) {
 		self.saveProfileSnapshot = saveProfileSnapshot
 		self.loadProfileSnapshotData = loadProfileSnapshotData
@@ -103,6 +112,11 @@ public struct SecureStorageClient: Sendable {
 		self.saveRadixConnectMobileSession = saveRadixConnectMobileSession
 		self.loadRadixConnectMobileSession = loadRadixConnectMobileSession
 		self.keychainChanged = keychainChanged
+
+		self.saveProfileSnapshotData = saveProfileSnapshotData
+
+		self.loadMnemonicDataByFactorSourceID = loadMnemonicDataByFactorSourceID
+		self.saveMnemonicForFactorSourceData = saveMnemonicForFactorSourceData
 	}
 	#else
 
@@ -131,7 +145,11 @@ public struct SecureStorageClient: Sendable {
 		saveP2PLinks: @escaping SaveP2PLinks,
 		loadP2PLinksPrivateKey: @escaping LoadP2PLinksPrivateKey,
 		saveP2PLinksPrivateKey: @escaping SaveP2PLinksPrivateKey,
-		keychainChanged: @escaping KeychainChanged
+		keychainChanged: @escaping KeychainChanged,
+		saveProfileSnapshotData: @escaping SaveProfileSnapshotData,
+
+		loadMnemonicByFactorSourceID: @escaping LoadMnemonicByFactorSourceID,
+		saveMnemonicForFactorSourceData: @escaping SaveMnemonicForFactorSourceData
 	) {
 		self.saveProfileSnapshot = saveProfileSnapshot
 		self.loadProfileSnapshotData = loadProfileSnapshotData
@@ -158,6 +176,11 @@ public struct SecureStorageClient: Sendable {
 		self.loadP2PLinksPrivateKey = loadP2PLinksPrivateKey
 		self.saveP2PLinksPrivateKey = saveP2PLinksPrivateKey
 		self.keychainChanged = keychainChanged
+
+		self.saveProfileSnapshotData = saveProfileSnapshotData
+
+		self.loadMnemonicDataByFactorSourceID = loadMnemonicDataByFactorSourceID
+		self.saveMnemonicForFactorSourceData = saveMnemonicForFactorSourceData
 	}
 	#endif // DEBUG
 }
@@ -171,6 +194,7 @@ public struct LoadMnemonicByFactorSourceIDRequest: Sendable, Hashable {
 extension SecureStorageClient {
 	public typealias DisableCloudProfileSync = @Sendable (ProfileID) throws -> Void
 	public typealias SaveProfileSnapshot = @Sendable (Profile) throws -> Void
+	public typealias SaveProfileSnapshotData = @Sendable (ProfileID, Data) throws -> Void
 	public typealias LoadProfileSnapshotData = @Sendable (ProfileID) throws -> Data?
 	public typealias LoadProfileSnapshot = @Sendable (ProfileID) throws -> Profile?
 	public typealias LoadProfile = @Sendable (ProfileID) throws -> Profile?
@@ -178,6 +202,8 @@ extension SecureStorageClient {
 
 	public typealias SaveMnemonicForFactorSource = @Sendable (PrivateHierarchicalDeterministicFactorSource) throws -> Void
 	public typealias LoadMnemonicByFactorSourceID = @Sendable (LoadMnemonicByFactorSourceIDRequest) throws -> MnemonicWithPassphrase?
+	public typealias SaveMnemonicForFactorSourceData = @Sendable (FactorSourceIDFromHash, Data) throws -> Void
+	public typealias LoadMnemonicDataByFactorSourceID = @Sendable (LoadMnemonicByFactorSourceIDRequest) throws -> Data?
 	public typealias ContainsMnemonicIdentifiedByFactorSourceID = @Sendable (FactorSourceIDFromHash) -> Bool
 
 	#if DEBUG
@@ -280,7 +306,7 @@ extension SecureStorageClient {
 
 extension DeviceInfo {
 	public init(id: UUID, date: Date = .now, description: String? = nil) {
-        self.init(
+		self.init(
 			id: id,
 			date: date,
 			description: description ?? "iPhone",

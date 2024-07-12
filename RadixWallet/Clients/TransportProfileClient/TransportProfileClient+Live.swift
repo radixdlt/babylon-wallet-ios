@@ -13,7 +13,6 @@ extension TransportProfileClient: DependencyKey {
 			importProfile: { profile, factorSourceIDs, containsP2PLinks in
 				do {
 					var profile = profile
-					await profileStore.claimOwnership(of: &profile)
 					if profile.appPreferences.security.isCloudProfileSyncEnabled {
 						try? await cloudBackupClient.claimProfileOnICloud(profile)
 					}

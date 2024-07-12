@@ -72,7 +72,7 @@ public struct Splash: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			return delay().concatenate(with: verifyPasscode())
+			return delay().concatenate(with: verifyPasscode()).concatenate(with: boot_sargon_os())
 
 		case .didTapToUnlock:
 			state.biometricsCheckFailed = false
@@ -108,9 +108,7 @@ public struct Splash: Sendable, FeatureReducer {
 				return .none
 			}
 
-			return .run { send in
-				await send(.internal(.loadedProfile(onboardingClient.loadProfile())))
-			}
+			return .none
 
 		case let .loadedProfile(profile):
 			if profile.networks.isEmpty {
@@ -161,6 +159,20 @@ public struct Splash: Sendable, FeatureReducer {
 		}
 	}
 
+	private func boot_sargon_os() -> Effect<Action> {
+		.run { send in
+			try await SargonOS.creatingShared(
+				bootingWith: .creatingShared(drivers: .init(
+					bundle: Bundle.main,
+					userDefaultsSuite: "group.com.radixpublishing.preview", secureStorageDriver: SargonSecureStorage()
+				)
+				)
+			)
+
+			await send(.internal(.loadedProfile(onboardingClient.loadProfile())))
+		}
+	}
+
 	private func delay() -> Effect<Action> {
 		.run { _ in
 			let durationInMS: Int
@@ -181,5 +193,56 @@ public struct Splash: Sendable, FeatureReducer {
 				}
 			)))
 		}
+	}
+}
+
+// MARK: - SargonSecureStorage
+final class SargonSecureStorage: SecureStorageDriver {
+	@Dependency(\.secureStorageClient) var secureStorageClient
+	let userDefaults = UserDefaults.Dependency.radix
+
+	func loadData(key: SargonUniFFI.SecureStorageKey) async throws -> SargonUniFFI.BagOfBytes? {
+		switch key {
+		case .snapshotHeadersList:
+			nil
+		case .activeProfileId:
+			userDefaults.data(key: .activeProfileID)
+		case .deviceInfo:
+			try secureStorageClient.loadDeviceInfo()?.jsonData()
+		case let .deviceFactorSourceMnemonic(factorSourceId):
+			try secureStorageClient.loadMnemonicDataByFactorSourceID(.init(factorSourceID: factorSourceId, notifyIfMissing: true))
+		case let .profileSnapshot(profileId):
+			try secureStorageClient.loadProfileSnapshotData(profileId)
+		}
+	}
+
+	func saveData(key: SargonUniFFI.SecureStorageKey, data: SargonUniFFI.BagOfBytes) async throws {
+		switch key {
+		case .snapshotHeadersList:
+			return
+		case .activeProfileId:
+			userDefaults.set(data: data, key: .activeProfileID)
+		case .deviceInfo:
+			try secureStorageClient.saveDeviceInfo(DeviceInfo(jsonData: data))
+		case let .deviceFactorSourceMnemonic(factorSourceId):
+			try await secureStorageClient.saveMnemonicForFactorSourceData(factorSourceId, data)
+		case let .profileSnapshot(profileId):
+			try secureStorageClient.saveProfileSnapshotData(profileId, data)
+		}
+	}
+
+	func deleteDataForKey(key: SargonUniFFI.SecureStorageKey) async throws {
+		//        switch key {
+		//        case .snapshotHeadersList:
+		//            <#code#>
+		//        case .activeProfileId:
+		//            <#code#>
+		//        case .deviceInfo:
+		//            <#code#>
+		//        case .deviceFactorSourceMnemonic(let factorSourceId):
+		//            <#code#>
+		//        case .profileSnapshot(let profileId):
+		//            <#code#>
+		//        }
 	}
 }
