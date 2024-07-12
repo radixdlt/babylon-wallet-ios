@@ -119,22 +119,19 @@ public struct ResourceAsset: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .fungibleAsset(.delegate(.amountChanged)):
-			.send(.delegate(.amountChanged))
+			return .send(.delegate(.amountChanged))
 		case .fungibleAsset(.delegate(.resourceTapped)):
-			if let resource = state.kind.fungible?.resource {
-				loadFungibleResourceBalance(resource: resource)
-			} else {
-				.none
+			guard let resource = state.kind.fungible?.resource else {
+				return .none
 			}
-
+			return loadFungibleResourceBalance(resource: resource)
 		case .nonFungibleAsset(.delegate(.resourceTapped)):
-			if let nonFungible = state.kind.nonFungible {
-				loadNonFungibleResourceBalance(resource: nonFungible.resource, token: nonFungible.token)
-			} else {
-				.none
+			guard let nonFungible = state.kind.nonFungible else {
+				return .none
 			}
+			return loadNonFungibleResourceBalance(resource: nonFungible.resource, token: nonFungible.token)
 		default:
-			.none
+			return .none
 		}
 	}
 
