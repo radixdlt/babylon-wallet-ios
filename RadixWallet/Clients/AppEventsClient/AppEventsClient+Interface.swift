@@ -27,4 +27,5 @@ public enum AppEvent: Sendable, Hashable {
 	case appStarted
 	case walletCreated
 	case deferredDeepLinkReceived(String)
+	case walletDidReset
 }
