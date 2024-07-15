@@ -429,6 +429,35 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 			return .none
 
+		case let .proofs(.delegate(.showAsset(proof))):
+			let resource = proof.resourceBalance.resource
+
+			switch proof.resourceBalance.details {
+			case let .fungible(fungible):
+				state.destination = .fungibleTokenDetails(.init(
+					resourceAddress: resource.resourceAddress,
+					resource: .success(resource),
+					ownedFungibleResource: .init(
+						resourceAddress: resource.resourceAddress,
+						atLedgerState: resource.atLedgerState,
+						amount: fungible.amount,
+						metadata: resource.metadata
+					),
+					isXRD: resource.resourceAddress.isXRD
+				))
+			case let .nonFungible(nonFungible):
+				state.destination = .nonFungibleTokenDetails(.init(
+					resourceAddress: resource.resourceAddress,
+					resourceDetails: .success(resource),
+					token: nonFungible,
+					ledgerState: resource.atLedgerState
+				))
+			default:
+				break
+			}
+
+			return .none
+
 		case .networkFee(.delegate(.showCustomizeFees)):
 			guard let reviewedTransaction = state.reviewedTransaction else {
 				return .none
@@ -781,8 +810,8 @@ extension TransactionReview {
 
 extension TransactionReview {
 	public struct ProofEntity: Sendable, Identifiable, Hashable {
-		public let id: ResourceAddress
-		public let metadata: OnLedgerEntity.Metadata
+		public var id: ResourceBalance { resourceBalance }
+		public let resourceBalance: ResourceBalance
 	}
 
 	public struct DappEntity: Sendable, Identifiable, Hashable {

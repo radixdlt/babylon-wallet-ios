@@ -117,21 +117,32 @@ public struct ResourceBalanceView: View {
 	public let viewState: ResourceBalance.ViewState
 	public let appearance: Appearance
 	public let isSelected: Bool?
+	public let action: (() -> Void)?
 
-	public enum Appearance: Equatable {
+	public enum Appearance: Sendable, Equatable {
 		case standard
 		case compact(border: Bool)
 
 		static let compact: Appearance = .compact(border: false)
 	}
 
-	init(_ viewState: ResourceBalance.ViewState, appearance: Appearance = .standard, isSelected: Bool? = nil) {
+	init(_ viewState: ResourceBalance.ViewState, appearance: Appearance = .standard, isSelected: Bool? = nil, action: (() -> Void)? = nil) {
 		self.viewState = viewState
 		self.appearance = appearance
 		self.isSelected = isSelected
+		self.action = action
 	}
 
 	public var body: some View {
+		if let action {
+			Button(action: action) { borderCore }
+		} else {
+			borderCore
+		}
+	}
+
+	@ViewBuilder
+	private var borderCore: some View {
 		if border {
 			core
 				.padding(.small1)
