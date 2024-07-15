@@ -312,8 +312,8 @@ extension ResourceBalanceView {
 			VStack(alignment: .leading, spacing: .zero) {
 				NonFungibleView(
 					thumbnail: .stakeClaimNFT(viewState.resourceMetadata.iconURL),
-					caption1: viewState.resourceMetadata.title ?? "",
-					caption2: viewState.validatorName ?? "",
+					caption1: viewState.resourceMetadata.title,
+					caption2: viewState.validatorName,
 					compact: compact
 				)
 
@@ -517,16 +517,13 @@ extension ResourceBalanceView {
 				.padding(.trailing, .small1)
 
 			VStack(alignment: .leading, spacing: 0) {
-				if let caption1 {
-					Text(caption1)
-						.textStyle(titleTextStyle)
-						.foregroundColor(.app.gray1)
-				}
-				if let caption2 {
-					Text(caption2)
-						.textStyle(.body2Regular)
-						.foregroundColor(.app.gray2)
-				}
+				Text(caption1 ?? "-")
+					.textStyle(titleTextStyle)
+					.foregroundColor(.app.gray1)
+
+				Text(caption2 ?? "-")
+					.textStyle(.body2Regular)
+					.foregroundColor(.app.gray2)
 			}
 			.lineLimit(1)
 			.truncationMode(.tail)
