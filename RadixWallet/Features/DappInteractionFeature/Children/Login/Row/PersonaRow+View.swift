@@ -28,13 +28,15 @@ extension PersonaRow {
 		var body: some SwiftUI.View {
 			Button(action: action) {
 				VStack(alignment: .leading, spacing: .zero) {
-					HStack(alignment: .center, spacing: .medium3) {
+					HStack(alignment: .center, spacing: .zero) {
 						Image(.persona)
+							.resizable()
 							.frame(.small)
 
 						Text(viewState.name)
 							.foregroundColor(.app.gray1)
 							.textStyle(.secondaryHeader)
+							.padding(.leading, .medium3)
 
 						Spacer()
 
@@ -42,19 +44,20 @@ extension PersonaRow {
 							appearance: .dark,
 							state: isSelected ? .selected : .unselected
 						)
+						.padding(.leading, .small3)
 					}
 					.padding(.medium2)
 
 					Separator()
 					if let lastLogin = viewState.lastLogin {
-						VStack(spacing: .zero) {
+						VStack(alignment: .leading, spacing: .zero) {
 							Separator()
 
 							Text(lastLogin)
 								.foregroundColor(.app.gray2)
 								.textStyle(.body2Regular)
 								.padding(.horizontal, .medium2)
-								.padding(.vertical, .small3)
+								.padding(.vertical, .small2)
 						}
 					}
 				}
