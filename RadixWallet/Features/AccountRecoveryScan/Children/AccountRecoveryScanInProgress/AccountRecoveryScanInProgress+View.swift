@@ -186,18 +186,12 @@ public extension AccountRecoveryScanInProgress {
 }
 
 // MARK: - SimpleAccountCard
-/// A `SmallAccountCard` without `name`, and with the address centered
+/// An `AccountCard` without `name`, and with the address centered
 private struct SimpleAccountCard: View {
 	let account: Account
 
 	var body: some View {
-		SmallAccountCard(
-			identifiable: .address(of: account),
-			gradient: .init(account.appearanceID)
-		) {
-			Spacer(minLength: 0)
-		}
-		.cornerRadius(.small1)
+		AccountCard(kind: .display, account: .init(title: nil, ledgerIdentifiable: .address(of: account), gradient: .init(account.appearanceId)))
 	}
 }
 

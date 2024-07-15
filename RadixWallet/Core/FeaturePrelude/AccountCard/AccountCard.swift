@@ -50,13 +50,19 @@ extension AccountCard {
 
 	private var horizontalCore: some View {
 		HStack(spacing: .zero) {
-			Text(account.title)
-				.foregroundColor(.app.white)
-				.textStyle(.body1Header)
+			if let title = account.title {
+				Text(title)
+					.foregroundColor(.app.white)
+					.textStyle(.body1Header)
 
-			Spacer(minLength: .zero)
+				Spacer(minLength: .zero)
 
-			addressView
+				addressView
+			} else {
+				Spacer()
+				addressView
+				Spacer()
+			}
 		}
 	}
 

@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - AccountCardDataSource
 struct AccountCardDataSource {
-	let title: String
+	let title: String?
 	let ledgerIdentifiable: LedgerIdentifiable
 	let gradient: Gradient
 }
