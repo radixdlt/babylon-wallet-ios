@@ -32,7 +32,7 @@ extension View {
 		AnyView(self)
 	}
 
-	/// Embeds the view on a `Button` when an action isprovided.
+	/// Embeds the view on a `Button` when an action is provided.
 	/// Otherwise returns the same view unmodified.
 	func embedInButton(when action: (() -> Void)?) -> some View {
 		Group {
