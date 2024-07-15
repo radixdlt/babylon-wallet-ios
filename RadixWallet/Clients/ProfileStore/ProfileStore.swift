@@ -52,9 +52,16 @@ public final actor ProfileStore {
 	/// Holds an in-memory copy of the Profile, the source of truth is Keychain.
 	private let profileSubject: AsyncCurrentValueSubject<Profile>
 
+	/// Only mutable since we need to update the description with async, since reading
+	/// device model and name is async.
+	private var deviceInfo: DeviceInfo
+
 	init() {
 		let profile = SargonOS.shared.profile()
+		let metaDeviceInfo = Self._deviceInfo()
+		self.deviceInfo = metaDeviceInfo.deviceInfo
 		self.profileSubject = AsyncCurrentValueSubject(profile)
+
 		Task {
 			for await profile in await ProfileChangeBus.shared.profile_change_stream() {
 				self.profileSubject.send(profile)
@@ -181,8 +188,14 @@ extension ProfileStore {
 	}
 
 	public func isThisDevice(deviceID: DeviceID) -> Bool {
-		// TODO: fix
-		true
+		deviceInfo.id == deviceID
+	}
+
+	public func claimOwnership(of profile: inout Profile) {
+		@Dependency(\.date) var date
+		profile.header.lastUsedOnDevice = deviceInfo
+		profile.header.lastUsedOnDevice.date = date()
+		profile.header.lastModified = date()
 	}
 }
 

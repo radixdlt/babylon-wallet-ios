@@ -114,7 +114,7 @@ public struct App: Sendable, FeatureReducer {
 			goToMain(state: &state)
 
 		case let .splash(.delegate(.completed(profile))):
-			if profile.networks.isEmpty {
+			if profile.network?.accounts.isEmpty == true {
 				goToOnboarding(state: &state)
 			} else {
 				goToMain(state: &state)

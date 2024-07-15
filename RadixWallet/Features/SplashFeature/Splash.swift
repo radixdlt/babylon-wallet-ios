@@ -232,17 +232,17 @@ final class SargonSecureStorage: SecureStorageDriver {
 	}
 
 	func deleteDataForKey(key: SargonUniFFI.SecureStorageKey) async throws {
-		//        switch key {
-		//        case .snapshotHeadersList:
-		//            <#code#>
-		//        case .activeProfileId:
-		//            <#code#>
-		//        case .deviceInfo:
-		//            <#code#>
-		//        case .deviceFactorSourceMnemonic(let factorSourceId):
-		//            <#code#>
-		//        case .profileSnapshot(let profileId):
-		//            <#code#>
-		//        }
+		switch key {
+		case .snapshotHeadersList:
+			return
+		case .activeProfileId:
+			userDefaults.remove(.activeProfileID)
+		case .deviceInfo:
+			return
+		case let .deviceFactorSourceMnemonic(factorSourceId):
+			return
+		case let .profileSnapshot(profileId):
+			return
+		}
 	}
 }

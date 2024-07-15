@@ -190,9 +190,8 @@ extension CloudBackupClient {
 
 			var profileToUpload = profile
 			if shouldReclaim {
-				// TODO: fix
 				// The profile will already be locally claimed, but we want to update the lastUsedOnDevice date
-//				await profileStore.claimOwnership(of: &profileToUpload)
+				await profileStore.claimOwnership(of: &profileToUpload)
 			}
 
 			try? await backupProfileAndSaveResult(profileToUpload, existingRecord: existingRecord)
