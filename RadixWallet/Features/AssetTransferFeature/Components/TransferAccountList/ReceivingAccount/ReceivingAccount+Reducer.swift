@@ -116,7 +116,7 @@ extension ResourceAsset.State {
 		case let .fungibleAsset(state):
 			state.resource.resourceAddress
 		case let .nonFungibleAsset(state):
-			state.resourceAddress
+			state.resource.resourceAddress
 		}
 	}
 }

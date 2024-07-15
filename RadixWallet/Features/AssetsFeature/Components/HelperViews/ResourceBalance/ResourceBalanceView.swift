@@ -126,7 +126,12 @@ public struct ResourceBalanceView: View {
 		static let compact: Appearance = .compact(border: false)
 	}
 
-	init(_ viewState: ResourceBalance.ViewState, appearance: Appearance = .standard, isSelected: Bool? = nil, action: (() -> Void)? = nil) {
+	init(
+		_ viewState: ResourceBalance.ViewState,
+		appearance: Appearance = .standard,
+		isSelected: Bool? = nil,
+		action: (() -> Void)? = nil
+	) {
 		self.viewState = viewState
 		self.appearance = appearance
 		self.isSelected = isSelected
@@ -134,15 +139,12 @@ public struct ResourceBalanceView: View {
 	}
 
 	public var body: some View {
-		if let action {
-			Button(action: action) { borderCore }
-		} else {
-			borderCore
-		}
+		content
+			.embedInButton(when: action)
 	}
 
 	@ViewBuilder
-	private var borderCore: some View {
+	private var content: some View {
 		if border {
 			core
 				.padding(.small1)

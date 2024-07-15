@@ -31,4 +31,18 @@ extension View {
 	func eraseToAnyView() -> AnyView {
 		AnyView(self)
 	}
+
+	/// Embeds the view on a `Button` when an action is provided.
+	/// Otherwise returns the same view unmodified.
+	func embedInButton(when action: (() -> Void)?) -> some View {
+		Group {
+			if let action {
+				Button(action: action) {
+					self
+				}
+			} else {
+				self
+			}
+		}
+	}
 }
