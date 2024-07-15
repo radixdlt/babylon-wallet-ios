@@ -70,7 +70,8 @@ extension TransactionReviewAccount {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				InnerCard {
-					SmallAccountCard(account: viewStore.account)
+					// SmallAccountCard(account: viewStore.account)
+					AccountCard(account: viewStore.account)
 
 					VStack(spacing: .zero) {
 						ForEach(viewStore.transfers) { transfer in
@@ -170,6 +171,23 @@ extension SmallAccountCard where Accessory == EmptyView {
 				gradient: .init(colors: [.app.gray2]),
 				verticalPadding: .small1
 			)
+		}
+	}
+}
+
+extension AccountCard where Trailing == EmptyView, Bottom == EmptyView {
+	init(account: TransactionReview.ReviewAccount) {
+		switch account {
+		case let .user(account):
+			self.init(kind: .innerCompact, account: account)
+
+		case let .external(accountAddress, _):
+			let account = AccountCardDataSource(
+				title: L10n.TransactionReview.externalAccountName,
+				ledgerIdentifiable: .address(.account(accountAddress)),
+				gradient: .init(colors: [.app.gray2])
+			)
+			self.init(kind: .innerCompact, account: account)
 		}
 	}
 }

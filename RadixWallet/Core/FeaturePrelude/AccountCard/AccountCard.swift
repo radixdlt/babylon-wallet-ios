@@ -1,15 +1,15 @@
 import SwiftUI
 
 // MARK: - AccountCard
-public struct AccountCard<Trailing: View, Bottom: View>: View {
+struct AccountCard<Trailing: View, Bottom: View>: View {
 	let kind: Kind
-	let account: Account
+	let account: AccountCardDataSource
 	let trailing: Trailing
 	let bottom: Bottom
 
-	public init(
+	init(
 		kind: Kind,
-		account: Account,
+		account: AccountCardDataSource,
 		@ViewBuilder trailing: () -> Trailing,
 		@ViewBuilder bottom: () -> Bottom
 	) {
@@ -27,7 +27,7 @@ public struct AccountCard<Trailing: View, Bottom: View>: View {
 		.padding(.vertical, kind.verticalPadding)
 		.padding(.horizontal, kind.horizontalPadding)
 		.background {
-			LinearGradient(gradient: .init(account.appearanceId), startPoint: .leading, endPoint: .trailing)
+			LinearGradient(gradient: account.gradient, startPoint: .leading, endPoint: .trailing)
 		}
 		.clipShape(RoundedRectangle(cornerRadius: kind.cornerRadius))
 	}
@@ -50,13 +50,13 @@ extension AccountCard {
 
 	private var horizontalCore: some View {
 		HStack(spacing: .zero) {
-			Text(account.displayName.rawValue)
+			Text(account.title)
 				.foregroundColor(.app.white)
 				.textStyle(.body1Header)
 
 			Spacer(minLength: .zero)
 
-			AddressView(.address(of: account))
+			AddressView(account.ledgerIdentifiable)
 				.foregroundColor(.app.whiteTransparent)
 				.textStyle(.body2HighImportance)
 		}
@@ -64,11 +64,11 @@ extension AccountCard {
 
 	private var verticalCore: some View {
 		VStack(alignment: .leading, spacing: .small2) {
-			Text(account.displayName.rawValue)
+			Text(account.title)
 				.foregroundColor(.app.white)
 				.textStyle(.body1Header)
 
-			AddressView(.address(of: account))
+			AddressView(account.ledgerIdentifiable)
 				.foregroundColor(.app.whiteTransparent)
 				.textStyle(.body2HighImportance)
 		}
@@ -130,16 +130,5 @@ private extension AccountCard.Kind {
 		case .innerCompact:
 			.zero
 		}
-	}
-}
-
-extension AccountCard where Trailing == EmptyView, Bottom == EmptyView {
-	public init(kind: Kind = .display, account: Account) {
-		self.init(
-			kind: kind,
-			account: account,
-			trailing: { EmptyView() },
-			bottom: { EmptyView() }
-		)
 	}
 }

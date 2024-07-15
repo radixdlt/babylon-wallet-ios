@@ -893,6 +893,7 @@
 		5B6499B72BCFD0E8000F2176 /* SecurityFactors+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B52BCFD0E8000F2176 /* SecurityFactors+View.swift */; };
 		5B6499B82BCFD0E8000F2176 /* SecurityFactors+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B62BCFD0E8000F2176 /* SecurityFactors+Reducer.swift */; };
 		5B6499BA2BCFDB1E000F2176 /* ShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B92BCFDB1E000F2176 /* ShareView.swift */; };
+		5B6E11482C45835900C20F2D /* AccountCard+DataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6E11472C45835900C20F2D /* AccountCard+DataSource.swift */; };
 		5B758D4F2BCD5BF700348722 /* Effect+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B758D4E2BCD5BF700348722 /* Effect+Extra.swift */; };
 		5B758D532BCD721D00348722 /* SettingsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B758D522BCD721D00348722 /* SettingsRow.swift */; };
 		5B758D572BCE7AEC00348722 /* Preferences+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B758D552BCE7AEC00348722 /* Preferences+View.swift */; };
@@ -2042,6 +2043,7 @@
 		5B6499B52BCFD0E8000F2176 /* SecurityFactors+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityFactors+View.swift"; sourceTree = "<group>"; };
 		5B6499B62BCFD0E8000F2176 /* SecurityFactors+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityFactors+Reducer.swift"; sourceTree = "<group>"; };
 		5B6499B92BCFDB1E000F2176 /* ShareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareView.swift; sourceTree = "<group>"; };
+		5B6E11472C45835900C20F2D /* AccountCard+DataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountCard+DataSource.swift"; sourceTree = "<group>"; };
 		5B758D4E2BCD5BF700348722 /* Effect+Extra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Effect+Extra.swift"; sourceTree = "<group>"; };
 		5B758D522BCD721D00348722 /* SettingsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRow.swift; sourceTree = "<group>"; };
 		5B758D552BCE7AEC00348722 /* Preferences+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Preferences+View.swift"; sourceTree = "<group>"; };
@@ -5162,6 +5164,7 @@
 		48CFC1322ADC10D900E77A5C /* FeaturePrelude */ = {
 			isa = PBXGroup;
 			children = (
+				5B6E11462C45834C00C20F2D /* AccountCard */,
 				48CFC1332ADC10D900E77A5C /* LedgerRowView.swift */,
 				48CFC22C2ADC10D900E77A5C /* Radix+Dashboard.swift */,
 				48CFC1342ADC10D900E77A5C /* OnFirstTaskViewModifier.swift */,
@@ -5176,7 +5179,6 @@
 				48CFC1482ADC10D900E77A5C /* SmallAccountCard.swift */,
 				48CFC1492ADC10D900E77A5C /* UserDefaultsClient+AccountRecovery.swift */,
 				A47809072BDBDB4C006B68C0 /* RadixDateFormatter.swift */,
-				5BBC7DA92C403F3400B04BD6 /* AccountCard.swift */,
 			);
 			path = FeaturePrelude;
 			sourceTree = "<group>";
@@ -5652,6 +5654,15 @@
 				5B6499B62BCFD0E8000F2176 /* SecurityFactors+Reducer.swift */,
 			);
 			path = SecurityFactors;
+			sourceTree = "<group>";
+		};
+		5B6E11462C45834C00C20F2D /* AccountCard */ = {
+			isa = PBXGroup;
+			children = (
+				5BBC7DA92C403F3400B04BD6 /* AccountCard.swift */,
+				5B6E11472C45835900C20F2D /* AccountCard+DataSource.swift */,
+			);
+			path = AccountCard;
 			sourceTree = "<group>";
 		};
 		5B758D542BCE7AD100348722 /* Preferences */ = {
@@ -7122,6 +7133,7 @@
 				48CFC28D2ADC10D900E77A5C /* TransactionReviewRawTransaction+View.swift in Sources */,
 				83EE47882AF0EE3C00155F03 /* ProgrammaticScryptoSborValueBytes.swift in Sources */,
 				48CFC2C92ADC10D900E77A5C /* FungibleResourceAsset+View.swift in Sources */,
+				5B6E11482C45835900C20F2D /* AccountCard+DataSource.swift in Sources */,
 				48CFC50D2ADC10DA00E77A5C /* FungibleResourcesCollection.swift in Sources */,
 				83EE5EDF2BE3C16F00B1531D /* StateEntitySchemaPageResponse.swift in Sources */,
 				48CFC40F2ADC10DA00E77A5C /* Logger.swift in Sources */,
