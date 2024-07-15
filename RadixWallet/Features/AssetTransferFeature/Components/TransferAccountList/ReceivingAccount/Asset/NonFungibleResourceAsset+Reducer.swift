@@ -3,16 +3,12 @@ import ComposableArchitecture
 public struct NonFungibleResourceAsset: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
 		public typealias ID = String
-		public var id: ID { token.id.toRawString() }
 
 		public let resource: OnLedgerEntity.OwnedNonFungibleResource
+		public let token: OnLedgerEntity.NonFungibleToken
 
 		var resourceAddress: ResourceAddress { resource.resourceAddress }
-
-		public let token: OnLedgerEntity.NonFungibleToken
-		public var nftGlobalID: NonFungibleGlobalId {
-			token.id
-		}
+		public var id: ID { token.id.toRawString() }
 	}
 
 	public enum ViewAction: Equatable, Sendable {
