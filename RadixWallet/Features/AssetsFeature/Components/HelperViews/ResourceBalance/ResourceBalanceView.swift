@@ -241,8 +241,8 @@ extension ResourceBalanceView {
 			VStack(alignment: .leading, spacing: .medium3) {
 				FungibleView(
 					thumbnail: .lsu(viewState.icon),
-					caption1: viewState.title,
-					caption2: viewState.validatorName,
+					caption1: viewState.title ?? "-",
+					caption2: viewState.validatorName ?? "-",
 					fallback: nil,
 					amount: viewState.amount,
 					compact: compact,
@@ -273,8 +273,8 @@ extension ResourceBalanceView {
 			VStack(alignment: .leading, spacing: .zero) {
 				FungibleView(
 					thumbnail: .poolUnit(viewState.poolIcon),
-					caption1: viewState.poolName,
-					caption2: viewState.dAppName.wrappedValue?.flatMap { $0 },
+					caption1: viewState.poolName ?? "-",
+					caption2: viewState.dAppName.wrappedValue?.flatMap { $0 } ?? "-",
 					fallback: nil,
 					amount: viewState.amount,
 					compact: compact,
@@ -497,8 +497,8 @@ extension ResourceBalanceView {
 				CaptionedThumbnailView(
 					type: thumbnail.type,
 					url: thumbnail.url,
-					caption1: caption1,
-					caption2: caption2,
+					caption1: caption1 ?? "-",
+					caption2: caption2 ?? "-",
 					compact: compact
 				)
 
@@ -519,13 +519,16 @@ extension ResourceBalanceView {
 				.padding(.trailing, .small1)
 
 			VStack(alignment: .leading, spacing: 0) {
-				Text(caption1 ?? "-")
-					.textStyle(titleTextStyle)
-					.foregroundColor(.app.gray1)
-
-				Text(caption2 ?? "-")
-					.textStyle(.body2Regular)
-					.foregroundColor(.app.gray2)
+				if let caption1 {
+					Text(caption1)
+						.textStyle(titleTextStyle)
+						.foregroundColor(.app.gray1)
+				}
+				if let caption2 {
+					Text(caption2)
+						.textStyle(.body2Regular)
+						.foregroundColor(.app.gray2)
+				}
 			}
 			.lineLimit(1)
 			.truncationMode(.tail)
