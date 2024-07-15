@@ -18,12 +18,16 @@ extension AttributedString {
 			return
 		}
 
-		self = attributed.replacingAttributes(.emphasized, with: .foregroundColor(emphasizedColor))
+		let replacement = AttributeContainer.foregroundColor(emphasizedColor)
+		self = attributed
+			.replacingAttributes(.emphasized, with: replacement)
+			.replacingAttributes(.stronglyEmphasized, with: replacement)
 	}
 }
 
 extension AttributeContainer {
 	public static let emphasized: AttributeContainer = intent(.emphasized)
+	public static let stronglyEmphasized: AttributeContainer = intent(.stronglyEmphasized)
 
 	public static func intent(_ intent: InlinePresentationIntent) -> AttributeContainer {
 		var result = AttributeContainer()
