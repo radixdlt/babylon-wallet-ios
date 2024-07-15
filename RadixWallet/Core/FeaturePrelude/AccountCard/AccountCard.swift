@@ -56,9 +56,7 @@ extension AccountCard {
 
 			Spacer(minLength: .zero)
 
-			AddressView(account.ledgerIdentifiable)
-				.foregroundColor(.app.whiteTransparent)
-				.textStyle(.body2HighImportance)
+			addressView
 		}
 	}
 
@@ -68,10 +66,21 @@ extension AccountCard {
 				.foregroundColor(.app.white)
 				.textStyle(.body1Header)
 
-			AddressView(account.ledgerIdentifiable)
-				.foregroundColor(.app.whiteTransparent)
-				.textStyle(.body2HighImportance)
+			addressView
 		}
+	}
+
+	private var addressView: some View {
+		HStack(spacing: .small3) {
+			AddressView(account.ledgerIdentifiable)
+
+			if let tag = kind.tag {
+				Text("•")
+				Text(tag)
+			}
+		}
+		.foregroundColor(.app.whiteTransparent)
+		.textStyle(.body2HighImportance)
 	}
 }
 
@@ -91,7 +100,7 @@ extension AccountCard {
 
 		/// Stacks the name and address vertically, while expecting more content in the trailing and bottom sections.
 		/// Used for Home rows.
-		case home
+		case home(tag: String?)
 	}
 }
 
@@ -129,6 +138,15 @@ private extension AccountCard.Kind {
 			.small1
 		case .innerCompact:
 			.zero
+		}
+	}
+
+	var tag: String? {
+		switch self {
+		case let .home(tag):
+			tag
+		default:
+			nil
 		}
 	}
 }

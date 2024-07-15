@@ -78,7 +78,7 @@ extension Home.AccountRow {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: ViewState.init, send: { .view($0) }) { viewStore in
-				AccountCard(kind: .home, account: viewStore.account) {
+				AccountCard(kind: .home(tag: viewStore.tag?.display), account: viewStore.account) {
 					if viewStore.showFiatWorth {
 						Spacer()
 						loadable(
