@@ -10,6 +10,7 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 		public let token: OnLedgerEntity.NonFungibleToken?
 		public let ledgerState: AtLedgerState
 		public let stakeClaim: OnLedgerEntitiesClient.StakeClaim?
+		public let isClaimStakeEnabled: Bool
 
 		public init(
 			resourceAddress: ResourceAddress,
@@ -17,7 +18,8 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 			ownedResource: OnLedgerEntity.OwnedNonFungibleResource? = nil,
 			token: OnLedgerEntity.NonFungibleToken? = nil,
 			ledgerState: AtLedgerState,
-			stakeClaim: OnLedgerEntitiesClient.StakeClaim? = nil
+			stakeClaim: OnLedgerEntitiesClient.StakeClaim? = nil,
+			isClaimStakeEnabled: Bool = true
 		) {
 			self.resourceAddress = resourceAddress
 			self.resourceDetails = resourceDetails
@@ -25,6 +27,7 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 			self.ownedResource = ownedResource
 			self.ledgerState = ledgerState
 			self.stakeClaim = stakeClaim
+			self.isClaimStakeEnabled = isClaimStakeEnabled
 		}
 	}
 

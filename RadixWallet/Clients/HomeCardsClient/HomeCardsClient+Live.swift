@@ -64,7 +64,6 @@ private final class HomeCardsObserver: Sargon.HomeCardsObserver, Sendable {
 	let subject: AsyncCurrentValueSubject<[HomeCard]> = .init([])
 
 	func handleCardsUpdate(cards: [HomeCard]) {
-		print("M- Received cards from Sargon \(cards)")
 		subject.send(cards)
 	}
 }
