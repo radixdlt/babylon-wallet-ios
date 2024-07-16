@@ -11,18 +11,20 @@ extension AccountCard {
 	init(
 		kind: Kind,
 		account: Account,
+		showName: Bool = true,
 		@ViewBuilder trailing: () -> Trailing,
 		@ViewBuilder bottom: () -> Bottom
 	) {
-		self.init(kind: kind, account: account.asDataSource, trailing: trailing, bottom: bottom)
+		self.init(kind: kind, account: account.asDataSource(showName: showName), trailing: trailing, bottom: bottom)
 	}
 }
 
 extension AccountCard where Trailing == EmptyView, Bottom == EmptyView {
-	init(kind: Kind = .display, account: Account) {
+	init(kind: Kind = .display, account: Account, showName: Bool = true) {
 		self.init(
 			kind: kind,
 			account: account,
+			showName: showName,
 			trailing: { EmptyView() },
 			bottom: { EmptyView() }
 		)
@@ -58,6 +60,16 @@ extension AccountCard where Trailing == EmptyView, Bottom == EmptyView {
 }
 
 extension AccountCard where Bottom == EmptyView {
+	init(kind: Kind, account: Account, showName: Bool = true, @ViewBuilder trailing: () -> Trailing) {
+		self.init(
+			kind: kind,
+			account: account,
+			showName: showName,
+			trailing: trailing,
+			bottom: { EmptyView() }
+		)
+	}
+
 	init(kind: Kind = .display, account: AccountOrAddressOf, @ViewBuilder trailing: () -> Trailing) {
 		self.init(
 			kind: kind,
@@ -69,8 +81,12 @@ extension AccountCard where Bottom == EmptyView {
 }
 
 private extension Account {
-	var asDataSource: AccountCardDataSource {
-		.init(title: displayName.rawValue, ledgerIdentifiable: .address(of: self), gradient: .init(appearanceID))
+	func asDataSource(showName: Bool) -> AccountCardDataSource {
+		.init(
+			title: showName ? displayName.rawValue : nil,
+			ledgerIdentifiable: .address(of: self),
+			gradient: .init(appearanceID)
+		)
 	}
 }
 

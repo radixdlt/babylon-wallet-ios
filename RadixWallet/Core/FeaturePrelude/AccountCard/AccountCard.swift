@@ -28,6 +28,7 @@ struct AccountCard<Trailing: View, Bottom: View>: View {
 		.padding(.horizontal, kind.horizontalPadding)
 		.background {
 			LinearGradient(gradient: account.gradient, startPoint: .leading, endPoint: .trailing)
+				.brightness(kind.gradientBrightness)
 		}
 		.clipShape(RoundedRectangle(cornerRadius: kind.cornerRadius))
 	}
@@ -102,10 +103,15 @@ extension AccountCard {
 		/// Used for example in Customize Fees view.
 		case compact(addCornerRadius: Bool)
 
-		/// Stacks the name and address vertically, while expecting more content in the trailing and bottom sections.
+		/// Stacks the name and address vertically, while expecting more content on the trailing and bottom sections.
 		/// Its shape is clipped with a corner radius of 12.
 		/// Used for Home rows.
 		case home(tag: String?)
+
+		/// Stacks the name and address vertically, while expecting a view that allows selection on the trailing section.
+		/// Its shape is clipped with a corner radius of 12.
+		/// Used for example when choosing a receiving account.
+		case selection(isSelected: Bool)
 	}
 }
 
@@ -131,14 +137,14 @@ private extension AccountCard.Kind {
 		switch self {
 		case .display, .compact:
 			.horizontal
-		case .home:
+		case .home, .selection:
 			.vertical
 		}
 	}
 
 	var verticalAlignment: VerticalAlignment {
 		switch self {
-		case .compact, .display:
+		case .compact, .display, .selection:
 			.center
 		case .home:
 			.top
@@ -149,14 +155,14 @@ private extension AccountCard.Kind {
 		switch self {
 		case .display, .compact:
 			.medium3
-		case .home:
+		case .home, .selection:
 			.medium1
 		}
 	}
 
 	var verticalPadding: CGFloat {
 		switch self {
-		case .home, .display:
+		case .display, .home, .selection:
 			.medium2
 		case .compact:
 			.small1
@@ -167,7 +173,7 @@ private extension AccountCard.Kind {
 		switch self {
 		case let .display(addCornerRadius), let .compact(addCornerRadius):
 			addCornerRadius ? .small1 : .zero
-		case .home:
+		case .home, .selection:
 			.small1
 		}
 	}
@@ -178,6 +184,15 @@ private extension AccountCard.Kind {
 			tag
 		default:
 			nil
+		}
+	}
+
+	var gradientBrightness: CGFloat {
+		switch self {
+		case .display, .compact, .home:
+			.zero
+		case let .selection(isSelected):
+			isSelected ? -0.1 : .zero
 		}
 	}
 }
