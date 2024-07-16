@@ -27,16 +27,13 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 		}
 
 		var shouldDisplayNavBar: Bool {
-			guard config.canBeDismissed else {
-				return false
-			}
 			switch path.last {
 			case .nameAccount, .selectLedger:
-				return true
+				true
 			case .completion:
-				return false
+				false
 			case .none:
-				return true
+				true
 			}
 		}
 	}
@@ -132,8 +129,7 @@ extension CreateAccountCoordinator {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
-			assert(state.config.canBeDismissed)
-			return .run { send in
+			.run { send in
 				await send(.delegate(.dismissed))
 				if isPresented {
 					await dismiss()
