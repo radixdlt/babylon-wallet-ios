@@ -43,7 +43,7 @@ extension AccountCard {
 			case .vertical:
 				verticalCore
 			}
-			Spacer()
+			Spacer(minLength: .zero)
 			trailing
 		}
 	}
