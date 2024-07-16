@@ -44,6 +44,8 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 	let accessory: Accessory
 	let innerAccesory: InnerAccessory
 
+	@State private var isFocused: Bool = false
+
 	public init(
 		useSecureField: Bool = false,
 		primaryHeading: PrimaryHeading? = nil,
@@ -132,7 +134,9 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 							TextField(
 								placeholder,
 								text: text.removeDuplicates()
-							)
+							) { value in
+								isFocused = value
+							}
 						}
 					}
 					.modifier { view in
@@ -169,7 +173,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 				.cornerRadius(.small2)
 				.overlay(
 					RoundedRectangle(cornerRadius: .small2)
-						.stroke(accentColor(border: !isEnabled), lineWidth: 1)
+						.stroke(accentColor(border: !isFocused), lineWidth: 1)
 				)
 
 				hint
