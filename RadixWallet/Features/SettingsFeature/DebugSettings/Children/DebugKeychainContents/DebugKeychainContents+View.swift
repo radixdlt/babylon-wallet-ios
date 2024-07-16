@@ -62,7 +62,7 @@ struct KeyedMnemonicView: SwiftUI.View {
 			if let entitiesControlledByFactorSource = keyedMnemonicWithMetadata.entitiesControlledByFactorSource {
 				VStack(alignment: .leading, spacing: .small3) {
 					ForEach(entitiesControlledByFactorSource.accounts) { account in
-						SmallAccountCard(account: account)
+						AccountCard(account: account)
 							.cornerRadius(.small1)
 					}
 				}
