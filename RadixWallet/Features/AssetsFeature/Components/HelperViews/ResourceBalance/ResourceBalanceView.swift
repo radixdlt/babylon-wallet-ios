@@ -457,7 +457,7 @@ extension ResourceBalanceView {
 					compact: compact
 				)
 
-				if useSpacer {
+				if useSpacer, isSelected == nil {
 					Spacer(minLength: .small2)
 				}
 
@@ -465,9 +465,7 @@ extension ResourceBalanceView {
 					.padding(.leading, isSelected != nil ? .small2 : 0)
 
 				if let isSelected {
-					if !useSpacer {
-						Spacer(minLength: .small2)
-					}
+					Spacer(minLength: .small2)
 					CheckmarkView(appearance: .dark, isChecked: isSelected)
 				}
 			}
