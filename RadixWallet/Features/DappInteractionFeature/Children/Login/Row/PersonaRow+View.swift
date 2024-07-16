@@ -28,43 +28,36 @@ extension PersonaRow {
 		var body: some SwiftUI.View {
 			Button(action: action) {
 				VStack(alignment: .leading, spacing: .zero) {
-					ZStack {
-						HStack(alignment: .center) {
-							Circle()
-								.strokeBorder(Color.app.gray3, lineWidth: 1)
-								.background(Circle().fill(Color.app.gray4))
-								.frame(.small)
-								.padding(.trailing, .small1)
+					HStack(alignment: .center, spacing: .zero) {
+						Image(.persona)
+							.resizable()
+							.frame(.small)
 
-							VStack(alignment: .leading, spacing: 4) {
-								Text(viewState.name)
-									.foregroundColor(.app.gray1)
-									.textStyle(.secondaryHeader)
-							}
+						Text(viewState.name)
+							.foregroundColor(.app.gray1)
+							.textStyle(.secondaryHeader)
+							.padding(.leading, .medium3)
 
-							Spacer()
-						}
+						Spacer()
 
-						HStack {
-							Spacer()
-							RadioButton(
-								appearance: .dark,
-								state: isSelected ? .selected : .unselected
-							)
-						}
+						RadioButton(
+							appearance: .dark,
+							state: isSelected ? .selected : .unselected
+						)
+						.padding(.leading, .small3)
 					}
 					.padding(.medium2)
 
+					Separator()
 					if let lastLogin = viewState.lastLogin {
-						Group {
-							Color.app.gray4
-								.frame(height: 1)
+						VStack(alignment: .leading, spacing: .zero) {
+							Separator()
 
 							Text(lastLogin)
 								.foregroundColor(.app.gray2)
 								.textStyle(.body2Regular)
 								.padding(.horizontal, .medium2)
-								.padding(.vertical, .small1)
+								.padding(.vertical, .small2)
 						}
 					}
 				}

@@ -71,23 +71,17 @@ extension AssetsView.State {
 		public struct SelectedAssets: Hashable, Sendable {
 			public struct NonFungibleTokensPerResource: Hashable, Sendable, Identifiable {
 				public var id: ResourceAddress {
-					resourceAddress
+					resource.resourceAddress
 				}
 
-				public let resourceAddress: ResourceAddress
-				public let resourceImage: URL?
-				public let resourceName: String?
+				public let resource: OnLedgerEntity.OwnedNonFungibleResource
 				public var tokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>
 
 				public init(
-					resourceAddress: ResourceAddress,
-					resourceImage: URL?,
-					resourceName: String?,
+					resource: OnLedgerEntity.OwnedNonFungibleResource,
 					tokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>
 				) {
-					self.resourceAddress = resourceAddress
-					self.resourceImage = resourceImage
-					self.resourceName = resourceName
+					self.resource = resource
 					self.tokens = tokens
 				}
 			}
@@ -186,12 +180,7 @@ private struct NonFungibleTokensPerResourceProvider {
 				return nil
 			}
 
-			return .init(
-				resourceAddress: resource.resourceAddress,
-				resourceImage: resource.metadata.iconURL,
-				resourceName: resource.metadata.title,
-				tokens: .init(uncheckedUniqueElements: selectedAssets)
-			)
+			return .init(resource: resource, tokens: .init(uncheckedUniqueElements: selectedAssets))
 		}
 	}
 }

@@ -1,20 +1,17 @@
 // MARK: - ResetWalletClient
 public struct ResetWalletClient: Sendable {
 	public var resetWallet: ResetWallet
-	public var walletDidReset: WalletDidReset
 
 	init(
-		resetWallet: @escaping ResetWallet,
-		walletDidReset: @escaping WalletDidReset
+		resetWallet: @escaping ResetWallet
 	) {
 		self.resetWallet = resetWallet
-		self.walletDidReset = walletDidReset
 	}
 }
 
+// MARK: ResetWalletClient.ResetWallet
 extension ResetWalletClient {
 	public typealias ResetWallet = @Sendable () async -> Void
-	public typealias WalletDidReset = @Sendable () -> AnyAsyncSequence<Void>
 }
 
 extension DependencyValues {
