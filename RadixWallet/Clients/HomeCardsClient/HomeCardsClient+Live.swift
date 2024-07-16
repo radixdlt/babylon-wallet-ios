@@ -27,6 +27,8 @@ extension HomeCardsClient: DependencyKey {
 				try? await manager.walletCreated()
 			case let .deferredDeepLinkReceived(value):
 				try? await manager.deferredDeepLinkReceived(encodedValue: value)
+			case .walletDidReset:
+				try? await manager.walletReset()
 			}
 		}
 

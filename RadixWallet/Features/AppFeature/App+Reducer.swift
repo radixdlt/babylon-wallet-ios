@@ -57,7 +57,6 @@ public struct App: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.deepLinkHandlerClient) var deepLinkHandlerClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
-	@Dependency(\.resetWalletClient) var resetWalletClient
 	@Dependency(\.homeCardsClient) var homeCardsClient
 	@Dependency(\.appEventsClient) var appEventsClient
 
@@ -94,7 +93,7 @@ public struct App: Sendable, FeatureReducer {
 			return .none
 		case .task:
 			appEventsClient.handleEvent(.appStarted)
-			return didResetWalletEffect()
+			return walletDidResetEffect()
 		}
 	}
 
@@ -143,10 +142,10 @@ public struct App: Sendable, FeatureReducer {
 		return .none
 	}
 
-	private func didResetWalletEffect() -> Effect<Action> {
+	private func walletDidResetEffect() -> Effect<Action> {
 		.run { send in
 			do {
-				for try await _ in resetWalletClient.walletDidReset() {
+				for try await _ in appEventsClient.walletDidReset() {
 					guard !Task.isCancelled else { return }
 					await send(.internal(.didResetWallet))
 				}
@@ -183,5 +182,13 @@ extension App {
 		public static func == (lhs: Self, rhs: Self) -> Bool {
 			lhs.underlyingError.localizedDescription == rhs.underlyingError.localizedDescription
 		}
+	}
+}
+
+private extension AppEventsClient {
+	func walletDidReset() -> AnyAsyncSequence<AppEvent> {
+		events()
+			.filter { $0 == .walletDidReset }
+			.eraseToAnyAsyncSequence()
 	}
 }
