@@ -44,7 +44,7 @@ extension AccountPermission {
 			) { viewStore in
 				GeometryReader { geometry in
 					ScrollView {
-						VStack(spacing: .medium2) {
+						VStack(spacing: .large1) {
 							DappHeader(
 								thumbnail: viewStore.thumbnail,
 								title: viewStore.title,
@@ -59,13 +59,12 @@ extension AccountPermission {
 							}
 							.padding(.horizontal, .medium2)
 
-							Spacer()
-
 							Text(L10n.DAppRequest.AccountPermission.updateInSettingsExplanation)
 								.foregroundColor(.app.gray2)
 								.textStyle(.body1Regular)
 								.multilineTextAlignment(.center)
 								.padding(.horizontal, .medium2)
+								.padding(.top, .large1)
 
 							Spacer()
 						}
