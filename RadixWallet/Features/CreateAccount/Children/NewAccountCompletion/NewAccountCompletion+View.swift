@@ -115,6 +115,7 @@ private extension NewAccountCompletion.View {
 			.background(viewStore.appearanceID.gradient)
 			.cornerRadius(.small1)
 			.padding(.horizontal, .medium1)
+			.zIndex(Double(transparentCardsCount + 1))
 		}
 	}
 
