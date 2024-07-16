@@ -88,7 +88,7 @@ extension TransactionReview {
 				networkID: networkID
 			)
 
-			let proofs: TransactionReviewProofs.State? = try await exctractProofs(summary.presentedProofs.map(\.resourceAddress))
+			let proofs: TransactionReviewProofs.State? = try await exctractProofs(summary.presentedProofs)
 
 			return Sections(
 				withdrawals: withdrawals,
