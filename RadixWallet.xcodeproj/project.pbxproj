@@ -762,7 +762,6 @@
 		48CFC5EC2ADC10DA00E77A5C /* Loadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1442ADC10D900E77A5C /* Loadable.swift */; };
 		48CFC5ED2ADC10DA00E77A5C /* SlideUpPanel+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1462ADC10D900E77A5C /* SlideUpPanel+Reducer.swift */; };
 		48CFC5EE2ADC10DA00E77A5C /* SlideUpPanel+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1472ADC10D900E77A5C /* SlideUpPanel+View.swift */; };
-		48CFC5EF2ADC10DA00E77A5C /* SmallAccountCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1482ADC10D900E77A5C /* SmallAccountCard.swift */; };
 		48CFC5F02ADC10DA00E77A5C /* UserDefaultsClient+AccountRecovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1492ADC10D900E77A5C /* UserDefaultsClient+AccountRecovery.swift */; };
 		48CFC5F22ADC10DA00E77A5C /* AssetResource.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC14D2ADC10D900E77A5C /* AssetResource.generated.swift */; };
 		48CFC5F32ADC10DA00E77A5C /* Fonts.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC14E2ADC10D900E77A5C /* Fonts.generated.swift */; };
@@ -1944,7 +1943,6 @@
 		48CFC1442ADC10D900E77A5C /* Loadable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Loadable.swift; sourceTree = "<group>"; };
 		48CFC1462ADC10D900E77A5C /* SlideUpPanel+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SlideUpPanel+Reducer.swift"; sourceTree = "<group>"; };
 		48CFC1472ADC10D900E77A5C /* SlideUpPanel+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SlideUpPanel+View.swift"; sourceTree = "<group>"; };
-		48CFC1482ADC10D900E77A5C /* SmallAccountCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SmallAccountCard.swift; sourceTree = "<group>"; };
 		48CFC1492ADC10D900E77A5C /* UserDefaultsClient+AccountRecovery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UserDefaultsClient+AccountRecovery.swift"; sourceTree = "<group>"; };
 		48CFC14D2ADC10D900E77A5C /* AssetResource.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetResource.generated.swift; sourceTree = "<group>"; };
 		48CFC14E2ADC10D900E77A5C /* Fonts.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Fonts.generated.swift; sourceTree = "<group>"; };
@@ -5176,7 +5174,6 @@
 				48CFC1412ADC10D900E77A5C /* AddressView */,
 				48CFC1442ADC10D900E77A5C /* Loadable.swift */,
 				48CFC1452ADC10D900E77A5C /* SlideUpPanel */,
-				48CFC1482ADC10D900E77A5C /* SmallAccountCard.swift */,
 				48CFC1492ADC10D900E77A5C /* UserDefaultsClient+AccountRecovery.swift */,
 				A47809072BDBDB4C006B68C0 /* RadixDateFormatter.swift */,
 			);
@@ -7875,7 +7872,6 @@
 				A462B5BD2B90C62600C26D20 /* ResourceBalanceView+Helpers.swift in Sources */,
 				48CFC5B92ADC10DA00E77A5C /* BackButton.swift in Sources */,
 				48CFC2402ADC10D900E77A5C /* AccountPreferences+Reducer.swift in Sources */,
-				48CFC5EF2ADC10DA00E77A5C /* SmallAccountCard.swift in Sources */,
 				48CFC48C2ADC10DA00E77A5C /* DiskPersistenceClient+Test.swift in Sources */,
 				48CFC5A72ADC10DA00E77A5C /* InfoButtonStyle.swift in Sources */,
 				83EE5ED02BE3C16F00B1531D /* AccountResourcePreferencesCollection.swift in Sources */,
