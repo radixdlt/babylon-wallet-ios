@@ -76,10 +76,11 @@ extension View {
 			Text(title)
 				.foregroundColor(.app.gray1)
 				.textStyle(.sheetTitle)
-
-			Spacer(minLength: 0)
+				.padding(.bottom, .medium3)
 
 			self
+
+			Spacer(minLength: 0)
 		}
 	}
 }
