@@ -356,54 +356,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		switch childAction {
 		case let .withdrawals(.delegate(.showAsset(transfer, token))),
 		     let .deposits(.delegate(.showAsset(transfer, token))):
-			switch transfer.details {
-			case let .fungible(details):
-				state.destination = .fungibleTokenDetails(
-					.init(
-						resourceAddress: transfer.resource.resourceAddress,
-						resource: .success(transfer.resource),
-						ownedFungibleResource: .init(
-							resourceAddress: transfer.resource.resourceAddress,
-							atLedgerState: transfer.resource.atLedgerState,
-							amount: details.amount,
-							metadata: transfer.resource.metadata
-						),
-						isXRD: details.isXRD
-					)
-				)
-
-			case let .nonFungible(details):
-				state.destination = .nonFungibleTokenDetails(.init(
-					resourceAddress: transfer.resource.resourceAddress,
-					resourceDetails: .success(transfer.resource),
-					token: details,
-					ledgerState: transfer.resource.atLedgerState
-				))
-
-			case let .liquidStakeUnit(details):
-				state.destination = .lsuDetails(.init(
-					validator: details.validator,
-					stakeUnitResource: .init(resource: details.resource, amount: .init(nominalAmount: details.amount)),
-					xrdRedemptionValue: details.worth
-				))
-
-				return .none
-
-			case let .poolUnit(details):
-				state.destination = .poolUnitDetails(.init(resourcesDetails: details.details))
-
-			case let .stakeClaimNFT(details):
-				state.destination = .nonFungibleTokenDetails(.init(
-					resourceAddress: transfer.resource.resourceAddress,
-					resourceDetails: .success(transfer.resource),
-					token: token,
-					ledgerState: transfer.resource.atLedgerState,
-					stakeClaim: details.stakeClaimTokens.stakeClaims.first,
-					isClaimStakeEnabled: false
-				))
-			}
-
-			return .none
+			return resourceDetailsEffect(state: &state, resource: transfer.resource, details: transfer.details, nft: token)
 
 		case let .dAppsUsed(.delegate(.openDapp(dAppID))), let .contributingToPools(.delegate(.openDapp(dAppID))), let .redeemingFromPools(.delegate(.openDapp(dAppID))):
 			state.destination = .dApp(.init(dAppDefinitionAddress: dAppID))
@@ -433,32 +386,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .proofs(.delegate(.showAsset(proof))):
 			let resource = proof.resourceBalance.resource
-
-			switch proof.resourceBalance.details {
-			case let .fungible(fungible):
-				state.destination = .fungibleTokenDetails(.init(
-					resourceAddress: resource.resourceAddress,
-					resource: .success(resource),
-					ownedFungibleResource: .init(
-						resourceAddress: resource.resourceAddress,
-						atLedgerState: resource.atLedgerState,
-						amount: fungible.amount,
-						metadata: resource.metadata
-					),
-					isXRD: resource.resourceAddress.isXRD
-				))
-			case let .nonFungible(nonFungible):
-				state.destination = .nonFungibleTokenDetails(.init(
-					resourceAddress: resource.resourceAddress,
-					resourceDetails: .success(resource),
-					token: nonFungible,
-					ledgerState: resource.atLedgerState
-				))
-			default:
-				break
-			}
-
-			return .none
+			return resourceDetailsEffect(state: &state, resource: resource, details: proof.resourceBalance.details)
 
 		case .networkFee(.delegate(.showCustomizeFees)):
 			guard let reviewedTransaction = state.reviewedTransaction else {
@@ -759,6 +687,58 @@ extension TransactionReview {
 				await send(.internal(.determineFeePayerResult(result)))
 			}
 		}
+	}
+
+	func resourceDetailsEffect(
+		state: inout State,
+		resource: OnLedgerEntity.Resource,
+		details: ResourceBalance.Details,
+		nft: OnLedgerEntity.NonFungibleToken? = nil
+	) -> Effect<Action> {
+		switch details {
+		case let .fungible(details):
+			state.destination = .fungibleTokenDetails(.init(
+				resourceAddress: resource.resourceAddress,
+				resource: .success(resource),
+				ownedFungibleResource: .init(
+					resourceAddress: resource.resourceAddress,
+					atLedgerState: resource.atLedgerState,
+					amount: details.amount,
+					metadata: resource.metadata
+				),
+				isXRD: details.isXRD
+			))
+
+		case let .nonFungible(details):
+			state.destination = .nonFungibleTokenDetails(.init(
+				resourceAddress: resource.resourceAddress,
+				resourceDetails: .success(resource),
+				token: details,
+				ledgerState: resource.atLedgerState
+			))
+
+		case let .liquidStakeUnit(details):
+			state.destination = .lsuDetails(.init(
+				validator: details.validator,
+				stakeUnitResource: .init(resource: details.resource, amount: .init(nominalAmount: details.amount)),
+				xrdRedemptionValue: details.worth
+			))
+
+		case let .poolUnit(details):
+			state.destination = .poolUnitDetails(.init(resourcesDetails: details.details))
+
+		case let .stakeClaimNFT(details):
+			state.destination = .nonFungibleTokenDetails(.init(
+				resourceAddress: resource.resourceAddress,
+				resourceDetails: .success(resource),
+				token: nft,
+				ledgerState: resource.atLedgerState,
+				stakeClaim: details.stakeClaimTokens.stakeClaims.first,
+				isClaimStakeEnabled: false
+			))
+		}
+
+		return .none
 	}
 }
 

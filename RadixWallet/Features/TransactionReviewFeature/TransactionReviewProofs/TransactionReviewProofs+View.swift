@@ -29,18 +29,15 @@ extension TransactionReviewProofs {
 					.padding(.bottom, .medium2)
 
 					ForEach(viewStore.proofs) { proof in
-						VStack(spacing: 0) {
+						VStack(spacing: .medium3) {
 							ResourceBalanceView(proof.resourceBalance.viewState, appearance: .compact) {
 								viewStore.send(.proofTapped(proof))
 							}
-							.padding(.bottom, .medium3)
-
-							if proof.id == viewStore.proofs.last?.id {
-								Separator()
-									.padding(.bottom, .medium3)
-							}
 						}
+						.padding(.bottom, .medium3)
 					}
+					Separator()
+						.padding(.bottom, .medium3)
 				}
 			}
 		}
