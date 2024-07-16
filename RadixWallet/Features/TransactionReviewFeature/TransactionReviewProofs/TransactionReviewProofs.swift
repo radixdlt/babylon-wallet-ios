@@ -27,9 +27,7 @@ public struct TransactionReviewProofs: Sendable, FeatureReducer {
 		case .infoTapped:
 			.none
 		case let .proofTapped(proof):
-			.run { send in
-				await send(.delegate(.showAsset(proof)))
-			}
+			.send(.delegate(.showAsset(proof)))
 		}
 	}
 }
