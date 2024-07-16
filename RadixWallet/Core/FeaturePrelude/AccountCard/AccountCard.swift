@@ -36,7 +36,7 @@ struct AccountCard<Trailing: View, Bottom: View>: View {
 @MainActor
 extension AccountCard {
 	private var top: some View {
-		HStack(alignment: .top, spacing: .zero) {
+		HStack(alignment: kind.verticalAlignment, spacing: .zero) {
 			switch kind.axis {
 			case .horizontal:
 				horizontalCore
@@ -93,36 +93,61 @@ extension AccountCard {
 // MARK: AccountCard.Kind
 extension AccountCard {
 	public enum Kind {
-		/// Stacks the name and address horizontally, in a rounded rectangle shape with corner radius 12.
+		/// Stacks the name and address horizontally
+		/// When `addCornerRadius`, its shaped is clipped with a corner radius of 12.
 		/// Used for example in Account Settings view.
-		case display
+		case display(addCornerRadius: Bool)
 
 		/// Similar to `regular`, but with a smaller vertical padding.
 		/// Used for example in Customize Fees view.
-		case compact
-
-		/// Similar to `compact`, but without any corner radius on its shape.
-		case innerCompact
+		case compact(addCornerRadius: Bool)
 
 		/// Stacks the name and address vertically, while expecting more content in the trailing and bottom sections.
+		/// Its shape is clipped with a corner radius of 12.
 		/// Used for Home rows.
 		case home(tag: String?)
+	}
+}
+
+extension AccountCard.Kind {
+	/// A standard `.display` with corner radius added.
+	static var display: Self {
+		.display(addCornerRadius: true)
+	}
+
+	/// A standard `.compact` with corner radius added.
+	static var compact: Self {
+		.compact(addCornerRadius: true)
+	}
+
+	/// A `.compact` without corner radius, since it is part of an `InnerCard`.
+	static var innerCompact: Self {
+		.compact(addCornerRadius: false)
 	}
 }
 
 private extension AccountCard.Kind {
 	var axis: Axis {
 		switch self {
-		case .display, .compact, .innerCompact:
+		case .display, .compact:
 			.horizontal
 		case .home:
 			.vertical
 		}
 	}
 
+	var verticalAlignment: VerticalAlignment {
+		switch self {
+		case .compact, .display:
+			.center
+		case .home:
+			.top
+		}
+	}
+
 	var horizontalPadding: CGFloat {
 		switch self {
-		case .display, .compact, .innerCompact:
+		case .display, .compact:
 			.medium3
 		case .home:
 			.medium1
@@ -133,17 +158,17 @@ private extension AccountCard.Kind {
 		switch self {
 		case .home, .display:
 			.medium2
-		case .compact, .innerCompact:
+		case .compact:
 			.small1
 		}
 	}
 
 	var cornerRadius: CGFloat {
 		switch self {
-		case .display, .compact, .home:
+		case let .display(addCornerRadius), let .compact(addCornerRadius):
+			addCornerRadius ? .small1 : .zero
+		case .home:
 			.small1
-		case .innerCompact:
-			.zero
 		}
 	}
 

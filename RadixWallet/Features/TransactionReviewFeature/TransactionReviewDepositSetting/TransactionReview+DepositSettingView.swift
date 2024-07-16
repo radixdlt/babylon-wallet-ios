@@ -36,7 +36,7 @@ extension TransactionReview.View {
 
 			var body: some SwiftUI.View {
 				InnerCard {
-					SmallAccountCard(account: change.account)
+					AccountCard(kind: .innerCompact, account: change.account)
 
 					HStack(spacing: .medium3) {
 						Image(asset: change.ruleChange.image)

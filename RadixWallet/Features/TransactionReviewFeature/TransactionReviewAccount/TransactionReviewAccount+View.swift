@@ -154,20 +154,3 @@ extension ResourceBalance.Fungible {
 		)
 	}
 }
-
-extension AccountCard where Trailing == EmptyView, Bottom == EmptyView {
-	init(account: TransactionReview.ReviewAccount) {
-		switch account {
-		case let .user(account):
-			self.init(kind: .innerCompact, account: account)
-
-		case let .external(accountAddress, _):
-			let account = AccountCardDataSource(
-				title: L10n.TransactionReview.externalAccountName,
-				ledgerIdentifiable: .address(.account(accountAddress)),
-				gradient: .init(colors: [.app.gray2])
-			)
-			self.init(kind: .innerCompact, account: account)
-		}
-	}
-}
