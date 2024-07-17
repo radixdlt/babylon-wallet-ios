@@ -28,16 +28,15 @@ extension TransactionReviewProofs {
 					}
 					.padding(.bottom, .medium2)
 
-					ForEach(viewStore.proofs) { proof in
-						VStack(spacing: .medium3) {
+					VStack(spacing: .medium3) {
+						ForEach(viewStore.proofs) { proof in
 							ResourceBalanceView(proof.resourceBalance.viewState, appearance: .compact) {
 								viewStore.send(.proofTapped(proof))
 							}
 						}
-						.padding(.bottom, .medium3)
+						Separator()
 					}
-					Separator()
-						.padding(.bottom, .medium3)
+					.padding(.bottom, .medium3)
 				}
 			}
 		}
