@@ -119,7 +119,7 @@ public struct ResourceBalanceView: View {
 	public let isSelected: Bool?
 	public let action: (() -> Void)?
 
-	public enum Appearance: Equatable {
+	public enum Appearance: Sendable, Equatable {
 		case standard
 		case compact(border: Bool)
 
@@ -241,8 +241,8 @@ extension ResourceBalanceView {
 			VStack(alignment: .leading, spacing: .medium3) {
 				FungibleView(
 					thumbnail: .lsu(viewState.icon),
-					caption1: viewState.title,
-					caption2: viewState.validatorName,
+					caption1: viewState.title ?? "-",
+					caption2: viewState.validatorName ?? "-",
 					fallback: nil,
 					amount: viewState.amount,
 					compact: compact,
@@ -273,8 +273,8 @@ extension ResourceBalanceView {
 			VStack(alignment: .leading, spacing: .zero) {
 				FungibleView(
 					thumbnail: .poolUnit(viewState.poolIcon),
-					caption1: viewState.poolName,
-					caption2: viewState.dAppName.wrappedValue?.flatMap { $0 },
+					caption1: viewState.poolName ?? "-",
+					caption2: viewState.dAppName.wrappedValue?.flatMap { $0 } ?? "-",
 					fallback: nil,
 					amount: viewState.amount,
 					compact: compact,
@@ -314,8 +314,8 @@ extension ResourceBalanceView {
 			VStack(alignment: .leading, spacing: .zero) {
 				NonFungibleView(
 					thumbnail: .stakeClaimNFT(viewState.resourceMetadata.iconURL),
-					caption1: viewState.resourceMetadata.title ?? "",
-					caption2: viewState.validatorName ?? "",
+					caption1: viewState.resourceMetadata.title,
+					caption2: viewState.validatorName,
 					compact: compact
 				)
 
@@ -457,7 +457,7 @@ extension ResourceBalanceView {
 					compact: compact
 				)
 
-				if useSpacer {
+				if useSpacer, isSelected == nil {
 					Spacer(minLength: .small2)
 				}
 
@@ -465,9 +465,7 @@ extension ResourceBalanceView {
 					.padding(.leading, isSelected != nil ? .small2 : 0)
 
 				if let isSelected {
-					if !useSpacer, caption1 == nil {
-						Spacer(minLength: .small2)
-					}
+					Spacer(minLength: .small2)
 					CheckmarkView(appearance: .dark, isChecked: isSelected)
 				}
 			}
@@ -497,8 +495,8 @@ extension ResourceBalanceView {
 				CaptionedThumbnailView(
 					type: thumbnail.type,
 					url: thumbnail.url,
-					caption1: caption1,
-					caption2: caption2,
+					caption1: caption1 ?? "-",
+					caption2: caption2 ?? "-",
 					compact: compact
 				)
 

@@ -4,6 +4,7 @@ public struct AddressView: View {
 	let identifiable: LedgerIdentifiable
 	let isTappable: Bool
 	let imageColor: Color?
+	let isImageHidden: Bool
 	private let showLocalIdOnly: Bool
 
 	@Dependency(\.gatewaysClient) var gatewaysClient
@@ -17,12 +18,14 @@ public struct AddressView: View {
 		_ identifiable: LedgerIdentifiable,
 		showLocalIdOnly: Bool = false,
 		isTappable: Bool = true,
-		imageColor: Color? = nil
+		imageColor: Color? = nil,
+		isImageHidden: Bool = false
 	) {
 		self.identifiable = identifiable
 		self.showLocalIdOnly = showLocalIdOnly
 		self.isTappable = isTappable
 		self.imageColor = imageColor
+		self.isImageHidden = isImageHidden
 	}
 }
 
@@ -73,11 +76,14 @@ extension AddressView {
 		HStack(spacing: .small3) {
 			Text(formattedText)
 				.lineLimit(1)
-			if let imageColor {
-				image
-					.foregroundStyle(imageColor)
-			} else {
-				image
+
+			if !isImageHidden {
+				if let imageColor {
+					image
+						.foregroundStyle(imageColor)
+				} else {
+					image
+				}
 			}
 		}
 	}
