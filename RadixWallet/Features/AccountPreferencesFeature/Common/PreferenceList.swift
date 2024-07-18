@@ -54,15 +54,14 @@ struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 			ForEach(viewState.rows, id: \.id) { row in
 				PlainListRow(viewState: .init(
 					rowCoreViewState: .init(title: row.title, subtitle: row.subtitle),
-					accessory: accesory(for: row),
 					hints: hints(for: row),
+					accessory: { accesory(for: row) },
 					icon: {
 						if let icon = row.icon {
 							AssetIcon(icon)
 						}
 					}
-				)
-				)
+				))
 				.contentShape(Rectangle())
 				.tappable {
 					onRowSelected(viewState.id, row.id)
@@ -84,7 +83,7 @@ struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 		.textCase(nil)
 	}
 
-	private func accesory(for row: Row) -> AnyView {
+	private func accesory(for row: Row) -> some SwiftUI.View {
 		Group {
 			if case let .selection(selection) = viewState.mode {
 				if row.id == selection {
@@ -97,7 +96,6 @@ struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 				Image(asset: AssetResource.chevronRight)
 			}
 		}
-		.eraseToAnyView()
 	}
 
 	private func hints(for row: Row) -> [Hint.ViewState] {

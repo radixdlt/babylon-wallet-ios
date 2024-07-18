@@ -1,21 +1,21 @@
 // MARK: - PlainListRow
-struct PlainListRow<Icon: View>: View {
+struct PlainListRow<Icon: View, Accessory: View>: View {
 	struct ViewState {
-		let accessory: AnyView?
+		let accessory: Accessory?
 		let rowCoreViewState: PlainListRowCore.ViewState
 		let icon: Icon?
 		let hints: [Hint.ViewState]
 
 		init(
 			rowCoreViewState: PlainListRowCore.ViewState,
-			accessory: AnyView?,
 			hints: [Hint.ViewState] = [],
+			@ViewBuilder accessory: () -> Accessory,
 			@ViewBuilder icon: () -> Icon
 		) {
-			self.accessory = accessory
 			self.rowCoreViewState = rowCoreViewState
-			self.icon = icon()
 			self.hints = hints
+			self.accessory = accessory()
+			self.icon = icon()
 		}
 
 		init(
@@ -23,8 +23,8 @@ struct PlainListRow<Icon: View>: View {
 			accessory: ImageResource? = .chevronRight,
 			hints: [Hint.ViewState] = [],
 			@ViewBuilder icon: () -> Icon
-		) {
-			self.accessory = accessory.map { Image($0) }.eraseToAnyView()
+		) where Accessory == Image {
+			self.accessory = accessory.map { Image($0) }
 			self.rowCoreViewState = rowCoreViewState
 			self.icon = icon()
 			self.hints = hints
@@ -35,8 +35,8 @@ struct PlainListRow<Icon: View>: View {
 			rowCoreViewState: PlainListRowCore.ViewState,
 			accessory: ImageResource? = .chevronRight,
 			hints: [Hint.ViewState]
-		) where Icon == AssetIcon {
-			self.accessory = accessory.map { Image($0) }.eraseToAnyView()
+		) where Icon == AssetIcon, Accessory == Image {
+			self.accessory = accessory.map { Image($0) }
 			self.rowCoreViewState = rowCoreViewState
 			self.icon = content.map { AssetIcon($0) }
 			self.hints = hints
@@ -56,7 +56,7 @@ struct PlainListRow<Icon: View>: View {
 		subtitle: String? = nil,
 		accessory: ImageResource? = .chevronRight,
 		@ViewBuilder icon: () -> Icon
-	) {
+	) where Accessory == Image {
 		self.viewState = ViewState(rowCoreViewState: .init(title: title, subtitle: subtitle), accessory: accessory, icon: icon)
 	}
 
@@ -65,7 +65,7 @@ struct PlainListRow<Icon: View>: View {
 		title: String?,
 		subtitle: String? = nil,
 		accessory: ImageResource? = .chevronRight
-	) where Icon == AssetIcon {
+	) where Icon == AssetIcon, Accessory == Image {
 		self.viewState = ViewState(content, rowCoreViewState: .init(title: title, subtitle: subtitle), accessory: accessory, hints: [])
 	}
 

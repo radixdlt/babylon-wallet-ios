@@ -114,7 +114,7 @@ extension ResourcesList.View {
 				ForEach(resources) { resource in
 					PlainListRow(viewState: .init(
 						rowCoreViewState: resource.rowCoreViewState,
-						accessory: accesoryView(resource: resource),
+						accessory: { accesoryView(resource: resource) },
 						icon: { iconView(resource: resource) }
 					))
 					.background(Color.app.white)
@@ -124,12 +124,11 @@ extension ResourcesList.View {
 		}
 	}
 
-	private func accesoryView(resource: ResourceViewState) -> AnyView {
+	private func accesoryView(resource: ResourceViewState) -> some SwiftUI.View {
 		Image(.trash)
 			.onTapGesture {
 				store.send(.view(.assetRemove(resource.address)))
 			}
-			.eraseToAnyView()
 	}
 
 	private func iconView(resource: ResourceViewState) -> some SwiftUI.View {
