@@ -1,17 +1,28 @@
 // MARK: - PlainListRow
 struct PlainListRow<Icon: View>: View {
 	struct ViewState {
-		let accessory: ImageResource?
+		let accessory: AnyView?
 		let rowCoreViewState: PlainListRowCore.ViewState
 		let icon: Icon?
 		let hints: [Hint.ViewState]
 
 		init(
 			rowCoreViewState: PlainListRowCore.ViewState,
-			accessory: ImageResource? = .chevronRight,
+			accessory: AnyView?,
 			@ViewBuilder icon: () -> Icon
 		) {
 			self.accessory = accessory
+			self.rowCoreViewState = rowCoreViewState
+			self.icon = icon()
+			self.hints = []
+		}
+
+		init(
+			rowCoreViewState: PlainListRowCore.ViewState,
+			accessory: ImageResource? = .chevronRight,
+			@ViewBuilder icon: () -> Icon
+		) {
+			self.accessory = accessory.map { Image($0) }.eraseToAnyView()
 			self.rowCoreViewState = rowCoreViewState
 			self.icon = icon()
 			self.hints = []
@@ -23,7 +34,7 @@ struct PlainListRow<Icon: View>: View {
 			accessory: ImageResource? = .chevronRight,
 			hints: [Hint.ViewState]
 		) where Icon == AssetIcon {
-			self.accessory = accessory
+			self.accessory = accessory.map { Image($0) }.eraseToAnyView()
 			self.rowCoreViewState = rowCoreViewState
 			self.icon = content.map { AssetIcon($0) }
 			self.hints = hints
@@ -106,7 +117,7 @@ struct PlainListRow<Icon: View>: View {
 	@ViewBuilder
 	private var accessoryView: some View {
 		if let accessory = viewState.accessory {
-			Image(accessory)
+			accessory
 		}
 	}
 }

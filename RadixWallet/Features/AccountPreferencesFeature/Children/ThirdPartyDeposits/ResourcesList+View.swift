@@ -112,23 +112,33 @@ extension ResourcesList.View {
 		ScrollView {
 			VStack(spacing: .zero) {
 				ForEach(resources) { resource in
-					PlainListRow(viewState: resource.rowViewState)
-						.background(Color.app.white)
-						.withSeparator
+					PlainListRow(viewState: .init(
+						rowCoreViewState: resource.rowCoreViewState,
+						accessory: accesoryView(resource: resource),
+						icon: { iconView(resource: resource) }
+					))
+					.background(Color.app.white)
+					.withSeparator
 				}
 			}
 		}
 	}
+
+	private func accesoryView(resource: ResourceViewState) -> AnyView {
+		Image(.trash)
+			.onTapGesture {
+				store.send(.view(.assetRemove(resource.address)))
+			}
+			.eraseToAnyView()
+	}
+
+	private func iconView(resource: ResourceViewState) -> some SwiftUI.View {
+		Thumbnail(resource.thumbnailType, url: resource.iconURL).eraseToAnyView()
+	}
 }
 
 private extension ResourceViewState {
-	var rowViewState: PlainListRow<Thumbnail>.ViewState {
-		.init(rowCoreViewState: rowCoreViewState, accessory: .trash) {
-			Thumbnail(thumbnailType, url: iconURL)
-		}
-	}
-
-	private var thumbnailType: Thumbnail.ContentType {
+	var thumbnailType: Thumbnail.ContentType {
 		if address.resourceAddress.isNonFungible {
 			.nft
 		} else if address.resourceAddress.isXRD {
@@ -138,7 +148,7 @@ private extension ResourceViewState {
 		}
 	}
 
-	private var rowCoreViewState: PlainListRowCore.ViewState {
+	var rowCoreViewState: PlainListRowCore.ViewState {
 		.init(
 			title: name ?? "-",
 			subtitle: address.resourceAddress.formatted()
