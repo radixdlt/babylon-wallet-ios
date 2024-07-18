@@ -71,9 +71,11 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 			return .none
 
 		case .startup(.delegate(.profileCreatedFromImportedBDFS)):
+			appEventsClient.handleEvent(.walletRestored)
 			return .send(.delegate(.completed))
 
 		case .startup(.delegate(.completed)):
+			appEventsClient.handleEvent(.walletRestored)
 			return .send(.delegate(.completed))
 
 		default:

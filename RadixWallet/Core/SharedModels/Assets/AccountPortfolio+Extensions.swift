@@ -1,6 +1,6 @@
 
 extension OnLedgerEntity.NonFungibleToken {
-	public init(resourceAddress: ResourceAddress, nftID: NonFungibleLocalId, nftData: NFTData?) throws {
+	public init(resourceAddress: ResourceAddress, nftID: NonFungibleLocalId, nftData: NFTData?) {
 		self.init(
 			id: NonFungibleGlobalID(
 				resourceAddress: resourceAddress,

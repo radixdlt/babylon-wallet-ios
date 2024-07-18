@@ -37,7 +37,9 @@ public struct AddAsset: FeatureReducer, Sendable {
 			case let .allowDenyAssets(exceptionRule):
 				address = try? .assetException(.init(address: .init(validatingAddress: resourceAddress), exceptionRule: exceptionRule))
 			case .allowDepositors:
-				if let resourceAddress = try? ResourceAddress(validatingAddress: resourceAddress) {
+				if let nonFungibleGlobalId = try? NonFungibleGlobalId(resourceAddress) {
+					address = .allowedDepositor(.nonFungible(value: nonFungibleGlobalId))
+				} else if let resourceAddress = try? ResourceAddress(validatingAddress: resourceAddress) {
 					address = .allowedDepositor(.resource(value: resourceAddress))
 				}
 			}

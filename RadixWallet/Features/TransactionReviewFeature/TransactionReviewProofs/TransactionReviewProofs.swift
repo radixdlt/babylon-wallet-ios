@@ -13,7 +13,11 @@ public struct TransactionReviewProofs: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case infoTapped
-		case proofTapped(id: TransactionReview.ProofEntity.ID)
+		case proofTapped(TransactionReview.ProofEntity)
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case showAsset(TransactionReview.ProofEntity)
 	}
 
 	public init() {}
@@ -22,9 +26,8 @@ public struct TransactionReviewProofs: Sendable, FeatureReducer {
 		switch viewAction {
 		case .infoTapped:
 			.none
-		case let .proofTapped(id):
-			// FIXME: Handle tap
-			.none
+		case let .proofTapped(proof):
+			.send(.delegate(.showAsset(proof)))
 		}
 	}
 }

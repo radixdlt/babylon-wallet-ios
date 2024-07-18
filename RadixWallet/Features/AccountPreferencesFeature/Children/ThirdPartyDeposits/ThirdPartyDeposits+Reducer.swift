@@ -130,7 +130,7 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 		.run { send in
 			do {
 				/// Wait for user to complete the interaction with Transaction Review
-				let result = try await dappInteractionClient.addWalletInteraction(
+				let result = await dappInteractionClient.addWalletInteraction(
 					.transaction(.init(send: .init(transactionManifest: manifest))),
 					.accountDepositSettings
 				)
