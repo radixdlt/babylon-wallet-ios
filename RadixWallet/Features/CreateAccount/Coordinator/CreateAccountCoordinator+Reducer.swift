@@ -99,6 +99,7 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case dismissed
+		case accountCreated
 		case completed
 	}
 
@@ -196,7 +197,7 @@ extension CreateAccountCoordinator {
 				account: account,
 				config: state.config
 			)))
-			return .none
+			return .send(.delegate(.accountCreated))
 		}
 	}
 

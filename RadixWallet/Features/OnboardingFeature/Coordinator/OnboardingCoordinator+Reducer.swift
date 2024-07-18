@@ -25,12 +25,9 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 		case completed
 	}
 
-	public enum InternalAction: Sendable, Equatable {
-		case finishedOnboarding
-	}
-
 	@Dependency(\.onboardingClient) var onboardingClient
 	@Dependency(\.radixConnectClient) var radixConnectClient
+	@Dependency(\.appEventsClient) var appEventsClient
 
 	public init() {}
 
@@ -48,13 +45,6 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 		Reduce(core)
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
-		switch internalAction {
-		case .finishedOnboarding:
-			sendDelegateCompleted(state: state)
-		}
-	}
-
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .startup(.delegate(.setupNewUser)):
@@ -66,26 +56,25 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 			return .none
 
 		case .startup(.delegate(.profileCreatedFromImportedBDFS)):
-			return sendDelegateCompleted(state: state)
+			appEventsClient.handleEvent(.walletCreated)
+			return .send(.delegate(.completed))
 
 		case .startup(.delegate(.completed)):
-			return sendDelegateCompleted(state: state)
+			appEventsClient.handleEvent(.walletRestored)
+			return .send(.delegate(.completed))
 
-		case .createAccountCoordinator(.delegate(.completed)):
-			return .run { send in
+		case .createAccountCoordinator(.delegate(.accountCreated)):
+			appEventsClient.handleEvent(.walletCreated)
+			return .run { _ in
 				_ = await onboardingClient.finishOnboarding()
 				_ = await radixConnectClient.loadP2PLinksAndConnectAll()
-				await send(.internal(.finishedOnboarding))
 			}
+
+		case .createAccountCoordinator(.delegate(.completed)):
+			return .send(.delegate(.completed))
 
 		default:
 			return .none
 		}
-	}
-
-	private func sendDelegateCompleted(
-		state: State
-	) -> Effect<Action> {
-		.send(.delegate(.completed))
 	}
 }

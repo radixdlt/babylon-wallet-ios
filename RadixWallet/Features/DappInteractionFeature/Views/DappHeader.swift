@@ -8,7 +8,7 @@ struct DappHeader: View {
 	let subtitle: String
 
 	var body: some View {
-		VStack(spacing: .medium3) {
+		VStack(spacing: .medium2) {
 			Thumbnail(.dapp, url: thumbnail, size: .medium)
 
 			Text(title)

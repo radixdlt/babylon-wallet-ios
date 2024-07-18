@@ -17,21 +17,59 @@ public struct CloseButtonBar: View {
 
 // MARK: - CloseButton
 public struct CloseButton: View {
+	let kind: Kind
 	let action: () -> Void
 
-	public init(action: @escaping () -> Void) {
+	public init(kind: Kind = .toolbar, action: @escaping () -> Void) {
+		self.kind = kind
 		self.action = action
 	}
-}
 
-extension CloseButton {
 	public var body: some View {
 		Button(action: action) {
 			Image(.close)
-				.foregroundColor(.app.gray1)
-				.tint(.app.gray1)
+				.resizable()
+				.frame(kind.size)
+				.tint(kind.tint)
+				.padding(kind.padding)
 		}
-		.frame(.small)
+		.frame(.small, alignment: kind.alignment)
+	}
+}
+
+// MARK: CloseButton.Kind
+extension CloseButton {
+	public enum Kind {
+		case toolbar
+		case homeCard
+
+		var size: CGFloat {
+			switch self {
+			case .toolbar: .medium1
+			case .homeCard: .medium3
+			}
+		}
+
+		var tint: Color {
+			switch self {
+			case .toolbar: .app.gray1
+			case .homeCard: .app.gray2
+			}
+		}
+
+		var padding: CGFloat {
+			switch self {
+			case .toolbar: .zero
+			case .homeCard: .small2
+			}
+		}
+
+		var alignment: Alignment {
+			switch self {
+			case .toolbar: .center
+			case .homeCard: .topTrailing
+			}
+		}
 	}
 }
 
