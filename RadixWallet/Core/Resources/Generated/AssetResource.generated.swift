@@ -57,7 +57,6 @@ public enum AssetResource {
   public static let carouselBackgroundRadquest = ImageAsset(name: "carousel_background_radquest")
   public static let arrowBack = ImageAsset(name: "arrow-back")
   public static let check = ImageAsset(name: "check")
-  public static let checkmarkBig = ImageAsset(name: "checkmark-big")
   public static let checkmarkDarkSelected = ImageAsset(name: "checkmark-dark-selected")
   public static let checkmarkDarkUnselected = ImageAsset(name: "checkmark-dark-unselected")
   public static let checkmarkLightSelected = ImageAsset(name: "checkmark-light-selected")

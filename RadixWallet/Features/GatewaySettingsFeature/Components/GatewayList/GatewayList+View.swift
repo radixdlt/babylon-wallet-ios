@@ -3,8 +3,6 @@ import SwiftUI
 
 // MARK: - GatewayList.View
 extension GatewayList {
-	public struct ViewState: Equatable {}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<GatewayList>
@@ -14,22 +12,32 @@ extension GatewayList {
 		}
 
 		public var body: some SwiftUI.View {
-			LazyVStack(spacing: .zero) {
-				ForEachStore(
-					store.scope(
-						state: \.gateways,
-						action: { .child(.gateway(id: $0, action: $1)) }
-					),
-					content: {
-						GatewayRow.View(store: $0)
-						Separator()
-							.padding(.horizontal, .medium3)
-					}
-				)
-			}
-			.buttonStyle(.tappableRowStyle)
-			.onAppear {
-				store.send(.view(.appeared))
+			WithViewStore(store, observe: { $0 }) { viewStore in
+				LazyVStack(spacing: .zero) {
+					ForEachStore(
+						store.scope(
+							state: \.gateways,
+							action: { .child(.gateway(id: $0, action: $1)) }
+						),
+						content: { store in
+							VStack(spacing: .zero) {
+								GatewayRow.View(store: store)
+
+								if store.gateway.id != viewStore.gateways.last?.gateway.id {
+									Separator()
+										.padding(.horizontal, .medium3)
+								} else {
+									Separator()
+								}
+							}
+							.background(Color.app.white)
+						}
+					)
+				}
+				.buttonStyle(.tappableRowStyle)
+				.onAppear {
+					store.send(.view(.appeared))
+				}
 			}
 		}
 	}

@@ -3,11 +3,14 @@ import SwiftUI
 
 // MARK: - GatewayRow
 public struct GatewayRow: Sendable, FeatureReducer {
+	@ObservableState
 	public struct State: Sendable, Hashable, Identifiable {
 		public typealias ID = URL
 		public var id: URL { gateway.id }
 
 		let gateway: Gateway
+		var name: String { gateway.displayName }
+		var description: String { gateway.network.displayDescription }
 		var isSelected: Bool
 		let canBeDeleted: Bool
 

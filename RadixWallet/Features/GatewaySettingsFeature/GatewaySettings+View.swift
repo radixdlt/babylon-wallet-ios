@@ -17,13 +17,14 @@ extension GatewaySettings {
 					.padding(.bottom, .medium1)
 					.radixToolbar(title: L10n.Gateways.title)
 			}
+			.background(.app.gray5)
 			.task { @MainActor in await store.send(.view(.task)).finish() }
 			.destinations(with: store)
 		}
 
 		private func coreView() -> some SwiftUI.View {
 			VStack(spacing: .zero) {
-				VStack(alignment: .leading, spacing: .small2) {
+				VStack(alignment: .leading) {
 					subtitle
 
 					//	FIXME: Uncomment and implement
@@ -32,21 +33,17 @@ extension GatewaySettings {
 					//	}
 					//	.buttonStyle(.info)
 					//	.padding(.vertical, .medium2)
-
-					Separator()
 				}
-				.padding([.leading, .trailing, .top], .medium3)
+				.padding(.medium3)
 
 				GatewayList.View(store: store.gatewayList)
-
-				Spacer()
-					.frame(height: .large1)
 
 				Button(L10n.Gateways.addNewGatewayButtonTitle) {
 					store.send(.view(.addGatewayButtonTapped))
 				}
 				.buttonStyle(.secondaryRectangular(shouldExpand: true))
-				.padding(.horizontal, .medium1)
+				.padding(.horizontal, .medium3)
+				.padding(.top, .large1)
 			}
 		}
 

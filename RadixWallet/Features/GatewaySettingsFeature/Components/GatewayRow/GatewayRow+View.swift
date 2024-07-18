@@ -5,7 +5,7 @@ extension Gateway {
 	var displayName: String {
 		if isWellknown {
 			if network.id == .mainnet {
-				"Mainnet Gateway"
+				"Radix Mainnet Gateway"
 			} else if network.id == .stokenet {
 				"Stokenet (testnet) Gateway"
 			} else {
@@ -17,26 +17,8 @@ extension Gateway {
 	}
 }
 
-extension GatewayRow.State {
-	var viewState: GatewayRow.ViewState {
-		.init(
-			name: gateway.displayName,
-			description: gateway.network.displayDescription,
-			isSelected: isSelected,
-			canBeDeleted: canBeDeleted
-		)
-	}
-}
-
 // MARK: - GatewayRow.View
 extension GatewayRow {
-	public struct ViewState: Equatable {
-		let name: String
-		let description: String
-		let isSelected: Bool
-		let canBeDeleted: Bool
-	}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<GatewayRow>
@@ -46,33 +28,33 @@ extension GatewayRow {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			WithPerceptionTracking {
 				Button(
 					action: {
-						viewStore.send(.didSelect)
+						store.send(.view(.didSelect))
 					}, label: {
-						HStack {
-							Image(asset: AssetResource.checkmarkBig)
+						HStack(spacing: .zero) {
+							Image(asset: AssetResource.check)
 								.padding(.medium3)
-								.opacity(viewStore.isSelected ? 1 : 0)
+								.opacity(store.isSelected ? 1 : 0)
 
 							VStack(alignment: .leading) {
-								Text(viewStore.name)
+								Text(store.name)
 									.foregroundColor(.app.gray1)
 									.textStyle(.body1HighImportance)
 									.lineLimit(1)
 									.minimumScaleFactor(0.5)
 
-								Text(viewStore.description)
+								Text(store.description)
 									.foregroundColor(.app.gray2)
 									.textStyle(.body2Regular)
 							}
 
 							Spacer()
 
-							if viewStore.canBeDeleted {
+							if store.canBeDeleted {
 								Button {
-									viewStore.send(.removeButtonTapped)
+									store.send(.view(.removeButtonTapped))
 								} label: {
 									Image(asset: AssetResource.trash)
 										.padding(.medium3)
