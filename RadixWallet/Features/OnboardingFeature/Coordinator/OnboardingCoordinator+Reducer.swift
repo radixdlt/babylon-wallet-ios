@@ -56,10 +56,12 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 			return .none
 
 		case .startup(.delegate(.profileCreatedFromImportedBDFS)):
-			return sendDelegateCompleted(state: state)
+			appEventsClient.handleEvent(.walletCreated)
+			return .send(.delegate(.completed))
 
 		case .startup(.delegate(.completed)):
-			return sendDelegateCompleted(state: state)
+			appEventsClient.handleEvent(.walletRestored)
+			return .send(.delegate(.completed))
 
 		case .createAccountCoordinator(.delegate(.accountCreated)):
 			appEventsClient.handleEvent(.walletCreated)
@@ -69,16 +71,10 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 			}
 
 		case .createAccountCoordinator(.delegate(.completed)):
-			return sendDelegateCompleted(state: state)
+			return .send(.delegate(.completed))
 
 		default:
 			return .none
 		}
-	}
-
-	private func sendDelegateCompleted(
-		state: State
-	) -> Effect<Action> {
-		.send(.delegate(.completed))
 	}
 }
