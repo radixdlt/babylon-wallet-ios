@@ -30,6 +30,7 @@ public struct CloseButton: View {
 			Image(.close)
 				.resizable()
 				.frame(kind.size)
+				.foregroundColor(nil)
 				.tint(kind.tint)
 				.padding(kind.padding)
 		}
