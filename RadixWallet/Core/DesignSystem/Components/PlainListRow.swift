@@ -120,7 +120,7 @@ struct PlainListRowCore: View {
 		let detail: String?
 
 		init(
-			context: Context = .general,
+			context: Context = .settings,
 			title: String?,
 			subtitle: String? = nil,
 			detail: String? = nil
@@ -140,7 +140,7 @@ struct PlainListRowCore: View {
 		self.viewState = viewState
 	}
 
-	init(context: ViewState.Context = .general, title: String?, subtitle: String?) {
+	init(context: ViewState.Context = .settings, title: String?, subtitle: String?) {
 		self.viewState = ViewState(context: context, title: title, subtitle: subtitle)
 	}
 
@@ -178,7 +178,7 @@ struct PlainListRowCore: View {
 private extension PlainListRowCore.ViewState {
 	var titleTextStyle: TextStyle {
 		switch context {
-		case .general, .toggle:
+		case .toggle:
 			.secondaryHeader
 		case .settings:
 			.body1Header
@@ -187,7 +187,7 @@ private extension PlainListRowCore.ViewState {
 
 	var subtitleTextStyle: TextStyle {
 		switch context {
-		case .general, .toggle:
+		case .toggle:
 			.body2Regular
 		case .settings:
 			detail == nil ? .body1Regular : .body2Regular
@@ -196,7 +196,7 @@ private extension PlainListRowCore.ViewState {
 
 	var subtitleForegroundColor: Color {
 		switch context {
-		case .general, .toggle:
+		case .toggle:
 			.app.gray2
 		case .settings:
 			.app.gray1
@@ -205,7 +205,7 @@ private extension PlainListRowCore.ViewState {
 
 	var titleLineLimit: Int? {
 		switch context {
-		case .general, .settings:
+		case .settings:
 			1
 		case .toggle:
 			nil
@@ -214,7 +214,7 @@ private extension PlainListRowCore.ViewState {
 
 	var subtitleLineLimit: Int {
 		switch context {
-		case .general, .toggle:
+		case .toggle:
 			2
 		case .settings:
 			3
@@ -223,7 +223,7 @@ private extension PlainListRowCore.ViewState {
 
 	var verticalPadding: CGFloat {
 		switch context {
-		case .general, .toggle:
+		case .toggle:
 			.zero
 		case .settings:
 			.medium1
@@ -234,7 +234,6 @@ private extension PlainListRowCore.ViewState {
 // MARK: - PlainListRowCore.ViewState.Context
 extension PlainListRowCore.ViewState {
 	enum Context {
-		case general
 		case settings
 		case toggle
 	}

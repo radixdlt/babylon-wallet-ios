@@ -65,7 +65,7 @@ extension SettingsRow.Kind {
 			self.id = title
 			self.rowViewState = .init(
 				icon,
-				rowCoreViewState: .init(context: .settings, title: title, subtitle: subtitle, detail: detail),
+				rowCoreViewState: .init(title: title, subtitle: subtitle, detail: detail),
 				accessory: accessory,
 				hints: hints
 			)
