@@ -66,11 +66,14 @@ extension SecurityCenterClient {
 				}
 
 				func hasProblem5() -> Bool {
-					if isCloudProfileSyncEnabled, let cloudBackup = backups.cloud {
-						cloudBackup.result.failed
-					} else {
-						false
+					guard isCloudProfileSyncEnabled else {
+						return false
 					}
+					guard let cloudBackup = backups.cloud else {
+						return true
+					}
+
+					return !cloudBackup.result.succeeded
 				}
 
 				func hasProblem6() -> Bool {
