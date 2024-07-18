@@ -105,7 +105,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 						VStack(alignment: .leading, spacing: 0) {
 							Text(primaryHeading.text)
 								.textStyle(primaryHeading.isProminent ? .body1HighImportance : .body2Regular)
-								.foregroundColor(primaryHeading.isProminent && isEnabled ? accentColor(border: false) : .app.gray2)
+								.foregroundColor(primaryHeading.isProminent && isEnabled ? accentColor(isFocused: false) : .app.gray2)
 								.multilineTextAlignment(.leading)
 							if let subHeading {
 								Text(subHeading)
@@ -173,7 +173,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 				.cornerRadius(.small2)
 				.overlay(
 					RoundedRectangle(cornerRadius: .small2)
-						.stroke(accentColor(border: !isFocused), lineWidth: 1)
+						.stroke(accentColor(isFocused: isFocused), lineWidth: 1)
 				)
 
 				hint
@@ -184,10 +184,10 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 		}
 	}
 
-	private func accentColor(border: Bool) -> Color {
+	private func accentColor(isFocused: Bool) -> Color {
 		switch hint?.viewState.kind {
 		case .none:
-			border ? .app.gray4 : .app.gray1
+			isFocused ? .app.gray1 : .app.gray4
 		case .info:
 			.app.gray1
 		case .error:
