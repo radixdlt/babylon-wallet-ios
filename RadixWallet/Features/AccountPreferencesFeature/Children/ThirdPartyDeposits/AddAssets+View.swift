@@ -50,26 +50,25 @@ extension AddAsset {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: Action.view) { viewStore in
 				VStack {
-					CloseButton { viewStore.send(.closeTapped) }
-						.flushedLeft
+					VStack(spacing: .medium3) {
+						titleView(viewStore.mode.title)
+						instructionsView(viewStore.mode.instructions)
 
-					ScrollView {
-						VStack(spacing: .medium1) {
-							titleView(viewStore.mode.title)
-							instructionsView(viewStore.mode.instructions)
-
-							resourceAddressView(viewStore)
-							if case .allowDenyAssets = viewStore.mode {
-								depositListSelectionView(viewStore)
-							}
-							addAssetButton(viewStore)
+						resourceAddressView(viewStore)
+						if case .allowDenyAssets = viewStore.mode {
+							depositListSelectionView(viewStore)
 						}
-						.padding([.horizontal, .bottom], .medium1)
+						addAssetButton(viewStore)
+							.frame(maxHeight: .infinity, alignment: .bottom)
 					}
-					.scrollIndicators(.hidden)
+					.padding(.horizontal, .medium3)
+					.padding(.bottom, .medium2)
+				}
+				.withNavigationBar {
+					viewStore.send(.closeTapped)
 				}
 			}
-			.presentationDetents([.fraction(0.75)])
+			.presentationDetents([.fraction(0.55)])
 			.presentationDragIndicator(.visible)
 			.presentationBackground(.blur)
 		}
@@ -126,7 +125,7 @@ extension AddAsset.View {
 
 	@ViewBuilder
 	func depositExceptionSelectionView(_ exception: ResourcesListMode.ExceptionRule, _ viewStore: ViewStoreOf<AddAsset>) -> some SwiftUI.View {
-		HStack {
+		HStack(spacing: .small3) {
 			RadioButton(
 				appearance: .dark,
 				state: viewStore.mode.allowDenyAssets == exception ? .selected : .unselected
