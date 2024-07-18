@@ -99,7 +99,7 @@ extension AccountCard {
 		/// Used for example in Account Settings view.
 		case display(addCornerRadius: Bool)
 
-		/// Similar to `regular`, but with a smaller vertical padding.
+		/// Similar to `.display`, but with a smaller vertical padding.
 		/// Used for example in Customize Fees view.
 		case compact(addCornerRadius: Bool)
 
