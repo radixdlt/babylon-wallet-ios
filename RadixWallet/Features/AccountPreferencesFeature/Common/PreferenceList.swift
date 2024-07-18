@@ -52,42 +52,17 @@ struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 	var body: some View {
 		SwiftUI.Section {
 			ForEach(viewState.rows, id: \.id) { row in
-				HStack {
-					VStack(alignment: .leading) {
-						HStack(spacing: .medium3) {
-							if let icon = row.icon {
-								AssetIcon(icon)
-							}
-							PlainListRowCore(title: row.title, subtitle: row.subtitle)
-						}
-
-						if let hint = row.hint {
-							// Align hint with the PlainListRowCore
-							Text(hint)
-								.textStyle(.body2Regular)
-								.foregroundColor(.app.alert)
-								.lineSpacing(-4)
-								.padding(.leading, HitTargetSize.verySmall.frame.width + .medium3)
-								.padding(.top, .medium3)
+				PlainListRow(viewState: .init(
+					rowCoreViewState: .init(title: row.title, subtitle: row.subtitle),
+					accessory: accesory(for: row),
+					hints: hints(for: row),
+					icon: {
+						if let icon = row.icon {
+							AssetIcon(icon)
 						}
 					}
-					.padding(.vertical, .medium1)
-					.frame(minHeight: .plainListRowMinHeight)
-
-					Spacer(minLength: 0)
-
-					if case let .selection(selection) = viewState.mode {
-						if row.id == selection {
-							Image(asset: AssetResource.check)
-						} else {
-							/// Put a placeholder for unselected items.
-							FixedSpacer(width: .medium1)
-						}
-					} else {
-						Image(asset: AssetResource.chevronRight)
-					}
-				}
-				.padding(.horizontal, .medium3)
+				)
+				)
 				.contentShape(Rectangle())
 				.tappable {
 					onRowSelected(viewState.id, row.id)
@@ -107,6 +82,29 @@ struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 		}
 		.listSectionSeparator(.hidden)
 		.textCase(nil)
+	}
+
+	private func accesory(for row: Row) -> AnyView {
+		Group {
+			if case let .selection(selection) = viewState.mode {
+				if row.id == selection {
+					Image(asset: AssetResource.check)
+				} else {
+					/// Put a placeholder for unselected items.
+					FixedSpacer(width: .medium1)
+				}
+			} else {
+				Image(asset: AssetResource.chevronRight)
+			}
+		}
+		.eraseToAnyView()
+	}
+
+	private func hints(for row: Row) -> [Hint.ViewState] {
+		guard let hint = row.hint else {
+			return []
+		}
+		return [.init(kind: .warning(showIcon: false), text: Text(hint))]
 	}
 }
 

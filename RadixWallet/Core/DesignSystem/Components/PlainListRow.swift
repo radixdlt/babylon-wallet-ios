@@ -9,23 +9,25 @@ struct PlainListRow<Icon: View>: View {
 		init(
 			rowCoreViewState: PlainListRowCore.ViewState,
 			accessory: AnyView?,
+			hints: [Hint.ViewState] = [],
 			@ViewBuilder icon: () -> Icon
 		) {
 			self.accessory = accessory
 			self.rowCoreViewState = rowCoreViewState
 			self.icon = icon()
-			self.hints = []
+			self.hints = hints
 		}
 
 		init(
 			rowCoreViewState: PlainListRowCore.ViewState,
 			accessory: ImageResource? = .chevronRight,
+			hints: [Hint.ViewState] = [],
 			@ViewBuilder icon: () -> Icon
 		) {
 			self.accessory = accessory.map { Image($0) }.eraseToAnyView()
 			self.rowCoreViewState = rowCoreViewState
 			self.icon = icon()
-			self.hints = []
+			self.hints = hints
 		}
 
 		init(

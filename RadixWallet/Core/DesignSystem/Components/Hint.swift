@@ -19,7 +19,11 @@ public struct Hint: View, Equatable {
 	public enum Kind: Equatable {
 		case info
 		case error
-		case warning
+		case warning(showIcon: Bool)
+
+		static var warning: Self {
+			.warning(showIcon: true)
+		}
 	}
 
 	public let viewState: ViewState
@@ -83,9 +87,9 @@ public struct Hint: View, Equatable {
 
 	private var iconResource: ImageResource? {
 		switch viewState.kind {
-		case .info:
+		case .info, .warning(showIcon: false):
 			nil
-		case .error, .warning:
+		case .error, .warning(showIcon: true):
 			.error
 		}
 	}
