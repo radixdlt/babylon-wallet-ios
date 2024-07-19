@@ -174,7 +174,7 @@ extension DappDetails.View {
 						Spacer(minLength: 0)
 
 						AddressView(
-							.address(.account(viewStore.address)),
+							.address(.account(viewStore.address, isLedgerHWAccount: false)),
 							imageColor: .app.gray2
 						)
 						.foregroundColor(.app.gray1)

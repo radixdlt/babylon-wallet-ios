@@ -86,9 +86,9 @@ extension AccountOrAddressOf {
 	var identifer: LedgerIdentifiable {
 		switch self {
 		case let .profileAccount(value: account):
-			.address(.account(account.address))
+			.address(.account(account.address, isLedgerHWAccount: account.isLedgerControlled))
 		case let .addressOfExternalAccount(address):
-			.address(.account(address))
+			.address(.account(address, isLedgerHWAccount: false))
 		}
 	}
 

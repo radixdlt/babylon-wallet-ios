@@ -123,7 +123,7 @@ extension CompletionMigrateOlympiaAccountsToBabylon {
 					Text(name)
 						.textStyle(.body1Header)
 				}
-				AddressView(.address(.account(account.address)))
+				AddressView(.address(.account(account.address, isLedgerHWAccount: nil)))
 					.opacity(0.8)
 			}
 			.foregroundColor(.app.white)

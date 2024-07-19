@@ -221,14 +221,3 @@ private extension AddressDetails.View {
 		return .init(result)
 	}
 }
-
-private extension AddressDetails.State {
-	var showVerifyOnLedger: Bool {
-		switch address {
-		case let .account(_, isLedgerHWAccount):
-			isLedgerHWAccount
-		default:
-			false
-		}
-	}
-}

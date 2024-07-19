@@ -33,7 +33,9 @@ public enum LedgerIdentifiable: Sendable {
 // MARK: LedgerIdentifiable.Address
 extension LedgerIdentifiable {
 	public enum Address: Hashable, Sendable, Identifiable {
-		case account(AccountAddress, isLedgerHWAccount: Bool = false)
+		/// `isLedgerHWAccount` indicates if the account is controlled by a Ledger device.
+		/// if the value is nil, it means we don't know.
+		case account(AccountAddress, isLedgerHWAccount: Bool?)
 		case package(PackageAddress)
 		case resource(ResourceAddress)
 		case resourcePool(PoolAddress)
