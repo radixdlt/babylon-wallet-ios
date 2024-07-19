@@ -2,10 +2,12 @@ import ComposableArchitecture
 import SwiftUI
 
 extension AssetsView {
+	typealias NFTRowsToRefresh = [ResourceAddress]
+
 	func updateFromPortfolio(
 		state: inout State,
 		from portfolio: AccountPortfoliosClient.AccountPortfolio
-	) {
+	) -> NFTRowsToRefresh {
 		let mode = state.mode
 		let xrd = portfolio.account.fungibleResources.xrdResource.map { token in
 			let updatedRow = state.resources.fungibleTokenList?.updatedRow(token: token, for: .xrd)
@@ -34,6 +36,15 @@ extension AssetsView {
 				disabled: mode.selectedAssets?.disabledNFTs ?? [],
 				selectedAssets: mode.nftRowSelectedAssets(resource.resourceAddress)
 			)
+		}
+		let nftRowsToRefresh: [ResourceAddress] = portfolio.account.nonFungibleResources.compactMap { resource in
+			guard let row = state.resources.nonFungibleTokenList?.rows.first(where: {
+				$0.id == resource.resourceAddress &&
+					$0.resource.nonFungibleIdsCount != resource.nonFungibleIdsCount &&
+					$0.isExpanded
+			}) else { return nil }
+
+			return row.id
 		}
 
 		let fungibleTokenList: FungibleAssetList.State? = {
@@ -116,6 +127,8 @@ extension AssetsView {
 			stakeUnitList: stakeUnitList,
 			poolUnitsList: poolUnitList
 		)
+
+		return nftRowsToRefresh
 	}
 }
 

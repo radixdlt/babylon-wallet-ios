@@ -59,6 +59,7 @@ extension NonFungibleAssetList {
 			}
 
 			case tokensLoaded(TaskResult<TokensLoadResult>)
+			case refreshResources
 		}
 
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
@@ -131,6 +132,9 @@ extension NonFungibleAssetList {
 					state.isLoadingResources = false
 				}
 				return .none
+
+			case .refreshResources:
+				return loadResources(&state, pageIndex: 0)
 			}
 		}
 
