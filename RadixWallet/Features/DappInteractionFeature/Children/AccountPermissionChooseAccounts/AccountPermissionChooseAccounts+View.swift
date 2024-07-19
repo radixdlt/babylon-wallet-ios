@@ -131,7 +131,7 @@ extension AccountPermissionChooseAccounts.State {
 		accessKind: .ongoing,
 		dappMetadata: .previewValue,
 		chooseAccounts: .init(
-			selectionRequirement: .exactly(1),
+			context: .assetTransfer,
 			availableAccounts: .init(
 				uniqueElements: [
 					.previewValue0,
