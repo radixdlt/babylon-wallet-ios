@@ -38,13 +38,11 @@ extension AssetsView {
 			)
 		}
 		let nftRowsToRefresh: [ResourceAddress] = portfolio.account.nonFungibleResources.compactMap { resource in
-			guard let row = state.resources.nonFungibleTokenList?.rows.first(where: {
+			state.resources.nonFungibleTokenList?.rows.first {
 				$0.id == resource.resourceAddress &&
 					$0.resource.nonFungibleIdsCount != resource.nonFungibleIdsCount &&
 					$0.isExpanded
-			}) else { return nil }
-
-			return row.id
+			}?.id
 		}
 
 		let fungibleTokenList: FungibleAssetList.State? = {
