@@ -1,5 +1,5 @@
-
 // MARK: - Hint
+
 public struct Hint: View, Equatable {
 	public struct ViewState: Equatable {
 		public let kind: Kind
@@ -19,11 +19,8 @@ public struct Hint: View, Equatable {
 	public enum Kind: Equatable {
 		case info
 		case error
-		case warning(showIcon: Bool)
-
-		static var warning: Self {
-			.warning(showIcon: true)
-		}
+		case warning
+		case detail
 	}
 
 	public let viewState: ViewState
@@ -68,29 +65,40 @@ public struct Hint: View, Equatable {
 				}
 				text
 					.lineSpacing(0)
-					.textStyle(.body2HighImportance)
+					.textStyle(textStyle)
 			}
 			.foregroundColor(foregroundColor)
 		}
 	}
+}
 
-	private var foregroundColor: Color {
+private extension Hint {
+	var foregroundColor: Color {
 		switch viewState.kind {
 		case .info:
 			.app.gray2
 		case .error:
 			.app.red1
-		case .warning:
+		case .warning, .detail:
 			.app.alert
 		}
 	}
 
-	private var iconResource: ImageResource? {
+	var iconResource: ImageResource? {
 		switch viewState.kind {
-		case .info, .warning(showIcon: false):
+		case .info, .detail:
 			nil
-		case .error, .warning(showIcon: true):
+		case .error, .warning:
 			.error
+		}
+	}
+
+	var textStyle: TextStyle {
+		switch viewState.kind {
+		case .info, .error, .warning:
+			.body2HighImportance
+		case .detail:
+			.body1Regular
 		}
 	}
 }

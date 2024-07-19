@@ -70,7 +70,7 @@ struct PlainListRow<Icon: View, Accessory: View>: View {
 	}
 
 	var body: some View {
-		VStack(alignment: .leading) {
+		VStack(alignment: .leading, spacing: .small1) {
 			top
 			hints
 		}
