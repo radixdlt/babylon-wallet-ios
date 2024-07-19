@@ -34,7 +34,9 @@ public enum LedgerIdentifiable: Sendable {
 extension LedgerIdentifiable {
 	public enum Address: Hashable, Sendable, Identifiable {
 		/// `isLedgerHWAccount` indicates if the account is controlled by a Ledger device.
-		/// if the value is nil, it means we don't know.
+		/// - `true`: we know the account is controlled by a Ledger device
+		/// - `false`: either the account isn't controller by a Ledger device or it is an external account and we don't care.
+		/// - `nil`: we don't know if the account is controller by a Ledger device, we should check if needed.
 		case account(AccountAddress, isLedgerHWAccount: Bool?)
 		case package(PackageAddress)
 		case resource(ResourceAddress)
