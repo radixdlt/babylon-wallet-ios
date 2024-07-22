@@ -22,9 +22,10 @@ extension ChooseAccounts {
 			self.canCreateNewAccount = state.canCreateNewAccount
 
 			// If the dApp is asking for exactly(1) account and user has only one account, pre-select it
-			if let account = availableAccounts.first,
+			if case .permission = state.context,
+			   selectionRequirement == .exactly(1),
 			   availableAccounts.count == 1,
-			   selectionRequirement == .exactly(1)
+			   let account = availableAccounts.first
 			{
 				self.selectedAccounts = [account]
 			} else {

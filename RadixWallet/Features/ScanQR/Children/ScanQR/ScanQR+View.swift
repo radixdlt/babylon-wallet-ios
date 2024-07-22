@@ -74,7 +74,7 @@ extension ScanQR.View {
 				ForEach(Array(disclosure.items.enumerated()), id: \.0) { index, message in
 					HStack(alignment: .top, spacing: .small3) {
 						Text("\(index + 1).")
-						Text(markdown: message, emphasizedColor: .app.gray1)
+						Text(markdown: message, emphasizedColor: .app.gray1, emphasizedFont: .app.body2HighImportance)
 					}
 					.multilineTextAlignment(.leading)
 					.font(.app.body2Regular)
