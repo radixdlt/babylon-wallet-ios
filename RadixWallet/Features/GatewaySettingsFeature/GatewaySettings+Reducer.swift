@@ -38,6 +38,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 	}
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case addNewGateway(AddNewGateway.State)
 			case createAccount(CreateAccountCoordinator.State)
@@ -45,6 +46,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 			case removeGateway(AlertState<Action.RemoveGatewayAlert>)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case addNewGateway(AddNewGateway.Action)
 			case createAccount(CreateAccountCoordinator.Action)
@@ -218,10 +220,6 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case .addNewGateway(.delegate(.dismiss)):
-			state.destination = nil
-			return .none
-
 		case .createAccount(.delegate(.dismissed)):
 			return skipSwitching(&state)
 

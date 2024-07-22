@@ -79,44 +79,25 @@ private extension View {
 	}
 
 	private func removeGateway(with destinationStore: PresentationStoreOf<GatewaySettings.Destination>) -> some View {
-		alert(
-			store: destinationStore,
-			state: /GatewaySettings.Destination.State.removeGateway,
-			action: GatewaySettings.Destination.Action.removeGateway
-		)
+		alert(store: destinationStore.scope(state: \.removeGateway, action: \.removeGateway))
 	}
 
 	private func addNewGateway(with destinationStore: PresentationStoreOf<GatewaySettings.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /GatewaySettings.Destination.State.addNewGateway,
-			action: GatewaySettings.Destination.Action.addNewGateway,
-			content: { store in
-				WithNavigationBar {
-					store.send(.view(.closeButtonTapped))
-				} content: {
-					AddNewGateway.View(store: store)
-				}
-			}
-		)
+		sheet(store: destinationStore.scope(state: \.addNewGateway, action: \.addNewGateway)) {
+			AddNewGateway.View(store: $0)
+		}
 	}
 
 	private func createAccount(with destinationStore: PresentationStoreOf<GatewaySettings.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /GatewaySettings.Destination.State.createAccount,
-			action: GatewaySettings.Destination.Action.createAccount,
-			content: { CreateAccountCoordinator.View(store: $0) }
-		)
+		sheet(store: destinationStore.scope(state: \.createAccount, action: \.createAccount)) {
+			CreateAccountCoordinator.View(store: $0)
+		}
 	}
 
 	private func slideUpPanel(with destinationStore: PresentationStoreOf<GatewaySettings.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /GatewaySettings.Destination.State.slideUpPanel,
-			action: GatewaySettings.Destination.Action.slideUpPanel,
-			content: { SlideUpPanel.View(store: $0) }
-		)
+		sheet(store: destinationStore.scope(state: \.slideUpPanel, action: \.slideUpPanel)) {
+			SlideUpPanel.View(store: $0)
+		}
 	}
 }
 

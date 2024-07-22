@@ -26,12 +26,23 @@ extension AddNewGateway {
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<AddNewGateway>
 		@FocusState private var focusedField: State.Field?
+		@Environment(\.dismiss) var dismiss
 
 		public init(store: StoreOf<AddNewGateway>) {
 			self.store = store
 		}
 
 		public var body: some SwiftUI.View {
+			content
+				.withNavigationBar {
+					dismiss()
+				}
+				.presentationDetents([.fraction(0.55)])
+				.presentationDragIndicator(.visible)
+				.presentationBackground(.blur)
+		}
+
+		private var content: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView {
 					VStack(spacing: .medium2) {
@@ -63,11 +74,14 @@ extension AddNewGateway {
 								to: $focusedField
 							)
 						)
+						.padding(.top, .small3)
 						.textInputAutocapitalization(.never)
 						.keyboardType(.URL)
 						.autocorrectionDisabled()
 					}
-					.padding([.bottom, .horizontal], .medium1)
+					.padding(.top, .medium3)
+					.padding(.bottom, .medium1)
+					.padding(.horizontal, .large2)
 				}
 				.footer {
 					Button(L10n.Gateways.AddNewGateway.addGatewayButtonTitle) {
