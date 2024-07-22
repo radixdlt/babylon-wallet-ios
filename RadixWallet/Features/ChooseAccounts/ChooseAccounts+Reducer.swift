@@ -1,10 +1,10 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - _ChooseAccounts
+// MARK: - ChooseAccounts
 public struct ChooseAccounts: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public let selectionRequirement: SelectionRequirement
+		public let context: Context
 		public let filteredAccounts: [AccountAddress]
 		public var availableAccounts: IdentifiedArrayOf<Account>
 		public var selectedAccounts: [ChooseAccountsRow.State]?
@@ -13,14 +13,23 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 		@PresentationState
 		var destination: Destination.State? = nil
 
+		var selectionRequirement: SelectionRequirement {
+			switch context {
+			case .assetTransfer:
+				.exactly(1)
+			case let .permission(selectionRequirement):
+				selectionRequirement
+			}
+		}
+
 		public init(
-			selectionRequirement: SelectionRequirement,
+			context: Context,
 			filteredAccounts: [AccountAddress] = [],
 			availableAccounts: IdentifiedArrayOf<Account> = [],
 			selectedAccounts: [ChooseAccountsRow.State]? = nil,
 			canCreateNewAccount: Bool = true
 		) {
-			self.selectionRequirement = selectionRequirement
+			self.context = context
 			self.filteredAccounts = filteredAccounts
 			self.availableAccounts = availableAccounts
 			self.selectedAccounts = selectedAccounts
@@ -117,5 +126,13 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 			}
 			await send(.internal(.loadAccountsResult(result)))
 		}
+	}
+}
+
+// MARK: - ChooseAccounts.State.Context
+extension ChooseAccounts.State {
+	public enum Context: Sendable, Hashable {
+		case assetTransfer
+		case permission(SelectionRequirement)
 	}
 }

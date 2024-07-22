@@ -105,7 +105,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 						VStack(alignment: .leading, spacing: 0) {
 							Text(primaryHeading.text)
 								.textStyle(primaryHeading.isProminent ? .body1HighImportance : .body2Regular)
-								.foregroundColor(primaryHeading.isProminent && isEnabled ? accentColor(isFocused: false) : .app.gray2)
+								.foregroundColor(primaryHeading.isProminent && isEnabled ? accentColor(isFocused: true) : .app.gray2)
 								.multilineTextAlignment(.leading)
 							if let subHeading {
 								Text(subHeading)

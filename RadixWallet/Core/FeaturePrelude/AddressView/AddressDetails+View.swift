@@ -65,7 +65,6 @@ public extension AddressDetails {
 						.foregroundColor(.app.gray1)
 
 					qrCode
-						.padding(.horizontal, .large2)
 				}
 			}
 		}
@@ -75,9 +74,10 @@ public extension AddressDetails {
 				switch store.qrImage {
 				case let .success(value):
 					GeometryReader { proxy in
+						let size = min(proxy.size.height, proxy.size.width, 275)
 						Image(decorative: value, scale: 1)
 							.resizable()
-							.frame(width: proxy.size.height, height: proxy.size.height)
+							.frame(width: size, height: size)
 							.position(x: proxy.frame(in: .local).midX, y: proxy.frame(in: .local).midY)
 					}
 					.transition(.scale(scale: 0.95).combined(with: .opacity))
@@ -219,16 +219,5 @@ private extension AddressDetails.View {
 		}
 
 		return .init(result)
-	}
-}
-
-private extension AddressDetails.State {
-	var showVerifyOnLedger: Bool {
-		switch address {
-		case let .account(_, isLedgerHWAccount):
-			isLedgerHWAccount
-		default:
-			false
-		}
 	}
 }
