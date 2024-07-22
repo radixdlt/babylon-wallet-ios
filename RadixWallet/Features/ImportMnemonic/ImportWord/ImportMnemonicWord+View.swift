@@ -98,7 +98,7 @@ extension ImportMnemonicWord {
 							}
 						}
 					)
-					.disabled(viewStore.isReadonlyMode)
+					.allowsHitTesting(!viewStore.isReadonlyMode)
 					.minimumScaleFactor(0.9)
 					.keyboardType(.alphabet)
 					.textInputAutocapitalization(.never)

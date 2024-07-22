@@ -89,7 +89,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		public struct WriteMode: Sendable, Hashable {
 			public var isProgressing: Bool
 			public let persistStrategy: PersistStrategy?
-			public let hideAdvancedMode: Bool
 			public let showCloseButton: Bool
 		}
 
@@ -169,10 +168,9 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		public init(
 			header: Header? = nil,
 			warning: String? = nil,
-			hideAdvancedMode: Bool = false,
 			showCloseButton: Bool = false,
 			warningOnContinue: OnContinueWarning? = nil,
-			isWordCountFixed: Bool = false,
+			isWordCountFixed: Bool,
 			persistStrategy: PersistStrategy?,
 			language: BIP39Language = .english,
 			wordCount: BIP39WordCount = .twelve,
@@ -184,7 +182,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				.init(
 					isProgressing: false,
 					persistStrategy: persistStrategy,
-					hideAdvancedMode: hideAdvancedMode,
 					showCloseButton: showCloseButton
 				)
 			)

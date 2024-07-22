@@ -6,7 +6,7 @@ extension ImportMnemonic.State {
 	var viewState: ImportMnemonic.ViewState {
 		var viewState = ImportMnemonic.ViewState(
 			readonlyMode: mode.readonly?.context,
-			hideAdvancedMode: mode.write?.hideAdvancedMode ?? false,
+			hideAdvancedMode: hideAdvancedMode,
 			showCloseButton: showCloseButton,
 			isProgressing: mode.write?.isProgressing ?? false,
 			isWordCountFixed: isWordCountFixed,
@@ -31,6 +31,15 @@ extension ImportMnemonic.State {
 			readOnlyMode.context == .fromBackupPrompt
 		case let .write(writeMode):
 			writeMode.showCloseButton
+		}
+	}
+
+	private var hideAdvancedMode: Bool {
+		switch mode {
+		case .readonly:
+			true
+		case .write:
+			isWordCountFixed
 		}
 	}
 
@@ -113,17 +122,13 @@ extension ImportMnemonic {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView(showsIndicators: false) {
-					VStack(spacing: 0) {
+					VStack(spacing: .medium3) {
 						if let header = viewStore.header {
 							HeaderView(header: header)
-								.padding(.bottom, viewStore.isWordCountFixed ? .medium3 : 0)
 						}
 
 						if let warning = viewStore.warning {
 							WarningErrorView(text: warning, type: .warning)
-								.padding(.top, viewStore.header == nil ? .medium3 : 0)
-								.padding(.horizontal, .large3)
-								.padding(.bottom, .large3)
 						}
 
 						if !viewStore.isWordCountFixed {
@@ -144,8 +149,6 @@ extension ImportMnemonic {
 								}
 								.pickerStyle(.segmented)
 							}
-							.padding(.horizontal, .large3)
-							.padding(.bottom, .medium2)
 						}
 
 						#if DEBUG
@@ -153,13 +156,10 @@ extension ImportMnemonic {
 						#endif
 
 						wordsGrid(with: viewStore)
-							.padding(.horizontal, .medium2)
-							.padding(.bottom, .large3)
+							.padding(.vertical, .small1)
 
 						if viewStore.isShowingPassphrase {
 							passphrase(with: viewStore)
-								.padding(.horizontal, .medium2)
-								.padding(.bottom, .medium2)
 						}
 
 						if viewStore.showModeButton {
@@ -168,26 +168,26 @@ extension ImportMnemonic {
 							}
 							.buttonStyle(.blueText)
 							.frame(height: .large1)
-							.padding(.bottom, .medium1)
+							.padding(.bottom, .small2)
 						}
 
 						footer(with: viewStore)
-							.padding(.bottom, .medium2)
 					}
-					.navigationBarBackButtonHidden(viewStore.showBackButton || viewStore.showCloseButton) // need to be able to hook "back" button press
-					.toolbar {
-						if viewStore.showBackButton {
-							ToolbarItem(placement: .navigationBarLeading) {
-								BackButton {
-									viewStore.send(.backButtonTapped)
-								}
+					.padding(.medium3)
+				}
+				.navigationBarBackButtonHidden(viewStore.showBackButton || viewStore.showCloseButton) // need to be able to hook "back" button press
+				.toolbar {
+					if viewStore.showBackButton {
+						ToolbarItem(placement: .navigationBarLeading) {
+							BackButton {
+								viewStore.send(.backButtonTapped)
 							}
 						}
-						if viewStore.showCloseButton {
-							ToolbarItem(placement: .navigationBarLeading) {
-								CloseButton {
-									viewStore.send(.closeButtonTapped)
-								}
+					}
+					if viewStore.showCloseButton {
+						ToolbarItem(placement: .navigationBarLeading) {
+							CloseButton {
+								viewStore.send(.closeButtonTapped)
 							}
 						}
 					}
@@ -206,10 +206,9 @@ extension ImportMnemonic {
 			let header: State.Header
 
 			var body: some SwiftUI.View {
-				VStack(spacing: 0) {
+				VStack(spacing: .large2) {
 					Text(header.title)
 						.textStyle(.sheetTitle)
-						.padding(.bottom, .large2)
 
 					if let subtitle = header.subtitle {
 						Text(subtitle)
@@ -218,7 +217,7 @@ extension ImportMnemonic {
 				}
 				.foregroundColor(.app.gray1)
 				.multilineTextAlignment(.center)
-				.padding(.horizontal, .large3)
+				.padding(.horizontal, .small1)
 			}
 		}
 	}
@@ -294,7 +293,6 @@ extension ImportMnemonic.View {
 				viewStore.send(.doneViewing)
 			}
 			.buttonStyle(.primaryRectangular)
-			.padding(.horizontal, .medium2)
 		} else {
 			WithControlRequirements(
 				viewStore.mnemonic,
@@ -307,77 +305,67 @@ extension ImportMnemonic.View {
 					.buttonStyle(.primaryRectangular)
 			}
 			.controlState(viewStore.isProgressing ? .loading(.local) : .enabled)
-			.padding(.horizontal, .medium2)
 		}
 	}
 
 	#if DEBUG
-	@ViewBuilder
 	private func debugSection(with viewStore: ViewStoreOf<ImportMnemonic>) -> some View {
-		if viewStore.isReadonlyMode {
-			Button("DEBUG ONLY Copy") {
-				viewStore.send(.debugCopyMnemonic)
-			}
-			.buttonStyle(.secondaryRectangular(shouldExpand: true, isDestructive: true, isInToolbar: true))
-			.padding(.horizontal, .medium2)
-			.padding(.bottom, .medium3)
-		} else {
-			if !(viewStore.isWordCountFixed && viewStore.wordCount == .twentyFour) {
-				Button("DEBUG AccRecScan Olympia 15") {
-					viewStore.send(.debugUseOlympiaTestingMnemonicWithActiveAccounts(continue: true))
+		VStack(spacing: .medium3) {
+			if viewStore.isReadonlyMode {
+				Button("DEBUG ONLY Copy") {
+					viewStore.send(.debugCopyMnemonic)
+				}
+				.buttonStyle(.secondaryRectangular(shouldExpand: true, isDestructive: true, isInToolbar: true))
+			} else {
+				if !(viewStore.isWordCountFixed && viewStore.wordCount == .twentyFour) {
+					Button("DEBUG AccRecScan Olympia 15") {
+						viewStore.send(.debugUseOlympiaTestingMnemonicWithActiveAccounts(continue: true))
+					}
+					.buttonStyle(.secondaryRectangular(shouldExpand: true, isDestructive: true, isInToolbar: true))
+					.overlay(alignment: .trailing) {
+						Button("M") {
+							viewStore.send(.debugUseOlympiaTestingMnemonicWithActiveAccounts(continue: false))
+						}
+						.frame(width: 40)
+					}
+				}
+
+				Button("DEBUG AccRecScan Babylon 24") {
+					viewStore.send(.debugUseBabylonTestingMnemonicWithActiveAccounts(continue: true))
 				}
 				.buttonStyle(.secondaryRectangular(shouldExpand: true, isDestructive: true, isInToolbar: true))
 				.overlay(alignment: .trailing) {
 					Button("M") {
-						viewStore.send(.debugUseOlympiaTestingMnemonicWithActiveAccounts(continue: false))
+						viewStore.send(.debugUseBabylonTestingMnemonicWithActiveAccounts(continue: false))
 					}
 					.frame(width: 40)
 				}
-				.padding(.horizontal, .medium2)
-				.padding(.bottom, .medium3)
-			}
 
-			Button("DEBUG AccRecScan Babylon 24") {
-				viewStore.send(.debugUseBabylonTestingMnemonicWithActiveAccounts(continue: true))
-			}
-			.buttonStyle(.secondaryRectangular(shouldExpand: true, isDestructive: true, isInToolbar: true))
-			.overlay(alignment: .trailing) {
-				Button("M") {
-					viewStore.send(.debugUseBabylonTestingMnemonicWithActiveAccounts(continue: false))
+				Button("DEBUG zoo..vote (24)") {
+					viewStore.send(.debugUseTestingMnemonicZooVote(continue: true))
 				}
-				.frame(width: 40)
-			}
-			.padding(.horizontal, .medium2)
-			.padding(.bottom, .medium3)
-
-			Button("DEBUG zoo..vote (24)") {
-				viewStore.send(.debugUseTestingMnemonicZooVote(continue: true))
-			}
-			.buttonStyle(.secondaryRectangular(shouldExpand: true, isDestructive: true, isInToolbar: true))
-			.overlay(alignment: .trailing) {
-				Button("M") {
-					viewStore.send(.debugUseTestingMnemonicZooVote(continue: false))
-				}
-				.frame(width: 40)
-			}
-			.padding(.horizontal, .medium2)
-			.padding(.bottom, .medium3)
-
-			AppTextField(
-				placeholder: "DEBUG ONLY paste mnemonic",
-				text: viewStore.binding(
-					get: { $0.debugMnemonicPhraseSingleField },
-					send: { .debugMnemonicChanged($0) }
-				),
-				innerAccessory: {
-					Button("Paste") {
-						viewStore.send(.debugPasteMnemonic)
+				.buttonStyle(.secondaryRectangular(shouldExpand: true, isDestructive: true, isInToolbar: true))
+				.overlay(alignment: .trailing) {
+					Button("M") {
+						viewStore.send(.debugUseTestingMnemonicZooVote(continue: false))
 					}
-					.buttonStyle(.borderedProminent)
+					.frame(width: 40)
 				}
-			)
-			.padding(.horizontal, .medium2)
-			.padding(.bottom, .medium2)
+
+				AppTextField(
+					placeholder: "DEBUG ONLY paste mnemonic",
+					text: viewStore.binding(
+						get: { $0.debugMnemonicPhraseSingleField },
+						send: { .debugMnemonicChanged($0) }
+					),
+					innerAccessory: {
+						Button("Paste") {
+							viewStore.send(.debugPasteMnemonic)
+						}
+						.buttonStyle(.borderedProminent)
+					}
+				)
+			}
 		}
 	}
 	#endif
