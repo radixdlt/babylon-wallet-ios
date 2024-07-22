@@ -31,7 +31,6 @@ extension NewAccountCompletion {
 			}
 
 			self.isFirstOnNetwork = state.isFirstOnNetwork
-
 			self.accountAddress = state.account.address
 			self.appearanceID = state.account.appearanceID
 			self.explanation = L10n.CreateAccount.Completion.explanation

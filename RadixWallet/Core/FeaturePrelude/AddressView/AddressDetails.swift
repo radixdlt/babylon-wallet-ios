@@ -9,6 +9,7 @@ public struct AddressDetails: Sendable, FeatureReducer {
 		var showEnlarged = false
 
 		var showShare = false
+		var showVerifyOnLedger = false
 
 		public init(address: LedgerIdentifiable.Address) {
 			self.address = address
@@ -31,6 +32,7 @@ public struct AddressDetails: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case loadedTitle(TaskResult<String?>)
 		case loadedQrImage(TaskResult<CGImage>)
+		case loadedShowVerifyOnLedger(Bool)
 	}
 
 	@Dependency(\.accountsClient) var accountsClient
@@ -48,6 +50,7 @@ public struct AddressDetails: Sendable, FeatureReducer {
 		case .task:
 			return loadTitleEffect(state: &state)
 				.merge(with: loadQrCodeEffect(state: &state))
+				.merge(with: loadShowVerifyOnLedgerEffect(state: state))
 		case .copyButtonTapped:
 			pasteboardClient.copyString(state.address.address)
 			return .none
@@ -70,7 +73,7 @@ public struct AddressDetails: Sendable, FeatureReducer {
 				await openURL(url)
 			}
 		case .verifyOnLedgerButtonTapped:
-			if case let .account(address, _) = state.address {
+			if case let .account(address) = state.address {
 				ledgerHardwareWalletClient.verifyAddress(of: address)
 			}
 			return .none
@@ -97,6 +100,9 @@ public struct AddressDetails: Sendable, FeatureReducer {
 		case let .loadedQrImage(.failure(error)):
 			state.qrImage = .failure(error)
 			return .none
+		case let .loadedShowVerifyOnLedger(value):
+			state.showVerifyOnLedger = value
+			return .none
 		}
 	}
 
@@ -111,7 +117,7 @@ public struct AddressDetails: Sendable, FeatureReducer {
 
 	private func loadTitle(address: LedgerIdentifiable.Address) async throws -> String? {
 		switch address {
-		case let .account(address, _):
+		case let .account(address):
 			try await accountsClient.getAccountByAddress(address).displayName.rawValue
 		case let .resource(address):
 			try await onLedgerEntitiesClient.getResource(address).resourceTitle
@@ -139,6 +145,18 @@ public struct AddressDetails: Sendable, FeatureReducer {
 				try await qrGeneratorClient.generate(.init(content: content))
 			}
 			await send(.internal(.loadedQrImage(result)))
+		}
+	}
+
+	private func loadShowVerifyOnLedgerEffect(state: State) -> Effect<Action> {
+		switch state.address {
+		case let .account(address):
+			.run { send in
+				let showVerifyOnLedger = await accountsClient.isLedgerHWAccount(address)
+				await send(.internal(.loadedShowVerifyOnLedger(showVerifyOnLedger)))
+			}
+		default:
+			.send(.internal(.loadedShowVerifyOnLedger(false)))
 		}
 	}
 }
