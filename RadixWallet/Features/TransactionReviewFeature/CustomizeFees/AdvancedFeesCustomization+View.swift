@@ -15,12 +15,12 @@ extension AdvancedFeesCustomization.State {
 
 	private var paddingAmountHint: Hint? {
 		guard parsedPaddingFee == nil else { return nil }
-		return .error()
+		return .iconError()
 	}
 
 	private var tipPercentageHint: Hint? {
 		guard parsedTipPercentage == nil else { return nil }
-		return .error()
+		return .iconError()
 	}
 }
 

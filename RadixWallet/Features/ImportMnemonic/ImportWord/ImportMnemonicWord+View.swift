@@ -48,7 +48,7 @@ extension ImportMnemonicWord {
 			guard let validation, validation == .invalid else {
 				return nil
 			}
-			return .error(L10n.Common.invalid)
+			return .iconError(L10n.Common.invalid)
 		}
 
 		var showClearButton: Bool {
@@ -128,7 +128,7 @@ extension ImportMnemonicWord {
 					}
 
 					if viewStore.hint == nil {
-						Hint.error(L10n.Common.invalid) // Dummy spacer
+						Hint.iconError(L10n.Common.invalid) // Dummy spacer
 							.opacity(0)
 					}
 				}

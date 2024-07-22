@@ -32,7 +32,7 @@ extension NewPersonaInfo {
 			if let sanitizedName = state.sanitizedName {
 				if sanitizedName.count > Account.nameMaxLength {
 					self.sanitizedNameRequirement = nil
-					self.hint = .error(L10n.Error.PersonaLabel.tooLong)
+					self.hint = .iconError(L10n.Error.PersonaLabel.tooLong)
 				} else {
 					self.sanitizedNameRequirement = .init(sanitizedName: sanitizedName)
 					self.hint = defaultHint

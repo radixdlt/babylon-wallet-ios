@@ -1,5 +1,4 @@
 // MARK: - Hint
-
 public struct Hint: View, Equatable {
 	public struct ViewState: Equatable {
 		public let kind: Kind
@@ -18,9 +17,13 @@ public struct Hint: View, Equatable {
 
 	public enum Kind: Equatable {
 		case info
-		case error
+		case error(imageSize: HitTargetSize)
 		case warning
 		case detail
+
+		static var error: Self {
+			.error(imageSize: .smallest)
+		}
 	}
 
 	public let viewState: ViewState
@@ -53,15 +56,23 @@ public struct Hint: View, Equatable {
 		.init(kind: .error, text: nil)
 	}
 
+	public static func iconError(_ string: some StringProtocol) -> Self {
+		.init(kind: .error(imageSize: .icon), text: Text(string))
+	}
+
+	public static func iconError() -> Self {
+		.init(kind: .error(imageSize: .icon), text: nil)
+	}
+
 	public var body: some View {
 		if let text = viewState.text {
 			HStack(spacing: .small3) {
-				if let iconResource {
-					Image(iconResource)
+				if let imageResource {
+					Image(imageResource)
 						.renderingMode(.template)
 						.resizable()
 						.scaledToFit()
-						.frame(.smallest)
+						.frame(imageSize)
 				}
 				text
 					.lineSpacing(0)
@@ -84,7 +95,7 @@ private extension Hint {
 		}
 	}
 
-	var iconResource: ImageResource? {
+	var imageResource: ImageResource? {
 		switch viewState.kind {
 		case .info, .detail:
 			nil
@@ -99,6 +110,15 @@ private extension Hint {
 			.body2HighImportance
 		case .detail:
 			.body1Regular
+		}
+	}
+
+	var imageSize: HitTargetSize {
+		switch viewState.kind {
+		case .info, .detail, .warning:
+			.smallest
+		case let .error(imageSize):
+			imageSize
 		}
 	}
 }

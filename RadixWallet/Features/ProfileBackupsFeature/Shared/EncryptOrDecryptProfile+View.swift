@@ -45,7 +45,7 @@ extension EncryptOrDecryptProfile {
 				return nil
 			}
 			if !confirmedEncryptionPassword.isEmpty, confirmedEncryptionPassword != enteredEncryptionPassword {
-				return .error(L10n.ProfileBackup.ManualBackups.passwordsMissmatchError)
+				return .iconError(L10n.ProfileBackup.ManualBackups.passwordsMissmatchError)
 			}
 
 			return nil

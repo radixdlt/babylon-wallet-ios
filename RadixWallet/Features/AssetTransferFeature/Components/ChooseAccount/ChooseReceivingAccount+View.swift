@@ -24,12 +24,12 @@ extension ChooseReceivingAccount {
 
 				switch state.validateManualAccountAddress() {
 				case .invalid:
-					return .error(L10n.AssetTransfer.ChooseReceivingAccount.invalidAddressError)
+					return .iconError(L10n.AssetTransfer.ChooseReceivingAccount.invalidAddressError)
 				case .wrongNetwork:
-					return .error(L10n.AssetTransfer.Error.wrongNetwork)
+					return .iconError(L10n.AssetTransfer.Error.wrongNetwork)
 				case let .valid(validAddress):
 					if state.chooseAccounts.filteredAccounts.contains(where: { $0 == validAddress }) {
-						return .error(L10n.AssetTransfer.ChooseReceivingAccount.alreadyAddedError)
+						return .iconError(L10n.AssetTransfer.ChooseReceivingAccount.alreadyAddedError)
 					}
 					return .none
 				}

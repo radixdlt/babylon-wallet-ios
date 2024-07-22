@@ -15,10 +15,10 @@ extension UpdateAccountLabel.State {
 	private var hintAndControlState: (ControlState, Hint?) {
 		if let sanitizedName {
 			if sanitizedName.count > Account.nameMaxLength {
-				return (.disabled, .error(L10n.Error.AccountLabel.tooLong))
+				return (.disabled, .iconError(L10n.Error.AccountLabel.tooLong))
 			}
 		} else {
-			return (.disabled, .error(L10n.Error.AccountLabel.missing))
+			return (.disabled, .iconError(L10n.Error.AccountLabel.missing))
 		}
 
 		return (.enabled, nil)

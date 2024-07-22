@@ -6,7 +6,7 @@ extension AddNewGateway.State {
 		.init(
 			gatewayURL: inputtedURL,
 			focusedField: focusedField,
-			fieldHint: errorText.map(Hint.error),
+			fieldHint: errorText.map(Hint.iconError),
 			addGatewayButtonState: addGatewayButtonState
 		)
 	}

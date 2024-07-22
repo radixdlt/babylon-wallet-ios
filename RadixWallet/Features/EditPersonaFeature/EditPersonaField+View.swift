@@ -14,7 +14,7 @@ extension EditPersonaField {
 		init(state: State) {
 			self.primaryHeading = state.showsTitle ? state.behaviour.title : ""
 			self._input = state.$input
-			self.inputHint = (state.$input.errors?.first).map { .error($0) }
+			self.inputHint = (state.$input.errors?.first).map { .iconError($0) }
 			self.capitalization = state.behaviour.capitalization
 			self.keyboardType = state.behaviour.keyboardType
 			self.contentType = state.behaviour.contentType

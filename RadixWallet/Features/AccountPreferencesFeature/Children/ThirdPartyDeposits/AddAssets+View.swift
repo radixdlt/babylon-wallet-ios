@@ -15,11 +15,11 @@ extension AddAsset.State {
 				case .valid:
 					return .none
 				case .wrongNetwork:
-					return .error(L10n.AssetTransfer.Error.wrongNetwork)
+					return .iconError(L10n.AssetTransfer.Error.wrongNetwork)
 				case .alreadyAdded:
-					return .error(L10n.AssetTransfer.Error.resourceAlreadyAdded)
+					return .iconError(L10n.AssetTransfer.Error.resourceAlreadyAdded)
 				case .invalid:
-					return .error(L10n.AssetTransfer.ChooseReceivingAccount.invalidAddressError)
+					return .iconError(L10n.AssetTransfer.ChooseReceivingAccount.invalidAddressError)
 				}
 			}(),
 			resourceAddressFieldFocused: resourceAddressFieldFocused,
