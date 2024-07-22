@@ -40,7 +40,6 @@ extension CardCarousel {
 				}
 			}
 			.tabViewStyle(.page(indexDisplayMode: .never))
-			.animation(.default, value: store.cards)
 		}
 
 		@ViewBuilder
