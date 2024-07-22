@@ -166,7 +166,7 @@ extension SmallAccountCard where Accessory == EmptyView {
 		case let .external(accountAddress, _):
 			self.init(
 				L10n.TransactionReview.externalAccountName,
-				identifiable: .address(.account(accountAddress, isLedgerHWAccount: false)),
+				identifiable: .address(.account(accountAddress)),
 				gradient: .init(colors: [.app.gray2]),
 				verticalPadding: .small1
 			)

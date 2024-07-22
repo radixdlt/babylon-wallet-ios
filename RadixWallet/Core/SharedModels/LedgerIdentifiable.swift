@@ -4,7 +4,7 @@ public enum LedgerIdentifiable: Sendable {
 	case transaction(IntentHash)
 
 	public static func address(of account: Account) -> Self {
-		.address(.account(account.address, isLedgerHWAccount: account.isLedgerControlled))
+		.address(.account(account.address))
 	}
 
 	public var address: String {
@@ -33,11 +33,7 @@ public enum LedgerIdentifiable: Sendable {
 // MARK: LedgerIdentifiable.Address
 extension LedgerIdentifiable {
 	public enum Address: Hashable, Sendable, Identifiable {
-		/// `isLedgerHWAccount` indicates if the account is controlled by a Ledger device.
-		/// - `true`: we know the account is controlled by a Ledger device
-		/// - `false`: either the account isn't controller by a Ledger device or it is an external account and we don't care.
-		/// - `nil`: we don't know if the account is controller by a Ledger device, we should check if needed.
-		case account(AccountAddress, isLedgerHWAccount: Bool?)
+		case account(AccountAddress)
 		case package(PackageAddress)
 		case resource(ResourceAddress)
 		case resourcePool(PoolAddress)
@@ -52,7 +48,7 @@ extension LedgerIdentifiable {
 
 		public func formatted(_ format: AddressFormat) -> String {
 			switch self {
-			case let .account(accountAddress, _):
+			case let .account(accountAddress):
 				accountAddress.formatted(format)
 			case let .package(packageAddress):
 				packageAddress.formatted(format)
@@ -90,7 +86,7 @@ extension LedgerIdentifiable {
 
 		public var id: String {
 			switch self {
-			case let .account(accountAddress, _):
+			case let .account(accountAddress):
 				accountAddress.id
 			case let .package(packageAddress):
 				packageAddress.id
@@ -113,7 +109,7 @@ extension LedgerIdentifiable.Address {
 	public init?(address: Address) {
 		switch address {
 		case let .account(accountAddress):
-			self = .account(accountAddress, isLedgerHWAccount: false)
+			self = .account(accountAddress)
 		case let .resource(resourceAddress):
 			self = .resource(resourceAddress)
 		case let .pool(poolAddress):

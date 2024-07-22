@@ -16,7 +16,6 @@ extension NewAccountCompletion {
 		let subtitle: String
 
 		let accountAddress: AccountAddress
-		let isLedgerControlled: Bool
 		let appearanceID: AppearanceID
 
 		init(state: NewAccountCompletion.State) {
@@ -33,7 +32,6 @@ extension NewAccountCompletion {
 
 			self.isFirstOnNetwork = state.isFirstOnNetwork
 			self.accountAddress = state.account.address
-			self.isLedgerControlled = state.account.isLedgerControlled
 			self.appearanceID = state.account.appearanceID
 			self.explanation = L10n.CreateAccount.Completion.explanation
 
@@ -107,7 +105,7 @@ private extension NewAccountCompletion.View {
 					.textStyle(.body1Header)
 					.multilineTextAlignment(.center)
 
-				AddressView(.address(.account(viewStore.accountAddress, isLedgerHWAccount: viewStore.isLedgerControlled)), isTappable: false)
+				AddressView(.address(.account(viewStore.accountAddress)), isTappable: false)
 					.foregroundColor(.app.whiteTransparent)
 					.textStyle(.body2HighImportance)
 			}

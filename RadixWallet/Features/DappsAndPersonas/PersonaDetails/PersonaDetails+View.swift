@@ -199,7 +199,7 @@ extension PersonaDetails.View {
 						ForEach(viewStore.sharingAccounts) { account in
 							SmallAccountCard(
 								account.label.rawValue,
-								identifiable: .address(.account(account.address, isLedgerHWAccount: nil)),
+								identifiable: .address(.account(account.address)),
 								gradient: .init(account.appearanceId)
 							)
 							.cornerRadius(.small1)
