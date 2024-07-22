@@ -128,7 +128,7 @@ extension ImportMnemonicWord {
 					}
 
 					if viewStore.hint == nil {
-						Hint.iconError(L10n.Common.invalid) // Dummy spacer
+						Hint(viewState: .iconError(L10n.Common.invalid)) // Dummy spacer
 							.opacity(0)
 					}
 				}

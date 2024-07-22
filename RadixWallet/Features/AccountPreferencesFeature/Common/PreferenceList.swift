@@ -102,7 +102,7 @@ struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 		guard let hint = row.hint else {
 			return []
 		}
-		return [.init(kind: .detail, text: Text(hint))]
+		return [.init(kind: .detail, text: hint)]
 	}
 }
 
