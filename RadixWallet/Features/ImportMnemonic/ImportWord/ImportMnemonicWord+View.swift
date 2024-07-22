@@ -44,7 +44,7 @@ extension ImportMnemonicWord {
 
 		let validation: MnemonicValidation?
 
-		var hint: Hint? {
+		var hint: Hint.ViewState? {
 			guard let validation, validation == .invalid else {
 				return nil
 			}

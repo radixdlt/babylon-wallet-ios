@@ -32,7 +32,7 @@ extension AddAsset {
 	public struct ViewState: Equatable {
 		let resourceAddress: String
 		let validatedResourceAddress: ResourceViewState.Address?
-		let addressHint: Hint?
+		let addressHint: Hint.ViewState?
 		let resourceAddressFieldFocused: Bool
 		let mode: ResourcesListMode
 	}

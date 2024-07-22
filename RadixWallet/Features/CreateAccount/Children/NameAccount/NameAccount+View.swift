@@ -14,7 +14,7 @@ extension NameAccount {
 		public let subtitleText: String
 		public let entityName: String
 		public let sanitizedNameRequirement: SanitizedNameRequirement?
-		public let hint: Hint?
+		public let hint: Hint.ViewState?
 		public let useLedgerAsFactorSource: Bool
 
 		public struct SanitizedNameRequirement: Equatable {

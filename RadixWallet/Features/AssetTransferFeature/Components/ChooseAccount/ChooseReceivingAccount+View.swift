@@ -9,7 +9,7 @@ extension ChooseReceivingAccount {
 		var chooseAccounts: ChooseAccounts.State
 		var canSelectOwnAccount: Bool
 		var validateAccountAddress: AccountAddress?
-		var manualAddressHint: Hint?
+		var manualAddressHint: Hint.ViewState?
 
 		init(state: ChooseReceivingAccount.State) {
 			manualAccountAddress = state.manualAccountAddress

@@ -6,7 +6,7 @@ extension EditPersonaField {
 		let primaryHeading: String
 		@Validation<String, String>
 		var input: String?
-		let inputHint: Hint?
+		let inputHint: Hint.ViewState?
 		let contentType: UITextContentType?
 		let keyboardType: UIKeyboardType
 		let capitalization: EquatableTextInputCapitalization?

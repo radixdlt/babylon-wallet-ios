@@ -1,6 +1,6 @@
 // MARK: - Hint
 public struct Hint: View, Equatable {
-	public struct ViewState: Equatable {
+	public struct ViewState: Sendable, Equatable {
 		public let kind: Kind
 		public let text: Text?
 
@@ -13,9 +13,37 @@ public struct Hint: View, Equatable {
 			self.kind = kind
 			self.text = Text(text)
 		}
+
+		public static func info(_ text: () -> Text) -> Self {
+			.init(kind: .info, text: text())
+		}
+
+		public static func info(_ string: some StringProtocol) -> Self {
+			.init(kind: .info, text: Text(string))
+		}
+
+		public static func error(_ text: () -> Text) -> Self {
+			.init(kind: .error, text: text())
+		}
+
+		public static func error(_ string: some StringProtocol) -> Self {
+			.init(kind: .error, text: Text(string))
+		}
+
+		public static func error() -> Self {
+			.init(kind: .error, text: nil)
+		}
+
+		public static func iconError(_ string: some StringProtocol) -> Self {
+			.init(kind: .error(imageSize: .icon), text: Text(string))
+		}
+
+		public static func iconError() -> Self {
+			.init(kind: .error(imageSize: .icon), text: nil)
+		}
 	}
 
-	public enum Kind: Equatable {
+	public enum Kind: Sendable, Equatable {
 		case info
 		case error(imageSize: HitTargetSize)
 		case warning
@@ -28,40 +56,8 @@ public struct Hint: View, Equatable {
 
 	public let viewState: ViewState
 
-	private init(kind: Kind, text: Text?) {
-		self.viewState = .init(kind: kind, text: text)
-	}
-
 	public init(viewState: ViewState) {
 		self.viewState = viewState
-	}
-
-	public static func info(_ text: () -> Text) -> Self {
-		.init(kind: .info, text: text())
-	}
-
-	public static func info(_ string: some StringProtocol) -> Self {
-		.init(kind: .info, text: Text(string))
-	}
-
-	public static func error(_ text: () -> Text) -> Self {
-		.init(kind: .error, text: text())
-	}
-
-	public static func error(_ string: some StringProtocol) -> Self {
-		.init(kind: .error, text: Text(string))
-	}
-
-	public static func error() -> Self {
-		.init(kind: .error, text: nil)
-	}
-
-	public static func iconError(_ string: some StringProtocol) -> Self {
-		.init(kind: .error(imageSize: .icon), text: Text(string))
-	}
-
-	public static func iconError() -> Self {
-		.init(kind: .error(imageSize: .icon), text: nil)
 	}
 
 	public var body: some View {

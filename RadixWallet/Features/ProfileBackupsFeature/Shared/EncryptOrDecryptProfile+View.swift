@@ -39,7 +39,7 @@ extension EncryptOrDecryptProfile {
 			return confirmedEncryptionPassword == enteredEncryptionPassword
 		}
 
-		var confirmHint: Hint? {
+		var confirmHint: Hint.ViewState? {
 			guard needToConfirm else { return nil }
 			if enteredEncryptionPassword.isEmpty || !confirmedEncryptionPassword.isEmpty && focusedField != .confirmPassword {
 				return nil

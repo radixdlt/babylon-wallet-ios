@@ -38,7 +38,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 	let secondaryHeading: String?
 	let placeholder: String
 	let text: Binding<String>
-	let hint: Hint?
+	let hint: Hint.ViewState?
 	let focus: Focus?
 	let showClearButton: Bool
 	let accessory: Accessory
@@ -53,7 +53,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 		secondaryHeading: String? = nil,
 		placeholder: String,
 		text: Binding<String>,
-		hint: Hint? = nil,
+		hint: Hint.ViewState? = nil,
 		focus: Focus,
 		showClearButton: Bool = false,
 		@ViewBuilder accessory: () -> Accessory = { EmptyView() },
@@ -79,7 +79,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 		secondaryHeading: String? = nil,
 		placeholder: String,
 		text: Binding<String>,
-		hint: Hint? = nil,
+		hint: Hint.ViewState? = nil,
 		showClearButton: Bool = false,
 		@ViewBuilder accessory: () -> Accessory = { EmptyView() },
 		@ViewBuilder innerAccessory: () -> InnerAccessory = { EmptyView() }
@@ -176,7 +176,9 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 						.stroke(accentColor(isFocused: isFocused), lineWidth: 1)
 				)
 
-				hint
+				if let hint {
+					Hint(viewState: hint)
+				}
 			}
 
 			accessory
@@ -185,7 +187,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 	}
 
 	private func accentColor(isFocused: Bool) -> Color {
-		switch hint?.viewState.kind {
+		switch hint?.kind {
 		case .none:
 			isFocused ? .app.gray1 : .app.gray4
 		case .info:

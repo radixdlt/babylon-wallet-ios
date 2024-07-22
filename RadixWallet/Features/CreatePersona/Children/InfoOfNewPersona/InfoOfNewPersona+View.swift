@@ -13,7 +13,7 @@ extension NewPersonaInfo {
 		public let titleText: String
 		public let subtitleText: String
 		public let entityName: String
-		public let hint: Hint?
+		public let hint: Hint.ViewState?
 		public let sanitizedNameRequirement: SanitizedNameRequirement?
 		public let focusedInputField: State.InputField?
 
@@ -28,7 +28,7 @@ extension NewPersonaInfo {
 			self.subtitleText = L10n.CreatePersona.NameNewPersona.subtitle
 			self.entityName = state.inputtedName
 
-			let defaultHint: Hint = .info(L10n.CreatePersona.Explanation.thisWillBeShared)
+			let defaultHint: Hint.ViewState = .info(L10n.CreatePersona.Explanation.thisWillBeShared)
 			if let sanitizedName = state.sanitizedName {
 				if sanitizedName.count > Account.nameMaxLength {
 					self.sanitizedNameRequirement = nil
