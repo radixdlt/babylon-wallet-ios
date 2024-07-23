@@ -31,9 +31,10 @@ extension DappDetails.View {
 	public var body: some View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
-				VStack(spacing: 0) {
+				VStack(spacing: .medium1) {
 					Thumbnail(.dapp, url: viewStore.thumbnail, size: .veryLarge)
-						.padding(.vertical, .large2)
+						.padding(.top, .medium1)
+						.padding(.bottom, .small2)
 
 					InfoBlock(store: store)
 
@@ -49,8 +50,9 @@ extension DappDetails.View {
 							store.send(.view(.forgetThisDappTapped))
 						}
 						.buttonStyle(.primaryRectangular(isDestructive: true))
-						.padding([.horizontal, .top], .medium3)
-						.padding(.bottom, .large2)
+						.padding(.top, -.small2)
+						.padding(.horizontal, .medium3)
+						.padding(.bottom, .medium1)
 					}
 				}
 				.radixToolbar(title: viewStore.title)
@@ -156,43 +158,30 @@ extension DappDetails.View {
 
 		var body: some View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack(alignment: .leading, spacing: .medium2) {
+				VStack(alignment: .leading, spacing: .medium1) {
 					Separator()
 
 					if let description = viewStore.description {
 						Text(description)
-							.textBlock
-							.flushedLeft
+							.textStyle(.body1Regular)
+							.foregroundColor(.app.gray1)
+							.multilineTextAlignment(.leading)
+							.padding(.horizontal, .small2)
 
 						Separator()
 					}
 
-					HStack(spacing: 0) {
-						Text(L10n.AuthorizedDapps.DAppDetails.dAppDefinition)
-							.sectionHeading
-
-						Spacer(minLength: 0)
-
-						AddressView(
-							.address(.account(viewStore.address)),
-							imageColor: .app.gray2
-						)
-						.foregroundColor(.app.gray1)
-						.textStyle(.body1HighImportance)
-					}
-
-					if let domain = viewStore.domain {
-						Text(L10n.AuthorizedDapps.DAppDetails.website)
-							.sectionHeading
-
-						Button(domain.absoluteString) {
-							viewStore.send(.openURLTapped(domain))
+					VStack(spacing: .medium3) {
+						KeyValueView(key: L10n.AuthorizedDapps.DAppDetails.dAppDefinition) {
+							AddressView(.address(.account(viewStore.address)), imageColor: .app.gray2)
 						}
-						.buttonStyle(.url)
+
+						if let domain = viewStore.domain {
+							KeyValueUrlView(key: L10n.AuthorizedDapps.DAppDetails.website, url: domain, isLocked: false)
+						}
 					}
 				}
 				.padding(.horizontal, .medium1)
-				.padding(.bottom, .large2)
 			}
 		}
 	}
@@ -239,8 +228,9 @@ extension DappDetails.View {
 			if !elements.isEmpty {
 				VStack(alignment: .leading, spacing: .medium3) {
 					Text(heading)
-						.sectionHeading
-						.padding(.horizontal, .medium1)
+						.textStyle(.body1Regular)
+						.foregroundColor(.app.gray2)
+						.padding(.horizontal, .medium3)
 
 					ForEach(elements) { element in
 						Card {
@@ -250,10 +240,9 @@ extension DappDetails.View {
 								icon(element)
 							}
 						}
-						.padding(.horizontal, .medium3)
 					}
 				}
-				.padding(.bottom, .medium1)
+				.padding(.horizontal, .medium3)
 			}
 		}
 	}
@@ -273,24 +262,28 @@ extension DappDetails.View {
 
 		var body: some View {
 			WithViewStore(store, observe: ViewState.init) { viewStore in
-				if viewStore.hasPersonas {
-					Text(L10n.AuthorizedDapps.DAppDetails.personasHeading)
-						.sectionHeading
-						.flushedLeft
-						.padding(.horizontal, .medium1)
-						.padding(.vertical, .small2)
-
+				VStack(spacing: .medium2) {
 					Separator()
-						.padding(.bottom, .small2)
 
-					PersonaListCoreView(store: store, tappable: tappablePersonas, showShield: false)
-						.padding(.horizontal, .medium3)
-				} else {
-					Text(L10n.AuthorizedDapps.DAppDetails.noPersonasHeading)
-						.sectionHeading
-						.flushedLeft
-						.padding(.horizontal, .medium1)
-						.padding(.vertical, .small2)
+					VStack(spacing: .medium3) {
+						if viewStore.hasPersonas {
+							Text(L10n.AuthorizedDapps.DAppDetails.personasHeading)
+								.textBlock
+								.flushedLeft
+								.padding(.horizontal, .small2)
+
+							PersonaListCoreView(store: store, tappable: tappablePersonas, showShield: false)
+								.padding(.top, .small1)
+
+						} else {
+							Text(L10n.AuthorizedDapps.DAppDetails.noPersonasHeading)
+								.textBlock
+								.flushedLeft
+								.padding(.horizontal, .small2)
+						}
+					}
+					.padding(.horizontal, .medium3)
+					.padding(.bottom, .large1)
 				}
 			}
 		}

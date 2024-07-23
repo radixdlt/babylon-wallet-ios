@@ -107,6 +107,7 @@ struct KeyValueUrlView: View {
 			Button(url.absoluteString) {
 				openUrl(url)
 			}
+			.multilineTextAlignment(.leading)
 			.buttonStyle(.url)
 		}
 	}
