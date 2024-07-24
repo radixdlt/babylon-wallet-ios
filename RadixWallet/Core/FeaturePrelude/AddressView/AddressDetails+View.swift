@@ -117,7 +117,6 @@ public extension AddressDetails {
 						.renderingMode(.template)
 						.resizable()
 						.frame(.icon)
-						.scaledToFill()
 						.opacity(0.6)
 					Text(title)
 				}
