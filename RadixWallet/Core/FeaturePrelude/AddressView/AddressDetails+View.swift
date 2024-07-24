@@ -94,20 +94,34 @@ public extension AddressDetails {
 			.animation(.easeInOut, value: store.qrImage.isSuccess)
 		}
 
+		@ViewBuilder
 		private var actions: some SwiftUI.View {
-			HStack(spacing: .large3) {
-				Button(L10n.AddressDetails.copy, image: .copy) {
+			FlowLayout(multilineAlignment: .center, spacing: .large3) {
+				actionButton(L10n.AddressDetails.copy, image: .copyMedium) {
 					store.send(.view(.copyButtonTapped))
 				}
-				Button(L10n.AddressDetails.enlarge, image: .fullScreen) {
+				actionButton(L10n.AddressDetails.enlarge, image: .fullScreen) {
 					store.send(.view(.enlargeButtonTapped))
 				}
-				Button(L10n.AddressDetails.share, systemImage: "square.and.arrow.up") {
+				actionButton(L10n.AddressDetails.share, image: .share) {
 					store.send(.view(.shareButtonTapped))
 				}
 			}
-			.padding(.horizontal, .medium2)
 			.foregroundColor(.app.gray1)
+		}
+
+		private func actionButton(_ title: String, image: ImageResource, action: @escaping () -> Void) -> some SwiftUI.View {
+			Button(action: action) {
+				HStack(spacing: .small3) {
+					Image(image)
+						.renderingMode(.template)
+						.resizable()
+						.frame(.icon)
+						.scaledToFill()
+						.opacity(0.6)
+					Text(title)
+				}
+			}
 		}
 
 		private var bottom: some SwiftUI.View {
