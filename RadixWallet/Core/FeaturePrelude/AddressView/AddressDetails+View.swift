@@ -97,7 +97,7 @@ public extension AddressDetails {
 		@ViewBuilder
 		private var actions: some SwiftUI.View {
 			FlowLayout(multilineAlignment: .center, spacing: .large3) {
-				actionButton(L10n.AddressDetails.copy, image: .copyMedium) {
+				actionButton(L10n.AddressDetails.copy, image: .copyBig) {
 					store.send(.view(.copyButtonTapped))
 				}
 				actionButton(L10n.AddressDetails.enlarge, image: .fullScreen) {
@@ -152,6 +152,7 @@ private extension AddressDetails.View {
 				Text(L10n.AddressDetails.fullAddress)
 					.foregroundColor(.app.gray1)
 				Text(colorisedText)
+					.fixedSize(horizontal: false, vertical: true)
 			}
 			actions
 		}

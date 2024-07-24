@@ -68,7 +68,6 @@ public enum AssetResource {
   public static let close = ImageAsset(name: "close")
   public static let code = ImageAsset(name: "code")
   public static let copyBig = ImageAsset(name: "copy-big")
-  public static let copyMedium = ImageAsset(name: "copy-medium")
   public static let copy = ImageAsset(name: "copy")
   public static let create = ImageAsset(name: "create")
   public static let ellipsis = ImageAsset(name: "ellipsis")
