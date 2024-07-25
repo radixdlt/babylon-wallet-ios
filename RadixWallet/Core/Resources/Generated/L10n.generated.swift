@@ -808,6 +808,8 @@ public enum L10n {
       }
       /// Here are the dApps you have logged into with this Persona.
       public static let authorizedDappsHeading = L10n.tr("Localizable", "authorizedDapps_personaDetails_authorizedDappsHeading", fallback: "Here are the dApps you have logged into with this Persona.")
+      /// Edit
+      public static let edit = L10n.tr("Localizable", "authorizedDapps_personaDetails_edit", fallback: "Edit")
       /// Edit Account Sharing
       public static let editAccountSharing = L10n.tr("Localizable", "authorizedDapps_personaDetails_editAccountSharing", fallback: "Edit Account Sharing")
       /// Edit Avatar
