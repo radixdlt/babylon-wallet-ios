@@ -107,7 +107,6 @@ public extension AddressDetails {
 					store.send(.view(.shareButtonTapped))
 				}
 			}
-			.foregroundColor(.app.gray1)
 		}
 
 		private func actionButton(_ title: String, image: ImageResource, action: @escaping () -> Void) -> some SwiftUI.View {
@@ -117,8 +116,9 @@ public extension AddressDetails {
 						.renderingMode(.template)
 						.resizable()
 						.frame(.icon)
-						.opacity(0.6)
+						.foregroundColor(.app.gray2)
 					Text(title)
+						.foregroundColor(.app.gray1)
 				}
 			}
 		}
