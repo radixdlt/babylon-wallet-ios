@@ -16,6 +16,7 @@ public struct EditPersonaField<Behaviour: EditPersonaFieldKindBehaviour>: Sendab
 		public let entryID: PersonaDataEntryID
 		let isRequestedByDapp: Bool
 		let showsTitle: Bool
+		let defaultInfoHint: String?
 
 		@Validation<String, String>
 		public var input: String?
@@ -25,7 +26,8 @@ public struct EditPersonaField<Behaviour: EditPersonaFieldKindBehaviour>: Sendab
 			entryID: PersonaDataEntryID?,
 			input: Validation<String, String>,
 			isRequestedByDapp: Bool,
-			showsTitle: Bool
+			showsTitle: Bool,
+			defaultInfoHint: String? = nil
 		) {
 			@Dependency(\.uuid) var uuid
 			self.entryID = entryID ?? uuid()
@@ -33,6 +35,7 @@ public struct EditPersonaField<Behaviour: EditPersonaFieldKindBehaviour>: Sendab
 			self._input = input
 			self.isRequestedByDapp = isRequestedByDapp
 			self.showsTitle = showsTitle
+			self.defaultInfoHint = defaultInfoHint
 		}
 	}
 
@@ -86,18 +89,23 @@ extension EditPersonaStaticField.State {
 	public init(
 		behaviour: Behaviour,
 		entryID: PersonaDataEntryID?,
-		initial: String?
+		initial: String?,
+		defaultInfoHint: String? = nil
 	) {
 		self.init(
 			behaviour: behaviour,
 			entryID: entryID,
 			input: .init(
 				wrappedValue: initial,
-				onNil: L10n.EditPersona.Error.blank,
-				rules: [.if(\.isBlank, error: L10n.EditPersona.Error.blank)]
+				onNil: nil,
+				rules: [
+					.if(\.isBlank, error: L10n.EditPersona.Error.blank),
+					.if({ $0.count > Account.nameMaxLength }, error: L10n.Error.PersonaLabel.tooLong), // FIXME: define nameMaxLength for Persona
+				]
 			),
 			isRequestedByDapp: false,
-			showsTitle: true
+			showsTitle: true,
+			defaultInfoHint: defaultInfoHint
 		)
 	}
 }
@@ -218,7 +226,8 @@ extension EditPersonaDynamicField.State {
 		entryID: PersonaDataEntryID?,
 		text: String?,
 		isRequiredByDapp: Bool,
-		showsTitle: Bool
+		showsTitle: Bool,
+		defaultInfoHint: String? = nil
 	) {
 		self.init(
 			behaviour: behaviour,
@@ -229,7 +238,8 @@ extension EditPersonaDynamicField.State {
 				rules: []
 			),
 			isRequestedByDapp: isRequiredByDapp,
-			showsTitle: showsTitle
+			showsTitle: showsTitle,
+			defaultInfoHint: defaultInfoHint
 		)
 	}
 }

@@ -1,26 +1,35 @@
 import ComposableArchitecture
 import SwiftUI
 
-extension EditPersonaField {
-	public struct ViewState: Equatable {
-		let primaryHeading: String
-		@Validation<String, String>
-		var input: String?
-		let inputHint: Hint?
-		let contentType: UITextContentType?
-		let keyboardType: UIKeyboardType
-		let capitalization: EquatableTextInputCapitalization?
-
-		init(state: State) {
-			self.primaryHeading = state.showsTitle ? state.behaviour.title : ""
-			self._input = state.$input
-			self.inputHint = (state.$input.errors?.first).map { .error($0) }
-			self.capitalization = state.behaviour.capitalization
-			self.keyboardType = state.behaviour.keyboardType
-			self.contentType = state.behaviour.contentType
-		}
+extension EditPersonaField.State {
+	var primaryHeading: String {
+		showsTitle ? behaviour.title : ""
 	}
 
+	var inputHint: Hint? {
+		if let error = $input.errors?.first {
+			return .error(error)
+		} else if let defaultInfoHint {
+			return .info(defaultInfoHint)
+		}
+		return nil
+	}
+
+	var contentType: UITextContentType? {
+		behaviour.contentType
+	}
+
+	var keyboardType: UIKeyboardType {
+		behaviour.keyboardType
+	}
+
+	var capitalization: EquatableTextInputCapitalization? {
+		behaviour.capitalization
+	}
+}
+
+// MARK: - EditPersonaField.View
+extension EditPersonaField {
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<EditPersonaField>
 
@@ -29,13 +38,13 @@ extension EditPersonaField {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: ViewState.init, send: Action.view) { viewStore in
+			WithViewStore(store, observe: { $0 }) { viewStore in
 				AppTextField(
 					primaryHeading: .init(text: viewStore.primaryHeading),
-					placeholder: "",
+					placeholder: L10n.CreatePersona.NameNewPersona.placeholder,
 					text: viewStore.validation(
 						get: \.$input,
-						send: { .inputFieldChanged($0) }
+						send: { .view(.inputFieldChanged($0)) }
 					),
 					hint: viewStore.inputHint
 				)

@@ -1,7 +1,7 @@
 
 // MARK: - Hint
-public struct Hint: View, Equatable {
-	public struct ViewState: Equatable {
+public struct Hint: View, Sendable, Equatable {
+	public struct ViewState: Sendable, Equatable {
 		public let kind: Kind
 		public let text: Text?
 
@@ -16,7 +16,7 @@ public struct Hint: View, Equatable {
 		}
 	}
 
-	public enum Kind: Equatable {
+	public enum Kind: Sendable, Equatable {
 		case info
 		case error
 		case warning

@@ -83,7 +83,8 @@ public struct EditPersona: Sendable, FeatureReducer {
 			self.labelField = EditPersonaStaticField.State(
 				behaviour: .personaLabel,
 				entryID: mode.persona?.personaData.name?.id,
-				initial: mode.persona?.displayName.value
+				initial: mode.persona?.displayName.value,
+				defaultInfoHint: mode.defaultInfoHint
 			)
 		}
 	}
@@ -274,6 +275,15 @@ extension EditPersona.State.Mode {
 			[]
 		case let .dapp(_, requiredEntries):
 			requiredEntries
+		}
+	}
+
+	var defaultInfoHint: String? {
+		switch self {
+		case .create:
+			L10n.CreatePersona.Explanation.thisWillBeShared
+		case .edit, .dapp:
+			nil
 		}
 	}
 }
