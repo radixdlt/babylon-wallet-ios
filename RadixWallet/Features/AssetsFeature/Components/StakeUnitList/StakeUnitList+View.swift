@@ -26,7 +26,6 @@ public extension StakeUnitList {
 						viewStore.send(.view(.didTapClaimAllStakes))
 					}
 					.rowStyle()
-					.padding(.medium1)
 				}
 
 				if !viewStore.stakedValidators.isEmpty {
