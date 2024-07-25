@@ -71,6 +71,7 @@ extension AssetsView {
 				#if !DEBUG
 				.environment(\.resourceBalanceHideFiatValue, !viewStore.account.address.isOnMainnet)
 				#endif
+				.setListSectionSpacing(.medium2)
 				.buttonStyle(.plain)
 				.scrollContentBackground(.hidden)
 				.listStyle(.insetGrouped)
