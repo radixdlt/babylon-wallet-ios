@@ -1,14 +1,8 @@
 import ComposableArchitecture
 import SwiftUI
 
+// MARK: - IntroductionToPersonas.View
 extension IntroductionToPersonas {
-	public struct ViewState: Equatable {
-		let titleText: String
-		init(state: IntroductionToPersonas.State) {
-			self.titleText = L10n.CreatePersona.Introduction.title
-		}
-	}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<IntroductionToPersonas>
@@ -18,35 +12,33 @@ extension IntroductionToPersonas {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(
-				store,
-				observe: IntroductionToPersonas.ViewState.init(state:),
-				send: { .view($0) }
-			) { viewStore in
+			WithPerceptionTracking {
 				ScrollView {
 					VStack(spacing: .large2) {
-						introToPersona(with: viewStore)
+						introToPersona(with: store)
 					}
 					.multilineTextAlignment(.center)
-					.padding(.horizontal, .large1)
+					.padding(.horizontal, .large2)
 					.padding(.bottom, .medium2)
 				}
 				.footer {
 					Button(L10n.CreatePersona.Introduction.continue) {
-						viewStore.send(.continueButtonTapped)
+						store.send(.view(.continueButtonTapped))
 					}
 					.buttonStyle(.primaryRectangular)
 				}
-				.onAppear { viewStore.send(.appeared) }
+				.onAppear { store.send(.view(.appeared)) }
 				.destinations(with: store)
 			}
 		}
 
 		@ViewBuilder
-		private func introToPersona(with viewStore: ViewStoreOf<IntroductionToPersonas>) -> some SwiftUI.View {
+		private func introToPersona(with viewStore: StoreOf<IntroductionToPersonas>) -> some SwiftUI.View {
 			Image(asset: AssetResource.persona)
+				.resizable()
+				.frame(.veryHuge)
 
-			Text(viewStore.titleText)
+			Text(L10n.CreatePersona.Introduction.title)
 				.foregroundColor(.app.gray1)
 				.textStyle(.sheetTitle)
 

@@ -2,8 +2,9 @@ import ComposableArchitecture
 import SwiftUI
 
 public struct IntroductionToPersonas: Sendable, FeatureReducer {
+	@ObservableState
 	public struct State: Sendable, Hashable {
-		@PresentationState
+		@Presents
 		public var infoPanel: SlideUpPanel.State?
 		public init() {}
 	}

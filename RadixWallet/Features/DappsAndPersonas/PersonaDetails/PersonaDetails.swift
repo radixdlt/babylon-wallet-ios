@@ -188,10 +188,10 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case let .editablePersonaFetched(persona):
 			switch state.mode {
 			case .general:
-				state.destination = .editPersona(.init(mode: .edit, persona: persona))
+				state.destination = .editPersona(.init(mode: .edit(persona)))
 			case let .dApp(_, detailedPersona):
 				let required = Set(detailedPersona.sharedPersonaData.entries.map(\.value.discriminator))
-				state.destination = .editPersona(.init(mode: .dapp(requiredEntries: required), persona: persona))
+				state.destination = .editPersona(.init(mode: .dapp(persona: persona, requiredEntries: required)))
 			}
 
 			return .none

@@ -2,48 +2,63 @@ import ComposableArchitecture
 import SwiftUI
 
 extension EditPersona.State {
-	var viewState: EditPersona.ViewState {
-		.init(
-			personaLabel: persona.displayName.value,
-			avatarURL: URL(string: "something")!,
-			// Need to disable, since broken in swiftformat 0.52.7
-			// swiftformat:disable redundantClosure
-			addAFieldButtonState: {
-				if alreadyAddedEntryKinds.count < EntryKind.supportedKinds.count {
-					.enabled
-				} else {
-					.disabled
-				}
-			}(),
-			// swiftformat:enable redundantClosure
-			output: { () -> EditPersona.Output? in
-				guard
-					let personaLabelInput = labelField.input,
-					let personaLabelOutput = NonEmptyString(rawValue: personaLabelInput.trimmingWhitespace())
-				else {
-					return nil
-				}
+	var title: String {
+		switch mode {
+		case .create:
+			L10n.CreatePersona.Introduction.title
+		case let .edit(persona), let .dapp(persona, _):
+			persona.displayName.value
+		}
+	}
 
-				return EditPersona.Output(
-					personaLabel: personaLabelOutput,
-					name: entries.name?.content,
-					emailAddress: entries.emailAddress?.content,
-					phoneNumber: entries.phoneNumber?.content
-				)
-			}()
+	var saveButtonTitle: String {
+		switch mode {
+		case .create:
+			L10n.CreatePersona.saveAndContinueButtonTitle
+		case .edit, .dapp:
+			L10n.Common.save
+		}
+	}
+
+	var description: String {
+		switch mode {
+		case .create:
+			L10n.CreatePersona.Explanation.someDappsMayRequest
+		case .edit, .dapp:
+			L10n.EditPersona.sharedInformationHeading
+		}
+	}
+
+	// FIXME: Implement avatar change functionality
+	var avatarURL: URL? { nil }
+
+	var addAFieldButtonState: ControlState {
+		if alreadyAddedEntryKinds.count < EntryKind.supportedKinds.count {
+			.enabled
+		} else {
+			.disabled
+		}
+	}
+
+	var output: EditPersona.Output? {
+		guard
+			let personaLabelInput = labelField.input,
+			let personaLabelOutput = NonEmptyString(rawValue: personaLabelInput.trimmingWhitespace())
+		else {
+			return nil
+		}
+
+		return EditPersona.Output(
+			personaLabel: personaLabelOutput,
+			name: entries.name?.content,
+			emailAddress: entries.emailAddress?.content,
+			phoneNumber: entries.phoneNumber?.content
 		)
 	}
 }
 
-// MARK: - EditPersonaDetails.View
+// MARK: - EditPersona.View
 extension EditPersona {
-	public struct ViewState: Equatable {
-		let personaLabel: String
-		let avatarURL: URL
-		let addAFieldButtonState: ControlState
-		let output: Output?
-	}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<EditPersona>
@@ -53,53 +68,69 @@ extension EditPersona {
 		}
 
 		public var body: some SwiftUI.View {
-			NavigationStack {
-				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-					ScrollView(showsIndicators: false) {
-						VStack(spacing: .medium1) {
-							Thumbnail(.persona, url: viewStore.avatarURL, size: .veryLarge)
+			WithViewStore(store, observe: { $0 }) { viewStore in
+				switch viewStore.mode {
+				case .create:
+					content(viewStore)
 
-							EditPersonaField.View(store: store.labelField)
-
-							Separator()
-
-							Text(L10n.EditPersona.sharedInformationHeading)
-								.multilineTextAlignment(.leading)
-								.textStyle(.body1HighImportance)
-								.foregroundColor(.app.gray2)
-
-							Separator()
-
-							EditPersonaEntries.View(store: store.personaEntries)
-
-							Button(action: { viewStore.send(.addAFieldButtonTapped) }) {
-								Text(L10n.EditPersona.addAField).padding(.horizontal, .medium2)
+				case .edit, .dapp:
+					NavigationStack {
+						content(viewStore)
+							.radixToolbar(title: viewStore.title) {
+								viewStore.send(.view(.closeButtonTapped))
 							}
-							.buttonStyle(.secondaryRectangular)
-							.controlState(viewStore.addAFieldButtonState)
-							.padding(.top, .medium2)
-						}
-						.padding(.horizontal, .medium1)
-						.padding(.vertical, .medium1)
-					}
-					.scrollDismissesKeyboard(.interactively)
-					.footer {
-						WithControlRequirements(
-							viewStore.output,
-							forAction: { viewStore.send(.saveButtonTapped($0)) }
-						) { action in
-							Button(L10n.Common.save, action: action)
-								.buttonStyle(.primaryRectangular)
-						}
-					}
-					.radixToolbar(title: viewStore.personaLabel)
-					.toolbar {
-						ToolbarItem(placement: .cancellationAction) {
-							CloseButton { viewStore.send(.closeButtonTapped) }
-						}
 					}
 				}
-				.destinations(with: store)
+			}
+			.destinations(with: store)
+		}
+
+		private func content(_ viewStore: ViewStore<EditPersona.State, EditPersona.Action>) -> some SwiftUI.View {
+			ScrollView(showsIndicators: false) {
+				VStack(spacing: .large2) {
+					if viewStore.mode == .create {
+						Text(viewStore.title)
+							.foregroundColor(.app.gray1)
+							.textStyle(.sheetTitle)
+					}
+
+					Thumbnail(.persona, url: viewStore.avatarURL, size: .veryLarge)
+
+					EditPersonaField.View(store: store.labelField)
+
+					VStack(spacing: .medium1) {
+						Separator()
+
+						Text(viewStore.description)
+							.multilineTextAlignment(.leading)
+							.textStyle(.body1HighImportance)
+							.foregroundColor(.app.gray2)
+
+						if !viewStore.entries.isEmpty {
+							Separator()
+							EditPersonaEntries.View(store: store.personaEntries)
+								.padding(.top, .medium3)
+						}
+					}
+
+					Button(action: { viewStore.send(.view(.addAFieldButtonTapped)) }) {
+						Text(L10n.EditPersona.addAField).padding(.horizontal, .medium2)
+					}
+					.buttonStyle(.secondaryRectangular)
+					.controlState(viewStore.addAFieldButtonState)
+				}
+				.padding(.horizontal, .medium1)
+				.padding(.vertical, .medium1)
+			}
+			.scrollDismissesKeyboard(.interactively)
+			.footer {
+				WithControlRequirements(
+					viewStore.output,
+					forAction: { viewStore.send(.view(.saveButtonTapped($0))) }
+				) { action in
+					Button(viewStore.saveButtonTitle, action: action)
+						.buttonStyle(.primaryRectangular)
+				}
 			}
 		}
 	}
@@ -114,11 +145,11 @@ private extension StoreOf<EditPersona> {
 	}
 
 	var labelField: StoreOf<EditPersonaStaticField> {
-		scope(state: \.labelField) { .child(.labelField($0)) }
+		scope(state: \.labelField, action: \.child.labelField)
 	}
 
 	var personaEntries: StoreOf<EditPersonaEntries> {
-		scope(state: \.entries) { .child(.entries($0)) }
+		scope(state: \.entries, action: \.child.entries)
 	}
 }
 
@@ -131,20 +162,13 @@ private extension View {
 	}
 
 	private func closeConfirmationDialog(with destinationStore: PresentationStoreOf<EditPersona.Destination>) -> some View {
-		confirmationDialog(
-			store: destinationStore,
-			state: /EditPersona.Destination.State.closeConfirmationDialog,
-			action: EditPersona.Destination.Action.closeConfirmationDialog
-		)
+		confirmationDialog(store: destinationStore.scope(state: \.closeConfirmationDialog, action: \.closeConfirmationDialog))
 	}
 
 	private func addFields(with destinationStore: PresentationStoreOf<EditPersona.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /EditPersona.Destination.State.addFields,
-			action: EditPersona.Destination.Action.addFields,
-			content: { EditPersonaAddEntryKinds.View(store: $0) }
-		)
+		sheet(store: destinationStore.scope(state: \.addFields, action: \.addFields)) {
+			EditPersonaAddEntryKinds.View(store: $0)
+		}
 	}
 }
 
@@ -158,7 +182,7 @@ struct EditPersona_Preview: PreviewProvider {
 		EditPersona.View(
 			store: .init(
 				initialState: .previewValue(
-					mode: .edit
+					mode: .edit(.sample)
 				),
 				reducer: EditPersona.init
 			)
@@ -167,7 +191,7 @@ struct EditPersona_Preview: PreviewProvider {
 
 		EditPersona.View(
 			store: .init(
-				initialState: .previewValue(mode: .edit),
+				initialState: .previewValue(mode: .edit(.sample)),
 				reducer: EditPersona.init
 			)
 		)
@@ -177,10 +201,7 @@ struct EditPersona_Preview: PreviewProvider {
 
 extension EditPersona.State {
 	public static func previewValue(mode: EditPersona.State.Mode) -> Self {
-		.init(
-			mode: mode,
-			persona: .previewValue0
-		)
+		.init(mode: mode)
 	}
 }
 #endif

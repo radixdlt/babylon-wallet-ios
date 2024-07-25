@@ -57,8 +57,9 @@ extension EditPersona {
 public struct EditPersona: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Mode: Sendable, Hashable {
-			case edit
-			case dapp(requiredEntries: Set<EntryKind>)
+			case create
+			case edit(Persona)
+			case dapp(persona: Persona, requiredEntries: Set<EntryKind>)
 		}
 
 		public enum StaticFieldID: Sendable, Hashable, Comparable {
@@ -66,7 +67,6 @@ public struct EditPersona: Sendable, FeatureReducer {
 		}
 
 		let mode: Mode
-		let persona: Persona
 		var entries: EditPersonaEntries.State
 		var labelField: EditPersonaStaticField.State
 
@@ -77,21 +77,18 @@ public struct EditPersona: Sendable, FeatureReducer {
 			[entries.name?.kind, entries.emailAddress?.kind, entries.phoneNumber?.kind].compactMap(identity)
 		}
 
-		public init(
-			mode: Mode,
-			persona: Persona
-		) {
+		public init(mode: Mode) {
 			self.mode = mode
-			self.persona = persona
-			self.entries = .init(with: persona.personaData, mode: mode)
+			self.entries = .init(with: mode.persona?.personaData ?? .init(), mode: mode)
 			self.labelField = EditPersonaStaticField.State(
 				behaviour: .personaLabel,
-				entryID: persona.personaData.name?.id,
-				initial: persona.displayName.value
+				entryID: mode.persona?.personaData.name?.id,
+				initial: mode.persona?.displayName.value
 			)
 		}
 	}
 
+	@CasePathable
 	public enum ViewAction: Sendable, Equatable {
 		case closeButtonTapped
 		case saveButtonTapped(Output)
@@ -103,21 +100,28 @@ public struct EditPersona: Sendable, FeatureReducer {
 		}
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case labelField(EditPersonaStaticField.Action)
 		case entries(EditPersonaEntries.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
+		case personaInfoSet(
+			personaName: NonEmptyString,
+			personaData: PersonaData
+		)
 		case personaSaved(Persona)
 	}
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case closeConfirmationDialog(ConfirmationDialogState<ViewAction.CloseConfirmationDialogAction>)
 			case addFields(EditPersonaAddEntryKinds.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case closeConfirmationDialog(ViewAction.CloseConfirmationDialogAction)
 			case addFields(EditPersonaAddEntryKinds.Action)
@@ -138,14 +142,14 @@ public struct EditPersona: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.labelField, action: /Action.child .. ChildAction.labelField) {
+		Scope(state: \.labelField, action: \.child.labelField) {
 			EditPersonaField()
 		}
-		Scope(state: \.entries, action: /Action.child .. ChildAction.entries) {
+		Scope(state: \.entries, action: \.child.entries) {
 			EditPersonaEntries()
 		}
 		Reduce(core)
-			.ifLet(destinationPath, action: /Action.destination) {
+			.ifLet(destinationPath, action: \.destination) {
 				Destination()
 			}
 	}
@@ -178,17 +182,23 @@ public struct EditPersona: Sendable, FeatureReducer {
 			return .none
 
 		case let .saveButtonTapped(output):
-			return .run { [state] send in
-				let updatedPersona = state.persona.updated(with: output)
-				try await authorizedDappsClient.removeBrokenReferencesToSharedPersonaData(
-					personaCurrent: state.persona,
-					personaUpdated: updatedPersona
-				)
-				try await personasClient.updatePersona(updatedPersona)
-				await send(.delegate(.personaSaved(updatedPersona)))
-				await dismiss()
-			} catch: { error, _ in
-				errorQueue.schedule(error)
+			switch state.mode {
+			case .create:
+				return .send(.delegate(.personaInfoSet(personaName: output.personaLabel, personaData: output.personaData)))
+
+			case let .edit(persona), let .dapp(persona, _):
+				return .run { send in
+					let updatedPersona = persona.updated(with: output)
+					try await authorizedDappsClient.removeBrokenReferencesToSharedPersonaData(
+						personaCurrent: persona,
+						personaUpdated: updatedPersona
+					)
+					try await personasClient.updatePersona(updatedPersona)
+					await send(.delegate(.personaSaved(updatedPersona)))
+					await dismiss()
+				} catch: { error, _ in
+					errorQueue.schedule(error)
+				}
 			}
 
 		case .addAFieldButtonTapped:
@@ -217,9 +227,6 @@ public struct EditPersona: Sendable, FeatureReducer {
 
 				case .phoneNumber:
 					state.entries.phoneNumber = try? .singleFieldEntry(entryID: nil, kind)
-
-				default:
-					continue
 				}
 			}
 			state.destination = nil
@@ -242,7 +249,7 @@ extension PersonaDataEntryName {
 
 extension EditPersona.State {
 	func hasChanges() -> Bool {
-		guard let output = viewState.output else { return false }
+		guard let output, let persona = mode.persona else { return false }
 		return output.personaLabel.rawValue != persona.displayName.rawValue
 			// FIXME: Figure out some better way for diffing. Currently if we'd simply do `output.personaData != persona.personaData` we'd get `false` as `id`s would not match.
 			|| output.personaData.name?.value != persona.personaData.name?.value
@@ -252,11 +259,20 @@ extension EditPersona.State {
 }
 
 extension EditPersona.State.Mode {
+	var persona: Persona? {
+		switch self {
+		case let .edit(persona), let .dapp(persona, _):
+			persona
+		case .create:
+			nil
+		}
+	}
+
 	var requiredEntries: Set<PersonaData.Entry.Kind> {
 		switch self {
-		case .edit:
+		case .create, .edit:
 			[]
-		case let .dapp(requiredEntries):
+		case let .dapp(_, requiredEntries):
 			requiredEntries
 		}
 	}
@@ -280,7 +296,6 @@ extension PersonaData.Entry {
 		case let .name(entryModel): entryModel.description
 		case let .emailAddress(entryModel): entryModel.email
 		case let .phoneNumber(entryModel): entryModel.number
-		default: fatalError("Add support for new PersonaData entry kinds")
 		}
 	}
 }
