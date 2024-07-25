@@ -41,7 +41,7 @@ public struct ResourceBalanceButton: View {
 			case .nonFungible:
 				.large3
 			case .liquidStakeUnit:
-				.small1
+				.medium3
 			case .poolUnit, .stakeClaimNFT:
 				.medium1
 			}

@@ -32,11 +32,11 @@ struct ValidatorStakeView: View {
 		} label: {
 			ValidatorHeaderView(viewState: viewState.validatorNameViewState)
 				.contentShape(Rectangle())
-				.padding(.vertical, .medium3)
-				.padding(.horizontal, .small1)
-				.rowStyle()
+				.padding(.vertical, .large3)
+				.padding(.horizontal, .medium1)
 		}
 		.buttonStyle(.borderless)
+		.rowStyle()
 
 		if isExpanded {
 			if let liquidStakeUnitViewState = viewState.liquidStakeUnit {
