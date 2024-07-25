@@ -4,21 +4,23 @@ public struct EntitySecurityProblemsView: SwiftUI.View {
 	let action: () -> Void
 
 	public var body: some View {
-		VStack(alignment: .leading, spacing: .small2) {
-			ForEach(config.problems) { problem in
-				Button(action: action) {
-					switch config.kind {
-					case .account:
-						account(problem: problem)
-					case .persona:
-						WarningErrorView(text: problem.personas, type: .warning, useNarrowSpacing: true)
-							.frame(maxWidth: .infinity, alignment: .leading)
-							.padding(.bottom, .small3)
+		if !config.problems.isEmpty {
+			VStack(alignment: .leading, spacing: .small2) {
+				ForEach(config.problems) { problem in
+					Button(action: action) {
+						switch config.kind {
+						case .account:
+							account(problem: problem)
+						case .persona:
+							WarningErrorView(text: problem.personas, type: .warning, useNarrowSpacing: true)
+								.frame(maxWidth: .infinity, alignment: .leading)
+								.padding(.bottom, .small3)
+						}
 					}
 				}
 			}
+			.padding(.vertical, config.verticalPadding)
 		}
-		.padding(.vertical, config.verticalPadding)
 	}
 
 	private func account(problem: SecurityProblem) -> some SwiftUI.View {

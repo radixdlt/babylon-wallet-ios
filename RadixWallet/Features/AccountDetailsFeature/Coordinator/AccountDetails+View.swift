@@ -78,33 +78,34 @@ extension AccountDetails {
 
 		@ViewBuilder
 		func header(with viewStore: ViewStore<AccountDetails.ViewState, AccountDetails.ViewAction>) -> some SwiftUI.View {
-			AddressView(.address(.account(viewStore.accountAddress)))
-				.foregroundColor(.app.whiteTransparent)
-				.textStyle(.body2HighImportance)
-				.padding(.bottom, .small1)
+			VStack(spacing: .medium1) {
+				AddressView(.address(.account(viewStore.accountAddress)))
+					.foregroundColor(.app.whiteTransparent)
+					.textStyle(.body2HighImportance)
 
-			if let totalFiatWorth = viewStore.totalFiatWorth {
-				TotalCurrencyWorthView(
-					state: .init(totalCurrencyWorth: totalFiatWorth),
-					backgroundColor: .clear
-				) {
-					viewStore.send(.showFiatWorthToggled)
+				if let totalFiatWorth = viewStore.totalFiatWorth {
+					TotalCurrencyWorthView(
+						state: .init(totalCurrencyWorth: totalFiatWorth),
+						backgroundColor: .clear
+					) {
+						viewStore.send(.showFiatWorthToggled)
+					}
+					.foregroundColor(.app.white)
+					.padding(.bottom, .small3)
 				}
-				.foregroundColor(.app.white)
-				.padding(.horizontal, .medium1)
-			}
 
-			HStack(spacing: .medium3) {
-				historyButton()
-				transferButton()
-			}
-			.padding(.top, .small1)
-			.padding([.horizontal, .bottom], .medium1)
+				HStack(spacing: .medium3) {
+					historyButton
+					transferButton
+				}
+				.padding(.horizontal, .small3)
 
-			EntitySecurityProblemsView(config: viewStore.securityProblemsConfig) {
-				viewStore.send(.securityProblemsTapped)
+				EntitySecurityProblemsView(config: viewStore.securityProblemsConfig) {
+					viewStore.send(.securityProblemsTapped)
+				}
 			}
-			.padding([.horizontal, .bottom], .medium1)
+			.padding(.bottom, .medium1)
+			.padding(.horizontal, .medium1)
 		}
 
 		func assetsView() -> some SwiftUI.View {
@@ -113,20 +114,16 @@ extension AccountDetails {
 				.ignoresSafeArea(edges: .bottom)
 		}
 
-		func transferButton() -> some SwiftUI.View {
+		private var transferButton: some SwiftUI.View {
 			Button(L10n.Account.transfer, asset: AssetResource.transfer) {
 				store.send(.view(.transferButtonTapped))
 			}
 			.buttonStyle(.header)
 		}
 
-		func historyButton() -> some SwiftUI.View {
-			Button {
+		private var historyButton: some SwiftUI.View {
+			Button(L10n.Common.history, asset: AssetResource.iconHistory) {
 				store.send(.view(.historyButtonTapped))
-			} label: {
-				HStack(alignment: .center) {
-					Label(L10n.Common.history, asset: AssetResource.iconHistory)
-				}
 			}
 			.buttonStyle(.header)
 		}
@@ -148,7 +145,7 @@ public struct HeaderButtonStyle: ButtonStyle {
 			.foregroundColor(.app.white)
 			.frame(height: .standardButtonHeight)
 			.background(.app.whiteTransparent3)
-			.cornerRadius(.standardButtonHeight / 2)
+			.cornerRadius(.large2)
 			.opacity(configuration.isPressed ? 0.4 : 1)
 	}
 }
