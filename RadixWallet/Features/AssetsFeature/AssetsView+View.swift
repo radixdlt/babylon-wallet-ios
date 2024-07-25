@@ -133,9 +133,15 @@ extension AssetsView {
 
 extension View {
 	/// The common style for rows displayed in AssetsView
-	func rowStyle() -> some View {
+	func rowStyle(showSeparator: Bool = false) -> some View {
 		self
 			.listRowInsets(.init())
-			.listRowSeparator(.hidden)
+			.listRowSeparator(showSeparator ? .automatic : .hidden)
+			.alignmentGuide(.listRowSeparatorLeading) { _ in
+				.medium2
+			}
+			.alignmentGuide(.listRowSeparatorTrailing) { d in
+				d[.trailing] - .medium2
+			}
 	}
 }
