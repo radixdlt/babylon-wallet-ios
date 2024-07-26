@@ -25,6 +25,7 @@ extension NonFungibleAssetList.Row.View {
 			Section {
 				rowView(viewStore)
 					.rowStyle()
+					.listRowBackground(viewStore.rowBackground)
 
 				if viewStore.isExpanded {
 					ForEach(
@@ -70,12 +71,36 @@ extension NonFungibleAssetList.Row.View {
 			}
 			.padding(.horizontal, .medium1)
 			.padding(.top, .large3)
-			.padding(.bottom, .medium1)
-			.background(.app.white)
+			.padding(.bottom, .medium1 + CGFloat(viewStore.stackedCards) * .small2)
 		}
 	}
 
 	private var headerHeight: CGFloat { HitTargetSize.small.frame.height + 2 * .medium1 }
+}
+
+private extension ViewStoreOf<NonFungibleAssetList.Row> {
+	var stackedCards: Int {
+		if self.isExpanded {
+			0
+		} else if self.resource.nonFungibleIdsCount == 1 {
+			1
+		} else {
+			2
+		}
+	}
+
+	var rowBackground: some View {
+		Group {
+			switch stackedCards {
+			case 0:
+				Color.white
+			case 1:
+				Image(.listBackgroundSimple).resizable()
+			default:
+				Image(.listBackgroundMultiple).resizable()
+			}
+		}
+	}
 }
 
 // MARK: - Private Computed Properties
