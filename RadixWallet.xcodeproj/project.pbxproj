@@ -208,8 +208,6 @@
 		48CFC2F32ADC10D900E77A5C /* CreatePersonaCoordinator+Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD7F2ADC10D800E77A5C /* CreatePersonaCoordinator+Models.swift */; };
 		48CFC2F42ADC10D900E77A5C /* IntroductionToPersonas+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD822ADC10D800E77A5C /* IntroductionToPersonas+View.swift */; };
 		48CFC2F52ADC10D900E77A5C /* IntroductionToPersonas.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD832ADC10D800E77A5C /* IntroductionToPersonas.swift */; };
-		48CFC2F82ADC10D900E77A5C /* InfoOfNewPersona+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD882ADC10D800E77A5C /* InfoOfNewPersona+View.swift */; };
-		48CFC2F92ADC10D900E77A5C /* InfoOfNewPersona+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD892ADC10D800E77A5C /* InfoOfNewPersona+Reducer.swift */; };
 		48CFC2FA2ADC10D900E77A5C /* NewPersonaCompletion+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD8B2ADC10D800E77A5C /* NewPersonaCompletion+View.swift */; };
 		48CFC2FB2ADC10D900E77A5C /* NewPersonaCompletion+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD8C2ADC10D800E77A5C /* NewPersonaCompletion+Reducer.swift */; };
 		48CFC2FC2ADC10D900E77A5C /* DefaultDepositGuarantees+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD902ADC10D800E77A5C /* DefaultDepositGuarantees+Reducer.swift */; };
@@ -1389,8 +1387,6 @@
 		48CFBD7F2ADC10D800E77A5C /* CreatePersonaCoordinator+Models.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CreatePersonaCoordinator+Models.swift"; sourceTree = "<group>"; };
 		48CFBD822ADC10D800E77A5C /* IntroductionToPersonas+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "IntroductionToPersonas+View.swift"; sourceTree = "<group>"; };
 		48CFBD832ADC10D800E77A5C /* IntroductionToPersonas.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntroductionToPersonas.swift; sourceTree = "<group>"; };
-		48CFBD882ADC10D800E77A5C /* InfoOfNewPersona+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "InfoOfNewPersona+View.swift"; sourceTree = "<group>"; };
-		48CFBD892ADC10D800E77A5C /* InfoOfNewPersona+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "InfoOfNewPersona+Reducer.swift"; sourceTree = "<group>"; };
 		48CFBD8B2ADC10D800E77A5C /* NewPersonaCompletion+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NewPersonaCompletion+View.swift"; sourceTree = "<group>"; };
 		48CFBD8C2ADC10D800E77A5C /* NewPersonaCompletion+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NewPersonaCompletion+Reducer.swift"; sourceTree = "<group>"; };
 		48CFBD902ADC10D800E77A5C /* DefaultDepositGuarantees+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DefaultDepositGuarantees+Reducer.swift"; sourceTree = "<group>"; };
@@ -3324,7 +3320,6 @@
 			isa = PBXGroup;
 			children = (
 				48CFBD812ADC10D800E77A5C /* Introduction */,
-				48CFBD872ADC10D800E77A5C /* InfoOfNewPersona */,
 				48CFBD8A2ADC10D800E77A5C /* NewPersonaCompletion */,
 			);
 			path = Children;
@@ -3337,15 +3332,6 @@
 				48CFBD832ADC10D800E77A5C /* IntroductionToPersonas.swift */,
 			);
 			path = Introduction;
-			sourceTree = "<group>";
-		};
-		48CFBD872ADC10D800E77A5C /* InfoOfNewPersona */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBD882ADC10D800E77A5C /* InfoOfNewPersona+View.swift */,
-				48CFBD892ADC10D800E77A5C /* InfoOfNewPersona+Reducer.swift */,
-			);
-			path = InfoOfNewPersona;
 			sourceTree = "<group>";
 		};
 		48CFBD8A2ADC10D800E77A5C /* NewPersonaCompletion */ = {
@@ -7139,7 +7125,6 @@
 				48CFC3F02ADC10D900E77A5C /* RTCPrimitive.swift in Sources */,
 				A4ECE27B2BEEB01800468BF6 /* CloudBackupClient+Test.swift in Sources */,
 				48CFC2C02ADC10D900E77A5C /* AssetTransfer+View.swift in Sources */,
-				48CFC2F82ADC10D900E77A5C /* InfoOfNewPersona+View.swift in Sources */,
 				48CFC3EC2ADC10D900E77A5C /* DataChannelMessage.swift in Sources */,
 				48CFC3FF2ADC10D900E77A5C /* RTCPeerConnectionAsyncDelegate.swift in Sources */,
 				83EE5EE32BE3C16F00B1531D /* AccountDepositPreValidationResourceBadge.swift in Sources */,
@@ -7259,7 +7244,6 @@
 				48CFC56B2ADC10DA00E77A5C /* MetadataU8ArrayValue.swift in Sources */,
 				A4CFB55F2BAA821E00778BDD /* HScrollBar.swift in Sources */,
 				83EE5ED12BE3C16F00B1531D /* ComponentMethodRoyalty.swift in Sources */,
-				48CFC2F92ADC10D900E77A5C /* InfoOfNewPersona+Reducer.swift in Sources */,
 				48CFC44D2ADC10DA00E77A5C /* MnemonicClient+Live.swift in Sources */,
 				48CFC57E2ADC10DA00E77A5C /* ValidatorState.swift in Sources */,
 				48CFC56C2ADC10DA00E77A5C /* StateEntityFungiblesPageRequestOptIns.swift in Sources */,
