@@ -99,7 +99,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 
 	public var body: some View {
 		HStack(alignment: .textFieldAlignment, spacing: 0) {
-			VStack(alignment: .leading, spacing: .small3) {
+			VStack(alignment: .leading, spacing: .small1) {
 				HStack(spacing: 0) {
 					if let primaryHeading {
 						VStack(alignment: .leading, spacing: 0) {
@@ -166,8 +166,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 
 					innerAccesory
 				}
-				.padding([.top, .bottom])
-				.padding([.leading, .trailing], 6)
+				.padding(.medium3)
 				.frame(height: .standardButtonHeight)
 				.background(Color.app.gray5)
 				.cornerRadius(.small2)
@@ -186,10 +185,8 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 
 	private func accentColor(isFocused: Bool) -> Color {
 		switch hint?.viewState.kind {
-		case .none:
+		case .none, .info:
 			isFocused ? .app.gray1 : .app.gray4
-		case .info:
-			.app.gray1
 		case .error:
 			.app.red1
 		case .warning:

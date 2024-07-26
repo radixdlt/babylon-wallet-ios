@@ -32,6 +32,7 @@ extension EditPersonaField.State {
 extension EditPersonaField {
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<EditPersonaField>
+		@FocusState private var textFieldFocus: Bool
 
 		public init(store: StoreOf<EditPersonaField>) {
 			self.store = store
@@ -46,7 +47,15 @@ extension EditPersonaField {
 						get: \.$input,
 						send: { .view(.inputFieldChanged($0)) }
 					),
-					hint: viewStore.inputHint
+					hint: viewStore.inputHint,
+					focus: .on(
+						true,
+						binding: viewStore.binding(
+							get: \.textFieldFocused,
+							send: { .view(.focusChanged($0)) }
+						),
+						to: $textFieldFocus
+					)
 				)
 				.textContentType(viewStore.contentType)
 				.keyboardType(viewStore.keyboardType)

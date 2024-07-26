@@ -17,6 +17,7 @@ public struct EditPersonaField<Behaviour: EditPersonaFieldKindBehaviour>: Sendab
 		let isRequestedByDapp: Bool
 		let showsTitle: Bool
 		let defaultInfoHint: String?
+		var textFieldFocused: Bool
 
 		@Validation<String, String>
 		public var input: String?
@@ -27,7 +28,8 @@ public struct EditPersonaField<Behaviour: EditPersonaFieldKindBehaviour>: Sendab
 			input: Validation<String, String>,
 			isRequestedByDapp: Bool,
 			showsTitle: Bool,
-			defaultInfoHint: String? = nil
+			defaultInfoHint: String?,
+			textFieldFocused: Bool
 		) {
 			@Dependency(\.uuid) var uuid
 			self.entryID = entryID ?? uuid()
@@ -36,6 +38,7 @@ public struct EditPersonaField<Behaviour: EditPersonaFieldKindBehaviour>: Sendab
 			self.isRequestedByDapp = isRequestedByDapp
 			self.showsTitle = showsTitle
 			self.defaultInfoHint = defaultInfoHint
+			self.textFieldFocused = textFieldFocused
 		}
 	}
 
@@ -43,12 +46,17 @@ public struct EditPersonaField<Behaviour: EditPersonaFieldKindBehaviour>: Sendab
 
 	public enum ViewAction: Sendable, Equatable {
 		case inputFieldChanged(String)
+		case focusChanged(Bool)
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .inputFieldChanged(input):
 			state.input = input
+			return .none
+
+		case let .focusChanged(value):
+			state.textFieldFocused = value
 			return .none
 		}
 	}
@@ -90,7 +98,8 @@ extension EditPersonaStaticField.State {
 		behaviour: Behaviour,
 		entryID: PersonaDataEntryID?,
 		initial: String?,
-		defaultInfoHint: String? = nil
+		defaultInfoHint: String? = nil,
+		textFieldFocused: Bool = false
 	) {
 		self.init(
 			behaviour: behaviour,
@@ -105,7 +114,8 @@ extension EditPersonaStaticField.State {
 			),
 			isRequestedByDapp: false,
 			showsTitle: true,
-			defaultInfoHint: defaultInfoHint
+			defaultInfoHint: defaultInfoHint,
+			textFieldFocused: textFieldFocused
 		)
 	}
 }
@@ -227,7 +237,8 @@ extension EditPersonaDynamicField.State {
 		text: String?,
 		isRequiredByDapp: Bool,
 		showsTitle: Bool,
-		defaultInfoHint: String? = nil
+		defaultInfoHint: String? = nil,
+		textFieldFocused: Bool = false
 	) {
 		self.init(
 			behaviour: behaviour,
@@ -239,7 +250,8 @@ extension EditPersonaDynamicField.State {
 			),
 			isRequestedByDapp: isRequiredByDapp,
 			showsTitle: showsTitle,
-			defaultInfoHint: defaultInfoHint
+			defaultInfoHint: defaultInfoHint,
+			textFieldFocused: textFieldFocused
 		)
 	}
 }

@@ -84,7 +84,8 @@ public struct EditPersona: Sendable, FeatureReducer {
 				behaviour: .personaLabel,
 				entryID: mode.persona?.personaData.name?.id,
 				initial: mode.persona?.displayName.value,
-				defaultInfoHint: mode.defaultInfoHint
+				defaultInfoHint: mode.defaultInfoHint,
+				textFieldFocused: mode == .create
 			)
 		}
 	}

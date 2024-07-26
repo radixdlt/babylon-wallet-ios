@@ -60,11 +60,11 @@ public struct Hint: View, Sendable, Equatable {
 						.renderingMode(.template)
 						.resizable()
 						.scaledToFit()
-						.frame(.smallest)
+						.frame(.icon)
 				}
 				text
 					.lineSpacing(0)
-					.textStyle(.body2HighImportance)
+					.textStyle(.body2Regular)
 			}
 			.foregroundColor(foregroundColor)
 		}
