@@ -4,6 +4,7 @@ import SwiftUI
 // MARK: - EditPersonaFieldKindBehaviour
 public protocol EditPersonaFieldKindBehaviour: Sendable, Hashable, Comparable {
 	var title: String { get }
+	var placeholder: String { get }
 	var contentType: UITextContentType? { get }
 	var keyboardType: UIKeyboardType { get }
 	var capitalization: EquatableTextInputCapitalization? { get }
@@ -71,6 +72,12 @@ extension EditPersona.State.StaticFieldID: EditPersonaFieldKindBehaviour {
 	public var title: String {
 		switch self {
 		case .personaLabel: L10n.AuthorizedDapps.PersonaDetails.personaLabelHeading
+		}
+	}
+
+	public var placeholder: String {
+		switch self {
+		case .personaLabel: L10n.CreatePersona.NameNewPersona.placeholder
 		}
 	}
 
@@ -155,6 +162,8 @@ extension DynamicFieldID: EditPersonaFieldKindBehaviour {
 		case .creditCard: "Credit Card"
 		}
 	}
+
+	public var placeholder: String { "" }
 
 	public var contentType: UITextContentType? {
 		switch self {

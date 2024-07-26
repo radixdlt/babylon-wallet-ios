@@ -15,6 +15,10 @@ extension EditPersonaField.State {
 		return nil
 	}
 
+	var placeholder: String {
+		behaviour.placeholder
+	}
+
 	var contentType: UITextContentType? {
 		behaviour.contentType
 	}
@@ -42,7 +46,7 @@ extension EditPersonaField {
 			WithViewStore(store, observe: { $0 }) { viewStore in
 				AppTextField(
 					primaryHeading: viewStore.primaryHeading.map { .init(text: $0) },
-					placeholder: L10n.CreatePersona.NameNewPersona.placeholder,
+					placeholder: viewStore.placeholder,
 					text: viewStore.validation(
 						get: \.$input,
 						send: { .view(.inputFieldChanged($0)) }
