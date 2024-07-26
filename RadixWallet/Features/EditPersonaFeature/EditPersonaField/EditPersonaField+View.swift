@@ -64,6 +64,7 @@ extension EditPersonaField {
 				.textContentType(viewStore.contentType)
 				.keyboardType(viewStore.keyboardType)
 				.textInputAutocapitalization(viewStore.capitalization?.rawValue)
+				.autocorrectionDisabled()
 			}
 		}
 	}
