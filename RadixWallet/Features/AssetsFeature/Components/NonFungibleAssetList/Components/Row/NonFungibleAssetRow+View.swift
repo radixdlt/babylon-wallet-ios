@@ -49,7 +49,7 @@ extension NonFungibleAssetList.Row.View {
 		Button {
 			viewStore.send(.isExpandedToggled)
 		} label: {
-			HStack(spacing: .small1) {
+			HStack(spacing: .zero) {
 				Thumbnail(.nft, url: viewStore.resource.metadata.iconURL, size: .small)
 
 				VStack(alignment: .leading, spacing: .small2) {
@@ -64,8 +64,10 @@ extension NonFungibleAssetList.Row.View {
 						.font(.app.body2HighImportance)
 						.foregroundColor(.app.gray2)
 				}
+				.padding(.leading, .small1)
+
+				Spacer()
 			}
-			.frame(maxWidth: .infinity, alignment: .leading)
 			.padding(.horizontal, .medium1)
 			.padding(.top, .large3)
 			.padding(.bottom, .medium1)
