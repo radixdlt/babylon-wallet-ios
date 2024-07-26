@@ -49,3 +49,7 @@ extension CollectionOfEmailAddresses: PersonaDataCollectionProtocol {
 extension PersonaDataIdentifiedEmailAddress: PersonaDataCollectionElement {
 	public typealias Value = PersonaDataEntryEmailAddress
 }
+
+extension Persona {
+	public static let nameMaxLength = 30
+}

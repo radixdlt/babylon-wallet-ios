@@ -116,7 +116,7 @@ extension EditPersonaStaticField.State {
 				onNil: nil,
 				rules: [
 					.if(\.isBlank, error: L10n.EditPersona.Error.blank),
-					.if({ $0.count > Account.nameMaxLength }, error: L10n.Error.PersonaLabel.tooLong), // FIXME: define nameMaxLength for Persona
+					.if({ $0.count > Persona.nameMaxLength }, error: L10n.Error.PersonaLabel.tooLong),
 				]
 			),
 			isRequestedByDapp: false,
