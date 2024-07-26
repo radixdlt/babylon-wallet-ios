@@ -214,6 +214,9 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 		case let .presentResponseSuccessView(dappMetadata, txID, p2pRoute):
 			state.shouldIncrementOnCompletionDismiss = txID != nil
+			if !state.requestQueue.isEmpty {
+				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
+			}
 			state.destination = .dappInteractionCompletion(
 				.init(
 					txID: txID,
