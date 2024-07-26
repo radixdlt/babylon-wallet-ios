@@ -105,6 +105,7 @@ extension EditPersona {
 							.multilineTextAlignment(.leading)
 							.textStyle(.body1HighImportance)
 							.foregroundColor(.app.gray2)
+							.flushedLeft
 
 						if !viewStore.entries.isEmpty {
 							Separator()

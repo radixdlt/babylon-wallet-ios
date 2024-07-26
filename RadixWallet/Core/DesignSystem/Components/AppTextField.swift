@@ -100,29 +100,31 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 	public var body: some View {
 		HStack(alignment: .textFieldAlignment, spacing: 0) {
 			VStack(alignment: .leading, spacing: .small1) {
-				HStack(spacing: 0) {
-					if let primaryHeading {
-						VStack(alignment: .leading, spacing: 0) {
-							Text(primaryHeading.text)
-								.textStyle(primaryHeading.isProminent ? .body1HighImportance : .body2Regular)
-								.foregroundColor(primaryHeading.isProminent && isEnabled ? accentColor(isFocused: true) : .app.gray2)
-								.multilineTextAlignment(.leading)
-							if let subHeading {
-								Text(subHeading)
-									.textStyle(.body2Regular)
-									.foregroundColor(.app.gray2)
-									.multilineTextAlignment(.trailing)
+				if primaryHeading != nil || secondaryHeading != nil {
+					HStack(spacing: 0) {
+						if let primaryHeading {
+							VStack(alignment: .leading, spacing: 0) {
+								Text(primaryHeading.text)
+									.textStyle(primaryHeading.isProminent ? .body1HighImportance : .body2Regular)
+									.foregroundColor(primaryHeading.isProminent && isEnabled ? accentColor(isFocused: true) : .app.gray2)
+									.multilineTextAlignment(.leading)
+								if let subHeading {
+									Text(subHeading)
+										.textStyle(.body2Regular)
+										.foregroundColor(.app.gray2)
+										.multilineTextAlignment(.trailing)
+								}
 							}
 						}
-					}
 
-					Spacer(minLength: 0)
+						Spacer(minLength: 0)
 
-					if let secondaryHeading {
-						Text(secondaryHeading)
-							.textStyle(.body2Regular)
-							.foregroundColor(.app.gray2)
-							.multilineTextAlignment(.trailing)
+						if let secondaryHeading {
+							Text(secondaryHeading)
+								.textStyle(.body2Regular)
+								.foregroundColor(.app.gray2)
+								.multilineTextAlignment(.trailing)
+						}
 					}
 				}
 

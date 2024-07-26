@@ -23,7 +23,7 @@ extension EditPersonaEntry {
 		let contentView: (StoreOf<ContentReducer>) -> ContentReducer.View
 
 		public var body: some SwiftUI.View {
-			VStack {
+			VStack(spacing: .small2) {
 				WithViewStore(
 					store.scope(
 						state: identity,

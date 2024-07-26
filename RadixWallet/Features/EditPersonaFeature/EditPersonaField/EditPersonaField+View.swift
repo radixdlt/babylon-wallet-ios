@@ -2,8 +2,8 @@ import ComposableArchitecture
 import SwiftUI
 
 extension EditPersonaField.State {
-	var primaryHeading: String {
-		showsTitle ? behaviour.title : ""
+	var primaryHeading: String? {
+		showsTitle ? behaviour.title : nil
 	}
 
 	var inputHint: Hint? {
@@ -41,7 +41,7 @@ extension EditPersonaField {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }) { viewStore in
 				AppTextField(
-					primaryHeading: .init(text: viewStore.primaryHeading),
+					primaryHeading: viewStore.primaryHeading.map { .init(text: $0) },
 					placeholder: L10n.CreatePersona.NameNewPersona.placeholder,
 					text: viewStore.validation(
 						get: \.$input,
