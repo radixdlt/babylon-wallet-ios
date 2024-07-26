@@ -2728,18 +2728,12 @@
 		48CFBC9A2ADC10D800E77A5C /* EditPersonaFeature */ = {
 			isa = PBXGroup;
 			children = (
-				48CFBC9B2ADC10D800E77A5C /* EditPersonaField.swift */,
-				48CFBC9C2ADC10D800E77A5C /* EditPersonaEntry.swift */,
-				48CFBC9D2ADC10D800E77A5C /* EditPersonaName+View.swift */,
-				48CFBC9E2ADC10D800E77A5C /* EditPersonaEntry+View.swift */,
-				48CFBC9F2ADC10D800E77A5C /* EditPersonaAddEntryKinds+View.swift */,
-				48CFBCA02ADC10D800E77A5C /* EditPersona+View.swift */,
-				48CFBCA12ADC10D800E77A5C /* EditPersonaName.swift */,
-				48CFBCA22ADC10D800E77A5C /* EditPersona.swift */,
-				48CFBCA32ADC10D800E77A5C /* EditPersonaAddEntryKinds.swift */,
-				48CFBCA42ADC10D800E77A5C /* EditPersonaEntries.swift */,
-				48CFBCA52ADC10D800E77A5C /* EditPersonaEntries+View.swift */,
-				48CFBCA62ADC10D800E77A5C /* EditPersonaField+View.swift */,
+				E76F56C12C538159001EDC63 /* EditPersona */,
+				E76F56BF2C538061001EDC63 /* EditPersonaField */,
+				E76F56C22C538170001EDC63 /* EditPersonaName */,
+				E76F56C02C538081001EDC63 /* EditPersonaEntry */,
+				E76F56C32C538198001EDC63 /* EditPersonaEntries */,
+				E76F56C42C5381A7001EDC63 /* EditPersonaAddEntryKinds */,
 			);
 			path = EditPersonaFeature;
 			sourceTree = "<group>";
@@ -6492,6 +6486,60 @@
 				E6FA98492B04B9AC00748F20 /* ConfirmSkippingBDFS.swift */,
 			);
 			path = ConfirmSkippingBDFS;
+			sourceTree = "<group>";
+		};
+		E76F56BF2C538061001EDC63 /* EditPersonaField */ = {
+			isa = PBXGroup;
+			children = (
+				48CFBC9B2ADC10D800E77A5C /* EditPersonaField.swift */,
+				48CFBCA62ADC10D800E77A5C /* EditPersonaField+View.swift */,
+			);
+			path = EditPersonaField;
+			sourceTree = "<group>";
+		};
+		E76F56C02C538081001EDC63 /* EditPersonaEntry */ = {
+			isa = PBXGroup;
+			children = (
+				48CFBC9C2ADC10D800E77A5C /* EditPersonaEntry.swift */,
+				48CFBC9E2ADC10D800E77A5C /* EditPersonaEntry+View.swift */,
+			);
+			path = EditPersonaEntry;
+			sourceTree = "<group>";
+		};
+		E76F56C12C538159001EDC63 /* EditPersona */ = {
+			isa = PBXGroup;
+			children = (
+				48CFBCA22ADC10D800E77A5C /* EditPersona.swift */,
+				48CFBCA02ADC10D800E77A5C /* EditPersona+View.swift */,
+			);
+			path = EditPersona;
+			sourceTree = "<group>";
+		};
+		E76F56C22C538170001EDC63 /* EditPersonaName */ = {
+			isa = PBXGroup;
+			children = (
+				48CFBCA12ADC10D800E77A5C /* EditPersonaName.swift */,
+				48CFBC9D2ADC10D800E77A5C /* EditPersonaName+View.swift */,
+			);
+			path = EditPersonaName;
+			sourceTree = "<group>";
+		};
+		E76F56C32C538198001EDC63 /* EditPersonaEntries */ = {
+			isa = PBXGroup;
+			children = (
+				48CFBCA42ADC10D800E77A5C /* EditPersonaEntries.swift */,
+				48CFBCA52ADC10D800E77A5C /* EditPersonaEntries+View.swift */,
+			);
+			path = EditPersonaEntries;
+			sourceTree = "<group>";
+		};
+		E76F56C42C5381A7001EDC63 /* EditPersonaAddEntryKinds */ = {
+			isa = PBXGroup;
+			children = (
+				48CFBCA32ADC10D800E77A5C /* EditPersonaAddEntryKinds.swift */,
+				48CFBC9F2ADC10D800E77A5C /* EditPersonaAddEntryKinds+View.swift */,
+			);
+			path = EditPersonaAddEntryKinds;
 			sourceTree = "<group>";
 		};
 		E7A5AC942C09F428006CB6EC /* ResetWalletClient */ = {
