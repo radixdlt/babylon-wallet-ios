@@ -15,7 +15,7 @@ extension IntroductionToPersonas {
 			WithPerceptionTracking {
 				ScrollView {
 					VStack(spacing: .large2) {
-						introToPersona(with: store)
+						introToPersona
 					}
 					.multilineTextAlignment(.center)
 					.padding(.horizontal, .large2)
@@ -33,7 +33,7 @@ extension IntroductionToPersonas {
 		}
 
 		@ViewBuilder
-		private func introToPersona(with viewStore: StoreOf<IntroductionToPersonas>) -> some SwiftUI.View {
+		private var introToPersona: some SwiftUI.View {
 			Image(asset: AssetResource.persona)
 				.resizable()
 				.frame(.veryHuge)

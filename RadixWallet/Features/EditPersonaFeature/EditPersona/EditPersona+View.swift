@@ -2,15 +2,6 @@ import ComposableArchitecture
 import SwiftUI
 
 extension EditPersona.State {
-	var title: String {
-		switch mode {
-		case .create:
-			L10n.CreatePersona.Introduction.title
-		case let .edit(persona), let .dapp(persona, _):
-			persona.displayName.value
-		}
-	}
-
 	var saveButtonTitle: String {
 		switch mode {
 		case .create:
@@ -73,10 +64,10 @@ extension EditPersona {
 				case .create:
 					content(viewStore)
 
-				case .edit, .dapp:
+				case let .edit(persona), let .dapp(persona, _):
 					NavigationStack {
 						content(viewStore)
-							.radixToolbar(title: viewStore.title) {
+							.radixToolbar(title: persona.displayName.value) {
 								viewStore.send(.view(.closeButtonTapped))
 							}
 					}
@@ -89,7 +80,7 @@ extension EditPersona {
 			ScrollView(showsIndicators: false) {
 				VStack(spacing: .large2) {
 					if viewStore.mode == .create {
-						Text(viewStore.title)
+						Text(L10n.CreatePersona.Introduction.title)
 							.foregroundColor(.app.gray1)
 							.textStyle(.sheetTitle)
 					}
