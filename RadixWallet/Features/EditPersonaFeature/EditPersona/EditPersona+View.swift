@@ -105,8 +105,11 @@ extension EditPersona {
 						}
 					}
 
-					Button(action: { viewStore.send(.view(.addAFieldButtonTapped)) }) {
-						Text(L10n.EditPersona.addAField).padding(.horizontal, .medium2)
+					Button {
+						viewStore.send(.view(.addAFieldButtonTapped))
+					} label: {
+						Text(L10n.EditPersona.addAField)
+							.padding(.horizontal, .medium2)
 					}
 					.buttonStyle(.secondaryRectangular)
 					.controlState(viewStore.addAFieldButtonState)
