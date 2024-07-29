@@ -95,7 +95,7 @@ private extension Hint {
 	var textStyle: TextStyle {
 		switch viewState.kind {
 		case .info, .error, .warning:
-			.body2HighImportance
+			.body2Regular
 		case .detail:
 			.body1Regular
 		}
