@@ -214,6 +214,9 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 		case let .presentResponseSuccessView(dappMetadata, txID, p2pRoute):
 			state.shouldIncrementOnCompletionDismiss = txID != nil
+			if !state.requestQueue.isEmpty {
+				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
+			}
 			state.destination = .dappInteractionCompletion(
 				.init(
 					txID: txID,
@@ -248,8 +251,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			}
 
 		case .dappInteractionCompletion(.delegate(.dismiss)):
-			state.destination = nil
-			return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
+			return onCompletionScreenDismissed(&state)
 
 		case let .responseFailure(action):
 			switch action {
@@ -275,6 +277,15 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 		default:
 			return .none
+		}
+	}
+
+	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+		switch state.destination {
+		case .dappInteractionCompletion:
+			onCompletionScreenDismissed(&state)
+		default:
+			.none
 		}
 	}
 
@@ -346,6 +357,11 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func dismissCurrentModalAndRequest(_ request: RequestEnvelope, for state: inout State) {
 		state.requestQueue.remove(id: request.id)
 		state.destination = nil
+	}
+
+	func onCompletionScreenDismissed(_ state: inout State) -> Effect<Action> {
+		state.destination = nil
+		return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
 	}
 }
 

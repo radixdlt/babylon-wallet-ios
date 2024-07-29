@@ -259,6 +259,13 @@ public struct BackupResult: Hashable, Codable, Sendable {
 		}
 	}
 
+	public var isFinal: Bool {
+		switch result {
+		case .started: false
+		case .failure, .success: true
+		}
+	}
+
 	public enum Result: Hashable, Codable, Sendable {
 		case started(Date)
 		case success

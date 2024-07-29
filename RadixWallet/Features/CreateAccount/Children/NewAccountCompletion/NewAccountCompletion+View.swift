@@ -31,7 +31,6 @@ extension NewAccountCompletion {
 			}
 
 			self.isFirstOnNetwork = state.isFirstOnNetwork
-
 			self.accountAddress = state.account.address
 			self.appearanceID = state.account.appearanceID
 			self.explanation = L10n.CreateAccount.Completion.explanation
@@ -74,12 +73,11 @@ extension NewAccountCompletion {
 					Spacer()
 				}
 				.padding(.medium1)
-				.safeAreaInset(edge: .bottom, spacing: 0) {
+				.footer {
 					Button(L10n.CreateEntity.Completion.goToDestination(viewStore.destinationDisplayText)) {
 						viewStore.send(.goToDestination)
 					}
 					.buttonStyle(.primaryRectangular)
-					.padding(.medium1)
 				}
 			}
 		}
@@ -115,6 +113,7 @@ private extension NewAccountCompletion.View {
 			.background(viewStore.appearanceID.gradient)
 			.cornerRadius(.small1)
 			.padding(.horizontal, .medium1)
+			.zIndex(Double(transparentCardsCount + 1))
 		}
 	}
 

@@ -36,11 +36,9 @@ extension CardCarousel {
 					}
 					.tag(index)
 					.padding(.horizontal, margin - spacing)
-					.transition(.scale(scale: 0.8).combined(with: .opacity))
 				}
 			}
 			.tabViewStyle(.page(indexDisplayMode: .never))
-			.animation(.default, value: store.cards)
 		}
 
 		@ViewBuilder
