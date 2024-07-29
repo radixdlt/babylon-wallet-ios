@@ -35,6 +35,8 @@ extension Completion {
 	struct View: SwiftUI.View {
 		let store: StoreOf<Completion>
 
+		@ScaledMetric private var height: CGFloat = 360
+
 		var body: some SwiftUI.View {
 			WithViewStore(store, observe: ViewState.init) { viewStore in
 				WithNavigationBar {
@@ -83,7 +85,7 @@ extension Completion {
 				}
 			}
 			.presentationDragIndicator(.visible)
-			.presentationDetents([.fraction(0.66)])
+			.presentationDetents([.height(height)])
 			.presentationBackground(.blur)
 		}
 	}

@@ -60,6 +60,8 @@ extension SubmitTransaction {
 
 		private let store: StoreOf<SubmitTransaction>
 
+		@ScaledMetric private var height: CGFloat = 360
+
 		public init(store: StoreOf<SubmitTransaction>) {
 			self.store = store
 		}
@@ -131,19 +133,17 @@ extension SubmitTransaction {
 				.alert(store: store.scope(state: \.$dismissTransactionAlert, action: { .view(.dismissTransactionAlert($0)) }))
 				.interactiveDismissDisabled(viewStore.dismissalDisabled)
 				.presentationDragIndicator(.visible)
-				.presentationDetents(viewStore.presentationDetents)
+				.presentationDetents(presentationDetents(status: viewStore.status))
 				.presentationBackground(.blur)
 			}
 		}
-	}
-}
 
-private extension ViewStoreOf<SubmitTransaction> {
-	var presentationDetents: Set<PresentationDetent> {
-		if self.status.failed {
-			[.fraction(0.66), .large]
-		} else {
-			[.fraction(0.66)]
+		func presentationDetents(status: State.TXStatus) -> Set<PresentationDetent> {
+			if status.failed {
+				[.height(height), .large]
+			} else {
+				[.height(height)]
+			}
 		}
 	}
 }
