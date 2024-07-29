@@ -89,7 +89,14 @@ extension AddressView {
 	}
 
 	private var image: Image {
-		Image(.copy)
+		let imageResource: ImageResource =
+			switch identifiable {
+			case .address:
+				.copy
+			case .transaction:
+				.iconLinkOut
+			}
+		return Image(imageResource)
 	}
 
 	private var formattedText: String {
