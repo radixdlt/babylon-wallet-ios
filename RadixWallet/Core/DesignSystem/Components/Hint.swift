@@ -1,7 +1,7 @@
 
 // MARK: - Hint
-public struct Hint: View, Sendable, Equatable {
-	public struct ViewState: Sendable, Equatable {
+public struct Hint: View, Equatable {
+	public struct ViewState: Equatable {
 		public let kind: Kind
 		public let text: Text?
 
@@ -16,7 +16,7 @@ public struct Hint: View, Sendable, Equatable {
 		}
 	}
 
-	public enum Kind: Sendable, Equatable {
+	public enum Kind: Equatable {
 		case info
 		case error
 		case warning
@@ -60,11 +60,11 @@ public struct Hint: View, Sendable, Equatable {
 						.renderingMode(.template)
 						.resizable()
 						.scaledToFit()
-						.frame(.icon)
+						.frame(.smallest)
 				}
 				text
 					.lineSpacing(0)
-					.textStyle(.body2Regular)
+					.textStyle(.body2HighImportance)
 			}
 			.foregroundColor(foregroundColor)
 		}
