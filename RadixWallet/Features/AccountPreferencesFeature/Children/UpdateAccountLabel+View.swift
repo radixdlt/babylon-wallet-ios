@@ -91,7 +91,10 @@ extension UpdateAccountLabel {
 					.padding(.horizontal, .medium3)
 
 					Spacer()
-
+				}
+				.padding(.top, .small2)
+				.padding(.horizontal, .medium3)
+				.footer {
 					WithControlRequirements(
 						viewStore.sanitizedName,
 						forAction: { viewStore.send(.updateTapped($0)) }
@@ -101,9 +104,6 @@ extension UpdateAccountLabel {
 							.controlState(viewStore.updateButtonControlState)
 					}
 				}
-				.padding(.top, .small2)
-				.padding(.horizontal, .medium3)
-				.padding(.bottom, .medium2)
 			}
 		}
 	}
