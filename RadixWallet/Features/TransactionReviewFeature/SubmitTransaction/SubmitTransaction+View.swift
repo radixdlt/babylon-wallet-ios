@@ -138,7 +138,7 @@ extension SubmitTransaction {
 			}
 		}
 
-		func presentationDetents(status: State.TXStatus) -> Set<PresentationDetent> {
+		private func presentationDetents(status: State.TXStatus) -> Set<PresentationDetent> {
 			if status.failed {
 				[.height(height), .large]
 			} else {
