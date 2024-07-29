@@ -10,6 +10,7 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 		public let token: OnLedgerEntity.NonFungibleToken?
 		public let ledgerState: AtLedgerState
 		public let stakeClaim: OnLedgerEntitiesClient.StakeClaim?
+		public let isClaimStakeEnabled: Bool
 
 		public init(
 			resourceAddress: ResourceAddress,
@@ -17,7 +18,8 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 			ownedResource: OnLedgerEntity.OwnedNonFungibleResource? = nil,
 			token: OnLedgerEntity.NonFungibleToken? = nil,
 			ledgerState: AtLedgerState,
-			stakeClaim: OnLedgerEntitiesClient.StakeClaim? = nil
+			stakeClaim: OnLedgerEntitiesClient.StakeClaim? = nil,
+			isClaimStakeEnabled: Bool = true
 		) {
 			self.resourceAddress = resourceAddress
 			self.resourceDetails = resourceDetails
@@ -25,13 +27,13 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 			self.ownedResource = ownedResource
 			self.ledgerState = ledgerState
 			self.stakeClaim = stakeClaim
+			self.isClaimStakeEnabled = isClaimStakeEnabled
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case closeButtonTapped
 		case task
-		case openURLTapped(URL)
 		case tappedClaimStake
 	}
 
@@ -44,7 +46,6 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
-	@Dependency(\.openURL) var openURL
 	@Dependency(\.dismiss) var dismiss
 
 	public init() {}
@@ -57,16 +58,12 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 			}
 			state.resourceDetails = .loading
 			return .run { [resourceAddress = state.resourceAddress, ledgerState = state.ledgerState] send in
-				let result = await TaskResult { try await onLedgerEntitiesClient.getResource(resourceAddress, atLedgerState: ledgerState) }
+				let result = await TaskResult { try await onLedgerEntitiesClient.getResource(resourceAddress, atLedgerState: ledgerState, fetchMetadata: true) }
 				await send(.internal(.resourceLoadResult(result)))
 			}
 		case .closeButtonTapped:
 			return .run { _ in
 				await dismiss()
-			}
-		case let .openURLTapped(url):
-			return .run { _ in
-				await openURL(url)
 			}
 		case .tappedClaimStake:
 			guard let stakeClaim = state.stakeClaim else {

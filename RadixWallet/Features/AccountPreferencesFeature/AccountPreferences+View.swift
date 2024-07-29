@@ -61,23 +61,10 @@ extension AccountPreferences {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				AddressView(.address(of: viewStore.account), showFull: true)
-					.textStyle(.body2Regular)
-					.foregroundColor(.app.gray2)
-					.padding(.top, .small1)
-					.padding(.horizontal, .medium3)
-					.padding(.bottom, .medium3)
-
-				Button(L10n.AddressAction.showAccountQR) {
-					viewStore.send(.qrCodeButtonTapped)
-				}
-				.buttonStyle(.secondaryRectangular(shouldExpand: true))
-				.padding(.horizontal, .medium3)
-				.padding(.bottom, .medium3)
-
 				PreferencesList(
 					viewState: .init(sections: viewStore.sections),
 					onRowSelected: { _, rowId in viewStore.send(.rowTapped(rowId)) },
+					header: { header(for: viewStore.account) },
 					footer: { footer(with: viewStore) }
 				)
 				.task {
@@ -92,6 +79,27 @@ extension AccountPreferences {
 }
 
 extension AccountPreferences.View {
+	private func header(for account: Account) -> some View {
+		HStack(spacing: .small3) {
+			Text(account.displayName.rawValue)
+				.lineLimit(1)
+				.textStyle(.body1Header)
+				.foregroundColor(.app.white)
+				.truncationMode(.tail)
+				.layoutPriority(0)
+
+			Spacer()
+
+			AddressView(.address(of: account))
+				.foregroundColor(.app.whiteTransparent)
+				.textStyle(.body2HighImportance)
+		}
+		.padding(.horizontal, .medium1)
+		.padding(.vertical, .medium2)
+		.background(account.appearanceId.gradient)
+		.cornerRadius(.small1)
+	}
+
 	@ViewBuilder
 	private func footer(with viewStore: ViewStoreOf<AccountPreferences>) -> some View {
 		VStack {
@@ -140,17 +148,10 @@ private extension StoreOf<AccountPreferences> {
 private extension View {
 	func destination(store: StoreOf<AccountPreferences>) -> some View {
 		let destinationStore = store.destination
-		return showQRCode(with: destinationStore)
-			.updateAccountLabel(with: destinationStore)
+		return updateAccountLabel(with: destinationStore)
 			.thirdPartyDeposits(with: destinationStore)
 			.devAccountPreferences(with: destinationStore)
 			.confirmHideAccountAlert(with: destinationStore)
-	}
-
-	private func showQRCode(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
-		sheet(store: destinationStore.scope(state: \.showQR, action: \.showQR)) {
-			ShowQR.View(store: $0)
-		}
 	}
 
 	private func updateAccountLabel(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {

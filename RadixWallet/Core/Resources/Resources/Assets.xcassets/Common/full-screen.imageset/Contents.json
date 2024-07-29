@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "full-screen.pdf",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

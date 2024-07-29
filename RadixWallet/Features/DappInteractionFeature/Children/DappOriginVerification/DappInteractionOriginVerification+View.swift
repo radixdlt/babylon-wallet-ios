@@ -39,7 +39,7 @@ extension DappInteractionOriginVerification {
 					.textStyle(.sheetTitle)
 					.padding(.bottom, .large2)
 
-				Text(L10n.MobileConnect.linkSubtitle(store.dAppMetadata.name))
+				Text(markdown: L10n.MobileConnect.linkSubtitle(store.dAppMetadata.name), emphasizedColor: .app.gray1, emphasizedFont: .app.body1Header)
 					.foregroundColor(.app.gray1)
 					.textStyle(.body1Link)
 			}

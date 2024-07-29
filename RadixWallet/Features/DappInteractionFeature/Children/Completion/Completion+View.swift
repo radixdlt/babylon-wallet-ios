@@ -60,11 +60,11 @@ extension Completion {
 							HStack {
 								Text(L10n.TransactionReview.SubmitTransaction.txID)
 									.foregroundColor(.app.gray1)
-								AddressView(.identifier(.transaction(txID)))
+								AddressView(.transaction(txID))
 									.foregroundColor(.app.blue1)
 							}
 							.textStyle(.body1Header)
-							.padding(.top, .medium3)
+							.padding(.top, .small2)
 						}
 
 						Spacer()

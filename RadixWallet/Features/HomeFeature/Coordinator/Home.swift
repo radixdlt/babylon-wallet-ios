@@ -4,14 +4,17 @@ import SwiftUI
 
 // MARK: - Home
 public struct Home: Sendable, FeatureReducer {
-	public static let radixBannerURL = URL(string: "https://wallet.radixdlt.com/?wallet=downloaded")!
+	private enum CancellableId: Hashable {
+		case fetchAccountPortfolios
+	}
 
 	public struct State: Sendable, Hashable {
 		// MARK: - Components
+		public var carousel: CardCarousel.State = .init()
+
 		public var accountRows: IdentifiedArrayOf<Home.AccountRow.State> = []
 		fileprivate var problems: [SecurityProblem] = []
 
-		public var showRadixBanner: Bool = false
 		public var showFiatWorth: Bool = true
 
 		public var totalFiatWorth: Loadable<FiatWorth> = .idle
@@ -46,16 +49,14 @@ public struct Home: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case onFirstAppear
 		case task
+		case onDisappear
 		case pullToRefreshStarted
 		case createAccountButtonTapped
 		case settingsButtonTapped
-		case radixBannerButtonTapped
-		case radixBannerDismissButtonTapped
 		case showFiatWorthToggled
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		public typealias HasAccessToMnemonic = Bool
 		case accountsLoadedResult(TaskResult<Accounts>)
 		case currentGatewayChanged(to: Gateway)
 		case shouldShowNPSSurvey(Bool)
@@ -65,7 +66,9 @@ public struct Home: Sendable, FeatureReducer {
 		case setSecurityProblems([SecurityProblem])
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
+		case carousel(CardCarousel.Action)
 		case account(id: Home.AccountRow.State.ID, action: Home.AccountRow.Action)
 	}
 
@@ -82,6 +85,7 @@ public struct Home: Sendable, FeatureReducer {
 			case npsSurvey(NPSSurvey.State)
 			case relinkConnector(NewConnection.State)
 			case securityCenter(SecurityCenter.State)
+			case p2pLinks(P2PLinksFeature.State)
 		}
 
 		@CasePathable
@@ -92,6 +96,7 @@ public struct Home: Sendable, FeatureReducer {
 			case npsSurvey(NPSSurvey.Action)
 			case relinkConnector(NewConnection.Action)
 			case securityCenter(SecurityCenter.Action)
+			case p2pLinks(P2PLinksFeature.Action)
 
 			public enum AcknowledgeJailbreakAlert: Sendable, Hashable {}
 		}
@@ -112,10 +117,12 @@ public struct Home: Sendable, FeatureReducer {
 			Scope(state: \.securityCenter, action: \.securityCenter) {
 				SecurityCenter()
 			}
+			Scope(state: \.p2pLinks, action: \.p2pLinks) {
+				P2PLinksFeature()
+			}
 		}
 	}
 
-	@Dependency(\.openURL) var openURL
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.userDefaults) var userDefaults
 	@Dependency(\.accountsClient) var accountsClient
@@ -127,10 +134,17 @@ public struct Home: Sendable, FeatureReducer {
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.securityCenterClient) var securityCenterClient
+	@Dependency(\.continuousClock) var clock
+
+	private let accountPortfoliosRefreshIntervalInSeconds = 300 // 5 minutes
 
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
+		Scope(state: \.carousel, action: \.child.carousel) {
+			CardCarousel()
+		}
+
 		Reduce(core)
 			.forEach(\.accountRows, action: /Action.child .. ChildAction.account) {
 				Home.AccountRow()
@@ -159,8 +173,6 @@ public struct Home: Sendable, FeatureReducer {
 			return .none
 
 		case .task:
-			state.showRadixBanner = userDefaults.showRadixBanner
-
 			return .run { send in
 				for try await accounts in await accountsClient.accountsOnCurrentNetwork() {
 					guard !Task.isCancelled else { return }
@@ -175,6 +187,10 @@ public struct Home: Sendable, FeatureReducer {
 			.merge(with: loadFiatValues())
 			.merge(with: securityProblemsEffect())
 			.merge(with: delayedMediumEffect(for: .internal(.showLinkConnectorIfNeeded)))
+			.merge(with: scheduleFetchAccountPortfoliosTimer(state))
+
+		case .onDisappear:
+			return .cancel(id: CancellableId.fetchAccountPortfolios)
 
 		case .createAccountButtonTapped:
 			state.destination = .createAccount(
@@ -185,22 +201,7 @@ public struct Home: Sendable, FeatureReducer {
 			return .none
 
 		case .pullToRefreshStarted:
-			let accountAddresses = state.accounts.map(\.address)
-			return .run { _ in
-				_ = try await accountPortfoliosClient.fetchAccountPortfolios(accountAddresses, true)
-			} catch: { error, _ in
-				errorQueue.schedule(error)
-			}
-
-		case .radixBannerButtonTapped:
-			return .run { _ in
-				await openURL(Home.radixBannerURL)
-			}
-
-		case .radixBannerDismissButtonTapped:
-			userDefaults.setShowRadixBanner(false)
-			state.showRadixBanner = false
-			return .none
+			return fetchAccountPortfolios(state)
 
 		case .settingsButtonTapped:
 			return .send(.delegate(.displaySettings))
@@ -226,6 +227,7 @@ public struct Home: Sendable, FeatureReducer {
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
+			.merge(with: scheduleFetchAccountPortfoliosTimer(state))
 
 		case let .accountsLoadedResult(.failure(error)):
 			errorQueue.schedule(error)
@@ -301,6 +303,10 @@ public struct Home: Sendable, FeatureReducer {
 				state.destination = .securityCenter(.init())
 				return .none
 			}
+
+		case .carousel(.delegate(.addConnector)):
+			state.destination = .p2pLinks(.init(destination: .newConnection(.init())))
+			return .none
 
 		default:
 			return .none
@@ -419,6 +425,26 @@ public struct Home: Sendable, FeatureReducer {
 				await send(.internal(.setSecurityProblems(problems)))
 			}
 		}
+	}
+
+	public func fetchAccountPortfolios(_ state: State) -> Effect<Action> {
+		let accountAddresses = state.accounts.map(\.address)
+		return .run { _ in
+			_ = try await accountPortfoliosClient.fetchAccountPortfolios(accountAddresses, true)
+		} catch: { error, _ in
+			errorQueue.schedule(error)
+		}
+	}
+
+	public func scheduleFetchAccountPortfoliosTimer(_ state: State) -> Effect<Action> {
+		.run { _ in
+			for await _ in clock.timer(interval: .seconds(accountPortfoliosRefreshIntervalInSeconds)) {
+				guard !Task.isCancelled else { return }
+				let accountAddresses = state.accounts.map(\.address)
+				_ = try? await accountPortfoliosClient.fetchAccountPortfolios(accountAddresses, true)
+			}
+		}
+		.cancellable(id: CancellableId.fetchAccountPortfolios, cancelInFlight: true)
 	}
 }
 

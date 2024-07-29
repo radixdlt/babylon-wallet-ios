@@ -48,6 +48,6 @@ struct ScannQR_Preview: PreviewProvider {
 }
 
 extension ScanQRCoordinator.State {
-	public static let previewValue: Self = .init(scanInstructions: "Preview")
+	public static let previewValue: Self = .init(kind: .account)
 }
 #endif

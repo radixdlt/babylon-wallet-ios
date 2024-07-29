@@ -45,7 +45,10 @@ extension AccountDetails {
 				.background(viewStore.appearanceID.gradient)
 				.navigationBarBackButtonHidden()
 				.task {
-					viewStore.send(.task)
+					await viewStore.send(.task).finish()
+				}
+				.onDisappear {
+					viewStore.send(.onDisappear)
 				}
 				.toolbar {
 					ToolbarItem(placement: .principal) {
@@ -75,7 +78,7 @@ extension AccountDetails {
 
 		@ViewBuilder
 		func header(with viewStore: ViewStore<AccountDetails.ViewState, AccountDetails.ViewAction>) -> some SwiftUI.View {
-			AddressView(.address(.account(viewStore.accountAddress, isLedgerHWAccount: viewStore.isLedgerAccount)))
+			AddressView(.address(.account(viewStore.accountAddress)))
 				.foregroundColor(.app.whiteTransparent)
 				.textStyle(.body2HighImportance)
 				.padding(.bottom, .small1)

@@ -197,8 +197,10 @@ public enum L10n {
     public static let accountColorSubtitle = L10n.tr("Localizable", "accountSettings_accountColorSubtitle", fallback: "Select from a list of unique colors")
     /// Account Hidden
     public static let accountHidden = L10n.tr("Localizable", "accountSettings_accountHidden", fallback: "Account Hidden")
-    /// Account Label
-    public static let accountLabel = L10n.tr("Localizable", "accountSettings_accountLabel", fallback: "Account Label")
+    /// Account Name
+    public static let accountLabel = L10n.tr("Localizable", "accountSettings_accountLabel", fallback: "Account Name")
+    /// Name your account
+    public static let accountLabelSubtitle = L10n.tr("Localizable", "accountSettings_accountLabelSubtitle", fallback: "Name your account")
     /// Set development preferences
     public static let developmentHeading = L10n.tr("Localizable", "accountSettings_developmentHeading", fallback: "Set development preferences")
     /// Dev Preferences
@@ -227,6 +229,8 @@ public enum L10n {
     public static let specificAssetsDeposits = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits", fallback: "Allow/Deny Specific Assets")
     /// Third-party Deposits
     public static let thirdPartyDeposits = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits", fallback: "Third-party Deposits")
+    /// Choose who can deposit into your Account
+    public static let thirdPartyDepositsSubtitle = L10n.tr("Localizable", "accountSettings_thirdPartyDepositsSubtitle", fallback: "Choose who can deposit into your Account")
     /// Account Settings
     public static let title = L10n.tr("Localizable", "accountSettings_title", fallback: "Account Settings")
     /// Updated
@@ -632,13 +636,23 @@ public enum L10n {
       public static let readyToClaim = L10n.tr("Localizable", "assetDetails_staking_readyToClaim", fallback: "Ready to Claim")
       /// Ready to Claim in
       public static let readyToClaimIn = L10n.tr("Localizable", "assetDetails_staking_readyToClaimIn", fallback: "Ready to Claim in")
+      /// 1 day or less
+      public static let readyToClaimInDay = L10n.tr("Localizable", "assetDetails_staking_readyToClaimInDay", fallback: "1 day or less")
+      /// %d days or less
+      public static func readyToClaimInDays(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "assetDetails_staking_readyToClaimInDays", p1, fallback: "%d days or less")
+      }
+      /// 1 hour or less
+      public static let readyToClaimInHour = L10n.tr("Localizable", "assetDetails_staking_readyToClaimInHour", fallback: "1 hour or less")
+      /// %d hours or less
+      public static func readyToClaimInHours(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "assetDetails_staking_readyToClaimInHours", p1, fallback: "%d hours or less")
+      }
+      /// 1 minute or less
+      public static let readyToClaimInMinute = L10n.tr("Localizable", "assetDetails_staking_readyToClaimInMinute", fallback: "1 minute or less")
       /// %d minutes or less
       public static func readyToClaimInMinutes(_ p1: Int) -> String {
         return L10n.tr("Localizable", "assetDetails_staking_readyToClaimInMinutes", p1, fallback: "%d minutes or less")
-      }
-      /// Ready to claim in about %d minutes or less.
-      public static func unstaking(_ p1: Int) -> String {
-        return L10n.tr("Localizable", "assetDetails_staking_unstaking", p1, fallback: "Ready to claim in about %d minutes or less.")
       }
     }
     public enum StakingDetails {
@@ -794,6 +808,8 @@ public enum L10n {
       }
       /// Here are the dApps you have logged into with this Persona.
       public static let authorizedDappsHeading = L10n.tr("Localizable", "authorizedDapps_personaDetails_authorizedDappsHeading", fallback: "Here are the dApps you have logged into with this Persona.")
+      /// Edit
+      public static let edit = L10n.tr("Localizable", "authorizedDapps_personaDetails_edit", fallback: "Edit")
       /// Edit Account Sharing
       public static let editAccountSharing = L10n.tr("Localizable", "authorizedDapps_personaDetails_editAccountSharing", fallback: "Edit Account Sharing")
       /// Edit Avatar
@@ -1324,13 +1340,13 @@ public enum L10n {
       public static func lastLoginWasOn(_ p1: Any) -> String {
         return L10n.tr("Localizable", "dAppRequest_login_lastLoginWasOn", String(describing: p1), fallback: "Your last login was on %@")
       }
-      /// %@ is requesting that you login with a Persona.
+      /// **%@** is requesting that you login with a Persona.
       public static func subtitleKnownDapp(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dAppRequest_login_subtitleKnownDapp", String(describing: p1), fallback: "%@ is requesting that you login with a Persona.")
+        return L10n.tr("Localizable", "dAppRequest_login_subtitleKnownDapp", String(describing: p1), fallback: "**%@** is requesting that you login with a Persona.")
       }
-      /// %@ is requesting that you login for the **first time** with a Persona.
+      /// **%@** is requesting that you login for the first time with a Persona.
       public static func subtitleNewDapp(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dAppRequest_login_subtitleNewDapp", String(describing: p1), fallback: "%@ is requesting that you login for the **first time** with a Persona.")
+        return L10n.tr("Localizable", "dAppRequest_login_subtitleNewDapp", String(describing: p1), fallback: "**%@** is requesting that you login for the first time with a Persona.")
       }
       /// Login Request
       public static let titleKnownDapp = L10n.tr("Localizable", "dAppRequest_login_titleKnownDapp", fallback: "Login Request")
@@ -1795,6 +1811,32 @@ public enum L10n {
       public static let title = L10n.tr("Localizable", "homePage_visitDashboard_title", fallback: "Visit the Radix Dashboard")
     }
   }
+  public enum HomePageCarousel {
+    public enum ContinueOnDapp {
+      /// You can now connect with your Radix Wallet. Tap to dismiss.
+      public static let text = L10n.tr("Localizable", "homePageCarousel_continueOnDapp_text", fallback: "You can now connect with your Radix Wallet. Tap to dismiss.")
+      /// Continue on dApp in browser
+      public static let title = L10n.tr("Localizable", "homePageCarousel_continueOnDapp_title", fallback: "Continue on dApp in browser")
+    }
+    public enum DiscoverRadix {
+      /// Start RadQuest, learn about Radix, earn XRD and collectibles.
+      public static let text = L10n.tr("Localizable", "homePageCarousel_discoverRadix_text", fallback: "Start RadQuest, learn about Radix, earn XRD and collectibles.")
+      /// Discover Radix. Get XRD
+      public static let title = L10n.tr("Localizable", "homePageCarousel_discoverRadix_title", fallback: "Discover Radix. Get XRD")
+    }
+    public enum RejoinRadquest {
+      /// Continue your Radix journey in your browser. Tap to dismiss.
+      public static let text = L10n.tr("Localizable", "homePageCarousel_rejoinRadquest_text", fallback: "Continue your Radix journey in your browser. Tap to dismiss.")
+      /// Rejoin RadQuest
+      public static let title = L10n.tr("Localizable", "homePageCarousel_rejoinRadquest_title", fallback: "Rejoin RadQuest")
+    }
+    public enum UseDappsOnDesktop {
+      /// Connect to dApps on the big screen with Radix Connector.
+      public static let text = L10n.tr("Localizable", "homePageCarousel_useDappsOnDesktop_text", fallback: "Connect to dApps on the big screen with Radix Connector.")
+      /// Use dApps on Desktop
+      public static let title = L10n.tr("Localizable", "homePageCarousel_useDappsOnDesktop_title", fallback: "Use dApps on Desktop")
+    }
+  }
   public enum IOSProfileBackup {
     /// Available backups:
     public static let cloudBackupWallet = L10n.tr("Localizable", "iOSProfileBackup_cloudBackupWallet", fallback: "Available backups:")
@@ -2175,8 +2217,8 @@ public enum L10n {
       public static let linking = L10n.tr("Localizable", "linkedConnectors_newConnection_linking", fallback: "Linking…")
       /// Open your Radix Connector extension's menu by clicking its icon in your list of browser extensions, and scan the QR code shown.
       public static let subtitle = L10n.tr("Localizable", "linkedConnectors_newConnection_subtitle", fallback: "Open your Radix Connector extension's menu by clicking its icon in your list of browser extensions, and scan the QR code shown.")
-      /// Link New Connector
-      public static let title = L10n.tr("Localizable", "linkedConnectors_newConnection_title", fallback: "Link New Connector")
+      /// Link Connector
+      public static let title = L10n.tr("Localizable", "linkedConnectors_newConnection_title", fallback: "Link Connector")
     }
     public enum RelinkConnectors {
       /// Any Connectors you had linked to this wallet using a different phone have been disconnected
@@ -2216,9 +2258,9 @@ public enum L10n {
     public static let linkBody1 = L10n.tr("Localizable", "mobileConnect_linkBody1", fallback: "Does the website address match what you’re expecting?")
     /// If you came from a social media ad, is the website legitimate?
     public static let linkBody2 = L10n.tr("Localizable", "mobileConnect_linkBody2", fallback: "If you came from a social media ad, is the website legitimate?")
-    /// Before you connect to %@, you might want to check:
+    /// Before you connect to **%@**, you might want to check:
     public static func linkSubtitle(_ p1: Any) -> String {
-      return L10n.tr("Localizable", "mobileConnect_linkSubtitle", String(describing: p1), fallback: "Before you connect to %@, you might want to check:")
+      return L10n.tr("Localizable", "mobileConnect_linkSubtitle", String(describing: p1), fallback: "Before you connect to **%@**, you might want to check:")
     }
     /// Have you come from a genuine website?
     public static let linkTitle = L10n.tr("Localizable", "mobileConnect_linkTitle", fallback: "Have you come from a genuine website?")
@@ -2529,6 +2571,26 @@ public enum L10n {
       public static let subtitle = L10n.tr("Localizable", "revealSeedPhrase_warningDialog_subtitle", fallback: "Are you sure you have written down your seed phrase?")
       /// Use Caution
       public static let title = L10n.tr("Localizable", "revealSeedPhrase_warningDialog_title", fallback: "Use Caution")
+    }
+  }
+  public enum ScanQR {
+    public enum Account {
+      /// Scan a QR code of a Radix Account address from another wallet or an exchange.
+      public static let instructions = L10n.tr("Localizable", "scanQR_account_instructions", fallback: "Scan a QR code of a Radix Account address from another wallet or an exchange.")
+    }
+    public enum ConnectorExtension {
+      /// Go to **wallet.radixdlt.com** in your desktop browser.
+      public static let disclosureItem1 = L10n.tr("Localizable", "scanQR_connectorExtension_disclosureItem1", fallback: "Go to **wallet.radixdlt.com** in your desktop browser.")
+      /// Follow the instructions there to install the Radix Connector.
+      public static let disclosureItem2 = L10n.tr("Localizable", "scanQR_connectorExtension_disclosureItem2", fallback: "Follow the instructions there to install the Radix Connector.")
+      /// Don't have the Radix Connector browser extension?
+      public static let disclosureTitle = L10n.tr("Localizable", "scanQR_connectorExtension_disclosureTitle", fallback: "Don't have the Radix Connector browser extension?")
+      /// Scan the QR code in the Radix Connector browser extension.
+      public static let instructions = L10n.tr("Localizable", "scanQR_connectorExtension_instructions", fallback: "Scan the QR code in the Radix Connector browser extension.")
+    }
+    public enum ImportOlympia {
+      /// Scan the QR code shown in the Export section of the Radix Desktop Wallet for Olympia.
+      public static let instructions = L10n.tr("Localizable", "scanQR_importOlympia_instructions", fallback: "Scan the QR code shown in the Export section of the Radix Desktop Wallet for Olympia.")
     }
   }
   public enum SecurityCenter {

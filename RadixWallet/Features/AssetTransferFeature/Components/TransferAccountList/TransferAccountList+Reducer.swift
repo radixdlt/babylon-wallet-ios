@@ -120,7 +120,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 				}
 				return .none
 
-			case let .child(.row(resourceAddress, child: .delegate(.fungibleAsset(.amountChanged)))),
+			case let .child(.row(resourceAddress, child: .delegate(.amountChanged))),
 			     let .child(.row(resourceAddress, child: .delegate(.removed))):
 				updateTotalSum(&state, resourceId: resourceAddress)
 				return .none
@@ -209,9 +209,7 @@ extension TransferAccountList {
 		assets += selectedAssets.nonFungibleResources.flatMap { resource in
 			resource.tokens.map {
 				ResourceAsset.State(kind: .nonFungibleAsset(.init(
-					resourceImage: resource.resourceImage,
-					resourceName: resource.resourceName,
-					resourceAddress: resource.resourceAddress,
+					resource: resource.resource,
 					token: $0
 				)))
 			}
@@ -236,7 +234,7 @@ extension TransferAccountList {
 		let chooseAccount: ChooseReceivingAccount.State = .init(
 			networkID: state.fromAccount.networkID,
 			chooseAccounts: .init(
-				selectionRequirement: .exactly(1),
+				context: .assetTransfer,
 				filteredAccounts: filteredAccounts,
 				// Create account is very buggy when started from AssetTransfer, disable it for now.
 				canCreateNewAccount: false
@@ -264,9 +262,7 @@ extension TransferAccountList {
 			.nonFungibleAssets
 			.reduce(into: IdentifiedArrayOf<AssetsView.State.Mode.SelectedAssets.NonFungibleTokensPerResource>()) { partialResult, asset in
 				var resource = partialResult[id: asset.resourceAddress] ?? .init(
-					resourceAddress: asset.resourceAddress,
-					resourceImage: asset.resourceImage,
-					resourceName: asset.resourceName,
+					resource: asset.resource,
 					tokens: []
 				)
 				resource.tokens.append(asset.token)

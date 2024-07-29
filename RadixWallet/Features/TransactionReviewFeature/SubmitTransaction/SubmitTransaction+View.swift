@@ -69,7 +69,7 @@ extension SubmitTransaction {
 				WithNavigationBar {
 					viewStore.send(.closeButtonTapped)
 				} content: {
-					VStack(spacing: .medium3) {
+					VStack(spacing: .zero) {
 						Spacer()
 						if viewStore.status.failed {
 							Image(.errorLarge)
@@ -78,6 +78,7 @@ extension SubmitTransaction {
 								.textStyle(.sheetTitle)
 								.multilineTextAlignment(.center)
 								.padding(.horizontal, .medium2)
+								.padding(.top, .medium3)
 						} else {
 							Image(asset: AssetResource.transactionInProgress)
 								.opacity(opacity)
@@ -99,15 +100,17 @@ extension SubmitTransaction {
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)
 							.padding(.horizontal, .medium2)
+							.padding(.top, .medium3)
 
 						HStack {
 							Text(L10n.TransactionReview.SubmitTransaction.txID)
 								.foregroundColor(.app.gray1)
-							AddressView(.identifier(.transaction(viewStore.txID)))
+							AddressView(.transaction(viewStore.txID))
 								.foregroundColor(.app.blue1)
 						}
 						.textStyle(.body1Header)
 						.padding(.horizontal, .medium2)
+						.padding(.top, .small2)
 
 						Spacer()
 						if viewStore.status.failed, viewStore.showSwitchBackToBrowserMessage {
@@ -128,9 +131,19 @@ extension SubmitTransaction {
 				.alert(store: store.scope(state: \.$dismissTransactionAlert, action: { .view(.dismissTransactionAlert($0)) }))
 				.interactiveDismissDisabled(viewStore.dismissalDisabled)
 				.presentationDragIndicator(.visible)
-				.presentationDetents([.fraction(0.66)])
+				.presentationDetents(viewStore.presentationDetents)
 				.presentationBackground(.blur)
 			}
+		}
+	}
+}
+
+private extension ViewStoreOf<SubmitTransaction> {
+	var presentationDetents: Set<PresentationDetent> {
+		if self.status.failed {
+			[.fraction(0.66), .large]
+		} else {
+			[.fraction(0.66)]
 		}
 	}
 }

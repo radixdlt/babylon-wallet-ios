@@ -28,43 +28,15 @@ extension TransactionReviewProofs {
 					}
 					.padding(.bottom, .medium2)
 
-					ForEach(viewStore.proofs) { proof in
-						VStack(spacing: 0) {
-							let metadata = proof.metadata
-							ProofView(thumbnail: metadata.iconURL, name: metadata.name) {
-								viewStore.send(.proofTapped(id: proof.id))
-							}
-							.padding(.bottom, .medium3)
-
-							if proof.id != viewStore.proofs.last?.id {
-								Separator()
-									.padding(.bottom, .medium3)
+					VStack(spacing: .medium3) {
+						ForEach(viewStore.proofs) { proof in
+							ResourceBalanceView(proof.resourceBalance.viewState, appearance: .compact) {
+								viewStore.send(.proofTapped(proof))
 							}
 						}
+						Separator()
 					}
-				}
-			}
-		}
-
-		struct ProofView: SwiftUI.View {
-			let thumbnail: URL?
-			let name: String?
-			let action: () -> Void
-
-			var body: some SwiftUI.View {
-				Button(action: action) {
-					HStack(spacing: 0) {
-						Thumbnail(.dapp, url: thumbnail, size: .smallest)
-							.padding(.trailing, .small1)
-
-						if let name {
-							Text(name)
-								.textStyle(.body1HighImportance)
-								.foregroundColor(.app.gray1)
-						}
-
-						Spacer(minLength: 0)
-					}
+					.padding(.bottom, .medium3)
 				}
 			}
 		}

@@ -139,4 +139,13 @@ extension AccountsClient {
 	public func saveVirtualAccount(_ account: Account) async throws {
 		try await saveVirtualAccounts([account])
 	}
+
+	public func isLedgerHWAccount(_ address: AccountAddress) async -> Bool {
+		do {
+			let account = try await getAccountByAddress(address)
+			return account.isLedgerControlled
+		} catch {
+			return false
+		}
+	}
 }

@@ -123,7 +123,7 @@ extension ResourcesList.View {
 
 	@ViewBuilder
 	func resourceRowView(_ viewState: ResourceViewState, _ viewStore: ViewStoreOf<ResourcesList>) -> some SwiftUI.View {
-		HStack {
+		HStack(spacing: .zero) {
 			if viewState.address.resourceAddress.isNonFungible {
 				Thumbnail(.nft, url: viewState.iconURL)
 			} else {
@@ -131,12 +131,13 @@ extension ResourcesList.View {
 			}
 
 			VStack(alignment: .leading, spacing: .zero) {
-				Text(viewState.name ?? "")
+				Text(viewState.name ?? "-")
 					.textStyle(.body1HighImportance)
 					.foregroundColor(.app.gray1)
 				AddressView(
 					viewState.address.ledgerIdentifiable,
-					isTappable: false
+					isTappable: false,
+					isImageHidden: true
 				)
 				.foregroundColor(.app.gray2)
 			}

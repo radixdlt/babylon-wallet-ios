@@ -9,7 +9,7 @@ extension NonFungibleAssetList {
 			public var id: ResourceAddress { resource.resourceAddress }
 			public typealias AssetID = OnLedgerEntity.NonFungibleToken.ID
 
-			public let resource: OnLedgerEntity.OwnedNonFungibleResource
+			public var resource: OnLedgerEntity.OwnedNonFungibleResource
 			public let accountAddress: AccountAddress
 
 			/// The loaded pages of tokens
@@ -59,6 +59,7 @@ extension NonFungibleAssetList {
 			}
 
 			case tokensLoaded(TaskResult<TokensLoadResult>)
+			case refreshResources
 		}
 
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
@@ -80,20 +81,7 @@ extension NonFungibleAssetList {
 			case .isExpandedToggled:
 				state.isExpanded.toggle()
 				if state.isExpanded {
-					if state.resource.nonFungibleIdsCount < State.pageSize {
-						state.tokens = [.init(repeating: .loading, count: state.resource.nonFungibleIdsCount)]
-					} else {
-						/// The total number of full pages
-						let fullPagesCount = state.resource.nonFungibleIdsCount / State.pageSize
-						/// Prepopulate with placeholders
-						state.tokens = .init(repeating: .init(repeating: .loading, count: State.pageSize), count: fullPagesCount)
-						/// The number of items to add to the last page
-						let remainder = state.resource.nonFungibleIdsCount % State.pageSize
-						if fullPagesCount > 0, remainder > 0 {
-							/// At last page placeholders also
-							state.tokens.append(.init(repeating: .loading, count: remainder))
-						}
-					}
+					setTokensPlaceholders(&state)
 					return loadResources(&state, pageIndex: 0)
 				}
 
@@ -131,10 +119,15 @@ extension NonFungibleAssetList {
 					state.isLoadingResources = false
 				}
 				return .none
+
+			case .refreshResources:
+				state.nextPageCursor = nil
+				setTokensPlaceholders(&state)
+				return loadResources(&state, pageIndex: 0)
 			}
 		}
 
-		func loadResources(_ state: inout State, pageIndex: Int) -> Effect<Action> {
+		private func loadResources(_ state: inout State, pageIndex: Int) -> Effect<Action> {
 			state.isLoadingResources = true
 			let cursor = state.nextPageCursor
 			return .run { [resource = state.resource, accountAddress = state.accountAddress] send in
@@ -143,6 +136,23 @@ extension NonFungibleAssetList {
 					return InternalAction.TokensLoadResult(tokens: data.tokens, nextPageCursor: data.nextPageCursor, pageIndex: pageIndex)
 				}
 				await send(.internal(.tokensLoaded(result)))
+			}
+		}
+
+		private func setTokensPlaceholders(_ state: inout State) {
+			if state.resource.nonFungibleIdsCount < State.pageSize {
+				state.tokens = [.init(repeating: .loading, count: state.resource.nonFungibleIdsCount)]
+			} else {
+				/// The total number of full pages
+				let fullPagesCount = state.resource.nonFungibleIdsCount / State.pageSize
+				/// Prepopulate with placeholders
+				state.tokens = .init(repeating: .init(repeating: .loading, count: State.pageSize), count: fullPagesCount)
+				/// The number of items to add to the last page
+				let remainder = state.resource.nonFungibleIdsCount % State.pageSize
+				if fullPagesCount > 0, remainder > 0 {
+					/// At last page placeholders also
+					state.tokens.append(.init(repeating: .loading, count: remainder))
+				}
 			}
 		}
 	}

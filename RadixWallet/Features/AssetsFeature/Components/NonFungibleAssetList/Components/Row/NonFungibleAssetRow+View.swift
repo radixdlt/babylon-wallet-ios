@@ -50,7 +50,7 @@ extension NonFungibleAssetList.Row.View {
 			Thumbnail(.nft, url: viewStore.resource.metadata.iconURL, size: .small)
 
 			VStack(alignment: .leading, spacing: .small2) {
-				if let title = viewStore.resource.metadata.title {
+				if let title = viewStore.resource.metadata.name {
 					Text(title)
 						.foregroundColor(.app.gray1)
 						.lineSpacing(-4)
@@ -100,7 +100,7 @@ extension NonFungibleAssetList.Row.View {
 
 				HStack {
 					NFTIDView(
-						id: asset.id.nonFungibleLocalId.toUserFacingString(),
+						id: asset.id.nonFungibleLocalId.formatted(),
 						name: asset.data?.name,
 						thumbnail: asset.data?.keyImageURL
 					)
