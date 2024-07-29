@@ -344,9 +344,11 @@ extension TransactionReview {
 		return DappEntity(id: dAppDefinitionAddress, metadata: metadata)
 	}
 
-	private func exctractProofs(_ accountProofs: [ResourceAddress]) async throws -> TransactionReviewProofs.State? {
+	private func exctractProofs(_ accountProofs: [ResourceSpecifier]) async throws -> TransactionReviewProofs.State? {
 		let proofs = try await accountProofs
 			.uniqued()
+			.asyncMap(extractResourceBalanceInfo)
+			.flatMap { $0 }
 			.asyncMap(extractProofInfo)
 
 		guard !proofs.isEmpty else { return nil }
@@ -354,10 +356,33 @@ extension TransactionReview {
 		return TransactionReviewProofs.State(proofs: proofs.asIdentified())
 	}
 
-	private func extractProofInfo(_ address: ResourceAddress) async throws -> ProofEntity {
+	private func extractResourceBalanceInfo(specifier: ResourceSpecifier) async throws -> [(ResourceAddress, ResourceBalance.Details)] {
+		switch specifier {
+		case let .fungible(resourceAddress, amount):
+			return [(
+				resourceAddress,
+				.fungible(
+					.init(
+						isXRD: resourceAddress.isXRD,
+						amount: .init(nominalAmount: amount)
+					)
+				)
+			)]
+		case let .nonFungible(resourceAddress, ids):
+			let globalIds = ids.map { NonFungibleGlobalId(resourceAddress: resourceAddress, nonFungibleLocalId: $0) }
+			let tokens = try await onLedgerEntitiesClient.getNonFungibleTokenData(
+				.init(resource: resourceAddress, nonFungibleIds: globalIds)
+			)
+			return tokens.map { (resourceAddress, .nonFungible($0)) }
+		}
+	}
+
+	private func extractProofInfo(resourceAddress: ResourceAddress, details: ResourceBalance.Details) async throws -> ProofEntity {
 		try await ProofEntity(
-			id: address,
-			metadata: onLedgerEntitiesClient.getResource(address, metadataKeys: .dappMetadataKeys).metadata
+			resourceBalance: ResourceBalance(
+				resource: onLedgerEntitiesClient.getResource(resourceAddress, metadataKeys: .dappMetadataKeys),
+				details: details
+			)
 		)
 	}
 

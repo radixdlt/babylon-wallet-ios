@@ -96,9 +96,13 @@ public struct SignWithFactorSource: Sendable, FeatureReducer {
 						try await sign(signers: signingFactor.signers, factor: signingFactor.factorSource.extract(as: LedgerHardwareWalletFactorSource.self), state: state)
 					}
 					allSignatures.append(contentsOf: signatures)
-				} catch {
+				} catch let error as P2P.ConnectorExtension.Response.LedgerHardwareWallet.Failure where error.code == .userRejectedSigningOfTransaction {
+					// If user rejected transaction on ledger device, we will inform the delegate to dismiss the signing sheet.
 					await send(.delegate(.failedToSign(signingFactor)))
-					break
+					return
+				} catch {
+					// In any other type of error, we will just allow them to retry.
+					return
 				}
 			}
 			await send(.delegate(.done(signingFactors: signingFactors, signatures: allSignatures)))

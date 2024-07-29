@@ -113,7 +113,7 @@ extension Home.AccountRow {
 						}
 
 						HStack {
-							AddressView(.address(.account(viewStore.address, isLedgerHWAccount: viewStore.isLedgerAccount)))
+							AddressView(.address(.account(viewStore.address)))
 								.foregroundColor(.app.whiteTransparent)
 								.textStyle(.body2HighImportance)
 

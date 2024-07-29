@@ -25,8 +25,12 @@ extension HomeCardsClient: DependencyKey {
 				try? await manager.bootstrap()
 			case .walletCreated:
 				try? await manager.walletCreated()
+			case .walletRestored:
+				try? await manager.walletRestored()
 			case let .deferredDeepLinkReceived(value):
 				try? await manager.deferredDeepLinkReceived(encodedValue: value)
+			case .walletDidReset:
+				try? await manager.walletReset()
 			}
 		}
 
@@ -64,7 +68,6 @@ private final class HomeCardsObserver: Sargon.HomeCardsObserver, Sendable {
 	let subject: AsyncCurrentValueSubject<[HomeCard]> = .init([])
 
 	func handleCardsUpdate(cards: [HomeCard]) {
-		print("M- Received cards from Sargon \(cards)")
 		subject.send(cards)
 	}
 }

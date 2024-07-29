@@ -4,25 +4,41 @@ import SwiftUI
 // MARK: - OnboardingCoordinator
 public struct OnboardingCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public enum Root: Sendable, Hashable {
-			case startup(OnboardingStartup.State)
-			case createAccountCoordinator(CreateAccountCoordinator.State)
-		}
+		public var startup: OnboardingStartup.State
 
-		public var root: Root
+		@PresentationState
+		public var destination: Destination.State?
 
 		public init() {
-			self.root = .startup(.init())
+			self.startup = .init()
 		}
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case startup(OnboardingStartup.Action)
-		case createAccountCoordinator(CreateAccountCoordinator.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case completed
+	}
+
+	public struct Destination: DestinationReducer {
+		@CasePathable
+		public enum State: Sendable, Hashable {
+			case createAccount(CreateAccountCoordinator.State)
+		}
+
+		@CasePathable
+		public enum Action: Sendable, Equatable {
+			case createAccount(CreateAccountCoordinator.Action)
+		}
+
+		public var body: some ReducerOf<Self> {
+			Scope(state: \.createAccount, action: \.createAccount) {
+				CreateAccountCoordinator()
+			}
+		}
 	}
 
 	@Dependency(\.onboardingClient) var onboardingClient
@@ -32,23 +48,22 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.root, action: /Action.child) {
-			EmptyReducer()
-				.ifCaseLet(/State.Root.startup, action: /ChildAction.startup) {
-					OnboardingStartup()
-				}
-				.ifCaseLet(/State.Root.createAccountCoordinator, action: /ChildAction.createAccountCoordinator) {
-					CreateAccountCoordinator()
-				}
+		Scope(state: \.startup, action: \.child.startup) {
+			OnboardingStartup()
 		}
 
 		Reduce(core)
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
+			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .startup(.delegate(.setupNewUser)):
-			state.root = .createAccountCoordinator(
+			state.destination = .createAccount(
 				.init(
 					config: .init(purpose: .firstAccountForNewProfile)
 				)
@@ -56,29 +71,32 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 			return .none
 
 		case .startup(.delegate(.profileCreatedFromImportedBDFS)):
-			return sendDelegateCompleted(state: state)
+			appEventsClient.handleEvent(.walletRestored)
+			return .send(.delegate(.completed))
 
 		case .startup(.delegate(.completed)):
-			return sendDelegateCompleted(state: state)
-
-		case .createAccountCoordinator(.delegate(.accountCreated)):
-			appEventsClient.handleEvent(.walletCreated)
-			return .run { _ in
-				_ = await onboardingClient.finishOnboarding()
-				_ = await radixConnectClient.loadP2PLinksAndConnectAll()
-			}
-
-		case .createAccountCoordinator(.delegate(.completed)):
-			return sendDelegateCompleted(state: state)
+			appEventsClient.handleEvent(.walletRestored)
+			return .send(.delegate(.completed))
 
 		default:
 			return .none
 		}
 	}
 
-	private func sendDelegateCompleted(
-		state: State
-	) -> Effect<Action> {
-		.send(.delegate(.completed))
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .createAccount(.delegate(.completed)):
+			return .send(.delegate(.completed))
+
+		case .createAccount(.delegate(.accountCreated)):
+			appEventsClient.handleEvent(.walletCreated)
+			return .run { _ in
+				_ = await onboardingClient.finishOnboarding()
+				_ = await radixConnectClient.loadP2PLinksAndConnectAll()
+			}
+
+		default:
+			return .none
+		}
 	}
 }

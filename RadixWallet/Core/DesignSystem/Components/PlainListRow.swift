@@ -140,8 +140,8 @@ struct PlainListRowCore: View {
 		self.viewState = viewState
 	}
 
-	init(title: String?, subtitle: String?) {
-		self.viewState = ViewState(title: title, subtitle: subtitle)
+	init(context: ViewState.Context = .general, title: String?, subtitle: String?) {
+		self.viewState = ViewState(context: context, title: title, subtitle: subtitle)
 	}
 
 	var body: some View {
@@ -149,7 +149,7 @@ struct PlainListRowCore: View {
 			if let title = viewState.title {
 				Text(title)
 					.lineSpacing(-6)
-					.lineLimit(1)
+					.lineLimit(viewState.titleLineLimit)
 					.textStyle(viewState.titleTextStyle)
 					.foregroundColor(.app.gray1)
 			}
@@ -178,7 +178,7 @@ struct PlainListRowCore: View {
 private extension PlainListRowCore.ViewState {
 	var titleTextStyle: TextStyle {
 		switch context {
-		case .general:
+		case .general, .toggle:
 			.secondaryHeader
 		case .settings:
 			.body1Header
@@ -187,7 +187,7 @@ private extension PlainListRowCore.ViewState {
 
 	var subtitleTextStyle: TextStyle {
 		switch context {
-		case .general:
+		case .general, .toggle:
 			.body2Regular
 		case .settings:
 			detail == nil ? .body1Regular : .body2Regular
@@ -196,16 +196,25 @@ private extension PlainListRowCore.ViewState {
 
 	var subtitleForegroundColor: Color {
 		switch context {
-		case .general:
+		case .general, .toggle:
 			.app.gray2
 		case .settings:
 			.app.gray1
 		}
 	}
 
+	var titleLineLimit: Int? {
+		switch context {
+		case .general, .settings:
+			1
+		case .toggle:
+			nil
+		}
+	}
+
 	var subtitleLineLimit: Int {
 		switch context {
-		case .general:
+		case .general, .toggle:
 			2
 		case .settings:
 			3
@@ -214,7 +223,7 @@ private extension PlainListRowCore.ViewState {
 
 	var verticalPadding: CGFloat {
 		switch context {
-		case .general:
+		case .general, .toggle:
 			.zero
 		case .settings:
 			.medium1
@@ -227,6 +236,7 @@ extension PlainListRowCore.ViewState {
 	enum Context {
 		case general
 		case settings
+		case toggle
 	}
 }
 

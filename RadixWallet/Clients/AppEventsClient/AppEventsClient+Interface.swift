@@ -26,5 +26,7 @@ extension DependencyValues {
 public enum AppEvent: Sendable, Hashable {
 	case appStarted
 	case walletCreated
+	case walletRestored
 	case deferredDeepLinkReceived(String)
+	case walletDidReset
 }

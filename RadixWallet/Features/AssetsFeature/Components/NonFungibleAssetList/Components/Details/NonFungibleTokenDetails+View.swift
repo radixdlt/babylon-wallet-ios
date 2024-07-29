@@ -19,7 +19,8 @@ extension NonFungibleTokenDetails.State {
 				arbitraryDataFields: resourceDetails.metadata.arbitraryItems.asDataFields,
 				behaviors: resourceDetails.behaviors,
 				tags: ownedResource.map { .success($0.metadata.tags) } ?? resourceDetails.metadata.tags
-			)
+			),
+			isClaimStakeEnabled: isClaimStakeEnabled
 		)
 	}
 }
@@ -43,6 +44,7 @@ extension NonFungibleTokenDetails {
 		let tokenDetails: TokenDetails?
 		let resourceThumbnail: Loadable<URL?>
 		let resourceDetails: AssetResourceDetailsSection.ViewState
+		let isClaimStakeEnabled: Bool
 
 		public struct TokenDetails: Equatable {
 			let keyImage: URL?
@@ -89,7 +91,7 @@ extension NonFungibleTokenDetails {
 								}
 
 								if let stakeClaim = tokenDetails.stakeClaim {
-									stakeClaimView(stakeClaim) {
+									stakeClaimView(stakeClaim, isClaimStakeEnabled: viewStore.isClaimStakeEnabled) {
 										viewStore.send(.tappedClaimStake)
 									}
 								}
@@ -132,6 +134,7 @@ extension NonFungibleTokenDetails {
 extension NonFungibleTokenDetails.View {
 	fileprivate func stakeClaimView(
 		_ stakeClaim: OnLedgerEntitiesClient.StakeClaim,
+		isClaimStakeEnabled: Bool,
 		onClaimTap: @escaping () -> Void
 	) -> some SwiftUI.View {
 		VStack(spacing: .medium3) {
@@ -150,7 +153,7 @@ extension NonFungibleTokenDetails.View {
 			.padding(.vertical, .medium2)
 			.roundedCorners(strokeColor: .app.gray4)
 
-			if stakeClaim.isReadyToBeClaimed {
+			if stakeClaim.isReadyToBeClaimed, isClaimStakeEnabled {
 				Button(L10n.AssetDetails.Staking.readyToClaim, action: onClaimTap)
 					.buttonStyle(.primaryRectangular)
 			} else if let unstakingDurationDescription = stakeClaim.unstakingDurationDescription {

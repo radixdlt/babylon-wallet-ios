@@ -636,13 +636,23 @@ public enum L10n {
       public static let readyToClaim = L10n.tr("Localizable", "assetDetails_staking_readyToClaim", fallback: "Ready to Claim")
       /// Ready to Claim in
       public static let readyToClaimIn = L10n.tr("Localizable", "assetDetails_staking_readyToClaimIn", fallback: "Ready to Claim in")
+      /// 1 day or less
+      public static let readyToClaimInDay = L10n.tr("Localizable", "assetDetails_staking_readyToClaimInDay", fallback: "1 day or less")
+      /// %d days or less
+      public static func readyToClaimInDays(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "assetDetails_staking_readyToClaimInDays", p1, fallback: "%d days or less")
+      }
+      /// 1 hour or less
+      public static let readyToClaimInHour = L10n.tr("Localizable", "assetDetails_staking_readyToClaimInHour", fallback: "1 hour or less")
+      /// %d hours or less
+      public static func readyToClaimInHours(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "assetDetails_staking_readyToClaimInHours", p1, fallback: "%d hours or less")
+      }
+      /// 1 minute or less
+      public static let readyToClaimInMinute = L10n.tr("Localizable", "assetDetails_staking_readyToClaimInMinute", fallback: "1 minute or less")
       /// %d minutes or less
       public static func readyToClaimInMinutes(_ p1: Int) -> String {
         return L10n.tr("Localizable", "assetDetails_staking_readyToClaimInMinutes", p1, fallback: "%d minutes or less")
-      }
-      /// Ready to claim in about %d minutes or less.
-      public static func unstaking(_ p1: Int) -> String {
-        return L10n.tr("Localizable", "assetDetails_staking_unstaking", p1, fallback: "Ready to claim in about %d minutes or less.")
       }
     }
     public enum StakingDetails {
@@ -798,6 +808,8 @@ public enum L10n {
       }
       /// Here are the dApps you have logged into with this Persona.
       public static let authorizedDappsHeading = L10n.tr("Localizable", "authorizedDapps_personaDetails_authorizedDappsHeading", fallback: "Here are the dApps you have logged into with this Persona.")
+      /// Edit
+      public static let edit = L10n.tr("Localizable", "authorizedDapps_personaDetails_edit", fallback: "Edit")
       /// Edit Account Sharing
       public static let editAccountSharing = L10n.tr("Localizable", "authorizedDapps_personaDetails_editAccountSharing", fallback: "Edit Account Sharing")
       /// Edit Avatar

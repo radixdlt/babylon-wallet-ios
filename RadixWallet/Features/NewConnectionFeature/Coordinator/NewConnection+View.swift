@@ -72,14 +72,15 @@ extension NewConnection {
 
 extension View {
 	func withTitle(_ title: String) -> some View {
-		VStack {
+		VStack(spacing: .zero) {
 			Text(title)
 				.foregroundColor(.app.gray1)
 				.textStyle(.sheetTitle)
-
-			Spacer(minLength: 0)
+				.padding(.bottom, .medium3)
 
 			self
+
+			Spacer(minLength: 0)
 		}
 	}
 }

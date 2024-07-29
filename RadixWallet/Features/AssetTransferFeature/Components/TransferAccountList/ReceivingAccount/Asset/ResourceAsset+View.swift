@@ -59,5 +59,50 @@ extension ResourceAsset.View {
 				}
 			}
 		}
+		.destinations(with: store)
+	}
+}
+
+private extension StoreOf<ResourceAsset> {
+	var destination: PresentationStoreOf<ResourceAsset.Destination> {
+		func scopeState(state: State) -> PresentationState<ResourceAsset.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<ResourceAsset>) -> some View {
+		let destinationStore = store.destination
+		return fungibleTokenDetails(with: destinationStore)
+			.nonFungibleTokenDetails(with: destinationStore)
+			.lsuDetails(with: destinationStore)
+			.poolUnitDetails(with: destinationStore)
+	}
+
+	private func fungibleTokenDetails(with destinationStore: PresentationStoreOf<ResourceAsset.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.fungibleTokenDetails, action: \.fungibleTokenDetails)) {
+			FungibleTokenDetails.View(store: $0)
+		}
+	}
+
+	private func nonFungibleTokenDetails(with destinationStore: PresentationStoreOf<ResourceAsset.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.nonFungibleTokenDetails, action: \.nonFungibleTokenDetails)) {
+			NonFungibleTokenDetails.View(store: $0)
+		}
+	}
+
+	private func lsuDetails(with destinationStore: PresentationStoreOf<ResourceAsset.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.lsuDetails, action: \.lsuDetails)) {
+			LSUDetails.View(store: $0)
+		}
+	}
+
+	private func poolUnitDetails(with destinationStore: PresentationStoreOf<ResourceAsset.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.poolUnitDetails, action: \.poolUnitDetails)) {
+			PoolUnitDetails.View(store: $0)
+		}
 	}
 }

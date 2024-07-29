@@ -65,7 +65,6 @@ public extension AddressDetails {
 						.foregroundColor(.app.gray1)
 
 					qrCode
-						.padding(.horizontal, .large2)
 				}
 			}
 		}
@@ -75,9 +74,10 @@ public extension AddressDetails {
 				switch store.qrImage {
 				case let .success(value):
 					GeometryReader { proxy in
+						let size = min(proxy.size.height, proxy.size.width, 275)
 						Image(decorative: value, scale: 1)
 							.resizable()
-							.frame(width: proxy.size.height, height: proxy.size.height)
+							.frame(width: size, height: size)
 							.position(x: proxy.frame(in: .local).midX, y: proxy.frame(in: .local).midY)
 					}
 					.transition(.scale(scale: 0.95).combined(with: .opacity))
@@ -94,20 +94,33 @@ public extension AddressDetails {
 			.animation(.easeInOut, value: store.qrImage.isSuccess)
 		}
 
+		@ViewBuilder
 		private var actions: some SwiftUI.View {
-			HStack(spacing: .large3) {
-				Button(L10n.AddressDetails.copy, image: .copy) {
+			FlowLayout(multilineAlignment: .center, spacing: .large3) {
+				actionButton(L10n.AddressDetails.copy, image: .copyBig) {
 					store.send(.view(.copyButtonTapped))
 				}
-				Button(L10n.AddressDetails.enlarge, image: .fullScreen) {
+				actionButton(L10n.AddressDetails.enlarge, image: .fullScreen) {
 					store.send(.view(.enlargeButtonTapped))
 				}
-				Button(L10n.AddressDetails.share, systemImage: "square.and.arrow.up") {
+				actionButton(L10n.AddressDetails.share, image: .share) {
 					store.send(.view(.shareButtonTapped))
 				}
 			}
-			.padding(.horizontal, .medium2)
-			.foregroundColor(.app.gray1)
+		}
+
+		private func actionButton(_ title: String, image: ImageResource, action: @escaping () -> Void) -> some SwiftUI.View {
+			Button(action: action) {
+				HStack(spacing: .small3) {
+					Image(image)
+						.renderingMode(.template)
+						.resizable()
+						.frame(.icon)
+						.foregroundColor(.app.gray2)
+					Text(title)
+						.foregroundColor(.app.gray1)
+				}
+			}
 		}
 
 		private var bottom: some SwiftUI.View {
@@ -139,6 +152,7 @@ private extension AddressDetails.View {
 				Text(L10n.AddressDetails.fullAddress)
 					.foregroundColor(.app.gray1)
 				Text(colorisedText)
+					.fixedSize(horizontal: false, vertical: true)
 			}
 			actions
 		}
@@ -219,16 +233,5 @@ private extension AddressDetails.View {
 		}
 
 		return .init(result)
-	}
-}
-
-private extension AddressDetails.State {
-	var showVerifyOnLedger: Bool {
-		switch address {
-		case let .account(_, isLedgerHWAccount):
-			isLedgerHWAccount
-		default:
-			false
-		}
 	}
 }

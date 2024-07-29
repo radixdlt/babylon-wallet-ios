@@ -154,8 +154,9 @@ public struct AssetsView: Sendable, FeatureReducer {
 			state.isLoadingResources = false
 			state.isRefreshing = false
 			portfolio.account = portfolio.account.nonEmptyVaults
-			updateFromPortfolio(state: &state, from: portfolio)
-			return .none
+			let nftRowsToRefresh = updateFromPortfolio(state: &state, from: portfolio)
+
+			return !nftRowsToRefresh.isEmpty ? .send(.child(.nonFungibleTokenList(.internal(.refreshRows(nftRowsToRefresh))))) : .none
 		}
 	}
 
