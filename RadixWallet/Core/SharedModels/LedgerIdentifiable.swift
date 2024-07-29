@@ -4,7 +4,7 @@ public enum LedgerIdentifiable: Sendable {
 	case transaction(IntentHash)
 
 	public static func address(of account: Account) -> Self {
-		.address(.account(account.address, isLedgerHWAccount: account.isLedgerControlled))
+		.address(.account(account.address))
 	}
 
 	public var address: String {
@@ -33,7 +33,7 @@ public enum LedgerIdentifiable: Sendable {
 // MARK: LedgerIdentifiable.Address
 extension LedgerIdentifiable {
 	public enum Address: Hashable, Sendable, Identifiable {
-		case account(AccountAddress, isLedgerHWAccount: Bool = false)
+		case account(AccountAddress)
 		case package(PackageAddress)
 		case resource(ResourceAddress)
 		case resourcePool(PoolAddress)
@@ -48,7 +48,7 @@ extension LedgerIdentifiable {
 
 		public func formatted(_ format: AddressFormat) -> String {
 			switch self {
-			case let .account(accountAddress, _):
+			case let .account(accountAddress):
 				accountAddress.formatted(format)
 			case let .package(packageAddress):
 				packageAddress.formatted(format)
@@ -86,7 +86,7 @@ extension LedgerIdentifiable {
 
 		public var id: String {
 			switch self {
-			case let .account(accountAddress, _):
+			case let .account(accountAddress):
 				accountAddress.id
 			case let .package(packageAddress):
 				packageAddress.id
@@ -109,7 +109,7 @@ extension LedgerIdentifiable.Address {
 	public init?(address: Address) {
 		switch address {
 		case let .account(accountAddress):
-			self = .account(accountAddress, isLedgerHWAccount: false)
+			self = .account(accountAddress)
 		case let .resource(resourceAddress):
 			self = .resource(resourceAddress)
 		case let .pool(poolAddress):

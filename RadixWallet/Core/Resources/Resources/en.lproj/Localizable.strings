@@ -50,11 +50,15 @@
 "assetDetails_moreInfo" = "For more info";
 "assetDetails_supplyUnkown" = "Unknown";
 "assetDetails_behavior" = "Behavior";
-"assetDetails_staking_unstaking" = "Ready to claim in about %d minutes or less.";
 "assetDetails_staking_currentRedeemableValue" = "Current Redeemable Value";
 "assetDetails_staking_readyToClaim" = "Ready to Claim";
 "assetDetails_staking_readyToClaimIn" = "Ready to Claim in";
+"assetDetails_staking_readyToClaimInDays" = "%d days or less";
+"assetDetails_staking_readyToClaimInDay" = "1 day or less";
+"assetDetails_staking_readyToClaimInHours" = "%d hours or less";
+"assetDetails_staking_readyToClaimInHour" = "1 hour or less";
 "assetDetails_staking_readyToClaimInMinutes" = "%d minutes or less";
+"assetDetails_staking_readyToClaimInMinute" = "1 minute or less";
 "assetDetails_tags" = "Tags";
 "assetDetails_tags_officialRadix" = "Official Radix";
 "assetDetails_associatedDapps" = "Associated dApps";
@@ -272,6 +276,7 @@
 "authorizedDapps_personaDetails_nameVariantWestern" = "Western style (given name(s) first)";
 "authorizedDapps_personaDetails_hideThisPersona" = "Hide This Persona";
 "authorizedDapps_personaDetails_hidePersonaConfirmation" = "Are you sure you want to hide this persona?";
+"authorizedDapps_personaDetails_edit" = "Edit";
 "editPersona_requiredByDapp" = "Required by dApp";
 "editPersona_sharedInformationHeading" = "The following information can be seen if requested by the dApp";
 "editPersona_error_blank" = "Label cannot be blank";

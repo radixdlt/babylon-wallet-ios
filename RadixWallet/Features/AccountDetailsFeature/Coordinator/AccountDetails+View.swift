@@ -78,7 +78,7 @@ extension AccountDetails {
 
 		@ViewBuilder
 		func header(with viewStore: ViewStore<AccountDetails.ViewState, AccountDetails.ViewAction>) -> some SwiftUI.View {
-			AddressView(.address(.account(viewStore.accountAddress, isLedgerHWAccount: viewStore.isLedgerAccount)))
+			AddressView(.address(.account(viewStore.accountAddress)))
 				.foregroundColor(.app.whiteTransparent)
 				.textStyle(.body2HighImportance)
 				.padding(.bottom, .small1)

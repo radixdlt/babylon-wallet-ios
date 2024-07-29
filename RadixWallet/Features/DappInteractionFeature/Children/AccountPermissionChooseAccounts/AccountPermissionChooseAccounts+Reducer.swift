@@ -45,7 +45,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 				challenge: challenge,
 				accessKind: accessKind,
 				dappMetadata: dappMetadata,
-				chooseAccounts: .init(selectionRequirement: .init(numberOfAccounts))
+				chooseAccounts: .init(context: .permission(.init(numberOfAccounts)))
 			)
 		}
 	}

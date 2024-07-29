@@ -12,25 +12,35 @@ extension OnboardingCoordinator {
 		}
 
 		public var body: some SwiftUI.View {
-			SwitchStore(store.scope(state: \.root, action: Action.child)) { state in
-				switch state {
-				case .startup:
-					CaseLet(
-						/OnboardingCoordinator.State.Root.startup,
-						action: OnboardingCoordinator.ChildAction.startup,
-						then: { OnboardingStartup.View(store: $0) }
-					)
-				case .createAccountCoordinator:
-					CaseLet(
-						/OnboardingCoordinator.State.Root.createAccountCoordinator,
-						action: OnboardingCoordinator.ChildAction.createAccountCoordinator,
-						then: {
-							CreateAccountCoordinator.View(store: $0)
-								.padding(.top, .medium3)
-						}
-					)
-				}
-			}
+			OnboardingStartup.View(store: store.startup)
+				.destinations(with: store)
+		}
+	}
+}
+
+private extension StoreOf<OnboardingCoordinator> {
+	var destination: PresentationStoreOf<OnboardingCoordinator.Destination> {
+		func scopeState(state: State) -> PresentationState<OnboardingCoordinator.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+
+	var startup: StoreOf<OnboardingStartup> {
+		scope(state: \.startup, action: \.child.startup)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<OnboardingCoordinator>) -> some View {
+		let destinationStore = store.destination
+		return createAccount(with: destinationStore)
+	}
+
+	private func createAccount(with destinationStore: PresentationStoreOf<OnboardingCoordinator.Destination>) -> some View {
+		fullScreenCover(store: destinationStore.scope(state: \.createAccount, action: \.createAccount)) {
+			CreateAccountCoordinator.View(store: $0)
 		}
 	}
 }
