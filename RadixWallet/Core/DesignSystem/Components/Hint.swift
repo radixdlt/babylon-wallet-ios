@@ -1,5 +1,4 @@
 // MARK: - Hint
-
 public struct Hint: View, Equatable {
 	public struct ViewState: Equatable {
 		public let kind: Kind
