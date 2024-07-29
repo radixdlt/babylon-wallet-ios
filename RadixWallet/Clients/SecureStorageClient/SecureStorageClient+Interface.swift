@@ -280,13 +280,24 @@ extension SecureStorageClient {
 
 extension DeviceInfo {
 	public init(id: UUID, date: Date = .now, description: String? = nil) {
-        self.init(
+		self.init(
 			id: id,
 			date: date,
 			description: description ?? "iPhone",
 			systemVersion: nil,
 			hostAppVersion: nil,
 			hostVendor: "Apple"
+		)
+	}
+}
+
+extension HostInfo {
+	public static func current() -> HostInfo {
+		/// Mostly empty for now until full migration to Sargon is done
+		.init(
+			description: .init(name: "iPhone", model: ""),
+			hostOs: .ios(version: ""),
+			hostAppVersion: ""
 		)
 	}
 }

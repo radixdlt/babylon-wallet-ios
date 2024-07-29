@@ -513,7 +513,7 @@ extension ProfileStore {
 		let bdfs = DeviceFactorSource.babylon(
 			mnemonicWithPassphrase: mnemonic,
 			isMain: true,
-			deviceInfo: lastUsedOnDevice
+			hostInfo: .current()
 		)
 
 		let bdfsMnemonic = PrivateHierarchicalDeterministicFactorSource(

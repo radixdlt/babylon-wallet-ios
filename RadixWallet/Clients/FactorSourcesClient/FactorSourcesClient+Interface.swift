@@ -273,12 +273,12 @@ extension FactorSourcesClient {
 			DeviceFactorSource.babylon(
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
 				isMain: isMain,
-				deviceInfo: deviceInfo
+				hostInfo: .current()
 			)
 		case .olympia:
 			DeviceFactorSource.olympia(
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
-				deviceInfo: deviceInfo
+				hostInfo: .current()
 			)
 		}
 
