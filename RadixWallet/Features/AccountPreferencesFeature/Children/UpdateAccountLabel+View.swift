@@ -50,7 +50,7 @@ extension UpdateAccountLabel {
 				.withNavigationBar {
 					dismiss()
 				}
-				.presentationDetents([.fraction(0.5)])
+				.presentationDetents([.fraction(0.55)])
 				.presentationDragIndicator(.visible)
 				.presentationBackground(.blur)
 		}
