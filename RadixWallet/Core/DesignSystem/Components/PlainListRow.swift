@@ -1,20 +1,33 @@
 // MARK: - PlainListRow
-struct PlainListRow<Icon: View>: View {
+struct PlainListRow<Icon: View, Accessory: View>: View {
 	struct ViewState {
-		let accessory: ImageResource?
+		let accessory: Accessory?
 		let rowCoreViewState: PlainListRowCore.ViewState
 		let icon: Icon?
 		let hints: [Hint.ViewState]
 
 		init(
 			rowCoreViewState: PlainListRowCore.ViewState,
-			accessory: ImageResource? = .chevronRight,
+			hints: [Hint.ViewState] = [],
+			@ViewBuilder accessory: () -> Accessory,
 			@ViewBuilder icon: () -> Icon
 		) {
-			self.accessory = accessory
+			self.rowCoreViewState = rowCoreViewState
+			self.hints = hints
+			self.accessory = accessory()
+			self.icon = icon()
+		}
+
+		init(
+			rowCoreViewState: PlainListRowCore.ViewState,
+			accessory: ImageResource? = .chevronRight,
+			hints: [Hint.ViewState] = [],
+			@ViewBuilder icon: () -> Icon
+		) where Accessory == Image {
+			self.accessory = accessory.map { Image($0) }
 			self.rowCoreViewState = rowCoreViewState
 			self.icon = icon()
-			self.hints = []
+			self.hints = hints
 		}
 
 		init(
@@ -22,8 +35,8 @@ struct PlainListRow<Icon: View>: View {
 			rowCoreViewState: PlainListRowCore.ViewState,
 			accessory: ImageResource? = .chevronRight,
 			hints: [Hint.ViewState]
-		) where Icon == AssetIcon {
-			self.accessory = accessory
+		) where Icon == AssetIcon, Accessory == Image {
+			self.accessory = accessory.map { Image($0) }
 			self.rowCoreViewState = rowCoreViewState
 			self.icon = content.map { AssetIcon($0) }
 			self.hints = hints
@@ -43,7 +56,7 @@ struct PlainListRow<Icon: View>: View {
 		subtitle: String? = nil,
 		accessory: ImageResource? = .chevronRight,
 		@ViewBuilder icon: () -> Icon
-	) {
+	) where Accessory == Image {
 		self.viewState = ViewState(rowCoreViewState: .init(title: title, subtitle: subtitle), accessory: accessory, icon: icon)
 	}
 
@@ -52,12 +65,12 @@ struct PlainListRow<Icon: View>: View {
 		title: String?,
 		subtitle: String? = nil,
 		accessory: ImageResource? = .chevronRight
-	) where Icon == AssetIcon {
+	) where Icon == AssetIcon, Accessory == Image {
 		self.viewState = ViewState(content, rowCoreViewState: .init(title: title, subtitle: subtitle), accessory: accessory, hints: [])
 	}
 
 	var body: some View {
-		VStack(alignment: .leading) {
+		VStack(alignment: .leading, spacing: .small1) {
 			top
 			hints
 		}
@@ -106,7 +119,7 @@ struct PlainListRow<Icon: View>: View {
 	@ViewBuilder
 	private var accessoryView: some View {
 		if let accessory = viewState.accessory {
-			Image(accessory)
+			accessory
 		}
 	}
 }
@@ -120,7 +133,7 @@ struct PlainListRowCore: View {
 		let detail: String?
 
 		init(
-			context: Context = .general,
+			context: Context = .settings,
 			title: String?,
 			subtitle: String? = nil,
 			detail: String? = nil
@@ -140,7 +153,7 @@ struct PlainListRowCore: View {
 		self.viewState = viewState
 	}
 
-	init(context: ViewState.Context = .general, title: String?, subtitle: String?) {
+	init(context: ViewState.Context = .settings, title: String?, subtitle: String?) {
 		self.viewState = ViewState(context: context, title: title, subtitle: subtitle)
 	}
 
@@ -178,7 +191,7 @@ struct PlainListRowCore: View {
 private extension PlainListRowCore.ViewState {
 	var titleTextStyle: TextStyle {
 		switch context {
-		case .general, .toggle:
+		case .toggle:
 			.secondaryHeader
 		case .settings:
 			.body1Header
@@ -187,7 +200,7 @@ private extension PlainListRowCore.ViewState {
 
 	var subtitleTextStyle: TextStyle {
 		switch context {
-		case .general, .toggle:
+		case .toggle:
 			.body2Regular
 		case .settings:
 			detail == nil ? .body1Regular : .body2Regular
@@ -196,7 +209,7 @@ private extension PlainListRowCore.ViewState {
 
 	var subtitleForegroundColor: Color {
 		switch context {
-		case .general, .toggle:
+		case .toggle:
 			.app.gray2
 		case .settings:
 			.app.gray1
@@ -205,7 +218,7 @@ private extension PlainListRowCore.ViewState {
 
 	var titleLineLimit: Int? {
 		switch context {
-		case .general, .settings:
+		case .settings:
 			1
 		case .toggle:
 			nil
@@ -214,7 +227,7 @@ private extension PlainListRowCore.ViewState {
 
 	var subtitleLineLimit: Int {
 		switch context {
-		case .general, .toggle:
+		case .toggle:
 			2
 		case .settings:
 			3
@@ -223,7 +236,7 @@ private extension PlainListRowCore.ViewState {
 
 	var verticalPadding: CGFloat {
 		switch context {
-		case .general, .toggle:
+		case .toggle:
 			.zero
 		case .settings:
 			.medium1
@@ -234,7 +247,6 @@ private extension PlainListRowCore.ViewState {
 // MARK: - PlainListRowCore.ViewState.Context
 extension PlainListRowCore.ViewState {
 	enum Context {
-		case general
 		case settings
 		case toggle
 	}

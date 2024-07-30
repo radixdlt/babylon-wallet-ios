@@ -134,8 +134,7 @@ extension DisplayEntitiesControlledByMnemonic {
 				if !viewState.accounts.isEmpty {
 					VStack(alignment: .leading, spacing: .small3) {
 						ForEach(viewState.accounts) { account in
-							SmallAccountCard(account: account)
-								.cornerRadius(.small1)
+							AccountCard(kind: .compact, account: account)
 						}
 					}
 				} else if viewState.hiddenAccountsCount > 0 {

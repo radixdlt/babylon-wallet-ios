@@ -70,7 +70,7 @@ extension TransactionReviewAccount {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				InnerCard {
-					SmallAccountCard(account: viewStore.account)
+					AccountCard(account: viewStore.account)
 
 					VStack(spacing: .zero) {
 						ForEach(viewStore.transfers) { transfer in
@@ -152,24 +152,5 @@ extension ResourceBalance.Fungible {
 			amount: resource.redemptionValue ?? .zero, // FIXME: GK - best way to handle nil amount?
 			guarantee: nil
 		)
-	}
-}
-
-extension SmallAccountCard where Accessory == EmptyView {
-	public init(account: TransactionReview.ReviewAccount) {
-		switch account {
-		case let .user(account):
-			self.init(
-				account: account
-			)
-
-		case let .external(accountAddress, _):
-			self.init(
-				L10n.TransactionReview.externalAccountName,
-				identifiable: .address(.account(accountAddress)),
-				gradient: .init(colors: [.app.gray2]),
-				verticalPadding: .small1
-			)
-		}
 	}
 }

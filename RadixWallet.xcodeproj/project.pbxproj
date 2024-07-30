@@ -762,7 +762,6 @@
 		48CFC5EC2ADC10DA00E77A5C /* Loadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1442ADC10D900E77A5C /* Loadable.swift */; };
 		48CFC5ED2ADC10DA00E77A5C /* SlideUpPanel+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1462ADC10D900E77A5C /* SlideUpPanel+Reducer.swift */; };
 		48CFC5EE2ADC10DA00E77A5C /* SlideUpPanel+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1472ADC10D900E77A5C /* SlideUpPanel+View.swift */; };
-		48CFC5EF2ADC10DA00E77A5C /* SmallAccountCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1482ADC10D900E77A5C /* SmallAccountCard.swift */; };
 		48CFC5F02ADC10DA00E77A5C /* UserDefaultsClient+AccountRecovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1492ADC10D900E77A5C /* UserDefaultsClient+AccountRecovery.swift */; };
 		48CFC5F22ADC10DA00E77A5C /* AssetResource.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC14D2ADC10D900E77A5C /* AssetResource.generated.swift */; };
 		48CFC5F32ADC10DA00E77A5C /* Fonts.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC14E2ADC10D900E77A5C /* Fonts.generated.swift */; };
@@ -893,6 +892,7 @@
 		5B6499B72BCFD0E8000F2176 /* SecurityFactors+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B52BCFD0E8000F2176 /* SecurityFactors+View.swift */; };
 		5B6499B82BCFD0E8000F2176 /* SecurityFactors+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B62BCFD0E8000F2176 /* SecurityFactors+Reducer.swift */; };
 		5B6499BA2BCFDB1E000F2176 /* ShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B92BCFDB1E000F2176 /* ShareView.swift */; };
+		5B6E11482C45835900C20F2D /* AccountCard+DataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6E11472C45835900C20F2D /* AccountCard+DataSource.swift */; };
 		5B758D4F2BCD5BF700348722 /* Effect+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B758D4E2BCD5BF700348722 /* Effect+Extra.swift */; };
 		5B758D532BCD721D00348722 /* SettingsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B758D522BCD721D00348722 /* SettingsRow.swift */; };
 		5B758D572BCE7AEC00348722 /* Preferences+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B758D552BCE7AEC00348722 /* Preferences+View.swift */; };
@@ -914,6 +914,7 @@
 		5BBC7D9F2C3D390E00B04BD6 /* BootstrapClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC7D9C2C3D390D00B04BD6 /* BootstrapClient+Live.swift */; };
 		5BBC7DA42C3D442800B04BD6 /* URLRequest+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC7DA32C3D442800B04BD6 /* URLRequest+Extra.swift */; };
 		5BBC7DA62C3EFA9700B04BD6 /* HideAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC7DA52C3EFA9700B04BD6 /* HideAccountView.swift */; };
+		5BBC7DAA2C403F3400B04BD6 /* AccountCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC7DA92C403F3400B04BD6 /* AccountCard.swift */; };
 		5BBC7DA82C40278E00B04BD6 /* NonFungibleResourceAsset+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC7DA72C40278E00B04BD6 /* NonFungibleResourceAsset+Reducer.swift */; };
 		5BC82B6C2BED18A1009AC162 /* FactoryReset+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC82B6A2BED18A1009AC162 /* FactoryReset+View.swift */; };
 		5BC82B6D2BED18A1009AC162 /* FactoryReset+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC82B6B2BED18A1009AC162 /* FactoryReset+Reducer.swift */; };
@@ -1944,7 +1945,6 @@
 		48CFC1442ADC10D900E77A5C /* Loadable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Loadable.swift; sourceTree = "<group>"; };
 		48CFC1462ADC10D900E77A5C /* SlideUpPanel+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SlideUpPanel+Reducer.swift"; sourceTree = "<group>"; };
 		48CFC1472ADC10D900E77A5C /* SlideUpPanel+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SlideUpPanel+View.swift"; sourceTree = "<group>"; };
-		48CFC1482ADC10D900E77A5C /* SmallAccountCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SmallAccountCard.swift; sourceTree = "<group>"; };
 		48CFC1492ADC10D900E77A5C /* UserDefaultsClient+AccountRecovery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UserDefaultsClient+AccountRecovery.swift"; sourceTree = "<group>"; };
 		48CFC14D2ADC10D900E77A5C /* AssetResource.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetResource.generated.swift; sourceTree = "<group>"; };
 		48CFC14E2ADC10D900E77A5C /* Fonts.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Fonts.generated.swift; sourceTree = "<group>"; };
@@ -2043,6 +2043,7 @@
 		5B6499B52BCFD0E8000F2176 /* SecurityFactors+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityFactors+View.swift"; sourceTree = "<group>"; };
 		5B6499B62BCFD0E8000F2176 /* SecurityFactors+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityFactors+Reducer.swift"; sourceTree = "<group>"; };
 		5B6499B92BCFDB1E000F2176 /* ShareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareView.swift; sourceTree = "<group>"; };
+		5B6E11472C45835900C20F2D /* AccountCard+DataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountCard+DataSource.swift"; sourceTree = "<group>"; };
 		5B758D4E2BCD5BF700348722 /* Effect+Extra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Effect+Extra.swift"; sourceTree = "<group>"; };
 		5B758D522BCD721D00348722 /* SettingsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRow.swift; sourceTree = "<group>"; };
 		5B758D552BCE7AEC00348722 /* Preferences+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Preferences+View.swift"; sourceTree = "<group>"; };
@@ -2064,6 +2065,7 @@
 		5BBC7D9C2C3D390D00B04BD6 /* BootstrapClient+Live.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BootstrapClient+Live.swift"; sourceTree = "<group>"; };
 		5BBC7DA32C3D442800B04BD6 /* URLRequest+Extra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URLRequest+Extra.swift"; sourceTree = "<group>"; };
 		5BBC7DA52C3EFA9700B04BD6 /* HideAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HideAccountView.swift; sourceTree = "<group>"; };
+		5BBC7DA92C403F3400B04BD6 /* AccountCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountCard.swift; sourceTree = "<group>"; };
 		5BBC7DA72C40278E00B04BD6 /* NonFungibleResourceAsset+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NonFungibleResourceAsset+Reducer.swift"; sourceTree = "<group>"; };
 		5BC82B6A2BED18A1009AC162 /* FactoryReset+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactoryReset+View.swift"; sourceTree = "<group>"; };
 		5BC82B6B2BED18A1009AC162 /* FactoryReset+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactoryReset+Reducer.swift"; sourceTree = "<group>"; };
@@ -5166,6 +5168,7 @@
 		48CFC1322ADC10D900E77A5C /* FeaturePrelude */ = {
 			isa = PBXGroup;
 			children = (
+				5B6E11462C45834C00C20F2D /* AccountCard */,
 				48CFC1332ADC10D900E77A5C /* LedgerRowView.swift */,
 				48CFC22C2ADC10D900E77A5C /* Radix+Dashboard.swift */,
 				48CFC1342ADC10D900E77A5C /* OnFirstTaskViewModifier.swift */,
@@ -5177,7 +5180,6 @@
 				48CFC1412ADC10D900E77A5C /* AddressView */,
 				48CFC1442ADC10D900E77A5C /* Loadable.swift */,
 				48CFC1452ADC10D900E77A5C /* SlideUpPanel */,
-				48CFC1482ADC10D900E77A5C /* SmallAccountCard.swift */,
 				48CFC1492ADC10D900E77A5C /* UserDefaultsClient+AccountRecovery.swift */,
 				A47809072BDBDB4C006B68C0 /* RadixDateFormatter.swift */,
 			);
@@ -5655,6 +5657,15 @@
 				5B6499B62BCFD0E8000F2176 /* SecurityFactors+Reducer.swift */,
 			);
 			path = SecurityFactors;
+			sourceTree = "<group>";
+		};
+		5B6E11462C45834C00C20F2D /* AccountCard */ = {
+			isa = PBXGroup;
+			children = (
+				5BBC7DA92C403F3400B04BD6 /* AccountCard.swift */,
+				5B6E11472C45835900C20F2D /* AccountCard+DataSource.swift */,
+			);
+			path = AccountCard;
 			sourceTree = "<group>";
 		};
 		5B758D542BCE7AD100348722 /* Preferences */ = {
@@ -6920,6 +6931,7 @@
 				E62449D62AFBA61100272C67 /* Home+AccountRow+View.swift in Sources */,
 				48CFC5FE2ADC10DA00E77A5C /* Account+PreviewValues.swift in Sources */,
 				48CFC5522ADC10DA00E77A5C /* StateEntityNonFungiblesPageResponse.swift in Sources */,
+				5BBC7DAA2C403F3400B04BD6 /* AccountCard.swift in Sources */,
 				48CFC5672ADC10DA00E77A5C /* AtLedgerStateMixin.swift in Sources */,
 				A462B5B02B84078D00C26D20 /* CoreAPI_StringPlaintextMessageContent.swift in Sources */,
 				48CFC4172ADC10DA00E77A5C /* PasteboardClient+Live.swift in Sources */,
@@ -7125,6 +7137,7 @@
 				48CFC28D2ADC10D900E77A5C /* TransactionReviewRawTransaction+View.swift in Sources */,
 				83EE47882AF0EE3C00155F03 /* ProgrammaticScryptoSborValueBytes.swift in Sources */,
 				48CFC2C92ADC10D900E77A5C /* FungibleResourceAsset+View.swift in Sources */,
+				5B6E11482C45835900C20F2D /* AccountCard+DataSource.swift in Sources */,
 				48CFC50D2ADC10DA00E77A5C /* FungibleResourcesCollection.swift in Sources */,
 				83EE5EDF2BE3C16F00B1531D /* StateEntitySchemaPageResponse.swift in Sources */,
 				48CFC40F2ADC10DA00E77A5C /* Logger.swift in Sources */,
@@ -7867,7 +7880,6 @@
 				A462B5BD2B90C62600C26D20 /* ResourceBalanceView+Helpers.swift in Sources */,
 				48CFC5B92ADC10DA00E77A5C /* BackButton.swift in Sources */,
 				48CFC2402ADC10D900E77A5C /* AccountPreferences+Reducer.swift in Sources */,
-				48CFC5EF2ADC10DA00E77A5C /* SmallAccountCard.swift in Sources */,
 				48CFC48C2ADC10DA00E77A5C /* DiskPersistenceClient+Test.swift in Sources */,
 				48CFC5A72ADC10DA00E77A5C /* InfoButtonStyle.swift in Sources */,
 				83EE5ED02BE3C16F00B1531D /* AccountResourcePreferencesCollection.swift in Sources */,

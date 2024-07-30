@@ -24,8 +24,8 @@ extension Home {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState) { viewStore in
 				ScrollView {
-					VStack(spacing: .medium1) {
-						HeaderView(store: store)
+					VStack(spacing: .medium3) {
+						CardCarousel.View(store: store.scope(state: \.carousel, action: \.child.carousel))
 
 						if let fiatWorth = viewStore.totalFiatWorth {
 							VStack(spacing: .small2) {
@@ -62,14 +62,22 @@ extension Home {
 						.buttonStyle(.secondaryRectangular())
 					}
 					.padding(.bottom, .medium3)
+					.padding(.top, .small1)
 				}
 				.toolbar {
+					ToolbarItem(placement: .topBarLeading) {
+						Text(L10n.HomePage.title)
+							.foregroundColor(.app.gray1)
+							.textStyle(.sheetTitle)
+							.padding(.leading, .medium3)
+					}
 					ToolbarItem(placement: .navigationBarTrailing) {
 						Button {
 							store.send(.view(.settingsButtonTapped))
 						} label: {
 							Image(.homeHeaderSettings)
 						}
+						.padding(.trailing, .medium3)
 					}
 				}
 			}
@@ -85,23 +93,6 @@ extension Home {
 			}
 			.onDisappear {
 				store.send(.view(.onDisappear))
-			}
-		}
-
-		struct HeaderView: SwiftUI.View {
-			let store: StoreOf<Home>
-
-			var body: some SwiftUI.View {
-				VStack(spacing: .small2) {
-					Text(L10n.HomePage.title)
-						.foregroundColor(.app.gray1)
-						.textStyle(.sheetTitle)
-						.flushedLeft
-						.padding(.horizontal, .medium1)
-
-					CardCarousel.View(store: store.scope(state: \.carousel, action: \.child.carousel))
-				}
-				.padding(.top, .small3)
 			}
 		}
 	}

@@ -50,7 +50,7 @@ extension SettingsRow {
 extension SettingsRow.Kind {
 	struct Model: Identifiable {
 		let id: String
-		let rowViewState: PlainListRow<AssetIcon>.ViewState
+		let rowViewState: PlainListRow<AssetIcon, Image>.ViewState
 		let action: Feature.ViewAction
 
 		public init(
@@ -65,7 +65,7 @@ extension SettingsRow.Kind {
 			self.id = title
 			self.rowViewState = .init(
 				icon,
-				rowCoreViewState: .init(context: .settings, title: title, subtitle: subtitle, detail: detail),
+				rowCoreViewState: .init(title: title, subtitle: subtitle, detail: detail),
 				accessory: accessory,
 				hints: hints
 			)

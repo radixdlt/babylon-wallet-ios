@@ -64,7 +64,7 @@ extension AccountPreferences {
 				PreferencesList(
 					viewState: .init(sections: viewStore.sections),
 					onRowSelected: { _, rowId in viewStore.send(.rowTapped(rowId)) },
-					header: { header(for: viewStore.account) },
+					header: { AccountCard(account: viewStore.account) },
 					footer: { footer(with: viewStore) }
 				)
 				.task {
@@ -79,27 +79,6 @@ extension AccountPreferences {
 }
 
 extension AccountPreferences.View {
-	private func header(for account: Account) -> some View {
-		HStack(spacing: .small3) {
-			Text(account.displayName.rawValue)
-				.lineLimit(1)
-				.textStyle(.body1Header)
-				.foregroundColor(.app.white)
-				.truncationMode(.tail)
-				.layoutPriority(0)
-
-			Spacer()
-
-			AddressView(.address(of: account))
-				.foregroundColor(.app.whiteTransparent)
-				.textStyle(.body2HighImportance)
-		}
-		.padding(.horizontal, .medium1)
-		.padding(.vertical, .medium2)
-		.background(account.appearanceId.gradient)
-		.cornerRadius(.small1)
-	}
-
 	@ViewBuilder
 	private func footer(with viewStore: ViewStoreOf<AccountPreferences>) -> some View {
 		VStack {
@@ -215,7 +194,6 @@ extension PreferenceSection.Row where RowId == AccountPreferences.Section.Sectio
 	static var accountLabel: Self {
 		.init(
 			id: .personalize(.accountLabel),
-			context: .settings,
 			title: L10n.AccountSettings.accountLabel,
 			subtitle: L10n.AccountSettings.accountLabelSubtitle,
 			icon: .asset(AssetResource.create)
@@ -225,7 +203,6 @@ extension PreferenceSection.Row where RowId == AccountPreferences.Section.Sectio
 	static func thirdPartyDeposits(_ rule: DepositRule) -> Self {
 		.init(
 			id: .onLedger(.thirdPartyDeposits),
-			context: .settings,
 			title: L10n.AccountSettings.thirdPartyDeposits,
 			subtitle: L10n.AccountSettings.thirdPartyDepositsSubtitle,
 			icon: .asset(rule.icon)
@@ -235,7 +212,6 @@ extension PreferenceSection.Row where RowId == AccountPreferences.Section.Sectio
 	static var devAccountPreferences: Self {
 		.init(
 			id: .dev(.devPreferences),
-			context: .settings,
 			title: L10n.AccountSettings.devPreferences,
 			subtitle: nil,
 			icon: .asset(AssetResource.appSettings)

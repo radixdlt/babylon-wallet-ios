@@ -11,14 +11,13 @@ struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 
 		init(
 			id: RowId,
-			context: PlainListRowCore.ViewState.Context = .general,
 			title: String,
 			subtitle: String? = nil,
 			hint: String? = nil,
 			icon: AssetIcon.Content? = nil
 		) {
 			self.id = id
-			self.rowCoreViewState = .init(context: context, title: title, subtitle: subtitle)
+			self.rowCoreViewState = .init(title: title, subtitle: subtitle)
 			self.hint = hint
 			self.icon = icon
 		}
@@ -51,7 +50,21 @@ struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 	var body: some View {
 		SwiftUI.Section {
 			ForEach(viewState.rows, id: \.id) { row in
-				rowView(row)
+				PlainListRow(viewState: .init(
+					rowCoreViewState: row.rowCoreViewState,
+					hints: hints(for: row),
+					accessory: { accesory(for: row) },
+					icon: {
+						if let icon = row.icon {
+							AssetIcon(icon)
+						}
+					}
+				))
+				.contentShape(Rectangle())
+				.tappable {
+					onRowSelected(viewState.id, row.id)
+				}
+				.listRowInsets(EdgeInsets())
 			}
 		} header: {
 			if let title = viewState.title {
@@ -68,31 +81,8 @@ struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 		.textCase(nil)
 	}
 
-	private func rowView(_ row: Row) -> some SwiftUI.View {
-		HStack {
-			VStack(alignment: .leading) {
-				HStack(spacing: .medium3) {
-					if let icon = row.icon {
-						AssetIcon(icon)
-					}
-					PlainListRowCore(viewState: row.rowCoreViewState)
-				}
-
-				if let hint = row.hint {
-					// Align hint with the PlainListRowCore
-					Text(hint)
-						.textStyle(.body2Regular)
-						.foregroundColor(.app.alert)
-						.lineSpacing(-4)
-						.padding(.leading, HitTargetSize.verySmall.frame.width + .medium3)
-						.padding(.top, .medium3)
-				}
-			}
-			.padding(.vertical, .medium3)
-			.frame(minHeight: .plainListRowMinHeight)
-
-			Spacer(minLength: 0)
-
+	private func accesory(for row: Row) -> some SwiftUI.View {
+		Group {
 			if case let .selection(selection) = viewState.mode {
 				if row.id == selection {
 					Image(asset: AssetResource.check)
@@ -104,12 +94,13 @@ struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 				Image(asset: AssetResource.chevronRight)
 			}
 		}
-		.padding(.horizontal, .medium3)
-		.contentShape(Rectangle())
-		.tappable {
-			onRowSelected(viewState.id, row.id)
+	}
+
+	private func hints(for row: Row) -> [Hint.ViewState] {
+		guard let hint = row.hint else {
+			return []
 		}
-		.listRowInsets(EdgeInsets())
+		return [.init(kind: .detail, text: Text(hint))]
 	}
 }
 
