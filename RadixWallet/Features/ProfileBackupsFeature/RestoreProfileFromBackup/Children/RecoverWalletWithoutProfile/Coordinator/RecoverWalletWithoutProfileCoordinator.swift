@@ -132,7 +132,11 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		case let .path(.element(_, action: .importMnemonic(.delegate(delegateAction)))):
 			switch delegateAction {
 			case let .notPersisted(mnemonicWithPassphrase):
-				let mainBDFS = DeviceFactorSource.babylon(mnemonicWithPassphrase: mnemonicWithPassphrase, isMain: true)
+				let mainBDFS = DeviceFactorSource.babylon(
+					mnemonicWithPassphrase: mnemonicWithPassphrase,
+					isMain: true,
+					hostInfo: .current()
+				)
 
 				let privateHD = PrivateHierarchicalDeterministicFactorSource(
 					mnemonicWithPassphrase: mnemonicWithPassphrase,

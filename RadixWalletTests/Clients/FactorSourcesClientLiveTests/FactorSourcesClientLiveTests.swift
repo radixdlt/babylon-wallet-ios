@@ -114,7 +114,7 @@ extension FactorSource {
 					lastUsedOn: .now,
 					flags: []
 				),
-				hint: DeviceFactorSourceHint(name: name, model: "iPhone", mnemonicWordCount: .twentyFour)
+				hint: DeviceFactorSourceHint(name: name, model: "iPhone", mnemonicWordCount: .twentyFour, systemVersion: nil, hostAppVersion: nil, hostVendor: nil)
 			).asGeneral
 		}
 	}

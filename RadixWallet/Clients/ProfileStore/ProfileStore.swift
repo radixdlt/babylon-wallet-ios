@@ -512,7 +512,8 @@ extension ProfileStore {
 
 		let bdfs = DeviceFactorSource.babylon(
 			mnemonicWithPassphrase: mnemonic,
-			isMain: true
+			isMain: true,
+			hostInfo: .current()
 		)
 
 		let bdfsMnemonic = PrivateHierarchicalDeterministicFactorSource(
@@ -537,10 +538,10 @@ extension ProfileStore {
 		@Dependency(\.date) var date
 
 		func createNew(deviceID: DeviceID? = nil) -> DeviceInfo {
-			.init(
+			// FIXME! Use the HostInfoDriver instead! Or RATHER delete this whole file... SargonOS is gonna do this...
+			DeviceInfo(
 				id: deviceID ?? uuid(),
-				date: date.now,
-				description: "iPhone"
+				date: date.now
 			)
 		}
 
