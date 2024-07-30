@@ -79,17 +79,22 @@ extension AddressView {
 
 			if !isImageHidden {
 				if let imageColor {
-					image
+					Image(imageResource)
 						.foregroundStyle(imageColor)
 				} else {
-					image
+					Image(imageResource)
 				}
 			}
 		}
 	}
 
-	private var image: Image {
-		Image(.copy)
+	private var imageResource: ImageResource {
+		switch identifiable {
+		case .address:
+			.copy
+		case .transaction:
+			.iconLinkOut
+		}
 	}
 
 	private var formattedText: String {
