@@ -26,7 +26,6 @@ public extension StakeUnitList {
 						viewStore.send(.view(.didTapClaimAllStakes))
 					}
 					.rowStyle()
-					.padding(.medium1)
 				}
 
 				if !viewStore.stakedValidators.isEmpty {
@@ -98,14 +97,14 @@ public extension StakeUnitList {
 
 		@ViewBuilder
 		private func stakedValidatorsSectionHeader(_ validatorsCount: Int) -> some SwiftUI.View {
-			HStack {
-				Image(asset: AssetResource.iconValidator).withDottedCircleOverlay()
+			HStack(spacing: .small2) {
+				Image(.iconValidator)
+					.withDottedCircleOverlay()
 				Text(L10n.Account.Staking.stakedValidators(validatorsCount))
 					.textStyle(.body1Link)
 					.foregroundColor(.app.gray2)
 			}
 			.rowStyle()
-			.padding(.bottom, .small2)
 		}
 	}
 }

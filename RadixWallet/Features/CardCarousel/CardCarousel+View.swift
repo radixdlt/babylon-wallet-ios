@@ -15,7 +15,7 @@ extension CardCarousel {
 			WithPerceptionTracking {
 				VStack(spacing: .small2) {
 					coreView
-						.frame(height: store.cards.isEmpty ? 0 : height)
+						.frame(height: store.cards.isEmpty ? .small2 : height)
 
 					positionIndicator
 				}
@@ -36,7 +36,6 @@ extension CardCarousel {
 					}
 					.tag(index)
 					.padding(.horizontal, margin - spacing)
-					.transition(.scale(scale: 0.8).combined(with: .opacity))
 				}
 			}
 			.tabViewStyle(.page(indexDisplayMode: .never))

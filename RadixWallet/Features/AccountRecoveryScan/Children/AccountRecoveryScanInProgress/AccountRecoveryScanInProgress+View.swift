@@ -158,7 +158,7 @@ public extension AccountRecoveryScanInProgress {
 					} else {
 						VStack(alignment: .leading, spacing: .medium3) {
 							ForEach(viewStore.active) { account in
-								SimpleAccountCard(account: account)
+								AccountCard(account: account, showName: false)
 							}
 						}
 					}
@@ -182,22 +182,6 @@ public extension AccountRecoveryScanInProgress {
 			.buttonStyle(.primaryRectangular)
 			.controlState(viewStore.buttonControlState)
 		}
-	}
-}
-
-// MARK: - SimpleAccountCard
-/// A `SmallAccountCard` without `name`, and with the address centered
-private struct SimpleAccountCard: View {
-	let account: Account
-
-	var body: some View {
-		SmallAccountCard(
-			identifiable: .address(of: account),
-			gradient: .init(account.appearanceID)
-		) {
-			Spacer(minLength: 0)
-		}
-		.cornerRadius(.small1)
 	}
 }
 

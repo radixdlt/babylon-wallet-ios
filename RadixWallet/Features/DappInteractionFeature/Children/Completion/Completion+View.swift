@@ -64,7 +64,7 @@ extension Completion {
 									.foregroundColor(.app.blue1)
 							}
 							.textStyle(.body1Header)
-							.padding(.top, .medium3)
+							.padding(.top, .small2)
 						}
 
 						Spacer()

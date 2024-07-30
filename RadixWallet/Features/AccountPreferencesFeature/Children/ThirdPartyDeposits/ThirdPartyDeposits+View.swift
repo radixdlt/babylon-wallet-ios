@@ -18,9 +18,8 @@ extension ManageThirdPartyDeposits.State {
 			.init(
 				id: .allowDenyAssets,
 				title: "",
-				rows: [.allowDenyAssets()]
+				rows: [.allowDenyAssets(), .allowDepositors()]
 			),
-			.init(id: .allowDepositors, title: nil, rows: [.allowDepositors()]),
 		],
 		updateButtonControlState: account.onLedgerSettings.thirdPartyDeposits == thirdPartyDeposits ? .disabled : .enabled)
 	}

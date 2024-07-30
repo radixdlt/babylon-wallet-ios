@@ -22,8 +22,9 @@ public struct ResourceBalanceButton: View {
 	public var body: some View {
 		HStack(alignment: .center, spacing: .small2) {
 			Button(action: onTap) {
-				ResourceBalanceView(viewState, appearance: viewAppearance, isSelected: isSelected)
-					.padding(.vertical, verticalSpacing)
+				ResourceBalanceView(viewState, appearance: .standard, isSelected: isSelected)
+					.padding(.top, topPadding)
+					.padding(.bottom, bottomPadding)
 					.padding(.horizontal, horizontalSpacing)
 					.contentShape(Rectangle())
 					.background(background)
@@ -31,19 +32,32 @@ public struct ResourceBalanceButton: View {
 		}
 	}
 
-	private var viewAppearance: ResourceBalanceView.Appearance {
-		switch appearance {
-		case .assetList, .transactionReview:
-			.standard
-		}
-	}
-
-	private var verticalSpacing: CGFloat {
+	private var topPadding: CGFloat {
 		switch appearance {
 		case .assetList:
 			switch viewState {
-			case .fungible, .nonFungible:
+			case .fungible:
+				.medium1
+			case .nonFungible:
+				.large3
+			case .liquidStakeUnit:
+				.medium3
+			case .poolUnit, .stakeClaimNFT:
+				.medium1
+			}
+		case .transactionReview:
+			.medium2
+		}
+	}
+
+	private var bottomPadding: CGFloat {
+		switch appearance {
+		case .assetList:
+			switch viewState {
+			case .fungible:
 				.medium2
+			case .nonFungible:
+				.medium1
 			case .liquidStakeUnit, .poolUnit, .stakeClaimNFT:
 				.medium3
 			}
@@ -56,10 +70,14 @@ public struct ResourceBalanceButton: View {
 		switch appearance {
 		case .assetList:
 			switch viewState {
-			case .fungible, .nonFungible:
+			case .fungible:
 				.large3
-			case .liquidStakeUnit, .poolUnit, .stakeClaimNFT:
+			case .nonFungible:
+				.medium1
+			case .liquidStakeUnit:
 				.medium3
+			case .poolUnit, .stakeClaimNFT:
+				.medium2
 			}
 		case .transactionReview:
 			.medium2
