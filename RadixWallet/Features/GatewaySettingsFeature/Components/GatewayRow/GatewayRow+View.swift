@@ -4,11 +4,12 @@ import SwiftUI
 extension Gateway {
 	var displayName: String {
 		if isWellknown {
-			if network.id == .mainnet {
+			switch network.id {
+			case .mainnet:
 				"Radix Mainnet Gateway"
-			} else if network.id == .stokenet {
+			case .stokenet:
 				"Stokenet (testnet) Gateway"
-			} else {
+			default:
 				network.displayDescription
 			}
 		} else {
