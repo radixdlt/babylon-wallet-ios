@@ -15,7 +15,7 @@ extension CardCarousel {
 			WithPerceptionTracking {
 				VStack(spacing: .small2) {
 					coreView
-						.frame(height: store.cards.isEmpty ? 0 : height)
+						.frame(height: store.cards.isEmpty ? .small2 : height)
 
 					positionIndicator
 				}
