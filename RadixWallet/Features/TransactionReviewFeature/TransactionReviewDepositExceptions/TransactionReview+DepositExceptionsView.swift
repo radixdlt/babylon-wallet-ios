@@ -52,7 +52,7 @@ extension TransactionReview.View {
 
 			var body: some View {
 				InnerCard {
-					SmallAccountCard(account: change.account)
+					AccountCard(kind: .innerCompact, account: change.account)
 
 					VStack(spacing: 1) {
 						ForEach(change.resourcePreferenceChanges) { change in

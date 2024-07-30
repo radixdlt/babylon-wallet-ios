@@ -149,12 +149,7 @@ extension CustomizeFees {
 					.foregroundColor(.app.blue2)
 				}
 				if let feePayer = viewState.feePayer?.account {
-					SmallAccountCard(
-						feePayer.displayName.rawValue,
-						identifiable: .address(of: feePayer),
-						gradient: .init(feePayer.appearanceID)
-					)
-					.cornerRadius(.small1)
+					AccountCard(account: feePayer)
 				} else {
 					AppTextField(
 						placeholder: "",

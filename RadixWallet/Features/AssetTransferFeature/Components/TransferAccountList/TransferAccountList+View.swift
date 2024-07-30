@@ -23,12 +23,7 @@ extension TransferAccountList.View {
 						.textCase(.uppercase)
 						.flushedLeft(padding: .medium3)
 
-					SmallAccountCard(
-						viewStore.fromAccount.displayName.rawValue,
-						identifiable: .address(of: viewStore.fromAccount),
-						gradient: .init(viewStore.fromAccount.appearanceID)
-					)
-					.cornerRadius(.small1)
+					AccountCard(account: viewStore.fromAccount)
 				}
 
 				Text(L10n.AssetTransfer.AccountList.toLabel)

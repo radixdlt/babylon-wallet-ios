@@ -128,8 +128,8 @@ enum SelectAccountToPayForFeeRow {
 		var body: some SwiftUI.View {
 			Button(action: action) {
 				Card {
-					VStack(spacing: 0) {
-						SmallAccountCard(account: viewState.account)
+					VStack(spacing: .zero) {
+						AccountCard(kind: .innerCompact, account: viewState.account)
 
 						HStack {
 							ResourceBalanceView(.fungible(viewState.fungible), appearance: .compact)
