@@ -49,7 +49,7 @@ extension AddAsset {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: Action.view) { viewStore in
-				VStack {
+				VStack(spacing: .zero) {
 					VStack(spacing: .medium3) {
 						titleView(viewStore.mode.title)
 						instructionsView(viewStore.mode.instructions)
@@ -58,19 +58,20 @@ extension AddAsset {
 						if case .allowDenyAssets = viewStore.mode {
 							depositListSelectionView(viewStore)
 						}
-						addAssetButton(viewStore)
-							.frame(maxHeight: .infinity, alignment: .bottom)
 					}
-					.padding(.horizontal, .medium3)
-					.padding(.bottom, .medium2)
+					Spacer()
+				}
+				.padding(.horizontal, .medium3)
+				.footer {
+					addAssetButton(viewStore)
 				}
 				.withNavigationBar {
 					viewStore.send(.closeTapped)
 				}
+				.presentationDetents([.fraction(viewStore.mode.detentsFraction)])
+				.presentationDragIndicator(.visible)
+				.presentationBackground(.blur)
 			}
-			.presentationDetents([.fraction(0.55)])
-			.presentationDragIndicator(.visible)
-			.presentationBackground(.blur)
 		}
 	}
 }
@@ -163,7 +164,7 @@ extension ResourcesListMode.ExceptionRule {
 	}
 }
 
-extension ResourcesListMode {
+private extension ResourcesListMode {
 	var allowDenyAssets: ResourcesListMode.ExceptionRule? {
 		guard case let .allowDenyAssets(type) = self else {
 			return nil
@@ -186,6 +187,15 @@ extension ResourcesListMode {
 			L10n.AccountSettings.SpecificAssetsDeposits.addAnAssetSubtitle
 		case .allowDepositors:
 			L10n.AccountSettings.ThirdPartyDeposits.addDepositorSubtitle
+		}
+	}
+
+	var detentsFraction: CGFloat {
+		switch self {
+		case .allowDenyAssets:
+			0.6
+		case .allowDepositors:
+			0.55
 		}
 	}
 }

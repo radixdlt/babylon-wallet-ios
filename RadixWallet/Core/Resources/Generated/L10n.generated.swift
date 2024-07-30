@@ -769,8 +769,8 @@ public enum L10n {
   public enum AuthorizedDapps {
     /// These are the dApps that you have logged into using the Radix Wallet.
     public static let subtitle = L10n.tr("Localizable", "authorizedDapps_subtitle", fallback: "These are the dApps that you have logged into using the Radix Wallet.")
-    /// Authorized dApps
-    public static let title = L10n.tr("Localizable", "authorizedDapps_title", fallback: "Authorized dApps")
+    /// Approved dApps
+    public static let title = L10n.tr("Localizable", "authorizedDapps_title", fallback: "Approved dApps")
     /// What is a dApp?
     public static let whatIsDapp = L10n.tr("Localizable", "authorizedDapps_whatIsDapp", fallback: "What is a dApp?")
     public enum DAppDetails {
@@ -808,6 +808,8 @@ public enum L10n {
       }
       /// Here are the dApps you have logged into with this Persona.
       public static let authorizedDappsHeading = L10n.tr("Localizable", "authorizedDapps_personaDetails_authorizedDappsHeading", fallback: "Here are the dApps you have logged into with this Persona.")
+      /// Edit
+      public static let edit = L10n.tr("Localizable", "authorizedDapps_personaDetails_edit", fallback: "Edit")
       /// Edit Account Sharing
       public static let editAccountSharing = L10n.tr("Localizable", "authorizedDapps_personaDetails_editAccountSharing", fallback: "Edit Account Sharing")
       /// Edit Avatar

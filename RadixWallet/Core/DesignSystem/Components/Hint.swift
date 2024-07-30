@@ -19,11 +19,11 @@ public struct Hint: View, Equatable {
 		}
 
 		public static func error(_ string: String) -> Self {
-			.init(kind: .error, text: string)
+			.init(kind: .error(imageSize: .smallest), text: string)
 		}
 
 		public static func error() -> Self {
-			.init(kind: .error, text: nil)
+			.init(kind: .error(imageSize: .smallest), text: nil)
 		}
 
 		public static func iconError(_ string: String) -> Self {
@@ -40,10 +40,6 @@ public struct Hint: View, Equatable {
 		case error(imageSize: HitTargetSize)
 		case warning
 		case detail
-
-		static var error: Self {
-			.error(imageSize: .smallest)
-		}
 	}
 
 	public let viewState: ViewState
@@ -95,7 +91,7 @@ private extension Hint {
 	var textStyle: TextStyle {
 		switch viewState.kind {
 		case .info, .error, .warning:
-			.body2HighImportance
+			.body2Regular
 		case .detail:
 			.body1Regular
 		}

@@ -29,15 +29,11 @@ extension AuthorizedDappsFeature.View {
 	public var body: some View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
-				VStack(spacing: 0) {
+				VStack(spacing: .medium1) {
 					Text(L10n.AuthorizedDapps.subtitle)
 						.textBlock
-						.padding(.vertical, .medium3)
 
-					Separator()
-						.padding(.vertical, .medium3)
-
-					VStack(spacing: .medium3) {
+					VStack(spacing: .small1) {
 						ForEach(viewStore.dApps) { dApp in
 							Card {
 								viewStore.send(.didSelectDapp(dApp.id))
@@ -49,14 +45,14 @@ extension AuthorizedDappsFeature.View {
 						}
 					}
 					.animation(.easeInOut, value: viewStore.dApps)
-
-					Spacer(minLength: 0)
 				}
+				.padding(.vertical, .small1)
 				.padding(.horizontal, .medium3)
 				.onAppear {
 					viewStore.send(.appeared)
 				}
 			}
+			.background(Color.app.gray5)
 			.radixToolbar(title: L10n.AuthorizedDapps.title)
 			.destinations(with: store)
 		}

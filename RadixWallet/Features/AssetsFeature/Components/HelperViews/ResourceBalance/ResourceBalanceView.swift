@@ -280,6 +280,7 @@ extension ResourceBalanceView {
 					compact: compact,
 					isSelected: isSelected
 				)
+				.padding(.horizontal, hideDetails ? .zero : .small3)
 
 				if !hideDetails {
 					Text(L10n.TransactionReview.worth.uppercased())
