@@ -625,13 +625,6 @@ extension OnLedgerEntity.OwnedFungibleResource: Comparable {
 			return lhs.amount.fiatWorth != nil
 		}
 
-		if lhs.amount.nominalAmount > .zero, rhs.amount.nominalAmount > .zero {
-			return lhs.amount.nominalAmount > rhs.amount.nominalAmount // Sort descending by amount
-		}
-		if lhs.amount.nominalAmount != .zero || rhs.amount.nominalAmount != .zero {
-			return lhs.amount.nominalAmount != .zero
-		}
-
 		if let lhsSymbol = lhs.metadata.symbol, let rhsSymbol = rhs.metadata.symbol {
 			return lhsSymbol < rhsSymbol // Sort alphabetically by symbol
 		}
