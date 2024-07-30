@@ -24,8 +24,7 @@ extension TransactionHistory {
 
 					VStack(spacing: .zero) {
 						VStack(spacing: .small2) {
-							SmallAccountCard(account: viewStore.account)
-								.roundedCorners(radius: .small1)
+							AccountCard(account: viewStore.account)
 								.padding(.horizontal, .medium3)
 
 							if let filters = viewStore.activeFilters.nilIfEmpty {

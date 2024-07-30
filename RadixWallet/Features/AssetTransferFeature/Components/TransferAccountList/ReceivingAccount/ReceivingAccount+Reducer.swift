@@ -74,33 +74,6 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 }
 
 extension AccountOrAddressOf {
-	var name: String {
-		switch self {
-		case let .profileAccount(account):
-			account.displayName.value
-		case .addressOfExternalAccount:
-			L10n.Common.account
-		}
-	}
-
-	var identifer: LedgerIdentifiable {
-		switch self {
-		case let .profileAccount(value: account):
-			.address(.account(account.address))
-		case let .addressOfExternalAccount(address):
-			.address(.account(address))
-		}
-	}
-
-	var gradient: Gradient {
-		switch self {
-		case let .profileAccount(value: account):
-			.init(account.appearanceID)
-		case .addressOfExternalAccount:
-			.init(colors: [.app.gray2])
-		}
-	}
-
 	var isUserAccount: Bool {
 		guard case .profileAccount = self else {
 			return false

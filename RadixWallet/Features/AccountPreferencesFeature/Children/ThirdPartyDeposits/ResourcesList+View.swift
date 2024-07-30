@@ -50,10 +50,7 @@ extension ResourcesList {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: .medium1) {
 					headerView(viewStore)
-					if !viewStore.resources.isEmpty {
-						listView(viewStore)
-					}
-					Spacer(minLength: 0)
+					items(resources: viewStore.resources)
 				}
 				.onFirstTask { @MainActor in
 					await viewStore.send(.task).finish()
@@ -93,6 +90,7 @@ extension ResourcesList.View {
 					}
 				}
 				.pickerStyle(.segmented)
+				.padding(.horizontal, .small3)
 			}
 
 			Text(viewStore.info)
@@ -107,50 +105,53 @@ extension ResourcesList.View {
 					.multilineTextAlignment(.center)
 			}
 		}
-		.padding(.horizontal, .medium1)
+		.padding(.horizontal, .medium3)
 	}
 
-	@ViewBuilder
-	func listView(_ viewStore: ViewStoreOf<ResourcesList>) -> some SwiftUI.View {
-		List {
-			ForEach(viewStore.resources) { row in
-				resourceRowView(row, viewStore)
-			}
-		}
-		.scrollContentBackground(.hidden)
-		.listStyle(.grouped)
-	}
-
-	@ViewBuilder
-	func resourceRowView(_ viewState: ResourceViewState, _ viewStore: ViewStoreOf<ResourcesList>) -> some SwiftUI.View {
-		HStack(spacing: .zero) {
-			if viewState.address.resourceAddress.isNonFungible {
-				Thumbnail(.nft, url: viewState.iconURL)
-			} else {
-				Thumbnail(token: .other(viewState.iconURL))
-			}
-
-			VStack(alignment: .leading, spacing: .zero) {
-				Text(viewState.name ?? "-")
-					.textStyle(.body1HighImportance)
-					.foregroundColor(.app.gray1)
-				AddressView(
-					viewState.address.ledgerIdentifiable,
-					isTappable: false,
-					isImageHidden: true
-				)
-				.foregroundColor(.app.gray2)
-			}
-			.padding(.leading, .medium3)
-
-			Spacer(minLength: 0)
-
-			AssetIcon(.asset(AssetResource.trash))
-				.onTapGesture {
-					viewStore.send(.assetRemove(viewState.address))
+	private func items(resources: IdentifiedArrayOf<ResourceViewState>) -> some SwiftUI.View {
+		ScrollView {
+			VStack(spacing: .zero) {
+				ForEach(resources) { resource in
+					PlainListRow(viewState: .init(
+						rowCoreViewState: resource.rowCoreViewState,
+						accessory: { accesoryView(resource: resource) },
+						icon: { iconView(resource: resource) }
+					))
+					.background(Color.app.white)
+					.withSeparator
 				}
+			}
 		}
-		.frame(minHeight: .largeButtonHeight)
+	}
+
+	private func accesoryView(resource: ResourceViewState) -> some SwiftUI.View {
+		Image(.trash)
+			.onTapGesture {
+				store.send(.view(.assetRemove(resource.address)))
+			}
+	}
+
+	private func iconView(resource: ResourceViewState) -> some SwiftUI.View {
+		Thumbnail(resource.thumbnailType, url: resource.iconURL).eraseToAnyView()
+	}
+}
+
+private extension ResourceViewState {
+	var thumbnailType: Thumbnail.ContentType {
+		if address.resourceAddress.isNonFungible {
+			.nft
+		} else if address.resourceAddress.isXRD {
+			.token(.xrd)
+		} else {
+			.token(.other)
+		}
+	}
+
+	var rowCoreViewState: PlainListRowCore.ViewState {
+		.init(
+			title: name ?? "-",
+			subtitle: address.resourceAddress.formatted()
+		)
 	}
 }
 
