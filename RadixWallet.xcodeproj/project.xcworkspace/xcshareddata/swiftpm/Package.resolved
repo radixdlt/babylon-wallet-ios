@@ -110,6 +110,15 @@
       }
     },
     {
+      "identity" : "sargon",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/radixdlt/sargon",
+      "state" : {
+        "revision" : "3d4c3babf97bb5c7702e3cba74add5a04f00bfdd",
+        "version" : "1.0.33"
+      }
+    },
+    {
       "identity" : "screenshotpreventing-ios",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Sajjon/ScreenshotPreventing-iOS",
