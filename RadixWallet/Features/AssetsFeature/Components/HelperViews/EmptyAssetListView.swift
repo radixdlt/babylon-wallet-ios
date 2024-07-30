@@ -11,13 +11,13 @@ struct EmptyAssetListView: View {
 	let viewState: ViewState
 
 	var body: some View {
-		VStack(spacing: .medium1) {
+		VStack(spacing: .large2) {
 			Image(asset: viewState.imageAsset)
 			Text(viewState.description)
 				.foregroundColor(.app.gray1)
 				.textStyle(.sectionHeader)
 		}
-		.padding(.top, .medium1)
+		.padding(.top, .large2)
 		.centered
 		.listRowBackground(Color.clear)
 	}
