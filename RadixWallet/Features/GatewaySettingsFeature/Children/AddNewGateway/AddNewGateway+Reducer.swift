@@ -35,6 +35,7 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 	@Dependency(\.networkSwitchingClient) var networkSwitchingClient
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.dismiss) var dismiss
+	@Dependency(\.isPresented) var isPresented
 
 	public init() {}
 
@@ -95,7 +96,11 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 			return handle(error, state: &state)
 
 		case .addGatewayResult(.success):
-			return .run { _ in await dismiss() }
+			return .run { _ in
+				if isPresented {
+					await dismiss()
+				}
+			}
 
 		case let .addGatewayResult(.failure(error)):
 			return handle(error, state: &state)
