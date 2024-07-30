@@ -48,7 +48,7 @@ extension View {
 
 	/// Sets the List section spacing if possible.
 	@available(iOS, deprecated: 18.0, message: "Should use native `listSectionSpacing` once iOS 16 is no longer supported.")
-	func setListSectionSpacing(_ spacing: CGFloat) -> some SwiftUI.View {
+	func withListSectionSpacing(_ spacing: CGFloat) -> some SwiftUI.View {
 		Group {
 			if #available(iOS 17.0, *) {
 				self

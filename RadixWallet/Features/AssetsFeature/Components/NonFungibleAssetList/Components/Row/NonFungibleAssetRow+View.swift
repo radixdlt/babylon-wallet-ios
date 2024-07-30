@@ -99,7 +99,7 @@ extension NonFungibleAssetList.Row.View {
 			let isDisabled = viewStore.disabled.contains(asset.id)
 			VStack(spacing: .zero) {
 				Divider()
-					.frame(height: .assetsDividerHeight)
+					.frame(height: .assetDividerHeight)
 					.overlay(.app.gray5)
 
 				HStack {

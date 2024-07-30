@@ -92,9 +92,10 @@ extension StakeSummaryView {
 
 private extension Loadable<ResourceAmount> {
 	var isPositive: Bool {
-		guard let value = self.nominalAmount.wrappedValue else {
-			return false
+		if let value = self.nominalAmount.wrappedValue, value > 0 {
+			true
+		} else {
+			false
 		}
-		return value > 0
 	}
 }
