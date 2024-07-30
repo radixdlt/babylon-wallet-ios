@@ -235,7 +235,7 @@
 "gateways_addNewGateway_establishingConnectionErrorMessage" = "There was an error establishing a connection";
 "gateways_removeGatewayAlert_title" = "Remove Gateway";
 "gateways_removeGatewayAlert_message" = "You will no longer be able to connect to this gateway.";
-"authorizedDapps_title" = "Authorized dApps";
+"authorizedDapps_title" = "Approved dApps";
 "authorizedDapps_subtitle" = "These are the dApps that you have logged into using the Radix Wallet.";
 "authorizedDapps_whatIsDapp" = "What is a dApp?";
 "authorizedDapps_dAppDetails_dAppDefinition" = "dApp Definition";

@@ -14,7 +14,7 @@ struct ValidatorHeaderView: View {
 	var body: some View {
 		HStack(spacing: .zero) {
 			Thumbnail(.validator, url: viewState.imageURL, size: .small)
-				.padding(.trailing, .small1)
+				.padding(.trailing, .medium3)
 
 			VStack(alignment: .leading) {
 				if let name = viewState.name {

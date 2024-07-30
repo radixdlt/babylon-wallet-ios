@@ -1,6 +1,6 @@
 // MARK: - HitTargetSize
 public enum HitTargetSize: CGFloat {
-	//// 18
+	/// 18
 	case icon = 18
 
 	/// 24

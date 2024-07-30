@@ -169,9 +169,17 @@ extension OnLedgerEntitiesClient.StakeClaim {
 		guard let reamainingEpochsUntilClaim, isUnstaking else {
 			return nil
 		}
-		return L10n.AssetDetails.Staking.readyToClaimInMinutes(
-			reamainingEpochsUntilClaim * epochDurationInMinutes
-		)
+		typealias S = L10n.AssetDetails.Staking
+		let remainingMinutes = reamainingEpochsUntilClaim * epochDurationInMinutes
+		let remainingHours = remainingMinutes / 60
+		let remainingDays = remainingHours / 24
+		if remainingDays > 0 {
+			return remainingDays == 1 ? S.readyToClaimInDay : S.readyToClaimInDays(remainingDays)
+		} else if remainingHours > 0 {
+			return remainingHours == 1 ? S.readyToClaimInHour : S.readyToClaimInHours(remainingHours)
+		} else {
+			return remainingMinutes == 1 ? S.readyToClaimInMinute : S.readyToClaimInMinutes(remainingMinutes)
+		}
 	}
 }
 
