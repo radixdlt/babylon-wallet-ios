@@ -12,14 +12,14 @@ extension GatewaySettings {
 		}
 
 		public var body: some SwiftUI.View {
-			WithPerceptionTracking {
+			WithViewStore(store, observe: { $0 }) { viewStore in
 				ScrollView {
 					coreView()
 						.padding(.bottom, .medium1)
 						.radixToolbar(title: L10n.Gateways.title)
 				}
 				.background(.app.gray5)
-				.task { @MainActor in await store.send(.view(.task)).finish() }
+				.task { @MainActor in await viewStore.send(.view(.task)).finish() }
 				.destinations(with: store)
 			}
 		}

@@ -4,14 +4,13 @@ import SwiftUI
 
 // MARK: - GatewaySettings
 public struct GatewaySettings: Sendable, FeatureReducer {
-	@ObservableState
 	public struct State: Sendable, Hashable {
 		var gatewayList: GatewayList.State
 		var currentGateway: Gateway?
 		var validatedNewGatewayToSwitchTo: Gateway?
 		var gatewayForRemoval: Gateway?
 
-		@Presents
+		@PresentationState
 		var destination: Destination.State?
 
 		public init(
@@ -20,8 +19,6 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 			self.gatewayList = gatewayList
 		}
 	}
-
-	public typealias Action = FeatureAction<Self>
 
 	@CasePathable
 	public enum ViewAction: Sendable, Equatable {
