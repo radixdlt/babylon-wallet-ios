@@ -9,7 +9,7 @@ extension HomeCardsClient: DependencyKey {
 
 		// We are hardcoding to `.mainnet` because the cards are currently gateway agnostic. In the future, when Profile is integrated into Sargon, it will be Sargon
 		// observing the current gateway and defining the networkId to use.
-		let manager = HomeCardsManager(networkAntenna: URLSession.shared, networkId: .mainnet, cardsStorage: HomeCardsStorage(), observer: observer)
+		let manager = HomeCardsManager(networkingDriver: URLSession.shared, networkId: .mainnet, cardsStorage: HomeCardsStorage(), observer: observer)
 
 		Task {
 			for try await event in appEventsClient.events() {

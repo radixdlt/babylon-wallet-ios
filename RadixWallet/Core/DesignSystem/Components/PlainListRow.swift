@@ -126,7 +126,7 @@ struct PlainListRow<Icon: View, Accessory: View>: View {
 
 // MARK: - PlainListRowCore
 struct PlainListRowCore: View {
-	struct ViewState {
+	struct ViewState: Equatable {
 		let context: Context
 		let title: String?
 		let subtitle: String?

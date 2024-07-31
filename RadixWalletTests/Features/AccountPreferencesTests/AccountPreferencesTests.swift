@@ -13,14 +13,7 @@ final class AccountPreferencesTests: TestCase {
 		)
 
 		await store.send(.view(.hideAccountTapped)) { state in
-			state.destination = .confirmHideAccount(.init(
-				title: .init(L10n.AccountSettings.hideThisAccount),
-				message: .init(L10n.AccountSettings.hideAccountConfirmation),
-				buttons: [
-					.default(.init(L10n.Common.continue), action: .send(.confirmTapped)),
-					.cancel(.init(L10n.Common.cancel), action: .send(.cancelTapped)),
-				]
-			))
+			state.destination = .hideAccount
 		}
 
 		let idsOfUpdatedAccounts = ActorIsolated<Set<Account.ID>?>(nil)
@@ -35,7 +28,7 @@ final class AccountPreferencesTests: TestCase {
 			}
 		}
 
-		await store.send(.destination(.presented(.confirmHideAccount(.confirmTapped)))) { state in
+		await store.send(.destination(.presented(.hideAccount(.confirm)))) { state in
 			state.destination = nil
 		}
 

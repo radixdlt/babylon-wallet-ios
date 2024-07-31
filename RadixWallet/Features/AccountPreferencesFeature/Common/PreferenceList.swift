@@ -5,8 +5,7 @@ import SwiftUI
 struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 	struct Row: Equatable {
 		var id: RowId
-		let title: String
-		let subtitle: String?
+		let rowCoreViewState: PlainListRowCore.ViewState
 		let hint: String?
 		let icon: AssetIcon.Content?
 
@@ -18,8 +17,7 @@ struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 			icon: AssetIcon.Content? = nil
 		) {
 			self.id = id
-			self.title = title
-			self.subtitle = subtitle
+			self.rowCoreViewState = .init(title: title, subtitle: subtitle)
 			self.hint = hint
 			self.icon = icon
 		}
@@ -53,7 +51,7 @@ struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 		SwiftUI.Section {
 			ForEach(viewState.rows, id: \.id) { row in
 				PlainListRow(viewState: .init(
-					rowCoreViewState: .init(title: row.title, subtitle: row.subtitle),
+					rowCoreViewState: row.rowCoreViewState,
 					hints: hints(for: row),
 					accessory: { accesory(for: row) },
 					icon: {

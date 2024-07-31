@@ -10,7 +10,7 @@ extension AccountPreferences.State {
 					.init(
 						id: .personalize,
 						title: L10n.AccountSettings.personalizeHeading,
-						rows: [.accountLabel(account)]
+						rows: [.accountLabel]
 					),
 					.init(
 						id: .onLedgerBehaviour,
@@ -36,7 +36,7 @@ extension AccountPreferences.State {
 		sections.append(.init(
 			id: .development,
 			title: L10n.AccountSettings.developmentHeading,
-			rows: [.devAccountPreferences()]
+			rows: [.devAccountPreferences]
 		))
 	}
 }
@@ -46,9 +46,9 @@ extension AccountPreferences {
 	public struct ViewState: Equatable {
 		typealias Section = PreferenceSection<AccountPreferences.Section, AccountPreferences.Section.SectionRow>.ViewState
 		let account: Account
-		var sections: [Section]
-		var faucetButtonState: ControlState
-		var isOnMainnet: Bool
+		let sections: [Section]
+		let faucetButtonState: ControlState
+		let isOnMainnet: Bool
 	}
 
 	@MainActor
@@ -110,7 +110,7 @@ extension AccountPreferences.View {
 		Button(L10n.AccountSettings.HideAccount.button) {
 			store.send(.view(.hideAccountTapped))
 		}
-		.buttonStyle(.primaryRectangular(isDestructive: true))
+		.buttonStyle(.secondaryRectangular(shouldExpand: true))
 	}
 }
 
@@ -130,11 +130,11 @@ private extension View {
 		return updateAccountLabel(with: destinationStore)
 			.thirdPartyDeposits(with: destinationStore)
 			.devAccountPreferences(with: destinationStore)
-			.confirmHideAccountAlert(with: destinationStore)
+			.hideAccount(with: destinationStore, store: store)
 	}
 
 	private func updateAccountLabel(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
-		navigationDestination(store: destinationStore.scope(state: \.updateAccountLabel, action: \.updateAccountLabel)) {
+		sheet(store: destinationStore.scope(state: \.updateAccountLabel, action: \.updateAccountLabel)) {
 			UpdateAccountLabel.View(store: $0)
 		}
 	}
@@ -151,8 +151,12 @@ private extension View {
 		}
 	}
 
-	private func confirmHideAccountAlert(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
-		alert(store: destinationStore.scope(state: \.confirmHideAccount, action: \.confirmHideAccount))
+	private func hideAccount(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>, store: StoreOf<AccountPreferences>) -> some View {
+		sheet(store: destinationStore.scope(state: \.hideAccount, action: \.hideAccount)) { _ in
+			HideAccountView { action in
+				store.send(.destination(.presented(.hideAccount(action))))
+			}
+		}
 	}
 }
 
@@ -187,11 +191,11 @@ extension AccountPreferences {
 }
 
 extension PreferenceSection.Row where RowId == AccountPreferences.Section.SectionRow {
-	static func accountLabel(_ account: Account) -> Self {
+	static var accountLabel: Self {
 		.init(
 			id: .personalize(.accountLabel),
 			title: L10n.AccountSettings.accountLabel,
-			subtitle: account.displayName.rawValue,
+			subtitle: L10n.AccountSettings.accountLabelSubtitle,
 			icon: .asset(AssetResource.create)
 		)
 	}
@@ -200,12 +204,12 @@ extension PreferenceSection.Row where RowId == AccountPreferences.Section.Sectio
 		.init(
 			id: .onLedger(.thirdPartyDeposits),
 			title: L10n.AccountSettings.thirdPartyDeposits,
-			subtitle: rule.text,
-			icon: .asset(AssetResource.iconAcceptAirdrop)
+			subtitle: L10n.AccountSettings.thirdPartyDepositsSubtitle,
+			icon: .asset(rule.icon)
 		)
 	}
 
-	static func devAccountPreferences() -> Self {
+	static var devAccountPreferences: Self {
 		.init(
 			id: .dev(.devPreferences),
 			title: L10n.AccountSettings.devPreferences,
@@ -216,14 +220,14 @@ extension PreferenceSection.Row where RowId == AccountPreferences.Section.Sectio
 }
 
 extension DepositRule {
-	var text: String {
+	var icon: ImageAsset {
 		switch self {
 		case .acceptAll:
-			L10n.AccountSettings.ThirdPartyDeposits.acceptAll
+			AssetResource.iconAcceptAirdrop
 		case .acceptKnown:
-			L10n.AccountSettings.ThirdPartyDeposits.onlyKnown
+			AssetResource.iconAcceptKnownAirdrop
 		case .denyAll:
-			L10n.AccountSettings.ThirdPartyDeposits.denyAll
+			AssetResource.iconDeclineAirdrop
 		}
 	}
 }

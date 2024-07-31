@@ -914,6 +914,7 @@
 		5BBC7D9E2C3D390E00B04BD6 /* BootstrapClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC7D9B2C3D390D00B04BD6 /* BootstrapClient+Interface.swift */; };
 		5BBC7D9F2C3D390E00B04BD6 /* BootstrapClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC7D9C2C3D390D00B04BD6 /* BootstrapClient+Live.swift */; };
 		5BBC7DA42C3D442800B04BD6 /* URLRequest+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC7DA32C3D442800B04BD6 /* URLRequest+Extra.swift */; };
+		5BBC7DA62C3EFA9700B04BD6 /* HideAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC7DA52C3EFA9700B04BD6 /* HideAccountView.swift */; };
 		5BBC7DAA2C403F3400B04BD6 /* AccountCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC7DA92C403F3400B04BD6 /* AccountCard.swift */; };
 		5BBC7DA82C40278E00B04BD6 /* NonFungibleResourceAsset+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC7DA72C40278E00B04BD6 /* NonFungibleResourceAsset+Reducer.swift */; };
 		5BC82B6C2BED18A1009AC162 /* FactoryReset+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC82B6A2BED18A1009AC162 /* FactoryReset+View.swift */; };
@@ -1103,6 +1104,7 @@
 		A4ECE2792BEEB01800468BF6 /* CloudBackupClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4ECE2752BEEB01800468BF6 /* CloudBackupClient+Interface.swift */; };
 		A4ECE27A2BEEB01800468BF6 /* CloudBackupClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4ECE2762BEEB01800468BF6 /* CloudBackupClient+Live.swift */; };
 		A4ECE27B2BEEB01800468BF6 /* CloudBackupClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4ECE2772BEEB01800468BF6 /* CloudBackupClient+Test.swift */; };
+		E60D5E1F2C2EFAA2008BCF1F /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = E60D5E1E2C2EFAA2008BCF1F /* Sargon */; };
 		E62449D52AFBA61100272C67 /* Home+AccountRow+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */; };
 		E62449D62AFBA61100272C67 /* Home+AccountRow+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D42AFBA61100272C67 /* Home+AccountRow+View.swift */; };
 		E62BB7632AEA856300D46DAC /* ImportMnemonicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */; };
@@ -2065,6 +2067,7 @@
 		5BBC7D9B2C3D390D00B04BD6 /* BootstrapClient+Interface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BootstrapClient+Interface.swift"; sourceTree = "<group>"; };
 		5BBC7D9C2C3D390D00B04BD6 /* BootstrapClient+Live.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BootstrapClient+Live.swift"; sourceTree = "<group>"; };
 		5BBC7DA32C3D442800B04BD6 /* URLRequest+Extra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URLRequest+Extra.swift"; sourceTree = "<group>"; };
+		5BBC7DA52C3EFA9700B04BD6 /* HideAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HideAccountView.swift; sourceTree = "<group>"; };
 		5BBC7DA92C403F3400B04BD6 /* AccountCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountCard.swift; sourceTree = "<group>"; };
 		5BBC7DA72C40278E00B04BD6 /* NonFungibleResourceAsset+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NonFungibleResourceAsset+Reducer.swift"; sourceTree = "<group>"; };
 		5BC82B6A2BED18A1009AC162 /* FactoryReset+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactoryReset+View.swift"; sourceTree = "<group>"; };
@@ -2395,6 +2398,7 @@
 				48FFFAFD2ADC241A00B2B213 /* HeapModule in Frameworks */,
 				48C845C72BEA6DC600F74DA7 /* Sargon in Frameworks */,
 				48FFFAD52ADC21B900B2B213 /* LegibleError in Frameworks */,
+				E60D5E1F2C2EFAA2008BCF1F /* Sargon in Frameworks */,
 				48FFFB082ADC6FD300B2B213 /* SwiftUINavigationCore in Frameworks */,
 				48FFFAD82ADC21D200B2B213 /* NonEmpty in Frameworks */,
 				48FFFAE12ADC220F00B2B213 /* Tagged in Frameworks */,
@@ -2617,6 +2621,7 @@
 				48CFBC742ADC10D800E77A5C /* ThirdPartyDeposits */,
 				48CFBC722ADC10D800E77A5C /* UpdateAccountLabel+Reducer.swift */,
 				48CFBC732ADC10D800E77A5C /* UpdateAccountLabel+View.swift */,
+				5BBC7DA52C3EFA9700B04BD6 /* HideAccountView.swift */,
 			);
 			path = Children;
 			sourceTree = "<group>";
@@ -6638,6 +6643,7 @@
 				E6A0B04A2BF23C7000617DAC /* IdentifiedCollections */,
 				83B783552C1764AE00AA7930 /* Sargon */,
 				831F0CEC2C21819000D6F5BF /* Sargon */,
+				E60D5E1E2C2EFAA2008BCF1F /* Sargon */,
 			);
 			productName = RadixWallet;
 			productReference = 48CFBC4F2ADC106300E77A5C /* Radix Wallet Dev.app */;
@@ -6708,7 +6714,7 @@
 				5B1C4FD32BBB0B0C00B9436F /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Strict" */,
 				8318BB172BC8403800057BCB /* XCRemoteSwiftPackageReference "swift-custom-dump" */,
 				E6A0B0492BF23C7000617DAC /* XCRemoteSwiftPackageReference "swift-identified-collections" */,
-				830E43B02C2DBC2000B6E95F /* XCRemoteSwiftPackageReference "sargon" */,
+				835DEDE22C57E9C200D7ACF0 /* XCRemoteSwiftPackageReference "sargon" */,
 			);
 			productRefGroup = 48CFBC502ADC106300E77A5C /* Products */;
 			projectDirPath = "";
@@ -6945,6 +6951,7 @@
 				48CFC4F72ADC10DA00E77A5C /* PublicKeyHashType.swift in Sources */,
 				48CFC4AD2ADC10DA00E77A5C /* FungibleResourcesCollectionItemVaultAggregatedVaultItem.swift in Sources */,
 				83856D622B0279080026452A /* VerifyMnemonic+View.swift in Sources */,
+				5BBC7DA62C3EFA9700B04BD6 /* HideAccountView.swift in Sources */,
 				48CFC4332ADC10DA00E77A5C /* Either+Extra.swift in Sources */,
 				48CFC2C72ADC10D900E77A5C /* MessageMode+View.swift in Sources */,
 				E6FA984A2B04B9AC00748F20 /* ConfirmSkippingBDFS+View.swift in Sources */,
@@ -8669,20 +8676,20 @@
 				version = 6.13.2;
 			};
 		};
-		830E43B02C2DBC2000B6E95F /* XCRemoteSwiftPackageReference "sargon" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/radixdlt/sargon";
-			requirement = {
-				kind = exactVersion;
-				version = 1.0.31;
-			};
-		};
 		8318BB172BC8403800057BCB /* XCRemoteSwiftPackageReference "swift-custom-dump" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swift-custom-dump";
 			requirement = {
 				kind = exactVersion;
 				version = 1.3.0;
+			};
+		};
+		835DEDE22C57E9C200D7ACF0 /* XCRemoteSwiftPackageReference "sargon" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/radixdlt/sargon";
+			requirement = {
+				kind = exactVersion;
+				version = 1.0.33;
 			};
 		};
 		A415574E2B757C5E0040AD4E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
@@ -8922,6 +8929,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A47571FD2B29B0860059A95D /* XCRemoteSwiftPackageReference "IOSSecuritySuite" */;
 			productName = IOSSecuritySuite;
+		};
+		E60D5E1E2C2EFAA2008BCF1F /* Sargon */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Sargon;
 		};
 		E63D123C2ADD1FC00001CBB1 /* SwiftUIIntrospect */ = {
 			isa = XCSwiftPackageProductDependency;

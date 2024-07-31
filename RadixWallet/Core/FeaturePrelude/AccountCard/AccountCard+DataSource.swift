@@ -92,7 +92,7 @@ private extension Account {
 
 private extension AccountForDisplay {
 	var asDataSource: AccountCardDataSource {
-		.init(title: label.rawValue, ledgerIdentifiable: .address(.account(address)), gradient: .init(appearanceId))
+		.init(title: displayName.value, ledgerIdentifiable: .address(.account(address)), gradient: .init(appearanceId))
 	}
 }
 
