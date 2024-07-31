@@ -5,7 +5,6 @@ import SwiftUI
 public struct DappDetails: Sendable, FeatureReducer {
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.openURL) var openURL
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
@@ -95,7 +94,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case openURLTapped(URL)
 		case fungibleTapped(ResourceAddress)
 		case nonFungibleTapped(ResourceAddress)
 		case dAppTapped(DappDefinitionAddress)
@@ -196,11 +194,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 				await send(.internal(.metadataLoaded(.init(result: result))))
 			} catch: { error, _ in
 				errorQueue.schedule(error)
-			}
-
-		case let .openURLTapped(url):
-			return .run { _ in
-				await openURL(url)
 			}
 
 		case let .fungibleTapped(address):

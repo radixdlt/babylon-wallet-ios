@@ -11,18 +11,6 @@ extension ChooseAccountsRow {
 			self.mode = state.mode
 			self.account = state.account
 		}
-
-		var name: String {
-			account.displayName.rawValue
-		}
-
-		var appearanceID: AppearanceID {
-			account.appearanceID
-		}
-
-		var address: AccountAddress {
-			account.address
-		}
 	}
 
 	@MainActor
@@ -41,21 +29,7 @@ extension ChooseAccountsRow {
 
 		var body: some SwiftUI.View {
 			Button(action: action) {
-				HStack(spacing: 0) {
-					VStack(alignment: .leading, spacing: .medium3) {
-						if showName {
-							Text(viewState.name)
-								.foregroundColor(.app.white)
-								.textStyle(.body1Header)
-						}
-
-						AddressView(.address(of: viewState.account))
-							.foregroundColor(.app.whiteTransparent)
-							.textStyle(.body2HighImportance)
-					}
-
-					Spacer(minLength: .small2)
-
+				AccountCard(kind: .selection(isSelected: isSelected), account: viewState.account, showName: showName) {
 					switch viewState.mode {
 					case .checkmark:
 						CheckmarkView(
@@ -69,13 +43,6 @@ extension ChooseAccountsRow {
 						)
 					}
 				}
-				.padding(.vertical, .medium3)
-				.padding(.horizontal, .medium1)
-				.background(
-					viewState.appearanceID.gradient
-						.brightness(isSelected ? -0.1 : 0)
-				)
-				.cornerRadius(.small1)
 			}
 			.buttonStyle(.inert)
 		}

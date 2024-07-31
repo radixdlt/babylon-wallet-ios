@@ -89,6 +89,8 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 						.device
 					case let .ledger(ledger):
 						.ledger(ledger)
+					default:
+						fatalError("DISCREPANCY: Found non .device | .ledger factor source. A real world user cannot possible have this.")
 					}
 				case .specificPrivateHDFactorSource:
 					.device
@@ -210,6 +212,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 					)
 				case let .ledger(ledgerFactorSource):
 					return deriveWith(ledgerFactorSource: ledgerFactorSource, state)
+				default: fatalError("DISCREPANCY: Found non .device | .ledger factor source. A real world user cannot possible have this.")
 				}
 			}
 

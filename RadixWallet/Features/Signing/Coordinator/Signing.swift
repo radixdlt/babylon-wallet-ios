@@ -195,8 +195,7 @@ public struct Signing: Sendable, FeatureReducer {
 				signingFactors: nextFactors,
 				signingPurposeWithPayload: signingPurposeWithPayload
 			)
-		case .offDeviceMnemonic, .securityQuestions, .trustedContact:
-			fatalError("Implement me")
+		default: fatalError("DISCREPANCY: Found non .device | .ledger factor source. A real world user cannot possible have this.")
 		}
 	}
 }

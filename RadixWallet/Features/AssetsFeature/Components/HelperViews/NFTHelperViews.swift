@@ -30,14 +30,13 @@ struct NFTIDView: View {
 	let thumbnail: URL?
 
 	var body: some View {
-		VStack(spacing: .small1) {
+		VStack(spacing: .medium3) {
 			if let thumbnail {
 				NFTFullView(
 					url: thumbnail,
 					minAspect: minImageAspect,
 					maxAspect: maxImageAspect
 				)
-				.padding(.bottom, .small1)
 			}
 			NFTNameAndIDView(name: name, id: id)
 		}

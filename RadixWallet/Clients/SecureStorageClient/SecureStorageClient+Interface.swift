@@ -265,6 +265,41 @@ extension SecureStorageClient {
 	public func deleteProfileAndMnemonicsByFactorSourceIDs(profileID: Profile.ID, keepInICloudIfPresent: Bool) throws {
 		try deleteProfileAndMnemonicsByFactorSourceIDs(profileID, keepInICloudIfPresent)
 	}
+
+	@Sendable
+	public func loadDeviceInfoOrFallback() -> DeviceInfo {
+		if let loaded = (try? self.loadDeviceInfo()) {
+			loaded
+		} else {
+			DeviceInfo(
+				id: .init()
+			)
+		}
+	}
+}
+
+extension DeviceInfo {
+	public init(id: UUID, date: Date = .now, description: String? = nil) {
+		self.init(
+			id: id,
+			date: date,
+			description: description ?? "iPhone",
+			systemVersion: nil,
+			hostAppVersion: nil,
+			hostVendor: "Apple"
+		)
+	}
+}
+
+extension HostInfo {
+	public static func current() -> HostInfo {
+		/// Mostly empty for now until full migration to Sargon is done
+		.init(
+			description: .init(name: "iPhone", model: ""),
+			hostOs: .ios(version: ""),
+			hostAppVersion: ""
+		)
+	}
 }
 
 #if DEBUG
