@@ -15,6 +15,20 @@ extension RadixConnectMobile {
 	}
 
 	func handleRequest(_ request: URL) async throws {
+		@Dependency(\.continuousClock) var clock
+		// A slight delay before handling the request.
+		//
+		// This is mainly added to fix the following issue:
+		// In some cases the Wallet will show the "Failed to validate dApp" alert.
+		//
+		// The cause for this issue is that during dApp validation, when Dev mode is not enabled,
+		// network requests are being made, and seldomly, but quite consistent, the OS will terminate
+		// the request with the quite obscure message - "Network connection lost".
+		// Likely that this is because the app is not fully in foreground at the moment the request is being made.
+		// So adding a small delay allows the OS to be ready to handle the request. Still, this assumption is based
+		// purely on expirementation, and there might be some other more robust fix.
+		try? await clock.sleep(for: .milliseconds(100))
+
 		let result = try await radixConnectMobile.handleDeepLink(url: request.absoluteString)
 		incomingMessagesSubject.send(
 			.init(
