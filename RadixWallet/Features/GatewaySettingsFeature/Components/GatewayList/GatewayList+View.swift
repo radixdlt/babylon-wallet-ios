@@ -12,27 +12,18 @@ extension GatewayList {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: { $0 }) { viewStore in
+			WithPerceptionTracking {
 				LazyVStack(spacing: .zero) {
-					ForEachStore(
-						store.scope(
-							state: \.gateways,
-							action: { .child(.gateway(id: $0, action: $1)) }
-						),
-						content: { store in
-							VStack(spacing: .zero) {
-								GatewayRow.View(store: store)
+					ForEachStore(store.scope(state: \.gateways, action: \.child.gateway)) { rowStore in
+						VStack(spacing: .zero) {
+							GatewayRow.View(store: rowStore)
 
-								if store.gateway.id != viewStore.gateways.last?.gateway.id {
-									Separator()
-										.padding(.horizontal, .medium3)
-								} else {
-									Separator()
-								}
-							}
-							.background(Color.app.white)
+							let isLastRow = rowStore.gateway.id == store.gateways.last?.gateway.id
+							Separator()
+								.padding(.horizontal, isLastRow ? 0 : .medium3)
 						}
-					)
+						.background(.app.white)
+					}
 				}
 				.buttonStyle(.tappableRowStyle)
 				.onAppear {

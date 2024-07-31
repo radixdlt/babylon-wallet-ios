@@ -2,6 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - GatewayRow
+@Reducer
 public struct GatewayRow: Sendable, FeatureReducer {
 	@ObservableState
 	public struct State: Sendable, Hashable, Identifiable {
@@ -25,6 +26,8 @@ public struct GatewayRow: Sendable, FeatureReducer {
 		}
 	}
 
+	public typealias Action = FeatureAction<Self>
+
 	public enum ViewAction: Sendable, Equatable {
 		case didSelect
 		case removeButtonTapped
@@ -36,6 +39,10 @@ public struct GatewayRow: Sendable, FeatureReducer {
 	}
 
 	public init() {}
+
+	public var body: some ReducerOf<Self> {
+		Reduce(core)
+	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {

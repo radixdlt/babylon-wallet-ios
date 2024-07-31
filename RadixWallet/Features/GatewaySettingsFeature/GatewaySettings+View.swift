@@ -12,14 +12,16 @@ extension GatewaySettings {
 		}
 
 		public var body: some SwiftUI.View {
-			ScrollView {
-				coreView()
-					.padding(.bottom, .medium1)
-					.radixToolbar(title: L10n.Gateways.title)
+			WithPerceptionTracking {
+				ScrollView {
+					coreView()
+						.padding(.bottom, .medium1)
+						.radixToolbar(title: L10n.Gateways.title)
+				}
+				.background(.app.gray5)
+				.task { @MainActor in await store.send(.view(.task)).finish() }
+				.destinations(with: store)
 			}
-			.background(.app.gray5)
-			.task { @MainActor in await store.send(.view(.task)).finish() }
-			.destinations(with: store)
 		}
 
 		private func coreView() -> some SwiftUI.View {
@@ -64,7 +66,7 @@ private extension StoreOf<GatewaySettings> {
 	}
 
 	var gatewayList: StoreOf<GatewayList> {
-		scope(state: \.gatewayList) { .child(.gatewayList($0)) }
+		scope(state: \.gatewayList, action: \.child.gatewayList)
 	}
 }
 

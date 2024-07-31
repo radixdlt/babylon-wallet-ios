@@ -35,7 +35,7 @@ extension GatewayRow {
 						store.send(.view(.didSelect))
 					}, label: {
 						HStack(spacing: .zero) {
-							Image(asset: AssetResource.check)
+							Image(.check)
 								.padding(.medium3)
 								.opacity(store.isSelected ? 1 : 0)
 

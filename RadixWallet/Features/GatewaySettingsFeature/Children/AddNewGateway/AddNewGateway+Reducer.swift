@@ -2,7 +2,9 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - AddNewGateway
+@Reducer
 public struct AddNewGateway: Sendable, FeatureReducer {
+	@ObservableState
 	public struct State: Sendable, Hashable {
 		public enum Field: String, Sendable, Hashable {
 			case gatewayURL
@@ -16,6 +18,9 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 		public init() {}
 	}
 
+	public typealias Action = FeatureAction<Self>
+
+	@CasePathable
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 		case addNewGatewayButtonTapped
@@ -38,6 +43,10 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 	@Dependency(\.isPresented) var isPresented
 
 	public init() {}
+
+	public var body: some ReducerOf<Self> {
+		Reduce(core)
+	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {

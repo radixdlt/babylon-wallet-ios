@@ -4,13 +4,14 @@ import SwiftUI
 
 // MARK: - GatewaySettings
 public struct GatewaySettings: Sendable, FeatureReducer {
+	@ObservableState
 	public struct State: Sendable, Hashable {
 		var gatewayList: GatewayList.State
 		var currentGateway: Gateway?
 		var validatedNewGatewayToSwitchTo: Gateway?
 		var gatewayForRemoval: Gateway?
 
-		@PresentationState
+		@Presents
 		var destination: Destination.State?
 
 		public init(
@@ -20,6 +21,9 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		}
 	}
 
+	public typealias Action = FeatureAction<Self>
+
+	@CasePathable
 	public enum ViewAction: Sendable, Equatable {
 		case task
 		case addGatewayButtonTapped
@@ -33,6 +37,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		case switchToGatewayResult(TaskResult<Gateway>)
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case gatewayList(GatewayList.Action)
 	}
@@ -60,13 +65,13 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.addNewGateway, action: /Action.addNewGateway) {
+			Scope(state: \.addNewGateway, action: \.addNewGateway) {
 				AddNewGateway()
 			}
-			Scope(state: /State.createAccount, action: /Action.createAccount) {
+			Scope(state: \.createAccount, action: \.createAccount) {
 				CreateAccountCoordinator()
 			}
-			Scope(state: /State.slideUpPanel, action: /Action.slideUpPanel) {
+			Scope(state: \.slideUpPanel, action: \.slideUpPanel) {
 				SlideUpPanel()
 			}
 		}
@@ -89,17 +94,15 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.gatewayList, action: /Action.child .. ChildAction.gatewayList) {
+		Scope(state: \.gatewayList, action: \.child.gatewayList) {
 			GatewayList()
 		}
 
 		Reduce(core)
-			.ifLet(destinationPath, action: /Action.destination) {
+			.ifLet(\.$destination, action: \.destination) {
 				Destination()
 			}
 	}
-
-	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
