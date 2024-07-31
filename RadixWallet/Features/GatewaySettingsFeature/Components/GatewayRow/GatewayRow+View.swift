@@ -18,6 +18,15 @@ extension Gateway {
 	}
 }
 
+extension GatewayRow.State {
+	var rowCoreViewState: PlainListRowCore.ViewState {
+		.init(
+			title: name,
+			detail: description
+		)
+	}
+}
+
 // MARK: - GatewayRow.View
 extension GatewayRow {
 	@MainActor
@@ -34,40 +43,31 @@ extension GatewayRow {
 					action: {
 						store.send(.view(.didSelect))
 					}, label: {
-						HStack(spacing: .zero) {
-							Image(.check)
-								.padding(.medium3)
-								.opacity(store.isSelected ? 1 : 0)
-
-							VStack(alignment: .leading) {
-								Text(store.name)
-									.foregroundColor(.app.gray1)
-									.textStyle(.body1HighImportance)
-									.lineLimit(1)
-									.minimumScaleFactor(0.5)
-
-								Text(store.description)
-									.foregroundColor(.app.gray2)
-									.textStyle(.body2Regular)
-							}
-
-							Spacer()
-
-							if store.canBeDeleted {
-								Button {
-									store.send(.view(.removeButtonTapped))
-								} label: {
-									Image(asset: AssetResource.trash)
-										.padding(.medium3)
-								}
-							}
-						}
-						.contentShape(Rectangle())
-						.padding(.vertical, .small2)
+						PlainListRow(viewState: .init(
+							rowCoreViewState: store.rowCoreViewState,
+							accessory: { accesoryView },
+							icon: { iconView }
+						))
 					}
 				)
 			}
 		}
+	}
+}
+
+extension GatewayRow.View {
+	@ViewBuilder
+	private var accesoryView: some SwiftUI.View {
+		if store.canBeDeleted {
+			Button(asset: AssetResource.trash) {
+				store.send(.view(.removeButtonTapped))
+			}
+		}
+	}
+
+	private var iconView: some SwiftUI.View {
+		Image(.check)
+			.opacity(store.isSelected ? 1 : 0)
 	}
 }
 
