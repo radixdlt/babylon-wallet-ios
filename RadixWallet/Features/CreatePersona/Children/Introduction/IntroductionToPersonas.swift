@@ -1,6 +1,7 @@
 import ComposableArchitecture
 import SwiftUI
 
+@Reducer
 public struct IntroductionToPersonas: Sendable, FeatureReducer {
 	@ObservableState
 	public struct State: Sendable, Hashable {
@@ -8,6 +9,8 @@ public struct IntroductionToPersonas: Sendable, FeatureReducer {
 		public var infoPanel: SlideUpPanel.State?
 		public init() {}
 	}
+
+	public typealias Action = FeatureAction<Self>
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
