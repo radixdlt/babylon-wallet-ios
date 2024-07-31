@@ -49,7 +49,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			case updateAccountLabel(UpdateAccountLabel.State)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.State)
 			case devPreferences(DevAccountPreferences.State)
-			case confirmHideAccount(AlertState<Action.ConfirmHideAccountAlert>)
+			case hideAccount
 		}
 
 		@CasePathable
@@ -57,12 +57,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			case updateAccountLabel(UpdateAccountLabel.Action)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.Action)
 			case devPreferences(DevAccountPreferences.Action)
-			case confirmHideAccount(ConfirmHideAccountAlert)
-
-			public enum ConfirmHideAccountAlert: Hashable, Sendable {
-				case confirmTapped
-				case cancelTapped
-			}
+			case hideAccount(HideAccountAction)
 		}
 
 		public var body: some ReducerOf<Self> {
@@ -112,14 +107,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			return destination(for: row, &state)
 
 		case .hideAccountTapped:
-			state.destination = .confirmHideAccount(.init(
-				title: .init(L10n.AccountSettings.hideThisAccount),
-				message: .init(L10n.AccountSettings.hideAccountConfirmation),
-				buttons: [
-					.default(.init(L10n.Common.continue), action: .send(.confirmTapped)),
-					.cancel(.init(L10n.Common.cancel), action: .send(.cancelTapped)),
-				]
-			))
+			state.destination = .hideAccount
 			return .none
 
 		case .faucetButtonTapped:
@@ -169,30 +157,28 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		     .thirdPartyDeposits(.delegate(.accountUpdated)):
 			state.destination = nil
 			return .none
-		case .updateAccountLabel:
-			return .none
-		case .thirdPartyDeposits:
-			return .none
 		#if DEBUG
 		case .devPreferences(DevAccountPreferences.Action.delegate(.debugOnlyAccountWasDeleted)):
 			return .send(.delegate(.accountHidden))
 		#endif
-		case .devPreferences:
+		case .hideAccount(.confirm):
+			state.destination = nil
+			return hideAccountEffect(state: state)
+		case .hideAccount(.cancel):
+			state.destination = nil
 			return .none
-		case let .confirmHideAccount(action):
-			switch action {
-			case .confirmTapped:
-				return .run { [account = state.account] send in
-					try await entitiesVisibilityClient.hide(account: account)
-					overlayWindowClient.scheduleHUD(.accountHidden)
-					await send(.delegate(.accountHidden))
-				} catch: { error, _ in
-					errorQueue.schedule(error)
-				}
-			case .cancelTapped:
-				break
-			}
+		default:
 			return .none
+		}
+	}
+
+	private func hideAccountEffect(state: State) -> Effect<Action> {
+		.run { [account = state.account] send in
+			try await entitiesVisibilityClient.hide(account: account)
+			overlayWindowClient.scheduleHUD(.accountHidden)
+			await send(.delegate(.accountHidden))
+		} catch: { error, _ in
+			errorQueue.schedule(error)
 		}
 	}
 }

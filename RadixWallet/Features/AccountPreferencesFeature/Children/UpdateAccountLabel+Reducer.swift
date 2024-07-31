@@ -7,6 +7,7 @@ public struct UpdateAccountLabel: FeatureReducer, Sendable {
 		var account: Account
 		var accountLabel: String
 		var sanitizedName: NonEmptyString?
+		var textFieldFocused: Bool = true
 
 		init(account: Account) {
 			self.account = account
@@ -18,6 +19,7 @@ public struct UpdateAccountLabel: FeatureReducer, Sendable {
 	public enum ViewAction: Equatable, Sendable {
 		case accountLabelChanged(String)
 		case updateTapped(NonEmptyString)
+		case focusChanged(Bool)
 	}
 
 	public enum DelegateAction: Equatable, Sendable {
@@ -47,6 +49,10 @@ public struct UpdateAccountLabel: FeatureReducer, Sendable {
 					errorQueue.schedule(error)
 				}
 			}
+
+		case let .focusChanged(value):
+			state.textFieldFocused = value
+			return .none
 		}
 	}
 }
