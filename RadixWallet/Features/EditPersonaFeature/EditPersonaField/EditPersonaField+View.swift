@@ -6,9 +6,9 @@ extension EditPersonaField.State {
 		showsTitle ? behaviour.title : nil
 	}
 
-	var inputHint: Hint? {
+	var inputHint: Hint.ViewState? {
 		if let error = $input.errors?.first {
-			return .error(error)
+			return .iconError(error)
 		} else if let defaultInfoHint {
 			return .info(defaultInfoHint)
 		}
