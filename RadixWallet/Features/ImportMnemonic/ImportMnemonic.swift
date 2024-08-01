@@ -29,11 +29,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				words.append(contentsOf: (wordCount ..< Int(newWordCount.rawValue)).map {
 					.init(
 						id: $0,
-						placeholder: ImportMnemonic.placeholder(
-							index: $0,
-							wordCount: newWordCount,
-							language: language
-						),
 						isReadonlyMode: mode.readonly != nil
 					)
 				})
@@ -228,11 +223,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 								text: $0.element.word,
 								word: $0.element,
 								completion: .auto(match: .exact)
-							),
-							placeholder: ImportMnemonic.placeholder(
-								index: $0.offset,
-								wordCount: mnemonic.wordCount,
-								language: mnemonic.language
 							),
 							isReadonlyMode: isReadonlyMode
 						)
@@ -671,36 +661,6 @@ extension ImportMnemonic {
 			try? await clock.sleep(for: .milliseconds(75))
 			await send(.internal(.focusNext(nextID)))
 		}
-	}
-}
-
-extension ImportMnemonic {
-	static func placeholder(
-		index: Int,
-		wordCount: BIP39WordCount,
-		language: BIP39Language
-	) -> String {
-		precondition(index <= 23, "Invalid BIP39 word index, got index: \(index), exected less than 24.")
-		let word: BIP39Word = {
-			let wordList = language.wordlist() // BIP39.wordList(for: language)
-			switch language {
-			case .english:
-				let bip39Alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", /* X is missing */ "y", "z"]
-				return wordList
-					// we use `last` simply because we did not like the words "abandon baby"
-					// which we get by using `first`, too sad a combination.
-					.last(
-						where: { $0.word.hasPrefix(bip39Alphabet[index]) }
-					)!
-
-			default:
-				let scale = UInt16(89) // 2048 / 23
-				let indexScaled = U11(inner: scale * UInt16(index))
-				return wordList.first(where: { $0.index == indexScaled })!
-			}
-
-		}()
-		return word.word
 	}
 }
 

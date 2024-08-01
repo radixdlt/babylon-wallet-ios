@@ -7,7 +7,6 @@ extension ImportMnemonicWord.State {
 		.init(
 			isReadonlyMode: isReadonlyMode,
 			index: id,
-			placeholder: placeholder,
 			displayText: value.text,
 			autocompletionCandidates: autocompletionCandidates,
 			focusedField: focusedField,
@@ -37,7 +36,6 @@ extension ImportMnemonicWord {
 	public struct ViewState: Equatable {
 		let isReadonlyMode: Bool
 		let index: Int
-		let placeholder: String
 		let displayText: String
 		let autocompletionCandidates: ImportMnemonicWord.State.AutocompletionCandidates?
 		let focusedField: State.Field?
@@ -74,7 +72,7 @@ extension ImportMnemonicWord {
 				VStack(spacing: .small3) {
 					AppTextField(
 						primaryHeading: .init(text: L10n.ImportMnemonic.wordHeading(viewStore.index + 1), isProminent: true),
-						placeholder: viewStore.placeholder,
+						placeholder: "",
 						text: .init(
 							get: { viewStore.displayText },
 							set: { viewStore.send(.wordChanged(input: $0.lowercased().trimmingWhitespacesAndNewlines())) }
