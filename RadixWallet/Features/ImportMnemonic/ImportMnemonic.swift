@@ -391,6 +391,10 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				&state
 			)
 
+		case let .word(id, child: .delegate(.didSubmit)):
+			state.words[id: id]?.resignFocus()
+			return delayedEffect(delay: .milliseconds(75), for: .internal(.focusNext(id + 1)))
+
 		default:
 			return .none
 		}
@@ -652,15 +656,12 @@ extension ImportMnemonic {
 	private func focusNext(_ state: inout State) -> Effect<Action> {
 		if let current = state.idOfWordWithTextFieldFocus {
 			state.words[id: current]?.resignFocus()
+			return delayedEffect(delay: .milliseconds(75), for: .internal(.focusNext(current + 1)))
 		}
-		guard let nextID = state.words.first(where: { !$0.isComplete })?.id else {
+		guard let firstIncomplete = state.words.first(where: { !$0.isComplete })?.id else {
 			return .none
 		}
-
-		return .run { send in
-			try? await clock.sleep(for: .milliseconds(75))
-			await send(.internal(.focusNext(nextID)))
-		}
+		return delayedEffect(delay: .milliseconds(75), for: .internal(.focusNext(firstIncomplete)))
 	}
 }
 

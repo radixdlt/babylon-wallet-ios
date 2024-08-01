@@ -107,13 +107,15 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Hashable {
 		case wordChanged(input: String)
 		case userSelectedCandidate(BIP39Word)
-		case textFieldFocused(State.Field?)
+		case focusChanged(State.Field?)
+		case onSubmit
 	}
 
 	public enum DelegateAction: Sendable, Hashable {
 		case lookupWord(input: String)
 		case lostFocus(displayText: String)
 		case userSelectedCandidate(BIP39Word, fromPartial: String)
+		case didSubmit
 	}
 
 	public init() {}
@@ -155,9 +157,12 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 				fromPartial: state.value.text
 			)))
 
-		case let .textFieldFocused(field):
+		case let .focusChanged(field):
 			state.focusedField = field
-			return field == nil ? .send(.delegate(.lostFocus(displayText: state.value.text))) : .none
+			return .none
+
+		case .onSubmit:
+			return .send(.delegate(.didSubmit))
 		}
 	}
 }
