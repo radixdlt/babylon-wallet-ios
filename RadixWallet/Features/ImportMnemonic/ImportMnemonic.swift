@@ -10,8 +10,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		public typealias Words = IdentifiedArrayOf<ImportMnemonicWord.State>
 		public var words: Words
 
-		public var idOfWordWithTextFieldFocus: ImportMnemonicWord.State.ID?
-
 		public var language: BIP39Language
 		public var wordCount: BIP39WordCount {
 			guard let wordCount = BIP39WordCount(wordCount: words.count) else {
@@ -268,10 +266,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			public let savedIntoProfile: Bool
 		}
 
-		case focusNext(ImportMnemonicWord.State.ID)
-		case saveFactorSourceResult(
-			TaskResult<IntermediaryResult>
-		)
+		case focusOn(ImportMnemonicWord.State.ID)
+		case saveFactorSourceResult(TaskResult<IntermediaryResult>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -392,8 +388,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			)
 
 		case let .word(id, child: .delegate(.didSubmit)):
-			state.words[id: id]?.resignFocus()
-			return delayedEffect(delay: .milliseconds(75), for: .internal(.focusNext(id + 1)))
+			return focusNext(&state, after: id)
 
 		default:
 			return .none
@@ -403,7 +398,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			return focusNext(&state)
+			return focusNext(&state, after: nil)
 
 		case let .passphraseChanged(passphrase):
 			state.bip39Passphrase = passphrase
@@ -526,8 +521,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .focusNext(id):
-			state.idOfWordWithTextFieldFocus = id
+		case let .focusOn(id):
 			state.words[id: id]?.focus()
 			return .none
 
@@ -607,7 +601,7 @@ extension ImportMnemonic {
 		_ state: inout State
 	) -> Effect<Action> {
 		state.words[id: id]?.value = .complete(text: input, word: word, completion: completion)
-		return focusNext(&state)
+		return focusNext(&state, after: id)
 	}
 
 	private func updateWord(
@@ -653,15 +647,15 @@ extension ImportMnemonic {
 		}
 	}
 
-	private func focusNext(_ state: inout State) -> Effect<Action> {
-		if let current = state.idOfWordWithTextFieldFocus {
+	private func focusNext(_ state: inout State, after current: Int?) -> Effect<Action> {
+		if let current {
 			state.words[id: current]?.resignFocus()
-			return delayedEffect(delay: .milliseconds(75), for: .internal(.focusNext(current + 1)))
-		}
-		guard let firstIncomplete = state.words.first(where: { !$0.isComplete })?.id else {
+			return delayedEffect(delay: .milliseconds(75), for: .internal(.focusOn(current + 1)))
+		} else if let firstIncomplete = state.words.first(where: { !$0.isComplete })?.id {
+			return delayedEffect(delay: .milliseconds(75), for: .internal(.focusOn(firstIncomplete)))
+		} else {
 			return .none
 		}
-		return delayedEffect(delay: .milliseconds(75), for: .internal(.focusNext(firstIncomplete)))
 	}
 }
 
