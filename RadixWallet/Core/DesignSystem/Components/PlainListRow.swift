@@ -52,12 +52,13 @@ struct PlainListRow<Icon: View, Accessory: View>: View {
 	}
 
 	init(
+		context: PlainListRowCore.ViewState.Context = .settings,
 		title: String?,
 		subtitle: String? = nil,
 		accessory: ImageResource? = .chevronRight,
 		@ViewBuilder icon: () -> Icon
 	) where Accessory == Image {
-		self.viewState = ViewState(rowCoreViewState: .init(title: title, subtitle: subtitle), accessory: accessory, icon: icon)
+		self.viewState = ViewState(rowCoreViewState: .init(context: context, title: title, subtitle: subtitle), accessory: accessory, icon: icon)
 	}
 
 	init(
@@ -75,7 +76,7 @@ struct PlainListRow<Icon: View, Accessory: View>: View {
 			hints
 		}
 		.padding(.vertical, viewState.rowCoreViewState.verticalPadding)
-		.padding(.horizontal, .medium3)
+		.padding(.horizontal, viewState.rowCoreViewState.horizontalPadding)
 		.frame(minHeight: .plainListRowMinHeight)
 		.contentShape(Rectangle())
 	}
@@ -193,7 +194,7 @@ private extension PlainListRowCore.ViewState {
 		switch context {
 		case .toggle:
 			.secondaryHeader
-		case .settings:
+		case .settings, .dappAndPersona:
 			.body1Header
 		}
 	}
@@ -202,7 +203,7 @@ private extension PlainListRowCore.ViewState {
 		switch context {
 		case .toggle:
 			.body2Regular
-		case .settings:
+		case .settings, .dappAndPersona:
 			detail == nil ? .body1Regular : .body2Regular
 		}
 	}
@@ -211,14 +212,14 @@ private extension PlainListRowCore.ViewState {
 		switch context {
 		case .toggle:
 			.app.gray2
-		case .settings:
+		case .settings, .dappAndPersona:
 			.app.gray1
 		}
 	}
 
 	var titleLineLimit: Int? {
 		switch context {
-		case .settings:
+		case .settings, .dappAndPersona:
 			1
 		case .toggle:
 			nil
@@ -229,7 +230,7 @@ private extension PlainListRowCore.ViewState {
 		switch context {
 		case .toggle:
 			2
-		case .settings:
+		case .settings, .dappAndPersona:
 			3
 		}
 	}
@@ -240,6 +241,17 @@ private extension PlainListRowCore.ViewState {
 			.zero
 		case .settings:
 			.medium1
+		case .dappAndPersona:
+			.medium3
+		}
+	}
+
+	var horizontalPadding: CGFloat {
+		switch context {
+		case .toggle, .settings:
+			.medium3
+		case .dappAndPersona:
+			.medium1
 		}
 	}
 }
@@ -249,6 +261,7 @@ extension PlainListRowCore.ViewState {
 	enum Context {
 		case settings
 		case toggle
+		case dappAndPersona
 	}
 }
 

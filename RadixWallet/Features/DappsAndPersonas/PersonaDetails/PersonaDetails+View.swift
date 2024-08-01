@@ -237,7 +237,7 @@ extension PersonaDetails.View {
 
 		var body: some View {
 			WithViewStore(store, observe: { $0 }) { viewStore in
-				VStack(spacing: .medium1) {
+				VStack(spacing: .medium3) {
 					Text(L10n.AuthorizedDapps.PersonaDetails.authorizedDappsHeading)
 						.textBlock
 						.flushedLeft
@@ -247,7 +247,7 @@ extension PersonaDetails.View {
 						Card {
 							viewStore.send(.dAppTapped(dApp.id))
 						} contents: {
-							PlainListRow(title: dApp.displayName) {
+							PlainListRow(context: .dappAndPersona, title: dApp.displayName) {
 								Thumbnail(.dapp, url: dApp.thumbnail)
 							}
 						}
