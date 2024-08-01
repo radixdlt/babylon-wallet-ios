@@ -64,11 +64,11 @@ extension CreatePersonaCoordinator {
 							then: { IntroductionToPersonas.View(store: $0) }
 						)
 
-					case .step1_newPersonaInfo:
+					case .step1_createPersona:
 						CaseLet(
-							/CreatePersonaCoordinator.Path.State.step1_newPersonaInfo,
-							action: CreatePersonaCoordinator.Path.Action.step1_newPersonaInfo,
-							then: { NewPersonaInfo.View(store: $0) }
+							/CreatePersonaCoordinator.Path.State.step1_createPersona,
+							action: CreatePersonaCoordinator.Path.Action.step1_createPersona,
+							then: { EditPersona.View(store: $0) }
 						)
 
 					case .step2_completion:

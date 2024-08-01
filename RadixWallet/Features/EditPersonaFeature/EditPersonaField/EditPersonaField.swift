@@ -4,6 +4,7 @@ import SwiftUI
 // MARK: - EditPersonaFieldKindBehaviour
 public protocol EditPersonaFieldKindBehaviour: Sendable, Hashable, Comparable {
 	var title: String { get }
+	var placeholder: String { get }
 	var contentType: UITextContentType? { get }
 	var keyboardType: UIKeyboardType { get }
 	var capitalization: EquatableTextInputCapitalization? { get }
@@ -16,6 +17,8 @@ public struct EditPersonaField<Behaviour: EditPersonaFieldKindBehaviour>: Sendab
 		public let entryID: PersonaDataEntryID
 		let isRequestedByDapp: Bool
 		let showsTitle: Bool
+		let defaultInfoHint: String?
+		var textFieldFocused: Bool
 
 		@Validation<String, String>
 		public var input: String?
@@ -25,7 +28,9 @@ public struct EditPersonaField<Behaviour: EditPersonaFieldKindBehaviour>: Sendab
 			entryID: PersonaDataEntryID?,
 			input: Validation<String, String>,
 			isRequestedByDapp: Bool,
-			showsTitle: Bool
+			showsTitle: Bool,
+			defaultInfoHint: String?,
+			textFieldFocused: Bool
 		) {
 			@Dependency(\.uuid) var uuid
 			self.entryID = entryID ?? uuid()
@@ -33,6 +38,8 @@ public struct EditPersonaField<Behaviour: EditPersonaFieldKindBehaviour>: Sendab
 			self._input = input
 			self.isRequestedByDapp = isRequestedByDapp
 			self.showsTitle = showsTitle
+			self.defaultInfoHint = defaultInfoHint
+			self.textFieldFocused = textFieldFocused
 		}
 	}
 
@@ -40,12 +47,17 @@ public struct EditPersonaField<Behaviour: EditPersonaFieldKindBehaviour>: Sendab
 
 	public enum ViewAction: Sendable, Equatable {
 		case inputFieldChanged(String)
+		case focusChanged(Bool)
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .inputFieldChanged(input):
 			state.input = input
+			return .none
+
+		case let .focusChanged(value):
+			state.textFieldFocused = value
 			return .none
 		}
 	}
@@ -60,6 +72,12 @@ extension EditPersona.State.StaticFieldID: EditPersonaFieldKindBehaviour {
 	public var title: String {
 		switch self {
 		case .personaLabel: L10n.AuthorizedDapps.PersonaDetails.personaLabelHeading
+		}
+	}
+
+	public var placeholder: String {
+		switch self {
+		case .personaLabel: L10n.CreatePersona.NameNewPersona.placeholder
 		}
 	}
 
@@ -86,18 +104,25 @@ extension EditPersonaStaticField.State {
 	public init(
 		behaviour: Behaviour,
 		entryID: PersonaDataEntryID?,
-		initial: String?
+		initial: String?,
+		defaultInfoHint: String? = nil,
+		textFieldFocused: Bool = false
 	) {
 		self.init(
 			behaviour: behaviour,
 			entryID: entryID,
 			input: .init(
 				wrappedValue: initial,
-				onNil: L10n.EditPersona.Error.blank,
-				rules: [.if(\.isBlank, error: L10n.EditPersona.Error.blank)]
+				onNil: nil,
+				rules: [
+					.if(\.isBlank, error: L10n.EditPersona.Error.blank),
+					.if({ $0.count > Persona.nameMaxLength }, error: L10n.Error.PersonaLabel.tooLong),
+				]
 			),
 			isRequestedByDapp: false,
-			showsTitle: true
+			showsTitle: true,
+			defaultInfoHint: defaultInfoHint,
+			textFieldFocused: textFieldFocused
 		)
 	}
 }
@@ -137,6 +162,8 @@ extension DynamicFieldID: EditPersonaFieldKindBehaviour {
 		case .creditCard: "Credit Card"
 		}
 	}
+
+	public var placeholder: String { "" }
 
 	public var contentType: UITextContentType? {
 		switch self {
@@ -218,7 +245,9 @@ extension EditPersonaDynamicField.State {
 		entryID: PersonaDataEntryID?,
 		text: String?,
 		isRequiredByDapp: Bool,
-		showsTitle: Bool
+		showsTitle: Bool,
+		defaultInfoHint: String? = nil,
+		textFieldFocused: Bool = false
 	) {
 		self.init(
 			behaviour: behaviour,
@@ -229,7 +258,9 @@ extension EditPersonaDynamicField.State {
 				rules: []
 			),
 			isRequestedByDapp: isRequiredByDapp,
-			showsTitle: showsTitle
+			showsTitle: showsTitle,
+			defaultInfoHint: defaultInfoHint,
+			textFieldFocused: textFieldFocused
 		)
 	}
 }

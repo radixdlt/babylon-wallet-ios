@@ -106,8 +106,10 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 		case .persona(.delegate(.edit)):
 			if let persona = state.persona {
 				state.destination = .editPersona(.init(
-					mode: .dapp(requiredEntries: Set(state.requested.kindRequests.keys)),
-					persona: persona.persona
+					mode: .dapp(
+						persona: persona.persona,
+						requiredEntries: Set(state.requested.kindRequests.keys)
+					)
 				))
 			}
 			return .none

@@ -52,6 +52,7 @@ public struct EditPersonaEntries: Sendable, FeatureReducer {
 		}
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case name(EditPersonaEntry<EditPersonaName>.Action)
 		case emailAddress(EditPersonaEntry<EditPersonaDynamicField>.Action)
@@ -88,5 +89,11 @@ public struct EditPersonaEntries: Sendable, FeatureReducer {
 		default:
 			return .none
 		}
+	}
+}
+
+extension EditPersonaEntries.State {
+	var isEmpty: Bool {
+		name == nil && emailAddress == nil && phoneNumber == nil
 	}
 }

@@ -208,8 +208,6 @@
 		48CFC2F32ADC10D900E77A5C /* CreatePersonaCoordinator+Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD7F2ADC10D800E77A5C /* CreatePersonaCoordinator+Models.swift */; };
 		48CFC2F42ADC10D900E77A5C /* IntroductionToPersonas+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD822ADC10D800E77A5C /* IntroductionToPersonas+View.swift */; };
 		48CFC2F52ADC10D900E77A5C /* IntroductionToPersonas.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD832ADC10D800E77A5C /* IntroductionToPersonas.swift */; };
-		48CFC2F82ADC10D900E77A5C /* InfoOfNewPersona+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD882ADC10D800E77A5C /* InfoOfNewPersona+View.swift */; };
-		48CFC2F92ADC10D900E77A5C /* InfoOfNewPersona+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD892ADC10D800E77A5C /* InfoOfNewPersona+Reducer.swift */; };
 		48CFC2FA2ADC10D900E77A5C /* NewPersonaCompletion+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD8B2ADC10D800E77A5C /* NewPersonaCompletion+View.swift */; };
 		48CFC2FB2ADC10D900E77A5C /* NewPersonaCompletion+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD8C2ADC10D800E77A5C /* NewPersonaCompletion+Reducer.swift */; };
 		48CFC2FC2ADC10D900E77A5C /* DefaultDepositGuarantees+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD902ADC10D800E77A5C /* DefaultDepositGuarantees+Reducer.swift */; };
@@ -1393,8 +1391,6 @@
 		48CFBD7F2ADC10D800E77A5C /* CreatePersonaCoordinator+Models.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CreatePersonaCoordinator+Models.swift"; sourceTree = "<group>"; };
 		48CFBD822ADC10D800E77A5C /* IntroductionToPersonas+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "IntroductionToPersonas+View.swift"; sourceTree = "<group>"; };
 		48CFBD832ADC10D800E77A5C /* IntroductionToPersonas.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntroductionToPersonas.swift; sourceTree = "<group>"; };
-		48CFBD882ADC10D800E77A5C /* InfoOfNewPersona+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "InfoOfNewPersona+View.swift"; sourceTree = "<group>"; };
-		48CFBD892ADC10D800E77A5C /* InfoOfNewPersona+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "InfoOfNewPersona+Reducer.swift"; sourceTree = "<group>"; };
 		48CFBD8B2ADC10D800E77A5C /* NewPersonaCompletion+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NewPersonaCompletion+View.swift"; sourceTree = "<group>"; };
 		48CFBD8C2ADC10D800E77A5C /* NewPersonaCompletion+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NewPersonaCompletion+Reducer.swift"; sourceTree = "<group>"; };
 		48CFBD902ADC10D800E77A5C /* DefaultDepositGuarantees+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DefaultDepositGuarantees+Reducer.swift"; sourceTree = "<group>"; };
@@ -2741,18 +2737,12 @@
 		48CFBC9A2ADC10D800E77A5C /* EditPersonaFeature */ = {
 			isa = PBXGroup;
 			children = (
-				48CFBC9B2ADC10D800E77A5C /* EditPersonaField.swift */,
-				48CFBC9C2ADC10D800E77A5C /* EditPersonaEntry.swift */,
-				48CFBC9D2ADC10D800E77A5C /* EditPersonaName+View.swift */,
-				48CFBC9E2ADC10D800E77A5C /* EditPersonaEntry+View.swift */,
-				48CFBC9F2ADC10D800E77A5C /* EditPersonaAddEntryKinds+View.swift */,
-				48CFBCA02ADC10D800E77A5C /* EditPersona+View.swift */,
-				48CFBCA12ADC10D800E77A5C /* EditPersonaName.swift */,
-				48CFBCA22ADC10D800E77A5C /* EditPersona.swift */,
-				48CFBCA32ADC10D800E77A5C /* EditPersonaAddEntryKinds.swift */,
-				48CFBCA42ADC10D800E77A5C /* EditPersonaEntries.swift */,
-				48CFBCA52ADC10D800E77A5C /* EditPersonaEntries+View.swift */,
-				48CFBCA62ADC10D800E77A5C /* EditPersonaField+View.swift */,
+				E76F56C12C538159001EDC63 /* EditPersona */,
+				E76F56BF2C538061001EDC63 /* EditPersonaField */,
+				E76F56C22C538170001EDC63 /* EditPersonaName */,
+				E76F56C02C538081001EDC63 /* EditPersonaEntry */,
+				E76F56C32C538198001EDC63 /* EditPersonaEntries */,
+				E76F56C42C5381A7001EDC63 /* EditPersonaAddEntryKinds */,
 			);
 			path = EditPersonaFeature;
 			sourceTree = "<group>";
@@ -3333,7 +3323,6 @@
 			isa = PBXGroup;
 			children = (
 				48CFBD812ADC10D800E77A5C /* Introduction */,
-				48CFBD872ADC10D800E77A5C /* InfoOfNewPersona */,
 				48CFBD8A2ADC10D800E77A5C /* NewPersonaCompletion */,
 			);
 			path = Children;
@@ -3346,15 +3335,6 @@
 				48CFBD832ADC10D800E77A5C /* IntroductionToPersonas.swift */,
 			);
 			path = Introduction;
-			sourceTree = "<group>";
-		};
-		48CFBD872ADC10D800E77A5C /* InfoOfNewPersona */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBD882ADC10D800E77A5C /* InfoOfNewPersona+View.swift */,
-				48CFBD892ADC10D800E77A5C /* InfoOfNewPersona+Reducer.swift */,
-			);
-			path = InfoOfNewPersona;
 			sourceTree = "<group>";
 		};
 		48CFBD8A2ADC10D800E77A5C /* NewPersonaCompletion */ = {
@@ -6527,6 +6507,60 @@
 			path = ConfirmSkippingBDFS;
 			sourceTree = "<group>";
 		};
+		E76F56BF2C538061001EDC63 /* EditPersonaField */ = {
+			isa = PBXGroup;
+			children = (
+				48CFBC9B2ADC10D800E77A5C /* EditPersonaField.swift */,
+				48CFBCA62ADC10D800E77A5C /* EditPersonaField+View.swift */,
+			);
+			path = EditPersonaField;
+			sourceTree = "<group>";
+		};
+		E76F56C02C538081001EDC63 /* EditPersonaEntry */ = {
+			isa = PBXGroup;
+			children = (
+				48CFBC9C2ADC10D800E77A5C /* EditPersonaEntry.swift */,
+				48CFBC9E2ADC10D800E77A5C /* EditPersonaEntry+View.swift */,
+			);
+			path = EditPersonaEntry;
+			sourceTree = "<group>";
+		};
+		E76F56C12C538159001EDC63 /* EditPersona */ = {
+			isa = PBXGroup;
+			children = (
+				48CFBCA22ADC10D800E77A5C /* EditPersona.swift */,
+				48CFBCA02ADC10D800E77A5C /* EditPersona+View.swift */,
+			);
+			path = EditPersona;
+			sourceTree = "<group>";
+		};
+		E76F56C22C538170001EDC63 /* EditPersonaName */ = {
+			isa = PBXGroup;
+			children = (
+				48CFBCA12ADC10D800E77A5C /* EditPersonaName.swift */,
+				48CFBC9D2ADC10D800E77A5C /* EditPersonaName+View.swift */,
+			);
+			path = EditPersonaName;
+			sourceTree = "<group>";
+		};
+		E76F56C32C538198001EDC63 /* EditPersonaEntries */ = {
+			isa = PBXGroup;
+			children = (
+				48CFBCA42ADC10D800E77A5C /* EditPersonaEntries.swift */,
+				48CFBCA52ADC10D800E77A5C /* EditPersonaEntries+View.swift */,
+			);
+			path = EditPersonaEntries;
+			sourceTree = "<group>";
+		};
+		E76F56C42C5381A7001EDC63 /* EditPersonaAddEntryKinds */ = {
+			isa = PBXGroup;
+			children = (
+				48CFBCA32ADC10D800E77A5C /* EditPersonaAddEntryKinds.swift */,
+				48CFBC9F2ADC10D800E77A5C /* EditPersonaAddEntryKinds+View.swift */,
+			);
+			path = EditPersonaAddEntryKinds;
+			sourceTree = "<group>";
+		};
 		E7A5AC942C09F428006CB6EC /* ResetWalletClient */ = {
 			isa = PBXGroup;
 			children = (
@@ -7163,7 +7197,6 @@
 				48CFC3F02ADC10D900E77A5C /* RTCPrimitive.swift in Sources */,
 				A4ECE27B2BEEB01800468BF6 /* CloudBackupClient+Test.swift in Sources */,
 				48CFC2C02ADC10D900E77A5C /* AssetTransfer+View.swift in Sources */,
-				48CFC2F82ADC10D900E77A5C /* InfoOfNewPersona+View.swift in Sources */,
 				48CFC3EC2ADC10D900E77A5C /* DataChannelMessage.swift in Sources */,
 				48CFC3FF2ADC10D900E77A5C /* RTCPeerConnectionAsyncDelegate.swift in Sources */,
 				83EE5EE32BE3C16F00B1531D /* AccountDepositPreValidationResourceBadge.swift in Sources */,
@@ -7283,7 +7316,6 @@
 				48CFC56B2ADC10DA00E77A5C /* MetadataU8ArrayValue.swift in Sources */,
 				A4CFB55F2BAA821E00778BDD /* HScrollBar.swift in Sources */,
 				83EE5ED12BE3C16F00B1531D /* ComponentMethodRoyalty.swift in Sources */,
-				48CFC2F92ADC10D900E77A5C /* InfoOfNewPersona+Reducer.swift in Sources */,
 				48CFC44D2ADC10DA00E77A5C /* MnemonicClient+Live.swift in Sources */,
 				48CFC57E2ADC10DA00E77A5C /* ValidatorState.swift in Sources */,
 				48CFC56C2ADC10DA00E77A5C /* StateEntityFungiblesPageRequestOptIns.swift in Sources */,
