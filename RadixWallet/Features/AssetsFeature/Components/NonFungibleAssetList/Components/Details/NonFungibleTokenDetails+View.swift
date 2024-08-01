@@ -69,7 +69,7 @@ extension NonFungibleTokenDetails {
 				DetailsContainer(title: .success(viewStore.tokenDetails?.name ?? "")) {
 					store.send(.view(.closeButtonTapped))
 				} contents: {
-					VStack(spacing: .medium1) {
+					VStack(spacing: .zero) {
 						if let tokenDetails = viewStore.tokenDetails {
 							VStack(spacing: .medium3) {
 								if let keyImage = tokenDetails.keyImage {
@@ -107,7 +107,9 @@ extension NonFungibleTokenDetails {
 							}
 							.lineLimit(1)
 							.frame(maxWidth: .infinity, alignment: .leading)
+							.padding(.top, .small1)
 							.padding(.horizontal, .large2)
+							.padding(.bottom, .medium1)
 						}
 
 						VStack(spacing: .medium1) {
@@ -120,7 +122,6 @@ extension NonFungibleTokenDetails {
 						.padding(.vertical, .medium1)
 						.background(.app.gray5, ignoresSafeAreaEdges: .bottom)
 					}
-					.padding(.top, .small1)
 				}
 				.foregroundColor(.app.gray1)
 				.task { @MainActor in
