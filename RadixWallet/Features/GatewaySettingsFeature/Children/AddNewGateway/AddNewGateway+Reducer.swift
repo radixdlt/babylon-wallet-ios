@@ -2,7 +2,9 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - AddNewGateway
+@Reducer
 public struct AddNewGateway: Sendable, FeatureReducer {
+	@ObservableState
 	public struct State: Sendable, Hashable {
 		public enum Field: String, Sendable, Hashable {
 			case gatewayURL
@@ -16,9 +18,11 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 		public init() {}
 	}
 
+	public typealias Action = FeatureAction<Self>
+
+	@CasePathable
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case closeButtonTapped
 		case addNewGatewayButtonTapped
 		case textFieldFocused(State.Field?)
 		case textFieldChanged(String)
@@ -32,15 +36,17 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 		case validateNewGateway(URL)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
-		case dismiss
-	}
-
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.networkSwitchingClient) var networkSwitchingClient
 	@Dependency(\.gatewaysClient) var gatewaysClient
+	@Dependency(\.dismiss) var dismiss
+	@Dependency(\.isPresented) var isPresented
 
 	public init() {}
+
+	public var body: some ReducerOf<Self> {
+		Reduce(core)
+	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -48,9 +54,6 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 			return .run { send in
 				await send(.internal(.focusTextField(.gatewayURL)))
 			}
-
-		case .closeButtonTapped:
-			return .send(.delegate(.dismiss))
 
 		case .addNewGatewayButtonTapped:
 			guard let url = URL(string: state.inputtedURL)?.httpsURL else { return .none }
@@ -102,7 +105,11 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 			return handle(error, state: &state)
 
 		case .addGatewayResult(.success):
-			return .send(.delegate(.dismiss))
+			return .run { _ in
+				if isPresented {
+					await dismiss()
+				}
+			}
 
 		case let .addGatewayResult(.failure(error)):
 			return handle(error, state: &state)

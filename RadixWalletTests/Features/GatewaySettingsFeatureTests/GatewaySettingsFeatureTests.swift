@@ -198,7 +198,6 @@ final class GatewaySettingsFeatureTests: TestCase {
 		await store.send(.view(.addNewGatewayButtonTapped))
 		await store.receive(.internal(.gatewayValidationResult(.success(.sample))))
 		await store.receive(.internal(.addGatewayResult(.success(.instance))))
-		await store.receive(.delegate(.dismiss))
 	}
 
 	func test_whenNewAddGatewayButtonIsTapped_duplicateGatewayIsRejected() async throws {

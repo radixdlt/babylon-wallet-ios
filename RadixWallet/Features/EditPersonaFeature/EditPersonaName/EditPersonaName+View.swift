@@ -26,6 +26,7 @@ extension EditPersonaName {
 						}
 					}
 				}
+				.padding(.top, .small1)
 			}
 		}
 
@@ -77,7 +78,7 @@ extension EditPersonaName {
 		}
 
 		private var givenNameRow: some SwiftUI.View {
-			HStack(alignment: .top, spacing: .medium3) {
+			HStack(alignment: .top, spacing: .medium2) {
 				EditPersonaField.View(
 					store: store.scope(
 						state: \.given,

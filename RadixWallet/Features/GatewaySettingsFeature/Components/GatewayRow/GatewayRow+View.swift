@@ -4,11 +4,12 @@ import SwiftUI
 extension Gateway {
 	var displayName: String {
 		if isWellknown {
-			if network.id == .mainnet {
-				"Mainnet Gateway"
-			} else if network.id == .stokenet {
+			switch network.id {
+			case .mainnet:
+				"Radix Mainnet Gateway"
+			case .stokenet:
 				"Stokenet (testnet) Gateway"
-			} else {
+			default:
 				network.displayDescription
 			}
 		} else {
@@ -18,25 +19,16 @@ extension Gateway {
 }
 
 extension GatewayRow.State {
-	var viewState: GatewayRow.ViewState {
+	var rowCoreViewState: PlainListRowCore.ViewState {
 		.init(
-			name: gateway.displayName,
-			description: gateway.network.displayDescription,
-			isSelected: isSelected,
-			canBeDeleted: canBeDeleted
+			title: name,
+			detail: description
 		)
 	}
 }
 
 // MARK: - GatewayRow.View
 extension GatewayRow {
-	public struct ViewState: Equatable {
-		let name: String
-		let description: String
-		let isSelected: Bool
-		let canBeDeleted: Bool
-	}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<GatewayRow>
@@ -46,45 +38,36 @@ extension GatewayRow {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			WithPerceptionTracking {
 				Button(
 					action: {
-						viewStore.send(.didSelect)
+						store.send(.view(.didSelect))
 					}, label: {
-						HStack {
-							Image(asset: AssetResource.checkmarkBig)
-								.padding(.medium3)
-								.opacity(viewStore.isSelected ? 1 : 0)
-
-							VStack(alignment: .leading) {
-								Text(viewStore.name)
-									.foregroundColor(.app.gray1)
-									.textStyle(.body1HighImportance)
-									.lineLimit(1)
-									.minimumScaleFactor(0.5)
-
-								Text(viewStore.description)
-									.foregroundColor(.app.gray2)
-									.textStyle(.body2Regular)
-							}
-
-							Spacer()
-
-							if viewStore.canBeDeleted {
-								Button {
-									viewStore.send(.removeButtonTapped)
-								} label: {
-									Image(asset: AssetResource.trash)
-										.padding(.medium3)
-								}
-							}
-						}
-						.contentShape(Rectangle())
-						.padding(.vertical, .small2)
+						PlainListRow(viewState: .init(
+							rowCoreViewState: store.rowCoreViewState,
+							accessory: { accesoryView },
+							icon: { iconView }
+						))
 					}
 				)
 			}
 		}
+	}
+}
+
+extension GatewayRow.View {
+	@ViewBuilder
+	private var accesoryView: some SwiftUI.View {
+		if store.canBeDeleted {
+			Button(asset: AssetResource.trash) {
+				store.send(.view(.removeButtonTapped))
+			}
+		}
+	}
+
+	private var iconView: some SwiftUI.View {
+		Image(.check)
+			.opacity(store.isSelected ? 1 : 0)
 	}
 }
 

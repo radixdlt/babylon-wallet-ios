@@ -10,12 +10,9 @@ extension EditPersonaEntries {
 		}
 
 		public var body: some SwiftUI.View {
-			VStack(spacing: .medium2) {
+			VStack(spacing: .large1) {
 				IfLetStore(
-					store.scope(
-						state: \.name,
-						action: { .child(.name($0)) }
-					)
+					store.scope(state: \.name, action: \.child.name)
 				) { store in
 					EditPersonaEntry.View(
 						store: store,
@@ -26,10 +23,7 @@ extension EditPersonaEntries {
 				}
 
 				IfLetStore(
-					store.scope(
-						state: \.phoneNumber,
-						action: { .child(.phoneNumber($0)) }
-					)
+					store.scope(state: \.phoneNumber, action: \.child.phoneNumber)
 				) { store in
 					EditPersonaEntry.View(
 						store: store,
@@ -39,10 +33,7 @@ extension EditPersonaEntries {
 				}
 
 				IfLetStore(
-					store.scope(
-						state: \.emailAddress,
-						action: { .child(.emailAddress($0)) }
-					)
+					store.scope(state: \.emailAddress, action: \.child.emailAddress)
 				) { store in
 					EditPersonaEntry.View(
 						store: store,
