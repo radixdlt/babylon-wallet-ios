@@ -3,6 +3,11 @@ public struct ExpectedHTTPURLResponse: Swift.Error {
 	public init() {}
 }
 
+// MARK: - RequestRetryAttemptsExceeded
+public struct RequestRetryAttemptsExceeded: Swift.Error {
+	public init() {}
+}
+
 // MARK: - BadHTTPResponseCode
 public struct BadHTTPResponseCode: LocalizedError {
 	public let got: Int
