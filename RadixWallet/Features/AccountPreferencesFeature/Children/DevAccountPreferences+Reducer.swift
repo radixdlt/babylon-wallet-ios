@@ -190,8 +190,8 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 
 				let manifest = TransactionManifest.createMultipleNonFungibleTokens(
 					addressOfOwner: accountAddress,
-					collectionCount: 5,
-					nftsPerCollection: 10
+					collectionCount: 1,
+					nftsPerCollection: 120
 				)
 
 				await send(.internal(.reviewTransaction(manifest)))

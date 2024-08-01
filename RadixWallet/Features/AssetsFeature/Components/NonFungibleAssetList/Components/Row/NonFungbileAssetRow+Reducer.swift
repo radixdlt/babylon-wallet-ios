@@ -82,6 +82,7 @@ extension NonFungibleAssetList {
 				state.isExpanded.toggle()
 				if state.isExpanded {
 					setTokensPlaceholders(&state)
+					print("M- is expanded")
 					return loadResources(&state, pageIndex: 0)
 				}
 
@@ -92,6 +93,7 @@ extension NonFungibleAssetList {
 				let rowPageIndex = index / State.pageSize
 				/// Load next page if not currently loading and current page was not loaded.
 				if state.isLoadingResources == false, rowPageIndex > state.lastLoadedPageIndex {
+					print("M- on token did appear, row: \(index), pageIndex: \(rowPageIndex), last: \(state.lastLoadedPageIndex)")
 					return loadResources(&state, pageIndex: state.lastLoadedPageIndex + 1)
 				}
 				return .none
@@ -110,6 +112,7 @@ extension NonFungibleAssetList {
 					/// If user did quick scroll over the currently loading page, proactively load the next page.
 					/// If there are 5 pages in total, and user did scroll fast to last one, this will load all pages in chain, one after another.
 					if state.lastVisibleRowIndex / State.pageSize > tokensPage.pageIndex {
+						print("M- quick scroll")
 						return loadResources(&state, pageIndex: tokensPage.pageIndex + 1)
 					}
 
@@ -123,13 +126,15 @@ extension NonFungibleAssetList {
 			case .refreshResources:
 				state.nextPageCursor = nil
 				setTokensPlaceholders(&state)
+				print("M- refresh resources")
 				return loadResources(&state, pageIndex: 0)
 			}
 		}
 
 		private func loadResources(_ state: inout State, pageIndex: Int) -> Effect<Action> {
-			state.isLoadingResources = true
 			let cursor = state.nextPageCursor
+			print("M- Will load page \(pageIndex), cursor \(cursor ?? "nil"), isLoading: \(state.isLoadingResources)")
+			state.isLoadingResources = true
 			return .run { [resource = state.resource, accountAddress = state.accountAddress] send in
 				let result = await TaskResult {
 					let data = try await onLedgerEntitiesClient.getAccountOwnedNonFungibleTokenData(.init(accountAddress: accountAddress, resource: resource, mode: .loadPage(pageCursor: cursor)))
