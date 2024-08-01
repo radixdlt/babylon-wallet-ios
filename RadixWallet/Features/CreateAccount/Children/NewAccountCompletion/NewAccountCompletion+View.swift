@@ -105,7 +105,7 @@ private extension NewAccountCompletion.View {
 					.textStyle(.body1Header)
 					.multilineTextAlignment(.center)
 
-				AddressView(.address(.account(viewStore.accountAddress)), isTappable: false)
+				AddressView(.address(.account(viewStore.accountAddress)), isTappable: true)
 					.foregroundColor(.app.whiteTransparent)
 					.textStyle(.body2HighImportance)
 			}
