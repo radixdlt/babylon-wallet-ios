@@ -2638,9 +2638,9 @@
 		48CFBC7D2ADC10D800E77A5C /* GatewaySettingsFeature */ = {
 			isa = PBXGroup;
 			children = (
+				48CFBC862ADC10D800E77A5C /* GatewaySettings+Reducer.swift */,
 				48CFBC7E2ADC10D800E77A5C /* GatewaySettings+View.swift */,
 				48CFBC7F2ADC10D800E77A5C /* Components */,
-				48CFBC862ADC10D800E77A5C /* GatewaySettings+Reducer.swift */,
 				48CFBC872ADC10D800E77A5C /* Children */,
 			);
 			path = GatewaySettingsFeature;

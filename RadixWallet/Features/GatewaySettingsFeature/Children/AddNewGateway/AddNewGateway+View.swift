@@ -2,37 +2,36 @@ import ComposableArchitecture
 import SwiftUI
 
 extension AddNewGateway.State {
-	var viewState: AddNewGateway.ViewState {
-		.init(
-			gatewayURL: inputtedURL,
-			focusedField: focusedField,
-			fieldHint: errorText.map(Hint.error),
-			addGatewayButtonState: addGatewayButtonState
-		)
+	var fieldHint: Hint? {
+		errorText.map(Hint.error)
 	}
 }
 
 // MARK: - AddNewGateway.View
 extension AddNewGateway {
-	public struct ViewState: Equatable {
-		let gatewayURL: String
-		let textFieldPlaceholder: String = L10n.Gateways.AddNewGateway.textFieldPlaceholder
-		let focusedField: State.Field?
-		let fieldHint: Hint?
-		let addGatewayButtonState: ControlState
-	}
-
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<AddNewGateway>
+		@Perception.Bindable private var store: StoreOf<AddNewGateway>
 		@FocusState private var focusedField: State.Field?
+		@Environment(\.dismiss) var dismiss
+		private let detentFraction: CGFloat = 0.55
 
 		public init(store: StoreOf<AddNewGateway>) {
 			self.store = store
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			content
+				.withNavigationBar {
+					dismiss()
+				}
+				.presentationDetents([.fraction(detentFraction)])
+				.presentationDragIndicator(.visible)
+				.presentationBackground(.blur)
+		}
+
+		private var content: some SwiftUI.View {
+			WithPerceptionTracking {
 				ScrollView {
 					VStack(spacing: .medium2) {
 						Text(L10n.Gateways.AddNewGateway.title)
@@ -45,38 +44,33 @@ extension AddNewGateway {
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)
 
-						let gatewayURLBinding = viewStore.binding(
-							get: \.gatewayURL,
-							send: { .textFieldChanged($0) }
-						)
-
 						AppTextField(
-							placeholder: viewStore.textFieldPlaceholder,
-							text: gatewayURLBinding,
-							hint: viewStore.fieldHint,
+							placeholder: L10n.Gateways.AddNewGateway.textFieldPlaceholder,
+							text: $store.inputtedURL.sending(\.view.textFieldChanged),
+							hint: store.fieldHint,
 							focus: .on(
 								.gatewayURL,
-								binding: viewStore.binding(
-									get: \.focusedField,
-									send: { .textFieldFocused($0) }
-								),
+								binding: $store.focusedField.sending(\.view.textFieldFocused),
 								to: $focusedField
 							)
 						)
+						.padding(.top, .small3)
 						.textInputAutocapitalization(.never)
 						.keyboardType(.URL)
 						.autocorrectionDisabled()
 					}
-					.padding([.bottom, .horizontal], .medium1)
+					.padding(.top, .medium3)
+					.padding(.horizontal, .large2)
+					.padding(.bottom, .medium1)
 				}
 				.footer {
 					Button(L10n.Gateways.AddNewGateway.addGatewayButtonTitle) {
-						viewStore.send(.addNewGatewayButtonTapped)
+						store.send(.view(.addNewGatewayButtonTapped))
 					}
 					.buttonStyle(.primaryRectangular)
-					.controlState(viewStore.addGatewayButtonState)
+					.controlState(store.addGatewayButtonState)
 				}
-				.onAppear { viewStore.send(.appeared) }
+				.onAppear { store.send(.view(.appeared)) }
 			}
 		}
 	}
