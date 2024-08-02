@@ -19,7 +19,6 @@ public struct EntitySecurityProblemsView: SwiftUI.View {
 					}
 				}
 			}
-			.padding(.vertical, config.verticalPadding)
 		}
 	}
 
@@ -64,17 +63,6 @@ extension EntitySecurityProblemsView {
 			if self.problems != filtered {
 				self.problems = filtered
 			}
-		}
-	}
-}
-
-private extension EntitySecurityProblemsView.Config {
-	var verticalPadding: CGFloat {
-		switch kind {
-		case .account:
-			.zero
-		case .persona:
-			problems.isEmpty ? .zero : .small2
 		}
 	}
 }
