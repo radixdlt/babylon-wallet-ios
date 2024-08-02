@@ -601,7 +601,7 @@ extension ImportMnemonic {
 		_ state: inout State
 	) -> Effect<Action> {
 		state.words[id: id]?.value = .complete(text: input, word: word, completion: completion)
-		return focusNext(&state, after: id)
+		return .none
 	}
 
 	private func updateWord(
