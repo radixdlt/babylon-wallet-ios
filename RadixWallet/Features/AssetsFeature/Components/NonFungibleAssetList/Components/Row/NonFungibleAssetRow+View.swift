@@ -29,7 +29,7 @@ extension NonFungibleAssetList.Row.View {
 				if viewStore.isExpanded {
 					ForEach(
 						Array(
-							viewStore.tokens.flatMap(identity).enumerated()
+							viewStore.tokens.enumerated()
 						),
 						id: \.offset
 					) { index, item in
@@ -39,6 +39,8 @@ extension NonFungibleAssetList.Row.View {
 								viewStore.send(.onTokenDidAppear(index: index))
 							}
 					}
+
+					Text("Count displayed: \(viewStore.tokens.count)")
 				}
 			}
 			.listSectionSeparator(.hidden)

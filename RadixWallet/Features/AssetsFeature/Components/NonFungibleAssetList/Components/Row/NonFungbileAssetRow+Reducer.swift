@@ -12,10 +12,10 @@ extension NonFungibleAssetList {
 			public var resource: OnLedgerEntity.OwnedNonFungibleResource
 			public let accountAddress: AccountAddress
 
-			/// The loaded pages of tokens
-			public var tokens: [[Loadable<OnLedgerEntity.NonFungibleToken>]] = []
-			/// Last page index that was loaded, useful to determin the next page index that needs to be loaded
-			public var lastLoadedPageIndex: Int = -1
+			/// The loaded tokens
+			public var tokens: [Loadable<OnLedgerEntity.NonFungibleToken>] = []
+			/// Last token index that was loaded, useful to determin the next page index that needs to be loaded
+			public var lastLoadedTokenIndex: Int = 0
 			/// The last visible row to which user scrolled to, will be used to proactively fetch additional pages
 			/// if user did scroll past currently loading page
 			public var lastVisibleRowIndex: Int = 0
@@ -55,7 +55,7 @@ extension NonFungibleAssetList {
 			public struct TokensLoadResult: Sendable, Equatable {
 				let tokens: [OnLedgerEntity.NonFungibleToken]
 				let nextPageCursor: String?
-				let pageIndex: Int
+				let previousTokenIndex: Int
 			}
 
 			case tokensLoaded(TaskResult<TokensLoadResult>)
@@ -81,20 +81,20 @@ extension NonFungibleAssetList {
 			case .isExpandedToggled:
 				state.isExpanded.toggle()
 				if state.isExpanded {
+					state.lastLoadedTokenIndex = 0
 					setTokensPlaceholders(&state)
 					print("M- is expanded")
-					return loadResources(&state, pageIndex: 0)
+					return loadResources(&state, previousTokenIndex: 0)
 				}
 
 				return .none
 
 			case let .onTokenDidAppear(index):
 				state.lastVisibleRowIndex = index
-				let rowPageIndex = index / State.pageSize
 				/// Load next page if not currently loading and current page was not loaded.
-				if state.isLoadingResources == false, rowPageIndex > state.lastLoadedPageIndex {
-					print("M- on token did appear, row: \(index), pageIndex: \(rowPageIndex), last: \(state.lastLoadedPageIndex)")
-					return loadResources(&state, pageIndex: state.lastLoadedPageIndex + 1)
+				if state.isLoadingResources == false, index > state.lastLoadedTokenIndex, state.nextPageCursor != nil {
+					print("M- on token did appear, row: \(index), last: \(state.lastLoadedTokenIndex)")
+					return loadResources(&state, previousTokenIndex: state.lastLoadedTokenIndex)
 				}
 				return .none
 			}
@@ -105,16 +105,18 @@ extension NonFungibleAssetList {
 			case let .tokensLoaded(result):
 				switch result {
 				case let .success(tokensPage):
+					print("M- TokensPage: \(tokensPage.previousTokenIndex)")
 					state.nextPageCursor = tokensPage.nextPageCursor
-					state.tokens[tokensPage.pageIndex] = tokensPage.tokens.map(Loadable.success)
-					state.lastLoadedPageIndex = tokensPage.pageIndex
+					let success = tokensPage.tokens.map(Loadable.success)
+					state.tokens[tokensPage.previousTokenIndex ..< tokensPage.previousTokenIndex + success.count] = success[0 ..< success.count]
+					state.lastLoadedTokenIndex = max(state.lastLoadedTokenIndex, tokensPage.previousTokenIndex + success.count)
 
 					/// If user did quick scroll over the currently loading page, proactively load the next page.
 					/// If there are 5 pages in total, and user did scroll fast to last one, this will load all pages in chain, one after another.
-					if state.lastVisibleRowIndex / State.pageSize > tokensPage.pageIndex {
-						print("M- quick scroll")
-						return loadResources(&state, pageIndex: tokensPage.pageIndex + 1)
-					}
+//					if state.lastVisibleRowIndex / State.pageSize > tokensPage.pageIndex {
+//						print("M- quick scroll")
+//						return loadResources(&state, pageIndex: tokensPage.pageIndex + 1)
+//					}
 
 					state.isLoadingResources = false
 				case let .failure(err):
@@ -127,38 +129,25 @@ extension NonFungibleAssetList {
 				state.nextPageCursor = nil
 				setTokensPlaceholders(&state)
 				print("M- refresh resources")
-				return loadResources(&state, pageIndex: 0)
+				return loadResources(&state, previousTokenIndex: 0)
 			}
 		}
 
-		private func loadResources(_ state: inout State, pageIndex: Int) -> Effect<Action> {
+		private func loadResources(_ state: inout State, previousTokenIndex: Int) -> Effect<Action> {
 			let cursor = state.nextPageCursor
-			print("M- Will load page \(pageIndex), cursor \(cursor ?? "nil"), isLoading: \(state.isLoadingResources)")
+			print("M- Will load previous \(previousTokenIndex), cursor \(cursor ?? "nil"), isLoading: \(state.isLoadingResources)")
 			state.isLoadingResources = true
 			return .run { [resource = state.resource, accountAddress = state.accountAddress] send in
 				let result = await TaskResult {
 					let data = try await onLedgerEntitiesClient.getAccountOwnedNonFungibleTokenData(.init(accountAddress: accountAddress, resource: resource, mode: .loadPage(pageCursor: cursor)))
-					return InternalAction.TokensLoadResult(tokens: data.tokens, nextPageCursor: data.nextPageCursor, pageIndex: pageIndex)
+					return InternalAction.TokensLoadResult(tokens: data.tokens, nextPageCursor: data.nextPageCursor, previousTokenIndex: previousTokenIndex)
 				}
 				await send(.internal(.tokensLoaded(result)))
 			}
 		}
 
 		private func setTokensPlaceholders(_ state: inout State) {
-			if state.resource.nonFungibleIdsCount < State.pageSize {
-				state.tokens = [.init(repeating: .loading, count: state.resource.nonFungibleIdsCount)]
-			} else {
-				/// The total number of full pages
-				let fullPagesCount = state.resource.nonFungibleIdsCount / State.pageSize
-				/// Prepopulate with placeholders
-				state.tokens = .init(repeating: .init(repeating: .loading, count: State.pageSize), count: fullPagesCount)
-				/// The number of items to add to the last page
-				let remainder = state.resource.nonFungibleIdsCount % State.pageSize
-				if fullPagesCount > 0, remainder > 0 {
-					/// At last page placeholders also
-					state.tokens.append(.init(repeating: .loading, count: remainder))
-				}
-			}
+			state.tokens = .init(repeating: .loading, count: state.resource.nonFungibleIdsCount)
 		}
 	}
 }
