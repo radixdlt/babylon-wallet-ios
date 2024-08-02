@@ -156,7 +156,7 @@ extension CustomizeFees {
 				}
 
 				if let insufficientBalanceMessage = viewState.insufficientBalanceMessage {
-					WarningErrorView(text: insufficientBalanceMessage, type: .error)
+					WarningErrorView(text: insufficientBalanceMessage, type: .warning)
 				}
 			}
 		}
