@@ -69,7 +69,7 @@ extension ImportMnemonicWord {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack(spacing: .small3) {
+				VStack(spacing: Constants.appTextFieldSpacing) {
 					AppTextField(
 						primaryHeading: .init(text: L10n.ImportMnemonic.wordHeading(viewStore.index + 1), isProminent: true),
 						placeholder: "",
