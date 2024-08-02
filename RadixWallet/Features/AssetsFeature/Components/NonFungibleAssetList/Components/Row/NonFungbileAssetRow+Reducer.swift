@@ -106,7 +106,7 @@ extension NonFungibleAssetList {
 					state.nextPageCursor = tokensPage.nextPageCursor
 					let success = tokensPage.tokens.map(Loadable.success)
 					state.tokens[tokensPage.previousTokenIndex ..< tokensPage.previousTokenIndex + success.count] = success[0 ..< success.count]
-					state.lastLoadedTokenIndex = max(state.lastLoadedTokenIndex, tokensPage.previousTokenIndex + success.count)
+					state.lastLoadedTokenIndex = tokensPage.previousTokenIndex + success.count
 
 					/// If user did quick scroll over the currently loading page, proactively load the next page.
 					/// If there are 5 pages in total, and user did scroll fast to last one, this will load all pages in chain, one after another.
