@@ -39,8 +39,6 @@ extension NonFungibleAssetList.Row.View {
 								viewStore.send(.onTokenDidAppear(index: index))
 							}
 					}
-
-					Text("Count displayed: \(viewStore.tokens.count)")
 				}
 			}
 			.listSectionSeparator(.hidden)

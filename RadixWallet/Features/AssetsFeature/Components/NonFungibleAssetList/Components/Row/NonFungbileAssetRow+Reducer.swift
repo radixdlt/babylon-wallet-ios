@@ -83,7 +83,6 @@ extension NonFungibleAssetList {
 				if state.isExpanded {
 					state.lastLoadedTokenIndex = 0
 					setTokensPlaceholders(&state)
-					print("M- is expanded")
 					return loadResources(&state, previousTokenIndex: 0)
 				}
 
@@ -91,9 +90,8 @@ extension NonFungibleAssetList {
 
 			case let .onTokenDidAppear(index):
 				state.lastVisibleRowIndex = index
-				/// Load next page if not currently loading and current page was not loaded.
-				if state.isLoadingResources == false, index > state.lastLoadedTokenIndex, state.nextPageCursor != nil {
-					print("M- on token did appear, row: \(index), last: \(state.lastLoadedTokenIndex)")
+				/// Load next page if not currently loading, there are more pages to load and current page was not loaded.
+				if state.isLoadingResources == false, state.nextPageCursor != nil, index > state.lastLoadedTokenIndex {
 					return loadResources(&state, previousTokenIndex: state.lastLoadedTokenIndex)
 				}
 				return .none
@@ -105,7 +103,6 @@ extension NonFungibleAssetList {
 			case let .tokensLoaded(result):
 				switch result {
 				case let .success(tokensPage):
-					print("M- TokensPage: \(tokensPage.previousTokenIndex)")
 					state.nextPageCursor = tokensPage.nextPageCursor
 					let success = tokensPage.tokens.map(Loadable.success)
 					state.tokens[tokensPage.previousTokenIndex ..< tokensPage.previousTokenIndex + success.count] = success[0 ..< success.count]
@@ -127,14 +124,12 @@ extension NonFungibleAssetList {
 			case .refreshResources:
 				state.nextPageCursor = nil
 				setTokensPlaceholders(&state)
-				print("M- refresh resources")
 				return loadResources(&state, previousTokenIndex: 0)
 			}
 		}
 
 		private func loadResources(_ state: inout State, previousTokenIndex: Int) -> Effect<Action> {
 			let cursor = state.nextPageCursor
-			print("M- Will load previous \(previousTokenIndex), cursor \(cursor ?? "nil"), isLoading: \(state.isLoadingResources)")
 			state.isLoadingResources = true
 			return .run { [resource = state.resource, accountAddress = state.accountAddress] send in
 				let result = await TaskResult {
