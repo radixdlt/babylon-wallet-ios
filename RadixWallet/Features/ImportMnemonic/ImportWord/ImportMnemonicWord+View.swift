@@ -123,6 +123,7 @@ extension ImportMnemonicWord {
 							}
 						}
 					}
+					.submitLabel(.next)
 					.onSubmit {
 						viewStore.send(.onSubmit)
 					}
