@@ -113,10 +113,9 @@ extension NonFungibleAssetList {
 
 					/// If user did quick scroll over the currently loading page, proactively load the next page.
 					/// If there are 5 pages in total, and user did scroll fast to last one, this will load all pages in chain, one after another.
-//					if state.lastVisibleRowIndex / State.pageSize > tokensPage.pageIndex {
-//						print("M- quick scroll")
-//						return loadResources(&state, pageIndex: tokensPage.pageIndex + 1)
-//					}
+					if state.lastVisibleRowIndex - State.pageSize + 2 > state.lastLoadedTokenIndex {
+						return loadResources(&state, previousTokenIndex: state.lastLoadedTokenIndex)
+					}
 
 					state.isLoadingResources = false
 				case let .failure(err):
