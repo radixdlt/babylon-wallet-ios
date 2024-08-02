@@ -22,7 +22,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 			case invalid
 		}
 
-		func validateManualAccountAddress() -> AddressValidation {
+		var validatedManualAccountAddress: AddressValidation {
 			guard !manualAccountAddress.isEmpty,
 			      !chooseAccounts.filteredAccounts.contains(where: { $0.address == manualAccountAddress })
 			else {
@@ -42,7 +42,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 		}
 
 		var validatedAccountAddress: AccountAddress? {
-			guard case let .valid(address) = validateManualAccountAddress() else {
+			guard case let .valid(address) = validatedManualAccountAddress else {
 				return nil
 			}
 			return address
@@ -67,6 +67,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 		case chooseButtonTapped(AccountOrAddressOf)
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case chooseAccounts(ChooseAccounts.Action)
 	}
@@ -77,16 +78,18 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 	}
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case scanAccountAddress(ScanQRCoordinator.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case scanAccountAddress(ScanQRCoordinator.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.scanAccountAddress, action: /Action.scanAccountAddress) {
+			Scope(state: \.scanAccountAddress, action: \.scanAccountAddress) {
 				ScanQRCoordinator()
 			}
 		}
@@ -95,12 +98,12 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.chooseAccounts, action: /Action.child .. ChildAction.chooseAccounts) {
+		Scope(state: \.chooseAccounts, action: \.child.chooseAccounts) {
 			ChooseAccounts()
 		}
 
 		Reduce(core)
-			.ifLet(destinationPath, action: /Action.destination) {
+			.ifLet(destinationPath, action: \.destination) {
 				Destination()
 			}
 	}
