@@ -123,6 +123,7 @@ extension NonFungibleAssetList {
 
 			case .refreshResources:
 				state.nextPageCursor = nil
+				state.lastLoadedTokenIndex = 0
 				setTokensPlaceholders(&state)
 				return loadResources(&state, previousTokenIndex: 0)
 			}
