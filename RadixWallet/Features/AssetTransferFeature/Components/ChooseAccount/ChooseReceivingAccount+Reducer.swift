@@ -4,6 +4,7 @@ import SwiftUI
 
 // MARK: - ChooseReceivingAccount
 public struct ChooseReceivingAccount: Sendable, FeatureReducer {
+	@ObservableState
 	public struct State: Sendable, Hashable {
 		var chooseAccounts: ChooseAccounts.State
 		var manualAccountAddress: String = "" {
@@ -50,7 +51,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 
 		let networkID: NetworkID
 
-		@PresentationState
+		@Presents
 		var destination: Destination.State? = nil
 
 		public init(networkID: NetworkID, chooseAccounts: ChooseAccounts.State) {
@@ -59,6 +60,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 		}
 	}
 
+	@CasePathable
 	public enum ViewAction: Sendable, Equatable {
 		case scanQRCode
 		case closeButtonTapped

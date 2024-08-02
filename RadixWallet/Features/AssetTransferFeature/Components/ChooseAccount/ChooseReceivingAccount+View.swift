@@ -29,7 +29,7 @@ extension ChooseReceivingAccount.State {
 extension ChooseReceivingAccount {
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<ChooseReceivingAccount>
+		@Perception.Bindable private var store: StoreOf<ChooseReceivingAccount>
 		@FocusState private var focusedField: Bool
 
 		public init(store: StoreOf<ChooseReceivingAccount>) {
@@ -37,17 +37,17 @@ extension ChooseReceivingAccount {
 		}
 
 		public var body: some SwiftUI.View {
-			NavigationStack {
-				WithViewStore(store, observe: { $0 }) { viewStore in
+			WithPerceptionTracking {
+				NavigationStack {
 					ScrollView {
 						VStack(spacing: .medium2) {
 							Text(L10n.AssetTransfer.ChooseReceivingAccount.enterManually)
 								.textStyle(.body1Regular)
 								.foregroundColor(.app.gray1)
 
-							addressField(viewStore)
+							addressField
 
-							if !viewStore.chooseAccounts.availableAccounts.isEmpty {
+							if !store.chooseAccounts.availableAccounts.isEmpty {
 								Divider()
 
 								Text(L10n.AssetTransfer.ChooseReceivingAccount.chooseOwnAccount)
@@ -56,42 +56,34 @@ extension ChooseReceivingAccount {
 							ChooseAccounts.View(
 								store: store.scope(state: \.chooseAccounts, action: \.child.chooseAccounts)
 							)
-							.opacity(viewStore.canSelectOwnAccount ? 1.0 : 0.6)
-							.disabled(!viewStore.canSelectOwnAccount)
+							.opacity(store.canSelectOwnAccount ? 1.0 : 0.6)
+							.disabled(!store.canSelectOwnAccount)
 						}
 						.padding(.medium3)
 					}
 					.destinations(with: store)
-					.footer { chooseButton(viewStore) }
+					.footer { chooseButton }
 					.radixToolbar(title: L10n.AssetTransfer.ChooseReceivingAccount.navigationTitle) {
-						viewStore.send(.view(.closeButtonTapped))
+						store.send(.view(.closeButtonTapped))
 					}
 				}
 			}
 		}
 
-		private func addressField(_ viewStore: ViewStore<ChooseReceivingAccount.State, ChooseReceivingAccount.Action>) -> some SwiftUI.View {
+		private var addressField: some SwiftUI.View {
 			AppTextField(
 				placeholder: L10n.AssetTransfer.ChooseReceivingAccount.addressFieldPlaceholder,
-				text: viewStore.binding(
-					get: \.manualAccountAddress,
-					send: { .view(.manualAccountAddressChanged($0)) }
-				),
-				hint: viewStore.manualAddressHint,
+				text: $store.manualAccountAddress.sending(\.view.manualAccountAddressChanged),
+				hint: store.manualAddressHint,
 				focus: .on(
 					true,
-					binding: viewStore.binding(
-						get: \.manualAccountAddressFocused,
-						send: { .view(.focusChanged($0)) }
-					),
+					binding: $store.manualAccountAddressFocused.sending(\.view.focusChanged),
 					to: $focusedField
 				),
 				showClearButton: true,
 				innerAccessory: {
-					Button {
-						viewStore.send(.view(.scanQRCode))
-					} label: {
-						Image(asset: AssetResource.qrCodeScanner)
+					Button(asset: AssetResource.qrCodeScanner) {
+						store.send(.view(.scanQRCode))
 					}
 				}
 			)
@@ -99,16 +91,16 @@ extension ChooseReceivingAccount {
 			.keyboardType(.alphabet)
 		}
 
-		private func chooseButton(_ viewStore: ViewStore<ChooseReceivingAccount.State, ChooseReceivingAccount.Action>) -> some SwiftUI.View {
+		private var chooseButton: some SwiftUI.View {
 			WithControlRequirements(
-				viewStore.chooseAccounts.selectedAccounts?.first?.account,
-				or: viewStore.validatedAccountAddress,
+				store.chooseAccounts.selectedAccounts?.first?.account,
+				or: store.validatedAccountAddress,
 				forAction: { result in
 					let recipient: AccountOrAddressOf = switch result {
 					case let .left(account): .profileAccount(value: account)
 					case let .right(address): .addressOfExternalAccount(value: address)
 					}
-					viewStore.send(.view(.chooseButtonTapped(recipient)))
+					store.send(.view(.chooseButtonTapped(recipient)))
 				},
 				control: { action in
 					Button(L10n.Common.choose, action: action)
