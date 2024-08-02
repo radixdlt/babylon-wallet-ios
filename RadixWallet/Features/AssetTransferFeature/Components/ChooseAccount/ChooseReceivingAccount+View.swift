@@ -62,9 +62,11 @@ extension ChooseReceivingAccount.View {
 
 						addressField(viewStore)
 
-						Divider()
+						if !viewStore.chooseAccounts.availableAccounts.isEmpty {
+							Divider()
 
-						Text(L10n.AssetTransfer.ChooseReceivingAccount.chooseOwnAccount)
+							Text(L10n.AssetTransfer.ChooseReceivingAccount.chooseOwnAccount)
+						}
 
 						ChooseAccounts.View(
 							store: store.scope(
