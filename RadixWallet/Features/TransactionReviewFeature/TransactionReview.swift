@@ -132,7 +132,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case previewLoaded(TaskResult<TransactionToReview>)
 		case updateSections(TransactionReview.Sections?)
-		case buildTransactionItentResult(TaskResult<TransactionIntent>)
+		case buildTransactionIntentResult(TaskResult<TransactionIntent>)
 		case notarizeResult(TaskResult<NotarizeTransactionResponse>)
 		case determineFeePayerResult(TaskResult<FeePayerSelectionResult?>)
 	}
@@ -340,7 +340,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				#endif
 
 				return .run { send in
-					await send(.internal(.buildTransactionItentResult(TaskResult {
+					await send(.internal(.buildTransactionIntentResult(TaskResult {
 						try await transactionClient.buildTransactionIntent(request)
 					})))
 				}
@@ -422,6 +422,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				transactionSigners: preview.transactionSigners,
 				signingFactors: preview.signingFactors,
 				accountWithdraws: preview.analyzedManifestToReview.withdrawals,
+				accountDeposits: preview.analyzedManifestToReview.deposits,
 				isNonConforming: preview.analyzedManifestToReview.detailedManifestClass == nil
 			)
 
@@ -449,7 +450,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 			return .none
 
-		case let .buildTransactionItentResult(.success(intent)):
+		case let .buildTransactionIntentResult(.success(intent)):
 			guard let reviewedTransaction = state.reviewedTransaction else {
 				return .none
 			}
@@ -487,7 +488,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			))
 			return .none
 
-		case let .buildTransactionItentResult(.failure(error)),
+		case let .buildTransactionIntentResult(.failure(error)),
 		     let .notarizeResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
@@ -967,23 +968,35 @@ public struct ReviewedTransaction: Hashable, Sendable {
 	var signingFactors: SigningFactors
 
 	let accountWithdraws: [AccountAddress: [ResourceIndicator]]
+	let accountDeposits: [AccountAddress: [ResourceIndicator]]
 	let isNonConforming: Bool
 }
 
 // MARK: - FeeValidationOutcome
 enum FeeValidationOutcome {
-	case valid
+	case valid(introducesNewAccount: Bool)
 	case needsFeePayer
 	case insufficientBalance
+
+	var isValid: Bool {
+		guard case .valid = self else { return false }
+		return true
+	}
 }
 
 extension ReviewedTransaction {
+	var involvedAccounts: Set<AccountAddress> {
+		Set(accountWithdraws.keys).union(accountDeposits.keys)
+	}
+
 	var feePayingValidation: Loadable<FeeValidationOutcome> {
 		feePayer.map { selected in
+			let introducesNewAccount = selected.map { !involvedAccounts.contains($0.account.address) } ?? false
+
 			guard let feePayer = selected,
 			      let feePayerWithdraws = accountWithdraws[feePayer.account.address]
 			else {
-				return selected.validateBalance(forFee: transactionFee)
+				return selected.validateBalance(forFee: transactionFee, introducesNewAccount: introducesNewAccount)
 			}
 
 			let xrdAddress = ResourceAddress.xrd(on: networkID)
@@ -1002,16 +1015,17 @@ extension ReviewedTransaction {
 				return .insufficientBalance
 			}
 
-			return .valid
+			print("•• introducesNewAccount: FALSE")
+			return .valid(introducesNewAccount: false)
 		}
 	}
 }
 
 extension FeePayerCandidate? {
-	func validateBalance(forFee transactionFee: TransactionFee) -> FeeValidationOutcome {
+	func validateBalance(forFee transactionFee: TransactionFee, introducesNewAccount: Bool) -> FeeValidationOutcome {
 		if transactionFee.totalFee.lockFee == .zero {
 			// If no fee is required - valid
-			return .valid
+			return .valid(introducesNewAccount: introducesNewAccount)
 		}
 
 		guard let self else {
@@ -1024,7 +1038,7 @@ extension FeePayerCandidate? {
 			return .insufficientBalance
 		}
 
-		return .valid
+		return .valid(introducesNewAccount: introducesNewAccount)
 	}
 }
 
