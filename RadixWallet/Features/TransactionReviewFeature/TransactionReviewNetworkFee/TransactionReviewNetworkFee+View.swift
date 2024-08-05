@@ -41,7 +41,7 @@ extension TransactionReviewNetworkFee {
 						if case .needsFeePayer = validation {
 							WarningErrorView(text: L10n.TransactionReview.feePayerRequiredMessage, type: .warning)
 						} else if case .insufficientBalance = validation {
-							WarningErrorView(text: L10n.TransactionReview.insufficientBalance, type: .error)
+							WarningErrorView(text: L10n.TransactionReview.insufficientBalance, type: .warning)
 						}
 
 						Button(L10n.TransactionReview.NetworkFee.customizeButtonTitle) {
