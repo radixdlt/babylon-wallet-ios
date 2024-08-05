@@ -2,6 +2,38 @@ import ComposableArchitecture
 import SwiftUI
 
 extension ChooseReceivingAccount.State {
+	public enum AddressValidation: Sendable, Hashable {
+		case valid(AccountAddress)
+		case wrongNetwork(AccountAddress, incorrectNetwork: UInt8)
+		case invalid
+	}
+
+	var validatedManualAccountAddress: AddressValidation {
+		guard !manualAccountAddress.isEmpty,
+		      !chooseAccounts.filteredAccounts.contains(where: { $0.address == manualAccountAddress })
+		else {
+			return .invalid
+		}
+		guard
+			let addressOnSomeNetwork = try? AccountAddress(validatingAddress: manualAccountAddress)
+		else {
+			return .invalid
+		}
+		let networkOfAddress = addressOnSomeNetwork.networkID
+		guard networkOfAddress == networkID else {
+			loggerGlobal.warning("Manually inputted address is valid, but is on the WRONG network, inputted: \(networkOfAddress), but current network is: \(networkID.rawValue)")
+			return .wrongNetwork(addressOnSomeNetwork, incorrectNetwork: networkOfAddress.rawValue)
+		}
+		return .valid(addressOnSomeNetwork)
+	}
+
+	var validatedAccountAddress: AccountAddress? {
+		guard case let .valid(address) = validatedManualAccountAddress else {
+			return nil
+		}
+		return address
+	}
+
 	var canSelectOwnAccount: Bool {
 		manualAccountAddress.isEmpty
 	}
