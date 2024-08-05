@@ -106,6 +106,10 @@ extension FiatWorth {
 
 		let value = worth.value ?? .zero // Zero for the unknown case, just to do to the base formatting
 
+		if value == .zero {
+			formatter.maximumFractionDigits = 0
+		}
+
 		let formattedValue = {
 			let double = value.asDouble
 			guard let value = formatter.string(for: double) else {
