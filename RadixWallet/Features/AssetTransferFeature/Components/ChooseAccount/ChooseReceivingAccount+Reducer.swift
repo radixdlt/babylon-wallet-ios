@@ -3,6 +3,7 @@ import Sargon
 import SwiftUI
 
 // MARK: - ChooseReceivingAccount
+@Reducer
 public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 	@ObservableState
 	public struct State: Sendable, Hashable {
@@ -59,6 +60,8 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 			self.chooseAccounts = chooseAccounts
 		}
 	}
+
+	public typealias Action = FeatureAction<Self>
 
 	@CasePathable
 	public enum ViewAction: Sendable, Equatable {
