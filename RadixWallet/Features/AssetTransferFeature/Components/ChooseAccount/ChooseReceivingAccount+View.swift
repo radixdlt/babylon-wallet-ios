@@ -124,14 +124,9 @@ private extension StoreOf<ChooseReceivingAccount> {
 private extension View {
 	func destinations(with store: StoreOf<ChooseReceivingAccount>) -> some View {
 		let destinationStore = store.destination
-		return navigationDestination(
-			store: destinationStore,
-			state: /ChooseReceivingAccount.Destination.State.scanAccountAddress,
-			action: ChooseReceivingAccount.Destination.Action.scanAccountAddress,
-			destination: {
-				ScanQRCoordinator.View(store: $0)
-					.radixToolbar(title: L10n.AssetTransfer.ChooseReceivingAccount.scanQRNavigationTitle, alwaysVisible: false)
-			}
-		)
+		return navigationDestination(store: destinationStore.scope(state: \.scanAccountAddress, action: \.scanAccountAddress)) {
+			ScanQRCoordinator.View(store: $0)
+				.radixToolbar(title: L10n.AssetTransfer.ChooseReceivingAccount.scanQRNavigationTitle, alwaysVisible: false)
+		}
 	}
 }
