@@ -2,8 +2,8 @@ import ComposableArchitecture
 import SwiftUI
 
 extension AddNewGateway.State {
-	var fieldHint: Hint? {
-		errorText.map(Hint.error)
+	var fieldHint: Hint.ViewState? {
+		errorText.map(Hint.ViewState.iconError)
 	}
 }
 

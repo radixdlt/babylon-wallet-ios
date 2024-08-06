@@ -1,5 +1,5 @@
 // MARK: - HitTargetSize
-public enum HitTargetSize: CGFloat {
+public enum HitTargetSize: CGFloat, Sendable {
 	/// 18
 	case icon = 18
 

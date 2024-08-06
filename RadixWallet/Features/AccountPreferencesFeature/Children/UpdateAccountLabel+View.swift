@@ -13,13 +13,13 @@ extension UpdateAccountLabel.State {
 		)
 	}
 
-	private var hintAndControlState: (ControlState, Hint?) {
+	private var hintAndControlState: (ControlState, Hint.ViewState?) {
 		if let sanitizedName {
 			if sanitizedName.count > Account.nameMaxLength {
-				return (.disabled, .error(L10n.Error.AccountLabel.tooLong))
+				return (.disabled, .iconError(L10n.Error.AccountLabel.tooLong))
 			}
 		} else {
-			return (.disabled, .error(L10n.Error.AccountLabel.missing))
+			return (.disabled, .iconError(L10n.Error.AccountLabel.missing))
 		}
 
 		return (.enabled, nil)
@@ -31,7 +31,7 @@ extension UpdateAccountLabel {
 		let accountLabel: String
 		let sanitizedName: NonEmptyString?
 		let updateButtonControlState: ControlState
-		let hint: Hint?
+		let hint: Hint.ViewState?
 		let textFieldFocused: Bool
 	}
 

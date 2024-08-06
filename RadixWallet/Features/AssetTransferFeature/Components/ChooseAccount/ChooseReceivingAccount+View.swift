@@ -38,7 +38,7 @@ extension ChooseReceivingAccount.State {
 		manualAccountAddress.isEmpty
 	}
 
-	var manualAddressHint: Hint? {
+	var manualAddressHint: Hint.ViewState? {
 		guard !manualAccountAddressFocused, !manualAccountAddress.isEmpty else {
 			return .none
 		}

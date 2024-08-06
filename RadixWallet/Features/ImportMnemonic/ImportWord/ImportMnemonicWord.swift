@@ -69,7 +69,6 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 		public typealias ID = Int
 		public let id: ID
 		public var value: WordValue
-		public let placeholder: String
 		public let isReadonlyMode: Bool
 
 		public var autocompletionCandidates: AutocompletionCandidates? = nil
@@ -78,12 +77,10 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 		public init(
 			id: ID,
 			value: WordValue = .incomplete(text: "", hasFailedValidation: false),
-			placeholder: String,
 			isReadonlyMode: Bool
 		) {
 			self.id = id
 			self.value = value
-			self.placeholder = placeholder
 			self.isReadonlyMode = isReadonlyMode
 		}
 
@@ -110,13 +107,15 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Hashable {
 		case wordChanged(input: String)
 		case userSelectedCandidate(BIP39Word)
-		case textFieldFocused(State.Field?)
+		case focusChanged(State.Field?)
+		case onSubmit
 	}
 
 	public enum DelegateAction: Sendable, Hashable {
 		case lookupWord(input: String)
 		case lostFocus(displayText: String)
 		case userSelectedCandidate(BIP39Word, fromPartial: String)
+		case didSubmit
 	}
 
 	public init() {}
@@ -158,9 +157,12 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 				fromPartial: state.value.text
 			)))
 
-		case let .textFieldFocused(field):
+		case let .focusChanged(field):
 			state.focusedField = field
-			return field == nil ? .send(.delegate(.lostFocus(displayText: state.value.text))) : .none
+			return .none
+
+		case .onSubmit:
+			return .send(.delegate(.didSubmit))
 		}
 	}
 }

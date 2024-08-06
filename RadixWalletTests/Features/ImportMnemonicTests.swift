@@ -27,10 +27,10 @@ final class ImportMnemonicTests: TestCase {
 	func test_addi_erase_results_in_add_not_addict() async throws {
 		let mnemonic = try Mnemonic(phrase: "add addict address pen penalty pencil act action actor actress zoo wreck", language: .english)
 		let wordsBIP39 = mnemonic.words
-		let wordStrings = wordsBIP39.map(\.word)
 		let testClock = TestClock()
 		let store = TestStore(
 			initialState: ImportMnemonic.State(
+				isWordCountFixed: false,
 				persistStrategy: nil,
 				wordCount: .twelve
 			)
@@ -95,6 +95,7 @@ extension ImportMnemonicTests {
 		let testClock = TestClock()
 		let store = TestStore(
 			initialState: ImportMnemonic.State(
+				isWordCountFixed: false,
 				persistStrategy: nil,
 				wordCount: mnemonic.wordCount
 			)
