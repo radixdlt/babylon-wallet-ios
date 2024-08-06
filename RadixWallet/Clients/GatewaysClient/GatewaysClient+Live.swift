@@ -28,7 +28,7 @@ extension GatewaysClient: DependencyKey {
 				}
 			},
 			hasGateway: { url in
-				await appPreferencesClient.getPreferences().hasGateway(with: url)
+				try await appPreferencesClient.getPreferences().hasGateway(with: url)
 			}
 		)
 	}

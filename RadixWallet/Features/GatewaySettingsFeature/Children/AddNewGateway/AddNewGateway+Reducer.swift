@@ -33,6 +33,7 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 		case gatewayValidationResult(TaskResult<Gateway?>)
 		case addGatewayResult(TaskResult<EqVoid>)
 		case showDuplicateURLError
+		case showInvalidURLError
 		case validateNewGateway(URL)
 	}
 
@@ -59,11 +60,15 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 			guard let url = URL(string: state.inputtedURL)?.httpsURL else { return .none }
 
 			return .run { send in
-				let hasGateway = await gatewaysClient.hasGateway(url)
-				if hasGateway {
-					await send(.internal(.showDuplicateURLError))
-				} else {
-					await send(.internal(.validateNewGateway(url)))
+				do {
+					let hasGateway = try await gatewaysClient.hasGateway(url)
+					if hasGateway {
+						await send(.internal(.showDuplicateURLError))
+					} else {
+						await send(.internal(.validateNewGateway(url)))
+					}
+				} catch {
+					await send(.internal(.showInvalidURLError))
 				}
 			}
 
@@ -116,6 +121,10 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 
 		case .showDuplicateURLError:
 			state.errorText = L10n.Gateways.AddNewGateway.errorDuplicateURL
+			return .none
+
+		case .showInvalidURLError:
+			state.errorText = "Please enter a valid gateway URL"
 			return .none
 
 		case let .validateNewGateway(url):
