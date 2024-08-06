@@ -99,16 +99,18 @@ extension FiatWorth {
 	private static let hiddenValue = "• • • •"
 	private static let unknownValue = "—"
 
-	func currencyFormatted(applyCustomFont: Bool = false) -> AttributedString {
+	private static let currencyFormatter: NumberFormatter = {
 		let formatter = NumberFormatter()
 		formatter.numberStyle = .currency
-		formatter.currencyCode = currency.currencyCode
+		return formatter
+	}()
 
+	func currencyFormatted(applyCustomFont: Bool = false) -> AttributedString {
 		let value = worth.value ?? .zero // Zero for the unknown case, just to do to the base formatting
 
-		if value == .zero {
-			formatter.maximumFractionDigits = 0
-		}
+		let formatter = Self.currencyFormatter
+		formatter.currencyCode = currency.currencyCode
+		formatter.maximumFractionDigits = value == .zero ? 0 : 2
 
 		let formattedValue = {
 			let double = value.asDouble
