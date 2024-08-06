@@ -32,6 +32,7 @@ extension AuthorizedDappsFeature.View {
 				VStack(spacing: .medium1) {
 					Text(L10n.AuthorizedDapps.subtitle)
 						.textBlock
+						.frame(maxWidth: .infinity, alignment: .leading)
 
 					VStack(spacing: .small1) {
 						ForEach(viewStore.dApps) { dApp in
@@ -52,7 +53,7 @@ extension AuthorizedDappsFeature.View {
 					viewStore.send(.appeared)
 				}
 			}
-			.background(Color.app.gray5)
+			.background(.app.gray5)
 			.radixToolbar(title: L10n.AuthorizedDapps.title)
 			.destinations(with: store)
 		}
