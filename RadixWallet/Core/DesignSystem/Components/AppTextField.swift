@@ -99,7 +99,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 
 	public var body: some View {
 		HStack(alignment: .textFieldAlignment, spacing: 0) {
-			VStack(alignment: .leading, spacing: .small1) {
+			VStack(alignment: .leading, spacing: Constants.appTextFieldSpacing) {
 				if primaryHeading != nil || secondaryHeading != nil {
 					HStack(spacing: 0) {
 						if let primaryHeading {
@@ -207,6 +207,10 @@ extension VerticalAlignment {
 	}
 
 	fileprivate static let textFieldAlignment = VerticalAlignment(TextFieldAlignment.self)
+}
+
+extension Constants {
+	static let appTextFieldSpacing: CGFloat = .small1
 }
 
 #if DEBUG

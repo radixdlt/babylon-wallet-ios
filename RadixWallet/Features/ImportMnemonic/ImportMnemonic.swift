@@ -10,8 +10,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		public typealias Words = IdentifiedArrayOf<ImportMnemonicWord.State>
 		public var words: Words
 
-		public var idOfWordWithTextFieldFocus: ImportMnemonicWord.State.ID?
-
 		public var language: BIP39Language
 		public var wordCount: BIP39WordCount {
 			guard let wordCount = BIP39WordCount(wordCount: words.count) else {
@@ -29,11 +27,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				words.append(contentsOf: (wordCount ..< Int(newWordCount.rawValue)).map {
 					.init(
 						id: $0,
-						placeholder: ImportMnemonic.placeholder(
-							index: $0,
-							wordCount: newWordCount,
-							language: language
-						),
 						isReadonlyMode: mode.readonly != nil
 					)
 				})
@@ -229,11 +222,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 								word: $0.element,
 								completion: .auto(match: .exact)
 							),
-							placeholder: ImportMnemonic.placeholder(
-								index: $0.offset,
-								wordCount: mnemonic.wordCount,
-								language: mnemonic.language
-							),
 							isReadonlyMode: isReadonlyMode
 						)
 					}
@@ -278,10 +266,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			public let savedIntoProfile: Bool
 		}
 
-		case focusNext(ImportMnemonicWord.State.ID)
-		case saveFactorSourceResult(
-			TaskResult<IntermediaryResult>
-		)
+		case focusOn(ImportMnemonicWord.State.ID)
+		case saveFactorSourceResult(TaskResult<IntermediaryResult>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -401,6 +387,9 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				&state
 			)
 
+		case let .word(id, child: .delegate(.didSubmit)):
+			return focusNext(&state, after: id)
+
 		default:
 			return .none
 		}
@@ -409,7 +398,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			return focusNext(&state)
+			return focusNext(&state, after: nil)
 
 		case let .passphraseChanged(passphrase):
 			state.bip39Passphrase = passphrase
@@ -532,8 +521,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .focusNext(id):
-			state.idOfWordWithTextFieldFocus = id
+		case let .focusOn(id):
 			state.words[id: id]?.focus()
 			return .none
 
@@ -613,7 +601,7 @@ extension ImportMnemonic {
 		_ state: inout State
 	) -> Effect<Action> {
 		state.words[id: id]?.value = .complete(text: input, word: word, completion: completion)
-		return focusNext(&state)
+		return .none
 	}
 
 	private func updateWord(
@@ -659,48 +647,15 @@ extension ImportMnemonic {
 		}
 	}
 
-	private func focusNext(_ state: inout State) -> Effect<Action> {
-		if let current = state.idOfWordWithTextFieldFocus {
+	private func focusNext(_ state: inout State, after current: Int?) -> Effect<Action> {
+		if let current {
 			state.words[id: current]?.resignFocus()
-		}
-		guard let nextID = state.words.first(where: { !$0.isComplete })?.id else {
+			return delayedEffect(delay: .milliseconds(75), for: .internal(.focusOn(current + 1)))
+		} else if let firstIncomplete = state.words.first(where: { !$0.isComplete })?.id {
+			return delayedEffect(delay: .milliseconds(75), for: .internal(.focusOn(firstIncomplete)))
+		} else {
 			return .none
 		}
-
-		return .run { send in
-			try? await clock.sleep(for: .milliseconds(75))
-			await send(.internal(.focusNext(nextID)))
-		}
-	}
-}
-
-extension ImportMnemonic {
-	static func placeholder(
-		index: Int,
-		wordCount: BIP39WordCount,
-		language: BIP39Language
-	) -> String {
-		precondition(index <= 23, "Invalid BIP39 word index, got index: \(index), exected less than 24.")
-		let word: BIP39Word = {
-			let wordList = language.wordlist() // BIP39.wordList(for: language)
-			switch language {
-			case .english:
-				let bip39Alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", /* X is missing */ "y", "z"]
-				return wordList
-					// we use `last` simply because we did not like the words "abandon baby"
-					// which we get by using `first`, too sad a combination.
-					.last(
-						where: { $0.word.hasPrefix(bip39Alphabet[index]) }
-					)!
-
-			default:
-				let scale = UInt16(89) // 2048 / 23
-				let indexScaled = U11(inner: scale * UInt16(index))
-				return wordList.first(where: { $0.index == indexScaled })!
-			}
-
-		}()
-		return word.word
 	}
 }
 
