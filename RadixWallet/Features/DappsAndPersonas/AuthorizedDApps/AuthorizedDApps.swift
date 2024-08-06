@@ -26,6 +26,7 @@ public struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 
 	// MARK: Action
 
+	@CasePathable
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 		case didSelectDapp(AuthorizedDapp.ID)
@@ -41,16 +42,18 @@ public struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 	// MARK: Destination
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Hashable, Sendable {
 			case presentedDapp(DappDetails.State)
 		}
 
+		@CasePathable
 		public enum Action: Equatable, Sendable {
 			case presentedDapp(DappDetails.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.presentedDapp, action: /Action.presentedDapp) {
+			Scope(state: \.presentedDapp, action: \.presentedDapp) {
 				DappDetails()
 			}
 		}
@@ -62,7 +65,7 @@ public struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(destinationPath, action: /Action.destination) {
+			.ifLet(destinationPath, action: \.destination) {
 				Destination()
 			}
 	}
