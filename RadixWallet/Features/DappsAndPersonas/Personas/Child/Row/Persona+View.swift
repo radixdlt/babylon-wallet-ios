@@ -22,20 +22,21 @@ extension PersonaFeature {
 						viewStore.send(.tapped)
 					} contents: {
 						VStack(spacing: .zero) {
-							PlainListRow(title: viewStore.displayName) {
+							PlainListRow(context: .dappAndPersona, title: viewStore.displayName) {
 								Thumbnail(.persona, url: viewStore.thumbnail)
 							}
 							if showShield {
 								EntitySecurityProblemsView(config: viewStore.securityProblemsConfig) {
 									viewStore.send(.securityProblemsTapped)
 								}
-								.padding(.horizontal, .medium3)
+								.padding(.horizontal, .medium1)
+								.padding(.bottom, .small1)
 							}
 						}
 					}
 				} else {
 					Card {
-						PlainListRow(title: viewStore.displayName, accessory: nil) {
+						PlainListRow(context: .dappAndPersona, title: viewStore.displayName, accessory: nil) {
 							Thumbnail(.persona, url: viewStore.thumbnail)
 						}
 					}

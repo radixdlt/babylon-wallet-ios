@@ -785,7 +785,7 @@ extension DappInteractionFlow {
 
 	func goBackEffect(for state: inout State) -> Effect<Action> {
 		state.responseItems.removeLast()
-		state.path.removeLast()
+		_ = state.path.popLast()
 		return .none
 	}
 

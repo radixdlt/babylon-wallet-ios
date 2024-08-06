@@ -3,7 +3,9 @@ import Sargon
 import SwiftUI
 
 // MARK: - ChooseReceivingAccount
+@Reducer
 public struct ChooseReceivingAccount: Sendable, FeatureReducer {
+	@ObservableState
 	public struct State: Sendable, Hashable {
 		var chooseAccounts: ChooseAccounts.State
 		var manualAccountAddress: String = "" {
@@ -16,41 +18,9 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 
 		var manualAccountAddressFocused: Bool = false
 
-		public enum AddressValidation: Sendable, Hashable {
-			case valid(AccountAddress)
-			case wrongNetwork(AccountAddress, incorrectNetwork: UInt8)
-			case invalid
-		}
-
-		func validateManualAccountAddress() -> AddressValidation {
-			guard !manualAccountAddress.isEmpty,
-			      !chooseAccounts.filteredAccounts.contains(where: { $0.address == manualAccountAddress })
-			else {
-				return .invalid
-			}
-			guard
-				let addressOnSomeNetwork = try? AccountAddress(validatingAddress: manualAccountAddress)
-			else {
-				return .invalid
-			}
-			let networkOfAddress = addressOnSomeNetwork.networkID
-			guard networkOfAddress == networkID else {
-				loggerGlobal.warning("Manually inputted address is valid, but is on the WRONG network, inputted: \(networkOfAddress), but current network is: \(networkID.rawValue)")
-				return .wrongNetwork(addressOnSomeNetwork, incorrectNetwork: networkOfAddress.rawValue)
-			}
-			return .valid(addressOnSomeNetwork)
-		}
-
-		var validatedAccountAddress: AccountAddress? {
-			guard case let .valid(address) = validateManualAccountAddress() else {
-				return nil
-			}
-			return address
-		}
-
 		let networkID: NetworkID
 
-		@PresentationState
+		@Presents
 		var destination: Destination.State? = nil
 
 		public init(networkID: NetworkID, chooseAccounts: ChooseAccounts.State) {
@@ -59,6 +29,9 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 		}
 	}
 
+	public typealias Action = FeatureAction<Self>
+
+	@CasePathable
 	public enum ViewAction: Sendable, Equatable {
 		case scanQRCode
 		case closeButtonTapped
@@ -67,6 +40,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 		case chooseButtonTapped(AccountOrAddressOf)
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case chooseAccounts(ChooseAccounts.Action)
 	}
@@ -77,16 +51,18 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 	}
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case scanAccountAddress(ScanQRCoordinator.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case scanAccountAddress(ScanQRCoordinator.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.scanAccountAddress, action: /Action.scanAccountAddress) {
+			Scope(state: \.scanAccountAddress, action: \.scanAccountAddress) {
 				ScanQRCoordinator()
 			}
 		}
@@ -95,12 +71,12 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.chooseAccounts, action: /Action.child .. ChildAction.chooseAccounts) {
+		Scope(state: \.chooseAccounts, action: \.child.chooseAccounts) {
 			ChooseAccounts()
 		}
 
 		Reduce(core)
-			.ifLet(destinationPath, action: /Action.destination) {
+			.ifLet(destinationPath, action: \.destination) {
 				Destination()
 			}
 	}

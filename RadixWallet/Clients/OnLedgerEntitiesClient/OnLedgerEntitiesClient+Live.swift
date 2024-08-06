@@ -2,7 +2,7 @@ import Sargon
 
 // MARK: - OnLedgerEntitiesClient + DependencyKey
 extension OnLedgerEntitiesClient: DependencyKey {
-	public static let maximumNFTIDChunkSize = 29
+	public static let maximumNFTIDChunkSize = 100
 
 	enum Error: Swift.Error {
 		case emptyResponse
