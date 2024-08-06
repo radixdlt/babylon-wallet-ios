@@ -14,6 +14,7 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 		var inputtedURL: String = ""
 		var errorText: String?
 		var addGatewayButtonState: ControlState = .disabled
+		fileprivate var ffiUrl: FfiUrl?
 
 		public init() {}
 	}
@@ -33,7 +34,6 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 		case gatewayValidationResult(TaskResult<Gateway?>)
 		case addGatewayResult(TaskResult<EqVoid>)
 		case showDuplicateURLError
-		case showInvalidURLError
 		case validateNewGateway(URL)
 	}
 
@@ -57,18 +57,14 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 			}
 
 		case .addNewGatewayButtonTapped:
-			guard let url = URL(string: state.inputtedURL)?.httpsURL else { return .none }
+			guard let ffiUrl = state.ffiUrl else { return .none }
 
 			return .run { send in
-				do {
-					let hasGateway = try await gatewaysClient.hasGateway(url)
-					if hasGateway {
-						await send(.internal(.showDuplicateURLError))
-					} else {
-						await send(.internal(.validateNewGateway(url)))
-					}
-				} catch {
-					await send(.internal(.showInvalidURLError))
+				let hasGateway = await gatewaysClient.hasGateway(ffiUrl)
+				if hasGateway {
+					await send(.internal(.showDuplicateURLError))
+				} else {
+					await send(.internal(.validateNewGateway(ffiUrl.url)))
 				}
 			}
 
@@ -80,8 +76,13 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 		case let .textFieldChanged(inputtedURL):
 			state.inputtedURL = inputtedURL
 			state.errorText = nil
-			let url = URL(string: inputtedURL)
-			state.addGatewayButtonState = url != nil ? .enabled : .disabled
+			if let url = URL(string: state.inputtedURL)?.httpsURL, let ffiUrl = try? FfiUrl(urlPath: url.absoluteString) {
+				state.ffiUrl = ffiUrl
+				state.addGatewayButtonState = .enabled
+			} else {
+				state.ffiUrl = nil
+				state.addGatewayButtonState = .disabled
+			}
 			return .none
 		}
 	}
@@ -121,10 +122,6 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 
 		case .showDuplicateURLError:
 			state.errorText = L10n.Gateways.AddNewGateway.errorDuplicateURL
-			return .none
-
-		case .showInvalidURLError:
-			state.errorText = "Please enter a valid gateway URL"
 			return .none
 
 		case let .validateNewGateway(url):
