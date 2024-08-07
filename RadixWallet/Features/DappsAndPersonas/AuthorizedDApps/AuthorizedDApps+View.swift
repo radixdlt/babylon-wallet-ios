@@ -33,10 +33,9 @@ extension AuthorizedDappsFeature {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }) { viewStore in
 				ScrollView {
-					VStack(spacing: .medium1) {
+					VStack(alignment: .leading, spacing: .medium1) {
 						Text(L10n.AuthorizedDapps.subtitle)
 							.textBlock
-							.frame(maxWidth: .infinity, alignment: .leading)
 
 						VStack(spacing: .small1) {
 							ForEach(viewStore.dAppsDetails) { dApp in
@@ -57,6 +56,7 @@ extension AuthorizedDappsFeature {
 						viewStore.send(.view(.appeared))
 					}
 				}
+				.frame(maxWidth: .infinity, alignment: .leading)
 				.background(.app.gray5)
 				.radixToolbar(title: L10n.AuthorizedDapps.title)
 				.destinations(with: store)
