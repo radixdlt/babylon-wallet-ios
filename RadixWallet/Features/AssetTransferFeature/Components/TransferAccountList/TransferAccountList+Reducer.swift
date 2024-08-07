@@ -146,7 +146,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		case let .chooseAccount(.delegate(.handleResult(recipient))):
 			state.receivingAccounts[id: id]?.recipient = recipient
 			state.destination = nil
-			return .none
+			return signaturesStatusEffect(state, receivingAccountId: id)
 
 		case .chooseAccount(.delegate(.dismiss)):
 			state.destination = nil
@@ -225,10 +225,7 @@ extension TransferAccountList {
 
 		state.receivingAccounts[id: id]?.assets = existingAssets + newAssets
 
-		if let receivingAccount = state.receivingAccounts[id: id] {
-			return determineAdditionalRequiredSignatures(receivingAccount, forAssets: newAssets)
-		}
-		return .none
+		return signaturesStatusEffect(state, receivingAccountId: id)
 	}
 
 	private func navigateToChooseAccounts(_ state: inout State, id: ReceivingAccount.State.ID) -> Effect<Action> {
@@ -292,14 +289,18 @@ extension TransferAccountList {
 		return .none
 	}
 
-	private func determineAdditionalRequiredSignatures(
-		_ receivingAccount: ReceivingAccount.State,
-		forAssets assets: IdentifiedArrayOf<ResourceAsset.State>
-	) -> Effect<Action> {
-		switch receivingAccount.recipient {
+	private func signaturesStatusEffect(_ state: State, receivingAccountId: ReceivingAccount.State.ID) -> Effect<Action> {
+		guard
+			let receivingAccount = state.receivingAccounts[id: receivingAccountId],
+			let recipient = receivingAccount.recipient
+		else {
+			return .none
+		}
+
+		switch recipient {
 		case let .profileAccount(account):
-			.run { send in
-				for asset in assets {
+			return .run { send in
+				for asset in receivingAccount.assets {
 					let resourceAddress = asset.resourceAddress
 					let signatureNeeded = await needsSignatureForDepositting(
 						into: account,
@@ -315,7 +316,7 @@ extension TransferAccountList {
 			}
 
 		case let .addressOfExternalAccount(account):
-			.run { send in
+			return .run { send in
 				let resourceAddresses = receivingAccount.assets.map(\.id)
 				let result = try await gatewayAPIClient.prevalidateDeposit(.init(accountAddress: account.address, resourceAddresses: resourceAddresses))
 
@@ -325,9 +326,6 @@ extension TransferAccountList {
 					}
 				}
 			}
-
-		case .none:
-			.none
 		}
 	}
 }
