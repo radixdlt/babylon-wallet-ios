@@ -62,7 +62,7 @@ struct AssetResourceDetailsSection: View {
 				if let divisibility = viewState.divisibility {
 					loadable(divisibility) { value in
 						if let value {
-							KeyValueView(key: "Divisibility", value: "\(value)")
+							KeyValueView(key: L10n.AssetDetails.divisibility, value: "\(value)")
 						}
 					}
 				}
