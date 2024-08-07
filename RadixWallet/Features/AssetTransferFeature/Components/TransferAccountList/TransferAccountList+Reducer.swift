@@ -85,6 +85,8 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		}
 	}
 
+	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
@@ -294,13 +296,13 @@ extension TransferAccountList {
 		_ receivingAccount: ReceivingAccount.State,
 		forAssets assets: IdentifiedArrayOf<ResourceAsset.State>
 	) -> Effect<Action> {
-		if case let .profileAccount(value: userOwnedAccount) = receivingAccount.recipient {
-			return .run { send in
-				@Dependency(\.accountsClient) var accountsClient
+		switch receivingAccount.recipient {
+		case let .profileAccount(account):
+			.run { send in
 				for asset in assets {
 					let resourceAddress = asset.resourceAddress
 					let signatureNeeded = await needsSignatureForDepositting(
-						into: userOwnedAccount,
+						into: account,
 						resource: resourceAddress
 					)
 
@@ -311,7 +313,21 @@ extension TransferAccountList {
 					)))
 				}
 			}
+
+		case let .addressOfExternalAccount(account):
+			.run { send in
+				let resourceAddresses = receivingAccount.assets.map(\.id)
+				let result = try await gatewayAPIClient.prevalidateDeposit(.init(accountAddress: account.address, resourceAddresses: resourceAddresses))
+
+				if let behavior = result.resourceSpecificBehaviour {
+					for item in behavior {
+						await send(.internal(.updateSignatureStatus(accountID: receivingAccount.id, assetID: item.resourceAddress, signatureRequired: !item.allowsTryDeposit)))
+					}
+				}
+			}
+
+		case .none:
+			.none
 		}
-		return .none
 	}
 }
