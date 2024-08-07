@@ -10,19 +10,23 @@ extension ResourcesList.State {
 			canModify: canModify,
 			resources: .init(uncheckedUniqueElements: resourcesForDisplay),
 			info: {
+				guard canModify else {
+					return L10n.AccountSettings.SpecificAssetsDeposits.modificationDisabledForRecoveredAccount
+				}
+
 				switch mode {
 				case .allowDenyAssets(.allow) where resourcesForDisplay.isEmpty:
-					L10n.AccountSettings.SpecificAssetsDeposits.emptyAllowAll
+					return L10n.AccountSettings.SpecificAssetsDeposits.emptyAllowAll
 				case .allowDenyAssets(.allow):
-					L10n.AccountSettings.SpecificAssetsDeposits.allowInfo
+					return L10n.AccountSettings.SpecificAssetsDeposits.allowInfo
 				case .allowDenyAssets(.deny) where resourcesForDisplay.isEmpty:
-					L10n.AccountSettings.SpecificAssetsDeposits.emptyDenyAll
+					return L10n.AccountSettings.SpecificAssetsDeposits.emptyDenyAll
 				case .allowDenyAssets(.deny):
-					L10n.AccountSettings.SpecificAssetsDeposits.denyInfo
+					return L10n.AccountSettings.SpecificAssetsDeposits.denyInfo
 				case .allowDepositors where resourcesForDisplay.isEmpty:
-					L10n.AccountSettings.SpecificAssetsDeposits.allowDepositorsNoResources
+					return L10n.AccountSettings.SpecificAssetsDeposits.allowDepositorsNoResources
 				case .allowDepositors:
-					L10n.AccountSettings.SpecificAssetsDeposits.allowDepositors
+					return L10n.AccountSettings.SpecificAssetsDeposits.allowDepositors
 				}
 			}(),
 			mode: mode
@@ -97,13 +101,6 @@ extension ResourcesList.View {
 				.textStyle(.body1HighImportance)
 				.foregroundColor(.app.gray2)
 				.multilineTextAlignment(.center)
-
-			if !viewStore.canModify {
-				Text(L10n.AccountSettings.SpecificAssetsDeposits.modificationDisabledForRecoveredAccount)
-					.textStyle(.body1HighImportance)
-					.foregroundColor(.app.gray2)
-					.multilineTextAlignment(.center)
-			}
 		}
 		.padding(.horizontal, .medium3)
 	}
