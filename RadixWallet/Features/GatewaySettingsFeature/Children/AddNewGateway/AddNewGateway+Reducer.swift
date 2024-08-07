@@ -14,7 +14,7 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 		var inputtedURL: String = ""
 		var errorText: String?
 		var addGatewayButtonState: ControlState = .disabled
-		fileprivate var ffiUrl: FfiUrl?
+		var ffiUrl: FfiUrl?
 
 		public init() {}
 	}
