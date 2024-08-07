@@ -114,6 +114,9 @@ extension AssetTransfer.State {
 			guard $0.recipient != nil else {
 				return false
 			}
+			guard $0.isDepositEnabled else {
+				return false
+			}
 			let fungibleAssets = $0.assets.fungibleAssets
 			let nonFungibleAssets = $0.assets.nonFungibleAssets
 

@@ -73,6 +73,18 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 	}
 }
 
+extension ReceivingAccount.State {
+	var isDepositEnabled: Bool {
+		assets.allSatisfy(\.depositStatus.isEnabled)
+	}
+
+	mutating func updateDepositStatus(values: AssetsDepositStatus) {
+		for (id, status) in values {
+			assets[id: id]?.depositStatus = status
+		}
+	}
+}
+
 extension AccountOrAddressOf {
 	var isUserAccount: Bool {
 		guard case .profileAccount = self else {

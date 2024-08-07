@@ -259,5 +259,14 @@ extension ResourceAsset.State {
 
 		/// The user cannot deposit this asset since the receiving acccount has disallowed.
 		case forbidden
+
+		var isEnabled: Bool {
+			switch self {
+			case .loading, .forbidden:
+				false
+			case .allowed, .additionalSignatureRequired:
+				true
+			}
+		}
 	}
 }
