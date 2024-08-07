@@ -185,7 +185,7 @@ extension GatewayAPI.EntityMetadataCollection {
 	}
 
 	public var dappDefinitions: [String]? {
-		value(.dappDefinitions)?.asStringCollection
+		value(.dappDefinitions)?.asStringCollection ?? value(.dappDefinitions)?.asGlobalAddressCollection
 	}
 
 	public var claimedEntities: [String]? {
