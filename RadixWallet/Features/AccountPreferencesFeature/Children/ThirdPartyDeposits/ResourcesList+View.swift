@@ -2,47 +2,47 @@ import ComposableArchitecture
 import SwiftUI
 
 extension ResourcesList.State {
-	// Need to disable, since broken in swiftformat 0.52.7
-	// swiftformat:disable redundantClosure
+	private var resourcesForDisplay: [ResourceViewState] {
+		switch mode {
+		case let .allowDenyAssets(exception):
+			let addresses: [ResourceViewState.Address] = thirdPartyDeposits.assetsExceptionSet()
+				.filter { $0.exceptionRule == exception }
+				.map { .assetException($0) }
 
-	var viewState: ResourcesList.ViewState {
-		.init(
-			canModify: canModify,
-			resources: .init(uncheckedUniqueElements: resourcesForDisplay),
-			info: {
-				guard canModify else {
-					return L10n.AccountSettings.SpecificAssetsDeposits.modificationDisabledForRecoveredAccount
-				}
-
-				switch mode {
-				case .allowDenyAssets(.allow) where resourcesForDisplay.isEmpty:
-					return L10n.AccountSettings.SpecificAssetsDeposits.emptyAllowAll
-				case .allowDenyAssets(.allow):
-					return L10n.AccountSettings.SpecificAssetsDeposits.allowInfo
-				case .allowDenyAssets(.deny) where resourcesForDisplay.isEmpty:
-					return L10n.AccountSettings.SpecificAssetsDeposits.emptyDenyAll
-				case .allowDenyAssets(.deny):
-					return L10n.AccountSettings.SpecificAssetsDeposits.denyInfo
-				case .allowDepositors where resourcesForDisplay.isEmpty:
-					return L10n.AccountSettings.SpecificAssetsDeposits.allowDepositorsNoResources
-				case .allowDepositors:
-					return L10n.AccountSettings.SpecificAssetsDeposits.allowDepositors
-				}
-			}(),
-			mode: mode
-		)
+			return loadedResources.filter { addresses.contains($0.address) }
+		case .allowDepositors:
+			return loadedResources
+		}
 	}
-	// swiftformat:enable redundantClosure
+
+	var resources: IdentifiedArrayOf<ResourceViewState> {
+		.init(uncheckedUniqueElements: resourcesForDisplay)
+	}
+
+	var info: String {
+		guard canModify else {
+			return L10n.AccountSettings.SpecificAssetsDeposits.modificationDisabledForRecoveredAccount
+		}
+
+		switch mode {
+		case .allowDenyAssets(.allow) where resourcesForDisplay.isEmpty:
+			return L10n.AccountSettings.SpecificAssetsDeposits.emptyAllowAll
+		case .allowDenyAssets(.allow):
+			return L10n.AccountSettings.SpecificAssetsDeposits.allowInfo
+		case .allowDenyAssets(.deny) where resourcesForDisplay.isEmpty:
+			return L10n.AccountSettings.SpecificAssetsDeposits.emptyDenyAll
+		case .allowDenyAssets(.deny):
+			return L10n.AccountSettings.SpecificAssetsDeposits.denyInfo
+		case .allowDepositors where resourcesForDisplay.isEmpty:
+			return L10n.AccountSettings.SpecificAssetsDeposits.allowDepositorsNoResources
+		case .allowDepositors:
+			return L10n.AccountSettings.SpecificAssetsDeposits.allowDepositors
+		}
+	}
 }
 
+// MARK: - ResourcesList.View
 extension ResourcesList {
-	public struct ViewState: Equatable {
-		let canModify: Bool
-		let resources: IdentifiedArrayOf<ResourceViewState>
-		let info: String
-		let mode: ResourcesListMode
-	}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		let store: StoreOf<ResourcesList>
@@ -51,13 +51,13 @@ extension ResourcesList {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			WithViewStore(store, observe: { $0 }) { viewStore in
 				VStack(spacing: .medium1) {
 					headerView(viewStore)
 					items(resources: viewStore.resources)
 				}
 				.onFirstTask { @MainActor in
-					await viewStore.send(.task).finish()
+					await viewStore.send(.view(.task)).finish()
 				}
 				.padding(.top, .medium1)
 				.background(.app.gray5)
@@ -65,7 +65,7 @@ extension ResourcesList {
 				.radixToolbar(title: viewStore.mode.navigationTitle)
 				.footer {
 					Button(viewStore.mode.addButtonTitle) {
-						viewStore.send(.addAssetTapped)
+						viewStore.send(.view(.addAssetTapped))
 					}
 					.buttonStyle(.primaryRectangular)
 					.controlState(viewStore.canModify ? .enabled : .disabled)
@@ -78,7 +78,7 @@ extension ResourcesList {
 extension ResourcesList.View {
 	@ViewBuilder
 	func headerView(
-		_ viewStore: ViewStoreOf<ResourcesList>
+		_ viewStore: ViewStore<ResourcesList.State, ResourcesList.Action>
 	) -> some SwiftUI.View {
 		Group {
 			if case let .allowDenyAssets(exceptionRule) = viewStore.mode {
@@ -86,7 +86,7 @@ extension ResourcesList.View {
 					L10n.AccountSettings.SpecificAssetsDeposits.resourceListPicker,
 					selection: viewStore.binding(
 						get: { _ in exceptionRule },
-						send: { .exceptionListChanged($0) }
+						send: { .view(.exceptionListChanged($0)) }
 					)
 				) {
 					ForEach(DepositAddressExceptionRule.allCases, id: \.self) {
