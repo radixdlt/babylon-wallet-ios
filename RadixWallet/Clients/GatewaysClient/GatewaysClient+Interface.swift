@@ -41,7 +41,7 @@ extension GatewaysClient {
 	public typealias AddGateway = @Sendable (Gateway) async throws -> Void
 	public typealias RemoveGateway = @Sendable (Gateway) async throws -> Void
 	public typealias ChangeGateway = @Sendable (Gateway) async throws -> Void
-	public typealias HasGateway = @Sendable (Url) async -> Bool
+	public typealias HasGateway = @Sendable (FfiUrl) async -> Bool
 }
 
 extension GatewaysClient {

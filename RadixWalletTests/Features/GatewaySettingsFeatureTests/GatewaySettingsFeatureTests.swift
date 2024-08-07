@@ -1,5 +1,6 @@
 @testable import Radix_Wallet_Dev
 import Sargon
+import SargonUniFFI
 import XCTest
 
 // MARK: - GatewaySettingsFeatureTests
@@ -180,6 +181,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 		let validURL = URL.previewValue.absoluteString
 		var initialState = AddNewGateway.State()
 		initialState.inputtedURL = validURL
+		initialState.ffiUrl = try? .init(urlPath: validURL)
 
 		let store = TestStore(
 			initialState: initialState,
@@ -206,6 +208,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 		let validURL = URL.previewValue.absoluteString
 		var initialState = AddNewGateway.State()
 		initialState.inputtedURL = validURL
+		initialState.ffiUrl = try? .init(urlPath: validURL)
 
 		let store = TestStore(
 			initialState: initialState,
@@ -215,7 +218,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 				allGateways
 			}
 			$0.gatewaysClient.hasGateway = { url in
-				url.absoluteString == validURL
+				url.url.absoluteString == validURL
 			}
 		}
 		store.exhaustivity = .off
@@ -229,6 +232,6 @@ final class GatewaySettingsFeatureTests: TestCase {
 #if DEBUG
 
 extension URL {
-	public static let previewValue = URL(string: "https://example.com")!
+	public static let previewValue = URL(string: "https://example.com/")!
 }
 #endif // DEBUG
