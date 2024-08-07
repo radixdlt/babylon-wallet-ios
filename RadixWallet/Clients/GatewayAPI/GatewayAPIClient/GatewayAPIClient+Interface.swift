@@ -29,6 +29,7 @@ public struct GatewayAPIClient: Sendable, DependencyKey {
 	public var transactionStatus: GetTransactionStatus
 	public var transactionPreview: TransactionPreview
 	public var streamTransactions: StreamTransactions
+	public var prevalidateDeposit: PrevalidateDeposit
 }
 
 extension GatewayAPIClient {
@@ -55,6 +56,7 @@ extension GatewayAPIClient {
 	public typealias GetTransactionStatus = @Sendable (GatewayAPI.TransactionStatusRequest) async throws -> GatewayAPI.TransactionStatusResponse
 	public typealias TransactionPreview = @Sendable (GatewayAPI.TransactionPreviewRequest) async throws -> GatewayAPI.TransactionPreviewResponse
 	public typealias StreamTransactions = @Sendable (GatewayAPI.StreamTransactionsRequest) async throws -> GatewayAPI.StreamTransactionsResponse
+	public typealias PrevalidateDeposit = @Sendable (GatewayAPI.AccountDepositPreValidationRequest) async throws -> GatewayAPI.AccountDepositPreValidationResponse
 }
 
 extension GatewayAPIClient {
