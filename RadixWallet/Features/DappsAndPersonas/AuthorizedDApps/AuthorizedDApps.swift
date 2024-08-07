@@ -3,6 +3,7 @@ import Sargon
 import SwiftUI
 
 // MARK: - AuthorizedDapps
+@Reducer
 public struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
@@ -12,6 +13,7 @@ public struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 
 	// MARK: State
 
+	// TODO: Add `@ObservableState` after migrating `DappDetails` to `ObservableState`
 	public struct State: Sendable, Hashable {
 		public var dApps: AuthorizedDapps = []
 		public var thumbnails: [AuthorizedDapp.ID: URL] = [:]
@@ -23,6 +25,8 @@ public struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 			self.destination = destination
 		}
 	}
+
+	public typealias Action = FeatureAction<Self>
 
 	// MARK: Action
 
