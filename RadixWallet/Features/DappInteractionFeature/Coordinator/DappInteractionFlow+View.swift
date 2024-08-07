@@ -37,7 +37,6 @@ extension DappInteractionFlow {
 						}
 					}
 			}
-			.navigationTransition(.slide, interactivity: .disabled)
 			.onAppear { store.send(.view(.appeared)) }
 			.alert(
 				store: store.scope(
@@ -84,7 +83,10 @@ extension DappInteractionFlow {
 					CaseLet(
 						/DappInteractionFlow.Path.MainState.oneTimePersonaData,
 						action: DappInteractionFlow.Path.Action.oneTimePersonaData,
-						then: { OneTimePersonaData.View(store: $0) }
+						then: {
+							OneTimePersonaData.View(store: $0)
+								.toolbar(.visible, for: .navigationBar)
+						}
 					)
 
 				case .reviewTransaction:
