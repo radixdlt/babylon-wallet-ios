@@ -47,6 +47,7 @@
 "assetDetails_validator" = "Validator";
 "assetDetails_name" = "Name";
 "assetDetails_currentSupply" = "Current Supply";
+"assetDetails_divisibility" = "Divisibility";
 "assetDetails_moreInfo" = "For more info";
 "assetDetails_supplyUnkown" = "Unknown";
 "assetDetails_behavior" = "Behavior";
