@@ -18,7 +18,7 @@ extension ResourceAsset {
 
 extension ResourceAsset.View {
 	public var body: some View {
-		VStack(spacing: .small3) {
+		VStack(alignment: .leading, spacing: .small3) {
 			HStack {
 				SwitchStore(store.scope(state: \.kind, action: \.child)) { state in
 					switch state {
@@ -53,13 +53,17 @@ extension ResourceAsset.View {
 				.foregroundColor(.app.gray2)
 			}
 
-			WithViewStore(store, observe: \.additionalSignatureRequired) { viewStore in
-				if viewStore.state {
-					WarningErrorView(text: "Additional signature required to deposit", type: .warning)
-				}
-			}
+			depositStatus
 		}
 		.destinations(with: store)
+	}
+
+	private var depositStatus: some SwiftUI.View {
+		WithViewStore(store, observe: \.depositStatus.hint) { viewStore in
+			if let viewState = viewStore.state {
+				Hint(viewState: viewState)
+			}
+		}
 	}
 }
 
@@ -103,6 +107,19 @@ private extension View {
 	private func poolUnitDetails(with destinationStore: PresentationStoreOf<ResourceAsset.Destination>) -> some View {
 		sheet(store: destinationStore.scope(state: \.poolUnitDetails, action: \.poolUnitDetails)) {
 			PoolUnitDetails.View(store: $0)
+		}
+	}
+}
+
+private extension ResourceAsset.State.DepositStatus {
+	var hint: Hint.ViewState? {
+		switch self {
+		case .additionalSignatureRequired:
+			.init(kind: .warning, text: "Additional signature required to deposit")
+		case .forbidden:
+			.error("Account will reject this deposit")
+		case .allowed, .loading:
+			nil
 		}
 	}
 }

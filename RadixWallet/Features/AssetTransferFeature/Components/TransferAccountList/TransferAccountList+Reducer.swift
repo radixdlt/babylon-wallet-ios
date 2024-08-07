@@ -164,7 +164,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .updateSignatureStatus(accountID, assetID, signatureRequired):
-			state.receivingAccounts[id: accountID]?.assets[id: assetID]?.additionalSignatureRequired = signatureRequired
+			state.receivingAccounts[id: accountID]?.assets[id: assetID]?.depositStatus = signatureRequired ? .additionalSignatureRequired : .allowed
 			return .none
 		}
 	}
