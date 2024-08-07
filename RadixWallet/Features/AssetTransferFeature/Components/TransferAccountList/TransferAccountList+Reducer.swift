@@ -43,16 +43,9 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		case receivingAccount(id: ReceivingAccount.State.ID, action: ReceivingAccount.Action)
 	}
 
-	public enum DelegateAction: Equatable, Sendable {
-		case canSendTransferRequest(Bool)
-	}
-
 	public enum InternalAction: Equatable, Sendable {
-		case updateSignatureStatus(
-			accountID: ReceivingAccount.State.ID,
-			assetID: ResourceAsset.State.ID,
-			signatureRequired: Bool
-		)
+		case startLoadingDepositStatus(accountId: ReceivingAccount.State.ID)
+		case setDepositStatus(accountId: ReceivingAccount.State.ID, values: [ResourceAsset.State.ID: ResourceAsset.State.DepositStatus])
 	}
 
 	public struct Destination: DestinationReducer {
@@ -163,8 +156,11 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .updateSignatureStatus(accountID, assetID, signatureRequired):
-			state.receivingAccounts[id: accountID]?.assets[id: assetID]?.depositStatus = signatureRequired ? .additionalSignatureRequired : .allowed
+		case let .startLoadingDepositStatus(accountId):
+			state.receivingAccounts[id: accountId]?.setLoadingDepositStatus()
+			return .none
+		case let .setDepositStatus(accountId, values):
+			state.receivingAccounts[id: accountId]?.updateDepositStatus(values: values)
 			return .none
 		}
 	}
@@ -297,32 +293,28 @@ extension TransferAccountList {
 			return .none
 		}
 
+		typealias DepositStatus = ResourceAsset.State.DepositStatus
 		switch recipient {
 		case let .profileAccount(account):
 			return .run { send in
-				for asset in receivingAccount.assets {
-					let resourceAddress = asset.resourceAddress
-					let signatureNeeded = await needsSignatureForDepositting(
-						into: account,
-						resource: resourceAddress
-					)
-
-					await send(.internal(.updateSignatureStatus(
-						accountID: receivingAccount.id,
-						assetID: asset.id,
-						signatureRequired: signatureNeeded
-					)))
+				let result = await receivingAccount.assets.parallelMap { asset in
+					let result = await needsSignatureForDepositting(into: account, resource: asset.resourceAddress)
+					return (asset.id, result ? DepositStatus.additionalSignatureRequired : .allowed)
 				}
+				let values = Dictionary(uniqueKeysWithValues: result.map { ($0.0, $0.1) })
+				await send(.internal(.setDepositStatus(accountId: receivingAccountId, values: values)))
 			}
 
 		case let .addressOfExternalAccount(account):
 			return .run { send in
 				let resourceAddresses = receivingAccount.assets.map(\.id)
-				let result = try await gatewayAPIClient.prevalidateDeposit(.init(accountAddress: account.address, resourceAddresses: resourceAddresses))
+				if !resourceAddresses.isEmpty {
+					await send(.internal(.startLoadingDepositStatus(accountId: receivingAccountId)))
+					let result = try await gatewayAPIClient.prevalidateDeposit(.init(accountAddress: account.address, resourceAddresses: resourceAddresses))
 
-				if let behavior = result.resourceSpecificBehaviour {
-					for item in behavior {
-						await send(.internal(.updateSignatureStatus(accountID: receivingAccount.id, assetID: item.resourceAddress, signatureRequired: !item.allowsTryDeposit)))
+					if let behavior = result.resourceSpecificBehaviour {
+						let values = Dictionary(uniqueKeysWithValues: behavior.map { ($0.resourceAddress, $0.allowsTryDeposit ? DepositStatus.allowed : .forbidden) })
+						await send(.internal(.setDepositStatus(accountId: receivingAccountId, values: values)))
 					}
 				}
 			}

@@ -112,13 +112,14 @@ private extension View {
 }
 
 private extension ResourceAsset.State.DepositStatus {
+	// FIXME: Localisation
 	var hint: Hint.ViewState? {
 		switch self {
 		case .additionalSignatureRequired:
 			.init(kind: .warning, text: "Additional signature required to deposit")
 		case .forbidden:
-			.error("Account will reject this deposit")
-		case .allowed, .loading:
+			.error("Recipient does not accept these tokens")
+		case .idle, .loading, .allowed:
 			nil
 		}
 	}

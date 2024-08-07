@@ -8,6 +8,8 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 		public typealias ID = UUID
 		public let id = ID()
 
+		public typealias AssetsDepositStatus = [ResourceAsset.State.ID: ResourceAsset.State.DepositStatus]
+
 		public var recipient: AccountOrAddressOf?
 		public var assets: IdentifiedArrayOf<ResourceAsset.State>
 		public var canBeRemoved: Bool
@@ -76,6 +78,16 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 extension ReceivingAccount.State {
 	var isDepositEnabled: Bool {
 		assets.allSatisfy(\.depositStatus.isEnabled)
+	}
+
+	var isLoadingDepositStatus: Bool {
+		assets.contains(where: { $0.depositStatus == .loading })
+	}
+
+	mutating func setLoadingDepositStatus() {
+		for id in assets.elements.map(\.id) {
+			assets[id: id]?.depositStatus = .loading
+		}
 	}
 
 	mutating func updateDepositStatus(values: AssetsDepositStatus) {

@@ -127,6 +127,10 @@ extension AssetTransfer.State {
 			return !nonFungibleAssets.isEmpty
 		}
 	}
+
+	var isLoadingDepositStatus: Bool {
+		accounts.receivingAccounts.contains(where: \.isLoadingDepositStatus)
+	}
 }
 
 extension AssetTransfer {
