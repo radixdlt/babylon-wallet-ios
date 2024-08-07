@@ -17,6 +17,7 @@ extension FungibleTokenDetails.State {
 				validatorAddress: nil,
 				resourceName: resource.metadata.name,
 				currentSupply: resource.totalSupply.map { $0?.formatted() ?? L10n.AssetDetails.supplyUnkown },
+				divisibility: resource.divisibility,
 				arbitraryDataFields: resource.metadata.arbitraryItems.asDataFields,
 				behaviors: resource.behaviors,
 				tags: {
