@@ -533,6 +533,8 @@ public enum L10n {
     public static let behavior = L10n.tr("Localizable", "assetDetails_behavior", fallback: "Behavior")
     /// Current Supply
     public static let currentSupply = L10n.tr("Localizable", "assetDetails_currentSupply", fallback: "Current Supply")
+    /// Divisibility
+    public static let divisibility = L10n.tr("Localizable", "assetDetails_divisibility", fallback: "Divisibility")
     /// For more info
     public static let moreInfo = L10n.tr("Localizable", "assetDetails_moreInfo", fallback: "For more info")
     /// Name
