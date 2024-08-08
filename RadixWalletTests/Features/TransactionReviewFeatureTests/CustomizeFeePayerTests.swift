@@ -20,6 +20,7 @@ final class CustomizeFeePayerTests: TestCase {
 			),
 			signingFactors: [:],
 			accountWithdraws: [:],
+			accountDeposits: [:],
 			isNonConforming: true
 		)
 

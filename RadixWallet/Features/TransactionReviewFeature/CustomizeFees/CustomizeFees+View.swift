@@ -68,12 +68,6 @@ extension CustomizeFees {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: .zero) {
-					HStack {
-						CloseButton {
-							viewStore.send(.closeButtonTapped)
-						}
-						Spacer()
-					}
 					ScrollView {
 						VStack(spacing: .zero) {
 							VStack {
@@ -110,6 +104,9 @@ extension CustomizeFees {
 						.foregroundColor(.app.blue2)
 						.padding(.bottom, .medium1)
 					}
+				}
+				.withNavigationBar {
+					store.send(.view(.closeButtonTapped))
 				}
 			}
 			.destinations(with: store)
@@ -159,7 +156,7 @@ extension CustomizeFees {
 				}
 
 				if let insufficientBalanceMessage = viewState.insufficientBalanceMessage {
-					WarningErrorView(text: insufficientBalanceMessage, type: .error)
+					WarningErrorView(text: insufficientBalanceMessage, type: .warning)
 				}
 			}
 		}

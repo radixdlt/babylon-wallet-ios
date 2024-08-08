@@ -67,7 +67,7 @@ extension CloseButton {
 
 		var alignment: Alignment {
 			switch self {
-			case .toolbar: .center
+			case .toolbar: .leading
 			case .homeCard: .topTrailing
 			}
 		}
