@@ -117,9 +117,9 @@ private extension ResourceAsset.State.DepositStatus {
 		switch self {
 		case .additionalSignatureRequired:
 			.init(kind: .warning, text: "Additional signature required to deposit")
-		case .forbidden:
+		case .denied:
 			.error("Recipient does not accept these tokens")
-		case .idle, .loading, .allowed:
+		case .idle, .loading, .allowed, .failed:
 			nil
 		}
 	}

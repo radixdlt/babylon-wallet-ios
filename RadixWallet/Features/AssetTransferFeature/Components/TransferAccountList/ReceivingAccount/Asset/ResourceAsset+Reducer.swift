@@ -260,14 +260,17 @@ extension ResourceAsset.State {
 		/// The user needs to provide an additional signature to deposit this asset.
 		case additionalSignatureRequired
 
-		/// The user cannot deposit this asset since the receiving acccount has disallowed.
-		case forbidden
+		/// The user cannot deposit this asset since the receiving acccount has disallowed it.
+		case denied
+
+		/// The operation to check the deposit status failed. We will allow user to try the deposit and worst case fail later.
+		case failed
 
 		var isEnabled: Bool {
 			switch self {
-			case .idle, .loading, .forbidden:
+			case .idle, .loading, .denied:
 				false
-			case .allowed, .additionalSignatureRequired:
+			case .allowed, .additionalSignatureRequired, .failed:
 				true
 			}
 		}

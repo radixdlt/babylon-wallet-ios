@@ -84,9 +84,9 @@ extension ReceivingAccount.State {
 		assets.contains(where: { $0.depositStatus == .loading })
 	}
 
-	mutating func setLoadingDepositStatus() {
+	mutating func setAllDepositStatus(_ status: ResourceAsset.State.DepositStatus) {
 		for id in assets.elements.map(\.id) {
-			assets[id: id]?.depositStatus = .loading
+			assets[id: id]?.depositStatus = status
 		}
 	}
 
