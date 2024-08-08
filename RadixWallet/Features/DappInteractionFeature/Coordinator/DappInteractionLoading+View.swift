@@ -24,7 +24,7 @@ extension DappInteractionLoading {
 				send: { .view($0) }
 			) { viewStore in
 				NavigationStack {
-					ForceFullScreen {}
+					Color.clear
 						.controlState(viewStore.screenState)
 						.onAppear { viewStore.send(.appeared) }
 						.alert(

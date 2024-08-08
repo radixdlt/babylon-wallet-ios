@@ -83,30 +83,23 @@ public struct SplashView: View {
 	var biometricsCheckFailed: Bool = false
 
 	public var body: some View {
-		ForceFullScreen {
-			VStack {
-				if biometricsCheckFailed {
-					Spacer()
-					Image(systemName: "lock.circle.fill")
-						.resizable()
-						.frame(.small)
-					Text(L10n.Splash.tapAnywhereToUnlock)
-						.textStyle(.body1HighImportance)
-				}
-			}
-			.padding(.bottom, .medium1)
-			.foregroundColor(.app.white)
-			.frame(
-				minWidth: 0,
-				maxWidth: .infinity,
-				minHeight: 0,
-				maxHeight: .infinity
-			)
-			.background(
-				Image(.splash)
+		VStack {
+			if biometricsCheckFailed {
+				Spacer()
+				Image(systemName: "lock.circle.fill")
 					.resizable()
-					.scaledToFill()
-			)
+					.frame(.small)
+				Text(L10n.Splash.tapAnywhereToUnlock)
+					.textStyle(.body1HighImportance)
+			}
 		}
+		.padding(.bottom, .medium1)
+		.foregroundColor(.app.white)
+		.frame(maxWidth: .infinity, maxHeight: .infinity)
+		.background(
+			Image(.splash)
+				.resizable()
+				.scaledToFill()
+		)
 	}
 }
