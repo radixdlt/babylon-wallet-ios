@@ -25,6 +25,7 @@ extension DappInteractionLoading {
 			) { viewStore in
 				NavigationStack {
 					Color.clear
+						.edgesIgnoringSafeArea(.all)
 						.controlState(viewStore.screenState)
 						.onAppear { viewStore.send(.appeared) }
 						.alert(
