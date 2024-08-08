@@ -3,10 +3,6 @@ import SwiftUI
 
 // MARK: - AccountDetails
 public struct AccountDetails: Sendable, FeatureReducer {
-	private enum CancellableId: Hashable {
-		case fetchAccountPortfolio
-	}
-
 	public struct State: Sendable, Hashable, AccountWithInfoHolder {
 		public var accountWithInfo: AccountWithInfo
 		var assets: AssetsView.State
@@ -33,7 +29,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case task
-		case onDisappear
 		case backButtonTapped
 		case preferencesButtonTapped
 		case transferButtonTapped
@@ -149,10 +144,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 				}
 			}
 			.merge(with: securityProblemsEffect())
-			.merge(with: scheduleFetchAccountPortfolioTimer(state))
-
-		case .onDisappear:
-			return .cancel(id: CancellableId.fetchAccountPortfolio)
+			.merge(with: scheduleFetchAccountPortfolioTimer(state.account.address))
 
 		case .backButtonTapped:
 			return .send(.delegate(.dismiss))
@@ -290,13 +282,12 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	private func scheduleFetchAccountPortfolioTimer(_ state: State) -> Effect<Action> {
-		.run { [address = state.account.address] _ in
+	private func scheduleFetchAccountPortfolioTimer(_ address: AccountAddress) -> Effect<Action> {
+		.run { _ in
 			for await _ in clock.timer(interval: .seconds(accountPortfolioRefreshIntervalInSeconds)) {
 				guard !Task.isCancelled else { return }
 				_ = try? await accountPortfoliosClient.fetchAccountPortfolio(address, true)
 			}
 		}
-		.cancellable(id: CancellableId.fetchAccountPortfolio, cancelInFlight: true)
 	}
 }
