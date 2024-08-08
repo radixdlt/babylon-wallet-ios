@@ -2786,6 +2786,10 @@ public enum L10n {
       /// Seed Phrase
       public static let headingScan = L10n.tr("Localizable", "seedPhrases_seedPhrase_headingScan", fallback: "Seed Phrase")
       /// Connected to %d Accounts
+      public static func multipleConnectedAccounts(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "seedPhrases_seedPhrase_multipleConnectedAccounts", p1, fallback: "Connected to %d Accounts")
+      }
+      /// Connected to %d Accounts
       public static func multipleConnectedAccountsReveal(_ p1: Int) -> String {
         return L10n.tr("Localizable", "seedPhrases_seedPhrase_multipleConnectedAccountsReveal", p1, fallback: "Connected to %d Accounts")
       }
@@ -2794,9 +2798,13 @@ public enum L10n {
         return L10n.tr("Localizable", "seedPhrases_seedPhrase_multipleConnectedAccountsScan", p1, fallback: "Currently connected to %d Accounts")
       }
       /// Not connected to any Accounts
+      public static let noConnectedAccounts = L10n.tr("Localizable", "seedPhrases_seedPhrase_noConnectedAccounts", fallback: "Not connected to any Accounts")
+      /// Not connected to any Accounts
       public static let noConnectedAccountsReveal = L10n.tr("Localizable", "seedPhrases_seedPhrase_noConnectedAccountsReveal", fallback: "Not connected to any Accounts")
       /// Not yet connected to any Accounts
       public static let noConnectedAccountsScan = L10n.tr("Localizable", "seedPhrases_seedPhrase_noConnectedAccountsScan", fallback: "Not yet connected to any Accounts")
+      /// Connected to 1 Account
+      public static let oneConnectedAccount = L10n.tr("Localizable", "seedPhrases_seedPhrase_oneConnectedAccount", fallback: "Connected to 1 Account")
       /// Connected to 1 Account
       public static let oneConnectedAccountReveal = L10n.tr("Localizable", "seedPhrases_seedPhrase_oneConnectedAccountReveal", fallback: "Connected to 1 Account")
       /// Currently connected to 1 Account
@@ -3089,6 +3097,14 @@ public enum L10n {
       public static let subtitle = L10n.tr("Localizable", "transactionReview_accountDepositSettings_subtitle", fallback: "Third-party deposit setting")
       /// Review New Deposit Settings
       public static let title = L10n.tr("Localizable", "transactionReview_accountDepositSettings_title", fallback: "Review New Deposit Settings")
+    }
+    public enum FeePayerValidation {
+      /// Fee payer account required
+      public static let feePayerRequired = L10n.tr("Localizable", "transactionReview_feePayerValidation_feePayerRequired", fallback: "Fee payer account required")
+      /// Not enough XRD for transaction fee
+      public static let insufficientBalance = L10n.tr("Localizable", "transactionReview_feePayerValidation_insufficientBalance", fallback: "Not enough XRD for transaction fee")
+      /// Fee payer account required
+      public static let linksNewAccount = L10n.tr("Localizable", "transactionReview_feePayerValidation_linksNewAccount", fallback: "Fee payer account required")
     }
     public enum Guarantees {
       /// Apply
