@@ -1015,7 +1015,6 @@ extension ReviewedTransaction {
 				return .insufficientBalance
 			}
 
-			print("•• introducesNewAccount: FALSE")
 			return .valid(introducesNewAccount: false)
 		}
 	}

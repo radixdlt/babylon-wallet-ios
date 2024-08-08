@@ -28,6 +28,7 @@ extension DappInteractionFlow {
 				.transaction { $0.animation = nil }
 			} destination: {
 				destinations(for: $0)
+					.toolbar(.visible, for: .navigationBar)
 					.navigationBarBackButtonHidden()
 					.toolbar {
 						ToolbarItem(placement: .navigationBarLeading) {
@@ -83,10 +84,7 @@ extension DappInteractionFlow {
 					CaseLet(
 						/DappInteractionFlow.Path.MainState.oneTimePersonaData,
 						action: DappInteractionFlow.Path.Action.oneTimePersonaData,
-						then: {
-							OneTimePersonaData.View(store: $0)
-								.toolbar(.visible, for: .navigationBar)
-						}
+						then: { OneTimePersonaData.View(store: $0) }
 					)
 
 				case .reviewTransaction:
