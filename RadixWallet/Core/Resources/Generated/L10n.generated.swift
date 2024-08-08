@@ -3103,8 +3103,8 @@ public enum L10n {
       public static let feePayerRequired = L10n.tr("Localizable", "transactionReview_feePayerValidation_feePayerRequired", fallback: "Fee payer account required")
       /// Not enough XRD for transaction fee
       public static let insufficientBalance = L10n.tr("Localizable", "transactionReview_feePayerValidation_insufficientBalance", fallback: "Not enough XRD for transaction fee")
-      /// Fee payer account required
-      public static let linksNewAccount = L10n.tr("Localizable", "transactionReview_feePayerValidation_linksNewAccount", fallback: "Fee payer account required")
+      /// Account will be linked on ledger to your other Accounts in this transaction
+      public static let linksNewAccount = L10n.tr("Localizable", "transactionReview_feePayerValidation_linksNewAccount", fallback: "Account will be linked on ledger to your other Accounts in this transaction")
     }
     public enum Guarantees {
       /// Apply
