@@ -10,20 +10,20 @@ extension AccountPortfoliosClient: DependencyKey {
 		@Dependency(\.gatewaysClient) var gatewaysClient
 
 		/// Update currency amount visibility based on the profile state
-		Task {
-			for try await isCurrencyAmountVisible in await appPreferencesClient.appPreferenceUpdates().map(\.display.isCurrencyAmountVisible) {
-				guard !Task.isCancelled else { return }
-				await state.setIsCurrencyAmountVisble(isCurrencyAmountVisible)
-			}
-		}
-
-		/// Update used currency based on the profile state
-		Task {
-			for try await fiatCurrency in await appPreferencesClient.appPreferenceUpdates().map(\.display.fiatCurrencyPriceTarget) {
-				guard !Task.isCancelled else { return }
-				await state.setSelectedCurrency(fiatCurrency)
-			}
-		}
+//		Task {
+//			for try await isCurrencyAmountVisible in await appPreferencesClient.appPreferenceUpdates().map(\.display.isCurrencyAmountVisible) {
+//				guard !Task.isCancelled else { return }
+//				await state.setIsCurrencyAmountVisble(isCurrencyAmountVisible)
+//			}
+//		}
+//
+//		/// Update used currency based on the profile state
+//		Task {
+//			for try await fiatCurrency in await appPreferencesClient.appPreferenceUpdates().map(\.display.fiatCurrencyPriceTarget) {
+//				guard !Task.isCancelled else { return }
+//				await state.setSelectedCurrency(fiatCurrency)
+//			}
+//		}
 
 		/// Fetches the pool and stake units details for a given account; Will update the portfolio accordingly
 		@Sendable

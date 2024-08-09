@@ -1,5 +1,5 @@
 {
-  "originHash" : "7d3590b225945abb1bc0ab6c684b005c28c64bdc204afcc2d34c3e379ef8a3c8",
+  "originHash" : "1d033d2d9728e181322e687c87550e30c6bcdac33f59fe631e1e37780502d076",
   "pins" : [
     {
       "identity" : "anycodable",
@@ -24,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sideeffect-io/AsyncExtensions.git",
       "state" : {
-        "revision" : "1f0729e4f1f6c7166acfac3cec43b3cbe83be0e6",
-        "version" : "0.5.2"
+        "revision" : "3442d3d046800f1974bda096faaf0ac510b21154",
+        "version" : "0.5.3"
       }
     },
     {
@@ -107,15 +107,6 @@
       "state" : {
         "revision" : "33f7e93be5d4ec027d42af77a8ec4680d1862ad2",
         "version" : "11.6.4"
-      }
-    },
-    {
-      "identity" : "sargon",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/radixdlt/sargon",
-      "state" : {
-        "revision" : "823d811c9e9d0093977ea9cb20ff4ba2f5e77747",
-        "version" : "1.0.34"
       }
     },
     {
