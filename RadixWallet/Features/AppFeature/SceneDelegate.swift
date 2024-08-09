@@ -25,6 +25,16 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 		appsFlyerClient.continue(userActivity)
 	}
 
+	public func sceneWillResignActive(_ scene: UIScene) {
+		guard let scene = scene as? UIWindowScene else { return }
+		showPrivacyProtectionWindow(in: scene)
+	}
+
+	public func sceneDidBecomeActive(_ scene: UIScene) {
+		guard let scene = scene as? UIWindowScene else { return }
+		hidePrivacyProtectionWindow(in: scene)
+	}
+
 	func overlayWindow(in scene: UIWindowScene) {
 		let overlayView = OverlayReducer.View(
 			store: .init(
@@ -47,5 +57,21 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 		}
 
 		self.overlayWindow = overlayWindow
+	}
+
+	// MARK: Privacy Protection
+
+	private var privacyProtectionWindow: UIWindow?
+
+	private func showPrivacyProtectionWindow(in scene: UIWindowScene) {
+		privacyProtectionWindow = UIWindow(windowScene: scene)
+		privacyProtectionWindow?.rootViewController = UIHostingController(rootView: SplashView())
+		privacyProtectionWindow?.windowLevel = .statusBar + 1
+		privacyProtectionWindow?.makeKeyAndVisible()
+	}
+
+	private func hidePrivacyProtectionWindow(in scene: UIWindowScene) {
+		privacyProtectionWindow?.isHidden = true
+		privacyProtectionWindow = nil
 	}
 }
