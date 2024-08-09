@@ -710,6 +710,8 @@ Code: %@";
 "assetTransfer_maxAmountDialog_sendAllButton" = "%@ (send all XRD)";
 "assetTransfer_maxAmountDialog_saveXrdForFeeButton" = "%@ (save 1 XRD for fee)";
 "assetTransfer_extraSignature_label" = "You will be asked for an extra signature";
+"assetTransfer_depositStatus_signatureRequired" = "Additional signature required to deposit";
+"assetTransfer_depositStatus_denied" = "Recipient does not accept these tokens";
 "importOlympiaLedgerAccounts_title" = "Verify With Ledger Device";
 "importOlympiaLedgerAccounts_subtitle" = "You are attempting to import one or more Olympia accounts that must be verified with a Ledger hardware wallet device.";
 "importOlympiaLedgerAccounts_listHeading" = "Already verified Ledger devices:";
