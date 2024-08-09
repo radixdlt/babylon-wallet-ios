@@ -44,7 +44,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Equatable, Sendable {
-		case setAllDepositStatus(accountId: ReceivingAccount.State.ID, status: ResourceAsset.State.DepositStatus)
+		case setAllDepositStatus(accountId: ReceivingAccount.State.ID, status: Loadable<ResourceAsset.State.DepositStatus>)
 		case setDepositStatus(accountId: ReceivingAccount.State.ID, values: AssetsDepositStatus)
 	}
 
@@ -311,7 +311,7 @@ private extension TransferAccountList {
 			await send(.internal(.setDepositStatus(accountId: receivingAccountId, values: values)))
 		} catch: { error, send in
 			errorQueue.schedule(error)
-			await send(.internal(.setAllDepositStatus(accountId: receivingAccountId, status: .failed)))
+			await send(.internal(.setAllDepositStatus(accountId: receivingAccountId, status: .failure(error))))
 		}
 	}
 

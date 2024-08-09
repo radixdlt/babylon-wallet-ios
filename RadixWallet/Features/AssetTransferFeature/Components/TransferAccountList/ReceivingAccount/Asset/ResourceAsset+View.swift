@@ -111,15 +111,15 @@ private extension View {
 	}
 }
 
-private extension ResourceAsset.State.DepositStatus {
+private extension Loadable<ResourceAsset.State.DepositStatus> {
 	var hint: Hint.ViewState? {
 		switch self {
-		case .additionalSignatureRequired:
-			.init(kind: .warning, text: L10n.AssetTransfer.DepositStatus.signatureRequired)
-		case .denied:
-			.error(L10n.AssetTransfer.DepositStatus.denied)
-		case .idle, .loading, .allowed, .failed:
+		case .idle, .loading, .failure, .success(.allowed):
 			nil
+		case .success(.additionalSignatureRequired):
+			.init(kind: .warning, text: L10n.AssetTransfer.DepositStatus.signatureRequired)
+		case .success(.denied):
+			.error(L10n.AssetTransfer.DepositStatus.denied)
 		}
 	}
 }

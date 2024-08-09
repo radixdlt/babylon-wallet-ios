@@ -77,14 +77,14 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 
 extension ReceivingAccount.State {
 	var isDepositEnabled: Bool {
-		assets.allSatisfy(\.depositStatus.isEnabled)
+		assets.allSatisfy(\.isDepositEnabled)
 	}
 
 	var isLoadingDepositStatus: Bool {
 		assets.contains(where: { $0.depositStatus == .loading })
 	}
 
-	mutating func setAllDepositStatus(_ status: ResourceAsset.State.DepositStatus) {
+	mutating func setAllDepositStatus(_ status: Loadable<ResourceAsset.State.DepositStatus>) {
 		assets.mutateAll { asset in
 			asset.depositStatus = status
 		}
@@ -92,7 +92,7 @@ extension ReceivingAccount.State {
 
 	mutating func updateDepositStatus(values: AssetsDepositStatus) {
 		for (id, status) in values {
-			assets[id: id]?.depositStatus = status
+			assets[id: id]?.depositStatus = .success(status)
 		}
 	}
 }

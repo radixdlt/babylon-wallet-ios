@@ -36,7 +36,7 @@ public struct ResourceAsset: Sendable, FeatureReducer {
 		}
 
 		public var kind: Kind
-		public var depositStatus: DepositStatus = .idle
+		public var depositStatus: Loadable<DepositStatus> = .idle
 
 		@PresentationState
 		public var destination: Destination.State? = nil
@@ -248,12 +248,6 @@ extension OnLedgerEntity.NonFungibleToken {
 // MARK: - ResourceAsset.State.DepositStatus
 extension ResourceAsset.State {
 	public enum DepositStatus: Sendable, Hashable {
-		/// The deposit status is not yet determined.
-		case idle
-
-		/// The deposit status is being loaded
-		case loading
-
 		/// The deposit of this asset is allowed.
 		case allowed
 
@@ -262,15 +256,20 @@ extension ResourceAsset.State {
 
 		/// The user cannot deposit this asset since the receiving acccount has disallowed it.
 		case denied
+	}
 
-		/// The operation to check the deposit status failed. We will allow user to try the deposit and worst case fail later.
-		case failed
-
-		var isEnabled: Bool {
-			switch self {
-			case .idle, .loading, .denied:
+	var isDepositEnabled: Bool {
+		switch depositStatus {
+		case .idle, .loading:
+			false
+		case .failure:
+			// We will allow user to try the deposit and worst case fail later.
+			true
+		case let .success(status):
+			switch status {
+			case .denied:
 				false
-			case .allowed, .additionalSignatureRequired, .failed:
+			case .allowed, .additionalSignatureRequired:
 				true
 			}
 		}
