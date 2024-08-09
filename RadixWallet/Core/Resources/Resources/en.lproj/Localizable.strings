@@ -436,7 +436,7 @@
 "transactionReview_poolRedemptionHeading" = "Redeeming from pools";
 "transactionReview_feePayerValidation_insufficientBalance" = "Not enough XRD for transaction fee";
 "transactionReview_feePayerValidation_feePayerRequired" = "Fee payer account required";
-"transactionReview_feePayerValidation_linksNewAccount" = "Fee payer account required";
+"transactionReview_feePayerValidation_linksNewAccount" = "Account will be linked on ledger to your other Accounts in this transaction";
 "transactionReview_networkFee_heading" = "Transaction Fee";
 "transactionReview_networkFee_congestedText" = "The network is currently congested. Add a tip to speed up your transfer.";
 "transactionReview_networkFee_customizeButtonTitle" = "Customize";
