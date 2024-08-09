@@ -996,18 +996,18 @@ extension ReviewedTransaction {
 
 	var feePayingValidation: Loadable<FeeValidationOutcome> {
 		feePayer.map { selected in
-			guard transactionFee.totalFee.lockFee > .zero else {
-				// No fee is required - valid regardless of balance
-				return .valid(.feePayerSuperfluous)
-			}
-
 			guard let selected else {
-				// Fee is required, but no fee payer selected - invalid
-				return .needsFeePayer
+				if transactionFee.totalFee.lockFee == .zero {
+					// No fee is required - no fee payer needed
+					return .valid(.feePayerSuperfluous)
+				} else {
+					// Fee is required, but no fee payer selected - invalid
+					return .needsFeePayer
+				}
 			}
 
+			let xrdAddress: ResourceAddress = .xrd(on: networkID)
 			let feePayerWithdraws = accountWithdraws[selected.account.address] ?? []
-			let xrdAddress = ResourceAddress.xrd(on: networkID)
 			let xrdTransfer: Decimal192 = feePayerWithdraws.reduce(.zero) { partialResult, resource in
 				if case let .fungible(resourceAddress, indicator) = resource, resourceAddress == xrdAddress {
 					return partialResult + indicator.amount
@@ -1015,7 +1015,9 @@ extension ReviewedTransaction {
 				return partialResult
 			}
 
-			guard selected.xrdBalance >= xrdTransfer + transactionFee.totalFee.lockFee else {
+			let totalAmountNeeded = xrdTransfer + transactionFee.totalFee.lockFee
+
+			guard selected.xrdBalance >= totalAmountNeeded else {
 				// Insufficient balance to pay for withdraws and transaction fee
 				return .insufficientBalance
 			}
