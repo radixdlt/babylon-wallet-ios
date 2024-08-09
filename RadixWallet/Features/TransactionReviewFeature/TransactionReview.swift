@@ -974,9 +974,14 @@ public struct ReviewedTransaction: Hashable, Sendable {
 
 // MARK: - FeeValidationOutcome
 enum FeeValidationOutcome {
-	case valid(introducesNewAccount: Bool)
+	case valid(Details?)
 	case needsFeePayer
 	case insufficientBalance
+
+	enum Details {
+		case introducesNewAccount
+		case feePayerSuperfluous
+	}
 
 	var isValid: Bool {
 		guard case .valid = self else { return false }
@@ -991,53 +996,36 @@ extension ReviewedTransaction {
 
 	var feePayingValidation: Loadable<FeeValidationOutcome> {
 		feePayer.map { selected in
-			let introducesNewAccount = selected.map { !involvedAccounts.contains($0.account.address) } ?? false
-
-			guard let feePayer = selected,
-			      let feePayerWithdraws = accountWithdraws[feePayer.account.address]
-			else {
-				return selected.validateBalance(forFee: transactionFee, introducesNewAccount: introducesNewAccount)
+			guard transactionFee.totalFee.lockFee > .zero else {
+				// No fee is required - valid regardless of balance
+				return .valid(.feePayerSuperfluous)
 			}
 
-			let xrdAddress = ResourceAddress.xrd(on: networkID)
+			guard let selected else {
+				// Fee is required, but no fee payer selected - invalid
+				return .needsFeePayer
+			}
 
-			let xrdTotalTransfer: Decimal192 = feePayerWithdraws.reduce(.zero) { partialResult, resource in
+			let feePayerWithdraws = accountWithdraws[selected.account.address] ?? []
+			let xrdAddress = ResourceAddress.xrd(on: networkID)
+			let xrdTransfer: Decimal192 = feePayerWithdraws.reduce(.zero) { partialResult, resource in
 				if case let .fungible(resourceAddress, indicator) = resource, resourceAddress == xrdAddress {
 					return partialResult + indicator.amount
 				}
 				return partialResult
 			}
 
-			let total = xrdTotalTransfer + transactionFee.totalFee.lockFee
-
-			guard feePayer.xrdBalance >= total else {
+			guard selected.xrdBalance >= xrdTransfer + transactionFee.totalFee.lockFee else {
 				// Insufficient balance to pay for withdraws and transaction fee
 				return .insufficientBalance
 			}
 
-			return .valid(introducesNewAccount: false)
+			if !involvedAccounts.contains(selected.account.address) {
+				return .valid(.introducesNewAccount)
+			} else {
+				return .valid(nil)
+			}
 		}
-	}
-}
-
-extension FeePayerCandidate? {
-	func validateBalance(forFee transactionFee: TransactionFee, introducesNewAccount: Bool) -> FeeValidationOutcome {
-		if transactionFee.totalFee.lockFee == .zero {
-			// If no fee is required - valid
-			return .valid(introducesNewAccount: introducesNewAccount)
-		}
-
-		guard let self else {
-			// If fee is required, but no fee payer selected - invalid
-			return .needsFeePayer
-		}
-
-		guard self.xrdBalance >= transactionFee.totalFee.lockFee else {
-			// If insufficient balance - invalid
-			return .insufficientBalance
-		}
-
-		return .valid(introducesNewAccount: introducesNewAccount)
 	}
 }
 
