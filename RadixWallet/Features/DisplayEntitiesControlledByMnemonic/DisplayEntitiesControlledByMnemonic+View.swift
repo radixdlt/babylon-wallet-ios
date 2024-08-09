@@ -53,11 +53,11 @@ extension DisplayEntitiesControlledByMnemonic {
 					}
 				case .scanning:
 					if accounts == 0 {
-						L10n.SeedPhrases.SeedPhrase.noConnectedAccountsScan
+						L10n.SeedPhrases.SeedPhrase.noConnectedAccountsReveal
 					} else if accounts == 1 {
-						L10n.SeedPhrases.SeedPhrase.oneConnectedAccountScan
+						L10n.SeedPhrases.SeedPhrase.oneConnectedAccountReveal
 					} else {
-						L10n.SeedPhrases.SeedPhrase.multipleConnectedAccountsScan(accounts)
+						L10n.SeedPhrases.SeedPhrase.multipleConnectedAccountsReveal(accounts)
 					}
 				}
 			}

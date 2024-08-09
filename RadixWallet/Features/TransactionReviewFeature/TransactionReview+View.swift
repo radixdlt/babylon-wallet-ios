@@ -28,7 +28,7 @@ extension TransactionReview.State {
 			viewControlState: viewControlState,
 			rawTransaction: displayMode.rawTransaction,
 			showApprovalSlider: reviewedTransaction != nil,
-			canApproveTX: canApproveTX && reviewedTransaction?.feePayingValidation.wrappedValue == .valid,
+			canApproveTX: canApproveTX && reviewedTransaction?.feePayingValidation.wrappedValue?.isValid == true,
 			sliderResetDate: sliderResetDate,
 			canToggleViewMode: reviewedTransaction != nil && reviewedTransaction?.isNonConforming == false,
 			viewRawTransactionButtonState: reviewedTransaction?.feePayer.isSuccess == true ? .enabled : .disabled,

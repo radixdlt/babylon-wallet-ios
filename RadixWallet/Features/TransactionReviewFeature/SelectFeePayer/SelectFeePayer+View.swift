@@ -45,7 +45,6 @@ extension SelectFeePayer {
 						.multilineTextAlignment(.center)
 						.textStyle(.sheetTitle)
 						.foregroundColor(.app.gray1)
-						.padding(.top, .medium3)
 						.padding(.horizontal, .medium1)
 						.padding(.bottom, .small2)
 
@@ -101,6 +100,9 @@ extension SelectFeePayer {
 							.buttonStyle(.primaryRectangular)
 							.controlState(viewStore.selectButtonControlState)
 					}
+				}
+				.withNavigationBar {
+					store.send(.view(.closeButtonTapped))
 				}
 			}
 		}

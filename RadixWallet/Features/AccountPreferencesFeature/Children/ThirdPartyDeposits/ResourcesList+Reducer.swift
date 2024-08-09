@@ -29,6 +29,10 @@ public struct ResourcesList: FeatureReducer, Sendable {
 
 	public struct State: Hashable, Sendable {
 		let canModify: Bool
+		var mode: ResourcesListMode
+		var thirdPartyDeposits: ThirdPartyDeposits
+		let networkID: NetworkID
+		var loadedResources: [ResourceViewState] = []
 
 		var allDepositorAddresses: OrderedSet<ResourceViewState.Address> {
 			switch mode {
@@ -38,24 +42,6 @@ public struct ResourcesList: FeatureReducer, Sendable {
 				OrderedSet(thirdPartyDeposits.depositorsAllowSet().map { .allowedDepositor($0) })
 			}
 		}
-
-		var resourcesForDisplay: [ResourceViewState] {
-			switch mode {
-			case let .allowDenyAssets(exception):
-				let addresses: [ResourceViewState.Address] = thirdPartyDeposits.assetsExceptionSet()
-					.filter { $0.exceptionRule == exception }
-					.map { .assetException($0) }
-
-				return loadedResources.filter { addresses.contains($0.address) }
-			case .allowDepositors:
-				return loadedResources
-			}
-		}
-
-		var mode: ResourcesListMode
-		var thirdPartyDeposits: ThirdPartyDeposits
-		let networkID: NetworkID
-		var loadedResources: [ResourceViewState] = []
 
 		@PresentationState
 		var destination: Destination.State? = nil
@@ -112,7 +98,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(destinationPath, action: /Action.destination) {
+			.ifLet(destinationPath, action: \.destination) {
 				Destination()
 			}
 	}

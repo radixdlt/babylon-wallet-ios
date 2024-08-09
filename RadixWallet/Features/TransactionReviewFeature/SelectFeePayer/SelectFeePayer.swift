@@ -24,6 +24,7 @@ public struct SelectFeePayer: Sendable, FeatureReducer {
 		case selectedPayer(FeePayerCandidate?)
 		case confirmedFeePayer(FeePayerCandidate)
 		case pullToRefreshStarted
+		case closeButtonTapped
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -36,6 +37,7 @@ public struct SelectFeePayer: Sendable, FeatureReducer {
 
 	@Dependency(\.transactionClient) var transactionClient
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.dismiss) var dismiss
 
 	public init() {}
 
@@ -54,6 +56,11 @@ public struct SelectFeePayer: Sendable, FeatureReducer {
 
 		case .pullToRefreshStarted:
 			return loadCandidates(refresh: true)
+
+		case .closeButtonTapped:
+			return .run { _ in
+				await dismiss()
+			}
 		}
 	}
 

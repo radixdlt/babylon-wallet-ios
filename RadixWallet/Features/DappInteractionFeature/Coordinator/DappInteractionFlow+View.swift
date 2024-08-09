@@ -28,6 +28,7 @@ extension DappInteractionFlow {
 				.transaction { $0.animation = nil }
 			} destination: {
 				destinations(for: $0)
+					.toolbar(.visible, for: .navigationBar)
 					.navigationBarBackButtonHidden()
 					.toolbar {
 						ToolbarItem(placement: .navigationBarLeading) {
@@ -37,7 +38,6 @@ extension DappInteractionFlow {
 						}
 					}
 			}
-			.navigationTransition(.slide, interactivity: .disabled)
 			.onAppear { store.send(.view(.appeared)) }
 			.alert(
 				store: store.scope(
