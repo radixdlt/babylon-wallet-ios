@@ -47,9 +47,6 @@ extension AccountDetails {
 				.task {
 					await viewStore.send(.task).finish()
 				}
-				.onDisappear {
-					viewStore.send(.onDisappear)
-				}
 				.toolbar {
 					ToolbarItem(placement: .principal) {
 						Text(viewStore.displayName)
