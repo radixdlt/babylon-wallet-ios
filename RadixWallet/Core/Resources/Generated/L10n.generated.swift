@@ -721,6 +721,12 @@ public enum L10n {
       /// Scan Account QR Code
       public static let scanQRNavigationTitle = L10n.tr("Localizable", "assetTransfer_chooseReceivingAccount_scanQRNavigationTitle", fallback: "Scan Account QR Code")
     }
+    public enum DepositStatus {
+      /// Recipient does not accept these tokens
+      public static let denied = L10n.tr("Localizable", "assetTransfer_depositStatus_denied", fallback: "Recipient does not accept these tokens")
+      /// Additional signature required to deposit
+      public static let signatureRequired = L10n.tr("Localizable", "assetTransfer_depositStatus_signatureRequired", fallback: "Additional signature required to deposit")
+    }
     public enum Error {
       /// Total amount exceeds your current balance
       public static let insufficientBalance = L10n.tr("Localizable", "assetTransfer_error_insufficientBalance", fallback: "Total amount exceeds your current balance")
