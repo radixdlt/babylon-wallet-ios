@@ -110,15 +110,15 @@ extension AssetTransfer.State {
 			return false
 		}
 
-		return accounts.receivingAccounts.allSatisfy {
-			guard $0.recipient != nil else {
+		return accounts.receivingAccounts.allSatisfy { receivingAccount in
+			guard receivingAccount.recipient != nil else {
 				return false
 			}
-			guard $0.isDepositEnabled else {
+			guard receivingAccount.isDepositEnabled else {
 				return false
 			}
-			let fungibleAssets = $0.assets.fungibleAssets
-			let nonFungibleAssets = $0.assets.nonFungibleAssets
+			let fungibleAssets = receivingAccount.assets.fungibleAssets
+			let nonFungibleAssets = receivingAccount.assets.nonFungibleAssets
 
 			if !fungibleAssets.isEmpty {
 				return fungibleAssets.allSatisfy { $0.transferAmount != nil && $0.totalTransferSum <= $0.balance }
