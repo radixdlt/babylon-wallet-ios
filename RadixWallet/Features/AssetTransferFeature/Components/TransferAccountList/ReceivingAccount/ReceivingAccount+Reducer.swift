@@ -2,6 +2,8 @@ import ComposableArchitecture
 import Sargon
 import SwiftUI
 
+public typealias AssetsDepositStatus = [ResourceAsset.State.ID: ResourceAsset.State.DepositStatus]
+
 // MARK: - ReceivingAccount
 public struct ReceivingAccount: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
@@ -69,6 +71,28 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 			return .none
 		default:
 			return .none
+		}
+	}
+}
+
+extension ReceivingAccount.State {
+	var isDepositEnabled: Bool {
+		assets.allSatisfy(\.isDepositEnabled)
+	}
+
+	var isLoadingDepositStatus: Bool {
+		assets.contains(where: { $0.depositStatus == .loading })
+	}
+
+	mutating func setAllDepositStatus(_ status: Loadable<ResourceAsset.State.DepositStatus>) {
+		assets.mutateAll { asset in
+			asset.depositStatus = status
+		}
+	}
+
+	mutating func updateDepositStatus(values: AssetsDepositStatus) {
+		for (id, status) in values {
+			assets[id: id]?.depositStatus = .success(status)
 		}
 	}
 }

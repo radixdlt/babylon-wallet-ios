@@ -216,6 +216,11 @@ extension GatewayAPIClient {
 					request: streamTransactionsRequest,
 					dateEncodingStrategy: .iso8601
 				) { $0.appendingPathComponent("stream/transactions") }
+			},
+			prevalidateDeposit: { prevalidateDepositRequest in
+				try await post(
+					request: prevalidateDepositRequest
+				) { $0.appendingPathComponent("transaction/account-deposit-pre-validation") }
 			}
 		)
 	}

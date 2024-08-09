@@ -5,6 +5,7 @@ extension AssetTransfer.State {
 	var viewState: AssetTransfer.ViewState {
 		.init(
 			canSendTransferRequest: canSendTransferRequest,
+			isLoadingDepositStatus: isLoadingDepositStatus,
 			message: message
 		)
 	}
@@ -17,6 +18,7 @@ extension AssetTransfer.State {
 extension AssetTransfer {
 	public struct ViewState: Equatable {
 		let canSendTransferRequest: Bool
+		let isLoadingDepositStatus: Bool
 		let message: AssetTransferMessage.State?
 	}
 
@@ -48,8 +50,14 @@ extension AssetTransfer.View {
 
 					FixedSpacer(height: .small2)
 
-					Button(L10n.AssetTransfer.sendTransferButton) {
+					Button {
 						viewStore.send(.sendTransferTapped)
+					} label: {
+						if viewStore.isLoadingDepositStatus {
+							ProgressView()
+						} else {
+							Text(L10n.AssetTransfer.sendTransferButton)
+						}
 					}
 					.buttonStyle(.primaryRectangular)
 					.controlState(viewStore.canSendTransferRequest ? .enabled : .disabled)
