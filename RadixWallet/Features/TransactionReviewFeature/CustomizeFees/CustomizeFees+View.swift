@@ -31,20 +31,14 @@ extension CustomizeFees.State {
 			}(),
 			feePayer: feePayer,
 			noFeePayerText: {
-				if transactionFee.totalFee.lockFee == .zero {
+				if feePayingValidation == .valid(.feePayerSuperfluous) {
 					L10n.CustomizeNetworkFees.noneRequired
 				} else {
 					L10n.CustomizeNetworkFees.noAccountSelected
 				}
 			}(),
-			insufficientBalanceMessage: {
-				if let feePayer {
-					if feePayer.xrdBalance < transactionFee.totalFee.lockFee {
-						return L10n.CustomizeNetworkFees.Warning.insufficientBalance
-					}
-				}
-				return nil
-			}()
+			insufficientBalance:
+			feePayingValidation == .insufficientBalance
 		)
 	}
 
@@ -58,7 +52,7 @@ extension CustomizeFees {
 		let modeSwitchTitle: String
 		let feePayer: FeePayerCandidate?
 		let noFeePayerText: String
-		let insufficientBalanceMessage: String?
+		let insufficientBalance: Bool
 	}
 
 	@MainActor
@@ -155,8 +149,8 @@ extension CustomizeFees {
 					.disabled(true)
 				}
 
-				if let insufficientBalanceMessage = viewState.insufficientBalanceMessage {
-					WarningErrorView(text: insufficientBalanceMessage, type: .error)
+				if viewState.insufficientBalance {
+					WarningErrorView(text: L10n.CustomizeNetworkFees.Warning.insufficientBalance, type: .error)
 				}
 			}
 		}
