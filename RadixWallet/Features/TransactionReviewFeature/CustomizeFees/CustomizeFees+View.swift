@@ -1,58 +1,64 @@
 
 extension CustomizeFees.State {
-	// Need to disable, since broken in swiftformat 0.52.7
-	// swiftformat:disable redundantClosure
-
 	var viewState: CustomizeFees.ViewState {
 		.init(
-			title: {
-				switch transactionFee.mode {
-				case .normal:
-					L10n.CustomizeNetworkFees.NormalMode.title
-				case .advanced:
-					L10n.CustomizeNetworkFees.AdvancedMode.title
-				}
-			}(),
-			description: {
-				switch transactionFee.mode {
-				case .normal:
-					L10n.CustomizeNetworkFees.NormalMode.subtitle
-				case .advanced:
-					L10n.CustomizeNetworkFees.AdvancedMode.subtitle
-				}
-			}(),
-			modeSwitchTitle: {
-				switch transactionFee.mode {
-				case .normal:
-					L10n.CustomizeNetworkFees.viewAdvancedModeButtonTitle
-				case .advanced:
-					L10n.CustomizeNetworkFees.viewNormalModeButtonTitle
-				}
-			}(),
-			feePayer: feePayer,
-			noFeePayerText: {
-				if feePayingValidation == .valid(.feePayerSuperfluous) {
-					L10n.CustomizeNetworkFees.noneRequired
-				} else {
-					L10n.CustomizeNetworkFees.noAccountSelected
-				}
-			}(),
-			insufficientBalance:
-			feePayingValidation == .insufficientBalance
+			mode: transactionFee.mode,
+			feePayer: feePayer?.account,
+			feePayingValidation: feePayingValidation
 		)
 	}
+}
 
-	// swiftformat:enable redundantClosure
+extension CustomizeFees.ViewState {
+	var title: String {
+		switch mode {
+		case .normal:
+			L10n.CustomizeNetworkFees.NormalMode.title
+		case .advanced:
+			L10n.CustomizeNetworkFees.AdvancedMode.title
+		}
+	}
+
+	var description: String {
+		switch mode {
+		case .normal:
+			L10n.CustomizeNetworkFees.NormalMode.subtitle
+		case .advanced:
+			L10n.CustomizeNetworkFees.AdvancedMode.subtitle
+		}
+	}
+
+	var modeSwitchTitle: String {
+		switch mode {
+		case .normal:
+			L10n.CustomizeNetworkFees.viewAdvancedModeButtonTitle
+		case .advanced:
+			L10n.CustomizeNetworkFees.viewNormalModeButtonTitle
+		}
+	}
+
+	var noFeePayerText: String {
+		if feePayingValidation == .valid(.feePayerSuperfluous) {
+			L10n.CustomizeNetworkFees.noneRequired
+		} else {
+			L10n.CustomizeNetworkFees.noAccountSelected
+		}
+	}
+
+	var insufficientBalance: Bool {
+		feePayingValidation == .insufficientBalance
+	}
+
+	var linkingNewAccount: Bool {
+		feePayingValidation == .valid(.introducesNewAccount)
+	}
 }
 
 extension CustomizeFees {
 	public struct ViewState: Equatable {
-		let title: String
-		let description: String
-		let modeSwitchTitle: String
-		let feePayer: FeePayerCandidate?
-		let noFeePayerText: String
-		let insufficientBalance: Bool
+		let mode: TransactionFee.Mode
+		let feePayer: Account?
+		let feePayingValidation: FeeValidationOutcome?
 	}
 
 	@MainActor
@@ -139,7 +145,7 @@ extension CustomizeFees {
 					.textStyle(.body1StandaloneLink)
 					.foregroundColor(.app.blue2)
 				}
-				if let feePayer = viewState.feePayer?.account {
+				if let feePayer = viewState.feePayer {
 					AccountCard(account: feePayer)
 				} else {
 					AppTextField(
@@ -151,6 +157,8 @@ extension CustomizeFees {
 
 				if viewState.insufficientBalance {
 					WarningErrorView(text: L10n.CustomizeNetworkFees.Warning.insufficientBalance, type: .error)
+				} else if viewState.linkingNewAccount {
+					WarningErrorView(text: L10n.TransactionReview.FeePayerValidation.linksNewAccount, type: .warning)
 				}
 			}
 		}
