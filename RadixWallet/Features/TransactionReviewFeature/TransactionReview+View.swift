@@ -508,9 +508,7 @@ private extension View {
 
 	private func customizeFees(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
 		sheet(
-			store: destinationStore,
-			state: /TransactionReview.Destination.State.customizeFees,
-			action: TransactionReview.Destination.Action.customizeFees,
+			store: destinationStore.scope(state: \.customizeFees, action: \.customizeFees),
 			content: { CustomizeFees.View(store: $0).inNavigationView }
 		)
 	}

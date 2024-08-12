@@ -145,6 +145,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	}
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case customizeGuarantees(TransactionReviewGuarantees.State)
 			case signing(Signing.State)
@@ -159,6 +160,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			case rawTransactionAlert(AlertState<Action.RawTransactionAlert>)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case customizeGuarantees(TransactionReviewGuarantees.Action)
 			case signing(Signing.Action)
@@ -181,7 +183,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			Scope(state: /State.customizeGuarantees, action: /Action.customizeGuarantees) {
 				TransactionReviewGuarantees()
 			}
-			Scope(state: /State.customizeFees, action: /Action.customizeFees) {
+			Scope(state: \.customizeFees, action: \.customizeFees) {
 				CustomizeFees()
 			}
 			Scope(state: /State.signing, action: /Action.signing) {
