@@ -18,7 +18,8 @@ public struct CustomizeFeesMode {
 }
 
 // MARK: - CustomizeFees
-public struct CustomizeFees: FeatureReducer, Sendable {
+@Reducer
+public struct CustomizeFees: Sendable {
 	@ObservableState
 	public struct State: Hashable, Sendable {
 		let manifestSummary: ManifestSummary
@@ -76,43 +77,39 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 		case updated(TaskResult<ReviewedTransaction>)
 	}
 
-	public struct Destination: DestinationReducer {
-		@CasePathable
-		public enum State: Sendable, Hashable {
-			case selectFeePayer(SelectFeePayer.State)
-		}
-
-		@CasePathable
-		public enum Action: Sendable, Equatable {
-			case selectFeePayer(SelectFeePayer.Action)
-		}
-
-		public var body: some ReducerOf<Self> {
-			Scope(state: \.selectFeePayer, action: \.selectFeePayer) {
-				SelectFeePayer()
-			}
-		}
-	}
+//	public struct Destination: DestinationReducer {
+//		@CasePathable
+//		public enum State: Sendable, Hashable {
+//			case selectFeePayer(SelectFeePayer.State)
+//		}
+//
+//		@CasePathable
+//		public enum Action: Sendable, Equatable {
+//			case selectFeePayer(SelectFeePayer.Action)
+//		}
+//
+//		public var body: some ReducerOf<Self> {
+//			Scope(state: \.selectFeePayer, action: \.selectFeePayer) {
+//				SelectFeePayer()
+//			}
+//		}
+//	}
 
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.modeState, action: \.child.mode) {
-			Scope(state: \.normal, action: \.normalFeesCustomization) {
-				NormalFeesCustomization()
-			}
-			Scope(state: \.advanced, action: \.advancedFeesCustomization) {
-				AdvancedFeesCustomization()
-			}
-		}
+//		Scope(state: \.modeState, action: \.child.mode) {
+//			Scope(state: \.normal, action: \.normalFeesCustomization) {
+//				NormalFeesCustomization()
+//			}
+//			Scope(state: \.advanced, action: \.advancedFeesCustomization) {
+//				AdvancedFeesCustomization()
+//			}
+//		}
 		Reduce(core)
-			.ifLet(destinationPath, action: /Action.destination) {
-				Destination()
-			}
+			.ifLet(\.$destination, action: \.destination)
 	}
-
-	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -227,6 +224,14 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 		default:
 			return .none
 		}
+	}
+}
+
+// MARK: CustomizeFees.Destination
+extension CustomizeFees {
+	@Reducer(state: .equatable)
+	public enum Destination {
+		case selectFeePayer(SelectFeePayer)
 	}
 }
 

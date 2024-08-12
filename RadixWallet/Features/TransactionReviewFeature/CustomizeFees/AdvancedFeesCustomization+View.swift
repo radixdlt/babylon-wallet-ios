@@ -2,64 +2,48 @@ import ComposableArchitecture
 import SwiftUI
 
 extension AdvancedFeesCustomization.State {
-	var viewState: AdvancedFeesCustomization.ViewState {
-		.init(
-			feesViewState: .init(feeViewStates: fees.viewStates, totalFee: fees.total, isAdvancedMode: true),
-			paddingAmount: paddingAmount,
-			paddingAmountHint: paddingAmountHint,
-			tipPercentage: tipPercentage,
-			tipPercentageHint: tipPercentageHint,
-			focusField: focusField
-		)
+	var feesViewState: FeesView.ViewState {
+		.init(feeViewStates: fees.viewStates, totalFee: fees.total, isAdvancedMode: true)
 	}
 
-	private var paddingAmountHint: Hint.ViewState? {
+	var paddingAmountHint: Hint.ViewState? {
 		guard parsedPaddingFee == nil else { return nil }
 		return .iconError()
 	}
 
-	private var tipPercentageHint: Hint.ViewState? {
+	var tipPercentageHint: Hint.ViewState? {
 		guard parsedTipPercentage == nil else { return nil }
 		return .iconError()
 	}
 }
 
+// MARK: - AdvancedFeesCustomization.View
 extension AdvancedFeesCustomization {
-	public struct ViewState: Equatable, Sendable {
-		let feesViewState: FeesView.ViewState
-
-		let paddingAmount: String
-		let paddingAmountHint: Hint.ViewState?
-		let tipPercentage: String
-		let tipPercentageHint: Hint.ViewState?
-		let focusField: State.FocusField?
-	}
-
 	@MainActor
 	public struct View: SwiftUI.View {
-		let store: StoreOf<AdvancedFeesCustomization>
+		@Perception.Bindable
+		var store: StoreOf<AdvancedFeesCustomization>
 		@FocusState
 		var focusField: State.FocusField?
 
+		var paddingAmount: Binding<String> {
+			$store.paddingAmount.sending(\.view.paddingAmountChanged)
+		}
+
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			WithPerceptionTracking {
 				VStack(spacing: .zero) {
 					Group {
 						Divider()
+
 						AppTextField(
 							primaryHeading: .init(text: L10n.CustomizeNetworkFees.paddingFieldLabel),
 							placeholder: "",
-							text: viewStore.binding(
-								get: \.paddingAmount,
-								send: ViewAction.paddingAmountChanged
-							),
-							hint: viewStore.paddingAmountHint,
+							text: $store.paddingAmount.sending(\.view.paddingAmountChanged),
+							hint: store.paddingAmountHint,
 							focus: .on(
 								.padding,
-								binding: viewStore.binding(
-									get: \.focusField,
-									send: ViewAction.focusChanged
-								),
+								binding: $store.focusField.sending(\.view.focusChanged),
 								to: $focusField
 							)
 						)
@@ -70,17 +54,11 @@ extension AdvancedFeesCustomization {
 							primaryHeading: .init(text: L10n.CustomizeNetworkFees.tipFieldLabel),
 							subHeading: L10n.CustomizeNetworkFees.tipFieldInfo,
 							placeholder: "",
-							text: viewStore.binding(
-								get: \.tipPercentage,
-								send: ViewAction.tipPercentageChanged
-							),
-							hint: viewStore.tipPercentageHint,
+							text: $store.tipPercentage.sending(\.view.tipPercentageChanged),
+							hint: store.tipPercentageHint,
 							focus: .on(
 								.tipPercentage,
-								binding: viewStore.binding(
-									get: \.focusField,
-									send: ViewAction.focusChanged
-								),
+								binding: $store.focusField.sending(\.view.focusChanged),
 								to: $focusField
 							)
 						)
@@ -90,13 +68,13 @@ extension AdvancedFeesCustomization {
 					.multilineTextAlignment(.trailing)
 					.padding(.horizontal, .medium1)
 
-					FeesView(viewState: viewStore.feesViewState)
+					FeesView(viewState: store.feesViewState)
 				}
 				.toolbar {
 					ToolbarItemGroup(placement: .keyboard) {
 						Spacer()
 						Button(L10n.Common.done) {
-							viewStore.send(.focusChanged(nil))
+							store.send(.view(.focusChanged(nil)))
 						}
 						.foregroundColor(.app.blue1)
 					}

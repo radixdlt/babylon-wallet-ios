@@ -3,6 +3,7 @@ import SwiftUI
 
 // MARK: - AdvancedFeesCustomization
 public struct AdvancedFeesCustomization: FeatureReducer {
+	@ObservableState
 	public struct State: Hashable, Sendable {
 		public enum FocusField: Hashable, Sendable {
 			case padding
@@ -25,6 +26,7 @@ public struct AdvancedFeesCustomization: FeatureReducer {
 		}
 	}
 
+	@CasePathable
 	public enum ViewAction: Equatable, Sendable {
 		case paddingAmountChanged(String)
 		case tipPercentageChanged(String)

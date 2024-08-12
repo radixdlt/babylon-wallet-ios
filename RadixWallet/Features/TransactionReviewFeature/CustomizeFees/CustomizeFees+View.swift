@@ -40,7 +40,7 @@ extension CustomizeFees.State {
 extension CustomizeFees {
 	@MainActor
 	public struct View: SwiftUI.View {
-		let store: StoreOf<CustomizeFees>
+		@Perception.Bindable var store: StoreOf<CustomizeFees>
 
 		public var body: some SwiftUI.View {
 			WithPerceptionTracking {
@@ -65,15 +65,11 @@ extension CustomizeFees {
 							let modeStore = store.scope(state: \.modeState, action: \.child.mode)
 							switch modeStore.state {
 							case .normal:
-								if let store = modeStore.scope(
-									state: \.normal, action: \.normalFeesCustomization
-								) {
+								if let store = modeStore.scope(state: \.normal, action: \.normalFeesCustomization) {
 									NormalFeesCustomization.View(store: store)
 								}
 							case .advanced:
-								if let store = modeStore.scope(
-									state: \.advanced, action: \.advancedFeesCustomization
-								) {
+								if let store = modeStore.scope(state: \.advanced, action: \.advancedFeesCustomization) {
 									AdvancedFeesCustomization.View(store: store)
 								}
 							}
@@ -92,7 +88,10 @@ extension CustomizeFees {
 					store.send(.view(.closeButtonTapped))
 				}
 			}
-			.destinations(with: store)
+			.sheet(item: $store.scope(state: \.destination?.selectFeePayer, action: \.destination.selectFeePayer)) {
+				SelectFeePayer.View(store: $0)
+			}
+//			.destinations(with: $store)
 		}
 
 		@ViewBuilder
@@ -157,10 +156,13 @@ private extension StoreOf<CustomizeFees> {
 
 @MainActor
 private extension View {
-	func destinations(with store: StoreOf<CustomizeFees>) -> some View {
-		sheet(
-			store: store.destination.scope(state: \.selectFeePayer, action: \.selectFeePayer),
-			content: { SelectFeePayer.View(store: $0) }
-		)
+	func destinations(with store: Perception.Bindable<StoreOf<CustomizeFees>>) -> some View {
+//		sheet(item: store.scope(state: \.destination?.selectFeePayer, action: \.destination.selectFeePayer)) {
+//			SelectFeePayer.View(store: $0)
+//		}
+//		sheet(
+//			store: store.destination.scope(state: \.selectFeePayer, action: \.selectFeePayer),
+//			content: { SelectFeePayer.View(store: $0) }
+//		)
 	}
 }
