@@ -1,19 +1,30 @@
 import ComposableArchitecture
 import SwiftUI
 
+// MARK: - CustomizeFeesMode
+@Reducer
+public struct CustomizeFeesMode {
+	@ObservableState
+	public enum State: Hashable, Sendable {
+		case normal(NormalFeesCustomization.State)
+		case advanced(AdvancedFeesCustomization.State)
+	}
+
+	@CasePathable
+	public enum Action: Equatable, Sendable {
+		case normalFeesCustomization(NormalFeesCustomization.Action)
+		case advancedFeesCustomization(AdvancedFeesCustomization.Action)
+	}
+}
+
 // MARK: - CustomizeFees
 public struct CustomizeFees: FeatureReducer, Sendable {
+	@ObservableState
 	public struct State: Hashable, Sendable {
-		@CasePathable
-		enum CustomizationModeState: Hashable, Sendable {
-			case normal(NormalFeesCustomization.State)
-			case advanced(AdvancedFeesCustomization.State)
-		}
-
 		let manifestSummary: ManifestSummary
 		let signingPurpose: SigningPurpose
 		var reviewedTransaction: ReviewedTransaction
-		var modeState: CustomizationModeState
+		var modeState: CustomizeFeesMode.State
 
 		var feePayerAccount: Account? {
 			feePayer?.account
@@ -31,7 +42,7 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 			reviewedTransaction.feePayingValidation.wrappedValue
 		}
 
-		@PresentationState
+		@Presents
 		public var destination: Destination.State? = nil
 
 		init(
@@ -54,8 +65,7 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 
 	@CasePathable
 	public enum ChildAction: Equatable, Sendable {
-		case normalFeesCustomization(NormalFeesCustomization.Action)
-		case advancedFeesCustomization(AdvancedFeesCustomization.Action)
+		case mode(CustomizeFeesMode.Action)
 	}
 
 	public enum DelegateAction: Equatable, Sendable {
@@ -88,7 +98,7 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 	@Dependency(\.errorQueue) var errorQueue
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.modeState, action: \.child) {
+		Scope(state: \.modeState, action: \.child.mode) {
 			Scope(state: \.normal, action: \.normalFeesCustomization) {
 				NormalFeesCustomization()
 			}
@@ -122,7 +132,7 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .advancedFeesCustomization(.delegate(.updated(advancedFees))):
+		case let .mode(.advancedFeesCustomization(.delegate(.updated(advancedFees)))):
 			state.reviewedTransaction.transactionFee.mode = .advanced(advancedFees)
 			return .send(.delegate(.updated(state.reviewedTransaction)))
 		default:
@@ -221,7 +231,7 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 }
 
 extension TransactionFee {
-	var customizationModeState: CustomizeFees.State.CustomizationModeState {
+	var customizationModeState: CustomizeFeesMode.State {
 		switch mode {
 		case let .normal(normal):
 			.normal(.init(fees: normal))

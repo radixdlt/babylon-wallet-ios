@@ -994,6 +994,15 @@ extension ReviewedTransaction {
 		Set(accountWithdraws.keys).union(accountDeposits.keys)
 	}
 
+	/*
+	 selected             : no   : no  :         yes : yes : yes
+	 needs fee            : no   : yes :             :     :
+	 covers fee + transfer:      :     :         no  : yes : yes
+	 new account          :      :     :             : no  : yes
+
+	 ->                   : v(s) : nf  :         if  : v    : v(i)
+	 */
+
 	var feePayingValidation: Loadable<FeeValidationOutcome> {
 		feePayer.map { selected in
 			guard let selected else {

@@ -1,98 +1,87 @@
 
 extension CustomizeFees.State {
-	// Need to disable, since broken in swiftformat 0.52.7
-	// swiftformat:disable redundantClosure
-
-	var viewState: CustomizeFees.ViewState {
-		.init(
-			title: {
-				switch transactionFee.mode {
-				case .normal:
-					L10n.CustomizeNetworkFees.NormalMode.title
-				case .advanced:
-					L10n.CustomizeNetworkFees.AdvancedMode.title
-				}
-			}(),
-			description: {
-				switch transactionFee.mode {
-				case .normal:
-					L10n.CustomizeNetworkFees.NormalMode.subtitle
-				case .advanced:
-					L10n.CustomizeNetworkFees.AdvancedMode.subtitle
-				}
-			}(),
-			modeSwitchTitle: {
-				switch transactionFee.mode {
-				case .normal:
-					L10n.CustomizeNetworkFees.viewAdvancedModeButtonTitle
-				case .advanced:
-					L10n.CustomizeNetworkFees.viewNormalModeButtonTitle
-				}
-			}(),
-			feePayer: feePayer,
-			noFeePayerText: {
-				if feePayingValidation == .valid(.feePayerSuperfluous) {
-					L10n.CustomizeNetworkFees.noneRequired
-				} else {
-					L10n.CustomizeNetworkFees.noAccountSelected
-				}
-			}(),
-			insufficientBalance:
-			feePayingValidation == .insufficientBalance
-		)
-	}
-
-	// swiftformat:enable redundantClosure
-}
-
-extension CustomizeFees {
-	public struct ViewState: Equatable {
+	struct Titles: Equatable {
 		let title: String
 		let description: String
 		let modeSwitchTitle: String
-		let feePayer: FeePayerCandidate?
-		let noFeePayerText: String
-		let insufficientBalance: Bool
 	}
 
+	var titles: Titles {
+		switch transactionFee.mode {
+		case .normal:
+			Titles(
+				title: L10n.CustomizeNetworkFees.NormalMode.title,
+				description: L10n.CustomizeNetworkFees.NormalMode.subtitle,
+				modeSwitchTitle: L10n.CustomizeNetworkFees.viewAdvancedModeButtonTitle
+			)
+		case .advanced:
+			Titles(
+				title: L10n.CustomizeNetworkFees.AdvancedMode.title,
+				description: L10n.CustomizeNetworkFees.AdvancedMode.subtitle,
+				modeSwitchTitle: L10n.CustomizeNetworkFees.viewNormalModeButtonTitle
+			)
+		}
+	}
+
+	var noFeePayerText: String {
+		if feePayingValidation == .valid(.feePayerSuperfluous) {
+			L10n.CustomizeNetworkFees.noneRequired
+		} else {
+			L10n.CustomizeNetworkFees.noAccountSelected
+		}
+	}
+
+	var insufficientBalance: Bool {
+		feePayingValidation == .insufficientBalance
+	}
+}
+
+// MARK: - CustomizeFees.View
+extension CustomizeFees {
 	@MainActor
 	public struct View: SwiftUI.View {
 		let store: StoreOf<CustomizeFees>
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			WithPerceptionTracking {
+				let titles = store.titles
 				VStack(spacing: .zero) {
 					ScrollView {
 						VStack(spacing: .zero) {
 							VStack {
-								infoView(viewStore.state)
+								infoView(titles)
+
 								Divider()
-								feePayerView(viewStore.state)
-									.padding(.top, .small1)
+
+								feePayerView(
+									feePayer: store.feePayer?.account,
+									noFeePayerText: store.noFeePayerText,
+									insufficientBalance: store.insufficientBalance
+								)
+								.padding(.top, .small1)
 							}
 							.padding([.horizontal, .bottom], .medium1)
 
-							SwitchStore(store.scope(state: \.modeState, action: Action.child)) { state in
-								switch state {
-								case .normal:
-									CaseLet(
-										/CustomizeFees.State.CustomizationModeState.normal,
-										action: CustomizeFees.ChildAction.normalFeesCustomization,
-										then: { NormalFeesCustomization.View(store: $0) }
-									)
-								case .advanced:
-									CaseLet(
-										/CustomizeFees.State.CustomizationModeState.advanced,
-										action: CustomizeFees.ChildAction.advancedFeesCustomization,
-										then: { AdvancedFeesCustomization.View(store: $0) }
-									)
+							let modeStore = store.scope(state: \.modeState, action: \.child.mode)
+							switch modeStore.state {
+							case .normal:
+								if let store = modeStore.scope(
+									state: \.normal, action: \.normalFeesCustomization
+								) {
+									NormalFeesCustomization.View(store: store)
+								}
+							case .advanced:
+								if let store = modeStore.scope(
+									state: \.advanced, action: \.advancedFeesCustomization
+								) {
+									AdvancedFeesCustomization.View(store: store)
 								}
 							}
 						}
 						.padding(.vertical, .medium3)
 
-						Button(viewStore.modeSwitchTitle) {
-							viewStore.send(.toggleMode)
+						Button(titles.modeSwitchTitle) {
+							store.send(.view(.toggleMode))
 						}
 						.textStyle(.body1StandaloneLink)
 						.foregroundColor(.app.blue2)
@@ -107,14 +96,14 @@ extension CustomizeFees {
 		}
 
 		@ViewBuilder
-		func infoView(_ viewState: CustomizeFees.ViewState) -> some SwiftUI.View {
+		func infoView(_ titles: CustomizeFees.State.Titles) -> some SwiftUI.View {
 			VStack {
-				Text(viewState.title)
+				Text(titles.title)
 					.textStyle(.sheetTitle)
 					.foregroundColor(.app.gray1)
 					.multilineTextAlignment(.center)
 					.padding(.bottom, .small1)
-				Text(viewState.description)
+				Text(titles.description)
 					.textStyle(.body1Regular)
 					.foregroundColor(.app.gray1)
 					.multilineTextAlignment(.center)
@@ -123,7 +112,7 @@ extension CustomizeFees {
 		}
 
 		@ViewBuilder
-		func feePayerView(_ viewState: CustomizeFees.ViewState) -> some SwiftUI.View {
+		func feePayerView(feePayer: Account?, noFeePayerText: String, insufficientBalance: Bool) -> some SwiftUI.View {
 			VStack(alignment: .leading) {
 				HStack {
 					Text(L10n.CustomizeNetworkFees.payFeeFrom)
@@ -139,17 +128,17 @@ extension CustomizeFees {
 					.textStyle(.body1StandaloneLink)
 					.foregroundColor(.app.blue2)
 				}
-				if let feePayer = viewState.feePayer?.account {
+				if let feePayer {
 					AccountCard(account: feePayer)
 				} else {
 					AppTextField(
 						placeholder: "",
-						text: .constant(viewState.noFeePayerText)
+						text: .constant(noFeePayerText)
 					)
 					.disabled(true)
 				}
 
-				if viewState.insufficientBalance {
+				if insufficientBalance {
 					WarningErrorView(text: L10n.CustomizeNetworkFees.Warning.insufficientBalance, type: .error)
 				}
 			}
@@ -169,11 +158,8 @@ private extension StoreOf<CustomizeFees> {
 @MainActor
 private extension View {
 	func destinations(with store: StoreOf<CustomizeFees>) -> some View {
-		let destinationStore = store.destination
-		return sheet(
-			store: destinationStore,
-			state: /CustomizeFees.Destination.State.selectFeePayer,
-			action: CustomizeFees.Destination.Action.selectFeePayer,
+		sheet(
+			store: store.destination.scope(state: \.selectFeePayer, action: \.selectFeePayer),
 			content: { SelectFeePayer.View(store: $0) }
 		)
 	}
