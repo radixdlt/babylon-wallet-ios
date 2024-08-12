@@ -88,10 +88,7 @@ extension CustomizeFees {
 					store.send(.view(.closeButtonTapped))
 				}
 			}
-			.sheet(item: $store.scope(state: \.destination?.selectFeePayer, action: \.destination.selectFeePayer)) {
-				SelectFeePayer.View(store: $0)
-			}
-//			.destinations(with: $store)
+			.destinations(with: $store)
 		}
 
 		@ViewBuilder
@@ -145,24 +142,11 @@ extension CustomizeFees {
 	}
 }
 
-private extension StoreOf<CustomizeFees> {
-	var destination: PresentationStoreOf<CustomizeFees.Destination> {
-		func scopeState(state: State) -> PresentationState<CustomizeFees.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
-	}
-}
-
 @MainActor
 private extension View {
-	func destinations(with store: Perception.Bindable<StoreOf<CustomizeFees>>) -> some View {
-//		sheet(item: store.scope(state: \.destination?.selectFeePayer, action: \.destination.selectFeePayer)) {
-//			SelectFeePayer.View(store: $0)
-//		}
-//		sheet(
-//			store: store.destination.scope(state: \.selectFeePayer, action: \.selectFeePayer),
-//			content: { SelectFeePayer.View(store: $0) }
-//		)
+	func destinations(with store: BindableStoreOf<CustomizeFees>) -> some View {
+		sheet(item: store.scope(state: \.destination?.selectFeePayer, action: \.destination.selectFeePayer)) {
+			SelectFeePayer.View(store: $0)
+		}
 	}
 }

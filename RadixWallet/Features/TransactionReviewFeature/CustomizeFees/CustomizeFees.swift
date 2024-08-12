@@ -58,6 +58,16 @@ public struct CustomizeFees: Sendable {
 		}
 	}
 
+	@CasePathable
+	public enum Action: Sendable, Equatable {
+		case destination(PresentationAction<Destination.Action>)
+		case view(ViewAction)
+		case `internal`(InternalAction)
+		case child(ChildAction)
+		case delegate(DelegateAction)
+	}
+
+	@CasePathable
 	public enum ViewAction: Equatable, Sendable {
 		case changeFeePayerTapped
 		case toggleMode
@@ -65,50 +75,51 @@ public struct CustomizeFees: Sendable {
 	}
 
 	@CasePathable
-	public enum ChildAction: Equatable, Sendable {
-		case mode(CustomizeFeesMode.Action)
-	}
-
-	public enum DelegateAction: Equatable, Sendable {
-		case updated(ReviewedTransaction)
-	}
-
 	public enum InternalAction: Equatable, Sendable {
 		case updated(TaskResult<ReviewedTransaction>)
 	}
 
-//	public struct Destination: DestinationReducer {
-//		@CasePathable
-//		public enum State: Sendable, Hashable {
-//			case selectFeePayer(SelectFeePayer.State)
-//		}
-//
-//		@CasePathable
-//		public enum Action: Sendable, Equatable {
-//			case selectFeePayer(SelectFeePayer.Action)
-//		}
-//
-//		public var body: some ReducerOf<Self> {
-//			Scope(state: \.selectFeePayer, action: \.selectFeePayer) {
-//				SelectFeePayer()
-//			}
-//		}
-//	}
+	@CasePathable
+	public enum ChildAction: Equatable, Sendable {
+		case mode(CustomizeFeesMode.Action)
+	}
+
+	@CasePathable
+	public enum DelegateAction: Equatable, Sendable {
+		case updated(ReviewedTransaction)
+	}
 
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
 
 	public var body: some ReducerOf<Self> {
-//		Scope(state: \.modeState, action: \.child.mode) {
-//			Scope(state: \.normal, action: \.normalFeesCustomization) {
-//				NormalFeesCustomization()
-//			}
-//			Scope(state: \.advanced, action: \.advancedFeesCustomization) {
-//				AdvancedFeesCustomization()
-//			}
-//		}
+		Scope(state: \.modeState, action: \.child.mode) {
+			Scope(state: \.normal, action: \.normalFeesCustomization) {
+				NormalFeesCustomization()
+			}
+			Scope(state: \.advanced, action: \.advancedFeesCustomization) {
+				AdvancedFeesCustomization()
+			}
+		}
 		Reduce(core)
 			.ifLet(\.$destination, action: \.destination)
+	}
+
+	public func core(state: inout State, action: Action) -> Effect<Action> {
+		switch action {
+		case .destination(.dismiss):
+			.none
+		case let .destination(.presented(presentedAction)):
+			reduce(into: &state, presentedAction: presentedAction)
+		case let .view(viewAction):
+			reduce(into: &state, viewAction: viewAction)
+		case let .internal(internalAction):
+			reduce(into: &state, internalAction: internalAction)
+		case let .child(childAction):
+			reduce(into: &state, childAction: childAction)
+		case .delegate:
+			.none
+		}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
@@ -229,7 +240,7 @@ public struct CustomizeFees: Sendable {
 
 // MARK: CustomizeFees.Destination
 extension CustomizeFees {
-	@Reducer(state: .equatable)
+	@Reducer(state: .hashable, action: .equatable)
 	public enum Destination {
 		case selectFeePayer(SelectFeePayer)
 	}

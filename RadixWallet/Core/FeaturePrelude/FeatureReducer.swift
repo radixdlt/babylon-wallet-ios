@@ -108,6 +108,8 @@ public typealias ViewStoreOf<Feature: FeatureReducer> = ViewStore<Feature.ViewSt
 
 public typealias StackActionOf<R: Reducer> = StackAction<R.State, R.Action>
 
+public typealias BindableStoreOf<R: Reducer> = Perception.Bindable<StoreOf<R>>
+
 // MARK: - FeatureAction + Hashable
 extension FeatureAction: Hashable where Feature.Destination.Action: Hashable, Feature.ViewAction: Hashable, Feature.ChildAction: Hashable, Feature.InternalAction: Hashable, Feature.DelegateAction: Hashable {
 	public func hash(into hasher: inout Hasher) {
