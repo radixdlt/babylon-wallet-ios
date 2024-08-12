@@ -6,6 +6,7 @@ extension OverlayWindowClient: TestDependencyKey {
 		scheduleAlert: unimplemented("\(Self.self).scheduleAlert"),
 		scheduleAlertAndIgnoreAction: unimplemented("\(Self.self).scheduleAlertAndIgnoreAction"),
 		scheduleHUD: unimplemented("\(Self.self).scheduleHUD"),
+		scheduleSheet: unimplemented("\(Self.self).scheduleSheet"),
 		scheduleFullScreen: unimplemented("\(Self.self).scheduleFullScreen"),
 		sendAlertAction: unimplemented("\(Self.self).sendAlertAction"),
 		sendFullScreenAction: unimplemented("\(Self.self).sendFullScreenAction"),

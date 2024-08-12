@@ -50,6 +50,7 @@ extension OverlayWindowClient: DependencyKey {
 			},
 			scheduleAlertAndIgnoreAction: scheduleAlertAndIgnoreAction,
 			scheduleHUD: { items.send(.hud($0)) },
+			scheduleSheet: { items.send(.sheet($0, $1)) },
 			scheduleFullScreen: { fullScreen in
 				items.send(.fullScreen(fullScreen))
 				return await fullScreenActions.first { $0.id == fullScreen.id }?.action ?? .dismiss
@@ -61,6 +62,46 @@ extension OverlayWindowClient: DependencyKey {
 		)
 	}()
 }
+
+// MARK: - OverlayWindowClient.InfoLink
+extension OverlayWindowClient {
+	public enum InfoLink: String, Sendable {
+		private static let scheme: String = "infolink"
+
+		case linkingNewAccount
+		case somethingElse
+
+		public init?(url: URL) {
+			guard url.scheme == Self.scheme, let host = url.host(), let link = InfoLink(rawValue: host) else {
+				return nil
+			}
+			self = link
+		}
+	}
+}
+
+extension OverlayWindowClient {
+	public func showInfoLink(_ infoLink: InfoLink) {
+		scheduleSheet(infoLink.sheetState, .replace)
+	}
+}
+
+extension OverlayWindowClient.InfoLink {
+	var sheetState: OverlayWindowClient.Item.SheetState {
+		switch self {
+		case .linkingNewAccount:
+			.init(title: "Why your Accounts will be linked", text: linkingNewAccountString)
+		case .somethingElse:
+			.init(title: "blabla", text: "blablabettiblabbety blablabettiblabbety blablabettiblabbety")
+		}
+	}
+}
+
+let linkingNewAccountString = """
+Paying your transaction fee from this Account will make you identifiable on ledger as both the owner of the fee-paying Account and all other Accounts you use in this transaction.
+
+*This* is _because_ you’ll **sign** the [transactions](https://github.com) from each [Account](infolink://somethingElse) at the same time, so your Accounts will be linked together in the transaction record.
+"""
 
 extension OverlayWindowClient.Item.HUD {
 	public static let updatedAccount = Self(text: L10n.AccountSettings.updatedAccountHUDMessage)

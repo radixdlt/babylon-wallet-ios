@@ -15,6 +15,10 @@ public struct OverlayWindowClient: Sendable {
 	/// Usually to be called from the Main Window.
 	public var scheduleHUD: ScheduleHUD
 
+	/// Schedule a sheet to be shown in the Overlay Window.
+	/// Usually to be called from the Main Window.
+	public var scheduleSheet: ScheduleSheet
+
 	/// Schedule a FullScreen to be shown in the Overlay Window.
 	/// Usually to be called from the Main Window.
 	public var scheduleFullScreen: ScheduleFullScreen
@@ -33,6 +37,7 @@ public struct OverlayWindowClient: Sendable {
 		scheduleAlert: @escaping ScheduleAlert,
 		scheduleAlertAndIgnoreAction: @escaping ScheduleAlertAndIgnoreAction,
 		scheduleHUD: @escaping ScheduleHUD,
+		scheduleSheet: @escaping ScheduleSheet,
 		scheduleFullScreen: @escaping ScheduleFullScreen,
 		sendAlertAction: @escaping SendAlertAction,
 		sendFullScreenAction: @escaping SendFullScreenAction,
@@ -43,6 +48,7 @@ public struct OverlayWindowClient: Sendable {
 		self.scheduleAlert = scheduleAlert
 		self.scheduleAlertAndIgnoreAction = scheduleAlertAndIgnoreAction
 		self.scheduleHUD = scheduleHUD
+		self.scheduleSheet = scheduleSheet
 		self.scheduleFullScreen = scheduleFullScreen
 		self.sendAlertAction = sendAlertAction
 		self.sendFullScreenAction = sendFullScreenAction
@@ -58,6 +64,7 @@ extension OverlayWindowClient {
 	public typealias ScheduleAlert = @Sendable (Item.AlertState) async -> Item.AlertAction
 	public typealias ScheduleAlertAndIgnoreAction = @Sendable (Item.AlertState) -> Void
 	public typealias ScheduleHUD = @Sendable (Item.HUD) -> Void
+	public typealias ScheduleSheet = @Sendable (Item.SheetState, SheetBehavior) -> Void
 	public typealias ScheduleFullScreen = @Sendable (FullScreenOverlayCoordinator.State) async -> FullScreenAction
 	public typealias SendAlertAction = @Sendable (Item.AlertAction, Item.AlertState.ID) -> Void
 	public typealias SendFullScreenAction = @Sendable (FullScreenAction, FullScreenID) -> Void
@@ -78,28 +85,17 @@ extension OverlayWindowClient {
 			case emailSupport(additionalInfo: String)
 		}
 
+		public struct SheetState: Sendable, Hashable, Identifiable {
+			public let id = UUID()
+//			public let icon: Icon?
+			public let title: String
+			public let text: String
+		}
+
 		public struct HUD: Sendable, Hashable, Identifiable {
 			public let id = UUID()
 			public let text: String
 			public let icon: Icon?
-
-			public struct Icon: Hashable, Sendable {
-				public enum Kind: Hashable, Sendable {
-					case asset(ImageAsset)
-					case system(String)
-				}
-
-				public let kind: Kind
-				public let foregroundColor: Color
-
-				public init(
-					kind: Kind,
-					foregroundColor: Color = .app.green1
-				) {
-					self.kind = kind
-					self.foregroundColor = foregroundColor
-				}
-			}
 
 			public init(
 				text: String,
@@ -113,9 +109,33 @@ extension OverlayWindowClient {
 			}
 		}
 
+		public struct Icon: Hashable, Sendable {
+			public enum Kind: Hashable, Sendable {
+				case asset(ImageAsset)
+				case system(String)
+			}
+
+			public let kind: Kind
+			public let foregroundColor: Color
+
+			public init(
+				kind: Kind,
+				foregroundColor: Color = .app.green1
+			) {
+				self.kind = kind
+				self.foregroundColor = foregroundColor
+			}
+		}
+
 		case hud(HUD)
+		case sheet(SheetState, SheetBehavior)
 		case alert(AlertState)
 		case fullScreen(FullScreenOverlayCoordinator.State)
+	}
+
+	public enum SheetBehavior: Sendable {
+		case enqueue
+		case replace
 	}
 }
 

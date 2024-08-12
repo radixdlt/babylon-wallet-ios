@@ -26,6 +26,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		@CasePathable
 		public enum State: Sendable, Hashable {
 			case hud(HUD.State)
+			case sheet(Sheet.State)
 			case alert(OverlayWindowClient.Item.AlertState)
 			case fullScreen(FullScreenOverlayCoordinator.State)
 		}
@@ -33,6 +34,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case hud(HUD.Action)
+			case sheet(Sheet.Action)
 			case alert(OverlayWindowClient.Item.AlertAction)
 			case fullScreen(FullScreenOverlayCoordinator.Action)
 		}
@@ -41,7 +43,9 @@ struct OverlayReducer: Sendable, FeatureReducer {
 			Scope(state: \.hud, action: \.hud) {
 				HUD()
 			}
-
+			Scope(state: \.sheet, action: \.sheet) {
+				Sheet()
+			}
 			Scope(state: \.fullScreen, action: \.fullScreen) {
 				FullScreenOverlayCoordinator()
 			}
@@ -75,8 +79,13 @@ struct OverlayReducer: Sendable, FeatureReducer {
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .scheduleItem(event):
-			state.itemsQueue.append(event)
-			return showItemIfPossible(state: &state)
+			if case let .sheet(sheetState, .replace) = event, case .sheet = state.destination {
+				state.destination = .sheet(sheetState)
+				return .none
+			} else {
+				state.itemsQueue.append(event)
+				return showItemIfPossible(state: &state)
+			}
 		case .showNextItemIfPossible:
 			return showItemIfPossible(state: &state)
 		}
@@ -97,6 +106,9 @@ struct OverlayReducer: Sendable, FeatureReducer {
 			return dismiss(&state)
 
 		case .hud(.delegate(.dismiss)):
+			return dismiss(&state)
+
+		case .sheet(.delegate(.dismiss)):
 			return dismiss(&state)
 
 		case let .fullScreen(.delegate(action)):
@@ -147,6 +159,10 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		case let .hud(hud):
 			state.destination = .hud(.init(content: hud))
 			return .none
+
+		case let .sheet(sheetState, _):
+			state.destination = .sheet(sheetState)
+			return setIsUserInteractionEnabled(&state, isEnabled: true)
 
 		case let .alert(alert):
 			state.destination = .alert(alert)
