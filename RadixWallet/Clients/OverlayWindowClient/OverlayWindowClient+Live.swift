@@ -76,9 +76,15 @@ extension OverlayWindowClient {
 		case securityshield
 
 		public init?(url: URL) {
-			guard url.scheme == Self.scheme, let host = url.host(), let link = InfoLink(rawValue: host) else {
+			guard url.scheme == nil, url.host == nil, url.pathComponents.isEmpty, let query = url.query() else {
 				return nil
 			}
+
+			let parts = query.split(separator: "=")
+			guard parts.count == 2, parts[0] == "glossaryAnchor", let link = InfoLink(rawValue: String(parts[1])) else {
+				return nil
+			}
+
 			self = link
 		}
 	}
@@ -111,7 +117,7 @@ extension OverlayWindowClient.InfoLink {
 
 let linkingNewAccountString = """
 # Why your Accounts will be linked
-Paying your transaction fee from this Account will make you identifiable on ledger as both the owner of the fee-paying Account and all other Accounts you use in this transaction.
+Paying your transaction fee from this Account will make you [poolunit](?glossaryAnchor=poolunit) identifiable on ledger as both the owner of the fee-paying Account and all other Accounts you use in this transaction.
 
 *This* is _because_ you’ll **sign** the transactions on [github](https://github.com) from each [transaction fee ⓘ](infolink://transactionfee) at the same time, so your Accounts will be linked together in the transaction record.
 """
