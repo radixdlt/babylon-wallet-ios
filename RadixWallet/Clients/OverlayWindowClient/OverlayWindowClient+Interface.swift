@@ -88,7 +88,6 @@ extension OverlayWindowClient {
 		public struct SheetState: Sendable, Hashable, Identifiable {
 			public let id = UUID()
 //			public let icon: Icon?
-			public let title: String
 			public let text: String
 		}
 

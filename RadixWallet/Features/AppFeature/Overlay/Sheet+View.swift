@@ -12,25 +12,23 @@ extension Sheet {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				VStack(spacing: .zero) {
-					HStack(spacing: .zero) {
-						CloseButton {
-							store.send(.view(.closeButtonTapped))
+					CloseButtonBar {
+						store.send(.view(.closeButtonTapped))
+					}
+					.padding(.horizontal, .small3)
+
+					ScrollView {
+						VStack(spacing: .zero) {
+							ForEach(viewStore.parts, id: \.self) { part in
+								PartView(part: part)
+							}
+							.environment(\.openURL, openURL)
+							.padding(.horizontal, .large2)
 						}
-
-						Spacer()
+						.padding(.top, .small2)
 					}
-					.padding(.horizontal, .medium3)
-
-					ForEachStatic(viewStore.parts) { part in
-						PartView(part: part)
-					}
-					.environment(\.openURL, openURL)
-					.padding(.horizontal, .large2)
-
-					Spacer()
+					.animation(.default, value: viewStore.text)
 				}
-				.padding(.top, .medium3)
-				.animation(.default, value: viewStore.state)
 			}
 		}
 
@@ -59,13 +57,13 @@ extension Sheet {
 					.padding(.bottom, .medium3)
 			case let .heading2(heading2):
 				Text(heading2)
-					.textStyle(.body1Header)
+					.textStyle(.sectionHeader)
 					.foregroundColor(.app.gray1)
 					.multilineTextAlignment(.center)
 					.padding(.bottom, .medium3)
 			case let .heading3(heading3):
 				Text(heading3)
-					.textStyle(.body2Header)
+					.textStyle(.body1Header)
 					.foregroundColor(.app.gray1)
 					.multilineTextAlignment(.center)
 					.padding(.bottom, .medium3)
@@ -75,7 +73,7 @@ extension Sheet {
 					.foregroundColor(.app.gray1)
 					.multilineTextAlignment(.leading)
 					.flushedLeft
-					.padding(.bottom, .large2)
+					.padding(.bottom, .small3)
 			}
 		}
 	}
@@ -83,7 +81,7 @@ extension Sheet {
 
 // MARK: - Sheet.Part
 extension Sheet {
-	enum Part {
+	enum Part: Hashable {
 		case heading1(String)
 		case heading2(String)
 		case heading3(String)

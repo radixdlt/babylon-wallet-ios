@@ -69,7 +69,11 @@ extension OverlayWindowClient {
 		private static let scheme: String = "infolink"
 
 		case linkingNewAccount
-		case somethingElse
+		case poolunit
+		case gateways
+		case radixconnect
+		case transactionfee
+		case securityshield
 
 		public init?(url: URL) {
 			guard url.scheme == Self.scheme, let host = url.host(), let link = InfoLink(rawValue: host) else {
@@ -82,26 +86,69 @@ extension OverlayWindowClient {
 
 extension OverlayWindowClient {
 	public func showInfoLink(_ infoLink: InfoLink) {
-		scheduleSheet(infoLink.sheetState, .replace)
+		scheduleSheet(.init(text: infoLink.string), .replace)
 	}
 }
 
 extension OverlayWindowClient.InfoLink {
-	var sheetState: OverlayWindowClient.Item.SheetState {
+	var string: String {
 		switch self {
 		case .linkingNewAccount:
-			.init(title: "Why your Accounts will be linked", text: linkingNewAccountString)
-		case .somethingElse:
-			.init(title: "blabla", text: "# antoher headiing\n blablabettiblabbety blablabettiblabbety blablabettiblabbety")
+			linkingNewAccountString
+		case .poolunit:
+			poolunitString
+		case .gateways:
+			gatewaysString
+		case .radixconnect:
+			radixconnectString
+		case .transactionfee:
+			transactionfeeString
+		case .securityshield:
+			securityshieldString
 		}
 	}
 }
 
 let linkingNewAccountString = """
-# Why your Accounts will be linked!!
+# Why your Accounts will be linked
 Paying your transaction fee from this Account will make you identifiable on ledger as both the owner of the fee-paying Account and all other Accounts you use in this transaction.
 
-*This* is _because_ you’ll **sign** the [transactions](https://github.com) from each [Account **ⓘ**](infolink://somethingElse) at the same time, so your Accounts will be linked together in the transaction record.
+*This* is _because_ you’ll **sign** the transactions on [github](https://github.com) from each [transaction fee ⓘ](infolink://transactionfee) at the same time, so your Accounts will be linked together in the transaction record.
+"""
+
+let poolunitString = """
+# Pool Units
+Pool units are fungible tokens that represent the proportional size of a user's contribution to a liquidity pool (LP).
+
+Pool units are redeemable for the user's portion of the LP, but can also be traded, sold and used in DeFi applications.
+"""
+
+let gatewaysString = """
+# Gateways
+Gateways are your connection to blockchain networks – they enable users to communicate with the Radix Network and transfer data to and from it. As there are multiple different networks within the Radix ecosystem (for example, the Stokenet test environment or the Babylon mainnet), there a multiple gateways providing access to each one.
+"""
+
+let radixconnectString = """
+# Radix Connect
+Radix Connect enables users to link their Radix Wallet to desktop dApps.
+"""
+
+let transactionfeeString = """
+# Transaction Fee
+
+## Network fee
+These go to Radix node operators who validate transactions and secure the Radix Network. Network fees reflect the size of the transaction.
+
+## Royalty fee
+These are set by developers and allow them to collect a “use fee” every time their work is used in a transaction.
+
+## Tip
+These are optional payments you can make directly to validators to speed up transactions. [pool unit ⓘ](infolink://poolunit)
+"""
+
+let securityshieldString = """
+# Security Shields
+Security Shields are a combination of security factors you use to sign transactions, and recover locked Accounts and Personas. You'll need to pay a small transaction fee to apply one to the Radix Network.
 """
 
 extension OverlayWindowClient.Item.HUD {
