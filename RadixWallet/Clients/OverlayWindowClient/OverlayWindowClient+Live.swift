@@ -92,12 +92,13 @@ extension OverlayWindowClient.InfoLink {
 		case .linkingNewAccount:
 			.init(title: "Why your Accounts will be linked", text: linkingNewAccountString)
 		case .somethingElse:
-			.init(title: "blabla", text: "blablabettiblabbety blablabettiblabbety blablabettiblabbety")
+			.init(title: "blabla", text: "# antoher headiing\n blablabettiblabbety blablabettiblabbety blablabettiblabbety")
 		}
 	}
 }
 
 let linkingNewAccountString = """
+# Why your Accounts will be linked!!
 Paying your transaction fee from this Account will make you identifiable on ledger as both the owner of the fee-paying Account and all other Accounts you use in this transaction.
 
 *This* is _because_ you’ll **sign** the [transactions](https://github.com) from each [Account **ⓘ**](infolink://somethingElse) at the same time, so your Accounts will be linked together in the transaction record.

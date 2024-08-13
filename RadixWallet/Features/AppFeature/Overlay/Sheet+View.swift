@@ -21,20 +21,10 @@ extension Sheet {
 					}
 					.padding(.horizontal, .medium3)
 
-					Group {
-						Text(viewStore.title)
-							.textStyle(.sheetTitle)
-							.foregroundColor(.app.gray1)
-							.multilineTextAlignment(.center)
-							.padding(.bottom, .large2)
-
-						Text(viewStore.attributedString)
-							.textStyle(.body1Regular)
-							.foregroundColor(.app.gray1)
-							.multilineTextAlignment(.leading)
-							.flushedLeft
-							.environment(\.openURL, openURL)
+					ForEachStatic(viewStore.parts) { part in
+						PartView(part: part)
 					}
+					.environment(\.openURL, openURL)
 					.padding(.horizontal, .large2)
 
 					Spacer()
@@ -55,10 +45,96 @@ extension Sheet {
 			}
 		}
 	}
+
+	struct PartView: SwiftUI.View {
+		let part: Part
+
+		var body: some SwiftUI.View {
+			switch part {
+			case let .heading1(heading1):
+				Text(heading1)
+					.textStyle(.sheetTitle)
+					.foregroundColor(.app.gray1)
+					.multilineTextAlignment(.center)
+					.padding(.bottom, .medium3)
+			case let .heading2(heading2):
+				Text(heading2)
+					.textStyle(.body1Header)
+					.foregroundColor(.app.gray1)
+					.multilineTextAlignment(.center)
+					.padding(.bottom, .medium3)
+			case let .heading3(heading3):
+				Text(heading3)
+					.textStyle(.body2Header)
+					.foregroundColor(.app.gray1)
+					.multilineTextAlignment(.center)
+					.padding(.bottom, .medium3)
+			case let .text(text):
+				Text(text)
+					.textStyle(.body1Regular)
+					.foregroundColor(.app.gray1)
+					.multilineTextAlignment(.leading)
+					.flushedLeft
+					.padding(.bottom, .large2)
+			}
+		}
+	}
+}
+
+// MARK: - Sheet.Part
+extension Sheet {
+	enum Part {
+		case heading1(String)
+		case heading2(String)
+		case heading3(String)
+		case text(AttributedString)
+	}
 }
 
 extension Sheet.State {
-	var attributedString: AttributedString {
-		(try? AttributedString(markdown: text, options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace))) ?? .init(text)
+	private func heading(from row: Substring) -> Sheet.Part? {
+		if row.hasPrefix("# ") {
+			.heading1(String(row.dropFirst(2)))
+		} else if row.hasPrefix("## ") {
+			.heading2(String(row.dropFirst(3)))
+		} else if row.hasPrefix("### ") {
+			.heading3(String(row.dropFirst(4)))
+		} else {
+			nil
+		}
+	}
+
+	var parts: [Sheet.Part] {
+		var result: [Sheet.Part] = []
+		var currentText = ""
+
+		func addCurrentText() {
+			if !currentText.isEmpty {
+				result.append(.text(currentText.markdownAttributed))
+				currentText = ""
+			}
+		}
+
+		for row in text.split(separator: "\n", omittingEmptySubsequences: false) {
+			if let heading = heading(from: row) {
+				addCurrentText()
+				result.append(heading)
+			} else {
+				if !currentText.isEmpty {
+					currentText.append("\n")
+				}
+				currentText.append(String(row))
+			}
+		}
+
+		addCurrentText()
+
+		return result
+	}
+}
+
+extension String {
+	var markdownAttributed: AttributedString {
+		(try? AttributedString(markdown: self, options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace))) ?? .init(self)
 	}
 }
