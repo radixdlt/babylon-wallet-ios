@@ -100,7 +100,7 @@ extension OverlayWindowClient.InfoLink {
 let linkingNewAccountString = """
 Paying your transaction fee from this Account will make you identifiable on ledger as both the owner of the fee-paying Account and all other Accounts you use in this transaction.
 
-*This* is _because_ you’ll **sign** the [transactions](https://github.com) from each [Account](infolink://somethingElse) at the same time, so your Accounts will be linked together in the transaction record.
+*This* is _because_ you’ll **sign** the [transactions](https://github.com) from each [Account **ⓘ**](infolink://somethingElse) at the same time, so your Accounts will be linked together in the transaction record.
 """
 
 extension OverlayWindowClient.Item.HUD {

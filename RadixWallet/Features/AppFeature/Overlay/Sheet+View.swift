@@ -1,5 +1,6 @@
 import Foundation
 
+// MARK: - Sheet.View
 extension Sheet {
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<Sheet>
@@ -27,14 +28,12 @@ extension Sheet {
 							.multilineTextAlignment(.center)
 							.padding(.bottom, .large2)
 
-						if let attributed = try? AttributedString(markdown: viewStore.text) {
-							Text(attributed)
-								.textStyle(.body1Regular)
-								.foregroundColor(.app.gray1)
-								.multilineTextAlignment(.leading)
-								.flushedLeft
-								.environment(\.openURL, openURL)
-						}
+						Text(viewStore.attributedString)
+							.textStyle(.body1Regular)
+							.foregroundColor(.app.gray1)
+							.multilineTextAlignment(.leading)
+							.flushedLeft
+							.environment(\.openURL, openURL)
 					}
 					.padding(.horizontal, .large2)
 
@@ -55,5 +54,11 @@ extension Sheet {
 				}
 			}
 		}
+	}
+}
+
+extension Sheet.State {
+	var attributedString: AttributedString {
+		(try? AttributedString(markdown: text, options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace))) ?? .init(text)
 	}
 }
