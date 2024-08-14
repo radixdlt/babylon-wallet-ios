@@ -1082,6 +1082,7 @@
 		A47809082BDBDB4C006B68C0 /* RadixDateFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47809072BDBDB4C006B68C0 /* RadixDateFormatter.swift */; };
 		A48C95AE2C6A97D80047A056 /* Sheet+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A48C95AD2C6A97D80047A056 /* Sheet+Reducer.swift */; };
 		A48C95B02C6A98380047A056 /* Sheet+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A48C95AF2C6A98380047A056 /* Sheet+View.swift */; };
+		A48C95B22C6C9A660047A056 /* InfoLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = A48C95B12C6C9A660047A056 /* InfoLink.swift */; };
 		A48FD15F2B55E671009295E9 /* TrackedPoolInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A48FD15E2B55E671009295E9 /* TrackedPoolInteraction.swift */; };
 		A48FD1612B55F8F0009295E9 /* TransactionReview+Sections.swift in Sources */ = {isa = PBXBuildFile; fileRef = A48FD1602B55F8F0009295E9 /* TransactionReview+Sections.swift */; };
 		A4B017F72B4C099D00B42B8E /* TransactionReview+DepositSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4B017F42B4BF59000B42B8E /* TransactionReview+DepositSettingView.swift */; };
@@ -2235,6 +2236,7 @@
 		A47809072BDBDB4C006B68C0 /* RadixDateFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadixDateFormatter.swift; sourceTree = "<group>"; };
 		A48C95AD2C6A97D80047A056 /* Sheet+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sheet+Reducer.swift"; sourceTree = "<group>"; };
 		A48C95AF2C6A98380047A056 /* Sheet+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sheet+View.swift"; sourceTree = "<group>"; };
+		A48C95B12C6C9A660047A056 /* InfoLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoLink.swift; sourceTree = "<group>"; };
 		A48FD15E2B55E671009295E9 /* TrackedPoolInteraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackedPoolInteraction.swift; sourceTree = "<group>"; };
 		A48FD1602B55F8F0009295E9 /* TransactionReview+Sections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionReview+Sections.swift"; sourceTree = "<group>"; };
 		A4A1379A2BE4630200D84B50 /* RadixWalletDebug-PreAlpha.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "RadixWalletDebug-PreAlpha.entitlements"; sourceTree = "<group>"; };
@@ -4488,6 +4490,7 @@
 				48CFBF8B2ADC10D900E77A5C /* OverlayWindowClient+Test.swift */,
 				48CFBFB22ADC10D900E77A5C /* OverlayWindowClient+Live.swift */,
 				48CFBF8C2ADC10D900E77A5C /* OverlayWindowClient+Interface.swift */,
+				A48C95B12C6C9A660047A056 /* InfoLink.swift */,
 			);
 			path = OverlayWindowClient;
 			sourceTree = "<group>";
@@ -7512,6 +7515,7 @@
 				E65D6CEE2BC98267001D8A39 /* Stage2MigrateToSargon+AppPreferences+ViaProfile.swift in Sources */,
 				E634CA2F2AFD25B100C43DB7 /* DebugKeychainContents+View.swift in Sources */,
 				48CFC53F2ADC10DA00E77A5C /* MetadataU8Value.swift in Sources */,
+				A48C95B22C6C9A660047A056 /* InfoLink.swift in Sources */,
 				48CFC4CC2ADC10DA00E77A5C /* Models.swift in Sources */,
 				83EE5ED62BE3C16F00B1531D /* AccountDepositPreValidationResourceSpecificBehaviourItem.swift in Sources */,
 				48CFC3132ADC10D900E77A5C /* CompletionMigrateOlympiaAccountsToBabylon+View.swift in Sources */,

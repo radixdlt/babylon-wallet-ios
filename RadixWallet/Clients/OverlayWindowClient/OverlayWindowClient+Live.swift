@@ -63,99 +63,11 @@ extension OverlayWindowClient: DependencyKey {
 	}()
 }
 
-// MARK: - OverlayWindowClient.InfoLink
-extension OverlayWindowClient {
-	public enum InfoLink: String, Sendable {
-		private static let scheme: String = "infolink"
-
-		case linkingNewAccount
-		case poolunit
-		case gateways
-		case radixconnect
-		case transactionfee
-		case securityshield
-
-		public init?(url: URL) {
-			guard url.scheme == nil, url.host == nil, url.pathComponents.isEmpty, let query = url.query() else {
-				return nil
-			}
-
-			let parts = query.split(separator: "=")
-			guard parts.count == 2, parts[0] == "glossaryAnchor", let link = InfoLink(rawValue: String(parts[1])) else {
-				return nil
-			}
-
-			self = link
-		}
-	}
-}
-
 extension OverlayWindowClient {
 	public func showInfoLink(_ infoLink: InfoLink) {
 		scheduleSheet(.init(text: infoLink.string), .replace)
 	}
 }
-
-extension OverlayWindowClient.InfoLink {
-	var string: String {
-		switch self {
-		case .linkingNewAccount:
-			linkingNewAccountString
-		case .poolunit:
-			poolunitString
-		case .gateways:
-			gatewaysString
-		case .radixconnect:
-			radixconnectString
-		case .transactionfee:
-			transactionfeeString
-		case .securityshield:
-			securityshieldString
-		}
-	}
-}
-
-let linkingNewAccountString = """
-# Why your Accounts will be linked
-Paying your transaction fee from this Account will make you [poolunit](?glossaryAnchor=poolunit) identifiable on ledger as both the owner of the fee-paying Account and all other Accounts you use in this transaction.
-
-*This* is _because_ you’ll **sign** the transactions on [github](https://github.com) from each [transaction fee ⓘ](infolink://transactionfee) at the same time, so your Accounts will be linked together in the transaction record.
-"""
-
-let poolunitString = """
-# Pool Units
-Pool units are fungible tokens that represent the proportional size of a user's contribution to a liquidity pool (LP).
-
-Pool units are redeemable for the user's portion of the LP, but can also be traded, sold and used in DeFi applications.
-"""
-
-let gatewaysString = """
-# Gateways
-Gateways are your connection to blockchain networks – they enable users to communicate with the Radix Network and transfer data to and from it. As there are multiple different networks within the Radix ecosystem (for example, the Stokenet test environment or the Babylon mainnet), there a multiple gateways providing access to each one.
-"""
-
-let radixconnectString = """
-# Radix Connect
-Radix Connect enables users to link their Radix Wallet to desktop dApps.
-"""
-
-let transactionfeeString = """
-# Transaction Fee
-
-## Network fee
-These go to Radix node operators who validate transactions and secure the Radix Network. Network fees reflect the size of the transaction.
-
-## Royalty fee
-These are set by developers and allow them to collect a “use fee” every time their work is used in a transaction.
-
-## Tip
-These are optional payments you can make directly to validators to speed up transactions. [pool unit ⓘ](infolink://poolunit)
-"""
-
-let securityshieldString = """
-# Security Shields
-Security Shields are a combination of security factors you use to sign transactions, and recover locked Accounts and Personas. You'll need to pay a small transaction fee to apply one to the Radix Network.
-"""
 
 extension OverlayWindowClient.Item.HUD {
 	public static let updatedAccount = Self(text: L10n.AccountSettings.updatedAccountHUDMessage)
