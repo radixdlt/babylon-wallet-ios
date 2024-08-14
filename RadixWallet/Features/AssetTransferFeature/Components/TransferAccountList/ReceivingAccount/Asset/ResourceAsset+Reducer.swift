@@ -36,7 +36,7 @@ public struct ResourceAsset: Sendable, FeatureReducer {
 		}
 
 		public var kind: Kind
-		public var additionalSignatureRequired: Bool = false
+		public var depositStatus: Loadable<DepositStatus> = .idle
 
 		@PresentationState
 		public var destination: Destination.State? = nil
@@ -242,5 +242,36 @@ extension OnLedgerEntity.OwnedFungibleResource {
 extension OnLedgerEntity.NonFungibleToken {
 	fileprivate var resourceQuantifier: NonFungibleResourceIndicator {
 		.byIds(ids: [id.nonFungibleLocalId])
+	}
+}
+
+// MARK: - ResourceAsset.State.DepositStatus
+extension ResourceAsset.State {
+	public enum DepositStatus: Sendable, Hashable {
+		/// The deposit of this asset is allowed.
+		case allowed
+
+		/// The user needs to provide an additional signature to deposit this asset.
+		case additionalSignatureRequired
+
+		/// The user cannot deposit this asset since the receiving acccount has disallowed it.
+		case denied
+	}
+
+	var isDepositEnabled: Bool {
+		switch depositStatus {
+		case .idle, .loading:
+			false
+		case .failure:
+			// We will allow user to try the deposit and worst case fail later.
+			true
+		case let .success(status):
+			switch status {
+			case .denied:
+				false
+			case .allowed, .additionalSignatureRequired:
+				true
+			}
+		}
 	}
 }
