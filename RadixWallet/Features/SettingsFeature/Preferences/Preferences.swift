@@ -17,6 +17,7 @@ public struct Preferences: Sendable, FeatureReducer {
 		case hiddenEntitiesButtonTapped
 		case gatewaysButtonTapped
 		case developerModeToogled(Bool)
+		case advancedLockToogled(Bool)
 		case exportLogsButtonTapped
 		case exportLogsDismissed
 	}
@@ -87,6 +88,14 @@ public struct Preferences: Sendable, FeatureReducer {
 
 		case let .developerModeToogled(isEnabled):
 			state.appPreferences?.security.isDeveloperModeEnabled = isEnabled
+			guard let preferences = state.appPreferences else { return .none }
+			return .run { _ in
+				try await appPreferencesClient.updatePreferences(preferences)
+			}
+
+		case let .advancedLockToogled(isEnabled):
+			// FIXME: uncomment
+			//            state.appPreferences?.security.isAdvancedLockEnabled = isEnabled
 			guard let preferences = state.appPreferences else { return .none }
 			return .run { _ in
 				try await appPreferencesClient.updatePreferences(preferences)

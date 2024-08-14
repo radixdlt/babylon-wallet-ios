@@ -26,29 +26,24 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 		appsFlyerClient.continue(userActivity)
 	}
 
-	public func sceneWillResignActive(_ scene: UIScene) {
-		guard let scene = scene as? UIWindowScene else { return }
-		showPrivacyProtectionWindow(in: scene)
-	}
-
-	public func sceneDidBecomeActive(_ scene: UIScene) {
-		hidePrivacyProtectionWindow()
-	}
-
 	public func sceneWillEnterForeground(_ scene: UIScene) {
 		guard didEnterInBackground, let scene = scene as? UIWindowScene else { return }
 
 		if #unavailable(iOS 18) {
 			showBiometricsSplashWindow(in: scene)
 		}
+		hidePrivacyProtectionWindow()
 	}
 
 	public func sceneDidEnterBackground(_ scene: UIScene) {
+		guard let scene = scene as? UIWindowScene else { return }
+
 		didEnterInBackground = true
 
 		if #unavailable(iOS 18) {
 			hideBiometricsSplashWindow()
 		}
+		showPrivacyProtectionWindow(in: scene)
 	}
 
 	// MARK: Overlay

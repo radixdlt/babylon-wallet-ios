@@ -1,14 +1,18 @@
 extension Preferences.State {
 	var viewState: Preferences.ViewState {
 		let isDeveloperModeEnabled = appPreferences?.security.isDeveloperModeEnabled ?? false
+		// FIXME: use `isAdvancedLockEnabled` from appPreferences
+		let isAdvancedLockEnabled = true // appPreferences?.security.isAdvancedLockEnabled ?? false
 		#if DEBUG
 		return .init(
 			isDeveloperModeEnabled: isDeveloperModeEnabled,
+			isAdvancedLockEnabled: isAdvancedLockEnabled,
 			exportLogsUrl: exportLogsUrl
 		)
 		#else
 		return .init(
-			isDeveloperModeEnabled: isDeveloperModeEnabled
+			isDeveloperModeEnabled: isDeveloperModeEnabled,
+			isAdvancedLockEnabled: isAdvancedLockEnabled
 		)
 		#endif
 	}
@@ -19,15 +23,25 @@ extension Preferences.State {
 public extension Preferences {
 	struct ViewState: Equatable {
 		let isDeveloperModeEnabled: Bool
+		let isAdvancedLockEnabled: Bool
 		#if DEBUG
 		let exportLogsUrl: URL?
-		init(isDeveloperModeEnabled: Bool, exportLogsUrl: URL?) {
+		init(
+			isDeveloperModeEnabled: Bool,
+			isAdvancedLockEnabled: Bool,
+			exportLogsUrl: URL?
+		) {
 			self.isDeveloperModeEnabled = isDeveloperModeEnabled
+			self.isAdvancedLockEnabled = isAdvancedLockEnabled
 			self.exportLogsUrl = exportLogsUrl
 		}
 		#else
-		init(isDeveloperModeEnabled: Bool) {
+		init(
+			isDeveloperModeEnabled: Bool,
+			isAdvancedLockEnabled: Bool
+		) {
 			self.isDeveloperModeEnabled = isDeveloperModeEnabled
+			self.isAdvancedLockEnabled = isAdvancedLockEnabled
 		}
 		#endif
 	}
@@ -57,11 +71,9 @@ extension Preferences.View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(spacing: .zero) {
-					ForEachStatic(rows) { kind in
+					ForEachStatic(rows(viewStore: viewStore)) { kind in
 						SettingsRow(kind: kind, store: store)
 					}
-
-					developerMode(viewStore: viewStore)
 
 					#if DEBUG
 					exportLogs(viewStore: viewStore)
@@ -76,7 +88,7 @@ extension Preferences.View {
 	}
 
 	@MainActor
-	private var rows: [SettingsRow<Preferences>.Kind] {
+	private func rows(viewStore: ViewStoreOf<Preferences>) -> [SettingsRow<Preferences>.Kind] {
 		[
 			.separator,
 			.model(
@@ -91,30 +103,33 @@ extension Preferences.View {
 				icon: .systemImage("eye.fill"),
 				action: .hiddenEntitiesButtonTapped
 			),
+			.toggleModel(
+				icon: AssetResource.advancedLock,
+				title: "Advanced Lock",
+				subtitle: "Re-authenticate when switching between apps",
+				minHeight: .zero,
+				isOn: viewStore.binding(
+					get: \.isAdvancedLockEnabled,
+					send: { .advancedLockToogled($0) }
+				)
+			),
 			.header(L10n.Preferences.advancedPreferences),
 			.model(
 				title: L10n.Preferences.gateways,
 				icon: .asset(AssetResource.gateway),
 				action: .gatewaysButtonTapped
 			),
+			.toggleModel(
+				icon: AssetResource.developerMode,
+				title: L10n.Preferences.DeveloperMode.title,
+				subtitle: L10n.Preferences.DeveloperMode.subtitle,
+				minHeight: .zero,
+				isOn: viewStore.binding(
+					get: \.isDeveloperModeEnabled,
+					send: { .developerModeToogled($0) }
+				)
+			),
 		]
-	}
-
-	private func developerMode(viewStore: ViewStoreOf<Preferences>) -> some View {
-		ToggleView(
-			icon: AssetResource.developerMode,
-			title: L10n.Preferences.DeveloperMode.title,
-			subtitle: L10n.Preferences.DeveloperMode.subtitle,
-			minHeight: .zero,
-			isOn: viewStore.binding(
-				get: \.isDeveloperModeEnabled,
-				send: { .developerModeToogled($0) }
-			)
-		)
-		.padding(.horizontal, .medium3)
-		.padding(.vertical, .medium1)
-		.background(Color.app.white)
-		.withSeparator
 	}
 
 	#if DEBUG

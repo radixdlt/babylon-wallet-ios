@@ -1,5 +1,4 @@
 // MARK: - LocalAuthenticationClient
-
 /// A client for querying if passcode and biometrics are set up.
 public struct LocalAuthenticationClient: Sendable {
 	public var queryConfig: QueryConfig

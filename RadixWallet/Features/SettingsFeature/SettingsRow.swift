@@ -14,6 +14,19 @@ struct SettingsRow<Feature: FeatureReducer>: View {
 				}
 				.withSeparator
 
+		case let .toggle(model):
+			ToggleView(
+				icon: model.icon,
+				title: model.title,
+				subtitle: model.subtitle,
+				minHeight: model.minHeight,
+				isOn: model.isOn
+			)
+			.padding(.horizontal, .medium3)
+			.padding(.vertical, .medium1)
+			.background(Color.app.white)
+			.withSeparator
+
 		case let .header(title):
 			HStack(spacing: .zero) {
 				Text(title)
@@ -37,6 +50,9 @@ extension SettingsRow {
 	enum Kind {
 		/// A standard tappable row with the details specified on the `Model`
 		case model(Model)
+
+		/// A non-tappable row with a toggle, with details specified in the `ToggleModel`
+		case toggle(ToggleModel)
 
 		/// A small row acting as a section header with the provided title.
 		case header(String)
@@ -72,6 +88,30 @@ extension SettingsRow.Kind {
 			self.action = action
 		}
 	}
+
+	struct ToggleModel: Identifiable {
+		let id: String
+		let icon: ImageAsset?
+		let title: String
+		let subtitle: String
+		let minHeight: CGFloat
+		let isOn: Binding<Bool>
+
+		init(
+			icon: ImageAsset? = nil,
+			title: String,
+			subtitle: String,
+			minHeight: CGFloat = .largeButtonHeight,
+			isOn: Binding<Bool>
+		) {
+			self.id = title
+			self.icon = icon
+			self.title = title
+			self.subtitle = subtitle
+			self.minHeight = minHeight
+			self.isOn = isOn
+		}
+	}
 }
 
 // MARK: - Helper
@@ -94,6 +134,24 @@ extension SettingsRow.Kind {
 				icon: icon,
 				accessory: accessory,
 				action: action
+			)
+		)
+	}
+
+	static func toggleModel(
+		icon: ImageAsset?,
+		title: String,
+		subtitle: String,
+		minHeight: CGFloat,
+		isOn: Binding<Bool>
+	) -> Self {
+		.toggle(
+			.init(
+				icon: icon,
+				title: title,
+				subtitle: subtitle,
+				minHeight: minHeight,
+				isOn: isOn
 			)
 		)
 	}

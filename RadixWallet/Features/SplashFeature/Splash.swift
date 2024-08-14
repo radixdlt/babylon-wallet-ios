@@ -33,6 +33,8 @@ public struct Splash: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case passcodeConfigResult(TaskResult<LocalAuthenticationConfig>)
 		case biometricsCheckResult(TaskResult<Bool>)
+		case checkBiometrics
+		case loadingDataCompleted
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -80,11 +82,16 @@ public struct Splash: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			// Starting with iOS 18, the system-provided biometric check will be used
-			if #available(iOS 18, *) {
-				return loadProfileAndContinue()
-			} else {
-				return delay().concatenate(with: verifyPasscode())
+			return .run { send in
+				// FIXME: uncomment
+				let isAdvancedLockEnabled = true // await onboardingClient.loadProfile().appPreferences.security.isAdvancedLockEnabled
+
+				// Starting with iOS 18, the system-provided biometric check will be used
+				if #unavailable(iOS 18), isAdvancedLockEnabled {
+					await send(.internal(.checkBiometrics))
+				} else {
+					await send(.internal(.loadingDataCompleted))
+				}
 			}
 
 		case .didTapToUnlock:
@@ -95,6 +102,9 @@ public struct Splash: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
+		case .checkBiometrics:
+			return delay().concatenate(with: verifyPasscode()) // TODO: why this delay is needed?
+
 		case let .passcodeConfigResult(result):
 			let config = try? result.value
 
@@ -134,14 +144,10 @@ public struct Splash: Sendable, FeatureReducer {
 				return .none
 			}
 
-			switch state.context {
-			case .appStarted:
-				return loadProfileAndContinue()
-			case .appForegrounded:
-				return .run { _ in
-					localAuthenticationClient.setAuthenticatedSuccessfully()
-				}
-			}
+			return delegateCompleted(context: state.context)
+
+		case .loadingDataCompleted:
+			return delegateCompleted(context: state.context)
 		}
 	}
 
@@ -156,22 +162,6 @@ public struct Splash: Sendable, FeatureReducer {
 		}
 	}
 
-	private func loadProfileAndContinue() -> Effect<Action> {
-		.run { send in
-			await send(.delegate(
-				.completed(onboardingClient.loadProfile())
-			))
-		}
-	}
-
-	func authenticateWithBiometrics() -> Effect<Action> {
-		.run { send in
-			await send(.internal(.biometricsCheckResult(.init {
-				try await localAuthenticationClient.authenticateWithBiometrics()
-			})))
-		}
-	}
-
 	private func verifyPasscode() -> Effect<Action> {
 		.run { send in
 			await send(.internal(.passcodeConfigResult(
@@ -179,6 +169,25 @@ public struct Splash: Sendable, FeatureReducer {
 					try localAuthenticationClient.queryConfig()
 				}
 			)))
+		}
+	}
+
+	private func authenticateWithBiometrics() -> Effect<Action> {
+		.run { send in
+			await send(.internal(.biometricsCheckResult(.init {
+				try await localAuthenticationClient.authenticateWithBiometrics()
+			})))
+		}
+	}
+
+	private func delegateCompleted(context: State.Context) -> Effect<Action> {
+		.run { send in
+			switch context {
+			case .appStarted:
+				await send(.delegate(.completed(onboardingClient.loadProfile())))
+			case .appForegrounded:
+				localAuthenticationClient.setAuthenticatedSuccessfully()
+			}
 		}
 	}
 
