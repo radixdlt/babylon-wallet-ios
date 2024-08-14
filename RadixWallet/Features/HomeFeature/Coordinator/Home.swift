@@ -193,7 +193,8 @@ public struct Home: Sendable, FeatureReducer {
 			return .cancel(id: CancellableId.fetchAccountPortfolios)
 
 		case .createAccountButtonTapped:
-			overlayWindowClient.showInfoLink(.info(.linkingNewAccount))
+//			overlayWindowClient.showInfoLink(.info(.linkingNewAccount))
+			overlayWindowClient.showInfoLink(.glossary(.radixnetwork))
 
 //			state.destination = .createAccount(
 //				.init(config: .init(
