@@ -75,9 +75,9 @@ extension OverlayWindowClient.InfoLink.InfoItem {
 	var string: String {
 		switch self {
 		case .radixConnect:
-			radixconnectString
+			fatalError()
 		case .linkingNewAccount:
-			linkingNewAccountString
+			fatalError()
 		}
 	}
 }
@@ -132,45 +132,3 @@ extension OverlayWindowClient.InfoLink.GlossaryItem {
 		}
 	}
 }
-
-let linkingNewAccountString = """
-# Why your Accounts will be linked
-Paying your transaction fee from this Account will make you [poolunit](?glossaryAnchor=poolunit) identifiable on ledger as both the owner of the fee-paying Account and all other Accounts you use in this transaction.
-
-*This* is _because_ you’ll **sign** the transactions on [github](https://github.com) from each [transaction fee ⓘ](infolink://transactionfee) at the same time, so your Accounts will be linked together in the transaction record.
-"""
-
-let poolunitString = """
-# Pool Units
-Pool units are fungible tokens that represent the proportional size of a user's contribution to a liquidity pool (LP).
-
-Pool units are redeemable for the user's portion of the LP, but can also be traded, sold and used in DeFi applications.
-"""
-
-let gatewaysString = """
-# Gateways
-Gateways are your connection to blockchain networks – they enable users to communicate with the Radix Network and transfer data to and from it. As there are multiple different networks within the Radix ecosystem (for example, the Stokenet test environment or the Babylon mainnet), there a multiple gateways providing access to each one.
-"""
-
-let radixconnectString = """
-# Radix Connect
-Radix Connect enables users to link their Radix Wallet to desktop dApps.
-"""
-
-let transactionfeeString = """
-# Transaction Fee
-
-## Network fee
-These go to Radix node operators who validate transactions and secure the Radix Network. Network fees reflect the size of the transaction.
-
-## Royalty fee
-These are set by developers and allow them to collect a “use fee” every time their work is used in a transaction.
-
-## Tip
-These are optional payments you can make directly to validators to speed up transactions. [pool unit ⓘ](infolink://poolunit)
-"""
-
-let securityshieldString = """
-# Security Shields
-Security Shields are a combination of security factors you use to sign transactions, and recover locked Accounts and Personas. You'll need to pay a small transaction fee to apply one to the Radix Network.
-"""
