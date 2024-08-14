@@ -706,7 +706,6 @@
 		48CFC5AD2ADC10DA00E77A5C /* WarningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1002ADC10D900E77A5C /* WarningView.swift */; };
 		48CFC5AE2ADC10DA00E77A5C /* CheckmarkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1012ADC10D900E77A5C /* CheckmarkView.swift */; };
 		48CFC5AF2ADC10DA00E77A5C /* AssetIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1022ADC10D900E77A5C /* AssetIcon.swift */; };
-		48CFC5B12ADC10DA00E77A5C /* ForceFullScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1042ADC10D900E77A5C /* ForceFullScreen.swift */; };
 		48CFC5B22ADC10DA00E77A5C /* Footer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1052ADC10D900E77A5C /* Footer.swift */; };
 		48CFC5B32ADC10DA00E77A5C /* JaggedEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1062ADC10D900E77A5C /* JaggedEdge.swift */; };
 		48CFC5B42ADC10DA00E77A5C /* Button+Asset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1072ADC10D900E77A5C /* Button+Asset.swift */; };
@@ -1889,7 +1888,6 @@
 		48CFC1002ADC10D900E77A5C /* WarningView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WarningView.swift; sourceTree = "<group>"; };
 		48CFC1012ADC10D900E77A5C /* CheckmarkView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CheckmarkView.swift; sourceTree = "<group>"; };
 		48CFC1022ADC10D900E77A5C /* AssetIcon.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetIcon.swift; sourceTree = "<group>"; };
-		48CFC1042ADC10D900E77A5C /* ForceFullScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ForceFullScreen.swift; sourceTree = "<group>"; };
 		48CFC1052ADC10D900E77A5C /* Footer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Footer.swift; sourceTree = "<group>"; };
 		48CFC1062ADC10D900E77A5C /* JaggedEdge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JaggedEdge.swift; sourceTree = "<group>"; };
 		48CFC1072ADC10D900E77A5C /* Button+Asset.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Button+Asset.swift"; sourceTree = "<group>"; };
@@ -5097,7 +5095,6 @@
 				48CFC1002ADC10D900E77A5C /* WarningView.swift */,
 				48CFC1012ADC10D900E77A5C /* CheckmarkView.swift */,
 				48CFC1022ADC10D900E77A5C /* AssetIcon.swift */,
-				48CFC1042ADC10D900E77A5C /* ForceFullScreen.swift */,
 				48CFC1052ADC10D900E77A5C /* Footer.swift */,
 				48CFC1062ADC10D900E77A5C /* JaggedEdge.swift */,
 				48CFC1072ADC10D900E77A5C /* Button+Asset.swift */,
@@ -7446,7 +7443,6 @@
 				83377A032B9DDAF000D8AA36 /* NPSSurvey+View.swift in Sources */,
 				48CFC3112ADC10D900E77A5C /* AccountsToImport+View.swift in Sources */,
 				48CFC5A12ADC10DA00E77A5C /* Stroke.swift in Sources */,
-				48CFC5B12ADC10DA00E77A5C /* ForceFullScreen.swift in Sources */,
 				48CFC3812ADC10D900E77A5C /* NFTHelperViews.swift in Sources */,
 				48CFC5322ADC10DA00E77A5C /* MetadataNonFungibleLocalIdValue.swift in Sources */,
 				48CFC61B2ADC10DA00E77A5C /* P2P+RTCOutgoingMessage.swift in Sources */,
