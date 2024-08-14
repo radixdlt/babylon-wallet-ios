@@ -4,14 +4,23 @@ import SwiftUI
 // MARK: - Splash
 public struct Splash: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
+		public enum Context: Sendable {
+			case appStarted
+			case appForegrounded
+		}
+
+		public let context: Context
+
 		@PresentationState
 		public var destination: Destination.State?
 
 		var biometricsCheckFailed: Bool = false
 
 		public init(
+			context: Context = .appStarted,
 			destination: Destination.State? = nil
 		) {
+			self.context = context
 			self.destination = destination
 		}
 	}
@@ -23,8 +32,7 @@ public struct Splash: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case passcodeConfigResult(TaskResult<LocalAuthenticationConfig>)
-		case loadedProfile(Profile)
-		case accountRecoveryNeeded(TaskResult<Bool>)
+		case biometricsCheckResult(TaskResult<Bool>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -72,7 +80,12 @@ public struct Splash: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			return delay().concatenate(with: verifyPasscode())
+			// Starting with iOS 18, the system-provided biometric check will be used
+			if #available(iOS 18, *) {
+				return loadProfileAndContinue()
+			} else {
+				return delay().concatenate(with: verifyPasscode())
+			}
 
 		case .didTapToUnlock:
 			state.biometricsCheckFailed = false
@@ -108,27 +121,27 @@ public struct Splash: Sendable, FeatureReducer {
 				return .none
 			}
 
-			return .run { send in
-				await send(.internal(.loadedProfile(onboardingClient.loadProfile())))
-			}
+			return authenticateWithBiometrics()
 
-		case let .loadedProfile(profile):
-			if profile.networks.isEmpty {
-				return delegateCompleted()
-			} else {
-				return checkAccountRecoveryNeeded()
-			}
-
-		case let .accountRecoveryNeeded(.failure(error)):
+		case let .biometricsCheckResult(.failure(error)):
 			state.biometricsCheckFailed = true
 			errorQueue.schedule(error)
 			return .none
 
-		case let .accountRecoveryNeeded(.success(recoveryNeeded)):
-			if recoveryNeeded {
-				loggerGlobal.notice("Account recovery needed")
+		case let .biometricsCheckResult(.success(success)):
+			guard success else {
+				state.biometricsCheckFailed = true
+				return .none
 			}
-			return delegateCompleted()
+
+			switch state.context {
+			case .appStarted:
+				return loadProfileAndContinue()
+			case .appForegrounded:
+				return .run { _ in
+					localAuthenticationClient.setAuthenticatedSuccessfully()
+				}
+			}
 		}
 	}
 
@@ -143,19 +156,27 @@ public struct Splash: Sendable, FeatureReducer {
 		}
 	}
 
-	func delegateCompleted() -> Effect<Action> {
+	private func loadProfileAndContinue() -> Effect<Action> {
 		.run { send in
 			await send(.delegate(
-				.completed(ProfileStore.shared.profile)
+				.completed(onboardingClient.loadProfile())
 			))
 		}
 	}
 
-	func checkAccountRecoveryNeeded() -> Effect<Action> {
+	func authenticateWithBiometrics() -> Effect<Action> {
 		.run { send in
-			await send(.internal(.accountRecoveryNeeded(
-				.init {
-					try await deviceFactorSourceClient.isAccountRecoveryNeeded()
+			await send(.internal(.biometricsCheckResult(.init {
+				try await localAuthenticationClient.authenticateWithBiometrics()
+			})))
+		}
+	}
+
+	private func verifyPasscode() -> Effect<Action> {
+		.run { send in
+			await send(.internal(.passcodeConfigResult(
+				TaskResult {
+					try localAuthenticationClient.queryConfig()
 				}
 			)))
 		}
@@ -170,16 +191,6 @@ public struct Splash: Sendable, FeatureReducer {
 			durationInMS = 750
 			#endif
 			try? await clock.sleep(for: .milliseconds(durationInMS))
-		}
-	}
-
-	private func verifyPasscode() -> Effect<Action> {
-		.run { send in
-			await send(.internal(.passcodeConfigResult(
-				TaskResult {
-					try localAuthenticationClient.queryConfig()
-				}
-			)))
 		}
 	}
 }

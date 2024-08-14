@@ -4,6 +4,7 @@ import SwiftUI
 public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObject {
 	public weak var windowScene: UIWindowScene?
 	public var overlayWindow: UIWindow?
+	private var didEnterInBackground = false
 
 	public func scene(
 		_ scene: UIScene,
@@ -31,9 +32,26 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 	}
 
 	public func sceneDidBecomeActive(_ scene: UIScene) {
-		guard let scene = scene as? UIWindowScene else { return }
-		hidePrivacyProtectionWindow(in: scene)
+		hidePrivacyProtectionWindow()
 	}
+
+	public func sceneWillEnterForeground(_ scene: UIScene) {
+		guard didEnterInBackground, let scene = scene as? UIWindowScene else { return }
+
+		if #unavailable(iOS 18) {
+			showBiometricsSplashWindow(in: scene)
+		}
+	}
+
+	public func sceneDidEnterBackground(_ scene: UIScene) {
+		didEnterInBackground = true
+
+		if #unavailable(iOS 18) {
+			hideBiometricsSplashWindow()
+		}
+	}
+
+	// MARK: Overlay
 
 	func overlayWindow(in scene: UIWindowScene) {
 		let overlayView = OverlayReducer.View(
@@ -59,6 +77,35 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 		self.overlayWindow = overlayWindow
 	}
 
+	// MARK: Biometrics
+
+	private var biometricsSplashWindow: UIWindow?
+
+	private func showBiometricsSplashWindow(in scene: UIWindowScene) {
+		let splashView = Splash.View(
+			store: .init(
+				initialState: .init(context: .appForegrounded),
+				reducer: Splash.init
+			))
+
+		biometricsSplashWindow = UIWindow(windowScene: scene)
+		biometricsSplashWindow?.rootViewController = UIHostingController(rootView: splashView)
+		biometricsSplashWindow?.windowLevel = .normal + 1
+		biometricsSplashWindow?.makeKeyAndVisible()
+
+		@Dependency(\.localAuthenticationClient) var localAuthenticationClient
+		Task { @MainActor in
+			for try await _ in localAuthenticationClient.authenticatedSuccessfully() {
+				hideBiometricsSplashWindow()
+			}
+		}
+	}
+
+	private func hideBiometricsSplashWindow() {
+		biometricsSplashWindow?.isHidden = true
+		biometricsSplashWindow = nil
+	}
+
 	// MARK: Privacy Protection
 
 	private var privacyProtectionWindow: UIWindow?
@@ -70,7 +117,7 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 		privacyProtectionWindow?.makeKeyAndVisible()
 	}
 
-	private func hidePrivacyProtectionWindow(in scene: UIWindowScene) {
+	private func hidePrivacyProtectionWindow() {
 		privacyProtectionWindow?.isHidden = true
 		privacyProtectionWindow = nil
 	}
