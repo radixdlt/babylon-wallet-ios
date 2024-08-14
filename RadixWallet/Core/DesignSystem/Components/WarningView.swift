@@ -23,7 +23,6 @@ public struct WarningErrorView: View {
 		HStack(spacing: spacing) {
 			Image(.error)
 			Text(text)
-				.lineSpacing(-.small3)
 				.textStyle(.body1Header)
 				.multilineTextAlignment(.leading)
 		}

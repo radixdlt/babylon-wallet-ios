@@ -42,10 +42,10 @@ extension TransactionReviewNetworkFee {
 						case .needsFeePayer:
 							WarningErrorView(text: L10n.TransactionReview.FeePayerValidation.feePayerRequired, type: .warning)
 						case .insufficientBalance:
-							WarningErrorView(text: L10n.TransactionReview.FeePayerValidation.insufficientBalance, type: .error)
-						case .valid(.introducesNewAccount):
-							WarningErrorView(text: L10n.TransactionReview.FeePayerValidation.linksNewAccount, type: .warning)
-						case .valid:
+							WarningErrorView(text: L10n.TransactionReview.FeePayerValidation.insufficientBalance, type: .warning)
+						case .valid(introducesNewAccount: true):
+							EmptyView() // TODO: Here we could show a warning, that this introduces a new account into the transaction - the link between the accounts will now be public
+						case .valid(introducesNewAccount: false):
 							EmptyView()
 						}
 
