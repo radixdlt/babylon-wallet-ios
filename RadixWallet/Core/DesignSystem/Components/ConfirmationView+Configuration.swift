@@ -11,9 +11,9 @@ extension ConfirmationView.Configuration {
 
 	static var hideAsset: Self {
 		.init(
-			title: "Hide Asset",
-			message: "Hide this asset in your Radix Wallet? You can always unhide it in your account settings.",
-			primaryAction: "Hide Asset"
+			title: L10n.AssetDetails.HideAsset.title,
+			message: L10n.AssetDetails.HideAsset.message,
+			primaryAction: L10n.AssetDetails.HideAsset.button
 		)
 	}
 }

@@ -9,11 +9,18 @@ public extension HideAsset {
 		}
 
 		public var body: some SwiftUI.View {
-			Button("Hide Asset") {
-				store.send(.view(.buttonTapped))
+			WithPerceptionTracking {
+				if store.shouldShow {
+					Button(L10n.AssetDetails.HideAsset.button) {
+						store.send(.view(.buttonTapped))
+					}
+					.buttonStyle(.secondaryRectangular(shouldExpand: true))
+					.padding(.horizontal, .medium3)
+				}
 			}
-			.buttonStyle(.secondaryRectangular(shouldExpand: true))
-			.padding(.horizontal, .medium3)
+			.task {
+				await store.send(.view(.task)).finish()
+			}
 		}
 	}
 }
