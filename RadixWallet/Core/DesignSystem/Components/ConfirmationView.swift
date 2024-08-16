@@ -1,9 +1,10 @@
 import SwiftUI
 
-public typealias HideAccountAction = HideAccountView.Action
+public typealias ConfirmationAction = ConfirmationView.Action
 
-// MARK: - HideAccountView
-public struct HideAccountView: View {
+// MARK: - ConfirmationView
+public struct ConfirmationView: View {
+	let configuration: Configuration
 	let onAction: (Action) -> Void
 
 	public var body: some View {
@@ -26,11 +27,11 @@ public struct HideAccountView: View {
 					.frame(.small)
 					.foregroundColor(.app.gray3)
 
-				Text(L10n.AccountSettings.HideAccount.title)
+				Text(configuration.title)
 					.textStyle(.sheetTitle)
 					.foregroundColor(.app.gray1)
 
-				Text(L10n.AccountSettings.HideAccount.message)
+				Text(configuration.message)
 					.textStyle(.body1Regular)
 					.foregroundColor(.app.gray1)
 			}
@@ -44,7 +45,7 @@ public struct HideAccountView: View {
 				}
 				.buttonStyle(.secondaryRectangular)
 
-				Button(L10n.AccountSettings.HideAccount.button) {
+				Button(configuration.primaryAction) {
 					onAction(.confirm)
 				}
 				.buttonStyle(.primaryRectangular)
@@ -56,8 +57,13 @@ public struct HideAccountView: View {
 	}
 }
 
-// MARK: HideAccountView.Action
-extension HideAccountView {
+extension ConfirmationView {
+	public struct Configuration {
+		let title: String
+		let message: String
+		let primaryAction: String
+	}
+
 	public enum Action: Sendable {
 		case cancel
 		case confirm

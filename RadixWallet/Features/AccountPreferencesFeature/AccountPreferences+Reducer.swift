@@ -57,7 +57,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			case updateAccountLabel(UpdateAccountLabel.Action)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.Action)
 			case devPreferences(DevAccountPreferences.Action)
-			case hideAccount(HideAccountAction)
+			case hideAccount(ConfirmationAction)
 		}
 
 		public var body: some ReducerOf<Self> {

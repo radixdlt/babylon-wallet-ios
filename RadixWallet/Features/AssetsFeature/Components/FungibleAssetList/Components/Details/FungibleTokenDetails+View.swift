@@ -61,8 +61,12 @@ extension FungibleTokenDetails {
 				} thumbnailView: {
 					Thumbnail(token: viewStore.thumbnail.wrappedValue ?? .other(nil), size: .veryLarge)
 				} detailsView: {
-					AssetResourceDetailsSection(viewState: viewStore.details)
-						.padding(.bottom, .medium1)
+					VStack(spacing: .medium1) {
+						AssetResourceDetailsSection(viewState: viewStore.details)
+
+//						HideAssetButton()
+					}
+					.padding(.bottom, .medium1)
 				}
 				.task { @MainActor in
 					await viewStore.send(.task).finish()
