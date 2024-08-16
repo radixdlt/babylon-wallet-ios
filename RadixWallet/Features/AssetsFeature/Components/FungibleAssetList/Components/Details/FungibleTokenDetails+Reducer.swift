@@ -82,4 +82,13 @@ public struct FungibleTokenDetails: Sendable, FeatureReducer {
 			return .none
 		}
 	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+		switch childAction {
+		case .hideAsset(.delegate(.didHideAsset)):
+			.run { _ in await dismiss() }
+		default:
+			.none
+		}
+	}
 }
