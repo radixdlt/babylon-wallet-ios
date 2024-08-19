@@ -114,8 +114,8 @@ private extension HideAsset {
 
 	func isAlreadyHiddenEffect(state: State) -> Effect<Action> {
 		.run { send in
-			let hiddenAssets = await appPreferencesClient.getPreferences().assets
-			let isAlreadyHidden = hiddenAssets.contains(where: { $0.assetAddress == state.asset })
+			let hiddenAssets = await appPreferencesClient.getPreferences().assets.hiddenAssets
+			let isAlreadyHidden = hiddenAssets.contains(state.asset)
 			await send(.internal(.setIsAlreadyHidden(isAlreadyHidden)))
 		}
 	}

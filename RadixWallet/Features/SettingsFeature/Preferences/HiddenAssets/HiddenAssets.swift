@@ -8,6 +8,9 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 		var fungible: [OnLedgerEntity.Resource] = []
 		var nonFungible: [OnLedgerEntity.NonFungibleToken] = []
 		var poolUnit: [OnLedgerEntity.ResourcePool] = []
+
+		@Presents
+		var destination: Destination.State? = nil
 	}
 
 	public typealias Action = FeatureAction<Self>
@@ -23,6 +26,28 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 		case setFungible([OnLedgerEntity.Resource])
 		case setNonFungible([OnLedgerEntity.NonFungibleToken])
 		case setPoolUnit([OnLedgerEntity.ResourcePool])
+		case didUnhideAsset(AssetAddress)
+	}
+
+	public struct Destination: DestinationReducer {
+		@CasePathable
+		public enum State: Sendable, Hashable {
+			case unhideAlert(AlertState<Action.UnhideAlert>)
+		}
+
+		@CasePathable
+		public enum Action: Sendable, Equatable {
+			case unhideAlert(UnhideAlert)
+
+			public enum UnhideAlert: Hashable, Sendable {
+				case confirmTapped(AssetAddress)
+				case cancelTapped
+			}
+		}
+
+		public var body: some ReducerOf<Self> {
+			EmptyReducer()
+		}
 	}
 
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
@@ -34,15 +59,26 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 		Reduce(core)
 	}
 
-	public func reduce(into _: inout State, viewAction: ViewAction) -> Effect<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			.run { send in
+			return .run { send in
 				let hiddenAssets = await appPreferencesClient.getPreferences().assets.hiddenAssets
 				await send(.internal(.loadAssets(hiddenAssets)))
 			}
-		case .unhideTapped:
-			.none
+		case let .unhideTapped(asset):
+			state.destination = .unhideAlert(.init(
+				title: { TextState("Make this asset visible in your Accounts again?") },
+				actions: {
+					ButtonState(role: .cancel, action: .cancelTapped) {
+						TextState(L10n.Common.cancel)
+					}
+					ButtonState(action: .confirmTapped(asset)) {
+						TextState(L10n.Common.confirm)
+					}
+				}
+			))
+			return .none
 		}
 	}
 
@@ -52,15 +88,48 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 			return fungibleEffect(hiddenAssets: hiddenAssets)
 				.merge(with: nonFungibleEffect(hiddenAssets: hiddenAssets))
 				.merge(with: poolUnitEffect(hiddenAssets: hiddenAssets))
+
 		case let .setFungible(values):
 			state.fungible = values
 			return .none
+
 		case let .setNonFungible(values):
 			state.nonFungible = values
 			return .none
+
 		case let .setPoolUnit(values):
 			state.poolUnit = values
 			return .none
+
+		case let .didUnhideAsset(asset):
+			switch asset {
+			case let .fungible(resourceAddress):
+				state.fungible.removeAll(where: { $0.resourceAddress == resourceAddress })
+			case let .nonFungible(globalId):
+				state.nonFungible.removeAll(where: { $0.id == globalId })
+			case let .poolUnit(poolAddress):
+				state.poolUnit.removeAll(where: { $0.address == poolAddress })
+			}
+			state.destination = nil
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .unhideAlert(action):
+			switch action {
+			case let .confirmTapped(asset):
+				return .run { send in
+					try await appPreferencesClient.updating { preferences in
+						preferences.assets.unhideAsset(asset: asset)
+					}
+					await send(.internal(.didUnhideAsset(asset)))
+				}
+			case .cancelTapped:
+				state.destination = nil
+				return .none
+			}
 		}
 	}
 
