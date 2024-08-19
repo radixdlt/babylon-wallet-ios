@@ -4,8 +4,7 @@ public struct HideAsset: Sendable, FeatureReducer {
 	@ObservableState
 	public struct State: Sendable, Hashable {
 		let asset: AssetAddress
-		fileprivate var isAlreadyHidden = false
-		fileprivate var isXrd = false
+		var shouldShow = true
 
 		@Presents
 		var destination: Destination.State? = nil
@@ -13,17 +12,12 @@ public struct HideAsset: Sendable, FeatureReducer {
 		public init(asset: AssetAddress) {
 			self.asset = asset
 		}
-
-		var shouldShow: Bool {
-			!(isAlreadyHidden || isXrd)
-		}
 	}
 
 	public typealias Action = FeatureAction<Self>
 
 	public enum InternalAction: Sendable, Equatable {
-		case setIsXrd(Bool)
-		case setIsAlreadyHidden(Bool)
+		case setShouldShow(Bool)
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -67,8 +61,7 @@ public struct HideAsset: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			return isXrdEffect(state: state)
-				.merge(with: isAlreadyHiddenEffect(state: state))
+			return shouldShowEffect(state: state)
 
 		case .buttonTapped:
 			state.destination = .confirmation
@@ -78,11 +71,8 @@ public struct HideAsset: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .setIsXrd(value):
-			state.isXrd = value
-			return .none
-		case let .setIsAlreadyHidden(value):
-			state.isAlreadyHidden = value
+		case let .setShouldShow(value):
+			state.shouldShow = value
 			return .none
 		}
 	}
@@ -100,23 +90,23 @@ public struct HideAsset: Sendable, FeatureReducer {
 }
 
 private extension HideAsset {
-	func isXrdEffect(state: State) -> Effect<Action> {
+	func shouldShowEffect(state: State) -> Effect<Action> {
 		.run { send in
+			let isXrd: Bool
 			switch state.asset {
 			case let .fungible(resource):
 				let networkId = await gatewaysClient.getCurrentNetworkID()
-				await send(.internal(.setIsXrd(resource.isXRD(on: networkId))))
+				isXrd = resource.isXRD(on: networkId)
 			case .nonFungible, .poolUnit:
-				await send(.internal(.setIsXrd(false)))
+				isXrd = false
 			}
-		}
-	}
-
-	func isAlreadyHiddenEffect(state: State) -> Effect<Action> {
-		.run { send in
-			let hiddenAssets = await appPreferencesClient.getPreferences().assets.hiddenAssets
-			let isAlreadyHidden = hiddenAssets.contains(state.asset)
-			await send(.internal(.setIsAlreadyHidden(isAlreadyHidden)))
+			if isXrd {
+				await send(.internal(.setShouldShow(false)))
+			} else {
+				let hiddenAssets = await appPreferencesClient.getPreferences().assets.hiddenAssets
+				let isAlreadyHidden = hiddenAssets.contains(state.asset)
+				await send(.internal(.setShouldShow(!isAlreadyHidden)))
+			}
 		}
 	}
 

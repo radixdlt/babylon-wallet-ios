@@ -124,7 +124,7 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 					try await appPreferencesClient.updating { preferences in
 						preferences.assets.unhideAsset(asset: asset)
 					}
-					await send(.internal(.didUnhideAsset(asset)))
+					await send(.internal(.didUnhideAsset(asset)), animation: .default)
 				}
 			case .cancelTapped:
 				state.destination = nil
@@ -158,6 +158,8 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 		}
 	}
 }
+
+// MARK: - Helpers
 
 private extension [AssetAddress] {
 	var fungibleAddresses: [Address] {
