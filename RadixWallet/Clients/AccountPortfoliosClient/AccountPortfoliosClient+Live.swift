@@ -25,6 +25,15 @@ extension AccountPortfoliosClient: DependencyKey {
 			}
 		}
 
+		/// Update when hidden assets change
+		Task {
+			for try await _ in await appPreferencesClient.appPreferenceUpdates().map(\.assets.hiddenAssets) {
+				guard !Task.isCancelled else { return }
+				let accountAddresses = state.portfoliosSubject.value.wrappedValue.map { $0.map(\.key) } ?? []
+				_ = try await fetchAccountPortfolios(accountAddresses, false)
+			}
+		}
+
 		/// Fetches the pool and stake units details for a given account; Will update the portfolio accordingly
 		@Sendable
 		func fetchPoolAndStakeUnitsDetails(_ account: OnLedgerEntity.OnLedgerAccount, hiddenAssets: [AssetAddress], cachingStrategy: OnLedgerEntitiesClient.CachingStrategy) async {

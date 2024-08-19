@@ -26,11 +26,11 @@ extension HiddenAssets {
 				}
 				.background(Color.app.gray5)
 				.radixToolbar(title: "Hidden Assets")
+				.task {
+					store.send(.view(.task))
+				}
+				.alert(store: store.scope(state: \.$destination.unhideAlert, action: \.destination.unhideAlert))
 			}
-			.task {
-				store.send(.view(.task))
-			}
-			.alert(store: store.scope(state: \.$destination.unhideAlert, action: \.destination.unhideAlert))
 		}
 
 		private func header(_ value: String) -> some SwiftUI.View {
