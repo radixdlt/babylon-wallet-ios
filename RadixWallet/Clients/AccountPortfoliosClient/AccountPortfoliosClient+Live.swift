@@ -27,10 +27,10 @@ extension AccountPortfoliosClient: DependencyKey {
 
 		/// Fetches the pool and stake units details for a given account; Will update the portfolio accordingly
 		@Sendable
-		func fetchPoolAndStakeUnitsDetails(_ account: OnLedgerEntity.OnLedgerAccount, cachingStrategy: OnLedgerEntitiesClient.CachingStrategy) async {
+		func fetchPoolAndStakeUnitsDetails(_ account: OnLedgerEntity.OnLedgerAccount, hiddenAssets: [AssetAddress], cachingStrategy: OnLedgerEntitiesClient.CachingStrategy) async {
 			async let poolDetailsFetch = Task {
 				do {
-					let poolUnitDetails = try await onLedgerEntitiesClient.getOwnedPoolUnitsDetails(account, cachingStrategy: cachingStrategy)
+					let poolUnitDetails = try await onLedgerEntitiesClient.getOwnedPoolUnitsDetails(account, hiddenAssets: hiddenAssets, cachingStrategy: cachingStrategy)
 					await state.set(poolDetails: .success(poolUnitDetails), forAccount: account.address)
 				} catch {
 					await state.set(poolDetails: .failure(error), forAccount: account.address)
@@ -126,7 +126,7 @@ extension AccountPortfoliosClient: DependencyKey {
 
 			// Load additional details
 			_ = await accounts.map(\.nonEmptyVaults).parallelMap {
-				await fetchPoolAndStakeUnitsDetails($0, cachingStrategy: forceRefresh ? .forceUpdate : .useCache)
+				await fetchPoolAndStakeUnitsDetails($0, hiddenAssets: hiddenAssets, cachingStrategy: forceRefresh ? .forceUpdate : .useCache)
 			}
 
 			return Array(state.portfoliosSubject.value.wrappedValue!.values)
@@ -153,7 +153,7 @@ extension AccountPortfoliosClient: DependencyKey {
 			}
 
 			await state.handlePortfolioUpdate(portfolio)
-			await fetchPoolAndStakeUnitsDetails(account.nonEmptyVaults, cachingStrategy: forceRefresh ? .forceUpdate : .useCache)
+			await fetchPoolAndStakeUnitsDetails(account.nonEmptyVaults, hiddenAssets: hiddenAssets, cachingStrategy: forceRefresh ? .forceUpdate : .useCache)
 
 			return portfolio
 		}
