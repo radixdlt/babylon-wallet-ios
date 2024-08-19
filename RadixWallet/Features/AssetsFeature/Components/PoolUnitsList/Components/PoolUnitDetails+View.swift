@@ -61,10 +61,18 @@ extension PoolUnitDetails {
 							.padding(.horizontal, .large2)
 
 						AssetResourceDetailsSection(viewState: viewStore.resourceDetails)
+
+						HideAsset.View(store: store.hideAsset)
 					}
 					.padding(.bottom, .medium1)
 				}
 			}
 		}
+	}
+}
+
+private extension StoreOf<PoolUnitDetails> {
+	var hideAsset: StoreOf<HideAsset> {
+		scope(state: \.hideAsset, action: \.child.hideAsset)
 	}
 }

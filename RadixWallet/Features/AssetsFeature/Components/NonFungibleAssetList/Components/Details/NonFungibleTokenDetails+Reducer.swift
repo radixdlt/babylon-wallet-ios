@@ -11,6 +11,7 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 		public let ledgerState: AtLedgerState
 		public let stakeClaim: OnLedgerEntitiesClient.StakeClaim?
 		public let isClaimStakeEnabled: Bool
+		var hideAsset: HideAsset.State?
 
 		public init(
 			resourceAddress: ResourceAddress,
@@ -28,6 +29,9 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 			self.ledgerState = ledgerState
 			self.stakeClaim = stakeClaim
 			self.isClaimStakeEnabled = isClaimStakeEnabled
+			if let id = token?.id, stakeClaim == nil {
+				hideAsset = .init(asset: .nonFungible(id))
+			}
 		}
 	}
 
@@ -45,10 +49,22 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 		case tappedClaimStake(OnLedgerEntitiesClient.StakeClaim)
 	}
 
+	@CasePathable
+	public enum ChildAction: Sendable, Equatable {
+		case hideAsset(HideAsset.Action)
+	}
+
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.dismiss) var dismiss
 
 	public init() {}
+
+	public var body: some ReducerOf<Self> {
+		Reduce(core)
+			.ifLet(\.hideAsset, action: \.child.hideAsset) {
+				HideAsset()
+			}
+	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -81,6 +97,15 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 		case let .resourceLoadResult(.failure(err)):
 			state.resourceDetails = .failure(err)
 			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+		switch childAction {
+		case .hideAsset(.delegate(.didHideAsset)):
+			.run { _ in await dismiss() }
+		default:
+			.none
 		}
 	}
 }
