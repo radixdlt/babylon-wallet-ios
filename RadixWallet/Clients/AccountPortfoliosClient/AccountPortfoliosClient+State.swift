@@ -40,7 +40,9 @@ extension AccountPortfoliosClient {
 					}
 				}.count
 				item.nonFungibleIdsCount -= countHidden
-				nonFungibleResources.append(item)
+				if item.nonFungibleIdsCount > 0 {
+					nonFungibleResources.append(item)
+				}
 			}
 			modified.nonFungibleResources = nonFungibleResources
 
