@@ -80,13 +80,15 @@ extension AccountPortfoliosClient: DependencyKey {
 
 			/// Explicetely load and set the currency target and visibility to make sure
 			/// it is available for usage before resources are loaded
-			let preferences = await appPreferencesClient.getPreferences().display
-			await state.setSelectedCurrency(preferences.fiatCurrencyPriceTarget)
-			await state.setIsCurrencyAmountVisble(preferences.isCurrencyAmountVisible)
+			let preferences = await appPreferencesClient.getPreferences()
+			let display = preferences.display
+			await state.setSelectedCurrency(display.fiatCurrencyPriceTarget)
+			await state.setIsCurrencyAmountVisble(display.isCurrencyAmountVisible)
 
 			let accounts = try await onLedgerEntitiesClient.getAccounts(accountAddresses)
+			let hiddenAssets = preferences.assets.hiddenAssets
 
-			let portfolios = accounts.map { AccountPortfolio(account: $0) }
+			let portfolios = accounts.map { AccountPortfolio(account: $0, hiddenAssets: hiddenAssets) }
 			await state.handlePortfoliosUpdate(portfolios)
 
 			/// Put together all resources from already fetched and new accounts
@@ -140,7 +142,8 @@ extension AccountPortfoliosClient: DependencyKey {
 			}
 
 			let account = try await onLedgerEntitiesClient.getAccount(accountAddress)
-			let portfolio = AccountPortfolio(account: account)
+			let hiddenAssets = await appPreferencesClient.getPreferences().assets.hiddenAssets
+			let portfolio = AccountPortfolio(account: account, hiddenAssets: hiddenAssets)
 
 			if case let .success(tokenPrices) = await state.tokenPrices {
 				await applyTokenPrices(

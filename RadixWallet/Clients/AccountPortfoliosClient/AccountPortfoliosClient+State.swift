@@ -12,6 +12,14 @@ extension AccountPortfoliosClient {
 		public var debugDescription: String {
 			account.debugDescription
 		}
+
+		init(account: OnLedgerEntity.OnLedgerAccount, hiddenAssets: [AssetAddress]) {
+			var modified = account
+			modified.fungibleResources.nonXrdResources.removeAll(where: { resource in
+				hiddenAssets.contains(.fungible(resource.resourceAddress))
+			})
+			self.account = modified
+		}
 	}
 
 	/// Internal state that holds all loaded portfolios.
