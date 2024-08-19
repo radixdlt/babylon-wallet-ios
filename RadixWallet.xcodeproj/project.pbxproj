@@ -919,6 +919,8 @@
 		5BEB9CD32C6F6B24001FD9D4 /* HideAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEB9CD12C6F6B24001FD9D4 /* HideAsset.swift */; };
 		5BEB9CD52C6F6CC9001FD9D4 /* ConfirmationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEB9CD42C6F6CC9001FD9D4 /* ConfirmationView.swift */; };
 		5BEB9CD72C6F6DAB001FD9D4 /* ConfirmationView+Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEB9CD62C6F6DAB001FD9D4 /* ConfirmationView+Configuration.swift */; };
+		5BFA4FBA2C736B740030B517 /* HiddenAssets+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFA4FB82C736B740030B517 /* HiddenAssets+View.swift */; };
+		5BFA4FBB2C736B740030B517 /* HiddenAssets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFA4FB92C736B740030B517 /* HiddenAssets.swift */; };
 		830818482B9F1621002D8351 /* HTTPClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830818472B9F1621002D8351 /* HTTPClient+Live.swift */; };
 		8308184A2B9F162B002D8351 /* HTTPClient+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830818492B9F162B002D8351 /* HTTPClient+Mock.swift */; };
 		8308184C2B9F169B002D8351 /* TokenPriceClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8308184B2B9F169B002D8351 /* TokenPriceClient+Live.swift */; };
@@ -2072,6 +2074,8 @@
 		5BEB9CD12C6F6B24001FD9D4 /* HideAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HideAsset.swift; sourceTree = "<group>"; };
 		5BEB9CD42C6F6CC9001FD9D4 /* ConfirmationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmationView.swift; sourceTree = "<group>"; };
 		5BEB9CD62C6F6DAB001FD9D4 /* ConfirmationView+Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConfirmationView+Configuration.swift"; sourceTree = "<group>"; };
+		5BFA4FB82C736B740030B517 /* HiddenAssets+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HiddenAssets+View.swift"; sourceTree = "<group>"; };
+		5BFA4FB92C736B740030B517 /* HiddenAssets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HiddenAssets.swift; sourceTree = "<group>"; };
 		830818472B9F1621002D8351 /* HTTPClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPClient+Live.swift"; sourceTree = "<group>"; };
 		830818492B9F162B002D8351 /* HTTPClient+Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPClient+Mock.swift"; sourceTree = "<group>"; };
 		8308184B2B9F169B002D8351 /* TokenPriceClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TokenPriceClient+Live.swift"; sourceTree = "<group>"; };
@@ -5664,6 +5668,7 @@
 				5B758D552BCE7AEC00348722 /* Preferences+View.swift */,
 				5B758D562BCE7AEC00348722 /* Preferences.swift */,
 				48CFBD8F2ADC10D800E77A5C /* DefaultDepositGuarantees */,
+				5BFA4FB72C736B500030B517 /* HiddenAssets */,
 			);
 			path = Preferences;
 			sourceTree = "<group>";
@@ -5715,6 +5720,15 @@
 				5BEB9CD12C6F6B24001FD9D4 /* HideAsset.swift */,
 			);
 			path = HideAsset;
+			sourceTree = "<group>";
+		};
+		5BFA4FB72C736B500030B517 /* HiddenAssets */ = {
+			isa = PBXGroup;
+			children = (
+				5BFA4FB82C736B740030B517 /* HiddenAssets+View.swift */,
+				5BFA4FB92C736B740030B517 /* HiddenAssets.swift */,
+			);
+			path = HiddenAssets;
 			sourceTree = "<group>";
 		};
 		830E43AD2C2D8B3800B6E95F /* Mobile */ = {
@@ -6980,6 +6994,8 @@
 				5BEB9CD32C6F6B24001FD9D4 /* HideAsset.swift in Sources */,
 				5B272DD72C36E89600B74F1F /* AppEventsClient+Interface.swift in Sources */,
 				48CFC2A12ADC10D900E77A5C /* PersonaFeature.swift in Sources */,
+				5BFA4FBA2C736B740030B517 /* HiddenAssets+View.swift in Sources */,
+				5BFA4FBB2C736B740030B517 /* HiddenAssets.swift in Sources */,
 				A4DCCC502C2DA32C00438A7B /* HomeCardsClient+Interface.swift in Sources */,
 				48CFC4162ADC10DA00E77A5C /* PasteboardClient+Test.swift in Sources */,
 				48CFC34E2ADC10D900E77A5C /* Login+View.swift in Sources */,

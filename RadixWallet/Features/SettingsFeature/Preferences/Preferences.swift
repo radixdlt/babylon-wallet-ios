@@ -15,6 +15,7 @@ public struct Preferences: Sendable, FeatureReducer {
 		case appeared
 		case depositGuaranteesButtonTapped
 		case hiddenEntitiesButtonTapped
+		case hiddenAssetsButtonTapped
 		case gatewaysButtonTapped
 		case developerModeToogled(Bool)
 		case exportLogsButtonTapped
@@ -26,26 +27,33 @@ public struct Preferences: Sendable, FeatureReducer {
 	}
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case depositGuarantees(DefaultDepositGuarantees.State)
 			case hiddenEntities(AccountAndPersonaHiding.State)
+			case hiddenAssets(HiddenAssets.State)
 			case gateways(GatewaySettings.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case depositGuarantees(DefaultDepositGuarantees.Action)
 			case hiddenEntities(AccountAndPersonaHiding.Action)
+			case hiddenAssets(HiddenAssets.Action)
 			case gateways(GatewaySettings.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.depositGuarantees, action: /Action.depositGuarantees) {
+			Scope(state: \.depositGuarantees, action: \.depositGuarantees) {
 				DefaultDepositGuarantees()
 			}
-			Scope(state: /State.hiddenEntities, action: /Action.hiddenEntities) {
+			Scope(state: \.hiddenEntities, action: \.hiddenEntities) {
 				AccountAndPersonaHiding()
 			}
-			Scope(state: /State.gateways, action: /Action.gateways) {
+			Scope(state: \.hiddenAssets, action: \.hiddenAssets) {
+				HiddenAssets()
+			}
+			Scope(state: \.gateways, action: \.gateways) {
 				GatewaySettings()
 			}
 		}
@@ -79,6 +87,10 @@ public struct Preferences: Sendable, FeatureReducer {
 
 		case .hiddenEntitiesButtonTapped:
 			state.destination = .hiddenEntities(.init())
+			return .none
+
+		case .hiddenAssetsButtonTapped:
+			state.destination = .hiddenAssets(.init())
 			return .none
 
 		case .gatewaysButtonTapped:
