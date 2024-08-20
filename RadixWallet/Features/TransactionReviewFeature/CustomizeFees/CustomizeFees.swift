@@ -107,7 +107,13 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .changeFeePayerTapped:
-			state.destination = .selectFeePayer(.init(feePayer: state.feePayer, transactionFee: state.transactionFee))
+			state.destination = .selectFeePayer(
+				.init(
+					reviewedTransaction: state.reviewedTransaction,
+					selectedFeePayer: state.feePayer,
+					transactionFee: state.transactionFee
+				)
+			)
 			return .none
 		case .toggleMode:
 			state.reviewedTransaction.transactionFee.toggleMode()

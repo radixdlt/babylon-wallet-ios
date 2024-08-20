@@ -974,9 +974,9 @@ public struct ReviewedTransaction: Hashable, Sendable {
 
 // MARK: - FeePayerValidationOutcome
 public enum FeePayerValidationOutcome: Sendable, Hashable {
-	case valid(Details?)
 	case needsFeePayer
 	case insufficientBalance
+	case valid(Details?)
 
 	public enum Details: Sendable {
 		case introducesNewAccount
