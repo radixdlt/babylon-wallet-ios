@@ -64,12 +64,12 @@ extension HiddenAssets {
 				empty
 			} else {
 				VStack(spacing: .medium3) {
-					ForEachStatic(store.nonFungible) { token in
+					ForEachStatic(store.nonFungible) { details in
 						Card {
 							PlainListRow(viewState: .init(
-								rowCoreViewState: token.rowCoreViewState,
-								accessory: { unhideButton(asset: .nonFungible(token.id)) },
-								icon: { Thumbnail(.nft, url: token.data?.keyImageURL) }
+								rowCoreViewState: details.rowCoreViewState,
+								accessory: { unhideButton(asset: .nonFungible(details.token.id)) },
+								icon: { Thumbnail(.nft, url: details.resource.metadata.iconURL) }
 							))
 						}
 					}
@@ -122,9 +122,13 @@ extension HiddenAssets {
 	}
 }
 
-private extension OnLedgerEntity.NonFungibleToken {
+private extension HiddenAssets.State.NonFungibleDetails {
 	var rowCoreViewState: PlainListRowCore.ViewState {
-		.init(context: .hiddenAsset, title: data?.name, subtitle: id.nonFungibleLocalId.formatted())
+		.init(
+			context: .hiddenAsset,
+			title: resource.metadata.name ?? token.id.resourceAddress.formatted(),
+			subtitle: token.data?.name ?? token.id.localID.formatted()
+		)
 	}
 }
 

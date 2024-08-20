@@ -6,11 +6,16 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 	@ObservableState
 	public struct State: Sendable, Hashable {
 		var fungible: [OnLedgerEntity.Resource] = []
-		var nonFungible: [OnLedgerEntity.NonFungibleToken] = []
+		var nonFungible: [NonFungibleDetails] = []
 		var poolUnit: [PoolUnitDetails] = []
 
 		@Presents
 		var destination: Destination.State? = nil
+
+		public struct NonFungibleDetails: Sendable, Hashable {
+			let resource: OnLedgerEntity.Resource
+			let token: OnLedgerEntity.NonFungibleToken
+		}
 
 		public struct PoolUnitDetails: Sendable, Hashable {
 			let resource: OnLedgerEntity.Resource
@@ -29,7 +34,7 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case loadAssets([AssetAddress])
 		case setFungible([OnLedgerEntity.Resource])
-		case setNonFungible([OnLedgerEntity.NonFungibleToken])
+		case setNonFungible([State.NonFungibleDetails])
 		case setPoolUnit([State.PoolUnitDetails])
 		case didUnhideAsset(AssetAddress)
 	}
@@ -111,7 +116,7 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 			case let .fungible(resourceAddress):
 				state.fungible.removeAll(where: { $0.resourceAddress == resourceAddress })
 			case let .nonFungible(globalId):
-				state.nonFungible.removeAll(where: { $0.id == globalId })
+				state.nonFungible.removeAll(where: { $0.token.id == globalId })
 			case let .poolUnit(poolAddress):
 				state.poolUnit.removeAll(where: { $0.details.address == poolAddress })
 			}
@@ -147,12 +152,16 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 
 	private func nonFungibleEffect(hiddenAssets: [AssetAddress]) -> Effect<Action> {
 		.run { send in
-			let tokens = try await hiddenAssets.nonFungibleDictionary.parallelMap { resource, nonFungibleIds in
-				try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(resource: resource, nonFungibleIds: nonFungibleIds))
+			let nonFungibleDetails = try await hiddenAssets.nonFungibleDictionary.parallelMap { resourceAddress, nonFungibleIds in
+				let resource = try await onLedgerEntitiesClient.getResource(resourceAddress)
+				let tokens = try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(resource: resourceAddress, nonFungibleIds: nonFungibleIds))
+				return tokens.map {
+					State.NonFungibleDetails(resource: resource, token: $0)
+				}
 			}
 			.flatMap { $0 }
-			.sorted(by: \.id.resourceAddress.address)
-			await send(.internal(.setNonFungible(tokens)))
+
+			await send(.internal(.setNonFungible(nonFungibleDetails)))
 		}
 	}
 
