@@ -27,7 +27,7 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 			reviewedTransaction.transactionFee
 		}
 
-		var feePayingValidation: FeeValidationOutcome? {
+		var feePayingValidation: FeePayerValidationOutcome? {
 			reviewedTransaction.feePayingValidation.wrappedValue
 		}
 

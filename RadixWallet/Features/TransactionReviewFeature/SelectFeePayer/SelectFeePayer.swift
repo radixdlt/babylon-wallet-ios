@@ -5,6 +5,11 @@ import SwiftUI
 public struct SelectFeePayer: Sendable, FeatureReducer {
 	public typealias FeePayerCandidates = NonEmpty<IdentifiedArrayOf<FeePayerCandidate>>
 
+	public struct ValidatedFeePayerCandidate {
+		public let candidate: FeePayerCandidate
+		public let outcome: FeePayerValidationOutcome
+	}
+
 	public struct State: Sendable, Hashable {
 		public var feePayer: FeePayerCandidate?
 		public let transactionFee: TransactionFee
