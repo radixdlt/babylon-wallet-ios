@@ -1759,6 +1759,22 @@ public enum L10n {
       public static let title = L10n.tr("Localizable", "gateways_removeGatewayAlert_title", fallback: "Remove Gateway")
     }
   }
+  public enum HiddenAssets {
+    /// Tokens
+    public static let fungibles = L10n.tr("Localizable", "hiddenAssets_fungibles", fallback: "Tokens")
+    /// NFTs
+    public static let nonFungibles = L10n.tr("Localizable", "hiddenAssets_nonFungibles", fallback: "NFTs")
+    /// Pool Units
+    public static let poolUnits = L10n.tr("Localizable", "hiddenAssets_poolUnits", fallback: "Pool Units")
+    /// You have hidden the following assets. While hidden, you will not see these in any of your Accounts.
+    public static let text = L10n.tr("Localizable", "hiddenAssets_text", fallback: "You have hidden the following assets. While hidden, you will not see these in any of your Accounts.")
+    /// Hidden Assets
+    public static let title = L10n.tr("Localizable", "hiddenAssets_title", fallback: "Hidden Assets")
+    /// Unhide
+    public static let unhide = L10n.tr("Localizable", "hiddenAssets_unhide", fallback: "Unhide")
+    /// Make this asset visible in your Accounts again?
+    public static let unhideConfirmation = L10n.tr("Localizable", "hiddenAssets_unhideConfirmation", fallback: "Make this asset visible in your Accounts again?")
+  }
   public enum HiddenEntities {
     /// Accounts
     public static let accounts = L10n.tr("Localizable", "hiddenEntities_accounts", fallback: "Accounts")
@@ -3274,6 +3290,8 @@ public enum L10n {
     public static let externalAccountName = L10n.tr("Localizable", "transactionReview_externalAccountName", fallback: "Account")
     /// Guaranteed
     public static let guaranteed = L10n.tr("Localizable", "transactionReview_guaranteed", fallback: "Guaranteed")
+    /// This asset is hidden and will not be visible in your Account
+    public static let hiddenAsset = L10n.tr("Localizable", "transactionReview_hiddenAsset", fallback: "This asset is hidden and will not be visible in your Account")
     /// Message
     public static let messageHeading = L10n.tr("Localizable", "transactionReview_messageHeading", fallback: "Message")
     /// Contributing to pools
