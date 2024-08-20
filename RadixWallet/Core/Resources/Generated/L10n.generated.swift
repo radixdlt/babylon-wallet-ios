@@ -1759,6 +1759,22 @@ public enum L10n {
       public static let title = L10n.tr("Localizable", "gateways_removeGatewayAlert_title", fallback: "Remove Gateway")
     }
   }
+  public enum HiddenEntities {
+    /// Accounts
+    public static let accounts = L10n.tr("Localizable", "hiddenEntities_accounts", fallback: "Accounts")
+    /// Personas
+    public static let personas = L10n.tr("Localizable", "hiddenEntities_personas", fallback: "Personas")
+    /// You have hidden the following Personas and Accounts. They remain on the Radix Network, but while hidden, your wallet will treat them as if they don’t exist.
+    public static let text = L10n.tr("Localizable", "hiddenEntities_text", fallback: "You have hidden the following Personas and Accounts. They remain on the Radix Network, but while hidden, your wallet will treat them as if they don’t exist.")
+    /// Hidden Personas & Accounts
+    public static let title = L10n.tr("Localizable", "hiddenEntities_title", fallback: "Hidden Personas & Accounts")
+    /// Unhide
+    public static let unhide = L10n.tr("Localizable", "hiddenEntities_unhide", fallback: "Unhide")
+    /// Make this Account visible in your wallet again?
+    public static let unhideAccountsConfirmation = L10n.tr("Localizable", "hiddenEntities_unhideAccountsConfirmation", fallback: "Make this Account visible in your wallet again?")
+    /// Make this Persona visible in your wallet again?
+    public static let unhidePersonasConfirmation = L10n.tr("Localizable", "hiddenEntities_unhidePersonasConfirmation", fallback: "Make this Persona visible in your wallet again?")
+  }
   public enum HomePage {
     /// I have written down this seed phrase
     public static let backedUpMnemonicHeading = L10n.tr("Localizable", "homePage_backedUpMnemonicHeading", fallback: "I have written down this seed phrase")
@@ -2586,10 +2602,18 @@ public enum L10n {
   public enum Preferences {
     /// Advanced Preferences
     public static let advancedPreferences = L10n.tr("Localizable", "preferences_advancedPreferences", fallback: "Advanced Preferences")
+    /// Display
+    public static let displayPreferences = L10n.tr("Localizable", "preferences_displayPreferences", fallback: "Display")
     /// Network Gateways
     public static let gateways = L10n.tr("Localizable", "preferences_gateways", fallback: "Network Gateways")
     /// Preferences
     public static let title = L10n.tr("Localizable", "preferences_title", fallback: "Preferences")
+    public enum AdvancedLock {
+      /// Re-authenticate when switching between apps
+      public static let subtitle = L10n.tr("Localizable", "preferences_advancedLock_subtitle", fallback: "Re-authenticate when switching between apps")
+      /// Advanced Lock
+      public static let title = L10n.tr("Localizable", "preferences_advancedLock_title", fallback: "Advanced Lock")
+    }
     public enum DepositGuarantees {
       /// Set your guaranteed minimum for estimated deposits
       public static let subtitle = L10n.tr("Localizable", "preferences_depositGuarantees_subtitle", fallback: "Set your guaranteed minimum for estimated deposits")
@@ -2602,11 +2626,17 @@ public enum L10n {
       /// Developer Mode
       public static let title = L10n.tr("Localizable", "preferences_developerMode_title", fallback: "Developer Mode")
     }
+    public enum HiddenAssets {
+      /// Manage hidden Tokens, NFTs, and other asset types
+      public static let subtitle = L10n.tr("Localizable", "preferences_hiddenAssets_subtitle", fallback: "Manage hidden Tokens, NFTs, and other asset types")
+      /// Hidden Assets
+      public static let title = L10n.tr("Localizable", "preferences_hiddenAssets_title", fallback: "Hidden Assets")
+    }
     public enum HiddenEntities {
-      /// Manage hidden Accounts and Personas
-      public static let subtitle = L10n.tr("Localizable", "preferences_hiddenEntities_subtitle", fallback: "Manage hidden Accounts and Personas")
-      /// Hidden Accounts and Personas
-      public static let title = L10n.tr("Localizable", "preferences_hiddenEntities_title", fallback: "Hidden Accounts and Personas")
+      /// Manage hidden Personas and Accounts
+      public static let subtitle = L10n.tr("Localizable", "preferences_hiddenEntities_subtitle", fallback: "Manage hidden Personas and Accounts")
+      /// Hidden Personas & Accounts
+      public static let title = L10n.tr("Localizable", "preferences_hiddenEntities_title", fallback: "Hidden Personas & Accounts")
     }
   }
   public enum ProfileBackup {
