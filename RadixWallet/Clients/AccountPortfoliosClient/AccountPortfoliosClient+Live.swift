@@ -30,7 +30,7 @@ extension AccountPortfoliosClient: DependencyKey {
 			for try await _ in await appPreferencesClient.appPreferenceUpdates().map(\.assets.hiddenAssets) {
 				guard !Task.isCancelled else { return }
 				let accountAddresses = state.portfoliosSubject.value.wrappedValue.map { $0.map(\.key) } ?? []
-				_ = try await fetchAccountPortfolios(accountAddresses, false)
+				_ = try await fetchAccountPortfolios(accountAddresses, forceRefreshEntities: false, forceRefreshPrices: true)
 			}
 		}
 
@@ -77,11 +77,12 @@ extension AccountPortfoliosClient: DependencyKey {
 		@Sendable
 		func fetchAccountPortfolios(
 			_ accountAddresses: [AccountAddress],
-			_ forceRefresh: Bool
+			forceRefreshEntities: Bool,
+			forceRefreshPrices: Bool
 		) async throws -> [AccountPortfolio] {
 			let gateway = await gatewaysClient.getCurrentGateway()
 			await state.setRadixGateway(gateway)
-			if forceRefresh {
+			if forceRefreshEntities {
 				for accountAddress in accountAddresses {
 					cacheClient.removeFolder(.init(address: accountAddress))
 				}
@@ -131,11 +132,11 @@ extension AccountPortfoliosClient: DependencyKey {
 				}
 			}()
 
-			await applyTokenPrices(Array(allResources), forceRefresh: forceRefresh)
+			await applyTokenPrices(Array(allResources), forceRefresh: forceRefreshPrices)
 
 			// Load additional details
 			_ = await accounts.map(\.nonEmptyVaults).parallelMap {
-				await fetchPoolAndStakeUnitsDetails($0, hiddenAssets: hiddenAssets, cachingStrategy: forceRefresh ? .forceUpdate : .useCache)
+				await fetchPoolAndStakeUnitsDetails($0, hiddenAssets: hiddenAssets, cachingStrategy: forceRefreshEntities ? .forceUpdate : .useCache)
 			}
 
 			return Array(state.portfoliosSubject.value.wrappedValue!.values)
@@ -170,7 +171,7 @@ extension AccountPortfoliosClient: DependencyKey {
 		return AccountPortfoliosClient(
 			fetchAccountPortfolios: { accountAddresses, forceRefresh in
 				try await Task.detached {
-					try await fetchAccountPortfolios(accountAddresses, forceRefresh)
+					try await fetchAccountPortfolios(accountAddresses, forceRefreshEntities: forceRefresh, forceRefreshPrices: forceRefresh)
 				}.value
 			},
 			fetchAccountPortfolio: { accountAddress, forceRefresh in
