@@ -73,7 +73,7 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 			}
 		case let .unhideTapped(asset):
 			state.destination = .unhideAlert(.init(
-				title: { TextState("Make this asset visible in your Accounts again?") },
+				title: { TextState(L10n.HiddenAssets.unhideConfirmation) },
 				actions: {
 					ButtonState(role: .cancel, action: .cancelTapped) {
 						TextState(L10n.Common.cancel)

@@ -9,23 +9,23 @@ extension HiddenAssets {
 			WithPerceptionTracking {
 				ScrollView {
 					LazyVStack(alignment: .leading, spacing: .large3) {
-						Text("You have hidden the following assets. While hidden, you will not see these in any of your Accounts.")
+						Text(L10n.HiddenAssets.text)
 							.textStyle(.body1HighImportance)
 							.foregroundColor(.app.gray2)
 
-						header("Tokens")
-						fungible
+						header(L10n.HiddenAssets.fungibles)
+						fungibles
 
-						header("NFTs")
-						nonFungible
+						header(L10n.HiddenAssets.nonFungibles)
+						nonFungibles
 
-						header("Pool Units")
-						poolUnit
+						header(L10n.HiddenAssets.poolUnits)
+						poolUnits
 					}
 					.padding(.medium3)
 				}
 				.background(Color.app.gray5)
-				.radixToolbar(title: "Hidden Assets")
+				.radixToolbar(title: L10n.HiddenAssets.title)
 				.task {
 					store.send(.view(.task))
 				}
@@ -40,7 +40,7 @@ extension HiddenAssets {
 		}
 
 		@ViewBuilder
-		private var fungible: some SwiftUI.View {
+		private var fungibles: some SwiftUI.View {
 			if store.fungible.isEmpty {
 				empty
 			} else {
@@ -59,7 +59,7 @@ extension HiddenAssets {
 		}
 
 		@ViewBuilder
-		private var nonFungible: some SwiftUI.View {
+		private var nonFungibles: some SwiftUI.View {
 			if store.nonFungible.isEmpty {
 				empty
 			} else {
@@ -78,7 +78,7 @@ extension HiddenAssets {
 		}
 
 		@ViewBuilder
-		private var poolUnit: some SwiftUI.View {
+		private var poolUnits: some SwiftUI.View {
 			if store.poolUnit.isEmpty {
 				empty
 			} else {
@@ -97,7 +97,7 @@ extension HiddenAssets {
 		}
 
 		private func unhideButton(asset: AssetAddress) -> some SwiftUI.View {
-			Button("Unhide") {
+			Button(L10n.HiddenAssets.unhide) {
 				store.send(.view(.unhideTapped(asset)))
 			}
 			.buttonStyle(.secondaryRectangular(shouldExpand: false))
@@ -112,7 +112,7 @@ extension HiddenAssets {
 				))
 				.hidden()
 
-				Text("None")
+				Text(L10n.Common.none)
 					.textStyle(.secondaryHeader)
 					.foregroundColor(.app.gray2)
 			}
