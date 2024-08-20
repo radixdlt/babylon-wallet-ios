@@ -83,12 +83,12 @@ extension HiddenAssets {
 				empty
 			} else {
 				VStack(spacing: .medium3) {
-					ForEachStatic(store.poolUnit) { resource in
+					ForEachStatic(store.poolUnit) { poolUnit in
 						Card {
 							PlainListRow(viewState: .init(
-								rowCoreViewState: .init(context: .hiddenAsset, title: resource.metadata.name ?? "Pool Unit"),
-								accessory: { unhideButton(asset: .poolUnit(resource.address)) },
-								icon: { Thumbnail(.poolUnit, url: resource.metadata.iconURL) }
+								rowCoreViewState: poolUnit.rowCoreViewState,
+								accessory: { unhideButton(asset: .poolUnit(poolUnit.details.address)) },
+								icon: { Thumbnail(.poolUnit, url: poolUnit.resource.metadata.iconURL) }
 							))
 						}
 					}
@@ -125,5 +125,11 @@ extension HiddenAssets {
 private extension OnLedgerEntity.NonFungibleToken {
 	var rowCoreViewState: PlainListRowCore.ViewState {
 		.init(context: .hiddenAsset, title: data?.name, subtitle: id.nonFungibleLocalId.formatted())
+	}
+}
+
+private extension HiddenAssets.State.PoolUnitDetails {
+	var rowCoreViewState: PlainListRowCore.ViewState {
+		.init(context: .hiddenAsset, title: "-", subtitle: details.dAppName ?? "-")
 	}
 }

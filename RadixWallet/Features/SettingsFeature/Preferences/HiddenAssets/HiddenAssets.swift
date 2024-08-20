@@ -7,10 +7,15 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		var fungible: [OnLedgerEntity.Resource] = []
 		var nonFungible: [OnLedgerEntity.NonFungibleToken] = []
-		var poolUnit: [OnLedgerEntity.ResourcePool] = []
+		var poolUnit: [PoolUnitDetails] = []
 
 		@Presents
 		var destination: Destination.State? = nil
+
+		public struct PoolUnitDetails: Sendable, Hashable {
+			let resource: OnLedgerEntity.Resource
+			let details: OnLedgerEntitiesClient.OwnedResourcePoolDetails
+		}
 	}
 
 	public typealias Action = FeatureAction<Self>
@@ -25,7 +30,7 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 		case loadAssets([AssetAddress])
 		case setFungible([OnLedgerEntity.Resource])
 		case setNonFungible([OnLedgerEntity.NonFungibleToken])
-		case setPoolUnit([OnLedgerEntity.ResourcePool])
+		case setPoolUnit([State.PoolUnitDetails])
 		case didUnhideAsset(AssetAddress)
 	}
 
@@ -108,7 +113,7 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 			case let .nonFungible(globalId):
 				state.nonFungible.removeAll(where: { $0.id == globalId })
 			case let .poolUnit(poolAddress):
-				state.poolUnit.removeAll(where: { $0.address == poolAddress })
+				state.poolUnit.removeAll(where: { $0.details.address == poolAddress })
 			}
 			state.destination = nil
 			return .none
@@ -153,8 +158,19 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 
 	private func poolUnitEffect(hiddenAssets: [AssetAddress]) -> Effect<Action> {
 		.run { send in
-			let resources = try await onLedgerEntitiesClient.getEntities(addresses: hiddenAssets.poolUnitAddresses, metadataKeys: .resourceMetadataKeys).compactMap(\.resourcePool)
-			await send(.internal(.setPoolUnit(resources)))
+			let resourcePools = try await onLedgerEntitiesClient.getEntities(addresses: hiddenAssets.poolUnitAddresses, metadataKeys: .resourceMetadataKeys).compactMap(\.resourcePool)
+			let resources = try await resourcePools.parallelMap {
+				try await onLedgerEntitiesClient.getResource($0.poolUnitResourceAddress)
+			}
+			let poolUnitDetails = try await resources.parallelMap { resource in
+				if let details = try await onLedgerEntitiesClient.getPoolUnitDetails(resource, forAmount: .one) {
+					State.PoolUnitDetails(resource: resource, details: details)
+				} else {
+					nil
+				}
+			}
+			.compactMap { $0 }
+			await send(.internal(.setPoolUnit(poolUnitDetails)))
 		}
 	}
 }
