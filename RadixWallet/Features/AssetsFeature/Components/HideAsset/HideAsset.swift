@@ -103,8 +103,7 @@ private extension HideAsset {
 			if isXrd {
 				await send(.internal(.setShouldShow(false)))
 			} else {
-				let hiddenAssets = await appPreferencesClient.getPreferences().assets.hiddenAssets
-				let isAlreadyHidden = hiddenAssets.contains(state.asset)
+				let isAlreadyHidden = await appPreferencesClient.isAssetHidden(asset: state.asset)
 				await send(.internal(.setShouldShow(!isAlreadyHidden)))
 			}
 		}

@@ -70,6 +70,14 @@ extension AppPreferencesClient {
 			display.isCurrencyAmountVisible.toggle()
 		}
 	}
+
+	public func getHiddenAssets() async -> [AssetAddress] {
+		await getPreferences().assets.hiddenAssets
+	}
+
+	public func isAssetHidden(asset: AssetAddress) async -> Bool {
+		await getHiddenAssets().contains(asset)
+	}
 }
 
 // MARK: AppPreferencesClient.Error

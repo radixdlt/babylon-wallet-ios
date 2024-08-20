@@ -151,7 +151,7 @@ extension AccountPortfoliosClient: DependencyKey {
 			}
 
 			let account = try await onLedgerEntitiesClient.getAccount(accountAddress)
-			let hiddenAssets = await appPreferencesClient.getPreferences().assets.hiddenAssets
+			let hiddenAssets = await appPreferencesClient.getHiddenAssets()
 			let portfolio = AccountPortfolio(account: account, hiddenAssets: hiddenAssets)
 
 			if case let .success(tokenPrices) = await state.tokenPrices {

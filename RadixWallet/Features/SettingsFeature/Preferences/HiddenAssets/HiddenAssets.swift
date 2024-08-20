@@ -63,7 +63,7 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 		switch viewAction {
 		case .task:
 			return .run { send in
-				let hiddenAssets = await appPreferencesClient.getPreferences().assets.hiddenAssets
+				let hiddenAssets = await appPreferencesClient.getHiddenAssets()
 				await send(.internal(.loadAssets(hiddenAssets)))
 			}
 		case let .unhideTapped(asset):
