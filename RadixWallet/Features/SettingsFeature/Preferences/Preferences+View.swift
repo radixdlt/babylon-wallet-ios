@@ -85,7 +85,7 @@ extension Preferences.View {
 				icon: .asset(AssetResource.depositGuarantees),
 				action: .depositGuaranteesButtonTapped
 			),
-			.header("Display"),
+			.header(L10n.Preferences.displayPreferences),
 			.model(
 				title: L10n.Preferences.HiddenEntities.title,
 				subtitle: L10n.Preferences.HiddenEntities.subtitle,
@@ -93,8 +93,8 @@ extension Preferences.View {
 				action: .hiddenEntitiesButtonTapped
 			),
 			.model(
-				title: "Hidden Assets",
-				subtitle: "Manage hidden Tokens, NFTs and other asset types",
+				title: L10n.Preferences.HiddenAssets.title,
+				subtitle: L10n.Preferences.HiddenAssets.subtitle,
 				icon: .systemImage("eye.fill"),
 				action: .hiddenAssetsButtonTapped
 			),
