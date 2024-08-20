@@ -5,7 +5,8 @@ import SwiftUI
 public struct SelectFeePayer: Sendable, FeatureReducer {
 	public typealias FeePayerCandidates = NonEmpty<IdentifiedArrayOf<FeePayerCandidate>>
 
-	public struct ValidatedFeePayerCandidate {
+	public struct ValidatedFeePayerCandidate: Sendable, Hashable, Identifiable {
+		public var id: FeePayerCandidate.ID { candidate.id }
 		public let candidate: FeePayerCandidate
 		public let outcome: FeePayerValidationOutcome
 	}
