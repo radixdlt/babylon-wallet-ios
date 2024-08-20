@@ -27,8 +27,9 @@ extension AccountPortfoliosClient {
 				hiddenAssets.contains(.poolUnit(poolUnit.resourcePoolAddress))
 			})
 
-			// We cannot remove the NFTs, since at this moment we haven't loaded them yet
-			// All we can do is decrease the count for each resource
+			// We cannot remove the NFTs, since at this moment we haven't loaded them yet.
+			// All we can do is update the `nonFungibleIdsCount` to remove the hidden ones.
+			// Then, when loading the actual tokens, we will filter those that are hidden.
 			var nonFungibleResources: [OnLedgerEntity.OwnedNonFungibleResource] = []
 			for var item in modified.nonFungibleResources {
 				let countHidden = hiddenAssets.filter { asset in
