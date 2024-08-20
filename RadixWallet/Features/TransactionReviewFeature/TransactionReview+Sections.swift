@@ -645,7 +645,7 @@ extension TransactionReview {
 					guarantee: nil
 				)
 
-				return [.init(resource: resource, details: .fungible(details))]
+				return [.init(resource: resource, details: .fungible(details), isHidden: false)]
 			}
 
 		case let .nonFungible(_, indicator):

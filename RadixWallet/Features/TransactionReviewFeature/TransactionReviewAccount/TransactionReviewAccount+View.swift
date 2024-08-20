@@ -99,7 +99,7 @@ struct TransactionReviewResourceView: View {
 	var body: some View {
 		switch transfer.details {
 		case .fungible, .nonFungible, .liquidStakeUnit, .poolUnit:
-			ResourceBalanceButton(transfer.viewState, appearance: .transactionReview) {
+			ResourceBalanceButton(transfer.viewState, appearance: .transactionReview, warning: warning) {
 				onTap(nil)
 			}
 		case let .stakeClaimNFT(details):
@@ -107,6 +107,13 @@ struct TransactionReviewResourceView: View {
 				onTap(stakeClaim.token)
 			}
 		}
+	}
+
+	private var warning: String? {
+		guard let isHidden = transfer.isHidden, isHidden else {
+			return nil
+		}
+		return "This asset is hidden and will not be visible in your Account"
 	}
 }
 
