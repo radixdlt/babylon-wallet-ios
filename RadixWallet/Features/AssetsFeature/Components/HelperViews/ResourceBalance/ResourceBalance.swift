@@ -11,7 +11,7 @@ public struct ResourceBalance: Sendable, Hashable {
 	public let resource: OnLedgerEntity.Resource
 	public var details: Details
 
-	/// Indicates whether the reosurce is hidden in user's profile.
+	/// Indicates whether the resource is hidden in user's profile.
 	/// Value is optional since we won't check for cases that it doesn't matter.
 	public let isHidden: Bool?
 

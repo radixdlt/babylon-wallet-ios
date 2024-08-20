@@ -113,7 +113,7 @@ struct TransactionReviewResourceView: View {
 		guard let isHidden = transfer.isHidden, isHidden else {
 			return nil
 		}
-		return "This asset is hidden and will not be visible in your Account"
+		return L10n.TransactionReview.hiddenAsset
 	}
 }
 
