@@ -54,7 +54,7 @@ extension Sheet {
 					.textStyle(.sheetTitle)
 					.foregroundColor(.app.gray1)
 					.multilineTextAlignment(.center)
-					.padding(.bottom, .medium3)
+					.padding(.bottom, .large2)
 			case let .heading2(heading2):
 				Text(heading2)
 					.textStyle(.sectionHeader)
@@ -74,6 +74,11 @@ extension Sheet {
 					.multilineTextAlignment(.leading)
 					.flushedLeft
 					.padding(.bottom, .small3)
+			case .divider:
+				Divider()
+					.padding(.top, .small1)
+					.padding(.horizontal, -.small2)
+					.padding(.bottom, .large2)
 			}
 		}
 	}
@@ -86,6 +91,7 @@ extension Sheet {
 		case heading2(String)
 		case heading3(String)
 		case text(AttributedString)
+		case divider
 	}
 }
 
@@ -97,6 +103,8 @@ extension Sheet.State {
 			.heading2(String(row.dropFirst(3)))
 		} else if row.hasPrefix("### ") {
 			.heading3(String(row.dropFirst(4)))
+		} else if row.hasPrefix("---") {
+			.divider
 		} else {
 			nil
 		}

@@ -83,6 +83,33 @@ extension OverlayWindowClient.InfoLink.InfoItem {
 }
 
 extension OverlayWindowClient.InfoLink.GlossaryItem {
+//	var image: Image {
+//		switch self {
+//		case .radixnetwork:
+//		case .radquest:
+//		case .tokens:
+//		case .nfts:
+//		case .web3:
+//		case .accounts:
+//		case .personas:
+//		case .radixwallet:
+//		case .dapps:
+//		case .transactions:
+//		case .transactionfee:
+//		case .xrd:
+//		case .badges:
+//		case .transfers:
+//		case .dex:
+//		case .guarantees:
+//		case .networkstaking:
+//		case .validators:
+//		case .radixconnector:
+//		case .connectbutton:
+//		case .dashboard:
+//		case .bridging:
+//		}
+//	}
+
 	var string: String {
 		switch self {
 		case .radixnetwork:
