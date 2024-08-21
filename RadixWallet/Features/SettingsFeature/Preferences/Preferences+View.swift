@@ -170,7 +170,7 @@ private extension View {
 
 	private func hiddenEntities(with destinationStore: PresentationStoreOf<Preferences.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.hiddenEntities, action: \.hiddenEntities)) {
-			AccountAndPersonaHiding.View(store: $0)
+			HiddenEntities.View(store: $0)
 		}
 	}
 
