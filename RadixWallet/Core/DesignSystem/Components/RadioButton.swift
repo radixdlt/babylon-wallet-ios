@@ -3,7 +3,8 @@ public struct RadioButton: View {
 	public enum State {
 		case unselected
 		case selected
-		case disabled
+		case disabledSelected
+		case disabledUnselected
 	}
 
 	public enum Appearance {
@@ -30,14 +31,18 @@ extension RadioButton {
 			AssetResource.radioButtonLightUnselected
 		case (.light, .selected):
 			AssetResource.radioButtonLightSelected
-		case (.light, .disabled):
+		case (.light, .disabledSelected):
 			AssetResource.radioButtonLightDisabled
+		case (.light, .disabledUnselected):
+			AssetResource.radioButtonLightDisabledUnselected
 		case (.dark, .unselected):
 			AssetResource.radioButtonDarkUnselected
 		case (.dark, .selected):
 			AssetResource.radioButtonDarkSelected
-		case (.dark, .disabled):
+		case (.dark, .disabledSelected):
 			AssetResource.radioButtonDarkDisabled
+		case (.dark, .disabledUnselected):
+			AssetResource.radioButtonDarkDisabledUnselected
 		}
 
 		return Image(asset: resource)
