@@ -102,14 +102,14 @@ extension SelectFeePayer {
 // MARK: - SelectAccountToPayForFeeRow
 enum SelectAccountToPayForFeeRow {
 	struct ViewState: Equatable {
-		let insufficientBalance: Bool
 		let account: Account
 		let fungible: ResourceBalance.ViewState.Fungible
+		let isBalanceInsufficient: Bool
 
 		init(candidate: ValidatedFeePayerCandidate) {
-			self.insufficientBalance = candidate.outcome == .insufficientBalance
 			self.account = candidate.candidate.account
 			self.fungible = .xrd(balance: .init(nominalAmount: candidate.candidate.xrdBalance), network: account.networkID)
+			self.isBalanceInsufficient = candidate.outcome == .insufficientBalance
 		}
 	}
 
@@ -120,32 +120,35 @@ enum SelectAccountToPayForFeeRow {
 		let action: () -> Void
 
 		var buttonState: RadioButton.State {
-			viewState.insufficientBalance ? .disabled : (isSelected ? .selected : .unselected)
+			isSelected ? .selected : .unselected
+		}
+
+		var isDisabled: Bool {
+			viewState.isBalanceInsufficient
 		}
 
 		var body: some SwiftUI.View {
-			VStack(alignment: .leading) {
-				Button(action: action) {
-					Card {
-						VStack(spacing: .zero) {
-							AccountCard(kind: .innerCompact, account: viewState.account)
+			Button(action: action) {
+				Card {
+					VStack(alignment: .leading, spacing: .zero) {
+						AccountCard(kind: .innerCompact, account: viewState.account)
 
-							HStack {
-								ResourceBalanceView(.fungible(viewState.fungible), appearance: .compact)
+						HStack {
+							ResourceBalanceView(.fungible(viewState.fungible), appearance: .compact)
 
-								RadioButton(appearance: .dark, state: buttonState)
-							}
-							.padding(.medium3)
+							RadioButton(appearance: .dark, state: buttonState, disabled: isDisabled)
+						}
+						.padding(.medium3)
+
+						if viewState.isBalanceInsufficient {
+							WarningErrorView(text: L10n.TransactionReview.FeePayerValidation.insufficientBalance, type: .error)
+								.padding([.horizontal, .bottom], .medium3)
 						}
 					}
 				}
-				.buttonStyle(.inert)
-				.disabled(buttonState == .disabled)
-
-				if viewState.insufficientBalance {
-					WarningErrorView(text: L10n.TransactionReview.FeePayerValidation.insufficientBalance, type: .error)
-				}
 			}
+			.buttonStyle(.inert)
+			.disabled(isDisabled)
 		}
 	}
 }
