@@ -151,7 +151,12 @@ extension NonFungibleAssetList {
 }
 
 private extension NonFungibleAssetList.Row.InternalAction.TokensLoadResult {
-	init(tokens: [OnLedgerEntity.NonFungibleToken], hiddenAssets: [AssetAddress], nextPageCursor: String?, previousTokenIndex: Int) {
+	init(
+		tokens: [OnLedgerEntity.NonFungibleToken],
+		hiddenAssets: [AssetAddress],
+		nextPageCursor: String?,
+		previousTokenIndex: Int
+	) {
 		self.tokens = tokens.filter { token in
 			!hiddenAssets.contains(.nonFungible(token.id))
 		}

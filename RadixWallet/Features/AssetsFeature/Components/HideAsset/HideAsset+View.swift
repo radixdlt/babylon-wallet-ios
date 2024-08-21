@@ -1,5 +1,4 @@
 // MARK: - HideAsset.View
-
 public extension HideAsset {
 	struct View: SwiftUI.View {
 		private let store: StoreOf<HideAsset>
