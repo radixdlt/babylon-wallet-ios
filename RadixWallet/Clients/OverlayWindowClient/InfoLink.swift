@@ -83,25 +83,19 @@ extension OverlayWindowClient.GlossaryItem {
 		case .badges:
 			L10n.InfoLink.Glossary.badges
 		case .poolunits:
-//			L10n.InfoLink.Glossary.poolunits
-			"FIXME: String"
+			L10n.InfoLink.Glossary.poolunits
 		case .gateways:
-//			L10n.InfoLink.Glossary.gateways
-			"FIXME: String"
+			L10n.InfoLink.Glossary.gateways
 		case .radixconnect:
-//			L10n.InfoLink.Glossary.radixconnect
-			"FIXME: String"
+			L10n.InfoLink.Glossary.radixconnect
 		case .transactionfee:
 			L10n.InfoLink.Glossary.transactionfee
 		case .behaviors:
-//			L10n.InfoLink.Glossary.behaviors
-			"FIXME: String"
+			L10n.InfoLink.Glossary.behaviors
 		case .claimnfts:
-//			L10n.InfoLink.Glossary.claimnfts
-			"FIXME: String"
+			L10n.InfoLink.Glossary.claimnfts
 		case .liquidstakeunits:
-//			L10n.InfoLink.Glossary.liquidstakeunits
-			"FIXME: String"
+			L10n.InfoLink.Glossary.liquidstakeunits
 		case .radixnetwork:
 			L10n.InfoLink.Glossary.radixnetwork
 		case .accounts:
@@ -129,8 +123,7 @@ extension OverlayWindowClient.GlossaryItem {
 		case .bridging:
 			L10n.InfoLink.Glossary.bridging
 		case .payingaccount:
-//			L10n.InfoLink.Glossary.payingaccount
-			"FIXME: String"
+			L10n.InfoLink.Glossary.payingaccount
 		}
 	}
 }
