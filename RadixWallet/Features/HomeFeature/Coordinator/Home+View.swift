@@ -56,6 +56,12 @@ extension Home {
 						}
 						.padding(.horizontal, .medium1)
 
+						// FIXME: Revert
+						InfoButton(.radixnetwork)
+							.border(.green)
+
+						InfoButton(.behaviors, label: "Read about behaviours")
+
 						Button(L10n.HomePage.createNewAccount) {
 							store.send(.view(.createAccountButtonTapped))
 						}
