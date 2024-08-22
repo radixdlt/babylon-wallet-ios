@@ -34,7 +34,7 @@ extension Sheet {
 
 		private var openURL: OpenURLAction {
 			OpenURLAction { url in
-				if let infoLink = OverlayWindowClient.InfoLink(url: url) {
+				if let infoLink = OverlayWindowClient.GlossaryItem(url: url) {
 					store.send(.view(.infoLinkTapped(infoLink)))
 					return .handled
 				} else {
@@ -49,18 +49,12 @@ extension Sheet {
 
 		var body: some SwiftUI.View {
 			switch part {
-			case let .heading1(heading1):
-				Text(heading1)
+			case let .heading2(heading2):
+				Text(heading2)
 					.textStyle(.sheetTitle)
 					.foregroundColor(.app.gray1)
 					.multilineTextAlignment(.center)
 					.padding(.bottom, .large2)
-			case let .heading2(heading2):
-				Text(heading2)
-					.textStyle(.sectionHeader)
-					.foregroundColor(.app.gray1)
-					.multilineTextAlignment(.center)
-					.padding(.bottom, .medium3)
 			case let .heading3(heading3):
 				Text(heading3)
 					.textStyle(.body1Header)
@@ -75,7 +69,7 @@ extension Sheet {
 					.flushedLeft
 					.padding(.bottom, .small3)
 			case .divider:
-				Divider()
+				Separator()
 					.padding(.top, .small1)
 					.padding(.horizontal, -.small2)
 					.padding(.bottom, .large2)
@@ -87,7 +81,6 @@ extension Sheet {
 // MARK: - Sheet.Part
 extension Sheet {
 	enum Part: Hashable {
-		case heading1(String)
 		case heading2(String)
 		case heading3(String)
 		case text(AttributedString)
@@ -96,21 +89,11 @@ extension Sheet {
 }
 
 extension Sheet.State {
-	private func heading(from row: Substring) -> Sheet.Part? {
-		if row.hasPrefix("# ") {
-			.heading1(String(row.dropFirst(2)))
-		} else if row.hasPrefix("## ") {
-			.heading2(String(row.dropFirst(3)))
-		} else if row.hasPrefix("### ") {
-			.heading3(String(row.dropFirst(4)))
-		} else if row.hasPrefix("---") {
-			.divider
-		} else {
-			nil
-		}
+	var parts: [Sheet.Part] {
+		Self.parse(string: text)
 	}
 
-	var parts: [Sheet.Part] {
+	private static func parse(string: String) -> [Sheet.Part] {
 		var result: [Sheet.Part] = []
 		var currentText = ""
 
@@ -121,8 +104,8 @@ extension Sheet.State {
 			}
 		}
 
-		for row in text.split(separator: "\n", omittingEmptySubsequences: false) {
-			if let heading = heading(from: row) {
+		for row in string.split(separator: "\n", omittingEmptySubsequences: false) {
+			if let heading = nonTextPart(from: row) {
 				addCurrentText()
 				result.append(heading)
 			} else {
@@ -136,6 +119,18 @@ extension Sheet.State {
 		addCurrentText()
 
 		return result
+	}
+
+	private static func nonTextPart(from row: Substring) -> Sheet.Part? {
+		if row.hasPrefix("## ") {
+			.heading2(String(row.dropFirst(3)))
+		} else if row.hasPrefix("### ") {
+			.heading3(String(row.dropFirst(4)))
+		} else if row.hasPrefix("---") {
+			.divider
+		} else {
+			nil
+		}
 	}
 }
 

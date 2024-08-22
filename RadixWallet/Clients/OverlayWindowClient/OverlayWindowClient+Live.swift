@@ -64,8 +64,8 @@ extension OverlayWindowClient: DependencyKey {
 }
 
 extension OverlayWindowClient {
-	public func showInfoLink(_ infoLink: InfoLink) {
-		scheduleSheet(.init(text: infoLink.string), .replace)
+	public func showInfoLink(_ item: GlossaryItem) {
+		scheduleSheet(.init(text: item.string), .replace)
 	}
 }
 

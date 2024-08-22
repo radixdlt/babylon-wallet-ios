@@ -4,7 +4,7 @@ public struct Sheet: FeatureReducer {
 	public typealias State = OverlayWindowClient.Item.SheetState
 
 	public enum ViewAction: Equatable, Sendable {
-		case infoLinkTapped(OverlayWindowClient.InfoLink)
+		case infoLinkTapped(OverlayWindowClient.GlossaryItem)
 		case closeButtonTapped
 	}
 

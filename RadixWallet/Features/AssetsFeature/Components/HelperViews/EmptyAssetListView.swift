@@ -29,7 +29,7 @@ extension EmptyAssetListView {
 	}
 
 	static var nonFungibleResources: Self {
-		.init(viewState: .init(imageAsset: AssetResource.nonfungbileTokens, description: L10n.AssetDetails.NFTDetails.noNfts))
+		.init(viewState: .init(imageAsset: AssetResource.nft, description: L10n.AssetDetails.NFTDetails.noNfts))
 	}
 
 	static var stakes: Self {
