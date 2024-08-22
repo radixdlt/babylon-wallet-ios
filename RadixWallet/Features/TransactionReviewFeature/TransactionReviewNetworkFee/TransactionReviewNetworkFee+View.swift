@@ -66,7 +66,7 @@ extension TransactionReviewNetworkFee {
 						.foregroundColor(.app.blue2)
 					}
 				}
-				.task {
+				.task(id: viewStore.id) {
 					viewStore.send(.task)
 				}
 			}

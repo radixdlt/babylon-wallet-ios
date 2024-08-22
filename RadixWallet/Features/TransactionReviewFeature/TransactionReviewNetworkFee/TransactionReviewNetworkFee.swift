@@ -6,11 +6,13 @@ public struct TransactionReviewNetworkFee: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var reviewedTransaction: ReviewedTransaction
 		public var fiatValue: Loadable<String> = .idle
+		let id: UUID
 
 		public init(
 			reviewedTransaction: ReviewedTransaction
 		) {
 			self.reviewedTransaction = reviewedTransaction
+			self.id = .init()
 		}
 	}
 
