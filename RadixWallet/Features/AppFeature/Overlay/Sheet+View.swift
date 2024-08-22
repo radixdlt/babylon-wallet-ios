@@ -17,27 +17,37 @@ extension Sheet {
 					}
 					.padding(.horizontal, .small3)
 
-					ScrollView {
-						VStack(spacing: .zero) {
-							if let image = viewStore.image {
-								Image(asset: image)
-									.resizable()
-									.frame(.veryLarge)
-									.padding(.bottom, .medium2)
-							}
+					ScrollViewReader { proxy in
+						ScrollView {
+							VStack(spacing: .zero) {
+								if let image = viewStore.image {
+									Image(asset: image)
+										.resizable()
+										.frame(.veryLarge)
+										.padding(.bottom, .medium2)
+								}
 
-							ForEach(viewStore.parts, id: \.self) { part in
-								PartView(part: part)
+								ForEach(viewStore.parts, id: \.self) { part in
+									PartView(part: part)
+								}
+								.environment(\.openURL, openURL)
+								.padding(.horizontal, .large2)
 							}
-							.environment(\.openURL, openURL)
-							.padding(.horizontal, .large2)
+							.padding(.top, .small2)
+							.id(scrollViewTopID)
 						}
-						.padding(.top, .small2)
+						.animation(.default, value: viewStore.text)
+						.onChange(of: viewStore.text) { _ in
+							withAnimation {
+								proxy.scrollTo(scrollViewTopID, anchor: .top)
+							}
+						}
 					}
-					.animation(.default, value: viewStore.text)
 				}
 			}
 		}
+
+		private let scrollViewTopID = "scrollViewTopID"
 
 		private var openURL: OpenURLAction {
 			OpenURLAction { url in
