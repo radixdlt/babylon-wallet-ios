@@ -30,7 +30,7 @@ public struct Preferences: Sendable, FeatureReducer {
 		@CasePathable
 		public enum State: Sendable, Hashable {
 			case depositGuarantees(DefaultDepositGuarantees.State)
-			case hiddenEntities(AccountAndPersonaHiding.State)
+			case hiddenEntities(HiddenEntities.State)
 			case hiddenAssets(HiddenAssets.State)
 			case gateways(GatewaySettings.State)
 		}
@@ -38,7 +38,7 @@ public struct Preferences: Sendable, FeatureReducer {
 		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case depositGuarantees(DefaultDepositGuarantees.Action)
-			case hiddenEntities(AccountAndPersonaHiding.Action)
+			case hiddenEntities(HiddenEntities.Action)
 			case hiddenAssets(HiddenAssets.Action)
 			case gateways(GatewaySettings.Action)
 		}
@@ -48,7 +48,7 @@ public struct Preferences: Sendable, FeatureReducer {
 				DefaultDepositGuarantees()
 			}
 			Scope(state: \.hiddenEntities, action: \.hiddenEntities) {
-				AccountAndPersonaHiding()
+				HiddenEntities()
 			}
 			Scope(state: \.hiddenAssets, action: \.hiddenAssets) {
 				HiddenAssets()

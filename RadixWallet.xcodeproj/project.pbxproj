@@ -871,6 +871,8 @@
 		48FFFB082ADC6FD300B2B213 /* SwiftUINavigationCore in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB072ADC6FD300B2B213 /* SwiftUINavigationCore */; };
 		48FFFB0A2ADC721800B2B213 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB092ADC721800B2B213 /* Atomics */; };
 		48FFFB0D2ADC744700B2B213 /* TextBuilder in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB0C2ADC744700B2B213 /* TextBuilder */; };
+		5B135B392C7636DA004AAD2E /* HiddenEntities+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B135B382C7636DA004AAD2E /* HiddenEntities+View.swift */; };
+		5B135B3B2C7636FD004AAD2E /* HiddenEntities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B135B3A2C7636FD004AAD2E /* HiddenEntities.swift */; };
 		5B1C4FD52BBB0B0C00B9436F /* AppsFlyerLib-Strict in Frameworks */ = {isa = PBXBuildFile; productRef = 5B1C4FD42BBB0B0C00B9436F /* AppsFlyerLib-Strict */; };
 		5B1C4FD82BBB0C1E00B9436F /* AppsFlyerClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1C4FD72BBB0C1E00B9436F /* AppsFlyerClient+Interface.swift */; };
 		5B1C4FDA2BBB0DCF00B9436F /* AppsFlyerClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1C4FD92BBB0DCF00B9436F /* AppsFlyerClient+Live.swift */; };
@@ -926,10 +928,7 @@
 		8308184C2B9F169B002D8351 /* TokenPriceClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8308184B2B9F169B002D8351 /* TokenPriceClient+Live.swift */; };
 		8308184E2B9F16AD002D8351 /* TokenPriceClient+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8308184D2B9F16AD002D8351 /* TokenPriceClient+Mock.swift */; };
 		830E43AF2C2D8B5100B6E95F /* SessionStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830E43AE2C2D8B5100B6E95F /* SessionStorageTests.swift */; };
-		830EA9D62AE94033004C8051 /* AccountAndPersonaHiding+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9D52AE94033004C8051 /* AccountAndPersonaHiding+Reducer.swift */; };
 		830EA9DB2AEA8770004C8051 /* EntitiesVisibilityClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9DA2AEA8770004C8051 /* EntitiesVisibilityClient+Interface.swift */; };
-		830EA9DD2AEB8197004C8051 /* AccountAndPersonaHiding+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9DC2AEB8197004C8051 /* AccountAndPersonaHiding+View.swift */; };
-		830EA9E02AEB8219004C8051 /* AccountAndPersonaHidingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9DF2AEB8219004C8051 /* AccountAndPersonaHidingTests.swift */; };
 		830EA9E52AEB9088004C8051 /* DefaultValueDecodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9E42AEB9088004C8051 /* DefaultValueDecodable.swift */; };
 		830EA9E72AEBA793004C8051 /* EntitiesVisibilityClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9E62AEBA793004C8051 /* EntitiesVisibilityClient+Live.swift */; };
 		830EA9E92AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9E82AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift */; };
@@ -2027,6 +2026,8 @@
 		48DD0FF62BCBCBB900C54C43 /* Stage1MigrateToSargon+AssetException.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+AssetException.swift"; sourceTree = "<group>"; };
 		48FF43142AE43C7C00C568B9 /* TimeLimit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeLimit.swift; sourceTree = "<group>"; };
 		48FFFAF12ADC23AC00B2B213 /* Exports.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exports.swift; sourceTree = "<group>"; };
+		5B135B382C7636DA004AAD2E /* HiddenEntities+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HiddenEntities+View.swift"; sourceTree = "<group>"; };
+		5B135B3A2C7636FD004AAD2E /* HiddenEntities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HiddenEntities.swift; sourceTree = "<group>"; };
 		5B1C4FD72BBB0C1E00B9436F /* AppsFlyerClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppsFlyerClient+Interface.swift"; sourceTree = "<group>"; };
 		5B1C4FD92BBB0DCF00B9436F /* AppsFlyerClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppsFlyerClient+Live.swift"; sourceTree = "<group>"; };
 		5B272DD62C36E89600B74F1F /* AppEventsClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppEventsClient+Interface.swift"; sourceTree = "<group>"; };
@@ -2081,10 +2082,7 @@
 		8308184B2B9F169B002D8351 /* TokenPriceClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TokenPriceClient+Live.swift"; sourceTree = "<group>"; };
 		8308184D2B9F16AD002D8351 /* TokenPriceClient+Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TokenPriceClient+Mock.swift"; sourceTree = "<group>"; };
 		830E43AE2C2D8B5100B6E95F /* SessionStorageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStorageTests.swift; sourceTree = "<group>"; };
-		830EA9D52AE94033004C8051 /* AccountAndPersonaHiding+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountAndPersonaHiding+Reducer.swift"; sourceTree = "<group>"; };
 		830EA9DA2AEA8770004C8051 /* EntitiesVisibilityClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EntitiesVisibilityClient+Interface.swift"; sourceTree = "<group>"; };
-		830EA9DC2AEB8197004C8051 /* AccountAndPersonaHiding+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountAndPersonaHiding+View.swift"; sourceTree = "<group>"; };
-		830EA9DF2AEB8219004C8051 /* AccountAndPersonaHidingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountAndPersonaHidingTests.swift; sourceTree = "<group>"; };
 		830EA9E22AEB8933004C8051 /* EntitiesHidingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitiesHidingTests.swift; sourceTree = "<group>"; };
 		830EA9E42AEB9088004C8051 /* DefaultValueDecodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultValueDecodable.swift; sourceTree = "<group>"; };
 		830EA9E62AEBA793004C8051 /* EntitiesVisibilityClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EntitiesVisibilityClient+Live.swift"; sourceTree = "<group>"; };
@@ -2563,7 +2561,6 @@
 				5B45E2F32BC45706007C4C84 /* FactorSourceAccess */,
 				A41557512B7645D40040AD4E /* TransactionHistory */,
 				48AE39D82B0CBE3900813CF3 /* AccountRecoveryScan */,
-				830EA9D42AE94014004C8051 /* AccountAndPersonaHidingFeature */,
 				48CFBC6C2ADC10D800E77A5C /* AccountPreferencesFeature */,
 				48CFBC7D2ADC10D800E77A5C /* GatewaySettingsFeature */,
 				48CFBC8B2ADC10D800E77A5C /* SplashFeature */,
@@ -5597,6 +5594,15 @@
 			path = KeychainClientTests;
 			sourceTree = "<group>";
 		};
+		5B135B372C7636B6004AAD2E /* HiddenEntities */ = {
+			isa = PBXGroup;
+			children = (
+				5B135B382C7636DA004AAD2E /* HiddenEntities+View.swift */,
+				5B135B3A2C7636FD004AAD2E /* HiddenEntities.swift */,
+			);
+			path = HiddenEntities;
+			sourceTree = "<group>";
+		};
 		5B1C4FD62BBB0C0100B9436F /* AppsFlyerClient */ = {
 			isa = PBXGroup;
 			children = (
@@ -5668,6 +5674,7 @@
 				5B758D552BCE7AEC00348722 /* Preferences+View.swift */,
 				5B758D562BCE7AEC00348722 /* Preferences.swift */,
 				48CFBD8F2ADC10D800E77A5C /* DefaultDepositGuarantees */,
+				5B135B372C7636B6004AAD2E /* HiddenEntities */,
 				5BFA4FB72C736B500030B517 /* HiddenAssets */,
 			);
 			path = Preferences;
@@ -5739,15 +5746,6 @@
 			path = Mobile;
 			sourceTree = "<group>";
 		};
-		830EA9D42AE94014004C8051 /* AccountAndPersonaHidingFeature */ = {
-			isa = PBXGroup;
-			children = (
-				830EA9D52AE94033004C8051 /* AccountAndPersonaHiding+Reducer.swift */,
-				830EA9DC2AEB8197004C8051 /* AccountAndPersonaHiding+View.swift */,
-			);
-			path = AccountAndPersonaHidingFeature;
-			sourceTree = "<group>";
-		};
 		830EA9D92AEA8750004C8051 /* EntitiesVisibilityClient */ = {
 			isa = PBXGroup;
 			children = (
@@ -5756,14 +5754,6 @@
 				830EA9E82AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift */,
 			);
 			path = EntitiesVisibilityClient;
-			sourceTree = "<group>";
-		};
-		830EA9DE2AEB8201004C8051 /* AccountAndPersonaHidingTests */ = {
-			isa = PBXGroup;
-			children = (
-				830EA9DF2AEB8219004C8051 /* AccountAndPersonaHidingTests.swift */,
-			);
-			path = AccountAndPersonaHidingTests;
 			sourceTree = "<group>";
 		};
 		831F0CF02C2576AE00D6F5BF /* DappOriginVerification */ = {
@@ -6214,7 +6204,6 @@
 			isa = PBXGroup;
 			children = (
 				83EE474E2AF027CE00155F03 /* AssetTransferTests */,
-				830EA9DE2AEB8201004C8051 /* AccountAndPersonaHidingTests */,
 				8328806A2AE6724B0014FBF3 /* AccountPreferencesTests */,
 				E6DBA2782ADEBFB200A38425 /* SettingsFeatureTests */,
 				E6DBA27B2ADEBFB200A38425 /* AppFeatureTests */,
@@ -6891,7 +6880,6 @@
 				E6DBA31C2ADEBFB300A38425 /* RadixConnectE2E.swift in Sources */,
 				E6DBA3282ADEBFB300A38425 /* Misc+Extensions.swift in Sources */,
 				E6DBA3432ADEBFB300A38425 /* UserDefaultsClientTests.swift in Sources */,
-				830EA9E02AEB8219004C8051 /* AccountAndPersonaHidingTests.swift in Sources */,
 				E6DBA31A2ADEBFB300A38425 /* DataChannelClientTests.swift in Sources */,
 				E6DBA32B2ADEBFB300A38425 /* JSON+Sendable.swift in Sources */,
 				E6DBA3202ADEBFB300A38425 /* PeerConnectionMocks.swift in Sources */,
@@ -7161,7 +7149,6 @@
 				48CFC50A2ADC10DA00E77A5C /* InvalidTransactionError.swift in Sources */,
 				48CFC2BF2ADC10D900E77A5C /* ImportMnemonicsFlowCoordinator.swift in Sources */,
 				48CFC3632ADC10D900E77A5C /* AssetsView+Reducer.swift in Sources */,
-				830EA9DD2AEB8197004C8051 /* AccountAndPersonaHiding+View.swift in Sources */,
 				48CFC2792ADC10D900E77A5C /* P2PLinkRow+Reducer.swift in Sources */,
 				48CFC30F2ADC10D900E77A5C /* ImportOlympiaWalletCoordinator.swift in Sources */,
 				E68878592BDBFD42003F3393 /* Stage2MigrateToSargon+LedgerHardwareWalletFactorSource+New.swift in Sources */,
@@ -7249,6 +7236,7 @@
 				48CFC65C2ADC10DB00E77A5C /* Profile+Persona+Add.swift in Sources */,
 				48CFC5B52ADC10DA00E77A5C /* AppTextField.swift in Sources */,
 				48CFC4B42ADC10DA00E77A5C /* TransactionPreviewRequest.swift in Sources */,
+				5B135B3B2C7636FD004AAD2E /* HiddenEntities.swift in Sources */,
 				48CFC5E32ADC10DA00E77A5C /* AttributedString+Extra.swift in Sources */,
 				48CFC4812ADC10DA00E77A5C /* ROLAFailure.swift in Sources */,
 				48CFC3662ADC10D900E77A5C /* NonFungibleTokenDetails+Reducer.swift in Sources */,
@@ -7343,7 +7331,6 @@
 				48CFC6022ADC10DA00E77A5C /* P2P+LedgerHardwareWallet.swift in Sources */,
 				48CFC46A2ADC10DA00E77A5C /* ImportLegacyWalletClient+Live.swift in Sources */,
 				5B1C4FD82BBB0C1E00B9436F /* AppsFlyerClient+Interface.swift in Sources */,
-				830EA9D62AE94033004C8051 /* AccountAndPersonaHiding+Reducer.swift in Sources */,
 				48CFC5052ADC10DA00E77A5C /* TransactionPreviewResponseLogsInner.swift in Sources */,
 				5B1C4FDA2BBB0DCF00B9436F /* AppsFlyerClient+Live.swift in Sources */,
 				48CFC56B2ADC10DA00E77A5C /* MetadataU8ArrayValue.swift in Sources */,
@@ -7364,6 +7351,7 @@
 				83EE5EE72BE3C16F00B1531D /* PackageCodeCollection.swift in Sources */,
 				48CFC36B2ADC10D900E77A5C /* FungibleTokenDetails+Reducer.swift in Sources */,
 				5BBC7D9F2C3D390E00B04BD6 /* BootstrapClient+Live.swift in Sources */,
+				5B135B392C7636DA004AAD2E /* HiddenEntities+View.swift in Sources */,
 				4855B1C72BCAC82200DD0A47 /* Stage1MigrateToSargon+SignatureOfEntity.swift in Sources */,
 				83EE5EDD2BE3C16F00B1531D /* StatePackageBlueprintPageRequest.swift in Sources */,
 				48CFC3322ADC10D900E77A5C /* ImportMnemonic.swift in Sources */,
