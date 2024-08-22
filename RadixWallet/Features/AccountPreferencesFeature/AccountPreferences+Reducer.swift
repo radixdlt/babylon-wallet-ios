@@ -174,7 +174,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 	private func hideAccountEffect(state: State) -> Effect<Action> {
 		.run { [account = state.account] send in
-			try await entitiesVisibilityClient.hideAccount(account)
+			try await entitiesVisibilityClient.hide(account: account)
 			overlayWindowClient.scheduleHUD(.accountHidden)
 			await send(.delegate(.accountHidden))
 		} catch: { error, _ in

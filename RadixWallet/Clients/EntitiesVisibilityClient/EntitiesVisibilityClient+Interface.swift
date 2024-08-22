@@ -22,11 +22,11 @@ extension EntitiesVisibilityClient {
 }
 
 extension EntitiesVisibilityClient {
-	func hideAccount(_ account: Account) async throws {
+	func hide(account: Account) async throws {
 		try await hideAccount(account.id)
 	}
 
-	func hidePersona(_ persona: Persona) async throws {
+	func hide(persona: Persona) async throws {
 		try await hidePersona(persona.id)
 	}
 }

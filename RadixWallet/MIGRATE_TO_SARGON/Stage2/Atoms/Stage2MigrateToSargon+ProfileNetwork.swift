@@ -110,7 +110,7 @@ extension ProfileNetwork {
 		var identifiedPersonas = personas.asIdentified()
 		var identifiedAuthorizedDapps = authorizedDapps.asIdentified()
 
-		/// Hide the personas themselves
+		/// Hide the persona themself
 		identifiedPersonas[id: id]?.hide()
 
 		/// Remove the persona reference on any authorized dapp
