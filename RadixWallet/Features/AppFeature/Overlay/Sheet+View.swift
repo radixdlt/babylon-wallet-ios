@@ -19,6 +19,13 @@ extension Sheet {
 
 					ScrollView {
 						VStack(spacing: .zero) {
+							if let image = viewStore.image {
+								Image(asset: image)
+									.resizable()
+									.frame(.veryLarge)
+									.padding(.bottom, .medium2)
+							}
+
 							ForEach(viewStore.parts, id: \.self) { part in
 								PartView(part: part)
 							}
@@ -54,7 +61,7 @@ extension Sheet {
 					.textStyle(.sheetTitle)
 					.foregroundColor(.app.gray1)
 					.multilineTextAlignment(.center)
-					.padding(.bottom, .large2)
+					.padding(.bottom, .large1)
 			case let .heading3(heading3):
 				Text(heading3)
 					.textStyle(.body1Header)

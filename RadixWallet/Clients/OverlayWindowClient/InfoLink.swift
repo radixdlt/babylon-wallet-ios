@@ -3,28 +3,34 @@ import Foundation
 // MARK: - OverlayWindowClient.GlossaryItem
 extension OverlayWindowClient {
 	public enum GlossaryItem: String, Sendable {
-		case radixnetwork
-		case radquest
 		case tokens
 		case nfts
-		case web3
-		case accounts
-		case personas
-		case radixwallet
-		case dapps
-		case transactions
-		case transactionfee
-		case xrd
-		case badges
-		case transfers
-		case dex
-		case guarantees
 		case networkstaking
+		case personas
+		case dapps
+		case guarantees
+		case badges
+		case poolunits
+		case gateways
+		case radixconnect
+		case transactionfee
+		case behaviors
+		case claimnfts
+		case liquidstakeunits
+		case radixnetwork
+		case accounts
+		case radixwallet
+		case transactions
+		case dex
 		case validators
 		case radixconnector
 		case connectbutton
+		case xrd
+		case web3
+		case transfers
 		case dashboard
 		case bridging
+		case payingaccount
 	}
 }
 
@@ -43,79 +49,88 @@ extension OverlayWindowClient.GlossaryItem {
 		self = item
 	}
 
-	//	var image: Image {
-	//		switch self {
-	//		case .radixnetwork:
-	//		case .radquest:
-	//		case .tokens:
-	//		case .nfts:
-	//		case .web3:
-	//		case .accounts:
-	//		case .personas:
-	//		case .radixwallet:
-	//		case .dapps:
-	//		case .transactions:
-	//		case .transactionfee:
-	//		case .xrd:
-	//		case .badges:
-	//		case .transfers:
-	//		case .dex:
-	//		case .guarantees:
-	//		case .networkstaking:
-	//		case .validators:
-	//		case .radixconnector:
-	//		case .connectbutton:
-	//		case .dashboard:
-	//		case .bridging:
-	//		}
-	//	}
+	var image: ImageAsset? {
+		switch self {
+		case .nfts:
+			AssetResource.nft
+		case .networkstaking:
+			AssetResource.stakes
+		case .badges:
+			AssetResource.iconPackageOwnerBadge
+		case .poolunits:
+			AssetResource.poolUnits
+		case .radixnetwork:
+			AssetResource.fungibleTokens
+		default:
+			nil
+		}
+	}
 
 	var string: String {
 		switch self {
-		case .radixnetwork:
-			L10n.InfoLink.Glossary.radixnetwork
-		case .radquest:
-			L10n.InfoLink.Glossary.radquest
 		case .tokens:
 			L10n.InfoLink.Glossary.tokens
 		case .nfts:
 			L10n.InfoLink.Glossary.nfts
-		case .web3:
-			L10n.InfoLink.Glossary.web3
-		case .accounts:
-			L10n.InfoLink.Glossary.accounts
-		case .personas:
-			L10n.InfoLink.Glossary.personas
-		case .radixwallet:
-			L10n.InfoLink.Glossary.radixwallet
-		case .dapps:
-			L10n.InfoLink.Glossary.dapps
-		case .transactions:
-			L10n.InfoLink.Glossary.transactions
-		case .transactionfee:
-			L10n.InfoLink.Glossary.transactionfee
-		case .xrd:
-			L10n.InfoLink.Glossary.xrd
-		case .badges:
-			L10n.InfoLink.Glossary.badges
-		case .transfers:
-			L10n.InfoLink.Glossary.transfers
-		case .dex:
-			L10n.InfoLink.Glossary.dex
-		case .guarantees:
-			L10n.InfoLink.Glossary.guarantees
 		case .networkstaking:
 			L10n.InfoLink.Glossary.networkstaking
+		case .personas:
+			L10n.InfoLink.Glossary.personas
+		case .dapps:
+			L10n.InfoLink.Glossary.dapps
+		case .guarantees:
+			L10n.InfoLink.Glossary.guarantees
+		case .badges:
+			L10n.InfoLink.Glossary.badges
+		case .poolunits:
+//			L10n.InfoLink.Glossary.poolunits
+			"FIXME: String"
+		case .gateways:
+//			L10n.InfoLink.Glossary.gateways
+			"FIXME: String"
+		case .radixconnect:
+//			L10n.InfoLink.Glossary.radixconnect
+			"FIXME: String"
+		case .transactionfee:
+			L10n.InfoLink.Glossary.transactionfee
+		case .behaviors:
+//			L10n.InfoLink.Glossary.behaviors
+			"FIXME: String"
+		case .claimnfts:
+//			L10n.InfoLink.Glossary.claimnfts
+			"FIXME: String"
+		case .liquidstakeunits:
+//			L10n.InfoLink.Glossary.liquidstakeunits
+			"FIXME: String"
+		case .radixnetwork:
+			L10n.InfoLink.Glossary.radixnetwork
+		case .accounts:
+			L10n.InfoLink.Glossary.accounts
+		case .radixwallet:
+			L10n.InfoLink.Glossary.radixwallet
+		case .transactions:
+			L10n.InfoLink.Glossary.transactions
+		case .dex:
+			L10n.InfoLink.Glossary.dex
 		case .validators:
 			L10n.InfoLink.Glossary.validators
 		case .radixconnector:
 			L10n.InfoLink.Glossary.radixconnector
 		case .connectbutton:
 			L10n.InfoLink.Glossary.connectbutton
+		case .xrd:
+			L10n.InfoLink.Glossary.xrd
+		case .web3:
+			L10n.InfoLink.Glossary.web3
+		case .transfers:
+			L10n.InfoLink.Glossary.transfers
 		case .dashboard:
 			L10n.InfoLink.Glossary.dashboard
 		case .bridging:
 			L10n.InfoLink.Glossary.bridging
+		case .payingaccount:
+//			L10n.InfoLink.Glossary.payingaccount
+			"FIXME: String"
 		}
 	}
 }
