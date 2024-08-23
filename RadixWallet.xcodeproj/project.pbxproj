@@ -8508,8 +8508,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/tgrapperon/swift-dependencies-additions";
 			requirement = {
-				kind = exactVersion;
-				version = 1.0.1;
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.1;
 			};
 		};
 		48FFFAAF2ADC203700B2B213 /* XCRemoteSwiftPackageReference "WebRTC" */ = {
