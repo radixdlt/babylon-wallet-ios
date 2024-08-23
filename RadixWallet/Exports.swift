@@ -12,7 +12,6 @@
 @_exported import DependenciesAdditions
 @_exported import Either
 @_exported import Foundation
-@_exported import IdentifiedCollections
 @_exported import KeychainAccess
 @_exported import LegibleError
 @_exported import Logging
