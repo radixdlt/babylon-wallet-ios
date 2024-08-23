@@ -1,7 +1,6 @@
 @_exported import Algorithms
 @_exported import AsyncAlgorithms
 @_exported import AsyncExtensions
-@_exported import BigInt
 @_exported import BitCollections
 @_exported import Builders
 @_exported import CasePaths
