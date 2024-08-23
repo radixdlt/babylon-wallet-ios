@@ -3,7 +3,7 @@ import SwiftUI
 
 extension TransactionReviewNetworkFee.State {
 	var displayedTotalFee: String {
-		"\(reviewedTransaction.transactionFee.totalFee.displayedTotalFee) XRD"
+		L10n.TransactionReview.xrdAmount(reviewedTransaction.transactionFee.totalFee.displayedTotalFee)
 	}
 }
 
@@ -19,8 +19,8 @@ extension TransactionReviewNetworkFee {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-				VStack(alignment: .leading, spacing: .small2) {
-					HStack {
+				VStack(alignment: .leading, spacing: .zero) {
+					HStack(alignment: .top) {
 						Text(L10n.TransactionReview.NetworkFee.heading)
 							.sectionHeading
 							.textCase(.uppercase)
@@ -32,9 +32,19 @@ extension TransactionReviewNetworkFee {
 
 						Spacer(minLength: 0)
 
-						Text(viewStore.displayedTotalFee)
-							.textStyle(.body1HighImportance)
-							.foregroundColor(.app.gray1)
+						VStack(alignment: .trailing, spacing: .small3) {
+							Text(viewStore.displayedTotalFee)
+								.textStyle(.body1HighImportance)
+								.foregroundColor(.app.gray1)
+
+							loadable(viewStore.fiatValue) {
+								ProgressView()
+							} successContent: { value in
+								Text(value)
+									.textStyle(.body2HighImportance)
+									.foregroundColor(.app.gray2)
+							}
+						}
 					}
 
 					loadable(viewStore.reviewedTransaction.feePayingValidation) { validation in
@@ -55,6 +65,9 @@ extension TransactionReviewNetworkFee {
 						.textStyle(.body1StandaloneLink)
 						.foregroundColor(.app.blue2)
 					}
+				}
+				.task {
+					viewStore.send(.task)
 				}
 			}
 		}

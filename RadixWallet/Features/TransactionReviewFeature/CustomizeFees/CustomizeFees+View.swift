@@ -58,7 +58,7 @@ extension CustomizeFees {
 	public struct ViewState: Equatable {
 		let mode: TransactionFee.Mode
 		let feePayer: Account?
-		let feePayingValidation: FeeValidationOutcome?
+		let feePayingValidation: FeePayerValidationOutcome?
 	}
 
 	@MainActor
