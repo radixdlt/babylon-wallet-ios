@@ -36,7 +36,7 @@ extension Sheet {
 							.padding(.top, .small2)
 							.id(scrollViewTopID)
 						}
-						.animation(.default, value: viewStore.text)
+						.animation(.default.speed(2), value: viewStore.text)
 						.onChange(of: viewStore.text) { _ in
 							withAnimation {
 								proxy.scrollTo(scrollViewTopID, anchor: .top)
