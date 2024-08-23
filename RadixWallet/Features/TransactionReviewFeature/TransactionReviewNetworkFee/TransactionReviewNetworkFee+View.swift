@@ -25,10 +25,7 @@ extension TransactionReviewNetworkFee {
 							.sectionHeading
 							.textCase(.uppercase)
 
-						//    FIXME: Uncomment and implement
-						//    TransactionReviewInfoButton {
-						//    viewStore.send(.infoTapped)
-						//    }
+						InfoButton(.transactionfee)
 
 						Spacer(minLength: 0)
 
@@ -64,6 +61,7 @@ extension TransactionReviewNetworkFee {
 						}
 						.textStyle(.body1StandaloneLink)
 						.foregroundColor(.app.blue2)
+						.padding(.top, .small2)
 					}
 				}
 				.task {

@@ -688,23 +688,6 @@ struct RawTransactionView: SwiftUI.View {
 	}
 }
 
-// MARK: - TransactionReviewInfoButton
-public struct TransactionReviewInfoButton: View {
-	private let action: () -> Void
-
-	public init(action: @escaping () -> Void) {
-		self.action = action
-	}
-
-	public var body: some SwiftUI.View {
-		Button(action: action) {
-			Image(asset: AssetResource.info)
-				.renderingMode(.template)
-				.foregroundColor(.app.gray3)
-		}
-	}
-}
-
 extension StrokeStyle {
 	static let transactionReview = StrokeStyle(lineWidth: 2, dash: [5, 5])
 }

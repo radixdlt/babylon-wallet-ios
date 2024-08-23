@@ -16,7 +16,6 @@ public struct TransactionReviewNetworkFee: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case task
-		case infoTapped
 		case customizeTapped
 	}
 
@@ -51,8 +50,6 @@ public struct TransactionReviewNetworkFee: Sendable, FeatureReducer {
 				}
 				await send(.internal(.setTokenPrices(result)))
 			}
-		case .infoTapped:
-			return .none
 		case .customizeTapped:
 			return .send(.delegate(.showCustomizeFees))
 		}
