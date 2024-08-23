@@ -868,7 +868,6 @@
 		48FFFB062ADC6FD300B2B213 /* SwiftUINavigation in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB052ADC6FD300B2B213 /* SwiftUINavigation */; };
 		48FFFB082ADC6FD300B2B213 /* SwiftUINavigationCore in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB072ADC6FD300B2B213 /* SwiftUINavigationCore */; };
 		48FFFB0A2ADC721800B2B213 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB092ADC721800B2B213 /* Atomics */; };
-		48FFFB0D2ADC744700B2B213 /* TextBuilder in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB0C2ADC744700B2B213 /* TextBuilder */; };
 		5B1C4FD52BBB0B0C00B9436F /* AppsFlyerLib-Strict in Frameworks */ = {isa = PBXBuildFile; productRef = 5B1C4FD42BBB0B0C00B9436F /* AppsFlyerLib-Strict */; };
 		5B1C4FD82BBB0C1E00B9436F /* AppsFlyerClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1C4FD72BBB0C1E00B9436F /* AppsFlyerClient+Interface.swift */; };
 		5B1C4FDA2BBB0DCF00B9436F /* AppsFlyerClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1C4FD92BBB0DCF00B9436F /* AppsFlyerClient+Live.swift */; };
@@ -2370,7 +2369,6 @@
 				48FFFACF2ADC216400B2B213 /* CollectionConcurrencyKit in Frameworks */,
 				48FFFAB12ADC203700B2B213 /* WebRTC in Frameworks */,
 				831F0CED2C21819000D6F5BF /* Sargon in Frameworks */,
-				48FFFB0D2ADC744700B2B213 /* TextBuilder in Frameworks */,
 				48FFFB0A2ADC721800B2B213 /* Atomics in Frameworks */,
 				A47571FF2B29B0860059A95D /* IOSSecuritySuite in Frameworks */,
 				48FFFAFB2ADC241A00B2B213 /* HashTreeCollections in Frameworks */,
@@ -6659,7 +6657,6 @@
 				48FFFB052ADC6FD300B2B213 /* SwiftUINavigation */,
 				48FFFB072ADC6FD300B2B213 /* SwiftUINavigationCore */,
 				48FFFB092ADC721800B2B213 /* Atomics */,
-				48FFFB0C2ADC744700B2B213 /* TextBuilder */,
 				E63D123C2ADD1FC00001CBB1 /* SwiftUIIntrospect */,
 				A47571FE2B29B0860059A95D /* IOSSecuritySuite */,
 				A415574F2B757C5E0040AD4E /* ComposableArchitecture */,
@@ -6732,7 +6729,6 @@
 				48FFFAF32ADC241A00B2B213 /* XCRemoteSwiftPackageReference "swift-collections" */,
 				48FFFB012ADC6F8100B2B213 /* XCRemoteSwiftPackageReference "swift-builders" */,
 				48FFFB042ADC6FD300B2B213 /* XCRemoteSwiftPackageReference "swiftui-navigation" */,
-				48FFFB0B2ADC744700B2B213 /* XCRemoteSwiftPackageReference "TextBuilder" */,
 				A47571FD2B29B0860059A95D /* XCRemoteSwiftPackageReference "IOSSecuritySuite" */,
 				A415574E2B757C5E0040AD4E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
 				5B1C4FD32BBB0B0C00B9436F /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Strict" */,
@@ -8672,14 +8668,6 @@
 				version = 1.2.1;
 			};
 		};
-		48FFFB0B2ADC744700B2B213 /* XCRemoteSwiftPackageReference "TextBuilder" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/davdroman/TextBuilder";
-			requirement = {
-				kind = exactVersion;
-				version = 3.0.1;
-			};
-		};
 		5B1C4FD32BBB0B0C00B9436F /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Strict" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/AppsFlyerSDK/AppsFlyerFramework-Strict";
@@ -8908,11 +8896,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 48FFFAA62ADC1FBE00B2B213 /* XCRemoteSwiftPackageReference "swift-atomics" */;
 			productName = Atomics;
-		};
-		48FFFB0C2ADC744700B2B213 /* TextBuilder */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 48FFFB0B2ADC744700B2B213 /* XCRemoteSwiftPackageReference "TextBuilder" */;
-			productName = TextBuilder;
 		};
 		5B1C4FD42BBB0B0C00B9436F /* AppsFlyerLib-Strict */ = {
 			isa = XCSwiftPackageProductDependency;

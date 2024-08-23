@@ -22,5 +22,4 @@
 @_exported import Overture
 @_exported import Sargon
 @_exported import Tagged
-@_exported import TextBuilder
 @_exported import Validated
