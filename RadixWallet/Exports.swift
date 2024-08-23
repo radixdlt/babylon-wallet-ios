@@ -2,7 +2,6 @@
 @_exported import AsyncAlgorithms
 @_exported import AsyncExtensions
 @_exported import BitCollections
-@_exported import Builders
 @_exported import CasePaths
 @_exported import CollectionConcurrencyKit
 @_exported import Collections

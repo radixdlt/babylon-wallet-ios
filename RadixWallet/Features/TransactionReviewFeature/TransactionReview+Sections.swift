@@ -53,7 +53,7 @@ extension TransactionReview {
 					partialResult[next.resourceAddress] = .left(next)
 				}
 
-			newlyCreatedMetadata.append(contentsOf: existingResourceDetails)
+			newlyCreatedMetadata.merge(existingResourceDetails) { $1 }
 
 			return newlyCreatedMetadata
 		}

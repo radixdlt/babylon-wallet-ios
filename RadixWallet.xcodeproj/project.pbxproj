@@ -864,7 +864,6 @@
 		48FFFAF92ADC241A00B2B213 /* DequeModule in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAF82ADC241A00B2B213 /* DequeModule */; };
 		48FFFAFB2ADC241A00B2B213 /* HashTreeCollections in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAFA2ADC241A00B2B213 /* HashTreeCollections */; };
 		48FFFAFD2ADC241A00B2B213 /* HeapModule in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAFC2ADC241A00B2B213 /* HeapModule */; };
-		48FFFB032ADC6F8100B2B213 /* Builders in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB022ADC6F8100B2B213 /* Builders */; };
 		48FFFB062ADC6FD300B2B213 /* SwiftUINavigation in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB052ADC6FD300B2B213 /* SwiftUINavigation */; };
 		48FFFB082ADC6FD300B2B213 /* SwiftUINavigationCore in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB072ADC6FD300B2B213 /* SwiftUINavigationCore */; };
 		48FFFB0A2ADC721800B2B213 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB092ADC721800B2B213 /* Atomics */; };
@@ -2375,7 +2374,6 @@
 				48FFFAC52ADC211700B2B213 /* JSONTesting in Frameworks */,
 				48FFFB062ADC6FD300B2B213 /* SwiftUINavigation in Frameworks */,
 				5B1C4FD52BBB0B0C00B9436F /* AppsFlyerLib-Strict in Frameworks */,
-				48FFFB032ADC6F8100B2B213 /* Builders in Frameworks */,
 				48FFFAB72ADC207B00B2B213 /* NavigationTransitions in Frameworks */,
 				48FFFA992ADC1EEC00B2B213 /* AsyncExtensions in Frameworks */,
 				83B783562C1764AE00AA7930 /* Sargon in Frameworks */,
@@ -6653,7 +6651,6 @@
 				48FFFAF82ADC241A00B2B213 /* DequeModule */,
 				48FFFAFA2ADC241A00B2B213 /* HashTreeCollections */,
 				48FFFAFC2ADC241A00B2B213 /* HeapModule */,
-				48FFFB022ADC6F8100B2B213 /* Builders */,
 				48FFFB052ADC6FD300B2B213 /* SwiftUINavigation */,
 				48FFFB072ADC6FD300B2B213 /* SwiftUINavigationCore */,
 				48FFFB092ADC721800B2B213 /* Atomics */,
@@ -6727,7 +6724,6 @@
 				48FFFAEB2ADC226B00B2B213 /* XCRemoteSwiftPackageReference "CodeScanner" */,
 				48FFFAEE2ADC229900B2B213 /* XCRemoteSwiftPackageReference "AnyCodable" */,
 				48FFFAF32ADC241A00B2B213 /* XCRemoteSwiftPackageReference "swift-collections" */,
-				48FFFB012ADC6F8100B2B213 /* XCRemoteSwiftPackageReference "swift-builders" */,
 				48FFFB042ADC6FD300B2B213 /* XCRemoteSwiftPackageReference "swiftui-navigation" */,
 				A47571FD2B29B0860059A95D /* XCRemoteSwiftPackageReference "IOSSecuritySuite" */,
 				A415574E2B757C5E0040AD4E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
@@ -8652,14 +8648,6 @@
 				version = 1.1.0;
 			};
 		};
-		48FFFB012ADC6F8100B2B213 /* XCRemoteSwiftPackageReference "swift-builders" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/davdroman/swift-builders";
-			requirement = {
-				kind = exactVersion;
-				version = 0.6.0;
-			};
-		};
 		48FFFB042ADC6FD300B2B213 /* XCRemoteSwiftPackageReference "swiftui-navigation" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swiftui-navigation.git";
@@ -8876,11 +8864,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 48FFFAF32ADC241A00B2B213 /* XCRemoteSwiftPackageReference "swift-collections" */;
 			productName = HeapModule;
-		};
-		48FFFB022ADC6F8100B2B213 /* Builders */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 48FFFB012ADC6F8100B2B213 /* XCRemoteSwiftPackageReference "swift-builders" */;
-			productName = Builders;
 		};
 		48FFFB052ADC6FD300B2B213 /* SwiftUINavigation */ = {
 			isa = XCSwiftPackageProductDependency;
