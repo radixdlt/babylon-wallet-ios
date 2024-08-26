@@ -10,11 +10,17 @@ public extension HideResource {
 		public var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				if store.shouldShow {
-					Button(store.title) {
-						store.send(.view(.buttonTapped))
+					VStack(spacing: .medium2) {
+						if store.showSeparator {
+							AssetDetailsSeparator()
+						}
+
+						Button(store.title) {
+							store.send(.view(.buttonTapped))
+						}
+						.buttonStyle(.secondaryRectangular(shouldExpand: true))
+						.padding(.horizontal, .medium3)
 					}
-					.buttonStyle(.secondaryRectangular(shouldExpand: true))
-					.padding(.horizontal, .medium3)
 				}
 			}
 			.task {
@@ -57,6 +63,15 @@ private extension HideResource.State {
 			L10n.AssetDetails.hideAsset
 		case .nonFungible:
 			L10n.AssetDetails.hideCollection
+		}
+	}
+
+	var showSeparator: Bool {
+		switch kind {
+		case .fungible, .poolUnit:
+			false
+		case .nonFungible:
+			true
 		}
 	}
 
