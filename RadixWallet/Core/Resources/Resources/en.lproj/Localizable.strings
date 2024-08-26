@@ -80,9 +80,6 @@
 "assetDetails_poolUnitDetails_whatArePoolUnits" = "What are Pool units?";
 "assetDetails_badgeDetails_noBadges" = "You have no badges";
 "assetDetails_badgeDetails_whatAreBadges" = "What are badges?";
-"assetDetails_hideAsset_title" = "Hide Asset";
-"assetDetails_hideAsset_message" = "Hide this asset in your Radix Wallet? You can always unhide it in your account settings.";
-"assetDetails_hideAsset_button" = "Hide Asset";
 "assetDetails_behaviors_simpleAsset" = "This is a simple asset";
 "assetDetails_behaviors_supplyIncreasable" = "The supply of this asset can be increased.";
 "assetDetails_behaviors_supplyDecreasable" = "The supply of this asset can be decreased.";
@@ -102,10 +99,8 @@
 "assetDetails_behaviors_freezableByAnyone" = "Anyone can freeze this asset in place.";
 "assetDetails_behaviors_nftDataChangeable" = "Data that is set on these NFTs can be changed.";
 "assetDetails_behaviors_nftDataChangeableByAnyone" = "Anyone can change data that is set on these NFTs.";
-"assetDetails_hideCollectionButton" = "Hide Collection";
-"assetDetails_hideCollection_title" = "Hide Collection";
-"assetDetails_hideCollection_message" = "Hide **%@** NFT Collection in your Radix Wallet? You can always unhide it in your account settings.";
-"assetDetails_hideCollection_button" = "Hide";
+"assetDetails_hideAsset" = "Hide Asset";
+"assetDetails_hideCollection" = "Hide Collection";
 "accountSettings_title" = "Account Settings";
 "accountSettings_personalizeHeading" = "Personalize this Account";
 "accountSettings_accountLabel" = "Account Name";
