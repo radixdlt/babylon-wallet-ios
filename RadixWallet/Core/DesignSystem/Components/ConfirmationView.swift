@@ -4,7 +4,7 @@ public typealias ConfirmationAction = ConfirmationView.Action
 
 // MARK: - ConfirmationView
 public struct ConfirmationView: View {
-	let configuration: Configuration
+	let kind: Kind
 	let onAction: (Action) -> Void
 
 	public var body: some View {
@@ -27,11 +27,11 @@ public struct ConfirmationView: View {
 					.frame(.small)
 					.foregroundColor(.app.gray3)
 
-				Text(configuration.title)
+				Text(title)
 					.textStyle(.sheetTitle)
 					.foregroundColor(.app.gray1)
 
-				Text(markdown: configuration.message, emphasizedColor: .app.gray1, emphasizedFont: .app.body1Header)
+				Text(markdown: message, emphasizedColor: .app.gray1, emphasizedFont: .app.body1Header)
 					.textStyle(.body1Regular)
 					.foregroundColor(.app.gray1)
 			}
@@ -45,7 +45,7 @@ public struct ConfirmationView: View {
 				}
 				.buttonStyle(.secondaryRectangular)
 
-				Button(configuration.primaryAction) {
+				Button(primaryAction) {
 					onAction(.confirm)
 				}
 				.buttonStyle(.primaryRectangular)
@@ -58,14 +58,40 @@ public struct ConfirmationView: View {
 }
 
 extension ConfirmationView {
-	public struct Configuration {
-		let title: String
-		let message: String
-		let primaryAction: String
+	public enum Kind: Hashable, Sendable {
+		case hideAccount
+		case hideAsset
+		case hideCollection(name: String)
 	}
 
 	public enum Action: Sendable {
 		case cancel
 		case confirm
+	}
+}
+
+extension ConfirmationView {
+	var title: String {
+		switch kind {
+		case .hideAccount: L10n.Confirmation.HideAccount.title
+		case .hideAsset: L10n.Confirmation.HideAsset.title
+		case .hideCollection: L10n.Confirmation.HideCollection.title
+		}
+	}
+
+	var message: String {
+		switch kind {
+		case .hideAccount: L10n.Confirmation.HideAccount.message
+		case .hideAsset: L10n.Confirmation.HideAsset.message
+		case let .hideCollection(name): L10n.Confirmation.HideCollection.message(name)
+		}
+	}
+
+	var primaryAction: String {
+		switch kind {
+		case .hideAccount: L10n.Confirmation.HideAccount.button
+		case .hideAsset: L10n.Confirmation.HideAsset.button
+		case .hideCollection: L10n.Confirmation.HideCollection.button
+		}
 	}
 }

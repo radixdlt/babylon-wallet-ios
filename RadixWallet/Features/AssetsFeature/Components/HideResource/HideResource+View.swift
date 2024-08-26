@@ -43,7 +43,7 @@ private extension View {
 
 	private func confirmation(with destinationStore: PresentationStoreOf<HideResource.Destination>, store: StoreOf<HideResource>) -> some View {
 		sheet(store: destinationStore.scope(state: \.confirmation, action: \.confirmation)) { _ in
-			ConfirmationView(configuration: store.confirmationConfiguration) { action in
+			ConfirmationView(kind: store.confirmationKind) { action in
 				store.send(.destination(.presented(.confirmation(action))))
 			}
 		}
@@ -54,13 +54,13 @@ private extension HideResource.State {
 	var title: String {
 		switch kind {
 		case .fungible, .poolUnit:
-			L10n.AssetDetails.HideAsset.button
+			L10n.AssetDetails.hideAsset
 		case .nonFungible:
-			L10n.AssetDetails.hideCollectionButton
+			L10n.AssetDetails.hideCollection
 		}
 	}
 
-	var confirmationConfiguration: ConfirmationView.Configuration {
+	var confirmationKind: ConfirmationView.Kind {
 		switch kind {
 		case .fungible, .poolUnit:
 			.hideAsset
