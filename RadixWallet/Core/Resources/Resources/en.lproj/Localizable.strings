@@ -102,6 +102,10 @@
 "assetDetails_behaviors_freezableByAnyone" = "Anyone can freeze this asset in place.";
 "assetDetails_behaviors_nftDataChangeable" = "Data that is set on these NFTs can be changed.";
 "assetDetails_behaviors_nftDataChangeableByAnyone" = "Anyone can change data that is set on these NFTs.";
+"assetDetails_hideCollectionButton" = "Hide Collection";
+"assetDetails_hideCollection_title" = "Hide Collection";
+"assetDetails_hideCollection_message" = "Hide **%@** NFT Collection in your Radix Wallet? You can always unhide it in your account settings.";
+"assetDetails_hideCollection_button" = "Hide";
 "accountSettings_title" = "Account Settings";
 "accountSettings_personalizeHeading" = "Personalize this Account";
 "accountSettings_accountLabel" = "Account Name";
@@ -468,7 +472,8 @@
 "transactionReview_noMnemonicError_text" = "The required seed phrase is missing. Please return to the account and begin the recovery process.";
 "transactionReview_nonConformingManifestWarning_title" = "Warning";
 "transactionReview_nonConformingManifestWarning_message" = "This is a complex transaction that cannot be summarized - the raw transaction manifest will be shown. Do not submit unless you understand the contents.";
-"transactionReview_hiddenAsset" = "This asset is hidden and will not be visible in your Account";
+"transactionReview_hiddenAsset_deposit" = "This asset is hidden and will not be visible in your Account";
+"transactionReview_hiddenAsset_withdraw" = "This asset is hidden and is not visible in your Account";
 "transactionStatus_completing_text" = "Completing Transaction…";
 "transactionStatus_transactionID_text" = "Transaction ID: ";
 "transactionStatus_success_title" = "Transaction Success";

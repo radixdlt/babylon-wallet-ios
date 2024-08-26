@@ -535,6 +535,8 @@ public enum L10n {
     public static let currentSupply = L10n.tr("Localizable", "assetDetails_currentSupply", fallback: "Current Supply")
     /// Divisibility
     public static let divisibility = L10n.tr("Localizable", "assetDetails_divisibility", fallback: "Divisibility")
+    /// Hide Collection
+    public static let hideCollectionButton = L10n.tr("Localizable", "assetDetails_hideCollectionButton", fallback: "Hide Collection")
     /// For more info
     public static let moreInfo = L10n.tr("Localizable", "assetDetails_moreInfo", fallback: "For more info")
     /// Name
@@ -624,6 +626,16 @@ public enum L10n {
       public static let message = L10n.tr("Localizable", "assetDetails_hideAsset_message", fallback: "Hide this asset in your Radix Wallet? You can always unhide it in your account settings.")
       /// Hide Asset
       public static let title = L10n.tr("Localizable", "assetDetails_hideAsset_title", fallback: "Hide Asset")
+    }
+    public enum HideCollection {
+      /// Hide
+      public static let button = L10n.tr("Localizable", "assetDetails_hideCollection_button", fallback: "Hide")
+      /// Hide **%@** NFT Collection in your Radix Wallet? You can always unhide it in your account settings.
+      public static func message(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "assetDetails_hideCollection_message", String(describing: p1), fallback: "Hide **%@** NFT Collection in your Radix Wallet? You can always unhide it in your account settings.")
+      }
+      /// Hide Collection
+      public static let title = L10n.tr("Localizable", "assetDetails_hideCollection_title", fallback: "Hide Collection")
     }
     public enum PoolUnitDetails {
       /// You have no Pool units
@@ -3414,8 +3426,6 @@ public enum L10n {
     public static let externalAccountName = L10n.tr("Localizable", "transactionReview_externalAccountName", fallback: "Account")
     /// Guaranteed
     public static let guaranteed = L10n.tr("Localizable", "transactionReview_guaranteed", fallback: "Guaranteed")
-    /// This asset is hidden and will not be visible in your Account
-    public static let hiddenAsset = L10n.tr("Localizable", "transactionReview_hiddenAsset", fallback: "This asset is hidden and will not be visible in your Account")
     /// Message
     public static let messageHeading = L10n.tr("Localizable", "transactionReview_messageHeading", fallback: "Message")
     /// Contributing to pools
@@ -3515,6 +3525,12 @@ public enum L10n {
       public static let subtitle = L10n.tr("Localizable", "transactionReview_guarantees_subtitle", fallback: "Protect yourself by setting guaranteed minimums for estimated deposits")
       /// Customize Guarantees
       public static let title = L10n.tr("Localizable", "transactionReview_guarantees_title", fallback: "Customize Guarantees")
+    }
+    public enum HiddenAsset {
+      /// This asset is hidden and will not be visible in your Account
+      public static let deposit = L10n.tr("Localizable", "transactionReview_hiddenAsset_deposit", fallback: "This asset is hidden and will not be visible in your Account")
+      /// This asset is hidden and is not visible in your Account
+      public static let withdraw = L10n.tr("Localizable", "transactionReview_hiddenAsset_withdraw", fallback: "This asset is hidden and is not visible in your Account")
     }
     public enum NetworkFee {
       /// The network is currently congested. Add a tip to speed up your transfer.
