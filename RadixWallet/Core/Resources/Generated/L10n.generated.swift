@@ -535,8 +535,10 @@ public enum L10n {
     public static let currentSupply = L10n.tr("Localizable", "assetDetails_currentSupply", fallback: "Current Supply")
     /// Divisibility
     public static let divisibility = L10n.tr("Localizable", "assetDetails_divisibility", fallback: "Divisibility")
+    /// Hide Asset
+    public static let hideAsset = L10n.tr("Localizable", "assetDetails_hideAsset", fallback: "Hide Asset")
     /// Hide Collection
-    public static let hideCollectionButton = L10n.tr("Localizable", "assetDetails_hideCollectionButton", fallback: "Hide Collection")
+    public static let hideCollection = L10n.tr("Localizable", "assetDetails_hideCollection", fallback: "Hide Collection")
     /// For more info
     public static let moreInfo = L10n.tr("Localizable", "assetDetails_moreInfo", fallback: "For more info")
     /// Name
@@ -618,24 +620,6 @@ public enum L10n {
       public static let supplyIncreasable = L10n.tr("Localizable", "assetDetails_behaviors_supplyIncreasable", fallback: "The supply of this asset can be increased.")
       /// Anyone can increase the supply of this asset.
       public static let supplyIncreasableByAnyone = L10n.tr("Localizable", "assetDetails_behaviors_supplyIncreasableByAnyone", fallback: "Anyone can increase the supply of this asset.")
-    }
-    public enum HideAsset {
-      /// Hide Asset
-      public static let button = L10n.tr("Localizable", "assetDetails_hideAsset_button", fallback: "Hide Asset")
-      /// Hide this asset in your Radix Wallet? You can always unhide it in your account settings.
-      public static let message = L10n.tr("Localizable", "assetDetails_hideAsset_message", fallback: "Hide this asset in your Radix Wallet? You can always unhide it in your account settings.")
-      /// Hide Asset
-      public static let title = L10n.tr("Localizable", "assetDetails_hideAsset_title", fallback: "Hide Asset")
-    }
-    public enum HideCollection {
-      /// Hide
-      public static let button = L10n.tr("Localizable", "assetDetails_hideCollection_button", fallback: "Hide")
-      /// Hide **%@** NFT Collection in your Radix Wallet? You can always unhide it in your account settings.
-      public static func message(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "assetDetails_hideCollection_message", String(describing: p1), fallback: "Hide **%@** NFT Collection in your Radix Wallet? You can always unhide it in your account settings.")
-      }
-      /// Hide Collection
-      public static let title = L10n.tr("Localizable", "assetDetails_hideCollection_title", fallback: "Hide Collection")
     }
     public enum PoolUnitDetails {
       /// You have no Pool units
@@ -1073,6 +1057,34 @@ public enum L10n {
     public static let subtitle = L10n.tr("Localizable", "confirmMnemonicBackedUp_subtitle", fallback: "Confirm you have written down the seed phrase by entering the missing words below.")
     /// Confirm Your Seed Phrase
     public static let title = L10n.tr("Localizable", "confirmMnemonicBackedUp_title", fallback: "Confirm Your Seed Phrase")
+  }
+  public enum Confirmation {
+    public enum HideAccount {
+      /// Hide Account
+      public static let button = L10n.tr("Localizable", "confirmation_hideAccount_button", fallback: "Hide Account")
+      /// Hide this Account in your wallet? You can always unhide it from the main application settings.
+      public static let message = L10n.tr("Localizable", "confirmation_hideAccount_message", fallback: "Hide this Account in your wallet? You can always unhide it from the main application settings.")
+      /// Hide This Account
+      public static let title = L10n.tr("Localizable", "confirmation_hideAccount_title", fallback: "Hide This Account")
+    }
+    public enum HideAsset {
+      /// Hide Asset
+      public static let button = L10n.tr("Localizable", "confirmation_hideAsset_button", fallback: "Hide Asset")
+      /// Hide this asset in your Radix Wallet? You can always unhide it in your account settings.
+      public static let message = L10n.tr("Localizable", "confirmation_hideAsset_message", fallback: "Hide this asset in your Radix Wallet? You can always unhide it in your account settings.")
+      /// Hide Asset
+      public static let title = L10n.tr("Localizable", "confirmation_hideAsset_title", fallback: "Hide Asset")
+    }
+    public enum HideCollection {
+      /// Hide
+      public static let button = L10n.tr("Localizable", "confirmation_hideCollection_button", fallback: "Hide")
+      /// Hide **%@** NFT Collection in your Radix Wallet? You can always unhide it in your account settings.
+      public static func message(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "confirmation_hideCollection_message", String(describing: p1), fallback: "Hide **%@** NFT Collection in your Radix Wallet? You can always unhide it in your account settings.")
+      }
+      /// Hide Collection
+      public static let title = L10n.tr("Localizable", "confirmation_hideCollection_title", fallback: "Hide Collection")
+    }
   }
   public enum CreateAccount {
     /// Create First Account
