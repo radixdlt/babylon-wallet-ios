@@ -757,8 +757,6 @@
 		48CFC5E82ADC10DA00E77A5C /* FeatureReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC13F2ADC10D900E77A5C /* FeatureReducer.swift */; };
 		48CFC5EB2ADC10DA00E77A5C /* AddressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1432ADC10D900E77A5C /* AddressView.swift */; };
 		48CFC5EC2ADC10DA00E77A5C /* Loadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1442ADC10D900E77A5C /* Loadable.swift */; };
-		48CFC5ED2ADC10DA00E77A5C /* SlideUpPanel+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1462ADC10D900E77A5C /* SlideUpPanel+Reducer.swift */; };
-		48CFC5EE2ADC10DA00E77A5C /* SlideUpPanel+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1472ADC10D900E77A5C /* SlideUpPanel+View.swift */; };
 		48CFC5F02ADC10DA00E77A5C /* UserDefaultsClient+AccountRecovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1492ADC10D900E77A5C /* UserDefaultsClient+AccountRecovery.swift */; };
 		48CFC5F22ADC10DA00E77A5C /* AssetResource.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC14D2ADC10D900E77A5C /* AssetResource.generated.swift */; };
 		48CFC5F32ADC10DA00E77A5C /* Fonts.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC14E2ADC10D900E77A5C /* Fonts.generated.swift */; };
@@ -1105,6 +1103,7 @@
 		A4ECE2792BEEB01800468BF6 /* CloudBackupClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4ECE2752BEEB01800468BF6 /* CloudBackupClient+Interface.swift */; };
 		A4ECE27A2BEEB01800468BF6 /* CloudBackupClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4ECE2762BEEB01800468BF6 /* CloudBackupClient+Live.swift */; };
 		A4ECE27B2BEEB01800468BF6 /* CloudBackupClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4ECE2772BEEB01800468BF6 /* CloudBackupClient+Test.swift */; };
+		A4F30C942C7CA71400F983D6 /* WithNavigationBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F30C932C7CA71400F983D6 /* WithNavigationBar.swift */; };
 		E60D5E1F2C2EFAA2008BCF1F /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = E60D5E1E2C2EFAA2008BCF1F /* Sargon */; };
 		E62449D52AFBA61100272C67 /* Home+AccountRow+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */; };
 		E62449D62AFBA61100272C67 /* Home+AccountRow+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D42AFBA61100272C67 /* Home+AccountRow+View.swift */; };
@@ -1943,8 +1942,6 @@
 		48CFC13F2ADC10D900E77A5C /* FeatureReducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeatureReducer.swift; sourceTree = "<group>"; };
 		48CFC1432ADC10D900E77A5C /* AddressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressView.swift; sourceTree = "<group>"; };
 		48CFC1442ADC10D900E77A5C /* Loadable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Loadable.swift; sourceTree = "<group>"; };
-		48CFC1462ADC10D900E77A5C /* SlideUpPanel+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SlideUpPanel+Reducer.swift"; sourceTree = "<group>"; };
-		48CFC1472ADC10D900E77A5C /* SlideUpPanel+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SlideUpPanel+View.swift"; sourceTree = "<group>"; };
 		48CFC1492ADC10D900E77A5C /* UserDefaultsClient+AccountRecovery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UserDefaultsClient+AccountRecovery.swift"; sourceTree = "<group>"; };
 		48CFC14D2ADC10D900E77A5C /* AssetResource.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetResource.generated.swift; sourceTree = "<group>"; };
 		48CFC14E2ADC10D900E77A5C /* Fonts.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Fonts.generated.swift; sourceTree = "<group>"; };
@@ -2261,6 +2258,7 @@
 		A4ECE2752BEEB01800468BF6 /* CloudBackupClient+Interface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CloudBackupClient+Interface.swift"; sourceTree = "<group>"; };
 		A4ECE2762BEEB01800468BF6 /* CloudBackupClient+Live.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CloudBackupClient+Live.swift"; sourceTree = "<group>"; };
 		A4ECE2772BEEB01800468BF6 /* CloudBackupClient+Test.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CloudBackupClient+Test.swift"; sourceTree = "<group>"; };
+		A4F30C932C7CA71400F983D6 /* WithNavigationBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WithNavigationBar.swift; sourceTree = "<group>"; };
 		E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+AccountRow+Reducer.swift"; sourceTree = "<group>"; };
 		E62449D42AFBA61100272C67 /* Home+AccountRow+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+AccountRow+View.swift"; sourceTree = "<group>"; };
 		E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportMnemonicTests.swift; sourceTree = "<group>"; };
@@ -5164,6 +5162,7 @@
 			children = (
 				5B6E11462C45834C00C20F2D /* AccountCard */,
 				48CFC1332ADC10D900E77A5C /* LedgerRowView.swift */,
+				A4F30C932C7CA71400F983D6 /* WithNavigationBar.swift */,
 				48CFC22C2ADC10D900E77A5C /* Radix+Dashboard.swift */,
 				48CFC1342ADC10D900E77A5C /* OnFirstTaskViewModifier.swift */,
 				48076E3F2B14F5CA004575F8 /* OnFirstAppearViewModifier.swift */,
@@ -5173,7 +5172,6 @@
 				48CFC13F2ADC10D900E77A5C /* FeatureReducer.swift */,
 				48CFC1412ADC10D900E77A5C /* AddressView */,
 				48CFC1442ADC10D900E77A5C /* Loadable.swift */,
-				48CFC1452ADC10D900E77A5C /* SlideUpPanel */,
 				48CFC1492ADC10D900E77A5C /* UserDefaultsClient+AccountRecovery.swift */,
 				A47809072BDBDB4C006B68C0 /* RadixDateFormatter.swift */,
 			);
@@ -5203,15 +5201,6 @@
 				5B43B08A2BDAAD4B00AA1E92 /* AddressDetails.swift */,
 			);
 			path = AddressView;
-			sourceTree = "<group>";
-		};
-		48CFC1452ADC10D900E77A5C /* SlideUpPanel */ = {
-			isa = PBXGroup;
-			children = (
-				48CFC1462ADC10D900E77A5C /* SlideUpPanel+Reducer.swift */,
-				48CFC1472ADC10D900E77A5C /* SlideUpPanel+View.swift */,
-			);
-			path = SlideUpPanel;
 			sourceTree = "<group>";
 		};
 		48CFC14B2ADC10D900E77A5C /* Resources */ = {
@@ -7798,7 +7787,6 @@
 				48D5F3912BD8DDB9000DE964 /* DebugUserDefaultsContents+View.swift in Sources */,
 				48AF19CE2BB71C1600796130 /* IntoSargon+Bridge.swift in Sources */,
 				5B9846C02BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift in Sources */,
-				48CFC5EE2ADC10DA00E77A5C /* SlideUpPanel+View.swift in Sources */,
 				48CFC3492ADC10D900E77A5C /* PersonaDataPermissionBox.swift in Sources */,
 				5BBC43A92BBAC6B0005747B1 /* AppTextEditor.swift in Sources */,
 				A41266F12B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift in Sources */,
@@ -7861,7 +7849,6 @@
 				48CFC5312ADC10DA00E77A5C /* MetadataInstantValue.swift in Sources */,
 				48CFC5A02ADC10DA00E77A5C /* Binding+Extra.swift in Sources */,
 				48CFC2992ADC10D900E77A5C /* CustomizeFees.swift in Sources */,
-				48CFC5ED2ADC10DA00E77A5C /* SlideUpPanel+Reducer.swift in Sources */,
 				48CFC68C2ADC10DB00E77A5C /* Radix+Dashboard.swift in Sources */,
 				48CFC2CF2ADC10D900E77A5C /* TransferAccountList+Reducer.swift in Sources */,
 				48CFC31F2ADC10D900E77A5C /* NameAccount+Reducer.swift in Sources */,
@@ -7886,6 +7873,7 @@
 				A41266EF2B15578600EA38E9 /* ManualAccountRecoverySeedPhrase+Reducer.swift in Sources */,
 				83EE479A2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueI32.swift in Sources */,
 				48CFC5BE2ADC10DA00E77A5C /* RoundedCornerBackground.swift in Sources */,
+				A4F30C942C7CA71400F983D6 /* WithNavigationBar.swift in Sources */,
 				48AE39DD2B0CBE3900813CF3 /* AccountRecoveryScanCoordinator+View.swift in Sources */,
 				48CFC2FA2ADC10D900E77A5C /* NewPersonaCompletion+View.swift in Sources */,
 				48CFC3702ADC10D900E77A5C /* FungibleAssetList+Reducer.swift in Sources */,
