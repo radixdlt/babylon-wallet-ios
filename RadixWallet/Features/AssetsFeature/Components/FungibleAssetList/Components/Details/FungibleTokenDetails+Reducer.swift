@@ -9,7 +9,7 @@ public struct FungibleTokenDetails: Sendable, FeatureReducer {
 		let isXRD: Bool
 		let ownedFungibleResource: OnLedgerEntity.OwnedFungibleResource?
 		let ledgerState: AtLedgerState?
-		var hideAsset: HideAsset.State
+		var hideResource: HideResource.State
 
 		public init(
 			resourceAddress: ResourceAddress,
@@ -23,7 +23,7 @@ public struct FungibleTokenDetails: Sendable, FeatureReducer {
 			self.ownedFungibleResource = ownedFungibleResource
 			self.isXRD = isXRD
 			self.ledgerState = ledgerState
-			self.hideAsset = .init(asset: .fungible(resourceAddress))
+			self.hideResource = .init(kind: .fungible(resourceAddress))
 		}
 	}
 
@@ -38,7 +38,7 @@ public struct FungibleTokenDetails: Sendable, FeatureReducer {
 
 	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
-		case hideAsset(HideAsset.Action)
+		case hideResource(HideResource.Action)
 	}
 
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
@@ -48,8 +48,8 @@ public struct FungibleTokenDetails: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.hideAsset, action: \.child.hideAsset) {
-			HideAsset()
+		Scope(state: \.hideResource, action: \.child.hideResource) {
+			HideResource()
 		}
 
 		Reduce(core)
@@ -85,7 +85,7 @@ public struct FungibleTokenDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case .hideAsset(.delegate(.didHideAsset)):
+		case .hideResource(.delegate(.didHideResource)):
 			.run { _ in await dismiss() }
 		default:
 			.none

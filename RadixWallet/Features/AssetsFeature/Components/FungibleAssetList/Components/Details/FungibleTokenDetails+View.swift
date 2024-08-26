@@ -64,7 +64,7 @@ extension FungibleTokenDetails {
 					VStack(spacing: .medium1) {
 						AssetResourceDetailsSection(viewState: viewStore.details)
 
-						HideAsset.View(store: store.hideAsset)
+						HideResource.View(store: store.hideResource)
 					}
 					.padding(.bottom, .medium1)
 				}
@@ -77,7 +77,7 @@ extension FungibleTokenDetails {
 }
 
 private extension StoreOf<FungibleTokenDetails> {
-	var hideAsset: StoreOf<HideAsset> {
-		scope(state: \.hideAsset, action: \.child.hideAsset)
+	var hideResource: StoreOf<HideResource> {
+		scope(state: \.hideResource, action: \.child.hideResource)
 	}
 }

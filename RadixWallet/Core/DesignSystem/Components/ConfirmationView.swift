@@ -31,7 +31,7 @@ public struct ConfirmationView: View {
 					.textStyle(.sheetTitle)
 					.foregroundColor(.app.gray1)
 
-				Text(configuration.message)
+				Text(markdown: configuration.message, emphasizedColor: .app.gray1, emphasizedFont: .app.body1Header)
 					.textStyle(.body1Regular)
 					.foregroundColor(.app.gray1)
 			}

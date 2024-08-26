@@ -1,16 +1,30 @@
-// MARK: - HideAsset
+// MARK: - HideResource
 @Reducer
-public struct HideAsset: Sendable, FeatureReducer {
+public struct HideResource: Sendable, FeatureReducer {
 	@ObservableState
 	public struct State: Sendable, Hashable {
-		let asset: ResourceIdentifier
+		let kind: Kind
 		var shouldShow = true
 
 		@Presents
 		var destination: Destination.State? = nil
 
-		public init(asset: ResourceIdentifier) {
-			self.asset = asset
+		public init(kind: Kind) {
+			self.kind = kind
+		}
+
+		public enum Kind: Hashable, Sendable {
+			case fungible(ResourceAddress)
+			case nonFungible(ResourceAddress, name: String?)
+			case poolUnit(PoolAddress)
+		}
+
+		var resource: ResourceIdentifier {
+			switch kind {
+			case let .fungible(address): .fungible(address)
+			case let .nonFungible(address, _): .nonFungible(address)
+			case let .poolUnit(address): .poolUnit(address)
+			}
 		}
 	}
 
@@ -26,7 +40,7 @@ public struct HideAsset: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case didHideAsset
+		case didHideResource
 	}
 
 	// MARK: - Destination
@@ -81,7 +95,7 @@ public struct HideAsset: Sendable, FeatureReducer {
 		switch presentedAction {
 		case .confirmation(.confirm):
 			state.destination = nil
-			return hideAssetEffect(state: state)
+			return hideResourceEffect(state: state)
 		case .confirmation(.cancel):
 			state.destination = nil
 			return .none
@@ -89,11 +103,11 @@ public struct HideAsset: Sendable, FeatureReducer {
 	}
 }
 
-private extension HideAsset {
+private extension HideResource {
 	func shouldShowEffect(state: State) -> Effect<Action> {
 		.run { send in
 			let isXrd: Bool
-			switch state.asset {
+			switch state.resource {
 			case let .fungible(resource):
 				let networkId = await gatewaysClient.getCurrentNetworkID()
 				isXrd = resource.isXRD(on: networkId)
@@ -103,18 +117,18 @@ private extension HideAsset {
 			if isXrd {
 				await send(.internal(.setShouldShow(false)))
 			} else {
-				let isAlreadyHidden = await appPreferencesClient.isResourceHidden(resource: state.asset)
+				let isAlreadyHidden = await appPreferencesClient.isResourceHidden(resource: state.resource)
 				await send(.internal(.setShouldShow(!isAlreadyHidden)))
 			}
 		}
 	}
 
-	func hideAssetEffect(state: State) -> Effect<Action> {
+	func hideResourceEffect(state: State) -> Effect<Action> {
 		.run { send in
 			try await appPreferencesClient.updating { preferences in
-				preferences.resources.hideResource(resource: state.asset)
+				preferences.resources.hideResource(resource: state.resource)
 			}
-			await send(.delegate(.didHideAsset))
+			await send(.delegate(.didHideResource))
 		}
 	}
 }

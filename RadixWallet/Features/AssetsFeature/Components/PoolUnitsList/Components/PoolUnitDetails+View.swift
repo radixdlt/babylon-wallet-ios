@@ -62,7 +62,7 @@ extension PoolUnitDetails {
 
 						AssetResourceDetailsSection(viewState: viewStore.resourceDetails)
 
-						HideAsset.View(store: store.hideAsset)
+						HideResource.View(store: store.hideResource)
 					}
 					.padding(.bottom, .medium1)
 				}
@@ -72,7 +72,7 @@ extension PoolUnitDetails {
 }
 
 private extension StoreOf<PoolUnitDetails> {
-	var hideAsset: StoreOf<HideAsset> {
-		scope(state: \.hideAsset, action: \.child.hideAsset)
+	var hideResource: StoreOf<HideResource> {
+		scope(state: \.hideResource, action: \.child.hideResource)
 	}
 }

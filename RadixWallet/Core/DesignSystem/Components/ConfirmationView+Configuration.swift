@@ -16,4 +16,12 @@ extension ConfirmationView.Configuration {
 			primaryAction: L10n.AssetDetails.HideAsset.button
 		)
 	}
+
+	static func hideCollection(name: String) -> Self {
+		.init(
+			title: L10n.AssetDetails.HideCollection.title,
+			message: L10n.AssetDetails.HideCollection.message(name),
+			primaryAction: L10n.AssetDetails.HideCollection.button
+		)
+	}
 }
