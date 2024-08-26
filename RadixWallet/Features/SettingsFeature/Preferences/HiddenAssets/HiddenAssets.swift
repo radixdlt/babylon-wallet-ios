@@ -6,16 +6,11 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 	@ObservableState
 	public struct State: Sendable, Hashable {
 		var fungible: [OnLedgerEntity.Resource] = []
-		var nonFungible: [NonFungibleDetails] = []
+		var nonFungible: [OnLedgerEntity.Resource] = []
 		var poolUnit: [PoolUnitDetails] = []
 
 		@Presents
 		var destination: Destination.State? = nil
-
-		public struct NonFungibleDetails: Sendable, Hashable {
-			let resource: OnLedgerEntity.Resource
-			let token: OnLedgerEntity.NonFungibleToken
-		}
 
 		public struct PoolUnitDetails: Sendable, Hashable {
 			let resource: OnLedgerEntity.Resource
@@ -32,11 +27,11 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadAssets([ResourceIdentifier])
+		case loadResources([ResourceIdentifier])
 		case setFungible([OnLedgerEntity.Resource])
-		case setNonFungible([State.NonFungibleDetails])
+		case setNonFungible([OnLedgerEntity.Resource])
 		case setPoolUnit([State.PoolUnitDetails])
-		case didUnhideAsset(ResourceIdentifier)
+		case didUnhideResource(ResourceIdentifier)
 	}
 
 	public struct Destination: DestinationReducer {
@@ -73,17 +68,17 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 		switch viewAction {
 		case .task:
 			return .run { send in
-				let hiddenAssets = await appPreferencesClient.getHiddenAssets()
-				await send(.internal(.loadAssets(hiddenAssets)))
+				let hiddenResources = await appPreferencesClient.getHiddenResources()
+				await send(.internal(.loadResources(hiddenResources)))
 			}
-		case let .unhideTapped(asset):
+		case let .unhideTapped(resource):
 			state.destination = .unhideAlert(.init(
 				title: { TextState(L10n.HiddenAssets.unhideConfirmation) },
 				actions: {
 					ButtonState(role: .cancel, action: .cancelTapped) {
 						TextState(L10n.Common.cancel)
 					}
-					ButtonState(action: .confirmTapped(asset)) {
+					ButtonState(action: .confirmTapped(resource)) {
 						TextState(L10n.Common.confirm)
 					}
 				}
@@ -94,10 +89,10 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .loadAssets(hiddenAssets):
-			return fungibleEffect(hiddenAssets: hiddenAssets)
-				.merge(with: nonFungibleEffect(hiddenAssets: hiddenAssets))
-				.merge(with: poolUnitEffect(hiddenAssets: hiddenAssets))
+		case let .loadResources(hiddenResources):
+			return fungibleEffect(hiddenResources: hiddenResources)
+				.merge(with: nonFungibleEffect(hiddenResources: hiddenResources))
+				.merge(with: poolUnitEffect(hiddenResources: hiddenResources))
 
 		case let .setFungible(values):
 			state.fungible = values
@@ -111,12 +106,12 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 			state.poolUnit = values
 			return .none
 
-		case let .didUnhideAsset(asset):
-			switch asset {
+		case let .didUnhideResource(resource):
+			switch resource {
 			case let .fungible(resourceAddress):
 				state.fungible.removeAll(where: { $0.resourceAddress == resourceAddress })
 			case let .nonFungible(resourceAddress):
-				state.nonFungible.removeAll(where: { $0.token.id.resourceAddress == resourceAddress })
+				state.nonFungible.removeAll(where: { $0.resourceAddress == resourceAddress })
 			case let .poolUnit(poolAddress):
 				state.poolUnit.removeAll(where: { $0.details.address == poolAddress })
 			}
@@ -129,12 +124,12 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 		switch presentedAction {
 		case let .unhideAlert(action):
 			switch action {
-			case let .confirmTapped(asset):
+			case let .confirmTapped(resource):
 				return .run { send in
 					try await appPreferencesClient.updating { preferences in
-						preferences.resources.unhideResource(resource: asset)
+						preferences.resources.unhideResource(resource: resource)
 					}
-					await send(.internal(.didUnhideAsset(asset)), animation: .default)
+					await send(.internal(.didUnhideResource(resource)), animation: .default)
 				}
 			case .cancelTapped:
 				state.destination = nil
@@ -143,31 +138,23 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 		}
 	}
 
-	private func fungibleEffect(hiddenAssets: [ResourceIdentifier]) -> Effect<Action> {
+	private func fungibleEffect(hiddenResources: [ResourceIdentifier]) -> Effect<Action> {
 		.run { send in
-			let resources = try await onLedgerEntitiesClient.getEntities(addresses: hiddenAssets.fungibleAddresses, metadataKeys: .resourceMetadataKeys).compactMap(\.resource)
+			let resources = try await onLedgerEntitiesClient.getEntities(addresses: hiddenResources.fungibleAddresses, metadataKeys: .resourceMetadataKeys).compactMap(\.resource)
 			await send(.internal(.setFungible(resources)))
 		}
 	}
 
-	private func nonFungibleEffect(hiddenAssets: [ResourceIdentifier]) -> Effect<Action> {
-		.run { _ in
-//			let nonFungibleDetails = try await hiddenAssets.nonFungibleDictionary.parallelMap { resourceAddress, nonFungibleIds in
-//				let resource = try await onLedgerEntitiesClient.getResource(resourceAddress)
-//				let tokens = try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(resource: resourceAddress, nonFungibleIds: nonFungibleIds))
-//				return tokens.map {
-//					State.NonFungibleDetails(resource: resource, token: $0)
-//				}
-//			}
-//			.flatMap { $0 }
-//
-//			await send(.internal(.setNonFungible(nonFungibleDetails)))
+	private func nonFungibleEffect(hiddenResources: [ResourceIdentifier]) -> Effect<Action> {
+		.run { send in
+			let resources = try await onLedgerEntitiesClient.getEntities(addresses: hiddenResources.nonFungibleAddresses, metadataKeys: .resourceMetadataKeys).compactMap(\.resource)
+			await send(.internal(.setNonFungible(resources)))
 		}
 	}
 
-	private func poolUnitEffect(hiddenAssets: [ResourceIdentifier]) -> Effect<Action> {
+	private func poolUnitEffect(hiddenResources: [ResourceIdentifier]) -> Effect<Action> {
 		.run { send in
-			let resourcePools = try await onLedgerEntitiesClient.getEntities(addresses: hiddenAssets.poolUnitAddresses, metadataKeys: .resourceMetadataKeys).compactMap(\.resourcePool)
+			let resourcePools = try await onLedgerEntitiesClient.getEntities(addresses: hiddenResources.poolUnitAddresses, metadataKeys: .resourceMetadataKeys).compactMap(\.resourcePool)
 			let resources = try await resourcePools.parallelMap {
 				try await onLedgerEntitiesClient.getResource($0.poolUnitResourceAddress)
 			}
@@ -189,26 +176,21 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 private extension [ResourceIdentifier] {
 	var fungibleAddresses: [Address] {
 		compactMap { item in
-			switch item {
-			case let .fungible(resourceAddress):
-				resourceAddress.asGeneral
-			case .nonFungible, .poolUnit:
-				nil
+			guard case let .fungible(resourceAddress) = item else {
+				return nil
 			}
+			return resourceAddress.asGeneral
 		}
 	}
 
-//	var nonFungibleDictionary: [ResourceAddress: [NonFungibleGlobalId]] {
-//		let nonFungibleIds = self.compactMap { item -> ResourceAddress? in
-//			guard case let .nonFungible(id) = item else {
-//				return nil
-//			}
-//			return id
-//		}
-//		return Dictionary(grouping: nonFungibleIds) {
-//			$0.resourceAddress
-//		}
-//	}
+	var nonFungibleAddresses: [Address] {
+		compactMap { item in
+			guard case let .nonFungible(resourceAddress) = item else {
+				return nil
+			}
+			return resourceAddress.asGeneral
+		}
+	}
 
 	var poolUnitAddresses: [Address] {
 		compactMap { item in

@@ -36,10 +36,10 @@ extension AccountPortfoliosClient: DependencyKey {
 
 		/// Fetches the pool and stake units details for a given account; Will update the portfolio accordingly
 		@Sendable
-		func fetchPoolAndStakeUnitsDetails(_ account: OnLedgerEntity.OnLedgerAccount, hiddenAssets: [ResourceIdentifier], cachingStrategy: OnLedgerEntitiesClient.CachingStrategy) async {
+		func fetchPoolAndStakeUnitsDetails(_ account: OnLedgerEntity.OnLedgerAccount, hiddenResources: [ResourceIdentifier], cachingStrategy: OnLedgerEntitiesClient.CachingStrategy) async {
 			async let poolDetailsFetch = Task {
 				do {
-					let poolUnitDetails = try await onLedgerEntitiesClient.getOwnedPoolUnitsDetails(account, hiddenAssets: hiddenAssets, cachingStrategy: cachingStrategy)
+					let poolUnitDetails = try await onLedgerEntitiesClient.getOwnedPoolUnitsDetails(account, hiddenResources: hiddenResources, cachingStrategy: cachingStrategy)
 					await state.set(poolDetails: .success(poolUnitDetails), forAccount: account.address)
 				} catch {
 					await state.set(poolDetails: .failure(error), forAccount: account.address)
@@ -96,9 +96,9 @@ extension AccountPortfoliosClient: DependencyKey {
 			await state.setIsCurrencyAmountVisble(display.isCurrencyAmountVisible)
 
 			let accounts = try await onLedgerEntitiesClient.getAccounts(accountAddresses)
-			let hiddenAssets = preferences.resources.hiddenResources
+			let hiddenResources = preferences.resources.hiddenResources
 
-			let portfolios = accounts.map { AccountPortfolio(account: $0, hiddenAssets: hiddenAssets) }
+			let portfolios = accounts.map { AccountPortfolio(account: $0, hiddenResources: hiddenResources) }
 			await state.handlePortfoliosUpdate(portfolios)
 
 			/// Put together all resources from already fetched and new accounts
@@ -136,7 +136,7 @@ extension AccountPortfoliosClient: DependencyKey {
 
 			// Load additional details
 			_ = await accounts.map(\.nonEmptyVaults).parallelMap {
-				await fetchPoolAndStakeUnitsDetails($0, hiddenAssets: hiddenAssets, cachingStrategy: forceRefreshEntities ? .forceUpdate : .useCache)
+				await fetchPoolAndStakeUnitsDetails($0, hiddenResources: hiddenResources, cachingStrategy: forceRefreshEntities ? .forceUpdate : .useCache)
 			}
 
 			return Array(state.portfoliosSubject.value.wrappedValue!.values)
@@ -152,8 +152,8 @@ extension AccountPortfoliosClient: DependencyKey {
 			}
 
 			let account = try await onLedgerEntitiesClient.getAccount(accountAddress)
-			let hiddenAssets = await appPreferencesClient.getHiddenAssets()
-			let portfolio = AccountPortfolio(account: account, hiddenAssets: hiddenAssets)
+			let hiddenResources = await appPreferencesClient.getHiddenResources()
+			let portfolio = AccountPortfolio(account: account, hiddenResources: hiddenResources)
 
 			if case let .success(tokenPrices) = await state.tokenPrices {
 				await applyTokenPrices(
@@ -163,7 +163,7 @@ extension AccountPortfoliosClient: DependencyKey {
 			}
 
 			await state.handlePortfolioUpdate(portfolio)
-			await fetchPoolAndStakeUnitsDetails(account.nonEmptyVaults, hiddenAssets: hiddenAssets, cachingStrategy: forceRefresh ? .forceUpdate : .useCache)
+			await fetchPoolAndStakeUnitsDetails(account.nonEmptyVaults, hiddenResources: hiddenResources, cachingStrategy: forceRefresh ? .forceUpdate : .useCache)
 
 			return portfolio
 		}

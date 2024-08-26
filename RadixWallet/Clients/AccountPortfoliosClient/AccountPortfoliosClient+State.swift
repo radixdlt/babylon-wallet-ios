@@ -4,7 +4,7 @@ import Foundation
 extension AccountPortfoliosClient {
 	public struct AccountPortfolio: Sendable, Hashable, CustomDebugStringConvertible {
 		public var account: OnLedgerEntity.OnLedgerAccount
-		public let hiddenAssets: [ResourceIdentifier]
+		public let hiddenResources: [ResourceIdentifier]
 		public var poolUnitDetails: Loadable<[OnLedgerEntitiesClient.OwnedResourcePoolDetails]> = .idle
 		public var stakeUnitDetails: Loadable<IdentifiedArrayOf<OnLedgerEntitiesClient.OwnedStakeDetails>> = .idle
 
@@ -14,26 +14,26 @@ extension AccountPortfoliosClient {
 			account.debugDescription
 		}
 
-		init(account: OnLedgerEntity.OnLedgerAccount, hiddenAssets: [ResourceIdentifier]) {
+		init(account: OnLedgerEntity.OnLedgerAccount, hiddenResources: [ResourceIdentifier]) {
 			var modified = account
 
 			// Remove every hidden fungible resource
 			modified.fungibleResources.nonXrdResources.removeAll(where: { resource in
-				hiddenAssets.contains(.fungible(resource.resourceAddress))
+				hiddenResources.contains(.fungible(resource.resourceAddress))
 			})
 
 			// Remove every hidden non fungible resource
 			modified.nonFungibleResources.removeAll(where: { resource in
-				hiddenAssets.contains(.nonFungible(resource.resourceAddress))
+				hiddenResources.contains(.nonFungible(resource.resourceAddress))
 			})
 
 			// Remove every hidden pool unit
 			modified.poolUnitResources.poolUnits.removeAll(where: { poolUnit in
-				hiddenAssets.contains(.poolUnit(poolUnit.resourcePoolAddress))
+				hiddenResources.contains(.poolUnit(poolUnit.resourcePoolAddress))
 			})
 
 			self.account = modified
-			self.hiddenAssets = hiddenAssets
+			self.hiddenResources = hiddenResources
 		}
 	}
 

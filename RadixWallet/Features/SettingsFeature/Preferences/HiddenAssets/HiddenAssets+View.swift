@@ -49,7 +49,7 @@ extension HiddenAssets {
 						Card {
 							PlainListRow(viewState: .init(
 								rowCoreViewState: .init(context: .hiddenAsset, title: resource.fungibleResourceName),
-								accessory: { unhideButton(asset: .fungible(resource.resourceAddress)) },
+								accessory: { unhideButton(resource: .fungible(resource.resourceAddress)) },
 								icon: { Thumbnail(.token(.other), url: resource.metadata.iconURL) }
 							))
 						}
@@ -64,13 +64,13 @@ extension HiddenAssets {
 				empty
 			} else {
 				VStack(spacing: .medium3) {
-					ForEachStatic(store.nonFungible) { _ in
+					ForEachStatic(store.nonFungible) { resource in
 						Card {
-//							PlainListRow(viewState: .init(
-//								rowCoreViewState: details.rowCoreViewState,
-//								accessory: { unhideButton(asset: .nonFungible(details.token.id)) },
-//								icon: { Thumbnail(.nft, url: details.resource.metadata.iconURL) }
-//							))
+							PlainListRow(viewState: .init(
+								rowCoreViewState: .init(context: .hiddenAsset, title: resource.metadata.name),
+								accessory: { unhideButton(resource: .nonFungible(resource.resourceAddress)) },
+								icon: { Thumbnail(.nft, url: resource.metadata.iconURL) }
+							))
 						}
 					}
 				}
@@ -87,7 +87,7 @@ extension HiddenAssets {
 						Card {
 							PlainListRow(viewState: .init(
 								rowCoreViewState: poolUnit.rowCoreViewState,
-								accessory: { unhideButton(asset: .poolUnit(poolUnit.details.address)) },
+								accessory: { unhideButton(resource: .poolUnit(poolUnit.details.address)) },
 								icon: { Thumbnail(.poolUnit, url: poolUnit.resource.metadata.iconURL) }
 							))
 						}
@@ -96,9 +96,9 @@ extension HiddenAssets {
 			}
 		}
 
-		private func unhideButton(asset: ResourceIdentifier) -> some SwiftUI.View {
+		private func unhideButton(resource: ResourceIdentifier) -> some SwiftUI.View {
 			Button(L10n.HiddenAssets.unhide) {
-				store.send(.view(.unhideTapped(asset)))
+				store.send(.view(.unhideTapped(resource)))
 			}
 			.buttonStyle(.secondaryRectangular(shouldExpand: false))
 		}
@@ -107,7 +107,7 @@ extension HiddenAssets {
 			ZStack {
 				PlainListRow(viewState: .init(
 					rowCoreViewState: .init(context: .hiddenAsset, title: "dummy"),
-					accessory: { unhideButton(asset: .fungible(.mainnetXRD)) },
+					accessory: { unhideButton(resource: .fungible(.mainnetXRD)) },
 					icon: { Thumbnail(.token(.other), url: nil) }
 				))
 				.hidden()
@@ -119,16 +119,6 @@ extension HiddenAssets {
 			.background(Color.app.gray4)
 			.clipShape(RoundedRectangle(cornerRadius: .medium3))
 		}
-	}
-}
-
-private extension HiddenAssets.State.NonFungibleDetails {
-	var rowCoreViewState: PlainListRowCore.ViewState {
-		.init(
-			context: .hiddenAsset,
-			title: resource.metadata.name ?? token.id.resourceAddress.formatted(),
-			subtitle: token.data?.name ?? token.id.localID.formatted()
-		)
 	}
 }
 
