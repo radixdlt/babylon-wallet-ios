@@ -25,14 +25,13 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 		appsFlyerClient.continue(userActivity)
 	}
 
-	public func sceneWillResignActive(_ scene: UIScene) {
+	public func sceneDidEnterBackground(_ scene: UIScene) {
 		guard let scene = scene as? UIWindowScene else { return }
 		showPrivacyProtectionWindow(in: scene)
 	}
 
-	public func sceneDidBecomeActive(_ scene: UIScene) {
-		guard let scene = scene as? UIWindowScene else { return }
-		hidePrivacyProtectionWindow(in: scene)
+	public func sceneWillEnterForeground(_ scene: UIScene) {
+		hidePrivacyProtectionWindow()
 	}
 
 	func overlayWindow(in scene: UIWindowScene) {
@@ -70,7 +69,7 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 		privacyProtectionWindow?.makeKeyAndVisible()
 	}
 
-	private func hidePrivacyProtectionWindow(in scene: UIWindowScene) {
+	private func hidePrivacyProtectionWindow() {
 		privacyProtectionWindow?.isHidden = true
 		privacyProtectionWindow = nil
 	}
