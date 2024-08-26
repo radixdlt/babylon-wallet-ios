@@ -56,9 +56,6 @@ extension Home {
 						}
 						.padding(.horizontal, .medium1)
 
-						// FIXME: Revert
-						InfoButton(.behaviors, label: "Read about behaviours")
-
 						Button(L10n.HomePage.createNewAccount) {
 							store.send(.view(.createAccountButtonTapped))
 						}
