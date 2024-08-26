@@ -9,9 +9,15 @@ struct AssetBehaviorsView: View {
 	var body: some View {
 		if !behaviors.isEmpty {
 			Group {
-				Text(L10n.AssetDetails.behavior)
-					.textStyle(.body1Regular)
-					.foregroundColor(.app.gray2)
+				HStack(spacing: .zero) {
+					Text(L10n.AssetDetails.behavior)
+						.textStyle(.body1Regular)
+						.foregroundColor(.app.gray2)
+
+					Spacer(minLength: .small2)
+
+					InfoButton(.behaviors, label: "What are behaviors?") // FIXME: Strings
+				}
 
 				VStack(alignment: .leading, spacing: .small1) {
 					ForEach(filteredBehaviors, id: \.self) { behavior in
