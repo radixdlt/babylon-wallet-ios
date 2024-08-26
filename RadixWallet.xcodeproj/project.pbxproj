@@ -853,7 +853,6 @@
 		48FFFADE2ADC21F500B2B213 /* FileLogging in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFADD2ADC21F500B2B213 /* FileLogging */; };
 		48FFFAE12ADC220F00B2B213 /* Tagged in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAE02ADC220F00B2B213 /* Tagged */; };
 		48FFFAE42ADC222100B2B213 /* Validated in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAE32ADC222100B2B213 /* Validated */; };
-		48FFFAE72ADC223300B2B213 /* Overture in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAE62ADC223300B2B213 /* Overture */; };
 		48FFFAEA2ADC225B00B2B213 /* ScreenshotPreventing in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAE92ADC225B00B2B213 /* ScreenshotPreventing */; };
 		48FFFAED2ADC226B00B2B213 /* CodeScanner in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAEC2ADC226B00B2B213 /* CodeScanner */; };
 		48FFFAF02ADC229900B2B213 /* AnyCodable in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAEF2ADC229900B2B213 /* AnyCodable */; };
@@ -2346,7 +2345,6 @@
 			files = (
 				E7AE2D052BF7844300830BAA /* Sargon in Frameworks */,
 				48FFFABE2ADC209100B2B213 /* NukeUI in Frameworks */,
-				48FFFAE72ADC223300B2B213 /* Overture in Frameworks */,
 				48FFFA9F2ADC1F2700B2B213 /* KeychainAccess in Frameworks */,
 				489FEF912BDD0B80003EC10D /* Sargon in Frameworks */,
 				48FFFAAB2ADC1FE900B2B213 /* DependenciesAdditions in Frameworks */,
@@ -6623,7 +6621,6 @@
 				48FFFADD2ADC21F500B2B213 /* FileLogging */,
 				48FFFAE02ADC220F00B2B213 /* Tagged */,
 				48FFFAE32ADC222100B2B213 /* Validated */,
-				48FFFAE62ADC223300B2B213 /* Overture */,
 				48FFFAE92ADC225B00B2B213 /* ScreenshotPreventing */,
 				48FFFAEC2ADC226B00B2B213 /* CodeScanner */,
 				48FFFAEF2ADC229900B2B213 /* AnyCodable */,
@@ -6690,7 +6687,6 @@
 				48FFFADC2ADC21F500B2B213 /* XCRemoteSwiftPackageReference "swift-log-file" */,
 				48FFFADF2ADC220F00B2B213 /* XCRemoteSwiftPackageReference "swift-tagged" */,
 				48FFFAE22ADC222100B2B213 /* XCRemoteSwiftPackageReference "swift-validated" */,
-				48FFFAE52ADC223300B2B213 /* XCRemoteSwiftPackageReference "swift-overture" */,
 				48FFFAE82ADC225B00B2B213 /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */,
 				48FFFAEB2ADC226B00B2B213 /* XCRemoteSwiftPackageReference "CodeScanner" */,
 				48FFFAEE2ADC229900B2B213 /* XCRemoteSwiftPackageReference "AnyCodable" */,
@@ -8560,14 +8556,6 @@
 				version = 0.2.1;
 			};
 		};
-		48FFFAE52ADC223300B2B213 /* XCRemoteSwiftPackageReference "swift-overture" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/pointfreeco/swift-overture.git";
-			requirement = {
-				kind = exactVersion;
-				version = 0.5.0;
-			};
-		};
 		48FFFAE82ADC225B00B2B213 /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Sajjon/ScreenshotPreventing-iOS";
@@ -8742,11 +8730,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 48FFFAE22ADC222100B2B213 /* XCRemoteSwiftPackageReference "swift-validated" */;
 			productName = Validated;
-		};
-		48FFFAE62ADC223300B2B213 /* Overture */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 48FFFAE52ADC223300B2B213 /* XCRemoteSwiftPackageReference "swift-overture" */;
-			productName = Overture;
 		};
 		48FFFAE92ADC225B00B2B213 /* ScreenshotPreventing */ = {
 			isa = XCSwiftPackageProductDependency;
