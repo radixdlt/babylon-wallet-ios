@@ -37,8 +37,8 @@ public struct ResourceBalanceButton: View {
 				}
 			}
 			.padding(.top, topPadding)
-			.padding(.bottom, bottomPadding)
 			.padding(.horizontal, horizontalSpacing)
+			.padding(.bottom, bottomPadding)
 			.contentShape(Rectangle())
 			.background(background)
 		}

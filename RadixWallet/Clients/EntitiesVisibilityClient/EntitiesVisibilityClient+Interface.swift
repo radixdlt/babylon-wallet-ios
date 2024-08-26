@@ -20,13 +20,3 @@ extension EntitiesVisibilityClient {
 	public typealias UnhidePersona = @Sendable (Persona.ID) async throws -> Void
 	public typealias GetHiddenEntities = @Sendable () async throws -> HiddenEntities
 }
-
-extension EntitiesVisibilityClient {
-	func hide(account: Account) async throws {
-		try await hideAccount(account.id)
-	}
-
-	func hide(persona: Persona) async throws {
-		try await hidePersona(persona.id)
-	}
-}

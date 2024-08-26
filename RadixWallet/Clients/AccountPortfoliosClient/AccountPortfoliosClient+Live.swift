@@ -25,9 +25,9 @@ extension AccountPortfoliosClient: DependencyKey {
 			}
 		}
 
-		/// Update when hidden assets change
+		/// Update when hidden resources change
 		Task {
-			for try await _ in await appPreferencesClient.appPreferenceUpdates().map(\.resources.hiddenResources) {
+			for try await _ in await appPreferencesClient.appPreferenceUpdates().removeDuplicates(by: { $0.resources.hiddenResources == $1.resources.hiddenResources }) {
 				guard !Task.isCancelled else { return }
 				let accountAddresses = state.portfoliosSubject.value.wrappedValue.map { $0.map(\.key) } ?? []
 				_ = try await fetchAccountPortfolios(accountAddresses, forceRefreshEntities: false, forceRefreshPrices: true)

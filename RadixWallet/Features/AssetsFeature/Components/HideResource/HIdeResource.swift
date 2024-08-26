@@ -117,7 +117,7 @@ private extension HideResource {
 			if isXrd {
 				await send(.internal(.setShouldShow(false)))
 			} else {
-				let isAlreadyHidden = await appPreferencesClient.isResourceHidden(resource: state.resource)
+				let isAlreadyHidden = await appPreferencesClient.isResourceHidden(state.resource)
 				await send(.internal(.setShouldShow(!isAlreadyHidden)))
 			}
 		}

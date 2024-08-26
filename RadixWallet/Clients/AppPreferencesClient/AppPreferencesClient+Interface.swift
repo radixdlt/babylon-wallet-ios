@@ -75,7 +75,7 @@ extension AppPreferencesClient {
 		await getPreferences().resources.hiddenResources
 	}
 
-	public func isResourceHidden(resource: ResourceIdentifier) async -> Bool {
+	public func isResourceHidden(_ resource: ResourceIdentifier) async -> Bool {
 		await getHiddenResources().contains(resource)
 	}
 }
