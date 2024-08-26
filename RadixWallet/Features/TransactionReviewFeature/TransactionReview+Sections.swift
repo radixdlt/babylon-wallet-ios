@@ -418,7 +418,7 @@ extension TransactionReview {
 		guard !withdrawals.isEmpty else { return nil }
 
 		let withdrawalAccounts = withdrawals.map {
-			TransactionReviewAccount.State(account: $0.key, transfers: $0.value)
+			TransactionReviewAccount.State(account: $0.key, transfers: $0.value, isDeposit: false)
 		}
 		.asIdentified()
 
@@ -463,7 +463,7 @@ extension TransactionReview {
 
 		let depositAccounts = deposits
 			.filter { !$0.value.isEmpty }
-			.map { TransactionReviewAccount.State(account: $0.key, transfers: $0.value) }
+			.map { TransactionReviewAccount.State(account: $0.key, transfers: $0.value, isDeposit: true) }
 			.asIdentified()
 
 		guard !depositAccounts.isEmpty else { return nil }
