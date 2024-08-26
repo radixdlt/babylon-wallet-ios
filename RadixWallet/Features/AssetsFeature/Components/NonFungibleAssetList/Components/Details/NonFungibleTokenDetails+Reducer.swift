@@ -29,8 +29,8 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 			self.ledgerState = ledgerState
 			self.stakeClaim = stakeClaim
 			self.isClaimStakeEnabled = isClaimStakeEnabled
-			if let id = token?.id, stakeClaim == nil {
-				hideAsset = .init(asset: .nonFungible(id))
+			if stakeClaim == nil {
+				hideAsset = .init(asset: .nonFungible(resourceAddress))
 			}
 		}
 	}

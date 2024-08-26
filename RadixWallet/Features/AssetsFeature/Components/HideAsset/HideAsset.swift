@@ -3,13 +3,13 @@
 public struct HideAsset: Sendable, FeatureReducer {
 	@ObservableState
 	public struct State: Sendable, Hashable {
-		let asset: AssetAddress
+		let asset: ResourceIdentifier
 		var shouldShow = true
 
 		@Presents
 		var destination: Destination.State? = nil
 
-		public init(asset: AssetAddress) {
+		public init(asset: ResourceIdentifier) {
 			self.asset = asset
 		}
 	}
@@ -112,7 +112,7 @@ private extension HideAsset {
 	func hideAssetEffect(state: State) -> Effect<Action> {
 		.run { send in
 			try await appPreferencesClient.updating { preferences in
-				preferences.assets.hideAsset(asset: state.asset)
+				preferences.resources.hideResource(resource: state.asset)
 			}
 			await send(.delegate(.didHideAsset))
 		}

@@ -85,7 +85,7 @@ extension OnLedgerEntitiesClient {
 		resourceAssociatedDapps: TransactionReview.ResourceAssociatedDapps? = nil,
 		networkID: NetworkID,
 		guarantee: TransactionGuarantee?,
-		hiddenAssets: [AssetAddress]
+		hiddenAssets: [ResourceIdentifier]
 	) async throws -> ResourceBalance {
 		let resourceAddress = resource.resourceAddress
 
@@ -160,8 +160,8 @@ extension OnLedgerEntitiesClient {
 
 			worth = amount * validator.xrdVaultBalance / totalSupply
 		} else {
-			if let stake = try validatorStakes.first(where: { $0.validatorAddress == validator.address }) {
-				guard try stake.liquidStakeUnitAddress == validator.stakeUnitResourceAddress else {
+			if let stake = validatorStakes.first(where: { $0.validatorAddress == validator.address }) {
+				guard stake.liquidStakeUnitAddress == validator.stakeUnitResourceAddress else {
 					throw StakeUnitAddressMismatch()
 				}
 				// Distribute the worth in proportion to the amounts, if needed
@@ -209,12 +209,12 @@ extension OnLedgerEntitiesClient {
 				}
 			}
 
-			let newTokens = try ids.filter { id in
+			let newTokens = ids.filter { id in
 				newlyCreatedNonFungibles.contains { newId in
 					newId.resourceAddress == resourceAddress && newId.nonFungibleLocalId == id
 				}
 			}.map {
-				try OnLedgerEntity.NonFungibleToken(resourceAddress: resourceAddress, nftID: $0, nftData: nil)
+				OnLedgerEntity.NonFungibleToken(resourceAddress: resourceAddress, nftID: $0, nftData: nil)
 			}
 
 			let tokens = try await getNonFungibleTokenData(.init(
@@ -236,7 +236,7 @@ extension OnLedgerEntitiesClient {
 				)]
 			} else {
 				result = tokens.map { token in
-					let isHidden = hiddenAssets.contains(.nonFungible(token.id))
+					let isHidden = hiddenAssets.contains(.nonFungible(token.id.resourceAddress))
 					return ResourceBalance(resource: resource, details: .nonFungible(token), isHidden: isHidden)
 				}
 

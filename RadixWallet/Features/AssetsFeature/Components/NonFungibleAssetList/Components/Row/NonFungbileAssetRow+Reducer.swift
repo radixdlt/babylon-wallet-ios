@@ -137,8 +137,7 @@ extension NonFungibleAssetList {
 			return .run { [resource = state.resource, accountAddress = state.accountAddress] send in
 				let result = await TaskResult {
 					let data = try await onLedgerEntitiesClient.getAccountOwnedNonFungibleTokenData(.init(accountAddress: accountAddress, resource: resource, mode: .loadPage(pageCursor: cursor)))
-					let hiddenAssets = await appPreferencesClient.getHiddenAssets()
-					return InternalAction.TokensLoadResult(tokens: data.tokens, hiddenAssets: hiddenAssets, nextPageCursor: data.nextPageCursor, previousTokenIndex: previousTokenIndex)
+					return InternalAction.TokensLoadResult(tokens: data.tokens, nextPageCursor: data.nextPageCursor, previousTokenIndex: previousTokenIndex)
 				}
 				await send(.internal(.tokensLoaded(result)))
 			}
@@ -147,20 +146,5 @@ extension NonFungibleAssetList {
 		private func setTokensPlaceholders(_ state: inout State) {
 			state.tokens = .init(repeating: .loading, count: state.resource.nonFungibleIdsCount)
 		}
-	}
-}
-
-private extension NonFungibleAssetList.Row.InternalAction.TokensLoadResult {
-	init(
-		tokens: [OnLedgerEntity.NonFungibleToken],
-		hiddenAssets: [AssetAddress],
-		nextPageCursor: String?,
-		previousTokenIndex: Int
-	) {
-		self.tokens = tokens.filter { token in
-			!hiddenAssets.contains(.nonFungible(token.id))
-		}
-		self.nextPageCursor = nextPageCursor
-		self.previousTokenIndex = previousTokenIndex
 	}
 }

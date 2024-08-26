@@ -27,7 +27,7 @@ extension AccountPortfoliosClient: DependencyKey {
 
 		/// Update when hidden assets change
 		Task {
-			for try await _ in await appPreferencesClient.appPreferenceUpdates().map(\.assets.hiddenAssets) {
+			for try await _ in await appPreferencesClient.appPreferenceUpdates().map(\.resources.hiddenResources) {
 				guard !Task.isCancelled else { return }
 				let accountAddresses = state.portfoliosSubject.value.wrappedValue.map { $0.map(\.key) } ?? []
 				_ = try await fetchAccountPortfolios(accountAddresses, forceRefreshEntities: false, forceRefreshPrices: true)
@@ -36,7 +36,7 @@ extension AccountPortfoliosClient: DependencyKey {
 
 		/// Fetches the pool and stake units details for a given account; Will update the portfolio accordingly
 		@Sendable
-		func fetchPoolAndStakeUnitsDetails(_ account: OnLedgerEntity.OnLedgerAccount, hiddenAssets: [AssetAddress], cachingStrategy: OnLedgerEntitiesClient.CachingStrategy) async {
+		func fetchPoolAndStakeUnitsDetails(_ account: OnLedgerEntity.OnLedgerAccount, hiddenAssets: [ResourceIdentifier], cachingStrategy: OnLedgerEntitiesClient.CachingStrategy) async {
 			async let poolDetailsFetch = Task {
 				do {
 					let poolUnitDetails = try await onLedgerEntitiesClient.getOwnedPoolUnitsDetails(account, hiddenAssets: hiddenAssets, cachingStrategy: cachingStrategy)
@@ -96,7 +96,7 @@ extension AccountPortfoliosClient: DependencyKey {
 			await state.setIsCurrencyAmountVisble(display.isCurrencyAmountVisible)
 
 			let accounts = try await onLedgerEntitiesClient.getAccounts(accountAddresses)
-			let hiddenAssets = preferences.assets.hiddenAssets
+			let hiddenAssets = preferences.resources.hiddenResources
 
 			let portfolios = accounts.map { AccountPortfolio(account: $0, hiddenAssets: hiddenAssets) }
 			await state.handlePortfoliosUpdate(portfolios)

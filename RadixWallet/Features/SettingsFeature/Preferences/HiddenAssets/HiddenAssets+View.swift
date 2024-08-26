@@ -64,13 +64,13 @@ extension HiddenAssets {
 				empty
 			} else {
 				VStack(spacing: .medium3) {
-					ForEachStatic(store.nonFungible) { details in
+					ForEachStatic(store.nonFungible) { _ in
 						Card {
-							PlainListRow(viewState: .init(
-								rowCoreViewState: details.rowCoreViewState,
-								accessory: { unhideButton(asset: .nonFungible(details.token.id)) },
-								icon: { Thumbnail(.nft, url: details.resource.metadata.iconURL) }
-							))
+//							PlainListRow(viewState: .init(
+//								rowCoreViewState: details.rowCoreViewState,
+//								accessory: { unhideButton(asset: .nonFungible(details.token.id)) },
+//								icon: { Thumbnail(.nft, url: details.resource.metadata.iconURL) }
+//							))
 						}
 					}
 				}
@@ -96,7 +96,7 @@ extension HiddenAssets {
 			}
 		}
 
-		private func unhideButton(asset: AssetAddress) -> some SwiftUI.View {
+		private func unhideButton(asset: ResourceIdentifier) -> some SwiftUI.View {
 			Button(L10n.HiddenAssets.unhide) {
 				store.send(.view(.unhideTapped(asset)))
 			}

@@ -28,15 +28,15 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 	@CasePathable
 	public enum ViewAction: Sendable, Equatable {
 		case task
-		case unhideTapped(AssetAddress)
+		case unhideTapped(ResourceIdentifier)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadAssets([AssetAddress])
+		case loadAssets([ResourceIdentifier])
 		case setFungible([OnLedgerEntity.Resource])
 		case setNonFungible([State.NonFungibleDetails])
 		case setPoolUnit([State.PoolUnitDetails])
-		case didUnhideAsset(AssetAddress)
+		case didUnhideAsset(ResourceIdentifier)
 	}
 
 	public struct Destination: DestinationReducer {
@@ -50,7 +50,7 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 			case unhideAlert(UnhideAlert)
 
 			public enum UnhideAlert: Hashable, Sendable {
-				case confirmTapped(AssetAddress)
+				case confirmTapped(ResourceIdentifier)
 				case cancelTapped
 			}
 		}
@@ -115,8 +115,8 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 			switch asset {
 			case let .fungible(resourceAddress):
 				state.fungible.removeAll(where: { $0.resourceAddress == resourceAddress })
-			case let .nonFungible(globalId):
-				state.nonFungible.removeAll(where: { $0.token.id == globalId })
+			case let .nonFungible(resourceAddress):
+				state.nonFungible.removeAll(where: { $0.token.id.resourceAddress == resourceAddress })
 			case let .poolUnit(poolAddress):
 				state.poolUnit.removeAll(where: { $0.details.address == poolAddress })
 			}
@@ -132,7 +132,7 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 			case let .confirmTapped(asset):
 				return .run { send in
 					try await appPreferencesClient.updating { preferences in
-						preferences.assets.unhideAsset(asset: asset)
+						preferences.resources.unhideResource(resource: asset)
 					}
 					await send(.internal(.didUnhideAsset(asset)), animation: .default)
 				}
@@ -143,29 +143,29 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 		}
 	}
 
-	private func fungibleEffect(hiddenAssets: [AssetAddress]) -> Effect<Action> {
+	private func fungibleEffect(hiddenAssets: [ResourceIdentifier]) -> Effect<Action> {
 		.run { send in
 			let resources = try await onLedgerEntitiesClient.getEntities(addresses: hiddenAssets.fungibleAddresses, metadataKeys: .resourceMetadataKeys).compactMap(\.resource)
 			await send(.internal(.setFungible(resources)))
 		}
 	}
 
-	private func nonFungibleEffect(hiddenAssets: [AssetAddress]) -> Effect<Action> {
-		.run { send in
-			let nonFungibleDetails = try await hiddenAssets.nonFungibleDictionary.parallelMap { resourceAddress, nonFungibleIds in
-				let resource = try await onLedgerEntitiesClient.getResource(resourceAddress)
-				let tokens = try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(resource: resourceAddress, nonFungibleIds: nonFungibleIds))
-				return tokens.map {
-					State.NonFungibleDetails(resource: resource, token: $0)
-				}
-			}
-			.flatMap { $0 }
-
-			await send(.internal(.setNonFungible(nonFungibleDetails)))
+	private func nonFungibleEffect(hiddenAssets: [ResourceIdentifier]) -> Effect<Action> {
+		.run { _ in
+//			let nonFungibleDetails = try await hiddenAssets.nonFungibleDictionary.parallelMap { resourceAddress, nonFungibleIds in
+//				let resource = try await onLedgerEntitiesClient.getResource(resourceAddress)
+//				let tokens = try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(resource: resourceAddress, nonFungibleIds: nonFungibleIds))
+//				return tokens.map {
+//					State.NonFungibleDetails(resource: resource, token: $0)
+//				}
+//			}
+//			.flatMap { $0 }
+//
+//			await send(.internal(.setNonFungible(nonFungibleDetails)))
 		}
 	}
 
-	private func poolUnitEffect(hiddenAssets: [AssetAddress]) -> Effect<Action> {
+	private func poolUnitEffect(hiddenAssets: [ResourceIdentifier]) -> Effect<Action> {
 		.run { send in
 			let resourcePools = try await onLedgerEntitiesClient.getEntities(addresses: hiddenAssets.poolUnitAddresses, metadataKeys: .resourceMetadataKeys).compactMap(\.resourcePool)
 			let resources = try await resourcePools.parallelMap {
@@ -186,7 +186,7 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 
 // MARK: - Helpers
 
-private extension [AssetAddress] {
+private extension [ResourceIdentifier] {
 	var fungibleAddresses: [Address] {
 		compactMap { item in
 			switch item {
@@ -198,28 +198,24 @@ private extension [AssetAddress] {
 		}
 	}
 
-	var nonFungibleDictionary: [ResourceAddress: [NonFungibleGlobalId]] {
-		let nonFungibleIds = self.compactMap { item in
-			switch item {
-			case let .nonFungible(id):
-				id
-			case .fungible, .poolUnit:
-				nil
-			}
-		}
-		return Dictionary(grouping: nonFungibleIds) {
-			$0.resourceAddress
-		}
-	}
+//	var nonFungibleDictionary: [ResourceAddress: [NonFungibleGlobalId]] {
+//		let nonFungibleIds = self.compactMap { item -> ResourceAddress? in
+//			guard case let .nonFungible(id) = item else {
+//				return nil
+//			}
+//			return id
+//		}
+//		return Dictionary(grouping: nonFungibleIds) {
+//			$0.resourceAddress
+//		}
+//	}
 
 	var poolUnitAddresses: [Address] {
 		compactMap { item in
-			switch item {
-			case let .poolUnit(poolAddress):
-				poolAddress.asGeneral
-			case .fungible, .nonFungible:
-				nil
+			guard case let .poolUnit(poolAddress) = item else {
+				return nil
 			}
+			return poolAddress.asGeneral
 		}
 	}
 }

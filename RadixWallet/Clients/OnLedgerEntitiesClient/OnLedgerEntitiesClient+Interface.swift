@@ -534,7 +534,7 @@ extension OnLedgerEntitiesClient {
 	@Sendable
 	public func getOwnedPoolUnitsDetails(
 		_ account: OnLedgerEntity.OnLedgerAccount,
-		hiddenAssets: [AssetAddress],
+		hiddenAssets: [ResourceIdentifier],
 		cachingStrategy: CachingStrategy = .useCache
 	) async throws -> [OwnedResourcePoolDetails] {
 		let ownedPoolUnits = account.poolUnitResources.poolUnits.filter { poolUnit in

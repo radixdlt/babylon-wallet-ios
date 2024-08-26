@@ -4,7 +4,7 @@ import Foundation
 extension AccountPortfoliosClient {
 	public struct AccountPortfolio: Sendable, Hashable, CustomDebugStringConvertible {
 		public var account: OnLedgerEntity.OnLedgerAccount
-		public let hiddenAssets: [AssetAddress]
+		public let hiddenAssets: [ResourceIdentifier]
 		public var poolUnitDetails: Loadable<[OnLedgerEntitiesClient.OwnedResourcePoolDetails]> = .idle
 		public var stakeUnitDetails: Loadable<IdentifiedArrayOf<OnLedgerEntitiesClient.OwnedStakeDetails>> = .idle
 
@@ -14,7 +14,7 @@ extension AccountPortfoliosClient {
 			account.debugDescription
 		}
 
-		init(account: OnLedgerEntity.OnLedgerAccount, hiddenAssets: [AssetAddress]) {
+		init(account: OnLedgerEntity.OnLedgerAccount, hiddenAssets: [ResourceIdentifier]) {
 			var modified = account
 
 			// Remove every hidden fungible resource
@@ -22,30 +22,15 @@ extension AccountPortfoliosClient {
 				hiddenAssets.contains(.fungible(resource.resourceAddress))
 			})
 
+			// Remove every hidden non fungible resource
+			modified.nonFungibleResources.removeAll(where: { resource in
+				hiddenAssets.contains(.nonFungible(resource.resourceAddress))
+			})
+
 			// Remove every hidden pool unit
 			modified.poolUnitResources.poolUnits.removeAll(where: { poolUnit in
 				hiddenAssets.contains(.poolUnit(poolUnit.resourcePoolAddress))
 			})
-
-			// We cannot remove the NFTs, since at this moment we haven't loaded them yet.
-			// All we can do is update the `nonFungibleIdsCount` to remove the hidden ones.
-			// Then, when loading the actual tokens, we will filter those that are hidden.
-			var nonFungibleResources: [OnLedgerEntity.OwnedNonFungibleResource] = []
-			for var item in modified.nonFungibleResources {
-				let countHidden = hiddenAssets.filter { asset in
-					switch asset {
-					case let .nonFungible(globalId):
-						globalId.resourceAddress == item.resourceAddress
-					case .fungible, .poolUnit:
-						false
-					}
-				}.count
-				item.nonFungibleIdsCount -= countHidden
-				if item.nonFungibleIdsCount > 0 {
-					nonFungibleResources.append(item)
-				}
-			}
-			modified.nonFungibleResources = nonFungibleResources
 
 			self.account = modified
 			self.hiddenAssets = hiddenAssets
