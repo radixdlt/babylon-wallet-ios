@@ -42,16 +42,18 @@ extension HiddenAssets {
 		@ViewBuilder
 		private var fungibles: some SwiftUI.View {
 			if store.fungible.isEmpty {
-				empty
+				emptyState
 			} else {
 				VStack(spacing: .medium3) {
 					ForEachStatic(store.fungible) { resource in
 						Card {
-							PlainListRow(viewState: .init(
-								rowCoreViewState: .init(context: .hiddenAsset, title: resource.fungibleResourceName),
-								accessory: { unhideButton(resource: .fungible(resource.resourceAddress)) },
-								icon: { Thumbnail(.token(.other), url: resource.metadata.iconURL) }
-							))
+							AssetRow(
+								name: resource.fungibleResourceName,
+								address: .resource(resource.resourceAddress),
+								type: .token(.other),
+								url: resource.metadata.iconURL,
+								accessory: { unhideButton(resource: .fungible(resource.resourceAddress)) }
+							)
 						}
 					}
 				}
@@ -61,16 +63,18 @@ extension HiddenAssets {
 		@ViewBuilder
 		private var nonFungibles: some SwiftUI.View {
 			if store.nonFungible.isEmpty {
-				empty
+				emptyState
 			} else {
 				VStack(spacing: .medium3) {
-					ForEachStatic(store.nonFungible) { nonFungible in
+					ForEachStatic(store.nonFungible) { resource in
 						Card {
-							PlainListRow(viewState: .init(
-								rowCoreViewState: nonFungible.rowCoreViewState,
-								accessory: { unhideButton(resource: .nonFungible(nonFungible.resource.resourceAddress)) },
-								icon: { Thumbnail(.nft, url: nonFungible.resource.metadata.iconURL) }
-							))
+							AssetRow(
+								name: resource.metadata.name,
+								address: .resource(resource.resourceAddress),
+								type: .nft,
+								url: resource.metadata.iconURL,
+								accessory: { unhideButton(resource: .nonFungible(resource.resourceAddress)) }
+							)
 						}
 					}
 				}
@@ -80,16 +84,18 @@ extension HiddenAssets {
 		@ViewBuilder
 		private var poolUnits: some SwiftUI.View {
 			if store.poolUnit.isEmpty {
-				empty
+				emptyState
 			} else {
 				VStack(spacing: .medium3) {
 					ForEachStatic(store.poolUnit) { poolUnit in
 						Card {
-							PlainListRow(viewState: .init(
-								rowCoreViewState: poolUnit.rowCoreViewState,
-								accessory: { unhideButton(resource: .poolUnit(poolUnit.details.address)) },
-								icon: { Thumbnail(.poolUnit, url: poolUnit.resource.metadata.iconURL) }
-							))
+							AssetRow(
+								name: poolUnit.resource.fungibleResourceName,
+								address: .resourcePool(poolUnit.details.address),
+								type: .poolUnit,
+								url: poolUnit.resource.metadata.iconURL,
+								accessory: { unhideButton(resource: .poolUnit(poolUnit.details.address)) }
+							)
 						}
 					}
 				}
@@ -103,14 +109,10 @@ extension HiddenAssets {
 			.buttonStyle(.secondaryRectangular(shouldExpand: false))
 		}
 
-		private var empty: some SwiftUI.View {
+		private var emptyState: some SwiftUI.View {
 			ZStack {
-				PlainListRow(viewState: .init(
-					rowCoreViewState: .init(context: .hiddenAsset, title: "dummy"),
-					accessory: { unhideButton(resource: .fungible(.mainnetXRD)) },
-					icon: { Thumbnail(.token(.other), url: nil) }
-				))
-				.hidden()
+				AssetRow(name: "dummy", address: .resource(.mainnetXRD), type: .token(.other), url: nil, accessory: { unhideButton(resource: .fungible(.mainnetXRD)) })
+					.hidden()
 
 				Text(L10n.Common.none)
 					.textStyle(.secondaryHeader)
@@ -119,17 +121,5 @@ extension HiddenAssets {
 			.background(Color.app.gray4)
 			.clipShape(RoundedRectangle(cornerRadius: .medium3))
 		}
-	}
-}
-
-private extension HiddenAssets.State.NonFungibleDetails {
-	var rowCoreViewState: PlainListRowCore.ViewState {
-		.init(context: .hiddenAsset, title: resource.metadata.name ?? "-", subtitle: L10n.HiddenAssets.NonFungibles.count(count))
-	}
-}
-
-private extension HiddenAssets.State.PoolUnitDetails {
-	var rowCoreViewState: PlainListRowCore.ViewState {
-		.init(context: .hiddenAsset, title: resource.fungibleResourceName ?? "-", subtitle: details.dAppName ?? "-")
 	}
 }

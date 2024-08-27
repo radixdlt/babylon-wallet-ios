@@ -6,16 +6,11 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 	@ObservableState
 	public struct State: Sendable, Hashable {
 		var fungible: [OnLedgerEntity.Resource] = []
-		var nonFungible: [NonFungibleDetails] = []
-		var poolUnit: [PoolUnitDetails] = []
+		var nonFungible: [OnLedgerEntity.Resource] = []
+		var poolUnit: [State.PoolUnitDetails] = []
 
 		@Presents
 		var destination: Destination.State? = nil
-
-		public struct NonFungibleDetails: Sendable, Hashable {
-			let resource: OnLedgerEntity.Resource
-			let count: Int
-		}
 
 		public struct PoolUnitDetails: Sendable, Hashable {
 			let resource: OnLedgerEntity.Resource
@@ -34,7 +29,7 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case loadResources([ResourceIdentifier])
 		case setFungible([OnLedgerEntity.Resource])
-		case setNonFungible([State.NonFungibleDetails])
+		case setNonFungible([OnLedgerEntity.Resource])
 		case setPoolUnit([State.PoolUnitDetails])
 		case didUnhideResource(ResourceIdentifier)
 	}
@@ -117,7 +112,7 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 			case let .fungible(resourceAddress):
 				state.fungible.removeAll(where: { $0.resourceAddress == resourceAddress })
 			case let .nonFungible(resourceAddress):
-				state.nonFungible.removeAll(where: { $0.resource.resourceAddress == resourceAddress })
+				state.nonFungible.removeAll(where: { $0.resourceAddress == resourceAddress })
 			case let .poolUnit(poolAddress):
 				state.poolUnit.removeAll(where: { $0.details.address == poolAddress })
 			}
@@ -154,14 +149,7 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 	private func nonFungibleEffect(hiddenResources: [ResourceIdentifier]) -> Effect<Action> {
 		.run { send in
 			let resources = try await onLedgerEntitiesClient.getEntities(addresses: hiddenResources.nonFungibleAddresses, metadataKeys: .resourceMetadataKeys).compactMap(\.resource)
-			let accountAddresses = try await accountsClient.getAccountsOnCurrentNetwork().map(\.address)
-			let accounts = try await onLedgerEntitiesClient.getAccounts(accountAddresses)
-			let nonFungibleDetails = resources.map { resource in
-				let count = countOfNonFungibleIds(accounts: accounts, resourceAddress: resource.resourceAddress)
-				return State.NonFungibleDetails(resource: resource, count: count)
-			}
-
-			await send(.internal(.setNonFungible(nonFungibleDetails)))
+			await send(.internal(.setNonFungible(resources)))
 		}
 	}
 
@@ -181,12 +169,6 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 			.compactMap { $0 }
 			await send(.internal(.setPoolUnit(poolUnitDetails)))
 		}
-	}
-
-	private func countOfNonFungibleIds(accounts: [OnLedgerEntity.OnLedgerAccount], resourceAddress: ResourceAddress) -> Int {
-		accounts
-			.compactMap { $0.nonFungibleResources.first(where: { $0.resourceAddress == resourceAddress })?.nonFungibleIdsCount }
-			.reduce(0, +)
 	}
 }
 

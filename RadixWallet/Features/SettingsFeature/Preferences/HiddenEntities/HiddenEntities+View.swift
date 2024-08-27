@@ -39,13 +39,13 @@ extension HiddenEntities {
 		@ViewBuilder
 		private var personas: some SwiftUI.View {
 			if store.personas.isEmpty {
-				empty
+				emptyState
 			} else {
 				VStack(spacing: .medium3) {
 					ForEachStatic(store.personas) { persona in
 						Card {
 							PlainListRow(viewState: .init(
-								rowCoreViewState: .init(context: .hiddenAsset, title: persona.displayName.value),
+								rowCoreViewState: .init(context: .hiddenPersona, title: persona.displayName.value),
 								accessory: { unhideButton(action: .unhidePersonaTapped(persona.id)) },
 								icon: { Thumbnail(.persona, url: nil) }
 							))
@@ -58,7 +58,7 @@ extension HiddenEntities {
 		@ViewBuilder
 		private var accounts: some SwiftUI.View {
 			if store.accounts.isEmpty {
-				empty
+				emptyState
 			} else {
 				VStack(spacing: .medium3) {
 					ForEachStatic(store.accounts) { account in
@@ -79,10 +79,10 @@ extension HiddenEntities {
 			.buttonStyle(.secondaryRectangular(shouldExpand: false))
 		}
 
-		private var empty: some SwiftUI.View {
+		private var emptyState: some SwiftUI.View {
 			ZStack {
 				PlainListRow(viewState: .init(
-					rowCoreViewState: .init(context: .hiddenAsset, title: "dummy"),
+					rowCoreViewState: .init(context: .hiddenPersona, title: "dummy"),
 					accessory: { unhideButton(action: .task) },
 					icon: { Thumbnail(.persona, url: nil) }
 				))

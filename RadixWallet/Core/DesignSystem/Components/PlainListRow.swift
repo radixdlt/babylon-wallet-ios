@@ -196,14 +196,14 @@ private extension PlainListRowCore.ViewState {
 			.secondaryHeader
 		case .settings, .dappAndPersona:
 			.body1Header
-		case .hiddenAsset:
+		case .hiddenPersona:
 			.body1HighImportance
 		}
 	}
 
 	var subtitleTextStyle: TextStyle {
 		switch context {
-		case .toggle, .hiddenAsset:
+		case .toggle, .hiddenPersona:
 			.body2Regular
 		case .settings, .dappAndPersona:
 			detail == nil ? .body1Regular : .body2Regular
@@ -212,7 +212,7 @@ private extension PlainListRowCore.ViewState {
 
 	var subtitleForegroundColor: Color {
 		switch context {
-		case .toggle, .hiddenAsset:
+		case .toggle, .hiddenPersona:
 			.app.gray2
 		case .settings, .dappAndPersona:
 			.app.gray1
@@ -221,7 +221,7 @@ private extension PlainListRowCore.ViewState {
 
 	var titleLineLimit: Int? {
 		switch context {
-		case .settings, .dappAndPersona, .hiddenAsset:
+		case .settings, .dappAndPersona, .hiddenPersona:
 			1
 		case .toggle:
 			nil
@@ -230,7 +230,7 @@ private extension PlainListRowCore.ViewState {
 
 	var subtitleLineLimit: Int {
 		switch context {
-		case .toggle, .hiddenAsset:
+		case .toggle, .hiddenPersona:
 			2
 		case .settings, .dappAndPersona:
 			3
@@ -245,14 +245,14 @@ private extension PlainListRowCore.ViewState {
 			.medium1
 		case .dappAndPersona:
 			.medium3
-		case .hiddenAsset:
+		case .hiddenPersona:
 			.medium3
 		}
 	}
 
 	var horizontalPadding: CGFloat {
 		switch context {
-		case .toggle, .settings, .hiddenAsset:
+		case .toggle, .settings, .hiddenPersona:
 			.medium3
 		case .dappAndPersona:
 			.medium1
@@ -266,7 +266,7 @@ extension PlainListRowCore.ViewState {
 		case settings
 		case toggle
 		case dappAndPersona
-		case hiddenAsset
+		case hiddenPersona
 	}
 }
 
