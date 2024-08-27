@@ -23,6 +23,12 @@ public enum L10n {
     public static let tokens = L10n.tr("Localizable", "account_tokens", fallback: "Tokens")
     /// Transfer
     public static let transfer = L10n.tr("Localizable", "account_transfer", fallback: "Transfer")
+    public enum Nfts {
+      /// %d in this collection
+      public static func itemsCount(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "account_nfts_itemsCount", p1, fallback: "%d in this collection")
+      }
+    }
     public enum PoolUnits {
       /// Missing Total supply - could not calculate redemption value
       public static let noTotalSupply = L10n.tr("Localizable", "account_poolUnits_noTotalSupply", fallback: "Missing Total supply - could not calculate redemption value")
@@ -1796,8 +1802,18 @@ public enum L10n {
     public static let title = L10n.tr("Localizable", "hiddenAssets_title", fallback: "Hidden Assets")
     /// Unhide
     public static let unhide = L10n.tr("Localizable", "hiddenAssets_unhide", fallback: "Unhide")
-    /// Make this asset visible in your Accounts again?
-    public static let unhideConfirmation = L10n.tr("Localizable", "hiddenAssets_unhideConfirmation", fallback: "Make this asset visible in your Accounts again?")
+    public enum NonFungibles {
+      /// %d in this collection
+      public static func count(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "hiddenAssets_nonFungibles_count", p1, fallback: "%d in this collection")
+      }
+    }
+    public enum UnhideConfirmation {
+      /// Make this asset visible in your Accounts again?
+      public static let asset = L10n.tr("Localizable", "hiddenAssets_unhideConfirmation_asset", fallback: "Make this asset visible in your Accounts again?")
+      /// Make this collection visible in your Accounts again?
+      public static let collection = L10n.tr("Localizable", "hiddenAssets_unhideConfirmation_collection", fallback: "Make this collection visible in your Accounts again?")
+    }
   }
   public enum HiddenEntities {
     /// Accounts
