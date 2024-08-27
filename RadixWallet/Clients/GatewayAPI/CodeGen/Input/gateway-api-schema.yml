@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: v1.5.1
+  version: v1.7.0
   title: Radix Gateway API - Babylon
   license:
     name: The Radix License, Version 1.0
@@ -59,6 +59,7 @@ x-tagGroups:
       - Stream
       - State
       - Statistics
+      - Extensions
 tags:
   - name: SubAPIs
     x-displayName: Sub-APIs
@@ -70,6 +71,7 @@ tags:
       - **Stream** (`/transaction/*`) - For reading committed transactions.
       - **State** (`/state/*`) - For reading the current or past ledger state of the network.
       - **Statistics** (`/statistics/*`) - For calculating particular statistics against the current or past ledger state of the network.
+      - **Extensions** (`/Extensions/*`) - For endpoints that do not fit into other categories, for example, they may not support historic state.
   - name: Concepts
     x-displayName: Concepts
     x-traitTag: true # Don't display endpoints under this tag
@@ -611,25 +613,27 @@ tags:
 
       The currently supported filters are:
 
-      * `kind_filter` - one of `User`, `EpochChange`, `All`. You can use that filter to query for certain kinds of transactions. Defaults to `User`.
+      * `kind_filter` - One of `User`, `EpochChange`, `All`. You can use that filter to query for certain kinds of transactions. Defaults to `User`.
 
-      * `manifest_accounts_withdrawn_from_filter` - allows specifying an array of account addresses. If specified, the response will contain only transactions with a manifest containing withdrawals from the given accounts.
+      * `manifest_accounts_withdrawn_from_filter` - Allows specifying an array of account addresses. If specified, the response will contain only transactions with a manifest containing withdrawals from the given accounts.
 
-      * `manifest_accounts_deposited_into_filter` - similar to withdrawn, but will return only transactions with a manifest containing deposits to the given accounts.
+      * `manifest_accounts_deposited_into_filter` - Similar to withdrawn, but will return only transactions with a manifest containing deposits to the given accounts.
 
-      * `manifest_resources_filter` - allows specifying array of resource addresses. If specified, the response will contain only transactions containing the given resources in the manifest (regardless of their usage).
+      * `manifest_resources_filter` - Allows specifying array of resource addresses. If specified, the response will contain only transactions containing the given resources in the manifest (regardless of their usage).
 
-      * `manifest_badges_presented_filter` - allows specifying array of badge resource addresses. If specified, the response will contain only transactions where the given badges were presented.
+      * `manifest_badges_presented_filter` - Allows specifying array of badge resource addresses. If specified, the response will contain only transactions where the given badges were presented.
 
-      * `accounts_with_manifest_owner_method_calls` - allows specifying an array of account addresses. If specified, the response will contain only transactions that, for all specified accounts, contain manifest method calls to that account which require the owner role. See the [account docs](https://docs.radixdlt.com/docs/account) for more information.
+      * `accounts_with_manifest_owner_method_calls` - Allows specifying an array of account addresses. If specified, the response will contain only transactions that, for all specified accounts, contain manifest method calls to that account which require the owner role. See the [account docs](https://docs.radixdlt.com/docs/account) for more information.
 
-      * `accounts_without_manifest_owner_method_calls` - allows specifying an array of account addresses. If specified, the response will contain only transactions that, for all specified accounts, do NOT contain manifest method calls to that account which require owner role. See the [account docs](https://docs.radixdlt.com/docs/account) for more information.
+      * `accounts_without_manifest_owner_method_calls` - Allows specifying an array of account addresses. If specified, the response will contain only transactions that, for all specified accounts, do NOT contain manifest method calls to that account which require owner role. See the [account docs](https://docs.radixdlt.com/docs/account) for more information.
 
-      * `manifest_class_filter` - allows filtering to transactions which match the given manifest classification. If specified, the response will contain only transactions which have a class that matches the filter. If `match_only_most_specific` set to true, only transactions where the queried class is most specific will be returned. See the [docs on manifest classification](https://docs.radixdlt.com/docs/conforming-transaction-manifest-types) for more information.
+      * `manifest_class_filter` - Allows filtering to transactions which match the given manifest classification. If specified, the response will contain only transactions which have a class that matches the filter. If `match_only_most_specific` set to true, only transactions where the queried class is most specific will be returned. See the [docs on manifest classification](https://docs.radixdlt.com/docs/conforming-transaction-manifest-types) for more information.
 
-      * `affected_global_entities_filter` - allows specifying an array of global addresses. If specified, the response will contain transactions that affected all of the given global entities. A global entity is marked as "affected" by a transaction if any of its state (or its descendents' state) was modified as a result of the transaction.
+      * `affected_global_entities_filter` - Allows specifying an array of global addresses. If specified, the response will contain transactions that affected all of the given global entities. A global entity is marked as "affected" by a transaction if any of its state (or its descendents' state) was modified as a result of the transaction. For performance reasons consensus manager and transaction tracker are excluded from that filter.
 
-      * `events_filter` - filters the transaction stream to transactions which emitted at least one event matching each filter (each filter can be satisfied by a different event). Currently *only* deposit and withdrawal events emitted by an internal vault entity are tracked. For the purpose of filtering, the emitter address is replaced by the global ancestor of the emitter, for example, the top-level account / component which contains the vault which emitted the event.
+      * `event_global_emitters_filter` - Allows specifying an array of global addresses. If specified, the response will contain transactions in which all entities emitted events. If an event was published by an internal entity, it is going to be indexed as it is a global ancestor. For performance reasons events published by consensus manager and native XRD resource are excluded from that filter.
+
+      * `events_filter` - Filters the transaction stream to transactions which emitted at least one event matching each filter (each filter can be satisfied by a different event). Currently *only* deposit and withdrawal events emitted by an internal vault entity are tracked. For the purpose of filtering, the emitter address is replaced by the global ancestor of the emitter, for example, the top-level account / component which contains the vault which emitted the event.
 
       Each filter is a complex object where you can specify:
       - `event` (required) - the event tag. Currently only the following tags are supported:
@@ -1193,6 +1197,9 @@ tags:
   - name: Statistics
     x-displayName: Statistics Endpoints
     description: Calculate particular statistics based on current or historic ledger state.
+  - name: Extensions
+    x-displayName: Extensions Endpoints
+    description:  Endpoints that do not fit into other categories, for example, those which provide custom aggregation or indexing, or don't support historic state.
 
 paths:
   "/status/gateway-status":
@@ -1824,6 +1831,56 @@ paths:
         "4XX":
           $ref: "#/components/responses/ErrorResponse"
 
+  /state/account-locker/page/vaults:
+    post:
+      operationId: AccountLockerVaultsPage
+      summary: Get Account Locker Vaults Page
+      description: |
+        Returns all the resource vaults associated with a given account locker.
+        The returned response is in a paginated format, ordered by the most recent resource vault creation on the ledger.
+      tags:
+        - State
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StateAccountLockerPageVaultsRequest"
+      responses:
+        "200":
+          description: Account Locker vaults (paginated)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StateAccountLockerPageVaultsResponse"
+        "4XX":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /state/account-lockers/touched-at:
+    post:
+      operationId: AccountLockersTouchedAt
+      summary: Get Most Recent Touch of Account Lockers
+      description: |
+        Returns most recent state version given account locker has been touched. Touch refers to the creation of the account locker itself as well as any modification to its contents, such as
+        resource claim, airdrop or store.
+      tags:
+        - State
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StateAccountLockersTouchedAtRequest"
+      responses:
+        "200":
+          description: Account locker account pair last touch state version
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StateAccountLockersTouchedAtResponse"
+        "4XX":
+          $ref: "#/components/responses/ErrorResponse"
+
   /statistics/validators/uptime:
     post:
       operationId: ValidatorsUptime
@@ -1847,6 +1904,35 @@ paths:
                 $ref: "#/components/schemas/ValidatorsUptimeResponse"
         "4XX":
           $ref: "#/components/responses/ErrorResponse"
+
+  /extensions/resource-holders/page:
+    post:
+      operationId: ResourceHoldersPage
+      summary: Get Resource Holders Page
+      description: |
+        A paginated endpoint to discover which global entities hold the most of a given resource.
+        More specifically, it returns a page of global entities which hold the given resource, ordered descending by the total fungible balance / total count of non-fungibles stored in vaults in the state tree of that entity (excluding unclaimed royalty balances).
+        This endpoint operates only at the **current state version**, it is not possible to browse historical data.
+        Because of that, it is not possible to offer stable pagination as data constantly changes. Balances might change between pages being read, which might result in gaps or some entries being returned twice.
+        Under default Gateway configuration, up to 100 entries are returned per response. This can be increased up to 1000 entries per page with the `limit_per_page` parameter.
+      tags:
+        - Extensions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResourceHoldersRequest"
+      responses:
+        "200":
+          description: Resource holders
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResourceHoldersResponse"
+        "4XX":
+          $ref: "#/components/responses/ErrorResponse"
+
 
 components:
   responses:
@@ -2178,6 +2264,17 @@ components:
         programmatic_json:
           $ref: "#/components/schemas/ProgrammaticScryptoSborValue"
 
+    AccountLockerAddress:
+      type: object
+      required:
+        - locker_address
+        - account_address
+      properties:
+        locker_address:
+          $ref: "#/components/schemas/Address"
+        account_address:
+          $ref: "#/components/schemas/Address"
+
     EntityMetadataCollection:
       description: Entity metadata collection.
       allOf:
@@ -2217,6 +2314,115 @@ components:
           properties:
             typed:
               $ref: "#/components/schemas/MetadataTypedValue"
+
+    TwoWayLinkedDappsCollection:
+      description: A collection of two-way linked (resolved & verified) dApps linked to the entity defining this collection.
+      allOf:
+        - $ref: "#/components/schemas/ResultSetCursorMixin"
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/TwoWayLinkedDappsCollectionItem"
+    TwoWayLinkedDappsCollectionItem:
+      type: object
+      required:
+        - dapp_address
+      properties:
+        dapp_address:
+          $ref: "#/components/schemas/Address"
+
+    TwoWayLinkedEntitiesCollection:
+      description: A collection of two-way linked (resolved & verified) entities linked to the entity defining this collection.
+      allOf:
+        - $ref: "#/components/schemas/ResultSetCursorMixin"
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/TwoWayLinkedEntitiesCollectionItem"
+    TwoWayLinkedEntitiesCollectionItem:
+      type: object
+      required:
+        - entity_address
+      properties:
+        entity_address:
+          $ref: "#/components/schemas/Address"
+
+    TwoWayLinkedDappOnLedgerDetails:
+      type: object
+      properties:
+        dapps:
+          $ref: "#/components/schemas/TwoWayLinkedDappsCollection"
+        entities:
+          $ref: "#/components/schemas/TwoWayLinkedEntitiesCollection"
+        primary_locker:
+          $ref: "#/components/schemas/Address"
+
+    AccountLockerVaultCollection:
+      description: Account Locker Account Resources Collection
+      allOf:
+        - $ref: "#/components/schemas/ResultSetCursorMixin"
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/AccountLockerVaultCollectionItem"
+    AccountLockerVaultCollectionItemType:
+      type: string
+      enum:
+        - Fungible
+        - NonFungible
+    AccountLockerVaultCollectionItem:
+      type: object
+      required:
+        - type
+        - resource_address
+        - vault_address
+        - last_updated_at_state_version
+      properties:
+        type:
+          $ref: "#/components/schemas/AccountLockerVaultCollectionItemType"
+        resource_address:
+          $ref: "#/components/schemas/Address"
+        vault_address:
+          $ref: "#/components/schemas/Address"
+        last_updated_at_state_version:
+          $ref: "#/components/schemas/LastUpdatedAtStateVersion"
+      discriminator:
+        propertyName: type
+        mapping:
+          # NOTE: These need to match AccountLockerVaultCollectionItemType
+          Fungible: "#/components/schemas/AccountLockerVaultCollectionItemFungible"
+          NonFungible: "#/components/schemas/AccountLockerVaultCollectionItemNonFungible"
+    AccountLockerVaultCollectionItemFungible:
+      allOf:
+        - $ref: "#/components/schemas/AccountLockerVaultCollectionItem"
+        - type: object
+          required:
+            - amount
+          properties:
+            amount:
+              $ref: "#/components/schemas/BigDecimal"
+    AccountLockerVaultCollectionItemNonFungible:
+      allOf:
+        - $ref: "#/components/schemas/AccountLockerVaultCollectionItem"
+        - type: object
+          required:
+            - total_count
+          properties:
+            total_count:
+              type: integer
+              format: int64
 
     EntitySchemaCollection:
       allOf:
@@ -2943,6 +3149,67 @@ components:
           type: integer
           format: int64
 
+    ResourceHoldersCollection:
+      allOf:
+        - $ref: "#/components/schemas/ResultSetCursorMixin"
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/ResourceHoldersCollectionItem"
+
+    ResourceHoldersResourceType:
+      type: string
+      enum:
+        - FungibleResource
+        - NonFungibleResource
+    ResourceHoldersCollectionItem:
+      type: object
+      required:
+        - type
+        - holder_address
+        - last_updated_at_state_version
+      properties:
+        type:
+          $ref: "#/components/schemas/ResourceHoldersResourceType"
+        holder_address:
+          $ref: "#/components/schemas/Address"
+        last_updated_at_state_version:
+          type: integer
+          format: int64
+      discriminator:
+        propertyName: type
+        mapping:
+          # Must match ResourceHoldersResourceType
+          FungibleResource: "#/components/schemas/ResourceHoldersCollectionFungibleResourceItem"
+          NonFungibleResource: "#/components/schemas/ResourceHoldersCollectionNonFungibleResourceItem"
+
+    ResourceHoldersCollectionFungibleResourceItem:
+      allOf:
+        - $ref: "#/components/schemas/ResourceHoldersCollectionItem"
+        - type: object
+          required:
+            - amount
+          properties:
+            amount:
+              $ref: "#/components/schemas/BigDecimal"
+
+
+    ResourceHoldersCollectionNonFungibleResourceItem:
+      allOf:
+        - $ref: "#/components/schemas/ResourceHoldersCollectionItem"
+        - type: object
+          required:
+            - non_fungible_ids_count
+          properties:
+            non_fungible_ids_count:
+              type: integer
+              format: int64
+
+
     ValidatorCollection:
       allOf:
         - $ref: "#/components/schemas/ResultSetCursorMixin"
@@ -3071,6 +3338,7 @@ components:
             - genesis_helper
             - faucet
             - pool_package
+            - locker_package
             - transaction_tracker
           properties:
             xrd:
@@ -3128,6 +3396,8 @@ components:
             faucet:
               $ref: "#/components/schemas/Address"
             pool_package:
+              $ref: "#/components/schemas/Address"
+            locker_package:
               $ref: "#/components/schemas/Address"
             transaction_tracker:
               $ref: "#/components/schemas/Address"
@@ -3192,7 +3462,7 @@ components:
           description: A text-representation of a transaction manifest
           type: string
         blobs_hex:
-          description: An array of hex-encoded blob data (optional)
+          description: An array of hex-encoded blob data, if referenced by the manifest.
           type: array
           items:
             type: string
@@ -3201,35 +3471,50 @@ components:
           format: int64
           minimum: 0
           maximum: 10000000000
-          description: An integer between `0` and `10^10`, marking the epoch at which the transaction starts being valid
+          description: |
+            An integer between `0` and `10^10`, marking the epoch at which the transaction starts
+            being valid. If omitted, the current epoch will be used (taking into account the
+            `at_ledger_state`, if specified).
         end_epoch_exclusive:
           type: integer
           format: int64
           minimum: 0
           maximum: 10000000000
-          description: An integer between `0` and `10^10`, marking the epoch at which the transaction is no longer valid
+          description: |
+            An integer between `0` and `10^10`, marking the epoch at which the transaction is no
+            longer valid. If omitted, a maximum epoch (relative to the `start_epoch_inclusive`) will
+            be used.
         notary_public_key:
           $ref: "#/components/schemas/PublicKey"
           description: The notary public key to use (optional)
         notary_is_signatory:
           type: boolean
-          description: Whether the notary should count as a signatory (optional, default false)
+          description: Whether the notary should count as a signatory (defaults to `false`).
         tip_percentage:
           type: integer
           format: int32
           minimum: 0
           maximum: 65535
-          description: An integer between `0` and `65535`, giving the validator tip as a percentage amount. A value of `1` corresponds to 1% of the fee.
+          description: |
+            An integer between `0` and `65535`, giving the validator tip as a percentage amount.
+            A value of `1` corresponds to a 1% fee.
         nonce:
           type: integer
           format: int64
           minimum: 0
-          description: A decimal-string-encoded integer between `0` and `2^32 - 1`, used to ensure the transaction intent is unique.
+          description: |
+            An integer between `0` and `2^32 - 1`, chosen to allow a unique intent to be created
+            (to enable submitting an otherwise identical/duplicate intent).
         signer_public_keys:
           type: array
           items:
             $ref: "#/components/schemas/PublicKey"
           description: A list of public keys to be used as transaction signers
+        message:
+          type: object
+          description: |
+            An optional transaction message. Only affects the costing.
+            This type is defined in the Core API as `TransactionMessage`. See the Core API documentation for more details.
         flags:
           type: object
           required:
@@ -3238,10 +3523,40 @@ components:
             - skip_epoch_check
           properties:
             use_free_credit:
+              description: |
+                Whether to use a virtual, preview-only pool of XRD to pay for all execution fees.
               type: boolean
             assume_all_signature_proofs:
+              description: |
+                Whether the virtual signature proofs should be automatically placed in the auth zone.
               type: boolean
             skip_epoch_check:
+              description: |
+                Whether to skip the epoch range check (i.e. ignoring the `start_epoch_inclusive` and
+                `end_epoch_exclusive` parameters, if specified).
+
+                Note: effectively, without an epoch range, the Radix Engine cannot perform the
+                *intent hash duplicate* detection, which means that this check will be skipped as well.
+              type: boolean
+            disable_auth_checks:
+              description: |
+                Whether to skip the auth checks during execution.
+
+                This could be used to e.g.:
+                * Preview protocol update style transactions.
+                * Mint resources for previewing trades with resources you don't own. If doing this, be warned:
+                  * Only resources which were potentially mintable/burnable at creation time
+                    will be mintable/burnable, due to feature flags on the resource.
+                  * Please see the below warning about unexpected results if using this approach.
+
+                Warning: this mode of operation is quite a departure from normal operation:
+                * Calculated fees will likely be lower than a standard execution.
+                * This mode can subtly break invariants some dApp code might rely on, or result in unexpected
+                  behaviour, so the resulting execution result might not be valid for your needs. For example,
+                  if I used this flag to mint pool units to preview a redemption (or some dApp interaction which
+                  behind the scenes redeemed them), they'd redeem for less than they're currently worth,
+                  because the blueprint code relies on the total supply of the pool units to calculate their
+                  redemption worth, and you've just inflated the total supply through the mint operation.
               type: boolean
     TransactionPreviewResponse:
       type: object
@@ -3309,7 +3624,7 @@ components:
               $ref: "#/components/schemas/TransactionAccountDepositPreValidationAuthorizedDepositorBadge"
           example:
             account_address: "<account-address>"
-            resource_addresses: ["<resource-address>"]
+            resource_addresses: [ "<resource-address>" ]
 
     AccountDepositPreValidationResponse:
       allOf:
@@ -3624,38 +3939,47 @@ components:
                 - EpochChange
                 - All
             manifest_accounts_withdrawn_from_filter:
+              description: Allows specifying an array of account addresses. If specified, the response will contain only transactions with a manifest containing withdrawals from the given accounts.
               type: array
               items:
                 $ref: "#/components/schemas/Address"
             manifest_accounts_deposited_into_filter:
+              description: Similar to `manifest_accounts_withdrawn_from_filter`, but will return only transactions with a manifest containing deposits to the given accounts.
               type: array
               items:
                 $ref: "#/components/schemas/Address"
             manifest_badges_presented_filter:
+              description: Allows specifying array of badge resource addresses. If specified, the response will contain only transactions where the given badges were presented.
               type: array
               items:
                 $ref: "#/components/schemas/Address"
             manifest_resources_filter:
+              description: Allows specifying array of resource addresses. If specified, the response will contain only transactions containing the given resources in the manifest (regardless of their usage).
               type: array
               items:
                 $ref: "#/components/schemas/Address"
             affected_global_entities_filter:
+              description: Allows specifying an array of global addresses. If specified, the response will contain transactions that affected all of the given global entities. A global entity is marked as "affected" by a transaction if any of its state (or its descendents' state) was modified as a result of the transaction. For performance reasons consensus manager and transaction tracker are excluded from that filter.
               type: array
               items:
                 $ref: "#/components/schemas/Address"
             events_filter:
+              description: Filters the transaction stream to transactions which emitted at least one event matching each filter (each filter can be satisfied by a different event). Currently *only* deposit and withdrawal events emitted by an internal vault entity are tracked. For the purpose of filtering, the emitter address is replaced by the global ancestor of the emitter, for example, the top-level account / component which contains the vault which emitted the event.
               type: array
               items:
                 $ref: "#/components/schemas/StreamTransactionsRequestEventFilterItem"
             accounts_with_manifest_owner_method_calls:
+              description: Allows specifying an array of account addresses. If specified, the response will contain only transactions that, for all specified accounts, contain manifest method calls to that account which require the owner role. See the [account docs](https://docs.radixdlt.com/docs/account) for more information.
               type: array
               items:
                 $ref: "#/components/schemas/Address"
             accounts_without_manifest_owner_method_calls:
+              description: Allows specifying an array of account addresses. If specified, the response will contain only transactions that, for all specified accounts, do NOT contain manifest method calls to that account which require owner role. See the [account docs](https://docs.radixdlt.com/docs/account) for more information.
               type: array
               items:
                 $ref: "#/components/schemas/Address"
             manifest_class_filter:
+              description: Allows filtering to transactions which match the given manifest classification. If specified, the response will contain only transactions which have a class that matches the filter. If `match_only_most_specific` set to true, only transactions where the queried class is most specific will be returned. See the [docs on manifest classification](https://docs.radixdlt.com/docs/conforming-transaction-manifest-types) for more information.
               type: object
               required:
                 - class
@@ -3665,6 +3989,11 @@ components:
                 match_only_most_specific:
                   type: boolean
                   default: false
+            event_global_emitters_filter:
+              description: Allows specifying an array of global addresses. If specified, the response will contain transactions in which all entities emitted events. If an event was published by an internal entity, it is going to be indexed as it is a global ancestor. For performance reasons events published by consensus manager and native XRD resource are excluded from that filter.
+              type: array
+              items:
+                $ref: "#/components/schemas/Address"
             order:
               description: Configures the order of returned result set. Defaults to `desc`.
               type: string
@@ -3718,7 +4047,7 @@ components:
               $ref: "#/components/schemas/StateEntityDetailsOptIns"
             addresses:
               type: array
-              description: limited to max 100 items.
+              description: limited to max 20 items.
               items:
                 $ref: "#/components/schemas/Address"
             aggregation_level:
@@ -3733,6 +4062,8 @@ components:
           component_royalty_vault_balance: true
           package_royalty_vault_balance: true
           non_fungible_include_nfids: true
+          dapp_two_way_links: true
+          native_resource_details: true
           explicit_metadata:
             - name
             - description
@@ -3765,6 +4096,14 @@ components:
           type: array
           items:
             type: string
+        dapp_two_way_links:
+          description: if set to `true`, on-ledger dApp two-way links (resolved & verified) are returned. See https://docs.radixdlt.com/docs/metadata-for-verification for more details.
+          type: boolean
+          default: false
+        native_resource_details:
+          description: if set to `true`, additional details for the Network native resources are returned.
+          type: boolean
+          default: false
     StateEntityDetailsResponse:
       allOf:
         - $ref: "#/components/schemas/LedgerStateMixin"
@@ -3853,6 +4192,10 @@ components:
               $ref: "#/components/schemas/BigDecimal"
             total_burned:
               $ref: "#/components/schemas/BigDecimal"
+            two_way_linked_dapps:
+              $ref: "#/components/schemas/TwoWayLinkedDappsCollection"
+            native_resource_details:
+              $ref: "#/components/schemas/NativeResourceDetails"
     StateEntityDetailsResponseNonFungibleResourceDetails:
       allOf:
         - $ref: "#/components/schemas/StateEntityDetailsResponseItemDetails"
@@ -3863,6 +4206,7 @@ components:
             - total_supply
             - total_minted
             - total_burned
+            - non_fungible_data_mutable_fields
           properties:
             role_assignments:
               $ref: "#/components/schemas/ComponentEntityRoleAssignments"
@@ -3874,6 +4218,14 @@ components:
               $ref: "#/components/schemas/BigDecimal"
             total_burned:
               $ref: "#/components/schemas/BigDecimal"
+            non_fungible_data_mutable_fields:
+              type: array
+              items:
+                type: string
+            two_way_linked_dapps:
+              $ref: "#/components/schemas/TwoWayLinkedDappsCollection"
+            native_resource_details:
+              $ref: "#/components/schemas/NativeResourceDetails"
     StateEntityDetailsResponseFungibleVaultDetails:
       allOf:
         - $ref: "#/components/schemas/StateEntityDetailsResponseItemDetails"
@@ -3932,6 +4284,9 @@ components:
               $ref: "#/components/schemas/EntitySchemaCollection"
             role_assignments:
               $ref: "#/components/schemas/ComponentEntityRoleAssignments"
+            two_way_linked_dapp_address:
+              description: Two-way linked (resolved & verified) dApp address, if any.
+              $ref: "#/components/schemas/Address"
     StateEntityDetailsResponseComponentDetails:
       allOf:
         - $ref: "#/components/schemas/StateEntityDetailsResponseItemDetails"
@@ -3959,6 +4314,14 @@ components:
               $ref: "#/components/schemas/BigDecimal"
             royalty_config:
               $ref: "#/components/schemas/ComponentRoyaltyConfig"
+            two_way_linked_dapp_address:
+              description: Two-way linked (resolved & verified) dApp address, if any. Applicable to non-Account dApp components only.
+              $ref: "#/components/schemas/Address"
+            two_way_linked_dapp_details:
+              description: Two-way linked (resolved & verified) dApp details. Applicable to dApp definition accounts only and limited to on-ledger information only.
+              $ref: "#/components/schemas/TwoWayLinkedDappOnLedgerDetails"
+            native_resource_details:
+              $ref: "#/components/schemas/NativeResourceDetails"
 
     StateAccountResourcePreferencesPageRequest:
       allOf:
@@ -4488,6 +4851,7 @@ components:
                 - kind: "U32"
                   value: "1"
     StateKeyValueStoreDataRequestKeyItem:
+      description: Provide either `key_hex` or `key_json`. If both are provided, `key_hex` is used and `key_json` is ignored.
       type: object
       properties:
         key_hex:
@@ -4525,6 +4889,57 @@ components:
         is_locked:
           type: boolean
 
+    StateAccountLockerPageVaultsRequest:
+      allOf:
+        - $ref: "#/components/schemas/AtLedgerStateMixin"
+        - $ref: "#/components/schemas/CursorLimitMixin"
+        - $ref: "#/components/schemas/AccountLockerAddress"
+      example:
+        locker_address: "<locker-address>"
+        account_address: "<account-address>"
+
+    StateAccountLockerPageVaultsResponse:
+      allOf:
+        - $ref: "#/components/schemas/LedgerStateMixin"
+        - $ref: "#/components/schemas/AccountLockerVaultCollection"
+        - $ref: "#/components/schemas/AccountLockerAddress"
+
+    StateAccountLockersTouchedAtRequest:
+      allOf:
+        - $ref: "#/components/schemas/AtLedgerStateMixin"
+        - type: object
+          required:
+            - account_lockers
+          properties:
+            account_lockers:
+              type: array
+              items:
+                $ref: "#/components/schemas/AccountLockerAddress"
+      example:
+        account_lockers:
+          - locker_address: "<locker-address>"
+            account_address: "<account-address>"
+
+    StateAccountLockersTouchedAtResponse:
+      allOf:
+        - $ref: "#/components/schemas/LedgerStateMixin"
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/StateAccountLockersTouchedAtResponseItem"
+    StateAccountLockersTouchedAtResponseItem:
+      allOf:
+        - $ref: "#/components/schemas/AccountLockerAddress"
+        - type: object
+          required:
+            - last_touched_at_state_version
+          properties:
+            last_touched_at_state_version:
+              $ref: "#/components/schemas/LastUpdatedAtStateVersion"
 
     #
     # /state/validators/* Request & Response Types
@@ -4574,6 +4989,22 @@ components:
             validators:
               $ref: "#/components/schemas/ValidatorUptimeCollection"
 
+    ResourceHoldersRequest:
+      allOf:
+        - $ref: "#/components/schemas/CursorLimitMixin"
+        - type: object
+          properties:
+            resource_address:
+              $ref: "#/components/schemas/Address"
+      example:
+        limit_per_page: 100
+        resource_address: "<resource-address>"
+
+    ResourceHoldersResponse:
+      allOf:
+        - $ref: "#/components/schemas/ResourceHoldersCollection"
+
+
     #
     # Errors
     #
@@ -4606,6 +5037,7 @@ components:
       discriminator:
         propertyName: type
         mapping:
+          AccountLockerNotFoundError: "#/components/schemas/AccountLockerNotFoundError"
           EntityNotFoundError: "#/components/schemas/EntityNotFoundError"
           InvalidEntityError: "#/components/schemas/InvalidEntityError"
           NotSyncedUpError: "#/components/schemas/NotSyncedUpError"
@@ -4613,6 +5045,10 @@ components:
           InvalidTransactionError: "#/components/schemas/InvalidTransactionError"
           TransactionNotFoundError: "#/components/schemas/TransactionNotFoundError"
           InternalServerError: "#/components/schemas/InternalServerError"
+    AccountLockerNotFoundError:
+      allOf:
+        - $ref: "#/components/schemas/GatewayError"
+        - $ref: "#/components/schemas/AccountLockerAddress"
     EntityNotFoundError:
       allOf:
         - $ref: "#/components/schemas/GatewayError"
@@ -4702,6 +5138,188 @@ components:
           type: array
           items:
             type: string
+
+    #
+    # Native Resources
+    #
+
+    NativeResourceUnitRedemptionValue:
+      type: array
+      items:
+        $ref: "#/components/schemas/NativeResourceRedemptionValueItem"
+    NativeResourceRedemptionValueItem:
+      type: object
+      required:
+        - resource_address
+      properties:
+        resource_address:
+          $ref: "#/components/schemas/Address"
+        amount:
+          $ref: "#/components/schemas/BigDecimal"
+
+    NativeResourceKind:
+      type: string
+      enum:
+        - Xrd
+        - PackageOwnerBadge
+        - AccountOwnerBadge
+        - IdentityOwnerBadge
+        - ValidatorOwnerBadge
+        - Secp256k1SignatureResource
+        - Ed25519SignatureResource
+        - GlobalCallerResource
+        - PackageOfDirectCallerResource
+        - SystemExecutionResource
+        - ValidatorLiquidStakeUnit
+        - ValidatorClaimNft
+        - OneResourcePoolUnit
+        - TwoResourcePoolUnit
+        - MultiResourcePoolUnit
+        - AccessControllerRecoveryBadge
+    NativeResourceDetails:
+      type: object
+      discriminator:
+        propertyName: kind
+        mapping:
+          Xrd: "#/components/schemas/NativeResourceXrdValue"
+          PackageOwnerBadge: "#/components/schemas/NativeResourcePackageOwnerBadgeValue"
+          AccountOwnerBadge: "#/components/schemas/NativeResourceAccountOwnerBadgeValue"
+          IdentityOwnerBadge: "#/components/schemas/NativeResourceIdentityOwnerBadgeValue"
+          ValidatorOwnerBadge: "#/components/schemas/NativeResourceValidatorOwnerBadgeValue"
+          Secp256k1SignatureResource: "#/components/schemas/NativeResourceSecp256k1SignatureResourceValue"
+          Ed25519SignatureResource: "#/components/schemas/NativeResourceEd25519SignatureResourceValue"
+          GlobalCallerResource: "#/components/schemas/NativeResourceGlobalCallerResourceValue"
+          PackageOfDirectCallerResource: "#/components/schemas/NativeResourcePackageOfDirectCallerResourceValue"
+          SystemExecutionResource: "#/components/schemas/NativeResourceSystemExecutionResourceValue"
+          ValidatorLiquidStakeUnit: "#/components/schemas/NativeResourceValidatorLiquidStakeUnitValue"
+          ValidatorClaimNft: "#/components/schemas/NativeResourceValidatorClaimNftValue"
+          OneResourcePoolUnit: "#/components/schemas/NativeResourceOneResourcePoolUnitValue"
+          TwoResourcePoolUnit: "#/components/schemas/NativeResourceTwoResourcePoolUnitValue"
+          MultiResourcePoolUnit: "#/components/schemas/NativeResourceMultiResourcePoolUnitValue"
+          AccessControllerRecoveryBadge: "#/components/schemas/NativeResourceAccessControllerRecoveryBadgeValue"
+      required:
+        - kind
+      properties:
+        kind:
+          $ref: "#/components/schemas/NativeResourceKind"
+    NativeResourceXrdValue:
+      allOf:
+        - $ref: "#/components/schemas/NativeResourceDetails"
+        - type: object
+    NativeResourcePackageOwnerBadgeValue:
+      allOf:
+        - $ref: "#/components/schemas/NativeResourceDetails"
+        - type: object
+    NativeResourceAccountOwnerBadgeValue:
+      allOf:
+        - $ref: "#/components/schemas/NativeResourceDetails"
+        - type: object
+    NativeResourceIdentityOwnerBadgeValue:
+      allOf:
+        - $ref: "#/components/schemas/NativeResourceDetails"
+        - type: object
+    NativeResourceValidatorOwnerBadgeValue:
+      allOf:
+        - $ref: "#/components/schemas/NativeResourceDetails"
+        - type: object
+    NativeResourceSecp256k1SignatureResourceValue:
+      allOf:
+        - $ref: "#/components/schemas/NativeResourceDetails"
+        - type: object
+    NativeResourceEd25519SignatureResourceValue:
+      allOf:
+        - $ref: "#/components/schemas/NativeResourceDetails"
+        - type: object
+    NativeResourceGlobalCallerResourceValue:
+      allOf:
+        - $ref: "#/components/schemas/NativeResourceDetails"
+        - type: object
+    NativeResourcePackageOfDirectCallerResourceValue:
+      allOf:
+        - $ref: "#/components/schemas/NativeResourceDetails"
+        - type: object
+    NativeResourceSystemExecutionResourceValue:
+      allOf:
+        - $ref: "#/components/schemas/NativeResourceDetails"
+        - type: object
+    NativeResourceValidatorLiquidStakeUnitValue:
+      allOf:
+        - $ref: "#/components/schemas/NativeResourceDetails"
+        - type: object
+          required:
+            - validator_address
+            - redemption_resource_count
+            - unit_redemption_value
+          properties:
+            validator_address:
+              $ref: "#/components/schemas/Address"
+            redemption_resource_count:
+              type: integer
+            unit_redemption_value:
+              $ref: "#/components/schemas/NativeResourceUnitRedemptionValue"
+    NativeResourceValidatorClaimNftValue:
+      allOf:
+        - $ref: "#/components/schemas/NativeResourceDetails"
+        - type: object
+          required:
+            - validator_address
+          properties:
+            validator_address:
+              $ref: "#/components/schemas/Address"
+    NativeResourceOneResourcePoolUnitValue:
+      allOf:
+        - $ref: "#/components/schemas/NativeResourceDetails"
+        - type: object
+          required:
+            - pool_address
+            - redemption_resource_count
+            - unit_redemption_value
+          properties:
+            pool_address:
+              $ref: "#/components/schemas/Address"
+            redemption_resource_count:
+              type: integer
+            unit_redemption_value:
+              $ref: "#/components/schemas/NativeResourceUnitRedemptionValue"
+    NativeResourceTwoResourcePoolUnitValue:
+      allOf:
+        - $ref: "#/components/schemas/NativeResourceDetails"
+        - type: object
+          required:
+            - pool_address
+            - redemption_resource_count
+            - unit_redemption_value
+          properties:
+            pool_address:
+              $ref: "#/components/schemas/Address"
+            redemption_resource_count:
+              type: integer
+            unit_redemption_value:
+              $ref: "#/components/schemas/NativeResourceUnitRedemptionValue"
+    NativeResourceMultiResourcePoolUnitValue:
+      allOf:
+        - $ref: "#/components/schemas/NativeResourceDetails"
+        - type: object
+          required:
+            - pool_address
+            - redemption_resource_count
+            - unit_redemption_value
+          properties:
+            pool_address:
+              $ref: "#/components/schemas/Address"
+            redemption_resource_count:
+              type: integer
+            unit_redemption_value:
+              $ref: "#/components/schemas/NativeResourceUnitRedemptionValue"
+    NativeResourceAccessControllerRecoveryBadgeValue:
+      allOf:
+        - $ref: "#/components/schemas/NativeResourceDetails"
+        - type: object
+          required:
+            - access_controller_address
+          properties:
+            access_controller_address:
+              $ref: "#/components/schemas/Address"
 
     #
     # Metadata Typed Value
