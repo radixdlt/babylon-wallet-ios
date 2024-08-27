@@ -1078,8 +1078,8 @@
 		A47572052B29B4F20059A95D /* IOSSecurityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47572022B29B3CA0059A95D /* IOSSecurityClient+Test.swift */; };
 		A47572062B29B4F50059A95D /* IOSSecurityClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47572012B29B3CA0059A95D /* IOSSecurityClient+Live.swift */; };
 		A47809082BDBDB4C006B68C0 /* RadixDateFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47809072BDBDB4C006B68C0 /* RadixDateFormatter.swift */; };
-		A48C95AE2C6A97D80047A056 /* Sheet+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A48C95AD2C6A97D80047A056 /* Sheet+Reducer.swift */; };
-		A48C95B02C6A98380047A056 /* Sheet+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A48C95AF2C6A98380047A056 /* Sheet+View.swift */; };
+		A48C95AE2C6A97D80047A056 /* SheetOverlayCoordinator+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A48C95AD2C6A97D80047A056 /* SheetOverlayCoordinator+Reducer.swift */; };
+		A48C95B02C6A98380047A056 /* SheetOverlayCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A48C95AF2C6A98380047A056 /* SheetOverlayCoordinator+View.swift */; };
 		A48C95B22C6C9A660047A056 /* InfoLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = A48C95B12C6C9A660047A056 /* InfoLink.swift */; };
 		A48FD15F2B55E671009295E9 /* TrackedPoolInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A48FD15E2B55E671009295E9 /* TrackedPoolInteraction.swift */; };
 		A48FD1612B55F8F0009295E9 /* TransactionReview+Sections.swift in Sources */ = {isa = PBXBuildFile; fileRef = A48FD1602B55F8F0009295E9 /* TransactionReview+Sections.swift */; };
@@ -2232,8 +2232,8 @@
 		A47572022B29B3CA0059A95D /* IOSSecurityClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Test.swift"; sourceTree = "<group>"; };
 		A47572032B29B3CA0059A95D /* IOSSecurityClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Interface.swift"; sourceTree = "<group>"; };
 		A47809072BDBDB4C006B68C0 /* RadixDateFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadixDateFormatter.swift; sourceTree = "<group>"; };
-		A48C95AD2C6A97D80047A056 /* Sheet+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sheet+Reducer.swift"; sourceTree = "<group>"; };
-		A48C95AF2C6A98380047A056 /* Sheet+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sheet+View.swift"; sourceTree = "<group>"; };
+		A48C95AD2C6A97D80047A056 /* SheetOverlayCoordinator+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SheetOverlayCoordinator+Reducer.swift"; sourceTree = "<group>"; };
+		A48C95AF2C6A98380047A056 /* SheetOverlayCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SheetOverlayCoordinator+View.swift"; sourceTree = "<group>"; };
 		A48C95B12C6C9A660047A056 /* InfoLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoLink.swift; sourceTree = "<group>"; };
 		A48FD15E2B55E671009295E9 /* TrackedPoolInteraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackedPoolInteraction.swift; sourceTree = "<group>"; };
 		A48FD1602B55F8F0009295E9 /* TransactionReview+Sections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionReview+Sections.swift"; sourceTree = "<group>"; };
@@ -2844,8 +2844,8 @@
 				48CFBCCC2ADC10D800E77A5C /* HUD+View.swift */,
 				E7AE2D0D2C07359500830BAA /* FullScreenOverlayCoordinator+Reducer.swift */,
 				E7AE2D0F2C07371C00830BAA /* FullScreenOverlayCoordinator+View.swift */,
-				A48C95AD2C6A97D80047A056 /* Sheet+Reducer.swift */,
-				A48C95AF2C6A98380047A056 /* Sheet+View.swift */,
+				A48C95AD2C6A97D80047A056 /* SheetOverlayCoordinator+Reducer.swift */,
+				A48C95AF2C6A98380047A056 /* SheetOverlayCoordinator+View.swift */,
 				48CFBCCB2ADC10D800E77A5C /* Overlay+Reducer.swift */,
 				48CFBCCD2ADC10D800E77A5C /* Overlay+View.swift */,
 			);
@@ -7049,7 +7049,7 @@
 				48CFC2D32ADC10D900E77A5C /* AccountDetails+Reducer.swift in Sources */,
 				48CFC4822ADC10DA00E77A5C /* ROLAClient+Mock.swift in Sources */,
 				48CFC5022ADC10DA00E77A5C /* CursorLimitMixin.swift in Sources */,
-				A48C95AE2C6A97D80047A056 /* Sheet+Reducer.swift in Sources */,
+				A48C95AE2C6A97D80047A056 /* SheetOverlayCoordinator+Reducer.swift in Sources */,
 				48CFC42A2ADC10DA00E77A5C /* SafeCompare.swift in Sources */,
 				48CFC4512ADC10DA00E77A5C /* NetworkSwitchingClient+Test.swift in Sources */,
 				48CFC56D2ADC10DA00E77A5C /* TransactionReceipt.swift in Sources */,
@@ -7841,7 +7841,7 @@
 				83EE477A2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueI8.swift in Sources */,
 				48CFC57B2ADC10DA00E77A5C /* PublicKeyHash.swift in Sources */,
 				48CFC2FC2ADC10D900E77A5C /* DefaultDepositGuarantees+Reducer.swift in Sources */,
-				A48C95B02C6A98380047A056 /* Sheet+View.swift in Sources */,
+				A48C95B02C6A98380047A056 /* SheetOverlayCoordinator+View.swift in Sources */,
 				48CFC2D12ADC10D900E77A5C /* Style.swift in Sources */,
 				48CFC48B2ADC10DA00E77A5C /* DiskPersistenceClient+Interface.swift in Sources */,
 				48CFC3E92ADC10D900E77A5C /* Hashing.swift in Sources */,

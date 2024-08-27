@@ -1,11 +1,5 @@
 import Foundation
 
-// MARK: - SheetBehavior
-public enum SheetBehavior: Sendable {
-	case enqueue
-	case replace
-}
-
 // MARK: - SheetOverlayCoordinator
 public struct SheetOverlayCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {

@@ -125,6 +125,11 @@ extension OverlayWindowClient {
 		case sheet(SheetOverlayCoordinator.Root.State, SheetBehavior)
 		case fullScreen(FullScreenOverlayCoordinator.State)
 	}
+
+	public enum SheetBehavior: Sendable {
+		case enqueue
+		case replace
+	}
 }
 
 extension DependencyValues {
