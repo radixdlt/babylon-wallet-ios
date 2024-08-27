@@ -79,7 +79,7 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 			}
 		case let .unhideTapped(resource):
 			state.destination = .unhideAlert(.init(
-				title: { TextState(L10n.HiddenAssets.unhideConfirmation) },
+				title: { TextState(resource.unhideAlertTitle) },
 				actions: {
 					ButtonState(role: .cancel, action: .cancelTapped) {
 						TextState(L10n.Common.cancel)
@@ -217,6 +217,17 @@ private extension [ResourceIdentifier] {
 				return nil
 			}
 			return poolAddress.asGeneral
+		}
+	}
+}
+
+private extension ResourceIdentifier {
+	var unhideAlertTitle: String {
+		switch self {
+		case .fungible, .poolUnit:
+			L10n.HiddenAssets.UnhideConfirmation.asset
+		case .nonFungible:
+			L10n.HiddenAssets.UnhideConfirmation.collection
 		}
 	}
 }

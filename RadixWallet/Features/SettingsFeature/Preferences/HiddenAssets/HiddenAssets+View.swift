@@ -124,7 +124,7 @@ extension HiddenAssets {
 
 private extension HiddenAssets.State.NonFungibleDetails {
 	var rowCoreViewState: PlainListRowCore.ViewState {
-		.init(context: .hiddenAsset, title: resource.metadata.name ?? "-", subtitle: "\(count)")
+		.init(context: .hiddenAsset, title: resource.metadata.name ?? "-", subtitle: L10n.HiddenAssets.NonFungibles.count(count))
 	}
 }
 
