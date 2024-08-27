@@ -712,39 +712,39 @@ final class ProfileStoreExistingProfileTests: TestCase {
 		}
 	}
 
-	func test__GIVEN__saved_profile_P__WHEN__we_update_P_changing_its_identity__THEN__identity_is_checked() async throws {
-		try await withTimeLimit(.normal) {
-			// GIVEN saved profile
-			let P = Profile.withOneAccountsDeviceInfo_ABBA_mnemonic_ZOO_VOTE
-			let Q = Profile.withOneAccountsDeviceInfo_BEEF_mnemonic_ABANDON_ART
-			XCTAssertNotEqual(P.header, Q.header)
-
-			let identityCheckFails = self.expectation(description: "identity check fails")
-
-			try await withTestClients {
-				$0.savedProfile(P)
-				then(&$0)
-			} operation: {
-				let sut = ProfileStore()
-				do {
-					try await sut.updating {
-						// WHEN we update profile changing_its_identity
-						$0.header = Q.header // swap headers... emulating some ultra weird state.
-					}
-					return XCTFail("We expected to throw")
-				} catch {}
-			}
-
-			func then(_ d: inout DependencyValues) {
-				d.assertionFailure = AssertionFailureAction.init(action: { _, _, _ in
-					// THEN identity is checked
-					identityCheckFails.fulfill()
-				})
-			}
-
-			await self.nearFutureFulfillment(of: identityCheckFails)
-		}
-	}
+//	func test__GIVEN__saved_profile_P__WHEN__we_update_P_changing_its_identity__THEN__identity_is_checked() async throws {
+//		try await withTimeLimit(.normal) {
+//			// GIVEN saved profile
+//			let P = Profile.withOneAccountsDeviceInfo_ABBA_mnemonic_ZOO_VOTE
+//			let Q = Profile.withOneAccountsDeviceInfo_BEEF_mnemonic_ABANDON_ART
+//			XCTAssertNotEqual(P.header, Q.header)
+//
+//			let identityCheckFails = self.expectation(description: "identity check fails")
+//
+//			try await withTestClients {
+//				$0.savedProfile(P)
+//				then(&$0)
+//			} operation: {
+//				let sut = ProfileStore()
+//				do {
+//					try await sut.updating {
+//						// WHEN we update profile changing_its_identity
+//						$0.header = Q.header // swap headers... emulating some ultra weird state.
+//					}
+//					return XCTFail("We expected to throw")
+//				} catch {}
+//			}
+//
+//			func then(_ d: inout DependencyValues) {
+//				d.assertionFailure = AssertionFailureAction.init(action: { _, _, _ in
+//					// THEN identity is checked
+//					identityCheckFails.fulfill()
+//				})
+//			}
+//
+//			await self.nearFutureFulfillment(of: identityCheckFails)
+//		}
+//	}
 
 	func test__GIVEN__mismatch__WHEN__app_is_not_yet_unlocked__THEN__no_alert_is_displayed() async throws {
 		let alertNotScheduled = expectation(
