@@ -81,6 +81,7 @@
 "assetDetails_poolUnitDetails_whatArePoolUnits" = "What are Pool units?";
 "assetDetails_badgeDetails_noBadges" = "You have no badges";
 "assetDetails_badgeDetails_whatAreBadges" = "What are badges?";
+"assetDetails_behaviors_whatAreBehaviors" = "What are behaviors?";
 "assetDetails_behaviors_simpleAsset" = "This is a simple asset";
 "assetDetails_behaviors_supplyIncreasable" = "The supply of this asset can be increased.";
 "assetDetails_behaviors_supplyDecreasable" = "The supply of this asset can be decreased.";

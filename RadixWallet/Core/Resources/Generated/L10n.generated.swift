@@ -626,6 +626,8 @@ public enum L10n {
       public static let supplyIncreasable = L10n.tr("Localizable", "assetDetails_behaviors_supplyIncreasable", fallback: "The supply of this asset can be increased.")
       /// Anyone can increase the supply of this asset.
       public static let supplyIncreasableByAnyone = L10n.tr("Localizable", "assetDetails_behaviors_supplyIncreasableByAnyone", fallback: "Anyone can increase the supply of this asset.")
+      /// What are behaviors?
+      public static let whatAreBehaviors = L10n.tr("Localizable", "assetDetails_behaviors_whatAreBehaviors", fallback: "What are behaviors?")
     }
     public enum PoolUnitDetails {
       /// You have no Pool units
