@@ -64,12 +64,12 @@ extension HiddenAssets {
 				empty
 			} else {
 				VStack(spacing: .medium3) {
-					ForEachStatic(store.nonFungible) { resource in
+					ForEachStatic(store.nonFungible) { nonFungible in
 						Card {
 							PlainListRow(viewState: .init(
-								rowCoreViewState: .init(context: .hiddenAsset, title: resource.metadata.name),
-								accessory: { unhideButton(resource: .nonFungible(resource.resourceAddress)) },
-								icon: { Thumbnail(.nft, url: resource.metadata.iconURL) }
+								rowCoreViewState: nonFungible.rowCoreViewState,
+								accessory: { unhideButton(resource: .nonFungible(nonFungible.resource.resourceAddress)) },
+								icon: { Thumbnail(.nft, url: nonFungible.resource.metadata.iconURL) }
 							))
 						}
 					}
@@ -122,8 +122,14 @@ extension HiddenAssets {
 	}
 }
 
+private extension HiddenAssets.State.NonFungibleDetails {
+	var rowCoreViewState: PlainListRowCore.ViewState {
+		.init(context: .hiddenAsset, title: resource.metadata.name ?? "-", subtitle: "\(count)")
+	}
+}
+
 private extension HiddenAssets.State.PoolUnitDetails {
 	var rowCoreViewState: PlainListRowCore.ViewState {
-		.init(context: .hiddenAsset, title: "-", subtitle: details.dAppName ?? "-")
+		.init(context: .hiddenAsset, title: resource.fungibleResourceName ?? "-", subtitle: details.dAppName ?? "-")
 	}
 }
