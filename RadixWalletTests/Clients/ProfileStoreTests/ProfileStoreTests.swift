@@ -31,16 +31,17 @@ extension DependencyValues {
 		userDefaults userDefaultsValue: UserDefaults.Dependency = .ephemeral()
 	) {
 		if let profile {
+			let pre = self.precondition
 			secureStorageClient.loadProfile = { key in
-				precondition(key == profile.header.id)
+				pre(key == profile.header.id)
 				return profile
 			}
 			secureStorageClient.loadProfileSnapshot = { key in
-				precondition(key == profile.header.id)
+				pre(key == profile.header.id)
 				return profile
 			}
 			secureStorageClient.loadProfileSnapshotData = { key in
-				precondition(key == profile.header.id)
+				pre(key == profile.header.id)
 				return profile.jsonData()
 			}
 		} else {
