@@ -17,6 +17,7 @@ extension GatewayAPI {
 
 public struct StateEntityDetailsResponseFungibleResourceDetails: Codable, Hashable {
 
+    static let divisibilityRule = NumericRule<Int>(minimum: 0, exclusiveMinimum: false, maximum: nil, exclusiveMaximum: false, multipleOf: nil)
     public private(set) var type: StateEntityDetailsResponseItemDetailsType
     public private(set) var roleAssignments: ComponentEntityRoleAssignments
     public private(set) var divisibility: Int
@@ -26,14 +27,18 @@ public struct StateEntityDetailsResponseFungibleResourceDetails: Codable, Hashab
     public private(set) var totalMinted: String
     /** String-encoded decimal representing the amount of a related fungible resource. */
     public private(set) var totalBurned: String
+    public private(set) var twoWayLinkedDapps: TwoWayLinkedDappsCollection?
+    public private(set) var nativeResourceDetails: NativeResourceDetails?
 
-    public init(type: StateEntityDetailsResponseItemDetailsType, roleAssignments: ComponentEntityRoleAssignments, divisibility: Int, totalSupply: String, totalMinted: String, totalBurned: String) {
+    public init(type: StateEntityDetailsResponseItemDetailsType, roleAssignments: ComponentEntityRoleAssignments, divisibility: Int, totalSupply: String, totalMinted: String, totalBurned: String, twoWayLinkedDapps: TwoWayLinkedDappsCollection? = nil, nativeResourceDetails: NativeResourceDetails? = nil) {
         self.type = type
         self.roleAssignments = roleAssignments
         self.divisibility = divisibility
         self.totalSupply = totalSupply
         self.totalMinted = totalMinted
         self.totalBurned = totalBurned
+        self.twoWayLinkedDapps = twoWayLinkedDapps
+        self.nativeResourceDetails = nativeResourceDetails
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
@@ -43,6 +48,8 @@ public struct StateEntityDetailsResponseFungibleResourceDetails: Codable, Hashab
         case totalSupply = "total_supply"
         case totalMinted = "total_minted"
         case totalBurned = "total_burned"
+        case twoWayLinkedDapps = "two_way_linked_dapps"
+        case nativeResourceDetails = "native_resource_details"
     }
 
     // Encodable protocol methods
@@ -55,6 +62,8 @@ public struct StateEntityDetailsResponseFungibleResourceDetails: Codable, Hashab
         try container.encode(totalSupply, forKey: .totalSupply)
         try container.encode(totalMinted, forKey: .totalMinted)
         try container.encode(totalBurned, forKey: .totalBurned)
+        try container.encodeIfPresent(twoWayLinkedDapps, forKey: .twoWayLinkedDapps)
+        try container.encodeIfPresent(nativeResourceDetails, forKey: .nativeResourceDetails)
     }
 }
 

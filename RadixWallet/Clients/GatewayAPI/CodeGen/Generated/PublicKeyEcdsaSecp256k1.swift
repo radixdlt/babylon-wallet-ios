@@ -17,6 +17,7 @@ extension GatewayAPI {
 
 public struct PublicKeyEcdsaSecp256k1: Codable, Hashable {
 
+    static let keyHexRule = StringRule(minLength: 66, maxLength: 66, pattern: nil)
     public private(set) var keyType: PublicKeyType
     /** The hex-encoded compressed ECDSA Secp256k1 public key (33 bytes) */
     public private(set) var keyHex: String

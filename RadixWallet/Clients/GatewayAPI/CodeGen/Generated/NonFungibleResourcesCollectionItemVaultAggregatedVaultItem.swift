@@ -17,6 +17,7 @@ extension GatewayAPI {
 
 public struct NonFungibleResourcesCollectionItemVaultAggregatedVaultItem: Codable, Hashable {
 
+    static let lastUpdatedAtStateVersionRule = NumericRule<Int64>(minimum: 1, exclusiveMinimum: false, maximum: 100000000000000, exclusiveMaximum: false, multipleOf: nil)
     public private(set) var totalCount: Int64
     /** If specified, contains a cursor to query next page of the `items` collection. */
     public private(set) var nextCursor: String?

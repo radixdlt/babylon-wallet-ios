@@ -18,6 +18,9 @@ extension GatewayAPI {
 /** Optional. This allows for a request to be made against a historic state. If a constraint is specified, the Gateway will resolve the request against the ledger state at that time. If not specified, requests will be made with respect to the top of the committed ledger.  */
 public struct LedgerStateSelector: Codable, Hashable {
 
+    static let stateVersionRule = NumericRule<Int64>(minimum: 1, exclusiveMinimum: false, maximum: 100000000000000, exclusiveMaximum: false, multipleOf: nil)
+    static let epochRule = NumericRule<Int64>(minimum: 0, exclusiveMinimum: false, maximum: 10000000000, exclusiveMaximum: false, multipleOf: nil)
+    static let roundRule = NumericRule<Int64>(minimum: 0, exclusiveMinimum: false, maximum: 10000000000, exclusiveMaximum: false, multipleOf: nil)
     /** If provided, the latest ledger state lower than or equal to the given state version is returned. */
     public private(set) var stateVersion: Int64?
     /** If provided, the latest ledger state lower than or equal to the given round timestamp is returned. */
