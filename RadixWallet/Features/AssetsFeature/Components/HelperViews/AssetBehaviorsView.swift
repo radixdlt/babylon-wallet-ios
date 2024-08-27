@@ -19,7 +19,7 @@ struct AssetBehaviorsView: View {
 					}
 				}
 
-				InfoButton(.behaviors, label: "What are behaviors?") // FIXME: Strings
+				InfoButton(.behaviors, label: L10n.AssetDetails.Behaviors.whatAreBehaviors)
 			}
 			.transition(.opacity.combined(with: .scale(scale: 0.8)))
 		}
