@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: v1.7.0
+  version: v1.8.0
   title: Radix Gateway API - Babylon
   license:
     name: The Radix License, Version 1.0
