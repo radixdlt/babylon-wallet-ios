@@ -12,7 +12,9 @@ extension SheetOverlayCoordinator {
 		}
 
 		public var body: some SwiftUI.View {
-			NavigationStack {
+			WithNavigationBar {
+				store.send(.view(.closeButtonTapped))
+			} content: {
 				root(for: store.scope(state: \.root, action: \.child.root))
 			}
 		}
@@ -45,36 +47,29 @@ extension InfoLinkSheet {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-				VStack(spacing: .zero) {
-					CloseButtonBar {
-						store.send(.view(.closeButtonTapped))
-					}
-					.padding(.horizontal, .small3)
-
-					ScrollViewReader { proxy in
-						ScrollView {
-							VStack(spacing: .zero) {
-								if let image = viewStore.image {
-									Image(asset: image)
-										.resizable()
-										.frame(.veryLarge)
-										.padding(.bottom, .medium2)
-								}
-
-								ForEach(viewStore.parts, id: \.self) { part in
-									PartView(part: part)
-								}
-								.environment(\.openURL, openURL)
-								.padding(.horizontal, .large2)
+				ScrollViewReader { proxy in
+					ScrollView {
+						VStack(spacing: .zero) {
+							if let image = viewStore.image {
+								Image(asset: image)
+									.resizable()
+									.frame(.veryLarge)
+									.padding(.bottom, .medium2)
 							}
-							.padding(.top, .small2)
-							.id(scrollViewTopID)
+
+							ForEach(viewStore.parts, id: \.self) { part in
+								PartView(part: part)
+							}
+							.environment(\.openURL, openURL)
+							.padding(.horizontal, .large2)
 						}
-						.animation(.default.speed(2), value: viewStore.text)
-						.onChange(of: viewStore.text) { _ in
-							withAnimation {
-								proxy.scrollTo(scrollViewTopID, anchor: .top)
-							}
+						.padding(.top, .small2)
+						.id(scrollViewTopID)
+					}
+					.animation(.default.speed(2), value: viewStore.text)
+					.onChange(of: viewStore.text) { _ in
+						withAnimation {
+							proxy.scrollTo(scrollViewTopID, anchor: .top)
 						}
 					}
 				}
