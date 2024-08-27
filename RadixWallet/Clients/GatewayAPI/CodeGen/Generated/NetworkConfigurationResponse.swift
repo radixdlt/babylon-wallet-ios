@@ -17,7 +17,6 @@ extension GatewayAPI {
 
 public struct NetworkConfigurationResponse: Codable, Hashable {
 
-    static let networkIdRule = NumericRule<Int>(minimum: 0, exclusiveMinimum: false, maximum: 255, exclusiveMaximum: false, multipleOf: nil)
     /** The logical id of the network */
     public private(set) var networkId: Int
     /** The logical name of the network */

@@ -17,7 +17,6 @@ extension GatewayAPI {
 
 public struct StateEntityDetailsResponseFungibleResourceDetails: Codable, Hashable {
 
-    static let divisibilityRule = NumericRule<Int>(minimum: 0, exclusiveMinimum: false, maximum: nil, exclusiveMaximum: false, multipleOf: nil)
     public private(set) var type: StateEntityDetailsResponseItemDetailsType
     public private(set) var roleAssignments: ComponentEntityRoleAssignments
     public private(set) var divisibility: Int

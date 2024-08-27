@@ -17,7 +17,6 @@ extension GatewayAPI {
 
 public struct FungibleResourcesCollectionItemVaultAggregatedVaultItem: Codable, Hashable {
 
-    static let lastUpdatedAtStateVersionRule = NumericRule<Int64>(minimum: 1, exclusiveMinimum: false, maximum: 100000000000000, exclusiveMaximum: false, multipleOf: nil)
     /** Bech32m-encoded human readable version of the address. */
     public private(set) var vaultAddress: String
     /** String-encoded decimal representing the amount of a related fungible resource. */

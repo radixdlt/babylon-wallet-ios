@@ -17,7 +17,6 @@ extension GatewayAPI {
 
 public struct ValidatorCollectionItemEffectiveFeeFactorPending: Codable, Hashable {
 
-    static let effectiveAtEpochRule = NumericRule<Int64>(minimum: 0, exclusiveMinimum: false, maximum: 10000000000, exclusiveMaximum: false, multipleOf: nil)
     /** String-encoded decimal representing the amount of a related fungible resource. */
     public private(set) var feeFactor: String
     public private(set) var effectiveAtEpoch: Int64

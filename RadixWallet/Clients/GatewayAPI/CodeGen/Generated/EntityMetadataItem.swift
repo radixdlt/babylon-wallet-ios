@@ -18,7 +18,6 @@ extension GatewayAPI {
 /** Entity metadata key-value pair. */
 public struct EntityMetadataItem: Codable, Hashable {
 
-    static let lastUpdatedAtStateVersionRule = NumericRule<Int64>(minimum: 1, exclusiveMinimum: false, maximum: 100000000000000, exclusiveMaximum: false, multipleOf: nil)
     /** Entity metadata key. */
     public private(set) var key: String
     public private(set) var value: EntityMetadataItemValue

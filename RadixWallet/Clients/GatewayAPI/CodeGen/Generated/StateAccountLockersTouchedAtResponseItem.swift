@@ -17,7 +17,6 @@ extension GatewayAPI {
 
 public struct StateAccountLockersTouchedAtResponseItem: Codable, Hashable {
 
-    static let lastTouchedAtStateVersionRule = NumericRule<Int64>(minimum: 1, exclusiveMinimum: false, maximum: 100000000000000, exclusiveMaximum: false, multipleOf: nil)
     /** Bech32m-encoded human readable version of the address. */
     public private(set) var lockerAddress: String
     /** Bech32m-encoded human readable version of the address. */

@@ -39,10 +39,10 @@ public struct CommittedTransactionInfo: Codable, Hashable {
     /** A collection of zero or more manifest classes ordered from the most specific class to the least specific one. This field will be present only for user transactions.  */
     public private(set) var manifestClasses: [ManifestClass]?
     /** The optional transaction message. This type is defined in the Core API as `TransactionMessage`. See the Core API documentation for more details.  */
-    public private(set) var message: AnyCodable?
+	public private(set) var message: CoreAPI.TransactionMessage?
     public private(set) var balanceChanges: TransactionBalanceChanges?
 
-    public init(stateVersion: Int64, epoch: Int64, round: Int64, roundTimestamp: String, transactionStatus: TransactionStatus, payloadHash: String? = nil, intentHash: String? = nil, feePaid: String? = nil, affectedGlobalEntities: [String]? = nil, confirmedAt: Date? = nil, errorMessage: String? = nil, rawHex: String? = nil, receipt: TransactionReceipt? = nil, manifestInstructions: String? = nil, manifestClasses: [ManifestClass]? = nil, message: AnyCodable? = nil, balanceChanges: TransactionBalanceChanges? = nil) {
+    public init(stateVersion: Int64, epoch: Int64, round: Int64, roundTimestamp: String, transactionStatus: TransactionStatus, payloadHash: String? = nil, intentHash: String? = nil, feePaid: String? = nil, affectedGlobalEntities: [String]? = nil, confirmedAt: Date? = nil, errorMessage: String? = nil, rawHex: String? = nil, receipt: TransactionReceipt? = nil, manifestInstructions: String? = nil, manifestClasses: [ManifestClass]? = nil, message: CoreAPI.TransactionMessage? = nil, balanceChanges: TransactionBalanceChanges? = nil) {
         self.stateVersion = stateVersion
         self.epoch = epoch
         self.round = round

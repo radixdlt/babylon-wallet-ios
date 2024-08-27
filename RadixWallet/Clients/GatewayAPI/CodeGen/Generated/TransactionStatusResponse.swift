@@ -17,7 +17,6 @@ extension GatewayAPI {
 
 public struct TransactionStatusResponse: Codable, Hashable {
 
-    static let permanentlyRejectsAtEpochRule = NumericRule<Int64>(minimum: 0, exclusiveMinimum: false, maximum: 10000000000, exclusiveMaximum: false, multipleOf: nil)
     public private(set) var ledgerState: LedgerState
     public private(set) var status: TransactionStatus
     public private(set) var intentStatus: TransactionIntentStatus

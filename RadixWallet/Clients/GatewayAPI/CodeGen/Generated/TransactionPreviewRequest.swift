@@ -17,10 +17,6 @@ extension GatewayAPI {
 
 public struct TransactionPreviewRequest: Codable, Hashable {
 
-    static let startEpochInclusiveRule = NumericRule<Int64>(minimum: 0, exclusiveMinimum: false, maximum: 10000000000, exclusiveMaximum: false, multipleOf: nil)
-    static let endEpochExclusiveRule = NumericRule<Int64>(minimum: 0, exclusiveMinimum: false, maximum: 10000000000, exclusiveMaximum: false, multipleOf: nil)
-    static let tipPercentageRule = NumericRule<Int>(minimum: 0, exclusiveMinimum: false, maximum: 65535, exclusiveMaximum: false, multipleOf: nil)
-    static let nonceRule = NumericRule<Int64>(minimum: 0, exclusiveMinimum: false, maximum: nil, exclusiveMaximum: false, multipleOf: nil)
     /** A text-representation of a transaction manifest */
     public private(set) var manifest: String
     /** An array of hex-encoded blob data, if referenced by the manifest. */

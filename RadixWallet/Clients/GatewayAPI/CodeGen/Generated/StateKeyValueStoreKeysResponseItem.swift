@@ -17,7 +17,6 @@ extension GatewayAPI {
 
 public struct StateKeyValueStoreKeysResponseItem: Codable, Hashable {
 
-    static let lastUpdatedAtStateVersionRule = NumericRule<Int64>(minimum: 1, exclusiveMinimum: false, maximum: 100000000000000, exclusiveMaximum: false, multipleOf: nil)
     public private(set) var key: ScryptoSborValue
     /** The most recent state version underlying object was modified at. */
     public private(set) var lastUpdatedAtStateVersion: Int64

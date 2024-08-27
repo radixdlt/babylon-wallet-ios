@@ -17,7 +17,6 @@ extension GatewayAPI {
 
 public struct StateNonFungibleLocationResponseItem: Codable, Hashable {
 
-    static let lastUpdatedAtStateVersionRule = NumericRule<Int64>(minimum: 1, exclusiveMinimum: false, maximum: 100000000000000, exclusiveMaximum: false, multipleOf: nil)
     /** String-encoded non-fungible ID. */
     public private(set) var nonFungibleId: String
     /** Bech32m-encoded human readable version of the address. */

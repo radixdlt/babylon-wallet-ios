@@ -11,7 +11,7 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.AccountDefaultDepositRule")
-public typealias AccountDefaultDepositRule = GatewayAPI.AccountDefaultDepositRule
+public typealias GatewayAccountDefaultDepositRule = GatewayAPI.AccountDefaultDepositRule
 
 extension GatewayAPI {
 
