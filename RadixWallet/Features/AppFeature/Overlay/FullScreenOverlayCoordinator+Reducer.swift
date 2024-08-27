@@ -1,5 +1,6 @@
 import ComposableArchitecture
-import SwiftUI
+
+// import SwiftUI
 
 public struct FullScreenOverlayCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {

@@ -19,11 +19,11 @@ extension OverlayWindowClient: DependencyKey {
 				return Item.alert(.init(
 					title: { TextState(L10n.Common.errorAlertTitle) },
 					actions: {
-						let buttons: [ButtonState<OverlayWindowClient.Item.AlertAction>] = [
-							.init(role: .cancel, action: .dismissed, label: { TextState(L10n.Common.cancel) }),
-							.init(action: .emailSupport(additionalInfo: error.localizedDescription), label: { TextState(L10n.Error.emailSupportButtonTitle) }),
-						]
-						return buttons
+						ButtonState(role: .cancel, action: .dismissed) {
+							TextState(L10n.Common.cancel)
+						}
+						ButtonState(action: .emailSupport(additionalInfo: error.localizedDescription)) { TextState(L10n.Error.emailSupportButtonTitle)
+						}
 					},
 					message: { TextState(message) }
 				))
@@ -65,7 +65,7 @@ extension OverlayWindowClient: DependencyKey {
 
 extension OverlayWindowClient {
 	public func showInfoLink(_ item: GlossaryItem) {
-		scheduleSheet(.init(image: item.image, text: item.string), .replace)
+		scheduleSheet(.infoLink(.init(image: item.image, text: item.string)), .replace)
 	}
 }
 

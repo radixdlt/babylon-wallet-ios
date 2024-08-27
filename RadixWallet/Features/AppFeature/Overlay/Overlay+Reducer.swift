@@ -26,7 +26,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		@CasePathable
 		public enum State: Sendable, Hashable {
 			case hud(HUD.State)
-			case sheet(Sheet.State)
+			case sheet(SheetOverlayCoordinator.State)
 			case alert(OverlayWindowClient.Item.AlertState)
 			case fullScreen(FullScreenOverlayCoordinator.State)
 		}
@@ -34,7 +34,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case hud(HUD.Action)
-			case sheet(Sheet.Action)
+			case sheet(SheetOverlayCoordinator.Action)
 			case alert(OverlayWindowClient.Item.AlertAction)
 			case fullScreen(FullScreenOverlayCoordinator.Action)
 		}
@@ -44,7 +44,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 				HUD()
 			}
 			Scope(state: \.sheet, action: \.sheet) {
-				Sheet()
+				SheetOverlayCoordinator()
 			}
 			Scope(state: \.fullScreen, action: \.fullScreen) {
 				FullScreenOverlayCoordinator()
@@ -80,7 +80,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .scheduleItem(event):
 			if case let .sheet(sheetState, .replace) = event, case .sheet = state.destination {
-				state.destination = .sheet(sheetState)
+				state.destination = .sheet(.init(root: sheetState))
 				return .none
 			} else {
 				state.itemsQueue.append(event)
@@ -161,7 +161,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 			return .none
 
 		case let .sheet(sheetState, _):
-			state.destination = .sheet(sheetState)
+			state.destination = .sheet(.init(root: sheetState))
 			return setIsUserInteractionEnabled(&state, isEnabled: true)
 
 		case let .alert(alert):

@@ -1,11 +1,45 @@
-import Foundation
+import ComposableArchitecture
+import SwiftUI
+
+// MARK: - SheetOverlayCoordinator.View
+extension SheetOverlayCoordinator {
+	@MainActor
+	public struct View: SwiftUI.View {
+		private let store: StoreOf<SheetOverlayCoordinator>
+
+		public init(store: StoreOf<SheetOverlayCoordinator>) {
+			self.store = store
+		}
+
+		public var body: some SwiftUI.View {
+			NavigationStack {
+				root(for: store.scope(state: \.root, action: \.child.root))
+			}
+		}
+
+		private func root(
+			for store: StoreOf<SheetOverlayCoordinator.Root>
+		) -> some SwiftUI.View {
+			SwitchStore(store) { state in
+				switch state {
+				case .infoLink:
+					CaseLet(
+						/SheetOverlayCoordinator.Root.State.infoLink,
+						action: SheetOverlayCoordinator.Root.Action.infoLink,
+						then: { InfoLinkSheet.View(store: $0) }
+					)
+				}
+			}
+		}
+	}
+}
 
 // MARK: - Sheet.View
-extension Sheet {
+extension InfoLinkSheet {
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<Sheet>
+		private let store: StoreOf<InfoLinkSheet>
 
-		public init(store: StoreOf<Sheet>) {
+		public init(store: StoreOf<InfoLinkSheet>) {
 			self.store = store
 		}
 
@@ -95,8 +129,8 @@ extension Sheet {
 	}
 }
 
-// MARK: - Sheet.Part
-extension Sheet {
+// MARK: - InfoLinkSheet.Part
+extension InfoLinkSheet {
 	enum Part: Hashable {
 		case heading2(String)
 		case heading3(String)
@@ -105,13 +139,13 @@ extension Sheet {
 	}
 }
 
-extension Sheet.State {
-	var parts: [Sheet.Part] {
+extension InfoLinkSheet.State {
+	var parts: [InfoLinkSheet.Part] {
 		Self.parse(string: text)
 	}
 
-	private static func parse(string: String) -> [Sheet.Part] {
-		var result: [Sheet.Part] = []
+	private static func parse(string: String) -> [InfoLinkSheet.Part] {
+		var result: [InfoLinkSheet.Part] = []
 		var currentText = ""
 
 		func addCurrentText() {
@@ -138,7 +172,7 @@ extension Sheet.State {
 		return result
 	}
 
-	private static func nonTextPart(from row: Substring) -> Sheet.Part? {
+	private static func nonTextPart(from row: Substring) -> InfoLinkSheet.Part? {
 		if row.hasPrefix("## ") {
 			.heading2(String(row.dropFirst(3)))
 		} else if row.hasPrefix("### ") {

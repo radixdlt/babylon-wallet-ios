@@ -64,7 +64,7 @@ extension OverlayWindowClient {
 	public typealias ScheduleAlert = @Sendable (Item.AlertState) async -> Item.AlertAction
 	public typealias ScheduleAlertAndIgnoreAction = @Sendable (Item.AlertState) -> Void
 	public typealias ScheduleHUD = @Sendable (Item.HUD) -> Void
-	public typealias ScheduleSheet = @Sendable (Item.SheetState, SheetBehavior) -> Void
+	public typealias ScheduleSheet = @Sendable (SheetOverlayCoordinator.Root.State, SheetBehavior) -> Void
 	public typealias ScheduleFullScreen = @Sendable (FullScreenOverlayCoordinator.State) async -> FullScreenAction
 	public typealias SendAlertAction = @Sendable (Item.AlertAction, Item.AlertState.ID) -> Void
 	public typealias SendFullScreenAction = @Sendable (FullScreenAction, FullScreenID) -> Void
@@ -83,12 +83,6 @@ extension OverlayWindowClient {
 			case secondaryButtonTapped
 			case dismissed
 			case emailSupport(additionalInfo: String)
-		}
-
-		public struct SheetState: Sendable, Hashable, Identifiable {
-			public let id = UUID()
-			public let image: ImageAsset?
-			public let text: String
 		}
 
 		public struct HUD: Sendable, Hashable, Identifiable {
@@ -127,14 +121,9 @@ extension OverlayWindowClient {
 		}
 
 		case hud(HUD)
-		case sheet(SheetState, SheetBehavior)
 		case alert(AlertState)
+		case sheet(SheetOverlayCoordinator.Root.State, SheetBehavior)
 		case fullScreen(FullScreenOverlayCoordinator.State)
-	}
-
-	public enum SheetBehavior: Sendable {
-		case enqueue
-		case replace
 	}
 }
 
