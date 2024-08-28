@@ -61,6 +61,8 @@ extension OverlayWindowClient.GlossaryItem {
 			AssetResource.poolUnits
 		case .radixnetwork:
 			AssetResource.fungibleTokens
+		case .xrd:
+			AssetResource.xrd
 		default:
 			nil
 		}
