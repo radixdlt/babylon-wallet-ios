@@ -31,7 +31,6 @@ public struct ToggleView: SwiftUI.View {
 					}
 
 					PlainListRowCore(context: .toggle, title: title, subtitle: subtitle)
-						.padding(.vertical, .small3)
 				}
 			}
 		)

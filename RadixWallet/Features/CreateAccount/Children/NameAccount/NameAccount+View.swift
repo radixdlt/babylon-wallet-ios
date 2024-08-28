@@ -73,7 +73,7 @@ extension NameAccount {
 						)
 						.keyboardType(.asciiCapable)
 						.autocorrectionDisabled()
-						.padding(.bottom, .medium3)
+						.padding(.bottom, .large3)
 
 						useLedgerAsFactorSource(with: viewStore)
 					}
