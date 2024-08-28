@@ -44,8 +44,22 @@ public struct ProgrammaticScryptoSborValueEnum: Codable, Hashable {
         case fields
     }
 
-    // Encodable protocol methods
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.kind = try container.decode(ProgrammaticScryptoSborValueKind.self, forKey: .kind)
+        self.typeName = try container.decodeIfPresent(String.self, forKey: .typeName)
+        self.fieldName = try container.decodeIfPresent(String.self, forKey: .fieldName)
+        // For backward compatibility, since 1.5.1 the variant_id is returned as String instead of Int
+        self.variantId = if let string_variant_id = try? container.decode(String.self, forKey: .variantId) {
+            string_variant_id
+        } else {
+            try String(container.decode(Int.self, forKey: .variantId))
+        }
+        self.variantName = try container.decodeIfPresent(String.self, forKey: .variantName)
+        self.fields = try container.decode([GatewayAPI.ProgrammaticScryptoSborValue].self, forKey: .fields)
+    }
 
+    // Encodable protocol methods
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(kind, forKey: .kind)
