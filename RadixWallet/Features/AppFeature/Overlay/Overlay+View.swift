@@ -46,6 +46,7 @@ private extension View {
 		sheet(store: destinationStore.scope(state: \.sheet, action: \.sheet)) {
 			SheetOverlayCoordinator.View(store: $0)
 				.presentationDetents([.medium, .large])
+				.presentationBackground(.blur)
 		}
 	}
 
