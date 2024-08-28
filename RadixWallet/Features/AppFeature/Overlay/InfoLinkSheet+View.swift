@@ -3,6 +3,8 @@ import Foundation
 // MARK: - InfoLinkSheet.View
 extension InfoLinkSheet {
 	public struct View: SwiftUI.View {
+		@SwiftUI.State private var showTitle: Bool = false
+
 		private let store: StoreOf<InfoLinkSheet>
 
 		public init(store: StoreOf<InfoLinkSheet>) {
@@ -21,8 +23,10 @@ extension InfoLinkSheet {
 									.padding(.bottom, .medium2)
 							}
 
-							ForEach(viewStore.parts, id: \.self) { part in
+							let parts = viewStore.parts
+							ForEach(parts, id: \.self) { part in
 								PartView(part: part)
+									.measurePosition(part == parts.first ? scrollViewTopID : nil, coordSpace: coordSpace)
 							}
 							.environment(\.openURL, openURL)
 							.padding(.horizontal, .large2)
@@ -30,15 +34,32 @@ extension InfoLinkSheet {
 						.padding(.top, .small2)
 						.id(scrollViewTopID)
 					}
+					.coordinateSpace(name: coordSpace)
 					.animation(.default.speed(2), value: viewStore.text)
 					.onChange(of: viewStore.text) { _ in
 						withAnimation {
 							proxy.scrollTo(scrollViewTopID, anchor: .top)
 						}
 					}
+					.onPreferenceChange(PositionsPreferenceKey.self) { rects in
+						guard let offset = rects[scrollViewTopID]?.maxY else { return }
+						if !showTitle, offset < showTitleOffset {
+							showTitle = true
+						} else if showTitle, offset > hideTitleOffset {
+							showTitle = false
+						}
+					}
 				}
+				.navigationBarTitleDisplayMode(.inline)
+				.navigationTitle(showTitle ? viewStore.title : "")
 			}
 		}
+
+		private let showTitleOffset: CGFloat = 40
+
+		private let hideTitleOffset: CGFloat = 47
+
+		private let coordSpace: String = "InfoLinkSheet"
 
 		private let scrollViewTopID = "scrollViewTopID"
 
@@ -99,6 +120,10 @@ extension InfoLinkSheet {
 }
 
 extension InfoLinkSheet.State {
+	var title: String {
+		text.split(separator: "\n", omittingEmptySubsequences: false).first.flatMap(Self.title) ?? ""
+	}
+
 	var parts: [InfoLinkSheet.Part] {
 		Self.parse(string: text)
 	}
@@ -129,6 +154,11 @@ extension InfoLinkSheet.State {
 		addCurrentText()
 
 		return result
+	}
+
+	private static func title(in row: Substring) -> String? {
+		guard case let .heading2(heading) = nonTextPart(from: row) else { return nil }
+		return heading
 	}
 
 	private static func nonTextPart(from row: Substring) -> InfoLinkSheet.Part? {
