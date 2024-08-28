@@ -21,11 +21,13 @@ extension TransactionReviewNetworkFee {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading, spacing: .zero) {
 					HStack(alignment: .top) {
-						Text(L10n.TransactionReview.NetworkFee.heading)
-							.sectionHeading
-							.textCase(.uppercase)
+						HStack(spacing: .small2) {
+							Text(L10n.TransactionReview.NetworkFee.heading)
+								.sectionHeading
+								.textCase(.uppercase)
 
-						InfoButton(.transactionfee)
+							InfoButton(.transactionfee)
+						}
 
 						Spacer(minLength: 0)
 
