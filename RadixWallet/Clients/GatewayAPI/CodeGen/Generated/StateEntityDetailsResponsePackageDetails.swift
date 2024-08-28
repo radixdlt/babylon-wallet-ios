@@ -30,8 +30,10 @@ public struct StateEntityDetailsResponsePackageDetails: Codable, Hashable {
     public private(set) var blueprints: PackageBlueprintCollection?
     public private(set) var schemas: EntitySchemaCollection?
     public private(set) var roleAssignments: ComponentEntityRoleAssignments?
+    /** Bech32m-encoded human readable version of the address. */
+    public private(set) var twoWayLinkedDappAddress: String?
 
-    public init(type: StateEntityDetailsResponseItemDetailsType, codes: PackageCodeCollection, vmType: PackageVmType, codeHashHex: String, codeHex: String, royaltyVaultBalance: String? = nil, blueprints: PackageBlueprintCollection? = nil, schemas: EntitySchemaCollection? = nil, roleAssignments: ComponentEntityRoleAssignments? = nil) {
+    public init(type: StateEntityDetailsResponseItemDetailsType, codes: PackageCodeCollection, vmType: PackageVmType, codeHashHex: String, codeHex: String, royaltyVaultBalance: String? = nil, blueprints: PackageBlueprintCollection? = nil, schemas: EntitySchemaCollection? = nil, roleAssignments: ComponentEntityRoleAssignments? = nil, twoWayLinkedDappAddress: String? = nil) {
         self.type = type
         self.codes = codes
         self.vmType = vmType
@@ -41,6 +43,7 @@ public struct StateEntityDetailsResponsePackageDetails: Codable, Hashable {
         self.blueprints = blueprints
         self.schemas = schemas
         self.roleAssignments = roleAssignments
+        self.twoWayLinkedDappAddress = twoWayLinkedDappAddress
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
@@ -53,6 +56,7 @@ public struct StateEntityDetailsResponsePackageDetails: Codable, Hashable {
         case blueprints
         case schemas
         case roleAssignments = "role_assignments"
+        case twoWayLinkedDappAddress = "two_way_linked_dapp_address"
     }
 
     // Encodable protocol methods
@@ -68,6 +72,7 @@ public struct StateEntityDetailsResponsePackageDetails: Codable, Hashable {
         try container.encodeIfPresent(blueprints, forKey: .blueprints)
         try container.encodeIfPresent(schemas, forKey: .schemas)
         try container.encodeIfPresent(roleAssignments, forKey: .roleAssignments)
+        try container.encodeIfPresent(twoWayLinkedDappAddress, forKey: .twoWayLinkedDappAddress)
     }
 }
 
