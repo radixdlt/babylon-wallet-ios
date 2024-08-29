@@ -294,8 +294,8 @@ extension DappDetails.View {
 				VStack(spacing: .large2) {
 					VStack(spacing: .medium1) {
 						ToggleView(
-							title: "Show direct deposits to claim",
-							subtitle: viewStore.isDepositsVisible ? "Available deposits from this dApp will be shown on the recipient Accounts" : "Available deposits from this dApp will not be shown",
+							title: L10n.AuthorizedDapps.DAppDetails.depositsTitle,
+							subtitle: viewStore.isDepositsVisible ? L10n.AuthorizedDapps.DAppDetails.depositsVisible : L10n.AuthorizedDapps.DAppDetails.depositsHidden,
 							minHeight: .zero,
 							isOn: viewStore.binding(
 								get: \.isDepositsVisible,
