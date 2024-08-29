@@ -54,6 +54,7 @@ public struct Main: Sendable, FeatureReducer {
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.cloudBackupClient) var cloudBackupClient
 	@Dependency(\.securityCenterClient) var securityCenterClient
+	@Dependency(\.accountLockersClient) var accountLockersClient
 	@Dependency(\.deepLinkHandlerClient) var deepLinkHandlerClient
 
 	public init() {}
@@ -79,6 +80,7 @@ public struct Main: Sendable, FeatureReducer {
 
 			return startAutomaticBackupsEffect()
 				.merge(with: startMonitoringSecurityCenterEffect())
+				.merge(with: startMonitoringAccountLockersEffect())
 				.merge(with: gatewayValuesEffect())
 		}
 	}
@@ -99,6 +101,16 @@ public struct Main: Sendable, FeatureReducer {
 				try await securityCenterClient.startMonitoring()
 			} catch {
 				loggerGlobal.notice("securityCenterClient.startMonitoring failed: \(error)")
+			}
+		}
+	}
+
+	private func startMonitoringAccountLockersEffect() -> Effect<Action> {
+		.run { _ in
+			do {
+				try await accountLockersClient.startMonitoring()
+			} catch {
+				loggerGlobal.notice("accountLockersClient.startMonitoring failed: \(error)")
 			}
 		}
 	}

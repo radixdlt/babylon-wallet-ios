@@ -54,6 +54,13 @@ extension ProfileStore {
 		}
 	}
 
+	/// A multicasting replaying AsyncSequence of distinct AuthorizedDapp for the currently selected network.
+	public func authorizedDappValues() -> AnyAsyncSequence<AuthorizedDapps> {
+		_lens {
+			$0.network?.getAuthorizedDapps()
+		}
+	}
+
 	@_disfavoredOverload
 	private func lens<Property>(
 		_ keyPath: KeyPath<Profile, Property?>
