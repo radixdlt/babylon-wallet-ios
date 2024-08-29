@@ -23,23 +23,19 @@ extension NPSSurvey {
 				NavigationStack {
 					ScrollView {
 						VStack(spacing: .zero) {
-							CloseButton { store.send(.view(.closeButtonTapped)) }
-								.flushedLeft
-								.padding(.top, .medium3)
+							headerView()
+							scoreSelectionView()
 
-							VStack(spacing: .zero) {
-								headerView()
-								scoreSelectionView()
+							Divider()
+								.padding(.bottom, .medium1)
 
-								Divider()
-									.padding(.bottom, .medium1)
-
-								scoreReasonView()
-							}
-							.padding([.horizontal, .bottom], .large3)
+							scoreReasonView()
 						}
+						.padding([.horizontal, .bottom], .large3)
 					}
-					.separator(.top)
+					.withNavigationBar {
+						store.send(.view(.closeButtonTapped))
+					}
 					.footer {
 						WithControlRequirements(
 							store.feedbackScore,
