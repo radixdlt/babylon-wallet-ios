@@ -249,6 +249,9 @@
 "authorizedDapps_dAppDetails_personasHeading" = "Here are the Personas that you have used to login to this dApp.";
 "authorizedDapps_dAppDetails_noPersonasHeading" = "No Personas have been used to login to this dApp.";
 "authorizedDapps_dAppDetails_forgetDapp" = "Forget this dApp";
+"authorizedDapps_dAppDetails_depositsTitle" = "Show direct deposits to claim";
+"authorizedDapps_dAppDetails_depositsVisible" = "Available deposits from this dApp will be shown on the recipient Accounts";
+"authorizedDapps_dAppDetails_depositsHidden" = "Available deposits from this dApp will not be shown";
 "authorizedDapps_personaDetails_personaHidden" = "Persona Hidden";
 "authorizedDapps_personaDetails_editAvatarButtonTitle" = "Edit Avatar";
 "authorizedDapps_personaDetails_personaLabelHeading" = "Persona Label";

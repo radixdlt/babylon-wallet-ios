@@ -788,6 +788,12 @@ public enum L10n {
     public enum DAppDetails {
       /// dApp Definition
       public static let dAppDefinition = L10n.tr("Localizable", "authorizedDapps_dAppDetails_dAppDefinition", fallback: "dApp Definition")
+      /// Available deposits from this dApp will not be shown
+      public static let depositsHidden = L10n.tr("Localizable", "authorizedDapps_dAppDetails_depositsHidden", fallback: "Available deposits from this dApp will not be shown")
+      /// Show direct deposits to claim
+      public static let depositsTitle = L10n.tr("Localizable", "authorizedDapps_dAppDetails_depositsTitle", fallback: "Show direct deposits to claim")
+      /// Available deposits from this dApp will be shown on the recipient Accounts
+      public static let depositsVisible = L10n.tr("Localizable", "authorizedDapps_dAppDetails_depositsVisible", fallback: "Available deposits from this dApp will be shown on the recipient Accounts")
       /// Forget this dApp
       public static let forgetDapp = L10n.tr("Localizable", "authorizedDapps_dAppDetails_forgetDapp", fallback: "Forget this dApp")
       /// Missing description
