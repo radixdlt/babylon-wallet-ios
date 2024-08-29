@@ -1,8 +1,6 @@
 import Algorithms
 import Sargon
 
-public typealias ResourceIdentifier = String
-
 // MARK: - GatewayAPIClient
 public struct GatewayAPIClient: Sendable, DependencyKey {
 	// MARK: Request

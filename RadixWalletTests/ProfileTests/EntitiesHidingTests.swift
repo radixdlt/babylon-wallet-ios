@@ -141,10 +141,10 @@ final class EntitiesHidingTests: TestCase {
 
 extension ProfileNetwork {
 	mutating func hide(account: Account) {
-		hideAccounts(ids: [account.id])
+		hideAccount(id: account.id)
 	}
 
 	mutating func hide(persona: Persona) {
-		hidePersonas(ids: [persona.id])
+		hidePersona(id: persona.id)
 	}
 }
