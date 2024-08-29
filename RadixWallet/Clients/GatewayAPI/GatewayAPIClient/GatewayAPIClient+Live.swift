@@ -117,7 +117,8 @@ extension GatewayAPIClient {
 				request: GatewayAPI.StateEntityDetailsRequest(
 					atLedgerState: ledgerState,
 					optIns: .init(
-						explicitMetadata: explictMetadata.map(\.rawValue)
+						explicitMetadata: explictMetadata.map(\.rawValue),
+						dappTwoWayLinks: explictMetadata.contains(.twoWaysLinks) // TODO: Check if the metadata key is actually necessary or just `dappTwoWayLinks` opt in
 					),
 					addresses: addresses, aggregationLevel: .vault
 				)) { @Sendable base in base.appendingPathComponent("state/entity/details") }

@@ -14,15 +14,24 @@ extension AccountLockersClient {
 			let accountValues = await accountsClient.accountsOnCurrentNetwork()
 
 			for try await (dapps, accounts) in combineLatest(dappValues, accountValues) {
-				try await filterDappsWithAccountLockers(dapps)
+				_ = try await filterDappsWithAccountLockers(dapps)
 			}
 		}
 
 		@Sendable
 		func filterDappsWithAccountLockers(_ dapps: AuthorizedDapps) async throws -> AuthorizedDapps {
-			let entities = try await onLedgerEntitiesClient.getEntities(addresses: dapps.map(\.dAppDefinitionAddress.asGeneral), metadataKeys: .dappMetadataKeys).compactMap(\.account)
+			let dappsWithPrimaryLocker = try await onLedgerEntitiesClient.getEntities(addresses: dapps.map(\.dAppDefinitionAddress.asGeneral), metadataKeys: .dappMetadataKeys, cachingStrategy: .readFromLedgerSkipWrite)
+				.compactMap(\.account)
+				.filter { account in
+					account.details?.primaryLocker != nil
+				}
+				.map(\.address)
 
-			return dapps
+			let result = dapps.filter { dapp in
+				dappsWithPrimaryLocker.contains(dapp.dappDefinitionAddress)
+			}
+
+			return result
 		}
 
 		return .init(startMonitoring: startMonitoring)
