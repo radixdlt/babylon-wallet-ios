@@ -49,14 +49,16 @@ final class EntitiesHidingTests: TestCase {
 		networkId: .mainnet,
 		dappDefinitionAddress: .sample,
 		displayName: "name 0",
-		referencesToAuthorizedPersonas: [sharedPersona0]
+		referencesToAuthorizedPersonas: [sharedPersona0],
+		preferences: .init(deposits: .visible)
 	)
 
 	lazy var dApp1 = AuthorizedDapp(
 		networkId: .mainnet,
 		dappDefinitionAddress: .sampleOther,
 		displayName: "name 1",
-		referencesToAuthorizedPersonas: [sharedPersona0, sharedPersona1]
+		referencesToAuthorizedPersonas: [sharedPersona0, sharedPersona1],
+		preferences: .init(deposits: .visible)
 	)
 
 	lazy var network = ProfileNetwork(

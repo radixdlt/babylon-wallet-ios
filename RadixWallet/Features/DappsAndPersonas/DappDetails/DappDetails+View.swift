@@ -20,8 +20,9 @@ extension DappDetails {
 		let thumbnail: URL?
 		let address: DappDefinitionAddress
 		let associatedDapps: [OnLedgerEntity.AssociatedDapp]?
-		let showForgetDapp: Bool
+		let showConfiguration: Bool
 		let tappablePersonas: Bool
+		let isDepositsVisible: Bool
 	}
 }
 
@@ -45,14 +46,8 @@ extension DappDetails.View {
 					Personas(store: store.personas, tappablePersonas: viewStore.tappablePersonas)
 						.background(.app.gray5)
 
-					if viewStore.showForgetDapp {
-						Button(L10n.AuthorizedDapps.ForgetDappAlert.title) {
-							store.send(.view(.forgetThisDappTapped))
-						}
-						.buttonStyle(.primaryRectangular(isDestructive: true))
-						.padding(.top, -.small2)
-						.padding(.horizontal, .medium3)
-						.padding(.bottom, .medium1)
+					if viewStore.showConfiguration {
+						Configuration(store: store)
 					}
 				}
 				.radixToolbar(title: viewStore.title)
@@ -135,8 +130,9 @@ private extension DappDetails.State {
 			thumbnail: metadata?.iconURL,
 			address: dAppDefinitionAddress,
 			associatedDapps: associatedDapps,
-			showForgetDapp: context != .general,
-			tappablePersonas: context == .settings(.authorizedDapps)
+			showConfiguration: context != .general,
+			tappablePersonas: context == .settings(.authorizedDapps),
+			isDepositsVisible: authorizedDapp?.isDepositsVisible ?? true
 		)
 	}
 
@@ -285,6 +281,39 @@ extension DappDetails.View {
 					.padding(.horizontal, .medium3)
 					.padding(.bottom, .large1)
 				}
+			}
+		}
+	}
+
+	@MainActor
+	struct Configuration: View {
+		let store: StoreOf<DappDetails>
+
+		var body: some View {
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				VStack(spacing: .large2) {
+					VStack(spacing: .medium1) {
+						ToggleView(
+							title: L10n.AuthorizedDapps.DAppDetails.depositsTitle,
+							subtitle: viewStore.isDepositsVisible ? L10n.AuthorizedDapps.DAppDetails.depositsVisible : L10n.AuthorizedDapps.DAppDetails.depositsHidden,
+							minHeight: .zero,
+							isOn: viewStore.binding(
+								get: \.isDepositsVisible,
+								send: { .depositsVisibleToggled($0) }
+							)
+						)
+
+						Separator()
+					}
+					.padding(.horizontal, .small2)
+
+					Button(L10n.AuthorizedDapps.DAppDetails.forgetDapp) {
+						store.send(.view(.forgetThisDappTapped))
+					}
+					.buttonStyle(.primaryRectangular(isDestructive: true))
+				}
+				.padding(.horizontal, .medium3)
+				.padding(.bottom, .medium1)
 			}
 		}
 	}

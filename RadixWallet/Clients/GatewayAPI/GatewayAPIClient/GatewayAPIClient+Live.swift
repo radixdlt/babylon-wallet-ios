@@ -196,6 +196,16 @@ extension GatewayAPIClient {
 					request: request
 				) { $0.appendingPathComponent("state/non-fungible/data") }
 			},
+			getAccountLockerTouchedAt: { request in
+				try await post(
+					request: request
+				) { $0.appendingPathComponent("/state/account-lockers/touched-at") }
+			},
+			getAccountLockerVaults: { request in
+				try await post(
+					request: request
+				) { $0.appendingPathComponent("/state/account-locker/page/vaults") }
+			},
 			submitTransaction: { transactionSubmitRequest in
 				try await post(
 					request: transactionSubmitRequest

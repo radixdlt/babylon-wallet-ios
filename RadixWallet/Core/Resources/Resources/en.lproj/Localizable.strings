@@ -81,6 +81,7 @@
 "assetDetails_poolUnitDetails_whatArePoolUnits" = "What are Pool units?";
 "assetDetails_badgeDetails_noBadges" = "You have no badges";
 "assetDetails_badgeDetails_whatAreBadges" = "What are badges?";
+"assetDetails_behaviors_whatAreBehaviors" = "What are behaviors?";
 "assetDetails_behaviors_simpleAsset" = "This is a simple asset";
 "assetDetails_behaviors_supplyIncreasable" = "The supply of this asset can be increased.";
 "assetDetails_behaviors_supplyDecreasable" = "The supply of this asset can be decreased.";
@@ -248,6 +249,9 @@
 "authorizedDapps_dAppDetails_personasHeading" = "Here are the Personas that you have used to login to this dApp.";
 "authorizedDapps_dAppDetails_noPersonasHeading" = "No Personas have been used to login to this dApp.";
 "authorizedDapps_dAppDetails_forgetDapp" = "Forget this dApp";
+"authorizedDapps_dAppDetails_depositsTitle" = "Show direct deposits to claim";
+"authorizedDapps_dAppDetails_depositsVisible" = "Available deposits from this dApp will be shown on the recipient Accounts";
+"authorizedDapps_dAppDetails_depositsHidden" = "Available deposits from this dApp will not be shown";
 "authorizedDapps_personaDetails_personaHidden" = "Persona Hidden";
 "authorizedDapps_personaDetails_editAvatarButtonTitle" = "Edit Avatar";
 "authorizedDapps_personaDetails_personaLabelHeading" = "Persona Label";
