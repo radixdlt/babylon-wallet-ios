@@ -226,9 +226,9 @@ public struct DappDetails: Sendable, FeatureReducer {
 				return .none
 			}
 			return .run { _ in
-				var simple = try await authorizedDappsClient.getAuthorizedDapp(detailed: detailed)
-				simple.showDeposits(isVisible)
-				try await authorizedDappsClient.updateAuthorizedDapp(simple)
+				var dapp = try await authorizedDappsClient.getAuthorizedDapp(detailed: detailed)
+				dapp.showDeposits(isVisible)
+				try await authorizedDappsClient.updateAuthorizedDapp(dapp)
 			}
 
 		case .forgetThisDappTapped:
