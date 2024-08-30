@@ -1,5 +1,8 @@
 // MARK: - HitTargetSize
-public enum HitTargetSize: CGFloat {
+public enum HitTargetSize: CGFloat, Sendable {
+	/// 18
+	case icon = 18
+
 	/// 24
 	case smallest = 24
 
@@ -36,6 +39,8 @@ public enum HitTargetSize: CGFloat {
 
 	public var cornerRadius: CGFloat {
 		switch self {
+		case .icon:
+			.small3
 		case .smallest:
 			.small3
 		case .verySmall:
@@ -64,6 +69,11 @@ extension View {
 	@inlinable
 	public func frame(_ size: HitTargetSize, alignment: Alignment = .center) -> some View {
 		frame(width: size.frame.width, height: size.frame.height, alignment: alignment)
+	}
+
+	@inlinable
+	public func frame(_ size: CGFloat, alignment: Alignment = .center) -> some View {
+		frame(width: size, height: size, alignment: alignment)
 	}
 }
 

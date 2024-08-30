@@ -7,11 +7,14 @@ struct AssetResourceDetailsSection: View {
 
 	struct ViewState: Equatable {
 		let description: Loadable<String?>
+		let infoUrl: Loadable<URL?>
 		let resourceAddress: ResourceAddress
 		let isXRD: Bool
 		let validatorAddress: ValidatorAddress?
 		let resourceName: Loadable<String?>?
 		let currentSupply: Loadable<String?>
+		let divisibility: Loadable<UInt8?>?
+		let arbitraryDataFields: Loadable<[ArbitraryDataField]>
 		let behaviors: Loadable<[AssetBehavior]>
 		let tags: Loadable<[AssetTag]>
 	}
@@ -22,9 +25,14 @@ struct AssetResourceDetailsSection: View {
 
 			loadable(viewState.description) { description in
 				if let description {
-					Text(description)
-						.textStyle(.body1Regular)
-						.flushedLeft
+					VStack(alignment: .leading, spacing: .medium2) {
+						Text(description)
+							.textStyle(.body1Regular)
+
+						if let wrappedValue = viewState.infoUrl.wrappedValue, let infoUrl = wrappedValue {
+							KeyValueUrlView(key: L10n.AssetDetails.moreInfo, url: infoUrl, isLocked: false)
+						}
+					}
 
 					AssetDetailsSeparator()
 						.padding(.horizontal, -.large2)
@@ -41,15 +49,22 @@ struct AssetResourceDetailsSection: View {
 
 				if let resourceName = viewState.resourceName {
 					loadable(resourceName) { value in
-						KeyValueView(
-							key: L10n.AssetDetails.NFTDetails.resourceName,
-							value: value ?? ""
-						)
+						if let value {
+							KeyValueView(key: L10n.AssetDetails.NFTDetails.resourceName, value: value)
+						}
 					}
 				}
 
 				loadable(viewState.currentSupply) { supply in
 					KeyValueView(key: L10n.AssetDetails.currentSupply, value: supply ?? "")
+				}
+
+				if let divisibility = viewState.divisibility {
+					loadable(divisibility) { value in
+						if let value {
+							KeyValueView(key: L10n.AssetDetails.divisibility, value: "\(value)")
+						}
+					}
 				}
 
 				loadable(viewState.behaviors) { value in
@@ -58,6 +73,18 @@ struct AssetResourceDetailsSection: View {
 
 				loadable(viewState.tags) { _ in
 					AssetTagsView(tags: viewState.tags.wrappedValue ?? [])
+				}
+
+				loadable(viewState.arbitraryDataFields) { arbitraryDataFields in
+					if !arbitraryDataFields.isEmpty {
+						AssetDetailsSeparator()
+							.padding(.vertical, .small2)
+							.padding(.horizontal, -.large2)
+
+						ForEachStatic(arbitraryDataFields) { field in
+							ArbitraryDataFieldView(field: field)
+						}
+					}
 				}
 			}
 			.padding(.horizontal, .large2)

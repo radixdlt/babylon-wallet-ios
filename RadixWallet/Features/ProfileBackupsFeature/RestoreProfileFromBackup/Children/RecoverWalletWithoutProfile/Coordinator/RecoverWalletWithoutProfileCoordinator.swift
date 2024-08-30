@@ -119,7 +119,6 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 					.init(
 						header: .init(title: L10n.EnterSeedPhrase.Header.titleMain),
 						warning: L10n.EnterSeedPhrase.warning,
-						hideAdvancedMode: true,
 						// we require 24 word Babylon mnemonic
 						isWordCountFixed: true,
 						persistStrategy: nil,
@@ -135,7 +134,7 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 				let mainBDFS = DeviceFactorSource.babylon(
 					mnemonicWithPassphrase: mnemonicWithPassphrase,
 					isMain: true,
-					deviceInfo: secureStorageClient.loadDeviceInfoOrFallback()
+					hostInfo: .current()
 				)
 
 				let privateHD = PrivateHierarchicalDeterministicFactorSource(

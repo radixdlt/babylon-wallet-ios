@@ -20,8 +20,9 @@ extension DappDetails {
 		let thumbnail: URL?
 		let address: DappDefinitionAddress
 		let associatedDapps: [OnLedgerEntity.AssociatedDapp]?
-		let showForgetDapp: Bool
+		let showConfiguration: Bool
 		let tappablePersonas: Bool
+		let isDepositsVisible: Bool
 	}
 }
 
@@ -31,9 +32,10 @@ extension DappDetails.View {
 	public var body: some View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
-				VStack(spacing: 0) {
+				VStack(spacing: .medium1) {
 					Thumbnail(.dapp, url: viewStore.thumbnail, size: .veryLarge)
-						.padding(.vertical, .large2)
+						.padding(.top, .medium1)
+						.padding(.bottom, .small2)
 
 					InfoBlock(store: store)
 
@@ -44,13 +46,8 @@ extension DappDetails.View {
 					Personas(store: store.personas, tappablePersonas: viewStore.tappablePersonas)
 						.background(.app.gray5)
 
-					if viewStore.showForgetDapp {
-						Button(L10n.AuthorizedDapps.ForgetDappAlert.title) {
-							store.send(.view(.forgetThisDappTapped))
-						}
-						.buttonStyle(.primaryRectangular(isDestructive: true))
-						.padding([.horizontal, .top], .medium3)
-						.padding(.bottom, .large2)
+					if viewStore.showConfiguration {
+						Configuration(store: store)
 					}
 				}
 				.radixToolbar(title: viewStore.title)
@@ -133,8 +130,9 @@ private extension DappDetails.State {
 			thumbnail: metadata?.iconURL,
 			address: dAppDefinitionAddress,
 			associatedDapps: associatedDapps,
-			showForgetDapp: context != .general,
-			tappablePersonas: context == .settings(.authorizedDapps)
+			showConfiguration: context != .general,
+			tappablePersonas: context == .settings(.authorizedDapps),
+			isDepositsVisible: authorizedDapp?.isDepositsVisible ?? true
 		)
 	}
 
@@ -156,43 +154,30 @@ extension DappDetails.View {
 
 		var body: some View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack(alignment: .leading, spacing: .medium2) {
+				VStack(alignment: .leading, spacing: .medium1) {
 					Separator()
 
 					if let description = viewStore.description {
 						Text(description)
-							.textBlock
-							.flushedLeft
+							.textStyle(.body1Regular)
+							.foregroundColor(.app.gray1)
+							.multilineTextAlignment(.leading)
+							.padding(.horizontal, .small2)
 
 						Separator()
 					}
 
-					HStack(spacing: 0) {
-						Text(L10n.AuthorizedDapps.DAppDetails.dAppDefinition)
-							.sectionHeading
-
-						Spacer(minLength: 0)
-
-						AddressView(
-							.address(.account(viewStore.address)),
-							imageColor: .app.gray2
-						)
-						.foregroundColor(.app.gray1)
-						.textStyle(.body1HighImportance)
-					}
-
-					if let domain = viewStore.domain {
-						Text(L10n.AuthorizedDapps.DAppDetails.website)
-							.sectionHeading
-
-						Button(domain.absoluteString) {
-							viewStore.send(.openURLTapped(domain))
+					VStack(spacing: .medium3) {
+						KeyValueView(key: L10n.AuthorizedDapps.DAppDetails.dAppDefinition) {
+							AddressView(.address(.account(viewStore.address)), imageColor: .app.gray2)
 						}
-						.buttonStyle(.url)
+
+						if let domain = viewStore.domain {
+							KeyValueUrlView(key: L10n.AuthorizedDapps.DAppDetails.website, url: domain, isLocked: false)
+						}
 					}
 				}
 				.padding(.horizontal, .medium1)
-				.padding(.bottom, .large2)
 			}
 		}
 	}
@@ -239,8 +224,9 @@ extension DappDetails.View {
 			if !elements.isEmpty {
 				VStack(alignment: .leading, spacing: .medium3) {
 					Text(heading)
-						.sectionHeading
-						.padding(.horizontal, .medium1)
+						.textStyle(.body1Regular)
+						.foregroundColor(.app.gray2)
+						.padding(.horizontal, .medium3)
 
 					ForEach(elements) { element in
 						Card {
@@ -250,10 +236,9 @@ extension DappDetails.View {
 								icon(element)
 							}
 						}
-						.padding(.horizontal, .medium3)
 					}
 				}
-				.padding(.bottom, .medium1)
+				.padding(.horizontal, .medium3)
 			}
 		}
 	}
@@ -273,25 +258,62 @@ extension DappDetails.View {
 
 		var body: some View {
 			WithViewStore(store, observe: ViewState.init) { viewStore in
-				if viewStore.hasPersonas {
-					Text(L10n.AuthorizedDapps.DAppDetails.personasHeading)
-						.sectionHeading
-						.flushedLeft
-						.padding(.horizontal, .medium1)
-						.padding(.vertical, .small2)
-
+				VStack(spacing: .medium2) {
 					Separator()
-						.padding(.bottom, .small2)
 
-					PersonaListCoreView(store: store, tappable: tappablePersonas, showShield: false)
-						.padding(.horizontal, .medium3)
-				} else {
-					Text(L10n.AuthorizedDapps.DAppDetails.noPersonasHeading)
-						.sectionHeading
-						.flushedLeft
-						.padding(.horizontal, .medium1)
-						.padding(.vertical, .small2)
+					VStack(spacing: .medium3) {
+						if viewStore.hasPersonas {
+							Text(L10n.AuthorizedDapps.DAppDetails.personasHeading)
+								.textBlock
+								.flushedLeft
+								.padding(.horizontal, .small2)
+
+							PersonaListCoreView(store: store, tappable: tappablePersonas, showShield: false)
+								.padding(.top, .small1)
+
+						} else {
+							Text(L10n.AuthorizedDapps.DAppDetails.noPersonasHeading)
+								.textBlock
+								.flushedLeft
+								.padding(.horizontal, .small2)
+						}
+					}
+					.padding(.horizontal, .medium3)
+					.padding(.bottom, .large1)
 				}
+			}
+		}
+	}
+
+	@MainActor
+	struct Configuration: View {
+		let store: StoreOf<DappDetails>
+
+		var body: some View {
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				VStack(spacing: .large2) {
+					VStack(spacing: .medium1) {
+						ToggleView(
+							title: L10n.AuthorizedDapps.DAppDetails.depositsTitle,
+							subtitle: viewStore.isDepositsVisible ? L10n.AuthorizedDapps.DAppDetails.depositsVisible : L10n.AuthorizedDapps.DAppDetails.depositsHidden,
+							minHeight: .zero,
+							isOn: viewStore.binding(
+								get: \.isDepositsVisible,
+								send: { .depositsVisibleToggled($0) }
+							)
+						)
+
+						Separator()
+					}
+					.padding(.horizontal, .small2)
+
+					Button(L10n.AuthorizedDapps.DAppDetails.forgetDapp) {
+						store.send(.view(.forgetThisDappTapped))
+					}
+					.buttonStyle(.primaryRectangular(isDestructive: true))
+				}
+				.padding(.horizontal, .medium3)
+				.padding(.bottom, .medium1)
 			}
 		}
 	}

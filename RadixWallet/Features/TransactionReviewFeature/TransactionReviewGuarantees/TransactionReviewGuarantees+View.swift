@@ -116,7 +116,7 @@ extension TransactionReviewGuarantee {
 			WithViewStore(store, observe: \.viewState) { viewStore in
 				Card {
 					VStack(spacing: 0) {
-						SmallAccountCard(account: viewStore.account)
+						AccountCard(account: viewStore.account)
 
 						ResourceBalanceView(.fungible(viewStore.fungible))
 							.padding(.horizontal, .medium3)

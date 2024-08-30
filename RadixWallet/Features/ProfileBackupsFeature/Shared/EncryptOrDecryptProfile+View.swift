@@ -39,13 +39,13 @@ extension EncryptOrDecryptProfile {
 			return confirmedEncryptionPassword == enteredEncryptionPassword
 		}
 
-		var confirmHint: Hint? {
+		var confirmHint: Hint.ViewState? {
 			guard needToConfirm else { return nil }
 			if enteredEncryptionPassword.isEmpty || !confirmedEncryptionPassword.isEmpty && focusedField != .confirmPassword {
 				return nil
 			}
 			if !confirmedEncryptionPassword.isEmpty, confirmedEncryptionPassword != enteredEncryptionPassword {
-				return .error(L10n.ProfileBackup.ManualBackups.passwordsMissmatchError)
+				return .iconError(L10n.ProfileBackup.ManualBackups.passwordsMissmatchError)
 			}
 
 			return nil

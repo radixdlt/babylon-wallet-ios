@@ -10,6 +10,7 @@ public struct GatewaysClient: Sendable {
 	public var addGateway: AddGateway
 	public var removeGateway: RemoveGateway
 	public var changeGateway: ChangeGateway
+	public var hasGateway: HasGateway
 
 	public init(
 		currentGatewayValues: @escaping CurrentGatewayValues,
@@ -18,7 +19,8 @@ public struct GatewaysClient: Sendable {
 		getCurrentGateway: @escaping GetCurrentGateway,
 		addGateway: @escaping AddGateway,
 		removeGateway: @escaping RemoveGateway,
-		changeGateway: @escaping ChangeGateway
+		changeGateway: @escaping ChangeGateway,
+		hasGateway: @escaping HasGateway
 	) {
 		self.currentGatewayValues = currentGatewayValues
 		self.gatewaysValues = gatewaysValues
@@ -27,6 +29,7 @@ public struct GatewaysClient: Sendable {
 		self.addGateway = addGateway
 		self.removeGateway = removeGateway
 		self.changeGateway = changeGateway
+		self.hasGateway = hasGateway
 	}
 }
 
@@ -38,6 +41,7 @@ extension GatewaysClient {
 	public typealias AddGateway = @Sendable (Gateway) async throws -> Void
 	public typealias RemoveGateway = @Sendable (Gateway) async throws -> Void
 	public typealias ChangeGateway = @Sendable (Gateway) async throws -> Void
+	public typealias HasGateway = @Sendable (FfiUrl) async -> Bool
 }
 
 extension GatewaysClient {

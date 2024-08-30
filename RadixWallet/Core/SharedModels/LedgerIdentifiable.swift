@@ -1,10 +1,10 @@
 // MARK: - LedgerIdentifiable
 public enum LedgerIdentifiable: Sendable {
 	case address(Address)
-	case identifier(Identifier)
+	case transaction(IntentHash)
 
 	public static func address(of account: Account) -> Self {
-		.address(.account(account.address, isLedgerHWAccount: account.isLedgerControlled))
+		.address(.account(account.address))
 	}
 
 	public var address: String {
@@ -15,7 +15,7 @@ public enum LedgerIdentifiable: Sendable {
 		switch self {
 		case let .address(address):
 			address.formatted(format)
-		case let .identifier(identifier):
+		case let .transaction(identifier):
 			identifier.formatted(format)
 		}
 	}
@@ -24,42 +24,16 @@ public enum LedgerIdentifiable: Sendable {
 		switch self {
 		case let .address(address):
 			address.addressPrefix
-		case let .identifier(identifier):
-			identifier.addressPrefix
+		case .transaction:
+			"transaction"
 		}
 	}
 }
 
+// MARK: LedgerIdentifiable.Address
 extension LedgerIdentifiable {
-	public enum Identifier: Sendable {
-		case transaction(IntentHash)
-		case nonFungibleGlobalID(NonFungibleGlobalId)
-
-		public var address: String {
-			formatted(.raw)
-		}
-
-		public func formatted(_ format: AddressFormat = .default) -> String {
-			switch self {
-			case let .transaction(txId):
-				txId.formatted(format)
-			case let .nonFungibleGlobalID(nonFungibleGlobalId):
-				nonFungibleGlobalId.formatted(format)
-			}
-		}
-
-		public var addressPrefix: String {
-			switch self {
-			case .transaction:
-				"transaction"
-			case .nonFungibleGlobalID:
-				"nft"
-			}
-		}
-	}
-
-	public enum Address: Hashable, Sendable {
-		case account(AccountAddress, isLedgerHWAccount: Bool = false)
+	public enum Address: Hashable, Sendable, Identifiable {
+		case account(AccountAddress)
 		case package(PackageAddress)
 		case resource(ResourceAddress)
 		case resourcePool(PoolAddress)
@@ -74,7 +48,7 @@ extension LedgerIdentifiable {
 
 		public func formatted(_ format: AddressFormat) -> String {
 			switch self {
-			case let .account(accountAddress, _):
+			case let .account(accountAddress):
 				accountAddress.formatted(format)
 			case let .package(packageAddress):
 				packageAddress.formatted(format)
@@ -109,6 +83,25 @@ extension LedgerIdentifiable {
 				"resource"
 			}
 		}
+
+		public var id: String {
+			switch self {
+			case let .account(accountAddress):
+				accountAddress.id
+			case let .package(packageAddress):
+				packageAddress.id
+			case let .resource(resourceAddress):
+				resourceAddress.id
+			case let .resourcePool(resourcePoolAddress):
+				resourcePoolAddress.id
+			case let .component(componentAddress):
+				componentAddress.id
+			case let .validator(validatorAddress):
+				validatorAddress.id
+			case let .nonFungibleGlobalID(nonFungible):
+				nonFungible.id
+			}
+		}
 	}
 }
 
@@ -116,7 +109,7 @@ extension LedgerIdentifiable.Address {
 	public init?(address: Address) {
 		switch address {
 		case let .account(accountAddress):
-			self = .account(accountAddress, isLedgerHWAccount: false)
+			self = .account(accountAddress)
 		case let .resource(resourceAddress):
 			self = .resource(resourceAddress)
 		case let .pool(poolAddress):

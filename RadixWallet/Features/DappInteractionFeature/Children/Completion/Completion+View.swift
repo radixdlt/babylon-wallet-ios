@@ -35,6 +35,8 @@ extension Completion {
 	struct View: SwiftUI.View {
 		let store: StoreOf<Completion>
 
+		@ScaledMetric private var height: CGFloat = 360
+
 		var body: some SwiftUI.View {
 			WithViewStore(store, observe: ViewState.init) { viewStore in
 				WithNavigationBar {
@@ -60,11 +62,11 @@ extension Completion {
 							HStack {
 								Text(L10n.TransactionReview.SubmitTransaction.txID)
 									.foregroundColor(.app.gray1)
-								AddressView(.identifier(.transaction(txID)))
+								AddressView(.transaction(txID), imageColor: .app.gray2)
 									.foregroundColor(.app.blue1)
 							}
 							.textStyle(.body1Header)
-							.padding(.top, .medium3)
+							.padding(.top, .small2)
 						}
 
 						Spacer()
@@ -83,7 +85,7 @@ extension Completion {
 				}
 			}
 			.presentationDragIndicator(.visible)
-			.presentationDetents([.fraction(0.66)])
+			.presentationDetents([.height(height)])
 			.presentationBackground(.blur)
 		}
 	}

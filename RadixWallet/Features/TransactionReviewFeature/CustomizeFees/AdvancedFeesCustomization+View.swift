@@ -13,14 +13,14 @@ extension AdvancedFeesCustomization.State {
 		)
 	}
 
-	private var paddingAmountHint: Hint? {
+	private var paddingAmountHint: Hint.ViewState? {
 		guard parsedPaddingFee == nil else { return nil }
-		return .error()
+		return .iconError()
 	}
 
-	private var tipPercentageHint: Hint? {
+	private var tipPercentageHint: Hint.ViewState? {
 		guard parsedTipPercentage == nil else { return nil }
-		return .error()
+		return .iconError()
 	}
 }
 
@@ -29,9 +29,9 @@ extension AdvancedFeesCustomization {
 		let feesViewState: FeesView.ViewState
 
 		let paddingAmount: String
-		let paddingAmountHint: Hint?
+		let paddingAmountHint: Hint.ViewState?
 		let tipPercentage: String
-		let tipPercentageHint: Hint?
+		let tipPercentageHint: Hint.ViewState?
 		let focusField: State.FocusField?
 	}
 

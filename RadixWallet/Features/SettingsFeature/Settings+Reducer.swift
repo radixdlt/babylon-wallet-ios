@@ -13,7 +13,6 @@ public struct Settings: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destination.State?
 
-		public var userHasNoP2PLinks: Bool? = nil
 		public var securityProblems: [SecurityProblem] = []
 		fileprivate var personas: [IdentityAddress] = []
 
@@ -24,7 +23,6 @@ public struct Settings: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case task
-		case addConnectorButtonTapped
 		case securityCenterButtonTapped
 		case personasButtonTapped
 		case dappsButtonTapped
@@ -35,7 +33,6 @@ public struct Settings: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case setP2PLinks(P2PLinks)
 		case setSecurityProblems([SecurityProblem])
 		case setPersonas([IdentityAddress])
 	}
@@ -93,7 +90,6 @@ public struct Settings: Sendable, FeatureReducer {
 	// MARK: Reducer
 
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.p2pLinksClient) var p2pLinksClient
 	@Dependency(\.securityCenterClient) var securityCenterClient
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.dismiss) var dismiss
@@ -111,13 +107,8 @@ public struct Settings: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			return p2pLinksEffect()
-				.merge(with: securityProblemsEffect())
+			return securityProblemsEffect()
 				.merge(with: personasEffect())
-
-		case .addConnectorButtonTapped:
-			state.destination = .manageP2PLinks(.init(destination: .newConnection(.init())))
-			return .none
 
 		case .securityCenterButtonTapped:
 			state.destination = .securityCenter(.init())
@@ -151,9 +142,6 @@ public struct Settings: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .setP2PLinks(clients):
-			state.userHasNoP2PLinks = clients.isEmpty
-			return .none
 		case let .setSecurityProblems(problems):
 			state.securityProblems = problems
 			return .none
@@ -171,27 +159,10 @@ public struct Settings: Sendable, FeatureReducer {
 			.none
 		}
 	}
-
-	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
-		switch state.destination {
-		case .manageP2PLinks:
-			p2pLinksEffect()
-		default:
-			.none
-		}
-	}
 }
 
 // MARK: Private
 extension Settings {
-	private func p2pLinksEffect() -> Effect<Action> {
-		.run { send in
-			await send(.internal(.setP2PLinks(
-				p2pLinksClient.getP2PLinks()
-			)))
-		}
-	}
-
 	private func securityProblemsEffect() -> Effect<Action> {
 		.run { send in
 			for try await problems in await securityCenterClient.problems() {

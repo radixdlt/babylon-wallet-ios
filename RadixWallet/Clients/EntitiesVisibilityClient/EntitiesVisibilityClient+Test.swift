@@ -10,16 +10,18 @@ extension EntitiesVisibilityClient: TestDependencyKey {
 	public static let previewValue = Self.noop
 
 	public static let noop = Self(
-		hideAccounts: { _ in throw NoopError() },
-		hidePersonas: { _ in throw NoopError() },
-		unhideAllEntities: { throw NoopError() },
-		getHiddenEntityCounts: { throw NoopError() }
+		hideAccount: { _ in throw NoopError() },
+		hidePersona: { _ in throw NoopError() },
+		unhideAccount: { _ in throw NoopError() },
+		unhidePersona: { _ in throw NoopError() },
+		getHiddenEntities: { throw NoopError() }
 	)
 
 	public static let testValue = Self(
-		hideAccounts: unimplemented("\(Self.self).hideAccounts"),
-		hidePersonas: unimplemented("\(Self.self).hidePersonas"),
-		unhideAllEntities: unimplemented("\(Self.self).unhideAllEntities"),
-		getHiddenEntityCounts: unimplemented("\(Self.self).getHiddenEntityCounts")
+		hideAccount: unimplemented("\(Self.self).hideAccount"),
+		hidePersona: unimplemented("\(Self.self).hidePersona"),
+		unhideAccount: unimplemented("\(Self.self).unhideAccount"),
+		unhidePersona: unimplemented("\(Self.self).unhidePersona"),
+		getHiddenEntities: unimplemented("\(Self.self).getHiddenEntities")
 	)
 }

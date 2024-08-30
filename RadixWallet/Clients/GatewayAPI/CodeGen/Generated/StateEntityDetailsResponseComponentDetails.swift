@@ -28,8 +28,12 @@ public struct StateEntityDetailsResponseComponentDetails: Codable, Hashable {
     /** String-encoded decimal representing the amount of a related fungible resource. */
     public private(set) var royaltyVaultBalance: String?
     public private(set) var royaltyConfig: ComponentRoyaltyConfig?
+    /** Bech32m-encoded human readable version of the address. */
+    public private(set) var twoWayLinkedDappAddress: String?
+    public private(set) var twoWayLinkedDappDetails: TwoWayLinkedDappOnLedgerDetails?
+    public private(set) var nativeResourceDetails: NativeResourceDetails?
 
-    public init(type: StateEntityDetailsResponseItemDetailsType, packageAddress: String? = nil, blueprintName: String, blueprintVersion: String, state: AnyCodable? = nil, roleAssignments: ComponentEntityRoleAssignments? = nil, royaltyVaultBalance: String? = nil, royaltyConfig: ComponentRoyaltyConfig? = nil) {
+    public init(type: StateEntityDetailsResponseItemDetailsType, packageAddress: String? = nil, blueprintName: String, blueprintVersion: String, state: AnyCodable? = nil, roleAssignments: ComponentEntityRoleAssignments? = nil, royaltyVaultBalance: String? = nil, royaltyConfig: ComponentRoyaltyConfig? = nil, twoWayLinkedDappAddress: String? = nil, twoWayLinkedDappDetails: TwoWayLinkedDappOnLedgerDetails? = nil, nativeResourceDetails: NativeResourceDetails? = nil) {
         self.type = type
         self.packageAddress = packageAddress
         self.blueprintName = blueprintName
@@ -38,6 +42,9 @@ public struct StateEntityDetailsResponseComponentDetails: Codable, Hashable {
         self.roleAssignments = roleAssignments
         self.royaltyVaultBalance = royaltyVaultBalance
         self.royaltyConfig = royaltyConfig
+        self.twoWayLinkedDappAddress = twoWayLinkedDappAddress
+        self.twoWayLinkedDappDetails = twoWayLinkedDappDetails
+        self.nativeResourceDetails = nativeResourceDetails
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
@@ -49,6 +56,9 @@ public struct StateEntityDetailsResponseComponentDetails: Codable, Hashable {
         case roleAssignments = "role_assignments"
         case royaltyVaultBalance = "royalty_vault_balance"
         case royaltyConfig = "royalty_config"
+        case twoWayLinkedDappAddress = "two_way_linked_dapp_address"
+        case twoWayLinkedDappDetails = "two_way_linked_dapp_details"
+        case nativeResourceDetails = "native_resource_details"
     }
 
     // Encodable protocol methods
@@ -63,6 +73,9 @@ public struct StateEntityDetailsResponseComponentDetails: Codable, Hashable {
         try container.encodeIfPresent(roleAssignments, forKey: .roleAssignments)
         try container.encodeIfPresent(royaltyVaultBalance, forKey: .royaltyVaultBalance)
         try container.encodeIfPresent(royaltyConfig, forKey: .royaltyConfig)
+        try container.encodeIfPresent(twoWayLinkedDappAddress, forKey: .twoWayLinkedDappAddress)
+        try container.encodeIfPresent(twoWayLinkedDappDetails, forKey: .twoWayLinkedDappDetails)
+        try container.encodeIfPresent(nativeResourceDetails, forKey: .nativeResourceDetails)
     }
 }
 

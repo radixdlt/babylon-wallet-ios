@@ -116,6 +116,9 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.dappInteractionClient) var dappInteractionClient
 	@Dependency(\.securityCenterClient) var securityCenterClient
+	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
+
+	private let accountPortfolioRefreshIntervalInSeconds = 60
 
 	public init() {}
 
@@ -141,6 +144,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 				}
 			}
 			.merge(with: securityProblemsEffect())
+			.merge(with: scheduleFetchAccountPortfolioTimer(state.account.address))
 
 		case .backButtonTapped:
 			return .send(.delegate(.dismiss))
@@ -274,6 +278,15 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			for try await problems in await securityCenterClient.problems() {
 				guard !Task.isCancelled else { return }
 				await send(.internal(.setSecurityProblems(problems)))
+			}
+		}
+	}
+
+	private func scheduleFetchAccountPortfolioTimer(_ address: AccountAddress) -> Effect<Action> {
+		.run { _ in
+			for await _ in clock.timer(interval: .seconds(accountPortfolioRefreshIntervalInSeconds)) {
+				guard !Task.isCancelled else { return }
+				_ = try? await accountPortfoliosClient.fetchAccountPortfolio(address, true)
 			}
 		}
 	}

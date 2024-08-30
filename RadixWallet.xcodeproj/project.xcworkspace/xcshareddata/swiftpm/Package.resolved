@@ -1,5 +1,5 @@
 {
-  "originHash" : "6ea1eda3b4126e001634381c9c2bb0feb2cba4a17618c4d48c08eacd34d08a66",
+  "originHash" : "7d3590b225945abb1bc0ab6c684b005c28c64bdc204afcc2d34c3e379ef8a3c8",
   "pins" : [
     {
       "identity" : "anycodable",
@@ -110,12 +110,12 @@
       }
     },
     {
-      "identity" : "promisekit",
+      "identity" : "sargon",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/mxcl/PromiseKit",
+      "location" : "https://github.com/radixdlt/sargon",
       "state" : {
-        "revision" : "bef89714164f008e091c4c2f57b98d07890d031d",
-        "version" : "6.8.0"
+        "revision" : "c850c636dd54ba19c03378e2fa44d6822d96da49",
+        "version" : "1.0.42"
       }
     },
     {

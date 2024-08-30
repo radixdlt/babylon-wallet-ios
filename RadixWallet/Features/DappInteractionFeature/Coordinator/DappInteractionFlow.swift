@@ -690,7 +690,8 @@ extension DappInteractionFlow {
 				case .request, .wallet: nil
 				}
 			}(),
-			referencesToAuthorizedPersonas: []
+			referencesToAuthorizedPersonas: [],
+			preferences: .init(deposits: .visible)
 		)
 		// This extraction is really verbose right now, but it should become a lot simpler with native case paths
 		let sharedAccountsInfo: (DappInteractionNumberOfAccounts, [WalletInteractionWalletAccount])? = unwrap(
@@ -785,7 +786,7 @@ extension DappInteractionFlow {
 
 	func goBackEffect(for state: inout State) -> Effect<Action> {
 		state.responseItems.removeLast()
-		state.path.removeLast()
+		_ = state.path.popLast()
 		return .none
 	}
 

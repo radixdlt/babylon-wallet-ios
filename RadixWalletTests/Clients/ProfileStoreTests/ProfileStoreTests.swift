@@ -15,14 +15,12 @@ extension Profile {
 			let mnemonic = Mnemonic(wordCount: .twentyFour, language: .english)
 			let mnemonicWithPassphrase = MnemonicWithPassphrase(mnemonic: mnemonic, passphrase: "")
 
-			var bdfs = DeviceFactorSource.babylon(mnemonicWithPassphrase: mnemonicWithPassphrase, isMain: true)
+			var bdfs = DeviceFactorSource.babylon(mnemonicWithPassphrase: mnemonicWithPassphrase, isMain: true, hostInfo: HostInfo.sample)
 			bdfs.common.addedOn = date
 			bdfs.common.lastUsedOn = date
 			bdfs.hint.name = "iPhone"
 			return bdfs
 		}()
-		let deviceInfo = DeviceInfo(id: UUID(), date: date, description: "Builder")
-		var header = Header.init(snapshotVersion: .v100, id: UUID(), creatingDevice: deviceInfo, lastUsedOnDevice: deviceInfo, lastModified: date, contentHint: ContentHint.init(numberOfAccountsOnAllNetworksInTotal: 0, numberOfPersonasOnAllNetworksInTotal: 0, numberOfNetworks: 0))
 		return Self.init(header: .sample, deviceFactorSource: bdfs)
 	}
 }

@@ -18,7 +18,7 @@ extension OnLedgerEntitiesClient {
 	public typealias GetNonFungibleTokenData = @Sendable (GetNonFungibleTokenDataRequest) async throws -> [OnLedgerEntity.NonFungibleToken]
 	public typealias GetAccountOwnedNonFungibleTokenData = @Sendable (GetAccountOwnedNonFungibleTokenDataRequest) async throws -> GetAccountOwnedNonFungibleTokenResponse
 
-	public typealias GetEntities = @Sendable ([Address], Set<EntityMetadataKey>, AtLedgerState?, CachingStrategy) async throws -> [OnLedgerEntity]
+	public typealias GetEntities = @Sendable ([Address], Set<EntityMetadataKey>, AtLedgerState?, CachingStrategy, _ fetchMetadata: Bool) async throws -> [OnLedgerEntity]
 }
 
 // MARK: OnLedgerEntitiesClient.GetNonFungibleTokenDataRequest
@@ -149,13 +149,15 @@ extension OnLedgerEntitiesClient {
 		addresses: [Address],
 		metadataKeys: Set<EntityMetadataKey>,
 		cachingStrategy: CachingStrategy = .useCache,
-		atLedgerState: AtLedgerState? = nil
+		atLedgerState: AtLedgerState? = nil,
+		fetchMetadata: Bool = false
 	) async throws -> [OnLedgerEntity] {
 		try await getEntities(
 			addresses,
 			metadataKeys,
 			atLedgerState,
-			cachingStrategy
+			cachingStrategy,
+			fetchMetadata
 		)
 	}
 
@@ -246,13 +248,15 @@ extension OnLedgerEntitiesClient {
 		_ addresses: some Collection<ResourceAddress>,
 		metadataKeys: Set<EntityMetadataKey> = .resourceMetadataKeys,
 		cachingStrategy: CachingStrategy = .useCache,
-		atLedgerState: AtLedgerState? = nil
+		atLedgerState: AtLedgerState? = nil,
+		fetchMetadata: Bool = false
 	) async throws -> [OnLedgerEntity.Resource] {
 		try await getEntities(
 			addresses: addresses.map(\.asGeneral),
 			metadataKeys: metadataKeys,
 			cachingStrategy: cachingStrategy,
-			atLedgerState: atLedgerState
+			atLedgerState: atLedgerState,
+			fetchMetadata: fetchMetadata
 		).compactMap(\.resource)
 	}
 
@@ -260,12 +264,14 @@ extension OnLedgerEntitiesClient {
 	public func getResource(
 		_ address: ResourceAddress,
 		metadataKeys: Set<EntityMetadataKey> = .resourceMetadataKeys,
-		atLedgerState: AtLedgerState? = nil
+		atLedgerState: AtLedgerState? = nil,
+		fetchMetadata: Bool = false
 	) async throws -> OnLedgerEntity.Resource {
 		guard let resource = try await getResources(
 			[address],
 			metadataKeys: metadataKeys,
-			atLedgerState: atLedgerState
+			atLedgerState: atLedgerState,
+			fetchMetadata: fetchMetadata
 		).first
 		else {
 			throw Error.emptyResponse
@@ -528,14 +534,18 @@ extension OnLedgerEntitiesClient {
 	@Sendable
 	public func getOwnedPoolUnitsDetails(
 		_ account: OnLedgerEntity.OnLedgerAccount,
+		hiddenResources: [ResourceIdentifier],
 		cachingStrategy: CachingStrategy = .useCache
 	) async throws -> [OwnedResourcePoolDetails] {
-		let ownedPoolUnits = account.poolUnitResources.poolUnits
+		let ownedPoolUnits = account.poolUnitResources.poolUnits.filter { poolUnit in
+			!hiddenResources.contains(.poolUnit(poolUnit.resourcePoolAddress))
+		}
 		let pools = try await getEntities(
 			ownedPoolUnits.map(\.resourcePoolAddress).map(\.asGeneral),
 			[.dappDefinition],
 			account.atLedgerState,
-			cachingStrategy
+			cachingStrategy,
+			false
 		).compactMap(\.resourcePool)
 
 		var allResourceAddresses: [ResourceAddress] = []

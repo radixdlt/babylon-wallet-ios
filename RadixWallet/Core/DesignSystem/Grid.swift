@@ -44,6 +44,9 @@ extension Grid {
 }
 
 extension CGFloat {
+	/// 2
+	public static let assetDividerHeight: Self = 2
+
 	/// 40
 	public static let guaranteeAccountLabelHeight: Self = 40
 

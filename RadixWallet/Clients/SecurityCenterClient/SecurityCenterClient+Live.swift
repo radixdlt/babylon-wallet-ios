@@ -38,6 +38,10 @@ extension SecurityCenterClient {
 		func cloudBackups() async -> AnyAsyncSequence<BackupStatus?> {
 			let profileID = await profileStore.profile.id
 			let backups = userDefaults.lastCloudBackupValues(for: profileID)
+				.filter { backup in
+					backup?.isFinal ?? true
+				}
+				.eraseToAnyAsyncSequence()
 			return await statusValues(results: backups)
 		}
 
@@ -66,11 +70,13 @@ extension SecurityCenterClient {
 				}
 
 				func hasProblem5() -> Bool {
-					if isCloudProfileSyncEnabled, let cloudBackup = backups.cloud {
-						cloudBackup.result.failed
-					} else {
-						false
+					guard isCloudProfileSyncEnabled else {
+						return false
 					}
+					guard let cloudBackup = backups.cloud else {
+						return true
+					}
+					return cloudBackup.result.failed
 				}
 
 				func hasProblem6() -> Bool {

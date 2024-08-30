@@ -15,11 +15,14 @@ extension LSUDetails.State {
 			redeemableTokenAmount: .xrd(balance: xrdRedemptionValue, network: validator.address.networkID),
 			resourceDetails: .init(
 				description: .success(stakeUnitResource.resource.metadata.description),
+				infoUrl: .success(stakeUnitResource.resource.metadata.infoURL),
 				resourceAddress: stakeUnitResource.resource.resourceAddress,
 				isXRD: false,
 				validatorAddress: validator.address,
 				resourceName: .success(stakeUnitResource.resource.metadata.title),
 				currentSupply: .success(validator.xrdVaultBalance.formatted()),
+				divisibility: .success(stakeUnitResource.resource.divisibility),
+				arbitraryDataFields: .success(stakeUnitResource.resource.metadata.arbitraryItems.asDataFields),
 				behaviors: .success(stakeUnitResource.resource.behaviors),
 				tags: .success(stakeUnitResource.resource.metadata.tags)
 			)

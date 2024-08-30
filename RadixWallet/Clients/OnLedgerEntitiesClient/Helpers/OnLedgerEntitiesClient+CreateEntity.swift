@@ -78,7 +78,7 @@ extension OnLedgerEntitiesClient {
 		return await .init(
 			address: accountAddress,
 			atLedgerState: ledgerState,
-			metadata: .init(item.explicitMetadata),
+			metadata: .init(item.metadata),
 			fungibleResources: filteredFungibleResources.sorted(),
 			nonFungibleResources: filteredNonFungibleResources.sorted(),
 			poolUnitResources: poolUnitResources,
@@ -95,7 +95,7 @@ extension OnLedgerEntitiesClient {
 			address: .init(validatingAddress: item.address),
 			atLedgerState: ledgerState,
 			behaviors: item.details?.component?.roleAssignments?.extractBehaviors() ?? [],
-			metadata: .init(item.explicitMetadata)
+			metadata: .init(item.metadata)
 		)
 	}
 
@@ -113,7 +113,7 @@ extension OnLedgerEntitiesClient {
 				divisibility: UInt8(fungibleDetails.divisibility),
 				behaviors: item.details?.fungible?.roleAssignments.extractBehaviors() ?? [],
 				totalSupply: try? Decimal192(fungibleDetails.totalSupply),
-				metadata: .init(item.explicitMetadata)
+				metadata: .init(item.metadata)
 			)
 		case let .nonFungibleResource(nonFungibleDetails):
 			.init(
@@ -122,7 +122,7 @@ extension OnLedgerEntitiesClient {
 				divisibility: nil,
 				behaviors: item.details?.nonFungible?.roleAssignments.extractBehaviors() ?? [],
 				totalSupply: try? Decimal192(nonFungibleDetails.totalSupply),
-				metadata: .init(item.explicitMetadata)
+				metadata: .init(item.metadata)
 			)
 		default:
 			nil
@@ -144,7 +144,7 @@ extension OnLedgerEntitiesClient {
 			address: poolAddress,
 			poolUnitResourceAddress: .init(validatingAddress: state.poolUnitResourceAddress),
 			resources: extractOwnedFungibleResources(item, ledgerState: ledgerState).sorted(),
-			metadata: .init(item.explicitMetadata)
+			metadata: .init(item.metadata)
 		)
 	}
 
@@ -189,7 +189,7 @@ extension OnLedgerEntitiesClient {
 			stakeUnitResourceAddress: .init(validatingAddress: state.stakeUnitResourceAddress),
 			xrdVaultBalance: Decimal192(xrdStakeVaultBalance),
 			stakeClaimFungibleResourceAddress: .init(validatingAddress: state.unstakeClaimTokenResourceAddress),
-			metadata: .init(item.explicitMetadata)
+			metadata: .init(item.metadata)
 		)
 	}
 
@@ -247,7 +247,8 @@ extension OnLedgerEntitiesClient {
 			for: Array(stakeAndPoolAddresses),
 			.resourceMetadataKeys,
 			ledgerState: ledgerState,
-			cachingStrategy: cachingStrategy
+			cachingStrategy: cachingStrategy,
+			fetchMetadata: false
 		)
 		let validators = entities.compactMap(\.validator)
 		let resourcesPools = entities.compactMap(\.resourcePool)
@@ -362,7 +363,8 @@ extension OnLedgerEntitiesClient {
 			ownedStakes.map(\.validatorAddress).map(\.asGeneral),
 			.resourceMetadataKeys,
 			account.atLedgerState,
-			cachingStrategy
+			cachingStrategy,
+			false
 		).compactMap(\.validator)
 
 		let resourceAddresses = ownedStakes.flatMap {
@@ -621,13 +623,6 @@ extension OnLedgerEntity.OwnedFungibleResource: Comparable {
 
 		if lhs.amount.fiatWorth != nil || rhs.amount.fiatWorth != nil {
 			return lhs.amount.fiatWorth != nil
-		}
-
-		if lhs.amount.nominalAmount > .zero, rhs.amount.nominalAmount > .zero {
-			return lhs.amount.nominalAmount > rhs.amount.nominalAmount // Sort descending by amount
-		}
-		if lhs.amount.nominalAmount != .zero || rhs.amount.nominalAmount != .zero {
-			return lhs.amount.nominalAmount != .zero
 		}
 
 		if let lhsSymbol = lhs.metadata.symbol, let rhsSymbol = rhs.metadata.symbol {

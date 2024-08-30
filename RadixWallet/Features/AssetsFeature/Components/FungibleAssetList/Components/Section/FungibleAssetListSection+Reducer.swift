@@ -67,7 +67,7 @@ extension FungibleAssetList.Section {
 					)
 				) { rowStore in
 					FungibleAssetList.Section.Row.View(store: rowStore)
-						.rowStyle()
+						.rowStyle(showSeparator: true)
 				}
 			}
 			.listSectionSeparator(.hidden)

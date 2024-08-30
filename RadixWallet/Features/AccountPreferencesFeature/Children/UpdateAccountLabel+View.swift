@@ -8,17 +8,18 @@ extension UpdateAccountLabel.State {
 			accountLabel: accountLabel,
 			sanitizedName: sanitizedName,
 			updateButtonControlState: controlState,
-			hint: hint
+			hint: hint,
+			textFieldFocused: textFieldFocused
 		)
 	}
 
-	private var hintAndControlState: (ControlState, Hint?) {
+	private var hintAndControlState: (ControlState, Hint.ViewState?) {
 		if let sanitizedName {
 			if sanitizedName.count > Account.nameMaxLength {
-				return (.disabled, .error(L10n.Error.AccountLabel.tooLong))
+				return (.disabled, .iconError(L10n.Error.AccountLabel.tooLong))
 			}
 		} else {
-			return (.disabled, .error(L10n.Error.AccountLabel.missing))
+			return (.disabled, .iconError(L10n.Error.AccountLabel.missing))
 		}
 
 		return (.enabled, nil)
@@ -30,52 +31,79 @@ extension UpdateAccountLabel {
 		let accountLabel: String
 		let sanitizedName: NonEmptyString?
 		let updateButtonControlState: ControlState
-		let hint: Hint?
+		let hint: Hint.ViewState?
+		let textFieldFocused: Bool
 	}
 
 	@MainActor
 	public struct View: SwiftUI.View {
 		let store: StoreOf<UpdateAccountLabel>
+		@Environment(\.dismiss) var dismiss
+		@FocusState private var textFieldFocus: Bool
 
 		init(store: StoreOf<UpdateAccountLabel>) {
 			self.store = store
 		}
 
 		public var body: some SwiftUI.View {
+			content
+				.withNavigationBar {
+					dismiss()
+				}
+				.presentationDetents([.fraction(0.55)])
+				.presentationDragIndicator(.visible)
+				.presentationBackground(.blur)
+		}
+
+		private var content: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack {
-					VStack(alignment: .center, spacing: .medium1) {
+				VStack(spacing: .zero) {
+					VStack(spacing: .medium1) {
+						Text(L10n.AccountSettings.RenameAccount.title)
+							.textStyle(.sheetTitle)
+							.multilineTextAlignment(.center)
+
+						Text(L10n.AccountSettings.RenameAccount.subtitle)
+							.textStyle(.body1Regular)
+							.multilineTextAlignment(.center)
+
 						let nameBinding = viewStore.binding(
 							get: \.accountLabel,
 							send: { .accountLabelChanged($0) }
 						)
 						AppTextField(
-							primaryHeading: .init(text: L10n.AccountSettings.RenameAccount.subtitle),
 							placeholder: "",
 							text: nameBinding,
-							hint: viewStore.hint
+							hint: viewStore.hint,
+							focus: .on(
+								true,
+								binding: viewStore.binding(
+									get: \.textFieldFocused,
+									send: { .focusChanged($0) }
+								),
+								to: $textFieldFocus
+							)
 						)
 						.keyboardType(.asciiCapable)
 						.autocorrectionDisabled()
+					}
+					.foregroundColor(.app.gray1)
+					.padding(.horizontal, .medium3)
 
-						WithControlRequirements(
-							viewStore.sanitizedName,
-							forAction: { viewStore.send(.updateTapped($0)) }
-						) { action in
-							Button(L10n.AccountSettings.SpecificAssetsDeposits.update) {
-								action()
-							}
+					Spacer()
+				}
+				.padding(.top, .small2)
+				.padding(.horizontal, .medium3)
+				.footer {
+					WithControlRequirements(
+						viewStore.sanitizedName,
+						forAction: { viewStore.send(.updateTapped($0)) }
+					) { action in
+						Button(L10n.AccountSettings.SpecificAssetsDeposits.update, action: action)
 							.buttonStyle(.primaryRectangular)
 							.controlState(viewStore.updateButtonControlState)
-						}
 					}
-					.padding(.large3)
-					.background(.app.background)
-
-					Spacer(minLength: 0)
 				}
-				.background(.app.gray5)
-				.radixToolbar(title: L10n.AccountSettings.RenameAccount.title)
 			}
 		}
 	}

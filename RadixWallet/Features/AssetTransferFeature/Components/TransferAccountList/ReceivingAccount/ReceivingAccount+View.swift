@@ -41,11 +41,7 @@ extension ReceivingAccount.View {
 	private func account(_ viewStore: ViewStoreOf<ReceivingAccount>) -> some View {
 		Group {
 			if let account = viewStore.recipient {
-				SmallAccountCard(
-					account.name,
-					identifiable: account.identifer,
-					gradient: account.gradient
-				) {
+				AccountCard(kind: .display(addCornerRadius: false), account: account) {
 					removeAccountButton(viewStore)
 						.foregroundColor(.app.white)
 						.padding(.leading, .medium3)

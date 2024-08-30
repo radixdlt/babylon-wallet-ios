@@ -67,7 +67,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case task
+		case onFirstTask
 		case pullToRefreshStarted
 		case didSelectList(State.AssetKind)
 		case chooseButtonTapped(State.Mode.SelectedAssets)
@@ -100,6 +100,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
+	@Dependency(\.errorQueue) var errorQueue
 
 	public init() {}
 
@@ -121,7 +122,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .task:
+		case .onFirstTask:
 			state.isLoadingResources = true
 			state.accountPortfolio = .loading
 			return .run { [state] send in
@@ -132,16 +133,16 @@ public struct AssetsView: Sendable, FeatureReducer {
 			} catch: { error, _ in
 				loggerGlobal.error("AssetsView portfolioForAccount failed: \(error)")
 			}
+			.merge(with: fetchAccountPortfolio(state))
+
 		case let .didSelectList(kind):
 			state.activeAssetKind = kind
 			return .none
+
 		case .pullToRefreshStarted:
 			state.isRefreshing = true
-			return .run { [address = state.account.address] _ in
-				_ = try await accountPortfoliosClient.fetchAccountPortfolio(address, true)
-			} catch: { error, _ in
-				loggerGlobal.error("AssetsView fetch failed: \(error)")
-			}
+			return fetchAccountPortfolio(state)
+
 		case let .chooseButtonTapped(items):
 			return .send(.delegate(.handleSelectedAssets(items)))
 		}
@@ -153,8 +154,9 @@ public struct AssetsView: Sendable, FeatureReducer {
 			state.isLoadingResources = false
 			state.isRefreshing = false
 			portfolio.account = portfolio.account.nonEmptyVaults
-			updateFromPortfolio(state: &state, from: portfolio)
-			return .none
+			let nftRowsToRefresh = updateFromPortfolio(state: &state, from: portfolio)
+
+			return !nftRowsToRefresh.isEmpty ? .send(.child(.nonFungibleTokenList(.internal(.refreshRows(nftRowsToRefresh))))) : .none
 		}
 	}
 
@@ -181,328 +183,13 @@ public struct AssetsView: Sendable, FeatureReducer {
 			.none
 		}
 	}
-}
 
-extension AssetsView {
-	private func updateFromPortfolio(
-		state: inout State,
-		from portfolio: AccountPortfoliosClient.AccountPortfolio
-	) {
-		let mode = state.mode
-		let xrd = portfolio.account.fungibleResources.xrdResource.map { token in
-			FungibleAssetList.Section.Row.State(
-				xrdToken: token,
-				isSelected: mode.xrdRowSelected
-			)
+	public func fetchAccountPortfolio(_ state: State) -> Effect<Action> {
+		.run { [address = state.account.address] _ in
+			_ = try await accountPortfoliosClient.fetchAccountPortfolio(address, true)
+		} catch: { error, _ in
+			loggerGlobal.error("AssetsView fetch failed: \(error)")
+			errorQueue.schedule(error)
 		}
-		let nonXrd = portfolio.account.fungibleResources.nonXrdResources
-			.map { token in
-				FungibleAssetList.Section.Row.State(
-					nonXRDToken: token,
-					isSelected: mode.nonXrdRowSelected(token.resourceAddress)
-				)
-			}
-			.asIdentified()
-
-		let nfts = portfolio.account.nonFungibleResources.map { resource in
-			NonFungibleAssetList.Row.State(
-				accountAddress: portfolio.account.address,
-				resource: resource,
-				disabled: mode.selectedAssets?.disabledNFTs ?? [],
-				selectedAssets: mode.nftRowSelectedAssets(resource.resourceAddress)
-			)
-		}
-
-		let fungibleTokenList: FungibleAssetList.State? = {
-			var sections: IdentifiedArrayOf<FungibleAssetList.Section.State> = []
-			if let xrd {
-				sections.append(.init(id: .xrd, rows: [xrd]))
-			}
-
-			if !nonXrd.isEmpty {
-				sections.append(.init(id: .nonXrd, rows: nonXrd))
-			}
-
-			guard !sections.isEmpty else {
-				return nil
-			}
-
-			return .init(sections: sections)
-		}()
-
-		state.accountPortfolio.refresh(from: .success(portfolio))
-
-		let poolUnits = portfolio.account.poolUnitResources.poolUnits
-		let poolUnitList: PoolUnitsList.State? = poolUnits.isEmpty ? nil : .init(
-			poolUnits: poolUnits.map { poolUnit in
-				PoolUnitsList.State.PoolUnitState(
-					poolUnit: poolUnit,
-					resourceDetails: state.accountPortfolio.poolUnitDetails.flatten().flatMap {
-						$0.first { poolUnit.resourcePoolAddress == $0.address }.map(Loadable.success) ?? .loading
-					},
-					isSelected: mode.nonXrdRowSelected(poolUnit.resource.resourceAddress)
-				)
-			}.asIdentified()
-		)
-
-		let stakes = portfolio.account.poolUnitResources.radixNetworkStakes
-
-		let stakeUnitList: StakeUnitList.State? = stakes.isEmpty ? nil : .init(
-			account: portfolio.account,
-			selectedLiquidStakeUnits: mode.selectedAssets.map { assets in
-				let stakeUnitResources = stakes.map(\.stakeUnitResource)
-				return assets
-					.fungibleResources
-					.nonXrdResources
-					.filter(stakeUnitResources.contains)
-					.asIdentified()
-			},
-			selectedStakeClaimTokens:
-			mode.isSelection ?
-				stakes
-				.compactMap(\.stakeClaimResource)
-				.reduce(into: StakeUnitList.SelectedStakeClaimTokens()) { dict, resource in
-					if let selectedtokens = mode.nftRowSelectedAssets(resource.resourceAddress)?.elements.asIdentified() {
-						dict[resource] = selectedtokens
-					}
-				} : nil,
-			stakeUnitDetails: state.accountPortfolio.stakeUnitDetails.flatten()
-		)
-
-		state.totalFiatWorth.refresh(from: portfolio.totalFiatWorth)
-		state.resources = .init(
-			fungibleTokenList: fungibleTokenList,
-			nonFungibleTokenList: !nfts.isEmpty ? .init(rows: nfts.asIdentified()) : nil,
-			stakeUnitList: stakeUnitList,
-			poolUnitsList: poolUnitList
-		)
-	}
-}
-
-extension AccountPortfoliosClient.AccountPortfolio {
-	mutating func refresh(from portfolio: AccountPortfoliosClient.AccountPortfolio) {
-		self.account = portfolio.account
-		self.isCurrencyAmountVisible = portfolio.isCurrencyAmountVisible
-		self.fiatCurrency = portfolio.fiatCurrency
-		self.stakeUnitDetails.refresh(from: portfolio.stakeUnitDetails)
-		self.poolUnitDetails.refresh(from: portfolio.poolUnitDetails)
-	}
-}
-
-extension Loadable where Value == AccountPortfoliosClient.AccountPortfolio {
-	mutating func refresh(from portfolio: Loadable<Value>) {
-		self.refresh(from: portfolio, valueChangeMap: { old, new in
-			var old = old
-			old.refresh(from: new)
-			return old
-		})
-	}
-}
-
-extension AssetsView.State {
-	/// Computed property of currently selected assets
-	public var selectedAssets: Mode.SelectedAssets? {
-		guard case .selection = mode else { return nil }
-
-		let selectedLiquidStakeUnits = resources.stakeUnitList?.selectedLiquidStakeUnits ?? []
-
-		let selectedPoolUnitTokens = resources.poolUnitsList?.poolUnits
-			.map(SelectedResourceProvider.init)
-			.compactMap(\.selectedResource) ?? []
-
-		let selectedXRDResource = resources.fungibleTokenList?.sections[id: .xrd]?
-			.rows
-			.first
-			.map(SelectedResourceProvider.init)
-			.flatMap(\.selectedResource)
-
-		let selectedNonXrdResources = resources.fungibleTokenList?.sections[id: .nonXrd]?.rows
-			.map(SelectedResourceProvider.init)
-			.compactMap(\.selectedResource) ?? []
-
-		let selectedNonFungibleResources = resources.nonFungibleTokenList?.rows.compactMap(NonFungibleTokensPerResourceProvider.init) ?? []
-		let selectedStakeClaims = resources.stakeUnitList?.selectedStakeClaimTokens?.map { resource, tokens in
-			NonFungibleTokensPerResourceProvider(selectedAssets: .init(tokens), resource: resource)
-		} ?? []
-
-		let selectedFungibleResources = OnLedgerEntity.OwnedFungibleResources(
-			xrdResource: selectedXRDResource,
-			nonXrdResources: selectedNonXrdResources + selectedLiquidStakeUnits + selectedPoolUnitTokens
-		)
-
-		let selectedNonFungibleTokensPerResource =
-			(selectedNonFungibleResources + selectedStakeClaims)
-				.compactMap(\.nonFungibleTokensPerResource)
-
-		guard
-			selectedFungibleResources.xrdResource != nil
-			|| !selectedFungibleResources.nonXrdResources.isEmpty
-			|| !selectedNonFungibleTokensPerResource.isEmpty
-		else {
-			return nil
-		}
-
-		return .init(
-			fungibleResources: selectedFungibleResources,
-			nonFungibleResources: IdentifiedArrayOf(uniqueElements: selectedNonFungibleTokensPerResource),
-			disabledNFTs: mode.selectedAssets?.disabledNFTs ?? []
-		)
-	}
-
-	public var chooseButtonTitle: String {
-		guard let selectedAssets else {
-			return L10n.AssetTransfer.AddAssets.buttonAssetsNone
-		}
-
-		if selectedAssets.assetsCount == 1 {
-			return L10n.AssetTransfer.AddAssets.buttonAssetsOne
-		}
-
-		return L10n.AssetTransfer.AddAssets.buttonAssets(selectedAssets.assetsCount)
-	}
-}
-
-// MARK: - AssetsView.State.Mode
-extension AssetsView.State {
-	public enum Mode: Hashable, Sendable {
-		public struct SelectedAssets: Hashable, Sendable {
-			public struct NonFungibleTokensPerResource: Hashable, Sendable, Identifiable {
-				public var id: ResourceAddress {
-					resourceAddress
-				}
-
-				public let resourceAddress: ResourceAddress
-				public let resourceImage: URL?
-				public let resourceName: String?
-				public var tokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>
-
-				public init(
-					resourceAddress: ResourceAddress,
-					resourceImage: URL?,
-					resourceName: String?,
-					tokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>
-				) {
-					self.resourceAddress = resourceAddress
-					self.resourceImage = resourceImage
-					self.resourceName = resourceName
-					self.tokens = tokens
-				}
-			}
-
-			public var fungibleResources: OnLedgerEntity.OwnedFungibleResources
-			public var nonFungibleResources: IdentifiedArrayOf<NonFungibleTokensPerResource>
-			public var disabledNFTs: Set<NonFungibleAssetList.Row.State.AssetID>
-
-			public init(
-				fungibleResources: OnLedgerEntity.OwnedFungibleResources = .init(),
-				nonFungibleResources: IdentifiedArrayOf<NonFungibleTokensPerResource> = [],
-				disabledNFTs: Set<NonFungibleAssetList.Row.State.AssetID>
-			) {
-				self.fungibleResources = fungibleResources
-				self.nonFungibleResources = nonFungibleResources
-				self.disabledNFTs = disabledNFTs
-			}
-
-			public var assetsCount: Int {
-				fungibleResources.nonXrdResources.count +
-					nonFungibleResources.map(\.tokens.count).reduce(0, +) +
-					(fungibleResources.xrdResource != nil ? 1 : 0)
-			}
-		}
-
-		case normal
-		case selection(SelectedAssets)
-
-		public var selectedAssets: SelectedAssets? {
-			switch self {
-			case .normal:
-				nil
-			case let .selection(assets):
-				assets
-			}
-		}
-
-		public var isSelection: Bool {
-			if case .selection = self {
-				return true
-			}
-			return false
-		}
-
-		var xrdRowSelected: Bool? {
-			selectedAssets.map { $0.fungibleResources.xrdResource != nil }
-		}
-
-		func nonXrdRowSelected(_ resource: ResourceAddress) -> Bool? {
-			selectedAssets?.fungibleResources.nonXrdResources.contains { $0.resourceAddress == resource }
-		}
-
-		func nftRowSelectedAssets(_ resource: ResourceAddress) -> OrderedSet<OnLedgerEntity.NonFungibleToken>? {
-			selectedAssets.map { OrderedSet($0.nonFungibleResources[id: resource]?.tokens.elements ?? []) }
-		}
-	}
-}
-
-// MARK: - SelectedResourceProvider
-private struct SelectedResourceProvider<Resource> {
-	let isSelected: Bool?
-	let resource: Resource
-
-	var selectedResource: Resource? {
-		isSelected.flatMap { $0 ? resource : nil }
-	}
-}
-
-extension SelectedResourceProvider<OnLedgerEntity.OwnedFungibleResource> {
-	init(with row: FungibleAssetList.Section.Row.State) {
-		self.init(
-			isSelected: row.isSelected,
-			resource: row.token
-		)
-	}
-
-	init(with poolUnit: PoolUnitsList.State.PoolUnitState) {
-		self.init(
-			isSelected: poolUnit.isSelected,
-			resource: poolUnit.poolUnit.resource
-		)
-	}
-}
-
-// MARK: - NonFungibleTokensPerResourceProvider
-private struct NonFungibleTokensPerResourceProvider {
-	let selectedAssets: OrderedSet<OnLedgerEntity.NonFungibleToken>?
-	let resource: OnLedgerEntity.OwnedNonFungibleResource?
-
-	var nonFungibleTokensPerResource: AssetsView.State.Mode.SelectedAssets.NonFungibleTokensPerResource? {
-		selectedAssets.flatMap { selectedAssets -> AssetsView.State.Mode.SelectedAssets.NonFungibleTokensPerResource? in
-			guard
-				let resource,
-				!selectedAssets.isEmpty
-			else {
-				return nil
-			}
-
-//			let selected = selectedAssets.filter {
-//				resource.nonFungibleIds.contains($0.id)
-//			}
-			// resource.tokens.filter { token in selectedStakeClaimAssets.contains(token.id) }
-
-			return .init(
-				resourceAddress: resource.resourceAddress,
-				resourceImage: resource.metadata.iconURL,
-				resourceName: resource.metadata.title,
-				tokens: .init(uncheckedUniqueElements: selectedAssets)
-			)
-		}
-	}
-}
-
-extension NonFungibleTokensPerResourceProvider {
-	init(with row: NonFungibleAssetList.Row.State) {
-		self.init(
-			selectedAssets: row.selectedAssets,
-			resource: row.resource
-		)
 	}
 }

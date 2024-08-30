@@ -60,6 +60,8 @@ extension SubmitTransaction {
 
 		private let store: StoreOf<SubmitTransaction>
 
+		@ScaledMetric private var height: CGFloat = 360
+
 		public init(store: StoreOf<SubmitTransaction>) {
 			self.store = store
 		}
@@ -69,7 +71,7 @@ extension SubmitTransaction {
 				WithNavigationBar {
 					viewStore.send(.closeButtonTapped)
 				} content: {
-					VStack(spacing: .medium3) {
+					VStack(spacing: .zero) {
 						Spacer()
 						if viewStore.status.failed {
 							Image(.errorLarge)
@@ -78,6 +80,7 @@ extension SubmitTransaction {
 								.textStyle(.sheetTitle)
 								.multilineTextAlignment(.center)
 								.padding(.horizontal, .medium2)
+								.padding(.top, .medium3)
 						} else {
 							Image(asset: AssetResource.transactionInProgress)
 								.opacity(opacity)
@@ -99,15 +102,17 @@ extension SubmitTransaction {
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)
 							.padding(.horizontal, .medium2)
+							.padding(.top, .medium3)
 
 						HStack {
 							Text(L10n.TransactionReview.SubmitTransaction.txID)
 								.foregroundColor(.app.gray1)
-							AddressView(.identifier(.transaction(viewStore.txID)))
+							AddressView(.transaction(viewStore.txID), imageColor: .app.gray2)
 								.foregroundColor(.app.blue1)
 						}
 						.textStyle(.body1Header)
 						.padding(.horizontal, .medium2)
+						.padding(.top, .small2)
 
 						Spacer()
 						if viewStore.status.failed, viewStore.showSwitchBackToBrowserMessage {
@@ -128,8 +133,16 @@ extension SubmitTransaction {
 				.alert(store: store.scope(state: \.$dismissTransactionAlert, action: { .view(.dismissTransactionAlert($0)) }))
 				.interactiveDismissDisabled(viewStore.dismissalDisabled)
 				.presentationDragIndicator(.visible)
-				.presentationDetents([.fraction(0.66)])
+				.presentationDetents(presentationDetents(status: viewStore.status))
 				.presentationBackground(.blur)
+			}
+		}
+
+		private func presentationDetents(status: State.TXStatus) -> Set<PresentationDetent> {
+			if status.failed {
+				[.height(height), .large]
+			} else {
+				[.height(height)]
 			}
 		}
 	}

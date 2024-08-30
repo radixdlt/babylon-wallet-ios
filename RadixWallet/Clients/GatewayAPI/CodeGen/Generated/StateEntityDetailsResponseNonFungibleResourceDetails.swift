@@ -26,14 +26,20 @@ public struct StateEntityDetailsResponseNonFungibleResourceDetails: Codable, Has
     public private(set) var totalMinted: String
     /** String-encoded decimal representing the amount of a related fungible resource. */
     public private(set) var totalBurned: String
+    public private(set) var nonFungibleDataMutableFields: [String]
+    public private(set) var twoWayLinkedDapps: TwoWayLinkedDappsCollection?
+    public private(set) var nativeResourceDetails: NativeResourceDetails?
 
-    public init(type: StateEntityDetailsResponseItemDetailsType, roleAssignments: ComponentEntityRoleAssignments, nonFungibleIdType: NonFungibleIdType, totalSupply: String, totalMinted: String, totalBurned: String) {
+    public init(type: StateEntityDetailsResponseItemDetailsType, roleAssignments: ComponentEntityRoleAssignments, nonFungibleIdType: NonFungibleIdType, totalSupply: String, totalMinted: String, totalBurned: String, nonFungibleDataMutableFields: [String], twoWayLinkedDapps: TwoWayLinkedDappsCollection? = nil, nativeResourceDetails: NativeResourceDetails? = nil) {
         self.type = type
         self.roleAssignments = roleAssignments
         self.nonFungibleIdType = nonFungibleIdType
         self.totalSupply = totalSupply
         self.totalMinted = totalMinted
         self.totalBurned = totalBurned
+        self.nonFungibleDataMutableFields = nonFungibleDataMutableFields
+        self.twoWayLinkedDapps = twoWayLinkedDapps
+        self.nativeResourceDetails = nativeResourceDetails
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
@@ -43,6 +49,9 @@ public struct StateEntityDetailsResponseNonFungibleResourceDetails: Codable, Has
         case totalSupply = "total_supply"
         case totalMinted = "total_minted"
         case totalBurned = "total_burned"
+        case nonFungibleDataMutableFields = "non_fungible_data_mutable_fields"
+        case twoWayLinkedDapps = "two_way_linked_dapps"
+        case nativeResourceDetails = "native_resource_details"
     }
 
     // Encodable protocol methods
@@ -55,6 +64,9 @@ public struct StateEntityDetailsResponseNonFungibleResourceDetails: Codable, Has
         try container.encode(totalSupply, forKey: .totalSupply)
         try container.encode(totalMinted, forKey: .totalMinted)
         try container.encode(totalBurned, forKey: .totalBurned)
+        try container.encode(nonFungibleDataMutableFields, forKey: .nonFungibleDataMutableFields)
+        try container.encodeIfPresent(twoWayLinkedDapps, forKey: .twoWayLinkedDapps)
+        try container.encodeIfPresent(nativeResourceDetails, forKey: .nativeResourceDetails)
     }
 }
 

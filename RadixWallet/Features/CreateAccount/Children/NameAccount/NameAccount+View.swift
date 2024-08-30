@@ -14,7 +14,7 @@ extension NameAccount {
 		public let subtitleText: String
 		public let entityName: String
 		public let sanitizedNameRequirement: SanitizedNameRequirement?
-		public let hint: Hint?
+		public let hint: Hint.ViewState?
 		public let useLedgerAsFactorSource: Bool
 
 		public struct SanitizedNameRequirement: Equatable {
@@ -31,7 +31,7 @@ extension NameAccount {
 			if let sanitizedName = state.sanitizedName {
 				if sanitizedName.count > Account.nameMaxLength {
 					self.sanitizedNameRequirement = nil
-					self.hint = .error(L10n.Error.AccountLabel.tooLong)
+					self.hint = .iconError(L10n.Error.AccountLabel.tooLong)
 				} else {
 					self.sanitizedNameRequirement = .init(sanitizedName: sanitizedName)
 					self.hint = nil
@@ -73,7 +73,7 @@ extension NameAccount {
 						)
 						.keyboardType(.asciiCapable)
 						.autocorrectionDisabled()
-						.padding(.bottom, .medium3)
+						.padding(.bottom, .large3)
 
 						useLedgerAsFactorSource(with: viewStore)
 					}

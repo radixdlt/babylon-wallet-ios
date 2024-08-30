@@ -29,7 +29,7 @@ extension NonFungibleAssetList.Row.View {
 				if viewStore.isExpanded {
 					ForEach(
 						Array(
-							viewStore.tokens.flatMap(identity).enumerated()
+							viewStore.tokens.enumerated()
 						),
 						id: \.offset
 					) { index, item in
@@ -46,28 +46,32 @@ extension NonFungibleAssetList.Row.View {
 	}
 
 	private func rowView(_ viewStore: ViewStoreOf<NonFungibleAssetList.Row>) -> some SwiftUI.View {
-		HStack(spacing: .small1) {
-			Thumbnail(.nft, url: viewStore.resource.metadata.iconURL, size: .small)
+		Button {
+			viewStore.send(.isExpandedToggled)
+		} label: {
+			HStack(spacing: .zero) {
+				Thumbnail(.nft, url: viewStore.resource.metadata.iconURL, size: .small)
 
-			VStack(alignment: .leading, spacing: .small2) {
-				if let title = viewStore.resource.metadata.title {
-					Text(title)
-						.foregroundColor(.app.gray1)
-						.lineSpacing(-4)
-						.textStyle(.secondaryHeader)
+				VStack(alignment: .leading, spacing: .small2) {
+					if let title = viewStore.resource.metadata.name {
+						Text(title)
+							.foregroundColor(.app.gray1)
+							.lineSpacing(-4)
+							.textStyle(.secondaryHeader)
+					}
+
+					Text(L10n.Account.Nfts.itemsCount(viewStore.resource.nonFungibleIdsCount))
+						.font(.app.body2HighImportance)
+						.foregroundColor(.app.gray2)
 				}
+				.padding(.leading, .small1)
 
-				Text("\(viewStore.resource.nonFungibleIdsCount)")
-					.font(.app.body2HighImportance)
-					.foregroundColor(.app.gray2)
+				Spacer()
 			}
-		}
-		.frame(maxWidth: .infinity, alignment: .leading)
-		.padding(.horizontal, .medium1)
-		.frame(height: headerHeight)
-		.background(.app.white)
-		.onTapGesture {
-			viewStore.send(.isExpandedToggled, animation: .easeInOut)
+			.padding(.horizontal, .medium1)
+			.padding(.top, .large3)
+			.padding(.bottom, .medium1)
+			.background(.app.white)
 		}
 	}
 
@@ -95,12 +99,12 @@ extension NonFungibleAssetList.Row.View {
 			let isDisabled = viewStore.disabled.contains(asset.id)
 			VStack(spacing: .zero) {
 				Divider()
-					.frame(height: .small3)
+					.frame(height: .assetDividerHeight)
 					.overlay(.app.gray5)
 
 				HStack {
 					NFTIDView(
-						id: asset.id.nonFungibleLocalId.toUserFacingString(),
+						id: asset.id.nonFungibleLocalId.formatted(),
 						name: asset.data?.name,
 						thumbnail: asset.data?.keyImageURL
 					)
@@ -109,7 +113,8 @@ extension NonFungibleAssetList.Row.View {
 					}
 				}
 				.opacity(isDisabled ? 0.35 : 1)
-				.padding(.medium1)
+				.padding(.vertical, .medium1)
+				.padding(.horizontal, .medium3)
 				.frame(minHeight: headerHeight)
 				.background(.app.white)
 			}

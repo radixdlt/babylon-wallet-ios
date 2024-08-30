@@ -317,6 +317,17 @@ extension DeviceInfo {
 	}
 }
 
+extension HostInfo {
+	public static func current() -> HostInfo {
+		/// Mostly empty for now until full migration to Sargon is done
+		.init(
+			description: .init(name: "iPhone", model: ""),
+			hostOs: .ios(version: ""),
+			hostAppVersion: ""
+		)
+	}
+}
+
 #if DEBUG
 
 // MARK: - KeyedMnemonicWithPassphrase
