@@ -108,8 +108,8 @@ extension Home.AccountRow {
 						}
 
 						ForEachStatic(viewStore.accountLockerClaims) { claim in
-							Text("You have a claim for \(claim.lockerAddress)")
-								.textStyle(.secondaryHeader)
+							Text("You have \(claim.claims.count) claims for \(claim.dappName ?? L10n.DAppRequest.Metadata.unknownName)")
+								.textStyle(.body1Regular)
 								.foregroundStyle(.app.white)
 						}
 					}

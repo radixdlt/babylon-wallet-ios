@@ -23,20 +23,25 @@ extension AccountLockersClient {
 				let lockersPerAccount = getLockersPerAccount(accounts: accounts, dapps: dappsWithLockers)
 				let lockersStatePerAccount = try await getLockersStatePerAccount(lockersPerAccount: lockersPerAccount)
 
-				var claimsPerAccount: [AccountAddress: [AccountLockerClaims]] = [:]
+				var claimsPerAccount: ClaimsPerAccount = [:]
 				for account in accounts {
 					guard let lockerStates = lockersStatePerAccount[account.address] else { continue }
 					var accountLockerClaims: [AccountLockerClaims] = []
 					for lockerState in lockerStates.items {
 						// TODO: Check from cache if the lockerState.lastTouchedAtStateVersion has changed from last time we checked
 
-						let lockerContent = try await getLockerContent(lockerAddress: lockerState.lockerAddress, accountAddress: lockerState.accountAddress)
+						let lockerAddress = lockerState.lockerAddress
+						let accountAddress = lockerState.accountAddress
+						let lockerContent = try await getLockerContent(lockerAddress: lockerAddress, accountAddress: accountAddress)
 						let claims = lockerContent
 							.filter(\.isValidClaim)
+						let dappName = dappsWithLockers.first(where: { $0.lockerAddress == lockerAddress })?.dapp.displayName
+
 						accountLockerClaims.append(.init(
-							lockerAddress: lockerState.lockerAddress,
-							accountAddress: lockerState.accountAddress,
+							lockerAddress: lockerAddress,
+							accountAddress: accountAddress,
 							lastTouchedAtStateVersion: lockerState.lastTouchedAtStateVersion,
+							dappName: dappName,
 							claims: claims
 						))
 					}
@@ -136,6 +141,7 @@ public struct AccountLockerClaims: Sendable, Hashable {
 	let lockerAddress: String
 	let accountAddress: String // TODO: Consider removing it if not necessary
 	let lastTouchedAtStateVersion: Int64
+	let dappName: String?
 	let claims: [GatewayAPI.AccountLockerVaultCollectionItem]
 }
 
