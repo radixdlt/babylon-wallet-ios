@@ -7,7 +7,7 @@ extension OnboardingClient: DependencyKey {
 	public static func live() -> Self {
 		Self(
 			loadProfile: {
-				await ProfileStore.shared.profile
+				await ProfileStore.shared.profileSequence
 			},
 			finishOnboarding: {
 				await ProfileStore.shared.finishedOnboarding()

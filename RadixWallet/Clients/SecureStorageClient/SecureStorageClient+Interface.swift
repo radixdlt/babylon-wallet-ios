@@ -58,7 +58,7 @@ public struct SecureStorageClient: Sendable {
 		saveProfileSnapshot: @escaping SaveProfileSnapshot,
 		loadProfileSnapshotData: @escaping LoadProfileSnapshotData,
 		loadProfileSnapshot: @escaping LoadProfileSnapshot,
-		loadProfile: @escaping LoadProfile,
+		loadProfileState: @escaping LoadProfileState,
 		deleteProfile: @escaping DeleteProfile,
 		saveMnemonicForFactorSource: @escaping SaveMnemonicForFactorSource,
 		loadMnemonicByFactorSourceID: @escaping LoadMnemonicByFactorSourceID,
@@ -89,7 +89,7 @@ public struct SecureStorageClient: Sendable {
 		self.saveProfileSnapshot = saveProfileSnapshot
 		self.loadProfileSnapshotData = loadProfileSnapshotData
 		self.loadProfileSnapshot = loadProfileSnapshot
-		self.loadProfile = loadProfile
+		self.loadProfileState = loadProfileState
 		self.deleteProfile = deleteProfile
 		self.saveMnemonicForFactorSource = saveMnemonicForFactorSource
 		self.loadMnemonicByFactorSourceID = loadMnemonicByFactorSourceID
@@ -124,7 +124,7 @@ public struct SecureStorageClient: Sendable {
 		saveProfileSnapshot: @escaping SaveProfileSnapshot,
 		loadProfileSnapshotData: @escaping LoadProfileSnapshotData,
 		loadProfileSnapshot: @escaping LoadProfileSnapshot,
-		loadProfile: @escaping LoadProfile,
+		loadProfileState: @escaping LoadProfileState,
 		deleteProfile: @escaping DeleteProfile,
 		saveMnemonicForFactorSource: @escaping SaveMnemonicForFactorSource,
 		loadMnemonicByFactorSourceID: @escaping LoadMnemonicByFactorSourceID,
@@ -154,7 +154,7 @@ public struct SecureStorageClient: Sendable {
 		self.saveProfileSnapshot = saveProfileSnapshot
 		self.loadProfileSnapshotData = loadProfileSnapshotData
 		self.loadProfileSnapshot = loadProfileSnapshot
-		self.loadProfile = loadProfile
+		self.loadProfileState = loadProfileState
 		self.deleteProfile = deleteProfile
 		self.saveMnemonicForFactorSource = saveMnemonicForFactorSource
 		self.loadMnemonicByFactorSourceID = loadMnemonicByFactorSourceID

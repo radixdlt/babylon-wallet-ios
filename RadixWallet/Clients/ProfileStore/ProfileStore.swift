@@ -49,34 +49,44 @@ import Sargon
 public final actor ProfileStore {
 	public static let shared = ProfileStore()
 
-	/// Holds an in-memory copy of the Profile, the source of truth is Keychain.
-	private let profileSubject: AsyncCurrentValueSubject<Profile>
-
 	/// Only mutable since we need to update the description with async, since reading
 	/// device model and name is async.
 	private var deviceInfo: DeviceInfo
 
+	private let profileStateSubject: AsyncPassthroughSubject<Element>
+	private public typealias Subject = AsyncPassthroughSubject<Element>
+	public typealias Stream = AsyncThrowingPassthroughSubject<Element, any Error>
+
+	let stream = Stream()
+	let subject = Subject()
+
 	init() {
-		let profile = SargonOS.shared.profile()
 		let metaDeviceInfo = Self._deviceInfo()
 		self.deviceInfo = metaDeviceInfo.deviceInfo
-		self.profileSubject = AsyncCurrentValueSubject(profile)
+	}
+}
 
-		Task {
-			for await profile in await ProfileChangeBus.shared.profile_change_stream() {
-				self.profileSubject.send(profile)
+extension ProfileStore {
+	var profileSequence: AnyAsyncSequence<Profile> {
+		profileState.compactMap { state in
+			switch state {
+			case let .loaded(profile):
+				profile
+			case .none, .incompatible:
+				nil
 			}
 		}
+		.share()
+		.eraseToAnyAsyncSequence()
+	}
+
+	func profileState() async -> AnyAsyncSequence<ProfileState> {
+		ProfileStateChangeEventPublisher.shared.eventStream().eraseToAnyAsyncSequence()
 	}
 }
 
 // MARK: Public
 extension ProfileStore {
-	/// The current value of Profile. Use `updating` method to update it. Also see `values` for an AsyncSequence of Profile.
-	public var profile: Profile {
-		profileSubject.value
-	}
-
 	/// Mutates the in-memory copy of the Profile usung `transform`, and saves a
 	/// snapshot of it profile into Keychain (after having updated its header)
 	/// - Parameter transform: A mutating transform updating the profile.
@@ -84,7 +94,7 @@ extension ProfileStore {
 	public func updating<T: Sendable>(
 		_ transform: @Sendable (inout Profile) async throws -> T
 	) async throws -> T {
-		var updated = profile
+		var updated = try await profileSequence.first()
 		let result = try await transform(&updated)
 		try await Self._save(profile: updated)
 		return result // in many cases `Void`.
@@ -123,13 +133,8 @@ extension ProfileStore {
 		}
 	}
 
-	public func deleteProfile(
-		keepInICloudIfPresent: Bool
-	) async throws {
-		try await _deleteProfile(
-			keepInICloudIfPresent: keepInICloudIfPresent,
-			assertOwnership: true
-		)
+	public func deleteProfile() async throws {
+		try await SargonOS.shared.deleteWallet()
 	}
 
 	public func finishedOnboarding() async {}
@@ -221,20 +226,10 @@ extension ProfileStore {
 	func _lens<Property>(
 		_ transform: @escaping @Sendable (Profile) -> Property?
 	) -> AnyAsyncSequence<Property> where Property: Sendable & Equatable {
-		profileSubject.compactMap(transform)
+		profileSequence.compactMap(transform)
 			.share() // Multicast
 			.removeDuplicates()
 			.eraseToAnyAsyncSequence()
-	}
-}
-
-// MARK: Private
-extension ProfileStore {
-	private func _deleteProfile(
-		keepInICloudIfPresent: Bool,
-		assertOwnership: Bool = true
-	) async throws {
-		try await SargonOS.shared.deleteProfileThenCreateNewWithBdfs()
 	}
 }
 

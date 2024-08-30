@@ -203,16 +203,16 @@ final class SargonSecureStorage: SecureStorageDriver {
 
 	func loadData(key: SargonUniFFI.SecureStorageKey) async throws -> SargonUniFFI.BagOfBytes? {
 		switch key {
-		case .snapshotHeadersList:
-			nil
-		case .activeProfileId:
-			userDefaults.data(key: .activeProfileID)
 		case .deviceInfo:
-			try secureStorageClient.loadDeviceInfo()?.jsonData()
+			return try secureStorageClient.loadDeviceInfo()?.jsonData()
 		case let .deviceFactorSourceMnemonic(factorSourceId):
-			try secureStorageClient.loadMnemonicDataByFactorSourceID(.init(factorSourceID: factorSourceId, notifyIfMissing: true))
-		case let .profileSnapshot(profileId):
-			try secureStorageClient.loadProfileSnapshotData(profileId)
+			return try secureStorageClient.loadMnemonicDataByFactorSourceID(.init(factorSourceID: factorSourceId, notifyIfMissing: true))
+		case .profileSnapshot:
+			guard let activeProfileId = userDefaults.data(key: .activeProfileID) else {
+				return nil
+			}
+
+			return try secureStorageClient.loadProfileSnapshotData(profileId)
 		}
 	}
 
