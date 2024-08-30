@@ -7,6 +7,7 @@ extension AccountLockersClient {
 		@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 		@Dependency(\.accountsClient) var accountsClient
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
+		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
 		@Sendable
 		func startMonitoring() async throws {
@@ -16,10 +17,38 @@ extension AccountLockersClient {
 			for try await (dapps, accounts) in combineLatest(dappValues, accountValues) {
 				let dappsWithLockers = try await filterDappsWithAccountLockers(dapps)
 				let lockersPerAccount = getLockersPerAccount(accounts: accounts, dapps: dappsWithLockers)
-				print("M- Lockers per account: \(lockersPerAccount)")
+				let lockersStatePerAccount = try await getLockersStatePerAccount(lockersPerAccount: lockersPerAccount)
 
-				// Return [AccountAddress: [Claims]]
+				var result: [AccountAddress: [AccountLockerClaims]] = [:]
+				for account in accounts {
+					guard let lockerStates = lockersStatePerAccount[account.address] else { continue }
+					var accountLockerClaims: [AccountLockerClaims] = []
+					for lockerState in lockerStates.items {
+						// TODO: Check from cache if the lockerState.lastTouchedAtStateVersion has changed from last time we checked
+
+						let lockerContent = try await getLockerContent(lockerAddress: lockerState.lockerAddress, accountAddress: lockerState.accountAddress)
+						let claims = lockerContent
+							.filter(\.isValidClaim)
+						accountLockerClaims.append(.init(
+							lockerAddress: lockerState.lockerAddress,
+							accountAddress: lockerState.accountAddress,
+							lastTouchedAtStateVersion: lockerState.lastTouchedAtStateVersion,
+							claims: claims
+						))
+					}
+					result[account.address] = accountLockerClaims
+				}
+
+				print("M- Result: \(result)")
 			}
+		}
+
+		/// A struct holding the pending claims for a given locker address & account address.
+		struct AccountLockerClaims {
+			let lockerAddress: String
+			let accountAddress: String
+			let lastTouchedAtStateVersion: Int64
+			let claims: [GatewayAPI.AccountLockerVaultCollectionItem]
 		}
 
 		@Sendable
@@ -67,6 +96,25 @@ extension AccountLockersClient {
 			return result
 		}
 
+		typealias LockersStatePerAccount = [AccountAddress: GatewayAPI.StateAccountLockersTouchedAtResponse]
+
+		@Sendable
+		func getLockersStatePerAccount(lockersPerAccount: [AccountAddress: [String]]) async throws -> LockersStatePerAccount {
+			let result = try await lockersPerAccount.parallelMap { accountAddress, lockers in
+				let accountLockers = lockers.map {
+					GatewayAPI.AccountLockerAddress(lockerAddress: $0, accountAddress: accountAddress.address)
+				}
+				let response = try await gatewayAPIClient.getAccountLockerTouchedAt(.init(accountLockers: accountLockers))
+				return (accountAddress, response)
+			}
+			return Dictionary(uniqueKeysWithValues: result.map { ($0.0, $0.1) })
+		}
+
+		@Sendable
+		func getLockerContent(lockerAddress: String, accountAddress: String) async throws -> [GatewayAPI.AccountLockerVaultCollectionItem] {
+			try await gatewayAPIClient.getAccountLockerVaults(.init(lockerAddress: lockerAddress, accountAddress: accountAddress)).items
+		}
+
 		return .init(startMonitoring: startMonitoring)
 	}
 
@@ -76,10 +124,25 @@ extension AccountLockersClient {
 	}
 }
 
+// MARK: - ClaimInfo
+struct ClaimInfo: Sendable, Hashable {}
+
 private extension AuthorizedDapp {
 	var accountsInDapp: [AccountAddress] {
 		referencesToAuthorizedPersonas
 			.compactMap { $0.sharedAccounts?.ids }
 			.flatMap { $0 }
+	}
+}
+
+private extension GatewayAPI.AccountLockerVaultCollectionItem {
+	var isValidClaim: Bool {
+		// TODO: Figure out why auto generated models don't have the amount/totalCount on them
+		switch type {
+		case .fungible:
+			true // amount > 0
+		case .nonFungible:
+			true // totalCount > 0
+		}
 	}
 }
