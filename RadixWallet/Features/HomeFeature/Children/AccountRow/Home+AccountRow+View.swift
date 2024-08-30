@@ -8,6 +8,7 @@ extension Home.AccountRow {
 		let fiatWorth: Loadable<FiatWorth>
 		let isLoadingResources: Bool
 		let securityProblemsConfig: EntitySecurityProblemsView.Config
+		let accountLockerClaims: [AccountLockerClaims]
 
 		public enum AccountTag: Int, Hashable, Identifiable, Sendable {
 			case ledgerBabylon
@@ -48,6 +49,7 @@ extension Home.AccountRow {
 
 			self.tag = .init(state: state)
 			self.isLedgerAccount = state.isLedgerAccount
+			self.accountLockerClaims = state.accountLockerClaims
 
 			// Resources
 			guard let accountWithResources = state.accountWithResources.wrappedValue?.nonEmptyVaults else {
@@ -104,12 +106,21 @@ extension Home.AccountRow {
 						EntitySecurityProblemsView(config: viewStore.securityProblemsConfig) {
 							viewStore.send(.securityProblemsTapped)
 						}
+
+						ForEachStatic(viewStore.accountLockerClaims) { claim in
+							Text("You have a claim for \(claim.lockerAddress)")
+								.textStyle(.secondaryHeader)
+								.foregroundStyle(.app.white)
+						}
 					}
 					.padding(.top, .medium1)
 					.padding(.bottom, .small3)
 				}
 				.onTapGesture {
 					viewStore.send(.tapped)
+				}
+				.task { @MainActor in
+					await store.send(.view(.task)).finish()
 				}
 			}
 		}

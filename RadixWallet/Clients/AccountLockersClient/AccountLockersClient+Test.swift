@@ -12,10 +12,12 @@ extension AccountLockersClient: TestDependencyKey {
 	public static let previewValue: Self = .noop
 
 	public static let noop = Self(
-		startMonitoring: {}
+		startMonitoring: {},
+		accountClaims: unimplemented("\(Self.self).accountClaims") // TODO: Fix
 	)
 
 	public static let testValue = Self(
-		startMonitoring: unimplemented("\(Self.self).startMonitoring")
+		startMonitoring: unimplemented("\(Self.self).startMonitoring"),
+		accountClaims: unimplemented("\(Self.self).accountClaims")
 	)
 }

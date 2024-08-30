@@ -1,5 +1,7 @@
 import Foundation
 
+public typealias ClaimsPerAccount = [AccountAddress: [AccountLockerClaims]]
+
 extension AccountLockersClient {
 	public static let liveValue: Self = .live()
 
@@ -8,6 +10,8 @@ extension AccountLockersClient {
 		@Dependency(\.accountsClient) var accountsClient
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+
+		let accountLockersSubject = AsyncCurrentValueSubject<ClaimsPerAccount>([:])
 
 		@Sendable
 		func startMonitoring() async throws {
@@ -19,7 +23,7 @@ extension AccountLockersClient {
 				let lockersPerAccount = getLockersPerAccount(accounts: accounts, dapps: dappsWithLockers)
 				let lockersStatePerAccount = try await getLockersStatePerAccount(lockersPerAccount: lockersPerAccount)
 
-				var result: [AccountAddress: [AccountLockerClaims]] = [:]
+				var claimsPerAccount: [AccountAddress: [AccountLockerClaims]] = [:]
 				for account in accounts {
 					guard let lockerStates = lockersStatePerAccount[account.address] else { continue }
 					var accountLockerClaims: [AccountLockerClaims] = []
@@ -36,19 +40,12 @@ extension AccountLockersClient {
 							claims: claims
 						))
 					}
-					result[account.address] = accountLockerClaims
+					claimsPerAccount[account.address] = accountLockerClaims
 				}
 
-				print("M- Result: \(result)")
+				accountLockersSubject.send(claimsPerAccount)
+				print("M- Result: \(claimsPerAccount)")
 			}
-		}
-
-		/// A struct holding the pending claims for a given locker address & account address.
-		struct AccountLockerClaims {
-			let lockerAddress: String
-			let accountAddress: String
-			let lastTouchedAtStateVersion: Int64
-			let claims: [GatewayAPI.AccountLockerVaultCollectionItem]
 		}
 
 		@Sendable
@@ -115,7 +112,16 @@ extension AccountLockersClient {
 			try await gatewayAPIClient.getAccountLockerVaults(.init(lockerAddress: lockerAddress, accountAddress: accountAddress)).items
 		}
 
-		return .init(startMonitoring: startMonitoring)
+		return .init(
+			startMonitoring: startMonitoring,
+			accountClaims: { account in
+				accountLockersSubject.compactMap {
+					$0[account]
+				}
+				.share()
+				.eraseToAnyAsyncSequence()
+			}
+		)
 	}
 
 	private struct DappWithLockerAddress: Sendable, Hashable {
@@ -124,8 +130,14 @@ extension AccountLockersClient {
 	}
 }
 
-// MARK: - ClaimInfo
-struct ClaimInfo: Sendable, Hashable {}
+// MARK: - AccountLockerClaims
+/// A struct holding the pending claims for a given locker address & account address.
+public struct AccountLockerClaims: Sendable, Hashable {
+	let lockerAddress: String
+	let accountAddress: String // TODO: Consider removing it if not necessary
+	let lastTouchedAtStateVersion: Int64
+	let claims: [GatewayAPI.AccountLockerVaultCollectionItem]
+}
 
 private extension AuthorizedDapp {
 	var accountsInDapp: [AccountAddress] {
