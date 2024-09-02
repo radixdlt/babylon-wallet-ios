@@ -2,8 +2,7 @@ import Foundation
 
 // MARK: - SheetOverlayCoordinator
 public struct SheetOverlayCoordinator: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable, Identifiable {
-		public let id: UUID = .init()
+	public struct State: Sendable, Hashable {
 		public var root: Root.State
 
 		public init(root: Root.State) {

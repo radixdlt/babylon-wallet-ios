@@ -50,7 +50,7 @@ extension OverlayWindowClient: DependencyKey {
 			},
 			scheduleAlertAndIgnoreAction: scheduleAlertAndIgnoreAction,
 			scheduleHUD: { items.send(.hud($0)) },
-			scheduleSheet: { items.send(.sheet($0, $1)) },
+			scheduleSheet: { items.send(.sheet($0)) },
 			scheduleFullScreen: { fullScreen in
 				items.send(.fullScreen(fullScreen))
 				return await fullScreenActions.first { $0.id == fullScreen.id }?.action ?? .dismiss
@@ -64,8 +64,8 @@ extension OverlayWindowClient: DependencyKey {
 }
 
 extension OverlayWindowClient {
-	public func showInfoLink(_ item: GlossaryItem) {
-		scheduleSheet(.infoLink(.init(image: item.image, text: item.string)), .replace)
+	public func showInfoLink(_ state: InfoLinkSheet.State) {
+		scheduleSheet(.infoLink(state))
 	}
 }
 

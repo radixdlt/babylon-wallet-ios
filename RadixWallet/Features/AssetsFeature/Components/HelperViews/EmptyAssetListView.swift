@@ -6,7 +6,7 @@ struct EmptyAssetListView: View {
 	struct ViewState: Sendable, Equatable {
 		let imageAsset: ImageAsset
 		let description: String
-		let glossaryItem: OverlayWindowClient.GlossaryItem
+		let glossaryItem: InfoLinkSheet.GlossaryItem
 		let glossaryLabel: String
 	}
 

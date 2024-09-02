@@ -810,8 +810,6 @@
 		83EE48E02B8F68B5006CE672 /* FiatWorth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE48DF2B8F68B5006CE672 /* FiatWorth.swift */; };
 		83EE48E22B8F69D6006CE672 /* ResourceAmount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE48E12B8F69D6006CE672 /* ResourceAmount.swift */; };
 		83FDF7EC2AF260D600D9AA8B /* ProgrammaticScryptoSborValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FDF7EB2AF260D600D9AA8B /* ProgrammaticScryptoSborValue.swift */; };
-		A40816682C7F14D4005E65B9 /* InfoLinkSheet+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40816672C7F14D4005E65B9 /* InfoLinkSheet+Reducer.swift */; };
-		A408166A2C7F14F1005E65B9 /* InfoLinkSheet+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40816692C7F14F1005E65B9 /* InfoLinkSheet+View.swift */; };
 		A408154C2C7E0D08005E65B9 /* CodableHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40814312C7E0D08005E65B9 /* CodableHelper.swift */; };
 		A408154D2C7E0D08005E65B9 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40814322C7E0D08005E65B9 /* Extensions.swift */; };
 		A408154E2C7E0D08005E65B9 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40814332C7E0D08005E65B9 /* Models.swift */; };
@@ -1092,6 +1090,8 @@
 		A40816622C7E0D08005E65B9 /* ValidatorUptimeCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40815482C7E0D08005E65B9 /* ValidatorUptimeCollection.swift */; };
 		A40816632C7E0D08005E65B9 /* ValidatorUptimeCollectionItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40815492C7E0D08005E65B9 /* ValidatorUptimeCollectionItem.swift */; };
 		A40816642C7E0D08005E65B9 /* ValidatorVaultItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A408154A2C7E0D08005E65B9 /* ValidatorVaultItem.swift */; };
+		A40816682C7F14D4005E65B9 /* InfoLinkSheet+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40816672C7F14D4005E65B9 /* InfoLinkSheet+Reducer.swift */; };
+		A408166A2C7F14F1005E65B9 /* InfoLinkSheet+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40816692C7F14F1005E65B9 /* InfoLinkSheet+View.swift */; };
 		A41266EF2B15578600EA38E9 /* ManualAccountRecoverySeedPhrase+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266EE2B15578600EA38E9 /* ManualAccountRecoverySeedPhrase+Reducer.swift */; };
 		A41266F12B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266F02B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift */; };
 		A41266F72B160F3F00EA38E9 /* ManualAccountRecoveryCoordinator+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266F62B160F3F00EA38E9 /* ManualAccountRecoveryCoordinator+Reducer.swift */; };
@@ -1129,7 +1129,6 @@
 		A47809082BDBDB4C006B68C0 /* RadixDateFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47809072BDBDB4C006B68C0 /* RadixDateFormatter.swift */; };
 		A48C95AE2C6A97D80047A056 /* SheetOverlayCoordinator+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A48C95AD2C6A97D80047A056 /* SheetOverlayCoordinator+Reducer.swift */; };
 		A48C95B02C6A98380047A056 /* SheetOverlayCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A48C95AF2C6A98380047A056 /* SheetOverlayCoordinator+View.swift */; };
-		A48C95B22C6C9A660047A056 /* InfoLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = A48C95B12C6C9A660047A056 /* InfoLink.swift */; };
 		A48FD15F2B55E671009295E9 /* TrackedPoolInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A48FD15E2B55E671009295E9 /* TrackedPoolInteraction.swift */; };
 		A48FD1612B55F8F0009295E9 /* TransactionReview+Sections.swift in Sources */ = {isa = PBXBuildFile; fileRef = A48FD1602B55F8F0009295E9 /* TransactionReview+Sections.swift */; };
 		A4A96BB82C7743B200E19CD5 /* InfoButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4A96BB72C7743B200E19CD5 /* InfoButton.swift */; };
@@ -2011,8 +2010,6 @@
 		83EE48DF2B8F68B5006CE672 /* FiatWorth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiatWorth.swift; sourceTree = "<group>"; };
 		83EE48E12B8F69D6006CE672 /* ResourceAmount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceAmount.swift; sourceTree = "<group>"; };
 		83FDF7EB2AF260D600D9AA8B /* ProgrammaticScryptoSborValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValue.swift; sourceTree = "<group>"; };
-		A40816672C7F14D4005E65B9 /* InfoLinkSheet+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InfoLinkSheet+Reducer.swift"; sourceTree = "<group>"; };
-		A40816692C7F14F1005E65B9 /* InfoLinkSheet+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InfoLinkSheet+View.swift"; sourceTree = "<group>"; };
 		A40814312C7E0D08005E65B9 /* CodableHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CodableHelper.swift; sourceTree = "<group>"; };
 		A40814322C7E0D08005E65B9 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		A40814332C7E0D08005E65B9 /* Models.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
@@ -2293,6 +2290,8 @@
 		A40815482C7E0D08005E65B9 /* ValidatorUptimeCollection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValidatorUptimeCollection.swift; sourceTree = "<group>"; };
 		A40815492C7E0D08005E65B9 /* ValidatorUptimeCollectionItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValidatorUptimeCollectionItem.swift; sourceTree = "<group>"; };
 		A408154A2C7E0D08005E65B9 /* ValidatorVaultItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValidatorVaultItem.swift; sourceTree = "<group>"; };
+		A40816672C7F14D4005E65B9 /* InfoLinkSheet+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InfoLinkSheet+Reducer.swift"; sourceTree = "<group>"; };
+		A40816692C7F14F1005E65B9 /* InfoLinkSheet+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InfoLinkSheet+View.swift"; sourceTree = "<group>"; };
 		A41266EE2B15578600EA38E9 /* ManualAccountRecoverySeedPhrase+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoverySeedPhrase+Reducer.swift"; sourceTree = "<group>"; };
 		A41266F02B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoverySeedPhrase+View.swift"; sourceTree = "<group>"; };
 		A41266F62B160F3F00EA38E9 /* ManualAccountRecoveryCoordinator+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoveryCoordinator+Reducer.swift"; sourceTree = "<group>"; };
@@ -2332,7 +2331,6 @@
 		A47809072BDBDB4C006B68C0 /* RadixDateFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadixDateFormatter.swift; sourceTree = "<group>"; };
 		A48C95AD2C6A97D80047A056 /* SheetOverlayCoordinator+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SheetOverlayCoordinator+Reducer.swift"; sourceTree = "<group>"; };
 		A48C95AF2C6A98380047A056 /* SheetOverlayCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SheetOverlayCoordinator+View.swift"; sourceTree = "<group>"; };
-		A48C95B12C6C9A660047A056 /* InfoLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoLink.swift; sourceTree = "<group>"; };
 		A48FD15E2B55E671009295E9 /* TrackedPoolInteraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackedPoolInteraction.swift; sourceTree = "<group>"; };
 		A48FD1602B55F8F0009295E9 /* TransactionReview+Sections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionReview+Sections.swift"; sourceTree = "<group>"; };
 		A4A1379A2BE4630200D84B50 /* RadixWalletDebug-PreAlpha.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "RadixWalletDebug-PreAlpha.entitlements"; sourceTree = "<group>"; };
@@ -4589,7 +4587,6 @@
 				48CFBF8B2ADC10D900E77A5C /* OverlayWindowClient+Test.swift */,
 				48CFBFB22ADC10D900E77A5C /* OverlayWindowClient+Live.swift */,
 				48CFBF8C2ADC10D900E77A5C /* OverlayWindowClient+Interface.swift */,
-				A48C95B12C6C9A660047A056 /* InfoLink.swift */,
 			);
 			path = OverlayWindowClient;
 			sourceTree = "<group>";
@@ -7218,7 +7215,6 @@
 				48CFC4082ADC10DA00E77A5C /* UInt11.swift in Sources */,
 				48CFC2D32ADC10D900E77A5C /* AccountDetails+Reducer.swift in Sources */,
 				48CFC4822ADC10DA00E77A5C /* ROLAClient+Mock.swift in Sources */,
-				48CFC5022ADC10DA00E77A5C /* CursorLimitMixin.swift in Sources */,
 				A48C95AE2C6A97D80047A056 /* SheetOverlayCoordinator+Reducer.swift in Sources */,
 				A40815C02C7E0D08005E65B9 /* NetworkConfigurationResponseWellKnownAddresses.swift in Sources */,
 				48CFC42A2ADC10DA00E77A5C /* SafeCompare.swift in Sources */,
@@ -7723,10 +7719,6 @@
 				A40816412C7E0D08005E65B9 /* TransactionFungibleBalanceChanges.swift in Sources */,
 				E65D6CEE2BC98267001D8A39 /* Stage2MigrateToSargon+AppPreferences+ViaProfile.swift in Sources */,
 				E634CA2F2AFD25B100C43DB7 /* DebugKeychainContents+View.swift in Sources */,
-				48CFC53F2ADC10DA00E77A5C /* MetadataU8Value.swift in Sources */,
-				A48C95B22C6C9A660047A056 /* InfoLink.swift in Sources */,
-				48CFC4CC2ADC10DA00E77A5C /* Models.swift in Sources */,
-				83EE5ED62BE3C16F00B1531D /* AccountDepositPreValidationResourceSpecificBehaviourItem.swift in Sources */,
 				48CFC3132ADC10D900E77A5C /* CompletionMigrateOlympiaAccountsToBabylon+View.swift in Sources */,
 				A4ECE2732BEEAFFC00468BF6 /* SecurityCenterClient+Live.swift in Sources */,
 				48CFC36D2ADC10D900E77A5C /* FungibleAssetList+Row+Reducer.swift in Sources */,

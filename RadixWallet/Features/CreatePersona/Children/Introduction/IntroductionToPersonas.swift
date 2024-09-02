@@ -1,6 +1,3 @@
-import ComposableArchitecture
-import SwiftUI
-
 @Reducer
 public struct IntroductionToPersonas: Sendable, FeatureReducer {
 	@ObservableState
@@ -9,7 +6,6 @@ public struct IntroductionToPersonas: Sendable, FeatureReducer {
 	public typealias Action = FeatureAction<Self>
 
 	public enum ViewAction: Sendable, Equatable {
-		case appeared
 		case continueButtonTapped
 	}
 
@@ -21,8 +17,6 @@ public struct IntroductionToPersonas: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .appeared:
-			.none
 		case .continueButtonTapped:
 			.send(.delegate(.done))
 		}

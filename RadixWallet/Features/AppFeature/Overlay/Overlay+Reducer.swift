@@ -79,13 +79,8 @@ struct OverlayReducer: Sendable, FeatureReducer {
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .scheduleItem(event):
-			if case let .sheet(sheetState, .replace) = event, case .sheet = state.destination {
-				state.destination = .sheet(.init(root: sheetState))
-				return .none
-			} else {
-				state.itemsQueue.append(event)
-				return showItemIfPossible(state: &state)
-			}
+			state.itemsQueue.append(event)
+			return showItemIfPossible(state: &state)
 		case .showNextItemIfPossible:
 			return showItemIfPossible(state: &state)
 		}
@@ -160,7 +155,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 			state.destination = .hud(.init(content: hud))
 			return .none
 
-		case let .sheet(sheetState, _):
+		case let .sheet(sheetState):
 			state.destination = .sheet(.init(root: sheetState))
 			return setIsUserInteractionEnabled(&state, isEnabled: true)
 

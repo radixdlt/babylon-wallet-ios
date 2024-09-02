@@ -4,8 +4,26 @@ import Foundation
 extension InfoLinkSheet {
 	public struct View: SwiftUI.View {
 		@SwiftUI.State private var showTitle: Bool = false
-
 		private let store: StoreOf<InfoLinkSheet>
+
+		private let showTitleOffset: CGFloat = 40
+
+		private let hideTitleOffset: CGFloat = 47
+
+		private let coordSpace: String = "InfoLinkSheet"
+
+		private let scrollViewTopID = "scrollViewTopID"
+
+		private var openURL: OpenURLAction {
+			OpenURLAction { url in
+				if let infoLink = InfoLinkSheet.GlossaryItem(url: url) {
+					store.send(.view(.infoLinkTapped(infoLink)))
+					return .handled
+				} else {
+					return .systemAction
+				}
+			}
+		}
 
 		public init(store: StoreOf<InfoLinkSheet>) {
 			self.store = store
@@ -54,27 +72,11 @@ extension InfoLinkSheet {
 				.navigationTitle(showTitle ? viewStore.title : "")
 			}
 		}
-
-		private let showTitleOffset: CGFloat = 40
-
-		private let hideTitleOffset: CGFloat = 47
-
-		private let coordSpace: String = "InfoLinkSheet"
-
-		private let scrollViewTopID = "scrollViewTopID"
-
-		private var openURL: OpenURLAction {
-			OpenURLAction { url in
-				if let infoLink = OverlayWindowClient.GlossaryItem(url: url) {
-					store.send(.view(.infoLinkTapped(infoLink)))
-					return .handled
-				} else {
-					return .systemAction
-				}
-			}
-		}
 	}
+}
 
+// MARK: - InfoLinkSheet.PartView
+extension InfoLinkSheet {
 	struct PartView: SwiftUI.View {
 		let part: Part
 

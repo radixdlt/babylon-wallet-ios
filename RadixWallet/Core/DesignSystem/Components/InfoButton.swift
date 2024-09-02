@@ -1,10 +1,10 @@
 import SwiftUI
 
 public struct InfoButton: View {
-	public let item: OverlayWindowClient.GlossaryItem
+	public let item: InfoLinkSheet.GlossaryItem
 	public let label: String?
 
-	public init(_ item: OverlayWindowClient.GlossaryItem, label: String? = nil) {
+	public init(_ item: InfoLinkSheet.GlossaryItem, label: String? = nil) {
 		self.item = item
 		self.label = label
 	}
@@ -20,6 +20,6 @@ public struct InfoButton: View {
 
 	private func showInfo() {
 		@Dependency(\.overlayWindowClient) var overlayWindowClient
-		overlayWindowClient.showInfoLink(item)
+		overlayWindowClient.showInfoLink(.init(glossaryItem: item))
 	}
 }

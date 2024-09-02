@@ -45,7 +45,7 @@ private extension View {
 	private func sheet(with destinationStore: PresentationStoreOf<OverlayReducer.Destination>) -> some View {
 		sheet(store: destinationStore.scope(state: \.sheet, action: \.sheet)) {
 			SheetOverlayCoordinator.View(store: $0)
-				.presentationDetents([.medium, .large])
+				.presentationDetents([.fraction(0.75)])
 				.presentationBackground(.blur)
 		}
 	}

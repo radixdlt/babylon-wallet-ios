@@ -1,4 +1,3 @@
-import ComposableArchitecture
 import SwiftUI
 
 // MARK: - IntroductionToPersonas.View
@@ -43,30 +42,7 @@ extension IntroductionToPersonas {
 					}
 					.buttonStyle(.primaryRectangular)
 				}
-				.onAppear { store.send(.view(.appeared)) }
 			}
 		}
 	}
 }
-
-// #if DEBUG
-// import SwiftUI
-import ComposableArchitecture //
-
-//// MARK: - IntroductionToEntity_Preview
-// struct IntroductionToEntity_Preview: PreviewProvider {
-//	static var previews: some View {
-//		NavigationStack {
-//			IntroductionToEntity<Persona>.View(
-//				store: .init(
-//					initialState: .init(),
-//					reducer: IntroductionToEntity.init
-//				)
-//			)
-//			#if os(iOS)
-//			.toolbar(.visible, for: .navigationBar)
-//			#endif
-//		}
-//	}
-// }
-// #endif
