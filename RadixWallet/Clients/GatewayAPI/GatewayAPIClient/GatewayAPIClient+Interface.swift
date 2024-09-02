@@ -1,8 +1,6 @@
 import Algorithms
 import Sargon
 
-public typealias ResourceIdentifier = String
-
 // MARK: - GatewayAPIClient
 public struct GatewayAPIClient: Sendable, DependencyKey {
 	// MARK: Request
@@ -23,6 +21,10 @@ public struct GatewayAPIClient: Sendable, DependencyKey {
 	public var getEntityNonFungibleResourceVaultsPage: GetEntityNonFungibleResourceVaultsPage
 	public var getEntityNonFungibleIdsPage: GetEntityNonFungibleIdsPage
 	public var getNonFungibleData: GetNonFungibleData
+
+	// MARK: Account Lockers
+	public var getAccountLockerTouchedAt: GetAccountLockerTouchedAt
+	public var getAccountLockerVaults: GetAccountLockerVaults
 
 	// MARK: Transaction
 	public var submitTransaction: SubmitTransaction
@@ -50,6 +52,10 @@ extension GatewayAPIClient {
 	public typealias GetEntityNonFungibleResourceVaultsPage = @Sendable (GatewayAPI.StateEntityNonFungibleResourceVaultsPageRequest) async throws -> GatewayAPI.StateEntityNonFungibleResourceVaultsPageResponse
 	public typealias GetEntityNonFungibleIdsPage = @Sendable (GatewayAPI.StateEntityNonFungibleIdsPageRequest) async throws -> GatewayAPI.StateEntityNonFungibleIdsPageResponse
 	public typealias GetNonFungibleData = @Sendable (GatewayAPI.StateNonFungibleDataRequest) async throws -> GatewayAPI.StateNonFungibleDataResponse
+
+	// MARK: - Account Lockers
+	public typealias GetAccountLockerTouchedAt = @Sendable (GatewayAPI.StateAccountLockersTouchedAtRequest) async throws -> GatewayAPI.StateAccountLockersTouchedAtResponse
+	public typealias GetAccountLockerVaults = @Sendable (GatewayAPI.StateAccountLockerPageVaultsRequest) async throws -> GatewayAPI.StateAccountLockerPageVaultsResponse
 
 	// MARK: - Transaction
 	public typealias SubmitTransaction = @Sendable (GatewayAPI.TransactionSubmitRequest) async throws -> GatewayAPI.TransactionSubmitResponse

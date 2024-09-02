@@ -19,7 +19,7 @@ public struct StateEntityDetailsRequest: Codable, Hashable {
 
     public private(set) var atLedgerState: LedgerStateSelector?
     public private(set) var optIns: StateEntityDetailsOptIns?
-    /** limited to max 100 items. */
+    /** limited to max 20 items. */
     public private(set) var addresses: [String]
     public private(set) var aggregationLevel: ResourceAggregationLevel?
 

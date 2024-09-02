@@ -122,4 +122,12 @@ extension AuthorizedDappsClient {
 	public func isDappAuthorized(_ address: DappDefinitionAddress) async -> Bool {
 		await (try? getAuthorizedDapps().contains { $0.id == address }) ?? false
 	}
+
+	public func getAuthorizedDapp(detailed: AuthorizedDappDetailed) async throws -> AuthorizedDapp {
+		let dApps = try await getAuthorizedDapps()
+		guard let dApp = dApps[id: detailed.id] else {
+			throw AuthorizedDappDoesNotExists()
+		}
+		return dApp
+	}
 }

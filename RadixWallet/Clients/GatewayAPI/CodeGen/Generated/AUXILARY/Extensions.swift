@@ -36,7 +36,7 @@ extension Double: JSONEncodable {
     func encodeToJSON() -> Any { self }
 }
 
-extension Foundation.Decimal: JSONEncodable {
+extension Decimal: JSONEncodable {
     func encodeToJSON() -> Any { self }
 }
 
@@ -152,13 +152,13 @@ extension KeyedEncodingContainerProtocol {
         }
     }
 
-    public mutating func encode(_ value: Foundation.Decimal, forKey key: Self.Key) throws {
+    public mutating func encode(_ value: Decimal, forKey key: Self.Key) throws {
         var mutableValue = value
         let stringValue = NSDecimalString(&mutableValue, Locale(identifier: "en_US"))
         try encode(stringValue, forKey: key)
     }
 
-    public mutating func encodeIfPresent(_ value: Foundation.Decimal?, forKey key: Self.Key) throws {
+    public mutating func encodeIfPresent(_ value: Decimal?, forKey key: Self.Key) throws {
         if let value = value {
             try encode(value, forKey: key)
         }
@@ -202,7 +202,7 @@ extension KeyedDecodingContainerProtocol {
         return map
     }
 
-    public func decode(_ type: Foundation.Decimal.Type, forKey key: Self.Key) throws -> Foundation.Decimal {
+    public func decode(_ type: Decimal.Type, forKey key: Self.Key) throws -> Decimal {
         let stringValue = try decode(String.self, forKey: key)
         guard let decimalValue = Decimal(string: stringValue) else {
             let context = DecodingError.Context(codingPath: [key], debugDescription: "The key \(key) couldn't be converted to a Decimal value")
@@ -212,7 +212,7 @@ extension KeyedDecodingContainerProtocol {
         return decimalValue
     }
 
-    public func decodeIfPresent(_ type: Foundation.Decimal.Type, forKey key: Self.Key) throws -> Foundation.Decimal? {
+    public func decodeIfPresent(_ type: Decimal.Type, forKey key: Self.Key) throws -> Decimal? {
         guard let stringValue = try decodeIfPresent(String.self, forKey: key) else {
             return nil
         }

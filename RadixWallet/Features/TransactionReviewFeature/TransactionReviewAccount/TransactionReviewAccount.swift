@@ -59,10 +59,12 @@ public struct TransactionReviewAccount: Sendable, FeatureReducer {
 		public var id: AccountAddress { account.address }
 		public let account: TransactionReview.ReviewAccount
 		public var transfers: IdentifiedArrayOf<TransactionReview.Transfer>
+		public let isDeposit: Bool
 
-		public init(account: TransactionReview.ReviewAccount, transfers: IdentifiedArrayOf<TransactionReview.Transfer>) {
+		public init(account: TransactionReview.ReviewAccount, transfers: IdentifiedArrayOf<TransactionReview.Transfer>, isDeposit: Bool) {
 			self.account = account
 			self.transfers = transfers
+			self.isDeposit = isDeposit
 		}
 	}
 

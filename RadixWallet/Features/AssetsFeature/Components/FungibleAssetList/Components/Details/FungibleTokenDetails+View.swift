@@ -61,13 +61,23 @@ extension FungibleTokenDetails {
 				} thumbnailView: {
 					Thumbnail(token: viewStore.thumbnail.wrappedValue ?? .other(nil), size: .veryLarge)
 				} detailsView: {
-					AssetResourceDetailsSection(viewState: viewStore.details)
-						.padding(.bottom, .medium1)
+					VStack(spacing: .medium1) {
+						AssetResourceDetailsSection(viewState: viewStore.details)
+
+						HideResource.View(store: store.hideResource)
+					}
+					.padding(.bottom, .medium1)
 				}
 				.task { @MainActor in
 					await viewStore.send(.task).finish()
 				}
 			}
 		}
+	}
+}
+
+private extension StoreOf<FungibleTokenDetails> {
+	var hideResource: StoreOf<HideResource> {
+		scope(state: \.hideResource, action: \.child.hideResource)
 	}
 }

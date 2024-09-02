@@ -1,6 +1,7 @@
 import ComposableArchitecture
 import SwiftUI
 
+// MARK: - NonFungibleAssetList.Row
 extension NonFungibleAssetList {
 	public struct Row: Sendable, FeatureReducer {
 		public struct State: Sendable, Hashable, Identifiable {
@@ -63,6 +64,7 @@ extension NonFungibleAssetList {
 		}
 
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
+		@Dependency(\.appPreferencesClient) var appPreferencesClient
 		@Dependency(\.errorQueue) var errorQueue
 
 		public init() {}
