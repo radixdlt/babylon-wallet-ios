@@ -13,12 +13,15 @@ extension AccountLockersClient {
 
 		let claimsPerAccountSubject = AsyncCurrentValueSubject<ClaimsPerAccount>([:])
 
+		let timerInterval: DispatchTimeInterval = .seconds(600) // 10 minutes
+
 		@Sendable
 		func startMonitoring() async throws {
 			let dappValues = await authorizedDappsClient.authorizedDappValues()
 			let accountValues = await accountsClient.accountsOnCurrentNetwork()
+			let timer = AsyncTimerSequence(every: timerInterval)
 
-			for try await (dapps, accounts) in combineLatest(dappValues, accountValues) {
+			for try await (dapps, accounts, _) in combineLatest(dappValues, accountValues, timer) {
 				let dappsWithLockers = try await filterDappsWithAccountLockers(dapps)
 				let lockersPerAccount = getLockersPerAccount(accounts: accounts, dapps: dappsWithLockers)
 				let lockersStatePerAccount = try await getLockersStatePerAccount(lockersPerAccount: lockersPerAccount)
@@ -52,7 +55,6 @@ extension AccountLockersClient {
 				}
 
 				claimsPerAccountSubject.send(claimsPerAccount)
-				print("M- Result: \(claimsPerAccount)")
 			}
 		}
 
