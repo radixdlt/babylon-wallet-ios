@@ -7,6 +7,7 @@ import SwiftUI
 public struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
+	@Dependency(\.accountLockersClient) var accountLockersClient
 	@Dependency(\.errorQueue) var errorQueue
 
 	public typealias Store = StoreOf<Self>
@@ -17,6 +18,7 @@ public struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var dApps: AuthorizedDapps = []
 		public var thumbnails: [AuthorizedDapp.ID: URL] = [:]
+		public var dappsWithClaims: [String] = []
 
 		@PresentationState
 		public var destination: Destination.State? = nil
@@ -32,7 +34,7 @@ public struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 
 	@CasePathable
 	public enum ViewAction: Sendable, Equatable {
-		case appeared
+		case task
 		case didSelectDapp(AuthorizedDapp.ID)
 	}
 
@@ -41,6 +43,7 @@ public struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 		case loadedThumbnail(URL, dApp: AuthorizedDapp.ID)
 		case presentDappDetails(DappDetails.State)
 		case failedToGetDetailsOfDapp(id: AuthorizedDapp.ID)
+		case setDappsWithClaims([String])
 	}
 
 	// MARK: Destination
@@ -78,8 +81,9 @@ public struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .appeared:
+		case .task:
 			loadAuthorizedDapps()
+				.merge(with: accountLockerClaimsEffect())
 
 		case let .didSelectDapp(dAppID):
 			.run { send in
@@ -128,6 +132,10 @@ public struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 		case let .loadedThumbnail(thumbnail, dApp: id):
 			state.thumbnails[id] = thumbnail
 			return .none
+
+		case let .setDappsWithClaims(dappsWithClaims):
+			state.dappsWithClaims = dappsWithClaims
+			return .none
 		}
 	}
 
@@ -151,6 +159,15 @@ public struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 				try await authorizedDappsClient.getAuthorizedDapps()
 			}
 			await send(.internal(.loadedDapps(result)))
+		}
+	}
+
+	private func accountLockerClaimsEffect() -> Effect<Action> {
+		.run { send in
+			for try await dappsWithClaims in await accountLockersClient.dappsWithClaims() {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.setDappsWithClaims(dappsWithClaims)))
+			}
 		}
 	}
 }

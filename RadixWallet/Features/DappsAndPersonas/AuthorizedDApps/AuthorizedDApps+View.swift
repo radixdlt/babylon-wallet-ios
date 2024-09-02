@@ -6,6 +6,7 @@ extension AuthorizedDappsFeature.State {
 		let id: AuthorizedDapp.ID
 		let name: String
 		let thumbnail: URL?
+		let hasClaim: Bool
 	}
 
 	var dAppsDetails: IdentifiedArrayOf<Dapp> {
@@ -13,7 +14,8 @@ extension AuthorizedDappsFeature.State {
 			Dapp(
 				id: $0.id,
 				name: $0.displayName ?? L10n.DAppRequest.Metadata.unknownName,
-				thumbnail: thumbnails[$0.id]
+				thumbnail: thumbnails[$0.id],
+				hasClaim: dappsWithClaims.contains($0.id.address)
 			)
 		}
 		.asIdentified()
@@ -42,8 +44,16 @@ extension AuthorizedDappsFeature {
 								Card {
 									viewStore.send(.view(.didSelectDapp(dApp.id)))
 								} contents: {
-									PlainListRow(context: .dappAndPersona, title: dApp.name) {
-										Thumbnail(.dapp, url: dApp.thumbnail)
+									VStack(alignment: .leading, spacing: .zero) {
+										PlainListRow(context: .dappAndPersona, title: dApp.name) {
+											Thumbnail(.dapp, url: dApp.thumbnail)
+										}
+										if dApp.hasClaim {
+											// FIXME: Strings
+											WarningErrorView(text: "A deposit from this dApp is available. Go to your Accounts to view and claim.", type: .warning, useNarrowSpacing: true)
+												.padding(.horizontal, .medium1)
+												.padding(.bottom, .medium3)
+										}
 									}
 								}
 							}
@@ -52,14 +62,14 @@ extension AuthorizedDappsFeature {
 					}
 					.padding(.vertical, .small1)
 					.padding(.horizontal, .medium3)
-					.onAppear {
-						viewStore.send(.view(.appeared))
-					}
 				}
 				.frame(maxWidth: .infinity, alignment: .leading)
 				.background(.app.gray5)
 				.radixToolbar(title: L10n.AuthorizedDapps.title)
 				.destinations(with: store)
+				.task {
+					viewStore.send(.view(.task))
+				}
 			}
 		}
 	}
