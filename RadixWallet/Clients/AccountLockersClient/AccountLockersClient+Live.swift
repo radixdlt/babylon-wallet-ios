@@ -155,12 +155,11 @@ private extension AuthorizedDapp {
 
 private extension GatewayAPI.AccountLockerVaultCollectionItem {
 	var isValidClaim: Bool {
-		// TODO: Figure out why auto generated models don't have the amount/totalCount on them
-		switch type {
-		case .fungible:
-			true // amount > 0
-		case .nonFungible:
-			true // totalCount > 0
+		switch self {
+		case let .fungible(fungible):
+			Int(fungible.amount) ?? 0 > 0
+		case let .nonFungible(nonFungible):
+			nonFungible.totalCount > 0
 		}
 	}
 }
