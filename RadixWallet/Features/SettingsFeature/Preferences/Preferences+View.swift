@@ -1,8 +1,7 @@
 extension Preferences.State {
 	var viewState: Preferences.ViewState {
 		let isDeveloperModeEnabled = appPreferences?.security.isDeveloperModeEnabled ?? false
-		// FIXME: use `isAdvancedLockEnabled` from appPreferences
-		let isAdvancedLockEnabled = true // appPreferences?.security.isAdvancedLockEnabled ?? false
+		let isAdvancedLockEnabled = appPreferences?.security.isAdvancedLockEnabled ?? false
 		#if DEBUG
 		return .init(
 			isDeveloperModeEnabled: isDeveloperModeEnabled,
@@ -89,7 +88,22 @@ extension Preferences.View {
 
 	@MainActor
 	private func rows(viewStore: ViewStoreOf<Preferences>) -> [SettingsRow<Preferences>.Kind] {
-		[
+		let advancedLockToggle: SettingsRow<Preferences>.Kind? = if #unavailable(iOS 18) {
+			.toggleModel(
+				icon: AssetResource.advancedLock,
+				title: L10n.Preferences.AdvancedLock.title,
+				subtitle: L10n.Preferences.AdvancedLock.subtitle,
+				minHeight: .zero,
+				isOn: viewStore.binding(
+					get: \.isAdvancedLockEnabled,
+					send: { .advancedLockToogled($0) }
+				)
+			)
+		} else {
+			nil
+		}
+
+		return [
 			.separator,
 			.model(
 				title: L10n.Preferences.DepositGuarantees.title,
@@ -104,22 +118,13 @@ extension Preferences.View {
 				icon: .systemImage("eye.fill"),
 				action: .hiddenEntitiesButtonTapped
 			),
-			.toggleModel(
-				icon: AssetResource.advancedLock,
-				title: "Advanced Lock",
-				subtitle: "Re-authenticate when switching between apps",
-				minHeight: .zero,
-				isOn: viewStore.binding(
-					get: \.isAdvancedLockEnabled,
-					send: { .advancedLockToogled($0) }
-				)
-            ),
 			.model(
 				title: L10n.Preferences.HiddenAssets.title,
 				subtitle: L10n.Preferences.HiddenAssets.subtitle,
 				icon: .systemImage("eye.fill"),
 				action: .hiddenAssetsButtonTapped
 			),
+			advancedLockToggle,
 			.header(L10n.Preferences.advancedPreferences),
 			.model(
 				title: L10n.Preferences.gateways,
@@ -136,7 +141,7 @@ extension Preferences.View {
 					send: { .developerModeToogled($0) }
 				)
 			),
-		]
+		].compactMap { $0 }
 	}
 
 	#if DEBUG

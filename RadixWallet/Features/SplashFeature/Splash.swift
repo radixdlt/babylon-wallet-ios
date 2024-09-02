@@ -83,12 +83,15 @@ public struct Splash: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return .run { send in
-				// FIXME: uncomment
-				let isAdvancedLockEnabled = true // await onboardingClient.loadProfile().appPreferences.security.isAdvancedLockEnabled
+				let isAdvancedLockEnabled = await onboardingClient.loadProfile().appPreferences.security.isAdvancedLockEnabled
 
 				// Starting with iOS 18, the system-provided biometric check will be used
 				if #unavailable(iOS 18), isAdvancedLockEnabled {
+					#if targetEnvironment(simulator)
+					await send(.internal(.loadingDataCompleted))
+					#else
 					await send(.internal(.checkBiometrics))
+					#endif
 				} else {
 					await send(.internal(.loadingDataCompleted))
 				}
@@ -103,7 +106,7 @@ public struct Splash: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case .checkBiometrics:
-			return delay().concatenate(with: verifyPasscode()) // TODO: why this delay is needed?
+			return verifyPasscode()
 
 		case let .passcodeConfigResult(result):
 			let config = try? result.value
@@ -188,18 +191,6 @@ public struct Splash: Sendable, FeatureReducer {
 			case .appForegrounded:
 				localAuthenticationClient.setAuthenticatedSuccessfully()
 			}
-		}
-	}
-
-	private func delay() -> Effect<Action> {
-		.run { _ in
-			let durationInMS: Int
-			#if DEBUG
-			durationInMS = 400
-			#else
-			durationInMS = 750
-			#endif
-			try? await clock.sleep(for: .milliseconds(durationInMS))
 		}
 	}
 }

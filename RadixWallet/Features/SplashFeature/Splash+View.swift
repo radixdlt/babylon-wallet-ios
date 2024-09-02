@@ -101,5 +101,6 @@ public struct SplashView: View {
 				.resizable()
 				.scaledToFill()
 		)
+		.edgesIgnoringSafeArea(.all)
 	}
 }
