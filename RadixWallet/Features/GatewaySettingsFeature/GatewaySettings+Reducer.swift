@@ -24,7 +24,6 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case task
 		case addGatewayButtonTapped
-		case popoverButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -44,7 +43,6 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		public enum State: Sendable, Hashable {
 			case addNewGateway(AddNewGateway.State)
 			case createAccount(CreateAccountCoordinator.State)
-			case slideUpPanel(SlideUpPanel.State)
 			case removeGateway(AlertState<Action.RemoveGatewayAlert>)
 		}
 
@@ -52,7 +50,6 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		public enum Action: Sendable, Equatable {
 			case addNewGateway(AddNewGateway.Action)
 			case createAccount(CreateAccountCoordinator.Action)
-			case slideUpPanel(SlideUpPanel.Action)
 			case removeGateway(RemoveGatewayAlert)
 
 			public enum RemoveGatewayAlert: Sendable, Hashable {
@@ -67,9 +64,6 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 			}
 			Scope(state: \.createAccount, action: \.createAccount) {
 				CreateAccountCoordinator()
-			}
-			Scope(state: \.slideUpPanel, action: \.slideUpPanel) {
-				SlideUpPanel()
 			}
 		}
 	}
@@ -115,17 +109,6 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 
 		case .addGatewayButtonTapped:
 			state.destination = .addNewGateway(AddNewGateway.State())
-			return .none
-
-		case .popoverButtonTapped:
-//			state.destination = .slideUpPanel(
-//				.init(
-//					title: L10n.Gateways.WhatIsAGateway.title,
-//					explanation: L10n.Gateways.WhatIsAGateway.explanation
-//				)
-//			)
-			// FIXME: display what is a gateway once we have copy
-			loggerGlobal.warning("What is A gateway tutorial slide up panel skipped, since no copy.")
 			return .none
 		}
 	}
@@ -235,10 +218,6 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 				}
 				await send(.internal(.switchToGatewayResult(result)))
 			}
-
-		case .slideUpPanel(.delegate(.dismiss)):
-			state.destination = nil
-			return .none
 
 		case let .removeGateway(removeGatewayAction):
 			switch removeGatewayAction {

@@ -12,7 +12,7 @@ public struct InfoButtonStyle: ButtonStyle {
 			configuration.label
 				.textStyle(.body1StandaloneLink)
 		} icon: {
-			Image(asset: AssetResource.info)
+			Image(.info)
 		}
 		.labelStyle(.titleAndIcon)
 		.foregroundColor(.app.blue2)

@@ -1,4 +1,3 @@
-import ComposableArchitecture
 import SwiftUI
 
 // MARK: - IntroductionToPersonas.View
@@ -23,11 +22,7 @@ extension IntroductionToPersonas {
 							.foregroundColor(.app.gray1)
 							.textStyle(.sheetTitle)
 
-						//    FIXME: Uncomment and implement
-						//    Button(L10n.CreatePersona.Introduction.learnAboutPersonas) {
-						//        viewStore.send(.showTutorial)
-						//    }
-						//    .buttonStyle(.info)
+						InfoButton(.personas, label: L10n.CreatePersona.Introduction.learnAboutPersonas)
 
 						Text(L10n.CreatePersona.Introduction.subtitle1)
 							.font(.app.body1Regular)
@@ -47,42 +42,7 @@ extension IntroductionToPersonas {
 					}
 					.buttonStyle(.primaryRectangular)
 				}
-				.onAppear { store.send(.view(.appeared)) }
-				.destinations(with: store)
 			}
 		}
 	}
 }
-
-@MainActor
-private extension View {
-	func destinations(with store: StoreOf<IntroductionToPersonas>) -> some View {
-		let slideUpStore = store.scope(state: \.$infoPanel) { .child(.infoPanel($0)) }
-		return sheet(
-			store: slideUpStore,
-			content: { SlideUpPanel.View(store: $0) }
-		)
-	}
-}
-
-// #if DEBUG
-// import SwiftUI
-import ComposableArchitecture //
-
-//// MARK: - IntroductionToEntity_Preview
-// struct IntroductionToEntity_Preview: PreviewProvider {
-//	static var previews: some View {
-//		NavigationStack {
-//			IntroductionToEntity<Persona>.View(
-//				store: .init(
-//					initialState: .init(),
-//					reducer: IntroductionToEntity.init
-//				)
-//			)
-//			#if os(iOS)
-//			.toolbar(.visible, for: .navigationBar)
-//			#endif
-//		}
-//	}
-// }
-// #endif
