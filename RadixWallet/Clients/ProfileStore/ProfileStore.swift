@@ -53,15 +53,30 @@ public final actor ProfileStore {
 	/// device model and name is async.
 	private var deviceInfo: DeviceInfo
 
-	let profile: BufferSub
+	private let profileSubject: AsyncReplaySubject<Profile> = .init(bufferSize: 1)
+	private let profileStateSubject: AsyncReplaySubject<ProfileState> = .init(bufferSize: 1)
 
 	init() {
 		let metaDeviceInfo = Self._deviceInfo()
 		self.deviceInfo = metaDeviceInfo.deviceInfo
+
+		Task {
+			for await state in await ProfileStateChangeEventPublisher.shared.eventStream() {
+				if case let .loaded(profile) = state {
+					profileSubject.send(profile)
+				}
+
+				profileStateSubject.send(state)
+			}
+		}
 	}
 }
 
 extension ProfileStore {
+	func profile() async -> Profile {
+		profileSubject.first()
+	}
+
 	func profileSequence() async -> AnyAsyncSequence<Profile> {
 		await profileState().compactMap { state in
 			switch state {
@@ -72,6 +87,10 @@ extension ProfileStore {
 			}
 		}
 		.eraseToAnyAsyncSequence()
+	}
+
+	func profile() async throws -> Profile {
+		try await profileSequence()
 	}
 
 	func profileState() async -> AnyAsyncSequence<ProfileState> {

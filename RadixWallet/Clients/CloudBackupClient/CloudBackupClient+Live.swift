@@ -209,7 +209,7 @@ extension CloudBackupClient {
 			},
 			startAutomaticBackups: {
 				// The active profile should not be synced to iCloud keychain
-				let profileID = await profileStore.profile.id
+				let profileID = await profileStore.profile().id
 				try secureStorageClient.disableCloudProfileSync(profileID)
 
 				let ticks = AsyncTimerSequence(every: retryBackupInterval)
@@ -234,7 +234,7 @@ extension CloudBackupClient {
 				}
 			},
 			migrateProfilesFromKeychain: {
-				let activeProfile = await profileStore.profile.id
+				let activeProfile = try await profileStore.profile().id
 				guard let headerList = try secureStorageClient.loadProfileHeaderList() else { return [] }
 
 				let previouslyMigrated = userDefaults.getMigratedKeychainProfiles
@@ -270,7 +270,7 @@ extension CloudBackupClient {
 				return migrated
 			},
 			deleteProfileBackup: { optionalID in
-				let activeProfileID = await profileStore.profile.id
+				let activeProfileID = try await profileStore.profile().id
 				let id = optionalID ?? activeProfileID
 				try await container.privateCloudDatabase.deleteRecord(withID: .init(recordName: id.uuidString))
 				try userDefaults.removeLastCloudBackup(for: id)

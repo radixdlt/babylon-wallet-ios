@@ -10,7 +10,7 @@ extension FactorSourcesClient: DependencyKey {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 
 		let getFactorSources: GetFactorSources = {
-			await profileStore.profile.factorSources.asIdentified()
+			await profileStore.profile().factorSources.asIdentified()
 		}
 
 		let saveFactorSource: SaveFactorSource = { source in

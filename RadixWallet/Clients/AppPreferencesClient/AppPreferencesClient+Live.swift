@@ -8,7 +8,7 @@ extension AppPreferencesClient: DependencyKey {
 			appPreferenceUpdates: {
 				await profileStore.appPreferencesValues()
 			},
-			getPreferences: { await profileStore.profile.appPreferences },
+			getPreferences: { await profileStore.profileSequence().first().appPreferences },
 			updatePreferences: { newPreferences in
 				try await profileStore.updating {
 					$0.appPreferences = newPreferences

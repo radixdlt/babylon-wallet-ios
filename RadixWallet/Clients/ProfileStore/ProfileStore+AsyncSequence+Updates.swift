@@ -4,7 +4,7 @@
 extension ProfileStore {
 	/// The current network if any
 	public func network() throws -> ProfileNetwork {
-		try profile.network(id: profile.networkID)
+		try profile().network(id: profile.networkID)
 	}
 
 	/// A multicasting replaying AsyncSequence of distinct Profile.
