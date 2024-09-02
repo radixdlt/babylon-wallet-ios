@@ -10,7 +10,7 @@ public struct EntitySecurityProblemsView: SwiftUI.View {
 					Button(action: action) {
 						switch config.kind {
 						case .account:
-							account(problem: problem)
+							AccountBannerView(kind: .securityProblem(message: problem.accountCard))
 						case .persona:
 							WarningErrorView(text: problem.personas, type: .warning, useNarrowSpacing: true)
 								.frame(maxWidth: .infinity, alignment: .leading)
@@ -20,25 +20,6 @@ public struct EntitySecurityProblemsView: SwiftUI.View {
 				}
 			}
 		}
-	}
-
-	private func account(problem: SecurityProblem) -> some SwiftUI.View {
-		HStack(spacing: .zero) {
-			Image(.error)
-				.resizable()
-				.frame(width: .medium3, height: .medium3)
-
-			Text(problem.accountCard)
-				.textStyle(.body2HighImportance)
-				.padding(.leading, .small2)
-				.multilineTextAlignment(.leading)
-
-			Spacer()
-		}
-		.foregroundColor(.app.white)
-		.padding(.small1)
-		.background(.app.whiteTransparent2)
-		.cornerRadius(.small2)
 	}
 }
 

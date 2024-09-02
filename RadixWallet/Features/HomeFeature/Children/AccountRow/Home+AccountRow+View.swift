@@ -103,14 +103,16 @@ extension Home.AccountRow {
 					VStack(spacing: .small1) {
 						ownedResourcesList(viewStore)
 
-						EntitySecurityProblemsView(config: viewStore.securityProblemsConfig) {
-							viewStore.send(.securityProblemsTapped)
-						}
+						VStack(spacing: .small2) {
+							EntitySecurityProblemsView(config: viewStore.securityProblemsConfig) {
+								viewStore.send(.securityProblemsTapped)
+							}
 
-						ForEachStatic(viewStore.accountLockerClaims) { claim in
-							Text("You have \(claim.claims.count) claims for \(claim.dappName ?? L10n.DAppRequest.Metadata.unknownName)")
-								.textStyle(.body1Regular)
-								.foregroundStyle(.app.white)
+							ForEachStatic(viewStore.accountLockerClaims) { claim in
+								Button {} label: {
+									AccountBannerView(kind: .lockerClaim(dappName: claim.dappName))
+								}
+							}
 						}
 					}
 					.padding(.top, .medium1)

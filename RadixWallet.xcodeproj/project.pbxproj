@@ -729,6 +729,7 @@
 		5B3C48B52C80D11E00DB160D /* AccountLockersClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3C48B42C80D11E00DB160D /* AccountLockersClient+Interface.swift */; };
 		5B3C48B72C80D17E00DB160D /* AccountLockersClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3C48B62C80D17E00DB160D /* AccountLockersClient+Live.swift */; };
 		5B3C48B92C80D23F00DB160D /* AccountLockersClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3C48B82C80D23F00DB160D /* AccountLockersClient+Test.swift */; };
+		5B3C48C12C85CEAA00DB160D /* AccountBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3C48C02C85CEAA00DB160D /* AccountBannerView.swift */; };
 		5B43B08B2BDAAD4B00AA1E92 /* AddressDetails+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B43B0892BDAAD4B00AA1E92 /* AddressDetails+View.swift */; };
 		5B43B08C2BDAAD4B00AA1E92 /* AddressDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B43B08A2BDAAD4B00AA1E92 /* AddressDetails.swift */; };
 		5B45E2FA2BC45770007C4C84 /* FactorSourceAccess+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B45E2F82BC45770007C4C84 /* FactorSourceAccess+View.swift */; };
@@ -1929,6 +1930,7 @@
 		5B3C48B42C80D11E00DB160D /* AccountLockersClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountLockersClient+Interface.swift"; sourceTree = "<group>"; };
 		5B3C48B62C80D17E00DB160D /* AccountLockersClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountLockersClient+Live.swift"; sourceTree = "<group>"; };
 		5B3C48B82C80D23F00DB160D /* AccountLockersClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountLockersClient+Test.swift"; sourceTree = "<group>"; };
+		5B3C48C02C85CEAA00DB160D /* AccountBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountBannerView.swift; sourceTree = "<group>"; };
 		5B43B0892BDAAD4B00AA1E92 /* AddressDetails+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddressDetails+View.swift"; sourceTree = "<group>"; };
 		5B43B08A2BDAAD4B00AA1E92 /* AddressDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressDetails.swift; sourceTree = "<group>"; };
 		5B45E2F82BC45770007C4C84 /* FactorSourceAccess+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactorSourceAccess+View.swift"; sourceTree = "<group>"; };
@@ -4898,6 +4900,7 @@
 				A4CFB5602BAA826E00778BDD /* Measure+Position.swift */,
 				E7B7A0FC2BBBFB6100EEE900 /* HeaderListViewContainer.swift */,
 				5B77D7B12C0DFE8300F5F215 /* EntitySecurityProblemsView.swift */,
+				5B3C48C02C85CEAA00DB160D /* AccountBannerView.swift */,
 			);
 			path = DesignSystem;
 			sourceTree = "<group>";
@@ -8013,6 +8016,7 @@
 				48CFC3FE2ADC10D900E77A5C /* RTCDataChannel+Delegate.swift in Sources */,
 				48CFC2FD2ADC10D900E77A5C /* DefaultDepositGuarantees+View.swift in Sources */,
 				48CFC5E02ADC10DA00E77A5C /* LoadableView.swift in Sources */,
+				5B3C48C12C85CEAA00DB160D /* AccountBannerView.swift in Sources */,
 				48CFC6012ADC10DA00E77A5C /* P2P+ConnectorExtension+Request.swift in Sources */,
 				A40815832C7E0D08005E65B9 /* InvalidRequestError.swift in Sources */,
 				48CFC5C22ADC10DA00E77A5C /* Shapes.swift in Sources */,

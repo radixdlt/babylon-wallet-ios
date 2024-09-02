@@ -1,0 +1,53 @@
+import SwiftUI
+
+// MARK: - AccountBannerView
+struct AccountBannerView: View {
+	let kind: Kind
+
+	var body: some View {
+		HStack(spacing: .zero) {
+			image
+				.resizable()
+				.frame(width: .medium3, height: .medium3)
+
+			Text(text)
+				.textStyle(.body2HighImportance)
+				.padding(.leading, .small2)
+				.multilineTextAlignment(.leading)
+
+			Spacer()
+		}
+		.foregroundColor(.app.white)
+		.padding(.small1)
+		.background(.app.whiteTransparent2)
+		.cornerRadius(.small2)
+	}
+
+	private var image: Image {
+		switch kind {
+		case .securityProblem:
+			Image(.error)
+
+		case .lockerClaim:
+			Image(systemName: "bell")
+		}
+	}
+
+	private var text: String {
+		switch kind {
+		case let .securityProblem(message):
+			message
+		case let .lockerClaim(dappName):
+			// FIXME: Strings
+			"\(dappName ?? L10n.DAppRequest.Metadata.unknownName) has a deposit for you to claim"
+		}
+	}
+}
+
+// MARK: AccountBannerView.Kind
+extension AccountBannerView {
+	enum Kind: Sendable, Hashable {
+		case securityProblem(message: String)
+		case lockerClaim(dappName: String?)
+	}
+}
