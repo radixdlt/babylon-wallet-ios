@@ -97,6 +97,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case fungibleTapped(ResourceAddress)
 		case nonFungibleTapped(ResourceAddress)
 		case dAppTapped(DappDefinitionAddress)
+		case depositsVisibleToggled(Bool)
 		case forgetThisDappTapped
 	}
 
@@ -218,6 +219,17 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case let .dAppTapped(address):
 			state.destination = .dappDetails(.init(dAppDefinitionAddress: address))
 			return .none
+
+		case let .depositsVisibleToggled(isVisible):
+			state.authorizedDapp?.showDeposits(isVisible)
+			guard let detailed = state.authorizedDapp else {
+				return .none
+			}
+			return .run { _ in
+				var dapp = try await authorizedDappsClient.getAuthorizedDapp(detailed: detailed)
+				dapp.showDeposits(isVisible)
+				try await authorizedDappsClient.updateAuthorizedDapp(dapp)
+			}
 
 		case .forgetThisDappTapped:
 			state.destination = .confirmDisconnectAlert(.confirmDisconnect)

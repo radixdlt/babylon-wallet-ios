@@ -97,6 +97,7 @@ extension Preferences.View {
 				icon: .asset(AssetResource.depositGuarantees),
 				action: .depositGuaranteesButtonTapped
 			),
+			.header(L10n.Preferences.displayPreferences),
 			.model(
 				title: L10n.Preferences.HiddenEntities.title,
 				subtitle: L10n.Preferences.HiddenEntities.subtitle,
@@ -112,6 +113,12 @@ extension Preferences.View {
 					get: \.isAdvancedLockEnabled,
 					send: { .advancedLockToogled($0) }
 				)
+            ),
+			.model(
+				title: L10n.Preferences.HiddenAssets.title,
+				subtitle: L10n.Preferences.HiddenAssets.subtitle,
+				icon: .systemImage("eye.fill"),
+				action: .hiddenAssetsButtonTapped
 			),
 			.header(L10n.Preferences.advancedPreferences),
 			.model(
@@ -166,33 +173,31 @@ private extension View {
 		let destinationStore = store.destination
 		return depositGuarantees(with: destinationStore)
 			.hiddenEntities(with: destinationStore)
+			.hiddenAssets(with: destinationStore)
 			.gateways(with: destinationStore)
 	}
 
 	private func depositGuarantees(with destinationStore: PresentationStoreOf<Preferences.Destination>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /Preferences.Destination.State.depositGuarantees,
-			action: Preferences.Destination.Action.depositGuarantees,
-			destination: { DefaultDepositGuarantees.View(store: $0) }
-		)
+		navigationDestination(store: destinationStore.scope(state: \.depositGuarantees, action: \.depositGuarantees)) {
+			DefaultDepositGuarantees.View(store: $0)
+		}
 	}
 
 	private func hiddenEntities(with destinationStore: PresentationStoreOf<Preferences.Destination>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /Preferences.Destination.State.hiddenEntities,
-			action: Preferences.Destination.Action.hiddenEntities,
-			destination: { AccountAndPersonaHiding.View(store: $0) }
-		)
+		navigationDestination(store: destinationStore.scope(state: \.hiddenEntities, action: \.hiddenEntities)) {
+			HiddenEntities.View(store: $0)
+		}
+	}
+
+	private func hiddenAssets(with destinationStore: PresentationStoreOf<Preferences.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.hiddenAssets, action: \.hiddenAssets)) {
+			HiddenAssets.View(store: $0)
+		}
 	}
 
 	private func gateways(with destinationStore: PresentationStoreOf<Preferences.Destination>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /Preferences.Destination.State.gateways,
-			action: Preferences.Destination.Action.gateways,
-			destination: { GatewaySettings.View(store: $0) }
-		)
+		navigationDestination(store: destinationStore.scope(state: \.gateways, action: \.gateways)) {
+			GatewaySettings.View(store: $0)
+		}
 	}
 }

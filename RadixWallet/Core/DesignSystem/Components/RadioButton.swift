@@ -3,7 +3,6 @@ public struct RadioButton: View {
 	public enum State {
 		case unselected
 		case selected
-		case disabled
 	}
 
 	public enum Appearance {
@@ -12,32 +11,39 @@ public struct RadioButton: View {
 	}
 
 	public let appearance: Appearance
-	public var state: State
+	public let state: State
+	public let isDisabled: Bool
 
 	public init(
 		appearance: Appearance,
-		state: State
+		state: State,
+		disabled: Bool = false
 	) {
 		self.appearance = appearance
 		self.state = state
+		self.isDisabled = disabled
 	}
 }
 
 extension RadioButton {
 	public var body: some View {
-		let resource: ImageAsset = switch (appearance, state) {
-		case (.light, .unselected):
+		let resource: ImageAsset = switch (appearance, state, isDisabled) {
+		case (.light, .unselected, false):
 			AssetResource.radioButtonLightUnselected
-		case (.light, .selected):
+		case (.light, .selected, false):
 			AssetResource.radioButtonLightSelected
-		case (.light, .disabled):
+		case (.light, .selected, true):
 			AssetResource.radioButtonLightDisabled
-		case (.dark, .unselected):
+		case (.light, .unselected, true):
+			AssetResource.radioButtonLightDisabledUnselected
+		case (.dark, .unselected, false):
 			AssetResource.radioButtonDarkUnselected
-		case (.dark, .selected):
+		case (.dark, .selected, false):
 			AssetResource.radioButtonDarkSelected
-		case (.dark, .disabled):
+		case (.dark, .selected, true):
 			AssetResource.radioButtonDarkDisabled
+		case (.dark, .unselected, true):
+			AssetResource.radioButtonDarkDisabledUnselected
 		}
 
 		return Image(asset: resource)

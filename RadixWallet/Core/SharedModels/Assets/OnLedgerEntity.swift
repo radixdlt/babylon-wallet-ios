@@ -384,7 +384,7 @@ extension OnLedgerEntity {
 		public let resourceAddress: ResourceAddress
 		public let atLedgerState: AtLedgerState
 		public let metadata: Metadata
-		public let nonFungibleIdsCount: Int
+		public var nonFungibleIdsCount: Int
 		/// The vault where the owned ids are stored
 		public let vaultAddress: VaultAddress
 
@@ -519,7 +519,7 @@ extension OnLedgerEntity {
 extension OnLedgerEntity.OnLedgerAccount {
 	public struct PoolUnitResources: Sendable, Hashable, Codable {
 		public var radixNetworkStakes: IdentifiedArrayOf<RadixNetworkStake>
-		public let poolUnits: [PoolUnit]
+		public var poolUnits: [PoolUnit]
 	}
 
 	public struct RadixNetworkStake: Sendable, Hashable, Codable, Identifiable, CustomDebugStringConvertible {

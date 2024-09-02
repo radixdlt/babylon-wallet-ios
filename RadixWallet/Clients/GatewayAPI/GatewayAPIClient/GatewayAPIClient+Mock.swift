@@ -14,10 +14,13 @@ extension GatewayAPIClient: TestDependencyKey {
 		getEntityNonFungibleResourceVaultsPage: unimplemented("\(Self.self).getEntityNonFungibleResourceVaultsPage"),
 		getEntityNonFungibleIdsPage: unimplemented("\(Self.self).getEntityNonFungibleIdsPage"),
 		getNonFungibleData: unimplemented("\(Self.self).getNonFungibleData"),
+		getAccountLockerTouchedAt: unimplemented("\(Self.self).getAccountLockerTouchedAt"),
+		getAccountLockerVaults: unimplemented("\(Self.self).GetAccountLockerVaults"),
 		submitTransaction: unimplemented("\(Self.self).submitTransaction"),
 		transactionStatus: unimplemented("\(Self.self).transactionStatus"),
 		transactionPreview: unimplemented("\(Self.self).transactionPreview"),
-		streamTransactions: unimplemented("\(Self.self).streamTransactions")
+		streamTransactions: unimplemented("\(Self.self).streamTransactions"),
+		prevalidateDeposit: unimplemented("\(Self.self).prevalidateDeposit")
 	)
 
 	// TODO: convert to noop, don't use in tests.
@@ -39,6 +42,8 @@ extension GatewayAPIClient: TestDependencyKey {
 			getEntityNonFungibleResourceVaultsPage: unimplemented("\(self).getEntityNonFungibleResourceVaultsPage"),
 			getEntityNonFungibleIdsPage: unimplemented("\(self).getEntityNonFungibleIdsPage"),
 			getNonFungibleData: unimplemented("\(self).getNonFungibleData"),
+			getAccountLockerTouchedAt: unimplemented("\(Self.self).getAccountLockerTouchedAt"),
+			getAccountLockerVaults: unimplemented("\(Self.self).GetAccountLockerVaults"),
 			submitTransaction: { _ in
 				.init(duplicate: submittedTXIsDoubleSpend)
 			},
@@ -53,7 +58,8 @@ extension GatewayAPIClient: TestDependencyKey {
 				)
 			},
 			transactionPreview: unimplemented("\(self).transactionPreview"),
-			streamTransactions: unimplemented("\(self).streamTransactions")
+			streamTransactions: unimplemented("\(self).streamTransactions"),
+			prevalidateDeposit: unimplemented("\(Self.self).prevalidateDeposit")
 		)
 	}
 }

@@ -46,7 +46,13 @@ final class CustomizeFeePayerTests: TestCase {
 		let selectedFeePayer = FeePayerCandidate(account: .previewValue1, xrdBalance: 20)
 
 		await sut.send(.view(.changeFeePayerTapped)) {
-			$0.destination = .selectFeePayer(.init(feePayer: nil, transactionFee: .nonContingentLockPaying))
+			$0.destination = .selectFeePayer(
+				.init(
+					reviewedTransaction: transactionStub,
+					selectedFeePayer: nil,
+					transactionFee: .nonContingentLockPaying
+				)
+			)
 		}
 		await sut.send(.destination(.presented(.selectFeePayer(.delegate(.selected(selectedFeePayer)))))) {
 			$0.destination = nil

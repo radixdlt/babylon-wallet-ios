@@ -45,6 +45,7 @@ rm ../Generated/MetadataTypedValue.swift
 rm ../Generated/PublicKeyHash.swift
 rm ../Generated/GatewayError.swift
 rm ../Generated/ProgrammaticScryptoSborValue.swift
+rm ../Generated/AccountLockerVaultCollectionItem.swift
 
 cd $OUTPUTDIR
 find $PROJECT_NAME -type f -not -name 'Configuration.swift' -delete

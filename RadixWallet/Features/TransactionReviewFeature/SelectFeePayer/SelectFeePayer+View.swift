@@ -2,34 +2,24 @@ import ComposableArchitecture
 import SwiftUI
 
 extension SelectFeePayer.State {
-	var viewState: SelectFeePayer.ViewState {
-		.init(
-			feePayerCandidates: feePayerCandidates.rawValue,
-			fee: transactionFee.totalFee.displayedTotalFee,
-			selectedPayer: feePayer
-		)
+	var feeString: String {
+		transactionFee.totalFee.displayedTotalFee
+	}
+
+	var selectButtonControlState: ControlState {
+		switch feePayerCandidates {
+		case .idle, .loading:
+			.loading(.local)
+		case .success:
+			.enabled
+		case .failure:
+			.disabled
+		}
 	}
 }
 
 // MARK: - SelectFeePayer.View
 extension SelectFeePayer {
-	public struct ViewState: Equatable {
-		let feePayerCandidates: Loadable<IdentifiedArrayOf<FeePayerCandidate>>
-		let fee: String
-		let selectedPayer: FeePayerCandidate?
-
-		var selectButtonControlState: ControlState {
-			switch feePayerCandidates {
-			case .idle, .loading:
-				.loading(.local)
-			case .success:
-				.enabled
-			case .failure:
-				.disabled
-			}
-		}
-	}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<SelectFeePayer>
@@ -39,7 +29,7 @@ extension SelectFeePayer {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				VStack {
 					Text(L10n.CustomizeNetworkFees.SelectFeePayer.navigationTitle)
 						.multilineTextAlignment(.center)
@@ -48,7 +38,7 @@ extension SelectFeePayer {
 						.padding(.horizontal, .medium1)
 						.padding(.bottom, .small2)
 
-					Text(L10n.CustomizeNetworkFees.SelectFeePayer.subtitle(viewStore.fee))
+					Text(L10n.CustomizeNetworkFees.SelectFeePayer.subtitle(viewStore.feeString))
 						.multilineTextAlignment(.center)
 						.textStyle(.body1HighImportance)
 						.foregroundColor(.app.gray2)
@@ -63,8 +53,8 @@ extension SelectFeePayer {
 								VStack(spacing: .small1) {
 									Selection(
 										viewStore.binding(
-											get: \.selectedPayer,
-											send: { .selectedPayer($0) }
+											get: \.selectedFeePayer,
+											send: { .selectedFeePayer($0) }
 										),
 										from: candidates
 									) { item in
@@ -79,7 +69,7 @@ extension SelectFeePayer {
 								.padding(.horizontal, .medium1)
 								.padding(.bottom, .medium2)
 								.onFirstAppear {
-									proxy.scrollTo(viewStore.selectedPayer?.id, anchor: .center)
+									proxy.scrollTo(viewStore.selectedFeePayer?.id, anchor: .center)
 								}
 							}
 						}
@@ -93,8 +83,8 @@ extension SelectFeePayer {
 				}
 				.footer {
 					WithControlRequirements(
-						viewStore.selectedPayer,
-						forAction: { viewStore.send(.confirmedFeePayer($0)) }
+						viewStore.selectedFeePayer,
+						forAction: { viewStore.send(.confirmedFeePayer($0.candidate)) }
 					) { action in
 						Button(L10n.CustomizeNetworkFees.SelectFeePayer.selectAccountButtonTitle, action: action)
 							.buttonStyle(.primaryRectangular)
@@ -114,10 +104,12 @@ enum SelectAccountToPayForFeeRow {
 	struct ViewState: Equatable {
 		let account: Account
 		let fungible: ResourceBalance.ViewState.Fungible
+		let isBalanceInsufficient: Bool
 
-		init(candidate: FeePayerCandidate) {
-			self.account = candidate.account
-			self.fungible = .xrd(balance: .init(nominalAmount: candidate.xrdBalance), network: account.networkID)
+		init(candidate: ValidatedFeePayerCandidate) {
+			self.account = candidate.candidate.account
+			self.fungible = .xrd(balance: .init(nominalAmount: candidate.candidate.xrdBalance), network: account.networkID)
+			self.isBalanceInsufficient = candidate.outcome == .insufficientBalance
 		}
 	}
 
@@ -127,22 +119,36 @@ enum SelectAccountToPayForFeeRow {
 		let isSelected: Bool
 		let action: () -> Void
 
+		var buttonState: RadioButton.State {
+			isSelected ? .selected : .unselected
+		}
+
+		var isDisabled: Bool {
+			viewState.isBalanceInsufficient
+		}
+
 		var body: some SwiftUI.View {
 			Button(action: action) {
 				Card {
-					VStack(spacing: .zero) {
+					VStack(alignment: .leading, spacing: .zero) {
 						AccountCard(kind: .innerCompact, account: viewState.account)
 
 						HStack {
 							ResourceBalanceView(.fungible(viewState.fungible), appearance: .compact)
 
-							RadioButton(appearance: .dark, state: isSelected ? .selected : .unselected)
+							RadioButton(appearance: .dark, state: buttonState, disabled: isDisabled)
 						}
 						.padding(.medium3)
+
+						if viewState.isBalanceInsufficient {
+							WarningErrorView(text: L10n.TransactionReview.FeePayerValidation.insufficientBalance, type: .error)
+								.padding([.horizontal, .bottom], .medium3)
+						}
 					}
 				}
 			}
 			.buttonStyle(.inert)
+			.disabled(isDisabled)
 		}
 	}
 }

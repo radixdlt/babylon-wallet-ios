@@ -130,6 +130,11 @@ extension AccountCard.Kind {
 	static var innerCompact: Self {
 		.compact(addCornerRadius: false)
 	}
+
+	/// Behaves same way as `.selection` but it is never selected.
+	static var hiddenEntity: Self {
+		.selection(isSelected: false)
+	}
 }
 
 private extension AccountCard.Kind {

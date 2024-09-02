@@ -153,7 +153,7 @@ private extension View {
 
 	private func hideAccount(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>, store: StoreOf<AccountPreferences>) -> some View {
 		sheet(store: destinationStore.scope(state: \.hideAccount, action: \.hideAccount)) { _ in
-			HideAccountView { action in
+			ConfirmationView(kind: .hideAccount) { action in
 				store.send(.destination(.presented(.hideAccount(action))))
 			}
 		}

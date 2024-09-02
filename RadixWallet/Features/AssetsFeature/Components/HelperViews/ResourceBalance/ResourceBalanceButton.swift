@@ -5,6 +5,7 @@ public struct ResourceBalanceButton: View {
 	public let viewState: ResourceBalance.ViewState
 	public let appearance: Appearance
 	public let isSelected: Bool?
+	public let warning: String?
 	public let onTap: () -> Void
 
 	public enum Appearance {
@@ -12,23 +13,34 @@ public struct ResourceBalanceButton: View {
 		case transactionReview
 	}
 
-	init(_ viewState: ResourceBalance.ViewState, appearance: Appearance, isSelected: Bool? = nil, onTap: @escaping () -> Void) {
+	init(
+		_ viewState: ResourceBalance.ViewState,
+		appearance: Appearance,
+		isSelected: Bool? = nil,
+		warning: String? = nil,
+		onTap: @escaping () -> Void
+	) {
 		self.viewState = viewState
 		self.appearance = appearance
 		self.isSelected = isSelected
+		self.warning = warning
 		self.onTap = onTap
 	}
 
 	public var body: some View {
-		HStack(alignment: .center, spacing: .small2) {
-			Button(action: onTap) {
+		Button(action: onTap) {
+			VStack(alignment: .leading, spacing: .small2) {
 				ResourceBalanceView(viewState, appearance: .standard, isSelected: isSelected)
-					.padding(.top, topPadding)
-					.padding(.bottom, bottomPadding)
-					.padding(.horizontal, horizontalSpacing)
-					.contentShape(Rectangle())
-					.background(background)
+
+				if let warning {
+					WarningErrorView(text: warning, type: .warning, useNarrowSpacing: true)
+				}
 			}
+			.padding(.top, topPadding)
+			.padding(.horizontal, horizontalSpacing)
+			.padding(.bottom, bottomPadding)
+			.contentShape(Rectangle())
+			.background(background)
 		}
 	}
 

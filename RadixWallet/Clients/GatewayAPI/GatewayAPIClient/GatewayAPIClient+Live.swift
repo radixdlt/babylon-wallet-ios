@@ -196,6 +196,16 @@ extension GatewayAPIClient {
 					request: request
 				) { $0.appendingPathComponent("state/non-fungible/data") }
 			},
+			getAccountLockerTouchedAt: { request in
+				try await post(
+					request: request
+				) { $0.appendingPathComponent("/state/account-lockers/touched-at") }
+			},
+			getAccountLockerVaults: { request in
+				try await post(
+					request: request
+				) { $0.appendingPathComponent("/state/account-locker/page/vaults") }
+			},
 			submitTransaction: { transactionSubmitRequest in
 				try await post(
 					request: transactionSubmitRequest
@@ -216,6 +226,11 @@ extension GatewayAPIClient {
 					request: streamTransactionsRequest,
 					dateEncodingStrategy: .iso8601
 				) { $0.appendingPathComponent("stream/transactions") }
+			},
+			prevalidateDeposit: { prevalidateDepositRequest in
+				try await post(
+					request: prevalidateDepositRequest
+				) { $0.appendingPathComponent("transaction/account-deposit-pre-validation") }
 			}
 		)
 	}

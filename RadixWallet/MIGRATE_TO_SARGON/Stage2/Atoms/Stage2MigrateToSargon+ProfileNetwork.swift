@@ -55,17 +55,21 @@ extension ProfileNetwork {
 		accounts = identified.elements
 	}
 
-	public mutating func hideAccounts(ids idsOfAccountsToHide: Set<Account.ID>) {
+	public mutating func hideAccount(id: Account.ID) {
 		var identified = accounts.asIdentified()
-		for id in idsOfAccountsToHide {
-			identified[id: id]?.hide()
-			authorizedDapps.mutateAll { dapp in
-				dapp.referencesToAuthorizedPersonas.mutateAll { persona in
-					persona.sharedAccounts?.ids.removeAll(where: { $0 == id })
-				}
+		identified[id: id]?.hide()
+		authorizedDapps.mutateAll { dapp in
+			dapp.referencesToAuthorizedPersonas.mutateAll { persona in
+				persona.sharedAccounts?.ids.removeAll(where: { $0 == id })
 			}
 		}
 		accounts = identified.elements
+	}
+
+	public mutating func unhideAccount(id: Account.ID) {
+		var identifiedAccounts = accounts.asIdentified()
+		identifiedAccounts[id: id]?.unhide()
+		accounts = identifiedAccounts.elements
 	}
 
 	public func getPersonas() -> Personas {
@@ -102,19 +106,18 @@ extension ProfileNetwork {
 		self.personas = identifiedPersonas.elements
 	}
 
-	public mutating func hidePersonas(ids idsOfPersonaToHide: Set<Persona.ID>) {
+	public mutating func hidePersona(id: Persona.ID) {
 		var identifiedPersonas = personas.asIdentified()
 		var identifiedAuthorizedDapps = authorizedDapps.asIdentified()
-		for id in idsOfPersonaToHide {
-			/// Hide the personas themselves
-			identifiedPersonas[id: id]?.hide()
 
-			/// Remove the persona reference on any authorized dapp
-			identifiedAuthorizedDapps.mutateAll { dapp in
-				var referencesToAuthorizedPersonas = dapp.referencesToAuthorizedPersonas.asIdentified()
-				referencesToAuthorizedPersonas.remove(id: id)
-				dapp.referencesToAuthorizedPersonas = referencesToAuthorizedPersonas.elements
-			}
+		/// Hide the persona themself
+		identifiedPersonas[id: id]?.hide()
+
+		/// Remove the persona reference on any authorized dapp
+		identifiedAuthorizedDapps.mutateAll { dapp in
+			var referencesToAuthorizedPersonas = dapp.referencesToAuthorizedPersonas.asIdentified()
+			referencesToAuthorizedPersonas.remove(id: id)
+			dapp.referencesToAuthorizedPersonas = referencesToAuthorizedPersonas.elements
 		}
 		self.personas = identifiedPersonas.elements
 
@@ -123,12 +126,9 @@ extension ProfileNetwork {
 		self.authorizedDapps = identifiedAuthorizedDapps.elements
 	}
 
-	public mutating func unhideAllEntities() {
-		var identifiedAccounts = accounts.asIdentified()
+	public mutating func unhidePersona(id: Persona.ID) {
 		var identifiedPersonas = personas.asIdentified()
-		identifiedAccounts.mutateAll { $0.unhide() }
-		identifiedPersonas.mutateAll { $0.unhide() }
-		accounts = identifiedAccounts.elements
+		identifiedPersonas[id: id]?.unhide()
 		personas = identifiedPersonas.elements
 	}
 

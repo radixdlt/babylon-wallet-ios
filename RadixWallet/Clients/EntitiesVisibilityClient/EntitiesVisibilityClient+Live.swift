@@ -7,28 +7,29 @@ extension EntitiesVisibilityClient: DependencyKey {
 		profileStore: ProfileStore = .shared
 	) -> Self {
 		.init(
-			hideAccounts: { idsOfAccounts in
+			hideAccount: { id in
 				try await profileStore.updatingOnCurrentNetwork { network in
-					network.hideAccounts(ids: idsOfAccounts)
+					network.hideAccount(id: id)
 				}
 			},
-			hidePersonas: { idsOfPersonas in
+			hidePersona: { id in
 				try await profileStore.updatingOnCurrentNetwork { network in
-					network.hidePersonas(ids: idsOfPersonas)
+					network.hidePersona(id: id)
 				}
 			},
-			unhideAllEntities: {
+			unhideAccount: { id in
 				try await profileStore.updatingOnCurrentNetwork { network in
-					network.unhideAllEntities()
+					network.unhideAccount(id: id)
 				}
 			},
-			getHiddenEntityCounts: {
+			unhidePersona: { id in
+				try await profileStore.updatingOnCurrentNetwork { network in
+					network.unhidePersona(id: id)
+				}
+			},
+			getHiddenEntities: {
 				let network = try await profileStore.network()
-
-				return .init(
-					hiddenAccountsCount: network.getHiddenAccounts().count,
-					hiddenPersonasCount: network.getHiddenPersonas().count
-				)
+				return .init(accounts: network.getHiddenAccounts(), personas: network.getHiddenPersonas())
 			}
 		)
 	}

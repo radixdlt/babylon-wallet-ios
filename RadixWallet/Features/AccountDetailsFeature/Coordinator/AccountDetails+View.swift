@@ -44,6 +44,7 @@ extension AccountDetails {
 				.ignoresSafeArea(edges: .bottom)
 				.background(viewStore.appearanceID.gradient)
 				.navigationBarBackButtonHidden()
+				.navigationBarTitleDisplayMode(.inline)
 				.task {
 					await viewStore.send(.task).finish()
 				}

@@ -3,7 +3,7 @@ import SwiftUI
 
 extension TransactionReviewNetworkFee.State {
 	var displayedTotalFee: String {
-		"\(reviewedTransaction.transactionFee.totalFee.displayedTotalFee) XRD"
+		L10n.TransactionReview.xrdAmount(reviewedTransaction.transactionFee.totalFee.displayedTotalFee)
 	}
 }
 
@@ -19,8 +19,8 @@ extension TransactionReviewNetworkFee {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-				VStack(alignment: .leading, spacing: .small2) {
-					HStack {
+				VStack(alignment: .leading, spacing: .zero) {
+					HStack(alignment: .top) {
 						Text(L10n.TransactionReview.NetworkFee.heading)
 							.sectionHeading
 							.textCase(.uppercase)
@@ -32,20 +32,30 @@ extension TransactionReviewNetworkFee {
 
 						Spacer(minLength: 0)
 
-						Text(viewStore.displayedTotalFee)
-							.textStyle(.body1HighImportance)
-							.foregroundColor(.app.gray1)
+						VStack(alignment: .trailing, spacing: .small3) {
+							Text(viewStore.displayedTotalFee)
+								.textStyle(.body1HighImportance)
+								.foregroundColor(.app.gray1)
+
+							loadable(viewStore.fiatValue) {
+								ProgressView()
+							} successContent: { value in
+								Text(value)
+									.textStyle(.body2HighImportance)
+									.foregroundColor(.app.gray2)
+							}
+						}
 					}
 
 					loadable(viewStore.reviewedTransaction.feePayingValidation) { validation in
 						switch validation {
 						case .needsFeePayer:
-							WarningErrorView(text: L10n.TransactionReview.feePayerRequiredMessage, type: .warning)
+							WarningErrorView(text: L10n.TransactionReview.FeePayerValidation.feePayerRequired, type: .warning)
 						case .insufficientBalance:
-							WarningErrorView(text: L10n.TransactionReview.insufficientBalance, type: .warning)
-						case .valid(introducesNewAccount: true):
-							EmptyView() // TODO: Here we could show a warning, that this introduces a new account into the transaction - the link between the accounts will now be public
-						case .valid(introducesNewAccount: false):
+							WarningErrorView(text: L10n.TransactionReview.FeePayerValidation.insufficientBalance, type: .error)
+						case .valid(.introducesNewAccount):
+							WarningErrorView(text: L10n.TransactionReview.FeePayerValidation.linksNewAccount, type: .warning)
+						case .valid:
 							EmptyView()
 						}
 
@@ -55,6 +65,9 @@ extension TransactionReviewNetworkFee {
 						.textStyle(.body1StandaloneLink)
 						.foregroundColor(.app.blue2)
 					}
+				}
+				.task {
+					viewStore.send(.task)
 				}
 			}
 		}
