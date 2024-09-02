@@ -29,7 +29,7 @@ extension SecurityCenterClient {
 
 		@Sendable
 		func manualBackups() async -> AnyAsyncSequence<BackupStatus?> {
-			let profileID = await profileStore.profile.id
+			let profileID = await profileStore.profileSequence().first().id
 			let backups = userDefaults.lastManualBackupValues(for: profileID)
 			return await statusValues(results: backups)
 		}

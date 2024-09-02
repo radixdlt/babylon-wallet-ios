@@ -53,12 +53,7 @@ public final actor ProfileStore {
 	/// device model and name is async.
 	private var deviceInfo: DeviceInfo
 
-	private let profileStateSubject: AsyncPassthroughSubject<Element>
-	private public typealias Subject = AsyncPassthroughSubject<Element>
-	public typealias Stream = AsyncThrowingPassthroughSubject<Element, any Error>
-
-	let stream = Stream()
-	let subject = Subject()
+	let profile: BufferSub
 
 	init() {
 		let metaDeviceInfo = Self._deviceInfo()
@@ -67,8 +62,8 @@ public final actor ProfileStore {
 }
 
 extension ProfileStore {
-	var profileSequence: AnyAsyncSequence<Profile> {
-		profileState.compactMap { state in
+	func profileSequence() async -> AnyAsyncSequence<Profile> {
+		await profileState().compactMap { state in
 			switch state {
 			case let .loaded(profile):
 				profile
@@ -76,12 +71,11 @@ extension ProfileStore {
 				nil
 			}
 		}
-		.share()
 		.eraseToAnyAsyncSequence()
 	}
 
 	func profileState() async -> AnyAsyncSequence<ProfileState> {
-		ProfileStateChangeEventPublisher.shared.eventStream().eraseToAnyAsyncSequence()
+		await ProfileStateChangeEventPublisher.shared.eventStream().eraseToAnyAsyncSequence()
 	}
 }
 
@@ -94,7 +88,7 @@ extension ProfileStore {
 	public func updating<T: Sendable>(
 		_ transform: @Sendable (inout Profile) async throws -> T
 	) async throws -> T {
-		var updated = try await profileSequence.first()
+		var updated = try await profileSequence().first()
 		let result = try await transform(&updated)
 		try await Self._save(profile: updated)
 		return result // in many cases `Void`.
