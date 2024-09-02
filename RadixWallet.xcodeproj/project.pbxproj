@@ -798,6 +798,7 @@
 		83823EAA2B72365000827211 /* TokenPriceClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83823EA92B72365000827211 /* TokenPriceClient+Interface.swift */; };
 		83856D622B0279080026452A /* VerifyMnemonic+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83856D602B0279080026452A /* VerifyMnemonic+View.swift */; };
 		83856D632B0279080026452A /* VerifyMnemonic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83856D612B0279080026452A /* VerifyMnemonic.swift */; };
+		838ABCC92C85905D00B1C167 /* AccountLockerVaultCollectionItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 838ABCC82C85905D00B1C167 /* AccountLockerVaultCollectionItem.swift */; };
 		8397D82C2B46ACB50016365A /* StakeUnitList+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8397D82A2B46ACB50016365A /* StakeUnitList+View.swift */; };
 		8397D82D2B46ACB50016365A /* StakeUnitList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8397D82B2B46ACB50016365A /* StakeUnitList.swift */; };
 		839B6C542B21D28400402651 /* ExpandableTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 839B6C532B21D28400402651 /* ExpandableTextView.swift */; };
@@ -831,7 +832,6 @@
 		A408155D2C7E0D08005E65B9 /* AccountLockerAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40814432C7E0D08005E65B9 /* AccountLockerAddress.swift */; };
 		A408155E2C7E0D08005E65B9 /* AccountLockerNotFoundError.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40814442C7E0D08005E65B9 /* AccountLockerNotFoundError.swift */; };
 		A408155F2C7E0D08005E65B9 /* AccountLockerVaultCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40814452C7E0D08005E65B9 /* AccountLockerVaultCollection.swift */; };
-		A40815602C7E0D08005E65B9 /* AccountLockerVaultCollectionItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40814462C7E0D08005E65B9 /* AccountLockerVaultCollectionItem.swift */; };
 		A40815612C7E0D08005E65B9 /* AccountLockerVaultCollectionItemFungible.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40814472C7E0D08005E65B9 /* AccountLockerVaultCollectionItemFungible.swift */; };
 		A40815622C7E0D08005E65B9 /* AccountLockerVaultCollectionItemNonFungible.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40814482C7E0D08005E65B9 /* AccountLockerVaultCollectionItemNonFungible.swift */; };
 		A40815632C7E0D08005E65B9 /* AccountLockerVaultCollectionItemType.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40814492C7E0D08005E65B9 /* AccountLockerVaultCollectionItemType.swift */; };
@@ -1995,6 +1995,7 @@
 		83823EA92B72365000827211 /* TokenPriceClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TokenPriceClient+Interface.swift"; sourceTree = "<group>"; };
 		83856D602B0279080026452A /* VerifyMnemonic+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "VerifyMnemonic+View.swift"; sourceTree = "<group>"; };
 		83856D612B0279080026452A /* VerifyMnemonic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VerifyMnemonic.swift; sourceTree = "<group>"; };
+		838ABCC82C85905D00B1C167 /* AccountLockerVaultCollectionItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountLockerVaultCollectionItem.swift; sourceTree = "<group>"; };
 		8397D82A2B46ACB50016365A /* StakeUnitList+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "StakeUnitList+View.swift"; sourceTree = "<group>"; };
 		8397D82B2B46ACB50016365A /* StakeUnitList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StakeUnitList.swift; sourceTree = "<group>"; };
 		839B6C532B21D28400402651 /* ExpandableTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpandableTextView.swift; sourceTree = "<group>"; };
@@ -2027,7 +2028,6 @@
 		A40814432C7E0D08005E65B9 /* AccountLockerAddress.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountLockerAddress.swift; sourceTree = "<group>"; };
 		A40814442C7E0D08005E65B9 /* AccountLockerNotFoundError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountLockerNotFoundError.swift; sourceTree = "<group>"; };
 		A40814452C7E0D08005E65B9 /* AccountLockerVaultCollection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountLockerVaultCollection.swift; sourceTree = "<group>"; };
-		A40814462C7E0D08005E65B9 /* AccountLockerVaultCollectionItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountLockerVaultCollectionItem.swift; sourceTree = "<group>"; };
 		A40814472C7E0D08005E65B9 /* AccountLockerVaultCollectionItemFungible.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountLockerVaultCollectionItemFungible.swift; sourceTree = "<group>"; };
 		A40814482C7E0D08005E65B9 /* AccountLockerVaultCollectionItemNonFungible.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountLockerVaultCollectionItemNonFungible.swift; sourceTree = "<group>"; };
 		A40814492C7E0D08005E65B9 /* AccountLockerVaultCollectionItemType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountLockerVaultCollectionItemType.swift; sourceTree = "<group>"; };
@@ -4781,6 +4781,7 @@
 				48CFC0BA2ADC10D900E77A5C /* MetadataTypedValue.swift */,
 				48CFC0BB2ADC10D900E77A5C /* GatewayError.swift */,
 				48CFC0BC2ADC10D900E77A5C /* FungibleResourcesCollectionItem.swift */,
+				838ABCC82C85905D00B1C167 /* AccountLockerVaultCollectionItem.swift */,
 				48CFC0BD2ADC10D900E77A5C /* ResourcePoolState.swift */,
 				48CFC0BE2ADC10D900E77A5C /* PublicKeyHash.swift */,
 				48CFC0BF2ADC10D900E77A5C /* NonFungibleResourcesCollectionItem.swift */,
@@ -5741,7 +5742,6 @@
 				A40814432C7E0D08005E65B9 /* AccountLockerAddress.swift */,
 				A40814442C7E0D08005E65B9 /* AccountLockerNotFoundError.swift */,
 				A40814452C7E0D08005E65B9 /* AccountLockerVaultCollection.swift */,
-				A40814462C7E0D08005E65B9 /* AccountLockerVaultCollectionItem.swift */,
 				A40814472C7E0D08005E65B9 /* AccountLockerVaultCollectionItemFungible.swift */,
 				A40814482C7E0D08005E65B9 /* AccountLockerVaultCollectionItemNonFungible.swift */,
 				A40814492C7E0D08005E65B9 /* AccountLockerVaultCollectionItemType.swift */,
@@ -7174,7 +7174,6 @@
 				5BB7C1762BC81F50001216EB /* ImportOlympiaNameLedger.swift in Sources */,
 				48CFC4022ADC10D900E77A5C /* KeychainClient+Interface.swift in Sources */,
 				48CFC44E2ADC10DA00E77A5C /* AppPreferencesClient+Interface.swift in Sources */,
-				48CFC5432ADC10DA00E77A5C /* EntityMetadataCollection.swift in Sources */,
 				5BEB9CD52C6F6CC9001FD9D4 /* ConfirmationView.swift in Sources */,
 				48CFC3442ADC10D900E77A5C /* AccountPermission.swift in Sources */,
 				48CFC5E82ADC10DA00E77A5C /* FeatureReducer.swift in Sources */,
@@ -7324,9 +7323,7 @@
 				48CFC2552ADC10D900E77A5C /* Splash.swift in Sources */,
 				48CFC6232ADC10DA00E77A5C /* AccountPortfolio+Extensions.swift in Sources */,
 				48CFC3292ADC10D900E77A5C /* CameraPermission+Reducer.swift in Sources */,
-				48CFC53A2ADC10DA00E77A5C /* NotSyncedUpError.swift in Sources */,
 				5B3C48A92C7E190C00DB160D /* AssetRow.swift in Sources */,
-				48CFC54E2ADC10DA00E77A5C /* StateEntityNonFungibleResourceVaultsPageResponse.swift in Sources */,
 				A40816172C7E0D08005E65B9 /* StateEntityNonFungibleIdsPageRequest.swift in Sources */,
 				A40815812C7E0D08005E65B9 /* InternalServerError.swift in Sources */,
 				A40816402C7E0D08005E65B9 /* TransactionDetailsOptIns.swift in Sources */,
@@ -7385,7 +7382,6 @@
 				A40816212C7E0D08005E65B9 /* StateKeyValueStoreDataRequest.swift in Sources */,
 				48CFC65C2ADC10DB00E77A5C /* Profile+Persona+Add.swift in Sources */,
 				48CFC5B52ADC10DA00E77A5C /* AppTextField.swift in Sources */,
-				48CFC4B42ADC10DA00E77A5C /* TransactionPreviewRequest.swift in Sources */,
 				5B135B3B2C7636FD004AAD2E /* HiddenEntities.swift in Sources */,
 				A408165D2C7E0D08005E65B9 /* ValidatorCollectionItemEffectiveFeeFactor.swift in Sources */,
 				A40815762C7E0D08005E65B9 /* EntitySchemaCollectionItem.swift in Sources */,
@@ -7494,7 +7490,6 @@
 				48CFC6022ADC10DA00E77A5C /* P2P+LedgerHardwareWallet.swift in Sources */,
 				48CFC46A2ADC10DA00E77A5C /* ImportLegacyWalletClient+Live.swift in Sources */,
 				5B1C4FD82BBB0C1E00B9436F /* AppsFlyerClient+Interface.swift in Sources */,
-				48CFC5052ADC10DA00E77A5C /* TransactionPreviewResponseLogsInner.swift in Sources */,
 				5B1C4FDA2BBB0DCF00B9436F /* AppsFlyerClient+Live.swift in Sources */,
 				A4CFB55F2BAA821E00778BDD /* HScrollBar.swift in Sources */,
 				48CFC44D2ADC10DA00E77A5C /* MnemonicClient+Live.swift in Sources */,
@@ -7679,6 +7674,7 @@
 				48AE39DC2B0CBE3900813CF3 /* AccountRecoveryScanCoordinator.swift in Sources */,
 				48CFC5762ADC10DA00E77A5C /* TransactionReceiptStatus.swift in Sources */,
 				A462B59C2B83838600C26D20 /* CoreAPI_TransactionStatus.swift in Sources */,
+				838ABCC92C85905D00B1C167 /* AccountLockerVaultCollectionItem.swift in Sources */,
 				A40816452C7E0D08005E65B9 /* TransactionNonFungibleBalanceChanges.swift in Sources */,
 				A40815822C7E0D08005E65B9 /* InvalidEntityError.swift in Sources */,
 				48CFC5DE2ADC10DA00E77A5C /* OnFirstTaskViewModifier.swift in Sources */,
@@ -8048,7 +8044,6 @@
 				48CFC5EC2ADC10DA00E77A5C /* Loadable.swift in Sources */,
 				48CFC45F2ADC10DA00E77A5C /* TransactionFailure.swift in Sources */,
 				48CFC2B82ADC10D900E77A5C /* RestoreProfileFromBackupCoordinator+View.swift in Sources */,
-				A40815602C7E0D08005E65B9 /* AccountLockerVaultCollectionItem.swift in Sources */,
 				48CFC2BA2ADC10D900E77A5C /* SelectBackup+View.swift in Sources */,
 				48CFC4432ADC10DA00E77A5C /* RadixConnectClient+Live.swift in Sources */,
 				48CFC2BC2ADC10D900E77A5C /* ImportMnemonicsFlowCoordinator+View.swift in Sources */,
