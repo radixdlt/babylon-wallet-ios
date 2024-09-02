@@ -11,7 +11,7 @@ extension AccountLockersClient {
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
-		let accountLockersSubject = AsyncCurrentValueSubject<ClaimsPerAccount>([:])
+		let claimsPerAccountSubject = AsyncCurrentValueSubject<ClaimsPerAccount>([:])
 
 		@Sendable
 		func startMonitoring() async throws {
@@ -35,20 +35,23 @@ extension AccountLockersClient {
 						let lockerContent = try await getLockerContent(lockerAddress: lockerAddress, accountAddress: accountAddress)
 						let claims = lockerContent
 							.filter(\.isValidClaim)
-						let dappName = dappsWithLockers.first(where: { $0.lockerAddress == lockerAddress })?.dapp.displayName
+						guard let dapp = dappsWithLockers.first(where: { $0.lockerAddress == lockerAddress })?.dapp else {
+							fatalError("Programmer error: there should be a dapp for the given locker")
+						}
 
 						accountLockerClaims.append(.init(
 							lockerAddress: lockerAddress,
 							accountAddress: accountAddress,
+							dappDefinitionAddress: dapp.dappDefinitionAddress.address,
+							dappName: dapp.displayName,
 							lastTouchedAtStateVersion: lockerState.lastTouchedAtStateVersion,
-							dappName: dappName,
 							claims: claims
 						))
 					}
 					claimsPerAccount[account.address] = accountLockerClaims
 				}
 
-				accountLockersSubject.send(claimsPerAccount)
+				claimsPerAccountSubject.send(claimsPerAccount)
 				print("M- Result: \(claimsPerAccount)")
 			}
 		}
@@ -117,15 +120,28 @@ extension AccountLockersClient {
 			try await gatewayAPIClient.getAccountLockerVaults(.init(lockerAddress: lockerAddress, accountAddress: accountAddress)).items
 		}
 
+		let dappsWithClaims: @Sendable () async -> AnyAsyncSequence<[String]> = {
+			claimsPerAccountSubject
+				.map { claimsPerAccount in
+					let addresses = claimsPerAccount.values.flatMap { claims in
+						claims.map(\.dappDefinitionAddress)
+					}
+					return Array(Set(addresses))
+				}
+				.share()
+				.eraseToAnyAsyncSequence()
+		}
+
 		return .init(
 			startMonitoring: startMonitoring,
 			accountClaims: { account in
-				accountLockersSubject.compactMap {
+				claimsPerAccountSubject.compactMap {
 					$0[account]
 				}
 				.share()
 				.eraseToAnyAsyncSequence()
-			}
+			},
+			dappsWithClaims: dappsWithClaims
 		)
 	}
 
@@ -139,9 +155,10 @@ extension AccountLockersClient {
 /// A struct holding the pending claims for a given locker address & account address.
 public struct AccountLockerClaims: Sendable, Hashable {
 	let lockerAddress: String
-	let accountAddress: String // TODO: Consider removing it if not necessary
-	let lastTouchedAtStateVersion: Int64
+	let accountAddress: String
+	let dappDefinitionAddress: String
 	let dappName: String?
+	let lastTouchedAtStateVersion: Int64
 	let claims: [GatewayAPI.AccountLockerVaultCollectionItem]
 }
 
