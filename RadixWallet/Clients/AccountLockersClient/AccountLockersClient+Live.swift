@@ -32,7 +32,13 @@ extension AccountLockersClient {
 
 				// Loop over each account to determine its claims
 				for account in accounts {
-					guard let lockerStates = lockersStatePerAccount[account.address] else { continue }
+					guard let lockerStates = lockersStatePerAccount[account.address] else {
+						// If there are no lockers for the given account, set an empty list for it
+						// This is necessary so that if such account used to have, but doesn't have any more, we emit an update
+						// for such account removing the old list of claims.
+						claimsPerAccount[account.address] = []
+						continue
+					}
 					var accountLockerClaims: [AccountLockerClaims] = []
 
 					// Loop over each locker associated to this account
