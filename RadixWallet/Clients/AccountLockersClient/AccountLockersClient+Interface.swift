@@ -17,3 +17,14 @@ extension AccountLockersClient {
 	public typealias AccountClaims = @Sendable (AccountAddress) async -> AnyAsyncSequence<[AccountLockerClaims]>
 	public typealias DappsWithClaims = @Sendable () async -> AnyAsyncSequence<[String]>
 }
+
+// MARK: - AccountLockerClaims
+/// A struct holding the pending claims for a given locker address & account address.
+public struct AccountLockerClaims: Sendable, Hashable, Codable {
+	let lockerAddress: String
+	let accountAddress: String
+	let dappDefinitionAddress: String
+	let dappName: String?
+	let lastTouchedAtStateVersion: Int64
+	let claims: [GatewayAPI.AccountLockerVaultCollectionItem]
+}

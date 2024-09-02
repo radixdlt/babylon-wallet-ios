@@ -10,6 +10,7 @@ extension AccountLockersClient {
 		@Dependency(\.accountsClient) var accountsClient
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+		@Dependency(\.cacheClient) var cacheClient
 
 		let claimsPerAccountSubject = AsyncCurrentValueSubject<ClaimsPerAccount>([:])
 
@@ -31,25 +32,30 @@ extension AccountLockersClient {
 					guard let lockerStates = lockersStatePerAccount[account.address] else { continue }
 					var accountLockerClaims: [AccountLockerClaims] = []
 					for lockerState in lockerStates.items {
-						// TODO: Check from cache if the lockerState.lastTouchedAtStateVersion has changed from last time we checked
+						if let cached = getCachedVersionIfValid(lockerState: lockerState) {
+							accountLockerClaims.append(cached)
+							continue
+						}
 
 						let lockerAddress = lockerState.lockerAddress
 						let accountAddress = lockerState.accountAddress
 						let lockerContent = try await getLockerContent(lockerAddress: lockerAddress, accountAddress: accountAddress)
-						let claims = lockerContent
-							.filter(\.isValidClaim)
+						let claims = lockerContent.filter(\.isValidClaim)
+
 						guard let dapp = dappsWithLockers.first(where: { $0.lockerAddress == lockerAddress })?.dapp else {
 							fatalError("Programmer error: there should be a dapp for the given locker")
 						}
 
-						accountLockerClaims.append(.init(
+						let accountLockerClaim = AccountLockerClaims(
 							lockerAddress: lockerAddress,
 							accountAddress: accountAddress,
 							dappDefinitionAddress: dapp.dappDefinitionAddress.address,
 							dappName: dapp.displayName,
 							lastTouchedAtStateVersion: lockerState.lastTouchedAtStateVersion,
 							claims: claims
-						))
+						)
+						cacheClient.save(accountLockerClaim, .accountLockerClaims(accountAddress: accountAddress, lockerAddress: lockerAddress))
+						accountLockerClaims.append(accountLockerClaim)
 					}
 					claimsPerAccount[account.address] = accountLockerClaims
 				}
@@ -118,6 +124,18 @@ extension AccountLockersClient {
 		}
 
 		@Sendable
+		func getCachedVersionIfValid(lockerState: GatewayAPI.StateAccountLockersTouchedAtResponseItem) -> AccountLockerClaims? {
+			let entry = CacheClient.Entry.accountLockerClaims(accountAddress: lockerState.accountAddress, lockerAddress: lockerState.lockerAddress)
+			guard
+				let cached = try? cacheClient.load(AccountLockerClaims.self, entry) as? AccountLockerClaims,
+				cached.lastTouchedAtStateVersion == lockerState.lastTouchedAtStateVersion
+			else {
+				return nil
+			}
+			return cached
+		}
+
+		@Sendable
 		func getLockerContent(lockerAddress: String, accountAddress: String) async throws -> [GatewayAPI.AccountLockerVaultCollectionItem] {
 			try await gatewayAPIClient.getAccountLockerVaults(.init(lockerAddress: lockerAddress, accountAddress: accountAddress)).items
 		}
@@ -151,17 +169,6 @@ extension AccountLockersClient {
 		let dapp: AuthorizedDapp
 		let lockerAddress: String
 	}
-}
-
-// MARK: - AccountLockerClaims
-/// A struct holding the pending claims for a given locker address & account address.
-public struct AccountLockerClaims: Sendable, Hashable {
-	let lockerAddress: String
-	let accountAddress: String
-	let dappDefinitionAddress: String
-	let dappName: String?
-	let lastTouchedAtStateVersion: Int64
-	let claims: [GatewayAPI.AccountLockerVaultCollectionItem]
 }
 
 private extension AuthorizedDapp {
