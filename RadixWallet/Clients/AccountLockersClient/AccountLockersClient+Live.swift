@@ -1,6 +1,6 @@
 import Foundation
 
-public typealias ClaimsPerAccount = [AccountAddress: [AccountLockerClaims]]
+public typealias ClaimsPerAccount = [AccountAddress: [AccountLockerClaimDetails]]
 
 extension AccountLockersClient {
 	public static let liveValue: Self = .live()
@@ -39,16 +39,16 @@ extension AccountLockersClient {
 						claimsPerAccount[account.address] = []
 						continue
 					}
-					var accountLockerClaims: [AccountLockerClaims] = []
+					var accountDetails: [AccountLockerClaimDetails] = []
 
 					// Loop over each locker associated to this account
 					for lockerState in lockerStates.items {
 						if let cached = getCachedVersionIfValid(lockerState: lockerState) {
 							// The cached claim information is valid.
-							accountLockerClaims.append(cached)
+							accountDetails.append(cached)
 
 						} else {
-							// The cache is outdated or doesn't exist, so we will fetch its details from Gateway
+							// The cache is outdated or doesn't exist, so we will fetch info from Gateway
 							let lockerAddress = lockerState.lockerAddress
 							let accountAddress = lockerState.accountAddress
 							let lockerContent = try await getLockerContent(lockerAddress: lockerAddress, accountAddress: accountAddress)
@@ -58,7 +58,7 @@ extension AccountLockersClient {
 								fatalError("Programmer error: there should be a dapp for the given locker")
 							}
 
-							let accountLockerClaim = AccountLockerClaims(
+							let details = AccountLockerClaimDetails(
 								lockerAddress: lockerAddress,
 								accountAddress: accountAddress,
 								dappDefinitionAddress: dapp.dappDefinitionAddress.address,
@@ -68,13 +68,13 @@ extension AccountLockersClient {
 							)
 
 							// Cache the result and append to list
-							cacheClient.save(accountLockerClaim, .accountLockerClaims(accountAddress: accountAddress, lockerAddress: lockerAddress))
-							accountLockerClaims.append(accountLockerClaim)
+							cacheClient.save(details, .accountLockerClaimDetails(accountAddress: accountAddress, lockerAddress: lockerAddress))
+							accountDetails.append(details)
 						}
 					}
 
-					// Set the claims for the given account, filtering those that are empty.
-					claimsPerAccount[account.address] = accountLockerClaims.filter(not(\.claims.isEmpty))
+					// Set the details for the given account, filtering those who have no claims.
+					claimsPerAccount[account.address] = accountDetails.filter(not(\.claims.isEmpty))
 				}
 
 				// Emit a new result
@@ -143,10 +143,10 @@ extension AccountLockersClient {
 		}
 
 		@Sendable
-		func getCachedVersionIfValid(lockerState: GatewayAPI.StateAccountLockersTouchedAtResponseItem) -> AccountLockerClaims? {
-			let entry = CacheClient.Entry.accountLockerClaims(accountAddress: lockerState.accountAddress, lockerAddress: lockerState.lockerAddress)
+		func getCachedVersionIfValid(lockerState: GatewayAPI.StateAccountLockersTouchedAtResponseItem) -> AccountLockerClaimDetails? {
+			let entry = CacheClient.Entry.accountLockerClaimDetails(accountAddress: lockerState.accountAddress, lockerAddress: lockerState.lockerAddress)
 			guard
-				let cached = try? cacheClient.load(AccountLockerClaims.self, entry) as? AccountLockerClaims,
+				let cached = try? cacheClient.load(AccountLockerClaimDetails.self, entry) as? AccountLockerClaimDetails,
 				cached.lastTouchedAtStateVersion == lockerState.lastTouchedAtStateVersion
 			else {
 				return nil

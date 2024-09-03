@@ -161,7 +161,7 @@ extension CacheClient {
 		case rolaWellKnownFileVerification(_ url: String)
 		case tokenPrices(_ currency: FiatCurrency)
 		case dateOfFirstTransaction(_ accountAddress: AccountAddress)
-		case accountLockerClaims(accountAddress: String, lockerAddress: String)
+		case accountLockerClaimDetails(accountAddress: String, lockerAddress: String)
 
 		var filesystemFilePath: String {
 			switch self {
@@ -179,7 +179,7 @@ extension CacheClient {
 				"\(filesystemFolderPath)/prices-\(currency.rawValue)"
 			case let .dateOfFirstTransaction(address):
 				"\(filesystemFolderPath)/account-\(address.address)"
-			case let .accountLockerClaims(accountAddress, lockerAddress):
+			case let .accountLockerClaimDetails(accountAddress, lockerAddress):
 				"\(filesystemFolderPath)/\(accountAddress)/\(lockerAddress)"
 			}
 		}
@@ -200,8 +200,8 @@ extension CacheClient {
 				"TokenPrices"
 			case .dateOfFirstTransaction:
 				"DateOfFirstTransaction"
-			case .accountLockerClaims:
-				"AccountLockerClaims"
+			case .accountLockerClaimDetails:
+				"AccountLockerClaimDetails"
 			}
 
 			return "\(Self.root)/\(path)"
@@ -219,7 +219,7 @@ extension CacheClient {
 				60
 			case .tokenPrices:
 				60 * 5 // 5 minutes
-			case .dateOfFirstTransaction, .accountLockerClaims:
+			case .dateOfFirstTransaction, .accountLockerClaimDetails:
 				99 * 365 * 60 * 60 * 24
 			}
 		}

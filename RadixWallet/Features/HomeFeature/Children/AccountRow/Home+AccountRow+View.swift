@@ -8,7 +8,7 @@ extension Home.AccountRow {
 		let fiatWorth: Loadable<FiatWorth>
 		let isLoadingResources: Bool
 		let securityProblemsConfig: EntitySecurityProblemsView.Config
-		let accountLockerClaims: [AccountLockerClaims]
+		let accountLockerClaims: [AccountLockerClaimDetails]
 
 		public enum AccountTag: Int, Hashable, Identifiable, Sendable {
 			case ledgerBabylon

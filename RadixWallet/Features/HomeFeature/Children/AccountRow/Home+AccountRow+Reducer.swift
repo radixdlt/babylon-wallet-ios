@@ -13,7 +13,7 @@ extension Home {
 			public var showFiatWorth: Bool = true
 			public var totalFiatWorth: Loadable<FiatWorth>
 			public var securityProblemsConfig: EntitySecurityProblemsView.Config
-			public var accountLockerClaims: [AccountLockerClaims] = []
+			public var accountLockerClaims: [AccountLockerClaimDetails] = []
 
 			public init(
 				account: Account,
@@ -35,7 +35,7 @@ extension Home {
 		public enum InternalAction: Sendable, Equatable {
 			case accountUpdated(OnLedgerEntity.OnLedgerAccount)
 			case fiatWorthUpdated(Loadable<FiatWorth>)
-			case setAccountLockerClaims([AccountLockerClaims])
+			case setAccountLockerClaims([AccountLockerClaimDetails])
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
