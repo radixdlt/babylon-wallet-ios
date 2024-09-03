@@ -38,8 +38,7 @@ struct AccountBannerView: View {
 		case let .securityProblem(message):
 			message
 		case let .lockerClaim(dappName):
-			// FIXME: Strings
-			"\(dappName ?? L10n.DAppRequest.Metadata.unknownName) has a deposit for you to claim"
+			L10n.HomePage.accountLockerClaim(dappName ?? L10n.DAppRequest.Metadata.unknownName)
 		}
 	}
 }

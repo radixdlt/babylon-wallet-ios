@@ -51,8 +51,7 @@ extension AuthorizedDappsFeature {
 											Thumbnail(.dapp, url: dApp.thumbnail)
 										}
 										if dApp.hasClaim {
-											// FIXME: Strings
-											WarningErrorView(text: "A deposit from this dApp is available. Go to your Accounts to view and claim.", type: .warning, useNarrowSpacing: true)
+											WarningErrorView(text: L10n.AuthorizedDapps.pendingDeposit, type: .warning, useNarrowSpacing: true)
 												.padding(.horizontal, .medium1)
 												.padding(.bottom, .medium3)
 										}
