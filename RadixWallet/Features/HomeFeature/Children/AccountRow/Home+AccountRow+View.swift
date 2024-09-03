@@ -177,7 +177,7 @@ extension Home.AccountRow.View {
 				}
 
 				if viewStore.poolUnitsCount > 0 {
-					LabelledIcon(roundIcon: AssetResource.poolUnit, label: "\(viewStore.poolUnitsCount)")
+					LabelledIcon(roundIcon: AssetResource.poolUnits, label: "\(viewStore.poolUnitsCount)")
 				}
 			}
 		}

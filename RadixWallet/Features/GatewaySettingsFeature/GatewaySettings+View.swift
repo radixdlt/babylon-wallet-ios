@@ -25,18 +25,15 @@ extension GatewaySettings {
 		}
 
 		private func coreView() -> some SwiftUI.View {
-			VStack(spacing: .zero) {
-				VStack(alignment: .leading) {
-					subtitle
+			VStack(alignment: .leading, spacing: .zero) {
+				subtitle
+					.padding(.top, .medium3)
+					.padding(.horizontal, .medium3)
+					.padding(.bottom, .large2)
 
-					//	FIXME: Uncomment and implement
-					//	Button(L10n.Gateways.whatIsAGateway) {
-					//		store.send(.view(.popoverButtonTapped))
-					//	}
-					//	.buttonStyle(.info)
-					//	.padding(.vertical, .medium2)
-				}
-				.padding(.medium3)
+				InfoButton(.gateways, label: L10n.Gateways.whatIsAGateway)
+					.padding(.horizontal, .medium3)
+					.padding(.bottom, .large2)
 
 				GatewayList.View(store: store.gatewayList)
 
@@ -77,7 +74,6 @@ private extension View {
 		return removeGateway(with: destinationStore)
 			.addNewGateway(with: destinationStore)
 			.createAccount(with: destinationStore)
-			.slideUpPanel(with: destinationStore)
 	}
 
 	private func removeGateway(with destinationStore: PresentationStoreOf<GatewaySettings.Destination>) -> some View {
@@ -93,12 +89,6 @@ private extension View {
 	private func createAccount(with destinationStore: PresentationStoreOf<GatewaySettings.Destination>) -> some View {
 		sheet(store: destinationStore.scope(state: \.createAccount, action: \.createAccount)) {
 			CreateAccountCoordinator.View(store: $0)
-		}
-	}
-
-	private func slideUpPanel(with destinationStore: PresentationStoreOf<GatewaySettings.Destination>) -> some View {
-		sheet(store: destinationStore.scope(state: \.slideUpPanel, action: \.slideUpPanel)) {
-			SlideUpPanel.View(store: $0)
 		}
 	}
 }

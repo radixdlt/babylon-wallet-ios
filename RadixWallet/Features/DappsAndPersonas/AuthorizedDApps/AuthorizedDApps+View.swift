@@ -39,6 +39,8 @@ extension AuthorizedDappsFeature {
 						Text(L10n.AuthorizedDapps.subtitle)
 							.textBlock
 
+						InfoButton(.dapps, label: L10n.AuthorizedDapps.whatIsDapp)
+
 						VStack(spacing: .small1) {
 							ForEach(viewStore.dAppsDetails) { dApp in
 								Card {
