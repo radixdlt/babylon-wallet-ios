@@ -115,11 +115,12 @@ public struct App: Sendable, FeatureReducer {
 		case .onboardingCoordinator(.delegate(.completed)):
 			goToMain(state: &state)
 
-		case let .splash(.delegate(.completed(profile))):
-			if profile.network?.accounts.isEmpty == true {
-				goToOnboarding(state: &state)
-			} else {
+		case let .splash(.delegate(.completed(profileState))):
+			switch profileState {
+			case .loaded:
 				goToMain(state: &state)
+			case .none, .incompatible:
+				goToOnboarding(state: &state)
 			}
 
 		default:

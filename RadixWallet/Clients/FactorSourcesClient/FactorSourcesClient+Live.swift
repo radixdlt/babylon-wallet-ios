@@ -122,7 +122,7 @@ extension FactorSourcesClient: DependencyKey {
 		}
 
 		let getCurrentNetworkID: GetCurrentNetworkID = {
-			await profileStore.profile.networkID
+			await profileStore.profile().networkID
 		}
 
 		let indicesOfEntitiesControlledByFactorSource: IndicesOfEntitiesControlledByFactorSource = { request in
@@ -132,7 +132,7 @@ extension FactorSourcesClient: DependencyKey {
 
 			let currentNetworkID = await getCurrentNetworkID()
 			let networkID = request.networkID ?? currentNetworkID
-			let network = try? await profileStore.profile.network(id: networkID)
+			let network = try? await profileStore.profile().network(id: networkID)
 
 			func nextDerivationIndexForFactorSource(
 				entitiesControlledByFactorSource: some Collection<some EntityProtocol>

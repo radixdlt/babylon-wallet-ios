@@ -13,6 +13,7 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 
 		public let config: CreateAccountConfig
 		var name: NonEmptyString?
+		var useLedgerAsFactorSource: Bool = false
 
 		public init(
 			root: Path.State? = nil,
@@ -90,6 +91,7 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
+		case newProfileCreated(TaskResult<EqVoid>)
 		case createAccountResult(TaskResult<Account>)
 		case handleAccountCreated(TaskResult<Account>)
 	}
@@ -102,6 +104,7 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.accountsClient) var accountsClient
+	@Dependency(\.onboardingClient) var onboardingClient
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.isPresented) var isPresented
@@ -142,11 +145,13 @@ extension CreateAccountCoordinator {
 		switch childAction {
 		case let .root(.nameAccount(.delegate(.proceed(accountName, useLedgerAsFactorSource)))):
 			state.name = accountName
-			if useLedgerAsFactorSource {
-				state.path.append(.selectLedger(.init(context: .createHardwareAccount)))
-				return .none
+			state.useLedgerAsFactorSource = useLedgerAsFactorSource
+			if state.config.isFirstAccount {
+				return .run { send in
+					await send(.internal(.newProfileCreated(TaskResult { try await onboardingClient.createNewWallet() })))
+				}
 			} else {
-				return derivePublicKey(state: &state, factorSourceOption: .device)
+				return proceed(state: &state)
 			}
 
 		case let .path(.element(_, action: .selectLedger(.delegate(.choseLedger(ledger))))):
@@ -194,6 +199,13 @@ extension CreateAccountCoordinator {
 				config: state.config
 			)))
 			return .send(.delegate(.accountCreated))
+
+		case let .newProfileCreated(.failure(error)):
+			errorQueue.schedule(error)
+			return .none
+
+		case .newProfileCreated(.success):
+			return proceed(state: &state)
 		}
 	}
 
@@ -266,6 +278,15 @@ extension CreateAccountCoordinator {
 				purpose: .createNewEntity(kind: .account)
 			))
 		return .none
+	}
+
+	private func proceed(state: inout State) -> Effect<Action> {
+		if state.useLedgerAsFactorSource {
+			state.path.append(.selectLedger(.init(context: .createHardwareAccount)))
+			return .none
+		} else {
+			return derivePublicKey(state: &state, factorSourceOption: .device)
+		}
 	}
 }
 

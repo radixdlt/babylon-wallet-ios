@@ -61,12 +61,12 @@ public final actor ProfileStore {
 		self.deviceInfo = metaDeviceInfo.deviceInfo
 
 		Task {
-			for await state in await ProfileStateChangeEventPublisher.shared.eventStream() {
+			for try await state in await ProfileStateChangeEventPublisher.shared.eventStream() {
 				if case let .loaded(profile) = state {
-					profileSubject.send(profile)
+					self.profileSubject.send(profile)
 				}
 
-				profileStateSubject.send(state)
+				self.profileStateSubject.send(state)
 			}
 		}
 	}
@@ -74,23 +74,11 @@ public final actor ProfileStore {
 
 extension ProfileStore {
 	func profile() async -> Profile {
-		profileSubject.first()
+		try! await profileSubject.first()
 	}
 
 	func profileSequence() async -> AnyAsyncSequence<Profile> {
-		await profileState().compactMap { state in
-			switch state {
-			case let .loaded(profile):
-				profile
-			case .none, .incompatible:
-				nil
-			}
-		}
-		.eraseToAnyAsyncSequence()
-	}
-
-	func profile() async throws -> Profile {
-		try await profileSequence()
+		profileSubject.eraseToAnyAsyncSequence()
 	}
 
 	func profileState() async -> AnyAsyncSequence<ProfileState> {
@@ -107,9 +95,9 @@ extension ProfileStore {
 	public func updating<T: Sendable>(
 		_ transform: @Sendable (inout Profile) async throws -> T
 	) async throws -> T {
-		var updated = try await profileSequence().first()
+		var updated = await profile()
 		let result = try await transform(&updated)
-		try await Self._save(profile: updated)
+		try await SargonOS.shared.setProfile(profile: updated)
 		return result // in many cases `Void`.
 	}
 
@@ -129,28 +117,21 @@ extension ProfileStore {
 	///
 	/// NB: The profile should be claimed locally before calling this function
 	/// - Parameter profile: Imported Profile to use and save.
-	public func importProfile(_ profileToImport: Profile) async throws {
-		try await SargonOS.shared.importProfile(profile: profileToImport)
-	}
-
-	private static func deleteEphemeralProfile(id: ProfileID) {
-		@Dependency(\.secureStorageClient) var secureStorageClient
-		do {
-			try secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs(
-				profileID: id,
-				keepInICloudIfPresent: false
-			)
-		} catch {
-			// Not important enought to fail
-			logAssertionFailure("Failed to delete empty ephemeral profile ID, error: \(error)")
-		}
+	public func importProfile(_ profileToImport: Profile, skippedMainBdfs: Bool) async throws {
+		try await SargonOS.shared.importWallet(profile: profileToImport, bdfsSkipped: skippedMainBdfs)
 	}
 
 	public func deleteProfile() async throws {
 		try await SargonOS.shared.deleteWallet()
 	}
 
-	public func finishedOnboarding() async {}
+	public func newProfile() async throws {
+		let userDefaults = UserDefaults.Dependency.radix
+
+		try await SargonOS.shared.newWallet()
+		let profile = try SargonOS.shared.profile()
+		userDefaults.setActiveProfileID(profile.id)
+	}
 
 	public func finishOnboarding(
 		with accountsRecoveredFromScanningUsingMnemonic: AccountsRecoveredFromScanningUsingMnemonic
@@ -202,7 +183,7 @@ extension ProfileStore {
 		)
 
 		// We can "piggyback" on importProfile! Same logic applies!
-		try await importProfile(profile)
+		try await importProfile(profile, skippedMainBdfs: false)
 	}
 
 	public func isThisDevice(deviceID: DeviceID) -> Bool {
@@ -239,7 +220,7 @@ extension ProfileStore {
 	func _lens<Property>(
 		_ transform: @escaping @Sendable (Profile) -> Property?
 	) -> AnyAsyncSequence<Property> where Property: Sendable & Equatable {
-		profileSequence.compactMap(transform)
+		profileSubject.compactMap(transform)
 			.share() // Multicast
 			.removeDuplicates()
 			.eraseToAnyAsyncSequence()
@@ -249,67 +230,6 @@ extension ProfileStore {
 // MARK: Private Static
 extension ProfileStore {
 	typealias NewProfileTuple = (deviceInfo: DeviceInfo, profile: Profile)
-
-	/// Updates `headerList` (Keychain),  `activeProfileID` (UserDefaults) and saves a
-	/// snapshot of the profile into Keychain.
-	/// - Parameter profile: Profile to save
-	private static func _save(profile: Profile) async throws {
-		try await SargonOS.shared.setProfile(profile: profile)
-	}
-
-	private static func _newProfileAndBDFSMnemonic(
-		deviceInfo creatingDevice: DeviceInfo
-	) -> (
-		profile: Profile,
-		bdfsMnemonic: PrivateHierarchicalDeterministicFactorSource
-	) {
-		@Dependency(\.uuid) var uuid
-		@Dependency(\.date) var date
-		@Dependency(\.mnemonicClient) var mnemonicClient
-
-		var lastUsedOnDevice = creatingDevice
-		lastUsedOnDevice.date = date()
-
-		let profileID = uuid()
-		let header = Profile.Header(
-			snapshotVersion: .v100,
-			id: profileID,
-			creatingDevice: creatingDevice,
-			lastUsedOnDevice: lastUsedOnDevice,
-			lastModified: date.now,
-			contentHint: .init(
-				numberOfAccountsOnAllNetworksInTotal: 0,
-				numberOfPersonasOnAllNetworksInTotal: 0,
-				numberOfNetworks: 0
-			)
-		)
-
-		let mnemonic = MnemonicWithPassphrase(
-			mnemonic: mnemonicClient.generate(
-				BIP39WordCount.twentyFour,
-				BIP39Language.english
-			),
-			passphrase: ""
-		)
-
-		let bdfs = DeviceFactorSource.babylon(
-			mnemonicWithPassphrase: mnemonic,
-			isMain: true,
-			hostInfo: .current()
-		)
-
-		let bdfsMnemonic = PrivateHierarchicalDeterministicFactorSource(
-			mnemonicWithPassphrase: mnemonic,
-			factorSource: bdfs
-		)
-
-		let profile = Profile(
-			header: header,
-			deviceFactorSource: bdfs
-		)
-
-		return (profile, bdfsMnemonic)
-	}
 
 	/// Returns `MetaDeviceInfo` which contains `fromDeprecatedDeviceID` , and if
 	/// it is true, a migration of `DeviceID` into `DeviceInfo` might be needed.
@@ -351,34 +271,6 @@ extension ProfileStore {
 			loggerGlobal.error("Failed to save new device info: \(error)")
 			return MetaDeviceInfo(deviceInfo: new, fromDeprecatedDeviceID: fromDeprecatedDeviceID)
 		}
-	}
-
-	private static func _updateHeaderList(with header: Profile.Header) throws {
-		@Dependency(\.secureStorageClient) var secureStorageClient
-		var headers = try secureStorageClient.loadProfileHeaderList()?.rawValue ?? []
-		headers[id: header.id] = header
-		if let headerList = NonEmpty(rawValue: headers) {
-			try secureStorageClient.saveProfileHeaderList(headerList)
-		} else {
-			struct FailedToUpdateHeaderListWasEmpty: Swift.Error {}
-			throw FailedToUpdateHeaderListWasEmpty()
-		}
-	}
-
-	private static func _setActiveProfile(to header: Profile.Header) {
-		@Dependency(\.userDefaults) var userDefaults
-		userDefaults.setActiveProfileID(header.id)
-	}
-
-	/// **B**abylon **D**evice **F**actor **S**ource
-	private static func _persist(bdfsMnemonic: PrivateHierarchicalDeterministicFactorSource) throws {
-		@Dependency(\.secureStorageClient) var secureStorageClient
-		try secureStorageClient.saveMnemonicForFactorSource(bdfsMnemonic)
-	}
-
-	private static func _persist(profile: Profile) throws {
-		@Dependency(\.secureStorageClient) var secureStorageClient
-		try secureStorageClient.saveProfileSnapshot(profile)
 	}
 }
 

@@ -4,17 +4,16 @@ extension OnboardingClient: DependencyKey {
 
 	public static let liveValue = Self.live()
 
-	public static func live() -> Self {
+	public static func live(profileStore: ProfileStore = .shared) -> Self {
 		Self(
-			loadProfile: {
-				await ProfileStore.shared.profileSequence
+			loadProfileState: {
+				try! await profileStore.profileState().first()
 			},
-			finishOnboarding: {
-				await ProfileStore.shared.finishedOnboarding()
-				return EqVoid.instance
+			createNewWallet: {
+				try await profileStore.newProfile()
 			},
 			finishOnboardingWithRecoveredAccountAndBDFS: {
-				try await ProfileStore.shared.finishOnboarding(with: $0)
+				try await profileStore.finishOnboarding(with: $0)
 				return EqVoid.instance
 			}
 		)

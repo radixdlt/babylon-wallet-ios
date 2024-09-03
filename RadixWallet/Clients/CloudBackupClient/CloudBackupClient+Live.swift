@@ -234,14 +234,13 @@ extension CloudBackupClient {
 				}
 			},
 			migrateProfilesFromKeychain: {
-				let activeProfile = try await profileStore.profile().id
 				guard let headerList = try secureStorageClient.loadProfileHeaderList() else { return [] }
 
 				let previouslyMigrated = userDefaults.getMigratedKeychainProfiles
 
 				let migratable = try headerList.compactMap { header -> (Data, Profile.Header)? in
 					let id = header.id
-					guard !previouslyMigrated.contains(id), header.id != activeProfile else { return nil }
+					guard !previouslyMigrated.contains(id) else { return nil }
 
 					guard let profileData = try? secureStorageClient.loadProfileSnapshotData(id) else { return nil }
 

@@ -23,12 +23,12 @@ public struct Splash: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case passcodeConfigResult(TaskResult<LocalAuthenticationConfig>)
-		case loadedProfile(Profile)
+		case loadedProfileState(ProfileState)
 		case accountRecoveryNeeded(TaskResult<Bool>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case completed(Profile)
+		case completed(ProfileState)
 	}
 
 	public struct Destination: DestinationReducer {
@@ -72,7 +72,9 @@ public struct Splash: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			return delay().concatenate(with: verifyPasscode()).concatenate(with: boot_sargon_os())
+			return delay()
+				.concatenate(with: verifyPasscode())
+				.concatenate(with: boot_sargon_os())
 
 		case .didTapToUnlock:
 			state.biometricsCheckFailed = false
@@ -110,12 +112,8 @@ public struct Splash: Sendable, FeatureReducer {
 
 			return .none
 
-		case let .loadedProfile(profile):
-			if profile.networks.isEmpty {
-				return delegateCompleted()
-			} else {
-				return checkAccountRecoveryNeeded()
-			}
+		case let .loadedProfileState(profileState):
+			return .send(.delegate(.completed(profileState)))
 
 		case let .accountRecoveryNeeded(.failure(error)):
 			state.biometricsCheckFailed = true
@@ -126,7 +124,7 @@ public struct Splash: Sendable, FeatureReducer {
 			if recoveryNeeded {
 				loggerGlobal.notice("Account recovery needed")
 			}
-			return delegateCompleted()
+			return .none
 		}
 	}
 
@@ -138,14 +136,6 @@ public struct Splash: Sendable, FeatureReducer {
 			.run { _ in
 				await openURL(URL(string: UIApplication.openSettingsURLString)!)
 			}
-		}
-	}
-
-	func delegateCompleted() -> Effect<Action> {
-		.run { send in
-			await send(.delegate(
-				.completed(ProfileStore.shared.profile)
-			))
 		}
 	}
 
@@ -161,6 +151,7 @@ public struct Splash: Sendable, FeatureReducer {
 
 	private func boot_sargon_os() -> Effect<Action> {
 		.run { send in
+			_ = ProfileStore.shared
 			try await SargonOS.creatingShared(
 				bootingWith: .creatingShared(drivers: .init(
 					bundle: Bundle.main,
@@ -169,7 +160,7 @@ public struct Splash: Sendable, FeatureReducer {
 				)
 			)
 
-			await send(.internal(.loadedProfile(onboardingClient.loadProfile())))
+			await send(.internal(.loadedProfileState(onboardingClient.loadProfileState())))
 		}
 	}
 
@@ -203,45 +194,46 @@ final class SargonSecureStorage: SecureStorageDriver {
 
 	func loadData(key: SargonUniFFI.SecureStorageKey) async throws -> SargonUniFFI.BagOfBytes? {
 		switch key {
-		case .deviceInfo:
-			return try secureStorageClient.loadDeviceInfo()?.jsonData()
+		case .hostId:
+			return userDefaults.data(key: .hostId)
+
 		case let .deviceFactorSourceMnemonic(factorSourceId):
 			return try secureStorageClient.loadMnemonicDataByFactorSourceID(.init(factorSourceID: factorSourceId, notifyIfMissing: true))
+
 		case .profileSnapshot:
-			guard let activeProfileId = userDefaults.data(key: .activeProfileID) else {
+			guard let activeProfileId = userDefaults.getActiveProfileID() else {
 				return nil
 			}
 
-			return try secureStorageClient.loadProfileSnapshotData(profileId)
+			return try secureStorageClient.loadProfileSnapshotData(activeProfileId)
 		}
 	}
 
 	func saveData(key: SargonUniFFI.SecureStorageKey, data: SargonUniFFI.BagOfBytes) async throws {
 		switch key {
-		case .snapshotHeadersList:
-			return
-		case .activeProfileId:
-			userDefaults.set(data: data, key: .activeProfileID)
-		case .deviceInfo:
-			try secureStorageClient.saveDeviceInfo(DeviceInfo(jsonData: data))
+		case .hostId:
+			try userDefaults.set(data: data, key: .hostId)
 		case let .deviceFactorSourceMnemonic(factorSourceId):
 			try await secureStorageClient.saveMnemonicForFactorSourceData(factorSourceId, data)
-		case let .profileSnapshot(profileId):
-			try secureStorageClient.saveProfileSnapshotData(profileId, data)
+		case let .profileSnapshot:
+			guard let activeProfileId = userDefaults.getActiveProfileID() else {
+				return
+			}
+			try secureStorageClient.saveProfileSnapshotData(activeProfileId, data)
 		}
 	}
 
 	func deleteDataForKey(key: SargonUniFFI.SecureStorageKey) async throws {
 		switch key {
-		case .snapshotHeadersList:
-			return
-		case .activeProfileId:
-			userDefaults.remove(.activeProfileID)
-		case .deviceInfo:
-			return
+		case .hostId:
+			return try userDefaults.remove(.hostId)
 		case let .deviceFactorSourceMnemonic(factorSourceId):
 			return
-		case let .profileSnapshot(profileId):
+		case let .profileSnapshot:
+			guard let activeProfileId = userDefaults.getActiveProfileID() else {
+				return
+			}
+			try secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs(profileID: activeProfileId, keepInICloudIfPresent: true)
 			return
 		}
 	}

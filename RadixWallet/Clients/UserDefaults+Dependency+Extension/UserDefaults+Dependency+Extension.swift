@@ -21,6 +21,8 @@ public enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
 	case activeProfileID
 
 	case mnemonicsUserClaimsToHaveBackedUp
+
+	case hostId
 }
 
 extension UserDefaults.Dependency {

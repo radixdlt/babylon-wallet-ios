@@ -91,7 +91,6 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 		case .createAccount(.delegate(.accountCreated)):
 			appEventsClient.handleEvent(.walletCreated)
 			return .run { _ in
-				_ = await onboardingClient.finishOnboarding()
 				_ = await radixConnectClient.loadP2PLinksAndConnectAll()
 			}
 

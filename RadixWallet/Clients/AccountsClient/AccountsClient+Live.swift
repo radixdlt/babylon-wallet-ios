@@ -15,7 +15,7 @@ extension AccountsClient: DependencyKey {
 		}
 
 		let getCurrentNetworkID: GetCurrentNetworkID = {
-			await profileStore.profileSequence().first().networkID
+			await profileStore.profile().networkID
 		}
 
 		let getAccountsOnNetwork: GetAccountsOnNetwork = {
