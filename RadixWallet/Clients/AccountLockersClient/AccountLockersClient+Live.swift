@@ -156,7 +156,7 @@ extension AccountLockersClient {
 
 		@Sendable
 		func getLockerContent(lockerAddress: String, accountAddress: String) async throws -> [GatewayAPI.AccountLockerVaultCollectionItem] {
-			try await gatewayAPIClient.getAccountLockerVaults(.init(lockerAddress: lockerAddress, accountAddress: accountAddress)).items
+			try await gatewayAPIClient.fetchAllPaginatedItems(cursor: nil, gatewayAPIClient.getAccountLockerVaultsPage(lockerAddress: lockerAddress, accountAddress: accountAddress))
 		}
 
 		let dappsWithClaims: @Sendable () async -> AnyAsyncSequence<[String]> = {

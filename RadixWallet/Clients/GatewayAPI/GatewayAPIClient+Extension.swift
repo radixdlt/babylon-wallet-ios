@@ -76,6 +76,27 @@ extension GatewayAPIClient {
 		}
 	}
 
+	public func getAccountLockerVaultsPage(lockerAddress: String, accountAddress: String) -> @Sendable (PageCursor?) async throws -> PaginatedResourceResponse<GatewayAPI.AccountLockerVaultCollectionItem> {
+		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+		return { pageCursor in
+			let request = GatewayAPI.StateAccountLockerPageVaultsRequest(
+				atLedgerState: pageCursor?.ledgerState.selector,
+				cursor: pageCursor?.nextPageCursor,
+				lockerAddress: lockerAddress,
+				accountAddress: accountAddress
+			)
+			let response = try await gatewayAPIClient.getAccountLockerVaults(request)
+
+			return .init(
+				loadedItems: response.items,
+				totalCount: response.totalCount,
+				cursor: response.nextCursor.map {
+					PageCursor(ledgerState: response.ledgerState, nextPageCursor: $0)
+				}
+			)
+		}
+	}
+
 	public func fetchEntityMetadataPage(
 		_ address: String
 	) -> @Sendable (PageCursor?) async throws -> PaginatedResourceResponse<GatewayAPI.EntityMetadataItem> {
