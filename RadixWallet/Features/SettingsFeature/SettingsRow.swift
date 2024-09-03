@@ -16,6 +16,7 @@ struct SettingsRow<Feature: FeatureReducer>: View {
 
 		case let .toggle(model):
 			ToggleView(
+				context: .settings,
 				icon: model.icon,
 				title: model.title,
 				subtitle: model.subtitle,
