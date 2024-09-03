@@ -10,6 +10,7 @@
 "homePage_accountsTag_legacySoftware" = "Legacy";
 "homePage_accountsTag_ledgerLegacy" = "Legacy (Ledger)";
 "homePage_accountsTag_ledgerBabylon" = "Ledger";
+"homePage_accountLockerClaim" = "%@ has a deposit for you to claim";
 "homePage_visitDashboard_title" = "Visit the Radix Dashboard";
 "homePage_visitDashboard_subtitle" = "Ready to get started using the Radix Network and your Wallet?";
 "homePage_profileOlympiaError_title" = "SERIOUS ERROR - PLEASE READ";
@@ -240,6 +241,7 @@
 "authorizedDapps_title" = "Approved dApps";
 "authorizedDapps_subtitle" = "These are the dApps that you have logged into using the Radix Wallet.";
 "authorizedDapps_whatIsDapp" = "What is a dApp?";
+"authorizedDapps_pendingDeposit" = "A deposit from this dApp is available. Go to your Accounts to view and claim.";
 "authorizedDapps_dAppDetails_dAppDefinition" = "dApp Definition";
 "authorizedDapps_dAppDetails_missingDescription" = "Missing description";
 "authorizedDapps_dAppDetails_website" = "Website";
