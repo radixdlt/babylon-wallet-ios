@@ -111,15 +111,12 @@ extension GatewayAPIClient {
 		}
 
 		@Sendable
-		func getEntityDetails(_ addresses: [String], explictMetadata: Set<EntityMetadataKey>, ledgerState: GatewayAPI.LedgerStateSelector?) async throws -> GatewayAPI.StateEntityDetailsResponse {
-			assert(explictMetadata.count <= EntityMetadataKey.maxAllowedKeys)
+		func getEntityDetails(_ addresses: [String], optIns: GatewayAPI.StateEntityDetailsOptIns?, ledgerState: GatewayAPI.LedgerStateSelector?) async throws -> GatewayAPI.StateEntityDetailsResponse {
+			assert(optIns?.explicitMetadata?.count ?? 0 <= EntityMetadataKey.maxAllowedKeys)
 			return try await post(
 				request: GatewayAPI.StateEntityDetailsRequest(
 					atLedgerState: ledgerState,
-					optIns: .init(
-						explicitMetadata: explictMetadata.map(\.rawValue),
-						dappTwoWayLinks: explictMetadata.contains(.twoWaysLinks) // TODO: Check if the metadata key is actually necessary or just `dappTwoWayLinks` opt in
-					),
+					optIns: optIns,
 					addresses: addresses, aggregationLevel: .vault
 				)) { @Sendable base in base.appendingPathComponent("state/entity/details") }
 		}
@@ -127,9 +124,9 @@ extension GatewayAPIClient {
 		@Sendable
 		func getSingleEntityDetails(
 			_ address: String,
-			explictMetadata: Set<EntityMetadataKey>
+			explicitMetadata: Set<EntityMetadataKey>
 		) async throws -> SingleEntityDetailsResponse {
-			let response = try await getEntityDetails([address], explictMetadata: explictMetadata, ledgerState: nil)
+			let response = try await getEntityDetails([address], optIns: .init(explicitMetadata: explicitMetadata.map(\.rawValue)), ledgerState: nil)
 			guard let item = response.items.first else {
 				throw EmptyEntityDetailsResponse()
 			}
@@ -160,7 +157,7 @@ extension GatewayAPIClient {
 			},
 			getEntityDetails: getEntityDetails,
 			getEntityMetadata: { address, explicitMetadata in
-				try await getSingleEntityDetails(address, explictMetadata: explicitMetadata).details.metadata
+				try await getSingleEntityDetails(address, explicitMetadata: explicitMetadata).details.metadata
 			},
 			getEntityMetadataPage: { request in
 				try await post(

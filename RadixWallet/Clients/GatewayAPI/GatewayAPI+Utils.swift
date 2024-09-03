@@ -69,7 +69,6 @@ public enum EntityMetadataKey: String, CaseIterable, Sendable {
 	case accountType = "account_type"
 	case ownerKeys = "owner_keys"
 	case ownerBadge = "owner_badge"
-	case twoWaysLinks = "two_ways_links"
 
 	// The GW limits the number of metadata keys we can ask for
 	static let maxAllowedKeys = 11
@@ -89,7 +88,7 @@ extension Set<EntityMetadataKey> {
 	}
 
 	public static var dappMetadataKeys: Set<EntityMetadataKey> {
-		let keys: Set<EntityMetadataKey> = [.name, .description, .iconURL, .claimedEntities, .claimedWebsites, .relatedWebsites, .dappDefinitions, .accountType, .twoWaysLinks]
+		let keys: Set<EntityMetadataKey> = [.name, .description, .iconURL, .claimedEntities, .claimedWebsites, .relatedWebsites, .dappDefinitions, .accountType]
 		assert(keys.count <= EntityMetadataKey.maxAllowedKeys)
 		return keys
 	}
