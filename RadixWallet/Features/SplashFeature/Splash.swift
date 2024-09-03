@@ -42,17 +42,23 @@ public struct Splash: Sendable, FeatureReducer {
 	}
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case passcodeCheckFailed(AlertState<Action.PasscodeCheckFailedAlert>)
+			case errorAlert(AlertState<Action.ErrorAlert>)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case passcodeCheckFailed(PasscodeCheckFailedAlert)
+			case errorAlert(ErrorAlert)
 
 			public enum PasscodeCheckFailedAlert: Sendable, Equatable {
 				case retryButtonTapped
 				case openSettingsButtonTapped
 			}
+
+			public enum ErrorAlert: Sendable, Hashable {}
 		}
 
 		public var body: some ReducerOf<Self> {
@@ -60,13 +66,9 @@ public struct Splash: Sendable, FeatureReducer {
 		}
 	}
 
-	@Dependency(\.networkSwitchingClient) var networkSwitchingClient
-	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.continuousClock) var clock
 	@Dependency(\.localAuthenticationClient) var localAuthenticationClient
 	@Dependency(\.onboardingClient) var onboardingClient
 	@Dependency(\.openURL) var openURL
-	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 
 	public init() {}
 
@@ -138,7 +140,13 @@ public struct Splash: Sendable, FeatureReducer {
 
 		case let .biometricsCheckResult(.failure(error)):
 			state.biometricsCheckFailed = true
-			errorQueue.schedule(error)
+			state.destination = .errorAlert(.init(
+				title: .init(L10n.Common.errorAlertTitle),
+				message: .init(error.localizedDescription),
+				buttons: [
+					.default(.init(L10n.Common.ok)),
+				]
+			))
 			return .none
 
 		case let .biometricsCheckResult(.success(success)):

@@ -85,7 +85,7 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 
 		biometricsSplashWindow = UIWindow(windowScene: scene)
 		biometricsSplashWindow?.rootViewController = UIHostingController(rootView: splashView)
-		biometricsSplashWindow?.windowLevel = .normal + 1
+		biometricsSplashWindow?.windowLevel = .normal + 2
 		biometricsSplashWindow?.makeKeyAndVisible()
 
 		@Dependency(\.localAuthenticationClient) var localAuthenticationClient
