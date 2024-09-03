@@ -76,14 +76,14 @@ extension GatewayAPIClient {
 		}
 	}
 
-	public func getAccountLockerVaultsPage(lockerAddress: String, accountAddress: String) -> @Sendable (PageCursor?) async throws -> PaginatedResourceResponse<GatewayAPI.AccountLockerVaultCollectionItem> {
+	public func getAccountLockerVaultsPage(lockerAddress: LockerAddress, accountAddress: AccountAddress) -> @Sendable (PageCursor?) async throws -> PaginatedResourceResponse<GatewayAPI.AccountLockerVaultCollectionItem> {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		return { pageCursor in
 			let request = GatewayAPI.StateAccountLockerPageVaultsRequest(
 				atLedgerState: pageCursor?.ledgerState.selector,
 				cursor: pageCursor?.nextPageCursor,
-				lockerAddress: lockerAddress,
-				accountAddress: accountAddress
+				lockerAddress: lockerAddress.address,
+				accountAddress: accountAddress.address
 			)
 			let response = try await gatewayAPIClient.getAccountLockerVaults(request)
 

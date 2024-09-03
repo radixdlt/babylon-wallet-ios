@@ -737,6 +737,7 @@
 		5B45E2FF2BC59780007C4C84 /* SignWithFactorSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B45E2FD2BC59780007C4C84 /* SignWithFactorSource.swift */; };
 		5B45E3012BC5A491007C4C84 /* FactorSourceAccess+ViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B45E3002BC5A491007C4C84 /* FactorSourceAccess+ViewState.swift */; };
 		5B4712CC2C526146003B4712 /* HeaderButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4712CB2C526146003B4712 /* HeaderButtonStyle.swift */; };
+		5B526ADB2C876E7C00AF8B72 /* AccountLockerClaimDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B526ADA2C876E7C00AF8B72 /* AccountLockerClaimDetails.swift */; };
 		5B6499B72BCFD0E8000F2176 /* SecurityFactors+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B52BCFD0E8000F2176 /* SecurityFactors+View.swift */; };
 		5B6499B82BCFD0E8000F2176 /* SecurityFactors+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B62BCFD0E8000F2176 /* SecurityFactors+Reducer.swift */; };
 		5B6499BA2BCFDB1E000F2176 /* ShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B92BCFDB1E000F2176 /* ShareView.swift */; };
@@ -1943,6 +1944,7 @@
 		5B45E2FD2BC59780007C4C84 /* SignWithFactorSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignWithFactorSource.swift; sourceTree = "<group>"; };
 		5B45E3002BC5A491007C4C84 /* FactorSourceAccess+ViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactorSourceAccess+ViewState.swift"; sourceTree = "<group>"; };
 		5B4712CB2C526146003B4712 /* HeaderButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderButtonStyle.swift; sourceTree = "<group>"; };
+		5B526ADA2C876E7C00AF8B72 /* AccountLockerClaimDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountLockerClaimDetails.swift; sourceTree = "<group>"; };
 		5B6499B52BCFD0E8000F2176 /* SecurityFactors+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityFactors+View.swift"; sourceTree = "<group>"; };
 		5B6499B62BCFD0E8000F2176 /* SecurityFactors+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityFactors+Reducer.swift"; sourceTree = "<group>"; };
 		5B6499B92BCFDB1E000F2176 /* ShareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareView.swift; sourceTree = "<group>"; };
@@ -5497,6 +5499,7 @@
 				5B3C48B42C80D11E00DB160D /* AccountLockersClient+Interface.swift */,
 				5B3C48B62C80D17E00DB160D /* AccountLockersClient+Live.swift */,
 				5B3C48B82C80D23F00DB160D /* AccountLockersClient+Test.swift */,
+				5B526ADA2C876E7C00AF8B72 /* AccountLockerClaimDetails.swift */,
 			);
 			path = AccountLockersClient;
 			sourceTree = "<group>";
@@ -7838,6 +7841,7 @@
 				48CFC6212ADC10DA00E77A5C /* AtLedgerState.swift in Sources */,
 				A40816082C7E0D08005E65B9 /* StateEntityDetailsResponseFungibleResourceDetails.swift in Sources */,
 				48CFC3F52ADC10D900E77A5C /* SignalingClientTypes.swift in Sources */,
+				5B526ADB2C876E7C00AF8B72 /* AccountLockerClaimDetails.swift in Sources */,
 				A408164D2C7E0D08005E65B9 /* TransactionReceipt.swift in Sources */,
 				A408156A2C7E0D08005E65B9 /* CommittedTransactionInfo.swift in Sources */,
 				A408162D2C7E0D08005E65B9 /* StateNonFungibleIdsResponse.swift in Sources */,
@@ -8949,7 +8953,7 @@
 			repositoryURL = "https://github.com/radixdlt/sargon";
 			requirement = {
 				kind = exactVersion;
-				version = 1.0.42;
+				version = 1.0.44;
 			};
 		};
 		A415574E2B757C5E0040AD4E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {

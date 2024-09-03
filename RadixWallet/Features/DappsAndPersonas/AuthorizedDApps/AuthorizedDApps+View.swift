@@ -15,7 +15,7 @@ extension AuthorizedDappsFeature.State {
 				id: $0.id,
 				name: $0.displayName ?? L10n.DAppRequest.Metadata.unknownName,
 				thumbnail: thumbnails[$0.id],
-				hasClaim: dappsWithClaims.contains($0.id.address)
+				hasClaim: dappsWithClaims.contains($0.id)
 			)
 		}
 		.asIdentified()

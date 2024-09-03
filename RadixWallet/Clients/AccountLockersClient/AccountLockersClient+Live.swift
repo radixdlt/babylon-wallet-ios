@@ -14,72 +14,95 @@ extension AccountLockersClient {
 
 		let claimsPerAccountSubject = AsyncCurrentValueSubject<ClaimsPerAccount>([:])
 
-		let timerInterval = DispatchTimeInterval.minutes(5)
-
 		@Sendable
 		func startMonitoring() async throws {
+			// We will check the account locker claims on different conditions:
+
+			// Trigger any time the authorized dapps changes (at any level)
 			let dappValues = await authorizedDappsClient.authorizedDappValues()
-			let accountValues = await accountsClient.accountsOnCurrentNetwork()
-			let timer = AsyncTimerSequence(every: timerInterval)
+
+			// Trigger any time accounts are added/removed.
+			let accountValues = await accountsClient.accountsOnCurrentNetwork().removeDuplicates(by: { $0.map(\.id) == $1.map(\.id) })
+
+			// Trigger every 5 minutes
+			let timer = AsyncTimerSequence(every: .minutes(5))
 
 			for try await (dapps, accounts, _) in combineLatest(dappValues, accountValues, timer) {
-				// Fetch dapp & account lockers state
-				let dappsWithLockers = try await filterDappsWithAccountLockers(dapps)
-				let lockersPerAccount = getLockersPerAccount(accounts: accounts, dapps: dappsWithLockers)
-				let lockersStatePerAccount = try await getLockersStatePerAccount(lockersPerAccount: lockersPerAccount)
+				do {
+					try await checkClaims(dapps: dapps, accounts: accounts)
+				} catch {
+					loggerGlobal.error("Failed to check account locker claims \(error)")
+				}
+			}
+		}
 
-				var claimsPerAccount: ClaimsPerAccount = [:]
+		@Sendable
+		func checkClaims(dapps: AuthorizedDapps, accounts: Accounts) async throws {
+			// Fetch dapp & account lockers state
+			let dappsWithLockers = try await filterDappsWithAccountLockers(dapps)
+			let lockersPerAccount = getLockersPerAccount(accounts: accounts, dapps: dappsWithLockers)
+			let lockersStatePerAccount = try await getLockersStatePerAccount(lockersPerAccount: lockersPerAccount)
 
-				// Loop over each account to determine its claims
-				for account in accounts {
-					guard let lockerStates = lockersStatePerAccount[account.address] else {
-						// If there are no lockers for the given account, set an empty list for it
-						// This is necessary so that if such account used to have, but doesn't have any more, we emit an update
-						// for such account removing the old list of claims.
-						claimsPerAccount[account.address] = []
-						continue
-					}
-					var accountDetails: [AccountLockerClaimDetails] = []
+			var claimsPerAccount: ClaimsPerAccount = [:]
 
-					// Loop over each locker associated to this account
-					for lockerState in lockerStates.items {
-						if let cached = getCachedVersionIfValid(lockerState: lockerState) {
-							// The cached claim information is valid.
-							accountDetails.append(cached)
+			// Loop over each account to determine its claims
+			for account in accounts {
+				guard let lockerStates = lockersStatePerAccount[account.address] else {
+					// If there are no lockers for the given account, set an empty list for it
+					// This is necessary so that if such account used to have, but doesn't have any more, we emit an update
+					// for such account removing the old list of claims.
+					claimsPerAccount[account.address] = []
+					continue
+				}
+				var accountDetails: [AccountLockerClaimDetails] = []
 
-						} else {
-							// The cache is outdated or doesn't exist, so we will fetch info from Gateway
-							let lockerAddress = lockerState.lockerAddress
-							let accountAddress = lockerState.accountAddress
-							let lockerContent = try await getLockerContent(lockerAddress: lockerAddress, accountAddress: accountAddress)
-							let claims = lockerContent.filter(\.isValidClaim)
+				// Loop over each locker associated to this account
+				for lockerState in lockerStates.items {
+					let accountAddress = try AccountAddress(validatingAddress: lockerState.accountAddress)
+					let lockerAddress = try LockerAddress(validatingAddress: lockerState.lockerAddress)
 
-							guard let dapp = dappsWithLockers.first(where: { $0.lockerAddress == lockerAddress })?.dapp else {
-								fatalError("Programmer error: there should be a dapp for the given locker")
-							}
+					let cached = getCachedVersionIfValid(
+						accountAddress: accountAddress,
+						lockerAddress: lockerAddress,
+						lastTouchedAtStateVersion: lockerState.lastTouchedAtStateVersion
+					)
 
-							let details = AccountLockerClaimDetails(
-								lockerAddress: lockerAddress,
-								accountAddress: accountAddress,
-								dappDefinitionAddress: dapp.dappDefinitionAddress.address,
-								dappName: dapp.displayName,
-								lastTouchedAtStateVersion: lockerState.lastTouchedAtStateVersion,
-								claims: claims
-							)
+					if let cached {
+						// The cached claim information is valid.
+						accountDetails.append(cached)
+					} else {
+						// The cache is outdated or doesn't exist, so we will fetch info from Gateway
+						let lockerContent = try await getLockerContent(lockerAddress: lockerAddress, accountAddress: accountAddress)
+						let claims: [AccountLockerClaimDetails.Claim] = lockerContent
+							.filter(\.isValidClaim)
+							.compactMap { try? .init($0) }
 
-							// Cache the result and append to list
-							cacheClient.save(details, .accountLockerClaimDetails(accountAddress: accountAddress, lockerAddress: lockerAddress))
-							accountDetails.append(details)
+						guard let dapp = dappsWithLockers.first(where: { $0.lockerAddress == lockerAddress.address })?.dapp else {
+							assertionFailure("Programmer error: there should be a dapp for the given locker")
+							continue
 						}
-					}
 
-					// Set the details for the given account, filtering those who have no claims.
-					claimsPerAccount[account.address] = accountDetails.filter(not(\.claims.isEmpty))
+						let details = AccountLockerClaimDetails(
+							lockerAddress: lockerAddress,
+							accountAddress: accountAddress,
+							dappDefinitionAddress: dapp.dappDefinitionAddress,
+							dappName: dapp.displayName,
+							lastTouchedAtStateVersion: lockerState.lastTouchedAtStateVersion,
+							claims: claims
+						)
+
+						// Cache the result and append to list
+						cacheClient.save(details, .accountLockerClaimDetails(accountAddress, lockerAddress))
+						accountDetails.append(details)
+					}
 				}
 
-				// Emit a new result
-				claimsPerAccountSubject.send(claimsPerAccount)
+				// Set the details for the given account, filtering those who have no claims.
+				claimsPerAccount[account.address] = accountDetails.filter(not(\.claims.isEmpty))
 			}
+
+			// Emit a new result
+			claimsPerAccountSubject.send(claimsPerAccount)
 		}
 
 		@Sendable
@@ -92,9 +115,11 @@ extension AccountLockersClient {
 			// Get entity details from those dapps, to filter only those that actually have a primary locker.
 			let dappsWithLocker = try await onLedgerEntitiesClient
 				.getEntities(dappsWithDepositsVisible, .init(dappTwoWayLinks: true), nil, .useCache, false)
-				.compactMap(\.account)
-				.compactMap { account -> (AccountAddress, String)? in
-					guard let lockerAddress = account.details?.primaryLocker else {
+				.compactMap { entity -> (AccountAddress, String)? in
+					guard
+						let account = entity.account,
+						let lockerAddress = account.details?.primaryLocker
+					else {
 						return nil
 					}
 					return (account.address, lockerAddress)
@@ -113,13 +138,9 @@ extension AccountLockersClient {
 		func getLockersPerAccount(accounts: Accounts, dapps: [DappWithLockerAddress]) -> [AccountAddress: [String]] {
 			var result: [AccountAddress: [String]] = [:]
 			for account in accounts {
-				var lockerAddresses: [String] = []
-				for dapp in dapps {
-					let accountsInDapp = dapp.dapp.accountsInDapp
-					if accountsInDapp.contains(account.address) {
-						lockerAddresses.append(dapp.lockerAddress)
-					}
-				}
+				let lockerAddresses = dapps
+					.filter { $0.dapp.accountsInDapp.contains(account.address) }
+					.map(\.lockerAddress)
 				if !lockerAddresses.isEmpty {
 					result[account.address] = lockerAddresses
 				}
@@ -143,11 +164,11 @@ extension AccountLockersClient {
 		}
 
 		@Sendable
-		func getCachedVersionIfValid(lockerState: GatewayAPI.StateAccountLockersTouchedAtResponseItem) -> AccountLockerClaimDetails? {
-			let entry = CacheClient.Entry.accountLockerClaimDetails(accountAddress: lockerState.accountAddress, lockerAddress: lockerState.lockerAddress)
+		func getCachedVersionIfValid(accountAddress: AccountAddress, lockerAddress: LockerAddress, lastTouchedAtStateVersion: AtStateVersion) -> AccountLockerClaimDetails? {
+			let entry = CacheClient.Entry.accountLockerClaimDetails(accountAddress, lockerAddress)
 			guard
 				let cached = try? cacheClient.load(AccountLockerClaimDetails.self, entry) as? AccountLockerClaimDetails,
-				cached.lastTouchedAtStateVersion == lockerState.lastTouchedAtStateVersion
+				cached.lastTouchedAtStateVersion == lastTouchedAtStateVersion
 			else {
 				return nil
 			}
@@ -155,11 +176,11 @@ extension AccountLockersClient {
 		}
 
 		@Sendable
-		func getLockerContent(lockerAddress: String, accountAddress: String) async throws -> [GatewayAPI.AccountLockerVaultCollectionItem] {
+		func getLockerContent(lockerAddress: LockerAddress, accountAddress: AccountAddress) async throws -> [GatewayAPI.AccountLockerVaultCollectionItem] {
 			try await gatewayAPIClient.fetchAllPaginatedItems(cursor: nil, gatewayAPIClient.getAccountLockerVaultsPage(lockerAddress: lockerAddress, accountAddress: accountAddress))
 		}
 
-		let dappsWithClaims: @Sendable () async -> AnyAsyncSequence<[String]> = {
+		let dappsWithClaims: DappsWithClaims = {
 			claimsPerAccountSubject
 				.map { claimsPerAccount in
 					let addresses = claimsPerAccount.values.flatMap { claims in

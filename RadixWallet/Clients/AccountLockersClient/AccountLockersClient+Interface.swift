@@ -15,16 +15,5 @@ public struct AccountLockersClient: DependencyKey, Sendable {
 extension AccountLockersClient {
 	public typealias StartMonitoring = @Sendable () async throws -> Void
 	public typealias AccountClaims = @Sendable (AccountAddress) async -> AnyAsyncSequence<[AccountLockerClaimDetails]>
-	public typealias DappsWithClaims = @Sendable () async -> AnyAsyncSequence<[String]>
-}
-
-// MARK: - AccountLockerClaimDetails
-/// A struct holding the details for the pending claims of a given locker address & account address.
-public struct AccountLockerClaimDetails: Sendable, Hashable, Codable {
-	let lockerAddress: String
-	let accountAddress: String
-	let dappDefinitionAddress: String
-	let dappName: String?
-	let lastTouchedAtStateVersion: Int64
-	let claims: [GatewayAPI.AccountLockerVaultCollectionItem]
+	public typealias DappsWithClaims = @Sendable () async -> AnyAsyncSequence<[DappDefinitionAddress]>
 }

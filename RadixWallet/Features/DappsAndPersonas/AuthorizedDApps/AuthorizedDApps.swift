@@ -18,7 +18,7 @@ public struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var dApps: AuthorizedDapps = []
 		public var thumbnails: [AuthorizedDapp.ID: URL] = [:]
-		public var dappsWithClaims: [String] = []
+		public var dappsWithClaims: [DappDefinitionAddress] = []
 
 		@PresentationState
 		public var destination: Destination.State? = nil
@@ -43,7 +43,7 @@ public struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 		case loadedThumbnail(URL, dApp: AuthorizedDapp.ID)
 		case presentDappDetails(DappDetails.State)
 		case failedToGetDetailsOfDapp(id: AuthorizedDapp.ID)
-		case setDappsWithClaims([String])
+		case setDappsWithClaims([DappDefinitionAddress])
 	}
 
 	// MARK: Destination
