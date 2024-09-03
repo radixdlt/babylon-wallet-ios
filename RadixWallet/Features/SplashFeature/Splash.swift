@@ -90,10 +90,11 @@ public struct Splash: Sendable, FeatureReducer {
 				// Starting with iOS 18, the system-provided biometric check will be used
 				if #unavailable(iOS 18), isAdvancedLockEnabled {
 					#if targetEnvironment(simulator)
-					await send(.internal(.loadingDataCompleted))
+					let action: InternalAction = _XCTIsTesting ? .checkBiometrics : .loadingDataCompleted
 					#else
-					await send(.internal(.checkBiometrics))
+					let action: InternalAction = .checkBiometrics
 					#endif
+					await send(.internal(action))
 				} else {
 					await send(.internal(.loadingDataCompleted))
 				}
