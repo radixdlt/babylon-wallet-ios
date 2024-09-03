@@ -109,7 +109,9 @@ extension Home.AccountRow {
 							}
 
 							ForEachStatic(viewStore.accountLockerClaims) { claim in
-								Button {} label: {
+								Button {
+									viewStore.send(.accountLockerClaimTapped(claim))
+								} label: {
 									AccountBannerView(kind: .lockerClaim(dappName: claim.dappName))
 								}
 							}

@@ -9,6 +9,9 @@ public struct AccountLockersClient: DependencyKey, Sendable {
 
 	/// Async sequence with the set of dapps that have at least one AccountLockerClaimDetails associated to it.
 	public let dappsWithClaims: DappsWithClaims
+
+	/// Claim the content for a given account and locker
+	public let claimContent: ClaimContent
 }
 
 // MARK: AccountLockersClient.StartMonitoring
@@ -16,4 +19,5 @@ extension AccountLockersClient {
 	public typealias StartMonitoring = @Sendable () async throws -> Void
 	public typealias AccountClaims = @Sendable (AccountAddress) async -> AnyAsyncSequence<[AccountLockerClaimDetails]>
 	public typealias DappsWithClaims = @Sendable () async -> AnyAsyncSequence<[DappDefinitionAddress]>
+	public typealias ClaimContent = @Sendable (AccountLockerClaimDetails) async throws -> Void
 }

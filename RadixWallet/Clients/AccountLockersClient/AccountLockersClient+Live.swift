@@ -11,6 +11,7 @@ extension AccountLockersClient {
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.cacheClient) var cacheClient
+		@Dependency(\.dappInteractionClient) var dappInteractionClient
 
 		let claimsPerAccountSubject = AsyncCurrentValueSubject<ClaimsPerAccount>([:])
 
@@ -178,6 +179,8 @@ extension AccountLockersClient {
 			try await gatewayAPIClient.fetchAllPaginatedItems(cursor: nil, gatewayAPIClient.getAccountLockerVaultsPage(lockerAddress: lockerAddress, accountAddress: accountAddress))
 		}
 
+		// MARK: - DappsWithClaims
+
 		let dappsWithClaims: DappsWithClaims = {
 			claimsPerAccountSubject
 				.map { claimsPerAccount in
@@ -190,6 +193,51 @@ extension AccountLockersClient {
 				.eraseToAnyAsyncSequence()
 		}
 
+		// MARK: - ClaimContent
+
+		let claimContent: ClaimContent = { details in
+			let lockerAddress = try LockerAddress(validatingAddress: details.lockerAddress)
+			let claimant = try AccountAddress(validatingAddress: details.accountAddress)
+			let claimableResources = try await getAccountLockerClaimableResources(details: details)
+			let manifest = TransactionManifest.accountLockerClaim(
+				lockerAddress: lockerAddress,
+				claimant: claimant,
+				claimableResources: claimableResources
+			)
+			_ = await dappInteractionClient.addWalletInteraction(
+				.transaction(.init(send: .init(transactionManifest: manifest))),
+				.accountTransfer
+			)
+		}
+
+		@Sendable
+		func getAccountLockerClaimableResources(details: AccountLockerClaimDetails) async throws -> [AccountLockerClaimableResource] {
+			try await details.claims.parallelMap { item in
+				switch item {
+				case let .fungible(fungible):
+					let resourceAddress = try ResourceAddress(validatingAddress: fungible.resourceAddress)
+					let amount = try Decimal192(fungible.amount)
+					return AccountLockerClaimableResource.fungible(resourceAddress: resourceAddress, amount: amount)
+
+				case let .nonFungible(nonFungible):
+					let resourceAddress = try ResourceAddress(validatingAddress: nonFungible.resourceAddress)
+					let ids = try await gatewayAPIClient.fetchAllPaginatedItems(
+						cursor: nil,
+						gatewayAPIClient.fetchEntityNonFungibleResourceIdsPage(
+							details.accountAddress,
+							resourceAddress: nonFungible.resourceAddress,
+							vaultAddress: nonFungible.vaultAddress
+						)
+					)
+					.map { try NonFungibleLocalId($0) }
+
+					return AccountLockerClaimableResource.nonFungible(resourceAddress: resourceAddress, ids: ids)
+				}
+			}
+		}
+
+		// MARK: - Client
+
 		return .init(
 			startMonitoring: startMonitoring,
 			accountClaims: { account in
@@ -199,14 +247,17 @@ extension AccountLockersClient {
 				.share()
 				.eraseToAnyAsyncSequence()
 			},
-			dappsWithClaims: dappsWithClaims
+			dappsWithClaims: dappsWithClaims,
+			claimContent: claimContent
 		)
 	}
+}
 
-	private struct DappWithLockerAddress: Sendable, Hashable {
+// MARK: - Helpers
+
+private struct DappWithLockerAddress: Sendable, Hashable {
 		let dapp: AuthorizedDapp
 		let lockerAddress: LockerAddress
-	}
 }
 
 private extension AuthorizedDapp {
