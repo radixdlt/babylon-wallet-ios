@@ -24,6 +24,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 		public var status: TXStatus
 		public let inProgressDismissalDisabled: Bool
 		public let route: P2P.Route
+		public let isAccountLockerClaim: Bool
 
 		@PresentationState
 		var dismissTransactionAlert: AlertState<ViewAction.DismissAlertAction>?
@@ -32,12 +33,14 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 			notarizedTX: NotarizeTransactionResponse,
 			status: TXStatus = .notYetSubmitted,
 			inProgressDismissalDisabled: Bool = false,
-			route: P2P.Route
+			route: P2P.Route,
+			isAccountLockerClaim: Bool
 		) {
 			self.notarizedTX = notarizedTX
 			self.status = status
 			self.inProgressDismissalDisabled = inProgressDismissalDisabled
 			self.route = route
+			self.isAccountLockerClaim = isAccountLockerClaim
 		}
 	}
 
@@ -67,6 +70,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 	@Dependency(\.submitTXClient) var submitTXClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
+	@Dependency(\.accountLockersClient) var accountLockersClient
 
 	public init() {}
 
@@ -162,6 +166,9 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 	private func transactionCommittedSuccesfully(_ state: State) -> Effect<Action> {
 		// TODO: Could probably be moved in other place. TransactionClient? AccountPortfolio?
 		accountPortfoliosClient.updateAfterCommittedTransaction(state.notarizedTX.intent)
+		if state.isAccountLockerClaim {
+			accountLockersClient.didClaimContent()
+		}
 		return .send(.delegate(.committedSuccessfully(state.notarizedTX.txID)))
 	}
 }

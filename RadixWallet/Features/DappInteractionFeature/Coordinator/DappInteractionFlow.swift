@@ -905,6 +905,7 @@ extension DappInteractionFlow.Path.State {
 				} ?? Message.none,
 				waitsForTransactionToBeComitted: interaction.interactionId.isWalletAccountDepositSettingsInteraction,
 				isWalletTransaction: interaction.interactionId.isWalletInteraction,
+				isAccountLockerClaim: interaction.interactionId.isWalletAccountLockerClaimInteraction,
 				proposingDappMetadata: dappMetadata.onLedger,
 				p2pRoute: p2pRoute
 			))

@@ -14,18 +14,22 @@ extension AccountLockersClient {
 		@Dependency(\.dappInteractionClient) var dappInteractionClient
 
 		let claimsPerAccountSubject = AsyncCurrentValueSubject<ClaimsPerAccount>([:])
+		let didClaimSubject = AsyncCurrentValueSubject<Bool>(false)
 
 		@Sendable
 		func startMonitoring() async throws {
 			// We will check the account locker claims on different conditions:
 
-			// Trigger any time the authorized dapps changes (at any level)
+			// Any time the authorized dapps change (at any level)
 			let dappValues = await authorizedDappsClient.authorizedDappValues()
 
-			// Trigger every 5 minutes
+			// Every 5 minutes
 			let timer = AsyncTimerSequence(every: .minutes(5))
+			
+			// Whenever any flow on the Wallet indicates the client to force refresh (e.g. when an account locker was claimed)
+			let forceRefresh = didClaimSubject
 
-			for try await (dapps, _) in combineLatest(dappValues, timer) {
+			for try await (dapps, _, _) in combineLatest(dappValues, timer, forceRefresh) {
 				do {
 					try await checkClaims(dapps: dapps)
 				} catch {
@@ -206,7 +210,7 @@ extension AccountLockersClient {
 			)
 			_ = await dappInteractionClient.addWalletInteraction(
 				.transaction(.init(send: .init(transactionManifest: manifest))),
-				.accountTransfer
+				.accountLockerClaim
 			)
 		}
 
@@ -236,6 +240,12 @@ extension AccountLockersClient {
 			}
 		}
 
+		// MARK: - DidClaimContent
+
+		let didClaimContent: DidClaimContent = {
+			didClaimSubject.send(true)
+		}
+
 		// MARK: - Client
 
 		return .init(
@@ -248,7 +258,8 @@ extension AccountLockersClient {
 				.eraseToAnyAsyncSequence()
 			},
 			dappsWithClaims: dappsWithClaims,
-			claimContent: claimContent
+			claimContent: claimContent,
+			didClaimContent: didClaimContent
 		)
 	}
 }

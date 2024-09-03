@@ -14,6 +14,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public let signTransactionPurpose: SigningPurpose.SignTransactionPurpose
 		public let waitsForTransactionToBeComitted: Bool
 		public let isWalletTransaction: Bool
+		public let isAccountLockerClaim: Bool
 		public let proposingDappMetadata: DappMetadata.Ledger?
 		public let p2pRoute: P2P.Route
 
@@ -81,6 +82,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey = .init(),
 			waitsForTransactionToBeComitted: Bool = false,
 			isWalletTransaction: Bool,
+			isAccountLockerClaim: Bool = false,
 			proposingDappMetadata: DappMetadata.Ledger?,
 			p2pRoute: P2P.Route
 		) {
@@ -91,6 +93,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			self.ephemeralNotaryPrivateKey = ephemeralNotaryPrivateKey
 			self.waitsForTransactionToBeComitted = waitsForTransactionToBeComitted
 			self.isWalletTransaction = isWalletTransaction
+			self.isAccountLockerClaim = isAccountLockerClaim
 			self.proposingDappMetadata = proposingDappMetadata
 			self.p2pRoute = p2pRoute
 		}
@@ -484,7 +487,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.destination = .submitting(.init(
 				notarizedTX: notarizedTX,
 				inProgressDismissalDisabled: state.waitsForTransactionToBeComitted,
-				route: state.p2pRoute
+				route: state.p2pRoute,
+				isAccountLockerClaim: state.isAccountLockerClaim
 			))
 			return .none
 
@@ -549,7 +553,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.destination = .submitting(.init(
 				notarizedTX: notarizedTX,
 				inProgressDismissalDisabled: state.waitsForTransactionToBeComitted,
-				route: state.p2pRoute
+				route: state.p2pRoute,
+				isAccountLockerClaim: state.isAccountLockerClaim
 			))
 			return .none
 
