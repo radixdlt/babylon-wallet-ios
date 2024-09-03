@@ -14,7 +14,7 @@ extension AccountLockersClient {
 
 		let claimsPerAccountSubject = AsyncCurrentValueSubject<ClaimsPerAccount>([:])
 
-		let timerInterval: DispatchTimeInterval = .seconds(600) // 10 minutes
+		let timerInterval = DispatchTimeInterval.minutes(5)
 
 		@Sendable
 		func startMonitoring() async throws {
