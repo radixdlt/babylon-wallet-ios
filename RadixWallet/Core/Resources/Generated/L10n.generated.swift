@@ -779,6 +779,8 @@ public enum L10n {
     }
   }
   public enum AuthorizedDapps {
+    /// A deposit from this dApp is available. Go to your Accounts to view and claim.
+    public static let pendingDeposit = L10n.tr("Localizable", "authorizedDapps_pendingDeposit", fallback: "A deposit from this dApp is available. Go to your Accounts to view and claim.")
     /// These are the dApps that you have logged into using the Radix Wallet.
     public static let subtitle = L10n.tr("Localizable", "authorizedDapps_subtitle", fallback: "These are the dApps that you have logged into using the Radix Wallet.")
     /// Approved dApps
@@ -1840,6 +1842,10 @@ public enum L10n {
     public static let unhidePersonasConfirmation = L10n.tr("Localizable", "hiddenEntities_unhidePersonasConfirmation", fallback: "Make this Persona visible in your wallet again?")
   }
   public enum HomePage {
+    /// %@ has a deposit for you to claim
+    public static func accountLockerClaim(_ p1: Any) -> String {
+      return L10n.tr("Localizable", "homePage_accountLockerClaim", String(describing: p1), fallback: "%@ has a deposit for you to claim")
+    }
     /// I have written down this seed phrase
     public static let backedUpMnemonicHeading = L10n.tr("Localizable", "homePage_backedUpMnemonicHeading", fallback: "I have written down this seed phrase")
     /// Create a New Account
