@@ -27,7 +27,7 @@ extension AccountLockerClaimDetails.Claim {
 
 	public struct NonFungible: Sendable, Hashable, Codable {
 		let resourceAddress: ResourceAddress
-		let vaultAddress: VaultAddress
+		let count: Int
 	}
 }
 
@@ -41,8 +41,8 @@ extension AccountLockerClaimDetails.Claim {
 
 		case let .nonFungible(value):
 			let resourceAddress = try ResourceAddress(validatingAddress: value.resourceAddress)
-			let vaultAddress = try VaultAddress(validatingAddress: value.vaultAddress)
-			self = .nonFungible(.init(resourceAddress: resourceAddress, vaultAddress: vaultAddress))
+			let count = Int(value.totalCount)
+			self = .nonFungible(.init(resourceAddress: resourceAddress, count: count))
 		}
 	}
 }
