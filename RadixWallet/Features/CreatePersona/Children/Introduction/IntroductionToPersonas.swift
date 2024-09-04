@@ -15,6 +15,10 @@ public struct IntroductionToPersonas: Sendable, FeatureReducer {
 
 	public init() {}
 
+	public var body: some ReducerOf<Self> {
+		Reduce(core)
+	}
+
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .continueButtonTapped:
