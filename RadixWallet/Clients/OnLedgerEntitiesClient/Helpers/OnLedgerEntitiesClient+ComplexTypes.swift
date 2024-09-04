@@ -29,8 +29,8 @@ extension OnLedgerEntitiesClient {
 		let amount = resourceQuantifier.amount
 		let resourceAddress = resource.resourceAddress
 
-		@Dependency(\.appPreferencesClient) var appPreferencesClient
-		let hiddenResources = await appPreferencesClient.getHiddenResources()
+		@Dependency(\.resourcesVisibilityClient) var resourcesVisibilityClient
+		let hiddenResources = try await resourcesVisibilityClient.getHidden()
 
 		let guarantee: TransactionGuarantee? = { () -> TransactionGuarantee? in
 			guard case let .predicted(predictedAmount) = resourceQuantifier else { return nil }
@@ -200,8 +200,8 @@ extension OnLedgerEntitiesClient {
 
 		switch resourceInfo {
 		case let .left(resource):
-			@Dependency(\.appPreferencesClient) var appPreferencesClient
-			let hiddenResources = await appPreferencesClient.getHiddenResources()
+			@Dependency(\.resourcesVisibilityClient) var resourcesVisibilityClient
+			let hiddenResources = try await resourcesVisibilityClient.getHidden()
 
 			let existingTokenIds = ids.filter { id in
 				!newlyCreatedNonFungibles.contains { newId in

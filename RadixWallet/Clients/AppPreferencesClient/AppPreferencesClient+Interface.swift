@@ -70,14 +70,6 @@ extension AppPreferencesClient {
 			display.isCurrencyAmountVisible.toggle()
 		}
 	}
-
-	public func getHiddenResources() async -> [ResourceIdentifier] {
-		await getPreferences().resources.hiddenResources
-	}
-
-	public func isResourceHidden(_ resource: ResourceIdentifier) async -> Bool {
-		await getHiddenResources().contains(resource)
-	}
 }
 
 // MARK: AppPreferencesClient.Error

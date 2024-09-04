@@ -7,6 +7,7 @@ extension AccountPortfoliosClient: DependencyKey {
 		@Dependency(\.cacheClient) var cacheClient
 		@Dependency(\.tokenPricesClient) var tokenPricesClient
 		@Dependency(\.appPreferencesClient) var appPreferencesClient
+		@Dependency(\.resourcesVisibilityClient) var resourcesVisibilityClient
 		@Dependency(\.gatewaysClient) var gatewaysClient
 
 		/// Update currency amount visibility based on the profile state
@@ -27,7 +28,7 @@ extension AccountPortfoliosClient: DependencyKey {
 
 		/// Update when hidden resources change
 		Task {
-			for try await _ in await appPreferencesClient.appPreferenceUpdates().removeDuplicates(by: { $0.resources.hiddenResources == $1.resources.hiddenResources }) {
+			for try await _ in await resourcesVisibilityClient.hiddenValues().removeDuplicates() {
 				guard !Task.isCancelled else { return }
 				let accountAddresses = state.portfoliosSubject.value.wrappedValue.map { $0.map(\.key) } ?? []
 				_ = try await fetchAccountPortfolios(accountAddresses, forceRefreshEntities: false, forceRefreshPrices: true)
@@ -96,7 +97,7 @@ extension AccountPortfoliosClient: DependencyKey {
 			await state.setIsCurrencyAmountVisble(display.isCurrencyAmountVisible)
 
 			let accounts = try await onLedgerEntitiesClient.getAccounts(accountAddresses)
-			let hiddenResources = preferences.resources.hiddenResources
+			let hiddenResources = try await resourcesVisibilityClient.getHidden()
 
 			let portfolios = accounts.map { AccountPortfolio(account: $0, hiddenResources: hiddenResources) }
 			await state.handlePortfoliosUpdate(portfolios)
@@ -152,7 +153,7 @@ extension AccountPortfoliosClient: DependencyKey {
 			}
 
 			let account = try await onLedgerEntitiesClient.getAccount(accountAddress)
-			let hiddenResources = await appPreferencesClient.getHiddenResources()
+			let hiddenResources = try await resourcesVisibilityClient.getHidden()
 			let portfolio = AccountPortfolio(account: account, hiddenResources: hiddenResources)
 
 			if case let .success(tokenPrices) = await state.tokenPrices {
