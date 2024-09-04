@@ -77,7 +77,7 @@ extension AccountLockersClient {
 							.filter(\.isValidClaim)
 							.compactMap { try? .init($0) }
 
-						guard let dapp = dappsWithLockers.first(where: { $0.lockerAddress == lockerAddress.address })?.dapp else {
+						guard let dapp = dappsWithLockers.first(where: { $0.lockerAddress == lockerAddress })?.dapp else {
 							assertionFailure("Programmer error: there should be a dapp for the given locker")
 							continue
 						}
@@ -115,7 +115,7 @@ extension AccountLockersClient {
 			// Get entity details from those dapps, to filter only those that actually have a primary locker.
 			let dappsWithLocker = try await onLedgerEntitiesClient
 				.getEntities(dappsWithDepositsVisible, .init(dappTwoWayLinks: true), nil, .useCache, false)
-				.compactMap { entity -> (AccountAddress, String)? in
+				.compactMap { entity -> (AccountAddress, LockerAddress)? in
 					guard
 						let account = entity.account,
 						let lockerAddress = account.details?.primaryLocker
@@ -135,8 +135,8 @@ extension AccountLockersClient {
 		}
 
 		@Sendable
-		func getLockersPerAccount(accounts: Accounts, dapps: [DappWithLockerAddress]) -> [AccountAddress: [String]] {
-			var result: [AccountAddress: [String]] = [:]
+		func getLockersPerAccount(accounts: Accounts, dapps: [DappWithLockerAddress]) -> [AccountAddress: [LockerAddress]] {
+			var result: [AccountAddress: [LockerAddress]] = [:]
 			for account in accounts {
 				let lockerAddresses = dapps
 					.filter { $0.dapp.accountsInDapp.contains(account.address) }
@@ -152,10 +152,10 @@ extension AccountLockersClient {
 		typealias LockersStatePerAccount = [AccountAddress: GatewayAPI.StateAccountLockersTouchedAtResponse]
 
 		@Sendable
-		func getLockersStatePerAccount(lockersPerAccount: [AccountAddress: [String]]) async throws -> LockersStatePerAccount {
+		func getLockersStatePerAccount(lockersPerAccount: [AccountAddress: [LockerAddress]]) async throws -> LockersStatePerAccount {
 			let result = try await lockersPerAccount.parallelMap { accountAddress, lockers in
 				let accountLockers = lockers.map {
-					GatewayAPI.AccountLockerAddress(lockerAddress: $0, accountAddress: accountAddress.address)
+					GatewayAPI.AccountLockerAddress(lockerAddress: $0.address, accountAddress: accountAddress.address)
 				}
 				let response = try await gatewayAPIClient.getAccountLockerTouchedAt(.init(accountLockers: accountLockers))
 				return (accountAddress, response)
@@ -207,7 +207,7 @@ extension AccountLockersClient {
 
 	private struct DappWithLockerAddress: Sendable, Hashable {
 		let dapp: AuthorizedDapp
-		let lockerAddress: String
+		let lockerAddress: LockerAddress
 	}
 }
 

@@ -437,7 +437,7 @@ extension OnLedgerEntity.OnLedgerAccount.Details {
 		guard let gatewayDeposit = GatewayAPI.DepositRule(rawValue: gatewayDepositRaw) else {
 			return nil
 		}
-		let primaryLocker = component?.twoWayLinkedDappDetails?.primaryLocker
+		let primaryLocker = try? component?.twoWayLinkedDappDetails?.primaryLocker.map { try LockerAddress(validatingAddress: $0) }
 		self.init(depositRule: .init(gateway: gatewayDeposit), primaryLocker: primaryLocker)
 	}
 
@@ -462,9 +462,9 @@ extension OnLedgerEntity {
 
 		public struct Details: Sendable, Hashable, Codable {
 			public let depositRule: DepositRule
-			public let primaryLocker: String?
+			public let primaryLocker: LockerAddress?
 
-			public init(depositRule: DepositRule, primaryLocker: String?) {
+			public init(depositRule: DepositRule, primaryLocker: LockerAddress?) {
 				self.depositRule = depositRule
 				self.primaryLocker = primaryLocker
 			}
