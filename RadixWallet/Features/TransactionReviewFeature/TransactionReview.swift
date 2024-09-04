@@ -991,7 +991,9 @@ public enum FeePayerValidationOutcome: Sendable, Hashable {
 
 extension ReviewedTransaction {
 	var involvedAccounts: Set<AccountAddress> {
-		Set(accountWithdraws.keys).union(accountDeposits.keys)
+		Set(accountWithdraws.keys)
+			.union(accountDeposits.keys)
+			.union(transactionManifest.summary.addressesOfAccountsRequiringAuth)
 	}
 
 	var feePayingValidation: Loadable<FeePayerValidationOutcome> {
