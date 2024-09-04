@@ -3047,11 +3047,11 @@
 		48CFBCEA2ADC10D800E77A5C /* CustomizeFees */ = {
 			isa = PBXGroup;
 			children = (
+				48CFBCEF2ADC10D800E77A5C /* AdvancedFeesCustomization.swift */,
 				48CFBCEB2ADC10D800E77A5C /* AdvancedFeesCustomization+View.swift */,
+				48CFBCEE2ADC10D800E77A5C /* NormalFeesCustomization.swift */,
 				48CFBCEC2ADC10D800E77A5C /* NormalFeesCustomization+View.swift */,
 				48CFBCED2ADC10D800E77A5C /* FeesView.swift */,
-				48CFBCEE2ADC10D800E77A5C /* NormalFeesCustomization.swift */,
-				48CFBCEF2ADC10D800E77A5C /* AdvancedFeesCustomization.swift */,
 				48CFBCF02ADC10D800E77A5C /* CustomizeFees+View.swift */,
 				48CFBCF12ADC10D800E77A5C /* CustomizeFees.swift */,
 			);
