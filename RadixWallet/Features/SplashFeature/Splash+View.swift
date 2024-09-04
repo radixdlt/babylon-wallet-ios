@@ -46,12 +46,7 @@ private extension StoreOf<Splash> {
 private extension View {
 	func destinations(with store: StoreOf<Splash>) -> some View {
 		let destinationStore = store.destination
-		return passcodeCheckFailed(with: destinationStore)
-			.errorAlert(with: destinationStore)
-	}
-
-	private func passcodeCheckFailed(with destinationStore: PresentationStoreOf<Splash.Destination>) -> some View {
-		alert(store: destinationStore.scope(state: \.passcodeCheckFailed, action: \.passcodeCheckFailed))
+		return errorAlert(with: destinationStore)
 	}
 
 	private func errorAlert(with destinationStore: PresentationStoreOf<Splash.Destination>) -> some View {

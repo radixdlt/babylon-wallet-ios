@@ -44,21 +44,17 @@ public struct Splash: Sendable, FeatureReducer {
 	public struct Destination: DestinationReducer {
 		@CasePathable
 		public enum State: Sendable, Hashable {
-			case passcodeCheckFailed(AlertState<Action.PasscodeCheckFailedAlert>)
 			case errorAlert(AlertState<Action.ErrorAlert>)
 		}
 
 		@CasePathable
 		public enum Action: Sendable, Equatable {
-			case passcodeCheckFailed(PasscodeCheckFailedAlert)
 			case errorAlert(ErrorAlert)
 
-			public enum PasscodeCheckFailedAlert: Sendable, Equatable {
-				case retryButtonTapped
+			public enum ErrorAlert: Sendable, Equatable {
+				case retryVerifyPasscodeButtonTapped
 				case openSettingsButtonTapped
 			}
-
-			public enum ErrorAlert: Sendable, Hashable {}
 		}
 
 		public var body: some ReducerOf<Self> {
@@ -117,12 +113,12 @@ public struct Splash: Sendable, FeatureReducer {
 			guard config?.isPasscodeSetUp == true else {
 				state.biometricsCheckFailed = true
 
-				state.destination = .passcodeCheckFailed(.init(
+				state.destination = .errorAlert(.init(
 					title: { .init(L10n.Splash.PasscodeCheckFailedAlert.title) },
 					actions: {
 						ButtonState(
 							role: .none,
-							action: .send(.retryButtonTapped),
+							action: .send(.retryVerifyPasscodeButtonTapped),
 							label: { TextState(L10n.Common.retry) }
 						)
 						ButtonState(
@@ -165,9 +161,9 @@ public struct Splash: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case .passcodeCheckFailed(.retryButtonTapped):
+		case .errorAlert(.retryVerifyPasscodeButtonTapped):
 			verifyPasscode()
-		case .passcodeCheckFailed(.openSettingsButtonTapped):
+		case .errorAlert(.openSettingsButtonTapped):
 			.run { _ in
 				await openURL(URL(string: UIApplication.openSettingsURLString)!)
 			}
