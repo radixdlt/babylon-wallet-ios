@@ -36,12 +36,12 @@ final class SplashFeatureTests: TestCase {
 		await store.receive(.internal(.checkBiometrics))
 		await store.receive(.internal(.passcodeConfigResult(.success(authBiometricsConfig)))) {
 			$0.biometricsCheckFailed = true
-			$0.destination = .passcodeCheckFailed(.init(
+			$0.destination = .errorAlert(.init(
 				title: { .init(L10n.Splash.PasscodeCheckFailedAlert.title) },
 				actions: {
 					ButtonState(
 						role: .none,
-						action: .send(.retryButtonTapped),
+						action: .send(.retryVerifyPasscodeButtonTapped),
 						label: { TextState(L10n.Common.retry) }
 					)
 					ButtonState(
