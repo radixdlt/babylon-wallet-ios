@@ -125,6 +125,9 @@ extension CustomizeFees {
 					.foregroundColor(.app.gray1)
 					.multilineTextAlignment(.center)
 					.padding(.bottom, .medium2)
+
+				InfoButton(.transactionfee, label: "How do fees work")
+					.padding(.bottom, .medium2)
 			}
 		}
 
@@ -158,7 +161,10 @@ extension CustomizeFees {
 				if viewState.insufficientBalance {
 					WarningErrorView(text: L10n.CustomizeNetworkFees.Warning.insufficientBalance, type: .error)
 				} else if viewState.linkingNewAccount {
-					WarningErrorView(text: L10n.TransactionReview.FeePayerValidation.linksNewAccount, type: .warning)
+					HStack(alignment: .center) {
+						WarningErrorView(text: L10n.TransactionReview.FeePayerValidation.linksNewAccount, type: .warning)
+						InfoButton(.payingaccount)
+					}
 				}
 			}
 		}
