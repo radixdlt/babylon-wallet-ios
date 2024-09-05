@@ -33,8 +33,7 @@ public struct Splash: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case passcodeConfigResult(TaskResult<LocalAuthenticationConfig>)
 		case biometricsCheckResult(TaskResult<Bool>)
-		case checkBiometrics
-		case loadingDataCompleted
+		case advancedLockStateLoaded(isEnabled: Bool)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -86,13 +85,13 @@ public struct Splash: Sendable, FeatureReducer {
 				// Starting with iOS 18, the system-provided biometric check will be used
 				if #unavailable(iOS 18), isAdvancedLockEnabled {
 					#if targetEnvironment(simulator)
-					let action: InternalAction = _XCTIsTesting ? .checkBiometrics : .loadingDataCompleted
+					let isEnabled = _XCTIsTesting
 					#else
-					let action: InternalAction = .checkBiometrics
+					let isEnabled = true
 					#endif
-					await send(.internal(action))
+					await send(.internal(.advancedLockStateLoaded(isEnabled: isEnabled)))
 				} else {
-					await send(.internal(.loadingDataCompleted))
+					await send(.internal(.advancedLockStateLoaded(isEnabled: false)))
 				}
 			}
 
@@ -104,8 +103,8 @@ public struct Splash: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case .checkBiometrics:
-			return verifyPasscode()
+		case let .advancedLockStateLoaded(isEnabled):
+			return isEnabled ? verifyPasscode() : delegateCompleted(context: state.context)
 
 		case let .passcodeConfigResult(result):
 			let config = try? result.value
@@ -152,9 +151,6 @@ public struct Splash: Sendable, FeatureReducer {
 				return .none
 			}
 
-			return delegateCompleted(context: state.context)
-
-		case .loadingDataCompleted:
 			return delegateCompleted(context: state.context)
 		}
 	}

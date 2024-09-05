@@ -33,7 +33,7 @@ final class SplashFeatureTests: TestCase {
 		await store.send(.view(.appeared))
 
 		await clock.advance(by: .seconds(0.4))
-		await store.receive(.internal(.checkBiometrics))
+		await store.receive(.internal(.advancedLockStateLoaded(isEnabled: true)))
 		await store.receive(.internal(.passcodeConfigResult(.success(authBiometricsConfig)))) {
 			$0.biometricsCheckFailed = true
 			$0.destination = .errorAlert(.init(
