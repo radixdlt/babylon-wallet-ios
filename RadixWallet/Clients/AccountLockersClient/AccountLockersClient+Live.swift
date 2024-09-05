@@ -200,12 +200,10 @@ extension AccountLockersClient {
 		// MARK: - ClaimContent
 
 		let claimContent: ClaimContent = { details in
-			let lockerAddress = try LockerAddress(validatingAddress: details.lockerAddress)
-			let claimant = try AccountAddress(validatingAddress: details.accountAddress)
-			let claimableResources = try await getAccountLockerClaimableResources(details: details)
+			let claimableResources = getAccountLockerClaimableResources(claims: details.claims)
 			let manifest = TransactionManifest.accountLockerClaim(
-				lockerAddress: lockerAddress,
-				claimant: claimant,
+				lockerAddress: details.lockerAddress,
+				claimant: details.accountAddress,
 				claimableResources: claimableResources
 			)
 			_ = await dappInteractionClient.addWalletInteraction(
@@ -215,27 +213,14 @@ extension AccountLockersClient {
 		}
 
 		@Sendable
-		func getAccountLockerClaimableResources(details: AccountLockerClaimDetails) async throws -> [AccountLockerClaimableResource] {
-			try await details.claims.parallelMap { item in
+		func getAccountLockerClaimableResources(claims: [AccountLockerClaimDetails.Claim]) -> [AccountLockerClaimableResource] {
+			claims.map { item in
 				switch item {
 				case let .fungible(fungible):
-					let resourceAddress = try ResourceAddress(validatingAddress: fungible.resourceAddress)
-					let amount = try Decimal192(fungible.amount)
-					return AccountLockerClaimableResource.fungible(resourceAddress: resourceAddress, amount: amount)
+					.fungible(resourceAddress: fungible.resourceAddress, amount: fungible.amount)
 
 				case let .nonFungible(nonFungible):
-					let resourceAddress = try ResourceAddress(validatingAddress: nonFungible.resourceAddress)
-					let ids = try await gatewayAPIClient.fetchAllPaginatedItems(
-						cursor: nil,
-						gatewayAPIClient.fetchEntityNonFungibleResourceIdsPage(
-							details.accountAddress,
-							resourceAddress: nonFungible.resourceAddress,
-							vaultAddress: nonFungible.vaultAddress
-						)
-					)
-					.map { try NonFungibleLocalId($0) }
-
-					return AccountLockerClaimableResource.nonFungible(resourceAddress: resourceAddress, ids: ids)
+					.nonFungible(resourceAddress: nonFungible.resourceAddress, ids: [])
 				}
 			}
 		}
@@ -264,11 +249,10 @@ extension AccountLockersClient {
 	}
 }
 
-// MARK: - Helpers
-
+// MARK: - DappWithLockerAddress
 private struct DappWithLockerAddress: Sendable, Hashable {
-		let dapp: AuthorizedDapp
-		let lockerAddress: LockerAddress
+	let dapp: AuthorizedDapp
+	let lockerAddress: LockerAddress
 }
 
 private extension AuthorizedDapp {

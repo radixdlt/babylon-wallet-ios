@@ -36,6 +36,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case historyButtonTapped
 		case showFiatWorthToggled
 		case securityProblemsTapped
+		case accountLockerClaimTapped(AccountLockerClaimDetails)
 	}
 
 	@CasePathable
@@ -180,6 +181,11 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case .securityProblemsTapped:
 			state.destination = .securityCenter(.init())
 			return .none
+
+		case let .accountLockerClaimTapped(details):
+			return .run { _ in
+				try await accountLockersClient.claimContent(details)
+			}
 		}
 	}
 

@@ -105,8 +105,10 @@ extension AccountDetails {
 						viewStore.send(.securityProblemsTapped)
 					}
 
-					ForEachStatic(viewStore.accountLockerClaims) { claim in
-						Button {} label: {
+					ForEachStatic(viewStore.accountLockerClaims) { details in
+						Button {
+							viewStore.send(.accountLockerClaimTapped(details))
+						} label: {
 							AccountBannerView(kind: .lockerClaim(dappName: claim.dappName))
 						}
 					}
