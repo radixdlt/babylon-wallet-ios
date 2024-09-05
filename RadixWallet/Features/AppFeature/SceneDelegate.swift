@@ -20,10 +20,13 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 			overlayWindow(in: windowScene)
 		}
 
-		@Dependency(\.localAuthenticationClient) var localAuthenticationClient
-		Task { @MainActor in
-			for try await _ in localAuthenticationClient.authenticatedSuccessfully() {
-				hideBiometricsSplashWindow()
+		// avoids unimplemented("LocalAuthenticationClient.authenticatedSuccessfully")
+		if !_XCTIsTesting {
+			@Dependency(\.localAuthenticationClient) var localAuthenticationClient
+			Task { @MainActor in
+				for try await _ in localAuthenticationClient.authenticatedSuccessfully() {
+					hideBiometricsSplashWindow()
+				}
 			}
 		}
 	}
