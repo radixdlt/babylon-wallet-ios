@@ -285,7 +285,7 @@ extension View {
 		withSeparator()
 	}
 
-	/// Adds a separator below the view, without padding. The separator has horizontal padding of of the provided size.
+	/// Adds a separator below the view, without padding. The separator has horizontal padding of the provided size.
 	func withSeparator(horizontalPadding: CGFloat = .medium3) -> some View {
 		VStack(spacing: .zero) {
 			self

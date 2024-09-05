@@ -7,7 +7,7 @@ Clone the repo and run bootstrap script:
 ./scripts/bootstrap
 ```
 
-Will will setup SwiftFormat to format code, rules are defined in `.swiftformat`.
+Will setup SwiftFormat to format code, rules are defined in `.swiftformat`.
 
 ## Open project
 
