@@ -4,7 +4,7 @@ import SwiftUI
 public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObject {
 	public weak var windowScene: UIWindowScene?
 	public var overlayWindow: UIWindow?
-	private var didEnterInBackground = false
+	private var didEnterBackground = false
 
 	public func scene(
 		_ scene: UIScene,
@@ -19,6 +19,13 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 		{
 			overlayWindow(in: windowScene)
 		}
+
+		@Dependency(\.localAuthenticationClient) var localAuthenticationClient
+		Task { @MainActor in
+			for try await _ in localAuthenticationClient.authenticatedSuccessfully() {
+				hideBiometricsSplashWindow()
+			}
+		}
 	}
 
 	public func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
@@ -27,7 +34,7 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 	}
 
 	public func sceneWillEnterForeground(_ scene: UIScene) {
-		guard didEnterInBackground, let scene = scene as? UIWindowScene else { return }
+		guard didEnterBackground, let scene = scene as? UIWindowScene else { return }
 
 		if #unavailable(iOS 18) {
 			showBiometricsSplashWindow(in: scene)
@@ -38,7 +45,7 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 	public func sceneDidEnterBackground(_ scene: UIScene) {
 		guard let scene = scene as? UIWindowScene else { return }
 
-		didEnterInBackground = true
+		didEnterBackground = true
 
 		if #unavailable(iOS 18) {
 			hideBiometricsSplashWindow()
@@ -87,13 +94,6 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 		biometricsSplashWindow?.rootViewController = UIHostingController(rootView: splashView)
 		biometricsSplashWindow?.windowLevel = .normal + 2
 		biometricsSplashWindow?.makeKeyAndVisible()
-
-		@Dependency(\.localAuthenticationClient) var localAuthenticationClient
-		Task { @MainActor in
-			for try await _ in localAuthenticationClient.authenticatedSuccessfully() {
-				hideBiometricsSplashWindow()
-			}
-		}
 	}
 
 	private func hideBiometricsSplashWindow() {
