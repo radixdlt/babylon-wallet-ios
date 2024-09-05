@@ -28,10 +28,9 @@ extension AccountPortfoliosClient: DependencyKey {
 
 		/// Update when hidden resources change
 		Task {
-			for try await _ in await resourcesVisibilityClient.hiddenValues().removeDuplicates() {
+			for try await hiddenResources in await resourcesVisibilityClient.hiddenValues().removeDuplicates() {
 				guard !Task.isCancelled else { return }
-				let accountAddresses = state.portfoliosSubject.value.wrappedValue.map { $0.map(\.key) } ?? []
-				_ = try await fetchAccountPortfolios(accountAddresses, forceRefreshEntities: false, forceRefreshPrices: false)
+				await state.updatePortfoliosHiddenResources(hiddenResources: hiddenResources)
 			}
 		}
 
