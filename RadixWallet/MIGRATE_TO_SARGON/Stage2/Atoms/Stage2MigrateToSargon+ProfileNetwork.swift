@@ -132,6 +132,10 @@ extension ProfileNetwork {
 		personas = identifiedPersonas.elements
 	}
 
+	public func getHiddenResources() -> [ResourceIdentifier] {
+		resourcePreferences.hiddenResources
+	}
+
 	public var customDumpMirror: Mirror {
 		.init(
 			self,

@@ -60,7 +60,7 @@ public struct HideResource: Sendable, FeatureReducer {
 		}
 	}
 
-	@Dependency(\.appPreferencesClient) var appPreferencesClient
+	@Dependency(\.resourcesVisibilityClient) var resourcesVisibilityClient
 	@Dependency(\.gatewaysClient) var gatewaysClient
 
 	public var body: some ReducerOf<Self> {
@@ -117,7 +117,7 @@ private extension HideResource {
 			if isXrd {
 				await send(.internal(.setShouldShow(false)))
 			} else {
-				let isAlreadyHidden = await appPreferencesClient.isResourceHidden(state.resource)
+				let isAlreadyHidden = try await resourcesVisibilityClient.isHidden(state.resource)
 				await send(.internal(.setShouldShow(!isAlreadyHidden)))
 			}
 		}
@@ -125,9 +125,7 @@ private extension HideResource {
 
 	func hideResourceEffect(state: State) -> Effect<Action> {
 		.run { send in
-			try await appPreferencesClient.updating { preferences in
-				preferences.resources.hideResource(resource: state.resource)
-			}
+			try await resourcesVisibilityClient.hide(state.resource)
 			await send(.delegate(.didHideResource))
 		}
 	}
