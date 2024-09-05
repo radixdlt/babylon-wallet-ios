@@ -1220,6 +1220,7 @@
 		E6FA984B2B04B9AC00748F20 /* ConfirmSkippingBDFS.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA98492B04B9AC00748F20 /* ConfirmSkippingBDFS.swift */; };
 		E6FA984E2B04E3D500748F20 /* NoContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA984D2B04E3D500748F20 /* NoContentView.swift */; };
 		E713204C2BCD372600AE6B3C /* UnknownCaseDecodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = E713204B2BCD372600AE6B3C /* UnknownCaseDecodable.swift */; };
+		E74B41082C887F5A00979A82 /* SVGView in Frameworks */ = {isa = PBXBuildFile; productRef = E74B41072C887F5A00979A82 /* SVGView */; };
 		E75C5F342C1C1632002E3DFF /* Stage1MigrateToSargon+SignedAuthChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E75C5F332C1C1632002E3DFF /* Stage1MigrateToSargon+SignedAuthChallenge.swift */; };
 		E76645A42C23138300065D9A /* Throwable.swift in Sources */ = {isa = PBXBuildFile; fileRef = E76645A32C23138300065D9A /* Throwable.swift */; };
 		E7A5AC962C09F447006CB6EC /* ResetWalletClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A5AC952C09F447006CB6EC /* ResetWalletClient+Interface.swift */; };
@@ -2478,6 +2479,7 @@
 				48FFFB0D2ADC744700B2B213 /* TextBuilder in Frameworks */,
 				48FFFB0A2ADC721800B2B213 /* Atomics in Frameworks */,
 				48FFFB002ADC25A200B2B213 /* BigInt in Frameworks */,
+				E74B41082C887F5A00979A82 /* SVGView in Frameworks */,
 				A47571FF2B29B0860059A95D /* IOSSecuritySuite in Frameworks */,
 				48FFFAFB2ADC241A00B2B213 /* HashTreeCollections in Frameworks */,
 				48FFFAC52ADC211700B2B213 /* JSONTesting in Frameworks */,
@@ -6828,6 +6830,7 @@
 				83B783552C1764AE00AA7930 /* Sargon */,
 				831F0CEC2C21819000D6F5BF /* Sargon */,
 				E60D5E1E2C2EFAA2008BCF1F /* Sargon */,
+				E74B41072C887F5A00979A82 /* SVGView */,
 			);
 			productName = RadixWallet;
 			productReference = 48CFBC4F2ADC106300E77A5C /* Radix Wallet Dev.app */;
@@ -6899,6 +6902,7 @@
 				8318BB172BC8403800057BCB /* XCRemoteSwiftPackageReference "swift-custom-dump" */,
 				E6A0B0492BF23C7000617DAC /* XCRemoteSwiftPackageReference "swift-identified-collections" */,
 				835DEDE22C57E9C200D7ACF0 /* XCRemoteSwiftPackageReference "sargon" */,
+				E74B41062C887B8A00979A82 /* XCRemoteSwiftPackageReference "SVGView" */,
 			);
 			productRefGroup = 48CFBC502ADC106300E77A5C /* Products */;
 			projectDirPath = "";
@@ -8948,6 +8952,14 @@
 				version = 1.0.2;
 			};
 		};
+		E74B41062C887B8A00979A82 /* XCRemoteSwiftPackageReference "SVGView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/exyte/SVGView";
+			requirement = {
+				kind = exactVersion;
+				version = 1.0.6;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -9179,6 +9191,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E6A0B0492BF23C7000617DAC /* XCRemoteSwiftPackageReference "swift-identified-collections" */;
 			productName = IdentifiedCollections;
+		};
+		E74B41072C887F5A00979A82 /* SVGView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E74B41062C887B8A00979A82 /* XCRemoteSwiftPackageReference "SVGView" */;
+			productName = SVGView;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

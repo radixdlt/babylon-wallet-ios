@@ -1,5 +1,7 @@
 import NukeUI
 import SwiftUI
+import SVGView
+import Nuke
 
 // MARK: - Thumbnail
 public struct Thumbnail: View {
@@ -179,9 +181,14 @@ public struct LoadableImage<Placeholder: View>: View {
 		placeholders placeholderBehaviour: LoadableImagePlaceholderBehaviour = .default,
 		placeholder: () -> Placeholder
 	) {
+        ImageDecoderRegistry.shared.register { context in
+            let isSVG = context.urlResponse?.url?.isSVG ?? false
+            return isSVG ? ImageDecoders.Empty() : nil
+        }
+        
 		if let url {
-			if url.isVectorImage {
-				loggerGlobal.warning("LoadableImage: Vector images are not supported \(url)")
+			if url.isUnsupportedVectorImage {
+				loggerGlobal.warning("LoadableImage: Vector image is not supported \(url)")
 				self.url = nil
 			} else {
 				@Dependency(\.urlFormatterClient) var urlFormatterClient
@@ -212,20 +219,24 @@ public struct LoadableImage<Placeholder: View>: View {
 	}
 
 	public var body: some View {
-		if let url {
-			LazyImage(url: url) { state in
-				if state.isLoading {
-					loadingView
-				} else if let image = state.image {
-					imageView(image: image, imageSize: state.imageContainer?.image.size)
-				} else {
-					brokenImageView
-					let _ = loggerGlobal.warning("Could not load thumbnail from \(url): \(state.error)")
-				}
-			}
-		} else {
-			placeholder
-		}
+        if let url {
+//			LazyImage(url: URL(string: "https://upload.wikimedia.org/wikipedia/commons/9/9d/Swift_logo.svg")!) { state in
+            LazyImage(url: url) { state in
+                if state.isLoading {
+                    loadingView
+                } else if url.isSVG, let data = state.imageContainer?.data {
+                    SVGView(data: data)
+                } else if let image = state.image {
+                    imageView(image: image, imageSize: state.imageContainer?.image.size)
+                } else {
+                    brokenImageView
+                    let error = state.error?.legibleDescription ?? ""
+                    let _ = loggerGlobal.warning("Could not load thumbnail from \(url): \(error)")
+                }
+            }
+        } else {
+            placeholder
+        }
 	}
 
 	@MainActor
@@ -337,9 +348,9 @@ public struct LoadableImagePlaceholderBehaviour {
 }
 
 extension URL {
-	public var isVectorImage: Bool {
+	public var isUnsupportedVectorImage: Bool {
 		let pathComponent = lastPathComponent.lowercased()
-		for ignoredType in URL.vectorImageTypes {
+		for ignoredType in URL.unsupportedVectorImageTypes {
 			if pathComponent.hasSuffix("." + ignoredType) {
 				return true
 			}
@@ -347,6 +358,10 @@ extension URL {
 
 		return false
 	}
+    
+    public var isSVG: Bool {
+        lastPathComponent.lowercased().hasSuffix(".svg")
+    }
 
-	private static let vectorImageTypes: [String] = ["svg", "pdf"]
+	private static let unsupportedVectorImageTypes: [String] = ["pdf"]
 }
