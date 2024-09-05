@@ -65,7 +65,8 @@ final class EntitiesHidingTests: TestCase {
 		id: .mainnet,
 		accounts: [account0, account1],
 		personas: [persona0, persona1],
-		authorizedDapps: [dApp0, dApp1]
+		authorizedDapps: [dApp0, dApp1],
+		resourcePreferences: []
 	)
 
 	func test_GIVEN_hasUnhiddenAccounts_WHEN_accountIsHidden_THEN_accountIsFilteredOut() {

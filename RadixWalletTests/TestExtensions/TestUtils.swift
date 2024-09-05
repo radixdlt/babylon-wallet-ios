@@ -85,7 +85,8 @@ extension Profile {
 			id: networkID,
 			accounts: [account],
 			personas: [],
-			authorizedDapps: []
+			authorizedDapps: [],
+			resourcePreferences: []
 		)
 
 		self.networks = [network]
