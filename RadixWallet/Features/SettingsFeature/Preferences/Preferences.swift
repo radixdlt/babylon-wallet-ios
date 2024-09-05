@@ -132,6 +132,7 @@ public struct Preferences: Sendable, FeatureReducer {
 		case let .loadedAppPreferences(appPreferences):
 			state.appPreferences = appPreferences
 			return .none
+
 		case let .advancedLockDisableResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
