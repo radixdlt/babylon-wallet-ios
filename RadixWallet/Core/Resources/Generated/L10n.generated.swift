@@ -1213,6 +1213,8 @@ public enum L10n {
     public static let effectiveTip = L10n.tr("Localizable", "customizeNetworkFees_effectiveTip", fallback: "Effective Tip")
     /// Estimated Transaction Fees
     public static let feeBreakdownTitle = L10n.tr("Localizable", "customizeNetworkFees_feeBreakdownTitle", fallback: "Estimated Transaction Fees")
+    /// How do fees work
+    public static let howDoFeesWork = L10n.tr("Localizable", "customizeNetworkFees_howDoFeesWork", fallback: "How do fees work")
     /// Network Execution
     public static let networkExecution = L10n.tr("Localizable", "customizeNetworkFees_networkExecution", fallback: "Network Execution")
     /// Network Fee
@@ -2365,10 +2367,12 @@ public enum L10n {
       /// 
       /// Blog: [Why tokens on Radix are better than other crypto networks ↗](https://www.radixdlt.com/blog/its-10pm-do-you-know-where-your-tokens-are)
       public static let nfts = L10n.tr("Localizable", "infoLink_glossary_nfts", fallback: "## Non-fungible Token (NFT)\n\nNon-fungible tokens are a special class of web3 [token](?glossaryAnchor=tokens) where each token has a unique identity.\n\nLike other tokens, they can represent many things. But NFTs are used to represent things where each is different from another, like pieces of art, loan positions, treasury bonds, tickets to assigned-seating events, collectible cards, or equipment in games.\n\n---\n\nThe [Radix Network](?glossaryAnchor=radixnetwork) has special features specifically to make the creation and use of non-fungible tokens on Radix safe and predictable, and the [Radix Wallet](?glossaryAnchor=radixwallet) can automatically provide useful information about the NFTs you hold in your [Accounts](?glossaryAnchor=accounts).\n\nLearn: [More about NFTs ↗](https://learn.radixdlt.com/article/what-is-an-nft)\n\nBlog: [Why tokens on Radix are better than other crypto networks ↗](https://www.radixdlt.com/blog/its-10pm-do-you-know-where-your-tokens-are)")
+      /// ## Why your Accounts will be linked
+      /// 
       /// Paying your transaction fee from this Account will make you identifiable on ledger as both the owner of the fee-paying Account and all other Accounts you use in this transaction.
       /// 
       /// This is because you’ll sign the transactions from each Account at the same time, so your Accounts will be linked together in the transaction record.
-      public static let payingaccount = L10n.tr("Localizable", "infoLink_glossary_payingaccount", fallback: "Paying your transaction fee from this Account will make you identifiable on ledger as both the owner of the fee-paying Account and all other Accounts you use in this transaction.\n\nThis is because you’ll sign the transactions from each Account at the same time, so your Accounts will be linked together in the transaction record.")
+      public static let payingaccount = L10n.tr("Localizable", "infoLink_glossary_payingaccount", fallback: "## Why your Accounts will be linked\n\nPaying your transaction fee from this Account will make you identifiable on ledger as both the owner of the fee-paying Account and all other Accounts you use in this transaction.\n\nThis is because you’ll sign the transactions from each Account at the same time, so your Accounts will be linked together in the transaction record.")
       /// ## Radix Personas
       /// 
       /// Personas are the web3 replacement for the old email address and password login. Using a Persona of your choice, you can securely log in to [dApps](?glossaryAnchor=dapps) built on Radix without having to remember a password at all.
