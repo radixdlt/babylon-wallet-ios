@@ -36,7 +36,7 @@ extension AssetsView {
 									action: \.child.fungibleTokenList
 								),
 								then: { FungibleAssetList.View(store: $0) },
-								else: { EmptyAssetListView.fungibleResources }
+								else: { EmptyAssetListView(.fungibleResources) }
 							)
 						case .nonFungible:
 							IfLetStore(
@@ -45,7 +45,7 @@ extension AssetsView {
 									action: \.child.nonFungibleTokenList
 								),
 								then: { NonFungibleAssetList.View(store: $0) },
-								else: { EmptyAssetListView.nonFungibleResources }
+								else: { EmptyAssetListView(.nonFungibleResources) }
 							)
 						case .stakeUnits:
 							IfLetStore(
@@ -54,7 +54,7 @@ extension AssetsView {
 									action: \.child.stakeUnitList
 								),
 								then: { StakeUnitList.View(store: $0) },
-								else: { EmptyAssetListView.stakes }
+								else: { EmptyAssetListView(.stakes) }
 							)
 						case .poolUnits:
 							IfLetStore(
@@ -63,7 +63,7 @@ extension AssetsView {
 									action: \.child.poolUnitsList
 								),
 								then: { PoolUnitsList.View(store: $0) },
-								else: { EmptyAssetListView.poolUnits }
+								else: { EmptyAssetListView(.poolUnits) }
 							)
 						}
 					}

@@ -6,17 +6,18 @@ public struct TransactionReviewNetworkFee: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var reviewedTransaction: ReviewedTransaction
 		public var fiatValue: Loadable<String> = .idle
+		let id: UUID
 
 		public init(
 			reviewedTransaction: ReviewedTransaction
 		) {
 			self.reviewedTransaction = reviewedTransaction
+			self.id = .init()
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case task
-		case infoTapped
 		case customizeTapped
 	}
 
@@ -51,8 +52,6 @@ public struct TransactionReviewNetworkFee: Sendable, FeatureReducer {
 				}
 				await send(.internal(.setTokenPrices(result)))
 			}
-		case .infoTapped:
-			return .none
 		case .customizeTapped:
 			return .send(.delegate(.showCustomizeFees))
 		}

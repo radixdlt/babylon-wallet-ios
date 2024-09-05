@@ -1,11 +1,17 @@
-public struct FullScreenOverlayCoordinator: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable, Identifiable {
-		public let id: UUID = .init()
+import Foundation
+
+// MARK: - SheetOverlayCoordinator
+public struct SheetOverlayCoordinator: Sendable, FeatureReducer {
+	public struct State: Sendable, Hashable {
 		public var root: Root.State
 
 		public init(root: Root.State) {
 			self.root = root
 		}
+	}
+
+	public enum ViewAction: Sendable, Equatable {
+		case closeButtonTapped
 	}
 
 	@CasePathable
@@ -14,24 +20,23 @@ public struct FullScreenOverlayCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case claimWallet(ClaimWallet.DelegateAction)
 		case dismiss
 	}
 
 	public struct Root: Sendable, Hashable, Reducer {
 		@CasePathable
 		public enum State: Sendable, Hashable {
-			case claimWallet(ClaimWallet.State)
+			case infoLink(InfoLinkSheet.State)
 		}
 
 		@CasePathable
 		public enum Action: Sendable, Equatable {
-			case claimWallet(ClaimWallet.Action)
+			case infoLink(InfoLinkSheet.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: \.claimWallet, action: \.claimWallet) {
-				ClaimWallet()
+			Scope(state: \.infoLink, action: \.infoLink) {
+				InfoLinkSheet()
 			}
 		}
 	}
@@ -45,14 +50,10 @@ public struct FullScreenOverlayCoordinator: Sendable, FeatureReducer {
 		Reduce(core)
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		// Forward all delegate actions, re-wrapped
-		case let .root(.claimWallet(.delegate(action))):
-			.send(.delegate(.claimWallet(action)))
-
-		default:
-			.none
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+		switch viewAction {
+		case .closeButtonTapped:
+			.send(.delegate(.dismiss))
 		}
 	}
 }
