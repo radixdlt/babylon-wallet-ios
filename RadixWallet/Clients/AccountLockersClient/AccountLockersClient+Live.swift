@@ -21,15 +21,12 @@ extension AccountLockersClient {
 			// Trigger any time the authorized dapps changes (at any level)
 			let dappValues = await authorizedDappsClient.authorizedDappValues()
 
-			// Trigger any time accounts are added/removed.
-			let accountValues = await accountsClient.accountsOnCurrentNetwork().removeDuplicates(by: { $0.map(\.id) == $1.map(\.id) })
-
 			// Trigger every 5 minutes
 			let timer = AsyncTimerSequence(every: .minutes(5))
 
-			for try await (dapps, accounts, _) in combineLatest(dappValues, accountValues, timer) {
+			for try await (dapps, _) in combineLatest(dappValues, timer) {
 				do {
-					try await checkClaims(dapps: dapps, accounts: accounts)
+					try await checkClaims(dapps: dapps)
 				} catch {
 					loggerGlobal.error("Failed to check account locker claims \(error)")
 				}
@@ -37,8 +34,9 @@ extension AccountLockersClient {
 		}
 
 		@Sendable
-		func checkClaims(dapps: AuthorizedDapps, accounts: Accounts) async throws {
+		func checkClaims(dapps: AuthorizedDapps) async throws {
 			// Fetch dapp & account lockers state
+			let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
 			let dappsWithLockers = try await filterDappsWithAccountLockers(dapps)
 			let lockersPerAccount = getLockersPerAccount(accounts: accounts, dapps: dappsWithLockers)
 			let lockersStatePerAccount = try await getLockersStatePerAccount(lockersPerAccount: lockersPerAccount)
