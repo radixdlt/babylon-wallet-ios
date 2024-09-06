@@ -46,15 +46,11 @@ private extension StoreOf<Splash> {
 private extension View {
 	func destinations(with store: StoreOf<Splash>) -> some View {
 		let destinationStore = store.destination
-		return passcodeCheckFailed(with: destinationStore)
+		return errorAlert(with: destinationStore)
 	}
 
-	private func passcodeCheckFailed(with destinationStore: PresentationStoreOf<Splash.Destination>) -> some View {
-		alert(
-			store: destinationStore,
-			state: /Splash.Destination.State.passcodeCheckFailed,
-			action: Splash.Destination.Action.passcodeCheckFailed
-		)
+	private func errorAlert(with destinationStore: PresentationStoreOf<Splash.Destination>) -> some View {
+		alert(store: destinationStore.scope(state: \.errorAlert, action: \.errorAlert))
 	}
 }
 
@@ -101,5 +97,6 @@ public struct SplashView: View {
 				.resizable()
 				.scaledToFill()
 		)
+		.edgesIgnoringSafeArea(.all)
 	}
 }

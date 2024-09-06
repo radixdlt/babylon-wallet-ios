@@ -732,6 +732,9 @@
 		5B45E2FF2BC59780007C4C84 /* SignWithFactorSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B45E2FD2BC59780007C4C84 /* SignWithFactorSource.swift */; };
 		5B45E3012BC5A491007C4C84 /* FactorSourceAccess+ViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B45E3002BC5A491007C4C84 /* FactorSourceAccess+ViewState.swift */; };
 		5B4712CC2C526146003B4712 /* HeaderButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4712CB2C526146003B4712 /* HeaderButtonStyle.swift */; };
+		5B526AEC2C89C3C200AF8B72 /* ResourcesVisibilityClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B526AE82C89C3C200AF8B72 /* ResourcesVisibilityClient+Interface.swift */; };
+		5B526AED2C89C3C200AF8B72 /* ResourcesVisibilityClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B526AE92C89C3C200AF8B72 /* ResourcesVisibilityClient+Live.swift */; };
+		5B526AEE2C89C3C200AF8B72 /* ResourcesVisibilityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B526AEA2C89C3C200AF8B72 /* ResourcesVisibilityClient+Test.swift */; };
 		5B6499B72BCFD0E8000F2176 /* SecurityFactors+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B52BCFD0E8000F2176 /* SecurityFactors+View.swift */; };
 		5B6499B82BCFD0E8000F2176 /* SecurityFactors+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B62BCFD0E8000F2176 /* SecurityFactors+Reducer.swift */; };
 		5B6499BA2BCFDB1E000F2176 /* ShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B92BCFDB1E000F2176 /* ShareView.swift */; };
@@ -1933,6 +1936,9 @@
 		5B45E2FD2BC59780007C4C84 /* SignWithFactorSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignWithFactorSource.swift; sourceTree = "<group>"; };
 		5B45E3002BC5A491007C4C84 /* FactorSourceAccess+ViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactorSourceAccess+ViewState.swift"; sourceTree = "<group>"; };
 		5B4712CB2C526146003B4712 /* HeaderButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderButtonStyle.swift; sourceTree = "<group>"; };
+		5B526AE82C89C3C200AF8B72 /* ResourcesVisibilityClient+Interface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ResourcesVisibilityClient+Interface.swift"; sourceTree = "<group>"; };
+		5B526AE92C89C3C200AF8B72 /* ResourcesVisibilityClient+Live.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ResourcesVisibilityClient+Live.swift"; sourceTree = "<group>"; };
+		5B526AEA2C89C3C200AF8B72 /* ResourcesVisibilityClient+Test.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ResourcesVisibilityClient+Test.swift"; sourceTree = "<group>"; };
 		5B6499B52BCFD0E8000F2176 /* SecurityFactors+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityFactors+View.swift"; sourceTree = "<group>"; };
 		5B6499B62BCFD0E8000F2176 /* SecurityFactors+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityFactors+Reducer.swift"; sourceTree = "<group>"; };
 		5B6499B92BCFDB1E000F2176 /* ShareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareView.swift; sourceTree = "<group>"; };
@@ -4383,57 +4389,58 @@
 		48CFBF522ADC10D900E77A5C /* Clients */ = {
 			isa = PBXGroup;
 			children = (
-				5BBC7D9D2C3D390D00B04BD6 /* BootstrapClient */,
-				5B272DD52C36E88700B74F1F /* AppEventsClient */,
-				A4DCCC4C2C2DA23E00438A7B /* HomeCardsClient */,
-				8329ACE22BBAB9CD005FD9DC /* DeepLinkHandlerClient */,
-				E7A5AC942C09F428006CB6EC /* ResetWalletClient */,
-				A4ECE2782BEEB01800468BF6 /* CloudBackupClient */,
-				A4ECE2712BEEAFFC00468BF6 /* SecurityCenterClient */,
-				5B2A45002BD667FB00AEC8AD /* ContactSupportClient */,
-				5B9846BE2BBD5EF600E814F3 /* SensitiveInfoClient */,
-				5B1C4FD62BBB0C0100B9436F /* AppsFlyerClient */,
-				8370FC5A2B99C732007AD882 /* NPSSurveyClient */,
-				83823EA82B72362600827211 /* TokenPriceClient */,
-				83823EA52B722D9000827211 /* HTTPClient */,
-				A462B5752B820D1200C26D20 /* TransactionHistoryClient */,
-				A47572002B29B3B90059A95D /* IOSSecurityClient */,
-				830EA9D92AEA8750004C8051 /* EntitiesVisibilityClient */,
 				48CFBF8D2ADC10D900E77A5C /* AccountPortfoliosClient */,
 				48CFBF622ADC10D900E77A5C /* AccountsClient */,
+				5B272DD52C36E88700B74F1F /* AppEventsClient */,
 				48CFBF6C2ADC10D900E77A5C /* AppPreferencesClient */,
+				5B1C4FD62BBB0C0100B9436F /* AppsFlyerClient */,
 				48CFBF652ADC10D900E77A5C /* AuthorizedDappsClient */,
-				48CFBFAE2ADC10D900E77A5C /* TransportProfileClient */,
+				5BBC7D9D2C3D390D00B04BD6 /* BootstrapClient */,
 				48CFBF772ADC10D900E77A5C /* CacheClient */,
 				48CFC0D62ADC10D900E77A5C /* CameraPermissionClient */,
+				A4ECE2782BEEB01800468BF6 /* CloudBackupClient */,
+				5B2A45002BD667FB00AEC8AD /* ContactSupportClient */,
 				48CFBF562ADC10D900E77A5C /* DappInteractionClient */,
+				8329ACE22BBAB9CD005FD9DC /* DeepLinkHandlerClient */,
 				48CFBFA22ADC10D900E77A5C /* DeviceFactorSourceClient */,
 				48CFBFC32ADC10D900E77A5C /* DiskPersistenceClient */,
+				830EA9D92AEA8750004C8051 /* EntitiesVisibilityClient */,
 				48CFBF532ADC10D900E77A5C /* FactorSourcesClient */,
 				48CFC0CC2ADC10D900E77A5C /* FaucetClient */,
 				48CFBFC72ADC10D900E77A5C /* GatewayAPI */,
 				48CFBFA62ADC10D900E77A5C /* GatewaysClient */,
+				A4DCCC4C2C2DA23E00438A7B /* HomeCardsClient */,
+				83823EA52B722D9000827211 /* HTTPClient */,
 				48CFBF912ADC10D900E77A5C /* ImportLegacyWalletClient */,
+				A47572002B29B3B90059A95D /* IOSSecurityClient */,
+				48CFBF0C2ADC10D900E77A5C /* KeychainClient */,
 				48CFBF7B2ADC10D900E77A5C /* LedgerHardwareWalletClient */,
 				48CFBFA92ADC10D900E77A5C /* LocalAuthenticationClient */,
 				48CFBF682ADC10D900E77A5C /* MnemonicClient */,
 				48CFBF712ADC10D900E77A5C /* NetworkSwitchingClient */,
+				8370FC5A2B99C732007AD882 /* NPSSurveyClient */,
 				48CFBF5F2ADC10D900E77A5C /* OnboardingClient */,
 				48CFBFBB2ADC10D900E77A5C /* OnLedgerEntitiesClient */,
 				48CFBF8A2ADC10D900E77A5C /* OverlayWindowClient */,
 				48CFBF7F2ADC10D900E77A5C /* P2PLinksClient */,
+				48CFBF232ADC10D900E77A5C /* PasteboardClient */,
 				48CFBF972ADC10D900E77A5C /* PersonasClient */,
 				48CFC0DC2ADC10D900E77A5C /* ProfileStore */,
 				48CFBFB82ADC10D900E77A5C /* QRGeneratorClient */,
 				48CFBF592ADC10D900E77A5C /* RadixConnectClient */,
+				E7A5AC942C09F428006CB6EC /* ResetWalletClient */,
+				5B526AEB2C89C3C200AF8B72 /* ResourcesVisibilityClient */,
 				48CFBFB32ADC10D900E77A5C /* ROLAClient */,
 				48CFC0C82ADC10D900E77A5C /* SecureStorageClient */,
+				A4ECE2712BEEAFFC00468BF6 /* SecurityCenterClient */,
+				5B9846BE2BBD5EF600E814F3 /* SensitiveInfoClient */,
 				48CFC0D02ADC10D900E77A5C /* SubmitTransactionClient */,
+				83823EA82B72362600827211 /* TokenPriceClient */,
 				48CFBF822ADC10D900E77A5C /* TransactionClient */,
-				48CFBF0C2ADC10D900E77A5C /* KeychainClient */,
-				48CFBF172ADC10D900E77A5C /* UserDefaults+Dependency+Extension */,
-				48CFBF232ADC10D900E77A5C /* PasteboardClient */,
+				A462B5752B820D1200C26D20 /* TransactionHistoryClient */,
+				48CFBFAE2ADC10D900E77A5C /* TransportProfileClient */,
 				48CFC0C52ADC10D900E77A5C /* URLFormatterClient */,
+				48CFBF172ADC10D900E77A5C /* UserDefaults+Dependency+Extension */,
 			);
 			path = Clients;
 			sourceTree = "<group>";
@@ -5486,6 +5493,16 @@
 				5B45E3002BC5A491007C4C84 /* FactorSourceAccess+ViewState.swift */,
 			);
 			path = FactorSourceAccess;
+			sourceTree = "<group>";
+		};
+		5B526AEB2C89C3C200AF8B72 /* ResourcesVisibilityClient */ = {
+			isa = PBXGroup;
+			children = (
+				5B526AE82C89C3C200AF8B72 /* ResourcesVisibilityClient+Interface.swift */,
+				5B526AE92C89C3C200AF8B72 /* ResourcesVisibilityClient+Live.swift */,
+				5B526AEA2C89C3C200AF8B72 /* ResourcesVisibilityClient+Test.swift */,
+			);
+			path = ResourcesVisibilityClient;
 			sourceTree = "<group>";
 		};
 		5B6499B42BCFD0C7000F2176 /* SecurityFactors */ = {
@@ -7318,6 +7335,7 @@
 				48CFC6202ADC10DA00E77A5C /* OnLedgerEntity.swift in Sources */,
 				5B80FCC42C298E68008444F5 /* ArbitraryDataFieldView.swift in Sources */,
 				8370FC5C2B99C780007AD882 /* NPSSurveyClient+Interface.swift in Sources */,
+				5B526AED2C89C3C200AF8B72 /* ResourcesVisibilityClient+Live.swift in Sources */,
 				A408155B2C7E0D08005E65B9 /* AccountDepositPreValidationResourceSpecificBehaviourItem.swift in Sources */,
 				5B4712CC2C526146003B4712 /* HeaderButtonStyle.swift in Sources */,
 				48D5F38C2BD8DDB9000DE964 /* DebugKeychainTest.swift in Sources */,
@@ -7442,6 +7460,7 @@
 				48CFC5732ADC10DA00E77A5C /* Configuration.swift in Sources */,
 				A40815882C7E0D08005E65B9 /* ManifestClass.swift in Sources */,
 				48CFC5A42ADC10DA00E77A5C /* PrimaryTextButtonStyle.swift in Sources */,
+				5B526AEE2C89C3C200AF8B72 /* ResourcesVisibilityClient+Test.swift in Sources */,
 				A408160B2C7E0D08005E65B9 /* StateEntityDetailsResponseItemAncestorIdentities.swift in Sources */,
 				A4DCCC522C2DA33300438A7B /* HomeCardsClient+Test.swift in Sources */,
 				A40815DA2C7E0D08005E65B9 /* ProgrammaticScryptoSborValueKind.swift in Sources */,
@@ -7568,6 +7587,7 @@
 				48CFC4312ADC10DA00E77A5C /* PublicKey+Extensions.swift in Sources */,
 				48CFC2CE2ADC10D900E77A5C /* ReceivingAccount+Reducer.swift in Sources */,
 				48CFC3722ADC10D900E77A5C /* LSUDetails+View.swift in Sources */,
+				5B526AEC2C89C3C200AF8B72 /* ResourcesVisibilityClient+Interface.swift in Sources */,
 				48CFC47E2ADC10DA00E77A5C /* OverlayWindowClient+Live.swift in Sources */,
 				A408158B2C7E0D08005E65B9 /* MetadataDecimalArrayValue.swift in Sources */,
 				48CFC4722ADC10DA00E77A5C /* P2PLinksClient+Live.swift in Sources */,
@@ -8921,7 +8941,7 @@
 			repositoryURL = "https://github.com/radixdlt/sargon";
 			requirement = {
 				kind = exactVersion;
-				version = 1.0.42;
+				version = 1.0.45;
 			};
 		};
 		A415574E2B757C5E0040AD4E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
