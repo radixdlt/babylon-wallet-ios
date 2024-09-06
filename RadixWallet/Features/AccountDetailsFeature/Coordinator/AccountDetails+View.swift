@@ -109,7 +109,7 @@ extension AccountDetails {
 						Button {
 							viewStore.send(.accountLockerClaimTapped(details))
 						} label: {
-							AccountBannerView(kind: .lockerClaim(dappName: claim.dappName))
+							AccountBannerView(kind: .lockerClaim(dappName: details.dappName))
 						}
 					}
 				}
