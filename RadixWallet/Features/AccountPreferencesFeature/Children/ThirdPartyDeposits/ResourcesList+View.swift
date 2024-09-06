@@ -149,7 +149,7 @@ private extension ResourceViewState {
 
 	var rowCoreViewState: PlainListRowCore.ViewState {
 		.init(
-			title: name ?? "-",
+			title: name,
 			subtitle: address.resourceAddress.formatted()
 		)
 	}
