@@ -155,6 +155,9 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 
 		case let .statusUpdate(status):
 			state.status = status
+			if state.isAccountLockerClaim, status.isFinal {
+				accountLockersClient.forceRefresh()
+			}
 			if status == .committedSuccessfully {
 				return transactionCommittedSuccesfully(state)
 			} else {
@@ -166,9 +169,6 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 	private func transactionCommittedSuccesfully(_ state: State) -> Effect<Action> {
 		// TODO: Could probably be moved in other place. TransactionClient? AccountPortfolio?
 		accountPortfoliosClient.updateAfterCommittedTransaction(state.notarizedTX.intent)
-		if state.isAccountLockerClaim {
-			accountLockersClient.didClaimContent()
-		}
 		return .send(.delegate(.committedSuccessfully(state.notarizedTX.txID)))
 	}
 }
@@ -186,5 +186,9 @@ extension SubmitTransaction.State.TXStatus {
 		case .failed, .permanentlyRejected, .temporarilyRejected: true
 		case .notYetSubmitted, .submitting, .submitted, .committedSuccessfully: false
 		}
+	}
+
+	var isFinal: Bool {
+		!isInProgress
 	}
 }

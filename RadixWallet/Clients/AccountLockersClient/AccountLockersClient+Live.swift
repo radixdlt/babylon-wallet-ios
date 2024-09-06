@@ -14,7 +14,9 @@ extension AccountLockersClient {
 		@Dependency(\.dappInteractionClient) var dappInteractionClient
 
 		let claimsPerAccountSubject = AsyncCurrentValueSubject<ClaimsPerAccount>([:])
-		let updateClaimsSubject = AsyncCurrentValueSubject<Bool>(false)
+		let forceRefreshSubject = AsyncCurrentValueSubject<Bool>(false)
+
+		// MARK: - StartMonitoring
 
 		@Sendable
 		func startMonitoring() async throws {
@@ -25,9 +27,9 @@ extension AccountLockersClient {
 
 			// Every 5 minutes
 			let timer = AsyncTimerSequence(every: .minutes(5))
-			
+
 			// Whenever any flow on the Wallet indicates the client to force refresh (e.g. when an account locker was claimed)
-			let forceRefresh = didClaimSubject
+			let forceRefresh = forceRefreshSubject
 
 			for try await (dapps, _, _) in combineLatest(dappValues, timer, forceRefresh) {
 				do {
@@ -183,6 +185,16 @@ extension AccountLockersClient {
 			try await gatewayAPIClient.fetchAllPaginatedItems(cursor: nil, gatewayAPIClient.getAccountLockerVaultsPage(lockerAddress: lockerAddress, accountAddress: accountAddress))
 		}
 
+		// MARK: - AccountClaims
+
+		let accountClaims: AccountClaims = { account in
+			claimsPerAccountSubject.compactMap {
+				$0[account]
+			}
+			.share()
+			.eraseToAnyAsyncSequence()
+		}
+
 		// MARK: - DappsWithClaims
 
 		let dappsWithClaims: DappsWithClaims = {
@@ -210,23 +222,8 @@ extension AccountLockersClient {
 				.transaction(.init(send: .init(transactionManifest: manifest))),
 				.accountLockerClaim
 			)
-			switch response {
-			case let .dapp(.failure(failureResponse)):
-				print("M- Claim content failed \(failureResponse)")
-				if
-					failureResponse.error == .failedToPrepareTransaction,
-					let message = failureResponse.message,
-					message.contains("InsufficientBalance")
-				{
-					print("Insufficient balance, part of the content was already claimed")
-					updateClaimsSubject.send(true)
-				}
-
-			case .dapp(.success):
-				print("M- Claim content succeeded")
-
-			case .none:
-				print("M- No Claim content response")
+			if response.shouldForceRefresh {
+				forceRefreshSubject.send(true)
 			}
 		}
 
@@ -243,26 +240,20 @@ extension AccountLockersClient {
 			}
 		}
 
-		// MARK: - DidClaimContent
+		// MARK: - ForceRefresh
 
-		let didClaimContent: DidClaimContent = {
-			updateClaimsSubject.send(true)
+		let forceRefresh: ForceRefresh = {
+			forceRefreshSubject.send(true)
 		}
 
 		// MARK: - Client
 
 		return .init(
 			startMonitoring: startMonitoring,
-			accountClaims: { account in
-				claimsPerAccountSubject.compactMap {
-					$0[account]
-				}
-				.share()
-				.eraseToAnyAsyncSequence()
-			},
+			accountClaims: accountClaims,
 			dappsWithClaims: dappsWithClaims,
 			claimContent: claimContent,
-			didClaimContent: didClaimContent
+			forceRefresh: forceRefresh
 		)
 	}
 }
@@ -289,5 +280,25 @@ private extension GatewayAPI.AccountLockerVaultCollectionItem {
 		case let .nonFungible(nonFungible):
 			nonFungible.totalCount > 0
 		}
+	}
+}
+
+private extension P2P.RTCOutgoingMessage.Response? {
+	var shouldForceRefresh: Bool {
+		switch self {
+		case let .dapp(.failure(failure)):
+			failure.shouldForceRefresh
+		default:
+			false
+		}
+	}
+}
+
+private extension WalletToDappInteractionFailureResponse {
+	var shouldForceRefresh: Bool {
+		guard error == .failedToPrepareTransaction, let message else {
+			return false
+		}
+		return message.contains("InsufficientBalance") || message.contains("NotEnoughAmount")
 	}
 }

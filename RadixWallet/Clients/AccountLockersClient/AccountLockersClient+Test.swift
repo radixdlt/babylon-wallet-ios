@@ -16,7 +16,7 @@ extension AccountLockersClient: TestDependencyKey {
 		accountClaims: { _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		dappsWithClaims: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		claimContent: { _ in },
-		didClaimContent: {}
+		forceRefresh: {}
 	)
 
 	public static let testValue = Self(
@@ -24,6 +24,6 @@ extension AccountLockersClient: TestDependencyKey {
 		accountClaims: unimplemented("\(Self.self).accountClaims"),
 		dappsWithClaims: unimplemented("\(Self.self).dappsWithClaims"),
 		claimContent: unimplemented("\(Self.self).claimContent"),
-		didClaimContent: unimplemented("\(Self.self).didClaimContent")
+		forceRefresh: unimplemented("\(Self.self).forceRefresh")
 	)
 }
