@@ -161,7 +161,7 @@ extension CustomizeFees {
 				if viewState.insufficientBalance {
 					WarningErrorView(text: L10n.CustomizeNetworkFees.Warning.insufficientBalance, type: .error)
 				} else if viewState.linkingNewAccount {
-					HStack(alignment: .center) {
+					HStack(alignment: .center, spacing: .small1) {
 						WarningErrorView(text: L10n.TransactionReview.FeePayerValidation.linksNewAccount, type: .warning)
 						InfoButton(.payingaccount)
 					}
