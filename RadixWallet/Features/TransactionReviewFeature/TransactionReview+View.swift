@@ -386,7 +386,6 @@ extension TransactionReview {
 			let proofsStore = store.scope(state: \.proofs) { .child(.proofs($0)) }
 			return IfLetStore(proofsStore) { childStore in
 				TransactionReviewProofs.View(store: childStore)
-					.padding(.bottom, .medium1)
 			}
 		}
 
