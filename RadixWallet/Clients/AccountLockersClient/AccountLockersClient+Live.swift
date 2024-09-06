@@ -218,13 +218,10 @@ extension AccountLockersClient {
 				claimant: details.accountAddress,
 				claimableResources: claimableResources
 			)
-			let response = await dappInteractionClient.addWalletInteraction(
+			_ = await dappInteractionClient.addWalletInteraction(
 				.transaction(.init(send: .init(transactionManifest: manifest))),
 				.accountLockerClaim
 			)
-			if response.shouldForceRefresh {
-				forceRefreshSubject.send(true)
-			}
 		}
 
 		@Sendable
@@ -280,25 +277,5 @@ private extension GatewayAPI.AccountLockerVaultCollectionItem {
 		case let .nonFungible(nonFungible):
 			nonFungible.totalCount > 0
 		}
-	}
-}
-
-private extension P2P.RTCOutgoingMessage.Response? {
-	var shouldForceRefresh: Bool {
-		switch self {
-		case let .dapp(.failure(failure)):
-			failure.shouldForceRefresh
-		default:
-			false
-		}
-	}
-}
-
-private extension WalletToDappInteractionFailureResponse {
-	var shouldForceRefresh: Bool {
-		guard error == .failedToPrepareTransaction, let message else {
-			return false
-		}
-		return message.contains("InsufficientBalance") || message.contains("NotEnoughAmount")
 	}
 }
