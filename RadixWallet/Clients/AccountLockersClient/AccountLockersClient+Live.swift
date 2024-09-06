@@ -14,7 +14,7 @@ extension AccountLockersClient {
 		@Dependency(\.dappInteractionClient) var dappInteractionClient
 
 		let claimsPerAccountSubject = AsyncCurrentValueSubject<ClaimsPerAccount>([:])
-		let didClaimSubject = AsyncCurrentValueSubject<Bool>(false)
+		let updateClaimsSubject = AsyncCurrentValueSubject<Bool>(false)
 
 		@Sendable
 		func startMonitoring() async throws {
@@ -206,10 +206,28 @@ extension AccountLockersClient {
 				claimant: details.accountAddress,
 				claimableResources: claimableResources
 			)
-			_ = await dappInteractionClient.addWalletInteraction(
+			let response = await dappInteractionClient.addWalletInteraction(
 				.transaction(.init(send: .init(transactionManifest: manifest))),
 				.accountLockerClaim
 			)
+			switch response {
+			case let .dapp(.failure(failureResponse)):
+				print("M- Claim content failed \(failureResponse)")
+				if
+					failureResponse.error == .failedToPrepareTransaction,
+					let message = failureResponse.message,
+					message.contains("InsufficientBalance")
+				{
+					print("Insufficient balance, part of the content was already claimed")
+					updateClaimsSubject.send(true)
+				}
+
+			case .dapp(.success):
+				print("M- Claim content succeeded")
+
+			case .none:
+				print("M- No Claim content response")
+			}
 		}
 
 		@Sendable
@@ -220,7 +238,7 @@ extension AccountLockersClient {
 					.fungible(resourceAddress: fungible.resourceAddress, amount: fungible.amount)
 
 				case let .nonFungible(nonFungible):
-					.nonFungible(resourceAddress: nonFungible.resourceAddress, ids: [])
+					.nonFungible(resourceAddress: nonFungible.resourceAddress, numberOfItems: UInt64(nonFungible.count))
 				}
 			}
 		}
@@ -228,7 +246,7 @@ extension AccountLockersClient {
 		// MARK: - DidClaimContent
 
 		let didClaimContent: DidClaimContent = {
-			didClaimSubject.send(true)
+			updateClaimsSubject.send(true)
 		}
 
 		// MARK: - Client
