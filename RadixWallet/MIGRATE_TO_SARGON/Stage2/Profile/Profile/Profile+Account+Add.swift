@@ -41,7 +41,8 @@ extension Profile {
 				id: networkID,
 				accounts: [account],
 				personas: [],
-				authorizedDapps: []
+				authorizedDapps: [],
+				resourcePreferences: []
 			)
 			var identifiedNetworks = networks.asIdentified()
 			try identifiedNetworks.add(network)

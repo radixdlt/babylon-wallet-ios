@@ -1,7 +1,7 @@
 // MARK: - Custom flags
 
 /// Application version shared across all targets and flavours
-APP_VERSION = 1.8.3
+APP_VERSION = 1.9.0
 
 /// App Icon base name
 APP_ICON = AppIcon

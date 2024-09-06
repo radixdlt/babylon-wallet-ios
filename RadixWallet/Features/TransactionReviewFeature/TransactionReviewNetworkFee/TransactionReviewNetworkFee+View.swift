@@ -66,7 +66,7 @@ extension TransactionReviewNetworkFee {
 						.padding(.top, .small2)
 					}
 				}
-				.task {
+				.task(id: viewStore.id) {
 					viewStore.send(.task)
 				}
 			}
