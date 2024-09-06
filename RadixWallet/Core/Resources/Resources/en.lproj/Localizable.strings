@@ -1152,6 +1152,7 @@ Code: %@";
 "preferences_developerMode_subtitle" = "Warning: disables website validity checks";
 "preferences_advancedLock_title" = "Advanced Lock";
 "preferences_advancedLock_subtitle" = "Re-authenticate when switching between apps";
+"preferences_advancedLockAndroid_subtitle" = "Re-authenticate when switching, prevent screen recording";
 "preferences_displayPreferences" = "Display";
 "preferences_hiddenAssets_title" = "Hidden Assets";
 "preferences_hiddenAssets_subtitle" = "Manage hidden Tokens, NFTs, and other asset types";
