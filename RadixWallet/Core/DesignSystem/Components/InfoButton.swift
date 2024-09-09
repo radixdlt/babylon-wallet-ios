@@ -16,6 +16,7 @@ public struct InfoButton: View {
 			}
 		}
 		.buttonStyle(.info)
+		.foregroundColor(label != nil ? .app.blue2 : .app.gray3)
 	}
 
 	private func showInfo() {

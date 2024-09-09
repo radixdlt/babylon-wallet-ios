@@ -15,7 +15,6 @@ public struct InfoButtonStyle: ButtonStyle {
 			Image(.info)
 		}
 		.labelStyle(.titleAndIcon)
-		.foregroundColor(.app.blue2)
 		.opacity(configuration.isPressed ? 0.2 : 1)
 	}
 }

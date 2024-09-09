@@ -98,6 +98,7 @@ extension InfoLinkSheet {
 				Text(text)
 					.textStyle(.body1Regular)
 					.foregroundColor(.app.gray1)
+					.tint(.app.blue2)
 					.multilineTextAlignment(.leading)
 					.flushedLeft
 					.padding(.bottom, .small3)
