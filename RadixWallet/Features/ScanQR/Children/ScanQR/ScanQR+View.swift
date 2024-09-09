@@ -81,6 +81,10 @@ extension ScanQR.View {
 					.foregroundColor(.app.gray1)
 				}
 			}
+
+			if store.kind == .connectorExtension {
+				InfoButton(.radixconnect, label: L10n.ScanQR.ConnectorExtension.radixConnectLearMore)
+			}
 		}
 	}
 

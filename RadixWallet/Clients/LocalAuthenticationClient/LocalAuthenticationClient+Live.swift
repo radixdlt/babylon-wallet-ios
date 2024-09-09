@@ -2,11 +2,20 @@ import LocalAuthentication
 
 // MARK: - LocalAuthenticationClient + DependencyKey
 extension LocalAuthenticationClient: DependencyKey {
-	public static let liveValue: Self = .init(
-		queryConfig: {
-			try LAContext().queryLocalAuthenticationConfig()
-		}
-	)
+	public static let liveValue: Self = {
+		let authenticatedSuccessfully = AsyncPassthroughSubject<Void>()
+
+		return .init(
+			queryConfig: {
+				try LAContext().queryLocalAuthenticationConfig()
+			},
+			authenticateWithBiometrics: {
+				try await LAContext().authenticateWithBiometrics()
+			},
+			setAuthenticatedSuccessfully: { authenticatedSuccessfully.send(()) },
+			authenticatedSuccessfully: { authenticatedSuccessfully.eraseToAnyAsyncSequence() }
+		)
+	}()
 }
 
 // MARK: - LocalAuthenticationClient.Error
@@ -72,6 +81,21 @@ extension LAContext {
 				.success(false)
 			default:
 				.failure(.evaluationError(laError))
+			}
+		}
+	}
+
+	fileprivate func authenticateWithBiometrics() async throws -> Bool {
+		try await withCheckedThrowingContinuation { continuation in
+			evaluatePolicy(
+				.deviceOwnerAuthenticationWithBiometrics,
+				localizedReason: L10n.Biometrics.Prompt.title
+			) { success, error in
+				if let error {
+					continuation.resume(throwing: error)
+				} else {
+					continuation.resume(returning: success)
+				}
 			}
 		}
 	}

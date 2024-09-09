@@ -192,9 +192,7 @@ struct PlainListRowCore: View {
 private extension PlainListRowCore.ViewState {
 	var titleTextStyle: TextStyle {
 		switch context {
-		case .toggle:
-			.secondaryHeader
-		case .settings, .dappAndPersona:
+		case .toggle, .settings, .dappAndPersona:
 			.body1Header
 		case .hiddenPersona:
 			.body1HighImportance

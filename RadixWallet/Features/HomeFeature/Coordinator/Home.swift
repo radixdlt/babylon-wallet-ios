@@ -222,7 +222,13 @@ public struct Home: Sendable, FeatureReducer {
 				return .none
 			}
 
-			state.accountRows = accounts.map { Home.AccountRow.State(account: $0, problems: state.problems) }.asIdentified()
+			state.accountRows = accounts
+				.map { account in
+					// Create new Home.AccountRow.State only if it wasn't present before. Otherwise, we keep the old row
+					// which probably has already loaded its resources & fiat worth.
+					state.accountRows.first(where: { $0.id == account.address }) ?? .init(account: account, problems: state.problems)
+				}
+				.asIdentified()
 
 			return .run { [addresses = state.accountAddresses] _ in
 				_ = try await accountPortfoliosClient.fetchAccountPortfolios(addresses, false)
