@@ -86,8 +86,6 @@ extension InfoLinkSheet.GlossaryItem {
 			AssetResource.iconPackageOwnerBadge
 		case .poolunits:
 			AssetResource.poolUnits
-		case .radixnetwork:
-			AssetResource.fungibleTokens
 		case .xrd:
 			AssetResource.xrd
 		default:
