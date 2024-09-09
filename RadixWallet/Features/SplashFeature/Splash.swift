@@ -80,19 +80,19 @@ public struct Splash: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return .run { send in
-				let isAdvancedLockEnabled = await onboardingClient.loadProfile().appPreferences.security.isAdvancedLockEnabled
-
-				// Starting with iOS 18, the system-provided biometric check will be used
-				if #unavailable(iOS 18), isAdvancedLockEnabled {
-					#if targetEnvironment(simulator)
-					let isEnabled = _XCTIsTesting
-					#else
-					let isEnabled = true
-					#endif
-					await send(.internal(.advancedLockStateLoaded(isEnabled: isEnabled)))
-				} else {
-					await send(.internal(.advancedLockStateLoaded(isEnabled: false)))
-				}
+//				let isAdvancedLockEnabled = await onboardingClient.loadProfile().appPreferences.security.isAdvancedLockEnabled
+//
+//				// Starting with iOS 18, the system-provided biometric check will be used
+//				if #unavailable(iOS 18), isAdvancedLockEnabled {
+//					#if targetEnvironment(simulator)
+//					let isEnabled = _XCTIsTesting
+//					#else
+//					let isEnabled = true
+//					#endif
+//					await send(.internal(.advancedLockStateLoaded(isEnabled: isEnabled)))
+//				} else {
+				await send(.internal(.advancedLockStateLoaded(isEnabled: false)))
+				// }
 			}
 			.concatenate(with: boot_sargon_os())
 
@@ -168,7 +168,7 @@ public struct Splash: Sendable, FeatureReducer {
 	}
 
 	private func boot_sargon_os() -> Effect<Action> {
-		.run { send in
+		.run { _ in
 			_ = ProfileStore.shared
 			try await SargonOS.creatingShared(
 				bootingWith: .creatingShared(drivers: .init(
@@ -178,7 +178,7 @@ public struct Splash: Sendable, FeatureReducer {
 				)
 			)
 
-			await send(.internal(.loadedProfileState(onboardingClient.loadProfileState())))
+			// await send(.internal(.loadedProfileState(onboardingClient.loadProfileState())))
 		}
 	}
 
