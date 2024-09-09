@@ -34,6 +34,7 @@ public struct Splash: Sendable, FeatureReducer {
 		case passcodeConfigResult(TaskResult<LocalAuthenticationConfig>)
 		case biometricsCheckResult(TaskResult<Bool>)
 		case advancedLockStateLoaded(isEnabled: Bool)
+		case showAppLockMessage
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -53,6 +54,7 @@ public struct Splash: Sendable, FeatureReducer {
 			public enum ErrorAlert: Sendable, Equatable {
 				case retryVerifyPasscodeButtonTapped
 				case openSettingsButtonTapped
+				case appLockOkButtonTapped
 			}
 		}
 
@@ -64,6 +66,7 @@ public struct Splash: Sendable, FeatureReducer {
 	@Dependency(\.localAuthenticationClient) var localAuthenticationClient
 	@Dependency(\.onboardingClient) var onboardingClient
 	@Dependency(\.openURL) var openURL
+	@Dependency(\.userDefaults) var userDefaults
 
 	public init() {}
 
@@ -91,7 +94,11 @@ public struct Splash: Sendable, FeatureReducer {
 					#endif
 					await send(.internal(.advancedLockStateLoaded(isEnabled: isEnabled)))
 				} else {
-					await send(.internal(.advancedLockStateLoaded(isEnabled: false)))
+					if !userDefaults.appLockMessageShown {
+						await send(.internal(.showAppLockMessage))
+					} else {
+						await send(.internal(.advancedLockStateLoaded(isEnabled: false)))
+					}
 				}
 			}
 
@@ -152,17 +159,35 @@ public struct Splash: Sendable, FeatureReducer {
 			}
 
 			return delegateCompleted(context: state.context)
+
+		case .showAppLockMessage:
+			state.destination = .errorAlert(.init(
+				title: .init("Warning"),
+				message: .init("To protect your app, use the App Lock system feature"),
+				buttons: [
+					.default(
+						.init(L10n.Common.ok),
+						action: .send(.appLockOkButtonTapped)
+					),
+				]
+			))
+			return .none
 		}
 	}
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .errorAlert(.retryVerifyPasscodeButtonTapped):
-			verifyPasscode()
+			return verifyPasscode()
+
 		case .errorAlert(.openSettingsButtonTapped):
-			.run { _ in
+			return .run { _ in
 				await openURL(URL(string: UIApplication.openSettingsURLString)!)
 			}
+
+		case .errorAlert(.appLockOkButtonTapped):
+			userDefaults.setAppLockMessageShown(true)
+			return .send(.internal(.advancedLockStateLoaded(isEnabled: false)))
 		}
 	}
 
