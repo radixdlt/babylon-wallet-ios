@@ -85,20 +85,26 @@ public struct Splash: Sendable, FeatureReducer {
 			return .run { send in
 				let isAdvancedLockEnabled = await onboardingClient.loadProfile().appPreferences.security.isAdvancedLockEnabled
 
-				// Starting with iOS 18, the system-provided biometric check will be used
-				if #unavailable(iOS 18), isAdvancedLockEnabled {
-					#if targetEnvironment(simulator)
-					let isEnabled = _XCTIsTesting
-					#else
-					let isEnabled = true
-					#endif
-					await send(.internal(.advancedLockStateLoaded(isEnabled: isEnabled)))
-				} else {
-					if !userDefaults.appLockMessageShown {
-						await send(.internal(.showAppLockMessage))
+				guard #available(iOS 18, *) else {
+					// For versions below iOS 18, perform the advanced lock state check
+					if isAdvancedLockEnabled {
+						#if targetEnvironment(simulator)
+						let isEnabled = _XCTIsTesting
+						#else
+						let isEnabled = true
+						#endif
+						await send(.internal(.advancedLockStateLoaded(isEnabled: isEnabled)))
 					} else {
 						await send(.internal(.advancedLockStateLoaded(isEnabled: false)))
 					}
+					return
+				}
+
+				// Starting with iOS 18, the system-provided biometric check will be used
+				if isAdvancedLockEnabled, !userDefaults.appLockMessageShown {
+					await send(.internal(.showAppLockMessage))
+				} else {
+					await send(.internal(.advancedLockStateLoaded(isEnabled: false)))
 				}
 			}
 
@@ -144,11 +150,9 @@ public struct Splash: Sendable, FeatureReducer {
 		case let .biometricsCheckResult(.failure(error)):
 			state.biometricsCheckFailed = true
 			state.destination = .errorAlert(.init(
-				title: .init(L10n.Common.errorAlertTitle),
-				message: .init(error.localizedDescription),
-				buttons: [
-					.default(.init(L10n.Common.ok)),
-				]
+				title: { .init(L10n.Common.errorAlertTitle) },
+				actions: { .default(.init(L10n.Common.ok)) },
+				message: { .init(error.localizedDescription) }
 			))
 			return .none
 
@@ -162,14 +166,14 @@ public struct Splash: Sendable, FeatureReducer {
 
 		case .showAppLockMessage:
 			state.destination = .errorAlert(.init(
-				title: .init("Warning"),
-				message: .init("To protect your app, use the App Lock system feature"),
-				buttons: [
+				title: { .init("Advanced Lock Disabled") },
+				actions: {
 					.default(
-						.init(L10n.Common.ok),
+						.init(L10n.Common.dismiss),
 						action: .send(.appLockOkButtonTapped)
-					),
-				]
+					)
+				},
+				message: { .init("Your phone was updated and now supports Apple's built-in App Lock feature.") }
 			))
 			return .none
 		}
