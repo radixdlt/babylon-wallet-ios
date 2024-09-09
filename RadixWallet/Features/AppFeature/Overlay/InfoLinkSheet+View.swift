@@ -36,7 +36,7 @@ extension InfoLinkSheet {
 						VStack(spacing: .zero) {
 							if let image = viewStore.image {
 								Image(asset: image)
-									.resizable()
+									.aspectRatio(contentMode: .fit)
 									.frame(.veryLarge)
 									.padding(.bottom, .medium2)
 							}
