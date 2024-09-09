@@ -27,6 +27,13 @@ extension ProfileStore {
 		}
 	}
 
+	/// A multicasting replaying AsyncSequence of distinct Personas for the currently selected network.
+	public func hiddenResourcesValues() -> AnyAsyncSequence<[ResourceIdentifier]> {
+		_lens {
+			$0.network?.getHiddenResources()
+		}
+	}
+
 	/// A multicasting replaying AsyncSequence of distinct Gateways
 	public func currentGatewayValues() -> AnyAsyncSequence<Gateway> {
 		_lens {

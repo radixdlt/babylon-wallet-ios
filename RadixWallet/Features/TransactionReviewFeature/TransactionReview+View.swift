@@ -386,7 +386,6 @@ extension TransactionReview {
 			let proofsStore = store.scope(state: \.proofs) { .child(.proofs($0)) }
 			return IfLetStore(proofsStore) { childStore in
 				TransactionReviewProofs.View(store: childStore)
-					.padding(.bottom, .medium1)
 			}
 		}
 
@@ -684,23 +683,6 @@ struct RawTransactionView: SwiftUI.View {
 					alignment: .topLeading
 				)
 				.padding([.horizontal, .bottom], .medium1)
-		}
-	}
-}
-
-// MARK: - TransactionReviewInfoButton
-public struct TransactionReviewInfoButton: View {
-	private let action: () -> Void
-
-	public init(action: @escaping () -> Void) {
-		self.action = action
-	}
-
-	public var body: some SwiftUI.View {
-		Button(action: action) {
-			Image(asset: AssetResource.info)
-				.renderingMode(.template)
-				.foregroundColor(.app.gray3)
 		}
 	}
 }

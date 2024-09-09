@@ -156,7 +156,8 @@ extension ProfileStore {
 			id: .mainnet,
 			accounts: accounts.elements, // FIXME: Declare init in (Swift)Sargon accepting `Accounts` (IdentifiedArrayOf<Account>) ?
 			personas: [],
-			authorizedDapps: []
+			authorizedDapps: [],
+			resourcePreferences: []
 		)
 
 		var lastUsedOnDevice = deviceInfo

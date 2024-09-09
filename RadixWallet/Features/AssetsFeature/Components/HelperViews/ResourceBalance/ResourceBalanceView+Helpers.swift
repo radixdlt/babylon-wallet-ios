@@ -6,7 +6,7 @@ extension ResourceBalance.ViewState.PoolUnit {
 			resourcePoolAddress: poolUnit.resourcePoolAddress,
 			poolUnitAddress: poolUnit.resource.resourceAddress,
 			poolIcon: poolUnit.resource.metadata.iconURL,
-			poolName: poolUnit.resource.metadata.fungibleResourceName,
+			poolName: poolUnit.resource.metadata.title,
 			amount: nil,
 			dAppName: details.dAppName,
 			resources: details.map { .init(resources: $0) }

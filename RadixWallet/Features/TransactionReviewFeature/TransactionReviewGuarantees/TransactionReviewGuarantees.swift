@@ -12,16 +12,12 @@ public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 			guarantees.allSatisfy(\.percentageStepper.isValid)
 		}
 
-		@PresentationState
-		public var info: SlideUpPanel.State?
-
 		public init(guarantees: IdentifiedArrayOf<TransactionReviewGuarantee.State>) {
 			self.guarantees = guarantees
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case infoTapped
 		case applyTapped
 		case closeTapped
 	}
@@ -29,7 +25,6 @@ public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case guarantee(id: TransactionReviewGuarantee.State.ID, action: TransactionReviewGuarantee.Action)
-		case info(PresentationAction<SlideUpPanel.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -43,19 +38,10 @@ public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 			.forEach(\.guarantees, action: /Action.child .. /ChildAction.guarantee) {
 				TransactionReviewGuarantee()
 			}
-			.ifLet(\.$info, action: /Action.child .. /ChildAction.info) {
-				SlideUpPanel()
-			}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .infoTapped:
-			// FIXME: For mainnet
-			//			state.info = .init(title: L10n.TransactionReview.Guarantees.explanationTitle,
-			//			                   explanation: L10n.TransactionReview.Guarantees.explanationText)
-			return .none
-
 		case .applyTapped:
 			let guarantees = state.guarantees
 			return .run { send in

@@ -13,30 +13,23 @@ extension TransactionReviewProofs {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-				VStack(alignment: .leading, spacing: 0) {
+				VStack(alignment: .leading, spacing: .medium2) {
 					HStack {
 						Text(L10n.TransactionReview.presentingHeading)
 							.sectionHeading
 							.textCase(.uppercase)
 
-						//	FIXME: Uncomment and implement
-						//	TransactionReviewInfoButton {
-						//		viewStore.send(.infoTapped)
-						//	}
+						InfoButton(.badges)
 
 						Spacer(minLength: 0)
 					}
-					.padding(.bottom, .medium2)
 
-					VStack(spacing: .medium3) {
-						ForEach(viewStore.proofs) { proof in
-							ResourceBalanceView(proof.resourceBalance.viewState, appearance: .compact) {
-								viewStore.send(.proofTapped(proof))
-							}
+					ForEach(viewStore.proofs) { proof in
+						ResourceBalanceView(proof.resourceBalance.viewState, appearance: .compact) {
+							viewStore.send(.proofTapped(proof))
 						}
-						Separator()
 					}
-					.padding(.bottom, .medium3)
+					Separator()
 				}
 			}
 		}
