@@ -12,6 +12,7 @@ extension AccountLockersClient {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.cacheClient) var cacheClient
 		@Dependency(\.dappInteractionClient) var dappInteractionClient
+		@Dependency(\.submitTXClient) var submitTXClient
 
 		let claimsPerAccountSubject = AsyncCurrentValueSubject<ClaimsPerAccount>([:])
 		let forceRefreshSubject = AsyncCurrentValueSubject<Bool>(false)
@@ -218,10 +219,28 @@ extension AccountLockersClient {
 				claimant: details.accountAddress,
 				claimableResources: claimableResources
 			)
-			_ = await dappInteractionClient.addWalletInteraction(
+			let result = await dappInteractionClient.addWalletInteraction(
 				.transaction(.init(send: .init(transactionManifest: manifest))),
 				.accountLockerClaim
 			)
+
+			switch result {
+			case let .dapp(.success(success)):
+				if case let .transaction(tx) = success.items {
+					// Wait for the transaction to be committed
+					let txID = tx.send.transactionIntentHash
+					try await submitTXClient.hasTXBeenCommittedSuccessfully(txID)
+					// And update claim status after
+					forceRefreshSubject.send(true)
+				}
+
+			case .dapp(.failure):
+				// Update claim status since it may have failed due to an account locker no longer being available.
+				forceRefreshSubject.send(true)
+
+			default:
+				break
+			}
 		}
 
 		@Sendable

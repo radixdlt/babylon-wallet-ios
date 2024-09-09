@@ -24,7 +24,6 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 		public var status: TXStatus
 		public let inProgressDismissalDisabled: Bool
 		public let route: P2P.Route
-		public let isAccountLockerClaim: Bool
 
 		@PresentationState
 		var dismissTransactionAlert: AlertState<ViewAction.DismissAlertAction>?
@@ -33,14 +32,12 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 			notarizedTX: NotarizeTransactionResponse,
 			status: TXStatus = .notYetSubmitted,
 			inProgressDismissalDisabled: Bool = false,
-			route: P2P.Route,
-			isAccountLockerClaim: Bool
+			route: P2P.Route
 		) {
 			self.notarizedTX = notarizedTX
 			self.status = status
 			self.inProgressDismissalDisabled = inProgressDismissalDisabled
 			self.route = route
-			self.isAccountLockerClaim = isAccountLockerClaim
 		}
 	}
 
@@ -155,9 +152,6 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 
 		case let .statusUpdate(status):
 			state.status = status
-			if state.isAccountLockerClaim, status.isFinal {
-				accountLockersClient.forceRefresh()
-			}
 			if status == .committedSuccessfully {
 				return transactionCommittedSuccesfully(state)
 			} else {
