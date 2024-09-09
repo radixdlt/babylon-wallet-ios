@@ -887,6 +887,12 @@ public enum L10n {
     }
   }
   public enum Biometrics {
+    public enum AppLockAvailableAlert {
+      /// Your phone was updated and now supports Apple's built-in App Lock feature.
+      public static let message = L10n.tr("Localizable", "biometrics_appLockAvailableAlert_message", fallback: "Your phone was updated and now supports Apple's built-in App Lock feature.")
+      /// Advanced Lock Disabled
+      public static let title = L10n.tr("Localizable", "biometrics_appLockAvailableAlert_title", fallback: "Advanced Lock Disabled")
+    }
     public enum DeviceNotSecureAlert {
       /// Your device currently has no device access security set, such as biometrics or a PIN. The Radix Wallet requires this to be set for your security.
       public static let message = L10n.tr("Localizable", "biometrics_deviceNotSecureAlert_message", fallback: "Your device currently has no device access security set, such as biometrics or a PIN. The Radix Wallet requires this to be set for your security.")
