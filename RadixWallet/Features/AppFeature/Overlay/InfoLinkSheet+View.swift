@@ -49,7 +49,7 @@ extension InfoLinkSheet {
 							.environment(\.openURL, openURL)
 							.padding(.horizontal, .large2)
 						}
-						.padding(.top, .small2)
+						.padding(.vertical, .small2)
 						.id(scrollViewTopID)
 					}
 					.coordinateSpace(name: coordSpace)
