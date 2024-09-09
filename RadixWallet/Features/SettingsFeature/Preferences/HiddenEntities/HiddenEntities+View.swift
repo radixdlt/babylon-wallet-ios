@@ -77,6 +77,7 @@ extension HiddenEntities {
 				store.send(.view(action))
 			}
 			.buttonStyle(.secondaryRectangular(shouldExpand: false))
+			.padding(.leading, .small3)
 		}
 
 		private var emptyState: some SwiftUI.View {
