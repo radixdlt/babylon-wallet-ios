@@ -517,6 +517,8 @@
 "biometrics_deviceNotSecureAlert_message" = "Your device currently has no device access security set, such as biometrics or a PIN. The Radix Wallet requires this to be set for your security.";
 "biometrics_deviceNotSecureAlert_openSettings" = "Open Settings";
 "biometrics_deviceNotSecureAlert_quit" = "Quit";
+"biometrics_appLockAvailableAlert_title" = "Advanced Lock Disabled";
+"biometrics_appLockAvailableAlert_message" = "Your phone was updated and now supports Apple\'s built-in App Lock feature.";
 "common_account" = "Account";
 "common_cancel" = "Cancel";
 "common_continue" = "Continue";
