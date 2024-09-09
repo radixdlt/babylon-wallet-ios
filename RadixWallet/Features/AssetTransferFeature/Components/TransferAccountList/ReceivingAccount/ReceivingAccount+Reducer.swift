@@ -2,6 +2,8 @@ import ComposableArchitecture
 import Sargon
 import SwiftUI
 
+public typealias AssetsDepositStatus = [ResourceAsset.State.ID: ResourceAsset.State.DepositStatus]
+
 // MARK: - ReceivingAccount
 public struct ReceivingAccount: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
@@ -73,34 +75,29 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 	}
 }
 
+extension ReceivingAccount.State {
+	var isDepositEnabled: Bool {
+		assets.allSatisfy(\.isDepositEnabled)
+	}
+
+	var isLoadingDepositStatus: Bool {
+		assets.contains(where: { $0.depositStatus == .loading })
+	}
+
+	mutating func setAllDepositStatus(_ status: Loadable<ResourceAsset.State.DepositStatus>) {
+		assets.mutateAll { asset in
+			asset.depositStatus = status
+		}
+	}
+
+	mutating func updateDepositStatus(values: AssetsDepositStatus) {
+		for (id, status) in values {
+			assets[id: id]?.depositStatus = .success(status)
+		}
+	}
+}
+
 extension AccountOrAddressOf {
-	var name: String {
-		switch self {
-		case let .profileAccount(account):
-			account.displayName.value
-		case .addressOfExternalAccount:
-			L10n.Common.account
-		}
-	}
-
-	var identifer: LedgerIdentifiable {
-		switch self {
-		case let .profileAccount(value: account):
-			.address(.account(account.address))
-		case let .addressOfExternalAccount(address):
-			.address(.account(address))
-		}
-	}
-
-	var gradient: Gradient {
-		switch self {
-		case let .profileAccount(value: account):
-			.init(account.appearanceID)
-		case .addressOfExternalAccount:
-			.init(colors: [.app.gray2])
-		}
-	}
-
 	var isUserAccount: Bool {
 		guard case .profileAccount = self else {
 			return false
@@ -116,7 +113,7 @@ extension ResourceAsset.State {
 		case let .fungibleAsset(state):
 			state.resource.resourceAddress
 		case let .nonFungibleAsset(state):
-			state.resourceAddress
+			state.resource.resourceAddress
 		}
 	}
 }

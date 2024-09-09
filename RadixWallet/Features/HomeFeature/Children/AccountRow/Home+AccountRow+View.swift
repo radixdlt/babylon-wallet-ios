@@ -3,12 +3,11 @@ import SwiftUI
 
 extension Home.AccountRow {
 	public struct ViewState: Equatable {
-		let name: String
-		let address: AccountAddress
+		let account: Account
 		let showFiatWorth: Bool
 		let fiatWorth: Loadable<FiatWorth>
-		let appearanceID: AppearanceID
 		let isLoadingResources: Bool
+		let securityProblemsConfig: EntitySecurityProblemsView.Config
 
 		public enum AccountTag: Int, Hashable, Identifiable, Sendable {
 			case ledgerBabylon
@@ -41,12 +40,11 @@ extension Home.AccountRow {
 		}
 
 		init(state: State) {
-			self.name = state.account.displayName.rawValue
-			self.address = state.account.address
-			self.appearanceID = state.account.appearanceID
+			self.account = state.account
 			self.showFiatWorth = state.showFiatWorth
 			self.fiatWorth = state.totalFiatWorth
 			self.isLoadingResources = state.accountWithResources.isLoading
+			self.securityProblemsConfig = state.securityProblemsConfig
 
 			self.tag = .init(state: state)
 			self.isLedgerAccount = state.isLedgerAccount
@@ -80,57 +78,36 @@ extension Home.AccountRow {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: ViewState.init, send: { .view($0) }) { viewStore in
-				VStack(alignment: .leading, spacing: .medium3) {
-					VStack(alignment: .leading, spacing: .zero) {
-						HStack(spacing: .zero) {
-							Text(viewStore.name)
-								.lineLimit(1)
-								.textStyle(.body1Header)
-								.foregroundColor(.app.white)
-								.truncationMode(.tail)
-								.layoutPriority(0)
-
-							if viewStore.showFiatWorth {
-								Spacer()
-								loadable(
-									viewStore.fiatWorth,
-									loadingViewHeight: .medium1,
-									backgroundColor: .clear
-								) { fiatWorth in
-									if fiatWorth.worth.isUnknown || fiatWorth.worth > .zero {
-										Text(fiatWorth.currencyFormatted())
-											.lineLimit(1)
-											.textStyle(.secondaryHeader)
-											.foregroundStyle(.app.white)
-									}
-								}
-								.padding(.leading, .small1)
-								.frame(maxWidth: viewStore.fiatWorth.didLoad ? nil : .huge1)
-								.layoutPriority(1)
+				AccountCard(kind: .home(tag: viewStore.tag?.display), account: viewStore.account) {
+					if viewStore.showFiatWorth {
+						Spacer()
+						loadable(
+							viewStore.fiatWorth,
+							loadingViewHeight: .medium1,
+							backgroundColor: .clear
+						) { fiatWorth in
+							if fiatWorth.worth.isUnknown || fiatWorth.worth > .zero {
+								Text(fiatWorth.currencyFormatted())
+									.lineLimit(1)
+									.textStyle(.secondaryHeader)
+									.foregroundStyle(.app.white)
 							}
 						}
-
-						HStack {
-							AddressView(.address(.account(viewStore.address, isLedgerHWAccount: viewStore.isLedgerAccount)))
-								.foregroundColor(.app.whiteTransparent)
-								.textStyle(.body2HighImportance)
-
-							if let tag = viewStore.tag {
-								Text("•")
-								Text("\(tag.display)")
-							}
-						}
-						.foregroundColor(.app.whiteTransparent)
+						.padding(.leading, .small1)
+						.frame(maxWidth: viewStore.fiatWorth.didLoad ? nil : .huge1)
+						.layoutPriority(1)
 					}
+				} bottom: {
+					VStack(spacing: .small1) {
+						ownedResourcesList(viewStore)
 
-					ownedResourcesList(viewStore)
-
-					EntitySecurityProblems.View(store: store.entitySecurityProblems)
+						EntitySecurityProblemsView(config: viewStore.securityProblemsConfig) {
+							viewStore.send(.securityProblemsTapped)
+						}
+					}
+					.padding(.top, .medium1)
+					.padding(.bottom, .small3)
 				}
-				.padding(.horizontal, .medium1)
-				.padding(.vertical, .medium2)
-				.background(viewStore.appearanceID.gradient)
-				.cornerRadius(.small1)
 				.onTapGesture {
 					viewStore.send(.tapped)
 				}
@@ -187,11 +164,11 @@ extension Home.AccountRow.View {
 				}
 
 				if viewStore.poolUnitsCount > 0 {
-					LabelledIcon(roundIcon: AssetResource.poolUnit, label: "\(viewStore.poolUnitsCount)")
+					LabelledIcon(roundIcon: AssetResource.poolUnits, label: "\(viewStore.poolUnitsCount)")
 				}
 			}
 		}
-		.frame(height: Constants.diameter)
+		.frame(minHeight: Constants.diameter)
 		.shimmer(active: viewStore.isLoadingResources, config: .accountResourcesLoading)
 		.cornerRadius(Constants.iconSize.rawValue / 4)
 	}
@@ -383,12 +360,6 @@ extension Home.AccountRow.ViewState.AccountTag {
 	}
 }
 
-private extension StoreOf<Home.AccountRow> {
-	var entitySecurityProblems: StoreOf<EntitySecurityProblems> {
-		scope(state: \.entitySecurityProblems, action: \.child.entitySecurityProblems)
-	}
-}
-
 #if DEBUG
 import ComposableArchitecture
 import SwiftUI
@@ -405,6 +376,6 @@ struct Row_Preview: PreviewProvider {
 }
 
 extension Home.AccountRow.State {
-	public static let previewValue = Self(account: .previewValue0)
+	public static let previewValue = Self(account: .previewValue0, problems: [])
 }
 #endif

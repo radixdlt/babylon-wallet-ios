@@ -15,6 +15,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public let waitsForTransactionToBeComitted: Bool
 		public let isWalletTransaction: Bool
 		public let proposingDappMetadata: DappMetadata.Ledger?
+		public let p2pRoute: P2P.Route
 
 		public var networkID: NetworkID? { reviewedTransaction?.networkID }
 
@@ -80,7 +81,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey = .init(),
 			waitsForTransactionToBeComitted: Bool = false,
 			isWalletTransaction: Bool,
-			proposingDappMetadata: DappMetadata.Ledger?
+			proposingDappMetadata: DappMetadata.Ledger?,
+			p2pRoute: P2P.Route
 		) {
 			self.nonce = nonce
 			self.unvalidatedManifest = unvalidatedManifest
@@ -90,6 +92,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			self.waitsForTransactionToBeComitted = waitsForTransactionToBeComitted
 			self.isWalletTransaction = isWalletTransaction
 			self.proposingDappMetadata = proposingDappMetadata
+			self.p2pRoute = p2pRoute
 		}
 
 		public enum DisplayMode: Sendable, Hashable {
@@ -129,7 +132,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case previewLoaded(TaskResult<TransactionToReview>)
 		case updateSections(TransactionReview.Sections?)
-		case buildTransactionItentResult(TaskResult<TransactionIntent>)
+		case buildTransactionIntentResult(TaskResult<TransactionIntent>)
 		case notarizeResult(TaskResult<NotarizeTransactionResponse>)
 		case determineFeePayerResult(TaskResult<FeePayerSelectionResult?>)
 	}
@@ -337,7 +340,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				#endif
 
 				return .run { send in
-					await send(.internal(.buildTransactionItentResult(TaskResult {
+					await send(.internal(.buildTransactionIntentResult(TaskResult {
 						try await transactionClient.buildTransactionIntent(request)
 					})))
 				}
@@ -353,52 +356,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		switch childAction {
 		case let .withdrawals(.delegate(.showAsset(transfer, token))),
 		     let .deposits(.delegate(.showAsset(transfer, token))):
-			switch transfer.details {
-			case let .fungible(details):
-				state.destination = .fungibleTokenDetails(
-					.init(
-						resourceAddress: transfer.resource.resourceAddress,
-						resource: .success(transfer.resource),
-						ownedFungibleResource: .init(
-							resourceAddress: transfer.resource.resourceAddress,
-							atLedgerState: transfer.resource.atLedgerState,
-							amount: details.amount,
-							metadata: transfer.resource.metadata
-						),
-						isXRD: details.isXRD
-					)
-				)
-
-			case let .nonFungible(details):
-				state.destination = .nonFungibleTokenDetails(.init(
-					resourceAddress: transfer.resource.resourceAddress,
-					resourceDetails: .success(transfer.resource),
-					token: details,
-					ledgerState: transfer.resource.atLedgerState
-				))
-
-			case let .liquidStakeUnit(details):
-				state.destination = .lsuDetails(.init(
-					validator: details.validator,
-					stakeUnitResource: .init(resource: details.resource, amount: .init(nominalAmount: details.amount)),
-					xrdRedemptionValue: details.worth
-				))
-
-				return .none
-
-			case let .poolUnit(details):
-				state.destination = .poolUnitDetails(.init(resourcesDetails: details.details))
-
-			case let .stakeClaimNFT(details):
-				state.destination = .nonFungibleTokenDetails(.init(
-					resourceAddress: transfer.resource.resourceAddress,
-					resourceDetails: .success(transfer.resource),
-					token: token,
-					ledgerState: transfer.resource.atLedgerState
-				))
-			}
-
-			return .none
+			return resourceDetailsEffect(state: &state, resource: transfer.resource, details: transfer.details, nft: token)
 
 		case let .dAppsUsed(.delegate(.openDapp(dAppID))), let .contributingToPools(.delegate(.openDapp(dAppID))), let .redeemingFromPools(.delegate(.openDapp(dAppID))):
 			state.destination = .dApp(.init(dAppDefinitionAddress: dAppID))
@@ -425,6 +383,10 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.destination = .customizeGuarantees(.init(guarantees: guarantees.asIdentified()))
 
 			return .none
+
+		case let .proofs(.delegate(.showAsset(proof))):
+			let resource = proof.resourceBalance.resource
+			return resourceDetailsEffect(state: &state, resource: resource, details: proof.resourceBalance.details)
 
 		case .networkFee(.delegate(.showCustomizeFees)):
 			guard let reviewedTransaction = state.reviewedTransaction else {
@@ -460,6 +422,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				transactionSigners: preview.transactionSigners,
 				signingFactors: preview.signingFactors,
 				accountWithdraws: preview.analyzedManifestToReview.withdrawals,
+				accountDeposits: preview.analyzedManifestToReview.deposits,
 				isNonConforming: preview.analyzedManifestToReview.detailedManifestClass == nil
 			)
 
@@ -487,7 +450,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 			return .none
 
-		case let .buildTransactionItentResult(.success(intent)):
+		case let .buildTransactionIntentResult(.success(intent)):
 			guard let reviewedTransaction = state.reviewedTransaction else {
 				return .none
 			}
@@ -518,10 +481,14 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .notarizeResult(.success(notarizedTX)):
-			state.destination = .submitting(.init(notarizedTX: notarizedTX, inProgressDismissalDisabled: state.waitsForTransactionToBeComitted))
+			state.destination = .submitting(.init(
+				notarizedTX: notarizedTX,
+				inProgressDismissalDisabled: state.waitsForTransactionToBeComitted,
+				route: state.p2pRoute
+			))
 			return .none
 
-		case let .buildTransactionItentResult(.failure(error)),
+		case let .buildTransactionIntentResult(.failure(error)),
 		     let .notarizeResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
@@ -581,7 +548,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case let .signing(.delegate(.finishedSigning(.signTransaction(notarizedTX, origin: _)))):
 			state.destination = .submitting(.init(
 				notarizedTX: notarizedTX,
-				inProgressDismissalDisabled: state.waitsForTransactionToBeComitted
+				inProgressDismissalDisabled: state.waitsForTransactionToBeComitted,
+				route: state.p2pRoute
 			))
 			return .none
 
@@ -698,7 +666,7 @@ extension TransactionReview {
 			)
 		}
 
-		return manifest.modify(addGuarantees: state.allGuarantees)
+		return try manifest.modify(addGuarantees: state.allGuarantees)
 	}
 
 	func determineFeePayer(_ state: State, reviewedTransaction: ReviewedTransaction) -> Effect<Action> {
@@ -720,6 +688,58 @@ extension TransactionReview {
 				await send(.internal(.determineFeePayerResult(result)))
 			}
 		}
+	}
+
+	func resourceDetailsEffect(
+		state: inout State,
+		resource: OnLedgerEntity.Resource,
+		details: ResourceBalance.Details,
+		nft: OnLedgerEntity.NonFungibleToken? = nil
+	) -> Effect<Action> {
+		switch details {
+		case let .fungible(details):
+			state.destination = .fungibleTokenDetails(.init(
+				resourceAddress: resource.resourceAddress,
+				resource: .success(resource),
+				ownedFungibleResource: .init(
+					resourceAddress: resource.resourceAddress,
+					atLedgerState: resource.atLedgerState,
+					amount: details.amount,
+					metadata: resource.metadata
+				),
+				isXRD: details.isXRD
+			))
+
+		case let .nonFungible(details):
+			state.destination = .nonFungibleTokenDetails(.init(
+				resourceAddress: resource.resourceAddress,
+				resourceDetails: .success(resource),
+				token: details,
+				ledgerState: resource.atLedgerState
+			))
+
+		case let .liquidStakeUnit(details):
+			state.destination = .lsuDetails(.init(
+				validator: details.validator,
+				stakeUnitResource: .init(resource: details.resource, amount: .init(nominalAmount: details.amount)),
+				xrdRedemptionValue: details.worth
+			))
+
+		case let .poolUnit(details):
+			state.destination = .poolUnitDetails(.init(resourcesDetails: details.details))
+
+		case let .stakeClaimNFT(details):
+			state.destination = .nonFungibleTokenDetails(.init(
+				resourceAddress: resource.resourceAddress,
+				resourceDetails: .success(resource),
+				token: nft,
+				ledgerState: resource.atLedgerState,
+				stakeClaim: details.stakeClaimTokens.stakeClaims.first,
+				isClaimStakeEnabled: false
+			))
+		}
+
+		return .none
 	}
 }
 
@@ -773,8 +793,8 @@ extension TransactionReview {
 
 extension TransactionReview {
 	public struct ProofEntity: Sendable, Identifiable, Hashable {
-		public let id: ResourceAddress
-		public let metadata: OnLedgerEntity.Metadata
+		public var id: ResourceBalance { resourceBalance }
+		public let resourceBalance: ResourceBalance
 	}
 
 	public struct DappEntity: Sendable, Identifiable, Hashable {
@@ -948,64 +968,70 @@ public struct ReviewedTransaction: Hashable, Sendable {
 	var signingFactors: SigningFactors
 
 	let accountWithdraws: [AccountAddress: [ResourceIndicator]]
+	let accountDeposits: [AccountAddress: [ResourceIndicator]]
 	let isNonConforming: Bool
 }
 
-// MARK: - FeeValidationOutcome
-enum FeeValidationOutcome {
-	case valid
+// MARK: - FeePayerValidationOutcome
+public enum FeePayerValidationOutcome: Sendable, Hashable {
 	case needsFeePayer
 	case insufficientBalance
-}
+	case valid(Details?)
 
-extension ReviewedTransaction {
-	var feePayingValidation: Loadable<FeeValidationOutcome> {
-		feePayer.map { selected in
-			guard let feePayer = selected,
-			      let feePayerWithdraws = accountWithdraws[feePayer.account.address]
-			else {
-				return selected.validateBalance(forFee: transactionFee)
-			}
+	public enum Details: Sendable {
+		case introducesNewAccount
+		case feePayerSuperfluous
+	}
 
-			let xrdAddress = ResourceAddress.xrd(on: networkID)
-
-			let xrdTotalTransfer: Decimal192 = feePayerWithdraws.reduce(.zero) { partialResult, resource in
-				if case let .fungible(resourceAddress, indicator) = resource, resourceAddress == xrdAddress {
-					return partialResult + indicator.amount
-				}
-				return partialResult
-			}
-
-			let total = xrdTotalTransfer + transactionFee.totalFee.lockFee
-
-			guard feePayer.xrdBalance >= total else {
-				// Insufficient balance to pay for withdraws and transaction fee
-				return .insufficientBalance
-			}
-
-			return .valid
-		}
+	public var isValid: Bool {
+		guard case .valid = self else { return false }
+		return true
 	}
 }
 
-extension FeePayerCandidate? {
-	func validateBalance(forFee transactionFee: TransactionFee) -> FeeValidationOutcome {
-		if transactionFee.totalFee.lockFee == .zero {
-			// If no fee is required - valid
-			return .valid
+extension ReviewedTransaction {
+	var involvedAccounts: Set<AccountAddress> {
+		Set(accountWithdraws.keys)
+			.union(accountDeposits.keys)
+			.union(transactionManifest.summary.addressesOfAccountsRequiringAuth)
+	}
+
+	var feePayingValidation: Loadable<FeePayerValidationOutcome> {
+		feePayer.map(validateFeePayer)
+	}
+
+	func validateFeePayer(_ candidate: FeePayerCandidate?) -> FeePayerValidationOutcome {
+		guard let candidate else {
+			if transactionFee.totalFee.lockFee == .zero {
+				// No fee is required - no fee payer needed
+				return .valid(.feePayerSuperfluous)
+			} else {
+				// Fee is required, but no fee payer selected - invalid
+				return .needsFeePayer
+			}
 		}
 
-		guard let self else {
-			// If fee is required, but no fee payer selected - invalid
-			return .needsFeePayer
+		let xrdAddress: ResourceAddress = .xrd(on: networkID)
+		let feePayerWithdraws = accountWithdraws[candidate.account.address] ?? []
+		let xrdTransfer: Decimal192 = feePayerWithdraws.reduce(.zero) { partialResult, resource in
+			if case let .fungible(resourceAddress, indicator) = resource, resourceAddress == xrdAddress {
+				return partialResult + indicator.amount
+			}
+			return partialResult
 		}
 
-		guard self.xrdBalance >= transactionFee.totalFee.lockFee else {
-			// If insufficient balance - invalid
+		let totalAmountNeeded = xrdTransfer + transactionFee.totalFee.lockFee
+
+		guard candidate.xrdBalance >= totalAmountNeeded else {
+			// Insufficient balance to pay for withdraws and transaction fee
 			return .insufficientBalance
 		}
 
-		return .valid
+		if !involvedAccounts.contains(candidate.account.address) {
+			return .valid(.introducesNewAccount)
+		} else {
+			return .valid(nil)
+		}
 	}
 }
 

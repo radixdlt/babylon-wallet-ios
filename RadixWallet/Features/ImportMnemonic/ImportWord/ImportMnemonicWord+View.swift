@@ -7,7 +7,6 @@ extension ImportMnemonicWord.State {
 		.init(
 			isReadonlyMode: isReadonlyMode,
 			index: id,
-			placeholder: placeholder,
 			displayText: value.text,
 			autocompletionCandidates: autocompletionCandidates,
 			focusedField: focusedField,
@@ -37,18 +36,17 @@ extension ImportMnemonicWord {
 	public struct ViewState: Equatable {
 		let isReadonlyMode: Bool
 		let index: Int
-		let placeholder: String
 		let displayText: String
 		let autocompletionCandidates: ImportMnemonicWord.State.AutocompletionCandidates?
 		let focusedField: State.Field?
 
 		let validation: MnemonicValidation?
 
-		var hint: Hint? {
+		var hint: Hint.ViewState? {
 			guard let validation, validation == .invalid else {
 				return nil
 			}
-			return .error(L10n.Common.invalid)
+			return .iconError(L10n.Common.invalid)
 		}
 
 		var showClearButton: Bool {
@@ -71,24 +69,23 @@ extension ImportMnemonicWord {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack(spacing: .small3) {
+				VStack(spacing: Constants.appTextFieldSpacing) {
 					AppTextField(
 						primaryHeading: .init(text: L10n.ImportMnemonic.wordHeading(viewStore.index + 1), isProminent: true),
-						placeholder: viewStore.placeholder,
+						placeholder: "",
 						text: .init(
 							get: { viewStore.displayText },
 							set: { viewStore.send(.wordChanged(input: $0.lowercased().trimmingWhitespacesAndNewlines())) }
 						),
 						hint: viewStore.hint,
-						// FIXME: Bring back autofocus
-						//	focus: .on(
-						//		.textField,
-						//		binding: viewStore.binding(
-						//			get: \.focusedField,
-						//			send: { .textFieldFocused($0) }
-						//		),
-						//		to: $focusedField
-						//	),
+						focus: .on(
+							State.Field.textField,
+							binding: viewStore.binding(
+								get: \.focusedField,
+								send: ViewAction.focusChanged
+							),
+							to: $focusedField
+						),
 						showClearButton: viewStore.showClearButton,
 						innerAccessory: {
 							if viewStore.displayValidAccessory {
@@ -98,7 +95,7 @@ extension ImportMnemonicWord {
 							}
 						}
 					)
-					.disabled(viewStore.isReadonlyMode)
+					.allowsHitTesting(!viewStore.isReadonlyMode)
 					.minimumScaleFactor(0.9)
 					.keyboardType(.alphabet)
 					.textInputAutocapitalization(.never)
@@ -126,9 +123,13 @@ extension ImportMnemonicWord {
 							}
 						}
 					}
+					.submitLabel(.next)
+					.onSubmit {
+						viewStore.send(.onSubmit)
+					}
 
 					if viewStore.hint == nil {
-						Hint.error(L10n.Common.invalid) // Dummy spacer
+						Hint(viewState: .iconError(L10n.Common.invalid)) // Dummy spacer
 							.opacity(0)
 					}
 				}

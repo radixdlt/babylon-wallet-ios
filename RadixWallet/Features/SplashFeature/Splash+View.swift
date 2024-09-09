@@ -19,39 +19,15 @@ extension Splash {
 				observe: { $0 },
 				send: { .view($0) }
 			) { viewStore in
-				ForceFullScreen {
-					VStack {
-						if viewStore.biometricsCheckFailed {
-							Spacer()
-							Image(systemName: "lock.circle.fill")
-								.resizable()
-								.frame(.small)
-							Text(L10n.Splash.tapAnywhereToUnlock)
-								.textStyle(.body1HighImportance)
-						}
-					}
-					.padding([.bottom], .medium1)
-					.foregroundColor(.app.white)
-					.frame(
-						minWidth: 0,
-						maxWidth: .infinity,
-						minHeight: 0,
-						maxHeight: .infinity
-					)
-					.background(
-						Image(asset: AssetResource.splash)
-							.resizable()
-							.scaledToFill()
-					)
+				SplashView(biometricsCheckFailed: viewStore.biometricsCheckFailed)
 					.onTapGesture {
 						viewStore.send(.didTapToUnlock)
 					}
-				}
-				.edgesIgnoringSafeArea(.all)
-				.destinations(with: store)
-				.onAppear {
-					viewStore.send(.appeared)
-				}
+					.edgesIgnoringSafeArea(.all)
+					.destinations(with: store)
+					.onAppear {
+						viewStore.send(.appeared)
+					}
 			}
 		}
 	}
@@ -70,15 +46,11 @@ private extension StoreOf<Splash> {
 private extension View {
 	func destinations(with store: StoreOf<Splash>) -> some View {
 		let destinationStore = store.destination
-		return passcodeCheckFailed(with: destinationStore)
+		return errorAlert(with: destinationStore)
 	}
 
-	private func passcodeCheckFailed(with destinationStore: PresentationStoreOf<Splash.Destination>) -> some View {
-		alert(
-			store: destinationStore,
-			state: /Splash.Destination.State.passcodeCheckFailed,
-			action: Splash.Destination.Action.passcodeCheckFailed
-		)
+	private func errorAlert(with destinationStore: PresentationStoreOf<Splash.Destination>) -> some View {
+		alert(store: destinationStore.scope(state: \.errorAlert, action: \.errorAlert))
 	}
 }
 
@@ -101,3 +73,30 @@ extension Splash.State {
 	public static let previewValue = Self()
 }
 #endif
+
+// MARK: - SplashView
+public struct SplashView: View {
+	var biometricsCheckFailed: Bool = false
+
+	public var body: some View {
+		VStack {
+			if biometricsCheckFailed {
+				Spacer()
+				Image(systemName: "lock.circle.fill")
+					.resizable()
+					.frame(.small)
+				Text(L10n.Splash.tapAnywhereToUnlock)
+					.textStyle(.body1HighImportance)
+			}
+		}
+		.padding(.bottom, .medium1)
+		.foregroundColor(.app.white)
+		.frame(maxWidth: .infinity, maxHeight: .infinity)
+		.background(
+			Image(.splash)
+				.resizable()
+				.scaledToFill()
+		)
+		.edgesIgnoringSafeArea(.all)
+	}
+}

@@ -11,9 +11,14 @@ public struct ResourceBalance: Sendable, Hashable {
 	public let resource: OnLedgerEntity.Resource
 	public var details: Details
 
-	public init(resource: OnLedgerEntity.Resource, details: Details) {
+	/// Indicates whether the resource is hidden in user's profile.
+	/// Value is optional since we won't check for cases that it doesn't matter.
+	public let isHidden: Bool?
+
+	public init(resource: OnLedgerEntity.Resource, details: Details, isHidden: Bool? = nil) {
 		self.resource = resource
 		self.details = details
+		self.isHidden = isHidden
 	}
 
 	public enum Details: Sendable, Hashable {

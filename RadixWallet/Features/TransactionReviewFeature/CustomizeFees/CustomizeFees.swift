@@ -4,6 +4,7 @@ import SwiftUI
 // MARK: - CustomizeFees
 public struct CustomizeFees: FeatureReducer, Sendable {
 	public struct State: Hashable, Sendable {
+		@CasePathable
 		enum CustomizationModeState: Hashable, Sendable {
 			case normal(NormalFeesCustomization.State)
 			case advanced(AdvancedFeesCustomization.State)
@@ -24,6 +25,10 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 
 		var transactionFee: TransactionFee {
 			reviewedTransaction.transactionFee
+		}
+
+		var feePayingValidation: FeePayerValidationOutcome? {
+			reviewedTransaction.feePayingValidation.wrappedValue
 		}
 
 		@PresentationState
@@ -47,6 +52,7 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 		case closeButtonTapped
 	}
 
+	@CasePathable
 	public enum ChildAction: Equatable, Sendable {
 		case normalFeesCustomization(NormalFeesCustomization.Action)
 		case advancedFeesCustomization(AdvancedFeesCustomization.Action)
@@ -61,16 +67,18 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 	}
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case selectFeePayer(SelectFeePayer.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case selectFeePayer(SelectFeePayer.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.selectFeePayer, action: /Action.selectFeePayer) {
+			Scope(state: \.selectFeePayer, action: \.selectFeePayer) {
 				SelectFeePayer()
 			}
 		}
@@ -80,16 +88,14 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 	@Dependency(\.errorQueue) var errorQueue
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.modeState, action: /Action.child) {
-			EmptyReducer()
-				.ifCaseLet(/State.CustomizationModeState.normal, action: /ChildAction.normalFeesCustomization) {
-					NormalFeesCustomization()
-				}
-				.ifCaseLet(/State.CustomizationModeState.advanced, action: /ChildAction.advancedFeesCustomization) {
-					AdvancedFeesCustomization()
-				}
+		Scope(state: \.modeState, action: \.child) {
+			Scope(state: \.normal, action: \.normalFeesCustomization) {
+				NormalFeesCustomization()
+			}
+			Scope(state: \.advanced, action: \.advancedFeesCustomization) {
+				AdvancedFeesCustomization()
+			}
 		}
-
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -101,7 +107,13 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .changeFeePayerTapped:
-			state.destination = .selectFeePayer(.init(feePayer: state.feePayer, transactionFee: state.transactionFee))
+			state.destination = .selectFeePayer(
+				.init(
+					reviewedTransaction: state.reviewedTransaction,
+					selectedFeePayer: state.feePayer,
+					transactionFee: state.transactionFee
+				)
+			)
 			return .none
 		case .toggleMode:
 			state.reviewedTransaction.transactionFee.toggleMode()

@@ -48,9 +48,9 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					loggerGlobal.warning("Error from CE? \(errorFromConnectorExtension)")
 
 					switch errorFromConnectorExtension.code {
-					case .generic: break
+					case .generic, .userRejectedSigningOfTransaction: break
 					case .blindSigningNotEnabledButRequired:
-						overlayWindowClient.scheduleAlertIgnoreAction(
+						overlayWindowClient.scheduleAlertAndIgnoreAction(
 							.init(
 								title: {
 									TextState(L10n.LedgerHardwareDevices.CouldNotSign.title)
@@ -136,8 +136,8 @@ extension LedgerHardwareWalletClient: DependencyKey {
 				}
 			},
 			signTransaction: { request in
-				let hashedMsg = try request.transactionIntent.hash()
-				let compiledTransactionIntent = try request.transactionIntent.compile()
+				let hashedMsg = request.transactionIntent.hash()
+				let compiledTransactionIntent = request.transactionIntent.compile()
 				return try await sign(
 					signers: request.signers,
 					expectedHashedMessage: hashedMsg.hash.data

@@ -11,12 +11,9 @@ extension OverlayReducer {
 		}
 
 		var body: some SwiftUI.View {
-			IfLetStore(
-				store.destination,
-				state: /OverlayReducer.Destination.State.hud,
-				action: OverlayReducer.Destination.Action.hud,
-				then: { HUD.View(store: $0) }
-			)
+			IfLetStore(store.destination.scope(state: \.hud, action: \.hud)) {
+				HUD.View(store: $0)
+			}
 			.destinations(with: store)
 			.task { store.send(.view(.task)) }
 		}
@@ -37,11 +34,20 @@ private extension View {
 	func destinations(with store: StoreOf<OverlayReducer>) -> some View {
 		let destinationStore = store.destination
 		return alert(with: destinationStore)
+			.sheet(with: destinationStore)
 			.fullScreenCover(with: destinationStore)
 	}
 
 	private func alert(with destinationStore: PresentationStoreOf<OverlayReducer.Destination>) -> some View {
 		alert(store: destinationStore.scope(state: \.alert, action: \.alert))
+	}
+
+	private func sheet(with destinationStore: PresentationStoreOf<OverlayReducer.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.sheet, action: \.sheet)) {
+			SheetOverlayCoordinator.View(store: $0)
+				.presentationDetents([.fraction(0.75), .large])
+				.presentationBackground(.blur)
+		}
 	}
 
 	private func fullScreenCover(with destinationStore: PresentationStoreOf<OverlayReducer.Destination>) -> some View {

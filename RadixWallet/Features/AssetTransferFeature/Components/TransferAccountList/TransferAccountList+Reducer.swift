@@ -43,16 +43,9 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		case receivingAccount(id: ReceivingAccount.State.ID, action: ReceivingAccount.Action)
 	}
 
-	public enum DelegateAction: Equatable, Sendable {
-		case canSendTransferRequest(Bool)
-	}
-
 	public enum InternalAction: Equatable, Sendable {
-		case updateSignatureStatus(
-			accountID: ReceivingAccount.State.ID,
-			assetID: ResourceAsset.State.ID,
-			signatureRequired: Bool
-		)
+		case setAllDepositStatus(accountId: ReceivingAccount.State.ID, status: Loadable<ResourceAsset.State.DepositStatus>)
+		case setDepositStatus(accountId: ReceivingAccount.State.ID, values: AssetsDepositStatus)
 	}
 
 	public struct Destination: DestinationReducer {
@@ -84,6 +77,9 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 			}
 		}
 	}
+
+	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+	@Dependency(\.errorQueue) var errorQueue
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -120,7 +116,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 				}
 				return .none
 
-			case let .child(.row(resourceAddress, child: .delegate(.fungibleAsset(.amountChanged)))),
+			case let .child(.row(resourceAddress, child: .delegate(.amountChanged))),
 			     let .child(.row(resourceAddress, child: .delegate(.removed))):
 				updateTotalSum(&state, resourceId: resourceAddress)
 				return .none
@@ -144,7 +140,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		case let .chooseAccount(.delegate(.handleResult(recipient))):
 			state.receivingAccounts[id: id]?.recipient = recipient
 			state.destination = nil
-			return .none
+			return signaturesStatusEffect(state, receivingAccountId: id)
 
 		case .chooseAccount(.delegate(.dismiss)):
 			state.destination = nil
@@ -161,15 +157,18 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .updateSignatureStatus(accountID, assetID, signatureRequired):
-			state.receivingAccounts[id: accountID]?.assets[id: assetID]?.additionalSignatureRequired = signatureRequired
+		case let .setAllDepositStatus(accountId, status):
+			state.receivingAccounts[id: accountId]?.setAllDepositStatus(status)
+			return .none
+		case let .setDepositStatus(accountId, values):
+			state.receivingAccounts[id: accountId]?.updateDepositStatus(values: values)
 			return .none
 		}
 	}
 }
 
-extension TransferAccountList {
-	private func updateTotalSum(_ state: inout State, resourceId: String) {
+private extension TransferAccountList {
+	func updateTotalSum(_ state: inout State, resourceId: String) {
 		let totalSum = state.receivingAccounts
 			.flatMap(\.assets)
 			.fungibleAssets
@@ -187,7 +186,7 @@ extension TransferAccountList {
 		}
 	}
 
-	private func handleSelectedAssets(
+	func handleSelectedAssets(
 		_ selectedAssets: AssetsView.State.Mode.SelectedAssets,
 		id: ReceivingAccount.State.ID,
 		state: inout State
@@ -209,9 +208,7 @@ extension TransferAccountList {
 		assets += selectedAssets.nonFungibleResources.flatMap { resource in
 			resource.tokens.map {
 				ResourceAsset.State(kind: .nonFungibleAsset(.init(
-					resourceImage: resource.resourceImage,
-					resourceName: resource.resourceName,
-					resourceAddress: resource.resourceAddress,
+					resource: resource.resource,
 					token: $0
 				)))
 			}
@@ -225,18 +222,15 @@ extension TransferAccountList {
 
 		state.receivingAccounts[id: id]?.assets = existingAssets + newAssets
 
-		if let receivingAccount = state.receivingAccounts[id: id] {
-			return determineAdditionalRequiredSignatures(receivingAccount, forAssets: newAssets)
-		}
-		return .none
+		return signaturesStatusEffect(state, receivingAccountId: id)
 	}
 
-	private func navigateToChooseAccounts(_ state: inout State, id: ReceivingAccount.State.ID) -> Effect<Action> {
+	func navigateToChooseAccounts(_ state: inout State, id: ReceivingAccount.State.ID) -> Effect<Action> {
 		let filteredAccounts = state.receivingAccounts.compactMap(\.recipient?.accountAddress) + [state.fromAccount.address]
 		let chooseAccount: ChooseReceivingAccount.State = .init(
 			networkID: state.fromAccount.networkID,
 			chooseAccounts: .init(
-				selectionRequirement: .exactly(1),
+				context: .assetTransfer,
 				filteredAccounts: filteredAccounts,
 				// Create account is very buggy when started from AssetTransfer, disable it for now.
 				canCreateNewAccount: false
@@ -247,7 +241,7 @@ extension TransferAccountList {
 		return .none
 	}
 
-	private func navigateToSelectAssets(_ state: inout State, id: ReceivingAccount.State.ID) -> Effect<Action> {
+	func navigateToSelectAssets(_ state: inout State, id: ReceivingAccount.State.ID) -> Effect<Action> {
 		guard let assets = state.receivingAccounts[id: id]?.assets else {
 			return .none
 		}
@@ -264,9 +258,7 @@ extension TransferAccountList {
 			.nonFungibleAssets
 			.reduce(into: IdentifiedArrayOf<AssetsView.State.Mode.SelectedAssets.NonFungibleTokensPerResource>()) { partialResult, asset in
 				var resource = partialResult[id: asset.resourceAddress] ?? .init(
-					resourceAddress: asset.resourceAddress,
-					resourceImage: asset.resourceImage,
-					resourceName: asset.resourceName,
+					resource: asset.resource,
 					tokens: []
 				)
 				resource.tokens.append(asset.token)
@@ -294,28 +286,53 @@ extension TransferAccountList {
 		return .none
 	}
 
-	private func determineAdditionalRequiredSignatures(
-		_ receivingAccount: ReceivingAccount.State,
-		forAssets assets: IdentifiedArrayOf<ResourceAsset.State>
-	) -> Effect<Action> {
-		if case let .profileAccount(value: userOwnedAccount) = receivingAccount.recipient {
-			return .run { send in
-				@Dependency(\.accountsClient) var accountsClient
-				for asset in assets {
-					let resourceAddress = asset.resourceAddress
-					let signatureNeeded = await needsSignatureForDepositting(
-						into: userOwnedAccount,
-						resource: resourceAddress
-					)
-
-					await send(.internal(.updateSignatureStatus(
-						accountID: receivingAccount.id,
-						assetID: asset.id,
-						signatureRequired: signatureNeeded
-					)))
-				}
-			}
+	func signaturesStatusEffect(_ state: State, receivingAccountId: ReceivingAccount.State.ID) -> Effect<Action> {
+		guard
+			let receivingAccount = state.receivingAccounts[id: receivingAccountId],
+			let recipient = receivingAccount.recipient
+		else {
+			return .none
 		}
-		return .none
+
+		let resourceAddresses = receivingAccount.assets.map(\.id)
+		guard !resourceAddresses.isEmpty else {
+			return .none
+		}
+
+		return .run { send in
+			await send(.internal(.setAllDepositStatus(accountId: receivingAccountId, status: .loading)))
+			let values = switch recipient {
+			case let .profileAccount(account):
+				await getStatusesForProfileAccount(account, assets: receivingAccount.assets)
+
+			case let .addressOfExternalAccount(account):
+				try await getStatusesForExternalAccount(account, resourceAddresses: resourceAddresses)
+			}
+			await send(.internal(.setDepositStatus(accountId: receivingAccountId, values: values)))
+		} catch: { error, send in
+			errorQueue.schedule(error)
+			await send(.internal(.setAllDepositStatus(accountId: receivingAccountId, status: .failure(error))))
+		}
+	}
+
+	typealias DepositStatus = ResourceAsset.State.DepositStatus
+
+	func getStatusesForProfileAccount(_ account: Account, assets: IdentifiedArrayOf<ResourceAsset.State>) async -> AssetsDepositStatus {
+		let result = await assets.parallelMap { asset in
+			let result = await needsSignatureForDepositting(into: account, resource: asset.resourceAddress)
+			return (asset.id, result ? DepositStatus.additionalSignatureRequired : .allowed)
+		}
+		let values = Dictionary(uniqueKeysWithValues: result.map { ($0.0, $0.1) })
+		return values
+	}
+
+	func getStatusesForExternalAccount(_ account: AccountAddress, resourceAddresses: [ResourceAsset.State.ID]) async throws -> AssetsDepositStatus {
+		let result = try await gatewayAPIClient.prevalidateDeposit(.init(accountAddress: account.address, resourceAddresses: resourceAddresses))
+
+		if let behavior = result.resourceSpecificBehaviour {
+			return Dictionary(uniqueKeysWithValues: behavior.map { ($0.resourceAddress, $0.allowsTryDeposit ? DepositStatus.allowed : .denied) })
+		} else {
+			return .init()
+		}
 	}
 }

@@ -33,9 +33,11 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 		public enum Reason: Int, Sendable, Hashable, Decodable {
 			case generic = 0
 			case blindSigningNotEnabledButRequired = 1
+			case userRejectedSigningOfTransaction = 2
+
 			public var userFacingErrorDescription: String {
 				switch self {
-				case .generic:
+				case .generic, .userRejectedSigningOfTransaction:
 					L10n.Error.TransactionFailure.unknown
 				case .blindSigningNotEnabledButRequired:
 					L10n.Error.TransactionFailure.blindSigningNotEnabledButRequired
@@ -163,7 +165,6 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 			self.response = try decodeResponse {
 				Success.signChallenge($0)
 			}
-
 		case .deriveAndDisplayAddress:
 			self.response = try decodeResponse {
 				Success.deriveAndDisplayAddress($0)

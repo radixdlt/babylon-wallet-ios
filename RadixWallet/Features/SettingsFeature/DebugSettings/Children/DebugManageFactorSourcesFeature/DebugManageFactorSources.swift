@@ -76,6 +76,7 @@ public struct DebugManageFactorSources: Sendable, FeatureReducer {
 		case .importOlympiaMnemonicButtonTapped:
 			state.destination = .importMnemonic(
 				.init(
+					isWordCountFixed: false,
 					persistStrategy: .init(
 						factorSourceKindOfMnemonic: .olympia,
 						location: .intoKeychainAndProfile,

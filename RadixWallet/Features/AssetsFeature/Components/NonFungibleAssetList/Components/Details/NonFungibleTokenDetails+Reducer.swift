@@ -4,12 +4,14 @@ import SwiftUI
 // MARK: - NonFungibleTokenDetails
 public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public let resourceAddress: ResourceAddress
-		public var resourceDetails: Loadable<OnLedgerEntity.Resource>
-		public let ownedResource: OnLedgerEntity.OwnedNonFungibleResource?
-		public let token: OnLedgerEntity.NonFungibleToken?
-		public let ledgerState: AtLedgerState
-		public let stakeClaim: OnLedgerEntitiesClient.StakeClaim?
+		let resourceAddress: ResourceAddress
+		var resourceDetails: Loadable<OnLedgerEntity.Resource>
+		let ownedResource: OnLedgerEntity.OwnedNonFungibleResource?
+		let token: OnLedgerEntity.NonFungibleToken?
+		let ledgerState: AtLedgerState
+		let stakeClaim: OnLedgerEntitiesClient.StakeClaim?
+		let isClaimStakeEnabled: Bool
+		var hideResource: HideResource.State?
 
 		public init(
 			resourceAddress: ResourceAddress,
@@ -17,7 +19,8 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 			ownedResource: OnLedgerEntity.OwnedNonFungibleResource? = nil,
 			token: OnLedgerEntity.NonFungibleToken? = nil,
 			ledgerState: AtLedgerState,
-			stakeClaim: OnLedgerEntitiesClient.StakeClaim? = nil
+			stakeClaim: OnLedgerEntitiesClient.StakeClaim? = nil,
+			isClaimStakeEnabled: Bool = true
 		) {
 			self.resourceAddress = resourceAddress
 			self.resourceDetails = resourceDetails
@@ -25,13 +28,16 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 			self.ownedResource = ownedResource
 			self.ledgerState = ledgerState
 			self.stakeClaim = stakeClaim
+			self.isClaimStakeEnabled = isClaimStakeEnabled
+			if stakeClaim == nil, case let .success(resource) = resourceDetails {
+				hideResource = .init(kind: .nonFungible(resourceAddress, name: resource.metadata.name))
+			}
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case closeButtonTapped
 		case task
-		case openURLTapped(URL)
 		case tappedClaimStake
 	}
 
@@ -43,11 +49,22 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 		case tappedClaimStake(OnLedgerEntitiesClient.StakeClaim)
 	}
 
+	@CasePathable
+	public enum ChildAction: Sendable, Equatable {
+		case hideResource(HideResource.Action)
+	}
+
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
-	@Dependency(\.openURL) var openURL
 	@Dependency(\.dismiss) var dismiss
 
 	public init() {}
+
+	public var body: some ReducerOf<Self> {
+		Reduce(core)
+			.ifLet(\.hideResource, action: \.child.hideResource) {
+				HideResource()
+			}
+	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -57,16 +74,12 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 			}
 			state.resourceDetails = .loading
 			return .run { [resourceAddress = state.resourceAddress, ledgerState = state.ledgerState] send in
-				let result = await TaskResult { try await onLedgerEntitiesClient.getResource(resourceAddress, atLedgerState: ledgerState) }
+				let result = await TaskResult { try await onLedgerEntitiesClient.getResource(resourceAddress, atLedgerState: ledgerState, fetchMetadata: true) }
 				await send(.internal(.resourceLoadResult(result)))
 			}
 		case .closeButtonTapped:
 			return .run { _ in
 				await dismiss()
-			}
-		case let .openURLTapped(url):
-			return .run { _ in
-				await openURL(url)
 			}
 		case .tappedClaimStake:
 			guard let stakeClaim = state.stakeClaim else {
@@ -80,10 +93,22 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .resourceLoadResult(.success(resource)):
 			state.resourceDetails = .success(resource)
+			if state.stakeClaim == nil {
+				state.hideResource = .init(kind: .nonFungible(resource.resourceAddress, name: resource.metadata.name))
+			}
 			return .none
 		case let .resourceLoadResult(.failure(err)):
 			state.resourceDetails = .failure(err)
 			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+		switch childAction {
+		case .hideResource(.delegate(.didHideResource)):
+			.run { _ in await dismiss() }
+		default:
+			.none
 		}
 	}
 }

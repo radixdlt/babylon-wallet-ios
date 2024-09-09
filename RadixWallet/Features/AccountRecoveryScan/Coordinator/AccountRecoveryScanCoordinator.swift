@@ -132,6 +132,7 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 			let childState = state.backTo ?? AccountRecoveryScanCoordinator.State.accountRecoveryScanInProgressState(purpose: state.purpose)
 			state.root = .accountRecoveryScanInProgress(childState)
 			return .none
+
 		case let .selectInactiveAccountsToAdd(.delegate(.finished(selectedInactive, active))):
 			return completed(purpose: state.purpose, active: active, inactive: selectedInactive)
 

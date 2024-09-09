@@ -31,13 +31,9 @@ extension TransactionReviewGuarantees {
 							.multilineTextAlignment(.center)
 							.padding(.vertical, .medium3)
 
-						//	FIXME: Uncomment and implement
-						//	Button(L10n.TransactionReview.Guarantees.howDoGuaranteesWork) {
-						//		store.send(.view(.infoTapped))
-						//	}
-						//	.buttonStyle(.info)
-						//	.padding(.horizontal, .large2)
-						//	.padding(.bottom, .medium1)
+						InfoButton(.guarantees, label: L10n.TransactionReview.Guarantees.howDoGuaranteesWork)
+							.padding(.horizontal, .large2)
+							.padding(.bottom, .medium1)
 
 						Text(L10n.TransactionReview.Guarantees.subtitle)
 							.textStyle(.body1Regular)
@@ -64,12 +60,6 @@ extension TransactionReviewGuarantees {
 						.buttonStyle(.primaryRectangular)
 						.controlState(viewStore.isValid ? .enabled : .disabled)
 					}
-				}
-				.sheet(store: store.scope(state: \.$info, action: \.child.info)) {
-					SlideUpPanel.View(store: $0)
-						.presentationDetents([.medium])
-						.presentationDragIndicator(.visible)
-						.presentationBackground(.blur)
 				}
 				.toolbar {
 					ToolbarItem(placement: .cancellationAction) {
@@ -116,7 +106,7 @@ extension TransactionReviewGuarantee {
 			WithViewStore(store, observe: \.viewState) { viewStore in
 				Card {
 					VStack(spacing: 0) {
-						SmallAccountCard(account: viewStore.account)
+						AccountCard(account: viewStore.account)
 
 						ResourceBalanceView(.fungible(viewStore.fungible))
 							.padding(.horizontal, .medium3)

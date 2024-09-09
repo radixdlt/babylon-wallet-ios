@@ -20,10 +20,10 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		}
 	}
 
+	@CasePathable
 	public enum ViewAction: Sendable, Equatable {
 		case task
 		case addGatewayButtonTapped
-		case popoverButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -33,22 +33,23 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		case switchToGatewayResult(TaskResult<Gateway>)
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case gatewayList(GatewayList.Action)
 	}
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case addNewGateway(AddNewGateway.State)
 			case createAccount(CreateAccountCoordinator.State)
-			case slideUpPanel(SlideUpPanel.State)
 			case removeGateway(AlertState<Action.RemoveGatewayAlert>)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case addNewGateway(AddNewGateway.Action)
 			case createAccount(CreateAccountCoordinator.Action)
-			case slideUpPanel(SlideUpPanel.Action)
 			case removeGateway(RemoveGatewayAlert)
 
 			public enum RemoveGatewayAlert: Sendable, Hashable {
@@ -58,14 +59,11 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.addNewGateway, action: /Action.addNewGateway) {
+			Scope(state: \.addNewGateway, action: \.addNewGateway) {
 				AddNewGateway()
 			}
-			Scope(state: /State.createAccount, action: /Action.createAccount) {
+			Scope(state: \.createAccount, action: \.createAccount) {
 				CreateAccountCoordinator()
-			}
-			Scope(state: /State.slideUpPanel, action: /Action.slideUpPanel) {
-				SlideUpPanel()
 			}
 		}
 	}
@@ -87,17 +85,15 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.gatewayList, action: /Action.child .. ChildAction.gatewayList) {
+		Scope(state: \.gatewayList, action: \.child.gatewayList) {
 			GatewayList()
 		}
 
 		Reduce(core)
-			.ifLet(destinationPath, action: /Action.destination) {
+			.ifLet(\.$destination, action: \.destination) {
 				Destination()
 			}
 	}
-
-	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -113,17 +109,6 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 
 		case .addGatewayButtonTapped:
 			state.destination = .addNewGateway(AddNewGateway.State())
-			return .none
-
-		case .popoverButtonTapped:
-//			state.destination = .slideUpPanel(
-//				.init(
-//					title: L10n.Gateways.WhatIsAGateway.title,
-//					explanation: L10n.Gateways.WhatIsAGateway.explanation
-//				)
-//			)
-			// FIXME: display what is a gateway once we have copy
-			loggerGlobal.warning("What is A gateway tutorial slide up panel skipped, since no copy.")
 			return .none
 		}
 	}
@@ -218,10 +203,6 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case .addNewGateway(.delegate(.dismiss)):
-			state.destination = nil
-			return .none
-
 		case .createAccount(.delegate(.dismissed)):
 			return skipSwitching(&state)
 
@@ -237,10 +218,6 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 				}
 				await send(.internal(.switchToGatewayResult(result)))
 			}
-
-		case .slideUpPanel(.delegate(.dismiss)):
-			state.destination = nil
-			return .none
 
 		case let .removeGateway(removeGatewayAction):
 			switch removeGatewayAction {

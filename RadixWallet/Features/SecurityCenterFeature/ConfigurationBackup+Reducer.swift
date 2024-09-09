@@ -3,15 +3,12 @@ import ComposableArchitecture
 
 // MARK: - ConfigurationBackup
 public struct ConfigurationBackup: Sendable, FeatureReducer {
-	public typealias BackupStatus = SecurityCenterClient.BackupStatus
-
 	public struct Exportable: Sendable, Hashable {
 		public let profile: Profile
 		public let file: ExportableProfileFile
 	}
 
 	public struct State: Sendable, Hashable {
-		public var iCloudAccountStatus: CKAccountStatus? = nil
 		public var cloudBackupsEnabled: Bool = true
 		public var lastManualBackup: Date? = nil
 		public var lastCloudBackup: BackupStatus? = nil
@@ -25,12 +22,16 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		public var exportable: Exportable? = nil
 
 		public var outdatedBackupPresent: Bool {
-			guard let lastCloudBackup, lastCloudBackup.success else { return false }
-			return !cloudBackupsEnabled && !lastCloudBackup.upToDate
+			guard let lastCloudBackup, lastCloudBackup.result.succeeded else { return false }
+			return !cloudBackupsEnabled && !lastCloudBackup.isCurrent
 		}
 
 		public var actionsRequired: [Item] {
-			problems.isEmpty ? [] : Item.allCases
+			if let lastCloudBackup, lastCloudBackup.isCurrent, !lastCloudBackup.result.failed {
+				[]
+			} else {
+				Item.allCases
+			}
 		}
 
 		public init() {}
@@ -54,11 +55,9 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case setCloudBackupEnabled(Bool)
-		case setICloudAccountStatus(CKAccountStatus)
 		case setProblems([SecurityProblem])
 		case setLastManualBackup(Date?)
 		case setLastCloudBackup(BackupStatus?)
-		case didDeleteOutdatedBackup(ProfileID)
 		case exportProfile(Profile)
 	}
 
@@ -100,18 +99,17 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.cloudBackupClient) var cloudBackupClient
-	@Dependency(\.backupsClient) var backupsClient
+	@Dependency(\.transportProfileClient) var transportProfileClient
 	@Dependency(\.securityCenterClient) var securityCenterClient
 	@Dependency(\.userDefaults) var userDefaults
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .didAppear:
-			return checkCloudAccountStatusEffect()
-				.merge(with: checkCloudBackupEnabledEffect())
-				.merge(with: problemsEffect())
+			return problemsEffect()
 				.merge(with: lastManualBackupEffect())
 				.merge(with: lastCloudBackupEffect())
+				.merge(with: isCloudBackupEnabledEffect())
 
 		case let .cloudBackupsToggled(isEnabled):
 			return updateCloudBackupsSettingEffect(isEnabled: isEnabled)
@@ -127,13 +125,11 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			return .none
 
 		case .deleteOutdatedTapped:
-			return .run { send in
-				let profile = await ProfileStore.shared.profile
+			return .run { _ in
 				do {
-					try await cloudBackupClient.deleteProfileBackup(profile.id)
-					await send(.internal(.didDeleteOutdatedBackup(profile.id)))
+					try await cloudBackupClient.deleteProfileBackup()
 				} catch {
-					loggerGlobal.error("Failed to delete outdate backup \(profile.id.uuidString): \(error)")
+					loggerGlobal.error("Failed to delete outdated backup: \(error)")
 				}
 			}
 
@@ -142,7 +138,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			overlayWindowClient.scheduleHUD(.exportedProfile(encrypted: didEncryptIt))
 			loggerGlobal.notice("Profile successfully exported to: \(exportedProfileURL)")
 			if let profile {
-				try? backupsClient.didExportProfileSnapshot(profile)
+				try? transportProfileClient.didExportProfile(profile)
 			}
 			return .none
 
@@ -178,15 +174,8 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .didDeleteOutdatedBackup(id):
-			return .none
-
 		case let .setCloudBackupEnabled(isEnabled):
 			state.cloudBackupsEnabled = isEnabled
-			return .none
-
-		case let .setICloudAccountStatus(status):
-			state.iCloudAccountStatus = status
 			return .none
 
 		case let .setProblems(problems):
@@ -211,7 +200,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		.run { send in
 			for try await lastBackup in await securityCenterClient.lastManualBackup() {
 				guard !Task.isCancelled else { return }
-				await send(.internal(.setLastManualBackup(lastBackup?.backupDate)))
+				await send(.internal(.setLastManualBackup(lastBackup?.result.date)))
 			}
 		}
 	}
@@ -234,31 +223,25 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		}
 	}
 
-	private func checkCloudAccountStatusEffect() -> Effect<Action> {
-		.run { send in
+	private func updateCloudBackupsSettingEffect(isEnabled: Bool) -> Effect<Action> {
+		.run { _ in
 			do {
-				let status = try await cloudBackupClient.checkAccountStatus()
-				await send(.internal(.setICloudAccountStatus(status)))
+				try await appPreferencesClient.setIsCloudBackupEnabled(isEnabled)
 			} catch {
-				loggerGlobal.error("Failed to get iCloud account status: \(error)")
+				loggerGlobal.error("Failed to toggle cloud backups \(isEnabled ? "on" : "off"): \(error)")
 			}
 		}
 	}
 
-	private func checkCloudBackupEnabledEffect() -> Effect<Action> {
-		.run { send in
-			let isEnabled = await ProfileStore.shared.profile.appPreferences.security.isCloudProfileSyncEnabled
-			await send(.internal(.setCloudBackupEnabled(isEnabled)))
-		}
-	}
-
-	private func updateCloudBackupsSettingEffect(isEnabled: Bool) -> Effect<Action> {
+	private func isCloudBackupEnabledEffect() -> Effect<Action> {
 		.run { send in
 			do {
-				try await appPreferencesClient.setIsCloudBackupEnabled(isEnabled)
-				await send(.internal(.setCloudBackupEnabled(isEnabled)))
+				for try await isSyncEnabled in await cloudBackupClient.isCloudProfileSyncEnabled() {
+					guard !Task.isCancelled else { return }
+					await send(.internal(.setCloudBackupEnabled(isSyncEnabled)))
+				}
 			} catch {
-				loggerGlobal.error("Failed toggle cloud backups \(isEnabled ? "on" : "off"): \(error)")
+				loggerGlobal.error("cloudBackupClient.isCloudProfileSyncEnabled failed: \(error)")
 			}
 		}
 	}

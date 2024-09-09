@@ -5,8 +5,7 @@ import SwiftUI
 struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 	struct Row: Equatable {
 		var id: RowId
-		let title: String
-		let subtitle: String?
+		let rowCoreViewState: PlainListRowCore.ViewState
 		let hint: String?
 		let icon: AssetIcon.Content?
 
@@ -18,8 +17,7 @@ struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 			icon: AssetIcon.Content? = nil
 		) {
 			self.id = id
-			self.title = title
-			self.subtitle = subtitle
+			self.rowCoreViewState = .init(title: title, subtitle: subtitle)
 			self.hint = hint
 			self.icon = icon
 		}
@@ -52,42 +50,16 @@ struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 	var body: some View {
 		SwiftUI.Section {
 			ForEach(viewState.rows, id: \.id) { row in
-				HStack {
-					VStack(alignment: .leading) {
-						HStack(spacing: .medium3) {
-							if let icon = row.icon {
-								AssetIcon(icon)
-							}
-							PlainListRowCore(title: row.title, subtitle: row.subtitle)
-						}
-
-						if let hint = row.hint {
-							// Align hint with the PlainListRowCore
-							Text(hint)
-								.textStyle(.body2Regular)
-								.foregroundColor(.app.alert)
-								.lineSpacing(-4)
-								.padding(.leading, HitTargetSize.verySmall.frame.width + .medium3)
-								.padding(.top, .medium3)
+				PlainListRow(viewState: .init(
+					rowCoreViewState: row.rowCoreViewState,
+					hints: hints(for: row),
+					accessory: { accesory(for: row) },
+					icon: {
+						if let icon = row.icon {
+							AssetIcon(icon)
 						}
 					}
-					.padding(.vertical, .small1)
-					.frame(minHeight: .plainListRowMinHeight)
-
-					Spacer(minLength: 0)
-
-					if case let .selection(selection) = viewState.mode {
-						if row.id == selection {
-							Image(asset: AssetResource.check)
-						} else {
-							/// Put a placeholder for unselected items.
-							FixedSpacer(width: .medium1)
-						}
-					} else {
-						Image(asset: AssetResource.chevronRight)
-					}
-				}
-				.padding(.horizontal, .medium3)
+				))
 				.contentShape(Rectangle())
 				.tappable {
 					onRowSelected(viewState.id, row.id)
@@ -108,10 +80,32 @@ struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 		.listSectionSeparator(.hidden)
 		.textCase(nil)
 	}
+
+	private func accesory(for row: Row) -> some SwiftUI.View {
+		Group {
+			if case let .selection(selection) = viewState.mode {
+				if row.id == selection {
+					Image(asset: AssetResource.check)
+				} else {
+					/// Put a placeholder for unselected items.
+					FixedSpacer(width: .medium1)
+				}
+			} else {
+				Image(asset: AssetResource.chevronRight)
+			}
+		}
+	}
+
+	private func hints(for row: Row) -> [Hint.ViewState] {
+		guard let hint = row.hint else {
+			return []
+		}
+		return [.init(kind: .detail, text: hint)]
+	}
 }
 
 // MARK: - PreferencesList
-struct PreferencesList<SectionId: Hashable, RowId: Hashable, Footer: View>: View {
+struct PreferencesList<SectionId: Hashable, RowId: Hashable, Header: View, Footer: View>: View {
 	struct ViewState: Equatable {
 		let sections: [PreferenceSection<SectionId, RowId>.ViewState]
 	}
@@ -119,30 +113,46 @@ struct PreferencesList<SectionId: Hashable, RowId: Hashable, Footer: View>: View
 	let viewState: ViewState
 
 	var onRowSelected: (SectionId, RowId) -> Void
+	let header: Header
 	let footer: Footer
 
 	init(
 		viewState: ViewState,
 		onRowSelected: @escaping (SectionId, RowId) -> Void,
+		@ViewBuilder header: () -> Header = { EmptyView() },
 		@ViewBuilder footer: () -> Footer = { EmptyView() }
 	) {
 		self.viewState = viewState
 		self.onRowSelected = onRowSelected
+		self.header = header()
 		self.footer = footer()
 	}
 
 	var body: some View {
 		List {
+			section(for: header)
+
 			ForEach(viewState.sections, id: \.id) { section in
 				PreferenceSection(viewState: section, onRowSelected: onRowSelected)
 			}
 
-			footer
-				.listRowSeparator(.hidden)
-				.listRowBackground(Color.clear)
+			section(for: footer)
 		}
 		.scrollContentBackground(.hidden)
 		.listStyle(.grouped)
 		.environment(\.defaultMinListHeaderHeight, 0)
+	}
+
+	private func section(for content: some View) -> some View {
+		Section {
+			content
+		} header: {
+			Rectangle().frame(height: 0)
+		} footer: {
+			Rectangle().frame(height: 0)
+		}
+		.listRowSeparator(.hidden)
+		.listRowBackground(Color.clear)
+		.listRowInsets(EdgeInsets(top: .small2, leading: .medium3, bottom: .zero, trailing: .medium3))
 	}
 }

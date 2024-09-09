@@ -20,7 +20,7 @@ extension SecureStorageClient: TestDependencyKey {
 		containsMnemonicIdentifiedByFactorSourceID: { _ in false },
 		deleteMnemonicByFactorSourceID: { _ in },
 		deleteProfileAndMnemonicsByFactorSourceIDs: { _, _ in },
-		updateIsCloudProfileSyncEnabled: { _, _ in },
+		disableCloudProfileSync: { _ in },
 		loadProfileHeaderList: { nil },
 		saveProfileHeaderList: { _ in },
 		deleteProfileHeaderList: {},
@@ -28,10 +28,13 @@ extension SecureStorageClient: TestDependencyKey {
 		saveDeviceInfo: { _ in },
 		deprecatedLoadDeviceID: { nil },
 		deleteDeprecatedDeviceID: {},
+		saveRadixConnectMobileSession: { _, _ in },
+		loadRadixConnectMobileSession: { _ in nil },
 		loadP2PLinks: { nil },
 		saveP2PLinks: { _ in },
 		loadP2PLinksPrivateKey: { nil },
 		saveP2PLinksPrivateKey: { _ in },
+		keychainChanged: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		getAllMnemonics: { [] }
 	)
 	#else
@@ -46,7 +49,7 @@ extension SecureStorageClient: TestDependencyKey {
 		containsMnemonicIdentifiedByFactorSourceID: { _ in false },
 		deleteMnemonicByFactorSourceID: { _ in },
 		deleteProfileAndMnemonicsByFactorSourceIDs: { _, _ in },
-		updateIsCloudProfileSyncEnabled: { _, _ in },
+		disableCloudProfileSync: { _ in },
 		loadProfileHeaderList: { nil },
 		saveProfileHeaderList: { _ in },
 		deleteProfileHeaderList: {},
@@ -54,10 +57,13 @@ extension SecureStorageClient: TestDependencyKey {
 		saveDeviceInfo: { _ in },
 		deprecatedLoadDeviceID: { nil },
 		deleteDeprecatedDeviceID: {},
+		saveRadixConnectMobileSession: { _, _ in },
+		loadRadixConnectMobileSession: { _ in nil },
 		loadP2PLinks: { nil },
 		saveP2PLinks: { _ in },
 		loadP2PLinksPrivateKey: { nil },
-		saveP2PLinksPrivateKey: { _ in }
+		saveP2PLinksPrivateKey: { _ in },
+		keychainChanged: { AsyncLazySequence([]).eraseToAnyAsyncSequence() }
 	)
 	#endif // DEBUG
 
@@ -75,7 +81,7 @@ extension SecureStorageClient: TestDependencyKey {
 		containsMnemonicIdentifiedByFactorSourceID: unimplemented("\(Self.self).containsMnemonicIdentifiedByFactorSourceID"),
 		deleteMnemonicByFactorSourceID: unimplemented("\(Self.self).deleteMnemonicByFactorSourceID"),
 		deleteProfileAndMnemonicsByFactorSourceIDs: unimplemented("\(Self.self).deleteProfileMnemonicsByFactorSourceIDs"),
-		updateIsCloudProfileSyncEnabled: unimplemented("\(Self.self).updateIsCloudProfileSyncEnabled"),
+		disableCloudProfileSync: unimplemented("\(Self.self).disableCloudProfileSync"),
 		loadProfileHeaderList: unimplemented("\(Self.self).loadProfileHeaderList"),
 		saveProfileHeaderList: unimplemented("\(Self.self).saveProfileHeaderList"),
 		deleteProfileHeaderList: unimplemented("\(Self.self).deleteProfileHeaderList"),
@@ -83,10 +89,13 @@ extension SecureStorageClient: TestDependencyKey {
 		saveDeviceInfo: unimplemented("\(Self.self).saveDeviceInfo"),
 		deprecatedLoadDeviceID: unimplemented("\(Self.self).deprecatedLoadDeviceID"),
 		deleteDeprecatedDeviceID: unimplemented("\(Self.self).deleteDeprecatedDeviceID"),
+		saveRadixConnectMobileSession: unimplemented("\(Self.self).saveRadixConnectMobileSession"),
+		loadRadixConnectMobileSession: unimplemented("\(Self.self).loadRadixConnectMobileSession"),
 		loadP2PLinks: unimplemented("\(Self.self).loadP2PLinks"),
 		saveP2PLinks: unimplemented("\(Self.self).saveP2PLinks"),
 		loadP2PLinksPrivateKey: unimplemented("\(Self.self).loadP2PLinksPrivateKey"),
 		saveP2PLinksPrivateKey: unimplemented("\(Self.self).saveP2PLinksPrivateKey"),
+		keychainChanged: unimplemented("\(Self.self).keychainChanged"),
 		getAllMnemonics: unimplemented("\(Self.self).getAllMnemonics")
 	)
 	#else
@@ -101,7 +110,7 @@ extension SecureStorageClient: TestDependencyKey {
 		containsMnemonicIdentifiedByFactorSourceID: unimplemented("\(Self.self).containsMnemonicIdentifiedByFactorSourceID"),
 		deleteMnemonicByFactorSourceID: unimplemented("\(Self.self).deleteMnemonicByFactorSourceID"),
 		deleteProfileAndMnemonicsByFactorSourceIDs: unimplemented("\(Self.self).deleteProfileMnemonicsByFactorSourceIDs"),
-		updateIsCloudProfileSyncEnabled: unimplemented("\(Self.self).updateIsCloudProfileSyncEnabled"),
+		disableCloudProfileSync: unimplemented("\(Self.self).disableCloudProfileSync"),
 		loadProfileHeaderList: unimplemented("\(Self.self).loadProfileHeaderList"),
 		saveProfileHeaderList: unimplemented("\(Self.self).saveProfileHeaderList"),
 		deleteProfileHeaderList: unimplemented("\(Self.self).deleteProfileHeaderList"),
@@ -109,10 +118,13 @@ extension SecureStorageClient: TestDependencyKey {
 		saveDeviceInfo: unimplemented("\(Self.self).saveDeviceInfo"),
 		deprecatedLoadDeviceID: unimplemented("\(Self.self).deprecatedLoadDeviceID"),
 		deleteDeprecatedDeviceID: unimplemented("\(Self.self).deleteDeprecatedDeviceID"),
+		saveRadixConnectMobileSession: unimplemented("\(Self.self).saveRadixConnectMobileSession"),
+		loadRadixConnectMobileSession: unimplemented("\(Self.self).loadRadixConnectMobileSession"),
 		loadP2PLinks: unimplemented("\(Self.self).loadP2PLinks"),
 		saveP2PLinks: unimplemented("\(Self.self).saveP2PLinks"),
 		loadP2PLinksPrivateKey: unimplemented("\(Self.self).loadP2PLinksPrivateKey"),
-		saveP2PLinksPrivateKey: unimplemented("\(Self.self).saveP2PLinksPrivateKey")
+		saveP2PLinksPrivateKey: unimplemented("\(Self.self).saveP2PLinksPrivateKey"),
+		keychainChanged: unimplemented("\(Self.self).keychainChanged")
 	)
 	#endif
 }

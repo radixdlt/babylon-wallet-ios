@@ -13,19 +13,12 @@ final class AccountPreferencesTests: TestCase {
 		)
 
 		await store.send(.view(.hideAccountTapped)) { state in
-			state.destination = .confirmHideAccount(.init(
-				title: .init(L10n.AccountSettings.hideThisAccount),
-				message: .init(L10n.AccountSettings.hideAccountConfirmation),
-				buttons: [
-					.default(.init(L10n.Common.continue), action: .send(.confirmTapped)),
-					.cancel(.init(L10n.Common.cancel), action: .send(.cancelTapped)),
-				]
-			))
+			state.destination = .hideAccount
 		}
 
-		let idsOfUpdatedAccounts = ActorIsolated<Set<Account.ID>?>(nil)
-		store.dependencies.entitiesVisibilityClient.hideAccounts = { accounts in
-			await idsOfUpdatedAccounts.setValue(accounts)
+		let idOfUpdatedAccount = ActorIsolated<Account.ID?>(nil)
+		store.dependencies.entitiesVisibilityClient.hideAccount = { account in
+			await idOfUpdatedAccount.setValue(account)
 		}
 
 		let scheduleCompletionHUD = ActorIsolated<OverlayWindowClient.Item.HUD?>(nil)
@@ -35,12 +28,12 @@ final class AccountPreferencesTests: TestCase {
 			}
 		}
 
-		await store.send(.destination(.presented(.confirmHideAccount(.confirmTapped)))) { state in
+		await store.send(.destination(.presented(.hideAccount(.confirm)))) { state in
 			state.destination = nil
 		}
 
-		let idsOfUpdatedAccounts_ = await idsOfUpdatedAccounts.value
-		XCTAssertEqual([account.id], idsOfUpdatedAccounts_)
+		let idOfUpdatedAccount_ = await idOfUpdatedAccount.value
+		XCTAssertEqual(account.id, idOfUpdatedAccount_)
 
 		let scheduledCompletionHUD = await scheduleCompletionHUD.value
 		XCTAssertEqual(scheduledCompletionHUD, .accountHidden)

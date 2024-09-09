@@ -7,16 +7,20 @@ extension GatewayAPIClient: TestDependencyKey {
 		getEpoch: unimplemented("\(Self.self).getEpoch"),
 		getEntityDetails: unimplemented("\(Self.self).getEntityDetails"),
 		getEntityMetadata: unimplemented("\(Self.self).getEntityMetadata"),
+		getEntityMetadataPage: unimplemented("\(Self.self).getEntityMetadataPage"),
 		getEntityFungiblesPage: unimplemented("\(Self.self).getEntityFungiblesPage"),
 		getEntityFungibleResourceVaultsPage: unimplemented("\(Self.self).getEntityFungibleResourceVaultsPage"),
 		getEntityNonFungiblesPage: unimplemented("\(Self.self).getEntityNonFungiblesPage"),
 		getEntityNonFungibleResourceVaultsPage: unimplemented("\(Self.self).getEntityNonFungibleResourceVaultsPage"),
 		getEntityNonFungibleIdsPage: unimplemented("\(Self.self).getEntityNonFungibleIdsPage"),
 		getNonFungibleData: unimplemented("\(Self.self).getNonFungibleData"),
+		getAccountLockerTouchedAt: unimplemented("\(Self.self).getAccountLockerTouchedAt"),
+		getAccountLockerVaults: unimplemented("\(Self.self).GetAccountLockerVaults"),
 		submitTransaction: unimplemented("\(Self.self).submitTransaction"),
 		transactionStatus: unimplemented("\(Self.self).transactionStatus"),
 		transactionPreview: unimplemented("\(Self.self).transactionPreview"),
-		streamTransactions: unimplemented("\(Self.self).streamTransactions")
+		streamTransactions: unimplemented("\(Self.self).streamTransactions"),
+		prevalidateDeposit: unimplemented("\(Self.self).prevalidateDeposit")
 	)
 
 	// TODO: convert to noop, don't use in tests.
@@ -31,12 +35,15 @@ extension GatewayAPIClient: TestDependencyKey {
 			getEpoch: { 123 },
 			getEntityDetails: unimplemented("\(self).getEntityDetails"),
 			getEntityMetadata: unimplemented("\(self).getEntityMetadata"),
+			getEntityMetadataPage: unimplemented("\(self).getEntityMetadataPage"),
 			getEntityFungiblesPage: unimplemented("\(self).getEntityFungiblesPage"),
 			getEntityFungibleResourceVaultsPage: unimplemented("\(self).getEntityFungibleResourceVaultsPage"),
 			getEntityNonFungiblesPage: unimplemented("\(self).getEntityNonFungiblesPage"),
 			getEntityNonFungibleResourceVaultsPage: unimplemented("\(self).getEntityNonFungibleResourceVaultsPage"),
 			getEntityNonFungibleIdsPage: unimplemented("\(self).getEntityNonFungibleIdsPage"),
 			getNonFungibleData: unimplemented("\(self).getNonFungibleData"),
+			getAccountLockerTouchedAt: unimplemented("\(Self.self).getAccountLockerTouchedAt"),
+			getAccountLockerVaults: unimplemented("\(Self.self).GetAccountLockerVaults"),
 			submitTransaction: { _ in
 				.init(duplicate: submittedTXIsDoubleSpend)
 			},
@@ -51,7 +58,8 @@ extension GatewayAPIClient: TestDependencyKey {
 				)
 			},
 			transactionPreview: unimplemented("\(self).transactionPreview"),
-			streamTransactions: unimplemented("\(self).streamTransactions")
+			streamTransactions: unimplemented("\(self).streamTransactions"),
+			prevalidateDeposit: unimplemented("\(Self.self).prevalidateDeposit")
 		)
 	}
 }

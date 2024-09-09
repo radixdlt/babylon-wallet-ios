@@ -1,8 +1,6 @@
 import Algorithms
 import Sargon
 
-public typealias ResourceIdentifier = String
-
 // MARK: - GatewayAPIClient
 public struct GatewayAPIClient: Sendable, DependencyKey {
 	// MARK: Request
@@ -12,6 +10,7 @@ public struct GatewayAPIClient: Sendable, DependencyKey {
 	// MARK: Entity
 	public var getEntityDetails: GetEntityDetails
 	public var getEntityMetadata: GetEntityMetdata
+	public var getEntityMetadataPage: GetEntityMetdataPage
 
 	// MARK: Fungible Resources
 	public var getEntityFungiblesPage: GetEntityFungiblesPage
@@ -23,11 +22,16 @@ public struct GatewayAPIClient: Sendable, DependencyKey {
 	public var getEntityNonFungibleIdsPage: GetEntityNonFungibleIdsPage
 	public var getNonFungibleData: GetNonFungibleData
 
+	// MARK: Account Lockers
+	public var getAccountLockerTouchedAt: GetAccountLockerTouchedAt
+	public var getAccountLockerVaults: GetAccountLockerVaults
+
 	// MARK: Transaction
 	public var submitTransaction: SubmitTransaction
 	public var transactionStatus: GetTransactionStatus
 	public var transactionPreview: TransactionPreview
 	public var streamTransactions: StreamTransactions
+	public var prevalidateDeposit: PrevalidateDeposit
 }
 
 extension GatewayAPIClient {
@@ -37,6 +41,7 @@ extension GatewayAPIClient {
 	// MARK: - Entity
 	public typealias GetEntityDetails = @Sendable (_ addresses: [String], _ explicitMetadata: Set<EntityMetadataKey>, _ ledgerState: GatewayAPI.LedgerStateSelector?) async throws -> GatewayAPI.StateEntityDetailsResponse
 	public typealias GetEntityMetdata = @Sendable (_ address: String, _ explicitMetadata: Set<EntityMetadataKey>) async throws -> GatewayAPI.EntityMetadataCollection
+	public typealias GetEntityMetdataPage = @Sendable (GatewayAPI.StateEntityMetadataPageRequest) async throws -> GatewayAPI.StateEntityMetadataPageResponse
 
 	// MARK: - Fungible
 	public typealias GetEntityFungiblesPage = @Sendable (GatewayAPI.StateEntityFungiblesPageRequest) async throws -> GatewayAPI.StateEntityFungiblesPageResponse
@@ -48,11 +53,16 @@ extension GatewayAPIClient {
 	public typealias GetEntityNonFungibleIdsPage = @Sendable (GatewayAPI.StateEntityNonFungibleIdsPageRequest) async throws -> GatewayAPI.StateEntityNonFungibleIdsPageResponse
 	public typealias GetNonFungibleData = @Sendable (GatewayAPI.StateNonFungibleDataRequest) async throws -> GatewayAPI.StateNonFungibleDataResponse
 
+	// MARK: - Account Lockers
+	public typealias GetAccountLockerTouchedAt = @Sendable (GatewayAPI.StateAccountLockersTouchedAtRequest) async throws -> GatewayAPI.StateAccountLockersTouchedAtResponse
+	public typealias GetAccountLockerVaults = @Sendable (GatewayAPI.StateAccountLockerPageVaultsRequest) async throws -> GatewayAPI.StateAccountLockerPageVaultsResponse
+
 	// MARK: - Transaction
 	public typealias SubmitTransaction = @Sendable (GatewayAPI.TransactionSubmitRequest) async throws -> GatewayAPI.TransactionSubmitResponse
 	public typealias GetTransactionStatus = @Sendable (GatewayAPI.TransactionStatusRequest) async throws -> GatewayAPI.TransactionStatusResponse
 	public typealias TransactionPreview = @Sendable (GatewayAPI.TransactionPreviewRequest) async throws -> GatewayAPI.TransactionPreviewResponse
 	public typealias StreamTransactions = @Sendable (GatewayAPI.StreamTransactionsRequest) async throws -> GatewayAPI.StreamTransactionsResponse
+	public typealias PrevalidateDeposit = @Sendable (GatewayAPI.AccountDepositPreValidationRequest) async throws -> GatewayAPI.AccountDepositPreValidationResponse
 }
 
 extension GatewayAPIClient {

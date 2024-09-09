@@ -1,5 +1,6 @@
 @testable import Radix_Wallet_Dev
 import Sargon
+import SargonUniFFI
 import XCTest
 
 // MARK: - GatewaySettingsFeatureTests
@@ -180,6 +181,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 		let validURL = URL.previewValue.absoluteString
 		var initialState = AddNewGateway.State()
 		initialState.inputtedURL = validURL
+		initialState.ffiUrl = try? .init(urlPath: validURL)
 
 		let store = TestStore(
 			initialState: initialState,
@@ -190,6 +192,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 			$0.gatewaysClient.getAllGateways = {
 				allGateways
 			}
+			$0.gatewaysClient.hasGateway = { _ in false }
 		}
 		store.exhaustivity = .off
 
@@ -197,13 +200,38 @@ final class GatewaySettingsFeatureTests: TestCase {
 		await store.send(.view(.addNewGatewayButtonTapped))
 		await store.receive(.internal(.gatewayValidationResult(.success(.sample))))
 		await store.receive(.internal(.addGatewayResult(.success(.instance))))
-		await store.receive(.delegate(.dismiss))
+	}
+
+	func test_whenNewAddGatewayButtonIsTapped_duplicateGatewayIsRejected() async throws {
+		// given
+		let allGateways: Gateways = [.nebunet, .hammunet, .enkinet, .mardunet]
+		let validURL = URL.previewValue.absoluteString
+		var initialState = AddNewGateway.State()
+		initialState.inputtedURL = validURL
+		initialState.ffiUrl = try? .init(urlPath: validURL)
+
+		let store = TestStore(
+			initialState: initialState,
+			reducer: AddNewGateway.init
+		) {
+			$0.gatewaysClient.getAllGateways = {
+				allGateways
+			}
+			$0.gatewaysClient.hasGateway = { url in
+				url.url.absoluteString == validURL
+			}
+		}
+		store.exhaustivity = .off
+
+		// when
+		await store.send(.view(.addNewGatewayButtonTapped))
+		await store.receive(.internal(.showDuplicateURLError))
 	}
 }
 
 #if DEBUG
 
 extension URL {
-	public static let previewValue = URL(string: "https://example.com")!
+	public static let previewValue = URL(string: "https://example.com/")!
 }
 #endif // DEBUG

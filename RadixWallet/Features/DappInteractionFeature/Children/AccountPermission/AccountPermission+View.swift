@@ -42,30 +42,38 @@ extension AccountPermission {
 				observe: AccountPermission.ViewState.init,
 				send: { .view($0) }
 			) { viewStore in
-				ScrollView {
-					VStack(spacing: .medium2) {
-						DappHeader(
-							thumbnail: viewStore.thumbnail,
-							title: viewStore.title,
-							subtitle: viewStore.subtitle
-						)
+				GeometryReader { geometry in
+					ScrollView {
+						VStack(spacing: .zero) {
+							DappHeader(
+								thumbnail: viewStore.thumbnail,
+								title: viewStore.title,
+								subtitle: viewStore.subtitle
+							)
 
-						DappPermissionBox {
-							Text(viewStore.numberOfAccounts)
-								.foregroundColor(.app.gray1)
-								.textStyle(.body1Regular)
-								.padding(.medium1)
-						}
-						.padding(.horizontal, .medium2)
-
-						Text(L10n.DAppRequest.AccountPermission.updateInSettingsExplanation)
-							.foregroundColor(.app.gray2)
-							.textStyle(.body1Regular)
-							.multilineTextAlignment(.center)
+							DappPermissionBox {
+								Text(viewStore.numberOfAccounts)
+									.foregroundColor(.app.gray1)
+									.textStyle(.body1Regular)
+									.padding(.medium1)
+							}
 							.padding(.horizontal, .medium2)
+							.padding(.top, .large1)
+
+							Text(L10n.DAppRequest.AccountPermission.updateInSettingsExplanation)
+								.foregroundColor(.app.gray2)
+								.textStyle(.body1Regular)
+								.multilineTextAlignment(.center)
+								.padding(.horizontal, .medium2)
+								.padding(.top, .medium1)
+
+							Spacer()
+						}
+						.padding(.horizontal, .medium1)
+						.padding(.bottom, .medium2)
+						.frame(minHeight: geometry.size.height)
 					}
-					.padding(.horizontal, .medium1)
-					.padding(.bottom, .medium2)
+					.frame(width: geometry.size.width)
 				}
 				.footer {
 					Button(L10n.DAppRequest.AccountPermission.continue) {

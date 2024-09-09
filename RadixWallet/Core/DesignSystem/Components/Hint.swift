@@ -1,92 +1,108 @@
-
 // MARK: - Hint
 public struct Hint: View, Equatable {
-	public struct ViewState: Equatable {
+	public struct ViewState: Sendable, Equatable {
 		public let kind: Kind
-		public let text: Text?
+		public let text: AttributedString?
 
-		public init(kind: Kind, text: Text?) {
+		public init(kind: Kind, text: String?) {
 			self.kind = kind
-			self.text = text
+			self.text = text.map { .init(stringLiteral: $0) }
 		}
 
-		public init(kind: Kind, text: some StringProtocol) {
+		public init(kind: Kind, attributed: AttributedString?) {
 			self.kind = kind
-			self.text = Text(text)
+			self.text = attributed
+		}
+
+		public static func info(_ string: String) -> Self {
+			.init(kind: .info, text: string)
+		}
+
+		public static func error(_ string: String) -> Self {
+			.init(kind: .error(imageSize: .smallest), text: string)
+		}
+
+		public static func error() -> Self {
+			.init(kind: .error(imageSize: .smallest), text: nil)
+		}
+
+		public static func iconError(_ string: String) -> Self {
+			.init(kind: .error(imageSize: .icon), text: string)
+		}
+
+		public static func iconError() -> Self {
+			.init(kind: .error(imageSize: .icon), text: nil)
 		}
 	}
 
-	public enum Kind: Equatable {
+	public enum Kind: Sendable, Equatable {
 		case info
-		case error
+		case error(imageSize: HitTargetSize)
 		case warning
+		case detail
 	}
 
 	public let viewState: ViewState
-
-	private init(kind: Kind, text: Text?) {
-		self.viewState = .init(kind: kind, text: text)
-	}
 
 	public init(viewState: ViewState) {
 		self.viewState = viewState
 	}
 
-	public static func info(_ text: () -> Text) -> Self {
-		.init(kind: .info, text: text())
-	}
-
-	public static func info(_ string: some StringProtocol) -> Self {
-		.init(kind: .info, text: Text(string))
-	}
-
-	public static func error(_ text: () -> Text) -> Self {
-		.init(kind: .error, text: text())
-	}
-
-	public static func error(_ string: some StringProtocol) -> Self {
-		.init(kind: .error, text: Text(string))
-	}
-
-	public static func error() -> Self {
-		.init(kind: .error, text: nil)
-	}
-
 	public var body: some View {
 		if let text = viewState.text {
 			HStack(spacing: .small3) {
-				if let iconResource {
-					Image(iconResource)
+				if let imageResource {
+					Image(imageResource)
 						.renderingMode(.template)
 						.resizable()
 						.scaledToFit()
-						.frame(.smallest)
+						.frame(imageSize)
 				}
-				text
+				Text(text)
 					.lineSpacing(0)
-					.textStyle(.body2HighImportance)
+					.textStyle(textStyle)
 			}
 			.foregroundColor(foregroundColor)
 		}
 	}
+}
 
-	private var foregroundColor: Color {
+private extension Hint {
+	var foregroundColor: Color {
 		switch viewState.kind {
 		case .info:
 			.app.gray2
 		case .error:
 			.app.red1
-		case .warning:
+		case .warning, .detail:
 			.app.alert
 		}
 	}
 
-	private var iconResource: ImageResource? {
+	var imageResource: ImageResource? {
 		switch viewState.kind {
-		case .info:
+		case .info, .detail:
 			nil
 		case .error, .warning:
 			.error
+		}
+	}
+
+	var textStyle: TextStyle {
+		switch viewState.kind {
+		case .info, .error, .warning:
+			.body2Regular
+		case .detail:
+			.body1Regular
+		}
+	}
+
+	var imageSize: HitTargetSize {
+		switch viewState.kind {
+		case .info, .detail, .warning:
+			.smallest
+		case let .error(imageSize):
+			imageSize
 		}
 	}
 }

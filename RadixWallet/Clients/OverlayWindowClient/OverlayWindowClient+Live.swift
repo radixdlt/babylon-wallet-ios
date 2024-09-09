@@ -3,43 +3,70 @@ extension OverlayWindowClient: DependencyKey {
 	public static let liveValue: Self = {
 		let items = AsyncPassthroughSubject<Item>()
 		let alertActions = AsyncPassthroughSubject<(action: Item.AlertAction, id: Item.AlertState.ID)>()
+		let fullScreenActions = AsyncPassthroughSubject<(action: FullScreenAction, id: FullScreenID)>()
 		let isUserInteractionEnabled = AsyncPassthroughSubject<Bool>()
 
 		@Dependency(\.errorQueue) var errorQueue
 		@Dependency(\.pasteboardClient) var pasteBoardClient
 
 		errorQueue.errors().map { error in
-			Item.alert(.init(
-				title: { TextState(L10n.Common.errorAlertTitle) },
-				message: { TextState(error.localizedDescription) }
-			))
+			if let sargonError = error as? SargonError {
+				#if DEBUG
+				let message = error.localizedDescription
+				#else
+				let message = L10n.Error.emailSupportMessage(sargonError.errorCode)
+				#endif
+				return Item.alert(.init(
+					title: { TextState(L10n.Common.errorAlertTitle) },
+					actions: {
+						ButtonState(role: .cancel, action: .dismissed) {
+							TextState(L10n.Common.cancel)
+						}
+						ButtonState(action: .emailSupport(additionalInfo: error.localizedDescription)) { TextState(L10n.Error.emailSupportButtonTitle)
+						}
+					},
+					message: { TextState(message) }
+				))
+			} else {
+				return Item.alert(.init(
+					title: { TextState(L10n.Common.errorAlertTitle) },
+					message: { TextState(error.localizedDescription) }
+				))
+			}
 		}
 		.subscribe(items)
 
 		pasteBoardClient.copyEvents().map { _ in Item.hud(.copied) }.subscribe(items)
 
-		let scheduleAlertIgnoreAction: ScheduleAlertIgnoreAction = { alert in
+		let scheduleAlertAndIgnoreAction: ScheduleAlertAndIgnoreAction = { alert in
 			items.send(.alert(alert))
-		}
-
-		let scheduleFullScreenIgnoreAction: ScheduleFullScreenIgnoreAction = { fullScreen in
-			items.send(.fullScreen(fullScreen))
 		}
 
 		return .init(
 			scheduledItems: { items.eraseToAnyAsyncSequence() },
-			scheduleAlertIgnoreAction: scheduleAlertIgnoreAction,
-			scheduleAlertAwaitAction: { alert in
-				scheduleAlertIgnoreAction(alert)
+			scheduleAlert: { alert in
+				scheduleAlertAndIgnoreAction(alert)
 				return await alertActions.first { $0.id == alert.id }?.action ?? .dismissed
 			},
+			scheduleAlertAndIgnoreAction: scheduleAlertAndIgnoreAction,
 			scheduleHUD: { items.send(.hud($0)) },
-			scheduleFullScreenIgnoreAction: scheduleFullScreenIgnoreAction,
+			scheduleSheet: { items.send(.sheet($0)) },
+			scheduleFullScreen: { fullScreen in
+				items.send(.fullScreen(fullScreen))
+				return await fullScreenActions.first { $0.id == fullScreen.id }?.action ?? .dismiss
+			},
 			sendAlertAction: { action, id in alertActions.send((action, id)) },
+			sendFullScreenAction: { action, id in fullScreenActions.send((action, id)) },
 			setIsUserIteractionEnabled: { isUserInteractionEnabled.send($0) },
 			isUserInteractionEnabled: { isUserInteractionEnabled.eraseToAnyAsyncSequence() }
 		)
 	}()
+}
+
+extension OverlayWindowClient {
+	public func showInfoLink(_ state: InfoLinkSheet.State) {
+		scheduleSheet(.infoLink(state))
+	}
 }
 
 extension OverlayWindowClient.Item.HUD {

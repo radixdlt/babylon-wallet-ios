@@ -9,6 +9,7 @@ public struct FungibleTokenDetails: Sendable, FeatureReducer {
 		let isXRD: Bool
 		let ownedFungibleResource: OnLedgerEntity.OwnedFungibleResource?
 		let ledgerState: AtLedgerState?
+		var hideResource: HideResource.State
 
 		public init(
 			resourceAddress: ResourceAddress,
@@ -22,6 +23,7 @@ public struct FungibleTokenDetails: Sendable, FeatureReducer {
 			self.ownedFungibleResource = ownedFungibleResource
 			self.isXRD = isXRD
 			self.ledgerState = ledgerState
+			self.hideResource = .init(kind: .fungible(resourceAddress))
 		}
 	}
 
@@ -34,11 +36,24 @@ public struct FungibleTokenDetails: Sendable, FeatureReducer {
 		case resourceLoadResult(TaskResult<OnLedgerEntity.Resource>)
 	}
 
+	@CasePathable
+	public enum ChildAction: Sendable, Equatable {
+		case hideResource(HideResource.Action)
+	}
+
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.dismiss) var dismiss
 
 	public init() {}
+
+	public var body: some ReducerOf<Self> {
+		Scope(state: \.hideResource, action: \.child.hideResource) {
+			HideResource()
+		}
+
+		Reduce(core)
+	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -48,7 +63,7 @@ public struct FungibleTokenDetails: Sendable, FeatureReducer {
 			}
 			state.resource = .loading
 			return .run { [resourceAddress = state.resourceAddress, ledgerState = state.ledgerState] send in
-				let result = await TaskResult { try await onLedgerEntitiesClient.getResource(resourceAddress, atLedgerState: ledgerState) }
+				let result = await TaskResult { try await onLedgerEntitiesClient.getResource(resourceAddress, atLedgerState: ledgerState, fetchMetadata: true) }
 				await send(.internal(.resourceLoadResult(result)))
 			}
 		case .closeButtonTapped:
@@ -65,6 +80,15 @@ public struct FungibleTokenDetails: Sendable, FeatureReducer {
 			state.resource = .failure(error)
 			errorQueue.schedule(error)
 			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+		switch childAction {
+		case .hideResource(.delegate(.didHideResource)):
+			.run { _ in await dismiss() }
+		default:
+			.none
 		}
 	}
 }

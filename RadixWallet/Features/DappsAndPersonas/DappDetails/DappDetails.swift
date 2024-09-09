@@ -5,7 +5,6 @@ import SwiftUI
 public struct DappDetails: Sendable, FeatureReducer {
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.openURL) var openURL
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
@@ -95,10 +94,10 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case openURLTapped(URL)
 		case fungibleTapped(ResourceAddress)
 		case nonFungibleTapped(ResourceAddress)
 		case dAppTapped(DappDefinitionAddress)
+		case depositsVisibleToggled(Bool)
 		case forgetThisDappTapped
 	}
 
@@ -198,11 +197,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 				errorQueue.schedule(error)
 			}
 
-		case let .openURLTapped(url):
-			return .run { _ in
-				await openURL(url)
-			}
-
 		case let .fungibleTapped(address):
 			guard let resource = state.resources?.fungible[id: address] else {
 				errorQueue.schedule(MissingResource(address: address))
@@ -225,6 +219,17 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case let .dAppTapped(address):
 			state.destination = .dappDetails(.init(dAppDefinitionAddress: address))
 			return .none
+
+		case let .depositsVisibleToggled(isVisible):
+			state.authorizedDapp?.showDeposits(isVisible)
+			guard let detailed = state.authorizedDapp else {
+				return .none
+			}
+			return .run { _ in
+				var dapp = try await authorizedDappsClient.getAuthorizedDapp(detailed: detailed)
+				dapp.showDeposits(isVisible)
+				try await authorizedDappsClient.updateAuthorizedDapp(dapp)
+			}
 
 		case .forgetThisDappTapped:
 			state.destination = .confirmDisconnectAlert(.confirmDisconnect)

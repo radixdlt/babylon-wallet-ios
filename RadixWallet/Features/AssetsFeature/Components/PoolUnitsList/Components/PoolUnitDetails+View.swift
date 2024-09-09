@@ -10,11 +10,14 @@ extension PoolUnitDetails.State {
 			resources: .init(resources: resourcesDetails),
 			resourceDetails: .init(
 				description: .success(resource.metadata.description),
+				infoUrl: .success(resource.metadata.infoURL),
 				resourceAddress: resource.resourceAddress,
 				isXRD: false,
 				validatorAddress: nil,
 				resourceName: .success(resource.metadata.name),
 				currentSupply: .success(resource.totalSupply?.formatted() ?? L10n.AssetDetails.supplyUnkown),
+				divisibility: .success(resource.divisibility),
+				arbitraryDataFields: .success(resource.metadata.arbitraryItems.asDataFields),
 				behaviors: .success(resource.behaviors),
 				tags: .success(resource.metadata.tags)
 			)
@@ -58,10 +61,18 @@ extension PoolUnitDetails {
 							.padding(.horizontal, .large2)
 
 						AssetResourceDetailsSection(viewState: viewStore.resourceDetails)
+
+						HideResource.View(store: store.hideResource)
 					}
 					.padding(.bottom, .medium1)
 				}
 			}
 		}
+	}
+}
+
+private extension StoreOf<PoolUnitDetails> {
+	var hideResource: StoreOf<HideResource> {
+		scope(state: \.hideResource, action: \.child.hideResource)
 	}
 }

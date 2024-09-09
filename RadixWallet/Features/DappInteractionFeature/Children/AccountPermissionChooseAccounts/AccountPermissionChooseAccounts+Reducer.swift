@@ -3,7 +3,7 @@ import Sargon
 import SwiftUI
 
 // MARK: - ChooseAccountsResult
-typealias AccountPermissionChooseAccountsResult = P2P.Dapp.Response.Accounts
+typealias AccountPermissionChooseAccountsResult = WalletToDappInteractionResponse.Accounts
 
 // MARK: - AccountPermissionChooseAccounts
 struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
@@ -14,7 +14,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 		}
 
 		/// if `proofOfOwnership`, sign this challenge
-		let challenge: P2P.Dapp.Request.AuthChallengeNonce?
+		let challenge: DappToWalletInteractionAuthChallengeNonce?
 
 		let accessKind: AccessKind
 		let dappMetadata: DappMetadata
@@ -24,7 +24,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 		var destination: Destination.State?
 
 		init(
-			challenge: P2P.Dapp.Request.AuthChallengeNonce?,
+			challenge: DappToWalletInteractionAuthChallengeNonce?,
 			accessKind: AccessKind,
 			dappMetadata: DappMetadata,
 			chooseAccounts: ChooseAccounts.State
@@ -36,16 +36,16 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 		}
 
 		init(
-			challenge: P2P.Dapp.Request.AuthChallengeNonce?,
+			challenge: DappToWalletInteractionAuthChallengeNonce?,
 			accessKind: AccessKind,
 			dappMetadata: DappMetadata,
-			numberOfAccounts: DappInteraction.NumberOfAccounts
+			numberOfAccounts: DappInteractionNumberOfAccounts
 		) {
 			self.init(
 				challenge: challenge,
 				accessKind: accessKind,
 				dappMetadata: dappMetadata,
-				chooseAccounts: .init(selectionRequirement: .init(numberOfAccounts))
+				chooseAccounts: .init(context: .permission(.init(numberOfAccounts)))
 			)
 		}
 	}
@@ -167,11 +167,11 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 				state.destination = nil
 
 				var accountsLeftToVerifyDidSign: Set<Account.ID> = Set(selectedAccounts.map(\.id))
-				let walletAccountsWithProof: [P2P.Dapp.Response.Accounts.WithProof] = signedAuthChallenge.entitySignatures.map {
+				let walletAccountsWithProof: [WalletToDappInteractionResponse.Accounts.WithProof] = signedAuthChallenge.entitySignatures.map {
 					let account = try! $0.signerEntity.asAccount()
 					accountsLeftToVerifyDidSign.remove(account.id)
-					let proof = P2P.Dapp.Response.AuthProof(entitySignature: $0)
-					return P2P.Dapp.Response.Accounts.WithProof(account: .init(account: account), proof: proof)
+					let proof = WalletToDappInteractionAuthProof(entitySignature: $0)
+					return WalletToDappInteractionResponse.Accounts.WithProof(account: .init(account: account), proof: proof)
 				}
 				guard accountsLeftToVerifyDidSign.isEmpty else {
 					loggerGlobal.error("Failed to sign with all accounts..")

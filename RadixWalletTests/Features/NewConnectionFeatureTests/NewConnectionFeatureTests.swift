@@ -11,7 +11,7 @@ final class NewConnectionTests: TestCase {
 			// GIVEN
 			// initial state
 			initialState: NewConnection.State(
-				root: .scanQR(.init(scanInstructions: scanInstruction, step: .scanQR(.init(scanInstructions: scanInstruction))))
+				root: .scanQR(.init(kind: .account, step: .scanQR(.init(kind: .account))))
 			),
 			reducer: NewConnection.init
 		)

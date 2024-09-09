@@ -85,7 +85,8 @@ extension Profile {
 			id: networkID,
 			accounts: [account],
 			personas: [],
-			authorizedDapps: []
+			authorizedDapps: [],
+			resourcePreferences: []
 		)
 
 		self.networks = [network]
@@ -147,8 +148,8 @@ private func configureTestClients(
 ) {
 	d.device.$name = "Test"
 	d.device.$model = "Test"
-	d.entitiesVisibilityClient.hideAccounts = { _ in }
-	d.entitiesVisibilityClient.hidePersonas = { _ in }
+	d.entitiesVisibilityClient.hideAccount = { _ in }
+	d.entitiesVisibilityClient.hidePersona = { _ in }
 	d.uuid = .incrementing
 	d.date = .constant(Date(timeIntervalSince1970: 0))
 	d.mnemonicClient.generate = { _, _ in Mnemonic.sample }
@@ -237,7 +238,7 @@ extension PrivateHierarchicalDeterministicFactorSource {
 		model: String,
 		mnemonicWithPassphrase: MnemonicWithPassphrase = .testValueZooVote
 	) -> Self {
-		var bdfs = DeviceFactorSource.babylon(mnemonicWithPassphrase: mnemonicWithPassphrase, isMain: true)
+		var bdfs = DeviceFactorSource.babylon(mnemonicWithPassphrase: mnemonicWithPassphrase, isMain: true, hostInfo: .current())
 		bdfs.hint.model = model
 		bdfs.hint.name = name
 		bdfs.common.addedOn = .init(timeIntervalSince1970: 0)

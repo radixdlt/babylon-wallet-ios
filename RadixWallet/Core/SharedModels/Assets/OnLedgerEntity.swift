@@ -112,7 +112,8 @@ extension OnLedgerEntity.Metadata {
 			symbol: newlyCreated.symbol,
 			description: newlyCreated.description,
 			iconURL: newlyCreated.iconUrl.map { URL(string: $0) } ?? nil,
-			tags: newlyCreated.tags.compactMap(NonEmptyString.init(rawValue:)).map(AssetTag.custom)
+			tags: newlyCreated.tags.compactMap(NonEmptyString.init(rawValue:)).map(AssetTag.custom),
+			isComplete: false
 		)
 	}
 }
@@ -128,6 +129,7 @@ extension OnLedgerEntity {
 		public let symbol: String?
 		public let description: String?
 		public let iconURL: URL?
+		public let infoURL: URL?
 		public let tags: [AssetTag]
 		public let dappDefinitions: [AccountAddress]?
 		public let dappDefinition: AccountAddress?
@@ -139,6 +141,10 @@ extension OnLedgerEntity {
 		public let accountType: AccountType?
 		public let ownerKeys: PublicKeyHashesWithStateVersion?
 		public let ownerBadge: OwnerBadgeWithStateVersion?
+		public let arbitraryItems: [ArbitraryItem]
+
+		/// Indicates whether all the metadata has been downloaded, or if there is still more info to fetch.
+		public let isComplete: Bool
 
 		public struct ValueAtStateVersion<Value>: Codable where Value: Codable {
 			public let value: Value
@@ -169,12 +175,14 @@ extension OnLedgerEntity {
 
 		public typealias OwnerBadgeWithStateVersion = ValueAtStateVersion<NonFungibleLocalId>
 		public typealias PublicKeyHashesWithStateVersion = ValueAtStateVersion<[PublicKeyHash]>
+		public typealias ArbitraryItem = GatewayAPI.EntityMetadataItem
 
 		public init(
 			name: String? = nil,
 			symbol: String? = nil,
 			description: String? = nil,
 			iconURL: URL? = nil,
+			infoURL: URL? = nil,
 			tags: [AssetTag] = [],
 			dappDefinitions: [AccountAddress]? = nil,
 			dappDefinition: AccountAddress? = nil,
@@ -185,12 +193,15 @@ extension OnLedgerEntity {
 			claimedWebsites: [URL]? = nil,
 			accountType: AccountType? = nil,
 			ownerKeys: PublicKeyHashesWithStateVersion? = nil,
-			ownerBadge: OwnerBadgeWithStateVersion? = nil
+			ownerBadge: OwnerBadgeWithStateVersion? = nil,
+			arbitraryItems: [GatewayAPI.EntityMetadataItem] = [],
+			isComplete: Bool
 		) {
 			self.name = name
 			self.symbol = symbol
 			self.description = description
 			self.iconURL = iconURL
+			self.infoURL = infoURL
 			self.tags = tags
 			self.dappDefinitions = dappDefinitions
 			self.dappDefinition = dappDefinition
@@ -202,6 +213,8 @@ extension OnLedgerEntity {
 			self.accountType = accountType
 			self.ownerKeys = ownerKeys
 			self.ownerBadge = ownerBadge
+			self.arbitraryItems = arbitraryItems
+			self.isComplete = isComplete
 		}
 	}
 
@@ -371,7 +384,7 @@ extension OnLedgerEntity {
 		public let resourceAddress: ResourceAddress
 		public let atLedgerState: AtLedgerState
 		public let metadata: Metadata
-		public let nonFungibleIdsCount: Int
+		public var nonFungibleIdsCount: Int
 		/// The vault where the owned ids are stored
 		public let vaultAddress: VaultAddress
 
@@ -506,7 +519,7 @@ extension OnLedgerEntity {
 extension OnLedgerEntity.OnLedgerAccount {
 	public struct PoolUnitResources: Sendable, Hashable, Codable {
 		public var radixNetworkStakes: IdentifiedArrayOf<RadixNetworkStake>
-		public let poolUnits: [PoolUnit]
+		public var poolUnits: [PoolUnit]
 	}
 
 	public struct RadixNetworkStake: Sendable, Hashable, Codable, Identifiable, CustomDebugStringConvertible {
@@ -661,12 +674,6 @@ extension OnLedgerEntity.Resource {
 
 extension OnLedgerEntity.Resource {
 	public var fungibleResourceName: String? {
-		metadata.fungibleResourceName
-	}
-}
-
-extension OnLedgerEntity.Metadata {
-	public var fungibleResourceName: String? {
-		name ?? symbol
+		metadata.title
 	}
 }

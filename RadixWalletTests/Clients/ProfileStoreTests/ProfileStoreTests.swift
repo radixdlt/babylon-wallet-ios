@@ -15,14 +15,12 @@ extension Profile {
 			let mnemonic = Mnemonic(wordCount: .twentyFour, language: .english)
 			let mnemonicWithPassphrase = MnemonicWithPassphrase(mnemonic: mnemonic, passphrase: "")
 
-			var bdfs = DeviceFactorSource.babylon(mnemonicWithPassphrase: mnemonicWithPassphrase, isMain: true)
+			var bdfs = DeviceFactorSource.babylon(mnemonicWithPassphrase: mnemonicWithPassphrase, isMain: true, hostInfo: HostInfo.sample)
 			bdfs.common.addedOn = date
 			bdfs.common.lastUsedOn = date
 			bdfs.hint.name = "iPhone"
 			return bdfs
 		}()
-		let deviceInfo = DeviceInfo(id: UUID(), date: date, description: "Builder")
-		var header = Header.init(snapshotVersion: .v100, id: UUID(), creatingDevice: deviceInfo, lastUsedOnDevice: deviceInfo, lastModified: date, contentHint: ContentHint.init(numberOfAccountsOnAllNetworksInTotal: 0, numberOfPersonasOnAllNetworksInTotal: 0, numberOfNetworks: 0))
 		return Self.init(header: .sample, deviceFactorSource: bdfs)
 	}
 }
@@ -294,7 +292,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 			} operation: {
 				let sut = ProfileStore()
 				// WHEN import profile
-				try await sut.importCloudProfileSnapshot(profileSnapshotInIcloud.header)
+				try await sut.importProfile(profileSnapshotInIcloud)
 				return await sut.profile
 			}
 
@@ -303,33 +301,33 @@ final class ProfileStoreNewProfileTests: TestCase {
 		}
 	}
 
-	func test__GIVEN__no_profile__WHEN__import_profile_from_icloud_not_exists__THEN__error_is_thrown() async throws {
-		let icloudHeader: Header = .testValueProfileID_DEAD_deviceID_ABBA
-		try await withTimeLimit {
-			let assertionFailureIsCalled = self.expectation(description: "assertionFailure is called")
-			try await withTestClients {
-				// GIVEN no profile
-				$0.noProfile()
-				$0.secureStorageClient.loadProfileSnapshot = { headerId in
-					XCTAssertEqual(headerId, icloudHeader.id)
-					return nil
-				}
-				$0.assertionFailure = AssertionFailureAction.init(action: { _, _, _ in
-					// THEN identity is checked
-					assertionFailureIsCalled.fulfill()
-				})
-			} operation: {
-				let sut = ProfileStore()
-				// WHEN import profile
-				do {
-					try await sut.importCloudProfileSnapshot(icloudHeader)
-					return XCTFail("expected error")
-				} catch {}
-			}
-
-			await self.nearFutureFulfillment(of: assertionFailureIsCalled)
-		}
-	}
+//	func test__GIVEN__no_profile__WHEN__import_profile_from_icloud_not_exists__THEN__error_is_thrown() async throws {
+//		let icloudHeader: Header = .testValueProfileID_DEAD_deviceID_ABBA
+//		try await withTimeLimit {
+//			let assertionFailureIsCalled = self.expectation(description: "assertionFailure is called")
+//			try await withTestClients {
+//				// GIVEN no profile
+//				$0.noProfile()
+//				$0.secureStorageClient.loadProfileSnapshot = { headerId in
+//					XCTAssertEqual(headerId, icloudHeader.id)
+//					return nil
+//				}
+//				$0.assertionFailure = AssertionFailureAction.init(action: { _, _, _ in
+//					// THEN identity is checked
+//					assertionFailureIsCalled.fulfill()
+//				})
+//			} operation: {
+//				let sut = ProfileStore()
+//				// WHEN import profile
+//				do {
+//					try await sut.importCloudProfileSnapshot(icloudHeader)
+//					return XCTFail("expected error")
+//				} catch {}
+//			}
+//
+//			await self.nearFutureFulfillment(of: assertionFailureIsCalled)
+//		}
+//	}
 
 	func test__GIVEN__no_profile__WHEN__import_profile__THEN__ownership_has_changed() async throws {
 		let deviceInfo = DeviceInfo.testValueABBA
@@ -341,7 +339,9 @@ final class ProfileStoreNewProfileTests: TestCase {
 			} operation: {
 				let sut = ProfileStore()
 				// WHEN import profile
-				try await sut.importProfile(Profile.withOneAccountsDeviceInfo_BEEF_mnemonic_ABANDON_ART)
+				var profile = Profile.withOneAccountsDeviceInfo_BEEF_mnemonic_ABANDON_ART
+				await sut.claimOwnership(of: &profile)
+				try await sut.importProfile(profile)
 				return await sut.profile
 			}
 
@@ -746,40 +746,6 @@ final class ProfileStoreExistingProfileTests: TestCase {
 		}
 	}
 
-	func test__GIVEN__saved_profile_mismatch_deviceID__WHEN__claimAndContinueUseOnThisPhone__THEN__profile_uses_claimed_device() async throws {
-		try await doTestMismatch(
-			savedProfile: Profile.withOneAccount,
-			action: .claimAndContinueUseOnThisPhone
-		) { claimed in
-			// THEN profile uses claimed device
-			XCTAssertNoDifference(
-				claimed.header.lastUsedOnDevice.id,
-				DeviceInfo.testValueBEEF.id
-			)
-		}
-	}
-
-	func test__GIVEN__saved_profile_mismatch_deviceID__WHEN__deleteProfile__THEN__profile_got_deleted() async throws {
-		let uuidOfNewProfile = UUID()
-		let savedProfile = Profile.withOneAccount
-		let userDefaults = UserDefaults.Dependency.ephemeral()
-		try await doTestMismatch(
-			savedProfile: savedProfile,
-			userDefaults: userDefaults,
-			action: .deleteProfileFromThisPhone,
-			then: {
-				$0.uuid = .constant(uuidOfNewProfile)
-				XCTAssertNoDifference(userDefaults.string(key: .activeProfileID), savedProfile.header.id.uuidString)
-				$0.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { idToDelete, _ in
-					XCTAssertNoDifference(idToDelete, savedProfile.header.id)
-				}
-			}
-		)
-
-		// New active profile
-		XCTAssertNoDifference(userDefaults.string(key: .activeProfileID), uuidOfNewProfile.uuidString)
-	}
-
 	func test__GIVEN__mismatch__WHEN__app_is_not_yet_unlocked__THEN__no_alert_is_displayed() async throws {
 		let alertNotScheduled = expectation(
 			description: "overlayWindowClient did NOT scheduled alert"
@@ -804,7 +770,7 @@ final class ProfileStoreExistingProfileTests: TestCase {
 			}
 
 			func when(_ d: inout DependencyValues) {
-				d.overlayWindowClient.scheduleAlertAwaitAction = { _ in
+				d.overlayWindowClient.scheduleAlert = { _ in
 					// THEN NO alert is displayed
 					alertNotScheduled.fulfill()
 					return .dismissed // irrelevant, should not happen
@@ -955,62 +921,6 @@ final class ProfileStoreExistingProfileTests: TestCase {
 			}
 		}
 	}
-
-	func test__GIVEN__saved_profile__WHEN__we_update_profile_without_ownership__THEN__ownership_conflict_alert_is_shown() async throws {
-		try await withTimeLimit(.normal) {
-			// GIVEN saved profile
-			let saved = Profile.withOneAccountsDeviceInfo_ABBA_mnemonic_ABANDON_ART
-			let profileHasBeenUpdated = LockIsolated<Bool>(false)
-			let ownership_conflict_alert_is_shown = self.expectation(description: "ownership conflict alert is shown")
-
-			try await withTestClients {
-				$0.savedProfile(saved)
-				when(&$0)
-				then(&$0)
-			} operation: {
-				let sut = ProfileStore()
-				await sut.unlockedApp()
-				// WHEN we update profile...
-				do {
-					try await sut.updating {
-						$0.header.lastModified = Date()
-						profileHasBeenUpdated.setValue(true)
-					}
-					return XCTFail("Expected to throw")
-				} catch {
-					// expected to throw
-				}
-			}
-
-			func when(_ d: inout DependencyValues) {
-				d.secureStorageClient.loadProfileSnapshot = { _ in
-					profileHasBeenUpdated.withValue { hasBeenUpdated in
-						if hasBeenUpdated {
-							var modified = saved
-							modified.header.lastUsedOnDevice = .testValueBEEF // 0xBEEF != 0xABBA
-							// WHEN ... without ownership
-							return modified
-						} else {
-							return saved
-						}
-					}
-				}
-			}
-
-			func then(_ d: inout DependencyValues) {
-				d.overlayWindowClient.scheduleAlertAwaitAction = { alert in
-					XCTAssertNoDifference(
-						alert.message, TextState(overlayClientProfileStoreOwnershipConflictTextState)
-					)
-					// THEN ownership conflict alert is shown
-					ownership_conflict_alert_is_shown.fulfill()
-					return .dismissed
-				}
-			}
-
-			await self.nearFutureFulfillment(of: ownership_conflict_alert_is_shown)
-		}
-	}
 }
 
 // MARK: - ProfileStoreAsyncSequenceTests
@@ -1103,7 +1013,7 @@ extension ProfileStoreExistingProfileTests {
 	private func doTestMismatch(
 		savedProfile: Profile,
 		userDefaults: UserDefaults.Dependency = .ephemeral(),
-		action: OverlayWindowClient.Item.AlertAction,
+		action: OverlayWindowClient.FullScreenAction,
 		then: @escaping @Sendable (inout DependencyValues) -> Void = { _ in },
 		result assertResult: @escaping @Sendable (Profile) -> Void = { _ in }
 	) async throws {
@@ -1120,16 +1030,15 @@ extension ProfileStoreExistingProfileTests {
 				then(&$0)
 			} operation: { [self] in
 				let sut = ProfileStore.init()
-				await sut.unlockedApp() // must unlock to allow alert to be displayed
 				// The scheduling of the alert needs some time...
 				await nearFutureFulfillment(of: alertScheduled)
 				return await sut.profile
 			}
 
 			func when(_ d: inout DependencyValues) {
-				d.overlayWindowClient.scheduleAlertAwaitAction = { alert in
+				d.overlayWindowClient.scheduleFullScreen = { screen in
 					XCTAssertNoDifference(
-						alert.message, TextState(overlayClientProfileStoreOwnershipConflictTextState)
+						screen, .init(root: .claimWallet(.init()))
 					)
 					alertScheduled.fulfill()
 					return action

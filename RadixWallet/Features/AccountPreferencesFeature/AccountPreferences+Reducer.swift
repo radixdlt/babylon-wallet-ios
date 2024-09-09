@@ -25,7 +25,6 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case task
-		case qrCodeButtonTapped
 		case rowTapped(AccountPreferences.Section.SectionRow)
 		case hideAccountTapped
 		case faucetButtonTapped
@@ -47,31 +46,21 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	public struct Destination: DestinationReducer {
 		@CasePathable
 		public enum State: Hashable, Sendable {
-			case showQR(ShowQR.State)
 			case updateAccountLabel(UpdateAccountLabel.State)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.State)
 			case devPreferences(DevAccountPreferences.State)
-			case confirmHideAccount(AlertState<Action.ConfirmHideAccountAlert>)
+			case hideAccount
 		}
 
 		@CasePathable
 		public enum Action: Equatable, Sendable {
-			case showQR(ShowQR.Action)
 			case updateAccountLabel(UpdateAccountLabel.Action)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.Action)
 			case devPreferences(DevAccountPreferences.Action)
-			case confirmHideAccount(ConfirmHideAccountAlert)
-
-			public enum ConfirmHideAccountAlert: Hashable, Sendable {
-				case confirmTapped
-				case cancelTapped
-			}
+			case hideAccount(ConfirmationAction)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.showQR, action: /Action.showQR) {
-				ShowQR()
-			}
 			Scope(state: /State.updateAccountLabel, action: /Action.updateAccountLabel) {
 				UpdateAccountLabel()
 			}
@@ -114,22 +103,11 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			}
 			.merge(with: state.isOnMainnet ? .none : loadIsAllowedToUseFaucet(&state))
 
-		case .qrCodeButtonTapped:
-			state.destination = .showQR(.init(accountAddress: state.account.address))
-			return .none
-
 		case let .rowTapped(row):
 			return destination(for: row, &state)
 
 		case .hideAccountTapped:
-			state.destination = .confirmHideAccount(.init(
-				title: .init(L10n.AccountSettings.hideThisAccount),
-				message: .init(L10n.AccountSettings.hideAccountConfirmation),
-				buttons: [
-					.default(.init(L10n.Common.continue), action: .send(.confirmTapped)),
-					.cancel(.init(L10n.Common.cancel), action: .send(.cancelTapped)),
-				]
-			))
+			state.destination = .hideAccount
 			return .none
 
 		case .faucetButtonTapped:
@@ -175,41 +153,32 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case .showQR(.delegate(.dismiss)):
-			if case .showQR = state.destination {
-				state.destination = nil
-			}
-			return .none
-		case .showQR:
-			return .none
 		case .updateAccountLabel(.delegate(.accountLabelUpdated)),
 		     .thirdPartyDeposits(.delegate(.accountUpdated)):
 			state.destination = nil
-			return .none
-		case .updateAccountLabel:
-			return .none
-		case .thirdPartyDeposits:
 			return .none
 		#if DEBUG
 		case .devPreferences(DevAccountPreferences.Action.delegate(.debugOnlyAccountWasDeleted)):
 			return .send(.delegate(.accountHidden))
 		#endif
-		case .devPreferences:
+		case .hideAccount(.confirm):
+			state.destination = nil
+			return hideAccountEffect(state: state)
+		case .hideAccount(.cancel):
+			state.destination = nil
 			return .none
-		case let .confirmHideAccount(action):
-			switch action {
-			case .confirmTapped:
-				return .run { [account = state.account] send in
-					try await entitiesVisibilityClient.hide(account: account)
-					overlayWindowClient.scheduleHUD(.accountHidden)
-					await send(.delegate(.accountHidden))
-				} catch: { error, _ in
-					errorQueue.schedule(error)
-				}
-			case .cancelTapped:
-				break
-			}
+		default:
 			return .none
+		}
+	}
+
+	private func hideAccountEffect(state: State) -> Effect<Action> {
+		.run { [account = state.account] send in
+			try await entitiesVisibilityClient.hideAccount(account.id)
+			overlayWindowClient.scheduleHUD(.accountHidden)
+			await send(.delegate(.accountHidden))
+		} catch: { error, _ in
+			errorQueue.schedule(error)
 		}
 	}
 }

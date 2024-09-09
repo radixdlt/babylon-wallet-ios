@@ -1,3 +1,4 @@
+import CloudKit
 import ComposableArchitecture
 import SwiftUI
 
@@ -9,7 +10,14 @@ public struct SelectBackup: Sendable, FeatureReducer {
 			case migrating
 			case loading
 			case loaded
-			case failed
+			case failed(FailureReason)
+
+			public enum FailureReason: Sendable {
+				case networkUnavailable
+				case accountTemporarilyUnavailable
+				case notAuthenticated
+				case other
+			}
 		}
 
 		public var status: Status = .start
@@ -76,7 +84,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case selectedProfile(Profile, isInCloud: Bool, containsLegacyP2PLinks: Bool)
+		case selectedProfile(Profile, containsLegacyP2PLinks: Bool)
 		case backToStartOfOnboarding
 		case profileCreatedFromImportedBDFS
 	}
@@ -123,7 +131,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 			return .run { send in
 				do {
 					let backedUpProfile = try await cloudBackupClient.loadProfile(profileID)
-					await send(.delegate(.selectedProfile(backedUpProfile.profile, isInCloud: true, containsLegacyP2PLinks: backedUpProfile.containsLegacyP2PLinks)))
+					await send(.delegate(.selectedProfile(backedUpProfile.profile, containsLegacyP2PLinks: backedUpProfile.containsLegacyP2PLinks)))
 				} catch {
 					errorQueue.schedule(error)
 				}
@@ -140,6 +148,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		case let .profileImportResult(.success(profileURL)):
 			do {
 				guard profileURL.startAccessingSecurityScopedResource() else {
+					struct LackedPermissionToAccessSecurityScopedResource: Error {}
 					throw LackedPermissionToAccessSecurityScopedResource()
 				}
 				defer { profileURL.stopAccessingSecurityScopedResource() }
@@ -152,7 +161,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 				case let .plaintext(profile):
 					let containsP2PLinks = Profile.checkIfProfileJsonContainsLegacyP2PLinks(contents: data)
-					return .send(.delegate(.selectedProfile(profile, isInCloud: false, containsLegacyP2PLinks: containsP2PLinks)))
+					return .send(.delegate(.selectedProfile(profile, containsLegacyP2PLinks: containsP2PLinks)))
 				}
 			} catch {
 				errorQueue.schedule(error)
@@ -206,7 +215,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		case let .inputEncryptionPassword(.delegate(.successfullyDecrypted(_, decrypted, containsP2PLinks))):
 			state.destination = nil
 			overlayWindowClient.scheduleHUD(.decryptedProfile)
-			return .send(.delegate(.selectedProfile(decrypted, isInCloud: false, containsLegacyP2PLinks: containsP2PLinks)))
+			return .send(.delegate(.selectedProfile(decrypted, containsLegacyP2PLinks: containsP2PLinks)))
 
 		case .inputEncryptionPassword(.delegate(.successfullyEncrypted)):
 			preconditionFailure("Incorrect implementation, expected decryption")
@@ -227,8 +236,8 @@ public struct SelectBackup: Sendable, FeatureReducer {
 				await send(.internal(.setStatus(.migrating)))
 				_ = try await cloudBackupClient.migrateProfilesFromKeychain()
 
-				await send(.internal(.loadedThisDeviceID(
-					cloudBackupClient.loadDeviceID()
+				try await send(.internal(.loadedThisDeviceID(
+					secureStorageClient.loadDeviceInfo()?.id
 				)))
 
 				await send(.internal(.setStatus(.loading)))
@@ -239,9 +248,21 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 				await send(.internal(.setStatus(.loaded)))
 			} catch {
-				errorQueue.schedule(error)
+				let reason: State.Status.FailureReason
+				switch error {
+				case CKError.accountTemporarilyUnavailable:
+					reason = .accountTemporarilyUnavailable
+				case CKError.notAuthenticated:
+					reason = .notAuthenticated
+				case CKError.networkUnavailable, CKError.networkFailure:
+					reason = .networkUnavailable
+				default:
+					reason = .other
+					errorQueue.schedule(error)
+				}
+
 				loggerGlobal.error("Failed to migrate or load backed up profiles, error: \(error)")
-				await send(.internal(.setStatus(.failed)))
+				await send(.internal(.setStatus(.failed(reason))))
 			}
 		}
 	}

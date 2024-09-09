@@ -38,11 +38,13 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 	let secondaryHeading: String?
 	let placeholder: String
 	let text: Binding<String>
-	let hint: Hint?
+	let hint: Hint.ViewState?
 	let focus: Focus?
 	let showClearButton: Bool
 	let accessory: Accessory
 	let innerAccesory: InnerAccessory
+
+	@State private var isFocused: Bool = false
 
 	public init(
 		useSecureField: Bool = false,
@@ -51,7 +53,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 		secondaryHeading: String? = nil,
 		placeholder: String,
 		text: Binding<String>,
-		hint: Hint? = nil,
+		hint: Hint.ViewState? = nil,
 		focus: Focus,
 		showClearButton: Bool = false,
 		@ViewBuilder accessory: () -> Accessory = { EmptyView() },
@@ -77,7 +79,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 		secondaryHeading: String? = nil,
 		placeholder: String,
 		text: Binding<String>,
-		hint: Hint? = nil,
+		hint: Hint.ViewState? = nil,
 		showClearButton: Bool = false,
 		@ViewBuilder accessory: () -> Accessory = { EmptyView() },
 		@ViewBuilder innerAccessory: () -> InnerAccessory = { EmptyView() }
@@ -97,30 +99,32 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 
 	public var body: some View {
 		HStack(alignment: .textFieldAlignment, spacing: 0) {
-			VStack(alignment: .leading, spacing: .small3) {
-				HStack(spacing: 0) {
-					if let primaryHeading {
-						VStack(alignment: .leading, spacing: 0) {
-							Text(primaryHeading.text)
-								.textStyle(primaryHeading.isProminent ? .body1HighImportance : .body2Regular)
-								.foregroundColor(primaryHeading.isProminent && isEnabled ? accentColor(border: false) : .app.gray2)
-								.multilineTextAlignment(.leading)
-							if let subHeading {
-								Text(subHeading)
-									.textStyle(.body2Regular)
-									.foregroundColor(.app.gray2)
-									.multilineTextAlignment(.trailing)
+			VStack(alignment: .leading, spacing: Constants.appTextFieldSpacing) {
+				if primaryHeading != nil || secondaryHeading != nil {
+					HStack(spacing: 0) {
+						if let primaryHeading {
+							VStack(alignment: .leading, spacing: 0) {
+								Text(primaryHeading.text)
+									.textStyle(primaryHeading.isProminent ? .body1HighImportance : .body2Regular)
+									.foregroundColor(primaryHeading.isProminent && isEnabled ? accentColor(isFocused: true) : .app.gray2)
+									.multilineTextAlignment(.leading)
+								if let subHeading {
+									Text(subHeading)
+										.textStyle(.body2Regular)
+										.foregroundColor(.app.gray2)
+										.multilineTextAlignment(.trailing)
+								}
 							}
 						}
-					}
 
-					Spacer(minLength: 0)
+						Spacer(minLength: 0)
 
-					if let secondaryHeading {
-						Text(secondaryHeading)
-							.textStyle(.body2Regular)
-							.foregroundColor(.app.gray2)
-							.multilineTextAlignment(.trailing)
+						if let secondaryHeading {
+							Text(secondaryHeading)
+								.textStyle(.body2Regular)
+								.foregroundColor(.app.gray2)
+								.multilineTextAlignment(.trailing)
+						}
 					}
 				}
 
@@ -132,7 +136,9 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 							TextField(
 								placeholder,
 								text: text.removeDuplicates()
-							)
+							) { value in
+								isFocused = value
+							}
 						}
 					}
 					.modifier { view in
@@ -162,17 +168,18 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 
 					innerAccesory
 				}
-				.padding([.top, .bottom])
-				.padding([.leading, .trailing], 6)
+				.padding(.medium3)
 				.frame(height: .standardButtonHeight)
 				.background(Color.app.gray5)
 				.cornerRadius(.small2)
 				.overlay(
 					RoundedRectangle(cornerRadius: .small2)
-						.stroke(accentColor(border: !isEnabled), lineWidth: 1)
+						.stroke(accentColor(isFocused: isFocused), lineWidth: 1)
 				)
 
-				hint
+				if let hint {
+					Hint(viewState: hint)
+				}
 			}
 
 			accessory
@@ -180,15 +187,13 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 		}
 	}
 
-	private func accentColor(border: Bool) -> Color {
-		switch hint?.viewState.kind {
-		case .none:
-			border ? .app.gray4 : .app.gray1
-		case .info:
-			.app.gray1
+	private func accentColor(isFocused: Bool) -> Color {
+		switch hint?.kind {
+		case .none, .info:
+			isFocused ? .app.gray1 : .app.gray4
 		case .error:
 			.app.red1
-		case .warning:
+		case .warning, .detail:
 			.app.alert
 		}
 	}
@@ -202,6 +207,10 @@ extension VerticalAlignment {
 	}
 
 	fileprivate static let textFieldAlignment = VerticalAlignment(TextFieldAlignment.self)
+}
+
+extension Constants {
+	static let appTextFieldSpacing: CGFloat = .small1
 }
 
 #if DEBUG

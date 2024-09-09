@@ -6,13 +6,16 @@ struct Completion: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		let txID: IntentHash?
 		let dappMetadata: DappMetadata
+		let p2pRoute: P2P.Route
 
 		init(
 			txID: IntentHash?,
-			dappMetadata: DappMetadata
+			dappMetadata: DappMetadata,
+			p2pRoute: P2P.Route
 		) {
 			self.txID = txID
 			self.dappMetadata = dappMetadata
+			self.p2pRoute = p2pRoute
 		}
 	}
 

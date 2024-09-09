@@ -6,7 +6,7 @@ import SwiftUI
 struct Login: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		let dappMetadata: DappMetadata
-		let loginRequest: P2P.Dapp.Request.AuthLoginRequestItem
+		let loginRequest: DappToWalletInteractionAuthRequestItem
 
 		var personaPrimacy: PersonaPrimacy? = nil
 
@@ -21,7 +21,7 @@ struct Login: Sendable, FeatureReducer {
 
 		init(
 			dappMetadata: DappMetadata,
-			loginRequest: P2P.Dapp.Request.AuthLoginRequestItem,
+			loginRequest: DappToWalletInteractionAuthRequestItem,
 			personaPrimacy: PersonaPrimacy? = nil
 		) {
 			self.dappMetadata = dappMetadata
@@ -38,8 +38,11 @@ struct Login: Sendable, FeatureReducer {
 	}
 
 	enum InternalAction: Sendable, Equatable {
+		typealias SelectedPersonaID = IdentityAddress
+
 		case personasLoaded(
 			Personas,
+			SelectedPersonaID?,
 			AuthorizedDapp?,
 			AuthorizedPersonaSimple?
 		)
@@ -76,7 +79,7 @@ struct Login: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			return loadPersonas(state: &state).concatenate(with: determinePersonaPrimacy())
+			return loadPersonas(state: state).concatenate(with: determinePersonaPrimacy())
 
 		case let .selectedPersonaChanged(persona):
 			state.selectedPersona = persona
@@ -91,7 +94,7 @@ struct Login: Sendable, FeatureReducer {
 
 		case let .continueButtonTapped(persona):
 			let authorizedPersona = state.authorizedDapp?.referencesToAuthorizedPersonas.first(where: { $0.id == persona.id })
-			guard case let .withChallenge(loginWithChallenge) = state.loginRequest else {
+			guard case let .loginWithChallenge(loginWithChallenge) = state.loginRequest else {
 				return .send(.delegate(.continueButtonTapped(persona, state.authorizedDapp, authorizedPersona, nil)))
 			}
 
@@ -123,7 +126,7 @@ struct Login: Sendable, FeatureReducer {
 			state.personaPrimacy = personaPrimacy
 			return .none
 
-		case let .personasLoaded(personas, authorizedDapp, authorizedPersonaSimple):
+		case let .personasLoaded(personas, selectedPersonaID, authorizedDapp, authorizedPersonaSimple):
 			let lastLoggedInPersona: Persona? = if let authorizedPersonaSimple {
 				personas[id: authorizedPersonaSimple.identityAddress]
 			} else {
@@ -145,22 +148,29 @@ struct Login: Sendable, FeatureReducer {
 			}
 			state.authorizedDapp = authorizedDapp
 			state.authorizedPersona = authorizedPersonaSimple
+
+			if let selectedPersona = state.personas.first(where: { $0.id == selectedPersonaID }) {
+				state.selectedPersona = selectedPersona
+			} else if state.selectedPersona == nil {
+				state.selectedPersona = state.personas.first
+			}
+
 			return .none
 		}
 	}
 
 	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case .createPersonaCoordinator(.presented(.delegate(.completed))):
+		case let .createPersonaCoordinator(.presented(.delegate(.completed(persona)))):
 			state.personaPrimacy = .notFirstOnCurrentNetwork
-			return loadPersonas(state: &state)
+			return loadPersonas(state: state, selectedPersonaID: persona.id)
 
 		default:
 			return .none
 		}
 	}
 
-	func loadPersonas(state: inout State) -> Effect<Action> {
+	func loadPersonas(state: State, selectedPersonaID: IdentityAddress? = nil) -> Effect<Action> {
 		.run { [dAppDefinitionAddress = state.dappMetadata.dAppDefinitionAddress] send in
 			let personas = try await personasClient.getPersonas()
 			let authorizedDapps = try await authorizedDappsClient.getAuthorizedDapps()
@@ -182,7 +192,7 @@ struct Login: Sendable, FeatureReducer {
 					}
 				}
 			}()
-			await send(.internal(.personasLoaded(personas, authorizedDapp, authorizedPersona)))
+			await send(.internal(.personasLoaded(personas, selectedPersonaID, authorizedDapp, authorizedPersona)))
 		}
 	}
 
@@ -199,7 +209,7 @@ extension DappMetadata {
 	var dAppDefinitionAddress: DappDefinitionAddress {
 		switch self {
 		case let .ledger(metadata): metadata.dAppDefinintionAddress
-		case let .request(metadata): metadata.dAppDefinitionAddress
+		case let .request(metadata): metadata.dappDefinitionAddress
 		case .wallet: .wallet
 		}
 	}

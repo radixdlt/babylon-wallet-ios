@@ -25,14 +25,14 @@ public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 				if config.personaPrimacy.isFirstEver {
 					self.root = .step0_introduction(.init())
 				} else {
-					self.root = .step1_newPersonaInfo(.init(config: config))
+					self.root = .step1_createPersona(.init(mode: .create))
 				}
 			}
 		}
 
 		var shouldDisplayNavBar: Bool {
 			switch path.last {
-			case .step0_introduction, .step1_newPersonaInfo:
+			case .step0_introduction, .step1_createPersona:
 				true
 			case .step2_completion:
 				false
@@ -43,42 +43,46 @@ public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 	}
 
 	public struct Path: Sendable, Reducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case step0_introduction(IntroductionToPersonas.State)
-			case step1_newPersonaInfo(NewPersonaInfo.State)
+			case step1_createPersona(EditPersona.State)
 			case step2_completion(NewPersonaCompletion.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case step0_introduction(IntroductionToPersonas.Action)
-			case step1_newPersonaInfo(NewPersonaInfo.Action)
+			case step1_createPersona(EditPersona.Action)
 			case step2_completion(NewPersonaCompletion.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.step0_introduction, action: /Action.step0_introduction) {
+			Scope(state: \.step0_introduction, action: \.step0_introduction) {
 				IntroductionToPersonas()
 			}
-			Scope(state: /State.step1_newPersonaInfo, action: /Action.step1_newPersonaInfo) {
-				NewPersonaInfo()
+			Scope(state: \.step1_createPersona, action: \.step1_createPersona) {
+				EditPersona()
 			}
-			Scope(state: /State.step2_completion, action: /Action.step2_completion) {
+			Scope(state: \.step2_completion, action: \.step2_completion) {
 				NewPersonaCompletion()
 			}
 		}
 	}
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case derivePublicKey(DerivePublicKeys.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Hashable {
 			case derivePublicKey(DerivePublicKeys.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.derivePublicKey, action: /Action.derivePublicKey) {
+			Scope(state: \.derivePublicKey, action: \.derivePublicKey) {
 				DerivePublicKeys()
 			}
 		}
@@ -95,7 +99,7 @@ public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case dismissed
-		case completed
+		case completed(Persona)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -141,20 +145,20 @@ extension CreatePersonaCoordinator {
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .root(.step0_introduction(.delegate(.done))):
-			state.path.append(.step1_newPersonaInfo(.init(config: state.config)))
+			state.path.append(.step1_createPersona(.init(mode: .create)))
 			return .none
 
 		case
-			let .root(.step1_newPersonaInfo(.delegate(.proceed(name, fields)))),
-			let .path(.element(_, action: .step1_newPersonaInfo(.delegate(.proceed(name, fields))))):
+			let .root(.step1_createPersona(.delegate(.personaInfoSet(name, fields)))),
+			let .path(.element(_, action: .step1_createPersona(.delegate(.personaInfoSet(name, fields))))):
 			state.name = name
 			state.fields = fields
 
 			return .send(.internal(.derivePublicKey))
 
-		case .path(.element(_, action: .step2_completion(.delegate(.completed)))):
+		case let .path(.element(_, action: .step2_completion(.delegate(.completed(persona))))):
 			return .run { send in
-				await send(.delegate(.completed))
+				await send(.delegate(.completed(persona)))
 				await dismiss()
 			}
 

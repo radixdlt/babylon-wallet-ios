@@ -13,12 +13,12 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case local(LocalInteractionResponseItem)
 		}
 
-		typealias RemoteInteraction = P2P.Dapp.Request
-		typealias RemoteInteractionItem = P2P.Dapp.Request.AnyInteractionItem
-		typealias RemoteInteractionResponseItem = P2P.Dapp.Response.WalletInteractionSuccessResponse.AnyInteractionResponseItem
+		typealias RemoteInteraction = DappToWalletInteraction
+		typealias RemoteInteractionItem = DappToWalletInteraction.AnyInteractionItem
+		typealias RemoteInteractionResponseItem = WalletToDappInteractionSuccessResponse.AnyInteractionResponseItem
 
 		enum LocalInteractionItem: Sendable, Hashable {
-			case accountPermissionRequested(DappInteraction.NumberOfAccounts)
+			case accountPermissionRequested(DappInteractionNumberOfAccounts)
 		}
 
 		enum LocalInteractionResponseItem: Sendable, Hashable {
@@ -27,6 +27,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 		let dappMetadata: DappMetadata
 		let remoteInteraction: RemoteInteraction
+		let p2pRoute: P2P.Route
 		var persona: Persona?
 		var authorizedDapp: AuthorizedDapp?
 		var authorizedPersona: AuthorizedPersonaSimple?
@@ -53,10 +54,12 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 		init?(
 			dappMetadata: DappMetadata,
-			interaction remoteInteraction: RemoteInteraction
+			interaction remoteInteraction: RemoteInteraction,
+			p2pRoute: P2P.Route
 		) {
 			self.dappMetadata = dappMetadata
 			self.remoteInteraction = remoteInteraction
+			self.p2pRoute = p2pRoute
 
 			if let interactionItems = NonEmpty(rawValue: OrderedSet<AnyInteractionItem>(for: remoteInteraction.erasedItems)) {
 				self.interactionItems = interactionItems
@@ -64,7 +67,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 					for: interactionItems.first,
 					interaction: remoteInteraction,
 					dappMetadata: dappMetadata,
-					persona: nil
+					persona: nil,
+					p2pRoute: p2pRoute
 				)
 			} else {
 				return nil
@@ -85,7 +89,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 	enum InternalAction: Sendable, Equatable {
 		case usePersona(
-			P2P.Dapp.Request.AuthUsePersonaRequestItem,
+			DappToWalletInteractionAuthUsePersonaRequestItem,
 			Persona,
 			AuthorizedDapp,
 			AuthorizedPersonaSimple
@@ -97,7 +101,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		struct AutofillOngoingResponseItemsPayload: Sendable, Equatable {
 			struct AccountsPayload: Sendable, Equatable {
 				var requestItem: DappInteractionFlow.State.AnyInteractionItem
-				var numberOfAccountsRequested: DappInteraction.NumberOfAccounts
+				var numberOfAccountsRequested: DappInteractionNumberOfAccounts
 				var accounts: [Account]
 			}
 
@@ -108,7 +112,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 		case failedToUpdatePersonaAtEndOfFlow(
 			persona: Persona,
-			response: P2P.Dapp.Response.WalletInteractionSuccessResponse,
+			response: WalletToDappInteractionSuccessResponse,
 			metadata: DappMetadata
 		)
 	}
@@ -119,9 +123,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case dismissWithFailure(P2P.Dapp.Response.WalletInteractionFailureResponse)
+		case dismissWithFailure(WalletToDappInteractionFailureResponse)
 		case dismissWithSuccess(DappMetadata, IntentHash)
-		case submit(P2P.Dapp.Response.WalletInteractionSuccessResponse, DappMetadata)
+		case submit(WalletToDappInteractionSuccessResponse, DappMetadata)
 		case dismiss
 	}
 
@@ -316,7 +320,7 @@ extension DappInteractionFlow {
 			state.authorizedDapp = authorizedDapp
 			state.authorizedPersona = authorizedPersona
 
-			let responsePersona = P2P.Dapp.Response.PersonaResponse(
+			let responsePersona = DappWalletInteractionPersona(
 				identityAddress: persona.address,
 				label: persona.displayName.value
 			)
@@ -329,18 +333,18 @@ extension DappInteractionFlow {
 				else {
 					return dismissEffect(for: state, errorKind: .failedToSignAuthChallenge, message: "Failed to serialize signature")
 				}
-				let proof = P2P.Dapp.Response.AuthProof(entitySignature: entitySignature)
+				let proof = WalletToDappInteractionAuthProof(entitySignature: entitySignature)
 
-				state.responseItems[item] = .remote(.auth(.login(.withChallenge(.init(
+				state.responseItems[item] = .remote(.auth(.loginWithChallenge(.init(
 					persona: responsePersona,
 					challenge: signedAuthChallenge.challenge,
 					proof: proof
-				)))))
+				))))
 
 			} else {
-				state.responseItems[item] = .remote(.auth(.login(.withoutChallenge(.init(
+				state.responseItems[item] = .remote(.auth(.loginWithoutChallenge(.init(
 					persona: responsePersona
-				)))))
+				))))
 			}
 
 			resetOngoingResponseItemsIfNeeded(for: &state)
@@ -376,20 +380,20 @@ extension DappInteractionFlow {
 				return .none
 			}
 			state.persona = persona
-			let responsePersona = P2P.Dapp.Response.PersonaResponse(persona: persona)
+			let responsePersona = DappWalletInteractionPersona(persona: persona)
 			for (request, response) in state.responseItems {
 				// NB: native case paths should simplify this mutation logic a lot
 				switch response {
-				case let .remote(.auth(.login(.withChallenge(item)))):
-					state.responseItems[request] = .remote(.auth(.login(.withChallenge(.init(
+				case let .remote(.auth(.loginWithChallenge(item))):
+					state.responseItems[request] = .remote(.auth(.loginWithChallenge(.init(
 						persona: responsePersona,
 						challenge: item.challenge,
 						proof: item.proof
-					)))))
-				case .remote(.auth(.login(.withoutChallenge))):
-					state.responseItems[request] = .remote(.auth(.login(.withoutChallenge(.init(
+					))))
+				case .remote(.auth(.loginWithoutChallenge)):
+					state.responseItems[request] = .remote(.auth(.loginWithoutChallenge(.init(
 						persona: responsePersona
-					)))))
+					))))
 				case .remote(.auth(.usePersona)):
 					state.responseItems[request] = .remote(.auth(.usePersona(.init(
 						persona: responsePersona
@@ -405,7 +409,7 @@ extension DappInteractionFlow {
 			_ item: State.AnyInteractionItem,
 			_ txID: IntentHash
 		) -> Effect<Action> {
-			state.responseItems[item] = .remote(.send(.init(txID: txID)))
+			state.responseItems[item] = .remote(.send(.init(transactionIntentHash: txID)))
 			return continueEffect(for: &state)
 		}
 
@@ -535,7 +539,7 @@ extension DappInteractionFlow {
 				guard let persona = allPersonas[id: authorizedPersonaID] else { return nil }
 
 				guard
-					let responseItem = try? P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem(
+					let responseItem = try? WalletToDappInteractionPersonaDataRequestResponseItem(
 						personaDataRequested: personaDataRequested,
 						personaData: persona.personaData
 					)
@@ -575,8 +579,8 @@ extension DappInteractionFlow {
 // MARK: - DappInteractionFlow.InternalAction.AutofillOngoingResponseItemsPayload.PersonaDataPayload
 extension DappInteractionFlow.InternalAction.AutofillOngoingResponseItemsPayload {
 	struct PersonaDataPayload: Sendable, Equatable {
-		var personaDataRequested: P2P.Dapp.Request.PersonaDataRequestItem
-		var responseItem: P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem
+		var personaDataRequested: DappToWalletInteractionPersonaDataRequestItem
+		var responseItem: WalletToDappInteractionPersonaDataRequestResponseItem
 	}
 }
 
@@ -603,7 +607,7 @@ extension DappInteractionFlow {
 	func setAccountsResponse(
 		to item: State.AnyInteractionItem,
 		accessKind: AccountPermissionChooseAccounts.State.AccessKind,
-		chosenAccounts: P2P.Dapp.Response.Accounts,
+		chosenAccounts: WalletToDappInteractionResponse.Accounts,
 		into state: inout State
 	) {
 		switch accessKind {
@@ -621,7 +625,8 @@ extension DappInteractionFlow {
 				for: nextRequest,
 				interaction: state.remoteInteraction,
 				dappMetadata: state.dappMetadata,
-				persona: state.persona
+				persona: state.persona,
+				p2pRoute: state.p2pRoute
 			)
 		{
 			if state.root == nil {
@@ -640,7 +645,7 @@ extension DappInteractionFlow {
 	}
 
 	func finishInteractionFlow(_ state: State) -> Effect<Action> {
-		guard let response = P2P.Dapp.Response.WalletInteractionSuccessResponse(
+		guard let response = WalletToDappInteractionSuccessResponse(
 			for: state.remoteInteraction,
 			with: state.responseItems.values.compactMap(/State.AnyInteractionResponseItem.remote)
 		) else {
@@ -673,7 +678,7 @@ extension DappInteractionFlow {
 	func updatePersona(
 		_ persona: Persona,
 		_ state: State,
-		responseItems: P2P.Dapp.Response.WalletInteractionSuccessResponse.Items
+		responseItems: WalletToDappInteractionResponseItems
 	) async throws {
 		let networkID = await gatewaysClient.getCurrentNetworkID()
 		var authorizedDapp: AuthorizedDapp = state.authorizedDapp ?? AuthorizedDapp(
@@ -685,14 +690,15 @@ extension DappInteractionFlow {
 				case .request, .wallet: nil
 				}
 			}(),
-			referencesToAuthorizedPersonas: []
+			referencesToAuthorizedPersonas: [],
+			preferences: .init(deposits: .visible)
 		)
 		// This extraction is really verbose right now, but it should become a lot simpler with native case paths
-		let sharedAccountsInfo: (P2P.Dapp.Request.NumberOfAccounts, [P2P.Dapp.Response.WalletAccount])? = unwrap(
+		let sharedAccountsInfo: (DappInteractionNumberOfAccounts, [WalletInteractionWalletAccount])? = unwrap(
 			// request
 			{
 				switch state.remoteInteraction.items {
-				case let .request(.authorized(items)):
+				case let .authorizedRequest(items):
 					items.ongoingAccounts?.numberOfAccounts
 				default:
 					nil
@@ -701,7 +707,7 @@ extension DappInteractionFlow {
 			// response
 			{
 				switch responseItems {
-				case let .request(.authorized(items)):
+				case let .authorizedRequest(items):
 					items.ongoingAccounts?.accounts
 				default:
 					nil
@@ -709,11 +715,11 @@ extension DappInteractionFlow {
 			}()
 		)
 
-		let sharedPersonaDataInfo: (P2P.Dapp.Request.PersonaDataRequestItem, P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem)? = unwrap(
+		let sharedPersonaDataInfo: (DappToWalletInteractionPersonaDataRequestItem, WalletToDappInteractionPersonaDataRequestResponseItem)? = unwrap(
 			// request
 			{
 				switch state.remoteInteraction.items {
-				case let .request(.authorized(items)):
+				case let .authorizedRequest(items):
 					items.ongoingPersonaData
 				default: nil
 				}
@@ -721,7 +727,7 @@ extension DappInteractionFlow {
 			// response
 			{
 				switch responseItems {
-				case let .request(.authorized(items)):
+				case let .authorizedRequest(items):
 					items.ongoingPersonaData
 				default:
 					nil
@@ -780,18 +786,18 @@ extension DappInteractionFlow {
 
 	func goBackEffect(for state: inout State) -> Effect<Action> {
 		state.responseItems.removeLast()
-		state.path.removeLast()
+		_ = state.path.popLast()
 		return .none
 	}
 
 	func dismissEffect(
 		for state: State,
-		errorKind: P2P.Dapp.Response.WalletInteractionFailureResponse.ErrorType,
+		errorKind: DappWalletInteractionErrorType,
 		message: String?
 	) -> Effect<Action> {
 		.send(.delegate(.dismissWithFailure(.init(
-			interactionId: state.remoteInteraction.id,
-			errorType: errorKind,
+			interactionId: state.remoteInteraction.interactionId,
+			error: errorKind,
 			message: message
 		))))
 	}
@@ -833,17 +839,21 @@ extension DappInteractionFlow.Path.State {
 		for anyItem: DappInteractionFlow.State.AnyInteractionItem,
 		interaction: DappInteractionFlow.State.RemoteInteraction,
 		dappMetadata: DappMetadata,
-		persona: Persona?
+		persona: Persona?,
+		p2pRoute: P2P.Route
 	) {
 		self.item = anyItem
 		switch anyItem {
-		case .remote(.auth(.usePersona)):
-			return nil
-		case let .remote(.auth(.login(loginRequest))):
-			self.state = .login(.init(
-				dappMetadata: dappMetadata,
-				loginRequest: loginRequest
-			))
+		case let .remote(.auth(request)):
+			switch request {
+			case .loginWithChallenge, .loginWithoutChallenge:
+				self.state = .login(.init(
+					dappMetadata: dappMetadata,
+					loginRequest: request
+				))
+			case .usePersona:
+				return nil
+			}
 
 		case let .local(.accountPermissionRequested(numberOfAccounts)):
 			self.state = .accountPermission(.init(
@@ -893,20 +903,21 @@ extension DappInteractionFlow.Path.State {
 				message: item.message.map {
 					Message.plaintext(string: $0)
 				} ?? Message.none,
-				waitsForTransactionToBeComitted: interaction.id.isWalletAccountDepositSettingsInteraction,
-				isWalletTransaction: interaction.id.isWalletInteraction,
-				proposingDappMetadata: dappMetadata.onLedger
+				waitsForTransactionToBeComitted: interaction.interactionId.isWalletAccountDepositSettingsInteraction,
+				isWalletTransaction: interaction.interactionId.isWalletInteraction,
+				proposingDappMetadata: dappMetadata.onLedger,
+				p2pRoute: p2pRoute
 			))
 		}
 	}
 }
 
 extension DappInteractionFlow.State {
-	var usePersonaRequestItem: P2P.Dapp.Request.AuthUsePersonaRequestItem? {
+	var usePersonaRequestItem: DappToWalletInteractionAuthUsePersonaRequestItem? {
 		// NB: this should become a one liner with native case paths:
 		// remoteInteractions.items[keyPath: \.request?.authorized?.auth?.usePersona?]
 		guard
-			case let .request(.authorized(item)) = remoteInteraction.items,
+			case let .authorizedRequest(item) = remoteInteraction.items,
 			case let .usePersona(item) = item.auth
 		else {
 			return nil
@@ -914,55 +925,55 @@ extension DappInteractionFlow.State {
 		return item
 	}
 
-	var resetRequestItem: P2P.Dapp.Request.ResetRequestItem? {
+	var resetRequestItem: DappToWalletInteractionResetRequestItem? {
 		// NB: this should become a one liner with native case paths:
 		// remoteInteractions.items[keyPath: \.request?.authorized?.reset]
 		guard
-			case let .request(.authorized(item)) = remoteInteraction.items
+			case let .authorizedRequest(item) = remoteInteraction.items
 		else {
 			return nil
 		}
 		return item.reset
 	}
 
-	var ongoingAccountsRequestItem: P2P.Dapp.Request.AccountsRequestItem? {
+	var ongoingAccountsRequestItem: DappToWalletInteractionAccountsRequestItem? {
 		// NB: this should become a one liner with native case paths:
 		// remoteInteractions.items[keyPath: \.request?.authorized?.ongoingAccounts]
 		guard
-			case let .request(.authorized(item)) = remoteInteraction.items
+			case let .authorizedRequest(item) = remoteInteraction.items
 		else {
 			return nil
 		}
 		return item.ongoingAccounts
 	}
 
-	var oneTimeAccountsRequestItem: P2P.Dapp.Request.AccountsRequestItem? {
+	var oneTimeAccountsRequestItem: DappToWalletInteractionAccountsRequestItem? {
 		// NB: this should become a one liner with native case paths:
 		// remoteInteractions.items[keyPath: \.request?.authorized?.oneTimeAccountsRequestItem]
 		guard
-			case let .request(.authorized(item)) = remoteInteraction.items
+			case let .authorizedRequest(item) = remoteInteraction.items
 		else {
 			return nil
 		}
 		return item.oneTimeAccounts
 	}
 
-	var oneTimePersonaDataRequestItem: P2P.Dapp.Request.PersonaDataRequestItem? {
+	var oneTimePersonaDataRequestItem: DappToWalletInteractionPersonaDataRequestItem? {
 		// NB: this should become a one liner with native case paths:
 		// remoteInteractions.items[keyPath: \.request?.authorized?.oneTimePersonaDataRequestItem]
 		guard
-			case let .request(.authorized(item)) = remoteInteraction.items
+			case let .authorizedRequest(item) = remoteInteraction.items
 		else {
 			return nil
 		}
 		return item.oneTimePersonaData
 	}
 
-	var ongoingPersonaDataRequestItem: P2P.Dapp.Request.PersonaDataRequestItem? {
+	var ongoingPersonaDataRequestItem: DappToWalletInteractionPersonaDataRequestItem? {
 		// NB: this should become a one liner with native case paths:
 		// remoteInteractions.items[keyPath: \.request?.authorized?.ongoingPersonaData]
 		guard
-			case let .request(.authorized(item)) = remoteInteraction.items
+			case let .authorizedRequest(item) = remoteInteraction.items
 		else {
 			return nil
 		}

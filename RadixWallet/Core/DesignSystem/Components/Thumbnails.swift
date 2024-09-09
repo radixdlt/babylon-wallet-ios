@@ -255,7 +255,6 @@ public struct LoadableImage<Placeholder: View>: View {
 		case .shimmer:
 			Color.app.gray4
 				.shimmer(active: true, config: .accountResourcesLoading)
-
 		case let .color(color):
 			color
 		case let .asset(imageAsset):

@@ -7,7 +7,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 		let dappMetadata: DappMetadata
 		var personas: IdentifiedArrayOf<PersonaDataPermissionBox.State> = []
 		var selectedPersona: PersonaDataPermissionBox.State?
-		let requested: P2P.Dapp.Request.PersonaDataRequestItem
+		let requested: DappToWalletInteractionPersonaDataRequestItem
 
 		var personaPrimacy: PersonaPrimacy? = nil
 
@@ -16,7 +16,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 
 		init(
 			dappMetadata: DappMetadata,
-			requested: P2P.Dapp.Request.PersonaDataRequestItem,
+			requested: DappToWalletInteractionPersonaDataRequestItem,
 			personaPrimacy: PersonaPrimacy? = nil
 		) {
 			self.dappMetadata = dappMetadata
@@ -30,7 +30,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 		case appeared
 		case selectedPersonaChanged(PersonaDataPermissionBox.State?)
 		case createNewPersonaButtonTapped
-		case continueButtonTapped(P2P.Dapp.Request.Response)
+		case continueButtonTapped(WalletToDappInteractionPersonaDataRequestResponseItem)
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -44,7 +44,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case personaUpdated(Persona)
-		case continueButtonTapped(P2P.Dapp.Request.Response)
+		case continueButtonTapped(WalletToDappInteractionPersonaDataRequestResponseItem)
 	}
 
 	public struct Destination: DestinationReducer {
@@ -150,8 +150,10 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 		case let .persona(id, .delegate(.edit)):
 			if let persona = state.personas[id: id] {
 				state.destination = .editPersona(.init(
-					mode: .dapp(requiredEntries: Set(state.requested.kindRequests.keys)),
-					persona: persona.persona
+					mode: .dapp(
+						persona: persona.persona,
+						requiredEntries: Set(state.requested.kindRequests.keys)
+					)
 				))
 			}
 			return .none

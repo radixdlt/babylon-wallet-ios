@@ -5,6 +5,7 @@ public struct ResourceBalanceButton: View {
 	public let viewState: ResourceBalance.ViewState
 	public let appearance: Appearance
 	public let isSelected: Bool?
+	public let warning: String?
 	public let onTap: () -> Void
 
 	public enum Appearance {
@@ -12,38 +13,63 @@ public struct ResourceBalanceButton: View {
 		case transactionReview
 	}
 
-	init(_ viewState: ResourceBalance.ViewState, appearance: Appearance, isSelected: Bool? = nil, onTap: @escaping () -> Void) {
+	init(
+		_ viewState: ResourceBalance.ViewState,
+		appearance: Appearance,
+		isSelected: Bool? = nil,
+		warning: String? = nil,
+		onTap: @escaping () -> Void
+	) {
 		self.viewState = viewState
 		self.appearance = appearance
 		self.isSelected = isSelected
+		self.warning = warning
 		self.onTap = onTap
 	}
 
 	public var body: some View {
-		HStack(alignment: .center, spacing: .small2) {
-			Button(action: onTap) {
-				ResourceBalanceView(viewState, appearance: viewAppearance, isSelected: isSelected)
-					.padding(.vertical, verticalSpacing)
-					.padding(.horizontal, horizontalSpacing)
-					.contentShape(Rectangle())
-					.background(background)
+		Button(action: onTap) {
+			VStack(alignment: .leading, spacing: .small2) {
+				ResourceBalanceView(viewState, appearance: .standard, isSelected: isSelected)
+
+				if let warning {
+					WarningErrorView(text: warning, type: .warning, useNarrowSpacing: true)
+				}
 			}
+			.padding(.top, topPadding)
+			.padding(.horizontal, horizontalSpacing)
+			.padding(.bottom, bottomPadding)
+			.contentShape(Rectangle())
+			.background(background)
 		}
 	}
 
-	private var viewAppearance: ResourceBalanceView.Appearance {
-		switch appearance {
-		case .assetList, .transactionReview:
-			.standard
-		}
-	}
-
-	private var verticalSpacing: CGFloat {
+	private var topPadding: CGFloat {
 		switch appearance {
 		case .assetList:
 			switch viewState {
-			case .fungible, .nonFungible:
+			case .fungible:
+				.medium1
+			case .nonFungible:
+				.large3
+			case .liquidStakeUnit:
+				.medium3
+			case .poolUnit, .stakeClaimNFT:
+				.medium1
+			}
+		case .transactionReview:
+			.medium2
+		}
+	}
+
+	private var bottomPadding: CGFloat {
+		switch appearance {
+		case .assetList:
+			switch viewState {
+			case .fungible:
 				.medium2
+			case .nonFungible:
+				.medium1
 			case .liquidStakeUnit, .poolUnit, .stakeClaimNFT:
 				.medium3
 			}
@@ -56,10 +82,14 @@ public struct ResourceBalanceButton: View {
 		switch appearance {
 		case .assetList:
 			switch viewState {
-			case .fungible, .nonFungible:
+			case .fungible:
 				.large3
-			case .liquidStakeUnit, .poolUnit, .stakeClaimNFT:
+			case .nonFungible:
+				.medium1
+			case .liquidStakeUnit:
 				.medium3
+			case .poolUnit, .stakeClaimNFT:
+				.medium2
 			}
 		case .transactionReview:
 			.medium2

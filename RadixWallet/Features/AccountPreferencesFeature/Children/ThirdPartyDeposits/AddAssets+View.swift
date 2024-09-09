@@ -15,11 +15,11 @@ extension AddAsset.State {
 				case .valid:
 					return .none
 				case .wrongNetwork:
-					return .error(L10n.AssetTransfer.Error.wrongNetwork)
+					return .iconError(L10n.AssetTransfer.Error.wrongNetwork)
 				case .alreadyAdded:
-					return .error(L10n.AssetTransfer.Error.resourceAlreadyAdded)
+					return .iconError(L10n.AssetTransfer.Error.resourceAlreadyAdded)
 				case .invalid:
-					return .error(L10n.AssetTransfer.ChooseReceivingAccount.invalidAddressError)
+					return .iconError(L10n.AssetTransfer.ChooseReceivingAccount.invalidAddressError)
 				}
 			}(),
 			resourceAddressFieldFocused: resourceAddressFieldFocused,
@@ -32,7 +32,7 @@ extension AddAsset {
 	public struct ViewState: Equatable {
 		let resourceAddress: String
 		let validatedResourceAddress: ResourceViewState.Address?
-		let addressHint: Hint?
+		let addressHint: Hint.ViewState?
 		let resourceAddressFieldFocused: Bool
 		let mode: ResourcesListMode
 	}
@@ -49,29 +49,29 @@ extension AddAsset {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: Action.view) { viewStore in
-				VStack {
-					CloseButton { viewStore.send(.closeTapped) }
-						.flushedLeft
+				VStack(spacing: .zero) {
+					VStack(spacing: .medium3) {
+						titleView(viewStore.mode.title)
+						instructionsView(viewStore.mode.instructions)
 
-					ScrollView {
-						VStack(spacing: .medium1) {
-							titleView(viewStore.mode.title)
-							instructionsView(viewStore.mode.instructions)
-
-							resourceAddressView(viewStore)
-							if case .allowDenyAssets = viewStore.mode {
-								depositListSelectionView(viewStore)
-							}
-							addAssetButton(viewStore)
+						resourceAddressView(viewStore)
+						if case .allowDenyAssets = viewStore.mode {
+							depositListSelectionView(viewStore)
 						}
-						.padding([.horizontal, .bottom], .medium1)
 					}
-					.scrollIndicators(.hidden)
+					Spacer()
 				}
+				.padding(.horizontal, .medium3)
+				.footer {
+					addAssetButton(viewStore)
+				}
+				.withNavigationBar {
+					viewStore.send(.closeTapped)
+				}
+				.presentationDetents([.fraction(viewStore.mode.detentsFraction)])
+				.presentationDragIndicator(.visible)
+				.presentationBackground(.blur)
 			}
-			.presentationDetents([.fraction(0.75)])
-			.presentationDragIndicator(.visible)
-			.presentationBackground(.blur)
 		}
 	}
 }
@@ -126,7 +126,7 @@ extension AddAsset.View {
 
 	@ViewBuilder
 	func depositExceptionSelectionView(_ exception: ResourcesListMode.ExceptionRule, _ viewStore: ViewStoreOf<AddAsset>) -> some SwiftUI.View {
-		HStack {
+		HStack(spacing: .small3) {
 			RadioButton(
 				appearance: .dark,
 				state: viewStore.mode.allowDenyAssets == exception ? .selected : .unselected
@@ -164,7 +164,7 @@ extension ResourcesListMode.ExceptionRule {
 	}
 }
 
-extension ResourcesListMode {
+private extension ResourcesListMode {
 	var allowDenyAssets: ResourcesListMode.ExceptionRule? {
 		guard case let .allowDenyAssets(type) = self else {
 			return nil
@@ -187,6 +187,15 @@ extension ResourcesListMode {
 			L10n.AccountSettings.SpecificAssetsDeposits.addAnAssetSubtitle
 		case .allowDepositors:
 			L10n.AccountSettings.ThirdPartyDeposits.addDepositorSubtitle
+		}
+	}
+
+	var detentsFraction: CGFloat {
+		switch self {
+		case .allowDenyAssets:
+			0.6
+		case .allowDepositors:
+			0.55
 		}
 	}
 }

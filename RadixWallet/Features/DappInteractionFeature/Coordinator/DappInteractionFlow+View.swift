@@ -28,6 +28,7 @@ extension DappInteractionFlow {
 				.transaction { $0.animation = nil }
 			} destination: {
 				destinations(for: $0)
+					.toolbar(.visible, for: .navigationBar)
 					.navigationBarBackButtonHidden()
 					.toolbar {
 						ToolbarItem(placement: .navigationBarLeading) {
@@ -37,7 +38,6 @@ extension DappInteractionFlow {
 						}
 					}
 			}
-			.navigationTransition(.slide, interactivity: .disabled)
 			.onAppear { store.send(.view(.appeared)) }
 			.alert(
 				store: store.scope(
@@ -110,7 +110,8 @@ struct DappInteraction_Preview: PreviewProvider {
 			store: .init(
 				initialState: .init(
 					dappMetadata: .previewValue,
-					interaction: .previewValueAllRequests()
+					interaction: .previewValueAllRequests(),
+					p2pRoute: .wallet
 				)!
 			) {
 				DappInteractionFlow()
@@ -141,7 +142,8 @@ extension AuthorizedDappsClient {
 					networkId: .nebunet,
 					dappDefinitionAddress: .sample,
 					displayName: "something",
-					referencesToAuthorizedPersonas: []
+					referencesToAuthorizedPersonas: [],
+					preferences: .init(deposits: .visible)
 				)
 				dapp.referencesToAuthorizedPersonas = [
 					.sample,

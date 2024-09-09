@@ -43,26 +43,34 @@ extension [CKRecord.FieldKey] {
 }
 
 extension CloudBackupClient {
+	public func deleteProfileBackup() async throws {
+		try await deleteProfileBackup(nil)
+	}
+}
+
+extension CloudBackupClient {
 	struct IncorrectRecordTypeError: Error {}
 	struct NoProfileInRecordError: Error {}
 	struct MissingMetadataError: Error {}
-	struct HeaderAndMetadataMismatchError: Error {}
 	struct WrongRecordTypeError: Error { let type: CKRecord.RecordType }
-	struct ProfileMissingFromKeychainError: Error { let id: ProfileID }
+	struct FailedToClaimProfileError: Error { let error: Error }
 
 	public static let liveValue: Self = .live()
 
 	public static func live(
 		profileStore: ProfileStore = .shared
 	) -> CloudBackupClient {
+		@Dependency(\.appPreferencesClient) var appPreferencesClient
+		@Dependency(\.overlayWindowClient) var overlayWindowClient
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.userDefaults) var userDefaults
 
 		let container: CKContainer = .default()
 
 		@Sendable
-		func fetchProfileRecord(_ id: CKRecord.ID) async throws -> CKRecord {
-			let record = try await container.privateCloudDatabase.record(for: id)
+		func fetchProfileRecord(_ id: ProfileID) async throws -> CKRecord {
+			let recordID = CKRecord.ID(recordName: id.uuidString)
+			let record = try await container.privateCloudDatabase.record(for: recordID)
 			guard record.recordType == .profile else {
 				throw WrongRecordTypeError(type: record.recordType)
 			}
@@ -70,10 +78,10 @@ extension CloudBackupClient {
 		}
 
 		@Sendable
-		func fetchAllProfileRecords(headerOnly: Bool = false) async throws -> [CKRecord] {
+		func fetchAllProfileHeaders() async throws -> [CKRecord] {
 			let records = try await container.privateCloudDatabase.records(
 				matching: .init(recordType: .profile, predicate: .init(value: true)),
-				desiredKeys: headerOnly ? .header : nil
+				desiredKeys: .header
 			)
 			return try records.matchResults.map { try $0.1.get() }
 		}
@@ -92,16 +100,12 @@ extension CloudBackupClient {
 			let profile = try Profile(jsonString: json)
 			try FileManager.default.removeItem(at: fileURL)
 
-			guard try getProfileHeader(record).isEquivalent(to: profile.header) else {
-				throw HeaderAndMetadataMismatchError()
-			}
-
 			return BackedUpProfile(profile: profile, containsLegacyP2PLinks: containsLegacyP2PLinks)
 		}
 
 		@discardableResult
 		@Sendable
-		func uploadProfileToICloud(_ profile: Either<Data, String>, header: Profile.Header, existingRecord: CKRecord?) async throws -> CKRecord {
+		func backupProfile(_ profile: Either<Data, String>, header: Profile.Header, existingRecord: CKRecord?) async throws -> CKRecord {
 			let fileManager = FileManager.default
 			let tempDirectoryURL = fileManager.temporaryDirectory
 			let fileURL = tempDirectoryURL.appendingPathComponent(UUID().uuidString)
@@ -123,59 +127,123 @@ extension CloudBackupClient {
 		}
 
 		@Sendable
-		func backupProfileAndSaveResult(_ profile: Profile) async {
-			let existingRecord = try? await fetchProfileRecord(.init(recordName: profile.id.uuidString))
-			let result: BackupResult.Result
+		func backupProfileAndSaveResult(_ profile: Profile, existingRecord: CKRecord?) async throws {
+			try? userDefaults.setLastCloudBackup(.started(.now), of: profile.header)
+
 			do {
 				let json = profile.toJSONString()
-				try await uploadProfileToICloud(.right(json), header: profile.header, existingRecord: existingRecord)
-				result = .success
-			} catch CKError.accountTemporarilyUnavailable {
-				result = .temporarilyUnavailable
-			} catch CKError.notAuthenticated {
-				result = .notAuthenticated
+				try await backupProfile(.right(json), header: profile.header, existingRecord: existingRecord)
 			} catch {
-				loggerGlobal.error("Automatic cloud backup failed with error \(error)")
-				result = .failure
+				if await (try? container.accountStatus()) == .restricted {
+					try await appPreferencesClient.setIsCloudBackupEnabled(false)
+				}
+
+				let failure: BackupResult.Result.Failure
+				switch error {
+				case CKError.accountTemporarilyUnavailable:
+					failure = .temporarilyUnavailable
+				case CKError.notAuthenticated:
+					failure = .notAuthenticated
+				default:
+					loggerGlobal.error("Cloud backup failed with error \(error)")
+					failure = .other
+				}
+
+				try? userDefaults.setLastCloudBackup(.failure(failure), of: profile.header)
+				throw error
 			}
 
-			try? userDefaults.setLastCloudBackup(result, of: profile)
+			try? userDefaults.setLastCloudBackup(.success, of: profile.header)
 		}
 
-		return .init(
-			startAutomaticBackups: {
-				let timer = AsyncTimerSequence(every: .seconds(60))
-				let profiles = await profileStore.values()
+		@Sendable
+		func performAutomaticBackup(_ profile: Profile, timeToCheckIfClaimed: Bool) async {
+			let existingRecord = try? await fetchProfileRecord(profile.id)
+			let backedUpHeader = try? existingRecord.map(getProfileHeader)
 
-				for try await (profile, _) in combineLatest(profiles, timer) {
-					guard !Task.isCancelled else { return }
-					guard profile.appPreferences.security.isCloudProfileSyncEnabled else { continue }
-					guard profile.header.isNonEmpty else { continue }
+			if let backedUpHeader, let backupDate = existingRecord?.modificationDate {
+				try? userDefaults.setLastCloudBackup(.success, of: backedUpHeader, at: backupDate)
+			} else {
+				try? userDefaults.removeLastCloudBackup(for: profile.id)
+			}
 
-					let last = userDefaults.getLastCloudBackups[profile.id]
-					if let last, last.result == .success, last.profileHash == profile.hashValue { continue }
+			guard profile.appPreferences.security.isCloudProfileSyncEnabled else { return }
+			let isBackedUp = backedUpHeader?.saveIdentifier == profile.header.saveIdentifier
+			let shouldBackUp = profile.header.isNonEmpty && !isBackedUp
 
-					await backupProfileAndSaveResult(profile)
+			guard shouldBackUp || timeToCheckIfClaimed else { return }
+
+			let shouldReclaim: Bool
+			if let backedUpID = backedUpHeader?.lastUsedOnDevice.id, await !profileStore.isThisDevice(deviceID: backedUpID) {
+				let action = await overlayWindowClient.scheduleFullScreen(.init(root: .claimWallet(.init())))
+				switch action {
+				case .claimWallet(.transferBack):
+					shouldReclaim = true
+				case .claimWallet(.didClearWallet), .dismiss:
+					return
 				}
+			} else {
+				shouldReclaim = false
+			}
+
+			guard shouldBackUp || shouldReclaim else { return }
+
+			var profileToUpload = profile
+			if shouldReclaim {
+				// The profile will already be locally claimed, but we want to update the lastUsedOnDevice date
+				await profileStore.claimOwnership(of: &profileToUpload)
+			}
+
+			try? await backupProfileAndSaveResult(profileToUpload, existingRecord: existingRecord)
+		}
+
+		let retryBackupInterval: DispatchTimeInterval = .seconds(60)
+		let checkClaimedProfileInterval: TimeInterval = 15 * 60
+
+		return .init(
+			isCloudProfileSyncEnabled: {
+				await profileStore.appPreferencesValues()
+					.map(\.security.isCloudProfileSyncEnabled)
+					.removeDuplicates()
+					.eraseToAnyAsyncSequence()
 			},
-			loadDeviceID: {
-				try? secureStorageClient.loadDeviceInfo()?.id
+			startAutomaticBackups: {
+				// The active profile should not be synced to iCloud keychain
+				let profileID = await profileStore.profile.id
+				try secureStorageClient.disableCloudProfileSync(profileID)
+
+				let ticks = AsyncTimerSequence(every: retryBackupInterval)
+				let profiles = await profileStore.values()
+				var lastClaimCheck: Date = .distantPast
+
+				let iCloudAvailability = NotificationCenter.default.notifications(named: .NSUbiquityIdentityDidChange)
+					.map { _ in () }.prepend(())
+				let cloudKitStatus = NotificationCenter.default.notifications(named: .CKAccountChanged)
+					.map { _ in () }.prepend(())
+				let iCloudStatus = combineLatest(iCloudAvailability, cloudKitStatus)
+					.map { _, _ in () }
+
+				for try await (profile, tick, _) in combineLatest(profiles, ticks, iCloudStatus) {
+					guard !Task.isCancelled else { return }
+					if tick.timeIntervalSince(lastClaimCheck) > checkClaimedProfileInterval {
+						await performAutomaticBackup(profile, timeToCheckIfClaimed: true)
+						lastClaimCheck = .now
+					} else {
+						await performAutomaticBackup(profile, timeToCheckIfClaimed: false)
+					}
+				}
 			},
 			migrateProfilesFromKeychain: {
 				let activeProfile = await profileStore.profile.id
-				let backedUpRecords = try await fetchAllProfileRecords()
 				guard let headerList = try secureStorageClient.loadProfileHeaderList() else { return [] }
 
 				let previouslyMigrated = userDefaults.getMigratedKeychainProfiles
 
 				let migratable = try headerList.compactMap { header -> (Data, Profile.Header)? in
 					let id = header.id
-
 					guard !previouslyMigrated.contains(id), header.id != activeProfile else { return nil }
 
-					guard let profileData = try secureStorageClient.loadProfileSnapshotData(id) else {
-						throw ProfileMissingFromKeychainError(id: id)
-					}
+					guard let profileData = try? secureStorageClient.loadProfileSnapshotData(id) else { return nil }
 
 					let profile = try Profile(jsonData: profileData)
 					guard !profile.networks.isEmpty else { return nil }
@@ -184,17 +252,16 @@ extension CloudBackupClient {
 					return (profileData, header)
 				}
 
-				let migrated = try await migratable.asyncMap { profileData, header in
+				let backedUpRecords = try await fetchAllProfileHeaders()
+
+				let migrated: [CKRecord] = try await migratable.asyncCompactMap { profileData, header in
 					let backedUpRecord = backedUpRecords.first { $0.recordID.recordName == header.id.uuidString }
 					if let backedUpRecord, try getProfileHeader(backedUpRecord).lastModified >= header.lastModified {
-						// We already have a more recent version backed up on iCloud, so we return that
-						return backedUpRecord
+						// We already have a more recent version backed up on iCloud
+						return nil
 					}
 
-					let uploadedRecord = try await uploadProfileToICloud(.left(profileData), header: header, existingRecord: backedUpRecord)
-					try secureStorageClient.updateIsCloudProfileSyncEnabled(header.id, .disable)
-
-					return uploadedRecord
+					return try await backupProfile(.left(profileData), header: header, existingRecord: backedUpRecord)
 				}
 
 				let migratedIDs = migrated.compactMap { ProfileID(uuidString: $0.recordID.recordName) }
@@ -202,7 +269,9 @@ extension CloudBackupClient {
 
 				return migrated
 			},
-			deleteProfileBackup: { id in
+			deleteProfileBackup: { optionalID in
+				let activeProfileID = await profileStore.profile.id
+				let id = optionalID ?? activeProfileID
 				try await container.privateCloudDatabase.deleteRecord(withID: .init(recordName: id.uuidString))
 				try userDefaults.removeLastCloudBackup(for: id)
 			},
@@ -213,12 +282,21 @@ extension CloudBackupClient {
 				userDefaults.lastCloudBackupValues(for: id)
 			},
 			loadProfile: { id in
-				try await getProfile(fetchProfileRecord(.init(recordName: id.uuidString)))
+				try await getProfile(fetchProfileRecord(id))
 			},
 			loadProfileHeaders: {
-				try await fetchAllProfileRecords(headerOnly: true)
+				try await fetchAllProfileHeaders()
 					.map(getProfileHeader)
 					.filter(\.isNonEmpty)
+			},
+			claimProfileOnICloud: { profile in
+				let existingRecord = try? await fetchProfileRecord(profile.id)
+				do {
+					try await backupProfileAndSaveResult(profile, existingRecord: existingRecord)
+				} catch {
+					loggerGlobal.error("Failed to claim profile on iCloud \(error)")
+					throw FailedToClaimProfileError(error: error)
+				}
 			}
 		)
 	}
@@ -227,30 +305,6 @@ extension CloudBackupClient {
 private extension Profile.Header {
 	var isNonEmpty: Bool {
 		contentHint.numberOfAccountsOnAllNetworksInTotal + contentHint.numberOfPersonasOnAllNetworksInTotal > 0
-	}
-
-	func isEquivalent(to other: Self) -> Bool {
-		snapshotVersion.rawValue == other.snapshotVersion.rawValue &&
-			creatingDevice.isEquivalent(to: other.creatingDevice) &&
-			lastUsedOnDevice.isEquivalent(to: other.lastUsedOnDevice) &&
-			lastModified.isEquivalent(to: other.lastModified) &&
-			contentHint.numberOfAccountsOnAllNetworksInTotal == other.contentHint.numberOfAccountsOnAllNetworksInTotal &&
-			contentHint.numberOfPersonasOnAllNetworksInTotal == other.contentHint.numberOfPersonasOnAllNetworksInTotal &&
-			contentHint.numberOfNetworks == other.contentHint.numberOfNetworks
-	}
-}
-
-private extension DeviceInfo {
-	func isEquivalent(to other: Self) -> Bool {
-		id.uuidString == other.id.uuidString &&
-			date.isEquivalent(to: other.date) &&
-			description == other.description
-	}
-}
-
-private extension Date {
-	func isEquivalent(to other: Self) -> Bool {
-		abs(timeIntervalSince(other)) < 0.001
 	}
 }
 

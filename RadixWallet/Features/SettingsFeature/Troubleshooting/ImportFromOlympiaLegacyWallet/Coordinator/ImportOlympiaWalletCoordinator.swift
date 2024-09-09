@@ -405,7 +405,8 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			)
 
 			let privateHDFactorSource = PrivateHierarchicalDeterministicFactorSource.olympia(
-				mnemonicWithPassphrase: mnemonicWithPassphrase
+				mnemonicWithPassphrase: mnemonicWithPassphrase,
+				hostInfo: .current()
 			)
 
 			return migrateSoftwareAccountsToBabylon(

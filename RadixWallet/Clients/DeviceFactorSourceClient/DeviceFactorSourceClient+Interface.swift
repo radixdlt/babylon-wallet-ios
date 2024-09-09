@@ -12,10 +12,10 @@ public struct DeviceFactorSourceClient: Sendable {
 	/// Fetched accounts and personas on current network that are controlled by a device factor source, for every factor source in current profile
 	public var controlledEntities: GetControlledEntities
 
-	/// The entities (`Accounts` & `Personas`) that are problematic. This is, that either:
+	/// The entities (`Accounts` & `Personas`) that are in bad state. This is, that either:
 	/// - their mnmemonic is missing (entity was imported but seed phrase never entered), or
 	/// - their mnmemonic is not backed up (entity was created but seed phrase never written down).
-	public var problematicEntities: ProblematicEntities
+	public var entitiesInBadState: EntitiesInBadState
 
 	public init(
 		publicKeysFromOnDeviceHD: @escaping PublicKeysFromOnDeviceHD,
@@ -23,14 +23,14 @@ public struct DeviceFactorSourceClient: Sendable {
 		isAccountRecoveryNeeded: @escaping IsAccountRecoveryNeeded,
 		entitiesControlledByFactorSource: @escaping GetEntitiesControlledByFactorSource,
 		controlledEntities: @escaping GetControlledEntities,
-		problematicEntities: @escaping ProblematicEntities
+		entitiesInBadState: @escaping EntitiesInBadState
 	) {
 		self.publicKeysFromOnDeviceHD = publicKeysFromOnDeviceHD
 		self.signatureFromOnDeviceHD = signatureFromOnDeviceHD
 		self.isAccountRecoveryNeeded = isAccountRecoveryNeeded
 		self.entitiesControlledByFactorSource = entitiesControlledByFactorSource
 		self.controlledEntities = controlledEntities
-		self.problematicEntities = problematicEntities
+		self.entitiesInBadState = entitiesInBadState
 	}
 }
 
@@ -42,7 +42,7 @@ extension DeviceFactorSourceClient {
 	public typealias PublicKeysFromOnDeviceHD = @Sendable (PublicKeysFromOnDeviceHDRequest) async throws -> [HierarchicalDeterministicPublicKey]
 	public typealias SignatureFromOnDeviceHD = @Sendable (SignatureFromOnDeviceHDRequest) async throws -> SignatureWithPublicKey
 	public typealias IsAccountRecoveryNeeded = @Sendable () async throws -> Bool
-	public typealias ProblematicEntities = @Sendable () async throws -> (mnemonicMissing: ProblematicAddresses, unrecoverable: ProblematicAddresses)
+	public typealias EntitiesInBadState = @Sendable () async throws -> AnyAsyncSequence<(withoutControl: AddressesOfEntitiesInBadState, unrecoverable: AddressesOfEntitiesInBadState)>
 }
 
 // MARK: - DiscrepancyUnsupportedCurve
@@ -241,8 +241,8 @@ extension SigningPurpose {
 // MARK: - FactorInstanceDoesNotHaveADerivationPathUnableToSign
 struct FactorInstanceDoesNotHaveADerivationPathUnableToSign: Swift.Error {}
 
-// MARK: - ProblematicAddresses
-public struct ProblematicAddresses: Sendable, Hashable {
+// MARK: - AddressesOfEntitiesInBadState
+public struct AddressesOfEntitiesInBadState: Sendable, Hashable {
 	let accounts: [AccountAddress]
 	let hiddenAccounts: [AccountAddress]
 	let personas: [IdentityAddress]

@@ -10,6 +10,10 @@ public struct NonFungibleAssetList: Sendable, FeatureReducer {
 		case asset(NonFungibleAssetList.Row.State.ID, NonFungibleAssetList.Row.Action)
 	}
 
+	public enum InternalAction: Sendable, Equatable {
+		case refreshRows([ResourceAddress])
+	}
+
 	public enum DelegateAction: Sendable, Equatable {
 		case selected(OnLedgerEntity.OwnedNonFungibleResource, token: OnLedgerEntity.NonFungibleToken)
 	}
@@ -34,6 +38,13 @@ public struct NonFungibleAssetList: Sendable, FeatureReducer {
 
 		case .asset:
 			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case let .refreshRows(rows):
+			.merge(rows.map { .send(.child(.asset($0, .internal(.refreshResources)))) })
 		}
 	}
 }

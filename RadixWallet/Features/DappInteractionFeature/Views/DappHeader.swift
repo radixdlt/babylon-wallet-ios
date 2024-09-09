@@ -8,7 +8,7 @@ struct DappHeader: View {
 	let subtitle: String
 
 	var body: some View {
-		VStack(spacing: .medium3) {
+		VStack(spacing: .medium2) {
 			Thumbnail(.dapp, url: thumbnail, size: .medium)
 
 			Text(title)
@@ -16,7 +16,7 @@ struct DappHeader: View {
 				.lineSpacing(0)
 				.textStyle(.sheetTitle)
 
-			Text(markdown: subtitle, italicsColor: .app.gray1)
+			Text(markdown: subtitle, emphasizedColor: .app.gray1)
 				.foregroundColor(.app.gray2)
 				.textStyle(.secondaryHeader)
 		}

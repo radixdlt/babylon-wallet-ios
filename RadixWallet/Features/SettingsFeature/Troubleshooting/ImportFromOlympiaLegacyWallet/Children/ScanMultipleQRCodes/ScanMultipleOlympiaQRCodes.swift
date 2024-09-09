@@ -18,7 +18,7 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 		public init(
 			scannedPayloads: IdentifiedArrayOf<ScannedPayload> = []
 		) {
-			self.scanQR = .init(scanInstructions: L10n.ImportOlympiaAccounts.ScanQR.instructions)
+			self.scanQR = .init(kind: .importOlympia)
 			self.scannedPayloads = scannedPayloads
 		}
 

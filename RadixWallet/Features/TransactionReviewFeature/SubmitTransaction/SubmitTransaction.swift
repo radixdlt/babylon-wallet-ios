@@ -23,6 +23,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 		public let notarizedTX: NotarizeTransactionResponse
 		public var status: TXStatus
 		public let inProgressDismissalDisabled: Bool
+		public let route: P2P.Route
 
 		@PresentationState
 		var dismissTransactionAlert: AlertState<ViewAction.DismissAlertAction>?
@@ -30,11 +31,13 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 		public init(
 			notarizedTX: NotarizeTransactionResponse,
 			status: TXStatus = .notYetSubmitted,
-			inProgressDismissalDisabled: Bool = false
+			inProgressDismissalDisabled: Bool = false,
+			route: P2P.Route
 		) {
 			self.notarizedTX = notarizedTX
 			self.status = status
 			self.inProgressDismissalDisabled = inProgressDismissalDisabled
+			self.route = route
 		}
 	}
 
@@ -64,7 +67,6 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 	@Dependency(\.submitTXClient) var submitTXClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
-	@Dependency(\.npsSurveyClient) var npsSurveyClient
 
 	public init() {}
 
@@ -106,7 +108,6 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 			}
 
 			return .send(.delegate(.manuallyDismiss))
-
 		case .dismissTransactionAlert(.presented(.confirm)):
 			return .concatenate(.cancel(id: CancellableId.transactionStatus), .send(.delegate(.manuallyDismiss)))
 		case .dismissTransactionAlert(.presented(.cancel)):
@@ -161,7 +162,6 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 	private func transactionCommittedSuccesfully(_ state: State) -> Effect<Action> {
 		// TODO: Could probably be moved in other place. TransactionClient? AccountPortfolio?
 		accountPortfoliosClient.updateAfterCommittedTransaction(state.notarizedTX.intent)
-		npsSurveyClient.incrementTransactionCompleteCounter()
 		return .send(.delegate(.committedSuccessfully(state.notarizedTX.txID)))
 	}
 }

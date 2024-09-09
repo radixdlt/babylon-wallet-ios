@@ -3,6 +3,7 @@ import Sargon
 import SwiftUI
 
 // MARK: - AuthorizedDapps
+@Reducer
 public struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
@@ -12,6 +13,7 @@ public struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 
 	// MARK: State
 
+	// TODO: Add `@ObservableState` after migrating `DappDetails` to `ObservableState`
 	public struct State: Sendable, Hashable {
 		public var dApps: AuthorizedDapps = []
 		public var thumbnails: [AuthorizedDapp.ID: URL] = [:]
@@ -24,8 +26,11 @@ public struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 		}
 	}
 
+	public typealias Action = FeatureAction<Self>
+
 	// MARK: Action
 
+	@CasePathable
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 		case didSelectDapp(AuthorizedDapp.ID)
@@ -41,16 +46,18 @@ public struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 	// MARK: Destination
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Hashable, Sendable {
 			case presentedDapp(DappDetails.State)
 		}
 
+		@CasePathable
 		public enum Action: Equatable, Sendable {
 			case presentedDapp(DappDetails.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.presentedDapp, action: /Action.presentedDapp) {
+			Scope(state: \.presentedDapp, action: \.presentedDapp) {
 				DappDetails()
 			}
 		}
@@ -62,7 +69,7 @@ public struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(destinationPath, action: /Action.destination) {
+			.ifLet(destinationPath, action: \.destination) {
 				Destination()
 			}
 	}
@@ -113,9 +120,11 @@ public struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 		case let .loadedDapps(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
+
 		case let .presentDappDetails(presentedDappState):
 			state.destination = .presentedDapp(presentedDappState)
 			return .none
+
 		case let .loadedThumbnail(thumbnail, dApp: id):
 			state.thumbnails[id] = thumbnail
 			return .none

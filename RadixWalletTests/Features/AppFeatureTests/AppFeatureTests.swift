@@ -19,9 +19,10 @@ final class AppFeatureTests: TestCase {
 			reducer: App.init
 		) {
 			$0.gatewaysClient.gatewaysValues = { AsyncLazySequence([.init(current: .mainnet)]).eraseToAnyAsyncSequence() }
+			$0.deepLinkHandlerClient = .noop
 		}
 		// when
-		await store.send(.child(.main(.delegate(.removedWallet)))) {
+		await store.send(.internal(.didResetWallet)) {
 			$0.root = .onboardingCoordinator(.init())
 		}
 	}
@@ -59,6 +60,7 @@ final class AppFeatureTests: TestCase {
 		) {
 			$0.errorQueue = .liveValue
 			$0.continuousClock = clock
+			$0.deepLinkHandlerClient = .noop
 		}
 
 		// then

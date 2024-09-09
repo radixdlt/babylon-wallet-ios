@@ -9,20 +9,6 @@ extension JSONDecoder {
 	}
 }
 
-private var rdxClientVersion: String? {
-	guard
-		let mainBundleInfoDictionary = Bundle.main.infoDictionary,
-		let version = mainBundleInfoDictionary["CFBundleShortVersionString"] as? String,
-		let buildNumber = mainBundleInfoDictionary["CFBundleVersion"] as? String
-	else {
-		return nil
-	}
-
-	return version
-		+ "#" + buildNumber
-		+ "-" + (BuildConfiguration.current?.description ?? "UNKNOWN")
-}
-
 extension GatewayAPIClient {
 	public struct EmptyEntityDetailsResponse: Error {}
 	public typealias SingleEntityDetailsResponse = (ledgerState: GatewayAPI.LedgerState, details: GatewayAPI.StateEntityDetailsResponseItem)
@@ -60,12 +46,8 @@ extension GatewayAPIClient {
 				urlRequest.httpBody = httpBody
 			}
 
-			urlRequest.allHTTPHeaderFields = [
-				"accept": "application/json",
-				"Content-Type": "application/json",
-				"RDX-Client-Name": "iOS Wallet",
-				"RDX-Client-Version": rdxClientVersion ?? "UNKNOWN",
-			]
+			urlRequest.setHttpHeaderFields()
+
 			if let timeoutInterval {
 				urlRequest.timeoutInterval = timeoutInterval
 			}
@@ -179,6 +161,11 @@ extension GatewayAPIClient {
 			getEntityMetadata: { address, explicitMetadata in
 				try await getSingleEntityDetails(address, explictMetadata: explicitMetadata).details.metadata
 			},
+			getEntityMetadataPage: { request in
+				try await post(
+					request: request
+				) { $0.appendingPathComponent("state/entity/page/metadata/") }
+			},
 			getEntityFungiblesPage: { request in
 				try await post(
 					request: request
@@ -209,6 +196,16 @@ extension GatewayAPIClient {
 					request: request
 				) { $0.appendingPathComponent("state/non-fungible/data") }
 			},
+			getAccountLockerTouchedAt: { request in
+				try await post(
+					request: request
+				) { $0.appendingPathComponent("/state/account-lockers/touched-at") }
+			},
+			getAccountLockerVaults: { request in
+				try await post(
+					request: request
+				) { $0.appendingPathComponent("/state/account-locker/page/vaults") }
+			},
 			submitTransaction: { transactionSubmitRequest in
 				try await post(
 					request: transactionSubmitRequest
@@ -229,6 +226,11 @@ extension GatewayAPIClient {
 					request: streamTransactionsRequest,
 					dateEncodingStrategy: .iso8601
 				) { $0.appendingPathComponent("stream/transactions") }
+			},
+			prevalidateDeposit: { prevalidateDepositRequest in
+				try await post(
+					request: prevalidateDepositRequest
+				) { $0.appendingPathComponent("transaction/account-deposit-pre-validation") }
 			}
 		)
 	}

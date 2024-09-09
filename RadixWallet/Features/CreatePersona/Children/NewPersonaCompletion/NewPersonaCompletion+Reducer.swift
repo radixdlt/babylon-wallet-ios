@@ -34,7 +34,7 @@ public struct NewPersonaCompletion: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case completed
+		case completed(Persona)
 	}
 
 	public init() {}
@@ -42,7 +42,7 @@ public struct NewPersonaCompletion: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .goToDestination:
-			.send(.delegate(.completed))
+			.send(.delegate(.completed(state.persona)))
 		}
 	}
 }

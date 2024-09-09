@@ -16,15 +16,23 @@ extension PersonaDataPermissionBox.State {
 				.keys
 				.nilIfEmpty
 				.map { kinds in
-					.error {
-						Text {
-							L10n.DAppRequest.PersonalDataBox.requiredInformation.text.bold()
-							" "
-							kinds.sorted().map(\.title.localizedLowercase).joined(separator: ", ")
-						}
-					}
+					let items = kinds.sorted().map(\.title.localizedLowercase).joined(separator: ", ")
+					return try? AttributedString(markdown: "**\(L10n.DAppRequest.PersonalDataBox.requiredInformation)** \(items)")
+				}
+				.map {
+					.init(kind: .error(imageSize: .icon), attributed: $0)
 				}
 		)
+	}
+
+	private var missingEntries: String? {
+		responseValidation.missingEntries
+			.keys
+			.nilIfEmpty
+			.map { kinds in
+				let items = kinds.sorted().map(\.title.localizedLowercase).joined(separator: ", ")
+				return items
+			}
 	}
 }
 
@@ -32,7 +40,7 @@ extension PersonaDataPermissionBox {
 	struct ViewState: Equatable {
 		let personaLabel: String
 		let existingRequiredEntries: String?
-		let missingRequiredEntries: Hint?
+		let missingRequiredEntries: Hint.ViewState?
 	}
 
 	@MainActor
@@ -77,7 +85,9 @@ extension PersonaDataPermissionBox {
 								.textStyle(.body2Regular)
 						}
 
-						viewStore.missingRequiredEntries
+						if let viewState = viewStore.missingRequiredEntries {
+							Hint(viewState: viewState)
+						}
 
 						Button(L10n.DAppRequest.PersonalDataBox.edit) {
 							viewStore.send(.editButtonTapped)

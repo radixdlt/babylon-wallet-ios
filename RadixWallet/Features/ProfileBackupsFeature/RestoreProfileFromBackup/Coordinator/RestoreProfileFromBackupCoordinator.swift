@@ -5,51 +5,44 @@ import SwiftUI
 // MARK: - ProfileSelection
 public struct ProfileSelection: Sendable, Hashable {
 	public let profile: Profile
-	public let isInCloud: Bool
 	public let containsP2PLinks: Bool
 }
 
 // MARK: - RestoreProfileFromBackupCoordinator
 public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var root: Path.State
-		public var path: StackState<Path.State> = .init()
+		public var selectBackup = SelectBackup.State()
 		public var profileSelection: ProfileSelection?
 
-		public init() {
-			self.root = .selectBackup(.init())
-		}
+		@PresentationState
+		public var destination: Destination.State?
 	}
 
-	public struct Path: Sendable, Hashable, Reducer {
+	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
-			case selectBackup(SelectBackup.State)
 			case importMnemonicsFlow(ImportMnemonicsFlowCoordinator.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
-			case selectBackup(SelectBackup.Action)
 			case importMnemonicsFlow(ImportMnemonicsFlowCoordinator.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.selectBackup, action: /Action.selectBackup) {
-				SelectBackup()
-			}
-
-			Scope(state: /State.importMnemonicsFlow, action: /Action.importMnemonicsFlow) {
+			Scope(state: \.importMnemonicsFlow, action: \.importMnemonicsFlow) {
 				ImportMnemonicsFlowCoordinator()
 			}
 		}
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case delayedAppendToPath(RestoreProfileFromBackupCoordinator.Path.State)
+		case startImportMnemonicsFlow(Profile)
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
-		case root(Path.Action)
-		case path(StackActionOf<Path>)
+		case selectBackup(SelectBackup.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -59,7 +52,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 		case profileCreatedFromImportedBDFS
 	}
 
-	@Dependency(\.backupsClient) var backupsClient
+	@Dependency(\.transportProfileClient) var transportProfileClient
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.continuousClock) var clock
@@ -68,55 +61,61 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.root, action: /Action.child .. ChildAction.root) {
-			Path()
+		Scope(state: \.selectBackup, action: \.child.selectBackup) {
+			SelectBackup()
 		}
-
 		Reduce(core)
-			.forEach(\.path, action: /Action.child .. ChildAction.path) {
-				Path()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
-		switch internalAction {
-		case let .delayedAppendToPath(destination):
-			state.path.append(destination)
-			return .none
-		}
-	}
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .root(.selectBackup(.delegate(.selectedProfile(profile, isInCloud, containsLegacyP2PLinks)))):
-			state.profileSelection = .init(profile: profile, isInCloud: isInCloud, containsP2PLinks: containsLegacyP2PLinks)
+		case let .selectBackup(.delegate(.selectedProfile(profile, containsLegacyP2PLinks))):
+			state.profileSelection = .init(profile: profile, containsP2PLinks: containsLegacyP2PLinks)
 
 			return .run { send in
 				try? await clock.sleep(for: .milliseconds(300))
 				_ = await radixConnectClient.loadP2PLinksAndConnectAll()
-				await send(.internal(.delayedAppendToPath(
-					.importMnemonicsFlow(.init(context: .fromOnboarding(profile: profile)))
-				)))
+				await send(.internal(.startImportMnemonicsFlow(profile)))
 			}
 
-		case .root(.selectBackup(.delegate(.backToStartOfOnboarding))):
+		case .selectBackup(.delegate(.backToStartOfOnboarding)):
 			return .send(.delegate(.backToStartOfOnboarding))
 
-		case .root(.selectBackup(.delegate(.profileCreatedFromImportedBDFS))):
+		case .selectBackup(.delegate(.profileCreatedFromImportedBDFS)):
 			return .send(.delegate(.profileCreatedFromImportedBDFS))
 
-		case let .path(.element(_, action: .importMnemonicsFlow(.delegate(.finishedImportingMnemonics(skipList, _, notYetSavedNewMainBDFS))))):
+		default:
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case let .startImportMnemonicsFlow(profile):
+			state.destination = .importMnemonicsFlow(.init(context: .fromOnboarding(profile: profile)))
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .importMnemonicsFlow(.delegate(.finishedImportingMnemonics(skipList, _, notYetSavedNewMainBDFS))):
 			loggerGlobal.notice("Starting import snapshot process...")
 			guard let profileSelection = state.profileSelection else {
 				preconditionFailure("Expected to have a profile")
 			}
 			return .run { send in
 				loggerGlobal.notice("Importing snapshot...")
-				try await backupsClient.importSnapshot(
-					profileSelection.profile,
-					fromCloud: profileSelection.isInCloud,
-					containsP2PLinks: profileSelection.containsP2PLinks
+
+				let factorSourceIDs: Set<FactorSourceIDFromHash> = .init(
+					profileSelection.profile.factorSources.compactMap { $0.extract(DeviceFactorSource.self) }.map(\.id)
 				)
+				try await transportProfileClient.importProfile(profileSelection.profile, factorSourceIDs, profileSelection.containsP2PLinks)
 
 				if let notYetSavedNewMainBDFS {
 					try await factorSourcesClient.saveNewMainBDFS(notYetSavedNewMainBDFS)
@@ -129,8 +128,8 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 				errorQueue.schedule(error)
 			}
 
-		case let .path(.element(_, action: .importMnemonicsFlow(.delegate(.finishedEarly(didFail))))):
-			state.path.removeLast()
+		case let .importMnemonicsFlow(.delegate(.finishedEarly(didFail))):
+			state.destination = nil
 			return .run { send in
 				await radixConnectClient.disconnectAll()
 				if didFail {

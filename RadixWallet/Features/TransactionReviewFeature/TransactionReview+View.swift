@@ -28,7 +28,7 @@ extension TransactionReview.State {
 			viewControlState: viewControlState,
 			rawTransaction: displayMode.rawTransaction,
 			showApprovalSlider: reviewedTransaction != nil,
-			canApproveTX: canApproveTX && reviewedTransaction?.feePayingValidation.wrappedValue == .valid,
+			canApproveTX: canApproveTX && reviewedTransaction?.feePayingValidation.wrappedValue?.isValid == true,
 			sliderResetDate: sliderResetDate,
 			canToggleViewMode: reviewedTransaction != nil && reviewedTransaction?.isNonConforming == false,
 			viewRawTransactionButtonState: reviewedTransaction?.feePayer.isSuccess == true ? .enabled : .disabled,
@@ -386,7 +386,6 @@ extension TransactionReview {
 			let proofsStore = store.scope(state: \.proofs) { .child(.proofs($0)) }
 			return IfLetStore(proofsStore) { childStore in
 				TransactionReviewProofs.View(store: childStore)
-					.padding(.bottom, .medium1)
 			}
 		}
 
@@ -688,23 +687,6 @@ struct RawTransactionView: SwiftUI.View {
 	}
 }
 
-// MARK: - TransactionReviewInfoButton
-public struct TransactionReviewInfoButton: View {
-	private let action: () -> Void
-
-	public init(action: @escaping () -> Void) {
-		self.action = action
-	}
-
-	public var body: some SwiftUI.View {
-		Button(action: action) {
-			Image(asset: AssetResource.info)
-				.renderingMode(.template)
-				.foregroundColor(.app.gray3)
-		}
-	}
-}
-
 extension StrokeStyle {
 	static let transactionReview = StrokeStyle(lineWidth: 2, dash: [5, 5])
 }
@@ -798,12 +780,13 @@ struct TransactionReview_Previews: PreviewProvider {
 
 extension TransactionReview.State {
 	public static let previewValue: Self = .init(
-		unvalidatedManifest: try! .init(manifest: .previewValue),
+		unvalidatedManifest: .sample,
 		nonce: .secureRandom(),
 		signTransactionPurpose: .manifestFromDapp,
 		message: .none,
 		isWalletTransaction: false,
-		proposingDappMetadata: nil
+		proposingDappMetadata: nil,
+		p2pRoute: .wallet
 	)
 }
 #endif

@@ -32,11 +32,11 @@ struct ValidatorStakeView: View {
 		} label: {
 			ValidatorHeaderView(viewState: viewState.validatorNameViewState)
 				.contentShape(Rectangle())
-				.padding(.vertical, .medium3)
-				.padding(.horizontal, .small1)
-				.rowStyle()
+				.padding(.vertical, .large3)
+				.padding(.horizontal, .medium1)
 		}
 		.buttonStyle(.borderless)
+		.rowStyle()
 
 		if isExpanded {
 			if let liquidStakeUnitViewState = viewState.liquidStakeUnit {
@@ -59,7 +59,7 @@ struct ValidatorStakeView: View {
 	private func liquidStakeUnitView(viewState: ViewState.LiquidStakeUnit, action: @escaping () -> Void) -> some SwiftUI.View {
 		VStack(spacing: .zero) {
 			Divider()
-				.frame(height: .small3)
+				.frame(height: .assetDividerHeight)
 				.overlay(.app.gray5)
 
 			ResourceBalanceButton(.liquidStakeUnit(viewState.lsu), appearance: .assetList, isSelected: viewState.isSelected, onTap: action)
@@ -73,7 +73,7 @@ struct ValidatorStakeView: View {
 	) -> some SwiftUI.View {
 		VStack(spacing: .zero) {
 			Divider()
-				.frame(height: .small3)
+				.frame(height: .assetDividerHeight)
 				.overlay(.app.gray5)
 
 			ResourceBalanceView.StakeClaimNFT(

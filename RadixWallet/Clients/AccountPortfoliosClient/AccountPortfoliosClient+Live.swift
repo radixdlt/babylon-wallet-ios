@@ -7,6 +7,7 @@ extension AccountPortfoliosClient: DependencyKey {
 		@Dependency(\.cacheClient) var cacheClient
 		@Dependency(\.tokenPricesClient) var tokenPricesClient
 		@Dependency(\.appPreferencesClient) var appPreferencesClient
+		@Dependency(\.resourcesVisibilityClient) var resourcesVisibilityClient
 		@Dependency(\.gatewaysClient) var gatewaysClient
 
 		/// Update currency amount visibility based on the profile state
@@ -25,12 +26,20 @@ extension AccountPortfoliosClient: DependencyKey {
 			}
 		}
 
+		/// Update when hidden resources change
+		Task {
+			for try await hiddenResources in await resourcesVisibilityClient.hiddenValues().removeDuplicates() {
+				guard !Task.isCancelled else { return }
+				await state.updatePortfoliosHiddenResources(hiddenResources: hiddenResources)
+			}
+		}
+
 		/// Fetches the pool and stake units details for a given account; Will update the portfolio accordingly
 		@Sendable
-		func fetchPoolAndStakeUnitsDetails(_ account: OnLedgerEntity.OnLedgerAccount, cachingStrategy: OnLedgerEntitiesClient.CachingStrategy) async {
+		func fetchPoolAndStakeUnitsDetails(_ account: OnLedgerEntity.OnLedgerAccount, hiddenResources: [ResourceIdentifier], cachingStrategy: OnLedgerEntitiesClient.CachingStrategy) async {
 			async let poolDetailsFetch = Task {
 				do {
-					let poolUnitDetails = try await onLedgerEntitiesClient.getOwnedPoolUnitsDetails(account, cachingStrategy: cachingStrategy)
+					let poolUnitDetails = try await onLedgerEntitiesClient.getOwnedPoolUnitsDetails(account, hiddenResources: hiddenResources, cachingStrategy: cachingStrategy)
 					await state.set(poolDetails: .success(poolUnitDetails), forAccount: account.address)
 				} catch {
 					await state.set(poolDetails: .failure(error), forAccount: account.address)
@@ -68,11 +77,12 @@ extension AccountPortfoliosClient: DependencyKey {
 		@Sendable
 		func fetchAccountPortfolios(
 			_ accountAddresses: [AccountAddress],
-			_ forceRefresh: Bool
+			forceRefreshEntities: Bool,
+			forceRefreshPrices: Bool
 		) async throws -> [AccountPortfolio] {
 			let gateway = await gatewaysClient.getCurrentGateway()
 			await state.setRadixGateway(gateway)
-			if forceRefresh {
+			if forceRefreshEntities {
 				for accountAddress in accountAddresses {
 					cacheClient.removeFolder(.init(address: accountAddress))
 				}
@@ -80,13 +90,15 @@ extension AccountPortfoliosClient: DependencyKey {
 
 			/// Explicetely load and set the currency target and visibility to make sure
 			/// it is available for usage before resources are loaded
-			let preferences = await appPreferencesClient.getPreferences().display
-			await state.setSelectedCurrency(preferences.fiatCurrencyPriceTarget)
-			await state.setIsCurrencyAmountVisble(preferences.isCurrencyAmountVisible)
+			let preferences = await appPreferencesClient.getPreferences()
+			let display = preferences.display
+			await state.setSelectedCurrency(display.fiatCurrencyPriceTarget)
+			await state.setIsCurrencyAmountVisble(display.isCurrencyAmountVisible)
 
 			let accounts = try await onLedgerEntitiesClient.getAccounts(accountAddresses)
+			let hiddenResources = try await resourcesVisibilityClient.getHidden()
 
-			let portfolios = accounts.map { AccountPortfolio(account: $0) }
+			let portfolios = accounts.map { AccountPortfolio(account: $0, hiddenResources: hiddenResources) }
 			await state.handlePortfoliosUpdate(portfolios)
 
 			/// Put together all resources from already fetched and new accounts
@@ -120,11 +132,11 @@ extension AccountPortfoliosClient: DependencyKey {
 				}
 			}()
 
-			await applyTokenPrices(Array(allResources), forceRefresh: forceRefresh)
+			await applyTokenPrices(Array(allResources), forceRefresh: forceRefreshPrices)
 
 			// Load additional details
 			_ = await accounts.map(\.nonEmptyVaults).parallelMap {
-				await fetchPoolAndStakeUnitsDetails($0, cachingStrategy: forceRefresh ? .forceUpdate : .useCache)
+				await fetchPoolAndStakeUnitsDetails($0, hiddenResources: hiddenResources, cachingStrategy: forceRefreshEntities ? .forceUpdate : .useCache)
 			}
 
 			return Array(state.portfoliosSubject.value.wrappedValue!.values)
@@ -140,7 +152,8 @@ extension AccountPortfoliosClient: DependencyKey {
 			}
 
 			let account = try await onLedgerEntitiesClient.getAccount(accountAddress)
-			let portfolio = AccountPortfolio(account: account)
+			let hiddenResources = try await resourcesVisibilityClient.getHidden()
+			let portfolio = AccountPortfolio(account: account, hiddenResources: hiddenResources)
 
 			if case let .success(tokenPrices) = await state.tokenPrices {
 				await applyTokenPrices(
@@ -150,7 +163,7 @@ extension AccountPortfoliosClient: DependencyKey {
 			}
 
 			await state.handlePortfolioUpdate(portfolio)
-			await fetchPoolAndStakeUnitsDetails(account.nonEmptyVaults, cachingStrategy: forceRefresh ? .forceUpdate : .useCache)
+			await fetchPoolAndStakeUnitsDetails(account.nonEmptyVaults, hiddenResources: hiddenResources, cachingStrategy: forceRefresh ? .forceUpdate : .useCache)
 
 			return portfolio
 		}
@@ -158,7 +171,7 @@ extension AccountPortfoliosClient: DependencyKey {
 		return AccountPortfoliosClient(
 			fetchAccountPortfolios: { accountAddresses, forceRefresh in
 				try await Task.detached {
-					try await fetchAccountPortfolios(accountAddresses, forceRefresh)
+					try await fetchAccountPortfolios(accountAddresses, forceRefreshEntities: forceRefresh, forceRefreshPrices: forceRefresh)
 				}.value
 			},
 			fetchAccountPortfolio: { accountAddress, forceRefresh in

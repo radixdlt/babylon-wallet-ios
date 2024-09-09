@@ -119,7 +119,6 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 					.init(
 						header: .init(title: L10n.EnterSeedPhrase.Header.titleMain),
 						warning: L10n.EnterSeedPhrase.warning,
-						hideAdvancedMode: true,
 						// we require 24 word Babylon mnemonic
 						isWordCountFixed: true,
 						persistStrategy: nil,
@@ -132,7 +131,11 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		case let .path(.element(_, action: .importMnemonic(.delegate(delegateAction)))):
 			switch delegateAction {
 			case let .notPersisted(mnemonicWithPassphrase):
-				let mainBDFS = DeviceFactorSource.babylon(mnemonicWithPassphrase: mnemonicWithPassphrase, isMain: true)
+				let mainBDFS = DeviceFactorSource.babylon(
+					mnemonicWithPassphrase: mnemonicWithPassphrase,
+					isMain: true,
+					hostInfo: .current()
+				)
 
 				let privateHD = PrivateHierarchicalDeterministicFactorSource(
 					mnemonicWithPassphrase: mnemonicWithPassphrase,
