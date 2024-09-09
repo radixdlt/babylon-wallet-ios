@@ -166,14 +166,14 @@ public struct Splash: Sendable, FeatureReducer {
 
 		case .showAppLockMessage:
 			state.destination = .errorAlert(.init(
-				title: { .init("Advanced Lock Disabled") },
+				title: { .init(L10n.Biometrics.AppLockAvailableAlert.title) },
 				actions: {
 					.default(
 						.init(L10n.Common.dismiss),
 						action: .send(.appLockOkButtonTapped)
 					)
 				},
-				message: { .init("Your phone was updated and now supports Apple's built-in App Lock feature.") }
+				message: { .init(L10n.Biometrics.AppLockAvailableAlert.message) }
 			))
 			return .none
 		}
