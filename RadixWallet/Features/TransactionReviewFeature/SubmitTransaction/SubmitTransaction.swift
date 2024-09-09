@@ -181,8 +181,4 @@ extension SubmitTransaction.State.TXStatus {
 		case .notYetSubmitted, .submitting, .submitted, .committedSuccessfully: false
 		}
 	}
-
-	var isFinal: Bool {
-		!isInProgress
-	}
 }

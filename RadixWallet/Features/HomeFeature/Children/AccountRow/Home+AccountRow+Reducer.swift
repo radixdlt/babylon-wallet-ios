@@ -60,6 +60,8 @@ extension Home {
 			case let .accountLockerClaimTapped(details):
 				.run { _ in
 					try await accountLockersClient.claimContent(details)
+				} catch: { error, _ in
+					loggerGlobal.error("Account locker claim failed, error: \(error)")
 				}
 			}
 		}
