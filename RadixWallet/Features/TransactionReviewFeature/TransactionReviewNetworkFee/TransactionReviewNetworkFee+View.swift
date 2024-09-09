@@ -53,7 +53,7 @@ extension TransactionReviewNetworkFee {
 						case .insufficientBalance:
 							WarningErrorView(text: L10n.TransactionReview.FeePayerValidation.insufficientBalance, type: .error)
 						case .valid(.introducesNewAccount):
-							WarningErrorView(text: L10n.TransactionReview.FeePayerValidation.linksNewAccount, type: .warning)
+							WarningErrorView.transactionIntroducesNewAccount
 						case .valid:
 							EmptyView()
 						}
