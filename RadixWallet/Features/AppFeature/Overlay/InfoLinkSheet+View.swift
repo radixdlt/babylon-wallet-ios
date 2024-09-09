@@ -14,6 +14,8 @@ extension InfoLinkSheet {
 
 		private let scrollViewTopID = "scrollViewTopID"
 
+		private let imageSize: CGSize = .init(width: 128, height: 80)
+
 		private var openURL: OpenURLAction {
 			OpenURLAction { url in
 				if let infoLink = InfoLinkSheet.GlossaryItem(url: url) {
@@ -37,7 +39,8 @@ extension InfoLinkSheet {
 							if let image = viewStore.image {
 								Image(asset: image)
 									.resizable()
-									.frame(.veryLarge)
+									.aspectRatio(contentMode: .fit)
+									.frame(width: imageSize.width, height: imageSize.height)
 									.padding(.bottom, .medium2)
 							}
 
@@ -49,7 +52,7 @@ extension InfoLinkSheet {
 							.environment(\.openURL, openURL)
 							.padding(.horizontal, .large2)
 						}
-						.padding(.top, .small2)
+						.padding(.vertical, .small2)
 						.id(scrollViewTopID)
 					}
 					.coordinateSpace(name: coordSpace)
