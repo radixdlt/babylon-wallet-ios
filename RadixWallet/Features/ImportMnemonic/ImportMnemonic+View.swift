@@ -304,7 +304,7 @@ extension ImportMnemonic.View {
 					// We need to leave some empty space before the button. Otherwise, the keyboard will get automatically dismissed
 					// when focused on one of the last 3 words. It only happens on release mode, since it is related to the screenshot
 					// prevention solution (which isn't enabled in debug).
-					// More info: https://radixdlt.atlassian.net/browse/ABW-3789
+					// More info: https://radixdlt.atlassian.net/browse/ABW-3790
 					Spacer(minLength: .small3)
 				}
 				Button(L10n.ImportMnemonic.importSeedPhrase, action: action)
