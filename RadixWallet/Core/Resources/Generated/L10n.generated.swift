@@ -174,6 +174,8 @@ public enum L10n {
       public static let title = L10n.tr("Localizable", "accountSecuritySettings_backups_title", fallback: "Backups")
     }
     public enum DepositGuarantees {
+      /// How guarantees work
+      public static let howGuaranteesWork = L10n.tr("Localizable", "accountSecuritySettings_depositGuarantees_howGuaranteesWork", fallback: "How guarantees work")
       /// Set your default guaranteed minimum for estimated deposits
       public static let subtitle = L10n.tr("Localizable", "accountSecuritySettings_depositGuarantees_subtitle", fallback: "Set your default guaranteed minimum for estimated deposits")
       /// Set the guaranteed minimum deposit to be applied whenever a deposit in a transaction can only be estimated.
