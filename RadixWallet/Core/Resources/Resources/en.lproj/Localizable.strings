@@ -980,6 +980,7 @@ Code: %@";
 "accountSecuritySettings_depositGuarantees_title" = "Default Deposit Guarantees";
 "accountSecuritySettings_depositGuarantees_subtitle" = "Set your default guaranteed minimum for estimated deposits";
 "accountSecuritySettings_depositGuarantees_text" = "Set the guaranteed minimum deposit to be applied whenever a deposit in a transaction can only be estimated.\n\nYou can always change the guarantee from this default in each transaction.";
+"accountSecuritySettings_depositGuarantees_howGuaranteesWork" = "How guarantees work";
 "accountSecuritySettings_accountRecoveryScan_title" = "Account Recovery Scan";
 "accountSecuritySettings_accountRecoveryScan_subtitle" = "Using seed phrase or Ledger device";
 "accountSecuritySettings_backups_title" = "Backups";
