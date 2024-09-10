@@ -300,6 +300,12 @@ extension ImportMnemonic.View {
 			) { action in
 				if viewStore.isNonChecksummed {
 					WarningErrorView(text: L10n.ImportMnemonic.checksumFailure, type: .error)
+				} else {
+					// We need to leave some empty space before the button. Otherwise, the keyboard will get automatically dismissed
+					// when focused on one of the last 3 words. It only happens on release mode, since it is related to the screenshot
+					// prevention solution (which isn't enabled in debug).
+					// More info: https://radixdlt.atlassian.net/browse/ABW-3789
+					Spacer(minLength: .small3)
 				}
 				Button(L10n.ImportMnemonic.importSeedPhrase, action: action)
 					.buttonStyle(.primaryRectangular)
