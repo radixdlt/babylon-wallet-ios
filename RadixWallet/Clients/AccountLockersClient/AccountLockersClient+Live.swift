@@ -11,20 +11,28 @@ extension AccountLockersClient {
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.cacheClient) var cacheClient
+		@Dependency(\.dappInteractionClient) var dappInteractionClient
+		@Dependency(\.submitTXClient) var submitTXClient
 
 		let claimsPerAccountSubject = AsyncCurrentValueSubject<ClaimsPerAccount>([:])
+		let forceRefreshSubject = AsyncCurrentValueSubject<Bool>(false)
+
+		// MARK: - StartMonitoring
 
 		@Sendable
 		func startMonitoring() async throws {
 			// We will check the account locker claims on different conditions:
 
-			// Trigger any time the authorized dapps changes (at any level)
+			// Any time the authorized dapps change (at any level)
 			let dappValues = await authorizedDappsClient.authorizedDappValues()
 
-			// Trigger every 5 minutes
+			// Every 5 minutes
 			let timer = AsyncTimerSequence(every: .minutes(5))
 
-			for try await (dapps, _) in combineLatest(dappValues, timer) {
+			// Whenever any flow on the Wallet indicates the client to force refresh (e.g. when an account locker was claimed)
+			let forceRefresh = forceRefreshSubject
+
+			for try await (dapps, _, _) in combineLatest(dappValues, timer, forceRefresh) {
 				do {
 					try await checkClaims(dapps: dapps)
 				} catch {
@@ -178,6 +186,18 @@ extension AccountLockersClient {
 			try await gatewayAPIClient.fetchAllPaginatedItems(cursor: nil, gatewayAPIClient.getAccountLockerVaultsPage(lockerAddress: lockerAddress, accountAddress: accountAddress))
 		}
 
+		// MARK: - AccountClaims
+
+		let accountClaims: AccountClaims = { account in
+			claimsPerAccountSubject.compactMap {
+				$0[account]
+			}
+			.share()
+			.eraseToAnyAsyncSequence()
+		}
+
+		// MARK: - DappsWithClaims
+
 		let dappsWithClaims: DappsWithClaims = {
 			claimsPerAccountSubject
 				.map { claimsPerAccount in
@@ -190,23 +210,74 @@ extension AccountLockersClient {
 				.eraseToAnyAsyncSequence()
 		}
 
+		// MARK: - ClaimContent
+
+		let claimContent: ClaimContent = { details in
+			let claimableResources = getAccountLockerClaimableResources(claims: details.claims)
+			let manifest = TransactionManifest.accountLockerClaim(
+				lockerAddress: details.lockerAddress,
+				claimant: details.accountAddress,
+				claimableResources: claimableResources
+			)
+			let result = await dappInteractionClient.addWalletInteraction(
+				.transaction(.init(send: .init(transactionManifest: manifest))),
+				.accountLockerClaim
+			)
+
+			switch result {
+			case let .dapp(.success(success)):
+				if case let .transaction(tx) = success.items {
+					// Wait for the transaction to be committed
+					let txID = tx.send.transactionIntentHash
+					try await submitTXClient.hasTXBeenCommittedSuccessfully(txID)
+					// And update claim status after
+					forceRefreshSubject.send(true)
+				}
+
+			case .dapp(.failure):
+				// Update claim status since it may have failed due to an account locker no longer being available.
+				forceRefreshSubject.send(true)
+
+			default:
+				break
+			}
+		}
+
+		@Sendable
+		func getAccountLockerClaimableResources(claims: [AccountLockerClaimDetails.Claim]) -> [AccountLockerClaimableResource] {
+			claims.map { item in
+				switch item {
+				case let .fungible(fungible):
+					.fungible(resourceAddress: fungible.resourceAddress, amount: fungible.amount)
+
+				case let .nonFungible(nonFungible):
+					.nonFungible(resourceAddress: nonFungible.resourceAddress, numberOfItems: UInt64(nonFungible.count))
+				}
+			}
+		}
+
+		// MARK: - ForceRefresh
+
+		let forceRefresh: ForceRefresh = {
+			forceRefreshSubject.send(true)
+		}
+
+		// MARK: - Client
+
 		return .init(
 			startMonitoring: startMonitoring,
-			accountClaims: { account in
-				claimsPerAccountSubject.compactMap {
-					$0[account]
-				}
-				.share()
-				.eraseToAnyAsyncSequence()
-			},
-			dappsWithClaims: dappsWithClaims
+			accountClaims: accountClaims,
+			dappsWithClaims: dappsWithClaims,
+			claimContent: claimContent,
+			forceRefresh: forceRefresh
 		)
 	}
+}
 
-	private struct DappWithLockerAddress: Sendable, Hashable {
-		let dapp: AuthorizedDapp
-		let lockerAddress: LockerAddress
-	}
+// MARK: - DappWithLockerAddress
+private struct DappWithLockerAddress: Sendable, Hashable {
+	let dapp: AuthorizedDapp
+	let lockerAddress: LockerAddress
 }
 
 private extension AuthorizedDapp {

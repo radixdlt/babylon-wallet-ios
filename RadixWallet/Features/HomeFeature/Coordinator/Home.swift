@@ -135,6 +135,7 @@ public struct Home: Sendable, FeatureReducer {
 	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.securityCenterClient) var securityCenterClient
 	@Dependency(\.continuousClock) var clock
+	@Dependency(\.accountLockersClient) var accountLockersClient
 
 	private let accountPortfoliosRefreshIntervalInSeconds = 300 // 5 minutes
 
@@ -201,6 +202,7 @@ public struct Home: Sendable, FeatureReducer {
 			return .none
 
 		case .pullToRefreshStarted:
+			accountLockersClient.forceRefresh()
 			return fetchAccountPortfolios(state)
 
 		case .settingsButtonTapped:

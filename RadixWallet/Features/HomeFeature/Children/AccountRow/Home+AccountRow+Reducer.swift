@@ -30,6 +30,7 @@ extension Home {
 			case task
 			case tapped
 			case securityProblemsTapped
+			case accountLockerClaimTapped(AccountLockerClaimDetails)
 		}
 
 		public enum InternalAction: Sendable, Equatable {
@@ -56,6 +57,12 @@ extension Home {
 				.send(.delegate(.openDetails))
 			case .securityProblemsTapped:
 				.send(.delegate(.openSecurityCenter))
+			case let .accountLockerClaimTapped(details):
+				.run { _ in
+					try await accountLockersClient.claimContent(details)
+				} catch: { error, _ in
+					loggerGlobal.error("Account locker claim failed, error: \(error)")
+				}
 			}
 		}
 
