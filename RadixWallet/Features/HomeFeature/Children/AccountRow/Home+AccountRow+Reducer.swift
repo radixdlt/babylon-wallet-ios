@@ -27,7 +27,6 @@ extension Home {
 		}
 
 		public enum ViewAction: Sendable, Equatable {
-			case task
 			case tapped
 			case securityProblemsTapped
 			case accountLockerClaimTapped(AccountLockerClaimDetails)
@@ -36,7 +35,6 @@ extension Home {
 		public enum InternalAction: Sendable, Equatable {
 			case accountUpdated(OnLedgerEntity.OnLedgerAccount)
 			case fiatWorthUpdated(Loadable<FiatWorth>)
-			case setAccountLockerClaims([AccountLockerClaimDetails])
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
@@ -51,8 +49,6 @@ extension Home {
 
 		public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
-			case .task:
-				accountLockerClaimsEffect(state: state)
 			case .tapped:
 				.send(.delegate(.openDetails))
 			case .securityProblemsTapped:
@@ -79,19 +75,6 @@ extension Home {
 			case let .fiatWorthUpdated(fiatWorth):
 				state.totalFiatWorth.refresh(from: fiatWorth)
 				return .none
-
-			case let .setAccountLockerClaims(claims):
-				state.accountLockerClaims = claims
-				return .none
-			}
-		}
-
-		private func accountLockerClaimsEffect(state: State) -> Effect<Action> {
-			.run { send in
-				for try await claims in await accountLockersClient.accountClaims(state.account.address) {
-					guard !Task.isCancelled else { return }
-					await send(.internal(.setAccountLockerClaims(claims)))
-				}
 			}
 		}
 	}

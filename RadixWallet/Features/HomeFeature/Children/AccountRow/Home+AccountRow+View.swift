@@ -123,9 +123,6 @@ extension Home.AccountRow {
 				.onTapGesture {
 					viewStore.send(.tapped)
 				}
-				.task { @MainActor in
-					await store.send(.view(.task)).finish()
-				}
 			}
 		}
 	}
