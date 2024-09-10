@@ -13,7 +13,7 @@ extension AccountLockersClient: TestDependencyKey {
 
 	public static let noop = Self(
 		startMonitoring: {},
-		accountClaims: { _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() },
+		claims: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		dappsWithClaims: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		claimContent: { _ in },
 		forceRefresh: {}
@@ -21,7 +21,7 @@ extension AccountLockersClient: TestDependencyKey {
 
 	public static let testValue = Self(
 		startMonitoring: unimplemented("\(Self.self).startMonitoring"),
-		accountClaims: unimplemented("\(Self.self).accountClaims"),
+		claims: unimplemented("\(Self.self).claims"),
 		dappsWithClaims: unimplemented("\(Self.self).dappsWithClaims"),
 		claimContent: unimplemented("\(Self.self).claimContent"),
 		forceRefresh: unimplemented("\(Self.self).forceRefresh")

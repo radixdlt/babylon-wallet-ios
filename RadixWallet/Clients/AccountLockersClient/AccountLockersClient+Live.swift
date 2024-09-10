@@ -186,14 +186,13 @@ extension AccountLockersClient {
 			try await gatewayAPIClient.fetchAllPaginatedItems(cursor: nil, gatewayAPIClient.getAccountLockerVaultsPage(lockerAddress: lockerAddress, accountAddress: accountAddress))
 		}
 
-		// MARK: - AccountClaims
+		// MARK: - Claims
 
-		let accountClaims: AccountClaims = { account in
-			claimsPerAccountSubject.compactMap {
-				$0[account]
-			}
-			.share()
-			.eraseToAnyAsyncSequence()
+		let claims: Claims = {
+			claimsPerAccountSubject
+				.share()
+				.removeDuplicates()
+				.eraseToAnyAsyncSequence()
 		}
 
 		// MARK: - DappsWithClaims
@@ -266,7 +265,7 @@ extension AccountLockersClient {
 
 		return .init(
 			startMonitoring: startMonitoring,
-			accountClaims: accountClaims,
+			claims: claims,
 			dappsWithClaims: dappsWithClaims,
 			claimContent: claimContent,
 			forceRefresh: forceRefresh
