@@ -79,26 +79,37 @@ public struct Splash: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			return .run { send in
-//				let isAdvancedLockEnabled = await onboardingClient.loadProfile().appPreferences.security.isAdvancedLockEnabled
-//
-//				// Starting with iOS 18, the system-provided biometric check will be used
-//				if #unavailable(iOS 18), isAdvancedLockEnabled {
-//					#if targetEnvironment(simulator)
-//					let isEnabled = _XCTIsTesting
-//					#else
-//					let isEnabled = true
-//					#endif
-//					await send(.internal(.advancedLockStateLoaded(isEnabled: isEnabled)))
-//				} else {
-				await send(.internal(.advancedLockStateLoaded(isEnabled: false)))
-				// }
+			switch state.context {
+			case .appStarted:
+				return boot_sargon_os().concatenate(with: loadAdvancedLockState())
+			case .appForegrounded:
+				return loadAdvancedLockState()
 			}
-			.concatenate(with: boot_sargon_os())
 
 		case .didTapToUnlock:
 			state.biometricsCheckFailed = false
 			return verifyPasscode()
+		}
+	}
+
+	func loadAdvancedLockState() -> Effect<Action> {
+		.run { send in
+			let profileState = await onboardingClient.loadProfileState()
+
+			if case let .loaded(profile) = profileState {
+				let isAdvancedLockEnabled = profile.appPreferences.security.isAdvancedLockEnabled
+				// Starting with iOS 18, the system-provided biometric check will be used
+				if #unavailable(iOS 18), isAdvancedLockEnabled {
+					#if targetEnvironment(simulator)
+					let isEnabled = _XCTIsTesting
+					#else
+					let isEnabled = true
+					#endif
+					await send(.internal(.advancedLockStateLoaded(isEnabled: isEnabled)))
+				} else {
+					await send(.internal(.advancedLockStateLoaded(isEnabled: false)))
+				}
+			}
 		}
 	}
 
@@ -170,15 +181,15 @@ public struct Splash: Sendable, FeatureReducer {
 	private func boot_sargon_os() -> Effect<Action> {
 		.run { _ in
 			_ = ProfileStore.shared
-			try await SargonOS.creatingShared(
-				bootingWith: .creatingShared(drivers: .init(
-					bundle: Bundle.main,
-					userDefaultsSuite: "group.com.radixpublishing.preview", secureStorageDriver: SargonSecureStorage()
-				)
+			try! await SargonOS.creatingShared(
+				bootingWith: .creatingShared(
+					drivers: .init(
+						bundle: Bundle.main,
+						userDefaultsSuite: "group.com.radixpublishing.preview",
+						secureStorageDriver: SargonSecureStorage()
+					)
 				)
 			)
-
-			// await send(.internal(.loadedProfileState(onboardingClient.loadProfileState())))
 		}
 	}
 
@@ -204,7 +215,7 @@ public struct Splash: Sendable, FeatureReducer {
 		.run { send in
 			switch context {
 			case .appStarted:
-				await send(.delegate(.completed(onboardingClient.loadProfile())))
+				await send(.delegate(.completed(onboardingClient.loadProfileState())))
 			case .appForegrounded:
 				localAuthenticationClient.setAuthenticatedSuccessfully()
 			}
