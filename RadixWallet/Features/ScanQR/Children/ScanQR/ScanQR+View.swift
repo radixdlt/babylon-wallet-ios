@@ -83,7 +83,7 @@ extension ScanQR.View {
 			}
 
 			if store.kind == .connectorExtension {
-				InfoButton(.radixconnect, label: L10n.ScanQR.ConnectorExtension.radixConnectLearMore)
+				InfoButton(.radixconnect, label: L10n.InfoLink.Title.radixconnect)
 			}
 		}
 	}

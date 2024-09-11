@@ -31,7 +31,7 @@ extension TransactionReviewGuarantees {
 							.multilineTextAlignment(.center)
 							.padding(.vertical, .medium3)
 
-						InfoButton(.guarantees, label: L10n.TransactionReview.Guarantees.howDoGuaranteesWork)
+						InfoButton(.guarantees, label: L10n.InfoLink.Title.guarantees)
 							.padding(.horizontal, .large2)
 							.padding(.bottom, .medium1)
 
