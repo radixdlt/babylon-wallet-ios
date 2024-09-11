@@ -1,5 +1,5 @@
-
 // MARK: - URLFormatterClient + DependencyKey
+
 extension URLFormatterClient: DependencyKey {
 	public static let liveValue = Self.live()
 
@@ -23,10 +23,15 @@ extension URLFormatterClient: DependencyKey {
 	#endif
 
 	private static func makeURL(url: URL, imageServiceURL: URL, size: CGSize) -> URL {
-		let originItem = URLQueryItem(name: "imageOrigin", value: url.absoluteString)
-		let sizeItem = URLQueryItem(name: "imageSize", value: imageSizeString(size: size))
-
-		return imageServiceURL.appending(queryItems: [originItem, sizeItem])
+		if url.isDataURL {
+			let imageOrigin = url.absoluteString.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? ""
+			let imageSize = imageSizeString(size: size)
+			return URL(string: "\(imageServiceURL.absoluteString)/?imageOrigin=\(imageOrigin)&imageSize=\(imageSize)")!
+		} else {
+			let originItem = URLQueryItem(name: "imageOrigin", value: url.absoluteString)
+			let sizeItem = URLQueryItem(name: "imageSize", value: imageSizeString(size: size))
+			return imageServiceURL.appending(queryItems: [originItem, sizeItem])
+		}
 	}
 
 	private static func imageSizeString(size: CGSize) -> String {
