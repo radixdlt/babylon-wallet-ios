@@ -123,8 +123,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Sajjon/ScreenshotPreventing-iOS",
       "state" : {
-        "revision" : "02d9892489ef2bb145f693a36ec914109f1d90ab",
-        "version" : "0.0.1"
+        "branch" : "main",
+        "revision" : "03769bcd1b1c9c24af424890f0a3e6d15bd3000c"
       }
     },
     {
