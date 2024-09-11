@@ -3,8 +3,14 @@ import Foundation
 // MARK: - Definition
 extension AccountPortfoliosClient {
 	public struct AccountPortfolio: Sendable, Hashable, CustomDebugStringConvertible {
+		/// The visible account to consumers of this portfolio. It has already removed any reference to hidden resources.
 		public var account: OnLedgerEntity.OnLedgerAccount
-		public let hiddenResources: [ResourceIdentifier]
+
+		/// The original account, without any modifications made. Necessary for whenever we need to update the hidden resources.
+		private let originalAccount: OnLedgerEntity.OnLedgerAccount
+
+		private(set) var hiddenResources: [ResourceIdentifier]
+
 		public var poolUnitDetails: Loadable<[OnLedgerEntitiesClient.OwnedResourcePoolDetails]> = .idle
 		public var stakeUnitDetails: Loadable<IdentifiedArrayOf<OnLedgerEntitiesClient.OwnedStakeDetails>> = .idle
 
@@ -15,6 +21,17 @@ extension AccountPortfoliosClient {
 		}
 
 		init(account: OnLedgerEntity.OnLedgerAccount, hiddenResources: [ResourceIdentifier]) {
+			self.originalAccount = account
+			self.hiddenResources = hiddenResources
+			self.account = Self.removeHiddenResourcesFromAccount(account: account, hiddenResources: hiddenResources)
+		}
+
+		mutating func updateHiddenResources(hiddenResources: [ResourceIdentifier]) {
+			self.hiddenResources = hiddenResources
+			self.account = Self.removeHiddenResourcesFromAccount(account: originalAccount, hiddenResources: hiddenResources)
+		}
+
+		private static func removeHiddenResourcesFromAccount(account: OnLedgerEntity.OnLedgerAccount, hiddenResources: [ResourceIdentifier]) -> OnLedgerEntity.OnLedgerAccount {
 			var modified = account
 
 			// Remove every hidden fungible resource
@@ -32,8 +49,7 @@ extension AccountPortfoliosClient {
 				hiddenResources.contains(.poolUnit(poolUnit.resourcePoolAddress))
 			})
 
-			self.account = modified
-			self.hiddenResources = hiddenResources
+			return modified
 		}
 	}
 
@@ -68,6 +84,16 @@ extension AccountPortfoliosClient.State {
 		var portfolios = portfolios
 		portfolios.mutateAll(applyFiatWorth)
 		setOrUpdateAccountPortfolios(portfolios)
+	}
+
+	func updatePortfoliosHiddenResources(hiddenResources: [ResourceIdentifier]) {
+		if var existingPortfolios = portfoliosSubject.value.values.wrappedValue.map({ Array($0) }) {
+			existingPortfolios.mutateAll { portfolio in
+				portfolio.updateHiddenResources(hiddenResources: hiddenResources)
+			}
+			applyTokenPrices(to: &existingPortfolios)
+			setOrUpdateAccountPortfolios(existingPortfolios)
+		}
 	}
 
 	func portfolioForAccount(_ address: AccountAddress) -> AnyAsyncSequence<AccountPortfoliosClient.AccountPortfolio> {

@@ -4,14 +4,23 @@ import SwiftUI
 // MARK: - Splash
 public struct Splash: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
+		public enum Context: Sendable {
+			case appStarted
+			case appForegrounded
+		}
+
+		public let context: Context
+
 		@PresentationState
 		public var destination: Destination.State?
 
 		var biometricsCheckFailed: Bool = false
 
 		public init(
+			context: Context = .appStarted,
 			destination: Destination.State? = nil
 		) {
+			self.context = context
 			self.destination = destination
 		}
 	}
@@ -23,8 +32,9 @@ public struct Splash: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case passcodeConfigResult(TaskResult<LocalAuthenticationConfig>)
-		case loadedProfile(Profile)
-		case accountRecoveryNeeded(TaskResult<Bool>)
+		case biometricsCheckResult(TaskResult<Bool>)
+		case advancedLockStateLoaded(isEnabled: Bool)
+		case showAppLockMessage
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -32,16 +42,19 @@ public struct Splash: Sendable, FeatureReducer {
 	}
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
-			case passcodeCheckFailed(AlertState<Action.PasscodeCheckFailedAlert>)
+			case errorAlert(AlertState<Action.ErrorAlert>)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
-			case passcodeCheckFailed(PasscodeCheckFailedAlert)
+			case errorAlert(ErrorAlert)
 
-			public enum PasscodeCheckFailedAlert: Sendable, Equatable {
-				case retryButtonTapped
+			public enum ErrorAlert: Sendable, Equatable {
+				case retryVerifyPasscodeButtonTapped
 				case openSettingsButtonTapped
+				case appLockOkButtonTapped
 			}
 		}
 
@@ -50,13 +63,10 @@ public struct Splash: Sendable, FeatureReducer {
 		}
 	}
 
-	@Dependency(\.networkSwitchingClient) var networkSwitchingClient
-	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.continuousClock) var clock
 	@Dependency(\.localAuthenticationClient) var localAuthenticationClient
 	@Dependency(\.onboardingClient) var onboardingClient
 	@Dependency(\.openURL) var openURL
-	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
+	@Dependency(\.userDefaults) var userDefaults
 
 	public init() {}
 
@@ -72,7 +82,31 @@ public struct Splash: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			return delay().concatenate(with: verifyPasscode())
+			return .run { send in
+				let isAdvancedLockEnabled = await onboardingClient.loadProfile().appPreferences.security.isAdvancedLockEnabled
+
+				guard #available(iOS 18, *) else {
+					// For versions below iOS 18, perform the advanced lock state check
+					if isAdvancedLockEnabled {
+						#if targetEnvironment(simulator)
+						let isEnabled = _XCTIsTesting
+						#else
+						let isEnabled = true
+						#endif
+						await send(.internal(.advancedLockStateLoaded(isEnabled: isEnabled)))
+					} else {
+						await send(.internal(.advancedLockStateLoaded(isEnabled: false)))
+					}
+					return
+				}
+
+				// Starting with iOS 18, the system-provided biometric check will be used
+				if isAdvancedLockEnabled, !userDefaults.appLockMessageShown {
+					await send(.internal(.showAppLockMessage))
+				} else {
+					await send(.internal(.advancedLockStateLoaded(isEnabled: false)))
+				}
+			}
 
 		case .didTapToUnlock:
 			state.biometricsCheckFailed = false
@@ -82,18 +116,21 @@ public struct Splash: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
+		case let .advancedLockStateLoaded(isEnabled):
+			return isEnabled ? verifyPasscode() : delegateCompleted(context: state.context)
+
 		case let .passcodeConfigResult(result):
 			let config = try? result.value
 
 			guard config?.isPasscodeSetUp == true else {
 				state.biometricsCheckFailed = true
 
-				state.destination = .passcodeCheckFailed(.init(
+				state.destination = .errorAlert(.init(
 					title: { .init(L10n.Splash.PasscodeCheckFailedAlert.title) },
 					actions: {
 						ButtonState(
 							role: .none,
-							action: .send(.retryButtonTapped),
+							action: .send(.retryVerifyPasscodeButtonTapped),
 							label: { TextState(L10n.Common.retry) }
 						)
 						ButtonState(
@@ -108,68 +145,53 @@ public struct Splash: Sendable, FeatureReducer {
 				return .none
 			}
 
-			return .run { send in
-				await send(.internal(.loadedProfile(onboardingClient.loadProfile())))
-			}
+			return authenticateWithBiometrics()
 
-		case let .loadedProfile(profile):
-			if profile.networks.isEmpty {
-				return delegateCompleted()
-			} else {
-				return checkAccountRecoveryNeeded()
-			}
-
-		case let .accountRecoveryNeeded(.failure(error)):
+		case let .biometricsCheckResult(.failure(error)):
 			state.biometricsCheckFailed = true
-			errorQueue.schedule(error)
+			state.destination = .errorAlert(.init(
+				title: { .init(L10n.Common.errorAlertTitle) },
+				actions: { .default(.init(L10n.Common.ok)) },
+				message: { .init(error.localizedDescription) }
+			))
 			return .none
 
-		case let .accountRecoveryNeeded(.success(recoveryNeeded)):
-			if recoveryNeeded {
-				loggerGlobal.notice("Account recovery needed")
+		case let .biometricsCheckResult(.success(success)):
+			guard success else {
+				state.biometricsCheckFailed = true
+				return .none
 			}
-			return delegateCompleted()
+
+			return delegateCompleted(context: state.context)
+
+		case .showAppLockMessage:
+			state.destination = .errorAlert(.init(
+				title: { .init(L10n.Biometrics.AppLockAvailableAlert.title) },
+				actions: {
+					.default(
+						.init(L10n.Common.dismiss),
+						action: .send(.appLockOkButtonTapped)
+					)
+				},
+				message: { .init(L10n.Biometrics.AppLockAvailableAlert.message) }
+			))
+			return .none
 		}
 	}
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case .passcodeCheckFailed(.retryButtonTapped):
-			verifyPasscode()
-		case .passcodeCheckFailed(.openSettingsButtonTapped):
-			.run { _ in
+		case .errorAlert(.retryVerifyPasscodeButtonTapped):
+			return verifyPasscode()
+
+		case .errorAlert(.openSettingsButtonTapped):
+			return .run { _ in
 				await openURL(URL(string: UIApplication.openSettingsURLString)!)
 			}
-		}
-	}
 
-	func delegateCompleted() -> Effect<Action> {
-		.run { send in
-			await send(.delegate(
-				.completed(ProfileStore.shared.profile)
-			))
-		}
-	}
-
-	func checkAccountRecoveryNeeded() -> Effect<Action> {
-		.run { send in
-			await send(.internal(.accountRecoveryNeeded(
-				.init {
-					try await deviceFactorSourceClient.isAccountRecoveryNeeded()
-				}
-			)))
-		}
-	}
-
-	private func delay() -> Effect<Action> {
-		.run { _ in
-			let durationInMS: Int
-			#if DEBUG
-			durationInMS = 400
-			#else
-			durationInMS = 750
-			#endif
-			try? await clock.sleep(for: .milliseconds(durationInMS))
+		case .errorAlert(.appLockOkButtonTapped):
+			userDefaults.setAppLockMessageShown(true)
+			return .send(.internal(.advancedLockStateLoaded(isEnabled: false)))
 		}
 	}
 
@@ -180,6 +202,25 @@ public struct Splash: Sendable, FeatureReducer {
 					try localAuthenticationClient.queryConfig()
 				}
 			)))
+		}
+	}
+
+	private func authenticateWithBiometrics() -> Effect<Action> {
+		.run { send in
+			await send(.internal(.biometricsCheckResult(.init {
+				try await localAuthenticationClient.authenticateWithBiometrics()
+			})))
+		}
+	}
+
+	private func delegateCompleted(context: State.Context) -> Effect<Action> {
+		.run { send in
+			switch context {
+			case .appStarted:
+				await send(.delegate(.completed(onboardingClient.loadProfile())))
+			case .appForegrounded:
+				localAuthenticationClient.setAuthenticatedSuccessfully()
+			}
 		}
 	}
 }

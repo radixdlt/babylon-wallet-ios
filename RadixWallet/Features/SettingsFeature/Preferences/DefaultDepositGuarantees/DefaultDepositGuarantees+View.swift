@@ -18,11 +18,13 @@ extension DefaultDepositGuarantees {
 
 extension DefaultDepositGuarantees.View {
 	public var body: some View {
-		VStack(spacing: .medium1) {
+		VStack(alignment: .leading, spacing: .medium1) {
 			Text(L10n.AccountSecuritySettings.DepositGuarantees.text)
 				.textStyle(.body1HighImportance)
 				.foregroundColor(.app.gray2)
 				.allowsHitTesting(false)
+
+			InfoButton(.guarantees, label: L10n.TransactionReview.Guarantees.howDoGuaranteesWork)
 
 			Card {
 				let stepperStore = store.scope(state: \.percentageStepper) { .child(.percentageStepper($0)) }

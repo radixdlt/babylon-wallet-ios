@@ -1,4 +1,4 @@
-
+// MARK: - WarningErrorView
 public struct WarningErrorView: View {
 	public let text: String
 	public let type: ViewType
@@ -36,6 +36,15 @@ public struct WarningErrorView: View {
 			.app.alert
 		case .error:
 			.app.red1
+		}
+	}
+}
+
+extension WarningErrorView {
+	static func transactionIntroducesNewAccount() -> some View {
+		HStack(alignment: .center, spacing: .small1) {
+			WarningErrorView(text: L10n.TransactionReview.FeePayerValidation.linksNewAccount, type: .warning)
+			InfoButton(.payingaccount)
 		}
 	}
 }

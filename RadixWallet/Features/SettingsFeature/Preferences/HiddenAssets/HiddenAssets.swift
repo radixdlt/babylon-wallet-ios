@@ -55,7 +55,7 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 		}
 	}
 
-	@Dependency(\.appPreferencesClient) var appPreferencesClient
+	@Dependency(\.resourcesVisibilityClient) var resourcesVisibilityClient
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.accountsClient) var accountsClient
 
@@ -69,7 +69,7 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 		switch viewAction {
 		case .task:
 			return .run { send in
-				let hiddenResources = await appPreferencesClient.getHiddenResources()
+				let hiddenResources = try await resourcesVisibilityClient.getHidden()
 				await send(.internal(.loadResources(hiddenResources)))
 			}
 		case let .unhideTapped(resource):
@@ -127,9 +127,7 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 			switch action {
 			case let .confirmTapped(resource):
 				return .run { send in
-					try await appPreferencesClient.updating { preferences in
-						preferences.resources.unhideResource(resource: resource)
-					}
+					try await resourcesVisibilityClient.unhide(resource)
 					await send(.internal(.didUnhideResource(resource)), animation: .default)
 				}
 			case .cancelTapped:

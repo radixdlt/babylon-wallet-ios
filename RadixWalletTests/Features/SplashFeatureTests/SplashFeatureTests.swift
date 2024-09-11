@@ -14,13 +14,18 @@ final class SplashFeatureTests: TestCase {
 			initialState: Splash.State(),
 			reducer: Splash.init
 		) {
-			$0.localAuthenticationClient = LocalAuthenticationClient {
-				authBiometricsConfig
-			}
+			$0.localAuthenticationClient = LocalAuthenticationClient(
+				queryConfig: { authBiometricsConfig },
+				authenticateWithBiometrics: { true },
+				setAuthenticatedSuccessfully: unimplemented("\(Self.self).setAuthenticatedSuccessfully"),
+				authenticatedSuccessfully: unimplemented("\(Self.self).authenticatedSuccessfully")
+			)
 
 			$0.continuousClock = clock
 			$0.onboardingClient.loadProfile = {
-				Profile.withOneAccount
+				var profile = Profile.withOneAccount
+				profile.appPreferences.security.isAdvancedLockEnabled = true
+				return profile
 			}
 		}
 
@@ -28,14 +33,15 @@ final class SplashFeatureTests: TestCase {
 		await store.send(.view(.appeared))
 
 		await clock.advance(by: .seconds(0.4))
+		await store.receive(.internal(.advancedLockStateLoaded(isEnabled: true)))
 		await store.receive(.internal(.passcodeConfigResult(.success(authBiometricsConfig)))) {
 			$0.biometricsCheckFailed = true
-			$0.destination = .passcodeCheckFailed(.init(
+			$0.destination = .errorAlert(.init(
 				title: { .init(L10n.Splash.PasscodeCheckFailedAlert.title) },
 				actions: {
 					ButtonState(
 						role: .none,
-						action: .send(.retryButtonTapped),
+						action: .send(.retryVerifyPasscodeButtonTapped),
 						label: { TextState(L10n.Common.retry) }
 					)
 					ButtonState(

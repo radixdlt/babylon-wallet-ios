@@ -18,12 +18,14 @@ public struct Preferences: Sendable, FeatureReducer {
 		case hiddenAssetsButtonTapped
 		case gatewaysButtonTapped
 		case developerModeToogled(Bool)
+		case advancedLockToogled(Bool)
 		case exportLogsButtonTapped
 		case exportLogsDismissed
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case loadedAppPreferences(AppPreferences)
+		case advancedLockToggleResult(authResult: TaskResult<Bool>, isEnabled: Bool)
 	}
 
 	public struct Destination: DestinationReducer {
@@ -60,6 +62,8 @@ public struct Preferences: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
+	@Dependency(\.localAuthenticationClient) var localAuthenticationClient
+	@Dependency(\.errorQueue) var errorQueue
 
 	public init() {}
 
@@ -102,6 +106,16 @@ public struct Preferences: Sendable, FeatureReducer {
 			guard let preferences = state.appPreferences else { return .none }
 			return .run { _ in
 				try await appPreferencesClient.updatePreferences(preferences)
+			} catch: { error, _ in
+				errorQueue.schedule(error)
+			}
+
+		case let .advancedLockToogled(isEnabled):
+			return .run { send in
+				let authResult = await TaskResult<Bool> {
+					try await localAuthenticationClient.authenticateWithBiometrics()
+				}
+				await send(.internal(.advancedLockToggleResult(authResult: authResult, isEnabled: isEnabled)))
 			}
 
 		case .exportLogsButtonTapped:
@@ -119,6 +133,14 @@ public struct Preferences: Sendable, FeatureReducer {
 		case let .loadedAppPreferences(appPreferences):
 			state.appPreferences = appPreferences
 			return .none
+
+		case let .advancedLockToggleResult(.failure(error), _):
+			errorQueue.schedule(error)
+			return .none
+
+		case let .advancedLockToggleResult(.success(success), isEnabled):
+			guard success else { return .none }
+			return updateAdvancedLock(state: &state, isEnabled: isEnabled)
 		}
 	}
 
@@ -134,6 +156,16 @@ public struct Preferences: Sendable, FeatureReducer {
 		guard let preferences = state.appPreferences else { return .none }
 		return .run { _ in
 			try await appPreferencesClient.updatePreferences(preferences)
+		}
+	}
+
+	private func updateAdvancedLock(state: inout State, isEnabled: Bool) -> Effect<Action> {
+		state.appPreferences?.security.isAdvancedLockEnabled = isEnabled
+		guard let preferences = state.appPreferences else { return .none }
+		return .run { _ in
+			try await appPreferencesClient.updatePreferences(preferences)
+		} catch: { error, _ in
+			errorQueue.schedule(error)
 		}
 	}
 }
