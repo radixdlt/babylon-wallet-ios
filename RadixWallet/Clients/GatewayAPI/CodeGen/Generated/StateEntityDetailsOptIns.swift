@@ -30,20 +30,14 @@ public struct StateEntityDetailsOptIns: Codable, Hashable {
     public private(set) var nonFungibleIncludeNfids: Bool? = false
     /** allows specifying explicitly metadata properties which should be returned in response. */
     public private(set) var explicitMetadata: [String]?
-    /** if set to `true`, on-ledger dApp two-way links (resolved & verified) are returned. See https://docs.radixdlt.com/docs/metadata-for-verification for more details. */
-    public private(set) var dappTwoWayLinks: Bool? = false
-    /** if set to `true`, additional details for the Network native resources are returned. */
-    public private(set) var nativeResourceDetails: Bool? = false
 
-    public init(ancestorIdentities: Bool? = false, componentRoyaltyConfig: Bool? = false, componentRoyaltyVaultBalance: Bool? = false, packageRoyaltyVaultBalance: Bool? = false, nonFungibleIncludeNfids: Bool? = false, explicitMetadata: [String]? = nil, dappTwoWayLinks: Bool? = false, nativeResourceDetails: Bool? = false) {
+    public init(ancestorIdentities: Bool? = false, componentRoyaltyConfig: Bool? = false, componentRoyaltyVaultBalance: Bool? = false, packageRoyaltyVaultBalance: Bool? = false, nonFungibleIncludeNfids: Bool? = false, explicitMetadata: [String]? = nil) {
         self.ancestorIdentities = ancestorIdentities
         self.componentRoyaltyConfig = componentRoyaltyConfig
         self.componentRoyaltyVaultBalance = componentRoyaltyVaultBalance
         self.packageRoyaltyVaultBalance = packageRoyaltyVaultBalance
         self.nonFungibleIncludeNfids = nonFungibleIncludeNfids
         self.explicitMetadata = explicitMetadata
-        self.dappTwoWayLinks = dappTwoWayLinks
-        self.nativeResourceDetails = nativeResourceDetails
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
@@ -53,8 +47,6 @@ public struct StateEntityDetailsOptIns: Codable, Hashable {
         case packageRoyaltyVaultBalance = "package_royalty_vault_balance"
         case nonFungibleIncludeNfids = "non_fungible_include_nfids"
         case explicitMetadata = "explicit_metadata"
-        case dappTwoWayLinks = "dapp_two_way_links"
-        case nativeResourceDetails = "native_resource_details"
     }
 
     // Encodable protocol methods
@@ -67,8 +59,6 @@ public struct StateEntityDetailsOptIns: Codable, Hashable {
         try container.encodeIfPresent(packageRoyaltyVaultBalance, forKey: .packageRoyaltyVaultBalance)
         try container.encodeIfPresent(nonFungibleIncludeNfids, forKey: .nonFungibleIncludeNfids)
         try container.encodeIfPresent(explicitMetadata, forKey: .explicitMetadata)
-        try container.encodeIfPresent(dappTwoWayLinks, forKey: .dappTwoWayLinks)
-        try container.encodeIfPresent(nativeResourceDetails, forKey: .nativeResourceDetails)
     }
 }
 

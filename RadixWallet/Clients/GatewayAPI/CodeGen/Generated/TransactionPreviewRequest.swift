@@ -19,26 +19,24 @@ public struct TransactionPreviewRequest: Codable, Hashable {
 
     /** A text-representation of a transaction manifest */
     public private(set) var manifest: String
-    /** An array of hex-encoded blob data, if referenced by the manifest. */
+    /** An array of hex-encoded blob data (optional) */
     public private(set) var blobsHex: [String]?
-    /** An integer between `0` and `10^10`, marking the epoch at which the transaction starts being valid. If omitted, the current epoch will be used (taking into account the `at_ledger_state`, if specified).  */
+    /** An integer between `0` and `10^10`, marking the epoch at which the transaction starts being valid */
     public private(set) var startEpochInclusive: Int64
-    /** An integer between `0` and `10^10`, marking the epoch at which the transaction is no longer valid. If omitted, a maximum epoch (relative to the `start_epoch_inclusive`) will be used.  */
+    /** An integer between `0` and `10^10`, marking the epoch at which the transaction is no longer valid */
     public private(set) var endEpochExclusive: Int64
     public private(set) var notaryPublicKey: PublicKey?
-    /** Whether the notary should count as a signatory (defaults to `false`). */
+    /** Whether the notary should count as a signatory (optional, default false) */
     public private(set) var notaryIsSignatory: Bool?
-    /** An integer between `0` and `65535`, giving the validator tip as a percentage amount. A value of `1` corresponds to a 1% fee.  */
+    /** An integer between `0` and `65535`, giving the validator tip as a percentage amount. A value of `1` corresponds to 1% of the fee. */
     public private(set) var tipPercentage: Int
-    /** An integer between `0` and `2^32 - 1`, chosen to allow a unique intent to be created (to enable submitting an otherwise identical/duplicate intent).  */
+    /** A decimal-string-encoded integer between `0` and `2^32 - 1`, used to ensure the transaction intent is unique. */
     public private(set) var nonce: Int64
     /** A list of public keys to be used as transaction signers */
     public private(set) var signerPublicKeys: [PublicKey]
-    /** An optional transaction message. Only affects the costing. This type is defined in the Core API as `TransactionMessage`. See the Core API documentation for more details.  */
-    public private(set) var message: AnyCodable?
     public private(set) var flags: TransactionPreviewRequestFlags
 
-    public init(manifest: String, blobsHex: [String]? = nil, startEpochInclusive: Int64, endEpochExclusive: Int64, notaryPublicKey: PublicKey? = nil, notaryIsSignatory: Bool? = nil, tipPercentage: Int, nonce: Int64, signerPublicKeys: [PublicKey], message: AnyCodable? = nil, flags: TransactionPreviewRequestFlags) {
+    public init(manifest: String, blobsHex: [String]? = nil, startEpochInclusive: Int64, endEpochExclusive: Int64, notaryPublicKey: PublicKey? = nil, notaryIsSignatory: Bool? = nil, tipPercentage: Int, nonce: Int64, signerPublicKeys: [PublicKey], flags: TransactionPreviewRequestFlags) {
         self.manifest = manifest
         self.blobsHex = blobsHex
         self.startEpochInclusive = startEpochInclusive
@@ -48,7 +46,6 @@ public struct TransactionPreviewRequest: Codable, Hashable {
         self.tipPercentage = tipPercentage
         self.nonce = nonce
         self.signerPublicKeys = signerPublicKeys
-        self.message = message
         self.flags = flags
     }
 
@@ -62,7 +59,6 @@ public struct TransactionPreviewRequest: Codable, Hashable {
         case tipPercentage = "tip_percentage"
         case nonce
         case signerPublicKeys = "signer_public_keys"
-        case message
         case flags
     }
 
@@ -79,7 +75,6 @@ public struct TransactionPreviewRequest: Codable, Hashable {
         try container.encode(tipPercentage, forKey: .tipPercentage)
         try container.encode(nonce, forKey: .nonce)
         try container.encode(signerPublicKeys, forKey: .signerPublicKeys)
-        try container.encodeIfPresent(message, forKey: .message)
         try container.encode(flags, forKey: .flags)
     }
 }

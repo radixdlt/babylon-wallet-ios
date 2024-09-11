@@ -72,11 +72,9 @@ public struct NetworkConfigurationResponseWellKnownAddresses: Codable, Hashable 
     /** Bech32m-encoded human readable version of the address. */
     public private(set) var poolPackage: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var lockerPackage: String
-    /** Bech32m-encoded human readable version of the address. */
     public private(set) var transactionTracker: String
 
-    public init(xrd: String, secp256k1SignatureVirtualBadge: String, ed25519SignatureVirtualBadge: String, packageOfDirectCallerVirtualBadge: String, globalCallerVirtualBadge: String, systemTransactionBadge: String, packageOwnerBadge: String, validatorOwnerBadge: String, accountOwnerBadge: String, identityOwnerBadge: String, packagePackage: String, resourcePackage: String, accountPackage: String, identityPackage: String, consensusManagerPackage: String, accessControllerPackage: String, transactionProcessorPackage: String, metadataModulePackage: String, royaltyModulePackage: String, accessRulesPackage: String, roleAssignmentModulePackage: String, genesisHelperPackage: String, faucetPackage: String, consensusManager: String, genesisHelper: String, faucet: String, poolPackage: String, lockerPackage: String, transactionTracker: String) {
+    public init(xrd: String, secp256k1SignatureVirtualBadge: String, ed25519SignatureVirtualBadge: String, packageOfDirectCallerVirtualBadge: String, globalCallerVirtualBadge: String, systemTransactionBadge: String, packageOwnerBadge: String, validatorOwnerBadge: String, accountOwnerBadge: String, identityOwnerBadge: String, packagePackage: String, resourcePackage: String, accountPackage: String, identityPackage: String, consensusManagerPackage: String, accessControllerPackage: String, transactionProcessorPackage: String, metadataModulePackage: String, royaltyModulePackage: String, accessRulesPackage: String, roleAssignmentModulePackage: String, genesisHelperPackage: String, faucetPackage: String, consensusManager: String, genesisHelper: String, faucet: String, poolPackage: String, transactionTracker: String) {
         self.xrd = xrd
         self.secp256k1SignatureVirtualBadge = secp256k1SignatureVirtualBadge
         self.ed25519SignatureVirtualBadge = ed25519SignatureVirtualBadge
@@ -104,7 +102,6 @@ public struct NetworkConfigurationResponseWellKnownAddresses: Codable, Hashable 
         self.genesisHelper = genesisHelper
         self.faucet = faucet
         self.poolPackage = poolPackage
-        self.lockerPackage = lockerPackage
         self.transactionTracker = transactionTracker
     }
 
@@ -136,7 +133,6 @@ public struct NetworkConfigurationResponseWellKnownAddresses: Codable, Hashable 
         case genesisHelper = "genesis_helper"
         case faucet
         case poolPackage = "pool_package"
-        case lockerPackage = "locker_package"
         case transactionTracker = "transaction_tracker"
     }
 
@@ -171,7 +167,6 @@ public struct NetworkConfigurationResponseWellKnownAddresses: Codable, Hashable 
         try container.encode(genesisHelper, forKey: .genesisHelper)
         try container.encode(faucet, forKey: .faucet)
         try container.encode(poolPackage, forKey: .poolPackage)
-        try container.encode(lockerPackage, forKey: .lockerPackage)
         try container.encode(transactionTracker, forKey: .transactionTracker)
     }
 }
