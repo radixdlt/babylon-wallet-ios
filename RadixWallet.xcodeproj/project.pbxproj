@@ -724,6 +724,11 @@
 		5B2A45022BD6680400AEC8AD /* ContactSupportClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2A45012BD6680400AEC8AD /* ContactSupportClient.swift */; };
 		5B2A45042BD6689100AEC8AD /* ContactSupportClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2A45032BD6689100AEC8AD /* ContactSupportClient+Live.swift */; };
 		5B3C48A92C7E190C00DB160D /* AssetRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3C48A82C7E190C00DB160D /* AssetRow.swift */; };
+		5B3C48B52C80D11E00DB160D /* AccountLockersClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3C48B42C80D11E00DB160D /* AccountLockersClient+Interface.swift */; };
+		5B3C48B72C80D17E00DB160D /* AccountLockersClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3C48B62C80D17E00DB160D /* AccountLockersClient+Live.swift */; };
+		5B3C48B92C80D23F00DB160D /* AccountLockersClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3C48B82C80D23F00DB160D /* AccountLockersClient+Test.swift */; };
+		5B3C48C12C85CEAA00DB160D /* AccountBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3C48C02C85CEAA00DB160D /* AccountBannerView.swift */; };
+		5B3C48C32C874C8D00DB160D /* Dispatch+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3C48C22C874C8D00DB160D /* Dispatch+Extra.swift */; };
 		5B43B08B2BDAAD4B00AA1E92 /* AddressDetails+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B43B0892BDAAD4B00AA1E92 /* AddressDetails+View.swift */; };
 		5B43B08C2BDAAD4B00AA1E92 /* AddressDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B43B08A2BDAAD4B00AA1E92 /* AddressDetails.swift */; };
 		5B45E2FA2BC45770007C4C84 /* FactorSourceAccess+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B45E2F82BC45770007C4C84 /* FactorSourceAccess+View.swift */; };
@@ -732,6 +737,7 @@
 		5B45E2FF2BC59780007C4C84 /* SignWithFactorSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B45E2FD2BC59780007C4C84 /* SignWithFactorSource.swift */; };
 		5B45E3012BC5A491007C4C84 /* FactorSourceAccess+ViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B45E3002BC5A491007C4C84 /* FactorSourceAccess+ViewState.swift */; };
 		5B4712CC2C526146003B4712 /* HeaderButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4712CB2C526146003B4712 /* HeaderButtonStyle.swift */; };
+		5B526ADB2C876E7C00AF8B72 /* AccountLockerClaimDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B526ADA2C876E7C00AF8B72 /* AccountLockerClaimDetails.swift */; };
 		5B526AEC2C89C3C200AF8B72 /* ResourcesVisibilityClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B526AE82C89C3C200AF8B72 /* ResourcesVisibilityClient+Interface.swift */; };
 		5B526AED2C89C3C200AF8B72 /* ResourcesVisibilityClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B526AE92C89C3C200AF8B72 /* ResourcesVisibilityClient+Live.swift */; };
 		5B526AEE2C89C3C200AF8B72 /* ResourcesVisibilityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B526AEA2C89C3C200AF8B72 /* ResourcesVisibilityClient+Test.swift */; };
@@ -1928,6 +1934,11 @@
 		5B2A45012BD6680400AEC8AD /* ContactSupportClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactSupportClient.swift; sourceTree = "<group>"; };
 		5B2A45032BD6689100AEC8AD /* ContactSupportClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ContactSupportClient+Live.swift"; sourceTree = "<group>"; };
 		5B3C48A82C7E190C00DB160D /* AssetRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetRow.swift; sourceTree = "<group>"; };
+		5B3C48B42C80D11E00DB160D /* AccountLockersClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountLockersClient+Interface.swift"; sourceTree = "<group>"; };
+		5B3C48B62C80D17E00DB160D /* AccountLockersClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountLockersClient+Live.swift"; sourceTree = "<group>"; };
+		5B3C48B82C80D23F00DB160D /* AccountLockersClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountLockersClient+Test.swift"; sourceTree = "<group>"; };
+		5B3C48C02C85CEAA00DB160D /* AccountBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountBannerView.swift; sourceTree = "<group>"; };
+		5B3C48C22C874C8D00DB160D /* Dispatch+Extra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Dispatch+Extra.swift"; sourceTree = "<group>"; };
 		5B43B0892BDAAD4B00AA1E92 /* AddressDetails+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddressDetails+View.swift"; sourceTree = "<group>"; };
 		5B43B08A2BDAAD4B00AA1E92 /* AddressDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressDetails.swift; sourceTree = "<group>"; };
 		5B45E2F82BC45770007C4C84 /* FactorSourceAccess+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactorSourceAccess+View.swift"; sourceTree = "<group>"; };
@@ -1936,6 +1947,7 @@
 		5B45E2FD2BC59780007C4C84 /* SignWithFactorSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignWithFactorSource.swift; sourceTree = "<group>"; };
 		5B45E3002BC5A491007C4C84 /* FactorSourceAccess+ViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactorSourceAccess+ViewState.swift"; sourceTree = "<group>"; };
 		5B4712CB2C526146003B4712 /* HeaderButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderButtonStyle.swift; sourceTree = "<group>"; };
+		5B526ADA2C876E7C00AF8B72 /* AccountLockerClaimDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountLockerClaimDetails.swift; sourceTree = "<group>"; };
 		5B526AE82C89C3C200AF8B72 /* ResourcesVisibilityClient+Interface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ResourcesVisibilityClient+Interface.swift"; sourceTree = "<group>"; };
 		5B526AE92C89C3C200AF8B72 /* ResourcesVisibilityClient+Live.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ResourcesVisibilityClient+Live.swift"; sourceTree = "<group>"; };
 		5B526AEA2C89C3C200AF8B72 /* ResourcesVisibilityClient+Test.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ResourcesVisibilityClient+Test.swift"; sourceTree = "<group>"; };
@@ -4334,6 +4346,7 @@
 				48CFBF462ADC10D900E77A5C /* CustomDumpConformance.swift */,
 				48CFBF472ADC10D900E77A5C /* ByteArray+Hex.swift */,
 				5B758D4E2BCD5BF700348722 /* Effect+Extra.swift */,
+				5B3C48C22C874C8D00DB160D /* Dispatch+Extra.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -4389,6 +4402,7 @@
 		48CFBF522ADC10D900E77A5C /* Clients */ = {
 			isa = PBXGroup;
 			children = (
+				5B3C48B32C80D0FF00DB160D /* AccountLockersClient */,
 				48CFBF8D2ADC10D900E77A5C /* AccountPortfoliosClient */,
 				48CFBF622ADC10D900E77A5C /* AccountsClient */,
 				5B272DD52C36E88700B74F1F /* AppEventsClient */,
@@ -4910,6 +4924,7 @@
 				A4CFB5602BAA826E00778BDD /* Measure+Position.swift */,
 				E7B7A0FC2BBBFB6100EEE900 /* HeaderListViewContainer.swift */,
 				5B77D7B12C0DFE8300F5F215 /* EntitySecurityProblemsView.swift */,
+				5B3C48C02C85CEAA00DB160D /* AccountBannerView.swift */,
 			);
 			path = DesignSystem;
 			sourceTree = "<group>";
@@ -5483,6 +5498,17 @@
 				5BC82B6B2BED18A1009AC162 /* FactoryReset+Reducer.swift */,
 			);
 			path = FactoryReset;
+			sourceTree = "<group>";
+		};
+		5B3C48B32C80D0FF00DB160D /* AccountLockersClient */ = {
+			isa = PBXGroup;
+			children = (
+				5B3C48B42C80D11E00DB160D /* AccountLockersClient+Interface.swift */,
+				5B3C48B62C80D17E00DB160D /* AccountLockersClient+Live.swift */,
+				5B3C48B82C80D23F00DB160D /* AccountLockersClient+Test.swift */,
+				5B526ADA2C876E7C00AF8B72 /* AccountLockerClaimDetails.swift */,
+			);
+			path = AccountLockersClient;
 			sourceTree = "<group>";
 		};
 		5B45E2F32BC45706007C4C84 /* FactorSourceAccess */ = {
@@ -7223,6 +7249,7 @@
 				48CFC4002ADC10D900E77A5C /* Constants.swift in Sources */,
 				5B45E2FE2BC59780007C4C84 /* SignWithFactorSource+View.swift in Sources */,
 				5B45E2FF2BC59780007C4C84 /* SignWithFactorSource.swift in Sources */,
+				5B3C48C32C874C8D00DB160D /* Dispatch+Extra.swift in Sources */,
 				A40815842C7E0D08005E65B9 /* InvalidTransactionError.swift in Sources */,
 				836878612B4551910029C808 /* UnknownDappComponents+Reducer.swift in Sources */,
 				48CFC2782ADC10D900E77A5C /* P2PLinkRow+View.swift in Sources */,
@@ -7335,6 +7362,7 @@
 				48CFC6202ADC10DA00E77A5C /* OnLedgerEntity.swift in Sources */,
 				5B80FCC42C298E68008444F5 /* ArbitraryDataFieldView.swift in Sources */,
 				8370FC5C2B99C780007AD882 /* NPSSurveyClient+Interface.swift in Sources */,
+				5B3C48B52C80D11E00DB160D /* AccountLockersClient+Interface.swift in Sources */,
 				5B526AED2C89C3C200AF8B72 /* ResourcesVisibilityClient+Live.swift in Sources */,
 				A408155B2C7E0D08005E65B9 /* AccountDepositPreValidationResourceSpecificBehaviourItem.swift in Sources */,
 				5B4712CC2C526146003B4712 /* HeaderButtonStyle.swift in Sources */,
@@ -7586,6 +7614,7 @@
 				A462B5A42B8384FB00C26D20 /* CoreAPI_PlaintextMessageContent.swift in Sources */,
 				48CFC4312ADC10DA00E77A5C /* PublicKey+Extensions.swift in Sources */,
 				48CFC2CE2ADC10D900E77A5C /* ReceivingAccount+Reducer.swift in Sources */,
+				5B3C48B92C80D23F00DB160D /* AccountLockersClient+Test.swift in Sources */,
 				48CFC3722ADC10D900E77A5C /* LSUDetails+View.swift in Sources */,
 				5B526AEC2C89C3C200AF8B72 /* ResourcesVisibilityClient+Interface.swift in Sources */,
 				48CFC47E2ADC10DA00E77A5C /* OverlayWindowClient+Live.swift in Sources */,
@@ -7753,6 +7782,7 @@
 				48CFC47A2ADC10DA00E77A5C /* LocalAuthenticationClient+Interface.swift in Sources */,
 				A40815682C7E0D08005E65B9 /* BlueprintMethodRoyalty.swift in Sources */,
 				48D5F3922BD8DDB9000DE964 /* DebugSettingsCoordinator+Reducer.swift in Sources */,
+				5B3C48B72C80D17E00DB160D /* AccountLockersClient+Live.swift in Sources */,
 				48CFC5A32ADC10DA00E77A5C /* TrailingIconLabelStyle.swift in Sources */,
 				48CFC4182ADC10DA00E77A5C /* IdentifiedArrayOf+Extensions.swift in Sources */,
 				48CFC3EB2ADC10D900E77A5C /* RTCClients.swift in Sources */,
@@ -7831,6 +7861,7 @@
 				48CFC6212ADC10DA00E77A5C /* AtLedgerState.swift in Sources */,
 				A40816082C7E0D08005E65B9 /* StateEntityDetailsResponseFungibleResourceDetails.swift in Sources */,
 				48CFC3F52ADC10D900E77A5C /* SignalingClientTypes.swift in Sources */,
+				5B526ADB2C876E7C00AF8B72 /* AccountLockerClaimDetails.swift in Sources */,
 				A408164D2C7E0D08005E65B9 /* TransactionReceipt.swift in Sources */,
 				A408156A2C7E0D08005E65B9 /* CommittedTransactionInfo.swift in Sources */,
 				A408162D2C7E0D08005E65B9 /* StateNonFungibleIdsResponse.swift in Sources */,
@@ -8020,6 +8051,7 @@
 				48CFC3FE2ADC10D900E77A5C /* RTCDataChannel+Delegate.swift in Sources */,
 				48CFC2FD2ADC10D900E77A5C /* DefaultDepositGuarantees+View.swift in Sources */,
 				48CFC5E02ADC10DA00E77A5C /* LoadableView.swift in Sources */,
+				5B3C48C12C85CEAA00DB160D /* AccountBannerView.swift in Sources */,
 				48CFC6012ADC10DA00E77A5C /* P2P+ConnectorExtension+Request.swift in Sources */,
 				A40815832C7E0D08005E65B9 /* InvalidRequestError.swift in Sources */,
 				48CFC5C22ADC10DA00E77A5C /* Shapes.swift in Sources */,

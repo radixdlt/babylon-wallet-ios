@@ -18,7 +18,7 @@ extension OnLedgerEntitiesClient {
 	public typealias GetNonFungibleTokenData = @Sendable (GetNonFungibleTokenDataRequest) async throws -> [OnLedgerEntity.NonFungibleToken]
 	public typealias GetAccountOwnedNonFungibleTokenData = @Sendable (GetAccountOwnedNonFungibleTokenDataRequest) async throws -> GetAccountOwnedNonFungibleTokenResponse
 
-	public typealias GetEntities = @Sendable ([Address], Set<EntityMetadataKey>, AtLedgerState?, CachingStrategy, _ fetchMetadata: Bool) async throws -> [OnLedgerEntity]
+	public typealias GetEntities = @Sendable ([Address], GatewayAPI.StateEntityDetailsOptIns, AtLedgerState?, CachingStrategy, _ fetchMetadata: Bool) async throws -> [OnLedgerEntity]
 }
 
 // MARK: OnLedgerEntitiesClient.GetNonFungibleTokenDataRequest
@@ -154,7 +154,7 @@ extension OnLedgerEntitiesClient {
 	) async throws -> [OnLedgerEntity] {
 		try await getEntities(
 			addresses,
-			metadataKeys,
+			.init(explicitMetadata: metadataKeys.map(\.rawValue)),
 			atLedgerState,
 			cachingStrategy,
 			fetchMetadata
@@ -541,11 +541,11 @@ extension OnLedgerEntitiesClient {
 			!hiddenResources.contains(.poolUnit(poolUnit.resourcePoolAddress))
 		}
 		let pools = try await getEntities(
-			ownedPoolUnits.map(\.resourcePoolAddress).map(\.asGeneral),
-			[.dappDefinition],
-			account.atLedgerState,
-			cachingStrategy,
-			false
+			addresses: ownedPoolUnits.map(\.resourcePoolAddress).map(\.asGeneral),
+			metadataKeys: [.dappDefinition],
+			cachingStrategy: cachingStrategy,
+			atLedgerState: account.atLedgerState,
+			fetchMetadata: false
 		).compactMap(\.resourcePool)
 
 		var allResourceAddresses: [ResourceAddress] = []

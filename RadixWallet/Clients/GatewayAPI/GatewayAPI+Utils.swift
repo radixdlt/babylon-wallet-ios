@@ -28,6 +28,12 @@ extension GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregated: @uncheck
 // MARK: - GatewayAPI.EntityMetadataItem + Sendable
 extension GatewayAPI.EntityMetadataItem: @unchecked Sendable {}
 
+// MARK: - GatewayAPI.AccountLockerVaultCollectionItem + Sendable
+extension GatewayAPI.AccountLockerVaultCollectionItem: @unchecked Sendable {}
+
+// MARK: - GatewayAPI.StateAccountLockersTouchedAtResponse + Sendable
+extension GatewayAPI.StateAccountLockersTouchedAtResponse: @unchecked Sendable {}
+
 extension GatewayAPI.StateEntityDetailsResponseItemDetails {
 	public var fungible: GatewayAPI.StateEntityDetailsResponseFungibleResourceDetails? {
 		if case let .fungibleResource(details) = self {

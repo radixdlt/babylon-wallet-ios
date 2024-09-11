@@ -67,6 +67,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 	@Dependency(\.submitTXClient) var submitTXClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
+	@Dependency(\.accountLockersClient) var accountLockersClient
 
 	public init() {}
 

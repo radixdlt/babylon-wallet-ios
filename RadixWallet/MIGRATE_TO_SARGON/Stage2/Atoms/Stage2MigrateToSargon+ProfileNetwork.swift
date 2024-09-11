@@ -30,6 +30,10 @@ extension ProfileNetwork {
 		accounts.count
 	}
 
+	public func getAuthorizedDapps() -> AuthorizedDapps {
+		authorizedDapps.asIdentified()
+	}
+
 	#if DEBUG
 	public mutating func deleteAccount(address: AccountAddress) {
 		var identified = accounts.asIdentified()
