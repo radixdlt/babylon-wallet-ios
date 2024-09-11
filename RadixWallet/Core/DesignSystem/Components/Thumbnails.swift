@@ -218,7 +218,7 @@ public struct LoadableImage<Placeholder: View>: View {
 				if state.isLoading {
 					loadingView
 				} else if url.isSVG, let data = state.imageContainer?.data {
-					SVGView(data: data)
+					svgView(SVGView(data: data), imageSize: state.imageContainer?.image.size)
 				} else if let image = state.image {
 					imageView(image: image, imageSize: state.imageContainer?.image.size)
 				} else {
@@ -249,6 +249,25 @@ public struct LoadableImage<Placeholder: View>: View {
 			} else {
 				image
 					.scaledToFill()
+			}
+		}
+	}
+
+	@MainActor
+	@ViewBuilder
+	private func svgView(_ svgView: SVGView, imageSize: CGSize?) -> some View {
+		switch sizingBehaviour {
+		case let .fixedSize(size, _):
+			svgView
+				.frame(width: size.frame.width, height: size.frame.height)
+		case let .flexible(minAspect, maxAspect):
+			if let imageSize, imageSize != .zero {
+				let aspect = min(maxAspect, max(imageSize.width / imageSize.height, minAspect))
+				svgView
+					.aspectRatio(aspect, contentMode: .fill)
+			} else {
+				svgView
+					.scaledToFit()
 			}
 		}
 	}
@@ -342,11 +361,13 @@ public struct LoadableImagePlaceholderBehaviour {
 
 extension URL {
 	public var isSVG: Bool {
-		guard let imageOrigin = queryParameters?["imageOrigin"] else {
-			return lastPathComponent.lowercased().hasSuffix(".svg")
+		let imageURLString = if let imageOrigin = queryParameters?["imageOrigin"] {
+			imageOrigin
+		} else {
+			absoluteString
 		}
 
-		return imageOrigin.hasPrefix("data:image/svg+xml") || imageOrigin.hasSuffix(".svg")
+		return imageURLString.hasPrefix("data:image/svg+xml") || imageURLString.lowercased().hasSuffix(".svg")
 	}
 
 	public var isUnsupportedVectorImage: Bool {
