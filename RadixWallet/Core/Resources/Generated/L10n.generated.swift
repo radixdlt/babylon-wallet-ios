@@ -174,8 +174,6 @@ public enum L10n {
       public static let title = L10n.tr("Localizable", "accountSecuritySettings_backups_title", fallback: "Backups")
     }
     public enum DepositGuarantees {
-      /// How guarantees work
-      public static let howGuaranteesWork = L10n.tr("Localizable", "accountSecuritySettings_depositGuarantees_howGuaranteesWork", fallback: "How guarantees work")
       /// Set your default guaranteed minimum for estimated deposits
       public static let subtitle = L10n.tr("Localizable", "accountSecuritySettings_depositGuarantees_subtitle", fallback: "Set your default guaranteed minimum for estimated deposits")
       /// Set the guaranteed minimum deposit to be applied whenever a deposit in a transaction can only be estimated.
@@ -2567,6 +2565,32 @@ public enum L10n {
       /// 
       /// [Learn more about the XRD token](https://learn.radixdlt.com/article/what-is-the-xrd-token) ↗
       public static let xrd = L10n.tr("Localizable", "infoLink_glossary_xrd", fallback: "## XRD Token\n\nXRD is the official Radix Network token.\n\n---\n\n It is created by the [Radix Network](?glossaryAnchor=radixnetwork) itself and users and applications can use it to use features of the network. For example, [transaction fees](?glossaryAnchor=transactionfee) are always paid in XRD, and XRD is the only token that can be used to participate in [Radix Network staking](?glossaryAnchor=networkstaking).\n\nBecause XRD has a special role on Radix, XRD is also frequently used by [dApps](?glossaryAnchor=dapps) on Radix as a convenient form of money to pay for things and to enable exchanges with other tokens.\n\n[Buy XRD tokens](https://www.radixdlt.com/token) ↗\n\n[Learn more about the XRD token](https://learn.radixdlt.com/article/what-is-the-xrd-token) ↗")
+    }
+    public enum Title {
+      /// What are behaviors?
+      public static let behaviors = L10n.tr("Localizable", "infoLink_title_behaviors", fallback: "What are behaviors?")
+      /// What is a dApp?
+      public static let dapps = L10n.tr("Localizable", "infoLink_title_dapps", fallback: "What is a dApp?")
+      /// What is a Gateway?
+      public static let gateways = L10n.tr("Localizable", "infoLink_title_gateways", fallback: "What is a Gateway?")
+      /// How do guarantees work?
+      public static let guarantees = L10n.tr("Localizable", "infoLink_title_guarantees", fallback: "How do guarantees work?")
+      /// What is Staking?
+      public static let networkstaking = L10n.tr("Localizable", "infoLink_title_networkstaking", fallback: "What is Staking?")
+      /// What are NFTs?
+      public static let nfts = L10n.tr("Localizable", "infoLink_title_nfts", fallback: "What are NFTs?")
+      /// What is a Persona?
+      public static let personas = L10n.tr("Localizable", "infoLink_title_personas", fallback: "What is a Persona?")
+      /// Learn about Personas
+      public static let personasLearnAbout = L10n.tr("Localizable", "infoLink_title_personasLearnAbout", fallback: "Learn about Personas")
+      /// What are Pool units?
+      public static let poolunits = L10n.tr("Localizable", "infoLink_title_poolunits", fallback: "What are Pool units?")
+      /// Learn more about Radix Connect
+      public static let radixconnect = L10n.tr("Localizable", "infoLink_title_radixconnect", fallback: "Learn more about Radix Connect")
+      /// What are Tokens?
+      public static let tokens = L10n.tr("Localizable", "infoLink_title_tokens", fallback: "What are Tokens?")
+      /// How do fees work?
+      public static let transactionfee = L10n.tr("Localizable", "infoLink_title_transactionfee", fallback: "How do fees work?")
     }
   }
   public enum LedgerHardwareDevices {
