@@ -6,13 +6,13 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 	// MARK: State
 
 	public struct State: Sendable, Hashable {
-		public var links: IdentifiedArrayOf<P2PLinkRow.State>
+		public var links: IdentifiedArrayOf<P2PLink>
 
 		@PresentationState
 		public var destination: Destination.State?
 
 		public init(
-			links: IdentifiedArrayOf<P2PLinkRow.State> = .init(),
+			links: IdentifiedArrayOf<P2PLink> = .init(),
 			destination: Destination.State? = nil
 		) {
 			self.links = links
@@ -50,7 +50,7 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 			case removeConnection(RemoveConnection)
 
 			public enum RemoveConnection: Sendable, Hashable {
-				case removeTapped(P2PLinkRow.State.ID)
+				case removeTapped(P2PLink)
 			}
 		}
 
@@ -70,9 +70,6 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.forEach(\.links, action: /Action.child .. ChildAction.connection) {
-				P2PLinkRow()
-			}
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
 			}
@@ -97,9 +94,7 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadLinksResult(.success(linksFromProfile)):
-			state.links = .init(
-				uniqueElements: linksFromProfile.map { P2PLinkRow.State(link: $0) }
-			)
+			state.links = .init(uniqueElements: linksFromProfile)
 			return .none
 
 		case let .loadLinksResult(.failure(error)):
@@ -111,13 +106,11 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 			return .none
 
 		case let .saveNewConnectionResult(.success(newConnection)):
-			state.links.updateOrAppend(
-				P2PLinkRow.State(link: newConnection)
-			)
+			state.links.updateOrAppend(newConnection)
 			return .none
 
 		case let .deleteConnectionResult(.success(p2pLink)):
-			state.links.remove(id: p2pLink.publicKey)
+			state.links.remove(p2pLink)
 			return .none
 
 		case let .deleteConnectionResult(.failure(error)):
@@ -149,9 +142,7 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 				await send(.internal(.saveNewConnectionResult(result)))
 			}
 
-		case let .removeConnection(.removeTapped(id)):
-			guard let p2pLink = state.links.first(where: { $0.id == id })?.link else { return .none }
-
+		case let .removeConnection(.removeTapped(p2pLink)):
 			return .run { send in
 				let result = await TaskResult {
 					try await radixConnectClient.deleteP2PLinkByPassword(p2pLink.connectionPassword)
@@ -171,9 +162,10 @@ extension AlertState<P2PLinksFeature.Destination.Action.RemoveConnection> {
 		AlertState {
 			TextState(L10n.LinkedConnectors.RemoveConnectionAlert.title)
 		} actions: {
-			ButtonState(role: .destructive, action: .removeTapped(id)) {
-				TextState(L10n.LinkedConnectors.RemoveConnectionAlert.removeButtonTitle)
-			}
+			// TODO:
+//			ButtonState(role: .destructive, action: .removeTapped(id)) {
+//				TextState(L10n.LinkedConnectors.RemoveConnectionAlert.removeButtonTitle)
+//			}
 			ButtonState(role: .cancel) {
 				TextState(L10n.Common.cancel)
 			}

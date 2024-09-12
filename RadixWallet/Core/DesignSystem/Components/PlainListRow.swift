@@ -62,12 +62,12 @@ struct PlainListRow<Icon: View, Accessory: View>: View {
 	}
 
 	init(
-		_ content: AssetIcon.Content?,
+		context: PlainListRowCore.ViewState.Context = .settings,
 		title: String?,
 		subtitle: String? = nil,
-		accessory: ImageResource? = .chevronRight
-	) where Icon == AssetIcon, Accessory == Image {
-		self.viewState = ViewState(content, rowCoreViewState: .init(title: title, subtitle: subtitle), accessory: accessory, hints: [])
+		@ViewBuilder accessory: () -> Accessory
+	) where Icon == EmptyView {
+		self.viewState = ViewState(rowCoreViewState: .init(context: context, title: title, subtitle: subtitle), accessory: accessory, icon: { EmptyView() })
 	}
 
 	var body: some View {
