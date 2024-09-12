@@ -13,13 +13,13 @@ extension RadixConnectClient: TestDependencyKey {
 		getP2PLinksWithConnectionStatusUpdates: unimplemented("\(Self.self).getP2PLinksWithConnectionStatusUpdates"),
 		idsOfConnectedPeerConnections: unimplemented("\(Self.self).idsOfConnectedPeerConnections"),
 		updateOrAddP2PLink: unimplemented("\(Self.self).updateOrAddP2PLink"),
+		updateP2PLink: unimplemented("\(Self.self).updateP2PLink"),
 		deleteP2PLinkByPassword: unimplemented("\(Self.self).deleteP2PLinkByPassword"),
 		connectP2PLink: unimplemented("\(Self.self).connectP2PLink"),
 		receiveMessages: unimplemented("\(Self.self).receiveMessages"),
 		sendResponse: unimplemented("\(Self.self).sendResponse"),
 		sendRequest: unimplemented("\(Self.self).sendRequest"),
-		handleDappDeepLink: unimplemented("\(Self.self).sendRequest"),
-		updateP2PLinkName: unimplemented("\(Self.self).updateP2PLinkName")
+		handleDappDeepLink: unimplemented("\(Self.self).sendRequest")
 	)
 }
 
@@ -33,13 +33,13 @@ extension RadixConnectClient {
 		getP2PLinksWithConnectionStatusUpdates: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		idsOfConnectedPeerConnections: { [] },
 		updateOrAddP2PLink: { _ in },
+		updateP2PLink: { _ in },
 		deleteP2PLinkByPassword: { _ in },
 		connectP2PLink: { _ in },
 		receiveMessages: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		sendResponse: { _, _ in },
 		sendRequest: { _, _ in 0 },
-		handleDappDeepLink: { _ in },
-		updateP2PLinkName: { _ in }
+		handleDappDeepLink: { _ in }
 	)
 }
 #endif // DEBUG

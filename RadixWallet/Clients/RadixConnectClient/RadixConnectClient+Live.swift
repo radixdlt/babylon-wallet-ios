@@ -129,6 +129,9 @@ extension RadixConnectClient {
 					await rtcClients.disconnectAndRemoveClient(oldLink.connectionPassword)
 				}
 			},
+			updateP2PLink: { updated in
+				try await p2pLinksClient.updateP2PLink(updated)
+			},
 			deleteP2PLinkByPassword: { password in
 				loggerGlobal.info("Deleting P2P Connection")
 				try await p2pLinksClient.deleteP2PLinkByPassword(password)
@@ -174,9 +177,6 @@ extension RadixConnectClient {
 					errorQueue.schedule(error)
 					throw error
 				}
-			},
-			updateP2PLinkName: { updated in
-				_ = try await p2pLinksClient.updateOrAddP2PLink(updated)
 			}
 		)
 	}()
