@@ -111,8 +111,6 @@
 		48CFC2752ADC10D900E77A5C /* Main+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCBE2ADC10D800E77A5C /* Main+View.swift */; };
 		48CFC2762ADC10D900E77A5C /* P2PLinksFeature+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCC12ADC10D800E77A5C /* P2PLinksFeature+Reducer.swift */; };
 		48CFC2772ADC10D900E77A5C /* P2PLinksFeature+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCC22ADC10D800E77A5C /* P2PLinksFeature+View.swift */; };
-		48CFC2782ADC10D900E77A5C /* P2PLinkRow+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCC42ADC10D800E77A5C /* P2PLinkRow+View.swift */; };
-		48CFC2792ADC10D900E77A5C /* P2PLinkRow+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCC52ADC10D800E77A5C /* P2PLinkRow+Reducer.swift */; };
 		48CFC27A2ADC10D900E77A5C /* App+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCC72ADC10D800E77A5C /* App+View.swift */; };
 		48CFC27B2ADC10D900E77A5C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCC82ADC10D800E77A5C /* AppDelegate.swift */; };
 		48CFC27C2ADC10D900E77A5C /* HUD+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCCA2ADC10D800E77A5C /* HUD+Reducer.swift */; };
@@ -1353,8 +1351,6 @@
 		48CFBCBE2ADC10D800E77A5C /* Main+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Main+View.swift"; sourceTree = "<group>"; };
 		48CFBCC12ADC10D800E77A5C /* P2PLinksFeature+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "P2PLinksFeature+Reducer.swift"; sourceTree = "<group>"; };
 		48CFBCC22ADC10D800E77A5C /* P2PLinksFeature+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "P2PLinksFeature+View.swift"; sourceTree = "<group>"; };
-		48CFBCC42ADC10D800E77A5C /* P2PLinkRow+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "P2PLinkRow+View.swift"; sourceTree = "<group>"; };
-		48CFBCC52ADC10D800E77A5C /* P2PLinkRow+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "P2PLinkRow+Reducer.swift"; sourceTree = "<group>"; };
 		48CFBCC72ADC10D800E77A5C /* App+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "App+View.swift"; sourceTree = "<group>"; };
 		48CFBCC82ADC10D800E77A5C /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		48CFBCCA2ADC10D800E77A5C /* HUD+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "HUD+Reducer.swift"; sourceTree = "<group>"; };
@@ -2914,7 +2910,6 @@
 			isa = PBXGroup;
 			children = (
 				48CFBCC02ADC10D800E77A5C /* Coordinator */,
-				48CFBCC32ADC10D800E77A5C /* Row */,
 			);
 			path = P2PLinksFeature;
 			sourceTree = "<group>";
@@ -2926,15 +2921,6 @@
 				48CFBCC22ADC10D800E77A5C /* P2PLinksFeature+View.swift */,
 			);
 			path = Coordinator;
-			sourceTree = "<group>";
-		};
-		48CFBCC32ADC10D800E77A5C /* Row */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBCC42ADC10D800E77A5C /* P2PLinkRow+View.swift */,
-				48CFBCC52ADC10D800E77A5C /* P2PLinkRow+Reducer.swift */,
-			);
-			path = Row;
 			sourceTree = "<group>";
 		};
 		48CFBCC62ADC10D800E77A5C /* AppFeature */ = {
@@ -7252,7 +7238,6 @@
 				5B3C48C32C874C8D00DB160D /* Dispatch+Extra.swift in Sources */,
 				A40815842C7E0D08005E65B9 /* InvalidTransactionError.swift in Sources */,
 				836878612B4551910029C808 /* UnknownDappComponents+Reducer.swift in Sources */,
-				48CFC2782ADC10D900E77A5C /* P2PLinkRow+View.swift in Sources */,
 				83823EAA2B72365000827211 /* TokenPriceClient+Interface.swift in Sources */,
 				48CFC46D2ADC10DA00E77A5C /* PersonasClient+Interface.swift in Sources */,
 				48CFC2BB2ADC10D900E77A5C /* SelectBackup+Reducer.swift in Sources */,
@@ -7342,7 +7327,6 @@
 				48CFC2BF2ADC10D900E77A5C /* ImportMnemonicsFlowCoordinator.swift in Sources */,
 				48CFC3632ADC10D900E77A5C /* AssetsView+Reducer.swift in Sources */,
 				A408162F2C7E0D08005E65B9 /* StateNonFungibleLocationResponse.swift in Sources */,
-				48CFC2792ADC10D900E77A5C /* P2PLinkRow+Reducer.swift in Sources */,
 				48CFC30F2ADC10D900E77A5C /* ImportOlympiaWalletCoordinator.swift in Sources */,
 				E68878592BDBFD42003F3393 /* Stage2MigrateToSargon+LedgerHardwareWalletFactorSource+New.swift in Sources */,
 				A40815B02C7E0D08005E65B9 /* NativeResourceGlobalCallerResourceValue.swift in Sources */,
