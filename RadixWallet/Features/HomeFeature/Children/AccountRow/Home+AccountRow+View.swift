@@ -8,6 +8,7 @@ extension Home.AccountRow {
 		let fiatWorth: Loadable<FiatWorth>
 		let isLoadingResources: Bool
 		let securityProblemsConfig: EntitySecurityProblemsView.Config
+		let accountLockerClaims: [AccountLockerClaimDetails]
 
 		public enum AccountTag: Int, Hashable, Identifiable, Sendable {
 			case ledgerBabylon
@@ -48,6 +49,7 @@ extension Home.AccountRow {
 
 			self.tag = .init(state: state)
 			self.isLedgerAccount = state.isLedgerAccount
+			self.accountLockerClaims = state.accountLockerClaims
 
 			// Resources
 			guard let accountWithResources = state.accountWithResources.wrappedValue?.nonEmptyVaults else {
@@ -101,8 +103,18 @@ extension Home.AccountRow {
 					VStack(spacing: .small1) {
 						ownedResourcesList(viewStore)
 
-						EntitySecurityProblemsView(config: viewStore.securityProblemsConfig) {
-							viewStore.send(.securityProblemsTapped)
+						VStack(spacing: .small2) {
+							EntitySecurityProblemsView(config: viewStore.securityProblemsConfig) {
+								viewStore.send(.securityProblemsTapped)
+							}
+
+							ForEachStatic(viewStore.accountLockerClaims) { claim in
+								Button {
+									viewStore.send(.accountLockerClaimTapped(claim))
+								} label: {
+									AccountBannerView(kind: .lockerClaim(dappName: claim.dappName))
+								}
+							}
 						}
 					}
 					.padding(.top, .medium1)

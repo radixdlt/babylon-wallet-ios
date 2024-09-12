@@ -84,7 +84,7 @@ extension EditPersona {
 							.foregroundColor(.app.gray1)
 							.textStyle(.sheetTitle)
 
-						InfoButton(.personas, label: L10n.CreatePersona.Introduction.learnAboutPersonas)
+						InfoButton(.personas, label: L10n.InfoLink.Title.personasLearnAbout)
 					}
 
 					Thumbnail(.persona, url: viewStore.avatarURL, size: .veryLarge)

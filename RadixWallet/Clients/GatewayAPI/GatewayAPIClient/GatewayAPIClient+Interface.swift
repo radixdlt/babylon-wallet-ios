@@ -39,7 +39,7 @@ extension GatewayAPIClient {
 	public typealias GetEpoch = @Sendable () async throws -> Epoch
 
 	// MARK: - Entity
-	public typealias GetEntityDetails = @Sendable (_ addresses: [String], _ explicitMetadata: Set<EntityMetadataKey>, _ ledgerState: GatewayAPI.LedgerStateSelector?) async throws -> GatewayAPI.StateEntityDetailsResponse
+	public typealias GetEntityDetails = @Sendable (_ addresses: [String], _ optIns: GatewayAPI.StateEntityDetailsOptIns?, _ ledgerState: GatewayAPI.LedgerStateSelector?) async throws -> GatewayAPI.StateEntityDetailsResponse
 	public typealias GetEntityMetdata = @Sendable (_ address: String, _ explicitMetadata: Set<EntityMetadataKey>) async throws -> GatewayAPI.EntityMetadataCollection
 	public typealias GetEntityMetdataPage = @Sendable (GatewayAPI.StateEntityMetadataPageRequest) async throws -> GatewayAPI.StateEntityMetadataPageResponse
 
@@ -67,6 +67,11 @@ extension GatewayAPIClient {
 
 extension GatewayAPIClient {
 	@Sendable
+	func getEntityDetails(_ addresses: [String], _ explicitMetadata: Set<EntityMetadataKey>, _ ledgerState: GatewayAPI.LedgerStateSelector?) async throws -> GatewayAPI.StateEntityDetailsResponse {
+		try await getEntityDetails(addresses, .init(explicitMetadata: explicitMetadata.map(\.rawValue)), ledgerState)
+	}
+
+	@Sendable
 	public func getSingleEntityDetails(
 		_ address: String,
 		explictMetadata: Set<EntityMetadataKey> = []
@@ -85,7 +90,7 @@ extension GatewayAPIClient {
 	@Sendable
 	public func fetchEntitiesDetails(
 		_ addresses: [String],
-		explicitMetadata: Set<EntityMetadataKey>,
+		optIns: GatewayAPI.StateEntityDetailsOptIns,
 		selector: GatewayAPI.LedgerStateSelector? = nil
 	) async throws -> GatewayAPI.StateEntityDetailsResponse {
 		/// gatewayAPIClient.getEntityDetails accepts only `entityDetailsPageSize` addresses for one request.
@@ -94,7 +99,7 @@ extension GatewayAPIClient {
 			.chunks(ofCount: GatewayAPIClient.entityDetailsPageSize)
 			.map(Array.init)
 			.parallelMap {
-				try await getEntityDetails($0, explicitMetadata, selector)
+				try await getEntityDetails($0, optIns, selector)
 			}
 
 		guard !allResponses.isEmpty else {

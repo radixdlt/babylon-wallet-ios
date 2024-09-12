@@ -245,7 +245,7 @@ extension OnLedgerEntitiesClient {
 
 		let entities = try await getEntities(
 			for: Array(stakeAndPoolAddresses),
-			.resourceMetadataKeys,
+			optIns: .init(explicitMetadata: Set<EntityMetadataKey>.resourceMetadataKeys.map(\.rawValue)),
 			ledgerState: ledgerState,
 			cachingStrategy: cachingStrategy,
 			fetchMetadata: false
@@ -360,11 +360,10 @@ extension OnLedgerEntitiesClient {
 	) async throws -> [OwnedStakeDetails] {
 		let ownedStakes = account.poolUnitResources.radixNetworkStakes
 		let validators = try await getEntities(
-			ownedStakes.map(\.validatorAddress).map(\.asGeneral),
-			.resourceMetadataKeys,
-			account.atLedgerState,
-			cachingStrategy,
-			false
+			addresses: ownedStakes.map(\.validatorAddress).map(\.asGeneral),
+			metadataKeys: .resourceMetadataKeys,
+			cachingStrategy: cachingStrategy,
+			atLedgerState: account.atLedgerState
 		).compactMap(\.validator)
 
 		let resourceAddresses = ownedStakes.flatMap {

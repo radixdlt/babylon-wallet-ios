@@ -126,7 +126,7 @@ extension CustomizeFees {
 					.multilineTextAlignment(.center)
 					.padding(.bottom, .medium2)
 
-				InfoButton(.transactionfee, label: L10n.CustomizeNetworkFees.howDoFeesWork)
+				InfoButton(.transactionfee, label: L10n.InfoLink.Title.transactionfee)
 					.padding(.bottom, .medium2)
 			}
 		}

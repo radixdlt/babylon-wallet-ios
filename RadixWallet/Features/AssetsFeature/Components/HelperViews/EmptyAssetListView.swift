@@ -36,27 +36,27 @@ extension EmptyAssetListView.ViewState {
 		imageAsset: AssetResource.fungibleTokens,
 		description: L10n.AssetDetails.TokenDetails.noTokens,
 		glossaryItem: .tokens,
-		glossaryLabel: L10n.AssetDetails.TokenDetails.whatAreTokens
+		glossaryLabel: L10n.InfoLink.Title.tokens
 	)
 
 	static let nonFungibleResources = Self(
 		imageAsset: AssetResource.nft,
 		description: L10n.AssetDetails.NFTDetails.noNfts,
 		glossaryItem: .nfts,
-		glossaryLabel: L10n.AssetDetails.NFTDetails.whatAreNfts
+		glossaryLabel: L10n.InfoLink.Title.nfts
 	)
 
 	static let stakes = Self(
 		imageAsset: AssetResource.stakes,
 		description: L10n.AssetDetails.StakingDetails.noStakes,
 		glossaryItem: .networkstaking,
-		glossaryLabel: L10n.AssetDetails.StakingDetails.whatIsStaking
+		glossaryLabel: L10n.InfoLink.Title.networkstaking
 	)
 
 	static let poolUnits = Self(
 		imageAsset: AssetResource.poolUnits,
 		description: L10n.AssetDetails.PoolUnitDetails.noPoolUnits,
 		glossaryItem: .poolunits,
-		glossaryLabel: L10n.AssetDetails.PoolUnitDetails.whatArePoolUnits
+		glossaryLabel: L10n.InfoLink.Title.poolunits
 	)
 }

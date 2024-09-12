@@ -12,6 +12,7 @@ extension AuthorizedDappsClient: TestDependencyKey {
 
 	public static let testValue = Self(
 		getAuthorizedDapps: unimplemented("\(Self.self).getAuthorizedDapps"),
+		authorizedDappValues: unimplemented("\(Self.self).authorizedDappValues"),
 		addAuthorizedDapp: unimplemented("\(Self.self).addAuthorizedDapp"),
 		forgetAuthorizedDapp: unimplemented("\(Self.self).forgetAuthorizedDapp"),
 		updateAuthorizedDapp: unimplemented("\(Self.self).updateAuthorizedDapp"),
@@ -22,6 +23,7 @@ extension AuthorizedDappsClient: TestDependencyKey {
 
 	public static let noop = Self(
 		getAuthorizedDapps: { [] },
+		authorizedDappValues: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		addAuthorizedDapp: { _ in },
 		forgetAuthorizedDapp: { _, _ in },
 		updateAuthorizedDapp: { _ in },
