@@ -175,9 +175,7 @@ extension RadixConnectClient {
 					throw error
 				}
 			},
-			updateP2PLinkName: { link, name in
-				var updated = link
-				updated.displayName = name
+			updateP2PLinkName: { updated in
 				_ = try await p2pLinksClient.updateOrAddP2PLink(updated)
 			}
 		)

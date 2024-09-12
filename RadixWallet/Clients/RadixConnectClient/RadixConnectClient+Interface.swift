@@ -72,5 +72,5 @@ extension RadixConnectClient {
 
 	public typealias ConnectToP2PLinks = @Sendable (P2PLinks) async throws -> Void
 	public typealias HandleDappDeepLink = @Sendable (URL) async throws -> Void
-	public typealias UpdateP2PLinkName = @Sendable (P2PLink, String) async throws -> Void
+	public typealias UpdateP2PLinkName = @Sendable (P2PLink) async throws -> Void
 }

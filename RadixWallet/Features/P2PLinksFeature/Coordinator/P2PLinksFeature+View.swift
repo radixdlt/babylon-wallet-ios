@@ -87,6 +87,7 @@ private extension View {
 		let destinationStore = store.destination
 		return newConnection(with: destinationStore)
 			.confirmDeletionAlert(with: destinationStore)
+			.updateName(with: destinationStore)
 	}
 
 	private func newConnection(with destinationStore: PresentationStoreOf<P2PLinksFeature.Destination>) -> some View {
@@ -104,5 +105,11 @@ private extension View {
 			state: /P2PLinksFeature.Destination.State.removeConnection,
 			action: P2PLinksFeature.Destination.Action.removeConnection
 		)
+	}
+
+	private func updateName(with destinationStore: PresentationStoreOf<P2PLinksFeature.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.updateName, action: \.updateName)) {
+			UpdateP2PLinkName.View(store: $0)
+		}
 	}
 }

@@ -39,7 +39,7 @@ extension RadixConnectClient {
 		sendResponse: { _, _ in },
 		sendRequest: { _, _ in 0 },
 		handleDappDeepLink: { _ in },
-		updateP2PLinkName: { _, _ in }
+		updateP2PLinkName: { _ in }
 	)
 }
 #endif // DEBUG
