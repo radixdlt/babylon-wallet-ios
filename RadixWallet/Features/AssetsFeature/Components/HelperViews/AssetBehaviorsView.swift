@@ -19,7 +19,7 @@ struct AssetBehaviorsView: View {
 					}
 				}
 
-				InfoButton(.behaviors, label: L10n.AssetDetails.Behaviors.whatAreBehaviors)
+				InfoButton(.behaviors, label: L10n.InfoLink.Title.behaviors)
 			}
 			.transition(.opacity.combined(with: .scale(scale: 0.8)))
 		}

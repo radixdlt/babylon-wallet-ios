@@ -39,7 +39,7 @@ extension AuthorizedDappsFeature {
 						Text(L10n.AuthorizedDapps.subtitle)
 							.textBlock
 
-						InfoButton(.dapps, label: L10n.AuthorizedDapps.whatIsDapp)
+						InfoButton(.dapps, label: L10n.InfoLink.Title.dapps)
 
 						VStack(spacing: .small1) {
 							ForEach(viewStore.dAppsDetails) { dApp in
