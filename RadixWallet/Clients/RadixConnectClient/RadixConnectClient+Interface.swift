@@ -43,6 +43,8 @@ public struct RadixConnectClient: DependencyKey, Sendable {
 	public var sendRequest: SendRequest
 
 	public var handleDappDeepLink: HandleDappDeepLink
+
+	public var updateP2PLinkName: UpdateP2PLinkName
 }
 
 extension RadixConnectClient {
@@ -70,4 +72,5 @@ extension RadixConnectClient {
 
 	public typealias ConnectToP2PLinks = @Sendable (P2PLinks) async throws -> Void
 	public typealias HandleDappDeepLink = @Sendable (URL) async throws -> Void
+	public typealias UpdateP2PLinkName = @Sendable (P2PLink, String) async throws -> Void
 }
