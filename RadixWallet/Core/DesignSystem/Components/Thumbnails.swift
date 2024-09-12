@@ -181,8 +181,8 @@ public struct LoadableImage<Placeholder: View>: View {
 		placeholder: () -> Placeholder
 	) {
 		if let url {
-			if url.isUnsupportedVectorImage {
-				loggerGlobal.warning("LoadableImage: Vector image is not supported \(url)")
+			if url.isVectorImage(type: .pdf) {
+				loggerGlobal.warning("LoadableImage: PDF vector images are not supported \(url)")
 				self.url = nil
 			} else {
 				@Dependency(\.urlFormatterClient) var urlFormatterClient
@@ -217,7 +217,7 @@ public struct LoadableImage<Placeholder: View>: View {
 			LazyImage(url: url) { state in
 				if state.isLoading {
 					loadingView
-				} else if url.isSVG, let data = state.imageContainer?.data {
+				} else if url.isVectorImage(type: .svg), let data = state.imageContainer?.data {
 					svgView(SVGView(data: data), imageSize: state.imageContainer?.image.size)
 				} else if let image = state.image {
 					imageView(image: image, imageSize: state.imageContainer?.image.size)
@@ -359,27 +359,35 @@ public struct LoadableImagePlaceholderBehaviour {
 	}
 }
 
+// MARK: - VectorImageType
+public enum VectorImageType {
+	case svg
+	case pdf
+
+	public var urlExtension: String {
+		switch self {
+		case .svg: ".svg"
+		case .pdf: ".pdf"
+		}
+	}
+
+	public var dataURLType: String {
+		switch self {
+		case .svg: "svg+xml"
+		case .pdf: "pdf"
+		}
+	}
+}
+
 extension URL {
-	public var isSVG: Bool {
+	public func isVectorImage(type: VectorImageType) -> Bool {
 		let imageURLString = if let imageOrigin = queryParameters?["imageOrigin"] {
 			imageOrigin
 		} else {
 			absoluteString
 		}
 
-		return imageURLString.hasPrefix("data:image/svg+xml") || imageURLString.lowercased().hasSuffix(".svg")
+		return imageURLString.hasPrefix("data:image/\(type.dataURLType)") ||
+			imageURLString.lowercased().hasSuffix(type.urlExtension)
 	}
-
-	public var isUnsupportedVectorImage: Bool {
-		let pathComponent = lastPathComponent.lowercased()
-		for ignoredType in URL.unsupportedVectorImageTypes {
-			if pathComponent.hasSuffix("." + ignoredType) {
-				return true
-			}
-		}
-
-		return false
-	}
-
-	private static let unsupportedVectorImageTypes: [String] = ["pdf"]
 }
