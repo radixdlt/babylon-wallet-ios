@@ -39,7 +39,7 @@ public struct UpdateP2PLinkName: FeatureReducer, Sendable {
 			return .run { [link = state.link] send in
 				do {
 					try await radixConnectClient.updateP2PLinkName(link)
-					overlayWindowClient.scheduleHUD(.init(text: "Updated"))
+					overlayWindowClient.scheduleHUD(.init(text: L10n.LinkedConnectors.RenameConnector.successHud))
 					await send(.delegate(.linkNameUpdated(link)))
 				} catch {
 					errorQueue.schedule(error)

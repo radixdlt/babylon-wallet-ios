@@ -16,7 +16,7 @@ extension UpdateP2PLinkName.State {
 		if sanitizedName != nil {
 			(.enabled, nil)
 		} else {
-			(.disabled, .iconError("Linked Connector name required"))
+			(.disabled, .iconError(L10n.LinkedConnectors.RenameConnector.errorEmpty))
 		}
 	}
 }
@@ -54,11 +54,11 @@ extension UpdateP2PLinkName {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: .zero) {
 					VStack(spacing: .medium1) {
-						Text("Rename Connector")
+						Text(L10n.LinkedConnectors.RenameConnector.title)
 							.textStyle(.sheetTitle)
 							.multilineTextAlignment(.center)
 
-						Text("Enter a new name for this Linked Connector")
+						Text(L10n.LinkedConnectors.RenameConnector.subtitle)
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)
 
@@ -94,7 +94,7 @@ extension UpdateP2PLinkName {
 						viewStore.sanitizedName,
 						forAction: { viewStore.send(.updateTapped($0)) }
 					) { action in
-						Button("Update", action: action)
+						Button(L10n.LinkedConnectors.RenameConnector.update, action: action)
 							.buttonStyle(.primaryRectangular)
 							.controlState(viewStore.updateButtonControlState)
 					}
