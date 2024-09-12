@@ -8924,8 +8924,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Sajjon/ScreenshotPreventing-iOS";
 			requirement = {
-				branch = main;
-				kind = branch;
+				kind = revision;
+				revision = 03769bcd1b1c9c24af424890f0a3e6d15bd3000c;
 			};
 		};
 		8318BB172BC8403800057BCB /* XCRemoteSwiftPackageReference "swift-custom-dump" */ = {
