@@ -24,7 +24,7 @@ extension DefaultDepositGuarantees.View {
 				.foregroundColor(.app.gray2)
 				.allowsHitTesting(false)
 
-			InfoButton(.guarantees, label: L10n.TransactionReview.Guarantees.howDoGuaranteesWork)
+			InfoButton(.guarantees, label: L10n.InfoLink.Title.guarantees)
 
 			Card {
 				let stepperStore = store.scope(state: \.percentageStepper) { .child(.percentageStepper($0)) }

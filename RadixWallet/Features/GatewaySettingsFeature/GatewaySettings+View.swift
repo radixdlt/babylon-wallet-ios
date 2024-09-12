@@ -31,7 +31,7 @@ extension GatewaySettings {
 					.padding(.horizontal, .medium3)
 					.padding(.bottom, .large2)
 
-				InfoButton(.gateways, label: L10n.Gateways.whatIsAGateway)
+				InfoButton(.gateways, label: L10n.InfoLink.Title.gateways)
 					.padding(.horizontal, .medium3)
 					.padding(.bottom, .large2)
 
