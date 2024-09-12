@@ -25,16 +25,14 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case task
 		case addNewConnectionButtonTapped
+		case removeButtonTapped(P2PLink)
+		case editButtonTapped(P2PLink)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case loadLinksResult(TaskResult<OrderedSet<P2PLink>>)
 		case saveNewConnectionResult(TaskResult<P2PLink>)
 		case deleteConnectionResult(TaskResult<P2PLink>)
-	}
-
-	public enum ChildAction: Sendable, Equatable {
-		case connection(id: P2PLinkRow.State.ID, action: P2PLinkRow.Action)
 	}
 
 	// MARK: Destination
@@ -88,6 +86,13 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 		case .addNewConnectionButtonTapped:
 			state.destination = .newConnection(.init())
 			return .none
+
+		case let .removeButtonTapped(link):
+			state.destination = .removeConnection(.confirmRemoval(link: link))
+			return .none
+
+		case let .editButtonTapped(link):
+			return .none
 		}
 	}
 
@@ -115,16 +120,6 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 
 		case let .deleteConnectionResult(.failure(error)):
 			errorQueue.schedule(error)
-			return .none
-		}
-	}
-
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .connection(id, .delegate(.deleteConnection)):
-			state.destination = .removeConnection(.confirmRemoval(id: id))
-			return .none
-		default:
 			return .none
 		}
 	}
@@ -158,14 +153,13 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 }
 
 extension AlertState<P2PLinksFeature.Destination.Action.RemoveConnection> {
-	static func confirmRemoval(id: P2PLinkRow.State.ID) -> AlertState {
+	static func confirmRemoval(link: P2PLink) -> AlertState {
 		AlertState {
 			TextState(L10n.LinkedConnectors.RemoveConnectionAlert.title)
 		} actions: {
-			// TODO:
-//			ButtonState(role: .destructive, action: .removeTapped(id)) {
-//				TextState(L10n.LinkedConnectors.RemoveConnectionAlert.removeButtonTitle)
-//			}
+			ButtonState(role: .destructive, action: .removeTapped(link)) {
+				TextState(L10n.LinkedConnectors.RemoveConnectionAlert.removeButtonTitle)
+			}
 			ButtonState(role: .cancel) {
 				TextState(L10n.Common.cancel)
 			}

@@ -36,8 +36,12 @@ extension P2PLinksFeature {
 							ForEach(viewStore.linkRows) { link in
 								PlainListRow(title: link.displayName) {
 									HStack(spacing: .medium3) {
-										Button(asset: AssetResource.create) {}
-										Button(asset: AssetResource.delete) {}
+										Button(asset: AssetResource.create) {
+											viewStore.send(.editButtonTapped(link))
+										}
+										Button(asset: AssetResource.delete) {
+											viewStore.send(.removeButtonTapped(link))
+										}
 									}
 								}
 								.withSeparator(horizontalPadding: link == viewStore.linkRows.last ? .zero : .medium3)
