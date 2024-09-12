@@ -2662,8 +2662,8 @@ public enum L10n {
     public static let linkNewConnector = L10n.tr("Localizable", "linkedConnectors_linkNewConnector", fallback: "Link New Connector")
     /// This is an old version of the Radix Connector browser extension. Please update to the latest Connector and try linking again.
     public static let oldQRErrorMessage = L10n.tr("Localizable", "linkedConnectors_oldQRErrorMessage", fallback: "This is an old version of the Radix Connector browser extension. Please update to the latest Connector and try linking again.")
-    /// Connect your Radix Wallet to desktop web browsers by linking to the Radix Connector browser extension. Here are your linked Connectors.
-    public static let subtitle = L10n.tr("Localizable", "linkedConnectors_subtitle", fallback: "Connect your Radix Wallet to desktop web browsers by linking to the Radix Connector browser extension. Here are your linked Connectors.")
+    /// Your Radix Wallet is linked to the following desktop browsers using the Connector browser extension.
+    public static let subtitle = L10n.tr("Localizable", "linkedConnectors_subtitle", fallback: "Your Radix Wallet is linked to the following desktop browsers using the Connector browser extension.")
     /// Linked Connectors
     public static let title = L10n.tr("Localizable", "linkedConnectors_title", fallback: "Linked Connectors")
     /// This type of Connector link is not supported.

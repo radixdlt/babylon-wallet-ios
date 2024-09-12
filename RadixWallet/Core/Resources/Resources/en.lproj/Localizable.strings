@@ -192,7 +192,7 @@
 "settings_importFromLegacyWalletHeader_importLegacyAccounts" = "Import Legacy Accounts";
 "settings_appVersion" = "Version: %@ build #%@";
 "linkedConnectors_title" = "Linked Connectors";
-"linkedConnectors_subtitle" = "Connect your Radix Wallet to desktop web browsers by linking to the Radix Connector browser extension. Here are your linked Connectors.";
+"linkedConnectors_subtitle" = "Your Radix Wallet is linked to the following desktop browsers using the Connector browser extension.";
 "linkedConnectors_lastConnected" = "Last connected %@";
 "linkedConnectors_linkNewConnector" = "Link New Connector";
 "linkedConnectors_newConnection_title" = "Link Connector";
