@@ -163,6 +163,8 @@ public struct DappDetails: Sendable, FeatureReducer {
 		}
 	}
 
+	@Dependency(\.rolaClient) var rolaClient
+
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
@@ -184,13 +186,24 @@ public struct DappDetails: Sendable, FeatureReducer {
 			state.$resources = .loading
 			let dAppID = state.dAppDefinitionAddress
 			let checkForAuthorizedDapp = state.authorizedDapp == nil
-			return .run { send in
+			return .run { [dAppDefinitionAddress = state.dAppDefinitionAddress] send in
 				if checkForAuthorizedDapp, let authorizedDapp = try? await authorizedDappsClient.getDetailedDapp(dAppID) {
 					await send(.internal(.dAppUpdated(authorizedDapp)))
 				}
 
 				let result = await TaskResult {
-					try await onLedgerEntitiesClient.getAssociatedDapp(dAppID).metadata
+					var metadata = try await onLedgerEntitiesClient.getAssociatedDapp(dAppID).metadata
+
+					if let url = metadata.claimedWebsites?.first {
+						do {
+							try await rolaClient.performWellKnownFileCheck(url, dAppDefinitionAddress)
+						} catch {
+							loggerGlobal.error("Failed to validate dapp main website: \(error)")
+							metadata.claimedWebsites = nil
+						}
+					}
+
+					return metadata
 				}
 				await send(.internal(.metadataLoaded(.init(result: result))))
 			} catch: { error, _ in
