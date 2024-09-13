@@ -263,7 +263,7 @@ extension CloudBackupClient {
 				return migrated
 			},
 			deleteProfileBackup: { optionalID in
-				let activeProfileID = try await profileStore.profile().id
+				let activeProfileID = await profileStore.profile().id
 				let id = optionalID ?? activeProfileID
 				try await container.privateCloudDatabase.deleteRecord(withID: .init(recordName: id.uuidString))
 				try userDefaults.removeLastCloudBackup(for: id)

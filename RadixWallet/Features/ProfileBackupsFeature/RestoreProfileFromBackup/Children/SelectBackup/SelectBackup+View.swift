@@ -43,7 +43,7 @@ extension SelectBackup {
 					)
 			}
 			.task { @MainActor in
-				await store.send(.view(.task)) // .finish()
+				await store.send(.view(.task)).finish()
 			}
 		}
 	}

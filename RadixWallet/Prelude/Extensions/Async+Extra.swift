@@ -1,15 +1,10 @@
 extension AsyncSequence {
 	/// Waits and returns the first element from the seqeunce
 	public func first() async throws -> Element {
-		try await self.handleEvents(onElement: { _ in
-		                            },
-		                            onCancel: {
-		                            	loggerGlobal.error("Cancelled")
-		                            },
-		                            onFinish: { error in
-		                            	loggerGlobal.error("Finished \(error)")
-		                            })
-		                            .first { _ in true }!
+		for try await element in self.prefix(1) {
+			return element
+		}
+		throw CancellationError()
 	}
 }
 
