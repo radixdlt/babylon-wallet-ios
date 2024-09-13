@@ -14,6 +14,10 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
+	public enum InternalAction: Sendable, Equatable {
+		case newProfileCreated
+	}
+
 	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case startup(OnboardingStartup.Action)
@@ -44,6 +48,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.onboardingClient) var onboardingClient
 	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.appEventsClient) var appEventsClient
+	@Dependency(\.errorQueue) var errorQueue
 
 	public init() {}
 
@@ -60,15 +65,27 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case .startup(.delegate(.setupNewUser)):
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case .newProfileCreated:
 			state.destination = .createAccount(
 				.init(
 					config: .init(purpose: .firstAccountForNewProfile)
 				)
 			)
 			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+		switch childAction {
+		case .startup(.delegate(.setupNewUser)):
+			return .run { send in
+				try await onboardingClient.createNewWallet()
+				await send(.internal(.newProfileCreated))
+			} catch: { error, _ in
+				errorQueue.schedule(error)
+			}
 
 		case .startup(.delegate(.profileCreatedFromImportedBDFS)):
 			appEventsClient.handleEvent(.walletRestored)

@@ -91,7 +91,6 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case newProfileCreated(TaskResult<EqVoid>)
 		case createAccountResult(TaskResult<Account>)
 		case handleAccountCreated(TaskResult<Account>)
 	}
@@ -146,12 +145,11 @@ extension CreateAccountCoordinator {
 		case let .root(.nameAccount(.delegate(.proceed(accountName, useLedgerAsFactorSource)))):
 			state.name = accountName
 			state.useLedgerAsFactorSource = useLedgerAsFactorSource
-			if state.config.isFirstAccount {
-				return .run { send in
-					await send(.internal(.newProfileCreated(TaskResult { try await onboardingClient.createNewWallet() })))
-				}
+			if state.useLedgerAsFactorSource {
+				state.path.append(.selectLedger(.init(context: .createHardwareAccount)))
+				return .none
 			} else {
-				return proceed(state: &state)
+				return derivePublicKey(state: &state, factorSourceOption: .device)
 			}
 
 		case let .path(.element(_, action: .selectLedger(.delegate(.choseLedger(ledger))))):
@@ -199,13 +197,6 @@ extension CreateAccountCoordinator {
 				config: state.config
 			)))
 			return .send(.delegate(.accountCreated))
-
-		case let .newProfileCreated(.failure(error)):
-			errorQueue.schedule(error)
-			return .none
-
-		case .newProfileCreated(.success):
-			return proceed(state: &state)
 		}
 	}
 
@@ -278,15 +269,6 @@ extension CreateAccountCoordinator {
 				purpose: .createNewEntity(kind: .account)
 			))
 		return .none
-	}
-
-	private func proceed(state: inout State) -> Effect<Action> {
-		if state.useLedgerAsFactorSource {
-			state.path.append(.selectLedger(.init(context: .createHardwareAccount)))
-			return .none
-		} else {
-			return derivePublicKey(state: &state, factorSourceOption: .device)
-		}
 	}
 }
 

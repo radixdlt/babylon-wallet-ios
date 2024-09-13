@@ -26,7 +26,7 @@ final class SargonSecureStorage: SecureStorageDriver {
 
 			if let deviceInfo {
 				let hostId = HostId(id: deviceInfo.id, generatedAt: deviceInfo.date)
-				return try? JSONEncoder().encode(hostId)
+				return hostIdToJsonBytes(hostId: hostId)
 			}
 
 			return nil
@@ -46,7 +46,7 @@ final class SargonSecureStorage: SecureStorageDriver {
 	func saveData(key: SargonUniFFI.SecureStorageKey, data: SargonUniFFI.BagOfBytes) async throws {
 		switch key {
 		case .hostId:
-			let hostId = try JSONDecoder().decode(HostId.self, from: data)
+			let hostId = try newHostIdFromJsonBytes(jsonBytes: data)
 			let deviceInfo = DeviceInfo(id: hostId.id, date: hostId.generatedAt)
 			try secureStorageClient.saveDeviceInfo(deviceInfo)
 
@@ -84,27 +84,5 @@ final class SargonSecureStorage: SecureStorageDriver {
 				keepInICloudIfPresent: true
 			)
 		}
-	}
-}
-
-// MARK: - HostId + Codable
-extension HostId: Codable {
-	enum CodingKeys: String, CodingKey {
-		case id
-		case generatedAt = "generated_at"
-	}
-
-	public func encode(to encoder: any Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(id, forKey: .id)
-		try container.encode(generatedAt, forKey: .generatedAt)
-	}
-
-	public init(from decoder: any Decoder) throws {
-		let container = try decoder.container(keyedBy: CodingKeys.self)
-		try self.init(
-			id: container.decode(DeviceId.self, forKey: .id),
-			generatedAt: container.decode(Timestamp.self, forKey: .generatedAt)
-		)
 	}
 }

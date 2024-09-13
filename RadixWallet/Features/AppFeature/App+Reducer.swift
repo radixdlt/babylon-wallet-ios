@@ -113,18 +113,24 @@ public struct App: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .onboardingCoordinator(.delegate(.completed)):
-			goToMain(state: &state)
+			return goToMain(state: &state)
 
 		case let .splash(.delegate(.completed(profileState))):
 			switch profileState {
-			case .loaded:
-				goToMain(state: &state)
-			case .none, .incompatible:
-				goToOnboarding(state: &state)
+			case .none:
+				return goToOnboarding(state: &state)
+			case let .incompatible(error):
+				errorQueue.schedule(error)
+				return goToOnboarding(state: &state)
+			case let .loaded(profile):
+				if profile.networks.isEmpty {
+					return goToOnboarding(state: &state)
+				}
+				return goToMain(state: &state)
 			}
 
 		default:
-			.none
+			return .none
 		}
 	}
 
