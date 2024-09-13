@@ -27,7 +27,7 @@ extension SelectBackup {
 							viewStore.selectedProfile,
 							forAction: { viewStore.send(.tappedUseCloudBackup($0.id)) },
 							control: { action in
-								Button(L10n.IOSProfileBackup.useICloudBackup, action: action)
+								Button(L10n.Common.continue, action: action)
 									.buttonStyle(.primaryRectangular)
 							}
 						)
@@ -55,12 +55,15 @@ extension SelectBackup.View {
 	private func coreView(_ store: StoreOf<SelectBackup>, with viewStore: ViewStoreOf<SelectBackup>) -> some View {
 		ScrollView {
 			VStack(spacing: .medium1) {
-				Text(L10n.RecoverProfileBackup.Header.title)
-					.multilineTextAlignment(.center)
-					.textStyle(.sheetTitle)
+				VStack(spacing: .medium3) {
+					Text(L10n.RecoverProfileBackup.Header.title)
+						.textStyle(.sheetTitle)
 
-				Text(L10n.RecoverProfileBackup.Header.subtitle)
-					.textStyle(.body1Regular)
+					Text(L10n.RecoverProfileBackup.Header.subtitle)
+						.textStyle(.body1Regular)
+				}
+				.multilineTextAlignment(.center)
+				.padding(.horizontal, .small2)
 
 				Text(L10n.IOSRecoverProfileBackup.Choose.title)
 					.textStyle(.body1Header)
@@ -82,28 +85,32 @@ extension SelectBackup.View {
 					NoContentView(text)
 				}
 
-				VStack(alignment: .center, spacing: .small1) {
-					selectFileInsteadButton(with: store)
-					Divider()
-					restoreWithoutProfile(with: store)
+				Button(L10n.RecoverProfileBackup.ImportFileButton.title) {
+					store.send(.view(.importFromFileInstead))
 				}
+				.buttonStyle(.alternativeRectangular)
+
+				Divider()
+
+				VStack(spacing: .medium3) {
+					Text(L10n.RecoverProfileBackup.backupNotAvailable)
+						.textStyle(.body1Header)
+
+					Button(L10n.RecoverProfileBackup.otherRestoreOptionsButton) {
+						store.send(.view(.otherRestoreOptionsTapped))
+					}
+					.buttonStyle(.secondaryRectangular(shouldExpand: true))
+				}
+				.padding(.horizontal, .medium1)
 			}
+			.padding(.horizontal, .medium1)
 			.foregroundColor(.app.gray1)
-			.padding(.medium2)
-		}
-		.modifier {
-			if #available(iOS 17, *) {
-				$0.scrollIndicatorsFlash(onAppear: true)
-			} else {
-				$0
-			}
 		}
 	}
 
 	@MainActor
 	private func backupsList(with viewStore: ViewStoreOf<SelectBackup>) -> some View {
-		// TODO: This is speculative design, needs to be updated once we have the proper design
-		VStack(spacing: .medium1) {
+		VStack(spacing: .medium2) {
 			if let backedUpProfiles = viewStore.backedUpProfiles {
 				Selection(
 					viewStore.binding(get: \.selectedProfile) { .selectedProfile($0) },
@@ -115,7 +122,6 @@ extension SelectBackup.View {
 				NoContentView(L10n.IOSRecoverProfileBackup.noBackupsAvailable)
 			}
 		}
-		.padding(.horizontal, .medium3)
 	}
 
 	@MainActor
@@ -126,14 +132,14 @@ extension SelectBackup.View {
 		let header = item.value
 		let isVersionCompatible = header.isVersionCompatible()
 		let lastDevice = header.lastUsedOnDevice.id == viewStore.thisDeviceID ? L10n.IOSProfileBackup.thisDevice : header.lastUsedOnDevice.description
-		return Card(action: item.action) {
-			HStack {
-				VStack(alignment: .leading, spacing: 0) {
-					Group {
-						// Contains bold text segments.
-						Text(LocalizedStringKey(L10n.RecoverProfileBackup.backupFrom(lastDevice)))
-						Text(L10n.IOSProfileBackup.lastModifedDateLabel(formatDate(header.lastModified)))
 
+		return Card(.app.gray5) {
+			HStack(spacing: .zero) {
+				VStack(alignment: .leading, spacing: .small3) {
+					Group {
+						// TODO: Update Strings to use bold and new text. Also update date formatting
+						Text(markdown: L10n.RecoverProfileBackup.backupFrom(lastDevice), emphasizedColor: .app.gray2, emphasizedFont: .app.body2Link)
+						Text(L10n.IOSProfileBackup.lastModifedDateLabel(formatDate(header.lastModified)))
 						Text(L10n.IOSProfileBackup.totalAccountsNumberLabel(Int(header.contentHint.numberOfAccountsOnAllNetworksInTotal)))
 						Text(L10n.IOSProfileBackup.totalPersonasNumberLabel(Int(header.contentHint.numberOfPersonasOnAllNetworksInTotal)))
 					}
@@ -146,46 +152,27 @@ extension SelectBackup.View {
 							.textStyle(.body2HighImportance)
 					}
 				}
+
+				Spacer(minLength: .small2)
+
 				if isVersionCompatible {
-					Spacer()
 					RadioButton(
 						appearance: .dark,
 						state: item.isSelected ? .selected : .unselected
 					)
 				}
 			}
-			.padding(.medium3)
-			.frame(maxWidth: .infinity, alignment: .leading)
+			.padding(.top, .medium2)
+			.padding(.horizontal, .medium1)
+			.padding(.bottom, .medium3)
 		}
 		.disabled(!isVersionCompatible)
+		.onTapGesture(perform: item.action)
 	}
 
 	@MainActor
 	func formatDate(_ date: Date) -> String {
 		date.ISO8601Format(.iso8601Date(timeZone: .current))
-	}
-
-	@MainActor
-	private func selectFileInsteadButton(with store: StoreOf<SelectBackup>) -> some View {
-		secondaryButton(title: L10n.RecoverProfileBackup.ImportFileButton.title, store: store, action: .importFromFileInstead)
-	}
-
-	@MainActor
-	@ViewBuilder
-	private func restoreWithoutProfile(with store: StoreOf<SelectBackup>) -> some View {
-		Text(L10n.RecoverProfileBackup.backupNotAvailable)
-			.textStyle(.body1Header)
-			.foregroundColor(.app.gray1)
-
-		secondaryButton(title: L10n.RecoverProfileBackup.otherRestoreOptionsButton, store: store, action: .otherRestoreOptionsTapped)
-	}
-
-	@MainActor
-	private func secondaryButton(title: String, store: StoreOf<SelectBackup>, action: SelectBackup.ViewAction) -> some View {
-		Button(title) {
-			store.send(.view(action))
-		}
-		.buttonStyle(.alternativeRectangular)
 	}
 }
 
