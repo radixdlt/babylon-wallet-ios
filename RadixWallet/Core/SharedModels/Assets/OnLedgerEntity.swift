@@ -102,8 +102,8 @@ public enum OnLedgerEntity: Sendable, Hashable, Codable, CustomDebugStringConver
 			nil
 		case let .genericComponent(genericComponent):
 			genericComponent.metadata
-		case .locker:
-			nil
+		case let .locker(locker):
+			locker.metadata
 		}
 	}
 }
