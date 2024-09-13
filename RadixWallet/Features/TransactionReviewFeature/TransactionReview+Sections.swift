@@ -75,9 +75,12 @@ extension TransactionReview {
 				networkID: networkID
 			)
 
-			let dAppAddresses = summary.encounteredComponentAddresses.filter(\.isGlobal)
+			let componentAddresses = summary.encounteredAddresses.compactMap(\.componentAddress).filter(\.isGlobal)
+			let lockerAddresses = summary.encounteredAddresses.compactMap(\.lockerAddress)
+
 			let dAppsUsed: TransactionReviewDappsUsed.State? = try await extractDapps(
-				componentAddresses: dAppAddresses,
+				componentAddresses: componentAddresses,
+				lockerAddresses: lockerAddresses,
 				unknownTitle: L10n.TransactionReview.unknownComponents
 			)
 
@@ -313,9 +316,12 @@ extension TransactionReview {
 
 	private func extractDapps(
 		componentAddresses: [ComponentAddress],
+		lockerAddresses: [LockerAddress],
 		unknownTitle: (Int) -> String
 	) async throws -> TransactionReviewDapps<ComponentAddress>.State? {
-		let dApps = await extractDappEntities(componentAddresses.map(\.asGeneral))
+		let componentDapps = await extractDappEntities(componentAddresses.map(\.asGeneral))
+		let lockerDapps = await extractDappEntitiesFromLockerAddresses(lockerAddresses)
+		let dApps = componentDapps + lockerDapps
 		return try await extractDapps(dApps, unknownTitle: unknownTitle)
 	}
 
@@ -341,6 +347,23 @@ extension TransactionReview {
 	private func extractDappEntity(_ entity: Address) async throws -> DappEntity {
 		let dAppDefinitionAddress = try await onLedgerEntitiesClient.getDappDefinitionAddress(entity)
 		let metadata = try await onLedgerEntitiesClient.getDappMetadata(dAppDefinitionAddress, validatingDappEntity: entity)
+		return DappEntity(id: dAppDefinitionAddress, metadata: metadata)
+	}
+
+	private func extractDappEntitiesFromLockerAddresses(_ addresses: [LockerAddress]) async -> [(address: Address, entity: DappEntity?)] {
+		await addresses.asyncMap {
+			await (address: $0.asGeneral, entity: try? extractDappEntityFromLockerAddress($0))
+		}
+	}
+
+	private func extractDappEntityFromLockerAddress(_ address: LockerAddress) async throws -> DappEntity? {
+		guard
+			let locker = try await onLedgerEntitiesClient.getEntity(address.asGeneral, metadataKeys: .dappMetadataKeys).locker,
+			let dAppDefinitionAddress = locker.metadata.dappDefinition
+		else {
+			return nil
+		}
+		let metadata = try await onLedgerEntitiesClient.getDappMetadata(dAppDefinitionAddress)
 		return DappEntity(id: dAppDefinitionAddress, metadata: metadata)
 	}
 
@@ -751,6 +774,26 @@ extension NonFungibleResourceIndicator {
 		default:
 			assertionFailure("Cannot sum up the predicted amounts")
 			return self
+		}
+	}
+}
+
+extension ManifestEncounteredComponentAddress {
+	var componentAddress: ComponentAddress? {
+		switch self {
+		case let .component(address):
+			address
+		case .locker:
+			nil
+		}
+	}
+
+	var lockerAddress: LockerAddress? {
+		switch self {
+		case let .locker(address):
+			address
+		case .component:
+			nil
 		}
 	}
 }
