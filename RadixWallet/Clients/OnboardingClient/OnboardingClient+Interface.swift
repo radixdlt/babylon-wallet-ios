@@ -21,5 +21,5 @@ extension OnboardingClient {
 	public typealias LoadProfileState = @Sendable () async -> ProfileState
 	public typealias CreateNewWallet = @Sendable () async throws -> Void
 
-	public typealias FinishOnboardingWithRecoveredAccountsAndBDFS = @Sendable (AccountsRecoveredFromScanningUsingMnemonic) async throws -> EqVoid
+	public typealias FinishOnboardingWithRecoveredAccountsAndBDFS = @Sendable (AccountsRecoveredFromScanningUsingMnemonic) async throws -> Void
 }

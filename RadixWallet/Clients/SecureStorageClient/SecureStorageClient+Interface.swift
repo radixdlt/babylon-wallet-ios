@@ -27,6 +27,7 @@ public struct SecureStorageClient: Sendable {
 
 	public var loadDeviceInfo: LoadDeviceInfo
 	public var saveDeviceInfo: SaveDeviceInfo
+	public var deleteDeviceInfo: DeleteDeviceInfo
 
 	/// See https://radixdlt.atlassian.net/l/cp/fmoH9KcN
 	public var deprecatedLoadDeviceID: DeprecatedLoadDeviceID
@@ -69,6 +70,7 @@ public struct SecureStorageClient: Sendable {
 		deleteProfileHeaderList: @escaping DeleteProfileHeaderList,
 		loadDeviceInfo: @escaping LoadDeviceInfo,
 		saveDeviceInfo: @escaping SaveDeviceInfo,
+		deleteDeviceInfo: @escaping DeleteDeviceInfo,
 		deprecatedLoadDeviceID: @escaping DeprecatedLoadDeviceID,
 		deleteDeprecatedDeviceID: @escaping DeleteDeprecatedDeviceID,
 		saveRadixConnectMobileSession: @escaping SaveRadixConnectMobileSession,
@@ -98,6 +100,7 @@ public struct SecureStorageClient: Sendable {
 		self.deleteProfileHeaderList = deleteProfileHeaderList
 		self.loadDeviceInfo = loadDeviceInfo
 		self.saveDeviceInfo = saveDeviceInfo
+		self.deleteDeviceInfo = deleteDeviceInfo
 		self.deprecatedLoadDeviceID = deprecatedLoadDeviceID
 		self.deleteDeprecatedDeviceID = deleteDeprecatedDeviceID
 		self.loadP2PLinks = loadP2PLinks
@@ -132,6 +135,7 @@ public struct SecureStorageClient: Sendable {
 		deleteProfileHeaderList: @escaping DeleteProfileHeaderList,
 		loadDeviceInfo: @escaping LoadDeviceInfo,
 		saveDeviceInfo: @escaping SaveDeviceInfo,
+		deleteDeviceInfo: @escaping DeleteDeviceInfo,
 		deprecatedLoadDeviceID: @escaping DeprecatedLoadDeviceID,
 		deleteDeprecatedDeviceID: @escaping DeleteDeprecatedDeviceID,
 		saveRadixConnectMobileSession: @escaping SaveRadixConnectMobileSession,
@@ -161,6 +165,7 @@ public struct SecureStorageClient: Sendable {
 		self.deleteProfileHeaderList = deleteProfileHeaderList
 		self.loadDeviceInfo = loadDeviceInfo
 		self.saveDeviceInfo = saveDeviceInfo
+		self.deleteDeviceInfo = deleteDeviceInfo
 		self.deprecatedLoadDeviceID = deprecatedLoadDeviceID
 		self.deleteDeprecatedDeviceID = deleteDeprecatedDeviceID
 		self.saveRadixConnectMobileSession = saveRadixConnectMobileSession
@@ -213,6 +218,7 @@ extension SecureStorageClient {
 
 	public typealias LoadDeviceInfo = @Sendable () throws -> DeviceInfo?
 	public typealias SaveDeviceInfo = @Sendable (DeviceInfo) throws -> Void
+	public typealias DeleteDeviceInfo = @Sendable () throws -> Void
 
 	public typealias SaveRadixConnectMobileSession = @Sendable (SessionId, BagOfBytes) throws -> Void
 	public typealias LoadRadixConnectMobileSession = @Sendable (SessionId) throws -> BagOfBytes?
@@ -285,17 +291,6 @@ extension SecureStorageClient {
 	public func deleteProfileAndMnemonicsByFactorSourceIDs(profileID: Profile.ID, keepInICloudIfPresent: Bool) throws {
 		try deleteProfileAndMnemonicsByFactorSourceIDs(profileID, keepInICloudIfPresent)
 	}
-
-	@Sendable
-	public func loadDeviceInfoOrFallback() -> DeviceInfo {
-		if let loaded = (try? self.loadDeviceInfo()) {
-			loaded
-		} else {
-			DeviceInfo(
-				id: .init()
-			)
-		}
-	}
 }
 
 extension DeviceInfo {
@@ -307,17 +302,6 @@ extension DeviceInfo {
 			systemVersion: nil,
 			hostAppVersion: nil,
 			hostVendor: "Apple"
-		)
-	}
-}
-
-extension HostInfo {
-	public static func current() -> HostInfo {
-		/// Mostly empty for now until full migration to Sargon is done
-		.init(
-			description: .init(name: "iPhone", model: ""),
-			hostOs: .ios(version: ""),
-			hostAppVersion: ""
 		)
 	}
 }

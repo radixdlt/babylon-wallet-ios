@@ -109,6 +109,8 @@ public struct Splash: Sendable, FeatureReducer {
 				} else {
 					await send(.internal(.advancedLockStateLoaded(isEnabled: false)))
 				}
+			} else {
+				await send(.internal(.advancedLockStateLoaded(isEnabled: false)))
 			}
 		}
 	}
@@ -219,58 +221,6 @@ public struct Splash: Sendable, FeatureReducer {
 			case .appForegrounded:
 				localAuthenticationClient.setAuthenticatedSuccessfully()
 			}
-		}
-	}
-}
-
-// MARK: - SargonSecureStorage
-final class SargonSecureStorage: SecureStorageDriver {
-	@Dependency(\.secureStorageClient) var secureStorageClient
-	let userDefaults = UserDefaults.Dependency.radix
-
-	func loadData(key: SargonUniFFI.SecureStorageKey) async throws -> SargonUniFFI.BagOfBytes? {
-		switch key {
-		case .hostId:
-			return userDefaults.data(key: .hostId)
-
-		case let .deviceFactorSourceMnemonic(factorSourceId):
-			return try secureStorageClient.loadMnemonicDataByFactorSourceID(.init(factorSourceID: factorSourceId, notifyIfMissing: true))
-
-		case .profileSnapshot:
-			guard let activeProfileId = userDefaults.getActiveProfileID() else {
-				return nil
-			}
-
-			return try secureStorageClient.loadProfileSnapshotData(activeProfileId)
-		}
-	}
-
-	func saveData(key: SargonUniFFI.SecureStorageKey, data: SargonUniFFI.BagOfBytes) async throws {
-		switch key {
-		case .hostId:
-			try userDefaults.set(data: data, key: .hostId)
-		case let .deviceFactorSourceMnemonic(factorSourceId):
-			try await secureStorageClient.saveMnemonicForFactorSourceData(factorSourceId, data)
-		case let .profileSnapshot:
-			guard let activeProfileId = userDefaults.getActiveProfileID() else {
-				return
-			}
-			try secureStorageClient.saveProfileSnapshotData(activeProfileId, data)
-		}
-	}
-
-	func deleteDataForKey(key: SargonUniFFI.SecureStorageKey) async throws {
-		switch key {
-		case .hostId:
-			return try userDefaults.remove(.hostId)
-		case let .deviceFactorSourceMnemonic(factorSourceId):
-			return
-		case let .profileSnapshot:
-			guard let activeProfileId = userDefaults.getActiveProfileID() else {
-				return
-			}
-			try secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs(profileID: activeProfileId, keepInICloudIfPresent: true)
-			return
 		}
 	}
 }

@@ -188,13 +188,7 @@ extension CloudBackupClient {
 
 			guard shouldBackUp || shouldReclaim else { return }
 
-			var profileToUpload = profile
-			if shouldReclaim {
-				// The profile will already be locally claimed, but we want to update the lastUsedOnDevice date
-				await profileStore.claimOwnership(of: &profileToUpload)
-			}
-
-			try? await backupProfileAndSaveResult(profileToUpload, existingRecord: existingRecord)
+			try? await backupProfileAndSaveResult(profile, existingRecord: existingRecord)
 		}
 
 		let retryBackupInterval: DispatchTimeInterval = .seconds(60)

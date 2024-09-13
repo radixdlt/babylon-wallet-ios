@@ -186,6 +186,10 @@ extension SecureStorageClient: DependencyKey {
 			loggerGlobal.notice("Saved deviceInfo: \(deviceInfo)")
 		}
 
+		@Sendable func deleteDeviceInfo() throws {
+			try keychainClient.removeData(forKey: deviceInfoKey)
+		}
+
 		@Sendable func loadMnemonicFor(
 			key: KeychainClient.Key,
 			notifyIfMissing: Bool
@@ -466,6 +470,7 @@ extension SecureStorageClient: DependencyKey {
 			deleteProfileHeaderList: deleteProfileHeaderList,
 			loadDeviceInfo: loadDeviceInfo,
 			saveDeviceInfo: saveDeviceInfo,
+			deleteDeviceInfo: deleteDeviceInfo,
 			deprecatedLoadDeviceID: deprecatedLoadDeviceID,
 			deleteDeprecatedDeviceID: deleteDeprecatedDeviceID,
 			saveRadixConnectMobileSession: saveRadixConnectMobileSession,
@@ -497,6 +502,7 @@ extension SecureStorageClient: DependencyKey {
 			deleteProfileHeaderList: deleteProfileHeaderList,
 			loadDeviceInfo: loadDeviceInfo,
 			saveDeviceInfo: saveDeviceInfo,
+			deleteDeviceInfo: deleteDeviceInfo,
 			deprecatedLoadDeviceID: deprecatedLoadDeviceID,
 			deleteDeprecatedDeviceID: deleteDeprecatedDeviceID,
 			saveRadixConnectMobileSession: saveRadixConnectMobileSession,

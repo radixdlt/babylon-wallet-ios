@@ -14,7 +14,6 @@ extension OnboardingClient: DependencyKey {
 			},
 			finishOnboardingWithRecoveredAccountAndBDFS: {
 				try await profileStore.finishOnboarding(with: $0)
-				return EqVoid.instance
 			}
 		)
 	}

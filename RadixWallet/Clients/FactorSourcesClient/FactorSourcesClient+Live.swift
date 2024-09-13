@@ -185,12 +185,8 @@ extension FactorSourcesClient: DependencyKey {
 			createNewMainDeviceFactorSource: {
 				@Dependency(\.uuid) var uuid
 				@Dependency(\.date) var date
-				@Dependency(\.device) var device
 				@Dependency(\.mnemonicClient) var mnemonicClient
 				@Dependency(\.secureStorageClient) var secureStorageClient
-
-				let model = await device.model
-				let name = await device.name
 
 				let mnemonicWithPassphrase = MnemonicWithPassphrase(
 					mnemonic: mnemonicClient.generate(
@@ -201,14 +197,12 @@ extension FactorSourcesClient: DependencyKey {
 
 				loggerGlobal.info("Creating new main BDFS")
 
-				var newBDFS = DeviceFactorSource.babylon(
+				var newBDFS = await DeviceFactorSource.babylon(
 					mnemonicWithPassphrase: mnemonicWithPassphrase,
 					isMain: true,
-					hostInfo: .current()
+					hostInfo: SargonOS.shared.resolveHostInfo()
 				)
 
-				newBDFS.hint.model = model
-				newBDFS.hint.name = name
 				assert(newBDFS.isExplicitMainBDFS)
 
 				loggerGlobal.info("Saving new main BDFS to Keychain only, we will NOT save it into Profile just yet.")
