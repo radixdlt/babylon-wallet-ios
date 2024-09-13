@@ -1,5 +1,7 @@
 // MARK: - UpdateP2PLinkName
+@Reducer
 public struct UpdateP2PLinkName: FeatureReducer, Sendable {
+	@ObservableState
 	public struct State: Hashable, Sendable {
 		var link: P2PLink
 		var linkName: String
@@ -13,6 +15,9 @@ public struct UpdateP2PLinkName: FeatureReducer, Sendable {
 		}
 	}
 
+	public typealias Action = FeatureAction<Self>
+
+	@CasePathable
 	public enum ViewAction: Equatable, Sendable {
 		case linkNameChanged(String)
 		case updateTapped(NonEmptyString)
@@ -26,6 +31,10 @@ public struct UpdateP2PLinkName: FeatureReducer, Sendable {
 	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
+
+	public var body: some ReducerOf<Self> {
+		Reduce(core)
+	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
