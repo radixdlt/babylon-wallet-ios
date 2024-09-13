@@ -120,7 +120,7 @@ extension AccountLockersClient {
 
 			// Get entity details from those dapps, to filter only those that actually have a primary locker.
 			let dappsWithLocker = try await onLedgerEntitiesClient
-				.getEntities(dappsWithDepositsVisible, .init(dappTwoWayLinks: true), nil, .useCache, false)
+				.getEntities(dappsWithDepositsVisible, .dappDetails, nil, .useCache, false)
 				.compactMap { entity -> (AccountAddress, LockerAddress)? in
 					guard
 						let account = entity.account,
