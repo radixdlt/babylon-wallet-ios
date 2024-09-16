@@ -133,21 +133,24 @@ extension SelectBackup.View {
 		let isVersionCompatible = header.isVersionCompatible()
 		let lastDevice = header.lastUsedOnDevice.id == viewStore.thisDeviceID ? L10n.IOSProfileBackup.thisDevice : header.lastUsedOnDevice.description
 
+		let values: [String] = [
+			L10n.RecoverProfileBackup.backupFrom(lastDevice),
+			L10n.RecoverProfileBackup.lastModified(header.lastModified.formatted(date: .long, time: .omitted)),
+			L10n.RecoverProfileBackup.numberOfAccounts(Int(header.contentHint.numberOfAccountsOnAllNetworksInTotal)),
+			L10n.RecoverProfileBackup.numberOfPersonas(Int(header.contentHint.numberOfPersonasOnAllNetworksInTotal)),
+		]
+
 		return Card(.app.gray5) {
 			HStack(spacing: .zero) {
 				VStack(alignment: .leading, spacing: .small3) {
-					Group {
-						// TODO: Update Strings to use bold and new text. Also update date formatting
-						Text(markdown: L10n.RecoverProfileBackup.backupFrom(lastDevice), emphasizedColor: .app.gray2, emphasizedFont: .app.body2Link)
-						Text(L10n.IOSProfileBackup.lastModifedDateLabel(formatDate(header.lastModified)))
-						Text(L10n.IOSProfileBackup.totalAccountsNumberLabel(Int(header.contentHint.numberOfAccountsOnAllNetworksInTotal)))
-						Text(L10n.IOSProfileBackup.totalPersonasNumberLabel(Int(header.contentHint.numberOfPersonasOnAllNetworksInTotal)))
+					ForEachStatic(values) {
+						Text(markdown: $0, emphasizedColor: .app.gray2, emphasizedFont: .app.body2Link)
 					}
 					.foregroundColor(.app.gray2)
 					.textStyle(.body2Regular)
 
 					if !isVersionCompatible {
-						Text(L10n.IOSProfileBackup.incompatibleWalletDataLabel)
+						Text(L10n.RecoverProfileBackup.incompatibleWalletDataLabel)
 							.foregroundColor(.red)
 							.textStyle(.body2HighImportance)
 					}
@@ -168,11 +171,6 @@ extension SelectBackup.View {
 		}
 		.disabled(!isVersionCompatible)
 		.onTapGesture(perform: item.action)
-	}
-
-	@MainActor
-	func formatDate(_ date: Date) -> String {
-		date.ISO8601Format(.iso8601Date(timeZone: .current))
 	}
 }
 
