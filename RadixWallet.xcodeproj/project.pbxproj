@@ -696,7 +696,6 @@
 		48FFFAE12ADC220F00B2B213 /* Tagged in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAE02ADC220F00B2B213 /* Tagged */; };
 		48FFFAE42ADC222100B2B213 /* Validated in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAE32ADC222100B2B213 /* Validated */; };
 		48FFFAE72ADC223300B2B213 /* Overture in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAE62ADC223300B2B213 /* Overture */; };
-		48FFFAEA2ADC225B00B2B213 /* ScreenshotPreventing in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAE92ADC225B00B2B213 /* ScreenshotPreventing */; };
 		48FFFAED2ADC226B00B2B213 /* CodeScanner in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAEC2ADC226B00B2B213 /* CodeScanner */; };
 		48FFFAF02ADC229900B2B213 /* AnyCodable in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAEF2ADC229900B2B213 /* AnyCodable */; };
 		48FFFAF22ADC23AC00B2B213 /* Exports.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48FFFAF12ADC23AC00B2B213 /* Exports.swift */; };
@@ -741,6 +740,7 @@
 		5B526AEE2C89C3C200AF8B72 /* ResourcesVisibilityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B526AEA2C89C3C200AF8B72 /* ResourcesVisibilityClient+Test.swift */; };
 		5B634AAE2C92F6EC004B2FBC /* UpdateP2PLinkName+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B634AAD2C92F6EC004B2FBC /* UpdateP2PLinkName+Reducer.swift */; };
 		5B634AB02C92F6FA004B2FBC /* UpdateP2PLinkName+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B634AAF2C92F6FA004B2FBC /* UpdateP2PLinkName+View.swift */; };
+		5B634A942C91D2A0004B2FBC /* ScreenshotPreventing in Frameworks */ = {isa = PBXBuildFile; productRef = 5B634A932C91D2A0004B2FBC /* ScreenshotPreventing */; };
 		5B6499B72BCFD0E8000F2176 /* SecurityFactors+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B52BCFD0E8000F2176 /* SecurityFactors+View.swift */; };
 		5B6499B82BCFD0E8000F2176 /* SecurityFactors+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B62BCFD0E8000F2176 /* SecurityFactors+Reducer.swift */; };
 		5B6499BA2BCFDB1E000F2176 /* ShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B92BCFDB1E000F2176 /* ShareView.swift */; };
@@ -2503,6 +2503,7 @@
 				5B1C4FD52BBB0B0C00B9436F /* AppsFlyerLib-Strict in Frameworks */,
 				48FFFB032ADC6F8100B2B213 /* Builders in Frameworks */,
 				48FFFAB72ADC207B00B2B213 /* NavigationTransitions in Frameworks */,
+				5B634A942C91D2A0004B2FBC /* ScreenshotPreventing in Frameworks */,
 				48FFFA992ADC1EEC00B2B213 /* AsyncExtensions in Frameworks */,
 				83B783562C1764AE00AA7930 /* Sargon in Frameworks */,
 				E63D123D2ADD1FC00001CBB1 /* SwiftUIIntrospect in Frameworks */,
@@ -2518,7 +2519,6 @@
 				48FFFAE12ADC220F00B2B213 /* Tagged in Frameworks */,
 				48FFFAD22ADC218400B2B213 /* Either in Frameworks */,
 				48FFFAA52ADC1F9600B2B213 /* AsyncAlgorithms in Frameworks */,
-				48FFFAEA2ADC225B00B2B213 /* ScreenshotPreventing in Frameworks */,
 				48FFFAA82ADC1FBE00B2B213 /* Atomics in Frameworks */,
 				48FFFAF02ADC229900B2B213 /* AnyCodable in Frameworks */,
 				48FFFAF52ADC241A00B2B213 /* BitCollections in Frameworks */,
@@ -6848,7 +6848,6 @@
 				48FFFAE02ADC220F00B2B213 /* Tagged */,
 				48FFFAE32ADC222100B2B213 /* Validated */,
 				48FFFAE62ADC223300B2B213 /* Overture */,
-				48FFFAE92ADC225B00B2B213 /* ScreenshotPreventing */,
 				48FFFAEC2ADC226B00B2B213 /* CodeScanner */,
 				48FFFAEF2ADC229900B2B213 /* AnyCodable */,
 				48FFFAF42ADC241A00B2B213 /* BitCollections */,
@@ -6871,6 +6870,7 @@
 				83B783552C1764AE00AA7930 /* Sargon */,
 				831F0CEC2C21819000D6F5BF /* Sargon */,
 				E60D5E1E2C2EFAA2008BCF1F /* Sargon */,
+				5B634A932C91D2A0004B2FBC /* ScreenshotPreventing */,
 			);
 			productName = RadixWallet;
 			productReference = 48CFBC4F2ADC106300E77A5C /* Radix Wallet Dev.app */;
@@ -6928,7 +6928,6 @@
 				48FFFADF2ADC220F00B2B213 /* XCRemoteSwiftPackageReference "swift-tagged" */,
 				48FFFAE22ADC222100B2B213 /* XCRemoteSwiftPackageReference "swift-validated" */,
 				48FFFAE52ADC223300B2B213 /* XCRemoteSwiftPackageReference "swift-overture" */,
-				48FFFAE82ADC225B00B2B213 /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */,
 				48FFFAEB2ADC226B00B2B213 /* XCRemoteSwiftPackageReference "CodeScanner" */,
 				48FFFAEE2ADC229900B2B213 /* XCRemoteSwiftPackageReference "AnyCodable" */,
 				48FFFAF32ADC241A00B2B213 /* XCRemoteSwiftPackageReference "swift-collections" */,
@@ -6942,6 +6941,7 @@
 				8318BB172BC8403800057BCB /* XCRemoteSwiftPackageReference "swift-custom-dump" */,
 				E6A0B0492BF23C7000617DAC /* XCRemoteSwiftPackageReference "swift-identified-collections" */,
 				835DEDE22C57E9C200D7ACF0 /* XCRemoteSwiftPackageReference "sargon" */,
+				5B634A922C91D2A0004B2FBC /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */,
 			);
 			productRefGroup = 48CFBC502ADC106300E77A5C /* Products */;
 			projectDirPath = "";
@@ -8888,14 +8888,6 @@
 				version = 0.5.0;
 			};
 		};
-		48FFFAE82ADC225B00B2B213 /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Sajjon/ScreenshotPreventing-iOS";
-			requirement = {
-				kind = exactVersion;
-				version = 0.0.1;
-			};
-		};
 		48FFFAEB2ADC226B00B2B213 /* XCRemoteSwiftPackageReference "CodeScanner" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/twostraws/CodeScanner";
@@ -8960,6 +8952,14 @@
 				version = 6.13.2;
 			};
 		};
+		5B634A922C91D2A0004B2FBC /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Sajjon/ScreenshotPreventing-iOS";
+			requirement = {
+				kind = revision;
+				revision = 03769bcd1b1c9c24af424890f0a3e6d15bd3000c;
+			};
+		};
 		8318BB172BC8403800057BCB /* XCRemoteSwiftPackageReference "swift-custom-dump" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swift-custom-dump";
@@ -8973,7 +8973,7 @@
 			repositoryURL = "https://github.com/radixdlt/sargon";
 			requirement = {
 				kind = exactVersion;
-				version = 1.1.12;
+				version = 1.1.13;
 			};
 		};
 		A415574E2B757C5E0040AD4E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
@@ -9121,11 +9121,6 @@
 			package = 48FFFAE52ADC223300B2B213 /* XCRemoteSwiftPackageReference "swift-overture" */;
 			productName = Overture;
 		};
-		48FFFAE92ADC225B00B2B213 /* ScreenshotPreventing */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 48FFFAE82ADC225B00B2B213 /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */;
-			productName = ScreenshotPreventing;
-		};
 		48FFFAEC2ADC226B00B2B213 /* CodeScanner */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 48FFFAEB2ADC226B00B2B213 /* XCRemoteSwiftPackageReference "CodeScanner" */;
@@ -9195,6 +9190,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5B1C4FD32BBB0B0C00B9436F /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Strict" */;
 			productName = "AppsFlyerLib-Strict";
+		};
+		5B634A932C91D2A0004B2FBC /* ScreenshotPreventing */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5B634A922C91D2A0004B2FBC /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */;
+			productName = ScreenshotPreventing;
 		};
 		831F0CEC2C21819000D6F5BF /* Sargon */ = {
 			isa = XCSwiftPackageProductDependency;

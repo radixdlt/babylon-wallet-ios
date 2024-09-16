@@ -220,10 +220,11 @@ extension OnLedgerEntitiesClient {
 		atLedgerState: AtLedgerState? = nil
 	) async throws -> [OnLedgerEntity.AssociatedDapp] {
 		try await getEntities(
-			addresses: addresses.map(\.asGeneral),
-			metadataKeys: .dappMetadataKeys,
-			cachingStrategy: cachingStrategy,
-			atLedgerState: atLedgerState
+			addresses.map(\.asGeneral),
+			.dappDetails,
+			atLedgerState,
+			cachingStrategy,
+			false
 		)
 		.compactMap(\.account)
 		.map { .init(address: $0.address, metadata: $0.metadata) }
@@ -627,6 +628,15 @@ extension OnLedgerEntitiesClient {
 			poolUnitResource: poolUnitResource,
 			xrdResource: xrdResourceDetails,
 			nonXrdResources: nonXrdResourceDetails
+		)
+	}
+}
+
+extension GatewayAPI.StateEntityDetailsOptIns {
+	static var dappDetails: Self {
+		.init(
+			explicitMetadata: Set<EntityMetadataKey>.dappMetadataKeys.map(\.rawValue),
+			dappTwoWayLinks: true
 		)
 	}
 }

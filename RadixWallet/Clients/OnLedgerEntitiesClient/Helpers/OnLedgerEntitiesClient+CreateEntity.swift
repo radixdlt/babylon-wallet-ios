@@ -46,6 +46,9 @@ extension OnLedgerEntitiesClient {
 			}
 			return .validator(validator)
 
+		case let .locker(lockerAddress):
+			return try .locker(createLocker(item, ledgerState: ledgerState))
+
 		default:
 			return try .genericComponent(createGenericComponent(item, ledgerState: ledgerState))
 		}
@@ -83,6 +86,18 @@ extension OnLedgerEntitiesClient {
 			nonFungibleResources: filteredNonFungibleResources.sorted(),
 			poolUnitResources: poolUnitResources,
 			details: OnLedgerEntity.OnLedgerAccount.Details(item.details)
+		)
+	}
+
+	@Sendable
+	static func createLocker(
+		_ item: GatewayAPI.StateEntityDetailsResponseItem,
+		ledgerState: AtLedgerState
+	) throws -> OnLedgerEntity.Locker {
+		try .init(
+			address: .init(validatingAddress: item.address),
+			atLedgerState: ledgerState,
+			metadata: .init(item.metadata)
 		)
 	}
 

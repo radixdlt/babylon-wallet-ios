@@ -316,6 +316,8 @@ extension OnLedgerEntity {
 			.init(address: validator.address)
 		case let .genericComponent(component):
 			.init(address: component.address)
+		case let .locker(locker):
+			.init(address: locker.address)
 		}
 	}
 }
