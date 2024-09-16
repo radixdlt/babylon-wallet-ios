@@ -129,9 +129,6 @@ extension RadixConnectClient {
 					await rtcClients.disconnectAndRemoveClient(oldLink.connectionPassword)
 				}
 			},
-			updateP2PLink: { updated in
-				try await p2pLinksClient.updateP2PLink(updated)
-			},
 			deleteP2PLinkByPassword: { password in
 				loggerGlobal.info("Deleting P2P Connection")
 				try await p2pLinksClient.deleteP2PLinkByPassword(password)

@@ -19,6 +19,7 @@ public struct UpdateP2PLinkName: FeatureReducer, Sendable {
 
 	@CasePathable
 	public enum ViewAction: Equatable, Sendable {
+		case closeButtonTapped
 		case linkNameChanged(String)
 		case updateTapped(NonEmptyString)
 		case focusChanged(Bool)
@@ -28,9 +29,10 @@ public struct UpdateP2PLinkName: FeatureReducer, Sendable {
 		case linkNameUpdated(P2PLink)
 	}
 
-	@Dependency(\.radixConnectClient) var radixConnectClient
+	@Dependency(\.p2pLinksClient) var p2pLinksClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
+	@Dependency(\.dismiss) var dismiss
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -38,6 +40,10 @@ public struct UpdateP2PLinkName: FeatureReducer, Sendable {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
+		case .closeButtonTapped:
+			return .run { _ in
+				await dismiss()
+			}
 		case let .linkNameChanged(name):
 			state.linkName = name
 			state.sanitizedName = NonEmpty(rawValue: name.trimmingNewlines())
@@ -47,7 +53,7 @@ public struct UpdateP2PLinkName: FeatureReducer, Sendable {
 			state.link.displayName = newLabel.rawValue
 			return .run { [link = state.link] send in
 				do {
-					try await radixConnectClient.updateP2PLink(link)
+					try await p2pLinksClient.updateP2PLink(link)
 					overlayWindowClient.scheduleHUD(.init(text: L10n.LinkedConnectors.RenameConnector.successHud))
 					await send(.delegate(.linkNameUpdated(link)))
 				} catch {

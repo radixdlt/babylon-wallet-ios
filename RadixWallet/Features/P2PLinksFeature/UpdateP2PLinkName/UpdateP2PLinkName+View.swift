@@ -5,7 +5,6 @@ extension UpdateP2PLinkName {
 	@MainActor
 	public struct View: SwiftUI.View {
 		@Perception.Bindable var store: StoreOf<UpdateP2PLinkName>
-		@Environment(\.dismiss) var dismiss
 		@FocusState private var textFieldFocus: Bool
 
 		init(store: StoreOf<UpdateP2PLinkName>) {
@@ -15,9 +14,9 @@ extension UpdateP2PLinkName {
 		public var body: some SwiftUI.View {
 			content
 				.withNavigationBar {
-					dismiss()
+					store.send(.view(.closeButtonTapped))
 				}
-				.presentationDetents([.fraction(0.55)])
+				.presentationDetents([.fraction(0.55), .large])
 				.presentationDragIndicator(.visible)
 				.presentationBackground(.blur)
 		}

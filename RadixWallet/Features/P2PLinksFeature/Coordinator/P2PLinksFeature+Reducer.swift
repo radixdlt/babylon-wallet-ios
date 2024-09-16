@@ -107,7 +107,7 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadLinksResult(.success(linksFromProfile)):
-			state.links = .init(uniqueElements: linksFromProfile)
+			state.links = linksFromProfile.elements.asIdentified()
 			return .none
 
 		case let .loadLinksResult(.failure(error)):
