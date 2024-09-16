@@ -44,6 +44,7 @@ public struct UpdateP2PLinkName: FeatureReducer, Sendable {
 			return .run { _ in
 				await dismiss()
 			}
+
 		case let .linkNameChanged(name):
 			state.linkName = name
 			state.sanitizedName = NonEmpty(rawValue: name.trimmingNewlines())
