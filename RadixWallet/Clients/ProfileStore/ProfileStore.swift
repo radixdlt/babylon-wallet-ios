@@ -25,17 +25,21 @@ extension ProfileStore {
 		try! await profileSubject.first()
 	}
 
+	func profileState() async -> ProfileState {
+		try! await profileStateSubject.first()
+	}
+
 	func profileSequence() async -> AnyAsyncSequence<Profile> {
 		profileSubject.eraseToAnyAsyncSequence()
 	}
 
-	func profileState() async -> AnyAsyncSequence<ProfileState> {
+	func profileStateSequence() async -> AnyAsyncSequence<ProfileState> {
 		profileStateSubject.share().eraseToAnyAsyncSequence()
 	}
 }
 
 extension ProfileStore {
-	public func newProfile() async throws {
+	public func createNewWallet() async throws {
 		try await SargonOS.shared.newWallet()
 	}
 

@@ -7,10 +7,10 @@ extension OnboardingClient: DependencyKey {
 	public static func live(profileStore: ProfileStore = .shared) -> Self {
 		Self(
 			loadProfileState: {
-				try! await profileStore.profileState().first()
+				await profileStore.profileState()
 			},
 			createNewWallet: {
-				try await profileStore.newProfile()
+				try await profileStore.createNewWallet()
 			},
 			finishOnboardingWithRecoveredAccountAndBDFS: {
 				try await profileStore.finishOnboarding(with: $0)
