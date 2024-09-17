@@ -472,8 +472,8 @@ public enum L10n {
     /// No wallet backups available
     public static let noBackupsAvailable = L10n.tr("Localizable", "androidRecoverProfileBackup_noBackupsAvailable", fallback: "No wallet backups available")
     public enum Choose {
-      /// Choose a backup
-      public static let title = L10n.tr("Localizable", "androidRecoverProfileBackup_choose_title", fallback: "Choose a backup")
+      /// Choose a backup from Google Drive
+      public static let title = L10n.tr("Localizable", "androidRecoverProfileBackup_choose_title", fallback: "Choose a backup from Google Drive")
     }
   }
   public enum AppSettings {
@@ -2946,12 +2946,16 @@ public enum L10n {
     }
     /// Backup not available?
     public static let backupNotAvailable = L10n.tr("Localizable", "recoverProfileBackup_backupNotAvailable", fallback: "Backup not available?")
+    /// Could not load backups
+    public static let couldNotLoadBackups = L10n.tr("Localizable", "recoverProfileBackup_couldNotLoadBackups", fallback: "Could not load backups")
     /// Incompatible Wallet data
     public static let incompatibleWalletDataLabel = L10n.tr("Localizable", "recoverProfileBackup_incompatibleWalletDataLabel", fallback: "Incompatible Wallet data")
     /// **Last modified:** %@
     public static func lastModified(_ p1: Any) -> String {
       return L10n.tr("Localizable", "recoverProfileBackup_lastModified", String(describing: p1), fallback: "**Last modified:** %@")
     }
+    /// Network unavailable
+    public static let networkUnavailable = L10n.tr("Localizable", "recoverProfileBackup_networkUnavailable", fallback: "Network unavailable")
     /// **Number of accounts:** %d
     public static func numberOfAccounts(_ p1: Int) -> String {
       return L10n.tr("Localizable", "recoverProfileBackup_numberOfAccounts", p1, fallback: "**Number of accounts:** %d")
@@ -2964,6 +2968,14 @@ public enum L10n {
     public static let otherRestoreOptionsButton = L10n.tr("Localizable", "recoverProfileBackup_otherRestoreOptionsButton", fallback: "Other Restore Options")
     /// The password is wrong
     public static let passwordWrong = L10n.tr("Localizable", "recoverProfileBackup_passwordWrong", fallback: "The password is wrong")
+    /// This Device
+    public static let thisDevice = L10n.tr("Localizable", "recoverProfileBackup_thisDevice", fallback: "This Device")
+    /// Update in System Settings
+    public static let updateSystemSetings = L10n.tr("Localizable", "recoverProfileBackup_updateSystemSetings", fallback: "Update in System Settings")
+    public enum Choose {
+      /// Choose a backup on iCloud
+      public static let ios = L10n.tr("Localizable", "recoverProfileBackup_choose_iOS", fallback: "Choose a backup on iCloud")
+    }
     public enum Header {
       /// Select a backup to restore your Radix Wallet. You will be asked to enter your seed phrase(s) to recover control of your Accounts and Personas.
       public static let subtitle = L10n.tr("Localizable", "recoverProfileBackup_header_subtitle", fallback: "Select a backup to restore your Radix Wallet. You will be asked to enter your seed phrase(s) to recover control of your Accounts and Personas.")
@@ -2973,6 +2985,14 @@ public enum L10n {
     public enum ImportFileButton {
       /// Import from Backup File Instead
       public static let title = L10n.tr("Localizable", "recoverProfileBackup_importFileButton_title", fallback: "Import from Backup File Instead")
+    }
+    public enum NoBackupsAvailable {
+      /// No wallet backups available on current iCloud account
+      public static let ios = L10n.tr("Localizable", "recoverProfileBackup_noBackupsAvailable_iOS", fallback: "No wallet backups available on current iCloud account")
+    }
+    public enum NotLoggedIn {
+      /// Not logged in to iCloud
+      public static let ios = L10n.tr("Localizable", "recoverProfileBackup_notLoggedIn_iOS", fallback: "Not logged in to iCloud")
     }
   }
   public enum RecoverSeedPhrase {
