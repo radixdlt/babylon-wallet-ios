@@ -16,6 +16,13 @@ extension P2PLinksClient: DependencyKey {
 					$0.updateOrAppend(newLink)
 				}
 			},
+			updateP2PLink: { newLink in
+				try secureStorageClient.updatingP2PLinks {
+					if let index = $0.firstIndex(where: { $0.id == newLink.id }) {
+						$0.update(newLink, at: index)
+					}
+				}
+			},
 			deleteP2PLinkByPassword: { password in
 				try secureStorageClient.updatingP2PLinks {
 					$0.removeAll(where: { $0.connectionPassword == password })
