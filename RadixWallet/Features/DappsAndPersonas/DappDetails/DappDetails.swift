@@ -189,24 +189,13 @@ public struct DappDetails: Sendable, FeatureReducer {
 			state.$resources = .loading
 			let dAppID = state.dAppDefinitionAddress
 			let checkForAuthorizedDapp = state.authorizedDapp == nil
-			return .run { [dAppDefinitionAddress = state.dAppDefinitionAddress] send in
+			return .run { send in
 				if checkForAuthorizedDapp, let authorizedDapp = try? await authorizedDappsClient.getDetailedDapp(dAppID) {
 					await send(.internal(.dAppUpdated(authorizedDapp)))
 				}
 
 				let result = await TaskResult {
-					let metadata = try await onLedgerEntitiesClient.getAssociatedDapp(dAppID).metadata
-
-					if let url = metadata.claimedWebsites?.first {
-						do {
-							try await rolaClient.performWellKnownFileCheck(url, dAppDefinitionAddress)
-							await send(.internal(.mainWebsiteValidated(url)))
-						} catch {
-							loggerGlobal.error("Failed to validate dapp main website: \(error)")
-						}
-					}
-
-					return metadata
+					try await onLedgerEntitiesClient.getAssociatedDapp(dAppID).metadata
 				}
 				await send(.internal(.metadataLoaded(.init(result: result))))
 			} catch: { error, _ in
@@ -283,6 +272,15 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 				let associatedDapps = await metadata.flatMap { await loadDapps(metadata: $0, validated: dAppDefinitionAddress) }
 				await send(.internal(.associatedDappsLoaded(associatedDapps)))
+
+				if let url = metadata.wrappedValue?.claimedWebsites?.first {
+					do {
+						try await rolaClient.performWellKnownFileCheck(url, dAppDefinitionAddress)
+						await send(.internal(.mainWebsiteValidated(url)))
+					} catch {
+						loggerGlobal.error("Failed to validate dapp main website: \(error)")
+					}
+				}
 			}
 
 		case let .resourcesLoaded(resources):
