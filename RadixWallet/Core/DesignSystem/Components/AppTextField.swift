@@ -1,3 +1,4 @@
+import ScreenshotPreventing
 import SwiftUINavigation
 
 // MARK: - AppTextField
@@ -41,6 +42,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 	let hint: Hint.ViewState?
 	let focus: Focus?
 	let showClearButton: Bool
+	let preventScreenshot: Bool
 	let accessory: Accessory
 	let innerAccesory: InnerAccessory
 
@@ -56,6 +58,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 		hint: Hint.ViewState? = nil,
 		focus: Focus,
 		showClearButton: Bool = false,
+		preventScreenshot: Bool = false,
 		@ViewBuilder accessory: () -> Accessory = { EmptyView() },
 		@ViewBuilder innerAccessory: () -> InnerAccessory = { EmptyView() }
 	) {
@@ -68,6 +71,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 		self.hint = hint
 		self.focus = focus
 		self.showClearButton = showClearButton
+		self.preventScreenshot = preventScreenshot
 		self.accessory = accessory()
 		self.innerAccesory = innerAccessory()
 	}
@@ -81,6 +85,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 		text: Binding<String>,
 		hint: Hint.ViewState? = nil,
 		showClearButton: Bool = false,
+		preventScreenshot: Bool = false,
 		@ViewBuilder accessory: () -> Accessory = { EmptyView() },
 		@ViewBuilder innerAccessory: () -> InnerAccessory = { EmptyView() }
 	) where FocusValue == Never {
@@ -93,6 +98,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 		self.hint = hint
 		self.focus = nil
 		self.showClearButton = showClearButton
+		self.preventScreenshot = preventScreenshot
 		self.accessory = accessory()
 		self.innerAccesory = innerAccessory()
 	}
@@ -139,6 +145,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 							) { value in
 								isFocused = value
 							}
+							.screenshotProtected(isProtected: isScreenshotProtected)
 						}
 					}
 					.modifier { view in
@@ -185,6 +192,14 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 			accessory
 				.alignmentGuide(.textFieldAlignment, computeValue: { $0[VerticalAlignment.center] })
 		}
+	}
+
+	private var isScreenshotProtected: Bool {
+		#if DEBUG
+		false
+		#else
+		preventScreenshot
+		#endif
 	}
 
 	private func accentColor(isFocused: Bool) -> Color {

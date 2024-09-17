@@ -4,7 +4,7 @@ import SwiftUI
 // MARK: - P2PLinks.View
 extension P2PLinksFeature {
 	public struct ViewState: Equatable {
-		public let linkRows: IdentifiedArrayOf<P2PLinkRow.State>
+		public let linkRows: IdentifiedArrayOf<P2PLink>
 
 		init(state: P2PLinksFeature.State) {
 			linkRows = state.links
@@ -26,39 +26,42 @@ extension P2PLinksFeature {
 				send: { .view($0) }
 			) { viewStore in
 				ScrollView {
-					Text(L10n.LinkedConnectors.subtitle)
-						.foregroundColor(.app.gray2)
-						.textStyle(.body1HighImportance)
-						.flushedLeft
-						.padding([.horizontal, .top], .medium3)
-						.padding(.bottom, .small2)
+					VStack(alignment: .leading, spacing: .medium3) {
+						Text(L10n.LinkedConnectors.subtitle)
+							.textStyle(.body1Header)
+							.foregroundStyle(.app.gray2)
+							.padding(.horizontal, .medium3)
 
-					Separator()
-
-					VStack(alignment: .leading) {
-						ForEachStore(
-							store.scope(
-								state: \.links,
-								action: { .child(.connection(id: $0, action: $1)) }
-							),
-							content: {
-								P2PLinkRow.View(store: $0)
-									.padding(.medium3)
-
-								Separator()
+						VStack(spacing: .zero) {
+							ForEach(viewStore.linkRows) { link in
+								PlainListRow(title: link.displayName) {
+									HStack(spacing: .medium3) {
+										Button(asset: AssetResource.create) {
+											viewStore.send(.editButtonTapped(link))
+										}
+										Button(asset: AssetResource.delete) {
+											viewStore.send(.removeButtonTapped(link))
+										}
+									}
+								}
+								.withSeparator(horizontalPadding: link == viewStore.linkRows.last ? .zero : .medium3)
 							}
-						)
+						}
+						.background(Color.app.white)
+
+						Button(L10n.LinkedConnectors.linkNewConnector) {
+							viewStore.send(.addNewConnectionButtonTapped)
+						}
+						.buttonStyle(.secondaryRectangular(
+							shouldExpand: true,
+							image: .init(asset: AssetResource.qrCodeScanner)
+						))
+						.padding(.horizontal, .medium2)
+						.padding(.vertical, .medium1)
 					}
-					Button(L10n.LinkedConnectors.linkNewConnector) {
-						viewStore.send(.addNewConnectionButtonTapped)
-					}
-					.buttonStyle(.secondaryRectangular(
-						shouldExpand: true,
-						image: .init(asset: AssetResource.qrCodeScanner)
-					))
-					.padding(.horizontal, .medium3)
-					.padding(.vertical, .large1)
+					.padding(.vertical, .medium3)
 				}
+				.background(Color.app.gray5)
 				.radixToolbar(title: L10n.LinkedConnectors.title)
 				.task { @MainActor in
 					await store.send(.view(.task)).finish()
@@ -84,6 +87,7 @@ private extension View {
 		let destinationStore = store.destination
 		return newConnection(with: destinationStore)
 			.confirmDeletionAlert(with: destinationStore)
+			.updateName(with: destinationStore)
 	}
 
 	private func newConnection(with destinationStore: PresentationStoreOf<P2PLinksFeature.Destination>) -> some View {
@@ -102,27 +106,10 @@ private extension View {
 			action: P2PLinksFeature.Destination.Action.removeConnection
 		)
 	}
-}
 
-#if DEBUG
-import ComposableArchitecture
-import SwiftUI
-
-struct P2PLinksFeature_Preview: PreviewProvider {
-	static var previews: some View {
-		NavigationStack {
-			P2PLinksFeature.View(
-				store: .init(
-					initialState: .previewValue,
-					reducer: P2PLinksFeature.init
-				)
-			)
-			.navigationBarTitleDisplayMode(.inline)
+	private func updateName(with destinationStore: PresentationStoreOf<P2PLinksFeature.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.updateName, action: \.updateName)) {
+			UpdateP2PLinkName.View(store: $0)
 		}
 	}
 }
-
-extension P2PLinksFeature.State {
-	public static let previewValue: Self = .init()
-}
-#endif

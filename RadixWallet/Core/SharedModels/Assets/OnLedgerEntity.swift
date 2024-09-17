@@ -18,6 +18,8 @@ public enum OnLedgerEntity: Sendable, Hashable, Codable, CustomDebugStringConver
 			"genericComponent: \(generic)"
 		case let .nonFungibleToken(nft):
 			"nonFungibleToken: \(nft)"
+		case let .locker(locker):
+			"locker: \(locker)"
 		}
 	}
 
@@ -28,6 +30,7 @@ public enum OnLedgerEntity: Sendable, Hashable, Codable, CustomDebugStringConver
 	case nonFungibleToken(NonFungibleToken)
 	case accountNonFungibleIds(AccountNonFungibleIdsPage)
 	case genericComponent(GenericComponent)
+	case locker(Locker)
 
 	public var resource: Resource? {
 		guard case let .resource(resource) = self else {
@@ -78,6 +81,13 @@ public enum OnLedgerEntity: Sendable, Hashable, Codable, CustomDebugStringConver
 		return genericComponent
 	}
 
+	public var locker: Locker? {
+		guard case let .locker(locker) = self else {
+			return nil
+		}
+		return locker
+	}
+
 	public var metadata: Metadata? {
 		switch self {
 		case let .resource(resource):
@@ -92,6 +102,8 @@ public enum OnLedgerEntity: Sendable, Hashable, Codable, CustomDebugStringConver
 			nil
 		case let .genericComponent(genericComponent):
 			genericComponent.metadata
+		case let .locker(locker):
+			locker.metadata
 		}
 	}
 }
@@ -276,6 +288,15 @@ extension OnLedgerEntity {
 		public let address: ComponentAddress
 		public let atLedgerState: AtLedgerState
 		public let behaviors: [AssetBehavior]
+		public let metadata: Metadata
+	}
+}
+
+// MARK: - OnLedgerEntity.Locker
+extension OnLedgerEntity {
+	public struct Locker: Sendable, Hashable, Codable {
+		public let address: LockerAddress
+		public let atLedgerState: AtLedgerState
 		public let metadata: Metadata
 	}
 }

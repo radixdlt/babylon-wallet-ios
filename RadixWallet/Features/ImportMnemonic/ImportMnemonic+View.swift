@@ -195,10 +195,7 @@ extension ImportMnemonic {
 				.animation(.default, value: viewStore.wordCount)
 				.animation(.default, value: viewStore.isAdvancedMode)
 				.onAppear { viewStore.send(.appeared) }
-				#if !DEBUG
-					.screenshotProtected(isProtected: true)
-				#endif // !DEBUG
-					.destinations(with: store)
+				.destinations(with: store)
 			}
 		}
 

@@ -2,6 +2,7 @@
 public struct P2PLinksClient: Sendable {
 	public var getP2PLinks: GetP2PLinks
 	public var updateOrAddP2PLink: UpdateOrAddP2PLink
+	public var updateP2PLink: UpdateP2PLink
 	public var deleteP2PLinkByPassword: DeleteP2PLinkByPassword
 	public var deleteAllP2PLinks: DeleteAllP2PLinks
 	public var getP2PLinkPrivateKey: GetP2PLinkPrivateKey
@@ -10,6 +11,7 @@ public struct P2PLinksClient: Sendable {
 	public init(
 		getP2PLinks: @escaping GetP2PLinks,
 		updateOrAddP2PLink: @escaping UpdateOrAddP2PLink,
+		updateP2PLink: @escaping UpdateP2PLink,
 		deleteP2PLinkByPassword: @escaping DeleteP2PLinkByPassword,
 		deleteAllP2PLinks: @escaping DeleteAllP2PLinks,
 		getP2PLinkPrivateKey: @escaping GetP2PLinkPrivateKey,
@@ -17,6 +19,7 @@ public struct P2PLinksClient: Sendable {
 	) {
 		self.getP2PLinks = getP2PLinks
 		self.updateOrAddP2PLink = updateOrAddP2PLink
+		self.updateP2PLink = updateP2PLink
 		self.deleteP2PLinkByPassword = deleteP2PLinkByPassword
 		self.deleteAllP2PLinks = deleteAllP2PLinks
 		self.getP2PLinkPrivateKey = getP2PLinkPrivateKey
@@ -27,6 +30,7 @@ public struct P2PLinksClient: Sendable {
 extension P2PLinksClient {
 	public typealias GetP2PLinks = @Sendable () async -> P2PLinks
 	public typealias UpdateOrAddP2PLink = @Sendable (P2PLink) async throws -> P2PLink?
+	public typealias UpdateP2PLink = @Sendable (P2PLink) async throws -> Void
 	public typealias DeleteP2PLinkByPassword = @Sendable (RadixConnectPassword) async throws -> Void
 	public typealias DeleteAllP2PLinks = @Sendable () async throws -> Void
 	public typealias GetP2PLinkPrivateKey = @Sendable () async throws -> (privateKey: Curve25519.PrivateKey, isNew: Bool)
