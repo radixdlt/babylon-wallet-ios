@@ -2,7 +2,7 @@ import ComposableArchitecture
 import Sargon
 import SwiftUI
 
-public typealias AssetsDepositStatus = [ResourceAsset.State.ID: ResourceAsset.State.DepositStatus]
+public typealias AssetsDepositStatus = [ResourceAddress: ResourceAsset.State.DepositStatus]
 
 // MARK: - ReceivingAccount
 public struct ReceivingAccount: Sendable, FeatureReducer {
@@ -91,8 +91,10 @@ extension ReceivingAccount.State {
 	}
 
 	mutating func updateDepositStatus(values: AssetsDepositStatus) {
-		for (id, status) in values {
-			assets[id: id]?.depositStatus = .success(status)
+		assets.mutateAll { asset in
+			if let depositStatus = values[asset.resourceAddress] {
+				asset.depositStatus = .success(depositStatus)
+			}
 		}
 	}
 }
