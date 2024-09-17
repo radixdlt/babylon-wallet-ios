@@ -137,7 +137,7 @@ extension OnLedgerEntity {
 		public let poolUnit: PoolAddress?
 		public let poolUnitResource: ResourceAddress?
 		public let claimedEntities: [String]?
-		public var claimedWebsites: [URL]?
+		public let claimedWebsites: [URL]?
 		public let accountType: AccountType?
 		public let ownerKeys: PublicKeyHashesWithStateVersion?
 		public let ownerBadge: OwnerBadgeWithStateVersion?

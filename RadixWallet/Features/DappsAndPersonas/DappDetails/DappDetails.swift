@@ -35,6 +35,8 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 		public var personaList: PersonaList.State
 
+		public var mainWebsite: URL?
+
 		@Loadable
 		public var metadata: OnLedgerEntity.Metadata? = nil
 
@@ -110,6 +112,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case resourcesLoaded(Loadable<State.Resources>)
 		case associatedDappsLoaded(Loadable<[OnLedgerEntity.AssociatedDapp]>)
 		case dAppUpdated(AuthorizedDappDetailed)
+		case mainWebsiteValidated(URL)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -192,14 +195,14 @@ public struct DappDetails: Sendable, FeatureReducer {
 				}
 
 				let result = await TaskResult {
-					var metadata = try await onLedgerEntitiesClient.getAssociatedDapp(dAppID).metadata
+					let metadata = try await onLedgerEntitiesClient.getAssociatedDapp(dAppID).metadata
 
 					if let url = metadata.claimedWebsites?.first {
 						do {
 							try await rolaClient.performWellKnownFileCheck(url, dAppDefinitionAddress)
+							await send(.internal(.mainWebsiteValidated(url)))
 						} catch {
 							loggerGlobal.error("Failed to validate dapp main website: \(error)")
-							metadata.claimedWebsites = nil
 						}
 					}
 
@@ -299,6 +302,10 @@ public struct DappDetails: Sendable, FeatureReducer {
 			state.authorizedDapp = dApp
 			state.personaList = .init(dApp: dApp)
 
+			return .none
+
+		case let .mainWebsiteValidated(url):
+			state.mainWebsite = url
 			return .none
 		}
 	}
