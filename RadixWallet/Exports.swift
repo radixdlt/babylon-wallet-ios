@@ -18,7 +18,6 @@
 @_exported import Logging
 @_exported import NavigationTransitions
 @_exported import NonEmpty
-@_exported import Overture
 @_exported import Sargon
 @_exported import Tagged
 @_exported import Validated

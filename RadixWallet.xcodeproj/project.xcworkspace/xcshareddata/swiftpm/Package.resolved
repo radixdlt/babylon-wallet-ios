@@ -1,5 +1,5 @@
 {
-  "originHash" : "c7867aaf26d1dbb286f38a59aab2257d700d739d413fbe97751b1a97422ceccd",
+  "originHash" : "f528c9655a2c3955bddbbf05c7862280c04b49245d70aa4d9479e7417c484702",
   "pins" : [
     {
       "identity" : "anycodable",
@@ -287,15 +287,6 @@
       "state" : {
         "revision" : "0a5bc04095a675662cf24757cc0640aa2204253b",
         "version" : "1.0.2"
-      }
-    },
-    {
-      "identity" : "swift-overture",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/pointfreeco/swift-overture.git",
-      "state" : {
-        "revision" : "7977acd7597f413717058acc1e080731249a1d7e",
-        "version" : "0.5.0"
       }
     },
     {
