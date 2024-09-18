@@ -147,12 +147,12 @@ extension TransactionHistoryFilters {
 
 			private var collapsedHeight: CGFloat {
 				CGFloat(collapsedRowLimit) * rowHeight + // height of each row
-					CGFloat(collapsedRowLimit - 1) * spacing + // height of spacing among rows
+					CGFloat(collapsedRowLimit - 1) * spacing.height + // height of spacing among rows
 					2 * clippedPadding // height of padding left on top & bottom to avoid clipping issues
 			}
 
 			private let collapsedRowLimit: Int = 3
-			private let spacing: CGFloat = .small1
+			private let spacing: CGSize = .init(width: .small3, height: .small2)
 
 			// When clipping the view, the rounded corners elements (which are clipped in a Capsule) next to an edge will look trimmed.
 			// Therefore, we leave a minimum padding on each edge to avoid this unwanted effect.
@@ -168,14 +168,10 @@ extension TransactionHistoryFilters {
 			var body: some SwiftUI.View {
 				if !filters.isEmpty {
 					let isCollapsible = labels != nil
-					VStack(alignment: .leading, spacing: .zero) {
-						if let heading {
-							Text(heading)
-								.textStyle(.body1HighImportance)
-								.foregroundStyle(.app.gray2)
-								.flushedLeft
-								.padding(.bottom, .medium3)
-						}
+					VStack(alignment: .leading, spacing: .medium3) {
+						Text(heading)
+							.textStyle(.body1HighImportance)
+							.foregroundStyle(.app.gray2)
 
 						FlowLayout(spacing: spacing) {
 							FiltersView(filters: filters, store: store)
@@ -196,21 +192,13 @@ extension TransactionHistoryFilters {
 						}
 
 						if totalHeight > collapsedHeight, let labels {
-							Button {
+							Button(isCollapsed ? "+ \(labels.showAll)" : "- \(labels.showLess)") {
 								withAnimation {
 									isCollapsed.toggle()
-								}
-							} label: {
-								ZStack {
-									Text("+ \(labels.showAll)")
-										.opacity(isCollapsed ? 1 : 0)
-									Text("- \(labels.showLess)")
-										.opacity(isCollapsed ? 0 : 1)
 								}
 							}
 							.buttonStyle(.blueText)
 							.frame(maxWidth: .infinity)
-							.padding(.top, .medium3)
 						}
 					}
 					.animation(.default, value: isCollapsed)
