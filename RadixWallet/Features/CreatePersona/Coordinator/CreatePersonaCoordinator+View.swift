@@ -58,11 +58,9 @@ extension CreatePersonaCoordinator {
 				SwitchStore(store) { state in
 					switch state {
 					case .step0_introduction:
-						CaseLet(
-							/CreatePersonaCoordinator.Path.State.step0_introduction,
-							action: CreatePersonaCoordinator.Path.Action.step0_introduction,
-							then: { IntroductionToPersonas.View(store: $0) }
-						)
+						IntroductionToPersonas {
+							self.store.send(.view(.introductionContinueButtonTapped))
+						}
 
 					case .step1_createPersona:
 						CaseLet(
