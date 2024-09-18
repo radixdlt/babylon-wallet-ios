@@ -8,31 +8,15 @@ final class SargonSecureStorage: SecureStorageDriver {
 	func loadData(key: SargonUniFFI.SecureStorageKey) async throws -> SargonUniFFI.BagOfBytes? {
 		switch key {
 		case .hostId:
-			let deviceInfo: DeviceInfo? = {
-				if let existing = try? secureStorageClient.loadDeviceInfo() {
-					return existing
-				}
-
-				if let legacyDeviceID = try? secureStorageClient.deprecatedLoadDeviceID() {
-					let deviceInfo = DeviceInfo(id: legacyDeviceID, date: .now)
-					try? secureStorageClient.saveDeviceInfo(deviceInfo)
-					secureStorageClient.deleteDeprecatedDeviceID()
-					return deviceInfo
-				}
-
-				return nil
-
-			}()
-
-			if let deviceInfo {
-				let hostId = HostId(id: deviceInfo.id, generatedAt: deviceInfo.date)
-				return hostIdToJsonBytes(hostId: hostId)
-			}
-
-			return nil
+			return loadHostId()
 
 		case let .deviceFactorSourceMnemonic(factorSourceId):
-			return try secureStorageClient.loadMnemonicDataByFactorSourceID(.init(factorSourceID: factorSourceId, notifyIfMissing: true))
+			return try secureStorageClient.loadMnemonicDataByFactorSourceID(
+				.init(
+					factorSourceID: factorSourceId,
+					notifyIfMissing: true
+				)
+			)
 
 		case .profileSnapshot:
 			guard let activeProfileId = userDefaults.getActiveProfileID() else {
@@ -53,18 +37,9 @@ final class SargonSecureStorage: SecureStorageDriver {
 		case let .deviceFactorSourceMnemonic(factorSourceId):
 			try secureStorageClient.saveMnemonicForFactorSourceData(factorSourceId, data)
 
-		case .profileSnapshot:
-			if let activeProfileId = userDefaults.getActiveProfileID() {
-				try secureStorageClient.saveProfileSnapshotData(activeProfileId, data)
-				return
-			}
-
-			let json = String(data: data, encoding: .utf8)!
-			let profile = try Profile(jsonString: json)
-
-			try secureStorageClient.saveProfileSnapshotData(profile.id, data)
-
-			userDefaults.setActiveProfileID(profile.id)
+		case let .profileSnapshot(profileId):
+			try secureStorageClient.saveProfileSnapshotData(profileId, data)
+			userDefaults.setActiveProfileID(profileId)
 		}
 	}
 
@@ -84,5 +59,30 @@ final class SargonSecureStorage: SecureStorageDriver {
 				keepInICloudIfPresent: true
 			)
 		}
+	}
+
+	private func loadHostId() -> BagOfBytes? {
+		let deviceInfo: DeviceInfo? = {
+			if let existing = try? secureStorageClient.loadDeviceInfo() {
+				return existing
+			}
+
+			if let legacyDeviceID = try? secureStorageClient.deprecatedLoadDeviceID() {
+				let deviceInfo = DeviceInfo(id: legacyDeviceID, date: .now)
+				try? secureStorageClient.saveDeviceInfo(deviceInfo)
+				secureStorageClient.deleteDeprecatedDeviceID()
+				return deviceInfo
+			}
+
+			return nil
+
+		}()
+
+		if let deviceInfo {
+			let hostId = HostId(id: deviceInfo.id, generatedAt: deviceInfo.date)
+			return hostIdToJsonBytes(hostId: hostId)
+		}
+
+		return nil
 	}
 }

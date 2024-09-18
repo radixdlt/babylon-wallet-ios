@@ -120,8 +120,6 @@ extension UserDefaults.Dependency.Key {
 			return [userDefaults.showRelinkConnectorsAfterProfileRestore].map(String.init(describing:))
 		case .homeCards:
 			return [userDefaults.getHomeCards() == nil ? "No Data available" : "Data available"]
-		case .hostId:
-			return []
 		}
 	}
 }

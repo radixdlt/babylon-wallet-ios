@@ -75,11 +75,11 @@ extension TransactionReview {
 				networkID: networkID
 			)
 
-			//            let dAppAddresses = summary.encounteredAddresses.filter(\.isGlobal)
-//			let dAppsUsed: TransactionReviewDappsUsed.State? = try await extractDapps(
-//				componentAddresses: dAppAddresses,
-//				unknownTitle: L10n.TransactionReview.unknownComponents
-//			)
+			let dAppAddresses = summary.encounteredAddresses.filter(\.isGlobal)
+			let dAppsUsed: TransactionReviewDappsUsed.State? = try await extractDapps(
+				componentAddresses: dAppAddresses,
+				unknownTitle: L10n.TransactionReview.unknownComponents
+			)
 
 			let deposits = try await extractDeposits(
 				accountDeposits: summary.deposits,
@@ -92,7 +92,7 @@ extension TransactionReview {
 
 			return Sections(
 				withdrawals: withdrawals,
-				dAppsUsed: nil,
+				dAppsUsed: dAppsUsed,
 				deposits: deposits,
 				proofs: proofs
 			)

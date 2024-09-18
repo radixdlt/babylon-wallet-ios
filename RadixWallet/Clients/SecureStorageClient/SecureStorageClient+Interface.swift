@@ -7,10 +7,8 @@ extension Profile {
 
 // MARK: - SecureStorageClient
 public struct SecureStorageClient: Sendable {
-	public var saveProfileSnapshot: SaveProfileSnapshot
 	public var loadProfileSnapshotData: LoadProfileSnapshotData
-	public var loadProfileSnapshot: LoadProfileSnapshot
-	public var deleteProfile: DeleteProfile
+	public var saveProfileSnapshotData: SaveProfileSnapshotData
 
 	public var saveMnemonicForFactorSource: SaveMnemonicForFactorSource
 	public var loadMnemonicByFactorSourceID: LoadMnemonicByFactorSourceID
@@ -44,8 +42,6 @@ public struct SecureStorageClient: Sendable {
 	public var saveP2PLinksPrivateKey: SaveP2PLinksPrivateKey
 	public var keychainChanged: KeychainChanged
 
-	public var saveProfileSnapshotData: SaveProfileSnapshotData
-
 	public var loadMnemonicDataByFactorSourceID: LoadMnemonicDataByFactorSourceID
 	public var saveMnemonicForFactorSourceData: SaveMnemonicForFactorSourceData
 
@@ -55,10 +51,8 @@ public struct SecureStorageClient: Sendable {
 
 	#if DEBUG
 	init(
-		saveProfileSnapshot: @escaping SaveProfileSnapshot,
 		loadProfileSnapshotData: @escaping LoadProfileSnapshotData,
-		loadProfileSnapshot: @escaping LoadProfileSnapshot,
-		deleteProfile: @escaping DeleteProfile,
+		saveProfileSnapshotData: @escaping SaveProfileSnapshotData,
 		saveMnemonicForFactorSource: @escaping SaveMnemonicForFactorSource,
 		loadMnemonicByFactorSourceID: @escaping LoadMnemonicByFactorSourceID,
 		containsMnemonicIdentifiedByFactorSourceID: @escaping ContainsMnemonicIdentifiedByFactorSourceID,
@@ -81,14 +75,11 @@ public struct SecureStorageClient: Sendable {
 		saveP2PLinksPrivateKey: @escaping SaveP2PLinksPrivateKey,
 		keychainChanged: @escaping KeychainChanged,
 		getAllMnemonics: @escaping GetAllMnemonics,
-		saveProfileSnapshotData: @escaping SaveProfileSnapshotData,
 		loadMnemonicDataByFactorSourceID: @escaping LoadMnemonicDataByFactorSourceID,
 		saveMnemonicForFactorSourceData: @escaping SaveMnemonicForFactorSourceData
 	) {
-		self.saveProfileSnapshot = saveProfileSnapshot
 		self.loadProfileSnapshotData = loadProfileSnapshotData
-		self.loadProfileSnapshot = loadProfileSnapshot
-		self.deleteProfile = deleteProfile
+		self.saveProfileSnapshotData = saveProfileSnapshotData
 		self.saveMnemonicForFactorSource = saveMnemonicForFactorSource
 		self.loadMnemonicByFactorSourceID = loadMnemonicByFactorSourceID
 		self.containsMnemonicIdentifiedByFactorSourceID = containsMnemonicIdentifiedByFactorSourceID
@@ -111,19 +102,14 @@ public struct SecureStorageClient: Sendable {
 		self.saveRadixConnectMobileSession = saveRadixConnectMobileSession
 		self.loadRadixConnectMobileSession = loadRadixConnectMobileSession
 		self.keychainChanged = keychainChanged
-
-		self.saveProfileSnapshotData = saveProfileSnapshotData
-
 		self.loadMnemonicDataByFactorSourceID = loadMnemonicDataByFactorSourceID
 		self.saveMnemonicForFactorSourceData = saveMnemonicForFactorSourceData
 	}
 	#else
 
 	init(
-		saveProfileSnapshot: @escaping SaveProfileSnapshot,
 		loadProfileSnapshotData: @escaping LoadProfileSnapshotData,
-		loadProfileSnapshot: @escaping LoadProfileSnapshot,
-		deleteProfile: @escaping DeleteProfile,
+		saveProfileSnapshotData: @escaping SaveProfileSnapshotData,
 		saveMnemonicForFactorSource: @escaping SaveMnemonicForFactorSource,
 		loadMnemonicByFactorSourceID: @escaping LoadMnemonicByFactorSourceID,
 		containsMnemonicIdentifiedByFactorSourceID: @escaping ContainsMnemonicIdentifiedByFactorSourceID,
@@ -145,15 +131,12 @@ public struct SecureStorageClient: Sendable {
 		loadP2PLinksPrivateKey: @escaping LoadP2PLinksPrivateKey,
 		saveP2PLinksPrivateKey: @escaping SaveP2PLinksPrivateKey,
 		keychainChanged: @escaping KeychainChanged,
-		saveProfileSnapshotData: @escaping SaveProfileSnapshotData,
 
 		loadMnemonicByFactorSourceID: @escaping LoadMnemonicByFactorSourceID,
 		saveMnemonicForFactorSourceData: @escaping SaveMnemonicForFactorSourceData
 	) {
-		self.saveProfileSnapshot = saveProfileSnapshot
 		self.loadProfileSnapshotData = loadProfileSnapshotData
-		self.loadProfileSnapshot = loadProfileSnapshot
-		self.deleteProfile = deleteProfile
+		self.saveProfileSnapshotData = saveProfileSnapshotData
 		self.saveMnemonicForFactorSource = saveMnemonicForFactorSource
 		self.loadMnemonicByFactorSourceID = loadMnemonicByFactorSourceID
 		self.containsMnemonicIdentifiedByFactorSourceID = containsMnemonicIdentifiedByFactorSourceID
@@ -175,9 +158,6 @@ public struct SecureStorageClient: Sendable {
 		self.loadP2PLinksPrivateKey = loadP2PLinksPrivateKey
 		self.saveP2PLinksPrivateKey = saveP2PLinksPrivateKey
 		self.keychainChanged = keychainChanged
-
-		self.saveProfileSnapshotData = saveProfileSnapshotData
-
 		self.loadMnemonicDataByFactorSourceID = loadMnemonicDataByFactorSourceID
 		self.saveMnemonicForFactorSourceData = saveMnemonicForFactorSourceData
 	}
@@ -192,11 +172,8 @@ public struct LoadMnemonicByFactorSourceIDRequest: Sendable, Hashable {
 
 extension SecureStorageClient {
 	public typealias DisableCloudProfileSync = @Sendable (ProfileID) throws -> Void
-	public typealias SaveProfileSnapshot = @Sendable (Profile) throws -> Void
 	public typealias SaveProfileSnapshotData = @Sendable (ProfileID, Data) throws -> Void
 	public typealias LoadProfileSnapshotData = @Sendable (ProfileID) throws -> Data?
-	public typealias LoadProfileSnapshot = @Sendable (ProfileID) throws -> Profile?
-	public typealias LoadProfile = @Sendable (ProfileID) throws -> Profile?
 	public typealias DeleteProfile = @Sendable (ProfileID) throws -> Void
 
 	public typealias SaveMnemonicForFactorSource = @Sendable (PrivateHierarchicalDeterministicFactorSource) throws -> Void

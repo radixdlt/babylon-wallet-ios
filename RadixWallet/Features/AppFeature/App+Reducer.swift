@@ -123,9 +123,6 @@ public struct App: Sendable, FeatureReducer {
 				errorQueue.schedule(error)
 				return goToOnboarding(state: &state)
 			case let .loaded(profile):
-				if profile.networks.isEmpty {
-					return goToOnboarding(state: &state)
-				}
 				return goToMain(state: &state)
 			}
 

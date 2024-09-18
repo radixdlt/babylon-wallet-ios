@@ -182,12 +182,13 @@ public struct Splash: Sendable, FeatureReducer {
 
 	private func boot_sargon_os() -> Effect<Action> {
 		.run { _ in
-			_ = ProfileStore.shared
-			try! await SargonOS.creatingShared(
+			// Ignore error.
+			// The only error that can be thrown is SargonOSAlreadyBooted.
+			try? await SargonOS.creatingShared(
 				bootingWith: .creatingShared(
 					drivers: .init(
 						bundle: Bundle.main,
-						userDefaultsSuite: "group.com.radixpublishing.preview",
+						userDefaultsSuite: UserDefaults.Dependency.radixSuiteName,
 						secureStorageDriver: SargonSecureStorage()
 					)
 				)

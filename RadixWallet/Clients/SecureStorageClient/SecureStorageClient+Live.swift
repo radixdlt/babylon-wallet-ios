@@ -207,15 +207,6 @@ extension SecureStorageClient: DependencyKey {
 			return try jsonDecoder().decode(MnemonicWithPassphrase.self, from: data)
 		}
 
-		let loadProfileSnapshot: LoadProfileSnapshot = { id -> Profile? in
-			guard
-				let existingSnapshotData = try loadProfileSnapshotData(id)
-			else {
-				return nil
-			}
-			return try Profile(jsonData: existingSnapshotData)
-		}
-
 		let loadMnemonicByFactorSourceID: LoadMnemonicByFactorSourceID = { request in
 			let key = key(factorSourceID: request.factorSourceID)
 			return try loadMnemonicFor(key: key, notifyIfMissing: request.notifyIfMissing)
@@ -286,13 +277,6 @@ extension SecureStorageClient: DependencyKey {
 		}
 		#endif
 
-		let saveProfileSnapshot: SaveProfileSnapshot = { profile in
-			try saveProfile(
-				snapshotData: profile.profileSnapshot(),
-				key: profile.header.id.keychainKey
-			)
-		}
-
 		let saveProfileSnapshotData: SaveProfileSnapshotData = { id, data in
 			try saveProfile(snapshotData: data, key: id.keychainKey)
 		}
@@ -326,10 +310,6 @@ extension SecureStorageClient: DependencyKey {
 					comment: .init("mnemonic")
 				)
 			)
-		}
-
-		let loadProfile: LoadProfile = { id in
-			try loadProfileSnapshot(id)
 		}
 
 		let containsMnemonicIdentifiedByFactorSourceID: ContainsMnemonicIdentifiedByFactorSourceID = { factorSourceID in
@@ -455,10 +435,8 @@ extension SecureStorageClient: DependencyKey {
 
 		#if DEBUG
 		return Self(
-			saveProfileSnapshot: saveProfileSnapshot,
 			loadProfileSnapshotData: loadProfileSnapshotData,
-			loadProfileSnapshot: loadProfileSnapshot,
-			deleteProfile: deleteProfile,
+			saveProfileSnapshotData: saveProfileSnapshotData,
 			saveMnemonicForFactorSource: saveMnemonicForFactorSource,
 			loadMnemonicByFactorSourceID: loadMnemonicByFactorSourceID,
 			containsMnemonicIdentifiedByFactorSourceID: containsMnemonicIdentifiedByFactorSourceID,
@@ -481,16 +459,13 @@ extension SecureStorageClient: DependencyKey {
 			saveP2PLinksPrivateKey: saveP2PLinksPrivateKey,
 			keychainChanged: keychainChanged,
 			getAllMnemonics: getAllMnemonics,
-			saveProfileSnapshotData: saveProfileSnapshotData,
 			loadMnemonicDataByFactorSourceID: loadMnemonicDataByFactorSourceID,
 			saveMnemonicForFactorSourceData: saveMnemonicForFactorSourceData
 		)
 		#else
 		return Self(
-			saveProfileSnapshot: saveProfileSnapshot,
 			loadProfileSnapshotData: loadProfileSnapshotData,
-			loadProfileSnapshot: loadProfileSnapshot,
-			deleteProfile: deleteProfile,
+			saveProfileSnapshotData: saveProfileSnapshotData,
 			saveMnemonicForFactorSource: saveMnemonicForFactorSource,
 			loadMnemonicByFactorSourceID: loadMnemonicByFactorSourceID,
 			containsMnemonicIdentifiedByFactorSourceID: containsMnemonicIdentifiedByFactorSourceID,
@@ -512,7 +487,6 @@ extension SecureStorageClient: DependencyKey {
 			loadP2PLinksPrivateKey: loadP2PLinksPrivateKey,
 			saveP2PLinksPrivateKey: saveP2PLinksPrivateKey,
 			keychainChanged: keychainChanged,
-			saveProfileSnapshotData: saveProfileSnapshotData,
 			loadMnemonicDataByFactorSourceID: loadMnemonicDataByFactorSourceID,
 			saveMnemonicForFactorSourceData: saveMnemonicForFactorSourceData
 		)

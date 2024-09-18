@@ -13,7 +13,6 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 
 		public let config: CreateAccountConfig
 		var name: NonEmptyString?
-		var useLedgerAsFactorSource: Bool = false
 
 		public init(
 			root: Path.State? = nil,
@@ -103,7 +102,6 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.accountsClient) var accountsClient
-	@Dependency(\.onboardingClient) var onboardingClient
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.isPresented) var isPresented
@@ -144,8 +142,7 @@ extension CreateAccountCoordinator {
 		switch childAction {
 		case let .root(.nameAccount(.delegate(.proceed(accountName, useLedgerAsFactorSource)))):
 			state.name = accountName
-			state.useLedgerAsFactorSource = useLedgerAsFactorSource
-			if state.useLedgerAsFactorSource {
+			if useLedgerAsFactorSource {
 				state.path.append(.selectLedger(.init(context: .createHardwareAccount)))
 				return .none
 			} else {

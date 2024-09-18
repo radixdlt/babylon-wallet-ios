@@ -21,14 +21,13 @@ public enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
 	case activeProfileID
 
 	case mnemonicsUserClaimsToHaveBackedUp
-
-	case hostId
 }
 
 extension UserDefaults.Dependency {
 	public typealias Key = UserDefaultsKey
+	public static let radixSuiteName: String = "group.com.radixpublishing.preview"
 	public static let radix: Self = .init(.init(
-		suiteName: "group.com.radixpublishing.preview"
+		suiteName: radixSuiteName
 	)!)
 }
 

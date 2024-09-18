@@ -10,10 +10,8 @@ extension DependencyValues {
 extension SecureStorageClient: TestDependencyKey {
 	#if DEBUG
 	public static let noop = Self(
-		saveProfileSnapshot: { _ in },
 		loadProfileSnapshotData: { _ in nil },
-		loadProfileSnapshot: { _ in nil },
-		deleteProfile: { _ in },
+		saveProfileSnapshotData: { _, _ in },
 		saveMnemonicForFactorSource: { _ in },
 		loadMnemonicByFactorSourceID: { _ in nil },
 		containsMnemonicIdentifiedByFactorSourceID: { _ in false },
@@ -36,16 +34,13 @@ extension SecureStorageClient: TestDependencyKey {
 		saveP2PLinksPrivateKey: { _ in },
 		keychainChanged: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		getAllMnemonics: { [] },
-		saveProfileSnapshotData: { _, _ in },
 		loadMnemonicDataByFactorSourceID: { _ in nil },
 		saveMnemonicForFactorSourceData: { _, _ in }
 	)
 	#else
 	public static let noop = Self(
-		saveProfileSnapshot: { _ in },
 		loadProfileSnapshotData: { _ in nil },
-		loadProfileSnapshot: { _ in nil },
-		deleteProfile: { _ in },
+		saveProfileSnapshotData: { _, _ in },
 		saveMnemonicForFactorSource: { _ in },
 		loadMnemonicByFactorSourceID: { _ in nil },
 		containsMnemonicIdentifiedByFactorSourceID: { _ in false },
@@ -66,7 +61,6 @@ extension SecureStorageClient: TestDependencyKey {
 		loadP2PLinksPrivateKey: { nil },
 		saveP2PLinksPrivateKey: { _ in },
 		keychainChanged: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
-		saveProfileSnapshotData: { _, _ in },
 		loadMnemonicDataByFactorSourceID: { _ in nil },
 		saveMnemonicForFactorSourceData: { _, _ in }
 	)
@@ -76,10 +70,8 @@ extension SecureStorageClient: TestDependencyKey {
 
 	#if DEBUG
 	public static let testValue = Self(
-		saveProfileSnapshot: unimplemented("\(Self.self).saveProfileSnapshot"),
 		loadProfileSnapshotData: unimplemented("\(Self.self).loadProfileSnapshotData"),
-		loadProfileSnapshot: unimplemented("\(Self.self).loadProfileSnapshot"),
-		deleteProfile: unimplemented("\(Self.self).deleteProfile"),
+		saveProfileSnapshotData: unimplemented("\(Self.self).keychainChanged"),
 		saveMnemonicForFactorSource: unimplemented("\(Self.self).saveMnemonicForFactorSource"),
 		loadMnemonicByFactorSourceID: unimplemented("\(Self.self).loadMnemonicByFactorSourceID"),
 		containsMnemonicIdentifiedByFactorSourceID: unimplemented("\(Self.self).containsMnemonicIdentifiedByFactorSourceID"),
@@ -102,16 +94,13 @@ extension SecureStorageClient: TestDependencyKey {
 		saveP2PLinksPrivateKey: unimplemented("\(Self.self).saveP2PLinksPrivateKey"),
 		keychainChanged: unimplemented("\(Self.self).keychainChanged"),
 		getAllMnemonics: unimplemented("\(Self.self).getAllMnemonics"),
-		saveProfileSnapshotData: unimplemented("\(Self.self).keychainChanged"),
 		loadMnemonicDataByFactorSourceID: unimplemented("\(Self.self).keychainChanged"),
 		saveMnemonicForFactorSourceData: unimplemented("\(Self.self).keychainChanged")
 	)
 	#else
 	public static let testValue = Self(
-		saveProfileSnapshot: unimplemented("\(Self.self).saveProfileSnapshot"),
 		loadProfileSnapshotData: unimplemented("\(Self.self).loadProfileSnapshotData"),
-		loadProfileSnapshot: unimplemented("\(Self.self).loadProfileSnapshot"),
-		deleteProfile: unimplemented("\(Self.self).deleteProfile"),
+		saveProfileSnapshotData: unimplemented("\(Self.self).keychainChanged"),
 		saveMnemonicForFactorSource: unimplemented("\(Self.self).saveMnemonicForFactorSource"),
 		loadMnemonicByFactorSourceID: unimplemented("\(Self.self).loadMnemonicByFactorSourceID"),
 		containsMnemonicIdentifiedByFactorSourceID: unimplemented("\(Self.self).containsMnemonicIdentifiedByFactorSourceID"),
@@ -132,7 +121,6 @@ extension SecureStorageClient: TestDependencyKey {
 		loadP2PLinksPrivateKey: unimplemented("\(Self.self).loadP2PLinksPrivateKey"),
 		saveP2PLinksPrivateKey: unimplemented("\(Self.self).saveP2PLinksPrivateKey"),
 		keychainChanged: unimplemented("\(Self.self).keychainChanged"),
-		saveProfileSnapshotData: unimplemented("\(Self.self).keychainChanged"),
 		loadMnemonicDataByFactorSourceID: unimplemented("\(Self.self).keychainChanged"),
 		saveMnemonicForFactorSourceData: unimplemented("\(Self.self).keychainChanged")
 	)
