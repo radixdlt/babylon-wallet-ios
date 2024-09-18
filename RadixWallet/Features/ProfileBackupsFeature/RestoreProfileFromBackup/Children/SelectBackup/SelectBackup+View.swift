@@ -76,7 +76,7 @@ extension SelectBackup.View {
 				case .failed(.accountTemporarilyUnavailable), .failed(.notAuthenticated):
 					failureBox(message: L10n.RecoverProfileBackup.NotLoggedIn.ios)
 				case .failed(.networkUnavailable):
-					failureBox(message: L10n.RecoverProfileBackup.NotLoggedIn.ios)
+					failureBox(message: L10n.RecoverProfileBackup.networkUnavailable)
 				case .failed(.other):
 					failureBox(message: L10n.RecoverProfileBackup.couldNotLoadBackups)
 				}
