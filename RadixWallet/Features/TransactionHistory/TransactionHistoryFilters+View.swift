@@ -146,11 +146,17 @@ extension TransactionHistoryFilters {
 			let store: StoreOf<TransactionHistoryFilters>
 
 			private var collapsedHeight: CGFloat {
-				CGFloat(collapsedRowLimit) * rowHeight + CGFloat(collapsedRowLimit - 1) * spacing
+				CGFloat(collapsedRowLimit) * rowHeight + // height of each row
+					CGFloat(collapsedRowLimit - 1) * spacing + // height of spacing among rows
+					2 * clippedPadding // height of padding left on top & bottom to avoid clipping issues
 			}
 
 			private let collapsedRowLimit: Int = 3
 			private let spacing: CGFloat = .small1
+
+			// When clipping the view, the rounded corners elements (which are clipped in a Capsule) next to an edge will look trimmed.
+			// Therefore, we leave a minimum padding on each edge to avoid this unwanted effect.
+			private let clippedPadding: CGFloat = 1
 
 			init(_ heading: String? = nil, filters: IdentifiedArrayOf<State.Filter>, labels: CollapseLabels? = nil, store: StoreOf<TransactionHistoryFilters>) {
 				self.heading = heading
@@ -179,6 +185,7 @@ extension TransactionHistoryFilters {
 							TransactionFilterView.Dummy()
 								.measureSize(flowDummyID)
 						}
+						.padding(clippedPadding)
 						.frame(maxHeight: isCollapsible && isCollapsed ? collapsedHeight : .infinity, alignment: .top)
 						.clipped()
 						.onReadSizes(flowDummyID, flowLayoutID) { dummySize, flowSize in
