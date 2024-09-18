@@ -18,6 +18,8 @@ struct AssetBehaviorsView: View {
 						AssetBehaviorRow(behavior: behavior, isXRD: isXRD)
 					}
 				}
+
+				InfoButton(.behaviors, label: L10n.InfoLink.Title.behaviors)
 			}
 			.transition(.opacity.combined(with: .scale(scale: 0.8)))
 		}

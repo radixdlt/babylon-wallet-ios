@@ -21,14 +21,13 @@ extension TransactionReviewNetworkFee {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading, spacing: .zero) {
 					HStack(alignment: .top) {
-						Text(L10n.TransactionReview.NetworkFee.heading)
-							.sectionHeading
-							.textCase(.uppercase)
+						HStack(spacing: .small2) {
+							Text(L10n.TransactionReview.NetworkFee.heading)
+								.sectionHeading
+								.textCase(.uppercase)
 
-						//    FIXME: Uncomment and implement
-						//    TransactionReviewInfoButton {
-						//    viewStore.send(.infoTapped)
-						//    }
+							InfoButton(.transactionfee)
+						}
 
 						Spacer(minLength: 0)
 
@@ -54,7 +53,7 @@ extension TransactionReviewNetworkFee {
 						case .insufficientBalance:
 							WarningErrorView(text: L10n.TransactionReview.FeePayerValidation.insufficientBalance, type: .error)
 						case .valid(.introducesNewAccount):
-							WarningErrorView(text: L10n.TransactionReview.FeePayerValidation.linksNewAccount, type: .warning)
+							WarningErrorView.transactionIntroducesNewAccount()
 						case .valid:
 							EmptyView()
 						}
@@ -64,9 +63,10 @@ extension TransactionReviewNetworkFee {
 						}
 						.textStyle(.body1StandaloneLink)
 						.foregroundColor(.app.blue2)
+						.padding(.top, .small2)
 					}
 				}
-				.task {
+				.task(id: viewStore.id) {
 					viewStore.send(.task)
 				}
 			}

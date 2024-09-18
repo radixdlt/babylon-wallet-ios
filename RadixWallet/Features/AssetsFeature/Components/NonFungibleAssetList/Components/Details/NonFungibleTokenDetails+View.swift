@@ -119,6 +119,11 @@ extension NonFungibleTokenDetails {
 							}
 
 							AssetResourceDetailsSection(viewState: viewStore.resourceDetails)
+
+							IfLetStore(store.scope(state: \.hideResource, action: \.child.hideResource)) { store in
+								HideResource.View(store: store)
+									.padding(.vertical, .medium1)
+							}
 						}
 						.padding(.vertical, .medium1)
 						.background(.app.gray5, ignoresSafeAreaEdges: .bottom)

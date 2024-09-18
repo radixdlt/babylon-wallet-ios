@@ -24,7 +24,7 @@ extension OnLedgerEntitiesClient {
 	@discardableResult
 	static func getEntities(
 		for addresses: [Address],
-		_ explicitMetadata: Set<EntityMetadataKey>,
+		optIns: GatewayAPI.StateEntityDetailsOptIns,
 		ledgerState: AtLedgerState?,
 		cachingStrategy: CachingStrategy,
 		fetchMetadata: Bool
@@ -33,7 +33,7 @@ extension OnLedgerEntitiesClient {
 			for: addresses.map(\.cachingIdentifier),
 			cachingStrategy: cachingStrategy,
 			fetchMetadata: fetchMetadata,
-			refresh: fetchEntites(explicitMetadata, ledgerState: ledgerState, fetchMetadata: fetchMetadata)
+			refresh: fetchEntites(optIns, ledgerState: ledgerState, fetchMetadata: fetchMetadata)
 		)
 	}
 
@@ -238,7 +238,7 @@ extension OnLedgerEntitiesClient {
 
 	@Sendable
 	static func fetchEntites(
-		_ explicitMetadata: Set<EntityMetadataKey>,
+		_ optIns: GatewayAPI.StateEntityDetailsOptIns,
 		ledgerState: AtLedgerState?,
 		forceRefresh: Bool = false,
 		fetchMetadata: Bool
@@ -252,7 +252,7 @@ extension OnLedgerEntitiesClient {
 
 			let response = try await gatewayAPIClient.fetchEntitiesDetails(
 				entities.map(\.address.address),
-				explicitMetadata: explicitMetadata,
+				optIns: optIns,
 				selector: ledgerState?.selector
 			)
 
@@ -316,6 +316,8 @@ extension OnLedgerEntity {
 			.init(address: validator.address)
 		case let .genericComponent(component):
 			.init(address: component.address)
+		case let .locker(locker):
+			.init(address: locker.address)
 		}
 	}
 }

@@ -141,7 +141,8 @@ extension AuthorizedDappsClient {
 					networkId: .nebunet,
 					dappDefinitionAddress: .sample,
 					displayName: "something",
-					referencesToAuthorizedPersonas: []
+					referencesToAuthorizedPersonas: [],
+					preferences: .init(deposits: .visible)
 				)
 				dapp.referencesToAuthorizedPersonas = [
 					.sample,

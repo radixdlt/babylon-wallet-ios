@@ -14,6 +14,8 @@ extension GatewayAPIClient: TestDependencyKey {
 		getEntityNonFungibleResourceVaultsPage: unimplemented("\(Self.self).getEntityNonFungibleResourceVaultsPage"),
 		getEntityNonFungibleIdsPage: unimplemented("\(Self.self).getEntityNonFungibleIdsPage"),
 		getNonFungibleData: unimplemented("\(Self.self).getNonFungibleData"),
+		getAccountLockerTouchedAt: unimplemented("\(Self.self).getAccountLockerTouchedAt"),
+		getAccountLockerVaults: unimplemented("\(Self.self).GetAccountLockerVaults"),
 		submitTransaction: unimplemented("\(Self.self).submitTransaction"),
 		transactionStatus: unimplemented("\(Self.self).transactionStatus"),
 		transactionPreview: unimplemented("\(Self.self).transactionPreview"),
@@ -40,6 +42,8 @@ extension GatewayAPIClient: TestDependencyKey {
 			getEntityNonFungibleResourceVaultsPage: unimplemented("\(self).getEntityNonFungibleResourceVaultsPage"),
 			getEntityNonFungibleIdsPage: unimplemented("\(self).getEntityNonFungibleIdsPage"),
 			getNonFungibleData: unimplemented("\(self).getNonFungibleData"),
+			getAccountLockerTouchedAt: unimplemented("\(Self.self).getAccountLockerTouchedAt"),
+			getAccountLockerVaults: unimplemented("\(Self.self).GetAccountLockerVaults"),
 			submitTransaction: { _ in
 				.init(duplicate: submittedTXIsDoubleSpend)
 			},

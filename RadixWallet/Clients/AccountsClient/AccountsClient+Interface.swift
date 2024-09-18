@@ -11,7 +11,7 @@ public struct AccountsClient: Sendable {
 
 	public var getHiddenAccountsOnCurrentNetwork: GetHiddenAccountsOnCurrentNetwork
 
-	/// Async sequence of Accounts valuues on current network (active gateway), emits new
+	/// Async sequence of Accounts values on current network (active gateway), emits new
 	/// value of Accounts when you switch network (if new active gateway is on a new network).
 	public var accountsOnCurrentNetwork: AccountsOnCurrentNetwork
 

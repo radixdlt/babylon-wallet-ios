@@ -8,9 +8,9 @@ public struct CloseButtonBar: View {
 
 	public var body: some View {
 		HStack {
-			Spacer()
 			CloseButton(action: action)
 				.padding(.small2)
+			Spacer()
 		}
 	}
 }

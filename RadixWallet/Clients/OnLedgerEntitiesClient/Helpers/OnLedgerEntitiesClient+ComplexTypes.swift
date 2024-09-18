@@ -29,6 +29,9 @@ extension OnLedgerEntitiesClient {
 		let amount = resourceQuantifier.amount
 		let resourceAddress = resource.resourceAddress
 
+		@Dependency(\.resourcesVisibilityClient) var resourcesVisibilityClient
+		let hiddenResources = try await resourcesVisibilityClient.getHidden()
+
 		let guarantee: TransactionGuarantee? = { () -> TransactionGuarantee? in
 			guard case let .predicted(predictedAmount) = resourceQuantifier else { return nil }
 			let guaranteedAmount = defaultDepositGuarantee * predictedAmount.value
@@ -50,7 +53,8 @@ extension OnLedgerEntitiesClient {
 				entities: entities,
 				resourceAssociatedDapps: resourceAssociatedDapps,
 				networkID: networkID,
-				guarantee: guarantee
+				guarantee: guarantee,
+				hiddenResources: hiddenResources
 			)
 		}
 
@@ -64,11 +68,13 @@ extension OnLedgerEntitiesClient {
 				guarantee: guarantee
 			)
 		}
+
 		// Normal fungible resource
 		let isXRD = resourceAddress.isXRD(on: networkID)
+		let isHidden = hiddenResources.contains(.fungible(resourceAddress))
 		let details: ResourceBalance.Fungible = .init(isXRD: isXRD, amount: .init(nominalAmount: amount), guarantee: guarantee)
 
-		return .init(resource: resource, details: .fungible(details))
+		return .init(resource: resource, details: .fungible(details), isHidden: isHidden)
 	}
 
 	private func poolUnit(
@@ -78,7 +84,8 @@ extension OnLedgerEntitiesClient {
 		entities: TransactionReview.ResourcesInfo = [:],
 		resourceAssociatedDapps: TransactionReview.ResourceAssociatedDapps? = nil,
 		networkID: NetworkID,
-		guarantee: TransactionGuarantee?
+		guarantee: TransactionGuarantee?,
+		hiddenResources: [ResourceIdentifier]
 	) async throws -> ResourceBalance {
 		let resourceAddress = resource.resourceAddress
 
@@ -104,6 +111,8 @@ extension OnLedgerEntitiesClient {
 				}
 			}
 
+			let isHidden = hiddenResources.contains(.poolUnit(poolContribution.poolAddress))
+
 			return .init(
 				resource: resource,
 				details: .poolUnit(.init(
@@ -115,19 +124,23 @@ extension OnLedgerEntitiesClient {
 						nonXrdResources: nonXrdResources
 					),
 					guarantee: guarantee
-				))
+				)),
+				isHidden: isHidden
 			)
 		} else {
 			guard let details = try await getPoolUnitDetails(resource, forAmount: amount) else {
 				throw FailedToGetPoolUnitDetails()
 			}
 
+			let isHidden = hiddenResources.contains(.poolUnit(details.address))
+
 			return .init(
 				resource: resource,
 				details: .poolUnit(.init(
 					details: details,
 					guarantee: guarantee
-				))
+				)),
+				isHidden: isHidden
 			)
 		}
 	}
@@ -147,8 +160,8 @@ extension OnLedgerEntitiesClient {
 
 			worth = amount * validator.xrdVaultBalance / totalSupply
 		} else {
-			if let stake = try validatorStakes.first(where: { $0.validatorAddress == validator.address }) {
-				guard try stake.liquidStakeUnitAddress == validator.stakeUnitResourceAddress else {
+			if let stake = validatorStakes.first(where: { $0.validatorAddress == validator.address }) {
+				guard stake.liquidStakeUnitAddress == validator.stakeUnitResourceAddress else {
 					throw StakeUnitAddressMismatch()
 				}
 				// Distribute the worth in proportion to the amounts, if needed
@@ -187,18 +200,21 @@ extension OnLedgerEntitiesClient {
 
 		switch resourceInfo {
 		case let .left(resource):
+			@Dependency(\.resourcesVisibilityClient) var resourcesVisibilityClient
+			let hiddenResources = try await resourcesVisibilityClient.getHidden()
+
 			let existingTokenIds = ids.filter { id in
 				!newlyCreatedNonFungibles.contains { newId in
 					newId.resourceAddress == resourceAddress && newId.nonFungibleLocalId == id
 				}
 			}
 
-			let newTokens = try ids.filter { id in
+			let newTokens = ids.filter { id in
 				newlyCreatedNonFungibles.contains { newId in
 					newId.resourceAddress == resourceAddress && newId.nonFungibleLocalId == id
 				}
 			}.map {
-				try OnLedgerEntity.NonFungibleToken(resourceAddress: resourceAddress, nftID: $0, nftData: nil)
+				OnLedgerEntity.NonFungibleToken(resourceAddress: resourceAddress, nftID: $0, nftData: nil)
 			}
 
 			let tokens = try await getNonFungibleTokenData(.init(
@@ -220,7 +236,8 @@ extension OnLedgerEntitiesClient {
 				)]
 			} else {
 				result = tokens.map { token in
-					ResourceBalance(resource: resource, details: .nonFungible(token))
+					let isHidden = hiddenResources.contains(.nonFungible(token.id.resourceAddress))
+					return ResourceBalance(resource: resource, details: .nonFungible(token), isHidden: isHidden)
 				}
 
 				guard result.count == ids.count else {
@@ -241,7 +258,7 @@ extension OnLedgerEntitiesClient {
 					)
 				}
 				.map { id in
-					ResourceBalance(resource: resource, details: .nonFungible(.init(id: id, data: nil)))
+					ResourceBalance(resource: resource, details: .nonFungible(.init(id: id, data: nil)), isHidden: false)
 				}
 
 			guard result.count == ids.count else {

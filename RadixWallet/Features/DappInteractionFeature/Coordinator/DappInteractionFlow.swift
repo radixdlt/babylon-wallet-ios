@@ -690,7 +690,8 @@ extension DappInteractionFlow {
 				case .request, .wallet: nil
 				}
 			}(),
-			referencesToAuthorizedPersonas: []
+			referencesToAuthorizedPersonas: [],
+			preferences: .init(deposits: .visible)
 		)
 		// This extraction is really verbose right now, but it should become a lot simpler with native case paths
 		let sharedAccountsInfo: (DappInteractionNumberOfAccounts, [WalletInteractionWalletAccount])? = unwrap(

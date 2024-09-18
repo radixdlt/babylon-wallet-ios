@@ -19,6 +19,8 @@ extension PersonaList {
 							.textStyle(.body1Link)
 							.foregroundColor(.app.gray2)
 
+						InfoButton(.personas, label: L10n.InfoLink.Title.personas)
+
 						PersonaListCoreView(store: store, tappable: true, showShield: true)
 
 						Button(L10n.Personas.createNewPersona) {

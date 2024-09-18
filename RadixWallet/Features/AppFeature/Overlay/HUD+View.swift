@@ -12,7 +12,7 @@ extension HUD {
 	struct ViewState: Equatable, Sendable {
 		let offset: Double
 		let text: String
-		let icon: OverlayWindowClient.Item.HUD.Icon?
+		let icon: OverlayWindowClient.Item.Icon?
 	}
 
 	struct View: SwiftUI.View {

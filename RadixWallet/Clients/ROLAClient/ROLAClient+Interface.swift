@@ -14,7 +14,7 @@ public struct ROLAClient: Sendable, DependencyKey {
 // MARK: ROLAClient.PerformWellKnownFileCheck
 extension ROLAClient {
 	public typealias PerformDappDefinitionVerification = @Sendable (DappToWalletInteractionMetadata) async throws -> Void
-	public typealias PerformWellKnownFileCheck = @Sendable (DappToWalletInteractionMetadata) async throws -> Void
+	public typealias PerformWellKnownFileCheck = @Sendable (URL, DappDefinitionAddress) async throws -> Void
 	public typealias ManifestForAuthKeyCreation = @Sendable (ManifestForAuthKeyCreationRequest) async throws -> TransactionManifest
 	public typealias AuthenticationDataToSignForChallenge = @Sendable (AuthenticationDataToSignForChallengeRequest) throws -> AuthenticationDataToSignForChallengeResponse
 }

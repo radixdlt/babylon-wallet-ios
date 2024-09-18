@@ -35,6 +35,8 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 		public var personaList: PersonaList.State
 
+		public var mainWebsite: URL?
+
 		@Loadable
 		public var metadata: OnLedgerEntity.Metadata? = nil
 
@@ -97,6 +99,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case fungibleTapped(ResourceAddress)
 		case nonFungibleTapped(ResourceAddress)
 		case dAppTapped(DappDefinitionAddress)
+		case depositsVisibleToggled(Bool)
 		case forgetThisDappTapped
 	}
 
@@ -109,6 +112,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case resourcesLoaded(Loadable<State.Resources>)
 		case associatedDappsLoaded(Loadable<[OnLedgerEntity.AssociatedDapp]>)
 		case dAppUpdated(AuthorizedDappDetailed)
+		case mainWebsiteValidated(URL)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -161,6 +165,8 @@ public struct DappDetails: Sendable, FeatureReducer {
 			"Missing resource: \(address)"
 		}
 	}
+
+	@Dependency(\.rolaClient) var rolaClient
 
 	public init() {}
 
@@ -219,6 +225,17 @@ public struct DappDetails: Sendable, FeatureReducer {
 			state.destination = .dappDetails(.init(dAppDefinitionAddress: address))
 			return .none
 
+		case let .depositsVisibleToggled(isVisible):
+			state.authorizedDapp?.showDeposits(isVisible)
+			guard let detailed = state.authorizedDapp else {
+				return .none
+			}
+			return .run { _ in
+				var dapp = try await authorizedDappsClient.getAuthorizedDapp(detailed: detailed)
+				dapp.showDeposits(isVisible)
+				try await authorizedDappsClient.updateAuthorizedDapp(dapp)
+			}
+
 		case .forgetThisDappTapped:
 			state.destination = .confirmDisconnectAlert(.confirmDisconnect)
 			return .none
@@ -255,6 +272,15 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 				let associatedDapps = await metadata.flatMap { await loadDapps(metadata: $0, validated: dAppDefinitionAddress) }
 				await send(.internal(.associatedDappsLoaded(associatedDapps)))
+
+				if let url = metadata.wrappedValue?.claimedWebsites?.first {
+					do {
+						try await rolaClient.performWellKnownFileCheck(url, dAppDefinitionAddress)
+						await send(.internal(.mainWebsiteValidated(url)))
+					} catch {
+						loggerGlobal.error("Failed to validate dapp main website: \(error)")
+					}
+				}
 			}
 
 		case let .resourcesLoaded(resources):
@@ -274,6 +300,10 @@ public struct DappDetails: Sendable, FeatureReducer {
 			state.authorizedDapp = dApp
 			state.personaList = .init(dApp: dApp)
 
+			return .none
+
+		case let .mainWebsiteValidated(url):
+			state.mainWebsite = url
 			return .none
 		}
 	}

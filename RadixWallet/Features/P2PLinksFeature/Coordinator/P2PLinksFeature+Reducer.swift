@@ -6,13 +6,13 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 	// MARK: State
 
 	public struct State: Sendable, Hashable {
-		public var links: IdentifiedArrayOf<P2PLinkRow.State>
+		public var links: IdentifiedArrayOf<P2PLink>
 
 		@PresentationState
 		public var destination: Destination.State?
 
 		public init(
-			links: IdentifiedArrayOf<P2PLinkRow.State> = .init(),
+			links: IdentifiedArrayOf<P2PLink> = .init(),
 			destination: Destination.State? = nil
 		) {
 			self.links = links
@@ -25,6 +25,8 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case task
 		case addNewConnectionButtonTapped
+		case removeButtonTapped(P2PLink)
+		case editButtonTapped(P2PLink)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -33,30 +35,33 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 		case deleteConnectionResult(TaskResult<P2PLink>)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case connection(id: P2PLinkRow.State.ID, action: P2PLinkRow.Action)
-	}
-
 	// MARK: Destination
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case newConnection(NewConnection.State)
 			case removeConnection(AlertState<Action.RemoveConnection>)
+			case updateName(UpdateP2PLinkName.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case newConnection(NewConnection.Action)
 			case removeConnection(RemoveConnection)
+			case updateName(UpdateP2PLinkName.Action)
 
 			public enum RemoveConnection: Sendable, Hashable {
-				case removeTapped(P2PLinkRow.State.ID)
+				case removeTapped(P2PLink)
 			}
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.newConnection, action: /Action.newConnection) {
+			Scope(state: \.newConnection, action: \.newConnection) {
 				NewConnection()
+			}
+			Scope(state: \.updateName, action: \.updateName) {
+				UpdateP2PLinkName()
 			}
 		}
 	}
@@ -70,9 +75,6 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.forEach(\.links, action: /Action.child .. ChildAction.connection) {
-				P2PLinkRow()
-			}
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
 			}
@@ -91,15 +93,21 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 		case .addNewConnectionButtonTapped:
 			state.destination = .newConnection(.init())
 			return .none
+
+		case let .removeButtonTapped(link):
+			state.destination = .removeConnection(.confirmRemoval(link: link))
+			return .none
+
+		case let .editButtonTapped(link):
+			state.destination = .updateName(.init(link: link))
+			return .none
 		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadLinksResult(.success(linksFromProfile)):
-			state.links = .init(
-				uniqueElements: linksFromProfile.map { P2PLinkRow.State(link: $0) }
-			)
+			state.links = linksFromProfile.elements.asIdentified()
 			return .none
 
 		case let .loadLinksResult(.failure(error)):
@@ -111,27 +119,15 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 			return .none
 
 		case let .saveNewConnectionResult(.success(newConnection)):
-			state.links.updateOrAppend(
-				P2PLinkRow.State(link: newConnection)
-			)
+			state.links.updateOrAppend(newConnection)
 			return .none
 
 		case let .deleteConnectionResult(.success(p2pLink)):
-			state.links.remove(id: p2pLink.publicKey)
+			state.links.remove(p2pLink)
 			return .none
 
 		case let .deleteConnectionResult(.failure(error)):
 			errorQueue.schedule(error)
-			return .none
-		}
-	}
-
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .connection(id, .delegate(.deleteConnection)):
-			state.destination = .removeConnection(.confirmRemoval(id: id))
-			return .none
-		default:
 			return .none
 		}
 	}
@@ -149,9 +145,7 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 				await send(.internal(.saveNewConnectionResult(result)))
 			}
 
-		case let .removeConnection(.removeTapped(id)):
-			guard let p2pLink = state.links.first(where: { $0.id == id })?.link else { return .none }
-
+		case let .removeConnection(.removeTapped(p2pLink)):
 			return .run { send in
 				let result = await TaskResult {
 					try await radixConnectClient.deleteP2PLinkByPassword(p2pLink.connectionPassword)
@@ -160,6 +154,11 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 				await send(.internal(.deleteConnectionResult(result)))
 			}
 
+		case let .updateName(.delegate(.linkNameUpdated(link))):
+			state.links.updateOrAppend(link)
+			state.destination = nil
+			return .none
+
 		default:
 			return .none
 		}
@@ -167,11 +166,11 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 }
 
 extension AlertState<P2PLinksFeature.Destination.Action.RemoveConnection> {
-	static func confirmRemoval(id: P2PLinkRow.State.ID) -> AlertState {
+	static func confirmRemoval(link: P2PLink) -> AlertState {
 		AlertState {
 			TextState(L10n.LinkedConnectors.RemoveConnectionAlert.title)
 		} actions: {
-			ButtonState(role: .destructive, action: .removeTapped(id)) {
+			ButtonState(role: .destructive, action: .removeTapped(link)) {
 				TextState(L10n.LinkedConnectors.RemoveConnectionAlert.removeButtonTitle)
 			}
 			ButtonState(role: .cancel) {

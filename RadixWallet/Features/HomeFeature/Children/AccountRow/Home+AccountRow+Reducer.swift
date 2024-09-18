@@ -13,6 +13,7 @@ extension Home {
 			public var showFiatWorth: Bool = true
 			public var totalFiatWorth: Loadable<FiatWorth>
 			public var securityProblemsConfig: EntitySecurityProblemsView.Config
+			public var accountLockerClaims: [AccountLockerClaimDetails] = []
 
 			public init(
 				account: Account,
@@ -28,6 +29,7 @@ extension Home {
 		public enum ViewAction: Sendable, Equatable {
 			case tapped
 			case securityProblemsTapped
+			case accountLockerClaimTapped(AccountLockerClaimDetails)
 		}
 
 		public enum InternalAction: Sendable, Equatable {
@@ -43,6 +45,7 @@ extension Home {
 		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.userDefaults) var userDefaults
+		@Dependency(\.accountLockersClient) var accountLockersClient
 
 		public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
@@ -50,6 +53,12 @@ extension Home {
 				.send(.delegate(.openDetails))
 			case .securityProblemsTapped:
 				.send(.delegate(.openSecurityCenter))
+			case let .accountLockerClaimTapped(details):
+				.run { _ in
+					try await accountLockersClient.claimContent(details)
+				} catch: { error, _ in
+					loggerGlobal.error("Account locker claim failed, error: \(error)")
+				}
 			}
 		}
 
