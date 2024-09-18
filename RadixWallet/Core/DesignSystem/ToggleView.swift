@@ -1,5 +1,6 @@
-
+// MARK: - ToggleView
 public struct ToggleView: SwiftUI.View {
+	public let context: Context
 	public let icon: ImageAsset?
 	public let title: String
 	public let subtitle: String
@@ -7,12 +8,14 @@ public struct ToggleView: SwiftUI.View {
 	public let isOn: Binding<Bool>
 
 	public init(
+		context: Context = .toggle,
 		icon: ImageAsset? = nil,
 		title: String,
 		subtitle: String,
 		minHeight: CGFloat = .largeButtonHeight,
 		isOn: Binding<Bool>
 	) {
+		self.context = context
 		self.icon = icon
 		self.title = title
 		self.subtitle = subtitle
@@ -30,11 +33,27 @@ public struct ToggleView: SwiftUI.View {
 							.padding(.trailing, .medium3)
 					}
 
-					PlainListRowCore(context: .toggle, title: title, subtitle: subtitle)
-						.padding(.vertical, .small3)
+					PlainListRowCore(context: context.plainListRowContext, title: title, subtitle: subtitle)
 				}
 			}
 		)
 		.frame(maxWidth: .infinity, minHeight: minHeight)
+	}
+}
+
+// MARK: ToggleView.Context
+extension ToggleView {
+	public enum Context {
+		case settings
+		case toggle
+	}
+}
+
+extension ToggleView.Context {
+	var plainListRowContext: PlainListRowCore.ViewState.Context {
+		switch self {
+		case .settings: .settings
+		case .toggle: .toggle
+		}
 	}
 }

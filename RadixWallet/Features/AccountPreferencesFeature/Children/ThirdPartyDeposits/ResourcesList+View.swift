@@ -107,17 +107,20 @@ extension ResourcesList.View {
 
 	private func items(resources: IdentifiedArrayOf<ResourceViewState>) -> some SwiftUI.View {
 		ScrollView {
-			VStack(spacing: .zero) {
+			VStack(spacing: .medium3) {
 				ForEach(resources) { resource in
-					PlainListRow(viewState: .init(
-						rowCoreViewState: resource.rowCoreViewState,
-						accessory: { accesoryView(resource: resource) },
-						icon: { iconView(resource: resource) }
-					))
-					.background(Color.app.white)
-					.withSeparator
+					Card {
+						AssetRow(
+							name: resource.name,
+							address: resource.address.ledgerIdentifiable,
+							type: resource.thumbnailType,
+							url: resource.iconURL,
+							accessory: { accesoryView(resource: resource) }
+						)
+					}
 				}
 			}
+			.padding(.horizontal, .medium3)
 		}
 	}
 
@@ -146,7 +149,7 @@ private extension ResourceViewState {
 
 	var rowCoreViewState: PlainListRowCore.ViewState {
 		.init(
-			title: name ?? "-",
+			title: name,
 			subtitle: address.resourceAddress.formatted()
 		)
 	}
@@ -217,17 +220,17 @@ extension ResourcesListMode {
 	}
 }
 
-extension ResourceViewState.Address {
-	var ledgerIdentifiable: LedgerIdentifiable {
+private extension ResourceViewState.Address {
+	var ledgerIdentifiable: LedgerIdentifiable.Address {
 		switch self {
 		case let .assetException(exception):
-			.address(.resource(exception.address))
+			.resource(exception.address)
 
 		case let .allowedDepositor(.resource(resourceAddress)):
-			.address(.resource(resourceAddress))
+			.resource(resourceAddress)
 
 		case let .allowedDepositor(.nonFungible(nonFungibleGlobalID)):
-			.address(.nonFungibleGlobalID(nonFungibleGlobalID))
+			.nonFungibleGlobalID(nonFungibleGlobalID)
 		}
 	}
 }

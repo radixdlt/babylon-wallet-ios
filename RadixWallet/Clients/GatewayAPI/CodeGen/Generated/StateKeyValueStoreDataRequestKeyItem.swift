@@ -15,6 +15,7 @@ public typealias StateKeyValueStoreDataRequestKeyItem = GatewayAPI.StateKeyValue
 
 extension GatewayAPI {
 
+/** Provide either &#x60;key_hex&#x60; or &#x60;key_json&#x60;. If both are provided, &#x60;key_hex&#x60; is used and &#x60;key_json&#x60; is ignored. */
 public struct StateKeyValueStoreDataRequestKeyItem: Codable, Hashable {
 
     /** Hex-encoded binary blob. */

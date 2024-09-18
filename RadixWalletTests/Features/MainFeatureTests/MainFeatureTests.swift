@@ -34,6 +34,7 @@ final class MainFeatureTests: TestCase {
 				.dependency(\.resetWalletClient, .noop)
 				.dependency(\.securityCenterClient, .noop)
 				.dependency(\.deepLinkHandlerClient, .noop)
+				.dependency(\.accountLockersClient, .noop)
 		}
 
 		XCTAssertFalse(store.state.showIsUsingTestnetBanner)

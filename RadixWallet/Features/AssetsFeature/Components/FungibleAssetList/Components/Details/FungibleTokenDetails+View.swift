@@ -17,6 +17,7 @@ extension FungibleTokenDetails.State {
 				validatorAddress: nil,
 				resourceName: resource.metadata.name,
 				currentSupply: resource.totalSupply.map { $0?.formatted() ?? L10n.AssetDetails.supplyUnkown },
+				divisibility: resource.divisibility,
 				arbitraryDataFields: resource.metadata.arbitraryItems.asDataFields,
 				behaviors: resource.behaviors,
 				tags: {
@@ -60,13 +61,23 @@ extension FungibleTokenDetails {
 				} thumbnailView: {
 					Thumbnail(token: viewStore.thumbnail.wrappedValue ?? .other(nil), size: .veryLarge)
 				} detailsView: {
-					AssetResourceDetailsSection(viewState: viewStore.details)
-						.padding(.bottom, .medium1)
+					VStack(spacing: .medium1) {
+						AssetResourceDetailsSection(viewState: viewStore.details)
+
+						HideResource.View(store: store.hideResource)
+					}
+					.padding(.bottom, .medium1)
 				}
 				.task { @MainActor in
 					await viewStore.send(.task).finish()
 				}
 			}
 		}
+	}
+}
+
+private extension StoreOf<FungibleTokenDetails> {
+	var hideResource: StoreOf<HideResource> {
+		scope(state: \.hideResource, action: \.child.hideResource)
 	}
 }

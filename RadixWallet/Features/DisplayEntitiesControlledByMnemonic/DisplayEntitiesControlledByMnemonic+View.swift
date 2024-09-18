@@ -45,19 +45,19 @@ extension DisplayEntitiesControlledByMnemonic {
 				switch type {
 				case .standard:
 					switch (personas, accounts) {
-					case (0, 0): L10n.SeedPhrases.SeedPhrase.noConnectedAccountsReveal
-					case (0, 1): L10n.SeedPhrases.SeedPhrase.oneConnectedAccountReveal
-					case (0, _): L10n.SeedPhrases.SeedPhrase.multipleConnectedAccountsReveal(accounts)
+					case (0, 0): L10n.SeedPhrases.SeedPhrase.noConnectedAccounts
+					case (0, 1): L10n.SeedPhrases.SeedPhrase.oneConnectedAccount
+					case (0, _): L10n.SeedPhrases.SeedPhrase.multipleConnectedAccounts(accounts)
 					case (_, 1): L10n.DisplayMnemonics.ConnectedAccountsPersonasLabel.one(accounts)
 					case (_, _): L10n.DisplayMnemonics.ConnectedAccountsPersonasLabel.many(accounts)
 					}
 				case .scanning:
 					if accounts == 0 {
-						L10n.SeedPhrases.SeedPhrase.noConnectedAccountsReveal
+						L10n.SeedPhrases.SeedPhrase.noConnectedAccounts
 					} else if accounts == 1 {
-						L10n.SeedPhrases.SeedPhrase.oneConnectedAccountReveal
+						L10n.SeedPhrases.SeedPhrase.oneConnectedAccount
 					} else {
-						L10n.SeedPhrases.SeedPhrase.multipleConnectedAccountsReveal(accounts)
+						L10n.SeedPhrases.SeedPhrase.multipleConnectedAccounts(accounts)
 					}
 				}
 			}

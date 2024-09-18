@@ -110,12 +110,15 @@ extension AssetTransfer.State {
 			return false
 		}
 
-		return accounts.receivingAccounts.allSatisfy {
-			guard $0.recipient != nil else {
+		return accounts.receivingAccounts.allSatisfy { receivingAccount in
+			guard receivingAccount.recipient != nil else {
 				return false
 			}
-			let fungibleAssets = $0.assets.fungibleAssets
-			let nonFungibleAssets = $0.assets.nonFungibleAssets
+			guard receivingAccount.isDepositEnabled else {
+				return false
+			}
+			let fungibleAssets = receivingAccount.assets.fungibleAssets
+			let nonFungibleAssets = receivingAccount.assets.nonFungibleAssets
 
 			if !fungibleAssets.isEmpty {
 				return fungibleAssets.allSatisfy { $0.transferAmount != nil && $0.totalTransferSum <= $0.balance }
@@ -123,6 +126,10 @@ extension AssetTransfer.State {
 
 			return !nonFungibleAssets.isEmpty
 		}
+	}
+
+	var isLoadingDepositStatus: Bool {
+		accounts.receivingAccounts.contains(where: \.isLoadingDepositStatus)
 	}
 }
 

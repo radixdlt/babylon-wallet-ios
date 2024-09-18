@@ -3,16 +3,13 @@ import SwiftUI
 
 // MARK: - AccountDetails
 public struct AccountDetails: Sendable, FeatureReducer {
-	private enum CancellableId: Hashable {
-		case fetchAccountPortfolio
-	}
-
 	public struct State: Sendable, Hashable, AccountWithInfoHolder {
 		public var accountWithInfo: AccountWithInfo
 		var assets: AssetsView.State
 		var securityProblemsConfig: EntitySecurityProblemsView.Config
 		fileprivate var problems: [SecurityProblem] = []
 		var showFiatWorth: Bool
+		var accountLockerClaims: [AccountLockerClaimDetails] = []
 
 		@PresentationState
 		var destination: Destination.State?
@@ -33,13 +30,13 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case task
-		case onDisappear
 		case backButtonTapped
 		case preferencesButtonTapped
 		case transferButtonTapped
 		case historyButtonTapped
 		case showFiatWorthToggled
 		case securityProblemsTapped
+		case accountLockerClaimTapped(AccountLockerClaimDetails)
 	}
 
 	@CasePathable
@@ -54,6 +51,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case accountUpdated(Account)
 		case setSecurityProblems([SecurityProblem])
+		case setAccountLockerClaims([AccountLockerClaimDetails])
 	}
 
 	public struct Destination: DestinationReducer {
@@ -122,6 +120,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	@Dependency(\.dappInteractionClient) var dappInteractionClient
 	@Dependency(\.securityCenterClient) var securityCenterClient
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
+	@Dependency(\.accountLockersClient) var accountLockersClient
 
 	private let accountPortfolioRefreshIntervalInSeconds = 60
 
@@ -149,10 +148,8 @@ public struct AccountDetails: Sendable, FeatureReducer {
 				}
 			}
 			.merge(with: securityProblemsEffect())
-			.merge(with: scheduleFetchAccountPortfolioTimer(state))
-
-		case .onDisappear:
-			return .cancel(id: CancellableId.fetchAccountPortfolio)
+			.merge(with: scheduleFetchAccountPortfolioTimer(state.account.address))
+			.merge(with: accountLockerClaimsEffect(state: state))
 
 		case .backButtonTapped:
 			return .send(.delegate(.dismiss))
@@ -184,6 +181,11 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case .securityProblemsTapped:
 			state.destination = .securityCenter(.init())
 			return .none
+
+		case let .accountLockerClaimTapped(details):
+			return .run { _ in
+				try await accountLockersClient.claimContent(details)
+			}
 		}
 	}
 
@@ -195,6 +197,9 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case let .setSecurityProblems(problems):
 			state.problems = problems
 			state.securityProblemsConfig.update(problems: problems)
+			return .none
+		case let .setAccountLockerClaims(claims):
+			state.accountLockerClaims = claims
 			return .none
 		}
 	}
@@ -290,13 +295,21 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	private func scheduleFetchAccountPortfolioTimer(_ state: State) -> Effect<Action> {
-		.run { [address = state.account.address] _ in
+	private func scheduleFetchAccountPortfolioTimer(_ address: AccountAddress) -> Effect<Action> {
+		.run { _ in
 			for await _ in clock.timer(interval: .seconds(accountPortfolioRefreshIntervalInSeconds)) {
 				guard !Task.isCancelled else { return }
 				_ = try? await accountPortfoliosClient.fetchAccountPortfolio(address, true)
 			}
 		}
-		.cancellable(id: CancellableId.fetchAccountPortfolio, cancelInFlight: true)
+	}
+
+	private func accountLockerClaimsEffect(state: State) -> Effect<Action> {
+		.run { send in
+			for try await claims in await accountLockersClient.accountClaims(state.account.address) {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.setAccountLockerClaims(claims)))
+			}
+		}
 	}
 }

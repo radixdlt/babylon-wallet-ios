@@ -15,43 +15,55 @@ public struct Preferences: Sendable, FeatureReducer {
 		case appeared
 		case depositGuaranteesButtonTapped
 		case hiddenEntitiesButtonTapped
+		case hiddenAssetsButtonTapped
 		case gatewaysButtonTapped
 		case developerModeToogled(Bool)
+		case advancedLockToogled(Bool)
 		case exportLogsButtonTapped
 		case exportLogsDismissed
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case loadedAppPreferences(AppPreferences)
+		case advancedLockToggleResult(authResult: TaskResult<Bool>, isEnabled: Bool)
 	}
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case depositGuarantees(DefaultDepositGuarantees.State)
-			case hiddenEntities(AccountAndPersonaHiding.State)
+			case hiddenEntities(HiddenEntities.State)
+			case hiddenAssets(HiddenAssets.State)
 			case gateways(GatewaySettings.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case depositGuarantees(DefaultDepositGuarantees.Action)
-			case hiddenEntities(AccountAndPersonaHiding.Action)
+			case hiddenEntities(HiddenEntities.Action)
+			case hiddenAssets(HiddenAssets.Action)
 			case gateways(GatewaySettings.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.depositGuarantees, action: /Action.depositGuarantees) {
+			Scope(state: \.depositGuarantees, action: \.depositGuarantees) {
 				DefaultDepositGuarantees()
 			}
-			Scope(state: /State.hiddenEntities, action: /Action.hiddenEntities) {
-				AccountAndPersonaHiding()
+			Scope(state: \.hiddenEntities, action: \.hiddenEntities) {
+				HiddenEntities()
 			}
-			Scope(state: /State.gateways, action: /Action.gateways) {
+			Scope(state: \.hiddenAssets, action: \.hiddenAssets) {
+				HiddenAssets()
+			}
+			Scope(state: \.gateways, action: \.gateways) {
 				GatewaySettings()
 			}
 		}
 	}
 
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
+	@Dependency(\.localAuthenticationClient) var localAuthenticationClient
+	@Dependency(\.errorQueue) var errorQueue
 
 	public init() {}
 
@@ -81,6 +93,10 @@ public struct Preferences: Sendable, FeatureReducer {
 			state.destination = .hiddenEntities(.init())
 			return .none
 
+		case .hiddenAssetsButtonTapped:
+			state.destination = .hiddenAssets(.init())
+			return .none
+
 		case .gatewaysButtonTapped:
 			state.destination = .gateways(.init())
 			return .none
@@ -90,6 +106,16 @@ public struct Preferences: Sendable, FeatureReducer {
 			guard let preferences = state.appPreferences else { return .none }
 			return .run { _ in
 				try await appPreferencesClient.updatePreferences(preferences)
+			} catch: { error, _ in
+				errorQueue.schedule(error)
+			}
+
+		case let .advancedLockToogled(isEnabled):
+			return .run { send in
+				let authResult = await TaskResult<Bool> {
+					try await localAuthenticationClient.authenticateWithBiometrics()
+				}
+				await send(.internal(.advancedLockToggleResult(authResult: authResult, isEnabled: isEnabled)))
 			}
 
 		case .exportLogsButtonTapped:
@@ -107,6 +133,14 @@ public struct Preferences: Sendable, FeatureReducer {
 		case let .loadedAppPreferences(appPreferences):
 			state.appPreferences = appPreferences
 			return .none
+
+		case let .advancedLockToggleResult(.failure(error), _):
+			errorQueue.schedule(error)
+			return .none
+
+		case let .advancedLockToggleResult(.success(success), isEnabled):
+			guard success else { return .none }
+			return updateAdvancedLock(state: &state, isEnabled: isEnabled)
 		}
 	}
 
@@ -122,6 +156,16 @@ public struct Preferences: Sendable, FeatureReducer {
 		guard let preferences = state.appPreferences else { return .none }
 		return .run { _ in
 			try await appPreferencesClient.updatePreferences(preferences)
+		}
+	}
+
+	private func updateAdvancedLock(state: inout State, isEnabled: Bool) -> Effect<Action> {
+		state.appPreferences?.security.isAdvancedLockEnabled = isEnabled
+		guard let preferences = state.appPreferences else { return .none }
+		return .run { _ in
+			try await appPreferencesClient.updatePreferences(preferences)
+		} catch: { error, _ in
+			errorQueue.schedule(error)
 		}
 	}
 }

@@ -16,6 +16,7 @@ extension NonFungibleTokenDetails.State {
 				validatorAddress: nil,
 				resourceName: resourceDetails.metadata.name,
 				currentSupply: resourceDetails.totalSupply.map { $0?.formatted() },
+				divisibility: nil,
 				arbitraryDataFields: resourceDetails.metadata.arbitraryItems.asDataFields,
 				behaviors: resourceDetails.behaviors,
 				tags: ownedResource.map { .success($0.metadata.tags) } ?? resourceDetails.metadata.tags
@@ -118,6 +119,11 @@ extension NonFungibleTokenDetails {
 							}
 
 							AssetResourceDetailsSection(viewState: viewStore.resourceDetails)
+
+							IfLetStore(store.scope(state: \.hideResource, action: \.child.hideResource)) { store in
+								HideResource.View(store: store)
+									.padding(.vertical, .medium1)
+							}
 						}
 						.padding(.vertical, .medium1)
 						.background(.app.gray5, ignoresSafeAreaEdges: .bottom)

@@ -47,7 +47,7 @@ extension TransactionReviewAccounts {
 
 extension TransactionReviewAccount.State {
 	var viewState: TransactionReviewAccount.ViewState {
-		.init(account: account, transfers: transfers.elements, showApprovedMark: account.isApproved)
+		.init(account: account, transfers: transfers.elements, showApprovedMark: account.isApproved, isDeposit: isDeposit)
 	}
 }
 
@@ -57,6 +57,7 @@ extension TransactionReviewAccount {
 		let account: TransactionReview.ReviewAccount
 		let transfers: [TransactionReview.Transfer] // FIXME: GK use viewstate?
 		let showApprovedMark: Bool
+		let isDeposit: Bool
 	}
 
 	@MainActor
@@ -74,7 +75,7 @@ extension TransactionReviewAccount {
 
 					VStack(spacing: .zero) {
 						ForEach(viewStore.transfers) { transfer in
-							TransactionReviewResourceView(transfer: transfer.value) { token in
+							TransactionReviewResourceView(transfer: transfer.value, isDeposit: viewStore.isDeposit) { token in
 								viewStore.send(.transferTapped(transfer.value, token))
 							}
 
@@ -94,12 +95,13 @@ extension TransactionReviewAccount {
 // MARK: - TransactionReviewResourceView
 struct TransactionReviewResourceView: View {
 	let transfer: ResourceBalance // FIXME: GK use viewstate
+	let isDeposit: Bool
 	let onTap: (OnLedgerEntity.NonFungibleToken?) -> Void
 
 	var body: some View {
 		switch transfer.details {
 		case .fungible, .nonFungible, .liquidStakeUnit, .poolUnit:
-			ResourceBalanceButton(transfer.viewState, appearance: .transactionReview) {
+			ResourceBalanceButton(transfer.viewState, appearance: .transactionReview, warning: warning) {
 				onTap(nil)
 			}
 		case let .stakeClaimNFT(details):
@@ -107,6 +109,13 @@ struct TransactionReviewResourceView: View {
 				onTap(stakeClaim.token)
 			}
 		}
+	}
+
+	private var warning: String? {
+		guard let isHidden = transfer.isHidden, isHidden else {
+			return nil
+		}
+		return isDeposit ? L10n.TransactionReview.HiddenAsset.deposit : L10n.TransactionReview.HiddenAsset.withdraw
 	}
 }
 

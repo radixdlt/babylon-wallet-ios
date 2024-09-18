@@ -10,7 +10,8 @@ extension AccountDetails.State {
 			isLedgerAccount: account.isLedgerControlled,
 			totalFiatWorth: showFiatWorth ? assets.totalFiatWorth : nil,
 			account: account,
-			securityProblemsConfig: securityProblemsConfig
+			securityProblemsConfig: securityProblemsConfig,
+			accountLockerClaims: accountLockerClaims
 		)
 	}
 }
@@ -25,6 +26,7 @@ extension AccountDetails {
 		let totalFiatWorth: Loadable<FiatWorth>?
 		let account: Account
 		let securityProblemsConfig: EntitySecurityProblemsView.Config
+		let accountLockerClaims: [AccountLockerClaimDetails]
 	}
 
 	@MainActor
@@ -44,11 +46,9 @@ extension AccountDetails {
 				.ignoresSafeArea(edges: .bottom)
 				.background(viewStore.appearanceID.gradient)
 				.navigationBarBackButtonHidden()
+				.navigationBarTitleDisplayMode(.inline)
 				.task {
 					await viewStore.send(.task).finish()
-				}
-				.onDisappear {
-					viewStore.send(.onDisappear)
 				}
 				.toolbar {
 					ToolbarItem(placement: .principal) {
@@ -100,8 +100,18 @@ extension AccountDetails {
 				}
 				.padding(.horizontal, .small3)
 
-				EntitySecurityProblemsView(config: viewStore.securityProblemsConfig) {
-					viewStore.send(.securityProblemsTapped)
+				VStack(spacing: .small2) {
+					EntitySecurityProblemsView(config: viewStore.securityProblemsConfig) {
+						viewStore.send(.securityProblemsTapped)
+					}
+
+					ForEachStatic(viewStore.accountLockerClaims) { details in
+						Button {
+							viewStore.send(.accountLockerClaimTapped(details))
+						} label: {
+							AccountBannerView(kind: .lockerClaim(dappName: details.dappName))
+						}
+					}
 				}
 			}
 			.padding(.bottom, .medium1)

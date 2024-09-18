@@ -19,11 +19,11 @@ extension OverlayWindowClient: DependencyKey {
 				return Item.alert(.init(
 					title: { TextState(L10n.Common.errorAlertTitle) },
 					actions: {
-						let buttons: [ButtonState<OverlayWindowClient.Item.AlertAction>] = [
-							.init(role: .cancel, action: .dismissed, label: { TextState(L10n.Common.cancel) }),
-							.init(action: .emailSupport(additionalInfo: error.localizedDescription), label: { TextState(L10n.Error.emailSupportButtonTitle) }),
-						]
-						return buttons
+						ButtonState(role: .cancel, action: .dismissed) {
+							TextState(L10n.Common.cancel)
+						}
+						ButtonState(action: .emailSupport(additionalInfo: error.localizedDescription)) { TextState(L10n.Error.emailSupportButtonTitle)
+						}
 					},
 					message: { TextState(message) }
 				))
@@ -50,6 +50,7 @@ extension OverlayWindowClient: DependencyKey {
 			},
 			scheduleAlertAndIgnoreAction: scheduleAlertAndIgnoreAction,
 			scheduleHUD: { items.send(.hud($0)) },
+			scheduleSheet: { items.send(.sheet($0)) },
 			scheduleFullScreen: { fullScreen in
 				items.send(.fullScreen(fullScreen))
 				return await fullScreenActions.first { $0.id == fullScreen.id }?.action ?? .dismiss
@@ -60,6 +61,12 @@ extension OverlayWindowClient: DependencyKey {
 			isUserInteractionEnabled: { isUserInteractionEnabled.eraseToAnyAsyncSequence() }
 		)
 	}()
+}
+
+extension OverlayWindowClient {
+	public func showInfoLink(_ state: InfoLinkSheet.State) {
+		scheduleSheet(.infoLink(state))
+	}
 }
 
 extension OverlayWindowClient.Item.HUD {

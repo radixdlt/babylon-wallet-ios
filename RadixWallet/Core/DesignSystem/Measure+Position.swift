@@ -1,11 +1,15 @@
 import Foundation
 
 extension View {
-	public func measurePosition(_ id: AnyHashable, coordSpace: String) -> some View {
+	public func measurePosition(_ id: AnyHashable?, coordSpace: String) -> some View {
 		background {
-			GeometryReader { proxy in
+			if let id {
+				GeometryReader { proxy in
+					Color.clear
+						.preference(key: PositionsPreferenceKey.self, value: [id: proxy.frame(in: .named(coordSpace))])
+				}
+			} else {
 				Color.clear
-					.preference(key: PositionsPreferenceKey.self, value: [id: proxy.frame(in: .named(coordSpace))])
 			}
 		}
 	}

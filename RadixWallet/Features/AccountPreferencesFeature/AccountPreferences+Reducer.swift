@@ -57,7 +57,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			case updateAccountLabel(UpdateAccountLabel.Action)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.Action)
 			case devPreferences(DevAccountPreferences.Action)
-			case hideAccount(HideAccountAction)
+			case hideAccount(ConfirmationAction)
 		}
 
 		public var body: some ReducerOf<Self> {
@@ -174,7 +174,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 	private func hideAccountEffect(state: State) -> Effect<Action> {
 		.run { [account = state.account] send in
-			try await entitiesVisibilityClient.hide(account: account)
+			try await entitiesVisibilityClient.hideAccount(account.id)
 			overlayWindowClient.scheduleHUD(.accountHidden)
 			await send(.delegate(.accountHidden))
 		} catch: { error, _ in

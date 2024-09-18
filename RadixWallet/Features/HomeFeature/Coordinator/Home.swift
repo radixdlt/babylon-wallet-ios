@@ -14,6 +14,7 @@ public struct Home: Sendable, FeatureReducer {
 
 		public var accountRows: IdentifiedArrayOf<Home.AccountRow.State> = []
 		fileprivate var problems: [SecurityProblem] = []
+		fileprivate var claims: ClaimsPerAccount = [:]
 
 		public var showFiatWorth: Bool = true
 
@@ -64,6 +65,7 @@ public struct Home: Sendable, FeatureReducer {
 		case accountsFiatWorthLoaded([AccountAddress: Loadable<FiatWorth>])
 		case showLinkConnectorIfNeeded
 		case setSecurityProblems([SecurityProblem])
+		case setAccountLockerClaims(ClaimsPerAccount)
 	}
 
 	@CasePathable
@@ -135,6 +137,7 @@ public struct Home: Sendable, FeatureReducer {
 	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.securityCenterClient) var securityCenterClient
 	@Dependency(\.continuousClock) var clock
+	@Dependency(\.accountLockersClient) var accountLockersClient
 
 	private let accountPortfoliosRefreshIntervalInSeconds = 300 // 5 minutes
 
@@ -186,6 +189,7 @@ public struct Home: Sendable, FeatureReducer {
 			.merge(with: loadAccountResources())
 			.merge(with: loadFiatValues())
 			.merge(with: securityProblemsEffect())
+			.merge(with: accountLockerClaimsEffect())
 			.merge(with: delayedMediumEffect(for: .internal(.showLinkConnectorIfNeeded)))
 			.merge(with: scheduleFetchAccountPortfoliosTimer(state))
 
@@ -201,6 +205,7 @@ public struct Home: Sendable, FeatureReducer {
 			return .none
 
 		case .pullToRefreshStarted:
+			accountLockersClient.forceRefresh()
 			return fetchAccountPortfolios(state)
 
 		case .settingsButtonTapped:
@@ -220,7 +225,13 @@ public struct Home: Sendable, FeatureReducer {
 				return .none
 			}
 
-			state.accountRows = accounts.map { Home.AccountRow.State(account: $0, problems: state.problems) }.asIdentified()
+			state.accountRows = accounts
+				.map { account in
+					// Create new Home.AccountRow.State only if it wasn't present before. Otherwise, we keep the old row
+					// which probably has already loaded its resources & fiat worth.
+					state.accountRows.first(where: { $0.id == account.address }) ?? .init(account: account, problems: state.problems)
+				}
+				.asIdentified()
 
 			return .run { [addresses = state.accountAddresses] _ in
 				_ = try await accountPortfoliosClient.fetchAccountPortfolios(addresses, false)
@@ -286,6 +297,13 @@ public struct Home: Sendable, FeatureReducer {
 			state.problems = problems
 			state.accountRows.mutateAll { row in
 				row.securityProblemsConfig.update(problems: problems)
+			}
+			return .none
+
+		case let .setAccountLockerClaims(claims):
+			state.claims = claims
+			state.accountRows.mutateAll { row in
+				row.accountLockerClaims = claims[row.id] ?? []
 			}
 			return .none
 		}
@@ -445,6 +463,15 @@ public struct Home: Sendable, FeatureReducer {
 			}
 		}
 		.cancellable(id: CancellableId.fetchAccountPortfolios, cancelInFlight: true)
+	}
+
+	private func accountLockerClaimsEffect() -> Effect<Action> {
+		.run { send in
+			for try await claims in await accountLockersClient.claims() {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.setAccountLockerClaims(claims)))
+			}
+		}
 	}
 }
 

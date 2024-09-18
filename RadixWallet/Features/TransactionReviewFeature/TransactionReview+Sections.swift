@@ -75,9 +75,17 @@ extension TransactionReview {
 				networkID: networkID
 			)
 
-			let dAppAddresses = summary.encounteredComponentAddresses.filter(\.isGlobal)
+			let dappAddresses = summary.encounteredAddresses.compactMap {
+				switch $0 {
+				case let .component(componentAddress):
+					componentAddress.isGlobal ? componentAddress.asGeneral : nil
+				case let .locker(lockerAddress):
+					lockerAddress.asGeneral
+				}
+			}
+
 			let dAppsUsed: TransactionReviewDappsUsed.State? = try await extractDapps(
-				componentAddresses: dAppAddresses,
+				addresses: dappAddresses,
 				unknownTitle: L10n.TransactionReview.unknownComponents
 			)
 
@@ -312,10 +320,10 @@ extension TransactionReview {
 	}
 
 	private func extractDapps(
-		componentAddresses: [ComponentAddress],
+		addresses: [Address],
 		unknownTitle: (Int) -> String
 	) async throws -> TransactionReviewDapps<ComponentAddress>.State? {
-		let dApps = await extractDappEntities(componentAddresses.map(\.asGeneral))
+		let dApps = await extractDappEntities(addresses)
 		return try await extractDapps(dApps, unknownTitle: unknownTitle)
 	}
 
@@ -418,7 +426,7 @@ extension TransactionReview {
 		guard !withdrawals.isEmpty else { return nil }
 
 		let withdrawalAccounts = withdrawals.map {
-			TransactionReviewAccount.State(account: $0.key, transfers: $0.value)
+			TransactionReviewAccount.State(account: $0.key, transfers: $0.value, isDeposit: false)
 		}
 		.asIdentified()
 
@@ -463,7 +471,7 @@ extension TransactionReview {
 
 		let depositAccounts = deposits
 			.filter { !$0.value.isEmpty }
-			.map { TransactionReviewAccount.State(account: $0.key, transfers: $0.value) }
+			.map { TransactionReviewAccount.State(account: $0.key, transfers: $0.value, isDeposit: true) }
 			.asIdentified()
 
 		guard !depositAccounts.isEmpty else { return nil }
@@ -645,7 +653,7 @@ extension TransactionReview {
 					guarantee: nil
 				)
 
-				return [.init(resource: resource, details: .fungible(details))]
+				return [.init(resource: resource, details: .fungible(details), isHidden: false)]
 			}
 
 		case let .nonFungible(_, indicator):

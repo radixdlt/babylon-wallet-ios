@@ -60,7 +60,7 @@ extension NonFungibleAssetList.Row.View {
 							.textStyle(.secondaryHeader)
 					}
 
-					Text("\(viewStore.resource.nonFungibleIdsCount)")
+					Text(L10n.Account.Nfts.itemsCount(viewStore.resource.nonFungibleIdsCount))
 						.font(.app.body2HighImportance)
 						.foregroundColor(.app.gray2)
 				}

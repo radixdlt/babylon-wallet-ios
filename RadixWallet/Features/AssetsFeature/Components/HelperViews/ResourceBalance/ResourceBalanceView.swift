@@ -203,7 +203,7 @@ extension ResourceBalanceView {
 		public var body: some View {
 			FungibleView(
 				thumbnail: viewState.icon,
-				caption1: viewState.title,
+				caption1: viewState.title ?? "-",
 				caption2: nil,
 				fallback: fallback,
 				amount: viewState.amount,
