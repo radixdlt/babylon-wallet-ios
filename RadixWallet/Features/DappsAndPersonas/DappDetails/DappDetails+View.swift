@@ -126,7 +126,7 @@ private extension DappDetails.State {
 		.init(
 			title: authorizedDapp?.displayName?.rawValue ?? metadata?.name ?? L10n.DAppRequest.Metadata.unknownName,
 			description: metadata?.description,
-			domain: metadata?.claimedWebsites?.first,
+			domain: mainWebsite,
 			thumbnail: metadata?.iconURL,
 			address: dAppDefinitionAddress,
 			associatedDapps: associatedDapps,
