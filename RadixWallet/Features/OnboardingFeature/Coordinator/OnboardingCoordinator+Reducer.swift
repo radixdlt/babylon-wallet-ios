@@ -81,7 +81,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 		switch childAction {
 		case .startup(.delegate(.setupNewUser)):
 			return .run { send in
-				try await onboardingClient.createNewWallet()
+				try await onboardingClient.createNewProfile()
 				await send(.internal(.newProfileCreated))
 			} catch: { error, _ in
 				errorQueue.schedule(error)

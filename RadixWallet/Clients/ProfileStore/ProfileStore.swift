@@ -61,6 +61,16 @@ extension ProfileStore {
 	}
 }
 
+extension ProfileStore {
+	public func isThisDevice(deviceID: DeviceID) async -> Bool {
+		guard let hostId = try? await SargonOS.shared.resolveHostId().id else {
+			return false
+		}
+
+		return hostId == deviceID
+	}
+}
+
 // MARK: Public
 extension ProfileStore {
 	/// Mutates the in-memory copy of the Profile usung `transform`, and saves a
@@ -84,16 +94,6 @@ extension ProfileStore {
 			try await update(&network)
 			try profile.updateOnNetwork(network)
 		}
-	}
-}
-
-extension ProfileStore {
-	public func isThisDevice(deviceID: DeviceID) async -> Bool {
-		guard let hostId = try? await SargonOS.shared.resolveHostId().id else {
-			return false
-		}
-
-		return hostId == deviceID
 	}
 }
 

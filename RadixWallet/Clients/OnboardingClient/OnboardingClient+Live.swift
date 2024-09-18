@@ -9,7 +9,7 @@ extension OnboardingClient: DependencyKey {
 			loadProfileState: {
 				await profileStore.profileState()
 			},
-			createNewWallet: {
+			createNewProfile: {
 				try await profileStore.createNewWallet()
 			},
 			finishOnboardingWithRecoveredAccountAndBDFS: {
