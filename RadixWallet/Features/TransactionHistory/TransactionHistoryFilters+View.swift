@@ -52,8 +52,6 @@ extension TransactionHistoryFilters {
 								SubSection(filters: viewStore.transactionTypes, store: store)
 							}
 
-							Divider()
-
 							Spacer(minLength: 0)
 						}
 						.padding(.horizontal, .medium1)
