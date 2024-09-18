@@ -65,7 +65,7 @@ extension SelectBackup.View {
 				.multilineTextAlignment(.center)
 				.padding(.horizontal, .small2)
 
-				Text(L10n.IOSRecoverProfileBackup.Choose.title)
+				Text(L10n.RecoverProfileBackup.Choose.ios)
 					.textStyle(.body1Header)
 
 				switch viewStore.status {
@@ -73,16 +73,12 @@ extension SelectBackup.View {
 					ProgressView()
 				case .loaded:
 					backupsList(with: viewStore)
-				case let .failed(reason):
-					let text = switch reason {
-					case .accountTemporarilyUnavailable, .notAuthenticated:
-						L10n.IOSRecoverProfileBackup.notLoggedInToICloud
-					case .networkUnavailable:
-						L10n.IOSRecoverProfileBackup.networkUnavailable
-					case .other:
-						L10n.IOSRecoverProfileBackup.couldNotLoadBackups
-					}
-					NoContentView(text)
+				case .failed(.accountTemporarilyUnavailable), .failed(.notAuthenticated):
+					failureBox(message: L10n.RecoverProfileBackup.NotLoggedIn.ios)
+				case .failed(.networkUnavailable):
+					failureBox(message: L10n.RecoverProfileBackup.NotLoggedIn.ios)
+				case .failed(.other):
+					failureBox(message: L10n.RecoverProfileBackup.couldNotLoadBackups)
 				}
 
 				Button(L10n.RecoverProfileBackup.ImportFileButton.title) {
@@ -104,8 +100,20 @@ extension SelectBackup.View {
 				.padding(.horizontal, .medium1)
 			}
 			.padding(.horizontal, .medium1)
+			.padding(.bottom, .medium1)
 			.foregroundColor(.app.gray1)
 		}
+	}
+
+	private func failureBox(message: String) -> some View {
+		Text(message)
+			.textStyle(.body1Regular)
+			.foregroundStyle(.app.gray2)
+			.padding(.vertical, .large1)
+			.padding(.horizontal, .large2)
+			.frame(maxWidth: .infinity)
+			.background(.app.gray5)
+			.roundedCorners(radius: .small1)
 	}
 
 	@MainActor
@@ -119,7 +127,7 @@ extension SelectBackup.View {
 					cloudBackupDataCard(item, viewStore: viewStore)
 				}
 			} else {
-				NoContentView(L10n.IOSRecoverProfileBackup.noBackupsAvailable)
+				failureBox(message: L10n.RecoverProfileBackup.NoBackupsAvailable.ios)
 			}
 		}
 	}
@@ -131,7 +139,7 @@ extension SelectBackup.View {
 	) -> some View {
 		let header = item.value
 		let isVersionCompatible = header.isVersionCompatible()
-		let lastDevice = header.lastUsedOnDevice.id == viewStore.thisDeviceID ? L10n.IOSProfileBackup.thisDevice : header.lastUsedOnDevice.description
+		let lastDevice = header.lastUsedOnDevice.id == viewStore.thisDeviceID ? L10n.RecoverProfileBackup.thisDevice : header.lastUsedOnDevice.description
 
 		let values: [String] = [
 			L10n.RecoverProfileBackup.backupFrom(lastDevice),
