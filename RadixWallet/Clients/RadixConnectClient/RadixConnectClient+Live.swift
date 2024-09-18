@@ -15,23 +15,23 @@ extension RadixConnectClient {
 		let radixConnectMobile = RadixConnectMobile()
 		let localNetworkAuthorization = LocalNetworkAuthorization()
 
-//		Task {
-//			for try await accounts in await accountsClient.accountsOnCurrentNetwork() {
-//				guard !Task.isCancelled else { return }
-//				try? await sendAccountListMessage(accounts: accounts)
-//			}
-//		}
-//
-//		Task {
-//			let connectedClients = await rtcClients.connectClients()
-//				.filter { updates in
-//					!updates.flatMap(\.idsOfConnectedPeerConnections).isEmpty
-//				}
-//			for try await updates in connectedClients {
-//				guard !Task.isCancelled else { return }
-//				sendAccountListMessageAfterConnect()
-//			}
-//		}
+		Task {
+			for try await accounts in await accountsClient.accountsOnCurrentNetwork() {
+				guard !Task.isCancelled else { return }
+				try? await sendAccountListMessage(accounts: accounts)
+			}
+		}
+
+		Task {
+			let connectedClients = await rtcClients.connectClients()
+				.filter { updates in
+					!updates.flatMap(\.idsOfConnectedPeerConnections).isEmpty
+				}
+			for try await updates in connectedClients {
+				guard !Task.isCancelled else { return }
+				sendAccountListMessageAfterConnect()
+			}
+		}
 
 		@Sendable
 		func sendAccountListMessageAfterConnect() {

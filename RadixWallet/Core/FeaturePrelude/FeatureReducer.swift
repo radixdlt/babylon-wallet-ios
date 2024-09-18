@@ -108,7 +108,7 @@ public typealias ViewStoreOf<Feature: FeatureReducer> = ViewStore<Feature.ViewSt
 
 public typealias StackActionOf<R: Reducer> = StackAction<R.State, R.Action>
 
-// MARK: - FeatureAction + Equatable
+// MARK: - FeatureAction + Sendable, Equatable
 extension FeatureAction: Sendable, Equatable {}
 
 // MARK: - FeatureAction + Hashable

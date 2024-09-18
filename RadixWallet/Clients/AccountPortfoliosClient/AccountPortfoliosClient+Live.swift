@@ -10,20 +10,20 @@ extension AccountPortfoliosClient: DependencyKey {
 		@Dependency(\.gatewaysClient) var gatewaysClient
 
 		/// Update currency amount visibility based on the profile state
-//		Task {
-//			for try await isCurrencyAmountVisible in await appPreferencesClient.appPreferenceUpdates().map(\.display.isCurrencyAmountVisible) {
-//				guard !Task.isCancelled else { return }
-//				await state.setIsCurrencyAmountVisble(isCurrencyAmountVisible)
-//			}
-//		}
-//
-//		/// Update used currency based on the profile state
-//		Task {
-//			for try await fiatCurrency in await appPreferencesClient.appPreferenceUpdates().map(\.display.fiatCurrencyPriceTarget) {
-//				guard !Task.isCancelled else { return }
-//				await state.setSelectedCurrency(fiatCurrency)
-//			}
-//		}
+		Task {
+			for try await isCurrencyAmountVisible in await appPreferencesClient.appPreferenceUpdates().map(\.display.isCurrencyAmountVisible) {
+				guard !Task.isCancelled else { return }
+				state.setIsCurrencyAmountVisble(isCurrencyAmountVisible)
+			}
+		}
+
+		/// Update used currency based on the profile state
+		Task {
+			for try await fiatCurrency in await appPreferencesClient.appPreferenceUpdates().map(\.display.fiatCurrencyPriceTarget) {
+				guard !Task.isCancelled else { return }
+				state.setSelectedCurrency(fiatCurrency)
+			}
+		}
 
 		/// Fetches the pool and stake units details for a given account; Will update the portfolio accordingly
 		@Sendable
@@ -31,17 +31,17 @@ extension AccountPortfoliosClient: DependencyKey {
 			async let poolDetailsFetch = Task {
 				do {
 					let poolUnitDetails = try await onLedgerEntitiesClient.getOwnedPoolUnitsDetails(account, cachingStrategy: cachingStrategy)
-					await state.set(poolDetails: .success(poolUnitDetails), forAccount: account.address)
+					state.set(poolDetails: .success(poolUnitDetails), forAccount: account.address)
 				} catch {
-					await state.set(poolDetails: .failure(error), forAccount: account.address)
+					state.set(poolDetails: .failure(error), forAccount: account.address)
 				}
 			}.result
 			async let stakeUnitDetails = Task {
 				do {
 					let stakeUnitDetails = try await onLedgerEntitiesClient.getOwnedStakesDetails(account: account, cachingStrategy: cachingStrategy)
-					await state.set(stakeUnitDetails: .success(stakeUnitDetails.asIdentified()), forAccount: account.address)
+					state.set(stakeUnitDetails: .success(stakeUnitDetails.asIdentified()), forAccount: account.address)
 				} catch {
-					await state.set(stakeUnitDetails: .failure(error), forAccount: account.address)
+					state.set(stakeUnitDetails: .failure(error), forAccount: account.address)
 				}
 			}.result
 
@@ -61,7 +61,7 @@ extension AccountPortfoliosClient: DependencyKey {
 					)
 				}
 
-				await state.setTokenPrices(prices)
+				state.setTokenPrices(prices)
 			}
 		}
 
@@ -71,7 +71,7 @@ extension AccountPortfoliosClient: DependencyKey {
 			_ forceRefresh: Bool
 		) async throws -> [AccountPortfolio] {
 			let gateway = await gatewaysClient.getCurrentGateway()
-			await state.setRadixGateway(gateway)
+			state.setRadixGateway(gateway)
 			if forceRefresh {
 				for accountAddress in accountAddresses {
 					cacheClient.removeFolder(.init(address: accountAddress))
@@ -81,13 +81,13 @@ extension AccountPortfoliosClient: DependencyKey {
 			/// Explicetely load and set the currency target and visibility to make sure
 			/// it is available for usage before resources are loaded
 			let preferences = await appPreferencesClient.getPreferences().display
-			await state.setSelectedCurrency(preferences.fiatCurrencyPriceTarget)
-			await state.setIsCurrencyAmountVisble(preferences.isCurrencyAmountVisible)
+			state.setSelectedCurrency(preferences.fiatCurrencyPriceTarget)
+			state.setIsCurrencyAmountVisble(preferences.isCurrencyAmountVisible)
 
 			let accounts = try await onLedgerEntitiesClient.getAccounts(accountAddresses)
 
 			let portfolios = accounts.map { AccountPortfolio(account: $0) }
-			await state.handlePortfoliosUpdate(portfolios)
+			state.handlePortfoliosUpdate(portfolios)
 
 			/// Put together all resources from already fetched and new accounts
 			let currentAccounts = state.portfoliosSubject.value.wrappedValue.map { $0.values.map(\.account) } ?? []
@@ -142,14 +142,14 @@ extension AccountPortfoliosClient: DependencyKey {
 			let account = try await onLedgerEntitiesClient.getAccount(accountAddress)
 			let portfolio = AccountPortfolio(account: account)
 
-			if case let .success(tokenPrices) = await state.tokenPrices {
+			if case let .success(tokenPrices) = state.tokenPrices {
 				await applyTokenPrices(
 					tokenPrices.keys + account.resourcesWithPrices,
 					forceRefresh: forceRefresh
 				)
 			}
 
-			await state.handlePortfolioUpdate(portfolio)
+			state.handlePortfolioUpdate(portfolio)
 			await fetchPoolAndStakeUnitsDetails(account.nonEmptyVaults, cachingStrategy: forceRefresh ? .forceUpdate : .useCache)
 
 			return portfolio
@@ -172,7 +172,7 @@ extension AccountPortfoliosClient: DependencyKey {
 					.eraseToAnyAsyncSequence()
 			},
 			portfolioForAccount: { address in
-				await state.portfolioForAccount(address)
+				state.portfolioForAccount(address)
 			},
 			portfolios: { state.portfoliosSubject.value.wrappedValue.map { Array($0.values) } ?? [] }
 		)
