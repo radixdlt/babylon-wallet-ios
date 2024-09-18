@@ -17,12 +17,11 @@ extension TransactionHistoryFilters {
 			NavigationStack {
 				ScrollView {
 					WithViewStore(store, observe: \.filters, send: { .view($0) }) { viewStore in
-						VStack(spacing: .medium3) {
-							HStack(spacing: .small2) {
+						VStack(spacing: .medium1) {
+							FlowLayout(spacing: .small2) {
 								FiltersView(filters: viewStore.transferTypes, store: store)
-
-								Spacer(minLength: 0)
 							}
+							.padding(.bottom, .small3)
 
 							Divider()
 
@@ -102,7 +101,7 @@ extension TransactionHistoryFilters {
 			}
 
 			var body: some SwiftUI.View {
-				VStack(spacing: 0) {
+				VStack(spacing: .medium3) {
 					Button {
 						withAnimation(.default) {
 							expanded.toggle()
@@ -112,7 +111,6 @@ extension TransactionHistoryFilters {
 							Text(name)
 								.textStyle(.body1Header)
 								.foregroundStyle(.app.gray1)
-								.padding(.vertical, .small2)
 
 							Spacer()
 
@@ -123,7 +121,6 @@ extension TransactionHistoryFilters {
 
 					if expanded {
 						content
-							.padding(.top, .medium3)
 					}
 				}
 				.clipped()
