@@ -3,7 +3,6 @@
 @_exported import AsyncExtensions
 @_exported import BigInt
 @_exported import BitCollections
-@_exported import Builders
 @_exported import CasePaths
 @_exported import CollectionConcurrencyKit
 @_exported import Collections

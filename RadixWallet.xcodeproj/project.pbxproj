@@ -705,7 +705,6 @@
 		48FFFAFB2ADC241A00B2B213 /* HashTreeCollections in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAFA2ADC241A00B2B213 /* HashTreeCollections */; };
 		48FFFAFD2ADC241A00B2B213 /* HeapModule in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAFC2ADC241A00B2B213 /* HeapModule */; };
 		48FFFB002ADC25A200B2B213 /* BigInt in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAFF2ADC25A200B2B213 /* BigInt */; };
-		48FFFB032ADC6F8100B2B213 /* Builders in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB022ADC6F8100B2B213 /* Builders */; };
 		48FFFB062ADC6FD300B2B213 /* SwiftUINavigation in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB052ADC6FD300B2B213 /* SwiftUINavigation */; };
 		48FFFB082ADC6FD300B2B213 /* SwiftUINavigationCore in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB072ADC6FD300B2B213 /* SwiftUINavigationCore */; };
 		48FFFB0A2ADC721800B2B213 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB092ADC721800B2B213 /* Atomics */; };
@@ -738,9 +737,9 @@
 		5B526AEC2C89C3C200AF8B72 /* ResourcesVisibilityClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B526AE82C89C3C200AF8B72 /* ResourcesVisibilityClient+Interface.swift */; };
 		5B526AED2C89C3C200AF8B72 /* ResourcesVisibilityClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B526AE92C89C3C200AF8B72 /* ResourcesVisibilityClient+Live.swift */; };
 		5B526AEE2C89C3C200AF8B72 /* ResourcesVisibilityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B526AEA2C89C3C200AF8B72 /* ResourcesVisibilityClient+Test.swift */; };
+		5B634A942C91D2A0004B2FBC /* ScreenshotPreventing in Frameworks */ = {isa = PBXBuildFile; productRef = 5B634A932C91D2A0004B2FBC /* ScreenshotPreventing */; };
 		5B634AAE2C92F6EC004B2FBC /* UpdateP2PLinkName+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B634AAD2C92F6EC004B2FBC /* UpdateP2PLinkName+Reducer.swift */; };
 		5B634AB02C92F6FA004B2FBC /* UpdateP2PLinkName+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B634AAF2C92F6FA004B2FBC /* UpdateP2PLinkName+View.swift */; };
-		5B634A942C91D2A0004B2FBC /* ScreenshotPreventing in Frameworks */ = {isa = PBXBuildFile; productRef = 5B634A932C91D2A0004B2FBC /* ScreenshotPreventing */; };
 		5B6499B72BCFD0E8000F2176 /* SecurityFactors+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B52BCFD0E8000F2176 /* SecurityFactors+View.swift */; };
 		5B6499B82BCFD0E8000F2176 /* SecurityFactors+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B62BCFD0E8000F2176 /* SecurityFactors+Reducer.swift */; };
 		5B6499BA2BCFDB1E000F2176 /* ShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B92BCFDB1E000F2176 /* ShareView.swift */; };
@@ -2501,7 +2500,6 @@
 				48FFFAC52ADC211700B2B213 /* JSONTesting in Frameworks */,
 				48FFFB062ADC6FD300B2B213 /* SwiftUINavigation in Frameworks */,
 				5B1C4FD52BBB0B0C00B9436F /* AppsFlyerLib-Strict in Frameworks */,
-				48FFFB032ADC6F8100B2B213 /* Builders in Frameworks */,
 				48FFFAB72ADC207B00B2B213 /* NavigationTransitions in Frameworks */,
 				5B634A942C91D2A0004B2FBC /* ScreenshotPreventing in Frameworks */,
 				48FFFA992ADC1EEC00B2B213 /* AsyncExtensions in Frameworks */,
@@ -6856,7 +6854,6 @@
 				48FFFAFA2ADC241A00B2B213 /* HashTreeCollections */,
 				48FFFAFC2ADC241A00B2B213 /* HeapModule */,
 				48FFFAFF2ADC25A200B2B213 /* BigInt */,
-				48FFFB022ADC6F8100B2B213 /* Builders */,
 				48FFFB052ADC6FD300B2B213 /* SwiftUINavigation */,
 				48FFFB072ADC6FD300B2B213 /* SwiftUINavigationCore */,
 				48FFFB092ADC721800B2B213 /* Atomics */,
@@ -6932,7 +6929,6 @@
 				48FFFAEE2ADC229900B2B213 /* XCRemoteSwiftPackageReference "AnyCodable" */,
 				48FFFAF32ADC241A00B2B213 /* XCRemoteSwiftPackageReference "swift-collections" */,
 				48FFFAFE2ADC25A200B2B213 /* XCRemoteSwiftPackageReference "BigInt" */,
-				48FFFB012ADC6F8100B2B213 /* XCRemoteSwiftPackageReference "swift-builders" */,
 				48FFFB042ADC6FD300B2B213 /* XCRemoteSwiftPackageReference "swiftui-navigation" */,
 				48FFFB0B2ADC744700B2B213 /* XCRemoteSwiftPackageReference "TextBuilder" */,
 				A47571FD2B29B0860059A95D /* XCRemoteSwiftPackageReference "IOSSecuritySuite" */,
@@ -8920,14 +8916,6 @@
 				version = 5.3.0;
 			};
 		};
-		48FFFB012ADC6F8100B2B213 /* XCRemoteSwiftPackageReference "swift-builders" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/davdroman/swift-builders";
-			requirement = {
-				kind = exactVersion;
-				version = 0.6.0;
-			};
-		};
 		48FFFB042ADC6FD300B2B213 /* XCRemoteSwiftPackageReference "swiftui-navigation" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swiftui-navigation.git";
@@ -9160,11 +9148,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 48FFFAFE2ADC25A200B2B213 /* XCRemoteSwiftPackageReference "BigInt" */;
 			productName = BigInt;
-		};
-		48FFFB022ADC6F8100B2B213 /* Builders */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 48FFFB012ADC6F8100B2B213 /* XCRemoteSwiftPackageReference "swift-builders" */;
-			productName = Builders;
 		};
 		48FFFB052ADC6FD300B2B213 /* SwiftUINavigation */ = {
 			isa = XCSwiftPackageProductDependency;
