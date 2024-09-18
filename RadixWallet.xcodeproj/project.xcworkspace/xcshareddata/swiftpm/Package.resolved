@@ -1,5 +1,5 @@
 {
-  "originHash" : "c39101a99e19c140af6519d3ea9efa171e4dc5de6cd16f84ac9181d22c5993f6",
+  "originHash" : "19bc653dee4661e0daa5712645f3861fac7f2de445bfd139baae87195999d88e",
   "pins" : [
     {
       "identity" : "anycodable",
@@ -152,15 +152,6 @@
       "state" : {
         "revision" : "6c89474e62719ddcc1e9614989fff2f68208fe10",
         "version" : "1.1.0"
-      }
-    },
-    {
-      "identity" : "swift-builders",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/davdroman/swift-builders",
-      "state" : {
-        "revision" : "c2f1dc3ac3596732359926a5ef5e3ba7009aac21",
-        "version" : "0.6.0"
       }
     },
     {
@@ -386,15 +377,6 @@
       "state" : {
         "revision" : "af76cf3ef710b6ca5f8c05f3a31307d44a3c5828",
         "version" : "5.0.2"
-      }
-    },
-    {
-      "identity" : "textbuilder",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/davdroman/TextBuilder",
-      "state" : {
-        "revision" : "65b7c7bb9b163f4fc2d755c52a89a6f3040300df",
-        "version" : "3.0.1"
       }
     },
     {
