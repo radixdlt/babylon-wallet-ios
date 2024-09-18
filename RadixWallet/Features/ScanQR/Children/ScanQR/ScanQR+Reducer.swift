@@ -2,6 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - ScanQR
+@Reducer
 public struct ScanQR: Sendable, FeatureReducer {
 	@ObservableState
 	public struct State: Sendable, Hashable {
@@ -25,6 +26,8 @@ public struct ScanQR: Sendable, FeatureReducer {
 		#endif // sim
 	}
 
+	public typealias Action = FeatureAction<Self>
+
 	@CasePathable
 	public enum ViewAction: Sendable, Equatable {
 		case scanned(TaskResult<String>)
@@ -41,6 +44,10 @@ public struct ScanQR: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 
 	public init() {}
+
+	public var body: some ReducerOf<Self> {
+		Reduce(core)
+	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {

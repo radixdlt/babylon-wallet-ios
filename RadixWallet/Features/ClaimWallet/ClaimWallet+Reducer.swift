@@ -1,8 +1,9 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - NewConnectionApproval
+@Reducer
 public struct ClaimWallet: Sendable, FeatureReducer {
+	@ObservableState
 	public struct State: Sendable, Hashable {
 		public var isLoading: Bool = false
 
@@ -13,6 +14,9 @@ public struct ClaimWallet: Sendable, FeatureReducer {
 		public init() {}
 	}
 
+	public typealias Action = FeatureAction<Self>
+
+	@CasePathable
 	public enum ViewAction: Sendable, Equatable {
 		case clearWalletButtonTapped
 		case transferBackButtonTapped
@@ -26,6 +30,10 @@ public struct ClaimWallet: Sendable, FeatureReducer {
 	@Dependency(\.resetWalletClient) var resetWalletClient
 
 	public init() {}
+
+	public var body: some ReducerOf<Self> {
+		Reduce(core)
+	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
