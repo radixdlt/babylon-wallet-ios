@@ -18,7 +18,7 @@ extension TransactionHistoryFilters {
 				ScrollView {
 					WithViewStore(store, observe: \.filters, send: { .view($0) }) { viewStore in
 						VStack(spacing: .medium3) {
-							HStack(spacing: .small1) {
+							HStack(spacing: .small2) {
 								FiltersView(filters: viewStore.transferTypes, store: store)
 
 								Spacer(minLength: 0)
