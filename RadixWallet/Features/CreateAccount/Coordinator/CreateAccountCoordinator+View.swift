@@ -45,7 +45,6 @@ extension CreateAccountCoordinator {
 				} destination: {
 					destinations(for: $0, shouldDisplayNavBar: viewStore.shouldDisplayNavBar)
 				}
-				.navigationTransition(.slide, interactivity: .disabled)
 				.destinations(with: store)
 			}
 		}
