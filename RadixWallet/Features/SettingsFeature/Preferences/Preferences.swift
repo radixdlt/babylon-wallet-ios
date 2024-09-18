@@ -25,7 +25,7 @@ public struct Preferences: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case loadedAppPreferences(AppPreferences)
-		case advancedLockDisableResult(TaskResult<Bool>)
+		case advancedLockToggleResult(authResult: TaskResult<Bool>, isEnabled: Bool)
 	}
 
 	public struct Destination: DestinationReducer {
@@ -111,10 +111,11 @@ public struct Preferences: Sendable, FeatureReducer {
 			}
 
 		case let .advancedLockToogled(isEnabled):
-			if !isEnabled {
-				return confirmAdvancedLockDisableWithBiometrics()
-			} else {
-				return updateAdvancedLock(state: &state, isEnabled: isEnabled)
+			return .run { send in
+				let authResult = await TaskResult<Bool> {
+					try await localAuthenticationClient.authenticateWithBiometrics()
+				}
+				await send(.internal(.advancedLockToggleResult(authResult: authResult, isEnabled: isEnabled)))
 			}
 
 		case .exportLogsButtonTapped:
@@ -133,13 +134,13 @@ public struct Preferences: Sendable, FeatureReducer {
 			state.appPreferences = appPreferences
 			return .none
 
-		case let .advancedLockDisableResult(.failure(error)):
+		case let .advancedLockToggleResult(.failure(error), _):
 			errorQueue.schedule(error)
 			return .none
 
-		case let .advancedLockDisableResult(.success(success)):
+		case let .advancedLockToggleResult(.success(success), isEnabled):
 			guard success else { return .none }
-			return updateAdvancedLock(state: &state, isEnabled: false)
+			return updateAdvancedLock(state: &state, isEnabled: isEnabled)
 		}
 	}
 
@@ -155,14 +156,6 @@ public struct Preferences: Sendable, FeatureReducer {
 		guard let preferences = state.appPreferences else { return .none }
 		return .run { _ in
 			try await appPreferencesClient.updatePreferences(preferences)
-		}
-	}
-
-	private func confirmAdvancedLockDisableWithBiometrics() -> Effect<Action> {
-		.run { send in
-			await send(.internal(.advancedLockDisableResult(.init {
-				try await localAuthenticationClient.authenticateWithBiometrics()
-			})))
 		}
 	}
 

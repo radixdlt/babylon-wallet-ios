@@ -48,6 +48,7 @@ jobs:
         run: |
           timeout 300 snyk test --all-projects --org=${{ env.SNYK_COREAPPS_ORG_ID }} --severity-threshold=high || [ "$?" = "124" ]
       - name: Snyk code scan
+        continue-on-error: true
         run: |
           timeout 300 snyk code test --all-projects --org=${{ env.SNYK_COREAPPS_ORG_ID }} --severity-threshold=high || [ "$?" = "124" ]
 

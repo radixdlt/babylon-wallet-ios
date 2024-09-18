@@ -18,6 +18,8 @@ public enum OnLedgerEntity: Sendable, Hashable, Codable, CustomDebugStringConver
 			"genericComponent: \(generic)"
 		case let .nonFungibleToken(nft):
 			"nonFungibleToken: \(nft)"
+		case let .locker(locker):
+			"locker: \(locker)"
 		}
 	}
 
@@ -28,6 +30,7 @@ public enum OnLedgerEntity: Sendable, Hashable, Codable, CustomDebugStringConver
 	case nonFungibleToken(NonFungibleToken)
 	case accountNonFungibleIds(AccountNonFungibleIdsPage)
 	case genericComponent(GenericComponent)
+	case locker(Locker)
 
 	public var resource: Resource? {
 		guard case let .resource(resource) = self else {
@@ -78,6 +81,13 @@ public enum OnLedgerEntity: Sendable, Hashable, Codable, CustomDebugStringConver
 		return genericComponent
 	}
 
+	public var locker: Locker? {
+		guard case let .locker(locker) = self else {
+			return nil
+		}
+		return locker
+	}
+
 	public var metadata: Metadata? {
 		switch self {
 		case let .resource(resource):
@@ -92,6 +102,8 @@ public enum OnLedgerEntity: Sendable, Hashable, Codable, CustomDebugStringConver
 			nil
 		case let .genericComponent(genericComponent):
 			genericComponent.metadata
+		case let .locker(locker):
+			locker.metadata
 		}
 	}
 }
@@ -280,6 +292,15 @@ extension OnLedgerEntity {
 	}
 }
 
+// MARK: - OnLedgerEntity.Locker
+extension OnLedgerEntity {
+	public struct Locker: Sendable, Hashable, Codable {
+		public let address: LockerAddress
+		public let atLedgerState: AtLedgerState
+		public let metadata: Metadata
+	}
+}
+
 extension OnLedgerEntity {
 	public struct NonFungibleToken: Sendable, Hashable, Identifiable, Codable {
 		public typealias NFTData = GatewayAPI.ProgrammaticScryptoSborValueTuple
@@ -437,7 +458,8 @@ extension OnLedgerEntity.OnLedgerAccount.Details {
 		guard let gatewayDeposit = GatewayAPI.DepositRule(rawValue: gatewayDepositRaw) else {
 			return nil
 		}
-		self.init(depositRule: .init(gateway: gatewayDeposit))
+		let primaryLocker = try? component?.twoWayLinkedDappDetails?.primaryLocker.map { try LockerAddress(validatingAddress: $0) }
+		self.init(depositRule: .init(gateway: gatewayDeposit), primaryLocker: primaryLocker)
 	}
 
 	init?(_ details: GatewayAPI.StateEntityDetailsResponseItemDetails?) {
@@ -461,8 +483,11 @@ extension OnLedgerEntity {
 
 		public struct Details: Sendable, Hashable, Codable {
 			public let depositRule: DepositRule
-			public init(depositRule: DepositRule) {
+			public let primaryLocker: LockerAddress?
+
+			public init(depositRule: DepositRule, primaryLocker: LockerAddress?) {
 				self.depositRule = depositRule
+				self.primaryLocker = primaryLocker
 			}
 		}
 

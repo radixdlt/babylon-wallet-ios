@@ -4,6 +4,7 @@ import Sargon
 // MARK: - AuthorizedDappsClient
 public struct AuthorizedDappsClient: Sendable {
 	public var getAuthorizedDapps: GetAuthorizedDapps
+	public var authorizedDappValues: AuthorizedDappValues
 	public var addAuthorizedDapp: AddAuthorizedDapp
 	public var forgetAuthorizedDapp: ForgetAuthorizedDapp
 	public var updateAuthorizedDapp: UpdateAuthorizedDapp
@@ -13,6 +14,7 @@ public struct AuthorizedDappsClient: Sendable {
 
 	public init(
 		getAuthorizedDapps: @escaping GetAuthorizedDapps,
+		authorizedDappValues: @escaping AuthorizedDappValues,
 		addAuthorizedDapp: @escaping AddAuthorizedDapp,
 		forgetAuthorizedDapp: @escaping ForgetAuthorizedDapp,
 		updateAuthorizedDapp: @escaping UpdateAuthorizedDapp,
@@ -21,6 +23,7 @@ public struct AuthorizedDappsClient: Sendable {
 		detailsForAuthorizedDapp: @escaping DetailsForAuthorizedDapp
 	) {
 		self.getAuthorizedDapps = getAuthorizedDapps
+		self.authorizedDappValues = authorizedDappValues
 		self.addAuthorizedDapp = addAuthorizedDapp
 		self.forgetAuthorizedDapp = forgetAuthorizedDapp
 		self.updateAuthorizedDapp = updateAuthorizedDapp
@@ -32,6 +35,7 @@ public struct AuthorizedDappsClient: Sendable {
 
 extension AuthorizedDappsClient {
 	public typealias GetAuthorizedDapps = @Sendable () async throws -> AuthorizedDapps
+	public typealias AuthorizedDappValues = @Sendable () async -> AnyAsyncSequence<AuthorizedDapps>
 	public typealias DetailsForAuthorizedDapp = @Sendable (AuthorizedDapp) async throws -> AuthorizedDappDetailed
 	public typealias AddAuthorizedDapp = @Sendable (AuthorizedDapp) async throws -> Void
 	public typealias UpdateOrAddAuthorizedDapp = @Sendable (AuthorizedDapp) async throws -> Void

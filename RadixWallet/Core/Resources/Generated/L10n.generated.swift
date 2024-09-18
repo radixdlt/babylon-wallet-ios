@@ -578,14 +578,10 @@ public enum L10n {
       }
       /// Name
       public static let resourceName = L10n.tr("Localizable", "assetDetails_NFTDetails_resourceName", fallback: "Name")
-      /// What are NFTs?
-      public static let whatAreNfts = L10n.tr("Localizable", "assetDetails_NFTDetails_whatAreNfts", fallback: "What are NFTs?")
     }
     public enum BadgeDetails {
       /// You have no badges
       public static let noBadges = L10n.tr("Localizable", "assetDetails_badgeDetails_noBadges", fallback: "You have no badges")
-      /// What are badges?
-      public static let whatAreBadges = L10n.tr("Localizable", "assetDetails_badgeDetails_whatAreBadges", fallback: "What are badges?")
     }
     public enum Behaviors {
       /// Anyone can freeze this asset in place.
@@ -626,14 +622,10 @@ public enum L10n {
       public static let supplyIncreasable = L10n.tr("Localizable", "assetDetails_behaviors_supplyIncreasable", fallback: "The supply of this asset can be increased.")
       /// Anyone can increase the supply of this asset.
       public static let supplyIncreasableByAnyone = L10n.tr("Localizable", "assetDetails_behaviors_supplyIncreasableByAnyone", fallback: "Anyone can increase the supply of this asset.")
-      /// What are behaviors?
-      public static let whatAreBehaviors = L10n.tr("Localizable", "assetDetails_behaviors_whatAreBehaviors", fallback: "What are behaviors?")
     }
     public enum PoolUnitDetails {
       /// You have no Pool units
       public static let noPoolUnits = L10n.tr("Localizable", "assetDetails_poolUnitDetails_noPoolUnits", fallback: "You have no Pool units")
-      /// What are Pool units?
-      public static let whatArePoolUnits = L10n.tr("Localizable", "assetDetails_poolUnitDetails_whatArePoolUnits", fallback: "What are Pool units?")
     }
     public enum Staking {
       /// Current Redeemable Value
@@ -664,8 +656,6 @@ public enum L10n {
     public enum StakingDetails {
       /// You have no Stakes
       public static let noStakes = L10n.tr("Localizable", "assetDetails_stakingDetails_noStakes", fallback: "You have no Stakes")
-      /// What is Staking?
-      public static let whatIsStaking = L10n.tr("Localizable", "assetDetails_stakingDetails_whatIsStaking", fallback: "What is Staking?")
     }
     public enum Tags {
       /// Official Radix
@@ -674,8 +664,6 @@ public enum L10n {
     public enum TokenDetails {
       /// You have no Tokens
       public static let noTokens = L10n.tr("Localizable", "assetDetails_tokenDetails_noTokens", fallback: "You have no Tokens")
-      /// What are Tokens?
-      public static let whatAreTokens = L10n.tr("Localizable", "assetDetails_tokenDetails_whatAreTokens", fallback: "What are Tokens?")
     }
   }
   public enum AssetTransfer {
@@ -785,8 +773,6 @@ public enum L10n {
     public static let subtitle = L10n.tr("Localizable", "authorizedDapps_subtitle", fallback: "These are the dApps that you have logged into using the Radix Wallet.")
     /// Approved dApps
     public static let title = L10n.tr("Localizable", "authorizedDapps_title", fallback: "Approved dApps")
-    /// What is a dApp?
-    public static let whatIsDapp = L10n.tr("Localizable", "authorizedDapps_whatIsDapp", fallback: "What is a dApp?")
     public enum DAppDetails {
       /// dApp Definition
       public static let dAppDefinition = L10n.tr("Localizable", "authorizedDapps_dAppDetails_dAppDefinition", fallback: "dApp Definition")
@@ -887,6 +873,12 @@ public enum L10n {
     }
   }
   public enum Biometrics {
+    public enum AppLockAvailableAlert {
+      /// Your phone was updated and now supports Apple's built-in App Lock feature.
+      public static let message = L10n.tr("Localizable", "biometrics_appLockAvailableAlert_message", fallback: "Your phone was updated and now supports Apple's built-in App Lock feature.")
+      /// Advanced Lock Disabled
+      public static let title = L10n.tr("Localizable", "biometrics_appLockAvailableAlert_title", fallback: "Advanced Lock Disabled")
+    }
     public enum DeviceNotSecureAlert {
       /// Your device currently has no device access security set, such as biometrics or a PIN. The Radix Wallet requires this to be set for your security.
       public static let message = L10n.tr("Localizable", "biometrics_deviceNotSecureAlert_message", fallback: "Your device currently has no device access security set, such as biometrics or a PIN. The Radix Wallet requires this to be set for your security.")
@@ -1188,8 +1180,6 @@ public enum L10n {
     public enum Introduction {
       /// Continue
       public static let `continue` = L10n.tr("Localizable", "createPersona_introduction_continue", fallback: "Continue")
-      /// Learn about Personas
-      public static let learnAboutPersonas = L10n.tr("Localizable", "createPersona_introduction_learnAboutPersonas", fallback: "Learn about Personas")
       /// A Persona is an identity that you own and control. You can have as many as you like.
       public static let subtitle1 = L10n.tr("Localizable", "createPersona_introduction_subtitle1", fallback: "A Persona is an identity that you own and control. You can have as many as you like.")
       /// Personas are used to login to dApps on Radix. dApps may request access to personal information associated with your Persona, like your name or email address.
@@ -1213,8 +1203,6 @@ public enum L10n {
     public static let effectiveTip = L10n.tr("Localizable", "customizeNetworkFees_effectiveTip", fallback: "Effective Tip")
     /// Estimated Transaction Fees
     public static let feeBreakdownTitle = L10n.tr("Localizable", "customizeNetworkFees_feeBreakdownTitle", fallback: "Estimated Transaction Fees")
-    /// How do fees work
-    public static let howDoFeesWork = L10n.tr("Localizable", "customizeNetworkFees_howDoFeesWork", fallback: "How do fees work")
     /// Network Execution
     public static let networkExecution = L10n.tr("Localizable", "customizeNetworkFees_networkExecution", fallback: "Network Execution")
     /// Network Fee
@@ -1776,8 +1764,6 @@ public enum L10n {
     public static let subtitle = L10n.tr("Localizable", "gateways_subtitle", fallback: "Choose the gateway your wallet will use to connect to the Radix Network or test networks. Only change this if you know what you’re doing.")
     /// Gateways
     public static let title = L10n.tr("Localizable", "gateways_title", fallback: "Gateways")
-    /// What is a Gateway?
-    public static let whatIsAGateway = L10n.tr("Localizable", "gateways_whatIsAGateway", fallback: "What is a Gateway?")
     public enum AddNewGateway {
       /// Add Gateway
       public static let addGatewayButtonTitle = L10n.tr("Localizable", "gateways_addNewGateway_addGatewayButtonTitle", fallback: "Add Gateway")
@@ -2455,8 +2441,8 @@ public enum L10n {
       /// 
       /// [Get the Radix Wallet](https://wallet.radixdlt.com/) ↗
       /// 
-      /// [Learn more about the Radix Wallet] (https://learn.radixdlt.com/article/what-is-the-radix-wallet) ↗
-      public static let radixwallet = L10n.tr("Localizable", "infoLink_glossary_radixwallet", fallback: "## Radix Wallet\n\nThe Radix Wallet is an iOS and Android mobile app that is your gateway to the capabilities of the Radix Network.\n\n---\n\nIt helps you create and use [Accounts](?glossaryAnchor=accounts) that can hold all of your digital assets on Radix, and [Personas](?glossaryAnchor=personas) that you can use to securely log in to [dApps](?glossaryAnchor=dapps) built on Radix without a password.\n\nThe Radix Wallet also makes sure that you are always in control of [transactions](?glossaryAnchor=transactions) that interact with your Accounts and assets.\n\nThink of the Radix Wallet as your companion as you move between dApps on Radix – keeping your assets safe, and letting you choose who you are and what you bring with you on each dApp.\n\nThe Radix Wallet was created by the team who created the Radix Network’s technology, and is offered for free (and open-source) to let anyone use Radix and dApps built on Radix.\n\n[Get the Radix Wallet](https://wallet.radixdlt.com/) ↗\n\n[Learn more about the Radix Wallet] (https://learn.radixdlt.com/article/what-is-the-radix-wallet) ↗")
+      /// [Learn more about the Radix Wallet](https://learn.radixdlt.com/article/what-is-the-radix-wallet) ↗
+      public static let radixwallet = L10n.tr("Localizable", "infoLink_glossary_radixwallet", fallback: "## Radix Wallet\n\nThe Radix Wallet is an iOS and Android mobile app that is your gateway to the capabilities of the Radix Network.\n\n---\n\nIt helps you create and use [Accounts](?glossaryAnchor=accounts) that can hold all of your digital assets on Radix, and [Personas](?glossaryAnchor=personas) that you can use to securely log in to [dApps](?glossaryAnchor=dapps) built on Radix without a password.\n\nThe Radix Wallet also makes sure that you are always in control of [transactions](?glossaryAnchor=transactions) that interact with your Accounts and assets.\n\nThink of the Radix Wallet as your companion as you move between dApps on Radix – keeping your assets safe, and letting you choose who you are and what you bring with you on each dApp.\n\nThe Radix Wallet was created by the team who created the Radix Network’s technology, and is offered for free (and open-source) to let anyone use Radix and dApps built on Radix.\n\n[Get the Radix Wallet](https://wallet.radixdlt.com/) ↗\n\n[Learn more about the Radix Wallet](https://learn.radixdlt.com/article/what-is-the-radix-wallet) ↗")
       /// ## Token
       /// 
       /// Token is the general term for any kind of web3 asset that you can hold in a crypto wallet.
@@ -2560,6 +2546,32 @@ public enum L10n {
       /// [Learn more about the XRD token](https://learn.radixdlt.com/article/what-is-the-xrd-token) ↗
       public static let xrd = L10n.tr("Localizable", "infoLink_glossary_xrd", fallback: "## XRD Token\n\nXRD is the official Radix Network token.\n\n---\n\n It is created by the [Radix Network](?glossaryAnchor=radixnetwork) itself and users and applications can use it to use features of the network. For example, [transaction fees](?glossaryAnchor=transactionfee) are always paid in XRD, and XRD is the only token that can be used to participate in [Radix Network staking](?glossaryAnchor=networkstaking).\n\nBecause XRD has a special role on Radix, XRD is also frequently used by [dApps](?glossaryAnchor=dapps) on Radix as a convenient form of money to pay for things and to enable exchanges with other tokens.\n\n[Buy XRD tokens](https://www.radixdlt.com/token) ↗\n\n[Learn more about the XRD token](https://learn.radixdlt.com/article/what-is-the-xrd-token) ↗")
     }
+    public enum Title {
+      /// What are behaviors?
+      public static let behaviors = L10n.tr("Localizable", "infoLink_title_behaviors", fallback: "What are behaviors?")
+      /// What is a dApp?
+      public static let dapps = L10n.tr("Localizable", "infoLink_title_dapps", fallback: "What is a dApp?")
+      /// What is a Gateway?
+      public static let gateways = L10n.tr("Localizable", "infoLink_title_gateways", fallback: "What is a Gateway?")
+      /// How do guarantees work?
+      public static let guarantees = L10n.tr("Localizable", "infoLink_title_guarantees", fallback: "How do guarantees work?")
+      /// What is Staking?
+      public static let networkstaking = L10n.tr("Localizable", "infoLink_title_networkstaking", fallback: "What is Staking?")
+      /// What are NFTs?
+      public static let nfts = L10n.tr("Localizable", "infoLink_title_nfts", fallback: "What are NFTs?")
+      /// What is a Persona?
+      public static let personas = L10n.tr("Localizable", "infoLink_title_personas", fallback: "What is a Persona?")
+      /// Learn about Personas
+      public static let personasLearnAbout = L10n.tr("Localizable", "infoLink_title_personasLearnAbout", fallback: "Learn about Personas")
+      /// What are Pool units?
+      public static let poolunits = L10n.tr("Localizable", "infoLink_title_poolunits", fallback: "What are Pool units?")
+      /// Learn more about Radix Connect
+      public static let radixconnect = L10n.tr("Localizable", "infoLink_title_radixconnect", fallback: "Learn more about Radix Connect")
+      /// What are Tokens?
+      public static let tokens = L10n.tr("Localizable", "infoLink_title_tokens", fallback: "What are Tokens?")
+      /// How do fees work?
+      public static let transactionfee = L10n.tr("Localizable", "infoLink_title_transactionfee", fallback: "How do fees work?")
+    }
   }
   public enum LedgerHardwareDevices {
     /// Added
@@ -2630,8 +2642,8 @@ public enum L10n {
     public static let linkNewConnector = L10n.tr("Localizable", "linkedConnectors_linkNewConnector", fallback: "Link New Connector")
     /// This is an old version of the Radix Connector browser extension. Please update to the latest Connector and try linking again.
     public static let oldQRErrorMessage = L10n.tr("Localizable", "linkedConnectors_oldQRErrorMessage", fallback: "This is an old version of the Radix Connector browser extension. Please update to the latest Connector and try linking again.")
-    /// Connect your Radix Wallet to desktop web browsers by linking to the Radix Connector browser extension. Here are your linked Connectors.
-    public static let subtitle = L10n.tr("Localizable", "linkedConnectors_subtitle", fallback: "Connect your Radix Wallet to desktop web browsers by linking to the Radix Connector browser extension. Here are your linked Connectors.")
+    /// Your Radix Wallet is linked to the following desktop browsers using the Connector browser extension.
+    public static let subtitle = L10n.tr("Localizable", "linkedConnectors_subtitle", fallback: "Your Radix Wallet is linked to the following desktop browsers using the Connector browser extension.")
     /// Linked Connectors
     public static let title = L10n.tr("Localizable", "linkedConnectors_title", fallback: "Linked Connectors")
     /// This type of Connector link is not supported.
@@ -2703,6 +2715,18 @@ public enum L10n {
       public static let removeButtonTitle = L10n.tr("Localizable", "linkedConnectors_removeConnectionAlert_removeButtonTitle", fallback: "Remove")
       /// Remove Connection
       public static let title = L10n.tr("Localizable", "linkedConnectors_removeConnectionAlert_title", fallback: "Remove Connection")
+    }
+    public enum RenameConnector {
+      /// Linked Connector name required
+      public static let errorEmpty = L10n.tr("Localizable", "linkedConnectors_renameConnector_errorEmpty", fallback: "Linked Connector name required")
+      /// Enter a new name for this Linked Connector
+      public static let subtitle = L10n.tr("Localizable", "linkedConnectors_renameConnector_subtitle", fallback: "Enter a new name for this Linked Connector")
+      /// Updated
+      public static let successHud = L10n.tr("Localizable", "linkedConnectors_renameConnector_successHud", fallback: "Updated")
+      /// Rename Connector
+      public static let title = L10n.tr("Localizable", "linkedConnectors_renameConnector_title", fallback: "Rename Connector")
+      /// Update
+      public static let update = L10n.tr("Localizable", "linkedConnectors_renameConnector_update", fallback: "Update")
     }
   }
   public enum Misc {
@@ -2792,8 +2816,6 @@ public enum L10n {
     public static let subtitle = L10n.tr("Localizable", "personas_subtitle", fallback: "Here are all of your current Personas in your Radix Wallet.")
     /// Personas
     public static let title = L10n.tr("Localizable", "personas_title", fallback: "Personas")
-    /// What is a Persona?
-    public static let whatIsPersona = L10n.tr("Localizable", "personas_whatIsPersona", fallback: "What is a Persona?")
     /// Write down main seed phrase
     public static let writeSeedPhrase = L10n.tr("Localizable", "personas_writeSeedPhrase", fallback: "Write down main seed phrase")
   }
@@ -3067,8 +3089,6 @@ public enum L10n {
       public static let disclosureTitle = L10n.tr("Localizable", "scanQR_connectorExtension_disclosureTitle", fallback: "Don't have the Radix Connector browser extension?")
       /// Scan the QR code in the Radix Connector browser extension.
       public static let instructions = L10n.tr("Localizable", "scanQR_connectorExtension_instructions", fallback: "Scan the QR code in the Radix Connector browser extension.")
-      /// Learn more about Radix Connect
-      public static let radixConnectLearMore = L10n.tr("Localizable", "scanQR_connectorExtension_radixConnectLearMore", fallback: "Learn more about Radix Connect")
     }
     public enum ImportOlympia {
       /// Scan the QR code shown in the Export section of the Radix Desktop Wallet for Olympia.
@@ -3569,8 +3589,6 @@ public enum L10n {
     public enum Guarantees {
       /// Apply
       public static let applyButtonText = L10n.tr("Localizable", "transactionReview_guarantees_applyButtonText", fallback: "Apply")
-      /// How do guarantees work?
-      public static let howDoGuaranteesWork = L10n.tr("Localizable", "transactionReview_guarantees_howDoGuaranteesWork", fallback: "How do guarantees work?")
       /// Set guaranteed minimum %%
       public static let setGuaranteedMinimum = L10n.tr("Localizable", "transactionReview_guarantees_setGuaranteedMinimum", fallback: "Set guaranteed minimum %%")
       /// Protect yourself by setting guaranteed minimums for estimated deposits

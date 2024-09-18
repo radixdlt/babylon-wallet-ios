@@ -16,6 +16,7 @@ public enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
 	case showRelinkConnectorsAfterUpdate
 	case showRelinkConnectorsAfterProfileRestore
 	case homeCards
+	case appLockMessageShown
 
 	/// DO NOT CHANGE THIS KEY
 	case activeProfileID
@@ -233,6 +234,14 @@ extension UserDefaults.Dependency {
 
 	public func setHomeCards(_ value: Data) {
 		set(data: value, key: .homeCards)
+	}
+
+	public var appLockMessageShown: Bool {
+		bool(key: .appLockMessageShown)
+	}
+
+	public func setAppLockMessageShown(_ value: Bool) {
+		set(value, forKey: Key.appLockMessageShown.rawValue)
 	}
 }
 

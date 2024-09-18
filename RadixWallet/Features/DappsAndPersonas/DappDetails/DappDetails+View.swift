@@ -290,23 +290,22 @@ extension DappDetails.View {
 		let store: StoreOf<DappDetails>
 
 		var body: some View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { _ in
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: .large2) {
-					// TODO: Revert as part of 1.10.0 release
-//					VStack(spacing: .medium1) {
-//						ToggleView(
-//							title: L10n.AuthorizedDapps.DAppDetails.depositsTitle,
-//							subtitle: viewStore.isDepositsVisible ? L10n.AuthorizedDapps.DAppDetails.depositsVisible : L10n.AuthorizedDapps.DAppDetails.depositsHidden,
-//							minHeight: .zero,
-//							isOn: viewStore.binding(
-//								get: \.isDepositsVisible,
-//								send: { .depositsVisibleToggled($0) }
-//							)
-//						)
-//
-//						Separator()
-//					}
-//					.padding(.horizontal, .small2)
+					VStack(spacing: .medium1) {
+						ToggleView(
+							title: L10n.AuthorizedDapps.DAppDetails.depositsTitle,
+							subtitle: viewStore.isDepositsVisible ? L10n.AuthorizedDapps.DAppDetails.depositsVisible : L10n.AuthorizedDapps.DAppDetails.depositsHidden,
+							minHeight: .zero,
+							isOn: viewStore.binding(
+								get: \.isDepositsVisible,
+								send: { .depositsVisibleToggled($0) }
+							)
+						)
+
+						Separator()
+					}
+					.padding(.horizontal, .small2)
 
 					Button(L10n.AuthorizedDapps.DAppDetails.forgetDapp) {
 						store.send(.view(.forgetThisDappTapped))

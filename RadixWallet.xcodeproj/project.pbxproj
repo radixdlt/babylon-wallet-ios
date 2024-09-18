@@ -111,8 +111,6 @@
 		48CFC2752ADC10D900E77A5C /* Main+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCBE2ADC10D800E77A5C /* Main+View.swift */; };
 		48CFC2762ADC10D900E77A5C /* P2PLinksFeature+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCC12ADC10D800E77A5C /* P2PLinksFeature+Reducer.swift */; };
 		48CFC2772ADC10D900E77A5C /* P2PLinksFeature+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCC22ADC10D800E77A5C /* P2PLinksFeature+View.swift */; };
-		48CFC2782ADC10D900E77A5C /* P2PLinkRow+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCC42ADC10D800E77A5C /* P2PLinkRow+View.swift */; };
-		48CFC2792ADC10D900E77A5C /* P2PLinkRow+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCC52ADC10D800E77A5C /* P2PLinkRow+Reducer.swift */; };
 		48CFC27A2ADC10D900E77A5C /* App+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCC72ADC10D800E77A5C /* App+View.swift */; };
 		48CFC27B2ADC10D900E77A5C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCC82ADC10D800E77A5C /* AppDelegate.swift */; };
 		48CFC27C2ADC10D900E77A5C /* HUD+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCCA2ADC10D800E77A5C /* HUD+Reducer.swift */; };
@@ -698,7 +696,6 @@
 		48FFFAE12ADC220F00B2B213 /* Tagged in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAE02ADC220F00B2B213 /* Tagged */; };
 		48FFFAE42ADC222100B2B213 /* Validated in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAE32ADC222100B2B213 /* Validated */; };
 		48FFFAE72ADC223300B2B213 /* Overture in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAE62ADC223300B2B213 /* Overture */; };
-		48FFFAEA2ADC225B00B2B213 /* ScreenshotPreventing in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAE92ADC225B00B2B213 /* ScreenshotPreventing */; };
 		48FFFAED2ADC226B00B2B213 /* CodeScanner in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAEC2ADC226B00B2B213 /* CodeScanner */; };
 		48FFFAF02ADC229900B2B213 /* AnyCodable in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAEF2ADC229900B2B213 /* AnyCodable */; };
 		48FFFAF22ADC23AC00B2B213 /* Exports.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48FFFAF12ADC23AC00B2B213 /* Exports.swift */; };
@@ -724,6 +721,11 @@
 		5B2A45022BD6680400AEC8AD /* ContactSupportClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2A45012BD6680400AEC8AD /* ContactSupportClient.swift */; };
 		5B2A45042BD6689100AEC8AD /* ContactSupportClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2A45032BD6689100AEC8AD /* ContactSupportClient+Live.swift */; };
 		5B3C48A92C7E190C00DB160D /* AssetRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3C48A82C7E190C00DB160D /* AssetRow.swift */; };
+		5B3C48B52C80D11E00DB160D /* AccountLockersClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3C48B42C80D11E00DB160D /* AccountLockersClient+Interface.swift */; };
+		5B3C48B72C80D17E00DB160D /* AccountLockersClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3C48B62C80D17E00DB160D /* AccountLockersClient+Live.swift */; };
+		5B3C48B92C80D23F00DB160D /* AccountLockersClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3C48B82C80D23F00DB160D /* AccountLockersClient+Test.swift */; };
+		5B3C48C12C85CEAA00DB160D /* AccountBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3C48C02C85CEAA00DB160D /* AccountBannerView.swift */; };
+		5B3C48C32C874C8D00DB160D /* Dispatch+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3C48C22C874C8D00DB160D /* Dispatch+Extra.swift */; };
 		5B43B08B2BDAAD4B00AA1E92 /* AddressDetails+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B43B0892BDAAD4B00AA1E92 /* AddressDetails+View.swift */; };
 		5B43B08C2BDAAD4B00AA1E92 /* AddressDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B43B08A2BDAAD4B00AA1E92 /* AddressDetails.swift */; };
 		5B45E2FA2BC45770007C4C84 /* FactorSourceAccess+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B45E2F82BC45770007C4C84 /* FactorSourceAccess+View.swift */; };
@@ -732,9 +734,13 @@
 		5B45E2FF2BC59780007C4C84 /* SignWithFactorSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B45E2FD2BC59780007C4C84 /* SignWithFactorSource.swift */; };
 		5B45E3012BC5A491007C4C84 /* FactorSourceAccess+ViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B45E3002BC5A491007C4C84 /* FactorSourceAccess+ViewState.swift */; };
 		5B4712CC2C526146003B4712 /* HeaderButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4712CB2C526146003B4712 /* HeaderButtonStyle.swift */; };
+		5B526ADB2C876E7C00AF8B72 /* AccountLockerClaimDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B526ADA2C876E7C00AF8B72 /* AccountLockerClaimDetails.swift */; };
 		5B526AEC2C89C3C200AF8B72 /* ResourcesVisibilityClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B526AE82C89C3C200AF8B72 /* ResourcesVisibilityClient+Interface.swift */; };
 		5B526AED2C89C3C200AF8B72 /* ResourcesVisibilityClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B526AE92C89C3C200AF8B72 /* ResourcesVisibilityClient+Live.swift */; };
 		5B526AEE2C89C3C200AF8B72 /* ResourcesVisibilityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B526AEA2C89C3C200AF8B72 /* ResourcesVisibilityClient+Test.swift */; };
+		5B634AAE2C92F6EC004B2FBC /* UpdateP2PLinkName+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B634AAD2C92F6EC004B2FBC /* UpdateP2PLinkName+Reducer.swift */; };
+		5B634AB02C92F6FA004B2FBC /* UpdateP2PLinkName+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B634AAF2C92F6FA004B2FBC /* UpdateP2PLinkName+View.swift */; };
+		5B634A942C91D2A0004B2FBC /* ScreenshotPreventing in Frameworks */ = {isa = PBXBuildFile; productRef = 5B634A932C91D2A0004B2FBC /* ScreenshotPreventing */; };
 		5B6499B72BCFD0E8000F2176 /* SecurityFactors+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B52BCFD0E8000F2176 /* SecurityFactors+View.swift */; };
 		5B6499B82BCFD0E8000F2176 /* SecurityFactors+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B62BCFD0E8000F2176 /* SecurityFactors+Reducer.swift */; };
 		5B6499BA2BCFDB1E000F2176 /* ShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B92BCFDB1E000F2176 /* ShareView.swift */; };
@@ -1348,8 +1354,6 @@
 		48CFBCBE2ADC10D800E77A5C /* Main+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Main+View.swift"; sourceTree = "<group>"; };
 		48CFBCC12ADC10D800E77A5C /* P2PLinksFeature+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "P2PLinksFeature+Reducer.swift"; sourceTree = "<group>"; };
 		48CFBCC22ADC10D800E77A5C /* P2PLinksFeature+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "P2PLinksFeature+View.swift"; sourceTree = "<group>"; };
-		48CFBCC42ADC10D800E77A5C /* P2PLinkRow+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "P2PLinkRow+View.swift"; sourceTree = "<group>"; };
-		48CFBCC52ADC10D800E77A5C /* P2PLinkRow+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "P2PLinkRow+Reducer.swift"; sourceTree = "<group>"; };
 		48CFBCC72ADC10D800E77A5C /* App+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "App+View.swift"; sourceTree = "<group>"; };
 		48CFBCC82ADC10D800E77A5C /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		48CFBCCA2ADC10D800E77A5C /* HUD+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "HUD+Reducer.swift"; sourceTree = "<group>"; };
@@ -1929,6 +1933,11 @@
 		5B2A45012BD6680400AEC8AD /* ContactSupportClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactSupportClient.swift; sourceTree = "<group>"; };
 		5B2A45032BD6689100AEC8AD /* ContactSupportClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ContactSupportClient+Live.swift"; sourceTree = "<group>"; };
 		5B3C48A82C7E190C00DB160D /* AssetRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetRow.swift; sourceTree = "<group>"; };
+		5B3C48B42C80D11E00DB160D /* AccountLockersClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountLockersClient+Interface.swift"; sourceTree = "<group>"; };
+		5B3C48B62C80D17E00DB160D /* AccountLockersClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountLockersClient+Live.swift"; sourceTree = "<group>"; };
+		5B3C48B82C80D23F00DB160D /* AccountLockersClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountLockersClient+Test.swift"; sourceTree = "<group>"; };
+		5B3C48C02C85CEAA00DB160D /* AccountBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountBannerView.swift; sourceTree = "<group>"; };
+		5B3C48C22C874C8D00DB160D /* Dispatch+Extra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Dispatch+Extra.swift"; sourceTree = "<group>"; };
 		5B43B0892BDAAD4B00AA1E92 /* AddressDetails+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddressDetails+View.swift"; sourceTree = "<group>"; };
 		5B43B08A2BDAAD4B00AA1E92 /* AddressDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressDetails.swift; sourceTree = "<group>"; };
 		5B45E2F82BC45770007C4C84 /* FactorSourceAccess+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactorSourceAccess+View.swift"; sourceTree = "<group>"; };
@@ -1937,9 +1946,12 @@
 		5B45E2FD2BC59780007C4C84 /* SignWithFactorSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignWithFactorSource.swift; sourceTree = "<group>"; };
 		5B45E3002BC5A491007C4C84 /* FactorSourceAccess+ViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactorSourceAccess+ViewState.swift"; sourceTree = "<group>"; };
 		5B4712CB2C526146003B4712 /* HeaderButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderButtonStyle.swift; sourceTree = "<group>"; };
+		5B526ADA2C876E7C00AF8B72 /* AccountLockerClaimDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountLockerClaimDetails.swift; sourceTree = "<group>"; };
 		5B526AE82C89C3C200AF8B72 /* ResourcesVisibilityClient+Interface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ResourcesVisibilityClient+Interface.swift"; sourceTree = "<group>"; };
 		5B526AE92C89C3C200AF8B72 /* ResourcesVisibilityClient+Live.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ResourcesVisibilityClient+Live.swift"; sourceTree = "<group>"; };
 		5B526AEA2C89C3C200AF8B72 /* ResourcesVisibilityClient+Test.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ResourcesVisibilityClient+Test.swift"; sourceTree = "<group>"; };
+		5B634AAD2C92F6EC004B2FBC /* UpdateP2PLinkName+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UpdateP2PLinkName+Reducer.swift"; sourceTree = "<group>"; };
+		5B634AAF2C92F6FA004B2FBC /* UpdateP2PLinkName+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UpdateP2PLinkName+View.swift"; sourceTree = "<group>"; };
 		5B6499B52BCFD0E8000F2176 /* SecurityFactors+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityFactors+View.swift"; sourceTree = "<group>"; };
 		5B6499B62BCFD0E8000F2176 /* SecurityFactors+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityFactors+Reducer.swift"; sourceTree = "<group>"; };
 		5B6499B92BCFDB1E000F2176 /* ShareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareView.swift; sourceTree = "<group>"; };
@@ -2493,6 +2505,7 @@
 				5B1C4FD52BBB0B0C00B9436F /* AppsFlyerLib-Strict in Frameworks */,
 				48FFFB032ADC6F8100B2B213 /* Builders in Frameworks */,
 				48FFFAB72ADC207B00B2B213 /* NavigationTransitions in Frameworks */,
+				5B634A942C91D2A0004B2FBC /* ScreenshotPreventing in Frameworks */,
 				48FFFA992ADC1EEC00B2B213 /* AsyncExtensions in Frameworks */,
 				83B783562C1764AE00AA7930 /* Sargon in Frameworks */,
 				E63D123D2ADD1FC00001CBB1 /* SwiftUIIntrospect in Frameworks */,
@@ -2508,7 +2521,6 @@
 				48FFFAE12ADC220F00B2B213 /* Tagged in Frameworks */,
 				48FFFAD22ADC218400B2B213 /* Either in Frameworks */,
 				48FFFAA52ADC1F9600B2B213 /* AsyncAlgorithms in Frameworks */,
-				48FFFAEA2ADC225B00B2B213 /* ScreenshotPreventing in Frameworks */,
 				48FFFAA82ADC1FBE00B2B213 /* Atomics in Frameworks */,
 				48FFFAF02ADC229900B2B213 /* AnyCodable in Frameworks */,
 				48FFFAF52ADC241A00B2B213 /* BitCollections in Frameworks */,
@@ -2904,8 +2916,8 @@
 		48CFBCBF2ADC10D800E77A5C /* P2PLinksFeature */ = {
 			isa = PBXGroup;
 			children = (
+				5B634AAC2C92F6C5004B2FBC /* UpdateP2PLinkName */,
 				48CFBCC02ADC10D800E77A5C /* Coordinator */,
-				48CFBCC32ADC10D800E77A5C /* Row */,
 			);
 			path = P2PLinksFeature;
 			sourceTree = "<group>";
@@ -2917,15 +2929,6 @@
 				48CFBCC22ADC10D800E77A5C /* P2PLinksFeature+View.swift */,
 			);
 			path = Coordinator;
-			sourceTree = "<group>";
-		};
-		48CFBCC32ADC10D800E77A5C /* Row */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBCC42ADC10D800E77A5C /* P2PLinkRow+View.swift */,
-				48CFBCC52ADC10D800E77A5C /* P2PLinkRow+Reducer.swift */,
-			);
-			path = Row;
 			sourceTree = "<group>";
 		};
 		48CFBCC62ADC10D800E77A5C /* AppFeature */ = {
@@ -4337,6 +4340,7 @@
 				48CFBF462ADC10D900E77A5C /* CustomDumpConformance.swift */,
 				48CFBF472ADC10D900E77A5C /* ByteArray+Hex.swift */,
 				5B758D4E2BCD5BF700348722 /* Effect+Extra.swift */,
+				5B3C48C22C874C8D00DB160D /* Dispatch+Extra.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -4392,6 +4396,7 @@
 		48CFBF522ADC10D900E77A5C /* Clients */ = {
 			isa = PBXGroup;
 			children = (
+				5B3C48B32C80D0FF00DB160D /* AccountLockersClient */,
 				48CFBF8D2ADC10D900E77A5C /* AccountPortfoliosClient */,
 				48CFBF622ADC10D900E77A5C /* AccountsClient */,
 				5B272DD52C36E88700B74F1F /* AppEventsClient */,
@@ -4913,6 +4918,7 @@
 				A4CFB5602BAA826E00778BDD /* Measure+Position.swift */,
 				E7B7A0FC2BBBFB6100EEE900 /* HeaderListViewContainer.swift */,
 				5B77D7B12C0DFE8300F5F215 /* EntitySecurityProblemsView.swift */,
+				5B3C48C02C85CEAA00DB160D /* AccountBannerView.swift */,
 			);
 			path = DesignSystem;
 			sourceTree = "<group>";
@@ -5488,6 +5494,17 @@
 			path = FactoryReset;
 			sourceTree = "<group>";
 		};
+		5B3C48B32C80D0FF00DB160D /* AccountLockersClient */ = {
+			isa = PBXGroup;
+			children = (
+				5B3C48B42C80D11E00DB160D /* AccountLockersClient+Interface.swift */,
+				5B3C48B62C80D17E00DB160D /* AccountLockersClient+Live.swift */,
+				5B3C48B82C80D23F00DB160D /* AccountLockersClient+Test.swift */,
+				5B526ADA2C876E7C00AF8B72 /* AccountLockerClaimDetails.swift */,
+			);
+			path = AccountLockersClient;
+			sourceTree = "<group>";
+		};
 		5B45E2F32BC45706007C4C84 /* FactorSourceAccess */ = {
 			isa = PBXGroup;
 			children = (
@@ -5506,6 +5523,15 @@
 				5B526AEA2C89C3C200AF8B72 /* ResourcesVisibilityClient+Test.swift */,
 			);
 			path = ResourcesVisibilityClient;
+			sourceTree = "<group>";
+		};
+		5B634AAC2C92F6C5004B2FBC /* UpdateP2PLinkName */ = {
+			isa = PBXGroup;
+			children = (
+				5B634AAD2C92F6EC004B2FBC /* UpdateP2PLinkName+Reducer.swift */,
+				5B634AAF2C92F6FA004B2FBC /* UpdateP2PLinkName+View.swift */,
+			);
+			path = UpdateP2PLinkName;
 			sourceTree = "<group>";
 		};
 		5B6499B42BCFD0C7000F2176 /* SecurityFactors */ = {
@@ -6833,7 +6859,6 @@
 				48FFFAE02ADC220F00B2B213 /* Tagged */,
 				48FFFAE32ADC222100B2B213 /* Validated */,
 				48FFFAE62ADC223300B2B213 /* Overture */,
-				48FFFAE92ADC225B00B2B213 /* ScreenshotPreventing */,
 				48FFFAEC2ADC226B00B2B213 /* CodeScanner */,
 				48FFFAEF2ADC229900B2B213 /* AnyCodable */,
 				48FFFAF42ADC241A00B2B213 /* BitCollections */,
@@ -6856,6 +6881,7 @@
 				83B783552C1764AE00AA7930 /* Sargon */,
 				831F0CEC2C21819000D6F5BF /* Sargon */,
 				E60D5E1E2C2EFAA2008BCF1F /* Sargon */,
+				5B634A932C91D2A0004B2FBC /* ScreenshotPreventing */,
 			);
 			productName = RadixWallet;
 			productReference = 48CFBC4F2ADC106300E77A5C /* Radix Wallet Dev.app */;
@@ -6913,7 +6939,6 @@
 				48FFFADF2ADC220F00B2B213 /* XCRemoteSwiftPackageReference "swift-tagged" */,
 				48FFFAE22ADC222100B2B213 /* XCRemoteSwiftPackageReference "swift-validated" */,
 				48FFFAE52ADC223300B2B213 /* XCRemoteSwiftPackageReference "swift-overture" */,
-				48FFFAE82ADC225B00B2B213 /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */,
 				48FFFAEB2ADC226B00B2B213 /* XCRemoteSwiftPackageReference "CodeScanner" */,
 				48FFFAEE2ADC229900B2B213 /* XCRemoteSwiftPackageReference "AnyCodable" */,
 				48FFFAF32ADC241A00B2B213 /* XCRemoteSwiftPackageReference "swift-collections" */,
@@ -6927,6 +6952,7 @@
 				8318BB172BC8403800057BCB /* XCRemoteSwiftPackageReference "swift-custom-dump" */,
 				E6A0B0492BF23C7000617DAC /* XCRemoteSwiftPackageReference "swift-identified-collections" */,
 				83D908AA2C92E66E00822CC4 /* XCLocalSwiftPackageReference "../sargon" */,
+				5B634A922C91D2A0004B2FBC /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */,
 			);
 			productRefGroup = 48CFBC502ADC106300E77A5C /* Products */;
 			projectDirPath = "";
@@ -7159,6 +7185,7 @@
 				48CFC3122ADC10D900E77A5C /* AccountsToImport.swift in Sources */,
 				E62449D62AFBA61100272C67 /* Home+AccountRow+View.swift in Sources */,
 				A40816682C7F14D4005E65B9 /* InfoLinkSheet+Reducer.swift in Sources */,
+				5B634AAE2C92F6EC004B2FBC /* UpdateP2PLinkName+Reducer.swift in Sources */,
 				A408154D2C7E0D08005E65B9 /* Extensions.swift in Sources */,
 				48CFC5FE2ADC10DA00E77A5C /* Account+PreviewValues.swift in Sources */,
 				A408157C2C7E0D08005E65B9 /* FungibleResourcesCollectionItemVaultAggregatedVault.swift in Sources */,
@@ -7234,9 +7261,9 @@
 				48CFC4002ADC10D900E77A5C /* Constants.swift in Sources */,
 				5B45E2FE2BC59780007C4C84 /* SignWithFactorSource+View.swift in Sources */,
 				5B45E2FF2BC59780007C4C84 /* SignWithFactorSource.swift in Sources */,
+				5B3C48C32C874C8D00DB160D /* Dispatch+Extra.swift in Sources */,
 				A40815842C7E0D08005E65B9 /* InvalidTransactionError.swift in Sources */,
 				836878612B4551910029C808 /* UnknownDappComponents+Reducer.swift in Sources */,
-				48CFC2782ADC10D900E77A5C /* P2PLinkRow+View.swift in Sources */,
 				83823EAA2B72365000827211 /* TokenPriceClient+Interface.swift in Sources */,
 				48CFC46D2ADC10DA00E77A5C /* PersonasClient+Interface.swift in Sources */,
 				48CFC2BB2ADC10D900E77A5C /* SelectBackup+Reducer.swift in Sources */,
@@ -7326,7 +7353,6 @@
 				48CFC2BF2ADC10D900E77A5C /* ImportMnemonicsFlowCoordinator.swift in Sources */,
 				48CFC3632ADC10D900E77A5C /* AssetsView+Reducer.swift in Sources */,
 				A408162F2C7E0D08005E65B9 /* StateNonFungibleLocationResponse.swift in Sources */,
-				48CFC2792ADC10D900E77A5C /* P2PLinkRow+Reducer.swift in Sources */,
 				48CFC30F2ADC10D900E77A5C /* ImportOlympiaWalletCoordinator.swift in Sources */,
 				E68878592BDBFD42003F3393 /* Stage2MigrateToSargon+LedgerHardwareWalletFactorSource+New.swift in Sources */,
 				A40815B02C7E0D08005E65B9 /* NativeResourceGlobalCallerResourceValue.swift in Sources */,
@@ -7346,6 +7372,7 @@
 				48CFC6202ADC10DA00E77A5C /* OnLedgerEntity.swift in Sources */,
 				5B80FCC42C298E68008444F5 /* ArbitraryDataFieldView.swift in Sources */,
 				8370FC5C2B99C780007AD882 /* NPSSurveyClient+Interface.swift in Sources */,
+				5B3C48B52C80D11E00DB160D /* AccountLockersClient+Interface.swift in Sources */,
 				5B526AED2C89C3C200AF8B72 /* ResourcesVisibilityClient+Live.swift in Sources */,
 				A408155B2C7E0D08005E65B9 /* AccountDepositPreValidationResourceSpecificBehaviourItem.swift in Sources */,
 				5B4712CC2C526146003B4712 /* HeaderButtonStyle.swift in Sources */,
@@ -7456,6 +7483,7 @@
 				83823EA72B722DB000827211 /* HTTPClient+Interface.swift in Sources */,
 				A40816152C7E0D08005E65B9 /* StateEntityMetadataPageRequest.swift in Sources */,
 				48CFC5972ADC10DA00E77A5C /* ToggleView.swift in Sources */,
+				5B634AB02C92F6FA004B2FBC /* UpdateP2PLinkName+View.swift in Sources */,
 				48CFC4892ADC10DA00E77A5C /* EntityMetadata+GWMetadata.swift in Sources */,
 				48CFC3512ADC10D900E77A5C /* DappHeader.swift in Sources */,
 				A40815742C7E0D08005E65B9 /* EntityNotFoundError.swift in Sources */,
@@ -7597,6 +7625,7 @@
 				A462B5A42B8384FB00C26D20 /* CoreAPI_PlaintextMessageContent.swift in Sources */,
 				48CFC4312ADC10DA00E77A5C /* PublicKey+Extensions.swift in Sources */,
 				48CFC2CE2ADC10D900E77A5C /* ReceivingAccount+Reducer.swift in Sources */,
+				5B3C48B92C80D23F00DB160D /* AccountLockersClient+Test.swift in Sources */,
 				48CFC3722ADC10D900E77A5C /* LSUDetails+View.swift in Sources */,
 				5B526AEC2C89C3C200AF8B72 /* ResourcesVisibilityClient+Interface.swift in Sources */,
 				48CFC47E2ADC10DA00E77A5C /* OverlayWindowClient+Live.swift in Sources */,
@@ -7764,6 +7793,7 @@
 				48CFC47A2ADC10DA00E77A5C /* LocalAuthenticationClient+Interface.swift in Sources */,
 				A40815682C7E0D08005E65B9 /* BlueprintMethodRoyalty.swift in Sources */,
 				48D5F3922BD8DDB9000DE964 /* DebugSettingsCoordinator+Reducer.swift in Sources */,
+				5B3C48B72C80D17E00DB160D /* AccountLockersClient+Live.swift in Sources */,
 				48CFC5A32ADC10DA00E77A5C /* TrailingIconLabelStyle.swift in Sources */,
 				48CFC4182ADC10DA00E77A5C /* IdentifiedArrayOf+Extensions.swift in Sources */,
 				48CFC3EB2ADC10D900E77A5C /* RTCClients.swift in Sources */,
@@ -7842,6 +7872,7 @@
 				48CFC6212ADC10DA00E77A5C /* AtLedgerState.swift in Sources */,
 				A40816082C7E0D08005E65B9 /* StateEntityDetailsResponseFungibleResourceDetails.swift in Sources */,
 				48CFC3F52ADC10D900E77A5C /* SignalingClientTypes.swift in Sources */,
+				5B526ADB2C876E7C00AF8B72 /* AccountLockerClaimDetails.swift in Sources */,
 				A408164D2C7E0D08005E65B9 /* TransactionReceipt.swift in Sources */,
 				A408156A2C7E0D08005E65B9 /* CommittedTransactionInfo.swift in Sources */,
 				A408162D2C7E0D08005E65B9 /* StateNonFungibleIdsResponse.swift in Sources */,
@@ -8032,6 +8063,7 @@
 				48CFC3FE2ADC10D900E77A5C /* RTCDataChannel+Delegate.swift in Sources */,
 				48CFC2FD2ADC10D900E77A5C /* DefaultDepositGuarantees+View.swift in Sources */,
 				48CFC5E02ADC10DA00E77A5C /* LoadableView.swift in Sources */,
+				5B3C48C12C85CEAA00DB160D /* AccountBannerView.swift in Sources */,
 				48CFC6012ADC10DA00E77A5C /* P2P+ConnectorExtension+Request.swift in Sources */,
 				A40815832C7E0D08005E65B9 /* InvalidRequestError.swift in Sources */,
 				48CFC5C22ADC10DA00E77A5C /* Shapes.swift in Sources */,
@@ -8875,14 +8907,6 @@
 				version = 0.5.0;
 			};
 		};
-		48FFFAE82ADC225B00B2B213 /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Sajjon/ScreenshotPreventing-iOS";
-			requirement = {
-				kind = exactVersion;
-				version = 0.0.1;
-			};
-		};
 		48FFFAEB2ADC226B00B2B213 /* XCRemoteSwiftPackageReference "CodeScanner" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/twostraws/CodeScanner";
@@ -8945,6 +8969,14 @@
 			requirement = {
 				kind = exactVersion;
 				version = 6.13.2;
+			};
+		};
+		5B634A922C91D2A0004B2FBC /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Sajjon/ScreenshotPreventing-iOS";
+			requirement = {
+				kind = revision;
+				revision = 03769bcd1b1c9c24af424890f0a3e6d15bd3000c;
 			};
 		};
 		8318BB172BC8403800057BCB /* XCRemoteSwiftPackageReference "swift-custom-dump" */ = {
@@ -9100,11 +9132,6 @@
 			package = 48FFFAE52ADC223300B2B213 /* XCRemoteSwiftPackageReference "swift-overture" */;
 			productName = Overture;
 		};
-		48FFFAE92ADC225B00B2B213 /* ScreenshotPreventing */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 48FFFAE82ADC225B00B2B213 /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */;
-			productName = ScreenshotPreventing;
-		};
 		48FFFAEC2ADC226B00B2B213 /* CodeScanner */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 48FFFAEB2ADC226B00B2B213 /* XCRemoteSwiftPackageReference "CodeScanner" */;
@@ -9174,6 +9201,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5B1C4FD32BBB0B0C00B9436F /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Strict" */;
 			productName = "AppsFlyerLib-Strict";
+		};
+		5B634A932C91D2A0004B2FBC /* ScreenshotPreventing */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5B634A922C91D2A0004B2FBC /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */;
+			productName = ScreenshotPreventing;
 		};
 		831F0CEC2C21819000D6F5BF /* Sargon */ = {
 			isa = XCSwiftPackageProductDependency;

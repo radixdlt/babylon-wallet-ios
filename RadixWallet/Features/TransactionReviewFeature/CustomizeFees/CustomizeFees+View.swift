@@ -126,7 +126,7 @@ extension CustomizeFees {
 					.multilineTextAlignment(.center)
 					.padding(.bottom, .medium2)
 
-				InfoButton(.transactionfee, label: L10n.CustomizeNetworkFees.howDoFeesWork)
+				InfoButton(.transactionfee, label: L10n.InfoLink.Title.transactionfee)
 					.padding(.bottom, .medium2)
 			}
 		}
@@ -161,10 +161,7 @@ extension CustomizeFees {
 				if viewState.insufficientBalance {
 					WarningErrorView(text: L10n.CustomizeNetworkFees.Warning.insufficientBalance, type: .error)
 				} else if viewState.linkingNewAccount {
-					HStack(alignment: .center, spacing: .small1) {
-						WarningErrorView(text: L10n.TransactionReview.FeePayerValidation.linksNewAccount, type: .warning)
-						InfoButton(.payingaccount)
-					}
+					WarningErrorView.transactionIntroducesNewAccount()
 				}
 			}
 		}

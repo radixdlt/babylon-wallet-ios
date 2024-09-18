@@ -34,6 +34,7 @@ public struct Splash: Sendable, FeatureReducer {
 		case passcodeConfigResult(TaskResult<LocalAuthenticationConfig>)
 		case biometricsCheckResult(TaskResult<Bool>)
 		case advancedLockStateLoaded(isEnabled: Bool)
+		case showAppLockMessage
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -53,6 +54,7 @@ public struct Splash: Sendable, FeatureReducer {
 			public enum ErrorAlert: Sendable, Equatable {
 				case retryVerifyPasscodeButtonTapped
 				case openSettingsButtonTapped
+				case appLockOkButtonTapped
 			}
 		}
 
@@ -64,6 +66,7 @@ public struct Splash: Sendable, FeatureReducer {
 	@Dependency(\.localAuthenticationClient) var localAuthenticationClient
 	@Dependency(\.onboardingClient) var onboardingClient
 	@Dependency(\.openURL) var openURL
+	@Dependency(\.userDefaults) var userDefaults
 
 	public init() {}
 
@@ -98,14 +101,25 @@ public struct Splash: Sendable, FeatureReducer {
 
 			if case let .loaded(profile) = profileState {
 				let isAdvancedLockEnabled = profile.appPreferences.security.isAdvancedLockEnabled
+
+				guard #available(iOS 18, *) else {
+					// For versions below iOS 18, perform the advanced lock state check
+					if isAdvancedLockEnabled {
+						#if targetEnvironment(simulator)
+						let isEnabled = _XCTIsTesting
+						#else
+						let isEnabled = true
+						#endif
+						await send(.internal(.advancedLockStateLoaded(isEnabled: isEnabled)))
+					} else {
+						await send(.internal(.advancedLockStateLoaded(isEnabled: false)))
+					}
+					return
+				}
+
 				// Starting with iOS 18, the system-provided biometric check will be used
-				if #unavailable(iOS 18), isAdvancedLockEnabled {
-					#if targetEnvironment(simulator)
-					let isEnabled = _XCTIsTesting
-					#else
-					let isEnabled = true
-					#endif
-					await send(.internal(.advancedLockStateLoaded(isEnabled: isEnabled)))
+				if isAdvancedLockEnabled, !userDefaults.appLockMessageShown {
+					await send(.internal(.showAppLockMessage))
 				} else {
 					await send(.internal(.advancedLockStateLoaded(isEnabled: false)))
 				}
@@ -151,11 +165,9 @@ public struct Splash: Sendable, FeatureReducer {
 		case let .biometricsCheckResult(.failure(error)):
 			state.biometricsCheckFailed = true
 			state.destination = .errorAlert(.init(
-				title: .init(L10n.Common.errorAlertTitle),
-				message: .init(error.localizedDescription),
-				buttons: [
-					.default(.init(L10n.Common.ok)),
-				]
+				title: { .init(L10n.Common.errorAlertTitle) },
+				actions: { .default(.init(L10n.Common.ok)) },
+				message: { .init(error.localizedDescription) }
 			))
 			return .none
 
@@ -166,17 +178,35 @@ public struct Splash: Sendable, FeatureReducer {
 			}
 
 			return delegateCompleted(context: state.context)
+
+		case .showAppLockMessage:
+			state.destination = .errorAlert(.init(
+				title: { .init(L10n.Biometrics.AppLockAvailableAlert.title) },
+				actions: {
+					.default(
+						.init(L10n.Common.dismiss),
+						action: .send(.appLockOkButtonTapped)
+					)
+				},
+				message: { .init(L10n.Biometrics.AppLockAvailableAlert.message) }
+			))
+			return .none
 		}
 	}
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .errorAlert(.retryVerifyPasscodeButtonTapped):
-			verifyPasscode()
+			return verifyPasscode()
+
 		case .errorAlert(.openSettingsButtonTapped):
-			.run { _ in
+			return .run { _ in
 				await openURL(URL(string: UIApplication.openSettingsURLString)!)
 			}
+
+		case .errorAlert(.appLockOkButtonTapped):
+			userDefaults.setAppLockMessageShown(true)
+			return .send(.internal(.advancedLockStateLoaded(isEnabled: false)))
 		}
 	}
 

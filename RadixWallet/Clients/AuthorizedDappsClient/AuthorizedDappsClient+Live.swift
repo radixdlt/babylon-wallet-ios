@@ -12,6 +12,9 @@ extension AuthorizedDappsClient: DependencyKey {
 				}
 				return network.authorizedDapps.asIdentified()
 			},
+			authorizedDappValues: {
+				await profileStore.authorizedDappValues()
+			},
 			addAuthorizedDapp: { newDapp in
 				try await profileStore.updating {
 					_ = try $0.addAuthorizedDapp(newDapp)

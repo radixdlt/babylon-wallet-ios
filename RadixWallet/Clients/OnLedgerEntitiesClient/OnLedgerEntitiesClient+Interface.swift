@@ -18,7 +18,7 @@ extension OnLedgerEntitiesClient {
 	public typealias GetNonFungibleTokenData = @Sendable (GetNonFungibleTokenDataRequest) async throws -> [OnLedgerEntity.NonFungibleToken]
 	public typealias GetAccountOwnedNonFungibleTokenData = @Sendable (GetAccountOwnedNonFungibleTokenDataRequest) async throws -> GetAccountOwnedNonFungibleTokenResponse
 
-	public typealias GetEntities = @Sendable ([Address], Set<EntityMetadataKey>, AtLedgerState?, CachingStrategy, _ fetchMetadata: Bool) async throws -> [OnLedgerEntity]
+	public typealias GetEntities = @Sendable ([Address], GatewayAPI.StateEntityDetailsOptIns, AtLedgerState?, CachingStrategy, _ fetchMetadata: Bool) async throws -> [OnLedgerEntity]
 }
 
 // MARK: OnLedgerEntitiesClient.GetNonFungibleTokenDataRequest
@@ -154,7 +154,7 @@ extension OnLedgerEntitiesClient {
 	) async throws -> [OnLedgerEntity] {
 		try await getEntities(
 			addresses,
-			metadataKeys,
+			.init(explicitMetadata: metadataKeys.map(\.rawValue)),
 			atLedgerState,
 			cachingStrategy,
 			fetchMetadata
@@ -220,10 +220,11 @@ extension OnLedgerEntitiesClient {
 		atLedgerState: AtLedgerState? = nil
 	) async throws -> [OnLedgerEntity.AssociatedDapp] {
 		try await getEntities(
-			addresses: addresses.map(\.asGeneral),
-			metadataKeys: .dappMetadataKeys,
-			cachingStrategy: cachingStrategy,
-			atLedgerState: atLedgerState
+			addresses.map(\.asGeneral),
+			.dappDetails,
+			atLedgerState,
+			cachingStrategy,
+			false
 		)
 		.compactMap(\.account)
 		.map { .init(address: $0.address, metadata: $0.metadata) }
@@ -541,11 +542,11 @@ extension OnLedgerEntitiesClient {
 			!hiddenResources.contains(.poolUnit(poolUnit.resourcePoolAddress))
 		}
 		let pools = try await getEntities(
-			ownedPoolUnits.map(\.resourcePoolAddress).map(\.asGeneral),
-			[.dappDefinition],
-			account.atLedgerState,
-			cachingStrategy,
-			false
+			addresses: ownedPoolUnits.map(\.resourcePoolAddress).map(\.asGeneral),
+			metadataKeys: [.dappDefinition],
+			cachingStrategy: cachingStrategy,
+			atLedgerState: account.atLedgerState,
+			fetchMetadata: false
 		).compactMap(\.resourcePool)
 
 		var allResourceAddresses: [ResourceAddress] = []
@@ -627,6 +628,15 @@ extension OnLedgerEntitiesClient {
 			poolUnitResource: poolUnitResource,
 			xrdResource: xrdResourceDetails,
 			nonXrdResources: nonXrdResourceDetails
+		)
+	}
+}
+
+extension GatewayAPI.StateEntityDetailsOptIns {
+	static var dappDetails: Self {
+		.init(
+			explicitMetadata: Set<EntityMetadataKey>.dappMetadataKeys.map(\.rawValue),
+			dappTwoWayLinks: true
 		)
 	}
 }

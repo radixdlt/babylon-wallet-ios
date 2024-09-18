@@ -19,6 +19,7 @@ extension DappInteractionClient {
 	public enum WalletInteraction: String, Sendable, Hashable {
 		case accountDepositSettings
 		case accountTransfer
+		case accountLockerClaim
 	}
 
 	public typealias AddWalletInteraction = @Sendable (_ items: DappToWalletInteractionItems, _ interaction: WalletInteraction) async -> P2P.RTCOutgoingMessage.Response?
@@ -38,8 +39,12 @@ extension WalletInteractionId {
 		hasPrefix(DappInteractionClient.WalletInteraction.accountTransfer.rawValue)
 	}
 
+	public var isWalletAccountLockerClaimInteraction: Bool {
+		hasPrefix(DappInteractionClient.WalletInteraction.accountLockerClaim.rawValue)
+	}
+
 	public var isWalletInteraction: Bool {
-		isWalletAccountTransferInteraction || isWalletAccountDepositSettingsInteraction
+		isWalletAccountTransferInteraction || isWalletAccountDepositSettingsInteraction || isWalletAccountLockerClaimInteraction
 	}
 }
 
