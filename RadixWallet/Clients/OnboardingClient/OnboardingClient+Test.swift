@@ -19,6 +19,6 @@ extension OnboardingClient: TestDependencyKey {
 	public static let noop = Self(
 		loadProfileState: { fatalError("noop") },
 		createNewProfile: { fatalError("noop") },
-		finishOnboardingWithRecoveredAccountAndBDFS: { _ in EqVoid.instance }
+		finishOnboardingWithRecoveredAccountAndBDFS: { _ in }
 	)
 }

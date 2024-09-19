@@ -36,7 +36,7 @@ extension AppPreferencesClient {
 	public typealias GetPreferences = @Sendable () async -> AppPreferences
 	public typealias UpdatePreferences = @Sendable (AppPreferences) async throws -> Void
 	public typealias ExtractProfile = @Sendable () async -> Profile
-	public typealias DeleteProfile = @Sendable (_ keepInICloudIfPresent: Bool) async throws -> Void
+	public typealias DeleteProfile = @Sendable () async throws -> Void
 }
 
 extension AppPreferencesClient {

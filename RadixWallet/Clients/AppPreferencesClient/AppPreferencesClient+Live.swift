@@ -17,7 +17,7 @@ extension AppPreferencesClient: DependencyKey {
 			extractProfile: {
 				await profileStore.profile()
 			},
-			deleteProfileAndFactorSources: { _ in
+			deleteProfileAndFactorSources: {
 				try await profileStore.deleteProfile()
 			},
 			setIsCloudBackupEnabled: { isEnabled in

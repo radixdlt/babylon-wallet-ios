@@ -198,7 +198,7 @@ extension CloudBackupClient {
 
 		/// Updates the `lastUsedOnDevice` to use this device, on `profile`
 		/// - Parameter profile: Profile to update `lastUsedOnDevice` of
-		public func claimOwnership(of profile: inout Profile) {
+		func claimOwnership(of profile: inout Profile) {
 			@Dependency(\.date) var date
 			let deviceInfo = (try? secureStorageClient.loadDeviceInfo()) ?? DeviceInfo(id: .init())
 
