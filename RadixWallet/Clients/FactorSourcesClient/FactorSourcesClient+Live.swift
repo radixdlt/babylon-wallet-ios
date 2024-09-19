@@ -197,10 +197,12 @@ extension FactorSourcesClient: DependencyKey {
 
 				loggerGlobal.info("Creating new main BDFS")
 
-				var newBDFS = await DeviceFactorSource.babylon(
+				let hostInfo = await SargonOS.shared.resolveHostInfo()
+
+				let newBDFS = DeviceFactorSource.babylon(
 					mnemonicWithPassphrase: mnemonicWithPassphrase,
 					isMain: true,
-					hostInfo: SargonOS.shared.resolveHostInfo()
+					hostInfo: hostInfo
 				)
 
 				assert(newBDFS.isExplicitMainBDFS)

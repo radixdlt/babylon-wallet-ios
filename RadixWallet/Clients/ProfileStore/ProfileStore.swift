@@ -1,6 +1,8 @@
 import Sargon
 
 // MARK: - ProfileStore
+// Until we fully migrate to have everything Profile in SargonOS, this will be kept in place.
+// The next steps for migration are outlined in https://radixdlt.atlassian.net/browse/ABW-3590.
 public final actor ProfileStore {
 	public static let shared = ProfileStore()
 

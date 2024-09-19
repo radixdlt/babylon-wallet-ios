@@ -136,10 +136,11 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 			switch delegateAction {
 			case let .notPersisted(mnemonicWithPassphrase):
 				return .run { send in
-					let mainBDFS = await DeviceFactorSource.babylon(
+					let hostInfo = await SargonOS.shared.resolveHostInfo()
+					let mainBDFS = DeviceFactorSource.babylon(
 						mnemonicWithPassphrase: mnemonicWithPassphrase,
 						isMain: true,
-						hostInfo: SargonOS.shared.resolveHostInfo()
+						hostInfo: hostInfo
 					)
 
 					let privateHD = PrivateHierarchicalDeterministicFactorSource(

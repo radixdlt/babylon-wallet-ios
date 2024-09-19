@@ -267,17 +267,18 @@ extension FactorSourcesClient {
 	) async throws -> DeviceFactorSource {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 
+		let hostInfo = await SargonOS.shared.resolveHostInfo()
 		let factorSource = switch onDeviceMnemonicKind {
 		case let .babylon(isMain):
-			await DeviceFactorSource.babylon(
+			DeviceFactorSource.babylon(
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
 				isMain: isMain,
-				hostInfo: SargonOS.shared.resolveHostInfo()
+				hostInfo: hostInfo
 			)
 		case .olympia:
-			await DeviceFactorSource.olympia(
+			DeviceFactorSource.olympia(
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
-				hostInfo: SargonOS.shared.resolveHostInfo()
+				hostInfo: hostInfo
 			)
 		}
 

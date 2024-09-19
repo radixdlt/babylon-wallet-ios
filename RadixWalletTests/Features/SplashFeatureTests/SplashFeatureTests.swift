@@ -22,10 +22,10 @@ final class SplashFeatureTests: TestCase {
 			)
 
 			$0.continuousClock = clock
-			$0.onboardingClient.loadProfile = {
+			$0.onboardingClient.loadProfileState = {
 				var profile = Profile.withOneAccount
 				profile.appPreferences.security.isAdvancedLockEnabled = true
-				return profile
+				return .loaded(profile)
 			}
 		}
 

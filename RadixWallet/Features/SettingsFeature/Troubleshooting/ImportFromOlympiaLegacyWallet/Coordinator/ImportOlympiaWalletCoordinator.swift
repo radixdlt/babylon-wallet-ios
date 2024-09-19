@@ -413,9 +413,10 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			)
 
 			return .run { send in
-				let privateHDFactorSource = await PrivateHierarchicalDeterministicFactorSource.olympia(
+				let hostInfo = await SargonOS.shared.resolveHostInfo()
+				let privateHDFactorSource = PrivateHierarchicalDeterministicFactorSource.olympia(
 					mnemonicWithPassphrase: mnemonicWithPassphrase,
-					hostInfo: SargonOS.shared.resolveHostInfo()
+					hostInfo: hostInfo
 				)
 
 				await send(.internal(.createdOlympiaPrivateHDForAccounts(privateHDFactorSource, progress.softwareAccountsToMigrate)))

@@ -163,10 +163,7 @@ private func configureTestClients(
 	d.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { _, _ in }
 	d.secureStorageClient.deleteMnemonicByFactorSourceID = { _ in }
 	d.secureStorageClient.saveMnemonicForFactorSource = { _ in }
-	d.secureStorageClient.saveProfileSnapshot = { _ in }
 	d.secureStorageClient.loadProfileSnapshotData = { _ in nil }
-	d.secureStorageClient.loadProfileSnapshot = { _ in nil }
-	d.secureStorageClient.loadProfile = { _ in nil }
 	d.date = .constant(Date(timeIntervalSince1970: 0))
 }
 
