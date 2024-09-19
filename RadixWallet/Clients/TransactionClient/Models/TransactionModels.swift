@@ -40,6 +40,7 @@ extension GatewayAPI.TransactionPreviewRequest {
 		let notaryIsSignatory = transactionSigners.notaryIsSignatory
 
 		self.init(
+			optIns: .init(radixEngineToolkitReceipt: true),
 			manifest: rawManifest.instructionsString,
 			blobsHex: rawManifest.blobs.blobs.map(\.hex),
 			startEpochInclusive: .init(header.startEpochInclusive),
