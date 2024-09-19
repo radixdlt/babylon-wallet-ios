@@ -180,6 +180,7 @@ extension TransactionClient {
 			guard transactionPreviewResponse.receipt.status == .succeeded else {
 				throw TransactionFailure.fromFailedTXReviewResponse(transactionPreviewResponse)
 			}
+			print("M- \(transactionPreviewResponse.radixEngineToolkitReceiptData)")
 			let receiptBytes = try Data(hex: transactionPreviewResponse.encodedReceipt)
 
 			/// Analyze the manifest
@@ -393,5 +394,14 @@ extension TransactionFailure {
 		} else {
 			return .failedToPrepareTXReview(.failedToRetrieveTXReceipt(message))
 		}
+	}
+}
+
+private extension GatewayAPI.TransactionPreviewResponse {
+	var radixEngineToolkitReceiptData: Data? {
+		guard let dictionary = radixEngineToolkitReceipt?.value as? [String: Any] else {
+			return nil
+		}
+		return try? JSONSerialization.data(withJSONObject: dictionary, options: [])
 	}
 }
