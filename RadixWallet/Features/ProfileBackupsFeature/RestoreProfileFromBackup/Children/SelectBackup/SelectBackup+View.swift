@@ -27,7 +27,7 @@ extension SelectBackup {
 							viewStore.selectedProfile,
 							forAction: { viewStore.send(.tappedUseCloudBackup($0.id)) },
 							control: { action in
-								Button(L10n.IOSProfileBackup.useICloudBackup, action: action)
+								Button(L10n.Common.continue, action: action)
 									.buttonStyle(.primaryRectangular)
 							}
 						)
@@ -55,14 +55,17 @@ extension SelectBackup.View {
 	private func coreView(_ store: StoreOf<SelectBackup>, with viewStore: ViewStoreOf<SelectBackup>) -> some View {
 		ScrollView {
 			VStack(spacing: .medium1) {
-				Text(L10n.RecoverProfileBackup.Header.title)
-					.multilineTextAlignment(.center)
-					.textStyle(.sheetTitle)
+				VStack(spacing: .medium3) {
+					Text(L10n.RecoverProfileBackup.Header.title)
+						.textStyle(.sheetTitle)
 
-				Text(L10n.RecoverProfileBackup.Header.subtitle)
-					.textStyle(.body1Regular)
+					Text(L10n.RecoverProfileBackup.Header.subtitle)
+						.textStyle(.body1Regular)
+				}
+				.multilineTextAlignment(.center)
+				.padding(.horizontal, .small2)
 
-				Text(L10n.IOSRecoverProfileBackup.Choose.title)
+				Text(L10n.RecoverProfileBackup.Choose.ios)
 					.textStyle(.body1Header)
 
 				switch viewStore.status {
@@ -70,40 +73,52 @@ extension SelectBackup.View {
 					ProgressView()
 				case .loaded:
 					backupsList(with: viewStore)
-				case let .failed(reason):
-					let text = switch reason {
-					case .accountTemporarilyUnavailable, .notAuthenticated:
-						L10n.IOSRecoverProfileBackup.notLoggedInToICloud
-					case .networkUnavailable:
-						L10n.IOSRecoverProfileBackup.networkUnavailable
-					case .other:
-						L10n.IOSRecoverProfileBackup.couldNotLoadBackups
-					}
-					NoContentView(text)
+				case .failed(.accountTemporarilyUnavailable), .failed(.notAuthenticated):
+					failureBox(message: L10n.RecoverProfileBackup.NotLoggedIn.ios)
+				case .failed(.networkUnavailable):
+					failureBox(message: L10n.RecoverProfileBackup.networkUnavailable)
+				case .failed(.other):
+					failureBox(message: L10n.RecoverProfileBackup.couldNotLoadBackups)
 				}
 
-				VStack(alignment: .center, spacing: .small1) {
-					selectFileInsteadButton(with: store)
-					Divider()
-					restoreWithoutProfile(with: store)
+				Button(L10n.RecoverProfileBackup.ImportFileButton.title) {
+					store.send(.view(.importFromFileInstead))
 				}
+				.buttonStyle(.alternativeRectangular)
+
+				Divider()
+
+				VStack(spacing: .medium3) {
+					Text(L10n.RecoverProfileBackup.backupNotAvailable)
+						.textStyle(.body1Header)
+
+					Button(L10n.RecoverProfileBackup.otherRestoreOptionsButton) {
+						store.send(.view(.otherRestoreOptionsTapped))
+					}
+					.buttonStyle(.secondaryRectangular(shouldExpand: true))
+				}
+				.padding(.horizontal, .medium1)
 			}
+			.padding(.horizontal, .medium1)
+			.padding(.bottom, .medium1)
 			.foregroundColor(.app.gray1)
-			.padding(.medium2)
 		}
-		.modifier {
-			if #available(iOS 17, *) {
-				$0.scrollIndicatorsFlash(onAppear: true)
-			} else {
-				$0
-			}
-		}
+	}
+
+	private func failureBox(message: String) -> some View {
+		Text(message)
+			.textStyle(.body1Regular)
+			.foregroundStyle(.app.gray2)
+			.padding(.vertical, .large1)
+			.padding(.horizontal, .large2)
+			.frame(maxWidth: .infinity)
+			.background(.app.gray5)
+			.roundedCorners(radius: .small1)
 	}
 
 	@MainActor
 	private func backupsList(with viewStore: ViewStoreOf<SelectBackup>) -> some View {
-		// TODO: This is speculative design, needs to be updated once we have the proper design
-		VStack(spacing: .medium1) {
+		VStack(spacing: .medium2) {
 			if let backedUpProfiles = viewStore.backedUpProfiles {
 				Selection(
 					viewStore.binding(get: \.selectedProfile) { .selectedProfile($0) },
@@ -112,10 +127,9 @@ extension SelectBackup.View {
 					cloudBackupDataCard(item, viewStore: viewStore)
 				}
 			} else {
-				NoContentView(L10n.IOSRecoverProfileBackup.noBackupsAvailable)
+				failureBox(message: L10n.RecoverProfileBackup.NoBackupsAvailable.ios)
 			}
 		}
-		.padding(.horizontal, .medium3)
 	}
 
 	@MainActor
@@ -125,67 +139,46 @@ extension SelectBackup.View {
 	) -> some View {
 		let header = item.value
 		let isVersionCompatible = header.isVersionCompatible()
-		let lastDevice = header.lastUsedOnDevice.id == viewStore.thisDeviceID ? L10n.IOSProfileBackup.thisDevice : header.lastUsedOnDevice.description
-		return Card(action: item.action) {
-			HStack {
-				VStack(alignment: .leading, spacing: 0) {
-					Group {
-						// Contains bold text segments.
-						Text(LocalizedStringKey(L10n.RecoverProfileBackup.backupFrom(lastDevice)))
-						Text(L10n.IOSProfileBackup.lastModifedDateLabel(formatDate(header.lastModified)))
+		let lastDevice = header.lastUsedOnDevice.id == viewStore.thisDeviceID ? L10n.RecoverProfileBackup.thisDevice : header.lastUsedOnDevice.description
 
-						Text(L10n.IOSProfileBackup.totalAccountsNumberLabel(Int(header.contentHint.numberOfAccountsOnAllNetworksInTotal)))
-						Text(L10n.IOSProfileBackup.totalPersonasNumberLabel(Int(header.contentHint.numberOfPersonasOnAllNetworksInTotal)))
+		let values: [String] = [
+			L10n.RecoverProfileBackup.backupFrom(lastDevice),
+			L10n.RecoverProfileBackup.lastModified(header.lastModified.formatted(date: .long, time: .omitted)),
+			L10n.RecoverProfileBackup.numberOfAccounts(Int(header.contentHint.numberOfAccountsOnAllNetworksInTotal)),
+			L10n.RecoverProfileBackup.numberOfPersonas(Int(header.contentHint.numberOfPersonasOnAllNetworksInTotal)),
+		]
+
+		return Card(.app.gray5) {
+			HStack(spacing: .zero) {
+				VStack(alignment: .leading, spacing: .small3) {
+					ForEachStatic(values) {
+						Text(markdown: $0, emphasizedColor: .app.gray2, emphasizedFont: .app.body2Link)
 					}
 					.foregroundColor(.app.gray2)
 					.textStyle(.body2Regular)
 
 					if !isVersionCompatible {
-						Text(L10n.IOSProfileBackup.incompatibleWalletDataLabel)
+						Text(L10n.RecoverProfileBackup.incompatibleWalletDataLabel)
 							.foregroundColor(.red)
 							.textStyle(.body2HighImportance)
 					}
 				}
+
+				Spacer(minLength: .small2)
+
 				if isVersionCompatible {
-					Spacer()
 					RadioButton(
 						appearance: .dark,
 						state: item.isSelected ? .selected : .unselected
 					)
 				}
 			}
-			.padding(.medium3)
-			.frame(maxWidth: .infinity, alignment: .leading)
+			.padding(.top, .medium2)
+			.padding(.horizontal, .medium1)
+			.padding(.bottom, .medium3)
 		}
 		.disabled(!isVersionCompatible)
-	}
-
-	@MainActor
-	func formatDate(_ date: Date) -> String {
-		date.ISO8601Format(.iso8601Date(timeZone: .current))
-	}
-
-	@MainActor
-	private func selectFileInsteadButton(with store: StoreOf<SelectBackup>) -> some View {
-		secondaryButton(title: L10n.RecoverProfileBackup.ImportFileButton.title, store: store, action: .importFromFileInstead)
-	}
-
-	@MainActor
-	@ViewBuilder
-	private func restoreWithoutProfile(with store: StoreOf<SelectBackup>) -> some View {
-		Text(L10n.RecoverProfileBackup.backupNotAvailable)
-			.textStyle(.body1Header)
-			.foregroundColor(.app.gray1)
-
-		secondaryButton(title: L10n.RecoverProfileBackup.otherRestoreOptionsButton, store: store, action: .otherRestoreOptionsTapped)
-	}
-
-	@MainActor
-	private func secondaryButton(title: String, store: StoreOf<SelectBackup>, action: SelectBackup.ViewAction) -> some View {
-		Button(title) {
-			store.send(.view(action))
-		}
-		.buttonStyle(.alternativeRectangular)
+		.onTapGesture(perform: item.action)
 	}
 }
 
