@@ -22,11 +22,11 @@ public struct TransactionPreviewResponse: Codable, Hashable {
     /** An optional field which is only provided if the `request_radix_engine_toolkit_receipt` flag is set to true when requesting a transaction preview from the API. This receipt is primarily intended for use with the toolkit and may contain information that is already available in the receipt provided in the `receipt` field of this response. A typical client of this API is not expected to use this receipt. The primary clients this receipt is intended for is the Radix wallet or any client that needs to perform execution summaries on their transactions.  */
     public private(set) var radixEngineToolkitReceipt: AnyCodable?
     /** This type is defined in the Core API as `TransactionReceipt`. See the Core API documentation for more details.  */
-    public private(set) var receipt: AnyCodable
+	public private(set) var receipt: CoreAPI.TransactionReceipt
     public private(set) var resourceChanges: [AnyCodable]
     public private(set) var logs: [TransactionPreviewResponseLogsInner]
 
-    public init(encodedReceipt: String, radixEngineToolkitReceipt: AnyCodable? = nil, receipt: AnyCodable, resourceChanges: [AnyCodable], logs: [TransactionPreviewResponseLogsInner]) {
+	public init(encodedReceipt: String, radixEngineToolkitReceipt: AnyCodable? = nil, receipt: CoreAPI.TransactionReceipt, resourceChanges: [AnyCodable], logs: [TransactionPreviewResponseLogsInner]) {
         self.encodedReceipt = encodedReceipt
         self.radixEngineToolkitReceipt = radixEngineToolkitReceipt
         self.receipt = receipt
