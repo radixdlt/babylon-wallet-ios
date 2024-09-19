@@ -20,7 +20,7 @@ public struct FactorSourceAccess: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Hashable {
-		case isConnectedToAnyConnectorExtension(Bool)
+		case hasP2PLinks(Bool)
 	}
 
 	public enum DelegateAction: Sendable, Hashable {
@@ -48,7 +48,7 @@ public struct FactorSourceAccess: Sendable, FeatureReducer {
 		}
 	}
 
-	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
+	@Dependency(\.p2pLinksClient) var p2pLinksClient
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -75,8 +75,8 @@ public struct FactorSourceAccess: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .isConnectedToAnyConnectorExtension(isConnected):
-			if !isConnected {
+		case let .hasP2PLinks(hasP2PLinks):
+			if !hasP2PLinks {
 				state.destination = .noP2PLink(.noP2Plink)
 			}
 			return .none
@@ -100,12 +100,10 @@ public struct FactorSourceAccess: Sendable, FeatureReducer {
 			return .none
 		}
 		return .run { send in
-			for try await isConnected in await ledgerHardwareWalletClient.isConnectedToAnyConnectorExtension() {
-				guard !Task.isCancelled else { return }
-				await send(.internal(.isConnectedToAnyConnectorExtension(isConnected)))
-			}
+			let result = await p2pLinksClient.hasP2PLinks()
+			await send(.internal(.hasP2PLinks(result)))
 		} catch: { error, _ in
-			loggerGlobal.error("failed to get links updates, error: \(error)")
+			loggerGlobal.error("failed to check if has p2p links, error: \(error)")
 		}
 	}
 }
