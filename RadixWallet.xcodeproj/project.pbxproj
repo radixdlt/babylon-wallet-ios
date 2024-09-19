@@ -738,9 +738,9 @@
 		5B526AEC2C89C3C200AF8B72 /* ResourcesVisibilityClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B526AE82C89C3C200AF8B72 /* ResourcesVisibilityClient+Interface.swift */; };
 		5B526AED2C89C3C200AF8B72 /* ResourcesVisibilityClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B526AE92C89C3C200AF8B72 /* ResourcesVisibilityClient+Live.swift */; };
 		5B526AEE2C89C3C200AF8B72 /* ResourcesVisibilityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B526AEA2C89C3C200AF8B72 /* ResourcesVisibilityClient+Test.swift */; };
+		5B634A942C91D2A0004B2FBC /* ScreenshotPreventing in Frameworks */ = {isa = PBXBuildFile; productRef = 5B634A932C91D2A0004B2FBC /* ScreenshotPreventing */; };
 		5B634AAE2C92F6EC004B2FBC /* UpdateP2PLinkName+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B634AAD2C92F6EC004B2FBC /* UpdateP2PLinkName+Reducer.swift */; };
 		5B634AB02C92F6FA004B2FBC /* UpdateP2PLinkName+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B634AAF2C92F6FA004B2FBC /* UpdateP2PLinkName+View.swift */; };
-		5B634A942C91D2A0004B2FBC /* ScreenshotPreventing in Frameworks */ = {isa = PBXBuildFile; productRef = 5B634A932C91D2A0004B2FBC /* ScreenshotPreventing */; };
 		5B6499B72BCFD0E8000F2176 /* SecurityFactors+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B52BCFD0E8000F2176 /* SecurityFactors+View.swift */; };
 		5B6499B82BCFD0E8000F2176 /* SecurityFactors+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B62BCFD0E8000F2176 /* SecurityFactors+Reducer.swift */; };
 		5B6499BA2BCFDB1E000F2176 /* ShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B92BCFDB1E000F2176 /* ShareView.swift */; };
@@ -769,6 +769,7 @@
 		5BBC7DAA2C403F3400B04BD6 /* AccountCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC7DA92C403F3400B04BD6 /* AccountCard.swift */; };
 		5BC82B6C2BED18A1009AC162 /* FactoryReset+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC82B6A2BED18A1009AC162 /* FactoryReset+View.swift */; };
 		5BC82B6D2BED18A1009AC162 /* FactoryReset+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC82B6B2BED18A1009AC162 /* FactoryReset+Reducer.swift */; };
+		5BE2776B2C9C7FE0005FF976 /* TransactionPreviewOptIns.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE2776A2C9C7FE0005FF976 /* TransactionPreviewOptIns.swift */; };
 		5BEB9CD22C6F6B24001FD9D4 /* HideResource+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEB9CD02C6F6B24001FD9D4 /* HideResource+View.swift */; };
 		5BEB9CD32C6F6B24001FD9D4 /* HIdeResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEB9CD12C6F6B24001FD9D4 /* HIdeResource.swift */; };
 		5BEB9CD52C6F6CC9001FD9D4 /* ConfirmationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEB9CD42C6F6CC9001FD9D4 /* ConfirmationView.swift */; };
@@ -1979,6 +1980,7 @@
 		5BBC7DA92C403F3400B04BD6 /* AccountCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountCard.swift; sourceTree = "<group>"; };
 		5BC82B6A2BED18A1009AC162 /* FactoryReset+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactoryReset+View.swift"; sourceTree = "<group>"; };
 		5BC82B6B2BED18A1009AC162 /* FactoryReset+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactoryReset+Reducer.swift"; sourceTree = "<group>"; };
+		5BE2776A2C9C7FE0005FF976 /* TransactionPreviewOptIns.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionPreviewOptIns.swift; sourceTree = "<group>"; };
 		5BEB9CD02C6F6B24001FD9D4 /* HideResource+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HideResource+View.swift"; sourceTree = "<group>"; };
 		5BEB9CD12C6F6B24001FD9D4 /* HIdeResource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HIdeResource.swift; sourceTree = "<group>"; };
 		5BEB9CD42C6F6CC9001FD9D4 /* ConfirmationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmationView.swift; sourceTree = "<group>"; };
@@ -6021,6 +6023,7 @@
 				A408152C2C7E0D08005E65B9 /* TransactionNotFoundError.swift */,
 				A408152D2C7E0D08005E65B9 /* TransactionPayloadGatewayHandlingStatus.swift */,
 				A408152E2C7E0D08005E65B9 /* TransactionPayloadStatus.swift */,
+				5BE2776A2C9C7FE0005FF976 /* TransactionPreviewOptIns.swift */,
 				A408152F2C7E0D08005E65B9 /* TransactionPreviewRequest.swift */,
 				A40815302C7E0D08005E65B9 /* TransactionPreviewRequestFlags.swift */,
 				A40815312C7E0D08005E65B9 /* TransactionPreviewResponse.swift */,
@@ -7839,6 +7842,7 @@
 				48CFC2CA2ADC10D900E77A5C /* NonFungibleResourceAsset+View.swift in Sources */,
 				48CFC3452ADC10D900E77A5C /* Completion+View.swift in Sources */,
 				5B43B08B2BDAAD4B00AA1E92 /* AddressDetails+View.swift in Sources */,
+				5BE2776B2C9C7FE0005FF976 /* TransactionPreviewOptIns.swift in Sources */,
 				5B43B08C2BDAAD4B00AA1E92 /* AddressDetails.swift in Sources */,
 				A40815CD2C7E0D08005E65B9 /* PackageCodeCollection.swift in Sources */,
 				48CFC3682ADC10D900E77A5C /* NonFungibleAssetRow+View.swift in Sources */,
