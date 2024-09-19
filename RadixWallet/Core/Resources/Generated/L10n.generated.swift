@@ -1950,8 +1950,6 @@ public enum L10n {
     }
     /// Unable to find wallet backup in iCloud.
     public static let profileNotFoundInCloud = L10n.tr("Localizable", "iOSProfileBackup_profileNotFoundInCloud", fallback: "Unable to find wallet backup in iCloud.")
-    /// This Device
-    public static let thisDevice = L10n.tr("Localizable", "iOSProfileBackup_thisDevice", fallback: "This Device")
     /// Number of Accounts: %d
     public static func totalAccountsNumberLabel(_ p1: Int) -> String {
       return L10n.tr("Localizable", "iOSProfileBackup_totalAccountsNumberLabel", p1, fallback: "Number of Accounts: %d")
@@ -1993,20 +1991,6 @@ public enum L10n {
       public static let subtitle = L10n.tr("Localizable", "iOSProfileBackup_profileSync_subtitle", fallback: "Warning: If disabled you might lose access to your Accounts and Personas.")
       /// Sync Wallet Data to iCloud
       public static let title = L10n.tr("Localizable", "iOSProfileBackup_profileSync_title", fallback: "Sync Wallet Data to iCloud")
-    }
-  }
-  public enum IOSRecoverProfileBackup {
-    /// Could not load backups
-    public static let couldNotLoadBackups = L10n.tr("Localizable", "iOSRecoverProfileBackup_couldNotLoadBackups", fallback: "Could not load backups")
-    /// Network unavailable
-    public static let networkUnavailable = L10n.tr("Localizable", "iOSRecoverProfileBackup_networkUnavailable", fallback: "Network unavailable")
-    /// No wallet backups available on current iCloud account
-    public static let noBackupsAvailable = L10n.tr("Localizable", "iOSRecoverProfileBackup_noBackupsAvailable", fallback: "No wallet backups available on current iCloud account")
-    /// Not logged in to iCloud
-    public static let notLoggedInToICloud = L10n.tr("Localizable", "iOSRecoverProfileBackup_notLoggedInToICloud", fallback: "Not logged in to iCloud")
-    public enum Choose {
-      /// Choose a backup on iCloud
-      public static let title = L10n.tr("Localizable", "iOSRecoverProfileBackup_choose_title", fallback: "Choose a backup on iCloud")
     }
   }
   public enum ImportMnemonic {
@@ -2970,8 +2954,6 @@ public enum L10n {
     public static let passwordWrong = L10n.tr("Localizable", "recoverProfileBackup_passwordWrong", fallback: "The password is wrong")
     /// This Device
     public static let thisDevice = L10n.tr("Localizable", "recoverProfileBackup_thisDevice", fallback: "This Device")
-    /// Update in System Settings
-    public static let updateSystemSetings = L10n.tr("Localizable", "recoverProfileBackup_updateSystemSetings", fallback: "Update in System Settings")
     public enum Choose {
       /// Choose a backup on iCloud
       public static let ios = L10n.tr("Localizable", "recoverProfileBackup_choose_iOS", fallback: "Choose a backup on iCloud")
