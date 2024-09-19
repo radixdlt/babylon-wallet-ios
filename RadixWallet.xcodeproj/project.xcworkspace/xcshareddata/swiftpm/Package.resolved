@@ -1,5 +1,5 @@
 {
-  "originHash" : "1d033d2d9728e181322e687c87550e30c6bcdac33f59fe631e1e37780502d076",
+  "originHash" : "4eb650ade57061cd1cf989ce8f615547774e9303f591ff57a76f3f2c04cdbd07",
   "pins" : [
     {
       "identity" : "anycodable",
@@ -114,8 +114,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/radixdlt/sargon",
       "state" : {
-        "revision" : "585417fe2ac8eefafad07494be7f8f8abb382b9d",
-        "version" : "1.1.13"
+        "revision" : "1d035be68609f8c0b888086af86c1c4143ec5aef",
+        "version" : "1.1.14"
       }
     },
     {
@@ -123,7 +123,6 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Sajjon/ScreenshotPreventing-iOS",
       "state" : {
-        "branch" : "main",
         "revision" : "03769bcd1b1c9c24af424890f0a3e6d15bd3000c"
       }
     },

@@ -1,4 +1,4 @@
-import AsyncAlgorithms
+@preconcurrency import AsyncAlgorithms
 import ComposableArchitecture // actually CasePaths... but CI fails if we do `import CasePaths` 🤷‍♂️
 import Network
 
@@ -16,6 +16,7 @@ extension RadixConnectClient {
 		let localNetworkAuthorization = LocalNetworkAuthorization()
 
 		Task {
+			@Dependency(\.accountsClient) var accountsClient
 			for try await accounts in await accountsClient.accountsOnCurrentNetwork() {
 				guard !Task.isCancelled else { return }
 				try? await sendAccountListMessage(accounts: accounts)
@@ -114,7 +115,7 @@ extension RadixConnectClient {
 			},
 			getP2PLinksWithConnectionStatusUpdates: getP2PLinksWithConnectionStatusUpdates,
 			idsOfConnectedPeerConnections: {
-				let connectedClients = await rtcClients.currentlyConnectedClients
+				let connectedClients = rtcClients.currentlyConnectedClients
 				@Dependency(\.p2pLinksClient) var p2pLinksClient
 
 				let links = await p2pLinksClient.getP2PLinks()
@@ -181,7 +182,7 @@ extension RadixConnectClient {
 
 extension AsyncSequence where AsyncIterator: Sendable, Element == P2P.RTCIncomingMessage {
 	func compactMap<Case>(
-		_ casePath: CasePath<P2P.RTCMessageFromPeer, Case>
+		_ casePath: AnyCasePath<P2P.RTCMessageFromPeer, Case>
 	) async -> AnyAsyncSequence<P2P.RTCIncomingMessageContainer<Case>> {
 		compactMap { $0.unpackMap(casePath.extract) }
 			.share()
@@ -191,13 +192,13 @@ extension AsyncSequence where AsyncIterator: Sendable, Element == P2P.RTCIncomin
 
 extension RadixConnectClient {
 	public func receiveRequests<Case>(
-		_ casePath: CasePath<P2P.RTCMessageFromPeer.Request, Case>
+		_ casePath: AnyCasePath<P2P.RTCMessageFromPeer.Request, Case>
 	) async -> AnyAsyncSequence<P2P.RTCIncomingMessageContainer<Case>> {
 		await receiveMessages().compactMap(/P2P.RTCMessageFromPeer.request .. casePath)
 	}
 
 	public func receiveResponses<Case>(
-		_ casePath: CasePath<P2P.RTCMessageFromPeer.Response, Case>
+		_ casePath: AnyCasePath<P2P.RTCMessageFromPeer.Response, Case>
 	) async -> AnyAsyncSequence<P2P.RTCIncomingMessageContainer<Case>> {
 		await receiveMessages().compactMap(/P2P.RTCMessageFromPeer.response .. casePath)
 	}
