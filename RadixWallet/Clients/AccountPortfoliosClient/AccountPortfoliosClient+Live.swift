@@ -48,18 +48,18 @@ extension AccountPortfoliosClient: DependencyKey {
 				@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 				do {
 					let poolUnitDetails = try await onLedgerEntitiesClient.getOwnedPoolUnitsDetails(account, hiddenResources: hiddenResources, cachingStrategy: cachingStrategy)
-					state.set(poolDetails: .success(poolUnitDetails), forAccount: account.address)
+					await state.set(poolDetails: .success(poolUnitDetails), forAccount: account.address)
 				} catch {
-					state.set(poolDetails: .failure(error), forAccount: account.address)
+					await state.set(poolDetails: .failure(error), forAccount: account.address)
 				}
 			}.result
 			async let stakeUnitDetails = Task {
 				@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 				do {
 					let stakeUnitDetails = try await onLedgerEntitiesClient.getOwnedStakesDetails(account: account, cachingStrategy: cachingStrategy)
-					state.set(stakeUnitDetails: .success(stakeUnitDetails.asIdentified()), forAccount: account.address)
+					await state.set(stakeUnitDetails: .success(stakeUnitDetails.asIdentified()), forAccount: account.address)
 				} catch {
-					state.set(stakeUnitDetails: .failure(error), forAccount: account.address)
+					await state.set(stakeUnitDetails: .failure(error), forAccount: account.address)
 				}
 			}.result
 
@@ -79,7 +79,7 @@ extension AccountPortfoliosClient: DependencyKey {
 					)
 				}
 
-				state.setTokenPrices(prices)
+				await state.setTokenPrices(prices)
 			}
 		}
 
@@ -90,7 +90,7 @@ extension AccountPortfoliosClient: DependencyKey {
 			forceRefreshPrices: Bool
 		) async throws -> [AccountPortfolio] {
 			let gateway = await gatewaysClient.getCurrentGateway()
-			state.setRadixGateway(gateway)
+			await state.setRadixGateway(gateway)
 			if forceRefreshEntities {
 				for accountAddress in accountAddresses {
 					cacheClient.removeFolder(.init(address: accountAddress))
@@ -101,14 +101,14 @@ extension AccountPortfoliosClient: DependencyKey {
 			/// it is available for usage before resources are loaded
 			let preferences = await appPreferencesClient.getPreferences()
 			let display = preferences.display
-			state.setSelectedCurrency(display.fiatCurrencyPriceTarget)
-			state.setIsCurrencyAmountVisble(display.isCurrencyAmountVisible)
+			await state.setSelectedCurrency(display.fiatCurrencyPriceTarget)
+			await state.setIsCurrencyAmountVisble(display.isCurrencyAmountVisible)
 
 			let accounts = try await onLedgerEntitiesClient.getAccounts(accountAddresses)
 			let hiddenResources = try await resourcesVisibilityClient.getHidden()
 
 			let portfolios = accounts.map { AccountPortfolio(account: $0, hiddenResources: hiddenResources) }
-			state.handlePortfoliosUpdate(portfolios)
+			await state.handlePortfoliosUpdate(portfolios)
 
 			/// Put together all resources from already fetched and new accounts
 			let currentAccounts = state.portfoliosSubject.value.wrappedValue.map { $0.values.map(\.account) } ?? []
@@ -164,14 +164,14 @@ extension AccountPortfoliosClient: DependencyKey {
 			let hiddenResources = try await resourcesVisibilityClient.getHidden()
 			let portfolio = AccountPortfolio(account: account, hiddenResources: hiddenResources)
 
-			if case let .success(tokenPrices) = state.tokenPrices {
+			if case let .success(tokenPrices) = await state.tokenPrices {
 				await applyTokenPrices(
 					tokenPrices.keys + account.resourcesWithPrices,
 					forceRefresh: forceRefresh
 				)
 			}
 
-			state.handlePortfolioUpdate(portfolio)
+			await state.handlePortfolioUpdate(portfolio)
 			await fetchPoolAndStakeUnitsDetails(account.nonEmptyVaults, hiddenResources: hiddenResources, cachingStrategy: forceRefresh ? .forceUpdate : .useCache)
 
 			return portfolio
@@ -194,7 +194,7 @@ extension AccountPortfoliosClient: DependencyKey {
 					.eraseToAnyAsyncSequence()
 			},
 			portfolioForAccount: { address in
-				state.portfolioForAccount(address)
+				await state.portfolioForAccount(address)
 			},
 			portfolios: { state.portfoliosSubject.value.wrappedValue.map { Array($0.values) } ?? [] }
 		)

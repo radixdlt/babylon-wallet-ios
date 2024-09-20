@@ -115,7 +115,7 @@ extension RadixConnectClient {
 			},
 			getP2PLinksWithConnectionStatusUpdates: getP2PLinksWithConnectionStatusUpdates,
 			idsOfConnectedPeerConnections: {
-				let connectedClients = rtcClients.currentlyConnectedClients
+				let connectedClients = await rtcClients.currentlyConnectedClients
 				@Dependency(\.p2pLinksClient) var p2pLinksClient
 
 				let links = await p2pLinksClient.getP2PLinks()
