@@ -180,8 +180,9 @@ extension TransactionClient {
 			guard transactionPreviewResponse.receipt.status == .succeeded else {
 				throw TransactionFailure.fromFailedTXReviewResponse(transactionPreviewResponse)
 			}
-			print("M- \(transactionPreviewResponse.radixEngineToolkitReceiptData)")
-			let receiptBytes = try Data(hex: transactionPreviewResponse.encodedReceipt)
+			guard let receiptBytes = transactionPreviewResponse.radixEngineToolkitReceiptData else {
+				throw TransactionFailure.failedToPrepareTXReview(.failedToExtractTXReceiptBytes)
+			}
 
 			/// Analyze the manifest
 			let analyzedManifestToReview = try manifestToSign.executionSummary(
