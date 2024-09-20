@@ -1,4 +1,4 @@
-@preconcurrency import AsyncAlgorithms
+import AsyncAlgorithms
 import ComposableArchitecture // actually CasePaths... but CI fails if we do `import CasePaths` 🤷‍♂️
 import Network
 
@@ -7,7 +7,6 @@ extension RadixConnectClient {
 		@Dependency(\.p2pLinksClient) var p2pLinksClient
 		@Dependency(\.errorQueue) var errorQueue
 		@Dependency(\.accountsClient) var accountsClient
-		@Dependency(\.jsonEncoder) var jsonEncoder
 
 		let userDefaults = UserDefaults.Dependency.radix // FIXME: find a better way to ensure we use the same userDefaults everywhere
 
@@ -46,6 +45,8 @@ extension RadixConnectClient {
 
 		@Sendable
 		func sendAccountListMessage(accounts: Accounts) async throws {
+			@Dependency(\.jsonEncoder) var jsonEncoder
+
 			let encoder = jsonEncoder()
 			let accounts = accounts.map {
 				WalletInteractionWalletAccount(
