@@ -186,7 +186,7 @@ extension TransactionClient {
 
 			/// Analyze the manifest
 			let analyzedManifestToReview = try manifestToSign.executionSummary(
-				encodedReceipt: receiptBytes
+				engineToolkitReceipt: receiptBytes
 			)
 
 			/// Transactions created outside of the Wallet are not allowed to use reserved instructions
