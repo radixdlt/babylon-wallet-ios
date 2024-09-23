@@ -270,7 +270,7 @@ extension OnLedgerEntitiesClient {
 				if fetchMetadata, let nextCursor = item.metadata.nextCursor {
 					// Only fetch metadata if explicitly requested and there is more after the first page returned.
 					let remaining = try await gatewayAPIClient.fetchEntityMetadata(item.address, ledgerState: response.ledgerState, nextCursor: nextCursor)
-					allMetadataItems.append(contentsOf: remaining)
+					allMetadataItems.formUnion(remaining)
 				}
 
 				let updatedItem = GatewayAPI.StateEntityDetailsResponseItem(

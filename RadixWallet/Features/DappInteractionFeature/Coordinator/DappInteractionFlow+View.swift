@@ -1,5 +1,4 @@
 import ComposableArchitecture
-import NavigationTransition
 import SwiftUI
 
 // MARK: - DappInteractionFlow.View
