@@ -17,12 +17,11 @@ extension TransactionHistoryFilters {
 			NavigationStack {
 				ScrollView {
 					WithViewStore(store, observe: \.filters, send: { .view($0) }) { viewStore in
-						VStack(spacing: .medium3) {
-							HStack(spacing: .small1) {
+						VStack(spacing: .medium1) {
+							FlowLayout(spacing: .small2) {
 								FiltersView(filters: viewStore.transferTypes, store: store)
-
-								Spacer(minLength: 0)
 							}
+							.padding(.bottom, .small3)
 
 							Divider()
 
@@ -51,8 +50,6 @@ extension TransactionHistoryFilters {
 							Section(L10n.TransactionHistory.Filters.transactionTypeLabel) {
 								SubSection(filters: viewStore.transactionTypes, store: store)
 							}
-
-							Divider()
 
 							Spacer(minLength: 0)
 						}
@@ -104,7 +101,7 @@ extension TransactionHistoryFilters {
 			}
 
 			var body: some SwiftUI.View {
-				VStack(spacing: 0) {
+				VStack(spacing: .medium3) {
 					Button {
 						withAnimation(.default) {
 							expanded.toggle()
@@ -114,7 +111,6 @@ extension TransactionHistoryFilters {
 							Text(name)
 								.textStyle(.body1Header)
 								.foregroundStyle(.app.gray1)
-								.padding(.vertical, .small2)
 
 							Spacer()
 
@@ -125,7 +121,6 @@ extension TransactionHistoryFilters {
 
 					if expanded {
 						content
-							.padding(.top, .medium3)
 					}
 				}
 				.clipped()
@@ -148,11 +143,17 @@ extension TransactionHistoryFilters {
 			let store: StoreOf<TransactionHistoryFilters>
 
 			private var collapsedHeight: CGFloat {
-				CGFloat(collapsedRowLimit) * rowHeight + CGFloat(collapsedRowLimit - 1) * spacing
+				CGFloat(collapsedRowLimit) * rowHeight + // height of each row
+					CGFloat(collapsedRowLimit - 1) * spacing.height + // height of spacing among rows
+					2 * clippedPadding // height of padding left on top & bottom to avoid clipping issues
 			}
 
 			private let collapsedRowLimit: Int = 3
-			private let spacing: CGFloat = .small1
+			private let spacing: CGSize = .init(width: .small3, height: .small2)
+
+			// When clipping the view, the rounded corners elements (which are clipped in a Capsule) next to an edge will look trimmed.
+			// Therefore, we leave a minimum padding on each edge to avoid this unwanted effect.
+			private let clippedPadding: CGFloat = 1
 
 			init(_ heading: String? = nil, filters: IdentifiedArrayOf<State.Filter>, labels: CollapseLabels? = nil, store: StoreOf<TransactionHistoryFilters>) {
 				self.heading = heading
@@ -164,14 +165,10 @@ extension TransactionHistoryFilters {
 			var body: some SwiftUI.View {
 				if !filters.isEmpty {
 					let isCollapsible = labels != nil
-					VStack(alignment: .leading, spacing: .zero) {
-						if let heading {
-							Text(heading)
-								.textStyle(.body1HighImportance)
-								.foregroundStyle(.app.gray2)
-								.flushedLeft
-								.padding(.bottom, .medium3)
-						}
+					VStack(alignment: .leading, spacing: .medium3) {
+						Text(heading)
+							.textStyle(.body1HighImportance)
+							.foregroundStyle(.app.gray2)
 
 						FlowLayout(spacing: spacing) {
 							FiltersView(filters: filters, store: store)
@@ -181,6 +178,7 @@ extension TransactionHistoryFilters {
 							TransactionFilterView.Dummy()
 								.measureSize(flowDummyID)
 						}
+						.padding(clippedPadding)
 						.frame(maxHeight: isCollapsible && isCollapsed ? collapsedHeight : .infinity, alignment: .top)
 						.clipped()
 						.onReadSizes(flowDummyID, flowLayoutID) { dummySize, flowSize in
@@ -191,21 +189,13 @@ extension TransactionHistoryFilters {
 						}
 
 						if totalHeight > collapsedHeight, let labels {
-							Button {
+							Button(isCollapsed ? "+ \(labels.showAll)" : "- \(labels.showLess)") {
 								withAnimation {
 									isCollapsed.toggle()
-								}
-							} label: {
-								ZStack {
-									Text("+ \(labels.showAll)")
-										.opacity(isCollapsed ? 1 : 0)
-									Text("- \(labels.showLess)")
-										.opacity(isCollapsed ? 0 : 1)
 								}
 							}
 							.buttonStyle(.blueText)
 							.frame(maxWidth: .infinity)
-							.padding(.top, .medium3)
 						}
 					}
 					.animation(.default, value: isCollapsed)
