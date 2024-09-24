@@ -180,13 +180,13 @@ extension TransactionClient {
 			guard transactionPreviewResponse.receipt.status == .succeeded else {
 				throw TransactionFailure.fromFailedTXReviewResponse(transactionPreviewResponse)
 			}
-			guard let receiptBytes = transactionPreviewResponse.radixEngineToolkitReceiptData else {
+			guard let engineToolkitReceipt = transactionPreviewResponse.engineToolkitReceipt else {
 				throw TransactionFailure.failedToPrepareTXReview(.failedToExtractTXReceiptBytes)
 			}
 
 			/// Analyze the manifest
 			let analyzedManifestToReview = try manifestToSign.executionSummary(
-				engineToolkitReceipt: receiptBytes
+				engineToolkitReceipt: engineToolkitReceipt
 			)
 
 			/// Transactions created outside of the Wallet are not allowed to use reserved instructions
@@ -399,10 +399,13 @@ extension TransactionFailure {
 }
 
 private extension GatewayAPI.TransactionPreviewResponse {
-	var radixEngineToolkitReceiptData: Data? {
-		guard let dictionary = radixEngineToolkitReceipt?.value as? [String: Any] else {
+	var engineToolkitReceipt: String? {
+		guard
+			let dictionary = radixEngineToolkitReceipt?.value as? [String: Any],
+			let data = try? JSONSerialization.data(withJSONObject: dictionary, options: [])
+		else {
 			return nil
 		}
-		return try? JSONSerialization.data(withJSONObject: dictionary, options: [])
+		return String(data: data, encoding: .utf8)
 	}
 }
