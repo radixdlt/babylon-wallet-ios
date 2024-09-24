@@ -1,6 +1,6 @@
 import SwiftUI
 
-public struct IntroductionToPersonas: View {
+public struct IntroductionToPersonasView: View {
 	public let onContinue: () -> Void
 
 	public var body: some View {

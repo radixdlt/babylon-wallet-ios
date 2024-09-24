@@ -58,7 +58,7 @@ extension CreatePersonaCoordinator {
 				SwitchStore(store) { state in
 					switch state {
 					case .step0_introduction:
-						IntroductionToPersonas {
+						IntroductionToPersonasView {
 							self.store.send(.view(.introductionContinueButtonTapped))
 						}
 

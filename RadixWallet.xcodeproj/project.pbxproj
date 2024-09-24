@@ -204,7 +204,7 @@
 		48CFC2F12ADC10D900E77A5C /* CreatePersonaCoordinator+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD7D2ADC10D800E77A5C /* CreatePersonaCoordinator+Reducer.swift */; };
 		48CFC2F22ADC10D900E77A5C /* CreatePersonaCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD7E2ADC10D800E77A5C /* CreatePersonaCoordinator+View.swift */; };
 		48CFC2F32ADC10D900E77A5C /* CreatePersonaCoordinator+Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD7F2ADC10D800E77A5C /* CreatePersonaCoordinator+Models.swift */; };
-		48CFC2F42ADC10D900E77A5C /* IntroductionToPersonas.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD822ADC10D800E77A5C /* IntroductionToPersonas.swift */; };
+		48CFC2F42ADC10D900E77A5C /* IntroductionToPersonasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD822ADC10D800E77A5C /* IntroductionToPersonasView.swift */; };
 		48CFC2FA2ADC10D900E77A5C /* NewPersonaCompletion+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD8B2ADC10D800E77A5C /* NewPersonaCompletion+View.swift */; };
 		48CFC2FB2ADC10D900E77A5C /* NewPersonaCompletion+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD8C2ADC10D800E77A5C /* NewPersonaCompletion+Reducer.swift */; };
 		48CFC2FC2ADC10D900E77A5C /* DefaultDepositGuarantees+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD902ADC10D800E77A5C /* DefaultDepositGuarantees+Reducer.swift */; };
@@ -1445,7 +1445,7 @@
 		48CFBD7D2ADC10D800E77A5C /* CreatePersonaCoordinator+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CreatePersonaCoordinator+Reducer.swift"; sourceTree = "<group>"; };
 		48CFBD7E2ADC10D800E77A5C /* CreatePersonaCoordinator+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CreatePersonaCoordinator+View.swift"; sourceTree = "<group>"; };
 		48CFBD7F2ADC10D800E77A5C /* CreatePersonaCoordinator+Models.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CreatePersonaCoordinator+Models.swift"; sourceTree = "<group>"; };
-		48CFBD822ADC10D800E77A5C /* IntroductionToPersonas.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntroductionToPersonas.swift; sourceTree = "<group>"; };
+		48CFBD822ADC10D800E77A5C /* IntroductionToPersonasView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntroductionToPersonasView.swift; sourceTree = "<group>"; };
 		48CFBD8B2ADC10D800E77A5C /* NewPersonaCompletion+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NewPersonaCompletion+View.swift"; sourceTree = "<group>"; };
 		48CFBD8C2ADC10D800E77A5C /* NewPersonaCompletion+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NewPersonaCompletion+Reducer.swift"; sourceTree = "<group>"; };
 		48CFBD902ADC10D800E77A5C /* DefaultDepositGuarantees+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DefaultDepositGuarantees+Reducer.swift"; sourceTree = "<group>"; };
@@ -3431,7 +3431,7 @@
 		48CFBD802ADC10D800E77A5C /* Children */ = {
 			isa = PBXGroup;
 			children = (
-				48CFBD822ADC10D800E77A5C /* IntroductionToPersonas.swift */,
+				48CFBD822ADC10D800E77A5C /* IntroductionToPersonasView.swift */,
 				48CFBD8A2ADC10D800E77A5C /* NewPersonaCompletion */,
 			);
 			path = Children;
@@ -7855,7 +7855,7 @@
 				A408162D2C7E0D08005E65B9 /* StateNonFungibleIdsResponse.swift in Sources */,
 				A40816372C7E0D08005E65B9 /* StreamTransactionsRequest.swift in Sources */,
 				48CFC4792ADC10DA00E77A5C /* LocalAuthenticationClient+Live.swift in Sources */,
-				48CFC2F42ADC10D900E77A5C /* IntroductionToPersonas.swift in Sources */,
+				48CFC2F42ADC10D900E77A5C /* IntroductionToPersonasView.swift in Sources */,
 				A40816532C7E0D08005E65B9 /* TransactionSubmitResponse.swift in Sources */,
 				A4ECE2742BEEAFFC00468BF6 /* SecurityCenterClient+Test.swift in Sources */,
 				48CFC5BB2ADC10DA00E77A5C /* PlainListRow.swift in Sources */,
