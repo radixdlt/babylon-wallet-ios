@@ -1,5 +1,34 @@
 // MARK: - AccountPortfoliosClient + DependencyKey
 extension AccountPortfoliosClient: DependencyKey {
+	private static func registerSubscribers(state: State) {
+		/// Update currency amount visibility based on the profile state
+		Task {
+			@Dependency(\.appPreferencesClient) var appPreferencesClient
+			for try await isCurrencyAmountVisible in await appPreferencesClient.appPreferenceUpdates().map(\.display.isCurrencyAmountVisible) {
+				guard !Task.isCancelled else { return }
+				await state.setIsCurrencyAmountVisble(isCurrencyAmountVisible)
+			}
+		}
+
+		/// Update used currency based on the profile state
+		Task {
+			@Dependency(\.appPreferencesClient) var appPreferencesClient
+			for try await fiatCurrency in await appPreferencesClient.appPreferenceUpdates().map(\.display.fiatCurrencyPriceTarget) {
+				guard !Task.isCancelled else { return }
+				await state.setSelectedCurrency(fiatCurrency)
+			}
+		}
+
+		/// Update when hidden resources change
+		Task {
+			@Dependency(\.resourcesVisibilityClient) var resourcesVisibilityClient
+			for try await hiddenResources in await resourcesVisibilityClient.hiddenValues().removeDuplicates() {
+				guard !Task.isCancelled else { return }
+				await state.updatePortfoliosHiddenResources(hiddenResources: hiddenResources)
+			}
+		}
+	}
+
 	public static let liveValue: AccountPortfoliosClient = {
 		let state = State()
 
@@ -10,34 +39,13 @@ extension AccountPortfoliosClient: DependencyKey {
 		@Dependency(\.resourcesVisibilityClient) var resourcesVisibilityClient
 		@Dependency(\.gatewaysClient) var gatewaysClient
 
-		/// Update currency amount visibility based on the profile state
-		Task {
-			for try await isCurrencyAmountVisible in await appPreferencesClient.appPreferenceUpdates().map(\.display.isCurrencyAmountVisible) {
-				guard !Task.isCancelled else { return }
-				await state.setIsCurrencyAmountVisble(isCurrencyAmountVisible)
-			}
-		}
-
-		/// Update used currency based on the profile state
-		Task {
-			for try await fiatCurrency in await appPreferencesClient.appPreferenceUpdates().map(\.display.fiatCurrencyPriceTarget) {
-				guard !Task.isCancelled else { return }
-				await state.setSelectedCurrency(fiatCurrency)
-			}
-		}
-
-		/// Update when hidden resources change
-		Task {
-			for try await hiddenResources in await resourcesVisibilityClient.hiddenValues().removeDuplicates() {
-				guard !Task.isCancelled else { return }
-				await state.updatePortfoliosHiddenResources(hiddenResources: hiddenResources)
-			}
-		}
+		Self.registerSubscribers(state: state)
 
 		/// Fetches the pool and stake units details for a given account; Will update the portfolio accordingly
 		@Sendable
 		func fetchPoolAndStakeUnitsDetails(_ account: OnLedgerEntity.OnLedgerAccount, hiddenResources: [ResourceIdentifier], cachingStrategy: OnLedgerEntitiesClient.CachingStrategy) async {
 			async let poolDetailsFetch = Task {
+				@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 				do {
 					let poolUnitDetails = try await onLedgerEntitiesClient.getOwnedPoolUnitsDetails(account, hiddenResources: hiddenResources, cachingStrategy: cachingStrategy)
 					await state.set(poolDetails: .success(poolUnitDetails), forAccount: account.address)
@@ -46,6 +54,7 @@ extension AccountPortfoliosClient: DependencyKey {
 				}
 			}.result
 			async let stakeUnitDetails = Task {
+				@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 				do {
 					let stakeUnitDetails = try await onLedgerEntitiesClient.getOwnedStakesDetails(account: account, cachingStrategy: cachingStrategy)
 					await state.set(stakeUnitDetails: .success(stakeUnitDetails.asIdentified()), forAccount: account.address)

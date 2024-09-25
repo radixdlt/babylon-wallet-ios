@@ -36,7 +36,7 @@ public protocol FeatureReducer: Reducer where State: Sendable & Hashable, Action
 
 // MARK: - FeatureAction
 @CasePathable
-public enum FeatureAction<Feature: FeatureReducer>: Sendable, Equatable {
+public enum FeatureAction<Feature: FeatureReducer> {
 	case destination(PresentationAction<Feature.Destination.Action>)
 	case view(Feature.ViewAction)
 	case `internal`(Feature.InternalAction)
@@ -107,6 +107,9 @@ public typealias PresentationStoreOf<R: Reducer> = Store<PresentationState<R.Sta
 public typealias ViewStoreOf<Feature: FeatureReducer> = ViewStore<Feature.ViewState, Feature.ViewAction>
 
 public typealias StackActionOf<R: Reducer> = StackAction<R.State, R.Action>
+
+// MARK: - FeatureAction + Sendable, Equatable
+extension FeatureAction: Sendable, Equatable {}
 
 // MARK: - FeatureAction + Hashable
 extension FeatureAction: Hashable where Feature.Destination.Action: Hashable, Feature.ViewAction: Hashable, Feature.ChildAction: Hashable, Feature.InternalAction: Hashable, Feature.DelegateAction: Hashable {
