@@ -107,7 +107,7 @@ extension ResourcesList.View {
 
 	private func items(resources: IdentifiedArrayOf<ResourceViewState>) -> some SwiftUI.View {
 		ScrollView {
-			VStack(spacing: .zero) {
+			VStack(spacing: .medium3) {
 				ForEach(resources) { resource in
 					Card {
 						AssetRow(

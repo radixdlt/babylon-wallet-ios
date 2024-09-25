@@ -87,6 +87,7 @@ extension ImportMnemonicWord {
 							to: $focusedField
 						),
 						showClearButton: viewStore.showClearButton,
+						preventScreenshot: true,
 						innerAccessory: {
 							if viewStore.displayValidAccessory {
 								Image(asset: AssetResource.successCheckmark)

@@ -167,7 +167,7 @@ final class ROLAClientTests: TestCase {
 			$0.cacheClient.load = { _, _ in throw CacheClient.Error.dataLoadingFailed }
 			$0.cacheClient.save = { _, _ in }
 		} operation: {
-			try await sut.performWellKnownFileCheck(metadata)
+			try await sut.performWellKnownFileCheck(metadata.origin.url(), metadata.dappDefinitionAddress)
 		}
 	}
 
@@ -270,7 +270,7 @@ final class ROLAClientTests: TestCase {
 			$0.cacheClient.save = { _, _ in }
 		} operation: {
 			do {
-				try await sut.performWellKnownFileCheck(metadata)
+				try await sut.performWellKnownFileCheck(metadata.origin.url(), metadata.dappDefinitionAddress)
 				XCTFail("Expected error: radixJsonUnknownFileFormat")
 			} catch {
 				XCTAssertEqual(error as? ROLAFailure, expectedError)
@@ -305,7 +305,7 @@ final class ROLAClientTests: TestCase {
 			$0.cacheClient.save = { _, _ in }
 		} operation: {
 			do {
-				try await sut.performWellKnownFileCheck(metadata)
+				try await sut.performWellKnownFileCheck(metadata.origin.url(), metadata.dappDefinitionAddress)
 				XCTFail("Expected error: unknownDappDefinitionAddress")
 			} catch {
 				XCTAssertEqual(error as? ROLAFailure, expectedError)

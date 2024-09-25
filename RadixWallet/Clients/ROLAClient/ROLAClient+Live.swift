@@ -40,15 +40,13 @@ extension ROLAClient {
 					validatingWebsite: metadata.origin.url()
 				)
 			},
-			performWellKnownFileCheck: { metadata async throws in
+			performWellKnownFileCheck: { url, dappDefinitionAddress async throws in
 				@Dependency(\.urlSession) var urlSession
 
-				let originURL = try metadata.origin.url()
-
-				let url = originURL.appending(path: Constants.wellKnownFilePath)
+				let wellKnownURL = url.appending(path: Constants.wellKnownFilePath)
 
 				let fetchWellKnownFile = {
-					let (data, urlResponse) = try await urlSession.data(from: url)
+					let (data, urlResponse) = try await urlSession.data(from: wellKnownURL)
 
 					guard let httpURLResponse = urlResponse as? HTTPURLResponse else {
 						throw ExpectedHTTPURLResponse()
@@ -73,7 +71,7 @@ extension ROLAClient {
 				let response = try await fetchWellKnownFile()
 
 				let dAppDefinitionAddresses = response.dApps.map(\.dAppDefinitionAddress)
-				guard dAppDefinitionAddresses.contains(metadata.dappDefinitionAddress) else {
+				guard dAppDefinitionAddresses.contains(dappDefinitionAddress) else {
 					throw ROLAFailure.unknownDappDefinitionAddress
 				}
 			},

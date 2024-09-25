@@ -294,7 +294,7 @@ private extension TransferAccountList {
 			return .none
 		}
 
-		let resourceAddresses = receivingAccount.assets.map(\.id)
+		let resourceAddresses = Array(Set(receivingAccount.assets.map(\.resourceAddress)))
 		guard !resourceAddresses.isEmpty else {
 			return .none
 		}
@@ -320,17 +320,22 @@ private extension TransferAccountList {
 	func getStatusesForProfileAccount(_ account: Account, assets: IdentifiedArrayOf<ResourceAsset.State>) async -> AssetsDepositStatus {
 		let result = await assets.parallelMap { asset in
 			let result = await needsSignatureForDepositting(into: account, resource: asset.resourceAddress)
-			return (asset.id, result ? DepositStatus.additionalSignatureRequired : .allowed)
+			return (asset.resourceAddress, result ? DepositStatus.additionalSignatureRequired : .allowed)
 		}
 		let values = Dictionary(uniqueKeysWithValues: result.map { ($0.0, $0.1) })
 		return values
 	}
 
-	func getStatusesForExternalAccount(_ account: AccountAddress, resourceAddresses: [ResourceAsset.State.ID]) async throws -> AssetsDepositStatus {
-		let result = try await gatewayAPIClient.prevalidateDeposit(.init(accountAddress: account.address, resourceAddresses: resourceAddresses))
+	func getStatusesForExternalAccount(_ account: AccountAddress, resourceAddresses: [ResourceAddress]) async throws -> AssetsDepositStatus {
+		let result = try await gatewayAPIClient.prevalidateDeposit(.init(accountAddress: account.address, resourceAddresses: resourceAddresses.map(\.address)))
 
 		if let behavior = result.resourceSpecificBehaviour {
-			return Dictionary(uniqueKeysWithValues: behavior.map { ($0.resourceAddress, $0.allowsTryDeposit ? DepositStatus.allowed : .denied) })
+			return Dictionary(uniqueKeysWithValues: behavior.compactMap { item in
+				guard let address = try? ResourceAddress(validatingAddress: item.resourceAddress) else {
+					return nil
+				}
+				return (address, item.allowsTryDeposit ? .allowed : .denied)
+			})
 		} else {
 			return .init()
 		}

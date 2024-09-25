@@ -13,7 +13,7 @@ extension ROLAClient: TestDependencyKey {
 extension ROLAClient {
 	public static let noop = Self(
 		performDappDefinitionVerification: { _ in },
-		performWellKnownFileCheck: { _ in },
+		performWellKnownFileCheck: { _, _ in },
 		manifestForAuthKeyCreation: { _ in throw NoopError() },
 		authenticationDataToSignForChallenge: { _ in throw NoopError() }
 	)
