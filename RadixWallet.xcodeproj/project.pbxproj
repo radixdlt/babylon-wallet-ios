@@ -738,9 +738,9 @@
 		5B526AEC2C89C3C200AF8B72 /* ResourcesVisibilityClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B526AE82C89C3C200AF8B72 /* ResourcesVisibilityClient+Interface.swift */; };
 		5B526AED2C89C3C200AF8B72 /* ResourcesVisibilityClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B526AE92C89C3C200AF8B72 /* ResourcesVisibilityClient+Live.swift */; };
 		5B526AEE2C89C3C200AF8B72 /* ResourcesVisibilityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B526AEA2C89C3C200AF8B72 /* ResourcesVisibilityClient+Test.swift */; };
+		5B634A942C91D2A0004B2FBC /* ScreenshotPreventing in Frameworks */ = {isa = PBXBuildFile; productRef = 5B634A932C91D2A0004B2FBC /* ScreenshotPreventing */; };
 		5B634AAE2C92F6EC004B2FBC /* UpdateP2PLinkName+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B634AAD2C92F6EC004B2FBC /* UpdateP2PLinkName+Reducer.swift */; };
 		5B634AB02C92F6FA004B2FBC /* UpdateP2PLinkName+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B634AAF2C92F6FA004B2FBC /* UpdateP2PLinkName+View.swift */; };
-		5B634A942C91D2A0004B2FBC /* ScreenshotPreventing in Frameworks */ = {isa = PBXBuildFile; productRef = 5B634A932C91D2A0004B2FBC /* ScreenshotPreventing */; };
 		5B6499B72BCFD0E8000F2176 /* SecurityFactors+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B52BCFD0E8000F2176 /* SecurityFactors+View.swift */; };
 		5B6499B82BCFD0E8000F2176 /* SecurityFactors+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B62BCFD0E8000F2176 /* SecurityFactors+Reducer.swift */; };
 		5B6499BA2BCFDB1E000F2176 /* ShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B92BCFDB1E000F2176 /* ShareView.swift */; };
@@ -6940,8 +6940,8 @@
 				5B1C4FD32BBB0B0C00B9436F /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Strict" */,
 				8318BB172BC8403800057BCB /* XCRemoteSwiftPackageReference "swift-custom-dump" */,
 				E6A0B0492BF23C7000617DAC /* XCRemoteSwiftPackageReference "swift-identified-collections" */,
-				835DEDE22C57E9C200D7ACF0 /* XCRemoteSwiftPackageReference "sargon" */,
 				5B634A922C91D2A0004B2FBC /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */,
+				E7FF4BC02C9C2F1200124A25 /* XCRemoteSwiftPackageReference "sargon" */,
 			);
 			productRefGroup = 48CFBC502ADC106300E77A5C /* Products */;
 			projectDirPath = "";
@@ -8404,6 +8404,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.radixpublishing.radixwallet.ios.dev";
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
 			};
 			name = "Debug-Dev";
@@ -8424,6 +8425,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
@@ -8510,6 +8512,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore com.radixpublishing.radixwallet.ios.alpha";
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
 			};
 			name = "Debug-Alpha";
@@ -8597,6 +8600,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore com.radixpublishing.radixwallet.ios.pre-alpha";
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
 			};
 			name = "Debug-PreAlpha";
@@ -8674,6 +8678,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Beta;
@@ -8725,7 +8730,7 @@
 			repositoryURL = "https://github.com/sideeffect-io/AsyncExtensions.git";
 			requirement = {
 				kind = exactVersion;
-				version = 0.5.2;
+				version = 0.5.3;
 			};
 		};
 		48FFFA9D2ADC1F2700B2B213 /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
@@ -8968,14 +8973,6 @@
 				version = 1.3.0;
 			};
 		};
-		835DEDE22C57E9C200D7ACF0 /* XCRemoteSwiftPackageReference "sargon" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/radixdlt/sargon";
-			requirement = {
-				kind = exactVersion;
-				version = 1.1.13;
-			};
-		};
 		A415574E2B757C5E0040AD4E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture";
@@ -8998,6 +8995,14 @@
 			requirement = {
 				kind = exactVersion;
 				version = 1.0.2;
+			};
+		};
+		E7FF4BC02C9C2F1200124A25 /* XCRemoteSwiftPackageReference "sargon" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/radixdlt/sargon";
+			requirement = {
+				kind = exactVersion;
+				version = 1.1.14;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

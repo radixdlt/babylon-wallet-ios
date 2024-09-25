@@ -68,7 +68,7 @@ extension AsyncSequence {
 }
 
 extension AsyncSequence {
-	public func subscribe(_ listener: some AsyncSubject<Element, Never>) where Self: Sendable {
+	public func subscribe(_ listener: some AsyncSubjectable<Element>) where Self: Sendable {
 		Task {
 			for try await value in self {
 				listener.send(value)
