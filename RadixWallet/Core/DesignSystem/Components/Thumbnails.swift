@@ -336,36 +336,3 @@ public struct LoadableImagePlaceholderBehaviour {
 		case standard
 	}
 }
-
-// MARK: - VectorImageType
-public enum VectorImageType {
-	case svg
-	case pdf
-
-	public var urlExtension: String {
-		switch self {
-		case .svg: ".svg"
-		case .pdf: ".pdf"
-		}
-	}
-
-	public var dataURLType: String {
-		switch self {
-		case .svg: "svg+xml"
-		case .pdf: "pdf"
-		}
-	}
-}
-
-extension URL {
-	public func isVectorImage(type: VectorImageType) -> Bool {
-		let imageURLString = if let imageOrigin = queryParameters?["imageOrigin"] {
-			imageOrigin
-		} else {
-			absoluteString
-		}
-
-		return imageURLString.hasPrefix("data:image/\(type.dataURLType)") ||
-			imageURLString.lowercased().hasSuffix(type.urlExtension)
-	}
-}
