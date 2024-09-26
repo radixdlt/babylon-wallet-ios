@@ -180,8 +180,8 @@ public struct LoadableImage<Placeholder: View>: View {
 		placeholder: () -> Placeholder
 	) {
 		if let url {
-			if url.isVectorImage {
-				loggerGlobal.warning("LoadableImage: Vector images are not supported \(url)")
+			if url.isVectorImage(type: .pdf) {
+				loggerGlobal.warning("LoadableImage: PDF vector images are not supported \(url)")
 				self.url = nil
 			} else {
 				@Dependency(\.urlFormatterClient) var urlFormatterClient
@@ -220,7 +220,8 @@ public struct LoadableImage<Placeholder: View>: View {
 					imageView(image: image, imageSize: state.imageContainer?.image.size)
 				} else {
 					brokenImageView
-					let _ = loggerGlobal.warning("Could not load thumbnail from \(url): \(state.error)")
+					let error = state.error?.legibleDescription ?? ""
+					let _ = loggerGlobal.warning("Could not load thumbnail from \(url): \(error)")
 				}
 			}
 		} else {
@@ -334,19 +335,4 @@ public struct LoadableImagePlaceholderBehaviour {
 		case brokenImage
 		case standard
 	}
-}
-
-extension URL {
-	public var isVectorImage: Bool {
-		let pathComponent = lastPathComponent.lowercased()
-		for ignoredType in URL.vectorImageTypes {
-			if pathComponent.hasSuffix("." + ignoredType) {
-				return true
-			}
-		}
-
-		return false
-	}
-
-	private static let vectorImageTypes: [String] = ["svg", "pdf"]
 }
