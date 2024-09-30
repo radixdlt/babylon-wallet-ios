@@ -5,15 +5,18 @@ struct PersonaProofOfOwnership: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		let identityAddress: IdentityAddress
 		let dappMetadata: DappMetadata
+		let challenge: DappToWalletInteractionAuthChallengeNonce
 
 		var persona: Persona?
 
 		init(
 			identityAddress: IdentityAddress,
-			dappMetadata: DappMetadata
+			dappMetadata: DappMetadata,
+			challenge: DappToWalletInteractionAuthChallengeNonce
 		) {
 			self.identityAddress = identityAddress
 			self.dappMetadata = dappMetadata
+			self.challenge = challenge
 		}
 	}
 
@@ -28,7 +31,13 @@ struct PersonaProofOfOwnership: Sendable, FeatureReducer {
 		case setPersona(Persona)
 	}
 
+	enum DelegateAction: Sendable, Equatable {
+		case proovedOwnership(SignedAuthChallenge)
+	}
+
 	@Dependency(\.personasClient) var personasClient
+	@Dependency(\.rolaClient) var rolaClient
+	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -39,7 +48,7 @@ struct PersonaProofOfOwnership: Sendable, FeatureReducer {
 		case .task:
 			loadPersonaEffect(state: state)
 		case .continueButtonTapped:
-			.none
+			signChallengeEffect(state: state)
 		}
 	}
 
@@ -57,6 +66,31 @@ struct PersonaProofOfOwnership: Sendable, FeatureReducer {
 			await send(.internal(.setPersona(persona)))
 		} catch: { _, _ in
 			// TODO: Handle persona not found
+		}
+	}
+
+	private func signChallengeEffect(state: State) -> Effect<Action> {
+		guard let persona = state.persona else {
+			return .none
+		}
+		let createAuthPayloadRequest = AuthenticationDataToSignForChallengeRequest(
+			challenge: state.challenge,
+			origin: state.dappMetadata.origin,
+			dAppDefinitionAddress: state.dappMetadata.dAppDefinitionAddress
+		)
+
+		return .run { [challenge = state.challenge] send in
+			let authToSignResponse = try rolaClient.authenticationDataToSignForChallenge(createAuthPayloadRequest)
+
+			let signature = try await deviceFactorSourceClient.signUsingDeviceFactorSource(
+				signerEntity: .persona(persona),
+				hashedDataToSign: authToSignResponse.payloadToHashAndSign.hash(),
+				purpose: .signAuth
+			)
+
+			let signedAuthChallenge = SignedAuthChallenge(challenge: challenge, entitySignatures: Set([signature]))
+
+			await send(.delegate(.proovedOwnership(signedAuthChallenge)))
 		}
 	}
 }

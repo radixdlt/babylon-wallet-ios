@@ -19,6 +19,14 @@ extension PersonaProofOfOwnership {
 							PersonaRow.View(viewState: viewState, isSelected: nil) {}
 						}
 					}
+					.padding(.horizontal, .medium1)
+					.padding(.bottom, .medium2)
+				}
+				.footer {
+					Button(L10n.Common.continue) {
+						store.send(.view(.continueButtonTapped))
+					}
+					.buttonStyle(.primaryRectangular)
 				}
 				.task { store.send(.view(.task)) }
 			}
