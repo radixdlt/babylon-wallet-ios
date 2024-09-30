@@ -94,7 +94,14 @@ extension DappInteractionFlow {
 						then: { TransactionReview.View(store: $0) }
 					)
 
-				case .personaProofOfOwnership, .accountsProofOfOwnership:
+				case .personaProofOfOwnership:
+					CaseLet(
+						/DappInteractionFlow.Path.MainState.personaProofOfOwnership,
+						action: DappInteractionFlow.Path.Action.personaProofOfOwnership,
+						then: { PersonaProofOfOwnership.View(store: $0) }
+					)
+
+				case .accountsProofOfOwnership:
 					Color.orange
 				}
 			}

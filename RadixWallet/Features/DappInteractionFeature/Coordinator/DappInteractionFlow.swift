@@ -143,7 +143,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case personaDataPermission(PersonaDataPermission.State)
 			case oneTimePersonaData(OneTimePersonaData.State)
 			case reviewTransaction(TransactionReview.State)
-			case personaProofOfOwnership
+			case personaProofOfOwnership(PersonaProofOfOwnership.State)
 			case accountsProofOfOwnership
 		}
 
@@ -155,6 +155,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case personaDataPermission(PersonaDataPermission.Action)
 			case oneTimePersonaData(OneTimePersonaData.Action)
 			case reviewTransaction(TransactionReview.Action)
+			case personaProofOfOwnership(PersonaProofOfOwnership.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -176,6 +177,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				}
 				Scope(state: \.reviewTransaction, action: \.reviewTransaction) {
 					TransactionReview()
+				}
+				Scope(state: \.personaProofOfOwnership, action: \.personaProofOfOwnership) {
+					PersonaProofOfOwnership()
 				}
 			}
 		}
@@ -898,7 +902,12 @@ extension DappInteractionFlow.Path.State {
 			))
 
 		case let .remote(.personaProofOfOwnership(item)):
-			self.state = .personaProofOfOwnership
+			self.state = .personaProofOfOwnership(
+				.init(
+					identityAddress: item.identityAddress,
+					dappMetadata: dappMetadata
+				)
+			)
 
 		case let .remote(.accountsProofOfOwnership(item)):
 			self.state = .accountsProofOfOwnership

@@ -22,7 +22,7 @@ extension PersonaRow {
 	@MainActor
 	struct View: SwiftUI.View {
 		let viewState: ViewState
-		let isSelected: Bool
+		let isSelected: Bool?
 		let action: () -> Void
 
 		var body: some SwiftUI.View {
@@ -40,11 +40,13 @@ extension PersonaRow {
 
 						Spacer()
 
-						RadioButton(
-							appearance: .dark,
-							state: isSelected ? .selected : .unselected
-						)
-						.padding(.leading, .small3)
+						if let isSelected {
+							RadioButton(
+								appearance: .dark,
+								state: isSelected ? .selected : .unselected
+							)
+							.padding(.leading, .small3)
+						}
 					}
 					.padding(.medium2)
 
