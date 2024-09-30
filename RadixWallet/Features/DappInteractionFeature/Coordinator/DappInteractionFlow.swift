@@ -143,6 +143,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case personaDataPermission(PersonaDataPermission.State)
 			case oneTimePersonaData(OneTimePersonaData.State)
 			case reviewTransaction(TransactionReview.State)
+			case personaProofOfOwnership
+			case accountsProofOfOwnership
 		}
 
 		@CasePathable
@@ -894,6 +896,12 @@ extension DappInteractionFlow.Path.State {
 				personaID: persona.id,
 				requested: item
 			))
+
+		case let .remote(.personaProofOfOwnership(item)):
+			self.state = .personaProofOfOwnership
+
+		case let .remote(.accountsProofOfOwnership(item)):
+			self.state = .accountsProofOfOwnership
 
 		case let .remote(.send(item)):
 			self.state = .reviewTransaction(.init(

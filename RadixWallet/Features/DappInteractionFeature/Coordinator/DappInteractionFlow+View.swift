@@ -93,6 +93,9 @@ extension DappInteractionFlow {
 						action: DappInteractionFlow.Path.Action.reviewTransaction,
 						then: { TransactionReview.View(store: $0) }
 					)
+
+				case .personaProofOfOwnership, .accountsProofOfOwnership:
+					Color.orange
 				}
 			}
 		}
