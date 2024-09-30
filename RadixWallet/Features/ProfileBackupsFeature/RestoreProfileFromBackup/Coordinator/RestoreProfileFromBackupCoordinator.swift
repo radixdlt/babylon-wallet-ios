@@ -115,7 +115,12 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 				let factorSourceIDs: Set<FactorSourceIDFromHash> = .init(
 					profileSelection.profile.factorSources.compactMap { $0.extract(DeviceFactorSource.self) }.map(\.id)
 				)
-				try await transportProfileClient.importProfile(profileSelection.profile, factorSourceIDs, profileSelection.containsP2PLinks, skippedMainBdfs)
+				try await transportProfileClient.importProfile(
+					profileSelection.profile,
+					factorSourceIDs,
+					skippedMainBdfs,
+					profileSelection.containsP2PLinks
+				)
 
 				await send(.delegate(.profileImported(
 					skippedAnyMnemonic: !skipList.isEmpty
