@@ -78,7 +78,7 @@ jobs:
 
       - uses: RDXWorks-actions/setup-xcode@master
         with:
-          xcode-version: "15.3.0"
+          xcode-version: "16.0.0"
 
       - uses: RDXWorks-actions/ssh-agent@master
         with:
