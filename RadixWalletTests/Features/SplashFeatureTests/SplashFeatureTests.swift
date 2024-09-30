@@ -29,6 +29,11 @@ final class SplashFeatureTests: TestCase {
 				profile.appPreferences.security.isAdvancedLockEnabled = true
 				return .loaded(profile)
 			}
+			$0.secureStorageClient.loadProfileSnapshotData = { _ in
+				var profile = Profile.withOneAccount
+				profile.appPreferences.security.isAdvancedLockEnabled = true
+				return profile.jsonData()
+			}
 			$0.userDefaults = userDefaults
 		}
 
@@ -61,7 +66,7 @@ final class SplashFeatureTests: TestCase {
 		let store = TestStore(
 			initialState: Splash.State(),
 			reducer: Splash.init
-		) {
+		) { [profile] in
 			$0.localAuthenticationClient = LocalAuthenticationClient(
 				queryConfig: { authBiometricsConfig },
 				authenticateWithBiometrics: { true },
@@ -70,8 +75,11 @@ final class SplashFeatureTests: TestCase {
 			)
 
 			$0.continuousClock = clock
-			$0.onboardingClient.loadProfile = {
-				profile
+			$0.onboardingClient.loadProfileState = {
+				.loaded(profile)
+			}
+			$0.secureStorageClient.loadProfileSnapshotData = { _ in
+				profile.jsonData()
 			}
 		}
 
@@ -80,6 +88,6 @@ final class SplashFeatureTests: TestCase {
 
 		await clock.advance(by: .seconds(0.4))
 		await store.receive(.internal(.advancedLockStateLoaded(isEnabled: false)))
-		await store.receive(.delegate(.completed(profile)))
+		await store.receive(.delegate(.completed(.loaded(profile))))
 	}
 }

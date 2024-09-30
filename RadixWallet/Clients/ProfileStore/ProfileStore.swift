@@ -41,7 +41,7 @@ extension ProfileStore {
 }
 
 extension ProfileStore {
-	public func createNewWallet() async throws {
+	public func createNewProfile() async throws {
 		try await SargonOS.shared.newWallet()
 	}
 

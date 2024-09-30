@@ -27,7 +27,6 @@
 		4827520D2BDA5E13007854E0 /* SplashFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2902ADEBFB300A38425 /* SplashFeatureTests.swift */; };
 		4827520E2BDA5E50007854E0 /* TransactionClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2FA2ADEBFB300A38425 /* TransactionClientTests.swift */; };
 		4827520F2BDA5FAF007854E0 /* AppFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA27C2ADEBFB200A38425 /* AppFeatureTests.swift */; };
-		482752102BDA60FA007854E0 /* ProfileStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA3052ADEBFB300A38425 /* ProfileStoreTests.swift */; };
 		482752182BDB9032007854E0 /* DisplayName+NonEmptyString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 482752172BDB9032007854E0 /* DisplayName+NonEmptyString.swift */; };
 		4827521A2BDB90D4007854E0 /* FactorSourceCommon+New+Dependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 482752192BDB90D4007854E0 /* FactorSourceCommon+New+Dependencies.swift */; };
 		483A3DE42BD2658B00055932 /* Stage1MigrateToSargon+FactorSources.swift in Sources */ = {isa = PBXBuildFile; fileRef = 483A3DE32BD2658B00055932 /* Stage1MigrateToSargon+FactorSources.swift */; };
@@ -2441,7 +2440,6 @@
 		E6DBA2F62ADEBFB300A38425 /* SecureStorageClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SecureStorageClientTests.swift; sourceTree = "<group>"; };
 		E6DBA2FA2ADEBFB300A38425 /* TransactionClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionClientTests.swift; sourceTree = "<group>"; };
 		E6DBA3012ADEBFB300A38425 /* CacheClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CacheClientTests.swift; sourceTree = "<group>"; };
-		E6DBA3052ADEBFB300A38425 /* ProfileStoreTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileStoreTests.swift; sourceTree = "<group>"; };
 		E6DBA3092ADEBFB300A38425 /* FactorSourcesClientLiveTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FactorSourcesClientLiveTests.swift; sourceTree = "<group>"; };
 		E6DBA30B2ADEBFB300A38425 /* DiskPersistenceClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiskPersistenceClientTests.swift; sourceTree = "<group>"; };
 		E6DBA30F2ADEBFB300A38425 /* FaucetClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FaucetClientTests.swift; sourceTree = "<group>"; };
@@ -6556,7 +6554,6 @@
 				E6DBA2F52ADEBFB300A38425 /* SecureStorageClientTests */,
 				E6DBA2F92ADEBFB300A38425 /* TransactionClientTests */,
 				E6DBA3002ADEBFB300A38425 /* CacheClientTests */,
-				E6DBA3042ADEBFB300A38425 /* ProfileStoreTests */,
 				E6DBA3082ADEBFB300A38425 /* FactorSourcesClientLiveTests */,
 				E6DBA30A2ADEBFB300A38425 /* DiskPersistenceClientTests */,
 				E6DBA30E2ADEBFB300A38425 /* FaucetClientTests */,
@@ -6638,14 +6635,6 @@
 				E6DBA3012ADEBFB300A38425 /* CacheClientTests.swift */,
 			);
 			path = CacheClientTests;
-			sourceTree = "<group>";
-		};
-		E6DBA3042ADEBFB300A38425 /* ProfileStoreTests */ = {
-			isa = PBXGroup;
-			children = (
-				E6DBA3052ADEBFB300A38425 /* ProfileStoreTests.swift */,
-			);
-			path = ProfileStoreTests;
 			sourceTree = "<group>";
 		};
 		E6DBA3082ADEBFB300A38425 /* FactorSourcesClientLiveTests */ = {
@@ -6954,8 +6943,8 @@
 				5B1C4FD32BBB0B0C00B9436F /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Strict" */,
 				8318BB172BC8403800057BCB /* XCRemoteSwiftPackageReference "swift-custom-dump" */,
 				E6A0B0492BF23C7000617DAC /* XCRemoteSwiftPackageReference "swift-identified-collections" */,
-				83D908AA2C92E66E00822CC4 /* XCLocalSwiftPackageReference "../sargon" */,
 				5B634A922C91D2A0004B2FBC /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */,
+				835BA2792CAB05E700407AE9 /* XCLocalSwiftPackageReference "../sargon" */,
 			);
 			productRefGroup = 48CFBC502ADC106300E77A5C /* Products */;
 			projectDirPath = "";
@@ -7046,7 +7035,6 @@
 				482752042BD9951A007854E0 /* CustomizeFeePayerTests.swift in Sources */,
 				E6DBA31D2ADEBFB300A38425 /* PeerConnectionNegotiatorTests.swift in Sources */,
 				E6DBA3832ADEBFB300A38425 /* DiskPersistenceClientTests.swift in Sources */,
-				482752102BDA60FA007854E0 /* ProfileStoreTests.swift in Sources */,
 				482752092BDA5576007854E0 /* EntitiesHidingTests.swift in Sources */,
 				E6A0B04D2BF23D6E00617DAC /* IdentifiedArrayOf+Mutation+Position.swift in Sources */,
 				4884BDBA2BD98EF6003B1ED6 /* TestFixture.swift in Sources */,
@@ -8741,7 +8729,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		83D908AA2C92E66E00822CC4 /* XCLocalSwiftPackageReference "../sargon" */ = {
+		835BA2792CAB05E700407AE9 /* XCLocalSwiftPackageReference "../sargon" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../sargon;
 		};
@@ -9018,14 +9006,6 @@
 			requirement = {
 				kind = exactVersion;
 				version = 1.0.2;
-			};
-		};
-		E7FF4BC02C9C2F1200124A25 /* XCRemoteSwiftPackageReference "sargon" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/radixdlt/sargon";
-			requirement = {
-				kind = exactVersion;
-				version = 1.1.19;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

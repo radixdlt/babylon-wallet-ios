@@ -235,7 +235,11 @@ extension PrivateHierarchicalDeterministicFactorSource {
 		model: String,
 		mnemonicWithPassphrase: MnemonicWithPassphrase = .testValueZooVote
 	) -> Self {
-		var bdfs = DeviceFactorSource.babylon(mnemonicWithPassphrase: mnemonicWithPassphrase, isMain: true, hostInfo: .current())
+		var bdfs = DeviceFactorSource.babylon(
+			mnemonicWithPassphrase: mnemonicWithPassphrase,
+			isMain: true,
+			hostInfo: .sample
+		)
 		bdfs.hint.model = model
 		bdfs.hint.name = name
 		bdfs.common.addedOn = .init(timeIntervalSince1970: 0)

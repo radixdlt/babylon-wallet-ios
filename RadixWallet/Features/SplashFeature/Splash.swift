@@ -84,7 +84,7 @@ public struct Splash: Sendable, FeatureReducer {
 		case .appeared:
 			switch state.context {
 			case .appStarted:
-				return boot_sargon_os().concatenate(with: loadAdvancedLockState())
+				return bootSargonOS().concatenate(with: loadAdvancedLockState())
 			case .appForegrounded:
 				return loadAdvancedLockState()
 			}
@@ -210,19 +210,23 @@ public struct Splash: Sendable, FeatureReducer {
 		}
 	}
 
-	private func boot_sargon_os() -> Effect<Action> {
+	private func bootSargonOS() -> Effect<Action> {
 		.run { _ in
-			// Ignore error.
-			// The only error that can be thrown is SargonOSAlreadyBooted.
-			try? await SargonOS.creatingShared(
-				bootingWith: .creatingShared(
-					drivers: .init(
-						bundle: Bundle.main,
-						userDefaultsSuite: UserDefaults.Dependency.radixSuiteName,
-						secureStorageDriver: SargonSecureStorage()
+			do {
+				try await SargonOS.creatingShared(
+					bootingWith: .creatingShared(
+						drivers: .init(
+							bundle: Bundle.main,
+							userDefaultsSuite: UserDefaults.Dependency.radixSuiteName,
+							secureStorageDriver: SargonSecureStorage()
+						)
 					)
 				)
-			)
+			} catch {
+				// Ignore error.
+				// The only error that can be thrown is SargonOSAlreadyBooted.
+				loggerGlobal.error("Did try to boot SargonOS more than once")
+			}
 		}
 	}
 
