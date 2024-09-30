@@ -12,6 +12,10 @@ struct ___VARIABLE_featureName___: Sendable, FeatureReducer {
 		case appeared
 	}
 
+	var body: some ReducerOf<Self> {
+		Reduce(core)
+	}
+
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
