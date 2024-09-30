@@ -31,7 +31,7 @@ public actor RTCClients {
 		incomingMessagesSubject.share().eraseToAnyAsyncSequence()
 	}
 
-	public func connectClients() async -> AnyAsyncSequence<[P2P.ClientConnectionsUpdate]> {
+	public nonisolated func connectClients() async -> AnyAsyncSequence<[P2P.ClientConnectionsUpdate]> {
 		clientConnectionsUpdateSubject.share().eraseToAnyAsyncSequence()
 	}
 

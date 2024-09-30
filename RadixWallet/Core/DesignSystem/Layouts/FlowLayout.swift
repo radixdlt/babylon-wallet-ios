@@ -33,7 +33,7 @@ public struct FlowLayout: Layout {
 			alignment: alignment
 		).size
 
-		return .init(width: min(laidOutSize.width, containerWidth), height: laidOutSize.height)
+		return .init(width: containerWidth, height: laidOutSize.height)
 	}
 
 	public func placeSubviews(

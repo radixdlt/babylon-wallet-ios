@@ -133,7 +133,10 @@ extension DappInteractionClient {
 		if !isDeveloperModeEnabled {
 			do {
 				try await rolaClient.performDappDefinitionVerification(metadataValidDappDefAddress)
-				try await rolaClient.performWellKnownFileCheck(metadataValidDappDefAddress)
+				try await rolaClient.performWellKnownFileCheck(
+					metadataValidDappDefAddress.origin.url(),
+					metadataValidDappDefAddress.dappDefinitionAddress
+				)
 			} catch {
 				loggerGlobal.warning("\(error)")
 				return invalidRequest(.dAppValidationError(error.localizedDescription))

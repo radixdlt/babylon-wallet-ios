@@ -5,10 +5,12 @@ import XCTest
 // MARK: - SplashFeatureTests
 @MainActor
 final class SplashFeatureTests: TestCase {
-	func test__GIVEN__splash_appeared__WHEN__no_biometrics_config__THEN__alert_is_shown() async throws {
+	func test__GIVEN__splash_appeared__WHEN__advanced_lock_enabled__AND__message_not_shown() async throws {
 		let authBiometricsConfig = LocalAuthenticationConfig.neitherBiometricsNorPasscodeSetUp
 
 		let clock = TestClock()
+		let userDefaults = UserDefaults.Dependency.ephemeral()
+		userDefaults.setAppLockMessageShown(false)
 
 		let store = TestStore(
 			initialState: Splash.State(),
@@ -27,31 +29,57 @@ final class SplashFeatureTests: TestCase {
 				profile.appPreferences.security.isAdvancedLockEnabled = true
 				return .loaded(profile)
 			}
+			$0.userDefaults = userDefaults
 		}
 
 		// when
 		await store.send(.view(.appeared))
 
 		await clock.advance(by: .seconds(0.4))
-		await store.receive(.internal(.advancedLockStateLoaded(isEnabled: true)))
-		await store.receive(.internal(.passcodeConfigResult(.success(authBiometricsConfig)))) {
-			$0.biometricsCheckFailed = true
+		await store.receive(.internal(.showAppLockMessage)) {
 			$0.destination = .errorAlert(.init(
-				title: { .init(L10n.Splash.PasscodeCheckFailedAlert.title) },
+				title: { .init(L10n.Biometrics.AppLockAvailableAlert.title) },
 				actions: {
-					ButtonState(
-						role: .none,
-						action: .send(.retryVerifyPasscodeButtonTapped),
-						label: { TextState(L10n.Common.retry) }
-					)
-					ButtonState(
-						role: .none,
-						action: .send(.openSettingsButtonTapped),
-						label: { TextState(L10n.Common.systemSettings) }
+					.default(
+						.init(L10n.Common.dismiss),
+						action: .send(.appLockOkButtonTapped)
 					)
 				},
-				message: { .init(L10n.Splash.PasscodeCheckFailedAlert.message) }
+				message: { .init(L10n.Biometrics.AppLockAvailableAlert.message) }
 			))
 		}
+	}
+
+	func test__GIVEN__splash_appeared__WHEN__advanced_lock_disabled() async throws {
+		let authBiometricsConfig = LocalAuthenticationConfig.neitherBiometricsNorPasscodeSetUp
+
+		let clock = TestClock()
+
+		var profile = Profile.withOneAccount
+		profile.appPreferences.security.isAdvancedLockEnabled = false
+
+		let store = TestStore(
+			initialState: Splash.State(),
+			reducer: Splash.init
+		) {
+			$0.localAuthenticationClient = LocalAuthenticationClient(
+				queryConfig: { authBiometricsConfig },
+				authenticateWithBiometrics: { true },
+				setAuthenticatedSuccessfully: unimplemented("\(Self.self).setAuthenticatedSuccessfully"),
+				authenticatedSuccessfully: unimplemented("\(Self.self).authenticatedSuccessfully")
+			)
+
+			$0.continuousClock = clock
+			$0.onboardingClient.loadProfile = {
+				profile
+			}
+		}
+
+		// when
+		await store.send(.view(.appeared))
+
+		await clock.advance(by: .seconds(0.4))
+		await store.receive(.internal(.advancedLockStateLoaded(isEnabled: false)))
+		await store.receive(.delegate(.completed(profile)))
 	}
 }

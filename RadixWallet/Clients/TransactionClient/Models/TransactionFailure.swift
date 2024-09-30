@@ -80,7 +80,7 @@ extension TransactionFailure {
 		case failedSigning(FailedToPrepareForTXSigning)
 		case failedToRetrieveTXPreview(Error)
 		case failedToRetrieveTXReceipt(String)
-		case failedToExtractTXReceiptBytes(Error)
+		case failedToExtractTXReceiptBytes
 		case failedToGenerateTXReview(Error)
 		case manifestWithReservedInstructions([ReservedInstruction])
 		case oneOfRecevingAccountsDoesNotAllowDeposits
@@ -91,8 +91,8 @@ extension TransactionFailure {
 				error.errorDescription
 			case let .failedToRetrieveTXPreview(error):
 				"Failed to retrieve TX review from gateway: \(error.localizedDescription)"
-			case let .failedToExtractTXReceiptBytes(error):
-				"Failed to extract TX review bytes: \(error.localizedDescription)"
+			case .failedToExtractTXReceiptBytes:
+				"Failed to extract TX review bytes"
 			case let .failedToGenerateTXReview(error):
 				"ET failed to generate TX review: \(error.localizedDescription)"
 			case let .failedToRetrieveTXReceipt(message):

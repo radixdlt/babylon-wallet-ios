@@ -17,6 +17,7 @@ extension GatewayAPI {
 
 public struct TransactionPreviewRequest: Codable, Hashable {
 
+    public private(set) var optIns: TransactionPreviewOptIns?
     /** A text-representation of a transaction manifest */
     public private(set) var manifest: String
     /** An array of hex-encoded blob data, if referenced by the manifest. */
@@ -38,7 +39,8 @@ public struct TransactionPreviewRequest: Codable, Hashable {
     public private(set) var message: AnyCodable?
     public private(set) var flags: TransactionPreviewRequestFlags
 
-    public init(manifest: String, blobsHex: [String]? = nil, startEpochInclusive: Int64, endEpochExclusive: Int64, notaryPublicKey: PublicKey? = nil, notaryIsSignatory: Bool? = nil, tipPercentage: Int, nonce: Int64, signerPublicKeys: [PublicKey], message: AnyCodable? = nil, flags: TransactionPreviewRequestFlags) {
+    public init(optIns: TransactionPreviewOptIns? = nil, manifest: String, blobsHex: [String]? = nil, startEpochInclusive: Int64, endEpochExclusive: Int64, notaryPublicKey: PublicKey? = nil, notaryIsSignatory: Bool? = nil, tipPercentage: Int, nonce: Int64, signerPublicKeys: [PublicKey], message: AnyCodable? = nil, flags: TransactionPreviewRequestFlags) {
+        self.optIns = optIns
         self.manifest = manifest
         self.blobsHex = blobsHex
         self.startEpochInclusive = startEpochInclusive
@@ -53,6 +55,7 @@ public struct TransactionPreviewRequest: Codable, Hashable {
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
+        case optIns = "opt_ins"
         case manifest
         case blobsHex = "blobs_hex"
         case startEpochInclusive = "start_epoch_inclusive"
@@ -70,6 +73,7 @@ public struct TransactionPreviewRequest: Codable, Hashable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(optIns, forKey: .optIns)
         try container.encode(manifest, forKey: .manifest)
         try container.encodeIfPresent(blobsHex, forKey: .blobsHex)
         try container.encode(startEpochInclusive, forKey: .startEpochInclusive)

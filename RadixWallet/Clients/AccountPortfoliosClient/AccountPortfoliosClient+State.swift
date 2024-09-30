@@ -288,8 +288,15 @@ private extension MutableCollection where Element == OnLedgerEntitiesClient.Owne
 private extension MutableCollection where Element == OnLedgerEntitiesClient.OwnedStakeDetails {
 	mutating func updateFiatWorth(_ change: (ResourceAddress, ResourceAmount) -> FiatWorth?) {
 		mutateAll { detail in
+			let xrdRedemptionValue = detail.xrdRedemptionValue
 			detail.stakeUnitResource.mutate {
-				$0.amount.fiatWorth = change(.mainnetXRD, $0.amount)
+				$0.amount.fiatWorth = change(
+					.mainnetXRD,
+					.init(
+						nominalAmount: xrdRedemptionValue,
+						fiatWorth: $0.amount.fiatWorth
+					)
+				)
 			}
 			detail.stakeClaimTokens.mutate {
 				$0.stakeClaims.mutateAll { token in
