@@ -193,7 +193,7 @@ jobs:
           bundle exec fastlane tests
 
       - name: Upload results
-        uses: RDXWorks-actions/xcresulttool@main
+        uses: RDXWorks-actions/xcresulttool-xcode16@v1.8.0
         with:
           path: build/test_output/results.xcresult
           show-passed-tests: false
