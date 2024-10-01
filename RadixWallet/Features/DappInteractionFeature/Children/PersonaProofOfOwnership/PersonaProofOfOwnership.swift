@@ -32,7 +32,7 @@ struct PersonaProofOfOwnership: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case proovedOwnership(Persona, SignedAuthChallenge)
+		case provenOwnership(Persona, SignedAuthChallenge)
 		case failedToGetPersona
 	}
 
@@ -92,7 +92,7 @@ struct PersonaProofOfOwnership: Sendable, FeatureReducer {
 
 			let signedAuthChallenge = SignedAuthChallenge(challenge: challenge, entitySignatures: Set([signature]))
 
-			await send(.delegate(.proovedOwnership(persona, signedAuthChallenge)))
+			await send(.delegate(.provenOwnership(persona, signedAuthChallenge)))
 		}
 	}
 }

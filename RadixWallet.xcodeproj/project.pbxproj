@@ -762,6 +762,8 @@
 		5B9846C22BBD5F7600E814F3 /* SensitiveInfoClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9846C12BBD5F7600E814F3 /* SensitiveInfoClient+Live.swift */; };
 		5BA321C82CAB015E0087FD1C /* PersonaProofOfOwnership.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA321C62CAB015E0087FD1C /* PersonaProofOfOwnership.swift */; };
 		5BA321C92CAB015E0087FD1C /* PersonaProofOfOwnership+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA321C72CAB015E0087FD1C /* PersonaProofOfOwnership+View.swift */; };
+		5BA321D32CAC3E730087FD1C /* AccountsProofOfOwnership.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA321D12CAC3E730087FD1C /* AccountsProofOfOwnership.swift */; };
+		5BA321D42CAC3E730087FD1C /* AccountsProofOfOwnership+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA321D22CAC3E730087FD1C /* AccountsProofOfOwnership+View.swift */; };
 		5BB7C1762BC81F50001216EB /* ImportOlympiaNameLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB7C1752BC81F50001216EB /* ImportOlympiaNameLedger.swift */; };
 		5BB7C1782BC81F61001216EB /* ImportOlympiaNameLedger+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB7C1772BC81F61001216EB /* ImportOlympiaNameLedger+View.swift */; };
 		5BBC43A92BBAC6B0005747B1 /* AppTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC43A82BBAC6B0005747B1 /* AppTextEditor.swift */; };
@@ -1975,6 +1977,8 @@
 		5B9846C12BBD5F7600E814F3 /* SensitiveInfoClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SensitiveInfoClient+Live.swift"; sourceTree = "<group>"; };
 		5BA321C62CAB015E0087FD1C /* PersonaProofOfOwnership.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonaProofOfOwnership.swift; sourceTree = "<group>"; };
 		5BA321C72CAB015E0087FD1C /* PersonaProofOfOwnership+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PersonaProofOfOwnership+View.swift"; sourceTree = "<group>"; };
+		5BA321D12CAC3E730087FD1C /* AccountsProofOfOwnership.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsProofOfOwnership.swift; sourceTree = "<group>"; };
+		5BA321D22CAC3E730087FD1C /* AccountsProofOfOwnership+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountsProofOfOwnership+View.swift"; sourceTree = "<group>"; };
 		5BB7C1752BC81F50001216EB /* ImportOlympiaNameLedger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportOlympiaNameLedger.swift; sourceTree = "<group>"; };
 		5BB7C1772BC81F61001216EB /* ImportOlympiaNameLedger+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ImportOlympiaNameLedger+View.swift"; sourceTree = "<group>"; };
 		5BBC43A82BBAC6B0005747B1 /* AppTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTextEditor.swift; sourceTree = "<group>"; };
@@ -3822,7 +3826,6 @@
 		48CFBDFD2ADC10D800E77A5C /* Children */ = {
 			isa = PBXGroup;
 			children = (
-				5BA321CB2CAB06DB0087FD1C /* PersonaProofOfOwnership */,
 				831F0CF02C2576AE00D6F5BF /* DappOriginVerification */,
 				48CFBDFE2ADC10D800E77A5C /* AccountPermissionChooseAccounts */,
 				48CFBE012ADC10D800E77A5C /* AccountPermission */,
@@ -3830,6 +3833,8 @@
 				48CFBE072ADC10D800E77A5C /* PersonaDataPermission */,
 				48CFBE0C2ADC10D800E77A5C /* OneTimePersonaData */,
 				48CFBE0F2ADC10D800E77A5C /* Login */,
+				5BA321CB2CAB06DB0087FD1C /* PersonaProofOfOwnership */,
+				5BA321D02CAC3E520087FD1C /* AccountsProofOfOwnership */,
 			);
 			path = Children;
 			sourceTree = "<group>";
@@ -5608,6 +5613,15 @@
 				5BA321C72CAB015E0087FD1C /* PersonaProofOfOwnership+View.swift */,
 			);
 			path = PersonaProofOfOwnership;
+			sourceTree = "<group>";
+		};
+		5BA321D02CAC3E520087FD1C /* AccountsProofOfOwnership */ = {
+			isa = PBXGroup;
+			children = (
+				5BA321D12CAC3E730087FD1C /* AccountsProofOfOwnership.swift */,
+				5BA321D22CAC3E730087FD1C /* AccountsProofOfOwnership+View.swift */,
+			);
+			path = AccountsProofOfOwnership;
 			sourceTree = "<group>";
 		};
 		5BBC7D9D2C3D390D00B04BD6 /* BootstrapClient */ = {
@@ -8016,6 +8030,8 @@
 				48CFC2C82ADC10D900E77A5C /* ResourceAsset+Reducer.swift in Sources */,
 				83856D632B0279080026452A /* VerifyMnemonic.swift in Sources */,
 				831F0CF22C25897500D6F5BF /* DappInteractionOriginVerification+View.swift in Sources */,
+				5BA321D32CAC3E730087FD1C /* AccountsProofOfOwnership.swift in Sources */,
+				5BA321D42CAC3E730087FD1C /* AccountsProofOfOwnership+View.swift in Sources */,
 				48CFC48A2ADC10DA00E77A5C /* OnLedgerEntitiesClient+CreateEntity.swift in Sources */,
 				A40815982C7E0D08005E65B9 /* MetadataNonFungibleLocalIdArrayValue.swift in Sources */,
 				A4ECE27A2BEEB01800468BF6 /* CloudBackupClient+Live.swift in Sources */,

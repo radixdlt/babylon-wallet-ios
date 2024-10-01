@@ -144,7 +144,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case oneTimePersonaData(OneTimePersonaData.State)
 			case reviewTransaction(TransactionReview.State)
 			case personaProofOfOwnership(PersonaProofOfOwnership.State)
-			case accountsProofOfOwnership
+			case accountsProofOfOwnership(AccountsProofOfOwnership.State)
 		}
 
 		@CasePathable
@@ -156,6 +156,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case oneTimePersonaData(OneTimePersonaData.Action)
 			case reviewTransaction(TransactionReview.Action)
 			case personaProofOfOwnership(PersonaProofOfOwnership.Action)
+			case accountsProofOfOwnership(AccountsProofOfOwnership.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -180,6 +181,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				}
 				Scope(state: \.personaProofOfOwnership, action: \.personaProofOfOwnership) {
 					PersonaProofOfOwnership()
+				}
+				Scope(state: \.accountsProofOfOwnership, action: \.accountsProofOfOwnership) {
+					AccountsProofOfOwnership()
 				}
 			}
 		}
@@ -432,7 +436,7 @@ extension DappInteractionFlow {
 			_ signedAuthChallenge: SignedAuthChallenge
 		) -> Effect<Action> {
 			guard
-				// A **single** signature expected, since we proove ownership of a single Persona.
+				// A **single** signature expected, since we prove ownership of a single Persona.
 				let entitySignature = signedAuthChallenge.entitySignatures.first,
 				signedAuthChallenge.entitySignatures.count == 1
 			else {
@@ -495,7 +499,7 @@ extension DappInteractionFlow {
 		case let .reviewTransaction(.delegate(.failed(error))):
 			return handleSignAndSubmitTXFailed(error)
 
-		case let .personaProofOfOwnership(.delegate(.proovedOwnership(persona, challenge))):
+		case let .personaProofOfOwnership(.delegate(.provenOwnership(persona, challenge))):
 			return handlePersonaProofOfOwnership(item, persona, challenge)
 
 		case .personaProofOfOwnership(.delegate(.failedToGetPersona)):
@@ -931,16 +935,18 @@ extension DappInteractionFlow.Path.State {
 			))
 
 		case let .remote(.personaProofOfOwnership(item)):
-			self.state = .personaProofOfOwnership(
-				.init(
-					identityAddress: item.identityAddress,
-					dappMetadata: dappMetadata,
-					challenge: item.challenge
-				)
-			)
+			self.state = .personaProofOfOwnership(.init(
+				identityAddress: item.identityAddress,
+				dappMetadata: dappMetadata,
+				challenge: item.challenge
+			))
 
 		case let .remote(.accountsProofOfOwnership(item)):
-			self.state = .accountsProofOfOwnership
+			self.state = .accountsProofOfOwnership(.init(
+				accountAddresses: item.accountAddresses,
+				dappMetadata: dappMetadata,
+				challenge: item.challenge
+			))
 
 		case let .remote(.send(item)):
 			self.state = .reviewTransaction(.init(

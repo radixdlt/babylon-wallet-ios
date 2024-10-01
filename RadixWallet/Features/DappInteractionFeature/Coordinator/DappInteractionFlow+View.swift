@@ -102,7 +102,11 @@ extension DappInteractionFlow {
 					)
 
 				case .accountsProofOfOwnership:
-					Color.orange
+					CaseLet(
+						/DappInteractionFlow.Path.MainState.accountsProofOfOwnership,
+						action: DappInteractionFlow.Path.Action.accountsProofOfOwnership,
+						then: { AccountsProofOfOwnership.View(store: $0) }
+					)
 				}
 			}
 		}
