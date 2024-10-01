@@ -499,7 +499,7 @@ extension DappInteractionFlow {
 			return handlePersonaProofOfOwnership(item, persona, challenge)
 
 		case .personaProofOfOwnership(.delegate(.failedToGetPersona)):
-			return dismissEffect(for: state, errorKind: .invalidPersona, message: nil)
+			return dismissEffect(for: state, errorKind: .invalidPersonaOrAccounts, message: nil)
 
 		default:
 			return .none
