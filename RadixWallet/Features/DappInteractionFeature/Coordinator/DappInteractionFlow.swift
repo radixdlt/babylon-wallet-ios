@@ -453,6 +453,26 @@ extension DappInteractionFlow {
 			return continueEffect(for: &state)
 		}
 
+		func handleAccountsProofOfOwnership(
+			_ item: State.AnyInteractionItem,
+			_ accountAuthProofs: [AccountAuthProof],
+			_ signedAuthChallenge: SignedAuthChallenge
+		) -> Effect<Action> {
+			let proofs = accountAuthProofs.map {
+				WalletToDappInteractionProofOfOwnership.account(.init(
+					accountAddress: $0.account.address,
+					proof: $0.proof
+				))
+			}
+
+			state.responseItems[item] = .remote(.proofOfOwnership(.init(
+				challenge: signedAuthChallenge.challenge,
+				proofs: proofs
+			)))
+
+			return continueEffect(for: &state)
+		}
+
 		let item = state.currentItem
 
 		guard let action = childAction.action else { return .none }
@@ -502,8 +522,15 @@ extension DappInteractionFlow {
 		case let .personaProofOfOwnership(.delegate(.provenOwnership(persona, challenge))):
 			return handlePersonaProofOfOwnership(item, persona, challenge)
 
-		case .personaProofOfOwnership(.delegate(.failedToGetPersona)):
+		case let .accountsProofOfOwnership(.delegate(.provenOwnership(accountAuthProofs, challenge))):
+			return handleAccountsProofOfOwnership(item, accountAuthProofs, challenge)
+
+		case .personaProofOfOwnership(.delegate(.failedToGetPersona)),
+		     .accountsProofOfOwnership(.delegate(.failedToGetAccounts)):
 			return dismissEffect(for: state, errorKind: .invalidPersonaOrAccounts, message: nil)
+
+		case .accountsProofOfOwnership(.delegate(.failedToSignTransaction)):
+			return dismissEffect(for: state, errorKind: .failedToSignTransaction, message: nil)
 
 		default:
 			return .none
