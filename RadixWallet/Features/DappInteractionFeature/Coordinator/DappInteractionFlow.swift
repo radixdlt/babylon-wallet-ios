@@ -426,6 +426,34 @@ extension DappInteractionFlow {
 			return dismissEffect(for: state, errorKind: errorKind, message: message)
 		}
 
+		func handlePersonaProofOfOwnership(
+			_ item: State.AnyInteractionItem,
+			_ persona: Persona,
+			_ signedAuthChallenge: SignedAuthChallenge
+		) -> Effect<Action> {
+			let responsePersona = DappWalletInteractionPersona(
+				identityAddress: persona.address,
+				label: persona.displayName.value
+			)
+
+			guard
+				// A **single** signature expected, since we sign auth with a single Persona.
+				let entitySignature = signedAuthChallenge.entitySignatures.first,
+				signedAuthChallenge.entitySignatures.count == 1
+			else {
+				return dismissEffect(for: state, errorKind: .failedToSignAuthChallenge, message: "Failed to serialize signature")
+			}
+			let authProof = WalletToDappInteractionAuthProof(entitySignature: entitySignature)
+			let proof = WalletToDappInteractionProofOfOwnership.persona(.init(identityAddress: persona.address, proof: authProof))
+
+			state.responseItems[item] = .remote(.proofOfOwnership(.init(
+				challenge: signedAuthChallenge.challenge,
+				proofs: [proof]
+			)))
+
+			return continueEffect(for: &state)
+		}
+
 		let item = state.currentItem
 
 		guard let action = childAction.action else { return .none }
@@ -471,6 +499,9 @@ extension DappInteractionFlow {
 
 		case let .reviewTransaction(.delegate(.failed(error))):
 			return handleSignAndSubmitTXFailed(error)
+
+		case let .personaProofOfOwnership(.delegate(.proovedOwnership(persona, challenge))):
+			return handlePersonaProofOfOwnership(item, persona, challenge)
 
 		default:
 			return .none
@@ -905,7 +936,8 @@ extension DappInteractionFlow.Path.State {
 			self.state = .personaProofOfOwnership(
 				.init(
 					identityAddress: item.identityAddress,
-					dappMetadata: dappMetadata
+					dappMetadata: dappMetadata,
+					challenge: item.challenge
 				)
 			)
 

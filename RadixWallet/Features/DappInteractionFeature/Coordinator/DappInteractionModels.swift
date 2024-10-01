@@ -293,6 +293,8 @@ extension WalletToDappInteractionSuccessResponse {
 }
 
 private extension DappToWalletInteractionProofOfOwnershipRequestItem? {
+	/// From a given `DappToWalletInteractionProofOfOwnershipRequestItem`, we may have up to two
+	/// `DappToWalletInteraction.AnyInteractionItem`s: one for prooving `Accounts`, and one for `Persona`.
 	var splitted: [DappToWalletInteraction.AnyInteractionItem] {
 		guard let self else {
 			return []
