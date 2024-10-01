@@ -16,7 +16,7 @@ extension PersonaProofOfOwnership {
 						)
 
 						if let viewState = store.personaViewState {
-							PersonaRow.View(viewState: viewState, isSelected: nil) {}
+							PersonaRow.View(viewState: viewState, mode: .display)
 						}
 					}
 					.padding(.horizontal, .medium1)
