@@ -33,6 +33,7 @@ struct PersonaProofOfOwnership: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case proovedOwnership(Persona, SignedAuthChallenge)
+		case failedToGetPersona
 	}
 
 	@Dependency(\.personasClient) var personasClient
@@ -64,8 +65,9 @@ struct PersonaProofOfOwnership: Sendable, FeatureReducer {
 		.run { send in
 			let persona = try await personasClient.getPersona(id: state.identityAddress)
 			await send(.internal(.setPersona(persona)))
-		} catch: { _, _ in
-			// TODO: Handle persona not found
+		} catch: { error, send in
+			loggerGlobal.error("Failed to get Persona to proove its ownership, \(error)")
+			await send(.delegate(.failedToGetPersona))
 		}
 	}
 

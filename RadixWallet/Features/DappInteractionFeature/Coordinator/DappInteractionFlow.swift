@@ -431,13 +431,8 @@ extension DappInteractionFlow {
 			_ persona: Persona,
 			_ signedAuthChallenge: SignedAuthChallenge
 		) -> Effect<Action> {
-			let responsePersona = DappWalletInteractionPersona(
-				identityAddress: persona.address,
-				label: persona.displayName.value
-			)
-
 			guard
-				// A **single** signature expected, since we sign auth with a single Persona.
+				// A **single** signature expected, since we proove ownership of a single Persona.
 				let entitySignature = signedAuthChallenge.entitySignatures.first,
 				signedAuthChallenge.entitySignatures.count == 1
 			else {
@@ -502,6 +497,9 @@ extension DappInteractionFlow {
 
 		case let .personaProofOfOwnership(.delegate(.proovedOwnership(persona, challenge))):
 			return handlePersonaProofOfOwnership(item, persona, challenge)
+
+		case .personaProofOfOwnership(.delegate(.failedToGetPersona)):
+			return dismissEffect(for: state, errorKind: .invalidPersona, message: nil)
 
 		default:
 			return .none
