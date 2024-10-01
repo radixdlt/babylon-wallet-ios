@@ -529,8 +529,9 @@ extension DappInteractionFlow {
 		     .accountsProofOfOwnership(.delegate(.failedToGetAccounts)):
 			return dismissEffect(for: state, errorKind: .invalidPersonaOrAccounts, message: nil)
 
-		case .accountsProofOfOwnership(.delegate(.failedToSignTransaction)):
-			return dismissEffect(for: state, errorKind: .failedToSignTransaction, message: nil)
+		case .personaProofOfOwnership(.delegate(.failedToSign)),
+		     .accountsProofOfOwnership(.delegate(.failedToSign)):
+			return dismissEffect(for: state, errorKind: .failedToSignAuthChallenge, message: nil)
 
 		default:
 			return .none

@@ -38,7 +38,7 @@ struct AccountsProofOfOwnership: Sendable, FeatureReducer {
 	enum DelegateAction: Sendable, Equatable {
 		case provenOwnership([AccountAuthProof], SignedAuthChallenge)
 		case failedToGetAccounts
-		case failedToSignTransaction
+		case failedToSign
 	}
 
 	struct Destination: DestinationReducer {
@@ -118,8 +118,8 @@ struct AccountsProofOfOwnership: Sendable, FeatureReducer {
 				}
 
 				guard accountsLeftToVerifyDidSign.isEmpty else {
-					loggerGlobal.error("Failed to sign with all accounts..")
-					return .send(.delegate(.failedToSignTransaction))
+					loggerGlobal.error("Failed to sign with all accounts")
+					return .send(.delegate(.failedToSign))
 				}
 
 				return .send(.delegate(.provenOwnership(accountAuthProofs, signedAuthChallenge)))
@@ -127,13 +127,13 @@ struct AccountsProofOfOwnership: Sendable, FeatureReducer {
 			case .failedToSign:
 				state.destination = nil
 				loggerGlobal.error("Failed to sign proof of ownership")
-				return .send(.delegate(.failedToSignTransaction))
+				return .send(.delegate(.failedToSign))
 
 			case .finishedSigning(.signTransaction):
 				state.destination = nil
 				assertionFailure("Signed a transaction while expecting auth")
 				loggerGlobal.error("Signed a transaction while expecting auth")
-				return .send(.delegate(.failedToSignTransaction))
+				return .send(.delegate(.failedToSign))
 			}
 
 		default:
@@ -180,7 +180,7 @@ struct AccountsProofOfOwnership: Sendable, FeatureReducer {
 			await send(.internal(.performSignature(signingFactors, authToSignResponse)))
 		} catch: { _, send in
 			loggerGlobal.error("Failed to gather signature payloads")
-			await send(.delegate(.failedToSignTransaction))
+			await send(.delegate(.failedToSign))
 		}
 	}
 
