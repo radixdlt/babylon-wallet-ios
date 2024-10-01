@@ -97,6 +97,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		case presentPersonaNotFoundErrorAlert(reason: String)
 		case autofillOngoingResponseItemsIfPossible(AutofillOngoingResponseItemsPayload)
 		case delayedAppendToPath(DappInteractionFlow.Path.State)
+		case handleInvalidPersonaOrAccounts
 
 		struct AutofillOngoingResponseItemsPayload: Sendable, Equatable {
 			struct AccountsPayload: Sendable, Equatable {
@@ -209,41 +210,28 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			guard let usePersonaRequestItem = state.usePersonaRequestItem else {
-				return .none
-			}
-
-			return .run { [dappDefinitionAddress = state.dappMetadata.dAppDefinitionAddress] send in
-				let identityAddress = usePersonaRequestItem.identityAddress
-				guard
-					let persona = try await personasClient.getPersonas()[id: identityAddress],
-					let authorizedDapp = try await authorizedDappsClient.getAuthorizedDapps()[id: dappDefinitionAddress],
-					let authorizedPersona = authorizedDapp.referencesToAuthorizedPersonas.first(where: { $0.identityAddress == identityAddress })
-				else {
-					await send(.internal(.presentPersonaNotFoundErrorAlert(reason: "")))
-					return
-				}
-
-				await send(.internal(.usePersona(usePersonaRequestItem, persona, authorizedDapp, authorizedPersona)))
-
-			} catch: { error, send in
-				await send(.internal(.presentPersonaNotFoundErrorAlert(reason: error.legibleLocalizedDescription)))
+			if let requestItem = state.usePersonaRequestItem {
+				validateAuthUsePersonaEffect(requestItem: requestItem, dappDefinitionAddress: state.dappMetadata.dAppDefinitionAddress)
+			} else if let requestItem = state.proofOfOwnershipRequestItem {
+				validateProofOfOwnershipRequestItemEffect(requestItem: requestItem)
+			} else {
+				.none
 			}
 
 		case let .personaNotFoundErrorAlert(.presented(action)):
 			switch action {
 			case .cancelButtonTapped:
-				return dismissEffect(for: state, errorKind: .invalidPersona, message: nil)
+				dismissEffect(for: state, errorKind: .invalidPersona, message: nil)
 			}
 
 		case .personaNotFoundErrorAlert:
-			return .none
+			.none
 
 		case .closeButtonTapped:
-			return dismissEffect(for: state, errorKind: .rejectedByUser, message: nil)
+			dismissEffect(for: state, errorKind: .rejectedByUser, message: nil)
 
 		case .backButtonTapped:
-			return goBackEffect(for: &state)
+			goBackEffect(for: &state)
 		}
 	}
 
@@ -313,6 +301,54 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				}
 			)
 			return .none
+
+		case .handleInvalidPersonaOrAccounts:
+			return dismissEffect(for: state, errorKind: .invalidPersonaOrAccounts, message: nil)
+		}
+	}
+
+	private func validateAuthUsePersonaEffect(
+		requestItem: DappToWalletInteractionAuthUsePersonaRequestItem,
+		dappDefinitionAddress: DappDefinitionAddress
+	) -> Effect<Action> {
+		.run { send in
+			let identityAddress = requestItem.identityAddress
+			guard
+				let persona = try await personasClient.getPersonas()[id: identityAddress],
+				let authorizedDapp = try await authorizedDappsClient.getAuthorizedDapps()[id: dappDefinitionAddress],
+				let authorizedPersona = authorizedDapp.referencesToAuthorizedPersonas.first(where: { $0.identityAddress == identityAddress })
+			else {
+				await send(.internal(.presentPersonaNotFoundErrorAlert(reason: "")))
+				return
+			}
+
+			await send(.internal(.usePersona(requestItem, persona, authorizedDapp, authorizedPersona)))
+
+		} catch: { error, send in
+			await send(.internal(.presentPersonaNotFoundErrorAlert(reason: error.legibleLocalizedDescription)))
+		}
+	}
+
+	private func validateProofOfOwnershipRequestItemEffect(
+		requestItem: DappToWalletInteractionProofOfOwnershipRequestItem
+	) -> Effect<Action> {
+		.run { send in
+			if let identityAddress = requestItem.identityAddress {
+				// If there is an identityAddress set, verify we can access its corresponding Persona
+				let _ = try await personasClient.getPersona(id: identityAddress)
+			}
+			if let accountAddresses = requestItem.accountAddresses {
+				// For every accountAddress set, verify we can access its corresponding Account
+				let allAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
+				let accounts = allAccounts.filter {
+					accountAddresses.contains($0.address)
+				}
+				if accounts.count != accountAddresses.count {
+					await send(.internal(.handleInvalidPersonaOrAccounts))
+				}
+			}
+		} catch: { _, send in
+			await send(.internal(.handleInvalidPersonaOrAccounts))
 		}
 	}
 }
@@ -1079,6 +1115,15 @@ extension DappInteractionFlow.State {
 			return nil
 		}
 		return item.ongoingPersonaData
+	}
+
+	var proofOfOwnershipRequestItem: DappToWalletInteractionProofOfOwnershipRequestItem? {
+		guard
+			case let .unauthorizedRequest(item) = remoteInteraction.items
+		else {
+			return nil
+		}
+		return item.proofOfOwnership
 	}
 }
 
