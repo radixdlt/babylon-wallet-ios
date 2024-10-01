@@ -465,10 +465,30 @@ extension DappInteractionFlow {
 				))
 			}
 
-			state.responseItems[item] = .remote(.proofOfOwnership(.init(
-				challenge: signedAuthChallenge.challenge,
-				proofs: proofs
-			)))
+			let challenge = signedAuthChallenge.challenge
+
+			// A predicate that checks if a given response item matches the challenge.
+			func isMatchingChallenge(_ item: State.AnyInteractionResponseItem) -> Bool {
+				if case let .remote(.proofOfOwnership(response)) = item {
+					return response.challenge == challenge
+				}
+				return false
+			}
+
+			// Check if there is an existing response item for this challenge.
+			if let existing = state.responseItems.values.first(where: isMatchingChallenge), case var .remote(.proofOfOwnership(response)) = existing {
+				// Append the new proofs to the existing proof of ownership response.
+				response.proofs.append(contentsOf: proofs)
+				// Update the existing item with the modified response.
+				state.responseItems[item] = .remote(.proofOfOwnership(response))
+
+			} else {
+				// No existing response item, create a new proof of ownership response.
+				state.responseItems[item] = .remote(.proofOfOwnership(.init(
+					challenge: challenge,
+					proofs: proofs
+				)))
+			}
 
 			return continueEffect(for: &state)
 		}
