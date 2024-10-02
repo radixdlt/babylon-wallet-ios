@@ -11,8 +11,8 @@ extension PersonaProofOfOwnership {
 					VStack(spacing: .medium2) {
 						DappHeader(
 							thumbnail: store.dappMetadata.thumbnail,
-							title: "Verify Persona Login",
-							subtitle: "**\(store.dappMetadata.name)** is requesting verification of your login with the following Persona."
+							title: L10n.DAppRequest.PersonaProofOfOwnership.title,
+							subtitle: L10n.DAppRequest.PersonaProofOfOwnership.subtitle(store.dappMetadata.name)
 						)
 
 						if let viewState = store.personaViewState {

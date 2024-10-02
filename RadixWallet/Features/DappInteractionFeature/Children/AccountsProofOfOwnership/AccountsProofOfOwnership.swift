@@ -100,8 +100,10 @@ struct AccountsProofOfOwnership: Sendable, FeatureReducer {
 		case let .signing(.delegate(signingAction)):
 			switch signingAction {
 			case .cancelSigning:
+				// If the user cancels the signing flow, we just dismiss the `Signing` view and wllow them
+				// to retry by tapping Continue again.
 				state.destination = nil
-				return cancelSigningEffect(state: &state)
+				return .none
 
 			case let .finishedSigning(.signAuth(signedAuthChallenge)):
 				state.destination = nil
@@ -182,12 +184,6 @@ struct AccountsProofOfOwnership: Sendable, FeatureReducer {
 			loggerGlobal.error("Failed to gather signature payloads")
 			await send(.delegate(.failedToSign))
 		}
-	}
-
-	private func cancelSigningEffect(state: inout State) -> Effect<Action> {
-		// FIXME: How to cancel?
-		loggerGlobal.error("Cancelled signing")
-		return .none
 	}
 }
 

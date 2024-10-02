@@ -11,8 +11,8 @@ extension AccountsProofOfOwnership {
 					VStack(spacing: .medium2) {
 						DappHeader(
 							thumbnail: store.dappMetadata.thumbnail,
-							title: "Verify Account Ownership",
-							subtitle: "**\(store.dappMetadata.name)** is requesting verification that you own the following Account(s)."
+							title: L10n.DAppRequest.AccountsProofOfOwnership.title,
+							subtitle: L10n.DAppRequest.AccountsProofOfOwnership.subtitle(store.dappMetadata.name)
 						)
 
 						VStack(spacing: .small1) {
