@@ -12,3 +12,6 @@ NSDownloadsFolderUsageDescription = "This lets you import a Radix Wallet backup 
 
 // A message that tells the user why the app is requesting the ability to authenticate with Face ID.
 NSFaceIDUsageDescription = "This app authenticates you when signing transactions and connecting to dApps.";
+
+// A message that tells the user why the app is requesting access to local network.
+NSLocalNetworkUsageDescription = "This lets you connect to a Radix Wallet Connector on your desktop browser.";
