@@ -1299,6 +1299,14 @@ public enum L10n {
       /// You can update this permission in wallet settings for this dApp at any time.
       public static let updateInSettingsExplanation = L10n.tr("Localizable", "dAppRequest_accountPermission_updateInSettingsExplanation", fallback: "You can update this permission in wallet settings for this dApp at any time.")
     }
+    public enum AccountsProofOfOwnership {
+      /// **%@** is requesting verification that you own the following Account(s).
+      public static func subtitle(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "dAppRequest_accountsProofOfOwnership_subtitle", String(describing: p1), fallback: "**%@** is requesting verification that you own the following Account(s).")
+      }
+      /// Verify Account Ownership
+      public static let title = L10n.tr("Localizable", "dAppRequest_accountsProofOfOwnership_title", fallback: "Verify Account Ownership")
+    }
     public enum ChooseAccounts {
       /// Continue
       public static let `continue` = L10n.tr("Localizable", "dAppRequest_chooseAccounts_continue", fallback: "Continue")
@@ -1400,6 +1408,14 @@ public enum L10n {
     public enum MetadataLoadingAlert {
       /// Danger! Bad dApp configuration, or you're being spoofed!
       public static let message = L10n.tr("Localizable", "dAppRequest_metadataLoadingAlert_message", fallback: "Danger! Bad dApp configuration, or you're being spoofed!")
+    }
+    public enum PersonaProofOfOwnership {
+      /// **%@** is requesting verification of your login with the following Persona.
+      public static func subtitle(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "dAppRequest_personaProofOfOwnership_subtitle", String(describing: p1), fallback: "**%@** is requesting verification of your login with the following Persona.")
+      }
+      /// Verify Persona Login
+      public static let title = L10n.tr("Localizable", "dAppRequest_personaProofOfOwnership_title", fallback: "Verify Persona Login")
     }
     public enum PersonalDataBox {
       /// Edit
