@@ -51,24 +51,8 @@ extension SubmitTransactionClient: DependencyKey {
 			}
 		}
 
-		let submitTransaction: SubmitTransaction = { request in
-			let txID = request.txID
-
-			#if DEBUG
-			debugPrintCompiledNotarizedIntent(compiled: request.compiledNotarizedTXIntent)
-			#endif
-
-			let submitTransactionRequest = GatewayAPI.TransactionSubmitRequest(
-				notarizedTransactionHex: request.compiledNotarizedTXIntent.data.hex
-			)
-
-			let response = try await gatewayAPIClient.submitTransaction(submitTransactionRequest)
-
-			guard !response.duplicate else {
-				throw SubmitTXFailure.invalidTXWasDuplicate(txID: txID)
-			}
-
-			return txID
+		let submitTransaction: SubmitTransaction = { compiledNotarizedIntent in
+			try await SargonOS.shared.submitCompiledTransaction(compiledNotarizedIntent: compiledNotarizedIntent)
 		}
 
 		return Self(
@@ -103,21 +87,6 @@ extension GatewayAPI.TransactionCommittedDetailsResponse: @unchecked Sendable {}
 
 // MARK: - GatewayAPI.TransactionStatus + Sendable
 extension GatewayAPI.TransactionStatus: @unchecked Sendable {}
-
-// MARK: - SubmitTXFailure
-public enum SubmitTXFailure: Sendable, LocalizedError, Equatable {
-	case failedToSubmitTX
-	case invalidTXWasDuplicate(txID: IntentHash)
-
-	public var errorDescription: String? {
-		switch self {
-		case .failedToSubmitTX:
-			"Failed to submit transaction"
-		case let .invalidTXWasDuplicate(txID):
-			"Duplicate TX id: \(txID)"
-		}
-	}
-}
 
 // MARK: - TXFailureStatus
 public enum TXFailureStatus: LocalizedError, Sendable, Hashable {

@@ -80,13 +80,10 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			state.status = .submitting
-			return .run { [txID = state.notarizedTX.txID, notarized = state.notarizedTX.notarized] send in
+			return .run { [notarized = state.notarizedTX.notarized] send in
 				await send(.internal(.submitTXResult(
 					TaskResult {
-						try await submitTXClient.submitTransaction(.init(
-							txID: txID,
-							compiledNotarizedTXIntent: notarized
-						))
+						try await submitTXClient.submitTransaction(notarized)
 					}
 				)))
 			}
