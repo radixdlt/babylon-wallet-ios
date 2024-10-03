@@ -401,6 +401,10 @@
 "dAppRequest_metadata_wallet" = "Radix Wallet";
 "dAppRequest_personalDataBox_edit" = "Edit";
 "dAppRequest_personalDataBox_requiredInformation" = "Required information:";
+"dAppRequest_personaProofOfOwnership_title" = "Verify Persona Login";
+"dAppRequest_personaProofOfOwnership_subtitle" = "**%@** is requesting verification of your login with the following Persona.";
+"dAppRequest_accountsProofOfOwnership_title" = "Verify Account Ownership";
+"dAppRequest_accountsProofOfOwnership_subtitle" = "**%@** is requesting verification that you own the following Account(s).";
 "transactionReview_title" = "Review Your Transaction";
 "transactionReview_proposingDappSubtitle" = "Proposed by %@";
 "transactionReview_transferTitle" = "Review Your Transfer";
