@@ -131,7 +131,7 @@ final class FaucetClientTests: TestCase {
 			$0.transactionClient.notarizeTransaction = { _ in
 				try NotarizeTransactionResponse(notarized: CompiledNotarizedIntent.sample, intent: TransactionIntent.sample, txID: IntentHash.sample)
 			}
-			$0.submitTXClient.hasTXBeenCommittedSuccessfully = { _ in }
+			$0.submitTXClient.pollTransactionStatus = { _ in .success }
 			$0.gatewaysClient.getCurrentGateway = { .enkinet }
 		} operation: {
 			try await sut.getFreeXRD(.init(recipientAccountAddress: acco0))

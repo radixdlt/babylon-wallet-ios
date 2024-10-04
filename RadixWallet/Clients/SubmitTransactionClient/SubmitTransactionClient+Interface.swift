@@ -6,20 +6,16 @@ public enum SubmitTransactionFailure: Sendable, LocalizedError {
 // MARK: - SubmitTransactionClient
 public struct SubmitTransactionClient: Sendable {
 	public var submitTransaction: SubmitTransaction
-	public var hasTXBeenCommittedSuccessfully: HasTXBeenCommittedSuccessfully
+	public var pollTransactionStatus: PollTransactionStatus
 }
 
 extension SubmitTransactionClient {
 	public typealias SubmitTransaction = @Sendable (CompiledNotarizedIntent) async throws -> IntentHash
-	public typealias HasTXBeenCommittedSuccessfully = @Sendable (IntentHash) async throws -> Void
+	public typealias PollTransactionStatus = @Sendable (IntentHash) async throws -> Sargon.TransactionStatus
 }
 
-// MARK: - PollStrategy
-public struct PollStrategy: Sendable, Hashable {
-	public let sleepDuration: TimeInterval
-	public init(sleepDuration: TimeInterval) {
-		self.sleepDuration = sleepDuration
+extension SubmitTransactionClient {
+	func hasTXBeenCommittedSuccessfully(_ intentHash: IntentHash) async throws -> Bool {
+		try await pollTransactionStatus(intentHash) == .success
 	}
-
-	public static let `default` = Self(sleepDuration: 2)
 }

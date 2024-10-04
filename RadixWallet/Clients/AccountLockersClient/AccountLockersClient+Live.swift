@@ -228,9 +228,10 @@ extension AccountLockersClient {
 				if case let .transaction(tx) = success.items {
 					// Wait for the transaction to be committed
 					let txID = tx.send.transactionIntentHash
-					try await submitTXClient.hasTXBeenCommittedSuccessfully(txID)
-					// And update claim status after
-					forceRefreshSubject.send(true)
+					if try await submitTXClient.hasTXBeenCommittedSuccessfully(txID) {
+						// And update claim status after
+						forceRefreshSubject.send(true)
+					}
 				}
 
 			case .dapp(.failure):

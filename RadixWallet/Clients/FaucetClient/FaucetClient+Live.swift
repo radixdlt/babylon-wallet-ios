@@ -63,7 +63,7 @@ extension FaucetClient: DependencyKey {
 
 			_ = try await submitTXClient.submitTransaction(notarized.notarized)
 
-			try await submitTXClient.hasTXBeenCommittedSuccessfully(txID)
+			_ = try await submitTXClient.pollTransactionStatus(txID)
 		}
 
 		let getFreeXRD: GetFreeXRD = { faucetRequest in
