@@ -94,9 +94,14 @@ struct PersonaProofOfOwnership: Sendable, FeatureReducer {
 			let signedAuthChallenge = SignedAuthChallenge(challenge: challenge, entitySignatures: Set([signature]))
 
 			await send(.delegate(.provenOwnership(persona, signedAuthChallenge)))
-		} catch: { _, send in
-			loggerGlobal.error("Failed to sign proof of ownership")
-			await send(.delegate(.failedToSign))
+		} catch: { error, send in
+			if let status = error as? KeychainAccess.Status, status == .userCanceled {
+				// We don't consider this a failure and just allow to try again by tapping on Continue button.
+				loggerGlobal.info("User canceled signing")
+			} else {
+				loggerGlobal.error("Failed to sign proof of ownership")
+				await send(.delegate(.failedToSign))
+			}
 		}
 	}
 }
