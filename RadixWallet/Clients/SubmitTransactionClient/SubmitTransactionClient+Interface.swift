@@ -14,12 +14,6 @@ extension SubmitTransactionClient {
 	public typealias HasTXBeenCommittedSuccessfully = @Sendable (IntentHash) async throws -> Void
 }
 
-// MARK: - TransactionStatusUpdate
-public struct TransactionStatusUpdate: Sendable, Hashable {
-	public let txID: IntentHash
-	public let result: Loadable<EqVoid>
-}
-
 // MARK: - PollStrategy
 public struct PollStrategy: Sendable, Hashable {
 	public let sleepDuration: TimeInterval
