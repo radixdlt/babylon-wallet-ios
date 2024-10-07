@@ -6822,6 +6822,7 @@
 			buildConfigurationList = 48CFBC5D2ADC106400E77A5C /* Build configuration list for PBXNativeTarget "RadixWallet" */;
 			buildPhases = (
 				5B9846C32BBD643700E814F3 /* Create SensitiveInfo Sample */,
+				5B4E1D142CB423C9002FAC2E /* Custom linter */,
 				48CFBC4B2ADC106300E77A5C /* Sources */,
 				48CFBC4C2ADC106300E77A5C /* Frameworks */,
 				48CFBC4D2ADC106300E77A5C /* Resources */,
@@ -7009,6 +7010,24 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		5B4E1D142CB423C9002FAC2E /* Custom linter */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Custom linter";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Custom linter to avoid using Dictionary.init(uniqueKeysWithValues:)\n# Quick solution before considering using an external tool, such as SwiftLint \n\nPATTERN=\"uniqueKeysWithValues:\"\nFILES=$(grep -rnw --include=\\*.swift \"$PATTERN\" \"$SRCROOT\")\n\nif [ ! -z \"$FILES\" ]; then\n    echo \"Error: We shouldn't use Dictionary(uniqueKeysWithValues:), as it could lead to unhandled crashes if key is repeated\"\n    echo \"Instead, use our custom init(keysWithValues:), or consider refactoring your solution to use IdentifiedArrayOf\"\n    echo \"Please fix on the following files:\"\n    echo \"$FILES\"\n    exit 1 \nfi\n";
+		};
 		5B9846C32BBD643700E814F3 /* Create SensitiveInfo Sample */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
