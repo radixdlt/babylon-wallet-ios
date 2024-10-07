@@ -33,8 +33,8 @@ extension TransactionReview {
 		let allAddresses: IdentifiedArrayOf<ResourceAddress> = Array((allWithdrawAddresses + allDepositAddresses).uniqued()).asIdentified()
 
 		func resourcesInfo(_ resourceAddresses: [ResourceAddress]) async throws -> ResourcesInfo {
-			var newlyCreatedMetadata = Dictionary(
-				uniqueKeysWithValues: resourceAddresses.compactMap { resourceAddress in
+			var newlyCreatedMetadata = try Dictionary(
+				keysWithValues: resourceAddresses.compactMap { resourceAddress in
 					summary.newEntities.metadata[resourceAddress].map {
 						(
 							resourceAddress,
@@ -114,7 +114,7 @@ extension TransactionReview {
 
 			let dApps = await extractDappEntities(poolAddresses.map(\.asGeneral))
 
-			let perPoolUnitDapps = perPoolUnitDapps(dApps, poolInteractions: poolContributions)
+			let perPoolUnitDapps = try perPoolUnitDapps(dApps, poolInteractions: poolContributions)
 
 			// Extract Contributing to Pools section
 			let pools: TransactionReviewPools.State? = try await extractDapps(dApps, unknownTitle: L10n.TransactionReview.unknownPools)
@@ -155,7 +155,7 @@ extension TransactionReview {
 
 			let dApps = await extractDappEntities(poolAddresses.map(\.asGeneral))
 
-			let perPoolUnitDapps = perPoolUnitDapps(dApps, poolInteractions: poolRedemptions)
+			let perPoolUnitDapps = try perPoolUnitDapps(dApps, poolInteractions: poolRedemptions)
 
 			// Extract Contributing to Pools section
 			let pools: TransactionReviewPools.State? = try await extractDapps(dApps, unknownTitle: L10n.TransactionReview.unknownPools)
@@ -577,8 +577,8 @@ extension TransactionReview {
 	private func perPoolUnitDapps(
 		_ dappEntities: [(address: Address, entity: TransactionReview.DappEntity?)],
 		poolInteractions: [some TrackedPoolInteraction]
-	) -> ResourceAssociatedDapps {
-		Dictionary(uniqueKeysWithValues: dappEntities.compactMap { data -> (ResourceAddress, OnLedgerEntity.Metadata)? in
+	) throws -> ResourceAssociatedDapps {
+		try Dictionary(keysWithValues: dappEntities.compactMap { data -> (ResourceAddress, OnLedgerEntity.Metadata)? in
 			let poolUnitResource: ResourceAddress? = poolInteractions
 				.first(where: { $0.poolAddress.asGeneral == data.address })?
 				.poolUnitsResourceAddress

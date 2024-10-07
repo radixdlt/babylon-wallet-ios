@@ -14,3 +14,35 @@ extension Dictionary {
 		)
 	}
 }
+
+extension Dictionary {
+	// Custom initializer that throws if there are duplicate keys
+	init(keysWithValues: [(Key, Value)]) throws {
+		self = [:]
+
+		for (key, value) in keysWithValues {
+			if self[key] != nil {
+				throw DictionaryDuplicateKeyError()
+			}
+			self[key] = value
+		}
+	}
+
+	struct DictionaryDuplicateKeyError: Error {}
+}
+
+extension OrderedDictionary {
+	// Custom initializer that throws if there are duplicate keys
+	init(keysWithValues: [(Key, Value)]) throws {
+		self = OrderedDictionary()
+
+		for (key, value) in keysWithValues {
+			if self[key] != nil {
+				throw OrderedDictionaryDuplicateKeyError()
+			}
+			self[key] = value
+		}
+	}
+
+	struct OrderedDictionaryDuplicateKeyError: Error {}
+}
