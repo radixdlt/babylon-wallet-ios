@@ -18,7 +18,7 @@ extension Dictionary {
 extension Dictionary {
 	// Custom initializer that throws if there are duplicate keys
 	init(keysWithValues: [(Key, Value)]) throws {
-		self = [:] // Initialize an empty dictionary
+		self = [:]
 
 		for (key, value) in keysWithValues {
 			if self[key] != nil {
@@ -37,7 +37,6 @@ extension OrderedDictionary {
 		self = OrderedDictionary()
 
 		for (key, value) in keysWithValues {
-			// Check if the key already exists in the OrderedDictionary
 			if self[key] != nil {
 				throw OrderedDictionaryDuplicateKeyError()
 			}
