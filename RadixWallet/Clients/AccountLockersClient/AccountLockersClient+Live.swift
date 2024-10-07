@@ -166,7 +166,7 @@ extension AccountLockersClient {
 				let response = try await gatewayAPIClient.getAccountLockerTouchedAt(.init(accountLockers: accountLockers))
 				return (accountAddress, response)
 			}
-			return Dictionary(uniqueKeysWithValues: result.map { ($0.0, $0.1) })
+			return try Dictionary(keysWithValues: result.map { ($0.0, $0.1) })
 		}
 
 		@Sendable
