@@ -210,19 +210,10 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			if let requestItem = state.usePersonaRequestItem {
-				validateAuthUsePersonaEffect(requestItem: requestItem, dappDefinitionAddress: state.dappMetadata.dAppDefinitionAddress)
-			} else if let requestItem = state.proofOfOwnershipRequestItem {
-				validateProofOfOwnershipRequestItemEffect(requestItem: requestItem)
-			} else {
-				.none
-			}
+			validateRequestItemsEffect(state: state)
 
-		case let .personaNotFoundErrorAlert(.presented(action)):
-			switch action {
-			case .cancelButtonTapped:
-				dismissEffect(for: state, errorKind: .invalidPersona, message: nil)
-			}
+		case .personaNotFoundErrorAlert(.presented(.cancelButtonTapped)):
+			dismissEffect(for: state, errorKind: .invalidPersona, message: nil)
 
 		case .personaNotFoundErrorAlert:
 			.none
@@ -307,49 +298,60 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		}
 	}
 
-	private func validateAuthUsePersonaEffect(
-		requestItem: DappToWalletInteractionAuthUsePersonaRequestItem,
-		dappDefinitionAddress: DappDefinitionAddress
-	) -> Effect<Action> {
+	private func validateRequestItemsEffect(state: State) -> Effect<Action> {
 		.run { send in
-			let identityAddress = requestItem.identityAddress
-			guard
-				let persona = try await personasClient.getPersonas()[id: identityAddress],
-				let authorizedDapp = try await authorizedDappsClient.getAuthorizedDapps()[id: dappDefinitionAddress],
-				let authorizedPersona = authorizedDapp.referencesToAuthorizedPersonas.first(where: { $0.identityAddress == identityAddress })
-			else {
-				await send(.internal(.presentPersonaNotFoundErrorAlert(reason: "")))
-				return
-			}
-
-			await send(.internal(.usePersona(requestItem, persona, authorizedDapp, authorizedPersona)))
-
-		} catch: { error, send in
-			await send(.internal(.presentPersonaNotFoundErrorAlert(reason: error.legibleLocalizedDescription)))
-		}
-	}
-
-	private func validateProofOfOwnershipRequestItemEffect(
-		requestItem: DappToWalletInteractionProofOfOwnershipRequestItem
-	) -> Effect<Action> {
-		.run { send in
-			if let identityAddress = requestItem.identityAddress {
-				// If there is an identityAddress set, verify we can access its corresponding Persona
-				let _ = try await personasClient.getPersona(id: identityAddress)
-			}
-			if let accountAddresses = requestItem.accountAddresses {
-				// For every accountAddress set, verify we can access its corresponding Account
-				let allAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
-				let accounts = allAccounts.filter {
-					accountAddresses.contains($0.address)
+			// First, if there is a `DappToWalletInteractionAuthUsePersonaRequestItem`, we will fetch its corresponding data.
+			if let requestItem = state.usePersonaRequestItem {
+				do {
+					if let data = try await getAuthUsePersonaData(requestItem: requestItem, dappDefinitionAddress: state.dappMetadata.dAppDefinitionAddress) {
+						await send(.internal(.usePersona(requestItem, data.persona, data.authorizedDapp, data.authorizedPersona)))
+					} else {
+						await send(.internal(.presentPersonaNotFoundErrorAlert(reason: "")))
+						return
+					}
+				} catch {
+					await send(.internal(.presentPersonaNotFoundErrorAlert(reason: error.legibleLocalizedDescription)))
+					return
 				}
-				if accounts.count != accountAddresses.count {
+			}
+
+			// Then, if we haven't failed on previous step, we will validate the `DappToWalletInteractionProofOfOwnershipRequestItem` (if any).
+			if let requestItem = state.proofOfOwnershipRequestItem {
+				do {
+					if let identityAddress = requestItem.identityAddress {
+						// If there is an identityAddress set, verify we can access its corresponding Persona
+						let _ = try await personasClient.getPersona(id: identityAddress)
+					}
+					if let accountAddresses = requestItem.accountAddresses {
+						// For every accountAddress set, verify we can access its corresponding Account
+						let allAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
+						let accounts = allAccounts.filter {
+							accountAddresses.contains($0.address)
+						}
+						if accounts.count != accountAddresses.count {
+							await send(.internal(.handleInvalidPersonaOrAccounts))
+						}
+					}
+				} catch {
 					await send(.internal(.handleInvalidPersonaOrAccounts))
 				}
 			}
-		} catch: { _, send in
-			await send(.internal(.handleInvalidPersonaOrAccounts))
 		}
+	}
+
+	private func getAuthUsePersonaData(
+		requestItem: DappToWalletInteractionAuthUsePersonaRequestItem,
+		dappDefinitionAddress: DappDefinitionAddress
+	) async throws -> (persona: Persona, authorizedDapp: AuthorizedDapp, authorizedPersona: AuthorizedPersonaSimple)? {
+		let identityAddress = requestItem.identityAddress
+		guard
+			let persona = try await personasClient.getPersonas()[id: identityAddress],
+			let authorizedDapp = try await authorizedDappsClient.getAuthorizedDapps()[id: dappDefinitionAddress],
+			let authorizedPersona = authorizedDapp.referencesToAuthorizedPersonas.first(where: { $0.identityAddress == identityAddress })
+		else {
+			return nil
+		}
+		return (persona, authorizedDapp, authorizedPersona)
 	}
 }
 
