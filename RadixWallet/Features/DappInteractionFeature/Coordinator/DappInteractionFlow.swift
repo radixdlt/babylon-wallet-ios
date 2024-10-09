@@ -97,7 +97,6 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		case presentPersonaNotFoundErrorAlert(reason: String)
 		case autofillOngoingResponseItemsIfPossible(AutofillOngoingResponseItemsPayload)
 		case delayedAppendToPath(DappInteractionFlow.Path.State)
-		case handleInvalidPersonaOrAccounts
 
 		struct AutofillOngoingResponseItemsPayload: Sendable, Equatable {
 			struct AccountsPayload: Sendable, Equatable {
@@ -292,9 +291,6 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				}
 			)
 			return .none
-
-		case .handleInvalidPersonaOrAccounts:
-			return dismissEffect(for: state, errorKind: .invalidPersonaOrAccounts, message: nil)
 		}
 	}
 
@@ -312,28 +308,6 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				} catch {
 					await send(.internal(.presentPersonaNotFoundErrorAlert(reason: error.legibleLocalizedDescription)))
 					return
-				}
-			}
-
-			// Then, if we haven't failed on previous step, we will validate the `DappToWalletInteractionProofOfOwnershipRequestItem` (if any).
-			if let requestItem = state.proofOfOwnershipRequestItem {
-				do {
-					if let identityAddress = requestItem.identityAddress {
-						// If there is an identityAddress set, verify we can access its corresponding Persona
-						let _ = try await personasClient.getPersona(id: identityAddress)
-					}
-					if let accountAddresses = requestItem.accountAddresses {
-						// For every accountAddress set, verify we can access its corresponding Account
-						let allAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
-						let accounts = allAccounts.filter {
-							accountAddresses.contains($0.address)
-						}
-						if accounts.count != accountAddresses.count {
-							await send(.internal(.handleInvalidPersonaOrAccounts))
-						}
-					}
-				} catch {
-					await send(.internal(.handleInvalidPersonaOrAccounts))
 				}
 			}
 		}
@@ -1117,15 +1091,6 @@ extension DappInteractionFlow.State {
 			return nil
 		}
 		return item.ongoingPersonaData
-	}
-
-	var proofOfOwnershipRequestItem: DappToWalletInteractionProofOfOwnershipRequestItem? {
-		guard
-			case let .unauthorizedRequest(item) = remoteInteraction.items
-		else {
-			return nil
-		}
-		return item.proofOfOwnership
 	}
 }
 
