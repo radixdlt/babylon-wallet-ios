@@ -10,7 +10,7 @@ public struct SubmitTransactionClient: Sendable {
 }
 
 extension SubmitTransactionClient {
-	public typealias SubmitTransaction = @Sendable (CompiledNotarizedIntent) async throws -> IntentHash
+	public typealias SubmitTransaction = @Sendable (NotarizedTransaction) async throws -> IntentHash
 	public typealias PollTransactionStatus = @Sendable (IntentHash) async throws -> Sargon.TransactionStatus
 }
 

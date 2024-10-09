@@ -221,7 +221,8 @@ extension WalletToDappInteractionSuccessResponse {
 					items: .unauthorizedRequest(
 						.init(
 							oneTimeAccounts: oneTimeAccounts,
-							oneTimePersonaData: oneTimePersonaData
+							oneTimePersonaData: oneTimePersonaData,
+							proofOfOwnership: nil
 						)
 					)
 				)

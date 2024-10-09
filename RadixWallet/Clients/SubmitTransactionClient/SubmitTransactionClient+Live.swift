@@ -5,8 +5,8 @@ extension SubmitTransactionClient: DependencyKey {
 	public typealias Value = SubmitTransactionClient
 
 	public static let liveValue: Self = {
-		let submitTransaction: SubmitTransaction = { compiledNotarizedIntent in
-			try await SargonOS.shared.submitCompiledTransaction(compiledNotarizedIntent: compiledNotarizedIntent)
+		let submitTransaction: SubmitTransaction = { notarizedTransaction in
+			try await SargonOS.shared.submitTransaction(notarizedTransaction: notarizedTransaction)
 		}
 
 		let pollTransactionStatus: PollTransactionStatus = { intentHash in
