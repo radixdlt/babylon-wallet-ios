@@ -1480,6 +1480,8 @@ public enum L10n {
       public static func devExplanationInvalidOrigin(_ p1: Any) -> String {
         return L10n.tr("Localizable", "dAppRequest_validationOutcome_devExplanationInvalidOrigin", String(describing: p1), fallback: "'%@' is not valid origin.")
       }
+      /// dApp specified an invalid Persona or Account
+      public static let invalidPersonaOrAccoubts = L10n.tr("Localizable", "dAppRequest_validationOutcome_invalidPersonaOrAccoubts", fallback: "dApp specified an invalid Persona or Account")
       /// Could not validate the dApp.
       public static let invalidRequestMessage = L10n.tr("Localizable", "dAppRequest_validationOutcome_invalidRequestMessage", fallback: "Could not validate the dApp.")
       /// Invalid Request.
