@@ -61,12 +61,9 @@ extension FaucetClient: DependencyKey {
 
 			let txID = notarized.txID
 
-			_ = try await submitTXClient.submitTransaction(.init(
-				txID: txID,
-				compiledNotarizedTXIntent: notarized.notarized
-			))
+			_ = try await submitTXClient.submitTransaction(notarized.notarized)
 
-			try await submitTXClient.hasTXBeenCommittedSuccessfully(txID)
+			_ = try await submitTXClient.pollTransactionStatus(txID)
 		}
 
 		let getFreeXRD: GetFreeXRD = { faucetRequest in
@@ -81,9 +78,9 @@ extension FaucetClient: DependencyKey {
 			}
 
 			let networkID = await gatewaysClient.getCurrentNetworkID()
-			let networkIDOfAddress = try accountAddress.networkID
+			let networkIDOfAddress = accountAddress.networkID
 			assert(networkIDOfAddress == networkID)
-			let manifest = try TransactionManifest.faucet(
+			let manifest = TransactionManifest.faucet(
 				includeLockFeeInstruction: true,
 				addressOfReceivingAccount: accountAddress
 			)

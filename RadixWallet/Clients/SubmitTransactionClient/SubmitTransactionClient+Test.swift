@@ -12,13 +12,15 @@ extension SubmitTransactionClient: TestDependencyKey {
 
 	public static let testValue = Self(
 		submitTransaction: unimplemented("\(Self.self).submitTransaction"),
-		hasTXBeenCommittedSuccessfully: unimplemented("\(Self.self).hasTXBeenCommittedSuccessfully")
+		pollTransactionStatus: unimplemented("\(Self.self).pollTransactionStatus")
 	)
 
 	public static let noop = Self(
 		submitTransaction: { _ in
 			throw NoopError()
 		},
-		hasTXBeenCommittedSuccessfully: { _ in }
+		pollTransactionStatus: { _ in
+			throw NoopError()
+		}
 	)
 }

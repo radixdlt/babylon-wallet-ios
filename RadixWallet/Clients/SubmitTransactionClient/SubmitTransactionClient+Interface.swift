@@ -6,36 +6,16 @@ public enum SubmitTransactionFailure: Sendable, LocalizedError {
 // MARK: - SubmitTransactionClient
 public struct SubmitTransactionClient: Sendable {
 	public var submitTransaction: SubmitTransaction
-	public var hasTXBeenCommittedSuccessfully: HasTXBeenCommittedSuccessfully
+	public var pollTransactionStatus: PollTransactionStatus
 }
 
 extension SubmitTransactionClient {
-	public typealias SubmitTransaction = @Sendable (SubmitTXRequest) async throws -> IntentHash
-	public typealias HasTXBeenCommittedSuccessfully = @Sendable (IntentHash) async throws -> Void
+	public typealias SubmitTransaction = @Sendable (NotarizedTransaction) async throws -> IntentHash
+	public typealias PollTransactionStatus = @Sendable (IntentHash) async throws -> Sargon.TransactionStatus
 }
 
-// MARK: - SubmitTXRequest
-public struct SubmitTXRequest: Sendable, Hashable {
-	public let txID: IntentHash
-	public let compiledNotarizedTXIntent: CompiledNotarizedIntent
-	public init(txID: IntentHash, compiledNotarizedTXIntent: CompiledNotarizedIntent) {
-		self.txID = txID
-		self.compiledNotarizedTXIntent = compiledNotarizedTXIntent
+extension SubmitTransactionClient {
+	func hasTXBeenCommittedSuccessfully(_ intentHash: IntentHash) async throws -> Bool {
+		try await pollTransactionStatus(intentHash) == .success
 	}
-}
-
-// MARK: - TransactionStatusUpdate
-public struct TransactionStatusUpdate: Sendable, Hashable {
-	public let txID: IntentHash
-	public let result: Loadable<EqVoid>
-}
-
-// MARK: - PollStrategy
-public struct PollStrategy: Sendable, Hashable {
-	public let sleepDuration: TimeInterval
-	public init(sleepDuration: TimeInterval) {
-		self.sleepDuration = sleepDuration
-	}
-
-	public static let `default` = Self(sleepDuration: 2)
 }
