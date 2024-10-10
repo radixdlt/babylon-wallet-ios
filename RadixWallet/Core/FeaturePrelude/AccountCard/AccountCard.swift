@@ -131,8 +131,8 @@ extension AccountCard.Kind {
 		.compact(addCornerRadius: false)
 	}
 
-	/// Behaves same way as `.selection` but it is never selected.
-	static var hiddenEntity: Self {
+	/// Behaves same way as `.selection`, showing the name and address vertically, but it is never selected.
+	static var details: Self {
 		.selection(isSelected: false)
 	}
 }

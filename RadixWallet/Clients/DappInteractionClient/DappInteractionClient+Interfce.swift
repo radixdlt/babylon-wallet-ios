@@ -84,6 +84,8 @@ extension DappInteractionClient {
 			case invalidOrigin(invalidURLString: String)
 			case dAppValidationError(String)
 			case badContent(BadContent)
+			case invalidPersonaOrAccounts
+
 			public enum BadContent: Sendable, Hashable {
 				case numberOfAccountsInvalid
 			}
