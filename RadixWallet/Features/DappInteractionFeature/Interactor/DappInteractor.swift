@@ -160,7 +160,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			dismissCurrentModalAndRequest(request, for: &state)
 			switch response {
 			case .success:
-				return .send(.internal(.presentResponseSuccessView(dappMetadata, txID, request.route)))
+				return delayedShortEffect(for: .internal(.presentResponseSuccessView(dappMetadata, txID, request.route)))
 			case .failure:
 				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
 			}
@@ -244,7 +244,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 				return sendResponseToDappEffect(responseToDapp, for: request, dappMetadata: dappMetadata)
 			case let .dismiss(dappMetadata, txID):
 				dismissCurrentModalAndRequest(request, for: &state)
-				return .send(.internal(.presentResponseSuccessView(dappMetadata, txID, request.route)))
+				return delayedShortEffect(for: .internal(.presentResponseSuccessView(dappMetadata, txID, request.route)))
 			case .dismissSilently:
 				dismissCurrentModalAndRequest(request, for: &state)
 				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
