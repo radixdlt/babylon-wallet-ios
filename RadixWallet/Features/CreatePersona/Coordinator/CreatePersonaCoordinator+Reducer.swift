@@ -23,7 +23,7 @@ public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 				self.root = root
 			} else {
 				if config.personaPrimacy.isFirstEver {
-					self.root = .step0_introduction(.init())
+					self.root = .step0_introduction
 				} else {
 					self.root = .step1_createPersona(.init(mode: .create))
 				}
@@ -45,22 +45,19 @@ public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 	public struct Path: Sendable, Reducer {
 		@CasePathable
 		public enum State: Sendable, Hashable {
-			case step0_introduction(IntroductionToPersonas.State)
+			case step0_introduction
 			case step1_createPersona(EditPersona.State)
 			case step2_completion(NewPersonaCompletion.State)
 		}
 
 		@CasePathable
 		public enum Action: Sendable, Equatable {
-			case step0_introduction(IntroductionToPersonas.Action)
+			case step0_introduction
 			case step1_createPersona(EditPersona.Action)
 			case step2_completion(NewPersonaCompletion.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: \.step0_introduction, action: \.step0_introduction) {
-				IntroductionToPersonas()
-			}
 			Scope(state: \.step1_createPersona, action: \.step1_createPersona) {
 				EditPersona()
 			}
@@ -90,6 +87,7 @@ public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case closeButtonTapped
+		case introductionContinueButtonTapped
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -135,19 +133,19 @@ extension CreatePersonaCoordinator {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
-			.run { send in
+			return .run { send in
 				await send(.delegate(.dismissed))
 				await dismiss()
 			}
+
+		case .introductionContinueButtonTapped:
+			state.path.append(.step1_createPersona(.init(mode: .create)))
+			return .none
 		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case .root(.step0_introduction(.delegate(.done))):
-			state.path.append(.step1_createPersona(.init(mode: .create)))
-			return .none
-
 		case
 			let .root(.step1_createPersona(.delegate(.personaInfoSet(name, fields)))),
 			let .path(.element(_, action: .step1_createPersona(.delegate(.personaInfoSet(name, fields))))):
