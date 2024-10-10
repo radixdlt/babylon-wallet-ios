@@ -111,7 +111,7 @@ private extension View {
 	}
 }
 
-private extension Loadable<ResourceAsset.State.DepositStatus> {
+private extension Loadable<DepositStatus> {
 	var hint: Hint.ViewState? {
 		switch self {
 		case .idle, .loading, .failure, .success(.allowed):

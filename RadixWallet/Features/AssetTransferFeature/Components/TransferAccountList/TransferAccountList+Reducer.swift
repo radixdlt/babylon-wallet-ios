@@ -44,8 +44,8 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Equatable, Sendable {
-		case setAllDepositStatus(accountId: ReceivingAccount.State.ID, status: Loadable<ResourceAsset.State.DepositStatus>)
-		case setDepositStatus(accountId: ReceivingAccount.State.ID, values: AssetsDepositStatus)
+		case setAllDepositStatus(accountId: ReceivingAccount.State.ID, status: Loadable<DepositStatus>)
+		case setDepositStatus(accountId: ReceivingAccount.State.ID, values: DepositStatusPerResources)
 	}
 
 	public struct Destination: DestinationReducer {
@@ -315,27 +315,31 @@ private extension TransferAccountList {
 		}
 	}
 
-	typealias DepositStatus = ResourceAsset.State.DepositStatus
-
-	func getStatusesForProfileAccount(_ account: Account, assets: IdentifiedArrayOf<ResourceAsset.State>) async -> AssetsDepositStatus {
-		let result = await assets.parallelMap { asset in
+	func getStatusesForProfileAccount(_ account: Account, assets: IdentifiedArrayOf<ResourceAsset.State>) async -> DepositStatusPerResources {
+		await assets.parallelMap { asset in
 			let result = await needsSignatureForDepositting(into: account, resource: asset.resourceAddress)
-			return (asset.resourceAddress, result ? DepositStatus.additionalSignatureRequired : .allowed)
+			return DepositStatusPerResource(
+				resourceAddress: asset.resourceAddress,
+				depositStatus: result ? .additionalSignatureRequired : .allowed
+			)
 		}
-		let values = Dictionary(uniqueKeysWithValues: result.map { ($0.0, $0.1) })
-		return values
+		.asIdentified()
 	}
 
-	func getStatusesForExternalAccount(_ account: AccountAddress, resourceAddresses: [ResourceAddress]) async throws -> AssetsDepositStatus {
+	func getStatusesForExternalAccount(_ account: AccountAddress, resourceAddresses: [ResourceAddress]) async throws -> DepositStatusPerResources {
 		let result = try await gatewayAPIClient.prevalidateDeposit(.init(accountAddress: account.address, resourceAddresses: resourceAddresses.map(\.address)))
 
 		if let behavior = result.resourceSpecificBehaviour {
-			return Dictionary(uniqueKeysWithValues: behavior.compactMap { item in
+			return behavior.compactMap { item -> DepositStatusPerResource? in
 				guard let address = try? ResourceAddress(validatingAddress: item.resourceAddress) else {
 					return nil
 				}
-				return (address, item.allowsTryDeposit ? .allowed : .denied)
-			})
+				return DepositStatusPerResource(
+					resourceAddress: address,
+					depositStatus: item.allowsTryDeposit ? .allowed : .denied
+				)
+			}
+			.asIdentified()
 		} else {
 			return .init()
 		}
