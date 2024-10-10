@@ -24,7 +24,8 @@ public struct SignWithFactorSource: Sendable, FeatureReducer {
 				self.factorSourceAccess = .init(kind: .device, purpose: .signature)
 			case .ledger:
 				assert(signingFactors.allSatisfy { $0.factorSource.kind == LedgerHardwareWalletFactorSource.kind })
-				self.factorSourceAccess = .init(kind: .ledger(nil), purpose: .signature)
+				let ledger: LedgerHardwareWalletFactorSource? = signingFactors.first?.factorSource.extract()
+				self.factorSourceAccess = .init(kind: .ledger(ledger), purpose: .signature)
 			}
 		}
 	}

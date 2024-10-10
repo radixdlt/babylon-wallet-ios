@@ -30,6 +30,7 @@ public extension FactorSourceAccess {
 					.onFirstTask { @MainActor in
 						await store.send(.view(.onFirstTask)).finish()
 					}
+					.destinations(with: store)
 			}
 		}
 
@@ -84,5 +85,26 @@ public extension FactorSourceAccess {
 				.cornerRadius(.large1)
 			}
 		}
+	}
+}
+
+private extension StoreOf<FactorSourceAccess> {
+	var destination: PresentationStoreOf<FactorSourceAccess.Destination> {
+		func scopeState(state: State) -> PresentationState<FactorSourceAccess.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<FactorSourceAccess>) -> some View {
+		let destinationStore = store.destination
+		return noP2PLinkAlert(with: destinationStore)
+	}
+
+	private func noP2PLinkAlert(with destinationStore: PresentationStoreOf<FactorSourceAccess.Destination>) -> some View {
+		alert(store: destinationStore.scope(state: \.noP2PLink, action: \.noP2PLink))
 	}
 }
