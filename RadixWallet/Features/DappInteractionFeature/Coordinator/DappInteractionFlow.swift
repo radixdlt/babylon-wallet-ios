@@ -296,7 +296,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 	private func validateRequestItemsEffect(state: State) -> Effect<Action> {
 		.run { send in
-			// First, if there is a `DappToWalletInteractionAuthUsePersonaRequestItem`, we will fetch its corresponding data.
+			// If there is a `DappToWalletInteractionAuthUsePersonaRequestItem`, we will fetch its corresponding data.
 			if let requestItem = state.usePersonaRequestItem {
 				do {
 					if let data = try await getAuthUsePersonaData(requestItem: requestItem, dappDefinitionAddress: state.dappMetadata.dAppDefinitionAddress) {
