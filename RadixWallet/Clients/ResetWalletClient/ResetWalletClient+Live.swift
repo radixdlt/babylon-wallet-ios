@@ -12,7 +12,7 @@ extension ResetWalletClient: DependencyKey {
 		return Self(
 			resetWallet: {
 				do {
-					try await appPreferencesClient.deleteProfileAndFactorSources(true)
+					try await appPreferencesClient.deleteProfileAndFactorSources()
 					cacheClient.removeAll()
 					await radixConnectClient.disconnectAll()
 					userDefaults.removeAll()

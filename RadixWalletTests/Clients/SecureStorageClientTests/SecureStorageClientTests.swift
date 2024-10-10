@@ -26,7 +26,7 @@ final class SecureStorageClientTests: TestCase {
 
 	func test__WHEN__profile_is_saved__THEN__setDataWithoutAuth_called_with_icloud_sync_is_disabled() async throws {
 		try await doTest(authConfig: .biometricsAndPasscodeSetUp) { sut, _, profile in
-			try await sut.saveProfileSnapshot(profile)
+			try sut.saveProfileSnapshotData(profile.id, profile.jsonData())
 		} assertKeychainSetItemWithoutAuthRequest: { _, _, attributes in
 			XCTAssertFalse(attributes.iCloudSyncEnabled)
 		}
@@ -79,7 +79,7 @@ final class SecureStorageClientTests: TestCase {
 
 	func test__GIVEN__biometricsAndPasscodeSetUp__WHEN__profile_is_saved__THEN__setDataWithoutAuth_called_with_accessibility_whenUnlocked() async throws {
 		try await doTest(authConfig: .biometricsAndPasscodeSetUp) { sut, _, profile in
-			try await sut.saveProfileSnapshot(profile)
+			try sut.saveProfileSnapshotData(profile.id, profile.jsonData())
 		} assertKeychainSetItemWithoutAuthRequest: { _, _, attributes in
 			XCTAssertEqual(attributes.accessibility, .whenUnlocked)
 		}
@@ -117,7 +117,7 @@ private extension SecureStorageClientTests {
 			let mnemonicWithPassphrase = MnemonicWithPassphrase(mnemonic: mnemonic, passphrase: passphrase)
 			let factorSource = try DeviceFactorSource.babylon(
 				mnemonicWithPassphrase: mnemonicWithPassphrase, isMain: true,
-				hostInfo: .current()
+				hostInfo: .sample
 			)
 
 			let privateHDFactorSource = try PrivateHierarchicalDeterministicFactorSource(

@@ -44,7 +44,7 @@ final class AppFeatureTests: TestCase {
 		}
 
 		// THEN: navigate to main
-		await store.send(.child(.splash(.delegate(.completed(Profile.withOneAccount))))) {
+		await store.send(.child(.splash(.delegate(.completed(.loaded(Profile.withOneAccount)))))) {
 			$0.root = .main(.init(home: .init()))
 		}
 
@@ -64,7 +64,7 @@ final class AppFeatureTests: TestCase {
 		}
 
 		// then
-		await store.send(.child(.splash(.delegate(.completed(Profile.withNoAccounts))))) {
+		await store.send(.child(.splash(.delegate(.completed(.none))))) {
 			$0.root = .onboardingCoordinator(.init())
 		}
 

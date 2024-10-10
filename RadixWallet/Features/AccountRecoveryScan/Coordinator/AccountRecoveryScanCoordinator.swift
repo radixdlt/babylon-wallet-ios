@@ -158,12 +158,10 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 		case let .createProfile(privateHD):
 			let recoveredAccountAndBDFS = AccountsRecoveredFromScanningUsingMnemonic(
 				accounts: sortedAccounts,
-				deviceFactorSource: privateHD.factorSource
+				factorSource: privateHD
 			)
 			return .run { send in
 				let result = await TaskResult<EqVoid> {
-					try secureStorageClient.saveMnemonicForFactorSource(privateHD)
-
 					// Not important enough to throw.
 					try? userDefaults.addFactorSourceIDOfBackedUpMnemonic(privateHD.factorSource.id)
 

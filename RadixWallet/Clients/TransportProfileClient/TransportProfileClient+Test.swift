@@ -17,7 +17,7 @@ extension TransportProfileClient: TestDependencyKey {
 	)
 
 	public static let noop = Self(
-		importProfile: { _, _, _ in throw NoopError() },
+		importProfile: { _, _, _, _ in throw NoopError() },
 		profileForExport: { throw NoopError() },
 		didExportProfile: { _ in throw NoopError() }
 	)

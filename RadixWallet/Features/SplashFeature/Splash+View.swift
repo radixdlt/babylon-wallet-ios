@@ -25,7 +25,7 @@ extension Splash {
 					}
 					.edgesIgnoringSafeArea(.all)
 					.destinations(with: store)
-					.onAppear {
+					.task {
 						viewStore.send(.appeared)
 					}
 			}
