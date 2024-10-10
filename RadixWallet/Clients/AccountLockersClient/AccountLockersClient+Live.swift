@@ -226,12 +226,12 @@ extension AccountLockersClient {
 			switch result {
 			case let .dapp(.success(success)):
 				if case let .transaction(tx) = success.items {
-					// Wait for the transaction to be committed
+					// Poll transaction status until available
 					let txID = tx.send.transactionIntentHash
-					if try await submitTXClient.hasTXBeenCommittedSuccessfully(txID) {
-						// And update claim status after
-						forceRefreshSubject.send(true)
-					}
+					let _ = try await submitTXClient.pollTransactionStatus(txID)
+
+					// And update claim status after
+					forceRefreshSubject.send(true)
 				}
 
 			case .dapp(.failure):
