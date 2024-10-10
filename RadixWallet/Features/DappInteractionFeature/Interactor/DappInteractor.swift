@@ -409,8 +409,7 @@ extension DappInteractionClient.ValidatedDappRequest.InvalidRequestReason {
 		case .invalidOrigin, .invalidDappDefinitionAddress, .dAppValidationError:
 			shortExplanation
 		case .invalidPersonaOrAccounts:
-			// FIXME: Strings
-			"dApp specified an invalid Persona or Account"
+			L10n.DAppRequest.ValidationOutcome.invalidPersonaOrAccoubts
 		}
 	}
 
@@ -461,8 +460,7 @@ extension DappInteractionClient.ValidatedDappRequest.InvalidRequestReason {
 		case let .wrongNetworkID(ce, wallet):
 			L10n.DAppRequest.RequestWrongNetworkAlert.message(networkName(for: ce), networkName(for: wallet))
 		case .invalidPersonaOrAccounts:
-			// FIXME: Strings
-			"dApp specified an invalid Persona or Account"
+			L10n.DAppRequest.ValidationOutcome.invalidPersonaOrAccoubts
 		}
 	}
 
