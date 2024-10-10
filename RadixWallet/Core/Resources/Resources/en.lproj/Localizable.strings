@@ -389,6 +389,7 @@
 "dAppRequest_validationOutcome_shortExplanationP2PError" = "Radix Connect connection error";
 "dAppRequest_validationOutcome_invalidRequestTitle" = "Invalid Request.";
 "dAppRequest_validationOutcome_invalidRequestMessage" = "Could not validate the dApp.";
+"dAppRequest_validationOutcome_invalidPersonaOrAccoubts" = "dApp specified an invalid Persona or Account";
 "dAppRequest_requestMalformedAlert_message" = "Request received from dApp is invalid.";
 "dAppRequest_requestPersonaNotFoundAlert_message" = "dApp specified an invalid Persona.";
 "dAppRequest_requestWrongNetworkAlert_message" = "dApp made a request intended for network %@, but you are currently connected to %@.";
