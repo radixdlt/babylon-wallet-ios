@@ -252,30 +252,27 @@ extension TransactionReview {
 		}
 
 		private func header(_ proposingDappMetadata: DappMetadata.Ledger?) -> some SwiftUI.View {
-			VStack(alignment: .leading, spacing: .small3) {
-				HStack(spacing: .zero) {
-					Text(L10n.TransactionReview.title)
-						.textStyle(.sheetTitle)
-						.lineLimit(2)
-						.multilineTextAlignment(.leading)
-						.foregroundColor(.app.gray1)
+			VStack(alignment: .leading, spacing: .small2) {
+				Text(L10n.TransactionReview.title)
+					.textStyle(.sheetTitle)
+					.lineLimit(2)
+					.multilineTextAlignment(.leading)
+					.foregroundColor(.app.gray1)
 
-					Spacer(minLength: 0)
-
-					if let thumbnail = proposingDappMetadata?.thumbnail {
-						Thumbnail(.dapp, url: thumbnail, size: .medium)
-							.padding(.leading, .small2)
-					} else {
-						Spacer(minLength: .small2 + HitTargetSize.medium.rawValue)
+				if proposingDappMetadata?.thumbnail != nil || proposingDappMetadata?.name != nil {
+					HStack(spacing: .small2) {
+						if let thumbnail = proposingDappMetadata?.thumbnail {
+							Thumbnail(.dapp, url: thumbnail, size: .smallest)
+						}
+						if let name = proposingDappMetadata?.name {
+							Text(L10n.TransactionReview.proposingDappSubtitle(name.rawValue))
+								.textStyle(.body2HighImportance)
+								.foregroundColor(.app.gray1)
+						}
 					}
 				}
-
-				if let name = proposingDappMetadata?.name {
-					Text(L10n.TransactionReview.proposingDappSubtitle(name.rawValue))
-						.textStyle(.body2HighImportance)
-						.foregroundColor(.app.gray1)
-				}
 			}
+			.frame(maxWidth: .infinity, alignment: .leading)
 		}
 
 		@ViewBuilder
