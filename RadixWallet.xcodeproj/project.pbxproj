@@ -734,6 +734,9 @@
 		5B45E2FF2BC59780007C4C84 /* SignWithFactorSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B45E2FD2BC59780007C4C84 /* SignWithFactorSource.swift */; };
 		5B45E3012BC5A491007C4C84 /* FactorSourceAccess+ViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B45E3002BC5A491007C4C84 /* FactorSourceAccess+ViewState.swift */; };
 		5B4712CC2C526146003B4712 /* HeaderButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4712CB2C526146003B4712 /* HeaderButtonStyle.swift */; };
+		5B4A1ABF2CC00FB800679EE6 /* PreAuthorizationReview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4A1ABD2CC00FB800679EE6 /* PreAuthorizationReview.swift */; };
+		5B4A1AC02CC00FB800679EE6 /* PreAuthorizationReview+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4A1ABE2CC00FB800679EE6 /* PreAuthorizationReview+View.swift */; };
+		5B4A1AC42CC0125700679EE6 /* InteractionReview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4A1AC32CC0123300679EE6 /* InteractionReview.swift */; };
 		5B4E1D132CB421EB002FAC2E /* DepositStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4E1D122CB421E3002FAC2E /* DepositStatus.swift */; };
 		5B526ADB2C876E7C00AF8B72 /* AccountLockerClaimDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B526ADA2C876E7C00AF8B72 /* AccountLockerClaimDetails.swift */; };
 		5B526AEC2C89C3C200AF8B72 /* ResourcesVisibilityClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B526AE82C89C3C200AF8B72 /* ResourcesVisibilityClient+Interface.swift */; };
@@ -1947,6 +1950,9 @@
 		5B45E2FD2BC59780007C4C84 /* SignWithFactorSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignWithFactorSource.swift; sourceTree = "<group>"; };
 		5B45E3002BC5A491007C4C84 /* FactorSourceAccess+ViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactorSourceAccess+ViewState.swift"; sourceTree = "<group>"; };
 		5B4712CB2C526146003B4712 /* HeaderButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderButtonStyle.swift; sourceTree = "<group>"; };
+		5B4A1ABD2CC00FB800679EE6 /* PreAuthorizationReview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreAuthorizationReview.swift; sourceTree = "<group>"; };
+		5B4A1ABE2CC00FB800679EE6 /* PreAuthorizationReview+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PreAuthorizationReview+View.swift"; sourceTree = "<group>"; };
+		5B4A1AC32CC0123300679EE6 /* InteractionReview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractionReview.swift; sourceTree = "<group>"; };
 		5B4E1D122CB421E3002FAC2E /* DepositStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepositStatus.swift; sourceTree = "<group>"; };
 		5B526ADA2C876E7C00AF8B72 /* AccountLockerClaimDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountLockerClaimDetails.swift; sourceTree = "<group>"; };
 		5B526AE82C89C3C200AF8B72 /* ResourcesVisibilityClient+Interface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ResourcesVisibilityClient+Interface.swift"; sourceTree = "<group>"; };
@@ -2687,6 +2693,7 @@
 				48CFBCBF2ADC10D800E77A5C /* P2PLinksFeature */,
 				48CFBCC62ADC10D800E77A5C /* AppFeature */,
 				48CFBCD02ADC10D800E77A5C /* TransactionReviewFeature */,
+				5B4A1ABC2CC00F7F00679EE6 /* PreAuthorizationReview */,
 				48CFBCF92ADC10D800E77A5C /* DappsAndPersonas */,
 				48CFBD0E2ADC10D800E77A5C /* HomeFeature */,
 				48CFBD192ADC10D800E77A5C /* DerivePublicKeys */,
@@ -5517,6 +5524,24 @@
 			path = FactorSourceAccess;
 			sourceTree = "<group>";
 		};
+		5B4A1ABC2CC00F7F00679EE6 /* PreAuthorizationReview */ = {
+			isa = PBXGroup;
+			children = (
+				5B4A1AC22CC0120600679EE6 /* ReviewCommon */,
+				5B4A1ABD2CC00FB800679EE6 /* PreAuthorizationReview.swift */,
+				5B4A1ABE2CC00FB800679EE6 /* PreAuthorizationReview+View.swift */,
+			);
+			path = PreAuthorizationReview;
+			sourceTree = "<group>";
+		};
+		5B4A1AC22CC0120600679EE6 /* ReviewCommon */ = {
+			isa = PBXGroup;
+			children = (
+				5B4A1AC32CC0123300679EE6 /* InteractionReview.swift */,
+			);
+			path = ReviewCommon;
+			sourceTree = "<group>";
+		};
 		5B526AEB2C89C3C200AF8B72 /* ResourcesVisibilityClient */ = {
 			isa = PBXGroup;
 			children = (
@@ -7240,6 +7265,7 @@
 				48CFC27A2ADC10D900E77A5C /* App+View.swift in Sources */,
 				A40815E72C7E0D08005E65B9 /* ProgrammaticScryptoSborValueU128.swift in Sources */,
 				E7AE2D0E2C07359500830BAA /* FullScreenOverlayCoordinator+Reducer.swift in Sources */,
+				5B4A1AC42CC0125700679EE6 /* InteractionReview.swift in Sources */,
 				48CFC3ED2ADC10D900E77A5C /* DataChannelMessage+Codable.swift in Sources */,
 				A408163B2C7E0D08005E65B9 /* TransactionAccountDepositPreValidationAuthorizedDepositorBadge.swift in Sources */,
 				48CFC5DA2ADC10DA00E77A5C /* PresentationDetentIntrinsicHeight.swift in Sources */,
@@ -7761,6 +7787,8 @@
 				A40815822C7E0D08005E65B9 /* InvalidEntityError.swift in Sources */,
 				48CFC5DE2ADC10DA00E77A5C /* OnFirstTaskViewModifier.swift in Sources */,
 				489122782B186F61005F2EEE /* AlternativeRectangularButtonStyle.swift in Sources */,
+				5B4A1ABF2CC00FB800679EE6 /* PreAuthorizationReview.swift in Sources */,
+				5B4A1AC02CC00FB800679EE6 /* PreAuthorizationReview+View.swift in Sources */,
 				48CFC3652ADC10D900E77A5C /* NonFungibleTokenDetails+View.swift in Sources */,
 				48CFC5C42ADC10DA00E77A5C /* Separator.swift in Sources */,
 				48CFC46C2ADC10DA00E77A5C /* ParseOlympiaPayloads.swift in Sources */,
