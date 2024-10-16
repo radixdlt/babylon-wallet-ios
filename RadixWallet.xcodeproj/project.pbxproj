@@ -737,6 +737,8 @@
 		5B4712CC2C526146003B4712 /* HeaderButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4712CB2C526146003B4712 /* HeaderButtonStyle.swift */; };
 		5B4A1AB32CBFC99200679EE6 /* SignProofOfOwnership.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4A1AB22CBFC98B00679EE6 /* SignProofOfOwnership.swift */; };
 		5B4A1AB62CBFCFCF00679EE6 /* SignProofOfOwnership+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4A1AB52CBFCFC200679EE6 /* SignProofOfOwnership+View.swift */; };
+		5B4A1ABA2CBFEBB000679EE6 /* ProofOfOwnership+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4A1AB92CBFEBB000679EE6 /* ProofOfOwnership+View.swift */; };
+		5B4A1ABB2CBFEBB000679EE6 /* ProofOfOwnership.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4A1AB82CBFEBB000679EE6 /* ProofOfOwnership.swift */; };
 		5B4E1D132CB421EB002FAC2E /* DepositStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4E1D122CB421E3002FAC2E /* DepositStatus.swift */; };
 		5B4E1D1F2CB7FE8E002FAC2E /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 5B4E1D1E2CB7FE8E002FAC2E /* Sargon */; };
 		5B526ADB2C876E7C00AF8B72 /* AccountLockerClaimDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B526ADA2C876E7C00AF8B72 /* AccountLockerClaimDetails.swift */; };
@@ -764,10 +766,6 @@
 		5B9846BD2BBD5C8800E814F3 /* SensitiveInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B9846BC2BBD5C8800E814F3 /* SensitiveInfo.plist */; };
 		5B9846C02BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9846BF2BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift */; };
 		5B9846C22BBD5F7600E814F3 /* SensitiveInfoClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9846C12BBD5F7600E814F3 /* SensitiveInfoClient+Live.swift */; };
-		5BA321C82CAB015E0087FD1C /* PersonaProofOfOwnership.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA321C62CAB015E0087FD1C /* PersonaProofOfOwnership.swift */; };
-		5BA321C92CAB015E0087FD1C /* PersonaProofOfOwnership+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA321C72CAB015E0087FD1C /* PersonaProofOfOwnership+View.swift */; };
-		5BA321D32CAC3E730087FD1C /* AccountsProofOfOwnership.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA321D12CAC3E730087FD1C /* AccountsProofOfOwnership.swift */; };
-		5BA321D42CAC3E730087FD1C /* AccountsProofOfOwnership+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA321D22CAC3E730087FD1C /* AccountsProofOfOwnership+View.swift */; };
 		5BB7C1762BC81F50001216EB /* ImportOlympiaNameLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB7C1752BC81F50001216EB /* ImportOlympiaNameLedger.swift */; };
 		5BB7C1782BC81F61001216EB /* ImportOlympiaNameLedger+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB7C1772BC81F61001216EB /* ImportOlympiaNameLedger+View.swift */; };
 		5BBC43A92BBAC6B0005747B1 /* AppTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC43A82BBAC6B0005747B1 /* AppTextEditor.swift */; };
@@ -1957,6 +1955,8 @@
 		5B4712CB2C526146003B4712 /* HeaderButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderButtonStyle.swift; sourceTree = "<group>"; };
 		5B4A1AB22CBFC98B00679EE6 /* SignProofOfOwnership.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignProofOfOwnership.swift; sourceTree = "<group>"; };
 		5B4A1AB52CBFCFC200679EE6 /* SignProofOfOwnership+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SignProofOfOwnership+View.swift"; sourceTree = "<group>"; };
+		5B4A1AB82CBFEBB000679EE6 /* ProofOfOwnership.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProofOfOwnership.swift; sourceTree = "<group>"; };
+		5B4A1AB92CBFEBB000679EE6 /* ProofOfOwnership+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProofOfOwnership+View.swift"; sourceTree = "<group>"; };
 		5B4E1D122CB421E3002FAC2E /* DepositStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepositStatus.swift; sourceTree = "<group>"; };
 		5B526ADA2C876E7C00AF8B72 /* AccountLockerClaimDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountLockerClaimDetails.swift; sourceTree = "<group>"; };
 		5B526AE82C89C3C200AF8B72 /* ResourcesVisibilityClient+Interface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ResourcesVisibilityClient+Interface.swift"; sourceTree = "<group>"; };
@@ -1982,10 +1982,6 @@
 		5B9846BC2BBD5C8800E814F3 /* SensitiveInfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = SensitiveInfo.plist; sourceTree = "<group>"; };
 		5B9846BF2BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SensitiveInfoClient+Interface.swift"; sourceTree = "<group>"; };
 		5B9846C12BBD5F7600E814F3 /* SensitiveInfoClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SensitiveInfoClient+Live.swift"; sourceTree = "<group>"; };
-		5BA321C62CAB015E0087FD1C /* PersonaProofOfOwnership.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonaProofOfOwnership.swift; sourceTree = "<group>"; };
-		5BA321C72CAB015E0087FD1C /* PersonaProofOfOwnership+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PersonaProofOfOwnership+View.swift"; sourceTree = "<group>"; };
-		5BA321D12CAC3E730087FD1C /* AccountsProofOfOwnership.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsProofOfOwnership.swift; sourceTree = "<group>"; };
-		5BA321D22CAC3E730087FD1C /* AccountsProofOfOwnership+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountsProofOfOwnership+View.swift"; sourceTree = "<group>"; };
 		5BB7C1752BC81F50001216EB /* ImportOlympiaNameLedger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportOlympiaNameLedger.swift; sourceTree = "<group>"; };
 		5BB7C1772BC81F61001216EB /* ImportOlympiaNameLedger+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ImportOlympiaNameLedger+View.swift"; sourceTree = "<group>"; };
 		5BBC43A82BBAC6B0005747B1 /* AppTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTextEditor.swift; sourceTree = "<group>"; };
@@ -3842,9 +3838,7 @@
 				48CFBE072ADC10D800E77A5C /* PersonaDataPermission */,
 				48CFBE0C2ADC10D800E77A5C /* OneTimePersonaData */,
 				48CFBE0F2ADC10D800E77A5C /* Login */,
-				5BA321CB2CAB06DB0087FD1C /* PersonaProofOfOwnership */,
-				5BA321D02CAC3E520087FD1C /* AccountsProofOfOwnership */,
-				5B4A1AB42CBFCFA100679EE6 /* SignProofOfOwnership */,
+				5B4A1AB72CBFEB9700679EE6 /* ProofOfOwnership */,
 			);
 			path = Children;
 			sourceTree = "<group>";
@@ -5545,6 +5539,16 @@
 			path = SignProofOfOwnership;
 			sourceTree = "<group>";
 		};
+		5B4A1AB72CBFEB9700679EE6 /* ProofOfOwnership */ = {
+			isa = PBXGroup;
+			children = (
+				5B4A1AB82CBFEBB000679EE6 /* ProofOfOwnership.swift */,
+				5B4A1AB92CBFEBB000679EE6 /* ProofOfOwnership+View.swift */,
+				5B4A1AB42CBFCFA100679EE6 /* SignProofOfOwnership */,
+			);
+			path = ProofOfOwnership;
+			sourceTree = "<group>";
+		};
 		5B526AEB2C89C3C200AF8B72 /* ResourcesVisibilityClient */ = {
 			isa = PBXGroup;
 			children = (
@@ -5623,24 +5627,6 @@
 				5B9846C12BBD5F7600E814F3 /* SensitiveInfoClient+Live.swift */,
 			);
 			path = SensitiveInfoClient;
-			sourceTree = "<group>";
-		};
-		5BA321CB2CAB06DB0087FD1C /* PersonaProofOfOwnership */ = {
-			isa = PBXGroup;
-			children = (
-				5BA321C62CAB015E0087FD1C /* PersonaProofOfOwnership.swift */,
-				5BA321C72CAB015E0087FD1C /* PersonaProofOfOwnership+View.swift */,
-			);
-			path = PersonaProofOfOwnership;
-			sourceTree = "<group>";
-		};
-		5BA321D02CAC3E520087FD1C /* AccountsProofOfOwnership */ = {
-			isa = PBXGroup;
-			children = (
-				5BA321D12CAC3E730087FD1C /* AccountsProofOfOwnership.swift */,
-				5BA321D22CAC3E730087FD1C /* AccountsProofOfOwnership+View.swift */,
-			);
-			path = AccountsProofOfOwnership;
 			sourceTree = "<group>";
 		};
 		5BBC7D9D2C3D390D00B04BD6 /* BootstrapClient */ = {
@@ -7210,8 +7196,6 @@
 				48CFC2EF2ADC10D900E77A5C /* AddLedgerFactorSource.swift in Sources */,
 				48CFC5CC2ADC10DA00E77A5C /* Grid.swift in Sources */,
 				48CFC4902ADC10DA00E77A5C /* GatewayAPIClient+Live.swift in Sources */,
-				5BA321C82CAB015E0087FD1C /* PersonaProofOfOwnership.swift in Sources */,
-				5BA321C92CAB015E0087FD1C /* PersonaProofOfOwnership+View.swift in Sources */,
 				48CFC5CD2ADC10DA00E77A5C /* ShimmeringAnimation.swift in Sources */,
 				48CFC34F2ADC10D900E77A5C /* PersonaRow+View.swift in Sources */,
 				48CFC2FB2ADC10D900E77A5C /* NewPersonaCompletion+Reducer.swift in Sources */,
@@ -7349,6 +7333,8 @@
 				48CFC28A2ADC10D900E77A5C /* TransactionReviewGuarantees.swift in Sources */,
 				48CFC5772ADC10DA00E77A5C /* MetadataTypedValue.swift in Sources */,
 				48CFC44B2ADC10DA00E77A5C /* MnemonicClient+Interface.swift in Sources */,
+				5B4A1ABA2CBFEBB000679EE6 /* ProofOfOwnership+View.swift in Sources */,
+				5B4A1ABB2CBFEBB000679EE6 /* ProofOfOwnership.swift in Sources */,
 				48CFC3252ADC10D900E77A5C /* LocalNetworkPermission+View.swift in Sources */,
 				A40815B32C7E0D08005E65B9 /* NativeResourceMultiResourcePoolUnitValue.swift in Sources */,
 				48CFC5D82ADC10DA00E77A5C /* TextStyleModifier.swift in Sources */,
@@ -8072,8 +8058,6 @@
 				48CFC2C82ADC10D900E77A5C /* ResourceAsset+Reducer.swift in Sources */,
 				83856D632B0279080026452A /* VerifyMnemonic.swift in Sources */,
 				831F0CF22C25897500D6F5BF /* DappInteractionOriginVerification+View.swift in Sources */,
-				5BA321D32CAC3E730087FD1C /* AccountsProofOfOwnership.swift in Sources */,
-				5BA321D42CAC3E730087FD1C /* AccountsProofOfOwnership+View.swift in Sources */,
 				48CFC48A2ADC10DA00E77A5C /* OnLedgerEntitiesClient+CreateEntity.swift in Sources */,
 				A40815982C7E0D08005E65B9 /* MetadataNonFungibleLocalIdArrayValue.swift in Sources */,
 				A4ECE27A2BEEB01800468BF6 /* CloudBackupClient+Live.swift in Sources */,

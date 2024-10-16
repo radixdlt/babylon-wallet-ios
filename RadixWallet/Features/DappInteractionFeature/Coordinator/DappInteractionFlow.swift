@@ -143,8 +143,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case personaDataPermission(PersonaDataPermission.State)
 			case oneTimePersonaData(OneTimePersonaData.State)
 			case reviewTransaction(TransactionReview.State)
-			case personaProofOfOwnership(PersonaProofOfOwnership.State)
-			case accountsProofOfOwnership(AccountsProofOfOwnership.State)
+			case personaProofOfOwnership(ProofOfOwnership.State)
+			case accountsProofOfOwnership(ProofOfOwnership.State)
 		}
 
 		@CasePathable
@@ -155,8 +155,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case personaDataPermission(PersonaDataPermission.Action)
 			case oneTimePersonaData(OneTimePersonaData.Action)
 			case reviewTransaction(TransactionReview.Action)
-			case personaProofOfOwnership(PersonaProofOfOwnership.Action)
-			case accountsProofOfOwnership(AccountsProofOfOwnership.Action)
+			case personaProofOfOwnership(ProofOfOwnership.Action)
+			case accountsProofOfOwnership(ProofOfOwnership.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -180,10 +180,10 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 					TransactionReview()
 				}
 				Scope(state: \.personaProofOfOwnership, action: \.personaProofOfOwnership) {
-					PersonaProofOfOwnership()
+					ProofOfOwnership()
 				}
 				Scope(state: \.accountsProofOfOwnership, action: \.accountsProofOfOwnership) {
-					AccountsProofOfOwnership()
+					ProofOfOwnership()
 				}
 			}
 		}
@@ -551,14 +551,14 @@ extension DappInteractionFlow {
 		case let .reviewTransaction(.delegate(.failed(error))):
 			return handleSignAndSubmitTXFailed(error)
 
-		case let .personaProofOfOwnership(.delegate(.provenOwnership(persona, challenge))):
+		case let .personaProofOfOwnership(.delegate(.provenPersonaOwnership(persona, challenge))):
 			return handlePersonaProofOfOwnership(item, persona, challenge)
 
-		case let .accountsProofOfOwnership(.delegate(.provenOwnership(accountAuthProofs, challenge))):
+		case let .accountsProofOfOwnership(.delegate(.provenAccountsOwnership(accountAuthProofs, challenge))):
 			return handleAccountsProofOfOwnership(item, accountAuthProofs, challenge)
 
-		case .personaProofOfOwnership(.delegate(.failedToGetPersona)),
-		     .accountsProofOfOwnership(.delegate(.failedToGetAccounts)):
+		case .personaProofOfOwnership(.delegate(.failedToGetEntities)),
+		     .accountsProofOfOwnership(.delegate(.failedToGetEntities)):
 			return dismissEffect(for: state, errorKind: .invalidPersonaOrAccounts, message: nil)
 
 		case .personaProofOfOwnership(.delegate(.failedToSign)),

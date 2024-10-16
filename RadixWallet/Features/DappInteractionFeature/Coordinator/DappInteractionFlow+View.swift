@@ -98,14 +98,14 @@ extension DappInteractionFlow {
 					CaseLet(
 						/DappInteractionFlow.Path.MainState.personaProofOfOwnership,
 						action: DappInteractionFlow.Path.Action.personaProofOfOwnership,
-						then: { PersonaProofOfOwnership.View(store: $0) }
+						then: { ProofOfOwnership.View(store: $0) }
 					)
 
 				case .accountsProofOfOwnership:
 					CaseLet(
 						/DappInteractionFlow.Path.MainState.accountsProofOfOwnership,
 						action: DappInteractionFlow.Path.Action.accountsProofOfOwnership,
-						then: { AccountsProofOfOwnership.View(store: $0) }
+						then: { ProofOfOwnership.View(store: $0) }
 					)
 				}
 			}
