@@ -29,7 +29,7 @@ extension PersonaProofOfOwnership {
 					.buttonStyle(.primaryRectangular)
 				}
 				.task { store.send(.view(.task)) }
-				.destinations(with: store)
+				.signProofOfOwnership(store: store.signature)
 			}
 		}
 	}
@@ -45,20 +45,7 @@ private extension PersonaProofOfOwnership.State {
 }
 
 private extension StoreOf<PersonaProofOfOwnership> {
-	var destination: PresentationStoreOf<PersonaProofOfOwnership.Destination> {
-		func scopeState(state: State) -> PresentationState<PersonaProofOfOwnership.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
-	}
-}
-
-@MainActor
-private extension View {
-	func destinations(with store: StoreOf<PersonaProofOfOwnership>) -> some View {
-		let destinationStore = store.destination
-		return sheet(store: destinationStore.scope(state: \.signing, action: \.signing)) {
-			Signing.View(store: $0)
-		}
+	var signature: StoreOf<SignProofOfOwnership> {
+		scope(state: \.signature, action: \.child.signature)
 	}
 }

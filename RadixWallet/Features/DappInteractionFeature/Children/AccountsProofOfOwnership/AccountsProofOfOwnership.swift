@@ -5,7 +5,7 @@ struct AccountsProofOfOwnership: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		let accountAddresses: [AccountAddress]
 		let dappMetadata: DappMetadata
-		let challenge: DappToWalletInteractionAuthChallengeNonce
+		var signature: SignProofOfOwnership.State
 
 		var accounts: Accounts = []
 
@@ -19,7 +19,7 @@ struct AccountsProofOfOwnership: Sendable, FeatureReducer {
 		) {
 			self.accountAddresses = accountAddresses
 			self.dappMetadata = dappMetadata
-			self.challenge = challenge
+			self.signature = .init(dappMetadata: dappMetadata, challenge: challenge)
 		}
 	}
 
@@ -32,7 +32,6 @@ struct AccountsProofOfOwnership: Sendable, FeatureReducer {
 
 	enum InternalAction: Sendable, Equatable {
 		case setAccounts(Accounts)
-		case performSignature(SigningFactors, AuthenticationDataToSignForChallengeResponse)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -41,36 +40,20 @@ struct AccountsProofOfOwnership: Sendable, FeatureReducer {
 		case failedToSign
 	}
 
-	struct Destination: DestinationReducer {
-		@CasePathable
-		enum State: Sendable, Hashable {
-			case signing(Signing.State)
-		}
-
-		@CasePathable
-		enum Action: Sendable, Equatable {
-			case signing(Signing.Action)
-		}
-
-		var body: some ReducerOf<Self> {
-			Scope(state: \.signing, action: \.signing) {
-				Signing()
-			}
-		}
+	@CasePathable
+	enum ChildAction: Sendable, Equatable {
+		case signature(SignProofOfOwnership.Action)
 	}
 
 	@Dependency(\.accountsClient) var accountsClient
-	@Dependency(\.rolaClient) var rolaClient
-	@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 	var body: some ReducerOf<Self> {
-		Reduce(core)
-			.ifLet(destinationPath, action: \.destination) {
-				Destination()
-			}
-	}
+		Scope(state: \.signature, action: \.child.signature) {
+			SignProofOfOwnership()
+		}
 
-	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
+		Reduce(core)
+	}
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -86,28 +69,14 @@ struct AccountsProofOfOwnership: Sendable, FeatureReducer {
 		case let .setAccounts(accounts):
 			state.accounts = accounts
 			return .none
-		case let .performSignature(signingFactors, authToSignResponse):
-			state.destination = .signing(.init(
-				factorsLeftToSignWith: signingFactors,
-				signingPurposeWithPayload: .signAuth(authToSignResponse)
-			))
-			return .none
 		}
 	}
 
-	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
-		switch presentedAction {
-		case let .signing(.delegate(signingAction)):
-			switch signingAction {
-			case .cancelSigning:
-				// If the user cancels the signing flow, we just dismiss the `Signing` view and wllow them
-				// to retry by tapping Continue again.
-				state.destination = nil
-				return .none
-
-			case let .finishedSigning(.signAuth(signedAuthChallenge)):
-				state.destination = nil
-
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+		switch childAction {
+		case let .signature(.delegate(action)):
+			switch action {
+			case let .signedChallenge(signedAuthChallenge):
 				var accountsLeftToVerifyDidSign: Set<Account.ID> = Set(state.accounts.map(\.id))
 
 				let accountAuthProofs: [AccountAuthProof] = signedAuthChallenge.entitySignatures.compactMap { signature in
@@ -127,14 +96,6 @@ struct AccountsProofOfOwnership: Sendable, FeatureReducer {
 				return .send(.delegate(.provenOwnership(accountAuthProofs, signedAuthChallenge)))
 
 			case .failedToSign:
-				state.destination = nil
-				loggerGlobal.error("Failed to sign proof of ownership")
-				return .send(.delegate(.failedToSign))
-
-			case .finishedSigning(.signTransaction):
-				state.destination = nil
-				assertionFailure("Signed a transaction while expecting auth")
-				loggerGlobal.error("Signed a transaction while expecting auth")
 				return .send(.delegate(.failedToSign))
 			}
 
@@ -162,28 +123,13 @@ struct AccountsProofOfOwnership: Sendable, FeatureReducer {
 	}
 
 	private func gatherSignaturePayloadsEffect(state: State) -> Effect<Action> {
-		guard let signers = NonEmpty<Set<AccountOrPersona>>(rawValue: Set(state.accounts.map { AccountOrPersona.account($0) })) else {
+		guard
+			let signers = NonEmpty<Set<AccountOrPersona>>(rawValue: Set(state.accounts.map { AccountOrPersona.account($0) }))
+		else {
 			return .send(.delegate(.failedToGetAccounts))
 		}
 
-		let createAuthPayloadRequest = AuthenticationDataToSignForChallengeRequest(
-			challenge: state.challenge,
-			origin: state.dappMetadata.origin,
-			dAppDefinitionAddress: state.dappMetadata.dAppDefinitionAddress
-		)
-
-		return .run { send in
-			let signingFactors = try await factorSourcesClient.getSigningFactors(.init(
-				networkID: accountsClient.getCurrentNetworkID(),
-				signers: signers,
-				signingPurpose: .signAuth
-			))
-			let authToSignResponse = try rolaClient.authenticationDataToSignForChallenge(createAuthPayloadRequest)
-			await send(.internal(.performSignature(signingFactors, authToSignResponse)))
-		} catch: { _, send in
-			loggerGlobal.error("Failed to gather signature payloads")
-			await send(.delegate(.failedToSign))
-		}
+		return .send(.child(.signature(.internal(.handle(signers: signers)))))
 	}
 }
 
