@@ -36,3 +36,9 @@ extension P2PLinksClient {
 	public typealias GetP2PLinkPrivateKey = @Sendable () async throws -> (privateKey: Curve25519.PrivateKey, isNew: Bool)
 	public typealias StoreP2PLinkPrivateKey = @Sendable (Curve25519.PrivateKey) async throws -> Void
 }
+
+extension P2PLinksClient {
+	func hasP2PLinks() async -> Bool {
+		await !getP2PLinks().isEmpty
+	}
+}
