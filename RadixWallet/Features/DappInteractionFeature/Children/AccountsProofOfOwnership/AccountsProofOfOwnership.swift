@@ -77,18 +77,15 @@ struct AccountsProofOfOwnership: Sendable, FeatureReducer {
 		case let .signature(.delegate(action)):
 			switch action {
 			case let .signedChallenge(signedAuthChallenge):
-				var accountsLeftToVerifyDidSign: Set<Account.ID> = Set(state.accounts.map(\.id))
-
 				let accountAuthProofs: [AccountAuthProof] = signedAuthChallenge.entitySignatures.compactMap { signature in
 					guard let account = try? signature.signerEntity.asAccount() else {
 						return nil
 					}
-					accountsLeftToVerifyDidSign.remove(account.id)
 					let proof = WalletToDappInteractionAuthProof(entitySignature: signature)
 					return .init(account: account, proof: proof)
 				}
 
-				guard accountsLeftToVerifyDidSign.isEmpty else {
+				guard Set(state.accounts.map(\.id)) == Set(accountAuthProofs.map(\.account.id)) else {
 					loggerGlobal.error("Failed to sign with all accounts")
 					return .send(.delegate(.failedToSign))
 				}
