@@ -3,6 +3,7 @@
 struct PreAuthorizationReview: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
+		var dappName: String? = "Collabo.Fi"
 		init() {}
 	}
 

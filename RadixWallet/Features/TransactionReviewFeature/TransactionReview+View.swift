@@ -150,12 +150,6 @@ extension TransactionReview {
 			ScrollView(showsIndicators: false) {
 				VStack(spacing: 0) {
 					header(viewStore.proposingDappMetadata)
-						.measurePosition(navTitleID, coordSpace: coordSpace)
-						.padding(.horizontal, .medium3)
-						.padding(.bottom, .medium3)
-						.background {
-							JaggedEdge(shadowColor: shadowColor, isTopEdge: true)
-						}
 
 					if let rawTransaction = viewStore.rawTransaction {
 						RawTransactionView(transaction: rawTransaction) {
@@ -252,27 +246,17 @@ extension TransactionReview {
 		}
 
 		private func header(_ proposingDappMetadata: DappMetadata.Ledger?) -> some SwiftUI.View {
-			VStack(alignment: .leading, spacing: .small2) {
-				Text(L10n.TransactionReview.title)
-					.textStyle(.sheetTitle)
-					.lineLimit(2)
-					.multilineTextAlignment(.leading)
-					.foregroundColor(.app.gray1)
-
-				if proposingDappMetadata?.thumbnail != nil || proposingDappMetadata?.name != nil {
-					HStack(spacing: .small2) {
-						if let thumbnail = proposingDappMetadata?.thumbnail {
-							Thumbnail(.dapp, url: thumbnail, size: .smallest)
-						}
-						if let name = proposingDappMetadata?.name {
-							Text(L10n.TransactionReview.proposingDappSubtitle(name.rawValue))
-								.textStyle(.body2HighImportance)
-								.foregroundColor(.app.gray1)
-						}
-					}
-				}
+			InteractionReview.HeaderView(
+				kind: .transaction,
+				name: proposingDappMetadata?.name?.rawValue,
+				thumbnail: proposingDappMetadata?.thumbnail
+			)
+			.measurePosition(navTitleID, coordSpace: coordSpace)
+			.padding(.horizontal, .medium3)
+			.padding(.bottom, .medium3)
+			.background {
+				JaggedEdge(shadowColor: shadowColor, isTopEdge: true)
 			}
-			.frame(maxWidth: .infinity, alignment: .leading)
 		}
 
 		@ViewBuilder
