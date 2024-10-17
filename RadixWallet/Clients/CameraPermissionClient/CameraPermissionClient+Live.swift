@@ -4,7 +4,7 @@ import UIKit
 
 // MARK: - UserDefaults.Dependency + DependencyKey
 extension CameraPermissionClient: DependencyKey {
-	public static let liveValue = Self(
+	static let liveValue = Self(
 		getCameraAccess: {
 			await withCheckedContinuation { continuation in
 				AVCaptureDevice.requestAccess(for: .video) { access in

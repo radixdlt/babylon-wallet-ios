@@ -1,6 +1,6 @@
 
 extension View {
-	public func presentationDetentIntrinsicHeight() -> some View {
+	func presentationDetentIntrinsicHeight() -> some View {
 		self.modifier(PresentationDetentIntrinsicHeight())
 	}
 }

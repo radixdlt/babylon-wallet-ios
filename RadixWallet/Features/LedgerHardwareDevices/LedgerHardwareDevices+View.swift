@@ -9,7 +9,7 @@ extension LedgerHardwareDevices.State {
 
 // MARK: - LedgerHardwareDevice.View
 extension LedgerHardwareDevices {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		var allowSelection: Bool { context != .settings }
 		var showIcon: Bool { context != .settings }
 
@@ -61,14 +61,14 @@ extension LedgerHardwareDevices {
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<LedgerHardwareDevices>
 
-		public init(store: StoreOf<LedgerHardwareDevices>) {
+		init(store: StoreOf<LedgerHardwareDevices>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView {
 					VStack(spacing: 0) {
@@ -243,6 +243,6 @@ import ComposableArchitecture //
 // }
 //
 // extension ChooseLedgerHardwareDevice.State {
-//	public static let previewValue = Self()
+//	static let previewValue = Self()
 // }
 // #endif

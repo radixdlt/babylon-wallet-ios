@@ -1,16 +1,16 @@
 import Sargon
 
 // MARK: - TransactionSigners
-public struct TransactionSigners: Sendable, Hashable {
-	public let notaryPublicKey: Curve25519.Signing.PublicKey
-	public let intentSigning: IntentSigning
+struct TransactionSigners: Sendable, Hashable {
+	let notaryPublicKey: Curve25519.Signing.PublicKey
+	let intentSigning: IntentSigning
 
-	public enum IntentSigning: Sendable, Hashable {
+	enum IntentSigning: Sendable, Hashable {
 		case notaryIsSignatory
 		case intentSigners(NonEmpty<OrderedSet<AccountOrPersona>>)
 	}
 
-	public init(
+	init(
 		notaryPublicKey: Curve25519.Signing.PublicKey,
 		intentSigning: IntentSigning
 	) {
@@ -56,14 +56,14 @@ extension GatewayAPI.TransactionPreviewRequest {
 }
 
 extension TransactionSigners {
-	public var notaryIsSignatory: Bool {
+	var notaryIsSignatory: Bool {
 		switch self.intentSigning {
 		case .intentSigners: false
 		case .notaryIsSignatory: true
 		}
 	}
 
-	public var signerPublicKeys: Set<Sargon.PublicKey> {
+	var signerPublicKeys: Set<Sargon.PublicKey> {
 		switch intentSigning {
 		case let .intentSigners(signers):
 			Set(signers.flatMap { ent in ent.virtualHierarchicalDeterministicFactorInstances.map(\.publicKey.publicKey) })
@@ -72,7 +72,7 @@ extension TransactionSigners {
 		}
 	}
 
-	public func intentSignerEntitiesOrEmpty() -> OrderedSet<AccountOrPersona> {
+	func intentSignerEntitiesOrEmpty() -> OrderedSet<AccountOrPersona> {
 		switch intentSigning {
 		case .notaryIsSignatory: .init()
 		case let .intentSigners(signers): OrderedSet(signers)
@@ -92,11 +92,11 @@ extension GatewayAPI.PublicKey {
 }
 
 // MARK: - NotarizeTransactionRequest
-public struct NotarizeTransactionRequest: Sendable, Hashable {
-	public let intentSignatures: Set<SignatureWithPublicKey>
-	public let transactionIntent: TransactionIntent
-	public let notary: Curve25519.Signing.PrivateKey
-	public init(
+struct NotarizeTransactionRequest: Sendable, Hashable {
+	let intentSignatures: Set<SignatureWithPublicKey>
+	let transactionIntent: TransactionIntent
+	let notary: Curve25519.Signing.PrivateKey
+	init(
 		intentSignatures: Set<SignatureWithPublicKey>,
 		transactionIntent: TransactionIntent,
 		notary: Curve25519.Signing.PrivateKey
@@ -108,11 +108,11 @@ public struct NotarizeTransactionRequest: Sendable, Hashable {
 }
 
 // MARK: - NotarizeTransactionResponse
-public struct NotarizeTransactionResponse: Sendable, Hashable {
-	public let notarized: CompiledNotarizedIntent
-	public let intent: TransactionIntent
-	public let txID: IntentHash
-	public init(
+struct NotarizeTransactionResponse: Sendable, Hashable {
+	let notarized: CompiledNotarizedIntent
+	let intent: TransactionIntent
+	let txID: IntentHash
+	init(
 		notarized: CompiledNotarizedIntent,
 		intent: TransactionIntent,
 		txID: IntentHash
@@ -124,15 +124,15 @@ public struct NotarizeTransactionResponse: Sendable, Hashable {
 }
 
 // MARK: - BuildTransactionIntentRequest
-public struct BuildTransactionIntentRequest: Sendable {
-	public let networkID: NetworkID
-	public let nonce: Nonce
-	public let manifest: TransactionManifest
-	public let message: Message
-	public let makeTransactionHeaderInput: MakeTransactionHeaderInput
-	public let transactionSigners: TransactionSigners
+struct BuildTransactionIntentRequest: Sendable {
+	let networkID: NetworkID
+	let nonce: Nonce
+	let manifest: TransactionManifest
+	let message: Message
+	let makeTransactionHeaderInput: MakeTransactionHeaderInput
+	let transactionSigners: TransactionSigners
 
-	public init(
+	init(
 		networkID: NetworkID,
 		manifest: TransactionManifest,
 		message: Message,
@@ -150,12 +150,12 @@ public struct BuildTransactionIntentRequest: Sendable {
 }
 
 // MARK: - GetTransactionSignersRequest
-public struct GetTransactionSignersRequest: Sendable, Hashable {
-	public let networkID: NetworkID
-	public let manifest: TransactionManifest
-	public let ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
+struct GetTransactionSignersRequest: Sendable, Hashable {
+	let networkID: NetworkID
+	let manifest: TransactionManifest
+	let ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
 
-	public init(
+	init(
 		networkID: NetworkID,
 		manifest: TransactionManifest,
 		ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
@@ -167,16 +167,16 @@ public struct GetTransactionSignersRequest: Sendable, Hashable {
 }
 
 // MARK: - ManifestReviewRequest
-public struct ManifestReviewRequest: Sendable {
-	public let unvalidatedManifest: UnvalidatedTransactionManifest
-	public let message: Message
-	public let nonce: Nonce
-	public let makeTransactionHeaderInput: MakeTransactionHeaderInput
-	public let ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
-	public let signingPurpose: SigningPurpose
-	public let isWalletTransaction: Bool
+struct ManifestReviewRequest: Sendable {
+	let unvalidatedManifest: UnvalidatedTransactionManifest
+	let message: Message
+	let nonce: Nonce
+	let makeTransactionHeaderInput: MakeTransactionHeaderInput
+	let ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
+	let signingPurpose: SigningPurpose
+	let isWalletTransaction: Bool
 
-	public init(
+	init(
 		unvalidatedManifest: UnvalidatedTransactionManifest,
 		message: Message,
 		nonce: Nonce,
@@ -196,38 +196,38 @@ public struct ManifestReviewRequest: Sendable {
 }
 
 // MARK: - FeePayerCandidate
-public struct FeePayerCandidate: Sendable, Hashable, Identifiable {
-	public typealias ID = Account.ID
-	public var id: ID { account.id }
+struct FeePayerCandidate: Sendable, Hashable, Identifiable {
+	typealias ID = Account.ID
+	var id: ID { account.id }
 
-	public let account: Account
-	public let xrdBalance: Decimal192
+	let account: Account
+	let xrdBalance: Decimal192
 
-	public init(account: Account, xrdBalance: Decimal192) {
+	init(account: Account, xrdBalance: Decimal192) {
 		self.account = account
 		self.xrdBalance = xrdBalance
 	}
 }
 
 // MARK: - TransactionToReview
-public struct TransactionToReview: Sendable, Hashable {
-	public let transactionManifest: TransactionManifest
-	public let analyzedManifestToReview: ExecutionSummary
-	public let networkID: NetworkID
+struct TransactionToReview: Sendable, Hashable {
+	let transactionManifest: TransactionManifest
+	let analyzedManifestToReview: ExecutionSummary
+	let networkID: NetworkID
 
-	public var transactionFee: TransactionFee
-	public var transactionSigners: TransactionSigners
-	public var signingFactors: SigningFactors
+	var transactionFee: TransactionFee
+	var transactionSigners: TransactionSigners
+	var signingFactors: SigningFactors
 }
 
 // MARK: - FeePayerSelectionAmongstCandidates
-public struct FeePayerSelectionAmongstCandidates: Sendable, Hashable {
-	public var selected: FeePayerCandidate?
+struct FeePayerSelectionAmongstCandidates: Sendable, Hashable {
+	var selected: FeePayerCandidate?
 	/// contains `selected`
-	public let candidates: NonEmpty<IdentifiedArrayOf<FeePayerCandidate>>
-	public var transactionFee: TransactionFee
+	let candidates: NonEmpty<IdentifiedArrayOf<FeePayerCandidate>>
+	var transactionFee: TransactionFee
 
-	public init(
+	init(
 		selected: FeePayerCandidate?,
 		candidates: NonEmpty<IdentifiedArrayOf<FeePayerCandidate>>,
 		transactionFee: TransactionFee
@@ -239,7 +239,7 @@ public struct FeePayerSelectionAmongstCandidates: Sendable, Hashable {
 }
 
 // MARK: - DetermineFeePayerRequest
-public struct DetermineFeePayerRequest: Sendable {
+struct DetermineFeePayerRequest: Sendable {
 	let networkId: NetworkID
 	let transactionFee: TransactionFee
 	let transactionSigners: TransactionSigners
@@ -249,24 +249,24 @@ public struct DetermineFeePayerRequest: Sendable {
 }
 
 // MARK: - DetermineFeePayerResponse
-public struct DetermineFeePayerResponse: Sendable {
+struct DetermineFeePayerResponse: Sendable {
 	/// The result of selecting a fee payer among the below candidates list
-	public let feePayerSelection: FeePayerSelectionResult?
+	let feePayerSelection: FeePayerSelectionResult?
 	/// The list of all the possible fee payer candidates
-	public let candidates: NonEmpty<IdentifiedArrayOf<FeePayerCandidate>>
+	let candidates: NonEmpty<IdentifiedArrayOf<FeePayerCandidate>>
 }
 
 // MARK: - FeePayerSelectionResult
 /// The result of selecting a fee payer.
 /// In the case when the fee payer is not an account for which we do already have the signature - the fee, transactionSigners and signingFactors will be updated
 /// to account for the new signature that is required to be added
-public struct FeePayerSelectionResult: Equatable, Sendable {
-	public let payer: FeePayerCandidate
-	public let updatedFee: TransactionFee
-	public let transactionSigners: TransactionSigners
-	public let signingFactors: SigningFactors
+struct FeePayerSelectionResult: Equatable, Sendable {
+	let payer: FeePayerCandidate
+	let updatedFee: TransactionFee
+	let transactionSigners: TransactionSigners
+	let signingFactors: SigningFactors
 
-	public init(
+	init(
 		payer: FeePayerCandidate,
 		updatedFee: TransactionFee,
 		transactionSigners: TransactionSigners,

@@ -11,30 +11,30 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.EntitySchemaCollectionItem")
-public typealias EntitySchemaCollectionItem = GatewayAPI.EntitySchemaCollectionItem
+typealias EntitySchemaCollectionItem = GatewayAPI.EntitySchemaCollectionItem
 
 extension GatewayAPI {
 
-public struct EntitySchemaCollectionItem: Codable, Hashable {
+struct EntitySchemaCollectionItem: Codable, Hashable {
 
     /** Hex-encoded binary blob. */
-    public private(set) var schemaHashHex: String
+    private(set) var schemaHashHex: String
     /** Hex-encoded binary blob. */
-    public private(set) var schemaHex: String
+    private(set) var schemaHex: String
 
-    public init(schemaHashHex: String, schemaHex: String) {
+    init(schemaHashHex: String, schemaHex: String) {
         self.schemaHashHex = schemaHashHex
         self.schemaHex = schemaHex
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case schemaHashHex = "schema_hash_hex"
         case schemaHex = "schema_hex"
     }
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(schemaHashHex, forKey: .schemaHashHex)
         try container.encode(schemaHex, forKey: .schemaHex)

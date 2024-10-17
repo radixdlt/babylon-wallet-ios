@@ -1,6 +1,6 @@
 // MARK: - JSONValue
 // https://gist.github.com/hannesoid/10a35895e4dc5d6f1bb6428f7d4d23a5
-public indirect enum JSONValue: Codable, CustomStringConvertible, Sendable, Hashable {
+indirect enum JSONValue: Codable, CustomStringConvertible, Sendable, Hashable {
 	case double(Double)
 	case int32(Int32)
 	case int(Int)
@@ -10,7 +10,7 @@ public indirect enum JSONValue: Codable, CustomStringConvertible, Sendable, Hash
 	case array([JSONValue])
 	case `nil`
 
-	public init(from decoder: Decoder) throws {
+	init(from decoder: Decoder) throws {
 		let singleValueContainer = try decoder.singleValueContainer()
 		if let value = try? singleValueContainer.decode(Bool.self) {
 			self = .bool(value)
@@ -46,7 +46,7 @@ public indirect enum JSONValue: Codable, CustomStringConvertible, Sendable, Hash
 		)
 	}
 
-	public func encode(to encoder: Encoder) throws {
+	func encode(to encoder: Encoder) throws {
 		var container = encoder.singleValueContainer()
 		switch self {
 		case let .array(array): try container.encode(array)
@@ -61,7 +61,7 @@ public indirect enum JSONValue: Codable, CustomStringConvertible, Sendable, Hash
 		}
 	}
 
-	public var description: String {
+	var description: String {
 		stringRepresentation
 	}
 
@@ -93,7 +93,7 @@ public indirect enum JSONValue: Codable, CustomStringConvertible, Sendable, Hash
 
 // MARK: - Convenience
 extension JSONValue {
-	public var string: String? {
+	var string: String? {
 		switch self {
 		case let .string(value):
 			value
@@ -102,7 +102,7 @@ extension JSONValue {
 		}
 	}
 
-	public var int: Int? {
+	var int: Int? {
 		switch self {
 		case let .int(value):
 			value
@@ -111,7 +111,7 @@ extension JSONValue {
 		}
 	}
 
-	public var double: Double? {
+	var double: Double? {
 		switch self {
 		case let .double(value):
 			value
@@ -120,7 +120,7 @@ extension JSONValue {
 		}
 	}
 
-	public var bool: Bool? {
+	var bool: Bool? {
 		switch self {
 		case let .bool(value):
 			value
@@ -129,7 +129,7 @@ extension JSONValue {
 		}
 	}
 
-	public var dictionary: [String: JSONValue]? {
+	var dictionary: [String: JSONValue]? {
 		switch self {
 		case let .dictionary(value):
 			value
@@ -138,7 +138,7 @@ extension JSONValue {
 		}
 	}
 
-	public var array: [JSONValue]? {
+	var array: [JSONValue]? {
 		switch self {
 		case let .array(value):
 			value
@@ -147,7 +147,7 @@ extension JSONValue {
 		}
 	}
 
-	public var isNil: Bool {
+	var isNil: Bool {
 		switch self {
 		case .nil:
 			true
@@ -160,11 +160,11 @@ extension JSONValue {
 // MARK: - Even More Convenience
 
 extension JSONValue {
-	public var uint: UInt? {
+	var uint: UInt? {
 		int.map(UInt.init)
 	}
 
-	public subscript(key: String) -> JSONValue? {
+	subscript(key: String) -> JSONValue? {
 		dictionary?[key]
 	}
 }

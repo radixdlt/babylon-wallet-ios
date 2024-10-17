@@ -11,11 +11,11 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.StateEntityDetailsResponseItemDetailsType")
-public typealias StateEntityDetailsResponseItemDetailsType = GatewayAPI.StateEntityDetailsResponseItemDetailsType
+typealias StateEntityDetailsResponseItemDetailsType = GatewayAPI.StateEntityDetailsResponseItemDetailsType
 
 extension GatewayAPI {
 
-public enum StateEntityDetailsResponseItemDetailsType: String, Codable, CaseIterable {
+enum StateEntityDetailsResponseItemDetailsType: String, Codable, CaseIterable {
     case fungibleResource = "FungibleResource"
     case nonFungibleResource = "NonFungibleResource"
     case fungibleVault = "FungibleVault"

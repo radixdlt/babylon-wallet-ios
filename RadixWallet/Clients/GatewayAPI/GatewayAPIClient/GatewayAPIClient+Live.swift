@@ -10,16 +10,16 @@ extension JSONDecoder {
 }
 
 extension GatewayAPIClient {
-	public struct EmptyEntityDetailsResponse: Error {}
-	public typealias SingleEntityDetailsResponse = (ledgerState: GatewayAPI.LedgerState, details: GatewayAPI.StateEntityDetailsResponseItem)
-	public typealias Value = GatewayAPIClient
+	struct EmptyEntityDetailsResponse: Error {}
+	typealias SingleEntityDetailsResponse = (ledgerState: GatewayAPI.LedgerState, details: GatewayAPI.StateEntityDetailsResponseItem)
+	typealias Value = GatewayAPIClient
 
-	public static let liveValue = GatewayAPIClient.live(
+	static let liveValue = GatewayAPIClient.live(
 		jsonEncoder: .init(),
 		jsonDecoder: .default
 	)
 
-	public static func live(
+	static func live(
 		jsonEncoder: JSONEncoder,
 		jsonDecoder: JSONDecoder
 	) -> Self {

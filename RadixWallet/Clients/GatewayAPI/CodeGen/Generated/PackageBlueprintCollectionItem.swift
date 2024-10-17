@@ -11,24 +11,24 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.PackageBlueprintCollectionItem")
-public typealias PackageBlueprintCollectionItem = GatewayAPI.PackageBlueprintCollectionItem
+typealias PackageBlueprintCollectionItem = GatewayAPI.PackageBlueprintCollectionItem
 
 extension GatewayAPI {
 
-public struct PackageBlueprintCollectionItem: Codable, Hashable {
+struct PackageBlueprintCollectionItem: Codable, Hashable {
 
-    public private(set) var name: String
-    public private(set) var version: String
+    private(set) var name: String
+    private(set) var version: String
     /** This type is defined in the Core API as `BlueprintDefinition`. See the Core API documentation for more details.  */
-    public private(set) var definition: AnyCodable
-    public private(set) var dependantEntities: [String]?
+    private(set) var definition: AnyCodable
+    private(set) var dependantEntities: [String]?
     /** This type is defined in the Core API as `AuthConfig`. See the Core API documentation for more details.  */
-    public private(set) var authTemplate: AnyCodable?
-    public private(set) var authTemplateIsLocked: Bool?
-    public private(set) var royaltyConfig: BlueprintRoyaltyConfig?
-    public private(set) var royaltyConfigIsLocked: Bool?
+    private(set) var authTemplate: AnyCodable?
+    private(set) var authTemplateIsLocked: Bool?
+    private(set) var royaltyConfig: BlueprintRoyaltyConfig?
+    private(set) var royaltyConfigIsLocked: Bool?
 
-    public init(name: String, version: String, definition: AnyCodable, dependantEntities: [String]? = nil, authTemplate: AnyCodable? = nil, authTemplateIsLocked: Bool? = nil, royaltyConfig: BlueprintRoyaltyConfig? = nil, royaltyConfigIsLocked: Bool? = nil) {
+    init(name: String, version: String, definition: AnyCodable, dependantEntities: [String]? = nil, authTemplate: AnyCodable? = nil, authTemplateIsLocked: Bool? = nil, royaltyConfig: BlueprintRoyaltyConfig? = nil, royaltyConfigIsLocked: Bool? = nil) {
         self.name = name
         self.version = version
         self.definition = definition
@@ -39,7 +39,7 @@ public struct PackageBlueprintCollectionItem: Codable, Hashable {
         self.royaltyConfigIsLocked = royaltyConfigIsLocked
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case name
         case version
         case definition
@@ -52,7 +52,7 @@ public struct PackageBlueprintCollectionItem: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(name, forKey: .name)
         try container.encode(version, forKey: .version)

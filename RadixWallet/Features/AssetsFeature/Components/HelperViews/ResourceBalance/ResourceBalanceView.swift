@@ -4,47 +4,47 @@ import SwiftUI
 // MARK: - ResourceBalance.ViewState
 extension ResourceBalance {
 	// MARK: - ViewState
-	public enum ViewState: Sendable, Hashable {
+	enum ViewState: Sendable, Hashable {
 		case fungible(Fungible)
 		case nonFungible(NonFungible)
 		case liquidStakeUnit(LiquidStakeUnit)
 		case poolUnit(PoolUnit)
 		case stakeClaimNFT(StakeClaimNFT)
 
-		public struct Fungible: Sendable, Hashable {
-			public let address: ResourceAddress
-			public let icon: Thumbnail.FungibleContent
-			public let title: String?
-			public let amount: ResourceBalance.Amount?
+		struct Fungible: Sendable, Hashable {
+			let address: ResourceAddress
+			let icon: Thumbnail.FungibleContent
+			let title: String?
+			let amount: ResourceBalance.Amount?
 		}
 
-		public struct NonFungible: Sendable, Hashable {
-			public let id: NonFungibleGlobalId
-			public let resourceImage: URL?
-			public let resourceName: String?
-			public let nonFungibleName: String?
+		struct NonFungible: Sendable, Hashable {
+			let id: NonFungibleGlobalId
+			let resourceImage: URL?
+			let resourceName: String?
+			let nonFungibleName: String?
 		}
 
-		public struct LiquidStakeUnit: Sendable, Hashable {
-			public let address: ResourceAddress
-			public let icon: URL?
-			public let title: String?
-			public let amount: ResourceBalance.Amount?
-			public let worth: ResourceAmount
-			public var validatorName: String? = nil
+		struct LiquidStakeUnit: Sendable, Hashable {
+			let address: ResourceAddress
+			let icon: URL?
+			let title: String?
+			let amount: ResourceBalance.Amount?
+			let worth: ResourceAmount
+			var validatorName: String? = nil
 		}
 
-		public struct PoolUnit: Sendable, Hashable {
-			public let resourcePoolAddress: PoolAddress
-			public let poolUnitAddress: ResourceAddress
-			public let poolIcon: URL?
-			public let poolName: String?
-			public let amount: ResourceBalance.Amount?
-			public var dAppName: Loadable<String?>
-			public var resources: Loadable<[Fungible]>
+		struct PoolUnit: Sendable, Hashable {
+			let resourcePoolAddress: PoolAddress
+			let poolUnitAddress: ResourceAddress
+			let poolIcon: URL?
+			let poolName: String?
+			let amount: ResourceBalance.Amount?
+			var dAppName: Loadable<String?>
+			var resources: Loadable<[Fungible]>
 		}
 
-		public typealias StakeClaimNFT = ResourceBalance.StakeClaimNFT
+		typealias StakeClaimNFT = ResourceBalance.StakeClaimNFT
 	}
 
 	var viewState: ViewState {
@@ -113,13 +113,13 @@ private extension ResourceBalance.ViewState.PoolUnit {
 }
 
 // MARK: - ResourceBalanceView
-public struct ResourceBalanceView: View {
-	public let viewState: ResourceBalance.ViewState
-	public let appearance: Appearance
-	public let isSelected: Bool?
-	public let action: (() -> Void)?
+struct ResourceBalanceView: View {
+	let viewState: ResourceBalance.ViewState
+	let appearance: Appearance
+	let isSelected: Bool?
+	let action: (() -> Void)?
 
-	public enum Appearance: Sendable, Equatable {
+	enum Appearance: Sendable, Equatable {
 		case standard
 		case compact(border: Bool)
 
@@ -138,7 +138,7 @@ public struct ResourceBalanceView: View {
 		self.action = action
 	}
 
-	public var body: some View {
+	var body: some View {
 		content
 			.embedInButton(when: action)
 	}
@@ -195,12 +195,12 @@ public struct ResourceBalanceView: View {
 }
 
 extension ResourceBalanceView {
-	public struct Fungible: View {
+	struct Fungible: View {
 		@Environment(\.missingFungibleAmountFallback) var fallback
-		public let viewState: ResourceBalance.ViewState.Fungible
-		public let compact: Bool
+		let viewState: ResourceBalance.ViewState.Fungible
+		let compact: Bool
 
-		public var body: some View {
+		var body: some View {
 			FungibleView(
 				thumbnail: viewState.icon,
 				caption1: viewState.title ?? "-",
@@ -213,11 +213,11 @@ extension ResourceBalanceView {
 		}
 	}
 
-	public struct NonFungible: View {
-		public let viewState: ResourceBalance.ViewState.NonFungible
-		public let compact: Bool
+	struct NonFungible: View {
+		let viewState: ResourceBalance.ViewState.NonFungible
+		let compact: Bool
 
-		public var body: some View {
+		var body: some View {
 			NonFungibleView(
 				thumbnail: .nft(viewState.resourceImage),
 				caption1: viewState.resourceName ?? viewState.id.resourceAddress.formatted(),
@@ -227,17 +227,17 @@ extension ResourceBalanceView {
 		}
 	}
 
-	public struct LiquidStakeUnit: View {
+	struct LiquidStakeUnit: View {
 		@Environment(\.resourceBalanceHideDetails) var hideDetails
-		public let viewState: ResourceBalance.ViewState.LiquidStakeUnit
-		public let compact: Bool
-		public let isSelected: Bool?
+		let viewState: ResourceBalance.ViewState.LiquidStakeUnit
+		let compact: Bool
+		let isSelected: Bool?
 
 		private var fungible: ResourceBalance.ViewState.Fungible {
 			.xrd(balance: viewState.worth, network: viewState.address.networkID)
 		}
 
-		public var body: some View {
+		var body: some View {
 			VStack(alignment: .leading, spacing: .medium3) {
 				FungibleView(
 					thumbnail: .lsu(viewState.icon),
@@ -263,13 +263,13 @@ extension ResourceBalanceView {
 		}
 	}
 
-	public struct PoolUnit: View {
+	struct PoolUnit: View {
 		@Environment(\.resourceBalanceHideDetails) var hideDetails
-		public let viewState: ResourceBalance.ViewState.PoolUnit
-		public let compact: Bool
-		public let isSelected: Bool?
+		let viewState: ResourceBalance.ViewState.PoolUnit
+		let compact: Bool
+		let isSelected: Bool?
 
-		public var body: some View {
+		var body: some View {
 			VStack(alignment: .leading, spacing: .zero) {
 				FungibleView(
 					thumbnail: .poolUnit(viewState.poolIcon),
@@ -298,20 +298,20 @@ extension ResourceBalanceView {
 		}
 	}
 
-	public struct StakeClaimNFT: View {
+	struct StakeClaimNFT: View {
 		@Environment(\.resourceBalanceHideDetails) var hideDetails
-		public let viewState: ResourceBalance.ViewState.StakeClaimNFT
-		public let appearance: Appearance
-		public let compact: Bool
-		public let onTap: (OnLedgerEntitiesClient.StakeClaim) -> Void
-		public var onClaimAllTapped: (() -> Void)? = nil
+		let viewState: ResourceBalance.ViewState.StakeClaimNFT
+		let appearance: Appearance
+		let compact: Bool
+		let onTap: (OnLedgerEntitiesClient.StakeClaim) -> Void
+		var onClaimAllTapped: (() -> Void)? = nil
 
-		public enum Appearance {
+		enum Appearance {
 			case standalone
 			case transactionReview
 		}
 
-		public var body: some View {
+		var body: some View {
 			VStack(alignment: .leading, spacing: .zero) {
 				NonFungibleView(
 					thumbnail: .stakeClaimNFT(viewState.resourceMetadata.iconURL),
@@ -348,17 +348,17 @@ extension ResourceBalanceView {
 			}
 		}
 
-		public struct Tokens: View {
+		struct Tokens: View {
 			enum SectionKind {
 				case unstaking
 				case readyToBeClaimed
 				case toBeClaimed
 			}
 
-			public var viewState: ResourceBalance.StakeClaimNFT.Tokens
-			public let background: Color
-			public let onTap: ((OnLedgerEntitiesClient.StakeClaim) -> Void)?
-			public let onClaimAllTapped: (() -> Void)?
+			var viewState: ResourceBalance.StakeClaimNFT.Tokens
+			let background: Color
+			let onTap: ((OnLedgerEntitiesClient.StakeClaim) -> Void)?
+			let onClaimAllTapped: (() -> Void)?
 
 			init(
 				viewState: ResourceBalance.StakeClaimNFT.Tokens,
@@ -372,7 +372,7 @@ extension ResourceBalanceView {
 				self.onClaimAllTapped = onClaimAllTapped
 			}
 
-			public var body: some View {
+			var body: some View {
 				if !viewState.unstaking.isEmpty {
 					sectionView(viewState.unstaking, kind: .unstaking)
 				}
@@ -440,15 +440,15 @@ extension ResourceBalanceView {
 	// Helper Views
 
 	private struct FungibleView: View {
-		public let thumbnail: Thumbnail.FungibleContent
-		public let caption1: String?
-		public let caption2: String?
-		public let fallback: String?
-		public let amount: ResourceBalance.Amount?
-		public let compact: Bool
-		public let isSelected: Bool?
+		let thumbnail: Thumbnail.FungibleContent
+		let caption1: String?
+		let caption2: String?
+		let fallback: String?
+		let amount: ResourceBalance.Amount?
+		let compact: Bool
+		let isSelected: Bool?
 
-		public var body: some View {
+		var body: some View {
 			HStack(spacing: .zero) {
 				CaptionedThumbnailView(
 					type: thumbnail.type,

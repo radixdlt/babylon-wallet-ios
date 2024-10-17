@@ -7,7 +7,7 @@ private let keychainService = "Radix Wallet"
 
 // MARK: - KeychainHolder
 final class KeychainHolder: @unchecked Sendable {
-	public static let shared = KeychainHolder()
+	static let shared = KeychainHolder()
 
 	private let keychain: Keychain
 	private let service: String
@@ -27,11 +27,11 @@ extension KeychainHolder {
 	typealias Comment = KeychainClient.Comment
 	typealias AuthenticationPrompt = KeychainClient.AuthenticationPrompt
 
-	public var keychainChanged: AnyAsyncSequence<Void> {
+	var keychainChanged: AnyAsyncSequence<Void> {
 		keychainChangedSubject.eraseToAnyAsyncSequence()
 	}
 
-	public func getServiceAndAccessGroup() -> (service: String, accessGroup: String?) {
+	func getServiceAndAccessGroup() -> (service: String, accessGroup: String?) {
 		(service, accessGroup)
 	}
 

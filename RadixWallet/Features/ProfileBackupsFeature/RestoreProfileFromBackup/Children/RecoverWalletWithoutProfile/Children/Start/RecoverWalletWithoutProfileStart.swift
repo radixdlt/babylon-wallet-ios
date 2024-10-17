@@ -1,47 +1,47 @@
 // MARK: - RecoverWalletWithoutProfileStart
-public struct RecoverWalletWithoutProfileStart: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
+struct RecoverWalletWithoutProfileStart: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
 		@PresentationState
 		var destination: Destination.State? = nil
 
-		public init() {}
+		init() {}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case recoverWithBDFSTapped
 		case ledgerOnlyTapped
 		case olympiaOnlyTapped
 		case closeTapped
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case dismiss
 		case backToStartOfOnboarding
 		case recoverWithBDFSOnly
 	}
 
-	public struct Destination: DestinationReducer {
-		public enum State: Sendable, Hashable {
+	struct Destination: DestinationReducer {
+		enum State: Sendable, Hashable {
 			case alert(AlertState<Action.AlertAction>)
 		}
 
-		public enum Action: Sendable, Hashable {
+		enum Action: Sendable, Hashable {
 			case alert(AlertAction)
 
-			public enum AlertAction: Sendable {
+			enum AlertAction: Sendable {
 				case cancelTapped
 				case continueTapped
 			}
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			EmptyReducer()
 		}
 	}
 
-	public init() {}
+	init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .recoverWithBDFSTapped:
 			return .send(.delegate(.recoverWithBDFSOnly))
@@ -65,7 +65,7 @@ public struct RecoverWalletWithoutProfileStart: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .alert(.cancelTapped):
 			state.destination = nil

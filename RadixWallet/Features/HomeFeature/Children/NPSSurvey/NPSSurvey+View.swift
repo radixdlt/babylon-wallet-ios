@@ -15,10 +15,10 @@ extension NPSSurvey.State {
 
 // MARK: - NPSSurvey.View
 extension NPSSurvey {
-	public struct View: SwiftUI.View {
-		public let store: StoreOf<NPSSurvey>
+	struct View: SwiftUI.View {
+		let store: StoreOf<NPSSurvey>
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				NavigationStack {
 					ScrollView {

@@ -3,20 +3,20 @@ import SwiftUI
 
 // MARK: - DebugSettingsCoordinator.View
 extension DebugSettingsCoordinator {
-	public struct ViewState: Equatable {}
+	struct ViewState: Equatable {}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: Store
 
-		public init(store: Store) {
+		init(store: Store) {
 			self.store = store
 		}
 	}
 }
 
 extension DebugSettingsCoordinator.View {
-	public var body: some View {
+	var body: some View {
 		ScrollView {
 			VStack(spacing: .zero) {
 				ForEachStatic(rows) { kind in

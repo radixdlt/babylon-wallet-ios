@@ -1,22 +1,22 @@
 import SwiftUI
 
 // MARK: - ResourceBalancesView
-public struct ResourceBalancesView: View {
-	public let viewState: [ResourceBalance.ViewState]
+struct ResourceBalancesView: View {
+	let viewState: [ResourceBalance.ViewState]
 
-	public init(_ viewState: [ResourceBalance.ViewState]) {
+	init(_ viewState: [ResourceBalance.ViewState]) {
 		self.viewState = viewState
 	}
 
-	public init(fungibles: [ResourceBalance.ViewState.Fungible]) {
+	init(fungibles: [ResourceBalance.ViewState.Fungible]) {
 		self.init(fungibles.map(ResourceBalance.ViewState.fungible))
 	}
 
-	public init(nonFungibles: [ResourceBalance.ViewState.NonFungible]) {
+	init(nonFungibles: [ResourceBalance.ViewState.NonFungible]) {
 		self.init(nonFungibles.map(ResourceBalance.ViewState.nonFungible))
 	}
 
-	public var body: some View {
+	var body: some View {
 		VStack(spacing: 0) {
 			ForEach(viewState) { resource in
 				let isNotLast = resource.id != viewState.last?.id

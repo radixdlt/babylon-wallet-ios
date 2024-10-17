@@ -1,6 +1,6 @@
 
 extension DependencyValues {
-	public var secureStorageClient: SecureStorageClient {
+	var secureStorageClient: SecureStorageClient {
 		get { self[SecureStorageClient.self] }
 		set { self[SecureStorageClient.self] = newValue }
 	}
@@ -9,7 +9,7 @@ extension DependencyValues {
 // MARK: - SecureStorageClient + TestDependencyKey
 extension SecureStorageClient: TestDependencyKey {
 	#if DEBUG
-	public static let noop = Self(
+	static let noop = Self(
 		loadProfileSnapshotData: { _ in nil },
 		saveProfileSnapshotData: { _, _ in },
 		saveMnemonicForFactorSource: { _ in },
@@ -38,7 +38,7 @@ extension SecureStorageClient: TestDependencyKey {
 		saveMnemonicForFactorSourceData: { _, _ in }
 	)
 	#else
-	public static let noop = Self(
+	static let noop = Self(
 		loadProfileSnapshotData: { _ in nil },
 		saveProfileSnapshotData: { _, _ in },
 		saveMnemonicForFactorSource: { _ in },
@@ -66,10 +66,10 @@ extension SecureStorageClient: TestDependencyKey {
 	)
 	#endif // DEBUG
 
-	public static let previewValue = Self.noop
+	static let previewValue = Self.noop
 
 	#if DEBUG
-	public static let testValue = Self(
+	static let testValue = Self(
 		loadProfileSnapshotData: unimplemented("\(Self.self).loadProfileSnapshotData"),
 		saveProfileSnapshotData: unimplemented("\(Self.self).keychainChanged"),
 		saveMnemonicForFactorSource: unimplemented("\(Self.self).saveMnemonicForFactorSource"),
@@ -98,7 +98,7 @@ extension SecureStorageClient: TestDependencyKey {
 		saveMnemonicForFactorSourceData: unimplemented("\(Self.self).keychainChanged")
 	)
 	#else
-	public static let testValue = Self(
+	static let testValue = Self(
 		loadProfileSnapshotData: unimplemented("\(Self.self).loadProfileSnapshotData"),
 		saveProfileSnapshotData: unimplemented("\(Self.self).keychainChanged"),
 		saveMnemonicForFactorSource: unimplemented("\(Self.self).saveMnemonicForFactorSource"),

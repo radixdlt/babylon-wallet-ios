@@ -11,29 +11,29 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.StateEntityDetailsResponsePackageDetails")
-public typealias StateEntityDetailsResponsePackageDetails = GatewayAPI.StateEntityDetailsResponsePackageDetails
+typealias StateEntityDetailsResponsePackageDetails = GatewayAPI.StateEntityDetailsResponsePackageDetails
 
 extension GatewayAPI {
 
 /** vm_type, code_hash_hex and code_hex are always going to be empty, use &#x60;codes&#x60; property which will return collection (it&#39;s possible after protocol update that package might have multiple codes) */
-public struct StateEntityDetailsResponsePackageDetails: Codable, Hashable {
+struct StateEntityDetailsResponsePackageDetails: Codable, Hashable {
 
-    public private(set) var type: StateEntityDetailsResponseItemDetailsType
-    public private(set) var codes: PackageCodeCollection
-    public private(set) var vmType: PackageVmType
+    private(set) var type: StateEntityDetailsResponseItemDetailsType
+    private(set) var codes: PackageCodeCollection
+    private(set) var vmType: PackageVmType
     /** Hex-encoded binary blob. */
-    public private(set) var codeHashHex: String
+    private(set) var codeHashHex: String
     /** Hex-encoded binary blob. */
-    public private(set) var codeHex: String
+    private(set) var codeHex: String
     /** String-encoded decimal representing the amount of a related fungible resource. */
-    public private(set) var royaltyVaultBalance: String?
-    public private(set) var blueprints: PackageBlueprintCollection?
-    public private(set) var schemas: EntitySchemaCollection?
-    public private(set) var roleAssignments: ComponentEntityRoleAssignments?
+    private(set) var royaltyVaultBalance: String?
+    private(set) var blueprints: PackageBlueprintCollection?
+    private(set) var schemas: EntitySchemaCollection?
+    private(set) var roleAssignments: ComponentEntityRoleAssignments?
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var twoWayLinkedDappAddress: String?
+    private(set) var twoWayLinkedDappAddress: String?
 
-    public init(type: StateEntityDetailsResponseItemDetailsType, codes: PackageCodeCollection, vmType: PackageVmType, codeHashHex: String, codeHex: String, royaltyVaultBalance: String? = nil, blueprints: PackageBlueprintCollection? = nil, schemas: EntitySchemaCollection? = nil, roleAssignments: ComponentEntityRoleAssignments? = nil, twoWayLinkedDappAddress: String? = nil) {
+    init(type: StateEntityDetailsResponseItemDetailsType, codes: PackageCodeCollection, vmType: PackageVmType, codeHashHex: String, codeHex: String, royaltyVaultBalance: String? = nil, blueprints: PackageBlueprintCollection? = nil, schemas: EntitySchemaCollection? = nil, roleAssignments: ComponentEntityRoleAssignments? = nil, twoWayLinkedDappAddress: String? = nil) {
         self.type = type
         self.codes = codes
         self.vmType = vmType
@@ -46,7 +46,7 @@ public struct StateEntityDetailsResponsePackageDetails: Codable, Hashable {
         self.twoWayLinkedDappAddress = twoWayLinkedDappAddress
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case type
         case codes
         case vmType = "vm_type"
@@ -61,7 +61,7 @@ public struct StateEntityDetailsResponsePackageDetails: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(type, forKey: .type)
         try container.encode(codes, forKey: .codes)

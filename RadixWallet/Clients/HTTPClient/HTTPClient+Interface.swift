@@ -1,11 +1,11 @@
 // MARK: - HTTPClient
-public struct HTTPClient: Sendable, DependencyKey {
-	public let executeRequest: ExecuteRequest
+struct HTTPClient: Sendable, DependencyKey {
+	let executeRequest: ExecuteRequest
 }
 
 // MARK: HTTPClient.ExecuteRequest
 extension HTTPClient {
-	public typealias ExecuteRequest = @Sendable (_ request: URLRequest, _ acceptedStatusCodes: [HTTPStatusCode]) async throws -> Data
+	typealias ExecuteRequest = @Sendable (_ request: URLRequest, _ acceptedStatusCodes: [HTTPStatusCode]) async throws -> Data
 }
 
 extension HTTPClient {

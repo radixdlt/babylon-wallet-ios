@@ -1,12 +1,12 @@
 import Sargon
 
 // MARK: - OnboardingClient
-public struct OnboardingClient: Sendable {
-	public var loadProfileState: LoadProfileState
-	public var createNewProfile: CreateNewProfile
-	public var finishOnboardingWithRecoveredAccountAndBDFS: FinishOnboardingWithRecoveredAccountsAndBDFS
+struct OnboardingClient: Sendable {
+	var loadProfileState: LoadProfileState
+	var createNewProfile: CreateNewProfile
+	var finishOnboardingWithRecoveredAccountAndBDFS: FinishOnboardingWithRecoveredAccountsAndBDFS
 
-	public init(
+	init(
 		loadProfileState: @escaping LoadProfileState,
 		createNewProfile: @escaping CreateNewProfile,
 		finishOnboardingWithRecoveredAccountAndBDFS: @escaping FinishOnboardingWithRecoveredAccountsAndBDFS
@@ -18,8 +18,8 @@ public struct OnboardingClient: Sendable {
 }
 
 extension OnboardingClient {
-	public typealias LoadProfileState = @Sendable () async -> ProfileState
-	public typealias CreateNewProfile = @Sendable () async throws -> Void
+	typealias LoadProfileState = @Sendable () async -> ProfileState
+	typealias CreateNewProfile = @Sendable () async throws -> Void
 
-	public typealias FinishOnboardingWithRecoveredAccountsAndBDFS = @Sendable (AccountsRecoveredFromScanningUsingMnemonic) async throws -> Void
+	typealias FinishOnboardingWithRecoveredAccountsAndBDFS = @Sendable (AccountsRecoveredFromScanningUsingMnemonic) async throws -> Void
 }

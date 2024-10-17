@@ -1,25 +1,25 @@
 import ComposableArchitecture
 
 // MARK: - ImportOlympiaNameLedger
-public struct ImportOlympiaNameLedger: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public var nameLedger: NameLedgerFactorSource.State
+struct ImportOlympiaNameLedger: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		var nameLedger: NameLedgerFactorSource.State
 
-		public init(deviceInfo: LedgerDeviceInfo) {
+		init(deviceInfo: LedgerDeviceInfo) {
 			self.nameLedger = .init(deviceInfo: deviceInfo)
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case closeButtonTapped
 	}
 
 	@CasePathable
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case nameLedger(NameLedgerFactorSource.Action)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case savedNewLedger(LedgerHardwareWalletFactorSource)
 		case failedToSaveNewLedger
 	}
@@ -28,16 +28,16 @@ public struct ImportOlympiaNameLedger: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Scope(state: \.nameLedger, action: /Action.child .. ChildAction.nameLedger) {
 			NameLedgerFactorSource()
 		}
 		Reduce(core)
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
 			.run { _ in
@@ -46,7 +46,7 @@ public struct ImportOlympiaNameLedger: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .nameLedger(.delegate(.complete(ledger))):
 			saveNewLedger(ledger)

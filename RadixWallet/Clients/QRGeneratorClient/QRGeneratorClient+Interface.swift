@@ -1,8 +1,8 @@
 // MARK: - QRGeneratorClient
-public struct QRGeneratorClient: Sendable {
-	public var generate: Generate
+struct QRGeneratorClient: Sendable {
+	var generate: Generate
 
-	public init(
+	init(
 		generate: @escaping Generate
 	) {
 		self.generate = generate
@@ -11,16 +11,16 @@ public struct QRGeneratorClient: Sendable {
 
 // MARK: QRGeneratorClient.Generate
 extension QRGeneratorClient {
-	public typealias Generate = @Sendable (GenerateQRImageIntent) async throws -> CGImage
+	typealias Generate = @Sendable (GenerateQRImageIntent) async throws -> CGImage
 }
 
 // MARK: - GenerateQRImageIntent
-public struct GenerateQRImageIntent: Sendable {
-	public let data: Data
-	public let inputCorrectionLevel: InputCorrectionLevel
-	public let size: CGSize
+struct GenerateQRImageIntent: Sendable {
+	let data: Data
+	let inputCorrectionLevel: InputCorrectionLevel
+	let size: CGSize
 
-	public init(
+	init(
 		data: Data,
 		inputCorrectionLevel: InputCorrectionLevel = .default,
 		size: CGSize? = nil
@@ -34,7 +34,7 @@ public struct GenerateQRImageIntent: Sendable {
 extension GenerateQRImageIntent {
 	static let defaultSize: CGSize = .init(width: 300, height: 300)
 
-	public init(
+	init(
 		content: String,
 		encoding: String.Encoding = .utf8,
 		inputCorrectionLevel: InputCorrectionLevel = .default,
@@ -47,7 +47,7 @@ extension GenerateQRImageIntent {
 		)
 	}
 
-	public init(
+	init(
 		content: String,
 		encoding: String.Encoding = .utf8,
 		inputCorrectionLevel: InputCorrectionLevel = .default,
@@ -64,7 +64,7 @@ extension GenerateQRImageIntent {
 
 // MARK: GenerateQRImageIntent.InputCorrectionLevel
 extension GenerateQRImageIntent {
-	public enum InputCorrectionLevel: Int, Sendable, Hashable, CustomStringConvertible {
+	enum InputCorrectionLevel: Int, Sendable, Hashable, CustomStringConvertible {
 		/// Level Low 7%.
 		case low7 = 7
 
@@ -77,9 +77,9 @@ extension GenerateQRImageIntent {
 		/// Level High 30%.
 		case high30 = 30
 
-		public static let `default`: Self = .medium15
+		static let `default`: Self = .medium15
 
-		public var description: String {
+		var description: String {
 			switch self {
 			case .low7: "L 7"
 			case .medium15: "M 15"
@@ -88,7 +88,7 @@ extension GenerateQRImageIntent {
 			}
 		}
 
-		public var value: String {
+		var value: String {
 			switch self {
 			case .high30: "H"
 			case .low7: "L"
@@ -100,11 +100,11 @@ extension GenerateQRImageIntent {
 }
 
 // MARK: - GenerateQRImageError
-public enum GenerateQRImageError: Equatable, LocalizedError {
+enum GenerateQRImageError: Equatable, LocalizedError {
 	case failedToGenerate
 	case failedToConvertToCGImage
 
-	public var errorDescription: String? {
+	var errorDescription: String? {
 		switch self {
 		case .failedToGenerate:
 			"Failed to generate QR image, reason unknown."

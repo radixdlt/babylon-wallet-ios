@@ -11,29 +11,29 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.StateEntityDetailsResponseComponentDetails")
-public typealias StateEntityDetailsResponseComponentDetails = GatewayAPI.StateEntityDetailsResponseComponentDetails
+typealias StateEntityDetailsResponseComponentDetails = GatewayAPI.StateEntityDetailsResponseComponentDetails
 
 extension GatewayAPI {
 
-public struct StateEntityDetailsResponseComponentDetails: Codable, Hashable {
+struct StateEntityDetailsResponseComponentDetails: Codable, Hashable {
 
-    public private(set) var type: StateEntityDetailsResponseItemDetailsType
+    private(set) var type: StateEntityDetailsResponseItemDetailsType
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var packageAddress: String?
-    public private(set) var blueprintName: String
-    public private(set) var blueprintVersion: String
+    private(set) var packageAddress: String?
+    private(set) var blueprintName: String
+    private(set) var blueprintVersion: String
     /** A representation of a component's inner state. If this entity is a `GenericComponent`, this field will be in a programmatic JSON structure (you can deserialize it as a `ProgrammaticScryptoSborValue`). Otherwise, for \"native\" components such as `Account`, `Validator`, `AccessController`, `OneResourcePool`, `TwoResourcePool`, and `MultiResourcePool`, this field will be a custom JSON model defined in the Core API schema.  */
-    public private(set) var state: AnyCodable?
-    public private(set) var roleAssignments: ComponentEntityRoleAssignments?
+    private(set) var state: AnyCodable?
+    private(set) var roleAssignments: ComponentEntityRoleAssignments?
     /** String-encoded decimal representing the amount of a related fungible resource. */
-    public private(set) var royaltyVaultBalance: String?
-    public private(set) var royaltyConfig: ComponentRoyaltyConfig?
+    private(set) var royaltyVaultBalance: String?
+    private(set) var royaltyConfig: ComponentRoyaltyConfig?
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var twoWayLinkedDappAddress: String?
-    public private(set) var twoWayLinkedDappDetails: TwoWayLinkedDappOnLedgerDetails?
-    public private(set) var nativeResourceDetails: NativeResourceDetails?
+    private(set) var twoWayLinkedDappAddress: String?
+    private(set) var twoWayLinkedDappDetails: TwoWayLinkedDappOnLedgerDetails?
+    private(set) var nativeResourceDetails: NativeResourceDetails?
 
-    public init(type: StateEntityDetailsResponseItemDetailsType, packageAddress: String? = nil, blueprintName: String, blueprintVersion: String, state: AnyCodable? = nil, roleAssignments: ComponentEntityRoleAssignments? = nil, royaltyVaultBalance: String? = nil, royaltyConfig: ComponentRoyaltyConfig? = nil, twoWayLinkedDappAddress: String? = nil, twoWayLinkedDappDetails: TwoWayLinkedDappOnLedgerDetails? = nil, nativeResourceDetails: NativeResourceDetails? = nil) {
+    init(type: StateEntityDetailsResponseItemDetailsType, packageAddress: String? = nil, blueprintName: String, blueprintVersion: String, state: AnyCodable? = nil, roleAssignments: ComponentEntityRoleAssignments? = nil, royaltyVaultBalance: String? = nil, royaltyConfig: ComponentRoyaltyConfig? = nil, twoWayLinkedDappAddress: String? = nil, twoWayLinkedDappDetails: TwoWayLinkedDappOnLedgerDetails? = nil, nativeResourceDetails: NativeResourceDetails? = nil) {
         self.type = type
         self.packageAddress = packageAddress
         self.blueprintName = blueprintName
@@ -47,7 +47,7 @@ public struct StateEntityDetailsResponseComponentDetails: Codable, Hashable {
         self.nativeResourceDetails = nativeResourceDetails
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case type
         case packageAddress = "package_address"
         case blueprintName = "blueprint_name"
@@ -63,7 +63,7 @@ public struct StateEntityDetailsResponseComponentDetails: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(type, forKey: .type)
         try container.encodeIfPresent(packageAddress, forKey: .packageAddress)

@@ -1,30 +1,30 @@
 // MARK: - ImportLegacyWalletClient
-public struct ImportLegacyWalletClient: Sendable {
-	public var shouldShowImportWalletShortcutInSettings: ShouldShowImportWalletShortcutInSettings
-	public var parseHeaderFromQRCode: ParseHeaderFromQRCode
-	public var parseLegacyWalletFromQRCodes: ParseLegacyWalletFromQRCodes
+struct ImportLegacyWalletClient: Sendable {
+	var shouldShowImportWalletShortcutInSettings: ShouldShowImportWalletShortcutInSettings
+	var parseHeaderFromQRCode: ParseHeaderFromQRCode
+	var parseLegacyWalletFromQRCodes: ParseLegacyWalletFromQRCodes
 
-	public var migrateOlympiaSoftwareAccountsToBabylon: MigrateOlympiaSoftwareAccountsToBabylon
-	public var migrateOlympiaHardwareAccountsToBabylon: MigrateOlympiaHardwareAccountsToBabylon
+	var migrateOlympiaSoftwareAccountsToBabylon: MigrateOlympiaSoftwareAccountsToBabylon
+	var migrateOlympiaHardwareAccountsToBabylon: MigrateOlympiaHardwareAccountsToBabylon
 
-	public var findAlreadyImportedIfAny: FindAlreadyImportedIfAny
+	var findAlreadyImportedIfAny: FindAlreadyImportedIfAny
 }
 
 extension ImportLegacyWalletClient {
-	public typealias ShouldShowImportWalletShortcutInSettings = @Sendable () async -> Bool
-	public typealias ParseHeaderFromQRCode = @Sendable (NonEmptyString) throws -> Olympia.Export.Payload.Header
+	typealias ShouldShowImportWalletShortcutInSettings = @Sendable () async -> Bool
+	typealias ParseHeaderFromQRCode = @Sendable (NonEmptyString) throws -> Olympia.Export.Payload.Header
 
-	public typealias ParseLegacyWalletFromQRCodes = @Sendable (_ qrCodes: NonEmpty<OrderedSet<NonEmptyString>>) throws -> ScannedParsedOlympiaWalletToMigrate
+	typealias ParseLegacyWalletFromQRCodes = @Sendable (_ qrCodes: NonEmpty<OrderedSet<NonEmptyString>>) throws -> ScannedParsedOlympiaWalletToMigrate
 
-	public typealias MigrateOlympiaSoftwareAccountsToBabylon = @Sendable (MigrateOlympiaSoftwareAccountsToBabylonRequest) async throws -> MigratedSoftwareAccounts
+	typealias MigrateOlympiaSoftwareAccountsToBabylon = @Sendable (MigrateOlympiaSoftwareAccountsToBabylonRequest) async throws -> MigratedSoftwareAccounts
 
-	public typealias MigrateOlympiaHardwareAccountsToBabylon = @Sendable (MigrateOlympiaHardwareAccountsToBabylonRequest) async throws -> MigratedHardwareAccounts
+	typealias MigrateOlympiaHardwareAccountsToBabylon = @Sendable (MigrateOlympiaHardwareAccountsToBabylonRequest) async throws -> MigratedHardwareAccounts
 
-	public typealias FindAlreadyImportedIfAny = @Sendable (NonEmpty<OrderedSet<OlympiaAccountToMigrate>>) async -> Set<OlympiaAccountToMigrate.ID>
+	typealias FindAlreadyImportedIfAny = @Sendable (NonEmpty<OrderedSet<OlympiaAccountToMigrate>>) async -> Set<OlympiaAccountToMigrate.ID>
 }
 
 // extension ImportLegacyWalletClient {
-//	// FIXME: Post mainnet remove this function, only used to allow DEBUG builds //	public static func canImportOlympiaWallet(
+//	// FIXME: Post mainnet remove this function, only used to allow DEBUG builds //	static func canImportOlympiaWallet(
 //		currentNetworkID: NetworkID,
 //		isDeveloperModeEnabled: Bool
 //	) -> Bool {
@@ -34,7 +34,7 @@ extension ImportLegacyWalletClient {
 //		) != nil
 //	}
 //
-//	// FIXME: Post mainnet remove this function, only used to allow DEBUG builds //	/// Returns `nil` if it is not supported to //	public static func networkIDForOlympiaAccountsToImportInto(
+//	// FIXME: Post mainnet remove this function, only used to allow DEBUG builds //	/// Returns `nil` if it is not supported to //	static func networkIDForOlympiaAccountsToImportInto(
 //		currentNetworkID: NetworkID,
 //		isDeveloperModeEnabled: Bool
 //	) -> NetworkID? {

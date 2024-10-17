@@ -3,8 +3,8 @@ import Sargon
 // MARK: - ProfileStore
 // Until we fully migrate to have everything Profile in SargonOS, this will be kept in place.
 // The next steps for migration are outlined in https://radixdlt.atlassian.net/browse/ABW-3590.
-public final actor ProfileStore {
-	public static let shared = ProfileStore()
+final actor ProfileStore {
+	static let shared = ProfileStore()
 
 	private let profileSubject: AsyncReplaySubject<Profile> = .init(bufferSize: 1)
 	private let profileStateSubject: AsyncReplaySubject<ProfileState> = .init(bufferSize: 1)
@@ -41,11 +41,11 @@ extension ProfileStore {
 }
 
 extension ProfileStore {
-	public func createNewProfile() async throws {
+	func createNewProfile() async throws {
 		try await SargonOS.shared.newWallet()
 	}
 
-	public func finishOnboarding(
+	func finishOnboarding(
 		with accountsRecoveredFromScanningUsingMnemonic: AccountsRecoveredFromScanningUsingMnemonic
 	) async throws {
 		try await SargonOS.shared.newWalletWithDerivedBdfs(
@@ -54,19 +54,19 @@ extension ProfileStore {
 		)
 	}
 
-	public func importProfile(_ profileToImport: Profile, skippedMainBdfs: Bool) async throws {
+	func importProfile(_ profileToImport: Profile, skippedMainBdfs: Bool) async throws {
 		var profileToImport = profileToImport
 		profileToImport.changeCurrentToMainnetIfNeeded()
 		try await SargonOS.shared.importWallet(profile: profileToImport, bdfsSkipped: skippedMainBdfs)
 	}
 
-	public func deleteProfile() async throws {
+	func deleteProfile() async throws {
 		try await SargonOS.shared.deleteWallet()
 	}
 }
 
 extension ProfileStore {
-	public func isThisDevice(deviceID: DeviceID) async -> Bool {
+	func isThisDevice(deviceID: DeviceID) async -> Bool {
 		guard let hostId = try? await SargonOS.shared.resolveHostId().id else {
 			return false
 		}
@@ -81,7 +81,7 @@ extension ProfileStore {
 	/// snapshot of it profile into Keychain (after having updated its header)
 	/// - Parameter transform: A mutating transform updating the profile.
 	/// - Returns: The result of the transform, often this might be `Void`.
-	public func updating<T: Sendable>(
+	func updating<T: Sendable>(
 		_ transform: @Sendable (inout Profile) async throws -> T
 	) async throws -> T {
 		var updated = await profile()
@@ -92,7 +92,7 @@ extension ProfileStore {
 
 	/// Update Profile, by updating the current network
 	/// - Parameter update: A mutating update to perform on the profiles's active network
-	public func updatingOnCurrentNetwork(_ update: @Sendable (inout ProfileNetwork) async throws -> Void) async throws {
+	func updatingOnCurrentNetwork(_ update: @Sendable (inout ProfileNetwork) async throws -> Void) async throws {
 		try await updating { profile in
 			var network = try await network()
 			try await update(&network)

@@ -2,7 +2,7 @@ import ComposableArchitecture // actually CasePaths... but CI fails if we do `im
 
 // MARK: - DappInteractionClient + DependencyKey
 extension DappInteractionClient: DependencyKey {
-	public static var liveValue: DappInteractionClient = {
+	static var liveValue: DappInteractionClient = {
 		let interactionsSubject: AsyncPassthroughSubject<Result<ValidatedDappRequest, Error>> = .init()
 		let interactionResponsesSubject: AsyncPassthroughSubject<P2P.RTCOutgoingMessage.Response> = .init()
 

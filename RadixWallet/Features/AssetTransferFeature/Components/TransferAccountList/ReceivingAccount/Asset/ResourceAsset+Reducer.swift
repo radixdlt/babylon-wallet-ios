@@ -3,21 +3,21 @@ import SwiftUI
 
 // MARK: - ResourceAsset
 // Higher order reducer composing all types of assets that can be transferred
-public struct ResourceAsset: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable, Identifiable {
+struct ResourceAsset: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable, Identifiable {
 		@CasePathable
-		public enum Kind: Sendable, Hashable {
+		enum Kind: Sendable, Hashable {
 			case fungibleAsset(FungibleResourceAsset.State)
 			case nonFungibleAsset(NonFungibleResourceAsset.State)
 
-			public var fungible: FungibleResourceAsset.State? {
+			var fungible: FungibleResourceAsset.State? {
 				switch self {
 				case let .fungibleAsset(asset): asset
 				case .nonFungibleAsset: nil
 				}
 			}
 
-			public var nonFungible: NonFungibleResourceAsset.State? {
+			var nonFungible: NonFungibleResourceAsset.State? {
 				switch self {
 				case let .nonFungibleAsset(asset): asset
 				case .fungibleAsset: nil
@@ -25,8 +25,8 @@ public struct ResourceAsset: Sendable, FeatureReducer {
 			}
 		}
 
-		public typealias ID = String
-		public var id: ID {
+		typealias ID = String
+		var id: ID {
 			switch self.kind {
 			case let .fungibleAsset(asset):
 				asset.id
@@ -35,35 +35,35 @@ public struct ResourceAsset: Sendable, FeatureReducer {
 			}
 		}
 
-		public var kind: Kind
-		public var depositStatus: Loadable<DepositStatus> = .idle
+		var kind: Kind
+		var depositStatus: Loadable<DepositStatus> = .idle
 
 		@PresentationState
-		public var destination: Destination.State? = nil
+		var destination: Destination.State? = nil
 	}
 
 	@CasePathable
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case fungibleAsset(FungibleResourceAsset.Action)
 		case nonFungibleAsset(NonFungibleResourceAsset.Action)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case amountChanged
 		case removed
 	}
 
-	public enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable, Sendable {
 		case removeTapped
 	}
 
-	public enum InternalAction: Sendable, Hashable {
+	enum InternalAction: Sendable, Hashable {
 		case loadedBalance(ResourceBalance, OnLedgerEntity.NonFungibleToken? = nil)
 	}
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case fungibleTokenDetails(FungibleTokenDetails.State)
 			case nonFungibleTokenDetails(NonFungibleTokenDetails.State)
 			case lsuDetails(LSUDetails.State)
@@ -71,14 +71,14 @@ public struct ResourceAsset: Sendable, FeatureReducer {
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case fungibleTokenDetails(FungibleTokenDetails.Action)
 			case nonFungibleTokenDetails(NonFungibleTokenDetails.Action)
 			case lsuDetails(LSUDetails.Action)
 			case poolUnitDetails(PoolUnitDetails.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: /State.fungibleTokenDetails, action: /Action.fungibleTokenDetails) {
 				FungibleTokenDetails()
 			}
@@ -98,7 +98,7 @@ public struct ResourceAsset: Sendable, FeatureReducer {
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.errorQueue) var errorQueue
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Scope(state: \.kind, action: \.child) {
 			Scope(state: \.fungibleAsset, action: \.fungibleAsset) {
 				FungibleResourceAsset()
@@ -116,7 +116,7 @@ public struct ResourceAsset: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .fungibleAsset(.delegate(.amountChanged)):
 			return .send(.delegate(.amountChanged))
@@ -135,14 +135,14 @@ public struct ResourceAsset: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .removeTapped:
 			.send(.delegate(.removed))
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadedBalance(balance, token):
 			switch balance.details {

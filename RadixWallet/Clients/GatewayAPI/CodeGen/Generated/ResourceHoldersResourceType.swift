@@ -11,11 +11,11 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.ResourceHoldersResourceType")
-public typealias ResourceHoldersResourceType = GatewayAPI.ResourceHoldersResourceType
+typealias ResourceHoldersResourceType = GatewayAPI.ResourceHoldersResourceType
 
 extension GatewayAPI {
 
-public enum ResourceHoldersResourceType: String, Codable, CaseIterable {
+enum ResourceHoldersResourceType: String, Codable, CaseIterable {
     case fungibleResource = "FungibleResource"
     case nonFungibleResource = "NonFungibleResource"
 }

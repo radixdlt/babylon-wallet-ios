@@ -1,17 +1,17 @@
 // MARK: - LedgerIdentifiable
-public enum LedgerIdentifiable: Sendable {
+enum LedgerIdentifiable: Sendable {
 	case address(Address)
 	case transaction(IntentHash)
 
-	public static func address(of account: Account) -> Self {
+	static func address(of account: Account) -> Self {
 		.address(.account(account.address))
 	}
 
-	public var address: String {
+	var address: String {
 		formatted(.raw)
 	}
 
-	public func formatted(_ format: AddressFormat = .default) -> String {
+	func formatted(_ format: AddressFormat = .default) -> String {
 		switch self {
 		case let .address(address):
 			address.formatted(format)
@@ -20,7 +20,7 @@ public enum LedgerIdentifiable: Sendable {
 		}
 	}
 
-	public var addressPrefix: String {
+	var addressPrefix: String {
 		switch self {
 		case let .address(address):
 			address.addressPrefix
@@ -32,7 +32,7 @@ public enum LedgerIdentifiable: Sendable {
 
 // MARK: LedgerIdentifiable.Address
 extension LedgerIdentifiable {
-	public enum Address: Hashable, Sendable, Identifiable {
+	enum Address: Hashable, Sendable, Identifiable {
 		case account(AccountAddress)
 		case package(PackageAddress)
 		case resource(ResourceAddress)
@@ -42,11 +42,11 @@ extension LedgerIdentifiable {
 		// Will be displayd with full ResourceAddress+NFTLocalID
 		case nonFungibleGlobalID(NonFungibleGlobalId)
 
-		public var address: String {
+		var address: String {
 			formatted(.raw)
 		}
 
-		public func formatted(_ format: AddressFormat) -> String {
+		func formatted(_ format: AddressFormat) -> String {
 			switch self {
 			case let .account(accountAddress):
 				accountAddress.formatted(format)
@@ -65,7 +65,7 @@ extension LedgerIdentifiable {
 			}
 		}
 
-		public var addressPrefix: String {
+		var addressPrefix: String {
 			switch self {
 			case .account:
 				"account"
@@ -84,7 +84,7 @@ extension LedgerIdentifiable {
 			}
 		}
 
-		public var id: String {
+		var id: String {
 			switch self {
 			case let .account(accountAddress):
 				accountAddress.id
@@ -106,7 +106,7 @@ extension LedgerIdentifiable {
 }
 
 extension LedgerIdentifiable.Address {
-	public init?(address: Address) {
+	init?(address: Address) {
 		switch address {
 		case let .account(accountAddress):
 			self = .account(accountAddress)

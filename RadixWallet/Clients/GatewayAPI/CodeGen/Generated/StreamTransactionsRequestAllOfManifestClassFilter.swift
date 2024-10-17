@@ -11,29 +11,29 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.StreamTransactionsRequestAllOfManifestClassFilter")
-public typealias StreamTransactionsRequestAllOfManifestClassFilter = GatewayAPI.StreamTransactionsRequestAllOfManifestClassFilter
+typealias StreamTransactionsRequestAllOfManifestClassFilter = GatewayAPI.StreamTransactionsRequestAllOfManifestClassFilter
 
 extension GatewayAPI {
 
 /** Allows filtering to transactions which match the given manifest classification. If specified, the response will contain only transactions which have a class that matches the filter. If &#x60;match_only_most_specific&#x60; set to true, only transactions where the queried class is most specific will be returned. See the [docs on manifest classification](https://docs.radixdlt.com/docs/conforming-transaction-manifest-types) for more information. */
-public struct StreamTransactionsRequestAllOfManifestClassFilter: Codable, Hashable {
+struct StreamTransactionsRequestAllOfManifestClassFilter: Codable, Hashable {
 
-    public private(set) var _class: ManifestClass
-    public private(set) var matchOnlyMostSpecific: Bool? = false
+    private(set) var _class: ManifestClass
+    private(set) var matchOnlyMostSpecific: Bool? = false
 
-    public init(_class: ManifestClass, matchOnlyMostSpecific: Bool? = false) {
+    init(_class: ManifestClass, matchOnlyMostSpecific: Bool? = false) {
         self._class = _class
         self.matchOnlyMostSpecific = matchOnlyMostSpecific
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case _class = "class"
         case matchOnlyMostSpecific = "match_only_most_specific"
     }
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(_class, forKey: ._class)
         try container.encodeIfPresent(matchOnlyMostSpecific, forKey: .matchOnlyMostSpecific)

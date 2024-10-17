@@ -23,10 +23,10 @@ import XCTest
 // * After timeout handler I've added a `XCTFail`
 
 /// RawValue is measured in milliseconds (must of course not be power's of two... just I like them!)
-public enum TimeLimit: Sendable, Hashable {
+enum TimeLimit: Sendable, Hashable {
 	case preset(Preset)
 	case custom(Duration)
-	public enum Preset: Int, Sendable, Hashable {
+	enum Preset: Int, Sendable, Hashable {
 		case fast = 256
 		case normal = 1024
 		case slow = 2048
@@ -36,11 +36,11 @@ public enum TimeLimit: Sendable, Hashable {
 		}
 	}
 
-	public static let `default`: Self = .fast
-	public static let fast: Self = .preset(.fast)
-	public static let normal: Self = .preset(.normal)
-	public static let slow: Self = .preset(.slow)
-	public static let marathon: Self = .preset(.marathon)
+	static let `default`: Self = .fast
+	static let fast: Self = .preset(.fast)
+	static let normal: Self = .preset(.normal)
+	static let slow: Self = .preset(.slow)
+	static let marathon: Self = .preset(.marathon)
 
 	var duration: Duration {
 		switch self {
@@ -63,7 +63,7 @@ public enum TimeLimit: Sendable, Hashable {
 /// `timeoutHandler` is called and given the opportunity to handle the timeout
 /// and `body` is cancelled.
 ///
-/// This function is not part of the public interface of the testing library.
+/// This function is not part of the interface of the testing library.
 func withTimeLimit(
 	_ timeLimit: TimeLimit = .default,
 	failOnTimeout: Bool = true,

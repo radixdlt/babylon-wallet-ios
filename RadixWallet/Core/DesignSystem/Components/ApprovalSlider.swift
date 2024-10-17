@@ -1,16 +1,16 @@
 // MARK: - ApprovalSlider
-public struct ApprovalSlider: View {
+struct ApprovalSlider: View {
 	private let title: String
 	private let resetDate: Date
 	private let action: () -> Void
 
-	public init(title: String, resetDate: Date, action: @escaping () -> Void) {
+	init(title: String, resetDate: Date, action: @escaping () -> Void) {
 		self.title = title
 		self.resetDate = resetDate
 		self.action = action
 	}
 
-	public var body: some View {
+	var body: some View {
 		Core(title: title, action: action)
 			.id(resetDate)
 	}
@@ -23,7 +23,7 @@ public struct ApprovalSlider: View {
 		let title: String
 		let action: () -> Void
 
-		public var body: some View {
+		var body: some View {
 			GeometryReader { proxy in
 				let width = proxy.size.width - .approveSliderHeight
 				ZStack {

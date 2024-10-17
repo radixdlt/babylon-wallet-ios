@@ -2,28 +2,28 @@ import ComposableArchitecture
 import SwiftUI
 
 extension TransactionReview {
-	public struct DepositExceptionsState: Sendable, Hashable {
-		public var changes: IdentifiedArrayOf<DepositExceptionsChange>
+	struct DepositExceptionsState: Sendable, Hashable {
+		var changes: IdentifiedArrayOf<DepositExceptionsChange>
 	}
 
-	public struct DepositExceptionsChange: Sendable, Identifiable, Hashable {
-		public var id: AccountAddress.ID { account.address.id }
-		public let account: Account
-		public let resourcePreferenceChanges: IdentifiedArrayOf<ResourcePreferenceChange>
-		public let allowedDepositorChanges: IdentifiedArrayOf<AllowedDepositorChange>
+	struct DepositExceptionsChange: Sendable, Identifiable, Hashable {
+		var id: AccountAddress.ID { account.address.id }
+		let account: Account
+		let resourcePreferenceChanges: IdentifiedArrayOf<ResourcePreferenceChange>
+		let allowedDepositorChanges: IdentifiedArrayOf<AllowedDepositorChange>
 
-		public struct ResourcePreferenceChange: Sendable, Identifiable, Hashable {
-			public var id: OnLedgerEntity.Resource.ID { resource.id }
-			public let resource: OnLedgerEntity.Resource
-			public let change: ResourcePreferenceUpdate
+		struct ResourcePreferenceChange: Sendable, Identifiable, Hashable {
+			var id: OnLedgerEntity.Resource.ID { resource.id }
+			let resource: OnLedgerEntity.Resource
+			let change: ResourcePreferenceUpdate
 		}
 
-		public struct AllowedDepositorChange: Sendable, Identifiable, Hashable {
-			public var id: OnLedgerEntity.Resource.ID { resource.id }
-			public let resource: OnLedgerEntity.Resource
-			public let change: Change
+		struct AllowedDepositorChange: Sendable, Identifiable, Hashable {
+			var id: OnLedgerEntity.Resource.ID { resource.id }
+			let resource: OnLedgerEntity.Resource
+			let change: Change
 
-			public enum Change: Sendable, Hashable {
+			enum Change: Sendable, Hashable {
 				case added
 				case removed
 			}
@@ -33,10 +33,10 @@ extension TransactionReview {
 
 // MARK: - TransactionReview.View.DepositExceptionsView
 extension TransactionReview.View {
-	public struct DepositExceptionsView: View {
-		public var viewState: TransactionReview.DepositExceptionsState
+	struct DepositExceptionsView: View {
+		var viewState: TransactionReview.DepositExceptionsState
 
-		public var body: some View {
+		var body: some View {
 			Card {
 				VStack(spacing: .small1) {
 					ForEach(viewState.changes) { change in

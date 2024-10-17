@@ -1,8 +1,8 @@
 
 extension TransportProfileClient: DependencyKey {
-	public static let liveValue = Self.live()
+	static let liveValue = Self.live()
 
-	public static func live(
+	static func live(
 		profileStore: ProfileStore = .shared
 	) -> Self {
 		@Dependency(\.userDefaults) var userDefaults

@@ -4,14 +4,14 @@ import SwiftUI
 // MARK: - App.View
 extension App {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<App>
 
-		public init(store: StoreOf<App>) {
+		init(store: StoreOf<App>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			SwitchStore(store.scope(state: \.root, action: \.child)) { state in
 				switch state {
 				case .main:

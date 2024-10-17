@@ -11,31 +11,31 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.StateEntityDetailsOptIns")
-public typealias StateEntityDetailsOptIns = GatewayAPI.StateEntityDetailsOptIns
+typealias StateEntityDetailsOptIns = GatewayAPI.StateEntityDetailsOptIns
 
 extension GatewayAPI {
 
 /** Check detailed [OptIns](#section/Using-endpoints-with-opt-in-features) documentation for more details */
-public struct StateEntityDetailsOptIns: Codable, Hashable {
+struct StateEntityDetailsOptIns: Codable, Hashable {
 
     /** if set to `true`, ancestor addresses - `parent_address`, `owner_address` and `global_address` for entities are returned. */
-    public private(set) var ancestorIdentities: Bool? = false
+    private(set) var ancestorIdentities: Bool? = false
     /** if set to `true`, `royalty_config` for component entities is returned. */
-    public private(set) var componentRoyaltyConfig: Bool? = false
+    private(set) var componentRoyaltyConfig: Bool? = false
     /** if set to `true`, `royalty_vault_balance` for component entities is returned. */
-    public private(set) var componentRoyaltyVaultBalance: Bool? = false
+    private(set) var componentRoyaltyVaultBalance: Bool? = false
     /** if set to `true`, `royalty_vault_balance` for package entities is returned. */
-    public private(set) var packageRoyaltyVaultBalance: Bool? = false
+    private(set) var packageRoyaltyVaultBalance: Bool? = false
     /** if set to `true`, first page of non fungible ids are returned for each non fungible resource, with `next_cursor` which can be later used at `/state/entity/page/non-fungible-vault/ids` endpoint. */
-    public private(set) var nonFungibleIncludeNfids: Bool? = false
+    private(set) var nonFungibleIncludeNfids: Bool? = false
     /** allows specifying explicitly metadata properties which should be returned in response. */
-    public private(set) var explicitMetadata: [String]?
+    private(set) var explicitMetadata: [String]?
     /** if set to `true`, on-ledger dApp two-way links (resolved & verified) are returned. See https://docs.radixdlt.com/docs/metadata-for-verification for more details. */
-    public private(set) var dappTwoWayLinks: Bool? = false
+    private(set) var dappTwoWayLinks: Bool? = false
     /** if set to `true`, additional details for the Network native resources are returned. */
-    public private(set) var nativeResourceDetails: Bool? = false
+    private(set) var nativeResourceDetails: Bool? = false
 
-    public init(ancestorIdentities: Bool? = false, componentRoyaltyConfig: Bool? = false, componentRoyaltyVaultBalance: Bool? = false, packageRoyaltyVaultBalance: Bool? = false, nonFungibleIncludeNfids: Bool? = false, explicitMetadata: [String]? = nil, dappTwoWayLinks: Bool? = false, nativeResourceDetails: Bool? = false) {
+    init(ancestorIdentities: Bool? = false, componentRoyaltyConfig: Bool? = false, componentRoyaltyVaultBalance: Bool? = false, packageRoyaltyVaultBalance: Bool? = false, nonFungibleIncludeNfids: Bool? = false, explicitMetadata: [String]? = nil, dappTwoWayLinks: Bool? = false, nativeResourceDetails: Bool? = false) {
         self.ancestorIdentities = ancestorIdentities
         self.componentRoyaltyConfig = componentRoyaltyConfig
         self.componentRoyaltyVaultBalance = componentRoyaltyVaultBalance
@@ -46,7 +46,7 @@ public struct StateEntityDetailsOptIns: Codable, Hashable {
         self.nativeResourceDetails = nativeResourceDetails
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case ancestorIdentities = "ancestor_identities"
         case componentRoyaltyConfig = "component_royalty_config"
         case componentRoyaltyVaultBalance = "component_royalty_vault_balance"
@@ -59,7 +59,7 @@ public struct StateEntityDetailsOptIns: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(ancestorIdentities, forKey: .ancestorIdentities)
         try container.encodeIfPresent(componentRoyaltyConfig, forKey: .componentRoyaltyConfig)

@@ -1,8 +1,8 @@
 
 extension PersonasClient: DependencyKey {
-	public typealias Value = PersonasClient
+	typealias Value = PersonasClient
 
-	public static func live(
+	static func live(
 		profileStore: ProfileStore = .shared
 	) -> Self {
 		let getPersonasOnNetwork: GetPersonasOnNetwork = { networkID in
@@ -42,5 +42,5 @@ extension PersonasClient: DependencyKey {
 		)
 	}
 
-	public static let liveValue = Self.live()
+	static let liveValue = Self.live()
 }

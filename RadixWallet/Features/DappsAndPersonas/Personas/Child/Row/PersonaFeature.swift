@@ -2,14 +2,14 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - Persona
-public struct PersonaFeature: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable, Identifiable {
-		public let id: Persona.ID
-		public let thumbnail: URL?
-		public let displayName: String
-		public var securityProblemsConfig: EntitySecurityProblemsView.Config
+struct PersonaFeature: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable, Identifiable {
+		let id: Persona.ID
+		let thumbnail: URL?
+		let displayName: String
+		var securityProblemsConfig: EntitySecurityProblemsView.Config
 
-		public init(persona: AuthorizedPersonaDetailed, problems: [SecurityProblem]) {
+		init(persona: AuthorizedPersonaDetailed, problems: [SecurityProblem]) {
 			self.init(
 				id: persona.id,
 				thumbnail: nil,
@@ -19,7 +19,7 @@ public struct PersonaFeature: Sendable, FeatureReducer {
 			)
 		}
 
-		public init(persona: Persona, problems: [SecurityProblem]) {
+		init(persona: Persona, problems: [SecurityProblem]) {
 			self.init(
 				id: persona.id,
 				thumbnail: nil,
@@ -29,7 +29,7 @@ public struct PersonaFeature: Sendable, FeatureReducer {
 			)
 		}
 
-		public init(
+		init(
 			id: Persona.ID,
 			thumbnail: URL?,
 			displayName: String,
@@ -43,19 +43,19 @@ public struct PersonaFeature: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case tapped
 		case securityProblemsTapped
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case openDetails
 		case openSecurityCenter
 	}
 
-	public init() {}
+	init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .tapped:
 			.send(.delegate(.openDetails))

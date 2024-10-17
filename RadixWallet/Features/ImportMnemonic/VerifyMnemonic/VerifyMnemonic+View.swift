@@ -1,7 +1,7 @@
 import SwiftUI
 
 extension VerifyMnemonic.State {
-	public var viewState: VerifyMnemonic.ViewState {
+	var viewState: VerifyMnemonic.ViewState {
 		let enumeratedWords = mnemonic.words.identifiablyEnumerated()
 		let wordViewStates = enumeratedWords.map { word in
 			let isConfirmationWord = wordsToConfirm.contains(word)
@@ -28,7 +28,7 @@ extension VerifyMnemonic.State {
 }
 
 extension VerifyMnemonic {
-	public struct ViewState: Sendable, Equatable {
+	struct ViewState: Sendable, Equatable {
 		struct WordViewState: Sendable, Equatable, Identifiable {
 			var id: OffsetIdentified<BIP39Word> {
 				word
@@ -46,15 +46,15 @@ extension VerifyMnemonic {
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		@FocusState private var focusedField: Int?
 		private let store: StoreOf<VerifyMnemonic>
 
-		public init(store: StoreOf<VerifyMnemonic>) {
+		init(store: StoreOf<VerifyMnemonic>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView {
 					VStack(spacing: .medium1) {

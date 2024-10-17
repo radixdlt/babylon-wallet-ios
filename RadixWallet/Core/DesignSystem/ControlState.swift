@@ -1,25 +1,25 @@
 // MARK: - ControlState
-public enum ControlState: Sendable, Hashable {
+enum ControlState: Sendable, Hashable {
 	case enabled
 	case loading(LoadingContext)
 	case disabled
 
-	public var isEnabled: Bool {
+	var isEnabled: Bool {
 		self == .enabled
 	}
 
-	public var isLoading: Bool {
+	var isLoading: Bool {
 		guard case .loading = self else { return false }
 		return true
 	}
 
-	public var isDisabled: Bool {
+	var isDisabled: Bool {
 		self == .disabled
 	}
 }
 
 // MARK: - LoadingContext
-public enum LoadingContext: Sendable, Hashable {
+enum LoadingContext: Sendable, Hashable {
 	case local
 	case global(text: String?)
 }
@@ -49,7 +49,7 @@ extension EnvironmentValues {
 }
 
 extension View {
-	public func controlState(_ state: ControlState) -> some View {
+	func controlState(_ state: ControlState) -> some View {
 		self.environment(\.controlState, state)
 			.transformPreference(LoadingContextKey.self) {
 				switch state {

@@ -2,36 +2,36 @@ import Sargon
 
 // MARK: - OnLedgerEntitiesClient
 /// A client that manages loading Entities from the Ledger.
-public struct OnLedgerEntitiesClient: Sendable {
+struct OnLedgerEntitiesClient: Sendable {
 	/// Retrieve the entities identified by addresses
-	public var getEntities: GetEntities
+	var getEntities: GetEntities
 
 	/// Retrieve the token data associated with the given non fungible ids
-	public let getNonFungibleTokenData: GetNonFungibleTokenData
+	let getNonFungibleTokenData: GetNonFungibleTokenData
 
 	/// Retrieve the token data associated with the given account.
-	public let getAccountOwnedNonFungibleTokenData: GetAccountOwnedNonFungibleTokenData
+	let getAccountOwnedNonFungibleTokenData: GetAccountOwnedNonFungibleTokenData
 }
 
 // MARK: - OnLedgerEntitiesClient.GetResources
 extension OnLedgerEntitiesClient {
-	public typealias GetNonFungibleTokenData = @Sendable (GetNonFungibleTokenDataRequest) async throws -> [OnLedgerEntity.NonFungibleToken]
-	public typealias GetAccountOwnedNonFungibleTokenData = @Sendable (GetAccountOwnedNonFungibleTokenDataRequest) async throws -> GetAccountOwnedNonFungibleTokenResponse
+	typealias GetNonFungibleTokenData = @Sendable (GetNonFungibleTokenDataRequest) async throws -> [OnLedgerEntity.NonFungibleToken]
+	typealias GetAccountOwnedNonFungibleTokenData = @Sendable (GetAccountOwnedNonFungibleTokenDataRequest) async throws -> GetAccountOwnedNonFungibleTokenResponse
 
-	public typealias GetEntities = @Sendable ([Address], GatewayAPI.StateEntityDetailsOptIns, AtLedgerState?, CachingStrategy, _ fetchMetadata: Bool) async throws -> [OnLedgerEntity]
+	typealias GetEntities = @Sendable ([Address], GatewayAPI.StateEntityDetailsOptIns, AtLedgerState?, CachingStrategy, _ fetchMetadata: Bool) async throws -> [OnLedgerEntity]
 }
 
 // MARK: OnLedgerEntitiesClient.GetNonFungibleTokenDataRequest
 extension OnLedgerEntitiesClient {
-	public struct GetAccountOwnedNonFungibleResourceIdsRequest: Sendable {
+	struct GetAccountOwnedNonFungibleResourceIdsRequest: Sendable {
 		/// The address of the account that owns the non fungible resource ids
-		public let accountAddress: AccountAddress
+		let accountAddress: AccountAddress
 		/// The non fungible resource collection for with to retrieve the ids
-		public let resource: OnLedgerEntity.OwnedNonFungibleResource
+		let resource: OnLedgerEntity.OwnedNonFungibleResource
 		/// The cursor of the page to read
-		public let pageCursor: String?
+		let pageCursor: String?
 
-		public init(
+		init(
 			account: AccountAddress,
 			resource: OnLedgerEntity.OwnedNonFungibleResource,
 			pageCursor: String?
@@ -42,15 +42,15 @@ extension OnLedgerEntitiesClient {
 		}
 	}
 
-	public struct GetNonFungibleTokenDataRequest: Sendable {
+	struct GetNonFungibleTokenDataRequest: Sendable {
 		/// The ledger state at which to retrieve the data, should be ledger state
 		/// from the OnLedgerEntity.OwnedNonFungibleResource.
-		public let atLedgerState: AtLedgerState?
+		let atLedgerState: AtLedgerState?
 		/// The non fungible resource collection to retrieve the ids data for
-		public let resource: ResourceAddress
-		public let nonFungibleIds: [NonFungibleGlobalId]
+		let resource: ResourceAddress
+		let nonFungibleIds: [NonFungibleGlobalId]
 
-		public init(
+		init(
 			atLedgerState: AtLedgerState? = nil,
 			resource: ResourceAddress,
 			nonFungibleIds: [NonFungibleGlobalId]
@@ -61,20 +61,20 @@ extension OnLedgerEntitiesClient {
 		}
 	}
 
-	public struct GetAccountOwnedNonFungibleTokenDataRequest: Sendable {
-		public enum Mode: Sendable {
+	struct GetAccountOwnedNonFungibleTokenDataRequest: Sendable {
+		enum Mode: Sendable {
 			case loadAll
 			case loadPage(pageCursor: String?)
 		}
 
 		/// The address of the account that owns the non fungible resource ids
-		public let accountAddress: AccountAddress
+		let accountAddress: AccountAddress
 		/// The non fungible resource collection for with to retrieve the ids
-		public let resource: OnLedgerEntity.OwnedNonFungibleResource
+		let resource: OnLedgerEntity.OwnedNonFungibleResource
 		/// The page to load, if not provided will load all pages
-		public let mode: Mode
+		let mode: Mode
 
-		public init(
+		init(
 			accountAddress: AccountAddress,
 			resource: OnLedgerEntity.OwnedNonFungibleResource,
 			mode: Mode
@@ -85,11 +85,11 @@ extension OnLedgerEntitiesClient {
 		}
 	}
 
-	public struct GetAccountOwnedNonFungibleTokenResponse: Sendable {
-		public let tokens: [OnLedgerEntity.NonFungibleToken]
-		public let nextPageCursor: String?
+	struct GetAccountOwnedNonFungibleTokenResponse: Sendable {
+		let tokens: [OnLedgerEntity.NonFungibleToken]
+		let nextPageCursor: String?
 
-		public init(
+		init(
 			tokens: [OnLedgerEntity.NonFungibleToken],
 			nextPageCursor: String?
 		) {
@@ -101,11 +101,11 @@ extension OnLedgerEntitiesClient {
 
 // MARK: OnLedgerEntitiesClient.ItemsPage
 extension OnLedgerEntitiesClient {
-	public struct ItemsPage: Sendable {
-		public let cursor: String?
-		public let pageLimit: Int
+	struct ItemsPage: Sendable {
+		let cursor: String?
+		let pageLimit: Int
 
-		public init(cursor: String?, pageLimit: Int) {
+		init(cursor: String?, pageLimit: Int) {
 			self.cursor = cursor
 			self.pageLimit = pageLimit
 		}
@@ -113,21 +113,21 @@ extension OnLedgerEntitiesClient {
 }
 
 extension OnLedgerEntitiesClient {
-	public struct CachingStrategy: Sendable, Hashable, CustomDebugStringConvertible {
-		public enum Read: Sendable, Hashable {
+	struct CachingStrategy: Sendable, Hashable, CustomDebugStringConvertible {
+		enum Read: Sendable, Hashable {
 			case fromCache
 			case fromLedger
 		}
 
-		public enum Write: Sendable, Hashable {
+		enum Write: Sendable, Hashable {
 			case toCache
 			case skip
 		}
 
-		public let read: Read
-		public let write: Write
+		let read: Read
+		let write: Write
 
-		public var debugDescription: String {
+		var debugDescription: String {
 			if self == Self.forceUpdate {
 				"forceUpdate"
 			} else if self == Self.useCache {
@@ -139,13 +139,13 @@ extension OnLedgerEntitiesClient {
 			}
 		}
 
-		public static let forceUpdate = Self(read: .fromLedger, write: .toCache)
-		public static let useCache = Self(read: .fromCache, write: .toCache)
-		public static let readFromLedgerSkipWrite = Self(read: .fromLedger, write: .skip)
+		static let forceUpdate = Self(read: .fromLedger, write: .toCache)
+		static let useCache = Self(read: .fromCache, write: .toCache)
+		static let readFromLedgerSkipWrite = Self(read: .fromLedger, write: .skip)
 	}
 
 	@Sendable
-	public func getEntities(
+	func getEntities(
 		addresses: [Address],
 		metadataKeys: Set<EntityMetadataKey>,
 		cachingStrategy: CachingStrategy = .useCache,
@@ -162,7 +162,7 @@ extension OnLedgerEntitiesClient {
 	}
 
 	@Sendable
-	public func getAccounts(
+	func getAccounts(
 		_ addresses: [AccountAddress],
 		metadataKeys: Set<EntityMetadataKey> = .resourceMetadataKeys,
 		cachingStrategy: CachingStrategy = .useCache,
@@ -177,7 +177,7 @@ extension OnLedgerEntitiesClient {
 	}
 
 	@Sendable
-	public func getEntity(
+	func getEntity(
 		_ address: Address,
 		metadataKeys: Set<EntityMetadataKey>,
 		cachingStrategy: CachingStrategy = .useCache,
@@ -196,7 +196,7 @@ extension OnLedgerEntitiesClient {
 	}
 
 	@Sendable
-	public func getAccount(
+	func getAccount(
 		_ address: AccountAddress,
 		metadataKeys: Set<EntityMetadataKey> = .resourceMetadataKeys,
 		cachingStrategy: CachingStrategy = .useCache,
@@ -214,7 +214,7 @@ extension OnLedgerEntitiesClient {
 	}
 
 	@Sendable
-	public func getAssociatedDapps(
+	func getAssociatedDapps(
 		_ addresses: [DappDefinitionAddress],
 		cachingStrategy: CachingStrategy = .useCache,
 		atLedgerState: AtLedgerState? = nil
@@ -231,7 +231,7 @@ extension OnLedgerEntitiesClient {
 	}
 
 	@Sendable
-	public func getAssociatedDapp(
+	func getAssociatedDapp(
 		_ address: DappDefinitionAddress,
 		cachingStrategy: CachingStrategy = .useCache
 	) async throws -> OnLedgerEntity.AssociatedDapp {
@@ -245,7 +245,7 @@ extension OnLedgerEntitiesClient {
 	}
 
 	@Sendable
-	public func getResources(
+	func getResources(
 		_ addresses: some Collection<ResourceAddress>,
 		metadataKeys: Set<EntityMetadataKey> = .resourceMetadataKeys,
 		cachingStrategy: CachingStrategy = .useCache,
@@ -262,7 +262,7 @@ extension OnLedgerEntitiesClient {
 	}
 
 	@Sendable
-	public func getResource(
+	func getResource(
 		_ address: ResourceAddress,
 		metadataKeys: Set<EntityMetadataKey> = .resourceMetadataKeys,
 		atLedgerState: AtLedgerState? = nil,
@@ -282,7 +282,7 @@ extension OnLedgerEntitiesClient {
 
 	/// Extracts the dApp definition address from an entity, if one is present
 	@Sendable
-	public func getDappDefinitionAddress(
+	func getDappDefinitionAddress(
 		_ address: Address
 	) async throws -> DappDefinitionAddress {
 		let entityMetadata = try await getEntity(address, metadataKeys: [.dappDefinition]).metadata
@@ -295,7 +295,7 @@ extension OnLedgerEntitiesClient {
 
 	/// Fetches the metadata for a dApp. If an entity address is supplied, it validates that it is contained in `claimed_entities`
 	@Sendable
-	public func getDappMetadata(
+	func getDappMetadata(
 		_ dappDefinition: DappDefinitionAddress,
 		validatingDappEntity entity: Address? = nil,
 		validatingDappDefinitionAddress dappDefinitionAddress: DappDefinitionAddress? = nil,
@@ -325,16 +325,16 @@ extension OnLedgerEntitiesClient {
 }
 
 // MARK: - OnLedgerSyncOfAccounts
-public struct OnLedgerSyncOfAccounts: Sendable, Hashable {
+struct OnLedgerSyncOfAccounts: Sendable, Hashable {
 	/// Inactive virtual accounts, unknown to the Ledger OnNetwork.
-	public let inactive: IdentifiedArrayOf<Account>
+	let inactive: IdentifiedArrayOf<Account>
 	/// Accounts known to the Ledger OnNetwork, with state updated according to that OnNetwork.
-	public let active: IdentifiedArrayOf<Account>
+	let active: IdentifiedArrayOf<Account>
 }
 
 extension OnLedgerEntitiesClient {
 	/// returns the updated account, else `nil` if account was not changed,
-	public func syncThirdPartyDepositWithOnLedgerSettings(
+	func syncThirdPartyDepositWithOnLedgerSettings(
 		account: Account
 	) async throws -> Account? {
 		guard let ruleOfAccount = try await getOnLedgerCustomizedThirdPartyDepositRule(addresses: [account.address]).first else {
@@ -351,7 +351,7 @@ extension OnLedgerEntitiesClient {
 		}
 	}
 
-	public func syncThirdPartyDepositWithOnLedgerSettings(
+	func syncThirdPartyDepositWithOnLedgerSettings(
 		addressesOf accounts: IdentifiedArrayOf<Account>
 	) async throws -> OnLedgerSyncOfAccounts {
 		let activeAddresses: [CustomizedOnLedgerThirdPartDepositForAccount]
@@ -376,12 +376,12 @@ extension OnLedgerEntitiesClient {
 		return OnLedgerSyncOfAccounts(inactive: inactive, active: active)
 	}
 
-	public struct CustomizedOnLedgerThirdPartDepositForAccount: Sendable, Hashable {
-		public let address: AccountAddress
-		public let rule: DepositRule
+	struct CustomizedOnLedgerThirdPartDepositForAccount: Sendable, Hashable {
+		let address: AccountAddress
+		let rule: DepositRule
 	}
 
-	public func getOnLedgerCustomizedThirdPartyDepositRule(
+	func getOnLedgerCustomizedThirdPartyDepositRule(
 		addresses: some Collection<AccountAddress>
 	) async throws -> [CustomizedOnLedgerThirdPartDepositForAccount] {
 		try await self.getAccounts(
@@ -413,7 +413,7 @@ extension OnLedgerEntitiesClient {
 
 extension OnLedgerEntitiesClient {
 	/// Returns the validator of a correctly linked LSU, and `nil` for any other resource
-	public func isLiquidStakeUnit(_ resource: OnLedgerEntity.Resource) async -> OnLedgerEntity.Validator? {
+	func isLiquidStakeUnit(_ resource: OnLedgerEntity.Resource) async -> OnLedgerEntity.Validator? {
 		guard let validatorAddress = resource.metadata.validator?.asGeneral else {
 			return nil
 		}
@@ -438,7 +438,7 @@ extension OnLedgerEntitiesClient {
 		return validator
 	}
 
-	public func isPoolUnitResource(_ resource: OnLedgerEntity.Resource) async -> Bool {
+	func isPoolUnitResource(_ resource: OnLedgerEntity.Resource) async -> Bool {
 		guard let poolAddress = resource.metadata.poolUnit?.asGeneral else {
 			return false // no declared pool unit
 		}
@@ -462,7 +462,7 @@ extension OnLedgerEntitiesClient {
 		return true // It is a pool unit resource address
 	}
 
-	public func isStakeClaimNFT(_ resource: OnLedgerEntity.Resource) async -> OnLedgerEntity.Validator? {
+	func isStakeClaimNFT(_ resource: OnLedgerEntity.Resource) async -> OnLedgerEntity.Validator? {
 		guard let validatorAddress = resource.metadata.validator else {
 			return nil // no declared validator
 		}
@@ -487,7 +487,7 @@ extension OnLedgerEntitiesClient {
 }
 
 extension OnLedgerEntitiesClient {
-	public func getPoolUnitDetails(_ poolUnitResource: OnLedgerEntity.Resource, forAmount amount: Decimal192) async throws -> OwnedResourcePoolDetails? {
+	func getPoolUnitDetails(_ poolUnitResource: OnLedgerEntity.Resource, forAmount amount: Decimal192) async throws -> OwnedResourcePoolDetails? {
 		guard let poolAddress = poolUnitResource.metadata.poolUnit?.asGeneral else {
 			return nil
 		}
@@ -533,7 +533,7 @@ extension OnLedgerEntitiesClient {
 	/// This loads all of the related pool unit details required by the Pool units screen.
 	/// We don't do any pagination there(yet), since the number of owned pools will not be big, this can be revised in the future.
 	@Sendable
-	public func getOwnedPoolUnitsDetails(
+	func getOwnedPoolUnitsDetails(
 		_ account: OnLedgerEntity.OnLedgerAccount,
 		hiddenResources: [ResourceIdentifier],
 		cachingStrategy: CachingStrategy = .useCache

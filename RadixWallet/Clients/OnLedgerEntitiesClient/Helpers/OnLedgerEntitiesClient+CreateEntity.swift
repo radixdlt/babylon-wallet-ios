@@ -369,7 +369,7 @@ extension OnLedgerEntitiesClient {
 extension OnLedgerEntitiesClient {
 	/// This loads all of the related stake unit details required by the Pool Units screen.
 	/// We don't do any pagination there(yet), since the number of owned stakes will not be big, this can be revised in the future.
-	public func getOwnedStakesDetails(
+	func getOwnedStakesDetails(
 		account: OnLedgerEntity.OnLedgerAccount,
 		cachingStrategy: CachingStrategy = .useCache
 	) async throws -> [OwnedStakeDetails] {
@@ -510,13 +510,13 @@ extension OnLedgerEntity.OnLedgerAccount.PoolUnitResources {
 }
 
 extension [OnLedgerEntity.OwnedNonFungibleResource] {
-	public var nonEmptyVaults: [OnLedgerEntity.OwnedNonFungibleResource] {
+	var nonEmptyVaults: [OnLedgerEntity.OwnedNonFungibleResource] {
 		filter { $0.nonFungibleIdsCount > 0 }
 	}
 }
 
 extension OnLedgerEntity.OwnedFungibleResources {
-	public var nonEmptyVaults: OnLedgerEntity.OwnedFungibleResources {
+	var nonEmptyVaults: OnLedgerEntity.OwnedFungibleResources {
 		.init(
 			xrdResource: xrdResource.flatMap { $0.amount.nominalAmount > 0 ? $0 : nil },
 			nonXrdResources: nonXrdResources.filter { $0.amount.nominalAmount > 0 }
@@ -525,7 +525,7 @@ extension OnLedgerEntity.OwnedFungibleResources {
 }
 
 extension OnLedgerEntity.OnLedgerAccount {
-	public var nonEmptyVaults: OnLedgerEntity.OnLedgerAccount {
+	var nonEmptyVaults: OnLedgerEntity.OnLedgerAccount {
 		.init(
 			address: address,
 			atLedgerState: atLedgerState,
@@ -539,33 +539,33 @@ extension OnLedgerEntity.OnLedgerAccount {
 }
 
 extension OnLedgerEntitiesClient {
-	public struct OwnedStakeDetails: Hashable, Sendable {
-		public let validator: OnLedgerEntity.Validator
-		public var stakeUnitResource: ResourceWithVaultAmount?
-		public var stakeClaimTokens: NonFungibleResourceWithTokens?
-		public let currentEpoch: Epoch
+	struct OwnedStakeDetails: Hashable, Sendable {
+		let validator: OnLedgerEntity.Validator
+		var stakeUnitResource: ResourceWithVaultAmount?
+		var stakeClaimTokens: NonFungibleResourceWithTokens?
+		let currentEpoch: Epoch
 	}
 
-	public struct OwnedResourcePoolDetails: Hashable, Sendable {
-		public let address: PoolAddress
-		public let dAppName: String?
-		public let poolUnitResource: ResourceWithVaultAmount
-		public var xrdResource: ResourceWithRedemptionValue?
-		public var nonXrdResources: [ResourceWithRedemptionValue]
+	struct OwnedResourcePoolDetails: Hashable, Sendable {
+		let address: PoolAddress
+		let dAppName: String?
+		let poolUnitResource: ResourceWithVaultAmount
+		var xrdResource: ResourceWithRedemptionValue?
+		var nonXrdResources: [ResourceWithRedemptionValue]
 
-		public struct ResourceWithRedemptionValue: Hashable, Sendable {
-			public let resource: OnLedgerEntity.Resource
-			public var redemptionValue: ResourceAmount?
+		struct ResourceWithRedemptionValue: Hashable, Sendable {
+			let resource: OnLedgerEntity.Resource
+			var redemptionValue: ResourceAmount?
 		}
 	}
 
-	public struct ResourceWithVaultAmount: Hashable, Sendable {
-		public let resource: OnLedgerEntity.Resource
-		public var amount: ResourceAmount
+	struct ResourceWithVaultAmount: Hashable, Sendable {
+		let resource: OnLedgerEntity.Resource
+		var amount: ResourceAmount
 	}
 
-	public struct StakeClaim: Hashable, Sendable, Identifiable {
-		public var id: NonFungibleGlobalId {
+	struct StakeClaim: Hashable, Sendable, Identifiable {
+		var id: NonFungibleGlobalId {
 			token.id
 		}
 
@@ -589,9 +589,9 @@ extension OnLedgerEntitiesClient {
 		}
 	}
 
-	public struct NonFungibleResourceWithTokens: Hashable, Sendable {
-		public let resource: OnLedgerEntity.Resource
-		public var stakeClaims: IdentifiedArrayOf<StakeClaim>
+	struct NonFungibleResourceWithTokens: Hashable, Sendable {
+		let resource: OnLedgerEntity.Resource
+		var stakeClaims: IdentifiedArrayOf<StakeClaim>
 	}
 }
 
@@ -627,7 +627,7 @@ extension [OnLedgerEntity.OwnedFungibleResource] {
 
 // MARK: - OnLedgerEntity.OwnedFungibleResource + Comparable
 extension OnLedgerEntity.OwnedFungibleResource: Comparable {
-	public static func < (
+	static func < (
 		lhs: OnLedgerEntity.OwnedFungibleResource,
 		rhs: OnLedgerEntity.OwnedFungibleResource
 	) -> Bool {
@@ -656,7 +656,7 @@ extension OnLedgerEntity.OwnedFungibleResource: Comparable {
 
 // MARK: - OnLedgerEntity.OwnedNonFungibleResource + Comparable
 extension OnLedgerEntity.OwnedNonFungibleResource: Comparable {
-	public static func < (
+	static func < (
 		lhs: Self,
 		rhs: Self
 	) -> Bool {
@@ -675,7 +675,7 @@ extension OnLedgerEntity.OwnedNonFungibleResource: Comparable {
 
 // MARK: - OnLedgerEntity.OnLedgerAccount.PoolUnit + Comparable
 extension OnLedgerEntity.OnLedgerAccount.PoolUnit: Comparable {
-	public static func < (
+	static func < (
 		lhs: Self,
 		rhs: Self
 	) -> Bool {

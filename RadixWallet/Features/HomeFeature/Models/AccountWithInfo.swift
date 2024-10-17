@@ -1,16 +1,16 @@
 import Foundation
 
 // MARK: - AccountWithInfo
-public struct AccountWithInfo: Sendable, Hashable {
-	public var account: Account
+struct AccountWithInfo: Sendable, Hashable {
+	var account: Account
 
-	public var isDappDefinitionAccount: Bool = false
+	var isDappDefinitionAccount: Bool = false
 
 	init(account: Account) {
 		self.account = account
 	}
 
-	public var id: AccountAddress { account.address }
-	public var isLegacyAccount: Bool { account.isLegacy }
-	public var isLedgerAccount: Bool { account.isLedgerControlled }
+	var id: AccountAddress { account.address }
+	var isLegacyAccount: Bool { account.isLegacy }
+	var isLedgerAccount: Bool { account.isLedgerControlled }
 }

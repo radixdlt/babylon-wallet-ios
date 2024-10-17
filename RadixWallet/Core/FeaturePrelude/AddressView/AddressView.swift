@@ -1,6 +1,6 @@
 // MARK: - AddressView
 @MainActor
-public struct AddressView: View {
+struct AddressView: View {
 	let identifiable: LedgerIdentifiable
 	let isTappable: Bool
 	let imageColor: Color?
@@ -14,7 +14,7 @@ public struct AddressView: View {
 
 	@State private var sheet: Sheet?
 
-	public init(
+	init(
 		_ identifiable: LedgerIdentifiable,
 		showLocalIdOnly: Bool = false,
 		isTappable: Bool = true,
@@ -31,7 +31,7 @@ public struct AddressView: View {
 
 extension AddressView {
 	@ViewBuilder
-	public var body: some View {
+	var body: some View {
 		if isTappable {
 			tappableAddressView
 		} else {

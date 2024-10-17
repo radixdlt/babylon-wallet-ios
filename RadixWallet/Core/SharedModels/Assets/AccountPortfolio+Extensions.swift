@@ -1,6 +1,6 @@
 
 extension OnLedgerEntity.NonFungibleToken {
-	public init(resourceAddress: ResourceAddress, nftID: NonFungibleLocalId, nftData: NFTData?) {
+	init(resourceAddress: ResourceAddress, nftID: NonFungibleLocalId, nftData: NFTData?) {
 		self.init(
 			id: NonFungibleGlobalID(
 				resourceAddress: resourceAddress,
@@ -12,7 +12,7 @@ extension OnLedgerEntity.NonFungibleToken {
 }
 
 extension OnLedgerEntity.Resource {
-	public init(resourceAddress: ResourceAddress, metadata: OnLedgerEntity.Metadata) {
+	init(resourceAddress: ResourceAddress, metadata: OnLedgerEntity.Metadata) {
 		self.init(
 			resourceAddress: resourceAddress,
 			atLedgerState: .init(version: 0, epoch: 0),

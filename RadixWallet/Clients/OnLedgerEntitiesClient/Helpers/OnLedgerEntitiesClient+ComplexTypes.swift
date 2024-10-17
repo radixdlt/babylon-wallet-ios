@@ -16,7 +16,7 @@ extension OnLedgerEntitiesClient {
 
 	// MARK: Fungibles
 
-	public func fungibleResourceBalance(
+	func fungibleResourceBalance(
 		_ resource: OnLedgerEntity.Resource,
 		resourceQuantifier: FungibleResourceIndicator,
 		poolContributions: [some TrackedPoolInteraction] = [] as [TrackedPoolContribution],
@@ -188,7 +188,7 @@ extension OnLedgerEntitiesClient {
 
 	// MARK: Non-fungibles
 
-	public func nonFungibleResourceBalances(
+	func nonFungibleResourceBalances(
 		_ resourceInfo: TransactionReview.ResourceInfo,
 		resourceAddress: ResourceAddress,
 		resourceQuantifier: NonFungibleResourceIndicator,
@@ -269,7 +269,7 @@ extension OnLedgerEntitiesClient {
 		return result
 	}
 
-	public func stakeClaim(
+	func stakeClaim(
 		_ resource: OnLedgerEntity.Resource,
 		stakeClaimValidator: OnLedgerEntity.Validator,
 		unstakeData: [NonFungibleGlobalId: UnstakeData],

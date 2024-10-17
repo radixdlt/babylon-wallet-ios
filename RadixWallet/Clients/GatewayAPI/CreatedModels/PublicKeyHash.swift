@@ -2,19 +2,19 @@
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.PublicKey")
-public typealias PublicKey = GatewayAPI.PublicKey
+typealias PublicKey = GatewayAPI.PublicKey
 
 // MARK: - GatewayAPI.PublicKey
 extension GatewayAPI {
-	public enum PublicKey: Codable, Hashable {
+	enum PublicKey: Codable, Hashable {
 		case ecdsaSecp256k1(PublicKeyEcdsaSecp256k1)
 		case eddsaEd25519(PublicKeyEddsaEd25519)
 
-		public enum CodingKeys: String, CodingKey, CaseIterable {
+		enum CodingKeys: String, CodingKey, CaseIterable {
 			case keyType = "key_type"
 		}
 
-		public init(from decoder: Decoder) throws {
+		init(from decoder: Decoder) throws {
 			let container = try decoder.container(keyedBy: CodingKeys.self)
 			let type = try container.decode(PublicKeyType.self, forKey: .keyType)
 
@@ -26,7 +26,7 @@ extension GatewayAPI {
 			}
 		}
 
-		public func encode(to encoder: Encoder) throws {
+		func encode(to encoder: Encoder) throws {
 			switch self {
 			case let .ecdsaSecp256k1(key):
 				try key.encode(to: encoder)

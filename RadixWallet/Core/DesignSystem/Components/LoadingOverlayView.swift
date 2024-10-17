@@ -1,6 +1,6 @@
 
 extension View {
-	public func presentsLoadingViewOverlay() -> some View {
+	func presentsLoadingViewOverlay() -> some View {
 		overlayPreferenceValue(LoadingContextKey.self, alignment: .center) { context in
 			if case let .global(text) = context {
 				LoadingOverlayView(text)
@@ -12,11 +12,11 @@ extension View {
 // MARK: - LoadingOverlayView
 private struct LoadingOverlayView: View {
 	private let text: String?
-	public init(_ text: String?) {
+	init(_ text: String?) {
 		self.text = text
 	}
 
-	public var body: some View {
+	var body: some View {
 		ZStack {
 			VStack(spacing: .medium2) {
 				LoadingView().frame(width: 100, height: 100)

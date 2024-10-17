@@ -27,21 +27,21 @@ extension DisplayEntitiesControlledByMnemonic.State {
 
 // MARK: - DisplayEntitiesControlledByMnemonic.ViewState
 extension DisplayEntitiesControlledByMnemonic {
-	public struct ViewState: Equatable {
-		public struct HeadingState: Equatable {
-			public let title: String
-			public let type: HeadingType
-			public let isError: Bool
+	struct ViewState: Equatable {
+		struct HeadingState: Equatable {
+			let title: String
+			let type: HeadingType
+			let isError: Bool
 			var foregroundColor: Color {
 				isError ? .app.gray2 : .app.gray1
 			}
 
-			public enum HeadingType: Equatable {
+			enum HeadingType: Equatable {
 				case standard
 				case scanning(selected: Bool)
 			}
 
-			public func connectedAccountsLabel(accounts: Int, personas: Int) -> String {
+			func connectedAccountsLabel(accounts: Int, personas: Int) -> String {
 				switch type {
 				case .standard:
 					switch (personas, accounts) {
@@ -63,12 +63,12 @@ extension DisplayEntitiesControlledByMnemonic {
 			}
 		}
 
-		public let headingState: HeadingState?
-		public let promptUserToBackUpMnemonic: Bool
-		public let promptUserToImportMnemonic: Bool
-		public let accounts: [Account]
-		public let hiddenAccountsCount: Int
-		public let personasCount: Int
+		let headingState: HeadingState?
+		let promptUserToBackUpMnemonic: Bool
+		let promptUserToImportMnemonic: Bool
+		let accounts: [Account]
+		let hiddenAccountsCount: Int
+		let personasCount: Int
 
 		var totalAccountsCount: Int {
 			accounts.count + hiddenAccountsCount
@@ -79,14 +79,14 @@ extension DisplayEntitiesControlledByMnemonic {
 // MARK: - DisplayEntitiesControlledByMnemonic.View
 extension DisplayEntitiesControlledByMnemonic {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<DisplayEntitiesControlledByMnemonic>
 
-		public init(store: StoreOf<DisplayEntitiesControlledByMnemonic>) {
+		init(store: StoreOf<DisplayEntitiesControlledByMnemonic>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				MnemonicView(viewState: viewStore.state) {
 					viewStore.send(.navigateButtonTapped)

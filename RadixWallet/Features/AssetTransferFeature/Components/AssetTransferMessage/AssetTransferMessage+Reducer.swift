@@ -1,19 +1,19 @@
 import ComposableArchitecture
 import SwiftUI
 
-public struct AssetTransferMessage: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public enum Kind: Sendable, Hashable {
+struct AssetTransferMessage: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		enum Kind: Sendable, Hashable {
 			case `private`
 			case `public`
 		}
 
-		public let kind: Kind = .public // only public is supported for now
-		public var message: String
-		public var focused: Bool = true
+		let kind: Kind = .public // only public is supported for now
+		var message: String
+		var focused: Bool = true
 
 		@PresentationState
-		public var destination: Destination.State?
+		var destination: Destination.State?
 
 		init(message: String) {
 			self.message = message
@@ -24,34 +24,34 @@ public struct AssetTransferMessage: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case messageKindTapped
 		case removeMessageTapped
 		case focusChanged(Bool)
 		case messageChanged(String)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case removed
 	}
 
-	public struct Destination: DestinationReducer {
-		public enum State: Sendable, Hashable {
+	struct Destination: DestinationReducer {
+		enum State: Sendable, Hashable {
 			case messageMode(MessageMode.State)
 		}
 
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case messageMode(MessageMode.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: /State.messageMode, action: /Action.messageMode) {
 				MessageMode()
 			}
 		}
 	}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -60,7 +60,7 @@ public struct AssetTransferMessage: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .messageKindTapped:
 			state.destination = .messageMode(.init())

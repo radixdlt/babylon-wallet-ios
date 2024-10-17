@@ -1,6 +1,6 @@
 
 extension DependencyValues {
-	public var errorQueue: ErrorQueue {
+	var errorQueue: ErrorQueue {
 		get { self[ErrorQueue.self] }
 		set { self[ErrorQueue.self] = newValue }
 	}
@@ -8,9 +8,9 @@ extension DependencyValues {
 
 // MARK: - ErrorQueue + TestDependencyKey
 extension ErrorQueue: TestDependencyKey {
-	public static let previewValue = liveValue
+	static let previewValue = liveValue
 
-	public static let testValue = Self(
+	static let testValue = Self(
 		errors: unimplemented("\(Self.self).errors"),
 		schedule: unimplemented("\(Self.self).schedule")
 	)

@@ -1,21 +1,21 @@
 // MARK: - RecoverWalletControlWithBDFSOnly
 
-public struct RecoverWalletControlWithBDFSOnly: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public init() {}
+struct RecoverWalletControlWithBDFSOnly: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		init() {}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case continueTapped
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case `continue`
 	}
 
-	public init() {}
+	init() {}
 
-	public func reduce(into _: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into _: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .continueTapped:
 			.send(.delegate(.continue))

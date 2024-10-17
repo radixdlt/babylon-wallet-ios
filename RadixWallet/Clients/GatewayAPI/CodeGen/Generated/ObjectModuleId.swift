@@ -11,11 +11,11 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.ObjectModuleId")
-public typealias ObjectModuleId = GatewayAPI.ObjectModuleId
+typealias ObjectModuleId = GatewayAPI.ObjectModuleId
 
 extension GatewayAPI {
 
-public enum ObjectModuleId: String, Codable, CaseIterable {
+enum ObjectModuleId: String, Codable, CaseIterable {
     case main = "Main"
     case metadata = "Metadata"
     case royalty = "Royalty"

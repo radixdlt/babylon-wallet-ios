@@ -14,15 +14,15 @@ import SwiftUI
 
  - Note: This component relies on the Introspect library for UIKit introspection.
  */
-public struct HeaderListViewContainer<Header: View, List: View>: UIViewRepresentable {
-	public typealias UIViewType = UIView
+struct HeaderListViewContainer<Header: View, List: View>: UIViewRepresentable {
+	typealias UIViewType = UIView
 
 	private let headerView: Header
 	private let listView: List
 
 	@State private var observation: NSKeyValueObservation?
 
-	public init(
+	init(
 		@ViewBuilder headerView: () -> Header,
 		@ViewBuilder listView: () -> List
 	) {
@@ -30,14 +30,14 @@ public struct HeaderListViewContainer<Header: View, List: View>: UIViewRepresent
 		self.listView = listView()
 	}
 
-	public func makeUIView(context: Context) -> UIView {
+	func makeUIView(context: Context) -> UIView {
 		let containerView = UIView()
 		addSubviews(in: containerView, context: context)
 
 		return containerView
 	}
 
-	public func updateUIView(_ uiView: UIViewType, context: Context) {
+	func updateUIView(_ uiView: UIViewType, context: Context) {
 		context.coordinator.headerController.rootView = AnyView(
 			headerView
 				.onSizeChanged { size in
@@ -120,14 +120,14 @@ public struct HeaderListViewContainer<Header: View, List: View>: UIViewRepresent
 		context.coordinator.listController.view.setNeedsUpdateConstraints()
 	}
 
-	public func makeCoordinator() -> Coordinator {
+	func makeCoordinator() -> Coordinator {
 		Coordinator(
 			headerController: UIHostingController(rootView: AnyView(headerView)),
 			listController: UIHostingController(rootView: AnyView(listView))
 		)
 	}
 
-	public class Coordinator: NSObject {
+	class Coordinator: NSObject {
 		var topConstraint: NSLayoutConstraint?
 		var bottomConstraint: NSLayoutConstraint?
 		var initialTopInset: CGFloat = 0

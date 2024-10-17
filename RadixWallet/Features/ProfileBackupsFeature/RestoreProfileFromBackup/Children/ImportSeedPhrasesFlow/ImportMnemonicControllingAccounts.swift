@@ -2,22 +2,22 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - ImportMnemonicControllingAccounts
-public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable, Identifiable {
-		public var id: EntitiesControlledByFactorSource.ID {
+struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable, Identifiable {
+		var id: EntitiesControlledByFactorSource.ID {
 			entitiesControlledByFactorSource.id
 		}
 
-		public let entitiesControlledByFactorSource: EntitiesControlledByFactorSource
+		let entitiesControlledByFactorSource: EntitiesControlledByFactorSource
 
-		public let entities: DisplayEntitiesControlledByMnemonic.State
+		let entities: DisplayEntitiesControlledByMnemonic.State
 
 		@PresentationState
-		public var destination: Destination.State? = nil
+		var destination: Destination.State? = nil
 
-		public var isMainBDFS: Bool
+		var isMainBDFS: Bool
 
-		public init(
+		init(
 			entitiesControlledByFactorSource ents: EntitiesControlledByFactorSource,
 			isMainBDFS: Bool
 		) {
@@ -56,44 +56,44 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case validated(PrivateHierarchicalDeterministicFactorSource)
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case appeared
 		case inputMnemonicButtonTapped
 		case skipButtonTapped
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case persistedMnemonicInKeychain(FactorSourceIDFromHash)
 		case skippedMnemonic(FactorSourceIDFromHash)
 		case skippedMainBDFS(FactorSourceIDFromHash)
 		case failedToSaveInKeychain(FactorSourceIDFromHash)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case entities(DisplayEntitiesControlledByMnemonic.Action)
 	}
 
 	// MARK: - Destination
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case importMnemonic(ImportMnemonic.State)
 			case confirmSkippingBDFS(ConfirmSkippingBDFS.State)
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case importMnemonic(ImportMnemonic.Action)
 			/// **B**abylon **D**evice **F**actor **S**ource
 			case confirmSkippingBDFS(ConfirmSkippingBDFS.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: \.importMnemonic, action: \.importMnemonic) {
 				ImportMnemonic()
 			}
@@ -109,9 +109,9 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	@Dependency(\.userDefaults) var userDefaults
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -120,7 +120,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return .none
@@ -145,7 +145,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .importMnemonic(.delegate(delegateAction)):
 			switch delegateAction {
@@ -181,7 +181,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .validated(privateHDFactorSource):
 			state.destination = nil

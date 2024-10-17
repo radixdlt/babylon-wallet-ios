@@ -3,16 +3,16 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - SelectBackup
-public struct SelectBackup: Sendable, FeatureReducer {
-	public struct State: Hashable, Sendable {
-		public enum Status: Hashable, Sendable {
+struct SelectBackup: Sendable, FeatureReducer {
+	struct State: Hashable, Sendable {
+		enum Status: Hashable, Sendable {
 			case start
 			case migrating
 			case loading
 			case loaded
 			case failed(FailureReason)
 
-			public enum FailureReason: Sendable {
+			enum FailureReason: Sendable {
 				case networkUnavailable
 				case accountTemporarilyUnavailable
 				case notAuthenticated
@@ -20,21 +20,21 @@ public struct SelectBackup: Sendable, FeatureReducer {
 			}
 		}
 
-		public var status: Status = .start
+		var status: Status = .start
 
-		public var backedUpProfiles: [Profile.Header]? = nil
+		var backedUpProfiles: [Profile.Header]? = nil
 
-		public var selectedProfile: Profile.Header? = nil
+		var selectedProfile: Profile.Header? = nil
 
-		public var isDisplayingFileImporter: Bool
-		public var thisDeviceID: UUID?
+		var isDisplayingFileImporter: Bool
+		var thisDeviceID: UUID?
 
 		@PresentationState
-		public var destination: Destination.State?
+		var destination: Destination.State?
 
-		public var profileFile: ExportableProfileFile?
+		var profileFile: ExportableProfileFile?
 
-		public init(
+		init(
 			isDisplayingFileImporter: Bool = false,
 			thisDeviceID: UUID? = nil
 		) {
@@ -43,20 +43,20 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		}
 	}
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case inputEncryptionPassword(EncryptOrDecryptProfile.State)
 			case recoverWalletWithoutProfileCoordinator(RecoverWalletWithoutProfileCoordinator.State)
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case inputEncryptionPassword(EncryptOrDecryptProfile.Action)
 			case recoverWalletWithoutProfileCoordinator(RecoverWalletWithoutProfileCoordinator.Action)
 		}
 
-		public var body: some Reducer<State, Action> {
+		var body: some Reducer<State, Action> {
 			Scope(state: \.inputEncryptionPassword, action: \.inputEncryptionPassword) {
 				EncryptOrDecryptProfile()
 			}
@@ -66,7 +66,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case task
 		case selectedProfile(Profile.Header?)
 		case importFromFileInstead
@@ -77,13 +77,13 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		case closeButtonTapped
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case setStatus(State.Status)
 		case loadedProfileHeadersFromCloudBackup([Profile.Header]?)
 		case loadedThisDeviceID(UUID?)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case selectedProfile(Profile, containsLegacyP2PLinks: Bool)
 		case backToStartOfOnboarding
 		case profileCreatedFromImportedBDFS
@@ -99,9 +99,9 @@ public struct SelectBackup: Sendable, FeatureReducer {
 	@Dependency(\.secureStorageClient) var secureStorageClient
 	@Dependency(\.userDefaults) var userDefaults
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<SelectBackup> {
+	var body: some ReducerOf<SelectBackup> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -110,7 +110,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			return migrateAndLoadEffect()
@@ -176,7 +176,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .setStatus(status):
 			state.status = status
@@ -192,7 +192,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .recoverWalletWithoutProfileCoordinator(.delegate(.dismiss)):
 			state.destination = nil
@@ -225,12 +225,12 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
 		state.destination = nil
 		return .none
 	}
 
-	public func migrateAndLoadEffect() -> Effect<Action> {
+	func migrateAndLoadEffect() -> Effect<Action> {
 		.run { send in
 			do {
 				await send(.internal(.setStatus(.migrating)))

@@ -11,12 +11,12 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.ProgrammaticScryptoSborValueKind")
-public typealias ProgrammaticScryptoSborValueKind = GatewayAPI.ProgrammaticScryptoSborValueKind
+typealias ProgrammaticScryptoSborValueKind = GatewayAPI.ProgrammaticScryptoSborValueKind
 
 extension GatewayAPI {
 
 /** These are the Scrypto SBOR &#x60;ValueKind&#x60;s, but with &#x60;Bytes&#x60; added as an alias for &#x60;Vec&#x60;, to display such values as hex-encoded strings.  */
-public enum ProgrammaticScryptoSborValueKind: String, Codable, CaseIterable {
+enum ProgrammaticScryptoSborValueKind: String, Codable, CaseIterable {
     case bool = "Bool"
     case i8 = "I8"
     case i16 = "I16"

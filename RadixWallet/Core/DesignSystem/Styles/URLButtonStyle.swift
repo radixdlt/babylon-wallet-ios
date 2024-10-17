@@ -1,6 +1,6 @@
 // MARK: - URLButtonStyle
-public struct URLButtonStyle: ButtonStyle {
-	public func makeBody(configuration: ButtonStyle.Configuration) -> some View {
+struct URLButtonStyle: ButtonStyle {
+	func makeBody(configuration: ButtonStyle.Configuration) -> some View {
 		Label {
 			configuration.label
 				.textStyle(.body1HighImportance)
@@ -14,5 +14,5 @@ public struct URLButtonStyle: ButtonStyle {
 }
 
 extension ButtonStyle where Self == URLButtonStyle {
-	public static var url: URLButtonStyle { .init() }
+	static var url: URLButtonStyle { .init() }
 }

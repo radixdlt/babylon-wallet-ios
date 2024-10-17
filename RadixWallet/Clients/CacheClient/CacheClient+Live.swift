@@ -1,6 +1,6 @@
 
 extension CacheClient: DependencyKey {
-	public static let liveValue = Self(
+	static let liveValue = Self(
 		save: { encodable, entry in
 			@Dependency(\.diskPersistenceClient) var diskPersistenceClient
 			@Dependency(\.date) var date

@@ -1,11 +1,11 @@
 import Foundation
 
-public typealias ClaimsPerAccount = [AccountAddress: [AccountLockerClaimDetails]]
+typealias ClaimsPerAccount = [AccountAddress: [AccountLockerClaimDetails]]
 
 extension AccountLockersClient {
-	public static let liveValue: Self = .live()
+	static let liveValue: Self = .live()
 
-	public static func live() -> AccountLockersClient {
+	static func live() -> AccountLockersClient {
 		@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 		@Dependency(\.accountsClient) var accountsClient
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient

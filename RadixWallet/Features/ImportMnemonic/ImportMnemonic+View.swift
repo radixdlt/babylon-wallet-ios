@@ -50,7 +50,7 @@ extension ImportMnemonic.State {
 
 // MARK: - ImportMnemonic.ViewState
 extension ImportMnemonic {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		var isReadonlyMode: Bool {
 			readonlyMode != nil
 		}
@@ -112,14 +112,14 @@ extension ImportMnemonic.ViewState {
 // MARK: - ImportMnemonic.View
 extension ImportMnemonic {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<ImportMnemonic>
 
-		public init(store: StoreOf<ImportMnemonic>) {
+		init(store: StoreOf<ImportMnemonic>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView(showsIndicators: false) {
 					VStack(spacing: .medium3) {

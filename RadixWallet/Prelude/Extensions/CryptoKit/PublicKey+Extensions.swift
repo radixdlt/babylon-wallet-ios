@@ -14,7 +14,7 @@ extension Curve25519.Signing.PublicKey: CustomDumpStringConvertible, CustomDebug
 
 // MARK: - Data + Sendable
 extension Data: @unchecked Sendable {}
-public typealias EdDSASignature = Data
+typealias EdDSASignature = Data
 
 // MARK: - Curve25519.Signing.PublicKey + Sendable
 extension Curve25519.Signing.PublicKey: @unchecked Sendable {}
@@ -49,19 +49,19 @@ extension Curve25519.Signing.PrivateKey {
 }
 
 extension Curve25519 {
-	public typealias PrivateKey = Curve25519.Signing.PrivateKey
-	public typealias PublicKey = Curve25519.Signing.PublicKey
+	typealias PrivateKey = Curve25519.Signing.PrivateKey
+	typealias PublicKey = Curve25519.Signing.PublicKey
 }
 
 // MARK: - Curve25519.Signing.PublicKey + ECPublicKey
 extension Curve25519.Signing.PublicKey {
-	public init(compressedRepresentation: some ContiguousBytes) throws {
-		// Curve25519 public keys ARE always compressed.
+	init(compressedRepresentation: some ContiguousBytes) throws {
+		// Curve25519 keys ARE always compressed.
 		try self.init(rawRepresentation: compressedRepresentation)
 	}
 
-	public var compressedRepresentation: Data {
-		// Curve25519 public keys ARE always compressed.
+	var compressedRepresentation: Data {
+		// Curve25519 keys ARE always compressed.
 		rawRepresentation
 	}
 }

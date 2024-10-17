@@ -3,28 +3,28 @@ import Sargon
 import SwiftUI
 
 // MARK: - ImportOlympiaWalletCoordinator
-public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
-	public typealias AccountsToMigrate = NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
-	public typealias MigratedAccounts = IdentifiedArrayOf<Account>
+struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
+	typealias AccountsToMigrate = NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
+	typealias MigratedAccounts = IdentifiedArrayOf<Account>
 
 	// MARK: State
 
-	public struct State: Sendable, Hashable {
-		public var scanQR: ScanMultipleOlympiaQRCodes.State = .init()
-		public var path: StackState<Path.State> = .init()
+	struct State: Sendable, Hashable {
+		var scanQR: ScanMultipleOlympiaQRCodes.State = .init()
+		var path: StackState<Path.State> = .init()
 
 		var progress: Progress = .start
 
-		public init() {}
+		init() {}
 	}
 
-	public struct MigratableAccount: Sendable, Hashable, Identifiable {
-		public let id: Secp256k1PublicKey
-		public let accountName: String?
-		public let olympiaAddress: LegacyOlympiaAccountAddress
-		public let babylonAddress: AccountAddress
-		public let appearanceID: AppearanceID
-		public let olympiaAccountType: Olympia.AccountType
+	struct MigratableAccount: Sendable, Hashable, Identifiable {
+		let id: Secp256k1PublicKey
+		let accountName: String?
+		let olympiaAddress: LegacyOlympiaAccountAddress
+		let babylonAddress: AccountAddress
+		let appearanceID: AppearanceID
+		let olympiaAccountType: Olympia.AccountType
 	}
 
 	// MARK: Progress
@@ -82,16 +82,16 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	// MARK: Action
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case closeButtonTapped
 	}
 
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case scanQR(ScanMultipleOlympiaQRCodes.Action)
 		case path(StackActionOf<Path>)
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case foundAlreadyImportedOlympiaSoftwareAccounts(
 			NetworkID,
 			Set<OlympiaAccountToMigrate.ID>,
@@ -107,28 +107,28 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		case createdOlympiaPrivateHDForAccounts(PrivateHierarchicalDeterministicFactorSource, AccountsToMigrate)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case finishedMigration(gotoAccountList: Bool)
 	}
 
 	// MARK: Path
 
-	public struct Path: Sendable, Reducer {
-		public enum State: Sendable, Hashable {
+	struct Path: Sendable, Reducer {
+		enum State: Sendable, Hashable {
 			case accountsToImport(AccountsToImport.State)
 			case importMnemonic(ImportMnemonic.State)
 			case importOlympiaLedgerAccountsAndFactorSources(ImportOlympiaLedgerAccountsAndFactorSources.State)
 			case completion(CompletionMigrateOlympiaAccountsToBabylon.State)
 		}
 
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case accountsToImport(AccountsToImport.Action)
 			case importMnemonic(ImportMnemonic.Action)
 			case importOlympiaLedgerAccountsAndFactorSources(ImportOlympiaLedgerAccountsAndFactorSources.Action)
 			case completion(CompletionMigrateOlympiaAccountsToBabylon.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: /State.accountsToImport, action: /Action.accountsToImport) {
 				AccountsToImport()
 			}
@@ -155,9 +155,9 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.secureStorageClient) var secureStorageClient
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Scope(state: \.scanQR, action: /Action.child .. ChildAction.scanQR) {
 			ScanMultipleOlympiaQRCodes()
 		}
@@ -167,14 +167,14 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
 			.run { _ in await dismiss() }
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .scanQR(.delegate(.viewAppeared)):
 			scanViewAppeared(in: &state)
@@ -190,7 +190,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, pathAction: Path.Action) -> Effect<Action> {
+	func reduce(into state: inout State, pathAction: Path.Action) -> Effect<Action> {
 		switch pathAction {
 		case .accountsToImport(.delegate(.viewAppeared)):
 			return accountsToImportViewAppeared(in: &state)
@@ -219,7 +219,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .foundAlreadyImportedOlympiaSoftwareAccounts(networkID, alreadyImported, existingAccounts):
 			foundAlreadyImportedAccounts(
@@ -510,7 +510,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func migratedSoftwareAccountsToBabylon(
+	func migratedSoftwareAccountsToBabylon(
 		in state: inout State,
 		softwareAccounts: MigratedSoftwareAccounts
 	) -> Effect<Action> {

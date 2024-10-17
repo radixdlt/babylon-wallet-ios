@@ -20,7 +20,7 @@
 /// This function performs a safe comparison between two buffers of bytes. It exists as a temporary shim until we refactor
 /// some of the usage sites to pass better data structures to us.
 @inlinable
-public func safeCompare(_ lhs: some ContiguousBytes, _ rhs: some ContiguousBytes) -> Bool {
+func safeCompare(_ lhs: some ContiguousBytes, _ rhs: some ContiguousBytes) -> Bool {
 	lhs.withUnsafeBytes { lhsPtr in
 		rhs.withUnsafeBytes { rhsPtr in
 			constantTimeCompare(lhsPtr, rhsPtr)
@@ -30,7 +30,7 @@ public func safeCompare(_ lhs: some ContiguousBytes, _ rhs: some ContiguousBytes
 
 /// A straightforward constant-time comparison function for any two collections of bytes.
 @inlinable
-public func constantTimeCompare(_ lhs: some Collection<UInt8>, _ rhs: some Collection<UInt8>) -> Bool {
+func constantTimeCompare(_ lhs: some Collection<UInt8>, _ rhs: some Collection<UInt8>) -> Bool {
 	guard lhs.count == rhs.count else {
 		return false
 	}

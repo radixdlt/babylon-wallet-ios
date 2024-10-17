@@ -11,28 +11,28 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.TransactionFungibleFeeBalanceChanges")
-public typealias TransactionFungibleFeeBalanceChanges = GatewayAPI.TransactionFungibleFeeBalanceChanges
+typealias TransactionFungibleFeeBalanceChanges = GatewayAPI.TransactionFungibleFeeBalanceChanges
 
 extension GatewayAPI {
 
-public struct TransactionFungibleFeeBalanceChanges: Codable, Hashable {
+struct TransactionFungibleFeeBalanceChanges: Codable, Hashable {
 
-    public private(set) var type: TransactionFungibleFeeBalanceChangeType
+    private(set) var type: TransactionFungibleFeeBalanceChangeType
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var entityAddress: String
+    private(set) var entityAddress: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var resourceAddress: String
+    private(set) var resourceAddress: String
     /** The string-encoded decimal representing the amount of change for the fungible resource.  */
-    public private(set) var balanceChange: String
+    private(set) var balanceChange: String
 
-    public init(type: TransactionFungibleFeeBalanceChangeType, entityAddress: String, resourceAddress: String, balanceChange: String) {
+    init(type: TransactionFungibleFeeBalanceChangeType, entityAddress: String, resourceAddress: String, balanceChange: String) {
         self.type = type
         self.entityAddress = entityAddress
         self.resourceAddress = resourceAddress
         self.balanceChange = balanceChange
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case type
         case entityAddress = "entity_address"
         case resourceAddress = "resource_address"
@@ -41,7 +41,7 @@ public struct TransactionFungibleFeeBalanceChanges: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(type, forKey: .type)
         try container.encode(entityAddress, forKey: .entityAddress)

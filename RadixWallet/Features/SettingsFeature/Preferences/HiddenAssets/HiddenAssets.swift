@@ -2,9 +2,9 @@ import ComposableArchitecture
 
 // MARK: - HiddenAssets
 @Reducer
-public struct HiddenAssets: Sendable, FeatureReducer {
+struct HiddenAssets: Sendable, FeatureReducer {
 	@ObservableState
-	public struct State: Sendable, Hashable {
+	struct State: Sendable, Hashable {
 		var fungible: [OnLedgerEntity.Resource] = []
 		var nonFungible: [OnLedgerEntity.Resource] = []
 		var poolUnit: [State.PoolUnitDetails] = []
@@ -12,21 +12,21 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 		@Presents
 		var destination: Destination.State? = nil
 
-		public struct PoolUnitDetails: Sendable, Hashable {
+		struct PoolUnitDetails: Sendable, Hashable {
 			let resource: OnLedgerEntity.Resource
 			let details: OnLedgerEntitiesClient.OwnedResourcePoolDetails
 		}
 	}
 
-	public typealias Action = FeatureAction<Self>
+	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case task
 		case unhideTapped(ResourceIdentifier)
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case loadResources([ResourceIdentifier])
 		case setFungible([OnLedgerEntity.Resource])
 		case setNonFungible([OnLedgerEntity.Resource])
@@ -34,23 +34,23 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 		case didUnhideResource(ResourceIdentifier)
 	}
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case unhideAlert(AlertState<Action.UnhideAlert>)
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case unhideAlert(UnhideAlert)
 
-			public enum UnhideAlert: Hashable, Sendable {
+			enum UnhideAlert: Hashable, Sendable {
 				case confirmTapped(ResourceIdentifier)
 				case cancelTapped
 			}
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			EmptyReducer()
 		}
 	}
@@ -59,13 +59,13 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.accountsClient) var accountsClient
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			return .run { send in
@@ -88,7 +88,7 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadResources(hiddenResources):
 			return fungibleEffect(hiddenResources: hiddenResources)
@@ -121,7 +121,7 @@ public struct HiddenAssets: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .unhideAlert(action):
 			switch action {

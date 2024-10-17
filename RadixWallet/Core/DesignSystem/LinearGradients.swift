@@ -1,13 +1,13 @@
 
 extension LinearGradient {
 	/// Namespace only
-	public struct App { fileprivate init() {} }
+	struct App { fileprivate init() {} }
 	/// Namespace containing app-specific linear gradients
-	public static let app = App()
+	static let app = App()
 }
 
 extension Gradient {
-	public init(accountNumber: UInt8) {
+	init(accountNumber: UInt8) {
 		self.init(colors: Self.colors(for: accountNumber))
 	}
 
@@ -32,7 +32,7 @@ extension Gradient {
 }
 
 extension LinearGradient.App {
-	public var brand1: LinearGradient {
+	var brand1: LinearGradient {
 		.init(
 			colors: [
 				.app.account11green,

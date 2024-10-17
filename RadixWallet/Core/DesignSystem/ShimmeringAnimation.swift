@@ -1,16 +1,16 @@
 // MARK: - ShimmerModifier
 /// A very basic horizontal shimmering animation based on the LinearGradient
-public struct ShimmerModifier: ViewModifier {
-	public struct Config {
-		public typealias Location = (start: UnitPoint, end: UnitPoint)
+struct ShimmerModifier: ViewModifier {
+	struct Config {
+		typealias Location = (start: UnitPoint, end: UnitPoint)
 
-		public let startLocation: Location
-		public let endLocation: Location
-		public let opacity: Double
-		public let gradient: Gradient
-		public let duration: Double
+		let startLocation: Location
+		let endLocation: Location
+		let opacity: Double
+		let gradient: Gradient
+		let duration: Double
 
-		public init(
+		init(
 			startLocation: Location,
 			endLocation: Location,
 			opacity: Double,
@@ -32,9 +32,9 @@ public struct ShimmerModifier: ViewModifier {
 	@State private var startPoint: UnitPoint
 	@State private var endPoint: UnitPoint
 
-	public var isActive: Bool
+	var isActive: Bool
 
-	public init(
+	init(
 		isActive: Bool,
 		config: Config
 	) {
@@ -44,7 +44,7 @@ public struct ShimmerModifier: ViewModifier {
 		self.isActive = isActive
 	}
 
-	public func body(content: Content) -> some View {
+	func body(content: Content) -> some View {
 		ZStack {
 			content
 			if isActive {
@@ -66,7 +66,7 @@ public struct ShimmerModifier: ViewModifier {
 }
 
 extension ShimmerModifier.Config {
-	public static let accountResourcesLoading = Self(
+	static let accountResourcesLoading = Self(
 		startLocation: (UnitPoint(x: -2, y: 0.5), UnitPoint.leading),
 		endLocation: (UnitPoint.trailing, UnitPoint(x: 2, y: 0.5)),
 		opacity: 0.5,
@@ -82,7 +82,7 @@ extension ShimmerModifier.Config {
 
 extension View {
 	/// Adds a basic shimmering animation to the view
-	@ViewBuilder public func shimmer(active: Bool, config: ShimmerModifier.Config) -> some View {
+	@ViewBuilder func shimmer(active: Bool, config: ShimmerModifier.Config) -> some View {
 		modifier(ShimmerModifier(isActive: active, config: config))
 	}
 }

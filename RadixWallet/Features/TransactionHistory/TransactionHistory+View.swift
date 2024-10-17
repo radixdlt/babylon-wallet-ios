@@ -10,14 +10,14 @@ extension TransactionHistory.State {
 // MARK: - TransactionHistory.View
 extension TransactionHistory {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<TransactionHistory>
 
-		public init(store: StoreOf<TransactionHistory>) {
+		init(store: StoreOf<TransactionHistory>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			NavigationStack {
 				WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 					let selection = viewStore.binding(get: \.currentMonth, send: ViewAction.selectedMonth)
@@ -127,9 +127,9 @@ private extension View {
 }
 
 // MARK: - DateRangeItem
-public struct DateRangeItem: ScrollBarItem, Sendable, Hashable, Identifiable {
-	public var id: Date { startDate }
-	public let caption: String
+struct DateRangeItem: ScrollBarItem, Sendable, Hashable, Identifiable {
+	var id: Date { startDate }
+	let caption: String
 	let startDate: Date
 	let endDate: Date
 	var range: Range<Date> { startDate ..< endDate }

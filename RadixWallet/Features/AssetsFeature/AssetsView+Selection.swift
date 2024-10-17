@@ -1,6 +1,6 @@
 extension AssetsView.State {
 	/// Computed property of currently selected assets
-	public var selectedAssets: Mode.SelectedAssets? {
+	var selectedAssets: Mode.SelectedAssets? {
 		guard case .selection = mode else { return nil }
 
 		let selectedLiquidStakeUnits = resources.stakeUnitList?.selectedLiquidStakeUnits ?? []
@@ -48,7 +48,7 @@ extension AssetsView.State {
 		)
 	}
 
-	public var chooseButtonTitle: String {
+	var chooseButtonTitle: String {
 		guard let selectedAssets else {
 			return L10n.AssetTransfer.AddAssets.buttonAssetsNone
 		}
@@ -67,17 +67,17 @@ import SwiftUI
 
 // MARK: - AssetsView.State.Mode
 extension AssetsView.State {
-	public enum Mode: Hashable, Sendable {
-		public struct SelectedAssets: Hashable, Sendable {
-			public struct NonFungibleTokensPerResource: Hashable, Sendable, Identifiable {
-				public var id: ResourceAddress {
+	enum Mode: Hashable, Sendable {
+		struct SelectedAssets: Hashable, Sendable {
+			struct NonFungibleTokensPerResource: Hashable, Sendable, Identifiable {
+				var id: ResourceAddress {
 					resource.resourceAddress
 				}
 
-				public let resource: OnLedgerEntity.OwnedNonFungibleResource
-				public var tokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>
+				let resource: OnLedgerEntity.OwnedNonFungibleResource
+				var tokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>
 
-				public init(
+				init(
 					resource: OnLedgerEntity.OwnedNonFungibleResource,
 					tokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>
 				) {
@@ -86,11 +86,11 @@ extension AssetsView.State {
 				}
 			}
 
-			public var fungibleResources: OnLedgerEntity.OwnedFungibleResources
-			public var nonFungibleResources: IdentifiedArrayOf<NonFungibleTokensPerResource>
-			public var disabledNFTs: Set<NonFungibleAssetList.Row.State.AssetID>
+			var fungibleResources: OnLedgerEntity.OwnedFungibleResources
+			var nonFungibleResources: IdentifiedArrayOf<NonFungibleTokensPerResource>
+			var disabledNFTs: Set<NonFungibleAssetList.Row.State.AssetID>
 
-			public init(
+			init(
 				fungibleResources: OnLedgerEntity.OwnedFungibleResources = .init(),
 				nonFungibleResources: IdentifiedArrayOf<NonFungibleTokensPerResource> = [],
 				disabledNFTs: Set<NonFungibleAssetList.Row.State.AssetID>
@@ -100,7 +100,7 @@ extension AssetsView.State {
 				self.disabledNFTs = disabledNFTs
 			}
 
-			public var assetsCount: Int {
+			var assetsCount: Int {
 				fungibleResources.nonXrdResources.count +
 					nonFungibleResources.map(\.tokens.count).reduce(0, +) +
 					(fungibleResources.xrdResource != nil ? 1 : 0)
@@ -110,7 +110,7 @@ extension AssetsView.State {
 		case normal
 		case selection(SelectedAssets)
 
-		public var selectedAssets: SelectedAssets? {
+		var selectedAssets: SelectedAssets? {
 			switch self {
 			case .normal:
 				nil
@@ -119,7 +119,7 @@ extension AssetsView.State {
 			}
 		}
 
-		public var isSelection: Bool {
+		var isSelection: Bool {
 			if case .selection = self {
 				return true
 			}

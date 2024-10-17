@@ -2,7 +2,7 @@ import LocalAuthentication
 
 // MARK: - LocalAuthenticationClient + DependencyKey
 extension LocalAuthenticationClient: DependencyKey {
-	public static let liveValue: Self = {
+	static let liveValue: Self = {
 		let authenticatedSuccessfully = AsyncPassthroughSubject<Void>()
 
 		return .init(
@@ -20,7 +20,7 @@ extension LocalAuthenticationClient: DependencyKey {
 
 // MARK: - LocalAuthenticationClient.Error
 extension LocalAuthenticationClient {
-	public enum Error: Swift.Error, Equatable {
+	enum Error: Swift.Error, Equatable {
 		case contextDeinitialized
 		case queryCancelled
 		case evaluationError(LAError)

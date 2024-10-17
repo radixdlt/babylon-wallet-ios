@@ -2,7 +2,7 @@ import WebRTC
 
 // MARK: - PeerConnectionClient
 /// A client that manages a given PeerConnection and its related DataChannel.
-public struct PeerConnectionClient: Sendable {
+struct PeerConnectionClient: Sendable {
 	typealias ID = PeerConnectionID
 	let id: ID
 	private let iceConnectionStateSubject: AsyncCurrentValueSubject<ICEConnectionState>

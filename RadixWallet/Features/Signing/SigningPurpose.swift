@@ -1,13 +1,13 @@
 import Foundation
 
 // MARK: - SigningPurpose
-public enum SigningPurpose: Sendable, Hashable {
+enum SigningPurpose: Sendable, Hashable {
 	case signAuth
 	case signTransaction(SignTransactionPurpose)
-	public enum SignTransactionPurpose: Sendable, Hashable {
+	enum SignTransactionPurpose: Sendable, Hashable {
 		case manifestFromDapp
 		case internalManifest(InternalTXSignPurpose)
-		public enum InternalTXSignPurpose: Sendable, Hashable {
+		enum InternalTXSignPurpose: Sendable, Hashable {
 			case transfer
 			case uploadAuthKey(forEntityKind: EntityKind)
 			#if DEBUG

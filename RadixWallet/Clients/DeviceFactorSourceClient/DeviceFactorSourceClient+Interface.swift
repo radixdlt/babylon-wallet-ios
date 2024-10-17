@@ -1,23 +1,23 @@
 import Sargon
 
 // MARK: - DeviceFactorSourceClient
-public struct DeviceFactorSourceClient: Sendable {
-	public var publicKeysFromOnDeviceHD: PublicKeysFromOnDeviceHD
-	public var signatureFromOnDeviceHD: SignatureFromOnDeviceHD
-	public var isAccountRecoveryNeeded: IsAccountRecoveryNeeded
+struct DeviceFactorSourceClient: Sendable {
+	var publicKeysFromOnDeviceHD: PublicKeysFromOnDeviceHD
+	var signatureFromOnDeviceHD: SignatureFromOnDeviceHD
+	var isAccountRecoveryNeeded: IsAccountRecoveryNeeded
 
 	// FIXME: Find a better home for this...
-	public var entitiesControlledByFactorSource: GetEntitiesControlledByFactorSource
+	var entitiesControlledByFactorSource: GetEntitiesControlledByFactorSource
 
 	/// Fetched accounts and personas on current network that are controlled by a device factor source, for every factor source in current profile
-	public var controlledEntities: GetControlledEntities
+	var controlledEntities: GetControlledEntities
 
 	/// The entities (`Accounts` & `Personas`) that are in bad state. This is, that either:
 	/// - their mnmemonic is missing (entity was imported but seed phrase never entered), or
 	/// - their mnmemonic is not backed up (entity was created but seed phrase never written down).
-	public var entitiesInBadState: EntitiesInBadState
+	var entitiesInBadState: EntitiesInBadState
 
-	public init(
+	init(
 		publicKeysFromOnDeviceHD: @escaping PublicKeysFromOnDeviceHD,
 		signatureFromOnDeviceHD: @escaping SignatureFromOnDeviceHD,
 		isAccountRecoveryNeeded: @escaping IsAccountRecoveryNeeded,
@@ -36,23 +36,23 @@ public struct DeviceFactorSourceClient: Sendable {
 
 // MARK: DeviceFactorSourceClient.onDeviceHDPublicKey
 extension DeviceFactorSourceClient {
-	public typealias GetEntitiesControlledByFactorSource = @Sendable (DeviceFactorSource, Profile?) async throws -> EntitiesControlledByFactorSource
-	public typealias GetControlledEntities = @Sendable (Profile?) async throws -> IdentifiedArrayOf<EntitiesControlledByFactorSource>
+	typealias GetEntitiesControlledByFactorSource = @Sendable (DeviceFactorSource, Profile?) async throws -> EntitiesControlledByFactorSource
+	typealias GetControlledEntities = @Sendable (Profile?) async throws -> IdentifiedArrayOf<EntitiesControlledByFactorSource>
 
-	public typealias PublicKeysFromOnDeviceHD = @Sendable (PublicKeysFromOnDeviceHDRequest) async throws -> [HierarchicalDeterministicPublicKey]
-	public typealias SignatureFromOnDeviceHD = @Sendable (SignatureFromOnDeviceHDRequest) async throws -> SignatureWithPublicKey
-	public typealias IsAccountRecoveryNeeded = @Sendable () async throws -> Bool
-	public typealias EntitiesInBadState = @Sendable () async throws -> AnyAsyncSequence<(withoutControl: AddressesOfEntitiesInBadState, unrecoverable: AddressesOfEntitiesInBadState)>
+	typealias PublicKeysFromOnDeviceHD = @Sendable (PublicKeysFromOnDeviceHDRequest) async throws -> [HierarchicalDeterministicPublicKey]
+	typealias SignatureFromOnDeviceHD = @Sendable (SignatureFromOnDeviceHDRequest) async throws -> SignatureWithPublicKey
+	typealias IsAccountRecoveryNeeded = @Sendable () async throws -> Bool
+	typealias EntitiesInBadState = @Sendable () async throws -> AnyAsyncSequence<(withoutControl: AddressesOfEntitiesInBadState, unrecoverable: AddressesOfEntitiesInBadState)>
 }
 
 // MARK: - DiscrepancyUnsupportedCurve
 struct DiscrepancyUnsupportedCurve: Swift.Error {}
 
 // MARK: - PublicKeysFromOnDeviceHDRequest
-public struct PublicKeysFromOnDeviceHDRequest: Sendable, Hashable {
-	public let derivationPaths: [DerivationPath]
+struct PublicKeysFromOnDeviceHDRequest: Sendable, Hashable {
+	let derivationPaths: [DerivationPath]
 
-	public func getMnemonicWithPassphrase() throws -> MnemonicWithPassphrase {
+	func getMnemonicWithPassphrase() throws -> MnemonicWithPassphrase {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		switch source {
 		case let .privateHDFactorSource(privateHD):
@@ -69,11 +69,11 @@ public struct PublicKeysFromOnDeviceHDRequest: Sendable, Hashable {
 		}
 	}
 
-	public enum Source: Sendable, Hashable {
+	enum Source: Sendable, Hashable {
 		case privateHDFactorSource(PrivateHierarchicalDeterministicFactorSource)
 		case loadMnemonicFor(DeviceFactorSource, purpose: SecureStorageClient.LoadMnemonicPurpose)
 
-		public var deviceFactorSource: DeviceFactorSource {
+		var deviceFactorSource: DeviceFactorSource {
 			switch self {
 			case let .loadMnemonicFor(deviceFactorSource, _):
 				deviceFactorSource
@@ -83,12 +83,12 @@ public struct PublicKeysFromOnDeviceHDRequest: Sendable, Hashable {
 		}
 	}
 
-	public let source: Source
-	public var deviceFactorSource: DeviceFactorSource {
+	let source: Source
+	var deviceFactorSource: DeviceFactorSource {
 		source.deviceFactorSource
 	}
 
-	public init(
+	init(
 		derivationPaths: [DerivationPath],
 		source: Source
 	) throws {
@@ -103,13 +103,13 @@ public struct PublicKeysFromOnDeviceHDRequest: Sendable, Hashable {
 }
 
 // MARK: - SignatureFromOnDeviceHDRequest
-public struct SignatureFromOnDeviceHDRequest: Sendable, Hashable {
-	public let mnemonicWithPassphrase: MnemonicWithPassphrase
-	public let derivationPath: DerivationPath
-	public let curve: SLIP10Curve
+struct SignatureFromOnDeviceHDRequest: Sendable, Hashable {
+	let mnemonicWithPassphrase: MnemonicWithPassphrase
+	let derivationPath: DerivationPath
+	let curve: SLIP10Curve
 
 	/// The data to sign
-	public let hashedData: Hash
+	let hashedData: Hash
 }
 
 // MARK: - FailedToFindDeviceFactorSourceForSigning
@@ -118,7 +118,7 @@ struct FailedToFindDeviceFactorSourceForSigning: Swift.Error {}
 // MARK: - IncorrectSignatureCountExpectedExactlyOne
 struct IncorrectSignatureCountExpectedExactlyOne: Swift.Error {}
 extension DeviceFactorSourceClient {
-	public func signUsingDeviceFactorSource(
+	func signUsingDeviceFactorSource(
 		signerEntity: AccountOrPersona,
 		hashedDataToSign: Hash,
 		purpose: SigningPurpose
@@ -155,7 +155,7 @@ extension DeviceFactorSourceClient {
 		}
 	}
 
-	public func signUsingDeviceFactorSource(
+	func signUsingDeviceFactorSource(
 		deviceFactorSource: DeviceFactorSource,
 		signerEntities: Set<AccountOrPersona>,
 		hashedDataToSign: Hash,
@@ -221,7 +221,7 @@ extension DeviceFactorSourceClient {
 }
 
 extension SigningPurpose {
-	public var loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose {
+	var loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose {
 		switch self {
 		case .signAuth: return .signAuthChallenge
 		case .signTransaction(.manifestFromDapp):
@@ -242,7 +242,7 @@ extension SigningPurpose {
 struct FactorInstanceDoesNotHaveADerivationPathUnableToSign: Swift.Error {}
 
 // MARK: - AddressesOfEntitiesInBadState
-public struct AddressesOfEntitiesInBadState: Sendable, Hashable {
+struct AddressesOfEntitiesInBadState: Sendable, Hashable {
 	let accounts: [AccountAddress]
 	let hiddenAccounts: [AccountAddress]
 	let personas: [IdentityAddress]

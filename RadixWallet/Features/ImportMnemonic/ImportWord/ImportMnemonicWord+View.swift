@@ -33,7 +33,7 @@ enum MnemonicValidation: Sendable, Hashable {
 }
 
 extension ImportMnemonicWord {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let isReadonlyMode: Bool
 		let index: Int
 		let displayText: String
@@ -59,15 +59,15 @@ extension ImportMnemonicWord {
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		@FocusState private var focusedField: State.Field?
 		private let store: StoreOf<ImportMnemonicWord>
 
-		public init(store: StoreOf<ImportMnemonicWord>) {
+		init(store: StoreOf<ImportMnemonicWord>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: Constants.appTextFieldSpacing) {
 					AppTextField(

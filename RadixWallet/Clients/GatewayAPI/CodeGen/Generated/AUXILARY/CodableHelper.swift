@@ -26,15 +26,15 @@ open class CodableHelper {
         return encoder
     }()
 
-    public static var dateFormatter: DateFormatter {
+    static var dateFormatter: DateFormatter {
         get { return customDateFormatter ?? defaultDateFormatter }
         set { customDateFormatter = newValue }
     }
-    public static var jsonDecoder: JSONDecoder {
+    static var jsonDecoder: JSONDecoder {
         get { return customJSONDecoder ?? defaultJSONDecoder }
         set { customJSONDecoder = newValue }
     }
-    public static var jsonEncoder: JSONEncoder {
+    static var jsonEncoder: JSONEncoder {
         get { return customJSONEncoder ?? defaultJSONEncoder }
         set { customJSONEncoder = newValue }
     }

@@ -4,14 +4,14 @@ import SwiftUI
 // MARK: - AccountsToImport.View
 extension AccountsToImport {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<AccountsToImport>
 
-		public init(store: StoreOf<AccountsToImport>) {
+		init(store: StoreOf<AccountsToImport>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				ScrollView {
 					VStack(spacing: .medium3) {
@@ -49,16 +49,16 @@ extension AccountsToImport {
 }
 
 // MARK: - AccountView
-public struct AccountView: View {
-	public typealias ViewState = ImportOlympiaWalletCoordinator.MigratableAccount
+struct AccountView: View {
+	typealias ViewState = ImportOlympiaWalletCoordinator.MigratableAccount
 
-	public let viewState: ViewState
+	let viewState: ViewState
 
-	public init(viewState: ViewState) {
+	init(viewState: ViewState) {
 		self.viewState = viewState
 	}
 
-	public var body: some View {
+	var body: some View {
 		HStack(spacing: 0) {
 			VStack(alignment: .leading, spacing: .small1) {
 				VPair(

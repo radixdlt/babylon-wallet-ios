@@ -10,7 +10,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		}
 
 		@PresentationState
-		public var destination: Destination.State?
+		var destination: Destination.State?
 	}
 
 	enum ViewAction: Sendable, Equatable {
@@ -22,9 +22,9 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		case showNextItemIfPossible
 	}
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case hud(HUD.State)
 			case sheet(SheetOverlayCoordinator.State)
 			case alert(OverlayWindowClient.Item.AlertState)
@@ -32,14 +32,14 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case hud(HUD.Action)
 			case sheet(SheetOverlayCoordinator.Action)
 			case alert(OverlayWindowClient.Item.AlertAction)
 			case fullScreen(FullScreenOverlayCoordinator.Action)
 		}
 
-		public var body: some Reducer<State, Action> {
+		var body: some Reducer<State, Action> {
 			Scope(state: \.hud, action: \.hud) {
 				HUD()
 			}

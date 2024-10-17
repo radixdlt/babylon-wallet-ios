@@ -44,13 +44,13 @@ extension ResourcesList.State {
 // MARK: - ResourcesList.View
 extension ResourcesList {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		let store: StoreOf<ResourcesList>
 		init(store: StoreOf<ResourcesList>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }) { viewStore in
 				VStack(spacing: .medium1) {
 					headerView(viewStore)

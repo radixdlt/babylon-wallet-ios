@@ -1,7 +1,7 @@
 
 extension GatewayAPIClient {
 	@Sendable
-	public func fetchEntityMetadata(_ address: String, ledgerState: GatewayAPI.LedgerState, nextCursor: String) async throws -> [GatewayAPI.EntityMetadataItem] {
+	func fetchEntityMetadata(_ address: String, ledgerState: GatewayAPI.LedgerState, nextCursor: String) async throws -> [GatewayAPI.EntityMetadataItem] {
 		try await fetchAllPaginatedItems(
 			cursor: .init(ledgerState: ledgerState, nextPageCursor: nextCursor),
 			fetchEntityMetadataPage(address)
@@ -9,7 +9,7 @@ extension GatewayAPIClient {
 	}
 
 	@Sendable
-	public func fetchAllFungibleResources(
+	func fetchAllFungibleResources(
 		_ entityDetails: GatewayAPI.StateEntityDetailsResponseItem,
 		ledgerState: GatewayAPI.LedgerState
 	) async throws -> [GatewayAPI.FungibleResourcesCollectionItem] {
@@ -31,7 +31,7 @@ extension GatewayAPIClient {
 
 	// FIXME: Similar function to the above, maybe worth extracting in a single function?
 	@Sendable
-	public func fetchAllNonFungibleResources(
+	func fetchAllNonFungibleResources(
 		_ entityDetails: GatewayAPI.StateEntityDetailsResponseItem,
 		ledgerState: GatewayAPI.LedgerState
 	) async throws -> [GatewayAPI.NonFungibleResourcesCollectionItem] {
@@ -51,7 +51,7 @@ extension GatewayAPIClient {
 		return firstPage.items + additionalItems
 	}
 
-	public func fetchFungibleResourcePage(
+	func fetchFungibleResourcePage(
 		_ entityAddress: String
 	) -> @Sendable (PageCursor?) async throws -> PaginatedResourceResponse<GatewayAPI.FungibleResourcesCollectionItem> {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
@@ -76,7 +76,7 @@ extension GatewayAPIClient {
 		}
 	}
 
-	public func getAccountLockerVaultsPage(lockerAddress: LockerAddress, accountAddress: AccountAddress) -> @Sendable (PageCursor?) async throws -> PaginatedResourceResponse<GatewayAPI.AccountLockerVaultCollectionItem> {
+	func getAccountLockerVaultsPage(lockerAddress: LockerAddress, accountAddress: AccountAddress) -> @Sendable (PageCursor?) async throws -> PaginatedResourceResponse<GatewayAPI.AccountLockerVaultCollectionItem> {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		return { pageCursor in
 			let request = GatewayAPI.StateAccountLockerPageVaultsRequest(
@@ -97,7 +97,7 @@ extension GatewayAPIClient {
 		}
 	}
 
-	public func fetchEntityMetadataPage(
+	func fetchEntityMetadataPage(
 		_ address: String
 	) -> @Sendable (PageCursor?) async throws -> PaginatedResourceResponse<GatewayAPI.EntityMetadataItem> {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
@@ -119,7 +119,7 @@ extension GatewayAPIClient {
 		}
 	}
 
-	public func fetchNonFungibleResourcePage(
+	func fetchNonFungibleResourcePage(
 		_ accountAddress: String
 	) -> @Sendable (PageCursor?) async throws -> PaginatedResourceResponse<GatewayAPI.NonFungibleResourcesCollectionItem> {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
@@ -147,7 +147,7 @@ extension GatewayAPIClient {
 		}
 	}
 
-	public func fetchEntityNonFungibleResourceIdsPage(
+	func fetchEntityNonFungibleResourceIdsPage(
 		_ accountAddress: String,
 		resourceAddress: String,
 		vaultAddress: String
@@ -178,22 +178,22 @@ extension GatewayAPIClient {
 // MARK: - Pagination
 extension GatewayAPIClient {
 	/// A page cursor is required to have the `nextPageCurosr` itself, as well the `ledgerState` of the previous page.
-	public struct PageCursor: Hashable, Sendable {
-		public let ledgerState: GatewayAPI.LedgerState
-		public let nextPageCursor: String
+	struct PageCursor: Hashable, Sendable {
+		let ledgerState: GatewayAPI.LedgerState
+		let nextPageCursor: String
 
-		public init(ledgerState: GatewayAPI.LedgerState, nextPageCursor: String) {
+		init(ledgerState: GatewayAPI.LedgerState, nextPageCursor: String) {
 			self.ledgerState = ledgerState
 			self.nextPageCursor = nextPageCursor
 		}
 	}
 
-	public struct PaginatedResourceResponse<Resource: Sendable>: Sendable {
-		public let loadedItems: [Resource]
-		public let totalCount: Int64?
-		public let cursor: PageCursor?
+	struct PaginatedResourceResponse<Resource: Sendable>: Sendable {
+		let loadedItems: [Resource]
+		let totalCount: Int64?
+		let cursor: PageCursor?
 
-		public init(loadedItems: [Resource], totalCount: Int64?, cursor: PageCursor?) {
+		init(loadedItems: [Resource], totalCount: Int64?, cursor: PageCursor?) {
 			self.loadedItems = loadedItems
 			self.totalCount = totalCount
 			self.cursor = cursor
@@ -204,7 +204,7 @@ extension GatewayAPIClient {
 	///
 	/// Provide an initial page cursor if needed to load the all the items starting with a given page
 	@Sendable
-	public func fetchAllPaginatedItems<Item>(
+	func fetchAllPaginatedItems<Item>(
 		cursor: PageCursor?,
 		_ paginatedRequest: @Sendable @escaping (_ cursor: PageCursor?) async throws -> PaginatedResourceResponse<Item>
 	) async throws -> [Item] {

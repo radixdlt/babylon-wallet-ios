@@ -3,7 +3,7 @@ import SwiftUI
 
 // MARK: - ChooseAccounts.View
 extension ChooseAccounts {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let availableAccounts: [ChooseAccountsRow.State]
 		let selectionRequirement: SelectionRequirement
 		let selectedAccounts: [ChooseAccountsRow.State]?
@@ -35,14 +35,14 @@ extension ChooseAccounts {
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
-		public let store: StoreOf<ChooseAccounts>
+	struct View: SwiftUI.View {
+		let store: StoreOf<ChooseAccounts>
 
-		public init(store: StoreOf<ChooseAccounts>) {
+		init(store: StoreOf<ChooseAccounts>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(
 				store,
 				observe: ChooseAccounts.ViewState.init,

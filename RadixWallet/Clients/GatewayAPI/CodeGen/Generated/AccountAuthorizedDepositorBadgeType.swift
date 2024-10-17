@@ -11,11 +11,11 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.AccountAuthorizedDepositorBadgeType")
-public typealias AccountAuthorizedDepositorBadgeType = GatewayAPI.AccountAuthorizedDepositorBadgeType
+typealias AccountAuthorizedDepositorBadgeType = GatewayAPI.AccountAuthorizedDepositorBadgeType
 
 extension GatewayAPI {
 
-public enum AccountAuthorizedDepositorBadgeType: String, Codable, CaseIterable {
+enum AccountAuthorizedDepositorBadgeType: String, Codable, CaseIterable {
     case resourceBadge = "ResourceBadge"
     case nonFungibleBadge = "NonFungibleBadge"
 }

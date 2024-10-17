@@ -11,29 +11,29 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.TransactionAccountDepositPreValidationAuthorizedDepositorBadge")
-public typealias TransactionAccountDepositPreValidationAuthorizedDepositorBadge = GatewayAPI.TransactionAccountDepositPreValidationAuthorizedDepositorBadge
+typealias TransactionAccountDepositPreValidationAuthorizedDepositorBadge = GatewayAPI.TransactionAccountDepositPreValidationAuthorizedDepositorBadge
 
 extension GatewayAPI {
 
-public struct TransactionAccountDepositPreValidationAuthorizedDepositorBadge: Codable, Hashable {
+struct TransactionAccountDepositPreValidationAuthorizedDepositorBadge: Codable, Hashable {
 
-    public private(set) var badgeType: AccountAuthorizedDepositorBadgeType
+    private(set) var badgeType: AccountAuthorizedDepositorBadgeType
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var resourceAddress: String
+    private(set) var resourceAddress: String
 
-    public init(badgeType: AccountAuthorizedDepositorBadgeType, resourceAddress: String) {
+    init(badgeType: AccountAuthorizedDepositorBadgeType, resourceAddress: String) {
         self.badgeType = badgeType
         self.resourceAddress = resourceAddress
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case badgeType = "badge_type"
         case resourceAddress = "resource_address"
     }
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(badgeType, forKey: .badgeType)
         try container.encode(resourceAddress, forKey: .resourceAddress)

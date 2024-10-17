@@ -11,22 +11,22 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.StateEntityDetailsResponseItem")
-public typealias StateEntityDetailsResponseItem = GatewayAPI.StateEntityDetailsResponseItem
+typealias StateEntityDetailsResponseItem = GatewayAPI.StateEntityDetailsResponseItem
 
 extension GatewayAPI {
 
-public struct StateEntityDetailsResponseItem: Codable, Hashable {
+struct StateEntityDetailsResponseItem: Codable, Hashable {
 
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var address: String
-    public private(set) var fungibleResources: FungibleResourcesCollection?
-    public private(set) var nonFungibleResources: NonFungibleResourcesCollection?
-    public private(set) var ancestorIdentities: StateEntityDetailsResponseItemAncestorIdentities?
-    public private(set) var metadata: EntityMetadataCollection
-    public private(set) var explicitMetadata: EntityMetadataCollection?
-    public private(set) var details: StateEntityDetailsResponseItemDetails?
+    private(set) var address: String
+    private(set) var fungibleResources: FungibleResourcesCollection?
+    private(set) var nonFungibleResources: NonFungibleResourcesCollection?
+    private(set) var ancestorIdentities: StateEntityDetailsResponseItemAncestorIdentities?
+    private(set) var metadata: EntityMetadataCollection
+    private(set) var explicitMetadata: EntityMetadataCollection?
+    private(set) var details: StateEntityDetailsResponseItemDetails?
 
-    public init(address: String, fungibleResources: FungibleResourcesCollection? = nil, nonFungibleResources: NonFungibleResourcesCollection? = nil, ancestorIdentities: StateEntityDetailsResponseItemAncestorIdentities? = nil, metadata: EntityMetadataCollection, explicitMetadata: EntityMetadataCollection? = nil, details: StateEntityDetailsResponseItemDetails? = nil) {
+    init(address: String, fungibleResources: FungibleResourcesCollection? = nil, nonFungibleResources: NonFungibleResourcesCollection? = nil, ancestorIdentities: StateEntityDetailsResponseItemAncestorIdentities? = nil, metadata: EntityMetadataCollection, explicitMetadata: EntityMetadataCollection? = nil, details: StateEntityDetailsResponseItemDetails? = nil) {
         self.address = address
         self.fungibleResources = fungibleResources
         self.nonFungibleResources = nonFungibleResources
@@ -36,7 +36,7 @@ public struct StateEntityDetailsResponseItem: Codable, Hashable {
         self.details = details
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case address
         case fungibleResources = "fungible_resources"
         case nonFungibleResources = "non_fungible_resources"
@@ -48,7 +48,7 @@ public struct StateEntityDetailsResponseItem: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(address, forKey: .address)
         try container.encodeIfPresent(fungibleResources, forKey: .fungibleResources)

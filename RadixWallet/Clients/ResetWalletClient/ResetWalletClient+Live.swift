@@ -1,7 +1,7 @@
 import ComposableArchitecture
 
 extension ResetWalletClient: DependencyKey {
-	public static let liveValue: Self = {
+	static let liveValue: Self = {
 		@Dependency(\.errorQueue) var errorQueue
 		@Dependency(\.appPreferencesClient) var appPreferencesClient
 		@Dependency(\.cacheClient) var cacheClient

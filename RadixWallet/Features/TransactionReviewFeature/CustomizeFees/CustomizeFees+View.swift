@@ -55,17 +55,17 @@ extension CustomizeFees.ViewState {
 }
 
 extension CustomizeFees {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let mode: TransactionFee.Mode
 		let feePayer: Account?
 		let feePayingValidation: FeePayerValidationOutcome?
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		let store: StoreOf<CustomizeFees>
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: .zero) {
 					ScrollView {

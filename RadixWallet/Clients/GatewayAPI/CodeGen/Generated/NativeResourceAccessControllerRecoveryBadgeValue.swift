@@ -11,29 +11,29 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.NativeResourceAccessControllerRecoveryBadgeValue")
-public typealias NativeResourceAccessControllerRecoveryBadgeValue = GatewayAPI.NativeResourceAccessControllerRecoveryBadgeValue
+typealias NativeResourceAccessControllerRecoveryBadgeValue = GatewayAPI.NativeResourceAccessControllerRecoveryBadgeValue
 
 extension GatewayAPI {
 
-public struct NativeResourceAccessControllerRecoveryBadgeValue: Codable, Hashable {
+struct NativeResourceAccessControllerRecoveryBadgeValue: Codable, Hashable {
 
-    public private(set) var kind: NativeResourceKind
+    private(set) var kind: NativeResourceKind
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var accessControllerAddress: String
+    private(set) var accessControllerAddress: String
 
-    public init(kind: NativeResourceKind, accessControllerAddress: String) {
+    init(kind: NativeResourceKind, accessControllerAddress: String) {
         self.kind = kind
         self.accessControllerAddress = accessControllerAddress
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case kind
         case accessControllerAddress = "access_controller_address"
     }
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(kind, forKey: .kind)
         try container.encode(accessControllerAddress, forKey: .accessControllerAddress)

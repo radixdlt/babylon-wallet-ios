@@ -2,19 +2,19 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - PersonasCoordinator
-public struct PersonasCoordinator: Sendable, FeatureReducer {
+struct PersonasCoordinator: Sendable, FeatureReducer {
 	// MARK: - State
 
-	public struct State: Sendable, Hashable {
-		public var personaList: PersonaList.State
+	struct State: Sendable, Hashable {
+		var personaList: PersonaList.State
 
 		@PresentationState
-		public var destination: Destination.State? = nil
+		var destination: Destination.State? = nil
 
 		/// Determines if the persona is first ever created across networks.
-		public var personaPrimacy: PersonaPrimacy? = nil
+		var personaPrimacy: PersonaPrimacy? = nil
 
-		public init(
+		init(
 			personaList: PersonaList.State = .init(),
 			destination: Destination.State? = nil,
 			personaPrimacy: PersonaPrimacy? = nil
@@ -27,37 +27,37 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 
 	// MARK: - Action
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case appeared
 	}
 
-	public enum InternalAction: Sendable & Equatable {
+	enum InternalAction: Sendable & Equatable {
 		case personaPrimacyDetermined(PersonaPrimacy)
 		case loadedPersonaDetails(PersonaDetails.State)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case personaList(PersonaList.Action)
 	}
 
 	// MARK: - Destination
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case createPersonaCoordinator(CreatePersonaCoordinator.State)
 			case personaDetails(PersonaDetails.State)
 			case securityCenter(SecurityCenter.State)
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case createPersonaCoordinator(CreatePersonaCoordinator.Action)
 			case personaDetails(PersonaDetails.Action)
 			case securityCenter(SecurityCenter.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: \.createPersonaCoordinator, action: \.createPersonaCoordinator) {
 				CreatePersonaCoordinator()
 			}
@@ -76,9 +76,9 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Scope(state: \.personaList, action: /Action.child .. ChildAction.personaList) {
 			PersonaList()
 		}
@@ -90,7 +90,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			.run { send in
@@ -101,7 +101,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .personaPrimacyDetermined(personaPrimacy):
 			state.personaPrimacy = personaPrimacy
@@ -113,7 +113,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .personaList(.delegate(.createNewPersona)):
 			assert(state.personaPrimacy != nil, "Should have checked 'personaPrimacy' already")
@@ -147,7 +147,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .createPersonaCoordinator(.delegate(delegateAction)):
 			switch delegateAction {

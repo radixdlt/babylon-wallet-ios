@@ -8,19 +8,19 @@ extension TransactionReviewAccounts.State {
 }
 
 extension TransactionReviewAccounts {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let showCustomizeGuaranteesButton: Bool
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<TransactionReviewAccounts>
 
-		public init(store: StoreOf<TransactionReviewAccounts>) {
+		init(store: StoreOf<TransactionReviewAccounts>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				Card {
 					VStack(spacing: .small1) {
@@ -53,7 +53,7 @@ extension TransactionReviewAccount.State {
 
 // MARK: - TransactionReviewAccount.View
 extension TransactionReviewAccount {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let account: TransactionReview.ReviewAccount
 		let transfers: [TransactionReview.Transfer] // FIXME: GK use viewstate?
 		let showApprovedMark: Bool
@@ -61,14 +61,14 @@ extension TransactionReviewAccount {
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<TransactionReviewAccount>
 
-		public init(store: StoreOf<TransactionReviewAccount>) {
+		init(store: StoreOf<TransactionReviewAccount>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				InnerCard {
 					AccountCard(account: viewStore.account)

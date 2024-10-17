@@ -2,7 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 
 extension View {
-	public func shieldPromptView(
+	func shieldPromptView(
 		text: String,
 		action onTapGesture: @escaping () -> Void
 	) -> some View {
@@ -28,14 +28,14 @@ extension View {
 		}
 	}
 
-	public func importMnemonicPromptView(action: @escaping () -> Void) -> some View {
+	func importMnemonicPromptView(action: @escaping () -> Void) -> some View {
 		shieldPromptView(
 			text: L10n.ImportMnemonic.ShieldPrompt.enterSeedPhrase,
 			action: action
 		)
 	}
 
-	public func exportMnemonicPromptView(action: @escaping () -> Void) -> some View {
+	func exportMnemonicPromptView(action: @escaping () -> Void) -> some View {
 		shieldPromptView(
 			text: L10n.ImportMnemonic.ShieldPrompt.backupSeedPhrase,
 			action: action

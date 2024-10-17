@@ -1,37 +1,37 @@
 // MARK: - RecoverWalletWithoutProfileCoordinator
 
-public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public var root: Path.State?
-		public var path: StackState<Path.State> = .init()
+struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		var root: Path.State?
+		var path: StackState<Path.State> = .init()
 
 		/// Not saved into keychain yet
-		public var factorSourceOfImportedMnemonic: PrivateHierarchicalDeterministicFactorSource?
+		var factorSourceOfImportedMnemonic: PrivateHierarchicalDeterministicFactorSource?
 
 		@PresentationState
 		var destination: Destination.State? = nil
 
-		public init() {
+		init() {
 			self.root = .init(.start(.init()))
 		}
 	}
 
-	public struct Path: Sendable, Hashable, Reducer {
-		public enum State: Sendable, Hashable {
+	struct Path: Sendable, Hashable, Reducer {
+		enum State: Sendable, Hashable {
 			case start(RecoverWalletWithoutProfileStart.State)
 			case recoverWalletControlWithBDFSOnly(RecoverWalletControlWithBDFSOnly.State)
 			case importMnemonic(ImportMnemonic.State)
 			case recoveryComplete(RecoverWalletControlWithBDFSComplete.State)
 		}
 
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case start(RecoverWalletWithoutProfileStart.Action)
 			case recoverWalletControlWithBDFSOnly(RecoverWalletControlWithBDFSOnly.Action)
 			case importMnemonic(ImportMnemonic.Action)
 			case recoveryComplete(RecoverWalletControlWithBDFSComplete.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: /State.start, action: /Action.start) {
 				RecoverWalletWithoutProfileStart()
 			}
@@ -50,32 +50,32 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public struct Destination: DestinationReducer {
-		public enum State: Hashable, Sendable {
+	struct Destination: DestinationReducer {
+		enum State: Hashable, Sendable {
 			case accountRecoveryScanCoordinator(AccountRecoveryScanCoordinator.State)
 		}
 
-		public enum Action: Equatable, Sendable {
+		enum Action: Equatable, Sendable {
 			case accountRecoveryScanCoordinator(AccountRecoveryScanCoordinator.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: /State.accountRecoveryScanCoordinator, action: /Action.accountRecoveryScanCoordinator) {
 				AccountRecoveryScanCoordinator()
 			}
 		}
 	}
 
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case root(Path.Action)
 		case path(StackActionOf<Path>)
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case createdPrivateHD(PrivateHierarchicalDeterministicFactorSource)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case dismiss
 		case backToStartOfOnboarding
 		case profileCreatedFromImportedBDFS
@@ -86,9 +86,9 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.device) var device
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.root, action: /Action.child .. ChildAction.root) {
 				Path()
@@ -103,7 +103,7 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .root(.start(.delegate(.backToStartOfOnboarding))):
 			return .send(.delegate(.backToStartOfOnboarding))
@@ -166,7 +166,7 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .createdPrivateHD(privateHD):
 			state.factorSourceOfImportedMnemonic = privateHD
@@ -175,7 +175,7 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .accountRecoveryScanCoordinator(.delegate(.completed)):
 			state.destination = nil

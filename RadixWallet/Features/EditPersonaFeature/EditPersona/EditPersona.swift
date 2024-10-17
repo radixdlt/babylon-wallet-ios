@@ -4,7 +4,7 @@ import SwiftUI
 
 // MARK: - EditPersona.Output
 extension EditPersona {
-	public struct Output: Sendable, Hashable {
+	struct Output: Sendable, Hashable {
 		let personaLabel: NonEmptyString
 
 		let name: EditPersonaName.State?
@@ -54,15 +54,15 @@ extension EditPersona {
 }
 
 // MARK: - EditPersona
-public struct EditPersona: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public enum Mode: Sendable, Hashable {
+struct EditPersona: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		enum Mode: Sendable, Hashable {
 			case create
 			case edit(Persona)
 			case dapp(persona: Persona, requiredEntries: Set<EntryKind>)
 		}
 
-		public enum StaticFieldID: Sendable, Hashable, Comparable {
+		enum StaticFieldID: Sendable, Hashable, Comparable {
 			case personaLabel
 		}
 
@@ -77,7 +77,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 			[entries.name?.kind, entries.emailAddress?.kind, entries.phoneNumber?.kind].compactMap(identity)
 		}
 
-		public init(mode: Mode) {
+		init(mode: Mode) {
 			self.mode = mode
 			self.entries = .init(with: mode.persona?.personaData ?? .init(), mode: mode)
 			self.labelField = EditPersonaStaticField.State(
@@ -91,24 +91,24 @@ public struct EditPersona: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case closeButtonTapped
 		case saveButtonTapped(Output)
 		case addAFieldButtonTapped
 
-		public enum CloseConfirmationDialogAction: Sendable, Hashable {
+		enum CloseConfirmationDialogAction: Sendable, Hashable {
 			case discardChanges
 			case keepEditing
 		}
 	}
 
 	@CasePathable
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case labelField(EditPersonaStaticField.Action)
 		case entries(EditPersonaEntries.Action)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case personaInfoSet(
 			personaName: NonEmptyString,
 			personaData: PersonaData
@@ -116,34 +116,34 @@ public struct EditPersona: Sendable, FeatureReducer {
 		case personaSaved(Persona)
 	}
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case closeConfirmationDialog(ConfirmationDialogState<ViewAction.CloseConfirmationDialogAction>)
 			case addFields(EditPersonaAddEntryKinds.State)
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case closeConfirmationDialog(ViewAction.CloseConfirmationDialogAction)
 			case addFields(EditPersonaAddEntryKinds.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: /State.addFields, action: /Action.addFields) {
 				EditPersonaAddEntryKinds()
 			}
 		}
 	}
 
-	public init() {}
+	init() {}
 
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.errorQueue) var errorQueue
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Scope(state: \.labelField, action: \.child.labelField) {
 			EditPersonaField()
 		}
@@ -158,7 +158,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
 			guard state.hasChanges() else {
@@ -210,7 +210,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .closeConfirmationDialog(.discardChanges):
 			return .run { _ in await dismiss() }

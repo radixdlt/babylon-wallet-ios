@@ -1,9 +1,9 @@
 // MARK: - EntitySecurityProblemsView
-public struct EntitySecurityProblemsView: SwiftUI.View {
+struct EntitySecurityProblemsView: SwiftUI.View {
 	let config: Config
 	let action: () -> Void
 
-	public var body: some View {
+	var body: some View {
 		if !config.problems.isEmpty {
 			VStack(alignment: .leading, spacing: .small2) {
 				ForEach(config.problems) { problem in
@@ -25,8 +25,8 @@ public struct EntitySecurityProblemsView: SwiftUI.View {
 
 // MARK: EntitySecurityProblemsView.Config
 extension EntitySecurityProblemsView {
-	public struct Config: Sendable, Hashable {
-		public enum Kind: Sendable, Hashable {
+	struct Config: Sendable, Hashable {
+		enum Kind: Sendable, Hashable {
 			case account(AccountAddress)
 			case persona(IdentityAddress)
 		}
@@ -34,12 +34,12 @@ extension EntitySecurityProblemsView {
 		let kind: Kind
 		fileprivate(set) var problems: [SecurityProblem] = []
 
-		public init(kind: Kind, problems: [SecurityProblem]) {
+		init(kind: Kind, problems: [SecurityProblem]) {
 			self.kind = kind
 			self.problems = problems.filter(kind: kind)
 		}
 
-		public mutating func update(problems: [SecurityProblem]) {
+		mutating func update(problems: [SecurityProblem]) {
 			let filtered = problems.filter(kind: kind)
 			if self.problems != filtered {
 				self.problems = filtered

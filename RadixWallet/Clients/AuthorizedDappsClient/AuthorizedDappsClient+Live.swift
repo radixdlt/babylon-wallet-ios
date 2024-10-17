@@ -1,8 +1,8 @@
 
 extension AuthorizedDappsClient: DependencyKey {
-	public typealias Value = AuthorizedDappsClient
+	typealias Value = AuthorizedDappsClient
 
-	public static func live(
+	static func live(
 		profileStore: ProfileStore = .shared
 	) -> Self {
 		Self(
@@ -48,5 +48,5 @@ extension AuthorizedDappsClient: DependencyKey {
 		)
 	}
 
-	public static let liveValue = Self.live()
+	static let liveValue = Self.live()
 }

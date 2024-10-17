@@ -2,28 +2,28 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - UserFeedback
-public struct NPSSurvey: FeatureReducer {
+struct NPSSurvey: FeatureReducer {
 	@ObservableState
-	public struct State: Hashable, Sendable {
-		public var feedbackScore: Int? = nil
-		public var feedbackReason: String = ""
-		public var isUploadingFeedback: Bool = false
+	struct State: Hashable, Sendable {
+		var feedbackScore: Int? = nil
+		var feedbackReason: String = ""
+		var isUploadingFeedback: Bool = false
 	}
 
-	public enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable, Sendable {
 		case feedbackScoreTapped(Int)
 		case feedbackReasonTextChanged(String)
 		case submitFeedbackTapped(score: Int)
 		case closeButtonTapped
 	}
 
-	public enum DelegateAction: Equatable, Sendable {
+	enum DelegateAction: Equatable, Sendable {
 		case feedbackFilled(NPSSurveyClient.UserFeedback)
 	}
 
 	@Dependency(\.dismiss) var dismiss
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .feedbackScoreTapped(score):
 			state.feedbackScore = score

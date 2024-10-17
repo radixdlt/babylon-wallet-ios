@@ -1,8 +1,8 @@
 // MARK: - GatewayAPIClient + TestDependencyKey
 extension GatewayAPIClient: TestDependencyKey {
-	public static let previewValue = Self.mock()
+	static let previewValue = Self.mock()
 
-	public static let testValue = Self(
+	static let testValue = Self(
 		getNetworkName: unimplemented("\(Self.self).getNetworkName"),
 		getEpoch: unimplemented("\(Self.self).getEpoch"),
 		getEntityDetails: unimplemented("\(Self.self).getEntityDetails"),
@@ -65,14 +65,14 @@ extension GatewayAPIClient: TestDependencyKey {
 }
 
 extension DependencyValues {
-	public var gatewayAPIClient: GatewayAPIClient {
+	var gatewayAPIClient: GatewayAPIClient {
 		get { self[GatewayAPIClient.self] }
 		set { self[GatewayAPIClient.self] = newValue }
 	}
 }
 
 extension GatewayAPI.LedgerState {
-	public static let previewValue = Self(
+	static let previewValue = Self(
 		network: "Network name",
 		stateVersion: 0,
 		proposerRoundTimestamp: "",

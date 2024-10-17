@@ -1,7 +1,7 @@
 
 // MARK: - AppPreferencesClient + DependencyKey
 extension AppPreferencesClient: DependencyKey {
-	public static func live(
+	static func live(
 		profileStore: ProfileStore = .shared
 	) -> Self {
 		Self(
@@ -32,5 +32,5 @@ extension AppPreferencesClient: DependencyKey {
 		)
 	}
 
-	public static let liveValue: Self = .live()
+	static let liveValue: Self = .live()
 }

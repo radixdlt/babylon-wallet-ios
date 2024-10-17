@@ -1,6 +1,6 @@
 
 extension DependencyValues {
-	public var importLegacyWalletClient: ImportLegacyWalletClient {
+	var importLegacyWalletClient: ImportLegacyWalletClient {
 		get { self[ImportLegacyWalletClient.self] }
 		set { self[ImportLegacyWalletClient.self] = newValue }
 	}
@@ -8,7 +8,7 @@ extension DependencyValues {
 
 // MARK: - ImportLegacyWalletClient + TestDependencyKey
 extension ImportLegacyWalletClient: TestDependencyKey {
-	public static let previewValue = Self(
+	static let previewValue = Self(
 		shouldShowImportWalletShortcutInSettings: { false },
 		parseHeaderFromQRCode: { _ in throw NoopError() },
 		parseLegacyWalletFromQRCodes: { _ in throw NoopError() },
@@ -17,7 +17,7 @@ extension ImportLegacyWalletClient: TestDependencyKey {
 		findAlreadyImportedIfAny: { _ in [] }
 	)
 
-	public static let testValue = Self(
+	static let testValue = Self(
 		shouldShowImportWalletShortcutInSettings: unimplemented("\(Self.self).shouldShowImportWalletShortcutInSettings"),
 		parseHeaderFromQRCode: unimplemented("\(Self.self).parseHeaderFromQRCode"),
 		parseLegacyWalletFromQRCodes: unimplemented("\(Self.self).parseLegacyWalletFromQRCodes"),

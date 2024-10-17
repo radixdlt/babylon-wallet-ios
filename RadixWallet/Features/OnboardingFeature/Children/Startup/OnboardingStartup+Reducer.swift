@@ -1,42 +1,42 @@
 import ComposableArchitecture
 import SwiftUI
 
-public struct OnboardingStartup: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
+struct OnboardingStartup: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
 		@PresentationState
-		public var destination: Destination.State?
+		var destination: Destination.State?
 
-		public init() {}
+		init() {}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case selectedNewWalletUser
 		case selectedRestoreFromBackup
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case setupNewUser
 		case profileCreatedFromImportedBDFS
 		case completed
 	}
 
-	public struct Destination: DestinationReducer {
-		public enum State: Sendable, Hashable {
+	struct Destination: DestinationReducer {
+		enum State: Sendable, Hashable {
 			case restoreFromBackup(RestoreProfileFromBackupCoordinator.State)
 		}
 
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case restoreFromBackup(RestoreProfileFromBackupCoordinator.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: /State.restoreFromBackup, action: /Action.restoreFromBackup) {
 				RestoreProfileFromBackupCoordinator()
 			}
 		}
 	}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -47,7 +47,7 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 
 	@Dependency(\.userDefaults) var userDefaults
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .selectedNewWalletUser:
 			return .send(.delegate(.setupNewUser))
@@ -58,7 +58,7 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .restoreFromBackup(.delegate(.profileImported)):
 			return .send(.delegate(.completed))

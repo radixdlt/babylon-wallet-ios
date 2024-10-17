@@ -1,13 +1,13 @@
 import SwiftUI
 
-public typealias ConfirmationAction = ConfirmationView.Action
+typealias ConfirmationAction = ConfirmationView.Action
 
 // MARK: - ConfirmationView
-public struct ConfirmationView: View {
+struct ConfirmationView: View {
 	let kind: Kind
 	let onAction: (Action) -> Void
 
-	public var body: some View {
+	var body: some View {
 		content
 			.withNavigationBar {
 				onAction(.cancel)
@@ -17,7 +17,7 @@ public struct ConfirmationView: View {
 			.presentationBackground(.blur)
 	}
 
-	public var content: some View {
+	var content: some View {
 		VStack(spacing: .zero) {
 			VStack(spacing: .medium2) {
 				Image(systemName: "eye.fill")
@@ -58,13 +58,13 @@ public struct ConfirmationView: View {
 }
 
 extension ConfirmationView {
-	public enum Kind: Hashable, Sendable {
+	enum Kind: Hashable, Sendable {
 		case hideAccount
 		case hideAsset
 		case hideCollection(name: String)
 	}
 
-	public enum Action: Sendable {
+	enum Action: Sendable {
 		case cancel
 		case confirm
 	}
