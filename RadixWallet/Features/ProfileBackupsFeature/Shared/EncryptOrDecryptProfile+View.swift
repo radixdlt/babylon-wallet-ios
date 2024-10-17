@@ -14,7 +14,7 @@ extension EncryptOrDecryptProfile.State {
 
 // MARK: - EncryptOrDecryptProfile.View
 extension EncryptOrDecryptProfile {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let enteredEncryptionPassword: String
 		let confirmedEncryptionPassword: String
 		let focusedField: State.Field?
@@ -79,15 +79,15 @@ extension EncryptOrDecryptProfile {
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<EncryptOrDecryptProfile>
 		@FocusState private var focusedField: State.Field?
 
-		public init(store: StoreOf<EncryptOrDecryptProfile>) {
+		init(store: StoreOf<EncryptOrDecryptProfile>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView {
 					VStack(spacing: .medium2) {

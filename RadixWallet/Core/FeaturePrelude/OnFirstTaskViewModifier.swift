@@ -18,7 +18,7 @@ struct OnFirstTaskViewModifier: ViewModifier {
 
 extension View {
 	/// Executes a given action only once, when the first `task` is fired by the system.
-	public func onFirstTask(
+	func onFirstTask(
 		priority: TaskPriority = .userInitiated,
 		_ action: @escaping @Sendable () async -> Void
 	) -> some View {

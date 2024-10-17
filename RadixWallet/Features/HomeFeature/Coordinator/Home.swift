@@ -3,26 +3,26 @@ import Sargon
 import SwiftUI
 
 // MARK: - Home
-public struct Home: Sendable, FeatureReducer {
+struct Home: Sendable, FeatureReducer {
 	private enum CancellableId: Hashable {
 		case fetchAccountPortfolios
 	}
 
-	public struct State: Sendable, Hashable {
+	struct State: Sendable, Hashable {
 		// MARK: - Components
-		public var carousel: CardCarousel.State = .init()
+		var carousel: CardCarousel.State = .init()
 
-		public var accountRows: IdentifiedArrayOf<Home.AccountRow.State> = []
+		var accountRows: IdentifiedArrayOf<Home.AccountRow.State> = []
 		fileprivate var problems: [SecurityProblem] = []
 		fileprivate var claims: ClaimsPerAccount = [:]
 
-		public var showFiatWorth: Bool = true
+		var showFiatWorth: Bool = true
 
-		public var totalFiatWorth: Loadable<FiatWorth> = .idle
+		var totalFiatWorth: Loadable<FiatWorth> = .idle
 
 		// MARK: - Destination
 		@PresentationState
-		public var destination: Destination.State? = nil {
+		var destination: Destination.State? = nil {
 			didSet {
 				guard destination == nil else { return }
 				showNextDestination()
@@ -31,9 +31,9 @@ public struct Home: Sendable, FeatureReducer {
 
 		private var destinationsQueue: [Destination.State] = []
 
-		public init() {}
+		init() {}
 
-		public mutating func addDestination(_ destination: Destination.State) {
+		mutating func addDestination(_ destination: Destination.State) {
 			if self.destination == nil {
 				self.destination = destination
 			} else {
@@ -41,13 +41,13 @@ public struct Home: Sendable, FeatureReducer {
 			}
 		}
 
-		public mutating func showNextDestination() {
+		mutating func showNextDestination() {
 			guard !destinationsQueue.isEmpty else { return }
 			destination = destinationsQueue.removeFirst()
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case onFirstAppear
 		case task
 		case onDisappear
@@ -57,7 +57,7 @@ public struct Home: Sendable, FeatureReducer {
 		case showFiatWorthToggled
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case accountsLoadedResult(TaskResult<Accounts>)
 		case currentGatewayChanged(to: Gateway)
 		case shouldShowNPSSurvey(Bool)
@@ -69,18 +69,18 @@ public struct Home: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case carousel(CardCarousel.Action)
 		case account(id: Home.AccountRow.State.ID, action: Home.AccountRow.Action)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case displaySettings
 	}
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case accountDetails(AccountDetails.State)
 			case createAccount(CreateAccountCoordinator.State)
 			case acknowledgeJailbreakAlert(AlertState<Action.AcknowledgeJailbreakAlert>)
@@ -91,7 +91,7 @@ public struct Home: Sendable, FeatureReducer {
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case accountDetails(AccountDetails.Action)
 			case createAccount(CreateAccountCoordinator.Action)
 			case acknowledgeJailbreakAlert(AcknowledgeJailbreakAlert)
@@ -100,10 +100,10 @@ public struct Home: Sendable, FeatureReducer {
 			case securityCenter(SecurityCenter.Action)
 			case p2pLinks(P2PLinksFeature.Action)
 
-			public enum AcknowledgeJailbreakAlert: Sendable, Hashable {}
+			enum AcknowledgeJailbreakAlert: Sendable, Hashable {}
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: \.accountDetails, action: \.accountDetails) {
 				AccountDetails()
 			}
@@ -141,9 +141,9 @@ public struct Home: Sendable, FeatureReducer {
 
 	private let accountPortfoliosRefreshIntervalInSeconds = 300 // 5 minutes
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Scope(state: \.carousel, action: \.child.carousel) {
 			CardCarousel()
 		}
@@ -159,7 +159,7 @@ public struct Home: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onFirstAppear:
 			if iOSSecurityClient.isJailbroken() {
@@ -218,7 +218,7 @@ public struct Home: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .accountsLoadedResult(.success(accounts)):
 			guard accounts.elements != state.accounts.elements else {
@@ -309,7 +309,7 @@ public struct Home: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .account(id, action: .delegate(delegateAction)):
 			guard let accountRow = state.accountRows[id: id] else { return .none }
@@ -331,7 +331,7 @@ public struct Home: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .accountDetails(.delegate(.dismiss)):
 			state.destination = nil
@@ -357,7 +357,7 @@ public struct Home: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
 		var effect: Effect<Action>?
 
 		switch state.destination {
@@ -374,7 +374,7 @@ public struct Home: Sendable, FeatureReducer {
 		return effect ?? .none
 	}
 
-	public func loadGateways() -> Effect<Action> {
+	func loadGateways() -> Effect<Action> {
 		.run { send in
 			for try await gateway in await gatewaysClient.currentGatewayValues() {
 				guard !Task.isCancelled else { return }
@@ -445,7 +445,7 @@ public struct Home: Sendable, FeatureReducer {
 		}
 	}
 
-	public func fetchAccountPortfolios(_ state: State) -> Effect<Action> {
+	func fetchAccountPortfolios(_ state: State) -> Effect<Action> {
 		let accountAddresses = state.accounts.map(\.address)
 		return .run { _ in
 			_ = try await accountPortfoliosClient.fetchAccountPortfolios(accountAddresses, true)
@@ -454,7 +454,7 @@ public struct Home: Sendable, FeatureReducer {
 		}
 	}
 
-	public func scheduleFetchAccountPortfoliosTimer(_ state: State) -> Effect<Action> {
+	func scheduleFetchAccountPortfoliosTimer(_ state: State) -> Effect<Action> {
 		.run { _ in
 			for await _ in clock.timer(interval: .seconds(accountPortfoliosRefreshIntervalInSeconds)) {
 				guard !Task.isCancelled else { return }
@@ -476,11 +476,11 @@ public struct Home: Sendable, FeatureReducer {
 }
 
 extension Home.State {
-	public var accounts: IdentifiedArrayOf<Account> {
+	var accounts: IdentifiedArrayOf<Account> {
 		accountRows.map(\.account).asIdentified()
 	}
 
-	public var accountAddresses: [AccountAddress] {
+	var accountAddresses: [AccountAddress] {
 		accounts.map(\.address)
 	}
 }

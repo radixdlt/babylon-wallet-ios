@@ -1,12 +1,12 @@
 // MARK: - StakeSummaryView
-public struct StakeSummaryView: View {
-	public struct ViewState: Hashable, Sendable {
-		public let staked: Loadable<ResourceAmount>
-		public let unstaking: Loadable<ResourceAmount>
-		public let readyToClaim: Loadable<ResourceAmount>
-		public let canClaimStakes: Bool
+struct StakeSummaryView: View {
+	struct ViewState: Hashable, Sendable {
+		let staked: Loadable<ResourceAmount>
+		let unstaking: Loadable<ResourceAmount>
+		let readyToClaim: Loadable<ResourceAmount>
+		let canClaimStakes: Bool
 
-		public var readyToClaimControlState: ControlState {
+		var readyToClaimControlState: ControlState {
 			if !canClaimStakes || readyToClaim.isLoading || readyToClaim.wrappedValue?.nominalAmount == .zero {
 				.disabled
 			} else {
@@ -16,10 +16,10 @@ public struct StakeSummaryView: View {
 	}
 
 	@Environment(\.resourceBalanceHideFiatValue) var resourceBalanceHideFiatValue
-	public let viewState: ViewState
-	public let onReadyToClaimTapped: () -> Void
+	let viewState: ViewState
+	let onReadyToClaimTapped: () -> Void
 
-	public var body: some View {
+	var body: some View {
 		VStack(alignment: .leading, spacing: .medium3) {
 			HStack(spacing: .small2) {
 				Image(asset: AssetResource.stakes)

@@ -2,20 +2,20 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - ScanQRCoordinator
-public struct ScanQRCoordinator: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public enum Step: Sendable, Hashable {
+struct ScanQRCoordinator: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		enum Step: Sendable, Hashable {
 			case cameraPermission(CameraPermission.State)
 			case scanQR(ScanQR.State)
 
-			public init() {
+			init() {
 				self = .cameraPermission(.init())
 			}
 		}
 
-		public var step: Step
-		public let kind: ScanQR.Kind
-		public init(
+		var step: Step
+		let kind: ScanQR.Kind
+		init(
 			kind: ScanQR.Kind,
 			step: Step = .init()
 		) {
@@ -24,24 +24,24 @@ public struct ScanQRCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case proceedWithScan
 	}
 
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case cameraPermission(CameraPermission.Action)
 		case scanQR(ScanQR.Action)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case dismiss
 		case scanned(String)
 	}
 
 	@Dependency(\.continuousClock) var clock
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Scope(state: \.step, action: /.self) {
 			Scope(state: /State.Step.cameraPermission, action: /Action.child .. ChildAction.cameraPermission) {
 				CameraPermission()
@@ -54,7 +54,7 @@ public struct ScanQRCoordinator: Sendable, FeatureReducer {
 		Reduce(core)
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case .proceedWithScan:
 			state.step = .scanQR(.init(kind: state.kind))
@@ -62,7 +62,7 @@ public struct ScanQRCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .cameraPermission(.delegate(.permissionResponse(allowed))):
 			if allowed {

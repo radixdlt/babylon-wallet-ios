@@ -31,7 +31,7 @@ extension LSUDetails.State {
 }
 
 extension LSUDetails {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let containerWithHeader: DetailsContainerWithHeaderViewState
 		let thumbnailURL: URL?
 
@@ -40,14 +40,14 @@ extension LSUDetails {
 		let resourceDetails: AssetResourceDetailsSection.ViewState
 	}
 
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<LSUDetails>
 
-		public init(store: StoreOf<LSUDetails>) {
+		init(store: StoreOf<LSUDetails>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(
 				store,
 				observe: \.viewState,

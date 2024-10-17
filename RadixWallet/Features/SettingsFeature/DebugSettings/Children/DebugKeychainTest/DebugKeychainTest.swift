@@ -4,8 +4,8 @@ import SwiftUI
 #if DEBUG
 
 // MARK: - DebugKeychainTest
-public struct DebugKeychainTest: Sendable, FeatureReducer {
-	public enum Status: Sendable, Hashable {
+struct DebugKeychainTest: Sendable, FeatureReducer {
+	enum Status: Sendable, Hashable {
 		case new
 		case initializing
 		case initialized
@@ -16,20 +16,20 @@ public struct DebugKeychainTest: Sendable, FeatureReducer {
 		case finishedSuccessfully
 	}
 
-	public struct State: Sendable, Hashable {
-		public var status: Status = .new
+	struct State: Sendable, Hashable {
+		var status: Status = .new
 		var containsDataForAuth: Bool = false
 		var containsDataForNoAuth: Bool = false
 		var serviceAndAccessGroup: KeychainClient.KeychainServiceAndAccessGroup?
-		public init() {}
+		init() {}
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case statusChanged(Status)
 		case containsResult(contains: Bool, key: KeychainClient.Key)
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case appeared
 		case testAuth
 		case testNoAuth
@@ -38,9 +38,9 @@ public struct DebugKeychainTest: Sendable, FeatureReducer {
 
 	@Dependency(\.keychainClient) var keychainClient
 
-	public init() {}
+	init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			state.serviceAndAccessGroup = keychainClient.serviceAndAccessGroup()
@@ -95,7 +95,7 @@ public struct DebugKeychainTest: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .statusChanged(newStatus):
 			state.status = newStatus
@@ -169,7 +169,7 @@ extension KeychainClient {
 	}
 }
 
-public func valuesFromManyTasks<T: Hashable & Sendable>(
+func valuesFromManyTasks<T: Hashable & Sendable>(
 	task: @Sendable @escaping () async throws -> T
 ) async throws -> Set<T> {
 	let t0 = Task {
@@ -243,7 +243,7 @@ public func valuesFromManyTasks<T: Hashable & Sendable>(
 }
 
 extension Data {
-	public static func randomKeychainDemo() -> Self {
+	static func randomKeychainDemo() -> Self {
 		try! .random(byteCount: 16)
 	}
 }

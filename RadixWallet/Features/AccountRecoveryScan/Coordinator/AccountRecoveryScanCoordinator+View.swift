@@ -1,14 +1,14 @@
 // MARK: - AccountRecoveryScanCoordinator.View
-public extension AccountRecoveryScanCoordinator {
+extension AccountRecoveryScanCoordinator {
 	@MainActor
 	struct View: SwiftUI.View {
 		private let store: StoreOf<AccountRecoveryScanCoordinator>
 
-		public init(store: StoreOf<AccountRecoveryScanCoordinator>) {
+		init(store: StoreOf<AccountRecoveryScanCoordinator>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			SwitchStore(store.scope(state: \.root, action: Action.child)) { state in
 				switch state {
 				case .accountRecoveryScanInProgress:

@@ -3,8 +3,8 @@ import Sargon
 import SwiftUI
 
 // MARK: - GatewaySettings
-public struct GatewaySettings: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
+struct GatewaySettings: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
 		var gatewayList: GatewayList.State
 		var currentGateway: Gateway?
 		var validatedNewGatewayToSwitchTo: Gateway?
@@ -13,7 +13,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		@PresentationState
 		var destination: Destination.State?
 
-		public init(
+		init(
 			gatewayList: GatewayList.State = .init(gateways: [])
 		) {
 			self.gatewayList = gatewayList
@@ -21,12 +21,12 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case task
 		case addGatewayButtonTapped
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case savedGatewaysLoadedResult(TaskResult<SavedGateways>)
 		case hasAccountsResult(TaskResult<Bool>)
 		case createAccountOnNetworkBeforeSwitchingToIt(Gateway)
@@ -34,31 +34,31 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case gatewayList(GatewayList.Action)
 	}
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case addNewGateway(AddNewGateway.State)
 			case createAccount(CreateAccountCoordinator.State)
 			case removeGateway(AlertState<Action.RemoveGatewayAlert>)
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case addNewGateway(AddNewGateway.Action)
 			case createAccount(CreateAccountCoordinator.Action)
 			case removeGateway(RemoveGatewayAlert)
 
-			public enum RemoveGatewayAlert: Sendable, Hashable {
+			enum RemoveGatewayAlert: Sendable, Hashable {
 				case removeButtonTapped(GatewayRow.State)
 				case cancelButtonTapped
 			}
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: \.addNewGateway, action: \.addNewGateway) {
 				AddNewGateway()
 			}
@@ -68,9 +68,9 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum Error: String, LocalizedError, Sendable, Hashable {
+	enum Error: String, LocalizedError, Sendable, Hashable {
 		case errorRemovingGateway
-		public var errorDescription: String? {
+		var errorDescription: String? {
 			switch self {
 			case .errorRemovingGateway: "Error removing gateway"
 			}
@@ -82,9 +82,9 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.continuousClock) var clock
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Scope(state: \.gatewayList, action: \.child.gatewayList) {
 			GatewayList()
 		}
@@ -95,7 +95,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			return .run { send in
@@ -113,7 +113,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .savedGatewaysLoadedResult(.success(savedGateways)):
 
@@ -184,7 +184,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .gatewayList(.delegate(action)):
 			switch action {
@@ -201,7 +201,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .createAccount(.delegate(.dismissed)):
 			return skipSwitching(&state)

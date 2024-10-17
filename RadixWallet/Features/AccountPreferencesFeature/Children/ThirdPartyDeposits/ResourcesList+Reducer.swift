@@ -3,20 +3,20 @@ import Sargon
 import SwiftUI
 
 // MARK: - ResourcesListMode
-public enum ResourcesListMode: Hashable, Sendable {
-	public typealias ExceptionRule = DepositAddressExceptionRule
+enum ResourcesListMode: Hashable, Sendable {
+	typealias ExceptionRule = DepositAddressExceptionRule
 	case allowDenyAssets(ExceptionRule)
 	case allowDepositors
 }
 
 // MARK: - ResourceViewState
-public struct ResourceViewState: Hashable, Sendable, Identifiable {
-	public enum Address: Hashable, Sendable {
+struct ResourceViewState: Hashable, Sendable, Identifiable {
+	enum Address: Hashable, Sendable {
 		case assetException(AssetException)
 		case allowedDepositor(ResourceOrNonFungible)
 	}
 
-	public var id: Address { address }
+	var id: Address { address }
 
 	let iconURL: URL?
 	let name: String?
@@ -24,10 +24,10 @@ public struct ResourceViewState: Hashable, Sendable, Identifiable {
 }
 
 // MARK: - ResourcesList
-public struct ResourcesList: FeatureReducer, Sendable {
+struct ResourcesList: FeatureReducer, Sendable {
 	// MARK: State
 
-	public struct State: Hashable, Sendable {
+	struct State: Hashable, Sendable {
 		let canModify: Bool
 		var mode: ResourcesListMode
 		var thirdPartyDeposits: ThirdPartyDeposits
@@ -49,43 +49,43 @@ public struct ResourcesList: FeatureReducer, Sendable {
 
 	// MARK: Action
 
-	public enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable, Sendable {
 		case task
 		case addAssetTapped
 		case assetRemove(ResourceViewState.Address)
 		case exceptionListChanged(DepositAddressExceptionRule)
 	}
 
-	public enum DelegateAction: Equatable, Sendable {
+	enum DelegateAction: Equatable, Sendable {
 		case updated(ThirdPartyDeposits)
 	}
 
-	public enum InternalAction: Equatable, Sendable {
+	enum InternalAction: Equatable, Sendable {
 		case resourceLoaded(OnLedgerEntity.Resource?, ResourceViewState.Address)
 		case resourcesLoaded([OnLedgerEntity.Resource]?)
 	}
 
 	// MARK: Destination
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Hashable, Sendable {
+		enum State: Hashable, Sendable {
 			case addAsset(AddAsset.State)
 			case confirmAssetDeletion(AlertState<Action.ConfirmDeletionAlert>)
 		}
 
 		@CasePathable
-		public enum Action: Equatable, Sendable {
+		enum Action: Equatable, Sendable {
 			case addAsset(AddAsset.Action)
 			case confirmAssetDeletion(ConfirmDeletionAlert)
 
-			public enum ConfirmDeletionAlert: Hashable, Sendable {
+			enum ConfirmDeletionAlert: Hashable, Sendable {
 				case confirmTapped(ResourceViewState.Address)
 				case cancelTapped
 			}
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: \.addAsset, action: \.addAsset) {
 				AddAsset()
 			}
@@ -96,7 +96,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: \.destination) {
 				Destination()
@@ -105,7 +105,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			let addresses: [ResourceAddress] = state.allDepositorAddresses.map(\.resourceAddress)
@@ -136,7 +136,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .resourceLoaded(resource, newAsset):
 			state.loadedResources.append(.init(iconURL: resource?.metadata.iconURL, name: resource?.metadata.title, address: newAsset))
@@ -170,7 +170,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .addAsset(.delegate(.addAddress(mode, newAsset))):
 			state.mode = mode

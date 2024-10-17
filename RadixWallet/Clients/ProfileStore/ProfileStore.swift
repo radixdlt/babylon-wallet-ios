@@ -15,7 +15,7 @@ import Sargon
 /// data races, however, it is not a "client" (TCA Dependency), rather it should be used by clients,
 /// and only by clients, not by Reducers directly, since it is quite low level.
 ///
-/// This "public interface" (method meant to be used by the clients) is:
+/// This "interface" (method meant to be used by the clients) is:
 ///
 /// 	var profile: Profile { get }
 ///		func values() -> AnyAsyncSequence<Profile>
@@ -46,11 +46,11 @@ import Sargon
 ///
 /// And similar async sequences.
 ///
-public final actor ProfileStore {
+final actor ProfileStore {
 	@Dependency(\.secureStorageClient) var secureStorageClient
 	@Dependency(\.userDefaults) var userDefaults
 
-	public static let shared = ProfileStore()
+	static let shared = ProfileStore()
 
 	/// Holds an in-memory copy of the Profile, the source of truth is Keychain.
 	private let profileSubject: AsyncCurrentValueSubject<Profile>
@@ -72,7 +72,7 @@ public final actor ProfileStore {
 // MARK: Public
 extension ProfileStore {
 	/// The current value of Profile. Use `updating` method to update it. Also see `values` for an AsyncSequence of Profile.
-	public var profile: Profile {
+	var profile: Profile {
 		profileSubject.value
 	}
 
@@ -80,7 +80,7 @@ extension ProfileStore {
 	/// snapshot of it profile into Keychain (after having updated its header)
 	/// - Parameter transform: A mutating transform updating the profile.
 	/// - Returns: The result of the transform, often this might be `Void`.
-	public func updating<T: Sendable>(
+	func updating<T: Sendable>(
 		_ transform: @Sendable (inout Profile) async throws -> T
 	) async throws -> T {
 		var updated = profile
@@ -91,7 +91,7 @@ extension ProfileStore {
 
 	/// Update Profile, by updating the current network
 	/// - Parameter update: A mutating update to perform on the profiles's active network
-	public func updatingOnCurrentNetwork(_ update: @Sendable (inout ProfileNetwork) async throws -> Void) async throws {
+	func updatingOnCurrentNetwork(_ update: @Sendable (inout ProfileNetwork) async throws -> Void) async throws {
 		try await updating { profile in
 			var network = try await network()
 			try await update(&network)
@@ -105,7 +105,7 @@ extension ProfileStore {
 	///
 	/// NB: The profile should be claimed locally before calling this function
 	/// - Parameter profile: Imported Profile to use and save.
-	public func importProfile(_ profileToImport: Profile) throws {
+	func importProfile(_ profileToImport: Profile) throws {
 		// The software design of ProfileStore is to always have a profile at end
 		// of `ProfileStore.init`, which happens upon app launch since `ProfileStore`
 		// is a GlobalActor (`static let shared = ProfileStore`), this means that
@@ -144,7 +144,7 @@ extension ProfileStore {
 		}
 	}
 
-	public func deleteProfile(
+	func deleteProfile(
 		keepInICloudIfPresent: Bool
 	) throws {
 		try _deleteProfile(
@@ -153,11 +153,11 @@ extension ProfileStore {
 		)
 	}
 
-	public func finishedOnboarding() async {
+	func finishedOnboarding() async {
 		await updateDeviceInfo()
 	}
 
-	public func finishOnboarding(
+	func finishOnboarding(
 		with accountsRecoveredFromScanningUsingMnemonic: AccountsRecoveredFromScanningUsingMnemonic
 	) async throws {
 		@Dependency(\.uuid) var uuid
@@ -211,13 +211,13 @@ extension ProfileStore {
 		try importProfile(profile)
 	}
 
-	public func isThisDevice(deviceID: DeviceID) -> Bool {
+	func isThisDevice(deviceID: DeviceID) -> Bool {
 		deviceID == deviceInfo.id
 	}
 }
 
 extension DeviceInfo {
-	public static func deviceDescription(
+	static func deviceDescription(
 		name: String,
 		model: String
 	) -> String {
@@ -227,7 +227,7 @@ extension DeviceInfo {
 
 // MARK: - ProfileStore.Error
 extension ProfileStore {
-	public enum Error: String, Swift.Error, Equatable {
+	enum Error: String, Swift.Error, Equatable {
 		case profileIDMismatch
 		case profileUsedOnAnotherDevice
 	}
@@ -312,7 +312,7 @@ extension ProfileStore {
 extension ProfileStore {
 	/// Updates the `lastUsedOnDevice` to use this device, on `profile`
 	/// - Parameter profile: Profile to update `lastUsedOnDevice` of
-	public func claimOwnership(of profile: inout Profile) {
+	func claimOwnership(of profile: inout Profile) {
 		@Dependency(\.date) var date
 		profile.header.lastUsedOnDevice = deviceInfo
 		profile.header.lastUsedOnDevice.date = date()

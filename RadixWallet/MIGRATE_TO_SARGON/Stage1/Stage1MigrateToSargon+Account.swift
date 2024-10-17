@@ -9,19 +9,19 @@ extension Account: Comparable {
 }
 
 extension Account {
-	public static let nameMaxLength = 30
+	static let nameMaxLength = 30
 
-	public var derivationIndex: HDPathValue {
+	var derivationIndex: HDPathValue {
 		switch securityState {
 		case let .unsecured(uec): uec.transactionSigning.derivationPath.nonHardenedIndex
 		}
 	}
 
-	public var isLegacy: Bool {
+	var isLegacy: Bool {
 		address.isLegacy
 	}
 
-	public var isLedgerControlled: Bool {
+	var isLedgerControlled: Bool {
 		switch self.securityState {
 		case let .unsecured(control):
 			control.transactionSigning.factorSourceID.kind == .ledgerHqHardwareWallet
@@ -30,35 +30,35 @@ extension Account {
 }
 
 extension Account {
-	public var accountAddress: AccountAddress {
+	var accountAddress: AccountAddress {
 		address
 	}
 
-	public mutating func hide() {
+	mutating func hide() {
 		flags.append(.deletedByUser)
 	}
 
-	public mutating func unhide() {
+	mutating func unhide() {
 		entityFlags.remove(.deletedByUser)
 	}
 }
 
 extension Accounts {
-	public var nonHidden: Accounts {
+	var nonHidden: Accounts {
 		filter(not(\.isHidden))
 	}
 
-	public var hidden: Accounts {
+	var hidden: Accounts {
 		filter(\.isHidden)
 	}
 }
 
 extension [Account] {
-	public var nonHidden: Accounts {
+	var nonHidden: Accounts {
 		asIdentified().nonHidden
 	}
 
-	public var hidden: Accounts {
+	var hidden: Accounts {
 		asIdentified().hidden
 	}
 }

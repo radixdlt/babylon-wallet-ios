@@ -1,6 +1,6 @@
 
 extension DependencyValues {
-	public var onboardingClient: OnboardingClient {
+	var onboardingClient: OnboardingClient {
 		get { self[OnboardingClient.self] }
 		set { self[OnboardingClient.self] = newValue }
 	}
@@ -8,15 +8,15 @@ extension DependencyValues {
 
 // MARK: - OnboardingClient + TestDependencyKey
 extension OnboardingClient: TestDependencyKey {
-	public static let previewValue = Self.noop
+	static let previewValue = Self.noop
 
-	public static let testValue = Self(
+	static let testValue = Self(
 		loadProfile: unimplemented("\(Self.self).loadProfile"),
 		finishOnboarding: unimplemented("\(Self.self).finishOnboarding"),
 		finishOnboardingWithRecoveredAccountAndBDFS: unimplemented("\(Self.self).finishOnboardingWithRecoveredAccountAndBDFS")
 	)
 
-	public static let noop = Self(
+	static let noop = Self(
 		loadProfile: { fatalError("noop") },
 		finishOnboarding: { EqVoid.instance },
 		finishOnboardingWithRecoveredAccountAndBDFS: { _ in EqVoid.instance }

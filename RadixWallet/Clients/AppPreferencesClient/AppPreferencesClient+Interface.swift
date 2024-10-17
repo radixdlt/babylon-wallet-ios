@@ -1,18 +1,18 @@
 // MARK: - AppPreferencesClient
-public struct AppPreferencesClient: Sendable {
-	public var appPreferenceUpdates: AppPreferenceUpdates
-	public var getPreferences: GetPreferences
-	public var updatePreferences: UpdatePreferences
+struct AppPreferencesClient: Sendable {
+	var appPreferenceUpdates: AppPreferenceUpdates
+	var getPreferences: GetPreferences
+	var updatePreferences: UpdatePreferences
 
 	/// Sets the flag on the profile, does not delete old backups
-	public var setIsCloudBackupEnabled: SetIsCloudBackupEnabled
+	var setIsCloudBackupEnabled: SetIsCloudBackupEnabled
 
 	// FIXME: find a better home for this...? Should we have some actual `ProfileSnapshotClient`
 	// for this and `delete` method?
-	public var extractProfile: ExtractProfile
-	public var deleteProfileAndFactorSources: DeleteProfile
+	var extractProfile: ExtractProfile
+	var deleteProfileAndFactorSources: DeleteProfile
 
-	public init(
+	init(
 		appPreferenceUpdates: @escaping AppPreferenceUpdates,
 		getPreferences: @escaping GetPreferences,
 		updatePreferences: @escaping UpdatePreferences,
@@ -31,12 +31,12 @@ public struct AppPreferencesClient: Sendable {
 
 // MARK: - Typealias
 extension AppPreferencesClient {
-	public typealias AppPreferenceUpdates = @Sendable () async -> AnyAsyncSequence<AppPreferences>
-	public typealias SetIsCloudBackupEnabled = @Sendable (Bool) async throws -> Void
-	public typealias GetPreferences = @Sendable () async -> AppPreferences
-	public typealias UpdatePreferences = @Sendable (AppPreferences) async throws -> Void
-	public typealias ExtractProfile = @Sendable () async -> Profile
-	public typealias DeleteProfile = @Sendable (_ keepInICloudIfPresent: Bool) async throws -> Void
+	typealias AppPreferenceUpdates = @Sendable () async -> AnyAsyncSequence<AppPreferences>
+	typealias SetIsCloudBackupEnabled = @Sendable (Bool) async throws -> Void
+	typealias GetPreferences = @Sendable () async -> AppPreferences
+	typealias UpdatePreferences = @Sendable (AppPreferences) async throws -> Void
+	typealias ExtractProfile = @Sendable () async -> Profile
+	typealias DeleteProfile = @Sendable (_ keepInICloudIfPresent: Bool) async throws -> Void
 }
 
 extension AppPreferencesClient {
@@ -44,7 +44,7 @@ extension AppPreferencesClient {
 	///      var copy = try await getPreferences()
 	///      try await mutatePreferences(&copy)
 	///      try await updatePreferences(copy)
-	public func updating<T>(
+	func updating<T>(
 		_ mutatePreferences: @Sendable (inout AppPreferences) throws -> T
 	) async throws -> T {
 		var copy = await getPreferences()
@@ -53,7 +53,7 @@ extension AppPreferencesClient {
 		return result // in many cases `Void`.
 	}
 
-	public func updatingDisplay<T>(
+	func updatingDisplay<T>(
 		_ mutateDisplay: @Sendable (inout AppDisplay) throws -> T
 	) async throws -> T {
 		try await updating { preferences in
@@ -61,11 +61,11 @@ extension AppPreferencesClient {
 		}
 	}
 
-	public func isDeveloperModeEnabled() async -> Bool {
+	func isDeveloperModeEnabled() async -> Bool {
 		await extractProfile().appPreferences.security.isDeveloperModeEnabled
 	}
 
-	public func toggleIsCurrencyAmountVisible() async throws {
+	func toggleIsCurrencyAmountVisible() async throws {
 		try await updatingDisplay { display in
 			display.isCurrencyAmountVisible.toggle()
 		}
@@ -74,14 +74,14 @@ extension AppPreferencesClient {
 
 // MARK: AppPreferencesClient.Error
 extension AppPreferencesClient {
-	public enum Error: Swift.Error, LocalizedError {
+	enum Error: Swift.Error, LocalizedError {
 		case loadFailed(reason: String)
 		case saveFailed(reason: String)
 	}
 }
 
 extension DependencyValues {
-	public var appPreferencesClient: AppPreferencesClient {
+	var appPreferencesClient: AppPreferencesClient {
 		get { self[AppPreferencesClient.self] }
 		set { self[AppPreferencesClient.self] = newValue }
 	}

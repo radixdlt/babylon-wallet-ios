@@ -3,11 +3,11 @@ struct FailedToFindFactorSource: Swift.Error {}
 
 // MARK: - DeviceFactorSourceClient + DependencyKey
 extension DeviceFactorSourceClient: DependencyKey {
-	public typealias Value = Self
+	typealias Value = Self
 
-	public static let liveValue: Self = .liveValue()
+	static let liveValue: Self = .liveValue()
 
-	public static func liveValue(profileStore: ProfileStore = .shared) -> DeviceFactorSourceClient {
+	static func liveValue(profileStore: ProfileStore = .shared) -> DeviceFactorSourceClient {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.accountsClient) var accountsClient
 		@Dependency(\.personasClient) var personasClient

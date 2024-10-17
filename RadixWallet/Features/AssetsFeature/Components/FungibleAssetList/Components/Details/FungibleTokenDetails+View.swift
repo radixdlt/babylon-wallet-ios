@@ -40,21 +40,21 @@ extension FungibleTokenDetails.State {
 
 // MARK: - FungibleTokenDetails.View
 extension FungibleTokenDetails {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let detailsHeader: DetailsContainerWithHeaderViewState
 		let thumbnail: Loadable<Thumbnail.TokenContent>
 		let details: AssetResourceDetailsSection.ViewState
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<FungibleTokenDetails>
 
-		public init(store: StoreOf<FungibleTokenDetails>) {
+		init(store: StoreOf<FungibleTokenDetails>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				DetailsContainerWithHeaderView(viewState: viewStore.detailsHeader) {
 					viewStore.send(.closeButtonTapped)

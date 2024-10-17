@@ -1,8 +1,8 @@
 
 extension TransactionHistoryClient {
-	public static let liveValue = TransactionHistoryClient.live()
+	static let liveValue = TransactionHistoryClient.live()
 
-	public static func live() -> Self {
+	static func live() -> Self {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 

@@ -1,6 +1,6 @@
 
 extension DependencyValues {
-	public var personasClient: PersonasClient {
+	var personasClient: PersonasClient {
 		get { self[PersonasClient.self] }
 		set { self[PersonasClient.self] = newValue }
 	}
@@ -8,8 +8,8 @@ extension DependencyValues {
 
 // MARK: - PersonasClient + TestDependencyKey
 extension PersonasClient: TestDependencyKey {
-	public static let previewValue = Self.noop
-	public static let testValue = Self(
+	static let previewValue = Self.noop
+	static let testValue = Self(
 		personas: unimplemented("\(Self.self).personas"),
 		getPersonas: unimplemented("\(Self.self).getPersonas"),
 		getPersonasOnNetwork: unimplemented("\(Self.self).getPersonasOnNetwork"),
@@ -19,7 +19,7 @@ extension PersonasClient: TestDependencyKey {
 		hasSomePersonaOnAnyNetwork: unimplemented("\(Self.self).hasAnyPersonaOnAnyNetwork"),
 		hasSomePersonaOnCurrentNetwork: unimplemented("\(Self.self).hasAnyPersonaOnCurrentNetwork")
 	)
-	public static let noop = Self(
+	static let noop = Self(
 		personas: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		getPersonas: { .init() },
 		getPersonasOnNetwork: { _ in .init() },

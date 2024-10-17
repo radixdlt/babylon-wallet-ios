@@ -1,10 +1,10 @@
 // MARK: - FlowLayout
-public struct FlowLayout: Layout {
-	public let alignment: VerticalAlignment
-	public let spacing: CGSize
-	public let multilineAlignment: HorizontalAlignment
+struct FlowLayout: Layout {
+	let alignment: VerticalAlignment
+	let spacing: CGSize
+	let multilineAlignment: HorizontalAlignment
 
-	public init(
+	init(
 		alignment: VerticalAlignment = .center,
 		multilineAlignment: HorizontalAlignment = .leading,
 		spacing: CGFloat = 10
@@ -12,7 +12,7 @@ public struct FlowLayout: Layout {
 		self.init(alignment: alignment, multilineAlignment: multilineAlignment, spacing: .init(width: spacing, height: spacing))
 	}
 
-	public init(
+	init(
 		alignment: VerticalAlignment = .center,
 		multilineAlignment: HorizontalAlignment = .leading,
 		spacing: CGSize
@@ -22,7 +22,7 @@ public struct FlowLayout: Layout {
 		self.spacing = spacing
 	}
 
-	public func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+	func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
 		let containerWidth = proposal.replacingUnspecifiedDimensions().width
 		let dimensions = subviews.map { $0.dimensions(in: .unspecified) }
 
@@ -36,7 +36,7 @@ public struct FlowLayout: Layout {
 		return .init(width: containerWidth, height: laidOutSize.height)
 	}
 
-	public func placeSubviews(
+	func placeSubviews(
 		in bounds: CGRect,
 		proposal: ProposedViewSize,
 		subviews: Subviews,
@@ -108,7 +108,7 @@ public struct FlowLayout: Layout {
 }
 
 extension Sequence<CGRect> {
-	public var union: CGRect {
+	var union: CGRect {
 		reduce(.null) { $0.union($1) }
 	}
 }

@@ -1,9 +1,9 @@
 // MARK: - URLFormatterClient + DependencyKey
 
 extension URLFormatterClient: DependencyKey {
-	public static let liveValue = Self.live()
+	static let liveValue = Self.live()
 
-	public static func live(
+	static func live(
 		url imageServiceURL: URL = defaultImageServiceURL
 	) -> Self {
 		Self(
@@ -17,9 +17,9 @@ extension URLFormatterClient: DependencyKey {
 	}
 
 	#if DEBUG
-	public static let defaultImageServiceURL = URL(string: "https://image-service-dev.extratools.works")!
+	static let defaultImageServiceURL = URL(string: "https://image-service-dev.extratools.works")!
 	#else
-	public static let defaultImageServiceURL = URL(string: "https://image-service.radixdlt.com")!
+	static let defaultImageServiceURL = URL(string: "https://image-service.radixdlt.com")!
 	#endif
 
 	private static let maxFlexibleSize = CGSize(width: 1024, height: 1024)

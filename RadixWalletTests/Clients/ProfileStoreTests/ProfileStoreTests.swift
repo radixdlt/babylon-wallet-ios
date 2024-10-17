@@ -5,7 +5,7 @@ import XCTest
 
 // swiftformat:disable redundantInit
 extension Mnemonic {
-	public static let testValue = Self.testValueZooVote
+	static let testValue = Self.testValueZooVote
 }
 
 extension Profile {

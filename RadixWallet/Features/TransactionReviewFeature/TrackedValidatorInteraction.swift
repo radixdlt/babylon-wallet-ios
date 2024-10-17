@@ -1,7 +1,7 @@
 import Foundation
 
 // MARK: - TrackedValidatorInteraction
-public protocol TrackedValidatorInteraction {
+protocol TrackedValidatorInteraction {
 	var validatorAddress: ValidatorAddress { get }
 	var liquidStakeUnitAddress: ResourceAddress { get }
 	var liquidStakeUnitAmount: Decimal192 { get set }
@@ -9,7 +9,7 @@ public protocol TrackedValidatorInteraction {
 }
 
 extension Collection where Element: TrackedValidatorInteraction {
-	public var aggregated: [Element] {
+	var aggregated: [Element] {
 		var result: [Element] = []
 		for stake in self {
 			// Make sure no contribution is empty
@@ -26,7 +26,7 @@ extension Collection where Element: TrackedValidatorInteraction {
 
 // MARK: - TrackedValidatorStake + TrackedValidatorInteraction
 extension TrackedValidatorStake: TrackedValidatorInteraction {
-	public mutating func add(_ other: Self) {
+	mutating func add(_ other: Self) {
 		guard isCompatible(with: other) else { return }
 		xrdAmount += other.xrdAmount
 		liquidStakeUnitAmount += other.liquidStakeUnitAmount

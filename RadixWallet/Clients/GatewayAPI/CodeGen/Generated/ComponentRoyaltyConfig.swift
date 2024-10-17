@@ -11,29 +11,29 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.ComponentRoyaltyConfig")
-public typealias ComponentRoyaltyConfig = GatewayAPI.ComponentRoyaltyConfig
+typealias ComponentRoyaltyConfig = GatewayAPI.ComponentRoyaltyConfig
 
 extension GatewayAPI {
 
-public struct ComponentRoyaltyConfig: Codable, Hashable {
+struct ComponentRoyaltyConfig: Codable, Hashable {
 
-    public private(set) var isEnabled: Bool
+    private(set) var isEnabled: Bool
     /** The royalty rules by method. The array is only present if royalties are enabled. */
-    public private(set) var methodRules: [ComponentMethodRoyalty]?
+    private(set) var methodRules: [ComponentMethodRoyalty]?
 
-    public init(isEnabled: Bool, methodRules: [ComponentMethodRoyalty]? = nil) {
+    init(isEnabled: Bool, methodRules: [ComponentMethodRoyalty]? = nil) {
         self.isEnabled = isEnabled
         self.methodRules = methodRules
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case isEnabled = "is_enabled"
         case methodRules = "method_rules"
     }
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(isEnabled, forKey: .isEnabled)
         try container.encodeIfPresent(methodRules, forKey: .methodRules)

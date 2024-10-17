@@ -4,14 +4,14 @@ import SwiftUI
 // MARK: - ImportMnemonicsFlowCoordinator.View
 extension ImportMnemonicsFlowCoordinator {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<ImportMnemonicsFlowCoordinator>
 
-		public init(store: StoreOf<ImportMnemonicsFlowCoordinator>) {
+		init(store: StoreOf<ImportMnemonicsFlowCoordinator>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			Color.app.white
 				.onFirstTask { @MainActor in
 					await store.send(.view(.onFirstTask)).finish()

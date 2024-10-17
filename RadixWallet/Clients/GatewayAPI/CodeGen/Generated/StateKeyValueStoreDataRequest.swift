@@ -11,25 +11,25 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.StateKeyValueStoreDataRequest")
-public typealias StateKeyValueStoreDataRequest = GatewayAPI.StateKeyValueStoreDataRequest
+typealias StateKeyValueStoreDataRequest = GatewayAPI.StateKeyValueStoreDataRequest
 
 extension GatewayAPI {
 
-public struct StateKeyValueStoreDataRequest: Codable, Hashable {
+struct StateKeyValueStoreDataRequest: Codable, Hashable {
 
-    public private(set) var atLedgerState: LedgerStateSelector?
+    private(set) var atLedgerState: LedgerStateSelector?
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var keyValueStoreAddress: String
+    private(set) var keyValueStoreAddress: String
     /** limited to max 100 items. */
-    public private(set) var keys: [StateKeyValueStoreDataRequestKeyItem]
+    private(set) var keys: [StateKeyValueStoreDataRequestKeyItem]
 
-    public init(atLedgerState: LedgerStateSelector? = nil, keyValueStoreAddress: String, keys: [StateKeyValueStoreDataRequestKeyItem]) {
+    init(atLedgerState: LedgerStateSelector? = nil, keyValueStoreAddress: String, keys: [StateKeyValueStoreDataRequestKeyItem]) {
         self.atLedgerState = atLedgerState
         self.keyValueStoreAddress = keyValueStoreAddress
         self.keys = keys
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case atLedgerState = "at_ledger_state"
         case keyValueStoreAddress = "key_value_store_address"
         case keys
@@ -37,7 +37,7 @@ public struct StateKeyValueStoreDataRequest: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(atLedgerState, forKey: .atLedgerState)
         try container.encode(keyValueStoreAddress, forKey: .keyValueStoreAddress)

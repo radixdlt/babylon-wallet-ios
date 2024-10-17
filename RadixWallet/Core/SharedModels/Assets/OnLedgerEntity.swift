@@ -1,8 +1,8 @@
 import Sargon
 
 // MARK: - OnLedgerEntity
-public enum OnLedgerEntity: Sendable, Hashable, Codable, CustomDebugStringConvertible {
-	public var debugDescription: String {
+enum OnLedgerEntity: Sendable, Hashable, Codable, CustomDebugStringConvertible {
+	var debugDescription: String {
 		switch self {
 		case let .account(account):
 			"account: \(account)"
@@ -32,63 +32,63 @@ public enum OnLedgerEntity: Sendable, Hashable, Codable, CustomDebugStringConver
 	case genericComponent(GenericComponent)
 	case locker(Locker)
 
-	public var resource: Resource? {
+	var resource: Resource? {
 		guard case let .resource(resource) = self else {
 			return nil
 		}
 		return resource
 	}
 
-	public var nonFungibleToken: NonFungibleToken? {
+	var nonFungibleToken: NonFungibleToken? {
 		guard case let .nonFungibleToken(nonFungibleToken) = self else {
 			return nil
 		}
 		return nonFungibleToken
 	}
 
-	public var accountNonFungibleIds: AccountNonFungibleIdsPage? {
+	var accountNonFungibleIds: AccountNonFungibleIdsPage? {
 		guard case let .accountNonFungibleIds(ids) = self else {
 			return nil
 		}
 		return ids
 	}
 
-	public var account: OnLedgerAccount? {
+	var account: OnLedgerAccount? {
 		guard case let .account(account) = self else {
 			return nil
 		}
 		return account
 	}
 
-	public var resourcePool: ResourcePool? {
+	var resourcePool: ResourcePool? {
 		guard case let .resourcePool(resourcePool) = self else {
 			return nil
 		}
 		return resourcePool
 	}
 
-	public var validator: Validator? {
+	var validator: Validator? {
 		guard case let .validator(validator) = self else {
 			return nil
 		}
 		return validator
 	}
 
-	public var genericComponent: GenericComponent? {
+	var genericComponent: GenericComponent? {
 		guard case let .genericComponent(genericComponent) = self else {
 			return nil
 		}
 		return genericComponent
 	}
 
-	public var locker: Locker? {
+	var locker: Locker? {
 		guard case let .locker(locker) = self else {
 			return nil
 		}
 		return locker
 	}
 
-	public var metadata: Metadata? {
+	var metadata: Metadata? {
 		switch self {
 		case let .resource(resource):
 			resource.metadata
@@ -131,45 +131,45 @@ extension OnLedgerEntity.Metadata {
 }
 
 extension OnLedgerEntity {
-	public struct Metadata: Sendable, Hashable, Codable {
-		public enum PublicKeyHash: Sendable, Hashable, Codable {
+	struct Metadata: Sendable, Hashable, Codable {
+		enum PublicKeyHash: Sendable, Hashable, Codable {
 			case ecdsaSecp256k1(String)
 			case eddsaEd25519(String)
 		}
 
-		public let name: String?
-		public let symbol: String?
-		public let description: String?
-		public let iconURL: URL?
-		public let infoURL: URL?
-		public let tags: [AssetTag]
-		public let dappDefinitions: [AccountAddress]?
-		public let dappDefinition: AccountAddress?
-		public let validator: ValidatorAddress?
-		public let poolUnit: PoolAddress?
-		public let poolUnitResource: ResourceAddress?
-		public let claimedEntities: [String]?
-		public let claimedWebsites: [URL]?
-		public let accountType: AccountType?
-		public let ownerKeys: PublicKeyHashesWithStateVersion?
-		public let ownerBadge: OwnerBadgeWithStateVersion?
-		public let arbitraryItems: [ArbitraryItem]
+		let name: String?
+		let symbol: String?
+		let description: String?
+		let iconURL: URL?
+		let infoURL: URL?
+		let tags: [AssetTag]
+		let dappDefinitions: [AccountAddress]?
+		let dappDefinition: AccountAddress?
+		let validator: ValidatorAddress?
+		let poolUnit: PoolAddress?
+		let poolUnitResource: ResourceAddress?
+		let claimedEntities: [String]?
+		let claimedWebsites: [URL]?
+		let accountType: AccountType?
+		let ownerKeys: PublicKeyHashesWithStateVersion?
+		let ownerBadge: OwnerBadgeWithStateVersion?
+		let arbitraryItems: [ArbitraryItem]
 
 		/// Indicates whether all the metadata has been downloaded, or if there is still more info to fetch.
-		public let isComplete: Bool
+		let isComplete: Bool
 
-		public struct ValueAtStateVersion<Value>: Codable where Value: Codable {
-			public let value: Value
-			public let lastUpdatedAtStateVersion: AtStateVersion
+		struct ValueAtStateVersion<Value>: Codable where Value: Codable {
+			let value: Value
+			let lastUpdatedAtStateVersion: AtStateVersion
 
-			public func map<T>(_ transform: (Value) throws -> T) rethrows -> ValueAtStateVersion<T> {
+			func map<T>(_ transform: (Value) throws -> T) rethrows -> ValueAtStateVersion<T> {
 				try ValueAtStateVersion<T>(
 					value: transform(value),
 					lastUpdatedAtStateVersion: lastUpdatedAtStateVersion
 				)
 			}
 
-			public func map<T>(_ transform: (Value) throws -> T?) rethrows -> ValueAtStateVersion<T>? {
+			func map<T>(_ transform: (Value) throws -> T?) rethrows -> ValueAtStateVersion<T>? {
 				guard let transformed = try transform(value) else { return nil }
 				return ValueAtStateVersion<T>(
 					value: transformed,
@@ -177,7 +177,7 @@ extension OnLedgerEntity {
 				)
 			}
 
-			public func mapArray<T>(_ transform: (Value) throws -> [T]?) rethrows -> [ValueAtStateVersion<T>]? {
+			func mapArray<T>(_ transform: (Value) throws -> [T]?) rethrows -> [ValueAtStateVersion<T>]? {
 				guard let elements = try transform(value) else { return nil }
 				return elements.map { (element: T) in
 					ValueAtStateVersion<T>(value: element, lastUpdatedAtStateVersion: lastUpdatedAtStateVersion)
@@ -185,11 +185,11 @@ extension OnLedgerEntity {
 			}
 		}
 
-		public typealias OwnerBadgeWithStateVersion = ValueAtStateVersion<NonFungibleLocalId>
-		public typealias PublicKeyHashesWithStateVersion = ValueAtStateVersion<[PublicKeyHash]>
-		public typealias ArbitraryItem = GatewayAPI.EntityMetadataItem
+		typealias OwnerBadgeWithStateVersion = ValueAtStateVersion<NonFungibleLocalId>
+		typealias PublicKeyHashesWithStateVersion = ValueAtStateVersion<[PublicKeyHash]>
+		typealias ArbitraryItem = GatewayAPI.EntityMetadataItem
 
-		public init(
+		init(
 			name: String? = nil,
 			symbol: String? = nil,
 			description: String? = nil,
@@ -231,20 +231,20 @@ extension OnLedgerEntity {
 	}
 
 	// MARK: - AccountType
-	public enum AccountType: String, Sendable, Codable {
+	enum AccountType: String, Sendable, Codable {
 		case dappDefinition = "dapp definition"
 	}
 
-	public struct Resource: Sendable, Hashable, Codable, Identifiable, CustomDebugStringConvertible {
-		public var id: ResourceAddress { resourceAddress }
-		public let resourceAddress: ResourceAddress
-		public let atLedgerState: AtLedgerState
-		public let divisibility: UInt8?
-		public let behaviors: [AssetBehavior]
-		public let totalSupply: Decimal192?
-		public let metadata: Metadata
+	struct Resource: Sendable, Hashable, Codable, Identifiable, CustomDebugStringConvertible {
+		var id: ResourceAddress { resourceAddress }
+		let resourceAddress: ResourceAddress
+		let atLedgerState: AtLedgerState
+		let divisibility: UInt8?
+		let behaviors: [AssetBehavior]
+		let totalSupply: Decimal192?
+		let metadata: Metadata
 
-		public var debugDescription: String {
+		var debugDescription: String {
 			"""
 			\(resourceAddress.formatted())
 			symbol: \(metadata.symbol ?? "???")
@@ -254,7 +254,7 @@ extension OnLedgerEntity {
 			"""
 		}
 
-		public var fungibility: Fungibility {
+		var fungibility: Fungibility {
 			if resourceAddress.isFungible {
 				.fungible
 			} else {
@@ -262,12 +262,12 @@ extension OnLedgerEntity {
 			}
 		}
 
-		public enum Fungibility {
+		enum Fungibility {
 			case fungible
 			case nonFungible
 		}
 
-		public init(
+		init(
 			resourceAddress: ResourceAddress,
 			atLedgerState: AtLedgerState,
 			divisibility: UInt8? = nil,
@@ -284,62 +284,62 @@ extension OnLedgerEntity {
 		}
 	}
 
-	public struct GenericComponent: Sendable, Hashable, Codable {
-		public let address: ComponentAddress
-		public let atLedgerState: AtLedgerState
-		public let behaviors: [AssetBehavior]
-		public let metadata: Metadata
+	struct GenericComponent: Sendable, Hashable, Codable {
+		let address: ComponentAddress
+		let atLedgerState: AtLedgerState
+		let behaviors: [AssetBehavior]
+		let metadata: Metadata
 	}
 }
 
 // MARK: - OnLedgerEntity.Locker
 extension OnLedgerEntity {
-	public struct Locker: Sendable, Hashable, Codable {
-		public let address: LockerAddress
-		public let atLedgerState: AtLedgerState
-		public let metadata: Metadata
+	struct Locker: Sendable, Hashable, Codable {
+		let address: LockerAddress
+		let atLedgerState: AtLedgerState
+		let metadata: Metadata
 	}
 }
 
 extension OnLedgerEntity {
-	public struct NonFungibleToken: Sendable, Hashable, Identifiable, Codable {
-		public typealias NFTData = GatewayAPI.ProgrammaticScryptoSborValueTuple
-		public let id: NonFungibleGlobalId
-		public let data: NFTData?
+	struct NonFungibleToken: Sendable, Hashable, Identifiable, Codable {
+		typealias NFTData = GatewayAPI.ProgrammaticScryptoSborValueTuple
+		let id: NonFungibleGlobalId
+		let data: NFTData?
 	}
 
-	public struct AccountNonFungibleIdsPage: Sendable, Hashable, Codable {
-		public let accountAddress: AccountAddress
-		public let resourceAddress: ResourceAddress
-		public let ids: [NonFungibleGlobalId]
-		public let pageCursor: String?
-		public let nextPageCursor: String?
-	}
-}
-
-extension OnLedgerEntity {
-	public struct ResourcePool: Sendable, Hashable, Codable {
-		public let address: PoolAddress
-		public let poolUnitResourceAddress: ResourceAddress
-		public let resources: OwnedFungibleResources
-		public let metadata: Metadata
-	}
-
-	public struct Validator: Sendable, Hashable, Codable {
-		public let address: ValidatorAddress
-		public let stakeUnitResourceAddress: ResourceAddress
-		public let xrdVaultBalance: Decimal192
-		public let stakeClaimFungibleResourceAddress: ResourceAddress
-		public let metadata: Metadata
+	struct AccountNonFungibleIdsPage: Sendable, Hashable, Codable {
+		let accountAddress: AccountAddress
+		let resourceAddress: ResourceAddress
+		let ids: [NonFungibleGlobalId]
+		let pageCursor: String?
+		let nextPageCursor: String?
 	}
 }
 
 extension OnLedgerEntity {
-	public struct OwnedFungibleResources: Sendable, Hashable, Codable, CustomDebugStringConvertible {
-		public var xrdResource: OwnedFungibleResource?
-		public var nonXrdResources: [OwnedFungibleResource]
+	struct ResourcePool: Sendable, Hashable, Codable {
+		let address: PoolAddress
+		let poolUnitResourceAddress: ResourceAddress
+		let resources: OwnedFungibleResources
+		let metadata: Metadata
+	}
 
-		public init(
+	struct Validator: Sendable, Hashable, Codable {
+		let address: ValidatorAddress
+		let stakeUnitResourceAddress: ResourceAddress
+		let xrdVaultBalance: Decimal192
+		let stakeClaimFungibleResourceAddress: ResourceAddress
+		let metadata: Metadata
+	}
+}
+
+extension OnLedgerEntity {
+	struct OwnedFungibleResources: Sendable, Hashable, Codable, CustomDebugStringConvertible {
+		var xrdResource: OwnedFungibleResource?
+		var nonXrdResources: [OwnedFungibleResource]
+
+		init(
 			xrdResource: OwnedFungibleResource? = nil,
 			nonXrdResources: [OwnedFungibleResource] = []
 		) {
@@ -351,7 +351,7 @@ extension OnLedgerEntity {
 			self.nonXrdResources = nonXrdResources
 		}
 
-		public var debugDescription: String {
+		var debugDescription: String {
 			let xrd = xrdResource?.debugDescription ?? ""
 			let nonXRD = nonXrdResources.map(\.debugDescription).joined(separator: "\n")
 			return [
@@ -361,23 +361,23 @@ extension OnLedgerEntity {
 		}
 	}
 
-	public struct OwnedFungibleResource: Sendable, Hashable, Identifiable, Codable, CustomDebugStringConvertible {
-		public var id: ResourceAddress {
+	struct OwnedFungibleResource: Sendable, Hashable, Identifiable, Codable, CustomDebugStringConvertible {
+		var id: ResourceAddress {
 			resourceAddress
 		}
 
-		public let resourceAddress: ResourceAddress
-		public let atLedgerState: AtLedgerState
-		public var amount: ResourceAmount
-		public let metadata: Metadata
+		let resourceAddress: ResourceAddress
+		let atLedgerState: AtLedgerState
+		var amount: ResourceAmount
+		let metadata: Metadata
 
-		public var debugDescription: String {
+		var debugDescription: String {
 			let symbol: String = metadata.symbol ?? "???"
 
 			return "\(symbol) - \(resourceAddress.formatted()) | # \(amount.nominalAmount.formatted())"
 		}
 
-		public init(
+		init(
 			resourceAddress: ResourceAddress,
 			atLedgerState: AtLedgerState,
 			amount: ResourceAmount,
@@ -390,26 +390,26 @@ extension OnLedgerEntity {
 		}
 	}
 
-	public struct OwnedNonFungibleResource: Sendable, Hashable, Identifiable, Codable, CustomDebugStringConvertible {
-		public var id: ResourceAddress {
+	struct OwnedNonFungibleResource: Sendable, Hashable, Identifiable, Codable, CustomDebugStringConvertible {
+		var id: ResourceAddress {
 			resourceAddress
 		}
 
-		public var debugDescription: String {
+		var debugDescription: String {
 			"""
 			\(resourceAddress.formatted())
 			localID count: #\(nonFungibleIdsCount)
 			"""
 		}
 
-		public let resourceAddress: ResourceAddress
-		public let atLedgerState: AtLedgerState
-		public let metadata: Metadata
-		public var nonFungibleIdsCount: Int
+		let resourceAddress: ResourceAddress
+		let atLedgerState: AtLedgerState
+		let metadata: Metadata
+		var nonFungibleIdsCount: Int
 		/// The vault where the owned ids are stored
-		public let vaultAddress: VaultAddress
+		let vaultAddress: VaultAddress
 
-		public init(
+		init(
 			resourceAddress: ResourceAddress,
 			atLedgerState: AtLedgerState,
 			metadata: Metadata,
@@ -427,7 +427,7 @@ extension OnLedgerEntity {
 
 // MARK: - GatewayAPI.DepositRule
 extension GatewayAPI {
-	public enum DepositRule: String, Sendable, Hashable, Codable {
+	enum DepositRule: String, Sendable, Hashable, Codable {
 		case accept = "Accept"
 		case reject = "Reject"
 		case allowExisting = "AllowExisting"
@@ -435,7 +435,7 @@ extension GatewayAPI {
 }
 
 extension DepositRule {
-	public init(gateway: GatewayAPI.DepositRule) {
+	init(gateway: GatewayAPI.DepositRule) {
 		switch gateway {
 		case .accept: self = .acceptAll
 		case .reject: self = .denyAll
@@ -473,25 +473,25 @@ extension OnLedgerEntity.OnLedgerAccount.Details {
 
 // MARK: - OnLedgerEntity.OnLedgerAccount
 extension OnLedgerEntity {
-	public struct OnLedgerAccount: Sendable, Hashable, Codable, CustomDebugStringConvertible {
-		public let address: AccountAddress
-		public let atLedgerState: AtLedgerState
-		public let metadata: Metadata
-		public var fungibleResources: OwnedFungibleResources
-		public var nonFungibleResources: [OwnedNonFungibleResource]
-		public var poolUnitResources: PoolUnitResources
+	struct OnLedgerAccount: Sendable, Hashable, Codable, CustomDebugStringConvertible {
+		let address: AccountAddress
+		let atLedgerState: AtLedgerState
+		let metadata: Metadata
+		var fungibleResources: OwnedFungibleResources
+		var nonFungibleResources: [OwnedNonFungibleResource]
+		var poolUnitResources: PoolUnitResources
 
-		public struct Details: Sendable, Hashable, Codable {
-			public let depositRule: DepositRule
-			public let primaryLocker: LockerAddress?
+		struct Details: Sendable, Hashable, Codable {
+			let depositRule: DepositRule
+			let primaryLocker: LockerAddress?
 
-			public init(depositRule: DepositRule, primaryLocker: LockerAddress?) {
+			init(depositRule: DepositRule, primaryLocker: LockerAddress?) {
 				self.depositRule = depositRule
 				self.primaryLocker = primaryLocker
 			}
 		}
 
-		public var debugDescription: String {
+		var debugDescription: String {
 			let fun = fungibleResources.debugDescription
 			let nonFun = nonFungibleResources.map(\.debugDescription).joined(separator: "\n")
 			let stakes = poolUnitResources.radixNetworkStakes.map(\.debugDescription).joined(separator: "\n")
@@ -506,9 +506,9 @@ extension OnLedgerEntity {
 			].compactMap { $0 }.joined(separator: "\n")
 		}
 
-		public var details: Details?
+		var details: Details?
 
-		public init(
+		init(
 			address: AccountAddress,
 			atLedgerState: AtLedgerState,
 			metadata: Metadata,
@@ -530,11 +530,11 @@ extension OnLedgerEntity {
 
 // MARK: - OnLedgerEntity.AssociatedDapp
 extension OnLedgerEntity {
-	public struct AssociatedDapp: Sendable, Hashable, Codable {
-		public let address: DappDefinitionAddress
-		public let metadata: Metadata
+	struct AssociatedDapp: Sendable, Hashable, Codable {
+		let address: DappDefinitionAddress
+		let metadata: Metadata
 
-		public init(address: DappDefinitionAddress, metadata: Metadata) {
+		init(address: DappDefinitionAddress, metadata: Metadata) {
 			self.address = address
 			self.metadata = metadata
 		}
@@ -542,17 +542,17 @@ extension OnLedgerEntity {
 }
 
 extension OnLedgerEntity.OnLedgerAccount {
-	public struct PoolUnitResources: Sendable, Hashable, Codable {
-		public var radixNetworkStakes: IdentifiedArrayOf<RadixNetworkStake>
-		public var poolUnits: [PoolUnit]
+	struct PoolUnitResources: Sendable, Hashable, Codable {
+		var radixNetworkStakes: IdentifiedArrayOf<RadixNetworkStake>
+		var poolUnits: [PoolUnit]
 	}
 
-	public struct RadixNetworkStake: Sendable, Hashable, Codable, Identifiable, CustomDebugStringConvertible {
-		public var id: ValidatorAddress {
+	struct RadixNetworkStake: Sendable, Hashable, Codable, Identifiable, CustomDebugStringConvertible {
+		var id: ValidatorAddress {
 			validatorAddress
 		}
 
-		public var debugDescription: String {
+		var debugDescription: String {
 			"""
 			\(validatorAddress.formatted())
 			staked: \(stakeUnitResource?.amount.nominalAmount.formatted() ?? "NONE")
@@ -560,11 +560,11 @@ extension OnLedgerEntity.OnLedgerAccount {
 			"""
 		}
 
-		public let validatorAddress: ValidatorAddress
-		public var stakeUnitResource: OnLedgerEntity.OwnedFungibleResource?
-		public let stakeClaimResource: OnLedgerEntity.OwnedNonFungibleResource?
+		let validatorAddress: ValidatorAddress
+		var stakeUnitResource: OnLedgerEntity.OwnedFungibleResource?
+		let stakeClaimResource: OnLedgerEntity.OwnedNonFungibleResource?
 
-		public init(
+		init(
 			validatorAddress: ValidatorAddress,
 			stakeUnitResource: OnLedgerEntity.OwnedFungibleResource?,
 			stakeClaimResource: OnLedgerEntity.OwnedNonFungibleResource?
@@ -575,16 +575,16 @@ extension OnLedgerEntity.OnLedgerAccount {
 		}
 	}
 
-	public struct PoolUnit: Sendable, Hashable, Codable, CustomDebugStringConvertible {
-		public let resource: OnLedgerEntity.OwnedFungibleResource
-		public let resourcePoolAddress: PoolAddress
-		public let poolResources: [ResourceAddress]
+	struct PoolUnit: Sendable, Hashable, Codable, CustomDebugStringConvertible {
+		let resource: OnLedgerEntity.OwnedFungibleResource
+		let resourcePoolAddress: PoolAddress
+		let poolResources: [ResourceAddress]
 
-		public var descriptionOfPoolKind: String {
+		var descriptionOfPoolKind: String {
 			String(describing: resourcePoolAddress.poolKind)
 		}
 
-		public var debugDescription: String {
+		var debugDescription: String {
 			"""
 			\(resourcePoolAddress.formatted())
 			kind: \(descriptionOfPoolKind)
@@ -592,7 +592,7 @@ extension OnLedgerEntity.OnLedgerAccount {
 			"""
 		}
 
-		public init(
+		init(
 			resource: OnLedgerEntity.OwnedFungibleResource,
 			resourcePoolAddress: PoolAddress,
 			poolResources: [ResourceAddress] = []
@@ -606,7 +606,7 @@ extension OnLedgerEntity.OnLedgerAccount {
 
 // MARK: - OnLedgerEntity.NonFungibleToken.NFTData
 extension OnLedgerEntity.NonFungibleToken.NFTData {
-	public enum StandardField: String, Sendable, Hashable, Codable, CaseIterable {
+	enum StandardField: String, Sendable, Hashable, Codable, CaseIterable {
 		case name
 		case description
 		case keyImageURL = "key_image_url"
@@ -614,13 +614,13 @@ extension OnLedgerEntity.NonFungibleToken.NFTData {
 		case claimAmount = "claim_amount"
 	}
 
-	public func getString(forField field: StandardField) -> String? {
+	func getString(forField field: StandardField) -> String? {
 		self.fields.compactMap(/GatewayAPI.ProgrammaticScryptoSborValue.string).first {
 			$0.fieldName == field.rawValue
 		}?.value
 	}
 
-	public func getU64Value(forField field: StandardField) -> UInt64? {
+	func getU64Value(forField field: StandardField) -> UInt64? {
 		for f in fields {
 			if case let .u64(u64) = f, u64.fieldName == field.rawValue {
 				return UInt64(u64.value)
@@ -629,40 +629,40 @@ extension OnLedgerEntity.NonFungibleToken.NFTData {
 		return nil
 	}
 
-	public func getDecimalValue(forField field: StandardField) -> Decimal192? {
+	func getDecimalValue(forField field: StandardField) -> Decimal192? {
 		self.fields
 			.compactMap(/GatewayAPI.ProgrammaticScryptoSborValue.decimal)
 			.first { $0.fieldName == field.rawValue }
 			.flatMap { try? Decimal192($0.value) }
 	}
 
-	public var name: String? {
+	var name: String? {
 		getString(forField: .name)
 	}
 
-	public var tokenDescription: String? {
+	var tokenDescription: String? {
 		getString(forField: .description)
 	}
 
-	public var keyImageURL: URL? {
+	var keyImageURL: URL? {
 		getString(forField: .keyImageURL).flatMap(URL.init(string:))
 	}
 
-	public var claimAmount: Decimal192? {
+	var claimAmount: Decimal192? {
 		getDecimalValue(forField: .claimAmount)
 	}
 
-	public var claimEpoch: UInt64? {
+	var claimEpoch: UInt64? {
 		getU64Value(forField: .claimEpoch)
 	}
 }
 
 extension OnLedgerEntity.OnLedgerAccount {
-	public var allFungibleResourceAddresses: [ResourceAddress] {
+	var allFungibleResourceAddresses: [ResourceAddress] {
 		fungibleResources.xrdResource.asArray(\.resourceAddress) + fungibleResources.nonXrdResources.map(\.resourceAddress)
 	}
 
-	public var allResourceAddresses: Set<ResourceAddress> {
+	var allResourceAddresses: Set<ResourceAddress> {
 		Set(
 			allFungibleResourceAddresses
 				+ nonFungibleResources.map(\.resourceAddress)
@@ -671,7 +671,7 @@ extension OnLedgerEntity.OnLedgerAccount {
 		)
 	}
 
-	public func hasResource(_ resourceAddress: ResourceAddress) -> Bool {
+	func hasResource(_ resourceAddress: ResourceAddress) -> Bool {
 		allResourceAddresses.contains(resourceAddress)
 	}
 }
@@ -698,7 +698,7 @@ extension OnLedgerEntity.Resource {
 }
 
 extension OnLedgerEntity.Resource {
-	public var fungibleResourceName: String? {
+	var fungibleResourceName: String? {
 		metadata.title
 	}
 }

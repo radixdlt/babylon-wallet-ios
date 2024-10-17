@@ -2,14 +2,14 @@ import ComposableArchitecture
 import SwiftUI
 
 extension EditPersonaEntries {
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<EditPersonaEntries>
 
-		public init(store: StoreOf<EditPersonaEntries>) {
+		init(store: StoreOf<EditPersonaEntries>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			VStack(spacing: .large1) {
 				IfLetStore(
 					store.scope(state: \.name, action: \.child.name)

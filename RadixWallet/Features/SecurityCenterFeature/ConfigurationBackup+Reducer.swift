@@ -2,31 +2,31 @@ import CloudKit
 import ComposableArchitecture
 
 // MARK: - ConfigurationBackup
-public struct ConfigurationBackup: Sendable, FeatureReducer {
-	public struct Exportable: Sendable, Hashable {
-		public let profile: Profile
-		public let file: ExportableProfileFile
+struct ConfigurationBackup: Sendable, FeatureReducer {
+	struct Exportable: Sendable, Hashable {
+		let profile: Profile
+		let file: ExportableProfileFile
 	}
 
-	public struct State: Sendable, Hashable {
-		public var cloudBackupsEnabled: Bool = true
-		public var lastManualBackup: Date? = nil
-		public var lastCloudBackup: BackupStatus? = nil
+	struct State: Sendable, Hashable {
+		var cloudBackupsEnabled: Bool = true
+		var lastManualBackup: Date? = nil
+		var lastCloudBackup: BackupStatus? = nil
 
-		public var problems: [SecurityProblem] = []
+		var problems: [SecurityProblem] = []
 
 		@PresentationState
-		public var destination: Destination.State? = nil
+		var destination: Destination.State? = nil
 
 		/// An exportable Profile file, either encrypted or plaintext. Setting this will trigger showing a file exporter
-		public var exportable: Exportable? = nil
+		var exportable: Exportable? = nil
 
-		public var outdatedBackupPresent: Bool {
+		var outdatedBackupPresent: Bool {
 			guard let lastCloudBackup, lastCloudBackup.result.succeeded else { return false }
 			return !cloudBackupsEnabled && !lastCloudBackup.isCurrent
 		}
 
-		public var actionsRequired: [Item] {
+		var actionsRequired: [Item] {
 			if let lastCloudBackup, lastCloudBackup.isCurrent, !lastCloudBackup.result.failed {
 				[]
 			} else {
@@ -34,17 +34,17 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			}
 		}
 
-		public init() {}
+		init() {}
 	}
 
-	public enum Item: Sendable, Hashable, CaseIterable {
+	enum Item: Sendable, Hashable, CaseIterable {
 		case accounts
 		case personas
 		case securityFactors
 		case walletSettings
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case didAppear
 		case cloudBackupsToggled(Bool)
 		case exportTapped
@@ -53,7 +53,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		case profileExportResult(Result<URL, NSError>, Profile?)
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case setCloudBackupEnabled(Bool)
 		case setProblems([SecurityProblem])
 		case setLastManualBackup(Date?)
@@ -61,32 +61,32 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		case exportProfile(Profile)
 	}
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case encryptionPassword(EncryptOrDecryptProfile.State)
 			case encryptProfileOrNot(AlertState<Action.EncryptProfileOrNot>)
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case encryptionPassword(EncryptOrDecryptProfile.Action)
 			case encryptProfileOrNot(EncryptProfileOrNot)
 
-			public enum EncryptProfileOrNot: Sendable, Hashable {
+			enum EncryptProfileOrNot: Sendable, Hashable {
 				case encrypt
 				case doNotEncrypt
 			}
 		}
 
-		public var body: some Reducer<State, Action> {
+		var body: some Reducer<State, Action> {
 			Scope(state: \.encryptionPassword, action: \.encryptionPassword) {
 				EncryptOrDecryptProfile()
 			}
 		}
 	}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -103,7 +103,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 	@Dependency(\.securityCenterClient) var securityCenterClient
 	@Dependency(\.userDefaults) var userDefaults
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .didAppear:
 			return problemsEffect()
@@ -149,7 +149,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .encryptionPassword(.delegate(.successfullyEncrypted(profile, encrypted: encryptedFile))):
 			state.destination = nil
@@ -172,7 +172,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .setCloudBackupEnabled(isEnabled):
 			state.cloudBackupsEnabled = isEnabled

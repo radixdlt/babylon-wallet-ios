@@ -1,14 +1,14 @@
 // MARK: - ConfirmSkippingBDFS.View
 extension ConfirmSkippingBDFS {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<ConfirmSkippingBDFS>
 
-		public init(store: StoreOf<ConfirmSkippingBDFS>) {
+		init(store: StoreOf<ConfirmSkippingBDFS>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { _ in
 				ScrollView(.vertical, showsIndicators: false) {
 					VStack(spacing: .medium2) {
@@ -60,6 +60,6 @@ struct ConfirmSkippingBDFS_Preview: PreviewProvider {
 }
 
 extension ConfirmSkippingBDFS.State {
-	public static let previewValue = Self()
+	static let previewValue = Self()
 }
 #endif

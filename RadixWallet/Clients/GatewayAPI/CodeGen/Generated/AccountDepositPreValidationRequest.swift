@@ -11,24 +11,24 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.AccountDepositPreValidationRequest")
-public typealias AccountDepositPreValidationRequest = GatewayAPI.AccountDepositPreValidationRequest
+typealias AccountDepositPreValidationRequest = GatewayAPI.AccountDepositPreValidationRequest
 
 extension GatewayAPI {
 
-public struct AccountDepositPreValidationRequest: Codable, Hashable {
+struct AccountDepositPreValidationRequest: Codable, Hashable {
 
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var accountAddress: String
-    public private(set) var resourceAddresses: [String]
-    public private(set) var badge: TransactionAccountDepositPreValidationAuthorizedDepositorBadge?
+    private(set) var accountAddress: String
+    private(set) var resourceAddresses: [String]
+    private(set) var badge: TransactionAccountDepositPreValidationAuthorizedDepositorBadge?
 
-    public init(accountAddress: String, resourceAddresses: [String], badge: TransactionAccountDepositPreValidationAuthorizedDepositorBadge? = nil) {
+    init(accountAddress: String, resourceAddresses: [String], badge: TransactionAccountDepositPreValidationAuthorizedDepositorBadge? = nil) {
         self.accountAddress = accountAddress
         self.resourceAddresses = resourceAddresses
         self.badge = badge
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case accountAddress = "account_address"
         case resourceAddresses = "resource_addresses"
         case badge
@@ -36,7 +36,7 @@ public struct AccountDepositPreValidationRequest: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(accountAddress, forKey: .accountAddress)
         try container.encode(resourceAddresses, forKey: .resourceAddresses)

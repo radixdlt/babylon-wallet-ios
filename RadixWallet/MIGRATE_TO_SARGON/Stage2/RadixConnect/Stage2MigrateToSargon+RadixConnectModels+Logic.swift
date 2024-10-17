@@ -55,7 +55,7 @@ extension WalletToDappInteractionPersonaDataRequestResponseItem {
 }
 
 extension WalletInteractionWalletAccount {
-	public init(account: Account) {
+	init(account: Account) {
 		self.init(
 			address: account.address,
 			label: account.displayName,
@@ -65,7 +65,7 @@ extension WalletInteractionWalletAccount {
 }
 
 extension WalletToDappInteractionAuthProof {
-	public init(entitySignature: SignatureOfEntity) {
+	init(entitySignature: SignatureOfEntity) {
 		let sigPub = entitySignature.signatureWithPublicKey
 		let signature = sigPub.signature
 		self.init(
@@ -77,25 +77,25 @@ extension WalletToDappInteractionAuthProof {
 }
 
 extension DappWalletInteractionPersona {
-	public init(persona: Persona) {
+	init(persona: Persona) {
 		self.init(identityAddress: persona.address, label: persona.displayName.rawValue)
 	}
 }
 
 extension DappToWalletInteraction {
-	public enum MissingEntry: Sendable, Hashable {
+	enum MissingEntry: Sendable, Hashable {
 		case missingEntry
 		case missing(Int)
 	}
 
-	public enum KindRequest: Sendable, Hashable {
+	enum KindRequest: Sendable, Hashable {
 		case entry
 		case number(RequestedQuantity)
 	}
 }
 
 extension DappToWalletInteractionPersonaDataRequestItem {
-	public var kindRequests: [PersonaData.Entry.Kind: DappToWalletInteraction.KindRequest] {
+	var kindRequests: [PersonaData.Entry.Kind: DappToWalletInteraction.KindRequest] {
 		var result: [PersonaData.Entry.Kind: DappToWalletInteraction.KindRequest] = [:]
 		if isRequestingName == true {
 			result[.fullName] = .entry
@@ -112,7 +112,7 @@ extension DappToWalletInteractionPersonaDataRequestItem {
 
 // MARK: - WalletToDappInteractionResponse
 extension WalletToDappInteractionResponse {
-	public var interactionId: WalletInteractionId {
+	var interactionId: WalletInteractionId {
 		switch self {
 		case let .success(response):
 			response.interactionId
@@ -121,18 +121,18 @@ extension WalletToDappInteractionResponse {
 		}
 	}
 
-	public enum Accounts: Sendable, Hashable {
+	enum Accounts: Sendable, Hashable {
 		case withoutProofOfOwnership(IdentifiedArrayOf<Account>)
 		case withProofOfOwnership(challenge: DappToWalletInteractionAuthChallengeNonce, IdentifiedArrayOf<WithProof>)
 
-		public struct WithProof: Sendable, Hashable, Identifiable {
-			public typealias ID = WalletInteractionWalletAccount
-			public var id: ID { account }
-			public let account: WalletInteractionWalletAccount
+		struct WithProof: Sendable, Hashable, Identifiable {
+			typealias ID = WalletInteractionWalletAccount
+			var id: ID { account }
+			let account: WalletInteractionWalletAccount
 
-			public let proof: WalletToDappInteractionAuthProof
+			let proof: WalletToDappInteractionAuthProof
 
-			public init(
+			init(
 				account: WalletInteractionWalletAccount,
 				proof: WalletToDappInteractionAuthProof
 			) {
@@ -145,7 +145,7 @@ extension WalletToDappInteractionResponse {
 
 // MARK: - WalletToDappInteractionAccountsRequestResponseItem
 extension WalletToDappInteractionAccountsRequestResponseItem {
-	public init(
+	init(
 		accounts: WalletToDappInteractionResponse.Accounts
 	) {
 		switch accounts {

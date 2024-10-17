@@ -1,12 +1,12 @@
 
-public enum BuildConfiguration: Int, Sendable, Hashable, Comparable, CustomStringConvertible {
+enum BuildConfiguration: Int, Sendable, Hashable, Comparable, CustomStringConvertible {
 	case dev = 1
 	case alpha = 2
 	case preAlpha = 3
 	case beta = 4
 	case release = 5
 
-	public static var current: Self? {
+	static var current: Self? {
 		#if BETA
 		return .beta
 		#elseif ALPHA
@@ -22,7 +22,7 @@ public enum BuildConfiguration: Int, Sendable, Hashable, Comparable, CustomStrin
 		#endif
 	}
 
-	public var description: String {
+	var description: String {
 		switch self {
 		case .dev: "DEV"
 		case .alpha: "ALPHA"
@@ -32,7 +32,7 @@ public enum BuildConfiguration: Int, Sendable, Hashable, Comparable, CustomStrin
 		}
 	}
 
-	public static func < (lhs: Self, rhs: Self) -> Bool {
+	static func < (lhs: Self, rhs: Self) -> Bool {
 		lhs.rawValue < rhs.rawValue
 	}
 }

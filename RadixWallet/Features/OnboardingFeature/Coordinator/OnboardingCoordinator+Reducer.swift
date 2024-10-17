@@ -2,39 +2,39 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - OnboardingCoordinator
-public struct OnboardingCoordinator: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public var startup: OnboardingStartup.State
+struct OnboardingCoordinator: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		var startup: OnboardingStartup.State
 
 		@PresentationState
-		public var destination: Destination.State?
+		var destination: Destination.State?
 
-		public init() {
+		init() {
 			self.startup = .init()
 		}
 	}
 
 	@CasePathable
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case startup(OnboardingStartup.Action)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case completed
 	}
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case createAccount(CreateAccountCoordinator.State)
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case createAccount(CreateAccountCoordinator.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: \.createAccount, action: \.createAccount) {
 				CreateAccountCoordinator()
 			}
@@ -45,9 +45,9 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.appEventsClient) var appEventsClient
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Scope(state: \.startup, action: \.child.startup) {
 			OnboardingStartup()
 		}
@@ -60,7 +60,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .startup(.delegate(.setupNewUser)):
 			state.destination = .createAccount(
@@ -83,7 +83,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .createAccount(.delegate(.completed)):
 			return .send(.delegate(.completed))

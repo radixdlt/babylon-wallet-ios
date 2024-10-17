@@ -11,26 +11,26 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.TransactionStatusRequest")
-public typealias TransactionStatusRequest = GatewayAPI.TransactionStatusRequest
+typealias TransactionStatusRequest = GatewayAPI.TransactionStatusRequest
 
 extension GatewayAPI {
 
-public struct TransactionStatusRequest: Codable, Hashable {
+struct TransactionStatusRequest: Codable, Hashable {
 
     /** Bech32m-encoded hash. */
-    public private(set) var intentHash: String
+    private(set) var intentHash: String
 
-    public init(intentHash: String) {
+    init(intentHash: String) {
         self.intentHash = intentHash
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case intentHash = "intent_hash"
     }
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(intentHash, forKey: .intentHash)
     }

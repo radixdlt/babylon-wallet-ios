@@ -8,7 +8,7 @@ extension NewAccountCompletion.State {
 }
 
 extension NewAccountCompletion {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let entityName: String
 		let destinationDisplayText: String
 		let isFirstOnNetwork: Bool
@@ -40,14 +40,14 @@ extension NewAccountCompletion {
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<NewAccountCompletion>
 
-		public init(store: StoreOf<NewAccountCompletion>) {
+		init(store: StoreOf<NewAccountCompletion>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: .medium2) {
 					Spacer()

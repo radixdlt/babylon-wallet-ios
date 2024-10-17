@@ -43,7 +43,7 @@ extension [CKRecord.FieldKey] {
 }
 
 extension CloudBackupClient {
-	public func deleteProfileBackup() async throws {
+	func deleteProfileBackup() async throws {
 		try await deleteProfileBackup(nil)
 	}
 }
@@ -55,9 +55,9 @@ extension CloudBackupClient {
 	struct WrongRecordTypeError: Error { let type: CKRecord.RecordType }
 	struct FailedToClaimProfileError: Error { let error: Error }
 
-	public static let liveValue: Self = .live()
+	static let liveValue: Self = .live()
 
-	public static func live(
+	static func live(
 		profileStore: ProfileStore = .shared
 	) -> CloudBackupClient {
 		@Dependency(\.appPreferencesClient) var appPreferencesClient

@@ -4,14 +4,14 @@ import SwiftUI
 // MARK: - PoolUnitsList.View
 extension PoolUnitsList {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<PoolUnitsList>
 
-		public init(store: StoreOf<PoolUnitsList>) {
+		init(store: StoreOf<PoolUnitsList>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				ForEach(viewStore.poolUnits) { poolUnit in
 					Section {

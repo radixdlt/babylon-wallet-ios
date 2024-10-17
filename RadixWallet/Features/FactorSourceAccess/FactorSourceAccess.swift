@@ -1,67 +1,67 @@
 // MARK: - FactorSourceAccess
-public struct FactorSourceAccess: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public let kind: Kind
-		public let purpose: Purpose
+struct FactorSourceAccess: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		let kind: Kind
+		let purpose: Purpose
 
 		@PresentationState
-		public var destination: Destination.State? = nil
+		var destination: Destination.State? = nil
 
-		public init(kind: Kind, purpose: Purpose) {
+		init(kind: Kind, purpose: Purpose) {
 			self.kind = kind
 			self.purpose = purpose
 		}
 	}
 
-	public enum ViewAction: Sendable, Hashable {
+	enum ViewAction: Sendable, Hashable {
 		case onFirstTask
 		case retryButtonTapped
 		case closeButtonTapped
 	}
 
-	public enum InternalAction: Sendable, Hashable {
+	enum InternalAction: Sendable, Hashable {
 		case hasP2PLinks(Bool)
 	}
 
-	public enum DelegateAction: Sendable, Hashable {
+	enum DelegateAction: Sendable, Hashable {
 		case perform
 		case cancel
 	}
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case noP2PLink(AlertState<NoP2PLinkAlert>)
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Hashable {
+		enum Action: Sendable, Hashable {
 			case noP2PLink(NoP2PLinkAlert)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			EmptyReducer()
 		}
 
-		public enum NoP2PLinkAlert: Sendable, Hashable {
+		enum NoP2PLinkAlert: Sendable, Hashable {
 			case okTapped
 		}
 	}
 
 	@Dependency(\.p2pLinksClient) var p2pLinksClient
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
 			}
 	}
 
-	public init() {}
+	init() {}
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onFirstTask:
 			.send(.delegate(.perform))
@@ -73,7 +73,7 @@ public struct FactorSourceAccess: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .hasP2PLinks(hasP2PLinks):
 			if !hasP2PLinks {
@@ -83,7 +83,7 @@ public struct FactorSourceAccess: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .noP2PLink(.okTapped):
 			state.destination = nil
@@ -109,12 +109,12 @@ public struct FactorSourceAccess: Sendable, FeatureReducer {
 }
 
 extension FactorSourceAccess.State {
-	public enum Kind: Sendable, Hashable {
+	enum Kind: Sendable, Hashable {
 		case device
 		case ledger(LedgerHardwareWalletFactorSource?)
 	}
 
-	public enum Purpose: Sendable, Hashable {
+	enum Purpose: Sendable, Hashable {
 		/// Signing transactions.
 		case signature
 

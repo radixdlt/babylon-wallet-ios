@@ -232,6 +232,6 @@ final class GatewaySettingsFeatureTests: TestCase {
 #if DEBUG
 
 extension URL {
-	public static let previewValue = URL(string: "https://example.com/")!
+	static let previewValue = URL(string: "https://example.com/")!
 }
 #endif // DEBUG

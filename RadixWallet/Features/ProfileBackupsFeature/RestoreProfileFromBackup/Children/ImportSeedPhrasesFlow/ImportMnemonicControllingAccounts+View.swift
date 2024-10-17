@@ -9,7 +9,7 @@ extension ImportMnemonicControllingAccounts.State {
 
 // MARK: - ImportMnemonicControllingAccounts.View
 extension ImportMnemonicControllingAccounts {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let isMain: Bool
 
 		var navigationTitle: String {
@@ -32,14 +32,14 @@ extension ImportMnemonicControllingAccounts {
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<ImportMnemonicControllingAccounts>
 
-		public init(store: StoreOf<ImportMnemonicControllingAccounts>) {
+		init(store: StoreOf<ImportMnemonicControllingAccounts>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView {
 					VStack(spacing: 0) {

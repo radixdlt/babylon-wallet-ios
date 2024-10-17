@@ -11,35 +11,35 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.TransactionPreviewRequest")
-public typealias TransactionPreviewRequest = GatewayAPI.TransactionPreviewRequest
+typealias TransactionPreviewRequest = GatewayAPI.TransactionPreviewRequest
 
 extension GatewayAPI {
 
-public struct TransactionPreviewRequest: Codable, Hashable {
+struct TransactionPreviewRequest: Codable, Hashable {
 
-    public private(set) var optIns: TransactionPreviewOptIns?
+    private(set) var optIns: TransactionPreviewOptIns?
     /** A text-representation of a transaction manifest */
-    public private(set) var manifest: String
+    private(set) var manifest: String
     /** An array of hex-encoded blob data, if referenced by the manifest. */
-    public private(set) var blobsHex: [String]?
+    private(set) var blobsHex: [String]?
     /** An integer between `0` and `10^10`, marking the epoch at which the transaction starts being valid. If omitted, the current epoch will be used (taking into account the `at_ledger_state`, if specified).  */
-    public private(set) var startEpochInclusive: Int64
+    private(set) var startEpochInclusive: Int64
     /** An integer between `0` and `10^10`, marking the epoch at which the transaction is no longer valid. If omitted, a maximum epoch (relative to the `start_epoch_inclusive`) will be used.  */
-    public private(set) var endEpochExclusive: Int64
-    public private(set) var notaryPublicKey: PublicKey?
+    private(set) var endEpochExclusive: Int64
+    private(set) var notaryPublicKey: PublicKey?
     /** Whether the notary should count as a signatory (defaults to `false`). */
-    public private(set) var notaryIsSignatory: Bool?
+    private(set) var notaryIsSignatory: Bool?
     /** An integer between `0` and `65535`, giving the validator tip as a percentage amount. A value of `1` corresponds to a 1% fee.  */
-    public private(set) var tipPercentage: Int
+    private(set) var tipPercentage: Int
     /** An integer between `0` and `2^32 - 1`, chosen to allow a unique intent to be created (to enable submitting an otherwise identical/duplicate intent).  */
-    public private(set) var nonce: Int64
-    /** A list of public keys to be used as transaction signers */
-    public private(set) var signerPublicKeys: [PublicKey]
+    private(set) var nonce: Int64
+    /** A list of keys to be used as transaction signers */
+    private(set) var signerPublicKeys: [PublicKey]
     /** An optional transaction message. Only affects the costing. This type is defined in the Core API as `TransactionMessage`. See the Core API documentation for more details.  */
-    public private(set) var message: AnyCodable?
-    public private(set) var flags: TransactionPreviewRequestFlags
+    private(set) var message: AnyCodable?
+    private(set) var flags: TransactionPreviewRequestFlags
 
-    public init(optIns: TransactionPreviewOptIns? = nil, manifest: String, blobsHex: [String]? = nil, startEpochInclusive: Int64, endEpochExclusive: Int64, notaryPublicKey: PublicKey? = nil, notaryIsSignatory: Bool? = nil, tipPercentage: Int, nonce: Int64, signerPublicKeys: [PublicKey], message: AnyCodable? = nil, flags: TransactionPreviewRequestFlags) {
+    init(optIns: TransactionPreviewOptIns? = nil, manifest: String, blobsHex: [String]? = nil, startEpochInclusive: Int64, endEpochExclusive: Int64, notaryPublicKey: PublicKey? = nil, notaryIsSignatory: Bool? = nil, tipPercentage: Int, nonce: Int64, signerPublicKeys: [PublicKey], message: AnyCodable? = nil, flags: TransactionPreviewRequestFlags) {
         self.optIns = optIns
         self.manifest = manifest
         self.blobsHex = blobsHex
@@ -54,7 +54,7 @@ public struct TransactionPreviewRequest: Codable, Hashable {
         self.flags = flags
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case optIns = "opt_ins"
         case manifest
         case blobsHex = "blobs_hex"
@@ -71,7 +71,7 @@ public struct TransactionPreviewRequest: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(optIns, forKey: .optIns)
         try container.encode(manifest, forKey: .manifest)

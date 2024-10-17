@@ -4,36 +4,36 @@ import Sargon
 import SwiftUI
 
 extension Olympia {
-	public enum Export {}
-	public struct Parsed: Sendable, Hashable {
-		public let mnemonicWordCount: BIP39WordCount
-		public let accounts: NonEmpty<OrderedSet<Olympia.Parsed.ParsedAccount>>
+	enum Export {}
+	struct Parsed: Sendable, Hashable {
+		let mnemonicWordCount: BIP39WordCount
+		let accounts: NonEmpty<OrderedSet<Olympia.Parsed.ParsedAccount>>
 
-		public struct ParsedAccount: Sendable, Hashable {
-			public let accountType: Olympia.AccountType
-			public let publicKey: Secp256k1PublicKey
-			public let displayName: NonEmptyString?
+		struct ParsedAccount: Sendable, Hashable {
+			let accountType: Olympia.AccountType
+			let publicKey: Secp256k1PublicKey
+			let displayName: NonEmptyString?
 			/// the non hardened value of the path
-			public let addressIndex: HDPathValue
+			let addressIndex: HDPathValue
 		}
 	}
 }
 
 extension Olympia.Export {
-	public static let accountNameForbiddenCharReplacement = "_"
-	public static let accountNameMaxLength = Account.nameMaxLength
+	static let accountNameForbiddenCharReplacement = "_"
+	static let accountNameMaxLength = Account.nameMaxLength
 
-	public enum Separator: Sendable, Hashable, CaseIterable {
+	enum Separator: Sendable, Hashable, CaseIterable {
 		static let inter = "~"
 		static let intra = "^"
 		static let headerEnd = "]"
 		static let accountNameEnd = "}"
 
-		public static let allCases: [String] = [
+		static let allCases: [String] = [
 			inter, intra, headerEnd, accountNameEnd,
 		]
 
-		public static var regex: some RegexComponent {
+		static var regex: some RegexComponent {
 			ChoiceOf {
 				inter
 				intra
@@ -43,30 +43,30 @@ extension Olympia.Export {
 		}
 	}
 
-	public struct Payload: Sendable, Hashable {
-		public let header: Header
-		public let contents: Contents
+	struct Payload: Sendable, Hashable {
+		let header: Header
+		let contents: Contents
 
-		public struct Header: Sendable, Hashable {
-			public let payloadCount: Int
-			public let payloadIndex: Int
-			public let mnemonicWordCount: Int
+		struct Header: Sendable, Hashable {
+			let payloadCount: Int
+			let payloadIndex: Int
+			let mnemonicWordCount: Int
 		}
 
-		public struct Contents: Sendable, Hashable {
-			public let accounts: OrderedSet<Olympia.Parsed.ParsedAccount>
-			public let rest: NonEmptyString?
+		struct Contents: Sendable, Hashable {
+			let accounts: OrderedSet<Olympia.Parsed.ParsedAccount>
+			let rest: NonEmptyString?
 		}
 	}
 }
 
 // MARK: - CAP33
-public enum CAP33 {
-	public static func deserializeHeader(payload: NonEmptyString) throws -> Olympia.Export.Payload.Header {
+enum CAP33 {
+	static func deserializeHeader(payload: NonEmptyString) throws -> Olympia.Export.Payload.Header {
 		try deserializeHeaderAndContent(payload: payload).header
 	}
 
-	public static func deserialize(
+	static func deserialize(
 		payloads payloadStrings: NonEmpty<OrderedSet<NonEmptyString>>
 	) throws -> Olympia.Parsed {
 		var accounts: OrderedSet<Olympia.Parsed.ParsedAccount> = []
@@ -231,7 +231,7 @@ extension CAP33 {
 		return .account(account)
 	}
 
-	public static func _sanitize(name: NonEmptyString?) -> String {
+	static func _sanitize(name: NonEmptyString?) -> String {
 		guard let name else { return "" }
 
 		let result = String(name
@@ -306,7 +306,7 @@ extension CAP33 {
 
 // MARK: CAP33.ParseFailure
 extension CAP33 {
-	public enum ParseFailure: String, Swift.Error, Sendable, Hashable {
+	enum ParseFailure: String, Swift.Error, Sendable, Hashable {
 		case headerDoesNotContainEndSeparator
 		case payloadDidNotContainHeaderAndContent
 		case anyAccount

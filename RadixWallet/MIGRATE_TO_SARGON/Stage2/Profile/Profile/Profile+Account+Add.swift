@@ -8,7 +8,7 @@ struct TryingToUpdateAnAccountWhichIsNotAlreadySaved: Swift.Error {}
 
 extension Profile {
 	/// Updates an `Account` in the profile
-	public mutating func updateAccount(
+	mutating func updateAccount(
 		_ account: Account
 	) throws {
 		var network = try network(id: account.networkID)
@@ -17,7 +17,7 @@ extension Profile {
 	}
 
 	#if DEBUG
-	public mutating func deleteAccount(_ account: Account) throws {
+	mutating func deleteAccount(_ account: Account) throws {
 		var network = try network(id: account.networkID)
 		network.deleteAccount(address: account.address)
 		try updateOnNetwork(network)
@@ -26,7 +26,7 @@ extension Profile {
 
 	/// Saves an `Account` into the profile, if this is the first mainnet account,
 	/// we will switch to mainnet
-	public mutating func addAccount(
+	mutating func addAccount(
 		_ account: Account
 	) throws {
 		let networkID = account.networkID
@@ -62,7 +62,7 @@ extension Profile {
 }
 
 // MARK: - DisrepancyFactorSourceWrongKind
-public struct DisrepancyFactorSourceWrongKind: Swift.Error {
-	public let expected: FactorSourceKind
-	public let actual: FactorSourceKind
+struct DisrepancyFactorSourceWrongKind: Swift.Error {
+	let expected: FactorSourceKind
+	let actual: FactorSourceKind
 }

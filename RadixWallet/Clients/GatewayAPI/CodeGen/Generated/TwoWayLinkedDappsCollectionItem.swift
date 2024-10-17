@@ -11,26 +11,26 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.TwoWayLinkedDappsCollectionItem")
-public typealias TwoWayLinkedDappsCollectionItem = GatewayAPI.TwoWayLinkedDappsCollectionItem
+typealias TwoWayLinkedDappsCollectionItem = GatewayAPI.TwoWayLinkedDappsCollectionItem
 
 extension GatewayAPI {
 
-public struct TwoWayLinkedDappsCollectionItem: Codable, Hashable {
+struct TwoWayLinkedDappsCollectionItem: Codable, Hashable {
 
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var dappAddress: String
+    private(set) var dappAddress: String
 
-    public init(dappAddress: String) {
+    init(dappAddress: String) {
         self.dappAddress = dappAddress
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case dappAddress = "dapp_address"
     }
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(dappAddress, forKey: .dappAddress)
     }

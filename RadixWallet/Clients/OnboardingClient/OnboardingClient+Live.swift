@@ -1,10 +1,10 @@
 
 extension OnboardingClient: DependencyKey {
-	public typealias Value = OnboardingClient
+	typealias Value = OnboardingClient
 
-	public static let liveValue = Self.live()
+	static let liveValue = Self.live()
 
-	public static func live(
+	static func live(
 		profileStore: ProfileStore = .shared
 	) -> Self {
 		Self(

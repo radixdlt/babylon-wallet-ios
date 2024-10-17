@@ -1,5 +1,5 @@
 extension DependencyValues {
-	public var npsSurveyClient: NPSSurveyClient {
+	var npsSurveyClient: NPSSurveyClient {
 		get { self[NPSSurveyClient.self] }
 		set { self[NPSSurveyClient.self] = newValue }
 	}
@@ -7,7 +7,7 @@ extension DependencyValues {
 
 // MARK: - NPSSurveyClient + DependencyKey
 extension NPSSurveyClient: DependencyKey {
-	public static var liveValue: NPSSurveyClient {
+	static var liveValue: NPSSurveyClient {
 		@Dependency(\.userDefaults) var userDefaults
 
 		let shouldAskForFeedbackSubject: AsyncCurrentValueSubject<Bool> = .init(false)

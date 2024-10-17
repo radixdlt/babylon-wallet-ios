@@ -11,25 +11,25 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.ValidatorCollectionItem")
-public typealias ValidatorCollectionItem = GatewayAPI.ValidatorCollectionItem
+typealias ValidatorCollectionItem = GatewayAPI.ValidatorCollectionItem
 
 extension GatewayAPI {
 
-public struct ValidatorCollectionItem: Codable, Hashable {
+struct ValidatorCollectionItem: Codable, Hashable {
 
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var address: String
-    public private(set) var stakeVault: ValidatorVaultItem
-    public private(set) var pendingXrdWithdrawVault: ValidatorVaultItem
-    public private(set) var lockedOwnerStakeUnitVault: ValidatorVaultItem
-    public private(set) var pendingOwnerStakeUnitUnlockVault: ValidatorVaultItem
+    private(set) var address: String
+    private(set) var stakeVault: ValidatorVaultItem
+    private(set) var pendingXrdWithdrawVault: ValidatorVaultItem
+    private(set) var lockedOwnerStakeUnitVault: ValidatorVaultItem
+    private(set) var pendingOwnerStakeUnitUnlockVault: ValidatorVaultItem
     /** Validator inner state representation. This type is defined in the Core API as `ValidatorFieldStateValue`. See the Core API documentation for more details.  */
-    public private(set) var state: AnyCodable?
-    public private(set) var activeInEpoch: ValidatorCollectionItemActiveInEpoch?
-    public private(set) var metadata: EntityMetadataCollection
-    public private(set) var effectiveFeeFactor: ValidatorCollectionItemEffectiveFeeFactor
+    private(set) var state: AnyCodable?
+    private(set) var activeInEpoch: ValidatorCollectionItemActiveInEpoch?
+    private(set) var metadata: EntityMetadataCollection
+    private(set) var effectiveFeeFactor: ValidatorCollectionItemEffectiveFeeFactor
 
-    public init(address: String, stakeVault: ValidatorVaultItem, pendingXrdWithdrawVault: ValidatorVaultItem, lockedOwnerStakeUnitVault: ValidatorVaultItem, pendingOwnerStakeUnitUnlockVault: ValidatorVaultItem, state: AnyCodable?, activeInEpoch: ValidatorCollectionItemActiveInEpoch? = nil, metadata: EntityMetadataCollection, effectiveFeeFactor: ValidatorCollectionItemEffectiveFeeFactor) {
+    init(address: String, stakeVault: ValidatorVaultItem, pendingXrdWithdrawVault: ValidatorVaultItem, lockedOwnerStakeUnitVault: ValidatorVaultItem, pendingOwnerStakeUnitUnlockVault: ValidatorVaultItem, state: AnyCodable?, activeInEpoch: ValidatorCollectionItemActiveInEpoch? = nil, metadata: EntityMetadataCollection, effectiveFeeFactor: ValidatorCollectionItemEffectiveFeeFactor) {
         self.address = address
         self.stakeVault = stakeVault
         self.pendingXrdWithdrawVault = pendingXrdWithdrawVault
@@ -41,7 +41,7 @@ public struct ValidatorCollectionItem: Codable, Hashable {
         self.effectiveFeeFactor = effectiveFeeFactor
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case address
         case stakeVault = "stake_vault"
         case pendingXrdWithdrawVault = "pending_xrd_withdraw_vault"
@@ -55,7 +55,7 @@ public struct ValidatorCollectionItem: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(address, forKey: .address)
         try container.encode(stakeVault, forKey: .stakeVault)

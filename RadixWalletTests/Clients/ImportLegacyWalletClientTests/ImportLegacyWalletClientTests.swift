@@ -24,8 +24,8 @@ private struct TestVector: Codable, Sendable, Hashable {
 		let mnemonic: String
 		let accounts: [TestVector.OlympiaWallet.Account]
 		struct Account: Sendable, Hashable, Codable {
-			public let accountType: Olympia.AccountType
-			public let publicKeyCompressedBase64: String
+			let accountType: Olympia.AccountType
+			let publicKeyCompressedBase64: String
 			enum CodingKeys: String, CodingKey {
 				case accountType
 				case name
@@ -33,8 +33,8 @@ private struct TestVector: Codable, Sendable, Hashable {
 				case publicKeyCompressedBase64 = "pubKey"
 			}
 
-			public let addressIndex: Int
-			public let name: NonEmptyString?
+			let addressIndex: Int
+			let name: NonEmptyString?
 		}
 	}
 }

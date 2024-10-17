@@ -11,30 +11,30 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.StateKeyValueStoreDataRequestKeyItem")
-public typealias StateKeyValueStoreDataRequestKeyItem = GatewayAPI.StateKeyValueStoreDataRequestKeyItem
+typealias StateKeyValueStoreDataRequestKeyItem = GatewayAPI.StateKeyValueStoreDataRequestKeyItem
 
 extension GatewayAPI {
 
 /** Provide either &#x60;key_hex&#x60; or &#x60;key_json&#x60;. If both are provided, &#x60;key_hex&#x60; is used and &#x60;key_json&#x60; is ignored. */
-public struct StateKeyValueStoreDataRequestKeyItem: Codable, Hashable {
+struct StateKeyValueStoreDataRequestKeyItem: Codable, Hashable {
 
     /** Hex-encoded binary blob. */
-    public private(set) var keyHex: String?
-    public private(set) var keyJson: ProgrammaticScryptoSborValue?
+    private(set) var keyHex: String?
+    private(set) var keyJson: ProgrammaticScryptoSborValue?
 
-    public init(keyHex: String? = nil, keyJson: ProgrammaticScryptoSborValue? = nil) {
+    init(keyHex: String? = nil, keyJson: ProgrammaticScryptoSborValue? = nil) {
         self.keyHex = keyHex
         self.keyJson = keyJson
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case keyHex = "key_hex"
         case keyJson = "key_json"
     }
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(keyHex, forKey: .keyHex)
         try container.encodeIfPresent(keyJson, forKey: .keyJson)

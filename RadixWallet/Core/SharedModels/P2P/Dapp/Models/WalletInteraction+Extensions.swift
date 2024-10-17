@@ -2,15 +2,15 @@ import Sargon
 
 // MARK: - DappOrigin
 // extension DappToWalletInteractionMetadata {
-//	public typealias Origin = URL
+//	typealias Origin = URL
 // }
 
 extension DappOrigin {
-	public static let wallet = "com.radixpublishing.radixwallet.ios"
+	static let wallet = "com.radixpublishing.radixwallet.ios"
 
-	public struct InvalidOriginURL: Error {}
+	struct InvalidOriginURL: Error {}
 
-	public func url() throws -> URL {
+	func url() throws -> URL {
 		guard let url = URL(string: self) else {
 			throw InvalidOriginURL()
 		}
@@ -19,16 +19,16 @@ extension DappOrigin {
 }
 
 // MARK: - DappInteractionNumberOfAccounts
-public typealias DappInteractionNumberOfAccounts = RequestedQuantity
+typealias DappInteractionNumberOfAccounts = RequestedQuantity
 
 // MARK: - TxVersion
 extension TxVersion {
-	public static let `default`: Self = 1
+	static let `default`: Self = 1
 }
 
 // MARK: - DappToWalletInteractionSendTransactionItem
 extension DappToWalletInteractionSendTransactionItem {
-	public init(
+	init(
 		version: TxVersion = .default,
 		transactionManifest: TransactionManifest,
 		message: String? = nil
@@ -43,11 +43,11 @@ extension DappToWalletInteractionSendTransactionItem {
 
 // MARK: - DappToWalletInteraction.RequestValidation
 extension DappToWalletInteraction {
-	public struct RequestValidation: Sendable, Hashable {
-		public var missingEntries: [PersonaData.Entry.Kind: MissingEntry] = [:]
-		public var existingRequestedEntries: [PersonaData.Entry.Kind: [PersonaData.Entry]] = [:]
+	struct RequestValidation: Sendable, Hashable {
+		var missingEntries: [PersonaData.Entry.Kind: MissingEntry] = [:]
+		var existingRequestedEntries: [PersonaData.Entry.Kind: [PersonaData.Entry]] = [:]
 
-		public var response: WalletToDappInteractionPersonaDataRequestResponseItem? {
+		var response: WalletToDappInteractionPersonaDataRequestResponseItem? {
 			guard missingEntries.isEmpty else { return nil }
 			return try? .init(
 				name: existingRequestedEntries.extract(.fullName),

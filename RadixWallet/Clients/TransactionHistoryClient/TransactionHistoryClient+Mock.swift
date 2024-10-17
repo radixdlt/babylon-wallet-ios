@@ -1,8 +1,8 @@
 // MARK: - TransactionHistoryClient + TestDependencyKey
 extension TransactionHistoryClient: TestDependencyKey {
-	public static let previewValue = Self.mock()
+	static let previewValue = Self.mock()
 
-	public static let testValue = Self(
+	static let testValue = Self(
 		getFirstTransactionDate: unimplemented("\(Self.self).getFirstTransactionDate"),
 		getTransactionHistory: unimplemented("\(Self.self).getTransactionHistory")
 	)
@@ -17,7 +17,7 @@ extension TransactionHistoryClient: TestDependencyKey {
 }
 
 extension DependencyValues {
-	public var transactionHistoryClient: TransactionHistoryClient {
+	var transactionHistoryClient: TransactionHistoryClient {
 		get { self[TransactionHistoryClient.self] }
 		set { self[TransactionHistoryClient.self] = newValue }
 	}

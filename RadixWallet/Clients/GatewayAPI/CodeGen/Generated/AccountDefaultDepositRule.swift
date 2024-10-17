@@ -11,12 +11,12 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.AccountDefaultDepositRule")
-public typealias GatewayAccountDefaultDepositRule = GatewayAPI.AccountDefaultDepositRule
+typealias GatewayAccountDefaultDepositRule = GatewayAPI.AccountDefaultDepositRule
 
 extension GatewayAPI {
 
 /** Default deposit rule set to an account. */
-public enum AccountDefaultDepositRule: String, Codable, CaseIterable {
+enum AccountDefaultDepositRule: String, Codable, CaseIterable {
     case accept = "Accept"
     case reject = "Reject"
     case allowExisting = "AllowExisting"

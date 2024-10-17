@@ -2,7 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 
 extension ChooseReceivingAccount.State {
-	public enum AddressValidation: Sendable, Hashable {
+	enum AddressValidation: Sendable, Hashable {
 		case valid(AccountAddress)
 		case wrongNetwork(AccountAddress, incorrectNetwork: UInt8)
 		case invalid
@@ -60,15 +60,15 @@ extension ChooseReceivingAccount.State {
 // MARK: - ChooseReceivingAccount.View
 extension ChooseReceivingAccount {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		@Perception.Bindable private var store: StoreOf<ChooseReceivingAccount>
 		@FocusState private var focusedField: Bool
 
-		public init(store: StoreOf<ChooseReceivingAccount>) {
+		init(store: StoreOf<ChooseReceivingAccount>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				NavigationStack {
 					ScrollView {

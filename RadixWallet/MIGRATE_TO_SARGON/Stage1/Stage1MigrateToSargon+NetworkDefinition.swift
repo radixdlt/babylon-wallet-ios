@@ -3,8 +3,8 @@ import Sargon
 import Tagged
 
 extension NetworkDefinition {
-	public typealias Name = Tagged<Self, String>
-	public static func lookupBy(name: Name) throws -> Self {
+	typealias Name = Tagged<Self, String>
+	static func lookupBy(name: Name) throws -> Self {
 		try lookupBy(logicalName: name.rawValue)
 	}
 }

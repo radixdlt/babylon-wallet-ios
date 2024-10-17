@@ -14,7 +14,7 @@ extension DispatchQueue.SchedulerTimeType.Stride: @unchecked Sendable {}
  any possible error: send/receive errors, aswell intternet connection going down.
  This is very crucial, failing to reconnect the websocket will result in inability to establish new peer connections.
  */
-public final actor AsyncWebSocket: NSObject, SignalingTransport {
+final actor AsyncWebSocket: NSObject, SignalingTransport {
 	struct UnknownMessageTypeError: Error {}
 	struct NoSessionAvailableError: Error {}
 

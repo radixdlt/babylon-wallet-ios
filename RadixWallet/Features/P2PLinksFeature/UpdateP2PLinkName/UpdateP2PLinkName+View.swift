@@ -3,7 +3,7 @@ import SwiftUI
 // MARK: - UpdateP2PLinkName.View
 extension UpdateP2PLinkName {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		@Perception.Bindable var store: StoreOf<UpdateP2PLinkName>
 		@FocusState private var textFieldFocus: Bool
 
@@ -11,7 +11,7 @@ extension UpdateP2PLinkName {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			content
 				.withNavigationBar {
 					store.send(.view(.closeButtonTapped))

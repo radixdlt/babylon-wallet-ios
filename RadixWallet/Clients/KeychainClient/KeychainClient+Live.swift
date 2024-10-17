@@ -1,7 +1,7 @@
 
 // MARK: - KeychainClient + DependencyKey
 extension KeychainClient: DependencyKey {
-	public static let liveValue: Self = .liveValue()
+	static let liveValue: Self = .liveValue()
 
 	static func liveValue(
 		keychainHolder: KeychainHolder = .shared

@@ -2,7 +2,7 @@
 
 // MARK: Add Persona
 extension Profile {
-	public mutating func addPersona(
+	mutating func addPersona(
 		_ persona: Persona
 	) throws {
 		let networkID = persona.networkID
@@ -11,7 +11,7 @@ extension Profile {
 		try updateOnNetwork(network)
 	}
 
-	public func hasAnyPersonaOnAnyNetwork() -> Bool {
+	func hasAnyPersonaOnAnyNetwork() -> Bool {
 		networks
 			.map { $0.hasSomePersona() }
 			.reduce(into: false) { $0 = $0 || $1 }

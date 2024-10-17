@@ -11,24 +11,24 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.ValidatorsUptimeRequest")
-public typealias ValidatorsUptimeRequest = GatewayAPI.ValidatorsUptimeRequest
+typealias ValidatorsUptimeRequest = GatewayAPI.ValidatorsUptimeRequest
 
 extension GatewayAPI {
 
 /** For &#x60;at_ledger_state&#x60; and &#x60;from_ledger_state&#x60; you can use one of &#x60;state_version&#x60;, &#x60;epoch&#x60;, &#x60;epoch&#x60; and &#x60;round&#x60;, or &#x60;timestamp&#x60;, but then ongoing epoch will be selected and used for querying data. i.e for request with &#x60;{ \&quot;from_state_version\&quot; &#x3D; { \&quot;state_version\&quot; &#x3D; 100 }, \&quot;at_state_version\&quot; &#x3D; { \&quot;state_version\&quot; &#x3D; 300} }&#x60; gateway api will check in which epoch transactions with state version 100 and 300 were and then use that as inclusive boundary for request.  */
-public struct ValidatorsUptimeRequest: Codable, Hashable {
+struct ValidatorsUptimeRequest: Codable, Hashable {
 
-    public private(set) var atLedgerState: LedgerStateSelector?
-    public private(set) var fromLedgerState: LedgerStateSelector?
-    public private(set) var validatorAddresses: [String]?
+    private(set) var atLedgerState: LedgerStateSelector?
+    private(set) var fromLedgerState: LedgerStateSelector?
+    private(set) var validatorAddresses: [String]?
 
-    public init(atLedgerState: LedgerStateSelector? = nil, fromLedgerState: LedgerStateSelector? = nil, validatorAddresses: [String]? = nil) {
+    init(atLedgerState: LedgerStateSelector? = nil, fromLedgerState: LedgerStateSelector? = nil, validatorAddresses: [String]? = nil) {
         self.atLedgerState = atLedgerState
         self.fromLedgerState = fromLedgerState
         self.validatorAddresses = validatorAddresses
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case atLedgerState = "at_ledger_state"
         case fromLedgerState = "from_ledger_state"
         case validatorAddresses = "validator_addresses"
@@ -36,7 +36,7 @@ public struct ValidatorsUptimeRequest: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(atLedgerState, forKey: .atLedgerState)
         try container.encodeIfPresent(fromLedgerState, forKey: .fromLedgerState)

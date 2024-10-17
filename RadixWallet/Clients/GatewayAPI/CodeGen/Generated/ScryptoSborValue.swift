@@ -11,29 +11,29 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.ScryptoSborValue")
-public typealias ScryptoSborValue = GatewayAPI.ScryptoSborValue
+typealias ScryptoSborValue = GatewayAPI.ScryptoSborValue
 
 extension GatewayAPI {
 
-public struct ScryptoSborValue: Codable, Hashable {
+struct ScryptoSborValue: Codable, Hashable {
 
     /** Hex-encoded binary blob. */
-    public private(set) var rawHex: String
-    public private(set) var programmaticJson: ProgrammaticScryptoSborValue
+    private(set) var rawHex: String
+    private(set) var programmaticJson: ProgrammaticScryptoSborValue
 
-    public init(rawHex: String, programmaticJson: ProgrammaticScryptoSborValue) {
+    init(rawHex: String, programmaticJson: ProgrammaticScryptoSborValue) {
         self.rawHex = rawHex
         self.programmaticJson = programmaticJson
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case rawHex = "raw_hex"
         case programmaticJson = "programmatic_json"
     }
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(rawHex, forKey: .rawHex)
         try container.encode(programmaticJson, forKey: .programmaticJson)

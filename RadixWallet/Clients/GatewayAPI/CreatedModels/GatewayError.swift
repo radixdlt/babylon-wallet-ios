@@ -3,11 +3,11 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.GatewayError")
-public typealias GatewayError = GatewayAPI.GatewayError
+typealias GatewayError = GatewayAPI.GatewayError
 
 // MARK: - GatewayAPI.GatewayError
 extension GatewayAPI {
-	public enum GatewayError: Codable, JSONEncodable, Hashable {
+	enum GatewayError: Codable, JSONEncodable, Hashable {
 		case anyCodable(AnyCodable)
 		case entityNotFoundError(EntityNotFoundError)
 		case internalServerError(InternalServerError)
@@ -16,7 +16,7 @@ extension GatewayAPI {
 		case notSyncedUpError(NotSyncedUpError)
 		case transactionNotFoundError(TransactionNotFoundError)
 
-		public func encode(to encoder: Encoder) throws {
+		func encode(to encoder: Encoder) throws {
 			var container = encoder.singleValueContainer()
 			switch self {
 			case let .anyCodable(value):
@@ -36,7 +36,7 @@ extension GatewayAPI {
 			}
 		}
 
-		public init(from decoder: Decoder) throws {
+		init(from decoder: Decoder) throws {
 			let container = try decoder.singleValueContainer()
 			if let value = try? container.decode(AnyCodable.self) {
 				self = .anyCodable(value)

@@ -1,8 +1,8 @@
 // MARK: - StakeUnitList
-public struct StakeUnitList: Sendable, FeatureReducer {
+struct StakeUnitList: Sendable, FeatureReducer {
 	typealias SelectedStakeClaimTokens = [OnLedgerEntity.OwnedNonFungibleResource: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>]
 
-	public struct State: Sendable, Hashable {
+	struct State: Sendable, Hashable {
 		let account: OnLedgerEntity.OnLedgerAccount
 		var ownedStakes: IdentifiedArrayOf<OnLedgerEntity.OnLedgerAccount.RadixNetworkStake> {
 			account.poolUnitResources.radixNetworkStakes
@@ -106,7 +106,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case appeared
 		case didTapLiquidStakeUnit(forValidator: ValidatorAddress)
 		case didTapStakeClaimNFT(OnLedgerEntitiesClient.StakeClaim)
@@ -114,10 +114,10 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 		case didTapClaimAllStakes
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case selected(Selection)
 
-		public enum Selection: Sendable, Equatable {
+		enum Selection: Sendable, Equatable {
 			case unit(OnLedgerEntitiesClient.ResourceWithVaultAmount, details: OnLedgerEntitiesClient.OwnedStakeDetails)
 			case claim(OnLedgerEntity.Resource, claim: OnLedgerEntitiesClient.StakeClaim)
 		}
@@ -127,9 +127,9 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.errorQueue) var errorQueue
 
-	public init() {}
+	init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return .none
@@ -246,7 +246,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 
 // MARK: - OnLedgerEntitiesClient.OwnedStakeDetails + Identifiable
 extension OnLedgerEntitiesClient.OwnedStakeDetails: Identifiable {
-	public var id: ValidatorAddress {
+	var id: ValidatorAddress {
 		validator.address
 	}
 }

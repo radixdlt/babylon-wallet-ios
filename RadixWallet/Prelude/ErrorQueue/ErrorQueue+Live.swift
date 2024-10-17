@@ -1,8 +1,8 @@
 
 extension ErrorQueue: DependencyKey {
-	public typealias Value = ErrorQueue
+	typealias Value = ErrorQueue
 
-	public static var liveValue: Self {
+	static var liveValue: Self {
 		let errors = AsyncPassthroughSubject<Error>()
 		return Self(
 			errors: { errors.share().eraseToAnyAsyncSequence() },

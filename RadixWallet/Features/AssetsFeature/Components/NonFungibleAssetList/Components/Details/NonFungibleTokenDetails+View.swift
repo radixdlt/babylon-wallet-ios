@@ -41,13 +41,13 @@ extension NonFungibleTokenDetails.ViewState.TokenDetails {
 
 // MARK: - NonFungibleTokenList.Detail.View
 extension NonFungibleTokenDetails {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let tokenDetails: TokenDetails?
 		let resourceThumbnail: Loadable<URL?>
 		let resourceDetails: AssetResourceDetailsSection.ViewState
 		let isClaimStakeEnabled: Bool
 
-		public struct TokenDetails: Equatable {
+		struct TokenDetails: Equatable {
 			let keyImage: URL?
 			let nonFungibleGlobalID: NonFungibleGlobalId
 			let name: String?
@@ -58,14 +58,14 @@ extension NonFungibleTokenDetails {
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<NonFungibleTokenDetails>
 
-		public init(store: StoreOf<NonFungibleTokenDetails>) {
+		init(store: StoreOf<NonFungibleTokenDetails>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				DetailsContainer(title: .success(viewStore.tokenDetails?.name ?? "")) {
 					store.send(.view(.closeButtonTapped))

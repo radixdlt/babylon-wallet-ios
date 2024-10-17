@@ -21,14 +21,14 @@ extension SelectFeePayer.State {
 // MARK: - SelectFeePayer.View
 extension SelectFeePayer {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<SelectFeePayer>
 
-		public init(store: StoreOf<SelectFeePayer>) {
+		init(store: StoreOf<SelectFeePayer>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				VStack {
 					Text(L10n.CustomizeNetworkFees.SelectFeePayer.navigationTitle)

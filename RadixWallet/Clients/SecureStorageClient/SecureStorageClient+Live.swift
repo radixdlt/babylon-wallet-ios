@@ -7,7 +7,7 @@ extension KeychainAccess.Accessibility: @unchecked Sendable {}
 extension KeychainAccess.AuthenticationPolicy: @unchecked Sendable {}
 
 // MARK: - SecureStorageError
-public enum SecureStorageError: Swift.Error, Equatable {
+enum SecureStorageError: Swift.Error, Equatable {
 	case evaluateLocalAuthenticationFailed(reason: LocalAuthenticationClient.Error)
 	case evaluateLocalAuthenticationFailedUnknown(reason: String)
 	case passcodeNotSet
@@ -26,9 +26,9 @@ func importantKeychainIdentifier(_ msg: String) -> Tagged<KeychainClient, NonEmp
 
 // MARK: - SecureStorageClient + DependencyKey
 extension SecureStorageClient: DependencyKey {
-	public typealias Value = SecureStorageClient
+	typealias Value = SecureStorageClient
 
-	public static let liveValue: Self = {
+	static let liveValue: Self = {
 		@Dependency(\.keychainClient) var keychainClient
 		@Dependency(\.jsonEncoder) var jsonEncoder
 		@Dependency(\.jsonDecoder) var jsonDecoder
@@ -518,10 +518,10 @@ extension FactorSourceIDFromHash {
 }
 
 extension FactorSourceIdFromHash {
-	public static let keychainKeySeparator = ":"
+	static let keychainKeySeparator = ":"
 	/// NEVER EVER CHANGE THIS! If you do, users apps will be unable to load the Mnemonic
 	/// from keychain!
-	public var keychainKey: String {
+	var keychainKey: String {
 		"\(kind)\(Self.keychainKeySeparator)\(body.data.hex())"
 	}
 }

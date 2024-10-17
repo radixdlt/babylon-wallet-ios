@@ -1,7 +1,7 @@
 import Foundation
 
 extension DependencyValues {
-	public var accountLockersClient: AccountLockersClient {
+	var accountLockersClient: AccountLockersClient {
 		get { self[AccountLockersClient.self] }
 		set { self[AccountLockersClient.self] = newValue }
 	}
@@ -9,9 +9,9 @@ extension DependencyValues {
 
 // MARK: - AccountLockersClient + TestDependencyKey
 extension AccountLockersClient: TestDependencyKey {
-	public static let previewValue: Self = .noop
+	static let previewValue: Self = .noop
 
-	public static let noop = Self(
+	static let noop = Self(
 		startMonitoring: {},
 		claims: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		dappsWithClaims: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
@@ -19,7 +19,7 @@ extension AccountLockersClient: TestDependencyKey {
 		forceRefresh: {}
 	)
 
-	public static let testValue = Self(
+	static let testValue = Self(
 		startMonitoring: unimplemented("\(Self.self).startMonitoring"),
 		claims: unimplemented("\(Self.self).claims"),
 		dappsWithClaims: unimplemented("\(Self.self).dappsWithClaims"),

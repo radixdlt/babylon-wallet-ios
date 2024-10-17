@@ -4,7 +4,7 @@ import DependenciesAdditions
 import os
 
 extension DependencyValues {
-	public var cloudBackupClient: CloudBackupClient {
+	var cloudBackupClient: CloudBackupClient {
 		get { self[CloudBackupClient.self] }
 		set { self[CloudBackupClient.self] = newValue }
 	}
@@ -12,9 +12,9 @@ extension DependencyValues {
 
 // MARK: - CloudBackupClient + TestDependencyKey
 extension CloudBackupClient: TestDependencyKey {
-	public static let previewValue: Self = .noop
+	static let previewValue: Self = .noop
 
-	public static let noop = Self(
+	static let noop = Self(
 		isCloudProfileSyncEnabled: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		startAutomaticBackups: {},
 		migrateProfilesFromKeychain: { throw NoopError() },
@@ -26,7 +26,7 @@ extension CloudBackupClient: TestDependencyKey {
 		claimProfileOnICloud: { _ in throw NoopError() }
 	)
 
-	public static let testValue = Self(
+	static let testValue = Self(
 		isCloudProfileSyncEnabled: unimplemented("\(Self.self).isCloudProfileSyncEnabled"),
 		startAutomaticBackups: unimplemented("\(Self.self).startAutomaticBackups"),
 		migrateProfilesFromKeychain: unimplemented("\(Self.self).migrateProfilesFromKeychain"),

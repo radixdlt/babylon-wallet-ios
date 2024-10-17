@@ -3,20 +3,20 @@ import SwiftUI
 
 // MARK: - NonFungibleTokenList.Row.View
 extension NonFungibleAssetList.Row {
-	public typealias ViewState = State
+	typealias ViewState = State
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<NonFungibleAssetList.Row>
 
-		public init(store: StoreOf<NonFungibleAssetList.Row>) {
+		init(store: StoreOf<NonFungibleAssetList.Row>) {
 			self.store = store
 		}
 	}
 }
 
 extension NonFungibleAssetList.Row.View {
-	public var body: some SwiftUI.View {
+	var body: some SwiftUI.View {
 		WithViewStore(
 			store,
 			observe: identity,

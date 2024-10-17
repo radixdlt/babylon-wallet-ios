@@ -11,29 +11,29 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.TransactionStatusResponseKnownPayloadItem")
-public typealias TransactionStatusResponseKnownPayloadItem = GatewayAPI.TransactionStatusResponseKnownPayloadItem
+typealias TransactionStatusResponseKnownPayloadItem = GatewayAPI.TransactionStatusResponseKnownPayloadItem
 
 extension GatewayAPI {
 
-public struct TransactionStatusResponseKnownPayloadItem: Codable, Hashable {
+struct TransactionStatusResponseKnownPayloadItem: Codable, Hashable {
 
     /** Bech32m-encoded hash. */
-    public private(set) var payloadHash: String
-    public private(set) var status: TransactionStatus
-    public private(set) var payloadStatus: TransactionPayloadStatus?
+    private(set) var payloadHash: String
+    private(set) var status: TransactionStatus
+    private(set) var payloadStatus: TransactionPayloadStatus?
     /** An additional description to clarify the payload status.  */
-    public private(set) var payloadStatusDescription: String?
+    private(set) var payloadStatusDescription: String?
     /** The initial error message received for a rejection or failure during transaction execution. This will typically be the useful error message, explaining the root cause of the issue. Please note that presence of an error message doesn't imply that this payload will definitely reject or fail. This could represent an error during a temporary rejection (such as out of fees) which then gets resolved (e.g. by depositing money to pay the fee), allowing the transaction to be committed.  */
-    public private(set) var errorMessage: String?
+    private(set) var errorMessage: String?
     /** The latest error message received for a rejection or failure during transaction execution, this is only returned if it is different from the initial error message. This is more current than the initial error message, but may be less useful, as it could be a message regarding the expiry of the transaction at the end of its epoch validity window. Please note that presence of an error message doesn't imply that this payload will definitely reject or fail. This could represent an error during a temporary rejection (such as out of fees) which then gets resolved (e.g. by depositing money to pay the fee), allowing the transaction to be committed.  */
-    public private(set) var latestErrorMessage: String?
-    public private(set) var handlingStatus: TransactionPayloadGatewayHandlingStatus?
+    private(set) var latestErrorMessage: String?
+    private(set) var handlingStatus: TransactionPayloadGatewayHandlingStatus?
     /** Additional reason for why the Gateway has its current handling status.  */
-    public private(set) var handlingStatusReason: String?
+    private(set) var handlingStatusReason: String?
     /** The most recent error message received when submitting this transaction to the network. Please note that the presence of an error message doesn't imply that this transaction payload will definitely reject or fail. This could be a transient error.  */
-    public private(set) var submissionError: String?
+    private(set) var submissionError: String?
 
-    public init(payloadHash: String, status: TransactionStatus, payloadStatus: TransactionPayloadStatus? = nil, payloadStatusDescription: String? = nil, errorMessage: String? = nil, latestErrorMessage: String? = nil, handlingStatus: TransactionPayloadGatewayHandlingStatus? = nil, handlingStatusReason: String? = nil, submissionError: String? = nil) {
+    init(payloadHash: String, status: TransactionStatus, payloadStatus: TransactionPayloadStatus? = nil, payloadStatusDescription: String? = nil, errorMessage: String? = nil, latestErrorMessage: String? = nil, handlingStatus: TransactionPayloadGatewayHandlingStatus? = nil, handlingStatusReason: String? = nil, submissionError: String? = nil) {
         self.payloadHash = payloadHash
         self.status = status
         self.payloadStatus = payloadStatus
@@ -45,7 +45,7 @@ public struct TransactionStatusResponseKnownPayloadItem: Codable, Hashable {
         self.submissionError = submissionError
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case payloadHash = "payload_hash"
         case status
         case payloadStatus = "payload_status"
@@ -59,7 +59,7 @@ public struct TransactionStatusResponseKnownPayloadItem: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(payloadHash, forKey: .payloadHash)
         try container.encode(status, forKey: .status)

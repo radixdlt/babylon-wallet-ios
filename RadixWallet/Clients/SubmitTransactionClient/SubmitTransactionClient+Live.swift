@@ -2,9 +2,9 @@ import Sargon
 
 // MARK: - SubmitTransactionClient + DependencyKey
 extension SubmitTransactionClient: DependencyKey {
-	public typealias Value = SubmitTransactionClient
+	typealias Value = SubmitTransactionClient
 
-	public static let liveValue: Self = {
+	static let liveValue: Self = {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
 		let hasTXBeenCommittedSuccessfully: HasTXBeenCommittedSuccessfully = { intentHash in
@@ -105,11 +105,11 @@ extension GatewayAPI.TransactionCommittedDetailsResponse: @unchecked Sendable {}
 extension GatewayAPI.TransactionStatus: @unchecked Sendable {}
 
 // MARK: - SubmitTXFailure
-public enum SubmitTXFailure: Sendable, LocalizedError, Equatable {
+enum SubmitTXFailure: Sendable, LocalizedError, Equatable {
 	case failedToSubmitTX
 	case invalidTXWasDuplicate(txID: IntentHash)
 
-	public var errorDescription: String? {
+	var errorDescription: String? {
 		switch self {
 		case .failedToSubmitTX:
 			"Failed to submit transaction"
@@ -120,12 +120,12 @@ public enum SubmitTXFailure: Sendable, LocalizedError, Equatable {
 }
 
 // MARK: - TXFailureStatus
-public enum TXFailureStatus: LocalizedError, Sendable, Hashable {
+enum TXFailureStatus: LocalizedError, Sendable, Hashable {
 	case permanentlyRejected(reason: Reason)
 	case temporarilyRejected(currentEpoch: Epoch)
 	case failed(reason: Reason)
 
-	public var errorDescription: String? {
+	var errorDescription: String? {
 		switch self {
 		case .permanentlyRejected: "Permanently Rejected"
 		case .temporarilyRejected: "Temporarily Rejected"
@@ -136,9 +136,9 @@ public enum TXFailureStatus: LocalizedError, Sendable, Hashable {
 
 // MARK: TXFailureStatus.Reason
 extension TXFailureStatus {
-	public enum Reason: Sendable, Hashable, Equatable {
-		public enum ApplicationError: Equatable, Sendable, Hashable {
-			public enum WorktopError: Sendable, Hashable, Equatable {
+	enum Reason: Sendable, Hashable, Equatable {
+		enum ApplicationError: Equatable, Sendable, Hashable {
+			enum WorktopError: Sendable, Hashable, Equatable {
 				case assertionFailed
 			}
 
@@ -151,7 +151,7 @@ extension TXFailureStatus {
 }
 
 extension TXFailureStatus.Reason {
-	public init(_ rawError: String?) {
+	init(_ rawError: String?) {
 		guard let rawError else {
 			self = .unknown
 			return

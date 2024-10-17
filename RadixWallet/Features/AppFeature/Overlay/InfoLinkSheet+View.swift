@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - InfoLinkSheet.View
 extension InfoLinkSheet {
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		@SwiftUI.State private var showTitle: Bool = false
 		private let store: StoreOf<InfoLinkSheet>
 
@@ -27,11 +27,11 @@ extension InfoLinkSheet {
 			}
 		}
 
-		public init(store: StoreOf<InfoLinkSheet>) {
+		init(store: StoreOf<InfoLinkSheet>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				ScrollViewReader { proxy in
 					ScrollView {

@@ -19,7 +19,7 @@ struct AccountCard<Trailing: View, Bottom: View>: View {
 		self.bottom = bottom()
 	}
 
-	public var body: some View {
+	var body: some View {
 		VStack(spacing: .zero) {
 			top
 			bottom
@@ -93,7 +93,7 @@ extension AccountCard {
 
 // MARK: AccountCard.Kind
 extension AccountCard {
-	public enum Kind {
+	enum Kind {
 		/// Stacks the name and address horizontally
 		/// When `addCornerRadius`, its shaped is clipped with a corner radius of 12.
 		/// Used for example in Account Settings view.

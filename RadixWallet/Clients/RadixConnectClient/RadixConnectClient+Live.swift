@@ -3,7 +3,7 @@ import ComposableArchitecture // actually CasePaths... but CI fails if we do `im
 import Network
 
 extension RadixConnectClient {
-	public static let liveValue: Self = {
+	static let liveValue: Self = {
 		@Dependency(\.p2pLinksClient) var p2pLinksClient
 		@Dependency(\.errorQueue) var errorQueue
 		@Dependency(\.accountsClient) var accountsClient
@@ -192,13 +192,13 @@ extension AsyncSequence where AsyncIterator: Sendable, Element == P2P.RTCIncomin
 }
 
 extension RadixConnectClient {
-	public func receiveRequests<Case>(
+	func receiveRequests<Case>(
 		_ casePath: AnyCasePath<P2P.RTCMessageFromPeer.Request, Case>
 	) async -> AnyAsyncSequence<P2P.RTCIncomingMessageContainer<Case>> {
 		await receiveMessages().compactMap(/P2P.RTCMessageFromPeer.request .. casePath)
 	}
 
-	public func receiveResponses<Case>(
+	func receiveResponses<Case>(
 		_ casePath: AnyCasePath<P2P.RTCMessageFromPeer.Response, Case>
 	) async -> AnyAsyncSequence<P2P.RTCIncomingMessageContainer<Case>> {
 		await receiveMessages().compactMap(/P2P.RTCMessageFromPeer.response .. casePath)
@@ -212,7 +212,7 @@ private final class LocalNetworkAuthorization: NSObject, @unchecked Sendable {
 	private var netService: NetService?
 	private var completion: ((Bool) -> Void)?
 
-	public func requestAuthorization() async -> Bool {
+	func requestAuthorization() async -> Bool {
 		await withCheckedContinuation { continuation in
 			requestAuthorization { result in
 				continuation.resume(returning: result)

@@ -2,9 +2,9 @@ import Sargon
 
 // MARK: - FactorSourcesClient + DependencyKey
 extension FactorSourcesClient: DependencyKey {
-	public typealias Value = FactorSourcesClient
+	typealias Value = FactorSourcesClient
 
-	public static func live(
+	static func live(
 		profileStore: ProfileStore = .shared
 	) -> Self {
 		@Dependency(\.secureStorageClient) var secureStorageClient
@@ -355,7 +355,7 @@ extension FactorSourcesClient: DependencyKey {
 		)
 	}
 
-	public static let liveValue = Self.live()
+	static let liveValue = Self.live()
 }
 
 func signingFactors(

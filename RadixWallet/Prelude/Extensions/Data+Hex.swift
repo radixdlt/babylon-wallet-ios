@@ -22,7 +22,7 @@
 // * Changed `func hexEncodedString` to `func hex`
 // * Added computed property `var hex: String`
 
-public enum ByteHexEncodingErrors: Error, Equatable {
+enum ByteHexEncodingErrors: Error, Equatable {
 	case hexStringContainsOddNumberOfChars
 	case incorrectHexValue
 	case incorrectString
@@ -43,7 +43,7 @@ private func htoi(_ value: UInt8) throws -> UInt8 {
 }
 
 extension Data {
-	public init(
+	init(
 		hex hexString: String,
 		lowercaseInput: Bool = true,
 		trimWhitespaces: Bool = true,
@@ -81,38 +81,38 @@ extension Data {
 }
 
 extension Data {
-	public struct HexEncodingOptions: OptionSet {
-		public typealias RawValue = Int
-		public let rawValue: RawValue
-		public init(rawValue: RawValue) {
+	struct HexEncodingOptions: OptionSet {
+		typealias RawValue = Int
+		let rawValue: RawValue
+		init(rawValue: RawValue) {
 			self.rawValue = rawValue
 		}
 
-		public static let upperCase = HexEncodingOptions(rawValue: 1 << 0)
+		static let upperCase = HexEncodingOptions(rawValue: 1 << 0)
 	}
 
-	public func hex(options: HexEncodingOptions = []) -> String {
+	func hex(options: HexEncodingOptions = []) -> String {
 		let format = options.contains(.upperCase) ? "%02hhX" : "%02hhx"
 		return map { String(format: format, $0) }.joined()
 	}
 
-	public var hex: String {
+	var hex: String {
 		hex()
 	}
 }
 
 extension ContiguousBytes {
-	public var hex: String {
+	var hex: String {
 		data.hex
 	}
 
-	public var data: Data {
+	var data: Data {
 		withUnsafeBytes {
 			Data($0)
 		}
 	}
 
-	public var bytes: [UInt8] {
+	var bytes: [UInt8] {
 		withUnsafeBytes {
 			[UInt8]($0)
 		}
@@ -120,12 +120,12 @@ extension ContiguousBytes {
 }
 
 extension FixedWidthInteger {
-	public var data: Data {
+	var data: Data {
 		let data = withUnsafeBytes(of: bigEndian) { Data($0) }
 		return data
 	}
 
-	public var bytes: [UInt8] {
+	var bytes: [UInt8] {
 		[UInt8](data)
 	}
 }
@@ -142,13 +142,13 @@ extension Data: ExpressibleByStringLiteral {
 }
 
 extension String {
-	public static let deadbeef32Bytes = Self(repeating: "deadbeef", count: 8)
-	public static let deadbeef64Bytes = Self(repeating: "deadbeef", count: 16)
+	static let deadbeef32Bytes = Self(repeating: "deadbeef", count: 8)
+	static let deadbeef64Bytes = Self(repeating: "deadbeef", count: 16)
 }
 
 extension Data {
-	public static let deadbeef32Bytes = try! Self(hex: .deadbeef32Bytes)
-	public static let deadbeef64Bytes = try! Self(hex: .deadbeef64Bytes)
+	static let deadbeef32Bytes = try! Self(hex: .deadbeef32Bytes)
+	static let deadbeef64Bytes = try! Self(hex: .deadbeef64Bytes)
 }
 
 #endif // DEBUG

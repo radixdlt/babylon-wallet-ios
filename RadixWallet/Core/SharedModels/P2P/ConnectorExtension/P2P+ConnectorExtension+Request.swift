@@ -1,13 +1,13 @@
 // MARK: - P2P.ConnectorExtension
 extension P2P {
 	/// Just a namespace
-	public enum ConnectorExtension {}
+	enum ConnectorExtension {}
 }
 
 // MARK: - P2P.ConnectorExtension.Request
 extension P2P.ConnectorExtension {
 	/// A request we send to connector extension
-	public enum Request: Sendable, Hashable, Encodable {
+	enum Request: Sendable, Hashable, Encodable {
 		/// Messages sent to Connector Extension for interaction with
 		/// Ledger hardware wallets by LedgerHQ, e.g. Ledger Nano S
 		case ledgerHardwareWallet(LedgerHardwareWallet)
@@ -15,7 +15,7 @@ extension P2P.ConnectorExtension {
 		/// Accounts sent to Connector Extension
 		case accountListMessage(AccountListMessage)
 
-		public func encode(to encoder: Encoder) throws {
+		func encode(to encoder: Encoder) throws {
 			switch self {
 			case let .ledgerHardwareWallet(request):
 				try request.encode(to: encoder)
@@ -30,23 +30,23 @@ extension P2P.ConnectorExtension {
 extension P2P.ConnectorExtension.Request {
 	/// Message sent to Connector Extension for interaction with
 	/// Ledger hardware wallets by LedgerHQ, e.g. Ledger Nano S
-	public struct LedgerHardwareWallet: Sendable, Hashable, Encodable {
-		public let interactionID: P2P.LedgerHardwareWallet.InteractionId
-		public let request: Request
+	struct LedgerHardwareWallet: Sendable, Hashable, Encodable {
+		let interactionID: P2P.LedgerHardwareWallet.InteractionId
+		let request: Request
 
-		public init(interactionID: P2P.LedgerHardwareWallet.InteractionId, request: Request) {
+		init(interactionID: P2P.LedgerHardwareWallet.InteractionId, request: Request) {
 			self.interactionID = interactionID
 			self.request = request
 		}
 
-		public enum Request: Sendable, Hashable, Encodable {
+		enum Request: Sendable, Hashable, Encodable {
 			case getDeviceInfo
 			case derivePublicKeys(DerivePublicKeys)
 			case signTransaction(SignTransaction)
 			case signChallenge(SignAuthChallenge)
 			case deriveAndDisplayAddress(DeriveAndDisplayAddress)
 
-			public var discriminator: P2P.LedgerHardwareWallet.Discriminator {
+			var discriminator: P2P.LedgerHardwareWallet.Discriminator {
 				switch self {
 				case .derivePublicKeys: .derivePublicKeys
 				case .getDeviceInfo: .getDeviceInfo
@@ -56,11 +56,11 @@ extension P2P.ConnectorExtension.Request {
 				}
 			}
 
-			public struct DerivePublicKeys: Sendable, Hashable, Encodable {
-				public let keysParameters: [P2P.LedgerHardwareWallet.KeyParameters]
-				public let ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
+			struct DerivePublicKeys: Sendable, Hashable, Encodable {
+				let keysParameters: [P2P.LedgerHardwareWallet.KeyParameters]
+				let ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
 
-				public init(
+				init(
 					keysParameters: [P2P.LedgerHardwareWallet.KeyParameters],
 					ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
 				) {
@@ -69,14 +69,14 @@ extension P2P.ConnectorExtension.Request {
 				}
 			}
 
-			public struct SignTransaction: Sendable, Hashable, Encodable {
-				public let signers: [P2P.LedgerHardwareWallet.KeyParameters]
-				public let ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
-				public let compiledTransactionIntent: HexCodable
-				public let displayHash: Bool
-				public let mode: String
+			struct SignTransaction: Sendable, Hashable, Encodable {
+				let signers: [P2P.LedgerHardwareWallet.KeyParameters]
+				let ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
+				let compiledTransactionIntent: HexCodable
+				let displayHash: Bool
+				let mode: String
 
-				public init(
+				init(
 					signers: [P2P.LedgerHardwareWallet.KeyParameters],
 					ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice,
 					compiledTransactionIntent: HexCodable,
@@ -90,14 +90,14 @@ extension P2P.ConnectorExtension.Request {
 				}
 			}
 
-			public struct SignAuthChallenge: Sendable, Hashable, Encodable {
-				public let signers: [P2P.LedgerHardwareWallet.KeyParameters]
-				public let ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
-				public let challenge: DappToWalletInteractionAuthChallengeNonce
-				public let origin: DappOrigin
-				public let dAppDefinitionAddress: AccountAddress
+			struct SignAuthChallenge: Sendable, Hashable, Encodable {
+				let signers: [P2P.LedgerHardwareWallet.KeyParameters]
+				let ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
+				let challenge: DappToWalletInteractionAuthChallengeNonce
+				let origin: DappOrigin
+				let dAppDefinitionAddress: AccountAddress
 
-				public init(
+				init(
 					signers: [P2P.LedgerHardwareWallet.KeyParameters],
 					ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice,
 					challenge: DappToWalletInteractionAuthChallengeNonce,
@@ -112,10 +112,10 @@ extension P2P.ConnectorExtension.Request {
 				}
 			}
 
-			public struct DeriveAndDisplayAddress: Sendable, Hashable, Encodable {
-				public let keyParameters: P2P.LedgerHardwareWallet.KeyParameters
-				public let ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
-				public init(
+			struct DeriveAndDisplayAddress: Sendable, Hashable, Encodable {
+				let keyParameters: P2P.LedgerHardwareWallet.KeyParameters
+				let ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
+				init(
 					keyParameters: P2P.LedgerHardwareWallet.KeyParameters,
 					ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
 				) {
@@ -126,7 +126,7 @@ extension P2P.ConnectorExtension.Request {
 		}
 
 		private typealias CodingKeys = P2P.LedgerHardwareWallet.CodingKeys
-		public func encode(to encoder: Encoder) throws {
+		func encode(to encoder: Encoder) throws {
 			var container = encoder.container(keyedBy: CodingKeys.self)
 			try container.encode(interactionID, forKey: .interactionID)
 			try container.encode(
@@ -147,22 +147,22 @@ extension P2P.ConnectorExtension.Request {
 		}
 	}
 
-	public struct LinkClientInteractionResponse: Sendable, Hashable, Encodable {
-		public enum Discriminator: String, Sendable, Hashable, Encodable {
+	struct LinkClientInteractionResponse: Sendable, Hashable, Encodable {
+		enum Discriminator: String, Sendable, Hashable, Encodable {
 			case linkClient
 		}
 
-		public let discriminator: Discriminator
-		public let publicKey: Ed25519PublicKey
-		public let signature: Ed25519Signature
+		let discriminator: Discriminator
+		let publicKey: Ed25519PublicKey
+		let signature: Ed25519Signature
 	}
 
-	public struct AccountListMessage: Sendable, Hashable, Encodable {
-		public enum Discriminator: String, Sendable, Hashable, Encodable {
+	struct AccountListMessage: Sendable, Hashable, Encodable {
+		enum Discriminator: String, Sendable, Hashable, Encodable {
 			case accountList
 		}
 
-		public let discriminator: Discriminator
-		public let accounts: [WalletInteractionWalletAccount]
+		let discriminator: Discriminator
+		let accounts: [WalletInteractionWalletAccount]
 	}
 }

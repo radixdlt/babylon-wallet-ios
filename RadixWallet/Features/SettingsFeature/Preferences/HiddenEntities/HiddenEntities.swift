@@ -2,9 +2,9 @@ import ComposableArchitecture
 
 // MARK: - HiddenEntities
 @Reducer
-public struct HiddenEntities: Sendable, FeatureReducer {
+struct HiddenEntities: Sendable, FeatureReducer {
 	@ObservableState
-	public struct State: Sendable, Hashable {
+	struct State: Sendable, Hashable {
 		var personas: Personas = []
 		var accounts: Accounts = []
 
@@ -12,52 +12,52 @@ public struct HiddenEntities: Sendable, FeatureReducer {
 		var destination: Destination.State? = nil
 	}
 
-	public typealias Action = FeatureAction<Self>
+	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case task
 		case unhidePersonaTapped(Persona.ID)
 		case unhideAccountTapped(Account.ID)
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case setEntities(EntitiesVisibilityClient.HiddenEntities)
 		case didUnhidePersona(Persona.ID)
 		case didUnhideAccount(Account.ID)
 	}
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case unhideAlert(AlertState<Action.UnhideAlert>)
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case unhideAlert(UnhideAlert)
 
-			public enum UnhideAlert: Hashable, Sendable {
+			enum UnhideAlert: Hashable, Sendable {
 				case confirmPersonaTapped(Persona.ID)
 				case confirmAccountTapped(Account.ID)
 				case cancelTapped
 			}
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			EmptyReducer()
 		}
 	}
 
 	@Dependency(\.entitiesVisibilityClient) var entitiesVisibilityClient
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			return .run { send in
@@ -93,7 +93,7 @@ public struct HiddenEntities: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .setEntities(hiddenEntities):
 			state.personas = hiddenEntities.personas
@@ -112,7 +112,7 @@ public struct HiddenEntities: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .unhideAlert(action):
 			switch action {

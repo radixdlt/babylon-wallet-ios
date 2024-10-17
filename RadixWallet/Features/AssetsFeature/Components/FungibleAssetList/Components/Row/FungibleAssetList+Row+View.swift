@@ -27,20 +27,20 @@ extension ResourceBalance.ViewState.Fungible {
 
 // MARK: - FungibleTokenList.Row.View
 extension FungibleAssetList.Section.Row {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let resource: ResourceBalance.ViewState.Fungible
 		let isSelected: Bool?
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<FungibleAssetList.Section.Row>
 
-		public init(store: StoreOf<FungibleAssetList.Section.Row>) {
+		init(store: StoreOf<FungibleAssetList.Section.Row>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: FeatureAction.view) { viewStore in
 				ResourceBalanceButton(.fungible(viewStore.resource), appearance: .assetList, isSelected: viewStore.isSelected) {
 					viewStore.send(.tapped)

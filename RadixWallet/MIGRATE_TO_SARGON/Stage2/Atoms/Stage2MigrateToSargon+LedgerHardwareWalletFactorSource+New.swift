@@ -16,8 +16,8 @@ extension LedgerHardwareWalletFactorSource {
 
 extension LedgerHardwareWalletFactorSource {
 	/// Creates a factor source of `.ledger` kind with the specified
-	/// Ledger model, name and `deviceID` (hash of public key)
-	public static func model(
+	/// Ledger model, name and `deviceID` (hash of key)
+	static func model(
 		_ model: LedgerHardwareWalletModel,
 		name: String,
 		body: Exactly32Bytes

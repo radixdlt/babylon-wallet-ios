@@ -43,93 +43,93 @@ extension Color {
 
 extension Color {
 	/// Namespace only
-	public struct App { fileprivate init() {} }
-	public static let app = App()
+	struct App { fileprivate init() {} }
+	static let app = App()
 }
 
 extension ShapeStyle where Self == Color {
 	/// Namespace only
-	public static var app: Color.App { Color.app }
+	static var app: Color.App { Color.app }
 }
 
 extension Color.App {
 	// blue
-	public var blue1: Color { .init(hex: .blue1) }
-	public var blue2: Color { .init(hex: .blue2) }
-	public var blue3: Color { .init(hex: .blue3) }
+	var blue1: Color { .init(hex: .blue1) }
+	var blue2: Color { .init(hex: .blue2) }
+	var blue3: Color { .init(hex: .blue3) }
 
 	// green
-	public var green1: Color { .init(hex: .green1) }
-	public var green2: Color { .init(hex: .green2) }
-	public var green3: Color { .init(hex: .green3) }
+	var green1: Color { .init(hex: .green1) }
+	var green2: Color { .init(hex: .green2) }
+	var green3: Color { .init(hex: .green3) }
 
 	// gray
-	public var gray1: Color { .init(hex: .gray1) }
-	public var gray2: Color { .init(hex: .gray2) }
-	public var gray3: Color { .init(hex: .gray3) }
-	public var gray4: Color { .init(hex: .gray4) }
-	public var gray5: Color { .init(hex: .gray5) }
+	var gray1: Color { .init(hex: .gray1) }
+	var gray2: Color { .init(hex: .gray2) }
+	var gray3: Color { .init(hex: .gray3) }
+	var gray4: Color { .init(hex: .gray4) }
+	var gray5: Color { .init(hex: .gray5) }
 
 	// white
-	public var white: Color { .init(hex: .white) }
+	var white: Color { .init(hex: .white) }
 	/// white with 0.8 opacity
-	public var whiteTransparent: Color { .white.opacity(0.8) }
+	var whiteTransparent: Color { .white.opacity(0.8) }
 	/// white with 0.3 opacity
-	public var whiteTransparent2: Color { .white.opacity(0.3) }
+	var whiteTransparent2: Color { .white.opacity(0.3) }
 	/// white with 0.2 opacity
-	public var whiteTransparent3: Color { .white.opacity(0.2) }
+	var whiteTransparent3: Color { .white.opacity(0.2) }
 
 	// orange
-	public var orange1: Color { .init(hex: .orange1) }
-	public var orange2: Color { .init(hex: .orange2) }
+	var orange1: Color { .init(hex: .orange1) }
+	var orange2: Color { .init(hex: .orange2) }
 
-	public var red1: Color { .init(hex: .error) }
+	var red1: Color { .init(hex: .error) }
 
 	// alert
-	public var alert: Color { .init(hex: .alert) }
-	public var lightAlert: Color { .init(hex: .lightAlert) }
-	public var error: Color { .init(hex: .error) }
-	public var notification: Color { .init(hex: .notification) }
+	var alert: Color { .init(hex: .alert) }
+	var lightAlert: Color { .init(hex: .lightAlert) }
+	var error: Color { .init(hex: .error) }
+	var notification: Color { .init(hex: .notification) }
 
-	public var background: Color { .dynamic(light: .white, dark: .black) }
+	var background: Color { .dynamic(light: .white, dark: .black) }
 	@available(*, deprecated, message: "Use dynamic 'background' color instead")
-	public var backgroundDark: Color { .black }
+	var backgroundDark: Color { .black }
 	@available(*, deprecated, message: "Use dynamic 'background' color instead")
-	public var backgroundLight: Color { .white }
+	var backgroundLight: Color { .white }
 
-	public var buttonTextBlack: Color { .black }
-	public var buttonTextBlackTransparent: Color { .black.opacity(0.6) }
+	var buttonTextBlack: Color { .black }
+	var buttonTextBlackTransparent: Color { .black.opacity(0.6) }
 
-	public var shadowBlack: Color { .black.opacity(0.08) }
+	var shadowBlack: Color { .black.opacity(0.08) }
 
-	public var cardShadowBlack: Color { .black.opacity(0.15) }
+	var cardShadowBlack: Color { .black.opacity(0.15) }
 
 	// Account gradient
-	public var account0green: Color { .init(hex: .account0green) }
+	var account0green: Color { .init(hex: .account0green) }
 
-	public var account1pink: Color { .init(hex: .account1pink) }
+	var account1pink: Color { .init(hex: .account1pink) }
 
-	public var account4pink: Color { .init(hex: .account4pink) }
+	var account4pink: Color { .init(hex: .account4pink) }
 
-	public var account5blue: Color { .init(hex: .account5blue) }
+	var account5blue: Color { .init(hex: .account5blue) }
 
-	public var account6green: Color { .init(hex: .account6green) }
+	var account6green: Color { .init(hex: .account6green) }
 
-	public var account7pink: Color { .init(hex: .account7pink) }
+	var account7pink: Color { .init(hex: .account7pink) }
 
-	public var account9green1: Color { .init(hex: .account9green1) }
-	public var account9green2: Color { .init(hex: .account9green2) }
+	var account9green1: Color { .init(hex: .account9green1) }
+	var account9green2: Color { .init(hex: .account9green2) }
 
-	public var account10pink1: Color { .init(hex: .account10pink1) }
-	public var account10pink2: Color { .init(hex: .account10pink2) }
+	var account10pink1: Color { .init(hex: .account10pink1) }
+	var account10pink2: Color { .init(hex: .account10pink2) }
 
-	public var account11green: Color { .init(hex: .account11green) }
-	public var account11blue1: Color { .init(hex: .account11blue1) }
-	public var account11pink: Color { .init(hex: .account11pink) }
+	var account11green: Color { .init(hex: .account11green) }
+	var account11blue1: Color { .init(hex: .account11blue1) }
+	var account11pink: Color { .init(hex: .account11pink) }
 
 	// Approval gradient
 
-	public var gradientPurple: Color { .init(hex: 0xFF07E6) }
+	var gradientPurple: Color { .init(hex: 0xFF07E6) }
 }
 
 // MARK: - Color.Hex
@@ -214,7 +214,7 @@ extension Color {
 		)
 	}
 
-	public init(
+	init(
 		red: UInt8,
 		green: UInt8,
 		blue: UInt8,
@@ -231,11 +231,11 @@ extension Color {
 		)
 	}
 
-	public static func randomDark(seed: Data?) -> Self {
+	static func randomDark(seed: Data?) -> Self {
 		random(range: 40 ... 128, seed: seed)
 	}
 
-	public static func randomLight(seed: Data?) -> Self {
+	static func randomLight(seed: Data?) -> Self {
 		random(range: 128 ... 240, seed: seed)
 	}
 

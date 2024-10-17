@@ -2,45 +2,45 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - ScanMultipleOlympiaQRCodes
-public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public struct ScannedPayload: Sendable, Hashable, Identifiable {
-			public typealias ID = Int
-			public var id: ID { payloadIndex }
-			public let unparsedPayload: NonEmptyString
-			public let payloadIndex: Int
+struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		struct ScannedPayload: Sendable, Hashable, Identifiable {
+			typealias ID = Int
+			var id: ID { payloadIndex }
+			let unparsedPayload: NonEmptyString
+			let payloadIndex: Int
 		}
 
-		public var scanQR: ScanQRCoordinator.State
-		public var numberOfPayloadsToScan: Int?
-		public var scannedPayloads: IdentifiedArrayOf<ScannedPayload>
+		var scanQR: ScanQRCoordinator.State
+		var numberOfPayloadsToScan: Int?
+		var scannedPayloads: IdentifiedArrayOf<ScannedPayload>
 
-		public init(
+		init(
 			scannedPayloads: IdentifiedArrayOf<ScannedPayload> = []
 		) {
 			self.scanQR = .init(kind: .importOlympia)
 			self.scannedPayloads = scannedPayloads
 		}
 
-		public mutating func reset() {
+		mutating func reset() {
 			numberOfPayloadsToScan = nil
 			scannedPayloads = []
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case appeared
 	}
 
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case scanQR(ScanQRCoordinator.Action)
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case scannedParsedOlympiaWalletToMigrate(ScannedParsedOlympiaWalletToMigrate)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case viewAppeared
 		case finishedScanning(ScannedParsedOlympiaWalletToMigrate)
 	}
@@ -49,16 +49,16 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Scope(state: \.scanQR, action: /Action.child .. ChildAction.scanQR) {
 			ScanQRCoordinator()
 		}
 		Reduce(core)
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .scanQR(.delegate(.scanned(qrString))):
 			guard let unparsed = NonEmptyString(qrString) else {
@@ -104,14 +104,14 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .scannedParsedOlympiaWalletToMigrate(olympiaWallet):
 			.send(.delegate(.finishedScanning(olympiaWallet)))
 		}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			.send(.delegate(.viewAppeared))

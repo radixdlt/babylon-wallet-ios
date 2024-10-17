@@ -2,23 +2,23 @@ import Foundation
 import IdentifiedCollections
 import Sargon
 
-public typealias Accounts = IdentifiedArrayOf<Account>
-public typealias Personas = IdentifiedArrayOf<Persona>
-public typealias ProfileNetworks = IdentifiedArrayOf<ProfileNetwork>
-public typealias AssetsExceptionList = IdentifiedArrayOf<AssetException>
-public typealias DepositorsAllowList = IdentifiedArrayOf<ResourceOrNonFungible>
-public typealias FactorSources = IdentifiedArrayOf<FactorSource>
-public typealias P2PLinks = IdentifiedArrayOf<P2PLink>
-public typealias AuthorizedDapps = IdentifiedArrayOf<AuthorizedDapp>
-public typealias ReferencesToAuthorizedPersonas = IdentifiedArrayOf<AuthorizedPersonaSimple>
-public typealias DetailedAuthorizedPersonas = IdentifiedArrayOf<AuthorizedPersonaDetailed>
-public typealias AccountsForDisplay = IdentifiedArrayOf<AccountForDisplay>
-public typealias Gateways = IdentifiedArrayOf<Gateway>
+typealias Accounts = IdentifiedArrayOf<Account>
+typealias Personas = IdentifiedArrayOf<Persona>
+typealias ProfileNetworks = IdentifiedArrayOf<ProfileNetwork>
+typealias AssetsExceptionList = IdentifiedArrayOf<AssetException>
+typealias DepositorsAllowList = IdentifiedArrayOf<ResourceOrNonFungible>
+typealias FactorSources = IdentifiedArrayOf<FactorSource>
+typealias P2PLinks = IdentifiedArrayOf<P2PLink>
+typealias AuthorizedDapps = IdentifiedArrayOf<AuthorizedDapp>
+typealias ReferencesToAuthorizedPersonas = IdentifiedArrayOf<AuthorizedPersonaSimple>
+typealias DetailedAuthorizedPersonas = IdentifiedArrayOf<AuthorizedPersonaDetailed>
+typealias AccountsForDisplay = IdentifiedArrayOf<AccountForDisplay>
+typealias Gateways = IdentifiedArrayOf<Gateway>
 
-public typealias EntityFlags = IdentifiedArrayOf<EntityFlag>
+typealias EntityFlags = IdentifiedArrayOf<EntityFlag>
 
 extension Account {
-	public var entityFlags: EntityFlags {
+	var entityFlags: EntityFlags {
 		get { flags.asIdentified() }
 		set {
 			flags = newValue.elements
@@ -27,7 +27,7 @@ extension Account {
 }
 
 extension Persona {
-	public var entityFlags: EntityFlags {
+	var entityFlags: EntityFlags {
 		get { flags.asIdentified() }
 		set {
 			flags = newValue.elements

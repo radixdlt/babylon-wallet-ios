@@ -1,14 +1,14 @@
 // MARK: - RecoverWalletWithoutProfileStart.View
 extension RecoverWalletWithoutProfileStart {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<RecoverWalletWithoutProfileStart>
 
-		public init(store: StoreOf<RecoverWalletWithoutProfileStart>) {
+		init(store: StoreOf<RecoverWalletWithoutProfileStart>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { _ in
 				ScrollView {
 					VStack(alignment: .center, spacing: .large3) {
@@ -119,6 +119,6 @@ struct RecoverWalletWithoutProfile_Preview: PreviewProvider {
 }
 
 extension RecoverWalletWithoutProfileStart.State {
-	public static let previewValue = Self()
+	static let previewValue = Self()
 }
 #endif

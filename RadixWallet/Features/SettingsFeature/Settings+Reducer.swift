@@ -2,26 +2,26 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - Settings
-public struct Settings: Sendable, FeatureReducer {
-	public typealias Store = StoreOf<Self>
+struct Settings: Sendable, FeatureReducer {
+	typealias Store = StoreOf<Self>
 
-	public init() {}
+	init() {}
 
 	// MARK: State
 
-	public struct State: Sendable, Hashable {
+	struct State: Sendable, Hashable {
 		@PresentationState
-		public var destination: Destination.State?
+		var destination: Destination.State?
 
-		public var securityProblems: [SecurityProblem] = []
+		var securityProblems: [SecurityProblem] = []
 		fileprivate var personas: [IdentityAddress] = []
 
-		public init() {}
+		init() {}
 	}
 
 	// MARK: Action
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case task
 		case securityCenterButtonTapped
 		case personasButtonTapped
@@ -32,14 +32,14 @@ public struct Settings: Sendable, FeatureReducer {
 		case debugButtonTapped
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case setSecurityProblems([SecurityProblem])
 		case setPersonas([IdentityAddress])
 	}
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case securityCenter(SecurityCenter.State)
 			case manageP2PLinks(P2PLinksFeature.State)
 			case authorizedDapps(AuthorizedDappsFeature.State)
@@ -50,7 +50,7 @@ public struct Settings: Sendable, FeatureReducer {
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case securityCenter(SecurityCenter.Action)
 			case manageP2PLinks(P2PLinksFeature.Action)
 			case authorizedDapps(AuthorizedDappsFeature.Action)
@@ -60,7 +60,7 @@ public struct Settings: Sendable, FeatureReducer {
 			case debugSettings(DebugSettingsCoordinator.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: \.securityCenter, action: \.securityCenter) {
 				SecurityCenter()
 			}
@@ -95,7 +95,7 @@ public struct Settings: Sendable, FeatureReducer {
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.userDefaults) var userDefaults
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -104,7 +104,7 @@ public struct Settings: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			return securityProblemsEffect()
@@ -140,7 +140,7 @@ public struct Settings: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .setSecurityProblems(problems):
 			state.securityProblems = problems
@@ -151,7 +151,7 @@ public struct Settings: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .troubleshooting(.delegate(.goToAccountList)):
 			.run { _ in await dismiss() }
@@ -183,7 +183,7 @@ extension Settings {
 }
 
 extension Settings.State {
-	public var personasSecurityProblems: [SecurityProblem] {
+	var personasSecurityProblems: [SecurityProblem] {
 		securityProblems.filter {
 			switch $0 {
 			case .problem5, .problem6, .problem7:

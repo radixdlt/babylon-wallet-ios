@@ -3,18 +3,18 @@ import Sargon
 import SwiftUI
 
 // MARK: - CreateAccountCoordinator
-public struct CreateAccountCoordinator: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
+struct CreateAccountCoordinator: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
 		var root: Path.State?
 		var path: StackState<Path.State> = .init()
 
 		@PresentationState
-		public var destination: Destination.State? = nil
+		var destination: Destination.State? = nil
 
-		public let config: CreateAccountConfig
+		let config: CreateAccountConfig
 		var name: NonEmptyString?
 
-		public init(
+		init(
 			root: Path.State? = nil,
 			config: CreateAccountConfig
 		) {
@@ -38,20 +38,20 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public struct Path: Sendable, Reducer {
-		public enum State: Sendable, Hashable {
+	struct Path: Sendable, Reducer {
+		enum State: Sendable, Hashable {
 			case nameAccount(NameAccount.State)
 			case selectLedger(LedgerHardwareDevices.State)
 			case completion(NewAccountCompletion.State)
 		}
 
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case nameAccount(NameAccount.Action)
 			case selectLedger(LedgerHardwareDevices.Action)
 			case completion(NewAccountCompletion.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: /State.nameAccount, action: /Action.nameAccount) {
 				NameAccount()
 			}
@@ -64,37 +64,37 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public struct Destination: DestinationReducer {
-		public enum State: Sendable, Hashable {
+	struct Destination: DestinationReducer {
+		enum State: Sendable, Hashable {
 			case derivePublicKey(DerivePublicKeys.State)
 		}
 
-		public enum Action: Sendable, Hashable {
+		enum Action: Sendable, Hashable {
 			case derivePublicKey(DerivePublicKeys.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: /State.derivePublicKey, action: /Action.derivePublicKey) {
 				DerivePublicKeys()
 			}
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case closeButtonTapped
 	}
 
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case root(Path.Action)
 		case path(StackActionOf<Path>)
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case createAccountResult(TaskResult<Account>)
 		case handleAccountCreated(TaskResult<Account>)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case dismissed
 		case accountCreated
 		case completed
@@ -107,9 +107,9 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.isPresented) var isPresented
 	@Dependency(\.dismiss) var dismiss
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.root, action: /Action.child .. ChildAction.root) {
 				Path()
@@ -126,7 +126,7 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 }
 
 extension CreateAccountCoordinator {
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
 			.run { send in
@@ -138,7 +138,7 @@ extension CreateAccountCoordinator {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .root(.nameAccount(.delegate(.proceed(accountName, useLedgerAsFactorSource)))):
 			state.name = accountName
@@ -170,7 +170,7 @@ extension CreateAccountCoordinator {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .createAccountResult(.success(account)):
 			return .run { send in
@@ -197,7 +197,7 @@ extension CreateAccountCoordinator {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .derivePublicKey(.delegate(.derivedPublicKeys(hdKeys, factorSourceID, networkID))):
 			guard let hdKey = hdKeys.first else {
@@ -206,7 +206,7 @@ extension CreateAccountCoordinator {
 				return .none
 			}
 			guard let name = state.name else {
-				fatalError("Derived public keys without account name set")
+				fatalError("Derived keys without account name set")
 			}
 
 			return .run { send in
@@ -270,7 +270,7 @@ extension CreateAccountCoordinator {
 }
 
 extension CreateAccountCoordinator.State {
-	public var lastStepState: CreateAccountCoordinator.Path.State? {
+	var lastStepState: CreateAccountCoordinator.Path.State? {
 		path.last
 	}
 }

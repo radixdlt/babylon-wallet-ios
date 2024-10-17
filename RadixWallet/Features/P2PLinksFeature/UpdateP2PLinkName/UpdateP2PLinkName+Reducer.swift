@@ -1,8 +1,8 @@
 // MARK: - UpdateP2PLinkName
 @Reducer
-public struct UpdateP2PLinkName: FeatureReducer, Sendable {
+struct UpdateP2PLinkName: FeatureReducer, Sendable {
 	@ObservableState
-	public struct State: Hashable, Sendable {
+	struct State: Hashable, Sendable {
 		var link: P2PLink
 		var linkName: String
 		var sanitizedName: NonEmptyString?
@@ -15,17 +15,17 @@ public struct UpdateP2PLinkName: FeatureReducer, Sendable {
 		}
 	}
 
-	public typealias Action = FeatureAction<Self>
+	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	public enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable, Sendable {
 		case closeButtonTapped
 		case linkNameChanged(String)
 		case updateTapped(NonEmptyString)
 		case focusChanged(Bool)
 	}
 
-	public enum DelegateAction: Equatable, Sendable {
+	enum DelegateAction: Equatable, Sendable {
 		case linkNameUpdated(P2PLink)
 	}
 
@@ -34,11 +34,11 @@ public struct UpdateP2PLinkName: FeatureReducer, Sendable {
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.dismiss) var dismiss
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
 			return .run { _ in

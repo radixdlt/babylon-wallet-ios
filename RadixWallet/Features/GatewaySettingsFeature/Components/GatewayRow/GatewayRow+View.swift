@@ -30,14 +30,14 @@ extension GatewayRow.State {
 // MARK: - GatewayRow.View
 extension GatewayRow {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<GatewayRow>
 
-		public init(store: StoreOf<GatewayRow>) {
+		init(store: StoreOf<GatewayRow>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				Button(
 					action: {

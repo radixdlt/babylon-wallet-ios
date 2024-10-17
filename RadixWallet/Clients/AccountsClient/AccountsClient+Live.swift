@@ -1,9 +1,9 @@
 // MARK: - AccountsClient + DependencyKey
 
 extension AccountsClient: DependencyKey {
-	public typealias Value = AccountsClient
+	typealias Value = AccountsClient
 
-	public static func live(
+	static func live(
 		profileStore: ProfileStore = .shared
 	) -> Self {
 		let saveVirtualAccounts: SaveVirtualAccounts = { accounts in
@@ -118,5 +118,5 @@ extension AccountsClient: DependencyKey {
 		#endif
 	}
 
-	public static let liveValue: Self = .live()
+	static let liveValue: Self = .live()
 }

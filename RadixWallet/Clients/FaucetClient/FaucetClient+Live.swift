@@ -3,7 +3,7 @@ let minimumNumberOfEpochsPassedForFaucetToBeReused = 1
 
 // MARK: - FaucetClient + DependencyKey
 extension FaucetClient: DependencyKey {
-	public static let liveValue: Self = {
+	static let liveValue: Self = {
 		@Dependency(\.userDefaults) var userDefaults
 		@Dependency(\.gatewaysClient) var gatewaysClient
 

@@ -1,11 +1,11 @@
 import ComposableArchitecture
 import SwiftUI
 
-public struct NormalFeesCustomization: FeatureReducer {
-	public struct State: Hashable, Sendable {
+struct NormalFeesCustomization: FeatureReducer {
+	struct State: Hashable, Sendable {
 		let fees: TransactionFee.NormalFeeCustomization
 
-		public init(
+		init(
 			fees: TransactionFee.NormalFeeCustomization
 		) {
 			self.fees = fees

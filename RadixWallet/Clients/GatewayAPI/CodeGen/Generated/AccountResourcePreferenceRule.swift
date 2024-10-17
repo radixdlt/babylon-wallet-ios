@@ -11,11 +11,11 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.AccountResourcePreferenceRule")
-public typealias AccountResourcePreferenceRule = GatewayAPI.AccountResourcePreferenceRule
+typealias AccountResourcePreferenceRule = GatewayAPI.AccountResourcePreferenceRule
 
 extension GatewayAPI {
 
-public enum AccountResourcePreferenceRule: String, Codable, CaseIterable {
+enum AccountResourcePreferenceRule: String, Codable, CaseIterable {
     case allowed = "Allowed"
     case disallowed = "Disallowed"
 }

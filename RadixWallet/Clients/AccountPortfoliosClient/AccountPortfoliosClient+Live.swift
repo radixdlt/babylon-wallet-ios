@@ -29,7 +29,7 @@ extension AccountPortfoliosClient: DependencyKey {
 		}
 	}
 
-	public static let liveValue: AccountPortfoliosClient = {
+	static let liveValue: AccountPortfoliosClient = {
 		let state = State()
 
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient

@@ -2,13 +2,13 @@ import Sargon
 
 // MARK: - LedgerRowView
 @MainActor
-public struct LedgerRowView: View {
-	public struct ViewState: Equatable {
+struct LedgerRowView: View {
+	struct ViewState: Equatable {
 		let description: String
 		let addedOn: Date
 		let lastUsedOn: Date
 
-		public init(factorSource: LedgerHardwareWalletFactorSource) {
+		init(factorSource: LedgerHardwareWalletFactorSource) {
 			self.description = factorSource.hint.name
 			self.addedOn = factorSource.common.addedOn
 			self.lastUsedOn = factorSource.common.lastUsedOn
@@ -20,20 +20,20 @@ public struct LedgerRowView: View {
 	private let action: (() -> Void)?
 
 	/// Creates a tappable Ledger card. If `isSelected` is non-nil, the card will have a radio button.
-	public init(viewState: ViewState, isSelected: Bool? = nil, action: @escaping () -> Void) {
+	init(viewState: ViewState, isSelected: Bool? = nil, action: @escaping () -> Void) {
 		self.viewState = viewState
 		self.isSelected = isSelected
 		self.action = action
 	}
 
 	/// Creates an inert Ledger card, with no selection indication.
-	public init(viewState: ViewState) {
+	init(viewState: ViewState) {
 		self.viewState = viewState
 		self.isSelected = nil
 		self.action = nil
 	}
 
-	public var body: some View {
+	var body: some View {
 		Card(.app.gray5, action: action) {
 			HStack(spacing: 0) {
 				VStack(alignment: .leading, spacing: 0) {

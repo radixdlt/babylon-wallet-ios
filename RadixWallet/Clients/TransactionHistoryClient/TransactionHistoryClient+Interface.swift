@@ -1,51 +1,51 @@
 import Foundation
 
 // MARK: - TransactionHistoryClient
-public struct TransactionHistoryClient: Sendable, DependencyKey {
-	public var getFirstTransactionDate: GetFirstTransactionDate
-	public var getTransactionHistory: GetTransactionHistory
+struct TransactionHistoryClient: Sendable, DependencyKey {
+	var getFirstTransactionDate: GetFirstTransactionDate
+	var getTransactionHistory: GetTransactionHistory
 }
 
 // MARK: TransactionHistoryClient.GetTransactionHistory
 extension TransactionHistoryClient {
-	public typealias GetFirstTransactionDate = @Sendable (AccountAddress) async throws -> Date?
-	public typealias GetTransactionHistory = @Sendable (TransactionHistoryRequest) async throws -> TransactionHistoryResponse
+	typealias GetFirstTransactionDate = @Sendable (AccountAddress) async throws -> Date?
+	typealias GetTransactionHistory = @Sendable (TransactionHistoryRequest) async throws -> TransactionHistoryResponse
 }
 
 // MARK: - TransactionHistoryRequest
-public struct TransactionHistoryRequest: Sendable, Hashable {
-	public let account: AccountAddress
-	public let parameters: Parameters
-	public let cursor: String?
+struct TransactionHistoryRequest: Sendable, Hashable {
+	let account: AccountAddress
+	let parameters: Parameters
+	let cursor: String?
 
-	public let allResourcesAddresses: Set<ResourceAddress>
-	public let resources: IdentifiedArrayOf<OnLedgerEntity.Resource>
+	let allResourcesAddresses: Set<ResourceAddress>
+	let resources: IdentifiedArrayOf<OnLedgerEntity.Resource>
 
 	// MARK: - Parameters
-	public struct Parameters: Sendable, Hashable {
-		public let period: AnyRange<Date>
-		public let filters: [TransactionFilter]
-		public let direction: TransactionHistory.Direction
+	struct Parameters: Sendable, Hashable {
+		let period: AnyRange<Date>
+		let filters: [TransactionFilter]
+		let direction: TransactionHistory.Direction
 	}
 }
 
 // MARK: - TransactionHistoryResponse
-public struct TransactionHistoryResponse: Sendable, Hashable {
-	public let nextCursor: String?
-	public let resources: IdentifiedArrayOf<OnLedgerEntity.Resource>
-	public let items: [TransactionHistoryItem]
+struct TransactionHistoryResponse: Sendable, Hashable {
+	let nextCursor: String?
+	let resources: IdentifiedArrayOf<OnLedgerEntity.Resource>
+	let items: [TransactionHistoryItem]
 }
 
 // MARK: - TransactionHistoryItem
-public struct TransactionHistoryItem: Sendable, Hashable, Identifiable {
-	public let id: IntentHash
-	public let time: Date
-	public let message: String?
-	public let manifestClass: GatewayAPI.ManifestClass?
-	public let withdrawals: [ResourceBalance]
-	public let deposits: [ResourceBalance]
-	public let depositSettingsUpdated: Bool
-	public let failed: Bool
+struct TransactionHistoryItem: Sendable, Hashable, Identifiable {
+	let id: IntentHash
+	let time: Date
+	let message: String?
+	let manifestClass: GatewayAPI.ManifestClass?
+	let withdrawals: [ResourceBalance]
+	let deposits: [ResourceBalance]
+	let depositSettingsUpdated: Bool
+	let failed: Bool
 
 	init(
 		id: IntentHash,
@@ -69,29 +69,29 @@ public struct TransactionHistoryItem: Sendable, Hashable, Identifiable {
 }
 
 // MARK: - TransactionFilter
-public enum TransactionFilter: Hashable, Sendable {
+enum TransactionFilter: Hashable, Sendable {
 	case transferType(TransferType)
 	case asset(ResourceAddress)
 	case transactionType(TransactionType)
 
-	public enum TransferType: CaseIterable, Sendable {
+	enum TransferType: CaseIterable, Sendable {
 		case deposit
 		case withdrawal
 	}
 
-	public typealias TransactionType = GatewayAPI.ManifestClass
+	typealias TransactionType = GatewayAPI.ManifestClass
 
-	public var transferType: TransferType? {
+	var transferType: TransferType? {
 		guard case let .transferType(transferType) = self else { return nil }
 		return transferType
 	}
 
-	public var asset: ResourceAddress? {
+	var asset: ResourceAddress? {
 		guard case let .asset(asset) = self else { return nil }
 		return asset
 	}
 
-	public var transactionType: TransactionType? {
+	var transactionType: TransactionType? {
 		guard case let .transactionType(transactionType) = self else { return nil }
 		return transactionType
 	}

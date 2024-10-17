@@ -3,8 +3,8 @@ import SwiftUI
 
 // MARK: - ValidatorStakeView
 struct ValidatorStakeView: View {
-	public struct ViewState: Sendable, Hashable, Identifiable {
-		public var id: ValidatorAddress {
+	struct ViewState: Sendable, Hashable, Identifiable {
+		var id: ValidatorAddress {
 			stakeDetails.id
 		}
 
@@ -14,7 +14,7 @@ struct ValidatorStakeView: View {
 		var liquidStakeUnit: LiquidStakeUnit?
 		var stakeClaimResource: ResourceBalance.StakeClaimNFT?
 
-		public struct LiquidStakeUnit: Sendable, Hashable {
+		struct LiquidStakeUnit: Sendable, Hashable {
 			let lsu: ResourceBalance.ViewState.LiquidStakeUnit
 			var isSelected: Bool?
 		}
@@ -26,7 +26,7 @@ struct ValidatorStakeView: View {
 	let onStakeClaimTokenTapped: (OnLedgerEntitiesClient.StakeClaim) -> Void
 	let onClaimAllStakeClaimsTapped: () -> Void
 
-	public var body: some SwiftUI.View {
+	var body: some SwiftUI.View {
 		Button {
 			isExpanded.toggle()
 		} label: {

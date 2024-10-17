@@ -1,8 +1,8 @@
 import ComposableArchitecture
 import SwiftUI
 
-public struct EditPersonaEntry<ContentReducer>: FeatureReducer where ContentReducer: FeatureReducer & EmptyInitializable {
-	public struct State: Sendable, Hashable {
+struct EditPersonaEntry<ContentReducer>: FeatureReducer where ContentReducer: FeatureReducer & EmptyInitializable {
+	struct State: Sendable, Hashable {
 		typealias ID = EntryKind
 		let kind: EntryKind
 		let isRequestedByDapp: Bool
@@ -10,19 +10,19 @@ public struct EditPersonaEntry<ContentReducer>: FeatureReducer where ContentRedu
 		var content: ContentReducer.State
 	}
 
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case content(ContentReducer.Action)
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case deleteButtonTapped
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case delete
 	}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 
 		Scope(state: \.content, action: /Action.child .. ChildAction.content) {
@@ -30,7 +30,7 @@ public struct EditPersonaEntry<ContentReducer>: FeatureReducer where ContentRedu
 		}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .deleteButtonTapped:
 			.send(.delegate(.delete))

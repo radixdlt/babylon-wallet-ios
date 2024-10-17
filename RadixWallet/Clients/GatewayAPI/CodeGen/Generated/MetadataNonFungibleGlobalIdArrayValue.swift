@@ -11,28 +11,28 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.MetadataNonFungibleGlobalIdArrayValue")
-public typealias MetadataNonFungibleGlobalIdArrayValue = GatewayAPI.MetadataNonFungibleGlobalIdArrayValue
+typealias MetadataNonFungibleGlobalIdArrayValue = GatewayAPI.MetadataNonFungibleGlobalIdArrayValue
 
 extension GatewayAPI {
 
-public struct MetadataNonFungibleGlobalIdArrayValue: Codable, Hashable {
+struct MetadataNonFungibleGlobalIdArrayValue: Codable, Hashable {
 
-    public private(set) var type: MetadataValueType
-    public private(set) var values: [MetadataNonFungibleGlobalIdArrayValueAllOfValues]
+    private(set) var type: MetadataValueType
+    private(set) var values: [MetadataNonFungibleGlobalIdArrayValueAllOfValues]
 
-    public init(type: MetadataValueType, values: [MetadataNonFungibleGlobalIdArrayValueAllOfValues]) {
+    init(type: MetadataValueType, values: [MetadataNonFungibleGlobalIdArrayValueAllOfValues]) {
         self.type = type
         self.values = values
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case type
         case values
     }
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(type, forKey: .type)
         try container.encode(values, forKey: .values)

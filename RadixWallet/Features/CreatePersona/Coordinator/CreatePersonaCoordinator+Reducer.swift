@@ -2,8 +2,8 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - CreatePersonaCoordinator
-public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
+struct CreatePersonaCoordinator: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
 		var root: Path.State?
 		var path: StackState<Path.State> = .init()
 		var name: NonEmptyString?
@@ -12,9 +12,9 @@ public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 		@PresentationState
 		var destination: Destination.State? = nil
 
-		public let config: CreatePersonaConfig
+		let config: CreatePersonaConfig
 
-		public init(
+		init(
 			root: Path.State? = nil,
 			config: CreatePersonaConfig
 		) {
@@ -42,22 +42,22 @@ public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public struct Path: Sendable, Reducer {
+	struct Path: Sendable, Reducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case step0_introduction(IntroductionToPersonas.State)
 			case step1_createPersona(EditPersona.State)
 			case step2_completion(NewPersonaCompletion.State)
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case step0_introduction(IntroductionToPersonas.Action)
 			case step1_createPersona(EditPersona.Action)
 			case step2_completion(NewPersonaCompletion.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: \.step0_introduction, action: \.step0_introduction) {
 				IntroductionToPersonas()
 			}
@@ -70,39 +70,39 @@ public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case derivePublicKey(DerivePublicKeys.State)
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Hashable {
+		enum Action: Sendable, Hashable {
 			case derivePublicKey(DerivePublicKeys.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: \.derivePublicKey, action: \.derivePublicKey) {
 				DerivePublicKeys()
 			}
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case closeButtonTapped
 	}
 
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case root(Path.Action)
 		case path(StackActionOf<Path>)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case dismissed
 		case completed(Persona)
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case derivePublicKey
 		case createPersonaResult(TaskResult<Persona>)
 		case handleFailure
@@ -113,9 +113,9 @@ public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.dismiss) var dismiss
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.root, action: /Action.child .. ChildAction.root) {
 				Path()
@@ -132,7 +132,7 @@ public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 }
 
 extension CreatePersonaCoordinator {
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
 			.run { send in
@@ -142,7 +142,7 @@ extension CreatePersonaCoordinator {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .root(.step0_introduction(.delegate(.done))):
 			state.path.append(.step1_createPersona(.init(mode: .create)))
@@ -167,7 +167,7 @@ extension CreatePersonaCoordinator {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case .derivePublicKey:
 			state.destination = .derivePublicKey(
@@ -203,7 +203,7 @@ extension CreatePersonaCoordinator {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .derivePublicKey(.delegate(.derivedPublicKeys(hdKeys, factorSourceID, networkID))):
 			guard let hdKey = hdKeys.first else {
@@ -211,7 +211,7 @@ extension CreatePersonaCoordinator {
 				return .send(.internal(.handleFailure))
 			}
 			guard let name = state.name, let personaData = state.fields else {
-				fatalError("Derived public keys without persona name or extra fields set")
+				fatalError("Derived keys without persona name or extra fields set")
 			}
 			return .run { send in
 				let factorSourceIDFromHash = try factorSourceID.extract(as: FactorSourceIDFromHash.self)

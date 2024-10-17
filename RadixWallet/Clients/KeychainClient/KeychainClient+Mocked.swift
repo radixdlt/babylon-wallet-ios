@@ -1,6 +1,6 @@
 
 extension DependencyValues {
-	public var keychainClient: KeychainClient {
+	var keychainClient: KeychainClient {
 		get { self[KeychainClient.self] }
 		set { self[KeychainClient.self] = newValue }
 	}
@@ -8,9 +8,9 @@ extension DependencyValues {
 
 // MARK: - KeychainClient + TestDependencyKey
 extension KeychainClient: TestDependencyKey {
-	public static let previewValue = Self.noop
+	static let previewValue = Self.noop
 
-	public static var testValue = Self(
+	static var testValue = Self(
 		getServiceAndAccessGroup: unimplemented("\(Self.self).getServiceAndAccessGroup"),
 		containsDataForKey: unimplemented("\(Self.self).containsDataForKey"),
 		setDataWithoutAuthForKey: unimplemented("\(Self.self).setDataWithoutAuthForKey"),
@@ -25,7 +25,7 @@ extension KeychainClient: TestDependencyKey {
 		keychainChanged: unimplemented("\(Self.self).keychainChanged")
 	)
 
-	public static let noop: Self = .init(
+	static let noop: Self = .init(
 		getServiceAndAccessGroup: { .init(service: "KeychainClientTest", accessGroup: nil) },
 		containsDataForKey: { _, _ in false },
 		setDataWithoutAuthForKey: { _, _, _ in throw NoopError() },

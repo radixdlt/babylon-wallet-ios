@@ -1,12 +1,12 @@
 import ComposableArchitecture
 import SwiftUI
 
-public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObject {
-	public weak var windowScene: UIWindowScene?
-	public var overlayWindow: UIWindow?
+final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObject {
+	weak var windowScene: UIWindowScene?
+	var overlayWindow: UIWindow?
 	private var didEnterBackground = false
 
-	public func scene(
+	func scene(
 		_ scene: UIScene,
 		willConnectTo session: UISceneSession,
 		options connectionOptions: UIScene.ConnectionOptions
@@ -31,12 +31,12 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 		}
 	}
 
-	public func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+	func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
 		@Dependency(\.appsFlyerClient) var appsFlyerClient
 		appsFlyerClient.continue(userActivity)
 	}
 
-	public func sceneWillEnterForeground(_ scene: UIScene) {
+	func sceneWillEnterForeground(_ scene: UIScene) {
 		guard didEnterBackground, let scene = scene as? UIWindowScene else { return }
 
 		if #unavailable(iOS 18) {
@@ -45,7 +45,7 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 		hidePrivacyProtectionWindow()
 	}
 
-	public func sceneDidEnterBackground(_ scene: UIScene) {
+	func sceneDidEnterBackground(_ scene: UIScene) {
 		guard let scene = scene as? UIWindowScene else { return }
 
 		didEnterBackground = true

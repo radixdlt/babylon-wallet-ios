@@ -1,6 +1,6 @@
 // MARK: - FactorSourceAccess.View
 
-public extension FactorSourceAccess {
+extension FactorSourceAccess {
 	struct ViewState: Equatable {
 		let title: String
 		let message: String
@@ -13,11 +13,11 @@ public extension FactorSourceAccess {
 	struct View: SwiftUI.View {
 		private let store: StoreOf<FactorSourceAccess>
 
-		public init(store: StoreOf<FactorSourceAccess>) {
+		init(store: StoreOf<FactorSourceAccess>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				content(viewStore)
 					.withNavigationBar {

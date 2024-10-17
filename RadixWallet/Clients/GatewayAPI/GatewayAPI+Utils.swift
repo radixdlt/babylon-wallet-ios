@@ -35,14 +35,14 @@ extension GatewayAPI.AccountLockerVaultCollectionItem: @unchecked Sendable {}
 extension GatewayAPI.StateAccountLockersTouchedAtResponse: @unchecked Sendable {}
 
 extension GatewayAPI.StateEntityDetailsResponseItemDetails {
-	public var fungible: GatewayAPI.StateEntityDetailsResponseFungibleResourceDetails? {
+	var fungible: GatewayAPI.StateEntityDetailsResponseFungibleResourceDetails? {
 		if case let .fungibleResource(details) = self {
 			return details
 		}
 		return nil
 	}
 
-	public var nonFungible: GatewayAPI.StateEntityDetailsResponseNonFungibleResourceDetails? {
+	var nonFungible: GatewayAPI.StateEntityDetailsResponseNonFungibleResourceDetails? {
 		if case let .nonFungibleResource(details) = self {
 			return details
 		}
@@ -51,7 +51,7 @@ extension GatewayAPI.StateEntityDetailsResponseItemDetails {
 }
 
 // MARK: - EntityMetadataKey
-public enum EntityMetadataKey: String, CaseIterable, Sendable {
+enum EntityMetadataKey: String, CaseIterable, Sendable {
 	case name
 	case symbol
 	case description
@@ -75,19 +75,19 @@ public enum EntityMetadataKey: String, CaseIterable, Sendable {
 }
 
 extension Set<EntityMetadataKey> {
-	public static var resourceMetadataKeys: Set<EntityMetadataKey> {
+	static var resourceMetadataKeys: Set<EntityMetadataKey> {
 		let keys: Set<EntityMetadataKey> = [.name, .symbol, .description, .iconURL, .infoURL, .validator, .pool, .accountType, .tags, .dappDefinition, .dappDefinitions]
 		assert(keys.count <= EntityMetadataKey.maxAllowedKeys)
 		return keys
 	}
 
-	public static var poolUnitMetadataKeys: Set<EntityMetadataKey> {
+	static var poolUnitMetadataKeys: Set<EntityMetadataKey> {
 		let keys: Set<EntityMetadataKey> = [.name, .description, .iconURL, .poolUnit]
 		assert(keys.count <= EntityMetadataKey.maxAllowedKeys)
 		return keys
 	}
 
-	public static var dappMetadataKeys: Set<EntityMetadataKey> {
+	static var dappMetadataKeys: Set<EntityMetadataKey> {
 		let keys: Set<EntityMetadataKey> = [.name, .description, .iconURL, .claimedEntities, .claimedWebsites, .relatedWebsites, .dappDefinitions, .accountType]
 		assert(keys.count <= EntityMetadataKey.maxAllowedKeys)
 		return keys
@@ -95,14 +95,14 @@ extension Set<EntityMetadataKey> {
 }
 
 extension GatewayAPI.LedgerState {
-	public var selector: GatewayAPI.LedgerStateSelector {
+	var selector: GatewayAPI.LedgerStateSelector {
 		// TODO: Determine what other fields should be sent
 		.init(stateVersion: stateVersion)
 	}
 }
 
 extension GatewayAPI.StateEntityDetailsResponseComponentDetails {
-	public func decodeState<State: Decodable>() throws -> State? {
+	func decodeState<State: Decodable>() throws -> State? {
 		guard let state else {
 			return nil
 		}

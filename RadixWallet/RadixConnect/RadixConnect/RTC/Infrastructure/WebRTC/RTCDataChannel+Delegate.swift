@@ -44,7 +44,7 @@ extension RTCDataChannelAsyncDelegate {
 }
 
 extension DataChannelReadyState {
-	public init(rtc: RTCDataChannelState) {
+	init(rtc: RTCDataChannelState) {
 		switch rtc {
 		case .connecting:
 			self = .connecting

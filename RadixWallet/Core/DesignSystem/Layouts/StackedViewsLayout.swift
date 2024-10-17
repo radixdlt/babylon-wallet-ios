@@ -1,5 +1,5 @@
 
-public struct StackedViewsLayout: Layout {
+struct StackedViewsLayout: Layout {
 	var isExpanded: Bool
 
 	/// Spacing between views in Expanded state
@@ -11,7 +11,7 @@ public struct StackedViewsLayout: Layout {
 	/// Number of visible views in Collapsed state
 	var collapsedViewsCount: Int
 
-	public init(
+	init(
 		isExpanded: Bool,
 		spacing: CGFloat = .small3,
 		collapsedSpacing: CGFloat = 10,
@@ -23,13 +23,13 @@ public struct StackedViewsLayout: Layout {
 		self.collapsedViewsCount = collapsedViewsCount
 	}
 
-	public static var layoutProperties: LayoutProperties {
+	static var layoutProperties: LayoutProperties {
 		var properties = LayoutProperties()
 		properties.stackOrientation = .vertical
 		return properties
 	}
 
-	public func sizeThatFits(
+	func sizeThatFits(
 		proposal: ProposedViewSize,
 		subviews: Subviews,
 		cache: inout ()
@@ -48,7 +48,7 @@ public struct StackedViewsLayout: Layout {
 		return .init(width: container.width, height: height)
 	}
 
-	public func placeSubviews(
+	func placeSubviews(
 		in bounds: CGRect,
 		proposal: ProposedViewSize,
 		subviews: Subviews,

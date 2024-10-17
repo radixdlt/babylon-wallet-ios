@@ -11,27 +11,27 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.StateEntityNonFungibleResourceVaultsPageOptIns")
-public typealias StateEntityNonFungibleResourceVaultsPageOptIns = GatewayAPI.StateEntityNonFungibleResourceVaultsPageOptIns
+typealias StateEntityNonFungibleResourceVaultsPageOptIns = GatewayAPI.StateEntityNonFungibleResourceVaultsPageOptIns
 
 extension GatewayAPI {
 
 /** Check detailed [OptIns](#section/Using-endpoints-with-opt-in-features) documentation for more details */
-public struct StateEntityNonFungibleResourceVaultsPageOptIns: Codable, Hashable {
+struct StateEntityNonFungibleResourceVaultsPageOptIns: Codable, Hashable {
 
     /** if set to `true`, first page of non fungible ids are returned for each non fungible resource, with cursor which can be later used at `/state/entity/page/non-fungible-vault/ids` endpoint. */
-    public private(set) var nonFungibleIncludeNfids: Bool?
+    private(set) var nonFungibleIncludeNfids: Bool?
 
-    public init(nonFungibleIncludeNfids: Bool? = nil) {
+    init(nonFungibleIncludeNfids: Bool? = nil) {
         self.nonFungibleIncludeNfids = nonFungibleIncludeNfids
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case nonFungibleIncludeNfids = "non_fungible_include_nfids"
     }
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(nonFungibleIncludeNfids, forKey: .nonFungibleIncludeNfids)
     }

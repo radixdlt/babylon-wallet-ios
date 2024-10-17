@@ -11,26 +11,26 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.NativeResourceOneResourcePoolUnitValue")
-public typealias NativeResourceOneResourcePoolUnitValue = GatewayAPI.NativeResourceOneResourcePoolUnitValue
+typealias NativeResourceOneResourcePoolUnitValue = GatewayAPI.NativeResourceOneResourcePoolUnitValue
 
 extension GatewayAPI {
 
-public struct NativeResourceOneResourcePoolUnitValue: Codable, Hashable {
+struct NativeResourceOneResourcePoolUnitValue: Codable, Hashable {
 
-    public private(set) var kind: NativeResourceKind
+    private(set) var kind: NativeResourceKind
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var poolAddress: String
-    public private(set) var redemptionResourceCount: Int
-    public private(set) var unitRedemptionValue: [NativeResourceRedemptionValueItem]
+    private(set) var poolAddress: String
+    private(set) var redemptionResourceCount: Int
+    private(set) var unitRedemptionValue: [NativeResourceRedemptionValueItem]
 
-    public init(kind: NativeResourceKind, poolAddress: String, redemptionResourceCount: Int, unitRedemptionValue: [NativeResourceRedemptionValueItem]) {
+    init(kind: NativeResourceKind, poolAddress: String, redemptionResourceCount: Int, unitRedemptionValue: [NativeResourceRedemptionValueItem]) {
         self.kind = kind
         self.poolAddress = poolAddress
         self.redemptionResourceCount = redemptionResourceCount
         self.unitRedemptionValue = unitRedemptionValue
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case kind
         case poolAddress = "pool_address"
         case redemptionResourceCount = "redemption_resource_count"
@@ -39,7 +39,7 @@ public struct NativeResourceOneResourcePoolUnitValue: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(kind, forKey: .kind)
         try container.encode(poolAddress, forKey: .poolAddress)

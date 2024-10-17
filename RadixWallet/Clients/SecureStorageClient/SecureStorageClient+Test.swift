@@ -1,6 +1,6 @@
 
 extension DependencyValues {
-	public var secureStorageClient: SecureStorageClient {
+	var secureStorageClient: SecureStorageClient {
 		get { self[SecureStorageClient.self] }
 		set { self[SecureStorageClient.self] = newValue }
 	}
@@ -9,7 +9,7 @@ extension DependencyValues {
 // MARK: - SecureStorageClient + TestDependencyKey
 extension SecureStorageClient: TestDependencyKey {
 	#if DEBUG
-	public static let noop = Self(
+	static let noop = Self(
 		saveProfileSnapshot: { _ in },
 		loadProfileSnapshotData: { _ in nil },
 		loadProfileSnapshot: { _ in nil },
@@ -38,7 +38,7 @@ extension SecureStorageClient: TestDependencyKey {
 		getAllMnemonics: { [] }
 	)
 	#else
-	public static let noop = Self(
+	static let noop = Self(
 		saveProfileSnapshot: { _ in },
 		loadProfileSnapshotData: { _ in nil },
 		loadProfileSnapshot: { _ in nil },
@@ -67,10 +67,10 @@ extension SecureStorageClient: TestDependencyKey {
 	)
 	#endif // DEBUG
 
-	public static let previewValue = Self.noop
+	static let previewValue = Self.noop
 
 	#if DEBUG
-	public static let testValue = Self(
+	static let testValue = Self(
 		saveProfileSnapshot: unimplemented("\(Self.self).saveProfileSnapshot"),
 		loadProfileSnapshotData: unimplemented("\(Self.self).loadProfileSnapshotData"),
 		loadProfileSnapshot: unimplemented("\(Self.self).loadProfileSnapshot"),
@@ -99,7 +99,7 @@ extension SecureStorageClient: TestDependencyKey {
 		getAllMnemonics: unimplemented("\(Self.self).getAllMnemonics")
 	)
 	#else
-	public static let testValue = Self(
+	static let testValue = Self(
 		saveProfileSnapshot: unimplemented("\(Self.self).saveProfileSnapshot"),
 		loadProfileSnapshotData: unimplemented("\(Self.self).loadProfileSnapshotData"),
 		loadProfileSnapshot: unimplemented("\(Self.self).loadProfileSnapshot"),
