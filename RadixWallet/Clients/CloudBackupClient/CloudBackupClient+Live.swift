@@ -190,11 +190,21 @@ extension CloudBackupClient {
 
 			var profileToUpload = profile
 			if shouldReclaim {
-				// The profile will already be locally claimed, but we want to update the lastUsedOnDevice date
-				await profileStore.claimOwnership(of: &profileToUpload)
+				claimOwnership(of: &profileToUpload)
 			}
 
 			try? await backupProfileAndSaveResult(profileToUpload, existingRecord: existingRecord)
+		}
+
+		/// Updates the `lastUsedOnDevice` to use this device, on `profile`
+		/// - Parameter profile: Profile to update `lastUsedOnDevice` of
+		func claimOwnership(of profile: inout Profile) {
+			@Dependency(\.date) var date
+			let deviceInfo = (try? secureStorageClient.loadDeviceInfo()) ?? DeviceInfo(id: .init())
+
+			profile.header.lastUsedOnDevice = deviceInfo
+			profile.header.lastUsedOnDevice.date = date()
+			profile.header.lastModified = date()
 		}
 
 		let retryBackupInterval: DispatchTimeInterval = .seconds(60)
@@ -209,7 +219,7 @@ extension CloudBackupClient {
 			},
 			startAutomaticBackups: {
 				// The active profile should not be synced to iCloud keychain
-				let profileID = await profileStore.profile.id
+				let profileID = await profileStore.profile().id
 				try secureStorageClient.disableCloudProfileSync(profileID)
 
 				let ticks = AsyncTimerSequence(every: retryBackupInterval)
@@ -234,14 +244,13 @@ extension CloudBackupClient {
 				}
 			},
 			migrateProfilesFromKeychain: {
-				let activeProfile = await profileStore.profile.id
 				guard let headerList = try secureStorageClient.loadProfileHeaderList() else { return [] }
 
 				let previouslyMigrated = userDefaults.getMigratedKeychainProfiles
 
 				let migratable = try headerList.compactMap { header -> (Data, Profile.Header)? in
 					let id = header.id
-					guard !previouslyMigrated.contains(id), header.id != activeProfile else { return nil }
+					guard !previouslyMigrated.contains(id) else { return nil }
 
 					guard let profileData = try? secureStorageClient.loadProfileSnapshotData(id) else { return nil }
 
@@ -270,7 +279,7 @@ extension CloudBackupClient {
 				return migrated
 			},
 			deleteProfileBackup: { optionalID in
-				let activeProfileID = await profileStore.profile.id
+				let activeProfileID = await profileStore.profile().id
 				let id = optionalID ?? activeProfileID
 				try await container.privateCloudDatabase.deleteRecord(withID: .init(recordName: id.uuidString))
 				try userDefaults.removeLastCloudBackup(for: id)

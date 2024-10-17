@@ -26,8 +26,9 @@ enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
 
 extension UserDefaults.Dependency {
 	typealias Key = UserDefaultsKey
+	static let radixSuiteName: String = "group.com.radixpublishing.preview"
 	static let radix: Self = .init(.init(
-		suiteName: "group.com.radixpublishing.preview"
+		suiteName: radixSuiteName
 	)!)
 }
 

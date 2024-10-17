@@ -69,7 +69,7 @@ struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	enum DelegateAction: Sendable, Equatable {
 		case persistedMnemonicInKeychain(FactorSourceIDFromHash)
 		case skippedMnemonic(FactorSourceIDFromHash)
-		case createdNewMainBDFS(oldSkipped: FactorSourceIDFromHash, DeviceFactorSource)
+		case skippedMainBDFS(FactorSourceIDFromHash)
 		case failedToSaveInKeychain(FactorSourceIDFromHash)
 	}
 
@@ -173,19 +173,8 @@ struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 			return .none
 
 		case .confirmSkippingBDFS(.delegate(.confirmed)):
-			loggerGlobal.notice("Skipping BDFS! Generating a new one and hiding affected accounts/personas.")
 			state.destination = nil
-			return .run { [entitiesControlledByFactorSource = state.entitiesControlledByFactorSource] send in
-				loggerGlobal.info("Generating mnemonic for new main BDFS")
-				let newMainBDFS = try await factorSourcesClient.createNewMainBDFS()
-				loggerGlobal.info("Delegating done with creating new BDFS (skipped old)")
-				await send(.delegate(.createdNewMainBDFS(
-					oldSkipped: entitiesControlledByFactorSource.factorSourceID,
-					newMainBDFS.factorSource
-				)))
-			} catch: { error, _ in
-				loggerGlobal.critical("Failed to create new main BDFS error: \(error)")
-			}
+			return .send(.delegate(.skippedMainBDFS(state.entitiesControlledByFactorSource.factorSourceID)))
 
 		default:
 			return .none

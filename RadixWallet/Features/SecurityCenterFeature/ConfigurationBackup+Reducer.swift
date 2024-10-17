@@ -166,7 +166,7 @@ struct ConfigurationBackup: Sendable, FeatureReducer {
 		case .encryptProfileOrNot(.doNotEncrypt):
 			state.destination = nil
 			return .run { send in
-				let profile = await ProfileStore.shared.profile
+				let profile = await ProfileStore.shared.profile()
 				await send(.internal(.exportProfile(profile)))
 			}
 		}

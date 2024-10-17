@@ -8,20 +8,20 @@ extension AppPreferencesClient: DependencyKey {
 			appPreferenceUpdates: {
 				await profileStore.appPreferencesValues()
 			},
-			getPreferences: { await profileStore.profile.appPreferences },
+			getPreferences: { await profileStore.profile().appPreferences },
 			updatePreferences: { newPreferences in
 				try await profileStore.updating {
 					$0.appPreferences = newPreferences
 				}
 			},
 			extractProfile: {
-				await profileStore.profile
+				await profileStore.profile()
 			},
-			deleteProfileAndFactorSources: { keepInICloudIfPresent in
-				try await profileStore.deleteProfile(keepInICloudIfPresent: keepInICloudIfPresent)
+			deleteProfileAndFactorSources: {
+				try await profileStore.deleteProfile()
 			},
 			setIsCloudBackupEnabled: { isEnabled in
-				let profile = await profileStore.profile
+				let profile = await profileStore.profile()
 				let wasEnabled = profile.appPreferences.security.isCloudProfileSyncEnabled
 				guard wasEnabled != isEnabled else { return }
 

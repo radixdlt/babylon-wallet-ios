@@ -104,7 +104,7 @@ struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case let .importMnemonicsFlow(.delegate(.finishedImportingMnemonics(skipList, _, notYetSavedNewMainBDFS))):
+		case let .importMnemonicsFlow(.delegate(.finishedImportingMnemonics(skipList, _, skippedMainBdfs))):
 			loggerGlobal.notice("Starting import snapshot process...")
 			guard let profileSelection = state.profileSelection else {
 				preconditionFailure("Expected to have a profile")
@@ -115,11 +115,12 @@ struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 				let factorSourceIDs: Set<FactorSourceIDFromHash> = .init(
 					profileSelection.profile.factorSources.compactMap { $0.extract(DeviceFactorSource.self) }.map(\.id)
 				)
-				try await transportProfileClient.importProfile(profileSelection.profile, factorSourceIDs, profileSelection.containsP2PLinks)
-
-				if let notYetSavedNewMainBDFS {
-					try await factorSourcesClient.saveNewMainBDFS(notYetSavedNewMainBDFS)
-				}
+				try await transportProfileClient.importProfile(
+					profileSelection.profile,
+					factorSourceIDs,
+					skippedMainBdfs,
+					profileSelection.containsP2PLinks
+				)
 
 				await send(.delegate(.profileImported(
 					skippedAnyMnemonic: !skipList.isEmpty

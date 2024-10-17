@@ -7,11 +7,8 @@ extension Profile {
 
 // MARK: - SecureStorageClient
 struct SecureStorageClient: Sendable {
-	var saveProfileSnapshot: SaveProfileSnapshot
 	var loadProfileSnapshotData: LoadProfileSnapshotData
-	var loadProfileSnapshot: LoadProfileSnapshot
-	var loadProfile: LoadProfile
-	var deleteProfile: DeleteProfile
+	var saveProfileSnapshotData: SaveProfileSnapshotData
 
 	var saveMnemonicForFactorSource: SaveMnemonicForFactorSource
 	var loadMnemonicByFactorSourceID: LoadMnemonicByFactorSourceID
@@ -28,6 +25,7 @@ struct SecureStorageClient: Sendable {
 
 	var loadDeviceInfo: LoadDeviceInfo
 	var saveDeviceInfo: SaveDeviceInfo
+	var deleteDeviceInfo: DeleteDeviceInfo
 
 	/// See https://radixdlt.atlassian.net/l/cp/fmoH9KcN
 	var deprecatedLoadDeviceID: DeprecatedLoadDeviceID
@@ -44,17 +42,17 @@ struct SecureStorageClient: Sendable {
 	var saveP2PLinksPrivateKey: SaveP2PLinksPrivateKey
 	var keychainChanged: KeychainChanged
 
+	var loadMnemonicDataByFactorSourceID: LoadMnemonicDataByFactorSourceID
+	var saveMnemonicForFactorSourceData: SaveMnemonicForFactorSourceData
+
 	#if DEBUG
 	var getAllMnemonics: GetAllMnemonics
 	#endif
 
 	#if DEBUG
 	init(
-		saveProfileSnapshot: @escaping SaveProfileSnapshot,
 		loadProfileSnapshotData: @escaping LoadProfileSnapshotData,
-		loadProfileSnapshot: @escaping LoadProfileSnapshot,
-		loadProfile: @escaping LoadProfile,
-		deleteProfile: @escaping DeleteProfile,
+		saveProfileSnapshotData: @escaping SaveProfileSnapshotData,
 		saveMnemonicForFactorSource: @escaping SaveMnemonicForFactorSource,
 		loadMnemonicByFactorSourceID: @escaping LoadMnemonicByFactorSourceID,
 		containsMnemonicIdentifiedByFactorSourceID: @escaping ContainsMnemonicIdentifiedByFactorSourceID,
@@ -66,6 +64,7 @@ struct SecureStorageClient: Sendable {
 		deleteProfileHeaderList: @escaping DeleteProfileHeaderList,
 		loadDeviceInfo: @escaping LoadDeviceInfo,
 		saveDeviceInfo: @escaping SaveDeviceInfo,
+		deleteDeviceInfo: @escaping DeleteDeviceInfo,
 		deprecatedLoadDeviceID: @escaping DeprecatedLoadDeviceID,
 		deleteDeprecatedDeviceID: @escaping DeleteDeprecatedDeviceID,
 		saveRadixConnectMobileSession: @escaping SaveRadixConnectMobileSession,
@@ -75,13 +74,12 @@ struct SecureStorageClient: Sendable {
 		loadP2PLinksPrivateKey: @escaping LoadP2PLinksPrivateKey,
 		saveP2PLinksPrivateKey: @escaping SaveP2PLinksPrivateKey,
 		keychainChanged: @escaping KeychainChanged,
-		getAllMnemonics: @escaping GetAllMnemonics
+		getAllMnemonics: @escaping GetAllMnemonics,
+		loadMnemonicDataByFactorSourceID: @escaping LoadMnemonicDataByFactorSourceID,
+		saveMnemonicForFactorSourceData: @escaping SaveMnemonicForFactorSourceData
 	) {
-		self.saveProfileSnapshot = saveProfileSnapshot
 		self.loadProfileSnapshotData = loadProfileSnapshotData
-		self.loadProfileSnapshot = loadProfileSnapshot
-		self.loadProfile = loadProfile
-		self.deleteProfile = deleteProfile
+		self.saveProfileSnapshotData = saveProfileSnapshotData
 		self.saveMnemonicForFactorSource = saveMnemonicForFactorSource
 		self.loadMnemonicByFactorSourceID = loadMnemonicByFactorSourceID
 		self.containsMnemonicIdentifiedByFactorSourceID = containsMnemonicIdentifiedByFactorSourceID
@@ -93,6 +91,7 @@ struct SecureStorageClient: Sendable {
 		self.deleteProfileHeaderList = deleteProfileHeaderList
 		self.loadDeviceInfo = loadDeviceInfo
 		self.saveDeviceInfo = saveDeviceInfo
+		self.deleteDeviceInfo = deleteDeviceInfo
 		self.deprecatedLoadDeviceID = deprecatedLoadDeviceID
 		self.deleteDeprecatedDeviceID = deleteDeprecatedDeviceID
 		self.loadP2PLinks = loadP2PLinks
@@ -103,15 +102,14 @@ struct SecureStorageClient: Sendable {
 		self.saveRadixConnectMobileSession = saveRadixConnectMobileSession
 		self.loadRadixConnectMobileSession = loadRadixConnectMobileSession
 		self.keychainChanged = keychainChanged
+		self.loadMnemonicDataByFactorSourceID = loadMnemonicDataByFactorSourceID
+		self.saveMnemonicForFactorSourceData = saveMnemonicForFactorSourceData
 	}
 	#else
 
 	init(
-		saveProfileSnapshot: @escaping SaveProfileSnapshot,
 		loadProfileSnapshotData: @escaping LoadProfileSnapshotData,
-		loadProfileSnapshot: @escaping LoadProfileSnapshot,
-		loadProfile: @escaping LoadProfile,
-		deleteProfile: @escaping DeleteProfile,
+		saveProfileSnapshotData: @escaping SaveProfileSnapshotData,
 		saveMnemonicForFactorSource: @escaping SaveMnemonicForFactorSource,
 		loadMnemonicByFactorSourceID: @escaping LoadMnemonicByFactorSourceID,
 		containsMnemonicIdentifiedByFactorSourceID: @escaping ContainsMnemonicIdentifiedByFactorSourceID,
@@ -123,6 +121,7 @@ struct SecureStorageClient: Sendable {
 		deleteProfileHeaderList: @escaping DeleteProfileHeaderList,
 		loadDeviceInfo: @escaping LoadDeviceInfo,
 		saveDeviceInfo: @escaping SaveDeviceInfo,
+		deleteDeviceInfo: @escaping DeleteDeviceInfo,
 		deprecatedLoadDeviceID: @escaping DeprecatedLoadDeviceID,
 		deleteDeprecatedDeviceID: @escaping DeleteDeprecatedDeviceID,
 		saveRadixConnectMobileSession: @escaping SaveRadixConnectMobileSession,
@@ -131,13 +130,13 @@ struct SecureStorageClient: Sendable {
 		saveP2PLinks: @escaping SaveP2PLinks,
 		loadP2PLinksPrivateKey: @escaping LoadP2PLinksPrivateKey,
 		saveP2PLinksPrivateKey: @escaping SaveP2PLinksPrivateKey,
-		keychainChanged: @escaping KeychainChanged
+		keychainChanged: @escaping KeychainChanged,
+
+		loadMnemonicByFactorSourceID: @escaping LoadMnemonicByFactorSourceID,
+		saveMnemonicForFactorSourceData: @escaping SaveMnemonicForFactorSourceData
 	) {
-		self.saveProfileSnapshot = saveProfileSnapshot
 		self.loadProfileSnapshotData = loadProfileSnapshotData
-		self.loadProfileSnapshot = loadProfileSnapshot
-		self.loadProfile = loadProfile
-		self.deleteProfile = deleteProfile
+		self.saveProfileSnapshotData = saveProfileSnapshotData
 		self.saveMnemonicForFactorSource = saveMnemonicForFactorSource
 		self.loadMnemonicByFactorSourceID = loadMnemonicByFactorSourceID
 		self.containsMnemonicIdentifiedByFactorSourceID = containsMnemonicIdentifiedByFactorSourceID
@@ -149,6 +148,7 @@ struct SecureStorageClient: Sendable {
 		self.deleteProfileHeaderList = deleteProfileHeaderList
 		self.loadDeviceInfo = loadDeviceInfo
 		self.saveDeviceInfo = saveDeviceInfo
+		self.deleteDeviceInfo = deleteDeviceInfo
 		self.deprecatedLoadDeviceID = deprecatedLoadDeviceID
 		self.deleteDeprecatedDeviceID = deleteDeprecatedDeviceID
 		self.saveRadixConnectMobileSession = saveRadixConnectMobileSession
@@ -158,6 +158,8 @@ struct SecureStorageClient: Sendable {
 		self.loadP2PLinksPrivateKey = loadP2PLinksPrivateKey
 		self.saveP2PLinksPrivateKey = saveP2PLinksPrivateKey
 		self.keychainChanged = keychainChanged
+		self.loadMnemonicDataByFactorSourceID = loadMnemonicDataByFactorSourceID
+		self.saveMnemonicForFactorSourceData = saveMnemonicForFactorSourceData
 	}
 	#endif // DEBUG
 }
@@ -170,14 +172,14 @@ struct LoadMnemonicByFactorSourceIDRequest: Sendable, Hashable {
 
 extension SecureStorageClient {
 	typealias DisableCloudProfileSync = @Sendable (ProfileID) throws -> Void
-	typealias SaveProfileSnapshot = @Sendable (Profile) throws -> Void
+	typealias SaveProfileSnapshotData = @Sendable (ProfileID, Data) throws -> Void
 	typealias LoadProfileSnapshotData = @Sendable (ProfileID) throws -> Data?
-	typealias LoadProfileSnapshot = @Sendable (ProfileID) throws -> Profile?
-	typealias LoadProfile = @Sendable (ProfileID) throws -> Profile?
 	typealias DeleteProfile = @Sendable (ProfileID) throws -> Void
 
 	typealias SaveMnemonicForFactorSource = @Sendable (PrivateHierarchicalDeterministicFactorSource) throws -> Void
 	typealias LoadMnemonicByFactorSourceID = @Sendable (LoadMnemonicByFactorSourceIDRequest) throws -> MnemonicWithPassphrase?
+	typealias SaveMnemonicForFactorSourceData = @Sendable (FactorSourceIDFromHash, Data) throws -> Void
+	typealias LoadMnemonicDataByFactorSourceID = @Sendable (LoadMnemonicByFactorSourceIDRequest) throws -> Data?
 	typealias ContainsMnemonicIdentifiedByFactorSourceID = @Sendable (FactorSourceIDFromHash) -> Bool
 
 	#if DEBUG
@@ -193,6 +195,7 @@ extension SecureStorageClient {
 
 	typealias LoadDeviceInfo = @Sendable () throws -> DeviceInfo?
 	typealias SaveDeviceInfo = @Sendable (DeviceInfo) throws -> Void
+	typealias DeleteDeviceInfo = @Sendable () throws -> Void
 
 	typealias SaveRadixConnectMobileSession = @Sendable (SessionId, BagOfBytes) throws -> Void
 	typealias LoadRadixConnectMobileSession = @Sendable (SessionId) throws -> BagOfBytes?
@@ -265,17 +268,6 @@ extension SecureStorageClient {
 	func deleteProfileAndMnemonicsByFactorSourceIDs(profileID: Profile.ID, keepInICloudIfPresent: Bool) throws {
 		try deleteProfileAndMnemonicsByFactorSourceIDs(profileID, keepInICloudIfPresent)
 	}
-
-	@Sendable
-	func loadDeviceInfoOrFallback() -> DeviceInfo {
-		if let loaded = (try? self.loadDeviceInfo()) {
-			loaded
-		} else {
-			DeviceInfo(
-				id: .init()
-			)
-		}
-	}
 }
 
 extension DeviceInfo {
@@ -287,17 +279,6 @@ extension DeviceInfo {
 			systemVersion: nil,
 			hostAppVersion: nil,
 			hostVendor: "Apple"
-		)
-	}
-}
-
-extension HostInfo {
-	static func current() -> HostInfo {
-		/// Mostly empty for now until full migration to Sargon is done
-		.init(
-			description: .init(name: "iPhone", model: ""),
-			hostOs: .ios(version: ""),
-			hostAppVersion: ""
 		)
 	}
 }

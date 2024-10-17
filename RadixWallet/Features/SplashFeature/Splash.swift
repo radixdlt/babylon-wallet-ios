@@ -38,7 +38,7 @@ struct Splash: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case completed(Profile)
+		case completed(ProfileState)
 	}
 
 	struct Destination: DestinationReducer {
@@ -82,8 +82,25 @@ struct Splash: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			return .run { send in
-				let isAdvancedLockEnabled = await onboardingClient.loadProfile().appPreferences.security.isAdvancedLockEnabled
+			switch state.context {
+			case .appStarted:
+				return bootSargonOS().concatenate(with: loadAdvancedLockState())
+			case .appForegrounded:
+				return loadAdvancedLockState()
+			}
+
+		case .didTapToUnlock:
+			state.biometricsCheckFailed = false
+			return verifyPasscode()
+		}
+	}
+
+	func loadAdvancedLockState() -> Effect<Action> {
+		.run { send in
+			let profileState = await onboardingClient.loadProfileState()
+
+			if case let .loaded(profile) = profileState {
+				let isAdvancedLockEnabled = profile.appPreferences.security.isAdvancedLockEnabled
 
 				guard #available(iOS 18, *) else {
 					// For versions below iOS 18, perform the advanced lock state check
@@ -106,11 +123,9 @@ struct Splash: Sendable, FeatureReducer {
 				} else {
 					await send(.internal(.advancedLockStateLoaded(isEnabled: false)))
 				}
+			} else {
+				await send(.internal(.advancedLockStateLoaded(isEnabled: false)))
 			}
-
-		case .didTapToUnlock:
-			state.biometricsCheckFailed = false
-			return verifyPasscode()
 		}
 	}
 
@@ -195,6 +210,26 @@ struct Splash: Sendable, FeatureReducer {
 		}
 	}
 
+	private func bootSargonOS() -> Effect<Action> {
+		.run { _ in
+			do {
+				try await SargonOS.creatingShared(
+					bootingWith: .creatingShared(
+						drivers: .init(
+							bundle: Bundle.main,
+							userDefaultsSuite: UserDefaults.Dependency.radixSuiteName,
+							secureStorageDriver: SargonSecureStorage()
+						)
+					)
+				)
+			} catch {
+				// Ignore error.
+				// The only error that can be thrown is SargonOSAlreadyBooted.
+				loggerGlobal.error("Did try to boot SargonOS more than once")
+			}
+		}
+	}
+
 	private func verifyPasscode() -> Effect<Action> {
 		.run { send in
 			await send(.internal(.passcodeConfigResult(
@@ -217,7 +252,7 @@ struct Splash: Sendable, FeatureReducer {
 		.run { send in
 			switch context {
 			case .appStarted:
-				await send(.delegate(.completed(onboardingClient.loadProfile())))
+				await send(.delegate(.completed(onboardingClient.loadProfileState())))
 			case .appForegrounded:
 				localAuthenticationClient.setAuthenticatedSuccessfully()
 			}

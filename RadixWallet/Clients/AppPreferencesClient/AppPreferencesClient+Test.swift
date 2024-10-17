@@ -18,7 +18,7 @@ extension AppPreferencesClient {
 		getPreferences: { .default },
 		updatePreferences: { _ in },
 		extractProfile: { fatalError() },
-		deleteProfileAndFactorSources: { _ in },
+		deleteProfileAndFactorSources: {},
 		setIsCloudBackupEnabled: { _ in }
 	)
 }

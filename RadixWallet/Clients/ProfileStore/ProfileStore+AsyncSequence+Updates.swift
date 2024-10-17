@@ -3,8 +3,9 @@
 // MARK: Public
 extension ProfileStore {
 	/// The current network if any
-	func network() throws -> ProfileNetwork {
-		try profile.network(id: profile.networkID)
+	func network() async throws -> ProfileNetwork {
+		let profile = await self.profile()
+		return try profile.network(id: profile.networkID)
 	}
 
 	/// A multicasting replaying AsyncSequence of distinct Profile.

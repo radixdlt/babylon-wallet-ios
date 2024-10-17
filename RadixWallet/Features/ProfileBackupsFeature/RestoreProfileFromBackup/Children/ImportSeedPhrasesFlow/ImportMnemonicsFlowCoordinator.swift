@@ -26,7 +26,7 @@ struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		var mnemonicsLeftToImport: IdentifiedArrayOf<ImportMnemonicControllingAccounts.State> = []
 		var imported: OrderedSet<SkippedOrImported> = []
 		var skipped: OrderedSet<SkippedOrImported> = []
-		var newMainBDFS: DeviceFactorSource?
+		var skippedMainBdfs: Bool = false
 
 		enum Context: Sendable, Hashable {
 			case fromOnboarding(profile: Profile)
@@ -95,7 +95,7 @@ struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		case finishedImportingMnemonics(
 			skipped: OrderedSet<SkippedOrImported>,
 			imported: OrderedSet<SkippedOrImported>,
-			notYetSavedNewMainBDFS: DeviceFactorSource?
+			skippedMainBdfs: Bool
 		)
 
 		case finishedEarly(dueToFailure: Bool)
@@ -203,8 +203,8 @@ struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		switch presentedAction {
 		case let .importMnemonicControllingAccounts(.delegate(delegateAction)):
 			switch delegateAction {
-			case let .createdNewMainBDFS(skipped, newMainBDFS):
-				state.newMainBDFS = newMainBDFS
+			case let .skippedMainBDFS(skipped):
+				state.skippedMainBdfs = true
 				state.skipped.append(.init(factorSourceID: skipped))
 				return finishedWith(factorSourceID: skipped, state: &state)
 
@@ -255,17 +255,11 @@ struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 			return .none
 		} else {
 			state.destination = nil
-			return .run { [skipped = state.skipped, imported = state.imported, newMainBDFS = state.newMainBDFS, context = state.context] send in
-				if let newMainBDFS, !context.isFromOnboarding {
-					try await factorSourcesClient.saveNewMainBDFS(newMainBDFS)
-				}
-
-				return await send(.delegate(.finishedImportingMnemonics(
-					skipped: skipped,
-					imported: imported,
-					notYetSavedNewMainBDFS: newMainBDFS
-				)))
-			}
+			return .send(.delegate(.finishedImportingMnemonics(
+				skipped: state.skipped,
+				imported: state.imported,
+				skippedMainBdfs: state.skippedMainBdfs
+			)))
 		}
 	}
 }
