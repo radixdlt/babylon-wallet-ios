@@ -16,7 +16,6 @@ extension GatewayAPIClient: TestDependencyKey {
 		getNonFungibleData: unimplemented("\(Self.self).getNonFungibleData"),
 		getAccountLockerTouchedAt: unimplemented("\(Self.self).getAccountLockerTouchedAt"),
 		getAccountLockerVaults: unimplemented("\(Self.self).GetAccountLockerVaults"),
-		transactionPreview: unimplemented("\(Self.self).transactionPreview"),
 		streamTransactions: unimplemented("\(Self.self).streamTransactions"),
 		prevalidateDeposit: unimplemented("\(Self.self).prevalidateDeposit")
 	)
@@ -42,7 +41,6 @@ extension GatewayAPIClient: TestDependencyKey {
 			getNonFungibleData: unimplemented("\(self).getNonFungibleData"),
 			getAccountLockerTouchedAt: unimplemented("\(Self.self).getAccountLockerTouchedAt"),
 			getAccountLockerVaults: unimplemented("\(Self.self).GetAccountLockerVaults"),
-			transactionPreview: unimplemented("\(self).transactionPreview"),
 			streamTransactions: unimplemented("\(self).streamTransactions"),
 			prevalidateDeposit: unimplemented("\(Self.self).prevalidateDeposit")
 		)
