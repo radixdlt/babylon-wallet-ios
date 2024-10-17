@@ -141,17 +141,15 @@ extension TransactionClient {
 
 			let notarySignature = try request.notary.signature(for: signedIntentHash.hash.data)
 
-			let uncompiledNotarized = try NotarizedTransaction(
+			let notarizedTransaction = try NotarizedTransaction(
 				signedIntent: signedTransactionIntent,
 				notarySignature: NotarySignature(signature: .ed25519(value: .init(bytes: .init(bytes: notarySignature))))
 			)
 
-			let compiledNotarizedTXIntent = uncompiledNotarized.compile()
-
 			let txID = request.transactionIntent.hash()
 
 			return .init(
-				notarized: compiledNotarizedTXIntent,
+				notarized: notarizedTransaction,
 				intent: request.transactionIntent,
 				txID: txID
 			)
