@@ -140,10 +140,11 @@ struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 					if case let .transaction(tx) = success.items {
 						/// Wait for the transaction to be committed
 						let txID = tx.send.transactionIntentHash
-						try await submitTXClient.hasTXBeenCommittedSuccessfully(txID)
-						/// Safe to update the account to new state
-						try await accountsClient.updateAccount(updatedAccount)
-						await send(.internal(.updated(updatedAccount)))
+						if try await submitTXClient.hasTXBeenCommittedSuccessfully(txID) {
+							/// Safe to update the account to new state
+							try await accountsClient.updateAccount(updatedAccount)
+							await send(.internal(.updated(updatedAccount)))
+						}
 						return
 					}
 
@@ -155,10 +156,6 @@ struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 				}
 
 			} catch {
-				/// Polling failure will be displayed in SubmiTransactionView
-				if case is TXFailureStatus = error {
-					return
-				}
 				errorQueue.schedule(error)
 			}
 		}

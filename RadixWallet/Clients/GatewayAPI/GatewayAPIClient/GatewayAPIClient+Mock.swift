@@ -16,8 +16,6 @@ extension GatewayAPIClient: TestDependencyKey {
 		getNonFungibleData: unimplemented("\(Self.self).getNonFungibleData"),
 		getAccountLockerTouchedAt: unimplemented("\(Self.self).getAccountLockerTouchedAt"),
 		getAccountLockerVaults: unimplemented("\(Self.self).GetAccountLockerVaults"),
-		submitTransaction: unimplemented("\(Self.self).submitTransaction"),
-		transactionStatus: unimplemented("\(Self.self).transactionStatus"),
 		transactionPreview: unimplemented("\(Self.self).transactionPreview"),
 		streamTransactions: unimplemented("\(Self.self).streamTransactions"),
 		prevalidateDeposit: unimplemented("\(Self.self).prevalidateDeposit")
@@ -44,19 +42,6 @@ extension GatewayAPIClient: TestDependencyKey {
 			getNonFungibleData: unimplemented("\(self).getNonFungibleData"),
 			getAccountLockerTouchedAt: unimplemented("\(Self.self).getAccountLockerTouchedAt"),
 			getAccountLockerVaults: unimplemented("\(Self.self).GetAccountLockerVaults"),
-			submitTransaction: { _ in
-				.init(duplicate: submittedTXIsDoubleSpend)
-			},
-			transactionStatus: { _ in
-				.init(
-					ledgerState: .previewValue,
-					status: .committedSuccess,
-					intentStatus: .committedSuccess,
-					intentStatusDescription: "",
-					knownPayloads: [.init(payloadHash: "payload-hash-hex", status: .committedSuccess)],
-					errorMessage: nil
-				)
-			},
 			transactionPreview: unimplemented("\(self).transactionPreview"),
 			streamTransactions: unimplemented("\(self).streamTransactions"),
 			prevalidateDeposit: unimplemented("\(Self.self).prevalidateDeposit")
