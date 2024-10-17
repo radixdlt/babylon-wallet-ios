@@ -4,9 +4,10 @@ import SwiftUI
 // MARK: - TransactionReview
 public struct TransactionReview: Sendable, FeatureReducer {
 	public typealias Transfer = IDResourceBalance
+	typealias Common = InteractionReviewCommon
 
 	public struct State: Sendable, Hashable {
-		public var displayMode: DisplayMode = .review
+		var displayMode: Common.DisplayMode = .detailed
 
 		public let nonce: Nonce
 		public let unvalidatedManifest: UnvalidatedTransactionManifest
@@ -93,16 +94,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			self.isWalletTransaction = isWalletTransaction
 			self.proposingDappMetadata = proposingDappMetadata
 			self.p2pRoute = p2pRoute
-		}
-
-		public enum DisplayMode: Sendable, Hashable {
-			case review
-			case raw(String)
-
-			var rawTransaction: String? {
-				guard case let .raw(transaction) = self else { return nil }
-				return transaction
-			}
 		}
 	}
 
@@ -271,10 +262,10 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case .showRawTransactionTapped:
 			switch state.displayMode {
-			case .review:
+			case .detailed:
 				return showRawTransaction(&state)
 			case .raw:
-				state.displayMode = .review
+				state.displayMode = .detailed
 				return .none
 			}
 

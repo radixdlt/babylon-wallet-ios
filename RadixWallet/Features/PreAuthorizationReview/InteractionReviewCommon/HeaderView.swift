@@ -1,7 +1,6 @@
 import SwiftUI
 
-// MARK: InteractionReview.HeaderView
-extension InteractionReview {
+extension InteractionReviewCommon {
 	struct HeaderView: View {
 		let kind: Kind
 		let name: String?

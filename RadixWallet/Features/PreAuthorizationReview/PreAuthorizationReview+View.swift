@@ -44,9 +44,10 @@ extension PreAuthorizationReview {
 				VStack(spacing: .zero) {
 					header
 
-					ForEach(0 ..< 30) { index in
-						Text("Row \(index)")
-							.padding()
+					if let rawContent = store.displayMode.rawTransaction {
+						rawTransaction(rawContent)
+					} else {
+						details
 					}
 
 					Spacer()
@@ -67,7 +68,7 @@ extension PreAuthorizationReview {
 		}
 
 		private var header: some SwiftUI.View {
-			InteractionReview.HeaderView(
+			Common.HeaderView(
 				kind: .preAuthorization,
 				name: store.dappName,
 				thumbnail: nil
@@ -75,6 +76,14 @@ extension PreAuthorizationReview {
 			.measurePosition(navTitleID, coordSpace: coordSpace)
 			.padding(.horizontal, .medium3)
 			.padding(.bottom, .medium3)
+		}
+
+		private func rawTransaction(_ content: String) -> some SwiftUI.View {
+			Common.RawTransactionView(transaction: content) {} toggleAction: {}
+		}
+
+		private var details: some SwiftUI.View {
+			VStack(spacing: .medium1) {}
 		}
 	}
 }

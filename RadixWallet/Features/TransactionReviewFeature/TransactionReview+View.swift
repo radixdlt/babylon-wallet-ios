@@ -152,7 +152,7 @@ extension TransactionReview {
 					header(viewStore.proposingDappMetadata)
 
 					if let rawTransaction = viewStore.rawTransaction {
-						RawTransactionView(transaction: rawTransaction) {
+						Common.RawTransactionView(transaction: rawTransaction) {
 							viewStore.send(.copyRawTransactionTapped)
 						}
 					} else {
@@ -246,7 +246,7 @@ extension TransactionReview {
 		}
 
 		private func header(_ proposingDappMetadata: DappMetadata.Ledger?) -> some SwiftUI.View {
-			InteractionReview.HeaderView(
+			Common.HeaderView(
 				kind: .transaction,
 				name: proposingDappMetadata?.name?.rawValue,
 				thumbnail: proposingDappMetadata?.thumbnail
@@ -630,40 +630,6 @@ struct TransactionMessageView: View {
 				.flushedLeft
 				.padding(.horizontal, .medium3)
 				.padding(.vertical, .small1)
-		}
-	}
-}
-
-// MARK: - RawTransactionView
-struct RawTransactionView: SwiftUI.View {
-	let transaction: String
-	let copyTapped: () -> Void
-
-	var body: some SwiftUI.View {
-		VStack(alignment: .trailing) {
-			Button(action: copyTapped) {
-				HStack(spacing: .small3) {
-					AssetIcon(.asset(AssetResource.copy))
-					Text(L10n.Common.copy)
-						.textStyle(.body1Header)
-				}
-				.foregroundColor(.app.gray1)
-			}
-			.buttonStyle(.secondaryRectangular)
-			.padding([.trailing, .top], .medium3)
-			.padding(.bottom, .medium1)
-
-			Text(transaction)
-				.textSelection(.enabled)
-				.textStyle(.monospace)
-				.multilineTextAlignment(.leading)
-				.foregroundColor(.app.gray1)
-				.frame(
-					maxWidth: .infinity,
-					maxHeight: .infinity,
-					alignment: .topLeading
-				)
-				.padding([.horizontal, .bottom], .medium1)
 		}
 	}
 }

@@ -1,9 +1,12 @@
 // MARK: - PreAuthorizationReview
 @Reducer
 struct PreAuthorizationReview: Sendable, FeatureReducer {
+	typealias Common = InteractionReviewCommon
+
 	@ObservableState
 	struct State: Sendable, Hashable {
 		var dappName: String? = "Collabo.Fi"
+		var displayMode: Common.DisplayMode = .detailed
 		init() {}
 	}
 
