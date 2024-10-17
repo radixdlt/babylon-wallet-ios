@@ -18,14 +18,16 @@ struct SignWithFactorSource: Sendable, FeatureReducer {
 			self.kind = kind
 			self.signingFactors = signingFactors
 			self.signingPurposeWithPayload = signingPurposeWithPayload
+
+			let purpose = signingPurposeWithPayload.factorSourceAccessPurpose
 			switch kind {
 			case .device:
 				assert(signingFactors.allSatisfy { $0.factorSource.kind == DeviceFactorSource.kind })
-				self.factorSourceAccess = .init(kind: .device, purpose: .signature)
+				self.factorSourceAccess = .init(kind: .device, purpose: purpose)
 			case .ledger:
 				assert(signingFactors.allSatisfy { $0.factorSource.kind == LedgerHardwareWalletFactorSource.kind })
 				let ledger: LedgerHardwareWalletFactorSource? = signingFactors.first?.factorSource.extract()
-				self.factorSourceAccess = .init(kind: .ledger(ledger), purpose: .signature)
+				self.factorSourceAccess = .init(kind: .ledger(ledger), purpose: purpose)
 			}
 		}
 	}
@@ -160,5 +162,16 @@ extension SignWithFactorSource.State {
 	enum Kind: Sendable, Hashable {
 		case device
 		case ledger
+	}
+}
+
+private extension SigningPurposeWithPayload {
+	var factorSourceAccessPurpose: FactorSourceAccess.State.Purpose {
+		switch self {
+		case .signAuth:
+			.proveOwnership
+		case .signTransaction:
+			.signature
+		}
 	}
 }

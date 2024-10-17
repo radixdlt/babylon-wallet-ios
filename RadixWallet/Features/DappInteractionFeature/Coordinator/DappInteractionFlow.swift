@@ -143,6 +143,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case personaDataPermission(PersonaDataPermission.State)
 			case oneTimePersonaData(OneTimePersonaData.State)
 			case reviewTransaction(TransactionReview.State)
+			case personaProofOfOwnership(ProofOfOwnership.State)
+			case accountsProofOfOwnership(ProofOfOwnership.State)
 		}
 
 		@CasePathable
@@ -153,6 +155,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case personaDataPermission(PersonaDataPermission.Action)
 			case oneTimePersonaData(OneTimePersonaData.Action)
 			case reviewTransaction(TransactionReview.Action)
+			case personaProofOfOwnership(ProofOfOwnership.Action)
+			case accountsProofOfOwnership(ProofOfOwnership.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -174,6 +178,12 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				}
 				Scope(state: \.reviewTransaction, action: \.reviewTransaction) {
 					TransactionReview()
+				}
+				Scope(state: \.personaProofOfOwnership, action: \.personaProofOfOwnership) {
+					ProofOfOwnership()
+				}
+				Scope(state: \.accountsProofOfOwnership, action: \.accountsProofOfOwnership) {
+					ProofOfOwnership()
 				}
 			}
 		}
@@ -199,41 +209,19 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			guard let usePersonaRequestItem = state.usePersonaRequestItem else {
-				return .none
-			}
+			validateRequestItemsEffect(state: state)
 
-			return .run { [dappDefinitionAddress = state.dappMetadata.dAppDefinitionAddress] send in
-				let identityAddress = usePersonaRequestItem.identityAddress
-				guard
-					let persona = try await personasClient.getPersonas()[id: identityAddress],
-					let authorizedDapp = try await authorizedDappsClient.getAuthorizedDapps()[id: dappDefinitionAddress],
-					let authorizedPersona = authorizedDapp.referencesToAuthorizedPersonas.first(where: { $0.identityAddress == identityAddress })
-				else {
-					await send(.internal(.presentPersonaNotFoundErrorAlert(reason: "")))
-					return
-				}
-
-				await send(.internal(.usePersona(usePersonaRequestItem, persona, authorizedDapp, authorizedPersona)))
-
-			} catch: { error, send in
-				await send(.internal(.presentPersonaNotFoundErrorAlert(reason: error.legibleLocalizedDescription)))
-			}
-
-		case let .personaNotFoundErrorAlert(.presented(action)):
-			switch action {
-			case .cancelButtonTapped:
-				return dismissEffect(for: state, errorKind: .invalidPersona, message: nil)
-			}
+		case .personaNotFoundErrorAlert(.presented(.cancelButtonTapped)):
+			dismissEffect(for: state, errorKind: .invalidPersona, message: nil)
 
 		case .personaNotFoundErrorAlert:
-			return .none
+			.none
 
 		case .closeButtonTapped:
-			return dismissEffect(for: state, errorKind: .rejectedByUser, message: nil)
+			dismissEffect(for: state, errorKind: .rejectedByUser, message: nil)
 
 		case .backButtonTapped:
-			return goBackEffect(for: &state)
+			goBackEffect(for: &state)
 		}
 	}
 
@@ -304,6 +292,40 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			)
 			return .none
 		}
+	}
+
+	private func validateRequestItemsEffect(state: State) -> Effect<Action> {
+		.run { send in
+			// If there is a `DappToWalletInteractionAuthUsePersonaRequestItem`, we will fetch its corresponding data.
+			if let requestItem = state.usePersonaRequestItem {
+				do {
+					if let data = try await getAuthUsePersonaData(requestItem: requestItem, dappDefinitionAddress: state.dappMetadata.dAppDefinitionAddress) {
+						await send(.internal(.usePersona(requestItem, data.persona, data.authorizedDapp, data.authorizedPersona)))
+					} else {
+						await send(.internal(.presentPersonaNotFoundErrorAlert(reason: "")))
+						return
+					}
+				} catch {
+					await send(.internal(.presentPersonaNotFoundErrorAlert(reason: error.legibleLocalizedDescription)))
+					return
+				}
+			}
+		}
+	}
+
+	private func getAuthUsePersonaData(
+		requestItem: DappToWalletInteractionAuthUsePersonaRequestItem,
+		dappDefinitionAddress: DappDefinitionAddress
+	) async throws -> (persona: Persona, authorizedDapp: AuthorizedDapp, authorizedPersona: AuthorizedPersonaSimple)? {
+		let identityAddress = requestItem.identityAddress
+		guard
+			let persona = try await personasClient.getPersonas()[id: identityAddress],
+			let authorizedDapp = try await authorizedDappsClient.getAuthorizedDapps()[id: dappDefinitionAddress],
+			let authorizedPersona = authorizedDapp.referencesToAuthorizedPersonas.first(where: { $0.identityAddress == identityAddress })
+		else {
+			return nil
+		}
+		return (persona, authorizedDapp, authorizedPersona)
 	}
 }
 
@@ -420,6 +442,69 @@ extension DappInteractionFlow {
 			return dismissEffect(for: state, errorKind: errorKind, message: message)
 		}
 
+		func handlePersonaProofOfOwnership(
+			_ item: State.AnyInteractionItem,
+			_ persona: Persona,
+			_ signedAuthChallenge: SignedAuthChallenge
+		) -> Effect<Action> {
+			guard
+				// A **single** signature expected, since we prove ownership of a single Persona.
+				let entitySignature = signedAuthChallenge.entitySignatures.first,
+				signedAuthChallenge.entitySignatures.count == 1
+			else {
+				return dismissEffect(for: state, errorKind: .failedToSignAuthChallenge, message: "Failed to serialize signature")
+			}
+			let authProof = WalletToDappInteractionAuthProof(entitySignature: entitySignature)
+			let proof = WalletToDappInteractionProofOfOwnership.persona(.init(identityAddress: persona.address, proof: authProof))
+
+			state.responseItems[item] = .remote(.proofOfOwnership(.init(
+				challenge: signedAuthChallenge.challenge,
+				proofs: [proof]
+			)))
+
+			return continueEffect(for: &state)
+		}
+
+		func handleAccountsProofOfOwnership(
+			_ item: State.AnyInteractionItem,
+			_ accountAuthProofs: [AccountAuthProof],
+			_ signedAuthChallenge: SignedAuthChallenge
+		) -> Effect<Action> {
+			let proofs = accountAuthProofs.map {
+				WalletToDappInteractionProofOfOwnership.account(.init(
+					accountAddress: $0.account.address,
+					proof: $0.proof
+				))
+			}
+
+			let challenge = signedAuthChallenge.challenge
+
+			// A predicate that checks if a given response item matches the challenge.
+			func isMatchingChallenge(_ item: State.AnyInteractionResponseItem) -> Bool {
+				if case let .remote(.proofOfOwnership(response)) = item {
+					return response.challenge == challenge
+				}
+				return false
+			}
+
+			// Check if there is an existing response item for this challenge.
+			if let existing = state.responseItems.values.first(where: isMatchingChallenge), case var .remote(.proofOfOwnership(response)) = existing {
+				// Append the new proofs to the existing proof of ownership response.
+				response.proofs.append(contentsOf: proofs)
+				// Update the existing item with the modified response.
+				state.responseItems[item] = .remote(.proofOfOwnership(response))
+
+			} else {
+				// No existing response item, create a new proof of ownership response.
+				state.responseItems[item] = .remote(.proofOfOwnership(.init(
+					challenge: challenge,
+					proofs: proofs
+				)))
+			}
+
+			return continueEffect(for: &state)
+		}
+
 		let item = state.currentItem
 
 		guard let action = childAction.action else { return .none }
@@ -465,6 +550,20 @@ extension DappInteractionFlow {
 
 		case let .reviewTransaction(.delegate(.failed(error))):
 			return handleSignAndSubmitTXFailed(error)
+
+		case let .personaProofOfOwnership(.delegate(.provenPersonaOwnership(persona, challenge))):
+			return handlePersonaProofOfOwnership(item, persona, challenge)
+
+		case let .accountsProofOfOwnership(.delegate(.provenAccountsOwnership(accountAuthProofs, challenge))):
+			return handleAccountsProofOfOwnership(item, accountAuthProofs, challenge)
+
+		case .personaProofOfOwnership(.delegate(.failedToGetEntities)),
+		     .accountsProofOfOwnership(.delegate(.failedToGetEntities)):
+			return dismissEffect(for: state, errorKind: .invalidPersonaOrAccounts, message: nil)
+
+		case .personaProofOfOwnership(.delegate(.failedToSign)),
+		     .accountsProofOfOwnership(.delegate(.failedToSign)):
+			return dismissEffect(for: state, errorKind: .failedToSignAuthChallenge, message: nil)
 
 		default:
 			return .none
@@ -893,6 +992,20 @@ extension DappInteractionFlow.Path.State {
 				dappMetadata: dappMetadata,
 				personaID: persona.id,
 				requested: item
+			))
+
+		case let .remote(.personaProofOfOwnership(item)):
+			self.state = .personaProofOfOwnership(.init(
+				identityAddress: item.identityAddress,
+				dappMetadata: dappMetadata,
+				challenge: item.challenge
+			))
+
+		case let .remote(.accountsProofOfOwnership(item)):
+			self.state = .accountsProofOfOwnership(.init(
+				accountAddresses: item.accountAddresses,
+				dappMetadata: dappMetadata,
+				challenge: item.challenge
 			))
 
 		case let .remote(.send(item)):

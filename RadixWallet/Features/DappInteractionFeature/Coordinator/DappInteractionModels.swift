@@ -105,6 +105,8 @@ extension DappToWalletInteraction {
 		case ongoingAccounts(DappToWalletInteractionAccountsRequestItem)
 		case oneTimePersonaData(DappToWalletInteractionPersonaDataRequestItem)
 		case ongoingPersonaData(DappToWalletInteractionPersonaDataRequestItem)
+		case personaProofOfOwnership(PersonaProofOfOwnership)
+		case accountsProofOfOwnership(AccountsProofOfOwnership)
 
 		// transactions
 		case send(DappToWalletInteractionSendTransactionItem)
@@ -122,6 +124,10 @@ extension DappToWalletInteraction {
 				3
 			case .oneTimePersonaData:
 				4
+			case .personaProofOfOwnership:
+				5
+			case .accountsProofOfOwnership:
+				6
 			// transactions
 			case .send:
 				0
@@ -149,11 +155,41 @@ extension DappToWalletInteraction {
 				items.oneTimePersonaData.map(AnyInteractionItem.oneTimePersonaData),
 			]
 			.compactMap { $0 }
+			+
+			items.proofOfOwnership.splitted
 		case let .transaction(items):
 			[
 				.send(items.send),
 			]
 			.compactMap { $0 }
+		}
+	}
+}
+
+extension DappToWalletInteraction.AnyInteractionItem {
+	struct PersonaProofOfOwnership: Sendable, Hashable {
+		let challenge: DappToWalletInteractionAuthChallengeNonce
+		let identityAddress: IdentityAddress
+
+		init?(_ item: DappToWalletInteractionProofOfOwnershipRequestItem) {
+			guard let identityAddress = item.identityAddress else {
+				return nil
+			}
+			self.challenge = item.challenge
+			self.identityAddress = identityAddress
+		}
+	}
+
+	struct AccountsProofOfOwnership: Sendable, Hashable {
+		let challenge: DappToWalletInteractionAuthChallengeNonce
+		let accountAddresses: [AccountAddress]
+
+		init?(_ item: DappToWalletInteractionProofOfOwnershipRequestItem) {
+			guard let accountAddresses = item.accountAddresses, !accountAddresses.isEmpty else {
+				return nil
+			}
+			self.challenge = item.challenge
+			self.accountAddresses = accountAddresses
 		}
 	}
 }
@@ -167,6 +203,7 @@ extension WalletToDappInteractionSuccessResponse {
 		case ongoingAccounts(WalletToDappInteractionAccountsRequestResponseItem)
 		case oneTimePersonaData(WalletToDappInteractionPersonaDataRequestResponseItem)
 		case ongoingPersonaData(WalletToDappInteractionPersonaDataRequestResponseItem)
+		case proofOfOwnership(WalletToDappInteractionProofOfOwnershipRequestResponseItem)
 
 		// transaction responses
 		case send(WalletToDappInteractionSendTransactionResponseItem)
@@ -184,6 +221,7 @@ extension WalletToDappInteractionSuccessResponse {
 			var ongoingAccounts: WalletToDappInteractionAccountsRequestResponseItem? = nil
 			var oneTimePersonaData: WalletToDappInteractionPersonaDataRequestResponseItem? = nil
 			var ongoingPersonaData: WalletToDappInteractionPersonaDataRequestResponseItem? = nil
+			var proofOfOwnership: WalletToDappInteractionProofOfOwnershipRequestResponseItem? = nil
 
 			for item in items {
 				switch item {
@@ -197,6 +235,8 @@ extension WalletToDappInteractionSuccessResponse {
 					oneTimeAccounts = item
 				case let .oneTimePersonaData(item):
 					oneTimePersonaData = item
+				case let .proofOfOwnership(item):
+					proofOfOwnership = item
 				case .send:
 					continue
 				}
@@ -221,7 +261,8 @@ extension WalletToDappInteractionSuccessResponse {
 					items: .unauthorizedRequest(
 						.init(
 							oneTimeAccounts: oneTimeAccounts,
-							oneTimePersonaData: oneTimePersonaData
+							oneTimePersonaData: oneTimePersonaData,
+							proofOfOwnership: proofOfOwnership
 						)
 					)
 				)
@@ -231,7 +272,7 @@ extension WalletToDappInteractionSuccessResponse {
 			var send: WalletToDappInteractionSendTransactionResponseItem? = nil
 			for item in items {
 				switch item {
-				case .auth, .ongoingAccounts, .ongoingPersonaData, .oneTimeAccounts, .oneTimePersonaData:
+				case .auth, .ongoingAccounts, .ongoingPersonaData, .oneTimeAccounts, .oneTimePersonaData, .proofOfOwnership:
 					continue
 				case let .send(item):
 					send = item
@@ -248,5 +289,23 @@ extension WalletToDappInteractionSuccessResponse {
 				items: .transaction(.init(send: send))
 			)
 		}
+	}
+}
+
+private extension DappToWalletInteractionProofOfOwnershipRequestItem? {
+	/// From a given `DappToWalletInteractionProofOfOwnershipRequestItem`, we may have up to two
+	/// `DappToWalletInteraction.AnyInteractionItem`s: one for prooving `Accounts`, and one for `Persona`.
+	var splitted: [DappToWalletInteraction.AnyInteractionItem] {
+		guard let self else {
+			return []
+		}
+		var result: [DappToWalletInteraction.AnyInteractionItem] = []
+		if let persona = DappToWalletInteraction.AnyInteractionItem.PersonaProofOfOwnership(self) {
+			result.append(.personaProofOfOwnership(persona))
+		}
+		if let accounts = DappToWalletInteraction.AnyInteractionItem.AccountsProofOfOwnership(self) {
+			result.append(.accountsProofOfOwnership(accounts))
+		}
+		return result
 	}
 }

@@ -63,7 +63,7 @@ extension HiddenEntities {
 				VStack(spacing: .medium3) {
 					ForEachStatic(store.accounts) { account in
 						Card {
-							AccountCard(kind: .hiddenEntity, account: account) {
+							AccountCard(kind: .details, account: account) {
 								unhideButton(action: .unhideAccountTapped(account.id))
 							}
 						}

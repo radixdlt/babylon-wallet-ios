@@ -57,7 +57,8 @@ extension DappToWalletInteraction {
 			interactionId: interactionId,
 			items: .unauthorizedRequest(.init(
 				oneTimeAccounts: .previewValue,
-				oneTimePersonaData: .previewValue
+				oneTimePersonaData: .previewValue,
+				proofOfOwnership: nil
 			)),
 			metadata: .previewValue
 		)
