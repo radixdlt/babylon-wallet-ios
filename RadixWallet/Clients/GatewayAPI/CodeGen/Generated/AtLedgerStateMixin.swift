@@ -11,26 +11,26 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.AtLedgerStateMixin")
-public typealias AtLedgerStateMixin = GatewayAPI.AtLedgerStateMixin
+typealias AtLedgerStateMixin = GatewayAPI.AtLedgerStateMixin
 
 extension GatewayAPI {
 
 /** defines upper boundary (inclusive) for queried data. i.e &#x60;{ \&quot;at_state_version\&quot; &#x3D; {\&quot;epoch\&quot; &#x3D; 10} }&#x60;, will return data till 10 epoch. */
-public struct AtLedgerStateMixin: Codable, Hashable {
+struct AtLedgerStateMixin: Codable, Hashable {
 
-    public private(set) var atLedgerState: LedgerStateSelector?
+    private(set) var atLedgerState: LedgerStateSelector?
 
-    public init(atLedgerState: LedgerStateSelector? = nil) {
+    init(atLedgerState: LedgerStateSelector? = nil) {
         self.atLedgerState = atLedgerState
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case atLedgerState = "at_ledger_state"
     }
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(atLedgerState, forKey: .atLedgerState)
     }

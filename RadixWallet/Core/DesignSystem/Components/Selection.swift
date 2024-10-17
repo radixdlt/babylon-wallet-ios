@@ -1,32 +1,32 @@
 // MARK: - SelectionItem
-public struct SelectionItem<Value> {
-	public let value: Value
-	public var isSelected: Bool
-	public var isDisabled: Bool
-	public var action: @Sendable () -> Void
+struct SelectionItem<Value> {
+	let value: Value
+	var isSelected: Bool
+	var isDisabled: Bool
+	var action: @Sendable () -> Void
 }
 
 // MARK: Sendable
 extension SelectionItem: Sendable where Value: Sendable {}
 
 // MARK: - SelectionRequirement
-public enum SelectionRequirement: Sendable, Hashable {
+enum SelectionRequirement: Sendable, Hashable {
 	case exactly(Int)
 	case atLeast(Int)
 
-	public enum Quantifier: Sendable, Hashable {
+	enum Quantifier: Sendable, Hashable {
 		case exactly
 		case atLeast
 	}
 
-	public var quantifier: Quantifier {
+	var quantifier: Quantifier {
 		switch self {
 		case .exactly: .exactly
 		case .atLeast: .atLeast
 		}
 	}
 
-	public var count: Int {
+	var count: Int {
 		switch self {
 		case let .exactly(count), let .atLeast(count):
 			count
@@ -35,8 +35,8 @@ public enum SelectionRequirement: Sendable, Hashable {
 }
 
 // MARK: - Selection
-public struct Selection<Value: Hashable, Content: View>: View {
-	public typealias Item = SelectionItem<Value>
+struct Selection<Value: Hashable, Content: View>: View {
+	typealias Item = SelectionItem<Value>
 
 	@Binding
 	var selection: [Value]?
@@ -46,7 +46,7 @@ public struct Selection<Value: Hashable, Content: View>: View {
 	let requirement: SelectionRequirement
 	let content: (Item) -> Content
 
-	public init(
+	init(
 		_ selection: Binding<[Value]?>,
 		from values: some Sequence<Value>,
 		requiring requirement: SelectionRequirement,
@@ -59,7 +59,7 @@ public struct Selection<Value: Hashable, Content: View>: View {
 		self.content = content
 	}
 
-	public init(
+	init(
 		_ selection: Binding<Value?>,
 		from values: some Sequence<Value>,
 		@ViewBuilder content: @escaping (Item) -> Content
@@ -82,7 +82,7 @@ public struct Selection<Value: Hashable, Content: View>: View {
 		self.content = content
 	}
 
-	public var body: some View {
+	var body: some View {
 		ForEach(values, id: \.self) { value in
 			let isDisabled: Bool = {
 				guard !selectedValues.contains(value) else {
@@ -156,8 +156,8 @@ public struct Selection<Value: Hashable, Content: View>: View {
 }
 
 #if DEBUG
-public struct Selection_PreviewProvider: PreviewProvider {
-	public static var previews: some View {
+struct Selection_PreviewProvider: PreviewProvider {
+	static var previews: some View {
 		SingleSelection_Preview().previewDisplayName("Single - Exactly 1")
 
 		MultiSelection_Preview(requirement: .exactly(0)).previewDisplayName("Multi - Exactly 0")
@@ -170,11 +170,11 @@ public struct Selection_PreviewProvider: PreviewProvider {
 	}
 }
 
-public struct SingleSelection_Preview: View {
+struct SingleSelection_Preview: View {
 	@State
 	var selection: Int? = nil
 
-	public var body: some View {
+	var body: some View {
 		List {
 			Selection($selection, from: 1 ... 10) { item in
 				HStack {
@@ -199,12 +199,12 @@ public struct SingleSelection_Preview: View {
 	}
 }
 
-public struct MultiSelection_Preview: View {
+struct MultiSelection_Preview: View {
 	@State
 	var selection: [Int]? = nil
 	let requirement: SelectionRequirement
 
-	public var body: some View {
+	var body: some View {
 		List {
 			Selection($selection, from: 1 ... 10, requiring: requirement) { item in
 				HStack {

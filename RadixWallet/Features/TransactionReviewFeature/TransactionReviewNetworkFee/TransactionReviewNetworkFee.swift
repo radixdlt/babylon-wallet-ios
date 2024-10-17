@@ -2,13 +2,13 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - TransactionReviewNetworkFee
-public struct TransactionReviewNetworkFee: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public var reviewedTransaction: ReviewedTransaction
-		public var fiatValue: Loadable<String> = .idle
+struct TransactionReviewNetworkFee: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		var reviewedTransaction: ReviewedTransaction
+		var fiatValue: Loadable<String> = .idle
 		let id: UUID
 
-		public init(
+		init(
 			reviewedTransaction: ReviewedTransaction
 		) {
 			self.reviewedTransaction = reviewedTransaction
@@ -16,20 +16,20 @@ public struct TransactionReviewNetworkFee: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case task
 		case customizeTapped
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case setTokenPrices(TaskResult<PriceResult>)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case showCustomizeFees
 	}
 
-	public struct PriceResult: Sendable, Equatable {
+	struct PriceResult: Sendable, Equatable {
 		let prices: TokenPricesClient.TokenPrices
 		let currency: FiatCurrency
 	}
@@ -38,9 +38,9 @@ public struct TransactionReviewNetworkFee: Sendable, FeatureReducer {
 	@Dependency(\.tokenPricesClient) var tokenPricesClient
 	@Dependency(\.errorQueue) var errorQueue
 
-	public init() {}
+	init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			state.fiatValue = .loading
@@ -57,7 +57,7 @@ public struct TransactionReviewNetworkFee: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .setTokenPrices(.failure(error)):
 			loggerGlobal.error("TransactionReviewNetworkFee failed to fetch XRD price, error: \(error)")

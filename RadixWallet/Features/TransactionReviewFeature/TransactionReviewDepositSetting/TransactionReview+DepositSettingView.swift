@@ -1,26 +1,26 @@
 import ComposableArchitecture
 import SwiftUI
 
-public typealias AccountDefaultDepositRule = DepositRule
+typealias AccountDefaultDepositRule = DepositRule
 
 extension TransactionReview {
-	public struct DepositSettingState: Sendable, Hashable {
-		public var changes: IdentifiedArrayOf<DepositSettingChange>
+	struct DepositSettingState: Sendable, Hashable {
+		var changes: IdentifiedArrayOf<DepositSettingChange>
 	}
 
-	public struct DepositSettingChange: Sendable, Identifiable, Hashable {
-		public var id: AccountAddress.ID { account.address.id }
-		public let account: Account
-		public let ruleChange: AccountDefaultDepositRule
+	struct DepositSettingChange: Sendable, Identifiable, Hashable {
+		var id: AccountAddress.ID { account.address.id }
+		let account: Account
+		let ruleChange: AccountDefaultDepositRule
 	}
 }
 
 // MARK: - TransactionReview.View.DepositSettingView
 extension TransactionReview.View {
-	public struct DepositSettingView: View {
-		public var viewState: TransactionReview.DepositSettingState
+	struct DepositSettingView: View {
+		var viewState: TransactionReview.DepositSettingState
 
-		public var body: some View {
+		var body: some View {
 			Card {
 				VStack(spacing: .small1) {
 					ForEach(viewState.changes) { change in

@@ -3,12 +3,12 @@ import Sargon
 
 // MARK: - Signer
 // FIXME: move elsewhere. not really part of Profile... but.. where? We need some kind of shared target for higher level models that can depend on Profile. We lack such a package right now.
-public struct Signer: Sendable, Hashable, Identifiable {
-	public typealias ID = AccountOrPersona
-	public var id: ID { entity }
-	public let entity: AccountOrPersona
+struct Signer: Sendable, Hashable, Identifiable {
+	typealias ID = AccountOrPersona
+	var id: ID { entity }
+	let entity: AccountOrPersona
 
-	public let factorInstancesRequiredToSign: Set<HierarchicalDeterministicFactorInstance>
+	let factorInstancesRequiredToSign: Set<HierarchicalDeterministicFactorInstance>
 
 	init(
 		factorInstancesRequiredToSign: Set<HierarchicalDeterministicFactorInstance>,
@@ -25,7 +25,7 @@ public struct Signer: Sendable, Hashable, Identifiable {
 		self.entity = entity
 	}
 
-	public init(
+	init(
 		factorInstanceRequiredToSign: HierarchicalDeterministicFactorInstance,
 		entity: AccountOrPersona
 	) throws {

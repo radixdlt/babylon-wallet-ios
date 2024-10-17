@@ -1,22 +1,22 @@
 // MARK: - ConfirmSkippingBDFS
-public struct ConfirmSkippingBDFS: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public init() {}
+struct ConfirmSkippingBDFS: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		init() {}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case confirmTapped
 		case closeButtonTapped
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case confirmed
 		case cancel
 	}
 
-	public init() {}
+	init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .confirmTapped:
 			.send(.delegate(.confirmed))

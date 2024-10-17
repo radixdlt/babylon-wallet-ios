@@ -11,12 +11,12 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.TransactionStatus")
-public typealias TransactionStatus = GatewayAPI.TransactionStatus
+typealias TransactionStatus = GatewayAPI.TransactionStatus
 
 extension GatewayAPI {
 
 /** A top-level intent status, left in for backwards compatibility. It doesn&#39;t give much information. Rejected means PermanentRejection.  */
-public enum TransactionStatus: String, Codable, CaseIterable {
+enum TransactionStatus: String, Codable, CaseIterable {
     case unknown = "Unknown"
     case committedSuccess = "CommittedSuccess"
     case committedFailure = "CommittedFailure"

@@ -1,6 +1,6 @@
 // MARK: - ResetWalletClient
-public struct ResetWalletClient: Sendable {
-	public var resetWallet: ResetWallet
+struct ResetWalletClient: Sendable {
+	var resetWallet: ResetWallet
 
 	init(
 		resetWallet: @escaping ResetWallet
@@ -11,11 +11,11 @@ public struct ResetWalletClient: Sendable {
 
 // MARK: ResetWalletClient.ResetWallet
 extension ResetWalletClient {
-	public typealias ResetWallet = @Sendable () async -> Void
+	typealias ResetWallet = @Sendable () async -> Void
 }
 
 extension DependencyValues {
-	public var resetWalletClient: ResetWalletClient {
+	var resetWalletClient: ResetWalletClient {
 		get { self[ResetWalletClient.self] }
 		set { self[ResetWalletClient.self] = newValue }
 	}

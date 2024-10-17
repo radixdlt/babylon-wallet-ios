@@ -6,7 +6,7 @@ extension OverlayReducer {
 	struct View: SwiftUI.View {
 		private let store: StoreOf<OverlayReducer>
 
-		public init(store: StoreOf<OverlayReducer>) {
+		init(store: StoreOf<OverlayReducer>) {
 			self.store = store
 		}
 

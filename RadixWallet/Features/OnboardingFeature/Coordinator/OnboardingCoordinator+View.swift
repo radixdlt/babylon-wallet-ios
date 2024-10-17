@@ -4,14 +4,14 @@ import SwiftUI
 // MARK: - OnboardingCoordinator.View
 extension OnboardingCoordinator {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<OnboardingCoordinator>
 
-		public init(store: StoreOf<OnboardingCoordinator>) {
+		init(store: StoreOf<OnboardingCoordinator>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			OnboardingStartup.View(store: store.startup)
 				.destinations(with: store)
 		}
@@ -61,7 +61,7 @@ struct Onboarding_Preview: PreviewProvider {
 }
 
 extension OnboardingCoordinator.State {
-	public static let previewValue: Self = {
+	static let previewValue: Self = {
 		fatalError("impl me")
 	}()
 }

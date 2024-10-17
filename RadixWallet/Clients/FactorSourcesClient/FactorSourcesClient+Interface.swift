@@ -1,23 +1,23 @@
 import Sargon
 
 // MARK: - FactorSourcesClient
-public struct FactorSourcesClient: Sendable {
-	public var indicesOfEntitiesControlledByFactorSource: IndicesOfEntitiesControlledByFactorSource
-	public var nextEntityIndexForFactorSource: NextEntityIndexForFactorSource
-	public var getCurrentNetworkID: GetCurrentNetworkID
-	public var getMainDeviceFactorSource: GetMainDeviceFactorSource
-	public var createNewMainDeviceFactorSource: CreateNewMainDeviceFactorSource
-	public var getFactorSources: GetFactorSources
-	public var factorSourcesAsyncSequence: FactorSourcesAsyncSequence
-	public var addPrivateHDFactorSource: AddPrivateHDFactorSource
-	public var checkIfHasOlympiaFactorSourceForAccounts: CheckIfHasOlympiaFactorSourceForAccounts
-	public var saveFactorSource: SaveFactorSource
-	public var updateFactorSource: UpdateFactorSource
-	public var getSigningFactors: GetSigningFactors
-	public var updateLastUsed: UpdateLastUsed
-	public var flagFactorSourceForDeletion: FlagFactorSourceForDeletion
+struct FactorSourcesClient: Sendable {
+	var indicesOfEntitiesControlledByFactorSource: IndicesOfEntitiesControlledByFactorSource
+	var nextEntityIndexForFactorSource: NextEntityIndexForFactorSource
+	var getCurrentNetworkID: GetCurrentNetworkID
+	var getMainDeviceFactorSource: GetMainDeviceFactorSource
+	var createNewMainDeviceFactorSource: CreateNewMainDeviceFactorSource
+	var getFactorSources: GetFactorSources
+	var factorSourcesAsyncSequence: FactorSourcesAsyncSequence
+	var addPrivateHDFactorSource: AddPrivateHDFactorSource
+	var checkIfHasOlympiaFactorSourceForAccounts: CheckIfHasOlympiaFactorSourceForAccounts
+	var saveFactorSource: SaveFactorSource
+	var updateFactorSource: UpdateFactorSource
+	var getSigningFactors: GetSigningFactors
+	var updateLastUsed: UpdateLastUsed
+	var flagFactorSourceForDeletion: FlagFactorSourceForDeletion
 
-	public init(
+	init(
 		indicesOfEntitiesControlledByFactorSource: @escaping IndicesOfEntitiesControlledByFactorSource,
 		getCurrentNetworkID: @escaping GetCurrentNetworkID,
 		getMainDeviceFactorSource: @escaping GetMainDeviceFactorSource,
@@ -51,34 +51,34 @@ public struct FactorSourcesClient: Sendable {
 }
 
 // MARK: - NextEntityIndexForFactorSourceRequest
-public struct NextEntityIndexForFactorSourceRequest {
-	public let entityKind: EntityKind
+struct NextEntityIndexForFactorSourceRequest {
+	let entityKind: EntityKind
 
 	/// `nil` means use main BDFS
-	public let factorSourceID: FactorSourceID?
+	let factorSourceID: FactorSourceID?
 
 	/// If DeviceFactorSource with mnemonic `M` is used to derive Account with CAP26 derivation path at index `0`, then we must
 	/// allow `M` to be able to derive account wit hBIP44-like derivation path at index `0` as well in the future.
-	public let derivationPathScheme: DerivationPathScheme
+	let derivationPathScheme: DerivationPathScheme
 
 	/// `nil` means `currentNetwork`
-	public let networkID: NetworkID?
+	let networkID: NetworkID?
 }
 
 // MARK: - IndicesOfEntitiesControlledByFactorSourceRequest
-public struct IndicesOfEntitiesControlledByFactorSourceRequest: Sendable, Hashable {
-	public let entityKind: EntityKind
-	public let factorSourceID: FactorSourceID
+struct IndicesOfEntitiesControlledByFactorSourceRequest: Sendable, Hashable {
+	let entityKind: EntityKind
+	let factorSourceID: FactorSourceID
 
 	/// If DeviceFactorSource with mnemonic `M` is used to derive Account with CAP26 derivation path at index `0`, then we must
 	/// allow `M` to be able to derive account wit hBIP44-like derivation path at index `0` as well in the future.
-	public let derivationPathScheme: DerivationPathScheme
+	let derivationPathScheme: DerivationPathScheme
 
-	public let networkID: NetworkID?
+	let networkID: NetworkID?
 }
 
 // MARK: - IndicesUsedByFactorSource
-public struct IndicesUsedByFactorSource: Sendable, Hashable {
+struct IndicesUsedByFactorSource: Sendable, Hashable {
 	let indices: OrderedSet<HDPathValue>
 	let factorSource: FactorSource
 	let currentNetworkID: NetworkID
@@ -86,29 +86,29 @@ public struct IndicesUsedByFactorSource: Sendable, Hashable {
 
 // MARK: FactorSourcesClient.GetFactorSources
 extension FactorSourcesClient {
-	public typealias IndicesOfEntitiesControlledByFactorSource = @Sendable (IndicesOfEntitiesControlledByFactorSourceRequest) async throws -> IndicesUsedByFactorSource
-	public typealias NextEntityIndexForFactorSource = @Sendable (NextEntityIndexForFactorSourceRequest) async throws -> HDPathValue
-	public typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
-	public typealias GetMainDeviceFactorSource = @Sendable () async throws -> DeviceFactorSource
-	public typealias CreateNewMainDeviceFactorSource = @Sendable () async throws -> PrivateHierarchicalDeterministicFactorSource
-	public typealias GetFactorSources = @Sendable () async throws -> FactorSources
-	public typealias FactorSourcesAsyncSequence = @Sendable () async -> AnyAsyncSequence<FactorSources>
-	public typealias AddPrivateHDFactorSource = @Sendable (AddPrivateHDFactorSourceRequest) async throws -> FactorSourceIDFromHash
-	public typealias CheckIfHasOlympiaFactorSourceForAccounts = @Sendable (BIP39WordCount, NonEmpty<OrderedSet<OlympiaAccountToMigrate>>) async -> FactorSourceIDFromHash?
-	public typealias SaveFactorSource = @Sendable (FactorSource) async throws -> Void
-	public typealias UpdateFactorSource = @Sendable (FactorSource) async throws -> Void
-	public typealias GetSigningFactors = @Sendable (GetSigningFactorsRequest) async throws -> SigningFactors
-	public typealias UpdateLastUsed = @Sendable (UpdateFactorSourceLastUsedRequest) async throws -> Void
-	public typealias FlagFactorSourceForDeletion = @Sendable (FactorSourceID) async throws -> Void
+	typealias IndicesOfEntitiesControlledByFactorSource = @Sendable (IndicesOfEntitiesControlledByFactorSourceRequest) async throws -> IndicesUsedByFactorSource
+	typealias NextEntityIndexForFactorSource = @Sendable (NextEntityIndexForFactorSourceRequest) async throws -> HDPathValue
+	typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
+	typealias GetMainDeviceFactorSource = @Sendable () async throws -> DeviceFactorSource
+	typealias CreateNewMainDeviceFactorSource = @Sendable () async throws -> PrivateHierarchicalDeterministicFactorSource
+	typealias GetFactorSources = @Sendable () async throws -> FactorSources
+	typealias FactorSourcesAsyncSequence = @Sendable () async -> AnyAsyncSequence<FactorSources>
+	typealias AddPrivateHDFactorSource = @Sendable (AddPrivateHDFactorSourceRequest) async throws -> FactorSourceIDFromHash
+	typealias CheckIfHasOlympiaFactorSourceForAccounts = @Sendable (BIP39WordCount, NonEmpty<OrderedSet<OlympiaAccountToMigrate>>) async -> FactorSourceIDFromHash?
+	typealias SaveFactorSource = @Sendable (FactorSource) async throws -> Void
+	typealias UpdateFactorSource = @Sendable (FactorSource) async throws -> Void
+	typealias GetSigningFactors = @Sendable (GetSigningFactorsRequest) async throws -> SigningFactors
+	typealias UpdateLastUsed = @Sendable (UpdateFactorSourceLastUsedRequest) async throws -> Void
+	typealias FlagFactorSourceForDeletion = @Sendable (FactorSourceID) async throws -> Void
 }
 
 // MARK: - AddPrivateHDFactorSourceRequest
-public struct AddPrivateHDFactorSourceRequest: Sendable, Hashable {
-	public let privateHDFactorSource: PrivateHierarchicalDeterministicFactorSource
-	public let onMnemonicExistsStrategy: ImportMnemonic.State.PersistStrategy.OnMnemonicExistsStrategy
+struct AddPrivateHDFactorSourceRequest: Sendable, Hashable {
+	let privateHDFactorSource: PrivateHierarchicalDeterministicFactorSource
+	let onMnemonicExistsStrategy: ImportMnemonic.State.PersistStrategy.OnMnemonicExistsStrategy
 	/// E.g. import babylon factor sources should only be saved keychain, not profile (already there).
-	public let saveIntoProfile: Bool
-	public init(
+	let saveIntoProfile: Bool
+	init(
 		privateHDFactorSource: PrivateHierarchicalDeterministicFactorSource,
 		onMnemonicExistsStrategy: ImportMnemonic.State.PersistStrategy.OnMnemonicExistsStrategy,
 		saveIntoProfile: Bool
@@ -119,20 +119,20 @@ public struct AddPrivateHDFactorSourceRequest: Sendable, Hashable {
 	}
 }
 
-public typealias SigningFactors = OrderedDictionary<FactorSourceKind, NonEmpty<Set<SigningFactor>>>
+typealias SigningFactors = OrderedDictionary<FactorSourceKind, NonEmpty<Set<SigningFactor>>>
 
 extension SigningFactors {
-	public var expectedSignatureCount: Int {
+	var expectedSignatureCount: Int {
 		values.flatMap { $0.map(\.expectedSignatureCount) }.reduce(0, +)
 	}
 }
 
 // MARK: - GetSigningFactorsRequest
-public struct GetSigningFactorsRequest: Sendable, Hashable {
-	public let networkID: NetworkID
-	public let signers: NonEmpty<Set<AccountOrPersona>>
-	public let signingPurpose: SigningPurpose
-	public init(networkID: NetworkID, signers: NonEmpty<Set<AccountOrPersona>>, signingPurpose: SigningPurpose) {
+struct GetSigningFactorsRequest: Sendable, Hashable {
+	let networkID: NetworkID
+	let signers: NonEmpty<Set<AccountOrPersona>>
+	let signingPurpose: SigningPurpose
+	init(networkID: NetworkID, signers: NonEmpty<Set<AccountOrPersona>>, signingPurpose: SigningPurpose) {
 		self.networkID = networkID
 		self.signers = signers
 		self.signingPurpose = signingPurpose
@@ -140,18 +140,18 @@ public struct GetSigningFactorsRequest: Sendable, Hashable {
 }
 
 extension FactorSourcesClient {
-	public func createNewMainBDFS() async throws -> PrivateHierarchicalDeterministicFactorSource {
+	func createNewMainBDFS() async throws -> PrivateHierarchicalDeterministicFactorSource {
 		try await createNewMainDeviceFactorSource()
 	}
 
-	public func getFactorSource(
+	func getFactorSource(
 		id: FactorSourceID,
 		matching filter: @escaping (FactorSource) -> Bool = { _ in true }
 	) async throws -> FactorSource? {
 		try await getFactorSources(matching: filter)[id: id]
 	}
 
-	public func getDeviceFactorSource(
+	func getDeviceFactorSource(
 		of hdFactorInstance: HierarchicalDeterministicFactorInstance
 	) async throws -> DeviceFactorSource? {
 		guard let factorSource = try await getFactorSource(of: hdFactorInstance.factorInstance) else {
@@ -160,26 +160,26 @@ extension FactorSourcesClient {
 		return try factorSource.extract(as: DeviceFactorSource.self)
 	}
 
-	public func getFactorSource<Source: FactorSourceProtocol>(
+	func getFactorSource<Source: FactorSourceProtocol>(
 		id: FactorSourceID,
 		as _: Source.Type
 	) async throws -> Source? {
 		try await getFactorSource(id: id)?.extract(Source.self)
 	}
 
-	public func getFactorSource(
+	func getFactorSource(
 		of factorInstance: FactorInstance
 	) async throws -> FactorSource? {
 		try await getFactorSource(id: factorInstance.factorSourceID)
 	}
 
-	public func getFactorSources(
+	func getFactorSources(
 		matching filter: (FactorSource) -> Bool
 	) async throws -> IdentifiedArrayOf<FactorSource> {
 		try await IdentifiedArrayOf(uniqueElements: getFactorSources().filter(filter))
 	}
 
-	public func getFactorSources<Source: FactorSourceProtocol>(
+	func getFactorSources<Source: FactorSourceProtocol>(
 		type _: Source.Type
 	) async throws -> IdentifiedArrayOf<Source> {
 		try await IdentifiedArrayOf(uniqueElements: getFactorSources().compactMap { $0.extract(Source.self) })
@@ -187,11 +187,11 @@ extension FactorSourcesClient {
 }
 
 // MARK: - UpdateFactorSourceLastUsedRequest
-public struct UpdateFactorSourceLastUsedRequest: Sendable, Hashable {
-	public let factorSourceIDs: [FactorSourceID]
-	public let lastUsedOn: Date
-	public let usagePurpose: SigningPurpose
-	public init(
+struct UpdateFactorSourceLastUsedRequest: Sendable, Hashable {
+	let factorSourceIDs: [FactorSourceID]
+	let lastUsedOn: Date
+	let usagePurpose: SigningPurpose
+	init(
 		factorSourceIDs: [FactorSourceID],
 		usagePurpose: SigningPurpose,
 		lastUsedOn: Date = .init()
@@ -203,18 +203,18 @@ public struct UpdateFactorSourceLastUsedRequest: Sendable, Hashable {
 }
 
 // MARK: - SigningFactor
-public struct SigningFactor: Sendable, Hashable, Identifiable {
-	public typealias ID = FactorSourceID
-	public var id: ID { factorSource.id }
-	public let factorSource: FactorSource
-	public typealias Signers = NonEmpty<IdentifiedArrayOf<Signer>>
-	public var signers: Signers
+struct SigningFactor: Sendable, Hashable, Identifiable {
+	typealias ID = FactorSourceID
+	var id: ID { factorSource.id }
+	let factorSource: FactorSource
+	typealias Signers = NonEmpty<IdentifiedArrayOf<Signer>>
+	var signers: Signers
 
-	public var expectedSignatureCount: Int {
+	var expectedSignatureCount: Int {
 		signers.map(\.factorInstancesRequiredToSign.count).reduce(0, +)
 	}
 
-	public init(
+	init(
 		factorSource: FactorSource,
 		signers: Signers
 	) {
@@ -222,7 +222,7 @@ public struct SigningFactor: Sendable, Hashable, Identifiable {
 		self.signers = signers
 	}
 
-	public init(
+	init(
 		factorSource: FactorSource,
 		signer: Signer
 	) {
@@ -234,7 +234,7 @@ public struct SigningFactor: Sendable, Hashable, Identifiable {
 }
 
 extension FactorSourcesClient {
-	public func saveNewMainBDFS(_ newMainBDFS: DeviceFactorSource) async throws {
+	func saveNewMainBDFS(_ newMainBDFS: DeviceFactorSource) async throws {
 		let oldMainBDFSSources = try await getFactorSources(type: DeviceFactorSource.self).filter(\.isExplicitMainBDFS)
 
 		for oldMainBDFS in oldMainBDFSSources {
@@ -245,7 +245,7 @@ extension FactorSourcesClient {
 	}
 
 	@discardableResult
-	public func addOnDeviceFactorSource(
+	func addOnDeviceFactorSource(
 		privateHDFactorSource: PrivateHierarchicalDeterministicFactorSource,
 		onMnemonicExistsStrategy: ImportMnemonic.State.PersistStrategy.OnMnemonicExistsStrategy,
 		saveIntoProfile: Bool
@@ -259,7 +259,7 @@ extension FactorSourcesClient {
 		).asGeneral
 	}
 
-	public func addOnDeviceFactorSource(
+	func addOnDeviceFactorSource(
 		onDeviceMnemonicKind: OnDeviceMnemonicKind,
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
 		onMnemonicExistsStrategy: ImportMnemonic.State.PersistStrategy.OnMnemonicExistsStrategy,
@@ -267,18 +267,18 @@ extension FactorSourcesClient {
 	) async throws -> DeviceFactorSource {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 
-		let deviceInfo = secureStorageClient.loadDeviceInfoOrFallback()
+		let hostInfo = await SargonOS.shared.resolveHostInfo()
 		let factorSource = switch onDeviceMnemonicKind {
 		case let .babylon(isMain):
 			DeviceFactorSource.babylon(
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
 				isMain: isMain,
-				hostInfo: .current()
+				hostInfo: hostInfo
 			)
 		case .olympia:
 			DeviceFactorSource.olympia(
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
-				hostInfo: .current()
+				hostInfo: hostInfo
 			)
 		}
 
@@ -296,7 +296,7 @@ extension FactorSourcesClient {
 }
 
 // MARK: - OnDeviceMnemonicKind
-public enum OnDeviceMnemonicKind: Sendable, Hashable {
+enum OnDeviceMnemonicKind: Sendable, Hashable {
 	case babylon(isMain: Bool)
 	case olympia
 }

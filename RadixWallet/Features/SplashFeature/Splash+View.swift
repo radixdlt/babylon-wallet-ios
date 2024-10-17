@@ -3,17 +3,17 @@ import SwiftUI
 
 // MARK: - Splash.View
 extension Splash {
-	public struct ViewState: Equatable {}
+	struct ViewState: Equatable {}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<Splash>
 
-		public init(store: StoreOf<Splash>) {
+		init(store: StoreOf<Splash>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(
 				store,
 				observe: { $0 },
@@ -25,7 +25,7 @@ extension Splash {
 					}
 					.edgesIgnoringSafeArea(.all)
 					.destinations(with: store)
-					.onAppear {
+					.task {
 						viewStore.send(.appeared)
 					}
 			}
@@ -70,15 +70,15 @@ struct SplashView_Previews: PreviewProvider {
 }
 
 extension Splash.State {
-	public static let previewValue = Self()
+	static let previewValue = Self()
 }
 #endif
 
 // MARK: - SplashView
-public struct SplashView: View {
+struct SplashView: View {
 	var biometricsCheckFailed: Bool = false
 
-	public var body: some View {
+	var body: some View {
 		VStack {
 			if biometricsCheckFailed {
 				Spacer()

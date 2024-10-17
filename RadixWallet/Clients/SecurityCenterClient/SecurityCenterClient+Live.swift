@@ -5,9 +5,9 @@ import DependenciesAdditions
 import os
 
 extension SecurityCenterClient {
-	public static let liveValue: Self = .live()
+	static let liveValue: Self = .live()
 
-	public func problems() async -> AnyAsyncSequence<[SecurityProblem]> {
+	func problems() async -> AnyAsyncSequence<[SecurityProblem]> {
 		await problems(nil)
 	}
 
@@ -15,13 +15,13 @@ extension SecurityCenterClient {
 	///
 	/// Despite `.securityFactors` problems aren't actually related to recoverability status, we are considering them as well so
 	/// that user is aware that they still have problems to take care of.
-	public func isRecoverable() async -> AnyAsyncSequence<Bool> {
+	func isRecoverable() async -> AnyAsyncSequence<Bool> {
 		await problems()
 			.map(\.isEmpty)
 			.eraseToAnyAsyncSequence()
 	}
 
-	public static func live(
+	static func live(
 		profileStore: ProfileStore = .shared
 	) -> SecurityCenterClient {
 		@Dependency(\.userDefaults) var userDefaults
@@ -29,14 +29,14 @@ extension SecurityCenterClient {
 
 		@Sendable
 		func manualBackups() async -> AnyAsyncSequence<BackupStatus?> {
-			let profileID = await profileStore.profile.id
+			let profileID = await profileStore.profile().id
 			let backups = userDefaults.lastManualBackupValues(for: profileID)
 			return await statusValues(results: backups)
 		}
 
 		@Sendable
 		func cloudBackups() async -> AnyAsyncSequence<BackupStatus?> {
-			let profileID = await profileStore.profile.id
+			let profileID = await profileStore.profile().id
 			let backups = userDefaults.lastCloudBackupValues(for: profileID)
 				.filter { backup in
 					backup?.isFinal ?? true

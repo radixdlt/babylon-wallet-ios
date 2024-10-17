@@ -11,26 +11,26 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.TransactionBalanceChanges")
-public typealias TransactionBalanceChanges = GatewayAPI.TransactionBalanceChanges
+typealias TransactionBalanceChanges = GatewayAPI.TransactionBalanceChanges
 
 extension GatewayAPI {
 
-public struct TransactionBalanceChanges: Codable, Hashable {
+struct TransactionBalanceChanges: Codable, Hashable {
 
     /** A list of all fee-related fungible balance changes per entity and resource.  */
-    public private(set) var fungibleFeeBalanceChanges: [TransactionFungibleFeeBalanceChanges]
+    private(set) var fungibleFeeBalanceChanges: [TransactionFungibleFeeBalanceChanges]
     /** A list of all non-fee-related fungible balance changes per entity and resource.  */
-    public private(set) var fungibleBalanceChanges: [TransactionFungibleBalanceChanges]
+    private(set) var fungibleBalanceChanges: [TransactionFungibleBalanceChanges]
     /** A list of all non-fungible changes per entity and resource.  */
-    public private(set) var nonFungibleBalanceChanges: [TransactionNonFungibleBalanceChanges]
+    private(set) var nonFungibleBalanceChanges: [TransactionNonFungibleBalanceChanges]
 
-    public init(fungibleFeeBalanceChanges: [TransactionFungibleFeeBalanceChanges], fungibleBalanceChanges: [TransactionFungibleBalanceChanges], nonFungibleBalanceChanges: [TransactionNonFungibleBalanceChanges]) {
+    init(fungibleFeeBalanceChanges: [TransactionFungibleFeeBalanceChanges], fungibleBalanceChanges: [TransactionFungibleBalanceChanges], nonFungibleBalanceChanges: [TransactionNonFungibleBalanceChanges]) {
         self.fungibleFeeBalanceChanges = fungibleFeeBalanceChanges
         self.fungibleBalanceChanges = fungibleBalanceChanges
         self.nonFungibleBalanceChanges = nonFungibleBalanceChanges
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case fungibleFeeBalanceChanges = "fungible_fee_balance_changes"
         case fungibleBalanceChanges = "fungible_balance_changes"
         case nonFungibleBalanceChanges = "non_fungible_balance_changes"
@@ -38,7 +38,7 @@ public struct TransactionBalanceChanges: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(fungibleFeeBalanceChanges, forKey: .fungibleFeeBalanceChanges)
         try container.encode(fungibleBalanceChanges, forKey: .fungibleBalanceChanges)

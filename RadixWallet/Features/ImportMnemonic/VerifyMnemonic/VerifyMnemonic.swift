@@ -3,17 +3,17 @@ import Sargon
 import SwiftUI
 
 // MARK: - VerifyMnemonic
-public struct VerifyMnemonic: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public static let numberOfRandomWordsToConfirm = 3
+struct VerifyMnemonic: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		static let numberOfRandomWordsToConfirm = 3
 
-		public let mnemonic: Mnemonic
-		public let wordsToConfirm: NonEmpty<IdentifiedArrayOf<OffsetIdentified<BIP39Word>>>
-		public var enteredWords: IdentifiedArrayOf<OffsetIdentified<String>>
-		public var focusedField: Int?
-		public var invalidMnemonic: Bool = false
+		let mnemonic: Mnemonic
+		let wordsToConfirm: NonEmpty<IdentifiedArrayOf<OffsetIdentified<BIP39Word>>>
+		var enteredWords: IdentifiedArrayOf<OffsetIdentified<String>>
+		var focusedField: Int?
+		var invalidMnemonic: Bool = false
 
-		public init(mnemonic: Mnemonic) {
+		init(mnemonic: Mnemonic) {
 			self.mnemonic = mnemonic
 
 			let identifiedWords = mnemonic.words.identifiablyEnumerated()
@@ -34,7 +34,7 @@ public struct VerifyMnemonic: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case wordChanged(OffsetIdentified<String>)
 		case wordSubmitted
 		case textFieldFocused(Int?)
@@ -44,13 +44,13 @@ public struct VerifyMnemonic: Sendable, FeatureReducer {
 		#endif
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case mnemonicVerified
 	}
 
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .wordChanged(identifiedWord):
 			// reset the invalidMnemonic state

@@ -3,14 +3,14 @@ import SwiftUI
 
 // MARK: - NewConnectionName.State.Field
 extension NewConnectionName.State {
-	public enum Field: String, Sendable, Hashable {
+	enum Field: String, Sendable, Hashable {
 		case connectionName
 	}
 }
 
 // MARK: - NewConnectionName.View
 extension NewConnectionName {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let screenState: ControlState
 		let nameOfConnection: String
 		let saveButtonControlState: ControlState
@@ -30,15 +30,15 @@ extension NewConnectionName {
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<NewConnectionName>
 
 		@FocusState private var focusedField: NewConnectionName.State.Field?
-		public init(store: StoreOf<NewConnectionName>) {
+		init(store: StoreOf<NewConnectionName>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: ViewState.init(state:), send: { .view($0) }) { viewStore in
 				ScrollView(showsIndicators: false) {
 					VStack(spacing: 0) {
@@ -105,6 +105,6 @@ struct NewConnectionName_Preview: PreviewProvider {
 }
 
 extension NewConnectionName.State {
-	public static let sample: Self = .init()
+	static let sample: Self = .init()
 }
 #endif

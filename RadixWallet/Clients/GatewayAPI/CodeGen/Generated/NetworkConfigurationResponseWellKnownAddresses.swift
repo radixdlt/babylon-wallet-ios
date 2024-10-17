@@ -11,72 +11,72 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.NetworkConfigurationResponseWellKnownAddresses")
-public typealias NetworkConfigurationResponseWellKnownAddresses = GatewayAPI.NetworkConfigurationResponseWellKnownAddresses
+typealias NetworkConfigurationResponseWellKnownAddresses = GatewayAPI.NetworkConfigurationResponseWellKnownAddresses
 
 extension GatewayAPI {
 
-public struct NetworkConfigurationResponseWellKnownAddresses: Codable, Hashable {
+struct NetworkConfigurationResponseWellKnownAddresses: Codable, Hashable {
 
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var xrd: String
+    private(set) var xrd: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var secp256k1SignatureVirtualBadge: String
+    private(set) var secp256k1SignatureVirtualBadge: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var ed25519SignatureVirtualBadge: String
+    private(set) var ed25519SignatureVirtualBadge: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var packageOfDirectCallerVirtualBadge: String
+    private(set) var packageOfDirectCallerVirtualBadge: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var globalCallerVirtualBadge: String
+    private(set) var globalCallerVirtualBadge: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var systemTransactionBadge: String
+    private(set) var systemTransactionBadge: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var packageOwnerBadge: String
+    private(set) var packageOwnerBadge: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var validatorOwnerBadge: String
+    private(set) var validatorOwnerBadge: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var accountOwnerBadge: String
+    private(set) var accountOwnerBadge: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var identityOwnerBadge: String
+    private(set) var identityOwnerBadge: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var packagePackage: String
+    private(set) var packagePackage: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var resourcePackage: String
+    private(set) var resourcePackage: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var accountPackage: String
+    private(set) var accountPackage: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var identityPackage: String
+    private(set) var identityPackage: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var consensusManagerPackage: String
+    private(set) var consensusManagerPackage: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var accessControllerPackage: String
+    private(set) var accessControllerPackage: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var transactionProcessorPackage: String
+    private(set) var transactionProcessorPackage: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var metadataModulePackage: String
+    private(set) var metadataModulePackage: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var royaltyModulePackage: String
+    private(set) var royaltyModulePackage: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var accessRulesPackage: String
+    private(set) var accessRulesPackage: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var roleAssignmentModulePackage: String
+    private(set) var roleAssignmentModulePackage: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var genesisHelperPackage: String
+    private(set) var genesisHelperPackage: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var faucetPackage: String
+    private(set) var faucetPackage: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var consensusManager: String
+    private(set) var consensusManager: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var genesisHelper: String
+    private(set) var genesisHelper: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var faucet: String
+    private(set) var faucet: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var poolPackage: String
+    private(set) var poolPackage: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var lockerPackage: String
+    private(set) var lockerPackage: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var transactionTracker: String
+    private(set) var transactionTracker: String
 
-    public init(xrd: String, secp256k1SignatureVirtualBadge: String, ed25519SignatureVirtualBadge: String, packageOfDirectCallerVirtualBadge: String, globalCallerVirtualBadge: String, systemTransactionBadge: String, packageOwnerBadge: String, validatorOwnerBadge: String, accountOwnerBadge: String, identityOwnerBadge: String, packagePackage: String, resourcePackage: String, accountPackage: String, identityPackage: String, consensusManagerPackage: String, accessControllerPackage: String, transactionProcessorPackage: String, metadataModulePackage: String, royaltyModulePackage: String, accessRulesPackage: String, roleAssignmentModulePackage: String, genesisHelperPackage: String, faucetPackage: String, consensusManager: String, genesisHelper: String, faucet: String, poolPackage: String, lockerPackage: String, transactionTracker: String) {
+    init(xrd: String, secp256k1SignatureVirtualBadge: String, ed25519SignatureVirtualBadge: String, packageOfDirectCallerVirtualBadge: String, globalCallerVirtualBadge: String, systemTransactionBadge: String, packageOwnerBadge: String, validatorOwnerBadge: String, accountOwnerBadge: String, identityOwnerBadge: String, packagePackage: String, resourcePackage: String, accountPackage: String, identityPackage: String, consensusManagerPackage: String, accessControllerPackage: String, transactionProcessorPackage: String, metadataModulePackage: String, royaltyModulePackage: String, accessRulesPackage: String, roleAssignmentModulePackage: String, genesisHelperPackage: String, faucetPackage: String, consensusManager: String, genesisHelper: String, faucet: String, poolPackage: String, lockerPackage: String, transactionTracker: String) {
         self.xrd = xrd
         self.secp256k1SignatureVirtualBadge = secp256k1SignatureVirtualBadge
         self.ed25519SignatureVirtualBadge = ed25519SignatureVirtualBadge
@@ -108,7 +108,7 @@ public struct NetworkConfigurationResponseWellKnownAddresses: Codable, Hashable 
         self.transactionTracker = transactionTracker
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case xrd
         case secp256k1SignatureVirtualBadge = "secp256k1_signature_virtual_badge"
         case ed25519SignatureVirtualBadge = "ed25519_signature_virtual_badge"
@@ -142,7 +142,7 @@ public struct NetworkConfigurationResponseWellKnownAddresses: Codable, Hashable 
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(xrd, forKey: .xrd)
         try container.encode(secp256k1SignatureVirtualBadge, forKey: .secp256k1SignatureVirtualBadge)

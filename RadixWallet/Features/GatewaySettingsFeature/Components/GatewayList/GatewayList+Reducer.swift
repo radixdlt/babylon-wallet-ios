@@ -3,7 +3,7 @@ import SwiftUI
 
 // MARK: - GatewayRow.State + Comparable
 extension GatewayRow.State: Comparable {
-	public static func < (lhs: Self, rhs: Self) -> Bool {
+	static func < (lhs: Self, rhs: Self) -> Bool {
 		if lhs.canBeDeleted, !rhs.canBeDeleted {
 			return false
 		}
@@ -15,52 +15,52 @@ extension GatewayRow.State: Comparable {
 
 // MARK: - GatewayList
 @Reducer
-public struct GatewayList: Sendable, FeatureReducer {
+struct GatewayList: Sendable, FeatureReducer {
 	@ObservableState
-	public struct State: Sendable, Hashable {
+	struct State: Sendable, Hashable {
 		var gateways: IdentifiedArrayOf<GatewayRow.State>
 
-		public init(
+		init(
 			gateways: IdentifiedArrayOf<GatewayRow.State>
 		) {
 			self.gateways = gateways
 		}
 	}
 
-	public typealias Action = FeatureAction<Self>
+	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case appeared
 	}
 
 	@CasePathable
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case gateway(id: GatewayRow.State.ID, action: GatewayRow.Action)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case removeGateway(GatewayRow.State)
 		case switchToGateway(Gateway)
 	}
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.forEach(\.gateways, action: /Action.child .. ChildAction.gateway) {
 				GatewayRow()
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			.none
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .gateway(id: id, action: .delegate(action)):
 			switch action {

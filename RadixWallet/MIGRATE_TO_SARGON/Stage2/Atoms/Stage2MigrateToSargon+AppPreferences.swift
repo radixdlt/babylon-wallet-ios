@@ -2,13 +2,13 @@ import Foundation
 import Sargon
 
 extension AppPreferences {
-	public mutating func updateDisplay(_ display: AppDisplay) {
+	mutating func updateDisplay(_ display: AppDisplay) {
 		self.display = display
 	}
 }
 
 extension AppPreferences {
-	public mutating func changeCurrentToMainnetIfNeeded() {
+	mutating func changeCurrentToMainnetIfNeeded() {
 		gateways.changeCurrentToMainnetIfNeeded()
 	}
 }
@@ -16,7 +16,7 @@ extension AppPreferences {
 extension P2PLinks {
 	/// Appends a new `P2PLink`, returns `nil` if it was not inserted (because already present).
 	@discardableResult
-	public mutating func appendP2PLink(_ link: P2PLink) -> P2PLink? {
+	mutating func appendP2PLink(_ link: P2PLink) -> P2PLink? {
 		guard !contains(link) else {
 			return nil
 		}
@@ -27,7 +27,7 @@ extension P2PLinks {
 }
 
 extension AppPreferences {
-	public var customDumpMirror: Mirror {
+	var customDumpMirror: Mirror {
 		.init(
 			self,
 			children: [
@@ -40,7 +40,7 @@ extension AppPreferences {
 		)
 	}
 
-	public var description: String {
+	var description: String {
 		"""
 		transaction: \(transaction),
 		security: \(security),

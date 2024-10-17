@@ -2,7 +2,7 @@ import Foundation
 import Sargon
 
 extension SharedPersonaData {
-	public mutating func remove(id: PersonaDataEntryID) {
+	mutating func remove(id: PersonaDataEntryID) {
 		if id == self.name {
 			self.name = nil
 		}

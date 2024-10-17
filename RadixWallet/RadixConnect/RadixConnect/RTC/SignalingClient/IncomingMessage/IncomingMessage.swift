@@ -101,13 +101,13 @@ extension SignalingClient.IncomingMessage.FromSignalingServer.ResponseForRequest
 	}
 
 	struct ValidationError: Sendable, Equatable {
-		public let reason: JSONValue
-		public let requestId: SignalingClient.ClientMessage.RequestID
+		let reason: JSONValue
+		let requestId: SignalingClient.ClientMessage.RequestID
 	}
 
 	struct InvalidMessageError: Sendable, Equatable {
-		public let reason: JSONValue
-		public let messageSentThatWasInvalid: SignalingClient.ClientMessage
+		let reason: JSONValue
+		let messageSentThatWasInvalid: SignalingClient.ClientMessage
 	}
 
 	func resultOfRequest(id needle: SignalingClient.ClientMessage.RequestID) -> Result<Void, RequestFailure>? {

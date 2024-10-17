@@ -4,14 +4,14 @@ import SwiftUI
 // MARK: - PersonaList.View
 extension PersonaList {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<PersonaList>
 
-		public init(store: StoreOf<PersonaList>) {
+		init(store: StoreOf<PersonaList>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				ScrollView {
 					VStack(alignment: .leading, spacing: .medium3) {
@@ -40,18 +40,18 @@ extension PersonaList {
 }
 
 // MARK: - PersonaListCoreView
-public struct PersonaListCoreView: View {
+struct PersonaListCoreView: View {
 	private let store: StoreOf<PersonaList>
 	private let tappable: Bool
 	private let showShield: Bool
 
-	public init(store: StoreOf<PersonaList>, tappable: Bool, showShield: Bool) {
+	init(store: StoreOf<PersonaList>, tappable: Bool, showShield: Bool) {
 		self.store = store
 		self.tappable = tappable
 		self.showShield = showShield
 	}
 
-	public var body: some View {
+	var body: some View {
 		VStack(spacing: .medium3) {
 			ForEachStore(store.scope(state: \.personas, action: \.child.persona)) {
 				PersonaFeature.View(store: $0, tappable: tappable, showShield: showShield)
@@ -80,6 +80,6 @@ struct Personas_Preview: PreviewProvider {
 }
 
 extension PersonaList.State {
-	public static let previewValue: Self = .init()
+	static let previewValue: Self = .init()
 }
 #endif

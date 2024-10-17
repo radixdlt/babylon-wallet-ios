@@ -11,29 +11,29 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.ComponentEntityRoleAssignments")
-public typealias ComponentEntityRoleAssignments = GatewayAPI.ComponentEntityRoleAssignments
+typealias ComponentEntityRoleAssignments = GatewayAPI.ComponentEntityRoleAssignments
 
 extension GatewayAPI {
 
-public struct ComponentEntityRoleAssignments: Codable, Hashable {
+struct ComponentEntityRoleAssignments: Codable, Hashable {
 
     /** This type is defined in the Core API as `OwnerRole`. See the Core API documentation for more details.  */
-    public private(set) var owner: AnyCodable
-    public private(set) var entries: [ComponentEntityRoleAssignmentEntry]
+    private(set) var owner: AnyCodable
+    private(set) var entries: [ComponentEntityRoleAssignmentEntry]
 
-    public init(owner: AnyCodable, entries: [ComponentEntityRoleAssignmentEntry]) {
+    init(owner: AnyCodable, entries: [ComponentEntityRoleAssignmentEntry]) {
         self.owner = owner
         self.entries = entries
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case owner
         case entries
     }
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(owner, forKey: .owner)
         try container.encode(entries, forKey: .entries)

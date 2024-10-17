@@ -4,13 +4,13 @@ import SwiftUI
 let epochDurationInMinutes = 5
 
 // MARK: - SubmitTransaction
-public struct SubmitTransaction: Sendable, FeatureReducer {
+struct SubmitTransaction: Sendable, FeatureReducer {
 	private enum CancellableId: Hashable {
 		case transactionStatus
 	}
 
-	public struct State: Sendable, Hashable {
-		public enum TXStatus: Sendable, Hashable {
+	struct State: Sendable, Hashable {
+		enum TXStatus: Sendable, Hashable {
 			case notYetSubmitted
 			case submitting
 			case submitted
@@ -20,15 +20,15 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 			case failed(TXFailureStatus.Reason)
 		}
 
-		public let notarizedTX: NotarizeTransactionResponse
-		public var status: TXStatus
-		public let inProgressDismissalDisabled: Bool
-		public let route: P2P.Route
+		let notarizedTX: NotarizeTransactionResponse
+		var status: TXStatus
+		let inProgressDismissalDisabled: Bool
+		let route: P2P.Route
 
 		@PresentationState
 		var dismissTransactionAlert: AlertState<ViewAction.DismissAlertAction>?
 
-		public init(
+		init(
 			notarizedTX: NotarizeTransactionResponse,
 			status: TXStatus = .notYetSubmitted,
 			inProgressDismissalDisabled: Bool = false,
@@ -41,23 +41,23 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case submitTXResult(TaskResult<IntentHash>)
 		case statusUpdate(State.TXStatus)
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case appeared
 		case closeButtonTapped
 		case dismissTransactionAlert(PresentationAction<DismissAlertAction>)
 
-		public enum DismissAlertAction: Sendable, Equatable {
+		enum DismissAlertAction: Sendable, Equatable {
 			case cancel
 			case confirm
 		}
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case failedToSubmit
 		case submittedButNotCompleted(IntentHash)
 		case committedSuccessfully(IntentHash)
@@ -69,14 +69,14 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 	@Dependency(\.accountLockersClient) var accountLockersClient
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$dismissTransactionAlert, action: /Action.view .. ViewAction.dismissTransactionAlert)
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			state.status = .submitting
@@ -118,7 +118,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .submitTXResult(.failure(error)):
 			errorQueue.schedule(error)

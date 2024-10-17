@@ -21,5 +21,5 @@ extension Color {
 
 extension CGFloat {
 	static let dottedLineHeight: CGFloat = 64.0
-	public static let transferMessageDefaultHeight: Self = 64
+	static let transferMessageDefaultHeight: Self = 64
 }

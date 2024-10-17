@@ -4,14 +4,14 @@ import SwiftUI
 // MARK: - RestoreProfileFromBackupCoordinator.View
 extension RestoreProfileFromBackupCoordinator {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<RestoreProfileFromBackupCoordinator>
 
-		public init(store: StoreOf<RestoreProfileFromBackupCoordinator>) {
+		init(store: StoreOf<RestoreProfileFromBackupCoordinator>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			SelectBackup.View(store: store.selectBackup)
 				.inNavigationStack
 				.destinations(with: store)

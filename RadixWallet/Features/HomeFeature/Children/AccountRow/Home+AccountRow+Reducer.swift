@@ -4,18 +4,18 @@ import SwiftUI
 
 // MARK: - Home.AccountRow
 extension Home {
-	public struct AccountRow: Sendable, FeatureReducer {
-		public struct State: Sendable, Hashable, Identifiable, AccountWithInfoHolder {
-			public var id: AccountAddress { account.address }
-			public var accountWithInfo: AccountWithInfo
+	struct AccountRow: Sendable, FeatureReducer {
+		struct State: Sendable, Hashable, Identifiable, AccountWithInfoHolder {
+			var id: AccountAddress { account.address }
+			var accountWithInfo: AccountWithInfo
 
-			public var accountWithResources: Loadable<OnLedgerEntity.OnLedgerAccount>
-			public var showFiatWorth: Bool = true
-			public var totalFiatWorth: Loadable<FiatWorth>
-			public var securityProblemsConfig: EntitySecurityProblemsView.Config
-			public var accountLockerClaims: [AccountLockerClaimDetails] = []
+			var accountWithResources: Loadable<OnLedgerEntity.OnLedgerAccount>
+			var showFiatWorth: Bool = true
+			var totalFiatWorth: Loadable<FiatWorth>
+			var securityProblemsConfig: EntitySecurityProblemsView.Config
+			var accountLockerClaims: [AccountLockerClaimDetails] = []
 
-			public init(
+			init(
 				account: Account,
 				problems: [SecurityProblem]
 			) {
@@ -26,18 +26,18 @@ extension Home {
 			}
 		}
 
-		public enum ViewAction: Sendable, Equatable {
+		enum ViewAction: Sendable, Equatable {
 			case tapped
 			case securityProblemsTapped
 			case accountLockerClaimTapped(AccountLockerClaimDetails)
 		}
 
-		public enum InternalAction: Sendable, Equatable {
+		enum InternalAction: Sendable, Equatable {
 			case accountUpdated(OnLedgerEntity.OnLedgerAccount)
 			case fiatWorthUpdated(Loadable<FiatWorth>)
 		}
 
-		public enum DelegateAction: Sendable, Equatable {
+		enum DelegateAction: Sendable, Equatable {
 			case openDetails
 			case openSecurityCenter
 		}
@@ -47,7 +47,7 @@ extension Home {
 		@Dependency(\.userDefaults) var userDefaults
 		@Dependency(\.accountLockersClient) var accountLockersClient
 
-		public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+		func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
 			case .tapped:
 				.send(.delegate(.openDetails))
@@ -62,7 +62,7 @@ extension Home {
 			}
 		}
 
-		public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 			switch internalAction {
 			case let .accountUpdated(account):
 				assert(account.address == state.account.address)

@@ -2,21 +2,21 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - ManualAccountRecoveryCoordinator
-public struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
-	public typealias Store = StoreOf<Self>
+struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
+	typealias Store = StoreOf<Self>
 
-	public struct State: Sendable, Hashable {
-		public var path: StackState<Path.State> = .init()
-		public var isMainnet: Bool = false
+	struct State: Sendable, Hashable {
+		var path: StackState<Path.State> = .init()
+		var isMainnet: Bool = false
 
-		public init() {}
+		init() {}
 	}
 
 	// MARK: - Path
 
-	public struct Path: Sendable, Hashable, Reducer {
+	struct Path: Sendable, Hashable, Reducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case seedPhrase(ManualAccountRecoverySeedPhrase.State)
 			case ledger(LedgerHardwareDevices.State)
 
@@ -25,7 +25,7 @@ public struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case seedPhrase(ManualAccountRecoverySeedPhrase.Action)
 			case ledger(LedgerHardwareDevices.Action)
 
@@ -33,7 +33,7 @@ public struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 			case recoveryComplete(RecoverWalletControlWithBDFSComplete.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: \.seedPhrase, action: \.seedPhrase) {
 				ManualAccountRecoverySeedPhrase()
 			}
@@ -49,36 +49,36 @@ public struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case appeared
 		case closeButtonTapped
 		case useSeedPhraseTapped(isOlympia: Bool)
 		case useLedgerTapped(isOlympia: Bool)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case path(StackActionOf<Path>)
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case isMainnet(Bool)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case gotoAccountList
 	}
 
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.gatewaysClient) var gatewaysClient
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.forEach(\.path, action: /Action.child .. ChildAction.path) {
 				Path()
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return .run { send in
@@ -99,7 +99,7 @@ public struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .path(.element(id: id, action: pathAction)):
 			reduce(into: &state, id: id, pathAction: pathAction)
@@ -108,7 +108,7 @@ public struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .isMainnet(isMainnet):
 			state.isMainnet = isMainnet

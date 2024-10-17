@@ -2,10 +2,10 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - TransferAccountList
-public struct TransferAccountList: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public let fromAccount: Account
-		public var receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State> {
+struct TransferAccountList: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		let fromAccount: Account
+		var receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State> {
 			didSet {
 				if receivingAccounts.count > 1, receivingAccounts[0].canBeRemoved == false {
 					receivingAccounts[0].canBeRemoved = true
@@ -18,14 +18,14 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		}
 
 		@PresentationState
-		public var destination: Destination.State?
+		var destination: Destination.State?
 
-		public init(fromAccount: Account, receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State>) {
+		init(fromAccount: Account, receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State>) {
 			self.fromAccount = fromAccount
 			self.receivingAccounts = receivingAccounts
 		}
 
-		public init(fromAccount: Account) {
+		init(fromAccount: Account) {
 			self.init(
 				fromAccount: fromAccount,
 				receivingAccounts: [.empty(canBeRemovedWhenEmpty: false)].asIdentified()
@@ -33,40 +33,40 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable, Sendable {
 		case addAccountTapped
 		case addAssetCloseButtonTapped
 	}
 
 	@CasePathable
-	public enum ChildAction: Equatable, Sendable {
+	enum ChildAction: Equatable, Sendable {
 		case receivingAccount(id: ReceivingAccount.State.ID, action: ReceivingAccount.Action)
 	}
 
-	public enum InternalAction: Equatable, Sendable {
+	enum InternalAction: Equatable, Sendable {
 		case setAllDepositStatus(accountId: ReceivingAccount.State.ID, status: Loadable<DepositStatus>)
 		case setDepositStatus(accountId: ReceivingAccount.State.ID, values: DepositStatusPerResources)
 	}
 
-	public struct Destination: DestinationReducer {
-		public struct State: Sendable, Hashable {
+	struct Destination: DestinationReducer {
+		struct State: Sendable, Hashable {
 			let id: ReceivingAccount.State.ID
 			var state: MainState
 		}
 
 		@CasePathable
-		public enum MainState: Sendable, Hashable {
+		enum MainState: Sendable, Hashable {
 			case chooseAccount(ChooseReceivingAccount.State)
 			case addAsset(AssetsView.State)
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case chooseAccount(ChooseReceivingAccount.Action)
 			case addAsset(AssetsView.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: \.state, action: \.self) {
 				Scope(state: \.chooseAccount, action: \.chooseAccount) {
 					ChooseReceivingAccount()
@@ -81,7 +81,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	@Dependency(\.errorQueue) var errorQueue
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -93,7 +93,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .addAccountTapped:
 			state.receivingAccounts.append(.empty(canBeRemovedWhenEmpty: true))
@@ -105,7 +105,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .receivingAccount(id: id, action: action):
 			switch action {
@@ -133,7 +133,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		guard let id = state.destination?.id else { return .none }
 
 		switch presentedAction {
@@ -155,7 +155,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .setAllDepositStatus(accountId, status):
 			state.receivingAccounts[id: accountId]?.setAllDepositStatus(status)

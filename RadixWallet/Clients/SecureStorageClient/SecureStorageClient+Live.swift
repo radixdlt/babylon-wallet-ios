@@ -7,7 +7,7 @@ extension KeychainAccess.Accessibility: @unchecked Sendable {}
 extension KeychainAccess.AuthenticationPolicy: @unchecked Sendable {}
 
 // MARK: - SecureStorageError
-public enum SecureStorageError: Swift.Error, Equatable {
+enum SecureStorageError: Swift.Error, Equatable {
 	case evaluateLocalAuthenticationFailed(reason: LocalAuthenticationClient.Error)
 	case evaluateLocalAuthenticationFailedUnknown(reason: String)
 	case passcodeNotSet
@@ -26,9 +26,9 @@ func importantKeychainIdentifier(_ msg: String) -> Tagged<KeychainClient, NonEmp
 
 // MARK: - SecureStorageClient + DependencyKey
 extension SecureStorageClient: DependencyKey {
-	public typealias Value = SecureStorageClient
+	typealias Value = SecureStorageClient
 
-	public static let liveValue: Self = {
+	static let liveValue: Self = {
 		@Dependency(\.keychainClient) var keychainClient
 		@Dependency(\.jsonEncoder) var jsonEncoder
 		@Dependency(\.jsonDecoder) var jsonDecoder
@@ -186,6 +186,10 @@ extension SecureStorageClient: DependencyKey {
 			loggerGlobal.notice("Saved deviceInfo: \(deviceInfo)")
 		}
 
+		@Sendable func deleteDeviceInfo() throws {
+			try keychainClient.removeData(forKey: deviceInfoKey)
+		}
+
 		@Sendable func loadMnemonicFor(
 			key: KeychainClient.Key,
 			notifyIfMissing: Bool
@@ -201,15 +205,6 @@ extension SecureStorageClient: DependencyKey {
 				return nil
 			}
 			return try jsonDecoder().decode(MnemonicWithPassphrase.self, from: data)
-		}
-
-		let loadProfileSnapshot: LoadProfileSnapshot = { id -> Profile? in
-			guard
-				let existingSnapshotData = try loadProfileSnapshotData(id)
-			else {
-				return nil
-			}
-			return try Profile(jsonData: existingSnapshotData)
 		}
 
 		let loadMnemonicByFactorSourceID: LoadMnemonicByFactorSourceID = { request in
@@ -282,15 +277,39 @@ extension SecureStorageClient: DependencyKey {
 		}
 		#endif
 
-		let saveProfileSnapshot: SaveProfileSnapshot = { profile in
-			try saveProfile(
-				snapshotData: profile.profileSnapshot(),
-				key: profile.header.id.keychainKey
-			)
+		let saveProfileSnapshotData: SaveProfileSnapshotData = { id, data in
+			try saveProfile(snapshotData: data, key: id.keychainKey)
 		}
 
-		let loadProfile: LoadProfile = { id in
-			try loadProfileSnapshot(id)
+		let loadMnemonicDataByFactorSourceID: LoadMnemonicDataByFactorSourceID = { request in
+			let key = key(factorSourceID: request.factorSourceID)
+
+			let authenticationPrompt: KeychainClient.AuthenticationPrompt = NonEmptyString(rawValue: L10n.Biometrics.Prompt.title).map { KeychainClient.AuthenticationPrompt($0) } ?? "Authenticate to continue."
+			guard let data = try keychainClient.getDataWithAuth(
+				forKey: key,
+				authenticationPrompt: authenticationPrompt
+			) else {
+				return nil
+			}
+
+			return data
+		}
+
+		let saveMnemonicForFactorSourceData: SaveMnemonicForFactorSourceData = { id, data in
+			let mostSecureAccesibilityAndAuthenticationPolicy = try queryMostSecureAccesibilityAndAuthenticationPolicy()
+			let key = key(factorSourceID: id)
+
+			try keychainClient.setDataWithAuth(
+				data,
+				forKey: key,
+				attributes: .init(
+					iCloudSyncEnabled: false,
+					accessibility: mostSecureAccesibilityAndAuthenticationPolicy.accessibility,
+					authenticationPolicy: mostSecureAccesibilityAndAuthenticationPolicy.authenticationPolicy,
+					label: importantKeychainIdentifier("Radix Wallet Factor Secret")!,
+					comment: .init("mnemonic")
+				)
+			)
 		}
 
 		let containsMnemonicIdentifiedByFactorSourceID: ContainsMnemonicIdentifiedByFactorSourceID = { factorSourceID in
@@ -416,11 +435,8 @@ extension SecureStorageClient: DependencyKey {
 
 		#if DEBUG
 		return Self(
-			saveProfileSnapshot: saveProfileSnapshot,
 			loadProfileSnapshotData: loadProfileSnapshotData,
-			loadProfileSnapshot: loadProfileSnapshot,
-			loadProfile: loadProfile,
-			deleteProfile: deleteProfile,
+			saveProfileSnapshotData: saveProfileSnapshotData,
 			saveMnemonicForFactorSource: saveMnemonicForFactorSource,
 			loadMnemonicByFactorSourceID: loadMnemonicByFactorSourceID,
 			containsMnemonicIdentifiedByFactorSourceID: containsMnemonicIdentifiedByFactorSourceID,
@@ -432,6 +448,7 @@ extension SecureStorageClient: DependencyKey {
 			deleteProfileHeaderList: deleteProfileHeaderList,
 			loadDeviceInfo: loadDeviceInfo,
 			saveDeviceInfo: saveDeviceInfo,
+			deleteDeviceInfo: deleteDeviceInfo,
 			deprecatedLoadDeviceID: deprecatedLoadDeviceID,
 			deleteDeprecatedDeviceID: deleteDeprecatedDeviceID,
 			saveRadixConnectMobileSession: saveRadixConnectMobileSession,
@@ -441,15 +458,14 @@ extension SecureStorageClient: DependencyKey {
 			loadP2PLinksPrivateKey: loadP2PLinksPrivateKey,
 			saveP2PLinksPrivateKey: saveP2PLinksPrivateKey,
 			keychainChanged: keychainChanged,
-			getAllMnemonics: getAllMnemonics
+			getAllMnemonics: getAllMnemonics,
+			loadMnemonicDataByFactorSourceID: loadMnemonicDataByFactorSourceID,
+			saveMnemonicForFactorSourceData: saveMnemonicForFactorSourceData
 		)
 		#else
 		return Self(
-			saveProfileSnapshot: saveProfileSnapshot,
 			loadProfileSnapshotData: loadProfileSnapshotData,
-			loadProfileSnapshot: loadProfileSnapshot,
-			loadProfile: loadProfile,
-			deleteProfile: deleteProfile,
+			saveProfileSnapshotData: saveProfileSnapshotData,
 			saveMnemonicForFactorSource: saveMnemonicForFactorSource,
 			loadMnemonicByFactorSourceID: loadMnemonicByFactorSourceID,
 			containsMnemonicIdentifiedByFactorSourceID: containsMnemonicIdentifiedByFactorSourceID,
@@ -461,6 +477,7 @@ extension SecureStorageClient: DependencyKey {
 			deleteProfileHeaderList: deleteProfileHeaderList,
 			loadDeviceInfo: loadDeviceInfo,
 			saveDeviceInfo: saveDeviceInfo,
+			deleteDeviceInfo: deleteDeviceInfo,
 			deprecatedLoadDeviceID: deprecatedLoadDeviceID,
 			deleteDeprecatedDeviceID: deleteDeprecatedDeviceID,
 			saveRadixConnectMobileSession: saveRadixConnectMobileSession,
@@ -469,7 +486,9 @@ extension SecureStorageClient: DependencyKey {
 			saveP2PLinks: saveP2PLinks,
 			loadP2PLinksPrivateKey: loadP2PLinksPrivateKey,
 			saveP2PLinksPrivateKey: saveP2PLinksPrivateKey,
-			keychainChanged: keychainChanged
+			keychainChanged: keychainChanged,
+			loadMnemonicDataByFactorSourceID: loadMnemonicDataByFactorSourceID,
+			saveMnemonicForFactorSourceData: saveMnemonicForFactorSourceData
 		)
 		#endif
 	}()
@@ -518,10 +537,10 @@ extension FactorSourceIDFromHash {
 }
 
 extension FactorSourceIdFromHash {
-	public static let keychainKeySeparator = ":"
+	static let keychainKeySeparator = ":"
 	/// NEVER EVER CHANGE THIS! If you do, users apps will be unable to load the Mnemonic
 	/// from keychain!
-	public var keychainKey: String {
+	var keychainKey: String {
 		"\(kind)\(Self.keychainKeySeparator)\(body.data.hex())"
 	}
 }

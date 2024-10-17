@@ -10,20 +10,20 @@ extension Profile {
 
 extension Profile {
 	/// The networkID of the current gateway.
-	public var networkID: NetworkID {
+	var networkID: NetworkID {
 		appPreferences.gateways.current.network.id
 	}
 
 	/// The current network with a non empty set of accounts.
-	public var network: ProfileNetwork? {
+	var network: ProfileNetwork? {
 		try? network(id: networkID)
 	}
 
-	public func network(id needle: NetworkID) throws -> ProfileNetwork {
+	func network(id needle: NetworkID) throws -> ProfileNetwork {
 		try networks.asIdentified().network(id: needle)
 	}
 
-	public func containsNetwork(withID networkID: NetworkID) -> Bool {
+	func containsNetwork(withID networkID: NetworkID) -> Bool {
 		(try? network(id: networkID)) != nil
 	}
 }

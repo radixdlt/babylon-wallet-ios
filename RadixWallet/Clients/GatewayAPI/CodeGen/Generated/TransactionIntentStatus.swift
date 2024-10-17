@@ -11,12 +11,12 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.TransactionIntentStatus")
-public typealias TransactionIntentStatus = GatewayAPI.TransactionIntentStatus
+typealias TransactionIntentStatus = GatewayAPI.TransactionIntentStatus
 
 extension GatewayAPI {
 
 /** A more specific intent status. See the description field for further information. Note that &#x60;CommitPendingOutcomeUnknown&#x60; can either result in &#x60;CommittedSuccess&#x60; or &#x60;CommittedFailure&#x60;.  */
-public enum TransactionIntentStatus: String, Codable, CaseIterable {
+enum TransactionIntentStatus: String, Codable, CaseIterable {
     case unknown = "Unknown"
     case committedSuccess = "CommittedSuccess"
     case committedFailure = "CommittedFailure"

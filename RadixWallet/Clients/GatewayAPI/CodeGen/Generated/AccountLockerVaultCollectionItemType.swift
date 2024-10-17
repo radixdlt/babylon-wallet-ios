@@ -11,11 +11,11 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.AccountLockerVaultCollectionItemType")
-public typealias AccountLockerVaultCollectionItemType = GatewayAPI.AccountLockerVaultCollectionItemType
+typealias AccountLockerVaultCollectionItemType = GatewayAPI.AccountLockerVaultCollectionItemType
 
 extension GatewayAPI {
 
-public enum AccountLockerVaultCollectionItemType: String, Codable, CaseIterable {
+enum AccountLockerVaultCollectionItemType: String, Codable, CaseIterable {
     case fungible = "Fungible"
     case nonFungible = "NonFungible"
 }

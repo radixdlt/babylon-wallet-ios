@@ -14,7 +14,7 @@ extension SignalingClient {
 }
 
 extension SignalingClient.EncryptionKey {
-	public var symmetric: SymmetricKey {
+	var symmetric: SymmetricKey {
 		.init(data: self.data.data)
 	}
 }

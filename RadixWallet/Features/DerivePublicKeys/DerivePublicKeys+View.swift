@@ -4,14 +4,14 @@ import SwiftUI
 // MARK: - DerivePublicKeys.View
 extension DerivePublicKeys {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<DerivePublicKeys>
 
-		public init(store: StoreOf<DerivePublicKeys>) {
+		init(store: StoreOf<DerivePublicKeys>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			IfLetStore(store.scope(state: \.factorSourceAccess, action: \.child.factorSourceAccess)) {
 				FactorSourceAccess.View(store: $0)
 			} else: {

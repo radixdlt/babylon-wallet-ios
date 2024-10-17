@@ -2,19 +2,19 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - AdvancedFeesCustomization
-public struct AdvancedFeesCustomization: FeatureReducer {
-	public struct State: Hashable, Sendable {
-		public enum FocusField: Hashable, Sendable {
+struct AdvancedFeesCustomization: FeatureReducer {
+	struct State: Hashable, Sendable {
+		enum FocusField: Hashable, Sendable {
 			case padding
 			case tipPercentage
 		}
 
-		public var fees: TransactionFee.AdvancedFeeCustomization
+		var fees: TransactionFee.AdvancedFeeCustomization
 
-		public var paddingAmount: String
-		public var tipPercentage: String
+		var paddingAmount: String
+		var tipPercentage: String
 
-		public var focusField: FocusField?
+		var focusField: FocusField?
 
 		init(
 			fees: TransactionFee.AdvancedFeeCustomization
@@ -25,17 +25,17 @@ public struct AdvancedFeesCustomization: FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable, Sendable {
 		case paddingAmountChanged(String)
 		case tipPercentageChanged(String)
 		case focusChanged(State.FocusField?)
 	}
 
-	public enum DelegateAction: Equatable, Sendable {
+	enum DelegateAction: Equatable, Sendable {
 		case updated(TransactionFee.AdvancedFeeCustomization)
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .paddingAmountChanged(amount):
 			state.paddingAmount = amount

@@ -3,7 +3,7 @@ import AnyCodable
 #endif
 
 extension CoreAPI {
-	public enum TransactionMessage: Codable, Hashable {
+	enum TransactionMessage: Codable, Hashable {
 		case plaintext(PlaintextTransactionMessage)
 		case encrypted(AnyCodable)
 
@@ -11,12 +11,12 @@ extension CoreAPI {
 			case type
 		}
 
-		public var plaintext: PlaintextTransactionMessage? {
+		var plaintext: PlaintextTransactionMessage? {
 			guard case let .plaintext(value) = self else { return nil }
 			return value
 		}
 
-		public init(from decoder: Decoder) throws {
+		init(from decoder: Decoder) throws {
 			let container = try decoder.container(keyedBy: CodingKeys.self)
 
 			if let type = try? container.decode(TransactionMessageType.self, forKey: .type) {
@@ -31,7 +31,7 @@ extension CoreAPI {
 			}
 		}
 
-		public func encode(to encoder: Encoder) throws {
+		func encode(to encoder: Encoder) throws {
 			var container = encoder.container(keyedBy: CodingKeys.self)
 
 			switch self {
@@ -45,7 +45,7 @@ extension CoreAPI {
 		}
 	}
 
-	public enum TransactionMessageType: String, Codable, CaseIterable {
+	enum TransactionMessageType: String, Codable, CaseIterable {
 		case plaintext = "Plaintext"
 		case encrypted = "Encrypted"
 	}

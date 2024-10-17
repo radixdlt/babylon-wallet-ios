@@ -10,14 +10,14 @@ extension TransactionReviewNetworkFee.State {
 // MARK: - TransactionReviewNetworkFee.View
 extension TransactionReviewNetworkFee {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		let store: StoreOf<TransactionReviewNetworkFee>
 
-		public init(store: StoreOf<TransactionReviewNetworkFee>) {
+		init(store: StoreOf<TransactionReviewNetworkFee>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading, spacing: .zero) {
 					HStack(alignment: .top) {

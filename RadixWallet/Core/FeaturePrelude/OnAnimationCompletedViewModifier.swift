@@ -26,7 +26,7 @@ private struct OnAnimationCompletedViewModifier<Value: Sendable & VectorArithmet
 }
 
 extension View {
-	public func onAnimationCompleted(
+	func onAnimationCompleted(
 		for animatedValue: some Sendable & VectorArithmetic,
 		completion: @escaping @Sendable () -> Void
 	) -> some View {

@@ -1,10 +1,10 @@
 // MARK: - NoopError
-public struct NoopError {
-	public let message: String
-	public let file: StaticString
-	public let line: UInt
+struct NoopError {
+	let message: String
+	let file: StaticString
+	let line: UInt
 
-	public init(
+	init(
 		_ msg: String? = nil,
 		file: StaticString = #filePath,
 		line: UInt = #line
@@ -17,14 +17,14 @@ public struct NoopError {
 
 // MARK: LocalizedError
 extension NoopError: LocalizedError {
-	public var errorDescription: String? {
+	var errorDescription: String? {
 		"\(message) in `\(file)`#\(line)"
 	}
 }
 
 // MARK: Equatable
 extension NoopError: Equatable {
-	public static func == (lhs: NoopError, rhs: NoopError) -> Bool {
+	static func == (lhs: NoopError, rhs: NoopError) -> Bool {
 		lhs.message == rhs.message
 	}
 }

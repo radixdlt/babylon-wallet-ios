@@ -11,25 +11,25 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.AccountDepositPreValidationNonFungibleBadge")
-public typealias AccountDepositPreValidationNonFungibleBadge = GatewayAPI.AccountDepositPreValidationNonFungibleBadge
+typealias AccountDepositPreValidationNonFungibleBadge = GatewayAPI.AccountDepositPreValidationNonFungibleBadge
 
 extension GatewayAPI {
 
-public struct AccountDepositPreValidationNonFungibleBadge: Codable, Hashable {
+struct AccountDepositPreValidationNonFungibleBadge: Codable, Hashable {
 
-    public private(set) var badgeType: AccountAuthorizedDepositorBadgeType
+    private(set) var badgeType: AccountAuthorizedDepositorBadgeType
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var resourceAddress: String
+    private(set) var resourceAddress: String
     /** String-encoded non-fungible ID. */
-    public private(set) var nonFungibleId: String
+    private(set) var nonFungibleId: String
 
-    public init(badgeType: AccountAuthorizedDepositorBadgeType, resourceAddress: String, nonFungibleId: String) {
+    init(badgeType: AccountAuthorizedDepositorBadgeType, resourceAddress: String, nonFungibleId: String) {
         self.badgeType = badgeType
         self.resourceAddress = resourceAddress
         self.nonFungibleId = nonFungibleId
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case badgeType = "badge_type"
         case resourceAddress = "resource_address"
         case nonFungibleId = "non_fungible_id"
@@ -37,7 +37,7 @@ public struct AccountDepositPreValidationNonFungibleBadge: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(badgeType, forKey: .badgeType)
         try container.encode(resourceAddress, forKey: .resourceAddress)

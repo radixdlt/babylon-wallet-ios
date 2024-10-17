@@ -2,34 +2,34 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - ManualAccountRecoverySeedPhrase
-public struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
-	public typealias Store = StoreOf<Self>
+struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
+	typealias Store = StoreOf<Self>
 
 	// MARK: - State
 
-	public struct State: Sendable, Hashable {
+	struct State: Sendable, Hashable {
 		@PresentationState
-		public var destination: Destination.State? = nil
+		var destination: Destination.State? = nil
 
-		public let isOlympia: Bool
-		public var selected: EntitiesControlledByFactorSource? = nil
-		public var deviceFactorSources: IdentifiedArrayOf<EntitiesControlledByFactorSource> = []
+		let isOlympia: Bool
+		var selected: EntitiesControlledByFactorSource? = nil
+		var deviceFactorSources: IdentifiedArrayOf<EntitiesControlledByFactorSource> = []
 	}
 
 	// MARK: - Destination
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case importMnemonic(ImportMnemonic.State)
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case importMnemonic(ImportMnemonic.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: \.importMnemonic, action: \.importMnemonic) {
 				ImportMnemonic()
 			}
@@ -38,7 +38,7 @@ public struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
 
 	// MARK: - Action
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case appeared
 		case selected(EntitiesControlledByFactorSource?)
 		case addButtonTapped
@@ -46,11 +46,11 @@ public struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
 		case closeEnterMnemonicButtonTapped
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case loadedDeviceFactorSources(TaskResult<IdentifiedArrayOf<EntitiesControlledByFactorSource>>)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case recover(FactorSourceIDFromHash, olympia: Bool)
 	}
 
@@ -60,7 +60,7 @@ public struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.userDefaults) var userDefaults
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -69,7 +69,7 @@ public struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return updateEntities(state: &state)
@@ -109,7 +109,7 @@ public struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadedDeviceFactorSources(.success(deviceFactorSources)):
 			state.deviceFactorSources = deviceFactorSources
@@ -125,7 +125,7 @@ public struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .importMnemonic(.delegate(.persistedNewFactorSourceInProfile(factorSource))):
 			do {

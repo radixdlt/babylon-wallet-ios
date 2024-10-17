@@ -1,13 +1,13 @@
 extension UnknownDappComponents {
 	@MainActor
-	public struct View: SwiftUI.View {
-		public let store: StoreOf<UnknownDappComponents>
+	struct View: SwiftUI.View {
+		let store: StoreOf<UnknownDappComponents>
 
-		public init(store: StoreOf<UnknownDappComponents>) {
+		init(store: StoreOf<UnknownDappComponents>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			store.withState { state in
 				ScrollView {
 					ForEach(state.addresses, id: \.address) { address in

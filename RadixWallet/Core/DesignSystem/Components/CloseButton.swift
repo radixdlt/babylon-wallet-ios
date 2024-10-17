@@ -1,12 +1,12 @@
 // MARK: - CloseButtonBar
-public struct CloseButtonBar: View {
+struct CloseButtonBar: View {
 	let action: () -> Void
 
-	public init(action: @escaping () -> Void) {
+	init(action: @escaping () -> Void) {
 		self.action = action
 	}
 
-	public var body: some View {
+	var body: some View {
 		HStack {
 			CloseButton(action: action)
 				.padding(.small2)
@@ -16,16 +16,16 @@ public struct CloseButtonBar: View {
 }
 
 // MARK: - CloseButton
-public struct CloseButton: View {
+struct CloseButton: View {
 	let kind: Kind
 	let action: () -> Void
 
-	public init(kind: Kind = .toolbar, action: @escaping () -> Void) {
+	init(kind: Kind = .toolbar, action: @escaping () -> Void) {
 		self.kind = kind
 		self.action = action
 	}
 
-	public var body: some View {
+	var body: some View {
 		Button(action: action) {
 			Image(.close)
 				.resizable()
@@ -40,7 +40,7 @@ public struct CloseButton: View {
 
 // MARK: CloseButton.Kind
 extension CloseButton {
-	public enum Kind {
+	enum Kind {
 		case toolbar
 		case homeCard
 

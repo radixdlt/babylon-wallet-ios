@@ -1,13 +1,13 @@
 import JSONPreview
 
 // MARK: - JSONView
-public struct JSONView: SwiftUI.View {
+struct JSONView: SwiftUI.View {
 	let jsonString: String
-	public init(jsonString: String) {
+	init(jsonString: String) {
 		self.jsonString = jsonString
 	}
 
-	public var body: some View {
+	var body: some View {
 		UIKitJSONView(jsonString: jsonString)
 			.padding(.leading, -60) // we hide the "line number" view on the left which eats up precious widdth,zoo
 	}

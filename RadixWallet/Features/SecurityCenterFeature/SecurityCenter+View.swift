@@ -4,14 +4,14 @@ import SwiftUI
 // MARK: - SecurityCenter.View
 extension SecurityCenter {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<SecurityCenter>
 
-		public init(store: StoreOf<SecurityCenter>) {
+		init(store: StoreOf<SecurityCenter>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }) { viewStore in
 				ScrollView {
 					VStack(alignment: .leading, spacing: .zero) {

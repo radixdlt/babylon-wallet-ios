@@ -11,24 +11,24 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.ResourceHoldersCollectionItem")
-public typealias ResourceHoldersCollectionItem = GatewayAPI.ResourceHoldersCollectionItem
+typealias ResourceHoldersCollectionItem = GatewayAPI.ResourceHoldersCollectionItem
 
 extension GatewayAPI {
 
-public struct ResourceHoldersCollectionItem: Codable, Hashable {
+struct ResourceHoldersCollectionItem: Codable, Hashable {
 
-    public private(set) var type: ResourceHoldersResourceType
+    private(set) var type: ResourceHoldersResourceType
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var holderAddress: String
-    public private(set) var lastUpdatedAtStateVersion: Int64
+    private(set) var holderAddress: String
+    private(set) var lastUpdatedAtStateVersion: Int64
 
-    public init(type: ResourceHoldersResourceType, holderAddress: String, lastUpdatedAtStateVersion: Int64) {
+    init(type: ResourceHoldersResourceType, holderAddress: String, lastUpdatedAtStateVersion: Int64) {
         self.type = type
         self.holderAddress = holderAddress
         self.lastUpdatedAtStateVersion = lastUpdatedAtStateVersion
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case type
         case holderAddress = "holder_address"
         case lastUpdatedAtStateVersion = "last_updated_at_state_version"
@@ -36,7 +36,7 @@ public struct ResourceHoldersCollectionItem: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(type, forKey: .type)
         try container.encode(holderAddress, forKey: .holderAddress)

@@ -1,49 +1,49 @@
 import ComposableArchitecture
 import SwiftUI
 
-public struct Main: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
+struct Main: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
 		// MARK: - Components
-		public var home: Home.State
+		var home: Home.State
 
-		public var isOnMainnet = true
+		var isOnMainnet = true
 
 		// MARK: - Destination
 		@PresentationState
-		public var destination: Destination.State?
+		var destination: Destination.State?
 
-		public init(home: Home.State) {
+		init(home: Home.State) {
 			self.home = home
 		}
 	}
 
 	@CasePathable
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case task
 	}
 
 	@CasePathable
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case home(Home.Action)
 	}
 
 	@CasePathable
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case currentGatewayChanged(to: Gateway)
 	}
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case settings(Settings.State)
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case settings(Settings.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: \.settings, action: \.settings) {
 				Settings()
 			}
@@ -57,9 +57,9 @@ public struct Main: Sendable, FeatureReducer {
 	@Dependency(\.accountLockersClient) var accountLockersClient
 	@Dependency(\.deepLinkHandlerClient) var deepLinkHandlerClient
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Scope(state: \.home, action: \.child.home) {
 			Home()
 		}
@@ -71,7 +71,7 @@ public struct Main: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			// At fresh app start, handle deepLink only when app goes to main state.
@@ -125,7 +125,7 @@ public struct Main: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .home(.delegate(.displaySettings)):
 			state.destination = .settings(.init())
@@ -136,7 +136,7 @@ public struct Main: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .currentGatewayChanged(currentGateway):
 			state.isOnMainnet = currentGateway.network.id == .mainnet

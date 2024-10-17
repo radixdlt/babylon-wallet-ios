@@ -1,13 +1,13 @@
 // MARK: - HideResource.View
-public extension HideResource {
+extension HideResource {
 	struct View: SwiftUI.View {
 		private let store: StoreOf<HideResource>
 
-		public init(store: StoreOf<HideResource>) {
+		init(store: StoreOf<HideResource>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				if store.shouldShow {
 					VStack(spacing: .medium2) {

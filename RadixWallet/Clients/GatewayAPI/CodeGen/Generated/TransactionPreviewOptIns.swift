@@ -11,27 +11,27 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.TransactionPreviewOptIns")
-public typealias TransactionPreviewOptIns = GatewayAPI.TransactionPreviewOptIns
+typealias TransactionPreviewOptIns = GatewayAPI.TransactionPreviewOptIns
 
 extension GatewayAPI {
 
 /** A set of flags to configure the response of the transaction preview. */
-public struct TransactionPreviewOptIns: Codable, Hashable {
+struct TransactionPreviewOptIns: Codable, Hashable {
 
     /** This flag controls whether the preview response will include a Radix Engine Toolkit serializable receipt or not. If not provided, this defaults to `false` and no toolkit receipt is provided in the response.  */
-    public private(set) var radixEngineToolkitReceipt: Bool? = false
+    private(set) var radixEngineToolkitReceipt: Bool? = false
 
-    public init(radixEngineToolkitReceipt: Bool? = false) {
+    init(radixEngineToolkitReceipt: Bool? = false) {
         self.radixEngineToolkitReceipt = radixEngineToolkitReceipt
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case radixEngineToolkitReceipt = "radix_engine_toolkit_receipt"
     }
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(radixEngineToolkitReceipt, forKey: .radixEngineToolkitReceipt)
     }

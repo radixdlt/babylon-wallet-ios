@@ -2,8 +2,8 @@ import SwiftUI
 
 // MARK: - TransactionHistory.TableView
 extension TransactionHistory {
-	public struct TableView: UIViewRepresentable {
-		public enum Action: Hashable, Sendable {
+	struct TableView: UIViewRepresentable {
+		enum Action: Hashable, Sendable {
 			case transactionTapped(IntentHash)
 			case reachedTop
 			case pulledDown
@@ -18,7 +18,7 @@ extension TransactionHistory {
 
 		private static let cellIdentifier = "TransactionCell"
 
-		public func makeUIView(context: Context) -> UITableView {
+		func makeUIView(context: Context) -> UITableView {
 			let tableView = UITableView(frame: .zero, style: .plain)
 			tableView.backgroundColor = .clear
 			tableView.separatorStyle = .none
@@ -30,7 +30,7 @@ extension TransactionHistory {
 			return tableView
 		}
 
-		public func updateUIView(_ uiView: UITableView, context: Context) {
+		func updateUIView(_ uiView: UITableView, context: Context) {
 			if !sections.isEmpty, sections != context.coordinator.sections {
 				context.coordinator.sections = sections
 				uiView.reloadData()
@@ -42,11 +42,11 @@ extension TransactionHistory {
 			}
 		}
 
-		public func makeCoordinator() -> Coordinator {
+		func makeCoordinator() -> Coordinator {
 			Coordinator(sections: sections, action: action)
 		}
 
-		public class Coordinator: NSObject, UITableViewDataSource, UITableViewDelegate {
+		class Coordinator: NSObject, UITableViewDataSource, UITableViewDelegate {
 			var didSelectMonth: Bool = false
 
 			var sections: IdentifiedArrayOf<TransactionSection>
@@ -57,7 +57,7 @@ extension TransactionHistory {
 
 			private var month: Date = .distantPast
 
-			public init(
+			init(
 				sections: IdentifiedArrayOf<TransactionSection>,
 				action: @escaping (Action) -> Void
 			) {
@@ -65,11 +65,11 @@ extension TransactionHistory {
 				self.action = action
 			}
 
-			public func numberOfSections(in tableView: UITableView) -> Int {
+			func numberOfSections(in tableView: UITableView) -> Int {
 				sections.count
 			}
 
-			public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+			func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
 				let section = sections[section]
 
 				let headerView = TransactionHistory.SectionHeaderView(title: section.title)
@@ -79,11 +79,11 @@ extension TransactionHistory {
 				return hostingController.view
 			}
 
-			public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+			func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 				sections[section].transactions.count
 			}
 
-			public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+			func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 				let cell = tableView.dequeueReusableCell(withIdentifier: TableView.cellIdentifier, for: indexPath)
 				let item = sections[indexPath.section].transactions[indexPath.row]
 
@@ -100,17 +100,17 @@ extension TransactionHistory {
 				return cell
 			}
 
-			public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+			func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
 				UITableView.automaticDimension
 			}
 
-			public func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
+			func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
 				nil
 			}
 
 			// UIScrollViewDelegate
 
-			public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+			func scrollViewDidScroll(_ scrollView: UIScrollView) {
 				guard let tableView = scrollView as? UITableView else {
 					assertionFailure("This should be a UITableView")
 					return
@@ -140,11 +140,11 @@ extension TransactionHistory {
 				}
 			}
 
-			public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+			func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
 				didSelectMonth = false
 			}
 
-			public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+			func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
 				guard let tableView = scrollView as? UITableView else {
 					assertionFailure("This should be a UITableView")
 					return
@@ -460,7 +460,7 @@ extension TransactionHistory {
 		}
 	}
 
-	public enum Event {
+	enum Event {
 		case deposited
 		case withdrawn
 		case settings

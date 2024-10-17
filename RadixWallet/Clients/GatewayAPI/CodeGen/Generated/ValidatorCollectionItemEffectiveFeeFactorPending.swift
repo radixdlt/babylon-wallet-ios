@@ -11,29 +11,29 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.ValidatorCollectionItemEffectiveFeeFactorPending")
-public typealias ValidatorCollectionItemEffectiveFeeFactorPending = GatewayAPI.ValidatorCollectionItemEffectiveFeeFactorPending
+typealias ValidatorCollectionItemEffectiveFeeFactorPending = GatewayAPI.ValidatorCollectionItemEffectiveFeeFactorPending
 
 extension GatewayAPI {
 
-public struct ValidatorCollectionItemEffectiveFeeFactorPending: Codable, Hashable {
+struct ValidatorCollectionItemEffectiveFeeFactorPending: Codable, Hashable {
 
     /** String-encoded decimal representing the amount of a related fungible resource. */
-    public private(set) var feeFactor: String
-    public private(set) var effectiveAtEpoch: Int64
+    private(set) var feeFactor: String
+    private(set) var effectiveAtEpoch: Int64
 
-    public init(feeFactor: String, effectiveAtEpoch: Int64) {
+    init(feeFactor: String, effectiveAtEpoch: Int64) {
         self.feeFactor = feeFactor
         self.effectiveAtEpoch = effectiveAtEpoch
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case feeFactor = "fee_factor"
         case effectiveAtEpoch = "effective_at_epoch"
     }
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(feeFactor, forKey: .feeFactor)
         try container.encode(effectiveAtEpoch, forKey: .effectiveAtEpoch)

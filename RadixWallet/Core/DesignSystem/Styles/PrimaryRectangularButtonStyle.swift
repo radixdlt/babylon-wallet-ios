@@ -1,12 +1,12 @@
 // MARK: - PrimaryRectangularButtonStyle
-public struct PrimaryRectangularButtonStyle: ButtonStyle {
+struct PrimaryRectangularButtonStyle: ButtonStyle {
 	@Environment(\.controlState) var controlState
 
 	let shouldExpand: Bool
 	let height: CGFloat
 	let isDestructive: Bool
 
-	public func makeBody(configuration: ButtonStyle.Configuration) -> some View {
+	func makeBody(configuration: ButtonStyle.Configuration) -> some View {
 		ZStack {
 			configuration.label
 				.lineLimit(nil)
@@ -51,9 +51,9 @@ extension PrimaryRectangularButtonStyle {
 }
 
 extension ButtonStyle where Self == PrimaryRectangularButtonStyle {
-	public static var primaryRectangular: Self { .primaryRectangular() }
+	static var primaryRectangular: Self { .primaryRectangular() }
 
-	public static func primaryRectangular(
+	static func primaryRectangular(
 		shouldExpand: Bool = true,
 		height: CGFloat = .standardButtonHeight,
 		isDestructive: Bool = false

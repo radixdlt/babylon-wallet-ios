@@ -11,24 +11,24 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.ProgrammaticScryptoSborValueMap")
-public typealias ProgrammaticScryptoSborValueMap = GatewayAPI.ProgrammaticScryptoSborValueMap
+typealias ProgrammaticScryptoSborValueMap = GatewayAPI.ProgrammaticScryptoSborValueMap
 
 extension GatewayAPI {
 
-public struct ProgrammaticScryptoSborValueMap: Codable, Hashable {
+struct ProgrammaticScryptoSborValueMap: Codable, Hashable {
 
-    public private(set) var kind: ProgrammaticScryptoSborValueKind
+    private(set) var kind: ProgrammaticScryptoSborValueKind
     /** The name of the type of this value. This is only output when a schema is present and the type has a name. This property is ignored when the value is used as an input to the API.  */
-    public private(set) var typeName: String?
+    private(set) var typeName: String?
     /** The name of the field which hosts this value. This property is only included if this value is a child of a `Tuple` or `Enum` with named fields. This property is ignored when the value is used as an input to the API.  */
-    public private(set) var fieldName: String?
-    public private(set) var keyKind: ProgrammaticScryptoSborValueKind
-    public private(set) var keyTypeName: String?
-    public private(set) var valueKind: ProgrammaticScryptoSborValueKind
-    public private(set) var valueTypeName: String?
-    public private(set) var entries: [ProgrammaticScryptoSborValueMapEntry]
+    private(set) var fieldName: String?
+    private(set) var keyKind: ProgrammaticScryptoSborValueKind
+    private(set) var keyTypeName: String?
+    private(set) var valueKind: ProgrammaticScryptoSborValueKind
+    private(set) var valueTypeName: String?
+    private(set) var entries: [ProgrammaticScryptoSborValueMapEntry]
 
-    public init(kind: ProgrammaticScryptoSborValueKind, typeName: String? = nil, fieldName: String? = nil, keyKind: ProgrammaticScryptoSborValueKind, keyTypeName: String? = nil, valueKind: ProgrammaticScryptoSborValueKind, valueTypeName: String? = nil, entries: [ProgrammaticScryptoSborValueMapEntry]) {
+    init(kind: ProgrammaticScryptoSborValueKind, typeName: String? = nil, fieldName: String? = nil, keyKind: ProgrammaticScryptoSborValueKind, keyTypeName: String? = nil, valueKind: ProgrammaticScryptoSborValueKind, valueTypeName: String? = nil, entries: [ProgrammaticScryptoSborValueMapEntry]) {
         self.kind = kind
         self.typeName = typeName
         self.fieldName = fieldName
@@ -39,7 +39,7 @@ public struct ProgrammaticScryptoSborValueMap: Codable, Hashable {
         self.entries = entries
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case kind
         case typeName = "type_name"
         case fieldName = "field_name"
@@ -52,7 +52,7 @@ public struct ProgrammaticScryptoSborValueMap: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(kind, forKey: .kind)
         try container.encodeIfPresent(typeName, forKey: .typeName)

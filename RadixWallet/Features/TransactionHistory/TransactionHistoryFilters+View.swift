@@ -3,17 +3,17 @@ import SwiftUI
 
 // MARK: - TransactionHistoryFilters.View
 extension TransactionHistoryFilters {
-	public typealias ViewState = State.Filters
+	typealias ViewState = State.Filters
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<TransactionHistoryFilters>
 
-		public init(store: StoreOf<TransactionHistoryFilters>) {
+		init(store: StoreOf<TransactionHistoryFilters>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			NavigationStack {
 				ScrollView {
 					WithViewStore(store, observe: \.filters, send: { .view($0) }) { viewStore in

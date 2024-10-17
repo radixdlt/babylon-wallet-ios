@@ -1,7 +1,7 @@
 
 extension View {
 	@ViewBuilder
-	public func loadable<T>(
+	func loadable<T>(
 		_ loadable: Loadable<T>,
 		@ViewBuilder loadingView: () -> some View,
 		@ViewBuilder errorView: (Error) -> some View = { _ in EmptyView() },
@@ -18,7 +18,7 @@ extension View {
 	}
 
 	@ViewBuilder
-	public func loadable<T>(
+	func loadable<T>(
 		_ loadable: Loadable<T>,
 		loadingViewHeight: CGFloat = .large1,
 		backgroundColor: Color = .app.gray4,

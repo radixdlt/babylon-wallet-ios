@@ -3,11 +3,11 @@ import Sargon
 
 extension TransactionReview {
 	// Either the resource from ledger or metadata extracted from the TX manifest
-	public typealias ResourceInfo = Either<OnLedgerEntity.Resource, OnLedgerEntity.Metadata>
-	public typealias ResourcesInfo = [ResourceAddress: ResourceInfo]
-	public typealias ResourceAssociatedDapps = [ResourceAddress: OnLedgerEntity.Metadata]
+	typealias ResourceInfo = Either<OnLedgerEntity.Resource, OnLedgerEntity.Metadata>
+	typealias ResourcesInfo = [ResourceAddress: ResourceInfo]
+	typealias ResourceAssociatedDapps = [ResourceAddress: OnLedgerEntity.Metadata]
 
-	public struct Sections: Sendable, Hashable {
+	struct Sections: Sendable, Hashable {
 		var withdrawals: TransactionReviewAccounts.State? = nil
 		var dAppsUsed: TransactionReviewDappsUsed.State? = nil
 		var deposits: TransactionReviewAccounts.State? = nil
@@ -716,7 +716,7 @@ extension ResourceIndicator {
 		}
 	}
 
-	public mutating func add(_ other: Self) {
+	mutating func add(_ other: Self) {
 		guard other.resourceAddress == resourceAddress else {
 			assertionFailure("The indicators should have the same resource address")
 			return
@@ -740,7 +740,7 @@ extension ResourceIndicator {
 }
 
 extension FungibleResourceIndicator {
-	public func adding(_ other: Self) -> Self {
+	func adding(_ other: Self) -> Self {
 		switch (self, other) {
 		case let (.guaranteed(amount), .guaranteed(otherAmount)):
 			return .guaranteed(decimal: amount + otherAmount)
@@ -752,7 +752,7 @@ extension FungibleResourceIndicator {
 }
 
 extension NonFungibleResourceIndicator {
-	public func adding(_ other: Self) -> Self {
+	func adding(_ other: Self) -> Self {
 		switch (self, other) {
 		case let (.byIds(ids), .byIds(otherIds)):
 			return .byIds(ids: ids + otherIds)

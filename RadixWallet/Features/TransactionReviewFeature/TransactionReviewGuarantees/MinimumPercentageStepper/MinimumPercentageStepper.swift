@@ -8,12 +8,12 @@ extension MinimumPercentageStepper.State {
 }
 
 // MARK: - MinimumPercentageStepper
-public struct MinimumPercentageStepper: FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public var value: Decimal192?
+struct MinimumPercentageStepper: FeatureReducer {
+	struct State: Sendable, Hashable {
+		var value: Decimal192?
 		var string: String
 
-		public init(value: Decimal192) {
+		init(value: Decimal192) {
 			let clamped = value.clamped
 			self.value = clamped
 			// When first showing this view, we round the _displayed_ number, in case you don't touch it and return
@@ -21,19 +21,19 @@ public struct MinimumPercentageStepper: FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case increaseTapped
 		case decreaseTapped
 		case stringEntered(String)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case valueChanged
 	}
 
-	public init() {}
+	init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .increaseTapped:
 			let value = state.value.map { $0.floor(decimalPlaces: 0) + percentageDelta } ?? 100

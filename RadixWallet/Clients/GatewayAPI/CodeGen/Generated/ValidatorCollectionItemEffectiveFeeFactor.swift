@@ -11,28 +11,28 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.ValidatorCollectionItemEffectiveFeeFactor")
-public typealias ValidatorCollectionItemEffectiveFeeFactor = GatewayAPI.ValidatorCollectionItemEffectiveFeeFactor
+typealias ValidatorCollectionItemEffectiveFeeFactor = GatewayAPI.ValidatorCollectionItemEffectiveFeeFactor
 
 extension GatewayAPI {
 
-public struct ValidatorCollectionItemEffectiveFeeFactor: Codable, Hashable {
+struct ValidatorCollectionItemEffectiveFeeFactor: Codable, Hashable {
 
-    public private(set) var current: ValidatorCollectionItemEffectiveFeeFactorCurrent
-    public private(set) var pending: ValidatorCollectionItemEffectiveFeeFactorPending?
+    private(set) var current: ValidatorCollectionItemEffectiveFeeFactorCurrent
+    private(set) var pending: ValidatorCollectionItemEffectiveFeeFactorPending?
 
-    public init(current: ValidatorCollectionItemEffectiveFeeFactorCurrent, pending: ValidatorCollectionItemEffectiveFeeFactorPending? = nil) {
+    init(current: ValidatorCollectionItemEffectiveFeeFactorCurrent, pending: ValidatorCollectionItemEffectiveFeeFactorPending? = nil) {
         self.current = current
         self.pending = pending
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case current
         case pending
     }
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(current, forKey: .current)
         try container.encodeIfPresent(pending, forKey: .pending)

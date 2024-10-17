@@ -2,9 +2,9 @@ import Sargon
 
 // MARK: - MnemonicClient + DependencyKey
 extension MnemonicClient: DependencyKey {
-	public typealias Value = MnemonicClient
+	typealias Value = MnemonicClient
 
-	public static let liveValue: Self = .init(
+	static let liveValue: Self = .init(
 		generate: {
 			Mnemonic(wordCount: $0, language: $1)
 		},

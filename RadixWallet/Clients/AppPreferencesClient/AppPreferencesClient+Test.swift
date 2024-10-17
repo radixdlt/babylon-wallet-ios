@@ -1,8 +1,8 @@
 // MARK: - AppPreferencesClient + TestDependencyKey
 extension AppPreferencesClient: TestDependencyKey {
-	public static let previewValue = Self.noop
+	static let previewValue = Self.noop
 
-	public static let testValue = Self(
+	static let testValue = Self(
 		appPreferenceUpdates: unimplemented("\(Self.self).appPreferenceUpdates"),
 		getPreferences: unimplemented("\(Self.self).getPreferences"),
 		updatePreferences: unimplemented("\(Self.self).updatePreferences"),
@@ -13,12 +13,12 @@ extension AppPreferencesClient: TestDependencyKey {
 }
 
 extension AppPreferencesClient {
-	public static let noop = Self(
+	static let noop = Self(
 		appPreferenceUpdates: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		getPreferences: { .default },
 		updatePreferences: { _ in },
 		extractProfile: { fatalError() },
-		deleteProfileAndFactorSources: { _ in },
+		deleteProfileAndFactorSources: {},
 		setIsCloudBackupEnabled: { _ in }
 	)
 }

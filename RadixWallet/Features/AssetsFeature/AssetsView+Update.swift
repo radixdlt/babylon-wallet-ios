@@ -151,7 +151,7 @@ extension Loadable where Value == AccountPortfoliosClient.AccountPortfolio {
 }
 
 extension FungibleAssetList.State {
-	public mutating func updatedRow(
+	mutating func updatedRow(
 		token: OnLedgerEntity.OwnedFungibleResource,
 		for sectionID: FungibleAssetList.Section.State.ID
 	) -> FungibleAssetList.Section.Row.State? {
@@ -167,7 +167,7 @@ extension FungibleAssetList.State {
 }
 
 extension NonFungibleAssetList.State {
-	public mutating func updatedRow(resource: OnLedgerEntity.OwnedNonFungibleResource) -> NonFungibleAssetList.Row.State? {
+	mutating func updatedRow(resource: OnLedgerEntity.OwnedNonFungibleResource) -> NonFungibleAssetList.Row.State? {
 		guard var row = rows.first(where: { $0.id == resource.resourceAddress }) else { return nil }
 		row.resource = resource
 		return row
@@ -175,7 +175,7 @@ extension NonFungibleAssetList.State {
 }
 
 extension PoolUnitsList.State {
-	public mutating func updatedPoolUnit(
+	mutating func updatedPoolUnit(
 		poolUnit: OnLedgerEntity.OnLedgerAccount.PoolUnit,
 		resourceDetails: Loadable<OnLedgerEntitiesClient.OwnedResourcePoolDetails>
 	) -> PoolUnitsList.State.PoolUnitState? {

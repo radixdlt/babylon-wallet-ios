@@ -1,11 +1,11 @@
 import ComposableArchitecture
 
 // MARK: - TransactionHistoryFilters
-public struct TransactionHistoryFilters: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public private(set) var filters: Filters
+struct TransactionHistoryFilters: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		private(set) var filters: Filters
 
-		public struct Filters: Hashable, Sendable {
+		struct Filters: Hashable, Sendable {
 			var transferTypes: IdentifiedArrayOf<Filter>
 			var fungibles: IdentifiedArrayOf<Filter>
 			var nonFungibles: IdentifiedArrayOf<Filter>
@@ -20,18 +20,18 @@ public struct TransactionHistoryFilters: Sendable, FeatureReducer {
 			}
 		}
 
-		public struct Filter: Hashable, Sendable, Identifiable {
-			public let id: TransactionFilter
+		struct Filter: Hashable, Sendable, Identifiable {
+			let id: TransactionFilter
 			let icon: ImageResource?
 			let label: String
 			var isActive: Bool
 
-			public func hash(into hasher: inout Hasher) {
+			func hash(into hasher: inout Hasher) {
 				hasher.combine(id)
 			}
 		}
 
-		public init(portfolio: OnLedgerEntity.OnLedgerAccount, filters: [Filter.ID]) {
+		init(portfolio: OnLedgerEntity.OnLedgerAccount, filters: [Filter.ID]) {
 			let transferTypes = TransactionFilter.TransferType.allCases.map { Filter($0, isActive: filters.contains(.transferType($0))) }
 			let fungibles = portfolio.fungibleMetadata.map { Filter($0.key, metadata: $0.value, isActive: filters.contains(.asset($0.key))) }
 			let nonFungibles = portfolio.nonFungibleMetadata.map { Filter($0.key, metadata: $0.value, isActive: filters.contains(.asset($0.key))) }
@@ -41,20 +41,20 @@ public struct TransactionHistoryFilters: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable, Sendable {
 		case filterTapped(TransactionFilter)
 		case clearAllTapped
 		case showResultsTapped
 		case closeTapped
 	}
 
-	public enum DelegateAction: Equatable, Sendable {
+	enum DelegateAction: Equatable, Sendable {
 		case updateActiveFilters(IdentifiedArrayOf<State.Filter>)
 	}
 
 	@Dependency(\.dismiss) var dismiss
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .filterTapped(id):
 			guard let filter = state.filters.all[id: id] else {

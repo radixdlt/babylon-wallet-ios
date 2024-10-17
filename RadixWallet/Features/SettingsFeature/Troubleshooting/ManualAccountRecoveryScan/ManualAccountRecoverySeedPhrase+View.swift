@@ -13,24 +13,24 @@ extension ManualAccountRecoverySeedPhrase.State {
 
 // MARK: - ManualAccountRecoverySeedPhraseCoordinator.View
 extension ManualAccountRecoverySeedPhrase {
-	public struct ViewState: Equatable {
-		public let isOlympia: Bool
-		public let selected: EntitiesControlledByFactorSource?
-		public let deviceFactorSources: IdentifiedArrayOf<EntitiesControlledByFactorSource>
+	struct ViewState: Equatable {
+		let isOlympia: Bool
+		let selected: EntitiesControlledByFactorSource?
+		let deviceFactorSources: IdentifiedArrayOf<EntitiesControlledByFactorSource>
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: Store
 
-		public init(store: Store) {
+		init(store: Store) {
 			self.store = store
 		}
 	}
 }
 
 extension ManualAccountRecoverySeedPhrase.View {
-	public var body: some View {
+	var body: some View {
 		ScrollView {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: .zero) {

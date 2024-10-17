@@ -1,26 +1,26 @@
 // MARK: - TransactionClient
-public struct TransactionClient: Sendable, DependencyKey {
-	public var getTransactionReview: GetTransactionReview
-	public var buildTransactionIntent: BuildTransactionIntent
-	public var notarizeTransaction: NotarizeTransaction
-	public var myInvolvedEntities: MyInvolvedEntities
-	public var determineFeePayer: DetermineFeePayer
-	public var getFeePayerCandidates: GetFeePayerCandidates
+struct TransactionClient: Sendable, DependencyKey {
+	var getTransactionReview: GetTransactionReview
+	var buildTransactionIntent: BuildTransactionIntent
+	var notarizeTransaction: NotarizeTransaction
+	var myInvolvedEntities: MyInvolvedEntities
+	var determineFeePayer: DetermineFeePayer
+	var getFeePayerCandidates: GetFeePayerCandidates
 }
 
 // MARK: TransactionClient.SignAndSubmitTransaction
 extension TransactionClient {
-	public typealias GetTransactionReview = @Sendable (ManifestReviewRequest) async throws -> TransactionToReview
-	public typealias BuildTransactionIntent = @Sendable (BuildTransactionIntentRequest) async throws -> TransactionIntent
-	public typealias NotarizeTransaction = @Sendable (NotarizeTransactionRequest) async throws -> NotarizeTransactionResponse
+	typealias GetTransactionReview = @Sendable (ManifestReviewRequest) async throws -> TransactionToReview
+	typealias BuildTransactionIntent = @Sendable (BuildTransactionIntentRequest) async throws -> TransactionIntent
+	typealias NotarizeTransaction = @Sendable (NotarizeTransactionRequest) async throws -> NotarizeTransactionResponse
 
-	public typealias MyInvolvedEntities = @Sendable (TransactionManifest) async throws -> MyEntitiesInvolvedInTransaction
-	public typealias DetermineFeePayer = @Sendable (DetermineFeePayerRequest) async throws -> FeePayerSelectionResult?
-	public typealias GetFeePayerCandidates = @Sendable (_ refreshingBalances: Bool) async throws -> NonEmpty<IdentifiedArrayOf<FeePayerCandidate>>
+	typealias MyInvolvedEntities = @Sendable (TransactionManifest) async throws -> MyEntitiesInvolvedInTransaction
+	typealias DetermineFeePayer = @Sendable (DetermineFeePayerRequest) async throws -> FeePayerSelectionResult?
+	typealias GetFeePayerCandidates = @Sendable (_ refreshingBalances: Bool) async throws -> NonEmpty<IdentifiedArrayOf<FeePayerCandidate>>
 }
 
 extension DependencyValues {
-	public var transactionClient: TransactionClient {
+	var transactionClient: TransactionClient {
 		get { self[TransactionClient.self] }
 		set { self[TransactionClient.self] = newValue }
 	}

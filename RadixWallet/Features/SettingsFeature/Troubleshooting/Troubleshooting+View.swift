@@ -5,7 +5,7 @@ extension Troubleshooting.State {
 }
 
 // MARK: - Troubleshooting.View
-public extension Troubleshooting {
+extension Troubleshooting {
 	struct ViewState: Equatable {
 		let isLegacyImportEnabled: Bool
 	}
@@ -14,11 +14,11 @@ public extension Troubleshooting {
 	struct View: SwiftUI.View {
 		private let store: StoreOf<Troubleshooting>
 
-		public init(store: StoreOf<Troubleshooting>) {
+		init(store: StoreOf<Troubleshooting>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			content
 				.radixToolbar(title: L10n.Troubleshooting.title)
 				.tint(.app.gray1)

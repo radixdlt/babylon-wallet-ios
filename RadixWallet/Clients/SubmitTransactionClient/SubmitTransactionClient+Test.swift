@@ -1,6 +1,6 @@
 
 extension DependencyValues {
-	public var submitTXClient: SubmitTransactionClient {
+	var submitTXClient: SubmitTransactionClient {
 		get { self[SubmitTransactionClient.self] }
 		set { self[SubmitTransactionClient.self] = newValue }
 	}
@@ -8,14 +8,14 @@ extension DependencyValues {
 
 // MARK: - SubmitTransactionClient + TestDependencyKey
 extension SubmitTransactionClient: TestDependencyKey {
-	public static let previewValue = Self.noop
+	static let previewValue = Self.noop
 
-	public static let testValue = Self(
+	static let testValue = Self(
 		submitTransaction: unimplemented("\(Self.self).submitTransaction"),
 		hasTXBeenCommittedSuccessfully: unimplemented("\(Self.self).hasTXBeenCommittedSuccessfully")
 	)
 
-	public static let noop = Self(
+	static let noop = Self(
 		submitTransaction: { _ in
 			throw NoopError()
 		},

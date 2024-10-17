@@ -10,17 +10,17 @@ extension AddNewGateway.State {
 // MARK: - AddNewGateway.View
 extension AddNewGateway {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		@Perception.Bindable private var store: StoreOf<AddNewGateway>
 		@FocusState private var focusedField: State.Field?
 		@Environment(\.dismiss) var dismiss
 		private let detentFraction: CGFloat = 0.55
 
-		public init(store: StoreOf<AddNewGateway>) {
+		init(store: StoreOf<AddNewGateway>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			content
 				.withNavigationBar {
 					dismiss()
@@ -93,6 +93,6 @@ struct AddNewGateway_Preview: PreviewProvider {
 }
 
 extension AddNewGateway.State {
-	public static let previewValue = Self()
+	static let previewValue = Self()
 }
 #endif

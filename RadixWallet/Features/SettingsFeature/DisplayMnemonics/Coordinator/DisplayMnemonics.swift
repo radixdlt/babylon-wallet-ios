@@ -2,50 +2,50 @@ import ComposableArchitecture
 import SwiftUI
 
 // FIXME: Refactor ImportMnemonic
-public typealias ExportMnemonic = ImportMnemonic
-public typealias DisplayMnemonic = ExportMnemonic
+typealias ExportMnemonic = ImportMnemonic
+typealias DisplayMnemonic = ExportMnemonic
 
 // MARK: - DisplayMnemonics
-public struct DisplayMnemonics: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
+struct DisplayMnemonics: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
 		@PresentationState
-		public var destination: Destination.State? = nil
+		var destination: Destination.State? = nil
 
-		public var deviceFactorSources: IdentifiedArrayOf<DisplayEntitiesControlledByMnemonic.State> = []
+		var deviceFactorSources: IdentifiedArrayOf<DisplayEntitiesControlledByMnemonic.State> = []
 		fileprivate var problems: [SecurityProblem]?
 		fileprivate var entities: IdentifiedArrayOf<EntitiesControlledByFactorSource>?
 
-		public init() {}
+		init() {}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case task
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case setSecurityProblems([SecurityProblem])
 		case setEntities(TaskResult<IdentifiedArrayOf<EntitiesControlledByFactorSource>>)
 		case setDeviceFactorSources(IdentifiedArrayOf<DisplayEntitiesControlledByMnemonic.State>)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case row(id: DisplayEntitiesControlledByMnemonic.State.ID, action: DisplayEntitiesControlledByMnemonic.Action)
 	}
 
-	public struct Destination: DestinationReducer {
-		public enum State: Sendable, Hashable {
+	struct Destination: DestinationReducer {
+		enum State: Sendable, Hashable {
 			case displayMnemonic(ImportMnemonic.State)
 			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
 		}
 
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case displayMnemonic(DisplayMnemonic.Action)
 			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
 		}
 
-		public init() {}
+		init() {}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: /State.displayMnemonic, action: /Action.displayMnemonic) {
 				DisplayMnemonic()
 			}
@@ -60,9 +60,9 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 	@Dependency(\.keychainClient) var keychainClient
 	@Dependency(\.securityCenterClient) var securityCenterClient
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.forEach(\.deviceFactorSources, action: /Action.child .. ChildAction.row) {
 				DisplayEntitiesControlledByMnemonic()
@@ -74,7 +74,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			securityProblemsEffect()
@@ -82,7 +82,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .setSecurityProblems(problems):
 			state.problems = problems
@@ -103,7 +103,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .row(id, action: .delegate(delegateAction)):
 			guard let child = state.deviceFactorSources[id: id] else {
@@ -128,7 +128,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .displayMnemonic(.delegate(delegateAction)):
 			switch delegateAction {
@@ -149,8 +149,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 			case .finishedEarly:
 				state.destination = nil
 				return .none
-			case let .finishedImportingMnemonics(_, importedIDs, notYetSavedNewMainBDFS):
-				assert(notYetSavedNewMainBDFS == nil, "Discrepancy, new Main BDFS should already have been saved.")
+			case let .finishedImportingMnemonics(_, importedIDs, _):
 				for imported in importedIDs {
 					state.deviceFactorSources[id: .singleCurve(imported.factorSourceID, isOlympia: true)]?.imported()
 					state.deviceFactorSources[id: .singleCurve(imported.factorSourceID, isOlympia: false)]?.imported()

@@ -1,7 +1,7 @@
 #if os(iOS)
 
 extension View {
-	public func onWillDisappear(perform action: @escaping () -> Void) -> some View {
+	func onWillDisappear(perform action: @escaping () -> Void) -> some View {
 		self.modifier(OnWillDisappearModifier(onWillDisappear: action))
 	}
 }

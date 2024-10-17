@@ -2,8 +2,8 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - EditPersonaName
-public struct EditPersonaName: FeatureReducer, EmptyInitializable {
-	public struct State: Sendable, Hashable {
+struct EditPersonaName: FeatureReducer, EmptyInitializable {
+	struct State: Sendable, Hashable {
 		let id: PersonaDataEntryID
 		var family: EditPersonaDynamicField.State
 		var given: EditPersonaDynamicField.State
@@ -43,19 +43,19 @@ public struct EditPersonaName: FeatureReducer, EmptyInitializable {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case variantPick(PersonaDataEntryName.Variant)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case family(EditPersonaDynamicField.Action)
 		case given(EditPersonaDynamicField.Action)
 		case nickname(EditPersonaDynamicField.Action)
 	}
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Scope(
 			state: \.family,
 			action: /Action.child .. ChildAction.family,
@@ -76,7 +76,7 @@ public struct EditPersonaName: FeatureReducer, EmptyInitializable {
 		Reduce(core)
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .variantPick(variant):
 			state.variant = variant

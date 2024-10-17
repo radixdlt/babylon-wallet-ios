@@ -11,24 +11,24 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.StateEntityNonFungibleResourceVaultsPageResponse")
-public typealias StateEntityNonFungibleResourceVaultsPageResponse = GatewayAPI.StateEntityNonFungibleResourceVaultsPageResponse
+typealias StateEntityNonFungibleResourceVaultsPageResponse = GatewayAPI.StateEntityNonFungibleResourceVaultsPageResponse
 
 extension GatewayAPI {
 
-public struct StateEntityNonFungibleResourceVaultsPageResponse: Codable, Hashable {
+struct StateEntityNonFungibleResourceVaultsPageResponse: Codable, Hashable {
 
-    public private(set) var ledgerState: LedgerState
+    private(set) var ledgerState: LedgerState
     /** Total number of items in underlying collection, fragment of which is available in `items` collection. */
-    public private(set) var totalCount: Int64?
+    private(set) var totalCount: Int64?
     /** If specified, contains a cursor to query next page of the `items` collection. */
-    public private(set) var nextCursor: String?
-    public private(set) var items: [NonFungibleResourcesCollectionItemVaultAggregatedVaultItem]
+    private(set) var nextCursor: String?
+    private(set) var items: [NonFungibleResourcesCollectionItemVaultAggregatedVaultItem]
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var address: String
+    private(set) var address: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var resourceAddress: String
+    private(set) var resourceAddress: String
 
-    public init(ledgerState: LedgerState, totalCount: Int64? = nil, nextCursor: String? = nil, items: [NonFungibleResourcesCollectionItemVaultAggregatedVaultItem], address: String, resourceAddress: String) {
+    init(ledgerState: LedgerState, totalCount: Int64? = nil, nextCursor: String? = nil, items: [NonFungibleResourcesCollectionItemVaultAggregatedVaultItem], address: String, resourceAddress: String) {
         self.ledgerState = ledgerState
         self.totalCount = totalCount
         self.nextCursor = nextCursor
@@ -37,7 +37,7 @@ public struct StateEntityNonFungibleResourceVaultsPageResponse: Codable, Hashabl
         self.resourceAddress = resourceAddress
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case ledgerState = "ledger_state"
         case totalCount = "total_count"
         case nextCursor = "next_cursor"
@@ -48,7 +48,7 @@ public struct StateEntityNonFungibleResourceVaultsPageResponse: Codable, Hashabl
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(ledgerState, forKey: .ledgerState)
         try container.encodeIfPresent(totalCount, forKey: .totalCount)

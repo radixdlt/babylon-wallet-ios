@@ -1,5 +1,5 @@
 // MARK: - ResourceAmount
-public struct ResourceAmount: Sendable, Hashable, Codable {
+struct ResourceAmount: Sendable, Hashable, Codable {
 	let nominalAmount: Decimal192
 	var fiatWorth: FiatWorth?
 
@@ -12,20 +12,20 @@ public struct ResourceAmount: Sendable, Hashable, Codable {
 		self.fiatWorth = fiatWorth
 	}
 
-	public init(from decoder: Decoder) throws {
+	init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		self.nominalAmount = try container.decode(Decimal192.self, forKey: .nominalAmount)
 		self.fiatWorth = nil
 	}
 
-	public func encode(to encoder: Encoder) throws {
+	func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(nominalAmount, forKey: .nominalAmount)
 	}
 
-	public static let zero = ResourceAmount(nominalAmount: 0, fiatWorth: nil)
+	static let zero = ResourceAmount(nominalAmount: 0, fiatWorth: nil)
 
-	public static func + (lhs: ResourceAmount, rhs: ResourceAmount) -> ResourceAmount {
+	static func + (lhs: ResourceAmount, rhs: ResourceAmount) -> ResourceAmount {
 		.init(
 			nominalAmount: lhs.nominalAmount + rhs.nominalAmount,
 			fiatWorth: {
@@ -46,7 +46,7 @@ public struct ResourceAmount: Sendable, Hashable, Codable {
 
 // MARK: Comparable
 extension ResourceAmount: Comparable {
-	public static func < (lhs: Self, rhs: Self) -> Bool {
+	static func < (lhs: Self, rhs: Self) -> Bool {
 		lhs.nominalAmount < rhs.nominalAmount
 	}
 }

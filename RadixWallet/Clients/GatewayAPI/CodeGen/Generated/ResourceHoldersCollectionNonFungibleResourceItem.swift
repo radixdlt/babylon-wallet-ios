@@ -11,26 +11,26 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.ResourceHoldersCollectionNonFungibleResourceItem")
-public typealias ResourceHoldersCollectionNonFungibleResourceItem = GatewayAPI.ResourceHoldersCollectionNonFungibleResourceItem
+typealias ResourceHoldersCollectionNonFungibleResourceItem = GatewayAPI.ResourceHoldersCollectionNonFungibleResourceItem
 
 extension GatewayAPI {
 
-public struct ResourceHoldersCollectionNonFungibleResourceItem: Codable, Hashable {
+struct ResourceHoldersCollectionNonFungibleResourceItem: Codable, Hashable {
 
-    public private(set) var type: ResourceHoldersResourceType
+    private(set) var type: ResourceHoldersResourceType
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var holderAddress: String
-    public private(set) var lastUpdatedAtStateVersion: Int64
-    public private(set) var nonFungibleIdsCount: Int64
+    private(set) var holderAddress: String
+    private(set) var lastUpdatedAtStateVersion: Int64
+    private(set) var nonFungibleIdsCount: Int64
 
-    public init(type: ResourceHoldersResourceType, holderAddress: String, lastUpdatedAtStateVersion: Int64, nonFungibleIdsCount: Int64) {
+    init(type: ResourceHoldersResourceType, holderAddress: String, lastUpdatedAtStateVersion: Int64, nonFungibleIdsCount: Int64) {
         self.type = type
         self.holderAddress = holderAddress
         self.lastUpdatedAtStateVersion = lastUpdatedAtStateVersion
         self.nonFungibleIdsCount = nonFungibleIdsCount
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case type
         case holderAddress = "holder_address"
         case lastUpdatedAtStateVersion = "last_updated_at_state_version"
@@ -39,7 +39,7 @@ public struct ResourceHoldersCollectionNonFungibleResourceItem: Codable, Hashabl
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(type, forKey: .type)
         try container.encode(holderAddress, forKey: .holderAddress)

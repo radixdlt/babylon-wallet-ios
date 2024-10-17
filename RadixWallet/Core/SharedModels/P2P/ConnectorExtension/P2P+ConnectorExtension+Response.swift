@@ -3,13 +3,13 @@ import Sargon
 // MARK: - P2P.ConnectorExtension.Response
 extension P2P.ConnectorExtension {
 	/// A response received from connector extension for some request we have sent.
-	public enum Response: Sendable, Hashable, Decodable {
+	enum Response: Sendable, Hashable, Decodable {
 		/// Messages sent from Connector Extension being a response
 		/// from an interaction with a Ledger hardware wallet by LedgerHQ,
 		/// e.g. Ledger Nano S
 		case ledgerHardwareWallet(LedgerHardwareWallet)
 
-		public init(from decoder: Decoder) throws {
+		init(from decoder: Decoder) throws {
 			self = try .ledgerHardwareWallet(.init(from: decoder))
 		}
 	}
@@ -20,22 +20,22 @@ extension P2P.ConnectorExtension.Response {
 	/// Message sent from Connector Extension being a response
 	/// from an interaction with a Ledger hardware wallet by LedgerHQ,
 	/// e.g. Ledger Nano S
-	public struct LedgerHardwareWallet: Sendable, Hashable, Decodable {
-		public let interactionID: P2P.LedgerHardwareWallet.InteractionId
-		public let discriminator: P2P.LedgerHardwareWallet.Discriminator
-		public let response: Result<Success, Failure>
+	struct LedgerHardwareWallet: Sendable, Hashable, Decodable {
+		let interactionID: P2P.LedgerHardwareWallet.InteractionId
+		let discriminator: P2P.LedgerHardwareWallet.Discriminator
+		let response: Result<Success, Failure>
 	}
 }
 
 // MARK: - P2P.ConnectorExtension.Response.LedgerHardwareWallet.Failure
 extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
-	public struct Failure: LocalizedError, Sendable, Hashable, Decodable {
-		public enum Reason: Int, Sendable, Hashable, Decodable {
+	struct Failure: LocalizedError, Sendable, Hashable, Decodable {
+		enum Reason: Int, Sendable, Hashable, Decodable {
 			case generic = 0
 			case blindSigningNotEnabledButRequired = 1
 			case userRejectedSigningOfTransaction = 2
 
-			public var userFacingErrorDescription: String {
+			var userFacingErrorDescription: String {
 				switch self {
 				case .generic, .userRejectedSigningOfTransaction:
 					L10n.Error.TransactionFailure.unknown
@@ -45,9 +45,9 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 			}
 		}
 
-		public let code: Reason
-		public let message: String
-		public var errorDescription: String? {
+		let code: Reason
+		let message: String
+		var errorDescription: String? {
 			var description = code.userFacingErrorDescription
 			#if DEBUG
 			return "[DEBUG ONLY] \(description)\nmessage from Ledger: '\(message)'"
@@ -56,7 +56,7 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 			#endif
 		}
 
-		public enum CodingKeys: CodingKey {
+		enum CodingKeys: CodingKey {
 			case code
 			case message
 		}
@@ -64,7 +64,7 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 }
 
 extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Failure {
-	public init(from decoder: Decoder) throws {
+	init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let codeRaw = try container.decode(Reason.RawValue.self, forKey: .code)
 		let code = Reason(rawValue: codeRaw) ?? .generic
@@ -74,18 +74,18 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Failure {
 }
 
 extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
-	public enum Success: Sendable, Hashable {
+	enum Success: Sendable, Hashable {
 		case getDeviceInfo(GetDeviceInfo)
 		case derivePublicKeys([DerivedPublicKey])
 		case signTransaction([SignatureOfSigner])
 		case signChallenge([SignatureOfSigner])
 		case deriveAndDisplayAddress(DerivedAddress)
 
-		public struct GetDeviceInfo: Sendable, Hashable, Decodable {
-			public let id: Exactly32Bytes
-			public let model: P2P.LedgerHardwareWallet.Model
+		struct GetDeviceInfo: Sendable, Hashable, Decodable {
+			let id: Exactly32Bytes
+			let model: P2P.LedgerHardwareWallet.Model
 
-			public init(
+			init(
 				id: Exactly32Bytes,
 				model: P2P.LedgerHardwareWallet.Model
 			) {
@@ -94,17 +94,17 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 			}
 		}
 
-		public struct DerivedAddress: Sendable, Hashable, Decodable {
-			public let derivedKey: DerivedPublicKey
-			public let address: String
+		struct DerivedAddress: Sendable, Hashable, Decodable {
+			let derivedKey: DerivedPublicKey
+			let address: String
 		}
 
-		public struct DerivedPublicKey: Sendable, Hashable, Decodable {
-			public let curve: String
-			public let derivationPath: String
-			public let publicKey: HexCodable
+		struct DerivedPublicKey: Sendable, Hashable, Decodable {
+			let curve: String
+			let derivationPath: String
+			let publicKey: HexCodable
 
-			public init(
+			init(
 				curve: String,
 				derivationPath: String,
 				publicKey: HexCodable
@@ -115,11 +115,11 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 			}
 		}
 
-		public struct SignatureOfSigner: Sendable, Hashable, Decodable {
-			public let signature: HexCodable
-			public let derivedPublicKey: DerivedPublicKey
+		struct SignatureOfSigner: Sendable, Hashable, Decodable {
+			let signature: HexCodable
+			let derivedPublicKey: DerivedPublicKey
 
-			public init(
+			init(
 				derivedPublicKey: DerivedPublicKey,
 				signature: HexCodable
 			) {
@@ -131,7 +131,7 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 
 	private typealias CodingKeys = P2P.LedgerHardwareWallet.CodingKeys
 
-	public init(from decoder: Decoder) throws {
+	init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let discriminator = try container.decode(
 			P2P.LedgerHardwareWallet.Discriminator.self,

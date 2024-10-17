@@ -11,11 +11,11 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.MetadataValueType")
-public typealias MetadataValueType = GatewayAPI.MetadataValueType
+typealias MetadataValueType = GatewayAPI.MetadataValueType
 
 extension GatewayAPI {
 
-public enum MetadataValueType: String, Codable, CaseIterable {
+enum MetadataValueType: String, Codable, CaseIterable {
     case string = "String"
     case bool = "Bool"
     case u8 = "U8"

@@ -2,7 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - EditPersonaFieldKindBehaviour
-public protocol EditPersonaFieldKindBehaviour: Sendable, Hashable, Comparable {
+protocol EditPersonaFieldKindBehaviour: Sendable, Hashable, Comparable {
 	var title: String { get }
 	var placeholder: String { get }
 	var contentType: UITextContentType? { get }
@@ -11,17 +11,17 @@ public protocol EditPersonaFieldKindBehaviour: Sendable, Hashable, Comparable {
 }
 
 // MARK: - EditPersonaField
-public struct EditPersonaField<Behaviour: EditPersonaFieldKindBehaviour>: Sendable, FeatureReducer, EmptyInitializable {
-	public struct State: Sendable, Hashable {
-		public let behaviour: Behaviour
-		public let entryID: PersonaDataEntryID
+struct EditPersonaField<Behaviour: EditPersonaFieldKindBehaviour>: Sendable, FeatureReducer, EmptyInitializable {
+	struct State: Sendable, Hashable {
+		let behaviour: Behaviour
+		let entryID: PersonaDataEntryID
 		let isRequestedByDapp: Bool
 		let showsTitle: Bool
 		let defaultInfoHint: String?
 		var textFieldFocused: Bool
 
 		@Validation<String, String>
-		public var input: String?
+		var input: String?
 
 		private init(
 			behaviour: Behaviour,
@@ -43,14 +43,14 @@ public struct EditPersonaField<Behaviour: EditPersonaFieldKindBehaviour>: Sendab
 		}
 	}
 
-	public init() {}
+	init() {}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case inputFieldChanged(String)
 		case focusChanged(Bool)
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .inputFieldChanged(input):
 			state.input = input
@@ -65,35 +65,35 @@ public struct EditPersonaField<Behaviour: EditPersonaFieldKindBehaviour>: Sendab
 
 // MARK: Static Fields
 
-public typealias EditPersonaStaticField = EditPersonaField<EditPersona.State.StaticFieldID>
+typealias EditPersonaStaticField = EditPersonaField<EditPersona.State.StaticFieldID>
 
 // MARK: - EditPersona.State.StaticFieldID + EditPersonaFieldKindBehaviour
 extension EditPersona.State.StaticFieldID: EditPersonaFieldKindBehaviour {
-	public var title: String {
+	var title: String {
 		switch self {
 		case .personaLabel: L10n.AuthorizedDapps.PersonaDetails.personaLabelHeading
 		}
 	}
 
-	public var placeholder: String {
+	var placeholder: String {
 		switch self {
 		case .personaLabel: L10n.CreatePersona.NameNewPersona.placeholder
 		}
 	}
 
-	public var contentType: UITextContentType? {
+	var contentType: UITextContentType? {
 		switch self {
 		case .personaLabel: .none
 		}
 	}
 
-	public var keyboardType: UIKeyboardType {
+	var keyboardType: UIKeyboardType {
 		switch self {
 		case .personaLabel: .default
 		}
 	}
 
-	public var capitalization: EquatableTextInputCapitalization? {
+	var capitalization: EquatableTextInputCapitalization? {
 		switch self {
 		case .personaLabel: .words
 		}
@@ -101,7 +101,7 @@ extension EditPersona.State.StaticFieldID: EditPersonaFieldKindBehaviour {
 }
 
 extension EditPersonaStaticField.State {
-	public init(
+	init(
 		behaviour: Behaviour,
 		entryID: PersonaDataEntryID?,
 		initial: String?,
@@ -129,10 +129,10 @@ extension EditPersonaStaticField.State {
 
 // MARK: Dynamic Fields
 
-public typealias EditPersonaDynamicField = EditPersonaField<DynamicFieldID>
+typealias EditPersonaDynamicField = EditPersonaField<DynamicFieldID>
 
 // MARK: - DynamicFieldID
-public enum DynamicFieldID: Hashable, Sendable {
+enum DynamicFieldID: Hashable, Sendable {
 	case givenNames
 	case nickName
 	case familyName
@@ -148,7 +148,7 @@ public enum DynamicFieldID: Hashable, Sendable {
 // MARK: EditPersonaFieldKindBehaviour
 extension DynamicFieldID: EditPersonaFieldKindBehaviour {
 	// FIXME: Localize
-	public var title: String {
+	var title: String {
 		switch self {
 		case .givenNames: L10n.AuthorizedDapps.PersonaDetails.givenName
 		case .nickName: L10n.AuthorizedDapps.PersonaDetails.nickname
@@ -163,9 +163,9 @@ extension DynamicFieldID: EditPersonaFieldKindBehaviour {
 		}
 	}
 
-	public var placeholder: String { "" }
+	var placeholder: String { "" }
 
-	public var contentType: UITextContentType? {
+	var contentType: UITextContentType? {
 		switch self {
 		case .givenNames: .name
 		case .nickName: .name
@@ -180,7 +180,7 @@ extension DynamicFieldID: EditPersonaFieldKindBehaviour {
 		}
 	}
 
-	public var keyboardType: UIKeyboardType {
+	var keyboardType: UIKeyboardType {
 		switch self {
 		case .givenNames: .default
 		case .nickName: .default
@@ -195,7 +195,7 @@ extension DynamicFieldID: EditPersonaFieldKindBehaviour {
 		}
 	}
 
-	public var capitalization: EquatableTextInputCapitalization? {
+	var capitalization: EquatableTextInputCapitalization? {
 		switch self {
 		case .givenNames: .words
 		case .nickName: .words
@@ -212,7 +212,7 @@ extension DynamicFieldID: EditPersonaFieldKindBehaviour {
 }
 
 extension PersonaData.Entry.Kind {
-	public static var supportedKinds: [Self] {
+	static var supportedKinds: [Self] {
 		[
 			.fullName,
 			.phoneNumber,
@@ -240,7 +240,7 @@ extension PersonaData.Entry.Kind: Comparable {
 }
 
 extension EditPersonaDynamicField.State {
-	public init(
+	init(
 		behaviour: Behaviour,
 		entryID: PersonaDataEntryID?,
 		text: String?,

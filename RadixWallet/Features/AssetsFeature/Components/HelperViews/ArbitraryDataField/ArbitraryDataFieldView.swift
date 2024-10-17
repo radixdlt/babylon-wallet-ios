@@ -3,10 +3,10 @@ import SwiftUI
 // MARK: - ArbitraryDataFieldView
 /// A view used to represent arbitrary data, which is a key/value pair that isn't standarized by the Wallet.
 /// These can be found inside a resource metadata or in NFTs.
-public struct ArbitraryDataFieldView: View {
+struct ArbitraryDataFieldView: View {
 	let field: Field
 
-	public var body: some View {
+	var body: some View {
 		switch field.kind {
 		case let .primitive(value):
 			ViewThatFits(in: .horizontal) {

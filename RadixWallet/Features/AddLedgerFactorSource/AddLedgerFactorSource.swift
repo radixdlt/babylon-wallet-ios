@@ -2,36 +2,36 @@ import ComposableArchitecture
 import Sargon
 import SwiftUI
 
-public typealias LedgerDeviceInfo = P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo
+typealias LedgerDeviceInfo = P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo
 
 // MARK: - AddLedgerFactorSource
-public struct AddLedgerFactorSource: Sendable, FeatureReducer {
+struct AddLedgerFactorSource: Sendable, FeatureReducer {
 	// MARK: AddLedgerFactorSource
 
-	public struct State: Sendable, Hashable {
-		public var isWaitingForResponseFromLedger = false
-		public var unnamedDeviceToAdd: LedgerDeviceInfo?
+	struct State: Sendable, Hashable {
+		var isWaitingForResponseFromLedger = false
+		var unnamedDeviceToAdd: LedgerDeviceInfo?
 
 		@PresentationState
-		public var destination: Destination.State? = nil
+		var destination: Destination.State? = nil
 
-		public init() {}
+		init() {}
 	}
 
 	// MARK: Action
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case sendAddLedgerRequestButtonTapped
 		case closeButtonTapped
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case getDeviceInfoResult(TaskResult<LedgerDeviceInfo>)
 		case alreadyExists(LedgerHardwareWalletFactorSource)
 		case proceedToNameDevice(LedgerDeviceInfo)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case completed(LedgerHardwareWalletFactorSource)
 		case failedToAddLedger
 		case dismiss
@@ -39,18 +39,18 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	// MARK: Destination
 
-	public struct Destination: DestinationReducer {
-		public enum State: Sendable, Hashable {
+	struct Destination: DestinationReducer {
+		enum State: Sendable, Hashable {
 			case ledgerAlreadyExistsAlert(AlertState<Never>)
 			case nameLedger(NameLedgerFactorSource.State)
 		}
 
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case ledgerAlreadyExistsAlert(Never)
 			case nameLedger(NameLedgerFactorSource.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: /State.nameLedger, action: /Action.nameLedger) {
 				NameLedgerFactorSource()
 			}
@@ -64,9 +64,9 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 	@Dependency(\.radixConnectClient) var radixConnectClient
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -75,7 +75,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .sendAddLedgerRequestButtonTapped:
 			sendAddLedgerRequestEffect(&state)
@@ -85,7 +85,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .getDeviceInfoResult(.success(ledgerDeviceInfo)):
 			return gotDeviceEffect(ledgerDeviceInfo, in: &state)
@@ -103,7 +103,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .nameLedger(.delegate(.complete(ledger))):
 			completeWithLedgerEffect(ledger)
@@ -178,34 +178,34 @@ extension AlertState<Never> {
 }
 
 // MARK: - NameLedgerFactorSource
-public struct NameLedgerFactorSource: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public let deviceInfo: LedgerDeviceInfo
-		public var ledgerName = ""
+struct NameLedgerFactorSource: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		let deviceInfo: LedgerDeviceInfo
+		var ledgerName = ""
 
-		public init(deviceInfo: LedgerDeviceInfo) {
+		init(deviceInfo: LedgerDeviceInfo) {
 			self.deviceInfo = deviceInfo
 		}
 
-		public var nameIsValid: Bool {
+		var nameIsValid: Bool {
 			!ledgerName.isEmpty
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case ledgerNameChanged(String)
 		case confirmNameButtonTapped
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case complete(LedgerHardwareWalletFactorSource)
 		case failedToCreateLedgerFactorSource
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
-	public init() {}
+	init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .ledgerNameChanged(name):
 			state.ledgerName = name

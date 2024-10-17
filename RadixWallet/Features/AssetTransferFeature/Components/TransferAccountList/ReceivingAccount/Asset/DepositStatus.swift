@@ -1,16 +1,16 @@
 import Foundation
 
-public typealias DepositStatus = DepositStatusPerResource.DepositStatus
-public typealias DepositStatusPerResources = IdentifiedArrayOf<DepositStatusPerResource>
+typealias DepositStatus = DepositStatusPerResource.DepositStatus
+typealias DepositStatusPerResources = IdentifiedArrayOf<DepositStatusPerResource>
 
 // MARK: - DepositStatusPerResource
-public struct DepositStatusPerResource: Sendable, Hashable, Identifiable {
+struct DepositStatusPerResource: Sendable, Hashable, Identifiable {
 	let resourceAddress: ResourceAddress
 	let depositStatus: DepositStatus
 
-	public var id: ResourceAddress { resourceAddress }
+	var id: ResourceAddress { resourceAddress }
 
-	public enum DepositStatus: Sendable, Hashable {
+	enum DepositStatus: Sendable, Hashable {
 		/// The deposit of this asset is allowed.
 		case allowed
 

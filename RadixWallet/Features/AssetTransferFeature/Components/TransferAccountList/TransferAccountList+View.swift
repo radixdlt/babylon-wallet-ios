@@ -4,17 +4,17 @@ import SwiftUI
 // MARK: - TransferAccountList.View
 extension TransferAccountList {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<TransferAccountList>
 
-		public init(store: StoreOf<TransferAccountList>) {
+		init(store: StoreOf<TransferAccountList>) {
 			self.store = store
 		}
 	}
 }
 
 extension TransferAccountList.View {
-	public var body: some View {
+	var body: some View {
 		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 			VStack(alignment: .trailing, spacing: .zero) {
 				VStack(spacing: .small2) {

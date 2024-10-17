@@ -1,5 +1,5 @@
 extension HTTPClient {
-	public static let liveValue: HTTPClient = {
+	static let liveValue: HTTPClient = {
 		let session = URLSession.shared
 
 		return .init(

@@ -2,15 +2,15 @@ import Sargon
 
 // MARK: - FactorSourcesClient + DependencyKey
 extension FactorSourcesClient: DependencyKey {
-	public typealias Value = FactorSourcesClient
+	typealias Value = FactorSourcesClient
 
-	public static func live(
+	static func live(
 		profileStore: ProfileStore = .shared
 	) -> Self {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 
 		let getFactorSources: GetFactorSources = {
-			await profileStore.profile.factorSources.asIdentified()
+			await profileStore.profile().factorSources.asIdentified()
 		}
 
 		let saveFactorSource: SaveFactorSource = { source in
@@ -122,7 +122,7 @@ extension FactorSourcesClient: DependencyKey {
 		}
 
 		let getCurrentNetworkID: GetCurrentNetworkID = {
-			await profileStore.profile.networkID
+			await profileStore.profile().networkID
 		}
 
 		let indicesOfEntitiesControlledByFactorSource: IndicesOfEntitiesControlledByFactorSource = { request in
@@ -132,7 +132,7 @@ extension FactorSourcesClient: DependencyKey {
 
 			let currentNetworkID = await getCurrentNetworkID()
 			let networkID = request.networkID ?? currentNetworkID
-			let network = try? await profileStore.profile.network(id: networkID)
+			let network = try? await profileStore.profile().network(id: networkID)
 
 			func nextDerivationIndexForFactorSource(
 				entitiesControlledByFactorSource: some Collection<some EntityProtocol>
@@ -185,12 +185,8 @@ extension FactorSourcesClient: DependencyKey {
 			createNewMainDeviceFactorSource: {
 				@Dependency(\.uuid) var uuid
 				@Dependency(\.date) var date
-				@Dependency(\.device) var device
 				@Dependency(\.mnemonicClient) var mnemonicClient
 				@Dependency(\.secureStorageClient) var secureStorageClient
-
-				let model = await device.model
-				let name = await device.name
 
 				let mnemonicWithPassphrase = MnemonicWithPassphrase(
 					mnemonic: mnemonicClient.generate(
@@ -201,14 +197,14 @@ extension FactorSourcesClient: DependencyKey {
 
 				loggerGlobal.info("Creating new main BDFS")
 
-				var newBDFS = DeviceFactorSource.babylon(
+				let hostInfo = await SargonOS.shared.resolveHostInfo()
+
+				let newBDFS = DeviceFactorSource.babylon(
 					mnemonicWithPassphrase: mnemonicWithPassphrase,
 					isMain: true,
-					hostInfo: .current()
+					hostInfo: hostInfo
 				)
 
-				newBDFS.hint.model = model
-				newBDFS.hint.name = name
 				assert(newBDFS.isExplicitMainBDFS)
 
 				loggerGlobal.info("Saving new main BDFS to Keychain only, we will NOT save it into Profile just yet.")
@@ -355,7 +351,7 @@ extension FactorSourcesClient: DependencyKey {
 		)
 	}
 
-	public static let liveValue = Self.live()
+	static let liveValue = Self.live()
 }
 
 func signingFactors(

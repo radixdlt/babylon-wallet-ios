@@ -1,16 +1,16 @@
 import SwiftUI
 
 // MARK: - ScrollBarItem
-public protocol ScrollBarItem: Identifiable {
+protocol ScrollBarItem: Identifiable {
 	var caption: String { get }
 }
 
 // MARK: - HScrollBar
-public struct HScrollBar<Item: ScrollBarItem>: View {
+struct HScrollBar<Item: ScrollBarItem>: View {
 	let items: IdentifiedArrayOf<Item>
 	@Binding var selection: Item.ID
 
-	public var body: some View {
+	var body: some View {
 		ScrollViewReader { proxy in
 			ScrollView(.horizontal, showsIndicators: false) {
 				HStack(spacing: .zero) {

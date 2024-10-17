@@ -1,54 +1,54 @@
 // MARK: - Hint
-public struct Hint: View, Equatable {
-	public struct ViewState: Sendable, Equatable {
-		public let kind: Kind
-		public let text: AttributedString?
+struct Hint: View, Equatable {
+	struct ViewState: Sendable, Equatable {
+		let kind: Kind
+		let text: AttributedString?
 
-		public init(kind: Kind, text: String?) {
+		init(kind: Kind, text: String?) {
 			self.kind = kind
 			self.text = text.map { .init(stringLiteral: $0) }
 		}
 
-		public init(kind: Kind, attributed: AttributedString?) {
+		init(kind: Kind, attributed: AttributedString?) {
 			self.kind = kind
 			self.text = attributed
 		}
 
-		public static func info(_ string: String) -> Self {
+		static func info(_ string: String) -> Self {
 			.init(kind: .info, text: string)
 		}
 
-		public static func error(_ string: String) -> Self {
+		static func error(_ string: String) -> Self {
 			.init(kind: .error(imageSize: .smallest), text: string)
 		}
 
-		public static func error() -> Self {
+		static func error() -> Self {
 			.init(kind: .error(imageSize: .smallest), text: nil)
 		}
 
-		public static func iconError(_ string: String) -> Self {
+		static func iconError(_ string: String) -> Self {
 			.init(kind: .error(imageSize: .icon), text: string)
 		}
 
-		public static func iconError() -> Self {
+		static func iconError() -> Self {
 			.init(kind: .error(imageSize: .icon), text: nil)
 		}
 	}
 
-	public enum Kind: Sendable, Equatable {
+	enum Kind: Sendable, Equatable {
 		case info
 		case error(imageSize: HitTargetSize)
 		case warning
 		case detail
 	}
 
-	public let viewState: ViewState
+	let viewState: ViewState
 
-	public init(viewState: ViewState) {
+	init(viewState: ViewState) {
 		self.viewState = viewState
 	}
 
-	public var body: some View {
+	var body: some View {
 		if let text = viewState.text {
 			HStack(spacing: .small3) {
 				if let imageResource {

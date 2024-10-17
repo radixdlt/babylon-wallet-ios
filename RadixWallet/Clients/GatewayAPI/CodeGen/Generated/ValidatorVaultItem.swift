@@ -11,25 +11,25 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.ValidatorVaultItem")
-public typealias ValidatorVaultItem = GatewayAPI.ValidatorVaultItem
+typealias ValidatorVaultItem = GatewayAPI.ValidatorVaultItem
 
 extension GatewayAPI {
 
-public struct ValidatorVaultItem: Codable, Hashable {
+struct ValidatorVaultItem: Codable, Hashable {
 
     /** String-encoded decimal representing the amount of a related fungible resource. */
-    public private(set) var balance: String
-    public private(set) var lastChangedAtStateVersion: Int64
+    private(set) var balance: String
+    private(set) var lastChangedAtStateVersion: Int64
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var address: String
+    private(set) var address: String
 
-    public init(balance: String, lastChangedAtStateVersion: Int64, address: String) {
+    init(balance: String, lastChangedAtStateVersion: Int64, address: String) {
         self.balance = balance
         self.lastChangedAtStateVersion = lastChangedAtStateVersion
         self.address = address
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case balance
         case lastChangedAtStateVersion = "last_changed_at_state_version"
         case address
@@ -37,7 +37,7 @@ public struct ValidatorVaultItem: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(balance, forKey: .balance)
         try container.encode(lastChangedAtStateVersion, forKey: .lastChangedAtStateVersion)

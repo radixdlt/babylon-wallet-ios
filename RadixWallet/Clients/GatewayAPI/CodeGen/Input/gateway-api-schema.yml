@@ -528,12 +528,12 @@ tags:
                 "fields": [
                   {
                     "kind": "String",
-                    "value": "The Radix Public Network's native token, used to pay the network's required transaction fees and to secure the network through staking to its validator nodes."
+                    "value": "The Radix Network's native token, used to pay the network's required transaction fees and to secure the network through staking to its validator nodes."
                   }
                 ]
               },
               "typed": {
-                "value": "The Radix Public Network's native token, used to pay the network's required transaction fees and to secure the network through staking to its validator nodes.",
+                "value": "The Radix Network's native token, used to pay the network's required transaction fees and to secure the network through staking to its validator nodes.",
                 "type": "String"
               }
             },
@@ -2027,7 +2027,7 @@ components:
               type: string
               minLength: 66
               maxLength: 66
-              description: The hex-encoded compressed ECDSA Secp256k1 public key (33 bytes)
+              description: The hex-encoded compressed ECDSA Secp256k1 key (33 bytes)
     PublicKeyEddsaEd25519:
       allOf:
         - $ref: "#/components/schemas/PublicKey"
@@ -2039,7 +2039,7 @@ components:
               type: string
               minLength: 64
               maxLength: 64
-              description: The hex-encoded compressed EdDSA Ed25519 public key (32 bytes)
+              description: The hex-encoded compressed EdDSA Ed25519 key (32 bytes)
 
     PublicKeyHashType:
       type: string
@@ -3488,7 +3488,7 @@ components:
             be used.
         notary_public_key:
           $ref: "#/components/schemas/PublicKey"
-          description: The notary public key to use (optional)
+          description: The notary key to use (optional)
         notary_is_signatory:
           type: boolean
           description: Whether the notary should count as a signatory (defaults to `false`).
@@ -3511,7 +3511,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/PublicKey"
-          description: A list of public keys to be used as transaction signers
+          description: A list of keys to be used as transaction signers
         message:
           type: object
           description: |

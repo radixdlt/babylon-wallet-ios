@@ -3,27 +3,27 @@ import Sargon
 import SwiftUI
 
 // MARK: - ImportOlympiaLedgerAccountsAndFactorSources
-public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureReducer {
-	public typealias ValidatedAccounts = NonEmpty<Set<OlympiaAccountToMigrate>>
+struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureReducer {
+	typealias ValidatedAccounts = NonEmpty<Set<OlympiaAccountToMigrate>>
 
-	public struct State: Sendable, Hashable {
-		public let networkID: NetworkID
+	struct State: Sendable, Hashable {
+		let networkID: NetworkID
 
 		/// Not yet migrated, containing unvalidated and validated accounts.
-		public var olympiaAccounts: OlympiaAccountsValidation
+		var olympiaAccounts: OlympiaAccountsValidation
 
 		/// All ledgers that have been on this screen
-		public var knownLedgers: IdentifiedArrayOf<LedgerHardwareWalletFactorSource> = []
+		var knownLedgers: IdentifiedArrayOf<LedgerHardwareWalletFactorSource> = []
 
 		/// Migrated (and before that validated)
-		public var migratedAccounts: [MigratedHardwareAccounts] = []
+		var migratedAccounts: [MigratedHardwareAccounts] = []
 
 		@PresentationState
-		public var destination: Destination.State?
+		var destination: Destination.State?
 
-		public var hasAConnectorExtension: Bool = false
+		var hasAConnectorExtension: Bool = false
 
-		public init(
+		init(
 			networkID: NetworkID,
 			hardwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
 		) {
@@ -33,22 +33,22 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		}
 	}
 
-	public struct Destination: DestinationReducer {
-		public enum State: Sendable, Hashable {
+	struct Destination: DestinationReducer {
+		enum State: Sendable, Hashable {
 			case noP2PLink(AlertState<NoP2PLinkAlert>)
 			case addNewP2PLink(NewConnection.State)
 			case nameLedger(ImportOlympiaNameLedger.State)
 			case derivePublicKeys(DerivePublicKeys.State)
 		}
 
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case noP2PLink(NoP2PLinkAlert)
 			case addNewP2PLink(NewConnection.Action)
 			case nameLedger(ImportOlympiaNameLedger.Action)
 			case derivePublicKeys(DerivePublicKeys.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: /State.addNewP2PLink, action: /Action.addNewP2PLink) {
 				NewConnection()
 			}
@@ -61,12 +61,12 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case onFirstTask
 		case continueTapped
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case hasAConnectorExtension(Bool)
 
 		/// Starts the process of adding a new Ledger device
@@ -79,11 +79,11 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		case processedOlympiaHardwareAccounts(ValidatedAccounts, MigratedHardwareAccounts)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case failed(Failure)
 		case completed(IdentifiedArrayOf<Account>)
 
-		public enum Failure: Sendable, Equatable {
+		enum Failure: Sendable, Equatable {
 			case failedToSaveNewLedger
 			case failedToDerivePublicKey
 		}
@@ -96,9 +96,9 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	@Dependency(\.importLegacyWalletClient) var importLegacyWalletClient
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<ImportOlympiaLedgerAccountsAndFactorSources> {
+	var body: some ReducerOf<ImportOlympiaLedgerAccountsAndFactorSources> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -107,7 +107,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onFirstTask:
 			return checkP2PLinkEffect()
@@ -135,7 +135,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .hasAConnectorExtension(isConnected):
 			state.hasAConnectorExtension = isConnected
@@ -178,7 +178,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .noP2PLink(noP2PLinkAction):
 			switch noP2PLinkAction {
@@ -298,7 +298,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 		olympiaAccountsToValidate: Set<OlympiaAccountToMigrate>
 	) async throws -> OlympiaAccountsValidation {
 		guard !derivedPublicKeys.isEmpty else {
-			loggerGlobal.warning("Response contained no public keys at all.")
+			loggerGlobal.warning("Response contained no keys at all.")
 			return OlympiaAccountsValidation(
 				validated: [],
 				unvalidated: olympiaAccountsToValidate
@@ -353,10 +353,10 @@ extension LedgerHardwareWalletModel {
 }
 
 // MARK: - OlympiaAccountsValidation
-public struct OlympiaAccountsValidation: Sendable, Hashable {
-	public var validated: Set<OlympiaAccountToMigrate>
-	public var unvalidated: Set<OlympiaAccountToMigrate>
-	public init(validated: Set<OlympiaAccountToMigrate>, unvalidated: Set<OlympiaAccountToMigrate>) {
+struct OlympiaAccountsValidation: Sendable, Hashable {
+	var validated: Set<OlympiaAccountToMigrate>
+	var unvalidated: Set<OlympiaAccountToMigrate>
+	init(validated: Set<OlympiaAccountToMigrate>, unvalidated: Set<OlympiaAccountToMigrate>) {
 		self.validated = validated
 		self.unvalidated = unvalidated
 	}

@@ -192,7 +192,7 @@ final class AssetTransferDepositRuleTests: TestCase {
 }
 
 extension ThirdPartyDeposits {
-	public mutating func setAssetsExceptionList(
+	mutating func setAssetsExceptionList(
 		_ new: OrderedSet<AssetException>?
 	) {
 		guard let new else {

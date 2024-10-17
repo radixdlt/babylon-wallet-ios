@@ -1,14 +1,14 @@
 // MARK: - CheckmarkView
-public struct CheckmarkView: View {
-	public enum Appearance {
+struct CheckmarkView: View {
+	enum Appearance {
 		case light
 		case dark
 	}
 
-	public let appearance: Appearance
-	public var isChecked: Bool
+	let appearance: Appearance
+	var isChecked: Bool
 
-	public init(
+	init(
 		appearance: Appearance,
 		isChecked: Bool
 	) {
@@ -18,7 +18,7 @@ public struct CheckmarkView: View {
 }
 
 extension CheckmarkView {
-	public var body: some View {
+	var body: some View {
 		let resource: ImageAsset = switch (appearance, isChecked) {
 		case (.light, true):
 			AssetResource.checkmarkLightSelected

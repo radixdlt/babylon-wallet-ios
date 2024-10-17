@@ -18,7 +18,7 @@ struct OnFirstAppearViewModifier: ViewModifier {
 
 extension View {
 	/// Executes a given action only once, when the first `onAppear` is fired by the system.
-	public func onFirstAppear(
+	func onFirstAppear(
 		priority: TaskPriority = .userInitiated,
 		_ action: @escaping () -> Void
 	) -> some View {
