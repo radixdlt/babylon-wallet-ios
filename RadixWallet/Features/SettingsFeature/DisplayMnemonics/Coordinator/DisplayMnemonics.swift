@@ -149,8 +149,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 			case .finishedEarly:
 				state.destination = nil
 				return .none
-			case let .finishedImportingMnemonics(_, importedIDs, notYetSavedNewMainBDFS):
-				assert(notYetSavedNewMainBDFS == nil, "Discrepancy, new Main BDFS should already have been saved.")
+			case let .finishedImportingMnemonics(_, importedIDs, _):
 				for imported in importedIDs {
 					state.deviceFactorSources[id: .singleCurve(imported.factorSourceID, isOlympia: true)]?.imported()
 					state.deviceFactorSources[id: .singleCurve(imported.factorSourceID, isOlympia: false)]?.imported()

@@ -6,7 +6,7 @@ extension PersonasClient: DependencyKey {
 		profileStore: ProfileStore = .shared
 	) -> Self {
 		let getPersonasOnNetwork: GetPersonasOnNetwork = { networkID in
-			guard let network = try? await profileStore.profile.network(id: networkID) else {
+			guard let network = try? await profileStore.profile().network(id: networkID) else {
 				return .init()
 			}
 			return network.getPersonas()
@@ -34,10 +34,10 @@ extension PersonasClient: DependencyKey {
 				}
 			},
 			hasSomePersonaOnAnyNetwork: {
-				await profileStore.profile.hasAnyPersonaOnAnyNetwork()
+				await profileStore.profile().hasAnyPersonaOnAnyNetwork()
 			},
 			hasSomePersonaOnCurrentNetwork: {
-				await profileStore.profile.network?.hasSomePersona() ?? false
+				await profileStore.profile().network?.hasSomePersona() ?? false
 			}
 		)
 	}

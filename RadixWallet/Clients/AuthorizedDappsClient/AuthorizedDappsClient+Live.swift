@@ -7,7 +7,7 @@ extension AuthorizedDappsClient: DependencyKey {
 	) -> Self {
 		Self(
 			getAuthorizedDapps: {
-				guard let network = await profileStore.profile.network else {
+				guard let network = await profileStore.profile().network else {
 					return .init()
 				}
 				return network.authorizedDapps.asIdentified()
@@ -21,7 +21,7 @@ extension AuthorizedDappsClient: DependencyKey {
 				}
 			},
 			forgetAuthorizedDapp: { toForget, maybeNetworkID in
-				let currentNetworkID = await profileStore.profile.networkID
+				let currentNetworkID = await profileStore.profile().networkID
 				let networkID = maybeNetworkID ?? currentNetworkID
 				return try await profileStore.updating {
 					_ = try $0.forgetAuthorizedDapp(toForget, on: networkID)
@@ -43,7 +43,7 @@ extension AuthorizedDappsClient: DependencyKey {
 				}
 			},
 			detailsForAuthorizedDapp: { simple in
-				try await profileStore.profile.detailsForAuthorizedDapp(simple)
+				try await profileStore.profile().detailsForAuthorizedDapp(simple)
 			}
 		)
 	}

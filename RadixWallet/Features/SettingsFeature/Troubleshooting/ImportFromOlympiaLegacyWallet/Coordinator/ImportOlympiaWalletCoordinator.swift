@@ -104,6 +104,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		case migratedSoftwareAccountsToBabylon(
 			MigratedSoftwareAccounts
 		)
+		case createdOlympiaPrivateHDForAccounts(PrivateHierarchicalDeterministicFactorSource, AccountsToMigrate)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -237,6 +238,13 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 		case let .migratedSoftwareAccountsToBabylon(softwareAccounts):
 			migratedSoftwareAccountsToBabylon(in: &state, softwareAccounts: softwareAccounts)
+
+		case let .createdOlympiaPrivateHDForAccounts(privateHD, accountsToMigrate):
+			migrateSoftwareAccountsToBabylon(
+				accountsToMigrate,
+				factorSourceID: privateHD.factorSource.id,
+				factorSource: privateHD
+			)
 		}
 	}
 
@@ -404,16 +412,15 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 				of: progress.softwareAccountsToMigrate
 			)
 
-			let privateHDFactorSource = PrivateHierarchicalDeterministicFactorSource.olympia(
-				mnemonicWithPassphrase: mnemonicWithPassphrase,
-				hostInfo: .current()
-			)
+			return .run { send in
+				let hostInfo = await SargonOS.shared.resolveHostInfo()
+				let privateHDFactorSource = PrivateHierarchicalDeterministicFactorSource.olympia(
+					mnemonicWithPassphrase: mnemonicWithPassphrase,
+					hostInfo: hostInfo
+				)
 
-			return migrateSoftwareAccountsToBabylon(
-				progress.softwareAccountsToMigrate,
-				factorSourceID: privateHDFactorSource.factorSource.id,
-				factorSource: privateHDFactorSource
-			)
+				await send(.internal(.createdOlympiaPrivateHDForAccounts(privateHDFactorSource, progress.softwareAccountsToMigrate)))
+			}
 		} catch {
 			errorQueue.schedule(error)
 			return .none

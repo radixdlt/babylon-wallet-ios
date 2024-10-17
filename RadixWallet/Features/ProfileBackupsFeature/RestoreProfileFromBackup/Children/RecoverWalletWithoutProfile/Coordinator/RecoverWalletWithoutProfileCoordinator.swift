@@ -71,6 +71,10 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		case path(StackActionOf<Path>)
 	}
 
+	public enum InternalAction: Sendable, Equatable {
+		case createdPrivateHD(PrivateHierarchicalDeterministicFactorSource)
+	}
+
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
 		case backToStartOfOnboarding
@@ -131,21 +135,21 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		case let .path(.element(_, action: .importMnemonic(.delegate(delegateAction)))):
 			switch delegateAction {
 			case let .notPersisted(mnemonicWithPassphrase):
-				let mainBDFS = DeviceFactorSource.babylon(
-					mnemonicWithPassphrase: mnemonicWithPassphrase,
-					isMain: true,
-					hostInfo: .current()
-				)
+				return .run { send in
+					let hostInfo = await SargonOS.shared.resolveHostInfo()
+					let mainBDFS = DeviceFactorSource.babylon(
+						mnemonicWithPassphrase: mnemonicWithPassphrase,
+						isMain: true,
+						hostInfo: hostInfo
+					)
 
-				let privateHD = PrivateHierarchicalDeterministicFactorSource(
-					mnemonicWithPassphrase: mnemonicWithPassphrase,
-					factorSource: mainBDFS
-				)
+					let privateHD = PrivateHierarchicalDeterministicFactorSource(
+						mnemonicWithPassphrase: mnemonicWithPassphrase,
+						factorSource: mainBDFS
+					)
 
-				state.factorSourceOfImportedMnemonic = privateHD
-				state.destination = .accountRecoveryScanCoordinator(.init(purpose: .createProfile(privateHD)))
-
-				return .none
+					await send(.internal(.createdPrivateHD(privateHD)))
+				}
 
 			default:
 				let errorMsg = "Discrepancy! Expected to have saved mnemonic into keychain but other action happened: \(delegateAction)"
@@ -158,6 +162,15 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 			return .send(.delegate(.profileCreatedFromImportedBDFS))
 
 		default:
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case let .createdPrivateHD(privateHD):
+			state.factorSourceOfImportedMnemonic = privateHD
+			state.destination = .accountRecoveryScanCoordinator(.init(purpose: .createProfile(privateHD)))
 			return .none
 		}
 	}
