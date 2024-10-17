@@ -27,7 +27,6 @@ struct GatewayAPIClient: Sendable, DependencyKey {
 	var getAccountLockerVaults: GetAccountLockerVaults
 
 	// MARK: Transaction
-	var transactionPreview: TransactionPreview
 	var streamTransactions: StreamTransactions
 	var prevalidateDeposit: PrevalidateDeposit
 }
@@ -56,7 +55,6 @@ extension GatewayAPIClient {
 	typealias GetAccountLockerVaults = @Sendable (GatewayAPI.StateAccountLockerPageVaultsRequest) async throws -> GatewayAPI.StateAccountLockerPageVaultsResponse
 
 	// MARK: - Transaction
-	typealias TransactionPreview = @Sendable (GatewayAPI.TransactionPreviewRequest) async throws -> GatewayAPI.TransactionPreviewResponse
 	typealias StreamTransactions = @Sendable (GatewayAPI.StreamTransactionsRequest) async throws -> GatewayAPI.StreamTransactionsResponse
 	typealias PrevalidateDeposit = @Sendable (GatewayAPI.AccountDepositPreValidationRequest) async throws -> GatewayAPI.AccountDepositPreValidationResponse
 }

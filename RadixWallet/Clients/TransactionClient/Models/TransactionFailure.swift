@@ -82,7 +82,7 @@ extension TransactionFailure {
 		case failedToRetrieveTXReceipt(String)
 		case failedToExtractTXReceiptBytes
 		case failedToGenerateTXReview(Error)
-		case manifestWithReservedInstructions([ReservedInstruction])
+		case manifestWithReservedInstructions(String)
 		case oneOfRecevingAccountsDoesNotAllowDeposits
 
 		var errorDescription: String? {
