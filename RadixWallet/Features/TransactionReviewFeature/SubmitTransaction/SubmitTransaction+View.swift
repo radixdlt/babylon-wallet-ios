@@ -47,7 +47,7 @@ extension SubmitTransaction.State.TXStatus {
 
 // MARK: - SubmitTransaction.View
 extension SubmitTransaction {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let txID: IntentHash
 		let status: State.TXStatus
 		let dismissalDisabled: Bool
@@ -55,18 +55,18 @@ extension SubmitTransaction {
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		@SwiftUI.State private var opacity: Double = 1.0
 
 		private let store: StoreOf<SubmitTransaction>
 
 		@ScaledMetric private var height: CGFloat = 360
 
-		public init(store: StoreOf<SubmitTransaction>) {
+		init(store: StoreOf<SubmitTransaction>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				WithNavigationBar {
 					viewStore.send(.closeButtonTapped)

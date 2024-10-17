@@ -1,7 +1,7 @@
 import Sargon
 
 extension ROLAClient {
-	public static let liveValue: Self = {
+	static let liveValue: Self = {
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 		@Dependency(\.cacheClient) var cacheClient
 		@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
@@ -134,7 +134,7 @@ extension ROLAClient {
 }
 
 extension OnLedgerEntity.Metadata {
-	public func ownerKeyHashes() throws -> [Sargon.PublicKeyHash]? {
+	func ownerKeyHashes() throws -> [Sargon.PublicKeyHash]? {
 		try ownerKeys?.value.map { hash in
 			switch hash {
 			case let .ecdsaSecp256k1(value):

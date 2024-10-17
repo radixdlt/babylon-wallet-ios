@@ -1,9 +1,9 @@
-public typealias Pasteboard = UIPasteboard
+typealias Pasteboard = UIPasteboard
 
 // MARK: - PasteboardClient + DependencyKey
 extension PasteboardClient: DependencyKey {
-	public typealias Value = PasteboardClient
-	public static let liveValue = Self.live()
+	typealias Value = PasteboardClient
+	static let liveValue = Self.live()
 
 	static func live(pasteboard: Pasteboard = .general) -> Self {
 		let copyEvents = AsyncPassthroughSubject<String>()

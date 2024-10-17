@@ -1,5 +1,5 @@
 
-public struct ErrorQueue: Sendable {
-	public var errors: @Sendable () -> AnyAsyncSequence<Error>
-	public var schedule: @Sendable (Error) -> Void
+struct ErrorQueue: Sendable {
+	var errors: @Sendable () -> AnyAsyncSequence<Error>
+	var schedule: @Sendable (Error) -> Void
 }

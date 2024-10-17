@@ -11,26 +11,26 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.StateEntityDetailsRequest")
-public typealias StateEntityDetailsRequest = GatewayAPI.StateEntityDetailsRequest
+typealias StateEntityDetailsRequest = GatewayAPI.StateEntityDetailsRequest
 
 extension GatewayAPI {
 
-public struct StateEntityDetailsRequest: Codable, Hashable {
+struct StateEntityDetailsRequest: Codable, Hashable {
 
-    public private(set) var atLedgerState: LedgerStateSelector?
-    public private(set) var optIns: StateEntityDetailsOptIns?
+    private(set) var atLedgerState: LedgerStateSelector?
+    private(set) var optIns: StateEntityDetailsOptIns?
     /** limited to max 20 items. */
-    public private(set) var addresses: [String]
-    public private(set) var aggregationLevel: ResourceAggregationLevel?
+    private(set) var addresses: [String]
+    private(set) var aggregationLevel: ResourceAggregationLevel?
 
-    public init(atLedgerState: LedgerStateSelector? = nil, optIns: StateEntityDetailsOptIns? = nil, addresses: [String], aggregationLevel: ResourceAggregationLevel? = nil) {
+    init(atLedgerState: LedgerStateSelector? = nil, optIns: StateEntityDetailsOptIns? = nil, addresses: [String], aggregationLevel: ResourceAggregationLevel? = nil) {
         self.atLedgerState = atLedgerState
         self.optIns = optIns
         self.addresses = addresses
         self.aggregationLevel = aggregationLevel
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case atLedgerState = "at_ledger_state"
         case optIns = "opt_ins"
         case addresses
@@ -39,7 +39,7 @@ public struct StateEntityDetailsRequest: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(atLedgerState, forKey: .atLedgerState)
         try container.encodeIfPresent(optIns, forKey: .optIns)

@@ -2,17 +2,17 @@ import ComposableArchitecture
 import SwiftUI
 
 extension SelectBackup {
-	public typealias ViewState = State
+	typealias ViewState = State
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<SelectBackup>
 
-		public init(store: StoreOf<SelectBackup>) {
+		init(store: StoreOf<SelectBackup>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				coreView(store, with: viewStore)
 					.toolbar {

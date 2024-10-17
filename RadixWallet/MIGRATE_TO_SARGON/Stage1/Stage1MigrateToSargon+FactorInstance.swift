@@ -2,7 +2,7 @@ import Foundation
 import Sargon
 
 extension FactorInstance {
-	public var factorSourceID: FactorSourceID {
+	var factorSourceID: FactorSourceID {
 		factorSourceId
 	}
 }

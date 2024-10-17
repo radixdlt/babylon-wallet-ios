@@ -2,7 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 
 extension Main.State {
-	public var showIsUsingTestnetBanner: Bool {
+	var showIsUsingTestnetBanner: Bool {
 		!isOnMainnet
 	}
 }
@@ -10,14 +10,14 @@ extension Main.State {
 // MARK: - Main.View
 extension Main {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<Main>
 
-		public init(store: StoreOf<Main>) {
+		init(store: StoreOf<Main>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			NavigationStack {
 				Home.View(store: store.home)
 					.destinations(with: store)
@@ -74,6 +74,6 @@ struct MainView_Previews: PreviewProvider {
 }
 
 extension Main.State {
-	public static let previewValue = Self(home: .previewValue)
+	static let previewValue = Self(home: .previewValue)
 }
 #endif

@@ -1,6 +1,6 @@
 
 extension DependencyValues {
-	public var deviceFactorSourceClient: DeviceFactorSourceClient {
+	var deviceFactorSourceClient: DeviceFactorSourceClient {
 		get { self[DeviceFactorSourceClient.self] }
 		set { self[DeviceFactorSourceClient.self] = newValue }
 	}
@@ -8,9 +8,9 @@ extension DependencyValues {
 
 // MARK: - DeviceFactorSourceClient + TestDependencyKey
 extension DeviceFactorSourceClient: TestDependencyKey {
-	public static let previewValue = Self.noop
+	static let previewValue = Self.noop
 
-	public static let noop = Self(
+	static let noop = Self(
 		publicKeysFromOnDeviceHD: { _ in throw NoopError() },
 		signatureFromOnDeviceHD: { _ in throw NoopError() },
 		isAccountRecoveryNeeded: { false },
@@ -19,7 +19,7 @@ extension DeviceFactorSourceClient: TestDependencyKey {
 		entitiesInBadState: { throw NoopError() }
 	)
 
-	public static let testValue = Self(
+	static let testValue = Self(
 		publicKeysFromOnDeviceHD: unimplemented("\(Self.self).publicKeysFromOnDeviceHD"),
 		signatureFromOnDeviceHD: unimplemented("\(Self.self).signatureFromOnDeviceHD"),
 		isAccountRecoveryNeeded: unimplemented("\(Self.self).isAccountRecoveryNeeded"),

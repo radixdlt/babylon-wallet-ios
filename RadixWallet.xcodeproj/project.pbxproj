@@ -27,7 +27,6 @@
 		4827520D2BDA5E13007854E0 /* SplashFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2902ADEBFB300A38425 /* SplashFeatureTests.swift */; };
 		4827520E2BDA5E50007854E0 /* TransactionClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2FA2ADEBFB300A38425 /* TransactionClientTests.swift */; };
 		4827520F2BDA5FAF007854E0 /* AppFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA27C2ADEBFB200A38425 /* AppFeatureTests.swift */; };
-		482752102BDA60FA007854E0 /* ProfileStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA3052ADEBFB300A38425 /* ProfileStoreTests.swift */; };
 		482752182BDB9032007854E0 /* DisplayName+NonEmptyString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 482752172BDB9032007854E0 /* DisplayName+NonEmptyString.swift */; };
 		4827521A2BDB90D4007854E0 /* FactorSourceCommon+New+Dependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 482752192BDB90D4007854E0 /* FactorSourceCommon+New+Dependencies.swift */; };
 		483A3DE42BD2658B00055932 /* Stage1MigrateToSargon+FactorSources.swift in Sources */ = {isa = PBXBuildFile; fileRef = 483A3DE32BD2658B00055932 /* Stage1MigrateToSargon+FactorSources.swift */; };
@@ -820,6 +819,7 @@
 		83AAAC6D2B483D1B00222B64 /* StakeSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83AAAC6B2B483D1B00222B64 /* StakeSummaryView.swift */; };
 		83B783562C1764AE00AA7930 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 83B783552C1764AE00AA7930 /* Sargon */; };
 		83D663B02B271D0100D1AB9E /* TruncationMask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D663AF2B271D0100D1AB9E /* TruncationMask.swift */; };
+		83D908AD2C931A7100822CC4 /* SargonSecureStorageDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D908AC2C931A7100822CC4 /* SargonSecureStorageDriver.swift */; };
 		83DFAF2E2B4E8A51008B70CE /* View+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83DFAF2D2B4E8A51008B70CE /* View+Extra.swift */; };
 		83EA887E2B7E68EE00FF8424 /* TotalCurrencyWorthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EA887D2B7E68EE00FF8424 /* TotalCurrencyWorthView.swift */; };
 		83EE47502AF027DF00155F03 /* AssetTransferDepositRuleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE474F2AF027DF00155F03 /* AssetTransferDepositRuleTests.swift */; };
@@ -2035,6 +2035,7 @@
 		839B6C532B21D28400402651 /* ExpandableTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpandableTextView.swift; sourceTree = "<group>"; };
 		83AAAC6B2B483D1B00222B64 /* StakeSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StakeSummaryView.swift; sourceTree = "<group>"; };
 		83D663AF2B271D0100D1AB9E /* TruncationMask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TruncationMask.swift; sourceTree = "<group>"; };
+		83D908AC2C931A7100822CC4 /* SargonSecureStorageDriver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SargonSecureStorageDriver.swift; sourceTree = "<group>"; };
 		83DFAF2D2B4E8A51008B70CE /* View+Extra.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "View+Extra.swift"; sourceTree = "<group>"; };
 		83EA887D2B7E68EE00FF8424 /* TotalCurrencyWorthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TotalCurrencyWorthView.swift; sourceTree = "<group>"; };
 		83EE474F2AF027DF00155F03 /* AssetTransferDepositRuleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetTransferDepositRuleTests.swift; sourceTree = "<group>"; };
@@ -2451,7 +2452,6 @@
 		E6DBA2F62ADEBFB300A38425 /* SecureStorageClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SecureStorageClientTests.swift; sourceTree = "<group>"; };
 		E6DBA2FA2ADEBFB300A38425 /* TransactionClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionClientTests.swift; sourceTree = "<group>"; };
 		E6DBA3012ADEBFB300A38425 /* CacheClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CacheClientTests.swift; sourceTree = "<group>"; };
-		E6DBA3052ADEBFB300A38425 /* ProfileStoreTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileStoreTests.swift; sourceTree = "<group>"; };
 		E6DBA3092ADEBFB300A38425 /* FactorSourcesClientLiveTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FactorSourcesClientLiveTests.swift; sourceTree = "<group>"; };
 		E6DBA30B2ADEBFB300A38425 /* DiskPersistenceClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiskPersistenceClientTests.swift; sourceTree = "<group>"; };
 		E6DBA30F2ADEBFB300A38425 /* FaucetClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FaucetClientTests.swift; sourceTree = "<group>"; };
@@ -2659,6 +2659,7 @@
 		48CFBC512ADC106300E77A5C /* RadixWallet */ = {
 			isa = PBXGroup;
 			children = (
+				83D908AB2C931A5600822CC4 /* SargonExtensions */,
 				A415D5272C0E70DA00EAC126 /* RadixWalletBeta.entitlements */,
 				A468D7E02C00C43500AFED2E /* RadixWalletDebug-Alpha.entitlements */,
 				A468D7DF2BF743CF00AFED2E /* RadixWalletRelease.entitlements */,
@@ -5775,6 +5776,14 @@
 			path = StakeUnitList;
 			sourceTree = "<group>";
 		};
+		83D908AB2C931A5600822CC4 /* SargonExtensions */ = {
+			isa = PBXGroup;
+			children = (
+				83D908AC2C931A7100822CC4 /* SargonSecureStorageDriver.swift */,
+			);
+			path = SargonExtensions;
+			sourceTree = "<group>";
+		};
 		83DFAF2C2B4D48E2008B70CE /* Components */ = {
 			isa = PBXGroup;
 			children = (
@@ -6580,7 +6589,6 @@
 				E6DBA2F52ADEBFB300A38425 /* SecureStorageClientTests */,
 				E6DBA2F92ADEBFB300A38425 /* TransactionClientTests */,
 				E6DBA3002ADEBFB300A38425 /* CacheClientTests */,
-				E6DBA3042ADEBFB300A38425 /* ProfileStoreTests */,
 				E6DBA3082ADEBFB300A38425 /* FactorSourcesClientLiveTests */,
 				E6DBA30A2ADEBFB300A38425 /* DiskPersistenceClientTests */,
 				E6DBA30E2ADEBFB300A38425 /* FaucetClientTests */,
@@ -6662,14 +6670,6 @@
 				E6DBA3012ADEBFB300A38425 /* CacheClientTests.swift */,
 			);
 			path = CacheClientTests;
-			sourceTree = "<group>";
-		};
-		E6DBA3042ADEBFB300A38425 /* ProfileStoreTests */ = {
-			isa = PBXGroup;
-			children = (
-				E6DBA3052ADEBFB300A38425 /* ProfileStoreTests.swift */,
-			);
-			path = ProfileStoreTests;
 			sourceTree = "<group>";
 		};
 		E6DBA3082ADEBFB300A38425 /* FactorSourcesClientLiveTests */ = {
@@ -6982,7 +6982,7 @@
 				8318BB172BC8403800057BCB /* XCRemoteSwiftPackageReference "swift-custom-dump" */,
 				E6A0B0492BF23C7000617DAC /* XCRemoteSwiftPackageReference "swift-identified-collections" */,
 				5B634A922C91D2A0004B2FBC /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */,
-				5B4E1D1D2CB7FE8E002FAC2E /* XCRemoteSwiftPackageReference "sargon" */,
+				835BA27A2CAB1FB100407AE9 /* XCRemoteSwiftPackageReference "sargon" */,
 			);
 			productRefGroup = 48CFBC502ADC106300E77A5C /* Products */;
 			projectDirPath = "";
@@ -7091,7 +7091,6 @@
 				482752042BD9951A007854E0 /* CustomizeFeePayerTests.swift in Sources */,
 				E6DBA31D2ADEBFB300A38425 /* PeerConnectionNegotiatorTests.swift in Sources */,
 				E6DBA3832ADEBFB300A38425 /* DiskPersistenceClientTests.swift in Sources */,
-				482752102BDA60FA007854E0 /* ProfileStoreTests.swift in Sources */,
 				482752092BDA5576007854E0 /* EntitiesHidingTests.swift in Sources */,
 				E6A0B04D2BF23D6E00617DAC /* IdentifiedArrayOf+Mutation+Position.swift in Sources */,
 				4884BDBA2BD98EF6003B1ED6 /* TestFixture.swift in Sources */,
@@ -8037,6 +8036,7 @@
 				48CFC3012ADC10D900E77A5C /* DebugSettingsCoordinator+Reducer.swift in Sources */,
 				A40816442C7E0D08005E65B9 /* TransactionIntentStatus.swift in Sources */,
 				A408157D2C7E0D08005E65B9 /* FungibleResourcesCollectionItemVaultAggregatedVaultItem.swift in Sources */,
+				83D908AD2C931A7100822CC4 /* SargonSecureStorageDriver.swift in Sources */,
 				83377A052B9DDB5C00D8AA36 /* NPSSurveyClient+Live.swift in Sources */,
 				A40815A52C7E0D08005E65B9 /* MetadataU32Value.swift in Sources */,
 				A462B5B22B8407D300C26D20 /* CoreAPI_BinaryPlaintextMessageContent.swift in Sources */,
@@ -9044,6 +9044,14 @@
 			requirement = {
 				kind = exactVersion;
 				version = 1.3.0;
+			};
+		};
+		835BA27A2CAB1FB100407AE9 /* XCRemoteSwiftPackageReference "sargon" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/radixdlt/sargon";
+			requirement = {
+				kind = exactVersion;
+				version = 1.1.27;
 			};
 		};
 		A415574E2B757C5E0040AD4E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {

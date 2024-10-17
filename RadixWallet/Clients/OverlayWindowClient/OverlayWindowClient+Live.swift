@@ -1,6 +1,6 @@
 // MARK: - OverlayWindowClient + DependencyKey
 extension OverlayWindowClient: DependencyKey {
-	public static let liveValue: Self = {
+	static let liveValue: Self = {
 		let items = AsyncPassthroughSubject<Item>()
 		let alertActions = AsyncPassthroughSubject<(action: Item.AlertAction, id: Item.AlertState.ID)>()
 		let fullScreenActions = AsyncPassthroughSubject<(action: FullScreenAction, id: FullScreenID)>()
@@ -64,14 +64,14 @@ extension OverlayWindowClient: DependencyKey {
 }
 
 extension OverlayWindowClient {
-	public func showInfoLink(_ state: InfoLinkSheet.State) {
+	func showInfoLink(_ state: InfoLinkSheet.State) {
 		scheduleSheet(.infoLink(state))
 	}
 }
 
 extension OverlayWindowClient.Item.HUD {
-	public static let updatedAccount = Self(text: L10n.AccountSettings.updatedAccountHUDMessage)
-	public static let copied = Self(text: L10n.AddressAction.copiedToClipboard)
-	public static let seedPhraseImported = Self(text: L10n.ImportMnemonic.seedPhraseImported)
-	public static let thankYou = Self(text: "Thank you!")
+	static let updatedAccount = Self(text: L10n.AccountSettings.updatedAccountHUDMessage)
+	static let copied = Self(text: L10n.AddressAction.copiedToClipboard)
+	static let seedPhraseImported = Self(text: L10n.ImportMnemonic.seedPhraseImported)
+	static let thankYou = Self(text: "Thank you!")
 }

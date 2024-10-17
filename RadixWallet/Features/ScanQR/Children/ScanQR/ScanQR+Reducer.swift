@@ -2,14 +2,14 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - ScanQR
-public struct ScanQR: Sendable, FeatureReducer {
+struct ScanQR: Sendable, FeatureReducer {
 	@ObservableState
-	public struct State: Sendable, Hashable {
-		public let kind: Kind
+	struct State: Sendable, Hashable {
+		let kind: Kind
 		#if targetEnvironment(simulator)
-		public var manualQRContent: String
+		var manualQRContent: String
 
-		public init(
+		init(
 			kind: Kind,
 			manualQRContent: String = ""
 		) {
@@ -17,7 +17,7 @@ public struct ScanQR: Sendable, FeatureReducer {
 			self.manualQRContent = manualQRContent
 		}
 		#else
-		public init(
+		init(
 			kind: Kind
 		) {
 			self.kind = kind
@@ -26,7 +26,7 @@ public struct ScanQR: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case scanned(TaskResult<String>)
 		#if targetEnvironment(simulator)
 		case manualQRContentChanged(String)
@@ -34,15 +34,15 @@ public struct ScanQR: Sendable, FeatureReducer {
 		#endif // sim
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case scanned(String)
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
 
-	public init() {}
+	init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		#if targetEnvironment(simulator)
 		case let .manualQRContentChanged(manualQRContent):
@@ -65,7 +65,7 @@ public struct ScanQR: Sendable, FeatureReducer {
 
 // MARK: ScanQR.Kind
 extension ScanQR {
-	public enum Kind: Sendable, Hashable {
+	enum Kind: Sendable, Hashable {
 		case connectorExtension
 		case account
 		case importOlympia

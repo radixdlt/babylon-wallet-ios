@@ -7,7 +7,7 @@
 /// decoding strategy, but it is quite strict to require that because some data we might want to
 /// Base64 encode/decode. An alternative is of course to create a variant of this type but `Base64Codable`,
 /// which overrides the data coding strategy of the encoder.
-public struct HexCodable:
+struct HexCodable:
 	Sendable,
 	Hashable,
 	Codable,
@@ -16,94 +16,94 @@ public struct HexCodable:
 	DataProtocol
 {
 	/// The underlying `Data` that is always hex coded.
-	public let data: Data
+	let data: Data
 
-	public init(data: Data) {
+	init(data: Data) {
 		self.data = data
 	}
 }
 
 // MARK: Hex
 extension HexCodable {
-	public init(hex: String) throws {
+	init(hex: String) throws {
 		try self.init(data: Data(hex: hex))
 	}
 
-	public func hex(options: Data.HexEncodingOptions = []) -> String {
+	func hex(options: Data.HexEncodingOptions = []) -> String {
 		data.hex(options: options)
 	}
 }
 
 extension String {
-	public func mask(showLast suffixCount: Int) -> String.SubSequence {
+	func mask(showLast suffixCount: Int) -> String.SubSequence {
 		"..." + suffix(suffixCount)
 	}
 }
 
 // MARK: Identifiable
 extension HexCodable {
-	public typealias ID = String
+	typealias ID = String
 
 	/// The underlying `data` as a hex string.
-	public var id: ID {
+	var id: ID {
 		data.hex()
 	}
 }
 
 // MARK: DataProtocol
 extension HexCodable {
-	public typealias Regions = Data.Regions
+	typealias Regions = Data.Regions
 
-	public var regions: Regions {
+	var regions: Regions {
 		data.regions
 	}
 }
 
 // MARK: RandomAccessCollection
 extension HexCodable {
-	public typealias Element = Data.Element
-	public typealias SubSequence = Data.SubSequence
-	public typealias Index = Data.Index
-	public typealias Indices = Data.Indices
+	typealias Element = Data.Element
+	typealias SubSequence = Data.SubSequence
+	typealias Index = Data.Index
+	typealias Indices = Data.Indices
 
-	public var endIndex: Index {
+	var endIndex: Index {
 		data.endIndex
 	}
 
-	public var indices: Indices {
+	var indices: Indices {
 		data.indices
 	}
 
-	public var startIndex: Index {
+	var startIndex: Index {
 		data.startIndex
 	}
 
-	public func formIndex(after index: inout Index) {
+	func formIndex(after index: inout Index) {
 		data.formIndex(after: &index)
 	}
 
-	public func formIndex(before index: inout Index) {
+	func formIndex(before index: inout Index) {
 		data.formIndex(before: &index)
 	}
 
-	public subscript(bounds: Range<Index>) -> SubSequence {
+	subscript(bounds: Range<Index>) -> SubSequence {
 		data[bounds]
 	}
 
-	public subscript(position: Index) -> Element {
+	subscript(position: Index) -> Element {
 		data[position]
 	}
 }
 
 // MARK: Codable
 extension HexCodable {
-	public init(from decoder: Decoder) throws {
+	init(from decoder: Decoder) throws {
 		let container = try decoder.singleValueContainer()
 		let data = try Data(hex: container.decode(String.self))
 		self.init(data: data)
 	}
 
-	public func encode(to encoder: Encoder) throws {
+	func encode(to encoder: Encoder) throws {
 		var container = encoder.singleValueContainer()
 		try container.encode(data.hex())
 	}
@@ -111,14 +111,14 @@ extension HexCodable {
 
 // MARK: CustomStringConvertible
 extension HexCodable {
-	public var description: String {
+	var description: String {
 		data.hex()
 	}
 }
 
 #if canImport(CustomDump)
 extension HexCodable: CustomDumpRepresentable {
-	public var customDumpValue: Any {
+	var customDumpValue: Any {
 		data.hex()
 	}
 }
@@ -126,54 +126,54 @@ extension HexCodable: CustomDumpRepresentable {
 
 #if DEBUG
 extension HexCodable: ExpressibleByStringLiteral {
-	public init(stringLiteral value: StringLiteralType) {
+	init(stringLiteral value: StringLiteralType) {
 		try! self.init(hex: value)
 	}
 }
 
 extension HexCodable {
-	public static let deadbeef32Bytes = Self(data: .deadbeef32Bytes)
+	static let deadbeef32Bytes = Self(data: .deadbeef32Bytes)
 }
 #endif // DEBUG
 
 // MARK: - CodableViaHexCodable
-public typealias CodableViaHexCodable = DecodableViaHexCodable & EncodableViaHexCodable
+typealias CodableViaHexCodable = DecodableViaHexCodable & EncodableViaHexCodable
 
 // MARK: - EncodableViaHexCodable
-public protocol EncodableViaHexCodable: Encodable {
+protocol EncodableViaHexCodable: Encodable {
 	var hexCodable: HexCodable { get }
 }
 
 // MARK: - DecodableViaHexCodable
-public protocol DecodableViaHexCodable: Decodable {
+protocol DecodableViaHexCodable: Decodable {
 	init(hexCodable: HexCodable) throws
 }
 
 extension EncodableViaHexCodable {
-	public func hex(options: Data.HexEncodingOptions = []) -> String {
+	func hex(options: Data.HexEncodingOptions = []) -> String {
 		self.hexCodable.hex(options: options)
 	}
 }
 
 extension DecodableViaHexCodable {
-	public init(hex: String) throws {
+	init(hex: String) throws {
 		try self.init(data: .init(hex: hex))
 	}
 
-	public init(data: Data) throws {
+	init(data: Data) throws {
 		try self.init(hexCodable: .init(data: data))
 	}
 }
 
 extension EncodableViaHexCodable {
-	public func encode(to encoder: Encoder) throws {
+	func encode(to encoder: Encoder) throws {
 		var container = encoder.singleValueContainer()
 		try container.encode(self.hexCodable)
 	}
 }
 
 extension DecodableViaHexCodable {
-	public init(from decoder: Decoder) throws {
+	init(from decoder: Decoder) throws {
 		let container = try decoder.singleValueContainer()
 		try self.init(hexCodable: container.decode(HexCodable.self))
 	}

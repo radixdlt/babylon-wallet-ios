@@ -11,25 +11,25 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.AccountAuthorizedDepositorsResponseItem")
-public typealias AccountAuthorizedDepositorsResponseItem = GatewayAPI.AccountAuthorizedDepositorsResponseItem
+typealias AccountAuthorizedDepositorsResponseItem = GatewayAPI.AccountAuthorizedDepositorsResponseItem
 
 extension GatewayAPI {
 
-public struct AccountAuthorizedDepositorsResponseItem: Codable, Hashable {
+struct AccountAuthorizedDepositorsResponseItem: Codable, Hashable {
 
-    public private(set) var badgeType: AccountAuthorizedDepositorBadgeType
+    private(set) var badgeType: AccountAuthorizedDepositorBadgeType
 
-    public init(badgeType: AccountAuthorizedDepositorBadgeType) {
+    init(badgeType: AccountAuthorizedDepositorBadgeType) {
         self.badgeType = badgeType
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case badgeType = "badge_type"
     }
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(badgeType, forKey: .badgeType)
     }

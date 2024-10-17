@@ -1,7 +1,7 @@
 #if DEBUG
 
 extension TransactionClient: TestDependencyKey {
-	public static let testValue = Self(
+	static let testValue = Self(
 		getTransactionReview: unimplemented("\(Self.self).getTransactionReview"),
 		buildTransactionIntent: unimplemented("\(Self.self).buildTransactionIntent"),
 		notarizeTransaction: unimplemented("\(Self.self).notarizeTransaction"),

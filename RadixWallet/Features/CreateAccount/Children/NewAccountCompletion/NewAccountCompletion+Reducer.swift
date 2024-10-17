@@ -1,13 +1,13 @@
 import ComposableArchitecture
 import SwiftUI
 
-public struct NewAccountCompletion: Sendable, FeatureReducer {
-	public struct State: Sendable & Hashable {
-		public let account: Account
-		public let isFirstOnNetwork: Bool
-		public let navigationButtonCTA: CreateAccountNavigationButtonCTA
+struct NewAccountCompletion: Sendable, FeatureReducer {
+	struct State: Sendable & Hashable {
+		let account: Account
+		let isFirstOnNetwork: Bool
+		let navigationButtonCTA: CreateAccountNavigationButtonCTA
 
-		public init(
+		init(
 			account: Account,
 			isFirstOnNetwork: Bool,
 			navigationButtonCTA: CreateAccountNavigationButtonCTA
@@ -17,7 +17,7 @@ public struct NewAccountCompletion: Sendable, FeatureReducer {
 			self.navigationButtonCTA = navigationButtonCTA
 		}
 
-		public init(
+		init(
 			account: Account,
 			config: CreateAccountConfig
 		) {
@@ -29,17 +29,17 @@ public struct NewAccountCompletion: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case goToDestination
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case completed
 	}
 
-	public init() {}
+	init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .goToDestination:
 			.run { send in

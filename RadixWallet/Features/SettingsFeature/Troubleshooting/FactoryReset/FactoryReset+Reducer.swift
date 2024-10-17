@@ -1,39 +1,39 @@
 // MARK: - FactoryReset
-public struct FactoryReset: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public var isRecoverable = true
+struct FactoryReset: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		var isRecoverable = true
 
 		@PresentationState
-		public var destination: Destination.State?
+		var destination: Destination.State?
 
-		public init() {}
+		init() {}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case onFirstTask
 		case resetWalletButtonTapped
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case setIsRecoverable(Bool)
 	}
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case confirmReset(AlertState<Action.ConfirmReset>)
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Hashable {
+		enum Action: Sendable, Hashable {
 			case confirmReset(ConfirmReset)
 
-			public enum ConfirmReset: Sendable, Hashable {
+			enum ConfirmReset: Sendable, Hashable {
 				case confirm
 			}
 		}
 
-		public var body: some Reducer<State, Action> {
+		var body: some Reducer<State, Action> {
 			EmptyReducer()
 		}
 	}
@@ -41,9 +41,9 @@ public struct FactoryReset: Sendable, FeatureReducer {
 	@Dependency(\.securityCenterClient) var securityCenterClient
 	@Dependency(\.resetWalletClient) var resetWalletClient
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<FactoryReset> {
+	var body: some ReducerOf<FactoryReset> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -52,7 +52,7 @@ public struct FactoryReset: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onFirstTask:
 			return isRecoverableEffect()
@@ -62,7 +62,7 @@ public struct FactoryReset: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .setIsRecoverable(isRecoverable):
 			state.isRecoverable = isRecoverable
@@ -70,7 +70,7 @@ public struct FactoryReset: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .confirmReset(.confirm):
 			.run { _ in

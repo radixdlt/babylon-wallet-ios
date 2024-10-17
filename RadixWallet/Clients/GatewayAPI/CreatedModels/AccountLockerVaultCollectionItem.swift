@@ -1,10 +1,10 @@
 
 @available(*, deprecated, renamed: "GatewayAPI.AccountLockerVaultCollectionItem")
-public typealias AccountLockerVaultCollectionItem = GatewayAPI.AccountLockerVaultCollectionItem
+typealias AccountLockerVaultCollectionItem = GatewayAPI.AccountLockerVaultCollectionItem
 
 // MARK: - GatewayAPI.AccountLockerVaultCollectionItem
 extension GatewayAPI {
-	public enum AccountLockerVaultCollectionItem: Codable, Hashable {
+	enum AccountLockerVaultCollectionItem: Codable, Hashable {
 		case fungible(AccountLockerVaultCollectionItemFungible)
 		case nonFungible(AccountLockerVaultCollectionItemNonFungible)
 
@@ -12,21 +12,21 @@ extension GatewayAPI {
 			case type
 		}
 
-		public var fungible: AccountLockerVaultCollectionItemFungible? {
+		var fungible: AccountLockerVaultCollectionItemFungible? {
 			if case let .fungible(wrapped) = self {
 				return wrapped
 			}
 			return nil
 		}
 
-		public var nonFungible: AccountLockerVaultCollectionItemNonFungible? {
+		var nonFungible: AccountLockerVaultCollectionItemNonFungible? {
 			if case let .nonFungible(wrapped) = self {
 				return wrapped
 			}
 			return nil
 		}
 
-		public init(from decoder: Decoder) throws {
+		init(from decoder: Decoder) throws {
 			let container = try decoder.container(keyedBy: CodingKeys.self)
 			let type = try container.decode(AccountLockerVaultCollectionItemType.self, forKey: .type)
 
@@ -38,7 +38,7 @@ extension GatewayAPI {
 			}
 		}
 
-		public func encode(to encoder: Encoder) throws {
+		func encode(to encoder: Encoder) throws {
 			switch self {
 			case let .fungible(item):
 				try item.encode(to: encoder)

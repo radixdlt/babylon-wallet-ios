@@ -29,7 +29,7 @@ extension AddAsset.State {
 }
 
 extension AddAsset {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let resourceAddress: String
 		let validatedResourceAddress: ResourceViewState.Address?
 		let addressHint: Hint.ViewState?
@@ -38,7 +38,7 @@ extension AddAsset {
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		let store: StoreOf<AddAsset>
 
 		@FocusState private var resourceAddressFieldFocus: Bool
@@ -47,7 +47,7 @@ extension AddAsset {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: Action.view) { viewStore in
 				VStack(spacing: .zero) {
 					VStack(spacing: .medium3) {

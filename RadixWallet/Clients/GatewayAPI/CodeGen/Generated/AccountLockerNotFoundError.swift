@@ -11,26 +11,26 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.AccountLockerNotFoundError")
-public typealias AccountLockerNotFoundError = GatewayAPI.AccountLockerNotFoundError
+typealias AccountLockerNotFoundError = GatewayAPI.AccountLockerNotFoundError
 
 extension GatewayAPI {
 
-public struct AccountLockerNotFoundError: Codable, Hashable {
+struct AccountLockerNotFoundError: Codable, Hashable {
 
     /** The type of error. Each subtype may have its own additional structured fields. */
-    public private(set) var type: String
+    private(set) var type: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var lockerAddress: String
+    private(set) var lockerAddress: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var accountAddress: String
+    private(set) var accountAddress: String
 
-    public init(type: String, lockerAddress: String, accountAddress: String) {
+    init(type: String, lockerAddress: String, accountAddress: String) {
         self.type = type
         self.lockerAddress = lockerAddress
         self.accountAddress = accountAddress
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case type
         case lockerAddress = "locker_address"
         case accountAddress = "account_address"
@@ -38,7 +38,7 @@ public struct AccountLockerNotFoundError: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(type, forKey: .type)
         try container.encode(lockerAddress, forKey: .lockerAddress)

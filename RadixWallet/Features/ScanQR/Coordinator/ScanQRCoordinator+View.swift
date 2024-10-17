@@ -4,14 +4,14 @@ import SwiftUI
 // MARK: - ScanQRCoordinator.View
 extension ScanQRCoordinator {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<ScanQRCoordinator>
 
-		public init(store: StoreOf<ScanQRCoordinator>) {
+		init(store: StoreOf<ScanQRCoordinator>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			SwitchStore(store.scope(state: \.step, action: { $0 })) { state in
 				switch state {
 				case .cameraPermission:
@@ -48,6 +48,6 @@ struct ScannQR_Preview: PreviewProvider {
 }
 
 extension ScanQRCoordinator.State {
-	public static let previewValue: Self = .init(kind: .account)
+	static let previewValue: Self = .init(kind: .account)
 }
 #endif

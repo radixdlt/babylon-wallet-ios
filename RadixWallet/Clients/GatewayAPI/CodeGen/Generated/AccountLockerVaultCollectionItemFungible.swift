@@ -11,23 +11,23 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.AccountLockerVaultCollectionItemFungible")
-public typealias AccountLockerVaultCollectionItemFungible = GatewayAPI.AccountLockerVaultCollectionItemFungible
+typealias AccountLockerVaultCollectionItemFungible = GatewayAPI.AccountLockerVaultCollectionItemFungible
 
 extension GatewayAPI {
 
-public struct AccountLockerVaultCollectionItemFungible: Codable, Hashable {
+struct AccountLockerVaultCollectionItemFungible: Codable, Hashable {
 
-    public private(set) var type: AccountLockerVaultCollectionItemType
+    private(set) var type: AccountLockerVaultCollectionItemType
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var resourceAddress: String
+    private(set) var resourceAddress: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var vaultAddress: String
+    private(set) var vaultAddress: String
     /** The most recent state version underlying object was modified at. */
-    public private(set) var lastUpdatedAtStateVersion: Int64
+    private(set) var lastUpdatedAtStateVersion: Int64
     /** String-encoded decimal representing the amount of a related fungible resource. */
-    public private(set) var amount: String
+    private(set) var amount: String
 
-    public init(type: AccountLockerVaultCollectionItemType, resourceAddress: String, vaultAddress: String, lastUpdatedAtStateVersion: Int64, amount: String) {
+    init(type: AccountLockerVaultCollectionItemType, resourceAddress: String, vaultAddress: String, lastUpdatedAtStateVersion: Int64, amount: String) {
         self.type = type
         self.resourceAddress = resourceAddress
         self.vaultAddress = vaultAddress
@@ -35,7 +35,7 @@ public struct AccountLockerVaultCollectionItemFungible: Codable, Hashable {
         self.amount = amount
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case type
         case resourceAddress = "resource_address"
         case vaultAddress = "vault_address"
@@ -45,7 +45,7 @@ public struct AccountLockerVaultCollectionItemFungible: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(type, forKey: .type)
         try container.encode(resourceAddress, forKey: .resourceAddress)

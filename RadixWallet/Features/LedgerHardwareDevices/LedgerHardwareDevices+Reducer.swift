@@ -7,45 +7,45 @@ struct SelectedLedgerControlRequirements: Hashable {
 }
 
 // MARK: - LedgerHardwareDevices
-public struct LedgerHardwareDevices: Sendable, FeatureReducer {
+struct LedgerHardwareDevices: Sendable, FeatureReducer {
 	// MARK: - State
 
-	public struct State: Sendable, Hashable {
-		public enum Context: Sendable, Hashable {
+	struct State: Sendable, Hashable {
+		enum Context: Sendable, Hashable {
 			case settings
 			case createHardwareAccount
 			case accountRecovery(olympia: Bool)
 			case setupMFA
 		}
 
-		public let context: Context
+		let context: Context
 
-		public var hasAConnectorExtension: Bool = false
+		var hasAConnectorExtension: Bool = false
 
 		@Loadable
-		public var ledgers: IdentifiedArrayOf<LedgerHardwareWalletFactorSource>? = nil
+		var ledgers: IdentifiedArrayOf<LedgerHardwareWalletFactorSource>? = nil
 
-		public var selectedLedgerID: FactorSourceIDFromHash? = nil
+		var selectedLedgerID: FactorSourceIDFromHash? = nil
 		let selectedLedgerControlRequirements: SelectedLedgerControlRequirements? = nil
 
 		@PresentationState
-		public var destination: Destination.State? = nil
+		var destination: Destination.State? = nil
 
 		var pendingAction: ActionRequiringP2P? = nil
 
-		public init(context: Context) {
+		init(context: Context) {
 			self.context = context
 		}
 	}
 
-	public enum ActionRequiringP2P: Sendable, Hashable {
+	enum ActionRequiringP2P: Sendable, Hashable {
 		case addLedger
 		case selectLedger(LedgerHardwareWalletFactorSource)
 	}
 
 	// MARK: - Action
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case onFirstTask
 		case selectedLedger(id: FactorSourceIDFromHash?)
 		case addNewLedgerButtonTapped
@@ -53,13 +53,13 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 		case whatIsALedgerButtonTapped
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case loadedLedgers(TaskResult<IdentifiedArrayOf<LedgerHardwareWalletFactorSource>>)
 		case hasAConnectorExtension(Bool)
 		case perform(ActionRequiringP2P)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case choseLedger(LedgerHardwareWalletFactorSource)
 		// Only used when in the `accountRecovery` context
 		case choseLedgerForRecovery(LedgerHardwareWalletFactorSource, isOlympia: Bool)
@@ -67,20 +67,20 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 
 	// MARK: - Destination
 
-	public struct Destination: DestinationReducer {
-		public enum State: Sendable, Hashable {
+	struct Destination: DestinationReducer {
+		enum State: Sendable, Hashable {
 			case noP2PLink(AlertState<NoP2PLinkAlert>)
 			case addNewP2PLink(NewConnection.State)
 			case addNewLedger(AddLedgerFactorSource.State)
 		}
 
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case noP2PLink(NoP2PLinkAlert)
 			case addNewP2PLink(NewConnection.Action)
 			case addNewLedger(AddLedgerFactorSource.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: /State.addNewP2PLink, action: /Action.addNewP2PLink) {
 				NewConnection()
 			}
@@ -97,9 +97,9 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.errorQueue) var errorQueue
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -108,7 +108,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onFirstTask:
 			return .merge(updateLedgersEffect(state: &state), checkP2PLinkEffect())
@@ -128,7 +128,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadedLedgers(result):
 			state.$ledgers = .init(result: result)
@@ -149,7 +149,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .noP2PLink(alertAction):
 			switch alertAction {
@@ -240,13 +240,13 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 }
 
 // MARK: - NoP2PLinkAlert
-public enum NoP2PLinkAlert: Sendable, Hashable {
+enum NoP2PLinkAlert: Sendable, Hashable {
 	case addNewP2PLinkTapped
 	case cancelTapped
 }
 
 extension AlertState<NoP2PLinkAlert> {
-	public static var noP2Plink: AlertState {
+	static var noP2Plink: AlertState {
 		AlertState {
 			TextState(L10n.LedgerHardwareDevices.LinkConnectorAlert.title)
 		} actions: {

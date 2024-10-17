@@ -4,13 +4,13 @@ import SwiftUI
 
 // MARK: - NonFungibleResourceAsset
 extension NonFungibleResourceAsset {
-	public typealias ViewState = State
+	typealias ViewState = State
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<NonFungibleResourceAsset>
 
-		public init(store: StoreOf<NonFungibleResourceAsset>) {
+		init(store: StoreOf<NonFungibleResourceAsset>) {
 			self.store = store
 		}
 	}
@@ -28,7 +28,7 @@ extension NonFungibleResourceAsset.ViewState {
 }
 
 extension NonFungibleResourceAsset.View {
-	public var body: some View {
+	var body: some View {
 		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 			ResourceBalanceView(viewStore.resourceBalance, appearance: .compact) {
 				viewStore.send(.resourceTapped)

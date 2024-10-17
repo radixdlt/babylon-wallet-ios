@@ -1,8 +1,8 @@
 // MARK: - ImportLegacyWalletClient + DependencyKey
 extension ImportLegacyWalletClient: DependencyKey {
-	public typealias Value = ImportLegacyWalletClient
+	typealias Value = ImportLegacyWalletClient
 
-	public static let liveValue: Self = {
+	static let liveValue: Self = {
 		@Dependency(\.accountsClient) var accountsClient
 
 		/// NB: This migrates, but does not save the migrated accounts to the profile. That needs to be done separately,

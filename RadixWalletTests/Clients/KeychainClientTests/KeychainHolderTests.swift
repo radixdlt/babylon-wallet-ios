@@ -79,7 +79,7 @@ extension KeychainHolder {
 	}
 }
 
-public func valuesFromManyTasks<T: Hashable>(
+func valuesFromManyTasks<T: Hashable>(
 	task: @Sendable @escaping () async throws -> T
 ) async throws -> Set<T> {
 	let t0 = Task {

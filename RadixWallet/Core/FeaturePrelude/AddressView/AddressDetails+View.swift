@@ -1,15 +1,15 @@
 // MARK: - AddressDetails.View
-public extension AddressDetails {
+extension AddressDetails {
 	@MainActor
 	struct View: SwiftUI.View {
 		@Perception.Bindable var store: StoreOf<AddressDetails>
 		@Environment(\.dismiss) var dismiss
 
-		public init(store: StoreOf<AddressDetails>) {
+		init(store: StoreOf<AddressDetails>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				content
 					.withNavigationBar {

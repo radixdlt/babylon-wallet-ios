@@ -3,26 +3,26 @@ import Sargon
 import SwiftUI
 
 // MARK: - DevAccountPreferences
-public struct DevAccountPreferences: Sendable, FeatureReducer {
+struct DevAccountPreferences: Sendable, FeatureReducer {
 	// MARK: - State
 
-	public struct State: Sendable, Hashable {
-		public let account: Account
-		public var address: AccountAddress { account.address }
+	struct State: Sendable, Hashable {
+		let account: Account
+		var address: AccountAddress { account.address }
 
 		@PresentationState
 		var destination: Destination.State? = nil
 
 		#if DEBUG
-		public var canCreateAuthSigningKey: Bool
-		public var canTurnIntoDappDefinitionAccountType: Bool
-		public var createFungibleTokenButtonState: ControlState
-		public var createNonFungibleTokenButtonState: ControlState
-		public var createMultipleFungibleTokenButtonState: ControlState
-		public var createMultipleNonFungibleTokenButtonState: ControlState
+		var canCreateAuthSigningKey: Bool
+		var canTurnIntoDappDefinitionAccountType: Bool
+		var createFungibleTokenButtonState: ControlState
+		var createNonFungibleTokenButtonState: ControlState
+		var createMultipleFungibleTokenButtonState: ControlState
+		var createMultipleNonFungibleTokenButtonState: ControlState
 		#endif
 
-		public init(account: Account) {
+		init(account: Account) {
 			self.account = account
 
 			#if DEBUG
@@ -38,7 +38,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 
 	// MARK: - Action
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case appeared
 		case closeButtonTapped
 		case closeTransactionButtonTapped
@@ -53,7 +53,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		#endif // DEBUG
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		#if DEBUG
 		case reviewTransaction(TransactionManifest)
 		case canCreateAuthSigningKey(Bool)
@@ -61,7 +61,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		#endif // DEBUG
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case dismiss
 		#if DEBUG
 		case debugOnlyAccountWasDeleted
@@ -70,22 +70,22 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 
 	// MARK: - Destination
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Hashable, Sendable {
+		enum State: Hashable, Sendable {
 			#if DEBUG
 			case reviewTransaction(TransactionReview.State)
 			#endif // DEBUG
 		}
 
 		@CasePathable
-		public enum Action: Equatable, Sendable {
+		enum Action: Equatable, Sendable {
 			#if DEBUG
 			case reviewTransaction(TransactionReview.Action)
 			#endif // DEBUG
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			#if DEBUG
 			Scope(state: /State.reviewTransaction, action: /Action.reviewTransaction) {
 				TransactionReview()
@@ -101,9 +101,9 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	#endif // DEBUG
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -112,7 +112,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			#if DEBUG
@@ -202,7 +202,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		#if DEBUG
 		switch internalAction {
 		case let .reviewTransaction(manifest):
@@ -228,7 +228,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		#endif
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		#if DEBUG
 		switch presentedAction {
 		case .reviewTransaction(.delegate(.transactionCompleted)), .reviewTransaction(.delegate(.failed)):

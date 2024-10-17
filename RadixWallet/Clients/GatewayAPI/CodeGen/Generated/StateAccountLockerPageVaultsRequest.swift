@@ -11,23 +11,23 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.StateAccountLockerPageVaultsRequest")
-public typealias StateAccountLockerPageVaultsRequest = GatewayAPI.StateAccountLockerPageVaultsRequest
+typealias StateAccountLockerPageVaultsRequest = GatewayAPI.StateAccountLockerPageVaultsRequest
 
 extension GatewayAPI {
 
-public struct StateAccountLockerPageVaultsRequest: Codable, Hashable {
+struct StateAccountLockerPageVaultsRequest: Codable, Hashable {
 
-    public private(set) var atLedgerState: LedgerStateSelector?
+    private(set) var atLedgerState: LedgerStateSelector?
     /** This cursor allows forward pagination, by providing the cursor from the previous request. */
-    public private(set) var cursor: String?
+    private(set) var cursor: String?
     /** The page size requested. */
-    public private(set) var limitPerPage: Int?
+    private(set) var limitPerPage: Int?
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var lockerAddress: String
+    private(set) var lockerAddress: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var accountAddress: String
+    private(set) var accountAddress: String
 
-    public init(atLedgerState: LedgerStateSelector? = nil, cursor: String? = nil, limitPerPage: Int? = nil, lockerAddress: String, accountAddress: String) {
+    init(atLedgerState: LedgerStateSelector? = nil, cursor: String? = nil, limitPerPage: Int? = nil, lockerAddress: String, accountAddress: String) {
         self.atLedgerState = atLedgerState
         self.cursor = cursor
         self.limitPerPage = limitPerPage
@@ -35,7 +35,7 @@ public struct StateAccountLockerPageVaultsRequest: Codable, Hashable {
         self.accountAddress = accountAddress
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case atLedgerState = "at_ledger_state"
         case cursor
         case limitPerPage = "limit_per_page"
@@ -45,7 +45,7 @@ public struct StateAccountLockerPageVaultsRequest: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(atLedgerState, forKey: .atLedgerState)
         try container.encodeIfPresent(cursor, forKey: .cursor)

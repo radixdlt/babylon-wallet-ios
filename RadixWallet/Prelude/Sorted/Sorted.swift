@@ -1,7 +1,7 @@
 // MARK: - Sorted
 @propertyWrapper
-public struct Sorted<S: Sequence, Value: Comparable> {
-	public var wrappedValue: S {
+struct Sorted<S: Sequence, Value: Comparable> {
+	var wrappedValue: S {
 		get {
 			fromArray(
 				_wrappedValue.sorted(by: { lhs, rhs in
@@ -18,7 +18,7 @@ public struct Sorted<S: Sequence, Value: Comparable> {
 	private let keyPath: KeyPath<S.Element, Value>
 	private let fromArray: @Sendable ([S.Element]) -> S
 
-	public init(
+	init(
 		wrappedValue: S,
 		by keyPath: KeyPath<S.Element, Value>,
 		fromArray: @escaping @Sendable ([S.Element]) -> S
@@ -34,14 +34,14 @@ extension Sorted: Sendable where S: Sendable, Value: Sendable {}
 
 // MARK: Equatable
 extension Sorted: Equatable where S: Equatable {
-	public static func == (lhs: Self, rhs: Self) -> Bool {
+	static func == (lhs: Self, rhs: Self) -> Bool {
 		lhs._wrappedValue == rhs._wrappedValue && lhs.keyPath == rhs.keyPath
 	}
 }
 
 // MARK: Hashable
 extension Sorted: Hashable where S: Hashable {
-	public func hash(into hasher: inout Hasher) {
+	func hash(into hasher: inout Hasher) {
 		hasher.combine(_wrappedValue)
 		hasher.combine(keyPath)
 	}
@@ -50,7 +50,7 @@ extension Sorted: Hashable where S: Hashable {
 // MARK: Default Conformances
 
 extension Sorted {
-	public init<E>(
+	init<E>(
 		wrappedValue: S,
 		by keyPath: KeyPath<E, Value>
 	) where S == [E] {
@@ -61,7 +61,7 @@ extension Sorted {
 }
 
 extension Sorted {
-	public init<E>(
+	init<E>(
 		wrappedValue: S,
 		by keyPath: KeyPath<E, Value>
 	) where S == IdentifiedArrayOf<E>, E: Identifiable {

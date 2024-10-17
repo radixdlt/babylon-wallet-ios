@@ -10,15 +10,15 @@ extension NormalFeesCustomization.State {
 }
 
 extension NormalFeesCustomization {
-	public struct ViewState: Equatable, Sendable {
+	struct ViewState: Equatable, Sendable {
 		let feesViewState: FeesView.ViewState
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		let store: StoreOf<NormalFeesCustomization>
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState) { viewStore in
 				FeesView(viewState: viewStore.feesViewState)
 			}

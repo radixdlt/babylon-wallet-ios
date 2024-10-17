@@ -1,41 +1,41 @@
 
 extension StringProtocol {
-	public var isBlank: Bool {
+	var isBlank: Bool {
 		trimmingWhitespacesAndNewlines().isEmpty
 	}
 
 	/// Trims whitespaces
-	public func trimmingWhitespace() -> String {
+	func trimmingWhitespace() -> String {
 		trimmingCharacters(in: .whitespaces)
 	}
 
 	/// Trims newlines
-	public func trimmingNewlines() -> String {
+	func trimmingNewlines() -> String {
 		trimmingCharacters(in: .newlines)
 	}
 
 	/// Trims whitespaces and newlines
-	public func trimmingWhitespacesAndNewlines() -> String {
+	func trimmingWhitespacesAndNewlines() -> String {
 		trimmingCharacters(in: .whitespacesAndNewlines)
 	}
 
-	public func lines() -> Int {
+	func lines() -> Int {
 		split(separator: "\n", omittingEmptySubsequences: false).count
 	}
 
-	public var nilIfBlank: Self? {
+	var nilIfBlank: Self? {
 		isBlank ? nil : self
 	}
 }
 
 extension Optional where Wrapped: StringProtocol {
-	public var isNilOrBlank: Bool {
+	var isNilOrBlank: Bool {
 		self == nil || self?.isBlank == true
 	}
 }
 
 extension String {
-	public var isEmailAddress: Bool {
+	var isEmailAddress: Bool {
 		// Adapted from https://www.swiftbysundell.com/articles/validating-email-addresses
 
 		let detector = try? NSDataDetector(

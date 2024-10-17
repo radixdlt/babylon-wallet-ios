@@ -6,8 +6,8 @@ typealias RequestEnvelope = DappInteractionClient.RequestEnvelope
 
 // MARK: Identifiable
 extension RequestEnvelope: Identifiable {
-	public typealias ID = WalletInteractionId
-	public var id: ID {
+	typealias ID = WalletInteractionId
+	var id: ID {
 		interaction.interactionId
 	}
 }
@@ -18,7 +18,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		var requestQueue: IdentifiedArrayOf<RequestEnvelope> = []
 
 		@PresentationState
-		public var destination: Destination.State?
+		var destination: Destination.State?
 
 		fileprivate var shouldIncrementOnCompletionDismiss = false
 	}

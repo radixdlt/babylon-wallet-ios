@@ -11,28 +11,28 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.EntityMetadataItem")
-public typealias EntityMetadataItem = GatewayAPI.EntityMetadataItem
+typealias EntityMetadataItem = GatewayAPI.EntityMetadataItem
 
 extension GatewayAPI {
 
 /** Entity metadata key-value pair. */
-public struct EntityMetadataItem: Codable, Hashable {
+struct EntityMetadataItem: Codable, Hashable {
 
     /** Entity metadata key. */
-    public private(set) var key: String
-    public private(set) var value: EntityMetadataItemValue
-    public private(set) var isLocked: Bool
+    private(set) var key: String
+    private(set) var value: EntityMetadataItemValue
+    private(set) var isLocked: Bool
     /** The most recent state version underlying object was modified at. */
-    public private(set) var lastUpdatedAtStateVersion: Int64
+    private(set) var lastUpdatedAtStateVersion: Int64
 
-    public init(key: String, value: EntityMetadataItemValue, isLocked: Bool, lastUpdatedAtStateVersion: Int64) {
+    init(key: String, value: EntityMetadataItemValue, isLocked: Bool, lastUpdatedAtStateVersion: Int64) {
         self.key = key
         self.value = value
         self.isLocked = isLocked
         self.lastUpdatedAtStateVersion = lastUpdatedAtStateVersion
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case key
         case value
         case isLocked = "is_locked"
@@ -41,7 +41,7 @@ public struct EntityMetadataItem: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(key, forKey: .key)
         try container.encode(value, forKey: .value)

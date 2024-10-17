@@ -1,7 +1,7 @@
 import Foundation
 
 // MARK: - TrackedPoolInteraction
-public protocol TrackedPoolInteraction {
+protocol TrackedPoolInteraction {
 	var poolAddress: PoolAddress { get }
 	var poolUnitsResourceAddress: ResourceAddress { get }
 	var poolUnitsAmount: Decimal192 { get set }
@@ -11,7 +11,7 @@ public protocol TrackedPoolInteraction {
 
 // MARK: - TrackedPoolContribution + TrackedPoolInteraction
 extension TrackedPoolContribution: TrackedPoolInteraction {
-	public var resourcesInInteraction: [ResourceAddress: Decimal192] {
+	var resourcesInInteraction: [ResourceAddress: Decimal192] {
 		get { contributedResources }
 		set { contributedResources = newValue }
 	}
@@ -19,14 +19,14 @@ extension TrackedPoolContribution: TrackedPoolInteraction {
 
 // MARK: - TrackedPoolRedemption + TrackedPoolInteraction
 extension TrackedPoolRedemption: TrackedPoolInteraction {
-	public var resourcesInInteraction: [ResourceAddress: Decimal192] {
+	var resourcesInInteraction: [ResourceAddress: Decimal192] {
 		get { redeemedResources }
 		set { redeemedResources = newValue }
 	}
 }
 
 extension Collection where Element: TrackedPoolInteraction {
-	public var aggregated: [Element] {
+	var aggregated: [Element] {
 		var result: [Element] = []
 		for poolInteraction in self {
 			// Make sure no contribution is empty
@@ -42,7 +42,7 @@ extension Collection where Element: TrackedPoolInteraction {
 }
 
 extension TrackedPoolInteraction {
-	public mutating func add(_ other: Self) {
+	mutating func add(_ other: Self) {
 		guard other.poolAddress == poolAddress, other.poolUnitsResourceAddress == poolUnitsResourceAddress else {
 			assertionFailure("The pools should have the same address and pool unit")
 			return

@@ -4,14 +4,14 @@ import SwiftUI
 // MARK: - CameraPermission.View
 extension CameraPermission {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<CameraPermission>
 
-		public init(store: StoreOf<CameraPermission>) {
+		init(store: StoreOf<CameraPermission>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			ZStack {}
 				.alert(
 					store: store.scope(
@@ -40,6 +40,6 @@ struct CameraPermission_Preview: PreviewProvider {
 }
 
 extension CameraPermission.State {
-	public static let previewValue: Self = .init()
+	static let previewValue: Self = .init()
 }
 #endif

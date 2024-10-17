@@ -1,10 +1,10 @@
 import Foundation
 
 // MARK: - InfoLinkSheet
-public struct InfoLinkSheet: FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public let image: ImageAsset?
-		public let text: String
+struct InfoLinkSheet: FeatureReducer {
+	struct State: Sendable, Hashable {
+		let image: ImageAsset?
+		let text: String
 
 		init(glossaryItem: InfoLinkSheet.GlossaryItem) {
 			self.image = glossaryItem.image
@@ -12,13 +12,13 @@ public struct InfoLinkSheet: FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable, Sendable {
 		case infoLinkTapped(InfoLinkSheet.GlossaryItem)
 	}
 
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .infoLinkTapped(item):
 			state = .init(glossaryItem: item)
@@ -29,7 +29,7 @@ public struct InfoLinkSheet: FeatureReducer {
 
 // MARK: InfoLinkSheet.GlossaryItem
 extension InfoLinkSheet {
-	public enum GlossaryItem: String, Sendable {
+	enum GlossaryItem: String, Sendable {
 		case tokens
 		case nfts
 		case networkstaking
@@ -64,7 +64,7 @@ extension InfoLinkSheet {
 extension InfoLinkSheet.GlossaryItem {
 	private static let fieldName = "glossaryAnchor"
 
-	public init?(url: URL) {
+	init?(url: URL) {
 		guard url.scheme == nil, url.host == nil, url.pathComponents.isEmpty, let query = url.query() else {
 			return nil
 		}

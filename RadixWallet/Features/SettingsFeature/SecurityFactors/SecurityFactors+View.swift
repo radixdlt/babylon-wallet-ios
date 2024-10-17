@@ -10,7 +10,7 @@ extension SecurityFactors.State {
 
 // MARK: - SecurityFactors.View
 
-public extension SecurityFactors {
+extension SecurityFactors {
 	struct ViewState: Equatable {
 		let seedPhrasesCount: Int?
 		let ledgerWalletsCount: Int?
@@ -21,11 +21,11 @@ public extension SecurityFactors {
 	struct View: SwiftUI.View {
 		private let store: StoreOf<SecurityFactors>
 
-		public init(store: StoreOf<SecurityFactors>) {
+		init(store: StoreOf<SecurityFactors>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			content
 				.radixToolbar(title: L10n.SecurityFactors.title)
 				.tint(.app.gray1)

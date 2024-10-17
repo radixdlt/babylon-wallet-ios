@@ -11,38 +11,38 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.CommittedTransactionInfo")
-public typealias CommittedTransactionInfo = GatewayAPI.CommittedTransactionInfo
+typealias CommittedTransactionInfo = GatewayAPI.CommittedTransactionInfo
 
 extension GatewayAPI {
 
-public struct CommittedTransactionInfo: Codable, Hashable {
+struct CommittedTransactionInfo: Codable, Hashable {
 
-    public private(set) var stateVersion: Int64
-    public private(set) var epoch: Int64
-    public private(set) var round: Int64
-    public private(set) var roundTimestamp: String
-    public private(set) var transactionStatus: TransactionStatus
+    private(set) var stateVersion: Int64
+    private(set) var epoch: Int64
+    private(set) var round: Int64
+    private(set) var roundTimestamp: String
+    private(set) var transactionStatus: TransactionStatus
     /** Bech32m-encoded hash. */
-    public private(set) var payloadHash: String?
+    private(set) var payloadHash: String?
     /** Bech32m-encoded hash. */
-    public private(set) var intentHash: String?
+    private(set) var intentHash: String?
     /** String-encoded decimal representing the amount of a related fungible resource. */
-    public private(set) var feePaid: String?
-    public private(set) var affectedGlobalEntities: [String]?
-    public private(set) var confirmedAt: Date?
-    public private(set) var errorMessage: String?
+    private(set) var feePaid: String?
+    private(set) var affectedGlobalEntities: [String]?
+    private(set) var confirmedAt: Date?
+    private(set) var errorMessage: String?
     /** Hex-encoded binary blob. */
-    public private(set) var rawHex: String?
-    public private(set) var receipt: TransactionReceipt?
+    private(set) var rawHex: String?
+    private(set) var receipt: TransactionReceipt?
     /** A text-representation of a transaction manifest. This field will be present only for user transactions and when explicitly opted-in using `manifest_instructions` flag.  */
-    public private(set) var manifestInstructions: String?
+    private(set) var manifestInstructions: String?
     /** A collection of zero or more manifest classes ordered from the most specific class to the least specific one. This field will be present only for user transactions.  */
-    public private(set) var manifestClasses: [ManifestClass]?
+    private(set) var manifestClasses: [ManifestClass]?
     /** The optional transaction message. This type is defined in the Core API as `TransactionMessage`. See the Core API documentation for more details.  */
-	public private(set) var message: CoreAPI.TransactionMessage?
-    public private(set) var balanceChanges: TransactionBalanceChanges?
+	private(set) var message: CoreAPI.TransactionMessage?
+    private(set) var balanceChanges: TransactionBalanceChanges?
 
-    public init(stateVersion: Int64, epoch: Int64, round: Int64, roundTimestamp: String, transactionStatus: TransactionStatus, payloadHash: String? = nil, intentHash: String? = nil, feePaid: String? = nil, affectedGlobalEntities: [String]? = nil, confirmedAt: Date? = nil, errorMessage: String? = nil, rawHex: String? = nil, receipt: TransactionReceipt? = nil, manifestInstructions: String? = nil, manifestClasses: [ManifestClass]? = nil, message: CoreAPI.TransactionMessage? = nil, balanceChanges: TransactionBalanceChanges? = nil) {
+    init(stateVersion: Int64, epoch: Int64, round: Int64, roundTimestamp: String, transactionStatus: TransactionStatus, payloadHash: String? = nil, intentHash: String? = nil, feePaid: String? = nil, affectedGlobalEntities: [String]? = nil, confirmedAt: Date? = nil, errorMessage: String? = nil, rawHex: String? = nil, receipt: TransactionReceipt? = nil, manifestInstructions: String? = nil, manifestClasses: [ManifestClass]? = nil, message: CoreAPI.TransactionMessage? = nil, balanceChanges: TransactionBalanceChanges? = nil) {
         self.stateVersion = stateVersion
         self.epoch = epoch
         self.round = round
@@ -62,7 +62,7 @@ public struct CommittedTransactionInfo: Codable, Hashable {
         self.balanceChanges = balanceChanges
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case stateVersion = "state_version"
         case epoch
         case round
@@ -84,7 +84,7 @@ public struct CommittedTransactionInfo: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(stateVersion, forKey: .stateVersion)
         try container.encode(epoch, forKey: .epoch)

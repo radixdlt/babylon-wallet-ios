@@ -4,14 +4,14 @@ import SwiftUI
 // MARK: - PersonasCoordinator.View
 extension PersonasCoordinator {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<PersonasCoordinator>
 
-		public init(store: StoreOf<PersonasCoordinator>) {
+		init(store: StoreOf<PersonasCoordinator>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			PersonaList.View(store: store.personaList)
 				.onAppear { store.send(.view(.appeared)) }
 				.destinations(with: store)
@@ -77,6 +77,6 @@ struct PersonasCoordinator_Preview: PreviewProvider {
 }
 
 extension PersonasCoordinator.State {
-	public static let previewValue: Self = .init()
+	static let previewValue: Self = .init()
 }
 #endif

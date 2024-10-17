@@ -2,9 +2,9 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - DisplayEntitiesControlledByMnemonic
-public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable, Identifiable {
-		public enum ID: Sendable, Hashable {
+struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable, Identifiable {
+		enum ID: Sendable, Hashable {
 			/// Mixture of account sets, including both:
 			/// * "Babylon accounts" (controlled by keys on `Curve25519`)
 			/// * "Olympia accounts" (controlled by keys on curve `secp256k1`)
@@ -18,7 +18,7 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 			/// - "Olympia accounts" (controlled by keys on curve `secp256k1`)
 			case singleCurve(FactorSourceIDFromHash, isOlympia: Bool)
 
-			public var factorSourceID: FactorSourceIDFromHash {
+			var factorSourceID: FactorSourceIDFromHash {
 				switch self {
 				case let .mixedCurves(id): id
 				case let .singleCurve(id, _): id
@@ -26,22 +26,22 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 			}
 		}
 
-		public let id: ID
+		let id: ID
 
-		public var isMnemonicMarkedAsBackedUp: Bool
-		public var isMnemonicPresentInKeychain: Bool
-		public let accounts: IdentifiedArrayOf<Account>
-		public let hiddenAccountsCount: Int
-		public let personasCount: Int
-		public var mode: Mode
+		var isMnemonicMarkedAsBackedUp: Bool
+		var isMnemonicPresentInKeychain: Bool
+		let accounts: IdentifiedArrayOf<Account>
+		let hiddenAccountsCount: Int
+		let personasCount: Int
+		var mode: Mode
 
-		public enum Mode: Sendable, Hashable {
+		enum Mode: Sendable, Hashable {
 			case mnemonicCanBeDisplayed
 			case mnemonicNeedsImport
 			case displayAccountListOnly
 		}
 
-		public init(
+		init(
 			id: ID,
 			isMnemonicMarkedAsBackedUp: Bool,
 			isMnemonicPresentInKeychain: Bool,
@@ -59,7 +59,7 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 			self.mode = mode
 		}
 
-		public init(
+		init(
 			entitiesControlledByKeysOnSameCurve entitiesSet: EntitiesControlledByFactorSource.EntitiesControlledByKeysOnSameCurve,
 			problems: [SecurityProblem]
 		) {
@@ -78,19 +78,19 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case appeared
 		case navigateButtonTapped
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case displayMnemonic
 		case importMissingMnemonic
 	}
 
-	public init() {}
+	init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return .none

@@ -11,11 +11,11 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.PackageVmType")
-public typealias PackageVmType = GatewayAPI.PackageVmType
+typealias PackageVmType = GatewayAPI.PackageVmType
 
 extension GatewayAPI {
 
-public enum PackageVmType: String, Codable, CaseIterable {
+enum PackageVmType: String, Codable, CaseIterable {
     case native = "Native"
     case scryptoV1 = "ScryptoV1"
 }

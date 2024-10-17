@@ -11,25 +11,25 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.AccountAuthorizedDepositorsResourceBadge")
-public typealias AccountAuthorizedDepositorsResourceBadge = GatewayAPI.AccountAuthorizedDepositorsResourceBadge
+typealias AccountAuthorizedDepositorsResourceBadge = GatewayAPI.AccountAuthorizedDepositorsResourceBadge
 
 extension GatewayAPI {
 
-public struct AccountAuthorizedDepositorsResourceBadge: Codable, Hashable {
+struct AccountAuthorizedDepositorsResourceBadge: Codable, Hashable {
 
-    public private(set) var badgeType: AccountAuthorizedDepositorBadgeType
+    private(set) var badgeType: AccountAuthorizedDepositorBadgeType
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var resourceAddress: String
+    private(set) var resourceAddress: String
     /** The most recent state version underlying object was modified at. */
-    public private(set) var lastUpdatedAtStateVersion: Int64
+    private(set) var lastUpdatedAtStateVersion: Int64
 
-    public init(badgeType: AccountAuthorizedDepositorBadgeType, resourceAddress: String, lastUpdatedAtStateVersion: Int64) {
+    init(badgeType: AccountAuthorizedDepositorBadgeType, resourceAddress: String, lastUpdatedAtStateVersion: Int64) {
         self.badgeType = badgeType
         self.resourceAddress = resourceAddress
         self.lastUpdatedAtStateVersion = lastUpdatedAtStateVersion
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case badgeType = "badge_type"
         case resourceAddress = "resource_address"
         case lastUpdatedAtStateVersion = "last_updated_at_state_version"
@@ -37,7 +37,7 @@ public struct AccountAuthorizedDepositorsResourceBadge: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(badgeType, forKey: .badgeType)
         try container.encode(resourceAddress, forKey: .resourceAddress)

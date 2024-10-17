@@ -50,7 +50,7 @@ struct AssetBehaviorRow: View {
 }
 
 extension AssetBehavior {
-	public func text(isXRD: Bool) -> String {
+	func text(isXRD: Bool) -> String {
 		switch self {
 		case .simpleAsset:
 			L10n.AssetDetails.Behaviors.simpleAsset
@@ -95,7 +95,7 @@ extension AssetBehavior {
 		}
 	}
 
-	public var icon: ImageAsset {
+	var icon: ImageAsset {
 		switch self {
 		case .simpleAsset: AssetResource.simpleAsset
 		case .supplyIncreasable: AssetResource.supplyIncreasable

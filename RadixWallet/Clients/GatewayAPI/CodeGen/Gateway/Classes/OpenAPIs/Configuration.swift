@@ -10,7 +10,7 @@ import FoundationNetworking
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.Configuration")
-public typealias Configuration = GatewayAPI.Configuration
+typealias Configuration = GatewayAPI.Configuration
 
 extension GatewayAPI {
 open class Configuration {
@@ -18,7 +18,7 @@ open class Configuration {
     /// Configures the range of HTTP status codes that will result in a successful response
     ///
     /// If a HTTP status code is outside of this range the response will be interpreted as failed.
-    public static var successfulStatusCodeRange: Range = 200..<300
+    static var successfulStatusCodeRange: Range = 200..<300
 }
 }
 

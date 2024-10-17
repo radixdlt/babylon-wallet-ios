@@ -2,28 +2,28 @@
 import Sargon
 
 // MARK: - DebugKeychainContents
-public struct DebugKeychainContents: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public var keyedMnemonics: IdentifiedArrayOf<KeyedMnemonicWithMetadata> = []
-		public init() {}
+struct DebugKeychainContents: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		var keyedMnemonics: IdentifiedArrayOf<KeyedMnemonicWithMetadata> = []
+		init() {}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case task
 		case deleteMnemonicByFactorSourceID(FactorSourceIDFromHash)
 		case deleteAllMnemonics
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case loadedMnemonics([KeyedMnemonicWithMetadata])
 	}
 
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.secureStorageClient) var secureStorageClient
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
-	public init() {}
+	init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			loadKeyValues()
@@ -36,7 +36,7 @@ public struct DebugKeychainContents: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadedMnemonics(mnemonics):
 			state.keyedMnemonics = mnemonics.asIdentified()
@@ -81,11 +81,11 @@ public struct DebugKeychainContents: Sendable, FeatureReducer {
 	}
 }
 
-public struct KeyedMnemonicWithMetadata: Sendable, Hashable, Identifiable {
-	public let keyedMnemonic: KeyedMnemonicWithPassphrase
-	public typealias ID = FactorSourceIDFromHash
-	public var id: ID { keyedMnemonic.factorSourceID }
-	public let entitiesControlledByFactorSource: EntitiesControlledByFactorSource?
+struct KeyedMnemonicWithMetadata: Sendable, Hashable, Identifiable {
+	let keyedMnemonic: KeyedMnemonicWithPassphrase
+	typealias ID = FactorSourceIDFromHash
+	var id: ID { keyedMnemonic.factorSourceID }
+	let entitiesControlledByFactorSource: EntitiesControlledByFactorSource?
 	init(keyedMnemonic: KeyedMnemonicWithPassphrase, entitiesControlledByFactorSource: EntitiesControlledByFactorSource? = nil) {
 		self.keyedMnemonic = keyedMnemonic
 		self.entitiesControlledByFactorSource = entitiesControlledByFactorSource

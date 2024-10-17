@@ -1,6 +1,6 @@
 
 extension OnLedgerEntity.Metadata {
-	public init(_ raw: GatewayAPI.EntityMetadataCollection?) {
+	init(_ raw: GatewayAPI.EntityMetadataCollection?) {
 		self.init(
 			name: raw?.name,
 			symbol: raw?.symbol,
@@ -25,7 +25,7 @@ extension OnLedgerEntity.Metadata {
 }
 
 extension OnLedgerEntity.Metadata {
-	public enum MetadataError: Error, CustomStringConvertible {
+	enum MetadataError: Error, CustomStringConvertible {
 		case missingName
 		case missingDappDefinition
 		case accountTypeNotDappDefinition
@@ -35,7 +35,7 @@ extension OnLedgerEntity.Metadata {
 		case websiteNotClaimed
 		case dAppDefinitionNotReciprocating
 
-		public var description: String {
+		var description: String {
 			switch self {
 			case .missingName:
 				"The entity has no name"
@@ -58,14 +58,14 @@ extension OnLedgerEntity.Metadata {
 	}
 
 	/// Check that `account_type` is present and equal to `dapp_definition`
-	public func validateAccountType() throws {
+	func validateAccountType() throws {
 		guard accountType == .dappDefinition else {
 			throw MetadataError.accountTypeNotDappDefinition
 		}
 	}
 
 	/// Check that `claimed_entities` is present and contains the provided `Address`
-	public func validate(dAppEntity entity: Address) throws {
+	func validate(dAppEntity entity: Address) throws {
 		guard let claimedEntities else {
 			throw MetadataError.missingClaimedEntities
 		}
@@ -76,7 +76,7 @@ extension OnLedgerEntity.Metadata {
 	}
 
 	/// Check that `claimed_websites`is present and contains the provided website `URL`
-	public func validate(website: URL) throws {
+	func validate(website: URL) throws {
 		guard let claimedWebsites else {
 			throw MetadataError.missingClaimedWebsites
 		}
@@ -87,7 +87,7 @@ extension OnLedgerEntity.Metadata {
 	}
 
 	/// Validate that `dapp_definitions` is present and contains the provided `dAppDefinitionAddress`
-	public func validate(dAppDefinitionAddress: DappDefinitionAddress) throws {
+	func validate(dAppDefinitionAddress: DappDefinitionAddress) throws {
 		guard let dappDefinitions, dappDefinitions.contains(dAppDefinitionAddress) else {
 			throw MetadataError.dAppDefinitionNotReciprocating
 		}
@@ -95,31 +95,31 @@ extension OnLedgerEntity.Metadata {
 }
 
 extension GatewayAPI.EntityMetadataItemValue {
-	public var asString: String? {
+	var asString: String? {
 		typed.stringValue?.value
 	}
 
-	public var asStringCollection: [String]? {
+	var asStringCollection: [String]? {
 		typed.stringArrayValue?.values
 	}
 
-	public var asURL: URL? {
+	var asURL: URL? {
 		(typed.urlValue?.value).flatMap(URL.init)
 	}
 
-	public var asURLCollection: [URL]? {
+	var asURLCollection: [URL]? {
 		typed.urlArrayValue?.values.compactMap(URL.init)
 	}
 
-	public var asOriginCollection: [URL]? {
+	var asOriginCollection: [URL]? {
 		typed.originArrayValue?.values.compactMap(URL.init)
 	}
 
-	public var asGlobalAddress: String? {
+	var asGlobalAddress: String? {
 		typed.globalAddressValue?.value
 	}
 
-	public var asNonFungibleLocalID: NonFungibleLocalId? {
+	var asNonFungibleLocalID: NonFungibleLocalId? {
 		guard let raw = typed.nonFungibleLocalIdValue?.value else {
 			return nil
 		}
@@ -131,11 +131,11 @@ extension GatewayAPI.EntityMetadataItemValue {
 		}
 	}
 
-	public var asGlobalAddressCollection: [String]? {
+	var asGlobalAddressCollection: [String]? {
 		typed.globalAddressArrayValue?.values
 	}
 
-	public var publicKeyHashes: [OnLedgerEntity.Metadata.PublicKeyHash]? {
+	var publicKeyHashes: [OnLedgerEntity.Metadata.PublicKeyHash]? {
 		typed.publicKeyHashArrayValue?.values.map { OnLedgerEntity.Metadata.PublicKeyHash(raw: $0) }
 	}
 }
@@ -152,68 +152,68 @@ extension OnLedgerEntity.Metadata.PublicKeyHash {
 }
 
 extension GatewayAPI.EntityMetadataCollection {
-	public func value(_ key: EntityMetadataKey) -> GatewayAPI.EntityMetadataItemValue? {
+	func value(_ key: EntityMetadataKey) -> GatewayAPI.EntityMetadataItemValue? {
 		items[key]?.value
 	}
 
-	public var name: String? {
+	var name: String? {
 		value(.name)?.asString
 	}
 
-	public var symbol: String? {
+	var symbol: String? {
 		value(.symbol)?.asString
 	}
 
-	public var description: String? {
+	var description: String? {
 		value(.description)?.asString
 	}
 
-	public var tags: [String]? {
+	var tags: [String]? {
 		value(.tags)?.asStringCollection
 	}
 
-	public var iconURL: URL? {
+	var iconURL: URL? {
 		value(.iconURL)?.asURL
 	}
 
-	public var infoURL: URL? {
+	var infoURL: URL? {
 		value(.infoURL)?.asURL
 	}
 
-	public var dappDefinition: String? {
+	var dappDefinition: String? {
 		value(.dappDefinition)?.asGlobalAddress
 	}
 
-	public var dappDefinitions: [String]? {
+	var dappDefinitions: [String]? {
 		value(.dappDefinitions)?.asStringCollection ?? value(.dappDefinitions)?.asGlobalAddressCollection
 	}
 
-	public var claimedEntities: [String]? {
+	var claimedEntities: [String]? {
 		value(.claimedEntities)?.asGlobalAddressCollection
 	}
 
-	public var claimedWebsites: [URL]? {
+	var claimedWebsites: [URL]? {
 		value(.claimedWebsites)?.asOriginCollection
 	}
 
-	public var accountType: OnLedgerEntity.AccountType? {
+	var accountType: OnLedgerEntity.AccountType? {
 		value(.accountType)?.asString.flatMap(OnLedgerEntity.AccountType.init)
 	}
 
-	public var ownerKeys: OnLedgerEntity.Metadata.PublicKeyHashesWithStateVersion? {
+	var ownerKeys: OnLedgerEntity.Metadata.PublicKeyHashesWithStateVersion? {
 		items[.ownerKeys]?.map(\.publicKeyHashes)
 	}
 
-	public var ownerBadge: OnLedgerEntity.Metadata.OwnerBadgeWithStateVersion? {
+	var ownerBadge: OnLedgerEntity.Metadata.OwnerBadgeWithStateVersion? {
 		items[.ownerBadge]?.map(\.asNonFungibleLocalID)
 	}
 
-	public var arbitraryItems: [OnLedgerEntity.Metadata.ArbitraryItem] {
+	var arbitraryItems: [OnLedgerEntity.Metadata.ArbitraryItem] {
 		let standardKeys = EntityMetadataKey.allCases.map(\.rawValue)
 		return items.filter { !standardKeys.contains($0.key) }
 	}
 
-	public var validator: ValidatorAddress? {
+	var validator: ValidatorAddress? {
 		extract(
 			key: .validator,
 			from: \.asGlobalAddress,
@@ -221,7 +221,7 @@ extension GatewayAPI.EntityMetadataCollection {
 		)
 	}
 
-	public var pool: PoolAddress? {
+	var pool: PoolAddress? {
 		extract(
 			key: .pool,
 			from: \.asGlobalAddress,
@@ -229,7 +229,7 @@ extension GatewayAPI.EntityMetadataCollection {
 		)
 	}
 
-	public var poolUnitResource: ResourceAddress? {
+	var poolUnitResource: ResourceAddress? {
 		extract(
 			key: .poolUnit,
 			from: \.asGlobalAddress,
@@ -273,18 +273,18 @@ extension GatewayAPI.EntityMetadataCollection {
 	}
 }
 
-public typealias AtStateVersion = Int64
+typealias AtStateVersion = Int64
 extension [GatewayAPI.EntityMetadataItem] {
-	public typealias Key = EntityMetadataKey
+	typealias Key = EntityMetadataKey
 
-	public subscript(key: Key) -> OnLedgerEntity.Metadata.ValueAtStateVersion<GatewayAPI.EntityMetadataItemValue>? {
+	subscript(key: Key) -> OnLedgerEntity.Metadata.ValueAtStateVersion<GatewayAPI.EntityMetadataItemValue>? {
 		guard let item = first(where: { $0.key == key.rawValue }) else {
 			return nil
 		}
 		return OnLedgerEntity.Metadata.ValueAtStateVersion(value: item.value, lastUpdatedAtStateVersion: item.lastUpdatedAtStateVersion)
 	}
 
-	public subscript(customKey key: String) -> OnLedgerEntity.Metadata.ValueAtStateVersion<GatewayAPI.EntityMetadataItemValue>? {
+	subscript(customKey key: String) -> OnLedgerEntity.Metadata.ValueAtStateVersion<GatewayAPI.EntityMetadataItemValue>? {
 		guard let item = first(where: { $0.key == key }) else {
 			return nil
 		}
@@ -293,7 +293,7 @@ extension [GatewayAPI.EntityMetadataItem] {
 }
 
 extension GatewayAPI.EntityMetadataCollection {
-	@Sendable public func extractTags() -> [AssetTag] {
+	@Sendable func extractTags() -> [AssetTag] {
 		tags?.compactMap(NonEmptyString.init(rawValue:)).map(AssetTag.init) ?? []
 	}
 }

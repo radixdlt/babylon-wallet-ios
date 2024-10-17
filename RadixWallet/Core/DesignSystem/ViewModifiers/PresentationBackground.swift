@@ -2,14 +2,14 @@ import SwiftUI
 @_spi(Advanced) import SwiftUIIntrospect
 
 // MARK: - PresentationBackground
-public enum PresentationBackground {
+enum PresentationBackground {
 	case blur(style: UIBlurEffect.Style)
 
-	public static let blur: Self = .blur(style: .systemUltraThinMaterialDark)
+	static let blur: Self = .blur(style: .systemUltraThinMaterialDark)
 }
 
 extension View {
-	public func presentationBackground(_ background: PresentationBackground) -> some View {
+	func presentationBackground(_ background: PresentationBackground) -> some View {
 		self.modifier(PresentationBackgroundModifier(background: background))
 	}
 }

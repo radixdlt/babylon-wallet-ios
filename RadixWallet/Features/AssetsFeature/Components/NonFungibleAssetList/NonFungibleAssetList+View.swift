@@ -4,14 +4,14 @@ import SwiftUI
 // MARK: - NonFungibleAssetList.View
 extension NonFungibleAssetList {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<NonFungibleAssetList>
 
-		public init(store: StoreOf<NonFungibleAssetList>) {
+		init(store: StoreOf<NonFungibleAssetList>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			ForEachStore(
 				store.scope(state: \.rows) { .child(.asset($0, $1)) },
 				content: {

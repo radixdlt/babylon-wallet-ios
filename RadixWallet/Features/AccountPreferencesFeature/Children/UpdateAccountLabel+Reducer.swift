@@ -2,8 +2,8 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - UpdateAccountLabel
-public struct UpdateAccountLabel: FeatureReducer, Sendable {
-	public struct State: Hashable, Sendable {
+struct UpdateAccountLabel: FeatureReducer, Sendable {
+	struct State: Hashable, Sendable {
 		var account: Account
 		var accountLabel: String
 		var sanitizedName: NonEmptyString?
@@ -16,13 +16,13 @@ public struct UpdateAccountLabel: FeatureReducer, Sendable {
 		}
 	}
 
-	public enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable, Sendable {
 		case accountLabelChanged(String)
 		case updateTapped(NonEmptyString)
 		case focusChanged(Bool)
 	}
 
-	public enum DelegateAction: Equatable, Sendable {
+	enum DelegateAction: Equatable, Sendable {
 		case accountLabelUpdated
 	}
 
@@ -30,7 +30,7 @@ public struct UpdateAccountLabel: FeatureReducer, Sendable {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .accountLabelChanged(label):
 			state.accountLabel = label

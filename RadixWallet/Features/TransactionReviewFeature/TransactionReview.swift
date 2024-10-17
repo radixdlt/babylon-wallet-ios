@@ -2,48 +2,48 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - TransactionReview
-public struct TransactionReview: Sendable, FeatureReducer {
-	public typealias Transfer = IDResourceBalance
+struct TransactionReview: Sendable, FeatureReducer {
+	typealias Transfer = IDResourceBalance
 
-	public struct State: Sendable, Hashable {
-		public var displayMode: DisplayMode = .review
+	struct State: Sendable, Hashable {
+		var displayMode: DisplayMode = .review
 
-		public let nonce: Nonce
-		public let unvalidatedManifest: UnvalidatedTransactionManifest
-		public let message: Message
-		public let signTransactionPurpose: SigningPurpose.SignTransactionPurpose
-		public let waitsForTransactionToBeComitted: Bool
-		public let isWalletTransaction: Bool
-		public let proposingDappMetadata: DappMetadata.Ledger?
-		public let p2pRoute: P2P.Route
+		let nonce: Nonce
+		let unvalidatedManifest: UnvalidatedTransactionManifest
+		let message: Message
+		let signTransactionPurpose: SigningPurpose.SignTransactionPurpose
+		let waitsForTransactionToBeComitted: Bool
+		let isWalletTransaction: Bool
+		let proposingDappMetadata: DappMetadata.Ledger?
+		let p2pRoute: P2P.Route
 
-		public var networkID: NetworkID? { reviewedTransaction?.networkID }
+		var networkID: NetworkID? { reviewedTransaction?.networkID }
 
-		public var reviewedTransaction: ReviewedTransaction? = nil
+		var reviewedTransaction: ReviewedTransaction? = nil
 
-		public var withdrawals: TransactionReviewAccounts.State? = nil
-		public var dAppsUsed: TransactionReviewDappsUsed.State? = nil
-		public var contributingToPools: TransactionReviewPools.State? = nil
-		public var redeemingFromPools: TransactionReviewPools.State? = nil
-		public var deposits: TransactionReviewAccounts.State? = nil
+		var withdrawals: TransactionReviewAccounts.State? = nil
+		var dAppsUsed: TransactionReviewDappsUsed.State? = nil
+		var contributingToPools: TransactionReviewPools.State? = nil
+		var redeemingFromPools: TransactionReviewPools.State? = nil
+		var deposits: TransactionReviewAccounts.State? = nil
 
-		public var stakingToValidators: ValidatorsState? = nil
-		public var unstakingFromValidators: ValidatorsState? = nil
-		public var claimingFromValidators: ValidatorsState? = nil
+		var stakingToValidators: ValidatorsState? = nil
+		var unstakingFromValidators: ValidatorsState? = nil
+		var claimingFromValidators: ValidatorsState? = nil
 
-		public var accountDepositSetting: DepositSettingState? = nil
-		public var accountDepositExceptions: DepositExceptionsState? = nil
+		var accountDepositSetting: DepositSettingState? = nil
+		var accountDepositExceptions: DepositExceptionsState? = nil
 
-		public var proofs: TransactionReviewProofs.State? = nil
-		public var networkFee: TransactionReviewNetworkFee.State? = nil
-		public let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey
-		public var canApproveTX: Bool = true
+		var proofs: TransactionReviewProofs.State? = nil
+		var networkFee: TransactionReviewNetworkFee.State? = nil
+		let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey
+		var canApproveTX: Bool = true
 		var sliderResetDate: Date = .now
 
 		@PresentationState
-		public var destination: Destination.State? = nil
+		var destination: Destination.State? = nil
 
-		public func printFeePayerInfo(line: UInt = #line, function: StaticString = #function) {
+		func printFeePayerInfo(line: UInt = #line, function: StaticString = #function) {
 			#if DEBUG
 			func doPrint(_ msg: String) {
 				loggerGlobal.info("\(function)#\(line) - \(msg)")
@@ -69,11 +69,11 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			#endif
 		}
 
-		public mutating func resetSlider() {
+		mutating func resetSlider() {
 			sliderResetDate = .now
 		}
 
-		public init(
+		init(
 			unvalidatedManifest: UnvalidatedTransactionManifest,
 			nonce: Nonce,
 			signTransactionPurpose: SigningPurpose.SignTransactionPurpose,
@@ -95,7 +95,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			self.p2pRoute = p2pRoute
 		}
 
-		public enum DisplayMode: Sendable, Hashable {
+		enum DisplayMode: Sendable, Hashable {
 			case review
 			case raw(String)
 
@@ -106,7 +106,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case appeared
 		case showRawTransactionTapped
 		case copyRawTransactionTapped
@@ -119,7 +119,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case approvalSliderSlid
 	}
 
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case withdrawals(TransactionReviewAccounts.Action)
 		case deposits(TransactionReviewAccounts.Action)
 		case dAppsUsed(TransactionReviewDappsUsed.Action)
@@ -129,7 +129,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case networkFee(TransactionReviewNetworkFee.Action)
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case previewLoaded(TaskResult<TransactionToReview>)
 		case updateSections(TransactionReview.Sections?)
 		case buildTransactionIntentResult(TaskResult<TransactionIntent>)
@@ -137,15 +137,15 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case determineFeePayerResult(TaskResult<FeePayerSelectionResult?>)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case failed(TransactionFailure)
 		case signedTXAndSubmittedToGateway(IntentHash)
 		case transactionCompleted(IntentHash)
 		case dismiss
 	}
 
-	public struct Destination: DestinationReducer {
-		public enum State: Sendable, Hashable {
+	struct Destination: DestinationReducer {
+		enum State: Sendable, Hashable {
 			case customizeGuarantees(TransactionReviewGuarantees.State)
 			case signing(Signing.State)
 			case submitting(SubmitTransaction.State)
@@ -159,7 +159,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			case rawTransactionAlert(AlertState<Action.RawTransactionAlert>)
 		}
 
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case customizeGuarantees(TransactionReviewGuarantees.Action)
 			case signing(Signing.Action)
 			case submitting(SubmitTransaction.Action)
@@ -172,12 +172,12 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			case unknownDappComponents(UnknownDappComponents.Action)
 			case rawTransactionAlert(RawTransactionAlert)
 
-			public enum RawTransactionAlert: Sendable, Equatable {
+			enum RawTransactionAlert: Sendable, Equatable {
 				case continueTapped
 			}
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: /State.customizeGuarantees, action: /Action.customizeGuarantees) {
 				TransactionReviewGuarantees()
 			}
@@ -220,9 +220,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.pasteboardClient) var pasteboardClient
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.networkFee, action: /Action.child .. ChildAction.networkFee) {
 				TransactionReviewNetworkFee()
@@ -252,7 +252,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return .run { [state = state] send in
@@ -352,7 +352,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .withdrawals(.delegate(.showAsset(transfer, token))),
 		     let .deposits(.delegate(.showAsset(transfer, token))):
@@ -406,7 +406,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .previewLoaded(.failure(error)):
 			loggerGlobal.error("Transaction preview failed, error: \(error)")
@@ -522,7 +522,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .customizeGuarantees(.delegate(.applyGuarantees(guaranteeStates))):
 			for guaranteeState in guaranteeStates {
@@ -578,7 +578,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
 		if case .signing = state.destination {
 			loggerGlobal.notice("Cancelled signing")
 			return resetToApprovable(&state)
@@ -744,13 +744,13 @@ extension TransactionReview {
 }
 
 // MARK: - FailedToAddLockFee
-public struct FailedToAddLockFee: LocalizedError {
-	public let underlyingError: Swift.Error
-	public init(underlyingError: Swift.Error) {
+struct FailedToAddLockFee: LocalizedError {
+	let underlyingError: Swift.Error
+	init(underlyingError: Swift.Error) {
 		self.underlyingError = underlyingError
 	}
 
-	public var errorDescription: String? {
+	var errorDescription: String? {
 		#if DEBUG
 		L10n.Error.TransactionFailure.failedToAddLockFee + "\n[DEBUG ONLY]: \(String(describing: underlyingError))"
 		#else
@@ -760,13 +760,13 @@ public struct FailedToAddLockFee: LocalizedError {
 }
 
 // MARK: - FailedToAddGuarantee
-public struct FailedToAddGuarantee: LocalizedError {
-	public let underlyingError: Swift.Error
-	public init(underlyingError: Swift.Error) {
+struct FailedToAddGuarantee: LocalizedError {
+	let underlyingError: Swift.Error
+	init(underlyingError: Swift.Error) {
 		self.underlyingError = underlyingError
 	}
 
-	public var errorDescription: String? {
+	var errorDescription: String? {
 		#if DEBUG
 		L10n.Error.TransactionFailure.failedToAddGuarantee + "\n[DEBUG ONLY]: \(String(describing: underlyingError))"
 		#else
@@ -792,17 +792,17 @@ extension TransactionReview {
 // MARK: Useful types
 
 extension TransactionReview {
-	public struct ProofEntity: Sendable, Identifiable, Hashable {
-		public var id: ResourceBalance { resourceBalance }
-		public let resourceBalance: ResourceBalance
+	struct ProofEntity: Sendable, Identifiable, Hashable {
+		var id: ResourceBalance { resourceBalance }
+		let resourceBalance: ResourceBalance
 	}
 
-	public struct DappEntity: Sendable, Identifiable, Hashable {
-		public let id: DappDefinitionAddress
-		public let metadata: OnLedgerEntity.Metadata
+	struct DappEntity: Sendable, Identifiable, Hashable {
+		let id: DappDefinitionAddress
+		let metadata: OnLedgerEntity.Metadata
 	}
 
-	public enum ReviewAccount: Sendable, Hashable {
+	enum ReviewAccount: Sendable, Hashable {
 		case user(Account)
 		case external(AccountAddress, approved: Bool)
 
@@ -828,7 +828,7 @@ extension TransactionReview {
 
 extension ResourceBalance {
 	/// The guarantee, for a fungible resource
-	public var fungibleGuarantee: TransactionGuarantee? {
+	var fungibleGuarantee: TransactionGuarantee? {
 		get {
 			switch details {
 			case let .fungible(fungible):
@@ -859,7 +859,7 @@ extension ResourceBalance {
 	}
 
 	/// The transferred amount, for a fungible resource
-	public var fungibleTransferAmount: Decimal192? {
+	var fungibleTransferAmount: Decimal192? {
 		switch details {
 		case let .fungible(fungible):
 			fungible.amount.nominalAmount
@@ -874,11 +874,11 @@ extension ResourceBalance {
 }
 
 extension TransactionReview.State {
-	public var allGuarantees: [TransactionGuarantee] {
+	var allGuarantees: [TransactionGuarantee] {
 		deposits?.accounts.flatMap { $0.transfers.compactMap(\.fungibleGuarantee) } ?? []
 	}
 
-	public mutating func applyGuarantee(
+	mutating func applyGuarantee(
 		_ updated: TransactionGuarantee,
 		transferID: TransactionReview.Transfer.ID
 	) {
@@ -914,7 +914,7 @@ extension [TransactionReview.ReviewAccount] {
 }
 
 extension Collection where Element: Equatable {
-	public func count(of element: Element) -> Int {
+	func count(of element: Element) -> Int {
 		var count = 0
 		for e in self where e == element {
 			count += 1
@@ -935,9 +935,9 @@ extension ResourceIndicator {
 }
 
 // MARK: - TransactionReviewFailure
-public struct TransactionReviewFailure: LocalizedError {
-	public let underylying: Swift.Error
-	public var errorDescription: String? {
+struct TransactionReviewFailure: LocalizedError {
+	let underylying: Swift.Error
+	var errorDescription: String? {
 		let additionalInfo = if case TransactionFailure.failedToPrepareTXReview(.oneOfRecevingAccountsDoesNotAllowDeposits) = underylying {
 			"\n\n" + L10n.Error.TransactionFailure.doesNotAllowThirdPartyDeposits
 		} else {
@@ -958,7 +958,7 @@ public struct TransactionReviewFailure: LocalizedError {
 }
 
 // MARK: - ReviewedTransaction
-public struct ReviewedTransaction: Hashable, Sendable {
+struct ReviewedTransaction: Hashable, Sendable {
 	let transactionManifest: TransactionManifest
 	let networkID: NetworkID
 	var feePayer: Loadable<FeePayerCandidate?> = .idle
@@ -973,17 +973,17 @@ public struct ReviewedTransaction: Hashable, Sendable {
 }
 
 // MARK: - FeePayerValidationOutcome
-public enum FeePayerValidationOutcome: Sendable, Hashable {
+enum FeePayerValidationOutcome: Sendable, Hashable {
 	case needsFeePayer
 	case insufficientBalance
 	case valid(Details?)
 
-	public enum Details: Sendable {
+	enum Details: Sendable {
 		case introducesNewAccount
 		case feePayerSuperfluous
 	}
 
-	public var isValid: Bool {
+	var isValid: Bool {
 		guard case .valid = self else { return false }
 		return true
 	}

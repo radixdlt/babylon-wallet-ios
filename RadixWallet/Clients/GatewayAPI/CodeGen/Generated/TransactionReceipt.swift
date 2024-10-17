@@ -11,32 +11,32 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.TransactionReceipt")
-public typealias TransactionReceipt = GatewayAPI.TransactionReceipt
+typealias TransactionReceipt = GatewayAPI.TransactionReceipt
 
 extension GatewayAPI {
 
-public struct TransactionReceipt: Codable, Hashable {
+struct TransactionReceipt: Codable, Hashable {
 
-    public private(set) var status: TransactionStatus?
+    private(set) var status: TransactionStatus?
     /** This type is defined in the Core API as `FeeSummary`. See the Core API documentation for more details.  */
-    public private(set) var feeSummary: AnyCodable?
-    public private(set) var costingParameters: AnyCodable?
+    private(set) var feeSummary: AnyCodable?
+    private(set) var costingParameters: AnyCodable?
     /** This type is defined in the Core API as `FeeDestination`. See the Core API documentation for more details.  */
-    public private(set) var feeDestination: AnyCodable?
+    private(set) var feeDestination: AnyCodable?
     /** This type is defined in the Core API as `FeeSource`. See the Core API documentation for more details.  */
-    public private(set) var feeSource: AnyCodable?
+    private(set) var feeSource: AnyCodable?
     /** This type is defined in the Core API as `StateUpdates`. See the Core API documentation for more details.  */
-    public private(set) var stateUpdates: AnyCodable?
+    private(set) var stateUpdates: AnyCodable?
     /** Information (number and active validator list) about new epoch if occured. This type is defined in the Core API as `NextEpoch`. See the Core API documentation for more details.  */
-    public private(set) var nextEpoch: AnyCodable?
+    private(set) var nextEpoch: AnyCodable?
     /** The manifest line-by-line engine return data (only present if `status` is `CommittedSuccess`). This type is defined in the Core API as `SborData`. See the Core API documentation for more details.  */
-    public private(set) var output: AnyCodable?
+    private(set) var output: AnyCodable?
     /** Events emitted by a transaction. */
-    public private(set) var events: [EventsItem]?
+    private(set) var events: [EventsItem]?
     /** Error message (only present if status is `Failed` or `Rejected`) */
-    public private(set) var errorMessage: String?
+    private(set) var errorMessage: String?
 
-    public init(status: TransactionStatus? = nil, feeSummary: AnyCodable? = nil, costingParameters: AnyCodable? = nil, feeDestination: AnyCodable? = nil, feeSource: AnyCodable? = nil, stateUpdates: AnyCodable? = nil, nextEpoch: AnyCodable? = nil, output: AnyCodable? = nil, events: [EventsItem]? = nil, errorMessage: String? = nil) {
+    init(status: TransactionStatus? = nil, feeSummary: AnyCodable? = nil, costingParameters: AnyCodable? = nil, feeDestination: AnyCodable? = nil, feeSource: AnyCodable? = nil, stateUpdates: AnyCodable? = nil, nextEpoch: AnyCodable? = nil, output: AnyCodable? = nil, events: [EventsItem]? = nil, errorMessage: String? = nil) {
         self.status = status
         self.feeSummary = feeSummary
         self.costingParameters = costingParameters
@@ -49,7 +49,7 @@ public struct TransactionReceipt: Codable, Hashable {
         self.errorMessage = errorMessage
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case status
         case feeSummary = "fee_summary"
         case costingParameters = "costing_parameters"
@@ -64,7 +64,7 @@ public struct TransactionReceipt: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(status, forKey: .status)
         try container.encodeIfPresent(feeSummary, forKey: .feeSummary)

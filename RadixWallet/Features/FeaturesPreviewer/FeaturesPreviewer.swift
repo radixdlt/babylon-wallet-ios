@@ -2,12 +2,12 @@ import ComposableArchitecture
 @_exported import SwiftUI
 
 // MARK: - FeaturesPreviewer
-public struct FeaturesPreviewer<Feature>
+struct FeaturesPreviewer<Feature>
 	where
 	Feature: PreviewedFeature
 {
 	/// Extracts a "result" from `Feature.Action`
-	public static func action(
+	static func action(
 		wrapInNavigationView: Bool = false,
 		resultFromAction: @escaping (Feature.Action) -> TaskResult<Feature.ResultFromFeature>?,
 		withReducer: @escaping (PreviewOfSomeFeatureReducer<Feature>) -> any Reducer<PreviewOfSomeFeatureReducer<Feature>.State, PreviewOfSomeFeatureReducer<Feature>.Action> = { $0._printChanges() }
@@ -32,7 +32,7 @@ public struct FeaturesPreviewer<Feature>
 	}
 
 	/// Extracts a "result" from `Feature.DelegateAction`
-	public static func delegateAction(
+	static func delegateAction(
 		wrapInNavigationView: Bool = false,
 		resultFromDelegateAction: @escaping (Feature.DelegateAction) -> TaskResult<Feature.ResultFromFeature>?,
 		withReducer: @escaping (PreviewOfSomeFeatureReducer<Feature>) -> any Reducer<PreviewOfSomeFeatureReducer<Feature>.State, PreviewOfSomeFeatureReducer<Feature>.Action> = { $0._printChanges() }

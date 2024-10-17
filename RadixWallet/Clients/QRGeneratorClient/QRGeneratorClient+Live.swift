@@ -3,7 +3,7 @@ import CoreImage.CIFilterBuiltins
 
 // MARK: - QRGeneratorClient + DependencyKey
 extension QRGeneratorClient: DependencyKey {
-	public static let liveValue = QRGeneratorClient(generate: generateImage)
+	static let liveValue = QRGeneratorClient(generate: generateImage)
 }
 
 @Sendable

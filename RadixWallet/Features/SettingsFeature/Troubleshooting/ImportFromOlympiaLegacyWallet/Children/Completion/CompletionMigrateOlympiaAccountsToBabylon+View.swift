@@ -41,7 +41,7 @@ extension Account {
 
 // MARK: - CompletionMigrateOlympiaAccountsToBabylon.View
 extension CompletionMigrateOlympiaAccountsToBabylon {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let title: String
 		let subtitle: String
 		let accounts: [AccountToBabylon]
@@ -56,14 +56,14 @@ extension CompletionMigrateOlympiaAccountsToBabylon {
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<CompletionMigrateOlympiaAccountsToBabylon>
 
-		public init(store: StoreOf<CompletionMigrateOlympiaAccountsToBabylon>) {
+		init(store: StoreOf<CompletionMigrateOlympiaAccountsToBabylon>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: 0) {
 					CloseButtonBar {
@@ -138,7 +138,7 @@ extension CompletionMigrateOlympiaAccountsToBabylon {
 }
 
 extension View {
-	public func accountsBackground(count: Int, after lastAppearanceID: AppearanceID? = nil) -> some View {
+	func accountsBackground(count: Int, after lastAppearanceID: AppearanceID? = nil) -> some View {
 		background(alignment: .bottom) {
 			AccountCardsBackground(count: count, after: lastAppearanceID)
 		}
@@ -199,7 +199,7 @@ struct CompletionMigrateOlympiaAccountsToBabylon_Preview: PreviewProvider {
 }
 
 extension CompletionMigrateOlympiaAccountsToBabylon.State {
-	public static let previewValue = Self(
+	static let previewValue = Self(
 		previouslyMigrated: [],
 		migrated: [.previewValue0, .previewValue1]
 	)

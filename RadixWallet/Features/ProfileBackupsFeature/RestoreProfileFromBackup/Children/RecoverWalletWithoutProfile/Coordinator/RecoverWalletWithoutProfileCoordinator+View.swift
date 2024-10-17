@@ -1,14 +1,14 @@
 // MARK: - RecoverWalletWithoutProfileCoordinator.View
-public extension RecoverWalletWithoutProfileCoordinator {
+extension RecoverWalletWithoutProfileCoordinator {
 	@MainActor
 	struct View: SwiftUI.View {
 		private let store: StoreOf<RecoverWalletWithoutProfileCoordinator>
 
-		public init(store: StoreOf<RecoverWalletWithoutProfileCoordinator>) {
+		init(store: StoreOf<RecoverWalletWithoutProfileCoordinator>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			NavigationStackStore(
 				store.scope(state: \.path, action: { .child(.path($0)) })
 			) {

@@ -2,16 +2,16 @@ import ComposableArchitecture
 import SwiftUI
 
 extension FungibleResourceAsset {
-	public typealias ViewState = State
+	typealias ViewState = State
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<FungibleResourceAsset>
 
 		@FocusState
 		private var focused: Bool
 
-		public init(store: StoreOf<FungibleResourceAsset>) {
+		init(store: StoreOf<FungibleResourceAsset>) {
 			self.store = store
 		}
 	}
@@ -34,7 +34,7 @@ extension ViewStore<FungibleResourceAsset.State, FungibleResourceAsset.ViewActio
 }
 
 extension FungibleResourceAsset.View {
-	public var body: some View {
+	var body: some View {
 		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 			VStack(alignment: .trailing) {
 				ResourceBalanceView(viewStore.resourceBalance, appearance: .compact) {

@@ -1,17 +1,17 @@
 // MARK: - NPSSurveyClient
-public struct NPSSurveyClient: Sendable {
-	public var uploadUserFeedback: UploadUserFeedback
-	public var incrementTransactionCompleteCounter: IncrementTransactionCompleteCounter
-	public var shouldAskForUserFeedback: ShouldAskForUserFeedback
+struct NPSSurveyClient: Sendable {
+	var uploadUserFeedback: UploadUserFeedback
+	var incrementTransactionCompleteCounter: IncrementTransactionCompleteCounter
+	var shouldAskForUserFeedback: ShouldAskForUserFeedback
 }
 
 extension NPSSurveyClient {
-	public struct UserFeedback: Equatable, Sendable {
-		public let npsScore: Int
-		public let reason: String?
+	struct UserFeedback: Equatable, Sendable {
+		let npsScore: Int
+		let reason: String?
 	}
 
-	public typealias UploadUserFeedback = @Sendable (UserFeedback?) async -> Void
-	public typealias IncrementTransactionCompleteCounter = @Sendable () -> Void
-	public typealias ShouldAskForUserFeedback = @Sendable () async -> AnyAsyncSequence<Bool>
+	typealias UploadUserFeedback = @Sendable (UserFeedback?) async -> Void
+	typealias IncrementTransactionCompleteCounter = @Sendable () -> Void
+	typealias ShouldAskForUserFeedback = @Sendable () async -> AnyAsyncSequence<Bool>
 }

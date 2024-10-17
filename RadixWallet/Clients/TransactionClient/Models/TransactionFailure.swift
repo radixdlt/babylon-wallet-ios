@@ -1,11 +1,11 @@
 // MARK: - TransactionFailure
-public enum TransactionFailure: Sendable, LocalizedError, Equatable {
+enum TransactionFailure: Sendable, LocalizedError, Equatable {
 	case failedToPrepareTXReview(FailedToPreviewTXReview)
 	case failedToPrepareForTXSigning(FailedToPrepareForTXSigning)
 	case failedToCompileOrSign(CompileOrSignFailure)
 	case failedToSubmit
 
-	public var errorDescription: String? {
+	var errorDescription: String? {
 		switch self {
 		case let .failedToPrepareTXReview(error):
 			error.localizedDescription
@@ -24,7 +24,7 @@ public enum TransactionFailure: Sendable, LocalizedError, Equatable {
 }
 
 extension TransactionFailure {
-	public var errorKindAndMessage: (errorKind: DappWalletInteractionErrorType, message: String?) {
+	var errorKindAndMessage: (errorKind: DappWalletInteractionErrorType, message: String?) {
 		switch self {
 		case let .failedToPrepareForTXSigning(error), let .failedToPrepareTXReview(.failedSigning(error)):
 			switch error {
@@ -76,7 +76,7 @@ extension TransactionFailure {
 
 // MARK: TransactionFailure.FailedToPreviewTXReview
 extension TransactionFailure {
-	public enum FailedToPreviewTXReview: Sendable, LocalizedError, Equatable {
+	enum FailedToPreviewTXReview: Sendable, LocalizedError, Equatable {
 		case failedSigning(FailedToPrepareForTXSigning)
 		case failedToRetrieveTXPreview(Error)
 		case failedToRetrieveTXReceipt(String)
@@ -85,7 +85,7 @@ extension TransactionFailure {
 		case manifestWithReservedInstructions([ReservedInstruction])
 		case oneOfRecevingAccountsDoesNotAllowDeposits
 
-		public var errorDescription: String? {
+		var errorDescription: String? {
 			switch self {
 			case let .failedSigning(error):
 				error.errorDescription
@@ -108,23 +108,23 @@ extension TransactionFailure {
 
 // MARK: TransactionFailure.FailedToPrepareForTXSigning
 extension TransactionFailure {
-	public enum FailedToPrepareForTXSigning: Sendable, LocalizedError, Equatable {
+	enum FailedToPrepareForTXSigning: Sendable, LocalizedError, Equatable {
 		case failedToParseTXItIsProbablyInvalid
 		case failedToGetEpoch
 		case failedToLoadNotaryAndSigners
 		case failedToLoadNotaryPublicKey
 		case failedToLoadSignerPublicKeys
 
-		public var errorDescription: String? {
+		var errorDescription: String? {
 			switch self {
 			case .failedToParseTXItIsProbablyInvalid:
 				"Failed to parse transaction, it is probably invalid."
 			case .failedToGetEpoch:
 				"Failed to get epoch"
 			case .failedToLoadNotaryPublicKey:
-				"Failed to load notary public key"
+				"Failed to load notary key"
 			case .failedToLoadSignerPublicKeys:
-				"Failed to load signer public keys"
+				"Failed to load signer keys"
 			case .failedToLoadNotaryAndSigners:
 				"Failed to load notary and signers"
 			}
@@ -134,7 +134,7 @@ extension TransactionFailure {
 
 // MARK: TransactionFailure.CompileOrSignFailure
 extension TransactionFailure {
-	public enum CompileOrSignFailure: Sendable, LocalizedError, Equatable {
+	enum CompileOrSignFailure: Sendable, LocalizedError, Equatable {
 		case failedToLoadFactorSourceForSigning
 		case failedToCompileTXIntent
 		case failedToGenerateTXId
@@ -145,7 +145,7 @@ extension TransactionFailure {
 		case failedToConvertNotarySignature
 		case failedToCompileNotarizedTXIntent
 
-		public var errorDescription: String? {
+		var errorDescription: String? {
 			switch self {
 			case .failedToLoadFactorSourceForSigning:
 				"Failed to load factor source for signing"

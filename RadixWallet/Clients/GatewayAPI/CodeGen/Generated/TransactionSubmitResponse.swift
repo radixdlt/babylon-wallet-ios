@@ -11,26 +11,26 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.TransactionSubmitResponse")
-public typealias TransactionSubmitResponse = GatewayAPI.TransactionSubmitResponse
+typealias TransactionSubmitResponse = GatewayAPI.TransactionSubmitResponse
 
 extension GatewayAPI {
 
-public struct TransactionSubmitResponse: Codable, Hashable {
+struct TransactionSubmitResponse: Codable, Hashable {
 
     /** Is true if the transaction is a duplicate of an existing pending transaction. */
-    public private(set) var duplicate: Bool
+    private(set) var duplicate: Bool
 
-    public init(duplicate: Bool) {
+    init(duplicate: Bool) {
         self.duplicate = duplicate
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case duplicate
     }
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(duplicate, forKey: .duplicate)
     }

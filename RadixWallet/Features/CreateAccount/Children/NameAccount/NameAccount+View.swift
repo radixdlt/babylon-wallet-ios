@@ -8,17 +8,17 @@ extension NameAccount.State {
 }
 
 extension NameAccount {
-	public struct ViewState: Equatable {
-		public let namePlaceholder: String
-		public let titleText: String
-		public let subtitleText: String
-		public let entityName: String
-		public let sanitizedNameRequirement: SanitizedNameRequirement?
-		public let hint: Hint.ViewState?
-		public let useLedgerAsFactorSource: Bool
+	struct ViewState: Equatable {
+		let namePlaceholder: String
+		let titleText: String
+		let subtitleText: String
+		let entityName: String
+		let sanitizedNameRequirement: SanitizedNameRequirement?
+		let hint: Hint.ViewState?
+		let useLedgerAsFactorSource: Bool
 
-		public struct SanitizedNameRequirement: Equatable {
-			public let sanitizedName: NonEmptyString
+		struct SanitizedNameRequirement: Equatable {
+			let sanitizedName: NonEmptyString
 		}
 
 		init(state: State) {
@@ -44,14 +44,14 @@ extension NameAccount {
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<NameAccount>
 
-		public init(store: StoreOf<NameAccount>) {
+		init(store: StoreOf<NameAccount>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView {
 					VStack(spacing: 0) {

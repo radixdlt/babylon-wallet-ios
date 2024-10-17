@@ -11,23 +11,23 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.ComponentEntityRoleAssignmentEntry")
-public typealias ComponentEntityRoleAssignmentEntry = GatewayAPI.ComponentEntityRoleAssignmentEntry
+typealias ComponentEntityRoleAssignmentEntry = GatewayAPI.ComponentEntityRoleAssignmentEntry
 
 extension GatewayAPI {
 
-public struct ComponentEntityRoleAssignmentEntry: Codable, Hashable {
+struct ComponentEntityRoleAssignmentEntry: Codable, Hashable {
 
-    public private(set) var roleKey: RoleKey
-    public private(set) var assignment: ComponentEntityRoleAssignmentEntryAssignment
-    public private(set) var updaterRoles: [RoleKey]?
+    private(set) var roleKey: RoleKey
+    private(set) var assignment: ComponentEntityRoleAssignmentEntryAssignment
+    private(set) var updaterRoles: [RoleKey]?
 
-    public init(roleKey: RoleKey, assignment: ComponentEntityRoleAssignmentEntryAssignment, updaterRoles: [RoleKey]? = nil) {
+    init(roleKey: RoleKey, assignment: ComponentEntityRoleAssignmentEntryAssignment, updaterRoles: [RoleKey]? = nil) {
         self.roleKey = roleKey
         self.assignment = assignment
         self.updaterRoles = updaterRoles
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case roleKey = "role_key"
         case assignment
         case updaterRoles = "updater_roles"
@@ -35,7 +35,7 @@ public struct ComponentEntityRoleAssignmentEntry: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(roleKey, forKey: .roleKey)
         try container.encode(assignment, forKey: .assignment)

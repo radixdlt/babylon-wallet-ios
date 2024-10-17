@@ -70,7 +70,7 @@ extension SettingsRow.Kind {
 		let rowViewState: PlainListRow<AssetIcon, Image>.ViewState
 		let action: Feature.ViewAction
 
-		public init(
+		init(
 			title: String,
 			subtitle: String? = nil,
 			detail: String? = nil,

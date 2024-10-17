@@ -2,7 +2,7 @@
 extension Either: @unchecked Sendable {}
 
 extension Either {
-	public func doAsync(
+	func doAsync(
 		ifLeft: (Left) async throws -> Void,
 		ifRight: (Right) async throws -> Void
 	) async rethrows {

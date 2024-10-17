@@ -1,12 +1,12 @@
 
 extension PersonasClient: DependencyKey {
-	public typealias Value = PersonasClient
+	typealias Value = PersonasClient
 
-	public static func live(
+	static func live(
 		profileStore: ProfileStore = .shared
 	) -> Self {
 		let getPersonasOnNetwork: GetPersonasOnNetwork = { networkID in
-			guard let network = try? await profileStore.profile.network(id: networkID) else {
+			guard let network = try? await profileStore.profile().network(id: networkID) else {
 				return .init()
 			}
 			return network.getPersonas()
@@ -34,13 +34,13 @@ extension PersonasClient: DependencyKey {
 				}
 			},
 			hasSomePersonaOnAnyNetwork: {
-				await profileStore.profile.hasAnyPersonaOnAnyNetwork()
+				await profileStore.profile().hasAnyPersonaOnAnyNetwork()
 			},
 			hasSomePersonaOnCurrentNetwork: {
-				await profileStore.profile.network?.hasSomePersona() ?? false
+				await profileStore.profile().network?.hasSomePersona() ?? false
 			}
 		)
 	}
 
-	public static let liveValue = Self.live()
+	static let liveValue = Self.live()
 }

@@ -8,7 +8,7 @@ enum DappInteraction {}
 /// Metadata for a dapp, either from a request or fetched from ledger.
 /// not to be confused with `DappToWalletInteractionMetadata` which is the
 /// associated value of one of the cases of this enum.
-public enum DappMetadata: Sendable, Hashable {
+enum DappMetadata: Sendable, Hashable {
 	/// The metadata sent with the request from the Dapp.
 	/// We only allow this case `request` to be passed around if `isDeveloperModeEnabled` is `true`.
 	case request(DappToWalletInteractionMetadata)
@@ -21,7 +21,7 @@ public enum DappMetadata: Sendable, Hashable {
 
 extension DappMetadata {
 	static let wallet: Wallet = .init()
-	public struct Wallet: Sendable, Hashable {
+	struct Wallet: Sendable, Hashable {
 		let origin: DappOrigin = .wallet
 		let name: NonEmptyString = "Radix Wallet"
 		let description: String? = nil
@@ -32,7 +32,7 @@ extension DappMetadata {
 // MARK: DappMetadata.Ledger
 extension DappMetadata {
 	/// A detailed DappMetaData fetched from Ledger.
-	public struct Ledger: Sendable, Hashable, Codable {
+	struct Ledger: Sendable, Hashable, Codable {
 		static let defaultName = NonEmptyString(rawValue: L10n.DAppRequest.Metadata.unknownName)!
 
 		let origin: DappOrigin
@@ -59,7 +59,7 @@ extension DappMetadata {
 }
 
 extension DappMetadata {
-	public var origin: DappOrigin {
+	var origin: DappOrigin {
 		switch self {
 		case let .ledger(metadata): metadata.origin
 		case let .request(metadata): metadata.origin
@@ -67,14 +67,14 @@ extension DappMetadata {
 		}
 	}
 
-	public var thumbnail: URL? {
+	var thumbnail: URL? {
 		guard case let .ledger(fromLedgerDappMetadata) = self else {
 			return nil
 		}
 		return fromLedgerDappMetadata.thumbnail
 	}
 
-	public var onLedger: Ledger? {
+	var onLedger: Ledger? {
 		guard case let .ledger(fromLedgerDappMetadata) = self else {
 			return nil
 		}

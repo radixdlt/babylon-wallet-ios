@@ -52,7 +52,7 @@ extension TransactionReview.State {
 
 // MARK: - TransactionReview.View
 extension TransactionReview {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let message: String?
 		let isExpandedDappUsed: Bool
 		let isExpandedContributingToPools: Bool
@@ -84,7 +84,7 @@ extension TransactionReview {
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		@SwiftUI.State private var showNavigationTitle: Bool = false
 
 		private let store: StoreOf<TransactionReview>
@@ -95,11 +95,11 @@ extension TransactionReview {
 
 		private let shadowColor: Color = .app.gray2.opacity(0.4)
 
-		public init(store: StoreOf<TransactionReview>) {
+		init(store: StoreOf<TransactionReview>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				coreView(with: viewStore)
 					.controlState(viewStore.viewControlState)
@@ -252,30 +252,27 @@ extension TransactionReview {
 		}
 
 		private func header(_ proposingDappMetadata: DappMetadata.Ledger?) -> some SwiftUI.View {
-			VStack(alignment: .leading, spacing: .small3) {
-				HStack(spacing: .zero) {
-					Text(L10n.TransactionReview.title)
-						.textStyle(.sheetTitle)
-						.lineLimit(2)
-						.multilineTextAlignment(.leading)
-						.foregroundColor(.app.gray1)
+			VStack(alignment: .leading, spacing: .small2) {
+				Text(L10n.TransactionReview.title)
+					.textStyle(.sheetTitle)
+					.lineLimit(2)
+					.multilineTextAlignment(.leading)
+					.foregroundColor(.app.gray1)
 
-					Spacer(minLength: 0)
-
-					if let thumbnail = proposingDappMetadata?.thumbnail {
-						Thumbnail(.dapp, url: thumbnail, size: .medium)
-							.padding(.leading, .small2)
-					} else {
-						Spacer(minLength: .small2 + HitTargetSize.medium.rawValue)
+				if proposingDappMetadata?.thumbnail != nil || proposingDappMetadata?.name != nil {
+					HStack(spacing: .small2) {
+						if let thumbnail = proposingDappMetadata?.thumbnail {
+							Thumbnail(.dapp, url: thumbnail, size: .smallest)
+						}
+						if let name = proposingDappMetadata?.name {
+							Text(L10n.TransactionReview.proposingDappSubtitle(name.rawValue))
+								.textStyle(.body2HighImportance)
+								.foregroundColor(.app.gray1)
+						}
 					}
 				}
-
-				if let name = proposingDappMetadata?.name {
-					Text(L10n.TransactionReview.proposingDappSubtitle(name.rawValue))
-						.textStyle(.body2HighImportance)
-						.foregroundColor(.app.gray1)
-				}
 			}
+			.frame(maxWidth: .infinity, alignment: .leading)
 		}
 
 		@ViewBuilder
@@ -692,15 +689,15 @@ extension StrokeStyle {
 }
 
 extension TransactionReview {
-	public typealias ValidatorsState = ValidatorsView.ViewState
-	public typealias ValidatorState = ValidatorView.ViewState
+	typealias ValidatorsState = ValidatorsView.ViewState
+	typealias ValidatorState = ValidatorView.ViewState
 
-	public struct ValidatorsView: SwiftUI.View {
+	struct ValidatorsView: SwiftUI.View {
 		let heading: TransactionHeading
 		let viewState: ViewState
 		let action: () -> Void
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			VStack(alignment: .leading, spacing: .small2) {
 				ExpandableTransactionHeading(heading: heading, isExpanded: viewState.isExpanded, action: action)
 
@@ -715,28 +712,28 @@ extension TransactionReview {
 			}
 		}
 
-		public struct ViewState: Hashable, Sendable {
-			public let validators: [ValidatorView.ViewState]
-			public var isExpanded: Bool
+		struct ViewState: Hashable, Sendable {
+			let validators: [ValidatorView.ViewState]
+			var isExpanded: Bool
 
-			public init(validators: [ValidatorView.ViewState], isExpanded: Bool = true) {
+			init(validators: [ValidatorView.ViewState], isExpanded: Bool = true) {
 				self.validators = validators
 				self.isExpanded = isExpanded
 			}
 		}
 	}
 
-	public struct ValidatorView: SwiftUI.View {
-		public let viewState: ViewState
+	struct ValidatorView: SwiftUI.View {
+		let viewState: ViewState
 
-		public struct ViewState: Hashable, Sendable, Identifiable {
-			public var id: ValidatorAddress { address }
-			public let address: ValidatorAddress
-			public let name: String?
-			public let thumbnail: URL?
+		struct ViewState: Hashable, Sendable, Identifiable {
+			var id: ValidatorAddress { address }
+			let address: ValidatorAddress
+			let name: String?
+			let thumbnail: URL?
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			Card {
 				HStack(spacing: .zero) {
 					Thumbnail(.validator, url: viewState.thumbnail)
@@ -779,7 +776,7 @@ struct TransactionReview_Previews: PreviewProvider {
 }
 
 extension TransactionReview.State {
-	public static let previewValue: Self = .init(
+	static let previewValue: Self = .init(
 		unvalidatedManifest: .sample,
 		nonce: .secureRandom(),
 		signTransactionPurpose: .manifestFromDapp,

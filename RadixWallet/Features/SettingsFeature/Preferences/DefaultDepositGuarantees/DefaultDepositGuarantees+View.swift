@@ -4,20 +4,20 @@ import SwiftUI
 // MARK: - DefaultDepositGuarantees.View
 extension DefaultDepositGuarantees {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: Store
 
 		@FocusState
 		private var focused: Bool
 
-		public init(store: Store) {
+		init(store: Store) {
 			self.store = store
 		}
 	}
 }
 
 extension DefaultDepositGuarantees.View {
-	public var body: some View {
+	var body: some View {
 		VStack(alignment: .leading, spacing: .medium1) {
 			Text(L10n.AccountSecuritySettings.DepositGuarantees.text)
 				.textStyle(.body1HighImportance)

@@ -28,7 +28,7 @@ extension ArbitraryDataFieldView.Field {
 
 // MARK: - ArbitraryDataFieldView.Action
 extension ArbitraryDataFieldView {
-	public enum Action: Hashable, Sendable {
+	enum Action: Hashable, Sendable {
 		case urlTapped(URL)
 	}
 }

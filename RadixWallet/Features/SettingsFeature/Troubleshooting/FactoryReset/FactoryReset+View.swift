@@ -1,14 +1,14 @@
 // MARK: - FactoryReset.View
-public extension FactoryReset {
+extension FactoryReset {
 	@MainActor
 	struct View: SwiftUI.View {
 		private let store: StoreOf<FactoryReset>
 
-		public init(store: StoreOf<FactoryReset>) {
+		init(store: StoreOf<FactoryReset>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			content
 				.radixToolbar(title: L10n.FactoryReset.title)
 				.tint(.app.gray1)

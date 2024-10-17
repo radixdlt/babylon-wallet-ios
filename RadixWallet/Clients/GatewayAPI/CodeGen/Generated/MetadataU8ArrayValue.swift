@@ -11,28 +11,28 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.MetadataU8ArrayValue")
-public typealias MetadataU8ArrayValue = GatewayAPI.MetadataU8ArrayValue
+typealias MetadataU8ArrayValue = GatewayAPI.MetadataU8ArrayValue
 
 extension GatewayAPI {
 
-public struct MetadataU8ArrayValue: Codable, Hashable {
+struct MetadataU8ArrayValue: Codable, Hashable {
 
-    public private(set) var type: MetadataValueType
-    public private(set) var valueHex: String
+    private(set) var type: MetadataValueType
+    private(set) var valueHex: String
 
-    public init(type: MetadataValueType, valueHex: String) {
+    init(type: MetadataValueType, valueHex: String) {
         self.type = type
         self.valueHex = valueHex
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case type
         case valueHex = "value_hex"
     }
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(type, forKey: .type)
         try container.encode(valueHex, forKey: .valueHex)

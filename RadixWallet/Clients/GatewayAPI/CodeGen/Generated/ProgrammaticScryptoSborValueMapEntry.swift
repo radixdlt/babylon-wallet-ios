@@ -11,28 +11,28 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.ProgrammaticScryptoSborValueMapEntry")
-public typealias ProgrammaticScryptoSborValueMapEntry = GatewayAPI.ProgrammaticScryptoSborValueMapEntry
+typealias ProgrammaticScryptoSborValueMapEntry = GatewayAPI.ProgrammaticScryptoSborValueMapEntry
 
 extension GatewayAPI {
 
-public struct ProgrammaticScryptoSborValueMapEntry: Codable, Hashable {
+struct ProgrammaticScryptoSborValueMapEntry: Codable, Hashable {
 
-    public private(set) var key: ProgrammaticScryptoSborValue
-    public private(set) var value: ProgrammaticScryptoSborValue
+    private(set) var key: ProgrammaticScryptoSborValue
+    private(set) var value: ProgrammaticScryptoSborValue
 
-    public init(key: ProgrammaticScryptoSborValue, value: ProgrammaticScryptoSborValue) {
+    init(key: ProgrammaticScryptoSborValue, value: ProgrammaticScryptoSborValue) {
         self.key = key
         self.value = value
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case key
         case value
     }
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(key, forKey: .key)
         try container.encode(value, forKey: .value)

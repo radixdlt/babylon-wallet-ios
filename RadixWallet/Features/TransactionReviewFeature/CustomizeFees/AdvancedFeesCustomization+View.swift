@@ -25,7 +25,7 @@ extension AdvancedFeesCustomization.State {
 }
 
 extension AdvancedFeesCustomization {
-	public struct ViewState: Equatable, Sendable {
+	struct ViewState: Equatable, Sendable {
 		let feesViewState: FeesView.ViewState
 
 		let paddingAmount: String
@@ -36,12 +36,12 @@ extension AdvancedFeesCustomization {
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		let store: StoreOf<AdvancedFeesCustomization>
 		@FocusState
 		var focusField: State.FocusField?
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: .zero) {
 					Group {

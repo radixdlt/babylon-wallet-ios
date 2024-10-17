@@ -1,13 +1,13 @@
 import Sargon
 
-public enum ROLAFailure: Sendable, LocalizedError, Equatable {
+enum ROLAFailure: Sendable, LocalizedError, Equatable {
 	case wrongAccountType
 	case unknownWebsite
 	case radixJsonNotFound
 	case radixJsonUnknownFileFormat
 	case unknownDappDefinitionAddress
 
-	public var errorDescription: String? {
+	var errorDescription: String? {
 		switch self {
 		case .wrongAccountType:
 			"Expected to find dapp definition account type"
@@ -22,7 +22,7 @@ public enum ROLAFailure: Sendable, LocalizedError, Equatable {
 		}
 	}
 
-	public var errorKindAndMessage: (errorKind: DappWalletInteractionErrorType, message: String?) {
+	var errorKindAndMessage: (errorKind: DappWalletInteractionErrorType, message: String?) {
 		switch self {
 		case .wrongAccountType:
 			(errorKind: .wrongAccountType, message: errorDescription)

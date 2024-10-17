@@ -2,37 +2,37 @@ import ComposableArchitecture
 import Sargon
 import SwiftUI
 
-public typealias TransactionReviewPools = TransactionReviewDapps<PoolAddress>
-public typealias TransactionReviewDappsUsed = TransactionReviewDapps<ComponentAddress>
+typealias TransactionReviewPools = TransactionReviewDapps<PoolAddress>
+typealias TransactionReviewDappsUsed = TransactionReviewDapps<ComponentAddress>
 
 // MARK: - TransactionReviewDapps
-public struct TransactionReviewDapps<AddressType: AddressProtocol>: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public var knownDapps: IdentifiedArrayOf<TransactionReview.DappEntity>
-		public var unknownDapps: IdentifiedArrayOf<AddressType>
-		public var isExpanded: Bool = true
-		public let unknownTitle: String
+struct TransactionReviewDapps<AddressType: AddressProtocol>: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		var knownDapps: IdentifiedArrayOf<TransactionReview.DappEntity>
+		var unknownDapps: IdentifiedArrayOf<AddressType>
+		var isExpanded: Bool = true
+		let unknownTitle: String
 
-		public init(knownDapps: IdentifiedArrayOf<TransactionReview.DappEntity>, unknownDapps: IdentifiedArrayOf<AddressType>, unknownTitle: (Int) -> String) {
+		init(knownDapps: IdentifiedArrayOf<TransactionReview.DappEntity>, unknownDapps: IdentifiedArrayOf<AddressType>, unknownTitle: (Int) -> String) {
 			self.knownDapps = knownDapps
 			self.unknownDapps = unknownDapps
 			self.unknownTitle = unknownTitle(unknownDapps.count)
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case dappTapped(TransactionReview.DappEntity.ID)
 		case unknownsTapped
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case openDapp(TransactionReview.DappEntity.ID)
 		case openUnknownAddresses(IdentifiedArrayOf<AddressType>)
 	}
 
-	public init() {}
+	init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .dappTapped(id):
 			.send(.delegate(.openDapp(id)))

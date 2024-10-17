@@ -2,10 +2,10 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - AssetsView
-public struct AssetsView: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
+struct AssetsView: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
 		/// All of the possible asset list
-		public enum AssetKind: String, Sendable, Hashable, CaseIterable, Identifiable {
+		enum AssetKind: String, Sendable, Hashable, CaseIterable, Identifiable {
 			case fungible
 			case nonFungible
 			case stakeUnits
@@ -25,26 +25,26 @@ public struct AssetsView: Sendable, FeatureReducer {
 			}
 		}
 
-		public struct Resources: Hashable, Sendable {
-			public var fungibleTokenList: FungibleAssetList.State?
-			public var nonFungibleTokenList: NonFungibleAssetList.State?
-			public var stakeUnitList: StakeUnitList.State?
-			public var poolUnitsList: PoolUnitsList.State?
+		struct Resources: Hashable, Sendable {
+			var fungibleTokenList: FungibleAssetList.State?
+			var nonFungibleTokenList: NonFungibleAssetList.State?
+			var stakeUnitList: StakeUnitList.State?
+			var poolUnitsList: PoolUnitsList.State?
 		}
 
-		public var activeAssetKind: AssetKind
-		public var assetKinds: NonEmpty<[AssetKind]>
+		var activeAssetKind: AssetKind
+		var assetKinds: NonEmpty<[AssetKind]>
 
-		public var resources: Resources = .init()
+		var resources: Resources = .init()
 
-		public let account: Account
-		public var accountPortfolio: Loadable<AccountPortfoliosClient.AccountPortfolio> = .idle
-		public var isLoadingResources: Bool = false
-		public var isRefreshing: Bool = false
-		public let mode: Mode
-		public var totalFiatWorth: Loadable<FiatWorth> = .loading
+		let account: Account
+		var accountPortfolio: Loadable<AccountPortfoliosClient.AccountPortfolio> = .idle
+		var isLoadingResources: Bool = false
+		var isRefreshing: Bool = false
+		let mode: Mode
+		var totalFiatWorth: Loadable<FiatWorth> = .loading
 
-		public init(account: Account, mode: Mode = .normal) {
+		init(account: Account, mode: Mode = .normal) {
 			self.init(
 				account: account,
 				resources: .init(),
@@ -66,7 +66,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case onFirstTask
 		case pullToRefreshStarted
 		case didSelectList(State.AssetKind)
@@ -74,22 +74,22 @@ public struct AssetsView: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case fungibleTokenList(FungibleAssetList.Action)
 		case nonFungibleTokenList(NonFungibleAssetList.Action)
 		case stakeUnitList(StakeUnitList.Action)
 		case poolUnitsList(PoolUnitsList.Action)
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case portfolioUpdated(AccountPortfoliosClient.AccountPortfolio)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case handleSelectedAssets(State.Mode.SelectedAssets)
 		case selected(Selection)
 
-		public enum Selection: Sendable, Equatable {
+		enum Selection: Sendable, Equatable {
 			case fungible(OnLedgerEntity.OwnedFungibleResource, isXrd: Bool)
 			case nonFungible(OnLedgerEntity.OwnedNonFungibleResource, token: OnLedgerEntity.NonFungibleToken)
 			case stakeUnit(OnLedgerEntitiesClient.ResourceWithVaultAmount, details: OnLedgerEntitiesClient.OwnedStakeDetails)
@@ -102,9 +102,9 @@ public struct AssetsView: Sendable, FeatureReducer {
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.errorQueue) var errorQueue
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.resources.fungibleTokenList, action: \.child.fungibleTokenList) {
 				FungibleAssetList()
@@ -120,7 +120,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onFirstTask:
 			state.isLoadingResources = true
@@ -148,7 +148,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case var .portfolioUpdated(portfolio):
 			state.isLoadingResources = false
@@ -160,7 +160,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .fungibleTokenList(.delegate(.selected(resource, isXrd))):
 			.send(.delegate(.selected(.fungible(resource, isXrd: isXrd))))
@@ -184,7 +184,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		}
 	}
 
-	public func fetchAccountPortfolio(_ state: State) -> Effect<Action> {
+	func fetchAccountPortfolio(_ state: State) -> Effect<Action> {
 		.run { [address = state.account.address] _ in
 			_ = try await accountPortfoliosClient.fetchAccountPortfolio(address, true)
 		} catch: { error, _ in

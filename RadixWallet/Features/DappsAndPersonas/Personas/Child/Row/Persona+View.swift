@@ -4,18 +4,18 @@ import SwiftUI
 // MARK: - PersonaFeature.View
 extension PersonaFeature {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<PersonaFeature>
 		private let tappable: Bool
 		private let showShield: Bool
 
-		public init(store: StoreOf<PersonaFeature>, tappable: Bool, showShield: Bool) {
+		init(store: StoreOf<PersonaFeature>, tappable: Bool, showShield: Bool) {
 			self.store = store
 			self.tappable = tappable
 			self.showShield = showShield
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				if tappable {
 					Card {
@@ -67,6 +67,6 @@ struct Persona_Preview: PreviewProvider {
 }
 
 extension PersonaFeature.State {
-	public static let previewValue: Self = .init(persona: .previewValue0, problems: [])
+	static let previewValue: Self = .init(persona: .previewValue0, problems: [])
 }
 #endif

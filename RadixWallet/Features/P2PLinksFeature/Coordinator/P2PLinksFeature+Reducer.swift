@@ -2,16 +2,16 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - P2PLinksFeature
-public struct P2PLinksFeature: Sendable, FeatureReducer {
+struct P2PLinksFeature: Sendable, FeatureReducer {
 	// MARK: State
 
-	public struct State: Sendable, Hashable {
-		public var links: IdentifiedArrayOf<P2PLink>
+	struct State: Sendable, Hashable {
+		var links: IdentifiedArrayOf<P2PLink>
 
 		@PresentationState
-		public var destination: Destination.State?
+		var destination: Destination.State?
 
-		public init(
+		init(
 			links: IdentifiedArrayOf<P2PLink> = .init(),
 			destination: Destination.State? = nil
 		) {
@@ -22,14 +22,14 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 
 	// MARK: Action
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case task
 		case addNewConnectionButtonTapped
 		case removeButtonTapped(P2PLink)
 		case editButtonTapped(P2PLink)
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case loadLinksResult(TaskResult<OrderedSet<P2PLink>>)
 		case saveNewConnectionResult(TaskResult<P2PLink>)
 		case deleteConnectionResult(TaskResult<P2PLink>)
@@ -37,26 +37,26 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 
 	// MARK: Destination
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case newConnection(NewConnection.State)
 			case removeConnection(AlertState<Action.RemoveConnection>)
 			case updateName(UpdateP2PLinkName.State)
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case newConnection(NewConnection.Action)
 			case removeConnection(RemoveConnection)
 			case updateName(UpdateP2PLinkName.Action)
 
-			public enum RemoveConnection: Sendable, Hashable {
+			enum RemoveConnection: Sendable, Hashable {
 				case removeTapped(P2PLink)
 			}
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: \.newConnection, action: \.newConnection) {
 				NewConnection()
 			}
@@ -71,9 +71,9 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.errorQueue) var errorQueue
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -82,7 +82,7 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			return .run { send in
@@ -104,7 +104,7 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadLinksResult(.success(linksFromProfile)):
 			state.links = linksFromProfile.elements.asIdentified()
@@ -132,7 +132,7 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .newConnection(.delegate(.newConnection(connectedClient))):
 			state.destination = nil

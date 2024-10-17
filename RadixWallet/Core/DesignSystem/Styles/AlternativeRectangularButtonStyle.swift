@@ -1,11 +1,11 @@
 import Foundation
 
 // MARK: - AlternativeRectangularButtonStyle
-public struct AlternativeRectangularButtonStyle: ButtonStyle {
+struct AlternativeRectangularButtonStyle: ButtonStyle {
 	@Environment(\.controlState) var controlState
 	let height: CGFloat
 
-	public func makeBody(configuration: ButtonStyle.Configuration) -> some View {
+	func makeBody(configuration: ButtonStyle.Configuration) -> some View {
 		configuration.label
 			.foregroundColor(forgroundColor)
 			.font(.app.body1Header)
@@ -24,9 +24,9 @@ public struct AlternativeRectangularButtonStyle: ButtonStyle {
 }
 
 extension ButtonStyle where Self == AlternativeRectangularButtonStyle {
-	public static var alternativeRectangular: Self { .alternativeRectangular() }
+	static var alternativeRectangular: Self { .alternativeRectangular() }
 
-	public static func alternativeRectangular(
+	static func alternativeRectangular(
 		height: CGFloat = .standardButtonHeight
 	) -> Self {
 		Self(height: height)

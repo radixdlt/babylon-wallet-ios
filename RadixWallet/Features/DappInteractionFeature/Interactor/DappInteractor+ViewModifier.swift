@@ -2,7 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 
 extension View {
-	public func presentsDappInteractions() -> some View {
+	func presentsDappInteractions() -> some View {
 		self.presentsDappInteractions(
 			store: .init(
 				initialState: .init(),

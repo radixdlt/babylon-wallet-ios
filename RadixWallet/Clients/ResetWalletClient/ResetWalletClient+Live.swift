@@ -1,7 +1,7 @@
 import ComposableArchitecture
 
 extension ResetWalletClient: DependencyKey {
-	public static let liveValue: Self = {
+	static let liveValue: Self = {
 		@Dependency(\.errorQueue) var errorQueue
 		@Dependency(\.appPreferencesClient) var appPreferencesClient
 		@Dependency(\.cacheClient) var cacheClient
@@ -12,7 +12,7 @@ extension ResetWalletClient: DependencyKey {
 		return Self(
 			resetWallet: {
 				do {
-					try await appPreferencesClient.deleteProfileAndFactorSources(true)
+					try await appPreferencesClient.deleteProfileAndFactorSources()
 					cacheClient.removeAll()
 					await radixConnectClient.disconnectAll()
 					userDefaults.removeAll()

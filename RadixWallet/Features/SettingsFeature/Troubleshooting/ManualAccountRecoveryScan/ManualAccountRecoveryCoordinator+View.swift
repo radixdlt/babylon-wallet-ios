@@ -9,22 +9,22 @@ extension ManualAccountRecoveryCoordinator.State {
 
 // MARK: - ManualAccountRecoveryCoordinator.View
 extension ManualAccountRecoveryCoordinator {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let olympiaControlState: ControlState
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: Store
 
-		public init(store: Store) {
+		init(store: Store) {
 			self.store = store
 		}
 	}
 }
 
 extension ManualAccountRecoveryCoordinator.View {
-	public var body: some View {
+	var body: some View {
 		NavigationStackStore(
 			store.scope(state: \.path) { .child(.path($0)) }
 		) {

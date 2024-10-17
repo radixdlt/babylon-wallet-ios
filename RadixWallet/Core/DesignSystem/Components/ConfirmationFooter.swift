@@ -1,11 +1,11 @@
 // MARK: - ConfirmationFooter
-public struct ConfirmationFooter: View {
-	public let title: String
-	public let isEnabled: Bool // TODO: remove post betanet v2, just set .controlState from outside instead
-	public let action: () -> Void
+struct ConfirmationFooter: View {
+	let title: String
+	let isEnabled: Bool // TODO: remove post betanet v2, just set .controlState from outside instead
+	let action: () -> Void
 
 	@available(*, deprecated, message: "Use `.footer` instead")
-	public init(
+	init(
 		title: String,
 		isEnabled: Bool,
 		action: @escaping () -> Void
@@ -17,7 +17,7 @@ public struct ConfirmationFooter: View {
 }
 
 extension ConfirmationFooter {
-	public var body: some View {
+	var body: some View {
 		VStack(spacing: .zero) {
 			Color.app.gray4.frame(height: 1)
 

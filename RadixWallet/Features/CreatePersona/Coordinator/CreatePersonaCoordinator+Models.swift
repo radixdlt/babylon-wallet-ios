@@ -2,16 +2,16 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - PersonaPrimacy
-public enum PersonaPrimacy: Sendable, Hashable {
+enum PersonaPrimacy: Sendable, Hashable {
 	case first(First)
 	case notFirst
 
-	public enum First: Sendable, Hashable {
+	enum First: Sendable, Hashable {
 		case onAnyNetwork
 		case justOnCurrentNetwork
 	}
 
-	public init(firstOnAnyNetwork: Bool, firstOnCurrent: Bool) {
+	init(firstOnAnyNetwork: Bool, firstOnCurrent: Bool) {
 		switch (firstOnAnyNetwork, firstOnCurrent) {
 		case (true, false):
 			assertionFailure("Discrepancy")
@@ -25,14 +25,14 @@ public enum PersonaPrimacy: Sendable, Hashable {
 		}
 	}
 
-	public var firstPersonaOnCurrentNetwork: Bool {
+	var firstPersonaOnCurrentNetwork: Bool {
 		switch self {
 		case .notFirst: false
 		case .first: true
 		}
 	}
 
-	public var isFirstEver: Bool {
+	var isFirstEver: Bool {
 		switch self {
 		case .first(.onAnyNetwork): true
 		default: false
@@ -41,17 +41,17 @@ public enum PersonaPrimacy: Sendable, Hashable {
 }
 
 extension PersonaPrimacy {
-	public static let firstOnAnyNetwork = Self(firstOnAnyNetwork: true, firstOnCurrent: true)
-	public static let notFirstOnCurrentNetwork = Self(firstOnAnyNetwork: false, firstOnCurrent: false)
+	static let firstOnAnyNetwork = Self(firstOnAnyNetwork: true, firstOnCurrent: true)
+	static let notFirstOnCurrentNetwork = Self(firstOnAnyNetwork: false, firstOnCurrent: false)
 }
 
 // MARK: - CreatePersonaConfig
-public struct CreatePersonaConfig: Sendable, Hashable {
-	public let personaPrimacy: PersonaPrimacy
+struct CreatePersonaConfig: Sendable, Hashable {
+	let personaPrimacy: PersonaPrimacy
 
-	public let navigationButtonCTA: CreatePersonaNavigationButtonCTA
+	let navigationButtonCTA: CreatePersonaNavigationButtonCTA
 
-	public init(
+	init(
 		personaPrimacy: PersonaPrimacy,
 		navigationButtonCTA: CreatePersonaNavigationButtonCTA
 	) {
@@ -61,7 +61,7 @@ public struct CreatePersonaConfig: Sendable, Hashable {
 }
 
 // MARK: - CreatePersonaNavigationButtonCTA
-public enum CreatePersonaNavigationButtonCTA: Sendable, Equatable {
+enum CreatePersonaNavigationButtonCTA: Sendable, Equatable {
 	case goBackToPersonaListInSettings
 	case goBackToChoosePersonas
 }

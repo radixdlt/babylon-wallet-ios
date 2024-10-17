@@ -1,6 +1,6 @@
 
 extension URL {
-	public var httpsURL: Self? {
+	var httpsURL: Self? {
 		var absoluteString = self.absoluteString
 		if let separator = absoluteString.range(of: "://") {
 			absoluteString.removeSubrange(absoluteString.startIndex ..< separator.upperBound)
@@ -12,7 +12,7 @@ extension URL {
 	/// A computed property that parses the query parameters of the URL into a dictionary.
 	///
 	/// - Returns: A dictionary of query parameters, or `nil` if the URL has no query items.
-	public var queryParameters: [String: String]? {
+	var queryParameters: [String: String]? {
 		guard
 			let components = URLComponents(url: self, resolvingAgainstBaseURL: true),
 			let queryItems = components.queryItems
@@ -29,7 +29,7 @@ extension URL {
 	/// as "immediate" data, encoded in Base64 or as plain text, rather than referencing external files.
 	///
 	/// - Returns: `true` if the URL's scheme is "data", indicating it conforms to the Data URL format; otherwise, `false`.
-	public var isDataURL: Bool {
+	var isDataURL: Bool {
 		scheme == "data"
 	}
 }

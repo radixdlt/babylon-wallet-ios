@@ -1,5 +1,5 @@
 
-public func update<T>(
+func update<T>(
 	_ initial: T,
 	with: (inout T) throws -> Void
 ) rethrows -> T {
@@ -8,7 +8,7 @@ public func update<T>(
 	return value
 }
 
-public func not<T>(
+func not<T>(
 	_ f: @escaping (T) -> Bool
 ) -> (T) -> Bool {
 	{ input in
@@ -17,11 +17,11 @@ public func not<T>(
 }
 
 /// You can use `identity` instead of `{ $0 }`
-public func identity<T>(_ t: T) -> T {
+func identity<T>(_ t: T) -> T {
 	t
 }
 
-public func generateElements<Element>(
+func generateElements<Element>(
 	start: Element,
 	step: (Element) -> Element,
 	count: Int,
@@ -38,7 +38,7 @@ public func generateElements<Element>(
 	return elements
 }
 
-public func generateIntegers<Integer>(
+func generateIntegers<Integer>(
 	start: Integer,
 	count: Int,
 	shouldInclude: @escaping (Integer) -> Bool
@@ -46,7 +46,7 @@ public func generateIntegers<Integer>(
 	generateElements(start: start, step: { $0 + 1 }, count: count, shouldInclude: shouldInclude)
 }
 
-public func generateIntegers<Integer>(
+func generateIntegers<Integer>(
 	start: Integer,
 	count: Int,
 	excluding disallowed: some Collection<Integer>

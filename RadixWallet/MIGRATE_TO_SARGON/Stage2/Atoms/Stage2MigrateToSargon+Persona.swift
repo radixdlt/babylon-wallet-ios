@@ -2,21 +2,21 @@ import Foundation
 import Sargon
 
 extension Persona {
-	public mutating func hide() {
+	mutating func hide() {
 		entityFlags.append(.deletedByUser)
 	}
 
-	public mutating func unhide() {
+	mutating func unhide() {
 		entityFlags.remove(.deletedByUser)
 	}
 }
 
 extension Personas {
-	public var nonHidden: Personas {
+	var nonHidden: Personas {
 		filter(not(\.isHidden))
 	}
 
-	public var hidden: Personas {
+	var hidden: Personas {
 		filter(\.isHidden)
 	}
 }

@@ -2,7 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 
 extension Home.AccountRow {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let account: Account
 		let showFiatWorth: Bool
 		let fiatWorth: Loadable<FiatWorth>
@@ -10,7 +10,7 @@ extension Home.AccountRow {
 		let securityProblemsConfig: EntitySecurityProblemsView.Config
 		let accountLockerClaims: [AccountLockerClaimDetails]
 
-		public enum AccountTag: Int, Hashable, Identifiable, Sendable {
+		enum AccountTag: Int, Hashable, Identifiable, Sendable {
 			case ledgerBabylon
 			case ledgerLegacy
 			case legacySoftware
@@ -71,14 +71,14 @@ extension Home.AccountRow {
 		}
 	}
 
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<Home.AccountRow>
 
-		public init(store: StoreOf<Home.AccountRow>) {
+		init(store: StoreOf<Home.AccountRow>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: ViewState.init, send: { .view($0) }) { viewStore in
 				AccountCard(kind: .home(tag: viewStore.tag?.display), account: viewStore.account) {
 					if viewStore.showFiatWorth {
@@ -388,6 +388,6 @@ struct Row_Preview: PreviewProvider {
 }
 
 extension Home.AccountRow.State {
-	public static let previewValue = Self(account: .previewValue0, problems: [])
+	static let previewValue = Self(account: .previewValue0, problems: [])
 }
 #endif

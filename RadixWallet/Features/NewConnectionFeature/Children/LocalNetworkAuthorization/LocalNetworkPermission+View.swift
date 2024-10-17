@@ -4,14 +4,14 @@ import SwiftUI
 // MARK: - LocalNetworkPermission.View
 extension LocalNetworkPermission {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<LocalNetworkPermission>
 
-		public init(store: StoreOf<LocalNetworkPermission>) {
+		init(store: StoreOf<LocalNetworkPermission>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			ZStack {}
 				.alert(
 					store: store.scope(
@@ -42,6 +42,6 @@ extension LocalNetworkPermission {
 }
 
 extension LocalNetworkPermission.State {
-	public static let previewValue: Self = .init()
+	static let previewValue: Self = .init()
 }
 #endif

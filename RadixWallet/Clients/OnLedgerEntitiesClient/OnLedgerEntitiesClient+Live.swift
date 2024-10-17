@@ -2,15 +2,15 @@ import Sargon
 
 // MARK: - OnLedgerEntitiesClient + DependencyKey
 extension OnLedgerEntitiesClient: DependencyKey {
-	public static let maximumNFTIDChunkSize = 100
+	static let maximumNFTIDChunkSize = 100
 
 	enum Error: Swift.Error {
 		case emptyResponse
 	}
 
-	public static let liveValue = Self.live()
+	static let liveValue = Self.live()
 
-	public static func live() -> Self {
+	static func live() -> Self {
 		Self(
 			getEntities: getEntities,
 			getNonFungibleTokenData: getNonFungibleData,
@@ -354,7 +354,7 @@ extension OnLedgerEntity.OnLedgerAccount.PoolUnitResources {
 }
 
 extension AtLedgerState {
-	public var selector: GatewayAPI.LedgerStateSelector {
+	var selector: GatewayAPI.LedgerStateSelector {
 		.init(stateVersion: self.version)
 	}
 }

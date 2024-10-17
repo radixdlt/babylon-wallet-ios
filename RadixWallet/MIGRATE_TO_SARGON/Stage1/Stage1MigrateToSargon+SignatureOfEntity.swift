@@ -2,13 +2,13 @@ import Foundation
 import Sargon
 
 // MARK: - SignatureOfEntity
-public struct SignatureOfEntity: Sendable, Hashable {
-	public let signerEntity: AccountOrPersona
-	public let derivationPath: DerivationPath
-	public let factorSourceID: FactorSourceID
-	public let signatureWithPublicKey: SignatureWithPublicKey
+struct SignatureOfEntity: Sendable, Hashable {
+	let signerEntity: AccountOrPersona
+	let derivationPath: DerivationPath
+	let factorSourceID: FactorSourceID
+	let signatureWithPublicKey: SignatureWithPublicKey
 
-	public init(
+	init(
 		signerEntity: AccountOrPersona,
 		derivationPath: DerivationPath,
 		factorSourceID: FactorSourceID,

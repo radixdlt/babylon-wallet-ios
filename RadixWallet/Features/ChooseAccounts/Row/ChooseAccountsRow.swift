@@ -2,17 +2,17 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - ChooseAccountsRow
-public enum ChooseAccountsRow {
-	public struct State: Sendable, Hashable {
-		public enum Mode: Sendable, Hashable {
+enum ChooseAccountsRow {
+	struct State: Sendable, Hashable {
+		enum Mode: Sendable, Hashable {
 			case checkmark
 			case radioButton
 		}
 
-		public let account: Account
-		public let mode: Mode
+		let account: Account
+		let mode: Mode
 
-		public init(
+		init(
 			account: Account,
 			mode: Mode
 		) {

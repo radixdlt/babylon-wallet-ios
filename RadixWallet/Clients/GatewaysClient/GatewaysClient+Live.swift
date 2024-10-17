@@ -1,8 +1,8 @@
 
 extension GatewaysClient: DependencyKey {
-	public typealias Value = GatewaysClient
+	typealias Value = GatewaysClient
 
-	public static func live(
+	static func live(
 		profileStore: ProfileStore = .shared
 	) -> Self {
 		@Dependency(\.appPreferencesClient) var appPreferencesClient
@@ -33,5 +33,5 @@ extension GatewaysClient: DependencyKey {
 		)
 	}
 
-	public static let liveValue: Self = .live()
+	static let liveValue: Self = .live()
 }

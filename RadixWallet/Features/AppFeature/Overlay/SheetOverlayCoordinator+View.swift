@@ -4,14 +4,14 @@ import SwiftUI
 // MARK: - SheetOverlayCoordinator.View
 extension SheetOverlayCoordinator {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<SheetOverlayCoordinator>
 
-		public init(store: StoreOf<SheetOverlayCoordinator>) {
+		init(store: StoreOf<SheetOverlayCoordinator>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithNavigationBar {
 				store.send(.view(.closeButtonTapped))
 			} content: {

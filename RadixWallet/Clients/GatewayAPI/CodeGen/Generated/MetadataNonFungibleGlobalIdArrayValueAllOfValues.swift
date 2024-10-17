@@ -11,30 +11,30 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.MetadataNonFungibleGlobalIdArrayValueAllOfValues")
-public typealias MetadataNonFungibleGlobalIdArrayValueAllOfValues = GatewayAPI.MetadataNonFungibleGlobalIdArrayValueAllOfValues
+typealias MetadataNonFungibleGlobalIdArrayValueAllOfValues = GatewayAPI.MetadataNonFungibleGlobalIdArrayValueAllOfValues
 
 extension GatewayAPI {
 
-public struct MetadataNonFungibleGlobalIdArrayValueAllOfValues: Codable, Hashable {
+struct MetadataNonFungibleGlobalIdArrayValueAllOfValues: Codable, Hashable {
 
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var resourceAddress: String
+    private(set) var resourceAddress: String
     /** String-encoded non-fungible ID. */
-    public private(set) var nonFungibleId: String
+    private(set) var nonFungibleId: String
 
-    public init(resourceAddress: String, nonFungibleId: String) {
+    init(resourceAddress: String, nonFungibleId: String) {
         self.resourceAddress = resourceAddress
         self.nonFungibleId = nonFungibleId
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case resourceAddress = "resource_address"
         case nonFungibleId = "non_fungible_id"
     }
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(resourceAddress, forKey: .resourceAddress)
         try container.encode(nonFungibleId, forKey: .nonFungibleId)
