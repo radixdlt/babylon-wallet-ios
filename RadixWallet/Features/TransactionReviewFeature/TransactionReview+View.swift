@@ -1,10 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
 
-private extension CGFloat {
-	static let transferLineTrailingPadding = CGFloat.huge3
-}
-
 extension View {
 	var sectionHeading: some View {
 		textStyle(.body1Header)
@@ -184,11 +180,7 @@ extension TransactionReview {
 							}
 							.background(alignment: .trailing) {
 								if viewStore.showTransferLine {
-									VLine()
-										.stroke(.app.gray3, style: .transactionReview)
-										.frame(width: 1)
-										.padding(.trailing, .transferLineTrailingPadding)
-										.padding(.top, -.medium1)
+									Common.TransferLineView()
 								}
 							}
 
@@ -228,7 +220,7 @@ extension TransactionReview {
 						JaggedEdge(shadowColor: shadowColor, isTopEdge: false)
 					}
 				}
-				.background(.app.gray5.gradient.shadow(.inner(color: shadowColor, radius: 15)))
+				.background(Common.gradientBackground)
 				.animation(.easeInOut, value: viewStore.canToggleViewMode ? viewStore.rawTransaction : nil)
 			}
 			.coordinateSpace(name: coordSpace)
@@ -516,6 +508,8 @@ private extension View {
 
 // MARK: - ExpandableTransactionHeading
 struct ExpandableTransactionHeading: View {
+	typealias Common = InteractionReviewCommon
+
 	let heading: TransactionHeading
 	let isExpanded: Bool
 	let action: () -> Void
@@ -531,7 +525,7 @@ struct ExpandableTransactionHeading: View {
 				Spacer(minLength: 0)
 			}
 		}
-		.padding(.trailing, .transferLineTrailingPadding + .small3) // padding from the vertical dotted line
+		.padding(.trailing, Common.transferLineTrailingPadding + .small3) // padding from the vertical dotted line
 	}
 }
 
@@ -632,10 +626,6 @@ struct TransactionMessageView: View {
 				.padding(.vertical, .small1)
 		}
 	}
-}
-
-extension StrokeStyle {
-	static let transactionReview = StrokeStyle(lineWidth: 2, dash: [5, 5])
 }
 
 extension TransactionReview {

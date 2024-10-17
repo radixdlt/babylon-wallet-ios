@@ -44,11 +44,16 @@ extension PreAuthorizationReview {
 				VStack(spacing: .zero) {
 					header
 
-					if let rawContent = store.displayMode.rawTransaction {
-						rawTransaction(rawContent)
-					} else {
-						details
+					Group {
+						if let rawContent = store.displayMode.rawTransaction {
+							rawTransaction(rawContent)
+						} else {
+							details
+						}
 					}
+					.padding(.horizontal, .small2)
+					.background(Common.gradientBackground)
+					.clipShape(RoundedRectangle(cornerRadius: .small1))
 
 					Spacer()
 				}
@@ -79,11 +84,21 @@ extension PreAuthorizationReview {
 		}
 
 		private func rawTransaction(_ content: String) -> some SwiftUI.View {
-			Common.RawTransactionView(transaction: content) {} toggleAction: {}
+			Common.RawTransactionView(transaction: content) {
+				store.send(.view(.copyRawTransactionButtonTapped))
+			} toggleAction: {
+				store.send(.view(.toggleDisplayModeButtonTapped))
+			}
 		}
 
 		private var details: some SwiftUI.View {
 			VStack(spacing: .medium1) {}
 		}
+	}
+}
+
+extension PreAuthorizationReview.State {
+	var showTransferLine: Bool {
+		true
 	}
 }

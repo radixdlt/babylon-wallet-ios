@@ -18,7 +18,7 @@ extension InteractionReviewCommon {
 
 		var body: some View {
 			VStack(alignment: .leading, spacing: .medium1) {
-				HStack(spacing: .small1) { // TODO: confirm spacing
+				HStack(spacing: .small2) {
 					Spacer()
 					copyButton
 					toggleButton
