@@ -41,11 +41,11 @@ extension ProfileStore {
 }
 
 extension ProfileStore {
-	public func createNewProfile() async throws {
+	func createNewProfile() async throws {
 		try await SargonOS.shared.newWallet()
 	}
 
-	public func finishOnboarding(
+	func finishOnboarding(
 		with accountsRecoveredFromScanningUsingMnemonic: AccountsRecoveredFromScanningUsingMnemonic
 	) async throws {
 		try await SargonOS.shared.newWalletWithDerivedBdfs(
@@ -54,19 +54,19 @@ extension ProfileStore {
 		)
 	}
 
-	public func importProfile(_ profileToImport: Profile, skippedMainBdfs: Bool) async throws {
+	func importProfile(_ profileToImport: Profile, skippedMainBdfs: Bool) async throws {
 		var profileToImport = profileToImport
 		profileToImport.changeCurrentToMainnetIfNeeded()
 		try await SargonOS.shared.importWallet(profile: profileToImport, bdfsSkipped: skippedMainBdfs)
 	}
 
-	public func deleteProfile() async throws {
+	func deleteProfile() async throws {
 		try await SargonOS.shared.deleteWallet()
 	}
 }
 
 extension ProfileStore {
-	public func isThisDevice(deviceID: DeviceID) async -> Bool {
+	func isThisDevice(deviceID: DeviceID) async -> Bool {
 		guard let hostId = try? await SargonOS.shared.resolveHostId().id else {
 			return false
 		}
