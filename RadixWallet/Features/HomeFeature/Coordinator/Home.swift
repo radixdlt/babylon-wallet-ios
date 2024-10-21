@@ -55,6 +55,7 @@ struct Home: Sendable, FeatureReducer {
 		case createAccountButtonTapped
 		case settingsButtonTapped
 		case showFiatWorthToggled
+		case dismissPreAuth
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -88,6 +89,7 @@ struct Home: Sendable, FeatureReducer {
 			case relinkConnector(NewConnection.State)
 			case securityCenter(SecurityCenter.State)
 			case p2pLinks(P2PLinksFeature.State)
+			case preAuth(PreAuthorizationReview.State)
 		}
 
 		@CasePathable
@@ -99,6 +101,7 @@ struct Home: Sendable, FeatureReducer {
 			case relinkConnector(NewConnection.Action)
 			case securityCenter(SecurityCenter.Action)
 			case p2pLinks(P2PLinksFeature.Action)
+			case preAuth(PreAuthorizationReview.Action)
 
 			enum AcknowledgeJailbreakAlert: Sendable, Hashable {}
 		}
@@ -121,6 +124,9 @@ struct Home: Sendable, FeatureReducer {
 			}
 			Scope(state: \.p2pLinks, action: \.p2pLinks) {
 				P2PLinksFeature()
+			}
+			Scope(state: \.preAuth, action: \.preAuth) {
+				PreAuthorizationReview()
 			}
 		}
 	}
@@ -209,12 +215,18 @@ struct Home: Sendable, FeatureReducer {
 			return fetchAccountPortfolios(state)
 
 		case .settingsButtonTapped:
-			return .send(.delegate(.displaySettings))
+			state.destination = .preAuth(.init())
+			return .none
+//			return .send(.delegate(.displaySettings))
 
 		case .showFiatWorthToggled:
 			return .run { _ in
 				try await appPreferencesClient.toggleIsCurrencyAmountVisible()
 			}
+
+		case .dismissPreAuth:
+			state.destination = nil
+			return .none
 		}
 	}
 
