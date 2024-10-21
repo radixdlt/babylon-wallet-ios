@@ -103,12 +103,10 @@ extension PreAuthorizationReview {
 
 		private var details: some SwiftUI.View {
 			VStack(alignment: .leading, spacing: .medium1) {
-				Common.HeadingView.withdrawing
+				withdrawals
 
 				VStack(alignment: .leading, spacing: .medium1) {
-					Common.HeadingView.contributingToPools
-
-					Common.HeadingView.redeemingFromPools
+					deposits
 				}
 				.frame(maxWidth: .infinity, alignment: .leading) // necessary?
 				.background(alignment: .trailing) {
@@ -116,6 +114,8 @@ extension PreAuthorizationReview {
 						Common.TransferLineView()
 					}
 				}
+
+				proofs
 			}
 			.padding(.top, .large2 + .small3)
 			.padding(.horizontal, .small1)
@@ -126,6 +126,33 @@ extension PreAuthorizationReview {
 				}
 				.buttonStyle(.secondaryRectangular)
 				.padding(.medium3)
+			}
+		}
+
+		@ViewBuilder
+		private var withdrawals: some SwiftUI.View {
+			if let childStore = store.scope(state: \.withdrawals, action: \.child.withdrawals) {
+				VStack(alignment: .leading, spacing: .small2) {
+					Common.HeadingView.withdrawing
+					Common.Accounts.View(store: childStore)
+				}
+			}
+		}
+
+		@ViewBuilder
+		private var deposits: some SwiftUI.View {
+			if let childStore = store.scope(state: \.deposits, action: \.child.deposits) {
+				VStack(alignment: .leading, spacing: .small2) {
+					Common.HeadingView.depositing
+					Common.Accounts.View(store: childStore)
+				}
+			}
+		}
+
+		@ViewBuilder
+		private var proofs: some SwiftUI.View {
+			if let childStore = store.scope(state: \.proofs, action: \.child.proofs) {
+				Common.Proofs.View(store: childStore)
 			}
 		}
 

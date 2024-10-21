@@ -12,6 +12,11 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		var expiration: Expiration?
 		var secondsToExpiration: Int?
 
+		// Sections
+		var withdrawals: Common.Accounts.State? = nil
+		var deposits: Common.Accounts.State? = nil
+		var proofs: Common.Proofs.State? = nil
+
 		init() {}
 	}
 
@@ -23,7 +28,15 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		case copyRawTransactionButtonTapped
 	}
 
+	@CasePathable
+	enum ChildAction: Sendable, Equatable {
+		case withdrawals(Common.Accounts.Action)
+		case deposits(Common.Accounts.Action)
+		case proofs(Common.Proofs.Action)
+	}
+
 	enum InternalAction: Sendable, Equatable {
+		case setSections(Common.Sections?)
 		case updateSecondsToExpiration(Date)
 	}
 
@@ -32,15 +45,26 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
+			.ifLet(\.withdrawals, action: \.child.withdrawals) {
+				Common.Accounts()
+			}
+			.ifLet(\.deposits, action: \.child.deposits) {
+				Common.Accounts()
+			}
+			.ifLet(\.proofs, action: \.child.proofs) {
+				Common.Proofs()
+			}
 	}
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
+			// TODO: Replace mocked data with real logic
 			let time = Date().addingTimeInterval(90)
 			state.expiration = .atTime(time)
 			state.secondsToExpiration = Int(time.timeIntervalSinceNow)
 			return startTimer(expirationDate: time)
+				.merge(with: simulateSections())
 
 		case .toggleDisplayModeButtonTapped:
 			switch state.displayMode {
@@ -63,6 +87,17 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
+		case let .setSections(sections):
+			guard let sections else {
+				// TOOD: Show alert to indicate manifest is complex
+				state.displayMode = .raw(state.exampleRaw)
+				return .none
+			}
+			state.withdrawals = sections.withdrawals
+			state.deposits = sections.deposits
+			state.proofs = sections.proofs
+			return .none
+
 		case let .updateSecondsToExpiration(expiration):
 			state.secondsToExpiration = Int(expiration.timeIntervalSinceNow)
 			return .none
@@ -71,6 +106,43 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 }
 
 private extension PreAuthorizationReview {
+	func simulateSections() -> Effect<Action> {
+		let resourceBalance: ResourceBalance = .init(resource: .init(resourceAddress: .sampleStokenetXRD, metadata: .init(name: "Radix", symbol: "XRD", isComplete: true)), details: .fungible(.init(isXRD: true, amount: .init(nominalAmount: .five))))
+		let idResourceBalance = resourceBalance.asIdentified
+
+		let nftBalance: ResourceBalance = .init(resource: .init(resourceAddress: .sampleMainnetNonFungibleGCMembership, atLedgerState: .init(version: 1, epoch: 2), metadata: .init(name: "GC Member Card", isComplete: true)), details: .nonFungible(.init(id: .sample, data: nil)))
+
+		let accountWithdraw = Common.Account.State(
+			account: .user(.sampleMainnetAlice),
+			transfers: [idResourceBalance],
+			isDeposit: false
+		)
+		let withdrawals = Common.Accounts.State(
+			accounts: [accountWithdraw],
+			enableCustomizeGuarantees: false
+		)
+		let accountDeposit = Common.Account.State(
+			account: .user(.sampleMainnetBob),
+			transfers: [idResourceBalance],
+			isDeposit: true
+		)
+		let deposits = Common.Accounts.State(
+			accounts: [accountDeposit],
+			enableCustomizeGuarantees: false
+		)
+
+		let proofs = Common.Proofs.State(proofs: [
+			.init(resourceBalance: nftBalance),
+		])
+
+		let sections = Common.Sections(
+			withdrawals: withdrawals,
+			deposits: deposits,
+			proofs: proofs
+		)
+		return .send(.internal(.setSections(sections)))
+	}
+
 	func startTimer(expirationDate: Date) -> Effect<Action> {
 		.run { send in
 			for await _ in self.clock.timer(interval: .seconds(1)) {
