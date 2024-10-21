@@ -84,7 +84,7 @@ extension TransactionClient {
 			}
 
 			return .init(
-				notaryKey: request.ephemeralNotaryKey,
+				notaryPublicKey: request.ephemeralNotaryPublicKey,
 				intentSigning: intentSigning
 			)
 		}
@@ -123,7 +123,7 @@ extension TransactionClient {
 				startEpochInclusive: epoch,
 				endEpochExclusive: epoch + request.makeTransactionHeaderInput.epochWindow,
 				nonce: request.nonce,
-				notaryKey: Sargon.Key.ed25519(request.transactionSigners.notaryKey.intoSargon()),
+				notaryPublicKey: Sargon.PublicKey.ed25519(request.transactionSigners.notaryPublicKey.intoSargon()),
 				notaryIsSignatory: request.transactionSigners.notaryIsSignatory,
 				tipPercentage: request.makeTransactionHeaderInput.tipPercentage
 			)
@@ -134,7 +134,7 @@ extension TransactionClient {
 		let notarizeTransaction: NotarizeTransaction = { request in
 			let signedTransactionIntent = SignedIntent(
 				intent: request.transactionIntent,
-				intentSignatures: IntentSignatures(signatures: Array(request.intentSignatures.map { IntentSignature(signatureWithKey: $0) }))
+				intentSignatures: IntentSignatures(signatures: Array(request.intentSignatures.map { IntentSignature(signatureWithPublicKey: $0) }))
 			)
 
 			let signedIntentHash = signedTransactionIntent.hash()
@@ -162,9 +162,9 @@ extension TransactionClient {
 					instructions: request.unvalidatedManifest.transactionManifestString,
 					blobs: request.unvalidatedManifest.blobs,
 					message: request.message,
-					isWalletTransaction: request.isWalletTransaction,
+					areInstructionsOriginatingFromHost: request.isWalletTransaction,
 					nonce: request.nonce,
-					notaryKey: .ed25519(request.ephemeralNotaryKey.intoSargon())
+					notaryPublicKey: .ed25519(request.ephemeralNotaryPublicKey.intoSargon())
 				)
 			} catch {
 				throw TransactionFailure.fromCommonError(error as? CommonError)
@@ -181,7 +181,7 @@ extension TransactionClient {
 			let transactionSigners = try await getTransactionSigners(.init(
 				networkID: networkID,
 				manifest: preview.transactionManifest,
-				ephemeralNotaryKey: request.ephemeralNotaryKey
+				ephemeralNotaryPublicKey: request.ephemeralNotaryPublicKey
 			))
 
 			/// Get all of the expected signing factors.
@@ -311,7 +311,7 @@ extension TransactionClient {
 				feeIncludingCandidate.updateSignaturesCost(signingFactors.expectedSignatureCount)
 				if candidate.xrdBalance >= feeIncludingCandidate.totalFee.max {
 					let signers = TransactionSigners(
-						notaryKey: request.transactionSigners.notaryKey,
+						notaryPublicKey: request.transactionSigners.notaryPublicKey,
 						intentSigning: .intentSigners(.init(rawValue: .init(signerEntities))!)
 					)
 					return .init(
