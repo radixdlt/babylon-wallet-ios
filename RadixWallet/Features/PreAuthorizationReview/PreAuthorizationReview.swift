@@ -28,6 +28,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.continuousClock) var clock
+	@Dependency(\.pasteboardClient) var pasteboardClient
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -38,6 +39,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		case .appeared:
 			let time = Date().addingTimeInterval(14)
 			state.expiration = .atTime(time)
+			state.secondsToExpiration = Int(time.timeIntervalSinceNow)
 			return startTimer(expirationDate: time)
 
 		case .toggleDisplayModeButtonTapped:
@@ -50,6 +52,11 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 			return .none
 
 		case .copyRawTransactionButtonTapped:
+			guard case let .raw(manifest) = state.displayMode else {
+				assertionFailure("Copy raw manifest button should only be visible in raw transaction mode")
+				return .none
+			}
+			pasteboardClient.copyString(manifest)
 			return .none
 		}
 	}
