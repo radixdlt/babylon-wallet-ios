@@ -463,7 +463,7 @@ extension TransactionReview {
 		return .init(accounts: depositAccounts, enableCustomizeGuarantees: requiresGuarantees)
 	}
 
-	func extractValidators(for addresses: [ValidatorAddress]) async throws -> ValidatorsState? {
+	func extractValidators(for addresses: [ValidatorAddress]) async throws -> Common.ValidatorsState? {
 		guard !addresses.isEmpty else { return nil }
 
 		let validators = try await onLedgerEntitiesClient.getEntities(
@@ -471,7 +471,7 @@ extension TransactionReview {
 			metadataKeys: .resourceMetadataKeys
 		)
 
-		.compactMap { entity -> ValidatorState? in
+		.compactMap { entity -> Common.ValidatorState? in
 			guard let validator = entity.validator else { return nil }
 			return .init(
 				address: validator.address,

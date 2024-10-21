@@ -67,9 +67,9 @@ extension TransactionReview {
 		let viewRawTransactionButtonState: ControlState
 		let proposingDappMetadata: DappMetadata.Ledger?
 
-		let stakingToValidators: ValidatorsState?
-		let unstakingFromValidators: ValidatorsState?
-		let claimingFromValidators: ValidatorsState?
+		let stakingToValidators: Common.ValidatorsState?
+		let unstakingFromValidators: Common.ValidatorsState?
+		let claimingFromValidators: Common.ValidatorsState?
 		let depositSettingSection: DepositSettingState?
 		let depositExceptionsSection: DepositExceptionsState?
 
@@ -312,20 +312,20 @@ extension TransactionReview {
 			}
 		}
 
-		private func stakingToValidatorsSection(_ viewState: TransactionReview.ValidatorsView.ViewState) -> some SwiftUI.View {
-			ValidatorsView(heading: .stakingToValidators, viewState: viewState) {
+		private func stakingToValidatorsSection(_ viewState: InteractionReview.ValidatorsView.ViewState) -> some SwiftUI.View {
+			Common.ValidatorsView(heading: .stakingToValidators, viewState: viewState) {
 				store.send(.view(.expandStakingToValidatorsTapped))
 			}
 		}
 
-		private func unstakingFromValidatorsSection(_ viewState: TransactionReview.ValidatorsView.ViewState) -> some SwiftUI.View {
-			ValidatorsView(heading: .unstakingFromValidators, viewState: viewState) {
+		private func unstakingFromValidatorsSection(_ viewState: InteractionReview.ValidatorsView.ViewState) -> some SwiftUI.View {
+			Common.ValidatorsView(heading: .unstakingFromValidators, viewState: viewState) {
 				store.send(.view(.expandUnstakingFromValidatorsTapped))
 			}
 		}
 
-		private func claimingFromValidatorsSection(_ viewState: TransactionReview.ValidatorsView.ViewState) -> some SwiftUI.View {
-			ValidatorsView(heading: .claimingFromValidators, viewState: viewState) {
+		private func claimingFromValidatorsSection(_ viewState: InteractionReview.ValidatorsView.ViewState) -> some SwiftUI.View {
+			Common.ValidatorsView(heading: .claimingFromValidators, viewState: viewState) {
 				store.send(.view(.expandClaimingFromValidatorsTapped))
 			}
 		}
@@ -540,79 +540,6 @@ struct TransactionMessageView: View {
 				.flushedLeft
 				.padding(.horizontal, .medium3)
 				.padding(.vertical, .small1)
-		}
-	}
-}
-
-extension TransactionReview {
-	typealias ValidatorsState = ValidatorsView.ViewState
-	typealias ValidatorState = ValidatorView.ViewState
-
-	struct ValidatorsView: SwiftUI.View {
-		let heading: InteractionReview.HeadingView
-		let viewState: ViewState
-		let action: () -> Void
-
-		var body: some SwiftUI.View {
-			VStack(alignment: .leading, spacing: .small2) {
-				ExpandableTransactionHeading(heading: heading, isExpanded: viewState.isExpanded, action: action)
-
-				if viewState.isExpanded {
-					VStack(spacing: .small2) {
-						ForEach(viewState.validators) { validator in
-							ValidatorView(viewState: validator)
-						}
-					}
-					.transition(.opacity.combined(with: .scale(scale: 0.95)))
-				}
-			}
-		}
-
-		struct ViewState: Hashable, Sendable {
-			let validators: [ValidatorView.ViewState]
-			var isExpanded: Bool
-
-			init(validators: [ValidatorView.ViewState], isExpanded: Bool = true) {
-				self.validators = validators
-				self.isExpanded = isExpanded
-			}
-		}
-	}
-
-	struct ValidatorView: SwiftUI.View {
-		let viewState: ViewState
-
-		struct ViewState: Hashable, Sendable, Identifiable {
-			var id: ValidatorAddress { address }
-			let address: ValidatorAddress
-			let name: String?
-			let thumbnail: URL?
-		}
-
-		var body: some SwiftUI.View {
-			Card {
-				HStack(spacing: .zero) {
-					Thumbnail(.validator, url: viewState.thumbnail)
-						.padding(.trailing, .medium3)
-
-					VStack(alignment: .leading, spacing: .zero) {
-						if let name = viewState.name {
-							Text(name)
-								.lineSpacing(-6)
-								.lineLimit(1)
-								.textStyle(.secondaryHeader)
-								.foregroundColor(.app.gray1)
-						}
-
-						AddressView(.address(.validator(viewState.address)))
-					}
-
-					Spacer(minLength: 0)
-				}
-				.frame(minHeight: .plainListRowMinHeight)
-				.padding(.horizontal, .medium3)
-				.contentShape(Rectangle())
-			}
 		}
 	}
 }

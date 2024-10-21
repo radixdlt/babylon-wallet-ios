@@ -27,9 +27,9 @@ struct TransactionReview: Sendable, FeatureReducer {
 		var redeemingFromPools: TransactionReviewPools.State? = nil
 		var deposits: Common.Accounts.State? = nil
 
-		var stakingToValidators: ValidatorsState? = nil
-		var unstakingFromValidators: ValidatorsState? = nil
-		var claimingFromValidators: ValidatorsState? = nil
+		var stakingToValidators: Common.ValidatorsState? = nil
+		var unstakingFromValidators: Common.ValidatorsState? = nil
+		var claimingFromValidators: Common.ValidatorsState? = nil
 
 		var accountDepositSetting: DepositSettingState? = nil
 		var accountDepositExceptions: DepositExceptionsState? = nil

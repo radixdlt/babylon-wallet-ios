@@ -9,9 +9,9 @@ extension InteractionReview {
 		var contributingToPools: TransactionReviewPools.State? = nil
 		var redeemingFromPools: TransactionReviewPools.State? = nil
 
-		var stakingToValidators: TransactionReview.ValidatorsState? = nil
-		var unstakingFromValidators: TransactionReview.ValidatorsState? = nil
-		var claimingFromValidators: TransactionReview.ValidatorsState? = nil
+		var stakingToValidators: InteractionReview.ValidatorsState? = nil
+		var unstakingFromValidators: InteractionReview.ValidatorsState? = nil
+		var claimingFromValidators: InteractionReview.ValidatorsState? = nil
 
 		var accountDepositSetting: TransactionReview.DepositSettingState? = nil
 		var accountDepositExceptions: TransactionReview.DepositExceptionsState? = nil
