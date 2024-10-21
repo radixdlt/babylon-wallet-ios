@@ -255,7 +255,7 @@ extension TransactionReview {
 		private func messageSection(with message: String?) -> some SwiftUI.View {
 			if let message {
 				VStack(alignment: .leading, spacing: .small2) {
-					TransactionHeading.message
+					Common.HeadingView.message
 					TransactionMessageView(message: message)
 				}
 			}
@@ -264,7 +264,7 @@ extension TransactionReview {
 		private var withdrawalsSection: some SwiftUI.View {
 			IfLetStore(store.scope(state: \.withdrawals) { .child(.withdrawals($0)) }) { childStore in
 				VStack(alignment: .leading, spacing: .small2) {
-					TransactionHeading.withdrawing
+					Common.HeadingView.withdrawing
 					TransactionReviewAccounts.View(store: childStore)
 				}
 			}
@@ -333,7 +333,7 @@ extension TransactionReview {
 		private var depositsSection: some SwiftUI.View {
 			IfLetStore(store.scope(state: \.deposits) { .child(.deposits($0)) }) { childStore in
 				VStack(alignment: .leading, spacing: .small2) {
-					TransactionHeading.depositing
+					Common.HeadingView.depositing
 					TransactionReviewAccounts.View(store: childStore)
 				}
 			}
@@ -342,7 +342,7 @@ extension TransactionReview {
 		@ViewBuilder
 		private func accountDepositSettingSection(_ viewState: DepositSettingState) -> some SwiftUI.View {
 			VStack(alignment: .leading, spacing: .small2) {
-				TransactionHeading.depositSetting
+				Common.HeadingView.depositSetting
 				DepositSettingView(viewState: viewState)
 			}
 		}
@@ -350,7 +350,7 @@ extension TransactionReview {
 		@ViewBuilder
 		private func accountDepositExceptionsSection(_ viewState: DepositExceptionsState) -> some SwiftUI.View {
 			VStack(alignment: .leading, spacing: .small2) {
-				TransactionHeading.depositExceptions
+				Common.HeadingView.depositExceptions
 				DepositExceptionsView(viewState: viewState)
 			}
 		}
@@ -510,7 +510,7 @@ private extension View {
 struct ExpandableTransactionHeading: View {
 	typealias Common = InteractionReviewCommon
 
-	let heading: TransactionHeading
+	let heading: Common.HeadingView
 	let isExpanded: Bool
 	let action: () -> Void
 
@@ -527,90 +527,6 @@ struct ExpandableTransactionHeading: View {
 		}
 		.padding(.trailing, Common.transferLineTrailingPadding + .small3) // padding from the vertical dotted line
 	}
-}
-
-// MARK: - TransactionHeading
-struct TransactionHeading: View {
-	let heading: String
-	let icon: ImageAsset
-
-	init(_ heading: String, icon: ImageAsset) {
-		self.heading = heading
-		self.icon = icon
-	}
-
-	var body: some View {
-		HStack(spacing: .small2) {
-			Image(asset: icon)
-				.padding(.small3)
-				.overlay {
-					Circle()
-						.stroke(style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
-						.foregroundColor(.app.gray3)
-				}
-			Text(heading)
-				.minimumScaleFactor(0.7)
-				.multilineTextAlignment(.leading)
-				.lineSpacing(0)
-				.sectionHeading
-				.textCase(.uppercase)
-		}
-	}
-
-	static let message = TransactionHeading(
-		L10n.TransactionReview.messageHeading,
-		icon: AssetResource.transactionReviewMessage
-	)
-
-	static let withdrawing = TransactionHeading(
-		L10n.TransactionReview.withdrawalsHeading,
-		icon: AssetResource.transactionReviewWithdrawing
-	)
-
-	static let depositing = TransactionHeading(
-		L10n.TransactionReview.depositsHeading,
-		icon: AssetResource.transactionReviewDepositing
-	)
-
-	static let usingDapps = TransactionHeading(
-		L10n.TransactionReview.usingDappsHeading,
-		icon: AssetResource.transactionReviewDapps
-	)
-
-	static let contributingToPools = TransactionHeading(
-		L10n.TransactionReview.poolContributionHeading,
-		icon: AssetResource.transactionReviewPools
-	)
-
-	static let redeemingFromPools = TransactionHeading(
-		L10n.TransactionReview.poolRedemptionHeading,
-		icon: AssetResource.transactionReviewPools
-	)
-
-	static let stakingToValidators = TransactionHeading(
-		L10n.TransactionReview.stakingToValidatorsHeading,
-		icon: AssetResource.iconValidator
-	)
-
-	static let unstakingFromValidators = TransactionHeading(
-		L10n.TransactionReview.unstakingFromValidatorsHeading,
-		icon: AssetResource.iconValidator
-	)
-
-	static let claimingFromValidators = TransactionHeading(
-		L10n.TransactionReview.claimFromValidatorsHeading,
-		icon: AssetResource.iconValidator
-	)
-
-	static let depositSetting = TransactionHeading(
-		L10n.TransactionReview.thirdPartyDepositSettingHeading,
-		icon: AssetResource.transactionReviewDepositSetting
-	)
-
-	static let depositExceptions = TransactionHeading(
-		L10n.TransactionReview.thirdPartyDepositExceptionsHeading,
-		icon: AssetResource.transactionReviewDepositSetting
-	)
 }
 
 // MARK: - TransactionMessageView
@@ -633,7 +549,7 @@ extension TransactionReview {
 	typealias ValidatorState = ValidatorView.ViewState
 
 	struct ValidatorsView: SwiftUI.View {
-		let heading: TransactionHeading
+		let heading: InteractionReviewCommon.HeadingView
 		let viewState: ViewState
 		let action: () -> Void
 

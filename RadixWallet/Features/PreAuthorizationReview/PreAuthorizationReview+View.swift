@@ -51,12 +51,13 @@ extension PreAuthorizationReview {
 							details
 						}
 					}
-					.padding(.horizontal, .small2)
 					.background(Common.gradientBackground)
 					.clipShape(RoundedRectangle(cornerRadius: .small1))
+					.padding(.horizontal, .small2)
 
 					Spacer()
 				}
+				.animation(.easeInOut, value: store.displayMode.rawTransaction)
 			}
 			.coordinateSpace(name: coordSpace)
 			.onPreferenceChange(PositionsPreferenceKey.self) { positions in
@@ -92,7 +93,31 @@ extension PreAuthorizationReview {
 		}
 
 		private var details: some SwiftUI.View {
-			VStack(spacing: .medium1) {}
+			VStack(alignment: .leading, spacing: .medium1) {
+				Common.HeadingView.withdrawing
+
+				VStack(alignment: .leading, spacing: .medium1) {
+					Common.HeadingView.contributingToPools
+
+					Common.HeadingView.redeemingFromPools
+				}
+				.frame(maxWidth: .infinity, alignment: .leading) // necessary?
+				.background(alignment: .trailing) {
+					if store.showTransferLine {
+						Common.TransferLineView()
+					}
+				}
+			}
+			.padding(.top, .large2 + .small3)
+			.padding(.horizontal, .small1)
+			.padding(.bottom, .medium1)
+			.overlay(alignment: .topTrailing) {
+				Button(asset: AssetResource.code) {
+					store.send(.view(.toggleDisplayModeButtonTapped))
+				}
+				.buttonStyle(.secondaryRectangular)
+				.padding(.medium3)
+			}
 		}
 	}
 }
