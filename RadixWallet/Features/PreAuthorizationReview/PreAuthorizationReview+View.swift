@@ -22,6 +22,9 @@ extension PreAuthorizationReview {
 							}
 						}
 					}
+					.onAppear {
+						store.send(.view(.appeared))
+					}
 			}
 		}
 
@@ -59,7 +62,9 @@ extension PreAuthorizationReview {
 						.padding(.top, .small2)
 						.padding(.horizontal, .small2)
 
-					Spacer()
+					expiration
+
+					slider
 				}
 				.animation(.easeInOut, value: store.displayMode.rawTransaction)
 			}
@@ -137,18 +142,88 @@ extension PreAuthorizationReview {
 
 				Spacer(minLength: .small2)
 
-				InfoButton(.dapps)
+				InfoButton(.dapps) // TODO: Update to correct one
 			}
 			.padding(.vertical, .medium3)
 			.padding(.horizontal, .medium2)
 			.background(Color.app.gray5)
 			.clipShape(RoundedRectangle(cornerRadius: .small1))
 		}
+
+		private var expiration: some SwiftUI.View {
+			Group {
+				switch store.expiration {
+				case .none:
+					Color.clear
+				case let .window(seconds):
+					let value = formatTime(seconds: seconds)
+					Text("Valid for **\(value) after approval**")
+				case .atTime:
+					if let seconds = store.secondsToExpiration {
+						if seconds > 0 {
+							let value = formatTime(seconds: seconds)
+							Text("Valid for the next **\(value)**")
+						} else {
+							Text("Invalid!")
+						}
+					}
+				}
+			}
+			.textStyle(.body2Regular)
+			.foregroundStyle(.app.account4pink)
+			.padding(.horizontal, .medium1)
+			.frame(minHeight: .huge2)
+		}
+
+		private var slider: some SwiftUI.View {
+			ApprovalSlider(
+				title: "Slide to sign and return",
+				resetDate: store.sliderResetDate
+			) {}
+				.controlState(store.sliderControlState)
+				.padding(.horizontal, .medium2)
+		}
 	}
 }
 
-extension PreAuthorizationReview.State {
+private extension PreAuthorizationReview.View {
+	/// Given an amount of seconds, returns a formatted String using the corresponding unit (days/hours/minutes/seconds).
+	/// A few examples on how should it look for each of them:
+	/// - `8 days` / `1 day`
+	/// - `23:21 hours` / `1:24 hour`
+	/// - `56:02 minutes` / `1:23 minute`
+	/// - `34 seconds` / `1 second`
+	func formatTime(seconds: Int) -> String {
+		let minutes = seconds / 60
+		let hours = minutes / 60
+		let days = hours / 24
+		if days > 0 {
+			return days == 1 ? "1 day" : "\(days) days"
+		} else if hours > 0 {
+			let remainingMinutes = minutes % 60
+			let formatted = String(format: "%d:%02d", hours, remainingMinutes)
+			return hours == 1 ? "\(formatted) hour" : "\(formatted) hours"
+		} else if minutes > 0 {
+			let remainingSeconds = seconds % 60
+			let formatted = String(format: "%d:%02d", minutes, remainingSeconds)
+			return minutes == 1 ? "\(formatted) minute" : "\(formatted) minutes"
+		} else {
+			return seconds == 1 ? "1 second" : "\(seconds) seconds"
+		}
+	}
+}
+
+private extension PreAuthorizationReview.State {
 	var showTransferLine: Bool {
 		true
+	}
+
+	var controlState: ControlState {
+		// If is loading transaction show loading
+		.enabled
+	}
+
+	var sliderControlState: ControlState {
+		isExpired ? .disabled : controlState
 	}
 }

@@ -5582,11 +5582,11 @@
 		5B4A1AC22CC0120600679EE6 /* InteractionReviewCommon */ = {
 			isa = PBXGroup;
 			children = (
+				5B4A1AC32CC0123300679EE6 /* InteractionReview.swift */,
+				5B03E3D22CC141C200E10A64 /* InteractionReviewCommon+Extra.swift */,
 				5B27FBD82CC67655002975BE /* HeadingView.swift */,
 				5B03E3D42CC1487400E10A64 /* TransferLineView.swift */,
-				5B03E3D22CC141C200E10A64 /* InteractionReviewCommon+Extra.swift */,
 				5B03E3D02CC127B100E10A64 /* RawTransactionView.swift */,
-				5B4A1AC32CC0123300679EE6 /* InteractionReview.swift */,
 				5B03E3CE2CC1222D00E10A64 /* DisplayMode.swift */,
 				5B4A1AC52CC0150D00679EE6 /* HeaderView.swift */,
 			);

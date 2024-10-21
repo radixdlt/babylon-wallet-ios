@@ -7,6 +7,11 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		var dappName: String? = "Collabo.Fi"
 		var displayMode: Common.DisplayMode = .detailed
+		var sliderResetDate: Date = .now // TODO: reset when it corresponds
+
+		var expiration: Expiration?
+		var secondsToExpiration: Int? // Only valid when expiration == .atTime
+
 		init() {}
 	}
 
@@ -18,6 +23,12 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		case copyRawTransactionButtonTapped
 	}
 
+	enum InternalAction: Sendable, Equatable {
+		case updateSecondsToExpiration(Date)
+	}
+
+	@Dependency(\.continuousClock) var clock
+
 	var body: some ReducerOf<Self> {
 		Reduce(core)
 	}
@@ -25,7 +36,10 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			return .none
+			let time = Date().addingTimeInterval(14)
+			state.expiration = .atTime(time)
+			return startTimer(expirationDate: time)
+
 		case .toggleDisplayModeButtonTapped:
 			switch state.displayMode {
 			case .detailed:
@@ -34,8 +48,43 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 				state.displayMode = .detailed
 			}
 			return .none
+
 		case .copyRawTransactionButtonTapped:
 			return .none
+		}
+	}
+
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case let .updateSecondsToExpiration(expiration):
+			state.secondsToExpiration = Int(expiration.timeIntervalSinceNow)
+			return .none
+		}
+	}
+}
+
+private extension PreAuthorizationReview {
+	enum CancellableId: Hashable {
+		case expirationTimer
+	}
+
+	func startTimer(expirationDate: Date) -> Effect<Action> {
+		.run { send in
+			for await _ in self.clock.timer(interval: .seconds(1)) {
+				await send(.internal(.updateSecondsToExpiration(expirationDate)))
+			}
+		}
+		.cancellable(id: CancellableId.expirationTimer, cancelInFlight: true)
+	}
+}
+
+extension PreAuthorizationReview.State {
+	var isExpired: Bool {
+		switch expiration {
+		case let .atTime(date):
+			date <= Date.now
+		case .window, .none:
+			false
 		}
 	}
 }
@@ -68,4 +117,10 @@ extension PreAuthorizationReview.State {
 
 		"""
 	}
+}
+
+// MARK: - Expiration
+enum Expiration: Sendable, Hashable {
+	case atTime(Date)
+	case window(Int)
 }
