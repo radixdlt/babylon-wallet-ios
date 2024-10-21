@@ -3,7 +3,6 @@ import SwiftUI
 
 // MARK: - TransactionReview
 struct TransactionReview: Sendable, FeatureReducer {
-	typealias Transfer = IDResourceBalance
 	typealias Common = InteractionReviewCommon
 
 	struct State: Sendable, Hashable {
@@ -780,35 +779,11 @@ extension TransactionReview {
 	}
 }
 
-// MARK: Useful types
-
+// MARK: - TransactionReview.DappEntity
 extension TransactionReview {
 	struct DappEntity: Sendable, Identifiable, Hashable {
 		let id: DappDefinitionAddress
 		let metadata: OnLedgerEntity.Metadata
-	}
-
-	enum ReviewAccount: Sendable, Hashable {
-		case user(Account)
-		case external(AccountAddress, approved: Bool)
-
-		var address: AccountAddress {
-			switch self {
-			case let .user(account):
-				account.address
-			case let .external(address, _):
-				address
-			}
-		}
-
-		var isApproved: Bool {
-			switch self {
-			case .user:
-				false
-			case let .external(_, approved):
-				approved
-			}
-		}
 	}
 }
 
@@ -866,13 +841,13 @@ extension TransactionReview.State {
 
 	mutating func applyGuarantee(
 		_ updated: TransactionGuarantee,
-		transferID: TransactionReview.Transfer.ID
+		transferID: InteractionReviewCommon.Transfer.ID
 	) {
 		guard let accountID = accountID(for: transferID) else { return }
 		deposits?.accounts[id: accountID]?.transfers[id: transferID]?.fungibleGuarantee = updated
 	}
 
-	private func accountID(for transferID: TransactionReview.Transfer.ID) -> AccountAddress? {
+	private func accountID(for transferID: InteractionReviewCommon.Transfer.ID) -> AccountAddress? {
 		for account in deposits?.accounts ?? [] {
 			for transfer in account.transfers {
 				if transfer.id == transferID {
@@ -886,10 +861,10 @@ extension TransactionReview.State {
 
 // MARK: Helpers
 
-extension [TransactionReview.ReviewAccount] {
+extension [InteractionReviewCommon.ReviewAccount] {
 	struct MissingUserAccountError: Error {}
 
-	func account(for accountAddress: AccountAddress) throws -> TransactionReview.ReviewAccount {
+	func account(for accountAddress: AccountAddress) throws -> InteractionReviewCommon.ReviewAccount {
 		guard let account = first(where: { $0.address == accountAddress }) else {
 			loggerGlobal.error("Can't find address that was specified for transfer")
 			throw MissingUserAccountError()

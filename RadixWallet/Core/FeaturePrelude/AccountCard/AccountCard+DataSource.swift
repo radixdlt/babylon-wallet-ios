@@ -48,7 +48,7 @@ extension AccountCard where Trailing == EmptyView, Bottom == EmptyView {
 		)
 	}
 
-	init(kind: Kind = .innerCompact, account: TransactionReview.ReviewAccount) {
+	init(kind: Kind = .innerCompact, account: InteractionReviewCommon.ReviewAccount) {
 		switch account {
 		case let .user(account):
 			self.init(kind: kind, account: account)

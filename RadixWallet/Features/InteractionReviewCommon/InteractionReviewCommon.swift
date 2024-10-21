@@ -11,3 +11,8 @@ extension InteractionReviewCommon {
 		case preAuthorization
 	}
 }
+
+// MARK: InteractionReviewCommon.Transfer
+extension InteractionReviewCommon {
+	typealias Transfer = IDResourceBalance
+}

@@ -285,7 +285,7 @@ extension TransactionReview {
 		}
 	}
 
-	private func extractUserAccounts(_ allAddress: [AccountAddress]) async throws -> [ReviewAccount] {
+	private func extractUserAccounts(_ allAddress: [AccountAddress]) async throws -> [Common.ReviewAccount] {
 		let userAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
 
 		return allAddress
@@ -384,8 +384,8 @@ extension TransactionReview {
 		resourceAssociatedDapps: ResourceAssociatedDapps? = nil,
 		networkID: NetworkID
 	) async throws -> Common.Accounts.State? {
-		var withdrawals: [ReviewAccount: IdentifiedArrayOf<Transfer>] = [:]
-		let userAccounts: [ReviewAccount] = try await extractUserAccounts(Array(accountWithdraws.keys))
+		var withdrawals: [Common.ReviewAccount: IdentifiedArrayOf<Common.Transfer>] = [:]
+		let userAccounts: [Common.ReviewAccount] = try await extractUserAccounts(Array(accountWithdraws.keys))
 
 		for (accountAddress, resources) in accountWithdraws {
 			let account = try userAccounts.account(for: accountAddress)
@@ -425,10 +425,10 @@ extension TransactionReview {
 		resourceAssociatedDapps: ResourceAssociatedDapps? = nil,
 		networkID: NetworkID
 	) async throws -> Common.Accounts.State? {
-		let userAccounts: [ReviewAccount] = try await extractUserAccounts(Array(accountDeposits.keys))
+		let userAccounts: [Common.ReviewAccount] = try await extractUserAccounts(Array(accountDeposits.keys))
 		let defaultDepositGuarantee = await appPreferencesClient.getPreferences().transaction.defaultDepositGuarantee
 
-		var deposits: [ReviewAccount: IdentifiedArrayOf<Transfer>] = [:]
+		var deposits: [Common.ReviewAccount: IdentifiedArrayOf<Common.Transfer>] = [:]
 
 		for (accountAddress, accountDeposits) in accountDeposits {
 			let account = try userAccounts.account(for: accountAddress)

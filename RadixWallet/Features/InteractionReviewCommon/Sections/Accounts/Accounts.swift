@@ -64,15 +64,10 @@ extension InteractionReviewCommon {
 		@ObservableState
 		struct State: Sendable, Identifiable, Hashable {
 			var id: AccountAddress { account.address }
-			let account: TransactionReview.ReviewAccount
-			var transfers: IdentifiedArrayOf<TransactionReview.Transfer>
-			let isDeposit: Bool
 
-			init(account: TransactionReview.ReviewAccount, transfers: IdentifiedArrayOf<TransactionReview.Transfer>, isDeposit: Bool) {
-				self.account = account
-				self.transfers = transfers
-				self.isDeposit = isDeposit
-			}
+			let account: InteractionReviewCommon.ReviewAccount
+			var transfers: IdentifiedArrayOf<InteractionReviewCommon.Transfer>
+			let isDeposit: Bool
 		}
 
 		typealias Action = FeatureAction<Self>
@@ -97,6 +92,35 @@ extension InteractionReviewCommon {
 				.none
 			case let .transferTapped(transfer, token):
 				.send(.delegate(.showAsset(transfer, token)))
+			}
+		}
+	}
+}
+
+// Neccessary so that ReviewAccount.user has a proper Account associated (and not the InteractionReviewCommon.Account reducer)
+typealias RadixAccount = Account
+
+// MARK: - InteractionReviewCommon.ReviewAccount
+extension InteractionReviewCommon {
+	enum ReviewAccount: Sendable, Hashable {
+		case user(RadixAccount)
+		case external(AccountAddress, approved: Bool)
+
+		var address: AccountAddress {
+			switch self {
+			case let .user(account):
+				account.address
+			case let .external(address, _):
+				address
+			}
+		}
+
+		var isApproved: Bool {
+			switch self {
+			case .user:
+				false
+			case let .external(_, approved):
+				approved
 			}
 		}
 	}
