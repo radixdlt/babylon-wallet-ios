@@ -11,7 +11,7 @@ extension InteractionReview {
 
 		var body: some SwiftUI.View {
 			VStack(alignment: .leading, spacing: .small2) {
-				ExpandableTransactionHeading(heading: heading, isExpanded: viewState.isExpanded, action: action)
+				InteractionReview.ExpandableHeadingView(heading: heading, isExpanded: viewState.isExpanded, action: action)
 
 				if viewState.isExpanded {
 					VStack(spacing: .small2) {

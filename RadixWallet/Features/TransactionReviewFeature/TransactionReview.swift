@@ -145,7 +145,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 			case nonFungibleTokenDetails(NonFungibleTokenDetails.State)
 			case poolUnitDetails(PoolUnitDetails.State)
 			case lsuDetails(LSUDetails.State)
-			case unknownDappComponents(UnknownDappComponents.State)
+			case unknownDappComponents(Common.UnknownDappComponents.State)
 			case rawTransactionAlert(AlertState<Action.RawTransactionAlert>)
 		}
 
@@ -159,7 +159,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 			case nonFungibleTokenDetails(NonFungibleTokenDetails.Action)
 			case lsuDetails(LSUDetails.Action)
 			case poolUnitDetails(PoolUnitDetails.Action)
-			case unknownDappComponents(UnknownDappComponents.Action)
+			case unknownDappComponents(Common.UnknownDappComponents.Action)
 			case rawTransactionAlert(RawTransactionAlert)
 
 			enum RawTransactionAlert: Sendable, Equatable {
@@ -196,7 +196,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 				LSUDetails()
 			}
 			Scope(state: /State.unknownDappComponents, action: /Action.unknownDappComponents) {
-				UnknownDappComponents()
+				Common.UnknownDappComponents()
 			}
 		}
 	}

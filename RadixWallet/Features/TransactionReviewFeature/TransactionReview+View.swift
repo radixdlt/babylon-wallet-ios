@@ -273,7 +273,7 @@ extension TransactionReview {
 		private func usingDappsSection(isExpanded: Bool) -> some SwiftUI.View {
 			IfLetStore(store.scope(state: \.dAppsUsed) { .child(.dAppsUsed($0)) }) { childStore in
 				VStack(alignment: .leading, spacing: .small2) {
-					ExpandableTransactionHeading(heading: .usingDapps, isExpanded: isExpanded) {
+					Common.ExpandableHeadingView(heading: .usingDapps, isExpanded: isExpanded) {
 						store.send(.view(.expandUsingDappsTapped))
 					}
 					if isExpanded {
@@ -287,7 +287,7 @@ extension TransactionReview {
 		private func contributingToPools(isExpanded: Bool) -> some SwiftUI.View {
 			IfLetStore(store.scope(state: \.contributingToPools) { .child(.contributingToPools($0)) }) { childStore in
 				VStack(alignment: .leading, spacing: .small2) {
-					ExpandableTransactionHeading(heading: .contributingToPools, isExpanded: isExpanded) {
+					Common.ExpandableHeadingView(heading: .contributingToPools, isExpanded: isExpanded) {
 						store.send(.view(.expandContributingToPoolsTapped))
 					}
 					if isExpanded {
@@ -301,7 +301,7 @@ extension TransactionReview {
 		private func redeemingFromPools(isExpanded: Bool) -> some SwiftUI.View {
 			IfLetStore(store.scope(state: \.redeemingFromPools) { .child(.redeemingFromPools($0)) }) { childStore in
 				VStack(alignment: .leading, spacing: .small2) {
-					ExpandableTransactionHeading(heading: .redeemingFromPools, isExpanded: isExpanded) {
+					Common.ExpandableHeadingView(heading: .redeemingFromPools, isExpanded: isExpanded) {
 						store.send(.view(.expandRedeemingFromPoolsTapped))
 					}
 					if isExpanded {
@@ -435,7 +435,7 @@ private extension View {
 			state: /TransactionReview.Destination.State.unknownDappComponents,
 			action: TransactionReview.Destination.Action.unknownDappComponents,
 			content: {
-				UnknownDappComponents.View(store: $0)
+				InteractionReview.UnknownDappComponents.View(store: $0)
 					.inNavigationStack
 					.presentationDetents([.medium])
 			}
@@ -503,29 +503,6 @@ private extension View {
 			action: TransactionReview.Destination.Action.submitting,
 			content: { SubmitTransaction.View(store: $0) }
 		)
-	}
-}
-
-// MARK: - ExpandableTransactionHeading
-struct ExpandableTransactionHeading: View {
-	typealias Common = InteractionReview
-
-	let heading: Common.HeadingView
-	let isExpanded: Bool
-	let action: () -> Void
-
-	var body: some SwiftUI.View {
-		Button(action: action) {
-			HStack(spacing: .small3) {
-				heading
-
-				Image(asset: isExpanded ? AssetResource.chevronUp : AssetResource.chevronDown)
-					.renderingMode(.original)
-
-				Spacer(minLength: 0)
-			}
-		}
-		.padding(.trailing, Common.transferLineTrailingPadding + .small3) // padding from the vertical dotted line
 	}
 }
 
