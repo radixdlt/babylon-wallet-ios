@@ -86,7 +86,7 @@ extension PreAuthorizationReview {
 			Common.HeaderView(
 				kind: .preAuthorization,
 				name: store.dappName,
-				thumbnail: nil
+				thumbnail: store.dappThumbnail
 			)
 			.measurePosition(navTitleID, coordSpace: coordSpace)
 			.padding(.horizontal, .medium3)
@@ -153,6 +153,7 @@ extension PreAuthorizationReview {
 		private var proofs: some SwiftUI.View {
 			if let childStore = store.scope(state: \.proofs, action: \.child.proofs) {
 				Common.Proofs.View(store: childStore)
+					.padding(.horizontal, .small3)
 			}
 		}
 
@@ -191,7 +192,7 @@ extension PreAuthorizationReview {
 							let value = formatTime(seconds: seconds)
 							Text("Valid for the next **\(value)**")
 						} else {
-							Text("Invalid!")
+							Text("This subintent is no longer valid!")
 						}
 					}
 				}

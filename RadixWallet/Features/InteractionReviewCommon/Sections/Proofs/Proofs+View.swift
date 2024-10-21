@@ -24,7 +24,9 @@ extension InteractionReviewCommon.Proofs {
 							store.send(.view(.proofTapped(proof)))
 						}
 					}
-					Separator()
+					if store.kind == .transaction {
+						Separator()
+					}
 				}
 			}
 		}

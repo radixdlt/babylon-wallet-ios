@@ -723,6 +723,7 @@
 		5B272DDB2C36E9D300B74F1F /* AppEventsClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B272DDA2C36E9D300B74F1F /* AppEventsClient+Test.swift */; };
 		5B27FBD92CC67655002975BE /* HeadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B27FBD82CC67655002975BE /* HeadingView.swift */; };
 		5B27FBE02CC6CCBE002975BE /* Sections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B27FBDF2CC6CCBE002975BE /* Sections.swift */; };
+		5B27FBE62CC700F4002975BE /* PreAuthorizationReview+Sections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B27FBE52CC700E5002975BE /* PreAuthorizationReview+Sections.swift */; };
 		5B2A45022BD6680400AEC8AD /* ContactSupportClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2A45012BD6680400AEC8AD /* ContactSupportClient.swift */; };
 		5B2A45042BD6689100AEC8AD /* ContactSupportClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2A45032BD6689100AEC8AD /* ContactSupportClient+Live.swift */; };
 		5B3C48A92C7E190C00DB160D /* AssetRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3C48A82C7E190C00DB160D /* AssetRow.swift */; };
@@ -1953,6 +1954,7 @@
 		5B272DDA2C36E9D300B74F1F /* AppEventsClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppEventsClient+Test.swift"; sourceTree = "<group>"; };
 		5B27FBD82CC67655002975BE /* HeadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadingView.swift; sourceTree = "<group>"; };
 		5B27FBDF2CC6CCBE002975BE /* Sections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sections.swift; sourceTree = "<group>"; };
+		5B27FBE52CC700E5002975BE /* PreAuthorizationReview+Sections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PreAuthorizationReview+Sections.swift"; sourceTree = "<group>"; };
 		5B2A45012BD6680400AEC8AD /* ContactSupportClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactSupportClient.swift; sourceTree = "<group>"; };
 		5B2A45032BD6689100AEC8AD /* ContactSupportClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ContactSupportClient+Live.swift"; sourceTree = "<group>"; };
 		5B3C48A82C7E190C00DB160D /* AssetRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetRow.swift; sourceTree = "<group>"; };
@@ -5585,6 +5587,7 @@
 			children = (
 				5B4A1ABD2CC00FB800679EE6 /* PreAuthorizationReview.swift */,
 				5B4A1ABE2CC00FB800679EE6 /* PreAuthorizationReview+View.swift */,
+				5B27FBE52CC700E5002975BE /* PreAuthorizationReview+Sections.swift */,
 			);
 			path = PreAuthorizationReview;
 			sourceTree = "<group>";
@@ -8017,6 +8020,7 @@
 				E7B7A0FD2BBBFB6100EEE900 /* HeaderListViewContainer.swift in Sources */,
 				48CFC3FA2ADC10D900E77A5C /* SignalingClient.swift in Sources */,
 				4813B0012BCA48CE0046BCAD /* Stage2MigrateToSargon+ProfileNetwork.swift in Sources */,
+				5B27FBE62CC700F4002975BE /* PreAuthorizationReview+Sections.swift in Sources */,
 				A40816332C7E0D08005E65B9 /* StatePackageCodePageRequest.swift in Sources */,
 				48CFC3692ADC10D900E77A5C /* NonFungibleAssetList+Reducer.swift in Sources */,
 				48CFC2752ADC10D900E77A5C /* Main+View.swift in Sources */,

@@ -6,11 +6,8 @@ extension InteractionReviewCommon {
 	struct Proofs: Sendable, FeatureReducer {
 		@ObservableState
 		struct State: Sendable, Hashable {
-			var proofs: IdentifiedArrayOf<ProofEntity>
-
-			init(proofs: IdentifiedArrayOf<ProofEntity>) {
-				self.proofs = proofs
-			}
+			let kind: InteractionReviewCommon.Kind
+			let proofs: IdentifiedArrayOf<ProofEntity>
 		}
 
 		typealias Action = FeatureAction<Self>

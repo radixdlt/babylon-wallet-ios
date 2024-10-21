@@ -5,7 +5,8 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 
 	@ObservableState
 	struct State: Sendable, Hashable {
-		var dappName: String? = "Collabo.Fi"
+		var dappName: String? = "CaviarNine"
+		var dappThumbnail: URL? = .init(string: "https://assets.caviarnine.com/icons/caviarnine_logo_light_400.png")
 		var displayMode: Common.DisplayMode = .detailed
 		var sliderResetDate: Date = .now // TODO: reset when it corresponds
 
@@ -64,7 +65,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 			state.expiration = .atTime(time)
 			state.secondsToExpiration = Int(time.timeIntervalSinceNow)
 			return startTimer(expirationDate: time)
-				.merge(with: simulateSections())
+				.merge(with: getSections())
 
 		case .toggleDisplayModeButtonTapped:
 			switch state.displayMode {
@@ -106,41 +107,14 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 }
 
 private extension PreAuthorizationReview {
-	func simulateSections() -> Effect<Action> {
-		let resourceBalance: ResourceBalance = .init(resource: .init(resourceAddress: .sampleStokenetXRD, metadata: .init(name: "Radix", symbol: "XRD", isComplete: true)), details: .fungible(.init(isXRD: true, amount: .init(nominalAmount: .five))))
-		let idResourceBalance = resourceBalance.asIdentified
-
-		let nftBalance: ResourceBalance = .init(resource: .init(resourceAddress: .sampleMainnetNonFungibleGCMembership, atLedgerState: .init(version: 1, epoch: 2), metadata: .init(name: "GC Member Card", isComplete: true)), details: .nonFungible(.init(id: .sample, data: nil)))
-
-		let accountWithdraw = Common.Account.State(
-			account: .user(.sampleMainnetAlice),
-			transfers: [idResourceBalance],
-			isDeposit: false
-		)
-		let withdrawals = Common.Accounts.State(
-			accounts: [accountWithdraw],
-			enableCustomizeGuarantees: false
-		)
-		let accountDeposit = Common.Account.State(
-			account: .user(.sampleMainnetBob),
-			transfers: [idResourceBalance],
-			isDeposit: true
-		)
-		let deposits = Common.Accounts.State(
-			accounts: [accountDeposit],
-			enableCustomizeGuarantees: false
-		)
-
-		let proofs = Common.Proofs.State(proofs: [
-			.init(resourceBalance: nftBalance),
-		])
-
-		let sections = Common.Sections(
-			withdrawals: withdrawals,
-			deposits: deposits,
-			proofs: proofs
-		)
-		return .send(.internal(.setSections(sections)))
+	func getSections() -> Effect<Action> {
+		.run { send in
+			let sections = try await simulateSections()
+			await send(.internal(.setSections(sections)))
+		} catch: { error, send in
+			loggerGlobal.error("Failed to extract PreAuthorization sections, error: \(error)")
+			await send(.internal(.setSections(nil)))
+		}
 	}
 
 	func startTimer(expirationDate: Date) -> Effect<Action> {

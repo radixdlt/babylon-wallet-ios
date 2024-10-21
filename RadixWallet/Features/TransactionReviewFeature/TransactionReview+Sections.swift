@@ -343,7 +343,7 @@ extension TransactionReview {
 
 		guard !proofs.isEmpty else { return nil }
 
-		return Common.Proofs.State(proofs: proofs.asIdentified())
+		return Common.Proofs.State(kind: .transaction, proofs: proofs.asIdentified())
 	}
 
 	private func extractResourceBalanceInfo(specifier: ResourceSpecifier) async throws -> [(ResourceAddress, ResourceBalance.Details)] {
