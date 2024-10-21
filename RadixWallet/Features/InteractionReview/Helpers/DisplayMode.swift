@@ -1,6 +1,6 @@
 import Foundation
 
-extension InteractionReviewCommon {
+extension InteractionReview {
 	enum DisplayMode: Sendable, Hashable {
 		case detailed
 		case raw(String)

@@ -508,7 +508,7 @@ private extension View {
 
 // MARK: - ExpandableTransactionHeading
 struct ExpandableTransactionHeading: View {
-	typealias Common = InteractionReviewCommon
+	typealias Common = InteractionReview
 
 	let heading: Common.HeadingView
 	let isExpanded: Bool
@@ -549,7 +549,7 @@ extension TransactionReview {
 	typealias ValidatorState = ValidatorView.ViewState
 
 	struct ValidatorsView: SwiftUI.View {
-		let heading: InteractionReviewCommon.HeadingView
+		let heading: InteractionReview.HeadingView
 		let viewState: ViewState
 		let action: () -> Void
 

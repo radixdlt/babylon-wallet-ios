@@ -3,7 +3,7 @@ import SwiftUI
 
 // MARK: - TransactionReview
 struct TransactionReview: Sendable, FeatureReducer {
-	typealias Common = InteractionReviewCommon
+	typealias Common = InteractionReview
 
 	struct State: Sendable, Hashable {
 		var displayMode: Common.DisplayMode = .detailed
@@ -595,7 +595,7 @@ extension AlertState<TransactionReview.Destination.Action.RawTransactionAlert> {
 	}
 }
 
-extension Collection<InteractionReviewCommon.Account.State> {
+extension Collection<InteractionReview.Account.State> {
 	var customizableGuarantees: [TransactionReviewGuarantee.State] {
 		flatMap { account in
 			account.transfers.compactMap { .init(account: account.account, transfer: $0) }
@@ -841,13 +841,13 @@ extension TransactionReview.State {
 
 	mutating func applyGuarantee(
 		_ updated: TransactionGuarantee,
-		transferID: InteractionReviewCommon.Transfer.ID
+		transferID: InteractionReview.Transfer.ID
 	) {
 		guard let accountID = accountID(for: transferID) else { return }
 		deposits?.accounts[id: accountID]?.transfers[id: transferID]?.fungibleGuarantee = updated
 	}
 
-	private func accountID(for transferID: InteractionReviewCommon.Transfer.ID) -> AccountAddress? {
+	private func accountID(for transferID: InteractionReview.Transfer.ID) -> AccountAddress? {
 		for account in deposits?.accounts ?? [] {
 			for transfer in account.transfers {
 				if transfer.id == transferID {
@@ -861,10 +861,10 @@ extension TransactionReview.State {
 
 // MARK: Helpers
 
-extension [InteractionReviewCommon.ReviewAccount] {
+extension [InteractionReview.ReviewAccount] {
 	struct MissingUserAccountError: Error {}
 
-	func account(for accountAddress: AccountAddress) throws -> InteractionReviewCommon.ReviewAccount {
+	func account(for accountAddress: AccountAddress) throws -> InteractionReview.ReviewAccount {
 		guard let account = first(where: { $0.address == accountAddress }) else {
 			loggerGlobal.error("Can't find address that was specified for transfer")
 			throw MissingUserAccountError()

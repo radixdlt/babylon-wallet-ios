@@ -1,6 +1,6 @@
 import Foundation
 
-extension InteractionReviewCommon {
+extension InteractionReview {
 	struct Sections: Sendable, Hashable {
 		var withdrawals: Accounts.State? = nil
 		var dAppsUsed: TransactionReviewDappsUsed.State? = nil

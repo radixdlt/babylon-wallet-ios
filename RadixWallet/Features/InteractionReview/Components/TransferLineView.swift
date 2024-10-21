@@ -1,7 +1,7 @@
 import SwiftUI
 
-extension InteractionReviewCommon {
-	typealias Common = InteractionReviewCommon
+extension InteractionReview {
+	typealias Common = InteractionReview
 
 	struct TransferLineView: View {
 		var body: some View {

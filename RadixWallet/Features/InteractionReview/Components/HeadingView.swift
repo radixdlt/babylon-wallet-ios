@@ -1,6 +1,6 @@
 import SwiftUI
 
-extension InteractionReviewCommon {
+extension InteractionReview {
 	struct HeadingView: View {
 		let heading: String
 		let icon: ImageAsset

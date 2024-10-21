@@ -1,4 +1,4 @@
-extension InteractionReviewCommon {
+extension InteractionReview {
 	static let gradientBackground: LinearGradient = .init(
 		stops: [
 			.init(color: .app.gray5, location: 0),

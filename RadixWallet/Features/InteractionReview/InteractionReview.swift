@@ -1,18 +1,18 @@
 import SwiftUI
 
-// MARK: - InteractionReviewCommon
+// MARK: - InteractionReview
 /// Namespace to group every component common to `TransactionReview` and `PreAuthorizationReview`
-enum InteractionReviewCommon {}
+enum InteractionReview {}
 
-// MARK: InteractionReviewCommon.Kind
-extension InteractionReviewCommon {
+// MARK: InteractionReview.Kind
+extension InteractionReview {
 	enum Kind: Sendable, Hashable {
 		case transaction
 		case preAuthorization
 	}
 }
 
-// MARK: InteractionReviewCommon.Transfer
-extension InteractionReviewCommon {
+// MARK: InteractionReview.Transfer
+extension InteractionReview {
 	typealias Transfer = IDResourceBalance
 }

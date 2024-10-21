@@ -2,9 +2,9 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - InteractionReviewProofs.View
-extension InteractionReviewCommon.Proofs {
+extension InteractionReview.Proofs {
 	struct View: SwiftUI.View {
-		let store: StoreOf<InteractionReviewCommon.Proofs>
+		let store: StoreOf<InteractionReview.Proofs>
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {

@@ -1,7 +1,7 @@
 // MARK: - PreAuthorizationReview
 @Reducer
 struct PreAuthorizationReview: Sendable, FeatureReducer {
-	typealias Common = InteractionReviewCommon
+	typealias Common = InteractionReview
 
 	@ObservableState
 	struct State: Sendable, Hashable {

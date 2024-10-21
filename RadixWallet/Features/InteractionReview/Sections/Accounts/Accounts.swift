@@ -1,18 +1,18 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - InteractionReviewCommon.Accounts
-extension InteractionReviewCommon {
+// MARK: - InteractionReview.Accounts
+extension InteractionReview {
 	@Reducer
 	struct Accounts: Sendable, FeatureReducer {
 		@ObservableState
 		struct State: Sendable, Hashable {
-			init(accounts: IdentifiedArrayOf<InteractionReviewCommon.Account.State>, enableCustomizeGuarantees: Bool) {
+			init(accounts: IdentifiedArrayOf<InteractionReview.Account.State>, enableCustomizeGuarantees: Bool) {
 				self.accounts = accounts
 				self.enableCustomizeGuarantees = enableCustomizeGuarantees
 			}
 
-			var accounts: IdentifiedArrayOf<InteractionReviewCommon.Account.State>
+			var accounts: IdentifiedArrayOf<InteractionReview.Account.State>
 			let enableCustomizeGuarantees: Bool
 		}
 
@@ -24,7 +24,7 @@ extension InteractionReviewCommon {
 
 		@CasePathable
 		enum ChildAction: Sendable, Equatable {
-			case account(id: AccountAddress, action: InteractionReviewCommon.Account.Action)
+			case account(id: AccountAddress, action: InteractionReview.Account.Action)
 		}
 
 		enum DelegateAction: Sendable, Equatable {
@@ -35,7 +35,7 @@ extension InteractionReviewCommon {
 		var body: some ReducerOf<Self> {
 			Reduce(core)
 				.forEach(\.accounts, action: /Action.child .. ChildAction.account) {
-					InteractionReviewCommon.Account()
+					InteractionReview.Account()
 				}
 		}
 
@@ -57,16 +57,16 @@ extension InteractionReviewCommon {
 	}
 }
 
-// MARK: - InteractionReviewCommon.Account
-extension InteractionReviewCommon {
+// MARK: - InteractionReview.Account
+extension InteractionReview {
 	@Reducer
 	struct Account: Sendable, FeatureReducer {
 		@ObservableState
 		struct State: Sendable, Identifiable, Hashable {
 			var id: AccountAddress { account.address }
 
-			let account: InteractionReviewCommon.ReviewAccount
-			var transfers: IdentifiedArrayOf<InteractionReviewCommon.Transfer>
+			let account: InteractionReview.ReviewAccount
+			var transfers: IdentifiedArrayOf<InteractionReview.Transfer>
 			let isDeposit: Bool
 		}
 
@@ -97,11 +97,11 @@ extension InteractionReviewCommon {
 	}
 }
 
-// Neccessary so that ReviewAccount.user has a proper Account associated (and not the InteractionReviewCommon.Account reducer)
+// Neccessary so that ReviewAccount.user has a proper Account associated (and not the InteractionReview.Account reducer)
 typealias RadixAccount = Account
 
-// MARK: - InteractionReviewCommon.ReviewAccount
-extension InteractionReviewCommon {
+// MARK: - InteractionReview.ReviewAccount
+extension InteractionReview {
 	enum ReviewAccount: Sendable, Hashable {
 		case user(RadixAccount)
 		case external(AccountAddress, approved: Bool)

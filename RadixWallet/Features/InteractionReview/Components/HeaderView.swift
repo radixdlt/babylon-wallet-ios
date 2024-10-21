@@ -1,6 +1,6 @@
 import SwiftUI
 
-extension InteractionReviewCommon {
+extension InteractionReview {
 	struct HeaderView: View {
 		let kind: Kind
 		let name: String?

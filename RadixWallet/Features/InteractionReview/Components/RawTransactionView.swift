@@ -1,6 +1,6 @@
 import SwiftUI
 
-extension InteractionReviewCommon {
+extension InteractionReview {
 	struct RawTransactionView: SwiftUI.View {
 		let transaction: String
 		let copyAction: () -> Void

@@ -1,13 +1,13 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - InteractionReviewCommon.Proofs
-extension InteractionReviewCommon {
+// MARK: - InteractionReview.Proofs
+extension InteractionReview {
 	@Reducer
 	struct Proofs: Sendable, FeatureReducer {
 		@ObservableState
 		struct State: Sendable, Hashable {
-			let kind: InteractionReviewCommon.Kind
+			let kind: InteractionReview.Kind
 			let proofs: IdentifiedArrayOf<ProofEntity>
 		}
 
@@ -37,8 +37,8 @@ extension InteractionReviewCommon {
 	}
 }
 
-// MARK: - InteractionReviewCommon.ProofEntity
-extension InteractionReviewCommon {
+// MARK: - InteractionReview.ProofEntity
+extension InteractionReview {
 	struct ProofEntity: Sendable, Identifiable, Hashable {
 		var id: ResourceBalance { resourceBalance }
 		let resourceBalance: ResourceBalance

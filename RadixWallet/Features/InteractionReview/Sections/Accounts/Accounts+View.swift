@@ -1,10 +1,10 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - InteractionReviewCommon.Accounts.View
-extension InteractionReviewCommon.Accounts {
+// MARK: - InteractionReview.Accounts.View
+extension InteractionReview.Accounts {
 	struct View: SwiftUI.View {
-		let store: StoreOf<InteractionReviewCommon.Accounts>
+		let store: StoreOf<InteractionReview.Accounts>
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
@@ -12,7 +12,7 @@ extension InteractionReviewCommon.Accounts {
 					VStack(spacing: .small1) {
 						ForEachStore(
 							store.scope(state: \.accounts, action: \.child.account),
-							content: { InteractionReviewCommon.Account.View(store: $0) }
+							content: { InteractionReview.Account.View(store: $0) }
 						)
 
 						if store.enableCustomizeGuarantees {
@@ -31,10 +31,10 @@ extension InteractionReviewCommon.Accounts {
 	}
 }
 
-// MARK: - InteractionReviewCommon.Account.View
-extension InteractionReviewCommon.Account {
+// MARK: - InteractionReview.Account.View
+extension InteractionReview.Account {
 	struct View: SwiftUI.View {
-		let store: StoreOf<InteractionReviewCommon.Account>
+		let store: StoreOf<InteractionReview.Account>
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {

@@ -90,8 +90,8 @@ extension TransactionReviewGuarantee.State {
 
 extension TransactionReviewGuarantee {
 	struct ViewState: Identifiable, Equatable {
-		let id: InteractionReviewCommon.Transfer.ID
-		let account: InteractionReviewCommon.ReviewAccount
+		let id: InteractionReview.Transfer.ID
+		let account: InteractionReview.ReviewAccount
 		let fungible: ResourceBalance.ViewState.Fungible
 	}
 
