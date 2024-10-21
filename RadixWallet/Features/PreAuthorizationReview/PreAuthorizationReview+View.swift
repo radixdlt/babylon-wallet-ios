@@ -55,6 +55,10 @@ extension PreAuthorizationReview {
 					.clipShape(RoundedRectangle(cornerRadius: .small1))
 					.padding(.horizontal, .small2)
 
+					feesInformation
+						.padding(.top, .small2)
+						.padding(.horizontal, .small2)
+
 					Spacer()
 				}
 				.animation(.easeInOut, value: store.displayMode.rawTransaction)
@@ -118,6 +122,27 @@ extension PreAuthorizationReview {
 				.buttonStyle(.secondaryRectangular)
 				.padding(.medium3)
 			}
+		}
+
+		private var feesInformation: some SwiftUI.View {
+			HStack(spacing: .zero) {
+				VStack(alignment: .leading, spacing: .zero) {
+					Text("Pre-authorization will be returned to \(store.dappName ?? "dApp") for processing.")
+						.foregroundStyle(.app.gray1)
+
+					Text("Network fees will be paid by the dApp")
+						.foregroundStyle(.app.gray2)
+				}
+				.textStyle(.body2Regular)
+
+				Spacer(minLength: .small2)
+
+				InfoButton(.dapps)
+			}
+			.padding(.vertical, .medium3)
+			.padding(.horizontal, .medium2)
+			.background(Color.app.gray5)
+			.clipShape(RoundedRectangle(cornerRadius: .small1))
 		}
 	}
 }
