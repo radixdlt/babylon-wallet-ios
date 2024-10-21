@@ -22,9 +22,9 @@ struct TransactionReview: Sendable, FeatureReducer {
 		var reviewedTransaction: ReviewedTransaction? = nil
 
 		var withdrawals: Common.Accounts.State? = nil
-		var dAppsUsed: TransactionReviewDappsUsed.State? = nil
-		var contributingToPools: TransactionReviewPools.State? = nil
-		var redeemingFromPools: TransactionReviewPools.State? = nil
+		var dAppsUsed: InteractionReviewDappsUsed.State? = nil
+		var contributingToPools: InteractionReviewPools.State? = nil
+		var redeemingFromPools: InteractionReviewPools.State? = nil
 		var deposits: Common.Accounts.State? = nil
 
 		var stakingToValidators: Common.ValidatorsState? = nil
@@ -112,9 +112,9 @@ struct TransactionReview: Sendable, FeatureReducer {
 	enum ChildAction: Sendable, Equatable {
 		case withdrawals(Common.Accounts.Action)
 		case deposits(Common.Accounts.Action)
-		case dAppsUsed(TransactionReviewDappsUsed.Action)
-		case contributingToPools(TransactionReviewPools.Action)
-		case redeemingFromPools(TransactionReviewPools.Action)
+		case dAppsUsed(InteractionReviewDappsUsed.Action)
+		case contributingToPools(InteractionReviewPools.Action)
+		case redeemingFromPools(InteractionReviewPools.Action)
 		case proofs(Common.Proofs.Action)
 		case networkFee(TransactionReviewNetworkFee.Action)
 	}
@@ -221,13 +221,13 @@ struct TransactionReview: Sendable, FeatureReducer {
 				Common.Accounts()
 			}
 			.ifLet(\.dAppsUsed, action: /Action.child .. ChildAction.dAppsUsed) {
-				TransactionReviewDappsUsed()
+				InteractionReviewDappsUsed()
 			}
 			.ifLet(\.contributingToPools, action: /Action.child .. ChildAction.contributingToPools) {
-				TransactionReviewPools()
+				InteractionReviewPools()
 			}
 			.ifLet(\.redeemingFromPools, action: /Action.child .. ChildAction.redeemingFromPools) {
-				TransactionReviewPools()
+				InteractionReviewPools()
 			}
 			.ifLet(\.withdrawals, action: /Action.child .. ChildAction.withdrawals) {
 				Common.Accounts()
@@ -776,14 +776,6 @@ extension TransactionReview {
 		state.canApproveTX = true
 		state.resetSlider()
 		return .none
-	}
-}
-
-// MARK: - TransactionReview.DappEntity
-extension TransactionReview {
-	struct DappEntity: Sendable, Identifiable, Hashable {
-		let id: DappDefinitionAddress
-		let metadata: OnLedgerEntity.Metadata
 	}
 }
 

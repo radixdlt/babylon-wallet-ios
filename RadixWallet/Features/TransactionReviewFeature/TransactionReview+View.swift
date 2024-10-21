@@ -277,7 +277,7 @@ extension TransactionReview {
 						store.send(.view(.expandUsingDappsTapped))
 					}
 					if isExpanded {
-						TransactionReviewDappsUsed.View(store: childStore)
+						InteractionReviewDappsUsed.View(store: childStore)
 							.transition(.opacity.combined(with: .scale(scale: 0.95)))
 					}
 				}
@@ -291,7 +291,7 @@ extension TransactionReview {
 						store.send(.view(.expandContributingToPoolsTapped))
 					}
 					if isExpanded {
-						TransactionReviewPools.View(store: childStore)
+						InteractionReviewPools.View(store: childStore)
 							.transition(.opacity.combined(with: .scale(scale: 0.95)))
 					}
 				}
@@ -305,7 +305,7 @@ extension TransactionReview {
 						store.send(.view(.expandRedeemingFromPoolsTapped))
 					}
 					if isExpanded {
-						TransactionReviewPools.View(store: childStore)
+						InteractionReviewPools.View(store: childStore)
 							.transition(.opacity.combined(with: .scale(scale: 0.95)))
 					}
 				}

@@ -66,7 +66,7 @@ extension TransactionReview {
 				}
 			}
 
-			let dAppsUsed: TransactionReviewDappsUsed.State? = try await extractDapps(
+			let dAppsUsed = try await extractDapps(
 				addresses: dappAddresses,
 				unknownTitle: L10n.TransactionReview.unknownComponents
 			)
@@ -99,7 +99,7 @@ extension TransactionReview {
 			let perPoolUnitDapps = try perPoolUnitDapps(dApps, poolInteractions: poolContributions)
 
 			// Extract Contributing to Pools section
-			let pools: TransactionReviewPools.State? = try await extractDapps(dApps, unknownTitle: L10n.TransactionReview.unknownPools)
+			let pools: InteractionReviewPools.State? = try await extractDapps(dApps, unknownTitle: L10n.TransactionReview.unknownPools)
 
 			// Extract Withdrawals section
 			let withdrawals = try await extractWithdrawals(
@@ -140,7 +140,7 @@ extension TransactionReview {
 			let perPoolUnitDapps = try perPoolUnitDapps(dApps, poolInteractions: poolRedemptions)
 
 			// Extract Contributing to Pools section
-			let pools: TransactionReviewPools.State? = try await extractDapps(dApps, unknownTitle: L10n.TransactionReview.unknownPools)
+			let pools: InteractionReviewPools.State? = try await extractDapps(dApps, unknownTitle: L10n.TransactionReview.unknownPools)
 
 			// Extract Withdrawals section, passing in poolRedemptions so that withdrawn pool units can be updated
 			let withdrawals = try await extractWithdrawals(
@@ -304,15 +304,15 @@ extension TransactionReview {
 	private func extractDapps(
 		addresses: [Address],
 		unknownTitle: (Int) -> String
-	) async throws -> TransactionReviewDapps<ComponentAddress>.State? {
+	) async throws -> InteractionReviewDapps<ComponentAddress>.State? {
 		let dApps = await extractDappEntities(addresses)
 		return try await extractDapps(dApps, unknownTitle: unknownTitle)
 	}
 
 	private func extractDapps<A: AddressProtocol>(
-		_ dAppEntities: [(address: Address, entity: DappEntity?)],
+		_ dAppEntities: [(address: Address, entity: InteractionReview.DappEntity?)],
 		unknownTitle: (Int) -> String
-	) async throws -> TransactionReviewDapps<A>.State? {
+	) async throws -> InteractionReviewDapps<A>.State? {
 		let knownDapps = dAppEntities.compactMap(\.entity).asIdentified()
 		let unknownDapps = try dAppEntities.filter { $0.entity == nil }
 			.map { try $0.address.asSpecific(type: A.self) }.asIdentified()
@@ -322,16 +322,16 @@ extension TransactionReview {
 		return .init(knownDapps: knownDapps, unknownDapps: unknownDapps, unknownTitle: unknownTitle)
 	}
 
-	private func extractDappEntities(_ addresses: [Address]) async -> [(address: Address, entity: DappEntity?)] {
+	private func extractDappEntities(_ addresses: [Address]) async -> [(address: Address, entity: InteractionReview.DappEntity?)] {
 		await addresses.asyncMap {
 			await (address: $0, entity: try? extractDappEntity($0.asGeneral))
 		}
 	}
 
-	private func extractDappEntity(_ entity: Address) async throws -> DappEntity {
+	private func extractDappEntity(_ entity: Address) async throws -> InteractionReview.DappEntity {
 		let dAppDefinitionAddress = try await onLedgerEntitiesClient.getDappDefinitionAddress(entity)
 		let metadata = try await onLedgerEntitiesClient.getDappMetadata(dAppDefinitionAddress, validatingDappEntity: entity)
-		return DappEntity(id: dAppDefinitionAddress, metadata: metadata)
+		return .init(id: dAppDefinitionAddress, metadata: metadata)
 	}
 
 	private func exctractProofs(_ accountProofs: [ResourceSpecifier]) async throws -> Common.Proofs.State? {
@@ -558,7 +558,7 @@ extension TransactionReview {
 	}
 
 	private func perPoolUnitDapps(
-		_ dappEntities: [(address: Address, entity: TransactionReview.DappEntity?)],
+		_ dappEntities: [(address: Address, entity: InteractionReview.DappEntity?)],
 		poolInteractions: [some TrackedPoolInteraction]
 	) throws -> ResourceAssociatedDapps {
 		try Dictionary(keysWithValues: dappEntities.compactMap { data -> (ResourceAddress, OnLedgerEntity.Metadata)? in

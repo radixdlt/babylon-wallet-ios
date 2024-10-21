@@ -1,8 +1,8 @@
 import ComposableArchitecture
 import SwiftUI
 
-extension TransactionReviewDapps.State {
-	var viewState: TransactionReviewDapps.ViewState {
+extension InteractionReviewDapps.State {
+	var viewState: InteractionReviewDapps.ViewState {
 		var dApps = knownDapps.map(\.knownDapp)
 		if !unknownDapps.isEmpty {
 			dApps.append(.unknown(unknownTitle))
@@ -11,8 +11,8 @@ extension TransactionReviewDapps.State {
 	}
 }
 
-extension TransactionReview.DappEntity {
-	fileprivate var knownDapp: TransactionReview.DappView.ViewState {
+extension InteractionReview.DappEntity {
+	fileprivate var knownDapp: InteractionReview.DappView.ViewState {
 		.known(
 			name: metadata.name,
 			thumbnail: metadata.iconURL,
@@ -21,17 +21,17 @@ extension TransactionReview.DappEntity {
 	}
 }
 
-// MARK: - TransactionReviewDapps.View
-extension TransactionReviewDapps {
+// MARK: - InteractionReviewDapps.View
+extension InteractionReviewDapps {
 	struct ViewState: Equatable {
-		let rows: [TransactionReview.DappView.ViewState]
+		let rows: [InteractionReview.DappView.ViewState]
 	}
 
 	@MainActor
 	struct View: SwiftUI.View {
-		let store: StoreOf<TransactionReviewDapps>
+		let store: StoreOf<InteractionReviewDapps>
 
-		init(store: StoreOf<TransactionReviewDapps>) {
+		init(store: StoreOf<InteractionReviewDapps>) {
 			self.store = store
 		}
 
@@ -39,7 +39,7 @@ extension TransactionReviewDapps {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: .small2) {
 					ForEach(viewStore.rows, id: \.self) { rowViewState in
-						TransactionReview.DappView(viewState: rowViewState) { action in
+						InteractionReview.DappView(viewState: rowViewState) { action in
 							switch action {
 							case let .knownDappTapped(id):
 								viewStore.send(.dappTapped(id))
@@ -54,16 +54,16 @@ extension TransactionReviewDapps {
 	}
 }
 
-// MARK: - TransactionReview.DappView
-extension TransactionReview {
+// MARK: - InteractionReview.DappView
+extension InteractionReview {
 	struct DappView: SwiftUI.View {
 		enum ViewState: Hashable {
-			case known(name: String?, thumbnail: URL?, id: TransactionReview.DappEntity.ID)
+			case known(name: String?, thumbnail: URL?, id: InteractionReview.DappEntity.ID)
 			case unknown(String)
 		}
 
 		enum Action {
-			case knownDappTapped(TransactionReview.DappEntity.ID)
+			case knownDappTapped(InteractionReview.DappEntity.ID)
 			case unknownComponentsTapped
 		}
 

@@ -142,8 +142,8 @@
 		48CFC2972ADC10D900E77A5C /* AdvancedFeesCustomization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCEF2ADC10D800E77A5C /* AdvancedFeesCustomization.swift */; };
 		48CFC2982ADC10D900E77A5C /* CustomizeFees+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCF02ADC10D800E77A5C /* CustomizeFees+View.swift */; };
 		48CFC2992ADC10D900E77A5C /* CustomizeFees.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCF12ADC10D800E77A5C /* CustomizeFees.swift */; };
-		48CFC29A2ADC10D900E77A5C /* TransactionReviewDapps+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCF32ADC10D800E77A5C /* TransactionReviewDapps+View.swift */; };
-		48CFC29B2ADC10D900E77A5C /* TransactionReviewDapps.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCF42ADC10D800E77A5C /* TransactionReviewDapps.swift */; };
+		48CFC29A2ADC10D900E77A5C /* InteractionReviewDapps+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCF32ADC10D800E77A5C /* InteractionReviewDapps+View.swift */; };
+		48CFC29B2ADC10D900E77A5C /* InteractionReviewDapps.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCF42ADC10D800E77A5C /* InteractionReviewDapps.swift */; };
 		48CFC29C2ADC10D900E77A5C /* TransactionReview+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCF52ADC10D800E77A5C /* TransactionReview+View.swift */; };
 		48CFC29E2ADC10D900E77A5C /* TransactionReview+DepositExceptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCF82ADC10D800E77A5C /* TransactionReview+DepositExceptionsView.swift */; };
 		48CFC29F2ADC10D900E77A5C /* PersonasCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCFC2ADC10D800E77A5C /* PersonasCoordinator+View.swift */; };
@@ -1408,8 +1408,8 @@
 		48CFBCEF2ADC10D800E77A5C /* AdvancedFeesCustomization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdvancedFeesCustomization.swift; sourceTree = "<group>"; };
 		48CFBCF02ADC10D800E77A5C /* CustomizeFees+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CustomizeFees+View.swift"; sourceTree = "<group>"; };
 		48CFBCF12ADC10D800E77A5C /* CustomizeFees.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomizeFees.swift; sourceTree = "<group>"; };
-		48CFBCF32ADC10D800E77A5C /* TransactionReviewDapps+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TransactionReviewDapps+View.swift"; sourceTree = "<group>"; };
-		48CFBCF42ADC10D800E77A5C /* TransactionReviewDapps.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionReviewDapps.swift; sourceTree = "<group>"; };
+		48CFBCF32ADC10D800E77A5C /* InteractionReviewDapps+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "InteractionReviewDapps+View.swift"; sourceTree = "<group>"; };
+		48CFBCF42ADC10D800E77A5C /* InteractionReviewDapps.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InteractionReviewDapps.swift; sourceTree = "<group>"; };
 		48CFBCF52ADC10D800E77A5C /* TransactionReview+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TransactionReview+View.swift"; sourceTree = "<group>"; };
 		48CFBCF82ADC10D800E77A5C /* TransactionReview+DepositExceptionsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TransactionReview+DepositExceptionsView.swift"; sourceTree = "<group>"; };
 		48CFBCFC2ADC10D800E77A5C /* PersonasCoordinator+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PersonasCoordinator+View.swift"; sourceTree = "<group>"; };
@@ -3020,7 +3020,6 @@
 				48CFBCE12ADC10D800E77A5C /* TransactionReviewRawTransaction */,
 				48CFBCE72ADC10D800E77A5C /* TransactionReviewNetworkFee */,
 				48CFBCEA2ADC10D800E77A5C /* CustomizeFees */,
-				48CFBCF22ADC10D800E77A5C /* TransactionReviewDapps */,
 				A4B017F32B4BF57B00B42B8E /* TransactionReviewDepositSetting */,
 				48CFBCF62ADC10D800E77A5C /* TransactionReviewDepositExceptions */,
 			);
@@ -3112,15 +3111,6 @@
 				48CFBCF12ADC10D800E77A5C /* CustomizeFees.swift */,
 			);
 			path = CustomizeFees;
-			sourceTree = "<group>";
-		};
-		48CFBCF22ADC10D800E77A5C /* TransactionReviewDapps */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBCF32ADC10D800E77A5C /* TransactionReviewDapps+View.swift */,
-				48CFBCF42ADC10D800E77A5C /* TransactionReviewDapps.swift */,
-			);
-			path = TransactionReviewDapps;
 			sourceTree = "<group>";
 		};
 		48CFBCF62ADC10D800E77A5C /* TransactionReviewDepositExceptions */ = {
@@ -5526,6 +5516,7 @@
 				5B27FBDF2CC6CCBE002975BE /* Sections.swift */,
 				48CFBCE42ADC10D800E77A5C /* Accounts */,
 				48CFBCDE2ADC10D800E77A5C /* Proofs */,
+				5B27FBF62CC716BC002975BE /* Dapps */,
 			);
 			path = Sections;
 			sourceTree = "<group>";
@@ -5569,6 +5560,15 @@
 				835F196C2B3581C300E0B71D /* UnknownDappComponents+View.swift */,
 			);
 			path = UnknownDappComponents;
+			sourceTree = "<group>";
+		};
+		5B27FBF62CC716BC002975BE /* Dapps */ = {
+			isa = PBXGroup;
+			children = (
+				48CFBCF42ADC10D800E77A5C /* InteractionReviewDapps.swift */,
+				48CFBCF32ADC10D800E77A5C /* InteractionReviewDapps+View.swift */,
+			);
+			path = Dapps;
 			sourceTree = "<group>";
 		};
 		5B2A45002BD667FB00AEC8AD /* ContactSupportClient */ = {
@@ -7728,7 +7728,7 @@
 				A408155D2C7E0D08005E65B9 /* AccountLockerAddress.swift in Sources */,
 				48CFC2CC2ADC10D900E77A5C /* FungibleResourceAsset+Reducer.swift in Sources */,
 				A40815B72C7E0D08005E65B9 /* NativeResourceRedemptionValueItem.swift in Sources */,
-				48CFC29A2ADC10D900E77A5C /* TransactionReviewDapps+View.swift in Sources */,
+				48CFC29A2ADC10D900E77A5C /* InteractionReviewDapps+View.swift in Sources */,
 				483A3DE62BD2678900055932 /* Stage1MigrateToSargon+FactorSourceCryptoParameters.swift in Sources */,
 				5B03E3D52CC1487900E10A64 /* TransferLineView.swift in Sources */,
 				48CFC36B2ADC10D900E77A5C /* FungibleTokenDetails+Reducer.swift in Sources */,
@@ -8324,7 +8324,7 @@
 				48CFC4672ADC10DA00E77A5C /* AccountPortfoliosClient+Interface.swift in Sources */,
 				48CFC36A2ADC10D900E77A5C /* FungibleAssetListSection+Reducer.swift in Sources */,
 				48CFC45A2ADC10DA00E77A5C /* LedgerHardwareWalletClient+Test.swift in Sources */,
-				48CFC29B2ADC10D900E77A5C /* TransactionReviewDapps.swift in Sources */,
+				48CFC29B2ADC10D900E77A5C /* InteractionReviewDapps.swift in Sources */,
 				48CFC3532ADC10D900E77A5C /* DappInteractor+ViewModifier.swift in Sources */,
 				48CFC40C2ADC10DA00E77A5C /* UserDefaults+Dependency+Extension.swift in Sources */,
 				48CFC2442ADC10D900E77A5C /* ThirdPartyDeposits+Reducer.swift in Sources */,
