@@ -2,7 +2,9 @@ import ComposableArchitecture
 import SwiftUI
 
 extension InteractionReviewCommon {
+	@Reducer
 	struct Proofs: Sendable, FeatureReducer {
+		@ObservableState
 		struct State: Sendable, Hashable {
 			var proofs: IdentifiedArrayOf<ProofEntity>
 
@@ -10,6 +12,8 @@ extension InteractionReviewCommon {
 				self.proofs = proofs
 			}
 		}
+
+		typealias Action = FeatureAction<Self>
 
 		enum ViewAction: Sendable, Equatable {
 			case infoTapped
@@ -20,7 +24,9 @@ extension InteractionReviewCommon {
 			case showAsset(ProofEntity)
 		}
 
-		init() {}
+		var body: some ReducerOf<Self> {
+			Reduce(core)
+		}
 
 		func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {

@@ -3,7 +3,9 @@ import SwiftUI
 
 // MARK: - InteractionReviewCommon.Accounts
 extension InteractionReviewCommon {
+	@Reducer
 	struct Accounts: Sendable, FeatureReducer {
+		@ObservableState
 		struct State: Sendable, Hashable {
 			init(accounts: IdentifiedArrayOf<InteractionReviewCommon.Account.State>, enableCustomizeGuarantees: Bool) {
 				self.accounts = accounts
@@ -13,6 +15,8 @@ extension InteractionReviewCommon {
 			var accounts: IdentifiedArrayOf<InteractionReviewCommon.Account.State>
 			let enableCustomizeGuarantees: Bool
 		}
+
+		typealias Action = FeatureAction<Self>
 
 		enum ViewAction: Sendable, Equatable {
 			case customizeGuaranteesTapped
@@ -27,8 +31,6 @@ extension InteractionReviewCommon {
 			case showCustomizeGuarantees
 			case showAsset(ResourceBalance, OnLedgerEntity.NonFungibleToken?)
 		}
-
-		init() {}
 
 		var body: some ReducerOf<Self> {
 			Reduce(core)
@@ -57,7 +59,9 @@ extension InteractionReviewCommon {
 
 // MARK: - InteractionReviewCommon.Account
 extension InteractionReviewCommon {
+	@Reducer
 	struct Account: Sendable, FeatureReducer {
+		@ObservableState
 		struct State: Sendable, Identifiable, Hashable {
 			var id: AccountAddress { account.address }
 			let account: TransactionReview.ReviewAccount
@@ -71,6 +75,8 @@ extension InteractionReviewCommon {
 			}
 		}
 
+		typealias Action = FeatureAction<Self>
+
 		enum ViewAction: Sendable, Equatable {
 			case appeared
 			case transferTapped(ResourceBalance, OnLedgerEntity.NonFungibleToken?)
@@ -81,7 +87,9 @@ extension InteractionReviewCommon {
 			case showStakeClaim(OnLedgerEntitiesClient.StakeClaim)
 		}
 
-		init() {}
+		var body: some ReducerOf<Self> {
+			Reduce(core)
+		}
 
 		func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
