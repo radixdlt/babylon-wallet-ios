@@ -265,7 +265,7 @@ extension TransactionReview {
 			IfLetStore(store.scope(state: \.withdrawals) { .child(.withdrawals($0)) }) { childStore in
 				VStack(alignment: .leading, spacing: .small2) {
 					Common.HeadingView.withdrawing
-					TransactionReviewAccounts.View(store: childStore)
+					Common.Accounts.View(store: childStore)
 				}
 			}
 		}
@@ -334,7 +334,7 @@ extension TransactionReview {
 			IfLetStore(store.scope(state: \.deposits) { .child(.deposits($0)) }) { childStore in
 				VStack(alignment: .leading, spacing: .small2) {
 					Common.HeadingView.depositing
-					TransactionReviewAccounts.View(store: childStore)
+					Common.Accounts.View(store: childStore)
 				}
 			}
 		}
@@ -358,7 +358,7 @@ extension TransactionReview {
 		private var proofsSection: some SwiftUI.View {
 			let proofsStore = store.scope(state: \.proofs) { .child(.proofs($0)) }
 			return IfLetStore(proofsStore) { childStore in
-				TransactionReviewProofs.View(store: childStore)
+				Common.Proofs.View(store: childStore)
 			}
 		}
 

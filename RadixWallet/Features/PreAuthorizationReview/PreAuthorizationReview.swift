@@ -10,7 +10,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		var sliderResetDate: Date = .now // TODO: reset when it corresponds
 
 		var expiration: Expiration?
-		var secondsToExpiration: Int? // Only valid when expiration == .atTime
+		var secondsToExpiration: Int?
 
 		init() {}
 	}
@@ -37,7 +37,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			let time = Date().addingTimeInterval(14)
+			let time = Date().addingTimeInterval(90)
 			state.expiration = .atTime(time)
 			state.secondsToExpiration = Int(time.timeIntervalSinceNow)
 			return startTimer(expirationDate: time)
@@ -52,7 +52,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 			return .none
 
 		case .copyRawTransactionButtonTapped:
-			guard case let .raw(manifest) = state.displayMode else {
+			guard let manifest = state.displayMode.rawTransaction else {
 				assertionFailure("Copy raw manifest button should only be visible in raw transaction mode")
 				return .none
 			}
@@ -71,10 +71,6 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 }
 
 private extension PreAuthorizationReview {
-	enum CancellableId: Hashable {
-		case expirationTimer
-	}
-
 	func startTimer(expirationDate: Date) -> Effect<Action> {
 		.run { send in
 			for await _ in self.clock.timer(interval: .seconds(1)) {
@@ -82,6 +78,18 @@ private extension PreAuthorizationReview {
 			}
 		}
 		.cancellable(id: CancellableId.expirationTimer, cancelInFlight: true)
+	}
+}
+
+private extension PreAuthorizationReview {
+	enum CancellableId: Hashable {
+		case expirationTimer
+	}
+
+	struct ReviewedPreAuthorization: Sendable, Hashable {
+		let manifest: TransactionManifest
+
+		// TODO: Fill required info once we have Sargon ready
 	}
 }
 
@@ -128,6 +136,7 @@ extension PreAuthorizationReview.State {
 
 // MARK: - Expiration
 enum Expiration: Sendable, Hashable {
+	// TODO: Replace with Sargon model
 	case atTime(Date)
 	case window(Int)
 }

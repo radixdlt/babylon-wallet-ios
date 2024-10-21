@@ -1,22 +1,22 @@
 import ComposableArchitecture
 import SwiftUI
 
-extension TransactionReviewAccounts.State {
-	var viewState: TransactionReviewAccounts.ViewState {
+extension InteractionReviewCommon.Accounts.State {
+	var viewState: InteractionReviewCommon.Accounts.ViewState {
 		.init(showCustomizeGuaranteesButton: enableCustomizeGuarantees)
 	}
 }
 
-extension TransactionReviewAccounts {
+extension InteractionReviewCommon.Accounts {
 	struct ViewState: Equatable {
 		let showCustomizeGuaranteesButton: Bool
 	}
 
 	@MainActor
 	struct View: SwiftUI.View {
-		private let store: StoreOf<TransactionReviewAccounts>
+		private let store: StoreOf<InteractionReviewCommon.Accounts>
 
-		init(store: StoreOf<TransactionReviewAccounts>) {
+		init(store: StoreOf<InteractionReviewCommon.Accounts>) {
 			self.store = store
 		}
 
@@ -26,7 +26,7 @@ extension TransactionReviewAccounts {
 					VStack(spacing: .small1) {
 						ForEachStore(
 							store.scope(state: \.accounts, action: \.child.account),
-							content: { TransactionReviewAccount.View(store: $0) }
+							content: { InteractionReviewCommon.Account.View(store: $0) }
 						)
 
 						if viewStore.showCustomizeGuaranteesButton {
@@ -45,14 +45,13 @@ extension TransactionReviewAccounts {
 	}
 }
 
-extension TransactionReviewAccount.State {
-	var viewState: TransactionReviewAccount.ViewState {
+extension InteractionReviewCommon.Account.State {
+	var viewState: InteractionReviewCommon.Account.ViewState {
 		.init(account: account, transfers: transfers.elements, showApprovedMark: account.isApproved, isDeposit: isDeposit)
 	}
 }
 
-// MARK: - TransactionReviewAccount.View
-extension TransactionReviewAccount {
+extension InteractionReviewCommon.Account {
 	struct ViewState: Equatable {
 		let account: TransactionReview.ReviewAccount
 		let transfers: [TransactionReview.Transfer] // FIXME: GK use viewstate?
@@ -62,9 +61,9 @@ extension TransactionReviewAccount {
 
 	@MainActor
 	struct View: SwiftUI.View {
-		private let store: StoreOf<TransactionReviewAccount>
+		private let store: StoreOf<InteractionReviewCommon.Account>
 
-		init(store: StoreOf<TransactionReviewAccount>) {
+		init(store: StoreOf<InteractionReviewCommon.Account>) {
 			self.store = store
 		}
 

@@ -7,25 +7,7 @@ extension TransactionReview {
 	typealias ResourcesInfo = [ResourceAddress: ResourceInfo]
 	typealias ResourceAssociatedDapps = [ResourceAddress: OnLedgerEntity.Metadata]
 
-	struct Sections: Sendable, Hashable {
-		var withdrawals: TransactionReviewAccounts.State? = nil
-		var dAppsUsed: TransactionReviewDappsUsed.State? = nil
-		var deposits: TransactionReviewAccounts.State? = nil
-
-		var contributingToPools: TransactionReviewPools.State? = nil
-		var redeemingFromPools: TransactionReviewPools.State? = nil
-
-		var stakingToValidators: ValidatorsState? = nil
-		var unstakingFromValidators: ValidatorsState? = nil
-		var claimingFromValidators: ValidatorsState? = nil
-
-		var accountDepositSetting: DepositSettingState? = nil
-		var accountDepositExceptions: DepositExceptionsState? = nil
-
-		var proofs: TransactionReviewProofs.State? = nil
-	}
-
-	func sections(for summary: ExecutionSummary, networkID: NetworkID) async throws -> Sections? {
+	func sections(for summary: ExecutionSummary, networkID: NetworkID) async throws -> Common.Sections? {
 		let allWithdrawAddresses = summary.withdrawals.values.flatMap { $0 }.map(\.resourceAddress)
 		let allDepositAddresses = summary.deposits.values.flatMap { $0 }.map(\.resourceAddress)
 
@@ -96,9 +78,9 @@ extension TransactionReview {
 				networkID: networkID
 			)
 
-			let proofs: TransactionReviewProofs.State? = try await exctractProofs(summary.presentedProofs)
+			let proofs = try await exctractProofs(summary.presentedProofs)
 
-			return Sections(
+			return Common.Sections(
 				withdrawals: withdrawals,
 				dAppsUsed: dAppsUsed,
 				deposits: deposits,
@@ -138,7 +120,7 @@ extension TransactionReview {
 				networkID: networkID
 			)
 
-			return Sections(
+			return Common.Sections(
 				withdrawals: withdrawals,
 				deposits: deposits,
 				contributingToPools: pools
@@ -179,7 +161,7 @@ extension TransactionReview {
 				networkID: networkID
 			)
 
-			return Sections(
+			return Common.Sections(
 				withdrawals: withdrawals,
 				deposits: deposits,
 				redeemingFromPools: pools
@@ -207,7 +189,7 @@ extension TransactionReview {
 				networkID: networkID
 			)
 
-			return Sections(
+			return Common.Sections(
 				withdrawals: withdrawals,
 				deposits: deposits,
 				stakingToValidators: stakingToValidators
@@ -235,7 +217,7 @@ extension TransactionReview {
 				networkID: networkID
 			)
 
-			return Sections(
+			return Common.Sections(
 				withdrawals: withdrawals,
 				deposits: deposits,
 				unstakingFromValidators: unstakingFromValidators
@@ -261,7 +243,7 @@ extension TransactionReview {
 				networkID: networkID
 			)
 
-			return Sections(
+			return Common.Sections(
 				withdrawals: withdrawals,
 				deposits: deposits,
 				claimingFromValidators: claimingFromValidators
@@ -296,7 +278,7 @@ extension TransactionReview {
 				authorizedDepositorsRemoved: authorizedDepositorsRemoved
 			)
 
-			return Sections(
+			return Common.Sections(
 				accountDepositSetting: accountDepositSetting,
 				accountDepositExceptions: accountDepositExceptions
 			)
@@ -352,7 +334,7 @@ extension TransactionReview {
 		return DappEntity(id: dAppDefinitionAddress, metadata: metadata)
 	}
 
-	private func exctractProofs(_ accountProofs: [ResourceSpecifier]) async throws -> TransactionReviewProofs.State? {
+	private func exctractProofs(_ accountProofs: [ResourceSpecifier]) async throws -> Common.Proofs.State? {
 		let proofs = try await accountProofs
 			.uniqued()
 			.asyncMap(extractResourceBalanceInfo)
@@ -361,7 +343,7 @@ extension TransactionReview {
 
 		guard !proofs.isEmpty else { return nil }
 
-		return TransactionReviewProofs.State(proofs: proofs.asIdentified())
+		return Common.Proofs.State(proofs: proofs.asIdentified())
 	}
 
 	private func extractResourceBalanceInfo(specifier: ResourceSpecifier) async throws -> [(ResourceAddress, ResourceBalance.Details)] {
@@ -385,8 +367,8 @@ extension TransactionReview {
 		}
 	}
 
-	private func extractProofInfo(resourceAddress: ResourceAddress, details: ResourceBalance.Details) async throws -> ProofEntity {
-		try await ProofEntity(
+	private func extractProofInfo(resourceAddress: ResourceAddress, details: ResourceBalance.Details) async throws -> Common.ProofEntity {
+		try await Common.ProofEntity(
 			resourceBalance: ResourceBalance(
 				resource: onLedgerEntitiesClient.getResource(resourceAddress, metadataKeys: .dappMetadataKeys),
 				details: details
@@ -401,7 +383,7 @@ extension TransactionReview {
 		entities: ResourcesInfo = [:],
 		resourceAssociatedDapps: ResourceAssociatedDapps? = nil,
 		networkID: NetworkID
-	) async throws -> TransactionReviewAccounts.State? {
+	) async throws -> Common.Accounts.State? {
 		var withdrawals: [ReviewAccount: IdentifiedArrayOf<Transfer>] = [:]
 		let userAccounts: [ReviewAccount] = try await extractUserAccounts(Array(accountWithdraws.keys))
 
@@ -426,7 +408,7 @@ extension TransactionReview {
 		guard !withdrawals.isEmpty else { return nil }
 
 		let withdrawalAccounts = withdrawals.map {
-			TransactionReviewAccount.State(account: $0.key, transfers: $0.value, isDeposit: false)
+			Common.Account.State(account: $0.key, transfers: $0.value, isDeposit: false)
 		}
 		.asIdentified()
 
@@ -442,7 +424,7 @@ extension TransactionReview {
 		entities: ResourcesInfo = [:],
 		resourceAssociatedDapps: ResourceAssociatedDapps? = nil,
 		networkID: NetworkID
-	) async throws -> TransactionReviewAccounts.State? {
+	) async throws -> Common.Accounts.State? {
 		let userAccounts: [ReviewAccount] = try await extractUserAccounts(Array(accountDeposits.keys))
 		let defaultDepositGuarantee = await appPreferencesClient.getPreferences().transaction.defaultDepositGuarantee
 
@@ -471,7 +453,7 @@ extension TransactionReview {
 
 		let depositAccounts = deposits
 			.filter { !$0.value.isEmpty }
-			.map { TransactionReviewAccount.State(account: $0.key, transfers: $0.value, isDeposit: true) }
+			.map { Common.Account.State(account: $0.key, transfers: $0.value, isDeposit: true) }
 			.asIdentified()
 
 		guard !depositAccounts.isEmpty else { return nil }

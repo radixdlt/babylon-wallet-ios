@@ -1,13 +1,13 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - TransactionReviewProofs.View
-extension TransactionReviewProofs {
+// MARK: - InteractionReviewProofs.View
+extension InteractionReviewCommon.Proofs {
 	@MainActor
 	struct View: SwiftUI.View {
-		let store: StoreOf<TransactionReviewProofs>
+		let store: StoreOf<InteractionReviewCommon.Proofs>
 
-		init(store: StoreOf<TransactionReviewProofs>) {
+		init(store: StoreOf<InteractionReviewCommon.Proofs>) {
 			self.store = store
 		}
 

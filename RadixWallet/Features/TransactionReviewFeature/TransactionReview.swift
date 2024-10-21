@@ -22,11 +22,11 @@ struct TransactionReview: Sendable, FeatureReducer {
 
 		var reviewedTransaction: ReviewedTransaction? = nil
 
-		var withdrawals: TransactionReviewAccounts.State? = nil
+		var withdrawals: Common.Accounts.State? = nil
 		var dAppsUsed: TransactionReviewDappsUsed.State? = nil
 		var contributingToPools: TransactionReviewPools.State? = nil
 		var redeemingFromPools: TransactionReviewPools.State? = nil
-		var deposits: TransactionReviewAccounts.State? = nil
+		var deposits: Common.Accounts.State? = nil
 
 		var stakingToValidators: ValidatorsState? = nil
 		var unstakingFromValidators: ValidatorsState? = nil
@@ -35,7 +35,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 		var accountDepositSetting: DepositSettingState? = nil
 		var accountDepositExceptions: DepositExceptionsState? = nil
 
-		var proofs: TransactionReviewProofs.State? = nil
+		var proofs: Common.Proofs.State? = nil
 		var networkFee: TransactionReviewNetworkFee.State? = nil
 		let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey
 		var canApproveTX: Bool = true
@@ -111,18 +111,18 @@ struct TransactionReview: Sendable, FeatureReducer {
 	}
 
 	enum ChildAction: Sendable, Equatable {
-		case withdrawals(TransactionReviewAccounts.Action)
-		case deposits(TransactionReviewAccounts.Action)
+		case withdrawals(Common.Accounts.Action)
+		case deposits(Common.Accounts.Action)
 		case dAppsUsed(TransactionReviewDappsUsed.Action)
 		case contributingToPools(TransactionReviewPools.Action)
 		case redeemingFromPools(TransactionReviewPools.Action)
-		case proofs(TransactionReviewProofs.Action)
+		case proofs(Common.Proofs.Action)
 		case networkFee(TransactionReviewNetworkFee.Action)
 	}
 
 	enum InternalAction: Sendable, Equatable {
 		case previewLoaded(TaskResult<TransactionToReview>)
-		case updateSections(TransactionReview.Sections?)
+		case updateSections(Common.Sections?)
 		case buildTransactionIntentResult(TaskResult<TransactionIntent>)
 		case notarizeResult(TaskResult<NotarizeTransactionResponse>)
 		case determineFeePayerResult(TaskResult<FeePayerSelectionResult?>)
@@ -219,7 +219,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 				TransactionReviewNetworkFee()
 			}
 			.ifLet(\.deposits, action: /Action.child .. ChildAction.deposits) {
-				TransactionReviewAccounts()
+				Common.Accounts()
 			}
 			.ifLet(\.dAppsUsed, action: /Action.child .. ChildAction.dAppsUsed) {
 				TransactionReviewDappsUsed()
@@ -231,10 +231,10 @@ struct TransactionReview: Sendable, FeatureReducer {
 				TransactionReviewPools()
 			}
 			.ifLet(\.withdrawals, action: /Action.child .. ChildAction.withdrawals) {
-				TransactionReviewAccounts()
+				Common.Accounts()
 			}
 			.ifLet(\.proofs, action: /Action.child .. ChildAction.proofs) {
-				TransactionReviewProofs()
+				Common.Proofs()
 			}
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -596,7 +596,7 @@ extension AlertState<TransactionReview.Destination.Action.RawTransactionAlert> {
 	}
 }
 
-extension Collection<TransactionReviewAccount.State> {
+extension Collection<InteractionReviewCommon.Account.State> {
 	var customizableGuarantees: [TransactionReviewGuarantee.State] {
 		flatMap { account in
 			account.transfers.compactMap { .init(account: account.account, transfer: $0) }
@@ -783,11 +783,6 @@ extension TransactionReview {
 // MARK: Useful types
 
 extension TransactionReview {
-	struct ProofEntity: Sendable, Identifiable, Hashable {
-		var id: ResourceBalance { resourceBalance }
-		let resourceBalance: ResourceBalance
-	}
-
 	struct DappEntity: Sendable, Identifiable, Hashable {
 		let id: DappDefinitionAddress
 		let metadata: OnLedgerEntity.Metadata
