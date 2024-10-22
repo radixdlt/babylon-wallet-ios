@@ -3,16 +3,18 @@ extension InteractionReview.UnknownDappComponents {
 		let store: StoreOf<InteractionReview.UnknownDappComponents>
 
 		var body: some SwiftUI.View {
-			ScrollView {
-				ForEach(store.addresses, id: \.address) { address in
-					row(address, heading: store.rowHeading)
+			WithPerceptionTracking {
+				ScrollView {
+					ForEach(store.addresses, id: \.address) { address in
+						row(address, heading: store.rowHeading)
+					}
 				}
-			}
-			.radixToolbar(title: store.title, alwaysVisible: false)
-			.toolbar {
-				ToolbarItem(placement: .cancellationAction) {
-					CloseButton {
-						store.send(.view(.closeButtonTapped))
+				.radixToolbar(title: store.title, alwaysVisible: false)
+				.toolbar {
+					ToolbarItem(placement: .cancellationAction) {
+						CloseButton {
+							store.send(.view(.closeButtonTapped))
+						}
 					}
 				}
 			}
