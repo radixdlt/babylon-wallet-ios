@@ -6,7 +6,9 @@ typealias InteractionReviewPools = InteractionReviewDapps<PoolAddress>
 typealias InteractionReviewDappsUsed = InteractionReviewDapps<ComponentAddress>
 
 // MARK: - InteractionReviewDapps
+@Reducer
 struct InteractionReviewDapps<AddressType: AddressProtocol>: Sendable, FeatureReducer {
+	@ObservableState
 	struct State: Sendable, Hashable {
 		var knownDapps: IdentifiedArrayOf<InteractionReview.DappEntity>
 		var unknownDapps: IdentifiedArrayOf<AddressType>
@@ -20,6 +22,8 @@ struct InteractionReviewDapps<AddressType: AddressProtocol>: Sendable, FeatureRe
 		}
 	}
 
+	typealias Action = FeatureAction<Self>
+
 	enum ViewAction: Sendable, Equatable {
 		case dappTapped(InteractionReview.DappEntity.ID)
 		case unknownsTapped
@@ -30,7 +34,9 @@ struct InteractionReviewDapps<AddressType: AddressProtocol>: Sendable, FeatureRe
 		case openUnknownAddresses(IdentifiedArrayOf<AddressType>)
 	}
 
-	init() {}
+	var body: some ReducerOf<Self> {
+		Reduce(core)
+	}
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {

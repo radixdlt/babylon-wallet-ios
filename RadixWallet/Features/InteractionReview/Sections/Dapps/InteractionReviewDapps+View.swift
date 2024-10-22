@@ -1,13 +1,37 @@
 import ComposableArchitecture
 import SwiftUI
 
+// MARK: - InteractionReviewDapps.View
+extension InteractionReviewDapps {
+	struct View: SwiftUI.View {
+		let store: StoreOf<InteractionReviewDapps>
+
+		var body: some SwiftUI.View {
+			WithPerceptionTracking {
+				VStack(spacing: .small2) {
+					ForEach(store.rows, id: \.self) { rowViewState in
+						InteractionReview.DappView(viewState: rowViewState) { action in
+							switch action {
+							case let .knownDappTapped(id):
+								store.send(.view(.dappTapped(id)))
+							case .unknownComponentsTapped:
+								store.send(.view(.unknownsTapped))
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
 extension InteractionReviewDapps.State {
-	var viewState: InteractionReviewDapps.ViewState {
+	var rows: [InteractionReview.DappView.ViewState] {
 		var dApps = knownDapps.map(\.knownDapp)
 		if !unknownDapps.isEmpty {
 			dApps.append(.unknown(unknownTitle))
 		}
-		return .init(rows: dApps)
+		return dApps
 	}
 }
 
@@ -18,39 +42,6 @@ extension InteractionReview.DappEntity {
 			thumbnail: metadata.iconURL,
 			id: id
 		)
-	}
-}
-
-// MARK: - InteractionReviewDapps.View
-extension InteractionReviewDapps {
-	struct ViewState: Equatable {
-		let rows: [InteractionReview.DappView.ViewState]
-	}
-
-	@MainActor
-	struct View: SwiftUI.View {
-		let store: StoreOf<InteractionReviewDapps>
-
-		init(store: StoreOf<InteractionReviewDapps>) {
-			self.store = store
-		}
-
-		var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack(spacing: .small2) {
-					ForEach(viewStore.rows, id: \.self) { rowViewState in
-						InteractionReview.DappView(viewState: rowViewState) { action in
-							switch action {
-							case let .knownDappTapped(id):
-								viewStore.send(.dappTapped(id))
-							case .unknownComponentsTapped:
-								viewStore.send(.unknownsTapped)
-							}
-						}
-					}
-				}
-			}
-		}
 	}
 }
 
