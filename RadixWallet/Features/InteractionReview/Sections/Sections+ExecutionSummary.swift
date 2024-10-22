@@ -1,10 +1,10 @@
-extension InteractionReview.MiddleSections {
+extension InteractionReview.Sections {
 	// Either the resource from ledger or metadata extracted from the TX manifest
 	typealias ResourceInfo = Either<OnLedgerEntity.Resource, OnLedgerEntity.Metadata>
 	typealias ResourcesInfo = [ResourceAddress: ResourceInfo]
 	typealias ResourceAssociatedDapps = [ResourceAddress: OnLedgerEntity.Metadata]
 
-	func sections(for summary: ExecutionSummary, networkID: NetworkID) async throws -> Common.Sections? {
+	func sections(for summary: ExecutionSummary, networkID: NetworkID) async throws -> Common.SectionsData? {
 		let allWithdrawAddresses = summary.withdrawals.values.flatMap { $0 }.map(\.resourceAddress)
 		let allDepositAddresses = summary.deposits.values.flatMap { $0 }.map(\.resourceAddress)
 
@@ -77,7 +77,7 @@ extension InteractionReview.MiddleSections {
 
 			let proofs = try await exctractProofs(summary.presentedProofs)
 
-			return Common.Sections(
+			return Common.SectionsData(
 				withdrawals: withdrawals,
 				dAppsUsed: dAppsUsed,
 				deposits: deposits,
@@ -117,7 +117,7 @@ extension InteractionReview.MiddleSections {
 				networkID: networkID
 			)
 
-			return Common.Sections(
+			return Common.SectionsData(
 				withdrawals: withdrawals,
 				deposits: deposits,
 				contributingToPools: pools
@@ -158,7 +158,7 @@ extension InteractionReview.MiddleSections {
 				networkID: networkID
 			)
 
-			return Common.Sections(
+			return Common.SectionsData(
 				withdrawals: withdrawals,
 				deposits: deposits,
 				redeemingFromPools: pools
@@ -186,7 +186,7 @@ extension InteractionReview.MiddleSections {
 				networkID: networkID
 			)
 
-			return Common.Sections(
+			return Common.SectionsData(
 				withdrawals: withdrawals,
 				deposits: deposits,
 				stakingToValidators: stakingToValidators
@@ -214,7 +214,7 @@ extension InteractionReview.MiddleSections {
 				networkID: networkID
 			)
 
-			return Common.Sections(
+			return Common.SectionsData(
 				withdrawals: withdrawals,
 				deposits: deposits,
 				unstakingFromValidators: unstakingFromValidators
@@ -240,7 +240,7 @@ extension InteractionReview.MiddleSections {
 				networkID: networkID
 			)
 
-			return Common.Sections(
+			return Common.SectionsData(
 				withdrawals: withdrawals,
 				deposits: deposits,
 				claimingFromValidators: claimingFromValidators
@@ -275,7 +275,7 @@ extension InteractionReview.MiddleSections {
 				authorizedDepositorsRemoved: authorizedDepositorsRemoved
 			)
 
-			return Common.Sections(
+			return Common.SectionsData(
 				accountDepositSetting: accountDepositSetting,
 				accountDepositExceptions: accountDepositExceptions
 			)
@@ -574,7 +574,7 @@ extension InteractionReview.MiddleSections {
 	}
 }
 
-extension InteractionReview.MiddleSections {
+extension InteractionReview.Sections {
 	struct ResourceEntityNotFound: Error {
 		let address: String
 	}
@@ -644,6 +644,101 @@ extension InteractionReview.MiddleSections {
 				unstakeData: unstakeData,
 				newlyCreatedNonFungibles: newlyCreatedNonFungibles
 			)
+		}
+	}
+}
+
+extension [AccountAddress: [ResourceIndicator]] {
+	/// Aggregate the transfer amounts for the same resource for the same account.
+	///
+	/// The RET analysis might return multiple withdrawls/deposits for the same resource,
+	/// instead of showing separate entries for each withdral/deposit, we aggregate
+	/// the fungible amounts or the non fungible ids.
+	///
+	/// Important note: This aggregates only the guranteed amounts,
+	/// predicted amounts cannot be aggregated since each amount will have a specific instruction index attached.
+	///
+	/// This function is only used curently for stake claim transactions, when the Dapp might sent a manifest
+	/// which is interpreted by RET as having multiple distinct withdrawls/deposits for the same resource.
+	///
+	/// This should eventually be moved to RET, so it should return the aggregated amounts
+	var aggregated: Self {
+		var aggregatedResult: Self = [:]
+
+		for (key, value) in self {
+			var result: [ResourceIndicator] = []
+			for indicator in value {
+				if let i = result.firstIndex(where: {
+					$0.resourceAddress == indicator.resourceAddress &&
+						$0.isGuaranteedAmount &&
+						indicator.isGuaranteedAmount
+				}) {
+					result[i].add(indicator)
+				} else {
+					result.append(indicator)
+				}
+			}
+
+			aggregatedResult[key] = result
+		}
+		return aggregatedResult
+	}
+}
+
+extension ResourceIndicator {
+	var isGuaranteedAmount: Bool {
+		switch self {
+		case .fungible(_, .guaranteed), .nonFungible(_, .byIds):
+			return true
+		default:
+			assertionFailure("Cannot sum up the predicted amounts")
+			return false // Cannot sum up the predicted amounts, as each predicted amount has a specific instruction index
+		}
+	}
+
+	mutating func add(_ other: Self) {
+		guard other.resourceAddress == resourceAddress else {
+			assertionFailure("The indicators should have the same resource address")
+			return
+		}
+		switch (self, other) {
+		case let (.fungible(_, fungibleIndicator), .fungible(_, otherFungibleIndicator)):
+			self = .fungible(
+				resourceAddress: resourceAddress,
+				indicator: fungibleIndicator.adding(otherFungibleIndicator)
+			)
+		case let (.nonFungible(_, nonFungibleIndicator), .nonFungible(_, otherNonFungibleIndicator)):
+			self = .nonFungible(
+				resourceAddress: resourceAddress,
+				indicator: nonFungibleIndicator.adding(otherNonFungibleIndicator)
+			)
+		default:
+			assertionFailure("Trying to add together two different kinds of resources")
+			return
+		}
+	}
+}
+
+extension FungibleResourceIndicator {
+	func adding(_ other: Self) -> Self {
+		switch (self, other) {
+		case let (.guaranteed(amount), .guaranteed(otherAmount)):
+			return .guaranteed(decimal: amount + otherAmount)
+		default:
+			assertionFailure("Cannot sum up the predicted amounts")
+			return self
+		}
+	}
+}
+
+extension NonFungibleResourceIndicator {
+	func adding(_ other: Self) -> Self {
+		switch (self, other) {
+		case let (.byIds(ids), .byIds(otherIds)):
+			return .byIds(ids: ids + otherIds)
+		default:
+			assertionFailure("Cannot sum up the predicted amounts")
+			return self
 		}
 	}
 }

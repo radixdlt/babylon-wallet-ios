@@ -121,7 +121,7 @@ extension PreAuthorizationReview {
 
 		private var sections: some SwiftUI.View {
 			let childStore = store.scope(state: \.sections, action: \.child.sections)
-			return Common.MiddleSections.View(store: childStore)
+			return Common.Sections.View(store: childStore)
 		}
 
 		@ViewBuilder

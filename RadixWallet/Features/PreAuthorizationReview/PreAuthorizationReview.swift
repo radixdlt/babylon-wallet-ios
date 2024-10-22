@@ -14,7 +14,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		var secondsToExpiration: Int?
 
 		// Sections
-		var sections: Common.MiddleSections.State = .init()
+		var sections: Common.Sections.State = .init()
 		var proofs: Common.Proofs.State? = nil
 
 		init() {}
@@ -30,7 +30,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 
 	@CasePathable
 	enum ChildAction: Sendable, Equatable {
-		case sections(Common.MiddleSections.Action)
+		case sections(Common.Sections.Action)
 		case proofs(Common.Proofs.Action)
 	}
 
@@ -43,7 +43,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 
 	var body: some ReducerOf<Self> {
 		Scope(state: \.sections, action: \.child.sections) {
-			Common.MiddleSections()
+			Common.Sections()
 		}
 		Reduce(core)
 			.ifLet(\.proofs, action: \.child.proofs) {

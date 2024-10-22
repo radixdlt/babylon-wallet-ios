@@ -1,5 +1,5 @@
-extension InteractionReview.MiddleSections {
-	func simulateSections() async throws -> Common.Sections? {
+extension InteractionReview.Sections {
+	func simulateSections() async throws -> Common.SectionsData? {
 		let xrdBalance: ResourceBalance = .init(resource: .init(resourceAddress: .sampleStokenetXRD, metadata: .init(name: "Radix", symbol: "XRD", isComplete: true)), details: .fungible(.init(isXRD: true, amount: .init(nominalAmount: .five))))
 		let idResourceBalance = xrdBalance.asIdentified
 
@@ -28,7 +28,7 @@ extension InteractionReview.MiddleSections {
 			.init(resourceBalance: nftBalance),
 		])
 
-		return Common.Sections(
+		return Common.SectionsData(
 			withdrawals: withdrawals,
 			deposits: deposits,
 			proofs: proofs

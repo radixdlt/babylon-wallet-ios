@@ -21,7 +21,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 
 		var reviewedTransaction: ReviewedTransaction? = nil
 
-		var sections: Common.MiddleSections.State = .init()
+		var sections: Common.Sections.State = .init()
 		var withdrawals: Common.Accounts.State? = nil
 		var dAppsUsed: InteractionReviewDappsUsed.State? = nil
 		var contributingToPools: InteractionReviewPools.State? = nil
@@ -112,7 +112,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 
 	@CasePathable
 	enum ChildAction: Sendable, Equatable {
-		case sections(Common.MiddleSections.Action)
+		case sections(Common.Sections.Action)
 		case withdrawals(Common.Accounts.Action)
 		case deposits(Common.Accounts.Action)
 		case dAppsUsed(InteractionReviewDappsUsed.Action)
@@ -124,7 +124,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 
 	enum InternalAction: Sendable, Equatable {
 		case previewLoaded(TaskResult<TransactionToReview>)
-		case updateSections(Common.Sections?)
+		case updateSections(Common.SectionsData?)
 		case buildTransactionIntentResult(TaskResult<TransactionIntent>)
 		case notarizeResult(TaskResult<NotarizeTransactionResponse>)
 		case determineFeePayerResult(TaskResult<FeePayerSelectionResult?>)
@@ -217,7 +217,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 
 	var body: some ReducerOf<Self> {
 		Scope(state: \.sections, action: \.child.sections) {
-			Common.MiddleSections()
+			Common.Sections()
 		}
 		Reduce(core)
 			.ifLet(\.networkFee, action: /Action.child .. ChildAction.networkFee) {

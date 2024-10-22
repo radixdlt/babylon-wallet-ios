@@ -1,9 +1,9 @@
 import SwiftUI
 
-// MARK: - InteractionReview.MiddleSections.View
-extension InteractionReview.MiddleSections {
+// MARK: - InteractionReview.Sections.View
+extension InteractionReview.Sections {
 	struct View: SwiftUI.View {
-		let store: StoreOf<InteractionReview.MiddleSections>
+		let store: StoreOf<InteractionReview.Sections>
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
@@ -123,15 +123,15 @@ extension InteractionReview.MiddleSections {
 	}
 }
 
-extension InteractionReview.MiddleSections.State {
+extension InteractionReview.Sections.State {
 	var showTransferLine: Bool {
 		withdrawals != nil && deposits != nil
 	}
 }
 
-extension StoreOf<InteractionReview.MiddleSections> {
-	var destination: PresentationStoreOf<InteractionReview.MiddleSections.Destination> {
-		func scopeState(state: State) -> PresentationState<InteractionReview.MiddleSections.Destination.State> {
+extension StoreOf<InteractionReview.Sections> {
+	var destination: PresentationStoreOf<InteractionReview.Sections.Destination> {
+		func scopeState(state: State) -> PresentationState<InteractionReview.Sections.Destination.State> {
 			state.$destination
 		}
 		return scope(state: scopeState, action: Action.destination)
@@ -140,9 +140,9 @@ extension StoreOf<InteractionReview.MiddleSections> {
 
 @MainActor
 private extension View {
-	typealias Destination = InteractionReview.MiddleSections.Destination
+	typealias Destination = InteractionReview.Sections.Destination
 
-	func destinations(with store: StoreOf<InteractionReview.MiddleSections>) -> some View {
+	func destinations(with store: StoreOf<InteractionReview.Sections>) -> some View {
 		let destinationStore = store.destination
 		return dApp(with: destinationStore)
 			.fungibleTokenDetails(with: destinationStore)
