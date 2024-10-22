@@ -2,31 +2,43 @@ import ComposableArchitecture
 import SwiftUI
 
 extension NonFungibleTokenDetails.State {
-	var viewState: NonFungibleTokenDetails.ViewState {
+	var tokenDetails: TokenDetails? {
+		token.map {
+			.init(token: $0, stakeClaim: stakeClaim)
+		}
+	}
+
+	var resourceThumbnail: Loadable<URL?> {
+		ownedResource.map { .success($0.metadata.iconURL) } ?? resourceDetails.metadata.iconURL
+	}
+
+	var resourceDetailsViewState: AssetResourceDetailsSection.ViewState {
 		.init(
-			tokenDetails: token.map {
-				NonFungibleTokenDetails.ViewState.TokenDetails(token: $0, stakeClaim: stakeClaim)
-			},
-			resourceThumbnail: ownedResource.map { .success($0.metadata.iconURL) } ?? resourceDetails.metadata.iconURL,
-			resourceDetails: .init(
-				description: resourceDetails.metadata.description,
-				infoUrl: resourceDetails.metadata.infoURL,
-				resourceAddress: resourceAddress,
-				isXRD: false,
-				validatorAddress: nil,
-				resourceName: resourceDetails.metadata.name,
-				currentSupply: resourceDetails.totalSupply.map { $0?.formatted() },
-				divisibility: nil,
-				arbitraryDataFields: resourceDetails.metadata.arbitraryItems.asDataFields,
-				behaviors: resourceDetails.behaviors,
-				tags: ownedResource.map { .success($0.metadata.tags) } ?? resourceDetails.metadata.tags
-			),
-			isClaimStakeEnabled: isClaimStakeEnabled
+			description: resourceDetails.metadata.description,
+			infoUrl: resourceDetails.metadata.infoURL,
+			resourceAddress: resourceAddress,
+			isXRD: false,
+			validatorAddress: nil,
+			resourceName: resourceDetails.metadata.name,
+			currentSupply: resourceDetails.totalSupply.map { $0?.formatted() },
+			divisibility: nil,
+			arbitraryDataFields: resourceDetails.metadata.arbitraryItems.asDataFields,
+			behaviors: resourceDetails.behaviors,
+			tags: ownedResource.map { .success($0.metadata.tags) } ?? resourceDetails.metadata.tags
 		)
+	}
+
+	struct TokenDetails: Equatable {
+		let keyImage: URL?
+		let nonFungibleGlobalID: NonFungibleGlobalId
+		let name: String?
+		let description: String?
+		let stakeClaim: OnLedgerEntitiesClient.StakeClaim?
+		let dataFields: [ArbitraryDataField]
 	}
 }
 
-extension NonFungibleTokenDetails.ViewState.TokenDetails {
+extension NonFungibleTokenDetails.State.TokenDetails {
 	init(token: OnLedgerEntity.NonFungibleToken, stakeClaim: OnLedgerEntitiesClient.StakeClaim?) {
 		self.init(
 			keyImage: token.data?.keyImageURL,
@@ -39,39 +51,18 @@ extension NonFungibleTokenDetails.ViewState.TokenDetails {
 	}
 }
 
-// MARK: - NonFungibleTokenList.Detail.View
+// MARK: - NonFungibleTokenDetails.View
 extension NonFungibleTokenDetails {
-	struct ViewState: Equatable {
-		let tokenDetails: TokenDetails?
-		let resourceThumbnail: Loadable<URL?>
-		let resourceDetails: AssetResourceDetailsSection.ViewState
-		let isClaimStakeEnabled: Bool
-
-		struct TokenDetails: Equatable {
-			let keyImage: URL?
-			let nonFungibleGlobalID: NonFungibleGlobalId
-			let name: String?
-			let description: String?
-			let stakeClaim: OnLedgerEntitiesClient.StakeClaim?
-			let dataFields: [ArbitraryDataField]
-		}
-	}
-
-	@MainActor
 	struct View: SwiftUI.View {
-		private let store: StoreOf<NonFungibleTokenDetails>
-
-		init(store: StoreOf<NonFungibleTokenDetails>) {
-			self.store = store
-		}
+		let store: StoreOf<NonFungibleTokenDetails>
 
 		var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				DetailsContainer(title: .success(viewStore.tokenDetails?.name ?? "")) {
+			WithPerceptionTracking {
+				DetailsContainer(title: .success(store.tokenDetails?.name ?? "")) {
 					store.send(.view(.closeButtonTapped))
 				} contents: {
 					VStack(spacing: .zero) {
-						if let tokenDetails = viewStore.tokenDetails {
+						if let tokenDetails = store.tokenDetails {
 							VStack(spacing: .medium3) {
 								if let keyImage = tokenDetails.keyImage {
 									NFTFullView(url: keyImage)
@@ -92,8 +83,8 @@ extension NonFungibleTokenDetails {
 								}
 
 								if let stakeClaim = tokenDetails.stakeClaim {
-									stakeClaimView(stakeClaim, isClaimStakeEnabled: viewStore.isClaimStakeEnabled) {
-										viewStore.send(.tappedClaimStake)
+									stakeClaimView(stakeClaim, isClaimStakeEnabled: store.isClaimStakeEnabled) {
+										store.send(.view(.tappedClaimStake))
 									}
 								}
 
@@ -114,11 +105,11 @@ extension NonFungibleTokenDetails {
 						}
 
 						VStack(spacing: .medium1) {
-							loadable(viewStore.resourceThumbnail) { url in
+							loadable(store.resourceThumbnail) { url in
 								Thumbnail(.nft, url: url, size: .veryLarge)
 							}
 
-							AssetResourceDetailsSection(viewState: viewStore.resourceDetails)
+							AssetResourceDetailsSection(viewState: store.resourceDetailsViewState)
 
 							IfLetStore(store.scope(state: \.hideResource, action: \.child.hideResource)) { store in
 								HideResource.View(store: store)
@@ -131,7 +122,7 @@ extension NonFungibleTokenDetails {
 				}
 				.foregroundColor(.app.gray1)
 				.task { @MainActor in
-					await viewStore.send(.task).finish()
+					await store.send(.view(.task)).finish()
 				}
 			}
 		}
