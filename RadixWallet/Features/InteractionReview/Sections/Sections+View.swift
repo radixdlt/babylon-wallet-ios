@@ -58,7 +58,7 @@ extension InteractionReview.Sections {
 				VStack(alignment: .leading, spacing: .small2) {
 					let isExpanded = childStore.isExpanded
 					Common.ExpandableHeadingView(heading: .contributingToPools, isExpanded: isExpanded) {
-//						store.send(.view(.expandContributingToPoolsTapped))
+						store.send(.view(.expandableItemToggled(.contributingToPools)))
 					}
 					if isExpanded {
 						InteractionReviewPools.View(store: childStore)
@@ -74,7 +74,7 @@ extension InteractionReview.Sections {
 				VStack(alignment: .leading, spacing: .small2) {
 					let isExpanded = childStore.isExpanded
 					Common.ExpandableHeadingView(heading: .redeemingFromPools, isExpanded: isExpanded) {
-//						store.send(.view(.expandRedeemingFromPoolsTapped))
+						store.send(.view(.expandableItemToggled(.redeemingFromPools)))
 					}
 					if isExpanded {
 						InteractionReviewPools.View(store: childStore)
@@ -88,7 +88,7 @@ extension InteractionReview.Sections {
 		private var stakingToValidators: some SwiftUI.View {
 			if let viewState = store.stakingToValidators {
 				Common.ValidatorsView(heading: .stakingToValidators, viewState: viewState) {
-//					store.send(.view(.expandStakingToValidatorsTapped))
+					store.send(.view(.expandableItemToggled(.stakingToValidators)))
 				}
 			}
 		}
@@ -97,7 +97,7 @@ extension InteractionReview.Sections {
 		private var unstakingFromValidators: some SwiftUI.View {
 			if let viewState = store.unstakingFromValidators {
 				Common.ValidatorsView(heading: .unstakingFromValidators, viewState: viewState) {
-//					store.send(.view(.expandUnstakingFromValidatorsTapped))
+					store.send(.view(.expandableItemToggled(.unstakingFromValidators)))
 				}
 			}
 		}
@@ -106,7 +106,7 @@ extension InteractionReview.Sections {
 		private var claimingFromValidators: some SwiftUI.View {
 			if let viewState = store.claimingFromValidators {
 				Common.ValidatorsView(heading: .claimingFromValidators, viewState: viewState) {
-//					store.send(.view(.expandClaimingFromValidatorsTapped))
+					store.send(.view(.expandableItemToggled(.claimingFromValidators)))
 				}
 			}
 		}
@@ -137,7 +137,7 @@ extension InteractionReview.Sections {
 				VStack(alignment: .leading, spacing: .small2) {
 					let isExpanded = childStore.isExpanded
 					Common.ExpandableHeadingView(heading: .usingDapps, isExpanded: isExpanded) {
-//						store.send(.view(.expandDappsUsedTapped))
+						store.send(.view(.expandableItemToggled(.dAppsUsed)))
 					}
 					if isExpanded {
 						InteractionReviewDappsUsed.View(store: childStore)

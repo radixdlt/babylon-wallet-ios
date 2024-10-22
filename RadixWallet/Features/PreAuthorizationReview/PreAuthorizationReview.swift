@@ -93,6 +93,12 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		case let .sections(.internal(.setSections(sections))):
 			state.proofs = sections?.proofs
 			return .none
+
+		case let .proofs(.delegate(.showAsset(proof))):
+			let resource = proof.resourceBalance.resource
+			let details = proof.resourceBalance.details
+			return .send(.child(.sections(.internal(.parent(.showResourceDetails(resource, details))))))
+
 		default:
 			return .none
 		}
@@ -101,7 +107,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 
 private extension PreAuthorizationReview {
 	func getSections() -> Effect<Action> {
-		.send(.child(.sections(.internal(.simulate))))
+		.send(.child(.sections(.internal(.parent(.simulate)))))
 	}
 
 	func startTimer(expirationDate: Date) -> Effect<Action> {

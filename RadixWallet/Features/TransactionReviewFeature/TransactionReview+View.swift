@@ -17,10 +17,6 @@ extension TransactionReview.State {
 	var viewState: TransactionReview.ViewState {
 		.init(
 			message: message.plaintext,
-			isExpandedDappUsed: dAppsUsed?.isExpanded == true,
-			isExpandedContributingToPools: contributingToPools?.isExpanded == true,
-			isExpandedRedeemingFromPools: redeemingFromPools?.isExpanded == true,
-			showTransferLine: withdrawals != nil && deposits != nil,
 			viewControlState: viewControlState,
 			rawTransaction: displayMode.rawTransaction,
 			showApprovalSlider: reviewedTransaction != nil,
@@ -28,12 +24,7 @@ extension TransactionReview.State {
 			sliderResetDate: sliderResetDate,
 			canToggleViewMode: reviewedTransaction != nil && reviewedTransaction?.isNonConforming == false,
 			viewRawTransactionButtonState: reviewedTransaction?.feePayer.isSuccess == true ? .enabled : .disabled,
-			proposingDappMetadata: proposingDappMetadata,
-			stakingToValidators: stakingToValidators,
-			unstakingFromValidators: unstakingFromValidators,
-			claimingFromValidators: claimingFromValidators,
-			depositSettingSection: accountDepositSetting,
-			depositExceptionsSection: accountDepositExceptions
+			proposingDappMetadata: proposingDappMetadata
 		)
 	}
 
@@ -50,14 +41,7 @@ extension TransactionReview.State {
 extension TransactionReview {
 	struct ViewState: Equatable {
 		let message: String?
-		let isExpandedDappUsed: Bool
-		let isExpandedContributingToPools: Bool
-		let isExpandedRedeemingFromPools: Bool
-		var isExpandedStakingToValidators: Bool { stakingToValidators?.isExpanded == true }
-		var isExpandedUnstakingFromValidators: Bool { unstakingFromValidators?.isExpanded == true }
-		var isExpandedClaimingFromValidators: Bool { claimingFromValidators?.isExpanded == true }
 
-		let showTransferLine: Bool
 		let viewControlState: ControlState
 		let rawTransaction: String?
 		let showApprovalSlider: Bool
@@ -66,12 +50,6 @@ extension TransactionReview {
 		let canToggleViewMode: Bool
 		let viewRawTransactionButtonState: ControlState
 		let proposingDappMetadata: DappMetadata.Ledger?
-
-		let stakingToValidators: Common.ValidatorsState?
-		let unstakingFromValidators: Common.ValidatorsState?
-		let claimingFromValidators: Common.ValidatorsState?
-		let depositSettingSection: Common.DepositSettingState?
-		let depositExceptionsSection: Common.DepositExceptionsState?
 
 		var approvalSliderControlState: ControlState {
 			// TODO: Is this the logic we want?
@@ -100,12 +78,6 @@ extension TransactionReview {
 				coreView(with: viewStore)
 					.controlState(viewStore.viewControlState)
 					.background(.white)
-					.animation(.easeInOut, value: viewStore.isExpandedDappUsed)
-					.animation(.easeInOut, value: viewStore.isExpandedContributingToPools)
-					.animation(.easeInOut, value: viewStore.isExpandedRedeemingFromPools)
-					.animation(.easeInOut, value: viewStore.isExpandedStakingToValidators)
-					.animation(.easeInOut, value: viewStore.isExpandedUnstakingFromValidators)
-					.animation(.easeInOut, value: viewStore.isExpandedClaimingFromValidators)
 					.toolbar {
 						ToolbarItem(placement: .automatic) {
 							if viewStore.canToggleViewMode {
@@ -231,100 +203,6 @@ extension TransactionReview {
 			return Common.Sections.View(store: childStore)
 		}
 
-		private var withdrawalsSection: some SwiftUI.View {
-			IfLetStore(store.scope(state: \.withdrawals) { .child(.withdrawals($0)) }) { childStore in
-				VStack(alignment: .leading, spacing: .small2) {
-					Common.HeadingView.withdrawing
-					Common.Accounts.View(store: childStore)
-				}
-			}
-		}
-
-		private func usingDappsSection(isExpanded: Bool) -> some SwiftUI.View {
-			IfLetStore(store.scope(state: \.dAppsUsed) { .child(.dAppsUsed($0)) }) { childStore in
-				VStack(alignment: .leading, spacing: .small2) {
-					Common.ExpandableHeadingView(heading: .usingDapps, isExpanded: isExpanded) {
-						store.send(.view(.expandUsingDappsTapped))
-					}
-					if isExpanded {
-						InteractionReviewDappsUsed.View(store: childStore)
-							.transition(.opacity.combined(with: .scale(scale: 0.95)))
-					}
-				}
-			}
-		}
-
-		private func contributingToPools(isExpanded: Bool) -> some SwiftUI.View {
-			IfLetStore(store.scope(state: \.contributingToPools) { .child(.contributingToPools($0)) }) { childStore in
-				VStack(alignment: .leading, spacing: .small2) {
-					Common.ExpandableHeadingView(heading: .contributingToPools, isExpanded: isExpanded) {
-						store.send(.view(.expandContributingToPoolsTapped))
-					}
-					if isExpanded {
-						InteractionReviewPools.View(store: childStore)
-							.transition(.opacity.combined(with: .scale(scale: 0.95)))
-					}
-				}
-			}
-		}
-
-		private func redeemingFromPools(isExpanded: Bool) -> some SwiftUI.View {
-			IfLetStore(store.scope(state: \.redeemingFromPools) { .child(.redeemingFromPools($0)) }) { childStore in
-				VStack(alignment: .leading, spacing: .small2) {
-					Common.ExpandableHeadingView(heading: .redeemingFromPools, isExpanded: isExpanded) {
-						store.send(.view(.expandRedeemingFromPoolsTapped))
-					}
-					if isExpanded {
-						InteractionReviewPools.View(store: childStore)
-							.transition(.opacity.combined(with: .scale(scale: 0.95)))
-					}
-				}
-			}
-		}
-
-		private func stakingToValidatorsSection(_ viewState: InteractionReview.ValidatorsView.ViewState) -> some SwiftUI.View {
-			Common.ValidatorsView(heading: .stakingToValidators, viewState: viewState) {
-				store.send(.view(.expandStakingToValidatorsTapped))
-			}
-		}
-
-		private func unstakingFromValidatorsSection(_ viewState: InteractionReview.ValidatorsView.ViewState) -> some SwiftUI.View {
-			Common.ValidatorsView(heading: .unstakingFromValidators, viewState: viewState) {
-				store.send(.view(.expandUnstakingFromValidatorsTapped))
-			}
-		}
-
-		private func claimingFromValidatorsSection(_ viewState: InteractionReview.ValidatorsView.ViewState) -> some SwiftUI.View {
-			Common.ValidatorsView(heading: .claimingFromValidators, viewState: viewState) {
-				store.send(.view(.expandClaimingFromValidatorsTapped))
-			}
-		}
-
-		private var depositsSection: some SwiftUI.View {
-			IfLetStore(store.scope(state: \.deposits) { .child(.deposits($0)) }) { childStore in
-				VStack(alignment: .leading, spacing: .small2) {
-					Common.HeadingView.depositing
-					Common.Accounts.View(store: childStore)
-				}
-			}
-		}
-
-		@ViewBuilder
-		private func accountDepositSettingSection(_ viewState: Common.DepositSettingState) -> some SwiftUI.View {
-			VStack(alignment: .leading, spacing: .small2) {
-				Common.HeadingView.depositSetting
-				Common.DepositSettingView(viewState: viewState)
-			}
-		}
-
-		@ViewBuilder
-		private func accountDepositExceptionsSection(_ viewState: Common.DepositExceptionsState) -> some SwiftUI.View {
-			VStack(alignment: .leading, spacing: .small2) {
-				Common.HeadingView.depositExceptions
-				Common.DepositExceptionsView(viewState: viewState)
-			}
-		}
-
 		private var proofsSection: some SwiftUI.View {
 			let proofsStore = store.scope(state: \.proofs) { .child(.proofs($0)) }
 			return IfLetStore(proofsStore) { childStore in
@@ -355,24 +233,9 @@ private extension View {
 	func destinations(with store: StoreOf<TransactionReview>) -> some View {
 		let destinationStore = store.destination
 		return customizeGuarantees(with: destinationStore)
-			.dApp(with: destinationStore)
-			.fungibleTokenDetails(with: destinationStore)
-			.nonFungibleTokenDetails(with: destinationStore)
-			.lsuDetails(with: destinationStore)
-			.poolUnitDetails(with: destinationStore)
 			.customizeFees(with: destinationStore)
 			.signing(with: destinationStore)
 			.submitting(with: destinationStore)
-			.unknownComponents(with: destinationStore)
-			.rawTransactionAlert(with: destinationStore)
-	}
-
-	private func rawTransactionAlert(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
-		alert(
-			store: destinationStore,
-			state: /TransactionReview.Destination.State.rawTransactionAlert,
-			action: TransactionReview.Destination.Action.rawTransactionAlert
-		)
 	}
 
 	private func customizeGuarantees(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
@@ -381,70 +244,6 @@ private extension View {
 			state: /TransactionReview.Destination.State.customizeGuarantees,
 			action: TransactionReview.Destination.Action.customizeGuarantees,
 			content: { TransactionReviewGuarantees.View(store: $0) }
-		)
-	}
-
-	private func dApp(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /TransactionReview.Destination.State.dApp,
-			action: TransactionReview.Destination.Action.dApp,
-			content: { detailsStore in
-				WithNavigationBar {
-					destinationStore.send(.dismiss)
-				} content: {
-					DappDetails.View(store: detailsStore)
-				}
-			}
-		)
-	}
-
-	private func unknownComponents(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /TransactionReview.Destination.State.unknownDappComponents,
-			action: TransactionReview.Destination.Action.unknownDappComponents,
-			content: {
-				InteractionReview.UnknownDappComponents.View(store: $0)
-					.inNavigationStack
-					.presentationDetents([.medium])
-			}
-		)
-	}
-
-	private func fungibleTokenDetails(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /TransactionReview.Destination.State.fungibleTokenDetails,
-			action: TransactionReview.Destination.Action.fungibleTokenDetails,
-			content: { FungibleTokenDetails.View(store: $0) }
-		)
-	}
-
-	private func nonFungibleTokenDetails(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /TransactionReview.Destination.State.nonFungibleTokenDetails,
-			action: TransactionReview.Destination.Action.nonFungibleTokenDetails,
-			content: { NonFungibleTokenDetails.View(store: $0) }
-		)
-	}
-
-	private func lsuDetails(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /TransactionReview.Destination.State.lsuDetails,
-			action: TransactionReview.Destination.Action.lsuDetails,
-			content: { LSUDetails.View(store: $0) }
-		)
-	}
-
-	private func poolUnitDetails(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /TransactionReview.Destination.State.poolUnitDetails,
-			action: TransactionReview.Destination.Action.poolUnitDetails,
-			content: { PoolUnitDetails.View(store: $0) }
 		)
 	}
 

@@ -31,12 +31,22 @@ extension InteractionReview {
 
 		enum ViewAction: Sendable, Equatable {
 			case appeared
+			case expandableItemToggled(ExpandableItem)
+
+			enum ExpandableItem: Sendable, Equatable {
+				case dAppsUsed, contributingToPools, redeemingFromPools, stakingToValidators, unstakingFromValidators, claimingFromValidators
+			}
 		}
 
 		enum InternalAction: Sendable, Equatable {
-			case resolveExecutionSummary(ExecutionSummary, NetworkID)
-			case simulate
+			case parent(ParentAction)
 			case setSections(Common.SectionsData?)
+
+			enum ParentAction: Sendable, Equatable {
+				case resolveExecutionSummary(ExecutionSummary, NetworkID)
+				case simulate
+				case showResourceDetails(OnLedgerEntity.Resource, ResourceBalance.Details)
+			}
 		}
 
 		@CasePathable
@@ -133,29 +143,31 @@ extension InteractionReview {
 		func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
 			case .appeared:
-				.none
+				return .none
+
+			case let .expandableItemToggled(item):
+				switch item {
+				case .dAppsUsed:
+					state.dAppsUsed?.isExpanded.toggle()
+				case .contributingToPools:
+					state.contributingToPools?.isExpanded.toggle()
+				case .redeemingFromPools:
+					state.redeemingFromPools?.isExpanded.toggle()
+				case .stakingToValidators:
+					state.stakingToValidators?.isExpanded.toggle()
+				case .unstakingFromValidators:
+					state.unstakingFromValidators?.isExpanded.toggle()
+				case .claimingFromValidators:
+					state.claimingFromValidators?.isExpanded.toggle()
+				}
+				return .none
 			}
 		}
 
 		func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 			switch internalAction {
-			case let .resolveExecutionSummary(executionSummary, networkID):
-				return .run { send in
-					let sections = try await sections(for: executionSummary, networkID: networkID)
-					await send(.internal(.setSections(sections)))
-				} catch: { error, send in
-					loggerGlobal.error("Failed to extract sections from ExecutionSummary, error: \(error)")
-					await send(.internal(.setSections(nil)))
-				}
-
-			case .simulate:
-				return .run { send in
-					let sections = try await simulateSections()
-					await send(.internal(.setSections(sections)))
-				} catch: { error, send in
-					loggerGlobal.error("Failed to extract sections, error: \(error)")
-					await send(.internal(.setSections(nil)))
-				}
+			case let .parent(action):
+				return reduce(into: &state, parentAction: action)
 
 			case let .setSections(sections):
 				guard let sections else {
@@ -174,6 +186,31 @@ extension InteractionReview {
 				state.accountDepositExceptions = sections.accountDepositExceptions
 				state.proofs = sections.proofs
 				return .none
+			}
+		}
+
+		func reduce(into state: inout State, parentAction: InternalAction.ParentAction) -> Effect<Action> {
+			switch parentAction {
+			case let .resolveExecutionSummary(executionSummary, networkID):
+				.run { send in
+					let sections = try await sections(for: executionSummary, networkID: networkID)
+					await send(.internal(.setSections(sections)))
+				} catch: { error, send in
+					loggerGlobal.error("Failed to extract sections from ExecutionSummary, error: \(error)")
+					await send(.internal(.setSections(nil)))
+				}
+
+			case .simulate:
+				.run { send in
+					let sections = try await simulateSections()
+					await send(.internal(.setSections(sections)))
+				} catch: { error, send in
+					loggerGlobal.error("Failed to extract sections, error: \(error)")
+					await send(.internal(.setSections(nil)))
+				}
+
+			case let .showResourceDetails(resource, details):
+				resourceDetailsEffect(state: &state, resource: resource, details: details)
 			}
 		}
 
