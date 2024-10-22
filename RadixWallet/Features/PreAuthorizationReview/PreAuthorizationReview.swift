@@ -14,8 +14,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		var secondsToExpiration: Int?
 
 		// Sections
-		var withdrawals: Common.Accounts.State? = nil
-		var deposits: Common.Accounts.State? = nil
+		var sections: Common.MiddleSections.State = .init()
 		var proofs: Common.Proofs.State? = nil
 
 		init() {}
@@ -31,13 +30,11 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 
 	@CasePathable
 	enum ChildAction: Sendable, Equatable {
-		case withdrawals(Common.Accounts.Action)
-		case deposits(Common.Accounts.Action)
+		case sections(Common.MiddleSections.Action)
 		case proofs(Common.Proofs.Action)
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case setSections(Common.Sections?)
 		case updateSecondsToExpiration(Date)
 	}
 
@@ -45,13 +42,10 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 	@Dependency(\.pasteboardClient) var pasteboardClient
 
 	var body: some ReducerOf<Self> {
+		Scope(state: \.sections, action: \.child.sections) {
+			Common.MiddleSections()
+		}
 		Reduce(core)
-			.ifLet(\.withdrawals, action: \.child.withdrawals) {
-				Common.Accounts()
-			}
-			.ifLet(\.deposits, action: \.child.deposits) {
-				Common.Accounts()
-			}
 			.ifLet(\.proofs, action: \.child.proofs) {
 				Common.Proofs()
 			}
@@ -88,19 +82,18 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .setSections(sections):
-			guard let sections else {
-				// TOOD: Show alert to indicate manifest is complex
-				state.displayMode = .raw(state.exampleRaw)
-				return .none
-			}
-			state.withdrawals = sections.withdrawals
-			state.deposits = sections.deposits
-			state.proofs = sections.proofs
-			return .none
-
 		case let .updateSecondsToExpiration(expiration):
 			state.secondsToExpiration = Int(expiration.timeIntervalSinceNow)
+			return .none
+		}
+	}
+
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+		switch childAction {
+		case let .sections(.internal(.setSections(sections))):
+			state.proofs = sections?.proofs
+			return .none
+		default:
 			return .none
 		}
 	}
@@ -108,13 +101,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 
 private extension PreAuthorizationReview {
 	func getSections() -> Effect<Action> {
-		.run { send in
-			let sections = try await simulateSections()
-			await send(.internal(.setSections(sections)))
-		} catch: { error, send in
-			loggerGlobal.error("Failed to extract PreAuthorization sections, error: \(error)")
-			await send(.internal(.setSections(nil)))
-		}
+		.send(.child(.sections(.internal(.simulate))))
 	}
 
 	func startTimer(expirationDate: Date) -> Effect<Action> {

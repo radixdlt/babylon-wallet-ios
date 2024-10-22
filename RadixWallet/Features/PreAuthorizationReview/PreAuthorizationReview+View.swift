@@ -103,17 +103,7 @@ extension PreAuthorizationReview {
 
 		private var details: some SwiftUI.View {
 			VStack(alignment: .leading, spacing: .medium1) {
-				withdrawals
-
-				VStack(alignment: .leading, spacing: .medium1) {
-					deposits
-				}
-				.frame(maxWidth: .infinity, alignment: .leading) // necessary?
-				.background(alignment: .trailing) {
-					if store.showTransferLine {
-						Common.TransferLineView()
-					}
-				}
+				sections
 
 				proofs
 			}
@@ -129,24 +119,9 @@ extension PreAuthorizationReview {
 			}
 		}
 
-		@ViewBuilder
-		private var withdrawals: some SwiftUI.View {
-			if let childStore = store.scope(state: \.withdrawals, action: \.child.withdrawals) {
-				VStack(alignment: .leading, spacing: .small2) {
-					Common.HeadingView.withdrawing
-					Common.Accounts.View(store: childStore)
-				}
-			}
-		}
-
-		@ViewBuilder
-		private var deposits: some SwiftUI.View {
-			if let childStore = store.scope(state: \.deposits, action: \.child.deposits) {
-				VStack(alignment: .leading, spacing: .small2) {
-					Common.HeadingView.depositing
-					Common.Accounts.View(store: childStore)
-				}
-			}
+		private var sections: some SwiftUI.View {
+			let childStore = store.scope(state: \.sections, action: \.child.sections)
+			return Common.MiddleSections.View(store: childStore)
 		}
 
 		@ViewBuilder

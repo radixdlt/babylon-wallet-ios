@@ -155,42 +155,7 @@ extension TransactionReview {
 						VStack(spacing: .medium1) {
 							messageSection(with: viewStore.message)
 
-							withdrawalsSection
-
-							VStack(spacing: .medium1) {
-								contributingToPools(isExpanded: viewStore.isExpandedContributingToPools)
-
-								redeemingFromPools(isExpanded: viewStore.isExpandedRedeemingFromPools)
-
-								if let viewState = viewStore.stakingToValidators {
-									stakingToValidatorsSection(viewState)
-								}
-
-								if let viewState = viewStore.unstakingFromValidators {
-									unstakingFromValidatorsSection(viewState)
-								}
-
-								if let viewState = viewStore.claimingFromValidators {
-									claimingFromValidatorsSection(viewState)
-								}
-
-								usingDappsSection(isExpanded: viewStore.isExpandedDappUsed)
-
-								depositsSection
-							}
-							.background(alignment: .trailing) {
-								if viewStore.showTransferLine {
-									Common.TransferLineView()
-								}
-							}
-
-							if let viewState = viewStore.depositSettingSection {
-								accountDepositSettingSection(viewState)
-							}
-
-							if let viewState = viewStore.depositExceptionsSection {
-								accountDepositExceptionsSection(viewState)
-							}
+							sections
 						}
 						.padding(.top, .small1)
 						.padding(.horizontal, .medium3)
@@ -259,6 +224,11 @@ extension TransactionReview {
 					TransactionMessageView(message: message)
 				}
 			}
+		}
+
+		private var sections: some SwiftUI.View {
+			let childStore = store.scope(state: \.sections, action: \.child.sections)
+			return Common.MiddleSections.View(store: childStore)
 		}
 
 		private var withdrawalsSection: some SwiftUI.View {

@@ -21,6 +21,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 
 		var reviewedTransaction: ReviewedTransaction? = nil
 
+		var sections: Common.MiddleSections.State = .init()
 		var withdrawals: Common.Accounts.State? = nil
 		var dAppsUsed: InteractionReviewDappsUsed.State? = nil
 		var contributingToPools: InteractionReviewPools.State? = nil
@@ -109,7 +110,9 @@ struct TransactionReview: Sendable, FeatureReducer {
 		case approvalSliderSlid
 	}
 
+	@CasePathable
 	enum ChildAction: Sendable, Equatable {
+		case sections(Common.MiddleSections.Action)
 		case withdrawals(Common.Accounts.Action)
 		case deposits(Common.Accounts.Action)
 		case dAppsUsed(InteractionReviewDappsUsed.Action)
@@ -213,6 +216,9 @@ struct TransactionReview: Sendable, FeatureReducer {
 	init() {}
 
 	var body: some ReducerOf<Self> {
+		Scope(state: \.sections, action: \.child.sections) {
+			Common.MiddleSections()
+		}
 		Reduce(core)
 			.ifLet(\.networkFee, action: /Action.child .. ChildAction.networkFee) {
 				TransactionReviewNetworkFee()
@@ -344,6 +350,20 @@ struct TransactionReview: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
+		case let .sections(.internal(.setSections(sections))):
+			state.proofs = sections?.proofs
+			return .none
+
+		case let .sections(.delegate(delegateAction)):
+			switch delegateAction {
+			case .failedToResolveSections:
+				return showRawTransaction(&state)
+
+			case let .showCustomizeGuarantees(guarantees):
+				state.destination = .customizeGuarantees(.init(guarantees: guarantees.asIdentified()))
+				return .none
+			}
+
 		case let .withdrawals(.delegate(.showAsset(transfer, token))),
 		     let .deposits(.delegate(.showAsset(transfer, token))):
 			return resourceDetailsEffect(state: &state, resource: transfer.resource, details: transfer.details, nft: token)
@@ -366,12 +386,6 @@ struct TransactionReview: Sendable, FeatureReducer {
 				rowHeading: L10n.Common.pool,
 				addresses: pools.map { .resourcePool($0) }
 			))
-			return .none
-
-		case .deposits(.delegate(.showCustomizeGuarantees)):
-			guard let guarantees = state.deposits?.accounts.customizableGuarantees, !guarantees.isEmpty else { return .none }
-			state.destination = .customizeGuarantees(.init(guarantees: guarantees.asIdentified()))
-
 			return .none
 
 		case let .proofs(.delegate(.showAsset(proof))):
@@ -622,14 +636,7 @@ extension TransactionReview {
 
 		state.networkFee = .init(reviewedTransaction: reviewedTransaction)
 
-		return .run { send in
-			let sections = try await sections(for: executionSummary, networkID: networkID)
-			await send(.internal(.updateSections(sections)))
-		} catch: { error, send in
-			loggerGlobal.error("Failed to extract transaction content, error: \(error)")
-			// FIXME: propagate/display error?
-			await send(.internal(.updateSections(nil)))
-		}
+		return .send(.child(.sections(.internal(.resolveExecutionSummary(executionSummary, networkID)))))
 	}
 
 	func showRawTransaction(_ state: inout State) -> Effect<Action> {
