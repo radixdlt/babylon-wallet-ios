@@ -14,17 +14,9 @@ extension InteractionReview.Sections {
 						contributingToPools
 						redeemingFromPools
 
-//						if let viewState = viewStore.stakingToValidators {
-//							stakingToValidatorsSection(viewState)
-//						}
-//
-//						if let viewState = viewStore.unstakingFromValidators {
-//							unstakingFromValidatorsSection(viewState)
-//						}
-//
-//						if let viewState = viewStore.claimingFromValidators {
-//							claimingFromValidatorsSection(viewState)
-//						}
+						stakingToValidators
+						unstakingFromValidators
+						claimingFromValidators
 
 						dAppsUsed
 
@@ -42,6 +34,9 @@ extension InteractionReview.Sections {
 				}
 				.animation(.easeInOut, value: store.contributingToPools?.isExpanded)
 				.animation(.easeInOut, value: store.redeemingFromPools?.isExpanded)
+				.animation(.easeInOut, value: store.stakingToValidators?.isExpanded)
+				.animation(.easeInOut, value: store.unstakingFromValidators?.isExpanded)
+				.animation(.easeInOut, value: store.claimingFromValidators?.isExpanded)
 				.animation(.easeInOut, value: store.dAppsUsed?.isExpanded)
 			}
 			.destinations(with: store)
@@ -85,6 +80,33 @@ extension InteractionReview.Sections {
 						InteractionReviewPools.View(store: childStore)
 							.transition(.opacity.combined(with: .scale(scale: 0.95)))
 					}
+				}
+			}
+		}
+
+		@ViewBuilder
+		private var stakingToValidators: some SwiftUI.View {
+			if let viewState = store.stakingToValidators {
+				Common.ValidatorsView(heading: .stakingToValidators, viewState: viewState) {
+//					store.send(.view(.expandStakingToValidatorsTapped))
+				}
+			}
+		}
+
+		@ViewBuilder
+		private var unstakingFromValidators: some SwiftUI.View {
+			if let viewState = store.unstakingFromValidators {
+				Common.ValidatorsView(heading: .unstakingFromValidators, viewState: viewState) {
+//					store.send(.view(.expandUnstakingFromValidatorsTapped))
+				}
+			}
+		}
+
+		@ViewBuilder
+		private var claimingFromValidators: some SwiftUI.View {
+			if let viewState = store.claimingFromValidators {
+				Common.ValidatorsView(heading: .claimingFromValidators, viewState: viewState) {
+//					store.send(.view(.expandClaimingFromValidatorsTapped))
 				}
 			}
 		}
