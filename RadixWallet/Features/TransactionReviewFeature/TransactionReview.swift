@@ -32,8 +32,8 @@ struct TransactionReview: Sendable, FeatureReducer {
 		var unstakingFromValidators: Common.ValidatorsState? = nil
 		var claimingFromValidators: Common.ValidatorsState? = nil
 
-		var accountDepositSetting: DepositSettingState? = nil
-		var accountDepositExceptions: DepositExceptionsState? = nil
+		var accountDepositSetting: Common.DepositSettingState? = nil
+		var accountDepositExceptions: Common.DepositExceptionsState? = nil
 
 		var proofs: Common.Proofs.State? = nil
 		var networkFee: TransactionReviewNetworkFee.State? = nil

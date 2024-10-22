@@ -17,8 +17,8 @@ extension InteractionReview {
 			var unstakingFromValidators: InteractionReview.ValidatorsState? = nil
 			var claimingFromValidators: InteractionReview.ValidatorsState? = nil
 
-			var accountDepositSetting: TransactionReview.DepositSettingState? = nil
-			var accountDepositExceptions: TransactionReview.DepositExceptionsState? = nil
+			var accountDepositSetting: InteractionReview.DepositSettingState? = nil
+			var accountDepositExceptions: InteractionReview.DepositExceptionsState? = nil
 
 			// The proofs are set here (within the resolve logic) but should be rendered and handled by the parent view, since they may be placed outside the Sections.
 			var proofs: Proofs.State? = nil

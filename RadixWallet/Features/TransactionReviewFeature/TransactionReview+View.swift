@@ -70,8 +70,8 @@ extension TransactionReview {
 		let stakingToValidators: Common.ValidatorsState?
 		let unstakingFromValidators: Common.ValidatorsState?
 		let claimingFromValidators: Common.ValidatorsState?
-		let depositSettingSection: DepositSettingState?
-		let depositExceptionsSection: DepositExceptionsState?
+		let depositSettingSection: Common.DepositSettingState?
+		let depositExceptionsSection: Common.DepositExceptionsState?
 
 		var approvalSliderControlState: ControlState {
 			// TODO: Is this the logic we want?
@@ -310,18 +310,18 @@ extension TransactionReview {
 		}
 
 		@ViewBuilder
-		private func accountDepositSettingSection(_ viewState: DepositSettingState) -> some SwiftUI.View {
+		private func accountDepositSettingSection(_ viewState: Common.DepositSettingState) -> some SwiftUI.View {
 			VStack(alignment: .leading, spacing: .small2) {
 				Common.HeadingView.depositSetting
-				DepositSettingView(viewState: viewState)
+				Common.DepositSettingView(viewState: viewState)
 			}
 		}
 
 		@ViewBuilder
-		private func accountDepositExceptionsSection(_ viewState: DepositExceptionsState) -> some SwiftUI.View {
+		private func accountDepositExceptionsSection(_ viewState: Common.DepositExceptionsState) -> some SwiftUI.View {
 			VStack(alignment: .leading, spacing: .small2) {
 				Common.HeadingView.depositExceptions
-				DepositExceptionsView(viewState: viewState)
+				Common.DepositExceptionsView(viewState: viewState)
 			}
 		}
 

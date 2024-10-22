@@ -12,7 +12,6 @@ extension InteractionReview.Sections {
 
 					VStack(alignment: .leading, spacing: .medium1) {
 						contributingToPools
-
 						redeemingFromPools
 
 //						if let viewState = viewStore.stakingToValidators {
@@ -38,13 +37,8 @@ extension InteractionReview.Sections {
 						}
 					}
 
-//					if let viewState = viewStore.depositSettingSection {
-//						accountDepositSettingSection(viewState)
-//					}
-//
-//					if let viewState = viewStore.depositExceptionsSection {
-//						accountDepositExceptionsSection(viewState)
-//					}
+					accountDepositSetting
+					accountDepositExceptions
 				}
 				.animation(.easeInOut, value: store.contributingToPools?.isExpanded)
 				.animation(.easeInOut, value: store.redeemingFromPools?.isExpanded)
@@ -91,6 +85,26 @@ extension InteractionReview.Sections {
 						InteractionReviewPools.View(store: childStore)
 							.transition(.opacity.combined(with: .scale(scale: 0.95)))
 					}
+				}
+			}
+		}
+
+		@ViewBuilder
+		private var accountDepositSetting: some SwiftUI.View {
+			if let viewState = store.accountDepositSetting {
+				VStack(alignment: .leading, spacing: .small2) {
+					Common.HeadingView.depositSetting
+					Common.DepositSettingView(viewState: viewState)
+				}
+			}
+		}
+
+		@ViewBuilder
+		private var accountDepositExceptions: some SwiftUI.View {
+			if let viewState = store.accountDepositExceptions {
+				VStack(alignment: .leading, spacing: .small2) {
+					Common.HeadingView.depositExceptions
+					Common.DepositExceptionsView(viewState: viewState)
 				}
 			}
 		}

@@ -488,8 +488,8 @@ extension InteractionReview.Sections {
 	func extractAccountDepositSetting(
 		for validAccounts: [Account],
 		defaultDepositRuleChanges: [AccountAddress: AccountDefaultDepositRule]
-	) -> TransactionReview.DepositSettingState? {
-		let depositSettingChanges: [TransactionReview.DepositSettingChange] = validAccounts.compactMap { account in
+	) -> Common.DepositSettingState? {
+		let depositSettingChanges: [Common.DepositSettingChange] = validAccounts.compactMap { account in
 			guard let depositRuleChange = defaultDepositRuleChanges[account.address] else { return nil }
 			return .init(account: account, ruleChange: depositRuleChange)
 		}
@@ -504,22 +504,22 @@ extension InteractionReview.Sections {
 		resourcePreferenceChanges: [AccountAddress: [ResourceAddress: ResourcePreferenceUpdate]],
 		authorizedDepositorsAdded: [AccountAddress: [ResourceOrNonFungible]],
 		authorizedDepositorsRemoved: [AccountAddress: [ResourceOrNonFungible]]
-	) async throws -> TransactionReview.DepositExceptionsState? {
-		let exceptionChanges: [TransactionReview.DepositExceptionsChange] = try await validAccounts.asyncCompactMap { account in
+	) async throws -> Common.DepositExceptionsState? {
+		let exceptionChanges: [Common.DepositExceptionsChange] = try await validAccounts.asyncCompactMap { account in
 			let resourcePreferenceChanges = try await resourcePreferenceChanges[account.address]?
 				.asyncMap { resourcePreference in
-					try await TransactionReview.DepositExceptionsChange.ResourcePreferenceChange(
+					try await Common.DepositExceptionsChange.ResourcePreferenceChange(
 						resource: onLedgerEntitiesClient.getResource(resourcePreference.key),
 						change: resourcePreference.value
 					)
 				} ?? []
 
 			let authorizedDepositorChanges = try await {
-				var changes: [TransactionReview.DepositExceptionsChange.AllowedDepositorChange] = []
+				var changes: [Common.DepositExceptionsChange.AllowedDepositorChange] = []
 				if let authorizedDepositorsAdded = authorizedDepositorsAdded[account.address] {
 					let added = try await authorizedDepositorsAdded.asyncMap { resourceOrNonFungible in
 						let resourceAddress = resourceOrNonFungible.resourceAddress
-						return try await TransactionReview.DepositExceptionsChange.AllowedDepositorChange(
+						return try await Common.DepositExceptionsChange.AllowedDepositorChange(
 							resource: onLedgerEntitiesClient.getResource(resourceAddress),
 							change: .added
 						)
@@ -529,7 +529,7 @@ extension InteractionReview.Sections {
 				if let authorizedDepositorsRemoved = authorizedDepositorsRemoved[account.address] {
 					let removed = try await authorizedDepositorsRemoved.asyncMap { resourceOrNonFungible in
 						let resourceAddress = resourceOrNonFungible.resourceAddress
-						return try await TransactionReview.DepositExceptionsChange.AllowedDepositorChange(
+						return try await Common.DepositExceptionsChange.AllowedDepositorChange(
 							resource: onLedgerEntitiesClient.getResource(resourceAddress),
 							change: .removed
 						)
@@ -542,7 +542,7 @@ extension InteractionReview.Sections {
 
 			guard !resourcePreferenceChanges.isEmpty || !authorizedDepositorChanges.isEmpty else { return nil }
 
-			return TransactionReview.DepositExceptionsChange(
+			return Common.DepositExceptionsChange(
 				account: account,
 				resourcePreferenceChanges: IdentifiedArray(uncheckedUniqueElements: resourcePreferenceChanges),
 				allowedDepositorChanges: IdentifiedArray(uncheckedUniqueElements: authorizedDepositorChanges)

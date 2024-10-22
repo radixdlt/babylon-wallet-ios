@@ -13,8 +13,8 @@ extension InteractionReview {
 		var unstakingFromValidators: InteractionReview.ValidatorsState? = nil
 		var claimingFromValidators: InteractionReview.ValidatorsState? = nil
 
-		var accountDepositSetting: TransactionReview.DepositSettingState? = nil
-		var accountDepositExceptions: TransactionReview.DepositExceptionsState? = nil
+		var accountDepositSetting: InteractionReview.DepositSettingState? = nil
+		var accountDepositExceptions: InteractionReview.DepositExceptionsState? = nil
 
 		var proofs: Proofs.State? = nil
 	}
