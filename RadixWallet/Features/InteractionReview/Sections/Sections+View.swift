@@ -194,44 +194,56 @@ private extension View {
 	}
 
 	private func dApp(with destinationStore: PresentationStoreOf<Destination>) -> some View {
-		sheet(store: destinationStore.scope(state: \.dApp, action: \.dApp)) { detailsStore in
-			WithNavigationBar {
-				destinationStore.send(.dismiss)
-			} content: {
-				DappDetails.View(store: detailsStore)
+		WithPerceptionTracking {
+			sheet(store: destinationStore.scope(state: \.dApp, action: \.dApp)) { detailsStore in
+				WithNavigationBar {
+					destinationStore.send(.dismiss)
+				} content: {
+					DappDetails.View(store: detailsStore)
+				}
 			}
 		}
 	}
 
 	private func unknownComponents(with destinationStore: PresentationStoreOf<Destination>) -> some View {
-		sheet(store: destinationStore.scope(state: \.unknownDappComponents, action: \.unknownDappComponents)) {
-			InteractionReview.UnknownDappComponents.View(store: $0)
-				.inNavigationStack
-				.presentationDetents([.medium])
+		WithPerceptionTracking {
+			sheet(store: destinationStore.scope(state: \.unknownDappComponents, action: \.unknownDappComponents)) {
+				InteractionReview.UnknownDappComponents.View(store: $0)
+					.inNavigationStack
+					.presentationDetents([.medium])
+			}
 		}
 	}
 
 	private func fungibleTokenDetails(with destinationStore: PresentationStoreOf<Destination>) -> some View {
-		sheet(store: destinationStore.scope(state: \.fungibleTokenDetails, action: \.fungibleTokenDetails)) {
-			FungibleTokenDetails.View(store: $0)
+		WithPerceptionTracking {
+			sheet(store: destinationStore.scope(state: \.fungibleTokenDetails, action: \.fungibleTokenDetails)) {
+				FungibleTokenDetails.View(store: $0)
+			}
 		}
 	}
 
 	private func nonFungibleTokenDetails(with destinationStore: PresentationStoreOf<Destination>) -> some View {
-		sheet(store: destinationStore.scope(state: \.nonFungibleTokenDetails, action: \.nonFungibleTokenDetails)) {
-			NonFungibleTokenDetails.View(store: $0)
+		WithPerceptionTracking {
+			sheet(store: destinationStore.scope(state: \.nonFungibleTokenDetails, action: \.nonFungibleTokenDetails)) {
+				NonFungibleTokenDetails.View(store: $0)
+			}
 		}
 	}
 
 	private func lsuDetails(with destinationStore: PresentationStoreOf<Destination>) -> some View {
-		sheet(store: destinationStore.scope(state: \.lsuDetails, action: \.lsuDetails)) {
-			LSUDetails.View(store: $0)
+		WithPerceptionTracking {
+			sheet(store: destinationStore.scope(state: \.lsuDetails, action: \.lsuDetails)) {
+				LSUDetails.View(store: $0)
+			}
 		}
 	}
 
 	private func poolUnitDetails(with destinationStore: PresentationStoreOf<Destination>) -> some View {
-		sheet(store: destinationStore.scope(state: \.poolUnitDetails, action: \.poolUnitDetails)) {
-			PoolUnitDetails.View(store: $0)
+		WithPerceptionTracking {
+			sheet(store: destinationStore.scope(state: \.poolUnitDetails, action: \.poolUnitDetails)) {
+				PoolUnitDetails.View(store: $0)
+			}
 		}
 	}
 }

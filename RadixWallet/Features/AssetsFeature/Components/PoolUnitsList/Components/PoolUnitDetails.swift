@@ -2,7 +2,9 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - PoolUnitDetails
+@Reducer
 struct PoolUnitDetails: Sendable, FeatureReducer {
+	@ObservableState
 	struct State: Sendable, Hashable {
 		let resourcesDetails: OnLedgerEntitiesClient.OwnedResourcePoolDetails
 		var hideResource: HideResource.State
@@ -14,6 +16,8 @@ struct PoolUnitDetails: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.dismiss) var dismiss
+
+	typealias Action = FeatureAction<Self>
 
 	enum ViewAction: Sendable, Equatable {
 		case closeButtonTapped
