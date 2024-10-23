@@ -10,12 +10,12 @@ struct SubmitTransactionClient: Sendable {
 }
 
 extension SubmitTransactionClient {
-	typealias SubmitTransaction = @Sendable (NotarizedTransaction) async throws -> IntentHash
-	typealias PollTransactionStatus = @Sendable (IntentHash) async throws -> Sargon.TransactionStatus
+	typealias SubmitTransaction = @Sendable (NotarizedTransaction) async throws -> TransactionIntentHash
+	typealias PollTransactionStatus = @Sendable (TransactionIntentHash) async throws -> Sargon.TransactionStatus
 }
 
 extension SubmitTransactionClient {
-	func hasTXBeenCommittedSuccessfully(_ intentHash: IntentHash) async throws -> Bool {
+	func hasTXBeenCommittedSuccessfully(_ intentHash: TransactionIntentHash) async throws -> Bool {
 		try await pollTransactionStatus(intentHash) == .success
 	}
 }

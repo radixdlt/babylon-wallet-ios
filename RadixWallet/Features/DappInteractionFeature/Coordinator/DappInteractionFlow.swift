@@ -124,7 +124,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case dismissWithFailure(WalletToDappInteractionFailureResponse)
-		case dismissWithSuccess(DappMetadata, IntentHash)
+		case dismissWithSuccess(DappMetadata, TransactionIntentHash)
 		case submit(WalletToDappInteractionSuccessResponse, DappMetadata)
 		case dismiss
 	}
@@ -429,7 +429,7 @@ extension DappInteractionFlow {
 
 		func handleSignAndSubmitTX(
 			_ item: State.AnyInteractionItem,
-			_ txID: IntentHash
+			_ txID: TransactionIntentHash
 		) -> Effect<Action> {
 			state.responseItems[item] = .remote(.send(.init(transactionIntentHash: txID)))
 			return continueEffect(for: &state)
