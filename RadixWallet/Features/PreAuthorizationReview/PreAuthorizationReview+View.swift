@@ -3,8 +3,7 @@ import SwiftUI
 extension PreAuthorizationReview.State {
 	var viewState: PreAuthorizationReview.ViewState {
 		.init(
-			dAppName: dAppName,
-			dAppThumbnail: dAppThumbnail,
+			dAppMetadata: dAppMetadata,
 			displayMode: displayMode,
 			sliderResetDate: sliderResetDate,
 			expiration: expiration,
@@ -18,14 +17,17 @@ extension PreAuthorizationReview.State {
 // MARK: - PreAuthorizationReview.View
 extension PreAuthorizationReview {
 	struct ViewState: Equatable {
-		let dAppName: String?
-		let dAppThumbnail: URL?
+		let dAppMetadata: DappMetadata.Ledger?
 		let displayMode: Common.DisplayMode
 		let sliderResetDate: Date
 		let expiration: Expiration?
 		let secondsToExpiration: Int?
 		let globalControlState: ControlState
 		let sliderControlState: ControlState
+
+		var dAppName: String? {
+			dAppMetadata?.name?.rawValue
+		}
 	}
 
 	struct View: SwiftUI.View {
@@ -72,7 +74,7 @@ extension PreAuthorizationReview {
 		private func content(_ viewStore: ViewStoreOf<PreAuthorizationReview>) -> some SwiftUI.View {
 			ScrollView(showsIndicators: false) {
 				VStack(spacing: .zero) {
-					header(dAppName: viewStore.dAppName, dAppThumbnail: viewStore.dAppThumbnail)
+					header(dAppMetadata: viewStore.dAppMetadata)
 
 					Group {
 						if let rawContent = viewStore.displayMode.rawTransaction {
@@ -114,11 +116,11 @@ extension PreAuthorizationReview {
 			}
 		}
 
-		private func header(dAppName: String?, dAppThumbnail: URL?) -> some SwiftUI.View {
+		private func header(dAppMetadata: DappMetadata.Ledger?) -> some SwiftUI.View {
 			Common.HeaderView(
 				kind: .preAuthorization,
-				name: dAppName,
-				thumbnail: dAppThumbnail
+				name: dAppMetadata?.name?.rawValue,
+				thumbnail: dAppMetadata?.thumbnail
 			)
 			.measurePosition(navTitleID, coordSpace: coordSpace)
 			.padding(.horizontal, .medium3)

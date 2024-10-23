@@ -1017,7 +1017,8 @@ extension DappInteractionFlow.Path.State {
 			self.state = .preAuthorizationReview(.init(
 				unvalidatedManifest: item.unvalidatedManifest,
 				nonce: .secureRandom(),
-				signTransactionPurpose: .manifestFromDapp
+				signTransactionPurpose: .manifestFromDapp,
+				dAppMetadata: dappMetadata.onLedger
 			))
 //			self.state = .reviewTransaction(.init(
 //				unvalidatedManifest: item.unvalidatedManifest,

@@ -7,14 +7,13 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		let nonce: Nonce
 		let signTransactionPurpose: SigningPurpose.SignTransactionPurpose
 		let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey = .init()
+		let dAppMetadata: DappMetadata.Ledger?
 
 		var reviewedPreAuthorization: ReviewedPreAuthorization?
-		var dAppName: String? = "CaviarNine"
-		var dAppThumbnail: URL? = .init(string: "https://assets.caviarnine.com/icons/caviarnine_logo_light_400.png")
+		var expiration: Expiration?
+
 		var displayMode: Common.DisplayMode = .detailed
 		var sliderResetDate: Date = .now // TODO: reset when it corresponds
-
-		var expiration: Expiration?
 		var secondsToExpiration: Int?
 
 		// Sections
@@ -40,6 +39,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.pasteboardClient) var pasteboardClient
 	@Dependency(\.transactionClient) var transactionClient
+	@Dependency(\.errorQueue) var errorQueue
 
 	var body: some ReducerOf<Self> {
 		Scope(state: \.sections, action: \.child.sections) {
@@ -51,7 +51,6 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			// TODO: Replace mocked data with real logic
 			return .run { [state = state] send in
 				let preview = await TaskResult {
 					try await transactionClient.getTransactionReview(.init(
@@ -88,14 +87,18 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .previewLoaded(.failure(error)):
-			// TODO: Handle error
+			loggerGlobal.error("PreAuthroization preview failed, error: \(error)")
+			errorQueue.schedule(error)
 			return .none
 
 		case let .previewLoaded(.success(preview)):
 			state.reviewedPreAuthorization = .init(manifest: preview.transactionManifest)
+
+			// Mocking expiration until we have Sargon ready. Timer won't be started if expiration != .atTime
 			let time = Date().addingTimeInterval(90)
 			state.expiration = .atTime(time)
 			state.secondsToExpiration = Int(time.timeIntervalSinceNow)
+
 			return startTimer(expirationDate: time)
 				.merge(with: getSections(executionSummary: preview.analyzedManifestToReview, networkId: preview.networkID))
 
