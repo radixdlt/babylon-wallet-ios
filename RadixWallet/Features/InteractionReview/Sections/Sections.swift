@@ -44,7 +44,7 @@ extension InteractionReview {
 
 			enum ParentAction: Sendable, Equatable {
 				case resolveExecutionSummary(ExecutionSummary, NetworkID)
-				case simulate
+				case resolveTransactionSummary(TransactionSummary, NetworkID)
 				case showResourceDetails(OnLedgerEntity.Resource, ResourceBalance.Details)
 			}
 		}
@@ -204,12 +204,12 @@ extension InteractionReview {
 					await send(.internal(.setSections(nil)))
 				}
 
-			case .simulate:
+			case let .resolveTransactionSummary(transactionSummary, networkID):
 				.run { send in
-					let sections = try await simulateSections()
+					let sections = try await sections(for: transactionSummary, networkID: networkID)
 					await send(.internal(.setSections(sections)))
 				} catch: { error, send in
-					loggerGlobal.error("Failed to extract sections, error: \(error)")
+					loggerGlobal.error("Failed to extract sections from TransactionSummary, error: \(error)")
 					await send(.internal(.setSections(nil)))
 				}
 

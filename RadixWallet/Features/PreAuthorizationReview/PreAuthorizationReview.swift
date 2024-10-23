@@ -94,13 +94,26 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		case let .previewLoaded(.success(preview)):
 			state.reviewedPreAuthorization = .init(manifest: preview.transactionManifest)
 
+			var effects: [Effect<Action>] = []
+			let sectionsEffect: Effect<Action>
+				// We will check Preview type to know which type of sections to get
+				= if 5 > 3
+			{
+				.send(.child(.sections(.internal(.parent(.resolveExecutionSummary(
+					preview.analyzedManifestToReview, preview.networkID
+				))))))
+			} else {
+				.send(.child(.sections(.internal(.parent(.resolveTransactionSummary(.init(), preview.networkID))))))
+			}
+			effects.append(sectionsEffect)
+
 			// Mocking expiration until we have Sargon ready. Timer won't be started if expiration != .atTime
 			let time = Date().addingTimeInterval(90)
 			state.expiration = .atTime(time)
 			state.secondsToExpiration = Int(time.timeIntervalSinceNow)
+			effects.append(startTimer(expirationDate: time))
 
-			return startTimer(expirationDate: time)
-				.merge(with: getSections(executionSummary: preview.analyzedManifestToReview, networkId: preview.networkID))
+			return .merge(effects)
 
 		case let .updateSecondsToExpiration(expiration):
 			state.secondsToExpiration = Int(expiration.timeIntervalSinceNow)
@@ -110,10 +123,6 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 }
 
 private extension PreAuthorizationReview {
-	func getSections(executionSummary: ExecutionSummary, networkId: NetworkID) -> Effect<Action> {
-		.send(.child(.sections(.internal(.parent(.resolveExecutionSummary(executionSummary, networkId))))))
-	}
-
 	func startTimer(expirationDate: Date) -> Effect<Action> {
 		.run { send in
 			for await _ in self.clock.timer(interval: .seconds(1)) {
