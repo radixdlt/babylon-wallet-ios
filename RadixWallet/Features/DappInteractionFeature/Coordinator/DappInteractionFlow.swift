@@ -145,6 +145,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case reviewTransaction(TransactionReview.State)
 			case personaProofOfOwnership(ProofOfOwnership.State)
 			case accountsProofOfOwnership(ProofOfOwnership.State)
+			case preAuthorizationReview(PreAuthorizationReview.State)
 		}
 
 		@CasePathable
@@ -157,6 +158,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case reviewTransaction(TransactionReview.Action)
 			case personaProofOfOwnership(ProofOfOwnership.Action)
 			case accountsProofOfOwnership(ProofOfOwnership.Action)
+			case preAuthorizationReview(PreAuthorizationReview.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -184,6 +186,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				}
 				Scope(state: \.accountsProofOfOwnership, action: \.accountsProofOfOwnership) {
 					ProofOfOwnership()
+				}
+				Scope(state: \.preAuthorizationReview, action: \.preAuthorizationReview) {
+					PreAuthorizationReview()
 				}
 			}
 		}
@@ -1009,18 +1014,23 @@ extension DappInteractionFlow.Path.State {
 			))
 
 		case let .remote(.send(item)):
-			self.state = .reviewTransaction(.init(
+			self.state = .preAuthorizationReview(.init(
 				unvalidatedManifest: item.unvalidatedManifest,
 				nonce: .secureRandom(),
-				signTransactionPurpose: .manifestFromDapp,
-				message: item.message.map {
-					Message.plaintext(string: $0)
-				} ?? Message.none,
-				waitsForTransactionToBeComitted: interaction.interactionId.isWalletAccountDepositSettingsInteraction,
-				isWalletTransaction: interaction.interactionId.isWalletInteraction,
-				proposingDappMetadata: dappMetadata.onLedger,
-				p2pRoute: p2pRoute
+				signTransactionPurpose: .manifestFromDapp
 			))
+//			self.state = .reviewTransaction(.init(
+//				unvalidatedManifest: item.unvalidatedManifest,
+//				nonce: .secureRandom(),
+//				signTransactionPurpose: .manifestFromDapp,
+//				message: item.message.map {
+//					Message.plaintext(string: $0)
+//				} ?? Message.none,
+//				waitsForTransactionToBeComitted: interaction.interactionId.isWalletAccountDepositSettingsInteraction,
+//				isWalletTransaction: interaction.interactionId.isWalletInteraction,
+//				proposingDappMetadata: dappMetadata.onLedger,
+//				p2pRoute: p2pRoute
+//			))
 		}
 	}
 }
