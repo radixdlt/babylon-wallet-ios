@@ -61,63 +61,65 @@ extension NonFungibleTokenDetails {
 				DetailsContainer(title: .success(store.tokenDetails?.name ?? "")) {
 					store.send(.view(.closeButtonTapped))
 				} contents: {
-					VStack(spacing: .zero) {
-						if let tokenDetails = store.tokenDetails {
-							VStack(spacing: .medium3) {
-								if let keyImage = tokenDetails.keyImage {
-									NFTFullView(url: keyImage)
-								}
+					WithPerceptionTracking {
+						VStack(spacing: .zero) {
+							if let tokenDetails = store.tokenDetails {
+								VStack(spacing: .medium3) {
+									if let keyImage = tokenDetails.keyImage {
+										NFTFullView(url: keyImage)
+									}
 
-								if let description = tokenDetails.description {
-									ExpandableTextView(fullText: description)
-										.textStyle(.body1Regular)
-										.foregroundColor(.app.gray1)
-									AssetDetailsSeparator()
-										.padding(.horizontal, -.large2)
-								}
+									if let description = tokenDetails.description {
+										ExpandableTextView(fullText: description)
+											.textStyle(.body1Regular)
+											.foregroundColor(.app.gray1)
+										AssetDetailsSeparator()
+											.padding(.horizontal, -.large2)
+									}
 
-								KeyValueView(nonFungibleGlobalID: tokenDetails.nonFungibleGlobalID, showLocalIdOnly: true)
+									KeyValueView(nonFungibleGlobalID: tokenDetails.nonFungibleGlobalID, showLocalIdOnly: true)
 
-								if let name = tokenDetails.name {
-									KeyValueView(key: L10n.AssetDetails.NFTDetails.name, value: name)
-								}
+									if let name = tokenDetails.name {
+										KeyValueView(key: L10n.AssetDetails.NFTDetails.name, value: name)
+									}
 
-								if let stakeClaim = tokenDetails.stakeClaim {
-									stakeClaimView(stakeClaim, isClaimStakeEnabled: store.isClaimStakeEnabled) {
-										store.send(.view(.tappedClaimStake))
+									if let stakeClaim = tokenDetails.stakeClaim {
+										stakeClaimView(stakeClaim, isClaimStakeEnabled: store.isClaimStakeEnabled) {
+											store.send(.view(.tappedClaimStake))
+										}
+									}
+
+									if !tokenDetails.dataFields.isEmpty {
+										AssetDetailsSeparator()
+											.padding(.horizontal, -.large2)
+
+										ForEachStatic(tokenDetails.dataFields) { field in
+											ArbitraryDataFieldView(field: field)
+										}
 									}
 								}
+								.lineLimit(1)
+								.frame(maxWidth: .infinity, alignment: .leading)
+								.padding(.top, .small1)
+								.padding(.horizontal, .large2)
+								.padding(.bottom, .medium1)
+							}
 
-								if !tokenDetails.dataFields.isEmpty {
-									AssetDetailsSeparator()
-										.padding(.horizontal, -.large2)
+							VStack(spacing: .medium1) {
+								loadable(store.resourceThumbnail) { url in
+									Thumbnail(.nft, url: url, size: .veryLarge)
+								}
 
-									ForEachStatic(tokenDetails.dataFields) { field in
-										ArbitraryDataFieldView(field: field)
-									}
+								AssetResourceDetailsSection(viewState: store.resourceDetailsViewState)
+
+								if let childStore = store.scope(state: \.hideResource, action: \.child.hideResource) {
+									HideResource.View(store: childStore)
+										.padding(.vertical, .medium1)
 								}
 							}
-							.lineLimit(1)
-							.frame(maxWidth: .infinity, alignment: .leading)
-							.padding(.top, .small1)
-							.padding(.horizontal, .large2)
-							.padding(.bottom, .medium1)
+							.padding(.vertical, .medium1)
+							.background(.app.gray5, ignoresSafeAreaEdges: .bottom)
 						}
-
-						VStack(spacing: .medium1) {
-							loadable(store.resourceThumbnail) { url in
-								Thumbnail(.nft, url: url, size: .veryLarge)
-							}
-
-							AssetResourceDetailsSection(viewState: store.resourceDetailsViewState)
-
-							IfLetStore(store.scope(state: \.hideResource, action: \.child.hideResource)) { store in
-								HideResource.View(store: store)
-									.padding(.vertical, .medium1)
-							}
-						}
-						.padding(.vertical, .medium1)
-						.background(.app.gray5, ignoresSafeAreaEdges: .bottom)
 					}
 				}
 				.foregroundColor(.app.gray1)
