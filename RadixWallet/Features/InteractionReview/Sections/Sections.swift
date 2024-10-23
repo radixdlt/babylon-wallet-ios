@@ -1,10 +1,8 @@
 // MARK: - InteractionReview.Sections
 extension InteractionReview {
-	@Reducer
 	struct Sections: Sendable, FeatureReducer {
 		typealias Common = InteractionReview
 
-		@ObservableState
 		struct State: Sendable, Hashable {
 			var withdrawals: Accounts.State? = nil
 			var dAppsUsed: InteractionReviewDappsUsed.State? = nil
@@ -23,7 +21,7 @@ extension InteractionReview {
 			// The proofs are set here (within the resolve logic) but should be rendered and handled by the parent view, since they may be placed outside the Sections.
 			var proofs: Proofs.State? = nil
 
-			@Presents
+			@PresentationState
 			var destination: Destination.State? = nil
 		}
 

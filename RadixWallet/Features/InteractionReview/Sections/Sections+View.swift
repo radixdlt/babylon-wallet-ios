@@ -1,50 +1,83 @@
 import SwiftUI
 
+extension InteractionReview.Sections.State {
+	var viewState: InteractionReview.Sections.ViewState {
+		.init(
+			isExpandedDappsUsed: dAppsUsed?.isExpanded == true,
+			isExpandedContributingToPools: contributingToPools?.isExpanded == true,
+			isExpandedRedeemingFromPools: redeemingFromPools?.isExpanded == true,
+			showTransferLine: withdrawals != nil && deposits != nil,
+			stakingToValidators: stakingToValidators,
+			unstakingFromValidators: unstakingFromValidators,
+			claimingFromValidators: claimingFromValidators,
+			accountDepositSetting: accountDepositSetting,
+			accountDepositExceptions: accountDepositExceptions
+		)
+	}
+}
+
 // MARK: - InteractionReview.Sections.View
 extension InteractionReview.Sections {
+	struct ViewState: Equatable {
+		let isExpandedDappsUsed: Bool
+		let isExpandedContributingToPools: Bool
+		let isExpandedRedeemingFromPools: Bool
+		let showTransferLine: Bool
+
+		let stakingToValidators: InteractionReview.ValidatorsState?
+		let unstakingFromValidators: InteractionReview.ValidatorsState?
+		let claimingFromValidators: InteractionReview.ValidatorsState?
+		let accountDepositSetting: InteractionReview.DepositSettingState?
+		let accountDepositExceptions: InteractionReview.DepositExceptionsState?
+
+		var isExpandedStakingToValidators: Bool { stakingToValidators?.isExpanded == true }
+		var isExpandedUnstakingFromValidators: Bool { unstakingFromValidators?.isExpanded == true }
+		var isExpandedClaimingFromValidators: Bool { claimingFromValidators?.isExpanded == true }
+	}
+
 	struct View: SwiftUI.View {
 		let store: StoreOf<InteractionReview.Sections>
 
 		var body: some SwiftUI.View {
-			WithPerceptionTracking {
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading, spacing: .medium1) {
 					withdrawals
 
 					VStack(alignment: .leading, spacing: .medium1) {
-						contributingToPools
-						redeemingFromPools
+						contributingToPools(viewStore.isExpandedContributingToPools)
+						redeemingFromPools(viewStore.isExpandedRedeemingFromPools)
 
-						stakingToValidators
-						unstakingFromValidators
-						claimingFromValidators
+						stakingToValidators(viewStore.stakingToValidators)
+						unstakingFromValidators(viewStore.unstakingFromValidators)
+						claimingFromValidators(viewStore.claimingFromValidators)
 
-						dAppsUsed
+						dAppsUsed(viewStore.isExpandedDappsUsed)
 
 						deposits
 					}
 					.frame(maxWidth: .infinity, alignment: .leading) // necessary?
 					.background(alignment: .trailing) {
-						if store.showTransferLine {
+						if viewStore.showTransferLine {
 							Common.TransferLineView()
 						}
 					}
 
-					accountDepositSetting
-					accountDepositExceptions
+					accountDepositSetting(viewStore.accountDepositSetting)
+					accountDepositExceptions(viewStore.accountDepositExceptions)
 				}
-				.animation(.easeInOut, value: store.contributingToPools?.isExpanded)
-				.animation(.easeInOut, value: store.redeemingFromPools?.isExpanded)
-				.animation(.easeInOut, value: store.stakingToValidators?.isExpanded)
-				.animation(.easeInOut, value: store.unstakingFromValidators?.isExpanded)
-				.animation(.easeInOut, value: store.claimingFromValidators?.isExpanded)
-				.animation(.easeInOut, value: store.dAppsUsed?.isExpanded)
+				.animation(.easeInOut, value: viewStore.isExpandedDappsUsed)
+				.animation(.easeInOut, value: viewStore.isExpandedContributingToPools)
+				.animation(.easeInOut, value: viewStore.isExpandedRedeemingFromPools)
+				.animation(.easeInOut, value: viewStore.isExpandedStakingToValidators)
+				.animation(.easeInOut, value: viewStore.isExpandedUnstakingFromValidators)
+				.animation(.easeInOut, value: viewStore.isExpandedClaimingFromValidators)
 			}
 			.destinations(with: store)
 		}
 
 		@ViewBuilder
 		private var withdrawals: some SwiftUI.View {
-			if let childStore = store.scope(state: \.withdrawals, action: \.child.withdrawals) {
+			IfLetStore(store.scope(state: \.withdrawals, action: \.child.withdrawals)) { childStore in
 				VStack(alignment: .leading, spacing: .small2) {
 					Common.HeadingView.withdrawing
 					Common.Accounts.View(store: childStore)
@@ -53,10 +86,9 @@ extension InteractionReview.Sections {
 		}
 
 		@ViewBuilder
-		private var contributingToPools: some SwiftUI.View {
-			if let childStore = store.scope(state: \.contributingToPools, action: \.child.contributingToPools) {
+		private func contributingToPools(_ isExpanded: Bool) -> some SwiftUI.View {
+			IfLetStore(store.scope(state: \.contributingToPools, action: \.child.contributingToPools)) { childStore in
 				VStack(alignment: .leading, spacing: .small2) {
-					let isExpanded = childStore.isExpanded
 					Common.ExpandableHeadingView(heading: .contributingToPools, isExpanded: isExpanded) {
 						store.send(.view(.expandableItemToggled(.contributingToPools)))
 					}
@@ -69,10 +101,9 @@ extension InteractionReview.Sections {
 		}
 
 		@ViewBuilder
-		private var redeemingFromPools: some SwiftUI.View {
-			if let childStore = store.scope(state: \.redeemingFromPools, action: \.child.redeemingFromPools) {
+		private func redeemingFromPools(_ isExpanded: Bool) -> some SwiftUI.View {
+			IfLetStore(store.scope(state: \.redeemingFromPools, action: \.child.redeemingFromPools)) { childStore in
 				VStack(alignment: .leading, spacing: .small2) {
-					let isExpanded = childStore.isExpanded
 					Common.ExpandableHeadingView(heading: .redeemingFromPools, isExpanded: isExpanded) {
 						store.send(.view(.expandableItemToggled(.redeemingFromPools)))
 					}
@@ -85,8 +116,8 @@ extension InteractionReview.Sections {
 		}
 
 		@ViewBuilder
-		private var stakingToValidators: some SwiftUI.View {
-			if let viewState = store.stakingToValidators {
+		private func stakingToValidators(_ viewState: InteractionReview.ValidatorsState?) -> some SwiftUI.View {
+			if let viewState {
 				Common.ValidatorsView(heading: .stakingToValidators, viewState: viewState) {
 					store.send(.view(.expandableItemToggled(.stakingToValidators)))
 				}
@@ -94,8 +125,8 @@ extension InteractionReview.Sections {
 		}
 
 		@ViewBuilder
-		private var unstakingFromValidators: some SwiftUI.View {
-			if let viewState = store.unstakingFromValidators {
+		private func unstakingFromValidators(_ viewState: InteractionReview.ValidatorsState?) -> some SwiftUI.View {
+			if let viewState {
 				Common.ValidatorsView(heading: .unstakingFromValidators, viewState: viewState) {
 					store.send(.view(.expandableItemToggled(.unstakingFromValidators)))
 				}
@@ -103,8 +134,8 @@ extension InteractionReview.Sections {
 		}
 
 		@ViewBuilder
-		private var claimingFromValidators: some SwiftUI.View {
-			if let viewState = store.claimingFromValidators {
+		private func claimingFromValidators(_ viewState: InteractionReview.ValidatorsState?) -> some SwiftUI.View {
+			if let viewState {
 				Common.ValidatorsView(heading: .claimingFromValidators, viewState: viewState) {
 					store.send(.view(.expandableItemToggled(.claimingFromValidators)))
 				}
@@ -112,8 +143,8 @@ extension InteractionReview.Sections {
 		}
 
 		@ViewBuilder
-		private var accountDepositSetting: some SwiftUI.View {
-			if let viewState = store.accountDepositSetting {
+		private func accountDepositSetting(_ viewState: InteractionReview.DepositSettingState?) -> some SwiftUI.View {
+			if let viewState {
 				VStack(alignment: .leading, spacing: .small2) {
 					Common.HeadingView.depositSetting
 					Common.DepositSettingView(viewState: viewState)
@@ -122,8 +153,8 @@ extension InteractionReview.Sections {
 		}
 
 		@ViewBuilder
-		private var accountDepositExceptions: some SwiftUI.View {
-			if let viewState = store.accountDepositExceptions {
+		private func accountDepositExceptions(_ viewState: InteractionReview.DepositExceptionsState?) -> some SwiftUI.View {
+			if let viewState {
 				VStack(alignment: .leading, spacing: .small2) {
 					Common.HeadingView.depositExceptions
 					Common.DepositExceptionsView(viewState: viewState)
@@ -132,10 +163,9 @@ extension InteractionReview.Sections {
 		}
 
 		@ViewBuilder
-		private var dAppsUsed: some SwiftUI.View {
-			if let childStore = store.scope(state: \.dAppsUsed, action: \.child.dAppsUsed) {
+		private func dAppsUsed(_ isExpanded: Bool) -> some SwiftUI.View {
+			IfLetStore(store.scope(state: \.dAppsUsed, action: \.child.dAppsUsed)) { childStore in
 				VStack(alignment: .leading, spacing: .small2) {
-					let isExpanded = childStore.isExpanded
 					Common.ExpandableHeadingView(heading: .usingDapps, isExpanded: isExpanded) {
 						store.send(.view(.expandableItemToggled(.dAppsUsed)))
 					}
@@ -149,7 +179,7 @@ extension InteractionReview.Sections {
 
 		@ViewBuilder
 		private var deposits: some SwiftUI.View {
-			if let childStore = store.scope(state: \.deposits, action: \.child.deposits) {
+			IfLetStore(store.scope(state: \.deposits, action: \.child.deposits)) { childStore in
 				VStack(alignment: .leading, spacing: .small2) {
 					Common.HeadingView.depositing
 					Common.Accounts.View(store: childStore)

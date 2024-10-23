@@ -1,12 +1,10 @@
 // MARK: - PreAuthorizationReview
-@Reducer
 struct PreAuthorizationReview: Sendable, FeatureReducer {
 	typealias Common = InteractionReview
 
-	@ObservableState
 	struct State: Sendable, Hashable {
-		var dappName: String? = "CaviarNine"
-		var dappThumbnail: URL? = .init(string: "https://assets.caviarnine.com/icons/caviarnine_logo_light_400.png")
+		var dAppName: String? = "CaviarNine"
+		var dAppThumbnail: URL? = .init(string: "https://assets.caviarnine.com/icons/caviarnine_logo_light_400.png")
 		var displayMode: Common.DisplayMode = .detailed
 		var sliderResetDate: Date = .now // TODO: reset when it corresponds
 
@@ -19,8 +17,6 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 
 		init() {}
 	}
-
-	typealias Action = FeatureAction<Self>
 
 	enum ViewAction: Sendable, Equatable {
 		case appeared

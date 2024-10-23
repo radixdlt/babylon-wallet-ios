@@ -1,7 +1,31 @@
 import SwiftUI
 
+extension PreAuthorizationReview.State {
+	var viewState: PreAuthorizationReview.ViewState {
+		.init(
+			dAppName: dAppName,
+			dAppThumbnail: dAppThumbnail,
+			displayMode: displayMode,
+			sliderResetDate: sliderResetDate,
+			expiration: expiration,
+			secondsToExpiration: secondsToExpiration,
+			sliderControlState: sliderControlState
+		)
+	}
+}
+
 // MARK: - PreAuthorizationReview.View
 extension PreAuthorizationReview {
+	struct ViewState: Equatable {
+		let dAppName: String?
+		let dAppThumbnail: URL?
+		let displayMode: Common.DisplayMode
+		let sliderResetDate: Date
+		let expiration: Expiration?
+		let secondsToExpiration: Int?
+		let sliderControlState: ControlState
+	}
+
 	struct View: SwiftUI.View {
 		let store: StoreOf<PreAuthorizationReview>
 
@@ -12,13 +36,13 @@ extension PreAuthorizationReview {
 		private let showTitleHysteresis: CGFloat = .small3
 
 		var body: some SwiftUI.View {
-			WithPerceptionTracking {
-				content
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				content(viewStore)
 					.background(.app.white)
 					.toolbar {
 						ToolbarItem(placement: .principal) {
 							if showNavigationTitle {
-								navigationTitle
+								navigationTitle(dAppName: viewStore.dAppName)
 							}
 						}
 					}
@@ -28,27 +52,27 @@ extension PreAuthorizationReview {
 			}
 		}
 
-		private var navigationTitle: some SwiftUI.View {
+		private func navigationTitle(dAppName: String?) -> some SwiftUI.View {
 			VStack(spacing: .zero) {
 				Text("Review your Pre-Authorization")
 					.textStyle(.body2Header)
 					.foregroundColor(.app.gray1)
 
-				if let name = store.dappName {
-					Text("Proposed by \(name)")
+				if let dAppName {
+					Text("Proposed by \(dAppName)")
 						.textStyle(.body2Regular)
 						.foregroundColor(.app.gray2)
 				}
 			}
 		}
 
-		private var content: some SwiftUI.View {
+		private func content(_ viewStore: ViewStoreOf<PreAuthorizationReview>) -> some SwiftUI.View {
 			ScrollView(showsIndicators: false) {
 				VStack(spacing: .zero) {
-					header
+					header(dAppName: viewStore.dAppName, dAppThumbnail: viewStore.dAppThumbnail)
 
 					Group {
-						if let rawContent = store.displayMode.rawTransaction {
+						if let rawContent = viewStore.displayMode.rawTransaction {
 							rawTransaction(rawContent)
 						} else {
 							details
@@ -58,15 +82,20 @@ extension PreAuthorizationReview {
 					.clipShape(RoundedRectangle(cornerRadius: .small1))
 					.padding(.horizontal, .small2)
 
-					feesInformation
+					feesInformation(dAppName: viewStore.dAppName)
 						.padding(.top, .small2)
 						.padding(.horizontal, .small2)
 
-					expiration
+					expiration(viewStore.expiration, secondsToExpiration: viewStore.secondsToExpiration)
 
-					slider
+					ApprovalSlider(
+						title: "Slide to sign and return",
+						resetDate: viewStore.sliderResetDate
+					) {}
+						.controlState(viewStore.sliderControlState)
+						.padding(.horizontal, .medium2)
 				}
-				.animation(.easeInOut, value: store.displayMode.rawTransaction)
+				.animation(.easeInOut, value: viewStore.displayMode.rawTransaction)
 			}
 			.coordinateSpace(name: coordSpace)
 			.onPreferenceChange(PositionsPreferenceKey.self) { positions in
@@ -82,11 +111,11 @@ extension PreAuthorizationReview {
 			}
 		}
 
-		private var header: some SwiftUI.View {
+		private func header(dAppName: String?, dAppThumbnail: URL?) -> some SwiftUI.View {
 			Common.HeaderView(
 				kind: .preAuthorization,
-				name: store.dappName,
-				thumbnail: store.dappThumbnail
+				name: dAppName,
+				thumbnail: dAppThumbnail
 			)
 			.measurePosition(navTitleID, coordSpace: coordSpace)
 			.padding(.horizontal, .medium3)
@@ -126,16 +155,16 @@ extension PreAuthorizationReview {
 
 		@ViewBuilder
 		private var proofs: some SwiftUI.View {
-			if let childStore = store.scope(state: \.proofs, action: \.child.proofs) {
+			IfLetStore(store.scope(state: \.proofs, action: \.child.proofs)) { childStore in
 				Common.Proofs.View(store: childStore)
 					.padding(.horizontal, .small3)
 			}
 		}
 
-		private var feesInformation: some SwiftUI.View {
+		private func feesInformation(dAppName: String?) -> some SwiftUI.View {
 			HStack(spacing: .zero) {
 				VStack(alignment: .leading, spacing: .zero) {
-					Text("Pre-authorization will be returned to \(store.dappName ?? "dApp") for processing.")
+					Text("Pre-authorization will be returned to \(dAppName ?? "dApp") for processing.")
 						.foregroundStyle(.app.gray1)
 
 					Text("Network fees will be paid by the dApp")
@@ -153,16 +182,12 @@ extension PreAuthorizationReview {
 			.clipShape(RoundedRectangle(cornerRadius: .small1))
 		}
 
-		private var expiration: some SwiftUI.View {
+		@ViewBuilder
+		private func expiration(_ expiration: Expiration?, secondsToExpiration: Int?) -> some SwiftUI.View {
 			Group {
-				switch store.expiration {
-				case .none:
-					Color.clear
-				case let .window(seconds):
-					let value = formatTime(seconds: seconds)
-					Text("Valid for **\(value) after approval**")
+				switch expiration {
 				case .atTime:
-					if let seconds = store.secondsToExpiration {
+					if let seconds = secondsToExpiration {
 						if seconds > 0 {
 							let value = formatTime(seconds: seconds)
 							Text("Valid for the next **\(value)**")
@@ -170,21 +195,19 @@ extension PreAuthorizationReview {
 							Text("This subintent is no longer valid!")
 						}
 					}
+
+				case let .window(seconds):
+					let value = formatTime(seconds: seconds)
+					Text("Valid for **\(value) after approval**")
+
+				case nil:
+					Color.clear
 				}
 			}
 			.textStyle(.body2Regular)
 			.foregroundStyle(.app.account4pink)
 			.padding(.horizontal, .medium1)
 			.frame(minHeight: .huge2)
-		}
-
-		private var slider: some SwiftUI.View {
-			ApprovalSlider(
-				title: "Slide to sign and return",
-				resetDate: store.sliderResetDate
-			) {}
-				.controlState(store.sliderControlState)
-				.padding(.horizontal, .medium2)
 		}
 	}
 }
