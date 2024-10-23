@@ -12,8 +12,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		var secondsToExpiration: Int?
 
 		// Sections
-		var sections: Common.Sections.State = .init()
-		var proofs: Common.Proofs.State? = nil
+		var sections: Common.Sections.State = .init(kind: .preAuthorization)
 
 		init() {}
 	}
@@ -27,7 +26,6 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 	@CasePathable
 	enum ChildAction: Sendable, Equatable {
 		case sections(Common.Sections.Action)
-		case proofs(Common.Proofs.Action)
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -42,9 +40,6 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 			Common.Sections()
 		}
 		Reduce(core)
-			.ifLet(\.proofs, action: \.child.proofs) {
-				Common.Proofs()
-			}
 	}
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
@@ -80,22 +75,6 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .updateSecondsToExpiration(expiration):
 			state.secondsToExpiration = Int(expiration.timeIntervalSinceNow)
-			return .none
-		}
-	}
-
-	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .sections(.internal(.setSections(sections))):
-			state.proofs = sections?.proofs
-			return .none
-
-		case let .proofs(.delegate(.showAsset(proof))):
-			let resource = proof.resourceBalance.resource
-			let details = proof.resourceBalance.details
-			return .send(.child(.sections(.internal(.parent(.showResourceDetails(resource, details))))))
-
-		default:
 			return .none
 		}
 	}

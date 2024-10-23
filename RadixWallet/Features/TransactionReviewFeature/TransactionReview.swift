@@ -21,7 +21,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 
 		var reviewedTransaction: ReviewedTransaction? = nil
 
-		var sections: Common.Sections.State = .init()
+		var sections: Common.Sections.State = .init(kind: .transaction)
 
 		var proofs: Common.Proofs.State? = nil
 		var networkFee: TransactionReviewNetworkFee.State? = nil

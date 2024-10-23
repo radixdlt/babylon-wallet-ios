@@ -4,6 +4,8 @@ extension InteractionReview {
 		typealias Common = InteractionReview
 
 		struct State: Sendable, Hashable {
+			let kind: InteractionReview.Kind
+
 			var withdrawals: Accounts.State? = nil
 			var dAppsUsed: InteractionReviewDappsUsed.State? = nil
 			var deposits: Accounts.State? = nil
@@ -18,7 +20,7 @@ extension InteractionReview {
 			var accountDepositSetting: InteractionReview.DepositSettingState? = nil
 			var accountDepositExceptions: InteractionReview.DepositExceptionsState? = nil
 
-			// The proofs are set here (within the resolve logic) but should be rendered and handled by the parent view, since they may be placed outside the Sections.
+			// The proofs are set here (within the resolve logic) but may be rendered and handled by the parent view, in the case they are placed outside the Sections (TransactionReview).
 			var proofs: Proofs.State? = nil
 
 			@PresentationState
@@ -54,6 +56,7 @@ extension InteractionReview {
 			case dAppsUsed(InteractionReviewDappsUsed.Action)
 			case contributingToPools(InteractionReviewPools.Action)
 			case redeemingFromPools(InteractionReviewPools.Action)
+			case proofs(Common.Proofs.Action)
 		}
 
 		enum DelegateAction: Sendable, Hashable {
@@ -130,6 +133,9 @@ extension InteractionReview {
 				}
 				.ifLet(\.redeemingFromPools, action: \.child.redeemingFromPools) {
 					InteractionReviewPools()
+				}
+				.ifLet(\.proofs, action: \.child.proofs) {
+					Common.Proofs()
 				}
 				.ifLet(destinationPath, action: /Action.destination) {
 					Destination()
@@ -241,6 +247,11 @@ extension InteractionReview {
 			case .deposits(.delegate(.showCustomizeGuarantees)):
 				guard let guarantees = state.deposits?.accounts.customizableGuarantees, !guarantees.isEmpty else { return .none }
 				return .send(.delegate(.showCustomizeGuarantees(guarantees)))
+
+			case let .proofs(.delegate(.showAsset(proof))):
+				let resource = proof.resourceBalance.resource
+				let details = proof.resourceBalance.details
+				return resourceDetailsEffect(state: &state, resource: resource, details: details)
 
 			default:
 				return .none

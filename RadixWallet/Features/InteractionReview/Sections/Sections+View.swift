@@ -7,6 +7,7 @@ extension InteractionReview.Sections.State {
 			isExpandedContributingToPools: contributingToPools?.isExpanded == true,
 			isExpandedRedeemingFromPools: redeemingFromPools?.isExpanded == true,
 			showTransferLine: withdrawals != nil && deposits != nil,
+			showProofs: kind == .preAuthorization,
 			stakingToValidators: stakingToValidators,
 			unstakingFromValidators: unstakingFromValidators,
 			claimingFromValidators: claimingFromValidators,
@@ -23,6 +24,7 @@ extension InteractionReview.Sections {
 		let isExpandedContributingToPools: Bool
 		let isExpandedRedeemingFromPools: Bool
 		let showTransferLine: Bool
+		let showProofs: Bool
 
 		let stakingToValidators: InteractionReview.ValidatorsState?
 		let unstakingFromValidators: InteractionReview.ValidatorsState?
@@ -54,6 +56,10 @@ extension InteractionReview.Sections {
 						dAppsUsed(viewStore.isExpandedDappsUsed)
 
 						deposits
+
+						if viewStore.showProofs {
+							proofs
+						}
 					}
 					.frame(maxWidth: .infinity, alignment: .leading) // necessary?
 					.background(alignment: .trailing) {
@@ -184,6 +190,14 @@ extension InteractionReview.Sections {
 					Common.HeadingView.depositing
 					Common.Accounts.View(store: childStore)
 				}
+			}
+		}
+
+		@ViewBuilder
+		private var proofs: some SwiftUI.View {
+			IfLetStore(store.scope(state: \.proofs, action: \.child.proofs)) { childStore in
+				Common.Proofs.View(store: childStore)
+					.padding(.horizontal, .small3)
 			}
 		}
 	}

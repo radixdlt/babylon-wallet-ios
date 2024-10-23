@@ -131,34 +131,22 @@ extension PreAuthorizationReview {
 		}
 
 		private var details: some SwiftUI.View {
-			VStack(alignment: .leading, spacing: .medium1) {
-				sections
-
-				proofs
-			}
-			.padding(.top, .large2 + .small3)
-			.padding(.horizontal, .small1)
-			.padding(.bottom, .medium1)
-			.overlay(alignment: .topTrailing) {
-				Button(asset: AssetResource.code) {
-					store.send(.view(.toggleDisplayModeButtonTapped))
+			sections
+				.padding(.top, .large2 + .small3)
+				.padding(.horizontal, .small1)
+				.padding(.bottom, .medium1)
+				.overlay(alignment: .topTrailing) {
+					Button(asset: AssetResource.code) {
+						store.send(.view(.toggleDisplayModeButtonTapped))
+					}
+					.buttonStyle(.secondaryRectangular)
+					.padding(.medium3)
 				}
-				.buttonStyle(.secondaryRectangular)
-				.padding(.medium3)
-			}
 		}
 
 		private var sections: some SwiftUI.View {
 			let childStore = store.scope(state: \.sections, action: \.child.sections)
 			return Common.Sections.View(store: childStore)
-		}
-
-		@ViewBuilder
-		private var proofs: some SwiftUI.View {
-			IfLetStore(store.scope(state: \.proofs, action: \.child.proofs)) { childStore in
-				Common.Proofs.View(store: childStore)
-					.padding(.horizontal, .small3)
-			}
 		}
 
 		private func feesInformation(dAppName: String?) -> some SwiftUI.View {
@@ -240,10 +228,6 @@ private extension PreAuthorizationReview.View {
 }
 
 private extension PreAuthorizationReview.State {
-	var showTransferLine: Bool {
-		true
-	}
-
 	var controlState: ControlState {
 		// If is loading transaction show loading
 		.enabled
