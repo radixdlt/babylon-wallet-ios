@@ -9,6 +9,7 @@ extension PreAuthorizationReview.State {
 			sliderResetDate: sliderResetDate,
 			expiration: expiration,
 			secondsToExpiration: secondsToExpiration,
+			globalControlState: globalControlState,
 			sliderControlState: sliderControlState
 		)
 	}
@@ -23,6 +24,7 @@ extension PreAuthorizationReview {
 		let sliderResetDate: Date
 		let expiration: Expiration?
 		let secondsToExpiration: Int?
+		let globalControlState: ControlState
 		let sliderControlState: ControlState
 	}
 
@@ -38,6 +40,7 @@ extension PreAuthorizationReview {
 		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				content(viewStore)
+					.controlState(viewStore.globalControlState)
 					.background(.app.white)
 					.toolbar {
 						ToolbarItem(placement: .principal) {
@@ -228,12 +231,11 @@ private extension PreAuthorizationReview.View {
 }
 
 private extension PreAuthorizationReview.State {
-	var controlState: ControlState {
-		// If is loading transaction show loading
-		.enabled
+	var globalControlState: ControlState {
+		reviewedPreAuthorization != nil ? .enabled : .loading(.global(text: "Incoming PreAuthorization"))
 	}
 
 	var sliderControlState: ControlState {
-		isExpired ? .disabled : controlState
+		isExpired ? .disabled : globalControlState
 	}
 }

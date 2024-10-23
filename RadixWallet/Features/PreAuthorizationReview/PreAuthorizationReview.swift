@@ -3,6 +3,12 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 	typealias Common = InteractionReview
 
 	struct State: Sendable, Hashable {
+		let unvalidatedManifest: UnvalidatedTransactionManifest
+		let nonce: Nonce
+		let signTransactionPurpose: SigningPurpose.SignTransactionPurpose
+		let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey = .init()
+
+		var reviewedPreAuthorization: ReviewedPreAuthorization?
 		var dAppName: String? = "CaviarNine"
 		var dAppThumbnail: URL? = .init(string: "https://assets.caviarnine.com/icons/caviarnine_logo_light_400.png")
 		var displayMode: Common.DisplayMode = .detailed
@@ -13,8 +19,6 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 
 		// Sections
 		var sections: Common.Sections.State = .init(kind: .preAuthorization)
-
-		init() {}
 	}
 
 	enum ViewAction: Sendable, Equatable {
@@ -29,11 +33,13 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 	}
 
 	enum InternalAction: Sendable, Equatable {
+		case previewLoaded(TaskResult<TransactionToReview>)
 		case updateSecondsToExpiration(Date)
 	}
 
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.pasteboardClient) var pasteboardClient
+	@Dependency(\.transactionClient) var transactionClient
 
 	var body: some ReducerOf<Self> {
 		Scope(state: \.sections, action: \.child.sections) {
@@ -46,11 +52,19 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			// TODO: Replace mocked data with real logic
-			let time = Date().addingTimeInterval(90)
-			state.expiration = .atTime(time)
-			state.secondsToExpiration = Int(time.timeIntervalSinceNow)
-			return startTimer(expirationDate: time)
-				.merge(with: getSections())
+			return .run { [state = state] send in
+				let preview = await TaskResult {
+					try await transactionClient.getTransactionReview(.init(
+						unvalidatedManifest: state.unvalidatedManifest,
+						message: .none,
+						nonce: state.nonce,
+						ephemeralNotaryPublicKey: state.ephemeralNotaryPrivateKey.publicKey,
+						signingPurpose: .signTransaction(state.signTransactionPurpose), // Update
+						isWalletTransaction: true
+					))
+				}
+				await send(.internal(.previewLoaded(preview)))
+			}
 
 		case .toggleDisplayModeButtonTapped:
 			switch state.displayMode {
@@ -73,6 +87,18 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
+		case let .previewLoaded(.failure(error)):
+			// TODO: Handle error
+			return .none
+
+		case let .previewLoaded(.success(preview)):
+			state.reviewedPreAuthorization = .init(manifest: preview.transactionManifest)
+			let time = Date().addingTimeInterval(90)
+			state.expiration = .atTime(time)
+			state.secondsToExpiration = Int(time.timeIntervalSinceNow)
+			return startTimer(expirationDate: time)
+				.merge(with: getSections(executionSummary: preview.analyzedManifestToReview, networkId: preview.networkID))
+
 		case let .updateSecondsToExpiration(expiration):
 			state.secondsToExpiration = Int(expiration.timeIntervalSinceNow)
 			return .none
@@ -81,8 +107,8 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 }
 
 private extension PreAuthorizationReview {
-	func getSections() -> Effect<Action> {
-		.send(.child(.sections(.internal(.parent(.simulate)))))
+	func getSections(executionSummary: ExecutionSummary, networkId: NetworkID) -> Effect<Action> {
+		.send(.child(.sections(.internal(.parent(.resolveExecutionSummary(executionSummary, networkId))))))
 	}
 
 	func startTimer(expirationDate: Date) -> Effect<Action> {
@@ -95,8 +121,8 @@ private extension PreAuthorizationReview {
 	}
 }
 
-private extension PreAuthorizationReview {
-	enum CancellableId: Hashable {
+extension PreAuthorizationReview {
+	private enum CancellableId: Hashable {
 		case expirationTimer
 	}
 
