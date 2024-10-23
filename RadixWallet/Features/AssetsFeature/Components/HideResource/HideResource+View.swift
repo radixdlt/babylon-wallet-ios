@@ -48,9 +48,11 @@ private extension View {
 	}
 
 	private func confirmation(with destinationStore: PresentationStoreOf<HideResource.Destination>, store: StoreOf<HideResource>) -> some View {
-		sheet(store: destinationStore.scope(state: \.confirmation, action: \.confirmation)) { _ in
-			ConfirmationView(kind: store.confirmationKind) { action in
-				store.send(.destination(.presented(.confirmation(action))))
+		WithPerceptionTracking {
+			sheet(store: destinationStore.scope(state: \.confirmation, action: \.confirmation)) { _ in
+				ConfirmationView(kind: store.confirmationKind) { action in
+					store.send(.destination(.presented(.confirmation(action))))
+				}
 			}
 		}
 	}

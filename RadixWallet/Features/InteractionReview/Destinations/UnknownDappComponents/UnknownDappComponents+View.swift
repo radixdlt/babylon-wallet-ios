@@ -1,24 +1,21 @@
-extension UnknownDappComponents {
-	@MainActor
+extension InteractionReview.UnknownDappComponents {
 	struct View: SwiftUI.View {
-		let store: StoreOf<UnknownDappComponents>
-
-		init(store: StoreOf<UnknownDappComponents>) {
-			self.store = store
-		}
+		let store: StoreOf<InteractionReview.UnknownDappComponents>
 
 		var body: some SwiftUI.View {
-			store.withState { state in
+			WithPerceptionTracking {
 				ScrollView {
-					ForEach(state.addresses, id: \.address) { address in
-						row(address, heading: state.rowHeading)
+					ForEach(store.addresses, id: \.address) { address in
+						row(address, heading: store.rowHeading)
 					}
 				}
-				.radixToolbar(title: state.title, alwaysVisible: false)
-			}
-			.toolbar {
-				ToolbarItem(placement: .cancellationAction) {
-					CloseButton { store.send(.view(.closeButtonTapped)) }
+				.radixToolbar(title: store.title, alwaysVisible: false)
+				.toolbar {
+					ToolbarItem(placement: .cancellationAction) {
+						CloseButton {
+							store.send(.view(.closeButtonTapped))
+						}
+					}
 				}
 			}
 		}

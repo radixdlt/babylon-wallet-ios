@@ -2,61 +2,55 @@ import ComposableArchitecture
 import SwiftUI
 
 extension LSUDetails.State {
-	var viewState: LSUDetails.ViewState {
+	var containerWithHeader: DetailsContainerWithHeaderViewState {
 		.init(
-			containerWithHeader: .init(
-				title: .success(stakeUnitResource.resource.metadata.title),
-				amount: stakeUnitResource.amount.nominalAmount.formatted(),
-				currencyWorth: nil,
-				symbol: .success(stakeUnitResource.resource.metadata.symbol)
-			),
-			thumbnailURL: stakeUnitResource.resource.metadata.iconURL,
-			validatorNameViewState: .init(with: validator),
-			redeemableTokenAmount: .xrd(balance: xrdRedemptionValue, network: validator.address.networkID),
-			resourceDetails: .init(
-				description: .success(stakeUnitResource.resource.metadata.description),
-				infoUrl: .success(stakeUnitResource.resource.metadata.infoURL),
-				resourceAddress: stakeUnitResource.resource.resourceAddress,
-				isXRD: false,
-				validatorAddress: validator.address,
-				resourceName: .success(stakeUnitResource.resource.metadata.title),
-				currentSupply: .success(validator.xrdVaultBalance.formatted()),
-				divisibility: .success(stakeUnitResource.resource.divisibility),
-				arbitraryDataFields: .success(stakeUnitResource.resource.metadata.arbitraryItems.asDataFields),
-				behaviors: .success(stakeUnitResource.resource.behaviors),
-				tags: .success(stakeUnitResource.resource.metadata.tags)
-			)
+			title: .success(stakeUnitResource.resource.metadata.title),
+			amount: stakeUnitResource.amount.nominalAmount.formatted(),
+			currencyWorth: nil,
+			symbol: .success(stakeUnitResource.resource.metadata.symbol)
+		)
+	}
+
+	var thumbnailURL: URL? {
+		stakeUnitResource.resource.metadata.iconURL
+	}
+
+	var validatorNameViewState: ValidatorHeaderView.ViewState {
+		.init(with: validator)
+	}
+
+	var redeemableTokenAmount: ResourceBalance.ViewState.Fungible {
+		.xrd(balance: xrdRedemptionValue, network: validator.address.networkID)
+	}
+
+	var resourceDetails: AssetResourceDetailsSection.ViewState {
+		.init(
+			description: .success(stakeUnitResource.resource.metadata.description),
+			infoUrl: .success(stakeUnitResource.resource.metadata.infoURL),
+			resourceAddress: stakeUnitResource.resource.resourceAddress,
+			isXRD: false,
+			validatorAddress: validator.address,
+			resourceName: .success(stakeUnitResource.resource.metadata.title),
+			currentSupply: .success(validator.xrdVaultBalance.formatted()),
+			divisibility: .success(stakeUnitResource.resource.divisibility),
+			arbitraryDataFields: .success(stakeUnitResource.resource.metadata.arbitraryItems.asDataFields),
+			behaviors: .success(stakeUnitResource.resource.behaviors),
+			tags: .success(stakeUnitResource.resource.metadata.tags)
 		)
 	}
 }
 
+// MARK: - LSUDetails.View
 extension LSUDetails {
-	struct ViewState: Equatable {
-		let containerWithHeader: DetailsContainerWithHeaderViewState
-		let thumbnailURL: URL?
-
-		let validatorNameViewState: ValidatorHeaderView.ViewState
-		let redeemableTokenAmount: ResourceBalance.ViewState.Fungible
-		let resourceDetails: AssetResourceDetailsSection.ViewState
-	}
-
 	struct View: SwiftUI.View {
-		private let store: StoreOf<LSUDetails>
-
-		init(store: StoreOf<LSUDetails>) {
-			self.store = store
-		}
+		let store: StoreOf<LSUDetails>
 
 		var body: some SwiftUI.View {
-			WithViewStore(
-				store,
-				observe: \.viewState,
-				send: LSUDetails.Action.view
-			) { viewStore in
-				DetailsContainerWithHeaderView(viewState: viewStore.containerWithHeader) {
-					viewStore.send(.closeButtonTapped)
+			WithPerceptionTracking {
+				DetailsContainerWithHeaderView(viewState: store.containerWithHeader) {
+					store.send(.view(.closeButtonTapped))
 				} thumbnailView: {
-					Thumbnail(.nft, url: viewStore.thumbnailURL, size: .veryLarge)
+					Thumbnail(.nft, url: store.thumbnailURL, size: .veryLarge)
 				} detailsView: {
 					VStack(spacing: .medium1) {
 						AssetDetailsSeparator()
@@ -65,13 +59,13 @@ extension LSUDetails {
 							.textStyle(.secondaryHeader)
 							.foregroundColor(.app.gray1)
 
-						ValidatorHeaderView(viewState: viewStore.validatorNameViewState)
+						ValidatorHeaderView(viewState: store.validatorNameViewState)
 							.padding(.horizontal, .large2)
 
-						ResourceBalanceView(.fungible(viewStore.redeemableTokenAmount), appearance: .compact(border: true))
+						ResourceBalanceView(.fungible(store.redeemableTokenAmount), appearance: .compact(border: true))
 							.padding(.horizontal, .large2)
 
-						AssetResourceDetailsSection(viewState: viewStore.resourceDetails)
+						AssetResourceDetailsSection(viewState: store.resourceDetails)
 					}
 					.padding(.bottom, .medium1)
 				}

@@ -2,7 +2,9 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - FungibleTokenDetails
+@Reducer
 struct FungibleTokenDetails: Sendable, FeatureReducer {
+	@ObservableState
 	struct State: Sendable, Hashable {
 		let resourceAddress: ResourceAddress
 		var resource: Loadable<OnLedgerEntity.Resource>
@@ -26,6 +28,8 @@ struct FungibleTokenDetails: Sendable, FeatureReducer {
 			self.hideResource = .init(kind: .fungible(resourceAddress))
 		}
 	}
+
+	typealias Action = FeatureAction<Self>
 
 	enum ViewAction: Sendable, Equatable {
 		case closeButtonTapped

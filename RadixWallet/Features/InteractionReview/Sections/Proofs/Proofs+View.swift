@@ -1,18 +1,13 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - TransactionReviewProofs.View
-extension TransactionReviewProofs {
-	@MainActor
+// MARK: - InteractionReviewProofs.View
+extension InteractionReview.Proofs {
 	struct View: SwiftUI.View {
-		let store: StoreOf<TransactionReviewProofs>
-
-		init(store: StoreOf<TransactionReviewProofs>) {
-			self.store = store
-		}
+		let store: StoreOf<InteractionReview.Proofs>
 
 		var body: some SwiftUI.View {
-			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+			WithPerceptionTracking {
 				VStack(alignment: .leading, spacing: .medium2) {
 					HStack {
 						Text(L10n.TransactionReview.presentingHeading)
@@ -24,12 +19,14 @@ extension TransactionReviewProofs {
 						Spacer(minLength: 0)
 					}
 
-					ForEach(viewStore.proofs) { proof in
+					ForEach(store.proofs) { proof in
 						ResourceBalanceView(proof.resourceBalance.viewState, appearance: .compact) {
-							viewStore.send(.proofTapped(proof))
+							store.send(.view(.proofTapped(proof)))
 						}
 					}
-					Separator()
+					if store.kind == .transaction {
+						Separator()
+					}
 				}
 			}
 		}

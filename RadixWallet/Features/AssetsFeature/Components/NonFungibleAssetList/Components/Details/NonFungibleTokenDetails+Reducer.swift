@@ -2,7 +2,9 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - NonFungibleTokenDetails
+@Reducer
 struct NonFungibleTokenDetails: Sendable, FeatureReducer {
+	@ObservableState
 	struct State: Sendable, Hashable {
 		let resourceAddress: ResourceAddress
 		var resourceDetails: Loadable<OnLedgerEntity.Resource>
@@ -34,6 +36,8 @@ struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 			}
 		}
 	}
+
+	typealias Action = FeatureAction<Self>
 
 	enum ViewAction: Sendable, Equatable {
 		case closeButtonTapped

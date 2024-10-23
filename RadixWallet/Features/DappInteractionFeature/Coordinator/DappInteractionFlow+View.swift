@@ -107,6 +107,13 @@ extension DappInteractionFlow {
 						action: DappInteractionFlow.Path.Action.accountsProofOfOwnership,
 						then: { ProofOfOwnership.View(store: $0) }
 					)
+
+				case .preAuthorizationReview:
+					CaseLet(
+						/DappInteractionFlow.Path.MainState.preAuthorizationReview,
+						action: DappInteractionFlow.Path.Action.preAuthorizationReview,
+						then: { PreAuthorizationReview.View(store: $0) }
+					)
 				}
 			}
 		}

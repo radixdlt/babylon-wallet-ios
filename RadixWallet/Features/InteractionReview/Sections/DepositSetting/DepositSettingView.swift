@@ -3,22 +3,13 @@ import SwiftUI
 
 typealias AccountDefaultDepositRule = DepositRule
 
-extension TransactionReview {
-	struct DepositSettingState: Sendable, Hashable {
-		var changes: IdentifiedArrayOf<DepositSettingChange>
-	}
-
-	struct DepositSettingChange: Sendable, Identifiable, Hashable {
-		var id: AccountAddress.ID { account.address.id }
-		let account: Account
-		let ruleChange: AccountDefaultDepositRule
-	}
-}
-
 // MARK: - TransactionReview.View.DepositSettingView
-extension TransactionReview.View {
+extension InteractionReview {
+	typealias DepositSettingState = DepositSettingView.ViewState
+	typealias DepositSettingChange = DepositSettingState.Change
+
 	struct DepositSettingView: View {
-		var viewState: TransactionReview.DepositSettingState
+		let viewState: ViewState
 
 		var body: some View {
 			Card {
@@ -32,7 +23,7 @@ extension TransactionReview.View {
 		}
 
 		struct AccountView: View {
-			let change: TransactionReview.DepositSettingChange
+			let change: ViewState.Change
 
 			var body: some SwiftUI.View {
 				InnerCard {
@@ -51,6 +42,19 @@ extension TransactionReview.View {
 					.background(.app.gray5)
 				}
 			}
+		}
+	}
+}
+
+// MARK: - InteractionReview.DepositSettingView.ViewState
+extension InteractionReview.DepositSettingView {
+	struct ViewState: Sendable, Hashable {
+		let changes: IdentifiedArrayOf<Change>
+
+		struct Change: Sendable, Identifiable, Hashable {
+			var id: AccountAddress.ID { account.address.id }
+			let account: Account
+			let ruleChange: AccountDefaultDepositRule
 		}
 	}
 }

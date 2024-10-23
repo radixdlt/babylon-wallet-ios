@@ -21,8 +21,8 @@ extension OnLedgerEntitiesClient {
 		resourceQuantifier: FungibleResourceIndicator,
 		poolContributions: [some TrackedPoolInteraction] = [] as [TrackedPoolContribution],
 		validatorStakes: [TrackedValidatorStake] = [],
-		entities: TransactionReview.ResourcesInfo = [:],
-		resourceAssociatedDapps: TransactionReview.ResourceAssociatedDapps? = nil,
+		entities: InteractionReview.Sections.ResourcesInfo = [:],
+		resourceAssociatedDapps: InteractionReview.Sections.ResourceAssociatedDapps? = nil,
 		networkID: NetworkID,
 		defaultDepositGuarantee: Decimal192 = 1
 	) async throws -> ResourceBalance {
@@ -81,8 +81,8 @@ extension OnLedgerEntitiesClient {
 		_ resource: OnLedgerEntity.Resource,
 		amount: Decimal192,
 		poolContributions: [some TrackedPoolInteraction] = [],
-		entities: TransactionReview.ResourcesInfo = [:],
-		resourceAssociatedDapps: TransactionReview.ResourceAssociatedDapps? = nil,
+		entities: InteractionReview.Sections.ResourcesInfo = [:],
+		resourceAssociatedDapps: InteractionReview.Sections.ResourceAssociatedDapps? = nil,
 		networkID: NetworkID,
 		guarantee: TransactionGuarantee?,
 		hiddenResources: [ResourceIdentifier]
@@ -189,7 +189,7 @@ extension OnLedgerEntitiesClient {
 	// MARK: Non-fungibles
 
 	func nonFungibleResourceBalances(
-		_ resourceInfo: TransactionReview.ResourceInfo,
+		_ resourceInfo: InteractionReview.Sections.ResourceInfo,
 		resourceAddress: ResourceAddress,
 		resourceQuantifier: NonFungibleResourceIndicator,
 		unstakeData: [NonFungibleGlobalId: UnstakeData] = [:],
@@ -321,7 +321,7 @@ extension OnLedgerEntitiesClient {
 	}
 }
 
-extension TransactionReview.ResourceInfo {
+extension InteractionReview.Sections.ResourceInfo {
 	var metadata: OnLedgerEntity.Metadata {
 		switch self {
 		case let .left(resource):
