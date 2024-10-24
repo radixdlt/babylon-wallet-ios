@@ -60,7 +60,7 @@ extension TransactionClient {
 				try await .init(validating: addresses.asyncMap(identityFromComponentAddress))
 			}
 
-			let summary = manifest.summary
+			let summary = try manifest.summary
 
 			return try await MyEntitiesInvolvedInTransaction(
 				identitiesRequiringAuth: mapIdentity(summary.addressesOfPersonasRequiringAuth),
@@ -128,7 +128,7 @@ extension TransactionClient {
 				tipPercentage: request.makeTransactionHeaderInput.tipPercentage
 			)
 
-			return .init(header: header, manifest: request.manifest, message: request.message ?? Message.none)
+			return .init(header: header, manifest: request.manifest, message: request.message)
 		}
 
 		let notarizeTransaction: NotarizeTransaction = { request in
@@ -157,42 +157,34 @@ extension TransactionClient {
 			)
 		}
 
-		let getTransactionReview: GetTransactionReview = { request in
-			let networkID = await gatewaysClient.getCurrentNetworkID()
+		@Sendable
+		func analyseTransactionPreview(request: ManifestReviewRequest) async throws -> Sargon.TransactionToReview {
+			do {
+				return try await SargonOS.shared.analyseTransactionPreview(
+					instructions: request.unvalidatedManifest.transactionManifestString,
+					blobs: request.unvalidatedManifest.blobs,
+					message: request.message,
+					areInstructionsOriginatingFromHost: request.isWalletTransaction,
+					nonce: request.nonce,
+					notaryPublicKey: .ed25519(request.ephemeralNotaryPublicKey.intoSargon())
+				)
+			} catch {
+				throw TransactionFailure.fromCommonError(error as? CommonError)
+			}
+		}
 
-			let manifestToSign = try request.unvalidatedManifest.transactionManifest(onNetwork: networkID)
+		let getTransactionReview: GetTransactionReview = { request in
+			// Get preview from SargonOS
+			let preview = try await analyseTransactionPreview(request: request)
+
+			let networkID = await gatewaysClient.getCurrentNetworkID()
 
 			/// Get all transaction signers.
 			let transactionSigners = try await getTransactionSigners(.init(
 				networkID: networkID,
-				manifest: manifestToSign,
+				manifest: preview.transactionManifest,
 				ephemeralNotaryPublicKey: request.ephemeralNotaryPublicKey
 			))
-
-			/// Get the transaction preview
-			let transactionPreviewRequest = try await createTransactionPreviewRequest(
-				for: request,
-				networkID: networkID,
-				transactionManifest: manifestToSign,
-				transactionSigners: transactionSigners
-			)
-			let transactionPreviewResponse = try await gatewayAPIClient.transactionPreview(transactionPreviewRequest)
-			guard transactionPreviewResponse.receipt.status == .succeeded else {
-				throw TransactionFailure.fromFailedTXReviewResponse(transactionPreviewResponse)
-			}
-			guard let engineToolkitReceipt = transactionPreviewResponse.engineToolkitReceipt else {
-				throw TransactionFailure.failedToPrepareTXReview(.failedToExtractTXReceiptBytes)
-			}
-
-			/// Analyze the manifest
-			let analyzedManifestToReview = try manifestToSign.executionSummary(
-				engineToolkitReceipt: engineToolkitReceipt
-			)
-
-			/// Transactions created outside of the Wallet are not allowed to use reserved instructions
-			if !request.isWalletTransaction, !analyzedManifestToReview.reservedInstructions.isEmpty {
-				throw TransactionFailure.failedToPrepareTXReview(.manifestWithReservedInstructions(analyzedManifestToReview.reservedInstructions))
-			}
 
 			/// Get all of the expected signing factors.
 			let signingFactors = try await {
@@ -209,7 +201,7 @@ extension TransactionClient {
 			/// If notary is signatory, count the signature of the notary that will be added.
 			let signaturesCount = transactionSigners.notaryIsSignatory ? 1 : signingFactors.expectedSignatureCount
 			var transactionFee = try TransactionFee(
-				executionSummary: analyzedManifestToReview,
+				executionSummary: preview.executionSummary,
 				signaturesCount: signaturesCount,
 				notaryIsSignatory: transactionSigners.notaryIsSignatory,
 				includeLockFee: false // Calculate without LockFee cost. It is yet to be determined if LockFe will be added or not
@@ -224,8 +216,8 @@ extension TransactionClient {
 			}
 
 			return TransactionToReview(
-				transactionManifest: manifestToSign,
-				analyzedManifestToReview: analyzedManifestToReview,
+				transactionManifest: preview.transactionManifest,
+				analyzedManifestToReview: preview.executionSummary,
 				networkID: networkID,
 				transactionFee: transactionFee,
 				transactionSigners: transactionSigners,
@@ -407,5 +399,26 @@ private extension GatewayAPI.TransactionPreviewResponse {
 			return nil
 		}
 		return String(data: data, encoding: .utf8)
+	}
+}
+
+extension TransactionFailure {
+	static func fromCommonError(_ commonError: CommonError?) -> Self {
+		switch commonError {
+		case let .ReservedInstructionsNotAllowedInManifest(reservedInstructions):
+			.failedToPrepareTXReview(.manifestWithReservedInstructions(reservedInstructions))
+
+		case .OneOfReceivingAccountsDoesNotAllowDeposits:
+			.failedToPrepareTXReview(.oneOfRecevingAccountsDoesNotAllowDeposits)
+
+		case .FailedTransactionPreview:
+			.failedToPrepareTXReview(.failedToRetrieveTXReceipt("Unknown reason"))
+
+		case .FailedToExtractTransactionReceiptBytes:
+			.failedToPrepareTXReview(.failedToExtractTXReceiptBytes)
+
+		default:
+			.failedToPrepareTXReview(.failedToRetrieveTXReceipt("Unknown reason"))
+		}
 	}
 }

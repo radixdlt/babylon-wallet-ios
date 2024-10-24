@@ -52,6 +52,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 				switch entity.securityState {
 				case let .unsecured(unsecuredEntityControl):
 					unsecuredEntityControl.transactionSigning.factorSourceID == factorSource.id
+				case let .securified(sec): fatalError("Implement")
 				}
 			}
 
@@ -59,6 +60,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 				switch entity.securityState {
 				case let .unsecured(unsecuredEntityControl):
 					unsecuredEntityControl.transactionSigning.factorSourceID == factorSource.id
+				case let .securified(sec): fatalError("Implement")
 				}
 			}
 
@@ -116,6 +118,8 @@ extension DeviceFactorSourceClient: DependencyKey {
 					switch entity.securityState {
 					case let .unsecured(value):
 						mnemonicMissingFactorSources.contains(value.transactionSigning.factorSourceId)
+					case let .securified(sec):
+						fatalError("Implement")
 					}
 				}
 
@@ -123,6 +127,8 @@ extension DeviceFactorSourceClient: DependencyKey {
 					switch entity.securityState {
 					case let .unsecured(value):
 						unrecoverableFactorSources.contains(value.transactionSigning.factorSourceId)
+					case let .securified(sec):
+						fatalError("Implement")
 					}
 				}
 

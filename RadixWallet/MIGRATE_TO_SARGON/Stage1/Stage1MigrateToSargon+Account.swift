@@ -14,6 +14,7 @@ extension Account {
 	var derivationIndex: HDPathValue {
 		switch securityState {
 		case let .unsecured(uec): uec.transactionSigning.derivationPath.nonHardenedIndex
+		case let .securified(sec): fatalError("Implement")
 		}
 	}
 
@@ -25,6 +26,7 @@ extension Account {
 		switch self.securityState {
 		case let .unsecured(control):
 			control.transactionSigning.factorSourceID.kind == .ledgerHqHardwareWallet
+		case let .securified(sec): fatalError("Implement")
 		}
 	}
 }

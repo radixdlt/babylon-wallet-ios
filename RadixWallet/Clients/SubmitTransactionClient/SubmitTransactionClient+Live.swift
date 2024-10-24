@@ -107,7 +107,7 @@ extension GatewayAPI.TransactionStatus: @unchecked Sendable {}
 // MARK: - SubmitTXFailure
 enum SubmitTXFailure: Sendable, LocalizedError, Equatable {
 	case failedToSubmitTX
-	case invalidTXWasDuplicate(txID: IntentHash)
+	case invalidTXWasDuplicate(txID: TransactionIntentHash)
 
 	var errorDescription: String? {
 		switch self {

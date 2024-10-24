@@ -119,7 +119,7 @@ final class FaucetClientTests: TestCase {
 		let userDefaults = UserDefaults.Dependency.ephemeral()
 		await userDefaults.saveEpochForWhenLastUsedByAccountAddress(expectedEpochs)
 
-		let hash = try IntentHash("txid_tdx_d_1pycj4pzxu9fc9x4qxflu63x7fmmal2raafd3wj9vea9nr5wy84dqsdq4cj")
+		let hash = try TransactionIntentHash("txid_tdx_d_1pycj4pzxu9fc9x4qxflu63x7fmmal2raafd3wj9vea9nr5wy84dqsdq4cj")
 
 		try await withDependencies {
 			$0.gatewayAPIClient.getEpoch = { currentEpoch }
@@ -129,7 +129,7 @@ final class FaucetClientTests: TestCase {
 			}
 			$0.userDefaults = userDefaults
 			$0.transactionClient.notarizeTransaction = { _ in
-				try NotarizeTransactionResponse(notarized: CompiledNotarizedIntent.sample, intent: TransactionIntent.sample, txID: IntentHash.sample)
+				try NotarizeTransactionResponse(notarized: CompiledNotarizedIntent.sample, intent: TransactionIntent.sample, txID: TransactionIntentHash.sample)
 			}
 			$0.submitTXClient.hasTXBeenCommittedSuccessfully = { _ in }
 			$0.gatewaysClient.getCurrentGateway = { .enkinet }

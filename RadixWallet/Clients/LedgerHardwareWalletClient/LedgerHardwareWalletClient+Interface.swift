@@ -170,6 +170,7 @@ extension LedgerHardwareWalletClient {
 			}
 
 			return .verifiedSame
+		case let .securified(sec): fatalError("Implement")
 		}
 	}
 }

@@ -10,15 +10,15 @@ struct SubmitTransactionClient: Sendable {
 }
 
 extension SubmitTransactionClient {
-	typealias SubmitTransaction = @Sendable (SubmitTXRequest) async throws -> IntentHash
-	typealias HasTXBeenCommittedSuccessfully = @Sendable (IntentHash) async throws -> Void
+	typealias SubmitTransaction = @Sendable (SubmitTXRequest) async throws -> TransactionIntentHash
+	typealias HasTXBeenCommittedSuccessfully = @Sendable (TransactionIntentHash) async throws -> Void
 }
 
 // MARK: - SubmitTXRequest
 struct SubmitTXRequest: Sendable, Hashable {
-	let txID: IntentHash
+	let txID: TransactionIntentHash
 	let compiledNotarizedTXIntent: CompiledNotarizedIntent
-	init(txID: IntentHash, compiledNotarizedTXIntent: CompiledNotarizedIntent) {
+	init(txID: TransactionIntentHash, compiledNotarizedTXIntent: CompiledNotarizedIntent) {
 		self.txID = txID
 		self.compiledNotarizedTXIntent = compiledNotarizedTXIntent
 	}
@@ -26,7 +26,7 @@ struct SubmitTXRequest: Sendable, Hashable {
 
 // MARK: - TransactionStatusUpdate
 struct TransactionStatusUpdate: Sendable, Hashable {
-	let txID: IntentHash
+	let txID: TransactionIntentHash
 	let result: Loadable<EqVoid>
 }
 

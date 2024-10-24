@@ -162,6 +162,8 @@ extension DappToWalletInteraction {
 				.send(items.send),
 			]
 			.compactMap { $0 }
+		case .preAuthorization:
+			fatalError("Implement")
 		}
 	}
 }
@@ -288,6 +290,9 @@ extension WalletToDappInteractionSuccessResponse {
 				interactionId: interaction.interactionId,
 				items: .transaction(.init(send: send))
 			)
+
+		case .preAuthorization:
+			fatalError("Implement")
 		}
 	}
 }
