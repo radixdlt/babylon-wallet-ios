@@ -56,19 +56,19 @@ extension TransactionFailure {
 //			case .failedToSubmitTX:
 //				return (errorKind: .failedToSubmitTransaction, message: nil)
 //			case let .invalidTXWasDuplicate(txID):
-//				return (errorKind: .submittedTransactionWasDuplicate, message: "IntentHash: \(txID)")
+//				return (errorKind: .submittedTransactionWasDuplicate, message: "TransactionIntentHash: \(txID)")
 //			}
 //
 //		case let .failedToPoll(error):
 //			switch error {
 //			case let .invalidTXWasSubmittedButNotSuccessful(txID, status: .rejected):
-//				return (errorKind: .submittedTransactionHasRejectedTransactionStatus, message: "IntentHash: \(txID)")
+//				return (errorKind: .submittedTransactionHasRejectedTransactionStatus, message: "TransactionIntentHash: \(txID)")
 //			case let .invalidTXWasSubmittedButNotSuccessful(txID, status: .failed):
-//				return (errorKind: .submittedTransactionHasFailedTransactionStatus, message: "IntentHash: \(txID)")
+//				return (errorKind: .submittedTransactionHasFailedTransactionStatus, message: "TransactionIntentHash: \(txID)")
 //			case let .failedToPollTX(txID, _):
-//				return (errorKind: .failedToPollSubmittedTransaction, message: "IntentHash: \(txID)")
+//				return (errorKind: .failedToPollSubmittedTransaction, message: "TransactionIntentHash: \(txID)")
 //			case let .failedToGetTransactionStatus(txID, _):
-//				return (errorKind: .failedToPollSubmittedTransaction, message: "IntentHash: \(txID)")
+//				return (errorKind: .failedToPollSubmittedTransaction, message: "TransactionIntentHash: \(txID)")
 //			}
 		}
 	}
@@ -82,7 +82,7 @@ extension TransactionFailure {
 		case failedToRetrieveTXReceipt(String)
 		case failedToExtractTXReceiptBytes
 		case failedToGenerateTXReview(Error)
-		case manifestWithReservedInstructions([ReservedInstruction])
+		case manifestWithReservedInstructions(String)
 		case oneOfRecevingAccountsDoesNotAllowDeposits
 
 		var errorDescription: String? {

@@ -38,7 +38,7 @@ struct TransactionHistoryResponse: Sendable, Hashable {
 
 // MARK: - TransactionHistoryItem
 struct TransactionHistoryItem: Sendable, Hashable, Identifiable {
-	let id: IntentHash
+	let id: TransactionIntentHash
 	let time: Date
 	let message: String?
 	let manifestClass: GatewayAPI.ManifestClass?
@@ -48,7 +48,7 @@ struct TransactionHistoryItem: Sendable, Hashable, Identifiable {
 	let failed: Bool
 
 	init(
-		id: IntentHash,
+		id: TransactionIntentHash,
 		time: Date,
 		message: String? = nil,
 		manifestClass: GatewayAPI.ManifestClass? = nil,

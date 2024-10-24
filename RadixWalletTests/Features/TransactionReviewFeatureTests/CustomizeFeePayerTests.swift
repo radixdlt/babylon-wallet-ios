@@ -26,7 +26,7 @@ final class CustomizeFeePayerTests: TestCase {
 
 		let state = CustomizeFees.State(
 			reviewedTransaction: transactionStub,
-			manifestSummary: manifestStub.summary,
+			manifestSummary: try! manifestStub.summary,
 			signingPurpose: .signTransaction(.internalManifest(.transfer))
 		)
 

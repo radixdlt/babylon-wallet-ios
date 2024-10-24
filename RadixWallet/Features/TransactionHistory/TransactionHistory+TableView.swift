@@ -4,7 +4,7 @@ import SwiftUI
 extension TransactionHistory {
 	struct TableView: UIViewRepresentable {
 		enum Action: Hashable, Sendable {
-			case transactionTapped(IntentHash)
+			case transactionTapped(TransactionIntentHash)
 			case reachedTop
 			case pulledDown
 			case nearingBottom
@@ -13,7 +13,7 @@ extension TransactionHistory {
 		}
 
 		let sections: IdentifiedArrayOf<TransactionSection>
-		let scrollTarget: Triggering<IntentHash?>
+		let scrollTarget: Triggering<TransactionIntentHash?>
 		let action: (Action) -> Void
 
 		private static let cellIdentifier = "TransactionCell"
@@ -472,7 +472,7 @@ extension IndexPath {
 }
 
 extension IdentifiedArrayOf<TransactionHistory.TransactionSection> {
-	var allTransactions: [IntentHash] {
+	var allTransactions: [TransactionIntentHash] {
 		flatMap(\.transactions.ids)
 	}
 
@@ -480,7 +480,7 @@ extension IdentifiedArrayOf<TransactionHistory.TransactionSection> {
 		self[indexPath.section].transactions[indexPath.row]
 	}
 
-	func indexPath(for transaction: IntentHash) -> IndexPath? {
+	func indexPath(for transaction: TransactionIntentHash) -> IndexPath? {
 		for (index, section) in enumerated() {
 			if let row = section.transactions.ids.firstIndex(of: transaction) {
 				return .init(row: row, section: index)

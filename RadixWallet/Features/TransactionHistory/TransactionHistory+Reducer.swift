@@ -24,7 +24,7 @@ struct TransactionHistory: Sendable, FeatureReducer {
 	}
 
 	enum ScrollTarget: Hashable, Sendable {
-		case transaction(IntentHash)
+		case transaction(TransactionIntentHash)
 		// The latest transaction before the given date
 		case beforeDate(Date)
 		case latestTransaction
@@ -45,7 +45,7 @@ struct TransactionHistory: Sendable, FeatureReducer {
 
 		var sections: IdentifiedArrayOf<TransactionSection> = []
 
-		var scrollTarget: Triggering<IntentHash?> = .updated(nil)
+		var scrollTarget: Triggering<TransactionIntentHash?> = .updated(nil)
 
 		/// The currently selected month
 		var currentMonth: DateRangeItem.ID

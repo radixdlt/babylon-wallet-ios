@@ -41,7 +41,7 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case submit(WalletToDappInteractionResponse, DappMetadata)
-		case dismiss(DappMetadata, IntentHash)
+		case dismiss(DappMetadata, TransactionIntentHash)
 		case dismissSilently
 	}
 

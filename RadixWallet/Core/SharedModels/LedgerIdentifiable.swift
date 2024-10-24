@@ -1,7 +1,7 @@
 // MARK: - LedgerIdentifiable
 enum LedgerIdentifiable: Sendable {
 	case address(Address)
-	case transaction(IntentHash)
+	case transaction(TransactionIntentHash)
 
 	static func address(of account: Account) -> Self {
 		.address(.account(account.address))
