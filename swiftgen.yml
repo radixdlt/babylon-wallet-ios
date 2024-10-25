@@ -6,8 +6,6 @@ strings:
   options:
     separator: _
   outputs:
-    params:
-      publicAccess: true
     templateName: structured-swift5
     output: L10n.generated.swift
 
@@ -16,14 +14,11 @@ xcassets:
   outputs:
     params:
       enumName: AssetResource
-      publicAccess: true
     templateName: swift5
     output: AssetResource.generated.swift
 
 fonts:
   inputs: Fonts
   outputs:
-    params:
-      publicAccess: true
     templateName: swift5
     output: Fonts.generated.swift
