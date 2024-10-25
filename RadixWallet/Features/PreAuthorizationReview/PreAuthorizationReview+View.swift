@@ -9,7 +9,8 @@ extension PreAuthorizationReview.State {
 			expiration: expiration,
 			secondsToExpiration: secondsToExpiration,
 			globalControlState: globalControlState,
-			sliderControlState: sliderControlState
+			sliderControlState: sliderControlState,
+			showRawTransactionButton: showRawTransactionButton
 		)
 	}
 }
@@ -24,6 +25,7 @@ extension PreAuthorizationReview {
 		let secondsToExpiration: Int?
 		let globalControlState: ControlState
 		let sliderControlState: ControlState
+		let showRawTransactionButton: Bool
 
 		var dAppName: String? {
 			dAppMetadata?.name?.rawValue
@@ -80,7 +82,7 @@ extension PreAuthorizationReview {
 						if let rawContent = viewStore.displayMode.rawTransaction {
 							rawTransaction(rawContent)
 						} else {
-							details
+							details(viewStore.showRawTransactionButton)
 						}
 					}
 					.background(Common.gradientBackground)
@@ -135,17 +137,19 @@ extension PreAuthorizationReview {
 			}
 		}
 
-		private var details: some SwiftUI.View {
+		private func details(_ showRawTransactionButton: Bool) -> some SwiftUI.View {
 			sections
 				.padding(.top, .large2 + .small3)
 				.padding(.horizontal, .small1)
 				.padding(.bottom, .medium1)
 				.overlay(alignment: .topTrailing) {
-					Button(asset: AssetResource.code) {
-						store.send(.view(.toggleDisplayModeButtonTapped))
+					if showRawTransactionButton {
+						Button(asset: AssetResource.code) {
+							store.send(.view(.toggleDisplayModeButtonTapped))
+						}
+						.buttonStyle(.secondaryRectangular)
+						.padding(.medium3)
 					}
-					.buttonStyle(.secondaryRectangular)
-					.padding(.medium3)
 				}
 		}
 
@@ -185,7 +189,7 @@ extension PreAuthorizationReview {
 							let value = formatTime(seconds: seconds)
 							Text("Valid for the next **\(value)**")
 						} else {
-							Text("This subintent is no longer valid!")
+							Text("This PreAuthorization is no longer valid")
 						}
 					}
 
@@ -239,5 +243,9 @@ private extension PreAuthorizationReview.State {
 
 	var sliderControlState: ControlState {
 		isExpired ? .disabled : globalControlState
+	}
+
+	var showRawTransactionButton: Bool {
+		globalControlState == .enabled
 	}
 }
