@@ -8,6 +8,7 @@ extension InteractionReview.Sections.State {
 			isExpandedRedeemingFromPools: redeemingFromPools?.isExpanded == true,
 			showTransferLine: withdrawals != nil && deposits != nil,
 			showProofs: kind == .preAuthorization,
+			showPossibleDappCalls: showPossibleDappCalls,
 			stakingToValidators: stakingToValidators,
 			unstakingFromValidators: unstakingFromValidators,
 			claimingFromValidators: claimingFromValidators,
@@ -25,6 +26,7 @@ extension InteractionReview.Sections {
 		let isExpandedRedeemingFromPools: Bool
 		let showTransferLine: Bool
 		let showProofs: Bool
+		let showPossibleDappCalls: Bool
 
 		let stakingToValidators: InteractionReview.ValidatorsState?
 		let unstakingFromValidators: InteractionReview.ValidatorsState?
@@ -53,7 +55,7 @@ extension InteractionReview.Sections {
 						unstakingFromValidators(viewStore.unstakingFromValidators)
 						claimingFromValidators(viewStore.claimingFromValidators)
 
-						dAppsUsed(viewStore.isExpandedDappsUsed)
+						dAppsUsed(viewStore.isExpandedDappsUsed, showPossibleDappCalls: viewStore.showPossibleDappCalls)
 
 						deposits
 
@@ -169,7 +171,7 @@ extension InteractionReview.Sections {
 		}
 
 		@ViewBuilder
-		private func dAppsUsed(_ isExpanded: Bool) -> some SwiftUI.View {
+		private func dAppsUsed(_ isExpanded: Bool, showPossibleDappCalls: Bool) -> some SwiftUI.View {
 			IfLetStore(store.scope(state: \.dAppsUsed, action: \.child.dAppsUsed)) { childStore in
 				VStack(alignment: .leading, spacing: .small2) {
 					Common.ExpandableHeadingView(heading: .usingDapps, isExpanded: isExpanded) {
@@ -179,8 +181,36 @@ extension InteractionReview.Sections {
 						InteractionReviewDappsUsed.View(store: childStore)
 							.transition(.opacity.combined(with: .scale(scale: 0.95)))
 					}
+					if showPossibleDappCalls {
+						possibleDappCalls
+					}
 				}
 			}
+		}
+
+		private var possibleDappCalls: some SwiftUI.View {
+			HStack(spacing: .zero) {
+				Image(.transactionReviewDapps)
+					.renderingMode(.template)
+					.resizable()
+					.foregroundStyle(.app.gray3)
+					.frame(.smallest)
+
+				Text("Possible dApp calls")
+					.textStyle(.body2HighImportance)
+					.foregroundStyle(.app.gray2)
+					.padding(.leading, .small2)
+
+				Spacer()
+
+				InfoButton(.dapps)
+			}
+			.padding(.leading, .medium3)
+			.padding(.vertical, .small1)
+			.padding(.trailing, .medium2)
+			.background(.app.white)
+			.clipShape(RoundedRectangle(cornerRadius: .small1))
+			.cardShadow
 		}
 
 		@ViewBuilder
@@ -206,6 +236,16 @@ extension InteractionReview.Sections {
 extension InteractionReview.Sections.State {
 	var showTransferLine: Bool {
 		withdrawals != nil && deposits != nil
+	}
+
+	var showPossibleDappCalls: Bool {
+		switch kind {
+		case .transaction:
+			false
+		case .preAuthorization:
+			// TODO: Only show for open pre authorizations
+			true
+		}
 	}
 }
 
