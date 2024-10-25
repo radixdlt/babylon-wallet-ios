@@ -1014,24 +1014,26 @@ extension DappInteractionFlow.Path.State {
 			))
 
 		case let .remote(.send(item)):
+			self.state = .reviewTransaction(.init(
+				unvalidatedManifest: item.unvalidatedManifest,
+				nonce: .secureRandom(),
+				signTransactionPurpose: .manifestFromDapp,
+				message: item.message.map {
+					Message.plaintext(string: $0)
+				} ?? Message.none,
+				waitsForTransactionToBeComitted: interaction.interactionId.isWalletAccountDepositSettingsInteraction,
+				isWalletTransaction: interaction.interactionId.isWalletInteraction,
+				proposingDappMetadata: dappMetadata.onLedger,
+				p2pRoute: p2pRoute
+			))
+
+		case let .remote(.subintent(item)):
 			self.state = .preAuthorizationReview(.init(
 				unvalidatedManifest: item.unvalidatedManifest,
 				nonce: .secureRandom(),
 				signTransactionPurpose: .manifestFromDapp,
 				dAppMetadata: dappMetadata.onLedger
 			))
-//			self.state = .reviewTransaction(.init(
-//				unvalidatedManifest: item.unvalidatedManifest,
-//				nonce: .secureRandom(),
-//				signTransactionPurpose: .manifestFromDapp,
-//				message: item.message.map {
-//					Message.plaintext(string: $0)
-//				} ?? Message.none,
-//				waitsForTransactionToBeComitted: interaction.interactionId.isWalletAccountDepositSettingsInteraction,
-//				isWalletTransaction: interaction.interactionId.isWalletInteraction,
-//				proposingDappMetadata: dappMetadata.onLedger,
-//				p2pRoute: p2pRoute
-//			))
 		}
 	}
 }
