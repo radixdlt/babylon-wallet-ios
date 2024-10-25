@@ -13,6 +13,7 @@ extension InteractionReview {
 		var body: some View {
 			HStack(spacing: .small2) {
 				Image(asset: icon)
+					.frame(.smallest)
 					.padding(.small3)
 					.overlay {
 						Circle()
