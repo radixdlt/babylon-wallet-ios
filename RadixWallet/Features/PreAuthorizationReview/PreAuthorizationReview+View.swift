@@ -167,6 +167,7 @@ extension PreAuthorizationReview {
 					Text("Network fees will be paid by the dApp")
 						.foregroundStyle(.app.gray2)
 				}
+				.lineSpacing(0)
 				.textStyle(.body2Regular)
 
 				Spacer(minLength: .small2)
