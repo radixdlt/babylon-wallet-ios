@@ -203,7 +203,7 @@ extension InteractionReview.Sections {
 
 				Spacer()
 
-				InfoButton(.dapps)
+				InfoButton(.possibledappcalls)
 			}
 			.padding(.leading, .medium3)
 			.padding(.vertical, .small1)

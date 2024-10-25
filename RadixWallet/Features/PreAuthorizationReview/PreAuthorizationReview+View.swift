@@ -171,7 +171,7 @@ extension PreAuthorizationReview {
 
 				Spacer(minLength: .small2)
 
-				InfoButton(.dapps) // TODO: Update to correct one
+				InfoButton(.preauthorizations)
 			}
 			.padding(.vertical, .medium3)
 			.padding(.horizontal, .medium2)
