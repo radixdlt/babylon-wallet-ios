@@ -79,7 +79,7 @@ struct IndicesOfEntitiesControlledByFactorSourceRequest: Sendable, Hashable {
 
 // MARK: - IndicesUsedByFactorSource
 struct IndicesUsedByFactorSource: Sendable, Hashable {
-	let indices: OrderedSet<HDPathValue>
+	let indices: OrderedSet<HdPathComponent>
 	let factorSource: FactorSource
 	let currentNetworkID: NetworkID
 }
@@ -87,7 +87,7 @@ struct IndicesUsedByFactorSource: Sendable, Hashable {
 // MARK: FactorSourcesClient.GetFactorSources
 extension FactorSourcesClient {
 	typealias IndicesOfEntitiesControlledByFactorSource = @Sendable (IndicesOfEntitiesControlledByFactorSourceRequest) async throws -> IndicesUsedByFactorSource
-	typealias NextEntityIndexForFactorSource = @Sendable (NextEntityIndexForFactorSourceRequest) async throws -> HDPathValue
+	typealias NextEntityIndexForFactorSource = @Sendable (NextEntityIndexForFactorSourceRequest) async throws -> HdPathComponent
 	typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
 	typealias GetMainDeviceFactorSource = @Sendable () async throws -> DeviceFactorSource
 	typealias CreateNewMainDeviceFactorSource = @Sendable () async throws -> PrivateHierarchicalDeterministicFactorSource
