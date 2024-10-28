@@ -16,8 +16,8 @@ struct SubmitTransaction: Sendable, FeatureReducer {
 			case submitted
 			case committedSuccessfully
 			case temporarilyRejected(remainingProcessingTime: Int)
-			case permanentlyRejected(TXFailureStatus.Reason)
-			case failed(TXFailureStatus.Reason)
+			case permanentlyRejected(TransactionStatusReason)
+			case failed(TransactionStatusReason)
 		}
 
 		let notarizedTX: NotarizeTransactionResponse
@@ -42,7 +42,7 @@ struct SubmitTransaction: Sendable, FeatureReducer {
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case submitTXResult(TaskResult<IntentHash>)
+		case submitTXResult(TaskResult<TransactionIntentHash>)
 		case statusUpdate(State.TXStatus)
 	}
 
@@ -59,8 +59,8 @@ struct SubmitTransaction: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case failedToSubmit
-		case submittedButNotCompleted(IntentHash)
-		case committedSuccessfully(IntentHash)
+		case submittedButNotCompleted(TransactionIntentHash)
+		case committedSuccessfully(TransactionIntentHash)
 		case manuallyDismiss
 	}
 
@@ -80,13 +80,10 @@ struct SubmitTransaction: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			state.status = .submitting
-			return .run { [txID = state.notarizedTX.txID, notarized = state.notarizedTX.notarized] send in
+			return .run { [notarized = state.notarizedTX.notarized] send in
 				await send(.internal(.submitTXResult(
 					TaskResult {
-						try await submitTXClient.submitTransaction(.init(
-							txID: txID,
-							compiledNotarizedTXIntent: notarized
-						))
+						try await submitTXClient.submitTransaction(notarized)
 					}
 				)))
 			}
@@ -128,23 +125,20 @@ struct SubmitTransaction: Sendable, FeatureReducer {
 		case let .submitTXResult(.success(txID)):
 			state.status = .submitted
 			return .run { [endEpoch = state.notarizedTX.intent.header.endEpochExclusive] send in
-				do {
-					try await submitTXClient.hasTXBeenCommittedSuccessfully(txID)
+				let status = try await submitTXClient.pollTransactionStatus(txID)
+				switch status {
+				case .success:
 					await send(.internal(.statusUpdate(.committedSuccessfully)))
-				} catch let error as TXFailureStatus {
-					// Error is always TXFailureStatus, just that it is erased to generic Error
-					switch error {
-					case let .permanentlyRejected(reason):
-						await send(.internal(.statusUpdate(.permanentlyRejected(reason))))
-					case let .temporarilyRejected(epoch):
-						await send(.internal(.statusUpdate(
-							.temporarilyRejected(
-								remainingProcessingTime: Int(endEpoch - epoch) * epochDurationInMinutes
-							)
-						)))
-					case let .failed(reason):
-						await send(.internal(.statusUpdate(.failed(reason))))
-					}
+				case let .permanentlyRejected(reason):
+					await send(.internal(.statusUpdate(.permanentlyRejected(reason))))
+				case let .temporarilyRejected(epoch):
+					await send(.internal(.statusUpdate(
+						.temporarilyRejected(
+							remainingProcessingTime: Int(endEpoch - epoch) * epochDurationInMinutes
+						)
+					)))
+				case let .failed(reason):
+					await send(.internal(.statusUpdate(.failed(reason))))
 				}
 			}
 			.cancellable(id: CancellableId.transactionStatus, cancelInFlight: true)

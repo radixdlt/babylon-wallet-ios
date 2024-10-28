@@ -109,13 +109,13 @@ struct NotarizeTransactionRequest: Sendable, Hashable {
 
 // MARK: - NotarizeTransactionResponse
 struct NotarizeTransactionResponse: Sendable, Hashable {
-	let notarized: CompiledNotarizedIntent
+	let notarized: NotarizedTransaction
 	let intent: TransactionIntent
-	let txID: IntentHash
+	let txID: TransactionIntentHash
 	init(
-		notarized: CompiledNotarizedIntent,
+		notarized: NotarizedTransaction,
 		intent: TransactionIntent,
-		txID: IntentHash
+		txID: TransactionIntentHash
 	) {
 		self.notarized = notarized
 		self.intent = intent

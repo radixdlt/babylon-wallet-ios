@@ -204,21 +204,6 @@ extension GatewayAPIClient {
 					request: request
 				) { $0.appendingPathComponent("/state/account-locker/page/vaults") }
 			},
-			submitTransaction: { transactionSubmitRequest in
-				try await post(
-					request: transactionSubmitRequest
-				) { $0.appendingPathComponent("transaction/submit") }
-			},
-			transactionStatus: { transactionStatusRequest in
-				try await post(
-					request: transactionStatusRequest
-				) { $0.appendingPathComponent("transaction/status") }
-			},
-			transactionPreview: { transactionPreviewRequest in
-				try await post(
-					request: transactionPreviewRequest
-				) { $0.appendingPathComponent("transaction/preview") }
-			},
 			streamTransactions: { streamTransactionsRequest in
 				try await post(
 					request: streamTransactionsRequest,

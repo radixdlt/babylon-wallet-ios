@@ -15,8 +15,7 @@ extension SubmitTransaction.State {
 extension SubmitTransaction.State.TXStatus {
 	var display: String {
 		switch self {
-		case .failed(.applicationError(.worktopError(.assertionFailed))),
-		     .permanentlyRejected(.applicationError(.worktopError(.assertionFailed))):
+		case .failed(.worktopError), .permanentlyRejected(.worktopError):
 			L10n.TransactionStatus.AssertionFailure.text
 		case .failed:
 			L10n.TransactionStatus.Failed.text
@@ -48,7 +47,7 @@ extension SubmitTransaction.State.TXStatus {
 // MARK: - SubmitTransaction.View
 extension SubmitTransaction {
 	struct ViewState: Equatable {
-		let txID: IntentHash
+		let txID: TransactionIntentHash
 		let status: State.TXStatus
 		let dismissalDisabled: Bool
 		let showSwitchBackToBrowserMessage: Bool

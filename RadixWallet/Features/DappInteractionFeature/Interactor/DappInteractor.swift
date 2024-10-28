@@ -37,7 +37,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			WalletToDappInteractionResponse,
 			for: RequestEnvelope,
 			DappMetadata,
-			IntentHash?
+			TransactionIntentHash?
 		)
 		case failedToSendResponseToDapp(
 			WalletToDappInteractionResponse,
@@ -50,7 +50,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			for: RequestEnvelope,
 			DappMetadata, reason: String
 		)
-		case presentResponseSuccessView(DappMetadata, IntentHash?, P2P.Route)
+		case presentResponseSuccessView(DappMetadata, TransactionIntentHash?, P2P.Route)
 		case presentInvalidRequest(
 			DappToWalletInteractionUnvalidated,
 			reason: DappInteractionClient.ValidatedDappRequest.InvalidRequestReason,
@@ -160,7 +160,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			dismissCurrentModalAndRequest(request, for: &state)
 			switch response {
 			case .success:
-				return .send(.internal(.presentResponseSuccessView(dappMetadata, txID, request.route)))
+				return delayedShortEffect(for: .internal(.presentResponseSuccessView(dappMetadata, txID, request.route)))
 			case .failure:
 				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
 			}
@@ -244,7 +244,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 				return sendResponseToDappEffect(responseToDapp, for: request, dappMetadata: dappMetadata)
 			case let .dismiss(dappMetadata, txID):
 				dismissCurrentModalAndRequest(request, for: &state)
-				return .send(.internal(.presentResponseSuccessView(dappMetadata, txID, request.route)))
+				return delayedShortEffect(for: .internal(.presentResponseSuccessView(dappMetadata, txID, request.route)))
 			case .dismissSilently:
 				dismissCurrentModalAndRequest(request, for: &state)
 				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
@@ -313,7 +313,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 			// In case of transaction response, sending it to the peer client is a silent operation.
 			// The success or failures is determined based on the transaction polling status.
-			let txID: IntentHash? = {
+			let txID: TransactionIntentHash? = {
 				if case let .success(successResponse) = responseToDapp,
 				   case let .transaction(txID) = successResponse.items
 				{

@@ -4,12 +4,12 @@ import SwiftUI
 // MARK: - Completion
 struct Completion: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
-		let txID: IntentHash?
+		let txID: TransactionIntentHash?
 		let dappMetadata: DappMetadata
 		let p2pRoute: P2P.Route
 
 		init(
-			txID: IntentHash?,
+			txID: TransactionIntentHash?,
 			dappMetadata: DappMetadata,
 			p2pRoute: P2P.Route
 		) {

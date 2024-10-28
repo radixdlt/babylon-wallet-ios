@@ -108,8 +108,8 @@ struct TransactionReview: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case failed(TransactionFailure)
-		case signedTXAndSubmittedToGateway(IntentHash)
-		case transactionCompleted(IntentHash)
+		case signedTXAndSubmittedToGateway(TransactionIntentHash)
+		case transactionCompleted(TransactionIntentHash)
 		case dismiss
 	}
 
@@ -271,14 +271,14 @@ struct TransactionReview: Sendable, FeatureReducer {
 			return .send(.child(.sections(.internal(.parent(.showResourceDetails(resource, details))))))
 
 		case .networkFee(.delegate(.showCustomizeFees)):
-			guard let reviewedTransaction = state.reviewedTransaction else {
+			guard let reviewedTransaction = state.reviewedTransaction,
+			      let summary = try? reviewedTransaction.transactionManifest.summary
+			else {
 				return .none
 			}
 			state.destination = .customizeFees(.init(
 				reviewedTransaction: reviewedTransaction,
-				manifestSummary: reviewedTransaction
-					.transactionManifest
-					.summary,
+				manifestSummary: summary,
 				signingPurpose: .signTransaction(state.signTransactionPurpose)
 			))
 			return .none
@@ -743,9 +743,12 @@ enum FeePayerValidationOutcome: Sendable, Hashable {
 
 extension ReviewedTransaction {
 	var involvedAccounts: Set<AccountAddress> {
-		Set(accountWithdraws.keys)
+		guard let summary = try? transactionManifest.summary else {
+			return Set()
+		}
+		return Set(accountWithdraws.keys)
 			.union(accountDeposits.keys)
-			.union(transactionManifest.summary.addressesOfAccountsRequiringAuth)
+			.union(summary.addressesOfAccountsRequiringAuth)
 	}
 
 	var feePayingValidation: Loadable<FeePayerValidationOutcome> {
