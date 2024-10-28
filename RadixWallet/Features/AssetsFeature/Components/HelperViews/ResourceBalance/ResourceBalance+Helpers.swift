@@ -12,11 +12,23 @@ struct SendableAnyHashable: @unchecked Sendable, Hashable {
 // MARK: - ResourceBalance + Comparable
 extension ResourceBalance: Comparable {
 	static func < (lhs: Self, rhs: Self) -> Bool {
+		switch (lhs, rhs) {
+		case (.known, .known):
+			lhs < rhs
+		default:
+			true
+		}
+	}
+}
+
+// MARK: - KnownResourceBalance + Comparable
+extension KnownResourceBalance: Comparable {
+	static func < (lhs: Self, rhs: Self) -> Bool {
 		switch (lhs.details, rhs.details) {
 		case let (.fungible(lhsValue), .fungible(rhsValue)):
 			if lhs.resource.resourceAddress == rhs.resource.resourceAddress {
 				// If it's the same resource, sort by the amount
-				order(lhs: lhsValue.amount.nominalAmount, rhs: rhsValue.amount.nominalAmount)
+				order(lhs: lhsValue.amount.exactAmount?.nominalAmount, rhs: rhsValue.amount.exactAmount?.nominalAmount)
 			} else {
 				if lhs.resource.resourceAddress.isXRD {
 					true
@@ -85,15 +97,15 @@ extension ResourceBalance: Comparable {
 	}
 }
 
-// MARK: - ResourceBalance.Amount + Comparable
-extension ResourceBalance.Amount: Comparable {
+// MARK: - KnownResourceBalance.Amount + Comparable
+extension KnownResourceBalance.Amount: Comparable {
 	static func < (lhs: Self, rhs: Self) -> Bool {
 		order(lhs: lhs.amount, rhs: rhs.amount) {
 			order(lhs: lhs.guaranteed, rhs: rhs.guaranteed)
 		}
 	}
 
-	static let zero = ResourceBalance.Amount(0)
+	static let zero = KnownResourceBalance.Amount(0)
 }
 
 private func order(lhs: OnLedgerEntity.Resource, rhs: OnLedgerEntity.Resource) -> Bool {

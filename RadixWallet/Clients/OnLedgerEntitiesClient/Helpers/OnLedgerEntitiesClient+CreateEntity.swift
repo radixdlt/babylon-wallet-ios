@@ -555,13 +555,13 @@ extension OnLedgerEntitiesClient {
 
 		struct ResourceWithRedemptionValue: Hashable, Sendable {
 			let resource: OnLedgerEntity.Resource
-			var redemptionValue: ResourceAmount?
+			var redemptionValue: ExactResourceAmount?
 		}
 	}
 
 	struct ResourceWithVaultAmount: Hashable, Sendable {
 		let resource: OnLedgerEntity.Resource
-		var amount: ResourceAmount
+		var amount: ExactResourceAmount
 	}
 
 	struct StakeClaim: Hashable, Sendable, Identifiable {
@@ -571,7 +571,7 @@ extension OnLedgerEntitiesClient {
 
 		let validatorAddress: ValidatorAddress
 		let token: OnLedgerEntity.NonFungibleToken
-		var claimAmount: ResourceAmount
+		var claimAmount: ExactResourceAmount
 		let reamainingEpochsUntilClaim: Int?
 
 		var isReadyToBeClaimed: Bool {

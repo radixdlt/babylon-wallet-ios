@@ -1,9 +1,9 @@
 // MARK: - StakeSummaryView
 struct StakeSummaryView: View {
 	struct ViewState: Hashable, Sendable {
-		let staked: Loadable<ResourceAmount>
-		let unstaking: Loadable<ResourceAmount>
-		let readyToClaim: Loadable<ResourceAmount>
+		let staked: Loadable<ExactResourceAmount>
+		let unstaking: Loadable<ExactResourceAmount>
+		let readyToClaim: Loadable<ExactResourceAmount>
 		let canClaimStakes: Bool
 
 		var readyToClaimControlState: ControlState {
@@ -65,7 +65,7 @@ extension StakeSummaryView {
 	@ViewBuilder
 	private func summaryRow(
 		_ name: String,
-		amount: Loadable<ResourceAmount>
+		amount: Loadable<ExactResourceAmount>
 	) -> some View {
 		HStack(alignment: .firstTextBaseline) {
 			Text(name)
@@ -90,7 +90,7 @@ extension StakeSummaryView {
 	}
 }
 
-private extension Loadable<ResourceAmount> {
+private extension Loadable<ExactResourceAmount> {
 	var isPositive: Bool {
 		if let value = self.nominalAmount.wrappedValue, value > 0 {
 			true

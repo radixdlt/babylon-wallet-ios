@@ -73,19 +73,21 @@ struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 			account: InteractionReview.ReviewAccount,
 			transfer: InteractionReview.Transfer
 		) {
+			guard let resource = transfer.value.resource else { return nil }
+
 			self.id = transfer.id
 			self.account = account
-			self.resource = transfer.value.resource
+			self.resource = resource
 
 			let url = resource.metadata.iconURL
-			switch transfer.details {
+			switch transfer.value.details {
 			case let .fungible(fungible):
 				self.thumbnail = .token(fungible.isXRD ? .xrd : .other(url))
 			case .poolUnit:
 				self.thumbnail = .poolUnit(url)
 			case .liquidStakeUnit:
 				self.thumbnail = .lsu(url)
-			case .stakeClaimNFT, .nonFungible:
+			case .stakeClaimNFT, .nonFungible, .none:
 				return nil
 			}
 

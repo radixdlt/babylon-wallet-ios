@@ -368,7 +368,7 @@ extension OnLedgerEntity {
 
 		let resourceAddress: ResourceAddress
 		let atLedgerState: AtLedgerState
-		var amount: ResourceAmount
+		var amount: ExactResourceAmount
 		let metadata: Metadata
 
 		var debugDescription: String {
@@ -380,7 +380,7 @@ extension OnLedgerEntity {
 		init(
 			resourceAddress: ResourceAddress,
 			atLedgerState: AtLedgerState,
-			amount: ResourceAmount,
+			amount: ExactResourceAmount,
 			metadata: Metadata
 		) {
 			self.resourceAddress = resourceAddress

@@ -176,7 +176,7 @@ extension AccountPortfoliosClient.State {
 
 // MARK: - Stake and Pool details handling
 extension AccountPortfoliosClient.State {
-	func calculateWorth(_ gateway: Gateway) -> (ResourceAddress, ResourceAmount) -> FiatWorth? {
+	func calculateWorth(_ gateway: Gateway) -> (ResourceAddress, ExactResourceAmount) -> FiatWorth? {
 		{ resourceAddress, amount in
 			let worth: FiatWorth.Worth? = {
 				guard case let .success(tokenPrices) = self.tokenPrices else {
@@ -247,7 +247,7 @@ private extension AccountPortfoliosClient.AccountPortfolio {
 		}
 	}
 
-	mutating func updateFiatWorth(_ change: (ResourceAddress, ResourceAmount) -> FiatWorth?) {
+	mutating func updateFiatWorth(_ change: (ResourceAddress, ExactResourceAmount) -> FiatWorth?) {
 		account.fungibleResources.updateFiatWorth(change)
 		stakeUnitDetails.mutateValue { $0.updateFiatWorth(change) }
 		poolUnitDetails.mutateValue { $0.updateFiatWorth(change) }
@@ -255,7 +255,7 @@ private extension AccountPortfoliosClient.AccountPortfolio {
 }
 
 private extension OnLedgerEntity.OwnedFungibleResources {
-	mutating func updateFiatWorth(_ change: (ResourceAddress, ResourceAmount) -> FiatWorth?) {
+	mutating func updateFiatWorth(_ change: (ResourceAddress, ExactResourceAmount) -> FiatWorth?) {
 		xrdResource.mutate { resource in
 			resource.amount.fiatWorth = change(.mainnetXRD, resource.amount)
 		}
@@ -269,7 +269,7 @@ private extension OnLedgerEntity.OwnedFungibleResources {
 }
 
 private extension MutableCollection where Element == OnLedgerEntitiesClient.OwnedResourcePoolDetails {
-	mutating func updateFiatWorth(_ change: (ResourceAddress, ResourceAmount) -> FiatWorth?) {
+	mutating func updateFiatWorth(_ change: (ResourceAddress, ExactResourceAmount) -> FiatWorth?) {
 		mutateAll { detail in
 			detail.xrdResource?.redemptionValue.mutate { amount in
 				amount.fiatWorth = change(.mainnetXRD, amount)
@@ -286,7 +286,7 @@ private extension MutableCollection where Element == OnLedgerEntitiesClient.Owne
 }
 
 private extension MutableCollection where Element == OnLedgerEntitiesClient.OwnedStakeDetails {
-	mutating func updateFiatWorth(_ change: (ResourceAddress, ResourceAmount) -> FiatWorth?) {
+	mutating func updateFiatWorth(_ change: (ResourceAddress, ExactResourceAmount) -> FiatWorth?) {
 		mutateAll { detail in
 			let xrdRedemptionValue = detail.xrdRedemptionValue
 			detail.stakeUnitResource.mutate {

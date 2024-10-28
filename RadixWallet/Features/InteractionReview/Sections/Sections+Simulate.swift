@@ -1,9 +1,9 @@
 extension InteractionReview.Sections {
 	func simulateSections() async throws -> Common.SectionsData? {
-		let xrdBalance: ResourceBalance = .init(resource: .init(resourceAddress: .sampleStokenetXRD, metadata: .init(name: "Radix", symbol: "XRD", isComplete: true)), details: .fungible(.init(isXRD: true, amount: .init(nominalAmount: .five))))
+		let xrdBalance: ResourceBalance = .init(resource: .init(resourceAddress: .sampleStokenetXRD, metadata: .init(name: "Radix", symbol: "XRD", isComplete: true)), details: .fungible(.init(isXRD: true, amount: .exact(.init(nominalAmount: .five)))))
 		let idResourceBalance = xrdBalance.asIdentified
 
-		let nftBalance: ResourceBalance = .init(resource: .init(resourceAddress: .sampleMainnetNonFungibleGCMembership, atLedgerState: .init(version: 1, epoch: 2), metadata: .init(name: "GC Member Card", iconURL: .init(string: "https://stokenet-gumball-club.radixdlt.com/assets/member-card.png"), isComplete: true)), details: .nonFungible(.init(id: .sample, data: nil)))
+		let nftBalance: KnownResourceBalance = .init(resource: .init(resourceAddress: .sampleMainnetNonFungibleGCMembership, atLedgerState: .init(version: 1, epoch: 2), metadata: .init(name: "GC Member Card", iconURL: .init(string: "https://stokenet-gumball-club.radixdlt.com/assets/member-card.png"), isComplete: true)), details: .nonFungible(.init(id: .sample, data: nil)))
 
 		let accountWithdraw = Common.Account.State(
 			account: .user(.sampleMainnetAlice),

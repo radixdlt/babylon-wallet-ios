@@ -20,7 +20,7 @@ extension InteractionReview.Proofs {
 					}
 
 					ForEach(store.proofs) { proof in
-						ResourceBalanceView(proof.resourceBalance.viewState, appearance: .compact) {
+						ResourceBalanceView(proof.resourceBalance.toResourceBalance.viewState, appearance: .compact) {
 							store.send(.view(.proofTapped(proof)))
 						}
 					}

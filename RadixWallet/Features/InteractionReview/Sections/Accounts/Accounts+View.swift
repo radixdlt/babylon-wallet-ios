@@ -69,15 +69,20 @@ struct TransactionReviewResourceView: View {
 	let onTap: (OnLedgerEntity.NonFungibleToken?) -> Void
 
 	var body: some View {
-		switch transfer.details {
-		case .fungible, .nonFungible, .liquidStakeUnit, .poolUnit:
-			ResourceBalanceButton(transfer.viewState, appearance: .transactionReview, warning: warning) {
-				onTap(nil)
+		switch transfer {
+		case let .known(known):
+			switch known.details {
+			case .fungible, .nonFungible, .liquidStakeUnit, .poolUnit:
+				ResourceBalanceButton(transfer.viewState, appearance: .transactionReview, warning: warning) {
+					onTap(nil)
+				}
+			case let .stakeClaimNFT(details):
+				ResourceBalanceView.StakeClaimNFT(viewState: details, appearance: .transactionReview, compact: false) { stakeClaim in
+					onTap(stakeClaim.token)
+				}
 			}
-		case let .stakeClaimNFT(details):
-			ResourceBalanceView.StakeClaimNFT(viewState: details, appearance: .transactionReview, compact: false) { stakeClaim in
-				onTap(stakeClaim.token)
-			}
+		case .unknown:
+			fatalError("Implement")
 		}
 	}
 
@@ -107,12 +112,12 @@ extension ResourceBalance.ViewState.Fungible { // FIXME: GK use full
 			address: resource.resource.resourceAddress,
 			icon: .token(isXRD ? .xrd : .other(resource.resource.metadata.iconURL)),
 			title: isXRD ? Constants.xrdTokenName : resource.resource.metadata.title,
-			amount: resource.redemptionValue.map { .init($0) }
+			amount: resource.redemptionValue.map { .init(exactAmount: $0) }
 		)
 	}
 }
 
-extension [ResourceBalance.Fungible] {
+extension [KnownResourceBalance.Fungible] {
 	init(resources: OnLedgerEntitiesClient.OwnedResourcePoolDetails) {
 		let xrdResource = resources.xrdResource.map {
 			Element(resourceWithRedemptionValue: $0, isXRD: true)
@@ -124,11 +129,16 @@ extension [ResourceBalance.Fungible] {
 	}
 }
 
-extension ResourceBalance.Fungible {
+extension KnownResourceBalance.Fungible {
 	init(resourceWithRedemptionValue resource: OnLedgerEntitiesClient.OwnedResourcePoolDetails.ResourceWithRedemptionValue, isXRD: Bool) {
+		let amount: ResourceAmount = if let redemptionValue = resource.redemptionValue {
+			.exact(redemptionValue)
+		} else {
+			.unknown
+		}
 		self.init(
 			isXRD: isXRD,
-			amount: resource.redemptionValue ?? .zero, // FIXME: GK - best way to handle nil amount?
+			amount: amount,
 			guarantee: nil
 		)
 	}

@@ -40,7 +40,7 @@ struct StakeUnitList: Sendable, FeatureReducer {
 
 				let stakeClaims = details.compactMap(\.stakeClaimTokens).flatMap(\.stakeClaims)
 				let stakedAmount = details.map {
-					ResourceAmount(
+					ExactResourceAmount(
 						nominalAmount: $0.xrdRedemptionValue,
 						fiatWorth: $0.stakeUnitResource?.amount.fiatWorth
 					)
@@ -76,7 +76,7 @@ struct StakeUnitList: Sendable, FeatureReducer {
 							)
 						},
 						stakeClaimResource: stake.stakeClaimTokens.map { stakeClaimTokens in
-							ResourceBalance.StakeClaimNFT(
+							KnownResourceBalance.StakeClaimNFT(
 								canClaimTokens: allSelectedTokens == nil, // cannot claim in selection mode
 								stakeClaimTokens: stakeClaimTokens,
 								selectedStakeClaims: allSelectedTokens

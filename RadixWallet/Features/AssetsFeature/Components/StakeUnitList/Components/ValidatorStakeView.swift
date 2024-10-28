@@ -12,7 +12,7 @@ struct ValidatorStakeView: View {
 
 		let validatorNameViewState: ValidatorHeaderView.ViewState
 		var liquidStakeUnit: LiquidStakeUnit?
-		var stakeClaimResource: ResourceBalance.StakeClaimNFT?
+		var stakeClaimResource: KnownResourceBalance.StakeClaimNFT?
 
 		struct LiquidStakeUnit: Sendable, Hashable {
 			let lsu: ResourceBalance.ViewState.LiquidStakeUnit
@@ -67,7 +67,7 @@ struct ValidatorStakeView: View {
 	}
 
 	private func stakeClaimNFTsView(
-		viewState: ResourceBalance.StakeClaimNFT,
+		viewState: KnownResourceBalance.StakeClaimNFT,
 		onTap: @escaping (OnLedgerEntitiesClient.StakeClaim) -> Void,
 		onClaimAllTapped: @escaping () -> Void
 	) -> some SwiftUI.View {

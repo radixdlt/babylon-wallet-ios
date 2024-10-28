@@ -45,7 +45,7 @@ extension InteractionReview {
 			enum ParentAction: Sendable, Equatable {
 				case resolveExecutionSummary(ExecutionSummary, NetworkID)
 				case simulate
-				case showResourceDetails(OnLedgerEntity.Resource, ResourceBalance.Details)
+				case showResourceDetails(OnLedgerEntity.Resource, KnownResourceBalance.Details)
 			}
 		}
 
@@ -218,7 +218,10 @@ extension InteractionReview {
 			switch childAction {
 			case let .withdrawals(.delegate(.showAsset(transfer, token))),
 			     let .deposits(.delegate(.showAsset(transfer, token))):
-				return resourceDetailsEffect(state: &state, resource: transfer.resource, details: transfer.details, nft: token)
+				guard let resource = transfer.resource, let details = transfer.details else {
+					return .none
+				}
+				return resourceDetailsEffect(state: &state, resource: resource, details: details, nft: token)
 
 			case let .dAppsUsed(.delegate(.openDapp(dAppID))), let .contributingToPools(.delegate(.openDapp(dAppID))), let .redeemingFromPools(.delegate(.openDapp(dAppID))):
 				state.destination = .dApp(.init(dAppDefinitionAddress: dAppID))
@@ -255,18 +258,23 @@ private extension InteractionReview.Sections {
 	func resourceDetailsEffect(
 		state: inout State,
 		resource: OnLedgerEntity.Resource,
-		details: ResourceBalance.Details,
+		details: KnownResourceBalance.Details,
 		nft: OnLedgerEntity.NonFungibleToken? = nil
 	) -> Effect<Action> {
 		switch details {
 		case let .fungible(details):
+			// FIXME: handle details for not exact amounts
+			guard let exactAmount = details.amount.exactAmount else {
+				return .none
+			}
+
 			state.destination = .fungibleTokenDetails(.init(
 				resourceAddress: resource.resourceAddress,
 				resource: .success(resource),
 				ownedFungibleResource: .init(
 					resourceAddress: resource.resourceAddress,
 					atLedgerState: resource.atLedgerState,
-					amount: details.amount,
+					amount: exactAmount,
 					metadata: resource.metadata
 				),
 				isXRD: details.isXRD

@@ -1,5 +1,40 @@
 // MARK: - ResourceAmount
-struct ResourceAmount: Sendable, Hashable, Codable {
+enum ResourceAmount: Sendable, Hashable, Codable {
+	case exact(ExactResourceAmount)
+	case atLeast(ExactResourceAmount)
+	case atMost(ExactResourceAmount)
+	case between(minimum: ExactResourceAmount, maximum: ExactResourceAmount)
+	case unknown
+}
+
+extension ResourceAmount {
+	var exactAmount: ExactResourceAmount? {
+		switch self {
+		case let .exact(amount):
+			amount
+		default:
+			nil
+		}
+	}
+
+	var debugDescription: String {
+		switch self {
+		case let .exact(amount):
+			amount.nominalAmount.formatted()
+		case let .atLeast(amount):
+			"At least \(amount.nominalAmount.formatted())"
+		case let .atMost(amount):
+			"No more than \(amount.nominalAmount.formatted())"
+		case let .between(minAmount, maxAmount):
+			"Min: \(minAmount.nominalAmount.formatted()); Max: \(maxAmount.nominalAmount.formatted())"
+		case .unknown:
+			"Unknown"
+		}
+	}
+}
+
+// MARK: - ExactResourceAmount
+struct ExactResourceAmount: Sendable, Hashable, Codable {
 	let nominalAmount: Decimal192
 	var fiatWorth: FiatWorth?
 
@@ -23,9 +58,9 @@ struct ResourceAmount: Sendable, Hashable, Codable {
 		try container.encode(nominalAmount, forKey: .nominalAmount)
 	}
 
-	static let zero = ResourceAmount(nominalAmount: 0, fiatWorth: nil)
+	static let zero = ExactResourceAmount(nominalAmount: 0, fiatWorth: nil)
 
-	static func + (lhs: ResourceAmount, rhs: ResourceAmount) -> ResourceAmount {
+	static func + (lhs: ExactResourceAmount, rhs: ExactResourceAmount) -> ExactResourceAmount {
 		.init(
 			nominalAmount: lhs.nominalAmount + rhs.nominalAmount,
 			fiatWorth: {
@@ -45,8 +80,15 @@ struct ResourceAmount: Sendable, Hashable, Codable {
 }
 
 // MARK: Comparable
-extension ResourceAmount: Comparable {
+extension ExactResourceAmount: Comparable {
 	static func < (lhs: Self, rhs: Self) -> Bool {
 		lhs.nominalAmount < rhs.nominalAmount
+	}
+}
+
+// MARK: - ResourceAmount + Comparable
+extension ResourceAmount: Comparable {
+	static func < (lhs: Self, rhs: Self) -> Bool {
+		(lhs.exactAmount ?? .zero).nominalAmount < (rhs.exactAmount ?? .zero).nominalAmount
 	}
 }

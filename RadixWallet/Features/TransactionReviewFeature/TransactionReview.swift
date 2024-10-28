@@ -589,22 +589,33 @@ extension ResourceBalance {
 				liquidStakeUnit.guarantee
 			case let .poolUnit(poolUnit):
 				poolUnit.guarantee
-			case .nonFungible, .stakeClaimNFT:
+			case .nonFungible, .stakeClaimNFT, .none:
 				nil
 			}
 		}
 		set {
-			switch details {
-			case var .fungible(fungible):
-				fungible.guarantee = newValue
-				details = .fungible(fungible)
-			case var .liquidStakeUnit(liquidStakeUnit):
-				liquidStakeUnit.guarantee = newValue
-				details = .liquidStakeUnit(liquidStakeUnit)
-			case var .poolUnit(poolUnit):
-				poolUnit.guarantee = newValue
-				details = .poolUnit(poolUnit)
-			case .nonFungible, .stakeClaimNFT:
+			switch self {
+			case let .known(knownResourceBalance):
+				switch knownResourceBalance.details {
+				case var .fungible(fungible):
+					fungible.guarantee = newValue
+					var known = knownResourceBalance
+					known.details = .fungible(fungible)
+					self = .known(known)
+				case var .liquidStakeUnit(liquidStakeUnit):
+					liquidStakeUnit.guarantee = newValue
+					var known = knownResourceBalance
+					known.details = .liquidStakeUnit(liquidStakeUnit)
+					self = .known(known)
+				case var .poolUnit(poolUnit):
+					poolUnit.guarantee = newValue
+					var known = knownResourceBalance
+					known.details = .poolUnit(poolUnit)
+					self = .known(known)
+				case .nonFungible, .stakeClaimNFT:
+					return
+				}
+			case .unknown:
 				return
 			}
 		}
@@ -614,12 +625,12 @@ extension ResourceBalance {
 	var fungibleTransferAmount: Decimal192? {
 		switch details {
 		case let .fungible(fungible):
-			fungible.amount.nominalAmount
+			fungible.amount.exactAmount?.nominalAmount
 		case let .liquidStakeUnit(liquidStakeUnit):
 			liquidStakeUnit.amount
 		case let .poolUnit(poolUnit):
 			poolUnit.details.poolUnitResource.amount.nominalAmount
-		case .nonFungible, .stakeClaimNFT:
+		case .nonFungible, .stakeClaimNFT, .none:
 			nil
 		}
 	}

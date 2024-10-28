@@ -25,12 +25,9 @@ extension OnLedgerEntitiesClient {
 		resourceAssociatedDapps: InteractionReview.Sections.ResourceAssociatedDapps? = nil,
 		networkID: NetworkID,
 		defaultDepositGuarantee: Decimal192 = 1
-	) async throws -> ResourceBalance {
+	) async throws -> KnownResourceBalance {
 		let amount = resourceQuantifier.amount
 		let resourceAddress = resource.resourceAddress
-
-		@Dependency(\.resourcesVisibilityClient) var resourcesVisibilityClient
-		let hiddenResources = try await resourcesVisibilityClient.getHidden()
 
 		let guarantee: TransactionGuarantee? = { () -> TransactionGuarantee? in
 			guard case let .predicted(predictedAmount) = resourceQuantifier else { return nil }
@@ -44,11 +41,38 @@ extension OnLedgerEntitiesClient {
 			)
 		}()
 
+		return try await fungibleResourceBalance(
+			resource,
+			resourceAmount: .exact(.init(nominalAmount: amount)),
+			guarantee: guarantee,
+			networkID: networkID
+		)
+	}
+
+	func fungibleResourceBalance(
+		_ resource: OnLedgerEntity.Resource,
+		resourceAmount: ResourceAmount,
+		guarantee: TransactionGuarantee? = nil,
+		poolContributions: [some TrackedPoolInteraction] = [] as [TrackedPoolContribution],
+		validatorStakes: [TrackedValidatorStake] = [],
+		entities: InteractionReview.Sections.ResourcesInfo = [:],
+		resourceAssociatedDapps: InteractionReview.Sections.ResourceAssociatedDapps? = nil,
+		networkID: NetworkID,
+		defaultDepositGuarantee: Decimal192 = 1
+	) async throws -> KnownResourceBalance {
+		let resourceAddress = resource.resourceAddress
+
+		@Dependency(\.resourcesVisibilityClient) var resourcesVisibilityClient
+		let hiddenResources = try await resourcesVisibilityClient.getHidden()
+
 		// Check if the fungible resource is a pool unit resource
-		if await isPoolUnitResource(resource) {
+		if
+			case let .exact(amount) = resourceAmount,
+			await isPoolUnitResource(resource)
+		{
 			return try await poolUnit(
 				resource,
-				amount: amount,
+				amount: amount.nominalAmount,
 				poolContributions: poolContributions,
 				entities: entities,
 				resourceAssociatedDapps: resourceAssociatedDapps,
@@ -59,10 +83,13 @@ extension OnLedgerEntitiesClient {
 		}
 
 		// Check if the fungible resource is an LSU
-		if let validator = await isLiquidStakeUnit(resource) {
+		if
+			case let .exact(amount) = resourceAmount,
+			let validator = await isLiquidStakeUnit(resource)
+		{
 			return try await liquidStakeUnit(
 				resource,
-				amount: amount,
+				amount: amount.nominalAmount,
 				validator: validator,
 				validatorStakes: validatorStakes,
 				guarantee: guarantee
@@ -72,7 +99,7 @@ extension OnLedgerEntitiesClient {
 		// Normal fungible resource
 		let isXRD = resourceAddress.isXRD(on: networkID)
 		let isHidden = hiddenResources.contains(.fungible(resourceAddress))
-		let details: ResourceBalance.Fungible = .init(isXRD: isXRD, amount: .init(nominalAmount: amount), guarantee: guarantee)
+		let details: KnownResourceBalance.Fungible = .init(isXRD: isXRD, amount: resourceAmount, guarantee: guarantee)
 
 		return .init(resource: resource, details: .fungible(details), isHidden: isHidden)
 	}
@@ -86,7 +113,7 @@ extension OnLedgerEntitiesClient {
 		networkID: NetworkID,
 		guarantee: TransactionGuarantee?,
 		hiddenResources: [ResourceIdentifier]
-	) async throws -> ResourceBalance {
+	) async throws -> KnownResourceBalance {
 		let resourceAddress = resource.resourceAddress
 
 		if let poolContribution = poolContributions.first(where: { $0.poolUnitsResourceAddress == resourceAddress }) {
@@ -151,7 +178,7 @@ extension OnLedgerEntitiesClient {
 		validator: OnLedgerEntity.Validator,
 		validatorStakes: [TrackedValidatorStake] = [],
 		guarantee: TransactionGuarantee?
-	) async throws -> ResourceBalance {
+	) async throws -> KnownResourceBalance {
 		let worth: Decimal192
 		if validatorStakes.isEmpty {
 			guard let totalSupply = resource.totalSupply, totalSupply.isPositive else {
@@ -175,7 +202,7 @@ extension OnLedgerEntitiesClient {
 			}
 		}
 
-		let details = ResourceBalance.LiquidStakeUnit(
+		let details = KnownResourceBalance.LiquidStakeUnit(
 			resource: resource,
 			amount: amount,
 			worth: .init(nominalAmount: worth),
@@ -194,9 +221,9 @@ extension OnLedgerEntitiesClient {
 		resourceQuantifier: NonFungibleResourceIndicator,
 		unstakeData: [NonFungibleGlobalId: UnstakeData] = [:],
 		newlyCreatedNonFungibles: [NonFungibleGlobalId] = []
-	) async throws -> [ResourceBalance] {
+	) async throws -> [KnownResourceBalance] {
 		let ids = resourceQuantifier.ids
-		let result: [ResourceBalance]
+		let result: [KnownResourceBalance]
 
 		switch resourceInfo {
 		case let .left(resource):
@@ -237,7 +264,7 @@ extension OnLedgerEntitiesClient {
 			} else {
 				result = tokens.map { token in
 					let isHidden = hiddenResources.contains(.nonFungible(token.id.resourceAddress))
-					return ResourceBalance(resource: resource, details: .nonFungible(token), isHidden: isHidden)
+					return KnownResourceBalance(resource: resource, details: .nonFungible(token), isHidden: isHidden)
 				}
 
 				guard result.count == ids.count else {
@@ -258,7 +285,7 @@ extension OnLedgerEntitiesClient {
 					)
 				}
 				.map { id in
-					ResourceBalance(resource: resource, details: .nonFungible(.init(id: id, data: nil)), isHidden: false)
+					KnownResourceBalance(resource: resource, details: .nonFungible(.init(id: id, data: nil)), isHidden: false)
 				}
 
 			guard result.count == ids.count else {
@@ -274,7 +301,7 @@ extension OnLedgerEntitiesClient {
 		stakeClaimValidator: OnLedgerEntity.Validator,
 		unstakeData: [NonFungibleGlobalId: UnstakeData],
 		tokens: [OnLedgerEntity.NonFungibleToken]
-	) throws -> ResourceBalance {
+	) throws -> KnownResourceBalance {
 		let stakeClaimTokens: [OnLedgerEntitiesClient.StakeClaim] = if unstakeData.isEmpty {
 			try tokens.map { token in
 				guard let data = token.data else {

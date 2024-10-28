@@ -282,7 +282,7 @@ extension InteractionReview.Sections {
 		}
 	}
 
-	private func extractUserAccounts(_ allAddress: [AccountAddress]) async throws -> [Common.ReviewAccount] {
+	func extractUserAccounts(_ allAddress: [AccountAddress]) async throws -> [Common.ReviewAccount] {
 		let userAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
 
 		return allAddress
@@ -343,7 +343,7 @@ extension InteractionReview.Sections {
 		return Common.Proofs.State(kind: .transaction, proofs: proofs.asIdentified())
 	}
 
-	private func extractResourceBalanceInfo(specifier: ResourceSpecifier) async throws -> [(ResourceAddress, ResourceBalance.Details)] {
+	private func extractResourceBalanceInfo(specifier: ResourceSpecifier) async throws -> [(ResourceAddress, KnownResourceBalance.Details)] {
 		switch specifier {
 		case let .fungible(resourceAddress, amount):
 			return [(
@@ -351,7 +351,7 @@ extension InteractionReview.Sections {
 				.fungible(
 					.init(
 						isXRD: resourceAddress.isXRD,
-						amount: .init(nominalAmount: amount)
+						amount: .exact(.init(nominalAmount: amount))
 					)
 				)
 			)]
@@ -364,9 +364,9 @@ extension InteractionReview.Sections {
 		}
 	}
 
-	private func extractProofInfo(resourceAddress: ResourceAddress, details: ResourceBalance.Details) async throws -> Common.ProofEntity {
+	private func extractProofInfo(resourceAddress: ResourceAddress, details: KnownResourceBalance.Details) async throws -> Common.ProofEntity {
 		try await Common.ProofEntity(
-			resourceBalance: ResourceBalance(
+			resourceBalance: KnownResourceBalance(
 				resource: onLedgerEntitiesClient.getResource(resourceAddress, metadataKeys: .dappMetadataKeys),
 				details: details
 			)
@@ -609,7 +609,7 @@ extension InteractionReview.Sections {
 		case let .fungible(_, source):
 			switch resourceInfo {
 			case let .left(resource):
-				return try await [onLedgerEntitiesClient.fungibleResourceBalance(
+				return try await [.known(onLedgerEntitiesClient.fungibleResourceBalance(
 					resource,
 					resourceQuantifier: source,
 					poolContributions: poolInteractions,
@@ -618,7 +618,7 @@ extension InteractionReview.Sections {
 					resourceAssociatedDapps: resourceAssociatedDapps,
 					networkID: networkID,
 					defaultDepositGuarantee: defaultDepositGuarantee
-				)]
+				))]
 			case let .right(newEntityMetadata):
 				// A newly created fungible resource
 
@@ -627,13 +627,13 @@ extension InteractionReview.Sections {
 					metadata: newEntityMetadata
 				)
 
-				let details: ResourceBalance.Fungible = .init(
+				let details: KnownResourceBalance.Fungible = .init(
 					isXRD: false,
-					amount: .init(nominalAmount: source.amount),
+					amount: .exact(.init(nominalAmount: source.amount)),
 					guarantee: nil
 				)
 
-				return [.init(resource: resource, details: .fungible(details), isHidden: false)]
+				return [.known(.init(resource: resource, details: .fungible(details), isHidden: false))]
 			}
 
 		case let .nonFungible(_, indicator):
@@ -644,6 +644,7 @@ extension InteractionReview.Sections {
 				unstakeData: unstakeData,
 				newlyCreatedNonFungibles: newlyCreatedNonFungibles
 			)
+			.map(\.toResourceBalance)
 		}
 	}
 }

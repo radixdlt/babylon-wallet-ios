@@ -58,7 +58,7 @@ struct ResourceAsset: Sendable, FeatureReducer {
 	}
 
 	enum InternalAction: Sendable, Hashable {
-		case loadedBalance(ResourceBalance, OnLedgerEntity.NonFungibleToken? = nil)
+		case loadedBalance(KnownResourceBalance, OnLedgerEntity.NonFungibleToken? = nil)
 	}
 
 	struct Destination: DestinationReducer {

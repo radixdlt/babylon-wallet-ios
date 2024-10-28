@@ -232,12 +232,12 @@ extension TransactionHistory {
 							EmptyTransactionView()
 						} else {
 							if !transaction.withdrawals.isEmpty {
-								let resources = transaction.withdrawals.map(\.viewState)
+								let resources = transaction.withdrawals.map(\.toResourceBalance.viewState)
 								TransfersActionView(type: .withdrawal, resources: resources)
 							}
 
 							if !transaction.deposits.isEmpty {
-								let resources = transaction.deposits.map(\.viewState)
+								let resources = transaction.deposits.map(\.toResourceBalance.viewState)
 								TransfersActionView(type: .deposit, resources: resources)
 							}
 

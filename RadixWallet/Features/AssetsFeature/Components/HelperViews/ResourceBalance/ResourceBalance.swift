@@ -1,3 +1,4 @@
+// MARK: - ResourceBalance
 typealias IDResourceBalance = Identified<Tagged<ResourceBalance, UUID>, ResourceBalance>
 
 extension ResourceBalance {
@@ -7,7 +8,56 @@ extension ResourceBalance {
 }
 
 // MARK: - ResourceBalance
-struct ResourceBalance: Sendable, Hashable {
+enum ResourceBalance: Sendable, Hashable {
+	case known(KnownResourceBalance)
+	case unknown
+
+	init(resource: OnLedgerEntity.Resource, details: KnownResourceBalance.Details, isHidden: Bool? = nil) {
+		let knownResourceBalance = KnownResourceBalance(resource: resource, details: details, isHidden: isHidden)
+		self = .known(knownResourceBalance)
+	}
+}
+
+extension ResourceBalance {
+	var resource: OnLedgerEntity.Resource? {
+		switch self {
+		case let .known(resourceBalance): resourceBalance.resource
+		case .unknown: nil
+		}
+	}
+
+	var details: KnownResourceBalance.Details? {
+		switch self {
+		case let .known(resourceBalance): resourceBalance.details
+		case .unknown: nil
+		}
+	}
+
+	var isHidden: Bool? {
+		switch self {
+		case let .known(resourceBalance): resourceBalance.isHidden
+		case .unknown: nil
+		}
+	}
+}
+
+// MARK: - KnownResourceBalance
+typealias IDKnownResourceBalance = Identified<Tagged<KnownResourceBalance, UUID>, KnownResourceBalance>
+
+extension KnownResourceBalance {
+	var asIdentified: IDKnownResourceBalance {
+		.init(self, id: .init())
+	}
+}
+
+extension KnownResourceBalance {
+	var toResourceBalance: ResourceBalance {
+		.known(self)
+	}
+}
+
+// MARK: - KnownResourceBalance
+struct KnownResourceBalance: Sendable, Hashable {
 	let resource: OnLedgerEntity.Resource
 	var details: Details
 
@@ -38,7 +88,7 @@ struct ResourceBalance: Sendable, Hashable {
 	struct LiquidStakeUnit: Sendable, Hashable {
 		let resource: OnLedgerEntity.Resource
 		let amount: Decimal192
-		let worth: ResourceAmount
+		let worth: ExactResourceAmount
 		let validator: OnLedgerEntity.Validator
 		var guarantee: TransactionGuarantee?
 	}
@@ -105,7 +155,11 @@ struct ResourceBalance: Sendable, Hashable {
 		}
 
 		init(_ amount: Decimal192, guaranteed: Decimal192? = nil) {
-			self.init(.init(nominalAmount: amount), guaranteed: guaranteed)
+			self.init(.exact(.init(nominalAmount: amount)), guaranteed: guaranteed)
+		}
+
+		init(exactAmount: ExactResourceAmount, guaranteed: Decimal192? = nil) {
+			self.init(.exact(exactAmount), guaranteed: guaranteed)
 		}
 	}
 }

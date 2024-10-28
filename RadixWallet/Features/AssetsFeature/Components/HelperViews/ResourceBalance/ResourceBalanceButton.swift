@@ -56,6 +56,8 @@ struct ResourceBalanceButton: View {
 				.medium3
 			case .poolUnit, .stakeClaimNFT:
 				.medium1
+			case .unknown:
+				fatalError("Implement")
 			}
 		case .transactionReview:
 			.medium2
@@ -72,6 +74,8 @@ struct ResourceBalanceButton: View {
 				.medium1
 			case .liquidStakeUnit, .poolUnit, .stakeClaimNFT:
 				.medium3
+			case .unknown:
+				fatalError("Implement")
 			}
 		case .transactionReview:
 			.medium2
@@ -90,6 +94,8 @@ struct ResourceBalanceButton: View {
 				.medium3
 			case .poolUnit, .stakeClaimNFT:
 				.medium2
+			case .unknown:
+				fatalError("Implement")
 			}
 		case .transactionReview:
 			.medium2
