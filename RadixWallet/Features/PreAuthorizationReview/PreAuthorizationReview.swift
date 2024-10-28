@@ -36,6 +36,10 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		case updateSecondsToExpiration(Date)
 	}
 
+	enum DelegateAction: Sendable, Equatable {
+		case failed(PreAuthorizationFailure)
+	}
+
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.pasteboardClient) var pasteboardClient
 	@Dependency(\.preAuthorizationClient) var preAuthorizationClient
@@ -85,7 +89,11 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		case let .previewLoaded(.failure(error)):
 			loggerGlobal.error("PreAuthroization preview failed, error: \(error)")
 			errorQueue.schedule(error)
-			return .none
+			guard let failure = error as? PreAuthorizationFailure else {
+				assertionFailure("Failed with unexpected error \(error)")
+				return .none
+			}
+			return .send(.delegate(.failed(failure)))
 
 		case let .previewLoaded(.success(preview)):
 			state.reviewedPreAuthorization = .init(manifest: preview.manifest)
@@ -116,6 +124,16 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		case let .updateSecondsToExpiration(expiration):
 			state.secondsToExpiration = Int(expiration.timeIntervalSinceNow)
 			return .none
+		}
+	}
+
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+		switch childAction {
+		case .sections(.delegate(.failedToResolveSections)):
+			showRawTransaction(&state)
+
+		default:
+			.none
 		}
 	}
 }

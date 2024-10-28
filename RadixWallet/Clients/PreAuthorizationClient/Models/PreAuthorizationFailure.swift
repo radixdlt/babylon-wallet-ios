@@ -12,6 +12,15 @@ enum PreAuthorizationFailure: Sendable, LocalizedError, Equatable {
 	}
 }
 
+extension PreAuthorizationFailure {
+	var errorKindAndMessage: (errorKind: DappWalletInteractionErrorType, message: String?) {
+		switch self {
+		case .failedToGetPreview:
+			(errorKind: .failedToPrepareTransaction, message: errorDescription)
+		}
+	}
+}
+
 // MARK: PreAuthorizationFailure.FailedToGetPreview
 extension PreAuthorizationFailure {
 	enum FailedToGetPreview: Sendable, LocalizedError, Equatable {

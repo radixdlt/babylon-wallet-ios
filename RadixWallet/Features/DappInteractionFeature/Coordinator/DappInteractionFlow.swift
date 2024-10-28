@@ -510,6 +510,13 @@ extension DappInteractionFlow {
 			return continueEffect(for: &state)
 		}
 
+		func handlePreAuthorizationFailure(
+			_ error: PreAuthorizationFailure
+		) -> Effect<Action> {
+			let (errorKind, message) = error.errorKindAndMessage
+			return dismissEffect(for: state, errorKind: errorKind, message: message)
+		}
+
 		let item = state.currentItem
 
 		guard let action = childAction.action else { return .none }
@@ -569,6 +576,9 @@ extension DappInteractionFlow {
 		case .personaProofOfOwnership(.delegate(.failedToSign)),
 		     .accountsProofOfOwnership(.delegate(.failedToSign)):
 			return dismissEffect(for: state, errorKind: .failedToSignAuthChallenge, message: nil)
+
+		case let .preAuthorizationReview(.delegate(.failed(error))):
+			return handlePreAuthorizationFailure(error)
 
 		default:
 			return .none
