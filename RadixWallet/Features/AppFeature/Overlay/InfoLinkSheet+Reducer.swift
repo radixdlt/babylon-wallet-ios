@@ -156,9 +156,9 @@ extension InfoLinkSheet.GlossaryItem {
 		case .payingaccount:
 			L10n.InfoLink.Glossary.payingaccount
 		case .preauthorizations:
-			L10n.InfoLink.Glossary.preauthorizations
+			"L10n.InfoLink.Glossary.preauthorizations"
 		case .possibledappcalls:
-			L10n.InfoLink.Glossary.possibledappcalls
+			"L10n.InfoLink.Glossary.possibledappcalls"
 		}
 	}
 }
