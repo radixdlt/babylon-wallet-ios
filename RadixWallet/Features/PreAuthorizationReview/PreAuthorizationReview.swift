@@ -1,16 +1,16 @@
 // MARK: - PreAuthorizationReview
 struct PreAuthorizationReview: Sendable, FeatureReducer {
 	typealias Common = InteractionReview
+	typealias Expiration = DappToWalletInteractionSubintentExpiration
 
 	struct State: Sendable, Hashable {
 		let unvalidatedManifest: UnvalidatedTransactionManifest
+		let expiration: Expiration?
 		let nonce: Nonce
 		let signTransactionPurpose: SigningPurpose.SignTransactionPurpose
-		let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey = .init()
 		let dAppMetadata: DappMetadata.Ledger?
 
 		var reviewedPreAuthorization: ReviewedPreAuthorization?
-		var expiration: Expiration?
 
 		var displayMode: Common.DisplayMode = .detailed
 		var sliderResetDate: Date = .now // TODO: reset when it corresponds
@@ -32,13 +32,13 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case previewLoaded(TaskResult<TransactionToReview>)
+		case previewLoaded(TaskResult<PreAuthorizationToReview>)
 		case updateSecondsToExpiration(Date)
 	}
 
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.pasteboardClient) var pasteboardClient
-	@Dependency(\.transactionClient) var transactionClient
+	@Dependency(\.preAuthorizationClient) var preAuthorizationClient
 	@Dependency(\.errorQueue) var errorQueue
 
 	var body: some ReducerOf<Self> {
@@ -53,13 +53,9 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		case .appeared:
 			return .run { [state = state] send in
 				let preview = await TaskResult {
-					try await transactionClient.getTransactionReview(.init(
+					try await preAuthorizationClient.getPreview(.init(
 						unvalidatedManifest: state.unvalidatedManifest,
-						message: .none,
-						nonce: state.nonce,
-						ephemeralNotaryPublicKey: state.ephemeralNotaryPrivateKey.publicKey,
-						signingPurpose: .signTransaction(state.signTransactionPurpose), // Update
-						isWalletTransaction: true
+						nonce: state.nonce
 					))
 				}
 				await send(.internal(.previewLoaded(preview)))
@@ -68,11 +64,11 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		case .toggleDisplayModeButtonTapped:
 			switch state.displayMode {
 			case .detailed:
-				state.displayMode = .raw(state.exampleRaw)
+				return showRawTransaction(&state)
 			case .raw:
 				state.displayMode = .detailed
+				return .none
 			}
-			return .none
 
 		case .copyRawTransactionButtonTapped:
 			guard let manifest = state.displayMode.rawTransaction else {
@@ -92,26 +88,28 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .previewLoaded(.success(preview)):
-			state.reviewedPreAuthorization = .init(manifest: preview.transactionManifest)
+			state.reviewedPreAuthorization = .init(manifest: preview.manifest)
 
 			var effects: [Effect<Action>] = []
-			let sectionsEffect: Effect<Action>
-				// We will check Preview type to know which type of sections to get
-				= if 5 > 3
-			{
-				.send(.child(.sections(.internal(.parent(.resolveExecutionSummary(
-					preview.analyzedManifestToReview, preview.networkID
-				))))))
-			} else {
-				.send(.child(.sections(.internal(.parent(.resolveTransactionSummary(.init(), preview.networkID))))))
+
+			// Trigger effect to load sections
+			let sectionsEffect: Effect<Action> = switch preview.kind {
+			case let .open(value):
+				.send(.child(.sections(.internal(.parent(.resolveManifestSummary(value.summary, preview.networkID))))))
+			case let .enclosed(value):
+				.send(.child(.sections(.internal(.parent(.resolveExecutionSummary(value.summary, preview.networkID))))))
 			}
 			effects.append(sectionsEffect)
 
-			// Mocking expiration until we have Sargon ready. Timer won't be started if expiration != .atTime
-			let time = Date().addingTimeInterval(90)
-			state.expiration = .atTime(time)
-			state.secondsToExpiration = Int(time.timeIntervalSinceNow)
-			effects.append(startTimer(expirationDate: time))
+			switch state.expiration {
+			case let .atTime(value):
+				// Trigger expiration countdown effect
+				let expirationDate = value.unixTimestampSeconds
+				state.secondsToExpiration = Int(expirationDate.timeIntervalSinceNow)
+				effects.append(startTimer(expirationDate: expirationDate))
+			case .afterDelay, .none:
+				break
+			}
 
 			return .merge(effects)
 
@@ -131,6 +129,17 @@ private extension PreAuthorizationReview {
 		}
 		.cancellable(id: CancellableId.expirationTimer, cancelInFlight: true)
 	}
+
+	func showRawTransaction(_ state: inout State) -> Effect<Action> {
+		guard let reviewedTransaction = state.reviewedPreAuthorization else {
+			struct MissingReviewedPreAuthorization: Error {}
+			errorQueue.schedule(MissingReviewedPreAuthorization())
+			return .none
+		}
+		// TODO: Confirm if we shouldn't expose manifest.instructionsString
+		state.displayMode = .raw(reviewedTransaction.manifest.manifestString)
+		return .none
+	}
 }
 
 extension PreAuthorizationReview {
@@ -139,56 +148,17 @@ extension PreAuthorizationReview {
 	}
 
 	struct ReviewedPreAuthorization: Sendable, Hashable {
-		let manifest: TransactionManifest
-
-		// TODO: Fill required info once we have Sargon ready
+		let manifest: SubintentManifest
 	}
 }
 
 extension PreAuthorizationReview.State {
 	var isExpired: Bool {
 		switch expiration {
-		case let .atTime(date):
-			date <= Date.now
-		case .window, .none:
+		case let .atTime(value):
+			value.unixTimestampSeconds <= Date.now
+		case .afterDelay, .none:
 			false
 		}
 	}
-}
-
-extension PreAuthorizationReview.State {
-	var exampleRaw: String {
-		"""
-		CALL_METHOD
-		Address("account_tdx_2_12ytkalad6hfxamsz4a7r8tevz7ahurfj58dlp4phl4nca5hs0hpu90")
-		"lock_fee"
-		Decimal("0.3696274912355")
-		;
-		CALL_METHOD
-		Address("account_tdx_2_12ytkalad6hfxamsz4a7r8tevz7ahurfj58dlp4phl4nca5hs0hpu90")
-		"withdraw"
-		Address("resource_tdx_2_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxtfd2jc")
-		Decimal("2")
-		;
-		TAKE_FROM_WORKTOP
-		Address("resource_tdx_2_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxtfd2jc")
-		Decimal("2")
-		Bucket("bucket1")
-		;
-		CALL_METHOD
-		Address("account_tdx_2_12x2hd6m7z9n389u47sn7qhv3cmeqseyathrpqa2mwlx8wczrpd36ar")
-		"try_deposit_or_abort"
-		Bucket("bucket1")
-		Enum<0u8>()
-		;
-
-		"""
-	}
-}
-
-// MARK: - Expiration
-enum Expiration: Sendable, Hashable {
-	// TODO: Replace with Sargon model
-	case atTime(Date)
-	case window(Int)
 }

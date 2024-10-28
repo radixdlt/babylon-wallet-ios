@@ -1030,6 +1030,7 @@ extension DappInteractionFlow.Path.State {
 		case let .remote(.subintent(item)):
 			self.state = .preAuthorizationReview(.init(
 				unvalidatedManifest: item.unvalidatedManifest,
+				expiration: item.expiration,
 				nonce: .secureRandom(),
 				signTransactionPurpose: .manifestFromDapp,
 				dAppMetadata: dappMetadata.onLedger

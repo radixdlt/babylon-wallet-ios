@@ -194,8 +194,8 @@ extension PreAuthorizationReview {
 						}
 					}
 
-				case let .window(seconds):
-					let value = formatTime(seconds: seconds)
+				case let .afterDelay(value):
+					let value = formatTime(seconds: Int(value.expireAfterSeconds))
 					Text("Valid for **\(value) after approval**")
 
 				case nil:

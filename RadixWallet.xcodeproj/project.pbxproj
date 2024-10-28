@@ -731,7 +731,7 @@
 		5B27FBFD2CC7E6C1002975BE /* Sections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B27FBFB2CC7E6C1002975BE /* Sections.swift */; };
 		5B27FBFE2CC7E6C1002975BE /* Sections+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B27FBFC2CC7E6C1002975BE /* Sections+View.swift */; };
 		5B27FC002CC7E783002975BE /* Sections+ExecutionSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B27FBFF2CC7E77B002975BE /* Sections+ExecutionSummary.swift */; };
-		5B27FC022CC7ECC9002975BE /* Sections+TransactionSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B27FC012CC7ECC2002975BE /* Sections+TransactionSummary.swift */; };
+		5B27FC022CC7ECC9002975BE /* Sections+ManifestSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B27FC012CC7ECC2002975BE /* Sections+ManifestSummary.swift */; };
 		5B2A45022BD6680400AEC8AD /* ContactSupportClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2A45012BD6680400AEC8AD /* ContactSupportClient.swift */; };
 		5B2A45042BD6689100AEC8AD /* ContactSupportClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2A45032BD6689100AEC8AD /* ContactSupportClient+Live.swift */; };
 		5B3C48A92C7E190C00DB160D /* AssetRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3C48A82C7E190C00DB160D /* AssetRow.swift */; };
@@ -780,6 +780,11 @@
 		5B80FCC42C298E68008444F5 /* ArbitraryDataFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B80FCC32C298E68008444F5 /* ArbitraryDataFieldView.swift */; };
 		5B80FCC72C298F13008444F5 /* ArbitraryDataField+Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B80FCC62C298F13008444F5 /* ArbitraryDataField+Models.swift */; };
 		5B80FCC92C299159008444F5 /* ArbitraryDataField+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B80FCC82C299159008444F5 /* ArbitraryDataField+Helpers.swift */; };
+		5B8433A12CD010DD00CA00F5 /* PreAuthorizationClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8433A02CD010DD00CA00F5 /* PreAuthorizationClient+Interface.swift */; };
+		5B8433A42CD011B600CA00F5 /* PreAuthorizationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8433A32CD011B000CA00F5 /* PreAuthorizationModels.swift */; };
+		5B8433A62CD011DE00CA00F5 /* PreAuthorizationClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8433A52CD011DC00CA00F5 /* PreAuthorizationClient+Test.swift */; };
+		5B8433A82CD0128000CA00F5 /* PreAuthorizationClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8433A72CD0127900CA00F5 /* PreAuthorizationClient+Live.swift */; };
+		5B8433AA2CD0131B00CA00F5 /* PreAuthorizationFailure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8433A92CD0131500CA00F5 /* PreAuthorizationFailure.swift */; };
 		5B96DD372BD917B300722882 /* Text+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B96DD362BD917B300722882 /* Text+Extra.swift */; };
 		5B9846BD2BBD5C8800E814F3 /* SensitiveInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B9846BC2BBD5C8800E814F3 /* SensitiveInfo.plist */; };
 		5B9846C02BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9846BF2BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift */; };
@@ -1968,7 +1973,7 @@
 		5B27FBFB2CC7E6C1002975BE /* Sections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sections.swift; sourceTree = "<group>"; };
 		5B27FBFC2CC7E6C1002975BE /* Sections+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sections+View.swift"; sourceTree = "<group>"; };
 		5B27FBFF2CC7E77B002975BE /* Sections+ExecutionSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sections+ExecutionSummary.swift"; sourceTree = "<group>"; };
-		5B27FC012CC7ECC2002975BE /* Sections+TransactionSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sections+TransactionSummary.swift"; sourceTree = "<group>"; };
+		5B27FC012CC7ECC2002975BE /* Sections+ManifestSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sections+ManifestSummary.swift"; sourceTree = "<group>"; };
 		5B2A45012BD6680400AEC8AD /* ContactSupportClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactSupportClient.swift; sourceTree = "<group>"; };
 		5B2A45032BD6689100AEC8AD /* ContactSupportClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ContactSupportClient+Live.swift"; sourceTree = "<group>"; };
 		5B3C48A82C7E190C00DB160D /* AssetRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetRow.swift; sourceTree = "<group>"; };
@@ -2014,6 +2019,11 @@
 		5B80FCC32C298E68008444F5 /* ArbitraryDataFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArbitraryDataFieldView.swift; sourceTree = "<group>"; };
 		5B80FCC62C298F13008444F5 /* ArbitraryDataField+Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ArbitraryDataField+Models.swift"; sourceTree = "<group>"; };
 		5B80FCC82C299159008444F5 /* ArbitraryDataField+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ArbitraryDataField+Helpers.swift"; sourceTree = "<group>"; };
+		5B8433A02CD010DD00CA00F5 /* PreAuthorizationClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PreAuthorizationClient+Interface.swift"; sourceTree = "<group>"; };
+		5B8433A32CD011B000CA00F5 /* PreAuthorizationModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreAuthorizationModels.swift; sourceTree = "<group>"; };
+		5B8433A52CD011DC00CA00F5 /* PreAuthorizationClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PreAuthorizationClient+Test.swift"; sourceTree = "<group>"; };
+		5B8433A72CD0127900CA00F5 /* PreAuthorizationClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PreAuthorizationClient+Live.swift"; sourceTree = "<group>"; };
+		5B8433A92CD0131500CA00F5 /* PreAuthorizationFailure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreAuthorizationFailure.swift; sourceTree = "<group>"; };
 		5B96DD362BD917B300722882 /* Text+Extra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Text+Extra.swift"; sourceTree = "<group>"; };
 		5B9846BC2BBD5C8800E814F3 /* SensitiveInfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = SensitiveInfo.plist; sourceTree = "<group>"; };
 		5B9846BF2BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SensitiveInfoClient+Interface.swift"; sourceTree = "<group>"; };
@@ -4480,6 +4490,7 @@
 				48CFC0D02ADC10D900E77A5C /* SubmitTransactionClient */,
 				83823EA82B72362600827211 /* TokenPriceClient */,
 				48CFBF822ADC10D900E77A5C /* TransactionClient */,
+				5B84339F2CD010AD00CA00F5 /* PreAuthorizationClient */,
 				A462B5752B820D1200C26D20 /* TransactionHistoryClient */,
 				48CFBFAE2ADC10D900E77A5C /* TransportProfileClient */,
 				48CFC0C52ADC10D900E77A5C /* URLFormatterClient */,
@@ -5518,7 +5529,7 @@
 				5B27FBFC2CC7E6C1002975BE /* Sections+View.swift */,
 				5B27FBDF2CC6CCBE002975BE /* Sections+Data.swift */,
 				5B27FBFF2CC7E77B002975BE /* Sections+ExecutionSummary.swift */,
-				5B27FC012CC7ECC2002975BE /* Sections+TransactionSummary.swift */,
+				5B27FC012CC7ECC2002975BE /* Sections+ManifestSummary.swift */,
 				48CFBCE42ADC10D800E77A5C /* Accounts */,
 				48CFBCDE2ADC10D800E77A5C /* Proofs */,
 				5B27FBF62CC716BC002975BE /* Dapps */,
@@ -5726,6 +5737,26 @@
 				5B80FCC82C299159008444F5 /* ArbitraryDataField+Helpers.swift */,
 			);
 			path = ArbitraryDataField;
+			sourceTree = "<group>";
+		};
+		5B84339F2CD010AD00CA00F5 /* PreAuthorizationClient */ = {
+			isa = PBXGroup;
+			children = (
+				5B8433A72CD0127900CA00F5 /* PreAuthorizationClient+Live.swift */,
+				5B8433A02CD010DD00CA00F5 /* PreAuthorizationClient+Interface.swift */,
+				5B8433A52CD011DC00CA00F5 /* PreAuthorizationClient+Test.swift */,
+				5B8433A22CD011A200CA00F5 /* Models */,
+			);
+			path = PreAuthorizationClient;
+			sourceTree = "<group>";
+		};
+		5B8433A22CD011A200CA00F5 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				5B8433A92CD0131500CA00F5 /* PreAuthorizationFailure.swift */,
+				5B8433A32CD011B000CA00F5 /* PreAuthorizationModels.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 		5B9846BE2BBD5EF600E814F3 /* SensitiveInfoClient */ = {
@@ -7354,6 +7385,7 @@
 				48CFC3092ADC10D900E77A5C /* DisplayMnemonics.swift in Sources */,
 				48CFC24D2ADC10D900E77A5C /* GatewayList+Reducer.swift in Sources */,
 				48CFC2C42ADC10D900E77A5C /* AssetTransferMessage+View.swift in Sources */,
+				5B8433A62CD011DE00CA00F5 /* PreAuthorizationClient+Test.swift in Sources */,
 				48CFC5FD2ADC10DA00E77A5C /* HTTPURLSessionResponse.swift in Sources */,
 				83856D622B0279080026452A /* VerifyMnemonic+View.swift in Sources */,
 				A408163A2C7E0D08005E65B9 /* StreamTransactionsResponse.swift in Sources */,
@@ -7407,6 +7439,7 @@
 				5B27FC002CC7E783002975BE /* Sections+ExecutionSummary.swift in Sources */,
 				48CFC43E2ADC10DA00E77A5C /* FactorSourcesClient+Interface.swift in Sources */,
 				48CFC4062ADC10DA00E77A5C /* JSONValue.swift in Sources */,
+				5B8433A12CD010DD00CA00F5 /* PreAuthorizationClient+Interface.swift in Sources */,
 				48CFC5812ADC10DA00E77A5C /* URLFormatterClient+Test.swift in Sources */,
 				48CFC4112ADC10DA00E77A5C /* ErrorQueue+Live.swift in Sources */,
 				48CFC48D2ADC10DA00E77A5C /* DiskPersistenceClient+Live.swift in Sources */,
@@ -7862,6 +7895,7 @@
 				484161472BCAD2D700D2B644 /* Stage1MigrateToSargon+HierarchicalDeterministicPublicKey.swift in Sources */,
 				48CFC3762ADC10D900E77A5C /* ValidatorStakeView.swift in Sources */,
 				48CFC4612ADC10DA00E77A5C /* MakeTransactionHeaderInput.swift in Sources */,
+				5B8433AA2CD0131B00CA00F5 /* PreAuthorizationFailure.swift in Sources */,
 				A40815C62C7E0D08005E65B9 /* NonFungibleResourcesCollectionItemVaultAggregatedVault.swift in Sources */,
 				5B4E1D132CB421EB002FAC2E /* DepositStatus.swift in Sources */,
 				48CFC2F22ADC10D900E77A5C /* CreatePersonaCoordinator+View.swift in Sources */,
@@ -7878,6 +7912,7 @@
 				48CFC3112ADC10D900E77A5C /* AccountsToImport+View.swift in Sources */,
 				48CFC5A12ADC10DA00E77A5C /* Stroke.swift in Sources */,
 				48CFC3812ADC10D900E77A5C /* NFTHelperViews.swift in Sources */,
+				5B8433A42CD011B600CA00F5 /* PreAuthorizationModels.swift in Sources */,
 				48CFC61B2ADC10DA00E77A5C /* P2P+RTCOutgoingMessage.swift in Sources */,
 				48CFC5BF2ADC10DA00E77A5C /* LoadingOverlayView.swift in Sources */,
 				48CFC3FD2ADC10D900E77A5C /* RTCPeerConnection+PeerConnection.swift in Sources */,
@@ -8223,7 +8258,7 @@
 				48AF19CE2BB71C1600796130 /* IntoSargon+Bridge.swift in Sources */,
 				5B9846C02BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift in Sources */,
 				48CFC3492ADC10D900E77A5C /* PersonaDataPermissionBox.swift in Sources */,
-				5B27FC022CC7ECC9002975BE /* Sections+TransactionSummary.swift in Sources */,
+				5B27FC022CC7ECC9002975BE /* Sections+ManifestSummary.swift in Sources */,
 				A408164E2C7E0D08005E65B9 /* TransactionStatus.swift in Sources */,
 				5BBC43A92BBAC6B0005747B1 /* AppTextEditor.swift in Sources */,
 				A41266F12B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift in Sources */,
@@ -8304,6 +8339,7 @@
 				48CFC5BE2ADC10DA00E77A5C /* RoundedCornerBackground.swift in Sources */,
 				A4F30C942C7CA71400F983D6 /* WithNavigationBar.swift in Sources */,
 				48AE39DD2B0CBE3900813CF3 /* AccountRecoveryScanCoordinator+View.swift in Sources */,
+				5B8433A82CD0128000CA00F5 /* PreAuthorizationClient+Live.swift in Sources */,
 				48CFC2FA2ADC10D900E77A5C /* NewPersonaCompletion+View.swift in Sources */,
 				48CFC3702ADC10D900E77A5C /* FungibleAssetList+Reducer.swift in Sources */,
 				83EE48DE2B8F4081006CE672 /* AccountPortfoliosClient+State.swift in Sources */,
