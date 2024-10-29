@@ -129,8 +129,6 @@
 		48CFC28A2ADC10D900E77A5C /* TransactionReviewGuarantees.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCDD2ADC10D800E77A5C /* TransactionReviewGuarantees.swift */; };
 		48CFC28B2ADC10D900E77A5C /* Proofs+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCDF2ADC10D800E77A5C /* Proofs+View.swift */; };
 		48CFC28C2ADC10D900E77A5C /* Proofs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCE02ADC10D800E77A5C /* Proofs.swift */; };
-		48CFC28D2ADC10D900E77A5C /* TransactionReviewRawTransaction+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCE22ADC10D800E77A5C /* TransactionReviewRawTransaction+View.swift */; };
-		48CFC28E2ADC10D900E77A5C /* TransactionReviewRawTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCE32ADC10D800E77A5C /* TransactionReviewRawTransaction.swift */; };
 		48CFC28F2ADC10D900E77A5C /* Accounts+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCE52ADC10D800E77A5C /* Accounts+View.swift */; };
 		48CFC2902ADC10D900E77A5C /* Accounts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCE62ADC10D800E77A5C /* Accounts.swift */; };
 		48CFC2912ADC10D900E77A5C /* TransactionReviewNetworkFee+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCE82ADC10D800E77A5C /* TransactionReviewNetworkFee+View.swift */; };
@@ -1402,8 +1400,6 @@
 		48CFBCDD2ADC10D800E77A5C /* TransactionReviewGuarantees.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionReviewGuarantees.swift; sourceTree = "<group>"; };
 		48CFBCDF2ADC10D800E77A5C /* Proofs+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Proofs+View.swift"; sourceTree = "<group>"; };
 		48CFBCE02ADC10D800E77A5C /* Proofs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Proofs.swift; sourceTree = "<group>"; };
-		48CFBCE22ADC10D800E77A5C /* TransactionReviewRawTransaction+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TransactionReviewRawTransaction+View.swift"; sourceTree = "<group>"; };
-		48CFBCE32ADC10D800E77A5C /* TransactionReviewRawTransaction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionReviewRawTransaction.swift; sourceTree = "<group>"; };
 		48CFBCE52ADC10D800E77A5C /* Accounts+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Accounts+View.swift"; sourceTree = "<group>"; };
 		48CFBCE62ADC10D800E77A5C /* Accounts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Accounts.swift; sourceTree = "<group>"; };
 		48CFBCE82ADC10D800E77A5C /* TransactionReviewNetworkFee+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TransactionReviewNetworkFee+View.swift"; sourceTree = "<group>"; };
@@ -3030,7 +3026,6 @@
 				48CFBCD12ADC10D800E77A5C /* SelectFeePayer */,
 				48CFBCD52ADC10D800E77A5C /* SubmitTransaction */,
 				48CFBCD82ADC10D800E77A5C /* TransactionReviewGuarantees */,
-				48CFBCE12ADC10D800E77A5C /* TransactionReviewRawTransaction */,
 				48CFBCE72ADC10D800E77A5C /* TransactionReviewNetworkFee */,
 				48CFBCEA2ADC10D800E77A5C /* CustomizeFees */,
 			);
@@ -3081,15 +3076,6 @@
 				48CFBCDF2ADC10D800E77A5C /* Proofs+View.swift */,
 			);
 			path = Proofs;
-			sourceTree = "<group>";
-		};
-		48CFBCE12ADC10D800E77A5C /* TransactionReviewRawTransaction */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBCE22ADC10D800E77A5C /* TransactionReviewRawTransaction+View.swift */,
-				48CFBCE32ADC10D800E77A5C /* TransactionReviewRawTransaction.swift */,
-			);
-			path = TransactionReviewRawTransaction;
 			sourceTree = "<group>";
 		};
 		48CFBCE42ADC10D800E77A5C /* Accounts */ = {
@@ -7598,7 +7584,6 @@
 				48CFC2852ADC10D900E77A5C /* SubmitTransaction+View.swift in Sources */,
 				A40815632C7E0D08005E65B9 /* AccountLockerVaultCollectionItemType.swift in Sources */,
 				48CFC47C2ADC10DA00E77A5C /* TransportProfileClient+Test.swift in Sources */,
-				48CFC28D2ADC10D900E77A5C /* TransactionReviewRawTransaction+View.swift in Sources */,
 				48CFC2C92ADC10D900E77A5C /* FungibleResourceAsset+View.swift in Sources */,
 				5B6E11482C45835900C20F2D /* AccountCard+DataSource.swift in Sources */,
 				48CFC40F2ADC10DA00E77A5C /* Logger.swift in Sources */,
@@ -8101,7 +8086,6 @@
 				48CFC4452ADC10DA00E77A5C /* OnboardingClient+Test.swift in Sources */,
 				48CFC32C2ADC10D900E77A5C /* ScanQR+Reducer.swift in Sources */,
 				48CFC37A2ADC10D900E77A5C /* PoolUnitDetails.swift in Sources */,
-				48CFC28E2ADC10D900E77A5C /* TransactionReviewRawTransaction.swift in Sources */,
 				48CFC6042ADC10DA00E77A5C /* ConnectorExtension+Messages.swift in Sources */,
 				48CFC65D2ADC10DB00E77A5C /* Profile+AuthorizedDapps+Edit.swift in Sources */,
 				E7A5AC9D2C108F2F006CB6EC /* WalletInteraction+Extensions.swift in Sources */,
