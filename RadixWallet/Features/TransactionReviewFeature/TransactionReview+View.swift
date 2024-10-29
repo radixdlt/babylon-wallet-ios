@@ -18,12 +18,12 @@ extension TransactionReview.State {
 		.init(
 			message: message.plaintext,
 			viewControlState: viewControlState,
-			rawTransaction: displayMode.rawTransaction,
+			rawManifest: displayMode.rawManifest,
 			showApprovalSlider: reviewedTransaction != nil,
 			canApproveTX: canApproveTX && reviewedTransaction?.feePayingValidation.wrappedValue?.isValid == true,
 			sliderResetDate: sliderResetDate,
 			canToggleViewMode: reviewedTransaction != nil && reviewedTransaction?.isNonConforming == false,
-			viewRawTransactionButtonState: reviewedTransaction?.feePayer.isSuccess == true ? .enabled : .disabled,
+			viewRawManifestButtonState: reviewedTransaction?.feePayer.isSuccess == true ? .enabled : .disabled,
 			proposingDappMetadata: proposingDappMetadata
 		)
 	}
@@ -43,12 +43,12 @@ extension TransactionReview {
 		let message: String?
 
 		let viewControlState: ControlState
-		let rawTransaction: String?
+		let rawManifest: String?
 		let showApprovalSlider: Bool
 		let canApproveTX: Bool
 		let sliderResetDate: Date
 		let canToggleViewMode: Bool
-		let viewRawTransactionButtonState: ControlState
+		let viewRawManifestButtonState: ControlState
 		let proposingDappMetadata: DappMetadata.Ledger?
 
 		var approvalSliderControlState: ControlState {
@@ -84,9 +84,9 @@ extension TransactionReview {
 								Button(asset: AssetResource.iconTxnBlocks) {
 									viewStore.send(.showRawTransactionTapped)
 								}
-								.controlState(viewStore.viewRawTransactionButtonState)
+								.controlState(viewStore.viewRawManifestButtonState)
 								.buttonStyle(.secondaryRectangular(isInToolbar: true))
-								.brightness(viewStore.rawTransaction == nil ? 0 : -0.15)
+								.brightness(viewStore.rawManifest == nil ? 0 : -0.15)
 							}
 						}
 
@@ -119,8 +119,8 @@ extension TransactionReview {
 				VStack(spacing: 0) {
 					header(viewStore.proposingDappMetadata)
 
-					if let rawTransaction = viewStore.rawTransaction {
-						Common.RawTransactionView(transaction: rawTransaction) {
+					if let manifest = viewStore.rawManifest {
+						Common.RawManifestView(manifest: manifest) {
 							viewStore.send(.copyRawTransactionTapped)
 						}
 					} else {
@@ -158,7 +158,7 @@ extension TransactionReview {
 					}
 				}
 				.background(Common.gradientBackground)
-				.animation(.easeInOut, value: viewStore.canToggleViewMode ? viewStore.rawTransaction : nil)
+				.animation(.easeInOut, value: viewStore.canToggleViewMode ? viewStore.rawManifest : nil)
 			}
 			.coordinateSpace(name: coordSpace)
 			.onPreferenceChange(PositionsPreferenceKey.self) { positions in

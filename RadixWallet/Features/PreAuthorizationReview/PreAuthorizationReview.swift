@@ -103,8 +103,8 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 			}
 
 		case .copyRawManifestButtonTapped:
-			guard let manifest = state.displayMode.rawTransaction else {
-				assertionFailure("Copy raw manifest button should only be visible in raw transaction mode")
+			guard let manifest = state.displayMode.rawManifest else {
+				assertionFailure("Copy raw manifest button should only be visible in raw mode")
 				return .none
 			}
 			pasteboardClient.copyString(manifest)
@@ -158,7 +158,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .sections(.delegate(.failedToResolveSections)):
-			state.destination = .rawManifestAlert(.rawTransaction)
+			state.destination = .rawManifestAlert(.rawManifest)
 			return showRawManifest(&state)
 
 		default:
@@ -206,6 +206,18 @@ extension PreAuthorizationReview.State {
 			value.unixTimestampSeconds <= Date.now
 		case .afterDelay, .none:
 			false
+		}
+	}
+}
+
+private extension AlertState<Never> {
+	static var rawManifest: AlertState {
+		AlertState {
+			TextState("Warning")
+		} actions: {
+			.default(TextState(L10n.Common.continue))
+		} message: {
+			TextState("This is a complex pre-authorization that cannot be summarized - the raw pre-authorization manifest will be shown. Do not sign and return unless you understand the contents.")
 		}
 	}
 }

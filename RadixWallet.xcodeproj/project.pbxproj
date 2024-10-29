@@ -708,7 +708,7 @@
 		48FFFB0A2ADC721800B2B213 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB092ADC721800B2B213 /* Atomics */; };
 		48FFFB0D2ADC744700B2B213 /* TextBuilder in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB0C2ADC744700B2B213 /* TextBuilder */; };
 		5B03E3CF2CC1223000E10A64 /* DisplayMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B03E3CE2CC1222D00E10A64 /* DisplayMode.swift */; };
-		5B03E3D12CC127B100E10A64 /* RawTransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B03E3D02CC127B100E10A64 /* RawTransactionView.swift */; };
+		5B03E3D12CC127B100E10A64 /* RawManifestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B03E3D02CC127B100E10A64 /* RawManifestView.swift */; };
 		5B03E3D32CC141D100E10A64 /* InteractionReview+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B03E3D22CC141C200E10A64 /* InteractionReview+Extra.swift */; };
 		5B03E3D52CC1487900E10A64 /* TransferLineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B03E3D42CC1487400E10A64 /* TransferLineView.swift */; };
 		5B135B392C7636DA004AAD2E /* HiddenEntities+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B135B382C7636DA004AAD2E /* HiddenEntities+View.swift */; };
@@ -1949,7 +1949,7 @@
 		48FF43142AE43C7C00C568B9 /* TimeLimit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeLimit.swift; sourceTree = "<group>"; };
 		48FFFAF12ADC23AC00B2B213 /* Exports.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exports.swift; sourceTree = "<group>"; };
 		5B03E3CE2CC1222D00E10A64 /* DisplayMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayMode.swift; sourceTree = "<group>"; };
-		5B03E3D02CC127B100E10A64 /* RawTransactionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RawTransactionView.swift; sourceTree = "<group>"; };
+		5B03E3D02CC127B100E10A64 /* RawManifestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RawManifestView.swift; sourceTree = "<group>"; };
 		5B03E3D22CC141C200E10A64 /* InteractionReview+Extra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InteractionReview+Extra.swift"; sourceTree = "<group>"; };
 		5B03E3D42CC1487400E10A64 /* TransferLineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferLineView.swift; sourceTree = "<group>"; };
 		5B135B382C7636DA004AAD2E /* HiddenEntities+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HiddenEntities+View.swift"; sourceTree = "<group>"; };
@@ -5542,7 +5542,7 @@
 				5B27FBD82CC67655002975BE /* HeadingView.swift */,
 				5B27FBEB2CC70E87002975BE /* ExpandableHeadingView.swift */,
 				5B03E3D42CC1487400E10A64 /* TransferLineView.swift */,
-				5B03E3D02CC127B100E10A64 /* RawTransactionView.swift */,
+				5B03E3D02CC127B100E10A64 /* RawManifestView.swift */,
 				5B4A1AC52CC0150D00679EE6 /* HeaderView.swift */,
 				5B27FBE92CC70C9D002975BE /* ValidatorsView.swift */,
 			);
@@ -8133,7 +8133,7 @@
 				A40815FA2C7E0D08005E65B9 /* ScryptoSborValue.swift in Sources */,
 				48CFC5F02ADC10DA00E77A5C /* UserDefaultsClient+AccountRecovery.swift in Sources */,
 				A408161A2C7E0D08005E65B9 /* StateEntityNonFungibleResourceVaultsPageRequest.swift in Sources */,
-				5B03E3D12CC127B100E10A64 /* RawTransactionView.swift in Sources */,
+				5B03E3D12CC127B100E10A64 /* RawManifestView.swift in Sources */,
 				48CFC3562ADC10D900E77A5C /* ImportOlympiaLedgerAccountsAndFactorSources.swift in Sources */,
 				48CFC5782ADC10DA00E77A5C /* GatewayError.swift in Sources */,
 				48CFC5E62ADC10DA00E77A5C /* SwiftUINavigation+Extra.swift in Sources */,

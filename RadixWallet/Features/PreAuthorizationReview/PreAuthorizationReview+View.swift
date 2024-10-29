@@ -10,7 +10,7 @@ extension PreAuthorizationReview.State {
 			secondsToExpiration: secondsToExpiration,
 			globalControlState: globalControlState,
 			sliderControlState: sliderControlState,
-			showRawTransactionButton: showRawTransactionButton
+			showRawManifestButton: showRawManifestButton
 		)
 	}
 }
@@ -25,7 +25,7 @@ extension PreAuthorizationReview {
 		let secondsToExpiration: Int?
 		let globalControlState: ControlState
 		let sliderControlState: ControlState
-		let showRawTransactionButton: Bool
+		let showRawManifestButton: Bool
 
 		var dAppName: String? {
 			dAppMetadata?.name?.rawValue
@@ -81,10 +81,10 @@ extension PreAuthorizationReview {
 					header(dAppMetadata: viewStore.dAppMetadata)
 
 					Group {
-						if let rawContent = viewStore.displayMode.rawTransaction {
-							rawTransaction(rawContent)
+						if let manifest = viewStore.displayMode.rawManifest {
+							rawManifest(manifest)
 						} else {
-							details(viewStore.showRawTransactionButton)
+							details(viewStore.showRawManifestButton)
 						}
 					}
 					.background(Common.gradientBackground)
@@ -104,7 +104,7 @@ extension PreAuthorizationReview {
 						.controlState(viewStore.sliderControlState)
 						.padding(.horizontal, .medium2)
 				}
-				.animation(.easeInOut, value: viewStore.displayMode.rawTransaction)
+				.animation(.easeInOut, value: viewStore.displayMode.rawManifest)
 			}
 			.coordinateSpace(name: coordSpace)
 			.onPreferenceChange(PositionsPreferenceKey.self) { positions in
@@ -131,21 +131,21 @@ extension PreAuthorizationReview {
 			.padding(.bottom, .medium3)
 		}
 
-		private func rawTransaction(_ content: String) -> some SwiftUI.View {
-			Common.RawTransactionView(transaction: content) {
+		private func rawManifest(_ manifest: String) -> some SwiftUI.View {
+			Common.RawManifestView(manifest: manifest) {
 				store.send(.view(.copyRawManifestButtonTapped))
 			} toggleAction: {
 				store.send(.view(.toggleDisplayModeButtonTapped))
 			}
 		}
 
-		private func details(_ showRawTransactionButton: Bool) -> some SwiftUI.View {
+		private func details(_ showRawManifestButton: Bool) -> some SwiftUI.View {
 			sections
 				.padding(.top, .large2 + .small3)
 				.padding(.horizontal, .small1)
 				.padding(.bottom, .medium1)
 				.overlay(alignment: .topTrailing) {
-					if showRawTransactionButton {
+					if showRawManifestButton {
 						Button(asset: AssetResource.code) {
 							store.send(.view(.toggleDisplayModeButtonTapped))
 						}
@@ -249,7 +249,7 @@ private extension PreAuthorizationReview.State {
 		isExpired ? .disabled : globalControlState
 	}
 
-	var showRawTransactionButton: Bool {
+	var showRawManifestButton: Bool {
 		globalControlState == .enabled
 	}
 }

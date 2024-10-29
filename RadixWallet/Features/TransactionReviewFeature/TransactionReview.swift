@@ -795,7 +795,7 @@ extension ReviewedTransaction {
 	}
 }
 
-extension AlertState<Never> {
+private extension AlertState<Never> {
 	static var rawTransaction: AlertState {
 		AlertState {
 			TextState(L10n.TransactionReview.NonConformingManifestWarning.title)
