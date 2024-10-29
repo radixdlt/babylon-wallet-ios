@@ -268,7 +268,7 @@ extension AccountRecoveryScanInProgress {
 		let paths = try derivationIndices.map { index in
 			if state.forOlympiaAccounts {
 				try Bip44LikePath(
-					index: HdPathComponent.unsecurified(Unsecurified.hardened(UnsecurifiedHardened(localKeySpace: index)))
+					index: HdPathComponent.unsecurifiedComponent(Unsecurified.hardenedComponent(UnsecurifiedHardened(localKeySpace: index)))
 				)
 				.asGeneral
 			} else {
