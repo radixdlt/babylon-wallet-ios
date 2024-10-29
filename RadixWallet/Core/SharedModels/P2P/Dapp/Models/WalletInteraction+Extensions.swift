@@ -41,6 +41,20 @@ extension DappToWalletInteractionSendTransactionItem {
 	}
 }
 
+extension DappToWalletInteractionSubintentRequestItem {
+	init(
+		unvalidatedManifest: UnvalidatedTransactionManifest,
+		expiration: DappToWalletInteractionSubintentExpiration? = nil
+	) {
+		self.init(
+			version: .default,
+			unvalidatedManifest: unvalidatedManifest,
+			message: nil,
+			expiration: expiration
+		)
+	}
+}
+
 // MARK: - DappToWalletInteraction.RequestValidation
 extension DappToWalletInteraction {
 	struct RequestValidation: Sendable, Hashable {
