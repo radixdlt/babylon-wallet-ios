@@ -32,6 +32,7 @@ extension PreAuthorizationReview {
 		}
 	}
 
+	@MainActor
 	struct View: SwiftUI.View {
 		let store: StoreOf<PreAuthorizationReview>
 
@@ -56,6 +57,7 @@ extension PreAuthorizationReview {
 					.onAppear {
 						store.send(.view(.appeared))
 					}
+					.destinations(with: store)
 			}
 		}
 
@@ -131,7 +133,7 @@ extension PreAuthorizationReview {
 
 		private func rawTransaction(_ content: String) -> some SwiftUI.View {
 			Common.RawTransactionView(transaction: content) {
-				store.send(.view(.copyRawTransactionButtonTapped))
+				store.send(.view(.copyRawManifestButtonTapped))
 			} toggleAction: {
 				store.send(.view(.toggleDisplayModeButtonTapped))
 			}
@@ -151,6 +153,7 @@ extension PreAuthorizationReview {
 						.padding(.medium3)
 					}
 				}
+				.frame(minHeight: .standardButtonHeight + 2 * .medium3, alignment: .top)
 		}
 
 		private var sections: some SwiftUI.View {
@@ -248,5 +251,26 @@ private extension PreAuthorizationReview.State {
 
 	var showRawTransactionButton: Bool {
 		globalControlState == .enabled
+	}
+}
+
+extension StoreOf<PreAuthorizationReview> {
+	var destination: PresentationStoreOf<PreAuthorizationReview.Destination> {
+		func scopeState(state: State) -> PresentationState<PreAuthorizationReview.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<PreAuthorizationReview>) -> some View {
+		let destinationStore = store.destination
+		return rawManifestAlert(with: destinationStore)
+	}
+
+	private func rawManifestAlert(with destinationStore: PresentationStoreOf<PreAuthorizationReview.Destination>) -> some View {
+		alert(store: destinationStore.scope(state: \.rawManifestAlert, action: \.rawManifestAlert))
 	}
 }

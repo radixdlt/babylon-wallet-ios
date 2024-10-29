@@ -18,12 +18,15 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 
 		// Sections
 		var sections: Common.Sections.State = .init(kind: .preAuthorization)
+
+		@PresentationState
+		var destination: Destination.State? = nil
 	}
 
 	enum ViewAction: Sendable, Equatable {
 		case appeared
 		case toggleDisplayModeButtonTapped
-		case copyRawTransactionButtonTapped
+		case copyRawManifestButtonTapped
 	}
 
 	@CasePathable
@@ -40,6 +43,26 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		case failed(PreAuthorizationFailure)
 	}
 
+	struct Destination: DestinationReducer {
+		@CasePathable
+		enum State: Sendable, Hashable {
+			case signing(Signing.State)
+			case rawManifestAlert(AlertState<Never>)
+		}
+
+		@CasePathable
+		enum Action: Sendable, Equatable {
+			case signing(Signing.Action)
+			case rawManifestAlert(Never)
+		}
+
+		var body: some ReducerOf<Self> {
+			Scope(state: \.signing, action: \.signing) {
+				Signing()
+			}
+		}
+	}
+
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.pasteboardClient) var pasteboardClient
 	@Dependency(\.preAuthorizationClient) var preAuthorizationClient
@@ -50,7 +73,12 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 			Common.Sections()
 		}
 		Reduce(core)
+			.ifLet(destinationPath, action: \.destination) {
+				Destination()
+			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -68,13 +96,13 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		case .toggleDisplayModeButtonTapped:
 			switch state.displayMode {
 			case .detailed:
-				return showRawTransaction(&state)
+				return showRawManifest(&state)
 			case .raw:
 				state.displayMode = .detailed
 				return .none
 			}
 
-		case .copyRawTransactionButtonTapped:
+		case .copyRawManifestButtonTapped:
 			guard let manifest = state.displayMode.rawTransaction else {
 				assertionFailure("Copy raw manifest button should only be visible in raw transaction mode")
 				return .none
@@ -130,10 +158,11 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .sections(.delegate(.failedToResolveSections)):
-			showRawTransaction(&state)
+			state.destination = .rawManifestAlert(.rawTransaction)
+			return showRawManifest(&state)
 
 		default:
-			.none
+			return .none
 		}
 	}
 }
@@ -148,14 +177,14 @@ private extension PreAuthorizationReview {
 		.cancellable(id: CancellableId.expirationTimer, cancelInFlight: true)
 	}
 
-	func showRawTransaction(_ state: inout State) -> Effect<Action> {
-		guard let reviewedTransaction = state.reviewedPreAuthorization else {
+	func showRawManifest(_ state: inout State) -> Effect<Action> {
+		guard let reviewedPreAuthorization = state.reviewedPreAuthorization else {
 			struct MissingReviewedPreAuthorization: Error {}
 			errorQueue.schedule(MissingReviewedPreAuthorization())
 			return .none
 		}
-		// TODO: Confirm if we shouldn't expose manifest.instructionsString
-		state.displayMode = .raw(reviewedTransaction.manifest.manifestString)
+
+		state.displayMode = .raw(reviewedPreAuthorization.manifest.manifestString)
 		return .none
 	}
 }

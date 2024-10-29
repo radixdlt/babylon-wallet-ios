@@ -39,6 +39,7 @@ extension InteractionReview.Sections {
 		var isExpandedClaimingFromValidators: Bool { claimingFromValidators?.isExpanded == true }
 	}
 
+	@MainActor
 	struct View: SwiftUI.View {
 		let store: StoreOf<InteractionReview.Sections>
 
@@ -270,11 +271,6 @@ private extension View {
 			.lsuDetails(with: destinationStore)
 			.poolUnitDetails(with: destinationStore)
 			.unknownComponents(with: destinationStore)
-			.rawTransactionAlert(with: destinationStore)
-	}
-
-	private func rawTransactionAlert(with destinationStore: PresentationStoreOf<Destination>) -> some View {
-		alert(store: destinationStore.scope(state: \.rawTransactionAlert, action: \.rawTransactionAlert))
 	}
 
 	private func dApp(with destinationStore: PresentationStoreOf<Destination>) -> some View {

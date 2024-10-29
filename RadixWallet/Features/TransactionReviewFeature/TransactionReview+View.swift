@@ -236,6 +236,7 @@ private extension View {
 			.customizeFees(with: destinationStore)
 			.signing(with: destinationStore)
 			.submitting(with: destinationStore)
+			.rawTransactionAlert(with: destinationStore)
 	}
 
 	private func customizeGuarantees(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
@@ -272,6 +273,10 @@ private extension View {
 			action: TransactionReview.Destination.Action.submitting,
 			content: { SubmitTransaction.View(store: $0) }
 		)
+	}
+
+	private func rawTransactionAlert(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
+		alert(store: destinationStore.scope(state: \.rawTransactionAlert, action: \.rawTransactionAlert))
 	}
 }
 

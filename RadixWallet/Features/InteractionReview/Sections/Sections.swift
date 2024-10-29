@@ -73,7 +73,6 @@ extension InteractionReview {
 				case poolUnitDetails(PoolUnitDetails.State)
 				case lsuDetails(LSUDetails.State)
 				case unknownDappComponents(Common.UnknownDappComponents.State)
-				case rawTransactionAlert(AlertState<Action.RawTransactionAlert>)
 			}
 
 			@CasePathable
@@ -84,11 +83,6 @@ extension InteractionReview {
 				case lsuDetails(LSUDetails.Action)
 				case poolUnitDetails(PoolUnitDetails.Action)
 				case unknownDappComponents(Common.UnknownDappComponents.Action)
-				case rawTransactionAlert(RawTransactionAlert)
-
-				enum RawTransactionAlert: Sendable, Equatable {
-					case continueTapped
-				}
 			}
 
 			var body: some ReducerOf<Self> {
@@ -175,7 +169,6 @@ extension InteractionReview {
 
 			case let .setSections(sections):
 				guard let sections else {
-					state.destination = .rawTransactionAlert(.rawTransaction)
 					return .send(.delegate(.failedToResolveSections))
 				}
 				state.withdrawals = sections.withdrawals
@@ -311,19 +304,5 @@ private extension InteractionReview.Sections {
 		}
 
 		return .none
-	}
-}
-
-extension AlertState<InteractionReview.Sections.Destination.Action.RawTransactionAlert> {
-	static var rawTransaction: AlertState {
-		AlertState {
-			TextState(L10n.TransactionReview.NonConformingManifestWarning.title)
-		} actions: {
-			ButtonState(action: .continueTapped) {
-				TextState(L10n.Common.continue)
-			}
-		} message: {
-			TextState(L10n.TransactionReview.NonConformingManifestWarning.message)
-		}
 	}
 }
