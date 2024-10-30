@@ -23,6 +23,8 @@ extension InteractionReview {
 			// The proofs are set here (within the resolve logic) but may be rendered and handled by the parent view, in the case they are placed outside the Sections (TransactionReview).
 			var proofs: Proofs.State? = nil
 
+			var showPossibleDappCalls = false
+
 			@PresentationState
 			var destination: Destination.State? = nil
 		}
@@ -189,7 +191,7 @@ extension InteractionReview {
 		func reduce(into state: inout State, parentAction: InternalAction.ParentAction) -> Effect<Action> {
 			switch parentAction {
 			case let .resolveExecutionSummary(executionSummary, networkID):
-				.run { send in
+				return .run { send in
 					let sections = try await sections(for: executionSummary, networkID: networkID)
 					await send(.internal(.setSections(sections)))
 				} catch: { error, send in
@@ -198,7 +200,8 @@ extension InteractionReview {
 				}
 
 			case let .resolveManifestSummary(manifestSummary, networkID):
-				.run { send in
+				state.showPossibleDappCalls = true
+				return .run { send in
 					let sections = try await sections(for: manifestSummary, networkID: networkID)
 					await send(.internal(.setSections(sections)))
 				} catch: { error, send in
@@ -207,7 +210,7 @@ extension InteractionReview {
 				}
 
 			case let .showResourceDetails(resource, details):
-				resourceDetailsEffect(state: &state, resource: resource, details: details)
+				return resourceDetailsEffect(state: &state, resource: resource, details: details)
 			}
 		}
 

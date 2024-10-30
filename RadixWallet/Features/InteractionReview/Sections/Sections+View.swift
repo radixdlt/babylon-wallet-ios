@@ -238,16 +238,6 @@ extension InteractionReview.Sections.State {
 	var showTransferLine: Bool {
 		withdrawals != nil && deposits != nil
 	}
-
-	var showPossibleDappCalls: Bool {
-		switch kind {
-		case .transaction:
-			false
-		case .preAuthorization:
-			// TODO: Only show for open pre authorizations
-			true
-		}
-	}
 }
 
 extension StoreOf<InteractionReview.Sections> {
