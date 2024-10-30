@@ -19,7 +19,7 @@ extension PreAuthorizationClient: DependencyKey {
 			let kind = try await analysePreview(request: request)
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 
-			return PreAuthorizationToReview(
+			return PreAuthorizationPreview(
 				kind: kind,
 				networkID: networkID
 			)

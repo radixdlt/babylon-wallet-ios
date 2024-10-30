@@ -7,10 +7,9 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		let unvalidatedManifest: UnvalidatedSubintentManifest
 		let expiration: Expiration?
 		let nonce: Nonce
-		let signTransactionPurpose: SigningPurpose.SignTransactionPurpose
 		let dAppMetadata: DappMetadata.Ledger?
 
-		var reviewedPreAuthorization: ReviewedPreAuthorization?
+		var preview: PreAuthorizationPreview?
 
 		var displayMode: Common.DisplayMode = .detailed
 		var sliderResetDate: Date = .now // TODO: reset when it corresponds
@@ -35,7 +34,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case previewLoaded(TaskResult<PreAuthorizationToReview>)
+		case previewLoaded(TaskResult<PreAuthorizationPreview>)
 		case updateSecondsToExpiration(Date)
 	}
 
@@ -124,7 +123,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 			return .send(.delegate(.failed(failure)))
 
 		case let .previewLoaded(.success(preview)):
-			state.reviewedPreAuthorization = .init(manifest: preview.manifest)
+			state.preview = preview
 
 			var effects: [Effect<Action>] = []
 
@@ -178,24 +177,21 @@ private extension PreAuthorizationReview {
 	}
 
 	func showRawManifest(_ state: inout State) -> Effect<Action> {
-		guard let reviewedPreAuthorization = state.reviewedPreAuthorization else {
-			struct MissingReviewedPreAuthorization: Error {}
-			errorQueue.schedule(MissingReviewedPreAuthorization())
+		guard let preview = state.preview else {
+			struct MissingPreAuthorizationPreview: Error {}
+			errorQueue.schedule(MissingPreAuthorizationPreview())
 			return .none
 		}
 
-		state.displayMode = .raw(reviewedPreAuthorization.manifest.manifestString)
+		state.displayMode = .raw(preview.manifest.manifestString)
 		return .none
 	}
 }
 
+// MARK: PreAuthorizationReview.CancellableId
 extension PreAuthorizationReview {
 	private enum CancellableId: Hashable {
 		case expirationTimer
-	}
-
-	struct ReviewedPreAuthorization: Sendable, Hashable {
-		let manifest: SubintentManifest
 	}
 }
 

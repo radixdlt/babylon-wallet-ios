@@ -1042,7 +1042,6 @@ extension DappInteractionFlow.Path.State {
 				unvalidatedManifest: item.unvalidatedManifest,
 				expiration: item.expiration,
 				nonce: .secureRandom(),
-				signTransactionPurpose: .manifestFromDapp,
 				dAppMetadata: dappMetadata.onLedger
 			))
 		}

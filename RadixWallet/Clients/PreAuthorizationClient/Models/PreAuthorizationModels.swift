@@ -1,6 +1,6 @@
 import Foundation
 
-struct PreAuthorizationToReview: Sendable, Hashable {
+struct PreAuthorizationPreview: Sendable, Hashable {
 	let kind: PreAuthToReview
 	let networkID: NetworkID
 

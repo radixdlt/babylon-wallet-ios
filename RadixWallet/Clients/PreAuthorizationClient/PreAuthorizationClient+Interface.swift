@@ -5,7 +5,7 @@ struct PreAuthorizationClient: Sendable {
 
 // MARK: PreAuthorizationClient.GetPreview
 extension PreAuthorizationClient {
-	typealias GetPreview = @Sendable (GetPreviewRequest) async throws -> PreAuthorizationToReview
+	typealias GetPreview = @Sendable (GetPreviewRequest) async throws -> PreAuthorizationPreview
 }
 
 // MARK: PreAuthorizationClient.GetPreviewRequest

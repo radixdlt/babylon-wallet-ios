@@ -243,7 +243,7 @@ private extension PreAuthorizationReview.View {
 
 private extension PreAuthorizationReview.State {
 	var globalControlState: ControlState {
-		reviewedPreAuthorization != nil ? .enabled : .loading(.global(text: L10n.PreAuthorizationReview.loading))
+		preview != nil ? .enabled : .loading(.global(text: L10n.PreAuthorizationReview.loading))
 	}
 
 	var sliderControlState: ControlState {
