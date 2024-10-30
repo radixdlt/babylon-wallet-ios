@@ -16,7 +16,7 @@ extension InteractionReview.Accounts {
 						)
 
 						if store.enableCustomizeGuarantees {
-							Button(L10n.TransactionReview.customizeGuaranteesButtonTitle) {
+							Button(L10n.InteractionReview.customizeGuaranteesButtonTitle) {
 								store.send(.view(.customizeGuaranteesTapped))
 							}
 							.textStyle(.body1Header)
@@ -85,7 +85,7 @@ struct TransactionReviewResourceView: View {
 		guard let isHidden = transfer.isHidden, isHidden else {
 			return nil
 		}
-		return isDeposit ? L10n.TransactionReview.HiddenAsset.deposit : L10n.TransactionReview.HiddenAsset.withdraw
+		return isDeposit ? L10n.InteractionReview.HiddenAsset.deposit : L10n.InteractionReview.HiddenAsset.withdraw
 	}
 }
 

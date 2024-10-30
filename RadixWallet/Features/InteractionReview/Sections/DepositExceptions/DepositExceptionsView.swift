@@ -116,11 +116,11 @@ extension ResourcePreferenceUpdate {
 	var text: String {
 		switch self {
 		case .set(.allowed):
-			L10n.TransactionReview.AccountDepositSettings.assetChangeAllow
+			L10n.InteractionReview.DepositExceptions.assetChangeAllow
 		case .set(.disallowed):
-			L10n.TransactionReview.AccountDepositSettings.assetChangeDisallow
+			L10n.InteractionReview.DepositExceptions.assetChangeDisallow
 		case .remove:
-			L10n.TransactionReview.AccountDepositSettings.assetChangeClear
+			L10n.InteractionReview.DepositExceptions.assetChangeClear
 		}
 	}
 }
@@ -138,9 +138,9 @@ extension InteractionReview.DepositExceptionsChange.AllowedDepositorChange.Chang
 	var text: String {
 		switch self {
 		case .added:
-			L10n.TransactionReview.AccountDepositSettings.depositorChangeAdd
+			L10n.InteractionReview.DepositExceptions.depositorChangeAdd
 		case .removed:
-			L10n.TransactionReview.AccountDepositSettings.depositorChangeRemove
+			L10n.InteractionReview.DepositExceptions.depositorChangeRemove
 		}
 	}
 }

@@ -30,57 +30,57 @@ extension InteractionReview {
 		}
 
 		static let message = HeadingView(
-			L10n.TransactionReview.messageHeading,
+			L10n.InteractionReview.messageHeading,
 			icon: AssetResource.transactionReviewMessage
 		)
 
 		static let withdrawing = HeadingView(
-			L10n.TransactionReview.withdrawalsHeading,
+			L10n.InteractionReview.withdrawalsHeading,
 			icon: AssetResource.transactionReviewWithdrawing
 		)
 
 		static let depositing = HeadingView(
-			L10n.TransactionReview.depositsHeading,
+			L10n.InteractionReview.depositsHeading,
 			icon: AssetResource.transactionReviewDepositing
 		)
 
 		static let usingDapps = HeadingView(
-			L10n.TransactionReview.usingDappsHeading,
+			L10n.InteractionReview.usingDappsHeading,
 			icon: AssetResource.transactionReviewDapps
 		)
 
 		static let contributingToPools = HeadingView(
-			L10n.TransactionReview.poolContributionHeading,
+			L10n.InteractionReview.poolContributionHeading,
 			icon: AssetResource.transactionReviewPools
 		)
 
 		static let redeemingFromPools = HeadingView(
-			L10n.TransactionReview.poolRedemptionHeading,
+			L10n.InteractionReview.poolRedemptionHeading,
 			icon: AssetResource.transactionReviewPools
 		)
 
 		static let stakingToValidators = HeadingView(
-			L10n.TransactionReview.stakingToValidatorsHeading,
+			L10n.InteractionReview.stakingToValidatorsHeading,
 			icon: AssetResource.iconValidator
 		)
 
 		static let unstakingFromValidators = HeadingView(
-			L10n.TransactionReview.unstakingFromValidatorsHeading,
+			L10n.InteractionReview.unstakingFromValidatorsHeading,
 			icon: AssetResource.iconValidator
 		)
 
 		static let claimingFromValidators = HeadingView(
-			L10n.TransactionReview.claimFromValidatorsHeading,
+			L10n.InteractionReview.claimFromValidatorsHeading,
 			icon: AssetResource.iconValidator
 		)
 
 		static let depositSetting = HeadingView(
-			L10n.TransactionReview.thirdPartyDepositSettingHeading,
+			L10n.InteractionReview.thirdPartyDepositSettingHeading,
 			icon: AssetResource.transactionReviewDepositSetting
 		)
 
 		static let depositExceptions = HeadingView(
-			L10n.TransactionReview.thirdPartyDepositExceptionsHeading,
+			L10n.InteractionReview.thirdPartyDepositExceptionsHeading,
 			icon: AssetResource.transactionReviewDepositSetting
 		)
 	}
