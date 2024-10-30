@@ -76,20 +76,7 @@ extension P2P.ConnectorExtension.Request {
 				let ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
 				let compiledTransactionIntent: HexCodable
 				let displayHash: Bool
-				let mode: String
-
-				init(
-					signers: [P2P.LedgerHardwareWallet.KeyParameters],
-					ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice,
-					compiledTransactionIntent: HexCodable,
-					displayHash: Bool
-				) {
-					self.signers = signers
-					self.ledgerDevice = ledgerDevice
-					self.compiledTransactionIntent = compiledTransactionIntent
-					self.mode = "summary"
-					self.displayHash = displayHash
-				}
+				let mode: String = "summary"
 			}
 
 			struct SignPreAuthorization: Sendable, Hashable, Encodable {
@@ -97,20 +84,7 @@ extension P2P.ConnectorExtension.Request {
 				let ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
 				let compiledSubintent: HexCodable
 				let displayHash: Bool
-				let mode: String
-
-				init(
-					signers: [P2P.LedgerHardwareWallet.KeyParameters],
-					ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice,
-					compiledSubintent: HexCodable,
-					displayHash: Bool
-				) {
-					self.signers = signers
-					self.ledgerDevice = ledgerDevice
-					self.compiledSubintent = compiledSubintent
-					self.mode = "summary"
-					self.displayHash = displayHash
-				}
+				let mode: String = "summary"
 			}
 
 			struct SignAuthChallenge: Sendable, Hashable, Encodable {
@@ -119,20 +93,6 @@ extension P2P.ConnectorExtension.Request {
 				let challenge: DappToWalletInteractionAuthChallengeNonce
 				let origin: DappOrigin
 				let dAppDefinitionAddress: AccountAddress
-
-				init(
-					signers: [P2P.LedgerHardwareWallet.KeyParameters],
-					ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice,
-					challenge: DappToWalletInteractionAuthChallengeNonce,
-					origin: DappOrigin,
-					dAppDefinitionAddress: AccountAddress
-				) {
-					self.signers = signers
-					self.ledgerDevice = ledgerDevice
-					self.challenge = challenge
-					self.origin = origin
-					self.dAppDefinitionAddress = dAppDefinitionAddress
-				}
 			}
 
 			struct DeriveAndDisplayAddress: Sendable, Hashable, Encodable {

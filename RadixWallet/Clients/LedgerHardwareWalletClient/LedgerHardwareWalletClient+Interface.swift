@@ -37,65 +37,27 @@ enum VerifyAddressOutcome: Sendable, Hashable {
 
 // MARK: - SignTransactionWithLedgerRequest
 struct SignTransactionWithLedgerRequest: Sendable, Hashable {
-	let signers: NonEmpty<IdentifiedArrayOf<Signer>>
 	let ledger: LedgerHardwareWalletFactorSource
+	let signers: NonEmpty<IdentifiedArrayOf<Signer>>
 	let transactionIntent: TransactionIntent
 	let displayHashOnLedgerDisplay: Bool
-
-	init(
-		ledger: LedgerHardwareWalletFactorSource,
-		signers: NonEmpty<IdentifiedArrayOf<Signer>>,
-		transactionIntent: TransactionIntent,
-		displayHashOnLedgerDisplay: Bool
-	) {
-		self.signers = signers
-		self.ledger = ledger
-		self.transactionIntent = transactionIntent
-		self.displayHashOnLedgerDisplay = displayHashOnLedgerDisplay
-	}
 }
 
 // MARK: - SignPreAuthorizationWithLedgerRequest
 struct SignPreAuthorizationWithLedgerRequest: Sendable, Hashable {
-	let signers: NonEmpty<IdentifiedArrayOf<Signer>>
 	let ledger: LedgerHardwareWalletFactorSource
+	let signers: NonEmpty<IdentifiedArrayOf<Signer>>
 	let subintent: Subintent
 	let displayHashOnLedgerDisplay: Bool
-
-	init(
-		ledger: LedgerHardwareWalletFactorSource,
-		signers: NonEmpty<IdentifiedArrayOf<Signer>>,
-		subintent: Subintent,
-		displayHashOnLedgerDisplay: Bool
-	) {
-		self.signers = signers
-		self.ledger = ledger
-		self.subintent = subintent
-		self.displayHashOnLedgerDisplay = displayHashOnLedgerDisplay
-	}
 }
 
 // MARK: - SignAuthChallengeWithLedgerRequest
 struct SignAuthChallengeWithLedgerRequest: Sendable, Hashable {
-	let signers: NonEmpty<IdentifiedArrayOf<Signer>>
 	let ledger: LedgerHardwareWalletFactorSource
+	let signers: NonEmpty<IdentifiedArrayOf<Signer>>
 	let challenge: DappToWalletInteractionAuthChallengeNonce
 	let origin: DappOrigin
 	let dAppDefinitionAddress: AccountAddress
-
-	init(
-		ledger: LedgerHardwareWalletFactorSource,
-		signers: NonEmpty<IdentifiedArrayOf<Signer>>,
-		challenge: DappToWalletInteractionAuthChallengeNonce,
-		origin: DappOrigin,
-		dAppDefinitionAddress: AccountAddress
-	) {
-		self.ledger = ledger
-		self.signers = signers
-		self.challenge = challenge
-		self.origin = origin
-		self.dAppDefinitionAddress = dAppDefinitionAddress
-	}
 }
 
 // MARK: - FailedToFindLedger
