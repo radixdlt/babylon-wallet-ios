@@ -6,6 +6,7 @@ struct LedgerHardwareWalletClient: Sendable {
 	var getDeviceInfo: GetDeviceInfo
 	var derivePublicKeys: DerivePublicKeys
 	var signTransaction: SignTransaction
+	var signPreAuthorization: SignPreAuthorization
 	var signAuthChallenge: SignAuthChallenge
 	var deriveAndDisplayAddress: DeriveAndDisplayAddress
 }
@@ -18,6 +19,7 @@ extension LedgerHardwareWalletClient {
 	typealias DeriveAndDisplayAddress = @Sendable (P2P.LedgerHardwareWallet.KeyParameters, LedgerHardwareWalletFactorSource) async throws -> (HierarchicalDeterministicPublicKey, String)
 
 	typealias SignTransaction = @Sendable (SignTransactionWithLedgerRequest) async throws -> Set<SignatureOfEntity>
+	typealias SignPreAuthorization = @Sendable (SignPreAuthorizationWithLedgerRequest) async throws -> Set<SignatureOfEntity>
 	typealias SignAuthChallenge = @Sendable (SignAuthChallengeWithLedgerRequest) async throws -> Set<SignatureOfEntity>
 }
 
@@ -35,45 +37,27 @@ enum VerifyAddressOutcome: Sendable, Hashable {
 
 // MARK: - SignTransactionWithLedgerRequest
 struct SignTransactionWithLedgerRequest: Sendable, Hashable {
-	let signers: NonEmpty<IdentifiedArrayOf<Signer>>
 	let ledger: LedgerHardwareWalletFactorSource
+	let signers: NonEmpty<IdentifiedArrayOf<Signer>>
 	let transactionIntent: TransactionIntent
 	let displayHashOnLedgerDisplay: Bool
+}
 
-	init(
-		ledger: LedgerHardwareWalletFactorSource,
-		signers: NonEmpty<IdentifiedArrayOf<Signer>>,
-		transactionIntent: TransactionIntent,
-		displayHashOnLedgerDisplay: Bool
-	) {
-		self.signers = signers
-		self.ledger = ledger
-		self.transactionIntent = transactionIntent
-		self.displayHashOnLedgerDisplay = displayHashOnLedgerDisplay
-	}
+// MARK: - SignPreAuthorizationWithLedgerRequest
+struct SignPreAuthorizationWithLedgerRequest: Sendable, Hashable {
+	let ledger: LedgerHardwareWalletFactorSource
+	let signers: NonEmpty<IdentifiedArrayOf<Signer>>
+	let subintent: Subintent
+	let displayHashOnLedgerDisplay: Bool
 }
 
 // MARK: - SignAuthChallengeWithLedgerRequest
 struct SignAuthChallengeWithLedgerRequest: Sendable, Hashable {
-	let signers: NonEmpty<IdentifiedArrayOf<Signer>>
 	let ledger: LedgerHardwareWalletFactorSource
+	let signers: NonEmpty<IdentifiedArrayOf<Signer>>
 	let challenge: DappToWalletInteractionAuthChallengeNonce
 	let origin: DappOrigin
 	let dAppDefinitionAddress: AccountAddress
-
-	init(
-		ledger: LedgerHardwareWalletFactorSource,
-		signers: NonEmpty<IdentifiedArrayOf<Signer>>,
-		challenge: DappToWalletInteractionAuthChallengeNonce,
-		origin: DappOrigin,
-		dAppDefinitionAddress: AccountAddress
-	) {
-		self.ledger = ledger
-		self.signers = signers
-		self.challenge = challenge
-		self.origin = origin
-		self.dAppDefinitionAddress = dAppDefinitionAddress
-	}
 }
 
 // MARK: - FailedToFindLedger

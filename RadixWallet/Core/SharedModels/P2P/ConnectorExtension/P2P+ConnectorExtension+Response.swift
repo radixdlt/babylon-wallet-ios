@@ -78,20 +78,13 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 		case getDeviceInfo(GetDeviceInfo)
 		case derivePublicKeys([DerivedPublicKey])
 		case signTransaction([SignatureOfSigner])
+		case signSubintentHash([SignatureOfSigner])
 		case signChallenge([SignatureOfSigner])
 		case deriveAndDisplayAddress(DerivedAddress)
 
 		struct GetDeviceInfo: Sendable, Hashable, Decodable {
 			let id: Exactly32Bytes
 			let model: P2P.LedgerHardwareWallet.Model
-
-			init(
-				id: Exactly32Bytes,
-				model: P2P.LedgerHardwareWallet.Model
-			) {
-				self.id = id
-				self.model = model
-			}
 		}
 
 		struct DerivedAddress: Sendable, Hashable, Decodable {
@@ -103,29 +96,11 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 			let curve: String
 			let derivationPath: String
 			let publicKey: HexCodable
-
-			init(
-				curve: String,
-				derivationPath: String,
-				publicKey: HexCodable
-			) {
-				self.curve = curve
-				self.derivationPath = derivationPath
-				self.publicKey = publicKey
-			}
 		}
 
 		struct SignatureOfSigner: Sendable, Hashable, Decodable {
 			let signature: HexCodable
 			let derivedPublicKey: DerivedPublicKey
-
-			init(
-				derivedPublicKey: DerivedPublicKey,
-				signature: HexCodable
-			) {
-				self.derivedPublicKey = derivedPublicKey
-				self.signature = signature
-			}
 		}
 	}
 
@@ -160,6 +135,10 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 		case .signTransaction:
 			self.response = try decodeResponse {
 				Success.signTransaction($0)
+			}
+		case .signSubintentHash:
+			self.response = try decodeResponse {
+				Success.signSubintentHash($0)
 			}
 		case .signChallenge:
 			self.response = try decodeResponse {
