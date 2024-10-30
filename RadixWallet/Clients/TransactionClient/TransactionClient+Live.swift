@@ -1,32 +1,3 @@
-// MARK: - MyEntitiesInvolvedInTransaction
-struct MyEntitiesInvolvedInTransaction: Sendable, Hashable {
-	/// A set of all MY personas or accounts in the manifest which had methods invoked on them that would typically require auth (or a signature) to be called successfully.
-	var entitiesRequiringAuth: OrderedSet<AccountOrPersona> {
-		OrderedSet(accountsRequiringAuth.map { .account($0) } + identitiesRequiringAuth.map { .persona($0) })
-	}
-
-	let identitiesRequiringAuth: OrderedSet<Persona>
-	let accountsRequiringAuth: OrderedSet<Account>
-
-	/// A set of all MY accounts in the manifest which were deposited into. This is a subset of the addresses seen in `accountsRequiringAuth`.
-	let accountsWithdrawnFrom: OrderedSet<Account>
-
-	/// A set of all MY accounts in the manifest which were withdrawn from. This is a subset of the addresses seen in `accountAddresses`
-	let accountsDepositedInto: OrderedSet<Account>
-
-	init(
-		identitiesRequiringAuth: OrderedSet<Persona>,
-		accountsRequiringAuth: OrderedSet<Account>,
-		accountsWithdrawnFrom: OrderedSet<Account>,
-		accountsDepositedInto: OrderedSet<Account>
-	) {
-		self.identitiesRequiringAuth = identitiesRequiringAuth
-		self.accountsRequiringAuth = accountsRequiringAuth
-		self.accountsWithdrawnFrom = accountsWithdrawnFrom
-		self.accountsDepositedInto = accountsDepositedInto
-	}
-}
-
 extension TransactionClient {
 	struct NoFeePayerCandidate: LocalizedError {
 		var errorDescription: String? { "No account containing XRD found" }
@@ -36,38 +7,19 @@ extension TransactionClient {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.gatewaysClient) var gatewaysClient
 		@Dependency(\.accountsClient) var accountsClient
-		@Dependency(\.personasClient) var personasClient
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
+		@Dependency(\.entitiesInvolvedClient) var entitiesInvolvedClient
 
 		@Sendable
 		func myEntitiesInvolvedInTransaction(
 			networkID: NetworkID,
 			manifest: TransactionManifest
-		) async throws -> MyEntitiesInvolvedInTransaction {
-			let allAccounts = try await accountsClient.getAccountsOnNetwork(networkID)
-
-			func accountFromComponentAddress(_ accountAddress: AccountAddress) -> Account? {
-				allAccounts.first { $0.address == accountAddress }
-			}
-			func identityFromComponentAddress(_ identityAddress: IdentityAddress) async throws -> Persona {
-				try await personasClient.getPersona(id: identityAddress)
-			}
-			func mapAccount(_ addresses: [AccountAddress]) throws -> OrderedSet<Account> {
-				try .init(validating: addresses.compactMap(accountFromComponentAddress))
-			}
-			func mapIdentity(_ addresses: [IdentityAddress]) async throws -> OrderedSet<Persona> {
-				try await .init(validating: addresses.asyncMap(identityFromComponentAddress))
-			}
-
-			let summary = try manifest.summary
-
-			return try await MyEntitiesInvolvedInTransaction(
-				identitiesRequiringAuth: mapIdentity(summary.addressesOfPersonasRequiringAuth),
-				accountsRequiringAuth: mapAccount(summary.addressesOfAccountsRequiringAuth),
-				accountsWithdrawnFrom: mapAccount(summary.addressesOfAccountsWithdrawnFrom),
-				accountsDepositedInto: mapAccount(summary.addressesOfAccountsDepositedInto)
-			)
+		) async throws -> EntitiesInvolvedResult {
+			try await entitiesInvolvedClient.getEntities(.init(
+				networkId: networkID,
+				dataSource: manifest.summary
+			))
 		}
 
 		@Sendable
@@ -263,7 +215,7 @@ extension TransactionClient {
 	static func feePayerSelectionAmongstCandidates(
 		request: DetermineFeePayerRequest,
 		allFeePayerCandidates: NonEmpty<IdentifiedArrayOf<FeePayerCandidate>>,
-		involvedEntities: MyEntitiesInvolvedInTransaction
+		involvedEntities: EntitiesInvolvedResult
 	) async throws -> FeePayerSelectionResult? {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
@@ -271,7 +223,7 @@ extension TransactionClient {
 		let allSignerEntities = request.transactionSigners.intentSignerEntitiesOrEmpty()
 
 		func findFeePayer(
-			amongst keyPath: KeyPath<MyEntitiesInvolvedInTransaction, OrderedSet<Account>>,
+			amongst keyPath: KeyPath<EntitiesInvolvedResult, OrderedSet<Account>>,
 			includeSignaturesCost: Bool
 		) async throws -> FeePayerSelectionResult? {
 			let accountsToCheck = involvedEntities[keyPath: keyPath]
