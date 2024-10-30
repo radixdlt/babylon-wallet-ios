@@ -19,7 +19,7 @@ extension PreAuthorizationClient {
 
 	struct BuildSubintentRequest: Sendable {
 		let networkId: NetworkID
-		let nonce: Nonce
+		let intentDiscriminator: IntentDiscriminator
 		let manifest: SubintentManifest
 	}
 }

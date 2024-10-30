@@ -1,5 +1,8 @@
 extension PreAuthorizationClient: DependencyKey {
+	static let epochWindow: Epoch = 10
+
 	static var liveValue: Self {
+		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.gatewaysClient) var gatewaysClient
 		@Dependency(\.entitiesInvolvedClient) var entitiesInvolvedClient
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
@@ -41,8 +44,23 @@ extension PreAuthorizationClient: DependencyKey {
 			)
 		}
 
-		let buildSubintent: BuildSubintent = { _ in
-			fatalError("implement")
+		let buildSubintent: BuildSubintent = { request in
+			let epoch = try await gatewayAPIClient.getEpoch()
+
+			let header = IntentHeaderV2(
+				networkId: request.networkId,
+				startEpochInclusive: epoch,
+				endEpochExclusive: epoch + Self.epochWindow,
+				minProposerTimestampInclusive: nil, // TODO: Confirm
+				maxProposerTimestampExclusive: nil, // TODO: Confirm
+				intentDiscriminator: request.intentDiscriminator
+			)
+
+			return .init(
+				header: header,
+				manifest: request.manifest,
+				message: .none
+			)
 		}
 
 		return Self(
