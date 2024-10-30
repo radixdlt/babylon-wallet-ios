@@ -18,10 +18,16 @@ enum SigningPurposeWithPayload: Sendable, Hashable {
 		origin: SigningPurpose.SignTransactionPurpose
 	)
 
+	case signPreAuthorization(Subintent, challenge: DappToWalletInteractionAuthChallengeNonce)
+
 	var purpose: SigningPurpose {
 		switch self {
-		case .signAuth: .signAuth
-		case let .signTransaction(_, _, purpose): .signTransaction(purpose)
+		case .signAuth:
+			.signAuth
+		case let .signTransaction(_, _, purpose):
+			.signTransaction(purpose)
+		case .signPreAuthorization:
+			.signPreAuthorization
 		}
 	}
 }
@@ -30,6 +36,7 @@ enum SigningPurposeWithPayload: Sendable, Hashable {
 enum SigningResponse: Sendable, Hashable {
 	case signTransaction(NotarizeTransactionResponse, origin: SigningPurpose.SignTransactionPurpose)
 	case signAuth(SignedAuthChallenge)
+	case signPreAuthorization(SignedAuthChallenge)
 }
 
 // MARK: - Signing
@@ -93,6 +100,7 @@ struct Signing: Sendable, FeatureReducer {
 			case let .signAuth(authData):
 				let response = SignedAuthChallenge(challenge: authData.input.challenge, entitySignatures: Set(state.signatures))
 				return .send(.delegate(.finishedSigning(.signAuth(response))))
+
 			case let .signTransaction(ephemeralNotaryPrivateKey, intent, _):
 
 				return .run { [signatures = state.signatures] send in
@@ -105,6 +113,10 @@ struct Signing: Sendable, FeatureReducer {
 						))
 					})))
 				}
+
+			case let .signPreAuthorization(_, challenge):
+				let response = SignedAuthChallenge(challenge: challenge, entitySignatures: Set(state.signatures))
+				return .send(.delegate(.finishedSigning(.signPreAuthorization(response))))
 			}
 
 		case let .notarizeResult(.failure(error)):
@@ -114,9 +126,9 @@ struct Signing: Sendable, FeatureReducer {
 
 		case let .notarizeResult(.success(notarized)):
 			switch state.signingPurposeWithPayload {
-			case .signAuth:
+			case .signAuth, .signPreAuthorization:
 				assertionFailure("Discrepancy")
-				loggerGlobal.warning("Discrepancy in signing, notarized a tx, but state.signingPurposeWithPayload == .signAuth, not possible.")
+				loggerGlobal.warning("Discrepancy in signing, notarized a tx, but state.signingPurposeWithPayload == \(state.signingPurposeWithPayload), not possible.")
 				return .none
 
 			case let .signTransaction(_, _, purpose):

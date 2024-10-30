@@ -15,6 +15,7 @@ extension P2P {
 			case getDeviceInfo
 			case derivePublicKeys
 			case signTransaction
+			case signPreAuthorization
 			case signChallenge
 			case deriveAndDisplayAddress
 		}

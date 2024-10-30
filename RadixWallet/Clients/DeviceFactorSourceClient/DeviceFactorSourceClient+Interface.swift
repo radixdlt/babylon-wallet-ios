@@ -131,7 +131,7 @@ extension DeviceFactorSourceClient {
 			let factorInstance = switch purpose {
 			case .signAuth:
 				control.authenticationSigning ?? control.transactionSigning
-			case .signTransaction:
+			case .signTransaction, .signPreAuthorization:
 				control.transactionSigning
 			}
 
@@ -183,7 +183,7 @@ extension DeviceFactorSourceClient {
 				let factorInstance = switch purpose {
 				case .signAuth:
 					unsecuredControl.authenticationSigning ?? unsecuredControl.transactionSigning
-				case .signTransaction:
+				case .signTransaction, .signPreAuthorization:
 					unsecuredControl.transactionSigning
 				}
 
@@ -223,7 +223,8 @@ extension DeviceFactorSourceClient {
 extension SigningPurpose {
 	var loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose {
 		switch self {
-		case .signAuth: return .signAuthChallenge
+		case .signAuth:
+			return .signAuthChallenge
 		case .signTransaction(.manifestFromDapp):
 			return .signTransaction
 		case .signTransaction(.internalManifest(.transfer)):
@@ -234,6 +235,8 @@ extension SigningPurpose {
 		case .signTransaction(.internalManifest(.debugModifyAccount)):
 			return .updateAccountMetadata
 		#endif // DEBUG
+		case .signPreAuthorization:
+			return .signTransaction
 		}
 	}
 }

@@ -153,6 +153,25 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					)
 				}
 			},
+			signPreAuthorization: { request in
+				let hashedMsg = request.subintent.hash()
+				let compiledSubintent = request.subintent.compile()
+				let data = compiledSubintentBytes(compiledIntent: compiledSubintent) // TODO: Add helper method in CompiledSubintent+Wrap+Functions
+				return try await sign(
+					signers: request.signers,
+					expectedHashedMessage: hashedMsg.hash.data
+				) {
+					try await makeRequest(
+						.signPreAuthorization(.init(
+							signers: request.signers.flatMap(\.keyParams),
+							ledgerDevice: request.ledger.device(),
+							compiledSubintent: .init(data: data),
+							displayHash: request.displayHashOnLedgerDisplay
+						)),
+						responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.signPreAuthorization
+					)
+				}
+			},
 			signAuthChallenge: { request in
 				@Dependency(\.rolaClient) var rolaClient
 

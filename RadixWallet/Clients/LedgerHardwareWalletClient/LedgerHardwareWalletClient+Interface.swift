@@ -6,6 +6,7 @@ struct LedgerHardwareWalletClient: Sendable {
 	var getDeviceInfo: GetDeviceInfo
 	var derivePublicKeys: DerivePublicKeys
 	var signTransaction: SignTransaction
+	var signPreAuthorization: SignPreAuthorization
 	var signAuthChallenge: SignAuthChallenge
 	var deriveAndDisplayAddress: DeriveAndDisplayAddress
 }
@@ -18,6 +19,7 @@ extension LedgerHardwareWalletClient {
 	typealias DeriveAndDisplayAddress = @Sendable (P2P.LedgerHardwareWallet.KeyParameters, LedgerHardwareWalletFactorSource) async throws -> (HierarchicalDeterministicPublicKey, String)
 
 	typealias SignTransaction = @Sendable (SignTransactionWithLedgerRequest) async throws -> Set<SignatureOfEntity>
+	typealias SignPreAuthorization = @Sendable (SignPreAuthorizationWithLedgerRequest) async throws -> Set<SignatureOfEntity>
 	typealias SignAuthChallenge = @Sendable (SignAuthChallengeWithLedgerRequest) async throws -> Set<SignatureOfEntity>
 }
 
@@ -49,6 +51,26 @@ struct SignTransactionWithLedgerRequest: Sendable, Hashable {
 		self.signers = signers
 		self.ledger = ledger
 		self.transactionIntent = transactionIntent
+		self.displayHashOnLedgerDisplay = displayHashOnLedgerDisplay
+	}
+}
+
+// MARK: - SignPreAuthorizationWithLedgerRequest
+struct SignPreAuthorizationWithLedgerRequest: Sendable, Hashable {
+	let signers: NonEmpty<IdentifiedArrayOf<Signer>>
+	let ledger: LedgerHardwareWalletFactorSource
+	let subintent: Subintent
+	let displayHashOnLedgerDisplay: Bool
+
+	init(
+		ledger: LedgerHardwareWalletFactorSource,
+		signers: NonEmpty<IdentifiedArrayOf<Signer>>,
+		subintent: Subintent,
+		displayHashOnLedgerDisplay: Bool
+	) {
+		self.signers = signers
+		self.ledger = ledger
+		self.subintent = subintent
 		self.displayHashOnLedgerDisplay = displayHashOnLedgerDisplay
 	}
 }

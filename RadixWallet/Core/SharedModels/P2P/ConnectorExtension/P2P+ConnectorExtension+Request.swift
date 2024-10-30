@@ -43,6 +43,7 @@ extension P2P.ConnectorExtension.Request {
 			case getDeviceInfo
 			case derivePublicKeys(DerivePublicKeys)
 			case signTransaction(SignTransaction)
+			case signPreAuthorization(SignPreAuthorization)
 			case signChallenge(SignAuthChallenge)
 			case deriveAndDisplayAddress(DeriveAndDisplayAddress)
 
@@ -51,6 +52,7 @@ extension P2P.ConnectorExtension.Request {
 				case .derivePublicKeys: .derivePublicKeys
 				case .getDeviceInfo: .getDeviceInfo
 				case .signTransaction: .signTransaction
+				case .signPreAuthorization: .signPreAuthorization
 				case .signChallenge: .signChallenge
 				case .deriveAndDisplayAddress: .deriveAndDisplayAddress
 				}
@@ -85,6 +87,27 @@ extension P2P.ConnectorExtension.Request {
 					self.signers = signers
 					self.ledgerDevice = ledgerDevice
 					self.compiledTransactionIntent = compiledTransactionIntent
+					self.mode = "summary"
+					self.displayHash = displayHash
+				}
+			}
+
+			struct SignPreAuthorization: Sendable, Hashable, Encodable {
+				let signers: [P2P.LedgerHardwareWallet.KeyParameters]
+				let ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
+				let compiledSubintent: HexCodable
+				let displayHash: Bool
+				let mode: String
+
+				init(
+					signers: [P2P.LedgerHardwareWallet.KeyParameters],
+					ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice,
+					compiledSubintent: HexCodable,
+					displayHash: Bool
+				) {
+					self.signers = signers
+					self.ledgerDevice = ledgerDevice
+					self.compiledSubintent = compiledSubintent
 					self.mode = "summary"
 					self.displayHash = displayHash
 				}
@@ -138,6 +161,8 @@ extension P2P.ConnectorExtension.Request {
 			case let .derivePublicKeys(request):
 				try request.encode(to: encoder)
 			case let .signTransaction(request):
+				try request.encode(to: encoder)
+			case let .signPreAuthorization(request):
 				try request.encode(to: encoder)
 			case let .signChallenge(request):
 				try request.encode(to: encoder)

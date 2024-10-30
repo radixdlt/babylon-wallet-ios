@@ -78,6 +78,7 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 		case getDeviceInfo(GetDeviceInfo)
 		case derivePublicKeys([DerivedPublicKey])
 		case signTransaction([SignatureOfSigner])
+		case signPreAuthorization([SignatureOfSigner])
 		case signChallenge([SignatureOfSigner])
 		case deriveAndDisplayAddress(DerivedAddress)
 
@@ -160,6 +161,10 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 		case .signTransaction:
 			self.response = try decodeResponse {
 				Success.signTransaction($0)
+			}
+		case .signPreAuthorization:
+			self.response = try decodeResponse {
+				Success.signPreAuthorization($0)
 			}
 		case .signChallenge:
 			self.response = try decodeResponse {
