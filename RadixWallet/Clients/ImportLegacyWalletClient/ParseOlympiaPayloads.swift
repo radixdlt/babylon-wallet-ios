@@ -13,8 +13,7 @@ extension Olympia {
 			let accountType: Olympia.AccountType
 			let publicKey: Secp256k1PublicKey
 			let displayName: NonEmptyString?
-			/// the non hardened value of the path
-			let addressIndex: HDPathValue
+			let addressIndex: HdPathComponent
 		}
 	}
 }
@@ -206,7 +205,7 @@ extension CAP33 {
 			throw ParseFailure.accountPublicKeyInvalidSecp256k1PublicKey
 		}
 
-		guard let bip44LikeAddressIndex = HDPathValue(components[2]) else {
+		guard let bip44LikeAddressIndex = UInt32(components[2]) else {
 			throw ParseFailure.accountAddressIndex
 		}
 
@@ -221,11 +220,11 @@ extension CAP33 {
 
 		let maybeName = NonEmptyString(rawValue: accountName)
 
-		let account = Olympia.Parsed.ParsedAccount(
+		let account = try Olympia.Parsed.ParsedAccount(
 			accountType: accountType,
 			publicKey: publicKey,
 			displayName: maybeName,
-			addressIndex: bip44LikeAddressIndex
+			addressIndex: HdPathComponent(localKeySpace: bip44LikeAddressIndex, keySpace: .unsecurified(isHardened: true))
 		)
 
 		return .account(account)

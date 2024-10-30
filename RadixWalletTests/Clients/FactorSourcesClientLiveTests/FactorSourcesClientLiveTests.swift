@@ -135,8 +135,8 @@ extension Account {
 					derivationPath: AccountPath(
 						networkID: .simulator,
 						keyKind: .transactionSigning,
-						index: index
-					).asDerivationPath
+						index: Hardened.unsecurified(UnsecurifiedHardened(localKeySpace: index))
+					).asGeneral
 				)
 			),
 			displayName: DisplayName(validating: "\(index)"),

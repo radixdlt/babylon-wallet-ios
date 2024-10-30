@@ -34,7 +34,7 @@ extension FactorSourcesClient: TestDependencyKey {
 		createNewMainDeviceFactorSource: { throw NoopError() },
 		getFactorSources: { throw NoopError() },
 		factorSourcesAsyncSequence: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
-		nextEntityIndexForFactorSource: { _ in 0 },
+		nextEntityIndexForFactorSource: { _ in HdPathComponent(globalKeySpace: 0) },
 		addPrivateHDFactorSource: { _ in throw NoopError() },
 		checkIfHasOlympiaFactorSourceForAccounts: { _, _ in nil },
 		saveFactorSource: { _ in },

@@ -8,12 +8,19 @@ extension Account: Comparable {
 	}
 }
 
+// MARK: - HdPathComponent + Comparable
+extension HdPathComponent: Comparable {
+	public static func < (lhs: Self, rhs: Self) -> Bool {
+		lhs.indexInGlobalKeySpace() < rhs.indexInGlobalKeySpace()
+	}
+}
+
 extension Account {
 	static let nameMaxLength = 30
 
-	var derivationIndex: HDPathValue {
+	var derivationIndex: HdPathComponent {
 		switch securityState {
-		case let .unsecured(uec): uec.transactionSigning.derivationPath.nonHardenedIndex
+		case let .unsecured(uec): uec.transactionSigning.derivationPath.lastPathComponent
 		}
 	}
 

@@ -448,19 +448,22 @@ extension DerivePublicKeys {
 			derivationPathScheme: derivationPathScheme,
 			networkID: maybeNetworkID
 		)
+		let hardened = try index.asHardened()
 		return DerivationPath.forEntity(
 			kind: entityKind,
 			networkID: networkID,
-			index: index
+			index: hardened
 		)
 	}
+}
 
+extension DerivePublicKeys {
 	private func nextIndex(
 		factorSourceID: FactorSourceID,
 		of entityKind: EntityKind,
 		derivationPathScheme: DerivationPathScheme,
 		networkID maybeNetworkID: NetworkID?
-	) async throws -> (index: HDPathValue, networkID: NetworkID) {
+	) async throws -> (index: HdPathComponent, networkID: NetworkID) {
 		let currentNetwork = await accountsClient.getCurrentNetworkID()
 		let networkID = maybeNetworkID ?? currentNetwork
 		let request = NextEntityIndexForFactorSourceRequest(

@@ -15,9 +15,9 @@ struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		var status: Status
 		var networkID: NetworkID = .mainnet
 		var batchNumber: Int = 0
-		var maxIndex: HDPathValue? = nil
+		var maxIndex: HdPathComponent? = nil
 
-		var indicesOfAlreadyUsedEntities: OrderedSet<HDPathValue> = []
+		var indicesOfAlreadyUsedEntities: OrderedSet<HdPathComponent> = []
 		let forOlympiaAccounts: Bool
 		var active: IdentifiedArrayOf<Account> = []
 		var inactive: IdentifiedArrayOf<Account> = []
@@ -255,25 +255,28 @@ extension AccountRecoveryScanInProgress {
 		let networkID = state.networkID
 
 		let derivationIndices = generateIntegers(
-			start: state.maxIndex ?? 0,
+			start: state.maxIndex?.indexInLocalKeySpace() ?? 0,
 			count: batchSize,
-			excluding: state.indicesOfAlreadyUsedEntities
+			excluding: state.indicesOfAlreadyUsedEntities.map { $0.indexInLocalKeySpace() }
 		)
 		assert(derivationIndices.count == batchSize)
-		state.maxIndex = derivationIndices.max()! + 1
+		state.maxIndex = try HdPathComponent(
+			localKeySpace: derivationIndices.max()! + 1,
+			keySpace: .unsecurified(isHardened: true)
+		)
 
-		let paths = derivationIndices.map { index in
+		let paths = try derivationIndices.map { index in
 			if state.forOlympiaAccounts {
-				Bip44LikePath(
-					index: index
+				try Bip44LikePath(
+					index: HdPathComponent.unsecurifiedComponent(Unsecurified.hardenedComponent(UnsecurifiedHardened(localKeySpace: index)))
 				)
-				.asDerivationPath
+				.asGeneral
 			} else {
-				AccountPath(
+				try AccountPath(
 					networkID: networkID,
 					keyKind: .transactionSigning,
-					index: index
-				).asDerivationPath
+					index: Hardened.unsecurified(UnsecurifiedHardened(localKeySpace: index))
+				).asGeneral
 			}
 		}
 
