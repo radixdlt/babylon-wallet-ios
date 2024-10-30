@@ -197,7 +197,7 @@ extension InteractionReview.Sections {
 					.foregroundStyle(.app.gray3)
 					.frame(.smallest)
 
-				Text("Possible dApp calls")
+				Text(L10n.InteractionReview.possibleDappCalls)
 					.textStyle(.body2HighImportance)
 					.foregroundStyle(.app.gray2)
 					.padding(.leading, .small2)

@@ -63,12 +63,12 @@ extension PreAuthorizationReview {
 
 		private func navigationTitle(dAppName: String?) -> some SwiftUI.View {
 			VStack(spacing: .zero) {
-				Text("Review your Pre-Authorization")
+				Text(L10n.PreAuthorizationReview.title)
 					.textStyle(.body2Header)
 					.foregroundColor(.app.gray1)
 
 				if let dAppName {
-					Text("Proposed by \(dAppName)")
+					Text(L10n.PreAuthorizationReview.subtitle(dAppName))
 						.textStyle(.body2Regular)
 						.foregroundColor(.app.gray2)
 				}
@@ -98,7 +98,7 @@ extension PreAuthorizationReview {
 					expiration(viewStore.expiration, secondsToExpiration: viewStore.secondsToExpiration)
 
 					ApprovalSlider(
-						title: "Slide to sign and return",
+						title: L10n.PreAuthorizationReview.slideToSign,
 						resetDate: viewStore.sliderResetDate
 					) {}
 						.controlState(viewStore.sliderControlState)
@@ -164,10 +164,10 @@ extension PreAuthorizationReview {
 		private func feesInformation(dAppName: String?) -> some SwiftUI.View {
 			HStack(spacing: .zero) {
 				VStack(alignment: .leading, spacing: .zero) {
-					Text("Pre-authorization will be returned to \(dAppName ?? "dApp") for processing.")
+					Text(L10n.PreAuthorizationReview.Fees.title(dAppName ?? "dApp"))
 						.foregroundStyle(.app.gray1)
 
-					Text("Network fees will be paid by the dApp")
+					Text(L10n.PreAuthorizationReview.Fees.subtitle)
 						.foregroundStyle(.app.gray2)
 				}
 				.lineSpacing(0)
@@ -191,15 +191,15 @@ extension PreAuthorizationReview {
 					if let seconds = secondsToExpiration {
 						if seconds > 0 {
 							let value = formatTime(seconds: seconds)
-							Text("Valid for the next **\(value)**")
+							Text(markdown: L10n.PreAuthorizationReview.Expiration.atTime(value), emphasizedColor: .app.account4pink, emphasizedFont: .app.body2Link)
 						} else {
-							Text("This PreAuthorization is no longer valid")
+							Text(L10n.PreAuthorizationReview.Expiration.expired)
 						}
 					}
 
 				case let .afterDelay(value):
 					let value = formatTime(seconds: Int(value.expireAfterSeconds))
-					Text("Valid for **\(value) after approval**")
+					Text(markdown: L10n.PreAuthorizationReview.Expiration.afterDelay(value), emphasizedColor: .app.account4pink, emphasizedFont: .app.body2Link)
 
 				case nil:
 					Color.clear
@@ -221,28 +221,29 @@ private extension PreAuthorizationReview.View {
 	/// - `56:02 minutes` / `1:23 minute`
 	/// - `34 seconds` / `1 second`
 	func formatTime(seconds: Int) -> String {
+		typealias S = L10n.PreAuthorizationReview.TimeFormat
 		let minutes = seconds / 60
 		let hours = minutes / 60
 		let days = hours / 24
 		if days > 0 {
-			return days == 1 ? "1 day" : "\(days) days"
+			return days == 1 ? S.day : S.days(days)
 		} else if hours > 0 {
 			let remainingMinutes = minutes % 60
 			let formatted = String(format: "%d:%02d", hours, remainingMinutes)
-			return hours == 1 ? "\(formatted) hour" : "\(formatted) hours"
+			return hours == 1 ? S.hour(formatted) : S.hours(formatted)
 		} else if minutes > 0 {
 			let remainingSeconds = seconds % 60
 			let formatted = String(format: "%d:%02d", minutes, remainingSeconds)
-			return minutes == 1 ? "\(formatted) minute" : "\(formatted) minutes"
+			return minutes == 1 ? S.minute(formatted) : S.minutes(formatted)
 		} else {
-			return seconds == 1 ? "1 second" : "\(seconds) seconds"
+			return seconds == 1 ? S.second : S.seconds(seconds)
 		}
 	}
 }
 
 private extension PreAuthorizationReview.State {
 	var globalControlState: ControlState {
-		reviewedPreAuthorization != nil ? .enabled : .loading(.global(text: "Incoming PreAuthorization"))
+		reviewedPreAuthorization != nil ? .enabled : .loading(.global(text: L10n.PreAuthorizationReview.loading))
 	}
 
 	var sliderControlState: ControlState {
@@ -254,19 +255,10 @@ private extension PreAuthorizationReview.State {
 	}
 }
 
-extension StoreOf<PreAuthorizationReview> {
-	var destination: PresentationStoreOf<PreAuthorizationReview.Destination> {
-		func scopeState(state: State) -> PresentationState<PreAuthorizationReview.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
-	}
-}
-
 @MainActor
 private extension View {
 	func destinations(with store: StoreOf<PreAuthorizationReview>) -> some View {
-		let destinationStore = store.destination
+		let destinationStore = store.scope(state: \.$destination, action: \.destination)
 		return rawManifestAlert(with: destinationStore)
 	}
 

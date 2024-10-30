@@ -213,11 +213,11 @@ extension PreAuthorizationReview.State {
 private extension AlertState<Never> {
 	static var rawManifest: AlertState {
 		AlertState {
-			TextState("Warning")
+			TextState(L10n.PreAuthorizationReview.RawManifestAlert.title)
 		} actions: {
 			.default(TextState(L10n.Common.continue))
 		} message: {
-			TextState("This is a complex pre-authorization that cannot be summarized - the raw pre-authorization manifest will be shown. Do not sign and return unless you understand the contents.")
+			TextState(L10n.PreAuthorizationReview.RawManifestAlert.message)
 		}
 	}
 }
