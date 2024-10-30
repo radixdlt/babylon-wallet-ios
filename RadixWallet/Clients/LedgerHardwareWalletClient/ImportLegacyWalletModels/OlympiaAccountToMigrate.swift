@@ -17,7 +17,7 @@ struct OlympiaAccountToMigrate: Sendable, Hashable, CustomDebugStringConvertible
 	let displayName: NonEmptyString?
 
 	/// the non hardened value of the path
-	let addressIndex: HDPathValue
+	let addressIndex: HdPathComponent
 
 	init(
 		accountType: Olympia.AccountType,
