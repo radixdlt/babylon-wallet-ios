@@ -975,6 +975,12 @@ internal enum L10n {
     internal static let systemSettings = L10n.tr("Localizable", "common_systemSettings", fallback: "Settings")
     /// Unauthorized
     internal static let unauthorized = L10n.tr("Localizable", "common_unauthorized", fallback: "Unauthorized")
+    internal enum NoMnemonicAlert {
+      /// The required seed phrase is missing. Please return to the account and begin the recovery process.
+      internal static let text = L10n.tr("Localizable", "common_noMnemonicAlert_text", fallback: "The required seed phrase is missing. Please return to the account and begin the recovery process.")
+      /// Could Not Complete
+      internal static let title = L10n.tr("Localizable", "common_noMnemonicAlert_title", fallback: "Could Not Complete")
+    }
   }
   internal enum ConfigurationBackup {
     /// You need an up-to-date Configuration Backup to recover your Accounts and Personas if you lose access to them.
@@ -2389,6 +2395,32 @@ internal enum L10n {
       /// 
       /// [Learn more about pool units](https://learn.radixdlt.com/article/what-are-pool-units-or-native-lp-tokens) ↗
       internal static let poolunits = L10n.tr("Localizable", "infoLink_glossary_poolunits", fallback: "## Pool Units\n\nPool units are fungible [tokens](?glossaryAnchor=tokens) that represent the proportional size of a user's contribution to a liquidity pool\n\nPool units are redeemable for the user's portion of the pool but can also be traded, sold and used in DeFi applications.\n\n---\n\nLiquidity pools play an integral role in lending and swapping on DeFi platforms. They work by liquidity providers (LPs) contributing tokens to a pool, thus creating a market for people to lend, borrow and swap. In return, these LPs receive tokens to show they've made a contribution to the pool. LPs usually get rewarded for their contributions in the form of fees paid by the people using the DeFi platform to swap and borrow crypto, but there are other ways for them to earn revenue.\n\nWith other wallets on other blockchains, this process raises risks. Other wallets can’t tell an LP what the tokens they received for providing liquidity are worth. Other wallets can’t even be sure they are actually tokens that represent a portion of a pool or that the tokens are redeemable. They don’t provide any confidence.\n\nThe [Radix Network](?glossaryAnchor=radixnetwork) solves this with a native package called a “pool”. This package automatically implements the logic of minting and burning pool units in the proportion to other LPs’ contributions. It also means your [Radix Wallet](?glossaryAnchor=radixwallet) can always read what your pool units are worth and ensures they’re always redeemable for tokens from the liquidity pool.\n\n[Learn more about pool units](https://learn.radixdlt.com/article/what-are-pool-units-or-native-lp-tokens) ↗")
+      /// ## Possible dApp Calls
+      /// 
+      /// When a dApp requests a [pre-authorization](?glossaryAnchor=preauthorizations), you may see in the summary "possible dApp calls". This simply indicates that the dApp may add additional actions to your pre-authorization before submitting the transaction to the Radix Network.
+      /// 
+      /// Not to worry - you are only approving and signing what you can see in your wallet. Nothing added by the dApp can do anything with your accounts and assets without your knowledge.
+      internal static let possibledappcalls = L10n.tr("Localizable", "infoLink_glossary_possibledappcalls", fallback: "## Possible dApp Calls\n\nWhen a dApp requests a [pre-authorization](?glossaryAnchor=preauthorizations), you may see in the summary \"possible dApp calls\". This simply indicates that the dApp may add additional actions to your pre-authorization before submitting the transaction to the Radix Network.\n\nNot to worry - you are only approving and signing what you can see in your wallet. Nothing added by the dApp can do anything with your accounts and assets without your knowledge.")
+      /// ## Pre-authorizations
+      /// 
+      /// Pre-authorizations are a way for a [dApp](?glossaryAnchor=dapps) to request your authorization to do something specific with your accounts and assets. When you approve a pre-authorization, it is provided to the dApp which can use it to create a [transaction](?glossaryAnchor=transactions) on the Radix Network.
+      /// 
+      /// ---
+      /// 
+      /// A pre-authorization request looks very similar to a transaction request in your wallet. In both cases, you get to review exactly what's going to happen with your own accounts and assets.
+      /// 
+      /// However, after you sign a pre-authorization, it is not submitted directly to the Radix Network like a transaction request. Instead, it is provided back to the dApp that requested it. The dApp can then include that pre-authorization in a transaction that it creates and submits.
+      /// 
+      /// This makes it possible for dApps to do helpful things, such as:
+      /// 
+      /// • Pay the [transaction fees](?glossaryAnchor=transactionfee) for you.
+      /// • Do transactions involving multiple people.
+      /// • Mint a badge or NFT and directly deposit it to your account.
+      /// 
+      /// In all of these cases, the dApp still needs you to approve and sign any interactions with your accounts and assets - the Radix Network guarantees it.
+      /// 
+      /// Because the pre-authorization is provided back to the dApp, there is a time limit how long it lasts. Once this time limit is up, the pre-authorization expires and can't be used. A dApp will need to make a request for another one. You can see how long you have until your pre-authoirzation expires in the pre-authorization summary.
+      internal static let preauthorizations = L10n.tr("Localizable", "infoLink_glossary_preauthorizations", fallback: "## Pre-authorizations\n\nPre-authorizations are a way for a [dApp](?glossaryAnchor=dapps) to request your authorization to do something specific with your accounts and assets. When you approve a pre-authorization, it is provided to the dApp which can use it to create a [transaction](?glossaryAnchor=transactions) on the Radix Network.\n\n---\n\nA pre-authorization request looks very similar to a transaction request in your wallet. In both cases, you get to review exactly what's going to happen with your own accounts and assets.\n\nHowever, after you sign a pre-authorization, it is not submitted directly to the Radix Network like a transaction request. Instead, it is provided back to the dApp that requested it. The dApp can then include that pre-authorization in a transaction that it creates and submits.\n\nThis makes it possible for dApps to do helpful things, such as:\n\n• Pay the [transaction fees](?glossaryAnchor=transactionfee) for you.\n• Do transactions involving multiple people.\n• Mint a badge or NFT and directly deposit it to your account.\n\nIn all of these cases, the dApp still needs you to approve and sign any interactions with your accounts and assets - the Radix Network guarantees it.\n\nBecause the pre-authorization is provided back to the dApp, there is a time limit how long it lasts. Once this time limit is up, the pre-authorization expires and can't be used. A dApp will need to make a request for another one. You can see how long you have until your pre-authoirzation expires in the pre-authorization summary.")
       /// ## Radix Connect
       /// 
       /// Radix Connect is the technology that lets users connect their [Radix Wallet](?glossaryAnchor=radixwallet) to [dApps](?glossaryAnchor=dapps) in mobile or desktop web browsers – and even more places in the future.
@@ -2573,6 +2605,82 @@ internal enum L10n {
       internal static let tokens = L10n.tr("Localizable", "infoLink_title_tokens", fallback: "What are Tokens?")
       /// How do fees work?
       internal static let transactionfee = L10n.tr("Localizable", "infoLink_title_transactionfee", fallback: "How do fees work?")
+    }
+  }
+  internal enum InteractionReview {
+    /// Claim from validators
+    internal static let claimFromValidatorsHeading = L10n.tr("Localizable", "interactionReview_claimFromValidatorsHeading", fallback: "Claim from validators")
+    /// Customize Guarantees
+    internal static let customizeGuaranteesButtonTitle = L10n.tr("Localizable", "interactionReview_customizeGuaranteesButtonTitle", fallback: "Customize Guarantees")
+    /// Depositing To
+    internal static let depositsHeading = L10n.tr("Localizable", "interactionReview_depositsHeading", fallback: "Depositing To")
+    /// Estimated
+    internal static let estimated = L10n.tr("Localizable", "interactionReview_estimated", fallback: "Estimated")
+    /// Account
+    internal static let externalAccountName = L10n.tr("Localizable", "interactionReview_externalAccountName", fallback: "Account")
+    /// Guaranteed
+    internal static let guaranteed = L10n.tr("Localizable", "interactionReview_guaranteed", fallback: "Guaranteed")
+    /// Message
+    internal static let messageHeading = L10n.tr("Localizable", "interactionReview_messageHeading", fallback: "Message")
+    /// Contributing to pools
+    internal static let poolContributionHeading = L10n.tr("Localizable", "interactionReview_poolContributionHeading", fallback: "Contributing to pools")
+    /// Redeeming from pools
+    internal static let poolRedemptionHeading = L10n.tr("Localizable", "interactionReview_poolRedemptionHeading", fallback: "Redeeming from pools")
+    /// Possible dApp calls
+    internal static let possibleDappCalls = L10n.tr("Localizable", "interactionReview_possibleDappCalls", fallback: "Possible dApp calls")
+    /// Presenting
+    internal static let presentingHeading = L10n.tr("Localizable", "interactionReview_presentingHeading", fallback: "Presenting")
+    /// Slide to Sign
+    internal static let slideToSign = L10n.tr("Localizable", "interactionReview_slideToSign", fallback: "Slide to Sign")
+    /// Staking to Validators
+    internal static let stakingToValidatorsHeading = L10n.tr("Localizable", "interactionReview_stakingToValidatorsHeading", fallback: "Staking to Validators")
+    /// Third-party deposit exceptions
+    internal static let thirdPartyDepositExceptionsHeading = L10n.tr("Localizable", "interactionReview_thirdPartyDepositExceptionsHeading", fallback: "Third-party deposit exceptions")
+    /// Third-party deposit setting
+    internal static let thirdPartyDepositSettingHeading = L10n.tr("Localizable", "interactionReview_thirdPartyDepositSettingHeading", fallback: "Third-party deposit setting")
+    /// To be claimed
+    internal static let toBeClaimed = L10n.tr("Localizable", "interactionReview_toBeClaimed", fallback: "To be claimed")
+    /// %d Unknown Components
+    internal static func unknownComponents(_ p1: Int) -> String {
+      return L10n.tr("Localizable", "interactionReview_unknownComponents", p1, fallback: "%d Unknown Components")
+    }
+    /// %d Pool Components
+    internal static func unknownPools(_ p1: Int) -> String {
+      return L10n.tr("Localizable", "interactionReview_unknownPools", p1, fallback: "%d Pool Components")
+    }
+    /// Requesting unstake from validators
+    internal static let unstakingFromValidatorsHeading = L10n.tr("Localizable", "interactionReview_unstakingFromValidatorsHeading", fallback: "Requesting unstake from validators")
+    /// Using dApps
+    internal static let usingDappsHeading = L10n.tr("Localizable", "interactionReview_usingDappsHeading", fallback: "Using dApps")
+    /// Withdrawing From
+    internal static let withdrawalsHeading = L10n.tr("Localizable", "interactionReview_withdrawalsHeading", fallback: "Withdrawing From")
+    /// Worth
+    internal static let worth = L10n.tr("Localizable", "interactionReview_worth", fallback: "Worth")
+    internal enum DepositExceptions {
+      /// Allow
+      internal static let assetChangeAllow = L10n.tr("Localizable", "interactionReview_depositExceptions_assetChangeAllow", fallback: "Allow")
+      /// Remove Exception
+      internal static let assetChangeClear = L10n.tr("Localizable", "interactionReview_depositExceptions_assetChangeClear", fallback: "Remove Exception")
+      /// Disallow
+      internal static let assetChangeDisallow = L10n.tr("Localizable", "interactionReview_depositExceptions_assetChangeDisallow", fallback: "Disallow")
+      /// Add Depositor
+      internal static let depositorChangeAdd = L10n.tr("Localizable", "interactionReview_depositExceptions_depositorChangeAdd", fallback: "Add Depositor")
+      /// Remove Depositor
+      internal static let depositorChangeRemove = L10n.tr("Localizable", "interactionReview_depositExceptions_depositorChangeRemove", fallback: "Remove Depositor")
+    }
+    internal enum DepositSettings {
+      /// Allow third parties to deposit **any asset** to this account.
+      internal static let acceptAllRule = L10n.tr("Localizable", "interactionReview_depositSettings_acceptAllRule", fallback: "Allow third parties to deposit **any asset** to this account.")
+      /// Allow third parties to deposit **only assets this account has already held**.
+      internal static let acceptKnownRule = L10n.tr("Localizable", "interactionReview_depositSettings_acceptKnownRule", fallback: "Allow third parties to deposit **only assets this account has already held**.")
+      /// **Disallow** all deposits from third parties without your consent.
+      internal static let denyAllRule = L10n.tr("Localizable", "interactionReview_depositSettings_denyAllRule", fallback: "**Disallow** all deposits from third parties without your consent.")
+    }
+    internal enum HiddenAsset {
+      /// This asset is hidden and will not be visible in your Account
+      internal static let deposit = L10n.tr("Localizable", "interactionReview_hiddenAsset_deposit", fallback: "This asset is hidden and will not be visible in your Account")
+      /// This asset is hidden and is not visible in your Account
+      internal static let withdraw = L10n.tr("Localizable", "interactionReview_hiddenAsset_withdraw", fallback: "This asset is hidden and is not visible in your Account")
     }
   }
   internal enum LedgerHardwareDevices {
@@ -2820,6 +2928,74 @@ internal enum L10n {
     internal static let title = L10n.tr("Localizable", "personas_title", fallback: "Personas")
     /// Write down main seed phrase
     internal static let writeSeedPhrase = L10n.tr("Localizable", "personas_writeSeedPhrase", fallback: "Write down main seed phrase")
+  }
+  internal enum PreAuthorizationReview {
+    /// Incoming Pre-Authorization
+    internal static let loading = L10n.tr("Localizable", "preAuthorizationReview_loading", fallback: "Incoming Pre-Authorization")
+    /// Slide to Sign and Return
+    internal static let slideToSign = L10n.tr("Localizable", "preAuthorizationReview_slideToSign", fallback: "Slide to Sign and Return")
+    /// Proposed by %@
+    internal static func subtitle(_ p1: Any) -> String {
+      return L10n.tr("Localizable", "preAuthorizationReview_subtitle", String(describing: p1), fallback: "Proposed by %@")
+    }
+    /// Review your Pre-Authorization
+    internal static let title = L10n.tr("Localizable", "preAuthorizationReview_title", fallback: "Review your Pre-Authorization")
+    internal enum Expiration {
+      /// Valid for **%@ after approval**
+      internal static func afterDelay(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "preAuthorizationReview_expiration_afterDelay", String(describing: p1), fallback: "Valid for **%@ after approval**")
+      }
+      /// Valid for the next **%@**
+      internal static func atTime(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "preAuthorizationReview_expiration_atTime", String(describing: p1), fallback: "Valid for the next **%@**")
+      }
+      /// Pre-authorization is no longer valid
+      internal static let expired = L10n.tr("Localizable", "preAuthorizationReview_expiration_expired", fallback: "Pre-authorization is no longer valid")
+    }
+    internal enum Fees {
+      /// Network fees will be paid by the dApp
+      internal static let subtitle = L10n.tr("Localizable", "preAuthorizationReview_fees_subtitle", fallback: "Network fees will be paid by the dApp")
+      /// Pre-authorization will be returned to %@ for processing.
+      internal static func title(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "preAuthorizationReview_fees_title", String(describing: p1), fallback: "Pre-authorization will be returned to %@ for processing.")
+      }
+    }
+    internal enum RawManifestAlert {
+      /// This is a complex pre-authorization that cannot be summarized - the raw pre-authorization manifest will be shown. Do not sign and return unless you understand the contents.
+      internal static let message = L10n.tr("Localizable", "preAuthorizationReview_rawManifestAlert_message", fallback: "This is a complex pre-authorization that cannot be summarized - the raw pre-authorization manifest will be shown. Do not sign and return unless you understand the contents.")
+      /// Warning
+      internal static let title = L10n.tr("Localizable", "preAuthorizationReview_rawManifestAlert_title", fallback: "Warning")
+    }
+    internal enum TimeFormat {
+      /// 1 day
+      internal static let day = L10n.tr("Localizable", "preAuthorizationReview_timeFormat_day", fallback: "1 day")
+      /// %d days
+      internal static func days(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "preAuthorizationReview_timeFormat_days", p1, fallback: "%d days")
+      }
+      /// %@ hour
+      internal static func hour(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "preAuthorizationReview_timeFormat_hour", String(describing: p1), fallback: "%@ hour")
+      }
+      /// %@ hours
+      internal static func hours(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "preAuthorizationReview_timeFormat_hours", String(describing: p1), fallback: "%@ hours")
+      }
+      /// %@ minute
+      internal static func minute(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "preAuthorizationReview_timeFormat_minute", String(describing: p1), fallback: "%@ minute")
+      }
+      /// %@ minutes
+      internal static func minutes(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "preAuthorizationReview_timeFormat_minutes", String(describing: p1), fallback: "%@ minutes")
+      }
+      /// 1 second
+      internal static let second = L10n.tr("Localizable", "preAuthorizationReview_timeFormat_second", fallback: "1 second")
+      /// %d seconds
+      internal static func seconds(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "preAuthorizationReview_timeFormat_seconds", p1, fallback: "%d seconds")
+      }
+    }
   }
   internal enum Preferences {
     /// Advanced Preferences
