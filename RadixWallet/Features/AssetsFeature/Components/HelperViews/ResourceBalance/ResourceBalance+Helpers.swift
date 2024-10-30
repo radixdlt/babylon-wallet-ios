@@ -1,7 +1,7 @@
 import Foundation
 
 // MARK: - SendableAnyHashable
-public struct SendableAnyHashable: @unchecked Sendable, Hashable {
+struct SendableAnyHashable: @unchecked Sendable, Hashable {
 	let wrapped: AnyHashable
 
 	init(wrapped: some Hashable & Sendable) {
@@ -11,7 +11,7 @@ public struct SendableAnyHashable: @unchecked Sendable, Hashable {
 
 // MARK: - ResourceBalance + Comparable
 extension ResourceBalance: Comparable {
-	public static func < (lhs: Self, rhs: Self) -> Bool {
+	static func < (lhs: Self, rhs: Self) -> Bool {
 		switch (lhs.details, rhs.details) {
 		case let (.fungible(lhsValue), .fungible(rhsValue)):
 			if lhs.resource.resourceAddress == rhs.resource.resourceAddress {
@@ -87,13 +87,13 @@ extension ResourceBalance: Comparable {
 
 // MARK: - ResourceBalance.Amount + Comparable
 extension ResourceBalance.Amount: Comparable {
-	public static func < (lhs: Self, rhs: Self) -> Bool {
+	static func < (lhs: Self, rhs: Self) -> Bool {
 		order(lhs: lhs.amount, rhs: rhs.amount) {
 			order(lhs: lhs.guaranteed, rhs: rhs.guaranteed)
 		}
 	}
 
-	public static let zero = ResourceBalance.Amount(0)
+	static let zero = ResourceBalance.Amount(0)
 }
 
 private func order(lhs: OnLedgerEntity.Resource, rhs: OnLedgerEntity.Resource) -> Bool {

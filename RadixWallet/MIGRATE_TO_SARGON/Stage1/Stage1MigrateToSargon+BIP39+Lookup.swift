@@ -2,19 +2,19 @@ import Foundation
 import Sargon
 
 // MARK: - BIP39LookupResult
-public enum BIP39LookupResult: Sendable, Hashable {
+enum BIP39LookupResult: Sendable, Hashable {
 	case unknown(Unknown)
 	case known(Known)
 
-	public enum Unknown: Sendable, Hashable {
+	enum Unknown: Sendable, Hashable {
 		/// Text was too short (possible empty)
 		case tooShort
 		/// Text is known to **not** be in the list
 		case notInList(input: NonEmptyString)
 	}
 
-	public enum Known: Sendable, Hashable {
-		public enum UnambiguousMatch: Sendable, Hashable {
+	enum Known: Sendable, Hashable {
+		enum UnambiguousMatch: Sendable, Hashable {
 			/// "zoo" **exactly** and **unambiguously** matches "zoo"
 			/// however "cat" exactly, but does **not** unambiguously, match "cat",
 			/// because "category" is another candiate.
@@ -33,7 +33,7 @@ public enum BIP39LookupResult: Sendable, Hashable {
 }
 
 extension [BIP39Word] {
-	public func lookup(
+	func lookup(
 		language: BIP39Language,
 		_ stringMaybeEmpty: String,
 		minLengthForCandidatesLookup: Int = 2
@@ -93,7 +93,7 @@ extension [BIP39Word] {
 extension BIP39Language {
 	/// The number of letters to unambiguously identify the word
 	/// https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki#wordlist
-	public var numberOfCharactersWhichUnambiguouslyIdentifiesWords: Int {
+	var numberOfCharactersWhichUnambiguouslyIdentifiesWords: Int {
 		switch self {
 		case .english:
 			//  - the wordlist is created in such a way that it's enough to type the first four

@@ -3,14 +3,14 @@ import SwiftUI
 // MARK: - IntroductionToPersonas.View
 extension IntroductionToPersonas {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<IntroductionToPersonas>
 
-		public init(store: StoreOf<IntroductionToPersonas>) {
+		init(store: StoreOf<IntroductionToPersonas>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				ScrollView {
 					VStack(spacing: .large2) {

@@ -3,11 +3,11 @@ import SwiftUI
 
 // MARK: - GatewayRow
 @Reducer
-public struct GatewayRow: Sendable, FeatureReducer {
+struct GatewayRow: Sendable, FeatureReducer {
 	@ObservableState
-	public struct State: Sendable, Hashable, Identifiable {
-		public typealias ID = URL
-		public var id: URL { gateway.id }
+	struct State: Sendable, Hashable, Identifiable {
+		typealias ID = URL
+		var id: URL { gateway.id }
 
 		let gateway: Gateway
 		var name: String { gateway.displayName }
@@ -15,7 +15,7 @@ public struct GatewayRow: Sendable, FeatureReducer {
 		var isSelected: Bool
 		let canBeDeleted: Bool
 
-		public init(
+		init(
 			gateway: Gateway,
 			isSelected: Bool,
 			canBeDeleted: Bool
@@ -26,25 +26,25 @@ public struct GatewayRow: Sendable, FeatureReducer {
 		}
 	}
 
-	public typealias Action = FeatureAction<Self>
+	typealias Action = FeatureAction<Self>
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case didSelect
 		case removeButtonTapped
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case didSelect
 		case removeButtonTapped
 	}
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .didSelect:
 			.send(.delegate(.didSelect))

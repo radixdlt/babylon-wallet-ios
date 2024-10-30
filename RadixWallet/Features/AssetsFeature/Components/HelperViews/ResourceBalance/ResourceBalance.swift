@@ -1,27 +1,27 @@
-public typealias IDResourceBalance = Identified<Tagged<ResourceBalance, UUID>, ResourceBalance>
+typealias IDResourceBalance = Identified<Tagged<ResourceBalance, UUID>, ResourceBalance>
 
 extension ResourceBalance {
-	public var asIdentified: IDResourceBalance {
+	var asIdentified: IDResourceBalance {
 		.init(self, id: .init())
 	}
 }
 
 // MARK: - ResourceBalance
-public struct ResourceBalance: Sendable, Hashable {
-	public let resource: OnLedgerEntity.Resource
-	public var details: Details
+struct ResourceBalance: Sendable, Hashable {
+	let resource: OnLedgerEntity.Resource
+	var details: Details
 
 	/// Indicates whether the resource is hidden in user's profile.
 	/// Value is optional since we won't check for cases that it doesn't matter.
-	public let isHidden: Bool?
+	let isHidden: Bool?
 
-	public init(resource: OnLedgerEntity.Resource, details: Details, isHidden: Bool? = nil) {
+	init(resource: OnLedgerEntity.Resource, details: Details, isHidden: Bool? = nil) {
 		self.resource = resource
 		self.details = details
 		self.isHidden = isHidden
 	}
 
-	public enum Details: Sendable, Hashable {
+	enum Details: Sendable, Hashable {
 		case fungible(Fungible)
 		case nonFungible(NonFungible)
 		case poolUnit(PoolUnit)
@@ -29,31 +29,31 @@ public struct ResourceBalance: Sendable, Hashable {
 		case stakeClaimNFT(StakeClaimNFT)
 	}
 
-	public struct Fungible: Sendable, Hashable {
-		public let isXRD: Bool
-		public let amount: ResourceAmount
-		public var guarantee: TransactionGuarantee?
+	struct Fungible: Sendable, Hashable {
+		let isXRD: Bool
+		let amount: ResourceAmount
+		var guarantee: TransactionGuarantee?
 	}
 
-	public struct LiquidStakeUnit: Sendable, Hashable {
-		public let resource: OnLedgerEntity.Resource
-		public let amount: Decimal192
-		public let worth: ResourceAmount
-		public let validator: OnLedgerEntity.Validator
-		public var guarantee: TransactionGuarantee?
+	struct LiquidStakeUnit: Sendable, Hashable {
+		let resource: OnLedgerEntity.Resource
+		let amount: Decimal192
+		let worth: ResourceAmount
+		let validator: OnLedgerEntity.Validator
+		var guarantee: TransactionGuarantee?
 	}
 
-	public typealias NonFungible = OnLedgerEntity.NonFungibleToken
+	typealias NonFungible = OnLedgerEntity.NonFungibleToken
 
-	public struct PoolUnit: Sendable, Hashable {
-		public let details: OnLedgerEntitiesClient.OwnedResourcePoolDetails
-		public var guarantee: TransactionGuarantee?
+	struct PoolUnit: Sendable, Hashable {
+		let details: OnLedgerEntitiesClient.OwnedResourcePoolDetails
+		var guarantee: TransactionGuarantee?
 	}
 
-	public struct StakeClaimNFT: Sendable, Hashable {
-		public let validatorName: String?
-		public var stakeClaimTokens: Tokens
-		public let stakeClaimResource: OnLedgerEntity.Resource
+	struct StakeClaimNFT: Sendable, Hashable {
+		let validatorName: String?
+		var stakeClaimTokens: Tokens
+		let stakeClaimResource: OnLedgerEntity.Resource
 
 		var resourceMetadata: OnLedgerEntity.Metadata {
 			stakeClaimResource.metadata
@@ -74,9 +74,9 @@ public struct ResourceBalance: Sendable, Hashable {
 			)
 		}
 
-		public struct Tokens: Sendable, Hashable {
-			public let canClaimTokens: Bool
-			public let stakeClaims: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim>
+		struct Tokens: Sendable, Hashable {
+			let canClaimTokens: Bool
+			let stakeClaims: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim>
 			var selectedStakeClaims: IdentifiedArrayOf<NonFungibleGlobalId>?
 
 			var unstaking: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim> {
@@ -95,9 +95,9 @@ public struct ResourceBalance: Sendable, Hashable {
 
 	// Helper types
 
-	public struct Amount: Sendable, Hashable {
-		public let amount: ResourceAmount
-		public let guaranteed: Decimal192?
+	struct Amount: Sendable, Hashable {
+		let amount: ResourceAmount
+		let guaranteed: Decimal192?
 
 		init(_ amount: ResourceAmount, guaranteed: Decimal192? = nil) {
 			self.amount = amount

@@ -2,29 +2,29 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - DebugManageFactorSources
-public struct DebugManageFactorSources: Sendable, FeatureReducer {
+struct DebugManageFactorSources: Sendable, FeatureReducer {
 	// MARK: State
-	public struct State: Sendable, Hashable {
-		public var factorSources: FactorSources?
+	struct State: Sendable, Hashable {
+		var factorSources: FactorSources?
 
 		@PresentationState
-		public var destination: Destination.State?
+		var destination: Destination.State?
 
-		public init() {}
+		init() {}
 	}
 
-	public struct Destination: DestinationReducer {
-		public enum State: Sendable, Hashable {
+	struct Destination: DestinationReducer {
+		enum State: Sendable, Hashable {
 			case importMnemonic(ImportMnemonic.State)
 			case addLedger(AddLedgerFactorSource.State)
 		}
 
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case importMnemonic(ImportMnemonic.Action)
 			case addLedger(AddLedgerFactorSource.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: /State.importMnemonic, action: /Action.importMnemonic) {
 				ImportMnemonic()
 			}
@@ -35,22 +35,22 @@ public struct DebugManageFactorSources: Sendable, FeatureReducer {
 	}
 
 	// MARK: Action
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case task
 		case importOlympiaMnemonicButtonTapped
 		case addLedgerButtonTapped
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case loadFactorSourcesResult(TaskResult<FactorSources>)
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -59,7 +59,7 @@ public struct DebugManageFactorSources: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			return .run { send in
@@ -92,7 +92,7 @@ public struct DebugManageFactorSources: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadFactorSourcesResult(.success(factorSources)):
 			state.factorSources = factorSources
@@ -103,7 +103,7 @@ public struct DebugManageFactorSources: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .importMnemonic(.delegate(.persistedNewFactorSourceInProfile)):
 			state.destination = nil

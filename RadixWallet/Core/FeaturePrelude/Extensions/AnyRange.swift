@@ -1,11 +1,11 @@
 import Foundation
 
 // MARK: - AnyRange
-public struct AnyRange<Bound: Comparable & Sendable>: Sendable {
-	public let lowerBound: Bound?
-	public let upperBound: Bound?
+struct AnyRange<Bound: Comparable & Sendable>: Sendable {
+	let lowerBound: Bound?
+	let upperBound: Bound?
 
-	public init(lowerBound: Bound? = nil, upperBound: Bound? = nil) {
+	init(lowerBound: Bound? = nil, upperBound: Bound? = nil) {
 		self.lowerBound = lowerBound
 		self.upperBound = upperBound
 	}
@@ -18,7 +18,7 @@ extension AnyRange: Equatable where Bound: Equatable {}
 extension AnyRange: Hashable where Bound: Hashable {}
 
 extension AnyRange {
-	public func contains(_ element: Bound) -> Bool {
+	func contains(_ element: Bound) -> Bool {
 		switch (lowerBound, upperBound) {
 		case let (lowerBound?, upperBound?):
 			(lowerBound ..< upperBound).contains(element)
@@ -31,7 +31,7 @@ extension AnyRange {
 		}
 	}
 
-	public var isEmpty: Bool {
+	var isEmpty: Bool {
 		lowerBound != nil && lowerBound == upperBound
 	}
 }

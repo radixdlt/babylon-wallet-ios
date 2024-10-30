@@ -1,7 +1,7 @@
 import Foundation
 
 extension CoreAPI {
-	public enum PlaintextMessageContent: Codable, Hashable {
+	enum PlaintextMessageContent: Codable, Hashable {
 		case string(StringPlaintextMessageContent)
 		case binary(BinaryPlaintextMessageContent)
 
@@ -9,12 +9,12 @@ extension CoreAPI {
 			case type
 		}
 
-		public var string: String? {
+		var string: String? {
 			guard case let .string(value) = self else { return nil }
 			return value.value
 		}
 
-		public init(from decoder: Decoder) throws {
+		init(from decoder: Decoder) throws {
 			let container = try decoder.container(keyedBy: CodingKeys.self)
 
 			if let type = try? container.decode(PlaintextMessageContentType.self, forKey: .type) {
@@ -29,7 +29,7 @@ extension CoreAPI {
 			}
 		}
 
-		public func encode(to encoder: Encoder) throws {
+		func encode(to encoder: Encoder) throws {
 			var container = encoder.container(keyedBy: CodingKeys.self)
 
 			switch self {
@@ -43,7 +43,7 @@ extension CoreAPI {
 		}
 	}
 
-	public enum PlaintextMessageContentType: String, Codable, CaseIterable {
+	enum PlaintextMessageContentType: String, Codable, CaseIterable {
 		case string = "String"
 		case binary = "Binary"
 	}

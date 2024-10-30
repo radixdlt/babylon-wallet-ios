@@ -4,14 +4,14 @@ import SwiftUI
 // MARK: - TransactionReviewRawTransaction.View
 extension TransactionReviewRawTransaction {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		let store: StoreOf<TransactionReviewRawTransaction>
 
-		public init(store: StoreOf<TransactionReviewRawTransaction>) {
+		init(store: StoreOf<TransactionReviewRawTransaction>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				NavigationStack {
 					ScrollView {

@@ -1,14 +1,14 @@
 
-public struct LabelledDate: View {
+struct LabelledDate: View {
 	let label: String
 	let date: Date
 
-	public init(label: String, date: Date) {
+	init(label: String, date: Date) {
 		self.label = label
 		self.date = date
 	}
 
-	public var body: some View {
+	var body: some View {
 		HStack(spacing: .small3) {
 			Text(label)
 				.textStyle(.body2Header)

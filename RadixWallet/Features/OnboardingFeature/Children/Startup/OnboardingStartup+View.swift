@@ -5,17 +5,17 @@ import SwiftUI
 // MARK: - OnboardingStartup.View
 extension OnboardingStartup {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		let store: StoreOf<OnboardingStartup>
 
-		public init(store: StoreOf<OnboardingStartup>) {
+		init(store: StoreOf<OnboardingStartup>) {
 			self.store = store
 		}
 	}
 }
 
 extension OnboardingStartup.View {
-	public var body: some View {
+	var body: some View {
 		NavigationStack {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				VStack(spacing: 0) {

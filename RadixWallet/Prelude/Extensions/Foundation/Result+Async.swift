@@ -1,6 +1,6 @@
 
 extension Result {
-	public func asyncFlatMap<NewSuccess: Sendable>(
+	func asyncFlatMap<NewSuccess: Sendable>(
 		transform: (Success) async -> Result<NewSuccess, Failure>
 	) async -> Result<NewSuccess, Failure> {
 		switch self {

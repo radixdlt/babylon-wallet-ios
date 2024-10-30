@@ -1,9 +1,9 @@
 // MARK: - DiskPersistenceClient
-public struct DiskPersistenceClient: Sendable {
-	public var save: Save
-	public var load: Load
-	public var remove: Remove
-	public var removeAll: RemoveAll
+struct DiskPersistenceClient: Sendable {
+	var save: Save
+	var load: Load
+	var remove: Remove
+	var removeAll: RemoveAll
 
 	init(
 		save: @escaping Save,
@@ -19,13 +19,13 @@ public struct DiskPersistenceClient: Sendable {
 }
 
 extension DiskPersistenceClient {
-	public typealias Save = @Sendable (Encodable, String) throws -> Void
-	public typealias Load = @Sendable (Decodable.Type, String) throws -> Decodable
-	public typealias Remove = @Sendable (String) throws -> Void
-	public typealias RemoveAll = @Sendable () throws -> Void
+	typealias Save = @Sendable (Encodable, String) throws -> Void
+	typealias Load = @Sendable (Decodable.Type, String) throws -> Decodable
+	typealias Remove = @Sendable (String) throws -> Void
+	typealias RemoveAll = @Sendable () throws -> Void
 }
 
-public extension DependencyValues {
+extension DependencyValues {
 	var diskPersistenceClient: DiskPersistenceClient {
 		get { self[DiskPersistenceClient.self] }
 		set { self[DiskPersistenceClient.self] = newValue }

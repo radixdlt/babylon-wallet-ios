@@ -2,8 +2,8 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - CustomizeFees
-public struct CustomizeFees: FeatureReducer, Sendable {
-	public struct State: Hashable, Sendable {
+struct CustomizeFees: FeatureReducer, Sendable {
+	struct State: Hashable, Sendable {
 		@CasePathable
 		enum CustomizationModeState: Hashable, Sendable {
 			case normal(NormalFeesCustomization.State)
@@ -32,7 +32,7 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 		}
 
 		@PresentationState
-		public var destination: Destination.State? = nil
+		var destination: Destination.State? = nil
 
 		init(
 			reviewedTransaction: ReviewedTransaction,
@@ -46,38 +46,38 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 		}
 	}
 
-	public enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable, Sendable {
 		case changeFeePayerTapped
 		case toggleMode
 		case closeButtonTapped
 	}
 
 	@CasePathable
-	public enum ChildAction: Equatable, Sendable {
+	enum ChildAction: Equatable, Sendable {
 		case normalFeesCustomization(NormalFeesCustomization.Action)
 		case advancedFeesCustomization(AdvancedFeesCustomization.Action)
 	}
 
-	public enum DelegateAction: Equatable, Sendable {
+	enum DelegateAction: Equatable, Sendable {
 		case updated(ReviewedTransaction)
 	}
 
-	public enum InternalAction: Equatable, Sendable {
+	enum InternalAction: Equatable, Sendable {
 		case updated(TaskResult<ReviewedTransaction>)
 	}
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case selectFeePayer(SelectFeePayer.State)
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case selectFeePayer(SelectFeePayer.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: \.selectFeePayer, action: \.selectFeePayer) {
 				SelectFeePayer()
 			}
@@ -87,7 +87,7 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Scope(state: \.modeState, action: \.child) {
 			Scope(state: \.normal, action: \.normalFeesCustomization) {
 				NormalFeesCustomization()
@@ -104,7 +104,7 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .changeFeePayerTapped:
 			state.destination = .selectFeePayer(
@@ -126,7 +126,7 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .advancedFeesCustomization(.delegate(.updated(advancedFees))):
 			state.reviewedTransaction.transactionFee.mode = .advanced(advancedFees)
@@ -136,7 +136,7 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .updated(.success(reviewedTransaction)):
 			state.reviewedTransaction = reviewedTransaction
@@ -148,7 +148,7 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .selectFeePayer(.delegate(.selected(selection))):
 			let previousFeePayer = state.feePayer

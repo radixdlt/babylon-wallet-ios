@@ -4,13 +4,13 @@ import SwiftUI
 // MARK: - AssetTransferMessage.View
 extension AssetTransferMessage {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<AssetTransferMessage>
 
 		@FocusState
 		private var focused: Bool
 
-		public init(store: StoreOf<AssetTransferMessage>) {
+		init(store: StoreOf<AssetTransferMessage>) {
 			self.store = store
 		}
 	}
@@ -23,7 +23,7 @@ extension ViewStore<AssetTransferMessage.State, AssetTransferMessage.ViewAction>
 }
 
 extension AssetTransferMessage.View {
-	public var body: some View {
+	var body: some View {
 		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 			VStack(alignment: .leading) {
 				Text(L10n.AssetTransfer.transactionMessage)

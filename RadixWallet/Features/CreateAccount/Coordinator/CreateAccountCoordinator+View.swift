@@ -9,19 +9,19 @@ extension CreateAccountCoordinator.State {
 }
 
 extension CreateAccountCoordinator {
-	public struct ViewState: Sendable, Equatable {
+	struct ViewState: Sendable, Equatable {
 		let shouldDisplayNavBar: Bool
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<CreateAccountCoordinator>
 
-		public init(store: StoreOf<CreateAccountCoordinator>) {
+		init(store: StoreOf<CreateAccountCoordinator>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				NavigationStackStore(
 					store.scope(state: \.path, action: { .child(.path($0)) })

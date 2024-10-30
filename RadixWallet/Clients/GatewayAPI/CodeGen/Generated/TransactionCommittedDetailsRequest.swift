@@ -11,24 +11,24 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.TransactionCommittedDetailsRequest")
-public typealias TransactionCommittedDetailsRequest = GatewayAPI.TransactionCommittedDetailsRequest
+typealias TransactionCommittedDetailsRequest = GatewayAPI.TransactionCommittedDetailsRequest
 
 extension GatewayAPI {
 
-public struct TransactionCommittedDetailsRequest: Codable, Hashable {
+struct TransactionCommittedDetailsRequest: Codable, Hashable {
 
-    public private(set) var atLedgerState: LedgerStateSelector?
+    private(set) var atLedgerState: LedgerStateSelector?
     /** Bech32m-encoded hash. */
-    public private(set) var intentHash: String
-    public private(set) var optIns: TransactionDetailsOptIns?
+    private(set) var intentHash: String
+    private(set) var optIns: TransactionDetailsOptIns?
 
-    public init(atLedgerState: LedgerStateSelector? = nil, intentHash: String, optIns: TransactionDetailsOptIns? = nil) {
+    init(atLedgerState: LedgerStateSelector? = nil, intentHash: String, optIns: TransactionDetailsOptIns? = nil) {
         self.atLedgerState = atLedgerState
         self.intentHash = intentHash
         self.optIns = optIns
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case atLedgerState = "at_ledger_state"
         case intentHash = "intent_hash"
         case optIns = "opt_ins"
@@ -36,7 +36,7 @@ public struct TransactionCommittedDetailsRequest: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(atLedgerState, forKey: .atLedgerState)
         try container.encode(intentHash, forKey: .intentHash)

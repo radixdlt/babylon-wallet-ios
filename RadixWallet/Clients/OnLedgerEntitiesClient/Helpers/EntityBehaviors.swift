@@ -41,7 +41,7 @@ extension GatewayAPI.ComponentEntityRoleAssignments {
 
 	 Finally, if we end up with no behaviors, we return the `.simpleAsset` behavior instead.
 	 */
-	@Sendable public func extractBehaviors() -> [AssetBehavior] {
+	@Sendable func extractBehaviors() -> [AssetBehavior] {
 		typealias AssignmentEntry = GatewayAPI.ComponentEntityRoleAssignmentEntry
 		typealias ParsedName = GatewayAPI.RoleKey.ParsedName
 		typealias ParsedAssignment = GatewayAPI.ComponentEntityRoleAssignmentEntry.ParsedAssignment
@@ -136,11 +136,11 @@ extension GatewayAPI.ComponentEntityRoleAssignments {
 }
 
 extension GatewayAPI.RoleKey {
-	public var parsedName: ParsedName? {
+	var parsedName: ParsedName? {
 		.init(rawValue: name)
 	}
 
-	public enum ParsedName: String, Hashable {
+	enum ParsedName: String, Hashable {
 		case minter
 		case burner
 		case withdrawer
@@ -164,20 +164,20 @@ extension GatewayAPI.RoleKey {
 }
 
 extension GatewayAPI.ComponentEntityRoleAssignmentEntry {
-	public var parsedAssignment: ParsedAssignment? {
+	var parsedAssignment: ParsedAssignment? {
 		.init(assignment)
 	}
 
-	public enum ParsedAssignment: Hashable {
+	enum ParsedAssignment: Hashable {
 		case owner
 		case explicit(Explicit)
 
-		public enum Explicit: Hashable {
+		enum Explicit: Hashable {
 			case denyAll
 			case allowAll
 			case protected
 
-			public init?(_ explicitRule: Any) {
+			init?(_ explicitRule: Any) {
 				guard let explicitRule = explicitRule as? [String: Any] else { return nil }
 				guard let type = explicitRule["type"] as? String else { return nil }
 
@@ -194,7 +194,7 @@ extension GatewayAPI.ComponentEntityRoleAssignmentEntry {
 			}
 		}
 
-		public init?(_ assignment: GatewayAPI.ComponentEntityRoleAssignmentEntryAssignment) {
+		init?(_ assignment: GatewayAPI.ComponentEntityRoleAssignmentEntryAssignment) {
 			switch assignment.resolution {
 			case .owner:
 				guard assignment.explicitRule == nil else { return nil }

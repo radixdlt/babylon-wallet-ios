@@ -10,16 +10,16 @@ extension JSONDecoder {
 }
 
 extension GatewayAPIClient {
-	public struct EmptyEntityDetailsResponse: Error {}
-	public typealias SingleEntityDetailsResponse = (ledgerState: GatewayAPI.LedgerState, details: GatewayAPI.StateEntityDetailsResponseItem)
-	public typealias Value = GatewayAPIClient
+	struct EmptyEntityDetailsResponse: Error {}
+	typealias SingleEntityDetailsResponse = (ledgerState: GatewayAPI.LedgerState, details: GatewayAPI.StateEntityDetailsResponseItem)
+	typealias Value = GatewayAPIClient
 
-	public static let liveValue = GatewayAPIClient.live(
+	static let liveValue = GatewayAPIClient.live(
 		jsonEncoder: .init(),
 		jsonDecoder: .default
 	)
 
-	public static func live(
+	static func live(
 		jsonEncoder: JSONEncoder,
 		jsonDecoder: JSONDecoder
 	) -> Self {
@@ -203,21 +203,6 @@ extension GatewayAPIClient {
 				try await post(
 					request: request
 				) { $0.appendingPathComponent("/state/account-locker/page/vaults") }
-			},
-			submitTransaction: { transactionSubmitRequest in
-				try await post(
-					request: transactionSubmitRequest
-				) { $0.appendingPathComponent("transaction/submit") }
-			},
-			transactionStatus: { transactionStatusRequest in
-				try await post(
-					request: transactionStatusRequest
-				) { $0.appendingPathComponent("transaction/status") }
-			},
-			transactionPreview: { transactionPreviewRequest in
-				try await post(
-					request: transactionPreviewRequest
-				) { $0.appendingPathComponent("transaction/preview") }
 			},
 			streamTransactions: { streamTransactionsRequest in
 				try await post(

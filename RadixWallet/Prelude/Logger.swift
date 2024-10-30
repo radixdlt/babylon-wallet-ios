@@ -52,11 +52,11 @@ func logAssertionFailure(_ errorMessage: String, severity: Logger.FailureSeverit
 	assertionFailure(errorMessage)
 }
 
-public let loggerGlobal = makeLogger(label: baseLabel)
+let loggerGlobal = makeLogger(label: baseLabel)
 
 extension Logger {
-	public static let logFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appending(path: "appLogs.txt")
-	public func feature(
+	static let logFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appending(path: "appLogs.txt")
+	func feature(
 		_ message: String,
 		marker: String = "feature",
 		emoji: String = "🔮"

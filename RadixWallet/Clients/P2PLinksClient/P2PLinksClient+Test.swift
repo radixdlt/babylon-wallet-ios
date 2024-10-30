@@ -1,6 +1,6 @@
 
 extension DependencyValues {
-	public var p2pLinksClient: P2PLinksClient {
+	var p2pLinksClient: P2PLinksClient {
 		get { self[P2PLinksClient.self] }
 		set { self[P2PLinksClient.self] = newValue }
 	}
@@ -8,8 +8,8 @@ extension DependencyValues {
 
 // MARK: - P2PLinksClient + TestDependencyKey
 extension P2PLinksClient: TestDependencyKey {
-	public static let previewValue = Self.noop
-	public static let noop = Self(
+	static let previewValue = Self.noop
+	static let noop = Self(
 		getP2PLinks: { [] },
 		updateOrAddP2PLink: { _ in nil },
 		updateP2PLink: { _ in },
@@ -18,7 +18,7 @@ extension P2PLinksClient: TestDependencyKey {
 		getP2PLinkPrivateKey: { (.init(), false) },
 		storeP2PLinkPrivateKey: { _ in }
 	)
-	public static let testValue = Self(
+	static let testValue = Self(
 		getP2PLinks: unimplemented("\(Self.self).getP2PLinks"),
 		updateOrAddP2PLink: unimplemented("\(Self.self).updateOrAddP2PLink"),
 		updateP2PLink: unimplemented("\(Self.self).updateP2PLink"),

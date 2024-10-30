@@ -45,7 +45,7 @@ struct AssetTagView: View {
 }
 
 extension AssetTag {
-	public var name: String {
+	var name: String {
 		switch self {
 		case .officialRadix:
 			L10n.AssetDetails.Tags.officialRadix
@@ -54,7 +54,7 @@ extension AssetTag {
 		}
 	}
 
-	public var icon: ImageAsset {
+	var icon: ImageAsset {
 		switch self {
 		case .officialRadix:
 			AssetResource.officialTagIcon

@@ -11,22 +11,22 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.StateEntitySchemaPageResponse")
-public typealias StateEntitySchemaPageResponse = GatewayAPI.StateEntitySchemaPageResponse
+typealias StateEntitySchemaPageResponse = GatewayAPI.StateEntitySchemaPageResponse
 
 extension GatewayAPI {
 
-public struct StateEntitySchemaPageResponse: Codable, Hashable {
+struct StateEntitySchemaPageResponse: Codable, Hashable {
 
-    public private(set) var ledgerState: LedgerState
+    private(set) var ledgerState: LedgerState
     /** Total number of items in underlying collection, fragment of which is available in `items` collection. */
-    public private(set) var totalCount: Int64?
+    private(set) var totalCount: Int64?
     /** If specified, contains a cursor to query next page of the `items` collection. */
-    public private(set) var nextCursor: String?
-    public private(set) var items: [EntitySchemaCollectionItem]
+    private(set) var nextCursor: String?
+    private(set) var items: [EntitySchemaCollectionItem]
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var address: String
+    private(set) var address: String
 
-    public init(ledgerState: LedgerState, totalCount: Int64? = nil, nextCursor: String? = nil, items: [EntitySchemaCollectionItem], address: String) {
+    init(ledgerState: LedgerState, totalCount: Int64? = nil, nextCursor: String? = nil, items: [EntitySchemaCollectionItem], address: String) {
         self.ledgerState = ledgerState
         self.totalCount = totalCount
         self.nextCursor = nextCursor
@@ -34,7 +34,7 @@ public struct StateEntitySchemaPageResponse: Codable, Hashable {
         self.address = address
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case ledgerState = "ledger_state"
         case totalCount = "total_count"
         case nextCursor = "next_cursor"
@@ -44,7 +44,7 @@ public struct StateEntitySchemaPageResponse: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(ledgerState, forKey: .ledgerState)
         try container.encodeIfPresent(totalCount, forKey: .totalCount)

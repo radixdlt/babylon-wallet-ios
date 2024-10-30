@@ -27,7 +27,7 @@ extension PoolUnitDetails.State {
 
 // MARK: - PoolUnitDetails.View
 extension PoolUnitDetails {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let containerWithHeader: DetailsContainerWithHeaderViewState
 		let thumbnailURL: URL?
 		let resources: [ResourceBalance.ViewState.Fungible]
@@ -36,14 +36,14 @@ extension PoolUnitDetails {
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<PoolUnitDetails>
 
-		public init(store: StoreOf<PoolUnitDetails>) {
+		init(store: StoreOf<PoolUnitDetails>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				DetailsContainerWithHeaderView(viewState: viewStore.containerWithHeader) {
 					viewStore.send(.closeButtonTapped)

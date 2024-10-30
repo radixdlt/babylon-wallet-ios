@@ -11,26 +11,26 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.TransactionFungibleBalanceChanges")
-public typealias TransactionFungibleBalanceChanges = GatewayAPI.TransactionFungibleBalanceChanges
+typealias TransactionFungibleBalanceChanges = GatewayAPI.TransactionFungibleBalanceChanges
 
 extension GatewayAPI {
 
-public struct TransactionFungibleBalanceChanges: Codable, Hashable {
+struct TransactionFungibleBalanceChanges: Codable, Hashable {
 
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var entityAddress: String
+    private(set) var entityAddress: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var resourceAddress: String
+    private(set) var resourceAddress: String
     /** The string-encoded decimal representing the amount of change for the fungible resource.  */
-    public private(set) var balanceChange: String
+    private(set) var balanceChange: String
 
-    public init(entityAddress: String, resourceAddress: String, balanceChange: String) {
+    init(entityAddress: String, resourceAddress: String, balanceChange: String) {
         self.entityAddress = entityAddress
         self.resourceAddress = resourceAddress
         self.balanceChange = balanceChange
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case entityAddress = "entity_address"
         case resourceAddress = "resource_address"
         case balanceChange = "balance_change"
@@ -38,7 +38,7 @@ public struct TransactionFungibleBalanceChanges: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(entityAddress, forKey: .entityAddress)
         try container.encode(resourceAddress, forKey: .resourceAddress)

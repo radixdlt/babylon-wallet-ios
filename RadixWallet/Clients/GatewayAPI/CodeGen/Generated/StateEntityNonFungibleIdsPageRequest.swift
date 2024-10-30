@@ -11,25 +11,25 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.StateEntityNonFungibleIdsPageRequest")
-public typealias StateEntityNonFungibleIdsPageRequest = GatewayAPI.StateEntityNonFungibleIdsPageRequest
+typealias StateEntityNonFungibleIdsPageRequest = GatewayAPI.StateEntityNonFungibleIdsPageRequest
 
 extension GatewayAPI {
 
-public struct StateEntityNonFungibleIdsPageRequest: Codable, Hashable {
+struct StateEntityNonFungibleIdsPageRequest: Codable, Hashable {
 
-    public private(set) var atLedgerState: LedgerStateSelector?
+    private(set) var atLedgerState: LedgerStateSelector?
     /** This cursor allows forward pagination, by providing the cursor from the previous request. */
-    public private(set) var cursor: String?
+    private(set) var cursor: String?
     /** The page size requested. */
-    public private(set) var limitPerPage: Int?
+    private(set) var limitPerPage: Int?
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var address: String
+    private(set) var address: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var vaultAddress: String
+    private(set) var vaultAddress: String
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var resourceAddress: String
+    private(set) var resourceAddress: String
 
-    public init(atLedgerState: LedgerStateSelector? = nil, cursor: String? = nil, limitPerPage: Int? = nil, address: String, vaultAddress: String, resourceAddress: String) {
+    init(atLedgerState: LedgerStateSelector? = nil, cursor: String? = nil, limitPerPage: Int? = nil, address: String, vaultAddress: String, resourceAddress: String) {
         self.atLedgerState = atLedgerState
         self.cursor = cursor
         self.limitPerPage = limitPerPage
@@ -38,7 +38,7 @@ public struct StateEntityNonFungibleIdsPageRequest: Codable, Hashable {
         self.resourceAddress = resourceAddress
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case atLedgerState = "at_ledger_state"
         case cursor
         case limitPerPage = "limit_per_page"
@@ -49,7 +49,7 @@ public struct StateEntityNonFungibleIdsPageRequest: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(atLedgerState, forKey: .atLedgerState)
         try container.encodeIfPresent(cursor, forKey: .cursor)

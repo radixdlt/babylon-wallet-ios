@@ -48,7 +48,7 @@ extension NewConnectionApproval.State {
 
 // MARK: - NewConnectionApproval.View
 extension NewConnectionApproval {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let screenState: ControlState
 		let continueButtonControlState: ControlState
 		let title: String
@@ -57,14 +57,14 @@ extension NewConnectionApproval {
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<NewConnectionApproval>
 
-		public init(store: StoreOf<NewConnectionApproval>) {
+		init(store: StoreOf<NewConnectionApproval>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: 0) {
 					Image(.desktopLinkConnector)

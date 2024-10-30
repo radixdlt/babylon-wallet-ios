@@ -1,14 +1,14 @@
 // MARK: - RecoverWalletControlWithBDFSOnly.View
-public extension RecoverWalletControlWithBDFSOnly {
+extension RecoverWalletControlWithBDFSOnly {
 	@MainActor
 	struct View: SwiftUI.View {
 		private let store: StoreOf<RecoverWalletControlWithBDFSOnly>
 
-		public init(store: StoreOf<RecoverWalletControlWithBDFSOnly>) {
+		init(store: StoreOf<RecoverWalletControlWithBDFSOnly>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			VStack(alignment: .center, spacing: .medium2) {
 				Text(L10n.RecoverWalletWithoutProfile.Info.headerTitle)
 					.textStyle(.sheetTitle)
@@ -48,7 +48,7 @@ struct RecoverWalletControlWithBDFSOnly_Preview: PreviewProvider {
 	}
 }
 
-public extension RecoverWalletControlWithBDFSOnly.State {
+extension RecoverWalletControlWithBDFSOnly.State {
 	static let previewValue = Self()
 }
 #endif

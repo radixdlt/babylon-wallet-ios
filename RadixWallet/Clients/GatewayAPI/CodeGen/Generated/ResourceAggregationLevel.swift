@@ -11,11 +11,11 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.ResourceAggregationLevel")
-public typealias ResourceAggregationLevel = GatewayAPI.ResourceAggregationLevel
+typealias ResourceAggregationLevel = GatewayAPI.ResourceAggregationLevel
 
 extension GatewayAPI {
 
-public enum ResourceAggregationLevel: String, Codable, CaseIterable {
+enum ResourceAggregationLevel: String, Codable, CaseIterable {
     case global = "Global"
     case vault = "Vault"
 }

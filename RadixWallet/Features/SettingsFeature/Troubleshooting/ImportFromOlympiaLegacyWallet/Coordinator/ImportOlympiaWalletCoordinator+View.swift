@@ -4,14 +4,14 @@ import SwiftUI
 // MARK: - ImportOlympiaWalletCoordinator.View
 extension ImportOlympiaWalletCoordinator {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<ImportOlympiaWalletCoordinator>
 
-		public init(store: StoreOf<ImportOlympiaWalletCoordinator>) {
+		init(store: StoreOf<ImportOlympiaWalletCoordinator>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			NavigationStackStore(store.scope(state: \.path, action: { .child(.path($0)) })) {
 				let scanQRStore = store.scope(state: \.scanQR, action: { .child(.scanQR($0)) })
 				ScanMultipleOlympiaQRCodes.View(store: scanQRStore)
@@ -88,6 +88,6 @@ struct ImportOlympiaWalletCoordinator_Preview: PreviewProvider {
 }
 
 extension ImportOlympiaWalletCoordinator.State {
-	public static let previewValue = Self()
+	static let previewValue = Self()
 }
 #endif

@@ -2,21 +2,21 @@ import Foundation
 
 // MARK: - Definition
 extension AccountPortfoliosClient {
-	public struct AccountPortfolio: Sendable, Hashable, CustomDebugStringConvertible {
+	struct AccountPortfolio: Sendable, Hashable, CustomDebugStringConvertible {
 		/// The visible account to consumers of this portfolio. It has already removed any reference to hidden resources.
-		public var account: OnLedgerEntity.OnLedgerAccount
+		var account: OnLedgerEntity.OnLedgerAccount
 
 		/// The original account, without any modifications made. Necessary for whenever we need to update the hidden resources.
 		private let originalAccount: OnLedgerEntity.OnLedgerAccount
 
 		private(set) var hiddenResources: [ResourceIdentifier]
 
-		public var poolUnitDetails: Loadable<[OnLedgerEntitiesClient.OwnedResourcePoolDetails]> = .idle
-		public var stakeUnitDetails: Loadable<IdentifiedArrayOf<OnLedgerEntitiesClient.OwnedStakeDetails>> = .idle
+		var poolUnitDetails: Loadable<[OnLedgerEntitiesClient.OwnedResourcePoolDetails]> = .idle
+		var stakeUnitDetails: Loadable<IdentifiedArrayOf<OnLedgerEntitiesClient.OwnedStakeDetails>> = .idle
 
 		var isCurrencyAmountVisible: Bool = true
 		var fiatCurrency: FiatCurrency = .usd
-		public var debugDescription: String {
+		var debugDescription: String {
 			account.debugDescription
 		}
 

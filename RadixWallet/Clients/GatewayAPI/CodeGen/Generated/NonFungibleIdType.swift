@@ -11,11 +11,11 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.NonFungibleIdType")
-public typealias NonFungibleIdType = GatewayAPI.NonFungibleIdType
+typealias NonFungibleIdType = GatewayAPI.NonFungibleIdType
 
 extension GatewayAPI {
 
-public enum NonFungibleIdType: String, Codable, CaseIterable {
+enum NonFungibleIdType: String, Codable, CaseIterable {
     case string = "String"
     case integer = "Integer"
     case bytes = "Bytes"

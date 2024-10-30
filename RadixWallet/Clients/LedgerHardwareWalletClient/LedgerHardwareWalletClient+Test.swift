@@ -1,6 +1,6 @@
 
 extension DependencyValues {
-	public var ledgerHardwareWalletClient: LedgerHardwareWalletClient {
+	var ledgerHardwareWalletClient: LedgerHardwareWalletClient {
 		get { self[LedgerHardwareWalletClient.self] }
 		set { self[LedgerHardwareWalletClient.self] = newValue }
 	}
@@ -8,9 +8,9 @@ extension DependencyValues {
 
 // MARK: - LedgerHardwareWalletClient + TestDependencyKey
 extension LedgerHardwareWalletClient: TestDependencyKey {
-	public static let previewValue = Self.noop
+	static let previewValue = Self.noop
 
-	public static let testValue = Self(
+	static let testValue = Self(
 		isConnectedToAnyConnectorExtension: unimplemented("\(Self.self).isConnectedToAnyConnectorExtension"),
 		getDeviceInfo: unimplemented("\(Self.self).getDeviceInfo"),
 		derivePublicKeys: unimplemented("\(Self.self).derivePublicKeys"),
@@ -19,7 +19,7 @@ extension LedgerHardwareWalletClient: TestDependencyKey {
 		deriveAndDisplayAddress: unimplemented("\(Self.self).deriveAndDisplayAddress")
 	)
 
-	public static let noop = Self(
+	static let noop = Self(
 		isConnectedToAnyConnectorExtension: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		getDeviceInfo: {
 			.init(

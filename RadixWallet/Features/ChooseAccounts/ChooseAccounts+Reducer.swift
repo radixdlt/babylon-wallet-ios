@@ -2,13 +2,13 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - ChooseAccounts
-public struct ChooseAccounts: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public let context: Context
-		public let filteredAccounts: [AccountAddress]
-		public var availableAccounts: IdentifiedArrayOf<Account>
-		public var selectedAccounts: [ChooseAccountsRow.State]?
-		public var canCreateNewAccount: Bool
+struct ChooseAccounts: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		let context: Context
+		let filteredAccounts: [AccountAddress]
+		var availableAccounts: IdentifiedArrayOf<Account>
+		var selectedAccounts: [ChooseAccountsRow.State]?
+		var canCreateNewAccount: Bool
 
 		@PresentationState
 		var destination: Destination.State? = nil
@@ -22,7 +22,7 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 			}
 		}
 
-		public init(
+		init(
 			context: Context,
 			filteredAccounts: [AccountAddress] = [],
 			availableAccounts: IdentifiedArrayOf<Account> = [],
@@ -37,26 +37,26 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case appeared
 		case createAccountButtonTapped
 		case selectedAccountsChanged([ChooseAccountsRow.State]?)
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case loadAccountsResult(TaskResult<Accounts>)
 	}
 
-	public struct Destination: DestinationReducer {
-		public enum State: Sendable, Hashable {
+	struct Destination: DestinationReducer {
+		enum State: Sendable, Hashable {
 			case createAccount(CreateAccountCoordinator.State)
 		}
 
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case createAccount(CreateAccountCoordinator.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: /State.createAccount, action: /Action.createAccount) {
 				CreateAccountCoordinator()
 			}
@@ -66,9 +66,9 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.accountsClient) var accountsClient
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -77,7 +77,7 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return loadAccounts()
@@ -94,7 +94,7 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadAccountsResult(.success(accounts)):
 			// Uniqueness is guaranteed as per `Accounts`
@@ -109,7 +109,7 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .createAccount(.delegate(.completed)):
 			loadAccounts()
@@ -131,7 +131,7 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 
 // MARK: - ChooseAccounts.State.Context
 extension ChooseAccounts.State {
-	public enum Context: Sendable, Hashable {
+	enum Context: Sendable, Hashable {
 		case assetTransfer
 		case permission(SelectionRequirement)
 	}

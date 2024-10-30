@@ -11,28 +11,28 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.MetadataPublicKeyValue")
-public typealias MetadataPublicKeyValue = GatewayAPI.MetadataPublicKeyValue
+typealias MetadataPublicKeyValue = GatewayAPI.MetadataPublicKeyValue
 
 extension GatewayAPI {
 
-public struct MetadataPublicKeyValue: Codable, Hashable {
+struct MetadataPublicKeyValue: Codable, Hashable {
 
-    public private(set) var type: MetadataValueType
-    public private(set) var value: PublicKey
+    private(set) var type: MetadataValueType
+    private(set) var value: PublicKey
 
-    public init(type: MetadataValueType, value: PublicKey) {
+    init(type: MetadataValueType, value: PublicKey) {
         self.type = type
         self.value = value
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case type
         case value
     }
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(type, forKey: .type)
         try container.encode(value, forKey: .value)

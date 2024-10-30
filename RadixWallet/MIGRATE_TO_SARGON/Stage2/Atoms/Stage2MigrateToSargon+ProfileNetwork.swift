@@ -10,19 +10,19 @@ struct PersonaAlreadyExists: Swift.Error {}
 struct TryingToUpdateAPersonaWhichIsNotAlreadySaved: Swift.Error {}
 
 extension ProfileNetwork {
-	public func getAccounts() -> Accounts {
+	func getAccounts() -> Accounts {
 		accounts.nonHidden
 	}
 
-	public func getHiddenAccounts() -> Accounts {
+	func getHiddenAccounts() -> Accounts {
 		accounts.hidden
 	}
 
-	public func accountsIncludingHidden() -> Accounts {
+	func accountsIncludingHidden() -> Accounts {
 		accounts.asIdentified()
 	}
 
-	public func hasSomeAccount() -> Bool {
+	func hasSomeAccount() -> Bool {
 		!accounts.isEmpty
 	}
 
@@ -30,25 +30,25 @@ extension ProfileNetwork {
 		accounts.count
 	}
 
-	public func getAuthorizedDapps() -> AuthorizedDapps {
+	func getAuthorizedDapps() -> AuthorizedDapps {
 		authorizedDapps.asIdentified()
 	}
 
 	#if DEBUG
-	public mutating func deleteAccount(address: AccountAddress) {
+	mutating func deleteAccount(address: AccountAddress) {
 		var identified = accounts.asIdentified()
 		identified.remove(id: address)
 		accounts = identified.elements
 	}
 	#endif
 
-	public mutating func updateAccount(_ account: Account) throws {
+	mutating func updateAccount(_ account: Account) throws {
 		var identified = accounts.asIdentified()
 		identified[id: account.id] = account
 		accounts = identified.elements
 	}
 
-	public mutating func addAccount(_ account: Account) throws {
+	mutating func addAccount(_ account: Account) throws {
 		var identified = accounts.asIdentified()
 		guard identified[id: account.id] == nil else {
 			throw AccountAlreadyExists()
@@ -59,7 +59,7 @@ extension ProfileNetwork {
 		accounts = identified.elements
 	}
 
-	public mutating func hideAccount(id: Account.ID) {
+	mutating func hideAccount(id: Account.ID) {
 		var identified = accounts.asIdentified()
 		identified[id: id]?.hide()
 		authorizedDapps.mutateAll { dapp in
@@ -70,29 +70,29 @@ extension ProfileNetwork {
 		accounts = identified.elements
 	}
 
-	public mutating func unhideAccount(id: Account.ID) {
+	mutating func unhideAccount(id: Account.ID) {
 		var identifiedAccounts = accounts.asIdentified()
 		identifiedAccounts[id: id]?.unhide()
 		accounts = identifiedAccounts.elements
 	}
 
-	public func getPersonas() -> Personas {
+	func getPersonas() -> Personas {
 		personas.asIdentified().nonHidden
 	}
 
-	public func getHiddenPersonas() -> Personas {
+	func getHiddenPersonas() -> Personas {
 		personas.asIdentified().hidden
 	}
 
-	public func personasIncludingHidden() -> Personas {
+	func personasIncludingHidden() -> Personas {
 		personas.asIdentified()
 	}
 
-	public func hasSomePersona() -> Bool {
+	func hasSomePersona() -> Bool {
 		!personas.isEmpty
 	}
 
-	public mutating func addPersona(_ persona: Persona) throws {
+	mutating func addPersona(_ persona: Persona) throws {
 		var identifiedPersonas = personas.asIdentified()
 		guard identifiedPersonas[id: persona.id] == nil else {
 			throw PersonaAlreadyExists()
@@ -102,7 +102,7 @@ extension ProfileNetwork {
 		self.personas = identifiedPersonas.elements
 	}
 
-	public mutating func updatePersona(_ persona: Persona) throws {
+	mutating func updatePersona(_ persona: Persona) throws {
 		var identifiedPersonas = personas.asIdentified()
 		guard identifiedPersonas.updateOrAppend(persona) != nil else {
 			throw TryingToUpdateAPersonaWhichIsNotAlreadySaved()
@@ -110,7 +110,7 @@ extension ProfileNetwork {
 		self.personas = identifiedPersonas.elements
 	}
 
-	public mutating func hidePersona(id: Persona.ID) {
+	mutating func hidePersona(id: Persona.ID) {
 		var identifiedPersonas = personas.asIdentified()
 		var identifiedAuthorizedDapps = authorizedDapps.asIdentified()
 
@@ -130,17 +130,17 @@ extension ProfileNetwork {
 		self.authorizedDapps = identifiedAuthorizedDapps.elements
 	}
 
-	public mutating func unhidePersona(id: Persona.ID) {
+	mutating func unhidePersona(id: Persona.ID) {
 		var identifiedPersonas = personas.asIdentified()
 		identifiedPersonas[id: id]?.unhide()
 		personas = identifiedPersonas.elements
 	}
 
-	public func getHiddenResources() -> [ResourceIdentifier] {
+	func getHiddenResources() -> [ResourceIdentifier] {
 		resourcePreferences.hiddenResources
 	}
 
-	public var customDumpMirror: Mirror {
+	var customDumpMirror: Mirror {
 		.init(
 			self,
 			children: [
@@ -153,7 +153,7 @@ extension ProfileNetwork {
 		)
 	}
 
-	public var description: String {
+	var description: String {
 		"""
 		networkID: \(id),
 		accounts: \(accounts),
@@ -168,14 +168,14 @@ extension ProfileNetworks {
 		count == 0
 	}
 
-	public func network(id needle: NetworkID) throws -> ProfileNetwork {
+	func network(id needle: NetworkID) throws -> ProfileNetwork {
 		guard let network = self[id: needle] else {
 			throw Error.unknownNetworkWithID(needle)
 		}
 		return network
 	}
 
-	public enum Error:
+	enum Error:
 		Swift.Error,
 		Sendable,
 		Hashable
@@ -184,7 +184,7 @@ extension ProfileNetworks {
 		case networkAlreadyExistsWithID(NetworkID)
 	}
 
-	public mutating func update(_ network: ProfileNetwork) throws {
+	mutating func update(_ network: ProfileNetwork) throws {
 		guard self[id: network.id] != nil else {
 			throw Error.unknownNetworkWithID(network.id)
 		}
@@ -192,7 +192,7 @@ extension ProfileNetworks {
 		assert(updatedElement != nil)
 	}
 
-	public mutating func add(_ network: ProfileNetwork) throws {
+	mutating func add(_ network: ProfileNetwork) throws {
 		guard self[id: network.id] == nil else {
 			throw Error.networkAlreadyExistsWithID(network.id)
 		}

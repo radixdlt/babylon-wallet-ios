@@ -1,16 +1,16 @@
 // MARK: - ScannedParsedOlympiaWalletToMigrate
-public struct ScannedParsedOlympiaWalletToMigrate: Sendable, Hashable {
-	public let mnemonicWordCount: BIP39WordCount
-	public let accounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
+struct ScannedParsedOlympiaWalletToMigrate: Sendable, Hashable {
+	let mnemonicWordCount: BIP39WordCount
+	let accounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
 }
 
 // MARK: - MigrateOlympiaSoftwareAccountsToBabylonRequest
-public struct MigrateOlympiaSoftwareAccountsToBabylonRequest: Sendable, Hashable {
-	public let olympiaAccounts: Set<OlympiaAccountToMigrate>
-	public let olympiaFactorSouceID: FactorSourceIDFromHash
-	public let olympiaFactorSource: PrivateHierarchicalDeterministicFactorSource?
+struct MigrateOlympiaSoftwareAccountsToBabylonRequest: Sendable, Hashable {
+	let olympiaAccounts: Set<OlympiaAccountToMigrate>
+	let olympiaFactorSouceID: FactorSourceIDFromHash
+	let olympiaFactorSource: PrivateHierarchicalDeterministicFactorSource?
 
-	public init(
+	init(
 		olympiaAccounts: Set<OlympiaAccountToMigrate>,
 		olympiaFactorSouceID: FactorSourceIDFromHash,
 		olympiaFactorSource: PrivateHierarchicalDeterministicFactorSource?
@@ -22,11 +22,11 @@ public struct MigrateOlympiaSoftwareAccountsToBabylonRequest: Sendable, Hashable
 }
 
 // MARK: - MigrateOlympiaHardwareAccountsToBabylonRequest
-public struct MigrateOlympiaHardwareAccountsToBabylonRequest: Sendable, Hashable {
-	public let olympiaAccounts: NonEmpty<Set<OlympiaAccountToMigrate>>
-	public let ledgerFactorSourceID: FactorSourceIDFromHash
+struct MigrateOlympiaHardwareAccountsToBabylonRequest: Sendable, Hashable {
+	let olympiaAccounts: NonEmpty<Set<OlympiaAccountToMigrate>>
+	let ledgerFactorSourceID: FactorSourceIDFromHash
 
-	public init(
+	init(
 		olympiaAccounts: NonEmpty<Set<OlympiaAccountToMigrate>>,
 		ledgerFactorSourceID: FactorSourceIDFromHash
 	) {

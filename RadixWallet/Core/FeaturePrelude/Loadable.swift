@@ -52,21 +52,21 @@
 
 @propertyWrapper
 @dynamicMemberLookup
-public enum Loadable<Value> {
+enum Loadable<Value> {
 	case idle
 	case loading
 	case success(Value)
 	case failure(Error)
 
-	public subscript<T>(dynamicMember keyPath: KeyPath<Value, T>) -> Loadable<T> {
+	subscript<T>(dynamicMember keyPath: KeyPath<Value, T>) -> Loadable<T> {
 		map { $0[keyPath: keyPath] }
 	}
 
-	public init(wrappedValue: Value?) {
+	init(wrappedValue: Value?) {
 		self.init(wrappedValue)
 	}
 
-	public init(_ value: Value?) {
+	init(_ value: Value?) {
 		if let value {
 			self = .success(value)
 		} else {
@@ -74,16 +74,16 @@ public enum Loadable<Value> {
 		}
 	}
 
-	public init(_ error: Error) {
+	init(_ error: Error) {
 		self = .failure(error)
 	}
 
-	public var projectedValue: Self {
+	var projectedValue: Self {
 		get { self }
 		set { self = newValue }
 	}
 
-	public var wrappedValue: Value? {
+	var wrappedValue: Value? {
 		get {
 			guard case let .success(value) = self else { return nil }
 			return value
@@ -93,21 +93,21 @@ public enum Loadable<Value> {
 		}
 	}
 
-	public var isLoading: Bool {
+	var isLoading: Bool {
 		if case .loading = self {
 			return true
 		}
 		return false
 	}
 
-    public var isSuccess: Bool {
+    var isSuccess: Bool {
         if case .success = self {
             return true
         }
         return false
     }
 
-    public var didLoad: Bool {
+    var didLoad: Bool {
         switch self {
         case .success, .failure:
             return true
@@ -118,7 +118,7 @@ public enum Loadable<Value> {
 }
 
 extension Loadable {
-	public init(result: TaskResult<Value>) {
+	init(result: TaskResult<Value>) {
 		switch result {
 		case let .success(value):
 			self = .success(value)
@@ -130,7 +130,7 @@ extension Loadable {
 
 // MARK: Equatable
 extension Loadable: Equatable where Value: Equatable {
-	public static func == (lhs: Self, rhs: Self) -> Bool {
+	static func == (lhs: Self, rhs: Self) -> Bool {
 		switch (lhs, rhs) {
 		case let (.success(lhs), .success(rhs)):
 			lhs == rhs
@@ -160,7 +160,7 @@ extension Equatable {
 
 // MARK: - Loadable + Hashable
 extension Loadable: Hashable where Value: Hashable {
-	public func hash(into hasher: inout Hasher) {
+	func hash(into hasher: inout Hasher) {
 		switch self {
 		case .idle:
 			hasher.combine(0)
@@ -182,18 +182,18 @@ extension Loadable: Hashable where Value: Hashable {
 extension Loadable: Sendable where Value: Sendable {}
 
 extension Loadable {
-	public func map<NewValue>(_ transform: (Value) -> NewValue) -> Loadable<NewValue> {
+	func map<NewValue>(_ transform: (Value) -> NewValue) -> Loadable<NewValue> {
 		flatMap { .success(transform($0)) }
 	}
 
-    public func errorFallback(_ fallback: Value) -> Loadable<Value> {
+    func errorFallback(_ fallback: Value) -> Loadable<Value> {
         if case .failure = self {
             return .success(fallback)
         }
         return self
     }
 
-	public func filter(by predicate: (Value.Element) -> Bool) -> Loadable<[Value.Element]> where Value: Sequence {
+	func filter(by predicate: (Value.Element) -> Bool) -> Loadable<[Value.Element]> where Value: Sequence {
 		switch self {
 		case .idle:
 			return .idle
@@ -207,7 +207,7 @@ extension Loadable {
 	}
 
 	/// Transforms a Loadable<Wrapped?> to Loadable<Wrapped>?
-	public func unwrap<Wrapped>() -> Loadable<Wrapped>? where Value == Wrapped? {
+	func unwrap<Wrapped>() -> Loadable<Wrapped>? where Value == Wrapped? {
 		switch self {
 		case .idle:
 			return .idle
@@ -223,7 +223,7 @@ extension Loadable {
 		}
 	}
 
-	public func first(where predicate: (Value.Element) -> Bool) -> Loadable<Value.Element?> where Value: Sequence {
+	func first(where predicate: (Value.Element) -> Bool) -> Loadable<Value.Element?> where Value: Sequence {
 		switch self {
 		case .idle:
 			return .idle
@@ -236,7 +236,7 @@ extension Loadable {
 		}
 	}
 
-	public func flatMap<NewValue>(_ transform: (Value) -> Loadable<NewValue>) -> Loadable<NewValue> {
+	func flatMap<NewValue>(_ transform: (Value) -> Loadable<NewValue>) -> Loadable<NewValue> {
 		switch self {
 		case .idle:
 			.idle
@@ -249,7 +249,7 @@ extension Loadable {
 		}
 	}
 
-	public func flatMap<NewValue>(_ transform: (Value) async -> Loadable<NewValue>) async -> Loadable<NewValue> {
+	func flatMap<NewValue>(_ transform: (Value) async -> Loadable<NewValue>) async -> Loadable<NewValue> {
 		switch self {
 		case .idle:
 			.idle
@@ -262,7 +262,7 @@ extension Loadable {
 		}
 	}
 
-	public func concat<OtherValue>(_ other: Loadable<OtherValue>) -> Loadable<(Value, OtherValue)> {
+	func concat<OtherValue>(_ other: Loadable<OtherValue>) -> Loadable<(Value, OtherValue)> {
 		switch (self, other) {
 		case (.idle, _), (_, .idle):
 			.idle
@@ -275,7 +275,7 @@ extension Loadable {
 		}
 	}
 
-    public func flatten<InnerValue>() -> Loadable<InnerValue> where Value == Loadable<InnerValue> {
+    func flatten<InnerValue>() -> Loadable<InnerValue> where Value == Loadable<InnerValue> {
         switch self {
         case .idle:
             return .idle
@@ -288,11 +288,11 @@ extension Loadable {
         }
     }
 
-    public func reduce(_ other: Loadable<Value>, join: (Value, Value) -> Value) -> Loadable<Value> {
+    func reduce(_ other: Loadable<Value>, join: (Value, Value) -> Value) -> Loadable<Value> {
         concat(other).map(join)
     }
 
-    public mutating func mutateValue(_ mutate: (inout Value) -> Void) {
+    mutating func mutateValue(_ mutate: (inout Value) -> Void) {
         switch self {
         case .idle, .loading, .failure:
             return
@@ -304,7 +304,7 @@ extension Loadable {
 
     /// Refreshes from other Loadable by taking into account the current `success` state.
     /// This is meant to preserve the `success` state while other Loadable is `loading` or `failed`.
-    public mutating func refresh(
+    mutating func refresh(
         from other: Loadable<Value>,
         valueChangeMap: (_ old: Value, _ new: Value) -> Value = { _, new in new }
     ) where Value: Equatable {
@@ -352,7 +352,7 @@ extension Array {
 
 extension Loadable {
 	/// Extract the given field either from the prefetched value or from the loaded value
-	public func get<Field>(_ keyPath: KeyPath<Value, Field>, prefetched: Value?) -> Loadable<Field> {
+	func get<Field>(_ keyPath: KeyPath<Value, Field>, prefetched: Value?) -> Loadable<Field> {
 		guard let prefetchedField = prefetched?[keyPath: keyPath] else {
 			return map { $0[keyPath: keyPath] }
 		}

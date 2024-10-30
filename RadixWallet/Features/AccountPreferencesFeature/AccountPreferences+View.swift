@@ -43,7 +43,7 @@ extension AccountPreferences.State {
 
 // MARK: - AccountPreferences.View
 extension AccountPreferences {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		typealias Section = PreferenceSection<AccountPreferences.Section, AccountPreferences.Section.SectionRow>.ViewState
 		let account: Account
 		let sections: [Section]
@@ -52,14 +52,14 @@ extension AccountPreferences {
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<AccountPreferences>
 
-		public init(store: StoreOf<AccountPreferences>) {
+		init(store: StoreOf<AccountPreferences>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				PreferencesList(
 					viewState: .init(sections: viewStore.sections),
@@ -162,29 +162,29 @@ private extension View {
 
 // MARK: - AccountPreferences.Section
 extension AccountPreferences {
-	public enum Section: Hashable, Sendable {
+	enum Section: Hashable, Sendable {
 		case personalize
 		case onLedgerBehaviour
 		case development
 
-		public enum SectionRow: Hashable, Sendable {
+		enum SectionRow: Hashable, Sendable {
 			case personalize(PersonalizeRow)
 			case onLedger(OnLedgerBehaviourRow)
 			case dev(DevelopmentRow)
 		}
 
-		public enum PersonalizeRow: Hashable, Sendable {
+		enum PersonalizeRow: Hashable, Sendable {
 			case accountLabel
 			case accountColor
 			case tags
 		}
 
-		public enum OnLedgerBehaviourRow: Hashable, Sendable {
+		enum OnLedgerBehaviourRow: Hashable, Sendable {
 			case accountSecurity
 			case thirdPartyDeposits
 		}
 
-		public enum DevelopmentRow: Hashable, Sendable {
+		enum DevelopmentRow: Hashable, Sendable {
 			case devPreferences
 		}
 	}

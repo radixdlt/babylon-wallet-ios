@@ -9,19 +9,19 @@ extension AddLedgerFactorSource.State {
 
 // MARK: - AddLedgerFactorSource.View
 extension AddLedgerFactorSource {
-	public struct ViewState: Equatable {
-		public let continueButtonControlState: ControlState
+	struct ViewState: Equatable {
+		let continueButtonControlState: ControlState
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<AddLedgerFactorSource>
 
-		public init(store: StoreOf<AddLedgerFactorSource>) {
+		init(store: StoreOf<AddLedgerFactorSource>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			NavigationStack {
 				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 					VStack(spacing: 0) {
@@ -131,21 +131,21 @@ extension NameLedgerFactorSource.State {
 }
 
 extension NameLedgerFactorSource {
-	public struct ViewState: Equatable {
-		public let ledgerName: String
-		public let model: P2P.LedgerHardwareWallet.Model
-		public let confirmButtonControlState: ControlState
+	struct ViewState: Equatable {
+		let ledgerName: String
+		let model: P2P.LedgerHardwareWallet.Model
+		let confirmButtonControlState: ControlState
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<NameLedgerFactorSource>
 
-		public init(store: StoreOf<NameLedgerFactorSource>) {
+		init(store: StoreOf<NameLedgerFactorSource>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			NavigationStack {
 				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 					ScrollView(showsIndicators: false) {

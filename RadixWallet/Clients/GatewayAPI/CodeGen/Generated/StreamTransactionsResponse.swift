@@ -11,28 +11,28 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.StreamTransactionsResponse")
-public typealias StreamTransactionsResponse = GatewayAPI.StreamTransactionsResponse
+typealias StreamTransactionsResponse = GatewayAPI.StreamTransactionsResponse
 
 extension GatewayAPI {
 
-public struct StreamTransactionsResponse: Codable, Hashable {
+struct StreamTransactionsResponse: Codable, Hashable {
 
-    public private(set) var ledgerState: LedgerState
+    private(set) var ledgerState: LedgerState
     /** Total number of items in underlying collection, fragment of which is available in `items` collection. */
-    public private(set) var totalCount: Int64?
+    private(set) var totalCount: Int64?
     /** If specified, contains a cursor to query next page of the `items` collection. */
-    public private(set) var nextCursor: String?
+    private(set) var nextCursor: String?
     /** The page of user transactions. */
-    public private(set) var items: [CommittedTransactionInfo]
+    private(set) var items: [CommittedTransactionInfo]
 
-    public init(ledgerState: LedgerState, totalCount: Int64? = nil, nextCursor: String? = nil, items: [CommittedTransactionInfo]) {
+    init(ledgerState: LedgerState, totalCount: Int64? = nil, nextCursor: String? = nil, items: [CommittedTransactionInfo]) {
         self.ledgerState = ledgerState
         self.totalCount = totalCount
         self.nextCursor = nextCursor
         self.items = items
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case ledgerState = "ledger_state"
         case totalCount = "total_count"
         case nextCursor = "next_cursor"
@@ -41,7 +41,7 @@ public struct StreamTransactionsResponse: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(ledgerState, forKey: .ledgerState)
         try container.encodeIfPresent(totalCount, forKey: .totalCount)

@@ -4,15 +4,15 @@ import SwiftUI
 // MARK: - Settings.View
 extension Settings {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: Store
 
-		public init(store: Store) {
+		init(store: Store) {
 			self.store = store
 		}
 	}
 
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		#if DEBUG
 		let debugAppInfo: String
 		#endif
@@ -45,7 +45,7 @@ extension Settings {
 }
 
 extension Settings.View {
-	public var body: some View {
+	var body: some View {
 		settingsView()
 			.radixToolbar(title: L10n.WalletSettings.title)
 			.tint(.app.gray1)

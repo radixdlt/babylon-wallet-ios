@@ -2,7 +2,7 @@ import Foundation
 import Sargon
 
 extension FactorSourceCommon {
-	public static func new(
+	static func new(
 		cryptoParameters: FactorSourceCryptoParameters
 	) throws -> Self {
 		@Dependency(\.date) var date

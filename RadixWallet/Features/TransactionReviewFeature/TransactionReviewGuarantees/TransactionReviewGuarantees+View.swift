@@ -9,19 +9,19 @@ extension TransactionReviewGuarantees.State {
 
 // MARK: - TransactionReviewGuarantees.View
 extension TransactionReviewGuarantees {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let isValid: Bool
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		let store: StoreOf<TransactionReviewGuarantees>
 
-		public init(store: StoreOf<TransactionReviewGuarantees>) {
+		init(store: StoreOf<TransactionReviewGuarantees>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			NavigationStack {
 				ScrollView(showsIndicators: false) {
 					VStack(spacing: 0) {
@@ -89,20 +89,20 @@ extension TransactionReviewGuarantee.State {
 }
 
 extension TransactionReviewGuarantee {
-	public struct ViewState: Identifiable, Equatable {
-		public let id: TransactionReview.Transfer.ID
+	struct ViewState: Identifiable, Equatable {
+		let id: TransactionReview.Transfer.ID
 		let account: TransactionReview.ReviewAccount
 		let fungible: ResourceBalance.ViewState.Fungible
 	}
 
-	public struct View: SwiftUI.View {
-		public let store: StoreOf<TransactionReviewGuarantee>
+	struct View: SwiftUI.View {
+		let store: StoreOf<TransactionReviewGuarantee>
 
-		public init(store: StoreOf<TransactionReviewGuarantee>) {
+		init(store: StoreOf<TransactionReviewGuarantee>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState) { viewStore in
 				Card {
 					VStack(spacing: 0) {

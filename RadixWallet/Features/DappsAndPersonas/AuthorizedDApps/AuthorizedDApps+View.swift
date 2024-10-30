@@ -25,14 +25,14 @@ extension AuthorizedDappsFeature.State {
 // MARK: - AuthorizedDappsFeature.View
 extension AuthorizedDappsFeature {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: Store
 
-		public init(store: Store) {
+		init(store: Store) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }) { viewStore in
 				ScrollView {
 					VStack(alignment: .leading, spacing: .medium1) {

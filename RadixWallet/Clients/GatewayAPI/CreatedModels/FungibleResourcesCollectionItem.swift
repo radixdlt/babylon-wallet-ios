@@ -1,10 +1,10 @@
 
 @available(*, deprecated, renamed: "GatewayAPI.FungibleResourcesCollectionItem")
-public typealias FungibleResourcesCollectionItem = GatewayAPI.FungibleResourcesCollectionItem
+typealias FungibleResourcesCollectionItem = GatewayAPI.FungibleResourcesCollectionItem
 
 // MARK: - GatewayAPI.FungibleResourcesCollectionItem
 extension GatewayAPI {
-	public enum FungibleResourcesCollectionItem: Codable, Hashable {
+	enum FungibleResourcesCollectionItem: Codable, Hashable {
 		case globallyAggregated(FungibleResourcesCollectionItemGloballyAggregated)
 		case vaultAggregated(FungibleResourcesCollectionItemVaultAggregated)
 
@@ -12,21 +12,21 @@ extension GatewayAPI {
 			case aggregationLevel = "aggregation_level"
 		}
 
-		public var global: FungibleResourcesCollectionItemGloballyAggregated? {
+		var global: FungibleResourcesCollectionItemGloballyAggregated? {
 			if case let .globallyAggregated(wrapped) = self {
 				return wrapped
 			}
 			return nil
 		}
 
-		public var vault: FungibleResourcesCollectionItemVaultAggregated? {
+		var vault: FungibleResourcesCollectionItemVaultAggregated? {
 			if case let .vaultAggregated(wrapped) = self {
 				return wrapped
 			}
 			return nil
 		}
 
-		public var resourceAddress: String {
+		var resourceAddress: String {
 			switch self {
 			case let .globallyAggregated(wrapped):
 				wrapped.resourceAddress
@@ -35,7 +35,7 @@ extension GatewayAPI {
 			}
 		}
 
-		public init(from decoder: Decoder) throws {
+		init(from decoder: Decoder) throws {
 			let container = try decoder.container(keyedBy: CodingKeys.self)
 			let aggregationLevel = try container.decode(ResourceAggregationLevel.self, forKey: .aggregationLevel)
 
@@ -47,7 +47,7 @@ extension GatewayAPI {
 			}
 		}
 
-		public func encode(to encoder: Encoder) throws {
+		func encode(to encoder: Encoder) throws {
 			switch self {
 			case let .globallyAggregated(item):
 				try item.encode(to: encoder)

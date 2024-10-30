@@ -26,20 +26,20 @@ extension ManageThirdPartyDeposits.State {
 }
 
 extension ManageThirdPartyDeposits {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let sections: [PreferenceSection<ManageThirdPartyDeposits.Section, ManageThirdPartyDeposits.Section.Row>.ViewState]
 		let updateButtonControlState: ControlState
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		let store: StoreOf<ManageThirdPartyDeposits>
 
 		init(store: StoreOf<ManageThirdPartyDeposits>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				PreferencesList(
 					viewState: .init(sections: viewStore.sections),
@@ -62,22 +62,22 @@ extension ManageThirdPartyDeposits {
 
 // MARK: - ManageThirdPartyDeposits.Section
 extension ManageThirdPartyDeposits {
-	public enum Section: Hashable, Sendable {
+	enum Section: Hashable, Sendable {
 		case depositRules
 		case allowDenyAssets
 		case allowDepositors
 
-		public enum Row: Hashable, Sendable {
+		enum Row: Hashable, Sendable {
 			case depositRule(DepositRule)
 			case allowDenyAssets(AllowDenyAssetsRow)
 			case allowDepositors(AllowDepositorsRow)
 		}
 
-		public enum AllowDenyAssetsRow: Hashable, Sendable {
+		enum AllowDenyAssetsRow: Hashable, Sendable {
 			case allowDenyAssets
 		}
 
-		public enum AllowDepositorsRow: Hashable, Sendable {
+		enum AllowDepositorsRow: Hashable, Sendable {
 			case allowDepositors
 		}
 	}

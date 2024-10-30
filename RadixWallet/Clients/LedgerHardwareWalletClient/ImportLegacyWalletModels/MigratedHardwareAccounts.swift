@@ -1,14 +1,14 @@
 // MARK: - MigratedHardwareAccounts
-public struct MigratedHardwareAccounts: Sendable, Hashable {
-	public let networkID: NetworkID
-	public let ledgerID: LedgerHardwareWalletFactorSource.ID
+struct MigratedHardwareAccounts: Sendable, Hashable {
+	let networkID: NetworkID
+	let ledgerID: LedgerHardwareWalletFactorSource.ID
 
-	public let accounts: NonEmpty<OrderedSet<MigratedAccount>>
-	public var babylonAccounts: Accounts {
+	let accounts: NonEmpty<OrderedSet<MigratedAccount>>
+	var babylonAccounts: Accounts {
 		Accounts(accounts.map(\.babylon))
 	}
 
-	public init(
+	init(
 		networkID: NetworkID,
 		ledgerID: LedgerHardwareWalletFactorSource.ID,
 		accounts: NonEmpty<OrderedSet<MigratedAccount>>
@@ -26,7 +26,7 @@ public struct MigratedHardwareAccounts: Sendable, Hashable {
 }
 
 extension [MigratedHardwareAccounts] {
-	public func collectBabylonAccounts() -> IdentifiedArrayOf<Account> {
+	func collectBabylonAccounts() -> IdentifiedArrayOf<Account> {
 		var result: IdentifiedArrayOf<Account> = []
 		for accounts in self {
 			result.append(contentsOf: accounts.babylonAccounts)

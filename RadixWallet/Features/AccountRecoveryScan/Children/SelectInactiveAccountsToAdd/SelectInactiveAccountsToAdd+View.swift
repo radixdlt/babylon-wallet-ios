@@ -1,7 +1,7 @@
 
 // MARK: - SelectInactiveAccountsToAdd.View
 
-public extension SelectInactiveAccountsToAdd {
+extension SelectInactiveAccountsToAdd {
 	struct ViewState: Equatable {
 		let availableAccounts: [ChooseAccountsRow.State]
 		let selectionRequirement: SelectionRequirement
@@ -22,11 +22,11 @@ public extension SelectInactiveAccountsToAdd {
 	struct View: SwiftUI.View {
 		private let store: StoreOf<SelectInactiveAccountsToAdd>
 
-		public init(store: StoreOf<SelectInactiveAccountsToAdd>) {
+		init(store: StoreOf<SelectInactiveAccountsToAdd>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(
 				store,
 				observe: SelectInactiveAccountsToAdd.ViewState.init,

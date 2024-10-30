@@ -3,49 +3,49 @@ import Sargon
 import SwiftUI
 
 // MARK: - ProfileSelection
-public struct ProfileSelection: Sendable, Hashable {
-	public let profile: Profile
-	public let containsP2PLinks: Bool
+struct ProfileSelection: Sendable, Hashable {
+	let profile: Profile
+	let containsP2PLinks: Bool
 }
 
 // MARK: - RestoreProfileFromBackupCoordinator
-public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public var selectBackup = SelectBackup.State()
-		public var profileSelection: ProfileSelection?
+struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		var selectBackup = SelectBackup.State()
+		var profileSelection: ProfileSelection?
 
 		@PresentationState
-		public var destination: Destination.State?
+		var destination: Destination.State?
 	}
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case importMnemonicsFlow(ImportMnemonicsFlowCoordinator.State)
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case importMnemonicsFlow(ImportMnemonicsFlowCoordinator.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: \.importMnemonicsFlow, action: \.importMnemonicsFlow) {
 				ImportMnemonicsFlowCoordinator()
 			}
 		}
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case startImportMnemonicsFlow(Profile)
 	}
 
 	@CasePathable
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case selectBackup(SelectBackup.Action)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case profileImported(skippedAnyMnemonic: Bool)
 		case failedToImportProfileDueToMnemonics
 		case backToStartOfOnboarding
@@ -58,9 +58,9 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.radixConnectClient) var radixConnectClient
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Scope(state: \.selectBackup, action: \.child.selectBackup) {
 			SelectBackup()
 		}
@@ -72,7 +72,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .selectBackup(.delegate(.selectedProfile(profile, containsLegacyP2PLinks))):
 			state.profileSelection = .init(profile: profile, containsP2PLinks: containsLegacyP2PLinks)
@@ -94,7 +94,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .startImportMnemonicsFlow(profile):
 			state.destination = .importMnemonicsFlow(.init(context: .fromOnboarding(profile: profile)))
@@ -102,9 +102,9 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case let .importMnemonicsFlow(.delegate(.finishedImportingMnemonics(skipList, _, notYetSavedNewMainBDFS))):
+		case let .importMnemonicsFlow(.delegate(.finishedImportingMnemonics(skipList, _, skippedMainBdfs))):
 			loggerGlobal.notice("Starting import snapshot process...")
 			guard let profileSelection = state.profileSelection else {
 				preconditionFailure("Expected to have a profile")
@@ -115,11 +115,12 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 				let factorSourceIDs: Set<FactorSourceIDFromHash> = .init(
 					profileSelection.profile.factorSources.compactMap { $0.extract(DeviceFactorSource.self) }.map(\.id)
 				)
-				try await transportProfileClient.importProfile(profileSelection.profile, factorSourceIDs, profileSelection.containsP2PLinks)
-
-				if let notYetSavedNewMainBDFS {
-					try await factorSourcesClient.saveNewMainBDFS(notYetSavedNewMainBDFS)
-				}
+				try await transportProfileClient.importProfile(
+					profileSelection.profile,
+					factorSourceIDs,
+					skippedMainBdfs,
+					profileSelection.containsP2PLinks
+				)
 
 				await send(.delegate(.profileImported(
 					skippedAnyMnemonic: !skipList.isEmpty

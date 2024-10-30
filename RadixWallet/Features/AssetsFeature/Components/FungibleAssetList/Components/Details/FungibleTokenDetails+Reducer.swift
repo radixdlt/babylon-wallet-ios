@@ -2,8 +2,8 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - FungibleTokenDetails
-public struct FungibleTokenDetails: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
+struct FungibleTokenDetails: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
 		let resourceAddress: ResourceAddress
 		var resource: Loadable<OnLedgerEntity.Resource>
 		let isXRD: Bool
@@ -11,7 +11,7 @@ public struct FungibleTokenDetails: Sendable, FeatureReducer {
 		let ledgerState: AtLedgerState?
 		var hideResource: HideResource.State
 
-		public init(
+		init(
 			resourceAddress: ResourceAddress,
 			resource: Loadable<OnLedgerEntity.Resource> = .idle,
 			ownedFungibleResource: OnLedgerEntity.OwnedFungibleResource? = nil,
@@ -27,17 +27,17 @@ public struct FungibleTokenDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case closeButtonTapped
 		case task
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case resourceLoadResult(TaskResult<OnLedgerEntity.Resource>)
 	}
 
 	@CasePathable
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case hideResource(HideResource.Action)
 	}
 
@@ -45,9 +45,9 @@ public struct FungibleTokenDetails: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.dismiss) var dismiss
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Scope(state: \.hideResource, action: \.child.hideResource) {
 			HideResource()
 		}
@@ -55,7 +55,7 @@ public struct FungibleTokenDetails: Sendable, FeatureReducer {
 		Reduce(core)
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			guard case .idle = state.resource else {
@@ -71,7 +71,7 @@ public struct FungibleTokenDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .resourceLoadResult(.success(resource)):
 			state.resource = .success(resource)
@@ -83,7 +83,7 @@ public struct FungibleTokenDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .hideResource(.delegate(.didHideResource)):
 			.run { _ in await dismiss() }

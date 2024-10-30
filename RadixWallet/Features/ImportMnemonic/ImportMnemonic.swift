@@ -3,15 +3,15 @@ import Sargon
 import SwiftUI
 
 // MARK: - ImportMnemonic
-public struct ImportMnemonic: Sendable, FeatureReducer {
-	public static let wordsPerRow = 3
+struct ImportMnemonic: Sendable, FeatureReducer {
+	static let wordsPerRow = 3
 
-	public struct State: Sendable, Hashable {
-		public typealias Words = IdentifiedArrayOf<ImportMnemonicWord.State>
-		public var words: Words
+	struct State: Sendable, Hashable {
+		typealias Words = IdentifiedArrayOf<ImportMnemonicWord.State>
+		var words: Words
 
-		public var language: BIP39Language
-		public var wordCount: BIP39WordCount {
+		var language: BIP39Language
+		var wordCount: BIP39WordCount {
 			guard let wordCount = BIP39WordCount(wordCount: words.count) else {
 				assertionFailure("Should never happen")
 				return .twentyFour
@@ -19,7 +19,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return wordCount
 		}
 
-		public mutating func changeWordCount(to newWordCount: BIP39WordCount) {
+		mutating func changeWordCount(to newWordCount: BIP39WordCount) {
 			let wordCount = words.count
 			let delta = Int(newWordCount.rawValue) - wordCount
 			if delta > 0 {
@@ -36,9 +36,9 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			}
 		}
 
-		public var bip39Passphrase: String = ""
+		var bip39Passphrase: String = ""
 
-		public var mnemonic: Mnemonic? {
+		var mnemonic: Mnemonic? {
 			guard completedWords.count == words.count else {
 				return nil
 			}
@@ -47,45 +47,45 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			)
 		}
 
-		public var completedWords: [BIP39Word] {
+		var completedWords: [BIP39Word] {
 			words.compactMap(\.completeWord)
 		}
 
-		public let isWordCountFixed: Bool
-		public var isAdvancedMode: Bool = false
+		let isWordCountFixed: Bool
+		var isAdvancedMode: Bool = false
 
-		public let header: Header?
-		public let warning: String?
-		public let warningOnContinue: OnContinueWarning?
+		let header: Header?
+		let warning: String?
+		let warningOnContinue: OnContinueWarning?
 
-		public struct ReadonlyMode: Sendable, Hashable {
-			public enum Context: Sendable, Hashable {
+		struct ReadonlyMode: Sendable, Hashable {
+			enum Context: Sendable, Hashable {
 				case fromSettings
 				case fromBackupPrompt
 			}
 
-			public let context: Context
+			let context: Context
 
 			// FIXME: This aint pretty... but we are short on time, forgive me... we are putting WAY
 			// to much logic and responsibility into this reducer here... for when a mnemonic is displayed
 			// either from settings or from AccountDetails after user have pressed "Back up this mnemonic"
 			// prompt, we need to able to mark a mnemonic as "backed up by user", we do so by use of
 			// `FactorSourceIDFromHash` - which require a FactorSourceKind....
-			public let factorSourceID: FactorSourceIDFromHash
+			let factorSourceID: FactorSourceIDFromHash
 
-			public init(context: Context, factorSourceID: FactorSourceIDFromHash) {
+			init(context: Context, factorSourceID: FactorSourceIDFromHash) {
 				self.context = context
 				self.factorSourceID = factorSourceID
 			}
 		}
 
-		public struct WriteMode: Sendable, Hashable {
-			public var isProgressing: Bool
-			public let persistStrategy: PersistStrategy?
-			public let showCloseButton: Bool
+		struct WriteMode: Sendable, Hashable {
+			var isProgressing: Bool
+			let persistStrategy: PersistStrategy?
+			let showCloseButton: Bool
 		}
 
-		public enum Mode: Sendable, Hashable {
+		enum Mode: Sendable, Hashable {
 			case readonly(ReadonlyMode)
 			case write(WriteMode)
 			var readonly: ReadonlyMode? {
@@ -112,30 +112,30 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			}
 		}
 
-		public var mode: Mode
+		var mode: Mode
 
 		#if DEBUG
-		public var debugMnemonicPhraseSingleField = ""
+		var debugMnemonicPhraseSingleField = ""
 		#endif
 
 		@PresentationState
-		public var destination: Destination.State?
+		var destination: Destination.State?
 
-		public struct PersistStrategy: Sendable, Hashable {
-			public enum Location: Sendable, Hashable {
+		struct PersistStrategy: Sendable, Hashable {
+			enum Location: Sendable, Hashable {
 				case intoKeychainAndProfile
 			}
 
-			public enum OnMnemonicExistsStrategy: Sendable, Hashable {
+			enum OnMnemonicExistsStrategy: Sendable, Hashable {
 				case abort
 				case appendWithCryptoParamaters
 			}
 
-			public let onMnemonicExistsStrategy: OnMnemonicExistsStrategy
-			public let factorSourceKindOfMnemonic: OnDeviceMnemonicKind
-			public let location: Location
+			let onMnemonicExistsStrategy: OnMnemonicExistsStrategy
+			let factorSourceKindOfMnemonic: OnDeviceMnemonicKind
+			let location: Location
 
-			public init(
+			init(
 				factorSourceKindOfMnemonic: OnDeviceMnemonicKind,
 				location: Location,
 				onMnemonicExistsStrategy: OnMnemonicExistsStrategy
@@ -146,19 +146,19 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			}
 		}
 
-		public struct OnContinueWarning: Sendable, Hashable {
+		struct OnContinueWarning: Sendable, Hashable {
 			let title: String
 			let text: String
 			let button: String
 
-			public init(title: String, text: String, button: String) {
+			init(title: String, text: String, button: String) {
 				self.title = title
 				self.text = text
 				self.button = button
 			}
 		}
 
-		public init(
+		init(
 			header: Header? = nil,
 			warning: String? = nil,
 			showCloseButton: Bool = false,
@@ -189,7 +189,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			changeWordCount(to: wordCount)
 		}
 
-		public init(
+		init(
 			header: Header? = nil,
 			warning: String? = nil,
 			mnemonicWithPassphrase: MnemonicWithPassphrase,
@@ -207,7 +207,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			self.bip39Passphrase = mnemonicWithPassphrase.passphrase
 		}
 
-		public static func words(
+		static func words(
 			from mnemonic: Mnemonic,
 			isReadonlyMode: Bool
 		) -> Words {
@@ -228,18 +228,18 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			)
 		}
 
-		public struct Header: Sendable, Hashable {
-			public let title: String
-			public let subtitle: String?
+		struct Header: Sendable, Hashable {
+			let title: String
+			let subtitle: String?
 
-			public init(title: String, subtitle: String? = nil) {
+			init(title: String, subtitle: String? = nil) {
 				self.title = title
 				self.subtitle = subtitle
 			}
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case appeared
 
 		case toggleModeButtonTapped
@@ -260,52 +260,52 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		#endif
 	}
 
-	public enum InternalAction: Sendable, Equatable {
-		public struct IntermediaryResult: Sendable, Equatable {
-			public let factorSource: FactorSource
-			public let savedIntoProfile: Bool
+	enum InternalAction: Sendable, Equatable {
+		struct IntermediaryResult: Sendable, Equatable {
+			let factorSource: FactorSource
+			let savedIntoProfile: Bool
 		}
 
 		case focusOn(ImportMnemonicWord.State.ID)
 		case saveFactorSourceResult(TaskResult<IntermediaryResult>)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case word(id: ImportMnemonicWord.State.ID, child: ImportMnemonicWord.Action)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case persistedNewFactorSourceInProfile(FactorSource)
 		case persistedMnemonicInKeychainOnly(FactorSource)
 		case notPersisted(MnemonicWithPassphrase)
 		case doneViewing(idOfBackedUpFactorSource: FactorSourceIdFromHash?) // `nil` means it was already marked as backed up
 	}
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case backupConfirmation(AlertState<Action.BackupConfirmation>)
 			case onContinueWarning(AlertState<Action.OnContinueWarning>)
 			case verifyMnemonic(VerifyMnemonic.State)
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case backupConfirmation(BackupConfirmation)
 			case onContinueWarning(OnContinueWarning)
 			case verifyMnemonic(VerifyMnemonic.Action)
 
-			public enum BackupConfirmation: Sendable, Hashable {
+			enum BackupConfirmation: Sendable, Hashable {
 				case userHasBackedUp
 				case userHasNotBackedUp
 			}
 
-			public enum OnContinueWarning: Sendable, Hashable {
+			enum OnContinueWarning: Sendable, Hashable {
 				case buttonTapped
 			}
 		}
 
-		public var body: some Reducer<State, Action> {
+		var body: some Reducer<State, Action> {
 			Scope(state: \.verifyMnemonic, action: \.verifyMnemonic) {
 				VerifyMnemonic()
 			}
@@ -324,9 +324,9 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 	@Dependency(\.pasteboardClient) var pasteboardClient
 	#endif
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.forEach(\.words, action: /Action.child .. ChildAction.word) {
 				ImportMnemonicWord()
@@ -338,7 +338,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .word(id, child: .delegate(.lookupWord(input))):
 			let lookUpResult = lookup(input: input, state)
@@ -395,7 +395,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return focusNext(&state, after: nil)
@@ -519,7 +519,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .focusOn(id):
 			state.words[id: id]?.focus()
@@ -544,7 +544,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .backupConfirmation(.userHasBackedUp):
 			guard let mnemonic = state.mnemonic else {

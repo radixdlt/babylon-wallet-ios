@@ -1,12 +1,12 @@
 // MARK: - SelectInactiveAccountsToAdd
 
-public struct SelectInactiveAccountsToAdd: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public let active: IdentifiedArrayOf<Account>
-		public let inactive: IdentifiedArrayOf<Account>
-		public var selectedInactive: IdentifiedArrayOf<Account> = []
+struct SelectInactiveAccountsToAdd: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		let active: IdentifiedArrayOf<Account>
+		let inactive: IdentifiedArrayOf<Account>
+		var selectedInactive: IdentifiedArrayOf<Account> = []
 
-		public init(
+		init(
 			active: IdentifiedArrayOf<Account>,
 			inactive: IdentifiedArrayOf<Account>
 		) {
@@ -15,13 +15,13 @@ public struct SelectInactiveAccountsToAdd: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case backButtonTapped
 		case doneTapped
 		case selectedAccountsChanged([ChooseAccountsRow.State]?)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case goBack
 		case finished(
 			selectedInactive: IdentifiedArrayOf<Account>,
@@ -29,9 +29,9 @@ public struct SelectInactiveAccountsToAdd: Sendable, FeatureReducer {
 		)
 	}
 
-	public init() {}
+	init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .backButtonTapped:
 			return .send(.delegate(.goBack))

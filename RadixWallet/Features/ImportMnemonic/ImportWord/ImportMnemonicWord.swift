@@ -2,13 +2,13 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - ImportMnemonicWord
-public struct ImportMnemonicWord: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable, Identifiable {
-		public enum Field: Hashable, Sendable {
+struct ImportMnemonicWord: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable, Identifiable {
+		enum Field: Hashable, Sendable {
 			case textField
 		}
 
-		public enum WordValue: Sendable, Hashable {
+		enum WordValue: Sendable, Hashable {
 			case incomplete(
 				text: String,
 				hasFailedValidation: Bool
@@ -20,7 +20,7 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 				completion: Completion
 			)
 
-			public enum Completion: Sendable, Hashable {
+			enum Completion: Sendable, Hashable {
 				/// We automatically completed the word, since it was unambigiously identified as a BIP39 word.
 				case auto(match: BIP39LookupResult.Known.UnambiguousMatch)
 
@@ -61,20 +61,20 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 			}
 		}
 
-		public struct AutocompletionCandidates: Sendable, Hashable {
-			public let input: NonEmptyString
-			public let candidates: NonEmpty<OrderedSet<BIP39Word>>
+		struct AutocompletionCandidates: Sendable, Hashable {
+			let input: NonEmptyString
+			let candidates: NonEmpty<OrderedSet<BIP39Word>>
 		}
 
-		public typealias ID = Int
-		public let id: ID
-		public var value: WordValue
-		public let isReadonlyMode: Bool
+		typealias ID = Int
+		let id: ID
+		var value: WordValue
+		let isReadonlyMode: Bool
 
-		public var autocompletionCandidates: AutocompletionCandidates? = nil
-		public var focusedField: Field? = nil
+		var autocompletionCandidates: AutocompletionCandidates? = nil
+		var focusedField: Field? = nil
 
-		public init(
+		init(
 			id: ID,
 			value: WordValue = .incomplete(text: "", hasFailedValidation: false),
 			isReadonlyMode: Bool
@@ -84,43 +84,43 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 			self.isReadonlyMode = isReadonlyMode
 		}
 
-		public var isComplete: Bool {
+		var isComplete: Bool {
 			value.isComplete
 		}
 
-		public var completeWord: BIP39Word? {
+		var completeWord: BIP39Word? {
 			guard case let .complete(_, word, _) = value else {
 				return nil
 			}
 			return word
 		}
 
-		public mutating func focus() {
+		mutating func focus() {
 			self.focusedField = .textField
 		}
 
-		public mutating func resignFocus() {
+		mutating func resignFocus() {
 			self.focusedField = nil
 		}
 	}
 
-	public enum ViewAction: Sendable, Hashable {
+	enum ViewAction: Sendable, Hashable {
 		case wordChanged(input: String)
 		case userSelectedCandidate(BIP39Word)
 		case focusChanged(State.Field?)
 		case onSubmit
 	}
 
-	public enum DelegateAction: Sendable, Hashable {
+	enum DelegateAction: Sendable, Hashable {
 		case lookupWord(input: String)
 		case lostFocus(displayText: String)
 		case userSelectedCandidate(BIP39Word, fromPartial: String)
 		case didSubmit
 	}
 
-	public init() {}
+	init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .wordChanged(input):
 			guard !state.isReadonlyMode else { return .none }

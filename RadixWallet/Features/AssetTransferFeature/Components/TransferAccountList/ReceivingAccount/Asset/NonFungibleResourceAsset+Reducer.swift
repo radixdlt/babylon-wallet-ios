@@ -1,27 +1,27 @@
 import ComposableArchitecture
 
-public struct NonFungibleResourceAsset: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable, Identifiable {
-		public typealias ID = String
+struct NonFungibleResourceAsset: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable, Identifiable {
+		typealias ID = String
 
-		public let resource: OnLedgerEntity.OwnedNonFungibleResource
-		public let token: OnLedgerEntity.NonFungibleToken
+		let resource: OnLedgerEntity.OwnedNonFungibleResource
+		let token: OnLedgerEntity.NonFungibleToken
 
 		var resourceAddress: ResourceAddress { resource.resourceAddress }
-		public var id: ID { token.id.toRawString() }
+		var id: ID { token.id.toRawString() }
 	}
 
-	public enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable, Sendable {
 		case resourceTapped
 	}
 
-	public enum DelegateAction: Equatable, Sendable {
+	enum DelegateAction: Equatable, Sendable {
 		case resourceTapped
 	}
 
-	public init() {}
+	init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .resourceTapped:
 			.send(.delegate(.resourceTapped))

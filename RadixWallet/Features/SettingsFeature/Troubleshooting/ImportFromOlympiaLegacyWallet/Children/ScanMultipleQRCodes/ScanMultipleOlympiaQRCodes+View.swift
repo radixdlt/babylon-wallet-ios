@@ -12,20 +12,20 @@ extension ScanMultipleOlympiaQRCodes.State {
 
 // MARK: - ScanMultipleOlympiaQRCodes.View
 extension ScanMultipleOlympiaQRCodes {
-	public struct ViewState: Equatable {
-		public let numberOfPayloadsToScan: Int?
-		public let numberOfPayloadsScanned: Int
+	struct ViewState: Equatable {
+		let numberOfPayloadsToScan: Int?
+		let numberOfPayloadsScanned: Int
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<ScanMultipleOlympiaQRCodes>
 
-		public init(store: StoreOf<ScanMultipleOlympiaQRCodes>) {
+		init(store: StoreOf<ScanMultipleOlympiaQRCodes>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			VStack(spacing: 0) {
 				Text(L10n.ImportOlympiaAccounts.ScanQR.title)
 					.textStyle(.sheetTitle)
@@ -69,6 +69,6 @@ struct ScanMultipleOlympiaQRCodes_Preview: PreviewProvider {
 }
 
 extension ScanMultipleOlympiaQRCodes.State {
-	public static let previewValue: Self = .init()
+	static let previewValue: Self = .init()
 }
 #endif

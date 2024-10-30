@@ -23,19 +23,19 @@ extension TransactionReview.DappEntity {
 
 // MARK: - TransactionReviewDapps.View
 extension TransactionReviewDapps {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let rows: [TransactionReview.DappView.ViewState]
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		let store: StoreOf<TransactionReviewDapps>
 
-		public init(store: StoreOf<TransactionReviewDapps>) {
+		init(store: StoreOf<TransactionReviewDapps>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: .small2) {
 					ForEach(viewStore.rows, id: \.self) { rowViewState in

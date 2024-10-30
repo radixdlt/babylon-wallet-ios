@@ -1,8 +1,8 @@
 import Sargon
 
 // MARK: - AuthorizedDappDoesNotExists
-public struct AuthorizedDappDoesNotExists: Swift.Error {
-	public init() {}
+struct AuthorizedDappDoesNotExists: Swift.Error {
+	init() {}
 }
 
 // MARK: - DappWasNotConnected
@@ -13,7 +13,7 @@ struct AuthorizedDappAlreadyExists: Swift.Error {}
 
 extension Profile {
 	/// Updates a `Persona` in the profile
-	public mutating func updatePersona(
+	mutating func updatePersona(
 		_ persona: Persona
 	) throws {
 		let networkID = persona.networkID
@@ -24,7 +24,7 @@ extension Profile {
 
 	/// Saves a `AuthorizedDapp` into the profile
 	@discardableResult
-	public mutating func addAuthorizedDapp(
+	mutating func addAuthorizedDapp(
 		_ unvalidatedAuthorizedDapp: AuthorizedDapp
 	) throws -> AuthorizedDapp {
 		let authorizedDapp = try validateAuthorizedPersonas(of: unvalidatedAuthorizedDapp)
@@ -43,7 +43,7 @@ extension Profile {
 	}
 
 	/// Forgets  a `AuthorizedDapp`
-	public mutating func forgetAuthorizedDapp(
+	mutating func forgetAuthorizedDapp(
 		_ authorizedDappID: AuthorizedDapp.ID,
 		on networkID: NetworkID
 	) throws {
@@ -93,7 +93,7 @@ extension Profile {
 	}
 
 	/// Removes a Persona from a dApp in the Profile
-	public mutating func deauthorizePersonaFromDapp(
+	mutating func deauthorizePersonaFromDapp(
 		_ personaID: Persona.ID,
 		dAppID: AuthorizedDapp.ID,
 		networkID: NetworkID
@@ -118,7 +118,7 @@ extension Profile {
 	}
 
 	/// Updates a `AuthorizedDapp` in the profile
-	public mutating func updateAuthorizedDapp(
+	mutating func updateAuthorizedDapp(
 		_ unvalidatedAuthorizedDapp: AuthorizedDapp
 	) throws {
 		let authorizedDapp = try validateAuthorizedPersonas(of: unvalidatedAuthorizedDapp)
@@ -136,7 +136,7 @@ extension Profile {
 	}
 
 	/// Updates or adds a `AuthorizedDapp` in the profile
-	public mutating func updateOrAddAuthorizedDapp(
+	mutating func updateOrAddAuthorizedDapp(
 		_ unvalidatedAuthorizedDapp: AuthorizedDapp
 	) throws {
 		let dapp = try validateAuthorizedPersonas(of: unvalidatedAuthorizedDapp)
@@ -151,7 +151,7 @@ extension Profile {
 }
 
 extension AuthorizedDapps {
-	public func contains(dapp authorizedDapp: AuthorizedDapp) -> Bool {
+	func contains(dapp authorizedDapp: AuthorizedDapp) -> Bool {
 		self[id: authorizedDapp.id] != nil
 	}
 }

@@ -1,6 +1,6 @@
 // MARK: - SelectionList
-public struct SelectionList<Choices: Sequence>: View where Choices.Element: Hashable {
-	public typealias Element = Choices.Element
+struct SelectionList<Choices: Sequence>: View where Choices.Element: Hashable {
+	typealias Element = Choices.Element
 
 	let choices: Choices
 	let title: (Element) -> String
@@ -8,7 +8,7 @@ public struct SelectionList<Choices: Sequence>: View where Choices.Element: Hash
 	var selection: [Element]?
 	let requirement: SelectionRequirement
 
-	public init(
+	init(
 		_ choices: Choices,
 		title: @escaping (Element) -> String,
 		selection: Binding<[Element]?>,
@@ -20,7 +20,7 @@ public struct SelectionList<Choices: Sequence>: View where Choices.Element: Hash
 		self.requirement = requirement
 	}
 
-	public var body: some View {
+	var body: some View {
 		ScrollView {
 			LazyVStack(spacing: 0) {
 				Selection($selection, from: choices, requiring: requirement) { item in
@@ -61,8 +61,8 @@ public struct SelectionList<Choices: Sequence>: View where Choices.Element: Hash
 }
 
 #if DEBUG
-public struct SelectionList_PreviewProvider: PreviewProvider {
-	public static var previews: some View {
+struct SelectionList_PreviewProvider: PreviewProvider {
+	static var previews: some View {
 		SelectionList_Preview(requirement: .exactly(0)).previewDisplayName("Exactly 0")
 		SelectionList_Preview(requirement: .exactly(1)).previewDisplayName("Exactly 1")
 		SelectionList_Preview(requirement: .exactly(2)).previewDisplayName("Exactly 2")
@@ -73,12 +73,12 @@ public struct SelectionList_PreviewProvider: PreviewProvider {
 	}
 }
 
-public struct SelectionList_Preview: View {
+struct SelectionList_Preview: View {
 	@State
 	var selection: [Int]? = nil
 	let requirement: SelectionRequirement
 
-	public var body: some View {
+	var body: some View {
 		SelectionList(
 			1 ... 10,
 			title: String.init,

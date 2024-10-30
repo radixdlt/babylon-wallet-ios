@@ -16,7 +16,7 @@
 import XCTest
 
 extension XCTestCase {
-	public func readTestFixtureData(
+	func readTestFixtureData(
 		bundle: Bundle,
 		jsonName: String,
 		file: StaticString = #filePath,
@@ -31,7 +31,7 @@ extension XCTestCase {
 		return try Data(contentsOf: fileURL)
 	}
 
-	public func readTestFixture<T: Decodable>(
+	func readTestFixture<T: Decodable>(
 		bundle: Bundle,
 		jsonName: String,
 		jsonDecoder: JSONDecoder = .iso8601,
@@ -48,7 +48,7 @@ extension XCTestCase {
 		return try jsonDecoder.decode(T.self, from: data)
 	}
 
-	public func testFixture<T: Decodable>(
+	func testFixture<T: Decodable>(
 		bundle: Bundle,
 		jsonName: String,
 		jsonDecoder: JSONDecoder = .iso8601,
@@ -66,7 +66,7 @@ extension XCTestCase {
 		try testFunction(test)
 	}
 
-	public func XCTAssertAllEqual(
+	func XCTAssertAllEqual(
 		_ elements: some BidirectionalCollection<some Equatable>,
 		file: StaticString = #filePath,
 		line: UInt = #line
@@ -90,7 +90,7 @@ extension XCTestCase {
 		}
 	}
 
-	public func XCTAssertAllEqual<Element: Equatable>(
+	func XCTAssertAllEqual<Element: Equatable>(
 		_ elements: some BidirectionalCollection<Element>,
 		_ head: Element,
 		file: StaticString = #filePath,
@@ -99,7 +99,7 @@ extension XCTestCase {
 		XCTAssertAllEqual([head] + elements)
 	}
 
-	public func XCTAssertAllEqual<Element: Equatable>(
+	func XCTAssertAllEqual<Element: Equatable>(
 		_ elements: some BidirectionalCollection<Element>,
 		_ args: Element...,
 		file: StaticString = #filePath,

@@ -2,17 +2,17 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - AccountPreferences
-public struct AccountPreferences: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public var account: Account
-		public var faucetButtonState: ControlState
-		public var address: AccountAddress { account.address }
-		public var isOnMainnet: Bool { account.networkID == .mainnet }
+struct AccountPreferences: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		var account: Account
+		var faucetButtonState: ControlState
+		var address: AccountAddress { account.address }
+		var isOnMainnet: Bool { account.networkID == .mainnet }
 
 		@PresentationState
 		var destination: Destination.State? = nil
 
-		public init(
+		init(
 			account: Account,
 			faucetButtonState: ControlState = .enabled
 		) {
@@ -23,14 +23,14 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 	// MARK: - Action
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case task
 		case rowTapped(AccountPreferences.Section.SectionRow)
 		case hideAccountTapped
 		case faucetButtonTapped
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case accountUpdated(Account)
 		case isAllowedToUseFaucet(TaskResult<Bool>)
 		case callDone(updateControlState: WritableKeyPath<State, ControlState>, changeTo: ControlState = .enabled)
@@ -38,14 +38,14 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		case hideLoader(updateControlState: WritableKeyPath<State, ControlState>)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case accountHidden
 	}
 
 	// MARK: - Destination
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Hashable, Sendable {
+		enum State: Hashable, Sendable {
 			case updateAccountLabel(UpdateAccountLabel.State)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.State)
 			case devPreferences(DevAccountPreferences.State)
@@ -53,14 +53,14 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		}
 
 		@CasePathable
-		public enum Action: Equatable, Sendable {
+		enum Action: Equatable, Sendable {
 			case updateAccountLabel(UpdateAccountLabel.Action)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.Action)
 			case devPreferences(DevAccountPreferences.Action)
 			case hideAccount(ConfirmationAction)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: /State.updateAccountLabel, action: /Action.updateAccountLabel) {
 				UpdateAccountLabel()
 			}
@@ -81,9 +81,9 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.errorQueue) var errorQueue
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -92,7 +92,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			return .run { [address = state.account.address] send in
@@ -117,7 +117,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .accountUpdated(updated):
 			state.account = updated
@@ -151,7 +151,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .updateAccountLabel(.delegate(.accountLabelUpdated)),
 		     .thirdPartyDeposits(.delegate(.accountUpdated)):

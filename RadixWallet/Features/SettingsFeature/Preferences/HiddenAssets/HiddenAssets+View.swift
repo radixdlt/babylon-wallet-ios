@@ -2,10 +2,10 @@ import SwiftUI
 
 // MARK: - HiddenAssets.View
 extension HiddenAssets {
-	public struct View: SwiftUI.View {
-		public let store: StoreOf<HiddenAssets>
+	struct View: SwiftUI.View {
+		let store: StoreOf<HiddenAssets>
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				ScrollView {
 					LazyVStack(alignment: .leading, spacing: .large3) {

@@ -1,10 +1,10 @@
 // MARK: - WarningErrorView
-public struct WarningErrorView: View {
-	public let text: String
-	public let type: ViewType
-	public let spacing: CGFloat
+struct WarningErrorView: View {
+	let text: String
+	let type: ViewType
+	let spacing: CGFloat
 
-	public init(
+	init(
 		text: String,
 		type: ViewType,
 		useNarrowSpacing: Bool = false
@@ -14,12 +14,12 @@ public struct WarningErrorView: View {
 		self.spacing = useNarrowSpacing ? .small2 : .medium3
 	}
 
-	public enum ViewType {
+	enum ViewType {
 		case warning
 		case error
 	}
 
-	public var body: some View {
+	var body: some View {
 		HStack(spacing: spacing) {
 			Image(.error)
 			Text(text)

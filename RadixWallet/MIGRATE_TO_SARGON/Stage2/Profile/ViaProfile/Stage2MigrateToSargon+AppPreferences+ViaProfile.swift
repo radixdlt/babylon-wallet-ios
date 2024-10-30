@@ -2,28 +2,28 @@ import Foundation
 import Sargon
 
 extension Profile {
-	public mutating func changeCurrentToMainnetIfNeeded() {
+	mutating func changeCurrentToMainnetIfNeeded() {
 		appPreferences.changeCurrentToMainnetIfNeeded()
 	}
 
-	public mutating func addNewGateway(_ newGateway: Gateway) throws {
+	mutating func addNewGateway(_ newGateway: Gateway) throws {
 		appPreferences.gateways.add(newGateway)
 	}
 
-	public mutating func removeGateway(_ gateway: Gateway) throws {
+	mutating func removeGateway(_ gateway: Gateway) throws {
 		appPreferences.gateways.remove(gateway)
 	}
 
 	/// Requires the presence of an `ProfileNetwork` in `networks` for
 	/// `newGateway.network.id`, otherwise an error is thrown.
-	public mutating func changeGateway(to newGateway: Gateway) throws {
+	mutating func changeGateway(to newGateway: Gateway) throws {
 		let newNetworkID = newGateway.network.id
 		// Ensure we have accounts on network, else do not change
 		_ = try network(id: newNetworkID)
 		try appPreferences.gateways.changeCurrent(to: newGateway)
 	}
 
-	public mutating func updateDisplayAppPreferences(_ display: AppDisplay) {
+	mutating func updateDisplayAppPreferences(_ display: AppDisplay) {
 		self.appPreferences.updateDisplay(display)
 	}
 }

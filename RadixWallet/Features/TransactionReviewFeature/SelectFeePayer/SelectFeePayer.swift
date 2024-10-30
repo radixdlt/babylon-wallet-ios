@@ -2,23 +2,23 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - ValidatedFeePayerCandidate
-public struct ValidatedFeePayerCandidate: Sendable, Hashable, Identifiable {
-	public var id: FeePayerCandidate.ID { candidate.id }
-	public let candidate: FeePayerCandidate
-	public let outcome: FeePayerValidationOutcome
+struct ValidatedFeePayerCandidate: Sendable, Hashable, Identifiable {
+	var id: FeePayerCandidate.ID { candidate.id }
+	let candidate: FeePayerCandidate
+	let outcome: FeePayerValidationOutcome
 }
 
 // MARK: - SelectFeePayer
-public struct SelectFeePayer: Sendable, FeatureReducer {
-	public typealias FeePayerCandidates = NonEmpty<IdentifiedArrayOf<FeePayerCandidate>>
+struct SelectFeePayer: Sendable, FeatureReducer {
+	typealias FeePayerCandidates = NonEmpty<IdentifiedArrayOf<FeePayerCandidate>>
 
-	public struct State: Sendable, Hashable {
-		public let reviewedTransaction: ReviewedTransaction
-		public var selectedFeePayer: ValidatedFeePayerCandidate?
-		public let transactionFee: TransactionFee
-		public var feePayerCandidates: Loadable<[ValidatedFeePayerCandidate]> = .idle
+	struct State: Sendable, Hashable {
+		let reviewedTransaction: ReviewedTransaction
+		var selectedFeePayer: ValidatedFeePayerCandidate?
+		let transactionFee: TransactionFee
+		var feePayerCandidates: Loadable<[ValidatedFeePayerCandidate]> = .idle
 
-		public init(
+		init(
 			reviewedTransaction: ReviewedTransaction,
 			selectedFeePayer: FeePayerCandidate?,
 			transactionFee: TransactionFee
@@ -29,7 +29,7 @@ public struct SelectFeePayer: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case task
 		case selectedFeePayer(ValidatedFeePayerCandidate?)
 		case confirmedFeePayer(FeePayerCandidate)
@@ -37,11 +37,11 @@ public struct SelectFeePayer: Sendable, FeatureReducer {
 		case closeButtonTapped
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case selected(FeePayerCandidate)
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case feePayerCandidatesLoaded(TaskResult<FeePayerCandidates>)
 	}
 
@@ -49,9 +49,9 @@ public struct SelectFeePayer: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.dismiss) var dismiss
 
-	public init() {}
+	init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			state.feePayerCandidates = .loading
@@ -74,7 +74,7 @@ public struct SelectFeePayer: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .feePayerCandidatesLoaded(.success(candidates)):
 			let validated = candidates.rawValue.map { candidate in

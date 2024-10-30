@@ -93,6 +93,20 @@ extension DappInteractionFlow {
 						action: DappInteractionFlow.Path.Action.reviewTransaction,
 						then: { TransactionReview.View(store: $0) }
 					)
+
+				case .personaProofOfOwnership:
+					CaseLet(
+						/DappInteractionFlow.Path.MainState.personaProofOfOwnership,
+						action: DappInteractionFlow.Path.Action.personaProofOfOwnership,
+						then: { ProofOfOwnership.View(store: $0) }
+					)
+
+				case .accountsProofOfOwnership:
+					CaseLet(
+						/DappInteractionFlow.Path.MainState.accountsProofOfOwnership,
+						action: DappInteractionFlow.Path.Action.accountsProofOfOwnership,
+						then: { ProofOfOwnership.View(store: $0) }
+					)
 				}
 			}
 		}

@@ -96,7 +96,7 @@ struct SignalingClient: Sendable {
 			.eraseToAnyAsyncSequence()
 	}
 
-	// MARK: - Public API
+	// MARK: - API
 
 	/// Cancel all ongoing tasks and prepare for deallocation
 	func cancel() {

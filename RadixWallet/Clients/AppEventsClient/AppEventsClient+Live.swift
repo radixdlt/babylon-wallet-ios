@@ -1,5 +1,5 @@
 extension AppEventsClient: DependencyKey {
-	public static let liveValue: AppEventsClient = {
+	static let liveValue: AppEventsClient = {
 		let eventsSubject = AsyncReplaySubject<AppEvent>(bufferSize: 10)
 
 		return .init(

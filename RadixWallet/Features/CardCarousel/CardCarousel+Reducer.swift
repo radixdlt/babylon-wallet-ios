@@ -2,38 +2,38 @@ import ComposableArchitecture
 
 // MARK: - CardCarousel
 @Reducer
-public struct CardCarousel: FeatureReducer, Sendable {
+struct CardCarousel: FeatureReducer, Sendable {
 	@ObservableState
-	public struct State: Hashable, Sendable {
-		public var cards: [HomeCard] = []
+	struct State: Hashable, Sendable {
+		var cards: [HomeCard] = []
 	}
 
-	public typealias Action = FeatureAction<Self>
+	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	public enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable, Sendable {
 		case task
 		case cardTapped(HomeCard)
 		case closeTapped(HomeCard)
 	}
 
 	@CasePathable
-	public enum InternalAction: Equatable, Sendable {
+	enum InternalAction: Equatable, Sendable {
 		case setCards([HomeCard])
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case addConnector
 	}
 
 	@Dependency(\.homeCardsClient) var homeCardsClient
 	@Dependency(\.openURL) var openURL
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			.run { send in
@@ -51,7 +51,7 @@ public struct CardCarousel: FeatureReducer, Sendable {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .setCards(cards):
 			state.cards = cards

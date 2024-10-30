@@ -51,14 +51,14 @@ extension EditPersona.State {
 // MARK: - EditPersona.View
 extension EditPersona {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<EditPersona>
 
-		public init(store: StoreOf<EditPersona>) {
+		init(store: StoreOf<EditPersona>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }) { viewStore in
 				switch viewStore.mode {
 				case .create:
@@ -197,7 +197,7 @@ struct EditPersona_Preview: PreviewProvider {
 }
 
 extension EditPersona.State {
-	public static func previewValue(mode: EditPersona.State.Mode) -> Self {
+	static func previewValue(mode: EditPersona.State.Mode) -> Self {
 		.init(mode: mode)
 	}
 }

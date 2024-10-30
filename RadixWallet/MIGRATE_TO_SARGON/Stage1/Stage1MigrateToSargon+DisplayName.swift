@@ -2,7 +2,7 @@ import Foundation
 import Sargon
 
 extension DisplayName {
-	public var rawValue: String {
+	var rawValue: String {
 		value
 	}
 }

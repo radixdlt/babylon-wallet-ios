@@ -4,18 +4,18 @@ import SwiftUI
 // MARK: - FungibleAssetList.View
 extension FungibleAssetList {
 	@MainActor
-	public struct View: SwiftUI.View {
-		public typealias Store = ComposableArchitecture.Store<State, Action>
+	struct View: SwiftUI.View {
+		typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
 
-		public init(store: Store) {
+		init(store: Store) {
 			self.store = store
 		}
 	}
 }
 
 extension FungibleAssetList.View {
-	public var body: some View {
+	var body: some View {
 		ForEachStore(
 			store.scope(state: \.sections) { .child(.section($0, $1)) }
 		) {

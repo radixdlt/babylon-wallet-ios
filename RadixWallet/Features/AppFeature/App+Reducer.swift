@@ -2,10 +2,10 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - App
-public struct App: Sendable, FeatureReducer {
-	public struct State: Hashable {
+struct App: Sendable, FeatureReducer {
+	struct State: Hashable {
 		@CasePathable
-		public enum Root: Hashable {
+		enum Root: Hashable {
 			case main(Main.State)
 			case onboardingCoordinator(OnboardingCoordinator.State)
 			case splash(Splash.State)
@@ -18,10 +18,10 @@ public struct App: Sendable, FeatureReducer {
 			}
 		}
 
-		public var root: Root
-		public var deferredDeepLink: URL?
+		var root: Root
+		var deferredDeepLink: URL?
 
-		public init(
+		init(
 			root: Root = .splash(.init())
 		) {
 			self.root = root
@@ -32,13 +32,13 @@ public struct App: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case task
 		case urlOpened(URL)
 	}
 
 	@CasePathable
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case incompatibleProfileDeleted
 		case toMain(isAccountRecoveryNeeded: Bool)
 		case toOnboarding
@@ -46,7 +46,7 @@ public struct App: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case main(Main.Action)
 		case onboardingCoordinator(OnboardingCoordinator.Action)
 		case splash(Splash.Action)
@@ -60,9 +60,9 @@ public struct App: Sendable, FeatureReducer {
 	@Dependency(\.homeCardsClient) var homeCardsClient
 	@Dependency(\.appEventsClient) var appEventsClient
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Scope(state: \.root, action: \.child) {
 			Scope(state: \.main, action: \.main) {
 				Main()
@@ -77,7 +77,7 @@ public struct App: Sendable, FeatureReducer {
 		Reduce(core)
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .urlOpened(url):
 			switch state.root {
@@ -97,7 +97,7 @@ public struct App: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case .incompatibleProfileDeleted:
 			goToOnboarding(state: &state)
@@ -110,20 +110,24 @@ public struct App: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .onboardingCoordinator(.delegate(.completed)):
-			goToMain(state: &state)
+			return goToMain(state: &state)
 
-		case let .splash(.delegate(.completed(profile))):
-			if profile.networks.isEmpty {
-				goToOnboarding(state: &state)
-			} else {
-				goToMain(state: &state)
+		case let .splash(.delegate(.completed(profileState))):
+			switch profileState {
+			case .none:
+				return goToOnboarding(state: &state)
+			case let .incompatible(error):
+				errorQueue.schedule(error)
+				return goToOnboarding(state: &state)
+			case let .loaded(profile):
+				return goToMain(state: &state)
 			}
 
 		default:
-			.none
+			return .none
 		}
 	}
 
@@ -168,18 +172,18 @@ public struct App: Sendable, FeatureReducer {
 // MARK: App.UserFacingError
 extension App {
 	/// A purely user-facing error. Not made for developer logging or analytics collection.
-	public struct UserFacingError: Sendable, Equatable, LocalizedError {
+	struct UserFacingError: Sendable, Equatable, LocalizedError {
 		let underlyingError: Swift.Error
 
 		init(_ underlyingError: Swift.Error) {
 			self.underlyingError = underlyingError
 		}
 
-		public var errorDescription: String? {
+		var errorDescription: String? {
 			underlyingError.legibleLocalizedDescription
 		}
 
-		public static func == (lhs: Self, rhs: Self) -> Bool {
+		static func == (lhs: Self, rhs: Self) -> Bool {
 			lhs.underlyingError.localizedDescription == rhs.underlyingError.localizedDescription
 		}
 	}

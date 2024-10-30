@@ -2,7 +2,7 @@ import Foundation
 import Sargon
 
 extension HierarchicalDeterministicPublicKey {
-	public var curve: SLIP10Curve {
+	var curve: SLIP10Curve {
 		derivationPath.curve
 	}
 

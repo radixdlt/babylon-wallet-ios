@@ -1,6 +1,6 @@
 
 extension Label where Title == Text, Icon == Image {
-	public init(_ titleKey: LocalizedStringKey, asset: ImageAsset) {
+	init(_ titleKey: LocalizedStringKey, asset: ImageAsset) {
 		self.init {
 			Text(titleKey)
 		} icon: {
@@ -9,7 +9,7 @@ extension Label where Title == Text, Icon == Image {
 		}
 	}
 
-	public init(_ title: some StringProtocol, asset: ImageAsset) {
+	init(_ title: some StringProtocol, asset: ImageAsset) {
 		self.init {
 			Text(title)
 		} icon: {

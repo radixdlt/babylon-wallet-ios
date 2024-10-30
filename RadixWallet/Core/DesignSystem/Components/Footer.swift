@@ -1,7 +1,7 @@
 
 extension View {
 	@ViewBuilder
-	public func footer(visible: Bool = true, @ViewBuilder _ content: () -> some View) -> some View {
+	func footer(visible: Bool = true, @ViewBuilder _ content: () -> some View) -> some View {
 		if visible {
 			modifier(FooterModifier(footerContent: content))
 		} else {

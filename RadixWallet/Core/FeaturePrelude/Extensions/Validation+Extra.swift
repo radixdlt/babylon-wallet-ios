@@ -2,7 +2,7 @@
 
 extension Binding {
 	@_disfavoredOverload
-	public static func validation<Value>(
+	static func validation<Value>(
 		_ validation: Binding<Validation<Value, some Any>>
 	) -> Binding<Value?> {
 		.init(
@@ -11,7 +11,7 @@ extension Binding {
 		)
 	}
 
-	public static func validation<S: StringProtocol>(
+	static func validation<S: StringProtocol>(
 		_ validation: Binding<Validation<S, some Any>>
 	) -> Binding<S> {
 		.validation(validation) ?? ""
@@ -19,7 +19,7 @@ extension Binding {
 }
 
 extension Binding {
-	public subscript<V, Error, T>(
+	subscript<V, Error, T>(
 		dynamicMember keyPath: KeyPath<Validated<V, Error>, T?>
 	) -> T? where Value == Validation<V, Error> {
 		wrappedValue.validated?[keyPath: keyPath]
@@ -68,14 +68,14 @@ struct VanillaValidationView: View {
 
 extension ViewStore {
 	@_disfavoredOverload
-	public func validation<Value>(
+	func validation<Value>(
 		get: @escaping (ViewState) -> Validation<Value, some Any>,
 		send valueToAction: @escaping (Value?) -> ViewAction
 	) -> Binding<Value?> {
 		.validation(self.binding(get: get, send: { valueToAction($0.rawValue) }))
 	}
 
-	public func validation<S: StringProtocol>(
+	func validation<S: StringProtocol>(
 		get: @escaping (ViewState) -> Validation<S, some Any>,
 		send valueToAction: @escaping (S) -> ViewAction
 	) -> Binding<S> {

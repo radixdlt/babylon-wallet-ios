@@ -11,25 +11,25 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.ValidatorCollection")
-public typealias ValidatorCollection = GatewayAPI.ValidatorCollection
+typealias ValidatorCollection = GatewayAPI.ValidatorCollection
 
 extension GatewayAPI {
 
-public struct ValidatorCollection: Codable, Hashable {
+struct ValidatorCollection: Codable, Hashable {
 
     /** Total number of items in underlying collection, fragment of which is available in `items` collection. */
-    public private(set) var totalCount: Int64?
+    private(set) var totalCount: Int64?
     /** If specified, contains a cursor to query next page of the `items` collection. */
-    public private(set) var nextCursor: String?
-    public private(set) var items: [ValidatorCollectionItem]
+    private(set) var nextCursor: String?
+    private(set) var items: [ValidatorCollectionItem]
 
-    public init(totalCount: Int64? = nil, nextCursor: String? = nil, items: [ValidatorCollectionItem]) {
+    init(totalCount: Int64? = nil, nextCursor: String? = nil, items: [ValidatorCollectionItem]) {
         self.totalCount = totalCount
         self.nextCursor = nextCursor
         self.items = items
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case totalCount = "total_count"
         case nextCursor = "next_cursor"
         case items
@@ -37,7 +37,7 @@ public struct ValidatorCollection: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(totalCount, forKey: .totalCount)
         try container.encodeIfPresent(nextCursor, forKey: .nextCursor)

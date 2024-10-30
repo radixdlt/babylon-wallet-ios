@@ -1,23 +1,23 @@
 import Sargon
 
 // MARK: - RadixDashboard
-public struct RadixDashboard: Sendable, Hashable, Codable, Identifiable, CustomStringConvertible {
-	public typealias ID = URL
+struct RadixDashboard: Sendable, Hashable, Codable, Identifiable, CustomStringConvertible {
+	typealias ID = URL
 
-	public let url: URL
-	public var id: ID { url }
+	let url: URL
+	var id: ID { url }
 
-	public init(url: URL) {
+	init(url: URL) {
 		self.url = url
 	}
 }
 
 extension RadixDashboard {
-	public static func dashboard(forNetwork network: NetworkDefinition) -> Self {
+	static func dashboard(forNetwork network: NetworkDefinition) -> Self {
 		dashboard(forNetworkID: network.id)
 	}
 
-	public static func dashboard(forNetworkID network: NetworkID) -> Self {
+	static func dashboard(forNetworkID network: NetworkID) -> Self {
 		switch network {
 		case .mainnet:
 			.mainnet
@@ -45,61 +45,61 @@ extension RadixDashboard {
 }
 
 extension RadixDashboard {
-	public static var mainnet: Self {
+	static var mainnet: Self {
 		.init(
 			url: URL(string: "https://dashboard.radixdlt.com/")!
 		)
 	}
 
-	public static var rcnet: Self {
+	static var rcnet: Self {
 		.init(
 			url: URL(string: "https://rcnet-dashboard.radixdlt.com/")!
 		)
 	}
 
-	public static var rcnetV2: Self {
+	static var rcnetV2: Self {
 		.init(
 			url: URL(string: "https://rcnet-v2-dashboard.radixdlt.com/")!
 		)
 	}
 
-	public static var rcnetV3: Self {
+	static var rcnetV3: Self {
 		.init(
 			url: URL(string: "https://rcnet-v3-dashboard.radixdlt.com/")!
 		)
 	}
 
-	public static var stokenet: Self {
+	static var stokenet: Self {
 		.init(
 			url: URL(string: "https://stokenet-dashboard.radixdlt.com/")!
 		)
 	}
 
-	public static var kisharnet: Self {
+	static var kisharnet: Self {
 		.init(
 			url: URL(string: "https://kisharnet-dashboard.radixdlt.com/")!
 		)
 	}
 
-	public static var mardunet: Self {
+	static var mardunet: Self {
 		.init(
 			url: URL(string: "https://mardunet-dashboard.rdx-works-main.extratools.works/")!
 		)
 	}
 
-	public static var gilganet: Self {
+	static var gilganet: Self {
 		.init(
 			url: URL(string: "https://gilganet-dashboard.rdx-works-main.extratools.works/")!
 		)
 	}
 
-	public static var enkinet: Self {
+	static var enkinet: Self {
 		.init(
 			url: URL(string: "https://enkinet-dashboard.rdx-works-main.extratools.works/")!
 		)
 	}
 
-	public static var hammunet: Self {
+	static var hammunet: Self {
 		.init(
 			url: URL(string: "https://hammunet-dashboard.rdx-works-main.extratools.works/")!
 		)
@@ -107,7 +107,7 @@ extension RadixDashboard {
 }
 
 extension RadixDashboard {
-	public var description: String {
+	var description: String {
 		"""
 		url: \(url)
 		"""

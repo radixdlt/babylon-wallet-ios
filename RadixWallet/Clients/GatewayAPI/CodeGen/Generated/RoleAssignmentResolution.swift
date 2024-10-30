@@ -11,11 +11,11 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.RoleAssignmentResolution")
-public typealias RoleAssignmentResolution = GatewayAPI.RoleAssignmentResolution
+typealias RoleAssignmentResolution = GatewayAPI.RoleAssignmentResolution
 
 extension GatewayAPI {
 
-public enum RoleAssignmentResolution: String, Codable, CaseIterable {
+enum RoleAssignmentResolution: String, Codable, CaseIterable {
     case explicit = "Explicit"
     case owner = "Owner"
 }

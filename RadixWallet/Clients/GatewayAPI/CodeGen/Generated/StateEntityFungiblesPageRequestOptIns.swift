@@ -11,27 +11,27 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.StateEntityFungiblesPageRequestOptIns")
-public typealias StateEntityFungiblesPageRequestOptIns = GatewayAPI.StateEntityFungiblesPageRequestOptIns
+typealias StateEntityFungiblesPageRequestOptIns = GatewayAPI.StateEntityFungiblesPageRequestOptIns
 
 extension GatewayAPI {
 
 /** Check detailed [OptIns](#section/Using-endpoints-with-opt-in-features) documentation for more details */
-public struct StateEntityFungiblesPageRequestOptIns: Codable, Hashable {
+struct StateEntityFungiblesPageRequestOptIns: Codable, Hashable {
 
     /** allows specifying explicitly metadata properties which should be returned in response, limited to max 20 items. */
-    public private(set) var explicitMetadata: [String]?
+    private(set) var explicitMetadata: [String]?
 
-    public init(explicitMetadata: [String]? = nil) {
+    init(explicitMetadata: [String]? = nil) {
         self.explicitMetadata = explicitMetadata
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case explicitMetadata = "explicit_metadata"
     }
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(explicitMetadata, forKey: .explicitMetadata)
     }

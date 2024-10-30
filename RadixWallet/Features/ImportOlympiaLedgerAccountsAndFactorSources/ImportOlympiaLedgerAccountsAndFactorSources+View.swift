@@ -13,11 +13,11 @@ extension ImportOlympiaLedgerAccountsAndFactorSources.State {
 
 // MARK: - ImportOlympiaLedgerAccountsAndFactorSources.View
 extension ImportOlympiaLedgerAccountsAndFactorSources {
-	public struct ViewState: Equatable {
-		public let usedLedgers: IdentifiedArrayOf<LedgerHardwareWalletFactorSource>
-		public let moreAccounts: Int
+	struct ViewState: Equatable {
+		let usedLedgers: IdentifiedArrayOf<LedgerHardwareWalletFactorSource>
+		let moreAccounts: Int
 
-		public init(
+		init(
 			knownLedgers: IdentifiedArrayOf<LedgerHardwareWalletFactorSource>,
 			migrated: [MigratedHardwareAccounts],
 			moreAccounts: Int
@@ -29,14 +29,14 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<ImportOlympiaLedgerAccountsAndFactorSources>
 
-		public init(store: StoreOf<ImportOlympiaLedgerAccountsAndFactorSources>) {
+		init(store: StoreOf<ImportOlympiaLedgerAccountsAndFactorSources>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView(showsIndicators: false) {
 					VStack(alignment: .center, spacing: .medium3) {

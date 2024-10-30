@@ -3,7 +3,7 @@ import Foundation
 import Sargon
 
 extension OnLedgerEntitiesClient.StakeClaim {
-	public func intoSargon() -> StakeClaim {
+	func intoSargon() -> StakeClaim {
 		StakeClaim(
 			validatorAddress: validatorAddress,
 			resourceAddress: token.id.resourceAddress.asNonFungibleResourceAddress!,

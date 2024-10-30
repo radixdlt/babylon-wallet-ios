@@ -109,7 +109,7 @@ extension Profile {
 }
 
 @discardableResult
-public func withTestClients<R>(
+func withTestClients<R>(
 	userDefaults: UserDefaults.Dependency = .ephemeral(),
 	_ operation: @escaping @autoclosure () -> R
 ) -> R {
@@ -117,7 +117,7 @@ public func withTestClients<R>(
 }
 
 @discardableResult
-public func withTestClients<R>(
+func withTestClients<R>(
 	userDefaults: UserDefaults.Dependency = .ephemeral(),
 	_ updateValuesForOperation: (inout DependencyValues) throws -> Void,
 	operation: () throws -> R
@@ -131,7 +131,7 @@ public func withTestClients<R>(
 
 @_unsafeInheritExecutor
 @discardableResult
-public func withTestClients<R>(
+func withTestClients<R>(
 	userDefaults: UserDefaults.Dependency = .ephemeral(),
 	_ updateValuesForOperation: (inout DependencyValues) async throws -> Void,
 	operation: () async throws -> R
@@ -163,10 +163,7 @@ private func configureTestClients(
 	d.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { _, _ in }
 	d.secureStorageClient.deleteMnemonicByFactorSourceID = { _ in }
 	d.secureStorageClient.saveMnemonicForFactorSource = { _ in }
-	d.secureStorageClient.saveProfileSnapshot = { _ in }
 	d.secureStorageClient.loadProfileSnapshotData = { _ in nil }
-	d.secureStorageClient.loadProfileSnapshot = { _ in nil }
-	d.secureStorageClient.loadProfile = { _ in nil }
 	d.date = .constant(Date(timeIntervalSince1970: 0))
 }
 
@@ -223,8 +220,8 @@ extension DeviceInfo {
 }
 
 extension MnemonicWithPassphrase {
-	public static let testValueZooVote: Self = .init(mnemonic: .testValueZooVote, passphrase: "")
-	public static let testValueAbandonArt: Self = .init(mnemonic: .testValueAbandonArt, passphrase: "")
+	static let testValueZooVote: Self = .init(mnemonic: .testValueZooVote, passphrase: "")
+	static let testValueAbandonArt: Self = .init(mnemonic: .testValueAbandonArt, passphrase: "")
 }
 
 extension PrivateHierarchicalDeterministicFactorSource {
@@ -233,12 +230,16 @@ extension PrivateHierarchicalDeterministicFactorSource {
 	static let testValueZooVote: Self = testValue(mnemonicWithPassphrase: .testValueZooVote)
 	static let testValueAbandonArt: Self = testValue(mnemonicWithPassphrase: .testValueAbandonArt)
 
-	public static func testValue(
+	static func testValue(
 		name: String,
 		model: String,
 		mnemonicWithPassphrase: MnemonicWithPassphrase = .testValueZooVote
 	) -> Self {
-		var bdfs = DeviceFactorSource.babylon(mnemonicWithPassphrase: mnemonicWithPassphrase, isMain: true, hostInfo: .current())
+		var bdfs = DeviceFactorSource.babylon(
+			mnemonicWithPassphrase: mnemonicWithPassphrase,
+			isMain: true,
+			hostInfo: .sample
+		)
 		bdfs.hint.model = model
 		bdfs.hint.name = name
 		bdfs.common.addedOn = .init(timeIntervalSince1970: 0)
@@ -266,6 +267,6 @@ private let deviceModel: String = "iPhone"
 private let expectedDeviceDescription = DeviceInfo.sample
 
 extension Mnemonic {
-	public static let testValueZooVote = try! Self(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo vote")
-	public static let testValueAbandonArt = try! Self(phrase: "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art")
+	static let testValueZooVote = try! Self(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo vote")
+	static let testValueAbandonArt = try! Self(phrase: "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art")
 }

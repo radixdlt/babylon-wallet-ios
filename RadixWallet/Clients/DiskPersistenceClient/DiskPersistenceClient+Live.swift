@@ -1,9 +1,9 @@
 
 // MARK: - DiskPersistenceClient + DependencyKey
 extension DiskPersistenceClient: DependencyKey {
-	public static let liveValue = live(.default)
+	static let liveValue = live(.default)
 
-	public static func live(_ fileManager: FileManager = .default) -> Self {
+	static func live(_ fileManager: FileManager = .default) -> Self {
 		var cachesDirectoryURL: URL? {
 			fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first
 		}

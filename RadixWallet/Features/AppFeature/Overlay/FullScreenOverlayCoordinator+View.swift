@@ -4,14 +4,14 @@ import SwiftUI
 // MARK: - FullScreenOverlayCoordinator.View
 extension FullScreenOverlayCoordinator {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<FullScreenOverlayCoordinator>
 
-		public init(store: StoreOf<FullScreenOverlayCoordinator>) {
+		init(store: StoreOf<FullScreenOverlayCoordinator>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			NavigationStack {
 				root(for: store.scope(state: \.root, action: \.child.root))
 			}

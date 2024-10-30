@@ -1,15 +1,15 @@
 
 extension DependencyValues {
-	public var networkSwitchingClient: NetworkSwitchingClient {
+	var networkSwitchingClient: NetworkSwitchingClient {
 		get { self[NetworkSwitchingClient.self] }
 		set { self[NetworkSwitchingClient.self] = newValue }
 	}
 }
 
 extension NetworkSwitchingClient {
-	public static let liveValue = Self.live()
+	static let liveValue = Self.live()
 
-	public static func live(
+	static func live(
 		profileStore: ProfileStore = .shared
 	) -> Self {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient

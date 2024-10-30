@@ -2,13 +2,13 @@ import ComposableArchitecture
 import SwiftUI
 
 extension PreviewResult {
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<PreviewResult<ResultFromFeature>>
-		public init(store: StoreOf<PreviewResult<ResultFromFeature>>) {
+		init(store: StoreOf<PreviewResult<ResultFromFeature>>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }) { viewStore in
 				GeometryReader { geoProxy in
 					ScrollView {

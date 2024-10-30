@@ -1,8 +1,8 @@
 // MARK: - HTTPClient + TestDependencyKey
 extension HTTPClient: TestDependencyKey {
-	public static let previewValue = Self.noop()
+	static let previewValue = Self.noop()
 
-	public static let testValue = Self(
+	static let testValue = Self(
 		executeRequest: unimplemented("\(Self.self).executeRequest")
 	)
 
@@ -14,7 +14,7 @@ extension HTTPClient: TestDependencyKey {
 }
 
 extension DependencyValues {
-	public var httpClient: HTTPClient {
+	var httpClient: HTTPClient {
 		get { self[HTTPClient.self] }
 		set { self[HTTPClient.self] = newValue }
 	}

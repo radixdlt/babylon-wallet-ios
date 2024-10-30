@@ -2,13 +2,13 @@ import ScreenshotPreventing
 import SwiftUINavigation
 
 // MARK: - AppTextField
-public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory: View>: View {
-	public struct Focus {
+struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory: View>: View {
+	struct Focus {
 		let value: FocusValue
 		let binding: Binding<FocusValue>
 		let focusState: FocusState<FocusValue>.Binding
 
-		public static func on(
+		static func on(
 			_ value: FocusValue,
 			binding: Binding<FocusValue>,
 			to focusState: FocusState<FocusValue>.Binding
@@ -17,20 +17,20 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 		}
 	}
 
-	public struct PrimaryHeading: Sendable, Hashable, ExpressibleByStringLiteral {
-		public let text: String
-		public let isProminent: Bool
-		public init(text: String, isProminent: Bool = true) {
+	struct PrimaryHeading: Sendable, Hashable, ExpressibleByStringLiteral {
+		let text: String
+		let isProminent: Bool
+		init(text: String, isProminent: Bool = true) {
 			self.text = text
 			self.isProminent = isProminent
 		}
 
-		public init(stringLiteral value: StringLiteralType) {
+		init(stringLiteral value: StringLiteralType) {
 			self.init(text: value)
 		}
 	}
 
-	public let useSecureField: Bool
+	let useSecureField: Bool
 
 	@Environment(\.isEnabled) var isEnabled: Bool
 
@@ -48,7 +48,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 
 	@State private var isFocused: Bool = false
 
-	public init(
+	init(
 		useSecureField: Bool = false,
 		primaryHeading: PrimaryHeading? = nil,
 		subHeading: String? = nil,
@@ -76,7 +76,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 		self.innerAccesory = innerAccessory()
 	}
 
-	public init(
+	init(
 		useSecureField: Bool = false,
 		primaryHeading: PrimaryHeading? = nil,
 		subHeading: String? = nil,
@@ -103,7 +103,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 		self.innerAccesory = innerAccessory()
 	}
 
-	public var body: some View {
+	var body: some View {
 		HStack(alignment: .textFieldAlignment, spacing: 0) {
 			VStack(alignment: .leading, spacing: Constants.appTextFieldSpacing) {
 				if primaryHeading != nil || secondaryHeading != nil {

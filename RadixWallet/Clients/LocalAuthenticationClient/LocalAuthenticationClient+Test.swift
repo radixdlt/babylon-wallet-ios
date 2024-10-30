@@ -1,6 +1,6 @@
 
 extension DependencyValues {
-	public var localAuthenticationClient: LocalAuthenticationClient {
+	var localAuthenticationClient: LocalAuthenticationClient {
 		get { self[LocalAuthenticationClient.self] }
 		set { self[LocalAuthenticationClient.self] = newValue }
 	}
@@ -8,7 +8,7 @@ extension DependencyValues {
 
 // MARK: - LocalAuthenticationClient + TestDependencyKey
 extension LocalAuthenticationClient: TestDependencyKey {
-	public static let testValue = Self(
+	static let testValue = Self(
 		queryConfig: { .biometricsAndPasscodeSetUp },
 		authenticateWithBiometrics: { true },
 		setAuthenticatedSuccessfully: unimplemented("\(Self.self).setAuthenticatedSuccessfully"),
