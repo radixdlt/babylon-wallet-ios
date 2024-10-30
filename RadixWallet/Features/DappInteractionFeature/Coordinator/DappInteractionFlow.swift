@@ -510,6 +510,14 @@ extension DappInteractionFlow {
 			return continueEffect(for: &state)
 		}
 
+		func handlePreAuthorizationSignature(
+			_ item: State.AnyInteractionItem,
+			_ encodedSignedPartialTransaction: String
+		) -> Effect<Action> {
+			state.responseItems[item] = .remote(.preAuthorization(.init(encodedSignedPartialTransaction: encodedSignedPartialTransaction)))
+			return continueEffect(for: &state)
+		}
+
 		func handlePreAuthorizationFailure(
 			_ error: PreAuthorizationFailure
 		) -> Effect<Action> {
@@ -576,6 +584,9 @@ extension DappInteractionFlow {
 		case .personaProofOfOwnership(.delegate(.failedToSign)),
 		     .accountsProofOfOwnership(.delegate(.failedToSign)):
 			return dismissEffect(for: state, errorKind: .failedToSignAuthChallenge, message: nil)
+
+		case let .preAuthorizationReview(.delegate(.signedPreAuthorization(encoded))):
+			return handlePreAuthorizationSignature(item, encoded)
 
 		case let .preAuthorizationReview(.delegate(.failed(error))):
 			return handlePreAuthorizationFailure(error)

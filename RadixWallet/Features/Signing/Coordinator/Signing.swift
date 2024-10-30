@@ -18,7 +18,7 @@ enum SigningPurposeWithPayload: Sendable, Hashable {
 		origin: SigningPurpose.SignTransactionPurpose
 	)
 
-	case signPreAuthorization(Subintent, challenge: DappToWalletInteractionAuthChallengeNonce)
+	case signPreAuthorization(Subintent)
 
 	var purpose: SigningPurpose {
 		switch self {
@@ -36,7 +36,7 @@ enum SigningPurposeWithPayload: Sendable, Hashable {
 enum SigningResponse: Sendable, Hashable {
 	case signTransaction(NotarizeTransactionResponse, origin: SigningPurpose.SignTransactionPurpose)
 	case signAuth(SignedAuthChallenge)
-	case signPreAuthorization(SignedAuthChallenge)
+	case signPreAuthorization(String)
 }
 
 // MARK: - Signing
@@ -114,9 +114,9 @@ struct Signing: Sendable, FeatureReducer {
 					})))
 				}
 
-			case let .signPreAuthorization(_, challenge):
-				let response = SignedAuthChallenge(challenge: challenge, entitySignatures: Set(state.signatures))
-				return .send(.delegate(.finishedSigning(.signPreAuthorization(response))))
+			case let .signPreAuthorization(subintent):
+				// TODO: Transform `state.signatures` into the String expected for encodedSignedPartialTransaction
+				return .send(.delegate(.finishedSigning(.signPreAuthorization("what should go here?"))))
 			}
 
 		case let .notarizeResult(.failure(error)):

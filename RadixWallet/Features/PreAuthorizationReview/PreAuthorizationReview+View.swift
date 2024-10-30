@@ -100,9 +100,11 @@ extension PreAuthorizationReview {
 					ApprovalSlider(
 						title: L10n.PreAuthorizationReview.slideToSign,
 						resetDate: viewStore.sliderResetDate
-					) {}
-						.controlState(viewStore.sliderControlState)
-						.padding(.horizontal, .medium2)
+					) {
+						store.send(.view(.approvalSliderSlid))
+					}
+					.controlState(viewStore.sliderControlState)
+					.padding(.horizontal, .medium2)
 				}
 				.animation(.easeInOut, value: viewStore.displayMode.rawManifest)
 			}

@@ -122,7 +122,7 @@ struct SignWithFactorSource: Sendable, FeatureReducer {
 			auth.payloadToHashAndSign.hash()
 		case let .signTransaction(_, intent, _):
 			intent.hash().hash
-		case let .signPreAuthorization(intent, _):
+		case let .signPreAuthorization(intent):
 			intent.hash().hash
 		}
 
@@ -157,7 +157,7 @@ struct SignWithFactorSource: Sendable, FeatureReducer {
 				dAppDefinitionAddress: authToSign.input.dAppDefinitionAddress
 			))
 
-		case let .signPreAuthorization(subintent, _):
+		case let .signPreAuthorization(subintent):
 			try await ledgerHardwareWalletClient.signPreAuthorization(.init(
 				ledger: ledger,
 				signers: signers,

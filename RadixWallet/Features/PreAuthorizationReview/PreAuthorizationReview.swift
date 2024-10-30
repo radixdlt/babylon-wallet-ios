@@ -13,7 +13,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 
 		var displayMode: Common.DisplayMode = .detailed
 		var isApprovalInProgress: Bool = false
-		var sliderResetDate: Date = .now // TODO: reset when it corresponds
+		var sliderResetDate: Date = .now
 		var secondsToExpiration: Int?
 
 		// Sections
@@ -43,8 +43,8 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
+		case signedPreAuthorization(String)
 		case failed(PreAuthorizationFailure)
-		case signedChallenge(SignedAuthChallenge)
 	}
 
 	struct Destination: DestinationReducer {
@@ -158,6 +158,13 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 			return .merge(effects)
 
 		case let .builtSubintent(subintent):
+			guard let preview = state.preview else {
+				return .none
+			}
+			state.destination = .signing(.init(
+				factorsLeftToSignWith: preview.signingFactors,
+				signingPurposeWithPayload: .signPreAuthorization(subintent)
+			))
 			return .none
 
 		case let .updateSecondsToExpiration(expiration):
@@ -192,8 +199,8 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 				loggerGlobal.error("Failed to sign PreAuthoriation")
 				return resetToApprovable(&state)
 
-			case let .finishedSigning(.signPreAuthorization(challenge)):
-				return .send(.delegate(.signedChallenge(challenge)))
+			case let .finishedSigning(.signPreAuthorization(encoded)):
+				return .send(.delegate(.signedPreAuthorization(encoded)))
 
 			case .finishedSigning:
 				assertionFailure("Unexpected signature instead of .signPreAuthorization")
@@ -233,11 +240,10 @@ private extension PreAuthorizationReview {
 			return .none
 		}
 
-		return .run { [nonce = state.nonce] send in
+		return .run { send in
 			let subintent = try await preAuthorizationClient.buildSubintent(.init(
 				networkId: preview.networkId,
-				// TODO: TransactionReview create new Nonce for every request, which one is correct?
-				nonce: nonce,
+				intentDiscriminator: .secureRandom(),
 				manifest: preview.manifest
 			))
 			await send(.internal(.builtSubintent(subintent)))
