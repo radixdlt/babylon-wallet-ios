@@ -43,7 +43,7 @@ extension DappToWalletInteractionSendTransactionItem {
 
 extension DappToWalletInteractionSubintentRequestItem {
 	init(
-		unvalidatedManifest: UnvalidatedTransactionManifest,
+		unvalidatedManifest: UnvalidatedSubintentManifest,
 		expiration: DappToWalletInteractionSubintentExpiration? = nil
 	) {
 		self.init(

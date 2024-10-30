@@ -4,7 +4,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 	typealias Expiration = DappToWalletInteractionSubintentExpiration
 
 	struct State: Sendable, Hashable {
-		let unvalidatedManifest: UnvalidatedTransactionManifest
+		let unvalidatedManifest: UnvalidatedSubintentManifest
 		let expiration: Expiration?
 		let nonce: Nonce
 		let signTransactionPurpose: SigningPurpose.SignTransactionPurpose

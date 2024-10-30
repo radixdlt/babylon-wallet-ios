@@ -202,6 +202,7 @@ struct DevAccountPreferences: Sendable, FeatureReducer {
 			}
 		case .createPreAuthorizationButtonTapped:
 			return .run { _ in
+				// TODO: Get Manifest from Sargon
 				let manifest = """
 				CALL_METHOD
 					  Address("component_tdx_2_1cptxxxxxxxxxfaucetxxxxxxxxx000527798379xxxxxxxxxyulkzl")
@@ -217,10 +218,10 @@ struct DevAccountPreferences: Sendable, FeatureReducer {
 
 				YIELD_TO_PARENT;
 				"""
-				let unvalidated = UnvalidatedTransactionManifest(transactionManifestString: manifest, blobs: Blobs([]))
+				let unvalidatedManifest = UnvalidatedSubintentManifest(subintentManifestString: manifest, blobs: Blobs([]))
 
 				_ = await dappInteractionClient.addWalletInteraction(
-					.preAuthorization(.init(request: .init(unvalidatedManifest: unvalidated))),
+					.preAuthorization(.init(request: .init(unvalidatedManifest: unvalidatedManifest))),
 					.accountTransfer
 				)
 			}

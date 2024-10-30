@@ -11,7 +11,7 @@ extension PreAuthorizationClient {
 // MARK: PreAuthorizationClient.GetPreviewRequest
 extension PreAuthorizationClient {
 	struct GetPreviewRequest: Hashable, Sendable {
-		let unvalidatedManifest: UnvalidatedTransactionManifest
+		let unvalidatedManifest: UnvalidatedSubintentManifest
 		let nonce: Nonce
 	}
 }

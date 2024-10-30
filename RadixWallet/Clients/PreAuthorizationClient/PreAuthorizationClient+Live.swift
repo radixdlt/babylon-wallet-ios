@@ -6,7 +6,7 @@ extension PreAuthorizationClient: DependencyKey {
 		func analysePreview(request: GetPreviewRequest) async throws -> PreAuthToReview {
 			do {
 				return try await SargonOS.shared.analysePreAuthPreview(
-					instructions: request.unvalidatedManifest.transactionManifestString,
+					instructions: request.unvalidatedManifest.subintentManifestString,
 					blobs: request.unvalidatedManifest.blobs,
 					nonce: request.nonce
 				)
