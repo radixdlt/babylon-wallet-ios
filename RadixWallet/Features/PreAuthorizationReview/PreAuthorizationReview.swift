@@ -12,6 +12,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		var preview: PreAuthorizationPreview?
 
 		var displayMode: Common.DisplayMode = .detailed
+		var isApprovalInProgress: Bool = false
 		var sliderResetDate: Date = .now // TODO: reset when it corresponds
 		var secondsToExpiration: Int?
 
@@ -26,6 +27,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		case appeared
 		case toggleDisplayModeButtonTapped
 		case copyRawManifestButtonTapped
+		case approvalSliderSlid
 	}
 
 	@CasePathable
@@ -35,11 +37,14 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 
 	enum InternalAction: Sendable, Equatable {
 		case previewLoaded(TaskResult<PreAuthorizationPreview>)
+		case builtSubintent(Subintent)
 		case updateSecondsToExpiration(Date)
+		case resetToApprovable
 	}
 
 	enum DelegateAction: Sendable, Equatable {
 		case failed(PreAuthorizationFailure)
+		case signedChallenge(SignedAuthChallenge)
 	}
 
 	struct Destination: DestinationReducer {
@@ -108,6 +113,10 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 			}
 			pasteboardClient.copyString(manifest)
 			return .none
+
+		case .approvalSliderSlid:
+			state.isApprovalInProgress = true
+			return buildSubintent(state: state)
 		}
 	}
 
@@ -130,9 +139,9 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 			// Trigger effect to load sections
 			let sectionsEffect: Effect<Action> = switch preview.kind {
 			case let .open(value):
-				.send(.child(.sections(.internal(.parent(.resolveManifestSummary(value.summary, preview.networkID))))))
+				.send(.child(.sections(.internal(.parent(.resolveManifestSummary(value.summary, preview.networkId))))))
 			case let .enclosed(value):
-				.send(.child(.sections(.internal(.parent(.resolveExecutionSummary(value.summary, preview.networkID))))))
+				.send(.child(.sections(.internal(.parent(.resolveExecutionSummary(value.summary, preview.networkId))))))
 			}
 			effects.append(sectionsEffect)
 
@@ -148,9 +157,15 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 
 			return .merge(effects)
 
+		case let .builtSubintent(subintent):
+			return .none
+
 		case let .updateSecondsToExpiration(expiration):
 			state.secondsToExpiration = Int(expiration.timeIntervalSinceNow)
 			return .none
+
+		case .resetToApprovable:
+			return resetToApprovable(&state)
 		}
 	}
 
@@ -159,6 +174,31 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		case .sections(.delegate(.failedToResolveSections)):
 			state.destination = .rawManifestAlert(.rawManifest)
 			return showRawManifest(&state)
+
+		default:
+			return .none
+		}
+	}
+
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .signing(.delegate(action)):
+			switch action {
+			case .cancelSigning:
+				loggerGlobal.notice("Cancelled signing")
+				return resetToApprovable(&state)
+
+			case .failedToSign:
+				loggerGlobal.error("Failed to sign PreAuthoriation")
+				return resetToApprovable(&state)
+
+			case let .finishedSigning(.signPreAuthorization(challenge)):
+				return .send(.delegate(.signedChallenge(challenge)))
+
+			case .finishedSigning:
+				assertionFailure("Unexpected signature instead of .signPreAuthorization")
+				return .none
+			}
 
 		default:
 			return .none
@@ -184,6 +224,33 @@ private extension PreAuthorizationReview {
 		}
 
 		state.displayMode = .raw(preview.manifest.manifestString)
+		return .none
+	}
+
+	func buildSubintent(state: State) -> Effect<Action> {
+		guard let preview = state.preview else {
+			assertionFailure("Expected preview")
+			return .none
+		}
+
+		return .run { [nonce = state.nonce] send in
+			let subintent = try await preAuthorizationClient.buildSubintent(.init(
+				networkId: preview.networkId,
+				// TODO: TransactionReview create new Nonce for every request, which one is correct?
+				nonce: nonce,
+				manifest: preview.manifest
+			))
+			await send(.internal(.builtSubintent(subintent)))
+		} catch: { error, send in
+			loggerGlobal.critical("Failed to build Subintent, error: \(error)")
+			errorQueue.schedule(error)
+			await send(.internal(.resetToApprovable))
+		}
+	}
+
+	func resetToApprovable(_ state: inout State) -> Effect<Action> {
+		state.isApprovalInProgress = false
+		state.sliderResetDate = .now
 		return .none
 	}
 }

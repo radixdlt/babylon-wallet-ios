@@ -247,7 +247,7 @@ private extension PreAuthorizationReview.State {
 	}
 
 	var sliderControlState: ControlState {
-		isExpired ? .disabled : globalControlState
+		isExpired || isApprovalInProgress ? .disabled : globalControlState
 	}
 
 	var showRawManifestButton: Bool {
@@ -259,10 +259,17 @@ private extension PreAuthorizationReview.State {
 private extension View {
 	func destinations(with store: StoreOf<PreAuthorizationReview>) -> some View {
 		let destinationStore = store.scope(state: \.$destination, action: \.destination)
-		return rawManifestAlert(with: destinationStore)
+		return signing(with: destinationStore)
+			.rawManifestAlert(with: destinationStore)
 	}
 
 	private func rawManifestAlert(with destinationStore: PresentationStoreOf<PreAuthorizationReview.Destination>) -> some View {
 		alert(store: destinationStore.scope(state: \.rawManifestAlert, action: \.rawManifestAlert))
+	}
+
+	private func signing(with destinationStore: PresentationStoreOf<PreAuthorizationReview.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.signing, action: \.signing)) {
+			Signing.View(store: $0)
+		}
 	}
 }

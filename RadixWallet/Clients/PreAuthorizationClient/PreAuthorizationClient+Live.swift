@@ -21,12 +21,18 @@ extension PreAuthorizationClient: DependencyKey {
 
 			return PreAuthorizationPreview(
 				kind: kind,
-				networkID: networkID
+				networkId: networkID,
+				signingFactors: [:] // TODO: Implement!
 			)
 		}
 
+		let buildSubintent: BuildSubintent = { _ in
+			fatalError("implement")
+		}
+
 		return Self(
-			getPreview: getPreview
+			getPreview: getPreview,
+			buildSubintent: buildSubintent
 		)
 	}
 }
