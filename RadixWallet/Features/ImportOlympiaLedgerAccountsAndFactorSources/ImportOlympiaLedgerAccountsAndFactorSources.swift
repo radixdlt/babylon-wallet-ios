@@ -324,7 +324,10 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 
 		guard
 			let verifiedToBeMigrated = NonEmpty<OrderedSet<OlympiaAccountToMigrate>>(
-				rawValue: OrderedSet(uncheckedUniqueElements: olympiaAccountsToMigrate.sorted(by: \.addressIndex))
+				rawValue: OrderedSet(
+					uncheckedUniqueElements: olympiaAccountsToMigrate
+						.sorted(by: \.addressIndex)
+				)
 			)
 		else {
 			loggerGlobal.warning("No accounts to migrated.")

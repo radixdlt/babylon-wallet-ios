@@ -141,17 +141,15 @@ extension TransactionClient {
 
 			let notarySignature = try request.notary.signature(for: signedIntentHash.hash.data)
 
-			let uncompiledNotarized = try NotarizedTransaction(
+			let notarizedTransaction = try NotarizedTransaction(
 				signedIntent: signedTransactionIntent,
 				notarySignature: NotarySignature(signature: .ed25519(value: .init(bytes: .init(bytes: notarySignature))))
 			)
 
-			let compiledNotarizedTXIntent = uncompiledNotarized.compile()
-
 			let txID = request.transactionIntent.hash()
 
 			return .init(
-				notarized: compiledNotarizedTXIntent,
+				notarized: notarizedTransaction,
 				intent: request.transactionIntent,
 				txID: txID
 			)
@@ -163,7 +161,6 @@ extension TransactionClient {
 				return try await SargonOS.shared.analyseTransactionPreview(
 					instructions: request.unvalidatedManifest.transactionManifestString,
 					blobs: request.unvalidatedManifest.blobs,
-					message: request.message,
 					areInstructionsOriginatingFromHost: request.isWalletTransaction,
 					nonce: request.nonce,
 					notaryPublicKey: .ed25519(request.ephemeralNotaryPublicKey.intoSargon())
@@ -222,29 +219,6 @@ extension TransactionClient {
 				transactionFee: transactionFee,
 				transactionSigners: transactionSigners,
 				signingFactors: signingFactors
-			)
-		}
-
-		@Sendable
-		func createTransactionPreviewRequest(
-			for request: ManifestReviewRequest,
-			networkID: NetworkID,
-			transactionManifest: TransactionManifest,
-			transactionSigners: TransactionSigners
-		) async throws -> GatewayAPI.TransactionPreviewRequest {
-			let intent = try await buildTransactionIntent(.init(
-				networkID: networkID,
-				manifest: transactionManifest,
-				message: request.message,
-				nonce: request.nonce,
-				makeTransactionHeaderInput: request.makeTransactionHeaderInput,
-				transactionSigners: transactionSigners
-			))
-
-			return try .init(
-				rawManifest: transactionManifest,
-				header: intent.header,
-				transactionSigners: transactionSigners
 			)
 		}
 
@@ -370,35 +344,6 @@ extension TransactionClient {
 
 		loggerGlobal.notice("Did not find any suitable fee payer, retrieving candidates for user selection....")
 		return nil
-	}
-}
-
-extension TransactionFailure {
-	static func fromFailedTXReviewResponse(_ response: GatewayAPI.TransactionPreviewResponse) -> Self {
-		let message = response.receipt.errorMessage ?? "Unknown reason"
-
-		// Quite rudimentary, but it is not worth making something smarter,
-		// as the GW will provide in the future strongly typed errors
-		let isFailureDueToDepositRules = message.contains("AccountError(DepositIsDisallowed") ||
-			message.contains("AccountError(NotAllBucketsCouldBeDeposited")
-
-		if isFailureDueToDepositRules {
-			return .failedToPrepareTXReview(.oneOfRecevingAccountsDoesNotAllowDeposits)
-		} else {
-			return .failedToPrepareTXReview(.failedToRetrieveTXReceipt(message))
-		}
-	}
-}
-
-private extension GatewayAPI.TransactionPreviewResponse {
-	var engineToolkitReceipt: String? {
-		guard
-			let dictionary = radixEngineToolkitReceipt?.value as? [String: Any],
-			let data = try? JSONSerialization.data(withJSONObject: dictionary, options: [])
-		else {
-			return nil
-		}
-		return String(data: data, encoding: .utf8)
 	}
 }
 

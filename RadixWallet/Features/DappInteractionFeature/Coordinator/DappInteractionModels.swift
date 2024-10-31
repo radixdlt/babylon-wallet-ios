@@ -111,6 +111,9 @@ extension DappToWalletInteraction {
 		// transactions
 		case send(DappToWalletInteractionSendTransactionItem)
 
+		// preAuthorization
+		case subintent(DappToWalletInteractionSubintentRequestItem)
+
 		var priority: some Comparable {
 			switch self {
 			// requests
@@ -130,6 +133,9 @@ extension DappToWalletInteraction {
 				6
 			// transactions
 			case .send:
+				0
+			// preAuthorization
+			case .subintent:
 				0
 			}
 		}
@@ -162,8 +168,10 @@ extension DappToWalletInteraction {
 				.send(items.send),
 			]
 			.compactMap { $0 }
-		case .preAuthorization:
-			fatalError("Implement")
+		case let .preAuthorization(items):
+			[
+				.subintent(items.request),
+			]
 		}
 	}
 }

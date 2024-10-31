@@ -448,19 +448,22 @@ extension DerivePublicKeys {
 			derivationPathScheme: derivationPathScheme,
 			networkID: maybeNetworkID
 		)
+		let hardened = try index.asHardened()
 		return DerivationPath.forEntity(
 			kind: entityKind,
 			networkID: networkID,
-			index: index
+			index: hardened
 		)
 	}
+}
 
+extension DerivePublicKeys {
 	private func nextIndex(
 		factorSourceID: FactorSourceID,
 		of entityKind: EntityKind,
 		derivationPathScheme: DerivationPathScheme,
 		networkID maybeNetworkID: NetworkID?
-	) async throws -> (index: HDPathValue, networkID: NetworkID) {
+	) async throws -> (index: HdPathComponent, networkID: NetworkID) {
 		let currentNetwork = await accountsClient.getCurrentNetworkID()
 		let networkID = maybeNetworkID ?? currentNetwork
 		let request = NextEntityIndexForFactorSourceRequest(
@@ -488,7 +491,7 @@ extension SLIP10Curve {
 private extension AlertState<DerivePublicKeys.Destination.Action.AlertAction> {
 	static let failedToFindFactorSourceAlert: AlertState = .init(
 		title: {
-			TextState(L10n.TransactionReview.NoMnemonicError.title)
+			TextState(L10n.Common.NoMnemonicAlert.title)
 		},
 		actions: {
 			ButtonState(action: .ok) {
@@ -496,7 +499,7 @@ private extension AlertState<DerivePublicKeys.Destination.Action.AlertAction> {
 			}
 		},
 		message: {
-			TextState(L10n.TransactionReview.NoMnemonicError.text)
+			TextState(L10n.Common.NoMnemonicAlert.text)
 		}
 	)
 }

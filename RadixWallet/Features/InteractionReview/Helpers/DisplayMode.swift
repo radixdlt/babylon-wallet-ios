@@ -5,9 +5,9 @@ extension InteractionReview {
 		case detailed
 		case raw(String)
 
-		var rawTransaction: String? {
-			guard case let .raw(transaction) = self else { return nil }
-			return transaction
+		var rawManifest: String? {
+			guard case let .raw(manifest) = self else { return nil }
+			return manifest
 		}
 	}
 }

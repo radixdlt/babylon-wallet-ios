@@ -291,7 +291,7 @@ extension ResourceBalanceView {
 				.padding(.horizontal, hideDetails ? .zero : .small3)
 
 				if !hideDetails {
-					Text(L10n.TransactionReview.worth.uppercased())
+					Text(L10n.InteractionReview.worth.uppercased())
 						.textStyle(.body2HighImportance)
 						.foregroundColor(.app.gray2)
 						.padding(.top, .small2)
@@ -653,7 +653,7 @@ extension ResourceBalanceView {
 			} else {
 				VStack(alignment: .trailing, spacing: 0) {
 					if guaranteed != nil {
-						Text(L10n.TransactionReview.estimated)
+						Text(L10n.InteractionReview.estimated)
 							.textStyle(.body3HighImportance)
 							.foregroundColor(.app.gray1)
 					} else if let title {
@@ -676,7 +676,7 @@ extension ResourceBalanceView {
 					}
 
 					if let guaranteedAmount = guaranteed {
-						Text(L10n.TransactionReview.guaranteed)
+						Text(L10n.InteractionReview.guaranteed)
 							.textStyle(.body2HighImportance)
 							.foregroundColor(.app.gray2)
 							.padding(.top, .small3)
@@ -703,7 +703,7 @@ extension ResourceBalanceView.StakeClaimNFT.Tokens.SectionKind {
 		case .readyToBeClaimed:
 			L10n.Account.Staking.readyToBeClaimed
 		case .toBeClaimed:
-			L10n.TransactionReview.toBeClaimed
+			L10n.InteractionReview.toBeClaimed
 		}
 	}
 }

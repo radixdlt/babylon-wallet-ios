@@ -1,17 +1,17 @@
 import SwiftUI
 
 extension InteractionReview {
-	struct RawTransactionView: SwiftUI.View {
-		let transaction: String
+	struct RawManifestView: SwiftUI.View {
+		let manifest: String
 		let copyAction: () -> Void
 		let toggleAction: (() -> Void)?
 
 		init(
-			transaction: String,
+			manifest: String,
 			copyAction: @escaping () -> Void,
 			toggleAction: (() -> Void)? = nil
 		) {
-			self.transaction = transaction
+			self.manifest = manifest
 			self.copyAction = copyAction
 			self.toggleAction = toggleAction
 		}
@@ -54,7 +54,7 @@ extension InteractionReview {
 		}
 
 		private var content: some View {
-			Text(transaction)
+			Text(manifest)
 				.textStyle(.monospace)
 				.foregroundColor(.app.gray1)
 				.multilineTextAlignment(.leading)

@@ -10,7 +10,7 @@ extension InteractionReview.Proofs {
 			WithPerceptionTracking {
 				VStack(alignment: .leading, spacing: .medium2) {
 					HStack {
-						Text(L10n.TransactionReview.presentingHeading)
+						Text(L10n.InteractionReview.presentingHeading)
 							.sectionHeading
 							.textCase(.uppercase)
 

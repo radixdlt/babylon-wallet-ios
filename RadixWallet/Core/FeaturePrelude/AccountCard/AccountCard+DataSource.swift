@@ -98,7 +98,7 @@ private extension AccountForDisplay {
 
 private extension AccountAddress {
 	var asDataSource: AccountCardDataSource {
-		.init(title: L10n.TransactionReview.externalAccountName, ledgerIdentifiable: .address(.account(self)), gradient: .external)
+		.init(title: L10n.InteractionReview.externalAccountName, ledgerIdentifiable: .address(.account(self)), gradient: .external)
 	}
 }
 

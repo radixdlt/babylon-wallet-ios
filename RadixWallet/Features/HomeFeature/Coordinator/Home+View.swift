@@ -118,7 +118,6 @@ private extension View {
 			.relinkConnector(with: destinationStore)
 			.securityCenter(with: destinationStore)
 			.p2pLinks(with: destinationStore)
-			.preAuth(with: destinationStore, store: store)
 	}
 
 	private func accountDetails(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
@@ -158,15 +157,6 @@ private extension View {
 	private func p2pLinks(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.p2pLinks, action: \.p2pLinks)) {
 			P2PLinksFeature.View(store: $0)
-		}
-	}
-
-	private func preAuth(with destinationStore: PresentationStoreOf<Home.Destination>, store: StoreOf<Home>) -> some View {
-		fullScreenCover(store: destinationStore.scope(state: \.preAuth, action: \.preAuth)) {
-			PreAuthorizationReview.View(store: $0)
-				.withNavigationBar {
-					store.send(.view(.dismissPreAuth))
-				}
 		}
 	}
 }

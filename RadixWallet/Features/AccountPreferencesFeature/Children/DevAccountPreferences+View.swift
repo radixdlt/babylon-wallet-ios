@@ -72,6 +72,10 @@ extension DevAccountPreferences {
 						createNonFungibleTokenButton(with: viewStore)
 						createMultipleFungibleTokenButton(with: viewStore)
 						createMultipleNonFungibleTokenButton(with: viewStore)
+						Button("Create PreAuthorization") {
+							viewStore.send(.createPreAuthorizationButtonTapped)
+						}
+						.buttonStyle(.secondaryRectangular(shouldExpand: true))
 						Spacer(minLength: 0)
 						deleteAccountButton { store.send(.view(.deleteAccountButtonTapped)) }
 						#endif // DEBUG

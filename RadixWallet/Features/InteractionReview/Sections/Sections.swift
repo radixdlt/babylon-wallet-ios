@@ -1,11 +1,11 @@
 // MARK: - InteractionReview.Sections
 extension InteractionReview {
-	@Reducer
 	struct Sections: Sendable, FeatureReducer {
 		typealias Common = InteractionReview
 
-		@ObservableState
 		struct State: Sendable, Hashable {
+			let kind: InteractionReview.Kind
+
 			var withdrawals: Accounts.State? = nil
 			var dAppsUsed: InteractionReviewDappsUsed.State? = nil
 			var deposits: Accounts.State? = nil
@@ -20,10 +20,12 @@ extension InteractionReview {
 			var accountDepositSetting: InteractionReview.DepositSettingState? = nil
 			var accountDepositExceptions: InteractionReview.DepositExceptionsState? = nil
 
-			// The proofs are set here (within the resolve logic) but should be rendered and handled by the parent view, since they may be placed outside the Sections.
+			// The proofs are set here (within the resolve logic) but may be rendered and handled by the parent view, in the case they are placed outside the Sections (TransactionReview).
 			var proofs: Proofs.State? = nil
 
-			@Presents
+			var showPossibleDappCalls = false
+
+			@PresentationState
 			var destination: Destination.State? = nil
 		}
 
@@ -44,7 +46,7 @@ extension InteractionReview {
 
 			enum ParentAction: Sendable, Equatable {
 				case resolveExecutionSummary(ExecutionSummary, NetworkID)
-				case simulate
+				case resolveManifestSummary(ManifestSummary, NetworkID)
 				case showResourceDetails(OnLedgerEntity.Resource, KnownResourceBalance.Details)
 			}
 		}
@@ -56,6 +58,7 @@ extension InteractionReview {
 			case dAppsUsed(InteractionReviewDappsUsed.Action)
 			case contributingToPools(InteractionReviewPools.Action)
 			case redeemingFromPools(InteractionReviewPools.Action)
+			case proofs(Common.Proofs.Action)
 		}
 
 		enum DelegateAction: Sendable, Hashable {
@@ -72,7 +75,6 @@ extension InteractionReview {
 				case poolUnitDetails(PoolUnitDetails.State)
 				case lsuDetails(LSUDetails.State)
 				case unknownDappComponents(Common.UnknownDappComponents.State)
-				case rawTransactionAlert(AlertState<Action.RawTransactionAlert>)
 			}
 
 			@CasePathable
@@ -83,11 +85,6 @@ extension InteractionReview {
 				case lsuDetails(LSUDetails.Action)
 				case poolUnitDetails(PoolUnitDetails.Action)
 				case unknownDappComponents(Common.UnknownDappComponents.Action)
-				case rawTransactionAlert(RawTransactionAlert)
-
-				enum RawTransactionAlert: Sendable, Equatable {
-					case continueTapped
-				}
 			}
 
 			var body: some ReducerOf<Self> {
@@ -133,6 +130,9 @@ extension InteractionReview {
 				.ifLet(\.redeemingFromPools, action: \.child.redeemingFromPools) {
 					InteractionReviewPools()
 				}
+				.ifLet(\.proofs, action: \.child.proofs) {
+					Common.Proofs()
+				}
 				.ifLet(destinationPath, action: /Action.destination) {
 					Destination()
 				}
@@ -171,7 +171,6 @@ extension InteractionReview {
 
 			case let .setSections(sections):
 				guard let sections else {
-					state.destination = .rawTransactionAlert(.rawTransaction)
 					return .send(.delegate(.failedToResolveSections))
 				}
 				state.withdrawals = sections.withdrawals
@@ -192,7 +191,7 @@ extension InteractionReview {
 		func reduce(into state: inout State, parentAction: InternalAction.ParentAction) -> Effect<Action> {
 			switch parentAction {
 			case let .resolveExecutionSummary(executionSummary, networkID):
-				.run { send in
+				return .run { send in
 					let sections = try await sections(for: executionSummary, networkID: networkID)
 					await send(.internal(.setSections(sections)))
 				} catch: { error, send in
@@ -200,17 +199,18 @@ extension InteractionReview {
 					await send(.internal(.setSections(nil)))
 				}
 
-			case .simulate:
-				.run { send in
-					let sections = try await simulateSections()
+			case let .resolveManifestSummary(manifestSummary, networkID):
+				state.showPossibleDappCalls = true
+				return .run { send in
+					let sections = try await sections(for: manifestSummary, networkID: networkID)
 					await send(.internal(.setSections(sections)))
 				} catch: { error, send in
-					loggerGlobal.error("Failed to extract sections, error: \(error)")
+					loggerGlobal.error("Failed to extract sections from ManifestSummary, error: \(error)")
 					await send(.internal(.setSections(nil)))
 				}
 
 			case let .showResourceDetails(resource, details):
-				resourceDetailsEffect(state: &state, resource: resource, details: details)
+				return resourceDetailsEffect(state: &state, resource: resource, details: details)
 			}
 		}
 
@@ -246,6 +246,11 @@ extension InteractionReview {
 			case .deposits(.delegate(.showCustomizeGuarantees)):
 				guard let guarantees = state.deposits?.accounts.customizableGuarantees, !guarantees.isEmpty else { return .none }
 				return .send(.delegate(.showCustomizeGuarantees(guarantees)))
+
+			case let .proofs(.delegate(.showAsset(proof))):
+				let resource = proof.resourceBalance.resource
+				let details = proof.resourceBalance.details
+				return resourceDetailsEffect(state: &state, resource: resource, details: details)
 
 			default:
 				return .none
@@ -305,19 +310,5 @@ private extension InteractionReview.Sections {
 		}
 
 		return .none
-	}
-}
-
-extension AlertState<InteractionReview.Sections.Destination.Action.RawTransactionAlert> {
-	static var rawTransaction: AlertState {
-		AlertState {
-			TextState(L10n.TransactionReview.NonConformingManifestWarning.title)
-		} actions: {
-			ButtonState(action: .continueTapped) {
-				TextState(L10n.Common.continue)
-			}
-		} message: {
-			TextState(L10n.TransactionReview.NonConformingManifestWarning.message)
-		}
 	}
 }

@@ -136,9 +136,9 @@ extension FactorSourcesClient: DependencyKey {
 
 			func nextDerivationIndexForFactorSource(
 				entitiesControlledByFactorSource: some Collection<some EntityProtocol>
-			) throws -> OrderedSet<HDPathValue> {
+			) throws -> OrderedSet<HdPathComponent> {
 				let indicesOfEntitiesControlledByAccount = entitiesControlledByFactorSource
-					.compactMap { entity -> HDPathValue? in
+					.compactMap { entity -> HdPathComponent? in
 						switch entity.securityState {
 						case let .unsecured(unsecuredControl):
 							let factorInstance = unsecuredControl.transactionSigning
@@ -150,14 +150,13 @@ extension FactorSourcesClient: DependencyKey {
 								/// allow `M` to be able to derive account wit hBIP44-like derivation path at index `0` as well in the future.
 								return nil
 							}
-							return factorInstance.derivationPath.nonHardenedIndex
-						case let .securified(sec): fatalError("Implement")
+							return factorInstance.derivationPath.lastPathComponent
 						}
 					}
 				return try OrderedSet(validating: indicesOfEntitiesControlledByAccount)
 			}
 
-			let indices: OrderedSet<HDPathValue> = if let network {
+			let indices: OrderedSet<HdPathComponent> = if let network {
 				switch request.entityKind {
 				case .account:
 					try nextDerivationIndexForFactorSource(
@@ -255,8 +254,13 @@ extension FactorSourcesClient: DependencyKey {
 					)
 				).indices
 
-				guard let max = indices.max() else { return 0 }
-				let nextIndex = max + 1
+				guard let max = indices.max() else {
+					return try! HdPathComponent(
+						localKeySpace: 0,
+						keySpace: .unsecurified(isHardened: true)
+					)
+				}
+				let nextIndex = HdPathComponent(globalKeySpace: max.indexInGlobalKeySpace() + 1)
 				return nextIndex
 			},
 			addPrivateHDFactorSource: addPrivateHDFactorSource,

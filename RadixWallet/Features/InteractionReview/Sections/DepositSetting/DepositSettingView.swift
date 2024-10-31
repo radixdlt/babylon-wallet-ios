@@ -63,11 +63,11 @@ extension AccountDefaultDepositRule {
 	var string: String {
 		switch self {
 		case .acceptAll:
-			L10n.TransactionReview.AccountDepositSettings.acceptAllRule
+			L10n.InteractionReview.DepositSettings.acceptAllRule
 		case .denyAll:
-			L10n.TransactionReview.AccountDepositSettings.denyAllRule
+			L10n.InteractionReview.DepositSettings.denyAllRule
 		case .acceptKnown:
-			L10n.TransactionReview.AccountDepositSettings.acceptKnownRule
+			L10n.InteractionReview.DepositSettings.acceptKnownRule
 		}
 	}
 

@@ -1,7 +1,38 @@
 import SwiftUI
 
+extension PreAuthorizationReview.State {
+	var viewState: PreAuthorizationReview.ViewState {
+		.init(
+			dAppMetadata: dAppMetadata,
+			displayMode: displayMode,
+			sliderResetDate: sliderResetDate,
+			expiration: expiration,
+			secondsToExpiration: secondsToExpiration,
+			globalControlState: globalControlState,
+			sliderControlState: sliderControlState,
+			showRawManifestButton: showRawManifestButton
+		)
+	}
+}
+
 // MARK: - PreAuthorizationReview.View
 extension PreAuthorizationReview {
+	struct ViewState: Equatable {
+		let dAppMetadata: DappMetadata.Ledger?
+		let displayMode: Common.DisplayMode
+		let sliderResetDate: Date
+		let expiration: Expiration?
+		let secondsToExpiration: Int?
+		let globalControlState: ControlState
+		let sliderControlState: ControlState
+		let showRawManifestButton: Bool
+
+		var dAppName: String? {
+			dAppMetadata?.name?.rawValue
+		}
+	}
+
+	@MainActor
 	struct View: SwiftUI.View {
 		let store: StoreOf<PreAuthorizationReview>
 
@@ -12,61 +43,68 @@ extension PreAuthorizationReview {
 		private let showTitleHysteresis: CGFloat = .small3
 
 		var body: some SwiftUI.View {
-			WithPerceptionTracking {
-				content
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				content(viewStore)
+					.controlState(viewStore.globalControlState)
 					.background(.app.white)
 					.toolbar {
 						ToolbarItem(placement: .principal) {
 							if showNavigationTitle {
-								navigationTitle
+								navigationTitle(dAppName: viewStore.dAppName)
 							}
 						}
 					}
 					.onAppear {
 						store.send(.view(.appeared))
 					}
+					.destinations(with: store)
 			}
 		}
 
-		private var navigationTitle: some SwiftUI.View {
+		private func navigationTitle(dAppName: String?) -> some SwiftUI.View {
 			VStack(spacing: .zero) {
-				Text("Review your Pre-Authorization")
+				Text(L10n.PreAuthorizationReview.title)
 					.textStyle(.body2Header)
 					.foregroundColor(.app.gray1)
 
-				if let name = store.dappName {
-					Text("Proposed by \(name)")
+				if let dAppName {
+					Text(L10n.PreAuthorizationReview.subtitle(dAppName))
 						.textStyle(.body2Regular)
 						.foregroundColor(.app.gray2)
 				}
 			}
 		}
 
-		private var content: some SwiftUI.View {
+		private func content(_ viewStore: ViewStoreOf<PreAuthorizationReview>) -> some SwiftUI.View {
 			ScrollView(showsIndicators: false) {
 				VStack(spacing: .zero) {
-					header
+					header(dAppMetadata: viewStore.dAppMetadata)
 
 					Group {
-						if let rawContent = store.displayMode.rawTransaction {
-							rawTransaction(rawContent)
+						if let manifest = viewStore.displayMode.rawManifest {
+							rawManifest(manifest)
 						} else {
-							details
+							details(viewStore.showRawManifestButton)
 						}
 					}
 					.background(Common.gradientBackground)
 					.clipShape(RoundedRectangle(cornerRadius: .small1))
 					.padding(.horizontal, .small2)
 
-					feesInformation
+					feesInformation(dAppName: viewStore.dAppName)
 						.padding(.top, .small2)
 						.padding(.horizontal, .small2)
 
-					expiration
+					expiration(viewStore.expiration, secondsToExpiration: viewStore.secondsToExpiration)
 
-					slider
+					ApprovalSlider(
+						title: L10n.PreAuthorizationReview.slideToSign,
+						resetDate: viewStore.sliderResetDate
+					) {}
+						.controlState(viewStore.sliderControlState)
+						.padding(.horizontal, .medium2)
 				}
-				.animation(.easeInOut, value: store.displayMode.rawTransaction)
+				.animation(.easeInOut, value: viewStore.displayMode.rawManifest)
 			}
 			.coordinateSpace(name: coordSpace)
 			.onPreferenceChange(PositionsPreferenceKey.self) { positions in
@@ -82,41 +120,40 @@ extension PreAuthorizationReview {
 			}
 		}
 
-		private var header: some SwiftUI.View {
+		private func header(dAppMetadata: DappMetadata.Ledger?) -> some SwiftUI.View {
 			Common.HeaderView(
 				kind: .preAuthorization,
-				name: store.dappName,
-				thumbnail: store.dappThumbnail
+				name: dAppMetadata?.name?.rawValue,
+				thumbnail: dAppMetadata?.thumbnail
 			)
 			.measurePosition(navTitleID, coordSpace: coordSpace)
 			.padding(.horizontal, .medium3)
 			.padding(.bottom, .medium3)
 		}
 
-		private func rawTransaction(_ content: String) -> some SwiftUI.View {
-			Common.RawTransactionView(transaction: content) {
-				store.send(.view(.copyRawTransactionButtonTapped))
+		private func rawManifest(_ manifest: String) -> some SwiftUI.View {
+			Common.RawManifestView(manifest: manifest) {
+				store.send(.view(.copyRawManifestButtonTapped))
 			} toggleAction: {
 				store.send(.view(.toggleDisplayModeButtonTapped))
 			}
 		}
 
-		private var details: some SwiftUI.View {
-			VStack(alignment: .leading, spacing: .medium1) {
-				sections
-
-				proofs
-			}
-			.padding(.top, .large2 + .small3)
-			.padding(.horizontal, .small1)
-			.padding(.bottom, .medium1)
-			.overlay(alignment: .topTrailing) {
-				Button(asset: AssetResource.code) {
-					store.send(.view(.toggleDisplayModeButtonTapped))
+		private func details(_ showRawManifestButton: Bool) -> some SwiftUI.View {
+			sections
+				.padding(.top, .large2 + .small3)
+				.padding(.horizontal, .small1)
+				.padding(.bottom, .medium1)
+				.overlay(alignment: .topTrailing) {
+					if showRawManifestButton {
+						Button(asset: AssetResource.code) {
+							store.send(.view(.toggleDisplayModeButtonTapped))
+						}
+						.buttonStyle(.secondaryRectangular)
+						.padding(.medium3)
+					}
 				}
-				.buttonStyle(.secondaryRectangular)
-				.padding(.medium3)
-			}
+				.frame(minHeight: .standardButtonHeight + 2 * .medium3, alignment: .top)
 		}
 
 		private var sections: some SwiftUI.View {
@@ -124,28 +161,21 @@ extension PreAuthorizationReview {
 			return Common.Sections.View(store: childStore)
 		}
 
-		@ViewBuilder
-		private var proofs: some SwiftUI.View {
-			if let childStore = store.scope(state: \.proofs, action: \.child.proofs) {
-				Common.Proofs.View(store: childStore)
-					.padding(.horizontal, .small3)
-			}
-		}
-
-		private var feesInformation: some SwiftUI.View {
+		private func feesInformation(dAppName: String?) -> some SwiftUI.View {
 			HStack(spacing: .zero) {
 				VStack(alignment: .leading, spacing: .zero) {
-					Text("Pre-authorization will be returned to \(store.dappName ?? "dApp") for processing.")
+					Text(L10n.PreAuthorizationReview.Fees.title(dAppName ?? "dApp"))
 						.foregroundStyle(.app.gray1)
 
-					Text("Network fees will be paid by the dApp")
+					Text(L10n.PreAuthorizationReview.Fees.subtitle)
 						.foregroundStyle(.app.gray2)
 				}
+				.lineSpacing(0)
 				.textStyle(.body2Regular)
 
 				Spacer(minLength: .small2)
 
-				InfoButton(.dapps) // TODO: Update to correct one
+				InfoButton(.preauthorizations)
 			}
 			.padding(.vertical, .medium3)
 			.padding(.horizontal, .medium2)
@@ -153,38 +183,32 @@ extension PreAuthorizationReview {
 			.clipShape(RoundedRectangle(cornerRadius: .small1))
 		}
 
-		private var expiration: some SwiftUI.View {
+		@ViewBuilder
+		private func expiration(_ expiration: Expiration?, secondsToExpiration: Int?) -> some SwiftUI.View {
 			Group {
-				switch store.expiration {
-				case .none:
-					Color.clear
-				case let .window(seconds):
-					let value = formatTime(seconds: seconds)
-					Text("Valid for **\(value) after approval**")
+				switch expiration {
 				case .atTime:
-					if let seconds = store.secondsToExpiration {
+					if let seconds = secondsToExpiration {
 						if seconds > 0 {
 							let value = formatTime(seconds: seconds)
-							Text("Valid for the next **\(value)**")
+							Text(markdown: L10n.PreAuthorizationReview.Expiration.atTime(value), emphasizedColor: .app.account4pink, emphasizedFont: .app.body2Link)
 						} else {
-							Text("This subintent is no longer valid!")
+							Text(L10n.PreAuthorizationReview.Expiration.expired)
 						}
 					}
+
+				case let .afterDelay(value):
+					let value = formatTime(seconds: Int(value.expireAfterSeconds))
+					Text(markdown: L10n.PreAuthorizationReview.Expiration.afterDelay(value), emphasizedColor: .app.account4pink, emphasizedFont: .app.body2Link)
+
+				case nil:
+					Color.clear
 				}
 			}
 			.textStyle(.body2Regular)
 			.foregroundStyle(.app.account4pink)
 			.padding(.horizontal, .medium1)
 			.frame(minHeight: .huge2)
-		}
-
-		private var slider: some SwiftUI.View {
-			ApprovalSlider(
-				title: "Slide to sign and return",
-				resetDate: store.sliderResetDate
-			) {}
-				.controlState(store.sliderControlState)
-				.padding(.horizontal, .medium2)
 		}
 	}
 }
@@ -197,36 +221,48 @@ private extension PreAuthorizationReview.View {
 	/// - `56:02 minutes` / `1:23 minute`
 	/// - `34 seconds` / `1 second`
 	func formatTime(seconds: Int) -> String {
+		typealias S = L10n.PreAuthorizationReview.TimeFormat
 		let minutes = seconds / 60
 		let hours = minutes / 60
 		let days = hours / 24
 		if days > 0 {
-			return days == 1 ? "1 day" : "\(days) days"
+			return days == 1 ? S.day : S.days(days)
 		} else if hours > 0 {
 			let remainingMinutes = minutes % 60
 			let formatted = String(format: "%d:%02d", hours, remainingMinutes)
-			return hours == 1 ? "\(formatted) hour" : "\(formatted) hours"
+			return hours == 1 ? S.hour(formatted) : S.hours(formatted)
 		} else if minutes > 0 {
 			let remainingSeconds = seconds % 60
 			let formatted = String(format: "%d:%02d", minutes, remainingSeconds)
-			return minutes == 1 ? "\(formatted) minute" : "\(formatted) minutes"
+			return minutes == 1 ? S.minute(formatted) : S.minutes(formatted)
 		} else {
-			return seconds == 1 ? "1 second" : "\(seconds) seconds"
+			return seconds == 1 ? S.second : S.seconds(seconds)
 		}
 	}
 }
 
 private extension PreAuthorizationReview.State {
-	var showTransferLine: Bool {
-		true
-	}
-
-	var controlState: ControlState {
-		// If is loading transaction show loading
-		.enabled
+	var globalControlState: ControlState {
+		preview != nil ? .enabled : .loading(.global(text: L10n.PreAuthorizationReview.loading))
 	}
 
 	var sliderControlState: ControlState {
-		isExpired ? .disabled : controlState
+		isExpired ? .disabled : globalControlState
+	}
+
+	var showRawManifestButton: Bool {
+		globalControlState == .enabled
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<PreAuthorizationReview>) -> some View {
+		let destinationStore = store.scope(state: \.$destination, action: \.destination)
+		return rawManifestAlert(with: destinationStore)
+	}
+
+	private func rawManifestAlert(with destinationStore: PresentationStoreOf<PreAuthorizationReview.Destination>) -> some View {
+		alert(store: destinationStore.scope(state: \.rawManifestAlert, action: \.rawManifestAlert))
 	}
 }

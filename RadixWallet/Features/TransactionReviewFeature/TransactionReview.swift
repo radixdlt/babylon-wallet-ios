@@ -21,7 +21,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 
 		var reviewedTransaction: ReviewedTransaction? = nil
 
-		var sections: Common.Sections.State = .init()
+		var sections: Common.Sections.State = .init(kind: .transaction)
 
 		var proofs: Common.Proofs.State? = nil
 		var networkFee: TransactionReviewNetworkFee.State? = nil
@@ -114,18 +114,22 @@ struct TransactionReview: Sendable, FeatureReducer {
 	}
 
 	struct Destination: DestinationReducer {
+		@CasePathable
 		enum State: Sendable, Hashable {
 			case customizeGuarantees(TransactionReviewGuarantees.State)
 			case signing(Signing.State)
 			case submitting(SubmitTransaction.State)
 			case customizeFees(CustomizeFees.State)
+			case rawTransactionAlert(AlertState<Never>)
 		}
 
+		@CasePathable
 		enum Action: Sendable, Equatable {
 			case customizeGuarantees(TransactionReviewGuarantees.Action)
 			case signing(Signing.Action)
 			case submitting(SubmitTransaction.Action)
 			case customizeFees(CustomizeFees.Action)
+			case rawTransactionAlert(Never)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -258,6 +262,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 		case let .sections(.delegate(delegateAction)):
 			switch delegateAction {
 			case .failedToResolveSections:
+				state.destination = .rawTransactionAlert(.rawTransaction)
 				return showRawTransaction(&state)
 
 			case let .showCustomizeGuarantees(guarantees):
@@ -797,6 +802,18 @@ extension ReviewedTransaction {
 			return .valid(.introducesNewAccount)
 		} else {
 			return .valid(nil)
+		}
+	}
+}
+
+private extension AlertState<Never> {
+	static var rawTransaction: AlertState {
+		AlertState {
+			TextState(L10n.TransactionReview.NonConformingManifestWarning.title)
+		} actions: {
+			.default(TextState(L10n.Common.continue))
+		} message: {
+			TextState(L10n.TransactionReview.NonConformingManifestWarning.message)
 		}
 	}
 }

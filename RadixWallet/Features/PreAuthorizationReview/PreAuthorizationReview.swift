@@ -1,78 +1,109 @@
 // MARK: - PreAuthorizationReview
-@Reducer
 struct PreAuthorizationReview: Sendable, FeatureReducer {
 	typealias Common = InteractionReview
+	typealias Expiration = DappToWalletInteractionSubintentExpiration
 
-	@ObservableState
 	struct State: Sendable, Hashable {
-		var dappName: String? = "CaviarNine"
-		var dappThumbnail: URL? = .init(string: "https://assets.caviarnine.com/icons/caviarnine_logo_light_400.png")
+		let unvalidatedManifest: UnvalidatedSubintentManifest
+		let expiration: Expiration?
+		let nonce: Nonce
+		let dAppMetadata: DappMetadata.Ledger?
+
+		var preview: PreAuthorizationPreview?
+
 		var displayMode: Common.DisplayMode = .detailed
 		var sliderResetDate: Date = .now // TODO: reset when it corresponds
-
-		var expiration: Expiration?
 		var secondsToExpiration: Int?
 
 		// Sections
-		var sections: Common.Sections.State = .init()
-		var proofs: Common.Proofs.State? = nil
+		var sections: Common.Sections.State = .init(kind: .preAuthorization)
 
-		init() {}
+		@PresentationState
+		var destination: Destination.State? = nil
 	}
-
-	typealias Action = FeatureAction<Self>
 
 	enum ViewAction: Sendable, Equatable {
 		case appeared
 		case toggleDisplayModeButtonTapped
-		case copyRawTransactionButtonTapped
+		case copyRawManifestButtonTapped
 	}
 
 	@CasePathable
 	enum ChildAction: Sendable, Equatable {
 		case sections(Common.Sections.Action)
-		case proofs(Common.Proofs.Action)
 	}
 
 	enum InternalAction: Sendable, Equatable {
+		case previewLoaded(TaskResult<PreAuthorizationPreview>)
 		case updateSecondsToExpiration(Date)
+	}
+
+	enum DelegateAction: Sendable, Equatable {
+		case failed(PreAuthorizationFailure)
+	}
+
+	struct Destination: DestinationReducer {
+		@CasePathable
+		enum State: Sendable, Hashable {
+			case signing(Signing.State)
+			case rawManifestAlert(AlertState<Never>)
+		}
+
+		@CasePathable
+		enum Action: Sendable, Equatable {
+			case signing(Signing.Action)
+			case rawManifestAlert(Never)
+		}
+
+		var body: some ReducerOf<Self> {
+			Scope(state: \.signing, action: \.signing) {
+				Signing()
+			}
+		}
 	}
 
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.pasteboardClient) var pasteboardClient
+	@Dependency(\.preAuthorizationClient) var preAuthorizationClient
+	@Dependency(\.errorQueue) var errorQueue
 
 	var body: some ReducerOf<Self> {
 		Scope(state: \.sections, action: \.child.sections) {
 			Common.Sections()
 		}
 		Reduce(core)
-			.ifLet(\.proofs, action: \.child.proofs) {
-				Common.Proofs()
+			.ifLet(destinationPath, action: \.destination) {
+				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			// TODO: Replace mocked data with real logic
-			let time = Date().addingTimeInterval(90)
-			state.expiration = .atTime(time)
-			state.secondsToExpiration = Int(time.timeIntervalSinceNow)
-			return startTimer(expirationDate: time)
-				.merge(with: getSections())
+			return .run { [state = state] send in
+				let preview = await TaskResult {
+					try await preAuthorizationClient.getPreview(.init(
+						unvalidatedManifest: state.unvalidatedManifest,
+						nonce: state.nonce
+					))
+				}
+				await send(.internal(.previewLoaded(preview)))
+			}
 
 		case .toggleDisplayModeButtonTapped:
 			switch state.displayMode {
 			case .detailed:
-				state.displayMode = .raw(state.exampleRaw)
+				return showRawManifest(&state)
 			case .raw:
 				state.displayMode = .detailed
+				return .none
 			}
-			return .none
 
-		case .copyRawTransactionButtonTapped:
-			guard let manifest = state.displayMode.rawTransaction else {
-				assertionFailure("Copy raw manifest button should only be visible in raw transaction mode")
+		case .copyRawManifestButtonTapped:
+			guard let manifest = state.displayMode.rawManifest else {
+				assertionFailure("Copy raw manifest button should only be visible in raw mode")
 				return .none
 			}
 			pasteboardClient.copyString(manifest)
@@ -82,6 +113,41 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
+		case let .previewLoaded(.failure(error)):
+			loggerGlobal.error("PreAuthroization preview failed, error: \(error)")
+			errorQueue.schedule(error)
+			guard let failure = error as? PreAuthorizationFailure else {
+				assertionFailure("Failed with unexpected error \(error)")
+				return .none
+			}
+			return .send(.delegate(.failed(failure)))
+
+		case let .previewLoaded(.success(preview)):
+			state.preview = preview
+
+			var effects: [Effect<Action>] = []
+
+			// Trigger effect to load sections
+			let sectionsEffect: Effect<Action> = switch preview.kind {
+			case let .open(value):
+				.send(.child(.sections(.internal(.parent(.resolveManifestSummary(value.summary, preview.networkID))))))
+			case let .enclosed(value):
+				.send(.child(.sections(.internal(.parent(.resolveExecutionSummary(value.summary, preview.networkID))))))
+			}
+			effects.append(sectionsEffect)
+
+			switch state.expiration {
+			case let .atTime(value):
+				// Trigger expiration countdown effect
+				let expirationDate = value.unixTimestampSeconds
+				state.secondsToExpiration = Int(expirationDate.timeIntervalSinceNow)
+				effects.append(startTimer(expirationDate: expirationDate))
+			case .afterDelay, .none:
+				break
+			}
+
+			return .merge(effects)
+
 		case let .updateSecondsToExpiration(expiration):
 			state.secondsToExpiration = Int(expiration.timeIntervalSinceNow)
 			return .none
@@ -90,14 +156,9 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .sections(.internal(.setSections(sections))):
-			state.proofs = sections?.proofs
-			return .none
-
-		case let .proofs(.delegate(.showAsset(proof))):
-			let resource = proof.resourceBalance.resource
-			let details = proof.resourceBalance.details
-			return .send(.child(.sections(.internal(.parent(.showResourceDetails(resource, details))))))
+		case .sections(.delegate(.failedToResolveSections)):
+			state.destination = .rawManifestAlert(.rawManifest)
+			return showRawManifest(&state)
 
 		default:
 			return .none
@@ -106,10 +167,6 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 }
 
 private extension PreAuthorizationReview {
-	func getSections() -> Effect<Action> {
-		.send(.child(.sections(.internal(.parent(.simulate)))))
-	}
-
 	func startTimer(expirationDate: Date) -> Effect<Action> {
 		.run { send in
 			for await _ in self.clock.timer(interval: .seconds(1)) {
@@ -118,64 +175,45 @@ private extension PreAuthorizationReview {
 		}
 		.cancellable(id: CancellableId.expirationTimer, cancelInFlight: true)
 	}
+
+	func showRawManifest(_ state: inout State) -> Effect<Action> {
+		guard let preview = state.preview else {
+			struct MissingPreAuthorizationPreview: Error {}
+			errorQueue.schedule(MissingPreAuthorizationPreview())
+			return .none
+		}
+
+		state.displayMode = .raw(preview.manifest.manifestString)
+		return .none
+	}
 }
 
-private extension PreAuthorizationReview {
-	enum CancellableId: Hashable {
+// MARK: PreAuthorizationReview.CancellableId
+extension PreAuthorizationReview {
+	private enum CancellableId: Hashable {
 		case expirationTimer
-	}
-
-	struct ReviewedPreAuthorization: Sendable, Hashable {
-		let manifest: TransactionManifest
-
-		// TODO: Fill required info once we have Sargon ready
 	}
 }
 
 extension PreAuthorizationReview.State {
 	var isExpired: Bool {
 		switch expiration {
-		case let .atTime(date):
-			date <= Date.now
-		case .window, .none:
+		case let .atTime(value):
+			value.unixTimestampSeconds <= Date.now
+		case .afterDelay, .none:
 			false
 		}
 	}
 }
 
-extension PreAuthorizationReview.State {
-	var exampleRaw: String {
-		"""
-		CALL_METHOD
-		Address("account_tdx_2_12ytkalad6hfxamsz4a7r8tevz7ahurfj58dlp4phl4nca5hs0hpu90")
-		"lock_fee"
-		Decimal("0.3696274912355")
-		;
-		CALL_METHOD
-		Address("account_tdx_2_12ytkalad6hfxamsz4a7r8tevz7ahurfj58dlp4phl4nca5hs0hpu90")
-		"withdraw"
-		Address("resource_tdx_2_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxtfd2jc")
-		Decimal("2")
-		;
-		TAKE_FROM_WORKTOP
-		Address("resource_tdx_2_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxtfd2jc")
-		Decimal("2")
-		Bucket("bucket1")
-		;
-		CALL_METHOD
-		Address("account_tdx_2_12x2hd6m7z9n389u47sn7qhv3cmeqseyathrpqa2mwlx8wczrpd36ar")
-		"try_deposit_or_abort"
-		Bucket("bucket1")
-		Enum<0u8>()
-		;
-
-		"""
+private extension AlertState<Never> {
+	static var rawManifest: AlertState {
+		AlertState {
+			TextState(L10n.PreAuthorizationReview.RawManifestAlert.title)
+		} actions: {
+			.default(TextState(L10n.Common.continue))
+		} message: {
+			TextState(L10n.PreAuthorizationReview.RawManifestAlert.message)
+		}
 	}
-}
-
-// MARK: - Expiration
-enum Expiration: Sendable, Hashable {
-	// TODO: Replace with Sargon model
-	case atTime(Date)
-	case window(Int)
 }
