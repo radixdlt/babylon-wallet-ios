@@ -16,7 +16,6 @@ extension ROLAClient {
 			let transactionSigningKeyHash: PublicKeyHash = switch entity.securityState {
 			case let .unsecured(control):
 				.init(hashing: control.transactionSigning.publicKey.publicKey)
-			case let .securified(sec): fatalError("Implement")
 			}
 
 			loggerGlobal.debug("ownerKeyHashes: \(ownerKeyHashes)")

@@ -32,7 +32,6 @@ extension Account {
 		switch self.securityState {
 		case let .unsecured(control):
 			control.transactionSigning.factorSourceID.kind == .ledgerHqHardwareWallet
-		case let .securified(sec): fatalError("Implement")
 		}
 	}
 }

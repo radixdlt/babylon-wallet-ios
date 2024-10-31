@@ -82,7 +82,7 @@ struct TransactionReviewResourceView: View {
 				}
 			}
 		case .unknown:
-			fatalError("Implement")
+			Text("Unknown")
 		}
 	}
 

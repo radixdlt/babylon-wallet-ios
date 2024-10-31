@@ -38,10 +38,9 @@ extension ResourceAmount {
 	var isGreaterThanZero: Bool {
 		switch self {
 		case let .exact(amount),
-		     let .atLeast(amount):
+		     let .atLeast(amount),
+		     let .between(amount, _):
 			amount.nominalAmount > 0
-		case let .between(minAmount, maxAmount):
-			minAmount.nominalAmount > 0
 		case .atMost, .unknown:
 			false
 		}

@@ -611,7 +611,6 @@ extension EntityView {
 					unsecuredControl: unsecuredControl,
 					indentation: inOneLevel
 				)
-			case let .securified(sec): fatalError("Implement")
 			}
 
 			Group {

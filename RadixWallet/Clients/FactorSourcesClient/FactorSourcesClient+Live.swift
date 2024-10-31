@@ -399,7 +399,6 @@ func signingFactors(
 				// trivial case,
 				signingFactors[factorSource.kind] = [sigingFactor].asIdentified()
 			}
-		case let .securified(sec): fatalError("Implement")
 		}
 	}
 

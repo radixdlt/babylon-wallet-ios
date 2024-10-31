@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -1259,7 +1259,6 @@
 		E713204C2BCD372600AE6B3C /* UnknownCaseDecodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = E713204B2BCD372600AE6B3C /* UnknownCaseDecodable.swift */; };
 		E75C5F342C1C1632002E3DFF /* Stage1MigrateToSargon+SignedAuthChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E75C5F332C1C1632002E3DFF /* Stage1MigrateToSargon+SignedAuthChallenge.swift */; };
 		E76645A42C23138300065D9A /* Throwable.swift in Sources */ = {isa = PBXBuildFile; fileRef = E76645A32C23138300065D9A /* Throwable.swift */; };
-		E79DD1AA2CC8F84F00B1EB86 /* Sections+ManifestSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1A92CC8F84F00B1EB86 /* Sections+ManifestSummary.swift */; };
 		E7A5AC962C09F447006CB6EC /* ResetWalletClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A5AC952C09F447006CB6EC /* ResetWalletClient+Interface.swift */; };
 		E7A5AC982C09F44C006CB6EC /* ResetWalletClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A5AC972C09F44C006CB6EC /* ResetWalletClient+Live.swift */; };
 		E7A5AC9A2C09F453006CB6EC /* ResetWalletClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A5AC992C09F453006CB6EC /* ResetWalletClient+Test.swift */; };
@@ -2505,7 +2504,6 @@
 		E713204B2BCD372600AE6B3C /* UnknownCaseDecodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnknownCaseDecodable.swift; sourceTree = "<group>"; };
 		E75C5F332C1C1632002E3DFF /* Stage1MigrateToSargon+SignedAuthChallenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+SignedAuthChallenge.swift"; sourceTree = "<group>"; };
 		E76645A32C23138300065D9A /* Throwable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Throwable.swift; sourceTree = "<group>"; };
-		E79DD1A92CC8F84F00B1EB86 /* Sections+ManifestSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sections+ManifestSummary.swift"; sourceTree = "<group>"; };
 		E7A5AC952C09F447006CB6EC /* ResetWalletClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ResetWalletClient+Interface.swift"; sourceTree = "<group>"; };
 		E7A5AC972C09F44C006CB6EC /* ResetWalletClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ResetWalletClient+Live.swift"; sourceTree = "<group>"; };
 		E7A5AC992C09F453006CB6EC /* ResetWalletClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ResetWalletClient+Test.swift"; sourceTree = "<group>"; };
@@ -7405,7 +7403,6 @@
 				E7AE2D0E2C07359500830BAA /* FullScreenOverlayCoordinator+Reducer.swift in Sources */,
 				5B4A1AC42CC0125700679EE6 /* InteractionReview.swift in Sources */,
 				48CFC3ED2ADC10D900E77A5C /* DataChannelMessage+Codable.swift in Sources */,
-				E79DD1AA2CC8F84F00B1EB86 /* Sections+ManifestSummary.swift in Sources */,
 				A408163B2C7E0D08005E65B9 /* TransactionAccountDepositPreValidationAuthorizedDepositorBadge.swift in Sources */,
 				48CFC5DA2ADC10DA00E77A5C /* PresentationDetentIntrinsicHeight.swift in Sources */,
 				48CFC2F52ADC10D900E77A5C /* IntroductionToPersonas.swift in Sources */,
@@ -8935,13 +8932,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCLocalSwiftPackageReference section */
-		E79DD1AB2CC908C500B1EB86 /* XCLocalSwiftPackageReference "../sargon" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../sargon;
-		};
-/* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
 		48FFFA972ADC1EEC00B2B213 /* XCRemoteSwiftPackageReference "AsyncExtensions" */ = {

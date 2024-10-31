@@ -137,7 +137,6 @@ private extension ManualAccountRecoverySeedPhrase.View {
 							case let .unsecured(unsecuredEntityControl):
 								let curve = unsecuredEntityControl.transactionSigning.derivationPath.curve
 								return viewStore.isOlympia && curve == .secp256k1 || !viewStore.isOlympia && curve == .curve25519
-							case let .securified(sec): fatalError("Implement")
 							}
 						},
 						hiddenAccountsCount: item.value.hiddenAccounts.count,

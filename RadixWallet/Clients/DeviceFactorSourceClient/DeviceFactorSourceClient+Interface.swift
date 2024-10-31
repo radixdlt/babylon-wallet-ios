@@ -152,7 +152,6 @@ extension DeviceFactorSourceClient {
 				throw IncorrectSignatureCountExpectedExactlyOne()
 			}
 			return signature
-		case let .securified(sec): fatalError("Implement")
 		}
 	}
 
@@ -214,7 +213,6 @@ extension DeviceFactorSourceClient {
 				)
 
 				signatures.insert(entitySignature)
-			case let .securified(sec): fatalError("Implement")
 			}
 		}
 
