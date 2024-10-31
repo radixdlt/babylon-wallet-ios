@@ -168,7 +168,7 @@ struct ResourceAsset: Sendable, FeatureReducer {
 					validator: details.validator,
 					stakeUnitResource: .init(
 						resource: details.resource,
-						amount: .init(nominalAmount: details.amount)
+						amount: details.amount
 					),
 					xrdRedemptionValue: details.worth
 				))
@@ -214,7 +214,7 @@ struct ResourceAsset: Sendable, FeatureReducer {
 		.run { [resourceAddress = resource.resourceAddress, resourceQuantifier = token.resourceQuantifier] send in
 			do {
 				let resource = try await onLedgerEntitiesClient.getResource(resourceAddress)
-				if let balance = try await onLedgerEntitiesClient.nonFungibleResourceBalances(.left(resource), resourceAddress: resourceAddress, resourceQuantifier: resourceQuantifier).first {
+				if let balance = try await onLedgerEntitiesClient.nonFungibleResourceBalances(.left(resource), resourceAddress: resourceAddress, ids: resourceQuantifier.ids).first {
 					await send(.internal(.loadedBalance(balance, token)))
 				}
 			} catch {
@@ -235,7 +235,7 @@ extension ResourceAsset.State {
 
 extension OnLedgerEntity.OwnedFungibleResource {
 	fileprivate var resourceQuantifier: FungibleResourceIndicator {
-		.guaranteed(decimal: amount.nominalAmount)
+		.guaranteed(decimal: amount.exactAmount?.nominalAmount ?? 0)
 	}
 }
 

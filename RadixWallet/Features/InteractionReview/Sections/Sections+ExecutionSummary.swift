@@ -640,7 +640,7 @@ extension InteractionReview.Sections {
 			return try await onLedgerEntitiesClient.nonFungibleResourceBalances(
 				resourceInfo,
 				resourceAddress: resourceAddress,
-				resourceQuantifier: indicator,
+				ids: indicator.ids,
 				unstakeData: unstakeData,
 				newlyCreatedNonFungibles: newlyCreatedNonFungibles
 			)

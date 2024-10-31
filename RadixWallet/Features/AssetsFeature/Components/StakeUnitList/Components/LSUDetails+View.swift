@@ -5,7 +5,7 @@ extension LSUDetails.State {
 	var containerWithHeader: DetailsContainerWithHeaderViewState {
 		.init(
 			title: .success(stakeUnitResource.resource.metadata.title),
-			amount: stakeUnitResource.amount.nominalAmount.formatted(),
+			amount: stakeUnitResource.amount.exactAmount?.nominalAmount.formatted() ?? "TODO",
 			currencyWorth: nil,
 			symbol: .success(stakeUnitResource.resource.metadata.symbol)
 		)

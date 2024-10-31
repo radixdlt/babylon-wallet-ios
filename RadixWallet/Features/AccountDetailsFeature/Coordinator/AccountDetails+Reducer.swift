@@ -224,13 +224,17 @@ struct AccountDetails: Sendable, FeatureReducer {
 				))
 
 			case let .stakeUnit(resource, details):
+				guard let xrdRedemptionValue = details.xrdRedemptionValue.exactAmount else {
+					fatalError()
+				}
+
 				state.destination = .stakeUnitDetails(.init(
 					validator: details.validator,
 					stakeUnitResource: resource,
-					xrdRedemptionValue: .init(
-						nominalAmount: details.xrdRedemptionValue,
-						fiatWorth: resource.amount.fiatWorth
-					)
+					xrdRedemptionValue: .exact(.init(
+						nominalAmount: xrdRedemptionValue.nominalAmount,
+						fiatWorth: resource.amount.exactAmount?.fiatWorth
+					))
 				))
 
 			case let .stakeClaim(resource, claim):

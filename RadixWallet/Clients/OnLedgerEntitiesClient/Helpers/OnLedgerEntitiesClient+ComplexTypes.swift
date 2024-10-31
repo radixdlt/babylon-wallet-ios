@@ -66,13 +66,10 @@ extension OnLedgerEntitiesClient {
 		let hiddenResources = try await resourcesVisibilityClient.getHidden()
 
 		// Check if the fungible resource is a pool unit resource
-		if
-			case let .exact(amount) = resourceAmount,
-			await isPoolUnitResource(resource)
-		{
+		if await isPoolUnitResource(resource) {
 			return try await poolUnit(
 				resource,
-				amount: amount.nominalAmount,
+				amount: resourceAmount,
 				poolContributions: poolContributions,
 				entities: entities,
 				resourceAssociatedDapps: resourceAssociatedDapps,
@@ -83,13 +80,10 @@ extension OnLedgerEntitiesClient {
 		}
 
 		// Check if the fungible resource is an LSU
-		if
-			case let .exact(amount) = resourceAmount,
-			let validator = await isLiquidStakeUnit(resource)
-		{
+		if let validator = await isLiquidStakeUnit(resource) {
 			return try await liquidStakeUnit(
 				resource,
-				amount: amount.nominalAmount,
+				amount: resourceAmount,
 				validator: validator,
 				validatorStakes: validatorStakes,
 				guarantee: guarantee
@@ -106,7 +100,7 @@ extension OnLedgerEntitiesClient {
 
 	private func poolUnit(
 		_ resource: OnLedgerEntity.Resource,
-		amount: Decimal192,
+		amount: ResourceAmount,
 		poolContributions: [some TrackedPoolInteraction] = [],
 		entities: InteractionReview.Sections.ResourcesInfo = [:],
 		resourceAssociatedDapps: InteractionReview.Sections.ResourceAssociatedDapps? = nil,
@@ -117,6 +111,9 @@ extension OnLedgerEntitiesClient {
 		let resourceAddress = resource.resourceAddress
 
 		if let poolContribution = poolContributions.first(where: { $0.poolUnitsResourceAddress == resourceAddress }) {
+			guard let amount = amount.exactAmount?.nominalAmount else {
+				fatalError()
+			}
 			// If this transfer does not contain all the pool units, scale the resource amounts pro rata
 			let adjustmentFactor = amount != poolContribution.poolUnitsAmount ? (amount / poolContribution.poolUnitsAmount) : 1
 			var xrdResource: OwnedResourcePoolDetails.ResourceWithRedemptionValue?
@@ -128,7 +125,7 @@ extension OnLedgerEntitiesClient {
 
 				let resource = OwnedResourcePoolDetails.ResourceWithRedemptionValue(
 					resource: .init(resourceAddress: address, metadata: entity.metadata),
-					redemptionValue: .init(nominalAmount: resourceAmount * adjustmentFactor)
+					redemptionValue: .exact(.init(nominalAmount: resourceAmount * adjustmentFactor))
 				)
 
 				if address.isXRD(on: networkID) {
@@ -146,7 +143,7 @@ extension OnLedgerEntitiesClient {
 					details: .init(
 						address: poolContribution.poolAddress,
 						dAppName: resourceAssociatedDapps?[resourceAddress]?.name,
-						poolUnitResource: .init(resource: resource, amount: .init(nominalAmount: amount)),
+						poolUnitResource: .init(resource: resource, amount: .exact(.init(nominalAmount: amount))),
 						xrdResource: xrdResource,
 						nonXrdResources: nonXrdResources
 					),
@@ -174,28 +171,31 @@ extension OnLedgerEntitiesClient {
 
 	private func liquidStakeUnit(
 		_ resource: OnLedgerEntity.Resource,
-		amount: Decimal192,
+		amount: ResourceAmount,
 		validator: OnLedgerEntity.Validator,
 		validatorStakes: [TrackedValidatorStake] = [],
 		guarantee: TransactionGuarantee?
 	) async throws -> KnownResourceBalance {
-		let worth: Decimal192
+		let worth: ResourceAmount
 		if validatorStakes.isEmpty {
 			guard let totalSupply = resource.totalSupply, totalSupply.isPositive else {
 				throw MissingPositiveTotalSupply()
 			}
 
-			worth = amount * validator.xrdVaultBalance / totalSupply
+			worth = amount.adjustedNominalAmount { $0 * validator.xrdVaultBalance / totalSupply }
 		} else {
+			guard let exactAmount = amount.exactAmount else {
+				fatalError()
+			}
 			if let stake = validatorStakes.first(where: { $0.validatorAddress == validator.address }) {
 				guard stake.liquidStakeUnitAddress == validator.stakeUnitResourceAddress else {
 					throw StakeUnitAddressMismatch()
 				}
 				// Distribute the worth in proportion to the amounts, if needed
-				if stake.liquidStakeUnitAmount == amount {
-					worth = stake.xrdAmount
+				if stake.liquidStakeUnitAmount == exactAmount.nominalAmount {
+					worth = .exact(.init(nominalAmount: stake.xrdAmount))
 				} else {
-					worth = (amount / stake.liquidStakeUnitAmount) * stake.xrdAmount
+					worth = .exact(.init(nominalAmount: (exactAmount.nominalAmount / stake.liquidStakeUnitAmount) * stake.xrdAmount))
 				}
 			} else {
 				throw MissingTrackedValidatorStake()
@@ -205,7 +205,7 @@ extension OnLedgerEntitiesClient {
 		let details = KnownResourceBalance.LiquidStakeUnit(
 			resource: resource,
 			amount: amount,
-			worth: .init(nominalAmount: worth),
+			worth: worth,
 			validator: validator,
 			guarantee: guarantee
 		)
@@ -218,11 +218,10 @@ extension OnLedgerEntitiesClient {
 	func nonFungibleResourceBalances(
 		_ resourceInfo: InteractionReview.Sections.ResourceInfo,
 		resourceAddress: ResourceAddress,
-		resourceQuantifier: NonFungibleResourceIndicator,
+		ids: [NonFungibleLocalId],
 		unstakeData: [NonFungibleGlobalId: UnstakeData] = [:],
 		newlyCreatedNonFungibles: [NonFungibleGlobalId] = []
 	) async throws -> [KnownResourceBalance] {
-		let ids = resourceQuantifier.ids
 		let result: [KnownResourceBalance]
 
 		switch resourceInfo {

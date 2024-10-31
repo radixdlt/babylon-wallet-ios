@@ -3,10 +3,10 @@ import Sargon
 extension InteractionReview.Sections {
 	func sections(for summary: ManifestSummary, networkID: NetworkID) async throws -> Common.SectionsData? {
 		let allWithdrawAddresses = summary.accountWithdrawals.values.flatMap { $0 }.map(\.resourceAddress)
-		//        let allDepositAddresses = summary.deposits.values.flatMap { $0 }.map(\.resourceAddress)
+		let allDepositAddresses = summary.accountDeposits.values.flatMap { $0 }.flatMap(\.specifiedResources.keys)
 
 		// Pre-populate with all resource addresses from withdraw and deposit.
-		let allAddresses: IdentifiedArrayOf<ResourceAddress> = Array(allWithdrawAddresses.uniqued()).asIdentified()
+		let allAddresses: IdentifiedArrayOf<ResourceAddress> = Array((allWithdrawAddresses + allDepositAddresses).uniqued()).asIdentified()
 
 		func resourcesInfo(_ resourceAddresses: [ResourceAddress]) async throws -> ResourcesInfo {
 			try await onLedgerEntitiesClient.getResources(resourceAddresses)
@@ -24,15 +24,15 @@ extension InteractionReview.Sections {
 		)
 
 		// Extract Deposits section
-		//        let deposits = try await extractDeposits(
-		//            accountDeposits: summary.deposits,
-		//            entities: resourcesInfo,
-		//            networkID: networkID
-		//        )
+		let deposits = try await extractDeposits(
+			accountDeposits: summary.accountDeposits,
+			entities: resourcesInfo,
+			networkID: networkID
+		)
 
 		return Common.SectionsData(
-			withdrawals: withdrawals
-			//            deposits: deposits
+			withdrawals: withdrawals,
+			deposits: deposits
 		)
 	}
 
@@ -123,7 +123,7 @@ extension InteractionReview.Sections {
 				case let .left(resource):
 					return try await [.known(onLedgerEntitiesClient.fungibleResourceBalance(
 						resource,
-						resourceAmount: .exact(ExactResourceAmount(nominalAmount: amount)),
+						resourceAmount: .exact(.init(nominalAmount: amount)),
 						entities: entities,
 						networkID: networkID,
 						defaultDepositGuarantee: defaultDepositGuarantee
@@ -138,7 +138,7 @@ extension InteractionReview.Sections {
 			return try await onLedgerEntitiesClient.nonFungibleResourceBalances(
 				resourceInfo,
 				resourceAddress: resourceAddress,
-				resourceQuantifier: .byIds(ids: ids)
+				ids: ids
 			)
 			.map(\.toResourceBalance)
 		}
@@ -161,19 +161,24 @@ extension InteractionReview.Sections {
 			case let .left(resource):
 				switch resourceBounds {
 				case let .fungible(bounds):
-					break
-				//                    let amount = bounds.
-				//                    transfers.append(
-				//                        try await .known(onLedgerEntitiesClient.fungibleResourceBalance(
-				//                            resource,
-				//                            resourceQuantifier: .guaranteed(decimal: amount),
-				//                            entities: entities,
-				//                            networkID: networkID,
-				//                            defaultDepositGuarantee: defaultDepositGuarantee
-				//                        ))
-				//                    )
+					try await transfers.append(
+						.known(onLedgerEntitiesClient.fungibleResourceBalance(
+							resource,
+							resourceAmount: .init(bounds: bounds),
+							entities: entities,
+							networkID: networkID,
+							defaultDepositGuarantee: defaultDepositGuarantee
+						))
+					)
 				case let .nonFungible(bounds):
-					break
+					try await transfers.append(contentsOf:
+						onLedgerEntitiesClient.nonFungibleResourceBalances(
+							resourceInfo,
+							resourceAddress: resourceAddress,
+							ids: bounds.certainIds
+						)
+						.map(\.toResourceBalance)
+					)
 				}
 			case .right:
 				break
@@ -195,6 +200,17 @@ extension AccountWithdraw {
 			resourceAddress
 		case let .ids(resourceAddress, _):
 			resourceAddress
+		}
+	}
+}
+
+extension SimpleNonFungibleResourceBounds {
+	var certainIds: [NonFungibleLocalId] {
+		switch self {
+		case let .exact(_, certainIds):
+			certainIds
+		case let .notExact(certainIds, _, _, _):
+			certainIds
 		}
 	}
 }

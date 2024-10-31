@@ -87,8 +87,8 @@ struct KnownResourceBalance: Sendable, Hashable {
 
 	struct LiquidStakeUnit: Sendable, Hashable {
 		let resource: OnLedgerEntity.Resource
-		let amount: Decimal192
-		let worth: ExactResourceAmount
+		let amount: ResourceAmount
+		let worth: ResourceAmount
 		let validator: OnLedgerEntity.Validator
 		var guarantee: TransactionGuarantee?
 	}

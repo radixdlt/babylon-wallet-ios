@@ -144,7 +144,7 @@ extension NonFungibleTokenDetails.View {
 				.foregroundColor(.app.gray1)
 
 			ResourceBalanceView(
-				.fungible(.xrd(balance: stakeClaim.claimAmount, network: stakeClaim.validatorAddress.networkID)),
+				.fungible(.xrd(balance: .exact(stakeClaim.claimAmount), network: stakeClaim.validatorAddress.networkID)),
 				appearance: .standard
 			)
 			.padding(.horizontal, .medium3)

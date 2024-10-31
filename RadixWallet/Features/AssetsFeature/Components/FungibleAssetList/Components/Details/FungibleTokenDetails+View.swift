@@ -5,8 +5,8 @@ extension FungibleTokenDetails.State {
 	var detailsHeader: DetailsContainerWithHeaderViewState {
 		.init(
 			title: resource.metadata.get(\.name, prefetched: ownedFungibleResource?.metadata).map { $0 ?? L10n.Account.PoolUnits.unknownPoolUnitName },
-			amount: ownedFungibleResource?.amount.nominalAmount.formatted(),
-			currencyWorth: ownedFungibleResource?.amount.fiatWorth?.currencyFormatted(applyCustomFont: false),
+			amount: ownedFungibleResource?.amount.exactAmount?.nominalAmount.formatted(), // FIXME: handle not exact amounts
+			currencyWorth: ownedFungibleResource?.amount.exactAmount?.fiatWorth?.currencyFormatted(applyCustomFont: false), // FIXME: handle not exact amounts
 			symbol: resource.metadata.get(\.symbol, prefetched: ownedFungibleResource?.metadata)
 		)
 	}

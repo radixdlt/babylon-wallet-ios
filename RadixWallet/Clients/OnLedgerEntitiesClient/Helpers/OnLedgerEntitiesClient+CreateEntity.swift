@@ -339,7 +339,7 @@ extension OnLedgerEntitiesClient {
 			return try .init(
 				resourceAddress: .init(validatingAddress: vaultAggregated.resourceAddress),
 				atLedgerState: ledgerState,
-				amount: .init(nominalAmount: amount),
+				amount: .exact(.init(nominalAmount: amount)),
 				metadata: .init(vaultAggregated.explicitMetadata)
 			)
 		} ?? []
@@ -419,7 +419,7 @@ extension OnLedgerEntitiesClient {
 			}
 
 			let stakeUnitResource: ResourceWithVaultAmount? = {
-				if let stakeUnitResource = stake.stakeUnitResource, stakeUnitResource.amount.nominalAmount > 0 {
+				if let stakeUnitResource = stake.stakeUnitResource, stakeUnitResource.amount.isGreaterThanZero {
 					guard let stakeUnitDetails = resourceDetails.first(where: { $0.resourceAddress == stakeUnitResource.resourceAddress }) else {
 						assertionFailure("Did not load stake unit details")
 						fatalError()
@@ -478,7 +478,11 @@ extension OnLedgerEntity.OnLedgerAccount.PoolUnitResources {
 	var nonEmptyVaults: OnLedgerEntity.OnLedgerAccount.PoolUnitResources {
 		let stakes = radixNetworkStakes.compactMap { stake in
 			let stakeUnitResource: OnLedgerEntity.OwnedFungibleResource? = {
-				guard let stakeUnitResource = stake.stakeUnitResource, stakeUnitResource.amount.nominalAmount > 0 else {
+				guard
+					let stakeUnitResource = stake.stakeUnitResource,
+					let amount = stakeUnitResource.amount.exactAmount,
+					amount.nominalAmount > 0
+				else {
 					return nil
 				}
 				return stakeUnitResource
@@ -502,7 +506,8 @@ extension OnLedgerEntity.OnLedgerAccount.PoolUnitResources {
 		}
 
 		let poolUnits = poolUnits.filter {
-			$0.resource.amount > .zero
+			guard let amount = $0.resource.amount.exactAmount else { return false }
+			return amount > .zero
 		}
 
 		return .init(radixNetworkStakes: stakes.asIdentified(), poolUnits: poolUnits)
@@ -518,8 +523,16 @@ extension [OnLedgerEntity.OwnedNonFungibleResource] {
 extension OnLedgerEntity.OwnedFungibleResources {
 	var nonEmptyVaults: OnLedgerEntity.OwnedFungibleResources {
 		.init(
-			xrdResource: xrdResource.flatMap { $0.amount.nominalAmount > 0 ? $0 : nil },
-			nonXrdResources: nonXrdResources.filter { $0.amount.nominalAmount > 0 }
+			xrdResource: xrdResource.flatMap {
+				guard let amount = $0.amount.exactAmount, amount.nominalAmount > 0 else {
+					return nil
+				}
+				return $0
+			},
+			nonXrdResources: nonXrdResources.filter {
+				guard let amount = $0.amount.exactAmount else { return false }
+				return amount.nominalAmount > 0
+			}
 		)
 	}
 }
@@ -555,13 +568,13 @@ extension OnLedgerEntitiesClient {
 
 		struct ResourceWithRedemptionValue: Hashable, Sendable {
 			let resource: OnLedgerEntity.Resource
-			var redemptionValue: ExactResourceAmount?
+			var redemptionValue: ResourceAmount?
 		}
 	}
 
 	struct ResourceWithVaultAmount: Hashable, Sendable {
 		let resource: OnLedgerEntity.Resource
-		var amount: ExactResourceAmount
+		var amount: ResourceAmount
 	}
 
 	struct StakeClaim: Hashable, Sendable, Identifiable {
@@ -631,12 +644,12 @@ extension OnLedgerEntity.OwnedFungibleResource: Comparable {
 		lhs: OnLedgerEntity.OwnedFungibleResource,
 		rhs: OnLedgerEntity.OwnedFungibleResource
 	) -> Bool {
-		if let lhsFiatWorth = lhs.amount.fiatWorth, let rhsFiathWorth = rhs.amount.fiatWorth {
+		if let lhsFiatWorth = lhs.amount.exactAmount?.fiatWorth, let rhsFiathWorth = rhs.amount.exactAmount?.fiatWorth {
 			return lhsFiatWorth > rhsFiathWorth // Sort descending by fiat worth
 		}
 
-		if lhs.amount.fiatWorth != nil || rhs.amount.fiatWorth != nil {
-			return lhs.amount.fiatWorth != nil
+		if lhs.amount.exactAmount?.fiatWorth != nil || rhs.amount.exactAmount?.fiatWorth != nil {
+			return lhs.amount.exactAmount?.fiatWorth != nil
 		}
 
 		if let lhsSymbol = lhs.metadata.symbol, let rhsSymbol = rhs.metadata.symbol {

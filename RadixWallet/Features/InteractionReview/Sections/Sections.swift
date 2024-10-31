@@ -263,18 +263,13 @@ private extension InteractionReview.Sections {
 	) -> Effect<Action> {
 		switch details {
 		case let .fungible(details):
-			// FIXME: handle details for not exact amounts
-			guard let exactAmount = details.amount.exactAmount else {
-				return .none
-			}
-
 			state.destination = .fungibleTokenDetails(.init(
 				resourceAddress: resource.resourceAddress,
 				resource: .success(resource),
 				ownedFungibleResource: .init(
 					resourceAddress: resource.resourceAddress,
 					atLedgerState: resource.atLedgerState,
-					amount: exactAmount,
+					amount: details.amount,
 					metadata: resource.metadata
 				),
 				isXRD: details.isXRD
@@ -291,7 +286,7 @@ private extension InteractionReview.Sections {
 		case let .liquidStakeUnit(details):
 			state.destination = .lsuDetails(.init(
 				validator: details.validator,
-				stakeUnitResource: .init(resource: details.resource, amount: .init(nominalAmount: details.amount)),
+				stakeUnitResource: .init(resource: details.resource, amount: details.amount),
 				xrdRedemptionValue: details.worth
 			))
 

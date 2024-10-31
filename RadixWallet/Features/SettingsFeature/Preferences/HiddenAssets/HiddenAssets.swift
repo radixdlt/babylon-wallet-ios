@@ -158,7 +158,7 @@ struct HiddenAssets: Sendable, FeatureReducer {
 				try await onLedgerEntitiesClient.getResource($0.poolUnitResourceAddress)
 			}
 			let poolUnitDetails = try await resources.parallelMap { resource in
-				if let details = try await onLedgerEntitiesClient.getPoolUnitDetails(resource, forAmount: .one) {
+				if let details = try await onLedgerEntitiesClient.getPoolUnitDetails(resource, forAmount: .exact(.init(nominalAmount: .one))) {
 					State.PoolUnitDetails(resource: resource, details: details)
 				} else {
 					nil

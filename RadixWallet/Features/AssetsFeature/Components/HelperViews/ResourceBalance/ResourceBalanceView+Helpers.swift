@@ -15,12 +15,12 @@ extension ResourceBalance.ViewState.PoolUnit {
 }
 
 extension ResourceBalance.ViewState.Fungible {
-	static func xrd(balance: ExactResourceAmount, network: NetworkID) -> Self {
+	static func xrd(balance: ResourceAmount, network: NetworkID) -> Self {
 		.init(
 			address: .xrd(on: network),
 			icon: .token(.xrd),
 			title: Constants.xrdTokenName,
-			amount: .init(.exact(balance))
+			amount: .init(balance)
 		)
 	}
 }

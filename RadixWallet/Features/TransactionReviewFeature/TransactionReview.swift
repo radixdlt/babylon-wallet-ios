@@ -627,9 +627,9 @@ extension ResourceBalance {
 		case let .fungible(fungible):
 			fungible.amount.exactAmount?.nominalAmount
 		case let .liquidStakeUnit(liquidStakeUnit):
-			liquidStakeUnit.amount
+			liquidStakeUnit.amount.exactAmount?.nominalAmount
 		case let .poolUnit(poolUnit):
-			poolUnit.details.poolUnitResource.amount.nominalAmount
+			poolUnit.details.poolUnitResource.amount.exactAmount?.nominalAmount
 		case .nonFungible, .stakeClaimNFT, .none:
 			nil
 		}

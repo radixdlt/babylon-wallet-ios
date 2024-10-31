@@ -31,7 +31,7 @@ extension ResourceBalance {
 			let icon: URL?
 			let title: String?
 			let amount: KnownResourceBalance.Amount?
-			let worth: ExactResourceAmount
+			let worth: ResourceAmount
 			var validatorName: String? = nil
 		}
 
@@ -111,7 +111,7 @@ private extension ResourceBalance.ViewState.PoolUnit {
 			poolUnitAddress: resource.resourceAddress,
 			poolIcon: resource.metadata.iconURL,
 			poolName: resource.fungibleResourceName,
-			amount: .init(exactAmount: details.details.poolUnitResource.amount, guaranteed: details.guarantee?.amount),
+			amount: .init(details.details.poolUnitResource.amount, guaranteed: details.guarantee?.amount),
 			dAppName: .success(details.details.dAppName),
 			resources: .success(.init(resources: details.details))
 		)
@@ -428,7 +428,7 @@ extension ResourceBalanceView {
 							} label: {
 								let isSelected = viewState.selectedStakeClaims?.contains(claim.id)
 								ResourceBalanceView(
-									.fungible(.xrd(balance: claim.claimAmount, network: claim.validatorAddress.networkID)),
+									.fungible(.xrd(balance: .exact(claim.claimAmount), network: claim.validatorAddress.networkID)),
 									appearance: .compact,
 									isSelected: isSelected
 								)

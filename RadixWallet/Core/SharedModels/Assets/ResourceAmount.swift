@@ -5,6 +5,24 @@ enum ResourceAmount: Sendable, Hashable, Codable {
 	case atMost(ExactResourceAmount)
 	case between(minimum: ExactResourceAmount, maximum: ExactResourceAmount)
 	case unknown
+
+	init(bounds: SimpleFungibleResourceBounds) {
+		switch bounds {
+		case let .exact(amount):
+			self = .exact(.init(nominalAmount: amount))
+		case let .atLeast(amount):
+			self = .atLeast(.init(nominalAmount: amount))
+		case let .atMost(amount):
+			self = .atMost(.init(nominalAmount: amount))
+		case let .between(minAmount, maxAmount):
+			self = .between(
+				minimum: .init(nominalAmount: minAmount),
+				maximum: .init(nominalAmount: maxAmount)
+			)
+		case .unknownAmount:
+			self = .unknown
+		}
+	}
 }
 
 extension ResourceAmount {
@@ -14,6 +32,18 @@ extension ResourceAmount {
 			amount
 		default:
 			nil
+		}
+	}
+
+	var isGreaterThanZero: Bool {
+		switch self {
+		case let .exact(amount),
+		     let .atLeast(amount):
+			amount.nominalAmount > 0
+		case let .between(minAmount, maxAmount):
+			minAmount.nominalAmount > 0
+		case .atMost, .unknown:
+			false
 		}
 	}
 
@@ -29,6 +59,26 @@ extension ResourceAmount {
 			"Min: \(minAmount.nominalAmount.formatted()); Max: \(maxAmount.nominalAmount.formatted())"
 		case .unknown:
 			"Unknown"
+		}
+	}
+
+	func adjustedNominalAmount(_ adjust: (Decimal192) -> Decimal192) -> Self {
+		switch self {
+		case let .exact(amount):
+			return .exact(.init(nominalAmount: adjust(amount.nominalAmount)))
+		case let .atLeast(amount):
+			return .atLeast(.init(nominalAmount: adjust(amount.nominalAmount)))
+		case let .atMost(amount):
+			return .atMost(.init(nominalAmount: adjust(amount.nominalAmount)))
+		case let .between(minAmount, maxAmount):
+			let min = adjust(minAmount.nominalAmount)
+			let max = adjust(maxAmount.nominalAmount)
+			return .between(
+				minimum: .init(nominalAmount: min),
+				maximum: .init(nominalAmount: max)
+			)
+		case .unknown:
+			return .unknown
 		}
 	}
 }

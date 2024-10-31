@@ -112,7 +112,7 @@ extension ResourceBalance.ViewState.Fungible { // FIXME: GK use full
 			address: resource.resource.resourceAddress,
 			icon: .token(isXRD ? .xrd : .other(resource.resource.metadata.iconURL)),
 			title: isXRD ? Constants.xrdTokenName : resource.resource.metadata.title,
-			amount: resource.redemptionValue.map { .init(exactAmount: $0) }
+			amount: resource.redemptionValue.map { .init($0) }
 		)
 	}
 }
@@ -131,14 +131,9 @@ extension [KnownResourceBalance.Fungible] {
 
 extension KnownResourceBalance.Fungible {
 	init(resourceWithRedemptionValue resource: OnLedgerEntitiesClient.OwnedResourcePoolDetails.ResourceWithRedemptionValue, isXRD: Bool) {
-		let amount: ResourceAmount = if let redemptionValue = resource.redemptionValue {
-			.exact(redemptionValue)
-		} else {
-			.unknown
-		}
 		self.init(
 			isXRD: isXRD,
-			amount: amount,
+			amount: resource.redemptionValue ?? .unknown,
 			guarantee: nil
 		)
 	}

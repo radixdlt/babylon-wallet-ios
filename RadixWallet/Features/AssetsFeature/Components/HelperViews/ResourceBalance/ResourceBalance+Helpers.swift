@@ -51,7 +51,7 @@ extension KnownResourceBalance: Comparable {
 			if lhsValue.validator.address == rhsValue.validator.address {
 				if lhs.resource.resourceAddress == rhs.resource.resourceAddress {
 					// If it's the same resource, sort by the amount
-					order(lhs: lhsValue.amount, rhs: rhsValue.amount)
+					order(lhs: lhsValue.amount.exactAmount?.nominalAmount ?? 0, rhs: rhsValue.amount.exactAmount?.nominalAmount ?? 0)
 				} else {
 					order(lhs: lhs.resource, rhs: rhs.resource)
 				}
@@ -60,7 +60,7 @@ extension KnownResourceBalance: Comparable {
 					// If it's the same validator (name), sort by the resource
 					if lhs.resource.resourceAddress == rhs.resource.resourceAddress {
 						// If it's the same resource, sort by the amount
-						order(lhs: lhsValue.amount, rhs: rhsValue.amount)
+						order(lhs: lhsValue.amount.exactAmount?.nominalAmount ?? 0, rhs: rhsValue.amount.exactAmount?.nominalAmount ?? 0)
 					} else {
 						order(lhs: lhs.resource, rhs: rhs.resource)
 					}
@@ -69,7 +69,7 @@ extension KnownResourceBalance: Comparable {
 		case let (.poolUnit(lhsValue), .poolUnit(rhsValue)):
 			if lhs.resource == rhs.resource {
 				// If it's the same resource, sort by the amount
-				order(lhs: lhsValue.details.poolUnitResource.amount.nominalAmount, rhs: rhsValue.details.poolUnitResource.amount.nominalAmount)
+				order(lhs: lhsValue.details.poolUnitResource.amount.exactAmount?.nominalAmount ?? 0, rhs: rhsValue.details.poolUnitResource.amount.exactAmount?.nominalAmount ?? 0)
 			} else {
 				// Else sort alphabetically by pool name, or failing that, address
 				order(lhs: lhs.resource.fungibleResourceName, rhs: rhs.resource.fungibleResourceName) {

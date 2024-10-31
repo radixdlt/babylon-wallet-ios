@@ -368,19 +368,19 @@ extension OnLedgerEntity {
 
 		let resourceAddress: ResourceAddress
 		let atLedgerState: AtLedgerState
-		var amount: ExactResourceAmount
+		var amount: ResourceAmount
 		let metadata: Metadata
 
 		var debugDescription: String {
 			let symbol: String = metadata.symbol ?? "???"
 
-			return "\(symbol) - \(resourceAddress.formatted()) | # \(amount.nominalAmount.formatted())"
+			return "\(symbol) - \(resourceAddress.formatted()) | # \(amount.debugDescription)"
 		}
 
 		init(
 			resourceAddress: ResourceAddress,
 			atLedgerState: AtLedgerState,
-			amount: ExactResourceAmount,
+			amount: ResourceAmount,
 			metadata: Metadata
 		) {
 			self.resourceAddress = resourceAddress
@@ -555,7 +555,7 @@ extension OnLedgerEntity.OnLedgerAccount {
 		var debugDescription: String {
 			"""
 			\(validatorAddress.formatted())
-			staked: \(stakeUnitResource?.amount.nominalAmount.formatted() ?? "NONE")
+			staked: \(stakeUnitResource?.amount.debugDescription ?? "NONE")
 			claimable?: \(stakeClaimResource != nil)
 			"""
 		}
@@ -588,7 +588,7 @@ extension OnLedgerEntity.OnLedgerAccount {
 			"""
 			\(resourcePoolAddress.formatted())
 			kind: \(descriptionOfPoolKind)
-			amount: \(resource.amount.nominalAmount.formatted())
+			amount: \(resource.amount.debugDescription)
 			"""
 		}
 
@@ -678,9 +678,9 @@ extension OnLedgerEntity.OnLedgerAccount {
 
 extension OnLedgerEntity.Resource {
 	func poolRedemptionValue(
-		for amount: Decimal192,
+		for amount: ResourceAmount,
 		poolUnitResource: OnLedgerEntitiesClient.ResourceWithVaultAmount
-	) -> Decimal192? {
+	) -> ResourceAmount? {
 		guard let poolUnitTotalSupply = poolUnitResource.resource.totalSupply else {
 			loggerGlobal.error("Missing total supply for \(poolUnitResource.resource.resourceAddress.address)")
 			return nil
@@ -689,11 +689,17 @@ extension OnLedgerEntity.Resource {
 			loggerGlobal.error("Total supply is 0 for \(poolUnitResource.resource.resourceAddress.address)")
 			return nil
 		}
-		let redemptionValue = poolUnitResource.amount.nominalAmount * (amount / poolUnitTotalSupply)
+		guard
+			case let .exact(poolUnitResourceAmount) = poolUnitResource.amount,
+			case let .exact(amount) = amount
+		else {
+			return nil
+		}
+		let redemptionValue = poolUnitResourceAmount.nominalAmount * (amount.nominalAmount / poolUnitTotalSupply)
 		let decimalPlaces = divisibility ?? Decimal192.maxDivisibility
 		let roundedRedemptionValue = redemptionValue.rounded(decimalPlaces: decimalPlaces)
 
-		return roundedRedemptionValue
+		return .exact(.init(nominalAmount: roundedRedemptionValue))
 	}
 }
 

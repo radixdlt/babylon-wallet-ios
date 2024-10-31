@@ -16,7 +16,7 @@ extension ResourceBalance.ViewState.Fungible {
 			address: resource.resourceAddress,
 			icon: .token(isXRD ? .xrd : .other(resource.metadata.iconURL)),
 			title: resource.metadata.title,
-			amount: .init(exactAmount: resource.amount)
+			amount: .init(resource.amount)
 		)
 	}
 
