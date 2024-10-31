@@ -689,17 +689,14 @@ extension OnLedgerEntity.Resource {
 			loggerGlobal.error("Total supply is 0 for \(poolUnitResource.resource.resourceAddress.address)")
 			return nil
 		}
-		guard
-			case let .exact(poolUnitResourceAmount) = poolUnitResource.amount,
-			case let .exact(amount) = amount
-		else {
+		guard case let .exact(amount) = amount else {
 			return nil
 		}
-		let redemptionValue = poolUnitResourceAmount.nominalAmount * (amount.nominalAmount / poolUnitTotalSupply)
+		let redemptionValue = poolUnitResource.amount.adjustedNominalAmount { $0 * (amount.nominalAmount / poolUnitTotalSupply) }
 		let decimalPlaces = divisibility ?? Decimal192.maxDivisibility
-		let roundedRedemptionValue = redemptionValue.rounded(decimalPlaces: decimalPlaces)
+		let roundedRedemptionValue = redemptionValue.adjustedNominalAmount { $0.rounded(decimalPlaces: decimalPlaces) }
 
-		return .exact(.init(nominalAmount: roundedRedemptionValue))
+		return roundedRedemptionValue
 	}
 }
 
