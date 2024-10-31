@@ -36,7 +36,7 @@ enum SigningPurposeWithPayload: Sendable, Hashable {
 enum SigningResponse: Sendable, Hashable {
 	case signTransaction(NotarizeTransactionResponse, origin: SigningPurpose.SignTransactionPurpose)
 	case signAuth(SignedAuthChallenge)
-	case signPreAuthorization(String)
+	case signPreAuthorization(SignedSubintent)
 }
 
 // MARK: - Signing
@@ -115,8 +115,10 @@ struct Signing: Sendable, FeatureReducer {
 				}
 
 			case let .signPreAuthorization(subintent):
-				// TODO: Transform `state.signatures` into the String expected for encodedSignedPartialTransaction
-				return .send(.delegate(.finishedSigning(.signPreAuthorization("what should go here?"))))
+				let intentSignatures = state.signatures.map(\.signatureWithPublicKey).map { IntentSignature(signatureWithPublicKey: $0) }
+				let signedSubintent = SignedSubintent(subintent: subintent, subintentSignatures: IntentSignatures(signatures: intentSignatures))
+
+				return .send(.delegate(.finishedSigning(.signPreAuthorization(signedSubintent))))
 			}
 
 		case let .notarizeResult(.failure(error)):

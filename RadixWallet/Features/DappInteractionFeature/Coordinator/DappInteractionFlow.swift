@@ -512,9 +512,10 @@ extension DappInteractionFlow {
 
 		func handlePreAuthorizationSignature(
 			_ item: State.AnyInteractionItem,
-			_ encodedSignedPartialTransaction: String
+			_ signedSubintent: SignedSubintent
 		) -> Effect<Action> {
-			state.responseItems[item] = .remote(.preAuthorization(.init(encodedSignedPartialTransaction: encodedSignedPartialTransaction)))
+			let preAuthResponse = newWalletToDappInteractionPreAuthorizationResponseItems(signedSubintent: signedSubintent)
+			state.responseItems[item] = .remote(.preAuthorization(preAuthResponse))
 			return continueEffect(for: &state)
 		}
 

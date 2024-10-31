@@ -43,7 +43,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case signedPreAuthorization(String)
+		case signedPreAuthorization(SignedSubintent)
 		case failed(PreAuthorizationFailure)
 	}
 
@@ -159,6 +159,10 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 
 		case let .builtSubintent(subintent):
 			guard let preview = state.preview else {
+				return .none
+			}
+
+			guard !preview.signingFactors.isEmpty else {
 				return .none
 			}
 			state.destination = .signing(.init(
