@@ -457,25 +457,31 @@ extension ResourceBalanceView {
 		let isSelected: Bool?
 
 		var body: some View {
-			HStack(spacing: .zero) {
-				CaptionedThumbnailView(
-					type: thumbnail.type,
-					url: thumbnail.url,
-					caption1: caption1,
-					caption2: caption2,
-					compact: compact
-				)
+			VStack(alignment: .leading) {
+				HStack(spacing: .zero) {
+					CaptionedThumbnailView(
+						type: thumbnail.type,
+						url: thumbnail.url,
+						caption1: caption1,
+						caption2: caption2,
+						compact: compact
+					)
 
-				if useSpacer, isSelected == nil {
-					Spacer(minLength: .small2)
+					if useSpacer, isSelected == nil {
+						Spacer(minLength: .small2)
+					}
+
+					AmountView(amount: amount, fallback: fallback, compact: compact)
+						.padding(.leading, isSelected != nil ? .small2 : 0)
+
+					if let isSelected {
+						Spacer(minLength: .small2)
+						CheckmarkView(appearance: .dark, isChecked: isSelected)
+					}
 				}
 
-				AmountView(amount: amount, fallback: fallback, compact: compact)
-					.padding(.leading, isSelected != nil ? .small2 : 0)
-
-				if let isSelected {
-					Spacer(minLength: .small2)
-					CheckmarkView(appearance: .dark, isChecked: isSelected)
+				if case .unknown = amount?.amount {
+					WarningErrorView(text: "Amount of deposit is unknown", type: .warning, useNarrowSpacing: true)
 				}
 			}
 		}
@@ -586,7 +592,7 @@ extension ResourceBalanceView {
 						compact: compact
 					)
 				case let .between(minAmount, maxAmount):
-					VStack {
+					VStack(alignment: .trailing) {
 						SubAmountView(
 							title: "At least",
 							amount: minAmount,
@@ -637,7 +643,7 @@ extension ResourceBalanceView {
 				VStack(alignment: .trailing, spacing: 0) {
 					if let title {
 						Text(title)
-							.textStyle(.body3HighImportance)
+							.textStyle(.body3Regular)
 							.foregroundColor(.app.gray1)
 					}
 					Text(amount.nominalAmount.formatted())
@@ -654,11 +660,11 @@ extension ResourceBalanceView {
 				VStack(alignment: .trailing, spacing: 0) {
 					if guaranteed != nil {
 						Text(L10n.InteractionReview.estimated)
-							.textStyle(.body3HighImportance)
+							.textStyle(.body3Regular)
 							.foregroundColor(.app.gray1)
 					} else if let title {
 						Text(title)
-							.textStyle(.body3HighImportance)
+							.textStyle(.body3Regular)
 							.foregroundColor(.app.gray1)
 					}
 					Text(amount.nominalAmount.formatted())
