@@ -30,9 +30,27 @@ extension InteractionReview.Sections {
 			networkID: networkID
 		)
 
+		let dappAddresses = summary.encounteredEntities.compactMap {
+			switch $0 {
+			case let .component(componentAddress):
+				componentAddress.isGlobal ? componentAddress.asGeneral : nil
+			case let .locker(lockerAddress):
+				lockerAddress.asGeneral
+			}
+		}
+
+		let dAppsUsed = try await extractDapps(
+			addresses: dappAddresses,
+			unknownTitle: L10n.TransactionReview.unknownComponents
+		)
+
+		let proofs = try await exctractProofs(summary.presentedProofs)
+
 		return Common.SectionsData(
 			withdrawals: withdrawals,
-			deposits: deposits
+			dAppsUsed: dAppsUsed,
+			deposits: deposits,
+			proofs: proofs
 		)
 	}
 
@@ -171,6 +189,7 @@ extension InteractionReview.Sections {
 						))
 					)
 				case let .nonFungible(bounds):
+					// TODO: use updated Sargon version
 					if !bounds.certainIds.isEmpty {
 						try await transfers.append(
 							contentsOf:

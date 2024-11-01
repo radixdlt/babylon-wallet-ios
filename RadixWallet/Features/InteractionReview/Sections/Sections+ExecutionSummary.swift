@@ -298,7 +298,7 @@ extension InteractionReview.Sections {
 			}
 	}
 
-	private func extractDapps(
+	func extractDapps(
 		addresses: [Address],
 		unknownTitle: (Int) -> String
 	) async throws -> InteractionReviewDapps<ComponentAddress>.State? {
@@ -331,7 +331,7 @@ extension InteractionReview.Sections {
 		return .init(id: dAppDefinitionAddress, metadata: metadata)
 	}
 
-	private func exctractProofs(_ accountProofs: [ResourceSpecifier]) async throws -> Common.Proofs.State? {
+	func exctractProofs(_ accountProofs: [ResourceSpecifier]) async throws -> Common.Proofs.State? {
 		let proofs = try await accountProofs
 			.uniqued()
 			.asyncMap(extractResourceBalanceInfo)
