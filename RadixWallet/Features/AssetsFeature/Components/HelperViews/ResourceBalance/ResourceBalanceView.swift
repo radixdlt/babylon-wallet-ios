@@ -174,7 +174,7 @@ struct ResourceBalanceView: View {
 			case let .stakeClaimNFT(viewState):
 				StakeClaimNFT(viewState: viewState, appearance: .standalone, compact: compact, onTap: { _ in })
 			case .unknown:
-				fatalError("Implement")
+				Unknown()
 			}
 
 			if !delegateSelection, let isSelected {
@@ -445,6 +445,26 @@ extension ResourceBalanceView {
 		}
 	}
 
+	struct Unknown: View {
+		var body: some View {
+			HStack(spacing: .small1) {
+				Image(.unknownDeposits)
+
+				Text("----")
+					.textStyle(.body2HighImportance)
+					.foregroundStyle(.app.gray4)
+
+				WarningErrorView(
+					text: "Unknown deposits to this account may occur",
+					type: .warning,
+					useNarrowSpacing: true,
+					useSmallerFontSize: true
+				)
+			}
+			.frame(maxWidth: .infinity)
+		}
+	}
+
 	// Helper Views
 
 	private struct FungibleView: View {
@@ -481,7 +501,7 @@ extension ResourceBalanceView {
 				}
 
 				if case .unknown = amount?.amount {
-					WarningErrorView(text: "Amount of deposit is unknown", type: .warning, useNarrowSpacing: true)
+					WarningErrorView(text: "Amount of deposit is unknown", type: .warning, useNarrowSpacing: true, useSmallerFontSize: true)
 				}
 			}
 		}
@@ -592,7 +612,7 @@ extension ResourceBalanceView {
 						compact: compact
 					)
 				case let .between(minAmount, maxAmount):
-					VStack(alignment: .trailing) {
+					VStack(alignment: .trailing, spacing: .small3) {
 						SubAmountView(
 							title: "At least",
 							amount: minAmount,

@@ -3,15 +3,18 @@ struct WarningErrorView: View {
 	let text: String
 	let type: ViewType
 	let spacing: CGFloat
+	let textStyle: TextStyle
 
 	init(
 		text: String,
 		type: ViewType,
-		useNarrowSpacing: Bool = false
+		useNarrowSpacing: Bool = false,
+		useSmallerFontSize: Bool = false
 	) {
 		self.text = text
 		self.type = type
 		self.spacing = useNarrowSpacing ? .small2 : .medium3
+		self.textStyle = useSmallerFontSize ? .body2HighImportance : .body1Header
 	}
 
 	enum ViewType {
@@ -24,7 +27,7 @@ struct WarningErrorView: View {
 			Image(.error)
 			Text(text)
 				.lineSpacing(-.small3)
-				.textStyle(.body1Header)
+				.textStyle(textStyle)
 				.multilineTextAlignment(.leading)
 		}
 		.foregroundColor(color)

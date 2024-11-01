@@ -33,7 +33,7 @@ struct ResourceBalanceButton: View {
 				ResourceBalanceView(viewState, appearance: .standard, isSelected: isSelected)
 
 				if let warning {
-					WarningErrorView(text: warning, type: .warning, useNarrowSpacing: true)
+					WarningErrorView(text: warning, type: .warning, useNarrowSpacing: true, useSmallerFontSize: true)
 				}
 			}
 			.padding(.top, topPadding)
@@ -48,7 +48,7 @@ struct ResourceBalanceButton: View {
 		switch appearance {
 		case .assetList:
 			switch viewState {
-			case .fungible:
+			case .fungible, .unknown:
 				.medium1
 			case .nonFungible:
 				.large3
@@ -56,8 +56,6 @@ struct ResourceBalanceButton: View {
 				.medium3
 			case .poolUnit, .stakeClaimNFT:
 				.medium1
-			case .unknown:
-				fatalError("Implement")
 			}
 		case .transactionReview:
 			.medium2
@@ -68,14 +66,12 @@ struct ResourceBalanceButton: View {
 		switch appearance {
 		case .assetList:
 			switch viewState {
-			case .fungible:
+			case .fungible, .unknown:
 				.medium2
 			case .nonFungible:
 				.medium1
 			case .liquidStakeUnit, .poolUnit, .stakeClaimNFT:
 				.medium3
-			case .unknown:
-				fatalError("Implement")
 			}
 		case .transactionReview:
 			.medium2
@@ -86,7 +82,7 @@ struct ResourceBalanceButton: View {
 		switch appearance {
 		case .assetList:
 			switch viewState {
-			case .fungible:
+			case .fungible, .unknown:
 				.large3
 			case .nonFungible:
 				.medium1
@@ -94,8 +90,6 @@ struct ResourceBalanceButton: View {
 				.medium3
 			case .poolUnit, .stakeClaimNFT:
 				.medium2
-			case .unknown:
-				fatalError("Implement")
 			}
 		case .transactionReview:
 			.medium2

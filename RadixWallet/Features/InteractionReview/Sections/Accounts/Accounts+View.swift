@@ -82,7 +82,9 @@ struct TransactionReviewResourceView: View {
 				}
 			}
 		case .unknown:
-			Text("Unknown")
+			ResourceBalanceButton(transfer.viewState, appearance: .transactionReview) {
+				onTap(nil)
+			}
 		}
 	}
 
