@@ -22,7 +22,8 @@ extension NonFungibleResourceAsset.ViewState {
 			id: token.id,
 			resourceImage: resource.metadata.iconURL,
 			resourceName: resource.metadata.name,
-			nonFungibleName: token.data?.name
+			nonFungibleName: token.data?.name,
+			amount: nil
 		))
 	}
 }

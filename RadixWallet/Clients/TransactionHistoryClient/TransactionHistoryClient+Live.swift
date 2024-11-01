@@ -90,7 +90,7 @@ extension TransactionHistoryClient {
 							return stakeClaimNFT
 						} else {
 							guard let token = keyedNonFungibleTokens[id: id] else { throw ProgrammerError() }
-							return KnownResourceBalance(resource: resource, details: .nonFungible(token))
+							return KnownResourceBalance(resource: resource, details: .nonFungible(.token(token)))
 						}
 					}
 			}

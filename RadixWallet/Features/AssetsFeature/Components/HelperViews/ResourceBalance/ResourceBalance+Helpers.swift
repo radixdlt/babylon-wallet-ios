@@ -28,35 +28,37 @@ extension KnownResourceBalance: Comparable {
 		case let (.fungible(lhsValue), .fungible(rhsValue)):
 			if lhs.resource.resourceAddress == rhs.resource.resourceAddress {
 				// If it's the same resource, sort by the amount
-				order(lhs: lhsValue.amount.exactAmount?.nominalAmount, rhs: rhsValue.amount.exactAmount?.nominalAmount)
+				return order(lhs: lhsValue.amount.exactAmount?.nominalAmount, rhs: rhsValue.amount.exactAmount?.nominalAmount)
 			} else {
 				if lhs.resource.resourceAddress.isXRD {
-					true
+					return true
 				} else if rhs.resource.resourceAddress.isXRD {
-					false
+					return false
 				} else {
 					// Else sort alphabetically by title, or failing that, address
-					order(lhs: lhs.resource.metadata.name, rhs: rhs.resource.metadata.name) {
+					return order(lhs: lhs.resource.metadata.name, rhs: rhs.resource.metadata.name) {
 						lhs.resource.resourceAddress.address < rhs.resource.resourceAddress.address
 					}
 				}
 			}
 		case let (.nonFungible(lhsValue), .nonFungible(rhsValue)):
-			if lhsValue.id.resourceAddress == rhsValue.id.resourceAddress {
-				lhsValue.id.nonFungibleLocalId.toUserFacingString() < rhsValue.id.nonFungibleLocalId.toUserFacingString()
+			guard case let .token(lhsToken) = lhsValue, case let .token(rhsToken) = rhsValue else { return false }
+
+			if lhsToken.id.resourceAddress == rhsToken.id.resourceAddress {
+				return lhsToken.id.nonFungibleLocalId.toUserFacingString() < rhsToken.id.nonFungibleLocalId.toUserFacingString()
 			} else {
-				lhsValue.id.resourceAddress.description < rhsValue.id.resourceAddress.description
+				return lhsToken.id.resourceAddress.description < rhsToken.id.resourceAddress.description
 			}
 		case let (.liquidStakeUnit(lhsValue), .liquidStakeUnit(rhsValue)):
 			if lhsValue.validator.address == rhsValue.validator.address {
 				if lhs.resource.resourceAddress == rhs.resource.resourceAddress {
 					// If it's the same resource, sort by the amount
-					order(lhs: lhsValue.amount.exactAmount?.nominalAmount ?? 0, rhs: rhsValue.amount.exactAmount?.nominalAmount ?? 0)
+					return order(lhs: lhsValue.amount.exactAmount?.nominalAmount ?? 0, rhs: rhsValue.amount.exactAmount?.nominalAmount ?? 0)
 				} else {
-					order(lhs: lhs.resource, rhs: rhs.resource)
+					return order(lhs: lhs.resource, rhs: rhs.resource)
 				}
 			} else {
-				order(lhs: lhsValue.validator.metadata.name, rhs: rhsValue.validator.metadata.name) {
+				return order(lhs: lhsValue.validator.metadata.name, rhs: rhsValue.validator.metadata.name) {
 					// If it's the same validator (name), sort by the resource
 					if lhs.resource.resourceAddress == rhs.resource.resourceAddress {
 						// If it's the same resource, sort by the amount
@@ -69,15 +71,15 @@ extension KnownResourceBalance: Comparable {
 		case let (.poolUnit(lhsValue), .poolUnit(rhsValue)):
 			if lhs.resource == rhs.resource {
 				// If it's the same resource, sort by the amount
-				order(lhs: lhsValue.details.poolUnitResource.amount.exactAmount?.nominalAmount ?? 0, rhs: rhsValue.details.poolUnitResource.amount.exactAmount?.nominalAmount ?? 0)
+				return order(lhs: lhsValue.details.poolUnitResource.amount.exactAmount?.nominalAmount ?? 0, rhs: rhsValue.details.poolUnitResource.amount.exactAmount?.nominalAmount ?? 0)
 			} else {
 				// Else sort alphabetically by pool name, or failing that, address
-				order(lhs: lhs.resource.fungibleResourceName, rhs: rhs.resource.fungibleResourceName) {
+				return order(lhs: lhs.resource.fungibleResourceName, rhs: rhs.resource.fungibleResourceName) {
 					lhs.resource.resourceAddress.address < rhs.resource.resourceAddress.address
 				}
 			}
 		default:
-			lhs.priority < rhs.priority
+			return lhs.priority < rhs.priority
 		}
 	}
 

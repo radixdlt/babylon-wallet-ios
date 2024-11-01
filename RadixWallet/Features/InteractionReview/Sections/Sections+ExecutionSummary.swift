@@ -360,7 +360,7 @@ extension InteractionReview.Sections {
 			let tokens = try await onLedgerEntitiesClient.getNonFungibleTokenData(
 				.init(resource: resourceAddress, nonFungibleIds: globalIds)
 			)
-			return tokens.map { (resourceAddress, .nonFungible($0)) }
+			return tokens.map { (resourceAddress, .nonFungible(.token($0))) }
 		}
 	}
 

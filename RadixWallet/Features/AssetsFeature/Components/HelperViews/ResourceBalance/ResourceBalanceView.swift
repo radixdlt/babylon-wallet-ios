@@ -20,10 +20,11 @@ extension ResourceBalance {
 		}
 
 		struct NonFungible: Sendable, Hashable {
-			let id: NonFungibleGlobalId
+			let id: NonFungibleGlobalId?
 			let resourceImage: URL?
 			let resourceName: String?
 			let nonFungibleName: String?
+			let amount: KnownResourceBalance.Amount?
 		}
 
 		struct LiquidStakeUnit: Sendable, Hashable {
@@ -82,12 +83,24 @@ private extension ResourceBalance.ViewState.Fungible {
 
 private extension ResourceBalance.ViewState.NonFungible {
 	init(resource: OnLedgerEntity.Resource, details: KnownResourceBalance.NonFungible) {
-		self.init(
-			id: details.id,
-			resourceImage: resource.metadata.iconURL,
-			resourceName: resource.metadata.name,
-			nonFungibleName: details.data?.name
-		)
+		switch details {
+		case let .token(token):
+			self.init(
+				id: token.id,
+				resourceImage: resource.metadata.iconURL,
+				resourceName: resource.metadata.name,
+				nonFungibleName: token.data?.name,
+				amount: nil
+			)
+		case let .amount(amount):
+			self.init(
+				id: nil,
+				resourceImage: resource.metadata.iconURL,
+				resourceName: resource.metadata.name,
+				nonFungibleName: resource.resourceAddress.formatted(),
+				amount: .init(amount)
+			)
+		}
 	}
 }
 
@@ -228,9 +241,10 @@ extension ResourceBalanceView {
 		var body: some View {
 			NonFungibleView(
 				thumbnail: .nft(viewState.resourceImage),
-				caption1: viewState.resourceName ?? viewState.id.resourceAddress.formatted(),
-				caption2: viewState.nonFungibleName ?? viewState.id.localID.formatted(),
-				compact: compact
+				caption1: viewState.resourceName ?? viewState.id?.resourceAddress.formatted(),
+				caption2: viewState.nonFungibleName ?? viewState.id?.localID.formatted(),
+				compact: compact,
+				amount: viewState.amount
 			)
 		}
 	}
@@ -325,7 +339,8 @@ extension ResourceBalanceView {
 					thumbnail: .stakeClaimNFT(viewState.resourceMetadata.iconURL),
 					caption1: viewState.resourceMetadata.title,
 					caption2: viewState.validatorName,
-					compact: compact
+					compact: compact,
+					amount: nil
 				)
 
 				if !hideDetails {
@@ -524,19 +539,29 @@ extension ResourceBalanceView {
 		let caption1: String?
 		let caption2: String?
 		let compact: Bool
-		// TODO: add amount
+		let amount: KnownResourceBalance.Amount?
 
 		var body: some View {
-			HStack(spacing: .zero) {
-				CaptionedThumbnailView(
-					type: thumbnail.type,
-					url: thumbnail.url,
-					caption1: caption1 ?? "-",
-					caption2: caption2 ?? "-",
-					compact: compact
-				)
+			VStack(alignment: .leading) {
+				HStack(spacing: .zero) {
+					CaptionedThumbnailView(
+						type: thumbnail.type,
+						url: thumbnail.url,
+						caption1: caption1 ?? "-",
+						caption2: caption2 ?? "-",
+						compact: compact
+					)
 
-				Spacer(minLength: 0)
+					Spacer(minLength: amount != nil ? .small2 : 0)
+
+					if let amount {
+						AmountView(amount: amount, compact: compact)
+					}
+				}
+
+				if case .unknown = amount?.amount {
+					WarningErrorView(text: "Amount of deposit is unknown", type: .warning, useNarrowSpacing: true, useSmallerFontSize: true)
+				}
 			}
 		}
 	}

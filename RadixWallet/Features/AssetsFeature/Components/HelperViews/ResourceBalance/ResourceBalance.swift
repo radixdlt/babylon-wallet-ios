@@ -93,7 +93,10 @@ struct KnownResourceBalance: Sendable, Hashable {
 		var guarantee: TransactionGuarantee?
 	}
 
-	typealias NonFungible = OnLedgerEntity.NonFungibleToken
+	enum NonFungible: Sendable, Hashable {
+		case token(OnLedgerEntity.NonFungibleToken)
+		case amount(amount: ResourceAmount)
+	}
 
 	struct PoolUnit: Sendable, Hashable {
 		let details: OnLedgerEntitiesClient.OwnedResourcePoolDetails

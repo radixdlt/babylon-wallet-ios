@@ -263,7 +263,7 @@ extension OnLedgerEntitiesClient {
 			} else {
 				result = tokens.map { token in
 					let isHidden = hiddenResources.contains(.nonFungible(token.id.resourceAddress))
-					return KnownResourceBalance(resource: resource, details: .nonFungible(token), isHidden: isHidden)
+					return KnownResourceBalance(resource: resource, details: .nonFungible(.token(token)), isHidden: isHidden)
 				}
 
 				guard result.count == ids.count else {
@@ -284,7 +284,7 @@ extension OnLedgerEntitiesClient {
 					)
 				}
 				.map { id in
-					KnownResourceBalance(resource: resource, details: .nonFungible(.init(id: id, data: nil)), isHidden: false)
+					KnownResourceBalance(resource: resource, details: .nonFungible(.token(.init(id: id, data: nil))), isHidden: false)
 				}
 
 			guard result.count == ids.count else {

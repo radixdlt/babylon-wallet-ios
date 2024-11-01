@@ -118,9 +118,9 @@ extension InteractionReview.Sections {
 
 		switch accountWithdraw {
 		case let .amount(_, amount):
-			if resourceAddress.isFungible {
-				switch resourceInfo {
-				case let .left(resource):
+			switch resourceInfo {
+			case let .left(resource):
+				if resourceAddress.isFungible {
 					return try await [.known(onLedgerEntitiesClient.fungibleResourceBalance(
 						resource,
 						resourceAmount: .exact(.init(nominalAmount: amount)),
@@ -128,11 +128,11 @@ extension InteractionReview.Sections {
 						networkID: networkID,
 						defaultDepositGuarantee: defaultDepositGuarantee
 					))]
-				case .right:
-					return []
+				} else {
+					return [.known(.init(resource: resource, details: .nonFungible(.amount(amount: .exact(.init(nominalAmount: amount))))))]
 				}
-			} else {
-				return [.unknown]
+			case .right:
+				return []
 			}
 		case let .ids(resourceAddress, ids):
 			return try await onLedgerEntitiesClient.nonFungibleResourceBalances(
@@ -171,14 +171,37 @@ extension InteractionReview.Sections {
 						))
 					)
 				case let .nonFungible(bounds):
-					try await transfers.append(contentsOf:
-						onLedgerEntitiesClient.nonFungibleResourceBalances(
-							resourceInfo,
-							resourceAddress: resourceAddress,
-							ids: bounds.certainIds
+					if !bounds.certainIds.isEmpty {
+						try await transfers.append(
+							contentsOf:
+							onLedgerEntitiesClient.nonFungibleResourceBalances(
+								resourceInfo,
+								resourceAddress: resourceAddress,
+								ids: bounds.certainIds
+							)
+							.map(\.toResourceBalance)
 						)
-						.map(\.toResourceBalance)
-					)
+					}
+
+					if case let .notExact(certainIds, _, upperBound, _) = bounds {
+						switch upperBound {
+						case let .inclusive(amount):
+							if Double(certainIds.count) < amount.asDouble {
+								transfers.append(.known(.init(
+									resource: resource,
+									details: .nonFungible(.amount(amount: .between(
+										minimum: .init(nominalAmount: 2),
+										maximum: .init(nominalAmount: 5)
+									)))
+								)))
+							}
+						case .unbounded:
+							transfers.append(.known(.init(
+								resource: resource,
+								details: .nonFungible(.amount(amount: .unknown))
+							)))
+						}
+					}
 				}
 			case .right:
 				break
