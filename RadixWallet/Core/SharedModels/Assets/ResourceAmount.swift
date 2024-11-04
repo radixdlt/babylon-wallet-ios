@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - ResourceAmount
 enum ResourceAmount: Sendable, Hashable, Codable {
 	case exact(ExactResourceAmount)
@@ -6,7 +8,7 @@ enum ResourceAmount: Sendable, Hashable, Codable {
 	case between(minimum: ExactResourceAmount, maximum: ExactResourceAmount)
 	case unknown
 
-	init(bounds: SimpleFungibleResourceBounds) {
+	init(bounds: SimpleCountedResourceBounds) {
 		switch bounds {
 		case let .exact(amount):
 			self = .exact(.init(nominalAmount: amount))

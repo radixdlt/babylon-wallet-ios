@@ -3,7 +3,7 @@ import Sargon
 extension InteractionReview.Sections {
 	func sections(for summary: ManifestSummary, networkID: NetworkID) async throws -> Common.SectionsData? {
 		let allWithdrawAddresses = summary.accountWithdrawals.values.flatMap { $0 }.map(\.resourceAddress)
-		let allDepositAddresses = summary.accountDeposits.values.flatMap { $0 }.flatMap(\.specifiedResources.keys)
+		let allDepositAddresses = summary.accountDeposits.values.flatMap(\.specifiedResources).map(\.resourceAddress)
 
 		// Pre-populate with all resource addresses from withdraw and deposit.
 		let allAddresses: IdentifiedArrayOf<ResourceAddress> = Array((allWithdrawAddresses + allDepositAddresses).uniqued()).asIdentified()
@@ -87,7 +87,7 @@ extension InteractionReview.Sections {
 	}
 
 	private func extractDeposits(
-		accountDeposits: [AccountAddress: [AccountDeposit]],
+		accountDeposits: [AccountAddress: AccountDeposits],
 		entities: ResourcesInfo = [:],
 		networkID: NetworkID
 	) async throws -> Common.Accounts.State? {
@@ -98,18 +98,18 @@ extension InteractionReview.Sections {
 
 		for (accountAddress, accountDeposits) in accountDeposits {
 			let account = try userAccounts.account(for: accountAddress)
-			let transfers = try await accountDeposits.asyncFlatMap {
-				let aux = try await transferInfo(
-					accountDeposit: $0,
-					entities: entities,
-					networkID: networkID,
-					defaultDepositGuarantee: defaultDepositGuarantee
-				)
-				return aux
-			}
-			.map(\.asIdentified)
+			var transfers = try await transferInfo(
+				accountDeposits: accountDeposits,
+				entities: entities,
+				networkID: networkID,
+				defaultDepositGuarantee: defaultDepositGuarantee
+			)
 
-			deposits[account, default: []].append(contentsOf: transfers)
+			if case .mayBePresent = accountDeposits.unspecifiedResources {
+				transfers.append(.unknown)
+			}
+
+			deposits[account, default: []].append(contentsOf: transfers.map(\.asIdentified))
 		}
 
 		let depositAccounts = deposits
@@ -163,14 +163,15 @@ extension InteractionReview.Sections {
 	}
 
 	func transferInfo(
-		accountDeposit: AccountDeposit,
+		accountDeposits: AccountDeposits,
 		entities: ResourcesInfo = [:],
 		networkID: NetworkID,
 		defaultDepositGuarantee: Decimal192 = 1
 	) async throws -> [ResourceBalance] {
 		var transfers: [ResourceBalance] = []
 
-		for (resourceAddress, resourceBounds) in accountDeposit.specifiedResources {
+		for resourceBounds in accountDeposits.specifiedResources {
+			let resourceAddress = resourceBounds.resourceAddress
 			guard let resourceInfo = entities[resourceAddress] else {
 				throw ResourceEntityNotFound(address: resourceAddress.address)
 			}
@@ -178,7 +179,7 @@ extension InteractionReview.Sections {
 			switch resourceInfo {
 			case let .left(resource):
 				switch resourceBounds {
-				case let .fungible(bounds):
+				case let .fungible(_, bounds):
 					try await transfers.append(
 						.known(onLedgerEntitiesClient.fungibleResourceBalance(
 							resource,
@@ -188,8 +189,7 @@ extension InteractionReview.Sections {
 							defaultDepositGuarantee: defaultDepositGuarantee
 						))
 					)
-				case let .nonFungible(bounds):
-					// TODO: use updated Sargon version
+				case let .nonFungible(_, bounds):
 					if !bounds.certainIds.isEmpty {
 						try await transfers.append(
 							contentsOf:
@@ -202,33 +202,17 @@ extension InteractionReview.Sections {
 						)
 					}
 
-					if case let .notExact(certainIds, _, upperBound, _) = bounds {
-						switch upperBound {
-						case let .inclusive(amount):
-							if Double(certainIds.count) < amount.asDouble {
-								transfers.append(.known(.init(
-									resource: resource,
-									details: .nonFungible(.amount(amount: .between(
-										minimum: .init(nominalAmount: 2),
-										maximum: .init(nominalAmount: 5)
-									)))
-								)))
-							}
-						case .unbounded:
-							transfers.append(.known(.init(
-								resource: resource,
-								details: .nonFungible(.amount(amount: .unknown))
-							)))
-						}
+					if let additionalAmount = bounds.additionalAmount {
+						let resourceAmount = ResourceAmount(bounds: additionalAmount)
+						transfers.append(.known(.init(
+							resource: resource,
+							details: .nonFungible(.amount(amount: resourceAmount))
+						)))
 					}
 				}
 			case .right:
 				break
 			}
-		}
-
-		if case .mayBePresent = accountDeposit.unspecifiedResources {
-			transfers.append(.unknown)
 		}
 
 		return transfers
@@ -246,13 +230,13 @@ extension AccountWithdraw {
 	}
 }
 
-extension SimpleNonFungibleResourceBounds {
-	var certainIds: [NonFungibleLocalId] {
+extension SimpleResourceBounds {
+	var resourceAddress: ResourceAddress {
 		switch self {
-		case let .exact(_, certainIds):
-			certainIds
-		case let .notExact(certainIds, _, _, _):
-			certainIds
+		case let .fungible(resourceAddress, _):
+			resourceAddress
+		case let .nonFungible(resourceAddress, _):
+			resourceAddress
 		}
 	}
 }
