@@ -43,7 +43,7 @@ extension InteractionReview {
 			case .transaction:
 				return L10n.TransactionReview.proposingDappSubtitle(name)
 			case .preAuthorization:
-				return "Proposed by \(name)"
+				return L10n.PreAuthorizationReview.subtitle(name)
 			}
 		}
 
