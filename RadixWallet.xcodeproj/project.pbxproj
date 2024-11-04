@@ -783,7 +783,6 @@
 		5B8433A62CD011DE00CA00F5 /* PreAuthorizationClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8433A52CD011DC00CA00F5 /* PreAuthorizationClient+Test.swift */; };
 		5B8433A82CD0128000CA00F5 /* PreAuthorizationClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8433A72CD0127900CA00F5 /* PreAuthorizationClient+Live.swift */; };
 		5B8433AA2CD0131B00CA00F5 /* PreAuthorizationFailure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8433A92CD0131500CA00F5 /* PreAuthorizationFailure.swift */; };
-		5B8F770B2CD94CAD00154A76 /* VisibleHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8F770A2CD94CA900154A76 /* VisibleHeaderView.swift */; };
 		5B96DD372BD917B300722882 /* Text+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B96DD362BD917B300722882 /* Text+Extra.swift */; };
 		5B9846BD2BBD5C8800E814F3 /* SensitiveInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B9846BC2BBD5C8800E814F3 /* SensitiveInfo.plist */; };
 		5B9846C02BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9846BF2BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift */; };
@@ -2021,7 +2020,6 @@
 		5B8433A52CD011DC00CA00F5 /* PreAuthorizationClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PreAuthorizationClient+Test.swift"; sourceTree = "<group>"; };
 		5B8433A72CD0127900CA00F5 /* PreAuthorizationClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PreAuthorizationClient+Live.swift"; sourceTree = "<group>"; };
 		5B8433A92CD0131500CA00F5 /* PreAuthorizationFailure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreAuthorizationFailure.swift; sourceTree = "<group>"; };
-		5B8F770A2CD94CA900154A76 /* VisibleHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisibleHeaderView.swift; sourceTree = "<group>"; };
 		5B96DD362BD917B300722882 /* Text+Extra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Text+Extra.swift"; sourceTree = "<group>"; };
 		5B9846BC2BBD5C8800E814F3 /* SensitiveInfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = SensitiveInfo.plist; sourceTree = "<group>"; };
 		5B9846BF2BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SensitiveInfoClient+Interface.swift"; sourceTree = "<group>"; };
@@ -5541,7 +5539,6 @@
 		5B27FBE82CC70AC2002975BE /* Components */ = {
 			isa = PBXGroup;
 			children = (
-				5B8F770A2CD94CA900154A76 /* VisibleHeaderView.swift */,
 				5B27FBD82CC67655002975BE /* HeadingView.swift */,
 				5B27FBEB2CC70E87002975BE /* ExpandableHeadingView.swift */,
 				5B03E3D42CC1487400E10A64 /* TransferLineView.swift */,
@@ -7597,7 +7594,6 @@
 				48CFC4042ADC10D900E77A5C /* KeychainHolder.swift in Sources */,
 				48CFC4392ADC10DA00E77A5C /* Sorted.swift in Sources */,
 				5B272DD92C36E93100B74F1F /* AppEventsClient+Live.swift in Sources */,
-				5B8F770B2CD94CAD00154A76 /* VisibleHeaderView.swift in Sources */,
 				48CFC34B2ADC10D900E77A5C /* OneTimePersonaData.swift in Sources */,
 				A408159A2C7E0D08005E65B9 /* MetadataOriginArrayValue.swift in Sources */,
 				48CFC3832ADC10D900E77A5C /* GeneralHelperViews.swift in Sources */,

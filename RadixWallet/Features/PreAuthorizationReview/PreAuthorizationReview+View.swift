@@ -36,10 +36,24 @@ extension PreAuthorizationReview {
 	struct View: SwiftUI.View {
 		let store: StoreOf<PreAuthorizationReview>
 
+		@SwiftUI.State private var showNavigationTitle = false
+
+		private let coordSpace: String = "PreAuthorizationReviewCoordSpace"
+		private let navTitleID: String = "PreAuthorizationReview.title"
+		private let showTitleHysteresis: CGFloat = .small3
+
 		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				content(viewStore)
 					.controlState(viewStore.globalControlState)
+					.background(.app.white)
+					.toolbar {
+						ToolbarItem(placement: .principal) {
+							if showNavigationTitle {
+								navigationTitle(dAppName: viewStore.dAppName)
+							}
+						}
+					}
 					.onAppear {
 						store.send(.view(.appeared))
 					}
@@ -47,9 +61,25 @@ extension PreAuthorizationReview {
 			}
 		}
 
+		private func navigationTitle(dAppName: String?) -> some SwiftUI.View {
+			VStack(spacing: .zero) {
+				Text(L10n.PreAuthorizationReview.title)
+					.textStyle(.body2Header)
+					.foregroundColor(.app.gray1)
+
+				if let dAppName {
+					Text(L10n.PreAuthorizationReview.subtitle(dAppName))
+						.textStyle(.body2Regular)
+						.foregroundColor(.app.gray2)
+				}
+			}
+		}
+
 		private func content(_ viewStore: ViewStoreOf<PreAuthorizationReview>) -> some SwiftUI.View {
-			Common.VisibleHeaderView(kind: .preAuthorization, metadata: viewStore.dAppMetadata) {
-				Group {
+			ScrollView(showsIndicators: false) {
+				VStack(spacing: .zero) {
+					header(dAppMetadata: viewStore.dAppMetadata)
+
 					Group {
 						if let manifest = viewStore.displayMode.rawManifest {
 							rawManifest(manifest)
@@ -76,6 +106,29 @@ extension PreAuthorizationReview {
 				}
 				.animation(.easeInOut, value: viewStore.displayMode.rawManifest)
 			}
+			.coordinateSpace(name: coordSpace)
+			.onPreferenceChange(PositionsPreferenceKey.self) { positions in
+				guard let offset = positions[navTitleID]?.maxY else {
+					showNavigationTitle = true
+					return
+				}
+				if showNavigationTitle, offset > showTitleHysteresis {
+					showNavigationTitle = false
+				} else if !showNavigationTitle, offset < 0 {
+					showNavigationTitle = true
+				}
+			}
+		}
+
+		private func header(dAppMetadata: DappMetadata.Ledger?) -> some SwiftUI.View {
+			Common.HeaderView(
+				kind: .preAuthorization,
+				name: dAppMetadata?.name?.rawValue,
+				thumbnail: dAppMetadata?.thumbnail
+			)
+			.measurePosition(navTitleID, coordSpace: coordSpace)
+			.padding(.horizontal, .medium3)
+			.padding(.bottom, .medium3)
 		}
 
 		private func rawManifest(_ manifest: String) -> some SwiftUI.View {

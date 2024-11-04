@@ -59,7 +59,15 @@ extension TransactionReview {
 
 	@MainActor
 	struct View: SwiftUI.View {
+		@SwiftUI.State private var showNavigationTitle: Bool = false
+
 		private let store: StoreOf<TransactionReview>
+
+		private let coordSpace: String = "TransactionReviewCoordSpace"
+		private let navTitleID: String = "TransactionReview.title"
+		private let showTitleHysteresis: CGFloat = .small3
+
+		private let shadowColor: Color = .app.gray2.opacity(0.4)
 
 		init(store: StoreOf<TransactionReview>) {
 			self.store = store
@@ -81,6 +89,22 @@ extension TransactionReview {
 								.brightness(viewStore.rawManifest == nil ? 0 : -0.15)
 							}
 						}
+
+						ToolbarItem(placement: .principal) {
+							if showNavigationTitle {
+								VStack(spacing: 0) {
+									Text(L10n.TransactionReview.title)
+										.textStyle(.body2Header)
+										.foregroundColor(.app.gray1)
+
+									if let name = viewStore.proposingDappMetadata?.name {
+										Text(L10n.TransactionReview.proposingDappSubtitle(name.rawValue))
+											.textStyle(.body2Regular)
+											.foregroundColor(.app.gray2)
+									}
+								}
+							}
+						}
 					}
 					.destinations(with: store)
 					.onAppear {
@@ -91,8 +115,10 @@ extension TransactionReview {
 
 		@ViewBuilder
 		private func coreView(with viewStore: ViewStoreOf<TransactionReview>) -> some SwiftUI.View {
-			Common.VisibleHeaderView(kind: .transaction, metadata: viewStore.proposingDappMetadata) {
-				VStack(spacing: .zero) {
+			ScrollView(showsIndicators: false) {
+				VStack(spacing: 0) {
+					header(viewStore.proposingDappMetadata)
+
 					if let manifest = viewStore.rawManifest {
 						Common.RawManifestView(manifest: manifest) {
 							viewStore.send(.copyRawTransactionTapped)
@@ -128,11 +154,37 @@ extension TransactionReview {
 					.padding(.vertical, .large3)
 					.padding(.horizontal, .large2)
 					.background {
-						JaggedEdge(shadowColor: Common.shadowColor, isTopEdge: false)
+						JaggedEdge(shadowColor: shadowColor, isTopEdge: false)
 					}
 				}
 				.background(Common.gradientBackground)
 				.animation(.easeInOut, value: viewStore.canToggleViewMode ? viewStore.rawManifest : nil)
+			}
+			.coordinateSpace(name: coordSpace)
+			.onPreferenceChange(PositionsPreferenceKey.self) { positions in
+				guard let offset = positions[navTitleID]?.maxY else {
+					showNavigationTitle = true
+					return
+				}
+				if showNavigationTitle, offset > showTitleHysteresis {
+					showNavigationTitle = false
+				} else if !showNavigationTitle, offset < 0 {
+					showNavigationTitle = true
+				}
+			}
+		}
+
+		private func header(_ proposingDappMetadata: DappMetadata.Ledger?) -> some SwiftUI.View {
+			Common.HeaderView(
+				kind: .transaction,
+				name: proposingDappMetadata?.name?.rawValue,
+				thumbnail: proposingDappMetadata?.thumbnail
+			)
+			.measurePosition(navTitleID, coordSpace: coordSpace)
+			.padding(.horizontal, .medium3)
+			.padding(.bottom, .medium3)
+			.background {
+				JaggedEdge(shadowColor: shadowColor, isTopEdge: true)
 			}
 		}
 

@@ -9,6 +9,4 @@ extension InteractionReview {
 	)
 
 	static let transferLineTrailingPadding: CGFloat = .huge3
-
-	static let shadowColor: Color = .app.gray2.opacity(0.4)
 }
