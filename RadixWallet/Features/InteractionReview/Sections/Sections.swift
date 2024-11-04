@@ -281,13 +281,10 @@ private extension InteractionReview.Sections {
 			))
 
 		case let .nonFungible(details):
-			guard case let .token(token) = details else {
-				return .none
-			}
 			state.destination = .nonFungibleTokenDetails(.init(
 				resourceAddress: resource.resourceAddress,
 				resourceDetails: .success(resource),
-				token: token,
+				details: details,
 				ledgerState: resource.atLedgerState
 			))
 
@@ -305,7 +302,7 @@ private extension InteractionReview.Sections {
 			state.destination = .nonFungibleTokenDetails(.init(
 				resourceAddress: resource.resourceAddress,
 				resourceDetails: .success(resource),
-				token: nft,
+				details: nft != nil ? .token(nft!) : nil,
 				ledgerState: resource.atLedgerState,
 				stakeClaim: details.stakeClaimTokens.stakeClaims.first,
 				isClaimStakeEnabled: false

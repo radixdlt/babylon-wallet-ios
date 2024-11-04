@@ -155,14 +155,11 @@ struct ResourceAsset: Sendable, FeatureReducer {
 				))
 
 			case let .nonFungible(details):
-				guard case let .token(token) = details else {
-					return .none
-				}
 				state.destination = .nonFungibleTokenDetails(.init(
 					resourceAddress: balance.resource.resourceAddress,
 					resourceDetails: .success(balance.resource),
 					ownedResource: state.kind.nonFungible?.resource,
-					token: token,
+					details: details,
 					ledgerState: balance.resource.atLedgerState
 				))
 
@@ -186,7 +183,7 @@ struct ResourceAsset: Sendable, FeatureReducer {
 					resourceAddress: details.stakeClaimResource.resourceAddress,
 					resourceDetails: .success(balance.resource),
 					ownedResource: state.kind.nonFungible?.resource,
-					token: token,
+					details: token != nil ? .token(token!) : nil,
 					ledgerState: details.stakeClaimResource.atLedgerState,
 					stakeClaim: details.stakeClaimTokens.stakeClaims.first,
 					isClaimStakeEnabled: false

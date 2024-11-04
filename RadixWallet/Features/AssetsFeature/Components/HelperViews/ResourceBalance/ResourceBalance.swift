@@ -96,6 +96,16 @@ struct KnownResourceBalance: Sendable, Hashable {
 	enum NonFungible: Sendable, Hashable {
 		case token(OnLedgerEntity.NonFungibleToken)
 		case amount(amount: ResourceAmount)
+
+		var token: OnLedgerEntity.NonFungibleToken? {
+			guard case let .token(token) = self else { return nil }
+			return token
+		}
+
+		var amount: ResourceAmount? {
+			guard case let .amount(amount) = self else { return nil }
+			return amount
+		}
 	}
 
 	struct PoolUnit: Sendable, Hashable {
