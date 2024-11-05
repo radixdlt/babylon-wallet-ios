@@ -50,7 +50,8 @@ extension InteractionReview.Sections {
 			withdrawals: withdrawals,
 			dAppsUsed: dAppsUsed,
 			deposits: deposits,
-			proofs: proofs
+			proofs: proofs,
+			showPossibleDappCalls: true
 		)
 	}
 

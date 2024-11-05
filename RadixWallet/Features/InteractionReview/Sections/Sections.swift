@@ -184,6 +184,7 @@ extension InteractionReview {
 				state.accountDepositSetting = sections.accountDepositSetting
 				state.accountDepositExceptions = sections.accountDepositExceptions
 				state.proofs = sections.proofs
+				state.showPossibleDappCalls = sections.showPossibleDappCalls
 				return .none
 			}
 		}
