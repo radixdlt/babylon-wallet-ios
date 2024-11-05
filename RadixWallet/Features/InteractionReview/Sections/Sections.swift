@@ -275,6 +275,7 @@ private extension InteractionReview.Sections {
 					resourceAddress: resource.resourceAddress,
 					atLedgerState: resource.atLedgerState,
 					amount: details.amount,
+					guarantee: details.guarantee?.amount,
 					metadata: resource.metadata
 				),
 				isXRD: details.isXRD
@@ -291,7 +292,11 @@ private extension InteractionReview.Sections {
 		case let .liquidStakeUnit(details):
 			state.destination = .lsuDetails(.init(
 				validator: details.validator,
-				stakeUnitResource: .init(resource: details.resource, amount: details.amount),
+				stakeUnitResource: .init(
+					resource: details.resource,
+					amount: details.amount,
+					guarantee: details.guarantee?.amount
+				),
 				xrdRedemptionValue: details.worth
 			))
 

@@ -168,7 +168,8 @@ struct ResourceAsset: Sendable, FeatureReducer {
 					validator: details.validator,
 					stakeUnitResource: .init(
 						resource: details.resource,
-						amount: details.amount
+						amount: details.amount,
+						guarantee: details.guarantee?.amount
 					),
 					xrdRedemptionValue: details.worth
 				))

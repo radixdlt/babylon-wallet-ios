@@ -506,7 +506,7 @@ extension ResourceBalanceView {
 						Spacer(minLength: .small2)
 					}
 
-					AmountView(amount: amount, fallback: fallback, compact: compact)
+					AmountView(amount: amount, fallback: fallback, appearance: compact ? .compact : .standard)
 						.padding(.leading, isSelected != nil ? .small2 : 0)
 
 					if let isSelected {
@@ -555,7 +555,7 @@ extension ResourceBalanceView {
 					Spacer(minLength: amount != nil ? .small2 : 0)
 
 					if let amount {
-						AmountView(amount: amount, compact: compact)
+						AmountView(amount: amount, appearance: compact ? .compact : .standard)
 					}
 				}
 
@@ -605,12 +605,25 @@ extension ResourceBalanceView {
 	struct AmountView: View {
 		let amount: KnownResourceBalance.Amount?
 		let fallback: String?
-		let compact: Bool
+		let appearance: Appearance
+		let symbol: Loadable<String?>?
 
-		init(amount: KnownResourceBalance.Amount?, fallback: String? = nil, compact: Bool) {
+		enum Appearance: Sendable, Equatable {
+			case standard
+			case compact
+			case large
+		}
+
+		init(
+			amount: KnownResourceBalance.Amount?,
+			fallback: String? = nil,
+			appearance: Appearance,
+			symbol: Loadable<String?>? = nil
+		) {
 			self.amount = amount
 			self.fallback = fallback
-			self.compact = compact
+			self.appearance = appearance
+			self.symbol = symbol
 		}
 
 		var body: some View {
@@ -620,33 +633,38 @@ extension ResourceBalanceView {
 					SubAmountView(
 						amount: exactAmount,
 						guaranteed: amount.guaranteed,
-						compact: compact
+						appearance: appearance,
+						symbol: symbol
 					)
 				case let .atLeast(exactAmount):
 					SubAmountView(
 						title: "At least",
 						amount: exactAmount,
 						guaranteed: amount.guaranteed,
-						compact: compact
+						appearance: appearance,
+						symbol: symbol
 					)
 				case let .atMost(exactAmount):
 					SubAmountView(
 						title: "No more than",
 						amount: exactAmount,
 						guaranteed: amount.guaranteed,
-						compact: compact
+						appearance: appearance,
+						symbol: symbol
 					)
 				case let .between(minAmount, maxAmount):
-					VStack(alignment: .trailing, spacing: .small3) {
+					VStack(alignment: alignment, spacing: .small3) {
 						SubAmountView(
 							title: "At least",
 							amount: minAmount,
-							compact: compact
+							appearance: appearance,
+							symbol: symbol
 						)
 						SubAmountView(
 							title: "No more than",
 							amount: maxAmount,
-							compact: compact
+							appearance: appearance,
+							symbol: symbol
 						)
 					}
 				case .unknown:
@@ -660,7 +678,21 @@ extension ResourceBalanceView {
 		}
 
 		private var amountTextStyle: TextStyle {
-			compact ? .body1HighImportance : .secondaryHeader
+			switch appearance {
+			case .standard, .large:
+				.secondaryHeader
+			case .compact:
+				.body1HighImportance
+			}
+		}
+
+		private var alignment: HorizontalAlignment {
+			switch appearance {
+			case .standard, .compact:
+				.trailing
+			case .large:
+				.center
+			}
 		}
 	}
 
@@ -669,29 +701,32 @@ extension ResourceBalanceView {
 		let title: String?
 		let amount: ExactResourceAmount
 		let guaranteed: Decimal192?
-		let compact: Bool
+		let appearance: AmountView.Appearance
+		let symbol: Loadable<String?>?
 
 		init(
 			title: String? = nil,
 			amount: ExactResourceAmount,
 			guaranteed: Decimal192? = nil,
-			compact: Bool
+			appearance: AmountView.Appearance,
+			symbol: Loadable<String?>?
 		) {
 			self.title = title
 			self.amount = amount
 			self.guaranteed = guaranteed
-			self.compact = compact
+			self.appearance = appearance
+			self.symbol = symbol
 		}
 
 		var body: some View {
-			if compact {
+			if appearance == .compact {
 				VStack(alignment: .trailing, spacing: 0) {
 					if let title {
 						Text(title)
-							.textStyle(.body3Regular)
+							.textStyle(titleTextStyle)
 							.foregroundColor(.app.gray1)
 					}
-					Text(amount.nominalAmount.formatted())
+					amountView(amount: amount.nominalAmount, isGuaranteed: false)
 						.textStyle(amountTextStyle)
 						.foregroundColor(.app.gray1)
 					if !resourceBalanceHideFiatValue, let fiatWorth = amount.fiatWorth?.currencyFormatted(applyCustomFont: false) {
@@ -702,21 +737,19 @@ extension ResourceBalanceView {
 					}
 				}
 			} else {
-				VStack(alignment: .trailing, spacing: 0) {
+				VStack(alignment: alignment, spacing: 0) {
 					if guaranteed != nil {
 						Text(L10n.InteractionReview.estimated)
-							.textStyle(.body3Regular)
+							.textStyle(titleTextStyle)
 							.foregroundColor(.app.gray1)
 					} else if let title {
 						Text(title)
-							.textStyle(.body3Regular)
+							.textStyle(titleTextStyle)
 							.foregroundColor(.app.gray1)
 					}
-					Text(amount.nominalAmount.formatted())
-						.lineLimit(1)
-						.minimumScaleFactor(0.8)
-						.truncationMode(.tail)
-						.textStyle(.secondaryHeader)
+
+					amountView(amount: amount.nominalAmount, isGuaranteed: false)
+						.textStyle(amountTextStyle)
 						.foregroundColor(.app.gray1)
 
 					if !resourceBalanceHideFiatValue, let fiatWorth = amount.fiatWorth?.currencyFormatted(applyCustomFont: false) {
@@ -728,20 +761,71 @@ extension ResourceBalanceView {
 
 					if let guaranteedAmount = guaranteed {
 						Text(L10n.InteractionReview.guaranteed)
-							.textStyle(.body2HighImportance)
+							.textStyle(.body3Regular)
 							.foregroundColor(.app.gray2)
 							.padding(.top, .small3)
 
-						Text(guaranteedAmount.formatted())
-							.textStyle(.body1Header)
+						amountView(amount: guaranteedAmount, isGuaranteed: true)
+							.textStyle(guaranteedAmountTextStyle)
 							.foregroundColor(.app.gray2)
 					}
 				}
 			}
 		}
 
+		@ViewBuilder
+		private func amountView(amount: Decimal192, isGuaranteed: Bool) -> some View {
+			let amountView = Text(amount.formatted())
+
+			if let wrappedValue = symbol?.wrappedValue, let symbol = wrappedValue {
+				(amountView + Text(" " + symbol).font(isGuaranteed ? .app.body2Header : .app.secondaryHeader))
+					.lineLimit(1)
+					.minimumScaleFactor(0.8)
+					.truncationMode(.tail)
+			} else {
+				amountView
+					.lineLimit(1)
+					.minimumScaleFactor(0.8)
+					.truncationMode(.tail)
+			}
+		}
+
+		private var titleTextStyle: TextStyle {
+			switch appearance {
+			case .standard, .compact:
+				.body3Regular
+			case .large:
+				.body1HighImportance
+			}
+		}
+
 		private var amountTextStyle: TextStyle {
-			compact ? .body1HighImportance : .secondaryHeader
+			switch appearance {
+			case .standard:
+				.secondaryHeader
+			case .compact:
+				.body1HighImportance
+			case .large:
+				.sheetTitle
+			}
+		}
+
+		private var guaranteedAmountTextStyle: TextStyle {
+			switch appearance {
+			case .standard, .compact:
+				.body1Header
+			case .large:
+				.sectionHeader
+			}
+		}
+
+		private var alignment: HorizontalAlignment {
+			switch appearance {
+			case .standard, .compact:
+				.trailing
+			case .large:
+				.center
+			}
 		}
 	}
 }

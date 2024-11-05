@@ -143,7 +143,11 @@ extension OnLedgerEntitiesClient {
 					details: .init(
 						address: poolContribution.poolAddress,
 						dAppName: resourceAssociatedDapps?[resourceAddress]?.name,
-						poolUnitResource: .init(resource: resource, amount: .exact(.init(nominalAmount: amount))),
+						poolUnitResource: .init(
+							resource: resource,
+							amount: .exact(.init(nominalAmount: amount)),
+							guarantee: guarantee?.amount
+						),
 						xrdResource: xrdResource,
 						nonXrdResources: nonXrdResources
 					),
@@ -152,7 +156,7 @@ extension OnLedgerEntitiesClient {
 				isHidden: isHidden
 			)
 		} else {
-			guard let details = try await getPoolUnitDetails(resource, forAmount: amount) else {
+			guard let details = try await getPoolUnitDetails(resource, forAmount: amount, guarantee: guarantee?.amount) else {
 				throw FailedToGetPoolUnitDetails()
 			}
 
