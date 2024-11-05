@@ -37,17 +37,6 @@ extension ResourceAmount {
 		}
 	}
 
-	var isGreaterThanZero: Bool {
-		switch self {
-		case let .exact(amount),
-		     let .atLeast(amount),
-		     let .between(amount, _):
-			amount.nominalAmount > 0
-		case .atMost, .unknown:
-			false
-		}
-	}
-
 	var debugDescription: String {
 		switch self {
 		case let .exact(amount):

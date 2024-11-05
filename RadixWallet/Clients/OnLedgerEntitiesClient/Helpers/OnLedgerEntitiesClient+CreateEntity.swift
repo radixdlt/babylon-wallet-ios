@@ -419,7 +419,7 @@ extension OnLedgerEntitiesClient {
 			}
 
 			let stakeUnitResource: ResourceWithVaultAmount? = {
-				if let stakeUnitResource = stake.stakeUnitResource, stakeUnitResource.amount.isGreaterThanZero {
+				if let stakeUnitResource = stake.stakeUnitResource {
 					guard let stakeUnitDetails = resourceDetails.first(where: { $0.resourceAddress == stakeUnitResource.resourceAddress }) else {
 						assertionFailure("Did not load stake unit details")
 						fatalError()
