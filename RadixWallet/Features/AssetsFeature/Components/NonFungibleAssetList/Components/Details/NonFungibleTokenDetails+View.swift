@@ -106,8 +106,14 @@ extension NonFungibleTokenDetails {
 							}
 
 							VStack(spacing: .medium1) {
-								loadable(store.resourceThumbnail) { url in
-									Thumbnail(.nft, url: url, size: .veryLarge)
+								VStack(spacing: .medium3) {
+									loadable(store.resourceThumbnail) { url in
+										Thumbnail(.nft, url: url, size: .veryLarge)
+									}
+
+									if let amount = store.amount {
+										ResourceBalanceView.AmountView(amount: .init(amount), appearance: .large)
+									}
 								}
 
 								AssetResourceDetailsSection(viewState: store.resourceDetailsViewState)

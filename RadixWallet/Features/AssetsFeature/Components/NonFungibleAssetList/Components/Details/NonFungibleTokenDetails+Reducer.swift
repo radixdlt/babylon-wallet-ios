@@ -19,6 +19,10 @@ struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 			details?.token
 		}
 
+		var amount: ResourceAmount? {
+			details?.amount
+		}
+
 		init(
 			resourceAddress: ResourceAddress,
 			resourceDetails: Loadable<OnLedgerEntity.Resource> = .idle,
