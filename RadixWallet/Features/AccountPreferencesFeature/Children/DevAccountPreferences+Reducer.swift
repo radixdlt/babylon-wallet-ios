@@ -49,7 +49,6 @@ struct DevAccountPreferences: Sendable, FeatureReducer {
 		case createNonFungibleTokenButtonTapped
 		case createMultipleFungibleTokenButtonTapped
 		case createMultipleNonFungibleTokenButtonTapped
-		case createPreAuthorizationButtonTapped
 		case deleteAccountButtonTapped
 		#endif // DEBUG
 	}
@@ -97,7 +96,6 @@ struct DevAccountPreferences: Sendable, FeatureReducer {
 
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.dappInteractionClient) var dappInteractionClient
 
 	#if DEBUG
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
@@ -199,31 +197,6 @@ struct DevAccountPreferences: Sendable, FeatureReducer {
 				await send(.internal(.reviewTransaction(manifest)))
 			} catch: { error, _ in
 				loggerGlobal.warning("Failed to create manifest which turns account into dapp definition account type, error: \(error)")
-			}
-		case .createPreAuthorizationButtonTapped:
-			return .run { _ in
-				// TODO: Get Manifest from Sargon
-				let manifest = """
-				CALL_METHOD
-					  Address("component_tdx_2_1cptxxxxxxxxxfaucetxxxxxxxxx000527798379xxxxxxxxxyulkzl")
-					  "free"
-					;
-
-					CALL_METHOD
-					  Address("account_tdx_2_1299trm47s3x648jemhu3lfm4d6gt73289rd9s2hpdjm3tp5pdwq4m5")
-					  "try_deposit_batch_or_abort"
-					  Expression("ENTIRE_WORKTOP")
-					  Enum<0u8>()
-					;
-
-				YIELD_TO_PARENT;
-				"""
-				let unvalidatedManifest = UnvalidatedSubintentManifest(subintentManifestString: manifest, blobs: Blobs([]))
-
-				_ = await dappInteractionClient.addWalletInteraction(
-					.preAuthorization(.init(request: .init(unvalidatedManifest: unvalidatedManifest))),
-					.accountTransfer
-				)
 			}
 
 		#endif
