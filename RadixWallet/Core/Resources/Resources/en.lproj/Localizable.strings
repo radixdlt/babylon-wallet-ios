@@ -1373,3 +1373,7 @@ Code: %@";
 "interactionReview_depositExceptions_depositorChangeRemove" = "Remove Depositor";
 "interactionReview_hiddenAsset_deposit" = "This asset is hidden and will not be visible in your Account";
 "interactionReview_hiddenAsset_withdraw" = "This asset is hidden and is not visible in your Account";
+"interactionReview_unknown_deposits" = "Unknown deposits to this account may occur";
+"interactionReview_unknown_amount" = "Amount of deposit is unknown";
+"interactionReview_atLeast" = "At least";
+"interactionReview_noMoreThan" = "No more than";
