@@ -1023,7 +1023,7 @@ extension DappInteractionFlow.Path.State {
 				challenge: item.challenge
 			))
 
-		case let .remote(.send(item)):
+		case let .remote(.submitTransaction(item)):
 			self.state = .reviewTransaction(.init(
 				unvalidatedManifest: item.unvalidatedManifest,
 				nonce: .secureRandom(),
@@ -1037,7 +1037,7 @@ extension DappInteractionFlow.Path.State {
 				p2pRoute: p2pRoute
 			))
 
-		case let .remote(.subintent(item)):
+		case let .remote(.signSubintent(item)):
 			self.state = .preAuthorizationReview(.init(
 				unvalidatedManifest: item.unvalidatedManifest,
 				expiration: item.expiration,
