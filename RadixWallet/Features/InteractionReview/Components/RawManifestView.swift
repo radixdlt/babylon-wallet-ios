@@ -2,17 +2,16 @@ import SwiftUI
 
 extension InteractionReview {
 	struct RawManifestView: SwiftUI.View {
+		@Dependency(\.pasteboardClient) var pasteboardClient
+
 		let manifest: String
-		let copyAction: () -> Void
 		let toggleAction: (() -> Void)?
 
 		init(
 			manifest: String,
-			copyAction: @escaping () -> Void,
 			toggleAction: (() -> Void)? = nil
 		) {
 			self.manifest = manifest
-			self.copyAction = copyAction
 			self.toggleAction = toggleAction
 		}
 
@@ -33,7 +32,9 @@ extension InteractionReview {
 		}
 
 		private var copyButton: some View {
-			Button(action: copyAction) {
+			Button {
+				pasteboardClient.copyString(manifest)
+			} label: {
 				HStack(spacing: .small3) {
 					AssetIcon(.asset(AssetResource.copy))
 					Text(L10n.Common.copy)

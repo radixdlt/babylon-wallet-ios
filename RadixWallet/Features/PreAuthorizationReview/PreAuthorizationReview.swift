@@ -25,7 +25,6 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 	enum ViewAction: Sendable, Equatable {
 		case appeared
 		case toggleDisplayModeButtonTapped
-		case copyRawManifestButtonTapped
 	}
 
 	@CasePathable
@@ -63,7 +62,6 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.continuousClock) var clock
-	@Dependency(\.pasteboardClient) var pasteboardClient
 	@Dependency(\.preAuthorizationClient) var preAuthorizationClient
 	@Dependency(\.errorQueue) var errorQueue
 
@@ -100,14 +98,6 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 				state.displayMode = .detailed
 				return .none
 			}
-
-		case .copyRawManifestButtonTapped:
-			guard let manifest = state.displayMode.rawManifest else {
-				assertionFailure("Copy raw manifest button should only be visible in raw mode")
-				return .none
-			}
-			pasteboardClient.copyString(manifest)
-			return .none
 		}
 	}
 
@@ -183,7 +173,7 @@ private extension PreAuthorizationReview {
 			return .none
 		}
 
-		state.displayMode = .raw(preview.manifest.manifestString)
+		state.displayMode = .raw(manifest: preview.manifest.manifestString)
 		return .none
 	}
 }

@@ -133,8 +133,6 @@ extension PreAuthorizationReview {
 
 		private func rawManifest(_ manifest: String) -> some SwiftUI.View {
 			Common.RawManifestView(manifest: manifest) {
-				store.send(.view(.copyRawManifestButtonTapped))
-			} toggleAction: {
 				store.send(.view(.toggleDisplayModeButtonTapped))
 			}
 		}
