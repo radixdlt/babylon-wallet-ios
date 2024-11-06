@@ -9,18 +9,6 @@ struct SendableAnyHashable: @unchecked Sendable, Hashable {
 	}
 }
 
-// MARK: - ResourceBalance + Comparable
-extension ResourceBalance: Comparable {
-	static func < (lhs: Self, rhs: Self) -> Bool {
-		switch (lhs, rhs) {
-		case (.known, .known):
-			lhs < rhs
-		default:
-			true
-		}
-	}
-}
-
 // MARK: - KnownResourceBalance + Comparable
 extension KnownResourceBalance: Comparable {
 	static func < (lhs: Self, rhs: Self) -> Bool {

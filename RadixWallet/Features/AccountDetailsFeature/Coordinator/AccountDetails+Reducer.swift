@@ -225,7 +225,7 @@ struct AccountDetails: Sendable, FeatureReducer {
 
 			case let .stakeUnit(resource, details):
 				guard let xrdRedemptionValue = details.xrdRedemptionValue.exactAmount else {
-					fatalError()
+					fatalError("Not possible")
 				}
 
 				state.destination = .stakeUnitDetails(.init(

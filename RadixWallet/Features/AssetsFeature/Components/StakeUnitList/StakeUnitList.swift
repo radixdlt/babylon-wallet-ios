@@ -41,7 +41,7 @@ struct StakeUnitList: Sendable, FeatureReducer {
 				let stakeClaims = details.compactMap(\.stakeClaimTokens).flatMap(\.stakeClaims)
 				let stakedAmount = details.map {
 					guard let exactAmount = $0.xrdRedemptionValue.exactAmount?.nominalAmount else {
-						fatalError()
+						fatalError("Not possible")
 					}
 					return ExactResourceAmount(
 						nominalAmount: exactAmount,
@@ -56,7 +56,7 @@ struct StakeUnitList: Sendable, FeatureReducer {
 
 				let validatorStakes = details.map { stake in
 					guard let xrdRedemptionValue = stake.xrdRedemptionValue.exactAmount?.nominalAmount else {
-						fatalError()
+						fatalError("Not possible")
 					}
 
 					return ValidatorStakeView.ViewState(

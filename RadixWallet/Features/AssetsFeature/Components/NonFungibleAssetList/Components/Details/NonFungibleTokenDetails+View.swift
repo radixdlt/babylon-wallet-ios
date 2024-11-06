@@ -12,6 +12,14 @@ extension NonFungibleTokenDetails.State {
 		ownedResource.map { .success($0.metadata.iconURL) } ?? resourceDetails.metadata.iconURL
 	}
 
+	var token: OnLedgerEntity.NonFungibleToken? {
+		details?.token
+	}
+
+	var amount: ResourceAmount? {
+		details?.amount
+	}
+
 	var resourceDetailsViewState: AssetResourceDetailsSection.ViewState {
 		.init(
 			description: resourceDetails.metadata.description,
@@ -115,28 +123,23 @@ extension NonFungibleTokenDetails {
 										ResourceBalanceView.AmountView(amount: .init(amount), appearance: .large)
 									}
 								}
-								.lineLimit(1)
-								.frame(maxWidth: .infinity, alignment: .leading)
-								.padding(.top, .small1)
-								.padding(.horizontal, .large2)
-								.padding(.bottom, .medium1)
-							}
 
-							AssetResourceDetailsSection(viewState: store.resourceDetailsViewState)
+								AssetResourceDetailsSection(viewState: store.resourceDetailsViewState)
 
-							if let childStore = store.scope(state: \.hideResource, action: \.child.hideResource) {
-								HideResource.View(store: childStore)
-									.padding(.vertical, .medium1)
+								if let childStore = store.scope(state: \.hideResource, action: \.child.hideResource) {
+									HideResource.View(store: childStore)
+										.padding(.vertical, .medium1)
+								}
 							}
+							.padding(.vertical, .medium1)
+							.background(.app.gray5, ignoresSafeAreaEdges: .bottom)
 						}
-						.padding(.vertical, .medium1)
-						.background(.app.gray5, ignoresSafeAreaEdges: .bottom)
 					}
 				}
-			}
-			.foregroundColor(.app.gray1)
-			.task { @MainActor in
-				await store.send(.view(.task)).finish()
+				.foregroundColor(.app.gray1)
+				.task { @MainActor in
+					await store.send(.view(.task)).finish()
+				}
 			}
 		}
 	}

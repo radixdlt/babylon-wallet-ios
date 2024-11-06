@@ -15,14 +15,6 @@ struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 		let isClaimStakeEnabled: Bool
 		var hideResource: HideResource.State?
 
-		var token: OnLedgerEntity.NonFungibleToken? {
-			details?.token
-		}
-
-		var amount: ResourceAmount? {
-			details?.amount
-		}
-
 		init(
 			resourceAddress: ResourceAddress,
 			resourceDetails: Loadable<OnLedgerEntity.Resource> = .idle,

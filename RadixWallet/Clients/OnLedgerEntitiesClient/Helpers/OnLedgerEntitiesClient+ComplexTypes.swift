@@ -112,7 +112,7 @@ extension OnLedgerEntitiesClient {
 
 		if let poolContribution = poolContributions.first(where: { $0.poolUnitsResourceAddress == resourceAddress }) {
 			guard let amount = amount.exactAmount?.nominalAmount else {
-				fatalError()
+				fatalError("Not possible")
 			}
 			// If this transfer does not contain all the pool units, scale the resource amounts pro rata
 			let adjustmentFactor = amount != poolContribution.poolUnitsAmount ? (amount / poolContribution.poolUnitsAmount) : 1
@@ -189,7 +189,7 @@ extension OnLedgerEntitiesClient {
 			worth = amount.adjustedNominalAmount { $0 * validator.xrdVaultBalance / totalSupply }
 		} else {
 			guard let exactAmount = amount.exactAmount else {
-				fatalError()
+				fatalError("Not possible")
 			}
 			if let stake = validatorStakes.first(where: { $0.validatorAddress == validator.address }) {
 				guard stake.liquidStakeUnitAddress == validator.stakeUnitResourceAddress else {
