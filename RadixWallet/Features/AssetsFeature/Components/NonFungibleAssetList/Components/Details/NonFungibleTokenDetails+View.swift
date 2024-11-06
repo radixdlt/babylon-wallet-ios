@@ -122,22 +122,21 @@ extension NonFungibleTokenDetails {
 								.padding(.bottom, .medium1)
 							}
 
-								AssetResourceDetailsSection(viewState: store.resourceDetailsViewState)
+							AssetResourceDetailsSection(viewState: store.resourceDetailsViewState)
 
-								if let childStore = store.scope(state: \.hideResource, action: \.child.hideResource) {
-									HideResource.View(store: childStore)
-										.padding(.vertical, .medium1)
-								}
+							if let childStore = store.scope(state: \.hideResource, action: \.child.hideResource) {
+								HideResource.View(store: childStore)
+									.padding(.vertical, .medium1)
 							}
-							.padding(.vertical, .medium1)
-							.background(.app.gray5, ignoresSafeAreaEdges: .bottom)
 						}
+						.padding(.vertical, .medium1)
+						.background(.app.gray5, ignoresSafeAreaEdges: .bottom)
 					}
 				}
-				.foregroundColor(.app.gray1)
-				.task { @MainActor in
-					await store.send(.view(.task)).finish()
-				}
+			}
+			.foregroundColor(.app.gray1)
+			.task { @MainActor in
+				await store.send(.view(.task)).finish()
 			}
 		}
 	}
