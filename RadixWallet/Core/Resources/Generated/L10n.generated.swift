@@ -1522,8 +1522,8 @@ internal enum L10n {
     /// You are responsible for the security of your Seed Phrase
     internal static let seedPhraseSecurityInfo = L10n.tr("Localizable", "displayMnemonics_seedPhraseSecurityInfo", fallback: "You are responsible for the security of your Seed Phrase")
     internal enum CautionAlert {
-      /// A seed phrase provides full control of its Accounts. Do not view in a area. Write down the seed phrase words securely. Screenshots are disabled.
-      internal static let message = L10n.tr("Localizable", "displayMnemonics_cautionAlert_message", fallback: "A seed phrase provides full control of its Accounts. Do not view in a area. Write down the seed phrase words securely. Screenshots are disabled.")
+      /// A seed phrase provides full control of its Accounts. Do not view in a public area. Write down the seed phrase words securely. Screenshots are disabled.
+      internal static let message = L10n.tr("Localizable", "displayMnemonics_cautionAlert_message", fallback: "A seed phrase provides full control of its Accounts. Do not view in a public area. Write down the seed phrase words securely. Screenshots are disabled.")
       /// Reveal Seed Phrase
       internal static let revealButtonLabel = L10n.tr("Localizable", "displayMnemonics_cautionAlert_revealButtonLabel", fallback: "Reveal Seed Phrase")
       /// Use Caution
@@ -2449,7 +2449,7 @@ internal enum L10n {
       internal static let radixconnector = L10n.tr("Localizable", "infoLink_glossary_radixconnector", fallback: "## Radix Connector Browser Extension\n\nWhen you want to use [dApp websites](?glossaryAnchor=dapps) on your desktop web browser, the Radix Connect browser extension helps make the connection to your [Radix Wallet](?glossaryAnchor=radixwallet) mobile app, quickly and securely.\n\n---\n\nAll you need to do is install it in your preferred desktop browser, link it to your Radix Wallet app via QR code, and it sits quietly in the background making the magic happen. It will also give you your list of [Accounts](?glossaryAnchor=accounts) for easy copying of addresses on desktop.\n\nTo download and set up the Radix Connector browser extension, visit **wallet.radixdlt.com** in your preferred desktop browser.\n\n[Learn more about the Radix Connector browser extension](https://learn.radixdlt.com/article/what-is-the-radix-connector-browser-extension) ↗")
       /// ## The Radix Network
       /// 
-      /// Radix is an open network that makes [web3](?glossaryAnchor=web3) possible. Think of the Radix Network as a place on the internet where users can directly control their own digital assets, and where those assets can move effortlessly between users and applications – without relying on any company.
+      /// Radix is an open network that makes [web3](?glossaryAnchor=web3) possible. Think of the Radix Network as a public place on the internet where users can directly control their own digital assets, and where those assets can move effortlessly between users and applications – without relying on any company.
       /// 
       /// ---
       /// 
@@ -2458,7 +2458,7 @@ internal enum L10n {
       /// [Visit the official Radix homepage](https://radixdlt.com) ↗
       /// 
       /// [Learn more about the Radix Network](https://learn.radixdlt.com/article/what-are-the-radix-public-network-and-radix-ledger) ↗
-      internal static let radixnetwork = L10n.tr("Localizable", "infoLink_glossary_radixnetwork", fallback: "## The Radix Network\n\nRadix is an open network that makes [web3](?glossaryAnchor=web3) possible. Think of the Radix Network as a place on the internet where users can directly control their own digital assets, and where those assets can move effortlessly between users and applications – without relying on any company.\n\n---\n\nYou can view and freely [transfer](?glossaryAnchor=transfers) your assets on the Radix Network using the [Radix Wallet](?glossaryAnchor=radixwallet) app. Applications built using the Radix Network’s capabilities (called [dApps](?glossaryAnchor=dapps) have the ability to interact with these assets and identities, letting you do things that weren't possible before on the web.\n\n[Visit the official Radix homepage](https://radixdlt.com) ↗\n\n[Learn more about the Radix Network](https://learn.radixdlt.com/article/what-are-the-radix-public-network-and-radix-ledger) ↗")
+      internal static let radixnetwork = L10n.tr("Localizable", "infoLink_glossary_radixnetwork", fallback: "## The Radix Network\n\nRadix is an open network that makes [web3](?glossaryAnchor=web3) possible. Think of the Radix Network as a public place on the internet where users can directly control their own digital assets, and where those assets can move effortlessly between users and applications – without relying on any company.\n\n---\n\nYou can view and freely [transfer](?glossaryAnchor=transfers) your assets on the Radix Network using the [Radix Wallet](?glossaryAnchor=radixwallet) app. Applications built using the Radix Network’s capabilities (called [dApps](?glossaryAnchor=dapps) have the ability to interact with these assets and identities, letting you do things that weren't possible before on the web.\n\n[Visit the official Radix homepage](https://radixdlt.com) ↗\n\n[Learn more about the Radix Network](https://learn.radixdlt.com/article/what-are-the-radix-public-network-and-radix-ledger) ↗")
       /// ## Radix Wallet
       /// 
       /// The Radix Wallet is an iOS and Android mobile app that is your gateway to the capabilities of the Radix Network.
@@ -2608,6 +2608,8 @@ internal enum L10n {
     }
   }
   internal enum InteractionReview {
+    /// At least
+    internal static let atLeast = L10n.tr("Localizable", "interactionReview_atLeast", fallback: "At least")
     /// Claim from validators
     internal static let claimFromValidatorsHeading = L10n.tr("Localizable", "interactionReview_claimFromValidatorsHeading", fallback: "Claim from validators")
     /// Customize Guarantees
@@ -2622,6 +2624,8 @@ internal enum L10n {
     internal static let guaranteed = L10n.tr("Localizable", "interactionReview_guaranteed", fallback: "Guaranteed")
     /// Message
     internal static let messageHeading = L10n.tr("Localizable", "interactionReview_messageHeading", fallback: "Message")
+    /// No more than
+    internal static let noMoreThan = L10n.tr("Localizable", "interactionReview_noMoreThan", fallback: "No more than")
     /// Contributing to pools
     internal static let poolContributionHeading = L10n.tr("Localizable", "interactionReview_poolContributionHeading", fallback: "Contributing to pools")
     /// Redeeming from pools
@@ -2681,6 +2685,12 @@ internal enum L10n {
       internal static let deposit = L10n.tr("Localizable", "interactionReview_hiddenAsset_deposit", fallback: "This asset is hidden and will not be visible in your Account")
       /// This asset is hidden and is not visible in your Account
       internal static let withdraw = L10n.tr("Localizable", "interactionReview_hiddenAsset_withdraw", fallback: "This asset is hidden and is not visible in your Account")
+    }
+    internal enum Unknown {
+      /// Amount of deposit is unknown
+      internal static let amount = L10n.tr("Localizable", "interactionReview_unknown_amount", fallback: "Amount of deposit is unknown")
+      /// Unknown deposits to this account may occur
+      internal static let deposits = L10n.tr("Localizable", "interactionReview_unknown_deposits", fallback: "Unknown deposits to this account may occur")
     }
   }
   internal enum LedgerHardwareDevices {
