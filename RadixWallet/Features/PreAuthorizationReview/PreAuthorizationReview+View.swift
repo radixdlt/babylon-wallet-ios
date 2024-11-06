@@ -133,8 +133,6 @@ extension PreAuthorizationReview {
 
 		private func rawManifest(_ manifest: String) -> some SwiftUI.View {
 			Common.RawManifestView(manifest: manifest) {
-				store.send(.view(.copyRawManifestButtonTapped))
-			} toggleAction: {
 				store.send(.view(.toggleDisplayModeButtonTapped))
 			}
 		}
@@ -190,7 +188,7 @@ extension PreAuthorizationReview {
 				case .atTime:
 					if let seconds = secondsToExpiration {
 						if seconds > 0 {
-							let value = formatTime(seconds: seconds)
+							let value = TimeFormatter.format(seconds: seconds)
 							Text(markdown: L10n.PreAuthorizationReview.Expiration.atTime(value), emphasizedColor: .app.account4pink, emphasizedFont: .app.body2Link)
 						} else {
 							Text(L10n.PreAuthorizationReview.Expiration.expired)
@@ -198,7 +196,7 @@ extension PreAuthorizationReview {
 					}
 
 				case let .afterDelay(value):
-					let value = formatTime(seconds: Int(value.expireAfterSeconds))
+					let value = TimeFormatter.format(seconds: Int(value.expireAfterSeconds))
 					Text(markdown: L10n.PreAuthorizationReview.Expiration.afterDelay(value), emphasizedColor: .app.account4pink, emphasizedFont: .app.body2Link)
 
 				case nil:
@@ -209,34 +207,6 @@ extension PreAuthorizationReview {
 			.foregroundStyle(.app.account4pink)
 			.padding(.horizontal, .medium1)
 			.frame(minHeight: .huge2)
-		}
-	}
-}
-
-private extension PreAuthorizationReview.View {
-	/// Given an amount of seconds, returns a formatted String using the corresponding unit (days/hours/minutes/seconds).
-	/// A few examples on how should it look for each of them:
-	/// - `8 days` / `1 day`
-	/// - `23:21 hours` / `1:24 hour`
-	/// - `56:02 minutes` / `1:23 minute`
-	/// - `34 seconds` / `1 second`
-	func formatTime(seconds: Int) -> String {
-		typealias S = L10n.PreAuthorizationReview.TimeFormat
-		let minutes = seconds / 60
-		let hours = minutes / 60
-		let days = hours / 24
-		if days > 0 {
-			return days == 1 ? S.day : S.days(days)
-		} else if hours > 0 {
-			let remainingMinutes = minutes % 60
-			let formatted = String(format: "%d:%02d", hours, remainingMinutes)
-			return hours == 1 ? S.hour(formatted) : S.hours(formatted)
-		} else if minutes > 0 {
-			let remainingSeconds = seconds % 60
-			let formatted = String(format: "%d:%02d", minutes, remainingSeconds)
-			return minutes == 1 ? S.minute(formatted) : S.minutes(formatted)
-		} else {
-			return seconds == 1 ? S.second : S.seconds(seconds)
 		}
 	}
 }

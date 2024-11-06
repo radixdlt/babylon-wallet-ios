@@ -120,9 +120,7 @@ extension TransactionReview {
 					header(viewStore.proposingDappMetadata)
 
 					if let manifest = viewStore.rawManifest {
-						Common.RawManifestView(manifest: manifest) {
-							viewStore.send(.copyRawTransactionTapped)
-						}
+						Common.RawManifestView(manifest: manifest)
 					} else {
 						VStack(spacing: .medium1) {
 							messageSection(with: viewStore.message)

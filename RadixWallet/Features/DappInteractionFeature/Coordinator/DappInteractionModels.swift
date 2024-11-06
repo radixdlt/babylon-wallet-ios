@@ -109,10 +109,10 @@ extension DappToWalletInteraction {
 		case accountsProofOfOwnership(AccountsProofOfOwnership)
 
 		// transactions
-		case send(DappToWalletInteractionSendTransactionItem)
+		case submitTransaction(DappToWalletInteractionSendTransactionItem)
 
 		// preAuthorization
-		case subintent(DappToWalletInteractionSubintentRequestItem)
+		case signSubintent(DappToWalletInteractionSubintentRequestItem)
 
 		var priority: some Comparable {
 			switch self {
@@ -132,10 +132,10 @@ extension DappToWalletInteraction {
 			case .accountsProofOfOwnership:
 				6
 			// transactions
-			case .send:
+			case .submitTransaction:
 				0
 			// preAuthorization
-			case .subintent:
+			case .signSubintent:
 				0
 			}
 		}
@@ -165,12 +165,12 @@ extension DappToWalletInteraction {
 			items.proofOfOwnership.splitted
 		case let .transaction(items):
 			[
-				.send(items.send),
+				.submitTransaction(items.send),
 			]
 			.compactMap { $0 }
 		case let .preAuthorization(items):
 			[
-				.subintent(items.request),
+				.signSubintent(items.request),
 			]
 		}
 	}

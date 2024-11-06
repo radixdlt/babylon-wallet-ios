@@ -88,7 +88,6 @@ struct TransactionReview: Sendable, FeatureReducer {
 	enum ViewAction: Sendable, Equatable {
 		case appeared
 		case showRawTransactionTapped
-		case copyRawTransactionTapped
 		case approvalSliderSlid
 	}
 
@@ -155,7 +154,6 @@ struct TransactionReview: Sendable, FeatureReducer {
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.pasteboardClient) var pasteboardClient
 
 	init() {}
 
@@ -202,14 +200,6 @@ struct TransactionReview: Sendable, FeatureReducer {
 				state.displayMode = .detailed
 				return .none
 			}
-
-		case .copyRawTransactionTapped:
-			guard case let .raw(manifest) = state.displayMode else {
-				assertionFailure("Copy raw manifest button should only be visible in raw transaction mode")
-				return .none
-			}
-			pasteboardClient.copyString(manifest)
-			return .none
 
 		case .approvalSliderSlid:
 			state.canApproveTX = false
@@ -491,7 +481,7 @@ extension TransactionReview {
 	func showRawTransaction(_ state: inout State) -> Effect<Action> {
 		do {
 			let manifest = try transactionManifestWithWalletInstructionsAdded(state)
-			state.displayMode = .raw(manifest.instructionsString)
+			state.displayMode = .raw(manifest: manifest.instructionsString)
 		} catch {
 			errorQueue.schedule(error)
 		}
