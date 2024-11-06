@@ -115,6 +115,12 @@ extension NonFungibleTokenDetails {
 										ResourceBalanceView.AmountView(amount: .init(amount), appearance: .large)
 									}
 								}
+								.lineLimit(1)
+								.frame(maxWidth: .infinity, alignment: .leading)
+								.padding(.top, .small1)
+								.padding(.horizontal, .large2)
+								.padding(.bottom, .medium1)
+							}
 
 								AssetResourceDetailsSection(viewState: store.resourceDetailsViewState)
 
