@@ -13,8 +13,8 @@ struct PreAuthorizationReviewTests {
 		let values: [Int: String] = [
 			1: "1 second",
 			34: "34 seconds",
-			minute + 23: "1:23 minute",
-			56 * minute + 2: "56:02 minutes",
+			minute + 23: "1 minute",
+			56 * minute + 2: "56 minutes",
 			hour + 24 * minute: "1:24 hour",
 			23 * hour + 21 * minute: "23:21 hours",
 			day: "1 day",

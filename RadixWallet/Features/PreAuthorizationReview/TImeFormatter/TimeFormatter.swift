@@ -3,7 +3,7 @@ extension PreAuthorizationReview {
 	/// A few examples on how should it look for each of them:
 	/// - `8 days` / `1 day`
 	/// - `23:21 hours` / `1:24 hour`
-	/// - `56:02 minutes` / `1:23 minute`
+	/// - `56 minutes` / `1 minute`
 	/// - `34 seconds` / `1 second`
 	enum TimeFormatter {
 		static func format(seconds: Int) -> String {
@@ -18,8 +18,7 @@ extension PreAuthorizationReview {
 				let formatted = String(format: "%d:%02d", hours, remainingMinutes)
 				return hours == 1 ? S.hour(formatted) : S.hours(formatted)
 			} else if minutes > 0 {
-				let remainingSeconds = seconds % 60
-				let formatted = String(format: "%d:%02d", minutes, remainingSeconds)
+				let formatted = "\(minutes)"
 				return minutes == 1 ? S.minute(formatted) : S.minutes(formatted)
 			} else {
 				return seconds == 1 ? S.second : S.seconds(seconds)
