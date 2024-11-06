@@ -60,8 +60,8 @@ struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 // MARK: - TransactionReviewGuarantee
 struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 	struct State: Identifiable, Sendable, Hashable {
-		let id: TransactionReview.Transfer.ID
-		let account: TransactionReview.ReviewAccount
+		let id: InteractionReview.Transfer.ID
+		let account: InteractionReview.ReviewAccount
 		let resource: OnLedgerEntity.Resource
 		let thumbnail: Thumbnail.FungibleContent
 		let amount: Decimal192
@@ -70,8 +70,8 @@ struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 		var percentageStepper: MinimumPercentageStepper.State
 
 		init?(
-			account: TransactionReview.ReviewAccount,
-			transfer: TransactionReview.Transfer
+			account: InteractionReview.ReviewAccount,
+			transfer: InteractionReview.Transfer
 		) {
 			self.id = transfer.id
 			self.account = account

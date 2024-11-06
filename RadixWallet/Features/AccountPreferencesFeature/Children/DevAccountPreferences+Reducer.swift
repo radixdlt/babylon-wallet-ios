@@ -198,6 +198,7 @@ struct DevAccountPreferences: Sendable, FeatureReducer {
 			} catch: { error, _ in
 				loggerGlobal.warning("Failed to create manifest which turns account into dapp definition account type, error: \(error)")
 			}
+
 		#endif
 		}
 	}

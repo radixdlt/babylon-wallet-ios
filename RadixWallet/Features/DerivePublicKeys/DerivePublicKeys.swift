@@ -491,7 +491,7 @@ extension SLIP10Curve {
 private extension AlertState<DerivePublicKeys.Destination.Action.AlertAction> {
 	static let failedToFindFactorSourceAlert: AlertState = .init(
 		title: {
-			TextState(L10n.TransactionReview.NoMnemonicError.title)
+			TextState(L10n.Common.NoMnemonicAlert.title)
 		},
 		actions: {
 			ButtonState(action: .ok) {
@@ -499,7 +499,7 @@ private extension AlertState<DerivePublicKeys.Destination.Action.AlertAction> {
 			}
 		},
 		message: {
-			TextState(L10n.TransactionReview.NoMnemonicError.text)
+			TextState(L10n.Common.NoMnemonicAlert.text)
 		}
 	)
 }

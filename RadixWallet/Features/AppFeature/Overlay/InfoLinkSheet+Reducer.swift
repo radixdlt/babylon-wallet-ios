@@ -58,6 +58,8 @@ extension InfoLinkSheet {
 		case dashboard
 		case bridging
 		case payingaccount
+		case preauthorizations
+		case possibledappcalls
 	}
 }
 
@@ -153,6 +155,10 @@ extension InfoLinkSheet.GlossaryItem {
 			L10n.InfoLink.Glossary.bridging
 		case .payingaccount:
 			L10n.InfoLink.Glossary.payingaccount
+		case .preauthorizations:
+			L10n.InfoLink.Glossary.preauthorizations
+		case .possibledappcalls:
+			L10n.InfoLink.Glossary.possibledappcalls
 		}
 	}
 }

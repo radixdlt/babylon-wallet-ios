@@ -1,40 +1,12 @@
 import ComposableArchitecture
 import SwiftUI
 
-extension TransactionReview {
-	struct DepositExceptionsState: Sendable, Hashable {
-		var changes: IdentifiedArrayOf<DepositExceptionsChange>
-	}
+extension InteractionReview {
+	typealias DepositExceptionsState = DepositExceptionsView.ViewState
+	typealias DepositExceptionsChange = DepositExceptionsView.Change
 
-	struct DepositExceptionsChange: Sendable, Identifiable, Hashable {
-		var id: AccountAddress.ID { account.address.id }
-		let account: Account
-		let resourcePreferenceChanges: IdentifiedArrayOf<ResourcePreferenceChange>
-		let allowedDepositorChanges: IdentifiedArrayOf<AllowedDepositorChange>
-
-		struct ResourcePreferenceChange: Sendable, Identifiable, Hashable {
-			var id: OnLedgerEntity.Resource.ID { resource.id }
-			let resource: OnLedgerEntity.Resource
-			let change: ResourcePreferenceUpdate
-		}
-
-		struct AllowedDepositorChange: Sendable, Identifiable, Hashable {
-			var id: OnLedgerEntity.Resource.ID { resource.id }
-			let resource: OnLedgerEntity.Resource
-			let change: Change
-
-			enum Change: Sendable, Hashable {
-				case added
-				case removed
-			}
-		}
-	}
-}
-
-// MARK: - TransactionReview.View.DepositExceptionsView
-extension TransactionReview.View {
 	struct DepositExceptionsView: View {
-		var viewState: TransactionReview.DepositExceptionsState
+		var viewState: ViewState
 
 		var body: some View {
 			Card {
@@ -48,7 +20,7 @@ extension TransactionReview.View {
 		}
 
 		struct AccountView: View {
-			let change: TransactionReview.DepositExceptionsChange
+			let change: Change
 
 			var body: some View {
 				InnerCard {
@@ -99,6 +71,36 @@ extension TransactionReview.View {
 	}
 }
 
+extension InteractionReview.DepositExceptionsView {
+	struct ViewState: Sendable, Hashable {
+		var changes: IdentifiedArrayOf<Change>
+	}
+
+	struct Change: Sendable, Identifiable, Hashable {
+		var id: AccountAddress.ID { account.address.id }
+		let account: Account
+		let resourcePreferenceChanges: IdentifiedArrayOf<ResourcePreferenceChange>
+		let allowedDepositorChanges: IdentifiedArrayOf<AllowedDepositorChange>
+
+		struct ResourcePreferenceChange: Sendable, Identifiable, Hashable {
+			var id: OnLedgerEntity.Resource.ID { resource.id }
+			let resource: OnLedgerEntity.Resource
+			let change: ResourcePreferenceUpdate
+		}
+
+		struct AllowedDepositorChange: Sendable, Identifiable, Hashable {
+			var id: OnLedgerEntity.Resource.ID { resource.id }
+			let resource: OnLedgerEntity.Resource
+			let change: Change
+
+			enum Change: Sendable, Hashable {
+				case added
+				case removed
+			}
+		}
+	}
+}
+
 extension ResourcePreferenceUpdate {
 	var image: ImageAsset {
 		switch self {
@@ -114,16 +116,16 @@ extension ResourcePreferenceUpdate {
 	var text: String {
 		switch self {
 		case .set(.allowed):
-			L10n.TransactionReview.AccountDepositSettings.assetChangeAllow
+			L10n.InteractionReview.DepositExceptions.assetChangeAllow
 		case .set(.disallowed):
-			L10n.TransactionReview.AccountDepositSettings.assetChangeDisallow
+			L10n.InteractionReview.DepositExceptions.assetChangeDisallow
 		case .remove:
-			L10n.TransactionReview.AccountDepositSettings.assetChangeClear
+			L10n.InteractionReview.DepositExceptions.assetChangeClear
 		}
 	}
 }
 
-extension TransactionReview.DepositExceptionsChange.AllowedDepositorChange.Change {
+extension InteractionReview.DepositExceptionsChange.AllowedDepositorChange.Change {
 	var image: ImageAsset {
 		switch self {
 		case .added:
@@ -136,9 +138,9 @@ extension TransactionReview.DepositExceptionsChange.AllowedDepositorChange.Chang
 	var text: String {
 		switch self {
 		case .added:
-			L10n.TransactionReview.AccountDepositSettings.depositorChangeAdd
+			L10n.InteractionReview.DepositExceptions.depositorChangeAdd
 		case .removed:
-			L10n.TransactionReview.AccountDepositSettings.depositorChangeRemove
+			L10n.InteractionReview.DepositExceptions.depositorChangeRemove
 		}
 	}
 }

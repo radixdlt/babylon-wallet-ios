@@ -145,6 +145,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case reviewTransaction(TransactionReview.State)
 			case personaProofOfOwnership(ProofOfOwnership.State)
 			case accountsProofOfOwnership(ProofOfOwnership.State)
+			case preAuthorizationReview(PreAuthorizationReview.State)
 		}
 
 		@CasePathable
@@ -157,6 +158,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case reviewTransaction(TransactionReview.Action)
 			case personaProofOfOwnership(ProofOfOwnership.Action)
 			case accountsProofOfOwnership(ProofOfOwnership.Action)
+			case preAuthorizationReview(PreAuthorizationReview.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -184,6 +186,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				}
 				Scope(state: \.accountsProofOfOwnership, action: \.accountsProofOfOwnership) {
 					ProofOfOwnership()
+				}
+				Scope(state: \.preAuthorizationReview, action: \.preAuthorizationReview) {
+					PreAuthorizationReview()
 				}
 			}
 		}
@@ -505,6 +510,13 @@ extension DappInteractionFlow {
 			return continueEffect(for: &state)
 		}
 
+		func handlePreAuthorizationFailure(
+			_ error: PreAuthorizationFailure
+		) -> Effect<Action> {
+			let (errorKind, message) = error.errorKindAndMessage
+			return dismissEffect(for: state, errorKind: errorKind, message: message)
+		}
+
 		let item = state.currentItem
 
 		guard let action = childAction.action else { return .none }
@@ -564,6 +576,9 @@ extension DappInteractionFlow {
 		case .personaProofOfOwnership(.delegate(.failedToSign)),
 		     .accountsProofOfOwnership(.delegate(.failedToSign)):
 			return dismissEffect(for: state, errorKind: .failedToSignAuthChallenge, message: nil)
+
+		case let .preAuthorizationReview(.delegate(.failed(error))):
+			return handlePreAuthorizationFailure(error)
 
 		default:
 			return .none
@@ -1008,7 +1023,7 @@ extension DappInteractionFlow.Path.State {
 				challenge: item.challenge
 			))
 
-		case let .remote(.send(item)):
+		case let .remote(.submitTransaction(item)):
 			self.state = .reviewTransaction(.init(
 				unvalidatedManifest: item.unvalidatedManifest,
 				nonce: .secureRandom(),
@@ -1020,6 +1035,14 @@ extension DappInteractionFlow.Path.State {
 				isWalletTransaction: interaction.interactionId.isWalletInteraction,
 				proposingDappMetadata: dappMetadata.onLedger,
 				p2pRoute: p2pRoute
+			))
+
+		case let .remote(.signSubintent(item)):
+			self.state = .preAuthorizationReview(.init(
+				unvalidatedManifest: item.unvalidatedManifest,
+				expiration: item.expiration,
+				nonce: .secureRandom(),
+				dAppMetadata: dappMetadata.onLedger
 			))
 		}
 	}

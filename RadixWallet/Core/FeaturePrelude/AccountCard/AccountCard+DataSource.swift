@@ -48,7 +48,7 @@ extension AccountCard where Trailing == EmptyView, Bottom == EmptyView {
 		)
 	}
 
-	init(kind: Kind = .innerCompact, account: TransactionReview.ReviewAccount) {
+	init(kind: Kind = .innerCompact, account: InteractionReview.ReviewAccount) {
 		switch account {
 		case let .user(account):
 			self.init(kind: kind, account: account)
@@ -98,7 +98,7 @@ private extension AccountForDisplay {
 
 private extension AccountAddress {
 	var asDataSource: AccountCardDataSource {
-		.init(title: L10n.TransactionReview.externalAccountName, ledgerIdentifiable: .address(.account(self)), gradient: .external)
+		.init(title: L10n.InteractionReview.externalAccountName, ledgerIdentifiable: .address(.account(self)), gradient: .external)
 	}
 }
 

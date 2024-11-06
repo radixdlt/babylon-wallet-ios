@@ -515,8 +515,8 @@ private func key(factorSourceID: FactorSourceIDFromHash) -> KeychainClient.Key {
 
 extension OverlayWindowClient.Item.AlertState {
 	fileprivate static let missingMnemonicAlert = Self(
-		title: { TextState(L10n.TransactionReview.NoMnemonicError.title) },
-		message: { TextState(L10n.TransactionReview.NoMnemonicError.text) }
+		title: { TextState(L10n.Common.NoMnemonicAlert.title) },
+		message: { TextState(L10n.Common.NoMnemonicAlert.text) }
 	)
 }
 

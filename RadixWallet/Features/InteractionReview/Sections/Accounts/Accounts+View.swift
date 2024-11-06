@@ -1,37 +1,23 @@
 import ComposableArchitecture
 import SwiftUI
 
-extension TransactionReviewAccounts.State {
-	var viewState: TransactionReviewAccounts.ViewState {
-		.init(showCustomizeGuaranteesButton: enableCustomizeGuarantees)
-	}
-}
-
-extension TransactionReviewAccounts {
-	struct ViewState: Equatable {
-		let showCustomizeGuaranteesButton: Bool
-	}
-
-	@MainActor
+// MARK: - InteractionReview.Accounts.View
+extension InteractionReview.Accounts {
 	struct View: SwiftUI.View {
-		private let store: StoreOf<TransactionReviewAccounts>
-
-		init(store: StoreOf<TransactionReviewAccounts>) {
-			self.store = store
-		}
+		let store: StoreOf<InteractionReview.Accounts>
 
 		var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			WithPerceptionTracking {
 				Card {
 					VStack(spacing: .small1) {
 						ForEachStore(
 							store.scope(state: \.accounts, action: \.child.account),
-							content: { TransactionReviewAccount.View(store: $0) }
+							content: { InteractionReview.Account.View(store: $0) }
 						)
 
-						if viewStore.showCustomizeGuaranteesButton {
-							Button(L10n.TransactionReview.customizeGuaranteesButtonTitle) {
-								viewStore.send(.customizeGuaranteesTapped)
+						if store.enableCustomizeGuarantees {
+							Button(L10n.InteractionReview.customizeGuaranteesButtonTitle) {
+								store.send(.view(.customizeGuaranteesTapped))
 							}
 							.textStyle(.body1Header)
 							.foregroundColor(.app.blue2)
@@ -45,44 +31,28 @@ extension TransactionReviewAccounts {
 	}
 }
 
-extension TransactionReviewAccount.State {
-	var viewState: TransactionReviewAccount.ViewState {
-		.init(account: account, transfers: transfers.elements, showApprovedMark: account.isApproved, isDeposit: isDeposit)
-	}
-}
-
-// MARK: - TransactionReviewAccount.View
-extension TransactionReviewAccount {
-	struct ViewState: Equatable {
-		let account: TransactionReview.ReviewAccount
-		let transfers: [TransactionReview.Transfer] // FIXME: GK use viewstate?
-		let showApprovedMark: Bool
-		let isDeposit: Bool
-	}
-
-	@MainActor
+// MARK: - InteractionReview.Account.View
+extension InteractionReview.Account {
 	struct View: SwiftUI.View {
-		private let store: StoreOf<TransactionReviewAccount>
-
-		init(store: StoreOf<TransactionReviewAccount>) {
-			self.store = store
-		}
+		let store: StoreOf<InteractionReview.Account>
 
 		var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			WithPerceptionTracking {
 				InnerCard {
-					AccountCard(account: viewStore.account)
+					AccountCard(account: store.account)
 
 					VStack(spacing: .zero) {
-						ForEach(viewStore.transfers) { transfer in
-							TransactionReviewResourceView(transfer: transfer.value, isDeposit: viewStore.isDeposit) { token in
-								viewStore.send(.transferTapped(transfer.value, token))
+						ForEach(store.transfers) { transfer in
+							TransactionReviewResourceView(transfer: transfer.value, isDeposit: store.isDeposit) { token in
+								store.send(.view(.transferTapped(transfer.value, token)))
 							}
 
-							if transfer.id != viewStore.transfers.last?.id {
-								Rectangle()
-									.fill(.app.gray4)
-									.frame(height: 1)
+							WithPerceptionTracking {
+								if transfer.id != store.transfers.last?.id {
+									Rectangle()
+										.fill(.app.gray4)
+										.frame(height: 1)
+								}
 							}
 						}
 					}
@@ -115,7 +85,7 @@ struct TransactionReviewResourceView: View {
 		guard let isHidden = transfer.isHidden, isHidden else {
 			return nil
 		}
-		return isDeposit ? L10n.TransactionReview.HiddenAsset.deposit : L10n.TransactionReview.HiddenAsset.withdraw
+		return isDeposit ? L10n.InteractionReview.HiddenAsset.deposit : L10n.InteractionReview.HiddenAsset.withdraw
 	}
 }
 
