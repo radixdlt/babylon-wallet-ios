@@ -470,7 +470,7 @@ extension ResourceBalanceView {
 					.foregroundStyle(.app.gray4)
 
 				WarningErrorView(
-					text: "Unknown deposits to this account may occur",
+					text: L10n.InteractionReview.Unknown.deposits,
 					type: .warning,
 					useNarrowSpacing: true,
 					useSmallerFontSize: true
@@ -516,7 +516,12 @@ extension ResourceBalanceView {
 				}
 
 				if case .unknown = amount?.amount {
-					WarningErrorView(text: "Amount of deposit is unknown", type: .warning, useNarrowSpacing: true, useSmallerFontSize: true)
+					WarningErrorView(
+						text: L10n.InteractionReview.Unknown.amount,
+						type: .warning,
+						useNarrowSpacing: true,
+						useSmallerFontSize: true
+					)
 				}
 			}
 		}
@@ -560,7 +565,12 @@ extension ResourceBalanceView {
 				}
 
 				if case .unknown = amount?.amount {
-					WarningErrorView(text: "Amount of deposit is unknown", type: .warning, useNarrowSpacing: true, useSmallerFontSize: true)
+					WarningErrorView(
+						text: L10n.InteractionReview.Unknown.amount,
+						type: .warning,
+						useNarrowSpacing: true,
+						useSmallerFontSize: true
+					)
 				}
 			}
 		}
@@ -638,7 +648,7 @@ extension ResourceBalanceView {
 					)
 				case let .atLeast(exactAmount):
 					SubAmountView(
-						title: "At least",
+						title: L10n.InteractionReview.atLeast,
 						amount: exactAmount,
 						guaranteed: amount.guaranteed,
 						appearance: appearance,
@@ -646,7 +656,7 @@ extension ResourceBalanceView {
 					)
 				case let .atMost(exactAmount):
 					SubAmountView(
-						title: "No more than",
+						title: L10n.InteractionReview.noMoreThan,
 						amount: exactAmount,
 						guaranteed: amount.guaranteed,
 						appearance: appearance,
@@ -655,13 +665,13 @@ extension ResourceBalanceView {
 				case let .between(minAmount, maxAmount):
 					VStack(alignment: alignment, spacing: .small3) {
 						SubAmountView(
-							title: "At least",
+							title: L10n.InteractionReview.atLeast,
 							amount: minAmount,
 							appearance: appearance,
 							symbol: symbol
 						)
 						SubAmountView(
-							title: "No more than",
+							title: L10n.InteractionReview.noMoreThan,
 							amount: maxAmount,
 							appearance: appearance,
 							symbol: symbol

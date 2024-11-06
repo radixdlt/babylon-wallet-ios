@@ -23,7 +23,6 @@ extension InteractionReview.Sections {
 			networkID: networkID
 		)
 
-		// Extract Deposits section
 		let deposits = try await extractDeposits(
 			accountDeposits: summary.accountDeposits,
 			entities: resourcesInfo,
@@ -124,7 +123,7 @@ extension InteractionReview.Sections {
 		return .init(accounts: depositAccounts, enableCustomizeGuarantees: requiresGuarantees)
 	}
 
-	func transferInfo(
+	private func transferInfo(
 		accountWithdraw: AccountWithdraw,
 		entities: ResourcesInfo = [:],
 		networkID: NetworkID,
@@ -163,7 +162,7 @@ extension InteractionReview.Sections {
 		}
 	}
 
-	func transferInfo(
+	private func transferInfo(
 		accountDeposits: AccountDeposits,
 		entities: ResourcesInfo = [:],
 		networkID: NetworkID,
