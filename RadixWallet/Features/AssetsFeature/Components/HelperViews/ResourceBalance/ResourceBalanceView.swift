@@ -16,7 +16,7 @@ extension ResourceBalance {
 			let address: ResourceAddress
 			let icon: Thumbnail.FungibleContent
 			let title: String?
-			let amount: KnownResourceBalance.Amount?
+			let amount: ResourceAmount?
 		}
 
 		struct NonFungible: Sendable, Hashable {
@@ -24,14 +24,14 @@ extension ResourceBalance {
 			let resourceImage: URL?
 			let resourceName: String?
 			let nonFungibleName: String?
-			let amount: KnownResourceBalance.Amount?
+			let amount: ResourceAmount?
 		}
 
 		struct LiquidStakeUnit: Sendable, Hashable {
 			let address: ResourceAddress
 			let icon: URL?
 			let title: String?
-			let amount: KnownResourceBalance.Amount?
+			let amount: ResourceAmount?
 			let worth: ResourceAmount
 			var validatorName: String? = nil
 		}
@@ -41,7 +41,7 @@ extension ResourceBalance {
 			let poolUnitAddress: ResourceAddress
 			let poolIcon: URL?
 			let poolName: String?
-			let amount: KnownResourceBalance.Amount?
+			let amount: ResourceAmount?
 			var dAppName: Loadable<String?>
 			var resources: Loadable<[Fungible]>
 		}
@@ -76,7 +76,7 @@ private extension ResourceBalance.ViewState.Fungible {
 			address: resource.resourceAddress,
 			icon: .token(details.isXRD ? .xrd : .other(resource.metadata.iconURL)),
 			title: resource.metadata.title,
-			amount: .init(details.amount, guaranteed: details.guarantee?.amount)
+			amount: details.amount
 		)
 	}
 }
@@ -110,7 +110,7 @@ private extension ResourceBalance.ViewState.LiquidStakeUnit {
 			address: resource.resourceAddress,
 			icon: resource.metadata.iconURL,
 			title: resource.metadata.title,
-			amount: .init(details.amount, guaranteed: details.guarantee?.amount),
+			amount: details.amount,
 			worth: details.worth,
 			validatorName: details.validator.metadata.name
 		)
@@ -124,7 +124,7 @@ private extension ResourceBalance.ViewState.PoolUnit {
 			poolUnitAddress: resource.resourceAddress,
 			poolIcon: resource.metadata.iconURL,
 			poolName: resource.fungibleResourceName,
-			amount: .init(details.details.poolUnitResource.amount, guaranteed: details.guarantee?.amount),
+			amount: details.details.poolUnitResource.amount,
 			dAppName: .success(details.details.dAppName),
 			resources: .success(.init(resources: details.details))
 		)
@@ -487,7 +487,7 @@ extension ResourceBalanceView {
 		let caption1: String?
 		let caption2: String?
 		let fallback: String?
-		let amount: KnownResourceBalance.Amount?
+		let amount: ResourceAmount?
 		let compact: Bool
 		let isSelected: Bool?
 
@@ -515,7 +515,7 @@ extension ResourceBalanceView {
 					}
 				}
 
-				if case .unknown = amount?.amount {
+				if case .unknown = amount {
 					WarningErrorView(
 						text: L10n.InteractionReview.Unknown.amount,
 						type: .warning,
@@ -544,7 +544,7 @@ extension ResourceBalanceView {
 		let caption1: String?
 		let caption2: String?
 		let compact: Bool
-		let amount: KnownResourceBalance.Amount?
+		let amount: ResourceAmount?
 
 		var body: some View {
 			VStack(alignment: .leading) {
@@ -564,7 +564,7 @@ extension ResourceBalanceView {
 					}
 				}
 
-				if case .unknown = amount?.amount {
+				if case .unknown = amount {
 					WarningErrorView(
 						text: L10n.InteractionReview.Unknown.amount,
 						type: .warning,
@@ -613,7 +613,7 @@ extension ResourceBalanceView {
 	}
 
 	struct AmountView: View {
-		let amount: KnownResourceBalance.Amount?
+		let amount: ResourceAmount?
 		let fallback: String?
 		let appearance: Appearance
 		let symbol: Loadable<String?>?
@@ -625,7 +625,7 @@ extension ResourceBalanceView {
 		}
 
 		init(
-			amount: KnownResourceBalance.Amount?,
+			amount: ResourceAmount?,
 			fallback: String? = nil,
 			appearance: Appearance,
 			symbol: Loadable<String?>? = nil
@@ -638,11 +638,10 @@ extension ResourceBalanceView {
 
 		var body: some View {
 			if let amount {
-				switch amount.amount {
+				switch amount {
 				case let .exact(exactAmount):
 					SubAmountView(
 						amount: exactAmount,
-						guaranteed: amount.guaranteed,
 						appearance: appearance,
 						symbol: symbol
 					)
@@ -650,7 +649,6 @@ extension ResourceBalanceView {
 					SubAmountView(
 						title: L10n.InteractionReview.atLeast,
 						amount: exactAmount,
-						guaranteed: amount.guaranteed,
 						appearance: appearance,
 						symbol: symbol
 					)
@@ -658,7 +656,6 @@ extension ResourceBalanceView {
 					SubAmountView(
 						title: L10n.InteractionReview.noMoreThan,
 						amount: exactAmount,
-						guaranteed: amount.guaranteed,
 						appearance: appearance,
 						symbol: symbol
 					)
@@ -677,6 +674,13 @@ extension ResourceBalanceView {
 							symbol: symbol
 						)
 					}
+				case let .predicted(predicted, guaranteed):
+					SubAmountView(
+						amount: predicted,
+						guaranteed: guaranteed,
+						appearance: appearance,
+						symbol: symbol
+					)
 				case .unknown:
 					EmptyView()
 				}
@@ -710,14 +714,14 @@ extension ResourceBalanceView {
 		@Environment(\.resourceBalanceHideFiatValue) var resourceBalanceHideFiatValue
 		let title: String?
 		let amount: ExactResourceAmount
-		let guaranteed: Decimal192?
+		let guaranteed: ExactResourceAmount?
 		let appearance: AmountView.Appearance
 		let symbol: Loadable<String?>?
 
 		init(
 			title: String? = nil,
 			amount: ExactResourceAmount,
-			guaranteed: Decimal192? = nil,
+			guaranteed: ExactResourceAmount? = nil,
 			appearance: AmountView.Appearance,
 			symbol: Loadable<String?>?
 		) {
@@ -769,7 +773,7 @@ extension ResourceBalanceView {
 							.padding(.top, .small3)
 					}
 
-					if let guaranteedAmount = guaranteed {
+					if let guaranteedAmount = guaranteed?.nominalAmount {
 						Text(L10n.InteractionReview.guaranteed)
 							.textStyle(.body3Regular)
 							.foregroundColor(.app.gray2)

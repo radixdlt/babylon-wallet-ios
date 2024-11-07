@@ -43,7 +43,7 @@ extension OnLedgerEntitiesClient {
 
 		return try await fungibleResourceBalance(
 			resource,
-			resourceAmount: .exact(.init(nominalAmount: amount)),
+			resourceAmount: .init(nominalAmount: amount, guaranteed: guarantee?.amount),
 			guarantee: guarantee,
 			networkID: networkID
 		)
@@ -125,7 +125,7 @@ extension OnLedgerEntitiesClient {
 
 				let resource = OwnedResourcePoolDetails.ResourceWithRedemptionValue(
 					resource: .init(resourceAddress: address, metadata: entity.metadata),
-					redemptionValue: .exact(.init(nominalAmount: resourceAmount * adjustmentFactor))
+					redemptionValue: .exact(resourceAmount * adjustmentFactor)
 				)
 
 				if address.isXRD(on: networkID) {
@@ -145,8 +145,7 @@ extension OnLedgerEntitiesClient {
 						dAppName: resourceAssociatedDapps?[resourceAddress]?.name,
 						poolUnitResource: .init(
 							resource: resource,
-							amount: .exact(.init(nominalAmount: amount)),
-							guarantee: guarantee?.amount
+							amount: .exact(amount)
 						),
 						xrdResource: xrdResource,
 						nonXrdResources: nonXrdResources
@@ -156,7 +155,7 @@ extension OnLedgerEntitiesClient {
 				isHidden: isHidden
 			)
 		} else {
-			guard let details = try await getPoolUnitDetails(resource, forAmount: amount, guarantee: guarantee?.amount) else {
+			guard let details = try await getPoolUnitDetails(resource, forAmount: amount) else {
 				throw FailedToGetPoolUnitDetails()
 			}
 
@@ -197,9 +196,9 @@ extension OnLedgerEntitiesClient {
 				}
 				// Distribute the worth in proportion to the amounts, if needed
 				if stake.liquidStakeUnitAmount == exactAmount.nominalAmount {
-					worth = .exact(.init(nominalAmount: stake.xrdAmount))
+					worth = .exact(stake.xrdAmount)
 				} else {
-					worth = .exact(.init(nominalAmount: (exactAmount.nominalAmount / stake.liquidStakeUnitAmount) * stake.xrdAmount))
+					worth = .exact((exactAmount.nominalAmount / stake.liquidStakeUnitAmount) * stake.xrdAmount)
 				}
 			} else {
 				throw MissingTrackedValidatorStake()

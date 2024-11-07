@@ -276,7 +276,6 @@ private extension InteractionReview.Sections {
 					resourceAddress: resource.resourceAddress,
 					atLedgerState: resource.atLedgerState,
 					amount: details.amount,
-					guarantee: details.guarantee?.amount,
 					metadata: resource.metadata
 				),
 				isXRD: details.isXRD
@@ -295,8 +294,7 @@ private extension InteractionReview.Sections {
 				validator: details.validator,
 				stakeUnitResource: .init(
 					resource: details.resource,
-					amount: details.amount,
-					guarantee: details.guarantee?.amount
+					amount: details.amount
 				),
 				xrdRedemptionValue: details.worth
 			))
@@ -308,7 +306,7 @@ private extension InteractionReview.Sections {
 			state.destination = .nonFungibleTokenDetails(.init(
 				resourceAddress: resource.resourceAddress,
 				resourceDetails: .success(resource),
-				details: nft != nil ? .token(nft!) : nil,
+				details: nft.map(KnownResourceBalance.NonFungible.token),
 				ledgerState: resource.atLedgerState,
 				stakeClaim: details.stakeClaimTokens.stakeClaims.first,
 				isClaimStakeEnabled: false

@@ -1,3 +1,5 @@
+import Sargon
+
 extension InteractionReview.Sections {
 	// Either the resource from ledger or metadata extracted from the TX manifest
 	typealias ResourceInfo = Either<OnLedgerEntity.Resource, OnLedgerEntity.Metadata>
@@ -54,15 +56,7 @@ extension InteractionReview.Sections {
 				networkID: networkID
 			)
 
-			let dappAddresses = summary.encounteredAddresses.compactMap {
-				switch $0 {
-				case let .component(componentAddress):
-					componentAddress.isGlobal ? componentAddress.asGeneral : nil
-				case let .locker(lockerAddress):
-					lockerAddress.asGeneral
-				}
-			}
-
+			let dappAddresses = extractDappAddresses(encounteredAddresses: summary.encounteredAddresses)
 			let dAppsUsed = try await extractDapps(
 				addresses: dappAddresses,
 				unknownTitle: L10n.TransactionReview.unknownComponents
@@ -298,6 +292,17 @@ extension InteractionReview.Sections {
 			}
 	}
 
+	func extractDappAddresses(encounteredAddresses: [ManifestEncounteredComponentAddress]) -> [Address] {
+		encounteredAddresses.compactMap {
+			switch $0 {
+			case let .component(componentAddress):
+				componentAddress.isGlobal ? componentAddress.asGeneral : nil
+			case let .locker(lockerAddress):
+				lockerAddress.asGeneral
+			}
+		}
+	}
+
 	func extractDapps(
 		addresses: [Address],
 		unknownTitle: (Int) -> String
@@ -351,7 +356,7 @@ extension InteractionReview.Sections {
 				.fungible(
 					.init(
 						isXRD: resourceAddress.isXRD,
-						amount: .exact(.init(nominalAmount: amount))
+						amount: .exact(amount)
 					)
 				)
 			)]
@@ -629,7 +634,7 @@ extension InteractionReview.Sections {
 
 				let details: KnownResourceBalance.Fungible = .init(
 					isXRD: false,
-					amount: .exact(.init(nominalAmount: source.amount)),
+					amount: .exact(source.amount),
 					guarantee: nil
 				)
 

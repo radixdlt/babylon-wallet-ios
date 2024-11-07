@@ -257,24 +257,23 @@ private extension AccountPortfoliosClient.AccountPortfolio {
 extension ResourceAmount {
 	mutating func updateFiatWorth(resourceAddress: ResourceAddress, change: (ResourceAddress, ExactResourceAmount) -> FiatWorth?) {
 		switch self {
-		case let .exact(exactAmount):
-			var updatedAmount = exactAmount
-			updatedAmount.fiatWorth = change(resourceAddress, exactAmount)
-			self = .exact(updatedAmount)
-		case let .atLeast(exactAmount):
-			var updatedAmount = exactAmount
-			updatedAmount.fiatWorth = change(resourceAddress, exactAmount)
-			self = .atLeast(updatedAmount)
-		case let .atMost(exactAmount):
-			var updatedAmount = exactAmount
-			updatedAmount.fiatWorth = change(resourceAddress, exactAmount)
-			self = .atMost(updatedAmount)
-		case let .between(minExactAmount, maxExactAmount):
-			var updatedMinAmount = minExactAmount
-			updatedMinAmount.fiatWorth = change(resourceAddress, minExactAmount)
-			var updatedMaxAmount = maxExactAmount
-			updatedMaxAmount.fiatWorth = change(resourceAddress, maxExactAmount)
-			self = .between(minimum: updatedMinAmount, maximum: updatedMaxAmount)
+		case var .exact(exactAmount):
+			exactAmount.fiatWorth = change(resourceAddress, exactAmount)
+			self = .exact(exactAmount)
+		case var .atLeast(exactAmount):
+			exactAmount.fiatWorth = change(resourceAddress, exactAmount)
+			self = .atLeast(exactAmount)
+		case var .atMost(exactAmount):
+			exactAmount.fiatWorth = change(resourceAddress, exactAmount)
+			self = .atMost(exactAmount)
+		case var .between(minExactAmount, maxExactAmount):
+			minExactAmount.fiatWorth = change(resourceAddress, minExactAmount)
+			maxExactAmount.fiatWorth = change(resourceAddress, maxExactAmount)
+			self = .between(minimum: minExactAmount, maximum: maxExactAmount)
+		case var .predicted(predicted, guaranteed):
+			predicted.fiatWorth = change(resourceAddress, predicted)
+			guaranteed.fiatWorth = change(resourceAddress, guaranteed)
+			self = .predicted(predicted: predicted, guaranteed: guaranteed)
 		case .unknown:
 			return
 		}
@@ -315,12 +314,11 @@ private extension MutableCollection where Element == OnLedgerEntitiesClient.Owne
 private extension MutableCollection where Element == OnLedgerEntitiesClient.OwnedStakeDetails {
 	mutating func updateFiatWorth(_ change: (ResourceAddress, ExactResourceAmount) -> FiatWorth?) {
 		mutateAll { detail in
-			var xrdRedemptionValue = detail.xrdRedemptionValue
 			var stakeUnitResource = detail.stakeUnitResource
 			stakeUnitResource.mutate {
 				$0.amount.updateFiatWorth(resourceAddress: .mainnetXRD, change: {
 					change(
-						.mainnetXRD,
+						$0,
 						detail.xrdRedemptionValue(exactAmount: $1)
 					)
 				})

@@ -339,7 +339,7 @@ extension OnLedgerEntitiesClient {
 			return try .init(
 				resourceAddress: .init(validatingAddress: vaultAggregated.resourceAddress),
 				atLedgerState: ledgerState,
-				amount: .exact(.init(nominalAmount: amount)),
+				amount: .exact(amount),
 				metadata: .init(vaultAggregated.explicitMetadata)
 			)
 		} ?? []
@@ -426,8 +426,7 @@ extension OnLedgerEntitiesClient {
 					}
 					return .init(
 						resource: stakeUnitDetails,
-						amount: stakeUnitResource.amount,
-						guarantee: stakeUnitResource.guarantee
+						amount: stakeUnitResource.amount
 					)
 				}
 
@@ -570,14 +569,14 @@ extension OnLedgerEntitiesClient {
 		struct ResourceWithRedemptionValue: Hashable, Sendable {
 			let resource: OnLedgerEntity.Resource
 			var redemptionValue: ResourceAmount?
-			var guarantee: Decimal192?
+//			var guarantee: Decimal192?
 		}
 	}
 
 	struct ResourceWithVaultAmount: Hashable, Sendable {
 		let resource: OnLedgerEntity.Resource
 		var amount: ResourceAmount
-		var guarantee: Decimal192?
+//		var guarantee: Decimal192?
 	}
 
 	struct StakeClaim: Hashable, Sendable, Identifiable {

@@ -489,8 +489,7 @@ extension OnLedgerEntitiesClient {
 extension OnLedgerEntitiesClient {
 	func getPoolUnitDetails(
 		_ poolUnitResource: OnLedgerEntity.Resource,
-		forAmount amount: ResourceAmount,
-		guarantee: Decimal192?
+		forAmount amount: ResourceAmount
 	) async throws -> OwnedResourcePoolDetails? {
 		guard let poolAddress = poolUnitResource.metadata.poolUnit?.asGeneral else {
 			return nil
@@ -527,8 +526,7 @@ extension OnLedgerEntitiesClient {
 
 		let poolUnitResource = ResourceWithVaultAmount(
 			resource: poolUnitResource,
-			amount: amount,
-			guarantee: guarantee
+			amount: amount
 		)
 
 		return await populatePoolDetails(pool, allResources, poolUnitResource)
@@ -581,8 +579,7 @@ extension OnLedgerEntitiesClient {
 
 			let poolUnitResource = ResourceWithVaultAmount(
 				resource: poolUnitResourcee,
-				amount: ownedPoolUnit.resource.amount,
-				guarantee: ownedPoolUnit.resource.guarantee
+				amount: ownedPoolUnit.resource.amount
 			)
 
 			return await populatePoolDetails(pool, allResources, poolUnitResource)
@@ -604,8 +601,7 @@ extension OnLedgerEntitiesClient {
 
 			nonXrdResourceDetails.append(.init(
 				resource: resourceDetails,
-				redemptionValue: resourceDetails.poolRedemptionValue(for: resource.amount, poolUnitResource: poolUnitResource),
-				guarantee: resource.guarantee
+				redemptionValue: resourceDetails.poolRedemptionValue(for: resource.amount, poolUnitResource: poolUnitResource)
 			))
 		}
 
@@ -617,8 +613,7 @@ extension OnLedgerEntitiesClient {
 			}
 			xrdResourceDetails = .init(
 				resource: details,
-				redemptionValue: details.poolRedemptionValue(for: xrdResource.amount, poolUnitResource: poolUnitResource),
-				guarantee: xrdResource.guarantee
+				redemptionValue: details.poolRedemptionValue(for: xrdResource.amount, poolUnitResource: poolUnitResource)
 			)
 		} else {
 			xrdResourceDetails = nil

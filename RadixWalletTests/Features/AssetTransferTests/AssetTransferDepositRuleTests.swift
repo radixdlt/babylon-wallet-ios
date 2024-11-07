@@ -17,7 +17,7 @@ final class AssetTransferDepositRuleTests: TestCase {
 			xrdResource: .init(
 				resourceAddress: resourceAddress,
 				atLedgerState: .init(version: 0, epoch: 0),
-				amount: .exact(.init(nominalAmount: Decimal192(1))),
+				amount: .exact(Decimal192(1)),
 				metadata: .init(nil)
 			)
 		),

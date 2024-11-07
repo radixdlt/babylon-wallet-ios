@@ -6,7 +6,6 @@ extension LSUDetails.State {
 		.init(
 			title: .success(stakeUnitResource.resource.metadata.title),
 			amount: stakeUnitResource.amount,
-			guaranteed: stakeUnitResource.guarantee,
 			currencyWorth: nil,
 			symbol: .success(stakeUnitResource.resource.metadata.symbol)
 		)

@@ -369,30 +369,22 @@ extension OnLedgerEntity {
 		let resourceAddress: ResourceAddress
 		let atLedgerState: AtLedgerState
 		var amount: ResourceAmount
-		let guarantee: Decimal192?
 		let metadata: Metadata
 
 		var debugDescription: String {
 			let symbol: String = metadata.symbol ?? "???"
-
-			if let guarantee {
-				return "\(symbol) - \(resourceAddress.formatted()) | # estimated: \(amount.debugDescription) guaranteed: \(guarantee.formatted())"
-			} else {
-				return "\(symbol) - \(resourceAddress.formatted()) | # \(amount.debugDescription)"
-			}
+			return "\(symbol) - \(resourceAddress.formatted()) | # \(amount.debugDescription)"
 		}
 
 		init(
 			resourceAddress: ResourceAddress,
 			atLedgerState: AtLedgerState,
 			amount: ResourceAmount,
-			guarantee: Decimal192? = nil,
 			metadata: Metadata
 		) {
 			self.resourceAddress = resourceAddress
 			self.atLedgerState = atLedgerState
 			self.amount = amount
-			self.guarantee = guarantee
 			self.metadata = metadata
 		}
 	}

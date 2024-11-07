@@ -29,15 +29,7 @@ extension InteractionReview.Sections {
 			networkID: networkID
 		)
 
-		let dappAddresses = summary.encounteredEntities.compactMap {
-			switch $0 {
-			case let .component(componentAddress):
-				componentAddress.isGlobal ? componentAddress.asGeneral : nil
-			case let .locker(lockerAddress):
-				lockerAddress.asGeneral
-			}
-		}
-
+		let dappAddresses = extractDappAddresses(encounteredAddresses: summary.encounteredEntities)
 		let dAppsUsed = try await extractDapps(
 			addresses: dappAddresses,
 			unknownTitle: L10n.TransactionReview.unknownComponents
@@ -141,13 +133,13 @@ extension InteractionReview.Sections {
 				if resourceAddress.isFungible {
 					return try await [.known(onLedgerEntitiesClient.fungibleResourceBalance(
 						resource,
-						resourceAmount: .exact(.init(nominalAmount: amount)),
+						resourceAmount: .exact(amount),
 						entities: entities,
 						networkID: networkID,
 						defaultDepositGuarantee: defaultDepositGuarantee
 					))]
 				} else {
-					return [.known(.init(resource: resource, details: .nonFungible(.amount(amount: .exact(.init(nominalAmount: amount))))))]
+					return [.known(.init(resource: resource, details: .nonFungible(.amount(amount: .exact(amount)))))]
 				}
 			case .right:
 				return []

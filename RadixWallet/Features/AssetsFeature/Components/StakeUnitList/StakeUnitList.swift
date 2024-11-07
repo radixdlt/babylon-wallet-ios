@@ -260,7 +260,7 @@ extension OnLedgerEntitiesClient.OwnedStakeDetails: Identifiable {
 
 extension OnLedgerEntitiesClient.OwnedStakeDetails {
 	var xrdRedemptionValue: ResourceAmount {
-		stakeUnitResource?.amount.adjustedNominalAmount { xrdRedemptionValue(exactAmount: .init(nominalAmount: $0)).nominalAmount } ?? .exact(.zero)
+		stakeUnitResource?.amount.adjustedNominalAmount { xrdRedemptionValue(exactAmount: .init(nominalAmount: $0)).nominalAmount } ?? .exact(ExactResourceAmount.zero)
 	}
 
 	func xrdRedemptionValue(exactAmount: ExactResourceAmount) -> ExactResourceAmount {

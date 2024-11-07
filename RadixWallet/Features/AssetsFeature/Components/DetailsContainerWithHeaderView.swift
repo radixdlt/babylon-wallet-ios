@@ -5,7 +5,6 @@ import SwiftUI
 struct DetailsContainerWithHeaderViewState: Equatable {
 	let title: Loadable<String?>
 	let amount: ResourceAmount?
-	let guaranteed: Decimal192?
 	let currencyWorth: AttributedString?
 	let symbol: Loadable<String?>
 }
@@ -15,7 +14,6 @@ extension DetailsContainerWithHeaderViewState {
 		self.init(
 			title: .success(resourceWithAmount.resource.metadata.name),
 			amount: resourceWithAmount.amount,
-			guaranteed: resourceWithAmount.guarantee,
 			currencyWorth: nil,
 			symbol: .success(resourceWithAmount.resource.metadata.symbol)
 		)
@@ -63,7 +61,7 @@ struct DetailsContainerWithHeaderView<ThumbnailView: View, DetailsView: View>: V
 
 			if let amount = viewState.amount {
 				ResourceBalanceView.AmountView(
-					amount: .init(amount, guaranteed: viewState.guaranteed),
+					amount: .init(amount),
 					appearance: .large,
 					symbol: viewState.symbol
 				)

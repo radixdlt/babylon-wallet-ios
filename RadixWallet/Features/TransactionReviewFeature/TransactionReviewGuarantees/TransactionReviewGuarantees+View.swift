@@ -82,7 +82,7 @@ extension TransactionReviewGuarantee.State {
 				address: resource.resourceAddress,
 				icon: thumbnail,
 				title: resource.metadata.title,
-				amount: .init(amount, guaranteed: guarantee.amount)
+				amount: .predicted(predicted: .init(nominalAmount: amount), guaranteed: .init(nominalAmount: guarantee.amount))
 			)
 		)
 	}

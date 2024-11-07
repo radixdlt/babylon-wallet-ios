@@ -87,17 +87,6 @@ extension KnownResourceBalance: Comparable {
 	}
 }
 
-// MARK: - KnownResourceBalance.Amount + Comparable
-extension KnownResourceBalance.Amount: Comparable {
-	static func < (lhs: Self, rhs: Self) -> Bool {
-		order(lhs: lhs.amount, rhs: rhs.amount) {
-			order(lhs: lhs.guaranteed, rhs: rhs.guaranteed)
-		}
-	}
-
-	static let zero = KnownResourceBalance.Amount(0)
-}
-
 private func order(lhs: OnLedgerEntity.Resource, rhs: OnLedgerEntity.Resource) -> Bool {
 	// Sort alphabetically by resource title, or failing that, address
 	order(lhs: lhs.metadata.title, rhs: rhs.metadata.title) {

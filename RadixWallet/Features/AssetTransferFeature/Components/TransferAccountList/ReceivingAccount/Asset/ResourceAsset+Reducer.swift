@@ -168,8 +168,7 @@ struct ResourceAsset: Sendable, FeatureReducer {
 					validator: details.validator,
 					stakeUnitResource: .init(
 						resource: details.resource,
-						amount: details.amount,
-						guarantee: details.guarantee?.amount
+						amount: details.amount
 					),
 					xrdRedemptionValue: details.worth
 				))
@@ -184,7 +183,7 @@ struct ResourceAsset: Sendable, FeatureReducer {
 					resourceAddress: details.stakeClaimResource.resourceAddress,
 					resourceDetails: .success(balance.resource),
 					ownedResource: state.kind.nonFungible?.resource,
-					details: token != nil ? .token(token!) : nil,
+					details: token.map(KnownResourceBalance.NonFungible.token),
 					ledgerState: details.stakeClaimResource.atLedgerState,
 					stakeClaim: details.stakeClaimTokens.stakeClaims.first,
 					isClaimStakeEnabled: false

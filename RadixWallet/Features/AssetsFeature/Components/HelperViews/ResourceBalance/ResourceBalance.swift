@@ -155,24 +155,4 @@ struct KnownResourceBalance: Sendable, Hashable {
 			}
 		}
 	}
-
-	// Helper types
-
-	struct Amount: Sendable, Hashable {
-		let amount: ResourceAmount
-		let guaranteed: Decimal192?
-
-		init(_ amount: ResourceAmount, guaranteed: Decimal192? = nil) {
-			self.amount = amount
-			self.guaranteed = guaranteed
-		}
-
-		init(_ amount: Decimal192, guaranteed: Decimal192? = nil) {
-			self.init(.exact(.init(nominalAmount: amount)), guaranteed: guaranteed)
-		}
-
-		init(exactAmount: ExactResourceAmount, guaranteed: Decimal192? = nil) {
-			self.init(.exact(exactAmount), guaranteed: guaranteed)
-		}
-	}
 }
