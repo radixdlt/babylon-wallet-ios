@@ -84,8 +84,6 @@ extension InteractionReview.Sections {
 		networkID: NetworkID
 	) async throws -> Common.Accounts.State? {
 		let userAccounts: [Common.ReviewAccount] = try await extractUserAccounts(Array(accountDeposits.keys))
-		let defaultDepositGuarantee = await appPreferencesClient.getPreferences().transaction.defaultDepositGuarantee
-
 		var deposits: [Common.ReviewAccount: IdentifiedArrayOf<Common.Transfer>] = [:]
 
 		for (accountAddress, accountDeposits) in accountDeposits {
@@ -93,8 +91,7 @@ extension InteractionReview.Sections {
 			var transfers = try await transferInfo(
 				accountDeposits: accountDeposits,
 				entities: entities,
-				networkID: networkID,
-				defaultDepositGuarantee: defaultDepositGuarantee
+				networkID: networkID
 			)
 
 			if case .mayBePresent = accountDeposits.unspecifiedResources {
@@ -118,8 +115,7 @@ extension InteractionReview.Sections {
 	private func transferInfo(
 		accountWithdraw: AccountWithdraw,
 		entities: ResourcesInfo = [:],
-		networkID: NetworkID,
-		defaultDepositGuarantee: Decimal192 = 1
+		networkID: NetworkID
 	) async throws -> [ResourceBalance] {
 		let resourceAddress = accountWithdraw.resourceAddress
 		guard let resourceInfo = entities[resourceAddress] else {
@@ -134,9 +130,7 @@ extension InteractionReview.Sections {
 					return try await [.known(onLedgerEntitiesClient.fungibleResourceBalance(
 						resource,
 						resourceAmount: .exact(amount),
-						entities: entities,
-						networkID: networkID,
-						defaultDepositGuarantee: defaultDepositGuarantee
+						networkID: networkID
 					))]
 				} else {
 					return [.known(.init(resource: resource, details: .nonFungible(.amount(amount: .exact(amount)))))]
@@ -157,8 +151,7 @@ extension InteractionReview.Sections {
 	private func transferInfo(
 		accountDeposits: AccountDeposits,
 		entities: ResourcesInfo = [:],
-		networkID: NetworkID,
-		defaultDepositGuarantee: Decimal192 = 1
+		networkID: NetworkID
 	) async throws -> [ResourceBalance] {
 		var transfers: [ResourceBalance] = []
 
@@ -176,9 +169,7 @@ extension InteractionReview.Sections {
 						.known(onLedgerEntitiesClient.fungibleResourceBalance(
 							resource,
 							resourceAmount: .init(bounds: bounds),
-							entities: entities,
-							networkID: networkID,
-							defaultDepositGuarantee: defaultDepositGuarantee
+							networkID: networkID
 						))
 					)
 				case let .nonFungible(_, bounds):
