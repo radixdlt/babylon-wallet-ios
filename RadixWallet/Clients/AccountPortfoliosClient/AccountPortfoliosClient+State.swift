@@ -255,7 +255,10 @@ private extension AccountPortfoliosClient.AccountPortfolio {
 }
 
 extension ResourceAmount {
-	mutating func updateFiatWorth(resourceAddress: ResourceAddress, change: (ResourceAddress, ExactResourceAmount) -> FiatWorth?) {
+	mutating func updateFiatWorth(
+		resourceAddress: ResourceAddress,
+		change: (ResourceAddress, ExactResourceAmount) -> FiatWorth?
+	) {
 		switch self {
 		case var .exact(exactAmount):
 			exactAmount.fiatWorth = change(resourceAddress, exactAmount)

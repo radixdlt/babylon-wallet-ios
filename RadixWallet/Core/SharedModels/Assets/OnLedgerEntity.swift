@@ -373,7 +373,7 @@ extension OnLedgerEntity {
 
 		var debugDescription: String {
 			let symbol: String = metadata.symbol ?? "???"
-			return "\(symbol) - \(resourceAddress.formatted()) | # \(amount.debugDescription)"
+			return "\(symbol) - \(resourceAddress.formatted()) | # \(String(reflecting: amount))"
 		}
 
 		init(
@@ -554,7 +554,7 @@ extension OnLedgerEntity.OnLedgerAccount {
 		var debugDescription: String {
 			"""
 			\(validatorAddress.formatted())
-			staked: \(stakeUnitResource?.amount.debugDescription ?? "NONE")
+			staked: \(stakeUnitResource.map { String(reflecting: $0.amount) } ?? "NONE")
 			claimable?: \(stakeClaimResource != nil)
 			"""
 		}
@@ -587,7 +587,7 @@ extension OnLedgerEntity.OnLedgerAccount {
 			"""
 			\(resourcePoolAddress.formatted())
 			kind: \(descriptionOfPoolKind)
-			amount: \(resource.amount.debugDescription)
+			amount: \(String(reflecting: resource.amount))
 			"""
 		}
 

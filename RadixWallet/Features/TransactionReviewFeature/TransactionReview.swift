@@ -608,10 +608,10 @@ extension ResourceBalance {
 					known.details = .poolUnit(poolUnit)
 					self = .known(known)
 				case .nonFungible, .stakeClaimNFT:
-					return
+					assertionFailure("Should not be possible to set guarantee")
 				}
 			case .unknown:
-				return
+				assertionFailure("Should not be possible to set guarantee")
 			}
 		}
 	}

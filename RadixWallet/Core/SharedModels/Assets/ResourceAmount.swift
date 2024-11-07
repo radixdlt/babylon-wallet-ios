@@ -50,23 +50,6 @@ extension ResourceAmount {
 		}
 	}
 
-	var debugDescription: String {
-		switch self {
-		case let .exact(amount):
-			amount.nominalAmount.formatted()
-		case let .atLeast(amount):
-			"At least \(amount.nominalAmount.formatted())"
-		case let .atMost(amount):
-			"No more than \(amount.nominalAmount.formatted())"
-		case let .between(minAmount, maxAmount):
-			"Min: \(minAmount.nominalAmount.formatted()); Max: \(maxAmount.nominalAmount.formatted())"
-		case let .predicted(predicted, guaranteed):
-			"estimated: \(predicted.nominalAmount.formatted()); guaranteed: \(guaranteed.nominalAmount.formatted())"
-		case .unknown:
-			"Unknown"
-		}
-	}
-
 	func adjustedNominalAmount(_ adjust: (Decimal192) -> Decimal192) -> Self {
 		switch self {
 		case let .exact(amount):
@@ -91,6 +74,26 @@ extension ResourceAmount {
 			)
 		case .unknown:
 			return .unknown
+		}
+	}
+}
+
+// MARK: CustomDebugStringConvertible
+extension ResourceAmount: CustomDebugStringConvertible {
+	var debugDescription: String {
+		switch self {
+		case let .exact(amount):
+			amount.nominalAmount.formatted()
+		case let .atLeast(amount):
+			"At least \(amount.nominalAmount.formatted())"
+		case let .atMost(amount):
+			"No more than \(amount.nominalAmount.formatted())"
+		case let .between(minAmount, maxAmount):
+			"Min: \(minAmount.nominalAmount.formatted()); Max: \(maxAmount.nominalAmount.formatted())"
+		case let .predicted(predicted, guaranteed):
+			"estimated: \(predicted.nominalAmount.formatted()); guaranteed: \(guaranteed.nominalAmount.formatted())"
+		case .unknown:
+			"Unknown"
 		}
 	}
 }
