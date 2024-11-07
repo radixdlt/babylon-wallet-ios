@@ -105,6 +105,7 @@ extension PreAuthorizationReview {
 					}
 					.controlState(viewStore.sliderControlState)
 					.padding(.horizontal, .medium2)
+					.padding(.bottom, .large3)
 				}
 				.animation(.easeInOut, value: viewStore.displayMode.rawManifest)
 			}
