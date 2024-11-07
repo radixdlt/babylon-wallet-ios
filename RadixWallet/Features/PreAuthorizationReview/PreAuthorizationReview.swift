@@ -5,9 +5,10 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 
 	struct State: Sendable, Hashable {
 		let unvalidatedManifest: UnvalidatedSubintentManifest
-		let expiration: Expiration?
+		let expiration: Expiration
 		let nonce: Nonce
 		let dAppMetadata: DappMetadata.Ledger?
+		let message: String?
 
 		var preview: PreAuthorizationPreview?
 
@@ -141,7 +142,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 				let expirationDate = value.unixTimestampSeconds
 				state.secondsToExpiration = Int(expirationDate.timeIntervalSinceNow)
 				effects.append(startTimer(expirationDate: expirationDate))
-			case .afterDelay, .none:
+			case .afterDelay:
 				break
 			}
 
@@ -235,11 +236,12 @@ private extension PreAuthorizationReview {
 			return .none
 		}
 
-		return .run { send in
+		return .run { [expiration = state.expiration, message = state.message] send in
 			let subintent = try await preAuthorizationClient.buildSubintent(.init(
-				networkId: preview.networkId,
 				intentDiscriminator: .secureRandom(),
-				manifest: preview.manifest
+				manifest: preview.manifest,
+				expiration: expiration,
+				message: message
 			))
 			await send(.internal(.builtSubintent(subintent)))
 		} catch: { error, send in
@@ -268,7 +270,7 @@ extension PreAuthorizationReview.State {
 		switch expiration {
 		case let .atTime(value):
 			value.unixTimestampSeconds <= Date.now
-		case .afterDelay, .none:
+		case .afterDelay:
 			false
 		}
 	}

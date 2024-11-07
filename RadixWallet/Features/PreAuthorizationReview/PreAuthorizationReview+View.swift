@@ -21,7 +21,7 @@ extension PreAuthorizationReview {
 		let dAppMetadata: DappMetadata.Ledger?
 		let displayMode: Common.DisplayMode
 		let sliderResetDate: Date
-		let expiration: Expiration?
+		let expiration: Expiration
 		let secondsToExpiration: Int?
 		let globalControlState: ControlState
 		let sliderControlState: ControlState
@@ -184,7 +184,7 @@ extension PreAuthorizationReview {
 		}
 
 		@ViewBuilder
-		private func expiration(_ expiration: Expiration?, secondsToExpiration: Int?) -> some SwiftUI.View {
+		private func expiration(_ expiration: Expiration, secondsToExpiration: Int?) -> some SwiftUI.View {
 			Group {
 				switch expiration {
 				case .atTime:
@@ -200,9 +200,6 @@ extension PreAuthorizationReview {
 				case let .afterDelay(value):
 					let value = TimeFormatter.format(seconds: Int(value.expireAfterSeconds))
 					Text(markdown: L10n.PreAuthorizationReview.Expiration.afterDelay(value), emphasizedColor: .app.account4pink, emphasizedFont: .app.body2Link)
-
-				case nil:
-					Color.clear
 				}
 			}
 			.textStyle(.body2Regular)

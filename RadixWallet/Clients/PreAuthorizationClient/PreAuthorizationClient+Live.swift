@@ -3,7 +3,6 @@ extension PreAuthorizationClient: DependencyKey {
 	static let epochWindow: Epoch = 10
 
 	static var liveValue: Self {
-		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.gatewaysClient) var gatewaysClient
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 		@Dependency(\.accountsClient) var accountsClient
@@ -62,21 +61,11 @@ extension PreAuthorizationClient: DependencyKey {
 		}
 
 		let buildSubintent: BuildSubintent = { request in
-			let epoch = try await gatewayAPIClient.getEpoch()
-
-			let header = IntentHeaderV2(
-				networkId: request.networkId,
-				startEpochInclusive: epoch,
-				endEpochExclusive: epoch + Self.epochWindow,
-				minProposerTimestampInclusive: nil, // TODO: Confirm
-				maxProposerTimestampExclusive: nil, // TODO: Confirm
-				intentDiscriminator: request.intentDiscriminator
-			)
-
-			return .init(
-				header: header,
-				manifest: request.manifest,
-				message: .none
+			try await SargonOS.shared.createSubintent(
+				intentDiscriminator: request.intentDiscriminator,
+				subintentManifest: request.manifest,
+				expiration: request.expiration,
+				message: request.message
 			)
 		}
 

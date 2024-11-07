@@ -18,8 +18,9 @@ extension PreAuthorizationClient {
 	}
 
 	struct BuildSubintentRequest: Sendable {
-		let networkId: NetworkID
 		let intentDiscriminator: IntentDiscriminator
 		let manifest: SubintentManifest
+		let expiration: DappToWalletInteractionSubintentExpiration
+		let message: String?
 	}
 }
