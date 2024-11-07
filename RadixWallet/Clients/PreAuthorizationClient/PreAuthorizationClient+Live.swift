@@ -1,7 +1,5 @@
 // MARK: - PreAuthorizationClient + DependencyKey
 extension PreAuthorizationClient: DependencyKey {
-	static let epochWindow: Epoch = 10
-
 	static var liveValue: Self {
 		@Dependency(\.gatewaysClient) var gatewaysClient
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
