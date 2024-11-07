@@ -15,42 +15,42 @@ extension OnLedgerEntitiesClient {
 	struct MissingStakeClaimTokenData: Swift.Error {}
 
 	// MARK: Fungibles
-    
-    func fungibleResourceBalance(
-        _ resource: OnLedgerEntity.Resource,
-        resourceAmount: ResourceAmount,
-        networkID: NetworkID
-    ) async throws -> KnownResourceBalance {
-        let resourceAddress = resource.resourceAddress
 
-        @Dependency(\.resourcesVisibilityClient) var resourcesVisibilityClient
-        let hiddenResources = try await resourcesVisibilityClient.getHidden()
+	func fungibleResourceBalance(
+		_ resource: OnLedgerEntity.Resource,
+		resourceAmount: ResourceAmount,
+		networkID: NetworkID
+	) async throws -> KnownResourceBalance {
+		let resourceAddress = resource.resourceAddress
 
-        // Check if the fungible resource is a pool unit resource
-        if await isPoolUnitResource(resource) {
-            return try await poolUnit(
-                resource,
-                amount: resourceAmount,
-                guarantee: nil,
-                hiddenResources: hiddenResources
-            )
-        }
+		@Dependency(\.resourcesVisibilityClient) var resourcesVisibilityClient
+		let hiddenResources = try await resourcesVisibilityClient.getHidden()
 
-        // Check if the fungible resource is an LSU
-        if let validator = await isLiquidStakeUnit(resource) {
-            return try await liquidStakeUnit(
-                resource,
-                amount: resourceAmount,
-                validator: validator
-            )
-        }
-        
-        let isXRD = resourceAddress.isXRD(on: networkID)
-        let isHidden = hiddenResources.contains(.fungible(resourceAddress))
-        let details: KnownResourceBalance.Fungible = .init(isXRD: isXRD, amount: resourceAmount)
+		// Check if the fungible resource is a pool unit resource
+		if await isPoolUnitResource(resource) {
+			return try await poolUnit(
+				resource,
+				amount: resourceAmount,
+				guarantee: nil,
+				hiddenResources: hiddenResources
+			)
+		}
 
-        return .init(resource: resource, details: .fungible(details), isHidden: isHidden)
-    }
+		// Check if the fungible resource is an LSU
+		if let validator = await isLiquidStakeUnit(resource) {
+			return try await liquidStakeUnit(
+				resource,
+				amount: resourceAmount,
+				validator: validator
+			)
+		}
+
+		let isXRD = resourceAddress.isXRD(on: networkID)
+		let isHidden = hiddenResources.contains(.fungible(resourceAddress))
+		let details: KnownResourceBalance.Fungible = .init(isXRD: isXRD, amount: resourceAmount)
+
+		return .init(resource: resource, details: .fungible(details), isHidden: isHidden)
+	}
 
 	func fungibleResourceBalance(
 		_ resource: OnLedgerEntity.Resource,
@@ -77,71 +77,71 @@ extension OnLedgerEntitiesClient {
 			)
 		}()
 
-        @Dependency(\.resourcesVisibilityClient) var resourcesVisibilityClient
-        let hiddenResources = try await resourcesVisibilityClient.getHidden()
+		@Dependency(\.resourcesVisibilityClient) var resourcesVisibilityClient
+		let hiddenResources = try await resourcesVisibilityClient.getHidden()
 
-        // Check if the fungible resource is a pool unit resource
-        if await isPoolUnitResource(resource) {
-            return try await poolUnit(
-                resource,
-                amount: .init(nominalAmount: amount),
-                guarantee: guarantee,
-                poolContributions: poolContributions,
-                entities: entities,
-                resourceAssociatedDapps: resourceAssociatedDapps,
-                networkID: networkID,
-                hiddenResources: hiddenResources
-            )
-        }
+		// Check if the fungible resource is a pool unit resource
+		if await isPoolUnitResource(resource) {
+			return try await poolUnit(
+				resource,
+				amount: .init(nominalAmount: amount),
+				guarantee: guarantee,
+				poolContributions: poolContributions,
+				entities: entities,
+				resourceAssociatedDapps: resourceAssociatedDapps,
+				networkID: networkID,
+				hiddenResources: hiddenResources
+			)
+		}
 
-        // Check if the fungible resource is an LSU
-        if let validator = await isLiquidStakeUnit(resource) {
-            return try await liquidStakeUnit(
-                resource,
-                amount: .init(nominalAmount: amount),
-                guarantee: guarantee,
-                validator: validator,
-                validatorStakes: validatorStakes
-            )
-        }
-        
-        let isXRD = resourceAddress.isXRD(on: networkID)
-        let isHidden = hiddenResources.contains(.fungible(resourceAddress))
-        let details: KnownResourceBalance.Fungible = .init(
-            isXRD: isXRD,
-            amount: .init(nominalAmount: amount, guaranteed: guarantee?.amount),
-            guarantee: guarantee
-        )
+		// Check if the fungible resource is an LSU
+		if let validator = await isLiquidStakeUnit(resource) {
+			return try await liquidStakeUnit(
+				resource,
+				amount: .init(nominalAmount: amount),
+				guarantee: guarantee,
+				validator: validator,
+				validatorStakes: validatorStakes
+			)
+		}
 
-        return .init(resource: resource, details: .fungible(details), isHidden: isHidden)
+		let isXRD = resourceAddress.isXRD(on: networkID)
+		let isHidden = hiddenResources.contains(.fungible(resourceAddress))
+		let details: KnownResourceBalance.Fungible = .init(
+			isXRD: isXRD,
+			amount: .init(nominalAmount: amount, guaranteed: guarantee?.amount),
+			guarantee: guarantee
+		)
+
+		return .init(resource: resource, details: .fungible(details), isHidden: isHidden)
 	}
-    
-    private func poolUnit(
-        _ resource: OnLedgerEntity.Resource,
-        amount: ResourceAmount,
-        guarantee: TransactionGuarantee?,
-        hiddenResources: [ResourceIdentifier]
-    ) async throws -> KnownResourceBalance {
-        guard let details = try await getPoolUnitDetails(resource, forAmount: amount) else {
-            throw FailedToGetPoolUnitDetails()
-        }
 
-        let isHidden = hiddenResources.contains(.poolUnit(details.address))
+	private func poolUnit(
+		_ resource: OnLedgerEntity.Resource,
+		amount: ResourceAmount,
+		guarantee: TransactionGuarantee?,
+		hiddenResources: [ResourceIdentifier]
+	) async throws -> KnownResourceBalance {
+		guard let details = try await getPoolUnitDetails(resource, forAmount: amount) else {
+			throw FailedToGetPoolUnitDetails()
+		}
 
-        return .init(
-            resource: resource,
-            details: .poolUnit(.init(
-                details: details,
-                guarantee: guarantee
-            )),
-            isHidden: isHidden
-        )
-    }
+		let isHidden = hiddenResources.contains(.poolUnit(details.address))
+
+		return .init(
+			resource: resource,
+			details: .poolUnit(.init(
+				details: details,
+				guarantee: guarantee
+			)),
+			isHidden: isHidden
+		)
+	}
 
 	private func poolUnit(
 		_ resource: OnLedgerEntity.Resource,
 		amount: ExactResourceAmount,
-        guarantee: TransactionGuarantee?,
+		guarantee: TransactionGuarantee?,
 		poolContributions: [some TrackedPoolInteraction] = [],
 		entities: InteractionReview.Sections.ResourcesInfo = [:],
 		resourceAssociatedDapps: InteractionReview.Sections.ResourceAssociatedDapps? = nil,
@@ -192,50 +192,50 @@ extension OnLedgerEntitiesClient {
 				isHidden: isHidden
 			)
 		} else {
-            return try await poolUnit(
-                resource,
-                amount: .init(nominalAmount: amount.nominalAmount, guaranteed: guarantee?.amount),
-                guarantee: guarantee,
-                hiddenResources: hiddenResources
-            )
+			return try await poolUnit(
+				resource,
+				amount: .init(nominalAmount: amount.nominalAmount, guaranteed: guarantee?.amount),
+				guarantee: guarantee,
+				hiddenResources: hiddenResources
+			)
 		}
 	}
 
-    private func liquidStakeUnit(
-        _ resource: OnLedgerEntity.Resource,
-        amount: ResourceAmount,
-        validator: OnLedgerEntity.Validator
-    ) async throws -> KnownResourceBalance {
-        guard let totalSupply = resource.totalSupply, totalSupply.isPositive else {
-            throw MissingPositiveTotalSupply()
-        }
+	private func liquidStakeUnit(
+		_ resource: OnLedgerEntity.Resource,
+		amount: ResourceAmount,
+		validator: OnLedgerEntity.Validator
+	) async throws -> KnownResourceBalance {
+		guard let totalSupply = resource.totalSupply, totalSupply.isPositive else {
+			throw MissingPositiveTotalSupply()
+		}
 
-        let worth = amount.adjustedNominalAmount { $0 * validator.xrdVaultBalance / totalSupply }
-        
-        let details = KnownResourceBalance.LiquidStakeUnit(
-            resource: resource,
-            amount: amount,
-            worth: worth,
-            validator: validator
-        )
+		let worth = amount.adjustedNominalAmount { $0 * validator.xrdVaultBalance / totalSupply }
 
-        return .init(resource: resource, details: .liquidStakeUnit(details))
-    }
-    
+		let details = KnownResourceBalance.LiquidStakeUnit(
+			resource: resource,
+			amount: amount,
+			worth: worth,
+			validator: validator
+		)
+
+		return .init(resource: resource, details: .liquidStakeUnit(details))
+	}
+
 	private func liquidStakeUnit(
 		_ resource: OnLedgerEntity.Resource,
 		amount: ExactResourceAmount,
-        guarantee: TransactionGuarantee?,
+		guarantee: TransactionGuarantee?,
 		validator: OnLedgerEntity.Validator,
 		validatorStakes: [TrackedValidatorStake] = []
 	) async throws -> KnownResourceBalance {
-        let worth: Decimal192
+		let worth: Decimal192
 		if validatorStakes.isEmpty {
 			guard let totalSupply = resource.totalSupply, totalSupply.isPositive else {
 				throw MissingPositiveTotalSupply()
 			}
 
-            worth = amount.nominalAmount * validator.xrdVaultBalance / totalSupply
+			worth = amount.nominalAmount * validator.xrdVaultBalance / totalSupply
 		} else {
 			if let stake = validatorStakes.first(where: { $0.validatorAddress == validator.address }) {
 				guard stake.liquidStakeUnitAddress == validator.stakeUnitResourceAddress else {
@@ -254,7 +254,7 @@ extension OnLedgerEntitiesClient {
 
 		let details = KnownResourceBalance.LiquidStakeUnit(
 			resource: resource,
-            amount: .init(nominalAmount: amount.nominalAmount, guaranteed: guarantee?.amount),
+			amount: .init(nominalAmount: amount.nominalAmount, guaranteed: guarantee?.amount),
 			worth: .init(nominalAmount: worth),
 			validator: validator,
 			guarantee: guarantee
@@ -313,7 +313,11 @@ extension OnLedgerEntitiesClient {
 			} else {
 				result = tokens.map { token in
 					let isHidden = hiddenResources.contains(.nonFungible(token.id.resourceAddress))
-					return KnownResourceBalance(resource: resource, details: .nonFungible(.token(token)), isHidden: isHidden)
+					return KnownResourceBalance(
+						resource: resource,
+						details: .nonFungible(.token(token)),
+						isHidden: isHidden
+					)
 				}
 
 				guard result.count == ids.count else {
@@ -334,7 +338,11 @@ extension OnLedgerEntitiesClient {
 					)
 				}
 				.map { id in
-					KnownResourceBalance(resource: resource, details: .nonFungible(.token(.init(id: id, data: nil))), isHidden: false)
+					KnownResourceBalance(
+						resource: resource,
+						details: .nonFungible(.token(.init(id: id, data: nil))),
+						isHidden: false
+					)
 				}
 
 			guard result.count == ids.count else {
