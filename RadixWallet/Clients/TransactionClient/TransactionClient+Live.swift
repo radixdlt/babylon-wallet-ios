@@ -356,8 +356,8 @@ extension TransactionFailure {
 		case .OneOfReceivingAccountsDoesNotAllowDeposits:
 			.failedToPrepareTXReview(.oneOfRecevingAccountsDoesNotAllowDeposits)
 
-		case .FailedTransactionPreview:
-			.failedToPrepareTXReview(.failedToRetrieveTXReceipt("Unknown reason"))
+		case let .FailedTransactionPreview(message):
+			.failedToPrepareTXReview(.failedToRetrieveTXReceipt(message))
 
 		case .FailedToExtractTransactionReceiptBytes:
 			.failedToPrepareTXReview(.failedToExtractTXReceiptBytes)
