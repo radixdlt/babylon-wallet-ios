@@ -33,7 +33,7 @@ struct ResourceBalanceButton: View {
 				ResourceBalanceView(viewState, appearance: .standard, isSelected: isSelected)
 
 				if let warning {
-					WarningErrorView(text: warning, type: .warning, useNarrowSpacing: true)
+					WarningErrorView(text: warning, type: .warning, useNarrowSpacing: true, useSmallerFontSize: true)
 				}
 			}
 			.padding(.top, topPadding)
@@ -48,7 +48,7 @@ struct ResourceBalanceButton: View {
 		switch appearance {
 		case .assetList:
 			switch viewState {
-			case .fungible:
+			case .fungible, .unknown:
 				.medium1
 			case .nonFungible:
 				.large3
@@ -66,7 +66,7 @@ struct ResourceBalanceButton: View {
 		switch appearance {
 		case .assetList:
 			switch viewState {
-			case .fungible:
+			case .fungible, .unknown:
 				.medium2
 			case .nonFungible:
 				.medium1
@@ -82,7 +82,7 @@ struct ResourceBalanceButton: View {
 		switch appearance {
 		case .assetList:
 			switch viewState {
-			case .fungible:
+			case .fungible, .unknown:
 				.large3
 			case .nonFungible:
 				.medium1

@@ -12,7 +12,7 @@ struct FungibleResourceAsset: Sendable, FeatureReducer {
 		}
 
 		var balance: Decimal192 {
-			resource.amount.nominalAmount
+			resource.amount.exactAmount!.nominalAmount
 		}
 
 		var totalExceedsBalance: Bool {

@@ -40,9 +40,12 @@ struct StakeUnitList: Sendable, FeatureReducer {
 
 				let stakeClaims = details.compactMap(\.stakeClaimTokens).flatMap(\.stakeClaims)
 				let stakedAmount = details.map {
-					ResourceAmount(
-						nominalAmount: $0.xrdRedemptionValue,
-						fiatWorth: $0.stakeUnitResource?.amount.fiatWorth
+					guard let exactAmount = $0.xrdRedemptionValue.exactAmount?.nominalAmount else {
+						fatalError("Not possible")
+					}
+					return ExactResourceAmount(
+						nominalAmount: exactAmount,
+						fiatWorth: $0.stakeUnitResource?.amount.exactAmount!.fiatWorth
 					)
 				}.reduce(.zero, +)
 
@@ -52,12 +55,16 @@ struct StakeUnitList: Sendable, FeatureReducer {
 					.reduce(.zero, +)
 
 				let validatorStakes = details.map { stake in
-					ValidatorStakeView.ViewState(
+					guard let xrdRedemptionValue = stake.xrdRedemptionValue.exactAmount?.nominalAmount else {
+						fatalError("Not possible")
+					}
+
+					return ValidatorStakeView.ViewState(
 						stakeDetails: stake,
 						validatorNameViewState: .init(
 							imageURL: stake.validator.metadata.iconURL,
 							name: stake.validator.metadata.name ?? L10n.Account.PoolUnits.unknownValidatorName,
-							stakedAmount: stake.xrdRedemptionValue
+							stakedAmount: xrdRedemptionValue
 						),
 						liquidStakeUnit: stake.stakeUnitResource.map { stakeUnitResource in
 							.init(
@@ -66,17 +73,17 @@ struct StakeUnitList: Sendable, FeatureReducer {
 									icon: stakeUnitResource.resource.metadata.iconURL,
 									title: stakeUnitResource.resource.metadata.title,
 									amount: nil,
-									worth: .init(
-										nominalAmount: stake.xrdRedemptionValue,
-										fiatWorth: stake.stakeUnitResource?.amount.fiatWorth
-									),
+									worth: .exact(.init(
+										nominalAmount: xrdRedemptionValue,
+										fiatWorth: stake.stakeUnitResource?.amount.exactAmount!.fiatWorth
+									)),
 									validatorName: nil
 								),
 								isSelected: selectedLiquidStakeUnits?.contains { $0.id == stakeUnitResource.resource.resourceAddress }
 							)
 						},
 						stakeClaimResource: stake.stakeClaimTokens.map { stakeClaimTokens in
-							ResourceBalance.StakeClaimNFT(
+							KnownResourceBalance.StakeClaimNFT(
 								canClaimTokens: allSelectedTokens == nil, // cannot claim in selection mode
 								stakeClaimTokens: stakeClaimTokens,
 								selectedStakeClaims: allSelectedTokens
@@ -252,7 +259,11 @@ extension OnLedgerEntitiesClient.OwnedStakeDetails: Identifiable {
 }
 
 extension OnLedgerEntitiesClient.OwnedStakeDetails {
-	var xrdRedemptionValue: Decimal192 {
-		((stakeUnitResource?.amount.nominalAmount ?? 0) * validator.xrdVaultBalance) / (stakeUnitResource?.resource.totalSupply ?? 1)
+	var xrdRedemptionValue: ResourceAmount {
+		stakeUnitResource?.amount.adjustedNominalAmount { xrdRedemptionValue(exactAmount: .init(nominalAmount: $0)).nominalAmount } ?? .exact(ExactResourceAmount.zero)
+	}
+
+	func xrdRedemptionValue(exactAmount: ExactResourceAmount) -> ExactResourceAmount {
+		.init(nominalAmount: (exactAmount.nominalAmount * validator.xrdVaultBalance) / (stakeUnitResource?.resource.totalSupply ?? 1))
 	}
 }

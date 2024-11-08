@@ -108,7 +108,7 @@ enum SelectAccountToPayForFeeRow {
 
 		init(candidate: ValidatedFeePayerCandidate) {
 			self.account = candidate.candidate.account
-			self.fungible = .xrd(balance: .init(nominalAmount: candidate.candidate.xrdBalance), network: account.networkID)
+			self.fungible = .xrd(balance: .exact(candidate.candidate.xrdBalance), network: account.networkID)
 			self.isBalanceInsufficient = candidate.outcome == .insufficientBalance
 		}
 	}

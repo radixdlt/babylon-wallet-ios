@@ -1,3 +1,4 @@
+// MARK: - ResourceBalance
 typealias IDResourceBalance = Identified<Tagged<ResourceBalance, UUID>, ResourceBalance>
 
 extension ResourceBalance {
@@ -7,7 +8,56 @@ extension ResourceBalance {
 }
 
 // MARK: - ResourceBalance
-struct ResourceBalance: Sendable, Hashable {
+enum ResourceBalance: Sendable, Hashable {
+	case known(KnownResourceBalance)
+	case unknown
+
+	init(resource: OnLedgerEntity.Resource, details: KnownResourceBalance.Details, isHidden: Bool? = nil) {
+		let knownResourceBalance = KnownResourceBalance(resource: resource, details: details, isHidden: isHidden)
+		self = .known(knownResourceBalance)
+	}
+}
+
+extension ResourceBalance {
+	var resource: OnLedgerEntity.Resource? {
+		switch self {
+		case let .known(resourceBalance): resourceBalance.resource
+		case .unknown: nil
+		}
+	}
+
+	var details: KnownResourceBalance.Details? {
+		switch self {
+		case let .known(resourceBalance): resourceBalance.details
+		case .unknown: nil
+		}
+	}
+
+	var isHidden: Bool? {
+		switch self {
+		case let .known(resourceBalance): resourceBalance.isHidden
+		case .unknown: nil
+		}
+	}
+}
+
+// MARK: - KnownResourceBalance
+typealias IDKnownResourceBalance = Identified<Tagged<KnownResourceBalance, UUID>, KnownResourceBalance>
+
+extension KnownResourceBalance {
+	var asIdentified: IDKnownResourceBalance {
+		.init(self, id: .init())
+	}
+}
+
+extension KnownResourceBalance {
+	var toResourceBalance: ResourceBalance {
+		.known(self)
+	}
+}
+
+// MARK: - KnownResourceBalance
+struct KnownResourceBalance: Sendable, Hashable {
 	let resource: OnLedgerEntity.Resource
 	var details: Details
 
@@ -37,13 +87,26 @@ struct ResourceBalance: Sendable, Hashable {
 
 	struct LiquidStakeUnit: Sendable, Hashable {
 		let resource: OnLedgerEntity.Resource
-		let amount: Decimal192
+		let amount: ResourceAmount
 		let worth: ResourceAmount
 		let validator: OnLedgerEntity.Validator
 		var guarantee: TransactionGuarantee?
 	}
 
-	typealias NonFungible = OnLedgerEntity.NonFungibleToken
+	enum NonFungible: Sendable, Hashable {
+		case token(OnLedgerEntity.NonFungibleToken)
+		case amount(amount: ResourceAmount)
+
+		var token: OnLedgerEntity.NonFungibleToken? {
+			guard case let .token(token) = self else { return nil }
+			return token
+		}
+
+		var amount: ResourceAmount? {
+			guard case let .amount(amount) = self else { return nil }
+			return amount
+		}
+	}
 
 	struct PoolUnit: Sendable, Hashable {
 		let details: OnLedgerEntitiesClient.OwnedResourcePoolDetails
@@ -90,22 +153,6 @@ struct ResourceBalance: Sendable, Hashable {
 			var toBeClaimed: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim> {
 				stakeClaims.filter(\.isToBeClaimed)
 			}
-		}
-	}
-
-	// Helper types
-
-	struct Amount: Sendable, Hashable {
-		let amount: ResourceAmount
-		let guaranteed: Decimal192?
-
-		init(_ amount: ResourceAmount, guaranteed: Decimal192? = nil) {
-			self.amount = amount
-			self.guaranteed = guaranteed
-		}
-
-		init(_ amount: Decimal192, guaranteed: Decimal192? = nil) {
-			self.init(.init(nominalAmount: amount), guaranteed: guaranteed)
 		}
 	}
 }

@@ -40,7 +40,7 @@ extension InteractionReview {
 // MARK: - InteractionReview.ProofEntity
 extension InteractionReview {
 	struct ProofEntity: Sendable, Identifiable, Hashable {
-		var id: ResourceBalance { resourceBalance }
-		let resourceBalance: ResourceBalance
+		var id: KnownResourceBalance { resourceBalance }
+		let resourceBalance: KnownResourceBalance
 	}
 }

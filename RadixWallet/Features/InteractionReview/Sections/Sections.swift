@@ -47,7 +47,7 @@ extension InteractionReview {
 			enum ParentAction: Sendable, Equatable {
 				case resolveExecutionSummary(ExecutionSummary, NetworkID)
 				case resolveManifestSummary(ManifestSummary, NetworkID)
-				case showResourceDetails(OnLedgerEntity.Resource, ResourceBalance.Details)
+				case showResourceDetails(OnLedgerEntity.Resource, KnownResourceBalance.Details)
 			}
 		}
 
@@ -184,6 +184,7 @@ extension InteractionReview {
 				state.accountDepositSetting = sections.accountDepositSetting
 				state.accountDepositExceptions = sections.accountDepositExceptions
 				state.proofs = sections.proofs
+				state.showPossibleDappCalls = sections.showPossibleDappCalls
 				return .none
 			}
 		}
@@ -218,7 +219,10 @@ extension InteractionReview {
 			switch childAction {
 			case let .withdrawals(.delegate(.showAsset(transfer, token))),
 			     let .deposits(.delegate(.showAsset(transfer, token))):
-				return resourceDetailsEffect(state: &state, resource: transfer.resource, details: transfer.details, nft: token)
+				guard let resource = transfer.resource, let details = transfer.details else {
+					return .none
+				}
+				return resourceDetailsEffect(state: &state, resource: resource, details: details, nft: token)
 
 			case let .dAppsUsed(.delegate(.openDapp(dAppID))), let .contributingToPools(.delegate(.openDapp(dAppID))), let .redeemingFromPools(.delegate(.openDapp(dAppID))):
 				state.destination = .dApp(.init(dAppDefinitionAddress: dAppID))
@@ -260,7 +264,7 @@ private extension InteractionReview.Sections {
 	func resourceDetailsEffect(
 		state: inout State,
 		resource: OnLedgerEntity.Resource,
-		details: ResourceBalance.Details,
+		details: KnownResourceBalance.Details,
 		nft: OnLedgerEntity.NonFungibleToken? = nil
 	) -> Effect<Action> {
 		switch details {
@@ -281,14 +285,17 @@ private extension InteractionReview.Sections {
 			state.destination = .nonFungibleTokenDetails(.init(
 				resourceAddress: resource.resourceAddress,
 				resourceDetails: .success(resource),
-				token: details,
+				details: details,
 				ledgerState: resource.atLedgerState
 			))
 
 		case let .liquidStakeUnit(details):
 			state.destination = .lsuDetails(.init(
 				validator: details.validator,
-				stakeUnitResource: .init(resource: details.resource, amount: .init(nominalAmount: details.amount)),
+				stakeUnitResource: .init(
+					resource: details.resource,
+					amount: details.amount
+				),
 				xrdRedemptionValue: details.worth
 			))
 
@@ -299,7 +306,7 @@ private extension InteractionReview.Sections {
 			state.destination = .nonFungibleTokenDetails(.init(
 				resourceAddress: resource.resourceAddress,
 				resourceDetails: .success(resource),
-				token: nft,
+				details: nft.map(KnownResourceBalance.NonFungible.token),
 				ledgerState: resource.atLedgerState,
 				stakeClaim: details.stakeClaimTokens.stakeClaims.first,
 				isClaimStakeEnabled: false
