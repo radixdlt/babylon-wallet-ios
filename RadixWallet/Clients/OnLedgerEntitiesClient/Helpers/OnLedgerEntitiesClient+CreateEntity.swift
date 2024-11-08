@@ -569,14 +569,12 @@ extension OnLedgerEntitiesClient {
 		struct ResourceWithRedemptionValue: Hashable, Sendable {
 			let resource: OnLedgerEntity.Resource
 			var redemptionValue: ResourceAmount?
-//			var guarantee: Decimal192?
 		}
 	}
 
 	struct ResourceWithVaultAmount: Hashable, Sendable {
 		let resource: OnLedgerEntity.Resource
 		var amount: ResourceAmount
-//		var guarantee: Decimal192?
 	}
 
 	struct StakeClaim: Hashable, Sendable, Identifiable {

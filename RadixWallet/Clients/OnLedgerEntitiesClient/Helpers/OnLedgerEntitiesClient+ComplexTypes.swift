@@ -142,7 +142,7 @@ extension OnLedgerEntitiesClient {
 		_ resource: OnLedgerEntity.Resource,
 		amount: ExactResourceAmount,
 		guarantee: TransactionGuarantee?,
-		poolContributions: [some TrackedPoolInteraction] = [],
+		poolContributions: [some TrackedPoolInteraction],
 		entities: InteractionReview.Sections.ResourcesInfo = [:],
 		resourceAssociatedDapps: InteractionReview.Sections.ResourceAssociatedDapps? = nil,
 		networkID: NetworkID,
@@ -227,7 +227,7 @@ extension OnLedgerEntitiesClient {
 		amount: ExactResourceAmount,
 		guarantee: TransactionGuarantee?,
 		validator: OnLedgerEntity.Validator,
-		validatorStakes: [TrackedValidatorStake] = []
+		validatorStakes: [TrackedValidatorStake]
 	) async throws -> KnownResourceBalance {
 		let worth: Decimal192
 		if validatorStakes.isEmpty {
