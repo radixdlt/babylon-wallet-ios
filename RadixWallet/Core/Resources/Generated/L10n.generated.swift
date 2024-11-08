@@ -1492,6 +1492,10 @@ internal enum L10n {
       internal static let invalidRequestMessage = L10n.tr("Localizable", "dAppRequest_validationOutcome_invalidRequestMessage", fallback: "Could not validate the dApp.")
       /// Invalid Request.
       internal static let invalidRequestTitle = L10n.tr("Localizable", "dAppRequest_validationOutcome_invalidRequestTitle", fallback: "Invalid Request.")
+      /// Pre-authorization request was rejected because you weren't given enough time to review it.
+      internal static let preAuthorizationExpirationTooClose = L10n.tr("Localizable", "dAppRequest_validationOutcome_preAuthorizationExpirationTooClose", fallback: "Pre-authorization request was rejected because you weren't given enough time to review it.")
+      /// Pre-authorization request was rejected because it has already expired.
+      internal static let preAuthorizationExpired = L10n.tr("Localizable", "dAppRequest_validationOutcome_preAuthorizationExpired", fallback: "Pre-authorization request was rejected because it has already expired.")
       /// Invalid data in request
       internal static let shortExplanationBadContent = L10n.tr("Localizable", "dAppRequest_validationOutcome_shortExplanationBadContent", fallback: "Invalid data in request")
       /// Please update Radix Wallet
@@ -1929,6 +1933,12 @@ internal enum L10n {
       internal static let text = L10n.tr("Localizable", "homePageCarousel_discoverRadix_text", fallback: "Start RadQuest, learn about Radix, earn XRD and collectibles.")
       /// Discover Radix. Get XRD
       internal static let title = L10n.tr("Localizable", "homePageCarousel_discoverRadix_title", fallback: "Discover Radix. Get XRD")
+    }
+    internal enum DiscoverRadixDapps {
+      /// Start digging into Web3 dApps on the Radix Ecosystem directory.
+      internal static let text = L10n.tr("Localizable", "homePageCarousel_discoverRadixDapps_text", fallback: "Start digging into Web3 dApps on the Radix Ecosystem directory.")
+      /// Discover Radix dApps
+      internal static let title = L10n.tr("Localizable", "homePageCarousel_discoverRadixDapps_title", fallback: "Discover Radix dApps")
     }
     internal enum RejoinRadquest {
       /// Continue your Radix journey in your browser. Tap to dismiss.
