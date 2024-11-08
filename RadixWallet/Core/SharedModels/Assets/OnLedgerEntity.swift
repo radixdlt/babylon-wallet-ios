@@ -373,8 +373,7 @@ extension OnLedgerEntity {
 
 		var debugDescription: String {
 			let symbol: String = metadata.symbol ?? "???"
-
-			return "\(symbol) - \(resourceAddress.formatted()) | # \(amount.nominalAmount.formatted())"
+			return "\(symbol) - \(resourceAddress.formatted()) | # \(String(reflecting: amount))"
 		}
 
 		init(
@@ -555,7 +554,7 @@ extension OnLedgerEntity.OnLedgerAccount {
 		var debugDescription: String {
 			"""
 			\(validatorAddress.formatted())
-			staked: \(stakeUnitResource?.amount.nominalAmount.formatted() ?? "NONE")
+			staked: \(stakeUnitResource.map { String(reflecting: $0.amount) } ?? "NONE")
 			claimable?: \(stakeClaimResource != nil)
 			"""
 		}
@@ -588,7 +587,7 @@ extension OnLedgerEntity.OnLedgerAccount {
 			"""
 			\(resourcePoolAddress.formatted())
 			kind: \(descriptionOfPoolKind)
-			amount: \(resource.amount.nominalAmount.formatted())
+			amount: \(String(reflecting: resource.amount))
 			"""
 		}
 
@@ -678,9 +677,9 @@ extension OnLedgerEntity.OnLedgerAccount {
 
 extension OnLedgerEntity.Resource {
 	func poolRedemptionValue(
-		for amount: Decimal192,
+		for amount: ResourceAmount,
 		poolUnitResource: OnLedgerEntitiesClient.ResourceWithVaultAmount
-	) -> Decimal192? {
+	) -> ResourceAmount? {
 		guard let poolUnitTotalSupply = poolUnitResource.resource.totalSupply else {
 			loggerGlobal.error("Missing total supply for \(poolUnitResource.resource.resourceAddress.address)")
 			return nil
@@ -689,9 +688,12 @@ extension OnLedgerEntity.Resource {
 			loggerGlobal.error("Total supply is 0 for \(poolUnitResource.resource.resourceAddress.address)")
 			return nil
 		}
-		let redemptionValue = poolUnitResource.amount.nominalAmount * (amount / poolUnitTotalSupply)
+		guard case let .exact(amount) = amount else {
+			return nil
+		}
+		let redemptionValue = poolUnitResource.amount.adjustedNominalAmount { $0 * (amount.nominalAmount / poolUnitTotalSupply) }
 		let decimalPlaces = divisibility ?? Decimal192.maxDivisibility
-		let roundedRedemptionValue = redemptionValue.rounded(decimalPlaces: decimalPlaces)
+		let roundedRedemptionValue = redemptionValue.adjustedNominalAmount { $0.rounded(decimalPlaces: decimalPlaces) }
 
 		return roundedRedemptionValue
 	}

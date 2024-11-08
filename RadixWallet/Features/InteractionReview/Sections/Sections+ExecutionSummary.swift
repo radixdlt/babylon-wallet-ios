@@ -1,3 +1,5 @@
+import Sargon
+
 extension InteractionReview.Sections {
 	// Either the resource from ledger or metadata extracted from the TX manifest
 	typealias ResourceInfo = Either<OnLedgerEntity.Resource, OnLedgerEntity.Metadata>
@@ -54,15 +56,7 @@ extension InteractionReview.Sections {
 				networkID: networkID
 			)
 
-			let dappAddresses = summary.encounteredAddresses.compactMap {
-				switch $0 {
-				case let .component(componentAddress):
-					componentAddress.isGlobal ? componentAddress.asGeneral : nil
-				case let .locker(lockerAddress):
-					lockerAddress.asGeneral
-				}
-			}
-
+			let dappAddresses = extractDappAddresses(encounteredAddresses: summary.encounteredAddresses)
 			let dAppsUsed = try await extractDapps(
 				addresses: dappAddresses,
 				unknownTitle: L10n.TransactionReview.unknownComponents
@@ -282,7 +276,7 @@ extension InteractionReview.Sections {
 		}
 	}
 
-	private func extractUserAccounts(_ allAddress: [AccountAddress]) async throws -> [Common.ReviewAccount] {
+	func extractUserAccounts(_ allAddress: [AccountAddress]) async throws -> [Common.ReviewAccount] {
 		let userAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
 
 		return allAddress
@@ -298,7 +292,18 @@ extension InteractionReview.Sections {
 			}
 	}
 
-	private func extractDapps(
+	func extractDappAddresses(encounteredAddresses: [ManifestEncounteredComponentAddress]) -> [Address] {
+		encounteredAddresses.compactMap {
+			switch $0 {
+			case let .component(componentAddress):
+				componentAddress.isGlobal ? componentAddress.asGeneral : nil
+			case let .locker(lockerAddress):
+				lockerAddress.asGeneral
+			}
+		}
+	}
+
+	func extractDapps(
 		addresses: [Address],
 		unknownTitle: (Int) -> String
 	) async throws -> InteractionReviewDapps<ComponentAddress>.State? {
@@ -331,7 +336,7 @@ extension InteractionReview.Sections {
 		return .init(id: dAppDefinitionAddress, metadata: metadata)
 	}
 
-	private func exctractProofs(_ accountProofs: [ResourceSpecifier]) async throws -> Common.Proofs.State? {
+	func exctractProofs(_ accountProofs: [ResourceSpecifier]) async throws -> Common.Proofs.State? {
 		let proofs = try await accountProofs
 			.uniqued()
 			.asyncMap(extractResourceBalanceInfo)
@@ -343,7 +348,7 @@ extension InteractionReview.Sections {
 		return Common.Proofs.State(kind: .transaction, proofs: proofs.asIdentified())
 	}
 
-	private func extractResourceBalanceInfo(specifier: ResourceSpecifier) async throws -> [(ResourceAddress, ResourceBalance.Details)] {
+	private func extractResourceBalanceInfo(specifier: ResourceSpecifier) async throws -> [(ResourceAddress, KnownResourceBalance.Details)] {
 		switch specifier {
 		case let .fungible(resourceAddress, amount):
 			return [(
@@ -351,7 +356,7 @@ extension InteractionReview.Sections {
 				.fungible(
 					.init(
 						isXRD: resourceAddress.isXRD,
-						amount: .init(nominalAmount: amount)
+						amount: .exact(amount)
 					)
 				)
 			)]
@@ -360,13 +365,13 @@ extension InteractionReview.Sections {
 			let tokens = try await onLedgerEntitiesClient.getNonFungibleTokenData(
 				.init(resource: resourceAddress, nonFungibleIds: globalIds)
 			)
-			return tokens.map { (resourceAddress, .nonFungible($0)) }
+			return tokens.map { (resourceAddress, .nonFungible(.token($0))) }
 		}
 	}
 
-	private func extractProofInfo(resourceAddress: ResourceAddress, details: ResourceBalance.Details) async throws -> Common.ProofEntity {
+	private func extractProofInfo(resourceAddress: ResourceAddress, details: KnownResourceBalance.Details) async throws -> Common.ProofEntity {
 		try await Common.ProofEntity(
-			resourceBalance: ResourceBalance(
+			resourceBalance: KnownResourceBalance(
 				resource: onLedgerEntitiesClient.getResource(resourceAddress, metadataKeys: .dappMetadataKeys),
 				details: details
 			)
@@ -609,7 +614,7 @@ extension InteractionReview.Sections {
 		case let .fungible(_, source):
 			switch resourceInfo {
 			case let .left(resource):
-				return try await [onLedgerEntitiesClient.fungibleResourceBalance(
+				return try await [.known(onLedgerEntitiesClient.fungibleResourceBalance(
 					resource,
 					resourceQuantifier: source,
 					poolContributions: poolInteractions,
@@ -618,7 +623,7 @@ extension InteractionReview.Sections {
 					resourceAssociatedDapps: resourceAssociatedDapps,
 					networkID: networkID,
 					defaultDepositGuarantee: defaultDepositGuarantee
-				)]
+				))]
 			case let .right(newEntityMetadata):
 				// A newly created fungible resource
 
@@ -627,23 +632,24 @@ extension InteractionReview.Sections {
 					metadata: newEntityMetadata
 				)
 
-				let details: ResourceBalance.Fungible = .init(
+				let details: KnownResourceBalance.Fungible = .init(
 					isXRD: false,
-					amount: .init(nominalAmount: source.amount),
+					amount: .exact(source.amount),
 					guarantee: nil
 				)
 
-				return [.init(resource: resource, details: .fungible(details), isHidden: false)]
+				return [.known(.init(resource: resource, details: .fungible(details), isHidden: false))]
 			}
 
 		case let .nonFungible(_, indicator):
 			return try await onLedgerEntitiesClient.nonFungibleResourceBalances(
 				resourceInfo,
 				resourceAddress: resourceAddress,
-				resourceQuantifier: indicator,
+				ids: indicator.ids,
 				unstakeData: unstakeData,
 				newlyCreatedNonFungibles: newlyCreatedNonFungibles
 			)
+			.map(\.toResourceBalance)
 		}
 	}
 }

@@ -103,6 +103,7 @@ internal enum AssetResource {
   internal static let persona = ImageAsset(name: "persona")
   internal static let token = ImageAsset(name: "token")
   internal static let unknownComponent = ImageAsset(name: "unknown-component")
+  internal static let unknownDeposits = ImageAsset(name: "unknown_deposits")
   internal static let xrd = ImageAsset(name: "xrd")
   internal static let advancedLock = ImageAsset(name: "advancedLock")
   internal static let appSettings = ImageAsset(name: "appSettings")

@@ -12,6 +12,14 @@ extension NonFungibleTokenDetails.State {
 		ownedResource.map { .success($0.metadata.iconURL) } ?? resourceDetails.metadata.iconURL
 	}
 
+	var token: OnLedgerEntity.NonFungibleToken? {
+		details?.token
+	}
+
+	var amount: ResourceAmount? {
+		details?.amount
+	}
+
 	var resourceDetailsViewState: AssetResourceDetailsSection.ViewState {
 		.init(
 			description: resourceDetails.metadata.description,
@@ -106,8 +114,14 @@ extension NonFungibleTokenDetails {
 							}
 
 							VStack(spacing: .medium1) {
-								loadable(store.resourceThumbnail) { url in
-									Thumbnail(.nft, url: url, size: .veryLarge)
+								VStack(spacing: .medium3) {
+									loadable(store.resourceThumbnail) { url in
+										Thumbnail(.nft, url: url, size: .veryLarge)
+									}
+
+									if let amount = store.amount {
+										ResourceBalanceView.AmountView(amount: .init(amount), appearance: .large)
+									}
 								}
 
 								AssetResourceDetailsSection(viewState: store.resourceDetailsViewState)
@@ -146,7 +160,7 @@ extension NonFungibleTokenDetails.View {
 				.foregroundColor(.app.gray1)
 
 			ResourceBalanceView(
-				.fungible(.xrd(balance: stakeClaim.claimAmount, network: stakeClaim.validatorAddress.networkID)),
+				.fungible(.xrd(balance: .exact(stakeClaim.claimAmount), network: stakeClaim.validatorAddress.networkID)),
 				appearance: .standard
 			)
 			.padding(.horizontal, .medium3)

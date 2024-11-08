@@ -42,8 +42,8 @@ struct TransactionHistoryItem: Sendable, Hashable, Identifiable {
 	let time: Date
 	let message: String?
 	let manifestClass: GatewayAPI.ManifestClass?
-	let withdrawals: [ResourceBalance]
-	let deposits: [ResourceBalance]
+	let withdrawals: [KnownResourceBalance]
+	let deposits: [KnownResourceBalance]
 	let depositSettingsUpdated: Bool
 	let failed: Bool
 
@@ -52,8 +52,8 @@ struct TransactionHistoryItem: Sendable, Hashable, Identifiable {
 		time: Date,
 		message: String? = nil,
 		manifestClass: GatewayAPI.ManifestClass? = nil,
-		withdrawals: [ResourceBalance] = [],
-		deposits: [ResourceBalance] = [],
+		withdrawals: [KnownResourceBalance] = [],
+		deposits: [KnownResourceBalance] = [],
 		depositSettingsUpdated: Bool = false,
 		failed: Bool = false
 	) {

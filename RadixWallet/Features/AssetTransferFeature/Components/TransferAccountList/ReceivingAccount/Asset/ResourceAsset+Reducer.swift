@@ -58,7 +58,7 @@ struct ResourceAsset: Sendable, FeatureReducer {
 	}
 
 	enum InternalAction: Sendable, Hashable {
-		case loadedBalance(ResourceBalance, OnLedgerEntity.NonFungibleToken? = nil)
+		case loadedBalance(KnownResourceBalance, OnLedgerEntity.NonFungibleToken? = nil)
 	}
 
 	struct Destination: DestinationReducer {
@@ -159,7 +159,7 @@ struct ResourceAsset: Sendable, FeatureReducer {
 					resourceAddress: balance.resource.resourceAddress,
 					resourceDetails: .success(balance.resource),
 					ownedResource: state.kind.nonFungible?.resource,
-					token: details,
+					details: details,
 					ledgerState: balance.resource.atLedgerState
 				))
 
@@ -168,7 +168,7 @@ struct ResourceAsset: Sendable, FeatureReducer {
 					validator: details.validator,
 					stakeUnitResource: .init(
 						resource: details.resource,
-						amount: .init(nominalAmount: details.amount)
+						amount: details.amount
 					),
 					xrdRedemptionValue: details.worth
 				))
@@ -183,7 +183,7 @@ struct ResourceAsset: Sendable, FeatureReducer {
 					resourceAddress: details.stakeClaimResource.resourceAddress,
 					resourceDetails: .success(balance.resource),
 					ownedResource: state.kind.nonFungible?.resource,
-					token: token,
+					details: token.map(KnownResourceBalance.NonFungible.token),
 					ledgerState: details.stakeClaimResource.atLedgerState,
 					stakeClaim: details.stakeClaimTokens.stakeClaims.first,
 					isClaimStakeEnabled: false
@@ -214,7 +214,7 @@ struct ResourceAsset: Sendable, FeatureReducer {
 		.run { [resourceAddress = resource.resourceAddress, resourceQuantifier = token.resourceQuantifier] send in
 			do {
 				let resource = try await onLedgerEntitiesClient.getResource(resourceAddress)
-				if let balance = try await onLedgerEntitiesClient.nonFungibleResourceBalances(.left(resource), resourceAddress: resourceAddress, resourceQuantifier: resourceQuantifier).first {
+				if let balance = try await onLedgerEntitiesClient.nonFungibleResourceBalances(.left(resource), resourceAddress: resourceAddress, ids: resourceQuantifier.ids).first {
 					await send(.internal(.loadedBalance(balance, token)))
 				}
 			} catch {
@@ -235,7 +235,7 @@ extension ResourceAsset.State {
 
 extension OnLedgerEntity.OwnedFungibleResource {
 	fileprivate var resourceQuantifier: FungibleResourceIndicator {
-		.guaranteed(decimal: amount.nominalAmount)
+		.guaranteed(decimal: amount.exactAmount?.nominalAmount ?? 0)
 	}
 }
 
