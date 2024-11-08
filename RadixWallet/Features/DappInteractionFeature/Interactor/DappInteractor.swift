@@ -464,9 +464,9 @@ extension DappInteractionClient.ValidatedDappRequest.InvalidRequestReason {
 		case .invalidPersonaOrAccounts:
 			L10n.DAppRequest.ValidationOutcome.invalidPersonaOrAccoubts
 		case .invalidPreAuthorization(.expirationTooClose):
-			"Pre-authorization request was rejected because you weren't given enough time to review it."
+			L10n.DAppRequest.ValidationOutcome.preAuthorizationExpirationTooClose
 		case .invalidPreAuthorization(.expired):
-			"Pre-authorization request was rejected because it has already expired."
+			L10n.DAppRequest.ValidationOutcome.preAuthorizationExpired
 		}
 	}
 
