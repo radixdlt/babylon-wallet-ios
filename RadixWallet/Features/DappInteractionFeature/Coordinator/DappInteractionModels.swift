@@ -217,6 +217,9 @@ extension WalletToDappInteractionSuccessResponse {
 
 		// transaction responses
 		case send(WalletToDappInteractionSendTransactionResponseItem)
+
+		// preAuthorization responses
+		case preAuthorization(WalletToDappInteractionPreAuthorizationResponseItems)
 	}
 
 	init?(
@@ -247,7 +250,7 @@ extension WalletToDappInteractionSuccessResponse {
 					oneTimePersonaData = item
 				case let .proofOfOwnership(item):
 					proofOfOwnership = item
-				case .send:
+				case .send, .preAuthorization:
 					continue
 				}
 			}
@@ -282,7 +285,7 @@ extension WalletToDappInteractionSuccessResponse {
 			var send: WalletToDappInteractionSendTransactionResponseItem? = nil
 			for item in items {
 				switch item {
-				case .auth, .ongoingAccounts, .ongoingPersonaData, .oneTimeAccounts, .oneTimePersonaData, .proofOfOwnership:
+				case .auth, .ongoingAccounts, .ongoingPersonaData, .oneTimeAccounts, .oneTimePersonaData, .proofOfOwnership, .preAuthorization:
 					continue
 				case let .send(item):
 					send = item
@@ -300,7 +303,24 @@ extension WalletToDappInteractionSuccessResponse {
 			)
 
 		case .preAuthorization:
-			fatalError("Implement")
+			var preAuthorization: WalletToDappInteractionPreAuthorizationResponseItems? = nil
+			for item in items {
+				switch item {
+				case .auth, .ongoingAccounts, .ongoingPersonaData, .oneTimeAccounts, .oneTimePersonaData, .proofOfOwnership, .send:
+					continue
+				case let .preAuthorization(item):
+					preAuthorization = item
+				}
+			}
+
+			guard let preAuthorization else {
+				return nil
+			}
+
+			self.init(
+				interactionId: interaction.interactionId,
+				items: .preAuthorization(preAuthorization)
+			)
 		}
 	}
 }

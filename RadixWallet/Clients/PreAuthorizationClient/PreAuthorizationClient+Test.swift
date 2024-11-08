@@ -10,10 +10,12 @@ extension PreAuthorizationClient: TestDependencyKey {
 	static let previewValue = Self.noop
 
 	static let noop = Self(
-		getPreview: { _ in throw NoopError() }
+		getPreview: { _ in throw NoopError() },
+		buildSubintent: { _ in throw NoopError() }
 	)
 
 	static let testValue = Self(
-		getPreview: unimplemented("\(Self.self).getPreview")
+		getPreview: unimplemented("\(Self.self).getPreview"),
+		buildSubintent: unimplemented("\(Self.self).buildSubintent")
 	)
 }

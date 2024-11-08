@@ -4,6 +4,8 @@ import Foundation
 enum SigningPurpose: Sendable, Hashable {
 	case signAuth
 	case signTransaction(SignTransactionPurpose)
+	case signPreAuthorization
+
 	enum SignTransactionPurpose: Sendable, Hashable {
 		case manifestFromDapp
 		case internalManifest(InternalTXSignPurpose)

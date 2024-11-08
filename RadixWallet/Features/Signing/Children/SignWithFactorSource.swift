@@ -122,6 +122,8 @@ struct SignWithFactorSource: Sendable, FeatureReducer {
 			auth.payloadToHashAndSign.hash()
 		case let .signTransaction(_, intent, _):
 			intent.hash().hash
+		case let .signPreAuthorization(intent):
+			intent.hash().hash
 		}
 
 		return try await deviceFactorSourceClient.signUsingDeviceFactorSource(
@@ -145,6 +147,7 @@ struct SignWithFactorSource: Sendable, FeatureReducer {
 				transactionIntent: intent,
 				displayHashOnLedgerDisplay: false
 			))
+
 		case let .signAuth(authToSign):
 			try await ledgerHardwareWalletClient.signAuthChallenge(.init(
 				ledger: ledger,
@@ -152,6 +155,14 @@ struct SignWithFactorSource: Sendable, FeatureReducer {
 				challenge: authToSign.input.challenge,
 				origin: authToSign.input.origin,
 				dAppDefinitionAddress: authToSign.input.dAppDefinitionAddress
+			))
+
+		case let .signPreAuthorization(subintent):
+			try await ledgerHardwareWalletClient.signPreAuthorization(.init(
+				ledger: ledger,
+				signers: signers,
+				subintent: subintent,
+				displayHashOnLedgerDisplay: false
 			))
 		}
 	}
@@ -170,7 +181,7 @@ private extension SigningPurposeWithPayload {
 		switch self {
 		case .signAuth:
 			.proveOwnership
-		case .signTransaction:
+		case .signTransaction, .signPreAuthorization:
 			.signature
 		}
 	}

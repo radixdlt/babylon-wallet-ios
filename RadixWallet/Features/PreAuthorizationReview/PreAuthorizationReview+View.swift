@@ -21,7 +21,7 @@ extension PreAuthorizationReview {
 		let dAppMetadata: DappMetadata.Ledger?
 		let displayMode: Common.DisplayMode
 		let sliderResetDate: Date
-		let expiration: Expiration?
+		let expiration: Expiration
 		let secondsToExpiration: Int?
 		let globalControlState: ControlState
 		let sliderControlState: ControlState
@@ -100,9 +100,12 @@ extension PreAuthorizationReview {
 					ApprovalSlider(
 						title: L10n.PreAuthorizationReview.slideToSign,
 						resetDate: viewStore.sliderResetDate
-					) {}
-						.controlState(viewStore.sliderControlState)
-						.padding(.horizontal, .medium2)
+					) {
+						store.send(.view(.approvalSliderSlid))
+					}
+					.controlState(viewStore.sliderControlState)
+					.padding(.horizontal, .medium2)
+					.padding(.bottom, .large3)
 				}
 				.animation(.easeInOut, value: viewStore.displayMode.rawManifest)
 			}
@@ -182,7 +185,7 @@ extension PreAuthorizationReview {
 		}
 
 		@ViewBuilder
-		private func expiration(_ expiration: Expiration?, secondsToExpiration: Int?) -> some SwiftUI.View {
+		private func expiration(_ expiration: Expiration, secondsToExpiration: Int?) -> some SwiftUI.View {
 			Group {
 				switch expiration {
 				case .atTime:
@@ -198,9 +201,6 @@ extension PreAuthorizationReview {
 				case let .afterDelay(value):
 					let value = TimeFormatter.format(seconds: Int(value.expireAfterSeconds))
 					Text(markdown: L10n.PreAuthorizationReview.Expiration.afterDelay(value), emphasizedColor: .app.account4pink, emphasizedFont: .app.body2Link)
-
-				case nil:
-					Color.clear
 				}
 			}
 			.textStyle(.body2Regular)
@@ -217,7 +217,7 @@ private extension PreAuthorizationReview.State {
 	}
 
 	var sliderControlState: ControlState {
-		isExpired ? .disabled : globalControlState
+		isExpired || isApprovalInProgress ? .disabled : globalControlState
 	}
 
 	var showRawManifestButton: Bool {
@@ -229,10 +229,17 @@ private extension PreAuthorizationReview.State {
 private extension View {
 	func destinations(with store: StoreOf<PreAuthorizationReview>) -> some View {
 		let destinationStore = store.scope(state: \.$destination, action: \.destination)
-		return rawManifestAlert(with: destinationStore)
+		return signing(with: destinationStore)
+			.rawManifestAlert(with: destinationStore)
 	}
 
 	private func rawManifestAlert(with destinationStore: PresentationStoreOf<PreAuthorizationReview.Destination>) -> some View {
 		alert(store: destinationStore.scope(state: \.rawManifestAlert, action: \.rawManifestAlert))
+	}
+
+	private func signing(with destinationStore: PresentationStoreOf<PreAuthorizationReview.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.signing, action: \.signing)) {
+			Signing.View(store: $0)
+		}
 	}
 }

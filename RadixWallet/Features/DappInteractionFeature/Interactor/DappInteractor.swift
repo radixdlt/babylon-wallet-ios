@@ -160,7 +160,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			dismissCurrentModalAndRequest(request, for: &state)
 			switch response {
 			case .success:
-				return delayedShortEffect(for: .internal(.presentResponseSuccessView(dappMetadata, txID, request.route)))
+				return .send(.internal(.presentResponseSuccessView(dappMetadata, txID, request.route)))
 			case .failure:
 				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
 			}

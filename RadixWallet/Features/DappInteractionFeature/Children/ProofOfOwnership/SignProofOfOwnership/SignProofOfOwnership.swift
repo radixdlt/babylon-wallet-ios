@@ -117,7 +117,7 @@ struct SignProofOfOwnership: Sendable, FeatureReducer {
 				loggerGlobal.error("Failed to sign proof of ownership")
 				return .send(.delegate(.failedToSign))
 
-			case .finishedSigning(.signTransaction):
+			case .finishedSigning(.signTransaction), .finishedSigning(.signPreAuthorization):
 				state.destination = nil
 				assertionFailure("Signed a transaction while expecting auth")
 				loggerGlobal.error("Signed a transaction while expecting auth")
