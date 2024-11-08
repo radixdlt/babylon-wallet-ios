@@ -11,29 +11,29 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.StreamTransactionsRequestEventFilterItem")
-public typealias StreamTransactionsRequestEventFilterItem = GatewayAPI.StreamTransactionsRequestEventFilterItem
+typealias StreamTransactionsRequestEventFilterItem = GatewayAPI.StreamTransactionsRequestEventFilterItem
 
 extension GatewayAPI {
 
-public struct StreamTransactionsRequestEventFilterItem: Codable, Hashable {
+struct StreamTransactionsRequestEventFilterItem: Codable, Hashable {
 
-    public enum Event: String, Codable, CaseIterable {
+    enum Event: String, Codable, CaseIterable {
         case deposit = "Deposit"
         case withdrawal = "Withdrawal"
     }
-    public private(set) var event: Event
+    private(set) var event: Event
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var emitterAddress: String?
+    private(set) var emitterAddress: String?
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var resourceAddress: String?
+    private(set) var resourceAddress: String?
 
-    public init(event: Event, emitterAddress: String? = nil, resourceAddress: String? = nil) {
+    init(event: Event, emitterAddress: String? = nil, resourceAddress: String? = nil) {
         self.event = event
         self.emitterAddress = emitterAddress
         self.resourceAddress = resourceAddress
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case event
         case emitterAddress = "emitter_address"
         case resourceAddress = "resource_address"
@@ -41,7 +41,7 @@ public struct StreamTransactionsRequestEventFilterItem: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(event, forKey: .event)
         try container.encodeIfPresent(emitterAddress, forKey: .emitterAddress)

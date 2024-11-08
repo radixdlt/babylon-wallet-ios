@@ -11,19 +11,19 @@ extension EditPersonaAddEntryKinds.State {
 }
 
 extension EditPersonaAddEntryKinds {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let availableEntryKinds: [EntryKind]
 		let selectedEntryKinds: [EntryKind]?
 	}
 
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<EditPersonaAddEntryKinds>
 
-		public init(store: StoreOf<EditPersonaAddEntryKinds>) {
+		init(store: StoreOf<EditPersonaAddEntryKinds>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				NavigationStack {
 					VStack(spacing: .medium3) {

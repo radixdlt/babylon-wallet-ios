@@ -70,7 +70,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 		case failedToProveOwnership(of: [Account])
 	}
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		enum State: Sendable, Hashable {
 			case signing(Signing.State)
 		}

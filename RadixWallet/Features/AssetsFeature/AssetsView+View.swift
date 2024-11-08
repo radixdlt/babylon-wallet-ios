@@ -3,17 +3,17 @@ import SwiftUI
 
 // MARK: - AssetsView.View
 extension AssetsView {
-	public typealias ViewState = State
+	typealias ViewState = State
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<AssetsView>
 
-		public init(store: StoreOf<AssetsView>) {
+		init(store: StoreOf<AssetsView>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: identity, send: FeatureAction.view) { viewStore in
 				List {
 					assetTypeSelectorView(viewStore)

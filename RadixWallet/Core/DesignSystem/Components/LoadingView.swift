@@ -1,9 +1,9 @@
 // MARK: - LoadingView
-public struct LoadingView: View {
+struct LoadingView: View {
 	@State private var rotationDegrees: CGFloat
 	private let lineWidth: CGFloat
 	private let stroke: Color
-	public init(
+	init(
 		rotationDegrees: CGFloat = 0.0,
 		lineWidth: CGFloat = 2,
 		stroke: Color = Color.app.white
@@ -15,7 +15,7 @@ public struct LoadingView: View {
 }
 
 extension LoadingView {
-	public var body: some View {
+	var body: some View {
 		ZStack {
 			Circle()
 				.stroke(

@@ -4,29 +4,29 @@ import SwiftUI
 private let stringValuesTestKey = "stringValuesTestKey"
 
 // MARK: - DebugUserDefaultsContents
-public struct DebugUserDefaultsContents: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public struct KeyValues: Sendable, Hashable, Identifiable {
-			public var id: String { key.rawValue }
-			public let key: UserDefaults.Dependency.Key
-			public let values: [String]
-			public init(key: UserDefaults.Dependency.Key, values: [String]) {
+struct DebugUserDefaultsContents: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		struct KeyValues: Sendable, Hashable, Identifiable {
+			var id: String { key.rawValue }
+			let key: UserDefaults.Dependency.Key
+			let values: [String]
+			init(key: UserDefaults.Dependency.Key, values: [String]) {
 				self.key = key
 				self.values = values
 			}
 		}
 
-		public var keyedValues: IdentifiedArrayOf<KeyValues> = []
-		public var stringValuesOverTime: [String] = []
-		public init() {}
+		var keyedValues: IdentifiedArrayOf<KeyValues> = []
+		var stringValuesOverTime: [String] = []
+		init() {}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case task
 		case removeAllButtonTapped
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case removedAll
 		case gotStringValue(String)
 	}
@@ -34,9 +34,9 @@ public struct DebugUserDefaultsContents: Sendable, FeatureReducer {
 	@Dependency(\.userDefaults) var userDefaults
 	@Dependency(\.uuid) var uuid
 	@Dependency(\.continuousClock) var clock
-	public init() {}
+	init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			loadKeyValues(into: &state)
@@ -64,7 +64,7 @@ public struct DebugUserDefaultsContents: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case .removedAll:
 			loadKeyValues(into: &state)

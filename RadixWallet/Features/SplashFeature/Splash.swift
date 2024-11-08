@@ -2,21 +2,21 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - Splash
-public struct Splash: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public enum Context: Sendable {
+struct Splash: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		enum Context: Sendable {
 			case appStarted
 			case appForegrounded
 		}
 
-		public let context: Context
+		let context: Context
 
 		@PresentationState
-		public var destination: Destination.State?
+		var destination: Destination.State?
 
 		var biometricsCheckFailed: Bool = false
 
-		public init(
+		init(
 			context: Context = .appStarted,
 			destination: Destination.State? = nil
 		) {
@@ -25,40 +25,40 @@ public struct Splash: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case appeared
 		case didTapToUnlock
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case passcodeConfigResult(TaskResult<LocalAuthenticationConfig>)
 		case biometricsCheckResult(TaskResult<Bool>)
 		case advancedLockStateLoaded(isEnabled: Bool)
 		case showAppLockMessage
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
-		case completed(Profile)
+	enum DelegateAction: Sendable, Equatable {
+		case completed(ProfileState)
 	}
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case errorAlert(AlertState<Action.ErrorAlert>)
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case errorAlert(ErrorAlert)
 
-			public enum ErrorAlert: Sendable, Equatable {
+			enum ErrorAlert: Sendable, Equatable {
 				case retryVerifyPasscodeButtonTapped
 				case openSettingsButtonTapped
 				case appLockOkButtonTapped
 			}
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			EmptyReducer()
 		}
 	}
@@ -68,9 +68,9 @@ public struct Splash: Sendable, FeatureReducer {
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.userDefaults) var userDefaults
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -79,11 +79,28 @@ public struct Splash: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			return .run { send in
-				let isAdvancedLockEnabled = await onboardingClient.loadProfile().appPreferences.security.isAdvancedLockEnabled
+			switch state.context {
+			case .appStarted:
+				return bootSargonOS().concatenate(with: loadAdvancedLockState())
+			case .appForegrounded:
+				return loadAdvancedLockState()
+			}
+
+		case .didTapToUnlock:
+			state.biometricsCheckFailed = false
+			return verifyPasscode()
+		}
+	}
+
+	func loadAdvancedLockState() -> Effect<Action> {
+		.run { send in
+			let profileState = await onboardingClient.loadProfileState()
+
+			if case let .loaded(profile) = profileState {
+				let isAdvancedLockEnabled = profile.appPreferences.security.isAdvancedLockEnabled
 
 				guard #available(iOS 18, *) else {
 					// For versions below iOS 18, perform the advanced lock state check
@@ -106,15 +123,13 @@ public struct Splash: Sendable, FeatureReducer {
 				} else {
 					await send(.internal(.advancedLockStateLoaded(isEnabled: false)))
 				}
+			} else {
+				await send(.internal(.advancedLockStateLoaded(isEnabled: false)))
 			}
-
-		case .didTapToUnlock:
-			state.biometricsCheckFailed = false
-			return verifyPasscode()
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .advancedLockStateLoaded(isEnabled):
 			return isEnabled ? verifyPasscode() : delegateCompleted(context: state.context)
@@ -179,7 +194,7 @@ public struct Splash: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .errorAlert(.retryVerifyPasscodeButtonTapped):
 			return verifyPasscode()
@@ -192,6 +207,26 @@ public struct Splash: Sendable, FeatureReducer {
 		case .errorAlert(.appLockOkButtonTapped):
 			userDefaults.setAppLockMessageShown(true)
 			return .send(.internal(.advancedLockStateLoaded(isEnabled: false)))
+		}
+	}
+
+	private func bootSargonOS() -> Effect<Action> {
+		.run { _ in
+			do {
+				try await SargonOS.creatingShared(
+					bootingWith: .creatingShared(
+						drivers: .init(
+							bundle: Bundle.main,
+							userDefaultsSuite: UserDefaults.Dependency.radixSuiteName,
+							secureStorageDriver: SargonSecureStorage()
+						)
+					)
+				)
+			} catch {
+				// Ignore error.
+				// The only error that can be thrown is SargonOSAlreadyBooted.
+				loggerGlobal.error("Did try to boot SargonOS more than once")
+			}
 		}
 	}
 
@@ -217,7 +252,7 @@ public struct Splash: Sendable, FeatureReducer {
 		.run { send in
 			switch context {
 			case .appStarted:
-				await send(.delegate(.completed(onboardingClient.loadProfile())))
+				await send(.delegate(.completed(onboardingClient.loadProfileState())))
 			case .appForegrounded:
 				localAuthenticationClient.setAuthenticatedSuccessfully()
 			}

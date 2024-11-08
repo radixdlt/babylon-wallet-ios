@@ -2,20 +2,20 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - DebugInspectProfile
-public struct DebugInspectProfile: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public enum Mode: Sendable, Hashable {
+struct DebugInspectProfile: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		enum Mode: Sendable, Hashable {
 			case rawJSON, structured
 		}
 
-		public var mode: Mode
-		public let profile: Profile
-		public init(profile: Profile, mode: Mode = .structured) {
+		var mode: Mode
+		let profile: Profile
+		init(profile: Profile, mode: Mode = .structured) {
 			self.profile = profile
 			self.mode = mode
 		}
 
-		public var json: String? {
+		var json: String? {
 			guard
 				case let json = profile.profileSnapshot(),
 				let jsonString = String(data: json, encoding: .utf8)
@@ -24,15 +24,15 @@ public struct DebugInspectProfile: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case toggleModeButtonTapped
 		case copyJSONButtonTapped
 	}
 
 	@Dependency(\.pasteboardClient) var pasteboardClient
-	public init() {}
+	init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .toggleModeButtonTapped:
 			state.mode.toggle()

@@ -11,12 +11,12 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.TransactionPayloadStatus")
-public typealias TransactionPayloadStatus = GatewayAPI.TransactionPayloadStatus
+typealias TransactionPayloadStatus = GatewayAPI.TransactionPayloadStatus
 
 extension GatewayAPI {
 
 /** A more specific payload status. See the description field for further information.  */
-public enum TransactionPayloadStatus: String, Codable, CaseIterable {
+enum TransactionPayloadStatus: String, Codable, CaseIterable {
     case unknown = "Unknown"
     case committedSuccess = "CommittedSuccess"
     case committedFailure = "CommittedFailure"

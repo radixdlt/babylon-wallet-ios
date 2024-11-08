@@ -1,15 +1,15 @@
 import SwiftUI
 
-public struct InfoButton: View {
-	public let item: InfoLinkSheet.GlossaryItem
-	public let label: String?
+struct InfoButton: View {
+	let item: InfoLinkSheet.GlossaryItem
+	let label: String?
 
-	public init(_ item: InfoLinkSheet.GlossaryItem, label: String? = nil) {
+	init(_ item: InfoLinkSheet.GlossaryItem, label: String? = nil) {
 		self.item = item
 		self.label = label
 	}
 
-	public var body: some View {
+	var body: some View {
 		Button(action: showInfo) {
 			if let label {
 				Text(label)

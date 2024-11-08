@@ -2,12 +2,14 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - PoolUnitDetails
-public struct PoolUnitDetails: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
+@Reducer
+struct PoolUnitDetails: Sendable, FeatureReducer {
+	@ObservableState
+	struct State: Sendable, Hashable {
 		let resourcesDetails: OnLedgerEntitiesClient.OwnedResourcePoolDetails
 		var hideResource: HideResource.State
 
-		public init(resourcesDetails: OnLedgerEntitiesClient.OwnedResourcePoolDetails) {
+		init(resourcesDetails: OnLedgerEntitiesClient.OwnedResourcePoolDetails) {
 			self.resourcesDetails = resourcesDetails
 			self.hideResource = .init(kind: .poolUnit(resourcesDetails.address))
 		}
@@ -15,16 +17,18 @@ public struct PoolUnitDetails: Sendable, FeatureReducer {
 
 	@Dependency(\.dismiss) var dismiss
 
-	public enum ViewAction: Sendable, Equatable {
+	typealias Action = FeatureAction<Self>
+
+	enum ViewAction: Sendable, Equatable {
 		case closeButtonTapped
 	}
 
 	@CasePathable
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case hideResource(HideResource.Action)
 	}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Scope(state: \.hideResource, action: \.child.hideResource) {
 			HideResource()
 		}
@@ -32,7 +36,7 @@ public struct PoolUnitDetails: Sendable, FeatureReducer {
 		Reduce(core)
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
 			.run { _ in
@@ -41,7 +45,7 @@ public struct PoolUnitDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .hideResource(.delegate(.didHideResource)):
 			.run { _ in await dismiss() }

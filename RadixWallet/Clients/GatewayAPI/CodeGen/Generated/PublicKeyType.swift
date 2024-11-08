@@ -11,11 +11,11 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.PublicKeyType")
-public typealias PublicKeyType = GatewayAPI.PublicKeyType
+typealias PublicKeyType = GatewayAPI.PublicKeyType
 
 extension GatewayAPI {
 
-public enum PublicKeyType: String, Codable, CaseIterable {
+enum PublicKeyType: String, Codable, CaseIterable {
     case ecdsaSecp256k1 = "EcdsaSecp256k1"
     case eddsaEd25519 = "EddsaEd25519"
 }

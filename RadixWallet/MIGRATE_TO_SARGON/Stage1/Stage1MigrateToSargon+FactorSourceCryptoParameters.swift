@@ -5,7 +5,7 @@ import Sargon
 // MARK: - CannotBeEmpty
 struct CannotBeEmpty: Swift.Error {}
 extension Array {
-	public init(notEmpty elements: some Collection<Element>) throws {
+	init(notEmpty elements: some Collection<Element>) throws {
 		guard !elements.isEmpty else {
 			throw CannotBeEmpty()
 		}
@@ -18,7 +18,7 @@ extension FactorSourceCryptoParameters {
 	/// add an Olympia Factor Source from Manual Account Recovery Scan where the mnemonic already existed as BDFS => append
 	/// (`secp256k1, bip44Olympia)` parameters to this BDFS, and analogously the reversed for Babylon params -> existing Olympia
 	/// DeviceFactorSource.
-	public mutating func append(_ other: Self) {
+	mutating func append(_ other: Self) {
 		guard self != other else {
 			return
 		}
@@ -42,7 +42,7 @@ extension FactorSourceCryptoParameters {
 
 extension Slip10Curve {
 	/// Higher means more preferrable, we prefer `curve25519` over `secp256k1`
-	public var preference: Int {
+	var preference: Int {
 		switch self {
 		case .curve25519: 1
 		case .secp256k1: 0
@@ -52,7 +52,7 @@ extension Slip10Curve {
 
 extension DerivationPathScheme {
 	/// Higher means more preferrable, we prefer `cap26` over `bip44Olympia`
-	public var preference: Int {
+	var preference: Int {
 		switch self {
 		case .cap26: 1
 		case .bip44Olympia: 0

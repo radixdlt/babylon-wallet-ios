@@ -1,20 +1,20 @@
 // MARK: - MyEntitiesInvolvedInTransaction
-public struct MyEntitiesInvolvedInTransaction: Sendable, Hashable {
+struct MyEntitiesInvolvedInTransaction: Sendable, Hashable {
 	/// A set of all MY personas or accounts in the manifest which had methods invoked on them that would typically require auth (or a signature) to be called successfully.
-	public var entitiesRequiringAuth: OrderedSet<AccountOrPersona> {
+	var entitiesRequiringAuth: OrderedSet<AccountOrPersona> {
 		OrderedSet(accountsRequiringAuth.map { .account($0) } + identitiesRequiringAuth.map { .persona($0) })
 	}
 
-	public let identitiesRequiringAuth: OrderedSet<Persona>
-	public let accountsRequiringAuth: OrderedSet<Account>
+	let identitiesRequiringAuth: OrderedSet<Persona>
+	let accountsRequiringAuth: OrderedSet<Account>
 
 	/// A set of all MY accounts in the manifest which were deposited into. This is a subset of the addresses seen in `accountsRequiringAuth`.
-	public let accountsWithdrawnFrom: OrderedSet<Account>
+	let accountsWithdrawnFrom: OrderedSet<Account>
 
 	/// A set of all MY accounts in the manifest which were withdrawn from. This is a subset of the addresses seen in `accountAddresses`
-	public let accountsDepositedInto: OrderedSet<Account>
+	let accountsDepositedInto: OrderedSet<Account>
 
-	public init(
+	init(
 		identitiesRequiringAuth: OrderedSet<Persona>,
 		accountsRequiringAuth: OrderedSet<Account>,
 		accountsWithdrawnFrom: OrderedSet<Account>,
@@ -28,11 +28,11 @@ public struct MyEntitiesInvolvedInTransaction: Sendable, Hashable {
 }
 
 extension TransactionClient {
-	public struct NoFeePayerCandidate: LocalizedError {
-		public var errorDescription: String? { "No account containing XRD found" }
+	struct NoFeePayerCandidate: LocalizedError {
+		var errorDescription: String? { "No account containing XRD found" }
 	}
 
-	public static var liveValue: Self {
+	static var liveValue: Self {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.gatewaysClient) var gatewaysClient
 		@Dependency(\.accountsClient) var accountsClient
@@ -60,7 +60,7 @@ extension TransactionClient {
 				try await .init(validating: addresses.asyncMap(identityFromComponentAddress))
 			}
 
-			let summary = manifest.summary
+			let summary = try manifest.summary
 
 			return try await MyEntitiesInvolvedInTransaction(
 				identitiesRequiringAuth: mapIdentity(summary.addressesOfPersonasRequiringAuth),
@@ -101,7 +101,7 @@ extension TransactionClient {
 					return nil
 				}
 
-				guard let xrdBalance = entity.fungibleResources.xrdResource?.amount else {
+				guard let xrdBalance = entity.fungibleResources.xrdResource?.amount.exactAmount else {
 					return nil
 				}
 
@@ -128,7 +128,7 @@ extension TransactionClient {
 				tipPercentage: request.makeTransactionHeaderInput.tipPercentage
 			)
 
-			return .init(header: header, manifest: request.manifest, message: request.message ?? Message.none)
+			return .init(header: header, manifest: request.manifest, message: request.message)
 		}
 
 		let notarizeTransaction: NotarizeTransaction = { request in
@@ -141,56 +141,47 @@ extension TransactionClient {
 
 			let notarySignature = try request.notary.signature(for: signedIntentHash.hash.data)
 
-			let uncompiledNotarized = try NotarizedTransaction(
+			let notarizedTransaction = try NotarizedTransaction(
 				signedIntent: signedTransactionIntent,
 				notarySignature: NotarySignature(signature: .ed25519(value: .init(bytes: .init(bytes: notarySignature))))
 			)
 
-			let compiledNotarizedTXIntent = uncompiledNotarized.compile()
-
 			let txID = request.transactionIntent.hash()
 
 			return .init(
-				notarized: compiledNotarizedTXIntent,
+				notarized: notarizedTransaction,
 				intent: request.transactionIntent,
 				txID: txID
 			)
 		}
 
-		let getTransactionReview: GetTransactionReview = { request in
-			let networkID = await gatewaysClient.getCurrentNetworkID()
+		@Sendable
+		func analyseTransactionPreview(request: ManifestReviewRequest) async throws -> Sargon.TransactionToReview {
+			do {
+				return try await SargonOS.shared.analyseTransactionPreview(
+					instructions: request.unvalidatedManifest.transactionManifestString,
+					blobs: request.unvalidatedManifest.blobs,
+					areInstructionsOriginatingFromHost: request.isWalletTransaction,
+					nonce: request.nonce,
+					notaryPublicKey: .ed25519(request.ephemeralNotaryPublicKey.intoSargon())
+				)
+			} catch {
+				throw TransactionFailure.fromCommonError(error as? CommonError)
+			}
+		}
 
-			let manifestToSign = try request.unvalidatedManifest.transactionManifest(onNetwork: networkID)
+		let getTransactionReview: GetTransactionReview = { request in
+			// Get preview from SargonOS
+			let preview = try await analyseTransactionPreview(request: request)
+
+			let networkID = await gatewaysClient.getCurrentNetworkID()
 
 			/// Get all transaction signers.
 			let transactionSigners = try await getTransactionSigners(.init(
 				networkID: networkID,
-				manifest: manifestToSign,
+				manifest: preview.transactionManifest,
 				ephemeralNotaryPublicKey: request.ephemeralNotaryPublicKey
 			))
-
-			/// Get the transaction preview
-			let transactionPreviewRequest = try await createTransactionPreviewRequest(
-				for: request,
-				networkID: networkID,
-				transactionManifest: manifestToSign,
-				transactionSigners: transactionSigners
-			)
-			let transactionPreviewResponse = try await gatewayAPIClient.transactionPreview(transactionPreviewRequest)
-			guard transactionPreviewResponse.receipt.status == .succeeded else {
-				throw TransactionFailure.fromFailedTXReviewResponse(transactionPreviewResponse)
-			}
-			let receiptBytes = try Data(hex: transactionPreviewResponse.encodedReceipt)
-
-			/// Analyze the manifest
-			let analyzedManifestToReview = try manifestToSign.executionSummary(
-				encodedReceipt: receiptBytes
-			)
-
-			/// Transactions created outside of the Wallet are not allowed to use reserved instructions
-			if !request.isWalletTransaction, !analyzedManifestToReview.reservedInstructions.isEmpty {
-				throw TransactionFailure.failedToPrepareTXReview(.manifestWithReservedInstructions(analyzedManifestToReview.reservedInstructions))
-			}
 
 			/// Get all of the expected signing factors.
 			let signingFactors = try await {
@@ -207,7 +198,7 @@ extension TransactionClient {
 			/// If notary is signatory, count the signature of the notary that will be added.
 			let signaturesCount = transactionSigners.notaryIsSignatory ? 1 : signingFactors.expectedSignatureCount
 			var transactionFee = try TransactionFee(
-				executionSummary: analyzedManifestToReview,
+				executionSummary: preview.executionSummary,
 				signaturesCount: signaturesCount,
 				notaryIsSignatory: transactionSigners.notaryIsSignatory,
 				includeLockFee: false // Calculate without LockFee cost. It is yet to be determined if LockFe will be added or not
@@ -222,35 +213,12 @@ extension TransactionClient {
 			}
 
 			return TransactionToReview(
-				transactionManifest: manifestToSign,
-				analyzedManifestToReview: analyzedManifestToReview,
+				transactionManifest: preview.transactionManifest,
+				analyzedManifestToReview: preview.executionSummary,
 				networkID: networkID,
 				transactionFee: transactionFee,
 				transactionSigners: transactionSigners,
 				signingFactors: signingFactors
-			)
-		}
-
-		@Sendable
-		func createTransactionPreviewRequest(
-			for request: ManifestReviewRequest,
-			networkID: NetworkID,
-			transactionManifest: TransactionManifest,
-			transactionSigners: TransactionSigners
-		) async throws -> GatewayAPI.TransactionPreviewRequest {
-			let intent = try await buildTransactionIntent(.init(
-				networkID: networkID,
-				manifest: transactionManifest,
-				message: request.message,
-				nonce: request.nonce,
-				makeTransactionHeaderInput: request.makeTransactionHeaderInput,
-				transactionSigners: transactionSigners
-			))
-
-			return try .init(
-				rawManifest: transactionManifest,
-				header: intent.header,
-				transactionSigners: transactionSigners
 			)
 		}
 
@@ -292,7 +260,7 @@ extension TransactionClient {
 
 extension TransactionClient {
 	@Sendable
-	public static func feePayerSelectionAmongstCandidates(
+	static func feePayerSelectionAmongstCandidates(
 		request: DetermineFeePayerRequest,
 		allFeePayerCandidates: NonEmpty<IdentifiedArrayOf<FeePayerCandidate>>,
 		involvedEntities: MyEntitiesInvolvedInTransaction
@@ -380,18 +348,22 @@ extension TransactionClient {
 }
 
 extension TransactionFailure {
-	static func fromFailedTXReviewResponse(_ response: GatewayAPI.TransactionPreviewResponse) -> Self {
-		let message = response.receipt.errorMessage ?? "Unknown reason"
+	static func fromCommonError(_ commonError: CommonError?) -> Self {
+		switch commonError {
+		case let .ReservedInstructionsNotAllowedInManifest(reservedInstructions):
+			.failedToPrepareTXReview(.manifestWithReservedInstructions(reservedInstructions))
 
-		// Quite rudimentary, but it is not worth making something smarter,
-		// as the GW will provide in the future strongly typed errors
-		let isFailureDueToDepositRules = message.contains("AccountError(DepositIsDisallowed") ||
-			message.contains("AccountError(NotAllBucketsCouldBeDeposited")
+		case .OneOfReceivingAccountsDoesNotAllowDeposits:
+			.failedToPrepareTXReview(.oneOfRecevingAccountsDoesNotAllowDeposits)
 
-		if isFailureDueToDepositRules {
-			return .failedToPrepareTXReview(.oneOfRecevingAccountsDoesNotAllowDeposits)
-		} else {
-			return .failedToPrepareTXReview(.failedToRetrieveTXReceipt(message))
+		case .FailedTransactionPreview:
+			.failedToPrepareTXReview(.failedToRetrieveTXReceipt("Unknown reason"))
+
+		case .FailedToExtractTransactionReceiptBytes:
+			.failedToPrepareTXReview(.failedToExtractTXReceiptBytes)
+
+		default:
+			.failedToPrepareTXReview(.failedToRetrieveTXReceipt("Unknown reason"))
 		}
 	}
 }

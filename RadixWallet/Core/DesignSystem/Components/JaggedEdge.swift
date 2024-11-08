@@ -1,5 +1,5 @@
 // MARK: - JaggedEdge
-public struct JaggedEdge: View {
+struct JaggedEdge: View {
 	private let toothWidth: CGFloat = 10
 	private let toothHeight: CGFloat = 5
 
@@ -8,14 +8,14 @@ public struct JaggedEdge: View {
 	let isTopEdge: Bool
 	let edgeShape: JaggedEdgeShape
 
-	public init(color: Color = .white, shadowColor: Color, isTopEdge: Bool) {
+	init(color: Color = .white, shadowColor: Color, isTopEdge: Bool) {
 		self.color = color
 		self.shadowColor = shadowColor
 		self.isTopEdge = isTopEdge
 		self.edgeShape = JaggedEdgeShape(isTopEdge: isTopEdge, toothWidth: toothWidth, toothHeight: toothHeight)
 	}
 
-	public var body: some View {
+	var body: some View {
 		ZStack {
 			edgeShape
 				.frame(height: toothHeight)

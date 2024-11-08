@@ -3,17 +3,17 @@ import SwiftUI
 
 // MARK: - FungibleAssetList.Section
 extension FungibleAssetList {
-	public struct Section: FeatureReducer {
-		public struct State: Sendable, Hashable, Identifiable {
-			public enum ID: Sendable, Hashable {
+	struct Section: FeatureReducer {
+		struct State: Sendable, Hashable, Identifiable {
+			enum ID: Sendable, Hashable {
 				case xrd
 				case nonXrd
 			}
 
-			public let id: ID
-			public var rows: IdentifiedArrayOf<Row.State>
+			let id: ID
+			var rows: IdentifiedArrayOf<Row.State>
 
-			public init(
+			init(
 				id: ID,
 				rows: IdentifiedArrayOf<Row.State> = []
 			) {
@@ -23,22 +23,22 @@ extension FungibleAssetList {
 		}
 
 		@CasePathable
-		public enum ChildAction: Sendable, Equatable {
+		enum ChildAction: Sendable, Equatable {
 			case row(Row.State.ID, Row.Action)
 		}
 
-		public enum DelegateAction: Sendable, Equatable {
+		enum DelegateAction: Sendable, Equatable {
 			case selected(OnLedgerEntity.OwnedFungibleResource)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Reduce(core)
 				.forEach(\.rows, action: /Action.child .. ChildAction.row) {
 					FungibleAssetList.Section.Row()
 				}
 		}
 
-		public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+		func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 			switch childAction {
 			case let .row(_, .delegate(.selected(resource))):
 				.send(.delegate(.selected(resource)))
@@ -51,14 +51,14 @@ extension FungibleAssetList {
 
 // MARK: - FungibleAssetList.Section.View
 extension FungibleAssetList.Section {
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<FungibleAssetList.Section>
 
-		public init(store: StoreOf<FungibleAssetList.Section>) {
+		init(store: StoreOf<FungibleAssetList.Section>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			Section {
 				ForEachStore(
 					store.scope(

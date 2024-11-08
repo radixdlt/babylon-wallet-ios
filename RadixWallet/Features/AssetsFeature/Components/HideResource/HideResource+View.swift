@@ -1,13 +1,13 @@
 // MARK: - HideResource.View
-public extension HideResource {
+extension HideResource {
 	struct View: SwiftUI.View {
 		private let store: StoreOf<HideResource>
 
-		public init(store: StoreOf<HideResource>) {
+		init(store: StoreOf<HideResource>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				if store.shouldShow {
 					VStack(spacing: .medium2) {
@@ -48,9 +48,11 @@ private extension View {
 	}
 
 	private func confirmation(with destinationStore: PresentationStoreOf<HideResource.Destination>, store: StoreOf<HideResource>) -> some View {
-		sheet(store: destinationStore.scope(state: \.confirmation, action: \.confirmation)) { _ in
-			ConfirmationView(kind: store.confirmationKind) { action in
-				store.send(.destination(.presented(.confirmation(action))))
+		WithPerceptionTracking {
+			sheet(store: destinationStore.scope(state: \.confirmation, action: \.confirmation)) { _ in
+				ConfirmationView(kind: store.confirmationKind) { action in
+					store.send(.destination(.presented(.confirmation(action))))
+				}
 			}
 		}
 	}

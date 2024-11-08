@@ -24,8 +24,8 @@ private struct TestVector: Codable, Sendable, Hashable {
 		let mnemonic: String
 		let accounts: [TestVector.OlympiaWallet.Account]
 		struct Account: Sendable, Hashable, Codable {
-			public let accountType: Olympia.AccountType
-			public let publicKeyCompressedBase64: String
+			let accountType: Olympia.AccountType
+			let publicKeyCompressedBase64: String
 			enum CodingKeys: String, CodingKey {
 				case accountType
 				case name
@@ -33,8 +33,8 @@ private struct TestVector: Codable, Sendable, Hashable {
 				case publicKeyCompressedBase64 = "pubKey"
 			}
 
-			public let addressIndex: Int
-			public let name: NonEmptyString?
+			let addressIndex: Int
+			let name: NonEmptyString?
 		}
 	}
 }
@@ -207,7 +207,7 @@ extension Olympia.Parsed.ParsedAccount {
 		.init(
 			accountType: accountType,
 			publicKeyCompressedBase64: publicKey.base64Encoded,
-			addressIndex: Int(addressIndex),
+			addressIndex: Int(addressIndex.indexInLocalKeySpace()),
 			name: displayName
 		)
 	}
@@ -265,7 +265,7 @@ final class ImportLegacyWalletClientTests: TestCase {
 					hex: "02f669a43024d90fde69351ccc53022c2f86708d9b3c42693640733c5778235da5"
 				),
 				displayName: .init(rawValue: "With forbidden char in name"),
-				addressIndex: 0
+				addressIndex: HdPathComponent(localKeySpace: 0, keySpace: .unsecurified(isHardened: true))
 			),
 			.init(
 				accountType: .hardware,
@@ -273,7 +273,7 @@ final class ImportLegacyWalletClientTests: TestCase {
 					hex: "03f6332edc2aa0f035c3c54d74a3acec76d9b5985eaddcda995b97d4117705d7b3"
 				),
 				displayName: nil,
-				addressIndex: 1
+				addressIndex: HdPathComponent(localKeySpace: 1, keySpace: .unsecurified(isHardened: true))
 			),
 			.init(
 				accountType: .hardware,
@@ -281,7 +281,7 @@ final class ImportLegacyWalletClientTests: TestCase {
 					hex: "0354938a7db217e2e610f5389996ab63a070fb4414664df9d15e275aea6fe497c6"
 				),
 				displayName: .init(rawValue: "Third|account_ok"),
-				addressIndex: 2
+				addressIndex: HdPathComponent(localKeySpace: 2, keySpace: .unsecurified(isHardened: true))
 			),
 		]
 

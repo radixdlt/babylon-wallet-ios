@@ -3,15 +3,15 @@ import SwiftUI
 
 // MARK: - CardCarousel.View
 extension CardCarousel {
-	public struct View: SwiftUI.View {
-		public let store: StoreOf<CardCarousel>
+	struct View: SwiftUI.View {
+		let store: StoreOf<CardCarousel>
 
 		private let margin: CGFloat = .medium1
 		private let spacing: CGFloat = .small1 * 0.5
 		@ScaledMetric private var height: CGFloat = 105
 		@SwiftUI.State private var selectedCardIndex = 0
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				VStack(spacing: .small2) {
 					coreView
@@ -58,12 +58,12 @@ extension CardCarousel {
 }
 
 // MARK: - CarouselCardView
-public struct CarouselCardView: View {
-	public let card: HomeCard
-	public let action: () -> Void
-	public let closeAction: () -> Void
+struct CarouselCardView: View {
+	let card: HomeCard
+	let action: () -> Void
+	let closeAction: () -> Void
 
-	public var body: some View {
+	var body: some View {
 		ZStack(alignment: .topTrailing) {
 			Button(action: action) {
 				VStack(alignment: .leading, spacing: .small2) {

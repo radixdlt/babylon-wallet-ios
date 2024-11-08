@@ -19,7 +19,7 @@ extension Preferences.State {
 
 // MARK: - Preferences.View
 
-public extension Preferences {
+extension Preferences {
 	struct ViewState: Equatable {
 		let isDeveloperModeEnabled: Bool
 		let isAdvancedLockEnabled: Bool
@@ -49,11 +49,11 @@ public extension Preferences {
 	struct View: SwiftUI.View {
 		private let store: StoreOf<Preferences>
 
-		public init(store: StoreOf<Preferences>) {
+		init(store: StoreOf<Preferences>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			content
 				.radixToolbar(title: L10n.Preferences.title)
 				.tint(.app.gray1)

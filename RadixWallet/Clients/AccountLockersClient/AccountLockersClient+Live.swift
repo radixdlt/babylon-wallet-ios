@@ -1,11 +1,11 @@
 import Foundation
 
-public typealias ClaimsPerAccount = [AccountAddress: [AccountLockerClaimDetails]]
+typealias ClaimsPerAccount = [AccountAddress: [AccountLockerClaimDetails]]
 
 extension AccountLockersClient {
-	public static let liveValue: Self = .live()
+	static let liveValue: Self = .live()
 
-	public static func live() -> AccountLockersClient {
+	static func live() -> AccountLockersClient {
 		@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 		@Dependency(\.accountsClient) var accountsClient
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
@@ -166,7 +166,7 @@ extension AccountLockersClient {
 				let response = try await gatewayAPIClient.getAccountLockerTouchedAt(.init(accountLockers: accountLockers))
 				return (accountAddress, response)
 			}
-			return Dictionary(uniqueKeysWithValues: result.map { ($0.0, $0.1) })
+			return try Dictionary(keysWithValues: result.map { ($0.0, $0.1) })
 		}
 
 		@Sendable
@@ -226,9 +226,10 @@ extension AccountLockersClient {
 			switch result {
 			case let .dapp(.success(success)):
 				if case let .transaction(tx) = success.items {
-					// Wait for the transaction to be committed
+					// Poll transaction status until available
 					let txID = tx.send.transactionIntentHash
-					try await submitTXClient.hasTXBeenCommittedSuccessfully(txID)
+					let _ = try await submitTXClient.pollTransactionStatus(txID)
+
 					// And update claim status after
 					forceRefreshSubject.send(true)
 				}

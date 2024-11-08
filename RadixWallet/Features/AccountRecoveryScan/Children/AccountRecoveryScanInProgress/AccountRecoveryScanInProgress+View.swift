@@ -25,7 +25,7 @@ extension AccountRecoveryScanInProgress.State {
 let batchSize = 50
 
 // MARK: - AccountRecoveryScanInProgress.View
-public extension AccountRecoveryScanInProgress {
+extension AccountRecoveryScanInProgress {
 	struct ViewState: Equatable {
 		let showToolbar: Bool
 		let status: AccountRecoveryScanInProgress.State.Status
@@ -73,11 +73,11 @@ public extension AccountRecoveryScanInProgress {
 	struct View: SwiftUI.View {
 		private let store: StoreOf<AccountRecoveryScanInProgress>
 
-		public init(store: StoreOf<AccountRecoveryScanInProgress>) {
+		init(store: StoreOf<AccountRecoveryScanInProgress>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				coreView(with: viewStore)
 					.presentsLoadingViewOverlay()

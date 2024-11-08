@@ -1,19 +1,19 @@
 // MARK: - HideResource
 @Reducer
-public struct HideResource: Sendable, FeatureReducer {
+struct HideResource: Sendable, FeatureReducer {
 	@ObservableState
-	public struct State: Sendable, Hashable {
+	struct State: Sendable, Hashable {
 		let kind: Kind
 		var shouldShow = true
 
 		@Presents
 		var destination: Destination.State? = nil
 
-		public init(kind: Kind) {
+		init(kind: Kind) {
 			self.kind = kind
 		}
 
-		public enum Kind: Hashable, Sendable {
+		enum Kind: Hashable, Sendable {
 			case fungible(ResourceAddress)
 			case nonFungible(ResourceAddress, name: String?)
 			case poolUnit(PoolAddress)
@@ -28,34 +28,34 @@ public struct HideResource: Sendable, FeatureReducer {
 		}
 	}
 
-	public typealias Action = FeatureAction<Self>
+	typealias Action = FeatureAction<Self>
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case setShouldShow(Bool)
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case task
 		case buttonTapped
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case didHideResource
 	}
 
 	// MARK: - Destination
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Hashable, Sendable {
+		enum State: Hashable, Sendable {
 			case confirmation
 		}
 
 		@CasePathable
-		public enum Action: Equatable, Sendable {
+		enum Action: Equatable, Sendable {
 			case confirmation(ConfirmationAction)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			EmptyReducer()
 		}
 	}
@@ -63,7 +63,7 @@ public struct HideResource: Sendable, FeatureReducer {
 	@Dependency(\.resourcesVisibilityClient) var resourcesVisibilityClient
 	@Dependency(\.gatewaysClient) var gatewaysClient
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -72,7 +72,7 @@ public struct HideResource: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			return shouldShowEffect(state: state)
@@ -83,7 +83,7 @@ public struct HideResource: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .setShouldShow(value):
 			state.shouldShow = value
@@ -91,7 +91,7 @@ public struct HideResource: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .confirmation(.confirm):
 			state.destination = nil

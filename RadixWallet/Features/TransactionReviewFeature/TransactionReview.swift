@@ -2,48 +2,37 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - TransactionReview
-public struct TransactionReview: Sendable, FeatureReducer {
-	public typealias Transfer = IDResourceBalance
+struct TransactionReview: Sendable, FeatureReducer {
+	typealias Common = InteractionReview
 
-	public struct State: Sendable, Hashable {
-		public var displayMode: DisplayMode = .review
+	struct State: Sendable, Hashable {
+		var displayMode: Common.DisplayMode = .detailed
 
-		public let nonce: Nonce
-		public let unvalidatedManifest: UnvalidatedTransactionManifest
-		public let message: Message
-		public let signTransactionPurpose: SigningPurpose.SignTransactionPurpose
-		public let waitsForTransactionToBeComitted: Bool
-		public let isWalletTransaction: Bool
-		public let proposingDappMetadata: DappMetadata.Ledger?
-		public let p2pRoute: P2P.Route
+		let nonce: Nonce
+		let unvalidatedManifest: UnvalidatedTransactionManifest
+		let message: Message
+		let signTransactionPurpose: SigningPurpose.SignTransactionPurpose
+		let waitsForTransactionToBeComitted: Bool
+		let isWalletTransaction: Bool
+		let proposingDappMetadata: DappMetadata.Ledger?
+		let p2pRoute: P2P.Route
 
-		public var networkID: NetworkID? { reviewedTransaction?.networkID }
+		var networkID: NetworkID? { reviewedTransaction?.networkID }
 
-		public var reviewedTransaction: ReviewedTransaction? = nil
+		var reviewedTransaction: ReviewedTransaction? = nil
 
-		public var withdrawals: TransactionReviewAccounts.State? = nil
-		public var dAppsUsed: TransactionReviewDappsUsed.State? = nil
-		public var contributingToPools: TransactionReviewPools.State? = nil
-		public var redeemingFromPools: TransactionReviewPools.State? = nil
-		public var deposits: TransactionReviewAccounts.State? = nil
+		var sections: Common.Sections.State = .init(kind: .transaction)
 
-		public var stakingToValidators: ValidatorsState? = nil
-		public var unstakingFromValidators: ValidatorsState? = nil
-		public var claimingFromValidators: ValidatorsState? = nil
-
-		public var accountDepositSetting: DepositSettingState? = nil
-		public var accountDepositExceptions: DepositExceptionsState? = nil
-
-		public var proofs: TransactionReviewProofs.State? = nil
-		public var networkFee: TransactionReviewNetworkFee.State? = nil
-		public let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey
-		public var canApproveTX: Bool = true
+		var proofs: Common.Proofs.State? = nil
+		var networkFee: TransactionReviewNetworkFee.State? = nil
+		let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey
+		var canApproveTX: Bool = true
 		var sliderResetDate: Date = .now
 
 		@PresentationState
-		public var destination: Destination.State? = nil
+		var destination: Destination.State? = nil
 
-		public func printFeePayerInfo(line: UInt = #line, function: StaticString = #function) {
+		func printFeePayerInfo(line: UInt = #line, function: StaticString = #function) {
 			#if DEBUG
 			func doPrint(_ msg: String) {
 				loggerGlobal.info("\(function)#\(line) - \(msg)")
@@ -69,11 +58,11 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			#endif
 		}
 
-		public mutating func resetSlider() {
+		mutating func resetSlider() {
 			sliderResetDate = .now
 		}
 
-		public init(
+		init(
 			unvalidatedManifest: UnvalidatedTransactionManifest,
 			nonce: Nonce,
 			signTransactionPurpose: SigningPurpose.SignTransactionPurpose,
@@ -94,90 +83,55 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			self.proposingDappMetadata = proposingDappMetadata
 			self.p2pRoute = p2pRoute
 		}
-
-		public enum DisplayMode: Sendable, Hashable {
-			case review
-			case raw(String)
-
-			var rawTransaction: String? {
-				guard case let .raw(transaction) = self else { return nil }
-				return transaction
-			}
-		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case appeared
 		case showRawTransactionTapped
-		case copyRawTransactionTapped
-		case expandContributingToPoolsTapped
-		case expandRedeemingFromPoolsTapped
-		case expandStakingToValidatorsTapped
-		case expandUnstakingFromValidatorsTapped
-		case expandClaimingFromValidatorsTapped
-		case expandUsingDappsTapped
 		case approvalSliderSlid
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case withdrawals(TransactionReviewAccounts.Action)
-		case deposits(TransactionReviewAccounts.Action)
-		case dAppsUsed(TransactionReviewDappsUsed.Action)
-		case contributingToPools(TransactionReviewPools.Action)
-		case redeemingFromPools(TransactionReviewPools.Action)
-		case proofs(TransactionReviewProofs.Action)
+	@CasePathable
+	enum ChildAction: Sendable, Equatable {
+		case sections(Common.Sections.Action)
+		case proofs(Common.Proofs.Action)
 		case networkFee(TransactionReviewNetworkFee.Action)
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case previewLoaded(TaskResult<TransactionToReview>)
-		case updateSections(TransactionReview.Sections?)
 		case buildTransactionIntentResult(TaskResult<TransactionIntent>)
 		case notarizeResult(TaskResult<NotarizeTransactionResponse>)
 		case determineFeePayerResult(TaskResult<FeePayerSelectionResult?>)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case failed(TransactionFailure)
-		case signedTXAndSubmittedToGateway(IntentHash)
-		case transactionCompleted(IntentHash)
+		case signedTXAndSubmittedToGateway(TransactionIntentHash)
+		case transactionCompleted(TransactionIntentHash)
 		case dismiss
 	}
 
-	public struct Destination: DestinationReducer {
-		public enum State: Sendable, Hashable {
+	struct Destination: DestinationReducer {
+		@CasePathable
+		enum State: Sendable, Hashable {
 			case customizeGuarantees(TransactionReviewGuarantees.State)
 			case signing(Signing.State)
 			case submitting(SubmitTransaction.State)
-			case dApp(DappDetails.State)
 			case customizeFees(CustomizeFees.State)
-			case fungibleTokenDetails(FungibleTokenDetails.State)
-			case nonFungibleTokenDetails(NonFungibleTokenDetails.State)
-			case poolUnitDetails(PoolUnitDetails.State)
-			case lsuDetails(LSUDetails.State)
-			case unknownDappComponents(UnknownDappComponents.State)
-			case rawTransactionAlert(AlertState<Action.RawTransactionAlert>)
+			case rawTransactionAlert(AlertState<Never>)
 		}
 
-		public enum Action: Sendable, Equatable {
+		@CasePathable
+		enum Action: Sendable, Equatable {
 			case customizeGuarantees(TransactionReviewGuarantees.Action)
 			case signing(Signing.Action)
 			case submitting(SubmitTransaction.Action)
-			case dApp(DappDetails.Action)
 			case customizeFees(CustomizeFees.Action)
-			case fungibleTokenDetails(FungibleTokenDetails.Action)
-			case nonFungibleTokenDetails(NonFungibleTokenDetails.Action)
-			case lsuDetails(LSUDetails.Action)
-			case poolUnitDetails(PoolUnitDetails.Action)
-			case unknownDappComponents(UnknownDappComponents.Action)
-			case rawTransactionAlert(RawTransactionAlert)
-
-			public enum RawTransactionAlert: Sendable, Equatable {
-				case continueTapped
-			}
+			case rawTransactionAlert(Never)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: /State.customizeGuarantees, action: /Action.customizeGuarantees) {
 				TransactionReviewGuarantees()
 			}
@@ -190,24 +144,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			Scope(state: /State.submitting, action: /Action.submitting) {
 				SubmitTransaction()
 			}
-			Scope(state: /State.dApp, action: /Action.dApp) {
-				DappDetails()
-			}
-			Scope(state: /State.fungibleTokenDetails, action: /Action.fungibleTokenDetails) {
-				FungibleTokenDetails()
-			}
-			Scope(state: /State.nonFungibleTokenDetails, action: /Action.nonFungibleTokenDetails) {
-				NonFungibleTokenDetails()
-			}
-			Scope(state: /State.poolUnitDetails, action: /Action.poolUnitDetails) {
-				PoolUnitDetails()
-			}
-			Scope(state: /State.lsuDetails, action: /Action.lsuDetails) {
-				LSUDetails()
-			}
-			Scope(state: /State.unknownDappComponents, action: /Action.unknownDappComponents) {
-				UnknownDappComponents()
-			}
 		}
 	}
 
@@ -218,32 +154,19 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.pasteboardClient) var pasteboardClient
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
+		Scope(state: \.sections, action: \.child.sections) {
+			Common.Sections()
+		}
 		Reduce(core)
 			.ifLet(\.networkFee, action: /Action.child .. ChildAction.networkFee) {
 				TransactionReviewNetworkFee()
 			}
-			.ifLet(\.deposits, action: /Action.child .. ChildAction.deposits) {
-				TransactionReviewAccounts()
-			}
-			.ifLet(\.dAppsUsed, action: /Action.child .. ChildAction.dAppsUsed) {
-				TransactionReviewDappsUsed()
-			}
-			.ifLet(\.contributingToPools, action: /Action.child .. ChildAction.contributingToPools) {
-				TransactionReviewPools()
-			}
-			.ifLet(\.redeemingFromPools, action: /Action.child .. ChildAction.redeemingFromPools) {
-				TransactionReviewPools()
-			}
-			.ifLet(\.withdrawals, action: /Action.child .. ChildAction.withdrawals) {
-				TransactionReviewAccounts()
-			}
 			.ifLet(\.proofs, action: /Action.child .. ChildAction.proofs) {
-				TransactionReviewProofs()
+				Common.Proofs()
 			}
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -252,7 +175,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return .run { [state = state] send in
@@ -271,44 +194,12 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case .showRawTransactionTapped:
 			switch state.displayMode {
-			case .review:
+			case .detailed:
 				return showRawTransaction(&state)
 			case .raw:
-				state.displayMode = .review
+				state.displayMode = .detailed
 				return .none
 			}
-
-		case .copyRawTransactionTapped:
-			guard case let .raw(manifest) = state.displayMode else {
-				assertionFailure("Copy raw manifest button should only be visible in raw transaction mode")
-				return .none
-			}
-			pasteboardClient.copyString(manifest)
-			return .none
-
-		case .expandContributingToPoolsTapped:
-			state.contributingToPools?.isExpanded.toggle()
-			return .none
-
-		case .expandRedeemingFromPoolsTapped:
-			state.redeemingFromPools?.isExpanded.toggle()
-			return .none
-
-		case .expandStakingToValidatorsTapped:
-			state.stakingToValidators?.isExpanded.toggle()
-			return .none
-
-		case .expandUnstakingFromValidatorsTapped:
-			state.unstakingFromValidators?.isExpanded.toggle()
-			return .none
-
-		case .expandClaimingFromValidatorsTapped:
-			state.claimingFromValidators?.isExpanded.toggle()
-			return .none
-
-		case .expandUsingDappsTapped:
-			state.dAppsUsed?.isExpanded.toggle()
-			return .none
 
 		case .approvalSliderSlid:
 			state.canApproveTX = false
@@ -352,51 +243,37 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .withdrawals(.delegate(.showAsset(transfer, token))),
-		     let .deposits(.delegate(.showAsset(transfer, token))):
-			return resourceDetailsEffect(state: &state, resource: transfer.resource, details: transfer.details, nft: token)
-
-		case let .dAppsUsed(.delegate(.openDapp(dAppID))), let .contributingToPools(.delegate(.openDapp(dAppID))), let .redeemingFromPools(.delegate(.openDapp(dAppID))):
-			state.destination = .dApp(.init(dAppDefinitionAddress: dAppID))
+		case let .sections(.internal(.setSections(sections))):
+			state.proofs = sections?.proofs
 			return .none
 
-		case let .dAppsUsed(.delegate(.openUnknownAddresses(components))):
-			state.destination = .unknownDappComponents(.init(
-				title: L10n.TransactionReview.unknownComponents(components.count),
-				rowHeading: L10n.Common.component,
-				addresses: components.map { .component($0) }
-			))
-			return .none
+		case let .sections(.delegate(delegateAction)):
+			switch delegateAction {
+			case .failedToResolveSections:
+				state.destination = .rawTransactionAlert(.rawTransaction)
+				return showRawTransaction(&state)
 
-		case let .contributingToPools(.delegate(.openUnknownAddresses(pools))), let .redeemingFromPools(.delegate(.openUnknownAddresses(pools))):
-			state.destination = .unknownDappComponents(.init(
-				title: L10n.TransactionReview.unknownPools(pools.count),
-				rowHeading: L10n.Common.pool,
-				addresses: pools.map { .resourcePool($0) }
-			))
-			return .none
-
-		case .deposits(.delegate(.showCustomizeGuarantees)):
-			guard let guarantees = state.deposits?.accounts.customizableGuarantees, !guarantees.isEmpty else { return .none }
-			state.destination = .customizeGuarantees(.init(guarantees: guarantees.asIdentified()))
-
-			return .none
+			case let .showCustomizeGuarantees(guarantees):
+				state.destination = .customizeGuarantees(.init(guarantees: guarantees.asIdentified()))
+				return .none
+			}
 
 		case let .proofs(.delegate(.showAsset(proof))):
 			let resource = proof.resourceBalance.resource
-			return resourceDetailsEffect(state: &state, resource: resource, details: proof.resourceBalance.details)
+			let details = proof.resourceBalance.details
+			return .send(.child(.sections(.internal(.parent(.showResourceDetails(resource, details))))))
 
 		case .networkFee(.delegate(.showCustomizeFees)):
-			guard let reviewedTransaction = state.reviewedTransaction else {
+			guard let reviewedTransaction = state.reviewedTransaction,
+			      let summary = try? reviewedTransaction.transactionManifest.summary
+			else {
 				return .none
 			}
 			state.destination = .customizeFees(.init(
 				reviewedTransaction: reviewedTransaction,
-				manifestSummary: reviewedTransaction
-					.transactionManifest
-					.summary,
+				manifestSummary: summary,
 				signingPurpose: .signTransaction(state.signTransactionPurpose)
 			))
 			return .none
@@ -406,7 +283,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .previewLoaded(.failure(error)):
 			loggerGlobal.error("Transaction preview failed, error: \(error)")
@@ -429,26 +306,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.reviewedTransaction = reviewedTransaction
 			return review(&state, executionSummary: preview.analyzedManifestToReview)
 				.concatenate(with: determineFeePayer(state, reviewedTransaction: reviewedTransaction))
-
-		case let .updateSections(sections):
-			guard let sections else {
-				state.destination = .rawTransactionAlert(.rawTransaction)
-				return showRawTransaction(&state)
-			}
-
-			state.withdrawals = sections.withdrawals
-			state.dAppsUsed = sections.dAppsUsed
-			state.contributingToPools = sections.contributingToPools
-			state.redeemingFromPools = sections.redeemingFromPools
-			state.stakingToValidators = sections.stakingToValidators
-			state.unstakingFromValidators = sections.unstakingFromValidators
-			state.claimingFromValidators = sections.claimingFromValidators
-			state.deposits = sections.deposits
-			state.accountDepositSetting = sections.accountDepositSetting
-			state.accountDepositExceptions = sections.accountDepositExceptions
-			state.proofs = sections.proofs
-
-			return .none
 
 		case let .buildTransactionIntentResult(.success(intent)):
 			guard let reviewedTransaction = state.reviewedTransaction else {
@@ -522,7 +379,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .customizeGuarantees(.delegate(.applyGuarantees(guaranteeStates))):
 			for guaranteeState in guaranteeStates {
@@ -578,7 +435,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
 		if case .signing = state.destination {
 			loggerGlobal.notice("Cancelled signing")
 			return resetToApprovable(&state)
@@ -591,21 +448,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	}
 }
 
-extension AlertState<TransactionReview.Destination.Action.RawTransactionAlert> {
-	static var rawTransaction: AlertState {
-		AlertState {
-			TextState(L10n.TransactionReview.NonConformingManifestWarning.title)
-		} actions: {
-			ButtonState(action: .continueTapped) {
-				TextState(L10n.Common.continue)
-			}
-		} message: {
-			TextState(L10n.TransactionReview.NonConformingManifestWarning.message)
-		}
-	}
-}
-
-extension Collection<TransactionReviewAccount.State> {
+extension Collection<InteractionReview.Account.State> {
 	var customizableGuarantees: [TransactionReviewGuarantee.State] {
 		flatMap { account in
 			account.transfers.compactMap { .init(account: account.account, transfer: $0) }
@@ -632,20 +475,13 @@ extension TransactionReview {
 
 		state.networkFee = .init(reviewedTransaction: reviewedTransaction)
 
-		return .run { send in
-			let sections = try await sections(for: executionSummary, networkID: networkID)
-			await send(.internal(.updateSections(sections)))
-		} catch: { error, send in
-			loggerGlobal.error("Failed to extract transaction content, error: \(error)")
-			// FIXME: propagate/display error?
-			await send(.internal(.updateSections(nil)))
-		}
+		return .send(.child(.sections(.internal(.parent(.resolveExecutionSummary(executionSummary, networkID))))))
 	}
 
 	func showRawTransaction(_ state: inout State) -> Effect<Action> {
 		do {
 			let manifest = try transactionManifestWithWalletInstructionsAdded(state)
-			state.displayMode = .raw(manifest.instructionsString)
+			state.displayMode = .raw(manifest: manifest.instructionsString)
 		} catch {
 			errorQueue.schedule(error)
 		}
@@ -689,68 +525,16 @@ extension TransactionReview {
 			}
 		}
 	}
-
-	func resourceDetailsEffect(
-		state: inout State,
-		resource: OnLedgerEntity.Resource,
-		details: ResourceBalance.Details,
-		nft: OnLedgerEntity.NonFungibleToken? = nil
-	) -> Effect<Action> {
-		switch details {
-		case let .fungible(details):
-			state.destination = .fungibleTokenDetails(.init(
-				resourceAddress: resource.resourceAddress,
-				resource: .success(resource),
-				ownedFungibleResource: .init(
-					resourceAddress: resource.resourceAddress,
-					atLedgerState: resource.atLedgerState,
-					amount: details.amount,
-					metadata: resource.metadata
-				),
-				isXRD: details.isXRD
-			))
-
-		case let .nonFungible(details):
-			state.destination = .nonFungibleTokenDetails(.init(
-				resourceAddress: resource.resourceAddress,
-				resourceDetails: .success(resource),
-				token: details,
-				ledgerState: resource.atLedgerState
-			))
-
-		case let .liquidStakeUnit(details):
-			state.destination = .lsuDetails(.init(
-				validator: details.validator,
-				stakeUnitResource: .init(resource: details.resource, amount: .init(nominalAmount: details.amount)),
-				xrdRedemptionValue: details.worth
-			))
-
-		case let .poolUnit(details):
-			state.destination = .poolUnitDetails(.init(resourcesDetails: details.details))
-
-		case let .stakeClaimNFT(details):
-			state.destination = .nonFungibleTokenDetails(.init(
-				resourceAddress: resource.resourceAddress,
-				resourceDetails: .success(resource),
-				token: nft,
-				ledgerState: resource.atLedgerState,
-				stakeClaim: details.stakeClaimTokens.stakeClaims.first,
-				isClaimStakeEnabled: false
-			))
-		}
-
-		return .none
-	}
 }
 
 // MARK: - FailedToAddLockFee
-public struct FailedToAddLockFee: LocalizedError {
-	public let underlyingError: Swift.Error
-	public init(underlyingError: Swift.Error) {
+struct FailedToAddLockFee: LocalizedError {
+	let underlyingError: Swift.Error
+	init(underlyingError: Swift.Error) {
 		self.underlyingError = underlyingError
 	}
 
-	public var errorDescription: String? {
+	var errorDescription: String? {
 		#if DEBUG
 		L10n.Error.TransactionFailure.failedToAddLockFee + "\n[DEBUG ONLY]: \(String(describing: underlyingError))"
 		#else
@@ -760,13 +544,13 @@ public struct FailedToAddLockFee: LocalizedError {
 }
 
 // MARK: - FailedToAddGuarantee
-public struct FailedToAddGuarantee: LocalizedError {
-	public let underlyingError: Swift.Error
-	public init(underlyingError: Swift.Error) {
+struct FailedToAddGuarantee: LocalizedError {
+	let underlyingError: Swift.Error
+	init(underlyingError: Swift.Error) {
 		self.underlyingError = underlyingError
 	}
 
-	public var errorDescription: String? {
+	var errorDescription: String? {
 		#if DEBUG
 		L10n.Error.TransactionFailure.failedToAddGuarantee + "\n[DEBUG ONLY]: \(String(describing: underlyingError))"
 		#else
@@ -789,46 +573,9 @@ extension TransactionReview {
 	}
 }
 
-// MARK: Useful types
-
-extension TransactionReview {
-	public struct ProofEntity: Sendable, Identifiable, Hashable {
-		public var id: ResourceBalance { resourceBalance }
-		public let resourceBalance: ResourceBalance
-	}
-
-	public struct DappEntity: Sendable, Identifiable, Hashable {
-		public let id: DappDefinitionAddress
-		public let metadata: OnLedgerEntity.Metadata
-	}
-
-	public enum ReviewAccount: Sendable, Hashable {
-		case user(Account)
-		case external(AccountAddress, approved: Bool)
-
-		var address: AccountAddress {
-			switch self {
-			case let .user(account):
-				account.address
-			case let .external(address, _):
-				address
-			}
-		}
-
-		var isApproved: Bool {
-			switch self {
-			case .user:
-				false
-			case let .external(_, approved):
-				approved
-			}
-		}
-	}
-}
-
 extension ResourceBalance {
 	/// The guarantee, for a fungible resource
-	public var fungibleGuarantee: TransactionGuarantee? {
+	var fungibleGuarantee: TransactionGuarantee? {
 		get {
 			switch details {
 			case let .fungible(fungible):
@@ -837,57 +584,68 @@ extension ResourceBalance {
 				liquidStakeUnit.guarantee
 			case let .poolUnit(poolUnit):
 				poolUnit.guarantee
-			case .nonFungible, .stakeClaimNFT:
+			case .nonFungible, .stakeClaimNFT, .none:
 				nil
 			}
 		}
 		set {
-			switch details {
-			case var .fungible(fungible):
-				fungible.guarantee = newValue
-				details = .fungible(fungible)
-			case var .liquidStakeUnit(liquidStakeUnit):
-				liquidStakeUnit.guarantee = newValue
-				details = .liquidStakeUnit(liquidStakeUnit)
-			case var .poolUnit(poolUnit):
-				poolUnit.guarantee = newValue
-				details = .poolUnit(poolUnit)
-			case .nonFungible, .stakeClaimNFT:
-				return
+			switch self {
+			case let .known(knownResourceBalance):
+				switch knownResourceBalance.details {
+				case var .fungible(fungible):
+					fungible.guarantee = newValue
+					var known = knownResourceBalance
+					known.details = .fungible(fungible)
+					self = .known(known)
+				case var .liquidStakeUnit(liquidStakeUnit):
+					liquidStakeUnit.guarantee = newValue
+					var known = knownResourceBalance
+					known.details = .liquidStakeUnit(liquidStakeUnit)
+					self = .known(known)
+				case var .poolUnit(poolUnit):
+					poolUnit.guarantee = newValue
+					var known = knownResourceBalance
+					known.details = .poolUnit(poolUnit)
+					self = .known(known)
+				case .nonFungible, .stakeClaimNFT:
+					assertionFailure("Should not be possible to set guarantee")
+				}
+			case .unknown:
+				assertionFailure("Should not be possible to set guarantee")
 			}
 		}
 	}
 
 	/// The transferred amount, for a fungible resource
-	public var fungibleTransferAmount: Decimal192? {
+	var fungibleTransferAmount: Decimal192? {
 		switch details {
 		case let .fungible(fungible):
-			fungible.amount.nominalAmount
+			fungible.amount.exactAmount?.nominalAmount
 		case let .liquidStakeUnit(liquidStakeUnit):
-			liquidStakeUnit.amount
+			liquidStakeUnit.amount.exactAmount?.nominalAmount
 		case let .poolUnit(poolUnit):
-			poolUnit.details.poolUnitResource.amount.nominalAmount
-		case .nonFungible, .stakeClaimNFT:
+			poolUnit.details.poolUnitResource.amount.exactAmount?.nominalAmount
+		case .nonFungible, .stakeClaimNFT, .none:
 			nil
 		}
 	}
 }
 
 extension TransactionReview.State {
-	public var allGuarantees: [TransactionGuarantee] {
-		deposits?.accounts.flatMap { $0.transfers.compactMap(\.fungibleGuarantee) } ?? []
+	var allGuarantees: [TransactionGuarantee] {
+		sections.deposits?.accounts.flatMap { $0.transfers.compactMap(\.fungibleGuarantee) } ?? []
 	}
 
-	public mutating func applyGuarantee(
+	mutating func applyGuarantee(
 		_ updated: TransactionGuarantee,
-		transferID: TransactionReview.Transfer.ID
+		transferID: InteractionReview.Transfer.ID
 	) {
 		guard let accountID = accountID(for: transferID) else { return }
-		deposits?.accounts[id: accountID]?.transfers[id: transferID]?.fungibleGuarantee = updated
+		sections.deposits?.accounts[id: accountID]?.transfers[id: transferID]?.fungibleGuarantee = updated
 	}
 
-	private func accountID(for transferID: TransactionReview.Transfer.ID) -> AccountAddress? {
-		for account in deposits?.accounts ?? [] {
+	private func accountID(for transferID: InteractionReview.Transfer.ID) -> AccountAddress? {
+		for account in sections.deposits?.accounts ?? [] {
 			for transfer in account.transfers {
 				if transfer.id == transferID {
 					return account.id
@@ -900,10 +658,10 @@ extension TransactionReview.State {
 
 // MARK: Helpers
 
-extension [TransactionReview.ReviewAccount] {
+extension [InteractionReview.ReviewAccount] {
 	struct MissingUserAccountError: Error {}
 
-	func account(for accountAddress: AccountAddress) throws -> TransactionReview.ReviewAccount {
+	func account(for accountAddress: AccountAddress) throws -> InteractionReview.ReviewAccount {
 		guard let account = first(where: { $0.address == accountAddress }) else {
 			loggerGlobal.error("Can't find address that was specified for transfer")
 			throw MissingUserAccountError()
@@ -914,7 +672,7 @@ extension [TransactionReview.ReviewAccount] {
 }
 
 extension Collection where Element: Equatable {
-	public func count(of element: Element) -> Int {
+	func count(of element: Element) -> Int {
 		var count = 0
 		for e in self where e == element {
 			count += 1
@@ -935,9 +693,9 @@ extension ResourceIndicator {
 }
 
 // MARK: - TransactionReviewFailure
-public struct TransactionReviewFailure: LocalizedError {
-	public let underylying: Swift.Error
-	public var errorDescription: String? {
+struct TransactionReviewFailure: LocalizedError {
+	let underylying: Swift.Error
+	var errorDescription: String? {
 		let additionalInfo = if case TransactionFailure.failedToPrepareTXReview(.oneOfRecevingAccountsDoesNotAllowDeposits) = underylying {
 			"\n\n" + L10n.Error.TransactionFailure.doesNotAllowThirdPartyDeposits
 		} else {
@@ -958,7 +716,7 @@ public struct TransactionReviewFailure: LocalizedError {
 }
 
 // MARK: - ReviewedTransaction
-public struct ReviewedTransaction: Hashable, Sendable {
+struct ReviewedTransaction: Hashable, Sendable {
 	let transactionManifest: TransactionManifest
 	let networkID: NetworkID
 	var feePayer: Loadable<FeePayerCandidate?> = .idle
@@ -973,17 +731,17 @@ public struct ReviewedTransaction: Hashable, Sendable {
 }
 
 // MARK: - FeePayerValidationOutcome
-public enum FeePayerValidationOutcome: Sendable, Hashable {
+enum FeePayerValidationOutcome: Sendable, Hashable {
 	case needsFeePayer
 	case insufficientBalance
 	case valid(Details?)
 
-	public enum Details: Sendable {
+	enum Details: Sendable {
 		case introducesNewAccount
 		case feePayerSuperfluous
 	}
 
-	public var isValid: Bool {
+	var isValid: Bool {
 		guard case .valid = self else { return false }
 		return true
 	}
@@ -991,9 +749,12 @@ public enum FeePayerValidationOutcome: Sendable, Hashable {
 
 extension ReviewedTransaction {
 	var involvedAccounts: Set<AccountAddress> {
-		Set(accountWithdraws.keys)
+		guard let summary = try? transactionManifest.summary else {
+			return Set()
+		}
+		return Set(accountWithdraws.keys)
 			.union(accountDeposits.keys)
-			.union(transactionManifest.summary.addressesOfAccountsRequiringAuth)
+			.union(summary.addressesOfAccountsRequiringAuth)
 	}
 
 	var feePayingValidation: Loadable<FeePayerValidationOutcome> {
@@ -1031,6 +792,18 @@ extension ReviewedTransaction {
 			return .valid(.introducesNewAccount)
 		} else {
 			return .valid(nil)
+		}
+	}
+}
+
+private extension AlertState<Never> {
+	static var rawTransaction: AlertState {
+		AlertState {
+			TextState(L10n.TransactionReview.NonConformingManifestWarning.title)
+		} actions: {
+			.default(TextState(L10n.Common.continue))
+		} message: {
+			TextState(L10n.TransactionReview.NonConformingManifestWarning.message)
 		}
 	}
 }

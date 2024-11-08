@@ -9,7 +9,7 @@ extension Secp256k1PublicKey: CustomDumpStringConvertible {
 }
 
 // MARK: - SigningPurposeWithPayload
-public enum SigningPurposeWithPayload: Sendable, Hashable {
+enum SigningPurposeWithPayload: Sendable, Hashable {
 	case signAuth(AuthenticationDataToSignForChallengeResponse)
 
 	case signTransaction(
@@ -27,22 +27,22 @@ public enum SigningPurposeWithPayload: Sendable, Hashable {
 }
 
 // MARK: - SigningResponse
-public enum SigningResponse: Sendable, Hashable {
+enum SigningResponse: Sendable, Hashable {
 	case signTransaction(NotarizeTransactionResponse, origin: SigningPurpose.SignTransactionPurpose)
 	case signAuth(SignedAuthChallenge)
 }
 
 // MARK: - Signing
-public struct Signing: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public var signatures: OrderedSet<SignatureOfEntity> = []
-		public var signWithFactorSource: SignWithFactorSource.State
+struct Signing: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		var signatures: OrderedSet<SignatureOfEntity> = []
+		var signWithFactorSource: SignWithFactorSource.State
 
-		public var factorsLeftToSignWith: SigningFactors
-		public let expectedSignatureCount: Int
-		public let signingPurposeWithPayload: SigningPurposeWithPayload
+		var factorsLeftToSignWith: SigningFactors
+		let expectedSignatureCount: Int
+		let signingPurposeWithPayload: SigningPurposeWithPayload
 
-		public init(
+		init(
 			factorsLeftToSignWith: SigningFactors,
 			signingPurposeWithPayload: SigningPurposeWithPayload
 		) {
@@ -57,17 +57,17 @@ public struct Signing: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case finishedSigningWithAllFactors
 		case notarizeResult(TaskResult<NotarizeTransactionResponse>)
 	}
 
 	@CasePathable
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case signWithFactorSource(SignWithFactorSource.Action)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case cancelSigning
 		case finishedSigning(SigningResponse)
 		case failedToSign
@@ -77,16 +77,16 @@ public struct Signing: Sendable, FeatureReducer {
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.transactionClient) var transactionClient
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Scope(state: \.signWithFactorSource, action: /Action.child .. ChildAction.signWithFactorSource) {
 			SignWithFactorSource()
 		}
 		Reduce(self.core)
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case .finishedSigningWithAllFactors:
 			switch state.signingPurposeWithPayload {
@@ -125,7 +125,7 @@ public struct Signing: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .signWithFactorSource(.delegate(.done(factors, signatures))):
 			return handleSignatures(signingFactors: factors, signatures: signatures, &state)

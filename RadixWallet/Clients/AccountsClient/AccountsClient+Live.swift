@@ -1,9 +1,9 @@
 // MARK: - AccountsClient + DependencyKey
 
 extension AccountsClient: DependencyKey {
-	public typealias Value = AccountsClient
+	typealias Value = AccountsClient
 
-	public static func live(
+	static func live(
 		profileStore: ProfileStore = .shared
 	) -> Self {
 		let saveVirtualAccounts: SaveVirtualAccounts = { accounts in
@@ -15,11 +15,11 @@ extension AccountsClient: DependencyKey {
 		}
 
 		let getCurrentNetworkID: GetCurrentNetworkID = {
-			await profileStore.profile.networkID
+			await profileStore.profile().networkID
 		}
 
 		let getAccountsOnNetwork: GetAccountsOnNetwork = {
-			try await profileStore.profile.network(id: $0).getAccounts()
+			try await profileStore.profile().network(id: $0).getAccounts()
 		}
 
 		let getAccountsOnCurrentNetwork: GetAccountsOnCurrentNetwork = {
@@ -30,13 +30,13 @@ extension AccountsClient: DependencyKey {
 			let offset = maybeOffset ?? 0
 			let currentNetworkID = await getCurrentNetworkID()
 			let networkID = maybeNetworkID ?? currentNetworkID
-			let numberOfAccounts = await (try? profileStore.profile.network(id: networkID).numberOfAccountsIncludingHidden) ?? 0
+			let numberOfAccounts = await (try? profileStore.profile().network(id: networkID).numberOfAccountsIncludingHidden) ?? 0
 			return AppearanceID.fromNumberOfAccounts(numberOfAccounts + offset)
 		}
 
 		let hasAccountOnNetwork: HasAccountOnNetwork = { networkID in
 			do {
-				let network = try await profileStore.profile.network(id: networkID)
+				let network = try await profileStore.profile().network(id: networkID)
 				// N.B. `accounts` is NonEmpty so `isEmpty` should always evaluate to `false`.
 				return network.hasSomeAccount()
 			} catch {
@@ -45,7 +45,7 @@ extension AccountsClient: DependencyKey {
 		}
 
 		let getHiddenAccountsOnCurrentNetwork: GetHiddenAccountsOnCurrentNetwork = {
-			try await profileStore.profile.network(id: getCurrentNetworkID()).getHiddenAccounts()
+			try await profileStore.profile().network(id: getCurrentNetworkID()).getHiddenAccounts()
 		}
 
 		let accountsOnCurrentNetwork: AccountsOnCurrentNetwork = {
@@ -118,5 +118,5 @@ extension AccountsClient: DependencyKey {
 		#endif
 	}
 
-	public static let liveValue: Self = .live()
+	static let liveValue: Self = .live()
 }

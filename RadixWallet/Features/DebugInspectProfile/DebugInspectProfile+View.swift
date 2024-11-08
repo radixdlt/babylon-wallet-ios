@@ -9,7 +9,7 @@ extension DebugInspectProfile.State {
 
 // MARK: - DebugInspectProfile.View
 extension DebugInspectProfile {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let profile: Profile
 		let mode: DebugInspectProfile.State.Mode
 		let json: String?
@@ -17,14 +17,14 @@ extension DebugInspectProfile {
 
 	@MainActor
 
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<DebugInspectProfile>
 
-		public init(store: StoreOf<DebugInspectProfile>) {
+		init(store: StoreOf<DebugInspectProfile>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				Group {
 					if let json = viewStore.json, viewStore.mode == .rawJSON {

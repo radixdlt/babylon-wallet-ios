@@ -1,22 +1,22 @@
 import ComposableArchitecture
 
 // MARK: - SecurityCenter
-public struct SecurityCenter: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public var problems: [SecurityProblem] = []
-		public var actionsRequired: Set<SecurityProblem.ProblemType> {
+struct SecurityCenter: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		var problems: [SecurityProblem] = []
+		var actionsRequired: Set<SecurityProblem.ProblemType> {
 			Set(problems.map(\.type))
 		}
 
 		@PresentationState
-		public var destination: Destination.State? = nil
+		var destination: Destination.State? = nil
 
-		public init() {}
+		init() {}
 	}
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case configurationBackup(ConfigurationBackup.State)
 			case securityFactors(SecurityFactors.State)
 			case displayMnemonics(DisplayMnemonics.State)
@@ -24,14 +24,14 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case configurationBackup(ConfigurationBackup.Action)
 			case securityFactors(SecurityFactors.Action)
 			case displayMnemonics(DisplayMnemonics.Action)
 			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: \.configurationBackup, action: \.configurationBackup) {
 				ConfigurationBackup()
 			}
@@ -47,17 +47,17 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case task
 		case problemTapped(SecurityProblem)
 		case cardTapped(SecurityProblem.ProblemType)
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case setProblems([SecurityProblem])
 	}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -68,7 +68,7 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 
 	@Dependency(\.securityCenterClient) var securityCenterClient
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			return securityProblemsEffect()
@@ -99,7 +99,7 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .setProblems(problems):
 			state.problems = problems
@@ -107,7 +107,7 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .importMnemonics(.delegate(.finishedEarly)), .importMnemonics(.delegate(.finishedImportingMnemonics)):
 			state.destination = nil

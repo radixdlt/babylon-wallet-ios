@@ -4,41 +4,41 @@ import SwiftUI
 
 // MARK: - AuthorizedDapps
 @Reducer
-public struct AuthorizedDappsFeature: Sendable, FeatureReducer {
+struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.accountLockersClient) var accountLockersClient
 	@Dependency(\.errorQueue) var errorQueue
 
-	public typealias Store = StoreOf<Self>
+	typealias Store = StoreOf<Self>
 
 	// MARK: State
 
 	// TODO: Add `@ObservableState` after migrating `DappDetails` to `ObservableState`
-	public struct State: Sendable, Hashable {
-		public var dApps: AuthorizedDapps = []
-		public var thumbnails: [AuthorizedDapp.ID: URL] = [:]
-		public var dappsWithClaims: [DappDefinitionAddress] = []
+	struct State: Sendable, Hashable {
+		var dApps: AuthorizedDapps = []
+		var thumbnails: [AuthorizedDapp.ID: URL] = [:]
+		var dappsWithClaims: [DappDefinitionAddress] = []
 
 		@PresentationState
-		public var destination: Destination.State? = nil
+		var destination: Destination.State? = nil
 
-		public init(destination: Destination.State? = nil) {
+		init(destination: Destination.State? = nil) {
 			self.destination = destination
 		}
 	}
 
-	public typealias Action = FeatureAction<Self>
+	typealias Action = FeatureAction<Self>
 
 	// MARK: Action
 
 	@CasePathable
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case task
 		case didSelectDapp(AuthorizedDapp.ID)
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case loadedDapps(TaskResult<AuthorizedDapps>)
 		case loadedThumbnail(URL, dApp: AuthorizedDapp.ID)
 		case presentDappDetails(DappDetails.State)
@@ -48,18 +48,18 @@ public struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 
 	// MARK: Destination
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Hashable, Sendable {
+		enum State: Hashable, Sendable {
 			case presentedDapp(DappDetails.State)
 		}
 
 		@CasePathable
-		public enum Action: Equatable, Sendable {
+		enum Action: Equatable, Sendable {
 			case presentedDapp(DappDetails.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: \.presentedDapp, action: \.presentedDapp) {
 				DappDetails()
 			}
@@ -68,9 +68,9 @@ public struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 
 	// MARK: Reducer
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: \.destination) {
 				Destination()
@@ -79,7 +79,7 @@ public struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			loadAuthorizedDapps()
@@ -97,7 +97,7 @@ public struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadedDapps(.success(dApps)):
 			state.dApps = dApps
@@ -139,7 +139,7 @@ public struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .presentedDapp(.delegate(.dAppForgotten)):
 			.run { send in

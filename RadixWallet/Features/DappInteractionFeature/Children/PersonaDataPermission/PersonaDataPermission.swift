@@ -41,7 +41,7 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 		case continueButtonTapped(WalletToDappInteractionPersonaDataRequestResponseItem)
 	}
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		enum State: Sendable, Hashable {
 			case editPersona(EditPersona.State)
 		}

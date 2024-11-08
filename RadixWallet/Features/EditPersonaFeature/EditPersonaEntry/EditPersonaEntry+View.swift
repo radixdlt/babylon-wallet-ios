@@ -3,7 +3,7 @@ import Sargon
 import SwiftUI
 
 extension PersonaData.Entry.Kind {
-	public var title: String {
+	var title: String {
 		switch self {
 		case .fullName:
 			L10n.AuthorizedDapps.PersonaDetails.fullName
@@ -17,12 +17,12 @@ extension PersonaData.Entry.Kind {
 
 // MARK: - EditPersonaEntry.View
 extension EditPersonaEntry {
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		let store: StoreOf<EditPersonaEntry>
 
 		let contentView: (StoreOf<ContentReducer>) -> ContentReducer.View
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			VStack(spacing: .small2) {
 				WithViewStore(
 					store.scope(

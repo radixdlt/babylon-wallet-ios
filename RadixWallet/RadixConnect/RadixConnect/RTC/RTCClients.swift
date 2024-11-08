@@ -3,35 +3,35 @@ import WebRTC
 
 // MARK: - P2P.ClientConnectionsUpdate
 extension P2P {
-	public struct ClientConnectionsUpdate: Sendable, Hashable {
-		public let clientID: Hash
-		public fileprivate(set) var idsOfConnectedPeerConnections: [PeerConnectionID]
+	struct ClientConnectionsUpdate: Sendable, Hashable {
+		let clientID: Hash
+		fileprivate(set) var idsOfConnectedPeerConnections: [PeerConnectionID]
 	}
 }
 
 // MARK: - RTCClients
 /// Holds and manages all of added RTCClients
-public actor RTCClients {
-	public struct RTCClientDidCloseError: Error, LocalizedError {
-		public var errorDescription: String? {
+actor RTCClients {
+	struct RTCClientDidCloseError: Error, LocalizedError {
+		var errorDescription: String? {
 			"RTCClient did close, retry connecting the browser with the Wallet"
 		}
 	}
 
 	// MARK: - Properties
 
-	public var currentlyConnectedClients: [P2P.ClientConnectionsUpdate] {
+	var currentlyConnectedClients: [P2P.ClientConnectionsUpdate] {
 		clientConnectionsUpdateSubject.value
 	}
 
 	// MARK: - Streams
 
 	/// A **multicasted** async sequence for received message from ALL RTCClients.
-	public func incomingMessages() async -> AnyAsyncSequence<P2P.RTCIncomingMessage> {
+	func incomingMessages() async -> AnyAsyncSequence<P2P.RTCIncomingMessage> {
 		incomingMessagesSubject.share().eraseToAnyAsyncSequence()
 	}
 
-	public func connectClients() async -> AnyAsyncSequence<[P2P.ClientConnectionsUpdate]> {
+	nonisolated func connectClients() async -> AnyAsyncSequence<[P2P.ClientConnectionsUpdate]> {
 		clientConnectionsUpdateSubject.share().eraseToAnyAsyncSequence()
 	}
 
@@ -59,16 +59,16 @@ public actor RTCClients {
 }
 
 extension RTCClients {
-	// Initializer for public clients
-	public init() {
+	// Initializer for clients
+	init() {
 		self.init(peerConnectionFactory: WebRTCFactory())
 	}
 }
 
 extension RTCClients {
-	// MARK: - Public API
+	// MARK: - API
 
-	public func connect(
+	func connect(
 		_ p2pLink: P2PLink,
 		isNewConnection: Bool,
 		waitsForConnectionToBeEstablished: Bool = false
@@ -86,7 +86,7 @@ extension RTCClients {
 
 	/// Disconnect and remove the RTCClient for the given connection password
 	/// - Parameter password: The connection password identifying the RTCClient
-	public func disconnectAndRemoveClient(_ password: RadixConnectPassword) async {
+	func disconnectAndRemoveClient(_ password: RadixConnectPassword) async {
 		await clients[password]?.cancel()
 		clients.removeValue(forKey: password)
 
@@ -98,7 +98,7 @@ extension RTCClients {
 	}
 
 	/// Disconnect and remove all RTCClients
-	public func disconnectAndRemoveAll() async {
+	func disconnectAndRemoveAll() async {
 		for id in clients.keys {
 			await disconnectAndRemoveClient(id)
 		}
@@ -109,7 +109,7 @@ extension RTCClients {
 	/// - Parameters:
 	///   - response: response to send
 	///   - origin: the sender of the original request we are responding to.
-	public func sendResponse(
+	func sendResponse(
 		_ response: P2P.RTCOutgoingMessage.Response,
 		to origin: P2P.RTCRoute
 	) async throws {
@@ -139,7 +139,7 @@ extension RTCClients {
 	///   - request: request to send
 	///   - strategy: strategy used to find suitable recipients or recipient.
 	/// - Returns: Number of peers we sent the message to
-	public func sendRequest(
+	func sendRequest(
 		_ request: P2P.RTCOutgoingMessage.Request,
 		strategy sendStrategy: P2P.RTCOutgoingMessage.Request.SendStrategy
 	) async throws -> Int {
@@ -262,7 +262,7 @@ actor RTCClient {
 
 	private var connectionsTask: Task<Void, Error>?
 
-	public func hasAnyActiveConnections() async -> Bool {
+	func hasAnyActiveConnections() async -> Bool {
 		!peerConnections.isEmpty
 	}
 
@@ -291,8 +291,8 @@ actor RTCClient {
 
 extension RTCClient {
 	typealias ID = RadixConnectPassword
-	public struct PeerConnectionDidCloseError: Error, LocalizedError {
-		public var errorDescription: String? {
+	struct PeerConnectionDidCloseError: Error, LocalizedError {
+		var errorDescription: String? {
 			"Peer Connection did close, retry the operation from dapp"
 		}
 	}

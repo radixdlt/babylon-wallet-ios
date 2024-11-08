@@ -3,7 +3,7 @@ import DependenciesAdditions
 import Sargon
 
 // MARK: - UserDefaultsKey
-public enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
+enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
 	case hideMigrateOlympiaButton
 	case epochForWhenLastUsedByAccountAddress
 	case transactionsCompletedCounter
@@ -25,14 +25,15 @@ public enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
 }
 
 extension UserDefaults.Dependency {
-	public typealias Key = UserDefaultsKey
-	public static let radix: Self = .init(.init(
-		suiteName: "group.com.radixpublishing.preview"
+	typealias Key = UserDefaultsKey
+	static let radixSuiteName: String = "group.com.radixpublishing.preview"
+	static let radix: Self = .init(.init(
+		suiteName: radixSuiteName
 	)!)
 }
 
 extension UserDefaults.Dependency {
-	public func codableValues<T: Sendable & Codable>(key: Key, codable: T.Type = T.self) -> AnyAsyncSequence<Result<T?, Error>> {
+	func codableValues<T: Sendable & Codable>(key: Key, codable: T.Type = T.self) -> AnyAsyncSequence<Result<T?, Error>> {
 		@Dependency(\.jsonDecoder) var jsonDecoder
 		return self.dataValues(forKey: key.rawValue).map {
 			if let data = $0 {
@@ -44,27 +45,27 @@ extension UserDefaults.Dependency {
 		.eraseToAnyAsyncSequence()
 	}
 
-	public func bool(key: Key, default defaultTo: Bool = false) -> Bool {
+	func bool(key: Key, default defaultTo: Bool = false) -> Bool {
 		bool(forKey: key.rawValue) ?? defaultTo
 	}
 
-	public func data(key: Key) -> Data? {
+	func data(key: Key) -> Data? {
 		data(forKey: key.rawValue)
 	}
 
-	public func string(key: Key) -> String? {
+	func string(key: Key) -> String? {
 		string(forKey: key.rawValue)
 	}
 
-	public func set(data: Data, key: Key) {
+	func set(data: Data, key: Key) {
 		set(data, forKey: key.rawValue)
 	}
 
-	public func set(string: String?, key: Key) {
+	func set(string: String?, key: Key) {
 		set(string, forKey: key.rawValue)
 	}
 
-	public func loadCodable<Model: Codable>(
+	func loadCodable<Model: Codable>(
 		key: Key, type: Model.Type = Model.self
 	) throws -> Model? {
 		@Dependency(\.jsonDecoder) var jsonDecoder
@@ -74,91 +75,91 @@ extension UserDefaults.Dependency {
 		return try jsonDecoder().decode(Model.self, from: data)
 	}
 
-	public func save(codable model: some Codable, forKey key: Key) throws {
+	func save(codable model: some Codable, forKey key: Key) throws {
 		@Dependency(\.jsonEncoder) var jsonEncoder
 		let data = try jsonEncoder().encode(model)
 		self.set(data: data, key: key)
 	}
 
-	public func removeAll(but exceptions: Set<Key> = []) {
+	func removeAll(but exceptions: Set<Key> = []) {
 		for key in Set(Key.allCases).subtracting(exceptions) {
 			remove(key)
 		}
 	}
 
-	public func remove(_ key: Key) {
+	func remove(_ key: Key) {
 		self.removeValue(forKey: key.rawValue)
 	}
 
-	public var hideMigrateOlympiaButton: Bool {
+	var hideMigrateOlympiaButton: Bool {
 		bool(key: .hideMigrateOlympiaButton)
 	}
 
-	public func setHideMigrateOlympiaButton(_ value: Bool) {
+	func setHideMigrateOlympiaButton(_ value: Bool) {
 		set(value, forKey: Key.hideMigrateOlympiaButton.rawValue)
 	}
 
-	public func getActiveProfileID() -> ProfileID? {
+	func getActiveProfileID() -> ProfileID? {
 		string(forKey: Key.activeProfileID.rawValue).flatMap(UUID.init(uuidString:))
 	}
 
-	public func setActiveProfileID(_ id: ProfileID) {
+	func setActiveProfileID(_ id: ProfileID) {
 		set(id.uuidString, forKey: Key.activeProfileID.rawValue)
 	}
 
-	public func removeActiveProfileID() {
+	func removeActiveProfileID() {
 		remove(.activeProfileID)
 	}
 
-	public func getTransactionsCompletedCounter() -> Int? {
+	func getTransactionsCompletedCounter() -> Int? {
 		integer(forKey: Key.transactionsCompletedCounter.rawValue)
 	}
 
-	public func setTransactionsCompletedCounter(_ count: Int) {
+	func setTransactionsCompletedCounter(_ count: Int) {
 		set(count, forKey: Key.transactionsCompletedCounter.rawValue)
 	}
 
-	public func transactionsCompletedCounterValues() -> AsyncStream<Int?> {
+	func transactionsCompletedCounterValues() -> AsyncStream<Int?> {
 		integerValues(forKey: Key.transactionsCompletedCounter.rawValue)
 	}
 
-	public func getDateOfLastSubmittedNPSSurvey() -> Date? {
+	func getDateOfLastSubmittedNPSSurvey() -> Date? {
 		date(forKey: Key.dateOfLastSubmittedNPSSurvey.rawValue)
 	}
 
-	public func setDateOfLastSubmittedNPSSurvey(_ date: Date) {
+	func setDateOfLastSubmittedNPSSurvey(_ date: Date) {
 		set(date, forKey: Key.dateOfLastSubmittedNPSSurvey.rawValue)
 	}
 
-	public func getNPSSurveyUserId() -> UUID? {
+	func getNPSSurveyUserId() -> UUID? {
 		string(forKey: Key.npsSurveyUserID.rawValue).flatMap(UUID.init(uuidString:))
 	}
 
-	public func setNPSSurveyUserId(_ id: UUID) {
+	func setNPSSurveyUserId(_ id: UUID) {
 		set(id.uuidString, forKey: Key.npsSurveyUserID.rawValue)
 	}
 
-	public var getMigratedKeychainProfiles: Set<ProfileID> {
+	var getMigratedKeychainProfiles: Set<ProfileID> {
 		(try? loadCodable(key: .migratedKeychainProfiles)) ?? []
 	}
 
-	public func appendMigratedKeychainProfiles(_ value: some Collection<ProfileID>) throws {
+	func appendMigratedKeychainProfiles(_ value: some Collection<ProfileID>) throws {
 		var migrated = getMigratedKeychainProfiles
 		migrated.append(contentsOf: value)
 		try save(codable: migrated, forKey: .migratedKeychainProfiles)
 	}
 
-	public var getLastCloudBackups: [ProfileID: BackupResult] {
+	var getLastCloudBackups: [ProfileID: BackupResult] {
 		(try? loadCodable(key: .lastCloudBackups)) ?? [:]
 	}
 
-	public func removeLastCloudBackup(for id: ProfileID) throws {
+	func removeLastCloudBackup(for id: ProfileID) throws {
 		var backups: [UUID: BackupResult] = getLastCloudBackups
 		backups[id] = nil
 		try save(codable: backups, forKey: .lastCloudBackups)
 	}
 
-	public func setLastCloudBackup(_ result: BackupResult.Result, of header: Profile.Header, at date: Date = .now) throws {
+	func setLastCloudBackup(_ result: BackupResult.Result, of header: Profile.Header, at date: Date = .now) throws {
 		var backups: [UUID: BackupResult] = getLastCloudBackups
 		let lastSuccess = result == .success ? date : backups[header.id]?.lastSuccess
 		backups[header.id] = .init(
@@ -171,16 +172,16 @@ extension UserDefaults.Dependency {
 		try save(codable: backups, forKey: .lastCloudBackups)
 	}
 
-	public func lastCloudBackupValues(for profileID: ProfileID) -> AnyAsyncSequence<BackupResult?> {
+	func lastCloudBackupValues(for profileID: ProfileID) -> AnyAsyncSequence<BackupResult?> {
 		lastBackupValues(for: profileID, key: .lastCloudBackups)
 	}
 
-	public var getLastManualBackups: [ProfileID: BackupResult] {
+	var getLastManualBackups: [ProfileID: BackupResult] {
 		(try? loadCodable(key: .lastManualBackups)) ?? [:]
 	}
 
 	/// Only call this on successful manual backups
-	public func setLastManualBackup(of profile: Profile) throws {
+	func setLastManualBackup(of profile: Profile) throws {
 		var backups: [ProfileID: BackupResult] = getLastManualBackups
 		let now = Date.now
 		backups[profile.id] = .init(
@@ -193,7 +194,7 @@ extension UserDefaults.Dependency {
 		try save(codable: backups, forKey: .lastManualBackups)
 	}
 
-	public func lastManualBackupValues(for profileID: ProfileID) -> AnyAsyncSequence<BackupResult?> {
+	func lastManualBackupValues(for profileID: ProfileID) -> AnyAsyncSequence<BackupResult?> {
 		lastBackupValues(for: profileID, key: .lastManualBackups)
 	}
 
@@ -203,61 +204,61 @@ extension UserDefaults.Dependency {
 			.eraseToAnyAsyncSequence()
 	}
 
-	public func getLastSyncedAccountsWithCE() -> String? {
+	func getLastSyncedAccountsWithCE() -> String? {
 		string(forKey: Key.lastSyncedAccountsWithCE.rawValue)
 	}
 
-	public func setLastSyncedAccountsWithCE(_ value: String) {
+	func setLastSyncedAccountsWithCE(_ value: String) {
 		set(value, forKey: Key.lastSyncedAccountsWithCE.rawValue)
 	}
 
-	public var showRelinkConnectorsAfterUpdate: Bool {
+	var showRelinkConnectorsAfterUpdate: Bool {
 		bool(key: .showRelinkConnectorsAfterUpdate)
 	}
 
-	public func setShowRelinkConnectorsAfterUpdate(_ value: Bool) {
+	func setShowRelinkConnectorsAfterUpdate(_ value: Bool) {
 		set(value, forKey: Key.showRelinkConnectorsAfterUpdate.rawValue)
 	}
 
-	public var showRelinkConnectorsAfterProfileRestore: Bool {
+	var showRelinkConnectorsAfterProfileRestore: Bool {
 		bool(key: .showRelinkConnectorsAfterProfileRestore)
 	}
 
-	public func setShowRelinkConnectorsAfterProfileRestore(_ value: Bool) {
+	func setShowRelinkConnectorsAfterProfileRestore(_ value: Bool) {
 		set(value, forKey: Key.showRelinkConnectorsAfterProfileRestore.rawValue)
 	}
 
-	public func getHomeCards() -> Data? {
+	func getHomeCards() -> Data? {
 		data(key: .homeCards)
 	}
 
-	public func setHomeCards(_ value: Data) {
+	func setHomeCards(_ value: Data) {
 		set(data: value, key: .homeCards)
 	}
 
-	public var appLockMessageShown: Bool {
+	var appLockMessageShown: Bool {
 		bool(key: .appLockMessageShown)
 	}
 
-	public func setAppLockMessageShown(_ value: Bool) {
+	func setAppLockMessageShown(_ value: Bool) {
 		set(value, forKey: Key.appLockMessageShown.rawValue)
 	}
 }
 
 // MARK: - BackupResult
-public struct BackupResult: Hashable, Codable, Sendable {
+struct BackupResult: Hashable, Codable, Sendable {
 	private static let timeoutInterval: TimeInterval = 5 * 60
 
-	public let date: Date
-	public let saveIdentifier: String
-	public let result: Result
-	public let lastSuccess: Date?
+	let date: Date
+	let saveIdentifier: String
+	let result: Result
+	let lastSuccess: Date?
 
-	public var succeeded: Bool {
+	var succeeded: Bool {
 		result == .success
 	}
 
-	public var failed: Bool {
+	var failed: Bool {
 		switch result {
 		case .failure:
 			true
@@ -268,19 +269,19 @@ public struct BackupResult: Hashable, Codable, Sendable {
 		}
 	}
 
-	public var isFinal: Bool {
+	var isFinal: Bool {
 		switch result {
 		case .started: false
 		case .failure, .success: true
 		}
 	}
 
-	public enum Result: Hashable, Codable, Sendable {
+	enum Result: Hashable, Codable, Sendable {
 		case started(Date)
 		case success
 		case failure(Failure)
 
-		public enum Failure: Hashable, Codable, Sendable {
+		enum Failure: Hashable, Codable, Sendable {
 			case temporarilyUnavailable
 			case notAuthenticated
 			case other
@@ -289,7 +290,7 @@ public struct BackupResult: Hashable, Codable, Sendable {
 }
 
 extension Profile.Header {
-	public var saveIdentifier: String {
+	var saveIdentifier: String {
 		"\(lastModified.timeIntervalSince1970)-\(lastUsedOnDevice.id.uuidString)"
 	}
 }

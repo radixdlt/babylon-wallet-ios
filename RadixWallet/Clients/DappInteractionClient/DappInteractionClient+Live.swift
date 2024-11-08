@@ -2,7 +2,7 @@ import ComposableArchitecture // actually CasePaths... but CI fails if we do `im
 
 // MARK: - DappInteractionClient + DependencyKey
 extension DappInteractionClient: DependencyKey {
-	public static var liveValue: DappInteractionClient = {
+	static var liveValue: DappInteractionClient = {
 		let interactionsSubject: AsyncPassthroughSubject<Result<ValidatedDappRequest, Error>> = .init()
 		let interactionResponsesSubject: AsyncPassthroughSubject<P2P.RTCOutgoingMessage.Response> = .init()
 
@@ -114,10 +114,15 @@ extension DappInteractionClient {
 			if authorized.ongoingAccounts?.numberOfAccounts.isValid == false {
 				return invalidRequest(.badContent(.numberOfAccountsInvalid))
 			}
+
 		case let .unauthorizedRequest(unauthorized):
 			if unauthorized.oneTimeAccounts?.numberOfAccounts.isValid == false {
 				return invalidRequest(.badContent(.numberOfAccountsInvalid))
 			}
+			if let proofOfOwnership = unauthorized.proofOfOwnership, await !proofOfOwnership.isValid() {
+				return invalidRequest(.invalidPersonaOrAccounts)
+			}
+
 		default:
 			break
 		}
@@ -154,5 +159,32 @@ extension DappInteractionClient {
 				requiresOriginVerification: message.originRequiresValidation
 			)
 		)
+	}
+}
+
+extension DappToWalletInteractionProofOfOwnershipRequestItem {
+	func isValid() async -> Bool {
+		@Dependency(\.personasClient) var personasClient
+		@Dependency(\.accountsClient) var accountsClient
+		do {
+			if let identityAddress {
+				// If there is an identityAddress set, verify we can access its corresponding Persona
+				let _ = try await personasClient.getPersona(id: identityAddress)
+			}
+			if let accountAddresses {
+				// For every accountAddress set, verify we can access its corresponding Account
+				let allAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
+				let accounts = allAccounts.filter {
+					accountAddresses.contains($0.address)
+				}
+				if accounts.count != accountAddresses.count {
+					return false
+				}
+			}
+		} catch {
+			return false
+		}
+
+		return true
 	}
 }

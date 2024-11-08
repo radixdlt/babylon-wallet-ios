@@ -2,55 +2,55 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - DappDetails
-public struct DappDetails: Sendable, FeatureReducer {
+struct DappDetails: Sendable, FeatureReducer {
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 
-	public struct FailedToLoadMetadata: Error, Hashable {}
+	struct FailedToLoadMetadata: Error, Hashable {}
 
-	public typealias Store = StoreOf<Self>
+	typealias Store = StoreOf<Self>
 
 	// MARK: State
 
-	public struct State: Sendable, Hashable {
-		public enum Context: Sendable, Hashable {
+	struct State: Sendable, Hashable {
+		enum Context: Sendable, Hashable {
 			case general
 			case settings(SettingsContext)
 
-			public enum SettingsContext: Sendable, Hashable {
+			enum SettingsContext: Sendable, Hashable {
 				case personaDetails
 				case authorizedDapps
 			}
 		}
 
-		public let context: Context
+		let context: Context
 
-		public let dAppDefinitionAddress: DappDefinitionAddress
+		let dAppDefinitionAddress: DappDefinitionAddress
 
 		// This will only be non-nil if the dApp is in fact authorized
-		public var authorizedDapp: AuthorizedDappDetailed?
+		var authorizedDapp: AuthorizedDappDetailed?
 
-		public var personaList: PersonaList.State
+		var personaList: PersonaList.State
 
-		public var mainWebsite: URL?
-
-		@Loadable
-		public var metadata: OnLedgerEntity.Metadata? = nil
+		var mainWebsite: URL?
 
 		@Loadable
-		public var resources: Resources? = nil
+		var metadata: OnLedgerEntity.Metadata? = nil
 
 		@Loadable
-		public var associatedDapps: [OnLedgerEntity.AssociatedDapp]? = nil
+		var resources: Resources? = nil
+
+		@Loadable
+		var associatedDapps: [OnLedgerEntity.AssociatedDapp]? = nil
 
 		@PresentationState
-		public var destination: Destination.State? = nil
+		var destination: Destination.State? = nil
 
 		// Authorized dApp
-		public init(
+		init(
 			dApp: AuthorizedDappDetailed,
 			context: Context.SettingsContext,
 			metadata: OnLedgerEntity.Metadata? = nil,
@@ -69,7 +69,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		}
 
 		// General
-		public init(
+		init(
 			dAppDefinitionAddress: DappDefinitionAddress,
 			metadata: OnLedgerEntity.Metadata? = nil,
 			resources: Resources? = nil,
@@ -86,15 +86,15 @@ public struct DappDetails: Sendable, FeatureReducer {
 			self.destination = destination
 		}
 
-		public struct Resources: Hashable, Sendable {
-			public var fungible: IdentifiedArrayOf<OnLedgerEntity.Resource>
-			public var nonFungible: IdentifiedArrayOf<OnLedgerEntity.Resource>
+		struct Resources: Hashable, Sendable {
+			var fungible: IdentifiedArrayOf<OnLedgerEntity.Resource>
+			var nonFungible: IdentifiedArrayOf<OnLedgerEntity.Resource>
 		}
 	}
 
 	// MARK: Action
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case appeared
 		case fungibleTapped(ResourceAddress)
 		case nonFungibleTapped(ResourceAddress)
@@ -103,11 +103,11 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case forgetThisDappTapped
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case dAppForgotten
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case metadataLoaded(Loadable<OnLedgerEntity.Metadata>)
 		case resourcesLoaded(Loadable<State.Resources>)
 		case associatedDappsLoaded(Loadable<[OnLedgerEntity.AssociatedDapp]>)
@@ -115,14 +115,14 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case mainWebsiteValidated(URL)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case personaList(PersonaList.Action)
 	}
 
 	// MARK: - Destination
 
-	public struct Destination: DestinationReducer {
-		public enum State: Hashable, Sendable {
+	struct Destination: DestinationReducer {
+		enum State: Hashable, Sendable {
 			case personaDetails(PersonaDetails.State)
 			case fungibleDetails(FungibleTokenDetails.State)
 			case nonFungibleDetails(NonFungibleTokenDetails.State)
@@ -130,20 +130,20 @@ public struct DappDetails: Sendable, FeatureReducer {
 			case confirmDisconnectAlert(AlertState<Action.ConfirmDisconnectAlert>)
 		}
 
-		public enum Action: Equatable, Sendable {
+		enum Action: Equatable, Sendable {
 			case personaDetails(PersonaDetails.Action)
 			case fungibleDetails(FungibleTokenDetails.Action)
 			case nonFungibleDetails(NonFungibleTokenDetails.Action)
 			case dappDetails(DappDetails.Action)
 			case confirmDisconnectAlert(ConfirmDisconnectAlert)
 
-			public enum ConfirmDisconnectAlert: Sendable, Equatable {
+			enum ConfirmDisconnectAlert: Sendable, Equatable {
 				case confirmTapped
 				case cancelTapped
 			}
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: /State.personaDetails, action: /Action.personaDetails) {
 				PersonaDetails()
 			}
@@ -168,9 +168,9 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 	@Dependency(\.rolaClient) var rolaClient
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Scope(state: \.personaList, action: /Action.child .. ChildAction.personaList) {
 			PersonaList()
 		}
@@ -182,7 +182,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			state.$metadata = .loading
@@ -242,7 +242,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .personaList(.delegate(.openDetails(persona))):
 
@@ -260,7 +260,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .metadataLoaded(metadata):
 			state.$metadata = metadata
@@ -308,7 +308,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .personaDetails(.delegate(.personaDeauthorized)):
 			let dAppID = state.dAppDefinitionAddress

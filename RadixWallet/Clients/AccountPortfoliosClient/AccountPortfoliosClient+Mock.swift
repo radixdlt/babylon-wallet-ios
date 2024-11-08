@@ -1,8 +1,8 @@
 
 extension AccountPortfoliosClient: TestDependencyKey {
-	public static let previewValue = AccountPortfoliosClient.noop
+	static let previewValue = AccountPortfoliosClient.noop
 
-	public static let testValue = AccountPortfoliosClient(
+	static let testValue = AccountPortfoliosClient(
 		fetchAccountPortfolios: unimplemented("\(AccountPortfoliosClient.self).fetchAccountPortfolios"),
 		fetchAccountPortfolio: unimplemented("\(AccountPortfoliosClient.self).fetchAccountPortfolio"),
 		portfolioUpdates: unimplemented("\(AccountPortfoliosClient.self).fetchAccountPortfolio"),
@@ -10,7 +10,7 @@ extension AccountPortfoliosClient: TestDependencyKey {
 		portfolios: unimplemented("\(AccountPortfoliosClient.self).portfolios")
 	)
 
-	public static let noop = AccountPortfoliosClient(
+	static let noop = AccountPortfoliosClient(
 		fetchAccountPortfolios: { _, _ in throw NoopError() },
 		fetchAccountPortfolio: { _, _ in throw NoopError() },
 		portfolioUpdates: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },

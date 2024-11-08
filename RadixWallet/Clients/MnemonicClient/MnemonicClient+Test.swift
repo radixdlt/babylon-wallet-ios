@@ -1,6 +1,6 @@
 
 extension DependencyValues {
-	public var mnemonicClient: MnemonicClient {
+	var mnemonicClient: MnemonicClient {
 		get { self[MnemonicClient.self] }
 		set { self[MnemonicClient.self] = newValue }
 	}
@@ -8,15 +8,15 @@ extension DependencyValues {
 
 // MARK: - MnemonicClient + TestDependencyKey
 extension MnemonicClient: TestDependencyKey {
-	public static let testValue = Self(
+	static let testValue = Self(
 		generate: unimplemented("\(Self.self).generate"),
 		import: unimplemented("\(Self.self).import"),
 		lookup: unimplemented("\(Self.self).lookup")
 	)
 
 	#if DEBUG
-	public static let previewValue = Self.noop
-	public static let noop = Self(
+	static let previewValue = Self.noop
+	static let noop = Self(
 		generate: { _, _ in Mnemonic.sample },
 		import: { _, _ in throw NoopError() },
 		lookup: { _ in .unknown(.tooShort) }

@@ -11,28 +11,28 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.BlueprintMethodRoyalty")
-public typealias BlueprintMethodRoyalty = GatewayAPI.BlueprintMethodRoyalty
+typealias BlueprintMethodRoyalty = GatewayAPI.BlueprintMethodRoyalty
 
 extension GatewayAPI {
 
-public struct BlueprintMethodRoyalty: Codable, Hashable {
+struct BlueprintMethodRoyalty: Codable, Hashable {
 
-    public private(set) var methodName: String
-    public private(set) var royaltyAmount: RoyaltyAmount?
+    private(set) var methodName: String
+    private(set) var royaltyAmount: RoyaltyAmount?
 
-    public init(methodName: String, royaltyAmount: RoyaltyAmount? = nil) {
+    init(methodName: String, royaltyAmount: RoyaltyAmount? = nil) {
         self.methodName = methodName
         self.royaltyAmount = royaltyAmount
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case methodName = "method_name"
         case royaltyAmount = "royalty_amount"
     }
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(methodName, forKey: .methodName)
         try container.encodeIfPresent(royaltyAmount, forKey: .royaltyAmount)

@@ -1,7 +1,7 @@
 // MARK: - HomeCardsClient
-public struct HomeCardsClient: Sendable {
-	public var cards: Cards
-	public var removeCard: RemoveCard
+struct HomeCardsClient: Sendable {
+	var cards: Cards
+	var removeCard: RemoveCard
 
 	init(
 		cards: @escaping Cards,
@@ -13,12 +13,12 @@ public struct HomeCardsClient: Sendable {
 }
 
 extension HomeCardsClient {
-	public typealias Cards = @Sendable () -> AnyAsyncSequence<[HomeCard]>
-	public typealias RemoveCard = @Sendable (HomeCard) -> Void
+	typealias Cards = @Sendable () -> AnyAsyncSequence<[HomeCard]>
+	typealias RemoveCard = @Sendable (HomeCard) -> Void
 }
 
 extension DependencyValues {
-	public var homeCardsClient: HomeCardsClient {
+	var homeCardsClient: HomeCardsClient {
 		get { self[HomeCardsClient.self] }
 		set { self[HomeCardsClient.self] = newValue }
 	}

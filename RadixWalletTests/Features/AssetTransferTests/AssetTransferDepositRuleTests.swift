@@ -17,7 +17,7 @@ final class AssetTransferDepositRuleTests: TestCase {
 			xrdResource: .init(
 				resourceAddress: resourceAddress,
 				atLedgerState: .init(version: 0, epoch: 0),
-				amount: .init(nominalAmount: Decimal192(1)),
+				amount: .exact(Decimal192(1)),
 				metadata: .init(nil)
 			)
 		),
@@ -192,7 +192,7 @@ final class AssetTransferDepositRuleTests: TestCase {
 }
 
 extension ThirdPartyDeposits {
-	public mutating func setAssetsExceptionList(
+	mutating func setAssetsExceptionList(
 		_ new: OrderedSet<AssetException>?
 	) {
 		guard let new else {

@@ -16,24 +16,24 @@ extension AssetTransfer.State {
 }
 
 extension AssetTransfer {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let canSendTransferRequest: Bool
 		let isLoadingDepositStatus: Bool
 		let message: AssetTransferMessage.State?
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<AssetTransfer>
 
-		public init(store: StoreOf<AssetTransfer>) {
+		init(store: StoreOf<AssetTransfer>) {
 			self.store = store
 		}
 	}
 }
 
 extension AssetTransfer.View {
-	public var body: some View {
+	var body: some View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(spacing: .medium3) {
@@ -97,14 +97,14 @@ extension AssetTransfer.View {
 // MARK: - AssetTransfer.SheetView
 extension AssetTransfer {
 	@MainActor
-	public struct SheetView: SwiftUI.View {
+	struct SheetView: SwiftUI.View {
 		private let store: StoreOf<AssetTransfer>
 
-		public init(store: StoreOf<AssetTransfer>) {
+		init(store: StoreOf<AssetTransfer>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			let bannerStore = store.scope(state: \.showIsUsingTestnetBanner, action: \.never)
 			WithNavigationBar {
 				store.send(.view(.closeButtonTapped))

@@ -5,14 +5,14 @@ import SwiftUI
 // MARK: - ScanQR.View
 extension ScanQR {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		@Perception.Bindable var store: StoreOf<ScanQR>
 
-		public init(store: StoreOf<ScanQR>) {
+		init(store: StoreOf<ScanQR>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				VStack(spacing: .medium1) {
 					#if !targetEnvironment(simulator)
@@ -161,6 +161,6 @@ struct ScanQR_Preview: PreviewProvider {
 }
 
 extension ScanQR.State {
-	public static let previewValue: Self = .init(kind: .account)
+	static let previewValue: Self = .init(kind: .account)
 }
 #endif

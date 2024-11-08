@@ -18,7 +18,7 @@ extension HUD {
 	struct View: SwiftUI.View {
 		private let store: StoreOf<HUD>
 
-		public init(store: StoreOf<HUD>) {
+		init(store: StoreOf<HUD>) {
 			self.store = store
 		}
 

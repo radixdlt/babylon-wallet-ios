@@ -2,17 +2,17 @@ import IdentifiedCollections
 import Sargon
 
 // MARK: - AuthorizedDappsClient
-public struct AuthorizedDappsClient: Sendable {
-	public var getAuthorizedDapps: GetAuthorizedDapps
-	public var authorizedDappValues: AuthorizedDappValues
-	public var addAuthorizedDapp: AddAuthorizedDapp
-	public var forgetAuthorizedDapp: ForgetAuthorizedDapp
-	public var updateAuthorizedDapp: UpdateAuthorizedDapp
-	public var updateOrAddAuthorizedDapp: UpdateOrAddAuthorizedDapp
-	public var deauthorizePersonaFromDapp: DeauthorizePersonaFromDapp
-	public var detailsForAuthorizedDapp: DetailsForAuthorizedDapp
+struct AuthorizedDappsClient: Sendable {
+	var getAuthorizedDapps: GetAuthorizedDapps
+	var authorizedDappValues: AuthorizedDappValues
+	var addAuthorizedDapp: AddAuthorizedDapp
+	var forgetAuthorizedDapp: ForgetAuthorizedDapp
+	var updateAuthorizedDapp: UpdateAuthorizedDapp
+	var updateOrAddAuthorizedDapp: UpdateOrAddAuthorizedDapp
+	var deauthorizePersonaFromDapp: DeauthorizePersonaFromDapp
+	var detailsForAuthorizedDapp: DetailsForAuthorizedDapp
 
-	public init(
+	init(
 		getAuthorizedDapps: @escaping GetAuthorizedDapps,
 		authorizedDappValues: @escaping AuthorizedDappValues,
 		addAuthorizedDapp: @escaping AddAuthorizedDapp,
@@ -34,18 +34,18 @@ public struct AuthorizedDappsClient: Sendable {
 }
 
 extension AuthorizedDappsClient {
-	public typealias GetAuthorizedDapps = @Sendable () async throws -> AuthorizedDapps
-	public typealias AuthorizedDappValues = @Sendable () async -> AnyAsyncSequence<AuthorizedDapps>
-	public typealias DetailsForAuthorizedDapp = @Sendable (AuthorizedDapp) async throws -> AuthorizedDappDetailed
-	public typealias AddAuthorizedDapp = @Sendable (AuthorizedDapp) async throws -> Void
-	public typealias UpdateOrAddAuthorizedDapp = @Sendable (AuthorizedDapp) async throws -> Void
-	public typealias ForgetAuthorizedDapp = @Sendable (AuthorizedDapp.ID, NetworkID?) async throws -> Void
-	public typealias UpdateAuthorizedDapp = @Sendable (AuthorizedDapp) async throws -> Void
-	public typealias DeauthorizePersonaFromDapp = @Sendable (Persona.ID, AuthorizedDapp.ID, NetworkID) async throws -> Void
+	typealias GetAuthorizedDapps = @Sendable () async throws -> AuthorizedDapps
+	typealias AuthorizedDappValues = @Sendable () async -> AnyAsyncSequence<AuthorizedDapps>
+	typealias DetailsForAuthorizedDapp = @Sendable (AuthorizedDapp) async throws -> AuthorizedDappDetailed
+	typealias AddAuthorizedDapp = @Sendable (AuthorizedDapp) async throws -> Void
+	typealias UpdateOrAddAuthorizedDapp = @Sendable (AuthorizedDapp) async throws -> Void
+	typealias ForgetAuthorizedDapp = @Sendable (AuthorizedDapp.ID, NetworkID?) async throws -> Void
+	typealias UpdateAuthorizedDapp = @Sendable (AuthorizedDapp) async throws -> Void
+	typealias DeauthorizePersonaFromDapp = @Sendable (Persona.ID, AuthorizedDapp.ID, NetworkID) async throws -> Void
 }
 
 extension AuthorizedDappsClient {
-	public func getDetailedDapp(
+	func getDetailedDapp(
 		_ id: AuthorizedDapp.ID
 	) async throws -> AuthorizedDappDetailed {
 		let dApps = try await getAuthorizedDapps()
@@ -55,13 +55,13 @@ extension AuthorizedDappsClient {
 		return try await detailsForAuthorizedDapp(dApp)
 	}
 
-	public func getDappsAuthorizedByPersona(
+	func getDappsAuthorizedByPersona(
 		_ id: Persona.ID
 	) async throws -> AuthorizedDapps {
 		try await getAuthorizedDapps().filter { dapp in dapp.referencesToAuthorizedPersonas.contains(where: { authPersona in authPersona.id == id }) }
 	}
 
-	public func removeBrokenReferencesToSharedPersonaData(
+	func removeBrokenReferencesToSharedPersonaData(
 		personaCurrent: Persona,
 		personaUpdated: Persona
 	) async throws {
@@ -123,11 +123,11 @@ extension AuthorizedDappsClient {
 		}
 	}
 
-	public func isDappAuthorized(_ address: DappDefinitionAddress) async -> Bool {
+	func isDappAuthorized(_ address: DappDefinitionAddress) async -> Bool {
 		await (try? getAuthorizedDapps().contains { $0.id == address }) ?? false
 	}
 
-	public func getAuthorizedDapp(detailed: AuthorizedDappDetailed) async throws -> AuthorizedDapp {
+	func getAuthorizedDapp(detailed: AuthorizedDappDetailed) async throws -> AuthorizedDapp {
 		let dApps = try await getAuthorizedDapps()
 		guard let dApp = dApps[id: detailed.id] else {
 			throw AuthorizedDappDoesNotExists()

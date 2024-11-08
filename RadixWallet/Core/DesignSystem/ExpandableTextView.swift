@@ -1,7 +1,7 @@
 // MARK: - ExpandableTextView
 /// Based on https://edoardo.fyi/blog/2022/07/swiftui-expandable-text/
 /// https://github.com/n3d1117/ExpandableText
-public struct ExpandableTextView: View {
+struct ExpandableTextView: View {
 	private let text: String
 	private let lineLimit: Int
 
@@ -21,12 +21,12 @@ public struct ExpandableTextView: View {
 		}
 	}
 
-	public init(fullText: String, lineLimit: Int = 3) {
+	init(fullText: String, lineLimit: Int = 3) {
 		self.text = fullText
 		self.lineLimit = lineLimit
 	}
 
-	public var body: some View {
+	var body: some View {
 		Text(.init(textForDisplay))
 			.textStyle(textStyle)
 			.foregroundColor(foregroundColor)

@@ -1,43 +1,43 @@
 // MARK: - SecurityFactors
 
-public struct SecurityFactors: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public var seedPhrasesCount: Int?
-		public var ledgerWalletsCount: Int?
-		public var securityProblems: [SecurityProblem] = []
+struct SecurityFactors: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		var seedPhrasesCount: Int?
+		var ledgerWalletsCount: Int?
+		var securityProblems: [SecurityProblem] = []
 
 		@PresentationState
-		public var destination: Destination.State?
+		var destination: Destination.State?
 
-		public init() {}
+		init() {}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case task
 		case seedPhrasesButtonTapped
 		case ledgerWalletsButtonTapped
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case loadedSeedPhrasesCount(Int)
 		case loadedLedgerWalletsCount(Int)
 		case setSecurityProblems([SecurityProblem])
 	}
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case seedPhrases(DisplayMnemonics.State)
 			case ledgerWallets(LedgerHardwareDevices.State)
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case seedPhrases(DisplayMnemonics.Action)
 			case ledgerWallets(LedgerHardwareDevices.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: \.seedPhrases, action: \.seedPhrases) {
 				DisplayMnemonics()
 			}
@@ -50,9 +50,9 @@ public struct SecurityFactors: Sendable, FeatureReducer {
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.securityCenterClient) var securityCenterClient
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -61,7 +61,7 @@ public struct SecurityFactors: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			return loadSeedPhrasesCount()
@@ -78,7 +78,7 @@ public struct SecurityFactors: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadedSeedPhrasesCount(count):
 			state.seedPhrasesCount = count

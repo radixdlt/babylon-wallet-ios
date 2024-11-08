@@ -1,8 +1,8 @@
 import Foundation
 
 // MARK: - RadixDateFormatter
-public enum RadixDateFormatter {
-	public static func string(from date: Date) -> String {
+enum RadixDateFormatter {
+	static func string(from date: Date) -> String {
 		let dateString = { date.formatted(date: .abbreviated, time: .omitted) }
 
 		let calendar = Calendar.current

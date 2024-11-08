@@ -2,22 +2,22 @@ import ComposableArchitecture
 import SwiftUI
 
 extension ResourceAsset {
-	public typealias ViewState = State
+	typealias ViewState = State
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<ResourceAsset>
 		@FocusState
 		private var focused: Bool
 
-		public init(store: StoreOf<ResourceAsset>) {
+		init(store: StoreOf<ResourceAsset>) {
 			self.store = store
 		}
 	}
 }
 
 extension ResourceAsset.View {
-	public var body: some View {
+	var body: some View {
 		VStack(alignment: .leading, spacing: .small3) {
 			HStack {
 				SwitchStore(store.scope(state: \.kind, action: \.child)) { state in
@@ -111,7 +111,7 @@ private extension View {
 	}
 }
 
-private extension Loadable<ResourceAsset.State.DepositStatus> {
+private extension Loadable<DepositStatus> {
 	var hint: Hint.ViewState? {
 		switch self {
 		case .idle, .loading, .failure, .success(.allowed):

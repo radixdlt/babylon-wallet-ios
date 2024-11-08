@@ -2,29 +2,31 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - NonFungibleTokenDetails
-public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
+@Reducer
+struct NonFungibleTokenDetails: Sendable, FeatureReducer {
+	@ObservableState
+	struct State: Sendable, Hashable {
 		let resourceAddress: ResourceAddress
 		var resourceDetails: Loadable<OnLedgerEntity.Resource>
 		let ownedResource: OnLedgerEntity.OwnedNonFungibleResource?
-		let token: OnLedgerEntity.NonFungibleToken?
+		let details: KnownResourceBalance.NonFungible?
 		let ledgerState: AtLedgerState
 		let stakeClaim: OnLedgerEntitiesClient.StakeClaim?
 		let isClaimStakeEnabled: Bool
 		var hideResource: HideResource.State?
 
-		public init(
+		init(
 			resourceAddress: ResourceAddress,
 			resourceDetails: Loadable<OnLedgerEntity.Resource> = .idle,
 			ownedResource: OnLedgerEntity.OwnedNonFungibleResource? = nil,
-			token: OnLedgerEntity.NonFungibleToken? = nil,
+			details: KnownResourceBalance.NonFungible? = nil,
 			ledgerState: AtLedgerState,
 			stakeClaim: OnLedgerEntitiesClient.StakeClaim? = nil,
 			isClaimStakeEnabled: Bool = true
 		) {
 			self.resourceAddress = resourceAddress
 			self.resourceDetails = resourceDetails
-			self.token = token
+			self.details = details
 			self.ownedResource = ownedResource
 			self.ledgerState = ledgerState
 			self.stakeClaim = stakeClaim
@@ -35,38 +37,40 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	typealias Action = FeatureAction<Self>
+
+	enum ViewAction: Sendable, Equatable {
 		case closeButtonTapped
 		case task
 		case tappedClaimStake
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case resourceLoadResult(TaskResult<OnLedgerEntity.Resource>)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case tappedClaimStake(OnLedgerEntitiesClient.StakeClaim)
 	}
 
 	@CasePathable
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case hideResource(HideResource.Action)
 	}
 
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.dismiss) var dismiss
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.hideResource, action: \.child.hideResource) {
 				HideResource()
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			guard case .idle = state.resourceDetails else {
@@ -89,7 +93,7 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .resourceLoadResult(.success(resource)):
 			state.resourceDetails = .success(resource)
@@ -103,7 +107,7 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .hideResource(.delegate(.didHideResource)):
 			.run { _ in await dismiss() }

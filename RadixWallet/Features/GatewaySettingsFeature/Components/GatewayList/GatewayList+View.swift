@@ -4,14 +4,14 @@ import SwiftUI
 // MARK: - GatewayList.View
 extension GatewayList {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<GatewayList>
 
-		public init(store: StoreOf<GatewayList>) {
+		init(store: StoreOf<GatewayList>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				LazyVStack(spacing: .zero) {
 					ForEachStore(store.scope(state: \.gateways, action: \.child.gateway)) { rowStore in

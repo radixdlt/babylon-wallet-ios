@@ -11,26 +11,26 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.AccountDepositPreValidationDecidingFactorsResourceSpecificDetailsItem")
-public typealias AccountDepositPreValidationDecidingFactorsResourceSpecificDetailsItem = GatewayAPI.AccountDepositPreValidationDecidingFactorsResourceSpecificDetailsItem
+typealias AccountDepositPreValidationDecidingFactorsResourceSpecificDetailsItem = GatewayAPI.AccountDepositPreValidationDecidingFactorsResourceSpecificDetailsItem
 
 extension GatewayAPI {
 
-public struct AccountDepositPreValidationDecidingFactorsResourceSpecificDetailsItem: Codable, Hashable {
+struct AccountDepositPreValidationDecidingFactorsResourceSpecificDetailsItem: Codable, Hashable {
 
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var resourceAddress: String
-    public private(set) var vaultExists: Bool
-    public private(set) var isXrd: Bool
-    public private(set) var resourcePreferenceRule: AccountResourcePreferenceRule?
+    private(set) var resourceAddress: String
+    private(set) var vaultExists: Bool
+    private(set) var isXrd: Bool
+    private(set) var resourcePreferenceRule: AccountResourcePreferenceRule?
 
-    public init(resourceAddress: String, vaultExists: Bool, isXrd: Bool, resourcePreferenceRule: AccountResourcePreferenceRule? = nil) {
+    init(resourceAddress: String, vaultExists: Bool, isXrd: Bool, resourcePreferenceRule: AccountResourcePreferenceRule? = nil) {
         self.resourceAddress = resourceAddress
         self.vaultExists = vaultExists
         self.isXrd = isXrd
         self.resourcePreferenceRule = resourcePreferenceRule
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case resourceAddress = "resource_address"
         case vaultExists = "vault_exists"
         case isXrd = "is_xrd"
@@ -39,7 +39,7 @@ public struct AccountDepositPreValidationDecidingFactorsResourceSpecificDetailsI
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(resourceAddress, forKey: .resourceAddress)
         try container.encode(vaultExists, forKey: .vaultExists)

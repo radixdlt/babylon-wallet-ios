@@ -1,5 +1,5 @@
 extension View {
-	public func onSizeChanged(
+	func onSizeChanged(
 		perform action: @escaping (CGSize) -> Void
 	) -> some View {
 		background(GeometryReader { geo in

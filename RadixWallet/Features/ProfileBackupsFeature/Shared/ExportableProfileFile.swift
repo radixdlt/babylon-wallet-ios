@@ -15,7 +15,7 @@ struct FileContentIsNotProfile: LocalizedError {
 
 // MARK: - ExportableProfileFile
 /// An exportable (and thus importable) Profile file, either encrypted or plaintext.
-public enum ExportableProfileFile: FileDocument, Sendable, Hashable {
+enum ExportableProfileFile: FileDocument, Sendable, Hashable {
 	case plaintext(Profile)
 	case encrypted(EncryptedProfileJSONData)
 }
@@ -29,13 +29,13 @@ extension String {
 
 extension UTType {
 	// FIXME: should we declare our own file format? For now we use require `.json` file extension.
-	public static let profile: Self = .json
+	static let profile: Self = .json
 }
 
 extension ExportableProfileFile {
-	public static let readableContentTypes: [UTType] = [.profile]
+	static let readableContentTypes: [UTType] = [.profile]
 
-	public init(configuration: ReadConfiguration) throws {
+	init(configuration: ReadConfiguration) throws {
 		guard let data = configuration.file.regularFileContents
 		else {
 			throw NoJSONDataFound()
@@ -43,7 +43,7 @@ extension ExportableProfileFile {
 		try self.init(data: data)
 	}
 
-	public init(data: Data) throws {
+	init(data: Data) throws {
 		switch Profile.analyzeContents(data: data) {
 		case .encryptedProfile:
 			self = .encrypted(data)
@@ -54,7 +54,7 @@ extension ExportableProfileFile {
 		}
 	}
 
-	public func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
+	func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
 		@Dependency(\.jsonEncoder) var jsonEncoder
 		let encoder = jsonEncoder()
 		// FIXME: Should we set skip escaping slashes for `jsonEncoder()` everywhere? Feels to risky to do that this close to release, so lets investigate later (thinking about Gateway...)
@@ -70,12 +70,12 @@ extension ExportableProfileFile {
 }
 
 extension OverlayWindowClient.Item.HUD {
-	public static let decryptedProfile = Self(
+	static let decryptedProfile = Self(
 		text: "Successfully decrypted wallet file.",
 		icon: .init(kind: .system("lock.open"))
 	)
 
-	public static func exportedProfile(encrypted: Bool) -> Self {
+	static func exportedProfile(encrypted: Bool) -> Self {
 		.init(
 			text: "Exported \(encrypted ? "encrypted " : "")wallet backup file",
 			icon: .init(kind: encrypted ? .system("lock.rectangle.stack") : .system("rectangle.stack"))

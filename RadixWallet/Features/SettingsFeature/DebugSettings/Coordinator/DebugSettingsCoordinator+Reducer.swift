@@ -1,23 +1,23 @@
 import ComposableArchitecture
 import SwiftUI
 
-public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
-	public typealias Store = StoreOf<Self>
+struct DebugSettingsCoordinator: Sendable, FeatureReducer {
+	typealias Store = StoreOf<Self>
 
-	public init() {}
+	init() {}
 
 	// MARK: State
 
-	public struct State: Sendable, Hashable {
+	struct State: Sendable, Hashable {
 		@PresentationState
-		public var destination: Destination.State?
+		var destination: Destination.State?
 
-		public init() {}
+		init() {}
 	}
 
 	// MARK: Action
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case factorSourcesButtonTapped
 		case debugInspectProfileButtonTapped
 		case debugUserDefaultsContentsButtonTapped
@@ -25,12 +25,12 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 		case debugKeychainContentsButtonTapped
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case profileToDebugLoaded(Profile)
 	}
 
-	public struct Destination: DestinationReducer {
-		public enum State: Sendable, Hashable {
+	struct Destination: DestinationReducer {
+		enum State: Sendable, Hashable {
 			case debugUserDefaultsContents(DebugUserDefaultsContents.State)
 			case debugInspectProfile(DebugInspectProfile.State)
 			case debugManageFactorSources(DebugManageFactorSources.State)
@@ -40,7 +40,7 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 			#endif // DEBUG
 		}
 
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case debugUserDefaultsContents(DebugUserDefaultsContents.Action)
 			case debugInspectProfile(DebugInspectProfile.Action)
 			#if DEBUG
@@ -50,7 +50,7 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 			case debugManageFactorSources(DebugManageFactorSources.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: /State.debugUserDefaultsContents, action: /Action.debugUserDefaultsContents) {
 				DebugUserDefaultsContents()
 			}
@@ -77,7 +77,7 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.dismiss) var dismiss
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -86,7 +86,7 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .factorSourcesButtonTapped:
 			state.destination = .debugManageFactorSources(.init())
@@ -116,7 +116,7 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .profileToDebugLoaded(profile):
 			state.destination = .debugInspectProfile(.init(profile: profile))

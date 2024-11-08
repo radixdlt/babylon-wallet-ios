@@ -2,13 +2,13 @@ import ComposableArchitecture
 import SwiftUI
 
 extension PreviewOfSomeFeatureReducer {
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<F>
-		public init(store: StoreOf<F>) {
+		init(store: StoreOf<F>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			NavigationView {
 				SwitchStore(store) { state in
 					switch state {

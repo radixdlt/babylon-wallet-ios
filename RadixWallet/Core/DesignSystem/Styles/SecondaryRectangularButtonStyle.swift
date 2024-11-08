@@ -1,5 +1,5 @@
 // MARK: - SecondaryRectangularButtonStyle
-public struct SecondaryRectangularButtonStyle: ButtonStyle {
+struct SecondaryRectangularButtonStyle: ButtonStyle {
 	@Environment(\.controlState) var controlState
 	let backgroundColor: Color
 	let shouldExpand: Bool
@@ -8,7 +8,7 @@ public struct SecondaryRectangularButtonStyle: ButtonStyle {
 	let image: Image?
 	let trailingImage: Image?
 
-	public func makeBody(configuration: ButtonStyle.Configuration) -> some View {
+	func makeBody(configuration: ButtonStyle.Configuration) -> some View {
 		ZStack {
 			HStack(spacing: .small2) {
 				image
@@ -50,9 +50,9 @@ extension SecondaryRectangularButtonStyle {
 }
 
 extension ButtonStyle where Self == SecondaryRectangularButtonStyle {
-	public static var secondaryRectangular: Self { .secondaryRectangular() }
+	static var secondaryRectangular: Self { .secondaryRectangular() }
 
-	public static func secondaryRectangular(
+	static func secondaryRectangular(
 		backgroundColor: Color = .app.gray4,
 		shouldExpand: Bool = false,
 		isDestructive: Bool = false,

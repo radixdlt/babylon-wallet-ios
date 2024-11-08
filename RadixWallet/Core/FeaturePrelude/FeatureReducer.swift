@@ -3,7 +3,7 @@ import Sargon
 import SwiftUI
 
 // MARK: - FeatureView
-public protocol FeatureView: SwiftUI.View where Feature.View == Self {
+protocol FeatureView: SwiftUI.View where Feature.View == Self {
 	associatedtype Feature: FeatureReducer
 
 	@MainActor
@@ -11,12 +11,12 @@ public protocol FeatureView: SwiftUI.View where Feature.View == Self {
 }
 
 // MARK: - EmptyInitializable
-public protocol EmptyInitializable {
+protocol EmptyInitializable {
 	init()
 }
 
 // MARK: - FeatureReducer
-public protocol FeatureReducer: Reducer where State: Sendable & Hashable, Action == FeatureAction<Self> {
+protocol FeatureReducer: Reducer where State: Sendable & Hashable, Action == FeatureAction<Self> {
 	associatedtype ViewAction: Sendable & Equatable = Never
 	associatedtype InternalAction: Sendable & Equatable = Never
 	associatedtype ChildAction: Sendable & Equatable = Never
@@ -36,7 +36,7 @@ public protocol FeatureReducer: Reducer where State: Sendable & Hashable, Action
 
 // MARK: - FeatureAction
 @CasePathable
-public enum FeatureAction<Feature: FeatureReducer>: Sendable, Equatable {
+enum FeatureAction<Feature: FeatureReducer> {
 	case destination(PresentationAction<Feature.Destination.Action>)
 	case view(Feature.ViewAction)
 	case `internal`(Feature.InternalAction)
@@ -45,24 +45,24 @@ public enum FeatureAction<Feature: FeatureReducer>: Sendable, Equatable {
 }
 
 // MARK: - DestinationReducer
-public protocol DestinationReducer: Reducer where State: Sendable & Hashable, Action: Sendable & Equatable {}
+protocol DestinationReducer: Reducer where State: Sendable & Hashable, Action: Sendable & Equatable {}
 
 // MARK: - EmptyDestination
-public enum EmptyDestination: DestinationReducer {
-	public struct State: Sendable, Hashable {}
-	public typealias Action = Never
-	public func reduce(into state: inout State, action: Never) -> Effect<Action> {}
-	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> { .none }
+enum EmptyDestination: DestinationReducer {
+	struct State: Sendable, Hashable {}
+	typealias Action = Never
+	func reduce(into state: inout State, action: Never) -> Effect<Action> {}
+	func reduceDismissedDestination(into state: inout State) -> Effect<Action> { .none }
 }
 
 extension Reducer where Self: FeatureReducer {
-	public typealias Action = FeatureAction<Self>
+	typealias Action = FeatureAction<Self>
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 	}
 
-	public func core(state: inout State, action: Action) -> Effect<Action> {
+	func core(state: inout State, action: Action) -> Effect<Action> {
 		switch action {
 		case .destination(.dismiss):
 			reduceDismissedDestination(into: &state)
@@ -79,38 +79,41 @@ extension Reducer where Self: FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		.none
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		.none
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		.none
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		.none
 	}
 
-	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
 		.none
 	}
 }
 
-public typealias AlertPresentationStore<AlertAction> = Store<PresentationState<AlertState<AlertAction>>, PresentationAction<AlertAction>>
+typealias AlertPresentationStore<AlertAction> = Store<PresentationState<AlertState<AlertAction>>, PresentationAction<AlertAction>>
 
-public typealias PresentationStoreOf<R: Reducer> = Store<PresentationState<R.State>, PresentationAction<R.Action>>
+typealias PresentationStoreOf<R: Reducer> = Store<PresentationState<R.State>, PresentationAction<R.Action>>
 
-public typealias ViewStoreOf<Feature: FeatureReducer> = ViewStore<Feature.ViewState, Feature.ViewAction>
+typealias ViewStoreOf<Feature: FeatureReducer> = ViewStore<Feature.ViewState, Feature.ViewAction>
 
-public typealias StackActionOf<R: Reducer> = StackAction<R.State, R.Action>
+typealias StackActionOf<R: Reducer> = StackAction<R.State, R.Action>
+
+// MARK: - FeatureAction + Sendable, Equatable
+extension FeatureAction: Sendable, Equatable {}
 
 // MARK: - FeatureAction + Hashable
 extension FeatureAction: Hashable where Feature.Destination.Action: Hashable, Feature.ViewAction: Hashable, Feature.ChildAction: Hashable, Feature.InternalAction: Hashable, Feature.DelegateAction: Hashable {
-	public func hash(into hasher: inout Hasher) {
+	func hash(into hasher: inout Hasher) {
 		switch self {
 		case let .destination(action):
 			hasher.combine(action)
@@ -127,7 +130,7 @@ extension FeatureAction: Hashable where Feature.Destination.Action: Hashable, Fe
 }
 
 /// For scoping to an actionless childstore
-public func actionless<T>(never: Never) -> T {}
+func actionless<T>(never: Never) -> T {}
 
 extension FeatureReducer {
 	func delayedMediumEffect(internal internalAction: InternalAction) -> Effect<Action> {

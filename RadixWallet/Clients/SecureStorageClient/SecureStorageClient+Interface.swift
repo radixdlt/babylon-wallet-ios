@@ -1,60 +1,58 @@
 import Sargon
 
 extension Profile {
-	public typealias Header = Sargon.Header
-	public typealias HeaderList = NonEmpty<IdentifiedArrayOf<Header>>
+	typealias Header = Sargon.Header
+	typealias HeaderList = NonEmpty<IdentifiedArrayOf<Header>>
 }
 
 // MARK: - SecureStorageClient
-public struct SecureStorageClient: Sendable {
-	public var saveProfileSnapshot: SaveProfileSnapshot
-	public var loadProfileSnapshotData: LoadProfileSnapshotData
-	public var loadProfileSnapshot: LoadProfileSnapshot
-	public var loadProfile: LoadProfile
-	public var deleteProfile: DeleteProfile
+struct SecureStorageClient: Sendable {
+	var loadProfileSnapshotData: LoadProfileSnapshotData
+	var saveProfileSnapshotData: SaveProfileSnapshotData
 
-	public var saveMnemonicForFactorSource: SaveMnemonicForFactorSource
-	public var loadMnemonicByFactorSourceID: LoadMnemonicByFactorSourceID
-	public var containsMnemonicIdentifiedByFactorSourceID: ContainsMnemonicIdentifiedByFactorSourceID
+	var saveMnemonicForFactorSource: SaveMnemonicForFactorSource
+	var loadMnemonicByFactorSourceID: LoadMnemonicByFactorSourceID
+	var containsMnemonicIdentifiedByFactorSourceID: ContainsMnemonicIdentifiedByFactorSourceID
 
-	public var deleteMnemonicByFactorSourceID: DeleteMnemonicByFactorSourceID
-	public var deleteProfileAndMnemonicsByFactorSourceIDs: DeleteProfileAndMnemonicsByFactorSourceIDs
+	var deleteMnemonicByFactorSourceID: DeleteMnemonicByFactorSourceID
+	var deleteProfileAndMnemonicsByFactorSourceIDs: DeleteProfileAndMnemonicsByFactorSourceIDs
 
-	public var disableCloudProfileSync: DisableCloudProfileSync
+	var disableCloudProfileSync: DisableCloudProfileSync
 
-	public var loadProfileHeaderList: LoadProfileHeaderList
-	public var saveProfileHeaderList: SaveProfileHeaderList
-	public var deleteProfileHeaderList: DeleteProfileHeaderList
+	var loadProfileHeaderList: LoadProfileHeaderList
+	var saveProfileHeaderList: SaveProfileHeaderList
+	var deleteProfileHeaderList: DeleteProfileHeaderList
 
-	public var loadDeviceInfo: LoadDeviceInfo
-	public var saveDeviceInfo: SaveDeviceInfo
+	var loadDeviceInfo: LoadDeviceInfo
+	var saveDeviceInfo: SaveDeviceInfo
+	var deleteDeviceInfo: DeleteDeviceInfo
 
 	/// See https://radixdlt.atlassian.net/l/cp/fmoH9KcN
-	public var deprecatedLoadDeviceID: DeprecatedLoadDeviceID
+	var deprecatedLoadDeviceID: DeprecatedLoadDeviceID
 	/// See https://radixdlt.atlassian.net/l/cp/fmoH9KcN
-	public var deleteDeprecatedDeviceID: DeleteDeprecatedDeviceID
+	var deleteDeprecatedDeviceID: DeleteDeprecatedDeviceID
 
-	public var saveRadixConnectMobileSession: SaveRadixConnectMobileSession
-	public var loadRadixConnectMobileSession: LoadRadixConnectMobileSession
+	var saveRadixConnectMobileSession: SaveRadixConnectMobileSession
+	var loadRadixConnectMobileSession: LoadRadixConnectMobileSession
 
-	public var loadP2PLinks: LoadP2PLinks
-	public var saveP2PLinks: SaveP2PLinks
+	var loadP2PLinks: LoadP2PLinks
+	var saveP2PLinks: SaveP2PLinks
 
-	public var loadP2PLinksPrivateKey: LoadP2PLinksPrivateKey
-	public var saveP2PLinksPrivateKey: SaveP2PLinksPrivateKey
-	public var keychainChanged: KeychainChanged
+	var loadP2PLinksPrivateKey: LoadP2PLinksPrivateKey
+	var saveP2PLinksPrivateKey: SaveP2PLinksPrivateKey
+	var keychainChanged: KeychainChanged
+
+	var loadMnemonicDataByFactorSourceID: LoadMnemonicDataByFactorSourceID
+	var saveMnemonicForFactorSourceData: SaveMnemonicForFactorSourceData
 
 	#if DEBUG
-	public var getAllMnemonics: GetAllMnemonics
+	var getAllMnemonics: GetAllMnemonics
 	#endif
 
 	#if DEBUG
 	init(
-		saveProfileSnapshot: @escaping SaveProfileSnapshot,
 		loadProfileSnapshotData: @escaping LoadProfileSnapshotData,
-		loadProfileSnapshot: @escaping LoadProfileSnapshot,
-		loadProfile: @escaping LoadProfile,
-		deleteProfile: @escaping DeleteProfile,
+		saveProfileSnapshotData: @escaping SaveProfileSnapshotData,
 		saveMnemonicForFactorSource: @escaping SaveMnemonicForFactorSource,
 		loadMnemonicByFactorSourceID: @escaping LoadMnemonicByFactorSourceID,
 		containsMnemonicIdentifiedByFactorSourceID: @escaping ContainsMnemonicIdentifiedByFactorSourceID,
@@ -66,6 +64,7 @@ public struct SecureStorageClient: Sendable {
 		deleteProfileHeaderList: @escaping DeleteProfileHeaderList,
 		loadDeviceInfo: @escaping LoadDeviceInfo,
 		saveDeviceInfo: @escaping SaveDeviceInfo,
+		deleteDeviceInfo: @escaping DeleteDeviceInfo,
 		deprecatedLoadDeviceID: @escaping DeprecatedLoadDeviceID,
 		deleteDeprecatedDeviceID: @escaping DeleteDeprecatedDeviceID,
 		saveRadixConnectMobileSession: @escaping SaveRadixConnectMobileSession,
@@ -75,13 +74,12 @@ public struct SecureStorageClient: Sendable {
 		loadP2PLinksPrivateKey: @escaping LoadP2PLinksPrivateKey,
 		saveP2PLinksPrivateKey: @escaping SaveP2PLinksPrivateKey,
 		keychainChanged: @escaping KeychainChanged,
-		getAllMnemonics: @escaping GetAllMnemonics
+		getAllMnemonics: @escaping GetAllMnemonics,
+		loadMnemonicDataByFactorSourceID: @escaping LoadMnemonicDataByFactorSourceID,
+		saveMnemonicForFactorSourceData: @escaping SaveMnemonicForFactorSourceData
 	) {
-		self.saveProfileSnapshot = saveProfileSnapshot
 		self.loadProfileSnapshotData = loadProfileSnapshotData
-		self.loadProfileSnapshot = loadProfileSnapshot
-		self.loadProfile = loadProfile
-		self.deleteProfile = deleteProfile
+		self.saveProfileSnapshotData = saveProfileSnapshotData
 		self.saveMnemonicForFactorSource = saveMnemonicForFactorSource
 		self.loadMnemonicByFactorSourceID = loadMnemonicByFactorSourceID
 		self.containsMnemonicIdentifiedByFactorSourceID = containsMnemonicIdentifiedByFactorSourceID
@@ -93,6 +91,7 @@ public struct SecureStorageClient: Sendable {
 		self.deleteProfileHeaderList = deleteProfileHeaderList
 		self.loadDeviceInfo = loadDeviceInfo
 		self.saveDeviceInfo = saveDeviceInfo
+		self.deleteDeviceInfo = deleteDeviceInfo
 		self.deprecatedLoadDeviceID = deprecatedLoadDeviceID
 		self.deleteDeprecatedDeviceID = deleteDeprecatedDeviceID
 		self.loadP2PLinks = loadP2PLinks
@@ -103,15 +102,14 @@ public struct SecureStorageClient: Sendable {
 		self.saveRadixConnectMobileSession = saveRadixConnectMobileSession
 		self.loadRadixConnectMobileSession = loadRadixConnectMobileSession
 		self.keychainChanged = keychainChanged
+		self.loadMnemonicDataByFactorSourceID = loadMnemonicDataByFactorSourceID
+		self.saveMnemonicForFactorSourceData = saveMnemonicForFactorSourceData
 	}
 	#else
 
 	init(
-		saveProfileSnapshot: @escaping SaveProfileSnapshot,
 		loadProfileSnapshotData: @escaping LoadProfileSnapshotData,
-		loadProfileSnapshot: @escaping LoadProfileSnapshot,
-		loadProfile: @escaping LoadProfile,
-		deleteProfile: @escaping DeleteProfile,
+		saveProfileSnapshotData: @escaping SaveProfileSnapshotData,
 		saveMnemonicForFactorSource: @escaping SaveMnemonicForFactorSource,
 		loadMnemonicByFactorSourceID: @escaping LoadMnemonicByFactorSourceID,
 		containsMnemonicIdentifiedByFactorSourceID: @escaping ContainsMnemonicIdentifiedByFactorSourceID,
@@ -123,6 +121,7 @@ public struct SecureStorageClient: Sendable {
 		deleteProfileHeaderList: @escaping DeleteProfileHeaderList,
 		loadDeviceInfo: @escaping LoadDeviceInfo,
 		saveDeviceInfo: @escaping SaveDeviceInfo,
+		deleteDeviceInfo: @escaping DeleteDeviceInfo,
 		deprecatedLoadDeviceID: @escaping DeprecatedLoadDeviceID,
 		deleteDeprecatedDeviceID: @escaping DeleteDeprecatedDeviceID,
 		saveRadixConnectMobileSession: @escaping SaveRadixConnectMobileSession,
@@ -131,13 +130,13 @@ public struct SecureStorageClient: Sendable {
 		saveP2PLinks: @escaping SaveP2PLinks,
 		loadP2PLinksPrivateKey: @escaping LoadP2PLinksPrivateKey,
 		saveP2PLinksPrivateKey: @escaping SaveP2PLinksPrivateKey,
-		keychainChanged: @escaping KeychainChanged
+		keychainChanged: @escaping KeychainChanged,
+
+		loadMnemonicByFactorSourceID: @escaping LoadMnemonicByFactorSourceID,
+		saveMnemonicForFactorSourceData: @escaping SaveMnemonicForFactorSourceData
 	) {
-		self.saveProfileSnapshot = saveProfileSnapshot
 		self.loadProfileSnapshotData = loadProfileSnapshotData
-		self.loadProfileSnapshot = loadProfileSnapshot
-		self.loadProfile = loadProfile
-		self.deleteProfile = deleteProfile
+		self.saveProfileSnapshotData = saveProfileSnapshotData
 		self.saveMnemonicForFactorSource = saveMnemonicForFactorSource
 		self.loadMnemonicByFactorSourceID = loadMnemonicByFactorSourceID
 		self.containsMnemonicIdentifiedByFactorSourceID = containsMnemonicIdentifiedByFactorSourceID
@@ -149,6 +148,7 @@ public struct SecureStorageClient: Sendable {
 		self.deleteProfileHeaderList = deleteProfileHeaderList
 		self.loadDeviceInfo = loadDeviceInfo
 		self.saveDeviceInfo = saveDeviceInfo
+		self.deleteDeviceInfo = deleteDeviceInfo
 		self.deprecatedLoadDeviceID = deprecatedLoadDeviceID
 		self.deleteDeprecatedDeviceID = deleteDeprecatedDeviceID
 		self.saveRadixConnectMobileSession = saveRadixConnectMobileSession
@@ -158,59 +158,62 @@ public struct SecureStorageClient: Sendable {
 		self.loadP2PLinksPrivateKey = loadP2PLinksPrivateKey
 		self.saveP2PLinksPrivateKey = saveP2PLinksPrivateKey
 		self.keychainChanged = keychainChanged
+		self.loadMnemonicDataByFactorSourceID = loadMnemonicDataByFactorSourceID
+		self.saveMnemonicForFactorSourceData = saveMnemonicForFactorSourceData
 	}
 	#endif // DEBUG
 }
 
 // MARK: - LoadMnemonicByFactorSourceIDRequest
-public struct LoadMnemonicByFactorSourceIDRequest: Sendable, Hashable {
-	public let factorSourceID: FactorSourceIDFromHash
-	public let notifyIfMissing: Bool
+struct LoadMnemonicByFactorSourceIDRequest: Sendable, Hashable {
+	let factorSourceID: FactorSourceIDFromHash
+	let notifyIfMissing: Bool
 }
 
 extension SecureStorageClient {
-	public typealias DisableCloudProfileSync = @Sendable (ProfileID) throws -> Void
-	public typealias SaveProfileSnapshot = @Sendable (Profile) throws -> Void
-	public typealias LoadProfileSnapshotData = @Sendable (ProfileID) throws -> Data?
-	public typealias LoadProfileSnapshot = @Sendable (ProfileID) throws -> Profile?
-	public typealias LoadProfile = @Sendable (ProfileID) throws -> Profile?
-	public typealias DeleteProfile = @Sendable (ProfileID) throws -> Void
+	typealias DisableCloudProfileSync = @Sendable (ProfileID) throws -> Void
+	typealias SaveProfileSnapshotData = @Sendable (ProfileID, Data) throws -> Void
+	typealias LoadProfileSnapshotData = @Sendable (ProfileID) throws -> Data?
+	typealias DeleteProfile = @Sendable (ProfileID) throws -> Void
 
-	public typealias SaveMnemonicForFactorSource = @Sendable (PrivateHierarchicalDeterministicFactorSource) throws -> Void
-	public typealias LoadMnemonicByFactorSourceID = @Sendable (LoadMnemonicByFactorSourceIDRequest) throws -> MnemonicWithPassphrase?
-	public typealias ContainsMnemonicIdentifiedByFactorSourceID = @Sendable (FactorSourceIDFromHash) -> Bool
+	typealias SaveMnemonicForFactorSource = @Sendable (PrivateHierarchicalDeterministicFactorSource) throws -> Void
+	typealias LoadMnemonicByFactorSourceID = @Sendable (LoadMnemonicByFactorSourceIDRequest) throws -> MnemonicWithPassphrase?
+	typealias SaveMnemonicForFactorSourceData = @Sendable (FactorSourceIDFromHash, Data) throws -> Void
+	typealias LoadMnemonicDataByFactorSourceID = @Sendable (LoadMnemonicByFactorSourceIDRequest) throws -> Data?
+	typealias ContainsMnemonicIdentifiedByFactorSourceID = @Sendable (FactorSourceIDFromHash) -> Bool
 
 	#if DEBUG
-	public typealias GetAllMnemonics = @Sendable () -> [KeyedMnemonicWithPassphrase]
+	typealias GetAllMnemonics = @Sendable () -> [KeyedMnemonicWithPassphrase]
 	#endif
 
-	public typealias DeleteMnemonicByFactorSourceID = @Sendable (FactorSourceIDFromHash) throws -> Void
-	public typealias DeleteProfileAndMnemonicsByFactorSourceIDs = @Sendable (ProfileID, _ keepInICloudIfPresent: Bool) throws -> Void
+	typealias DeleteMnemonicByFactorSourceID = @Sendable (FactorSourceIDFromHash) throws -> Void
+	typealias DeleteProfileAndMnemonicsByFactorSourceIDs = @Sendable (ProfileID, _ keepInICloudIfPresent: Bool) throws -> Void
 
-	public typealias LoadProfileHeaderList = @Sendable () throws -> Profile.HeaderList?
-	public typealias SaveProfileHeaderList = @Sendable (Profile.HeaderList) throws -> Void
-	public typealias DeleteProfileHeaderList = @Sendable () throws -> Void
+	typealias LoadProfileHeaderList = @Sendable () throws -> Profile.HeaderList?
+	typealias SaveProfileHeaderList = @Sendable (Profile.HeaderList) throws -> Void
+	typealias DeleteProfileHeaderList = @Sendable () throws -> Void
 
-	public typealias LoadDeviceInfo = @Sendable () throws -> DeviceInfo?
-	public typealias SaveDeviceInfo = @Sendable (DeviceInfo) throws -> Void
+	typealias LoadDeviceInfo = @Sendable () throws -> DeviceInfo?
+	typealias SaveDeviceInfo = @Sendable (DeviceInfo) throws -> Void
+	typealias DeleteDeviceInfo = @Sendable () throws -> Void
 
-	public typealias SaveRadixConnectMobileSession = @Sendable (SessionId, BagOfBytes) throws -> Void
-	public typealias LoadRadixConnectMobileSession = @Sendable (SessionId) throws -> BagOfBytes?
+	typealias SaveRadixConnectMobileSession = @Sendable (SessionId, BagOfBytes) throws -> Void
+	typealias LoadRadixConnectMobileSession = @Sendable (SessionId) throws -> BagOfBytes?
 
 	/// See https://radixdlt.atlassian.net/l/cp/fmoH9KcN
-	public typealias DeprecatedLoadDeviceID = @Sendable () throws -> DeviceID?
+	typealias DeprecatedLoadDeviceID = @Sendable () throws -> DeviceID?
 	/// See https://radixdlt.atlassian.net/l/cp/fmoH9KcN
-	public typealias DeleteDeprecatedDeviceID = @Sendable () -> Void
+	typealias DeleteDeprecatedDeviceID = @Sendable () -> Void
 
-	public typealias LoadP2PLinks = @Sendable () throws -> P2PLinks?
-	public typealias SaveP2PLinks = @Sendable (P2PLinks) throws -> Void
+	typealias LoadP2PLinks = @Sendable () throws -> P2PLinks?
+	typealias SaveP2PLinks = @Sendable (P2PLinks) throws -> Void
 
-	public typealias LoadP2PLinksPrivateKey = @Sendable () throws -> Curve25519.PrivateKey?
-	public typealias SaveP2PLinksPrivateKey = @Sendable (Curve25519.PrivateKey) throws -> Void
+	typealias LoadP2PLinksPrivateKey = @Sendable () throws -> Curve25519.PrivateKey?
+	typealias SaveP2PLinksPrivateKey = @Sendable (Curve25519.PrivateKey) throws -> Void
 
-	public typealias KeychainChanged = @Sendable () -> AnyAsyncSequence<Void>
+	typealias KeychainChanged = @Sendable () -> AnyAsyncSequence<Void>
 
-	public enum LoadMnemonicPurpose: Sendable, Hashable, CustomStringConvertible {
+	enum LoadMnemonicPurpose: Sendable, Hashable, CustomStringConvertible {
 		case signTransaction
 		case signAuthChallenge
 		case importOlympiaAccounts
@@ -227,7 +230,7 @@ extension SecureStorageClient {
 
 		case updateAccountMetadata
 
-		public var description: String {
+		var description: String {
 			switch self {
 			case .accountRecoveryScan:
 				"accountRecoveryScan"
@@ -254,7 +257,7 @@ extension SecureStorageClient {
 
 extension SecureStorageClient {
 	@Sendable
-	public func loadMnemonic(
+	func loadMnemonic(
 		factorSourceID: FactorSourceIDFromHash,
 		notifyIfMissing: Bool = true
 	) throws -> MnemonicWithPassphrase? {
@@ -262,24 +265,13 @@ extension SecureStorageClient {
 	}
 
 	@Sendable
-	public func deleteProfileAndMnemonicsByFactorSourceIDs(profileID: Profile.ID, keepInICloudIfPresent: Bool) throws {
+	func deleteProfileAndMnemonicsByFactorSourceIDs(profileID: Profile.ID, keepInICloudIfPresent: Bool) throws {
 		try deleteProfileAndMnemonicsByFactorSourceIDs(profileID, keepInICloudIfPresent)
-	}
-
-	@Sendable
-	public func loadDeviceInfoOrFallback() -> DeviceInfo {
-		if let loaded = (try? self.loadDeviceInfo()) {
-			loaded
-		} else {
-			DeviceInfo(
-				id: .init()
-			)
-		}
 	}
 }
 
 extension DeviceInfo {
-	public init(id: UUID, date: Date = .now, description: String? = nil) {
+	init(id: UUID, date: Date = .now, description: String? = nil) {
 		self.init(
 			id: id,
 			date: date,
@@ -291,22 +283,11 @@ extension DeviceInfo {
 	}
 }
 
-extension HostInfo {
-	public static func current() -> HostInfo {
-		/// Mostly empty for now until full migration to Sargon is done
-		.init(
-			description: .init(name: "iPhone", model: ""),
-			hostOs: .ios(version: ""),
-			hostAppVersion: ""
-		)
-	}
-}
-
 #if DEBUG
 
 // MARK: - KeyedMnemonicWithPassphrase
-public struct KeyedMnemonicWithPassphrase: Sendable, Hashable {
-	public let factorSourceID: FactorSourceIDFromHash
-	public let mnemonicWithPassphrase: MnemonicWithPassphrase
+struct KeyedMnemonicWithPassphrase: Sendable, Hashable {
+	let factorSourceID: FactorSourceIDFromHash
+	let mnemonicWithPassphrase: MnemonicWithPassphrase
 }
 #endif

@@ -1,14 +1,14 @@
 // MARK: - BackButton
-public struct BackButton: SwiftUI.View {
+struct BackButton: SwiftUI.View {
 	let action: () -> Void
 
-	public init(action: @escaping () -> Void) {
+	init(action: @escaping () -> Void) {
 		self.action = action
 	}
 }
 
 extension BackButton {
-	public var body: some SwiftUI.View {
+	var body: some SwiftUI.View {
 		Button(action: action) {
 			Image(asset: AssetResource.arrowBack).tint(.app.gray1)
 		}

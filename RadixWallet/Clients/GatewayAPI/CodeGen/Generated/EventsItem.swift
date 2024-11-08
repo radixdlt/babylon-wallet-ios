@@ -11,24 +11,24 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.EventsItem")
-public typealias EventsItem = GatewayAPI.EventsItem
+typealias EventsItem = GatewayAPI.EventsItem
 
 extension GatewayAPI {
 
-public struct EventsItem: Codable, Hashable {
+struct EventsItem: Codable, Hashable {
 
-    public private(set) var name: String
+    private(set) var name: String
     /** This type is defined in the Core API as `EventEmitterIdentifier`. See the Core API documentation for more details.  */
-    public private(set) var emitter: AnyCodable
-    public private(set) var data: ProgrammaticScryptoSborValue
+    private(set) var emitter: AnyCodable
+    private(set) var data: ProgrammaticScryptoSborValue
 
-    public init(name: String, emitter: AnyCodable, data: ProgrammaticScryptoSborValue) {
+    init(name: String, emitter: AnyCodable, data: ProgrammaticScryptoSborValue) {
         self.name = name
         self.emitter = emitter
         self.data = data
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case name
         case emitter
         case data
@@ -36,7 +36,7 @@ public struct EventsItem: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(name, forKey: .name)
         try container.encode(emitter, forKey: .emitter)

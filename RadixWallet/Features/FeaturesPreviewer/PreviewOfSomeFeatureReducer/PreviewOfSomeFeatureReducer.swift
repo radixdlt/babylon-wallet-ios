@@ -2,11 +2,11 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - PreviewOfSomeFeatureReducer
-public struct PreviewOfSomeFeatureReducer<Feature>: FeatureReducer where Feature: PreviewedFeature {
-	public typealias F = Self
+struct PreviewOfSomeFeatureReducer<Feature>: FeatureReducer where Feature: PreviewedFeature {
+	typealias F = Self
 
-	public enum State: Sendable, Hashable, EmptyInitializable {
-		public init() {
+	enum State: Sendable, Hashable, EmptyInitializable {
+		init() {
 			self = .previewOf(.init())
 		}
 
@@ -14,20 +14,20 @@ public struct PreviewOfSomeFeatureReducer<Feature>: FeatureReducer where Feature
 		case previewResult(PreviewResult<Feature.ResultFromFeature>.State)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case previewOf(Feature.Action)
 		case previewResult(PreviewResult<Feature.ResultFromFeature>.Action)
 	}
 
-	public let resultFromAction: (Feature.Action) -> TaskResult<Feature.ResultFromFeature>?
+	let resultFromAction: (Feature.Action) -> TaskResult<Feature.ResultFromFeature>?
 
-	public init(
+	init(
 		resultFromAction: @escaping (Feature.Action) -> TaskResult<Feature.ResultFromFeature>?
 	) {
 		self.resultFromAction = resultFromAction
 	}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Scope(state: /F.State.previewOf, action: /F.Action.child .. ChildAction.previewOf) {
 			Feature()
 		}
@@ -38,7 +38,7 @@ public struct PreviewOfSomeFeatureReducer<Feature>: FeatureReducer where Feature
 		Reduce(core)
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .previewOf(action):
 			if let result = resultFromAction(action) {

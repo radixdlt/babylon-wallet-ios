@@ -11,29 +11,29 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.ComponentEntityRoleAssignmentEntryAssignment")
-public typealias ComponentEntityRoleAssignmentEntryAssignment = GatewayAPI.ComponentEntityRoleAssignmentEntryAssignment
+typealias ComponentEntityRoleAssignmentEntryAssignment = GatewayAPI.ComponentEntityRoleAssignmentEntryAssignment
 
 extension GatewayAPI {
 
-public struct ComponentEntityRoleAssignmentEntryAssignment: Codable, Hashable {
+struct ComponentEntityRoleAssignmentEntryAssignment: Codable, Hashable {
 
-    public private(set) var resolution: RoleAssignmentResolution
+    private(set) var resolution: RoleAssignmentResolution
     /** This type is defined in the Core API as `AccessRule`. See the Core API documentation for more details.  */
-    public private(set) var explicitRule: AnyCodable?
+    private(set) var explicitRule: AnyCodable?
 
-    public init(resolution: RoleAssignmentResolution, explicitRule: AnyCodable? = nil) {
+    init(resolution: RoleAssignmentResolution, explicitRule: AnyCodable? = nil) {
         self.resolution = resolution
         self.explicitRule = explicitRule
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case resolution
         case explicitRule = "explicit_rule"
     }
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(resolution, forKey: .resolution)
         try container.encodeIfPresent(explicitRule, forKey: .explicitRule)

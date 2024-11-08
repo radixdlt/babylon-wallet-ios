@@ -2,12 +2,12 @@ import NukeUI
 import SwiftUI
 
 // MARK: - Thumbnail
-public struct Thumbnail: View {
+struct Thumbnail: View {
 	private let type: ContentType
 	private let url: URL?
 	private let size: HitTargetSize
 
-	public enum ContentType: Sendable, Hashable {
+	enum ContentType: Sendable, Hashable {
 		case token(Token)
 		case poolUnit
 		case lsu
@@ -18,19 +18,19 @@ public struct Thumbnail: View {
 		case pool
 		case validator
 
-		public enum Token: Sendable, Hashable {
+		enum Token: Sendable, Hashable {
 			case xrd
 			case other
 		}
 	}
 
-	public init(_ type: ContentType, url: URL?, size: HitTargetSize = .small) {
+	init(_ type: ContentType, url: URL?, size: HitTargetSize = .small) {
 		self.type = type
 		self.url = url
 		self.size = size
 	}
 
-	public var body: some View {
+	var body: some View {
 		switch type {
 		case .token(.xrd):
 			Image(asset: AssetResource.xrd)
@@ -92,7 +92,7 @@ public struct Thumbnail: View {
 }
 
 extension Thumbnail {
-	public enum FungibleContent: Sendable, Hashable {
+	enum FungibleContent: Sendable, Hashable {
 		case token(TokenContent)
 		case poolUnit(URL?)
 		case lsu(URL?)
@@ -114,7 +114,7 @@ extension Thumbnail {
 		}
 	}
 
-	public enum TokenContent: Sendable, Hashable {
+	enum TokenContent: Sendable, Hashable {
 		case xrd
 		case other(URL?)
 
@@ -133,7 +133,7 @@ extension Thumbnail {
 		}
 	}
 
-	public enum NonFungibleContent: Sendable, Hashable {
+	enum NonFungibleContent: Sendable, Hashable {
 		case nft(URL?)
 		case stakeClaimNFT(URL?)
 
@@ -152,36 +152,36 @@ extension Thumbnail {
 		}
 	}
 
-	public init(fungible: FungibleContent, size: HitTargetSize = .small) {
+	init(fungible: FungibleContent, size: HitTargetSize = .small) {
 		self.init(fungible.type, url: fungible.url, size: size)
 	}
 
-	public init(token: TokenContent, size: HitTargetSize = .small) {
+	init(token: TokenContent, size: HitTargetSize = .small) {
 		self.init(token.type, url: token.url, size: size)
 	}
 
-	public init(nonFungible: NonFungibleContent, size: HitTargetSize = .small) {
+	init(nonFungible: NonFungibleContent, size: HitTargetSize = .small) {
 		self.init(nonFungible.type, url: nonFungible.url, size: size)
 	}
 }
 
 // MARK: - LoadableImage
 /// A helper view that handles the loading state, and potentially the error state
-public struct LoadableImage<Placeholder: View>: View {
+struct LoadableImage<Placeholder: View>: View {
 	let url: URL?
 	let sizingBehaviour: LoadableImageSize
 	let placeholderBehaviour: LoadableImagePlaceholderBehaviour
 	let placeholder: Placeholder
 
-	public init(
+	init(
 		url: URL?,
 		size sizingBehaviour: LoadableImageSize,
 		placeholders placeholderBehaviour: LoadableImagePlaceholderBehaviour = .default,
 		placeholder: () -> Placeholder
 	) {
 		if let url {
-			if url.isVectorImage {
-				loggerGlobal.warning("LoadableImage: Vector images are not supported \(url)")
+			if url.isVectorImage(type: .pdf) {
+				loggerGlobal.warning("LoadableImage: PDF vector images are not supported \(url)")
 				self.url = nil
 			} else {
 				@Dependency(\.urlFormatterClient) var urlFormatterClient
@@ -201,7 +201,7 @@ public struct LoadableImage<Placeholder: View>: View {
 		self.placeholder = placeholder()
 	}
 
-	public init(
+	init(
 		url: URL,
 		size sizingBehaviour: LoadableImageSize,
 		placeholders placeholderBehaviour: LoadableImagePlaceholderBehaviour = .default
@@ -211,7 +211,7 @@ public struct LoadableImage<Placeholder: View>: View {
 		}
 	}
 
-	public var body: some View {
+	var body: some View {
 		if let url {
 			LazyImage(url: url) { state in
 				if state.isLoading {
@@ -220,7 +220,8 @@ public struct LoadableImage<Placeholder: View>: View {
 					imageView(image: image, imageSize: state.imageContainer?.image.size)
 				} else {
 					brokenImageView
-					let _ = loggerGlobal.warning("Could not load thumbnail from \(url): \(state.error)")
+					let error = state.error?.legibleDescription ?? ""
+					let _ = loggerGlobal.warning("Could not load thumbnail from \(url): \(error)")
 				}
 			}
 		} else {
@@ -304,49 +305,34 @@ public struct LoadableImage<Placeholder: View>: View {
 }
 
 // MARK: - LoadableImageSize
-public enum LoadableImageSize: Equatable {
+enum LoadableImageSize: Equatable {
 	case fixedSize(HitTargetSize, mode: ImageResizingMode = .aspectFill)
 	case flexible(minAspect: CGFloat, maxAspect: CGFloat)
 }
 
 // MARK: - LoadableImagePlaceholderBehaviour
-public struct LoadableImagePlaceholderBehaviour {
-	public let loading: LoadingPlaceholder
-	public let brokenImage: BrokenImagePlaceholder
+struct LoadableImagePlaceholderBehaviour {
+	let loading: LoadingPlaceholder
+	let brokenImage: BrokenImagePlaceholder
 
-	public static let `default`: Self = .init()
+	static let `default`: Self = .init()
 
 	/// `standard` refers to the placeholder supplied when creating the `LoadableImage`
-	public init(loading: LoadingPlaceholder = .color(.clear), brokenImage: BrokenImagePlaceholder = .brokenImage) {
+	init(loading: LoadingPlaceholder = .color(.clear), brokenImage: BrokenImagePlaceholder = .brokenImage) {
 		self.loading = loading
 		self.brokenImage = brokenImage
 	}
 
-	public enum LoadingPlaceholder {
+	enum LoadingPlaceholder {
 		case shimmer
 		case color(Color)
 		case asset(ImageAsset)
 		case standard
 	}
 
-	public enum BrokenImagePlaceholder {
+	enum BrokenImagePlaceholder {
 		case asset(ImageAsset)
 		case brokenImage
 		case standard
 	}
-}
-
-extension URL {
-	public var isVectorImage: Bool {
-		let pathComponent = lastPathComponent.lowercased()
-		for ignoredType in URL.vectorImageTypes {
-			if pathComponent.hasSuffix("." + ignoredType) {
-				return true
-			}
-		}
-
-		return false
-	}
-
-	private static let vectorImageTypes: [String] = ["svg", "pdf"]
 }

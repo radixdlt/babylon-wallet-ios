@@ -1,5 +1,5 @@
 {
-  "originHash" : "7d3590b225945abb1bc0ab6c684b005c28c64bdc204afcc2d34c3e379ef8a3c8",
+  "originHash" : "7f25d08c2d5bfce10ead9a90a371e548d360b6e5e8779b8ad654bfac475f1dc8",
   "pins" : [
     {
       "identity" : "anycodable",
@@ -24,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sideeffect-io/AsyncExtensions.git",
       "state" : {
-        "revision" : "1f0729e4f1f6c7166acfac3cec43b3cbe83be0e6",
-        "version" : "0.5.2"
+        "revision" : "3442d3d046800f1974bda096faaf0ac510b21154",
+        "version" : "0.5.3"
       }
     },
     {
@@ -112,10 +112,10 @@
     {
       "identity" : "sargon",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/radixdlt/sargon",
+      "location" : "https://github.com/radixdlt/sargon/",
       "state" : {
-        "revision" : "585417fe2ac8eefafad07494be7f8f8abb382b9d",
-        "version" : "1.1.13"
+        "revision" : "719ad87a7fd693418752c76024325b46f4b1bb4f",
+        "version" : "1.1.44"
       }
     },
     {
@@ -123,7 +123,6 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Sajjon/ScreenshotPreventing-iOS",
       "state" : {
-        "branch" : "main",
         "revision" : "03769bcd1b1c9c24af424890f0a3e6d15bd3000c"
       }
     },
@@ -402,8 +401,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/stasel/WebRTC/",
       "state" : {
-        "revision" : "3edaa8f0ddae889ad8ea236023de88672f6a16ec",
-        "version" : "120.0.0"
+        "revision" : "cdf22dbb602fd268ab60fccc647d62892b8bb7ed",
+        "version" : "123.0.0"
       }
     },
     {

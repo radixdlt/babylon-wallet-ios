@@ -1,18 +1,18 @@
 
 extension Collection {
-	public var nilIfEmpty: Self? {
+	var nilIfEmpty: Self? {
 		isEmpty ? nil : self
 	}
 }
 
 extension Optional where Wrapped: Collection {
-	public var isNilOrEmpty: Bool {
+	var isNilOrEmpty: Bool {
 		self == nil || self?.isEmpty == true
 	}
 }
 
 extension Collection {
-	public func sorted<Value: Comparable>(
+	func sorted<Value: Comparable>(
 		by keyPath: KeyPath<Element, Value>,
 		_ comparator: (Value, Value) -> Bool = (<)
 	) -> [Element] {
@@ -23,7 +23,7 @@ extension Collection {
 }
 
 extension MutableCollection where Self: RandomAccessCollection {
-	public mutating func sort<Value: Comparable>(
+	mutating func sort<Value: Comparable>(
 		by keyPath: KeyPath<Element, Value>,
 		_ comparator: (Value, Value) -> Bool = (<)
 	) {
@@ -35,7 +35,7 @@ extension MutableCollection where Self: RandomAccessCollection {
 
 extension IdentifiedArray {
 	/// This overload will use a different overload of the inner `sort`, which will prevent a crash
-	public mutating func sort<Value: Comparable>(
+	mutating func sort<Value: Comparable>(
 		by keyPath: KeyPath<Element, Value>,
 		_ comparator: (Value, Value) -> Bool = (<)
 	) {
@@ -47,7 +47,7 @@ extension IdentifiedArray {
 
 extension OrderedSet where Element: Hashable {
 	/// Add or remove the given element
-	public mutating func toggle(_ element: Element) {
+	mutating func toggle(_ element: Element) {
 		if contains(element) {
 			remove(element)
 		} else {
@@ -58,7 +58,7 @@ extension OrderedSet where Element: Hashable {
 
 extension IdentifiedArray {
 	/// Add or remove the given element
-	public mutating func togglePresence(of element: Element) {
+	mutating func togglePresence(of element: Element) {
 		if contains(element) {
 			remove(element)
 		} else {
@@ -69,7 +69,7 @@ extension IdentifiedArray {
 
 extension MutableCollection {
 	/// Mutates in place the elements of the collection
-	public mutating func mutateAll(_ mutate: (inout Self.Element) -> Void) {
+	mutating func mutateAll(_ mutate: (inout Self.Element) -> Void) {
 		for index in indices {
 			mutate(&self[index])
 		}
@@ -78,7 +78,7 @@ extension MutableCollection {
 
 extension MutableCollection where Self: RangeReplaceableCollection {
 	/// Filters in place the elements of the collection
-	public mutating func filterInPlace(_ isIncluded: (Element) throws -> Bool) rethrows {
+	mutating func filterInPlace(_ isIncluded: (Element) throws -> Bool) rethrows {
 		var index = startIndex
 		while index != endIndex {
 			if try !isIncluded(self[index]) {

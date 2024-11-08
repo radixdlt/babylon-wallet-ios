@@ -1,6 +1,6 @@
 
 extension DependencyValues {
-	public var factorSourcesClient: FactorSourcesClient {
+	var factorSourcesClient: FactorSourcesClient {
 		get { self[FactorSourcesClient.self] }
 		set { self[FactorSourcesClient.self] = newValue }
 	}
@@ -8,9 +8,9 @@ extension DependencyValues {
 
 // MARK: - FactorSourcesClient + TestDependencyKey
 extension FactorSourcesClient: TestDependencyKey {
-	public static let previewValue = Self.noop
+	static let previewValue = Self.noop
 
-	public static let testValue = Self(
+	static let testValue = Self(
 		indicesOfEntitiesControlledByFactorSource: unimplemented("\(Self.self).indicesOfEntitiesControlledByFactorSource"),
 		getCurrentNetworkID: unimplemented("\(Self.self).getCurrentNetworkID"),
 		getMainDeviceFactorSource: unimplemented("\(Self.self).getMainDeviceFactorSource"),
@@ -27,14 +27,14 @@ extension FactorSourcesClient: TestDependencyKey {
 		flagFactorSourceForDeletion: unimplemented("\(Self.self).flagFactorSourceForDeletion")
 	)
 
-	public static let noop = Self(
+	static let noop = Self(
 		indicesOfEntitiesControlledByFactorSource: { _ in throw NoopError() },
 		getCurrentNetworkID: { .kisharnet },
 		getMainDeviceFactorSource: { throw NoopError() },
 		createNewMainDeviceFactorSource: { throw NoopError() },
 		getFactorSources: { throw NoopError() },
 		factorSourcesAsyncSequence: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
-		nextEntityIndexForFactorSource: { _ in 0 },
+		nextEntityIndexForFactorSource: { _ in HdPathComponent(globalKeySpace: 0) },
 		addPrivateHDFactorSource: { _ in throw NoopError() },
 		checkIfHasOlympiaFactorSourceForAccounts: { _, _ in nil },
 		saveFactorSource: { _ in },

@@ -12,23 +12,23 @@
 
 // Deprecated typealiases
 @available(*, deprecated, renamed: "FontConvertible.Font", message: "This typealias will be removed in SwiftGen 7.0")
-public typealias Font = FontConvertible.Font
+internal typealias Font = FontConvertible.Font
 
 // swiftlint:disable superfluous_disable_command file_length implicit_return
 
 // MARK: - Fonts
 
 // swiftlint:disable identifier_name line_length type_body_length
-public enum FontFamily {
-  public enum IBMPlexSans {
-    public static let bold = FontConvertible(name: "IBMPlexSans-Bold", family: "IBM Plex Sans", path: "IBMPlexSans-Bold.ttf")
-    public static let medium = FontConvertible(name: "IBMPlexSans-Medium", family: "IBM Plex Sans", path: "IBMPlexSans-Medium.ttf")
-    public static let regular = FontConvertible(name: "IBMPlexSans-Regular", family: "IBM Plex Sans", path: "IBMPlexSans-Regular.ttf")
-    public static let semiBold = FontConvertible(name: "IBMPlexSans-SemiBold", family: "IBM Plex Sans", path: "IBMPlexSans-SemiBold.ttf")
-    public static let all: [FontConvertible] = [bold, medium, regular, semiBold]
+internal enum FontFamily {
+  internal enum IBMPlexSans {
+    internal static let bold = FontConvertible(name: "IBMPlexSans-Bold", family: "IBM Plex Sans", path: "IBMPlexSans-Bold.ttf")
+    internal static let medium = FontConvertible(name: "IBMPlexSans-Medium", family: "IBM Plex Sans", path: "IBMPlexSans-Medium.ttf")
+    internal static let regular = FontConvertible(name: "IBMPlexSans-Regular", family: "IBM Plex Sans", path: "IBMPlexSans-Regular.ttf")
+    internal static let semiBold = FontConvertible(name: "IBMPlexSans-SemiBold", family: "IBM Plex Sans", path: "IBMPlexSans-SemiBold.ttf")
+    internal static let all: [FontConvertible] = [bold, medium, regular, semiBold]
   }
-  public static let allCustomFonts: [FontConvertible] = [IBMPlexSans.all].flatMap { $0 }
-  public static func registerAllCustomFonts() {
+  internal static let allCustomFonts: [FontConvertible] = [IBMPlexSans.all].flatMap { $0 }
+  internal static func registerAllCustomFonts() {
     allCustomFonts.forEach { $0.register() }
   }
 }
@@ -36,18 +36,18 @@ public enum FontFamily {
 
 // MARK: - Implementation Details
 
-public struct FontConvertible {
-  public let name: String
-  public let family: String
-  public let path: String
+internal struct FontConvertible {
+  internal let name: String
+  internal let family: String
+  internal let path: String
 
   #if os(macOS)
-  public typealias Font = NSFont
+  internal typealias Font = NSFont
   #elseif os(iOS) || os(tvOS) || os(watchOS)
-  public typealias Font = UIFont
+  internal typealias Font = UIFont
   #endif
 
-  public func font(size: CGFloat) -> Font {
+  internal func font(size: CGFloat) -> Font {
     guard let font = Font(font: self, size: size) else {
       fatalError("Unable to initialize font '\(name)' (\(family))")
     }
@@ -56,22 +56,22 @@ public struct FontConvertible {
 
   #if canImport(SwiftUI)
   @available(iOS 13.0, tvOS 13.0, watchOS 6.0, macOS 10.15, *)
-  public func swiftUIFont(size: CGFloat) -> SwiftUI.Font {
+  internal func swiftUIFont(size: CGFloat) -> SwiftUI.Font {
     return SwiftUI.Font.custom(self, size: size)
   }
 
   @available(iOS 14.0, tvOS 14.0, watchOS 7.0, macOS 11.0, *)
-  public func swiftUIFont(fixedSize: CGFloat) -> SwiftUI.Font {
+  internal func swiftUIFont(fixedSize: CGFloat) -> SwiftUI.Font {
     return SwiftUI.Font.custom(self, fixedSize: fixedSize)
   }
 
   @available(iOS 14.0, tvOS 14.0, watchOS 7.0, macOS 11.0, *)
-  public func swiftUIFont(size: CGFloat, relativeTo textStyle: SwiftUI.Font.TextStyle) -> SwiftUI.Font {
+  internal func swiftUIFont(size: CGFloat, relativeTo textStyle: SwiftUI.Font.TextStyle) -> SwiftUI.Font {
     return SwiftUI.Font.custom(self, size: size, relativeTo: textStyle)
   }
   #endif
 
-  public func register() {
+  internal func register() {
     // swiftlint:disable:next conditional_returns_on_newline
     guard let url = url else { return }
     CTFontManagerRegisterFontsForURL(url as CFURL, .process, nil)
@@ -95,7 +95,7 @@ public struct FontConvertible {
   }
 }
 
-public extension FontConvertible.Font {
+internal extension FontConvertible.Font {
   convenience init?(font: FontConvertible, size: CGFloat) {
     font.registerIfNeeded()
     self.init(name: font.name, size: size)
@@ -104,7 +104,7 @@ public extension FontConvertible.Font {
 
 #if canImport(SwiftUI)
 @available(iOS 13.0, tvOS 13.0, watchOS 6.0, macOS 10.15, *)
-public extension SwiftUI.Font {
+internal extension SwiftUI.Font {
   static func custom(_ font: FontConvertible, size: CGFloat) -> SwiftUI.Font {
     font.registerIfNeeded()
     return custom(font.name, size: size)
@@ -112,7 +112,7 @@ public extension SwiftUI.Font {
 }
 
 @available(iOS 14.0, tvOS 14.0, watchOS 7.0, macOS 11.0, *)
-public extension SwiftUI.Font {
+internal extension SwiftUI.Font {
   static func custom(_ font: FontConvertible, fixedSize: CGFloat) -> SwiftUI.Font {
     font.registerIfNeeded()
     return custom(font.name, fixedSize: fixedSize)

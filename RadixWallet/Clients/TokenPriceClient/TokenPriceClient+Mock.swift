@@ -1,8 +1,8 @@
 // MARK: - TokenPricesClient + TestDependencyKey
 extension TokenPricesClient: TestDependencyKey {
-	public static let previewValue = Self.noop()
+	static let previewValue = Self.noop()
 
-	public static let testValue = Self(
+	static let testValue = Self(
 		getTokenPrices: unimplemented("\(Self.self).getTokenPrices")
 	)
 
@@ -14,7 +14,7 @@ extension TokenPricesClient: TestDependencyKey {
 }
 
 extension DependencyValues {
-	public var tokenPricesClient: TokenPricesClient {
+	var tokenPricesClient: TokenPricesClient {
 		get { self[TokenPricesClient.self] }
 		set { self[TokenPricesClient.self] = newValue }
 	}

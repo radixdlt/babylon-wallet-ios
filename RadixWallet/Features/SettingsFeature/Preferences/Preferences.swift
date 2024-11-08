@@ -1,17 +1,17 @@
 // MARK: - Preferences
 
-public struct Preferences: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public var appPreferences: AppPreferences?
+struct Preferences: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		var appPreferences: AppPreferences?
 		var exportLogsUrl: URL?
 
 		@PresentationState
-		public var destination: Destination.State?
+		var destination: Destination.State?
 
-		public init() {}
+		init() {}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case appeared
 		case depositGuaranteesButtonTapped
 		case hiddenEntitiesButtonTapped
@@ -23,14 +23,14 @@ public struct Preferences: Sendable, FeatureReducer {
 		case exportLogsDismissed
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case loadedAppPreferences(AppPreferences)
 		case advancedLockToggleResult(authResult: TaskResult<Bool>, isEnabled: Bool)
 	}
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case depositGuarantees(DefaultDepositGuarantees.State)
 			case hiddenEntities(HiddenEntities.State)
 			case hiddenAssets(HiddenAssets.State)
@@ -38,14 +38,14 @@ public struct Preferences: Sendable, FeatureReducer {
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case depositGuarantees(DefaultDepositGuarantees.Action)
 			case hiddenEntities(HiddenEntities.Action)
 			case hiddenAssets(HiddenAssets.Action)
 			case gateways(GatewaySettings.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: \.depositGuarantees, action: \.depositGuarantees) {
 				DefaultDepositGuarantees()
 			}
@@ -65,9 +65,9 @@ public struct Preferences: Sendable, FeatureReducer {
 	@Dependency(\.localAuthenticationClient) var localAuthenticationClient
 	@Dependency(\.errorQueue) var errorQueue
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -76,7 +76,7 @@ public struct Preferences: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return .run { send in
@@ -128,7 +128,7 @@ public struct Preferences: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadedAppPreferences(appPreferences):
 			state.appPreferences = appPreferences
@@ -144,7 +144,7 @@ public struct Preferences: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
 		guard case let .depositGuarantees(depositGuarantees) = state.destination, let value = depositGuarantees.depositGuarantee else {
 			return .none
 		}

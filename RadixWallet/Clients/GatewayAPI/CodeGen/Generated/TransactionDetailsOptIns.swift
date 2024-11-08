@@ -11,36 +11,36 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.TransactionDetailsOptIns")
-public typealias TransactionDetailsOptIns = GatewayAPI.TransactionDetailsOptIns
+typealias TransactionDetailsOptIns = GatewayAPI.TransactionDetailsOptIns
 
 extension GatewayAPI {
 
-public struct TransactionDetailsOptIns: Codable, Hashable {
+struct TransactionDetailsOptIns: Codable, Hashable {
 
     /** if set to `true`, raw transaction hex is returned. */
-    public private(set) var rawHex: Bool? = false
+    private(set) var rawHex: Bool? = false
     /** if set to `true`, state changes inside receipt object are returned. */
-    public private(set) var receiptStateChanges: Bool? = false
+    private(set) var receiptStateChanges: Bool? = false
     /** if set to `true`, fee summary inside receipt object is returned. */
-    public private(set) var receiptFeeSummary: Bool? = false
+    private(set) var receiptFeeSummary: Bool? = false
     /** if set to `true`, fee source inside receipt object is returned. */
-    public private(set) var receiptFeeSource: Bool? = false
+    private(set) var receiptFeeSource: Bool? = false
     /** if set to `true`, fee destination inside receipt object is returned. */
-    public private(set) var receiptFeeDestination: Bool? = false
+    private(set) var receiptFeeDestination: Bool? = false
     /** if set to `true`, costing parameters inside receipt object is returned. */
-    public private(set) var receiptCostingParameters: Bool? = false
+    private(set) var receiptCostingParameters: Bool? = false
     /** if set to `true`, events inside receipt object is returned. */
-    public private(set) var receiptEvents: Bool? = false
+    private(set) var receiptEvents: Bool? = false
     /** (true by default) if set to `true`, transaction receipt output is returned. */
-    public private(set) var receiptOutput: Bool? = true
+    private(set) var receiptOutput: Bool? = true
     /** if set to `true`, all affected global entities by given transaction are returned. */
-    public private(set) var affectedGlobalEntities: Bool? = false
+    private(set) var affectedGlobalEntities: Bool? = false
     /** if set to `true`, manifest instructions for user transactions are returned. */
-    public private(set) var manifestInstructions: Bool? = false
+    private(set) var manifestInstructions: Bool? = false
     /** if set to `true`, returns the fungible and non-fungible balance changes.  **Warning!** This opt-in might be missing for recently committed transactions, in that case a `null` value will be returned. Retry the request until non-null value is returned.  */
-    public private(set) var balanceChanges: Bool? = false
+    private(set) var balanceChanges: Bool? = false
 
-    public init(rawHex: Bool? = false, receiptStateChanges: Bool? = false, receiptFeeSummary: Bool? = false, receiptFeeSource: Bool? = false, receiptFeeDestination: Bool? = false, receiptCostingParameters: Bool? = false, receiptEvents: Bool? = false, receiptOutput: Bool? = true, affectedGlobalEntities: Bool? = false, manifestInstructions: Bool? = false, balanceChanges: Bool? = false) {
+    init(rawHex: Bool? = false, receiptStateChanges: Bool? = false, receiptFeeSummary: Bool? = false, receiptFeeSource: Bool? = false, receiptFeeDestination: Bool? = false, receiptCostingParameters: Bool? = false, receiptEvents: Bool? = false, receiptOutput: Bool? = true, affectedGlobalEntities: Bool? = false, manifestInstructions: Bool? = false, balanceChanges: Bool? = false) {
         self.rawHex = rawHex
         self.receiptStateChanges = receiptStateChanges
         self.receiptFeeSummary = receiptFeeSummary
@@ -54,7 +54,7 @@ public struct TransactionDetailsOptIns: Codable, Hashable {
         self.balanceChanges = balanceChanges
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case rawHex = "raw_hex"
         case receiptStateChanges = "receipt_state_changes"
         case receiptFeeSummary = "receipt_fee_summary"
@@ -70,7 +70,7 @@ public struct TransactionDetailsOptIns: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(rawHex, forKey: .rawHex)
         try container.encodeIfPresent(receiptStateChanges, forKey: .receiptStateChanges)

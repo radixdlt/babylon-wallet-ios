@@ -2,19 +2,17 @@ import ComposableArchitecture
 import Sargon
 import SwiftUI
 
-public typealias AssetsDepositStatus = [ResourceAddress: ResourceAsset.State.DepositStatus]
-
 // MARK: - ReceivingAccount
-public struct ReceivingAccount: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable, Identifiable {
-		public typealias ID = UUID
-		public let id = ID()
+struct ReceivingAccount: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable, Identifiable {
+		typealias ID = UUID
+		let id = ID()
 
-		public var recipient: AccountOrAddressOf?
-		public var assets: IdentifiedArrayOf<ResourceAsset.State>
-		public var canBeRemoved: Bool
+		var recipient: AccountOrAddressOf?
+		var assets: IdentifiedArrayOf<ResourceAsset.State>
+		var canBeRemoved: Bool
 
-		public init(
+		init(
 			recipient: AccountOrAddressOf?,
 			assets: IdentifiedArrayOf<ResourceAsset.State>,
 			canBeRemovedWhenEmpty: Bool
@@ -24,36 +22,36 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 			self.canBeRemoved = canBeRemovedWhenEmpty
 		}
 
-		public static func empty(canBeRemovedWhenEmpty: Bool) -> Self {
+		static func empty(canBeRemovedWhenEmpty: Bool) -> Self {
 			.init(recipient: nil, assets: [], canBeRemovedWhenEmpty: canBeRemovedWhenEmpty)
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case chooseAccountTapped
 		case addAssetTapped
 		case removeTapped
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case remove
 		case chooseAccount
 		case addAssets
 	}
 
 	@CasePathable
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case row(id: ResourceAsset.State.ID, child: ResourceAsset.Action)
 	}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.forEach(\.assets, action: /Action.child .. ChildAction.row) {
 				ResourceAsset()
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .removeTapped:
 			.send(.delegate(.remove))
@@ -64,7 +62,7 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .row(id: id, child: .delegate(.removed)):
 			state.assets.remove(id: id)
@@ -84,16 +82,16 @@ extension ReceivingAccount.State {
 		assets.contains(where: { $0.depositStatus == .loading })
 	}
 
-	mutating func setAllDepositStatus(_ status: Loadable<ResourceAsset.State.DepositStatus>) {
+	mutating func setAllDepositStatus(_ status: Loadable<DepositStatus>) {
 		assets.mutateAll { asset in
 			asset.depositStatus = status
 		}
 	}
 
-	mutating func updateDepositStatus(values: AssetsDepositStatus) {
+	mutating func updateDepositStatus(values: DepositStatusPerResources) {
 		assets.mutateAll { asset in
-			if let depositStatus = values[asset.resourceAddress] {
-				asset.depositStatus = .success(depositStatus)
+			if let value = values[id: asset.resourceAddress] {
+				asset.depositStatus = .success(value.depositStatus)
 			}
 		}
 	}

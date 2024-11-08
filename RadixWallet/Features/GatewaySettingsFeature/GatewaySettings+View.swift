@@ -4,14 +4,14 @@ import SwiftUI
 // MARK: - GatewaySettings.View
 extension GatewaySettings {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<GatewaySettings>
 
-		public init(store: StoreOf<GatewaySettings>) {
+		init(store: StoreOf<GatewaySettings>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }) { viewStore in
 				ScrollView {
 					coreView()
@@ -110,7 +110,7 @@ struct GatewaySettings_Preview: PreviewProvider {
 }
 
 extension GatewaySettings.State {
-	public static let previewValue = Self(
+	static let previewValue = Self(
 		gatewayList: .previewValue
 	)
 }

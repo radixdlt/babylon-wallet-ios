@@ -8,19 +8,19 @@ extension DebugKeychainContents.State {
 
 // MARK: - DebugKeychainContents.View
 extension DebugKeychainContents {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let keyedMnemonics: [KeyedMnemonicWithMetadata]
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<DebugKeychainContents>
 
-		public init(store: StoreOf<DebugKeychainContents>) {
+		init(store: StoreOf<DebugKeychainContents>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading) {
 					Form {

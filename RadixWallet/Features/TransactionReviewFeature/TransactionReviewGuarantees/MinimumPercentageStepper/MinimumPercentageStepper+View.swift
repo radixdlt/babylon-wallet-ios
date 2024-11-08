@@ -3,12 +3,12 @@ import SwiftUI
 
 // MARK: - MinimumPercentageStepper.View
 extension MinimumPercentageStepper {
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<MinimumPercentageStepper>
 		private let title: String
 		private let vertical: Bool
 
-		public init(
+		init(
 			store: StoreOf<MinimumPercentageStepper>,
 			title: String = L10n.TransactionReview.Guarantees.setGuaranteedMinimum,
 			vertical: Bool = false
@@ -18,7 +18,7 @@ extension MinimumPercentageStepper {
 			self.vertical = vertical
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			let layout = vertical
 				? AnyLayout(VStackLayout(spacing: .medium3))
 				: AnyLayout(HStackLayout(spacing: .medium3))
@@ -38,16 +38,16 @@ extension MinimumPercentageStepper {
 		}
 	}
 
-	public struct CoreView: SwiftUI.View {
+	struct CoreView: SwiftUI.View {
 		private let store: StoreOf<MinimumPercentageStepper>
 		private let expands: Bool
 
-		public init(store: StoreOf<MinimumPercentageStepper>, expands: Bool = false) {
+		init(store: StoreOf<MinimumPercentageStepper>, expands: Bool = false) {
 			self.store = store
 			self.expands = expands
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				HStack(spacing: .medium3) {
 					let buttonPadding: CGFloat = expands ? .medium3 : .zero

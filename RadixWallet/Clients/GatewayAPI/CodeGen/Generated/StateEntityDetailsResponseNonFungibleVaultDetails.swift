@@ -11,24 +11,24 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.StateEntityDetailsResponseNonFungibleVaultDetails")
-public typealias StateEntityDetailsResponseNonFungibleVaultDetails = GatewayAPI.StateEntityDetailsResponseNonFungibleVaultDetails
+typealias StateEntityDetailsResponseNonFungibleVaultDetails = GatewayAPI.StateEntityDetailsResponseNonFungibleVaultDetails
 
 extension GatewayAPI {
 
-public struct StateEntityDetailsResponseNonFungibleVaultDetails: Codable, Hashable {
+struct StateEntityDetailsResponseNonFungibleVaultDetails: Codable, Hashable {
 
-    public private(set) var type: StateEntityDetailsResponseItemDetailsType
+    private(set) var type: StateEntityDetailsResponseItemDetailsType
     /** Bech32m-encoded human readable version of the address. */
-    public private(set) var resourceAddress: String
-    public private(set) var balance: NonFungibleResourcesCollectionItemVaultAggregatedVaultItem
+    private(set) var resourceAddress: String
+    private(set) var balance: NonFungibleResourcesCollectionItemVaultAggregatedVaultItem
 
-    public init(type: StateEntityDetailsResponseItemDetailsType, resourceAddress: String, balance: NonFungibleResourcesCollectionItemVaultAggregatedVaultItem) {
+    init(type: StateEntityDetailsResponseItemDetailsType, resourceAddress: String, balance: NonFungibleResourcesCollectionItemVaultAggregatedVaultItem) {
         self.type = type
         self.resourceAddress = resourceAddress
         self.balance = balance
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case type
         case resourceAddress = "resource_address"
         case balance
@@ -36,7 +36,7 @@ public struct StateEntityDetailsResponseNonFungibleVaultDetails: Codable, Hashab
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(type, forKey: .type)
         try container.encode(resourceAddress, forKey: .resourceAddress)

@@ -4,94 +4,113 @@ import SwiftUI
 // MARK: - ResourceBalance.ViewState
 extension ResourceBalance {
 	// MARK: - ViewState
-	public enum ViewState: Sendable, Hashable {
+	enum ViewState: Sendable, Hashable {
 		case fungible(Fungible)
 		case nonFungible(NonFungible)
 		case liquidStakeUnit(LiquidStakeUnit)
 		case poolUnit(PoolUnit)
 		case stakeClaimNFT(StakeClaimNFT)
+		case unknown
 
-		public struct Fungible: Sendable, Hashable {
-			public let address: ResourceAddress
-			public let icon: Thumbnail.FungibleContent
-			public let title: String?
-			public let amount: ResourceBalance.Amount?
+		struct Fungible: Sendable, Hashable {
+			let address: ResourceAddress
+			let icon: Thumbnail.FungibleContent
+			let title: String?
+			let amount: ResourceAmount?
 		}
 
-		public struct NonFungible: Sendable, Hashable {
-			public let id: NonFungibleGlobalId
-			public let resourceImage: URL?
-			public let resourceName: String?
-			public let nonFungibleName: String?
+		struct NonFungible: Sendable, Hashable {
+			let id: NonFungibleGlobalId?
+			let resourceImage: URL?
+			let resourceName: String?
+			let nonFungibleName: String?
+			let amount: ResourceAmount?
 		}
 
-		public struct LiquidStakeUnit: Sendable, Hashable {
-			public let address: ResourceAddress
-			public let icon: URL?
-			public let title: String?
-			public let amount: ResourceBalance.Amount?
-			public let worth: ResourceAmount
-			public var validatorName: String? = nil
+		struct LiquidStakeUnit: Sendable, Hashable {
+			let address: ResourceAddress
+			let icon: URL?
+			let title: String?
+			let amount: ResourceAmount?
+			let worth: ResourceAmount
+			var validatorName: String? = nil
 		}
 
-		public struct PoolUnit: Sendable, Hashable {
-			public let resourcePoolAddress: PoolAddress
-			public let poolUnitAddress: ResourceAddress
-			public let poolIcon: URL?
-			public let poolName: String?
-			public let amount: ResourceBalance.Amount?
-			public var dAppName: Loadable<String?>
-			public var resources: Loadable<[Fungible]>
+		struct PoolUnit: Sendable, Hashable {
+			let resourcePoolAddress: PoolAddress
+			let poolUnitAddress: ResourceAddress
+			let poolIcon: URL?
+			let poolName: String?
+			let amount: ResourceAmount?
+			var dAppName: Loadable<String?>
+			var resources: Loadable<[Fungible]>
 		}
 
-		public typealias StakeClaimNFT = ResourceBalance.StakeClaimNFT
+		typealias StakeClaimNFT = KnownResourceBalance.StakeClaimNFT
 	}
 
 	var viewState: ViewState {
-		switch details {
-		case let .fungible(details):
-			.fungible(.init(resource: resource, details: details))
-		case let .nonFungible(details):
-			.nonFungible(.init(resource: resource, details: details))
-		case let .liquidStakeUnit(details):
-			.liquidStakeUnit(.init(resource: resource, details: details))
-		case let .poolUnit(details):
-			.poolUnit(.init(resource: resource, details: details))
-		case let .stakeClaimNFT(details):
-			.stakeClaimNFT(details)
+		switch self {
+		case let .known(known):
+			switch known.details {
+			case let .fungible(details):
+				.fungible(.init(resource: known.resource, details: details))
+			case let .nonFungible(details):
+				.nonFungible(.init(resource: known.resource, details: details))
+			case let .liquidStakeUnit(details):
+				.liquidStakeUnit(.init(resource: known.resource, details: details))
+			case let .poolUnit(details):
+				.poolUnit(.init(resource: known.resource, details: details))
+			case let .stakeClaimNFT(details):
+				.stakeClaimNFT(details)
+			}
+		case .unknown:
+			.unknown
 		}
 	}
 }
 
 private extension ResourceBalance.ViewState.Fungible {
-	init(resource: OnLedgerEntity.Resource, details: ResourceBalance.Fungible) {
+	init(resource: OnLedgerEntity.Resource, details: KnownResourceBalance.Fungible) {
 		self.init(
 			address: resource.resourceAddress,
 			icon: .token(details.isXRD ? .xrd : .other(resource.metadata.iconURL)),
 			title: resource.metadata.title,
-			amount: .init(details.amount, guaranteed: details.guarantee?.amount)
+			amount: details.amount
 		)
 	}
 }
 
 private extension ResourceBalance.ViewState.NonFungible {
-	init(resource: OnLedgerEntity.Resource, details: ResourceBalance.NonFungible) {
-		self.init(
-			id: details.id,
-			resourceImage: resource.metadata.iconURL,
-			resourceName: resource.metadata.name,
-			nonFungibleName: details.data?.name
-		)
+	init(resource: OnLedgerEntity.Resource, details: KnownResourceBalance.NonFungible) {
+		switch details {
+		case let .token(token):
+			self.init(
+				id: token.id,
+				resourceImage: resource.metadata.iconURL,
+				resourceName: resource.metadata.name,
+				nonFungibleName: token.data?.name,
+				amount: nil
+			)
+		case let .amount(amount):
+			self.init(
+				id: nil,
+				resourceImage: resource.metadata.iconURL,
+				resourceName: resource.metadata.name,
+				nonFungibleName: resource.resourceAddress.formatted(),
+				amount: .init(amount)
+			)
+		}
 	}
 }
 
 private extension ResourceBalance.ViewState.LiquidStakeUnit {
-	init(resource: OnLedgerEntity.Resource, details: ResourceBalance.LiquidStakeUnit) {
+	init(resource: OnLedgerEntity.Resource, details: KnownResourceBalance.LiquidStakeUnit) {
 		self.init(
 			address: resource.resourceAddress,
 			icon: resource.metadata.iconURL,
 			title: resource.metadata.title,
-			amount: .init(details.amount, guaranteed: details.guarantee?.amount),
+			amount: details.amount,
 			worth: details.worth,
 			validatorName: details.validator.metadata.name
 		)
@@ -99,13 +118,13 @@ private extension ResourceBalance.ViewState.LiquidStakeUnit {
 }
 
 private extension ResourceBalance.ViewState.PoolUnit {
-	init(resource: OnLedgerEntity.Resource, details: ResourceBalance.PoolUnit) {
+	init(resource: OnLedgerEntity.Resource, details: KnownResourceBalance.PoolUnit) {
 		self.init(
 			resourcePoolAddress: details.details.address,
 			poolUnitAddress: resource.resourceAddress,
 			poolIcon: resource.metadata.iconURL,
 			poolName: resource.fungibleResourceName,
-			amount: .init(details.details.poolUnitResource.amount, guaranteed: details.guarantee?.amount),
+			amount: details.details.poolUnitResource.amount,
 			dAppName: .success(details.details.dAppName),
 			resources: .success(.init(resources: details.details))
 		)
@@ -113,13 +132,13 @@ private extension ResourceBalance.ViewState.PoolUnit {
 }
 
 // MARK: - ResourceBalanceView
-public struct ResourceBalanceView: View {
-	public let viewState: ResourceBalance.ViewState
-	public let appearance: Appearance
-	public let isSelected: Bool?
-	public let action: (() -> Void)?
+struct ResourceBalanceView: View {
+	let viewState: ResourceBalance.ViewState
+	let appearance: Appearance
+	let isSelected: Bool?
+	let action: (() -> Void)?
 
-	public enum Appearance: Sendable, Equatable {
+	enum Appearance: Sendable, Equatable {
 		case standard
 		case compact(border: Bool)
 
@@ -138,7 +157,7 @@ public struct ResourceBalanceView: View {
 		self.action = action
 	}
 
-	public var body: some View {
+	var body: some View {
 		content
 			.embedInButton(when: action)
 	}
@@ -167,6 +186,8 @@ public struct ResourceBalanceView: View {
 				PoolUnit(viewState: viewState, compact: compact, isSelected: isSelected)
 			case let .stakeClaimNFT(viewState):
 				StakeClaimNFT(viewState: viewState, appearance: .standalone, compact: compact, onTap: { _ in })
+			case .unknown:
+				Unknown()
 			}
 
 			if !delegateSelection, let isSelected {
@@ -186,7 +207,7 @@ public struct ResourceBalanceView: View {
 	/// Delegate showing the selection state to the particular resource view
 	var delegateSelection: Bool {
 		switch viewState {
-		case .fungible, .nonFungible:
+		case .fungible, .nonFungible, .unknown:
 			false
 		case .liquidStakeUnit, .poolUnit, .stakeClaimNFT:
 			true
@@ -195,12 +216,12 @@ public struct ResourceBalanceView: View {
 }
 
 extension ResourceBalanceView {
-	public struct Fungible: View {
+	struct Fungible: View {
 		@Environment(\.missingFungibleAmountFallback) var fallback
-		public let viewState: ResourceBalance.ViewState.Fungible
-		public let compact: Bool
+		let viewState: ResourceBalance.ViewState.Fungible
+		let compact: Bool
 
-		public var body: some View {
+		var body: some View {
 			FungibleView(
 				thumbnail: viewState.icon,
 				caption1: viewState.title ?? "-",
@@ -213,31 +234,32 @@ extension ResourceBalanceView {
 		}
 	}
 
-	public struct NonFungible: View {
-		public let viewState: ResourceBalance.ViewState.NonFungible
-		public let compact: Bool
+	struct NonFungible: View {
+		let viewState: ResourceBalance.ViewState.NonFungible
+		let compact: Bool
 
-		public var body: some View {
+		var body: some View {
 			NonFungibleView(
 				thumbnail: .nft(viewState.resourceImage),
-				caption1: viewState.resourceName ?? viewState.id.resourceAddress.formatted(),
-				caption2: viewState.nonFungibleName ?? viewState.id.localID.formatted(),
-				compact: compact
+				caption1: viewState.resourceName ?? viewState.id?.resourceAddress.formatted(),
+				caption2: viewState.nonFungibleName ?? viewState.id?.localID.formatted(),
+				compact: compact,
+				amount: viewState.amount
 			)
 		}
 	}
 
-	public struct LiquidStakeUnit: View {
+	struct LiquidStakeUnit: View {
 		@Environment(\.resourceBalanceHideDetails) var hideDetails
-		public let viewState: ResourceBalance.ViewState.LiquidStakeUnit
-		public let compact: Bool
-		public let isSelected: Bool?
+		let viewState: ResourceBalance.ViewState.LiquidStakeUnit
+		let compact: Bool
+		let isSelected: Bool?
 
 		private var fungible: ResourceBalance.ViewState.Fungible {
 			.xrd(balance: viewState.worth, network: viewState.address.networkID)
 		}
 
-		public var body: some View {
+		var body: some View {
 			VStack(alignment: .leading, spacing: .medium3) {
 				FungibleView(
 					thumbnail: .lsu(viewState.icon),
@@ -263,13 +285,13 @@ extension ResourceBalanceView {
 		}
 	}
 
-	public struct PoolUnit: View {
+	struct PoolUnit: View {
 		@Environment(\.resourceBalanceHideDetails) var hideDetails
-		public let viewState: ResourceBalance.ViewState.PoolUnit
-		public let compact: Bool
-		public let isSelected: Bool?
+		let viewState: ResourceBalance.ViewState.PoolUnit
+		let compact: Bool
+		let isSelected: Bool?
 
-		public var body: some View {
+		var body: some View {
 			VStack(alignment: .leading, spacing: .zero) {
 				FungibleView(
 					thumbnail: .poolUnit(viewState.poolIcon),
@@ -283,7 +305,7 @@ extension ResourceBalanceView {
 				.padding(.horizontal, hideDetails ? .zero : .small3)
 
 				if !hideDetails {
-					Text(L10n.TransactionReview.worth.uppercased())
+					Text(L10n.InteractionReview.worth.uppercased())
 						.textStyle(.body2HighImportance)
 						.foregroundColor(.app.gray2)
 						.padding(.top, .small2)
@@ -298,26 +320,27 @@ extension ResourceBalanceView {
 		}
 	}
 
-	public struct StakeClaimNFT: View {
+	struct StakeClaimNFT: View {
 		@Environment(\.resourceBalanceHideDetails) var hideDetails
-		public let viewState: ResourceBalance.ViewState.StakeClaimNFT
-		public let appearance: Appearance
-		public let compact: Bool
-		public let onTap: (OnLedgerEntitiesClient.StakeClaim) -> Void
-		public var onClaimAllTapped: (() -> Void)? = nil
+		let viewState: ResourceBalance.ViewState.StakeClaimNFT
+		let appearance: Appearance
+		let compact: Bool
+		let onTap: (OnLedgerEntitiesClient.StakeClaim) -> Void
+		var onClaimAllTapped: (() -> Void)? = nil
 
-		public enum Appearance {
+		enum Appearance {
 			case standalone
 			case transactionReview
 		}
 
-		public var body: some View {
+		var body: some View {
 			VStack(alignment: .leading, spacing: .zero) {
 				NonFungibleView(
 					thumbnail: .stakeClaimNFT(viewState.resourceMetadata.iconURL),
 					caption1: viewState.resourceMetadata.title,
 					caption2: viewState.validatorName,
-					compact: compact
+					compact: compact,
+					amount: nil
 				)
 
 				if !hideDetails {
@@ -348,20 +371,20 @@ extension ResourceBalanceView {
 			}
 		}
 
-		public struct Tokens: View {
+		struct Tokens: View {
 			enum SectionKind {
 				case unstaking
 				case readyToBeClaimed
 				case toBeClaimed
 			}
 
-			public var viewState: ResourceBalance.StakeClaimNFT.Tokens
-			public let background: Color
-			public let onTap: ((OnLedgerEntitiesClient.StakeClaim) -> Void)?
-			public let onClaimAllTapped: (() -> Void)?
+			var viewState: KnownResourceBalance.StakeClaimNFT.Tokens
+			let background: Color
+			let onTap: ((OnLedgerEntitiesClient.StakeClaim) -> Void)?
+			let onClaimAllTapped: (() -> Void)?
 
 			init(
-				viewState: ResourceBalance.StakeClaimNFT.Tokens,
+				viewState: KnownResourceBalance.StakeClaimNFT.Tokens,
 				background: Color,
 				onTap: ((OnLedgerEntitiesClient.StakeClaim) -> Void)? = nil,
 				onClaimAllTapped: (() -> Void)? = nil
@@ -372,7 +395,7 @@ extension ResourceBalanceView {
 				self.onClaimAllTapped = onClaimAllTapped
 			}
 
-			public var body: some View {
+			var body: some View {
 				if !viewState.unstaking.isEmpty {
 					sectionView(viewState.unstaking, kind: .unstaking)
 				}
@@ -420,7 +443,7 @@ extension ResourceBalanceView {
 							} label: {
 								let isSelected = viewState.selectedStakeClaims?.contains(claim.id)
 								ResourceBalanceView(
-									.fungible(.xrd(balance: claim.claimAmount, network: claim.validatorAddress.networkID)),
+									.fungible(.xrd(balance: .exact(claim.claimAmount), network: claim.validatorAddress.networkID)),
 									appearance: .compact,
 									isSelected: isSelected
 								)
@@ -437,37 +460,68 @@ extension ResourceBalanceView {
 		}
 	}
 
+	struct Unknown: View {
+		var body: some View {
+			HStack(spacing: .small1) {
+				Image(.unknownDeposits)
+
+				Text("----")
+					.textStyle(.body2HighImportance)
+					.foregroundStyle(.app.gray4)
+
+				WarningErrorView(
+					text: L10n.InteractionReview.Unknown.deposits,
+					type: .warning,
+					useNarrowSpacing: true,
+					useSmallerFontSize: true
+				)
+			}
+			.frame(maxWidth: .infinity)
+		}
+	}
+
 	// Helper Views
 
 	private struct FungibleView: View {
-		public let thumbnail: Thumbnail.FungibleContent
-		public let caption1: String?
-		public let caption2: String?
-		public let fallback: String?
-		public let amount: ResourceBalance.Amount?
-		public let compact: Bool
-		public let isSelected: Bool?
+		let thumbnail: Thumbnail.FungibleContent
+		let caption1: String?
+		let caption2: String?
+		let fallback: String?
+		let amount: ResourceAmount?
+		let compact: Bool
+		let isSelected: Bool?
 
-		public var body: some View {
-			HStack(spacing: .zero) {
-				CaptionedThumbnailView(
-					type: thumbnail.type,
-					url: thumbnail.url,
-					caption1: caption1,
-					caption2: caption2,
-					compact: compact
-				)
+		var body: some View {
+			VStack(alignment: .leading) {
+				HStack(spacing: .zero) {
+					CaptionedThumbnailView(
+						type: thumbnail.type,
+						url: thumbnail.url,
+						caption1: caption1,
+						caption2: caption2,
+						compact: compact
+					)
 
-				if useSpacer, isSelected == nil {
-					Spacer(minLength: .small2)
+					if useSpacer, isSelected == nil {
+						Spacer(minLength: .small2)
+					}
+
+					AmountView(amount: amount, fallback: fallback, appearance: compact ? .compact : .standard)
+						.padding(.leading, isSelected != nil ? .small2 : 0)
+
+					if let isSelected {
+						Spacer(minLength: .small2)
+						CheckmarkView(appearance: .dark, isChecked: isSelected)
+					}
 				}
 
-				AmountView(amount: amount, fallback: fallback, compact: compact)
-					.padding(.leading, isSelected != nil ? .small2 : 0)
-
-				if let isSelected {
-					Spacer(minLength: .small2)
-					CheckmarkView(appearance: .dark, isChecked: isSelected)
+				if case .unknown = amount {
+					WarningErrorView(
+						text: L10n.InteractionReview.Unknown.amount,
+						type: .warning,
+						useNarrowSpacing: true,
+						useSmallerFontSize: true
+					)
 				}
 			}
 		}
@@ -490,18 +544,34 @@ extension ResourceBalanceView {
 		let caption1: String?
 		let caption2: String?
 		let compact: Bool
+		let amount: ResourceAmount?
 
 		var body: some View {
-			HStack(spacing: .zero) {
-				CaptionedThumbnailView(
-					type: thumbnail.type,
-					url: thumbnail.url,
-					caption1: caption1 ?? "-",
-					caption2: caption2 ?? "-",
-					compact: compact
-				)
+			VStack(alignment: .leading) {
+				HStack(spacing: .zero) {
+					CaptionedThumbnailView(
+						type: thumbnail.type,
+						url: thumbnail.url,
+						caption1: caption1 ?? "-",
+						caption2: caption2 ?? "-",
+						compact: compact
+					)
 
-				Spacer(minLength: 0)
+					Spacer(minLength: amount != nil ? .small2 : 0)
+
+					if let amount {
+						AmountView(amount: amount, appearance: compact ? .compact : .standard)
+					}
+				}
+
+				if case .unknown = amount {
+					WarningErrorView(
+						text: L10n.InteractionReview.Unknown.amount,
+						type: .warning,
+						useNarrowSpacing: true,
+						useSmallerFontSize: true
+					)
+				}
 			}
 		}
 	}
@@ -543,20 +613,77 @@ extension ResourceBalanceView {
 	}
 
 	struct AmountView: View {
-		@Environment(\.resourceBalanceHideFiatValue) var resourceBalanceHideFiatValue
-		let amount: ResourceBalance.Amount?
+		let amount: ResourceAmount?
 		let fallback: String?
-		let compact: Bool
+		let appearance: Appearance
+		let symbol: Loadable<String?>?
 
-		init(amount: ResourceBalance.Amount?, fallback: String? = nil, compact: Bool) {
+		enum Appearance: Sendable, Equatable {
+			case standard
+			case compact
+			case large
+		}
+
+		init(
+			amount: ResourceAmount?,
+			fallback: String? = nil,
+			appearance: Appearance,
+			symbol: Loadable<String?>? = nil
+		) {
 			self.amount = amount
 			self.fallback = fallback
-			self.compact = compact
+			self.appearance = appearance
+			self.symbol = symbol
 		}
 
 		var body: some View {
 			if let amount {
-				core(amount: amount, compact: compact)
+				switch amount {
+				case let .exact(exactAmount):
+					SubAmountView(
+						amount: exactAmount,
+						appearance: appearance,
+						symbol: symbol
+					)
+				case let .atLeast(exactAmount):
+					SubAmountView(
+						title: L10n.InteractionReview.atLeast,
+						amount: exactAmount,
+						appearance: appearance,
+						symbol: symbol
+					)
+				case let .atMost(exactAmount):
+					SubAmountView(
+						title: L10n.InteractionReview.noMoreThan,
+						amount: exactAmount,
+						appearance: appearance,
+						symbol: symbol
+					)
+				case let .between(minAmount, maxAmount):
+					VStack(alignment: alignment, spacing: .small3) {
+						SubAmountView(
+							title: L10n.InteractionReview.atLeast,
+							amount: minAmount,
+							appearance: appearance,
+							symbol: symbol
+						)
+						SubAmountView(
+							title: L10n.InteractionReview.noMoreThan,
+							amount: maxAmount,
+							appearance: appearance,
+							symbol: symbol
+						)
+					}
+				case let .predicted(predicted, guaranteed):
+					SubAmountView(
+						amount: predicted,
+						guaranteed: guaranteed,
+						appearance: appearance,
+						symbol: symbol
+					)
+				case .unknown:
+					EmptyView()
+				}
 			} else if let fallback {
 				Text(fallback)
 					.textStyle(amountTextStyle)
@@ -564,14 +691,59 @@ extension ResourceBalanceView {
 			}
 		}
 
-		@ViewBuilder
-		private func core(amount: ResourceBalance.Amount, compact: Bool) -> some View {
-			if compact {
+		private var amountTextStyle: TextStyle {
+			switch appearance {
+			case .standard, .large:
+				.secondaryHeader
+			case .compact:
+				.body1HighImportance
+			}
+		}
+
+		private var alignment: HorizontalAlignment {
+			switch appearance {
+			case .standard, .compact:
+				.trailing
+			case .large:
+				.center
+			}
+		}
+	}
+
+	struct SubAmountView: View {
+		@Environment(\.resourceBalanceHideFiatValue) var resourceBalanceHideFiatValue
+		let title: String?
+		let amount: ExactResourceAmount
+		let guaranteed: ExactResourceAmount?
+		let appearance: AmountView.Appearance
+		let symbol: Loadable<String?>?
+
+		init(
+			title: String? = nil,
+			amount: ExactResourceAmount,
+			guaranteed: ExactResourceAmount? = nil,
+			appearance: AmountView.Appearance,
+			symbol: Loadable<String?>?
+		) {
+			self.title = title
+			self.amount = amount
+			self.guaranteed = guaranteed
+			self.appearance = appearance
+			self.symbol = symbol
+		}
+
+		var body: some View {
+			if appearance == .compact {
 				VStack(alignment: .trailing, spacing: 0) {
-					Text(amount.amount.nominalAmount.formatted())
+					if let title {
+						Text(title)
+							.textStyle(titleTextStyle)
+							.foregroundColor(.app.gray1)
+					}
+					amountView(amount: amount.nominalAmount, isGuaranteed: false)
 						.textStyle(amountTextStyle)
 						.foregroundColor(.app.gray1)
-					if !resourceBalanceHideFiatValue, let fiatWorth = amount.amount.fiatWorth?.currencyFormatted(applyCustomFont: false) {
+					if !resourceBalanceHideFiatValue, let fiatWorth = amount.fiatWorth?.currencyFormatted(applyCustomFont: false) {
 						Text(fiatWorth)
 							.textStyle(.body2HighImportance)
 							.foregroundStyle(.app.gray2)
@@ -579,42 +751,95 @@ extension ResourceBalanceView {
 					}
 				}
 			} else {
-				VStack(alignment: .trailing, spacing: 0) {
-					if amount.guaranteed != nil {
-						Text(L10n.TransactionReview.estimated)
-							.textStyle(.body2HighImportance)
+				VStack(alignment: alignment, spacing: 0) {
+					if guaranteed != nil {
+						Text(L10n.InteractionReview.estimated)
+							.textStyle(titleTextStyle)
+							.foregroundColor(.app.gray1)
+					} else if let title {
+						Text(title)
+							.textStyle(titleTextStyle)
 							.foregroundColor(.app.gray1)
 					}
-					Text(amount.amount.nominalAmount.formatted())
-						.lineLimit(1)
-						.minimumScaleFactor(0.8)
-						.truncationMode(.tail)
-						.textStyle(.secondaryHeader)
+
+					amountView(amount: amount.nominalAmount, isGuaranteed: false)
+						.textStyle(amountTextStyle)
 						.foregroundColor(.app.gray1)
 
-					if !resourceBalanceHideFiatValue, let fiatWorth = amount.amount.fiatWorth?.currencyFormatted(applyCustomFont: false) {
+					if !resourceBalanceHideFiatValue, let fiatWorth = amount.fiatWorth?.currencyFormatted(applyCustomFont: false) {
 						Text(fiatWorth)
 							.textStyle(.body2HighImportance)
 							.foregroundStyle(.app.gray2)
 							.padding(.top, .small3)
 					}
 
-					if let guaranteedAmount = amount.guaranteed {
-						Text(L10n.TransactionReview.guaranteed)
-							.textStyle(.body2HighImportance)
+					if let guaranteedAmount = guaranteed?.nominalAmount {
+						Text(L10n.InteractionReview.guaranteed)
+							.textStyle(.body3Regular)
 							.foregroundColor(.app.gray2)
 							.padding(.top, .small3)
 
-						Text(guaranteedAmount.formatted())
-							.textStyle(.body1Header)
+						amountView(amount: guaranteedAmount, isGuaranteed: true)
+							.textStyle(guaranteedAmountTextStyle)
 							.foregroundColor(.app.gray2)
 					}
 				}
 			}
 		}
 
+		@ViewBuilder
+		private func amountView(amount: Decimal192, isGuaranteed: Bool) -> some View {
+			let amountView = Text(amount.formatted())
+
+			if let wrappedValue = symbol?.wrappedValue, let symbol = wrappedValue {
+				(amountView + Text(" " + symbol).font(isGuaranteed ? .app.body2Header : .app.secondaryHeader))
+					.lineLimit(1)
+					.minimumScaleFactor(0.8)
+					.truncationMode(.tail)
+			} else {
+				amountView
+					.lineLimit(1)
+					.minimumScaleFactor(0.8)
+					.truncationMode(.tail)
+			}
+		}
+
+		private var titleTextStyle: TextStyle {
+			switch appearance {
+			case .standard, .compact:
+				.body3Regular
+			case .large:
+				.body1HighImportance
+			}
+		}
+
 		private var amountTextStyle: TextStyle {
-			compact ? .body1HighImportance : .secondaryHeader
+			switch appearance {
+			case .standard:
+				.secondaryHeader
+			case .compact:
+				.body1HighImportance
+			case .large:
+				.sheetTitle
+			}
+		}
+
+		private var guaranteedAmountTextStyle: TextStyle {
+			switch appearance {
+			case .standard, .compact:
+				.body1Header
+			case .large:
+				.sectionHeader
+			}
+		}
+
+		private var alignment: HorizontalAlignment {
+			switch appearance {
+			case .standard, .compact:
+				.trailing
+			case .large:
+				.center
+			}
 		}
 	}
 }
@@ -627,7 +852,7 @@ extension ResourceBalanceView.StakeClaimNFT.Tokens.SectionKind {
 		case .readyToBeClaimed:
 			L10n.Account.Staking.readyToBeClaimed
 		case .toBeClaimed:
-			L10n.TransactionReview.toBeClaimed
+			L10n.InteractionReview.toBeClaimed
 		}
 	}
 }

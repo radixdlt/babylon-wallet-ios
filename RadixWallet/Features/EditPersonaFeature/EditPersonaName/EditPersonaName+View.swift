@@ -3,12 +3,12 @@ import SwiftUI
 
 // MARK: - EditPersonaName.View
 extension EditPersonaName {
-	public typealias ViewState = State
+	typealias ViewState = State
 
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		let store: StoreOf<EditPersonaName>
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				VStack(spacing: .medium2) {
 					variantPicker(viewStore)

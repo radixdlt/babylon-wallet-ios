@@ -343,7 +343,7 @@ import Sargon
 //
 //// MARK: - PeerConnectionNegotiator.FailedToCreatePeerConnectionError + Equatable
 // extension PeerConnectionNegotiator.FailedToCreatePeerConnectionError: Equatable {
-//	public static func == (lhs: Self, rhs: Self) -> Bool {
+//	static func == (lhs: Self, rhs: Self) -> Bool {
 //		lhs.remoteClientId == rhs.remoteClientId && lhs.underlyingError as NSError == rhs.underlyingError as NSError
 //	}
 // }

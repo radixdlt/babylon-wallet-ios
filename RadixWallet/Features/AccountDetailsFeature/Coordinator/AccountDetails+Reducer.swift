@@ -2,9 +2,9 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - AccountDetails
-public struct AccountDetails: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable, AccountWithInfoHolder {
-		public var accountWithInfo: AccountWithInfo
+struct AccountDetails: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable, AccountWithInfoHolder {
+		var accountWithInfo: AccountWithInfo
 		var assets: AssetsView.State
 		var securityProblemsConfig: EntitySecurityProblemsView.Config
 		fileprivate var problems: [SecurityProblem] = []
@@ -14,7 +14,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		@PresentationState
 		var destination: Destination.State?
 
-		public init(
+		init(
 			accountWithInfo: AccountWithInfo,
 			showFiatWorth: Bool
 		) {
@@ -28,7 +28,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case task
 		case backButtonTapped
 		case preferencesButtonTapped
@@ -40,23 +40,23 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case assets(AssetsView.Action)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case dismiss
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case accountUpdated(Account)
 		case setSecurityProblems([SecurityProblem])
 		case setAccountLockerClaims([AccountLockerClaimDetails])
 	}
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case preferences(AccountPreferences.State)
 			case history(TransactionHistory.State)
 			case transfer(AssetTransfer.State)
@@ -69,7 +69,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case preferences(AccountPreferences.Action)
 			case history(TransactionHistory.Action)
 			case transfer(AssetTransfer.Action)
@@ -81,7 +81,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			case securityCenter(SecurityCenter.Action)
 		}
 
-		public var body: some Reducer<State, Action> {
+		var body: some Reducer<State, Action> {
 			Scope(state: \.preferences, action: \.preferences) {
 				AccountPreferences()
 			}
@@ -124,9 +124,9 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	private let accountPortfolioRefreshIntervalInSeconds = 60
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Scope(state: \.assets, action: \.child.assets) {
 			AssetsView()
 		}
@@ -138,7 +138,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			return .run { [state] send in
@@ -189,7 +189,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .accountUpdated(account):
 			state.account = account
@@ -204,7 +204,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .assets(.delegate(.selected(selection))):
 			switch selection {
@@ -219,25 +219,29 @@ public struct AccountDetails: Sendable, FeatureReducer {
 				state.destination = .nonFungibleDetails(.init(
 					resourceAddress: resource.resourceAddress,
 					ownedResource: resource,
-					token: token,
+					details: .token(token),
 					ledgerState: resource.atLedgerState
 				))
 
 			case let .stakeUnit(resource, details):
+				guard let xrdRedemptionValue = details.xrdRedemptionValue.exactAmount else {
+					fatalError("Not possible")
+				}
+
 				state.destination = .stakeUnitDetails(.init(
 					validator: details.validator,
 					stakeUnitResource: resource,
-					xrdRedemptionValue: .init(
-						nominalAmount: details.xrdRedemptionValue,
-						fiatWorth: resource.amount.fiatWorth
-					)
+					xrdRedemptionValue: .exact(.init(
+						nominalAmount: xrdRedemptionValue.nominalAmount,
+						fiatWorth: resource.amount.exactAmount?.fiatWorth
+					))
 				))
 
 			case let .stakeClaim(resource, claim):
 				state.destination = .stakeClaimDetails(.init(
 					resourceAddress: resource.resourceAddress,
 					resourceDetails: .success(resource),
-					token: claim.token,
+					details: .token(claim.token),
 					ledgerState: resource.atLedgerState,
 					stakeClaim: claim
 				))
@@ -252,7 +256,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .transfer(.delegate(.dismissed)):
 			state.destination = nil

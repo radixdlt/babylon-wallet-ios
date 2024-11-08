@@ -1,8 +1,8 @@
 // MARK: - StakeUnitList
-public struct StakeUnitList: Sendable, FeatureReducer {
+struct StakeUnitList: Sendable, FeatureReducer {
 	typealias SelectedStakeClaimTokens = [OnLedgerEntity.OwnedNonFungibleResource: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>]
 
-	public struct State: Sendable, Hashable {
+	struct State: Sendable, Hashable {
 		let account: OnLedgerEntity.OnLedgerAccount
 		var ownedStakes: IdentifiedArrayOf<OnLedgerEntity.OnLedgerAccount.RadixNetworkStake> {
 			account.poolUnitResources.radixNetworkStakes
@@ -40,9 +40,12 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 
 				let stakeClaims = details.compactMap(\.stakeClaimTokens).flatMap(\.stakeClaims)
 				let stakedAmount = details.map {
-					ResourceAmount(
-						nominalAmount: $0.xrdRedemptionValue,
-						fiatWorth: $0.stakeUnitResource?.amount.fiatWorth
+					guard let exactAmount = $0.xrdRedemptionValue.exactAmount?.nominalAmount else {
+						fatalError("Not possible")
+					}
+					return ExactResourceAmount(
+						nominalAmount: exactAmount,
+						fiatWorth: $0.stakeUnitResource?.amount.exactAmount!.fiatWorth
 					)
 				}.reduce(.zero, +)
 
@@ -52,12 +55,16 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 					.reduce(.zero, +)
 
 				let validatorStakes = details.map { stake in
-					ValidatorStakeView.ViewState(
+					guard let xrdRedemptionValue = stake.xrdRedemptionValue.exactAmount?.nominalAmount else {
+						fatalError("Not possible")
+					}
+
+					return ValidatorStakeView.ViewState(
 						stakeDetails: stake,
 						validatorNameViewState: .init(
 							imageURL: stake.validator.metadata.iconURL,
 							name: stake.validator.metadata.name ?? L10n.Account.PoolUnits.unknownValidatorName,
-							stakedAmount: stake.xrdRedemptionValue
+							stakedAmount: xrdRedemptionValue
 						),
 						liquidStakeUnit: stake.stakeUnitResource.map { stakeUnitResource in
 							.init(
@@ -66,17 +73,17 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 									icon: stakeUnitResource.resource.metadata.iconURL,
 									title: stakeUnitResource.resource.metadata.title,
 									amount: nil,
-									worth: .init(
-										nominalAmount: stake.xrdRedemptionValue,
-										fiatWorth: stake.stakeUnitResource?.amount.fiatWorth
-									),
+									worth: .exact(.init(
+										nominalAmount: xrdRedemptionValue,
+										fiatWorth: stake.stakeUnitResource?.amount.exactAmount!.fiatWorth
+									)),
 									validatorName: nil
 								),
 								isSelected: selectedLiquidStakeUnits?.contains { $0.id == stakeUnitResource.resource.resourceAddress }
 							)
 						},
 						stakeClaimResource: stake.stakeClaimTokens.map { stakeClaimTokens in
-							ResourceBalance.StakeClaimNFT(
+							KnownResourceBalance.StakeClaimNFT(
 								canClaimTokens: allSelectedTokens == nil, // cannot claim in selection mode
 								stakeClaimTokens: stakeClaimTokens,
 								selectedStakeClaims: allSelectedTokens
@@ -106,7 +113,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case appeared
 		case didTapLiquidStakeUnit(forValidator: ValidatorAddress)
 		case didTapStakeClaimNFT(OnLedgerEntitiesClient.StakeClaim)
@@ -114,10 +121,10 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 		case didTapClaimAllStakes
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case selected(Selection)
 
-		public enum Selection: Sendable, Equatable {
+		enum Selection: Sendable, Equatable {
 			case unit(OnLedgerEntitiesClient.ResourceWithVaultAmount, details: OnLedgerEntitiesClient.OwnedStakeDetails)
 			case claim(OnLedgerEntity.Resource, claim: OnLedgerEntitiesClient.StakeClaim)
 		}
@@ -127,9 +134,9 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.errorQueue) var errorQueue
 
-	public init() {}
+	init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return .none
@@ -246,13 +253,17 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 
 // MARK: - OnLedgerEntitiesClient.OwnedStakeDetails + Identifiable
 extension OnLedgerEntitiesClient.OwnedStakeDetails: Identifiable {
-	public var id: ValidatorAddress {
+	var id: ValidatorAddress {
 		validator.address
 	}
 }
 
 extension OnLedgerEntitiesClient.OwnedStakeDetails {
-	var xrdRedemptionValue: Decimal192 {
-		((stakeUnitResource?.amount.nominalAmount ?? 0) * validator.xrdVaultBalance) / (stakeUnitResource?.resource.totalSupply ?? 1)
+	var xrdRedemptionValue: ResourceAmount {
+		stakeUnitResource?.amount.adjustedNominalAmount { xrdRedemptionValue(exactAmount: .init(nominalAmount: $0)).nominalAmount } ?? .exact(ExactResourceAmount.zero)
+	}
+
+	func xrdRedemptionValue(exactAmount: ExactResourceAmount) -> ExactResourceAmount {
+		.init(nominalAmount: (exactAmount.nominalAmount * validator.xrdVaultBalance) / (stakeUnitResource?.resource.totalSupply ?? 1))
 	}
 }

@@ -3,10 +3,10 @@ import SwiftUI
 
 // MARK: - AddNewGateway
 @Reducer
-public struct AddNewGateway: Sendable, FeatureReducer {
+struct AddNewGateway: Sendable, FeatureReducer {
 	@ObservableState
-	public struct State: Sendable, Hashable {
-		public enum Field: String, Sendable, Hashable {
+	struct State: Sendable, Hashable {
+		enum Field: String, Sendable, Hashable {
 			case gatewayURL
 		}
 
@@ -16,20 +16,20 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 		var addGatewayButtonState: ControlState = .disabled
 		var ffiUrl: FfiUrl?
 
-		public init() {}
+		init() {}
 	}
 
-	public typealias Action = FeatureAction<Self>
+	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case appeared
 		case addNewGatewayButtonTapped
 		case textFieldFocused(State.Field?)
 		case textFieldChanged(String)
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case focusTextField(State.Field?)
 		case gatewayValidationResult(TaskResult<Gateway?>)
 		case addGatewayResult(TaskResult<EqVoid>)
@@ -43,13 +43,13 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.isPresented) var isPresented
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return .run { send in
@@ -87,7 +87,7 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .focusTextField(focus):
 			state.focusedField = focus

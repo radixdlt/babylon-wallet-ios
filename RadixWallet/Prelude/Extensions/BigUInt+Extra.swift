@@ -3,13 +3,13 @@ extension BigUInt: @unchecked Sendable {}
 
 // MARK: - BigUInt.Error
 extension BigUInt {
-	public enum Error: Swift.Error {
+	enum Error: Swift.Error {
 		case initFromDecimalStringFailed
 	}
 }
 
 extension BigUInt {
-	public init(decimalString: String) throws {
+	init(decimalString: String) throws {
 		guard let value = Self(decimalString, radix: 10) else {
 			throw Error.initFromDecimalStringFailed
 		}
@@ -18,7 +18,7 @@ extension BigUInt {
 }
 
 extension BigUInt {
-	public var inAttos: Self {
+	var inAttos: Self {
 		self * BigUInt(2).power(18)
 	}
 }
