@@ -51,13 +51,13 @@ struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 		}
 
 		@CasePathable
-        enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case step0_introduction
 			case step1_createPersona(EditPersona.Action)
 			case step2_completion(NewPersonaCompletion.Action)
 		}
 
-        var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: \.step1_createPersona, action: \.step1_createPersona) {
 				EditPersona()
 			}

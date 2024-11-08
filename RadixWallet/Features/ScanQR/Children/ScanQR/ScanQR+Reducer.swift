@@ -49,7 +49,7 @@ struct ScanQR: Sendable, FeatureReducer {
 		Reduce(core)
 	}
 
-    func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		#if targetEnvironment(simulator)
 		case let .manualQRContentChanged(manualQRContent):
