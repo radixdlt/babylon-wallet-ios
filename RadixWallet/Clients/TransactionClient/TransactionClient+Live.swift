@@ -363,7 +363,11 @@ extension TransactionFailure {
 			.failedToPrepareTXReview(.failedToExtractTXReceiptBytes)
 
 		default:
-			.failedToPrepareTXReview(.failedToRetrieveTXReceipt("Unknown reason"))
+			if let code = commonError?.errorCode {
+				.failedToPrepareTXReview(.failedToRetrieveTXReceipt("Unknown reason, code: \(code)"))
+			} else {
+				.failedToPrepareTXReview(.failedToRetrieveTXReceipt("Unknown reason"))
+			}
 		}
 	}
 }
