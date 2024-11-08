@@ -32,8 +32,7 @@ extension TransactionFailure {
 				(errorKind: .failedToPrepareTransaction, message: error.errorDescription)
 			}
 
-		case .failedToPrepareTXReview(.failedToRetrieveTXPreview),
-		     .failedToPrepareTXReview(.failedToExtractTXReceiptBytes),
+		case .failedToPrepareTXReview(.failedToExtractTXReceiptBytes),
 		     .failedToPrepareTXReview(.failedToGenerateTXReview),
 		     .failedToPrepareTXReview(.failedToRetrieveTXReceipt),
 		     .failedToPrepareTXReview(.manifestWithReservedInstructions),
@@ -78,7 +77,6 @@ extension TransactionFailure {
 extension TransactionFailure {
 	enum FailedToPreviewTXReview: Sendable, LocalizedError, Equatable {
 		case failedSigning(FailedToPrepareForTXSigning)
-		case failedToRetrieveTXPreview(Error)
 		case failedToRetrieveTXReceipt(String)
 		case failedToExtractTXReceiptBytes
 		case failedToGenerateTXReview(Error)
@@ -89,8 +87,6 @@ extension TransactionFailure {
 			switch self {
 			case let .failedSigning(error):
 				error.errorDescription
-			case let .failedToRetrieveTXPreview(error):
-				"Failed to retrieve TX review from gateway: \(error.localizedDescription)"
 			case .failedToExtractTXReceiptBytes:
 				"Failed to extract TX review bytes"
 			case let .failedToGenerateTXReview(error):
