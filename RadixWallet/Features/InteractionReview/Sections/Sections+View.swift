@@ -8,7 +8,7 @@ extension InteractionReview.Sections.State {
 			isExpandedRedeemingFromPools: redeemingFromPools?.isExpanded == true,
 			showTransferLine: withdrawals != nil && deposits != nil,
 			showProofs: kind == .preAuthorization,
-			showPossibleDappCalls: showPossibleDappCalls,
+			showPossibleDappCalls: dAppsUsed?.showPossibleDappCalls == true,
 			stakingToValidators: stakingToValidators,
 			unstakingFromValidators: unstakingFromValidators,
 			claimingFromValidators: claimingFromValidators,
@@ -179,11 +179,14 @@ extension InteractionReview.Sections {
 						store.send(.view(.expandableItemToggled(.dAppsUsed)))
 					}
 					if isExpanded {
-						InteractionReviewDappsUsed.View(store: childStore)
-							.transition(.opacity.combined(with: .scale(scale: 0.95)))
-					}
-					if showPossibleDappCalls {
-						possibleDappCalls
+						if !childStore.rows.isEmpty {
+							InteractionReviewDappsUsed.View(store: childStore)
+								.transition(.opacity.combined(with: .scale(scale: 0.95)))
+						}
+
+						if showPossibleDappCalls {
+							possibleDappCalls
+						}
 					}
 				}
 			}

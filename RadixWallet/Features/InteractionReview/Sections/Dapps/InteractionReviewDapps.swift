@@ -14,11 +14,18 @@ struct InteractionReviewDapps<AddressType: AddressProtocol>: Sendable, FeatureRe
 		var unknownDapps: IdentifiedArrayOf<AddressType>
 		var isExpanded: Bool = true
 		let unknownTitle: String
+		let showPossibleDappCalls: Bool
 
-		init(knownDapps: IdentifiedArrayOf<InteractionReview.DappEntity>, unknownDapps: IdentifiedArrayOf<AddressType>, unknownTitle: (Int) -> String) {
+		init(
+			knownDapps: IdentifiedArrayOf<InteractionReview.DappEntity>,
+			unknownDapps: IdentifiedArrayOf<AddressType>,
+			unknownTitle: (Int) -> String,
+			showPossibleDappCalls: Bool
+		) {
 			self.knownDapps = knownDapps
 			self.unknownDapps = unknownDapps
 			self.unknownTitle = unknownTitle(unknownDapps.count)
+			self.showPossibleDappCalls = showPossibleDappCalls
 		}
 	}
 

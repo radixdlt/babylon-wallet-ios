@@ -135,24 +135,25 @@ private extension ResourceBalance.ViewState.PoolUnit {
 struct ResourceBalanceView: View {
 	let viewState: ResourceBalance.ViewState
 	let appearance: Appearance
+	let hasBorder: Bool
 	let isSelected: Bool?
 	let action: (() -> Void)?
 
 	enum Appearance: Sendable, Equatable {
 		case standard
-		case compact(border: Bool)
-
-		static let compact: Appearance = .compact(border: false)
+		case compact
 	}
 
 	init(
 		_ viewState: ResourceBalance.ViewState,
 		appearance: Appearance = .standard,
+		hasBorder: Bool = false,
 		isSelected: Bool? = nil,
 		action: (() -> Void)? = nil
 	) {
 		self.viewState = viewState
 		self.appearance = appearance
+		self.hasBorder = hasBorder
 		self.isSelected = isSelected
 		self.action = action
 	}
@@ -164,7 +165,7 @@ struct ResourceBalanceView: View {
 
 	@ViewBuilder
 	private var content: some View {
-		if border {
+		if hasBorder {
 			core
 				.padding(.small1)
 				.roundedCorners(strokeColor: .app.gray3)
@@ -198,10 +199,6 @@ struct ResourceBalanceView: View {
 
 	var compact: Bool {
 		appearance != .standard
-	}
-
-	var border: Bool {
-		appearance == .compact(border: true)
 	}
 
 	/// Delegate showing the selection state to the particular resource view
@@ -277,7 +274,11 @@ extension ResourceBalanceView {
 							.textStyle(.body2HighImportance)
 							.foregroundColor(.app.gray2)
 
-						ResourceBalanceView(.fungible(fungible), appearance: .compact(border: true))
+						ResourceBalanceView(
+							.fungible(fungible),
+							appearance: .compact,
+							hasBorder: true
+						)
 					}
 					.padding(.top, .small2)
 				}
@@ -312,7 +313,7 @@ extension ResourceBalanceView {
 						.padding(.bottom, .small3)
 
 					loadable(viewState.resources) { fungibles in
-						ResourceBalancesView(fungibles: fungibles)
+						ResourceBalancesView(fungibles: fungibles, appearance: .compact)
 							.environment(\.missingFungibleAmountFallback, L10n.Account.PoolUnits.noTotalSupply)
 					}
 				}
@@ -604,7 +605,7 @@ extension ResourceBalanceView {
 		}
 
 		private var size: HitTargetSize {
-			compact ? .smallest : .smallish
+			compact ? .smallest : .small
 		}
 
 		private var titleTextStyle: TextStyle {

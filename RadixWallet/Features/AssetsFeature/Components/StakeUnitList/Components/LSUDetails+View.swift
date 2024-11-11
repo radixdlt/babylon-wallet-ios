@@ -62,8 +62,12 @@ extension LSUDetails {
 						ValidatorHeaderView(viewState: store.validatorNameViewState)
 							.padding(.horizontal, .large2)
 
-						ResourceBalanceView(.fungible(store.redeemableTokenAmount), appearance: .compact(border: true))
-							.padding(.horizontal, .large2)
+						ResourceBalanceView(
+							.fungible(store.redeemableTokenAmount),
+							appearance: .standard,
+							hasBorder: true
+						)
+						.padding(.horizontal, .large2)
 
 						AssetResourceDetailsSection(viewState: store.resourceDetails)
 					}
