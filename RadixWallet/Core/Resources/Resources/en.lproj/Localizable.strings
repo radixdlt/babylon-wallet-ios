@@ -428,6 +428,8 @@
 "transactionReview_submitTransaction_txID" = "Transaction ID";
 "transactionReview_nonConformingManifestWarning_title" = "Warning";
 "transactionReview_nonConformingManifestWarning_message" = "This is a complex transaction that cannot be summarized - the raw transaction manifest will be shown. Do not submit unless you understand the contents.";
+"transactionReview_networkFee_congestedText" = "The network is currently congested. Add a tip to speed up your transfer.";
+"transactionReview_unacceptableManifest_rejected" = "A proposed transaction was rejected because it contains one or more reserved instructions.";
 "transactionStatus_completing_text" = "Completing Transaction…";
 "transactionStatus_transactionID_text" = "Transaction ID: ";
 "transactionStatus_success_title" = "Transaction Success";
