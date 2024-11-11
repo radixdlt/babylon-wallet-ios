@@ -68,7 +68,7 @@ extension PreAuthorizationReview {
 					.foregroundColor(.app.gray1)
 
 				if let dAppName {
-					Text(L10n.PreAuthorizationReview.subtitle(dAppName))
+					Text(L10n.InteractionReview.subtitle(dAppName))
 						.textStyle(.body2Regular)
 						.foregroundColor(.app.gray2)
 				}

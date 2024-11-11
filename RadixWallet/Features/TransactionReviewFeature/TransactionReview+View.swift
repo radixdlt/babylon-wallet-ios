@@ -98,7 +98,7 @@ extension TransactionReview {
 										.foregroundColor(.app.gray1)
 
 									if let name = viewStore.proposingDappMetadata?.name {
-										Text(L10n.TransactionReview.proposingDappSubtitle(name.rawValue))
+										Text(L10n.InteractionReview.subtitle(name.rawValue))
 											.textStyle(.body2Regular)
 											.foregroundColor(.app.gray2)
 									}
