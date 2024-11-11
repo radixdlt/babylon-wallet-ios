@@ -139,7 +139,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 			switch state.expiration {
 			case let .atTime(value):
 				// Trigger expiration countdown effect
-				let expirationDate = value.unixTimestampSeconds
+				let expirationDate = value.date
 				state.secondsToExpiration = Int(expirationDate.timeIntervalSinceNow)
 				effects.append(startTimer(expirationDate: expirationDate))
 			case .afterDelay:
@@ -269,7 +269,7 @@ extension PreAuthorizationReview.State {
 	var isExpired: Bool {
 		switch expiration {
 		case let .atTime(value):
-			value.unixTimestampSeconds <= Date.now
+			value.date <= Date.now
 		case .afterDelay:
 			false
 		}

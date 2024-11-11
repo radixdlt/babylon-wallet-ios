@@ -85,9 +85,15 @@ extension DappInteractionClient {
 			case dAppValidationError(String)
 			case badContent(BadContent)
 			case invalidPersonaOrAccounts
+			case invalidPreAuthorization(InvalidPreAuthorization)
 
 			enum BadContent: Sendable, Hashable {
 				case numberOfAccountsInvalid
+			}
+
+			enum InvalidPreAuthorization: Sendable, Hashable {
+				case expirationTooClose
+				case expired
 			}
 		}
 	}
