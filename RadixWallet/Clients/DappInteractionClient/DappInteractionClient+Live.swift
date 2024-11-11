@@ -123,6 +123,16 @@ extension DappInteractionClient {
 				return invalidRequest(.invalidPersonaOrAccounts)
 			}
 
+		case let .preAuthorization(preAuthorization):
+			switch preAuthorization.request.expiration.getStatus() {
+			case .valid:
+				break
+			case .expirationTooClose:
+				return invalidRequest(.invalidPreAuthorization(.expirationTooClose))
+			case .expired:
+				return invalidRequest(.invalidPreAuthorization(.expired))
+			}
+
 		default:
 			break
 		}

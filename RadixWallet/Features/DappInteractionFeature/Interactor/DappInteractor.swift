@@ -382,6 +382,10 @@ extension DappInteractionClient.ValidatedDappRequest.InvalidRequestReason {
 			.invalidRequest
 		case .invalidPersonaOrAccounts:
 			.invalidPersonaOrAccounts
+		case .invalidPreAuthorization(.expirationTooClose):
+			.subintentExpirationTooClose
+		case .invalidPreAuthorization(.expired):
+			.expiredSubintent
 		}
 	}
 
@@ -406,10 +410,8 @@ extension DappInteractionClient.ValidatedDappRequest.InvalidRequestReason {
 			L10n.DAppRequest.ValidationOutcome.subtitleIncompatibleVersion
 		case .wrongNetworkID:
 			L10n.DAppRequest.ValidationOutcome.subtitleWrongNetworkID
-		case .invalidOrigin, .invalidDappDefinitionAddress, .dAppValidationError:
+		case .invalidOrigin, .invalidDappDefinitionAddress, .dAppValidationError, .invalidPersonaOrAccounts, .invalidPreAuthorization:
 			shortExplanation
-		case .invalidPersonaOrAccounts:
-			L10n.DAppRequest.ValidationOutcome.invalidPersonaOrAccoubts
 		}
 	}
 
@@ -436,7 +438,7 @@ extension DappInteractionClient.ValidatedDappRequest.InvalidRequestReason {
 			L10n.DAppRequest.ValidationOutcome.devExplanationInvalidDappDefinitionAddress(invalidAddress)
 		case let .dAppValidationError(underlyingError):
 			"\(L10n.DAppRequest.ValidationOutcome.invalidRequestMessage): \(underlyingError)"
-		case .wrongNetworkID, .invalidPersonaOrAccounts:
+		case .wrongNetworkID, .invalidPersonaOrAccounts, .invalidPreAuthorization:
 			shortExplanation
 		}
 	}
@@ -461,6 +463,10 @@ extension DappInteractionClient.ValidatedDappRequest.InvalidRequestReason {
 			L10n.DAppRequest.RequestWrongNetworkAlert.message(networkName(for: ce), networkName(for: wallet))
 		case .invalidPersonaOrAccounts:
 			L10n.DAppRequest.ValidationOutcome.invalidPersonaOrAccoubts
+		case .invalidPreAuthorization(.expirationTooClose):
+			L10n.DAppRequest.ValidationOutcome.preAuthorizationExpirationTooClose
+		case .invalidPreAuthorization(.expired):
+			L10n.DAppRequest.ValidationOutcome.preAuthorizationExpired
 		}
 	}
 
