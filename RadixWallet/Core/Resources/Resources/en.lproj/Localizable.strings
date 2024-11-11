@@ -390,6 +390,8 @@
 "dAppRequest_validationOutcome_invalidRequestTitle" = "Invalid Request.";
 "dAppRequest_validationOutcome_invalidRequestMessage" = "Could not validate the dApp.";
 "dAppRequest_validationOutcome_invalidPersonaOrAccoubts" = "dApp specified an invalid Persona or Account";
+"dAppRequest_validationOutcome_preAuthorizationExpirationTooClose" = "Pre-authorization request was rejected because you weren\'t given enough time to review it.";
+"dAppRequest_validationOutcome_preAuthorizationExpired" = "Pre-authorization request was rejected because it has already expired.";
 "dAppRequest_requestMalformedAlert_message" = "Request received from dApp is invalid.";
 "dAppRequest_requestPersonaNotFoundAlert_message" = "dApp specified an invalid Persona.";
 "dAppRequest_requestWrongNetworkAlert_message" = "dApp made a request intended for network %@, but you are currently connected to %@.";
@@ -1247,6 +1249,8 @@ Code: %@";
 "homePageCarousel_continueOnDapp_text" = "You can now connect with your Radix Wallet. Tap to dismiss.";
 "homePageCarousel_useDappsOnDesktop_title" = "Use dApps on Desktop";
 "homePageCarousel_useDappsOnDesktop_text" = "Connect to dApps on the big screen with Radix Connector.";
+"homePageCarousel_discoverRadixDapps_title" = "Discover Radix dApps";
+"homePageCarousel_discoverRadixDapps_text" = "Start digging into Web3 dApps on the Radix Ecosystem directory.";
 "scanQR_connectorExtension_instructions" = "Scan the QR code in the Radix Connector browser extension.";
 "scanQR_connectorExtension_disclosureTitle" = "Don\'t have the Radix Connector browser extension?";
 "scanQR_connectorExtension_disclosureItem1" = "Go to **wallet.radixdlt.com** in your desktop browser.";

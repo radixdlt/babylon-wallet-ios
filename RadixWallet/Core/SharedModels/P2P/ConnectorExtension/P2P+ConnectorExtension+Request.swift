@@ -43,6 +43,7 @@ extension P2P.ConnectorExtension.Request {
 			case getDeviceInfo
 			case derivePublicKeys(DerivePublicKeys)
 			case signTransaction(SignTransaction)
+			case signSubintentHash(SignSubintentHash)
 			case signChallenge(SignAuthChallenge)
 			case deriveAndDisplayAddress(DeriveAndDisplayAddress)
 
@@ -51,6 +52,7 @@ extension P2P.ConnectorExtension.Request {
 				case .derivePublicKeys: .derivePublicKeys
 				case .getDeviceInfo: .getDeviceInfo
 				case .signTransaction: .signTransaction
+				case .signSubintentHash: .signSubintentHash
 				case .signChallenge: .signChallenge
 				case .deriveAndDisplayAddress: .deriveAndDisplayAddress
 				}
@@ -74,20 +76,13 @@ extension P2P.ConnectorExtension.Request {
 				let ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
 				let compiledTransactionIntent: HexCodable
 				let displayHash: Bool
-				let mode: String
+				let mode: String = "summary"
+			}
 
-				init(
-					signers: [P2P.LedgerHardwareWallet.KeyParameters],
-					ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice,
-					compiledTransactionIntent: HexCodable,
-					displayHash: Bool
-				) {
-					self.signers = signers
-					self.ledgerDevice = ledgerDevice
-					self.compiledTransactionIntent = compiledTransactionIntent
-					self.mode = "summary"
-					self.displayHash = displayHash
-				}
+			struct SignSubintentHash: Sendable, Hashable, Encodable {
+				let signers: [P2P.LedgerHardwareWallet.KeyParameters]
+				let ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
+				let subintentHash: HexCodable
 			}
 
 			struct SignAuthChallenge: Sendable, Hashable, Encodable {
@@ -96,20 +91,6 @@ extension P2P.ConnectorExtension.Request {
 				let challenge: DappToWalletInteractionAuthChallengeNonce
 				let origin: DappOrigin
 				let dAppDefinitionAddress: AccountAddress
-
-				init(
-					signers: [P2P.LedgerHardwareWallet.KeyParameters],
-					ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice,
-					challenge: DappToWalletInteractionAuthChallengeNonce,
-					origin: DappOrigin,
-					dAppDefinitionAddress: AccountAddress
-				) {
-					self.signers = signers
-					self.ledgerDevice = ledgerDevice
-					self.challenge = challenge
-					self.origin = origin
-					self.dAppDefinitionAddress = dAppDefinitionAddress
-				}
 			}
 
 			struct DeriveAndDisplayAddress: Sendable, Hashable, Encodable {
@@ -138,6 +119,8 @@ extension P2P.ConnectorExtension.Request {
 			case let .derivePublicKeys(request):
 				try request.encode(to: encoder)
 			case let .signTransaction(request):
+				try request.encode(to: encoder)
+			case let .signSubintentHash(request):
 				try request.encode(to: encoder)
 			case let .signChallenge(request):
 				try request.encode(to: encoder)

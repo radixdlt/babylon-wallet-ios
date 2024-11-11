@@ -12,7 +12,7 @@ extension ClaimWallet {
 		}
 
 		var body: some SwiftUI.View {
-			WithViewStore(store, observe: { $0 }) { viewStore in
+			WithPerceptionTracking {
 				VStack(spacing: 0) {
 					Spacer()
 
@@ -52,7 +52,7 @@ extension ClaimWallet {
 				}
 				.padding(.horizontal, .large1)
 				.padding(.vertical, .medium3)
-				.controlState(viewStore.screenState)
+				.controlState(store.screenState)
 			}
 		}
 	}

@@ -373,7 +373,7 @@ func signingFactors(
 			let factorInstance = switch signingPurpose {
 			case .signAuth:
 				unsecuredEntityControl.authenticationSigning ?? unsecuredEntityControl.transactionSigning
-			case .signTransaction:
+			case .signTransaction, .signPreAuthorization:
 				unsecuredEntityControl.transactionSigning
 			}
 
