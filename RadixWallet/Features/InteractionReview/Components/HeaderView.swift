@@ -33,18 +33,13 @@ extension InteractionReview {
 			case .transaction:
 				L10n.TransactionReview.title
 			case .preAuthorization:
-				"Review Your Pre-Authorization"
+				L10n.PreAuthorizationReview.title
 			}
 		}
 
 		private var subtitle: String? {
 			guard let name else { return nil }
-			switch kind {
-			case .transaction:
-				return L10n.TransactionReview.proposingDappSubtitle(name)
-			case .preAuthorization:
-				return L10n.PreAuthorizationReview.subtitle(name)
-			}
+			return L10n.InteractionReview.subtitle(name)
 		}
 
 		private var showBottom: Bool {
