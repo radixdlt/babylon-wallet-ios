@@ -125,7 +125,7 @@ struct CarouselCardView: View {
 		case .connector:
 			L10n.HomePageCarousel.UseDappsOnDesktop.title
 		case .discoverRadixDapps:
-			"Discover Radix dApps"
+			L10n.HomePageCarousel.DiscoverRadixDapps.title
 		}
 	}
 
@@ -140,7 +140,7 @@ struct CarouselCardView: View {
 		case .connector:
 			L10n.HomePageCarousel.UseDappsOnDesktop.text
 		case .discoverRadixDapps:
-			"Start digging into Web3 dApps on the Radix Ecosystem directory."
+			L10n.HomePageCarousel.DiscoverRadixDapps.text
 		}
 	}
 
