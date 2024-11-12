@@ -20,12 +20,14 @@ struct ConfirmationView: View {
 	var content: some View {
 		VStack(spacing: .zero) {
 			VStack(spacing: .medium2) {
-				Image(systemName: "eye.fill")
-					.renderingMode(.template)
-					.resizable()
-					.scaledToFit()
-					.frame(.small)
-					.foregroundColor(.app.gray3)
+				if kind != .deleteAccount {
+					Image(systemName: "eye.fill")
+						.renderingMode(.template)
+						.resizable()
+						.scaledToFit()
+						.frame(.small)
+						.foregroundColor(.app.gray3)
+				}
 
 				Text(title)
 					.textStyle(.sheetTitle)
@@ -62,6 +64,7 @@ extension ConfirmationView {
 		case hideAccount
 		case hideAsset
 		case hideCollection(name: String)
+		case deleteAccount
 	}
 
 	enum Action: Sendable {
@@ -76,6 +79,7 @@ extension ConfirmationView {
 		case .hideAccount: L10n.Confirmation.HideAccount.title
 		case .hideAsset: L10n.Confirmation.HideAsset.title
 		case .hideCollection: L10n.Confirmation.HideCollection.title
+		case .deleteAccount: "Delete This Account?"
 		}
 	}
 
@@ -84,6 +88,7 @@ extension ConfirmationView {
 		case .hideAccount: L10n.Confirmation.HideAccount.message
 		case .hideAsset: L10n.Confirmation.HideAsset.message
 		case let .hideCollection(name): L10n.Confirmation.HideCollection.message(name)
+		case .deleteAccount: "You’re about to permanently delete this Account. Once this is done, you will not be able to recover access."
 		}
 	}
 
@@ -92,6 +97,7 @@ extension ConfirmationView {
 		case .hideAccount: L10n.Confirmation.HideAccount.button
 		case .hideAsset: L10n.Confirmation.HideAsset.button
 		case .hideCollection: L10n.Confirmation.HideCollection.button
+		case .deleteAccount: "Continue"
 		}
 	}
 }

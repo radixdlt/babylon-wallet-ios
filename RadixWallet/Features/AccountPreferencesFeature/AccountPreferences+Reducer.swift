@@ -27,6 +27,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 		case task
 		case rowTapped(AccountPreferences.Section.SectionRow)
 		case hideAccountTapped
+		case deleteAccountTapped
 		case faucetButtonTapped
 	}
 
@@ -50,6 +51,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 			case thirdPartyDeposits(ManageThirdPartyDeposits.State)
 			case devPreferences(DevAccountPreferences.State)
 			case hideAccount
+			case deleteAccount
 		}
 
 		@CasePathable
@@ -58,6 +60,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 			case thirdPartyDeposits(ManageThirdPartyDeposits.Action)
 			case devPreferences(DevAccountPreferences.Action)
 			case hideAccount(ConfirmationAction)
+			case deleteAccount(ConfirmationAction)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -108,6 +111,10 @@ struct AccountPreferences: Sendable, FeatureReducer {
 
 		case .hideAccountTapped:
 			state.destination = .hideAccount
+			return .none
+
+		case .deleteAccountTapped:
+			state.destination = .deleteAccount
 			return .none
 
 		case .faucetButtonTapped:
@@ -164,7 +171,10 @@ struct AccountPreferences: Sendable, FeatureReducer {
 		case .hideAccount(.confirm):
 			state.destination = nil
 			return hideAccountEffect(state: state)
-		case .hideAccount(.cancel):
+		case .deleteAccount(.confirm):
+			state.destination = nil
+			return deleteAccountEffect(state: state)
+		case .hideAccount(.cancel), .deleteAccount(.cancel):
 			state.destination = nil
 			return .none
 		default:
@@ -177,6 +187,14 @@ struct AccountPreferences: Sendable, FeatureReducer {
 			try await entitiesVisibilityClient.hideAccount(account.id)
 			overlayWindowClient.scheduleHUD(.accountHidden)
 			await send(.delegate(.accountHidden))
+		} catch: { error, _ in
+			errorQueue.schedule(error)
+		}
+	}
+
+	private func deleteAccountEffect(state: State) -> Effect<Action> {
+		.run { [account = state.account] _ in
+			// TODO: choose receiver account
 		} catch: { error, _ in
 			errorQueue.schedule(error)
 		}
@@ -224,6 +242,7 @@ extension AccountPreferences {
 
 extension OverlayWindowClient.Item.HUD {
 	static let accountHidden = Self(text: L10n.AccountSettings.accountHidden)
+	static let accountDeleted = Self(text: "Account Deleted")
 }
 
 extension AccountPreferences {
