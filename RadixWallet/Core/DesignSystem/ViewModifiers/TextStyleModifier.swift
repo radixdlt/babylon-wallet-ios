@@ -1,7 +1,7 @@
 import SwiftUI
 
 // MARK: - TextStyle
-public enum TextStyle {
+enum TextStyle {
 	case enlarged
 	case sheetTitle
 	case sectionHeader
@@ -17,6 +17,7 @@ public enum TextStyle {
 	case body2Regular
 	case body2Link
 	case body3HighImportance
+	case body3Regular
 	case button
 	case monospace
 }
@@ -39,6 +40,7 @@ extension TextStyle {
 		case .body2Regular: .app.body2Regular
 		case .body2Link: .app.body2Link
 		case .body3HighImportance: .app.body3HighImportance
+		case .body3Regular: .app.body3Regular
 		case .button: .app.button
 		case .monospace: .app.monospace
 		}
@@ -54,14 +56,14 @@ extension TextStyle {
 		     .body1HighImportance, .body1Regular, .body1StandaloneLink, .body1Link:
 			23 / 4
 		case .body2Header, .body2HighImportance, .body2Regular,
-		     .body2Link, .body3HighImportance, .button, .monospace:
+		     .body2Link, .body3HighImportance, .body3Regular, .button, .monospace:
 			18 / 4
 		}
 	}
 }
 
 extension View {
-	public func textStyle(_ style: TextStyle) -> some View {
+	func textStyle(_ style: TextStyle) -> some View {
 		font(style.font)
 			.lineSpacing(style.lineSpacing)
 	}
@@ -69,45 +71,45 @@ extension View {
 
 extension Text {
 	/// Text formatted as a section heading
-	public var sectionHeading: some View {
+	var sectionHeading: some View {
 		textStyle(.body1Header)
 			.foregroundColor(.app.gray2)
 	}
 
 	/// Text formatted as an info item
-	public var infoItem: some View {
+	var infoItem: some View {
 		textStyle(.body1HighImportance)
 			.foregroundColor(.app.gray1)
 	}
 
 	/// An informative block of text
-	public var textBlock: some View {
+	var textBlock: some View {
 		textStyle(.body1HighImportance)
 			.foregroundColor(.app.gray2)
 	}
 
 	/// A url
-	public var urlLink: some View {
+	var urlLink: some View {
 		textStyle(.body1HighImportance)
 			.foregroundColor(.app.blue2)
 	}
 }
 
 extension View {
-	public var flushedLeft: some View {
+	var flushedLeft: some View {
 		flushedLeft(padding: 0)
 	}
 
-	public func flushedLeft(padding: CGFloat) -> some View {
+	func flushedLeft(padding: CGFloat) -> some View {
 		frame(maxWidth: .infinity, alignment: .leading)
 			.padding(.leading, padding)
 	}
 
-	public var flushedRight: some View {
+	var flushedRight: some View {
 		frame(maxWidth: .infinity, alignment: .trailing)
 	}
 
-	public var centered: some View {
+	var centered: some View {
 		frame(maxWidth: .infinity, alignment: .center)
 	}
 }

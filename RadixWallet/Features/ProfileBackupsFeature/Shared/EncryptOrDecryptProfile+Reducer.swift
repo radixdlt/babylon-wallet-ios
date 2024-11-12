@@ -1,13 +1,13 @@
 import ComposableArchitecture
 import SwiftUI
 
-public typealias EncryptionPassword = String
-public typealias EncryptedProfileJSONData = Data
+typealias EncryptionPassword = String
+typealias EncryptedProfileJSONData = Data
 
 // MARK: - EncryptOrDecryptProfile
-public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public enum Mode: Sendable, Hashable {
+struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		enum Mode: Sendable, Hashable {
 			case decrypt(EncryptedProfileJSONData)
 
 			case loadThenEncrypt
@@ -24,7 +24,7 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 			}
 		}
 
-		public enum Field: String, Sendable, Hashable {
+		enum Field: String, Sendable, Hashable {
 			case encryptionPassword
 			case confirmPassword
 		}
@@ -37,19 +37,19 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 		}
 
 		@PresentationState
-		public var destination: Destination.State? = nil
+		var destination: Destination.State? = nil
 
-		public var mode: Mode
+		var mode: Mode
 		var focusedField: Field?
 		var enteredEncryptionPassword: String = ""
 		var confirmedEncryptionPassword: String = ""
 
-		public init(mode: Mode) {
+		init(mode: Mode) {
 			self.mode = mode
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case appeared
 		case closeButtonTapped
 		case textFieldFocused(State.Field?)
@@ -58,7 +58,7 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 		case confirmedEncryptionPassword
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case focusTextField(State.Field?)
 
 		case loadProfileSnapshotToEncryptResult(
@@ -66,7 +66,7 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 		)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case dismiss
 		case successfullyDecrypted(encrypted: EncryptedProfileJSONData, decrypted: Profile, containsP2PLinks: Bool)
 		case successfullyEncrypted(plaintext: Profile, encrypted: EncryptedProfileJSONData)
@@ -74,20 +74,20 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 
 	// MARK: - Destination
 
-	public struct Destination: DestinationReducer {
-		public enum State: Hashable, Sendable {
+	struct Destination: DestinationReducer {
+		enum State: Hashable, Sendable {
 			case incorrectPasswordAlert(AlertState<Action.IncorrectPasswordAlert>)
 		}
 
-		public enum Action: Equatable, Sendable {
+		enum Action: Equatable, Sendable {
 			case incorrectPasswordAlert(IncorrectPasswordAlert)
 
-			public enum IncorrectPasswordAlert: Sendable, Hashable {
+			enum IncorrectPasswordAlert: Sendable, Hashable {
 				case okTapped
 			}
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			EmptyReducer()
 		}
 	}
@@ -96,7 +96,7 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.transportProfileClient) var transportProfileClient
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -105,7 +105,7 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return .run { [mode = state.mode] send in
@@ -178,7 +178,7 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .focusTextField(focus):
 			state.focusedField = focus
@@ -198,7 +198,7 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .incorrectPasswordAlert(.okTapped):
 			state.destination = nil

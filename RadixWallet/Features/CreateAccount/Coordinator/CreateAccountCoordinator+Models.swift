@@ -2,10 +2,10 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - CreateAccountConfig
-public struct CreateAccountConfig: Sendable, Hashable {
-	public let specificNetworkID: NetworkID?
-	public let isFirstAccount: Bool
-	public let navigationButtonCTA: CreateAccountNavigationButtonCTA
+struct CreateAccountConfig: Sendable, Hashable {
+	let specificNetworkID: NetworkID?
+	let isFirstAccount: Bool
+	let navigationButtonCTA: CreateAccountNavigationButtonCTA
 
 	fileprivate init(
 		isFirstAccount: Bool,
@@ -19,14 +19,14 @@ public struct CreateAccountConfig: Sendable, Hashable {
 }
 
 // MARK: - CreateAccountNavigationButtonCTA
-public enum CreateAccountNavigationButtonCTA: Sendable, Equatable {
+enum CreateAccountNavigationButtonCTA: Sendable, Equatable {
 	case goHome
 	case goBackToChooseAccounts
 	case goBackToGateways
 }
 
 extension CreateAccountConfig {
-	public init(purpose: CreateAccountPurpose) {
+	init(purpose: CreateAccountPurpose) {
 		switch purpose {
 		case .firstAccountForNewProfile:
 			self.init(
@@ -54,7 +54,7 @@ extension CreateAccountConfig {
 }
 
 // MARK: - CreateAccountPurpose
-public enum CreateAccountPurpose {
+enum CreateAccountPurpose {
 	case firstAccountForNewProfile
 	case firstAccountOnNewNetwork(NetworkID)
 	case newAccountDuringDappInteraction

@@ -1,8 +1,8 @@
 // MARK: - P2PLinksClient + DependencyKey
 extension P2PLinksClient: DependencyKey {
-	public typealias Value = P2PLinksClient
+	typealias Value = P2PLinksClient
 
-	public static func live(
+	static func live(
 		profileStore: ProfileStore = .shared
 	) -> Self {
 		@Dependency(\.secureStorageClient) var secureStorageClient
@@ -44,7 +44,7 @@ extension P2PLinksClient: DependencyKey {
 		)
 	}
 
-	public static let liveValue: Self = .live()
+	static let liveValue: Self = .live()
 }
 
 private extension SecureStorageClient {

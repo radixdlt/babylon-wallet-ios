@@ -2,9 +2,9 @@
 #if DEBUG
 
 extension RadixConnectClient: TestDependencyKey {
-	public static let previewValue = Self.noop
+	static let previewValue = Self.noop
 
-	public static let testValue = Self(
+	static let testValue = Self(
 		loadP2PLinksAndConnectAll: unimplemented("\(Self.self).loadFromProfileAndConnectAll"),
 		disconnectAll: unimplemented("\(Self.self).disconnectAll"),
 		connectToP2PLinks: unimplemented("\(Self.self).connectToP2PLinks"),

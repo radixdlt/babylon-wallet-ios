@@ -1,79 +1,63 @@
 import Sargon
 
 // MARK: - LedgerHardwareWalletClient
-public struct LedgerHardwareWalletClient: Sendable {
-	public var isConnectedToAnyConnectorExtension: IsConnectedToAnyConnectorExtension
-	public var getDeviceInfo: GetDeviceInfo
-	public var derivePublicKeys: DerivePublicKeys
-	public var signTransaction: SignTransaction
-	public var signAuthChallenge: SignAuthChallenge
-	public var deriveAndDisplayAddress: DeriveAndDisplayAddress
+struct LedgerHardwareWalletClient: Sendable {
+	var isConnectedToAnyConnectorExtension: IsConnectedToAnyConnectorExtension
+	var getDeviceInfo: GetDeviceInfo
+	var derivePublicKeys: DerivePublicKeys
+	var signTransaction: SignTransaction
+	var signPreAuthorization: SignPreAuthorization
+	var signAuthChallenge: SignAuthChallenge
+	var deriveAndDisplayAddress: DeriveAndDisplayAddress
 }
 
 extension LedgerHardwareWalletClient {
-	public typealias IsConnectedToAnyConnectorExtension = @Sendable () async -> AnyAsyncSequence<Bool>
-	public typealias GetDeviceInfo = @Sendable () async throws -> P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo
-	public typealias DerivePublicKeys = @Sendable ([P2P.LedgerHardwareWallet.KeyParameters], LedgerHardwareWalletFactorSource) async throws -> [HierarchicalDeterministicPublicKey]
+	typealias IsConnectedToAnyConnectorExtension = @Sendable () async -> AnyAsyncSequence<Bool>
+	typealias GetDeviceInfo = @Sendable () async throws -> P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo
+	typealias DerivePublicKeys = @Sendable ([P2P.LedgerHardwareWallet.KeyParameters], LedgerHardwareWalletFactorSource) async throws -> [HierarchicalDeterministicPublicKey]
 
-	public typealias DeriveAndDisplayAddress = @Sendable (P2P.LedgerHardwareWallet.KeyParameters, LedgerHardwareWalletFactorSource) async throws -> (HierarchicalDeterministicPublicKey, String)
+	typealias DeriveAndDisplayAddress = @Sendable (P2P.LedgerHardwareWallet.KeyParameters, LedgerHardwareWalletFactorSource) async throws -> (HierarchicalDeterministicPublicKey, String)
 
-	public typealias SignTransaction = @Sendable (SignTransactionWithLedgerRequest) async throws -> Set<SignatureOfEntity>
-	public typealias SignAuthChallenge = @Sendable (SignAuthChallengeWithLedgerRequest) async throws -> Set<SignatureOfEntity>
+	typealias SignTransaction = @Sendable (SignTransactionWithLedgerRequest) async throws -> Set<SignatureOfEntity>
+	typealias SignPreAuthorization = @Sendable (SignPreAuthorizationWithLedgerRequest) async throws -> Set<SignatureOfEntity>
+	typealias SignAuthChallenge = @Sendable (SignAuthChallengeWithLedgerRequest) async throws -> Set<SignatureOfEntity>
 }
 
 // MARK: - VerifyAddressOutcome
-public enum VerifyAddressOutcome: Sendable, Hashable {
-	public enum Mismatch: Sendable, Hashable {
+enum VerifyAddressOutcome: Sendable, Hashable {
+	enum Mismatch: Sendable, Hashable {
 		case publicKeyMismatch
 		case addressMismatch
 	}
 
-	/// Either addresses do not match, or public key do not match.
+	/// Either addresses do not match, or key do not match.
 	case mismatch(Mismatch)
 	case verifiedSame
 }
 
 // MARK: - SignTransactionWithLedgerRequest
-public struct SignTransactionWithLedgerRequest: Sendable, Hashable {
-	public let signers: NonEmpty<IdentifiedArrayOf<Signer>>
-	public let ledger: LedgerHardwareWalletFactorSource
-	public let transactionIntent: TransactionIntent
-	public let displayHashOnLedgerDisplay: Bool
+struct SignTransactionWithLedgerRequest: Sendable, Hashable {
+	let ledger: LedgerHardwareWalletFactorSource
+	let signers: NonEmpty<IdentifiedArrayOf<Signer>>
+	let transactionIntent: TransactionIntent
+	let displayHashOnLedgerDisplay: Bool
+}
 
-	public init(
-		ledger: LedgerHardwareWalletFactorSource,
-		signers: NonEmpty<IdentifiedArrayOf<Signer>>,
-		transactionIntent: TransactionIntent,
-		displayHashOnLedgerDisplay: Bool
-	) {
-		self.signers = signers
-		self.ledger = ledger
-		self.transactionIntent = transactionIntent
-		self.displayHashOnLedgerDisplay = displayHashOnLedgerDisplay
-	}
+// MARK: - SignPreAuthorizationWithLedgerRequest
+struct SignPreAuthorizationWithLedgerRequest: Sendable, Hashable {
+	let ledger: LedgerHardwareWalletFactorSource
+	let signers: NonEmpty<IdentifiedArrayOf<Signer>>
+	let subintent: Subintent
+	let displayHashOnLedgerDisplay: Bool
 }
 
 // MARK: - SignAuthChallengeWithLedgerRequest
-public struct SignAuthChallengeWithLedgerRequest: Sendable, Hashable {
-	public let signers: NonEmpty<IdentifiedArrayOf<Signer>>
-	public let ledger: LedgerHardwareWalletFactorSource
-	public let challenge: DappToWalletInteractionAuthChallengeNonce
-	public let origin: DappOrigin
-	public let dAppDefinitionAddress: AccountAddress
-
-	public init(
-		ledger: LedgerHardwareWalletFactorSource,
-		signers: NonEmpty<IdentifiedArrayOf<Signer>>,
-		challenge: DappToWalletInteractionAuthChallengeNonce,
-		origin: DappOrigin,
-		dAppDefinitionAddress: AccountAddress
-	) {
-		self.ledger = ledger
-		self.signers = signers
-		self.challenge = challenge
-		self.origin = origin
-		self.dAppDefinitionAddress = dAppDefinitionAddress
-	}
+struct SignAuthChallengeWithLedgerRequest: Sendable, Hashable {
+	let ledger: LedgerHardwareWalletFactorSource
+	let signers: NonEmpty<IdentifiedArrayOf<Signer>>
+	let challenge: DappToWalletInteractionAuthChallengeNonce
+	let origin: DappOrigin
+	let dAppDefinitionAddress: AccountAddress
 }
 
 // MARK: - FailedToFindLedger
@@ -89,7 +73,7 @@ struct FailedToFindLedger: LocalizedError {
 }
 
 extension LedgerHardwareWalletClient {
-	public func verifyAddress(of accountAddress: AccountAddress) {
+	func verifyAddress(of accountAddress: AccountAddress) {
 		@Dependency(\.accountsClient) var accountsClient
 		@Dependency(\.overlayWindowClient) var overlayWindowClient
 		Task {
@@ -138,7 +122,7 @@ extension LedgerHardwareWalletClient {
 	}
 
 	@discardableResult
-	public func verifyAddress(of account: Account) async throws -> VerifyAddressOutcome {
+	func verifyAddress(of account: Account) async throws -> VerifyAddressOutcome {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 		switch account.securityState {
 		case let .unsecured(unsecuredEntityControl):
@@ -158,7 +142,7 @@ extension LedgerHardwareWalletClient {
 			let (derivedKey, address) = try await deriveAndDisplayAddress(keyParams, ledger)
 
 			if derivedKey != signTXFactorInstance.publicKey {
-				let errMsg = "Re-derived public key on Ledger does not matched the transactionSigning factor instance of the account. \(derivedKey) != \(signTXFactorInstance.publicKey)"
+				let errMsg = "Re-derived key on Ledger does not matched the transactionSigning factor instance of the account. \(derivedKey) != \(signTXFactorInstance.publicKey)"
 				loggerGlobal.error(.init(stringLiteral: errMsg))
 				return .mismatch(.publicKeyMismatch)
 			}
@@ -175,7 +159,7 @@ extension LedgerHardwareWalletClient {
 }
 
 extension SLIP10Curve {
-	public func toLedger() -> P2P.LedgerHardwareWallet.KeyParameters.Curve {
+	func toLedger() -> P2P.LedgerHardwareWallet.KeyParameters.Curve {
 		switch self {
 		case .curve25519: .curve25519
 		case .secp256k1: .secp256k1
@@ -184,7 +168,7 @@ extension SLIP10Curve {
 }
 
 extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.DerivedPublicKey {
-	public func hdPubKey() throws -> HierarchicalDeterministicPublicKey {
+	func hdPubKey() throws -> HierarchicalDeterministicPublicKey {
 		try .init(curve: self.curve, key: self.publicKey.data, path: self.derivationPath)
 	}
 }

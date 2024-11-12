@@ -1,6 +1,6 @@
 
 extension DependencyValues {
-	public var accountsClient: AccountsClient {
+	var accountsClient: AccountsClient {
 		get { self[AccountsClient.self] }
 		set { self[AccountsClient.self] = newValue }
 	}
@@ -8,10 +8,10 @@ extension DependencyValues {
 
 // MARK: - AccountsClient + TestDependencyKey
 extension AccountsClient: TestDependencyKey {
-	public static let previewValue: Self = .noop
+	static let previewValue: Self = .noop
 
 	#if DEBUG
-	public static let noop = Self(
+	static let noop = Self(
 		getCurrentNetworkID: { .kisharnet },
 		nextAppearanceID: { _, _ in .sample },
 		getAccountsOnCurrentNetwork: { throw NoopError() },
@@ -27,7 +27,7 @@ extension AccountsClient: TestDependencyKey {
 		debugOnlyDeleteAccount: { _ in }
 	)
 
-	public static let testValue = Self(
+	static let testValue = Self(
 		getCurrentNetworkID: unimplemented("\(Self.self).getCurrentNetworkID"),
 		nextAppearanceID: unimplemented("\(Self.self).nextAppearanceID"),
 		getAccountsOnCurrentNetwork: unimplemented("\(Self.self).getAccountsOnCurrentNetwork"),
@@ -43,7 +43,7 @@ extension AccountsClient: TestDependencyKey {
 		debugOnlyDeleteAccount: unimplemented("\(Self.self).debugOnlyDeleteAccount")
 	)
 	#else
-	public static let noop = Self(
+	static let noop = Self(
 		getCurrentNetworkID: { .kisharnet },
 		nextAppearanceID: { _, _ in AppearanceId(value: 0) },
 		getAccountsOnCurrentNetwork: { throw NoopError() },
@@ -58,7 +58,7 @@ extension AccountsClient: TestDependencyKey {
 		updateAccount: { _ in }
 	)
 
-	public static let testValue = Self(
+	static let testValue = Self(
 		getCurrentNetworkID: unimplemented("\(Self.self).getCurrentNetworkID"),
 		nextAppearanceID: unimplemented("\(Self.self).nextAppearanceID"),
 		getAccountsOnCurrentNetwork: unimplemented("\(Self.self).getAccountsOnCurrentNetwork"),

@@ -1,9 +1,9 @@
 extension EntitiesVisibilityClient: DependencyKey {
-	public typealias Value = EntitiesVisibilityClient
+	typealias Value = EntitiesVisibilityClient
 
-	public static let liveValue: Self = .live()
+	static let liveValue: Self = .live()
 
-	public static func live(
+	static func live(
 		profileStore: ProfileStore = .shared
 	) -> Self {
 		.init(

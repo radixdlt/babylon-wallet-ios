@@ -1,10 +1,10 @@
 extension ButtonStyle where Self == HeaderButtonStyle {
-	public static var header: HeaderButtonStyle { .init() }
+	static var header: HeaderButtonStyle { .init() }
 }
 
 // MARK: - HeaderButtonStyle
-public struct HeaderButtonStyle: ButtonStyle {
-	public func makeBody(configuration: ButtonStyle.Configuration) -> some View {
+struct HeaderButtonStyle: ButtonStyle {
+	func makeBody(configuration: ButtonStyle.Configuration) -> some View {
 		configuration.label
 			.textStyle(.body1Header)
 			.frame(maxWidth: .infinity)

@@ -3,8 +3,8 @@ import Sargon
 import SwiftUI
 
 // MARK: - ManageThirdPartyDeposits
-public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
-	public struct State: Hashable, Sendable {
+struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
+	struct State: Hashable, Sendable {
 		var account: Account
 
 		var depositRule: DepositRule {
@@ -22,31 +22,31 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 		}
 	}
 
-	public enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable, Sendable {
 		case updateTapped
 		case rowTapped(ManageThirdPartyDeposits.Section.Row)
 	}
 
-	public enum DelegateAction: Equatable, Sendable {
+	enum DelegateAction: Equatable, Sendable {
 		case accountUpdated
 	}
 
-	public enum InternalAction: Equatable, Sendable {
+	enum InternalAction: Equatable, Sendable {
 		case updated(Account)
 	}
 
-	public struct Destination: DestinationReducer {
-		public enum State: Hashable, Sendable {
+	struct Destination: DestinationReducer {
+		enum State: Hashable, Sendable {
 			case allowDenyAssets(ResourcesList.State)
 			case allowDepositors(ResourcesList.State)
 		}
 
-		public enum Action: Equatable, Sendable {
+		enum Action: Equatable, Sendable {
 			case allowDenyAssets(ResourcesList.Action)
 			case allowDepositors(ResourcesList.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: /State.allowDenyAssets, action: /Action.allowDenyAssets) {
 				ResourcesList()
 			}
@@ -62,7 +62,7 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.errorQueue) var errorQueue
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -71,7 +71,7 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .rowTapped(row):
 			switch row {
@@ -106,7 +106,7 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .updated(account):
 			state.account = account
@@ -115,7 +115,7 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .allowDenyAssets(.delegate(.updated(thirdPartyDeposits))),
 		     let .allowDepositors(.delegate(.updated(thirdPartyDeposits))):
@@ -140,10 +140,11 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 					if case let .transaction(tx) = success.items {
 						/// Wait for the transaction to be committed
 						let txID = tx.send.transactionIntentHash
-						try await submitTXClient.hasTXBeenCommittedSuccessfully(txID)
-						/// Safe to update the account to new state
-						try await accountsClient.updateAccount(updatedAccount)
-						await send(.internal(.updated(updatedAccount)))
+						if try await submitTXClient.hasTXBeenCommittedSuccessfully(txID) {
+							/// Safe to update the account to new state
+							try await accountsClient.updateAccount(updatedAccount)
+							await send(.internal(.updated(updatedAccount)))
+						}
 						return
 					}
 
@@ -155,10 +156,6 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 				}
 
 			} catch {
-				/// Polling failure will be displayed in SubmiTransactionView
-				if case is TXFailureStatus = error {
-					return
-				}
 				errorQueue.schedule(error)
 			}
 		}

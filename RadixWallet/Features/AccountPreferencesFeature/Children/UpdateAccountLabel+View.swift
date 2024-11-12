@@ -27,7 +27,7 @@ extension UpdateAccountLabel.State {
 }
 
 extension UpdateAccountLabel {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let accountLabel: String
 		let sanitizedName: NonEmptyString?
 		let updateButtonControlState: ControlState
@@ -36,7 +36,7 @@ extension UpdateAccountLabel {
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		let store: StoreOf<UpdateAccountLabel>
 		@Environment(\.dismiss) var dismiss
 		@FocusState private var textFieldFocus: Bool
@@ -45,7 +45,7 @@ extension UpdateAccountLabel {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			content
 				.withNavigationBar {
 					dismiss()

@@ -1,16 +1,16 @@
 // MARK: - Troubleshooting
 
-public struct Troubleshooting: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
+struct Troubleshooting: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
 		var isLegacyImportEnabled = true
 
 		@PresentationState
-		public var destination: Destination.State?
+		var destination: Destination.State?
 
-		public init() {}
+		init() {}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case onFirstTask
 		case accountScanButtonTapped
 		case legacyImportButtonTapped
@@ -19,28 +19,28 @@ public struct Troubleshooting: Sendable, FeatureReducer {
 		case factoryResetButtonTapped
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case loadedIsLegacyImportEnabled(Bool)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case goToAccountList
 	}
 
-	public struct Destination: DestinationReducer {
-		public enum State: Sendable, Hashable {
+	struct Destination: DestinationReducer {
+		enum State: Sendable, Hashable {
 			case accountRecovery(ManualAccountRecoveryCoordinator.State)
 			case importOlympiaWallet(ImportOlympiaWalletCoordinator.State)
 			case factoryReset(FactoryReset.State)
 		}
 
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case accountRecovery(ManualAccountRecoveryCoordinator.Action)
 			case importOlympiaWallet(ImportOlympiaWalletCoordinator.Action)
 			case factoryReset(FactoryReset.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: /State.accountRecovery, action: /Action.accountRecovery) {
 				ManualAccountRecoveryCoordinator()
 			}
@@ -57,9 +57,9 @@ public struct Troubleshooting: Sendable, FeatureReducer {
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.contactSupportClient) var contactSupport
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -68,7 +68,7 @@ public struct Troubleshooting: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onFirstTask:
 			return loadIsLegacyImportEnabled()
@@ -100,7 +100,7 @@ public struct Troubleshooting: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadedIsLegacyImportEnabled(isLegacyImportEnabled):
 			state.isLegacyImportEnabled = isLegacyImportEnabled
@@ -108,7 +108,7 @@ public struct Troubleshooting: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .accountRecovery(.delegate(.gotoAccountList)):
 			return .send(.delegate(.goToAccountList))

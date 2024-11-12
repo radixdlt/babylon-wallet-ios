@@ -1,6 +1,6 @@
 
 extension DependencyValues {
-	public var gatewaysClient: GatewaysClient {
+	var gatewaysClient: GatewaysClient {
 		get { self[GatewaysClient.self] }
 		set { self[GatewaysClient.self] = newValue }
 	}
@@ -8,9 +8,9 @@ extension DependencyValues {
 
 // MARK: - GatewaysClient + TestDependencyKey
 extension GatewaysClient: TestDependencyKey {
-	public static let previewValue = Self.noop
+	static let previewValue = Self.noop
 
-	public static let testValue = Self(
+	static let testValue = Self(
 		currentGatewayValues: unimplemented("\(Self.self).currentGatewayValues"),
 		gatewaysValues: unimplemented("\(Self.self).gatewaysValues"),
 		getAllGateways: unimplemented("\(Self.self).getAllGateways"),
@@ -21,7 +21,7 @@ extension GatewaysClient: TestDependencyKey {
 		hasGateway: unimplemented("\(Self.self).hasGateway")
 	)
 
-	public static let noop = Self(
+	static let noop = Self(
 		currentGatewayValues: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		gatewaysValues: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		getAllGateways: { [.nebunet] },

@@ -11,28 +11,28 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.StateAccountLockersTouchedAtRequest")
-public typealias StateAccountLockersTouchedAtRequest = GatewayAPI.StateAccountLockersTouchedAtRequest
+typealias StateAccountLockersTouchedAtRequest = GatewayAPI.StateAccountLockersTouchedAtRequest
 
 extension GatewayAPI {
 
-public struct StateAccountLockersTouchedAtRequest: Codable, Hashable {
+struct StateAccountLockersTouchedAtRequest: Codable, Hashable {
 
-    public private(set) var atLedgerState: LedgerStateSelector?
-    public private(set) var accountLockers: [AccountLockerAddress]
+    private(set) var atLedgerState: LedgerStateSelector?
+    private(set) var accountLockers: [AccountLockerAddress]
 
-    public init(atLedgerState: LedgerStateSelector? = nil, accountLockers: [AccountLockerAddress]) {
+    init(atLedgerState: LedgerStateSelector? = nil, accountLockers: [AccountLockerAddress]) {
         self.atLedgerState = atLedgerState
         self.accountLockers = accountLockers
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case atLedgerState = "at_ledger_state"
         case accountLockers = "account_lockers"
     }
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(atLedgerState, forKey: .atLedgerState)
         try container.encode(accountLockers, forKey: .accountLockers)

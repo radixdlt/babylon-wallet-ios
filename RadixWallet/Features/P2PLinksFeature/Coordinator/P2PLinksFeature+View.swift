@@ -3,8 +3,8 @@ import SwiftUI
 
 // MARK: - P2PLinks.View
 extension P2PLinksFeature {
-	public struct ViewState: Equatable {
-		public let linkRows: IdentifiedArrayOf<P2PLink>
+	struct ViewState: Equatable {
+		let linkRows: IdentifiedArrayOf<P2PLink>
 
 		init(state: P2PLinksFeature.State) {
 			linkRows = state.links
@@ -12,14 +12,14 @@ extension P2PLinksFeature {
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<P2PLinksFeature>
 
-		public init(store: StoreOf<P2PLinksFeature>) {
+		init(store: StoreOf<P2PLinksFeature>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(
 				store,
 				observe: ViewState.init(state:),

@@ -16,7 +16,7 @@ extension DebugKeychainTest.State {
 
 // MARK: - DebugKeychainTest.View
 extension DebugKeychainTest {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let status: DebugKeychainTest.Status
 		let containsDataForAuth: Bool
 		let containsDataForNoAuth: Bool
@@ -25,14 +25,14 @@ extension DebugKeychainTest {
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<DebugKeychainTest>
 
-		public init(store: StoreOf<DebugKeychainTest>) {
+		init(store: StoreOf<DebugKeychainTest>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(alignment: .center) {
 					Text("This demo will create 10 Tasks run in parallel, each trying to load-else-generate-and-save some data for two different keys, one key for `auth` and one for `no auth`.\n\nThe test succeeds if only **one single** data was produced by the tasks, asserting that the operation is *atomic* and *data race free*.\n\nThe `Auth Test` also tests that the operation is **not** performed on the main thread, which it must not be.")

@@ -1,12 +1,12 @@
 // MARK: - UInt11
-public struct UInt11: Sendable, Hashable, ExpressibleByIntegerLiteral, Comparable {
-	public static func < (lhs: Self, rhs: Self) -> Bool {
+struct UInt11: Sendable, Hashable, ExpressibleByIntegerLiteral, Comparable {
+	static func < (lhs: Self, rhs: Self) -> Bool {
 		lhs.valueBoundBy16Bits < rhs.valueBoundBy16Bits
 	}
 
-	public let valueBoundBy16Bits: UInt16
+	let valueBoundBy16Bits: UInt16
 
-	public init?(valueBoundBy16Bits: UInt16) {
+	init?(valueBoundBy16Bits: UInt16) {
 		if valueBoundBy16Bits > UInt11.max16 {
 			return nil
 		}
@@ -24,30 +24,30 @@ extension UInt11 {
 
 // MARK: - Convenience Init
 extension UInt11 {
-	public init?(exactly source: some BinaryInteger) {
+	init?(exactly source: some BinaryInteger) {
 		guard let valueBoundBy16Bits = UInt16(exactly: source) else { return nil }
 		self.init(valueBoundBy16Bits: valueBoundBy16Bits)
 	}
 
-	public init(truncatingIfNeeded source: some BinaryInteger) {
+	init(truncatingIfNeeded source: some BinaryInteger) {
 		let valueBoundBy16Bits = UInt16(truncatingIfNeeded: source)
 		self.valueBoundBy16Bits = Swift.min(UInt11.max16, valueBoundBy16Bits)
 	}
 
 	/// Creates a new integer value from the given string and radix.
-	public init?(_ text: some StringProtocol, radix: Int = 10) {
+	init?(_ text: some StringProtocol, radix: Int = 10) {
 		guard let uint16 = UInt16(text, radix: radix) else { return nil }
 		self.init(valueBoundBy16Bits: uint16)
 	}
 
-	public init(integerLiteral value: Int) {
+	init(integerLiteral value: Int) {
 		guard let exactly = UInt11(exactly: value) else {
 			fatalError("bad integer literal value does not fit in UInt11, value passed was: \(value)")
 		}
 		self = exactly
 	}
 
-	public init?(bits: some Collection<Bool>) {
+	init?(bits: some Collection<Bool>) {
 		if bits.count > UInt11.bitWidth { return nil }
 		self.init(bits.binaryString, radix: 2)
 	}
@@ -87,7 +87,7 @@ extension FixedWidthInteger {
 }
 
 extension Int {
-	public static let bitsPerByte = 8
+	static let bitsPerByte = 8
 }
 
 extension Data {

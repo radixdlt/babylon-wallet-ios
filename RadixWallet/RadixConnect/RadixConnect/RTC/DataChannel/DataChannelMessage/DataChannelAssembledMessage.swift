@@ -2,21 +2,21 @@ import WebRTC
 
 // MARK: - DataChannelClient.AssembledMessage
 extension DataChannelClient {
-	public struct AssembledMessage: Equatable, Sendable {
+	struct AssembledMessage: Equatable, Sendable {
 		// According to CAP19
 		static let chunkSize = 15441
 
-		public let idOfChunks: Message.ID
-		public let messageContent: Data
-		public let messageHash: Data
+		let idOfChunks: Message.ID
+		let messageContent: Data
+		let messageHash: Data
 
-		public init(message: Data, id: Message.ID, messageHash: Data) {
+		init(message: Data, id: Message.ID, messageHash: Data) {
 			self.idOfChunks = id
 			self.messageContent = message
 			self.messageHash = messageHash
 		}
 
-		public init(message: Data, id: Message.ID) {
+		init(message: Data, id: Message.ID) {
 			self.init(
 				message: message,
 				id: id,

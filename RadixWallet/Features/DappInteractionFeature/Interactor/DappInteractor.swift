@@ -6,8 +6,8 @@ typealias RequestEnvelope = DappInteractionClient.RequestEnvelope
 
 // MARK: Identifiable
 extension RequestEnvelope: Identifiable {
-	public typealias ID = WalletInteractionId
-	public var id: ID {
+	typealias ID = WalletInteractionId
+	var id: ID {
 		interaction.interactionId
 	}
 }
@@ -18,7 +18,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		var requestQueue: IdentifiedArrayOf<RequestEnvelope> = []
 
 		@PresentationState
-		public var destination: Destination.State?
+		var destination: Destination.State?
 
 		fileprivate var shouldIncrementOnCompletionDismiss = false
 	}
@@ -37,7 +37,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			WalletToDappInteractionResponse,
 			for: RequestEnvelope,
 			DappMetadata,
-			IntentHash?
+			TransactionIntentHash?
 		)
 		case failedToSendResponseToDapp(
 			WalletToDappInteractionResponse,
@@ -50,7 +50,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			for: RequestEnvelope,
 			DappMetadata, reason: String
 		)
-		case presentResponseSuccessView(DappMetadata, IntentHash?, P2P.Route)
+		case presentResponseSuccessView(DappMetadata, TransactionIntentHash?, P2P.Route)
 		case presentInvalidRequest(
 			DappToWalletInteractionUnvalidated,
 			reason: DappInteractionClient.ValidatedDappRequest.InvalidRequestReason,
@@ -244,7 +244,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 				return sendResponseToDappEffect(responseToDapp, for: request, dappMetadata: dappMetadata)
 			case let .dismiss(dappMetadata, txID):
 				dismissCurrentModalAndRequest(request, for: &state)
-				return .send(.internal(.presentResponseSuccessView(dappMetadata, txID, request.route)))
+				return delayedShortEffect(for: .internal(.presentResponseSuccessView(dappMetadata, txID, request.route)))
 			case .dismissSilently:
 				dismissCurrentModalAndRequest(request, for: &state)
 				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
@@ -313,7 +313,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 			// In case of transaction response, sending it to the peer client is a silent operation.
 			// The success or failures is determined based on the transaction polling status.
-			let txID: IntentHash? = {
+			let txID: TransactionIntentHash? = {
 				if case let .success(successResponse) = responseToDapp,
 				   case let .transaction(txID) = successResponse.items
 				{
@@ -380,6 +380,12 @@ extension DappInteractionClient.ValidatedDappRequest.InvalidRequestReason {
 			.unknownDappDefinitionAddress
 		case .badContent:
 			.invalidRequest
+		case .invalidPersonaOrAccounts:
+			.invalidPersonaOrAccounts
+		case .invalidPreAuthorization(.expirationTooClose):
+			.subintentExpirationTooClose
+		case .invalidPreAuthorization(.expired):
+			.expiredSubintent
 		}
 	}
 
@@ -404,7 +410,7 @@ extension DappInteractionClient.ValidatedDappRequest.InvalidRequestReason {
 			L10n.DAppRequest.ValidationOutcome.subtitleIncompatibleVersion
 		case .wrongNetworkID:
 			L10n.DAppRequest.ValidationOutcome.subtitleWrongNetworkID
-		case .invalidOrigin, .invalidDappDefinitionAddress, .dAppValidationError:
+		case .invalidOrigin, .invalidDappDefinitionAddress, .dAppValidationError, .invalidPersonaOrAccounts, .invalidPreAuthorization:
 			shortExplanation
 		}
 	}
@@ -432,7 +438,7 @@ extension DappInteractionClient.ValidatedDappRequest.InvalidRequestReason {
 			L10n.DAppRequest.ValidationOutcome.devExplanationInvalidDappDefinitionAddress(invalidAddress)
 		case let .dAppValidationError(underlyingError):
 			"\(L10n.DAppRequest.ValidationOutcome.invalidRequestMessage): \(underlyingError)"
-		case .wrongNetworkID:
+		case .wrongNetworkID, .invalidPersonaOrAccounts, .invalidPreAuthorization:
 			shortExplanation
 		}
 	}
@@ -455,6 +461,12 @@ extension DappInteractionClient.ValidatedDappRequest.InvalidRequestReason {
 			L10n.DAppRequest.ValidationOutcome.invalidRequestMessage
 		case let .wrongNetworkID(ce, wallet):
 			L10n.DAppRequest.RequestWrongNetworkAlert.message(networkName(for: ce), networkName(for: wallet))
+		case .invalidPersonaOrAccounts:
+			L10n.DAppRequest.ValidationOutcome.invalidPersonaOrAccoubts
+		case .invalidPreAuthorization(.expirationTooClose):
+			L10n.DAppRequest.ValidationOutcome.preAuthorizationExpirationTooClose
+		case .invalidPreAuthorization(.expired):
+			L10n.DAppRequest.ValidationOutcome.preAuthorizationExpired
 		}
 	}
 

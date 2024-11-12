@@ -1,16 +1,16 @@
 // MARK: - VPair
-public struct VPair: View {
+struct VPair: View {
 	let heading: String
 	let item: String
 
-	public init(heading: String, item: String) {
+	init(heading: String, item: String) {
 		self.heading = heading
 		self.item = item
 	}
 }
 
 extension VPair {
-	public var body: some View {
+	var body: some View {
 		VStack(alignment: .leading, spacing: .small2) {
 			Group {
 				Text(heading)
@@ -24,24 +24,24 @@ extension VPair {
 }
 
 extension VPair {
-	public init(heading: String, item: some CustomStringConvertible) {
+	init(heading: String, item: some CustomStringConvertible) {
 		self.init(heading: heading, item: String(describing: item))
 	}
 }
 
 // MARK: - HPair
-public struct HPair: View {
+struct HPair: View {
 	let label: String
 	let item: String
 
-	public init(label: String, item: String) {
+	init(label: String, item: String) {
 		self.label = label
 		self.item = item
 	}
 }
 
 extension HPair {
-	public var body: some View {
+	var body: some View {
 		HStack(alignment: .center, spacing: .small2) {
 			Group {
 				Text(label)
@@ -56,7 +56,7 @@ extension HPair {
 }
 
 extension HPair {
-	public init(label: String, item: some CustomStringConvertible) {
+	init(label: String, item: some CustomStringConvertible) {
 		self.init(label: label, item: String(describing: item))
 	}
 }

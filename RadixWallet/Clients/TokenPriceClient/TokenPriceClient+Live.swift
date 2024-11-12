@@ -1,5 +1,5 @@
 extension TokenPricesClient {
-	public static let liveValue: TokenPricesClient = {
+	static let liveValue: TokenPricesClient = {
 		@Dependency(\.httpClient) var httpClient
 		@Dependency(\.jsonDecoder) var jsonDecoder
 		@Dependency(\.jsonEncoder) var jsonEncoder
@@ -36,7 +36,7 @@ extension TokenPricesClient {
 }
 
 extension TokenPricesClient.TokenPrices {
-	public init(_ tokenPricesResponse: TokensPriceResponse) {
+	init(_ tokenPricesResponse: TokensPriceResponse) {
 		self = tokenPricesResponse.tokens.reduce(into: [:]) { partialResult, next in
 			if let value = try? Decimal192(next.price) {
 				partialResult[next.resourceAddress] = value
@@ -46,26 +46,26 @@ extension TokenPricesClient.TokenPrices {
 }
 
 // MARK: - TokensPriceResponse
-public struct TokensPriceResponse: Decodable {
-	public let tokens: [TokenPrice]
+struct TokensPriceResponse: Decodable {
+	let tokens: [TokenPrice]
 
-	public init(tokens: [TokenPrice]) {
+	init(tokens: [TokenPrice]) {
 		self.tokens = tokens
 	}
 }
 
 // MARK: TokensPriceResponse.TokenPrice
 extension TokensPriceResponse {
-	public struct TokenPrice: Decodable {
+	struct TokenPrice: Decodable {
 		enum CodingKeys: String, CodingKey {
 			case resourceAddress = "resource_address"
 			case price = "usd_price"
 		}
 
-		public let resourceAddress: ResourceAddress
-		public let price: Double
+		let resourceAddress: ResourceAddress
+		let price: Double
 
-		public init(resourceAddress: ResourceAddress, price: Double) {
+		init(resourceAddress: ResourceAddress, price: Double) {
 			self.resourceAddress = resourceAddress
 			self.price = price
 		}

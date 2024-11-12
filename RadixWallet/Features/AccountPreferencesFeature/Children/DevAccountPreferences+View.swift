@@ -22,18 +22,18 @@ extension DevAccountPreferences.State {
 
 // MARK: - AccountPreferences.View
 extension DevAccountPreferences {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		#if DEBUG
-		public var canTurnIntoDappDefinitionAccounType: Bool
-		public var canCreateAuthSigningKey: Bool
-		public var createFungibleTokenButtonState: ControlState
-		public var createNonFungibleTokenButtonState: ControlState
-		public var createMultipleFungibleTokenButtonState: ControlState
-		public var createMultipleNonFungibleTokenButtonState: ControlState
+		var canTurnIntoDappDefinitionAccounType: Bool
+		var canCreateAuthSigningKey: Bool
+		var createFungibleTokenButtonState: ControlState
+		var createNonFungibleTokenButtonState: ControlState
+		var createMultipleFungibleTokenButtonState: ControlState
+		var createMultipleNonFungibleTokenButtonState: ControlState
 		#endif // DEBUG
 
 		#if DEBUG
-		public init(
+		init(
 			canTurnIntoDappDefinitionAccounType: Bool,
 			canCreateAuthSigningKey: Bool,
 			createFungibleTokenButtonState: ControlState,
@@ -49,19 +49,19 @@ extension DevAccountPreferences {
 			self.createMultipleNonFungibleTokenButtonState = createMultipleNonFungibleTokenButtonState
 		}
 		#else
-		public init() {}
+		init() {}
 		#endif // DEBUG
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<DevAccountPreferences>
 
-		public init(store: StoreOf<DevAccountPreferences>) {
+		init(store: StoreOf<DevAccountPreferences>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				NavigationStack {
 					VStack {

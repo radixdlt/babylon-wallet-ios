@@ -174,7 +174,7 @@ jobs:
 
       - uses: RDXWorks-actions/setup-xcode@master
         with:
-          xcode-version: "15.3.0"
+          xcode-version: "16.0.0"
 
       - name: "Set up ruby"
         uses: RDXWorks-actions/setup-ruby@master-upgrade-to-v1-171-0
@@ -193,7 +193,7 @@ jobs:
           bundle exec fastlane tests
 
       - name: Upload results
-        uses: RDXWorks-actions/xcresulttool@main
+        uses: RDXWorks-actions/xcresulttool-xcode16@v1.8.0
         with:
           path: build/test_output/results.xcresult
           show-passed-tests: false

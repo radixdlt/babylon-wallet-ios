@@ -2,53 +2,47 @@ import ComposableArchitecture
 import SwiftUI
 
 extension PoolUnitDetails.State {
-	var viewState: PoolUnitDetails.ViewState {
+	var containerWithHeader: DetailsContainerWithHeaderViewState {
+		.init(resourcesDetails.poolUnitResource)
+	}
+
+	var thumbnailURL: URL? {
+		resourcesDetails.poolUnitResource.resource.metadata.iconURL
+	}
+
+	var resources: [ResourceBalance.ViewState.Fungible] {
+		.init(resources: resourcesDetails)
+	}
+
+	var resourceDetails: AssetResourceDetailsSection.ViewState {
 		let resource = resourcesDetails.poolUnitResource.resource
 		return .init(
-			containerWithHeader: .init(resourcesDetails.poolUnitResource),
-			thumbnailURL: resource.metadata.iconURL,
-			resources: .init(resources: resourcesDetails),
-			resourceDetails: .init(
-				description: .success(resource.metadata.description),
-				infoUrl: .success(resource.metadata.infoURL),
-				resourceAddress: resource.resourceAddress,
-				isXRD: false,
-				validatorAddress: nil,
-				resourceName: .success(resource.metadata.name),
-				currentSupply: .success(resource.totalSupply?.formatted() ?? L10n.AssetDetails.supplyUnkown),
-				divisibility: .success(resource.divisibility),
-				arbitraryDataFields: .success(resource.metadata.arbitraryItems.asDataFields),
-				behaviors: .success(resource.behaviors),
-				tags: .success(resource.metadata.tags)
-			)
+			description: .success(resource.metadata.description),
+			infoUrl: .success(resource.metadata.infoURL),
+			resourceAddress: resource.resourceAddress,
+			isXRD: false,
+			validatorAddress: nil,
+			resourceName: .success(resource.metadata.name),
+			currentSupply: .success(resource.totalSupply?.formatted() ?? L10n.AssetDetails.supplyUnkown),
+			divisibility: .success(resource.divisibility),
+			arbitraryDataFields: .success(resource.metadata.arbitraryItems.asDataFields),
+			behaviors: .success(resource.behaviors),
+			tags: .success(resource.metadata.tags)
 		)
 	}
 }
 
 // MARK: - PoolUnitDetails.View
 extension PoolUnitDetails {
-	public struct ViewState: Equatable {
-		let containerWithHeader: DetailsContainerWithHeaderViewState
-		let thumbnailURL: URL?
-		let resources: [ResourceBalance.ViewState.Fungible]
+	struct View: SwiftUI.View {
+		let store: StoreOf<PoolUnitDetails>
 
-		let resourceDetails: AssetResourceDetailsSection.ViewState
-	}
-
-	@MainActor
-	public struct View: SwiftUI.View {
-		private let store: StoreOf<PoolUnitDetails>
-
-		public init(store: StoreOf<PoolUnitDetails>) {
-			self.store = store
-		}
-
-		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				DetailsContainerWithHeaderView(viewState: viewStore.containerWithHeader) {
-					viewStore.send(.closeButtonTapped)
+		var body: some SwiftUI.View {
+			WithPerceptionTracking {
+				DetailsContainerWithHeaderView(viewState: store.containerWithHeader) {
+					store.send(.view(.closeButtonTapped))
 				} thumbnailView: {
-					Thumbnail(.poolUnit, url: viewStore.thumbnailURL, size: .veryLarge)
+					Thumbnail(.poolUnit, url: store.thumbnailURL, size: .veryLarge)
 				} detailsView: {
 					VStack(spacing: .medium1) {
 						AssetDetailsSeparator()
@@ -57,10 +51,10 @@ extension PoolUnitDetails {
 							.textStyle(.secondaryHeader)
 							.foregroundColor(.app.gray1)
 
-						ResourceBalancesView(fungibles: viewStore.resources)
+						ResourceBalancesView(fungibles: store.resources)
 							.padding(.horizontal, .large2)
 
-						AssetResourceDetailsSection(viewState: viewStore.resourceDetails)
+						AssetResourceDetailsSection(viewState: store.resourceDetails)
 
 						HideResource.View(store: store.hideResource)
 					}

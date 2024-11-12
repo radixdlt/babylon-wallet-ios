@@ -4,14 +4,14 @@ import SwiftUI
 // MARK: - DisplayMnemonics.View
 extension DisplayMnemonics {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<DisplayMnemonics>
 
-		public init(store: StoreOf<DisplayMnemonics>) {
+		init(store: StoreOf<DisplayMnemonics>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				ScrollView {
 					VStack(alignment: .leading, spacing: .medium1) {
@@ -104,6 +104,6 @@ struct DisplayMnemonics_Preview: PreviewProvider {
 }
 
 extension DisplayMnemonics.State {
-	public static let previewValue = Self()
+	static let previewValue = Self()
 }
 #endif

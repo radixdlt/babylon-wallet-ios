@@ -1,7 +1,7 @@
 import CryptoKit
 
 // MARK: - VersionedEncryption
-public protocol VersionedEncryption {
+protocol VersionedEncryption {
 	static var version: EncryptionScheme.Version { get }
 	static var description: String { get }
 
@@ -10,18 +10,18 @@ public protocol VersionedEncryption {
 }
 
 // MARK: - EncryptionScheme
-public enum EncryptionScheme: Sendable, Hashable, VersionedAlgorithm {
+enum EncryptionScheme: Sendable, Hashable, VersionedAlgorithm {
 	case version1
 }
 
 extension EncryptionScheme {
-	public init(version: Version) {
+	init(version: Version) {
 		switch version {
 		case .version1: self = .version1
 		}
 	}
 
-	public static let `default`: Self = .version1
+	static let `default`: Self = .version1
 
 	private var schemeVersion: any VersionedEncryption.Type {
 		switch self {
@@ -29,26 +29,26 @@ extension EncryptionScheme {
 		}
 	}
 
-	public var version: Version {
+	var version: Version {
 		schemeVersion.version
 	}
 
-	public var description: String {
+	var description: String {
 		schemeVersion.description
 	}
 
-	public func encrypt(data: Data, encryptionKey key: SymmetricKey) throws -> Data {
+	func encrypt(data: Data, encryptionKey key: SymmetricKey) throws -> Data {
 		try schemeVersion.encrypt(data: data, encryptionKey: key)
 	}
 
-	public func decrypt(data: Data, decryptionKey key: SymmetricKey) throws -> Data {
+	func decrypt(data: Data, decryptionKey key: SymmetricKey) throws -> Data {
 		try schemeVersion.decrypt(data: data, decryptionKey: key)
 	}
 }
 
 // MARK: EncryptionScheme.Version
 extension EncryptionScheme {
-	public enum Version: Int, Sendable, Hashable, Codable {
+	enum Version: Int, Sendable, Hashable, Codable {
 		case version1 = 1
 	}
 }
@@ -56,11 +56,11 @@ extension EncryptionScheme {
 // MARK: EncryptionScheme.Version1
 extension EncryptionScheme {
 	/// AES GCM 256 encryption
-	public struct Version1: VersionedEncryption {
-		public static let version: Version = .version1
-		public static let description = "AESGCM-256"
+	struct Version1: VersionedEncryption {
+		static let version: Version = .version1
+		static let description = "AESGCM-256"
 
-		public static func encrypt(data: Data, encryptionKey key: SymmetricKey) throws -> Data {
+		static func encrypt(data: Data, encryptionKey key: SymmetricKey) throws -> Data {
 			let sealedBox = try AES.GCM.seal(data, using: key)
 			guard let combined = sealedBox.combined else {
 				struct SealedBoxContainsNoCombinedCipher: Swift.Error {}
@@ -69,7 +69,7 @@ extension EncryptionScheme {
 			return combined
 		}
 
-		public static func decrypt(data: Data, decryptionKey key: SymmetricKey) throws -> Data {
+		static func decrypt(data: Data, decryptionKey key: SymmetricKey) throws -> Data {
 			let sealedBox = try AES.GCM.SealedBox(combined: data)
 			return try AES.GCM.open(sealedBox, using: key)
 		}

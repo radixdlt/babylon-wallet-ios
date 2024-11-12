@@ -1,13 +1,13 @@
 // MARK: - InsecureRandomNumberGeneratorWithSeed
-public struct InsecureRandomNumberGeneratorWithSeed: RandomNumberGenerator {
-	public init(seed: Int) {
+struct InsecureRandomNumberGeneratorWithSeed: RandomNumberGenerator {
+	init(seed: Int) {
 		// Set the random seed
 		srand48(seed)
 	}
 }
 
 extension InsecureRandomNumberGeneratorWithSeed {
-	public init(data: Data) {
+	init(data: Data) {
 		let intByteCount = (Int.bitWidth / Int.bitsPerByte)
 		precondition(data.count >= intByteCount)
 		let bytes = [UInt8](data.suffix(intByteCount))
@@ -27,7 +27,7 @@ extension SignedInteger {
 }
 
 extension InsecureRandomNumberGeneratorWithSeed {
-	public func next() -> UInt64 {
+	func next() -> UInt64 {
 		// drand48() returns a Double, transform to UInt64
 		withUnsafeBytes(of: drand48()) { bytes in
 			bytes.load(as: UInt64.self)

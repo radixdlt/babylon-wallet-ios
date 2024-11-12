@@ -11,11 +11,11 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.NativeResourceKind")
-public typealias NativeResourceKind = GatewayAPI.NativeResourceKind
+typealias NativeResourceKind = GatewayAPI.NativeResourceKind
 
 extension GatewayAPI {
 
-public enum NativeResourceKind: String, Codable, CaseIterable {
+enum NativeResourceKind: String, Codable, CaseIterable {
     case xrd = "Xrd"
     case packageOwnerBadge = "PackageOwnerBadge"
     case accountOwnerBadge = "AccountOwnerBadge"

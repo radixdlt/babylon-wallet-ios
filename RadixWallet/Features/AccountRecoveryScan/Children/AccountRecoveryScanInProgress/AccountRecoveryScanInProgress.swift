@@ -1,9 +1,9 @@
 import Sargon
 
 // MARK: - AccountRecoveryScanInProgress
-public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public enum Status: Sendable, Hashable {
+struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		enum Status: Sendable, Hashable {
 			case new
 			case loadingFactorSource
 			case derivingPublicKeys
@@ -11,26 +11,26 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 			case scanComplete
 		}
 
-		public var mode: Mode
-		public var status: Status
-		public var networkID: NetworkID = .mainnet
-		public var batchNumber: Int = 0
-		public var maxIndex: HDPathValue? = nil
+		var mode: Mode
+		var status: Status
+		var networkID: NetworkID = .mainnet
+		var batchNumber: Int = 0
+		var maxIndex: HdPathComponent? = nil
 
-		public var indicesOfAlreadyUsedEntities: OrderedSet<HDPathValue> = []
-		public let forOlympiaAccounts: Bool
-		public var active: IdentifiedArrayOf<Account> = []
-		public var inactive: IdentifiedArrayOf<Account> = []
+		var indicesOfAlreadyUsedEntities: OrderedSet<HdPathComponent> = []
+		let forOlympiaAccounts: Bool
+		var active: IdentifiedArrayOf<Account> = []
+		var inactive: IdentifiedArrayOf<Account> = []
 
 		@PresentationState
-		public var destination: Destination.State? = nil
+		var destination: Destination.State? = nil
 
-		public enum Mode: Sendable, Hashable {
+		enum Mode: Sendable, Hashable {
 			case privateHD(PrivateHierarchicalDeterministicFactorSource)
 			case factorSourceWithID(id: FactorSourceIDFromHash, Loadable<FactorSource> = .idle)
 		}
 
-		public var factorSourceIDFromHash: FactorSourceIDFromHash {
+		var factorSourceIDFromHash: FactorSourceIDFromHash {
 			switch mode {
 			case let .privateHD(privateHD):
 				privateHD.factorSource.id
@@ -39,7 +39,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 			}
 		}
 
-		public init(
+		init(
 			mode: Mode,
 			forOlympiaAccounts: Bool = false,
 			status: Status = .new
@@ -50,7 +50,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case loadIndicesUsedByFactorSourceResult(TaskResult<IndicesUsedByFactorSource>)
 		case startScan(accounts: IdentifiedArrayOf<Account>)
 		case foundAccounts(
@@ -60,14 +60,14 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		case initiate
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case onFirstAppear
 		case scanMore
 		case continueTapped
 		case closeButtonTapped
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case foundAccounts(
 			active: IdentifiedArrayOf<Account>,
 			inactive: IdentifiedArrayOf<Account>
@@ -77,27 +77,27 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 	}
 
 	// MARK: - Destination
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Hashable, Sendable {
+		enum State: Hashable, Sendable {
 			case derivePublicKeys(DerivePublicKeys.State)
 		}
 
 		@CasePathable
-		public enum Action: Equatable, Sendable {
+		enum Action: Equatable, Sendable {
 			case derivePublicKeys(DerivePublicKeys.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: /State.derivePublicKeys, action: /Action.derivePublicKeys) {
 				DerivePublicKeys()
 			}
 		}
 	}
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -111,7 +111,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case .initiate:
 			switch state.mode {
@@ -170,14 +170,14 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onFirstAppear:
 			guard state.status == .new else {
 				return .none
 			}
 
-			/// A temporary hack to fix ABW-2657. When the deriving public keys slide up will not show
+			/// A temporary hack to fix ABW-2657. When the deriving keys slide up will not show
 			return delayedMediumEffect(for: .internal(.initiate))
 
 		case .scanMore:
@@ -199,7 +199,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		let globalOffset = state.active.count + state.inactive.count
 		switch presentedAction {
 		case let .derivePublicKeys(.delegate(delegateAction)):
@@ -245,7 +245,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
 		.run { _ in await dismiss() }
 	}
 }
@@ -255,25 +255,28 @@ extension AccountRecoveryScanInProgress {
 		let networkID = state.networkID
 
 		let derivationIndices = generateIntegers(
-			start: state.maxIndex ?? 0,
+			start: state.maxIndex?.indexInLocalKeySpace() ?? 0,
 			count: batchSize,
-			excluding: state.indicesOfAlreadyUsedEntities
+			excluding: state.indicesOfAlreadyUsedEntities.map { $0.indexInLocalKeySpace() }
 		)
 		assert(derivationIndices.count == batchSize)
-		state.maxIndex = derivationIndices.max()! + 1
+		state.maxIndex = try HdPathComponent(
+			localKeySpace: derivationIndices.max()! + 1,
+			keySpace: .unsecurified(isHardened: true)
+		)
 
-		let paths = derivationIndices.map { index in
+		let paths = try derivationIndices.map { index in
 			if state.forOlympiaAccounts {
-				Bip44LikePath(
-					index: index
+				try Bip44LikePath(
+					index: HdPathComponent.unsecurifiedComponent(Unsecurified.hardenedComponent(UnsecurifiedHardened(localKeySpace: index)))
 				)
-				.asDerivationPath
+				.asGeneral
 			} else {
-				AccountPath(
+				try AccountPath(
 					networkID: networkID,
 					keyKind: .transactionSigning,
-					index: index
-				).asDerivationPath
+					index: Hardened.unsecurified(UnsecurifiedHardened(localKeySpace: index))
+				).asGeneral
 			}
 		}
 

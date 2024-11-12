@@ -11,28 +11,28 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.ValidatorsUptimeResponse")
-public typealias ValidatorsUptimeResponse = GatewayAPI.ValidatorsUptimeResponse
+typealias ValidatorsUptimeResponse = GatewayAPI.ValidatorsUptimeResponse
 
 extension GatewayAPI {
 
-public struct ValidatorsUptimeResponse: Codable, Hashable {
+struct ValidatorsUptimeResponse: Codable, Hashable {
 
-    public private(set) var ledgerState: LedgerState
-    public private(set) var validators: ValidatorUptimeCollection
+    private(set) var ledgerState: LedgerState
+    private(set) var validators: ValidatorUptimeCollection
 
-    public init(ledgerState: LedgerState, validators: ValidatorUptimeCollection) {
+    init(ledgerState: LedgerState, validators: ValidatorUptimeCollection) {
         self.ledgerState = ledgerState
         self.validators = validators
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case ledgerState = "ledger_state"
         case validators
     }
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(ledgerState, forKey: .ledgerState)
         try container.encode(validators, forKey: .validators)

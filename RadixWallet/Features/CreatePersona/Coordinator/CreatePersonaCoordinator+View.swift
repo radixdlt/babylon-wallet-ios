@@ -9,19 +9,19 @@ extension CreatePersonaCoordinator.State {
 
 // MARK: - CreatePersonaCoordinator.View
 extension CreatePersonaCoordinator {
-	public struct ViewState: Sendable, Equatable {
+	struct ViewState: Sendable, Equatable {
 		let shouldDisplayNavBar: Bool
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<CreatePersonaCoordinator>
 
-		public init(store: StoreOf<CreatePersonaCoordinator>) {
+		init(store: StoreOf<CreatePersonaCoordinator>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				NavigationStackStore(
 					store.scope(state: \.path, action: { .child(.path($0)) })
@@ -58,11 +58,9 @@ extension CreatePersonaCoordinator {
 				SwitchStore(store) { state in
 					switch state {
 					case .step0_introduction:
-						CaseLet(
-							/CreatePersonaCoordinator.Path.State.step0_introduction,
-							action: CreatePersonaCoordinator.Path.Action.step0_introduction,
-							then: { IntroductionToPersonas.View(store: $0) }
-						)
+						IntroductionToPersonasView {
+							self.store.send(.view(.introductionContinueButtonTapped))
+						}
 
 					case .step1_createPersona:
 						CaseLet(

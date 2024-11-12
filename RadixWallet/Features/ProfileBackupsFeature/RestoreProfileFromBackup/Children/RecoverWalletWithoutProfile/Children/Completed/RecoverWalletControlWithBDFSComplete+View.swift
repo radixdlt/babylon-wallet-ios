@@ -1,14 +1,14 @@
 // MARK: - RecoverWalletControlWithBDFSComplete.View
-public extension RecoverWalletControlWithBDFSComplete {
+extension RecoverWalletControlWithBDFSComplete {
 	@MainActor
 	struct View: SwiftUI.View {
 		private let store: StoreOf<RecoverWalletControlWithBDFSComplete>
 
-		public init(store: StoreOf<RecoverWalletControlWithBDFSComplete>) {
+		init(store: StoreOf<RecoverWalletControlWithBDFSComplete>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			ScrollView {
 				VStack(spacing: .zero) {
 					Text(L10n.RecoverWalletWithoutProfile.Complete.headerTitle)

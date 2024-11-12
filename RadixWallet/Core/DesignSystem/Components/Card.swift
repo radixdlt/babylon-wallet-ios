@@ -1,10 +1,10 @@
 // MARK: - Card
-public struct Card<Contents: View>: View {
+struct Card<Contents: View>: View {
 	let action: (() -> Void)?
 	let color: Color
 	let contents: Contents
 
-	public init(
+	init(
 		_ color: Color = .app.white,
 		action: (() -> Void)? = nil,
 		@ViewBuilder contents: () -> Contents
@@ -14,7 +14,7 @@ public struct Card<Contents: View>: View {
 		self.contents = contents()
 	}
 
-	public var body: some View {
+	var body: some View {
 		if let action {
 			Button(action: action) {
 				contents
@@ -27,35 +27,35 @@ public struct Card<Contents: View>: View {
 	}
 }
 
-public extension ButtonStyle where Self == CardButtonStyle {
+extension ButtonStyle where Self == CardButtonStyle {
 	static func cardButtonStyle(_ color: Color) -> CardButtonStyle { CardButtonStyle(color: color) }
 }
 
 // MARK: - CardButtonStyle
-public struct CardButtonStyle: ButtonStyle {
-	public let color: Color
+struct CardButtonStyle: ButtonStyle {
+	let color: Color
 
-	public init(color: Color) {
+	init(color: Color) {
 		self.color = color
 	}
 
-	public func makeBody(configuration: ButtonStyle.Configuration) -> some View {
+	func makeBody(configuration: ButtonStyle.Configuration) -> some View {
 		configuration.label
 			.inCard(color, isPressed: configuration.isPressed)
 	}
 }
 
 // MARK: - Speechbubble
-public struct Speechbubble<Contents: View>: View {
+struct Speechbubble<Contents: View>: View {
 	let insetContents: Bool
 	let contents: Contents
 
-	public init(insetContents: Bool = false, @ViewBuilder contents: () -> Contents) {
+	init(insetContents: Bool = false, @ViewBuilder contents: () -> Contents) {
 		self.insetContents = insetContents
 		self.contents = contents()
 	}
 
-	public var body: some View {
+	var body: some View {
 		contents
 			.padding(insetContents ? .small1 : 0)
 			.inSpeechbubble
@@ -63,16 +63,16 @@ public struct Speechbubble<Contents: View>: View {
 }
 
 // MARK: - InnerCard
-public struct InnerCard<Contents: View>: View {
+struct InnerCard<Contents: View>: View {
 	let verticalSpacing: CGFloat
 	let contents: Contents
 
-	public init(verticalSpacing: CGFloat = 0, @ViewBuilder contents: () -> Contents) {
+	init(verticalSpacing: CGFloat = 0, @ViewBuilder contents: () -> Contents) {
 		self.verticalSpacing = verticalSpacing
 		self.contents = contents()
 	}
 
-	public var body: some View {
+	var body: some View {
 		VStack(spacing: verticalSpacing) {
 			contents
 		}
@@ -88,14 +88,14 @@ extension View {
 			.cardShadow
 	}
 
-	public var inSpeechbubble: some View {
+	var inSpeechbubble: some View {
 		padding(.bottom, SpeechbubbleShape.triangleSize.height)
 			.background(.app.white)
 			.clipShape(SpeechbubbleShape(cornerRadius: .medium3))
 			.cardShadow
 	}
 
-	public func inFlatBottomSpeechbubble(inset: CGFloat = 0) -> some View {
+	func inFlatBottomSpeechbubble(inset: CGFloat = 0) -> some View {
 		frame(minHeight: 2 * (.medium3 - inset))
 			.padding(.bottom, SpeechbubbleShape.triangleSize.height)
 			.background(.app.gray4)
@@ -103,29 +103,29 @@ extension View {
 	}
 
 	/// Gives the view rounded corners  (12 px) and no shadow, useful for inner views
-	public var inFlatCard: some View {
+	var inFlatCard: some View {
 		clipShape(RoundedRectangle(cornerRadius: .small1))
 	}
 
-	public var cardShadow: some View {
+	var cardShadow: some View {
 		shadow(color: .app.gray2.opacity(0.26), radius: .medium3, x: .zero, y: .small2)
 	}
 }
 
 // MARK: - SpeechbubbleShape
-public struct SpeechbubbleShape: Shape {
+struct SpeechbubbleShape: Shape {
 	let cornerRadius: CGFloat
 	let flatBottom: Bool
 
-	public static let triangleSize: CGSize = .init(width: 20, height: 12)
-	public static let triangleInset: CGFloat = 50
+	static let triangleSize: CGSize = .init(width: 20, height: 12)
+	static let triangleInset: CGFloat = 50
 
-	public init(cornerRadius: CGFloat, flatBottom: Bool = false) {
+	init(cornerRadius: CGFloat, flatBottom: Bool = false) {
 		self.cornerRadius = cornerRadius
 		self.flatBottom = flatBottom
 	}
 
-	public func path(in rect: CGRect) -> SwiftUI.Path {
+	func path(in rect: CGRect) -> SwiftUI.Path {
 		let inner = rect.inset(by: .init(top: 0, left: 0, bottom: Self.triangleSize.height, right: 0))
 		let arcCenters = inner.insetBy(dx: cornerRadius, dy: cornerRadius)
 		return Path { path in

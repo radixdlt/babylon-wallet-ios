@@ -1,22 +1,22 @@
 // MARK: - ExpectedHTTPURLResponse
-public struct ExpectedHTTPURLResponse: Swift.Error {
-	public init() {}
+struct ExpectedHTTPURLResponse: Swift.Error {
+	init() {}
 }
 
 // MARK: - RequestRetryAttemptsExceeded
-public struct RequestRetryAttemptsExceeded: Swift.Error {
-	public init() {}
+struct RequestRetryAttemptsExceeded: Swift.Error {
+	init() {}
 }
 
 // MARK: - BadHTTPResponseCode
-public struct BadHTTPResponseCode: LocalizedError {
-	public let got: Int
+struct BadHTTPResponseCode: LocalizedError {
+	let got: Int
 
-	public init(got: Int) {
+	init(got: Int) {
 		self.got = got
 	}
 
-	public var errorDescription: String? {
+	var errorDescription: String? {
 		switch got {
 		case 429:
 			L10n.Common.rateLimitReached
@@ -27,18 +27,18 @@ public struct BadHTTPResponseCode: LocalizedError {
 }
 
 // MARK: - ResponseDecodingError
-public struct ResponseDecodingError: Swift.Error {
-	public let receivedData: Data
-	public let error: Error
+struct ResponseDecodingError: Swift.Error {
+	let receivedData: Data
+	let error: Error
 
-	public init(receivedData: Data, error: Error) {
+	init(receivedData: Data, error: Error) {
 		self.receivedData = receivedData
 		self.error = error
 	}
 }
 
 // MARK: - HTTPStatusCode
-public enum HTTPStatusCode: Int, Error {
+enum HTTPStatusCode: Int, Error {
 	/// - ok: Standard response for successful HTTP requests.
 	case ok = 200
 

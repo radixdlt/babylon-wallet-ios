@@ -4,9 +4,9 @@ import SwiftUI
 
 // MARK: - ChooseReceivingAccount
 @Reducer
-public struct ChooseReceivingAccount: Sendable, FeatureReducer {
+struct ChooseReceivingAccount: Sendable, FeatureReducer {
 	@ObservableState
-	public struct State: Sendable, Hashable {
+	struct State: Sendable, Hashable {
 		var chooseAccounts: ChooseAccounts.State
 		var manualAccountAddress: String = "" {
 			didSet {
@@ -23,16 +23,16 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 		@Presents
 		var destination: Destination.State? = nil
 
-		public init(networkID: NetworkID, chooseAccounts: ChooseAccounts.State) {
+		init(networkID: NetworkID, chooseAccounts: ChooseAccounts.State) {
 			self.networkID = networkID
 			self.chooseAccounts = chooseAccounts
 		}
 	}
 
-	public typealias Action = FeatureAction<Self>
+	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case scanQRCode
 		case closeButtonTapped
 		case manualAccountAddressChanged(String)
@@ -41,36 +41,36 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case chooseAccounts(ChooseAccounts.Action)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case dismiss
 		case handleResult(AccountOrAddressOf)
 	}
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case scanAccountAddress(ScanQRCoordinator.State)
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case scanAccountAddress(ScanQRCoordinator.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: \.scanAccountAddress, action: \.scanAccountAddress) {
 				ScanQRCoordinator()
 			}
 		}
 	}
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Scope(state: \.chooseAccounts, action: \.child.chooseAccounts) {
 			ChooseAccounts()
 		}
@@ -83,7 +83,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .scanQRCode:
 			state.destination = .scanAccountAddress(.init(kind: .account))
@@ -110,7 +110,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case var .scanAccountAddress(.delegate(.scanned(address))):
 			state.destination = nil

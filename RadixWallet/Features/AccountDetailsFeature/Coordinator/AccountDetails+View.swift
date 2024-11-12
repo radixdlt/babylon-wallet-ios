@@ -18,7 +18,7 @@ extension AccountDetails.State {
 
 // MARK: - AccountDetails.View
 extension AccountDetails {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let accountAddress: AccountAddress
 		let appearanceID: AppearanceID
 		let displayName: String
@@ -30,14 +30,14 @@ extension AccountDetails {
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<AccountDetails>
 
-		public init(store: StoreOf<AccountDetails>) {
+		init(store: StoreOf<AccountDetails>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				HeaderListViewContainer(
 					headerView: { header(with: viewStore) },

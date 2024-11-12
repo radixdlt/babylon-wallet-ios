@@ -3,13 +3,13 @@ import Sargon
 import SwiftUI
 
 // MARK: - AssetTransfer
-public struct AssetTransfer: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public var accounts: TransferAccountList.State
-		public var message: AssetTransferMessage.State?
-		public let isMainnetAccount: Bool
+struct AssetTransfer: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		var accounts: TransferAccountList.State
+		var message: AssetTransferMessage.State?
+		let isMainnetAccount: Bool
 
-		public init(
+		init(
 			from account: Account
 		) {
 			self.isMainnetAccount = account.networkID == .mainnet
@@ -23,9 +23,9 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 
-	public init() {}
+	init() {}
 
-	public enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable, Sendable {
 		case closeButtonTapped
 		case addMessageTapped
 		case backgroundTapped
@@ -33,16 +33,16 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	public enum ChildAction: Equatable, Sendable {
+	enum ChildAction: Equatable, Sendable {
 		case message(AssetTransferMessage.Action)
 		case accounts(TransferAccountList.Action)
 	}
 
-	public enum DelegateAction: Equatable, Sendable {
+	enum DelegateAction: Equatable, Sendable {
 		case dismissed
 	}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Scope(state: \.accounts, action: /Action.child .. ChildAction.accounts) {
 			TransferAccountList()
 		}
@@ -52,7 +52,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .addMessageTapped:
 			state.message = .empty
@@ -93,7 +93,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .message(.delegate(.removed)):
 			state.message = nil
@@ -105,7 +105,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 }
 
 extension AssetTransfer.State {
-	public var canSendTransferRequest: Bool {
+	var canSendTransferRequest: Bool {
 		guard !accounts.receivingAccounts.isEmpty else {
 			return false
 		}

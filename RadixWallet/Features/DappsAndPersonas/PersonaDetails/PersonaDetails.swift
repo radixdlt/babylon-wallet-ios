@@ -3,7 +3,7 @@ import Sargon
 import SwiftUI
 
 // MARK: - PersonaDetails
-public struct PersonaDetails: Sendable, FeatureReducer {
+struct PersonaDetails: Sendable, FeatureReducer {
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.entitiesVisibilityClient) var entitiesVisibilityClient
@@ -11,14 +11,14 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
-	public init() {}
+	init() {}
 
 	// MARK: - State
 
-	public struct State: Sendable, Hashable {
-		public var mode: Mode
+	struct State: Sendable, Hashable {
+		var mode: Mode
 
-		public enum Mode: Sendable, Hashable {
+		enum Mode: Sendable, Hashable {
 			case general(Persona, dApps: IdentifiedArrayOf<DappInfo>)
 
 			case dApp(
@@ -34,12 +34,12 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			}
 		}
 
-		public struct DappInfo: Sendable, Hashable, Identifiable {
-			public let id: AuthorizedDapp.ID
-			public var thumbnail: URL?
-			public let displayName: String
+		struct DappInfo: Sendable, Hashable, Identifiable {
+			let id: AuthorizedDapp.ID
+			var thumbnail: URL?
+			let displayName: String
 
-			public init(dApp: AuthorizedDapp) {
+			init(dApp: AuthorizedDapp) {
 				self.id = dApp.id
 				self.thumbnail = nil
 				self.displayName = dApp.displayName ?? L10n.DAppRequest.Metadata.unknownName
@@ -47,20 +47,20 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		}
 
 		@PresentationState
-		public var destination: Destination.State? = nil
+		var destination: Destination.State? = nil
 
 		var identityAddress: IdentityAddress {
 			mode.id
 		}
 
-		public init(_ mode: Mode) {
+		init(_ mode: Mode) {
 			self.mode = mode
 		}
 	}
 
 	// MARK: - Action
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case appeared
 		case dAppTapped(AuthorizedDapp.ID)
 		case editPersonaTapped
@@ -69,13 +69,13 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case hidePersonaTapped
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case personaDeauthorized
 		case personaChanged(Persona.ID)
 		case personaHidden
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case editablePersonaFetched(Persona)
 		case reloaded(State.Mode)
 		case dAppsUpdated(IdentifiedArrayOf<State.DappInfo>)
@@ -86,8 +86,8 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	// MARK: - Destination
 
-	public struct Destination: DestinationReducer {
-		public enum State: Sendable, Hashable {
+	struct Destination: DestinationReducer {
+		enum State: Sendable, Hashable {
 			case editPersona(EditPersona.State)
 			case dAppDetails(DappDetails.State)
 
@@ -95,25 +95,25 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			case confirmHideAlert(AlertState<Action.ConfirmHideAlert>)
 		}
 
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case editPersona(EditPersona.Action)
 			case dAppDetails(DappDetails.Action)
 
 			case confirmForgetAlert(ConfirmForgetAlert)
 			case confirmHideAlert(ConfirmHideAlert)
 
-			public enum ConfirmForgetAlert: Sendable, Equatable {
+			enum ConfirmForgetAlert: Sendable, Equatable {
 				case confirmTapped
 				case cancelTapped
 			}
 
-			public enum ConfirmHideAlert: Sendable, Equatable {
+			enum ConfirmHideAlert: Sendable, Equatable {
 				case confirmTapped
 				case cancelTapped
 			}
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: /State.editPersona, action: /Action.editPersona) {
 				EditPersona()
 			}
@@ -125,7 +125,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	// MARK: - Reducer
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -134,7 +134,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			guard case let .general(_, dApps) = state.mode else { return .none }
@@ -183,7 +183,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .editablePersonaFetched(persona):
 			switch state.mode {
@@ -223,7 +223,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .editPersona(.delegate(.personaSaved(persona))):
 			guard persona.id == state.mode.id else { return .none }

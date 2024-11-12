@@ -2,7 +2,7 @@
 extension NonEmpty: @unchecked Sendable where Element: Sendable {}
 
 extension NonEmptyString {
-	public init?(maybeString: String?) {
+	init?(maybeString: String?) {
 		guard let string = maybeString else {
 			return nil
 		}

@@ -3,7 +3,7 @@ let minimumNumberOfEpochsPassedForFaucetToBeReused = 1
 
 // MARK: - FaucetClient + DependencyKey
 extension FaucetClient: DependencyKey {
-	public static let liveValue: Self = {
+	static let liveValue: Self = {
 		@Dependency(\.userDefaults) var userDefaults
 		@Dependency(\.gatewaysClient) var gatewaysClient
 
@@ -61,10 +61,9 @@ extension FaucetClient: DependencyKey {
 
 			let txID = notarized.txID
 
-			_ = try await submitTXClient.submitTransaction(.init(
-				txID: txID,
-				compiledNotarizedTXIntent: notarized.notarized
-			))
+			_ = try await submitTXClient.submitTransaction(notarized.notarized)
+
+			_ = try await submitTXClient.pollTransactionStatus(txID)
 
 			try await submitTXClient.hasTXBeenCommittedSuccessfully(txID)
 		}
@@ -81,9 +80,9 @@ extension FaucetClient: DependencyKey {
 			}
 
 			let networkID = await gatewaysClient.getCurrentNetworkID()
-			let networkIDOfAddress = try accountAddress.networkID
+			let networkIDOfAddress = accountAddress.networkID
 			assert(networkIDOfAddress == networkID)
-			let manifest = try TransactionManifest.faucet(
+			let manifest = TransactionManifest.faucet(
 				includeLockFeeInstruction: true,
 				addressOfReceivingAccount: accountAddress
 			)

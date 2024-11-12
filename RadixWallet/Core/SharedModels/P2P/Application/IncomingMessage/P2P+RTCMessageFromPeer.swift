@@ -2,7 +2,7 @@
 extension P2P {
 	/// A successfully received and decoded message from a peer
 	/// either a `response` or a `request`.
-	public enum RTCMessageFromPeer: Sendable, Hashable {
+	enum RTCMessageFromPeer: Sendable, Hashable {
 		/// A response from a peer to some request we have sent over RTC
 		case response(Response)
 
@@ -10,18 +10,18 @@ extension P2P {
 		case request(Request)
 
 		/// A response from a peer to some request we have sent.
-		public enum Response: Sendable, Hashable, Equatable, Decodable {
+		enum Response: Sendable, Hashable, Equatable, Decodable {
 			case connectorExtension(P2P.ConnectorExtension.Response)
 		}
 
-		public enum Request: Sendable, Hashable, Equatable {
+		enum Request: Sendable, Hashable, Equatable {
 			case dapp(DappToWalletInteractionUnvalidated)
 		}
 	}
 }
 
 extension P2P.RTCMessageFromPeer.Response {
-	public init(from decoder: Decoder) throws {
+	init(from decoder: Decoder) throws {
 		self = try .connectorExtension(.init(from: decoder))
 	}
 }

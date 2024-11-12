@@ -1,9 +1,9 @@
 extension ResourcesVisibilityClient: DependencyKey {
-	public typealias Value = ResourcesVisibilityClient
+	typealias Value = ResourcesVisibilityClient
 
-	public static let liveValue: Self = .live()
+	static let liveValue: Self = .live()
 
-	public static func live(
+	static func live(
 		profileStore: ProfileStore = .shared
 	) -> Self {
 		.init(

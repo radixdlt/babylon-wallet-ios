@@ -11,25 +11,25 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.NativeResourceDetails")
-public typealias NativeResourceDetails = GatewayAPI.NativeResourceDetails
+typealias NativeResourceDetails = GatewayAPI.NativeResourceDetails
 
 extension GatewayAPI {
 
-public struct NativeResourceDetails: Codable, Hashable {
+struct NativeResourceDetails: Codable, Hashable {
 
-    public private(set) var kind: NativeResourceKind
+    private(set) var kind: NativeResourceKind
 
-    public init(kind: NativeResourceKind) {
+    init(kind: NativeResourceKind) {
         self.kind = kind
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case kind
     }
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(kind, forKey: .kind)
     }

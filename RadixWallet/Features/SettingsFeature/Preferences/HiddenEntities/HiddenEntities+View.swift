@@ -2,10 +2,10 @@ import SwiftUI
 
 // MARK: - HiddenEntities.View
 extension HiddenEntities {
-	public struct View: SwiftUI.View {
-		public let store: StoreOf<HiddenEntities>
+	struct View: SwiftUI.View {
+		let store: StoreOf<HiddenEntities>
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				ScrollView {
 					LazyVStack(alignment: .leading, spacing: .large3) {
@@ -63,7 +63,7 @@ extension HiddenEntities {
 				VStack(spacing: .medium3) {
 					ForEachStatic(store.accounts) { account in
 						Card {
-							AccountCard(kind: .hiddenEntity, account: account) {
+							AccountCard(kind: .details, account: account) {
 								unhideButton(action: .unhideAccountTapped(account.id))
 							}
 						}

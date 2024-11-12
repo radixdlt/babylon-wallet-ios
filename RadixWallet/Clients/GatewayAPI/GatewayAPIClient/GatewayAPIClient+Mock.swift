@@ -1,8 +1,8 @@
 // MARK: - GatewayAPIClient + TestDependencyKey
 extension GatewayAPIClient: TestDependencyKey {
-	public static let previewValue = Self.mock()
+	static let previewValue = Self.mock()
 
-	public static let testValue = Self(
+	static let testValue = Self(
 		getNetworkName: unimplemented("\(Self.self).getNetworkName"),
 		getEpoch: unimplemented("\(Self.self).getEpoch"),
 		getEntityDetails: unimplemented("\(Self.self).getEntityDetails"),
@@ -16,9 +16,6 @@ extension GatewayAPIClient: TestDependencyKey {
 		getNonFungibleData: unimplemented("\(Self.self).getNonFungibleData"),
 		getAccountLockerTouchedAt: unimplemented("\(Self.self).getAccountLockerTouchedAt"),
 		getAccountLockerVaults: unimplemented("\(Self.self).GetAccountLockerVaults"),
-		submitTransaction: unimplemented("\(Self.self).submitTransaction"),
-		transactionStatus: unimplemented("\(Self.self).transactionStatus"),
-		transactionPreview: unimplemented("\(Self.self).transactionPreview"),
 		streamTransactions: unimplemented("\(Self.self).streamTransactions"),
 		prevalidateDeposit: unimplemented("\(Self.self).prevalidateDeposit")
 	)
@@ -44,20 +41,6 @@ extension GatewayAPIClient: TestDependencyKey {
 			getNonFungibleData: unimplemented("\(self).getNonFungibleData"),
 			getAccountLockerTouchedAt: unimplemented("\(Self.self).getAccountLockerTouchedAt"),
 			getAccountLockerVaults: unimplemented("\(Self.self).GetAccountLockerVaults"),
-			submitTransaction: { _ in
-				.init(duplicate: submittedTXIsDoubleSpend)
-			},
-			transactionStatus: { _ in
-				.init(
-					ledgerState: .previewValue,
-					status: .committedSuccess,
-					intentStatus: .committedSuccess,
-					intentStatusDescription: "",
-					knownPayloads: [.init(payloadHash: "payload-hash-hex", status: .committedSuccess)],
-					errorMessage: nil
-				)
-			},
-			transactionPreview: unimplemented("\(self).transactionPreview"),
 			streamTransactions: unimplemented("\(self).streamTransactions"),
 			prevalidateDeposit: unimplemented("\(Self.self).prevalidateDeposit")
 		)
@@ -65,14 +48,14 @@ extension GatewayAPIClient: TestDependencyKey {
 }
 
 extension DependencyValues {
-	public var gatewayAPIClient: GatewayAPIClient {
+	var gatewayAPIClient: GatewayAPIClient {
 		get { self[GatewayAPIClient.self] }
 		set { self[GatewayAPIClient.self] = newValue }
 	}
 }
 
 extension GatewayAPI.LedgerState {
-	public static let previewValue = Self(
+	static let previewValue = Self(
 		network: "Network name",
 		stateVersion: 0,
 		proposerRoundTimestamp: "",

@@ -1,8 +1,8 @@
 
 extension TransactionHistoryClient {
-	public static let liveValue = TransactionHistoryClient.live()
+	static let liveValue = TransactionHistoryClient.live()
 
-	public static func live() -> Self {
+	static func live() -> Self {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 
@@ -65,7 +65,7 @@ extension TransactionHistoryClient {
 				keyedNonFungibleTokens.append(contentsOf: nonFungibleTokenArray)
 			}
 
-			func nonFungibleResources(_ type: ChangeType, changes: GatewayAPI.TransactionNonFungibleBalanceChanges) async throws -> [ResourceBalance] {
+			func nonFungibleResources(_ type: ChangeType, changes: GatewayAPI.TransactionNonFungibleBalanceChanges) async throws -> [KnownResourceBalance] {
 				let address = try ResourceAddress(validatingAddress: changes.resourceAddress)
 
 				// The resource should have been fetched
@@ -90,7 +90,7 @@ extension TransactionHistoryClient {
 							return stakeClaimNFT
 						} else {
 							guard let token = keyedNonFungibleTokens[id: id] else { throw ProgrammerError() }
-							return ResourceBalance(resource: resource, details: .nonFungible(token))
+							return KnownResourceBalance(resource: resource, details: .nonFungible(.token(token)))
 						}
 					}
 			}
@@ -103,7 +103,7 @@ extension TransactionHistoryClient {
 					throw MissingIntentHash()
 				}
 
-				let txid = try IntentHash(hash)
+				let txid = try TransactionIntentHash(hash)
 
 				let manifestClass = info.manifestClasses?.first
 
@@ -118,8 +118,8 @@ extension TransactionHistoryClient {
 
 				let message = info.message?.plaintext?.content.string
 
-				var withdrawals: [ResourceBalance] = []
-				var deposits: [ResourceBalance] = []
+				var withdrawals: [KnownResourceBalance] = []
+				var deposits: [KnownResourceBalance] = []
 
 				if let changes = info.balanceChanges {
 					for nonFungible in changes.nonFungibleBalanceChanges where nonFungible.entityAddress == account.address {

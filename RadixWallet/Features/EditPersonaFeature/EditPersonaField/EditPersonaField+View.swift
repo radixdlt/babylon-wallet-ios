@@ -34,15 +34,15 @@ extension EditPersonaField.State {
 
 // MARK: - EditPersonaField.View
 extension EditPersonaField {
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<EditPersonaField>
 		@FocusState private var textFieldFocus: Bool
 
-		public init(store: StoreOf<EditPersonaField>) {
+		init(store: StoreOf<EditPersonaField>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }) { viewStore in
 				AppTextField(
 					primaryHeading: viewStore.primaryHeading.map { .init(text: $0) },

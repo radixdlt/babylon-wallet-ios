@@ -1,7 +1,7 @@
 // MARK: - Constants
 // Namespace
-public enum Constants {}
+enum Constants {}
 
-public extension Constants {
+extension Constants {
 	static let xrdTokenName = "XRD"
 }

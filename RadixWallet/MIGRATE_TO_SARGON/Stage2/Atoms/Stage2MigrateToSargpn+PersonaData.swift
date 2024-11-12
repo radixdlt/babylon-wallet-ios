@@ -2,7 +2,7 @@ import Foundation
 import Sargon
 
 extension PersonaData {
-	public func responseValidation(
+	func responseValidation(
 		for request: DappToWalletInteractionPersonaDataRequestItem
 	) -> DappToWalletInteraction.RequestValidation {
 		let allExisting = Dictionary(grouping: entries.map(\.value), by: \.discriminator)

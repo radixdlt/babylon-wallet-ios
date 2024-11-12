@@ -10,16 +10,16 @@ extension StakeUnitList.State {
 }
 
 // MARK: - StakeUnitList.View
-public extension StakeUnitList {
+extension StakeUnitList {
 	@MainActor
 	struct View: SwiftUI.View {
 		private let store: StoreOf<StakeUnitList>
 
-		public init(store: StoreOf<StakeUnitList>) {
+		init(store: StoreOf<StakeUnitList>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }) { viewStore in
 				Section {
 					StakeSummaryView(viewState: viewStore.stakeSummary) {

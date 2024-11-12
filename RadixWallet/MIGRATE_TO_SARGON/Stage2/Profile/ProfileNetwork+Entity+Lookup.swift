@@ -2,16 +2,16 @@
 struct NoEntityFoundMatchingCriteria: Swift.Error {}
 
 // MARK: - IncorrectEntityType
-public struct IncorrectEntityType: Swift.Error {}
+struct IncorrectEntityType: Swift.Error {}
 
 extension ProfileNetwork {
-	public func entity<Entity: EntityProtocol>(
+	func entity<Entity: EntityProtocol>(
 		address: Entity.EntityAddress
 	) throws -> Entity {
 		try entity(type: Entity.self, address: address)
 	}
 
-	public func entity<Entity: EntityProtocol>(
+	func entity<Entity: EntityProtocol>(
 		type: Entity.Type,
 		address: Entity.EntityAddress
 	) throws -> Entity {
@@ -21,7 +21,7 @@ extension ProfileNetwork {
 		return entity
 	}
 
-	public func entity(
+	func entity(
 		address: any AddressProtocol
 	) throws -> any EntityProtocol {
 		if let account = getAccounts().first(where: { $0.address.address == address.address }) {

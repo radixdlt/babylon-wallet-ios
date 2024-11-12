@@ -3,9 +3,9 @@ import Sargon
 
 // MARK: - LedgerHardwareWalletClient + DependencyKey
 extension LedgerHardwareWalletClient: DependencyKey {
-	public typealias Value = LedgerHardwareWalletClient
+	typealias Value = LedgerHardwareWalletClient
 
-	public static let liveValue: Self = {
+	static let liveValue: Self = {
 		@Dependency(\.radixConnectClient) var radixConnectClient
 
 		@Dependency(\.overlayWindowClient) var overlayWindowClient
@@ -153,6 +153,22 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					)
 				}
 			},
+			signPreAuthorization: { request in
+				let hashedMsg = request.subintent.hash()
+				return try await sign(
+					signers: request.signers,
+					expectedHashedMessage: hashedMsg.hash.data
+				) {
+					try await makeRequest(
+						.signSubintentHash(.init(
+							signers: request.signers.flatMap(\.keyParams),
+							ledgerDevice: request.ledger.device(),
+							subintentHash: .init(data: hashedMsg.hash.data)
+						)),
+						responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.signSubintentHash
+					)
+				}
+			},
 			signAuthChallenge: { request in
 				@Dependency(\.rolaClient) var rolaClient
 
@@ -208,29 +224,29 @@ extension LedgerHardwareWalletFactorSource {
 }
 
 // MARK: - UnrecognizedLedgerModel
-public struct UnrecognizedLedgerModel: Error {
-	public let model: String
-	public init(model: String) {
+struct UnrecognizedLedgerModel: Error {
+	let model: String
+	init(model: String) {
 		self.model = model
 	}
 }
 
 extension P2P.LedgerHardwareWallet.LedgerDevice {
-	public init(factorSource: FactorSource) throws {
+	init(factorSource: FactorSource) throws {
 		self = try factorSource.extract(as: LedgerHardwareWalletFactorSource.self).device()
 	}
 }
 
 // MARK: - MissingSignatureFromRequiredSigner
-public struct MissingSignatureFromRequiredSigner: Swift.Error {}
+struct MissingSignatureFromRequiredSigner: Swift.Error {}
 
 // MARK: - FailedToFindFactorInstanceMatchingDerivationPathInSignature
-public struct FailedToFindFactorInstanceMatchingDerivationPathInSignature: Swift.Error {}
+struct FailedToFindFactorInstanceMatchingDerivationPathInSignature: Swift.Error {}
 
 extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.SignatureOfSigner {
 	struct Validated: Sendable, Hashable {
-		public let signature: SignatureWithPublicKey
-		public let derivationPath: DerivationPath
+		let signature: SignatureWithPublicKey
+		let derivationPath: DerivationPath
 	}
 
 	func validate(hashed: Data) throws -> Validated {

@@ -2,16 +2,16 @@ import ComposableArchitecture
 import SwiftUI
 
 extension FungibleAssetList.Section {
-	public struct Row: Sendable, FeatureReducer {
-		public struct State: Sendable, Hashable, Identifiable {
-			public typealias ID = ResourceAddress
-			public var id: ID { token.resourceAddress }
+	struct Row: Sendable, FeatureReducer {
+		struct State: Sendable, Hashable, Identifiable {
+			typealias ID = ResourceAddress
+			var id: ID { token.resourceAddress }
 
-			public var token: OnLedgerEntity.OwnedFungibleResource
-			public var isXRD: Bool
-			public var isSelected: Bool?
+			var token: OnLedgerEntity.OwnedFungibleResource
+			var isXRD: Bool
+			var isSelected: Bool?
 
-			public init(
+			init(
 				xrdToken: OnLedgerEntity.OwnedFungibleResource,
 				isSelected: Bool? = nil
 			) {
@@ -22,7 +22,7 @@ extension FungibleAssetList.Section {
 				)
 			}
 
-			public init(
+			init(
 				nonXRDToken: OnLedgerEntity.OwnedFungibleResource,
 				isSelected: Bool? = nil
 			) {
@@ -44,15 +44,15 @@ extension FungibleAssetList.Section {
 			}
 		}
 
-		public enum ViewAction: Sendable, Equatable {
+		enum ViewAction: Sendable, Equatable {
 			case tapped
 		}
 
-		public enum DelegateAction: Sendable, Equatable {
+		enum DelegateAction: Sendable, Equatable {
 			case selected(OnLedgerEntity.OwnedFungibleResource)
 		}
 
-		public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+		func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
 			case .tapped:
 				if state.isSelected != nil {

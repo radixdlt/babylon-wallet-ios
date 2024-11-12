@@ -3,11 +3,11 @@ import Sargon
 import SwiftUI
 
 // MARK: - ProfileView
-public struct ProfileView: IndentedView {
-	public let profile: Profile
-	public let indentation: Indentation
+struct ProfileView: IndentedView {
+	let profile: Profile
+	let indentation: Indentation
 
-	public init(
+	init(
 		profile: Profile,
 		indentation: Indentation = .init()
 	) {
@@ -17,11 +17,11 @@ public struct ProfileView: IndentedView {
 }
 
 // MARK: - Indentation
-public struct Indentation {
-	public let indentationLevel: Int
-	public let pointsToIndentPerLevel: CGFloat
+struct Indentation {
+	let indentationLevel: Int
+	let pointsToIndentPerLevel: CGFloat
 
-	public init(
+	init(
 		indentationLevel: Int = 1,
 		pointsToIndentPerLevel: CGFloat = 2
 	) {
@@ -35,11 +35,11 @@ public struct Indentation {
 }
 
 extension Indentation {
-	public var leadingPadding: CGFloat {
+	var leadingPadding: CGFloat {
 		CGFloat(indentationLevel) * pointsToIndentPerLevel
 	}
 
-	public var spacing: CGFloat {
+	var spacing: CGFloat {
 		CGFloat(
 			Double(128) / pow(2.0, Double(indentationLevel))
 		)
@@ -47,7 +47,7 @@ extension Indentation {
 }
 
 extension ProfileView {
-	public var body: some View {
+	var body: some View {
 		ScrollView {
 			VStack(alignment: .leading, spacing: indentation.spacing) {
 				HeaderView(
@@ -75,26 +75,26 @@ extension ProfileView {
 }
 
 // MARK: - IndentedView
-public protocol IndentedView: SwiftUI.View {
+protocol IndentedView: SwiftUI.View {
 	var indentation: Indentation { get }
 }
 
 extension IndentedView {
-	public var inOneLevel: Indentation {
+	var inOneLevel: Indentation {
 		indentation.inOneLevel
 	}
 
-	public var leadingPadding: CGFloat {
+	var leadingPadding: CGFloat {
 		indentation.leadingPadding
 	}
 }
 
 // MARK: - HeaderView
-public struct HeaderView: IndentedView {
-	public let header: Profile.Header
-	public let indentation: Indentation
+struct HeaderView: IndentedView {
+	let header: Profile.Header
+	let indentation: Indentation
 
-	public var body: some View {
+	var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Labeled("ID", value: header.id)
 			Labeled("Snapshot version", value: header.snapshotVersion.rawValue)
@@ -105,11 +105,11 @@ public struct HeaderView: IndentedView {
 }
 
 // MARK: - CreatingDeviceView
-public struct CreatingDeviceView: IndentedView {
-	public let device: DeviceInfo
-	public let indentation: Indentation
+struct CreatingDeviceView: IndentedView {
+	let device: DeviceInfo
+	let indentation: Indentation
 
-	public var body: some View {
+	var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Labeled("Device ID", value: device.id)
 			Labeled("Creation date", value: device.date.ISO8601Format())
@@ -119,11 +119,11 @@ public struct CreatingDeviceView: IndentedView {
 }
 
 // MARK: - HeaderHintView
-public struct HeaderHintView: IndentedView {
-	public let hint: ContentHint
-	public let indentation: Indentation
+struct HeaderHintView: IndentedView {
+	let hint: ContentHint
+	let indentation: Indentation
 
-	public var body: some View {
+	var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Labeled("#Networks", value: hint.numberOfNetworks)
 			Labeled("#Accounts", value: hint.numberOfAccountsOnAllNetworksInTotal)
@@ -133,13 +133,13 @@ public struct HeaderHintView: IndentedView {
 }
 
 // MARK: - FactorSourcesView
-public struct FactorSourcesView: IndentedView {
-	public let factorSources: FactorSources
-	public let indentation: Indentation
+struct FactorSourcesView: IndentedView {
+	let factorSources: FactorSources
+	let indentation: Indentation
 }
 
 extension FactorSourcesView {
-	public var body: some View {
+	var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Text("Factor Sources")
 				.fontWeight(.heavy)
@@ -160,13 +160,13 @@ extension FactorSourcesView {
 }
 
 // MARK: - DebugInspectFactorSourceView
-public struct DebugInspectFactorSourceView: IndentedView {
-	public let factorSource: FactorSource
-	public let indentation: Indentation
+struct DebugInspectFactorSourceView: IndentedView {
+	let factorSource: FactorSource
+	let indentation: Indentation
 }
 
 extension DebugInspectFactorSourceView {
-	public var body: some View {
+	var body: some View {
 		VStack(alignment: .leading, spacing: 2) {
 			Text("Factor Source")
 				.fontWeight(.heavy)
@@ -211,9 +211,9 @@ extension FactorSource {
 }
 
 // MARK: - FactorSourceCommonView
-public struct FactorSourceCommonView: View {
-	public let common: FactorSourceCommon
-	public var body: some View {
+struct FactorSourceCommonView: View {
+	let common: FactorSourceCommon
+	var body: some View {
 		Labeled("Added On", value: common.addedOn.ISO8601Format())
 		Labeled("LastUsed On", value: common.lastUsedOn.ISO8601Format())
 		Labeled("Supported Curves", value: common.cryptoParameters.supportedCurves.map { String(describing: $0) }.joined(separator: ", "))
@@ -222,10 +222,10 @@ public struct FactorSourceCommonView: View {
 }
 
 // MARK: - DeviceFactorSouceView
-public struct DeviceFactorSouceView: View {
-	public let deviceFactorSource: DeviceFactorSource
+struct DeviceFactorSouceView: View {
+	let deviceFactorSource: DeviceFactorSource
 	var isMain: Bool { deviceFactorSource.common.flags.contains(.main) }
-	public var body: some View {
+	var body: some View {
 		Labeled("Is Main?", value: isMain)
 			.fontWeight(.heavy)
 		Labeled("Name", value: deviceFactorSource.hint.name)
@@ -234,22 +234,22 @@ public struct DeviceFactorSouceView: View {
 }
 
 // MARK: - LedgerFactorSourceView
-public struct LedgerFactorSourceView: View {
-	public let ledgerFactorSource: LedgerHardwareWalletFactorSource
-	public var body: some View {
+struct LedgerFactorSourceView: View {
+	let ledgerFactorSource: LedgerHardwareWalletFactorSource
+	var body: some View {
 		Labeled("Name", value: ledgerFactorSource.hint.name)
 		Labeled("Model", value: ledgerFactorSource.hint.model.rawValue)
 	}
 }
 
 // MARK: - AppPreferencesView
-public struct AppPreferencesView: IndentedView {
-	public let appPreferences: AppPreferences
-	public let indentation: Indentation
+struct AppPreferencesView: IndentedView {
+	let appPreferences: AppPreferences
+	let indentation: Indentation
 }
 
 extension AppPreferencesView {
-	public var body: some View {
+	var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Text("App Preferences")
 				.fontWeight(.heavy)
@@ -277,13 +277,13 @@ extension AppPreferencesView {
 }
 
 // MARK: - GatewaysView
-public struct GatewaysView: IndentedView {
-	public let savedGateways: SavedGateways
-	public let indentation: Indentation
+struct GatewaysView: IndentedView {
+	let savedGateways: SavedGateways
+	let indentation: Indentation
 }
 
 extension GatewaysView {
-	public var body: some View {
+	var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			ForEach(savedGateways.all) { gateway in
 				GatewayView(
@@ -298,14 +298,14 @@ extension GatewaysView {
 }
 
 // MARK: - GatewayView
-public struct GatewayView: IndentedView {
-	public let gateway: Gateway
-	public let isCurrent: Bool
-	public let indentation: Indentation
+struct GatewayView: IndentedView {
+	let gateway: Gateway
+	let isCurrent: Bool
+	let indentation: Indentation
 }
 
 extension GatewayView {
-	public var body: some View {
+	var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Text("Network & Gateway")
 				.fontWeight(.heavy)
@@ -324,13 +324,13 @@ extension GatewayView {
 }
 
 // MARK: - DisplayView
-public struct DisplayView: IndentedView {
-	public let display: AppDisplay
-	public let indentation: Indentation
+struct DisplayView: IndentedView {
+	let display: AppDisplay
+	let indentation: Indentation
 }
 
 extension DisplayView {
-	public var body: some View {
+	var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Text("Display")
 				.fontWeight(.heavy)
@@ -344,13 +344,13 @@ extension DisplayView {
 }
 
 // MARK: - AppSecurityView
-public struct AppSecurityView: IndentedView {
-	public let security: Security
-	public let indentation: Indentation
+struct AppSecurityView: IndentedView {
+	let security: Security
+	let indentation: Indentation
 }
 
 extension AppSecurityView {
-	public var body: some View {
+	var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Text("App Security")
 				.fontWeight(.heavy)
@@ -365,14 +365,14 @@ extension AppSecurityView {
 }
 
 // MARK: - AuthorizedDappsView
-public struct AuthorizedDappsView: IndentedView {
-	public let authorizedDapps: AuthorizedDapps
-	public let indentation: Indentation
-	public let getDetailedAuthorizedDapp: (AuthorizedDapp) -> AuthorizedDappDetailed?
+struct AuthorizedDappsView: IndentedView {
+	let authorizedDapps: AuthorizedDapps
+	let indentation: Indentation
+	let getDetailedAuthorizedDapp: (AuthorizedDapp) -> AuthorizedDappDetailed?
 }
 
 extension AuthorizedDappsView {
-	public var body: some View {
+	var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Text("Authorized Dapps")
 				.fontWeight(.heavy)
@@ -396,14 +396,14 @@ extension AuthorizedDappsView {
 }
 
 // MARK: - AuthorizedDappView
-public struct AuthorizedDappView: IndentedView {
-	public let authorizedDapp: AuthorizedDapp
-	public let indentation: Indentation
-	public let authorizedPersonas: DetailedAuthorizedPersonas?
+struct AuthorizedDappView: IndentedView {
+	let authorizedDapp: AuthorizedDapp
+	let indentation: Indentation
+	let authorizedPersonas: DetailedAuthorizedPersonas?
 }
 
 extension AuthorizedDappView {
-	public var body: some View {
+	var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Labeled("Name", value: String(describing: authorizedDapp.displayName))
 			Labeled("Dapp def address", value: String(describing: authorizedDapp.dAppDefinitionAddress))
@@ -424,10 +424,10 @@ extension AuthorizedDappView {
 }
 
 // MARK: - DappAuthorizedPersonaView
-public struct DappAuthorizedPersonaView: IndentedView {
-	public let detailedAuthorizedPersona: AuthorizedPersonaDetailed
-	public let indentation: Indentation
-	public var body: some View {
+struct DappAuthorizedPersonaView: IndentedView {
+	let detailedAuthorizedPersona: AuthorizedPersonaDetailed
+	let indentation: Indentation
+	var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Labeled("Address", value: detailedAuthorizedPersona.identityAddress)
 			Labeled("Name", value: detailedAuthorizedPersona.displayName.rawValue)
@@ -477,13 +477,13 @@ public struct DappAuthorizedPersonaView: IndentedView {
 }
 
 // MARK: - PerNetworkView
-public struct PerNetworkView: IndentedView {
-	public let networks: ProfileNetworks
-	public let indentation: Indentation
+struct PerNetworkView: IndentedView {
+	let networks: ProfileNetworks
+	let indentation: Indentation
 }
 
 extension PerNetworkView {
-	public var body: some View {
+	var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Text("Per Network")
 				.fontWeight(.heavy)
@@ -503,13 +503,13 @@ extension PerNetworkView {
 }
 
 // MARK: - ProfileNetworkView
-public struct ProfileNetworkView: IndentedView {
-	public let network: ProfileNetwork
-	public let indentation: Indentation
+struct ProfileNetworkView: IndentedView {
+	let network: ProfileNetwork
+	let indentation: Indentation
 }
 
 extension ProfileNetworkView {
-	public var body: some View {
+	var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Text("Network")
 				.fontWeight(.heavy)
@@ -554,18 +554,18 @@ extension ProfileNetworkView {
 	}
 }
 
-public typealias AccountsView = EntitiesView<Account>
-public typealias PersonasView = EntitiesView<Persona>
+typealias AccountsView = EntitiesView<Account>
+typealias PersonasView = EntitiesView<Persona>
 
 // MARK: - EntitiesView
-public struct EntitiesView<Entity: EntityProtocol>: IndentedView {
-	public let areHidden: Bool
-	public let entities: [Entity]
-	public let indentation: Indentation
+struct EntitiesView<Entity: EntityProtocol>: IndentedView {
+	let areHidden: Bool
+	let entities: [Entity]
+	let indentation: Indentation
 }
 
 extension EntitiesView {
-	public var body: some View {
+	var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			if areHidden {
 				Text("HIDDEN")
@@ -593,14 +593,14 @@ extension EntitiesView {
 }
 
 // MARK: - EntityView
-public struct EntityView<Entity: EntityProtocol>: IndentedView {
-	public let isHidden: Bool
-	public let entity: Entity
-	public let indentation: Indentation
+struct EntityView<Entity: EntityProtocol>: IndentedView {
+	let isHidden: Bool
+	let entity: Entity
+	let indentation: Indentation
 }
 
 extension EntityView {
-	public var body: some View {
+	var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Labeled("DisplayName", value: entity.displayName.rawValue)
 			Labeled("Address", value: entity.address.address)
@@ -643,13 +643,13 @@ extension EntityView {
 }
 
 // MARK: - UnsecuredEntityControlView
-public struct UnsecuredEntityControlView: IndentedView {
-	public let unsecuredControl: UnsecuredEntityControl
-	public let indentation: Indentation
+struct UnsecuredEntityControlView: IndentedView {
+	let unsecuredControl: UnsecuredEntityControl
+	let indentation: Indentation
 }
 
 extension UnsecuredEntityControlView {
-	public var body: some View {
+	var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			HierarchicalDeterministicFactorInstanceView(
 				description: "Transaction Signing",
@@ -668,14 +668,14 @@ extension UnsecuredEntityControlView {
 }
 
 // MARK: - HierarchicalDeterministicFactorInstanceView
-public struct HierarchicalDeterministicFactorInstanceView: IndentedView {
-	public let description: String
-	public let factorInstance: HierarchicalDeterministicFactorInstance
-	public let indentation: Indentation
+struct HierarchicalDeterministicFactorInstanceView: IndentedView {
+	let description: String
+	let factorInstance: HierarchicalDeterministicFactorInstance
+	let indentation: Indentation
 }
 
 extension HierarchicalDeterministicFactorInstanceView {
-	public var body: some View {
+	var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Text("\(description) factor instance")
 				.fontWeight(.heavy)
@@ -684,7 +684,7 @@ extension HierarchicalDeterministicFactorInstanceView {
 			#endif // os(macOS)
 
 			Labeled("Derivation Path", value: factorInstance.derivationPath.description)
-			Labeled("Public Key", value: factorInstance.publicKey.publicKey.hex)
+			Labeled("Key", value: factorInstance.publicKey.publicKey.hex)
 			Labeled("Curve", value: factorInstance.publicKey.curve.description)
 			Labeled("Factor Source ID", value: String(factorInstance.factorSourceID.description.mask(showLast: 6)))
 		}
@@ -693,19 +693,19 @@ extension HierarchicalDeterministicFactorInstanceView {
 }
 
 // MARK: - Labeled
-public struct Labeled: SwiftUI.View {
+struct Labeled: SwiftUI.View {
 	let label: String
 	let value: String
-	public init(_ label: String, value: String) {
+	init(_ label: String, value: String) {
 		self.label = label
 		self.value = value
 	}
 
-	public init(_ label: String, value: some CustomStringConvertible) {
+	init(_ label: String, value: some CustomStringConvertible) {
 		self.init(label, value: String(describing: value))
 	}
 
-	public var body: some View {
+	var body: some View {
 		HStack(alignment: .top) {
 			Text(label)
 				.fontWeight(.light)

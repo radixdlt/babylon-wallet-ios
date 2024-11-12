@@ -11,26 +11,26 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.StateEntityDetailsResponseNonFungibleResourceDetails")
-public typealias StateEntityDetailsResponseNonFungibleResourceDetails = GatewayAPI.StateEntityDetailsResponseNonFungibleResourceDetails
+typealias StateEntityDetailsResponseNonFungibleResourceDetails = GatewayAPI.StateEntityDetailsResponseNonFungibleResourceDetails
 
 extension GatewayAPI {
 
-public struct StateEntityDetailsResponseNonFungibleResourceDetails: Codable, Hashable {
+struct StateEntityDetailsResponseNonFungibleResourceDetails: Codable, Hashable {
 
-    public private(set) var type: StateEntityDetailsResponseItemDetailsType
-    public private(set) var roleAssignments: ComponentEntityRoleAssignments
-    public private(set) var nonFungibleIdType: NonFungibleIdType
+    private(set) var type: StateEntityDetailsResponseItemDetailsType
+    private(set) var roleAssignments: ComponentEntityRoleAssignments
+    private(set) var nonFungibleIdType: NonFungibleIdType
     /** String-encoded decimal representing the amount of a related fungible resource. */
-    public private(set) var totalSupply: String
+    private(set) var totalSupply: String
     /** String-encoded decimal representing the amount of a related fungible resource. */
-    public private(set) var totalMinted: String
+    private(set) var totalMinted: String
     /** String-encoded decimal representing the amount of a related fungible resource. */
-    public private(set) var totalBurned: String
-    public private(set) var nonFungibleDataMutableFields: [String]
-    public private(set) var twoWayLinkedDapps: TwoWayLinkedDappsCollection?
-    public private(set) var nativeResourceDetails: NativeResourceDetails?
+    private(set) var totalBurned: String
+    private(set) var nonFungibleDataMutableFields: [String]
+    private(set) var twoWayLinkedDapps: TwoWayLinkedDappsCollection?
+    private(set) var nativeResourceDetails: NativeResourceDetails?
 
-    public init(type: StateEntityDetailsResponseItemDetailsType, roleAssignments: ComponentEntityRoleAssignments, nonFungibleIdType: NonFungibleIdType, totalSupply: String, totalMinted: String, totalBurned: String, nonFungibleDataMutableFields: [String], twoWayLinkedDapps: TwoWayLinkedDappsCollection? = nil, nativeResourceDetails: NativeResourceDetails? = nil) {
+    init(type: StateEntityDetailsResponseItemDetailsType, roleAssignments: ComponentEntityRoleAssignments, nonFungibleIdType: NonFungibleIdType, totalSupply: String, totalMinted: String, totalBurned: String, nonFungibleDataMutableFields: [String], twoWayLinkedDapps: TwoWayLinkedDappsCollection? = nil, nativeResourceDetails: NativeResourceDetails? = nil) {
         self.type = type
         self.roleAssignments = roleAssignments
         self.nonFungibleIdType = nonFungibleIdType
@@ -42,7 +42,7 @@ public struct StateEntityDetailsResponseNonFungibleResourceDetails: Codable, Has
         self.nativeResourceDetails = nativeResourceDetails
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case type
         case roleAssignments = "role_assignments"
         case nonFungibleIdType = "non_fungible_id_type"
@@ -56,7 +56,7 @@ public struct StateEntityDetailsResponseNonFungibleResourceDetails: Codable, Has
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(type, forKey: .type)
         try container.encode(roleAssignments, forKey: .roleAssignments)

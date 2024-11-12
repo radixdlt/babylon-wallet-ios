@@ -2,45 +2,45 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - TransactionReviewGuarantees
-public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
+struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 	@Dependency(\.dismiss) var dismiss
 
-	public struct State: Sendable, Hashable {
-		public var guarantees: IdentifiedArrayOf<TransactionReviewGuarantee.State>
+	struct State: Sendable, Hashable {
+		var guarantees: IdentifiedArrayOf<TransactionReviewGuarantee.State>
 
-		public var isValid: Bool {
+		var isValid: Bool {
 			guarantees.allSatisfy(\.percentageStepper.isValid)
 		}
 
-		public init(guarantees: IdentifiedArrayOf<TransactionReviewGuarantee.State>) {
+		init(guarantees: IdentifiedArrayOf<TransactionReviewGuarantee.State>) {
 			self.guarantees = guarantees
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case applyTapped
 		case closeTapped
 	}
 
 	@CasePathable
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case guarantee(id: TransactionReviewGuarantee.State.ID, action: TransactionReviewGuarantee.Action)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case applyGuarantees(IdentifiedArrayOf<TransactionReviewGuarantee.State>)
 	}
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<TransactionReviewGuarantees> {
+	var body: some ReducerOf<TransactionReviewGuarantees> {
 		Reduce(core)
 			.forEach(\.guarantees, action: /Action.child .. /ChildAction.guarantee) {
 				TransactionReviewGuarantee()
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .applyTapped:
 			let guarantees = state.guarantees
@@ -58,34 +58,36 @@ public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 }
 
 // MARK: - TransactionReviewGuarantee
-public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
-	public struct State: Identifiable, Sendable, Hashable {
-		public let id: TransactionReview.Transfer.ID
-		public let account: TransactionReview.ReviewAccount
-		public let resource: OnLedgerEntity.Resource
-		public let thumbnail: Thumbnail.FungibleContent
-		public let amount: Decimal192
-		public var guarantee: TransactionGuarantee
+struct TransactionReviewGuarantee: Sendable, FeatureReducer {
+	struct State: Identifiable, Sendable, Hashable {
+		let id: InteractionReview.Transfer.ID
+		let account: InteractionReview.ReviewAccount
+		let resource: OnLedgerEntity.Resource
+		let thumbnail: Thumbnail.FungibleContent
+		let amount: Decimal192
+		var guarantee: TransactionGuarantee
 
-		public var percentageStepper: MinimumPercentageStepper.State
+		var percentageStepper: MinimumPercentageStepper.State
 
 		init?(
-			account: TransactionReview.ReviewAccount,
-			transfer: TransactionReview.Transfer
+			account: InteractionReview.ReviewAccount,
+			transfer: InteractionReview.Transfer
 		) {
+			guard let resource = transfer.value.resource else { return nil }
+
 			self.id = transfer.id
 			self.account = account
-			self.resource = transfer.value.resource
+			self.resource = resource
 
 			let url = resource.metadata.iconURL
-			switch transfer.details {
+			switch transfer.value.details {
 			case let .fungible(fungible):
 				self.thumbnail = .token(fungible.isXRD ? .xrd : .other(url))
 			case .poolUnit:
 				self.thumbnail = .poolUnit(url)
 			case .liquidStakeUnit:
 				self.thumbnail = .lsu(url)
-			case .stakeClaimNFT, .nonFungible:
+			case .stakeClaimNFT, .nonFungible, .none:
 				return nil
 			}
 
@@ -102,24 +104,24 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case percentageStepper(MinimumPercentageStepper.Action)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case dismiss
 	}
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Scope(state: \.percentageStepper, action: /Action.child .. /ChildAction.percentageStepper) {
 			MinimumPercentageStepper()
 		}
 		Reduce(core)
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .percentageStepper(.delegate(.valueChanged)):
 			state.updateAmount()

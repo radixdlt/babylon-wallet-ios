@@ -1,8 +1,8 @@
 // MARK: - CacheClient + TestDependencyKey
 extension CacheClient: TestDependencyKey {
-	public static let previewValue = Self.noop
+	static let previewValue = Self.noop
 
-	public static let testValue = Self(
+	static let testValue = Self(
 		save: unimplemented("\(Self.self).save"),
 		load: unimplemented("\(Self.self).load"),
 		removeFile: unimplemented("\(Self.self).removeFile"),
@@ -12,7 +12,7 @@ extension CacheClient: TestDependencyKey {
 }
 
 extension CacheClient {
-	public static let noop = Self(
+	static let noop = Self(
 		save: { _, _ in },
 		load: { _, _ in throw NoopError() },
 		removeFile: { _ in },

@@ -1,5 +1,5 @@
 // MARK: - VersionedAlgorithm
-public protocol VersionedAlgorithm: Codable {
+protocol VersionedAlgorithm: Codable {
 	associatedtype Version: Sendable & Hashable & Codable
 	var version: Version { get }
 	var description: String { get }
@@ -14,13 +14,13 @@ private enum VersionedAlgorithmCodingKeys: String, CodingKey {
 extension VersionedAlgorithm {
 	private typealias CodingKeys = VersionedAlgorithmCodingKeys
 
-	public init(from decoder: Decoder) throws {
+	init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let version = try container.decode(Version.self, forKey: .version)
 		self.init(version: version)
 	}
 
-	public func encode(to encoder: Encoder) throws {
+	func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(version, forKey: .version)
 		try container.encode(description, forKey: .description)

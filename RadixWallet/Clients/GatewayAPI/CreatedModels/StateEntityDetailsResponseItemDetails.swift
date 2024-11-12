@@ -2,11 +2,11 @@
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.StateEntityDetailsResponseItemDetails")
-public typealias StateEntityDetailsResponseItemDetails = GatewayAPI.StateEntityDetailsResponseItemDetails
+typealias StateEntityDetailsResponseItemDetails = GatewayAPI.StateEntityDetailsResponseItemDetails
 
 // MARK: - GatewayAPI.StateEntityDetailsResponseItemDetails
 extension GatewayAPI {
-	public enum StateEntityDetailsResponseItemDetails: Codable, Hashable {
+	enum StateEntityDetailsResponseItemDetails: Codable, Hashable {
 		case fungibleResource(StateEntityDetailsResponseFungibleResourceDetails)
 		case nonFungibleResource(StateEntityDetailsResponseNonFungibleResourceDetails)
 		case fungibleVault(StateEntityDetailsResponseFungibleVaultDetails)
@@ -14,18 +14,18 @@ extension GatewayAPI {
 		case package(StateEntityDetailsResponsePackageDetails)
 		case component(StateEntityDetailsResponseComponentDetails)
 
-		public var component: StateEntityDetailsResponseComponentDetails? {
+		var component: StateEntityDetailsResponseComponentDetails? {
 			if case let .component(wrapped) = self {
 				return wrapped
 			}
 			return nil
 		}
 
-		public enum CodingKeys: String, CodingKey, CaseIterable {
+		enum CodingKeys: String, CodingKey, CaseIterable {
 			case type
 		}
 
-		public init(from decoder: Decoder) throws {
+		init(from decoder: Decoder) throws {
 			let container = try decoder.container(keyedBy: CodingKeys.self)
 			let type = try container.decode(StateEntityDetailsResponseItemDetailsType.self, forKey: .type)
 
@@ -47,7 +47,7 @@ extension GatewayAPI {
 
 		// Encodable protocol methods
 
-		public func encode(to encoder: Encoder) throws {
+		func encode(to encoder: Encoder) throws {
 			switch self {
 			case let .fungibleResource(item):
 				try item.encode(to: encoder)

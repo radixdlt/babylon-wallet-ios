@@ -1,7 +1,7 @@
 // MARK: - AddressDetails
-public struct AddressDetails: Sendable, FeatureReducer {
+struct AddressDetails: Sendable, FeatureReducer {
 	@ObservableState
-	public struct State: Sendable, Hashable {
+	struct State: Sendable, Hashable {
 		let address: LedgerIdentifiable.Address
 
 		var title: Loadable<String?> = .idle
@@ -11,13 +11,13 @@ public struct AddressDetails: Sendable, FeatureReducer {
 		var showShare = false
 		var showVerifyOnLedger = false
 
-		public init(address: LedgerIdentifiable.Address) {
+		init(address: LedgerIdentifiable.Address) {
 			self.address = address
 		}
 	}
 
 	@CasePathable
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case task
 		case copyButtonTapped
 		case enlargeButtonTapped
@@ -29,7 +29,7 @@ public struct AddressDetails: Sendable, FeatureReducer {
 		case showShareChanged(Bool)
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case loadedTitle(TaskResult<String?>)
 		case loadedQrImage(TaskResult<CGImage>)
 		case loadedShowVerifyOnLedger(Bool)
@@ -43,9 +43,9 @@ public struct AddressDetails: Sendable, FeatureReducer {
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 
-	public init() {}
+	init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			return loadTitleEffect(state: &state)
@@ -86,7 +86,7 @@ public struct AddressDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadedTitle(.success(title)):
 			state.title = .success(title)
@@ -194,11 +194,11 @@ private extension OnLedgerEntity.Resource {
 // MARK: Hashable
 
 extension AddressDetails.State {
-	public static func == (lhs: AddressDetails.State, rhs: AddressDetails.State) -> Bool {
+	static func == (lhs: AddressDetails.State, rhs: AddressDetails.State) -> Bool {
 		lhs.address == rhs.address
 	}
 
-	public func hash(into hasher: inout Hasher) {
+	func hash(into hasher: inout Hasher) {
 		hasher.combine(address)
 	}
 }

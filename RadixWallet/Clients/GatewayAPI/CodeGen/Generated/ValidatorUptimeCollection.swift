@@ -11,25 +11,25 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.ValidatorUptimeCollection")
-public typealias ValidatorUptimeCollection = GatewayAPI.ValidatorUptimeCollection
+typealias ValidatorUptimeCollection = GatewayAPI.ValidatorUptimeCollection
 
 extension GatewayAPI {
 
-public struct ValidatorUptimeCollection: Codable, Hashable {
+struct ValidatorUptimeCollection: Codable, Hashable {
 
-    public private(set) var items: [ValidatorUptimeCollectionItem]
+    private(set) var items: [ValidatorUptimeCollectionItem]
 
-    public init(items: [ValidatorUptimeCollectionItem]) {
+    init(items: [ValidatorUptimeCollectionItem]) {
         self.items = items
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case items
     }
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(items, forKey: .items)
     }

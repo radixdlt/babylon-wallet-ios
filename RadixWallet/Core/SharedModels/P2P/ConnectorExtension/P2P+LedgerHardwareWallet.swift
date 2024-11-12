@@ -1,7 +1,7 @@
 // MARK: - P2P.LedgerHardwareWallet
 extension P2P {
 	/// Just a namespace
-	public enum LedgerHardwareWallet {
+	enum LedgerHardwareWallet {
 		enum CodingKeys: String, CodingKey {
 			case interactionID = "interactionId"
 			case discriminator
@@ -9,12 +9,13 @@ extension P2P {
 			case error
 		}
 
-		public typealias InteractionId = Tagged<Self, String>
+		typealias InteractionId = Tagged<Self, String>
 
-		public enum Discriminator: String, Sendable, Hashable, Codable {
+		enum Discriminator: String, Sendable, Hashable, Codable {
 			case getDeviceInfo
 			case derivePublicKeys
 			case signTransaction
+			case signSubintentHash
 			case signChallenge
 			case deriveAndDisplayAddress
 		}
@@ -23,7 +24,7 @@ extension P2P {
 		// `LedgerHardwareWalletFactorSource.Model` but in case we ever
 		// change the JSON values for CAP21 or for Profile, we want them
 		// to be **decoupled**.
-		public enum Model: String, Sendable, Hashable, Codable {
+		enum Model: String, Sendable, Hashable, Codable {
 			case nanoS
 			case nanoSPlus = "nanoS+"
 			case nanoX
@@ -33,29 +34,29 @@ extension P2P {
 		// `LedgerHardwareWalletFactorSource.Device` but in case we ever
 		// change the JSON values for CAP21 or for Profile, we want them
 		// to be **decoupled**.
-		public struct LedgerDevice: Sendable, Hashable, Codable {
-			public let name: NonEmptyString?
+		struct LedgerDevice: Sendable, Hashable, Codable {
+			let name: NonEmptyString?
 
 			/// `FactorSourceID`
-			public let id: String
-			public let model: Model
+			let id: String
+			let model: Model
 
-			public init(name: NonEmptyString?, id: String, model: Model) {
+			init(name: NonEmptyString?, id: String, model: Model) {
 				self.name = name
 				self.id = id
 				self.model = model
 			}
 		}
 
-		public struct KeyParameters: Sendable, Hashable, Codable {
-			public let curve: Curve
-			public let derivationPath: String
-			public enum Curve: String, Sendable, Hashable, Codable {
+		struct KeyParameters: Sendable, Hashable, Codable {
+			let curve: Curve
+			let derivationPath: String
+			enum Curve: String, Sendable, Hashable, Codable {
 				case curve25519
 				case secp256k1
 			}
 
-			public init(curve: Curve, derivationPath: String) {
+			init(curve: Curve, derivationPath: String) {
 				self.curve = curve
 				self.derivationPath = derivationPath
 			}
@@ -65,7 +66,7 @@ extension P2P {
 
 extension P2P.LedgerHardwareWallet.InteractionId {
 	/// Creates a new random interactionID using UUID
-	public static func random() -> Self {
+	static func random() -> Self {
 		.init(rawValue: UUID().uuidString)
 	}
 }

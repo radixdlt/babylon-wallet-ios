@@ -4,7 +4,7 @@ import SwiftUI
 // MARK: - DetailsContainerWithHeaderViewState
 struct DetailsContainerWithHeaderViewState: Equatable {
 	let title: Loadable<String?>
-	let amount: String?
+	let amount: ResourceAmount?
 	let currencyWorth: AttributedString?
 	let symbol: Loadable<String?>
 }
@@ -13,7 +13,7 @@ extension DetailsContainerWithHeaderViewState {
 	init(_ resourceWithAmount: OnLedgerEntitiesClient.ResourceWithVaultAmount) {
 		self.init(
 			title: .success(resourceWithAmount.resource.metadata.name),
-			amount: resourceWithAmount.amount.nominalAmount.formatted(),
+			amount: resourceWithAmount.amount,
 			currencyWorth: nil,
 			symbol: .success(resourceWithAmount.resource.metadata.symbol)
 		)
@@ -56,29 +56,18 @@ struct DetailsContainerWithHeaderView<ThumbnailView: View, DetailsView: View>: V
 	private func header(
 		with viewState: DetailsContainerWithHeaderViewState
 	) -> some View {
-		VStack(spacing: .zero) {
+		VStack(spacing: .medium3) {
 			thumbnailView
 
 			if let amount = viewState.amount {
-				let amountView = Text(amount)
-					.font(.app.sheetTitle)
-					.kerning(-0.5)
-
-				if let wrappedValue = viewState.symbol.wrappedValue, let symbol = wrappedValue {
-					amountView + Text(" " + symbol).font(.app.sectionHeader)
-				} else {
-					amountView
-				}
-			}
-
-			if !resourceBalanceHideFiatValue, let currencyWorth = viewState.currencyWorth {
-				Text(currencyWorth)
-					.textStyle(.body2HighImportance)
-					.foregroundStyle(.app.gray2)
-					.padding(.top, .small2)
+				ResourceBalanceView.AmountView(
+					amount: .init(amount),
+					appearance: .large,
+					symbol: viewState.symbol
+				)
 			}
 		}
-		.padding(.vertical, .small2)
+		.padding(.vertical, .small1)
 	}
 }
 

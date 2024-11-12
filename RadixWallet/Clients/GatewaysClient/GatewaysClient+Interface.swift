@@ -1,18 +1,18 @@
 import Sargon
 
 // MARK: - GatewaysClient
-public struct GatewaysClient: Sendable {
+struct GatewaysClient: Sendable {
 	/// Async sequence of Gateways, emits new value of Gateways
-	public var currentGatewayValues: CurrentGatewayValues
-	public var gatewaysValues: GatewaysValues
-	public var getAllGateways: GetAllGateways
-	public var getCurrentGateway: GetCurrentGateway
-	public var addGateway: AddGateway
-	public var removeGateway: RemoveGateway
-	public var changeGateway: ChangeGateway
-	public var hasGateway: HasGateway
+	var currentGatewayValues: CurrentGatewayValues
+	var gatewaysValues: GatewaysValues
+	var getAllGateways: GetAllGateways
+	var getCurrentGateway: GetCurrentGateway
+	var addGateway: AddGateway
+	var removeGateway: RemoveGateway
+	var changeGateway: ChangeGateway
+	var hasGateway: HasGateway
 
-	public init(
+	init(
 		currentGatewayValues: @escaping CurrentGatewayValues,
 		gatewaysValues: @escaping GatewaysValues,
 		getAllGateways: @escaping GetAllGateways,
@@ -34,22 +34,22 @@ public struct GatewaysClient: Sendable {
 }
 
 extension GatewaysClient {
-	public typealias CurrentGatewayValues = @Sendable () async -> AnyAsyncSequence<Gateway>
-	public typealias GatewaysValues = @Sendable () async -> AnyAsyncSequence<SavedGateways>
-	public typealias GetCurrentGateway = @Sendable () async -> Gateway
-	public typealias GetAllGateways = @Sendable () async -> Gateways
-	public typealias AddGateway = @Sendable (Gateway) async throws -> Void
-	public typealias RemoveGateway = @Sendable (Gateway) async throws -> Void
-	public typealias ChangeGateway = @Sendable (Gateway) async throws -> Void
-	public typealias HasGateway = @Sendable (FfiUrl) async -> Bool
+	typealias CurrentGatewayValues = @Sendable () async -> AnyAsyncSequence<Gateway>
+	typealias GatewaysValues = @Sendable () async -> AnyAsyncSequence<SavedGateways>
+	typealias GetCurrentGateway = @Sendable () async -> Gateway
+	typealias GetAllGateways = @Sendable () async -> Gateways
+	typealias AddGateway = @Sendable (Gateway) async throws -> Void
+	typealias RemoveGateway = @Sendable (Gateway) async throws -> Void
+	typealias ChangeGateway = @Sendable (Gateway) async throws -> Void
+	typealias HasGateway = @Sendable (FfiUrl) async -> Bool
 }
 
 extension GatewaysClient {
-	public func getCurrentNetworkID() async -> NetworkID {
+	func getCurrentNetworkID() async -> NetworkID {
 		await getCurrentGateway().network.id
 	}
 
-	public func getGatewayAPIEndpointBaseURL() async -> URL {
+	func getGatewayAPIEndpointBaseURL() async -> URL {
 		await getCurrentGateway().url
 	}
 }

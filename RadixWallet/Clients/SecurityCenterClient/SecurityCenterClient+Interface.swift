@@ -4,24 +4,24 @@ import DependenciesAdditions
 import os
 
 // MARK: - SecurityCenterClient
-public struct SecurityCenterClient: DependencyKey, Sendable {
-	public let startMonitoring: StartMonitoring
-	public let problems: Problems
-	public let lastManualBackup: LastManualBackup
-	public let lastCloudBackup: LastCloudBackup
+struct SecurityCenterClient: DependencyKey, Sendable {
+	let startMonitoring: StartMonitoring
+	let problems: Problems
+	let lastManualBackup: LastManualBackup
+	let lastCloudBackup: LastCloudBackup
 }
 
 // MARK: SecurityCenterClient.Problems
 extension SecurityCenterClient {
-	public typealias StartMonitoring = @Sendable () async throws -> Void
-	public typealias Problems = @Sendable (SecurityProblem.ProblemType?) async -> AnyAsyncSequence<[SecurityProblem]>
-	public typealias LastManualBackup = @Sendable () async -> AnyAsyncSequence<BackupStatus?>
-	public typealias LastCloudBackup = @Sendable () async -> AnyAsyncSequence<BackupStatus?>
+	typealias StartMonitoring = @Sendable () async throws -> Void
+	typealias Problems = @Sendable (SecurityProblem.ProblemType?) async -> AnyAsyncSequence<[SecurityProblem]>
+	typealias LastManualBackup = @Sendable () async -> AnyAsyncSequence<BackupStatus?>
+	typealias LastCloudBackup = @Sendable () async -> AnyAsyncSequence<BackupStatus?>
 }
 
 // MARK: - SecurityProblem
 /// As outlined in https://radixdlt.atlassian.net/wiki/spaces/AT/pages/3392569357/Security-related+Problem+States+in+the+Wallet
-public enum SecurityProblem: Hashable, Sendable, Identifiable {
+enum SecurityProblem: Hashable, Sendable, Identifiable {
 	/// The given addresses of `accounts` and `personas` are unrecoverable if the user loses their phone, since their corresponding seed phrase has not been written down.
 	/// NOTE: This definition differs from the one at Confluence since we don't have shields implemented yet.
 	case problem3(addresses: AddressesOfEntitiesInBadState)
@@ -40,9 +40,9 @@ public enum SecurityProblem: Hashable, Sendable, Identifiable {
 	/// meaning they can only be recovered with the seed phrase. (See problem 2) This would also be the state if a user disabled their PIN (and reenabled it), clearing phone keys.
 	case problem9(addresses: AddressesOfEntitiesInBadState)
 
-	public var id: Int { number }
+	var id: Int { number }
 
-	public var number: Int {
+	var number: Int {
 		switch self {
 		case .problem3: 3
 		case .problem5: 5
@@ -52,7 +52,7 @@ public enum SecurityProblem: Hashable, Sendable, Identifiable {
 		}
 	}
 
-	public var accountCard: String {
+	var accountCard: String {
 		switch self {
 		case .problem3: L10n.SecurityProblems.No3.accountCard
 		case .problem5: L10n.SecurityProblems.No5.accountCard
@@ -62,11 +62,11 @@ public enum SecurityProblem: Hashable, Sendable, Identifiable {
 		}
 	}
 
-	public var walletSettingsSecurityCenter: String {
+	var walletSettingsSecurityCenter: String {
 		securityCenterTitle
 	}
 
-	public var securityCenterTitle: String {
+	var securityCenterTitle: String {
 		switch self {
 		case let .problem3(addresses): problem3(addresses: addresses)
 		case .problem5: L10n.SecurityProblems.No5.securityCenterTitle
@@ -85,7 +85,7 @@ public enum SecurityProblem: Hashable, Sendable, Identifiable {
 		return hasHidden ? Problem.securityCenterTitleHidden(accounts, personas) : Problem.securityCenterTitle(accounts, personas)
 	}
 
-	public var securityCenterBody: String {
+	var securityCenterBody: String {
 		switch self {
 		case .problem3: L10n.SecurityProblems.No3.securityCenterBody
 		case .problem5: L10n.SecurityProblems.No5.securityCenterBody
@@ -95,7 +95,7 @@ public enum SecurityProblem: Hashable, Sendable, Identifiable {
 		}
 	}
 
-	public var configurationBackup: String? {
+	var configurationBackup: String? {
 		switch self {
 		case .problem3: nil
 		case .problem5: L10n.SecurityProblems.No5.configurationBackup
@@ -105,7 +105,7 @@ public enum SecurityProblem: Hashable, Sendable, Identifiable {
 		}
 	}
 
-	public var securityFactors: String? {
+	var securityFactors: String? {
 		switch self {
 		case .problem3: L10n.SecurityProblems.No3.securityFactors
 		case .problem5: nil
@@ -115,7 +115,7 @@ public enum SecurityProblem: Hashable, Sendable, Identifiable {
 		}
 	}
 
-	public var seedPhrases: String? {
+	var seedPhrases: String? {
 		switch self {
 		case .problem3: L10n.SecurityProblems.No3.seedPhrases
 		case .problem5: nil
@@ -125,7 +125,7 @@ public enum SecurityProblem: Hashable, Sendable, Identifiable {
 		}
 	}
 
-	public var walletSettingsPersonas: String {
+	var walletSettingsPersonas: String {
 		switch self {
 		case .problem3: L10n.SecurityProblems.No3.walletSettingsPersonas
 		case .problem5: L10n.SecurityProblems.No5.walletSettingsPersonas
@@ -135,7 +135,7 @@ public enum SecurityProblem: Hashable, Sendable, Identifiable {
 		}
 	}
 
-	public var personas: String {
+	var personas: String {
 		switch self {
 		case .problem3: L10n.SecurityProblems.No3.personas
 		case .problem5: L10n.SecurityProblems.No5.personas
@@ -145,25 +145,25 @@ public enum SecurityProblem: Hashable, Sendable, Identifiable {
 		}
 	}
 
-	public var type: ProblemType {
+	var type: ProblemType {
 		switch self {
 		case .problem3, .problem9: .securityFactors
 		case .problem5, .problem6, .problem7: .configurationBackup
 		}
 	}
 
-	public enum ProblemType: Hashable, Sendable, CaseIterable {
+	enum ProblemType: Hashable, Sendable, CaseIterable {
 		case securityFactors
 		case configurationBackup
 	}
 }
 
 // MARK: - BackupStatus
-public struct BackupStatus: Hashable, Codable, Sendable {
-	public let result: BackupResult
-	public let isCurrent: Bool
+struct BackupStatus: Hashable, Codable, Sendable {
+	let result: BackupResult
+	let isCurrent: Bool
 
-	public init(result: BackupResult, profile: Profile) {
+	init(result: BackupResult, profile: Profile) {
 		self.result = result
 		self.isCurrent = result.saveIdentifier == profile.header.saveIdentifier
 	}

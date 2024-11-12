@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - AccountLockerClaimDetails
 /// A struct holding the details for the pending claims of a given locker address & account address.
-public struct AccountLockerClaimDetails: Sendable, Hashable, Codable {
+struct AccountLockerClaimDetails: Sendable, Hashable, Codable {
 	let lockerAddress: LockerAddress
 	let accountAddress: AccountAddress
 	let dappDefinitionAddress: DappDefinitionAddress
@@ -13,19 +13,19 @@ public struct AccountLockerClaimDetails: Sendable, Hashable, Codable {
 
 // MARK: AccountLockerClaimDetails.Claim
 extension AccountLockerClaimDetails {
-	public enum Claim: Sendable, Hashable, Codable {
+	enum Claim: Sendable, Hashable, Codable {
 		case fungible(Fungible)
 		case nonFungible(NonFungible)
 	}
 }
 
 extension AccountLockerClaimDetails.Claim {
-	public struct Fungible: Sendable, Hashable, Codable {
+	struct Fungible: Sendable, Hashable, Codable {
 		let resourceAddress: ResourceAddress
 		let amount: Decimal192
 	}
 
-	public struct NonFungible: Sendable, Hashable, Codable {
+	struct NonFungible: Sendable, Hashable, Codable {
 		let resourceAddress: ResourceAddress
 		let count: Int
 	}

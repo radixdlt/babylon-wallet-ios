@@ -5,15 +5,15 @@ import SwiftUI
 
 extension DappDetails {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		let store: Store
 
-		public init(store: Store) {
+		init(store: Store) {
 			self.store = store
 		}
 	}
 
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let title: String
 		let description: String?
 		let domain: URL?
@@ -29,7 +29,7 @@ extension DappDetails {
 // MARK: - Body
 
 extension DappDetails.View {
-	public var body: some View {
+	var body: some View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(spacing: .medium1) {

@@ -3,7 +3,7 @@ import Sargon
 
 extension MnemonicWithPassphrase {
 	@discardableResult
-	public func validatePublicKeys(
+	func validatePublicKeys(
 		of softwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
 	) throws -> Bool {
 		guard validate(
@@ -20,7 +20,7 @@ extension MnemonicWithPassphrase {
 		return true
 	}
 
-	public func validatePublicKeys(
+	func validatePublicKeys(
 		of accounts: some Collection<Account>
 	) throws -> Bool {
 		guard validate(

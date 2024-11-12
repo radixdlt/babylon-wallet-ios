@@ -21,14 +21,14 @@ extension ConfigurationBackup.State {
 // MARK: - ConfigurationBackup.View
 extension ConfigurationBackup {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<ConfigurationBackup>
 
-		public init(store: StoreOf<ConfigurationBackup>) {
+		init(store: StoreOf<ConfigurationBackup>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }) { viewStore in
 				ScrollView {
 					VStack(alignment: .leading, spacing: .zero) {

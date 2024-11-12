@@ -6,15 +6,15 @@ import SwiftUI
 
 extension PersonaDetails {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		let store: StoreOf<PersonaDetails>
 
-		public init(store: StoreOf<PersonaDetails>) {
+		init(store: StoreOf<PersonaDetails>) {
 			self.store = store
 		}
 	}
 
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let thumbnail: URL?
 		let personaName: String
 		let isDappPersona: Bool
@@ -24,7 +24,7 @@ extension PersonaDetails {
 // MARK: - Body
 
 extension PersonaDetails.View {
-	public var body: some View {
+	var body: some View {
 		ScrollView(showsIndicators: false) {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: 0) {

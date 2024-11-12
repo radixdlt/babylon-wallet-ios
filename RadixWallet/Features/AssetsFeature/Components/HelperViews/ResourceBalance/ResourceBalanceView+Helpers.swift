@@ -1,7 +1,7 @@
 import SwiftUI
 
 extension ResourceBalance.ViewState.PoolUnit {
-	public init(poolUnit: OnLedgerEntity.OnLedgerAccount.PoolUnit, details: Loadable<OnLedgerEntitiesClient.OwnedResourcePoolDetails> = .idle) {
+	init(poolUnit: OnLedgerEntity.OnLedgerAccount.PoolUnit, details: Loadable<OnLedgerEntitiesClient.OwnedResourcePoolDetails> = .idle) {
 		self.init(
 			resourcePoolAddress: poolUnit.resourcePoolAddress,
 			poolUnitAddress: poolUnit.resource.resourceAddress,
@@ -15,7 +15,7 @@ extension ResourceBalance.ViewState.PoolUnit {
 }
 
 extension ResourceBalance.ViewState.Fungible {
-	public static func xrd(balance: ResourceAmount, network: NetworkID) -> Self {
+	static func xrd(balance: ResourceAmount, network: NetworkID) -> Self {
 		.init(
 			address: .xrd(on: network),
 			icon: .token(.xrd),
@@ -27,7 +27,7 @@ extension ResourceBalance.ViewState.Fungible {
 
 // MARK: - ResourceBalance.ViewState + Identifiable
 extension ResourceBalance.ViewState: Identifiable {
-	public var id: AnyHashable {
+	var id: AnyHashable {
 		self
 	}
 }

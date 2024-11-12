@@ -37,7 +37,7 @@ public enum HitTargetSize: CGFloat, Sendable {
 		.init(width: rawValue, height: rawValue)
 	}
 
-	public var cornerRadius: CGFloat {
+	var cornerRadius: CGFloat {
 		switch self {
 		case .icon:
 			.small3
@@ -79,8 +79,8 @@ extension View {
 
 // MARK: - Screen
 @MainActor
-public enum Screen {
-	public static let pixelScale: CGFloat = {
+enum Screen {
+	static let pixelScale: CGFloat = {
 		let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene
 		guard let screen = scene?.windows.first?.screen else { return 2 }
 		return screen.scale

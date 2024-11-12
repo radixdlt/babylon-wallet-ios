@@ -1,12 +1,12 @@
 import Sargon
 
 // MARK: - CacheClient
-public struct CacheClient: Sendable {
-	public var save: Save
-	public var load: Load
-	public var removeFile: RemoveFile
-	public var removeFolder: RemoveFolder
-	public var removeAll: RemoveAll
+struct CacheClient: Sendable {
+	var save: Save
+	var load: Load
+	var removeFile: RemoveFile
+	var removeFolder: RemoveFolder
+	var removeAll: RemoveAll
 
 	init(
 		save: @escaping Save,
@@ -24,28 +24,28 @@ public struct CacheClient: Sendable {
 }
 
 extension CacheClient {
-	public typealias Save = @Sendable (Encodable, Entry) -> Void
-	public typealias Load = @Sendable (Decodable.Type, Entry) throws -> Decodable
-	public typealias RemoveFile = @Sendable (Entry) -> Void
-	public typealias RemoveFolder = @Sendable (Entry) -> Void
-	public typealias RemoveAll = @Sendable () -> Void
+	typealias Save = @Sendable (Encodable, Entry) -> Void
+	typealias Load = @Sendable (Decodable.Type, Entry) throws -> Decodable
+	typealias RemoveFile = @Sendable (Entry) -> Void
+	typealias RemoveFolder = @Sendable (Entry) -> Void
+	typealias RemoveAll = @Sendable () -> Void
 }
 
 extension DependencyValues {
-	public var cacheClient: CacheClient {
+	var cacheClient: CacheClient {
 		get { self[CacheClient.self] }
 		set { self[CacheClient.self] = newValue }
 	}
 }
 
 // MARK: - InvalidateCachedDecision
-public enum InvalidateCachedDecision {
+enum InvalidateCachedDecision {
 	case cachedIsInvalid
 	case cachedIsValid
 }
 
 extension CacheClient {
-	public func withCaching<Model: Codable>(
+	func withCaching<Model: Codable>(
 		cacheEntry: Entry,
 		forceRefresh: Bool = false,
 		invalidateCached: (Model) -> InvalidateCachedDecision = { _ in .cachedIsValid },
@@ -108,17 +108,17 @@ extension Address {
 }
 
 extension CacheClient {
-	public enum Entry: Equatable {
+	enum Entry: Equatable {
 		static let root: String = "RadixWallet"
 
-		public init(address: some AddressProtocol) {
+		init(address: some AddressProtocol) {
 			self = .onLedgerEntity(.init(address: address))
 		}
 
-		public enum OnLedgerEntity: Hashable {
+		enum OnLedgerEntity: Hashable {
 			case address(Address)
 
-			public init(address: some AddressProtocol) {
+			init(address: some AddressProtocol) {
 				self = .address(address.asGeneral)
 			}
 
@@ -225,7 +225,7 @@ extension CacheClient {
 		}
 	}
 
-	public enum Error: Swift.Error {
+	enum Error: Swift.Error {
 		case dataLoadingFailed
 		case expirationDateLoadingFailed
 		case entryLifetimeExpired

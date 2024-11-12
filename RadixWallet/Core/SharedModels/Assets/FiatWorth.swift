@@ -12,7 +12,7 @@ extension FiatCurrency {
 }
 
 // MARK: - FiatWorth
-public struct FiatWorth: Sendable, Hashable {
+struct FiatWorth: Sendable, Hashable {
 	enum Worth: Sendable, Hashable {
 		case known(Decimal192)
 		case unknown
@@ -28,7 +28,7 @@ public struct FiatWorth: Sendable, Hashable {
 }
 
 extension FiatWorth {
-	public static func + (lhs: Self, rhs: Self) -> Self {
+	static func + (lhs: Self, rhs: Self) -> Self {
 		.init(
 			isVisible: lhs.isVisible,
 			worth: lhs.worth + rhs.worth,
@@ -38,7 +38,7 @@ extension FiatWorth {
 }
 
 extension FiatWorth.Worth {
-	public static func + (lhs: Self, rhs: Self) -> Self {
+	static func + (lhs: Self, rhs: Self) -> Self {
 		switch (lhs, rhs) {
 		case let (.known(lhsValue), .known(rhsValue)):
 			.known(lhsValue + rhsValue)
@@ -68,7 +68,7 @@ extension FiatWorth.Worth {
 
 // MARK: - FiatWorth + Comparable
 extension FiatWorth: Comparable {
-	public static func < (
+	static func < (
 		lhs: Self,
 		rhs: Self
 	) -> Bool {
@@ -78,7 +78,7 @@ extension FiatWorth: Comparable {
 
 // MARK: - FiatWorth.Worth + Comparable
 extension FiatWorth.Worth: Comparable {
-	public static func < (
+	static func < (
 		lhs: Self,
 		rhs: Self
 	) -> Bool {

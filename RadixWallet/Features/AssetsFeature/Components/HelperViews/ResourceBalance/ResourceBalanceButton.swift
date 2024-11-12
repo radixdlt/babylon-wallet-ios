@@ -1,14 +1,14 @@
 import SwiftUI
 
 // MARK: - ResourceBalanceButton
-public struct ResourceBalanceButton: View {
-	public let viewState: ResourceBalance.ViewState
-	public let appearance: Appearance
-	public let isSelected: Bool?
-	public let warning: String?
-	public let onTap: () -> Void
+struct ResourceBalanceButton: View {
+	let viewState: ResourceBalance.ViewState
+	let appearance: Appearance
+	let isSelected: Bool?
+	let warning: String?
+	let onTap: () -> Void
 
-	public enum Appearance {
+	enum Appearance {
 		case assetList
 		case transactionReview
 	}
@@ -27,13 +27,13 @@ public struct ResourceBalanceButton: View {
 		self.onTap = onTap
 	}
 
-	public var body: some View {
+	var body: some View {
 		Button(action: onTap) {
 			VStack(alignment: .leading, spacing: .small2) {
 				ResourceBalanceView(viewState, appearance: .standard, isSelected: isSelected)
 
 				if let warning {
-					WarningErrorView(text: warning, type: .warning, useNarrowSpacing: true)
+					WarningErrorView(text: warning, type: .warning, useNarrowSpacing: true, useSmallerFontSize: true)
 				}
 			}
 			.padding(.top, topPadding)
@@ -48,7 +48,7 @@ public struct ResourceBalanceButton: View {
 		switch appearance {
 		case .assetList:
 			switch viewState {
-			case .fungible:
+			case .fungible, .unknown:
 				.medium1
 			case .nonFungible:
 				.large3
@@ -66,7 +66,7 @@ public struct ResourceBalanceButton: View {
 		switch appearance {
 		case .assetList:
 			switch viewState {
-			case .fungible:
+			case .fungible, .unknown:
 				.medium2
 			case .nonFungible:
 				.medium1
@@ -82,7 +82,7 @@ public struct ResourceBalanceButton: View {
 		switch appearance {
 		case .assetList:
 			switch viewState {
-			case .fungible:
+			case .fungible, .unknown:
 				.large3
 			case .nonFungible:
 				.medium1

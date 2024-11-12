@@ -16,7 +16,7 @@ extension JSONDecoder: DependencyKey {
 extension JSONDecoder: @unchecked Sendable {}
 
 extension DependencyValues {
-	public var jsonDecoder: @Sendable () -> JSONDecoder {
+	var jsonDecoder: @Sendable () -> JSONDecoder {
 		self[JSONDecoder.self]
 	}
 }

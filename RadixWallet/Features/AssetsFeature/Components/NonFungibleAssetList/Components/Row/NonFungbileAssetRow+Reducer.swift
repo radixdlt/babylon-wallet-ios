@@ -3,33 +3,33 @@ import SwiftUI
 
 // MARK: - NonFungibleAssetList.Row
 extension NonFungibleAssetList {
-	public struct Row: Sendable, FeatureReducer {
-		public struct State: Sendable, Hashable, Identifiable {
+	struct Row: Sendable, FeatureReducer {
+		struct State: Sendable, Hashable, Identifiable {
 			static let pageSize = OnLedgerEntitiesClient.maximumNFTIDChunkSize
 
-			public var id: ResourceAddress { resource.resourceAddress }
-			public typealias AssetID = OnLedgerEntity.NonFungibleToken.ID
+			var id: ResourceAddress { resource.resourceAddress }
+			typealias AssetID = OnLedgerEntity.NonFungibleToken.ID
 
-			public var resource: OnLedgerEntity.OwnedNonFungibleResource
-			public let accountAddress: AccountAddress
+			var resource: OnLedgerEntity.OwnedNonFungibleResource
+			let accountAddress: AccountAddress
 
 			/// The loaded tokens
-			public var tokens: [Loadable<OnLedgerEntity.NonFungibleToken>] = []
+			var tokens: [Loadable<OnLedgerEntity.NonFungibleToken>] = []
 			/// Last token index that was loaded, useful to determin the next page index that needs to be loaded
-			public var lastLoadedTokenIndex: Int = 0
+			var lastLoadedTokenIndex: Int = 0
 			/// The last visible row to which user scrolled to, will be used to proactively fetch additional pages
 			/// if user did scroll past currently loading page
-			public var lastVisibleRowIndex: Int = 0
+			var lastVisibleRowIndex: Int = 0
 			/// Tokens pages are loaded one after another, in order to load the next page we need to have
 			/// the nextPageCursor received after loading current page.
-			public var nextPageCursor: String?
-			public var isLoadingResources: Bool = false
+			var nextPageCursor: String?
+			var isLoadingResources: Bool = false
 
-			public var isExpanded = false
-			public var disabled: Set<AssetID> = []
-			public var selectedAssets: OrderedSet<OnLedgerEntity.NonFungibleToken>?
+			var isExpanded = false
+			var disabled: Set<AssetID> = []
+			var selectedAssets: OrderedSet<OnLedgerEntity.NonFungibleToken>?
 
-			public init(
+			init(
 				accountAddress: AccountAddress,
 				resource: OnLedgerEntity.OwnedNonFungibleResource,
 				disabled: Set<AssetID> = [],
@@ -42,18 +42,18 @@ extension NonFungibleAssetList {
 			}
 		}
 
-		public enum ViewAction: Sendable, Equatable {
+		enum ViewAction: Sendable, Equatable {
 			case isExpandedToggled
 			case assetTapped(OnLedgerEntity.NonFungibleToken)
 			case onTokenDidAppear(index: Int)
 		}
 
-		public enum DelegateAction: Sendable, Equatable {
+		enum DelegateAction: Sendable, Equatable {
 			case open(OnLedgerEntity.NonFungibleToken)
 		}
 
-		public enum InternalAction: Sendable, Equatable {
-			public struct TokensLoadResult: Sendable, Equatable {
+		enum InternalAction: Sendable, Equatable {
+			struct TokensLoadResult: Sendable, Equatable {
 				let tokens: [OnLedgerEntity.NonFungibleToken]
 				let nextPageCursor: String?
 				let previousTokenIndex: Int
@@ -67,9 +67,9 @@ extension NonFungibleAssetList {
 		@Dependency(\.appPreferencesClient) var appPreferencesClient
 		@Dependency(\.errorQueue) var errorQueue
 
-		public init() {}
+		init() {}
 
-		public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+		func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
 			case let .assetTapped(asset):
 				guard !state.disabled.contains(asset.id) else { return .none }
@@ -100,7 +100,7 @@ extension NonFungibleAssetList {
 			}
 		}
 
-		public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 			switch internalAction {
 			case let .tokensLoaded(result):
 				switch result {

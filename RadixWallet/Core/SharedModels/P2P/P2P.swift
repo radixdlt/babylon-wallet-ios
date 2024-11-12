@@ -6,4 +6,4 @@
 ///
 /// But we might in future use WebRTC between an iOS and another mobile
 /// client, either iOS or Android, usecase is multi-sig.
-public enum P2P {}
+enum P2P {}

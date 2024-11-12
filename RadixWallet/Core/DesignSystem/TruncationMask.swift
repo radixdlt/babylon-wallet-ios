@@ -1,13 +1,13 @@
 import Foundation
 
 // MARK: - TruncationTextMask
-public struct TruncationTextMask: ViewModifier {
-	public let size: CGSize
-	public let enabled: Bool
+struct TruncationTextMask: ViewModifier {
+	let size: CGSize
+	let enabled: Bool
 
 	@Environment(\.layoutDirection) private var layoutDirection
 
-	public func body(content: Content) -> some View {
+	func body(content: Content) -> some View {
 		if enabled {
 			content
 				.mask(
@@ -43,7 +43,7 @@ public struct TruncationTextMask: ViewModifier {
 }
 
 extension View {
-	public func applyingTruncationMask(size: CGSize, enabled: Bool) -> some View {
+	func applyingTruncationMask(size: CGSize, enabled: Bool) -> some View {
 		modifier(TruncationTextMask(size: size, enabled: enabled))
 	}
 }

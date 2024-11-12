@@ -9,19 +9,19 @@ extension Home.State {
 
 // MARK: - Home.View
 extension Home {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let totalFiatWorth: Loadable<FiatWorth>?
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<Home>
 
-		public init(store: StoreOf<Home>) {
+		init(store: StoreOf<Home>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState) { viewStore in
 				ScrollView {
 					VStack(spacing: .medium3) {
@@ -162,7 +162,7 @@ private extension View {
 }
 
 extension View {
-	public func badged(_ showBadge: Bool) -> some View {
+	func badged(_ showBadge: Bool) -> some View {
 		overlay(alignment: .topTrailing) {
 			if showBadge {
 				Circle()
@@ -190,6 +190,6 @@ struct HomeView_Previews: PreviewProvider {
 }
 
 extension Home.State {
-	public static let previewValue = Home.State()
+	static let previewValue = Home.State()
 }
 #endif

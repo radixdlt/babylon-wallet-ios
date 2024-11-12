@@ -4,15 +4,15 @@ import SwiftUI
 // MARK: - ClaimWallet.View
 extension ClaimWallet {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<ClaimWallet>
 
-		public init(store: StoreOf<ClaimWallet>) {
+		init(store: StoreOf<ClaimWallet>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: { $0 }) { viewStore in
+		var body: some SwiftUI.View {
+			WithPerceptionTracking {
 				VStack(spacing: 0) {
 					Spacer()
 
@@ -52,7 +52,7 @@ extension ClaimWallet {
 				}
 				.padding(.horizontal, .large1)
 				.padding(.vertical, .medium3)
-				.controlState(viewStore.screenState)
+				.controlState(store.screenState)
 			}
 		}
 	}

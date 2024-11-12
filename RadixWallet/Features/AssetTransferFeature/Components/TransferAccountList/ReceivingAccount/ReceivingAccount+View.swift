@@ -3,20 +3,20 @@ import SwiftUI
 
 // MARK: - ReceivingAccount.View
 extension ReceivingAccount {
-	public typealias ViewState = State
+	typealias ViewState = State
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<ReceivingAccount>
 
-		public init(store: StoreOf<ReceivingAccount>) {
+		init(store: StoreOf<ReceivingAccount>) {
 			self.store = store
 		}
 	}
 }
 
 extension ReceivingAccount.View {
-	public var body: some View {
+	var body: some View {
 		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 			VStack(alignment: .leading, spacing: .zero) {
 				account(viewStore)

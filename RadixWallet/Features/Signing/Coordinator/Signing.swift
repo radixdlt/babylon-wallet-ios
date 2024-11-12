@@ -9,7 +9,7 @@ extension Secp256k1PublicKey: CustomDumpStringConvertible {
 }
 
 // MARK: - SigningPurposeWithPayload
-public enum SigningPurposeWithPayload: Sendable, Hashable {
+enum SigningPurposeWithPayload: Sendable, Hashable {
 	case signAuth(AuthenticationDataToSignForChallengeResponse)
 
 	case signTransaction(
@@ -18,31 +18,38 @@ public enum SigningPurposeWithPayload: Sendable, Hashable {
 		origin: SigningPurpose.SignTransactionPurpose
 	)
 
+	case signPreAuthorization(Subintent)
+
 	var purpose: SigningPurpose {
 		switch self {
-		case .signAuth: .signAuth
-		case let .signTransaction(_, _, purpose): .signTransaction(purpose)
+		case .signAuth:
+			.signAuth
+		case let .signTransaction(_, _, purpose):
+			.signTransaction(purpose)
+		case .signPreAuthorization:
+			.signPreAuthorization
 		}
 	}
 }
 
 // MARK: - SigningResponse
-public enum SigningResponse: Sendable, Hashable {
+enum SigningResponse: Sendable, Hashable {
 	case signTransaction(NotarizeTransactionResponse, origin: SigningPurpose.SignTransactionPurpose)
 	case signAuth(SignedAuthChallenge)
+	case signPreAuthorization(SignedSubintent)
 }
 
 // MARK: - Signing
-public struct Signing: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public var signatures: OrderedSet<SignatureOfEntity> = []
-		public var signWithFactorSource: SignWithFactorSource.State
+struct Signing: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		var signatures: OrderedSet<SignatureOfEntity> = []
+		var signWithFactorSource: SignWithFactorSource.State
 
-		public var factorsLeftToSignWith: SigningFactors
-		public let expectedSignatureCount: Int
-		public let signingPurposeWithPayload: SigningPurposeWithPayload
+		var factorsLeftToSignWith: SigningFactors
+		let expectedSignatureCount: Int
+		let signingPurposeWithPayload: SigningPurposeWithPayload
 
-		public init(
+		init(
 			factorsLeftToSignWith: SigningFactors,
 			signingPurposeWithPayload: SigningPurposeWithPayload
 		) {
@@ -57,17 +64,17 @@ public struct Signing: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case finishedSigningWithAllFactors
 		case notarizeResult(TaskResult<NotarizeTransactionResponse>)
 	}
 
 	@CasePathable
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case signWithFactorSource(SignWithFactorSource.Action)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case cancelSigning
 		case finishedSigning(SigningResponse)
 		case failedToSign
@@ -77,22 +84,23 @@ public struct Signing: Sendable, FeatureReducer {
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.transactionClient) var transactionClient
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Scope(state: \.signWithFactorSource, action: /Action.child .. ChildAction.signWithFactorSource) {
 			SignWithFactorSource()
 		}
 		Reduce(self.core)
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case .finishedSigningWithAllFactors:
 			switch state.signingPurposeWithPayload {
 			case let .signAuth(authData):
 				let response = SignedAuthChallenge(challenge: authData.input.challenge, entitySignatures: Set(state.signatures))
 				return .send(.delegate(.finishedSigning(.signAuth(response))))
+
 			case let .signTransaction(ephemeralNotaryPrivateKey, intent, _):
 
 				return .run { [signatures = state.signatures] send in
@@ -105,6 +113,12 @@ public struct Signing: Sendable, FeatureReducer {
 						))
 					})))
 				}
+
+			case let .signPreAuthorization(subintent):
+				let intentSignatures = state.signatures.map(\.signatureWithPublicKey).map { IntentSignature(signatureWithPublicKey: $0) }
+				let signedSubintent = SignedSubintent(subintent: subintent, subintentSignatures: IntentSignatures(signatures: intentSignatures))
+
+				return .send(.delegate(.finishedSigning(.signPreAuthorization(signedSubintent))))
 			}
 
 		case let .notarizeResult(.failure(error)):
@@ -114,9 +128,9 @@ public struct Signing: Sendable, FeatureReducer {
 
 		case let .notarizeResult(.success(notarized)):
 			switch state.signingPurposeWithPayload {
-			case .signAuth:
+			case .signAuth, .signPreAuthorization:
 				assertionFailure("Discrepancy")
-				loggerGlobal.warning("Discrepancy in signing, notarized a tx, but state.signingPurposeWithPayload == .signAuth, not possible.")
+				loggerGlobal.warning("Discrepancy in signing, notarized a tx, but state.signingPurposeWithPayload == \(state.signingPurposeWithPayload), not possible.")
 				return .none
 
 			case let .signTransaction(_, _, purpose):
@@ -125,7 +139,7 @@ public struct Signing: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .signWithFactorSource(.delegate(.done(factors, signatures))):
 			return handleSignatures(signingFactors: factors, signatures: signatures, &state)

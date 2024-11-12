@@ -17,20 +17,20 @@ struct Triggering<T: Hashable & Sendable>: Hashable, Sendable {
 }
 
 // MARK: - TransactionHistory
-public struct TransactionHistory: Sendable, FeatureReducer {
-	public enum Direction: Sendable {
+struct TransactionHistory: Sendable, FeatureReducer {
+	enum Direction: Sendable {
 		case up
 		case down
 	}
 
-	public enum ScrollTarget: Hashable, Sendable {
-		case transaction(IntentHash)
+	enum ScrollTarget: Hashable, Sendable {
+		case transaction(TransactionIntentHash)
 		// The latest transaction before the given date
 		case beforeDate(Date)
 		case latestTransaction
 	}
 
-	public struct State: Sendable, Hashable {
+	struct State: Sendable, Hashable {
 		var fullPeriod: Range<Date> = .now ..< .now
 
 		var availableMonths: IdentifiedArrayOf<DateRangeItem> = []
@@ -45,7 +45,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		var sections: IdentifiedArrayOf<TransactionSection> = []
 
-		var scrollTarget: Triggering<IntentHash?> = .updated(nil)
+		var scrollTarget: Triggering<TransactionIntentHash?> = .updated(nil)
 
 		/// The currently selected month
 		var currentMonth: DateRangeItem.ID
@@ -64,7 +64,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			var upCursor: Cursor = .initialRequest
 			var downCursor: Cursor = .initialRequest
 
-			public enum Cursor: Hashable, Sendable {
+			enum Cursor: Hashable, Sendable {
 				case initialRequest
 				case next(String)
 				case loadedAll
@@ -72,7 +72,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		}
 
 		@PresentationState
-		public var destination: Destination.State?
+		var destination: Destination.State?
 
 		init(account: Account) throws {
 			@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
@@ -88,8 +88,8 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		}
 	}
 
-	public struct TransactionSection: Sendable, Hashable, Identifiable {
-		public var id: Tagged<Self, Date> { .init(day) }
+	struct TransactionSection: Sendable, Hashable, Identifiable {
+		var id: Tagged<Self, Date> { .init(day) }
 		/// The day, in the form of a `Date` with all time components set to 0
 		let day: Date
 		/// The month, in the form of a `Date` with all time components set to 0 and the day set to 1
@@ -97,7 +97,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		var transactions: IdentifiedArrayOf<TransactionHistoryItem>
 	}
 
-	public enum ViewAction: Sendable, Hashable {
+	enum ViewAction: Sendable, Hashable {
 		case onAppear
 		case selectedMonth(DateRangeItem.ID)
 		case filtersTapped
@@ -106,7 +106,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		case closeTapped
 	}
 
-	public enum InternalAction: Sendable, Hashable {
+	enum InternalAction: Sendable, Hashable {
 		case loadedFirstTransactionDate(Date?)
 		case loadedHistory(
 			TransactionHistoryResponse,
@@ -115,18 +115,18 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		)
 	}
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case filters(TransactionHistoryFilters.State)
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case filters(TransactionHistoryFilters.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: \.filters, action: \.filters) {
 				TransactionHistoryFilters()
 			}
@@ -140,9 +140,9 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	@Dependency(\.openURL) var openURL
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -151,7 +151,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onAppear:
 			state.loading.isLoading = true
@@ -206,7 +206,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadedFirstTransactionDate(firstDate):
 			state.loading.isLoading = false
@@ -228,7 +228,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .filters(.delegate(.updateActiveFilters(filters))):
 			state.activeFilters = filters
@@ -238,7 +238,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
 		loadTransactionsWithFilters(state.activeFilters.map(\.id), state: &state)
 	}
 
@@ -439,7 +439,7 @@ extension TransactionHistory.State.Loading.Cursor {
 
 // MARK: - TransactionHistory.TransactionSection + CustomStringConvertible
 extension TransactionHistory.TransactionSection: CustomStringConvertible {
-	public var description: String {
+	var description: String {
 		"Section(\(id.rawValue.formatted(date: .numeric, time: .omitted))): \(transactions.count) transactions"
 	}
 }

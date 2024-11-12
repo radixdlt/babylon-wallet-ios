@@ -1,16 +1,16 @@
 import ComposableArchitecture
 
 // MARK: - SignWithFactorSource
-public struct SignWithFactorSource: Sendable, FeatureReducer {
+struct SignWithFactorSource: Sendable, FeatureReducer {
 	@ObservableState
-	public struct State: Sendable, Hashable {
-		public let kind: Kind
-		public let signingFactors: NonEmpty<Set<SigningFactor>>
-		public let signingPurposeWithPayload: SigningPurposeWithPayload
-		public var currentSigningFactor: SigningFactor?
-		public var factorSourceAccess: FactorSourceAccess.State
+	struct State: Sendable, Hashable {
+		let kind: Kind
+		let signingFactors: NonEmpty<Set<SigningFactor>>
+		let signingPurposeWithPayload: SigningPurposeWithPayload
+		var currentSigningFactor: SigningFactor?
+		var factorSourceAccess: FactorSourceAccess.State
 
-		public init(
+		init(
 			kind: Kind,
 			signingFactors: NonEmpty<Set<SigningFactor>>,
 			signingPurposeWithPayload: SigningPurposeWithPayload
@@ -18,45 +18,48 @@ public struct SignWithFactorSource: Sendable, FeatureReducer {
 			self.kind = kind
 			self.signingFactors = signingFactors
 			self.signingPurposeWithPayload = signingPurposeWithPayload
+
+			let purpose = signingPurposeWithPayload.factorSourceAccessPurpose
 			switch kind {
 			case .device:
 				assert(signingFactors.allSatisfy { $0.factorSource.kind == DeviceFactorSource.kind })
-				self.factorSourceAccess = .init(kind: .device, purpose: .signature)
+				self.factorSourceAccess = .init(kind: .device, purpose: purpose)
 			case .ledger:
 				assert(signingFactors.allSatisfy { $0.factorSource.kind == LedgerHardwareWalletFactorSource.kind })
-				self.factorSourceAccess = .init(kind: .ledger(nil), purpose: .signature)
+				let ledger: LedgerHardwareWalletFactorSource? = signingFactors.first?.factorSource.extract()
+				self.factorSourceAccess = .init(kind: .ledger(ledger), purpose: purpose)
 			}
 		}
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case signingWithFactor(SigningFactor)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case done(signingFactors: NonEmpty<Set<SigningFactor>>, signatures: Set<SignatureOfEntity>)
 		case failedToSign(SigningFactor)
 		case cancel
 	}
 
 	@CasePathable
-	public enum ChildAction: Sendable, Hashable {
+	enum ChildAction: Sendable, Hashable {
 		case factorSourceAccess(FactorSourceAccess.Action)
 	}
 
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Scope(state: \.factorSourceAccess, action: /Action.child .. ChildAction.factorSourceAccess) {
 			FactorSourceAccess()
 		}
 		Reduce(core)
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .factorSourceAccess(.delegate(.perform)):
 			signWithSigningFactors(of: state)
@@ -67,7 +70,7 @@ public struct SignWithFactorSource: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .signingWithFactor(factor):
 			state.currentSigningFactor = factor
@@ -119,6 +122,8 @@ public struct SignWithFactorSource: Sendable, FeatureReducer {
 			auth.payloadToHashAndSign.hash()
 		case let .signTransaction(_, intent, _):
 			intent.hash().hash
+		case let .signPreAuthorization(intent):
+			intent.hash().hash
 		}
 
 		return try await deviceFactorSourceClient.signUsingDeviceFactorSource(
@@ -142,6 +147,7 @@ public struct SignWithFactorSource: Sendable, FeatureReducer {
 				transactionIntent: intent,
 				displayHashOnLedgerDisplay: false
 			))
+
 		case let .signAuth(authToSign):
 			try await ledgerHardwareWalletClient.signAuthChallenge(.init(
 				ledger: ledger,
@@ -150,14 +156,33 @@ public struct SignWithFactorSource: Sendable, FeatureReducer {
 				origin: authToSign.input.origin,
 				dAppDefinitionAddress: authToSign.input.dAppDefinitionAddress
 			))
+
+		case let .signPreAuthorization(subintent):
+			try await ledgerHardwareWalletClient.signPreAuthorization(.init(
+				ledger: ledger,
+				signers: signers,
+				subintent: subintent,
+				displayHashOnLedgerDisplay: false
+			))
 		}
 	}
 }
 
 // MARK: - SignWithFactorSource.State.Kind
 extension SignWithFactorSource.State {
-	public enum Kind: Sendable, Hashable {
+	enum Kind: Sendable, Hashable {
 		case device
 		case ledger
+	}
+}
+
+private extension SigningPurposeWithPayload {
+	var factorSourceAccessPurpose: FactorSourceAccess.State.Purpose {
+		switch self {
+		case .signAuth:
+			.proveOwnership
+		case .signTransaction, .signPreAuthorization:
+			.signature
+		}
 	}
 }

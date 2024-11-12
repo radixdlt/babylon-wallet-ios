@@ -70,7 +70,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 		case failedToProveOwnership(of: [Account])
 	}
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		enum State: Sendable, Hashable {
 			case signing(Signing.State)
 		}
@@ -189,7 +189,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 				loggerGlobal.error("Failed to sign proof of ownership")
 				return .send(.delegate(.failedToProveOwnership(of: selectedAccounts)))
 
-			case .finishedSigning(.signTransaction):
+			case .finishedSigning(.signTransaction), .finishedSigning(.signPreAuthorization):
 				state.destination = nil
 				assertionFailure("wrong signing, signed tx, expected auth...")
 				loggerGlobal.error("Failed to sign proof of ownership")

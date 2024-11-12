@@ -9,20 +9,20 @@ extension DebugUserDefaultsContents.State {
 
 // MARK: - DebugUserDefaultsContents.View
 extension DebugUserDefaultsContents {
-	public struct ViewState: Equatable {
-		public let keyedValues: IdentifiedArrayOf<DebugUserDefaultsContents.State.KeyValues>
-		public let stringValuesOverTime: [String]
+	struct ViewState: Equatable {
+		let keyedValues: IdentifiedArrayOf<DebugUserDefaultsContents.State.KeyValues>
+		let stringValuesOverTime: [String]
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<DebugUserDefaultsContents>
 
-		public init(store: StoreOf<DebugUserDefaultsContents>) {
+		init(store: StoreOf<DebugUserDefaultsContents>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading) {
 					Form {
@@ -84,6 +84,6 @@ struct DebugUserDefaultsContents_Preview: PreviewProvider {
 }
 
 extension DebugUserDefaultsContents.State {
-	public static let previewValue = Self()
+	static let previewValue = Self()
 }
 #endif

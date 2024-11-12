@@ -1,38 +1,38 @@
 // MARK: - OverlayWindowClient
 /// This client is the intermediary between Main Window and the Overlay Window.
-public struct OverlayWindowClient: Sendable {
+struct OverlayWindowClient: Sendable {
 	/// All scheduled items to be shown in Overlay Window.
-	public var scheduledItems: ScheduledItems
+	var scheduledItems: ScheduledItems
 
 	/// Schedule an Alert to be shown in the Overlay Window.
 	/// Usually to be called from the Main Window.
-	public var scheduleAlert: ScheduleAlert
+	var scheduleAlert: ScheduleAlert
 
 	/// Schedule an Alert to be shown in the Overlay Window, but don't wait for any action
-	public var scheduleAlertAndIgnoreAction: ScheduleAlertAndIgnoreAction
+	var scheduleAlertAndIgnoreAction: ScheduleAlertAndIgnoreAction
 
 	/// Schedule a HUD to be shown in the Overlay Window.
 	/// Usually to be called from the Main Window.
-	public var scheduleHUD: ScheduleHUD
+	var scheduleHUD: ScheduleHUD
 
 	/// Schedule a sheet to be shown in the Overlay Window.
 	/// Usually to be called from the Main Window.
-	public var scheduleSheet: ScheduleSheet
+	var scheduleSheet: ScheduleSheet
 
 	/// Schedule a FullScreen to be shown in the Overlay Window.
 	/// Usually to be called from the Main Window.
-	public var scheduleFullScreen: ScheduleFullScreen
+	var scheduleFullScreen: ScheduleFullScreen
 
 	/// Used by the Overlay Window to send actions from an Alert back to the client
-	public var sendAlertAction: SendAlertAction
+	var sendAlertAction: SendAlertAction
 
 	/// Used by the Overlay Window to send actions from an FullScreenOverlay back to the client
-	public var sendFullScreenAction: SendFullScreenAction
+	var sendFullScreenAction: SendFullScreenAction
 
-	public var setIsUserIteractionEnabled: SetIsUserIteractionEnabled
-	public var isUserInteractionEnabled: IsUserInteractionEnabled
+	var setIsUserIteractionEnabled: SetIsUserIteractionEnabled
+	var isUserInteractionEnabled: IsUserInteractionEnabled
 
-	public init(
+	init(
 		scheduledItems: @escaping ScheduledItems,
 		scheduleAlert: @escaping ScheduleAlert,
 		scheduleAlertAndIgnoreAction: @escaping ScheduleAlertAndIgnoreAction,
@@ -58,39 +58,39 @@ public struct OverlayWindowClient: Sendable {
 }
 
 extension OverlayWindowClient {
-	public typealias FullScreenAction = FullScreenOverlayCoordinator.DelegateAction
-	public typealias FullScreenID = FullScreenOverlayCoordinator.State.ID
+	typealias FullScreenAction = FullScreenOverlayCoordinator.DelegateAction
+	typealias FullScreenID = FullScreenOverlayCoordinator.State.ID
 
-	public typealias ScheduleAlert = @Sendable (Item.AlertState) async -> Item.AlertAction
-	public typealias ScheduleAlertAndIgnoreAction = @Sendable (Item.AlertState) -> Void
-	public typealias ScheduleHUD = @Sendable (Item.HUD) -> Void
-	public typealias ScheduleSheet = @Sendable (SheetOverlayCoordinator.Root.State) -> Void
-	public typealias ScheduleFullScreen = @Sendable (FullScreenOverlayCoordinator.State) async -> FullScreenAction
-	public typealias SendAlertAction = @Sendable (Item.AlertAction, Item.AlertState.ID) -> Void
-	public typealias SendFullScreenAction = @Sendable (FullScreenAction, FullScreenID) -> Void
-	public typealias ScheduledItems = @Sendable () -> AnyAsyncSequence<Item>
+	typealias ScheduleAlert = @Sendable (Item.AlertState) async -> Item.AlertAction
+	typealias ScheduleAlertAndIgnoreAction = @Sendable (Item.AlertState) -> Void
+	typealias ScheduleHUD = @Sendable (Item.HUD) -> Void
+	typealias ScheduleSheet = @Sendable (SheetOverlayCoordinator.Root.State) -> Void
+	typealias ScheduleFullScreen = @Sendable (FullScreenOverlayCoordinator.State) async -> FullScreenAction
+	typealias SendAlertAction = @Sendable (Item.AlertAction, Item.AlertState.ID) -> Void
+	typealias SendFullScreenAction = @Sendable (FullScreenAction, FullScreenID) -> Void
+	typealias ScheduledItems = @Sendable () -> AnyAsyncSequence<Item>
 
-	public typealias SetIsUserIteractionEnabled = @Sendable (Bool) -> Void
-	public typealias IsUserInteractionEnabled = @Sendable () -> AnyAsyncSequence<Bool>
+	typealias SetIsUserIteractionEnabled = @Sendable (Bool) -> Void
+	typealias IsUserInteractionEnabled = @Sendable () -> AnyAsyncSequence<Bool>
 }
 
 // MARK: OverlayWindowClient.Item
 extension OverlayWindowClient {
-	public enum Item: Sendable, Hashable {
-		public typealias AlertState = ComposableArchitecture.AlertState<AlertAction>
-		public enum AlertAction: Sendable, Hashable {
+	enum Item: Sendable, Hashable {
+		typealias AlertState = ComposableArchitecture.AlertState<AlertAction>
+		enum AlertAction: Sendable, Hashable {
 			case primaryButtonTapped
 			case secondaryButtonTapped
 			case dismissed
 			case emailSupport(additionalInfo: String)
 		}
 
-		public struct HUD: Sendable, Hashable, Identifiable {
-			public let id = UUID()
-			public let text: String
-			public let icon: Icon?
+		struct HUD: Sendable, Hashable, Identifiable {
+			let id = UUID()
+			let text: String
+			let icon: Icon?
 
-			public init(
+			init(
 				text: String,
 				icon: Icon? = Icon(
 					kind: .system("checkmark.circle.fill"),
@@ -102,16 +102,16 @@ extension OverlayWindowClient {
 			}
 		}
 
-		public struct Icon: Hashable, Sendable {
-			public enum Kind: Hashable, Sendable {
+		struct Icon: Hashable, Sendable {
+			enum Kind: Hashable, Sendable {
 				case asset(ImageAsset)
 				case system(String)
 			}
 
-			public let kind: Kind
-			public let foregroundColor: Color
+			let kind: Kind
+			let foregroundColor: Color
 
-			public init(
+			init(
 				kind: Kind,
 				foregroundColor: Color = .app.green1
 			) {
@@ -128,7 +128,7 @@ extension OverlayWindowClient {
 }
 
 extension DependencyValues {
-	public var overlayWindowClient: OverlayWindowClient {
+	var overlayWindowClient: OverlayWindowClient {
 		get { self[OverlayWindowClient.self] }
 		set { self[OverlayWindowClient.self] = newValue }
 	}

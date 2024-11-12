@@ -1,13 +1,13 @@
 // MARK: - ToggleView
-public struct ToggleView: SwiftUI.View {
-	public let context: Context
-	public let icon: ImageAsset?
-	public let title: String
-	public let subtitle: String
-	public let minHeight: CGFloat
-	public let isOn: Binding<Bool>
+struct ToggleView: SwiftUI.View {
+	let context: Context
+	let icon: ImageAsset?
+	let title: String
+	let subtitle: String
+	let minHeight: CGFloat
+	let isOn: Binding<Bool>
 
-	public init(
+	init(
 		context: Context = .toggle,
 		icon: ImageAsset? = nil,
 		title: String,
@@ -23,7 +23,7 @@ public struct ToggleView: SwiftUI.View {
 		self.isOn = isOn
 	}
 
-	public var body: some SwiftUI.View {
+	var body: some SwiftUI.View {
 		Toggle(
 			isOn: isOn,
 			label: {
@@ -43,7 +43,7 @@ public struct ToggleView: SwiftUI.View {
 
 // MARK: ToggleView.Context
 extension ToggleView {
-	public enum Context {
+	enum Context {
 		case settings
 		case toggle
 	}

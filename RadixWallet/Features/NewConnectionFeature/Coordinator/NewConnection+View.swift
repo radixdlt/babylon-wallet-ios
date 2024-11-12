@@ -4,14 +4,14 @@ import SwiftUI
 // MARK: - NewConnection.View
 extension NewConnection {
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<NewConnection>
 
-		public init(store: StoreOf<NewConnection>) {
+		init(store: StoreOf<NewConnection>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			NavigationStack {
 				ZStack {
 					root(for: store.scope(state: \.root, action: { .child(.root($0)) }))

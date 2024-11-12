@@ -1,30 +1,33 @@
 // MARK: - WarningErrorView
-public struct WarningErrorView: View {
-	public let text: String
-	public let type: ViewType
-	public let spacing: CGFloat
+struct WarningErrorView: View {
+	let text: String
+	let type: ViewType
+	let spacing: CGFloat
+	let textStyle: TextStyle
 
-	public init(
+	init(
 		text: String,
 		type: ViewType,
-		useNarrowSpacing: Bool = false
+		useNarrowSpacing: Bool = false,
+		useSmallerFontSize: Bool = false
 	) {
 		self.text = text
 		self.type = type
 		self.spacing = useNarrowSpacing ? .small2 : .medium3
+		self.textStyle = useSmallerFontSize ? .body2HighImportance : .body1Header
 	}
 
-	public enum ViewType {
+	enum ViewType {
 		case warning
 		case error
 	}
 
-	public var body: some View {
+	var body: some View {
 		HStack(spacing: spacing) {
 			Image(.error)
 			Text(text)
 				.lineSpacing(-.small3)
-				.textStyle(.body1Header)
+				.textStyle(textStyle)
 				.multilineTextAlignment(.leading)
 		}
 		.foregroundColor(color)

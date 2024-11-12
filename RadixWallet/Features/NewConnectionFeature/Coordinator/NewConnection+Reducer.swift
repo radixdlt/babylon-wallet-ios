@@ -2,19 +2,19 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - NewConnection
-public struct NewConnection: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public typealias ConnectionName = String
+struct NewConnection: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		typealias ConnectionName = String
 
-		public var root: Root.State
+		var root: Root.State
 
 		@PresentationState
-		public var destination: Destination.State?
+		var destination: Destination.State?
 
-		public var linkConnectionQRData: LinkConnectionQRData?
-		public var connectionName: ConnectionName?
+		var linkConnectionQRData: LinkConnectionQRData?
+		var connectionName: ConnectionName?
 
-		public init(
+		init(
 			root: Root.State = .init(),
 			linkConnectionQRData: LinkConnectionQRData? = nil,
 			connectionName: ConnectionName? = nil
@@ -25,19 +25,19 @@ public struct NewConnection: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case closeButtonTapped
 	}
 
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case root(Root.Action)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case newConnection(P2PLink)
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case linkConnectionDataFromStringResult(TaskResult<LinkConnectionQRData>)
 		case establishConnection(String)
 		case establishConnectionResult(TaskResult<P2PLink>)
@@ -45,28 +45,28 @@ public struct NewConnection: Sendable, FeatureReducer {
 		case showErrorAlert(AlertState<Destination.Action.ErrorAlert>)
 	}
 
-	public struct Root: Sendable, Hashable, Reducer {
+	struct Root: Sendable, Hashable, Reducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case localNetworkPermission(LocalNetworkPermission.State)
 			case scanQR(ScanQRCoordinator.State)
 			case nameConnection(NewConnectionName.State)
 			case connectionApproval(NewConnectionApproval.State)
 
-			public init() {
+			init() {
 				self = .localNetworkPermission(.init())
 			}
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case localNetworkPermission(LocalNetworkPermission.Action)
 			case scanQR(ScanQRCoordinator.Action)
 			case nameConnection(NewConnectionName.Action)
 			case connectionApproval(NewConnectionApproval.Action)
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			Scope(state: /State.localNetworkPermission, action: /Action.localNetworkPermission) {
 				LocalNetworkPermission()
 			}
@@ -82,22 +82,22 @@ public struct NewConnection: Sendable, FeatureReducer {
 		}
 	}
 
-	public struct Destination: DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		public enum State: Sendable, Hashable {
+		enum State: Sendable, Hashable {
 			case errorAlert(AlertState<Action.ErrorAlert>)
 		}
 
 		@CasePathable
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case errorAlert(ErrorAlert)
 
-			public enum ErrorAlert: Hashable, Sendable {
+			enum ErrorAlert: Hashable, Sendable {
 				case dismissTapped
 			}
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			EmptyReducer()
 		}
 	}
@@ -108,16 +108,16 @@ public struct NewConnection: Sendable, FeatureReducer {
 	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.dismiss) var dismiss
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Scope(state: \.root, action: /Action.child .. ChildAction.root) {
 			Root()
 		}
 		Reduce(core)
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
 			.run { _ in
@@ -126,7 +126,7 @@ public struct NewConnection: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .linkConnectionDataFromStringResult(.success(linkConnectionQRData)):
 			state.linkConnectionQRData = linkConnectionQRData
@@ -200,7 +200,7 @@ public struct NewConnection: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .root(.localNetworkPermission(.delegate(.permissionResponse(allowed)))):
 			if allowed {
@@ -246,7 +246,7 @@ public struct NewConnection: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .errorAlert(.dismissTapped):
 			.run { _ in
@@ -272,7 +272,7 @@ public struct NewConnection: Sendable, FeatureReducer {
 }
 
 extension AlertState<NewConnection.Destination.Action.ErrorAlert> {
-	public static var unknownPurpose: AlertState {
+	static var unknownPurpose: AlertState {
 		AlertState {
 			TextState(L10n.LinkedConnectors.linkFailedErrorTitle)
 		} actions: {
@@ -284,7 +284,7 @@ extension AlertState<NewConnection.Destination.Action.ErrorAlert> {
 		}
 	}
 
-	public static var changingPurposeNotSupported: AlertState {
+	static var changingPurposeNotSupported: AlertState {
 		AlertState {
 			TextState(L10n.LinkedConnectors.linkFailedErrorTitle)
 		} actions: {
@@ -296,7 +296,7 @@ extension AlertState<NewConnection.Destination.Action.ErrorAlert> {
 		}
 	}
 
-	public static var invalidQRCode: AlertState {
+	static var invalidQRCode: AlertState {
 		AlertState {
 			TextState(L10n.LinkedConnectors.incorrectQrTitle)
 		} actions: {
@@ -308,7 +308,7 @@ extension AlertState<NewConnection.Destination.Action.ErrorAlert> {
 		}
 	}
 
-	public static var oldFormatQRCode: AlertState {
+	static var oldFormatQRCode: AlertState {
 		AlertState {
 			TextState(L10n.LinkedConnectors.incorrectQrTitle)
 		} actions: {

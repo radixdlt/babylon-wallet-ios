@@ -3,10 +3,10 @@ import NonEmpty
 
 extension Array where Element: Identifiable {
 	/// Returns an `IdentifiedArray` of the `Element`, omitting clashing elements
-	public func asIdentified() -> IdentifiedArrayOf<Element> {
+	func asIdentified() -> IdentifiedArrayOf<Element> {
 		var array: IdentifiedArrayOf<Element> = []
 		for element in self {
-			let (inserted, _) = array.append(element)
+			let _ = array.append(element)
 		}
 		return array
 	}

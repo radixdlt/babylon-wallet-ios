@@ -1,6 +1,6 @@
 // MARK: - GatewayAPI.MetadataTypedValue
 extension GatewayAPI {
-	public enum MetadataTypedValue: Codable, Hashable {
+	enum MetadataTypedValue: Codable, Hashable {
 		case stringValue(GatewayAPI.MetadataStringValue)
 		case boolValue(GatewayAPI.MetadataBoolValue)
 		case u8Value(GatewayAPI.MetadataU8Value)
@@ -38,7 +38,7 @@ extension GatewayAPI {
 			case type
 		}
 
-		public init(from decoder: Decoder) throws {
+		init(from decoder: Decoder) throws {
 			let container = try decoder.container(keyedBy: CodingKeys.self)
 
 			if let type = try? container.decode(String.self, forKey: .type) {
@@ -115,7 +115,7 @@ extension GatewayAPI {
 			}
 		}
 
-		public func encode(to encoder: Encoder) throws {
+		func encode(to encoder: Encoder) throws {
 			var container = encoder.container(keyedBy: CodingKeys.self)
 
 			switch self {
@@ -220,7 +220,7 @@ extension GatewayAPI {
 	}
 }
 
-public extension GatewayAPI.MetadataTypedValue {
+extension GatewayAPI.MetadataTypedValue {
 	var stringValue: GatewayAPI.MetadataStringValue? {
 		if case let .stringValue(value) = self {
 			return value

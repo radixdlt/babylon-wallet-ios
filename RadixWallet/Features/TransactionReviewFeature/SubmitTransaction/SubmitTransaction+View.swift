@@ -15,8 +15,7 @@ extension SubmitTransaction.State {
 extension SubmitTransaction.State.TXStatus {
 	var display: String {
 		switch self {
-		case .failed(.applicationError(.worktopError(.assertionFailed))),
-		     .permanentlyRejected(.applicationError(.worktopError(.assertionFailed))):
+		case .failed(.worktopError), .permanentlyRejected(.worktopError):
 			L10n.TransactionStatus.AssertionFailure.text
 		case .failed:
 			L10n.TransactionStatus.Failed.text
@@ -47,26 +46,26 @@ extension SubmitTransaction.State.TXStatus {
 
 // MARK: - SubmitTransaction.View
 extension SubmitTransaction {
-	public struct ViewState: Equatable {
-		let txID: IntentHash
+	struct ViewState: Equatable {
+		let txID: TransactionIntentHash
 		let status: State.TXStatus
 		let dismissalDisabled: Bool
 		let showSwitchBackToBrowserMessage: Bool
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		@SwiftUI.State private var opacity: Double = 1.0
 
 		private let store: StoreOf<SubmitTransaction>
 
 		@ScaledMetric private var height: CGFloat = 360
 
-		public init(store: StoreOf<SubmitTransaction>) {
+		init(store: StoreOf<SubmitTransaction>) {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				WithNavigationBar {
 					viewStore.send(.closeButtonTapped)

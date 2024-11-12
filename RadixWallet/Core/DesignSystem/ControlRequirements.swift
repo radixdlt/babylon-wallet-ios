@@ -4,10 +4,10 @@ import SwiftUI
 // MARK: - WithControlRequirements
 // TODO: simplify with variadic generics in the future
 //
-// public struct WithControlRequirements<Control: View>: View {
+// struct WithControlRequirements<Control: View>: View {
 //     [...]
 //
-//     public init<T...>(
+//     init<T...>(
 //         _ requirements: @autoclosure () -> T?...,
 //         forAction action: @escaping (T...) -> Void,
 //         @ViewBuilder control: (@escaping () -> Void) -> Control
@@ -16,13 +16,13 @@ import SwiftUI
 //     }
 // }
 
-public struct WithControlRequirements<Control: View>: View {
+struct WithControlRequirements<Control: View>: View {
 	@Environment(\.controlState) var controlState
 
 	let action: (() -> Void)?
 	let control: Control
 
-	public init<A>(
+	init<A>(
 		_ a: @autoclosure () -> A?,
 		forAction action: @escaping (A) -> Void,
 		@ViewBuilder control: (@escaping () -> Void) -> Control
@@ -36,7 +36,7 @@ public struct WithControlRequirements<Control: View>: View {
 		self.control = control(action ?? {})
 	}
 
-	public init<A, B>(
+	init<A, B>(
 		_ a: @autoclosure () -> A?,
 		_ b: @autoclosure () -> B?,
 		forAction action: @escaping (A, B) -> Void,
@@ -51,7 +51,7 @@ public struct WithControlRequirements<Control: View>: View {
 		self.control = control(action ?? {})
 	}
 
-	public init<A, B>(
+	init<A, B>(
 		_ a: @autoclosure () -> A?,
 		or b: @autoclosure () -> B?,
 		forAction action: @escaping (Either<A, B>) -> Void,
@@ -72,7 +72,7 @@ public struct WithControlRequirements<Control: View>: View {
 		self.control = control(controlAction ?? {})
 	}
 
-	public init<A, B, C>(
+	init<A, B, C>(
 		_ a: @autoclosure () -> A?,
 		_ b: @autoclosure () -> B?,
 		_ c: @autoclosure () -> C?,
@@ -88,7 +88,7 @@ public struct WithControlRequirements<Control: View>: View {
 		self.control = control(action ?? {})
 	}
 
-	public var body: some View {
+	var body: some View {
 		control.controlState(action == nil ? .disabled : controlState)
 	}
 }

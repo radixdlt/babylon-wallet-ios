@@ -11,26 +11,26 @@ import AnyCodable
 #endif
 
 @available(*, deprecated, renamed: "GatewayAPI.StateKeyValueStoreDataResponseItem")
-public typealias StateKeyValueStoreDataResponseItem = GatewayAPI.StateKeyValueStoreDataResponseItem
+typealias StateKeyValueStoreDataResponseItem = GatewayAPI.StateKeyValueStoreDataResponseItem
 
 extension GatewayAPI {
 
-public struct StateKeyValueStoreDataResponseItem: Codable, Hashable {
+struct StateKeyValueStoreDataResponseItem: Codable, Hashable {
 
-    public private(set) var key: ScryptoSborValue
-    public private(set) var value: ScryptoSborValue
+    private(set) var key: ScryptoSborValue
+    private(set) var value: ScryptoSborValue
     /** The most recent state version underlying object was modified at. */
-    public private(set) var lastUpdatedAtStateVersion: Int64
-    public private(set) var isLocked: Bool
+    private(set) var lastUpdatedAtStateVersion: Int64
+    private(set) var isLocked: Bool
 
-    public init(key: ScryptoSborValue, value: ScryptoSborValue, lastUpdatedAtStateVersion: Int64, isLocked: Bool) {
+    init(key: ScryptoSborValue, value: ScryptoSborValue, lastUpdatedAtStateVersion: Int64, isLocked: Bool) {
         self.key = key
         self.value = value
         self.lastUpdatedAtStateVersion = lastUpdatedAtStateVersion
         self.isLocked = isLocked
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case key
         case value
         case lastUpdatedAtStateVersion = "last_updated_at_state_version"
@@ -39,7 +39,7 @@ public struct StateKeyValueStoreDataResponseItem: Codable, Hashable {
 
     // Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(key, forKey: .key)
         try container.encode(value, forKey: .value)

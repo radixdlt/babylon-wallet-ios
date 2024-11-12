@@ -2,39 +2,39 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - FungibleResourceAsset
-public struct FungibleResourceAsset: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable, Identifiable {
-		public typealias ID = String
+struct FungibleResourceAsset: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable, Identifiable {
+		typealias ID = String
 		static let defaultFee: Decimal192 = 1
 
-		public var id: ID {
+		var id: ID {
 			resource.resourceAddress.address
 		}
 
-		public var balance: Decimal192 {
-			resource.amount.nominalAmount
+		var balance: Decimal192 {
+			resource.amount.exactAmount!.nominalAmount
 		}
 
-		public var totalExceedsBalance: Bool {
+		var totalExceedsBalance: Bool {
 			totalTransferSum > balance
 		}
 
 		// Transfered resource
-		public let resource: OnLedgerEntity.OwnedFungibleResource
-		public let isXRD: Bool
+		let resource: OnLedgerEntity.OwnedFungibleResource
+		let isXRD: Bool
 
 		// MARK: - Mutable state
 
 		@PresentationState
-		public var destination: Destination.State? = nil
+		var destination: Destination.State? = nil
 
-		public var transferAmountStr: String = ""
-		public var transferAmount: Decimal192? = nil
+		var transferAmountStr: String = ""
+		var transferAmount: Decimal192? = nil
 
 		// Total transfer sum for the transferred resource
-		public var totalTransferSum: Decimal192
+		var totalTransferSum: Decimal192
 
-		public var focused: Bool = false
+		var focused: Bool = false
 
 		init(
 			resource: OnLedgerEntity.OwnedFungibleResource,
@@ -47,48 +47,48 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable, Sendable {
 		case amountChanged(String)
 		case maxAmountTapped
 		case focusChanged(Bool)
 		case resourceTapped
 	}
 
-	public enum DelegateAction: Equatable, Sendable {
+	enum DelegateAction: Equatable, Sendable {
 		case amountChanged
 		case resourceTapped
 	}
 
-	public struct Destination: DestinationReducer {
-		public enum State: Sendable, Hashable {
+	struct Destination: DestinationReducer {
+		enum State: Sendable, Hashable {
 			case chooseXRDAmount(AlertState<Action.ChooseXRDAmount>)
 			case needsToPayFeeFromOtherAccount(AlertState<Action.NeedsToPayFeeFromOtherAccount>)
 		}
 
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case chooseXRDAmount(ChooseXRDAmount)
 			case needsToPayFeeFromOtherAccount(NeedsToPayFeeFromOtherAccount)
 
-			public enum ChooseXRDAmount: Hashable, Sendable {
+			enum ChooseXRDAmount: Hashable, Sendable {
 				case deductFee(Decimal192)
 				case sendAll(Decimal192)
 				case cancel
 			}
 
-			public enum NeedsToPayFeeFromOtherAccount: Hashable, Sendable {
+			enum NeedsToPayFeeFromOtherAccount: Hashable, Sendable {
 				case confirm(Decimal192)
 				case cancel
 			}
 		}
 
-		public var body: some ReducerOf<Self> {
+		var body: some ReducerOf<Self> {
 			EmptyReducer()
 		}
 	}
 
-	public init() {}
+	init() {}
 
-	public var body: some ReducerOf<Self> {
+	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -97,7 +97,7 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .amountChanged(transferAmountStr):
 			state.transferAmountStr = transferAmountStr
@@ -139,7 +139,7 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .chooseXRDAmount(.deductFee(amount)),
 		     let .chooseXRDAmount(.sendAll(amount)),

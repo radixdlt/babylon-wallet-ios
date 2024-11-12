@@ -11,12 +11,12 @@ extension DeviceFactorSource {
 
 extension DeviceFactorSource {
 	/// **B**abylon **D**evice **F**actor **S**ource
-	public var isExplicitMainBDFS: Bool {
+	var isExplicitMainBDFS: Bool {
 		isBDFS && isExplicitMain
 	}
 
 	/// **B**abylon **D**evice **F**actor **S**ource
-	public var isBDFS: Bool {
+	var isBDFS: Bool {
 		guard supportsBabylon else { return false }
 		if hint.mnemonicWordCount == .twentyFour {
 			return true
@@ -28,7 +28,7 @@ extension DeviceFactorSource {
 }
 
 extension FactorSourceProtocol {
-	public var isExplicitMain: Bool {
+	var isExplicitMain: Bool {
 		common.flags.contains(.main)
 	}
 }
