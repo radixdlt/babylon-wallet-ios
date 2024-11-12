@@ -356,14 +356,18 @@ extension TransactionFailure {
 		case .OneOfReceivingAccountsDoesNotAllowDeposits:
 			.failedToPrepareTXReview(.oneOfRecevingAccountsDoesNotAllowDeposits)
 
-		case .FailedTransactionPreview:
-			.failedToPrepareTXReview(.failedToRetrieveTXReceipt("Unknown reason"))
+		case let .FailedTransactionPreview(message):
+			.failedToPrepareTXReview(.failedTXPreview(message))
 
 		case .FailedToExtractTransactionReceiptBytes:
 			.failedToPrepareTXReview(.failedToExtractTXReceiptBytes)
 
 		default:
-			.failedToPrepareTXReview(.failedToRetrieveTXReceipt("Unknown reason"))
+			if let code = commonError?.errorCode {
+				.failedToPrepareTXReview(.failedTXPreview("Unknown reason, code: \(code)"))
+			} else {
+				.failedToPrepareTXReview(.failedTXPreview("Unknown reason"))
+			}
 		}
 	}
 }
