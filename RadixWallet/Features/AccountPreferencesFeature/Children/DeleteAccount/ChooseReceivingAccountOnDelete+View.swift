@@ -1,6 +1,15 @@
 import ComposableArchitecture
 import SwiftUI
 
+extension ChooseReceivingAccountOnDelete.State {
+	var hasAccountsWithEnoughXRD: Bool? {
+		chooseAccounts.availableAccounts.wrappedValue?.contains(where: { accountType in
+			guard case let .receiving(account) = accountType else { return false }
+			return account.hasEnoughXRD
+		})
+	}
+}
+
 // MARK: - ChooseReceivingAccountOnDelete.View
 extension ChooseReceivingAccountOnDelete {
 	@MainActor
@@ -15,17 +24,30 @@ extension ChooseReceivingAccountOnDelete {
 							.foregroundColor(.app.gray1)
 							.lineSpacing(0)
 							.textStyle(.sheetTitle)
-							.multilineTextAlignment(.center)
 
-						Text("Before deleting this Account, choose another one to transfer your assets to. The new Account must hold enough XRD to pay the transaction fee.")
+						Text("Before deleting this Account, choose another one to transfer your assets to.")
+							.foregroundColor(.app.gray1)
+							.textStyle(.body1Header)
+
+						Text("The new Account must hold enough XRD to pay the transaction fee.")
 							.foregroundColor(.app.gray1)
 							.textStyle(.body1Regular)
-							.multilineTextAlignment(.leading)
+
+						if viewStore.hasAccountsWithEnoughXRD == false {
+							WarningErrorView(
+								text: "You don’t have any other accounts with enough XRD.",
+								type: .warning,
+								useNarrowSpacing: true,
+								useSmallerFontSize: true
+							)
+							.flushedLeft
+						}
 
 						ChooseAccounts.View(store: store.chooseAccounts)
 					}
 					.padding(.horizontal, .medium1)
 					.padding(.bottom, .medium2)
+					.multilineTextAlignment(.center)
 				}
 				.footer {
 					VStack(spacing: .medium3) {
@@ -44,7 +66,7 @@ extension ChooseReceivingAccountOnDelete {
 					}
 				}
 			}
-			//            .destinations(with: store)
+			.destinations(with: store)
 		}
 	}
 }
@@ -59,5 +81,17 @@ private extension StoreOf<ChooseReceivingAccountOnDelete> {
 
 	var chooseAccounts: StoreOf<ChooseAccounts> {
 		scope(state: \.chooseAccounts) { .child(.chooseAccounts($0)) }
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<ChooseReceivingAccountOnDelete>) -> some View {
+		let destinationStore = store.destination
+		return confirmDeletionAlert(with: destinationStore)
+	}
+
+	private func confirmDeletionAlert(with destinationStore: PresentationStoreOf<ChooseReceivingAccountOnDelete.Destination>) -> some View {
+		alert(store: destinationStore.scope(state: \.confirmSkip, action: \.confirmSkip))
 	}
 }

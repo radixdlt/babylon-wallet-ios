@@ -61,6 +61,7 @@ struct DeleteAccountConfirmation: Sendable, FeatureReducer {
 		switch viewAction {
 		case .continueButtonTapped:
 			state.destination = .chooseReceivingAccount(.init(
+				accountToDelete: state.account,
 				chooseAccounts: .init(
 					context: .accountDeletion,
 					filteredAccounts: [state.account.accountAddress],
