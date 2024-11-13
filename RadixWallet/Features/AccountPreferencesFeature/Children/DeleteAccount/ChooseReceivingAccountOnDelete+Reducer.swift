@@ -31,16 +31,22 @@ struct ChooseReceivingAccountOnDelete: Sendable, FeatureReducer {
 	struct Destination: DestinationReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
-			case confirmSkip(AlertState<Action.ConfirmSkipAlert>)
+			case confirmSkipAlert(AlertState<Action.ConfirmSkipAlert>)
+			case tooManyAssetsAlert(AlertState<Action.TooManyAssetsAlert>)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
-			case confirmSkip(ConfirmSkipAlert)
+			case confirmSkipAlert(ConfirmSkipAlert)
+			case tooManyAssetsAlert(TooManyAssetsAlert)
 
 			enum ConfirmSkipAlert: Hashable, Sendable {
 				case cancelTapped
 				case continueTapped
+			}
+
+			enum TooManyAssetsAlert: Hashable, Sendable {
+				case okTapped
 			}
 		}
 
@@ -65,17 +71,23 @@ struct ChooseReceivingAccountOnDelete: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .continueButtonTapped(selectedAccounts):
+			guard let receivingAccount = selectedAccounts.first else {
+				return .none
+			}
+
+			// TODO: review transaction
+
 			return .none
 
 		case .skipButtonTapped:
-			state.destination = .confirmSkip(.confirmSkip)
+			state.destination = .confirmSkipAlert(.confirmSkip)
 			return .none
 		}
 	}
 
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case .confirmSkip(.continueTapped):
+		case .confirmSkipAlert(.continueTapped):
 			// TODO: review transaction
 			.none
 
@@ -98,6 +110,20 @@ extension AlertState<ChooseReceivingAccountOnDelete.Destination.Action.ConfirmSk
 			}
 		} message: {
 			TextState("If you do not transfer your assets out of this Account, they will be lost forever.")
+		}
+	}
+}
+
+extension AlertState<ChooseReceivingAccountOnDelete.Destination.Action.TooManyAssetsAlert> {
+	static var tooManyAssets: AlertState {
+		AlertState {
+			TextState("Cannot Delete Account")
+		} actions: {
+			ButtonState(role: .cancel, action: .okTapped) {
+				TextState(L10n.Common.ok)
+			}
+		} message: {
+			TextState("Too many assets currently held in Account to perform deletion. Move some and try again.")
 		}
 	}
 }

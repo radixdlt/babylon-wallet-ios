@@ -89,9 +89,14 @@ private extension View {
 	func destinations(with store: StoreOf<ChooseReceivingAccountOnDelete>) -> some View {
 		let destinationStore = store.destination
 		return confirmDeletionAlert(with: destinationStore)
+			.tooManyAssetsAlert(with: destinationStore)
 	}
 
 	private func confirmDeletionAlert(with destinationStore: PresentationStoreOf<ChooseReceivingAccountOnDelete.Destination>) -> some View {
-		alert(store: destinationStore.scope(state: \.confirmSkip, action: \.confirmSkip))
+		alert(store: destinationStore.scope(state: \.confirmSkipAlert, action: \.confirmSkipAlert))
+	}
+
+	private func tooManyAssetsAlert(with destinationStore: PresentationStoreOf<ChooseReceivingAccountOnDelete.Destination>) -> some View {
+		alert(store: destinationStore.scope(state: \.tooManyAssetsAlert, action: \.tooManyAssetsAlert))
 	}
 }
