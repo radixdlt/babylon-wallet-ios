@@ -51,7 +51,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 			case thirdPartyDeposits(ManageThirdPartyDeposits.State)
 			case devPreferences(DevAccountPreferences.State)
 			case hideAccount
-			case deleteAccount
+			case deleteAccount(DeleteAccountConfirmation.State)
 		}
 
 		@CasePathable
@@ -60,18 +60,21 @@ struct AccountPreferences: Sendable, FeatureReducer {
 			case thirdPartyDeposits(ManageThirdPartyDeposits.Action)
 			case devPreferences(DevAccountPreferences.Action)
 			case hideAccount(ConfirmationAction)
-			case deleteAccount(ConfirmationAction)
+			case deleteAccount(DeleteAccountConfirmation.Action)
 		}
 
 		var body: some ReducerOf<Self> {
-			Scope(state: /State.updateAccountLabel, action: /Action.updateAccountLabel) {
+			Scope(state: \.updateAccountLabel, action: \.updateAccountLabel) {
 				UpdateAccountLabel()
 			}
-			Scope(state: /State.thirdPartyDeposits, action: /Action.thirdPartyDeposits) {
+			Scope(state: \.thirdPartyDeposits, action: \.thirdPartyDeposits) {
 				ManageThirdPartyDeposits()
 			}
-			Scope(state: /State.devPreferences, action: /Action.devPreferences) {
+			Scope(state: \.devPreferences, action: \.devPreferences) {
 				DevAccountPreferences()
+			}
+			Scope(state: \.deleteAccount, action: \.deleteAccount) {
+				DeleteAccountConfirmation()
 			}
 		}
 	}
@@ -114,7 +117,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 			return .none
 
 		case .deleteAccountTapped:
-			state.destination = .deleteAccount
+			state.destination = .deleteAccount(.init(account: state.account))
 			return .none
 
 		case .faucetButtonTapped:
@@ -171,10 +174,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 		case .hideAccount(.confirm):
 			state.destination = nil
 			return hideAccountEffect(state: state)
-		case .deleteAccount(.confirm):
-			state.destination = nil
-			return deleteAccountEffect(state: state)
-		case .hideAccount(.cancel), .deleteAccount(.cancel):
+		case .hideAccount(.cancel), .deleteAccount(.delegate(.cancel)):
 			state.destination = nil
 			return .none
 		default:

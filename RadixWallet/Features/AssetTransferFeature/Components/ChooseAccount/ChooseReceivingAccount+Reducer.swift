@@ -103,8 +103,8 @@ struct ChooseReceivingAccount: Sendable, FeatureReducer {
 		case let .chooseButtonTapped(result):
 			// While we allow to easily selected the owned account, user is still able to paste the address of an owned account.
 			// This be sure to check if the manually introduced address matches any of the user owned accounts.
-			if case let .addressOfExternalAccount(address) = result, let ownedAccount = state.chooseAccounts.availableAccounts.first(where: { $0.address == address }) {
-				return .send(.delegate(.handleResult(.profileAccount(value: ownedAccount))))
+			if case let .addressOfExternalAccount(address) = result, let ownedAccount = state.chooseAccounts.availableAccounts.wrappedValue?.first(where: { $0.account.address == address }) {
+				return .send(.delegate(.handleResult(.profileAccount(value: ownedAccount.account))))
 			}
 			return .send(.delegate(.handleResult(result)))
 		}

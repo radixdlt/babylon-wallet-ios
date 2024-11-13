@@ -132,12 +132,12 @@ extension AccountPermissionChooseAccounts.State {
 		dappMetadata: .previewValue,
 		chooseAccounts: .init(
 			context: .assetTransfer,
-			availableAccounts: .init(
+			availableAccounts: .success(.init(
 				uniqueElements: [
-					.previewValue0,
-					.previewValue1,
+					.general(.previewValue0),
+					.general(.previewValue1),
 				]
-			)
+			))
 		)
 	)
 }

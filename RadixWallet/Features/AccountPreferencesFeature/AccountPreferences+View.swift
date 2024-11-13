@@ -170,10 +170,8 @@ private extension View {
 	}
 
 	private func deleteAccount(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>, store: StoreOf<AccountPreferences>) -> some View {
-		sheet(store: destinationStore.scope(state: \.deleteAccount, action: \.deleteAccount)) { _ in
-			ConfirmationView(kind: .deleteAccount) { action in
-				store.send(.destination(.presented(.deleteAccount(action))))
-			}
+		navigationDestination(store: destinationStore.scope(state: \.deleteAccount, action: \.deleteAccount)) {
+			DeleteAccountConfirmation.View(store: $0)
 		}
 	}
 }

@@ -6,8 +6,8 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		let context: Context
 		let filteredAccounts: [AccountAddress]
-		var availableAccounts: IdentifiedArrayOf<Account>
 		var selectedAccounts: [ChooseAccountsRow.State]?
+		var availableAccounts: Loadable<IdentifiedArrayOf<AccountType>>
 		var canCreateNewAccount: Bool
 
 		@PresentationState
@@ -15,7 +15,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 		var selectionRequirement: SelectionRequirement {
 			switch context {
-			case .assetTransfer:
+			case .assetTransfer, .accountDeletion:
 				.exactly(1)
 			case let .permission(selectionRequirement):
 				selectionRequirement
@@ -25,8 +25,8 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		init(
 			context: Context,
 			filteredAccounts: [AccountAddress] = [],
-			availableAccounts: IdentifiedArrayOf<Account> = [],
 			selectedAccounts: [ChooseAccountsRow.State]? = nil,
+			availableAccounts: Loadable<IdentifiedArrayOf<AccountType>> = .idle,
 			canCreateNewAccount: Bool = true
 		) {
 			self.context = context
@@ -44,7 +44,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case loadAccountsResult(TaskResult<Accounts>)
+		case loadAccountsResult(TaskResult<IdentifiedArrayOf<State.AccountType>>)
 	}
 
 	struct Destination: DestinationReducer {
@@ -65,22 +65,24 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.accountsClient) var accountsClient
+	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 
 	init() {}
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(destinationPath, action: /Action.destination) {
+			.ifLet(\.$destination, action: \.destination) {
 				Destination()
 			}
 	}
 
-	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
-
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			return loadAccounts()
+			if state.availableAccounts == .idle {
+				state.availableAccounts = .loading
+			}
+			return loadAccounts(context: state.context)
 
 		case .createAccountButtonTapped:
 			state.destination = .createAccount(.init(
@@ -98,9 +100,11 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .loadAccountsResult(.success(accounts)):
 			// Uniqueness is guaranteed as per `Accounts`
-			state.availableAccounts = accounts.filter {
-				!state.filteredAccounts.contains($0.address)
-			}.asIdentified()
+			state.availableAccounts = .success(
+				accounts.filter {
+					!state.filteredAccounts.contains($0.account.address)
+				}.asIdentified()
+			)
 			return .none
 
 		case let .loadAccountsResult(.failure(error)):
@@ -112,17 +116,41 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .createAccount(.delegate(.completed)):
-			loadAccounts()
+			loadAccounts(context: state.context)
 
 		default:
 			.none
 		}
 	}
 
-	private func loadAccounts() -> Effect<Action> {
+	private func loadAccounts(context: State.Context) -> Effect<Action> {
 		.run { send in
 			let result = await TaskResult {
-				try await accountsClient.getAccountsOnCurrentNetwork()
+				switch context {
+				case .assetTransfer, .permission:
+					return try await accountsClient.getAccountsOnCurrentNetwork()
+						.map { State.AccountType.general($0) }
+						.asIdentified()
+
+				case .accountDeletion:
+					let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
+					let entities = try await onLedgerEntitiesClient.getAccounts(accounts.map(\.address), cachingStrategy: .forceUpdate)
+					let receivingAccounts = accounts.compactMap { account -> State.ReceivingAccountCandidate? in
+						guard let entity = entities.first(where: { $0.address == account.address }) else {
+							assertionFailure("Failed to find account, this should never happen.")
+							return nil
+						}
+
+						let xrdBalance = entity.fungibleResources.xrdResource?.amount.exactAmount?.nominalAmount ?? 0
+						let hasEnoughXRD = xrdBalance >= 1
+
+						return .init(account: account, hasEnoughXRD: hasEnoughXRD)
+					}
+					return receivingAccounts
+						.sorted { $0.hasEnoughXRD && !$1.hasEnoughXRD }
+						.map { State.AccountType.receiving($0) }
+						.asIdentified()
+				}
 			}
 			await send(.internal(.loadAccountsResult(result)))
 		}
@@ -134,5 +162,39 @@ extension ChooseAccounts.State {
 	enum Context: Sendable, Hashable {
 		case assetTransfer
 		case permission(SelectionRequirement)
+		case accountDeletion
+	}
+
+	enum AccountType: Sendable, Hashable, Identifiable {
+		case general(Account)
+		case receiving(ReceivingAccountCandidate)
+
+		var id: Self { self }
+
+		var account: Account {
+			switch self {
+			case let .general(account):
+				account
+			case let .receiving(receivingAccount):
+				receivingAccount.account
+			}
+		}
+
+		var hasEnoughXRD: Bool? {
+			switch self {
+			case .general:
+				nil
+			case let .receiving(receivingAccount):
+				receivingAccount.hasEnoughXRD
+			}
+		}
+	}
+
+	struct ReceivingAccountCandidate: Sendable, Hashable, Identifiable {
+		typealias ID = Account.ID
+		var id: ID { account.id }
+
+		let account: Account
+		let hasEnoughXRD: Bool
 	}
 }
