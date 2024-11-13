@@ -34,6 +34,7 @@ extension DeleteAccountConfirmation {
 							viewStore.send(.view(.continueButtonTapped))
 						}
 						.buttonStyle(.primaryRectangular)
+						.controlState(viewStore.continueButtonState)
 
 						Button(L10n.Common.cancel) {
 							viewStore.send(.view(.cancelButtonTapped))

@@ -5,6 +5,7 @@ import SwiftUI
 struct DeleteAccountConfirmation: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		let account: Account
+		var continueButtonState: ControlState = .enabled
 
 		@PresentationState
 		var destination: Destination.State? = nil
@@ -18,6 +19,11 @@ struct DeleteAccountConfirmation: Sendable, FeatureReducer {
 	enum ViewAction: Sendable, Equatable {
 		case continueButtonTapped
 		case cancelButtonTapped
+	}
+
+	@CasePathable
+	enum InternalAction: Sendable, Equatable {
+		case confirmedDeletionResult(TaskResult<OnLedgerEntity.OnLedgerAccount>)
 	}
 
 	@CasePathable
@@ -44,8 +50,7 @@ struct DeleteAccountConfirmation: Sendable, FeatureReducer {
 		}
 	}
 
-	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
-	@Dependency(\.gatewaysClient) var gatewaysClient
+	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 	@Dependency(\.errorQueue) var errorQueue
 
 	init() {}
@@ -60,19 +65,41 @@ struct DeleteAccountConfirmation: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .continueButtonTapped:
-			state.destination = .chooseReceivingAccount(.init(
-				accountToDelete: state.account,
-				chooseAccounts: .init(
-					context: .accountDeletion,
-					filteredAccounts: [state.account.accountAddress],
-					canCreateNewAccount: false
-				)
-			))
-
-			return .none
-
+			state.continueButtonState = .loading(.local)
+			return .run { [address = state.account.address] send in
+				let result = await TaskResult {
+					try await accountPortfoliosClient.fetchAccountPortfolio(address, true).account
+				}
+				await send(.internal(.confirmedDeletionResult(result)))
+			}
 		case .cancelButtonTapped:
 			return .send(.delegate(.cancel))
+		}
+	}
+
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case let .confirmedDeletionResult(.success(account)):
+			state.continueButtonState = .enabled
+
+			if account.containsAnyAssets {
+				state.destination = .chooseReceivingAccount(.init(
+					accountToDelete: state.account,
+					chooseAccounts: .init(
+						context: .accountDeletion,
+						filteredAccounts: [state.account.accountAddress],
+						canCreateNewAccount: false
+					)
+				))
+			} else {
+				// TODO: skip account selection and review transaction
+			}
+			return .none
+
+		case let .confirmedDeletionResult(.failure(error)):
+			state.continueButtonState = .enabled
+			errorQueue.schedule(error)
+			return .none
 		}
 	}
 }

@@ -673,6 +673,13 @@ extension OnLedgerEntity.OnLedgerAccount {
 	func hasResource(_ resourceAddress: ResourceAddress) -> Bool {
 		allResourceAddresses.contains(resourceAddress)
 	}
+
+	var containsAnyAssets: Bool {
+		(fungibleResources.xrdResource?.amount.exactAmount?.nominalAmount ?? 0) > 0
+			|| fungibleResources.nonXrdResources.contains(where: { ($0.amount.exactAmount?.nominalAmount ?? 0) > 0 })
+			|| !nonFungibleResources.isEmpty
+			|| !poolUnitResources.poolUnits.isEmpty
+	}
 }
 
 extension OnLedgerEntity.Resource {
