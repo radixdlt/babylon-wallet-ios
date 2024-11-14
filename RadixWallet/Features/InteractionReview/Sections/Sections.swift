@@ -9,6 +9,7 @@ extension InteractionReview {
 			var withdrawals: Accounts.State? = nil
 			var dAppsUsed: InteractionReviewDappsUsed.State? = nil
 			var deposits: Accounts.State? = nil
+			var accountDeletion: Account.State? = nil
 
 			var contributingToPools: InteractionReviewPools.State? = nil
 			var redeemingFromPools: InteractionReviewPools.State? = nil
@@ -45,7 +46,7 @@ extension InteractionReview {
 			case setSections(Common.SectionsData?)
 
 			enum ParentAction: Sendable, Equatable {
-				case resolveExecutionSummary(ExecutionSummary, NetworkID)
+				case resolveExecutionSummary(ExecutionSummary, NetworkID, WalletInteractionId?)
 				case resolveManifestSummary(ManifestSummary, NetworkID)
 				case showResourceDetails(OnLedgerEntity.Resource, KnownResourceBalance.Details)
 			}
@@ -55,6 +56,7 @@ extension InteractionReview {
 		enum ChildAction: Sendable, Equatable {
 			case withdrawals(Common.Accounts.Action)
 			case deposits(Common.Accounts.Action)
+			case accountDeletion(Common.Account.Action)
 			case dAppsUsed(InteractionReviewDappsUsed.Action)
 			case contributingToPools(InteractionReviewPools.Action)
 			case redeemingFromPools(InteractionReviewPools.Action)
@@ -185,15 +187,20 @@ extension InteractionReview {
 				state.accountDepositExceptions = sections.accountDepositExceptions
 				state.proofs = sections.proofs
 				state.showPossibleDappCalls = sections.showPossibleDappCalls
+				state.accountDeletion = sections.accountDeletion
 				return .none
 			}
 		}
 
 		func reduce(into state: inout State, parentAction: InternalAction.ParentAction) -> Effect<Action> {
 			switch parentAction {
-			case let .resolveExecutionSummary(executionSummary, networkID):
+			case let .resolveExecutionSummary(executionSummary, networkID, interactionId):
 				return .run { send in
-					let sections = try await sections(for: executionSummary, networkID: networkID)
+					let sections = try await sections(
+						for: executionSummary,
+						networkID: networkID,
+						interactionId: interactionId
+					)
 					await send(.internal(.setSections(sections)))
 				} catch: { error, send in
 					loggerGlobal.error("Failed to extract sections from ExecutionSummary, error: \(error)")

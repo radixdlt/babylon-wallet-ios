@@ -212,7 +212,7 @@ struct DevAccountPreferences: Sendable, FeatureReducer {
 				nonce: .secureRandom(),
 				signTransactionPurpose: .internalManifest(.debugModifyAccount),
 				message: .none,
-				isWalletTransaction: true,
+				interactionId: .walletInteractionID(for: .accountTransfer),
 				proposingDappMetadata: nil,
 				p2pRoute: .wallet
 			))

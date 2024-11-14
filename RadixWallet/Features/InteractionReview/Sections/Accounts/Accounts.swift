@@ -68,6 +68,7 @@ extension InteractionReview {
 			let account: InteractionReview.ReviewAccount
 			var transfers: IdentifiedArrayOf<InteractionReview.Transfer>
 			let isDeposit: Bool
+			var isAccountDelete: Bool = false
 		}
 
 		typealias Action = FeatureAction<Self>

@@ -1043,8 +1043,7 @@ extension DappInteractionFlow.Path.State {
 				message: item.message.map {
 					Message.plaintext(string: $0)
 				} ?? Message.none,
-				waitsForTransactionToBeComitted: interaction.interactionId.isWalletAccountDepositSettingsInteraction,
-				isWalletTransaction: interaction.interactionId.isWalletInteraction,
+				interactionId: interaction.interactionId,
 				proposingDappMetadata: dappMetadata.onLedger,
 				p2pRoute: p2pRoute
 			))

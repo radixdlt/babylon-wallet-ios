@@ -41,17 +41,32 @@ extension InteractionReview.Account {
 				InnerCard {
 					AccountCard(account: store.account)
 
-					VStack(spacing: .zero) {
-						ForEach(store.transfers) { transfer in
-							TransactionReviewResourceView(transfer: transfer.value, isDeposit: store.isDeposit) { token in
-								store.send(.view(.transferTapped(transfer.value, token)))
-							}
+					if store.isAccountDelete {
+						HStack(spacing: .medium3) {
+							Image(.delete)
+							Text("Deleting Account. Permanently removing access and preventing future deposits.")
+								.lineSpacing(-.small3)
+								.textStyle(.body1HighImportance)
+								.multilineTextAlignment(.leading)
+						}
+						.flushedLeft
+						.padding(.horizontal, .medium3)
+						.padding(.vertical, .medium2)
+						.foregroundColor(.app.red1)
+						.background(.app.gray5)
+					} else {
+						VStack(spacing: .zero) {
+							ForEach(store.transfers) { transfer in
+								TransactionReviewResourceView(transfer: transfer.value, isDeposit: store.isDeposit) { token in
+									store.send(.view(.transferTapped(transfer.value, token)))
+								}
 
-							WithPerceptionTracking {
-								if transfer.id != store.transfers.last?.id {
-									Rectangle()
-										.fill(.app.gray4)
-										.frame(height: 1)
+								WithPerceptionTracking {
+									if transfer.id != store.transfers.last?.id {
+										Rectangle()
+											.fill(.app.gray4)
+											.frame(height: 1)
+									}
 								}
 							}
 						}

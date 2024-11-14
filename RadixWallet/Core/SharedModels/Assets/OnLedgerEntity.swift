@@ -675,10 +675,12 @@ extension OnLedgerEntity.OnLedgerAccount {
 	}
 
 	var containsAnyAssets: Bool {
-		(fungibleResources.xrdResource?.amount.exactAmount?.nominalAmount ?? 0) > 0
-			|| fungibleResources.nonXrdResources.contains(where: { ($0.amount.exactAmount?.nominalAmount ?? 0) > 0 })
-			|| !nonFungibleResources.isEmpty
-			|| !poolUnitResources.poolUnits.isEmpty
+		let account = nonEmptyVaults
+		return account.fungibleResources.xrdResource != nil
+			|| !account.fungibleResources.nonXrdResources.isEmpty
+			|| !account.nonFungibleResources.isEmpty
+			|| !account.poolUnitResources.poolUnits.isEmpty
+			|| !account.poolUnitResources.radixNetworkStakes.isEmpty
 	}
 }
 
