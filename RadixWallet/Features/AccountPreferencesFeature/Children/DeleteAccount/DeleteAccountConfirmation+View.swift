@@ -34,13 +34,13 @@ extension DeleteAccountConfirmation {
 							viewStore.send(.view(.continueButtonTapped))
 						}
 						.buttonStyle(.primaryRectangular)
-						.controlState(viewStore.continueButtonState)
 
 						Button(L10n.Common.cancel) {
 							viewStore.send(.view(.cancelButtonTapped))
 						}
 						.buttonStyle(.primaryText())
 					}
+					.controlState(viewStore.footerButtonState)
 				}
 				.destination(store: store)
 			}
@@ -62,11 +62,20 @@ private extension View {
 	func destination(store: StoreOf<DeleteAccountConfirmation>) -> some View {
 		let destinationStore = store.destination
 		return chooseReceivingAccount(with: destinationStore, store: store)
+			.accountDeleted(with: destinationStore, store: store)
 	}
 
 	private func chooseReceivingAccount(with destinationStore: PresentationStoreOf<DeleteAccountConfirmation.Destination>, store: StoreOf<DeleteAccountConfirmation>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.chooseReceivingAccount, action: \.chooseReceivingAccount)) {
 			ChooseReceivingAccountOnDelete.View(store: $0)
+		}
+	}
+
+	private func accountDeleted(with destinationStore: PresentationStoreOf<DeleteAccountConfirmation.Destination>, store: StoreOf<DeleteAccountConfirmation>) -> some View {
+		fullScreenCover(store: destinationStore.scope(state: \.accountDeleted, action: \.accountDeleted)) { _ in
+			AccountDeletedView {
+				store.send(.view(.goHomeButtonTapped))
+			}
 		}
 	}
 }

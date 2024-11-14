@@ -1264,6 +1264,7 @@
 		E79DD1B32CE365D600B1EB86 /* ChooseReceivingAccountOnDelete+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1B22CE365D600B1EB86 /* ChooseReceivingAccountOnDelete+View.swift */; };
 		E79DD1B62CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1B52CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift */; };
 		E79DD1B82CE4933800B1EB86 /* DeleteAccountConfirmation+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1B72CE4933800B1EB86 /* DeleteAccountConfirmation+View.swift */; };
+		E79DD1BC2CE62BD100B1EB86 /* AccountDeletedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1BB2CE62BD100B1EB86 /* AccountDeletedView.swift */; };
 		E7A5AC962C09F447006CB6EC /* ResetWalletClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A5AC952C09F447006CB6EC /* ResetWalletClient+Interface.swift */; };
 		E7A5AC982C09F44C006CB6EC /* ResetWalletClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A5AC972C09F44C006CB6EC /* ResetWalletClient+Live.swift */; };
 		E7A5AC9A2C09F453006CB6EC /* ResetWalletClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A5AC992C09F453006CB6EC /* ResetWalletClient+Test.swift */; };
@@ -2514,6 +2515,7 @@
 		E79DD1B22CE365D600B1EB86 /* ChooseReceivingAccountOnDelete+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChooseReceivingAccountOnDelete+View.swift"; sourceTree = "<group>"; };
 		E79DD1B52CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeleteAccountConfirmation+Reducer.swift"; sourceTree = "<group>"; };
 		E79DD1B72CE4933800B1EB86 /* DeleteAccountConfirmation+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeleteAccountConfirmation+View.swift"; sourceTree = "<group>"; };
+		E79DD1BB2CE62BD100B1EB86 /* AccountDeletedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountDeletedView.swift; sourceTree = "<group>"; };
 		E7A5AC952C09F447006CB6EC /* ResetWalletClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ResetWalletClient+Interface.swift"; sourceTree = "<group>"; };
 		E7A5AC972C09F44C006CB6EC /* ResetWalletClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ResetWalletClient+Live.swift"; sourceTree = "<group>"; };
 		E7A5AC992C09F453006CB6EC /* ResetWalletClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ResetWalletClient+Test.swift"; sourceTree = "<group>"; };
@@ -6943,6 +6945,7 @@
 				E79DD1B72CE4933800B1EB86 /* DeleteAccountConfirmation+View.swift */,
 				E79DD1B02CE365CF00B1EB86 /* ChooseReceivingAccountOnDelete+Reducer.swift */,
 				E79DD1B22CE365D600B1EB86 /* ChooseReceivingAccountOnDelete+View.swift */,
+				E79DD1BB2CE62BD100B1EB86 /* AccountDeletedView.swift */,
 			);
 			path = DeleteAccount;
 			sourceTree = "<group>";
@@ -7340,6 +7343,7 @@
 				48CFC6172ADC10DA00E77A5C /* WalletInteraction+PreviewValue.swift in Sources */,
 				48CFC3F12ADC10D900E77A5C /* RemoteClientID.swift in Sources */,
 				4813AFEB2BC9AF4A0046BCAD /* RawRepresentable+Extensions.swift in Sources */,
+				E79DD1BC2CE62BD100B1EB86 /* AccountDeletedView.swift in Sources */,
 				48CFC29C2ADC10D900E77A5C /* TransactionReview+View.swift in Sources */,
 				A40815BB2C7E0D08005E65B9 /* NativeResourceValidatorClaimNftValue.swift in Sources */,
 				A40816202C7E0D08005E65B9 /* StateEntitySchemaPageResponse.swift in Sources */,

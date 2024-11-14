@@ -41,6 +41,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case accountHidden
+		case accountDeleted
 	}
 
 	// MARK: - Destination
@@ -174,7 +175,9 @@ struct AccountPreferences: Sendable, FeatureReducer {
 		case .hideAccount(.confirm):
 			state.destination = nil
 			return hideAccountEffect(state: state)
-		case .hideAccount(.cancel), .deleteAccount(.delegate(.cancel)):
+		case .deleteAccount(.delegate(.deleted)):
+			return .send(.delegate(.accountDeleted))
+		case .hideAccount(.cancel), .deleteAccount(.delegate(.canceled)):
 			state.destination = nil
 			return .none
 		default:
@@ -187,14 +190,6 @@ struct AccountPreferences: Sendable, FeatureReducer {
 			try await entitiesVisibilityClient.hideAccount(account.id)
 			overlayWindowClient.scheduleHUD(.accountHidden)
 			await send(.delegate(.accountHidden))
-		} catch: { error, _ in
-			errorQueue.schedule(error)
-		}
-	}
-
-	private func deleteAccountEffect(state: State) -> Effect<Action> {
-		.run { [account = state.account] _ in
-			// TODO: choose receiver account
 		} catch: { error, _ in
 			errorQueue.schedule(error)
 		}

@@ -64,6 +64,7 @@ extension ChooseReceivingAccountOnDelete {
 						}
 						.buttonStyle(.primaryText())
 					}
+					.controlState(viewStore.footerControlState)
 				}
 			}
 			.destinations(with: store)

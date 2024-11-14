@@ -262,7 +262,8 @@ struct AccountDetails: Sendable, FeatureReducer {
 			state.destination = nil
 			return .none
 
-		case .preferences(.delegate(.accountHidden)):
+		case .preferences(.delegate(.accountHidden)),
+		     .preferences(.delegate(.accountDeleted)):
 			return .send(.delegate(.dismiss))
 
 		case let .stakeClaimDetails(.delegate(.tappedClaimStake(stakeClaim))):

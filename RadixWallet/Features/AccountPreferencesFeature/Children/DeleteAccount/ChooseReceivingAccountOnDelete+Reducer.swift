@@ -7,6 +7,7 @@ struct ChooseReceivingAccountOnDelete: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		let accountToDelete: Account
 		var chooseAccounts: ChooseAccounts.State
+		var footerControlState: ControlState = .enabled
 
 		@PresentationState
 		var destination: Destination.State? = nil
@@ -26,6 +27,11 @@ struct ChooseReceivingAccountOnDelete: Sendable, FeatureReducer {
 	@CasePathable
 	enum ChildAction: Sendable, Equatable {
 		case chooseAccounts(ChooseAccounts.Action)
+	}
+
+	@CasePathable
+	enum DelegateAction: Sendable, Equatable {
+		case finished(AccountAddress?)
 	}
 
 	struct Destination: DestinationReducer {
@@ -71,13 +77,13 @@ struct ChooseReceivingAccountOnDelete: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .continueButtonTapped(selectedAccounts):
-			guard let receivingAccount = selectedAccounts.first else {
+			guard let recipientAccount = selectedAccounts.first else {
 				return .none
 			}
 
-			// TODO: review transaction
+			state.footerControlState = .loading(.local)
 
-			return .none
+			return .send(.delegate(.finished(recipientAccount.account.address)))
 
 		case .skipButtonTapped:
 			state.destination = .confirmSkipAlert(.confirmSkip)
@@ -88,11 +94,10 @@ struct ChooseReceivingAccountOnDelete: Sendable, FeatureReducer {
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .confirmSkipAlert(.continueTapped):
-			// TODO: review transaction
-			.none
-
+			state.footerControlState = .loading(.local)
+			return .send(.delegate(.finished(nil)))
 		default:
-			.none
+			return .none
 		}
 	}
 }
