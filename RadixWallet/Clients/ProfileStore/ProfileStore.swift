@@ -6,7 +6,7 @@ import Sargon
 final actor ProfileStore {
 	static let shared = ProfileStore()
 
-	private let profileSubject: AsyncReplaySubject<Profile> = .init(bufferSize: 1)
+	private let profileSubject: AsyncCurrentValueSubject<Profile?> = .init(nil)
 	private let profileStateSubject: AsyncReplaySubject<ProfileState> = .init(bufferSize: 1)
 
 	private init() {
@@ -23,16 +23,11 @@ final actor ProfileStore {
 }
 
 extension ProfileStore {
-	func profile() async -> Profile {
-		try! await profileSubject.first()
-	}
-
-	func profileState() async -> ProfileState {
-		try! await profileStateSubject.first()
-	}
-
-	func profileSequence() async -> AnyAsyncSequence<Profile> {
-		profileSubject.eraseToAnyAsyncSequence()
+	func profile() -> Profile {
+		guard let profile = profileSubject.value else {
+			fatalError("Programmer error - tried to access profile when it was not loaded yet.")
+		}
+		return profile
 	}
 
 	func profileStateSequence() async -> AnyAsyncSequence<ProfileState> {
@@ -84,7 +79,7 @@ extension ProfileStore {
 	func updating<T: Sendable>(
 		_ transform: @Sendable (inout Profile) async throws -> T
 	) async throws -> T {
-		var updated = await profile()
+		var updated = profile()
 		let result = try await transform(&updated)
 		try await SargonOS.shared.setProfile(profile: updated)
 		return result
@@ -106,7 +101,8 @@ extension ProfileStore {
 	func _lens<Property>(
 		_ transform: @escaping @Sendable (Profile) -> Property?
 	) -> AnyAsyncSequence<Property> where Property: Sendable & Equatable {
-		profileSubject.compactMap(transform)
+		profileSubject
+			.compactMap { $0.flatMap(transform) }
 			.share() // Multicast
 			.removeDuplicates()
 			.eraseToAnyAsyncSequence()

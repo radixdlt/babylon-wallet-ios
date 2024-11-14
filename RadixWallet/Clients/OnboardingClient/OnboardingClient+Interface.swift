@@ -18,7 +18,7 @@ struct OnboardingClient: Sendable {
 }
 
 extension OnboardingClient {
-	typealias LoadProfileState = @Sendable () async -> ProfileState
+	typealias LoadProfileState = @Sendable () async throws -> ProfileState
 	typealias CreateNewProfile = @Sendable () async throws -> Void
 
 	typealias FinishOnboardingWithRecoveredAccountsAndBDFS = @Sendable (AccountsRecoveredFromScanningUsingMnemonic) async throws -> Void
