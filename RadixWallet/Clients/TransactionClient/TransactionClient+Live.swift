@@ -241,8 +241,7 @@ extension TransactionClient {
 			return try await feePayerSelectionAmongstCandidates(
 				request: request,
 				allFeePayerCandidates: feePayerCandidates,
-				involvedEntities: involvedEntites,
-				accountWithdraws: request.accountWithdraws
+				involvedEntities: involvedEntites
 			)
 		}
 
@@ -264,8 +263,7 @@ extension TransactionClient {
 	static func feePayerSelectionAmongstCandidates(
 		request: DetermineFeePayerRequest,
 		allFeePayerCandidates: NonEmpty<IdentifiedArrayOf<FeePayerCandidate>>,
-		involvedEntities: MyEntitiesInvolvedInTransaction,
-		accountWithdraws: [AccountAddress: [ResourceIndicator]]
+		involvedEntities: MyEntitiesInvolvedInTransaction
 	) async throws -> FeePayerSelectionResult? {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
@@ -282,13 +280,9 @@ extension TransactionClient {
 			}
 
 			for candidate in candidates {
-				let candidateXRDWithdraw = accountWithdraws[candidate.account.address]?
-					.first(where: \.resourceAddress.isXRD)?
-					.guaranteedFungibleAmount ?? .zero
-
 				if request.transactionSigners.intentSignerEntitiesOrEmpty().contains(.account(candidate.account)) {
 					/// The cost of the fee payer signature is already accounted for.
-					if candidate.xrdBalance >= totalCost + candidateXRDWithdraw {
+					if candidate.xrdBalance >= totalCost {
 						return .init(
 							payer: candidate,
 							updatedFee: request.transactionFee,
@@ -314,7 +308,7 @@ extension TransactionClient {
 
 				var feeIncludingCandidate = request.transactionFee
 				feeIncludingCandidate.updateSignaturesCost(signingFactors.expectedSignatureCount)
-				if candidate.xrdBalance >= feeIncludingCandidate.totalFee.max + candidateXRDWithdraw {
+				if candidate.xrdBalance >= feeIncludingCandidate.totalFee.max {
 					let signers = TransactionSigners(
 						notaryPublicKey: request.transactionSigners.notaryPublicKey,
 						intentSigning: .intentSigners(.init(rawValue: .init(signerEntities))!)
@@ -374,16 +368,6 @@ extension TransactionFailure {
 			} else {
 				.failedToPrepareTXReview(.failedTXPreview("Unknown reason"))
 			}
-		}
-	}
-}
-
-extension ResourceIndicator {
-	var guaranteedFungibleAmount: Decimal192? {
-		switch self {
-		case let .fungible(_, .guaranteed(value)): value
-		case .fungible(_, .predicted): nil
-		case .nonFungible: nil
 		}
 	}
 }

@@ -521,8 +521,7 @@ extension TransactionReview {
 						transactionSigners: reviewedTransaction.transactionSigners,
 						signingFactors: reviewedTransaction.signingFactors,
 						signingPurpose: .signTransaction(state.signTransactionPurpose),
-						manifest: reviewedTransaction.transactionManifest,
-						accountWithdraws: reviewedTransaction.accountWithdraws
+						manifest: reviewedTransaction.transactionManifest
 					))
 				}
 

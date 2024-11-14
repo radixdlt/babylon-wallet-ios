@@ -246,7 +246,6 @@ struct DetermineFeePayerRequest: Sendable {
 	let signingFactors: SigningFactors
 	let signingPurpose: SigningPurpose
 	let manifest: TransactionManifest
-	let accountWithdraws: [AccountAddress: [ResourceIndicator]]
 }
 
 // MARK: - DetermineFeePayerResponse
