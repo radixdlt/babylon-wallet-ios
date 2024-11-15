@@ -54,6 +54,7 @@ internal enum AssetResource {
   internal static let supplyIncreasableByAnyone = ImageAsset(name: "supply-increasable-by-anyone")
   internal static let supplyIncreasable = ImageAsset(name: "supply-increasable")
   internal static let carouselBackgroundConnect = ImageAsset(name: "carousel_background_connect")
+  internal static let carouselBackgroundEcosystem = ImageAsset(name: "carousel_background_ecosystem")
   internal static let carouselBackgroundRadquest = ImageAsset(name: "carousel_background_radquest")
   internal static let arrowBack = ImageAsset(name: "arrow-back")
   internal static let check = ImageAsset(name: "check")

@@ -32,10 +32,9 @@ extension TransactionFailure {
 				(errorKind: .failedToPrepareTransaction, message: error.errorDescription)
 			}
 
-		case .failedToPrepareTXReview(.failedToRetrieveTXPreview),
-		     .failedToPrepareTXReview(.failedToExtractTXReceiptBytes),
-		     .failedToPrepareTXReview(.failedToGenerateTXReview),
-		     .failedToPrepareTXReview(.failedToRetrieveTXReceipt),
+		case .failedToPrepareTXReview(.failedToExtractTXReceiptBytes),
+		     .failedToPrepareTXReview(.abortedTXReview),
+		     .failedToPrepareTXReview(.failedTXPreview),
 		     .failedToPrepareTXReview(.manifestWithReservedInstructions),
 		     .failedToPrepareTXReview(.oneOfRecevingAccountsDoesNotAllowDeposits):
 			(errorKind: .failedToPrepareTransaction, message: self.errorDescription)
@@ -78,10 +77,9 @@ extension TransactionFailure {
 extension TransactionFailure {
 	enum FailedToPreviewTXReview: Sendable, LocalizedError, Equatable {
 		case failedSigning(FailedToPrepareForTXSigning)
-		case failedToRetrieveTXPreview(Error)
-		case failedToRetrieveTXReceipt(String)
+		case abortedTXReview(Error)
+		case failedTXPreview(String)
 		case failedToExtractTXReceiptBytes
-		case failedToGenerateTXReview(Error)
 		case manifestWithReservedInstructions(String)
 		case oneOfRecevingAccountsDoesNotAllowDeposits
 
@@ -89,14 +87,12 @@ extension TransactionFailure {
 			switch self {
 			case let .failedSigning(error):
 				error.errorDescription
-			case let .failedToRetrieveTXPreview(error):
-				"Failed to retrieve TX review from gateway: \(error.localizedDescription)"
+			case let .abortedTXReview(error):
+				"Transaction review aborted: \(error.localizedDescription)"
+			case let .failedTXPreview(message):
+				"Error when generating TX preview: \(message)"
 			case .failedToExtractTXReceiptBytes:
 				"Failed to extract TX review bytes"
-			case let .failedToGenerateTXReview(error):
-				"ET failed to generate TX review: \(error.localizedDescription)"
-			case let .failedToRetrieveTXReceipt(message):
-				"Failed to retrive TX receipt from gateway: \(message)"
 			case .manifestWithReservedInstructions:
 				"Transaction Manifest contains forbidden instructions"
 			case .oneOfRecevingAccountsDoesNotAllowDeposits:

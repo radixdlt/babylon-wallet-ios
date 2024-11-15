@@ -105,7 +105,7 @@ struct CarouselCardView: View {
 
 	private var trailingPadding: CGFloat {
 		switch card {
-		case .continueRadQuest, .startRadQuest:
+		case .continueRadQuest, .startRadQuest, .discoverRadixDapps:
 			95
 		case .dapp:
 			85
@@ -124,6 +124,8 @@ struct CarouselCardView: View {
 			L10n.HomePageCarousel.ContinueOnDapp.title
 		case .connector:
 			L10n.HomePageCarousel.UseDappsOnDesktop.title
+		case .discoverRadixDapps:
+			L10n.HomePageCarousel.DiscoverRadixDapps.title
 		}
 	}
 
@@ -137,6 +139,8 @@ struct CarouselCardView: View {
 			L10n.HomePageCarousel.ContinueOnDapp.text
 		case .connector:
 			L10n.HomePageCarousel.UseDappsOnDesktop.text
+		case .discoverRadixDapps:
+			L10n.HomePageCarousel.DiscoverRadixDapps.text
 		}
 	}
 
@@ -150,12 +154,14 @@ struct CarouselCardView: View {
 			cardBackground(.thumbnail(.dapp, url))
 		case .connector:
 			cardBackground(.gradient(.carouselBackgroundConnect))
+		case .discoverRadixDapps:
+			cardBackground(.gradient(.carouselBackgroundEcosystem))
 		}
 	}
 
 	private var showLinkIcon: Bool {
 		switch card {
-		case .startRadQuest:
+		case .startRadQuest, .discoverRadixDapps:
 			true
 		case .continueRadQuest, .dapp, .connector:
 			false
