@@ -263,7 +263,7 @@ struct AccountDetails: Sendable, FeatureReducer {
 			return .none
 
 		case .preferences(.delegate(.accountHidden)),
-		     .preferences(.delegate(.accountDeleted)):
+		     .preferences(.delegate(.goHomeAfterAccountDeleted)):
 			return .send(.delegate(.dismiss))
 
 		case let .stakeClaimDetails(.delegate(.tappedClaimStake(stakeClaim))):

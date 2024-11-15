@@ -132,7 +132,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 			case let .open(value):
 				.send(.child(.sections(.internal(.parent(.resolveManifestSummary(value.summary, preview.networkId))))))
 			case let .enclosed(value):
-				.send(.child(.sections(.internal(.parent(.resolveExecutionSummary(value.summary, preview.networkId, nil))))))
+				.send(.child(.sections(.internal(.parent(.resolveExecutionSummary(value.summary, preview.networkId))))))
 			}
 			effects.append(sectionsEffect)
 

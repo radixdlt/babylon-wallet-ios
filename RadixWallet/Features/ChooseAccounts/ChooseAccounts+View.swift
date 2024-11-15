@@ -52,9 +52,7 @@ extension ChooseAccounts {
 				send: { .view($0) }
 			) { viewStore in
 				ScrollView {
-					loadable(viewStore.availableAccounts) {
-						ProgressView()
-					} successContent: { availableAccounts in
+					loadable(viewStore.availableAccounts) { availableAccounts in
 						VStack(spacing: .medium2) {
 							VStack(spacing: .small1) {
 								Selection(
@@ -93,19 +91,10 @@ extension ChooseAccounts {
 	}
 }
 
-private extension StoreOf<ChooseAccounts> {
-	var destination: PresentationStoreOf<ChooseAccounts.Destination> {
-		func scopeState(state: State) -> PresentationState<ChooseAccounts.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
-	}
-}
-
 @MainActor
 private extension View {
 	func destinations(with store: StoreOf<ChooseAccounts>) -> some View {
-		let destinationStore = store.destination
+		let destinationStore = store.scope(state: \.$destination, action: \.destination)
 		return sheet(
 			store: destinationStore,
 			state: /ChooseAccounts.Destination.State.createAccount,

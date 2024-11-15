@@ -21,16 +21,13 @@ extension ChooseReceivingAccountOnDelete {
 				ScrollView {
 					VStack(spacing: .medium2) {
 						Text("Move Assets to Another Account")
-							.foregroundColor(.app.gray1)
 							.lineSpacing(0)
 							.textStyle(.sheetTitle)
 
 						Text("Before deleting this Account, choose another one to transfer your assets to.")
-							.foregroundColor(.app.gray1)
 							.textStyle(.body1Header)
 
 						Text("The new Account must hold enough XRD to pay the transaction fee.")
-							.foregroundColor(.app.gray1)
 							.textStyle(.body1Regular)
 
 						if viewStore.hasAccountsWithEnoughXRD == false {
@@ -48,6 +45,7 @@ extension ChooseReceivingAccountOnDelete {
 					.padding(.horizontal, .medium1)
 					.padding(.bottom, .medium2)
 					.multilineTextAlignment(.center)
+					.foregroundStyle(.app.gray1)
 				}
 				.footer {
 					VStack(spacing: .medium3) {
@@ -74,14 +72,11 @@ extension ChooseReceivingAccountOnDelete {
 
 private extension StoreOf<ChooseReceivingAccountOnDelete> {
 	var destination: PresentationStoreOf<ChooseReceivingAccountOnDelete.Destination> {
-		func scopeState(state: State) -> PresentationState<ChooseReceivingAccountOnDelete.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
+		scope(state: \.$destination, action: \.destination)
 	}
 
 	var chooseAccounts: StoreOf<ChooseAccounts> {
-		scope(state: \.chooseAccounts) { .child(.chooseAccounts($0)) }
+		scope(state: \.chooseAccounts, action: \.child.chooseAccounts)
 	}
 }
 

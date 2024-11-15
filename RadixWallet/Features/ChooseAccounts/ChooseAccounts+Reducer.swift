@@ -169,7 +169,8 @@ extension ChooseAccounts.State {
 		case general(Account)
 		case receiving(ReceivingAccountCandidate)
 
-		var id: Self { self }
+		typealias ID = Account.ID
+		var id: ID { account.id }
 
 		var account: Account {
 			switch self {

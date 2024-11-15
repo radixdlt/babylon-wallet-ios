@@ -11,11 +11,6 @@ struct ChooseReceivingAccountOnDelete: Sendable, FeatureReducer {
 
 		@PresentationState
 		var destination: Destination.State? = nil
-
-		init(accountToDelete: Account, chooseAccounts: ChooseAccounts.State) {
-			self.accountToDelete = accountToDelete
-			self.chooseAccounts = chooseAccounts
-		}
 	}
 
 	@CasePathable

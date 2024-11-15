@@ -48,19 +48,10 @@ extension DeleteAccountConfirmation {
 	}
 }
 
-private extension StoreOf<DeleteAccountConfirmation> {
-	var destination: PresentationStoreOf<DeleteAccountConfirmation.Destination> {
-		func scopeState(state: State) -> PresentationState<DeleteAccountConfirmation.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
-	}
-}
-
 @MainActor
 private extension View {
 	func destination(store: StoreOf<DeleteAccountConfirmation>) -> some View {
-		let destinationStore = store.destination
+		let destinationStore = store.scope(state: \.$destination, action: \.destination)
 		return chooseReceivingAccount(with: destinationStore, store: store)
 			.accountDeleted(with: destinationStore, store: store)
 	}

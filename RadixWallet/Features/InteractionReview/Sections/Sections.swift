@@ -46,7 +46,7 @@ extension InteractionReview {
 			case setSections(Common.SectionsData?)
 
 			enum ParentAction: Sendable, Equatable {
-				case resolveExecutionSummary(ExecutionSummary, NetworkID, WalletInteractionId?)
+				case resolveExecutionSummary(ExecutionSummary, NetworkID, WalletInteractionId? = nil)
 				case resolveManifestSummary(ManifestSummary, NetworkID)
 				case showResourceDetails(OnLedgerEntity.Resource, KnownResourceBalance.Details)
 			}

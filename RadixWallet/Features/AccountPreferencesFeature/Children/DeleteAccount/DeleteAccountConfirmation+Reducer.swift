@@ -10,10 +10,6 @@ struct DeleteAccountConfirmation: Sendable, FeatureReducer {
 
 		@PresentationState
 		var destination: Destination.State? = nil
-
-		init(account: Account) {
-			self.account = account
-		}
 	}
 
 	@CasePathable
@@ -25,14 +21,14 @@ struct DeleteAccountConfirmation: Sendable, FeatureReducer {
 
 	@CasePathable
 	enum InternalAction: Sendable, Equatable {
-		case confirmedDeletionResult(TaskResult<OnLedgerEntity.OnLedgerAccount>)
+		case fetchAccountPortfolioResult(TaskResult<OnLedgerEntity.OnLedgerAccount>)
 		case accountDeletedSuccessfully
 		case accountDeletionFailed
 	}
 
 	@CasePathable
 	enum DelegateAction: Sendable, Equatable {
-		case deleted
+		case goHomeAfterAccountDeleted
 		case canceled
 	}
 
@@ -79,22 +75,22 @@ struct DeleteAccountConfirmation: Sendable, FeatureReducer {
 				let result = await TaskResult {
 					try await accountPortfoliosClient.fetchAccountPortfolio(address, true).account
 				}
-				await send(.internal(.confirmedDeletionResult(result)))
+				await send(.internal(.fetchAccountPortfolioResult(result)))
 			}
 		case .cancelButtonTapped:
 			return .send(.delegate(.canceled))
 
 		case .goHomeButtonTapped:
-			return .send(.delegate(.deleted))
+			return .send(.delegate(.goHomeAfterAccountDeleted))
 		}
 	}
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .confirmedDeletionResult(.success(account)):
+		case let .fetchAccountPortfolioResult(.success(account)):
 			state.footerButtonState = .enabled
 
-			if account.containsAnyAssets {
+			if account.containsAnyAsset {
 				state.destination = .chooseReceivingAccount(.init(
 					accountToDelete: state.account,
 					chooseAccounts: .init(
@@ -111,7 +107,7 @@ struct DeleteAccountConfirmation: Sendable, FeatureReducer {
 			}
 			return .none
 
-		case let .confirmedDeletionResult(.failure(error)):
+		case let .fetchAccountPortfolioResult(.failure(error)):
 			state.footerButtonState = .enabled
 			errorQueue.schedule(error)
 			return .none

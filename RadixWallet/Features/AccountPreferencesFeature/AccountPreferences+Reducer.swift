@@ -41,7 +41,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case accountHidden
-		case accountDeleted
+		case goHomeAfterAccountDeleted
 	}
 
 	// MARK: - Destination
@@ -175,8 +175,8 @@ struct AccountPreferences: Sendable, FeatureReducer {
 		case .hideAccount(.confirm):
 			state.destination = nil
 			return hideAccountEffect(state: state)
-		case .deleteAccount(.delegate(.deleted)):
-			return .send(.delegate(.accountDeleted))
+		case .deleteAccount(.delegate(.goHomeAfterAccountDeleted)):
+			return .send(.delegate(.goHomeAfterAccountDeleted))
 		case .hideAccount(.cancel), .deleteAccount(.delegate(.canceled)):
 			state.destination = nil
 			return .none
@@ -237,7 +237,6 @@ extension AccountPreferences {
 
 extension OverlayWindowClient.Item.HUD {
 	static let accountHidden = Self(text: L10n.AccountSettings.accountHidden)
-	static let accountDeleted = Self(text: "Account Deleted")
 }
 
 extension AccountPreferences {

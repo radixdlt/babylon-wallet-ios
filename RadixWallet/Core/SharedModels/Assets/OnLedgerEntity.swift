@@ -674,7 +674,7 @@ extension OnLedgerEntity.OnLedgerAccount {
 		allResourceAddresses.contains(resourceAddress)
 	}
 
-	var containsAnyAssets: Bool {
+	var containsAnyAsset: Bool {
 		let account = nonEmptyVaults
 		return account.fungibleResources.xrdResource != nil
 			|| !account.fungibleResources.nonXrdResources.isEmpty
