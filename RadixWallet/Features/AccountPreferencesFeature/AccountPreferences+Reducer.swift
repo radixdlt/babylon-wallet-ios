@@ -52,7 +52,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 			case thirdPartyDeposits(ManageThirdPartyDeposits.State)
 			case devPreferences(DevAccountPreferences.State)
 			case hideAccount
-			case deleteAccount(DeleteAccountConfirmation.State)
+			case deleteAccount(DeleteAccountCoordinator.State)
 		}
 
 		@CasePathable
@@ -61,7 +61,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 			case thirdPartyDeposits(ManageThirdPartyDeposits.Action)
 			case devPreferences(DevAccountPreferences.Action)
 			case hideAccount(ConfirmationAction)
-			case deleteAccount(DeleteAccountConfirmation.Action)
+			case deleteAccount(DeleteAccountCoordinator.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -75,7 +75,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 				DevAccountPreferences()
 			}
 			Scope(state: \.deleteAccount, action: \.deleteAccount) {
-				DeleteAccountConfirmation()
+				DeleteAccountCoordinator()
 			}
 		}
 	}

@@ -1265,6 +1265,8 @@
 		E79DD1B62CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1B52CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift */; };
 		E79DD1B82CE4933800B1EB86 /* DeleteAccountConfirmation+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1B72CE4933800B1EB86 /* DeleteAccountConfirmation+View.swift */; };
 		E79DD1BC2CE62BD100B1EB86 /* AccountDeletedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1BB2CE62BD100B1EB86 /* AccountDeletedView.swift */; };
+		E79DD1BE2CE756B100B1EB86 /* DeleteAccountCoordinator+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1BD2CE756B100B1EB86 /* DeleteAccountCoordinator+Reducer.swift */; };
+		E79DD1C02CE756C400B1EB86 /* DeleteAccountCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1BF2CE756C400B1EB86 /* DeleteAccountCoordinator+View.swift */; };
 		E7A5AC962C09F447006CB6EC /* ResetWalletClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A5AC952C09F447006CB6EC /* ResetWalletClient+Interface.swift */; };
 		E7A5AC982C09F44C006CB6EC /* ResetWalletClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A5AC972C09F44C006CB6EC /* ResetWalletClient+Live.swift */; };
 		E7A5AC9A2C09F453006CB6EC /* ResetWalletClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A5AC992C09F453006CB6EC /* ResetWalletClient+Test.swift */; };
@@ -2516,6 +2518,8 @@
 		E79DD1B52CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeleteAccountConfirmation+Reducer.swift"; sourceTree = "<group>"; };
 		E79DD1B72CE4933800B1EB86 /* DeleteAccountConfirmation+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeleteAccountConfirmation+View.swift"; sourceTree = "<group>"; };
 		E79DD1BB2CE62BD100B1EB86 /* AccountDeletedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountDeletedView.swift; sourceTree = "<group>"; };
+		E79DD1BD2CE756B100B1EB86 /* DeleteAccountCoordinator+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeleteAccountCoordinator+Reducer.swift"; sourceTree = "<group>"; };
+		E79DD1BF2CE756C400B1EB86 /* DeleteAccountCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeleteAccountCoordinator+View.swift"; sourceTree = "<group>"; };
 		E7A5AC952C09F447006CB6EC /* ResetWalletClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ResetWalletClient+Interface.swift"; sourceTree = "<group>"; };
 		E7A5AC972C09F44C006CB6EC /* ResetWalletClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ResetWalletClient+Live.swift"; sourceTree = "<group>"; };
 		E7A5AC992C09F453006CB6EC /* ResetWalletClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ResetWalletClient+Test.swift"; sourceTree = "<group>"; };
@@ -6941,6 +6945,8 @@
 		E79DD1B42CE492E800B1EB86 /* DeleteAccount */ = {
 			isa = PBXGroup;
 			children = (
+				E79DD1BD2CE756B100B1EB86 /* DeleteAccountCoordinator+Reducer.swift */,
+				E79DD1BF2CE756C400B1EB86 /* DeleteAccountCoordinator+View.swift */,
 				E79DD1B52CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift */,
 				E79DD1B72CE4933800B1EB86 /* DeleteAccountConfirmation+View.swift */,
 				E79DD1B02CE365CF00B1EB86 /* ChooseReceivingAccountOnDelete+Reducer.swift */,
@@ -7336,6 +7342,7 @@
 				48CFC45C2ADC10DA00E77A5C /* P2PLinksClient+Interface.swift in Sources */,
 				48CFC5822ADC10DA00E77A5C /* URLFormatterClient+Interface.swift in Sources */,
 				A408155C2C7E0D08005E65B9 /* AccountDepositPreValidationResponse.swift in Sources */,
+				E79DD1BE2CE756B100B1EB86 /* DeleteAccountCoordinator+Reducer.swift in Sources */,
 				48CFC2762ADC10D900E77A5C /* P2PLinksFeature+Reducer.swift in Sources */,
 				A408155A2C7E0D08005E65B9 /* AccountDepositPreValidationResourceBadge.swift in Sources */,
 				A40815D32C7E0D08005E65B9 /* ProgrammaticScryptoSborValueDecimal.swift in Sources */,
@@ -7385,6 +7392,7 @@
 				5BEB9CD32C6F6B24001FD9D4 /* HIdeResource.swift in Sources */,
 				5B272DD72C36E89600B74F1F /* AppEventsClient+Interface.swift in Sources */,
 				48CFC2A12ADC10D900E77A5C /* PersonaFeature.swift in Sources */,
+				E79DD1C02CE756C400B1EB86 /* DeleteAccountCoordinator+View.swift in Sources */,
 				5BFA4FBA2C736B740030B517 /* HiddenAssets+View.swift in Sources */,
 				5BFA4FBB2C736B740030B517 /* HiddenAssets.swift in Sources */,
 				A4DCCC502C2DA32C00438A7B /* HomeCardsClient+Interface.swift in Sources */,

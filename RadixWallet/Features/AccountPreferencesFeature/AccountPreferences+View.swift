@@ -171,7 +171,7 @@ private extension View {
 
 	private func deleteAccount(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>, store: StoreOf<AccountPreferences>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.deleteAccount, action: \.deleteAccount)) {
-			DeleteAccountConfirmation.View(store: $0)
+			DeleteAccountCoordinator.View(store: $0)
 		}
 	}
 }
