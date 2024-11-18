@@ -4,7 +4,7 @@ import SwiftUI
 // MARK: - ChooseAccounts.View
 extension ChooseAccounts {
 	struct ViewState: Equatable {
-		let availableAccounts: Loadable<[ChooseAccountsRow.State]>
+		let availableAccounts: [ChooseAccountsRow.State]
 		let selectionRequirement: SelectionRequirement
 		let selectedAccounts: [ChooseAccountsRow.State]?
 		let canCreateNewAccount: Bool
@@ -12,14 +12,12 @@ extension ChooseAccounts {
 		init(state: ChooseAccounts.State) {
 			let selectionRequirement = state.selectionRequirement
 
-			self.availableAccounts = state.availableAccounts.map { accounts in
-				accounts.map {
-					ChooseAccountsRow.State(
-						account: $0,
-						mode: selectionRequirement == .exactly(1) ? .radioButton : .checkmark,
-						isEnabled: !state.disabledAccounts.contains($0.address)
-					)
-				}
+			self.availableAccounts = state.availableAccounts.map {
+				ChooseAccountsRow.State(
+					account: $0,
+					mode: selectionRequirement == .exactly(1) ? .radioButton : .checkmark,
+					isEnabled: !state.disabledAccounts.contains($0.address)
+				)
 			}
 			self.selectionRequirement = selectionRequirement
 			self.canCreateNewAccount = state.canCreateNewAccount
@@ -27,8 +25,8 @@ extension ChooseAccounts {
 			// If the dApp is asking for exactly(1) account and user has only one account, pre-select it
 			if case .permission = state.context,
 			   selectionRequirement == .exactly(1),
-			   availableAccounts.wrappedValue?.count == 1,
-			   let account = availableAccounts.wrappedValue?.first
+			   availableAccounts.count == 1,
+			   let account = availableAccounts.first
 			{
 				self.selectedAccounts = [account]
 			} else {
@@ -52,33 +50,31 @@ extension ChooseAccounts {
 				send: { .view($0) }
 			) { viewStore in
 				ScrollView {
-					loadable(viewStore.availableAccounts) { availableAccounts in
-						VStack(spacing: .medium2) {
-							VStack(spacing: .small1) {
-								Selection(
-									viewStore.binding(
-										get: \.selectedAccounts,
-										send: { .selectedAccountsChanged($0) }
-									),
-									from: availableAccounts,
-									requiring: viewStore.selectionRequirement
-								) { item in
-									ChooseAccountsRow.View(
-										viewState: .init(state: item.value),
-										isSelected: item.isSelected,
-										action: item.action
-									)
-									.opacity(item.value.isEnabled ? 1 : 0.5)
-									.allowsHitTesting(item.value.isEnabled)
-								}
+					VStack(spacing: .medium2) {
+						VStack(spacing: .small1) {
+							Selection(
+								viewStore.binding(
+									get: \.selectedAccounts,
+									send: { .selectedAccountsChanged($0) }
+								),
+								from: viewStore.availableAccounts,
+								requiring: viewStore.selectionRequirement
+							) { item in
+								ChooseAccountsRow.View(
+									viewState: .init(state: item.value),
+									isSelected: item.isSelected,
+									action: item.action
+								)
+								.opacity(item.value.isEnabled ? 1 : 0.5)
+								.allowsHitTesting(item.value.isEnabled)
 							}
+						}
 
-							if viewStore.canCreateNewAccount {
-								Button(L10n.DAppRequest.ChooseAccounts.createNewAccount) {
-									viewStore.send(.createAccountButtonTapped)
-								}
-								.buttonStyle(.secondaryRectangular(shouldExpand: false))
+						if viewStore.canCreateNewAccount {
+							Button(L10n.DAppRequest.ChooseAccounts.createNewAccount) {
+								viewStore.send(.createAccountButtonTapped)
 							}
+							.buttonStyle(.secondaryRectangular(shouldExpand: false))
 						}
 					}
 				}

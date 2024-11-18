@@ -128,7 +128,7 @@ struct DeleteAccountCoordinator: Sendable, FeatureReducer {
 					context: .assetTransfer,
 					filteredAccounts: filteredAccounts,
 					disabledAccounts: disabledAccounts,
-					availableAccounts: .success(availableAccounts.map(\.account).asIdentified()),
+					availableAccounts: availableAccounts.map(\.account).asIdentified(),
 					canCreateNewAccount: false
 				),
 				hasAccountsWithEnoughXRD: hasAccountsWithEnoughXRD

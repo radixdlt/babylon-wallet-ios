@@ -79,7 +79,7 @@ extension ChooseReceivingAccount {
 
 							addressField
 
-							if store.chooseAccounts.availableAccounts.wrappedValue?.isEmpty == false {
+							if !store.chooseAccounts.availableAccounts.isEmpty {
 								Divider()
 
 								Text(L10n.AssetTransfer.ChooseReceivingAccount.chooseOwnAccount)

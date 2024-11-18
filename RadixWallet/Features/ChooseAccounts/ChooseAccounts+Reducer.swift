@@ -7,8 +7,8 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		let context: Context
 		let filteredAccounts: [AccountAddress]
 		let disabledAccounts: [AccountAddress]
+		var availableAccounts: IdentifiedArrayOf<Account>
 		var selectedAccounts: [ChooseAccountsRow.State]?
-		var availableAccounts: Loadable<Accounts>
 		var canCreateNewAccount: Bool
 
 		@PresentationState
@@ -27,8 +27,8 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			context: Context,
 			filteredAccounts: [AccountAddress] = [],
 			disabledAccounts: [AccountAddress] = [],
+			availableAccounts: IdentifiedArrayOf<Account> = [],
 			selectedAccounts: [ChooseAccountsRow.State]? = nil,
-			availableAccounts: Loadable<Accounts> = .idle,
 			canCreateNewAccount: Bool = true
 		) {
 			self.context = context
@@ -81,9 +81,6 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			if state.availableAccounts == .idle {
-				state.availableAccounts = .loading
-			}
 			return loadAccounts()
 
 		case .createAccountButtonTapped:
@@ -102,17 +99,15 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .loadAccountsResult(.success(accounts)):
 			// Uniqueness is guaranteed as per `Accounts`
-			state.availableAccounts = .success(
-				accounts
-					.filter {
-						!state.filteredAccounts.contains($0.address)
-					}
-					.sorted {
-						!state.disabledAccounts.contains($0.address)
-							&& state.disabledAccounts.contains($1.address)
-					}
-					.asIdentified()
-			)
+			state.availableAccounts = accounts
+				.filter {
+					!state.filteredAccounts.contains($0.address)
+				}
+				.sorted {
+					!state.disabledAccounts.contains($0.address)
+						&& state.disabledAccounts.contains($1.address)
+				}
+				.asIdentified()
 			return .none
 
 		case let .loadAccountsResult(.failure(error)):
