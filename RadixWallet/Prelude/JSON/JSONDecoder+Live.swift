@@ -12,7 +12,7 @@ extension JSONDecoder: DependencyKey {
 	public static var testValue: Value { liveValue }
 }
 
-// MARK: - JSONDecoder + Sendable
+// MARK: - JSONDecoder + @unchecked Sendable
 extension JSONDecoder: @unchecked Sendable {}
 
 extension DependencyValues {
