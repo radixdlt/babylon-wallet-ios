@@ -179,9 +179,9 @@
 "accountSettings_deleteAccount_message" = "You’re about to permanently delete this Account. Once this is done, you will not be able to recover access.";
 "accountSettings_moveAssets_title" = "Move Assets to Another Account";
 "accountSettings_moveAssets_message" = "Before deleting this Account, choose another one to transfer your assets to.";
-"accountSettings_deleteAccount_note" = "The new Account must hold enough XRD to pay the transaction fee.";
-"accountSettings_deleteAccount_noAccountsWarning" = "You don’t have any other accounts with enough XRD.";
-"accountSettings_deleteAccount_skipButton" = "Skip";
+"accountSettings_moveAssets_note" = "The new Account must hold enough XRD to pay the transaction fee.";
+"accountSettings_moveAssets_noAccountsWarning" = "You don’t have any other accounts with enough XRD.";
+"accountSettings_moveAssets_skipButton" = "Skip";
 "accountSettings_assetsWillBeLostWarning_title" = "Assets Will Be Lost";
 "accountSettings_assetsWillBeLostWarning_message" = "If you do not transfer your assets out of this Account, they will be lost forever.";
 "accountSettings_cannotDeleteAccountWarning_title" = "Cannot Delete Account";
