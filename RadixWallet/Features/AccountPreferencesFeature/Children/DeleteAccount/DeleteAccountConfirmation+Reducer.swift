@@ -69,7 +69,7 @@ struct DeleteAccountConfirmation: Sendable, FeatureReducer {
 						}
 
 						let xrdBalance = entity.fungibleResources.xrdResource?.amount.exactAmount?.nominalAmount ?? 0
-						let hasEnoughXRD = xrdBalance >= 1
+						let hasEnoughXRD = xrdBalance >= State.ReceivingAccountCandidate.minimumRequiredXRD
 
 						return .init(account: account, hasEnoughXRD: hasEnoughXRD)
 					}
@@ -99,5 +99,7 @@ extension DeleteAccountConfirmation.State {
 	struct ReceivingAccountCandidate: Sendable, Hashable {
 		let account: Account
 		let hasEnoughXRD: Bool
+
+		static let minimumRequiredXRD: Decimal192 = 4
 	}
 }
