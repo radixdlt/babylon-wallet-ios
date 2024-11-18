@@ -65,6 +65,12 @@ extension DebugSettingsCoordinator.View {
 				icon: .systemImage("key"),
 				action: .debugKeychainContentsButtonTapped
 			),
+            // ONLY DEBUG EVER
+            .model(
+                title: "FactorInstances Cache",
+                icon: .systemImage("key"),
+                action: .debugFactorInstancesCacheContentsButtonTapped
+            ),
 		]
 	}
 }
@@ -88,7 +94,8 @@ private extension View {
 			.debugUserDefaultsContents(with: destinationStore)
 		#if DEBUG
 			.debugKeychainTest(with: destinationStore)
-			.debugKeychainContents(with: destinationStore)
+            .debugKeychainContents(with: destinationStore)
+			.debugFactorInstancesCacheContents(with: destinationStore)
 		#endif
 			.debugInspectProfile(with: destinationStore)
 	}
@@ -126,6 +133,18 @@ private extension View {
 			destination: { DebugKeychainContents.View(store: $0) }
 		)
 	}
+    
+    
+    private func debugFactorInstancesCacheContents(
+        with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
+    ) -> some View {
+        navigationDestination(
+            store: destinationStore,
+            state: /DebugSettingsCoordinator.Destination.State.debugFactorInstancesCacheContents,
+            action: DebugSettingsCoordinator.Destination.Action.debugFactorInstancesCacheContents,
+            destination: { DebugFactorInstancesCacheContents.View(store: $0) }
+        )
+    }
 	#endif // DEBUG
 
 	private func factorSources(
