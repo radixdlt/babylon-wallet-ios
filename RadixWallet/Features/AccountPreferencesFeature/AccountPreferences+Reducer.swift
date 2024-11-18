@@ -177,7 +177,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 			return hideAccountEffect(state: state)
 		case .deleteAccount(.delegate(.goHomeAfterAccountDeleted)):
 			return .send(.delegate(.goHomeAfterAccountDeleted))
-		case .hideAccount(.cancel), .deleteAccount(.delegate(.canceled)):
+		case .hideAccount(.cancel):
 			state.destination = nil
 			return .none
 		default:

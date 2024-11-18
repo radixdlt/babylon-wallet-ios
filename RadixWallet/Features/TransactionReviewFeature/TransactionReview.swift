@@ -29,7 +29,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 		var sliderResetDate: Date = .now
 
 		var waitsForTransactionToBeComitted: Bool {
-			interactionId.isWalletAccountDepositSettingsInteraction
+			interactionId.isWalletAccountDepositSettingsInteraction || interactionId.isWalletAccountDeleteInteraction
 		}
 
 		var isWalletTransaction: Bool {

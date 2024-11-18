@@ -40,7 +40,6 @@ struct DeleteAccountCoordinator: Sendable, FeatureReducer {
 	@CasePathable
 	enum DelegateAction: Sendable, Equatable {
 		case goHomeAfterAccountDeleted
-		case canceled
 	}
 
 	// MARK: - Destination
@@ -113,9 +112,6 @@ struct DeleteAccountCoordinator: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case .deleteConfirmation(.delegate(.canceled)):
-			return .send(.delegate(.canceled))
-
 		case .deleteConfirmation(.delegate(.deleteAccount)):
 			return deleteAccount(
 				accountAddress: state.account.address,

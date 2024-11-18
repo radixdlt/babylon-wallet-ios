@@ -12,7 +12,6 @@ struct DeleteAccountConfirmation: Sendable, FeatureReducer {
 	@CasePathable
 	enum ViewAction: Sendable, Equatable {
 		case continueButtonTapped
-		case cancelButtonTapped
 	}
 
 	@CasePathable
@@ -22,7 +21,6 @@ struct DeleteAccountConfirmation: Sendable, FeatureReducer {
 
 	@CasePathable
 	enum DelegateAction: Sendable, Equatable {
-		case canceled
 		case chooseRecipientAccount
 		case deleteAccount
 	}
@@ -46,8 +44,6 @@ struct DeleteAccountConfirmation: Sendable, FeatureReducer {
 				}
 				await send(.internal(.fetchAccountPortfolioResult(result)))
 			}
-		case .cancelButtonTapped:
-			return .send(.delegate(.canceled))
 		}
 	}
 
