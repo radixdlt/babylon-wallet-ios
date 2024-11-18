@@ -118,13 +118,20 @@ struct DeleteAccountCoordinator: Sendable, FeatureReducer {
 				recipientAccountAddress: nil
 			)
 
-		case .deleteConfirmation(.delegate(.chooseRecipientAccount)):
+		case let .deleteConfirmation(.delegate(.chooseReceivingAccount(accounts, disabledAccounts))):
+			let filteredAccounts = [state.account.accountAddress]
+			let availableAccounts = accounts.filter { !filteredAccounts.contains($0.account.address) }
+			let hasAccountsWithEnoughXRD = availableAccounts.contains(where: \.hasEnoughXRD)
+
 			state.destination = .chooseReceivingAccount(.init(
 				chooseAccounts: .init(
 					context: .accountDeletion,
-					filteredAccounts: [state.account.accountAddress],
+					filteredAccounts: filteredAccounts,
+					disabledAccounts: disabledAccounts,
+					availableAccounts: .success(availableAccounts.map(\.account).asIdentified()),
 					canCreateNewAccount: false
-				)
+				),
+				hasAccountsWithEnoughXRD: hasAccountsWithEnoughXRD
 			))
 			return .none
 

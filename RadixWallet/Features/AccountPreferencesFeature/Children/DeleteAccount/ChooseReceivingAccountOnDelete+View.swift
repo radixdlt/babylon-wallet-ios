@@ -1,15 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
 
-extension ChooseReceivingAccountOnDelete.State {
-	var hasAccountsWithEnoughXRD: Bool? {
-		chooseAccounts.availableAccounts.wrappedValue?.contains(where: { accountType in
-			guard case let .receiving(account) = accountType else { return false }
-			return account.hasEnoughXRD
-		})
-	}
-}
-
 // MARK: - ChooseReceivingAccountOnDelete.View
 extension ChooseReceivingAccountOnDelete {
 	@MainActor
@@ -30,7 +21,7 @@ extension ChooseReceivingAccountOnDelete {
 						Text("The new Account must hold enough XRD to pay the transaction fee.")
 							.textStyle(.body1Regular)
 
-						if viewStore.hasAccountsWithEnoughXRD == false {
+						if !viewStore.hasAccountsWithEnoughXRD {
 							WarningErrorView(
 								text: "You don’t have any other accounts with enough XRD.",
 								type: .warning,

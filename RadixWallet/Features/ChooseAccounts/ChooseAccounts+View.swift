@@ -15,9 +15,9 @@ extension ChooseAccounts {
 			self.availableAccounts = state.availableAccounts.map { accounts in
 				accounts.map {
 					ChooseAccountsRow.State(
-						account: $0.account,
+						account: $0,
 						mode: selectionRequirement == .exactly(1) ? .radioButton : .checkmark,
-						isEnabled: $0.hasEnoughXRD != false
+						isEnabled: !state.disabledAccounts.contains($0.address)
 					)
 				}
 			}

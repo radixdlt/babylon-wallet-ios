@@ -134,8 +134,8 @@ extension AccountPermissionChooseAccounts.State {
 			context: .assetTransfer,
 			availableAccounts: .success(.init(
 				uniqueElements: [
-					.general(.previewValue0),
-					.general(.previewValue1),
+					.previewValue0,
+					.previewValue1,
 				]
 			))
 		)

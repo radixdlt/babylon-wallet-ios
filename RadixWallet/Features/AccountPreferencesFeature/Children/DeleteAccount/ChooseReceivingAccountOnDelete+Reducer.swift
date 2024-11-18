@@ -6,6 +6,7 @@ import SwiftUI
 struct ChooseReceivingAccountOnDelete: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		var chooseAccounts: ChooseAccounts.State
+		var hasAccountsWithEnoughXRD: Bool
 		var footerControlState: ControlState = .enabled
 
 		@PresentationState

@@ -6,8 +6,9 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		let context: Context
 		let filteredAccounts: [AccountAddress]
+		let disabledAccounts: [AccountAddress]
 		var selectedAccounts: [ChooseAccountsRow.State]?
-		var availableAccounts: Loadable<IdentifiedArrayOf<AccountType>>
+		var availableAccounts: Loadable<Accounts>
 		var canCreateNewAccount: Bool
 
 		@PresentationState
@@ -25,12 +26,14 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		init(
 			context: Context,
 			filteredAccounts: [AccountAddress] = [],
+			disabledAccounts: [AccountAddress] = [],
 			selectedAccounts: [ChooseAccountsRow.State]? = nil,
-			availableAccounts: Loadable<IdentifiedArrayOf<AccountType>> = .idle,
+			availableAccounts: Loadable<Accounts> = .idle,
 			canCreateNewAccount: Bool = true
 		) {
 			self.context = context
 			self.filteredAccounts = filteredAccounts
+			self.disabledAccounts = disabledAccounts
 			self.availableAccounts = availableAccounts
 			self.selectedAccounts = selectedAccounts
 			self.canCreateNewAccount = canCreateNewAccount
@@ -44,7 +47,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case loadAccountsResult(TaskResult<IdentifiedArrayOf<State.AccountType>>)
+		case loadAccountsResult(TaskResult<Accounts>)
 	}
 
 	struct Destination: DestinationReducer {
@@ -82,7 +85,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			if state.availableAccounts == .idle {
 				state.availableAccounts = .loading
 			}
-			return loadAccounts(context: state.context)
+			return loadAccounts()
 
 		case .createAccountButtonTapped:
 			state.destination = .createAccount(.init(
@@ -101,9 +104,15 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		case let .loadAccountsResult(.success(accounts)):
 			// Uniqueness is guaranteed as per `Accounts`
 			state.availableAccounts = .success(
-				accounts.filter {
-					!state.filteredAccounts.contains($0.account.address)
-				}.asIdentified()
+				accounts
+					.filter {
+						!state.filteredAccounts.contains($0.address)
+					}
+					.sorted {
+						!state.disabledAccounts.contains($0.address)
+							&& state.disabledAccounts.contains($1.address)
+					}
+					.asIdentified()
 			)
 			return .none
 
@@ -116,41 +125,17 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .createAccount(.delegate(.completed)):
-			loadAccounts(context: state.context)
+			loadAccounts()
 
 		default:
 			.none
 		}
 	}
 
-	private func loadAccounts(context: State.Context) -> Effect<Action> {
+	private func loadAccounts() -> Effect<Action> {
 		.run { send in
 			let result = await TaskResult {
-				switch context {
-				case .assetTransfer, .permission:
-					return try await accountsClient.getAccountsOnCurrentNetwork()
-						.map { State.AccountType.general($0) }
-						.asIdentified()
-
-				case .accountDeletion:
-					let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
-					let entities = try await onLedgerEntitiesClient.getAccounts(accounts.map(\.address), cachingStrategy: .forceUpdate)
-					let receivingAccounts = accounts.compactMap { account -> State.ReceivingAccountCandidate? in
-						guard let entity = entities.first(where: { $0.address == account.address }) else {
-							assertionFailure("Failed to find account, this should never happen.")
-							return nil
-						}
-
-						let xrdBalance = entity.fungibleResources.xrdResource?.amount.exactAmount?.nominalAmount ?? 0
-						let hasEnoughXRD = xrdBalance >= 1
-
-						return .init(account: account, hasEnoughXRD: hasEnoughXRD)
-					}
-					return receivingAccounts
-						.sorted { $0.hasEnoughXRD && !$1.hasEnoughXRD }
-						.map { State.AccountType.receiving($0) }
-						.asIdentified()
-				}
+				try await accountsClient.getAccountsOnCurrentNetwork()
 			}
 			await send(.internal(.loadAccountsResult(result)))
 		}
