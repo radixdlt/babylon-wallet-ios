@@ -47,7 +47,7 @@ extension HomeCardsClient: DependencyKey {
 	}()
 }
 
-// MARK: - HomeCardsManager + Sendable
+// MARK: - HomeCardsManager + @unchecked Sendable
 extension HomeCardsManager: @unchecked Sendable {}
 
 // MARK: - HomeCardsStorage
