@@ -12,11 +12,11 @@ extension ChooseAccounts {
 		init(state: ChooseAccounts.State) {
 			let selectionRequirement = state.selectionRequirement
 
-			self.availableAccounts = state.availableAccounts.map {
+			self.availableAccounts = state.availableAccounts.map { account in
 				ChooseAccountsRow.State(
-					account: $0,
+					account: account,
 					mode: selectionRequirement == .exactly(1) ? .radioButton : .checkmark,
-					isEnabled: !state.disabledAccounts.contains($0.address)
+					isEnabled: !state.disabledAccounts.contains(account.address)
 				)
 			}
 			self.selectionRequirement = selectionRequirement
