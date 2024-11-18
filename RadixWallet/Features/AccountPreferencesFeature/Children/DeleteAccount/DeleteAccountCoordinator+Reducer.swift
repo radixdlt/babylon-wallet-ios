@@ -29,6 +29,7 @@ struct DeleteAccountCoordinator: Sendable, FeatureReducer {
 	enum InternalAction: Sendable, Equatable {
 		case accountDeletedSuccessfully
 		case accountDeletionFailed
+		case accountDeletionFailedDueTooManyAssets
 	}
 
 	@CasePathable
@@ -49,18 +50,12 @@ struct DeleteAccountCoordinator: Sendable, FeatureReducer {
 		enum State: Hashable, Sendable {
 			case chooseReceivingAccount(ChooseReceivingAccountOnDelete.State)
 			case accountDeleted
-			case tooManyAssetsAlert(AlertState<Action.TooManyAssetsAlert>)
 		}
 
 		@CasePathable
 		enum Action: Equatable, Sendable {
 			case chooseReceivingAccount(ChooseReceivingAccountOnDelete.Action)
 			case accountDeleted
-			case tooManyAssetsAlert(TooManyAssetsAlert)
-
-			enum TooManyAssetsAlert: Hashable, Sendable {
-				case okTapped
-			}
 		}
 
 		var body: some ReducerOf<Self> {
@@ -103,6 +98,15 @@ struct DeleteAccountCoordinator: Sendable, FeatureReducer {
 
 		case .accountDeletionFailed:
 			updateChooseAccountControlState(state: &state, footerControlState: .enabled)
+			return .none
+
+		case .accountDeletionFailedDueTooManyAssets:
+			guard case var .chooseReceivingAccount(childState) = state.destination else { return .none }
+
+			childState.footerControlState = .enabled
+			childState.destination = .tooManyAssetsAlert(.tooManyAssets)
+			state.destination = .chooseReceivingAccount(childState)
+
 			return .none
 		}
 	}
@@ -164,7 +168,7 @@ struct DeleteAccountCoordinator: Sendable, FeatureReducer {
 	) -> Effect<Action> {
 		.run { send in
 			do {
-				let manifest = try await createDeleteAccountManifest(
+				let manifest = try await SargonOs.shared.createDeleteAccountManifest(
 					accountAddress: accountAddress,
 					recipientAccountAddress: recipientAccountAddress
 				)
@@ -193,31 +197,14 @@ struct DeleteAccountCoordinator: Sendable, FeatureReducer {
 					await send(.internal(.accountDeletionFailed))
 				}
 			} catch {
-				errorQueue.schedule(error)
-				await send(.internal(.accountDeletionFailed))
+				switch error as? CommonError {
+				case .MaxTransfersPerTransactionReached:
+					await send(.internal(.accountDeletionFailedDueTooManyAssets))
+				default:
+					errorQueue.schedule(error)
+					await send(.internal(.accountDeletionFailed))
+				}
 			}
 		}
 	}
-}
-
-extension AlertState<DeleteAccountCoordinator.Destination.Action.TooManyAssetsAlert> {
-	static var tooManyAssets: AlertState {
-		AlertState {
-			TextState("Cannot Delete Account")
-		} actions: {
-			ButtonState(role: .cancel, action: .okTapped) {
-				TextState(L10n.Common.ok)
-			}
-		} message: {
-			TextState("Too many assets currently held in Account to perform deletion. Move some and try again.")
-		}
-	}
-}
-
-// TODO: Use Sargon
-func createDeleteAccountManifest(
-	accountAddress: AccountAddress,
-	recipientAccountAddress: AccountAddress?
-) async throws -> TransactionManifest {
-	.sampleOther
 }

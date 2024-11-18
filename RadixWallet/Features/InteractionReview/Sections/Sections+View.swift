@@ -238,10 +238,7 @@ extension InteractionReview.Sections {
 			IfLetStore(store.scope(state: \.accountDeletion, action: \.child.accountDeletion)) { childStore in
 				VStack(alignment: .leading, spacing: .small2) {
 					Common.HeadingView.deletingAccount
-					Card {
-						Common.Account.View(store: childStore)
-							.padding(.small1)
-					}
+					Common.Accounts.View(store: childStore)
 				}
 			}
 		}

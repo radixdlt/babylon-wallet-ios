@@ -6,11 +6,7 @@ extension InteractionReview.Sections {
 	typealias ResourcesInfo = [ResourceAddress: ResourceInfo]
 	typealias ResourceAssociatedDapps = [ResourceAddress: OnLedgerEntity.Metadata]
 
-	func sections(
-		for summary: ExecutionSummary,
-		networkID: NetworkID,
-		interactionId: WalletInteractionId?
-	) async throws -> Common.SectionsData? {
+	func sections(for summary: ExecutionSummary, networkID: NetworkID) async throws -> Common.SectionsData? {
 		let allWithdrawAddresses = summary.withdrawals.values.flatMap { $0 }.map(\.resourceAddress)
 		let allDepositAddresses = summary.deposits.values.flatMap { $0 }.map(\.resourceAddress)
 
@@ -45,27 +41,7 @@ extension InteractionReview.Sections {
 
 		switch summary.detailedManifestClass {
 		case nil:
-			guard interactionId?.isWalletAccountDeleteInteraction == true else { return nil }
-
-			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
-			let deposits = try await extractDeposits(
-				accountDeposits: summary.deposits,
-				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
-				entities: resourcesInfo,
-				networkID: networkID
-			)
-
-			// FIXME: get delete account address
-			let accountDeletion: Common.Account.State? = if let accountAddress = summary.deposits.keys.first {
-				try await extractAccountDeletion(accountAddress: accountAddress)
-			} else {
-				nil
-			}
-
-			return Common.SectionsData(
-				deposits: deposits,
-				accountDeletion: accountDeletion
-			)
+			return nil
 
 		case .general, .transfer:
 			if summary.detailedManifestClass == .general {
@@ -297,6 +273,27 @@ extension InteractionReview.Sections {
 				accountDepositSetting: accountDepositSetting,
 				accountDepositExceptions: accountDepositExceptions
 			)
+
+		case let .deleteAccounts(accountAddresses):
+			let deleteAccounts: Common.Accounts.State? = try await extractDeleteAccounts(accountAddresses: accountAddresses)
+
+			var summary = summary
+			for accountAddress in accountAddresses {
+				summary.deposits[accountAddress] = nil
+			}
+
+			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
+			let deposits = try await extractDeposits(
+				accountDeposits: summary.deposits,
+				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
+				entities: resourcesInfo,
+				networkID: networkID
+			)
+
+			return Common.SectionsData(
+				deposits: deposits,
+				accountDeletion: deleteAccounts
+			)
 		}
 	}
 
@@ -489,16 +486,21 @@ extension InteractionReview.Sections {
 		return .init(accounts: depositAccounts, enableCustomizeGuarantees: requiresGuarantees)
 	}
 
-	private func extractAccountDeletion(accountAddress: AccountAddress) async throws -> Common.Account.State? {
-		let userAccounts: [Common.ReviewAccount] = try await extractUserAccounts([accountAddress])
-		let account = try userAccounts.account(for: accountAddress)
+	private func extractDeleteAccounts(accountAddresses: [AccountAddress]) async throws -> Common.Accounts.State? {
+		let userAccounts: [Common.ReviewAccount] = try await extractUserAccounts(accountAddresses)
+		let accounts = try accountAddresses
+			.map {
+				let account = try userAccounts.account(for: $0)
+				return Common.Account.State(
+					account: account,
+					transfers: [],
+					isDeposit: false,
+					isAccountDelete: true
+				)
+			}
+			.asIdentified()
 
-		return Common.Account.State(
-			account: account,
-			transfers: [],
-			isDeposit: false,
-			isAccountDelete: true
-		)
+		return .init(accounts: accounts, enableCustomizeGuarantees: false)
 	}
 
 	func extractValidators(for addresses: [ValidatorAddress]) async throws -> Common.ValidatorsState? {

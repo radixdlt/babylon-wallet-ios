@@ -32,15 +32,21 @@ struct ChooseReceivingAccountOnDelete: Sendable, FeatureReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
 			case confirmSkipAlert(AlertState<Action.ConfirmSkipAlert>)
+			case tooManyAssetsAlert(AlertState<Action.TooManyAssetsAlert>)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
 			case confirmSkipAlert(ConfirmSkipAlert)
+			case tooManyAssetsAlert(TooManyAssetsAlert)
 
 			enum ConfirmSkipAlert: Hashable, Sendable {
 				case cancelTapped
 				case continueTapped
+			}
+
+			enum TooManyAssetsAlert: Hashable, Sendable {
+				case okTapped
 			}
 		}
 
@@ -101,6 +107,20 @@ extension AlertState<ChooseReceivingAccountOnDelete.Destination.Action.ConfirmSk
 			}
 		} message: {
 			TextState("If you do not transfer your assets out of this Account, they will be lost forever.")
+		}
+	}
+}
+
+extension AlertState<ChooseReceivingAccountOnDelete.Destination.Action.TooManyAssetsAlert> {
+	static var tooManyAssets: AlertState {
+		AlertState {
+			TextState("Cannot Delete Account")
+		} actions: {
+			ButtonState(role: .cancel, action: .okTapped) {
+				TextState(L10n.Common.ok)
+			}
+		} message: {
+			TextState("Too many assets currently held in Account to perform deletion. Move some and try again.")
 		}
 	}
 }

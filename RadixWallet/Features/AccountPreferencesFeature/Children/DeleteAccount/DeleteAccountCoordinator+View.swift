@@ -30,7 +30,6 @@ private extension View {
 		let destinationStore = store.scope(state: \.$destination, action: \.destination)
 		return chooseReceivingAccount(with: destinationStore, store: store)
 			.accountDeleted(with: destinationStore, store: store)
-			.tooManyAssetsAlert(with: destinationStore)
 	}
 
 	private func chooseReceivingAccount(with destinationStore: PresentationStoreOf<DeleteAccountCoordinator.Destination>, store: StoreOf<DeleteAccountCoordinator>) -> some View {
@@ -40,14 +39,10 @@ private extension View {
 	}
 
 	private func accountDeleted(with destinationStore: PresentationStoreOf<DeleteAccountCoordinator.Destination>, store: StoreOf<DeleteAccountCoordinator>) -> some View {
-		fullScreenCover(store: destinationStore.scope(state: \.accountDeleted, action: \.accountDeleted)) { _ in
+		navigationDestination(store: destinationStore.scope(state: \.accountDeleted, action: \.accountDeleted)) { _ in
 			AccountDeletedView {
 				store.send(.view(.goHomeButtonTapped))
 			}
 		}
-	}
-
-	private func tooManyAssetsAlert(with destinationStore: PresentationStoreOf<DeleteAccountCoordinator.Destination>) -> some View {
-		alert(store: destinationStore.scope(state: \.tooManyAssetsAlert, action: \.tooManyAssetsAlert))
 	}
 }

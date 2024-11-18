@@ -28,5 +28,6 @@ public struct AccountDeletedView: View {
 			Button("Go to Homescreen", action: onGoHome)
 				.buttonStyle(.primaryRectangular)
 		}
+		.toolbar(.hidden)
 	}
 }

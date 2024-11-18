@@ -484,11 +484,7 @@ extension TransactionReview {
 
 		state.networkFee = .init(reviewedTransaction: reviewedTransaction)
 
-		return .send(.child(.sections(.internal(.parent(.resolveExecutionSummary(
-			executionSummary,
-			networkID,
-			state.interactionId
-		))))))
+		return .send(.child(.sections(.internal(.parent(.resolveExecutionSummary(executionSummary, networkID))))))
 	}
 
 	func showRawTransaction(_ state: inout State) -> Effect<Action> {
