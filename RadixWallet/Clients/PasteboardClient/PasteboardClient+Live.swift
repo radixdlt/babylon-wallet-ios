@@ -21,5 +21,5 @@ extension PasteboardClient: DependencyKey {
 	}
 }
 
-// MARK: - Pasteboard + Sendable
+// MARK: - Pasteboard + @unchecked Sendable
 extension Pasteboard: @unchecked Sendable {}

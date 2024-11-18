@@ -1,4 +1,4 @@
-// MARK: - NonEmpty + Sendable
+// MARK: - NonEmpty + @unchecked Sendable
 extension NonEmpty: @unchecked Sendable where Element: Sendable {}
 
 extension NonEmptyString {
