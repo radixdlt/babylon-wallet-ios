@@ -16,7 +16,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 		var selectionRequirement: SelectionRequirement {
 			switch context {
-			case .assetTransfer, .accountDeletion:
+			case .assetTransfer:
 				.exactly(1)
 			case let .permission(selectionRequirement):
 				selectionRequirement
@@ -68,7 +68,6 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.accountsClient) var accountsClient
-	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 
 	init() {}
 
@@ -147,40 +146,5 @@ extension ChooseAccounts.State {
 	enum Context: Sendable, Hashable {
 		case assetTransfer
 		case permission(SelectionRequirement)
-		case accountDeletion
-	}
-
-	enum AccountType: Sendable, Hashable, Identifiable {
-		case general(Account)
-		case receiving(ReceivingAccountCandidate)
-
-		typealias ID = Account.ID
-		var id: ID { account.id }
-
-		var account: Account {
-			switch self {
-			case let .general(account):
-				account
-			case let .receiving(receivingAccount):
-				receivingAccount.account
-			}
-		}
-
-		var hasEnoughXRD: Bool? {
-			switch self {
-			case .general:
-				nil
-			case let .receiving(receivingAccount):
-				receivingAccount.hasEnoughXRD
-			}
-		}
-	}
-
-	struct ReceivingAccountCandidate: Sendable, Hashable, Identifiable {
-		typealias ID = Account.ID
-		var id: ID { account.id }
-
-		let account: Account
-		let hasEnoughXRD: Bool
 	}
 }

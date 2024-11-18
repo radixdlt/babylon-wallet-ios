@@ -196,10 +196,7 @@ extension InteractionReview {
 			switch parentAction {
 			case let .resolveExecutionSummary(executionSummary, networkID):
 				return .run { send in
-					let sections = try await sections(
-						for: executionSummary,
-						networkID: networkID
-					)
+					let sections = try await sections(for: executionSummary, networkID: networkID)
 					await send(.internal(.setSections(sections)))
 				} catch: { error, send in
 					loggerGlobal.error("Failed to extract sections from ExecutionSummary, error: \(error)")

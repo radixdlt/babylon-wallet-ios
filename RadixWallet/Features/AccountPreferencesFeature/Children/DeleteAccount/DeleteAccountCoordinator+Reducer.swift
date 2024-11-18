@@ -125,7 +125,7 @@ struct DeleteAccountCoordinator: Sendable, FeatureReducer {
 
 			state.destination = .chooseReceivingAccount(.init(
 				chooseAccounts: .init(
-					context: .accountDeletion,
+					context: .assetTransfer,
 					filteredAccounts: filteredAccounts,
 					disabledAccounts: disabledAccounts,
 					availableAccounts: .success(availableAccounts.map(\.account).asIdentified()),
