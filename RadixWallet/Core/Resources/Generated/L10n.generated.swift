@@ -272,12 +272,6 @@ internal enum L10n {
     internal enum DeleteAccount {
       /// You’re about to permanently delete this Account. Once this is done, you will not be able to recover access.
       internal static let message = L10n.tr("Localizable", "accountSettings_deleteAccount_message", fallback: "You’re about to permanently delete this Account. Once this is done, you will not be able to recover access.")
-      /// You don’t have any other accounts with enough XRD.
-      internal static let noAccountsWarning = L10n.tr("Localizable", "accountSettings_deleteAccount_noAccountsWarning", fallback: "You don’t have any other accounts with enough XRD.")
-      /// The new Account must hold enough XRD to pay the transaction fee.
-      internal static let note = L10n.tr("Localizable", "accountSettings_deleteAccount_note", fallback: "The new Account must hold enough XRD to pay the transaction fee.")
-      /// Skip
-      internal static let skipButton = L10n.tr("Localizable", "accountSettings_deleteAccount_skipButton", fallback: "Skip")
       /// Delete This Account?
       internal static let title = L10n.tr("Localizable", "accountSettings_deleteAccount_title", fallback: "Delete This Account?")
     }
@@ -292,6 +286,12 @@ internal enum L10n {
     internal enum MoveAssets {
       /// Before deleting this Account, choose another one to transfer your assets to.
       internal static let message = L10n.tr("Localizable", "accountSettings_moveAssets_message", fallback: "Before deleting this Account, choose another one to transfer your assets to.")
+      /// You don’t have any other accounts with enough XRD.
+      internal static let noAccountsWarning = L10n.tr("Localizable", "accountSettings_moveAssets_noAccountsWarning", fallback: "You don’t have any other accounts with enough XRD.")
+      /// The new Account must hold enough XRD to pay the transaction fee.
+      internal static let note = L10n.tr("Localizable", "accountSettings_moveAssets_note", fallback: "The new Account must hold enough XRD to pay the transaction fee.")
+      /// Skip
+      internal static let skipButton = L10n.tr("Localizable", "accountSettings_moveAssets_skipButton", fallback: "Skip")
       /// Move Assets to Another Account
       internal static let title = L10n.tr("Localizable", "accountSettings_moveAssets_title", fallback: "Move Assets to Another Account")
     }
