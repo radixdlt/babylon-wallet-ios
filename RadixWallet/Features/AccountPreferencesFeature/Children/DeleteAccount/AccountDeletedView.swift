@@ -10,11 +10,11 @@ public struct AccountDeletedView: View {
 					.resizable()
 					.frame(.medium)
 
-				Text("Account Deleted")
+				Text(L10n.AccountSettings.AccountDeleted.title)
 					.textStyle(.sheetTitle)
 					.foregroundColor(.app.gray1)
 
-				Text("Your Account has been permanently deleted. Your wallet settings have been updated.")
+				Text(L10n.AccountSettings.AccountDeleted.message)
 					.textStyle(.body1Regular)
 					.foregroundColor(.app.gray1)
 
@@ -25,7 +25,7 @@ public struct AccountDeletedView: View {
 			.padding(.top, .huge1)
 		}
 		.footer {
-			Button("Go to Homescreen", action: onGoHome)
+			Button(L10n.AccountSettings.AccountDeleted.button, action: onGoHome)
 				.buttonStyle(.primaryRectangular)
 		}
 		.toolbar(.hidden)

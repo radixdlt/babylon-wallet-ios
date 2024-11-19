@@ -15,11 +15,11 @@ extension DeleteAccountConfirmation {
 							.resizable()
 							.frame(.medium)
 
-						Text("Delete This Account?")
+						Text(L10n.AccountSettings.DeleteAccount.title)
 							.textStyle(.sheetTitle)
 							.foregroundColor(.app.gray1)
 
-						Text("You’re about to permanently delete this Account. Once this is done, you will not be able to recover access.")
+						Text(L10n.AccountSettings.DeleteAccount.message)
 							.textStyle(.body1HighImportance)
 							.foregroundColor(.app.gray1)
 

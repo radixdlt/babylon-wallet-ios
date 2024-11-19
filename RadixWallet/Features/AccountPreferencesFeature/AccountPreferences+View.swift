@@ -116,7 +116,7 @@ extension AccountPreferences.View {
 
 	@MainActor
 	private func deleteAccountButton() -> some View {
-		Button("Delete Account") {
+		Button(L10n.AccountSettings.deleteAccount) {
 			store.send(.view(.deleteAccountTapped))
 		}
 		.buttonStyle(.primaryRectangular(isDestructive: true))

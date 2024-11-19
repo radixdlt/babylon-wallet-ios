@@ -11,19 +11,19 @@ extension ChooseReceivingAccountOnDelete {
 			WithViewStore(store, observe: { $0 }) { viewStore in
 				ScrollView {
 					VStack(spacing: .medium2) {
-						Text("Move Assets to Another Account")
+						Text(L10n.AccountSettings.MoveAssets.title)
 							.lineSpacing(0)
 							.textStyle(.sheetTitle)
 
-						Text("Before deleting this Account, choose another one to transfer your assets to.")
+						Text(L10n.AccountSettings.MoveAssets.message)
 							.textStyle(.body1Header)
 
-						Text("The new Account must hold enough XRD to pay the transaction fee.")
+						Text(L10n.AccountSettings.MoveAssets.note)
 							.textStyle(.body1Regular)
 
 						if !viewStore.hasAccountsWithEnoughXRD {
 							WarningErrorView(
-								text: "You don’t have any other accounts with enough XRD.",
+								text: L10n.AccountSettings.MoveAssets.noAccountsWarning,
 								type: .warning,
 								useNarrowSpacing: true,
 								useSmallerFontSize: true
@@ -48,7 +48,7 @@ extension ChooseReceivingAccountOnDelete {
 								.buttonStyle(.primaryRectangular)
 						}
 
-						Button("Skip") {
+						Button(L10n.AccountSettings.MoveAssets.skipButton) {
 							viewStore.send(.view(.skipButtonTapped))
 						}
 						.buttonStyle(.primaryText())

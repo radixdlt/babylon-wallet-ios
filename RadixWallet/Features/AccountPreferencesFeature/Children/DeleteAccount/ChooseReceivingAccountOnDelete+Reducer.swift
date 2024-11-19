@@ -98,7 +98,7 @@ struct ChooseReceivingAccountOnDelete: Sendable, FeatureReducer {
 extension AlertState<ChooseReceivingAccountOnDelete.Destination.Action.ConfirmSkipAlert> {
 	static var confirmSkip: AlertState {
 		AlertState {
-			TextState("Assets Will Be Lost")
+			TextState(L10n.AccountSettings.AssetsWillBeLostWarning.title)
 		} actions: {
 			ButtonState(role: .cancel, action: .cancelTapped) {
 				TextState(L10n.Common.cancel)
@@ -107,7 +107,7 @@ extension AlertState<ChooseReceivingAccountOnDelete.Destination.Action.ConfirmSk
 				TextState(L10n.Common.continue)
 			}
 		} message: {
-			TextState("If you do not transfer your assets out of this Account, they will be lost forever.")
+			TextState(L10n.AccountSettings.AssetsWillBeLostWarning.message)
 		}
 	}
 }
@@ -115,13 +115,13 @@ extension AlertState<ChooseReceivingAccountOnDelete.Destination.Action.ConfirmSk
 extension AlertState<ChooseReceivingAccountOnDelete.Destination.Action.TooManyAssetsAlert> {
 	static var tooManyAssets: AlertState {
 		AlertState {
-			TextState("Cannot Delete Account")
+			TextState(L10n.AccountSettings.CannotDeleteAccountWarning.title)
 		} actions: {
 			ButtonState(role: .cancel, action: .okTapped) {
 				TextState(L10n.Common.ok)
 			}
 		} message: {
-			TextState("Too many assets currently held in Account to perform deletion. Move some and try again.")
+			TextState(L10n.AccountSettings.CannotDeleteAccountWarning.message)
 		}
 	}
 }

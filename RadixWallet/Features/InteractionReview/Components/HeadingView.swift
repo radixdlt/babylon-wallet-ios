@@ -40,7 +40,7 @@ extension InteractionReview {
 		)
 
 		static let deletingAccount = HeadingView(
-			"Deleting Account",
+			L10n.TransactionReview.DeletingAccount.title,
 			icon: AssetResource.transactionReviewDeletingAccount
 		)
 

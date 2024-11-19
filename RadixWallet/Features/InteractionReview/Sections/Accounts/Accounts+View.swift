@@ -44,7 +44,7 @@ extension InteractionReview.Account {
 					if store.isAccountDelete {
 						HStack(spacing: .medium3) {
 							Image(.delete)
-							Text("Deleting Account. Permanently removing access and preventing future deposits.")
+							Text(L10n.TransactionReview.DeletingAccount.message)
 								.lineSpacing(-.small3)
 								.textStyle(.body1HighImportance)
 								.multilineTextAlignment(.leading)
