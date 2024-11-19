@@ -15,10 +15,12 @@ struct DebugFactorInstancesCacheContents: Sendable, FeatureReducer {
 
 	enum ViewAction: Sendable, Equatable {
 		case task
+		case deleteButtonTapped
 	}
     
     enum InternalAction: Sendable, Equatable {
         case loadedInstances(Instances)
+		case failedToDelete(String)
     }
 
 	var body: some ReducerOf<Self> {
@@ -27,6 +29,12 @@ struct DebugFactorInstancesCacheContents: Sendable, FeatureReducer {
     
     func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
         switch internalAction {
+		case let .failedToDelete(error):
+			struct Err: LocalizedError {
+				let localizedDescription: String
+			}
+			state.factorInstances = .failure(Err(localizedDescription: error))
+			return .none
         case let .loadedInstances(instances):
             state.factorInstances = .success(instances)
             return .none
@@ -35,6 +43,13 @@ struct DebugFactorInstancesCacheContents: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
+		case .deleteButtonTapped:
+			return .run { send in
+				try await FileSystem.shared.deleteFactorInstancesCache()
+				await send(.internal(.loadedInstances([:])))
+			} catch: { error, send in
+				await send(.internal(.failedToDelete(error.localizedDescription)))
+			}
 		case .task:
             state.factorInstances = .loading
                 return .run { send in

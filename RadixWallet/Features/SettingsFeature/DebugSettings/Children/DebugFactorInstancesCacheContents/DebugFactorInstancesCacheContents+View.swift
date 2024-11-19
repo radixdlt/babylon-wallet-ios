@@ -9,6 +9,10 @@ extension DebugFactorInstancesCacheContents {
         var body: some SwiftUI.View {
             WithPerceptionTracking {
                 VStack(spacing: .small2) {
+					Button("Delete Cache File") {
+						store.send(.view(.deleteButtonTapped))
+					}
+					.buttonStyle(.primaryRectangular(isDestructive: true))
                     loadable(store.factorInstances) {
                         ProgressView()
                     } successContent: { instances in
