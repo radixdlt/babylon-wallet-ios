@@ -144,7 +144,13 @@ struct AccountDetails: Sendable, FeatureReducer {
 			return .run { [state] send in
 				for try await accountUpdate in await accountsClient.accountUpdates(state.account.address) {
 					guard !Task.isCancelled else { return }
-					await send(.internal(.accountUpdated(accountUpdate)))
+
+					let isTombstoned = accountUpdate.flags.contains(.tombstonedByUser)
+					if isTombstoned {
+						await send(.delegate(.dismiss))
+					} else {
+						await send(.internal(.accountUpdated(accountUpdate)))
+					}
 				}
 			}
 			.merge(with: securityProblemsEffect())

@@ -38,6 +38,7 @@ extension AccountPortfoliosClient: DependencyKey {
 		@Dependency(\.appPreferencesClient) var appPreferencesClient
 		@Dependency(\.resourcesVisibilityClient) var resourcesVisibilityClient
 		@Dependency(\.gatewaysClient) var gatewaysClient
+		@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 		Self.registerSubscribers(state: state)
 
@@ -177,15 +178,27 @@ extension AccountPortfoliosClient: DependencyKey {
 			return portfolio
 		}
 
+		@Sendable
+		func syncAccountsDeletedOnLedger() {
+			Task.detached {
+				let isDeletedAccountDetected = try? await SargonOS.shared.syncAccountsDeletedOnLedger()
+				if isDeletedAccountDetected == true {
+					overlayWindowClient.scheduleAlertAndIgnoreAction(.deletedAccountDetectedAlert)
+				}
+			}
+		}
+
 		return AccountPortfoliosClient(
 			fetchAccountPortfolios: { accountAddresses, forceRefresh in
 				try await Task.detached {
-					try await fetchAccountPortfolios(accountAddresses, forceRefreshEntities: forceRefresh, forceRefreshPrices: forceRefresh)
+					syncAccountsDeletedOnLedger()
+					return try await fetchAccountPortfolios(accountAddresses, forceRefreshEntities: forceRefresh, forceRefreshPrices: forceRefresh)
 				}.value
 			},
 			fetchAccountPortfolio: { accountAddress, forceRefresh in
 				try await Task.detached {
-					try await fetchAccountPortfolio(accountAddress, forceRefresh)
+					syncAccountsDeletedOnLedger()
+					return try await fetchAccountPortfolio(accountAddress, forceRefresh)
 				}.value
 			},
 			portfolioUpdates: {
@@ -206,4 +219,11 @@ extension OnLedgerEntity.OnLedgerAccount {
 	fileprivate var resourcesWithPrices: [ResourceAddress] {
 		allFungibleResourceAddresses + poolUnitResources.poolUnits.flatMap(\.poolResources)
 	}
+}
+
+extension OverlayWindowClient.Item.AlertState {
+	fileprivate static let deletedAccountDetectedAlert = Self(
+		title: { TextState(L10n.HomePage.DeletedAccountWarning.title) },
+		message: { TextState(L10n.HomePage.DeletedAccountWarning.message) }
+	)
 }

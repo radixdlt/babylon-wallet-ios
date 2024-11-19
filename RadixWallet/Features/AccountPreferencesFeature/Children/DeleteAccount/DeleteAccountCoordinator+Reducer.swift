@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - DeleteAccountCoordinator
@@ -188,6 +189,7 @@ struct DeleteAccountCoordinator: Sendable, FeatureReducer {
 						/// Wait for the transaction to be committed
 						let txID = tx.send.transactionIntentHash
 						if try await submitTXClient.hasTXBeenCommittedSuccessfully(txID) {
+							try await SargonOs.shared.markAccountAsTombstoned(accountAddress: accountAddress)
 							await send(.internal(.accountDeletedSuccessfully))
 						}
 						return
