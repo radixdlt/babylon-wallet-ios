@@ -3,11 +3,11 @@ import Sargon
 
 extension Persona {
 	mutating func hide() {
-		entityFlags.append(.deletedByUser)
+		entityFlags.append(.hiddenByUser)
 	}
 
 	mutating func unhide() {
-		entityFlags.remove(.deletedByUser)
+		entityFlags.remove(.hiddenByUser)
 	}
 }
 

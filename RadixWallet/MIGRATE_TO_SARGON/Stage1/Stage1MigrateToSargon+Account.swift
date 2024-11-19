@@ -42,11 +42,11 @@ extension Account {
 	}
 
 	mutating func hide() {
-		flags.append(.deletedByUser)
+		flags.append(.hiddenByUser)
 	}
 
 	mutating func unhide() {
-		entityFlags.remove(.deletedByUser)
+		entityFlags.remove(.hiddenByUser)
 	}
 }
 

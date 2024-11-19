@@ -37,7 +37,13 @@ extension ProfileStore {
 
 extension ProfileStore {
 	func createNewProfile() async throws {
-		try await SargonOS.shared.newWallet()
+		let shouldPrederiveInstances: Bool
+		#if DEBUG
+		shouldPrederiveInstances = true
+		#else
+		shouldPrederiveInstances = false
+		#endif
+		return try await SargonOS.shared.newWallet(shouldPrederiveInstances: shouldPrederiveInstances)
 	}
 
 	func finishOnboarding(

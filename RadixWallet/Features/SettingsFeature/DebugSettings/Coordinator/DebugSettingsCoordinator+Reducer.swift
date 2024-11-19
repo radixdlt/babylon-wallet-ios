@@ -23,6 +23,7 @@ struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 		case debugUserDefaultsContentsButtonTapped
 		case debugTestKeychainButtonTapped
 		case debugKeychainContentsButtonTapped
+        case debugFactorInstancesCacheContentsButtonTapped
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -36,7 +37,8 @@ struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 			case debugManageFactorSources(DebugManageFactorSources.State)
 			#if DEBUG
 			case debugKeychainTest(DebugKeychainTest.State)
-			case debugKeychainContents(DebugKeychainContents.State)
+            case debugKeychainContents(DebugKeychainContents.State)
+			case debugFactorInstancesCacheContents(DebugFactorInstancesCacheContents.State)
 			#endif // DEBUG
 		}
 
@@ -45,7 +47,8 @@ struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 			case debugInspectProfile(DebugInspectProfile.Action)
 			#if DEBUG
 			case debugKeychainTest(DebugKeychainTest.Action)
-			case debugKeychainContents(DebugKeychainContents.Action)
+            case debugKeychainContents(DebugKeychainContents.Action)
+			case debugFactorInstancesCacheContents(DebugFactorInstancesCacheContents.Action)
 			#endif // DEBUG
 			case debugManageFactorSources(DebugManageFactorSources.Action)
 		}
@@ -64,6 +67,9 @@ struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 			Scope(state: /State.debugKeychainContents, action: /Action.debugKeychainContents) {
 				DebugKeychainContents()
 			}
+            Scope(state: /State.debugFactorInstancesCacheContents, action: /Action.debugFactorInstancesCacheContents) {
+                DebugFactorInstancesCacheContents()
+            }
 			#endif // DEBUG
 			Scope(state: /State.debugManageFactorSources, action: /Action.debugManageFactorSources) {
 				DebugManageFactorSources()
@@ -110,6 +116,12 @@ struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 			#endif // DEBUG
 			return .none
 
+        case .debugFactorInstancesCacheContentsButtonTapped:
+            #if DEBUG
+            state.destination = .debugFactorInstancesCacheContents(.init())
+            #endif // DEBUG
+            return .none
+            
 		case .debugUserDefaultsContentsButtonTapped:
 			state.destination = .debugUserDefaultsContents(.init())
 			return .none

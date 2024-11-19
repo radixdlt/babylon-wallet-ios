@@ -273,6 +273,8 @@ extension InteractionReview.Sections {
 				accountDepositSetting: accountDepositSetting,
 				accountDepositExceptions: accountDepositExceptions
 			)
+		case .some(.deleteAccounts(accountAddresses: let accountAddresses)):
+			fatalError()
 		}
 	}
 
