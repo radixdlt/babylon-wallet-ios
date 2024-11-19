@@ -1,37 +1,37 @@
-// MARK: - GatewayAPI.StateEntityDetailsResponse + @unchecked Sendable
+// MARK: - GatewayAPI.StateEntityDetailsResponse + Sendable
 extension GatewayAPI.StateEntityDetailsResponse: @unchecked Sendable {}
 
-// MARK: - GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregatedVaultItem + @unchecked Sendable
+// MARK: - GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregatedVaultItem + Sendable
 extension GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregatedVaultItem: @unchecked Sendable {}
 
-// MARK: - GatewayAPI.NonFungibleResourcesCollectionItem + @unchecked Sendable
+// MARK: - GatewayAPI.NonFungibleResourcesCollectionItem + Sendable
 extension GatewayAPI.NonFungibleResourcesCollectionItem: @unchecked Sendable {}
 
-// MARK: - GatewayAPI.FungibleResourcesCollectionItemVaultAggregatedVaultItem + @unchecked Sendable
+// MARK: - GatewayAPI.FungibleResourcesCollectionItemVaultAggregatedVaultItem + Sendable
 extension GatewayAPI.FungibleResourcesCollectionItemVaultAggregatedVaultItem: @unchecked Sendable {}
 
-// MARK: - GatewayAPI.FungibleResourcesCollectionItem + @unchecked Sendable
+// MARK: - GatewayAPI.FungibleResourcesCollectionItem + Sendable
 extension GatewayAPI.FungibleResourcesCollectionItem: @unchecked Sendable {}
 
-// MARK: - GatewayAPI.LedgerState + @unchecked Sendable
+// MARK: - GatewayAPI.LedgerState + Sendable
 extension GatewayAPI.LedgerState: @unchecked Sendable {}
 
-// MARK: - GatewayAPI.StateEntityDetailsResponseItem + @unchecked Sendable
+// MARK: - GatewayAPI.StateEntityDetailsResponseItem + Sendable
 extension GatewayAPI.StateEntityDetailsResponseItem: @unchecked Sendable {}
 
-// MARK: - GatewayAPI.FungibleResourcesCollectionItemVaultAggregated + @unchecked Sendable
+// MARK: - GatewayAPI.FungibleResourcesCollectionItemVaultAggregated + Sendable
 extension GatewayAPI.FungibleResourcesCollectionItemVaultAggregated: @unchecked Sendable {}
 
-// MARK: - GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregated + @unchecked Sendable
+// MARK: - GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregated + Sendable
 extension GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregated: @unchecked Sendable {}
 
-// MARK: - GatewayAPI.EntityMetadataItem + @unchecked Sendable
+// MARK: - GatewayAPI.EntityMetadataItem + Sendable
 extension GatewayAPI.EntityMetadataItem: @unchecked Sendable {}
 
-// MARK: - GatewayAPI.AccountLockerVaultCollectionItem + @unchecked Sendable
+// MARK: - GatewayAPI.AccountLockerVaultCollectionItem + Sendable
 extension GatewayAPI.AccountLockerVaultCollectionItem: @unchecked Sendable {}
 
-// MARK: - GatewayAPI.StateAccountLockersTouchedAtResponse + @unchecked Sendable
+// MARK: - GatewayAPI.StateAccountLockersTouchedAtResponse + Sendable
 extension GatewayAPI.StateAccountLockersTouchedAtResponse: @unchecked Sendable {}
 
 extension GatewayAPI.StateEntityDetailsResponseItemDetails {

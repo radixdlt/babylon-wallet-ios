@@ -4,7 +4,7 @@ import SwiftUI
 
 typealias RequestEnvelope = DappInteractionClient.RequestEnvelope
 
-// MARK: - RequestEnvelope + Identifiable
+// MARK: Identifiable
 extension RequestEnvelope: Identifiable {
 	typealias ID = WalletInteractionId
 	var id: ID {

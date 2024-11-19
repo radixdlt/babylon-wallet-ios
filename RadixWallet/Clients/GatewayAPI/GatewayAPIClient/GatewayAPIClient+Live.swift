@@ -1,4 +1,4 @@
-// MARK: - Date + @unchecked Sendable
+// MARK: - Date + Sendable
 extension Date: @unchecked Sendable {}
 
 extension JSONDecoder {

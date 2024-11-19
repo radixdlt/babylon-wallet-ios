@@ -1,9 +1,9 @@
 import Sargon
 
-// MARK: - KeychainAccess.Accessibility + @unchecked Sendable
+// MARK: - KeychainAccess.Accessibility + Sendable
 extension KeychainAccess.Accessibility: @unchecked Sendable {}
 
-// MARK: - KeychainAccess.AuthenticationPolicy + @unchecked Sendable
+// MARK: - KeychainAccess.AuthenticationPolicy + Sendable
 extension KeychainAccess.AuthenticationPolicy: @unchecked Sendable {}
 
 // MARK: - SecureStorageError

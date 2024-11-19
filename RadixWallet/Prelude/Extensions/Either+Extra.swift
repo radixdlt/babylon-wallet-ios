@@ -1,4 +1,4 @@
-// MARK: - Either + @unchecked Sendable
+// MARK: - Either + Sendable
 extension Either: @unchecked Sendable {}
 
 extension Either {

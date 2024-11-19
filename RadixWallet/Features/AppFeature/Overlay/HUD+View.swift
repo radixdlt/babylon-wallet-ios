@@ -70,7 +70,7 @@ extension HUD {
 	}
 }
 
-// MARK: - SwiftUI.Animation + @unchecked Sendable
+// MARK: - SwiftUI.Animation + Sendable
 extension SwiftUI.Animation: @unchecked Sendable {}
 
 extension SwiftUI.Animation {

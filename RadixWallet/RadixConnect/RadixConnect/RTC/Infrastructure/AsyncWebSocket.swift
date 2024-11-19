@@ -1,10 +1,10 @@
 import Network
 import WebRTC
 
-// MARK: - DispatchQueue.SchedulerOptions + @unchecked Sendable
+// MARK: - DispatchQueue.SchedulerOptions + Sendable
 extension DispatchQueue.SchedulerOptions: @unchecked Sendable {}
 
-// MARK: - DispatchQueue.SchedulerTimeType.Stride + @unchecked Sendable
+// MARK: - DispatchQueue.SchedulerTimeType.Stride + Sendable
 extension DispatchQueue.SchedulerTimeType.Stride: @unchecked Sendable {}
 
 // MARK: - AsyncWebSocket
