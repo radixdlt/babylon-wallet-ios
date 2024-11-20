@@ -69,6 +69,7 @@ struct DeleteAccountCoordinator: Sendable, FeatureReducer {
 
 	@Dependency(\.dappInteractionClient) var dappInteractionClient
 	@Dependency(\.submitTXClient) var submitTXClient
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.errorQueue) var errorQueue
 
 	init() {}
@@ -172,14 +173,27 @@ struct DeleteAccountCoordinator: Sendable, FeatureReducer {
 	) -> Effect<Action> {
 		.run { send in
 			do {
-				let manifest = try await SargonOs.shared.createDeleteAccountManifest(
+				let manifestOutcome = try await SargonOs.shared.createDeleteAccountManifest(
 					accountAddress: accountAddress,
 					recipientAccountAddress: recipientAccountAddress
 				)
 
+				/// Check for non-transferable resources
+				if !manifestOutcome.nonTransferableResources.isEmpty {
+					let action = await overlayWindowClient.scheduleAlert(.nonTransferableAssets)
+					switch action {
+					case .primaryButtonTapped:
+						/// Continue account deletion
+						break
+					default:
+						await send(.internal(.accountDeletionFailed))
+						return
+					}
+				}
+
 				/// Wait for user to complete the interaction with Transaction Review
 				let result = await dappInteractionClient.addWalletInteraction(
-					.transaction(.init(send: .init(transactionManifest: manifest))),
+					.transaction(.init(send: .init(transactionManifest: manifestOutcome.manifest))),
 					.accountDelete
 				)
 
@@ -211,5 +225,22 @@ struct DeleteAccountCoordinator: Sendable, FeatureReducer {
 				}
 			}
 		}
+	}
+}
+
+extension OverlayWindowClient.Item.AlertState {
+	fileprivate static var nonTransferableAssets: Self {
+		Self(
+			title: { TextState(L10n.AccountSettings.NonTransferableAssetsWarning.title) },
+			actions: {
+				ButtonState(role: .cancel, action: .dismissed) {
+					TextState(L10n.Common.cancel)
+				}
+				ButtonState(role: .destructive, action: .primaryButtonTapped) {
+					TextState(L10n.Common.continue)
+				}
+			},
+			message: { TextState(L10n.AccountSettings.NonTransferableAssetsWarning.message) }
+		)
 	}
 }
