@@ -226,7 +226,6 @@ struct Home: Sendable, FeatureReducer {
 			}
 
 			state.accountRows = accounts
-				.filter { !$0.flags.contains(.tombstonedByUser) }
 				.map { account in
 					// Create new Home.AccountRow.State only if it wasn't present before. Otherwise, we keep the old row
 					// which probably has already loaded its resources & fiat worth.

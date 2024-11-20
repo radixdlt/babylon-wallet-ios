@@ -11,7 +11,7 @@ struct TryingToUpdateAPersonaWhichIsNotAlreadySaved: Swift.Error {}
 
 extension ProfileNetwork {
 	func getAccounts() -> Accounts {
-		accounts.nonHidden
+		accounts.nonDeleted.nonHidden
 	}
 
 	func getHiddenAccounts() -> Accounts {
