@@ -41,7 +41,7 @@ extension InteractionReview.Account {
 				InnerCard {
 					AccountCard(account: store.account)
 
-					if store.isAccountDelete {
+					if store.purpose == .accountDeletion {
 						HStack(spacing: .medium3) {
 							Image(.delete)
 							Text(L10n.TransactionReview.DeletingAccount.message)
@@ -57,7 +57,7 @@ extension InteractionReview.Account {
 					} else {
 						VStack(spacing: .zero) {
 							ForEach(store.transfers) { transfer in
-								TransactionReviewResourceView(transfer: transfer.value, isDeposit: store.isDeposit) { token in
+								TransactionReviewResourceView(transfer: transfer.value, isDeposit: store.purpose == .deposit) { token in
 									store.send(.view(.transferTapped(transfer.value, token)))
 								}
 

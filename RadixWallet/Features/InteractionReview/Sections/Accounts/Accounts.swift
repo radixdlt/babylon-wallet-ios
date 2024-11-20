@@ -67,8 +67,7 @@ extension InteractionReview {
 
 			let account: InteractionReview.ReviewAccount
 			var transfers: IdentifiedArrayOf<InteractionReview.Transfer>
-			let isDeposit: Bool
-			var isAccountDelete: Bool = false
+			let purpose: Purpose
 		}
 
 		typealias Action = FeatureAction<Self>
@@ -95,6 +94,15 @@ extension InteractionReview {
 				.send(.delegate(.showAsset(transfer, token)))
 			}
 		}
+	}
+}
+
+// MARK: - InteractionReview.Account.Purpose
+extension InteractionReview.Account {
+	enum Purpose {
+		case withdrawal
+		case deposit
+		case accountDeletion
 	}
 }
 
