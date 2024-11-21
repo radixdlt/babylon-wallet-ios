@@ -5,11 +5,7 @@ import SwiftUI
 extension DeleteAccountCoordinator {
 	@MainActor
 	struct View: SwiftUI.View {
-		private let store: StoreOf<DeleteAccountCoordinator>
-
-		init(store: StoreOf<DeleteAccountCoordinator>) {
-			self.store = store
-		}
+		let store: StoreOf<DeleteAccountCoordinator>
 
 		var body: some SwiftUI.View {
 			DeleteAccountConfirmation.View(store: store.deleteConfirmation)
