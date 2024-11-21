@@ -207,6 +207,8 @@ internal enum L10n {
     internal static let accountLabel = L10n.tr("Localizable", "accountSettings_accountLabel", fallback: "Account Name")
     /// Name your account
     internal static let accountLabelSubtitle = L10n.tr("Localizable", "accountSettings_accountLabelSubtitle", fallback: "Name your account")
+    /// Delete Account
+    internal static let deleteAccount = L10n.tr("Localizable", "accountSettings_deleteAccount", fallback: "Delete Account")
     /// Set development preferences
     internal static let developmentHeading = L10n.tr("Localizable", "accountSettings_developmentHeading", fallback: "Set development preferences")
     /// Dev Preferences
@@ -247,6 +249,32 @@ internal enum L10n {
       /// Select the color for this Account
       internal static let text = L10n.tr("Localizable", "accountSettings_accountColor_text", fallback: "Select the color for this Account")
     }
+    internal enum AccountDeleted {
+      /// Go to Homescreen
+      internal static let button = L10n.tr("Localizable", "accountSettings_accountDeleted_button", fallback: "Go to Homescreen")
+      /// Your Account has been permanently deleted. Your wallet settings have been updated.
+      internal static let message = L10n.tr("Localizable", "accountSettings_accountDeleted_message", fallback: "Your Account has been permanently deleted. Your wallet settings have been updated.")
+      /// Account Deleted
+      internal static let title = L10n.tr("Localizable", "accountSettings_accountDeleted_title", fallback: "Account Deleted")
+    }
+    internal enum AssetsWillBeLostWarning {
+      /// If you do not transfer your assets out of this Account, they will be lost forever.
+      internal static let message = L10n.tr("Localizable", "accountSettings_assetsWillBeLostWarning_message", fallback: "If you do not transfer your assets out of this Account, they will be lost forever.")
+      /// Assets Will Be Lost
+      internal static let title = L10n.tr("Localizable", "accountSettings_assetsWillBeLostWarning_title", fallback: "Assets Will Be Lost")
+    }
+    internal enum CannotDeleteAccountWarning {
+      /// Too many assets currently held in Account to perform deletion. Move some and try again.
+      internal static let message = L10n.tr("Localizable", "accountSettings_cannotDeleteAccountWarning_message", fallback: "Too many assets currently held in Account to perform deletion. Move some and try again.")
+      /// Cannot Delete Account
+      internal static let title = L10n.tr("Localizable", "accountSettings_cannotDeleteAccountWarning_title", fallback: "Cannot Delete Account")
+    }
+    internal enum DeleteAccount {
+      /// You’re about to permanently delete this Account. Once this is done, you will not be able to recover access.
+      internal static let message = L10n.tr("Localizable", "accountSettings_deleteAccount_message", fallback: "You’re about to permanently delete this Account. Once this is done, you will not be able to recover access.")
+      /// Delete This Account?
+      internal static let title = L10n.tr("Localizable", "accountSettings_deleteAccount_title", fallback: "Delete This Account?")
+    }
     internal enum HideAccount {
       /// Hide Account
       internal static let button = L10n.tr("Localizable", "accountSettings_hideAccount_button", fallback: "Hide Account")
@@ -254,6 +282,24 @@ internal enum L10n {
       internal static let message = L10n.tr("Localizable", "accountSettings_hideAccount_message", fallback: "Hide this Account in your wallet? You can always unhide it from the main application settings.")
       /// Hide This Account
       internal static let title = L10n.tr("Localizable", "accountSettings_hideAccount_title", fallback: "Hide This Account")
+    }
+    internal enum MoveAssets {
+      /// Before deleting this Account, choose another one to transfer your assets to.
+      internal static let message = L10n.tr("Localizable", "accountSettings_moveAssets_message", fallback: "Before deleting this Account, choose another one to transfer your assets to.")
+      /// You don’t have any other accounts with enough XRD.
+      internal static let noAccountsWarning = L10n.tr("Localizable", "accountSettings_moveAssets_noAccountsWarning", fallback: "You don’t have any other accounts with enough XRD.")
+      /// The new Account must hold enough XRD to pay the transaction fee.
+      internal static let note = L10n.tr("Localizable", "accountSettings_moveAssets_note", fallback: "The new Account must hold enough XRD to pay the transaction fee.")
+      /// Skip
+      internal static let skipButton = L10n.tr("Localizable", "accountSettings_moveAssets_skipButton", fallback: "Skip")
+      /// Move Assets to Another Account
+      internal static let title = L10n.tr("Localizable", "accountSettings_moveAssets_title", fallback: "Move Assets to Another Account")
+    }
+    internal enum NonTransferableAssetsWarning {
+      /// Some of your assets are non-transferable, and will be lost.
+      internal static let message = L10n.tr("Localizable", "accountSettings_nonTransferableAssetsWarning_message", fallback: "Some of your assets are non-transferable, and will be lost.")
+      /// Assets Will Be Lost
+      internal static let title = L10n.tr("Localizable", "accountSettings_nonTransferableAssetsWarning_title", fallback: "Assets Will Be Lost")
     }
     internal enum RenameAccount {
       /// Update
@@ -1887,6 +1933,12 @@ internal enum L10n {
       internal static let ledgerLegacy = L10n.tr("Localizable", "homePage_accountsTag_ledgerLegacy", fallback: "Legacy (Ledger)")
       /// Legacy
       internal static let legacySoftware = L10n.tr("Localizable", "homePage_accountsTag_legacySoftware", fallback: "Legacy")
+    }
+    internal enum DeletedAccountWarning {
+      /// Your Radix Wallet is syncing, and removing the Account from view.
+      internal static let message = L10n.tr("Localizable", "homePage_deletedAccountWarning_message", fallback: "Your Radix Wallet is syncing, and removing the Account from view.")
+      /// Previously Deleted Account Detected
+      internal static let title = L10n.tr("Localizable", "homePage_deletedAccountWarning_title", fallback: "Previously Deleted Account Detected")
     }
     internal enum ProfileOlympiaError {
       /// Affected Accounts
@@ -3722,6 +3774,12 @@ internal enum L10n {
     internal static func xrdAmount(_ p1: Any) -> String {
       return L10n.tr("Localizable", "transactionReview_xrdAmount", String(describing: p1), fallback: "%@ XRD")
     }
+    internal enum DeletingAccount {
+      /// Deleting Account. Permanently removing access and preventing future deposits.
+      internal static let message = L10n.tr("Localizable", "transactionReview_deletingAccount_message", fallback: "Deleting Account. Permanently removing access and preventing future deposits.")
+      /// Deleting Account
+      internal static let title = L10n.tr("Localizable", "transactionReview_deletingAccount_title", fallback: "Deleting Account")
+    }
     internal enum FeePayerValidation {
       /// Fee payer account required
       internal static let feePayerRequired = L10n.tr("Localizable", "transactionReview_feePayerValidation_feePayerRequired", fallback: "Fee payer account required")
@@ -3741,6 +3799,8 @@ internal enum L10n {
       internal static let title = L10n.tr("Localizable", "transactionReview_guarantees_title", fallback: "Customize Guarantees")
     }
     internal enum NetworkFee {
+      /// The network is currently congested. Add a tip to speed up your transfer.
+      internal static let congestedText = L10n.tr("Localizable", "transactionReview_networkFee_congestedText", fallback: "The network is currently congested. Add a tip to speed up your transfer.")
       /// Customize
       internal static let customizeButtonTitle = L10n.tr("Localizable", "transactionReview_networkFee_customizeButtonTitle", fallback: "Customize")
       /// Transaction Fee
@@ -3755,6 +3815,10 @@ internal enum L10n {
     internal enum SubmitTransaction {
       /// Transaction ID
       internal static let txID = L10n.tr("Localizable", "transactionReview_submitTransaction_txID", fallback: "Transaction ID")
+    }
+    internal enum UnacceptableManifest {
+      /// A proposed transaction was rejected because it contains one or more reserved instructions.
+      internal static let rejected = L10n.tr("Localizable", "transactionReview_unacceptableManifest_rejected", fallback: "A proposed transaction was rejected because it contains one or more reserved instructions.")
     }
   }
   internal enum TransactionSigning {

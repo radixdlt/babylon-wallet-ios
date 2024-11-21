@@ -1,4 +1,4 @@
-// MARK: - BigUInt + Sendable
+// MARK: - BigUInt + @unchecked Sendable
 extension BigUInt: @unchecked Sendable {}
 
 // MARK: - BigUInt.Error

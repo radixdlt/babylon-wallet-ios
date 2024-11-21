@@ -1,6 +1,6 @@
 import WebRTC
 
-// MARK: - RTCDataChannel + Sendable
+// MARK: - RTCDataChannel + @unchecked Sendable
 extension RTCDataChannel: @unchecked Sendable {}
 
 // MARK: - RTCDataChannel + DataChannel

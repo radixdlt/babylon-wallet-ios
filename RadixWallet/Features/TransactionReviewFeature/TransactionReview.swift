@@ -288,7 +288,11 @@ struct TransactionReview: Sendable, FeatureReducer {
 		case let .previewLoaded(.failure(error)):
 			loggerGlobal.error("Transaction preview failed, error: \(error)")
 			errorQueue.schedule(TransactionReviewFailure(underylying: error))
-			return .send(.delegate(.failed(TransactionFailure.failedToPrepareTXReview(.failedToGenerateTXReview(error)))))
+			if let txFailure = error as? TransactionFailure {
+				return .send(.delegate(.failed(txFailure)))
+			} else {
+				return .send(.delegate(.failed(TransactionFailure.failedToPrepareTXReview(.abortedTXReview(error)))))
+			}
 
 		case let .previewLoaded(.success(preview)):
 			let reviewedTransaction = ReviewedTransaction(
@@ -517,7 +521,8 @@ extension TransactionReview {
 						transactionSigners: reviewedTransaction.transactionSigners,
 						signingFactors: reviewedTransaction.signingFactors,
 						signingPurpose: .signTransaction(state.signTransactionPurpose),
-						manifest: reviewedTransaction.transactionManifest
+						manifest: reviewedTransaction.transactionManifest,
+						accountWithdraws: reviewedTransaction.accountWithdraws
 					))
 				}
 

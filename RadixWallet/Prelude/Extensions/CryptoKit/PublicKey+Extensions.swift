@@ -12,11 +12,11 @@ extension Curve25519.Signing.PublicKey: CustomDumpStringConvertible, CustomDebug
 	}
 }
 
-// MARK: - Data + Sendable
+// MARK: - Data + @unchecked Sendable
 extension Data: @unchecked Sendable {}
 typealias EdDSASignature = Data
 
-// MARK: - Curve25519.Signing.PublicKey + Sendable
+// MARK: - Curve25519.Signing.PublicKey + @unchecked Sendable
 extension Curve25519.Signing.PublicKey: @unchecked Sendable {}
 
 // MARK: - Curve25519.Signing.PublicKey + Hashable
@@ -30,7 +30,7 @@ extension Curve25519.Signing.PublicKey: Hashable {
 	}
 }
 
-// MARK: - Curve25519.Signing.PrivateKey + Sendable
+// MARK: - Curve25519.Signing.PrivateKey + @unchecked Sendable
 extension Curve25519.Signing.PrivateKey: @unchecked Sendable {}
 
 // MARK: - Curve25519.Signing.PrivateKey + Hashable

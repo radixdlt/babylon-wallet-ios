@@ -97,7 +97,7 @@ struct Splash: Sendable, FeatureReducer {
 
 	func loadAdvancedLockState() -> Effect<Action> {
 		.run { send in
-			let profileState = await onboardingClient.loadProfileState()
+			let profileState = try await onboardingClient.loadProfileState()
 
 			if case let .loaded(profile) = profileState {
 				let isAdvancedLockEnabled = profile.appPreferences.security.isAdvancedLockEnabled
@@ -252,7 +252,7 @@ struct Splash: Sendable, FeatureReducer {
 		.run { send in
 			switch context {
 			case .appStarted:
-				await send(.delegate(.completed(onboardingClient.loadProfileState())))
+				try await send(.delegate(.completed(onboardingClient.loadProfileState())))
 			case .appForegrounded:
 				localAuthenticationClient.setAuthenticatedSuccessfully()
 			}

@@ -5,7 +5,7 @@ import WebRTC
 enum PeerConnectionIdTag {}
 typealias PeerConnectionID = Tagged<PeerConnectionIdTag, String>
 
-// MARK: Sendable
+// MARK: - PeerConnectionID + Sendable
 extension PeerConnectionID: Sendable {}
 
 extension LinkConnectionQRData {
