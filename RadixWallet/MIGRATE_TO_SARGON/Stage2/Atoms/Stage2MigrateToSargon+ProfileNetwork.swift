@@ -34,14 +34,6 @@ extension ProfileNetwork {
 		authorizedDapps.asIdentified()
 	}
 
-	#if DEBUG
-	mutating func deleteAccount(address: AccountAddress) {
-		var identified = accounts.asIdentified()
-		identified.remove(id: address)
-		accounts = identified.elements
-	}
-	#endif
-
 	mutating func updateAccount(_ account: Account) throws {
 		var identified = accounts.asIdentified()
 		identified[id: account.id] = account

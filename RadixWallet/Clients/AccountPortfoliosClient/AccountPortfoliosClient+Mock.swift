@@ -7,7 +7,8 @@ extension AccountPortfoliosClient: TestDependencyKey {
 		fetchAccountPortfolio: unimplemented("\(AccountPortfoliosClient.self).fetchAccountPortfolio"),
 		portfolioUpdates: unimplemented("\(AccountPortfoliosClient.self).fetchAccountPortfolio"),
 		portfolioForAccount: unimplemented("\(AccountPortfoliosClient.self).portfolioForAccount"),
-		portfolios: unimplemented("\(AccountPortfoliosClient.self).portfolios")
+		portfolios: unimplemented("\(AccountPortfoliosClient.self).portfolios"),
+		syncAccountsDeletedOnLedger: unimplemented("\(AccountPortfoliosClient.self).syncAccountsDeletedOnLedger")
 	)
 
 	static let noop = AccountPortfoliosClient(
@@ -15,6 +16,7 @@ extension AccountPortfoliosClient: TestDependencyKey {
 		fetchAccountPortfolio: { _, _ in throw NoopError() },
 		portfolioUpdates: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		portfolioForAccount: { _ in fatalError() },
-		portfolios: { fatalError() }
+		portfolios: { fatalError() },
+		syncAccountsDeletedOnLedger: {}
 	)
 }

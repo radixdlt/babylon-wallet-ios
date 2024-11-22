@@ -178,25 +178,15 @@ extension AccountPortfoliosClient: DependencyKey {
 			return portfolio
 		}
 
-		@Sendable
-		func syncAccountsDeletedOnLedger() async {
-			let isDeletedAccountDetected = try? await SargonOS.shared.syncAccountsDeletedOnLedger()
-			if isDeletedAccountDetected == true {
-				overlayWindowClient.scheduleAlertAndIgnoreAction(.deletedAccountDetectedAlert)
-			}
-		}
-
 		return AccountPortfoliosClient(
 			fetchAccountPortfolios: { accountAddresses, forceRefresh in
 				try await Task.detached {
-					await syncAccountsDeletedOnLedger()
-					return try await fetchAccountPortfolios(accountAddresses, forceRefreshEntities: forceRefresh, forceRefreshPrices: forceRefresh)
+					try await fetchAccountPortfolios(accountAddresses, forceRefreshEntities: forceRefresh, forceRefreshPrices: forceRefresh)
 				}.value
 			},
 			fetchAccountPortfolio: { accountAddress, forceRefresh in
 				try await Task.detached {
-					await syncAccountsDeletedOnLedger()
-					return try await fetchAccountPortfolio(accountAddress, forceRefresh)
+					try await fetchAccountPortfolio(accountAddress, forceRefresh)
 				}.value
 			},
 			portfolioUpdates: {
@@ -207,7 +197,13 @@ extension AccountPortfoliosClient: DependencyKey {
 			portfolioForAccount: { address in
 				await state.portfolioForAccount(address)
 			},
-			portfolios: { state.portfoliosSubject.value.wrappedValue.map { Array($0.values) } ?? [] }
+			portfolios: { state.portfoliosSubject.value.wrappedValue.map { Array($0.values) } ?? [] },
+			syncAccountsDeletedOnLedger: {
+				let isDeletedAccountDetected = try? await SargonOS.shared.syncAccountsDeletedOnLedger()
+				if isDeletedAccountDetected == true {
+					overlayWindowClient.scheduleAlertAndIgnoreAction(.deletedAccountDetectedAlert)
+				}
+			}
 		)
 	}()
 }

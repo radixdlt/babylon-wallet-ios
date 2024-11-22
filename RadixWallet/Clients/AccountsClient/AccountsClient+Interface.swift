@@ -31,70 +31,6 @@ struct AccountsClient: Sendable {
 	var hasAccountOnNetwork: HasAccountOnNetwork
 
 	var updateAccount: UpdateAccount
-
-	#if DEBUG
-	var debugOnlyDeleteAccount: DebugOnlyDeleteAccount
-	#endif
-
-	#if DEBUG
-	init(
-		getCurrentNetworkID: @escaping GetCurrentNetworkID,
-		nextAppearanceID: @escaping NextAppearanceID,
-		getAccountsOnCurrentNetwork: @escaping GetAccountsOnCurrentNetwork,
-		getHiddenAccountsOnCurrentNetwork: @escaping GetHiddenAccountsOnCurrentNetwork,
-		accountsOnCurrentNetwork: @escaping AccountsOnCurrentNetwork,
-		accountUpdates: @escaping AccountUpdates,
-		getAccountsOnNetwork: @escaping GetAccountsOnNetwork,
-		newVirtualAccount: @escaping NewVirtualAccount,
-		saveVirtualAccounts: @escaping SaveVirtualAccounts,
-		getAccountByAddress: @escaping GetAccountByAddress,
-		hasAccountOnNetwork: @escaping HasAccountOnNetwork,
-		updateAccount: @escaping UpdateAccount,
-		debugOnlyDeleteAccount: @escaping DebugOnlyDeleteAccount
-	) {
-		self.getCurrentNetworkID = getCurrentNetworkID
-		self.nextAppearanceID = nextAppearanceID
-		self.getAccountsOnCurrentNetwork = getAccountsOnCurrentNetwork
-		self.getHiddenAccountsOnCurrentNetwork = getHiddenAccountsOnCurrentNetwork
-		self.getAccountsOnNetwork = getAccountsOnNetwork
-		self.accountsOnCurrentNetwork = accountsOnCurrentNetwork
-		self.accountUpdates = accountUpdates
-		self.newVirtualAccount = newVirtualAccount
-		self.saveVirtualAccounts = saveVirtualAccounts
-		self.getAccountByAddress = getAccountByAddress
-		self.hasAccountOnNetwork = hasAccountOnNetwork
-		self.updateAccount = updateAccount
-		self.debugOnlyDeleteAccount = debugOnlyDeleteAccount
-	}
-	#else
-	init(
-		getCurrentNetworkID: @escaping GetCurrentNetworkID,
-		nextAppearanceID: @escaping NextAppearanceID,
-		getAccountsOnCurrentNetwork: @escaping GetAccountsOnCurrentNetwork,
-		getHiddenAccountsOnCurrentNetwork: @escaping GetHiddenAccountsOnCurrentNetwork,
-		accountsOnCurrentNetwork: @escaping AccountsOnCurrentNetwork,
-		accountUpdates: @escaping AccountUpdates,
-		getAccountsOnNetwork: @escaping GetAccountsOnNetwork,
-		newVirtualAccount: @escaping NewVirtualAccount,
-		saveVirtualAccounts: @escaping SaveVirtualAccounts,
-		getAccountByAddress: @escaping GetAccountByAddress,
-		hasAccountOnNetwork: @escaping HasAccountOnNetwork,
-		updateAccount: @escaping UpdateAccount
-	) {
-		self.getCurrentNetworkID = getCurrentNetworkID
-		self.nextAppearanceID = nextAppearanceID
-		self.getAccountsOnCurrentNetwork = getAccountsOnCurrentNetwork
-		self.getHiddenAccountsOnCurrentNetwork = getHiddenAccountsOnCurrentNetwork
-		self.getAccountsOnNetwork = getAccountsOnNetwork
-		self.accountsOnCurrentNetwork = accountsOnCurrentNetwork
-		self.accountUpdates = accountUpdates
-		self.newVirtualAccount = newVirtualAccount
-		self.saveVirtualAccounts = saveVirtualAccounts
-		self.getAccountByAddress = getAccountByAddress
-		self.hasAccountOnNetwork = hasAccountOnNetwork
-		self.updateAccount = updateAccount
-	}
-	#endif
 }
 
 extension AccountsClient {
@@ -117,9 +53,6 @@ extension AccountsClient {
 	typealias HasAccountOnNetwork = @Sendable (NetworkID) async throws -> Bool
 
 	typealias UpdateAccount = @Sendable (Account) async throws -> Void
-	#if DEBUG
-	typealias DebugOnlyDeleteAccount = @Sendable (Account) async throws -> Void
-	#endif
 }
 
 // MARK: - NewAccountRequest
@@ -127,11 +60,6 @@ struct NewAccountRequest: Sendable, Hashable {
 	let name: NonEmptyString
 	let factorInstance: HierarchicalDeterministicFactorInstance
 	let networkID: NetworkID
-	init(name: NonEmptyString, factorInstance: HierarchicalDeterministicFactorInstance, networkID: NetworkID) {
-		self.name = name
-		self.factorInstance = factorInstance
-		self.networkID = networkID
-	}
 }
 
 extension AccountsClient {

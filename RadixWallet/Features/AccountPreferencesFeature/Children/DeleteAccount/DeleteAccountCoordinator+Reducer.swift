@@ -30,7 +30,7 @@ struct DeleteAccountCoordinator: Sendable, FeatureReducer {
 	enum InternalAction: Sendable, Equatable {
 		case accountDeletedSuccessfully
 		case accountDeletionFailed
-		case accountDeletionFailedDueTooManyAssets
+		case accountDeletionFailedDueToManyAssets
 	}
 
 	@CasePathable
@@ -101,7 +101,7 @@ struct DeleteAccountCoordinator: Sendable, FeatureReducer {
 			updateChooseAccountControlState(state: &state, footerControlState: .enabled)
 			return .none
 
-		case .accountDeletionFailedDueTooManyAssets:
+		case .accountDeletionFailedDueToManyAssets:
 			guard case var .chooseReceivingAccount(childState) = state.destination else { return .none }
 
 			childState.footerControlState = .enabled
@@ -218,7 +218,7 @@ struct DeleteAccountCoordinator: Sendable, FeatureReducer {
 			} catch {
 				switch error as? CommonError {
 				case .MaxTransfersPerTransactionReached:
-					await send(.internal(.accountDeletionFailedDueTooManyAssets))
+					await send(.internal(.accountDeletionFailedDueToManyAssets))
 				default:
 					errorQueue.schedule(error)
 					await send(.internal(.accountDeletionFailed))

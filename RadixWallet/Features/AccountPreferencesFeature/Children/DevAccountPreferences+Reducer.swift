@@ -49,7 +49,6 @@ struct DevAccountPreferences: Sendable, FeatureReducer {
 		case createNonFungibleTokenButtonTapped
 		case createMultipleFungibleTokenButtonTapped
 		case createMultipleNonFungibleTokenButtonTapped
-		case deleteAccountButtonTapped
 		#endif // DEBUG
 	}
 
@@ -63,9 +62,6 @@ struct DevAccountPreferences: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case dismiss
-		#if DEBUG
-		case debugOnlyAccountWasDeleted
-		#endif
 	}
 
 	// MARK: - Destination
@@ -132,11 +128,6 @@ struct DevAccountPreferences: Sendable, FeatureReducer {
 			return .none
 
 		#if DEBUG
-		case .deleteAccountButtonTapped:
-			return .run { [account = state.account] send in
-				try await accountsClient.debugOnlyDeleteAccount(account)
-				await send(.delegate(.debugOnlyAccountWasDeleted))
-			}
 		case .turnIntoDappDefinitionAccountTypeButtonTapped:
 			return .run { [accountAddress = state.address] send in
 

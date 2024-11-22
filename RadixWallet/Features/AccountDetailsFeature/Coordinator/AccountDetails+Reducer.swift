@@ -310,6 +310,7 @@ struct AccountDetails: Sendable, FeatureReducer {
 			for await _ in clock.timer(interval: .seconds(accountPortfolioRefreshIntervalInSeconds)) {
 				guard !Task.isCancelled else { return }
 				_ = try? await accountPortfoliosClient.fetchAccountPortfolio(address, true)
+				await accountPortfoliosClient.syncAccountsDeletedOnLedger()
 			}
 		}
 	}

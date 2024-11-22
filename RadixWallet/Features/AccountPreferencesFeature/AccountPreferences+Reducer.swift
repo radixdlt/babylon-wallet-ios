@@ -168,10 +168,6 @@ struct AccountPreferences: Sendable, FeatureReducer {
 		     .thirdPartyDeposits(.delegate(.accountUpdated)):
 			state.destination = nil
 			return .none
-		#if DEBUG
-		case .devPreferences(DevAccountPreferences.Action.delegate(.debugOnlyAccountWasDeleted)):
-			return .send(.delegate(.accountHidden))
-		#endif
 		case .hideAccount(.confirm):
 			state.destination = nil
 			return hideAccountEffect(state: state)

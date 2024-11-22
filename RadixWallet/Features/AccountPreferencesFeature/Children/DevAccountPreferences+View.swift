@@ -73,7 +73,6 @@ extension DevAccountPreferences {
 						createMultipleFungibleTokenButton(with: viewStore)
 						createMultipleNonFungibleTokenButton(with: viewStore)
 						Spacer(minLength: 0)
-						deleteAccountButton { store.send(.view(.deleteAccountButtonTapped)) }
 						#endif // DEBUG
 					}
 					.multilineTextAlignment(.center)
@@ -117,11 +116,6 @@ private extension View {
 }
 
 extension DevAccountPreferences.View {
-	private func deleteAccountButton(action: @escaping () -> Void) -> some View {
-		Button("DELETE ACCOUNT", action: action)
-			.buttonStyle(.primaryRectangular(isDestructive: true))
-	}
-
 	@ViewBuilder
 	private func turnIntoDappDefinitionAccountTypeButton(with viewStore: ViewStoreOf<DevAccountPreferences>) -> some View {
 		Button("Turn into dApp Definition account type") {
