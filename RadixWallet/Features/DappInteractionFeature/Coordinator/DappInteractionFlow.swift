@@ -589,6 +589,9 @@ extension DappInteractionFlow {
 		case let .preAuthorizationReview(.delegate(.signedPreAuthorization(encoded))):
 			return handlePreAuthorizationSignature(item, encoded)
 
+		case let .preAuthorizationReview(.delegate(.committedSuccessfully(intentHash))):
+			return .send(.delegate(.dismissWithSuccess(state.dappMetadata, intentHash)))
+
 		case let .preAuthorizationReview(.delegate(.failed(error))):
 			return handlePreAuthorizationFailure(error)
 

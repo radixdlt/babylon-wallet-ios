@@ -46,6 +46,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case signedPreAuthorization(SignedSubintent)
+		case committedSuccessfully(TransactionIntentHash)
 		case failed(PreAuthorizationFailure)
 		case dismiss
 	}
@@ -220,9 +221,8 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 				return delayedShortEffect(for: .delegate(.dismiss))
 
 			case let .committedSuccessfully(intentHash):
-				// TODO: This will probably not be called since we dismiss this view before?
 				state.destination = nil
-				return .none
+				return delayedShortEffect(for: .delegate(.committedSuccessfully(intentHash)))
 			}
 
 		default:
@@ -288,8 +288,7 @@ private extension PreAuthorizationReview {
 				isDeepLink: state.isDeepLink
 			)
 		)
-		return .none
-//		return .send(.delegate(.signedPreAuthorization(signedSubintent)))
+		return .send(.delegate(.signedPreAuthorization(signedSubintent)))
 	}
 }
 

@@ -4,7 +4,7 @@ import SwiftUI
 
 typealias RequestEnvelope = DappInteractionClient.RequestEnvelope
 
-// MARK: - RequestEnvelope + Identifiable
+// MARK: Identifiable
 extension RequestEnvelope: Identifiable {
 	typealias ID = WalletInteractionId
 	var id: ID {
@@ -323,9 +323,17 @@ struct DappInteractor: Sendable, FeatureReducer {
 			}()
 			let isTransactionResponse = txID != nil
 
+			// Same thing applies for PreAuthorization responses.
+			let isPreAuthorizationResponse: Bool = {
+				if case let .success(successResponse) = responseToDapp, case .preAuthorization = successResponse.items {
+					return true
+				}
+				return false
+			}()
+
 			do {
 				_ = try await dappInteractionClient.completeInteraction(.response(.dapp(responseToDapp), origin: request.route))
-				if !isTransactionResponse {
+				if !isTransactionResponse, !isPreAuthorizationResponse {
 					await send(.internal(
 						.sentResponseToDapp(
 							responseToDapp,

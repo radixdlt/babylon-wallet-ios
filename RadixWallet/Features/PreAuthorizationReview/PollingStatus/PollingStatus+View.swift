@@ -114,8 +114,12 @@ private extension PreAuthorizationReview.PollingStatus.State {
 	}
 
 	var expirationMessage: String {
-		let time = PreAuthorizationReview.TimeFormatter.format(seconds: secondsToExpiration)
-		return "\(dAppName) has \(time) to use this pre-authorization"
+		if secondsToExpiration > 1 {
+			let time = PreAuthorizationReview.TimeFormatter.format(seconds: secondsToExpiration)
+			return "\(dAppName) has \(time) to use this pre-authorization"
+		} else {
+			return "Checking last time.."
+		}
 	}
 
 	private var dAppName: String {
