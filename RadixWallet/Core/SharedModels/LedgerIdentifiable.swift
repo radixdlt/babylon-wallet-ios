@@ -19,6 +19,7 @@ enum LedgerIdentifiable: Sendable {
 		case let .transaction(identifier):
 			identifier.formatted(format)
 		case let .preAuthorization(identifier):
+			// TODO: Update once Sargon PR is merged
 			"identifier.formatted(format)"
 		}
 	}

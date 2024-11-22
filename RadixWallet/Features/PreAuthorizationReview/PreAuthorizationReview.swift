@@ -47,24 +47,30 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 	enum DelegateAction: Sendable, Equatable {
 		case signedPreAuthorization(SignedSubintent)
 		case failed(PreAuthorizationFailure)
+		case dismiss
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
 			case signing(Signing.State)
+			case pollingStatus(PreAuthorizationReview.PollingStatus.State)
 			case rawManifestAlert(AlertState<Never>)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
 			case signing(Signing.Action)
+			case pollingStatus(PreAuthorizationReview.PollingStatus.Action)
 			case rawManifestAlert(Never)
 		}
 
 		var body: some ReducerOf<Self> {
 			Scope(state: \.signing, action: \.signing) {
 				Signing()
+			}
+			Scope(state: \.pollingStatus, action: \.pollingStatus) {
+				PreAuthorizationReview.PollingStatus()
 			}
 		}
 	}
@@ -157,7 +163,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 			}
 
 			guard !preview.signingFactors.isEmpty else {
-				return .send(.delegate(.signedPreAuthorization(.init(subintent: subintent, subintentSignatures: .init(signatures: [])))))
+				return handleSignedSubinent(state: &state, signedSubintent: .init(subintent: subintent, subintentSignatures: .init(signatures: [])))
 			}
 
 			state.destination = .signing(.init(
@@ -200,10 +206,22 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 				return resetToApprovable(&state)
 
 			case let .finishedSigning(.signPreAuthorization(encoded)):
-				return .send(.delegate(.signedPreAuthorization(encoded)))
+				return handleSignedSubinent(state: &state, signedSubintent: encoded)
 
 			case .finishedSigning:
 				assertionFailure("Unexpected signature instead of .signPreAuthorization")
+				return .none
+			}
+
+		case let .pollingStatus(.delegate(action)):
+			switch action {
+			case .dismiss:
+				state.destination = nil
+				return delayedShortEffect(for: .delegate(.dismiss))
+
+			case let .committedSuccessfully(intentHash):
+				// TODO: This will probably not be called since we dismiss this view before?
+				state.destination = nil
 				return .none
 			}
 
@@ -259,6 +277,19 @@ private extension PreAuthorizationReview {
 		state.isApprovalInProgress = false
 		state.sliderResetDate = .now
 		return .none
+	}
+
+	func handleSignedSubinent(state: inout State, signedSubintent: SignedSubintent) -> Effect<Action> {
+		state.destination = .pollingStatus(
+			.init(
+				dAppMetadata: state.dAppMetadata,
+				subintentHash: signedSubintent.subintent.hash(),
+				expiration: state.expiration,
+				isDeepLink: state.isDeepLink
+			)
+		)
+		return .none
+//		return .send(.delegate(.signedPreAuthorization(signedSubintent)))
 	}
 }
 

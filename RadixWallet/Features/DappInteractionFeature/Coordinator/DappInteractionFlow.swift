@@ -592,6 +592,10 @@ extension DappInteractionFlow {
 		case let .preAuthorizationReview(.delegate(.failed(error))):
 			return handlePreAuthorizationFailure(error)
 
+		case .preAuthorizationReview(.delegate(.dismiss)):
+			// This is what we do for TX Review, but doesn't it ignore next requests?
+			return .send(.delegate(.dismiss))
+
 		default:
 			return .none
 		}

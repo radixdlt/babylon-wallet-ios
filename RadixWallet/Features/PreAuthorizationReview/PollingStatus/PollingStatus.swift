@@ -1,6 +1,6 @@
-// MARK: - PreAuthorizationReview.PollStatus
+// MARK: - PreAuthorizationReview.PollingStatus
 extension PreAuthorizationReview {
-	struct PollStatus: Sendable, FeatureReducer {
+	struct PollingStatus: Sendable, FeatureReducer {
 		struct State: Sendable, Hashable {
 			let dAppMetadata: DappMetadata.Ledger? // can it actually be nil?
 			let subintentHash: SubintentHash
@@ -96,7 +96,7 @@ extension PreAuthorizationReview {
 	}
 }
 
-extension PreAuthorizationReview.PollStatus {
+extension PreAuthorizationReview.PollingStatus {
 	enum Status {
 		/// The Pre-Authorization hasn't been submitted within a Transaction yet. We are still polling until we get a final status (success or expired).
 		case unknown

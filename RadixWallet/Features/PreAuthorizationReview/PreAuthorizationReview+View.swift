@@ -230,16 +230,23 @@ private extension View {
 	func destinations(with store: StoreOf<PreAuthorizationReview>) -> some View {
 		let destinationStore = store.scope(state: \.$destination, action: \.destination)
 		return signing(with: destinationStore)
+			.pollingStatus(with: destinationStore)
 			.rawManifestAlert(with: destinationStore)
-	}
-
-	private func rawManifestAlert(with destinationStore: PresentationStoreOf<PreAuthorizationReview.Destination>) -> some View {
-		alert(store: destinationStore.scope(state: \.rawManifestAlert, action: \.rawManifestAlert))
 	}
 
 	private func signing(with destinationStore: PresentationStoreOf<PreAuthorizationReview.Destination>) -> some View {
 		sheet(store: destinationStore.scope(state: \.signing, action: \.signing)) {
 			Signing.View(store: $0)
 		}
+	}
+
+	private func pollingStatus(with destinationStore: PresentationStoreOf<PreAuthorizationReview.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.pollingStatus, action: \.pollingStatus)) {
+			PreAuthorizationReview.PollingStatus.View(store: $0)
+		}
+	}
+
+	private func rawManifestAlert(with destinationStore: PresentationStoreOf<PreAuthorizationReview.Destination>) -> some View {
+		alert(store: destinationStore.scope(state: \.rawManifestAlert, action: \.rawManifestAlert))
 	}
 }
