@@ -114,13 +114,13 @@ extension DappInteractionClient {
 			if authorized.ongoingAccounts?.numberOfAccounts.isValid == false {
 				return invalidRequest(.badContent(.numberOfAccountsInvalid))
 			}
+			if let proofOfOwnership = authorized.proofOfOwnership, await !proofOfOwnership.isValid() {
+				return invalidRequest(.invalidPersonaOrAccounts)
+			}
 
 		case let .unauthorizedRequest(unauthorized):
 			if unauthorized.oneTimeAccounts?.numberOfAccounts.isValid == false {
 				return invalidRequest(.badContent(.numberOfAccountsInvalid))
-			}
-			if let proofOfOwnership = unauthorized.proofOfOwnership, await !proofOfOwnership.isValid() {
-				return invalidRequest(.invalidPersonaOrAccounts)
 			}
 
 		case let .preAuthorization(preAuthorization):
