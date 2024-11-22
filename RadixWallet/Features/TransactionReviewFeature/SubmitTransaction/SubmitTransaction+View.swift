@@ -89,15 +89,11 @@ extension SubmitTransaction {
 							.padding(.horizontal, .medium2)
 							.padding(.top, .medium3)
 
-						HStack {
-							Text(L10n.TransactionReview.SubmitTransaction.txID)
-								.foregroundColor(.app.gray1)
-							AddressView(.transaction(viewStore.txID), imageColor: .app.gray2)
-								.foregroundColor(.app.blue1)
-						}
-						.textStyle(.body1Header)
-						.padding(.horizontal, .medium2)
-						.padding(.top, .small2)
+						AddressView(.transaction(viewStore.txID), imageColor: .app.gray2)
+							.foregroundColor(.app.blue1)
+							.textStyle(.body1Header)
+							.padding(.horizontal, .medium2)
+							.padding(.top, .small2)
 
 						Spacer()
 						if viewStore.status.failed, viewStore.showSwitchBackToBrowserMessage {

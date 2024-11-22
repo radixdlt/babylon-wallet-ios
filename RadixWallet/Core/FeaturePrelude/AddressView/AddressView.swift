@@ -79,6 +79,10 @@ extension AddressView {
 
 	private var addressView: some View {
 		HStack(spacing: .small3) {
+			Text(prefix)
+				.textStyle(.body1Header)
+				.foregroundStyle(.app.gray1)
+
 			Text(formattedText)
 				.lineLimit(1)
 
@@ -90,6 +94,17 @@ extension AddressView {
 					Image(imageResource)
 				}
 			}
+		}
+	}
+
+	private var prefix: String? {
+		switch identifiable {
+		case .address:
+			nil
+		case .transaction:
+			L10n.TransactionReview.SubmitTransaction.txID
+		case .preAuthorization:
+			"Pre-Authorization ID"
 		}
 	}
 
