@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -737,6 +737,10 @@
 		5B3C48B92C80D23F00DB160D /* AccountLockersClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3C48B82C80D23F00DB160D /* AccountLockersClient+Test.swift */; };
 		5B3C48C12C85CEAA00DB160D /* AccountBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3C48C02C85CEAA00DB160D /* AccountBannerView.swift */; };
 		5B3C48C32C874C8D00DB160D /* Dispatch+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3C48C22C874C8D00DB160D /* Dispatch+Extra.swift */; };
+		5B3FDC0A2CF0A4280024BFAF /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 5B3FDC092CF0A4280024BFAF /* Sargon */; };
+		5B3FDC0E2CF0A4D40024BFAF /* PollStatus+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FDC0D2CF0A4D40024BFAF /* PollStatus+View.swift */; };
+		5B3FDC0F2CF0A4D40024BFAF /* PollStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FDC0C2CF0A4D40024BFAF /* PollStatus.swift */; };
+		5B3FDC112CF0B9DB0024BFAF /* InteractionInProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FDC102CF0B9C60024BFAF /* InteractionInProgressView.swift */; };
 		5B43B08B2BDAAD4B00AA1E92 /* AddressDetails+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B43B0892BDAAD4B00AA1E92 /* AddressDetails+View.swift */; };
 		5B43B08C2BDAAD4B00AA1E92 /* AddressDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B43B08A2BDAAD4B00AA1E92 /* AddressDetails.swift */; };
 		5B447E0B2CAAFC2D0063AE39 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 5B447E0A2CAAFC2D0063AE39 /* Sargon */; };
@@ -1985,6 +1989,9 @@
 		5B3C48B82C80D23F00DB160D /* AccountLockersClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountLockersClient+Test.swift"; sourceTree = "<group>"; };
 		5B3C48C02C85CEAA00DB160D /* AccountBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountBannerView.swift; sourceTree = "<group>"; };
 		5B3C48C22C874C8D00DB160D /* Dispatch+Extra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Dispatch+Extra.swift"; sourceTree = "<group>"; };
+		5B3FDC0C2CF0A4D40024BFAF /* PollStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollStatus.swift; sourceTree = "<group>"; };
+		5B3FDC0D2CF0A4D40024BFAF /* PollStatus+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PollStatus+View.swift"; sourceTree = "<group>"; };
+		5B3FDC102CF0B9C60024BFAF /* InteractionInProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractionInProgressView.swift; sourceTree = "<group>"; };
 		5B43B0892BDAAD4B00AA1E92 /* AddressDetails+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddressDetails+View.swift"; sourceTree = "<group>"; };
 		5B43B08A2BDAAD4B00AA1E92 /* AddressDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressDetails.swift; sourceTree = "<group>"; };
 		5B45E2F82BC45770007C4C84 /* FactorSourceAccess+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactorSourceAccess+View.swift"; sourceTree = "<group>"; };
@@ -2558,6 +2565,7 @@
 				48FFFAAB2ADC1FE900B2B213 /* DependenciesAdditions in Frameworks */,
 				48FFFAA22ADC1F5D00B2B213 /* Algorithms in Frameworks */,
 				48FFFAC12ADC20C400B2B213 /* JSONPreview in Frameworks */,
+				5B3FDC0A2CF0A4280024BFAF /* Sargon in Frameworks */,
 				48FFFADB2ADC21E400B2B213 /* SwiftLogConsoleColors in Frameworks */,
 				48FFFADE2ADC21F500B2B213 /* FileLogging in Frameworks */,
 				48FFFACF2ADC216400B2B213 /* CollectionConcurrencyKit in Frameworks */,
@@ -5553,6 +5561,7 @@
 				5B03E3D02CC127B100E10A64 /* RawManifestView.swift */,
 				5B4A1AC52CC0150D00679EE6 /* HeaderView.swift */,
 				5B27FBE92CC70C9D002975BE /* ValidatorsView.swift */,
+				5B3FDC102CF0B9C60024BFAF /* InteractionInProgressView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -5612,6 +5621,15 @@
 			path = AccountLockersClient;
 			sourceTree = "<group>";
 		};
+		5B3FDC0B2CF0A4890024BFAF /* PollStatus */ = {
+			isa = PBXGroup;
+			children = (
+				5B3FDC0C2CF0A4D40024BFAF /* PollStatus.swift */,
+				5B3FDC0D2CF0A4D40024BFAF /* PollStatus+View.swift */,
+			);
+			path = PollStatus;
+			sourceTree = "<group>";
+		};
 		5B45E2F32BC45706007C4C84 /* FactorSourceAccess */ = {
 			isa = PBXGroup;
 			children = (
@@ -5646,7 +5664,8 @@
 			children = (
 				5B4A1ABD2CC00FB800679EE6 /* PreAuthorizationReview.swift */,
 				5B4A1ABE2CC00FB800679EE6 /* PreAuthorizationReview+View.swift */,
-				5B8F770E2CDA413000154A76 /* TImeFormatter */,
+				5B3FDC0B2CF0A4890024BFAF /* PollStatus */,
+				5B8F770E2CDA413000154A76 /* TimeFormatter */,
 			);
 			path = PreAuthorizationReview;
 			sourceTree = "<group>";
@@ -5754,12 +5773,12 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
-		5B8F770E2CDA413000154A76 /* TImeFormatter */ = {
+		5B8F770E2CDA413000154A76 /* TimeFormatter */ = {
 			isa = PBXGroup;
 			children = (
 				5B8F770F2CDA41B100154A76 /* TimeFormatter.swift */,
 			);
-			path = TImeFormatter;
+			path = TimeFormatter;
 			sourceTree = "<group>";
 		};
 		5B8F77112CDA41DC00154A76 /* PreAuthorizationReviewTests */ = {
@@ -7076,6 +7095,7 @@
 				5B634A932C91D2A0004B2FBC /* ScreenshotPreventing */,
 				5B447E0A2CAAFC2D0063AE39 /* Sargon */,
 				5B4E1D1E2CB7FE8E002FAC2E /* Sargon */,
+				5B3FDC092CF0A4280024BFAF /* Sargon */,
 			);
 			productName = RadixWallet;
 			productReference = 48CFBC4F2ADC106300E77A5C /* Radix Wallet Dev.app */;
@@ -7146,7 +7166,7 @@
 				8318BB172BC8403800057BCB /* XCRemoteSwiftPackageReference "swift-custom-dump" */,
 				E6A0B0492BF23C7000617DAC /* XCRemoteSwiftPackageReference "swift-identified-collections" */,
 				5B634A922C91D2A0004B2FBC /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */,
-				E79DD1C72CEE08BA00B1EB86 /* XCRemoteSwiftPackageReference "sargon" */,
+				5B3FDC082CF0A4280024BFAF /* XCLocalSwiftPackageReference "../sargon" */,
 			);
 			productRefGroup = 48CFBC502ADC106300E77A5C /* Products */;
 			projectDirPath = "";
@@ -7319,6 +7339,8 @@
 				48CFC3332ADC10D900E77A5C /* ImportMnemonic+View.swift in Sources */,
 				5B758D532BCD721D00348722 /* SettingsRow.swift in Sources */,
 				48CFC3842ADC10D900E77A5C /* AssetResourceDetails.swift in Sources */,
+				5B3FDC0E2CF0A4D40024BFAF /* PollStatus+View.swift in Sources */,
+				5B3FDC0F2CF0A4D40024BFAF /* PollStatus.swift in Sources */,
 				48CFC6932ADC10DB00E77A5C /* ImportLegacyWalletErrors.swift in Sources */,
 				48CFC61E2ADC10DA00E77A5C /* LedgerIdentifiable.swift in Sources */,
 				A462B57B2B8210A900C26D20 /* TransactionHistoryClient+Mock.swift in Sources */,
@@ -7553,6 +7575,7 @@
 				4813AFE22BC9A9AD0046BCAD /* Stage1MigrateToSargon+NetworkDefinition.swift in Sources */,
 				A40816522C7E0D08005E65B9 /* TransactionSubmitRequest.swift in Sources */,
 				A40816012C7E0D08005E65B9 /* StateAccountLockersTouchedAtResponseItem.swift in Sources */,
+				5B3FDC112CF0B9DB0024BFAF /* InteractionInProgressView.swift in Sources */,
 				48D5F38B2BD8DDB9000DE964 /* DebugKeychainContents+View.swift in Sources */,
 				A40816232C7E0D08005E65B9 /* StateKeyValueStoreDataResponse.swift in Sources */,
 				E75C5F342C1C1632002E3DFF /* Stage1MigrateToSargon+SignedAuthChallenge.swift in Sources */,
@@ -8981,6 +9004,13 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		5B3FDC082CF0A4280024BFAF /* XCLocalSwiftPackageReference "../sargon" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../sargon;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		48FFFA972ADC1EEC00B2B213 /* XCRemoteSwiftPackageReference "AsyncExtensions" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -9452,6 +9482,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5B1C4FD32BBB0B0C00B9436F /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Strict" */;
 			productName = "AppsFlyerLib-Strict";
+		};
+		5B3FDC092CF0A4280024BFAF /* Sargon */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Sargon;
 		};
 		5B447E0A2CAAFC2D0063AE39 /* Sargon */ = {
 			isa = XCSwiftPackageProductDependency;

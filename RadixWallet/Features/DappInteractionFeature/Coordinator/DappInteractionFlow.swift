@@ -1054,7 +1054,8 @@ extension DappInteractionFlow.Path.State {
 				expiration: item.expiration,
 				nonce: .secureRandom(),
 				dAppMetadata: dappMetadata.onLedger,
-				message: item.message
+				message: item.message,
+				isDeepLink: p2pRoute.isDeepLink
 			))
 		}
 	}

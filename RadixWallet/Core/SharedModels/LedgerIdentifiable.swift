@@ -2,6 +2,7 @@
 enum LedgerIdentifiable: Sendable {
 	case address(Address)
 	case transaction(TransactionIntentHash)
+	case preAuthorization(SubintentHash)
 
 	static func address(of account: Account) -> Self {
 		.address(.account(account.address))
@@ -17,6 +18,8 @@ enum LedgerIdentifiable: Sendable {
 			address.formatted(format)
 		case let .transaction(identifier):
 			identifier.formatted(format)
+		case let .preAuthorization(identifier):
+			"identifier.formatted(format)"
 		}
 	}
 
@@ -26,6 +29,8 @@ enum LedgerIdentifiable: Sendable {
 			address.addressPrefix
 		case .transaction:
 			"transaction"
+		case .preAuthorization:
+			"" // Subintent cannot be tracked on dashboard
 		}
 	}
 }

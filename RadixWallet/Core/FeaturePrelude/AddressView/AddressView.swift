@@ -56,6 +56,7 @@ extension AddressView {
 							AddressDetails.View(store: store)
 						}
 					}
+
 			case .transaction:
 				Menu {
 					Button(L10n.AddressAction.copyTransactionId, image: .copyBig) {
@@ -68,6 +69,10 @@ extension AddressView {
 				} label: {
 					addressView
 				}
+
+			case .preAuthorization:
+				addressView
+					.onTapGesture(perform: copyToPasteboard)
 			}
 		}
 	}
@@ -90,7 +95,7 @@ extension AddressView {
 
 	private var imageResource: ImageResource {
 		switch identifiable {
-		case .address:
+		case .address, .preAuthorization:
 			.copy
 		case .transaction:
 			.iconLinkOut

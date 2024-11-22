@@ -10,6 +10,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey = .init()
 		let dAppMetadata: DappMetadata.Ledger?
 		let message: String?
+		let isDeepLink: Bool
 
 		var preview: PreAuthorizationPreview?
 
@@ -166,8 +167,9 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .updateSecondsToExpiration(expiration):
-			state.secondsToExpiration = Int(expiration.timeIntervalSinceNow)
-			return .none
+			let secondsToExpiration = Int(expiration.timeIntervalSinceNow)
+			state.secondsToExpiration = secondsToExpiration
+			return secondsToExpiration > 0 ? .none : .cancel(id: CancellableId.expirationTimer)
 
 		case .resetToApprovable:
 			return resetToApprovable(&state)
