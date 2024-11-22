@@ -21,6 +21,7 @@ struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		let forOlympiaAccounts: Bool
 		var active: IdentifiedArrayOf<Account> = []
 		var inactive: IdentifiedArrayOf<Account> = []
+		var deleted: IdentifiedArrayOf<Account> = []
 
 		@PresentationState
 		var destination: Destination.State? = nil
@@ -55,7 +56,8 @@ struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		case startScan(accounts: IdentifiedArrayOf<Account>)
 		case foundAccounts(
 			active: IdentifiedArrayOf<Account>,
-			inactive: IdentifiedArrayOf<Account>
+			inactive: IdentifiedArrayOf<Account>,
+			deleted: IdentifiedArrayOf<Account>
 		)
 		case initiate
 	}
@@ -70,7 +72,8 @@ struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 	enum DelegateAction: Sendable, Equatable {
 		case foundAccounts(
 			active: IdentifiedArrayOf<Account>,
-			inactive: IdentifiedArrayOf<Account>
+			inactive: IdentifiedArrayOf<Account>,
+			deleted: IdentifiedArrayOf<Account>
 		)
 		case failed
 		case close
@@ -161,11 +164,12 @@ struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		case let .startScan(accounts):
 			return scanOnLedger(accounts: accounts, state: &state)
 
-		case let .foundAccounts(active, inactive):
+		case let .foundAccounts(active, inactive, deleted):
 			state.batchNumber += 1
 			state.status = .scanComplete
 			state.active.append(contentsOf: active)
 			state.inactive.append(contentsOf: inactive)
+			state.deleted.append(contentsOf: deleted)
 			return .none
 		}
 	}
@@ -189,9 +193,13 @@ struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 				let inactiveInBetweenActive = state.inactive.filter {
 					$0.derivationIndex < maxActive.derivationIndex
 				}
-				return .send(.delegate(.foundAccounts(active: state.active, inactive: inactiveInBetweenActive)))
+				return .send(.delegate(.foundAccounts(
+					active: state.active,
+					inactive: inactiveInBetweenActive,
+					deleted: state.deleted
+				)))
 			} else {
-				return .send(.delegate(.foundAccounts(active: [], inactive: [])))
+				return .send(.delegate(.foundAccounts(active: [], inactive: [], deleted: [])))
 			}
 
 		case .closeButtonTapped:
@@ -332,18 +340,37 @@ extension AccountRecoveryScanInProgress {
 		state.status = .scanningNetworkForActiveAccounts
 		state.destination = nil
 		loggerGlobal.debug("Scanning ledger with accounts with addresses: \(accounts.map(\.address))")
-		return .run { send in
+		return .run { [networkID = state.networkID] send in
+			let deletedAccountAddresses: [AccountAddress] = try await SargonOS.shared
+				.checkAccountsDeletedOnLedger(
+					networkId: networkID,
+					accountAddresses: accounts.map(\.address)
+				)
+				.compactMap { accountAddress, isDeleted in
+					isDeleted ? accountAddress : nil
+				}
+
+			let deletedAccounts = accounts.filter {
+				deletedAccountAddresses.contains($0.address)
+			}
+			.asIdentified()
+
+			let filteredAccounts = accounts.filter {
+				!deletedAccountAddresses.contains($0.address)
+			}
+			.asIdentified()
 
 			let onLedgerSyncOfAccounts = try await onLedgerEntitiesClient
 				.syncThirdPartyDepositWithOnLedgerSettings(
-					addressesOf: accounts
+					addressesOf: filteredAccounts
 				)
 
 			await send(
 				.internal(
 					.foundAccounts(
 						active: onLedgerSyncOfAccounts.active,
-						inactive: onLedgerSyncOfAccounts.inactive
+						inactive: onLedgerSyncOfAccounts.inactive,
+						deleted: deletedAccounts
 					)
 				)
 			)

@@ -273,6 +273,27 @@ extension InteractionReview.Sections {
 				accountDepositSetting: accountDepositSetting,
 				accountDepositExceptions: accountDepositExceptions
 			)
+
+		case let .deleteAccounts(accountAddresses):
+			let deleteAccounts: Common.Accounts.State? = try await extractDeleteAccounts(accountAddresses: accountAddresses)
+
+			var summary = summary
+			for accountAddress in accountAddresses {
+				summary.deposits[accountAddress] = nil
+			}
+
+			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
+			let deposits = try await extractDeposits(
+				accountDeposits: summary.deposits,
+				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
+				entities: resourcesInfo,
+				networkID: networkID
+			)
+
+			return Common.SectionsData(
+				deposits: deposits,
+				accountDeletion: deleteAccounts
+			)
 		}
 	}
 
@@ -410,7 +431,7 @@ extension InteractionReview.Sections {
 		guard !withdrawals.isEmpty else { return nil }
 
 		let withdrawalAccounts = withdrawals.map {
-			Common.Account.State(account: $0.key, transfers: $0.value, isDeposit: false)
+			Common.Account.State(account: $0.key, transfers: $0.value, purpose: .withdrawal)
 		}
 		.asIdentified()
 
@@ -456,13 +477,29 @@ extension InteractionReview.Sections {
 
 		let depositAccounts = deposits
 			.filter { !$0.value.isEmpty }
-			.map { Common.Account.State(account: $0.key, transfers: $0.value, isDeposit: true) }
+			.map { Common.Account.State(account: $0.key, transfers: $0.value, purpose: .deposit) }
 			.asIdentified()
 
 		guard !depositAccounts.isEmpty else { return nil }
 
 		let requiresGuarantees = !depositAccounts.customizableGuarantees.isEmpty
 		return .init(accounts: depositAccounts, enableCustomizeGuarantees: requiresGuarantees)
+	}
+
+	private func extractDeleteAccounts(accountAddresses: [AccountAddress]) async throws -> Common.Accounts.State? {
+		let userAccounts: [Common.ReviewAccount] = try await extractUserAccounts(accountAddresses)
+		let accounts = try accountAddresses
+			.map {
+				let account = try userAccounts.account(for: $0)
+				return Common.Account.State(
+					account: account,
+					transfers: [],
+					purpose: .accountDeletion
+				)
+			}
+			.asIdentified()
+
+		return .init(accounts: accounts, enableCustomizeGuarantees: false)
 	}
 
 	func extractValidators(for addresses: [ValidatorAddress]) async throws -> Common.ValidatorsState? {

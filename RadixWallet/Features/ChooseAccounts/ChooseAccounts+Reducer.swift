@@ -6,6 +6,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		let context: Context
 		let filteredAccounts: [AccountAddress]
+		let disabledAccounts: [AccountAddress]
 		var availableAccounts: IdentifiedArrayOf<Account>
 		var selectedAccounts: [ChooseAccountsRow.State]?
 		var canCreateNewAccount: Bool
@@ -25,12 +26,14 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		init(
 			context: Context,
 			filteredAccounts: [AccountAddress] = [],
+			disabledAccounts: [AccountAddress] = [],
 			availableAccounts: IdentifiedArrayOf<Account> = [],
 			selectedAccounts: [ChooseAccountsRow.State]? = nil,
 			canCreateNewAccount: Bool = true
 		) {
 			self.context = context
 			self.filteredAccounts = filteredAccounts
+			self.disabledAccounts = disabledAccounts
 			self.availableAccounts = availableAccounts
 			self.selectedAccounts = selectedAccounts
 			self.canCreateNewAccount = canCreateNewAccount
@@ -70,12 +73,10 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(destinationPath, action: /Action.destination) {
+			.ifLet(\.$destination, action: \.destination) {
 				Destination()
 			}
 	}
-
-	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -98,9 +99,15 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .loadAccountsResult(.success(accounts)):
 			// Uniqueness is guaranteed as per `Accounts`
-			state.availableAccounts = accounts.filter {
-				!state.filteredAccounts.contains($0.address)
-			}.asIdentified()
+			state.availableAccounts = accounts
+				.filter {
+					!state.filteredAccounts.contains($0.address)
+				}
+				.sorted {
+					!state.disabledAccounts.contains($0.address)
+						&& state.disabledAccounts.contains($1.address)
+				}
+				.asIdentified()
 			return .none
 
 		case let .loadAccountsResult(.failure(error)):

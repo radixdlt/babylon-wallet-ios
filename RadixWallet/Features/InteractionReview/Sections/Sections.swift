@@ -9,6 +9,7 @@ extension InteractionReview {
 			var withdrawals: Accounts.State? = nil
 			var dAppsUsed: InteractionReviewDappsUsed.State? = nil
 			var deposits: Accounts.State? = nil
+			var accountDeletion: Accounts.State? = nil
 
 			var contributingToPools: InteractionReviewPools.State? = nil
 			var redeemingFromPools: InteractionReviewPools.State? = nil
@@ -55,6 +56,7 @@ extension InteractionReview {
 		enum ChildAction: Sendable, Equatable {
 			case withdrawals(Common.Accounts.Action)
 			case deposits(Common.Accounts.Action)
+			case accountDeletion(Common.Accounts.Action)
 			case dAppsUsed(InteractionReviewDappsUsed.Action)
 			case contributingToPools(InteractionReviewPools.Action)
 			case redeemingFromPools(InteractionReviewPools.Action)
@@ -185,6 +187,7 @@ extension InteractionReview {
 				state.accountDepositExceptions = sections.accountDepositExceptions
 				state.proofs = sections.proofs
 				state.showPossibleDappCalls = sections.showPossibleDappCalls
+				state.accountDeletion = sections.accountDeletion
 				return .none
 			}
 		}

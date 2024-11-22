@@ -3,16 +3,9 @@
 struct SelectInactiveAccountsToAdd: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		let active: IdentifiedArrayOf<Account>
+		let deleted: IdentifiedArrayOf<Account>
 		let inactive: IdentifiedArrayOf<Account>
 		var selectedInactive: IdentifiedArrayOf<Account> = []
-
-		init(
-			active: IdentifiedArrayOf<Account>,
-			inactive: IdentifiedArrayOf<Account>
-		) {
-			self.active = active
-			self.inactive = inactive
-		}
 	}
 
 	enum ViewAction: Sendable, Equatable {
@@ -25,7 +18,8 @@ struct SelectInactiveAccountsToAdd: Sendable, FeatureReducer {
 		case goBack
 		case finished(
 			selectedInactive: IdentifiedArrayOf<Account>,
-			active: IdentifiedArrayOf<Account>
+			active: IdentifiedArrayOf<Account>,
+			deleted: IdentifiedArrayOf<Account>
 		)
 	}
 
@@ -47,7 +41,8 @@ struct SelectInactiveAccountsToAdd: Sendable, FeatureReducer {
 				.delegate(
 					.finished(
 						selectedInactive: state.selectedInactive,
-						active: state.active
+						active: state.active,
+						deleted: state.deleted
 					)
 				)
 			)

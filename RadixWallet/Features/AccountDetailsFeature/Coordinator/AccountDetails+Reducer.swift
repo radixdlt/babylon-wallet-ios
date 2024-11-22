@@ -144,7 +144,12 @@ struct AccountDetails: Sendable, FeatureReducer {
 			return .run { [state] send in
 				for try await accountUpdate in await accountsClient.accountUpdates(state.account.address) {
 					guard !Task.isCancelled else { return }
-					await send(.internal(.accountUpdated(accountUpdate)))
+
+					if accountUpdate.isDeleted {
+						await send(.delegate(.dismiss))
+					} else {
+						await send(.internal(.accountUpdated(accountUpdate)))
+					}
 				}
 			}
 			.merge(with: securityProblemsEffect())
@@ -262,7 +267,8 @@ struct AccountDetails: Sendable, FeatureReducer {
 			state.destination = nil
 			return .none
 
-		case .preferences(.delegate(.accountHidden)):
+		case .preferences(.delegate(.accountHidden)),
+		     .preferences(.delegate(.goHomeAfterAccountDeleted)):
 			return .send(.delegate(.dismiss))
 
 		case let .stakeClaimDetails(.delegate(.tappedClaimStake(stakeClaim))):
@@ -304,6 +310,7 @@ struct AccountDetails: Sendable, FeatureReducer {
 			for await _ in clock.timer(interval: .seconds(accountPortfolioRefreshIntervalInSeconds)) {
 				guard !Task.isCancelled else { return }
 				_ = try? await accountPortfoliosClient.fetchAccountPortfolio(address, true)
+				await accountPortfoliosClient.syncAccountsDeletedOnLedger()
 			}
 		}
 	}
