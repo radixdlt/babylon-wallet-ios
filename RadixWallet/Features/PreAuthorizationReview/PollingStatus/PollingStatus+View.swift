@@ -103,7 +103,7 @@ private extension PreAuthorizationReview.PollingStatus.State {
 	var subtitle: String {
 		switch status {
 		case .unknown:
-			"Your pre-authorization has been sent to \(dAppName)"
+			"Your pre-authorization has been sent to \(dAppMetadata.name)"
 		case .expired:
 			"Your pre-authorization has expired and can no longer be used."
 		}
@@ -116,13 +116,9 @@ private extension PreAuthorizationReview.PollingStatus.State {
 	var expirationMessage: String {
 		if secondsToExpiration > 1 {
 			let time = PreAuthorizationReview.TimeFormatter.format(seconds: secondsToExpiration)
-			return "\(dAppName) has \(time) to use this pre-authorization"
+			return "\(dAppMetadata.name) has \(time) to use this pre-authorization"
 		} else {
 			return "Checking last time.."
 		}
-	}
-
-	private var dAppName: String {
-		dAppMetadata?.name?.rawValue ?? "dApp"
 	}
 }

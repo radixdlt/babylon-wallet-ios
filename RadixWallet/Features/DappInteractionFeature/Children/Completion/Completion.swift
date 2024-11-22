@@ -7,16 +7,6 @@ struct Completion: Sendable, FeatureReducer {
 		let txID: TransactionIntentHash?
 		let dappMetadata: DappMetadata
 		let p2pRoute: P2P.Route
-
-		init(
-			txID: TransactionIntentHash?,
-			dappMetadata: DappMetadata,
-			p2pRoute: P2P.Route
-		) {
-			self.txID = txID
-			self.dappMetadata = dappMetadata
-			self.p2pRoute = p2pRoute
-		}
 	}
 
 	enum ViewAction: Sendable, Equatable {

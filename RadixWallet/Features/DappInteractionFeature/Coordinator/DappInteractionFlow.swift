@@ -1060,7 +1060,7 @@ extension DappInteractionFlow.Path.State {
 				unvalidatedManifest: item.unvalidatedManifest,
 				expiration: item.expiration,
 				nonce: .secureRandom(),
-				dAppMetadata: dappMetadata.onLedger,
+				dAppMetadata: dappMetadata,
 				message: item.message,
 				isDeepLink: p2pRoute.isDeepLink
 			))

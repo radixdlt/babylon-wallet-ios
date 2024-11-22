@@ -2,7 +2,7 @@
 extension PreAuthorizationReview {
 	struct PollingStatus: Sendable, FeatureReducer {
 		struct State: Sendable, Hashable {
-			let dAppMetadata: DappMetadata.Ledger? // can it actually be nil?
+			let dAppMetadata: DappMetadata
 			let subintentHash: SubintentHash
 			let expiration: Expiration
 			let isDeepLink: Bool
@@ -10,7 +10,7 @@ extension PreAuthorizationReview {
 			var secondsToExpiration: Int
 
 			init(
-				dAppMetadata: DappMetadata.Ledger?,
+				dAppMetadata: DappMetadata,
 				subintentHash: SubintentHash,
 				expiration: Expiration,
 				isDeepLink: Bool

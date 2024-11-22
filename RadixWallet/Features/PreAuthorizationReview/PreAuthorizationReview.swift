@@ -8,7 +8,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		let expiration: Expiration
 		let nonce: Nonce
 		let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey = .init()
-		let dAppMetadata: DappMetadata.Ledger?
+		let dAppMetadata: DappMetadata
 		let message: String?
 		let isDeepLink: Bool
 
