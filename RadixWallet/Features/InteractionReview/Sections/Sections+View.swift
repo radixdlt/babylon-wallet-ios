@@ -186,6 +186,7 @@ extension InteractionReview.Sections {
 
 						if showPossibleDappCalls {
 							possibleDappCalls
+								.transition(.opacity.combined(with: .scale(scale: 0.95)))
 						}
 					}
 				}
