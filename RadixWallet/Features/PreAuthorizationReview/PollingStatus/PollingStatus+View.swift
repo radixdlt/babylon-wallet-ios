@@ -25,13 +25,9 @@ extension PreAuthorizationReview.PollingStatus {
 									.foregroundStyle(.app.gray1)
 
 								if viewStore.showId {
-									HStack(spacing: .small3) {
-										Text("Pre-Authorization ID")
-											.foregroundColor(.app.gray1)
-										AddressView(.preAuthorization(viewStore.subintentHash))
-											.foregroundColor(.app.blue1)
-									}
-									.textStyle(.body1Header)
+									AddressView(.preAuthorization(viewStore.subintentHash))
+										.foregroundColor(.app.blue1)
+										.textStyle(.body1Header)
 								}
 							}
 
