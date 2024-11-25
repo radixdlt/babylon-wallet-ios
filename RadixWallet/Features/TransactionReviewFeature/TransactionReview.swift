@@ -627,14 +627,14 @@ extension ResourceBalance {
 	}
 
 	/// The transferred amount, for a fungible resource
-	var fungibleTransferAmount: Decimal192? {
+	var fungiblePredictedTransferAmount: Decimal192? {
 		switch details {
 		case let .fungible(fungible):
-			fungible.amount.exactAmount?.nominalAmount
+			fungible.amount.predictedAmount?.nominalAmount
 		case let .liquidStakeUnit(liquidStakeUnit):
-			liquidStakeUnit.amount.exactAmount?.nominalAmount
+			liquidStakeUnit.amount.predictedAmount?.nominalAmount
 		case let .poolUnit(poolUnit):
-			poolUnit.details.poolUnitResource.amount.exactAmount?.nominalAmount
+			poolUnit.details.poolUnitResource.amount.predictedAmount?.nominalAmount
 		case .nonFungible, .stakeClaimNFT, .none:
 			nil
 		}
