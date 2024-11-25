@@ -42,7 +42,8 @@ extension DappToWalletInteraction {
 				ongoingAccounts: .previewValue,
 				ongoingPersonaData: .previewValue,
 				oneTimeAccounts: .previewValue,
-				oneTimePersonaData: .previewValue
+				oneTimePersonaData: .previewValue,
+				proofOfOwnership: nil
 			)),
 			metadata: .previewValue
 		)
@@ -57,8 +58,7 @@ extension DappToWalletInteraction {
 			interactionId: interactionId,
 			items: .unauthorizedRequest(.init(
 				oneTimeAccounts: .previewValue,
-				oneTimePersonaData: .previewValue,
-				proofOfOwnership: nil
+				oneTimePersonaData: .previewValue
 			)),
 			metadata: .previewValue
 		)

@@ -155,14 +155,14 @@ extension DappToWalletInteraction {
 				items.ongoingPersonaData.map(AnyInteractionItem.ongoingPersonaData),
 			]
 			.compactMap { $0 }
+			+
+			items.proofOfOwnership.splitted
 		case let .unauthorizedRequest(items):
 			[
 				items.oneTimeAccounts.map(AnyInteractionItem.oneTimeAccounts),
 				items.oneTimePersonaData.map(AnyInteractionItem.oneTimePersonaData),
 			]
 			.compactMap { $0 }
-			+
-			items.proofOfOwnership.splitted
 		case let .transaction(items):
 			[
 				.submitTransaction(items.send),
@@ -264,7 +264,8 @@ extension WalletToDappInteractionSuccessResponse {
 							ongoingAccounts: ongoingAccounts,
 							ongoingPersonaData: ongoingPersonaData,
 							oneTimeAccounts: oneTimeAccounts,
-							oneTimePersonaData: oneTimePersonaData
+							oneTimePersonaData: oneTimePersonaData,
+							proofOfOwnership: proofOfOwnership
 						)
 					)
 				)
@@ -274,8 +275,7 @@ extension WalletToDappInteractionSuccessResponse {
 					items: .unauthorizedRequest(
 						.init(
 							oneTimeAccounts: oneTimeAccounts,
-							oneTimePersonaData: oneTimePersonaData,
-							proofOfOwnership: proofOfOwnership
+							oneTimePersonaData: oneTimePersonaData
 						)
 					)
 				)

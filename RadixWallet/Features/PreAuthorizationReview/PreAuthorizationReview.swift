@@ -7,6 +7,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		let unvalidatedManifest: UnvalidatedSubintentManifest
 		let expiration: Expiration
 		let nonce: Nonce
+		let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey = .init()
 		let dAppMetadata: DappMetadata.Ledger?
 		let message: String?
 
@@ -90,7 +91,8 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 				let preview = await TaskResult {
 					try await preAuthorizationClient.getPreview(.init(
 						unvalidatedManifest: state.unvalidatedManifest,
-						nonce: state.nonce
+						nonce: state.nonce,
+						notaryPublicKey: state.ephemeralNotaryPrivateKey.publicKey
 					))
 				}
 				await send(.internal(.previewLoaded(preview)))
