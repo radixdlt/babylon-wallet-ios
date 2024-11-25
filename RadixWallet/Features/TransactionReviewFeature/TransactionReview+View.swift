@@ -313,7 +313,7 @@ extension TransactionReview.State {
 		nonce: .secureRandom(),
 		signTransactionPurpose: .manifestFromDapp,
 		message: .none,
-		isWalletTransaction: false,
+		interactionId: .walletInteractionID(for: .accountTransfer),
 		proposingDappMetadata: nil,
 		p2pRoute: .wallet
 	)

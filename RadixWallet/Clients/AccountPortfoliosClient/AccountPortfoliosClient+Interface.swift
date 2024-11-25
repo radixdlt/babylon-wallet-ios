@@ -19,6 +19,9 @@ struct AccountPortfoliosClient: Sendable {
 
 	/// Currently loaded portfolios
 	var portfolios: Portfolios
+
+	/// Will check for any unsynced deleted accounts, sync them, and display an alert if any are found
+	var syncAccountsDeletedOnLedger: SyncAccountsDeletedOnLedger
 }
 
 extension AccountPortfoliosClient {
@@ -28,6 +31,7 @@ extension AccountPortfoliosClient {
 
 	typealias PortfolioUpdates = @Sendable () -> AnyAsyncSequence<Loadable<[AccountPortfolio]>>
 	typealias Portfolios = @Sendable () -> [AccountPortfolio]
+	typealias SyncAccountsDeletedOnLedger = @Sendable () async -> Void
 }
 
 extension DependencyValues {

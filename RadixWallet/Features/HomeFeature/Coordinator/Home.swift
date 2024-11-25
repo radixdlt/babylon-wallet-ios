@@ -206,7 +206,7 @@ struct Home: Sendable, FeatureReducer {
 
 		case .pullToRefreshStarted:
 			accountLockersClient.forceRefresh()
-			return fetchAccountPortfolios(state)
+			return fetchAccountPortfolios(state, forceRefresh: true)
 
 		case .settingsButtonTapped:
 			return .send(.delegate(.displaySettings))
@@ -233,12 +233,8 @@ struct Home: Sendable, FeatureReducer {
 				}
 				.asIdentified()
 
-			return .run { [addresses = state.accountAddresses] _ in
-				_ = try await accountPortfoliosClient.fetchAccountPortfolios(addresses, false)
-			} catch: { error, _ in
-				errorQueue.schedule(error)
-			}
-			.merge(with: scheduleFetchAccountPortfoliosTimer(state))
+			return fetchAccountPortfolios(state, forceRefresh: false)
+				.merge(with: scheduleFetchAccountPortfoliosTimer(state))
 
 		case let .accountsLoadedResult(.failure(error)):
 			errorQueue.schedule(error)
@@ -445,21 +441,21 @@ struct Home: Sendable, FeatureReducer {
 		}
 	}
 
-	func fetchAccountPortfolios(_ state: State) -> Effect<Action> {
-		let accountAddresses = state.accounts.map(\.address)
-		return .run { _ in
-			_ = try await accountPortfoliosClient.fetchAccountPortfolios(accountAddresses, true)
+	private func fetchAccountPortfolios(_ state: State, forceRefresh: Bool) -> Effect<Action> {
+		.run { [accountAddresses = state.accountAddresses] _ in
+			_ = try await accountPortfoliosClient.fetchAccountPortfolios(accountAddresses, forceRefresh)
+			await accountPortfoliosClient.syncAccountsDeletedOnLedger()
 		} catch: { error, _ in
 			errorQueue.schedule(error)
 		}
 	}
 
-	func scheduleFetchAccountPortfoliosTimer(_ state: State) -> Effect<Action> {
+	private func scheduleFetchAccountPortfoliosTimer(_ state: State) -> Effect<Action> {
 		.run { _ in
 			for await _ in clock.timer(interval: .seconds(accountPortfoliosRefreshIntervalInSeconds)) {
 				guard !Task.isCancelled else { return }
-				let accountAddresses = state.accounts.map(\.address)
-				_ = try? await accountPortfoliosClient.fetchAccountPortfolios(accountAddresses, true)
+				_ = try? await accountPortfoliosClient.fetchAccountPortfolios(state.accountAddresses, true)
+				await accountPortfoliosClient.syncAccountsDeletedOnLedger()
 			}
 		}
 		.cancellable(id: CancellableId.fetchAccountPortfolios, cancelInFlight: true)

@@ -131,8 +131,7 @@ struct SecureStorageClient: Sendable {
 		loadP2PLinksPrivateKey: @escaping LoadP2PLinksPrivateKey,
 		saveP2PLinksPrivateKey: @escaping SaveP2PLinksPrivateKey,
 		keychainChanged: @escaping KeychainChanged,
-
-		loadMnemonicByFactorSourceID: @escaping LoadMnemonicByFactorSourceID,
+		loadMnemonicDataByFactorSourceID: @escaping LoadMnemonicDataByFactorSourceID,
 		saveMnemonicForFactorSourceData: @escaping SaveMnemonicForFactorSourceData
 	) {
 		self.loadProfileSnapshotData = loadProfileSnapshotData

@@ -46,6 +46,7 @@ extension InteractionReview.Sections {
 		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading, spacing: .medium1) {
+					accountDeletion
 					withdrawals
 
 					VStack(alignment: .leading, spacing: .medium1) {
@@ -233,6 +234,16 @@ extension InteractionReview.Sections {
 			IfLetStore(store.scope(state: \.proofs, action: \.child.proofs)) { childStore in
 				Common.Proofs.View(store: childStore)
 					.padding(.horizontal, .small3)
+			}
+		}
+
+		@ViewBuilder
+		private var accountDeletion: some SwiftUI.View {
+			IfLetStore(store.scope(state: \.accountDeletion, action: \.child.accountDeletion)) { childStore in
+				VStack(alignment: .leading, spacing: .small2) {
+					Common.HeadingView.deletingAccount
+					Common.Accounts.View(store: childStore)
+				}
 			}
 		}
 	}

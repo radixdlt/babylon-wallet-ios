@@ -27,6 +27,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 		case task
 		case rowTapped(AccountPreferences.Section.SectionRow)
 		case hideAccountTapped
+		case deleteAccountTapped
 		case faucetButtonTapped
 	}
 
@@ -40,6 +41,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case accountHidden
+		case goHomeAfterAccountDeleted
 	}
 
 	// MARK: - Destination
@@ -50,6 +52,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 			case thirdPartyDeposits(ManageThirdPartyDeposits.State)
 			case devPreferences(DevAccountPreferences.State)
 			case hideAccount
+			case deleteAccount(DeleteAccountCoordinator.State)
 		}
 
 		@CasePathable
@@ -58,17 +61,21 @@ struct AccountPreferences: Sendable, FeatureReducer {
 			case thirdPartyDeposits(ManageThirdPartyDeposits.Action)
 			case devPreferences(DevAccountPreferences.Action)
 			case hideAccount(ConfirmationAction)
+			case deleteAccount(DeleteAccountCoordinator.Action)
 		}
 
 		var body: some ReducerOf<Self> {
-			Scope(state: /State.updateAccountLabel, action: /Action.updateAccountLabel) {
+			Scope(state: \.updateAccountLabel, action: \.updateAccountLabel) {
 				UpdateAccountLabel()
 			}
-			Scope(state: /State.thirdPartyDeposits, action: /Action.thirdPartyDeposits) {
+			Scope(state: \.thirdPartyDeposits, action: \.thirdPartyDeposits) {
 				ManageThirdPartyDeposits()
 			}
-			Scope(state: /State.devPreferences, action: /Action.devPreferences) {
+			Scope(state: \.devPreferences, action: \.devPreferences) {
 				DevAccountPreferences()
+			}
+			Scope(state: \.deleteAccount, action: \.deleteAccount) {
+				DeleteAccountCoordinator()
 			}
 		}
 	}
@@ -108,6 +115,10 @@ struct AccountPreferences: Sendable, FeatureReducer {
 
 		case .hideAccountTapped:
 			state.destination = .hideAccount
+			return .none
+
+		case .deleteAccountTapped:
+			state.destination = .deleteAccount(.init(account: state.account))
 			return .none
 
 		case .faucetButtonTapped:
@@ -157,13 +168,11 @@ struct AccountPreferences: Sendable, FeatureReducer {
 		     .thirdPartyDeposits(.delegate(.accountUpdated)):
 			state.destination = nil
 			return .none
-		#if DEBUG
-		case .devPreferences(DevAccountPreferences.Action.delegate(.debugOnlyAccountWasDeleted)):
-			return .send(.delegate(.accountHidden))
-		#endif
 		case .hideAccount(.confirm):
 			state.destination = nil
 			return hideAccountEffect(state: state)
+		case .deleteAccount(.delegate(.goHomeAfterAccountDeleted)):
+			return .send(.delegate(.goHomeAfterAccountDeleted))
 		case .hideAccount(.cancel):
 			state.destination = nil
 			return .none

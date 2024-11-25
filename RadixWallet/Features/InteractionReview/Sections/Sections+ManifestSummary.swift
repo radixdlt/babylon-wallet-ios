@@ -71,7 +71,7 @@ extension InteractionReview.Sections {
 		guard !withdrawals.isEmpty else { return nil }
 
 		let withdrawalAccounts = withdrawals.map {
-			Common.Account.State(account: $0.key, transfers: $0.value, isDeposit: false)
+			Common.Account.State(account: $0.key, transfers: $0.value, purpose: .withdrawal)
 		}
 		.asIdentified()
 
@@ -103,7 +103,7 @@ extension InteractionReview.Sections {
 
 		let depositAccounts = deposits
 			.filter { !$0.value.isEmpty }
-			.map { Common.Account.State(account: $0.key, transfers: $0.value, isDeposit: true) }
+			.map { Common.Account.State(account: $0.key, transfers: $0.value, purpose: .deposit) }
 			.asIdentified()
 
 		guard !depositAccounts.isEmpty else { return nil }

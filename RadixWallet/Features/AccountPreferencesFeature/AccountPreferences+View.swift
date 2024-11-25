@@ -87,6 +87,7 @@ extension AccountPreferences.View {
 			}
 
 			hideAccountButton()
+			deleteAccountButton()
 		}
 	}
 
@@ -112,6 +113,14 @@ extension AccountPreferences.View {
 		}
 		.buttonStyle(.secondaryRectangular(shouldExpand: true))
 	}
+
+	@MainActor
+	private func deleteAccountButton() -> some View {
+		Button(L10n.AccountSettings.deleteAccount) {
+			store.send(.view(.deleteAccountTapped))
+		}
+		.buttonStyle(.primaryRectangular(isDestructive: true))
+	}
 }
 
 private extension StoreOf<AccountPreferences> {
@@ -131,6 +140,7 @@ private extension View {
 			.thirdPartyDeposits(with: destinationStore)
 			.devAccountPreferences(with: destinationStore)
 			.hideAccount(with: destinationStore, store: store)
+			.deleteAccount(with: destinationStore, store: store)
 	}
 
 	private func updateAccountLabel(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
@@ -156,6 +166,12 @@ private extension View {
 			ConfirmationView(kind: .hideAccount) { action in
 				store.send(.destination(.presented(.hideAccount(action))))
 			}
+		}
+	}
+
+	private func deleteAccount(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>, store: StoreOf<AccountPreferences>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.deleteAccount, action: \.deleteAccount)) {
+			DeleteAccountCoordinator.View(store: $0)
 		}
 	}
 }
