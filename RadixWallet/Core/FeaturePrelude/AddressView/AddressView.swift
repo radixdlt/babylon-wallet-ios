@@ -104,7 +104,7 @@ extension AddressView {
 		case .transaction:
 			L10n.TransactionReview.SubmitTransaction.txID
 		case .preAuthorization:
-			"Pre-Authorization ID"
+			L10n.PreAuthorizationReview.UnknownStatus.identifier
 		}
 	}
 
