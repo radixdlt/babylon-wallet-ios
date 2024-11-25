@@ -326,23 +326,34 @@ extension InteractionReview.Sections {
 
 	func extractDapps(
 		addresses: [Address],
-		unknownTitle: (Int) -> String
+		unknownTitle: (Int) -> String,
+		showPossibleDappCalls: Bool = false
 	) async throws -> InteractionReviewDapps<ComponentAddress>.State? {
 		let dApps = await extractDappEntities(addresses)
-		return try await extractDapps(dApps, unknownTitle: unknownTitle)
+		return try await extractDapps(
+			dApps,
+			unknownTitle: unknownTitle,
+			showPossibleDappCalls: showPossibleDappCalls
+		)
 	}
 
 	private func extractDapps<A: AddressProtocol>(
 		_ dAppEntities: [(address: Address, entity: InteractionReview.DappEntity?)],
-		unknownTitle: (Int) -> String
+		unknownTitle: (Int) -> String,
+		showPossibleDappCalls: Bool = false
 	) async throws -> InteractionReviewDapps<A>.State? {
 		let knownDapps = dAppEntities.compactMap(\.entity).asIdentified()
 		let unknownDapps = try dAppEntities.filter { $0.entity == nil }
 			.map { try $0.address.asSpecific(type: A.self) }.asIdentified()
 
-		guard knownDapps.count + unknownDapps.count > 0 else { return nil }
+		guard knownDapps.count + unknownDapps.count > 0 || showPossibleDappCalls else { return nil }
 
-		return .init(knownDapps: knownDapps, unknownDapps: unknownDapps, unknownTitle: unknownTitle)
+		return .init(
+			knownDapps: knownDapps,
+			unknownDapps: unknownDapps,
+			unknownTitle: unknownTitle,
+			showPossibleDappCalls: showPossibleDappCalls
+		)
 	}
 
 	private func extractDappEntities(_ addresses: [Address]) async -> [(address: Address, entity: InteractionReview.DappEntity?)] {

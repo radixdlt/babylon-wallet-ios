@@ -32,7 +32,8 @@ extension InteractionReview.Sections {
 		let dappAddresses = extractDappAddresses(encounteredAddresses: summary.encounteredEntities)
 		let dAppsUsed = try await extractDapps(
 			addresses: dappAddresses,
-			unknownTitle: L10n.TransactionReview.unknownComponents
+			unknownTitle: L10n.TransactionReview.unknownComponents,
+			showPossibleDappCalls: true
 		)
 
 		let proofs = try await exctractProofs(summary.presentedProofs)
@@ -41,8 +42,7 @@ extension InteractionReview.Sections {
 			withdrawals: withdrawals,
 			dAppsUsed: dAppsUsed,
 			deposits: deposits,
-			proofs: proofs,
-			showPossibleDappCalls: true
+			proofs: proofs
 		)
 	}
 

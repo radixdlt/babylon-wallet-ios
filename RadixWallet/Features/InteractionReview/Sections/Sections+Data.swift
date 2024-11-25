@@ -18,7 +18,5 @@ extension InteractionReview {
 		var accountDepositExceptions: InteractionReview.DepositExceptionsState? = nil
 
 		var proofs: Proofs.State? = nil
-
-		var showPossibleDappCalls = false
 	}
 }

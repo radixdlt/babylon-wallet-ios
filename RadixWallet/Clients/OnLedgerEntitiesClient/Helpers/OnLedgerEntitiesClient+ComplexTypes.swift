@@ -304,12 +304,12 @@ extension OnLedgerEntitiesClient {
 			)) + newTokens
 
 			if let stakeClaimValidator = await isStakeClaimNFT(resource) {
-				result = try [stakeClaim(
+				result = try stakeClaims(
 					resource,
 					stakeClaimValidator: stakeClaimValidator,
 					unstakeData: unstakeData,
 					tokens: tokens
-				)]
+				)
 			} else {
 				result = tokens.map { token in
 					let isHidden = hiddenResources.contains(.nonFungible(token.id.resourceAddress))
@@ -359,6 +359,58 @@ extension OnLedgerEntitiesClient {
 		unstakeData: [NonFungibleGlobalId: UnstakeData],
 		tokens: [OnLedgerEntity.NonFungibleToken]
 	) throws -> KnownResourceBalance {
+		let stakeClaimTokens = try stakeClaimTokens(
+			resource,
+			stakeClaimValidator: stakeClaimValidator,
+			unstakeData: unstakeData,
+			tokens: tokens
+		)
+		return .init(
+			resource: resource,
+			details: .stakeClaimNFT(.init(
+				canClaimTokens: false,
+				stakeClaimTokens: .init(
+					resource: resource,
+					stakeClaims: stakeClaimTokens.asIdentified()
+				),
+				validatorName: stakeClaimValidator.metadata.name
+			))
+		)
+	}
+
+	private func stakeClaims(
+		_ resource: OnLedgerEntity.Resource,
+		stakeClaimValidator: OnLedgerEntity.Validator,
+		unstakeData: [NonFungibleGlobalId: UnstakeData],
+		tokens: [OnLedgerEntity.NonFungibleToken]
+	) throws -> [KnownResourceBalance] {
+		try stakeClaimTokens(
+			resource,
+			stakeClaimValidator: stakeClaimValidator,
+			unstakeData: unstakeData,
+			tokens: tokens
+		)
+		.map {
+			.init(
+				resource: resource,
+				details: .stakeClaimNFT(.init(
+					canClaimTokens: false,
+					stakeClaimTokens: .init(
+						resource: resource,
+						stakeClaims: [$0].asIdentified()
+					),
+					validatorName: stakeClaimValidator.metadata.name
+				))
+			)
+		}
+	}
+
+	private func stakeClaimTokens(
+		_ resource: OnLedgerEntity.Resource,
+		stakeClaimValidator: OnLedgerEntity.Validator,
+		unstakeData: [NonFungibleGlobalId: UnstakeData],
+		tokens: [OnLedgerEntity.NonFungibleToken]
+	) throws -> [OnLedgerEntitiesClient.StakeClaim] {
 		let stakeClaimTokens: [OnLedgerEntitiesClient.StakeClaim] = if unstakeData.isEmpty {
 			try tokens.map { token in
 				guard let data = token.data else {
@@ -391,17 +443,7 @@ extension OnLedgerEntitiesClient {
 			}
 		}
 
-		return .init(
-			resource: resource,
-			details: .stakeClaimNFT(.init(
-				canClaimTokens: false,
-				stakeClaimTokens: .init(
-					resource: resource,
-					stakeClaims: stakeClaimTokens.asIdentified()
-				),
-				validatorName: stakeClaimValidator.metadata.name
-			))
-		)
+		return stakeClaimTokens
 	}
 }
 
