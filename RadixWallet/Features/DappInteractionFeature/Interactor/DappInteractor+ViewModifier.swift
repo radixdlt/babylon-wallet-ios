@@ -79,7 +79,7 @@ private extension View {
 			store: destinationStore.scope(state: \.dappInteractionCompletion, action: \.dappInteractionCompletion),
 			onDismiss: { store.send(.view(.completionDismissed)) }
 		) {
-			Completion.View(store: $0)
+			DappInteractionCompletion.View(store: $0)
 		}
 	}
 

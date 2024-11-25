@@ -264,8 +264,8 @@
 		48CFC3422ADC10D900E77A5C /* AccountPermissionChooseAccounts+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE002ADC10D800E77A5C /* AccountPermissionChooseAccounts+Reducer.swift */; };
 		48CFC3432ADC10D900E77A5C /* AccountPermission+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE022ADC10D800E77A5C /* AccountPermission+View.swift */; };
 		48CFC3442ADC10D900E77A5C /* AccountPermission.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE032ADC10D800E77A5C /* AccountPermission.swift */; };
-		48CFC3452ADC10D900E77A5C /* Completion+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE052ADC10D800E77A5C /* Completion+View.swift */; };
-		48CFC3462ADC10D900E77A5C /* Completion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE062ADC10D800E77A5C /* Completion.swift */; };
+		48CFC3452ADC10D900E77A5C /* DappInteractionCompletion+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE052ADC10D800E77A5C /* DappInteractionCompletion+View.swift */; };
+		48CFC3462ADC10D900E77A5C /* DappInteractionCompletion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE062ADC10D800E77A5C /* DappInteractionCompletion.swift */; };
 		48CFC3472ADC10D900E77A5C /* PersonaDataPermissionBox+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE082ADC10D800E77A5C /* PersonaDataPermissionBox+View.swift */; };
 		48CFC3482ADC10D900E77A5C /* PersonaDataPermission.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE092ADC10D800E77A5C /* PersonaDataPermission.swift */; };
 		48CFC3492ADC10D900E77A5C /* PersonaDataPermissionBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE0A2ADC10D800E77A5C /* PersonaDataPermissionBox.swift */; };
@@ -1546,8 +1546,8 @@
 		48CFBE002ADC10D800E77A5C /* AccountPermissionChooseAccounts+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AccountPermissionChooseAccounts+Reducer.swift"; sourceTree = "<group>"; };
 		48CFBE022ADC10D800E77A5C /* AccountPermission+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AccountPermission+View.swift"; sourceTree = "<group>"; };
 		48CFBE032ADC10D800E77A5C /* AccountPermission.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountPermission.swift; sourceTree = "<group>"; };
-		48CFBE052ADC10D800E77A5C /* Completion+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Completion+View.swift"; sourceTree = "<group>"; };
-		48CFBE062ADC10D800E77A5C /* Completion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Completion.swift; sourceTree = "<group>"; };
+		48CFBE052ADC10D800E77A5C /* DappInteractionCompletion+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DappInteractionCompletion+View.swift"; sourceTree = "<group>"; };
+		48CFBE062ADC10D800E77A5C /* DappInteractionCompletion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DappInteractionCompletion.swift; sourceTree = "<group>"; };
 		48CFBE082ADC10D800E77A5C /* PersonaDataPermissionBox+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PersonaDataPermissionBox+View.swift"; sourceTree = "<group>"; };
 		48CFBE092ADC10D800E77A5C /* PersonaDataPermission.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonaDataPermission.swift; sourceTree = "<group>"; };
 		48CFBE0A2ADC10D800E77A5C /* PersonaDataPermissionBox.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonaDataPermissionBox.swift; sourceTree = "<group>"; };
@@ -3864,7 +3864,7 @@
 				831F0CF02C2576AE00D6F5BF /* DappOriginVerification */,
 				48CFBDFE2ADC10D800E77A5C /* AccountPermissionChooseAccounts */,
 				48CFBE012ADC10D800E77A5C /* AccountPermission */,
-				48CFBE042ADC10D800E77A5C /* Completion */,
+				48CFBE042ADC10D800E77A5C /* DappInteractionCompletion */,
 				48CFBE072ADC10D800E77A5C /* PersonaDataPermission */,
 				48CFBE0C2ADC10D800E77A5C /* OneTimePersonaData */,
 				48CFBE0F2ADC10D800E77A5C /* Login */,
@@ -3891,13 +3891,13 @@
 			path = AccountPermission;
 			sourceTree = "<group>";
 		};
-		48CFBE042ADC10D800E77A5C /* Completion */ = {
+		48CFBE042ADC10D800E77A5C /* DappInteractionCompletion */ = {
 			isa = PBXGroup;
 			children = (
-				48CFBE052ADC10D800E77A5C /* Completion+View.swift */,
-				48CFBE062ADC10D800E77A5C /* Completion.swift */,
+				48CFBE052ADC10D800E77A5C /* DappInteractionCompletion+View.swift */,
+				48CFBE062ADC10D800E77A5C /* DappInteractionCompletion.swift */,
 			);
-			path = Completion;
+			path = DappInteractionCompletion;
 			sourceTree = "<group>";
 		};
 		48CFBE072ADC10D800E77A5C /* PersonaDataPermission */ = {
@@ -7394,7 +7394,7 @@
 				5B27FBE02CC6CCBE002975BE /* Sections+Data.swift in Sources */,
 				83D663B02B271D0100D1AB9E /* TruncationMask.swift in Sources */,
 				E79DD1B62CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift in Sources */,
-				48CFC3462ADC10D900E77A5C /* Completion.swift in Sources */,
+				48CFC3462ADC10D900E77A5C /* DappInteractionCompletion.swift in Sources */,
 				A40816002C7E0D08005E65B9 /* StateAccountLockersTouchedAtResponse.swift in Sources */,
 				48CFC25A2ADC10D900E77A5C /* OnboardingCoordinator+Reducer.swift in Sources */,
 				5BB7C1782BC81F61001216EB /* ImportOlympiaNameLedger+View.swift in Sources */,
@@ -8105,7 +8105,7 @@
 				A40815DC2C7E0D08005E65B9 /* ProgrammaticScryptoSborValueMapEntry.swift in Sources */,
 				A40816112C7E0D08005E65B9 /* StateEntityFungibleResourceVaultsPageResponse.swift in Sources */,
 				48CFC2CA2ADC10D900E77A5C /* NonFungibleResourceAsset+View.swift in Sources */,
-				48CFC3452ADC10D900E77A5C /* Completion+View.swift in Sources */,
+				48CFC3452ADC10D900E77A5C /* DappInteractionCompletion+View.swift in Sources */,
 				5B43B08B2BDAAD4B00AA1E92 /* AddressDetails+View.swift in Sources */,
 				5BE2776B2C9C7FE0005FF976 /* TransactionPreviewOptIns.swift in Sources */,
 				5B43B08C2BDAAD4B00AA1E92 /* AddressDetails.swift in Sources */,

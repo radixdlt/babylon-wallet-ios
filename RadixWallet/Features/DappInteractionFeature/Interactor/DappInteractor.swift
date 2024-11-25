@@ -33,11 +33,10 @@ struct DappInteractor: Sendable, FeatureReducer {
 	enum InternalAction: Sendable, Equatable {
 		case receivedRequestFromDapp(RequestEnvelope)
 		case presentQueuedRequestIfNeeded
-		case sentResponseToDapp(
+		case sentPersonaDataResponseToDapp(
 			WalletToDappInteractionResponse,
 			for: RequestEnvelope,
-			DappMetadata,
-			TransactionIntentHash?
+			DappMetadata
 		)
 		case failedToSendResponseToDapp(
 			WalletToDappInteractionResponse,
@@ -50,7 +49,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			for: RequestEnvelope,
 			DappMetadata, reason: String
 		)
-		case presentResponseSuccessView(DappMetadata, TransactionIntentHash?, P2P.Route)
+		case presentResponseSuccessView(DappMetadata, DappInteractionCompletionKind, P2P.Route)
 		case presentInvalidRequest(
 			DappToWalletInteractionUnvalidated,
 			reason: DappInteractionClient.ValidatedDappRequest.InvalidRequestReason,
@@ -63,7 +62,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
 			case dappInteraction(DappInteractionCoordinator.State)
-			case dappInteractionCompletion(Completion.State)
+			case dappInteractionCompletion(DappInteractionCompletion.State)
+			case new(String)
 			case responseFailure(AlertState<Action.ResponseFailure>)
 			case invalidRequest(AlertState<Action.InvalidRequest>)
 		}
@@ -71,7 +71,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 		@CasePathable
 		enum Action: Sendable, Equatable {
 			case dappInteraction(DappInteractionCoordinator.Action)
-			case dappInteractionCompletion(Completion.Action)
+			case dappInteractionCompletion(DappInteractionCompletion.Action)
+			case new
 			case responseFailure(ResponseFailure)
 			case invalidRequest(InvalidRequest)
 
@@ -90,7 +91,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 				DappInteractionCoordinator()
 			}
 			Scope(state: \.dappInteractionCompletion, action: \.dappInteractionCompletion) {
-				Completion()
+				DappInteractionCompletion()
 			}
 		}
 	}
@@ -156,11 +157,11 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case .presentQueuedRequestIfNeeded:
 			return presentQueuedRequestIfNeededEffect(for: &state)
 
-		case let .sentResponseToDapp(response, for: request, dappMetadata, txID):
+		case let .sentPersonaDataResponseToDapp(response, for: request, dappMetadata):
 			dismissCurrentModalAndRequest(request, for: &state)
 			switch response {
 			case .success:
-				return .send(.internal(.presentResponseSuccessView(dappMetadata, txID, request.route)))
+				return .send(.internal(.presentResponseSuccessView(dappMetadata, .personaData, request.route)))
 			case .failure:
 				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
 			}
@@ -212,17 +213,13 @@ struct DappInteractor: Sendable, FeatureReducer {
 			))
 			return .none
 
-		case let .presentResponseSuccessView(dappMetadata, txID, p2pRoute):
-			state.shouldIncrementOnCompletionDismiss = txID != nil
+		case let .presentResponseSuccessView(dappMetadata, kind, p2pRoute):
+			state.shouldIncrementOnCompletionDismiss = kind.shouldIncrementOnCompletionDismiss
 			if !state.requestQueue.isEmpty {
 				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
 			}
 			state.destination = .dappInteractionCompletion(
-				.init(
-					txID: txID,
-					dappMetadata: dappMetadata,
-					p2pRoute: p2pRoute
-				)
+				.init(kind: kind, dappMetadata: dappMetadata, p2pRoute: p2pRoute)
 			)
 			return .none
 		}
@@ -311,42 +308,35 @@ struct DappInteractor: Sendable, FeatureReducer {
 	) -> Effect<Action> {
 		.run { send in
 
-			// In case of transaction response, sending it to the peer client is a silent operation.
+			// In case of transaction/preAuthorization responses, sending it to the peer client is a silent operation.
 			// The success or failures is determined based on the transaction polling status.
-			let txID: TransactionIntentHash? = {
-				if case let .success(successResponse) = responseToDapp,
-				   case let .transaction(txID) = successResponse.items
-				{
-					return txID.send.transactionIntentHash
-				}
-				return nil
-			}()
-			let isTransactionResponse = txID != nil
-
-			// Same thing applies for PreAuthorization responses.
-			let isPreAuthorizationResponse: Bool = {
-				if case let .success(successResponse) = responseToDapp, case .preAuthorization = successResponse.items {
+			let isPersonaDataResponse = {
+				guard case let .success(successResponse) = responseToDapp else {
 					return true
 				}
-				return false
+				switch successResponse.items {
+				case .authorizedRequest, .unauthorizedRequest:
+					return true
+				case .transaction, .preAuthorization:
+					return false
+				}
 			}()
 
 			do {
 				_ = try await dappInteractionClient.completeInteraction(.response(.dapp(responseToDapp), origin: request.route))
-				if !isTransactionResponse, !isPreAuthorizationResponse {
+				if isPersonaDataResponse {
 					await send(.internal(
-						.sentResponseToDapp(
+						.sentPersonaDataResponseToDapp(
 							responseToDapp,
 							for: request,
-							dappMetadata,
-							txID
+							dappMetadata
 						)
 					))
 				} else {
-					loggerGlobal.notice("Not delegating to `sentResponseToDapp`")
+					loggerGlobal.notice("Not delegating to `sentPersonaDataResponseToDapp`")
 				}
 			} catch {
-				if !isTransactionResponse {
+				if isPersonaDataResponse {
 					await send(.internal(
 						.failedToSendResponseToDapp(
 							responseToDapp,
@@ -356,7 +346,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 						)
 					))
 				} else {
-					loggerGlobal.notice("Failed to send response back to dapp, error: \(error), not delegating `sentResponseToDapp`.")
+					loggerGlobal.notice("Failed to send response back to dapp, error: \(error), not delegating `sentPersonaDataResponseToDapp`.")
 				}
 			}
 		}
@@ -515,6 +505,17 @@ extension DappInteractor {
 			}
 		} catch: { error, _ in
 			errorQueue.schedule(error)
+		}
+	}
+}
+
+private extension DappInteractionCompletionKind {
+	var shouldIncrementOnCompletionDismiss: Bool {
+		switch self {
+		case .transaction, .preAuthorization:
+			true
+		case .personaData:
+			false
 		}
 	}
 }

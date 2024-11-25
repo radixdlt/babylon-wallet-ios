@@ -124,7 +124,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case dismissWithFailure(WalletToDappInteractionFailureResponse)
-		case dismissWithSuccess(DappMetadata, TransactionIntentHash)
+		case dismissWithSuccess(DappMetadata, DappInteractionCompletionKind)
 		case submit(WalletToDappInteractionSuccessResponse, DappMetadata)
 		case dismiss
 	}
@@ -564,7 +564,7 @@ extension DappInteractionFlow {
 			return handleSignAndSubmitTX(item, txID)
 
 		case let .reviewTransaction(.delegate(.transactionCompleted(txID))):
-			return .send(.delegate(.dismissWithSuccess(state.dappMetadata, txID)))
+			return .send(.delegate(.dismissWithSuccess(state.dappMetadata, .transaction(txID))))
 
 		case .reviewTransaction(.delegate(.dismiss)):
 			return .send(.delegate(.dismiss))
@@ -590,13 +590,12 @@ extension DappInteractionFlow {
 			return handlePreAuthorizationSignature(item, encoded)
 
 		case let .preAuthorizationReview(.delegate(.committedSuccessfully(intentHash))):
-			return .send(.delegate(.dismissWithSuccess(state.dappMetadata, intentHash)))
+			return .send(.delegate(.dismissWithSuccess(state.dappMetadata, .preAuthorization(intentHash))))
 
 		case let .preAuthorizationReview(.delegate(.failed(error))):
 			return handlePreAuthorizationFailure(error)
 
 		case .preAuthorizationReview(.delegate(.dismiss)):
-			// This is what we do for TX Review, but doesn't it ignore next requests?
 			return .send(.delegate(.dismiss))
 
 		default:
