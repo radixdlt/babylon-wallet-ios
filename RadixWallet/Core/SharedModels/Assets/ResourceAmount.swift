@@ -50,6 +50,15 @@ extension ResourceAmount {
 		}
 	}
 
+	var predictedAmount: ExactResourceAmount? {
+		switch self {
+		case let .predicted(amount, _):
+			amount
+		default:
+			nil
+		}
+	}
+
 	func adjustedNominalAmount(_ adjust: (Decimal192) -> Decimal192) -> Self {
 		switch self {
 		case let .exact(amount):
