@@ -65,7 +65,7 @@ private extension DappInteractionCompletion.State {
 		case .personaData, .transaction:
 			L10n.DAppRequest.Completion.subtitle(dappMetadata.name)
 		case .preAuthorization:
-			"SOMETHING"
+			L10n.DAppRequest.Completion.subtitlePreAuthorization
 		}
 	}
 

@@ -76,7 +76,7 @@ extension PreAuthorizationReview.PollingStatus {
 		@ViewBuilder
 		private func expiredBottom(showBrowserMessage: Bool) -> some SwiftUI.View {
 			if showBrowserMessage {
-				Text("Switch back to your browser to try again")
+				Text(L10n.PreAuthorizationReview.ExpiredStatus.retryInBrowser)
 					.textStyle(.body1Regular)
 					.foregroundStyle(.app.gray1)
 					.padding(.medium1)
@@ -91,18 +91,18 @@ private extension PreAuthorizationReview.PollingStatus.State {
 	var title: String {
 		switch status {
 		case .unknown:
-			"Pre-Authorization Sent"
+			L10n.PreAuthorizationReview.UnknownStatus.title
 		case .expired:
-			"Pre-Authorization Timed Out"
+			L10n.PreAuthorizationReview.ExpiredStatus.title
 		}
 	}
 
 	var subtitle: String {
 		switch status {
 		case .unknown:
-			"Your pre-authorization has been sent to \(dAppMetadata.name)"
+			L10n.PreAuthorizationReview.UnknownStatus.subtitle(dAppMetadata.name)
 		case .expired:
-			"Your pre-authorization has expired and can no longer be used."
+			L10n.PreAuthorizationReview.ExpiredStatus.subtitle
 		}
 	}
 
@@ -113,9 +113,9 @@ private extension PreAuthorizationReview.PollingStatus.State {
 	var expirationMessage: String {
 		if secondsToExpiration > 0 {
 			let time = PreAuthorizationReview.TimeFormatter.format(seconds: secondsToExpiration)
-			return "\(dAppMetadata.name) has **\(time)** to use this pre-authorization"
+			return L10n.PreAuthorizationReview.UnknownStatus.expiration(dAppMetadata.name, time)
 		} else {
-			return "Checking one last time.."
+			return L10n.PreAuthorizationReview.UnknownStatus.lastCheck
 		}
 	}
 }
