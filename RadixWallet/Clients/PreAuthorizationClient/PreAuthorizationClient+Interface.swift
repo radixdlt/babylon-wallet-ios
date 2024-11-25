@@ -15,6 +15,7 @@ extension PreAuthorizationClient {
 	struct GetPreviewRequest: Hashable, Sendable {
 		let unvalidatedManifest: UnvalidatedSubintentManifest
 		let nonce: Nonce
+		let notaryPublicKey: Curve25519.Signing.PublicKey
 	}
 
 	struct BuildSubintentRequest: Sendable {
