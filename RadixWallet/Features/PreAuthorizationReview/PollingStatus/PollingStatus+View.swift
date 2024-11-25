@@ -4,7 +4,7 @@ extension PreAuthorizationReview.PollingStatus {
 	struct View: SwiftUI.View {
 		let store: StoreOf<PreAuthorizationReview.PollingStatus>
 
-		@ScaledMetric private var height: CGFloat = 430
+		@ScaledMetric private var height: CGFloat = 460
 
 		var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }) { viewStore in
@@ -12,6 +12,7 @@ extension PreAuthorizationReview.PollingStatus {
 					store.send(.view(.closeButtonTapped))
 				} content: {
 					VStack(spacing: .zero) {
+						Spacer()
 						VStack(spacing: .medium1) {
 							topAsset(viewStore.status)
 
@@ -24,16 +25,16 @@ extension PreAuthorizationReview.PollingStatus {
 									.textStyle(.body1Regular)
 									.foregroundStyle(.app.gray1)
 
-								if viewStore.showId {
+								if viewStore.showAddressView {
 									AddressView(.preAuthorization(viewStore.subintentHash))
 										.foregroundColor(.app.blue1)
 										.textStyle(.body1Header)
 								}
 							}
-
-							Spacer()
 						}
 						.padding(.horizontal, .large2)
+
+						Spacer()
 
 						switch viewStore.status {
 						case .unknown:
@@ -64,7 +65,7 @@ extension PreAuthorizationReview.PollingStatus {
 		}
 
 		private func unknownBottom(text: String) -> some SwiftUI.View {
-			Text(markdown: text, emphasizedColor: .app.account4pink, emphasizedFont: .app.body2Link)
+			Text(markdown: text, emphasizedColor: .app.account4pink, emphasizedFont: .app.button)
 				.textStyle(.body1Regular)
 				.foregroundStyle(.app.account4pink)
 				.padding(.medium1)
@@ -105,16 +106,16 @@ private extension PreAuthorizationReview.PollingStatus.State {
 		}
 	}
 
-	var showId: Bool {
+	var showAddressView: Bool {
 		status == .unknown
 	}
 
 	var expirationMessage: String {
-		if secondsToExpiration > 1 {
+		if secondsToExpiration > 0 {
 			let time = PreAuthorizationReview.TimeFormatter.format(seconds: secondsToExpiration)
-			return "\(dAppMetadata.name) has \(time) to use this pre-authorization"
+			return "\(dAppMetadata.name) has **\(time)** to use this pre-authorization"
 		} else {
-			return "Checking last time.."
+			return "Checking one last time.."
 		}
 	}
 }
