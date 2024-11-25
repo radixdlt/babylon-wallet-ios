@@ -229,6 +229,17 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 			return .none
 		}
 	}
+
+	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+		switch state.destination {
+		case .signing:
+			resetToApprovable(&state)
+		case .pollingStatus:
+			delayedShortEffect(for: .delegate(.dismiss))
+		case .rawManifestAlert, .none:
+			.none
+		}
+	}
 }
 
 private extension PreAuthorizationReview {
@@ -276,6 +287,7 @@ private extension PreAuthorizationReview {
 	func resetToApprovable(_ state: inout State) -> Effect<Action> {
 		state.isApprovalInProgress = false
 		state.sliderResetDate = .now
+		state.destination = nil
 		return .none
 	}
 

@@ -4,7 +4,7 @@ extension PreAuthorizationReview.PollingStatus {
 	struct View: SwiftUI.View {
 		let store: StoreOf<PreAuthorizationReview.PollingStatus>
 
-		@ScaledMetric private var height: CGFloat = 460
+		@ScaledMetric private var height: CGFloat = 485
 
 		var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }) { viewStore in
