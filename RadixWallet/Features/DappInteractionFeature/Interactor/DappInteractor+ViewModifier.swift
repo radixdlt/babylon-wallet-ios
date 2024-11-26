@@ -94,7 +94,7 @@ private extension View {
 
 	private func preAuthorizationPolling(with destinationStore: PresentationStoreOf<DappInteractor.Destination>) -> some View {
 		sheet(store: destinationStore.scope(state: \.pollPreAuthorizationStatus, action: \.pollPreAuthorizationStatus)) {
-			PreAuthorizationReview.PollingStatus.View(store: $0)
+			PollPreAuthorizationStatus.View(store: $0)
 		}
 	}
 }

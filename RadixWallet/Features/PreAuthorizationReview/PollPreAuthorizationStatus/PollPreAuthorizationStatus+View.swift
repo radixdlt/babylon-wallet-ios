@@ -1,8 +1,8 @@
-// MARK: - PreAuthorizationReview.PollingStatus.View
-extension PreAuthorizationReview.PollingStatus {
+// MARK: - PollPreAuthorizationStatus.View
+extension PollPreAuthorizationStatus {
 	@MainActor
 	struct View: SwiftUI.View {
-		let store: StoreOf<PreAuthorizationReview.PollingStatus>
+		let store: StoreOf<PollPreAuthorizationStatus>
 
 		@ScaledMetric private var height: CGFloat = 485
 
@@ -87,7 +87,7 @@ extension PreAuthorizationReview.PollingStatus {
 	}
 }
 
-private extension PreAuthorizationReview.PollingStatus.State {
+private extension PollPreAuthorizationStatus.State {
 	var title: String {
 		switch status {
 		case .unknown:

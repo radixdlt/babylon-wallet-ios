@@ -737,8 +737,8 @@
 		5B3C48B92C80D23F00DB160D /* AccountLockersClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3C48B82C80D23F00DB160D /* AccountLockersClient+Test.swift */; };
 		5B3C48C12C85CEAA00DB160D /* AccountBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3C48C02C85CEAA00DB160D /* AccountBannerView.swift */; };
 		5B3C48C32C874C8D00DB160D /* Dispatch+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3C48C22C874C8D00DB160D /* Dispatch+Extra.swift */; };
-		5B3FDC0E2CF0A4D40024BFAF /* PollingStatus+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FDC0D2CF0A4D40024BFAF /* PollingStatus+View.swift */; };
-		5B3FDC0F2CF0A4D40024BFAF /* PollingStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FDC0C2CF0A4D40024BFAF /* PollingStatus.swift */; };
+		5B3FDC0E2CF0A4D40024BFAF /* PollPreAuthorizationStatus+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FDC0D2CF0A4D40024BFAF /* PollPreAuthorizationStatus+View.swift */; };
+		5B3FDC0F2CF0A4D40024BFAF /* PollPreAuthorizationStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FDC0C2CF0A4D40024BFAF /* PollPreAuthorizationStatus.swift */; };
 		5B3FDC112CF0B9DB0024BFAF /* InteractionInProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FDC102CF0B9C60024BFAF /* InteractionInProgressView.swift */; };
 		5B43B08B2BDAAD4B00AA1E92 /* AddressDetails+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B43B0892BDAAD4B00AA1E92 /* AddressDetails+View.swift */; };
 		5B43B08C2BDAAD4B00AA1E92 /* AddressDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B43B08A2BDAAD4B00AA1E92 /* AddressDetails.swift */; };
@@ -1988,8 +1988,8 @@
 		5B3C48B82C80D23F00DB160D /* AccountLockersClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountLockersClient+Test.swift"; sourceTree = "<group>"; };
 		5B3C48C02C85CEAA00DB160D /* AccountBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountBannerView.swift; sourceTree = "<group>"; };
 		5B3C48C22C874C8D00DB160D /* Dispatch+Extra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Dispatch+Extra.swift"; sourceTree = "<group>"; };
-		5B3FDC0C2CF0A4D40024BFAF /* PollingStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollingStatus.swift; sourceTree = "<group>"; };
-		5B3FDC0D2CF0A4D40024BFAF /* PollingStatus+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PollingStatus+View.swift"; sourceTree = "<group>"; };
+		5B3FDC0C2CF0A4D40024BFAF /* PollPreAuthorizationStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollPreAuthorizationStatus.swift; sourceTree = "<group>"; };
+		5B3FDC0D2CF0A4D40024BFAF /* PollPreAuthorizationStatus+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PollPreAuthorizationStatus+View.swift"; sourceTree = "<group>"; };
 		5B3FDC102CF0B9C60024BFAF /* InteractionInProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractionInProgressView.swift; sourceTree = "<group>"; };
 		5B43B0892BDAAD4B00AA1E92 /* AddressDetails+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddressDetails+View.swift"; sourceTree = "<group>"; };
 		5B43B08A2BDAAD4B00AA1E92 /* AddressDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressDetails.swift; sourceTree = "<group>"; };
@@ -5619,13 +5619,13 @@
 			path = AccountLockersClient;
 			sourceTree = "<group>";
 		};
-		5B3FDC0B2CF0A4890024BFAF /* PollingStatus */ = {
+		5B3FDC0B2CF0A4890024BFAF /* PollPreAuthorizationStatus */ = {
 			isa = PBXGroup;
 			children = (
-				5B3FDC0C2CF0A4D40024BFAF /* PollingStatus.swift */,
-				5B3FDC0D2CF0A4D40024BFAF /* PollingStatus+View.swift */,
+				5B3FDC0C2CF0A4D40024BFAF /* PollPreAuthorizationStatus.swift */,
+				5B3FDC0D2CF0A4D40024BFAF /* PollPreAuthorizationStatus+View.swift */,
 			);
-			path = PollingStatus;
+			path = PollPreAuthorizationStatus;
 			sourceTree = "<group>";
 		};
 		5B45E2F32BC45706007C4C84 /* FactorSourceAccess */ = {
@@ -5662,7 +5662,7 @@
 			children = (
 				5B4A1ABD2CC00FB800679EE6 /* PreAuthorizationReview.swift */,
 				5B4A1ABE2CC00FB800679EE6 /* PreAuthorizationReview+View.swift */,
-				5B3FDC0B2CF0A4890024BFAF /* PollingStatus */,
+				5B3FDC0B2CF0A4890024BFAF /* PollPreAuthorizationStatus */,
 				5B8F770E2CDA413000154A76 /* TimeFormatter */,
 			);
 			path = PreAuthorizationReview;
@@ -7336,8 +7336,8 @@
 				48CFC3332ADC10D900E77A5C /* ImportMnemonic+View.swift in Sources */,
 				5B758D532BCD721D00348722 /* SettingsRow.swift in Sources */,
 				48CFC3842ADC10D900E77A5C /* AssetResourceDetails.swift in Sources */,
-				5B3FDC0E2CF0A4D40024BFAF /* PollingStatus+View.swift in Sources */,
-				5B3FDC0F2CF0A4D40024BFAF /* PollingStatus.swift in Sources */,
+				5B3FDC0E2CF0A4D40024BFAF /* PollPreAuthorizationStatus+View.swift in Sources */,
+				5B3FDC0F2CF0A4D40024BFAF /* PollPreAuthorizationStatus.swift in Sources */,
 				48CFC6932ADC10DB00E77A5C /* ImportLegacyWalletErrors.swift in Sources */,
 				48CFC61E2ADC10DA00E77A5C /* LedgerIdentifiable.swift in Sources */,
 				A462B57B2B8210A900C26D20 /* TransactionHistoryClient+Mock.swift in Sources */,

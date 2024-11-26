@@ -66,7 +66,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		enum State: Sendable, Hashable {
 			case dappInteraction(DappInteractionCoordinator.State)
 			case dappInteractionCompletion(DappInteractionCompletion.State)
-			case pollPreAuthorizationStatus(PreAuthorizationReview.PollingStatus.State)
+			case pollPreAuthorizationStatus(PollPreAuthorizationStatus.State)
 			case responseFailure(AlertState<Action.ResponseFailure>)
 			case invalidRequest(AlertState<Action.InvalidRequest>)
 		}
@@ -75,7 +75,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		enum Action: Sendable, Equatable {
 			case dappInteraction(DappInteractionCoordinator.Action)
 			case dappInteractionCompletion(DappInteractionCompletion.Action)
-			case pollPreAuthorizationStatus(PreAuthorizationReview.PollingStatus.Action)
+			case pollPreAuthorizationStatus(PollPreAuthorizationStatus.Action)
 			case responseFailure(ResponseFailure)
 			case invalidRequest(InvalidRequest)
 
@@ -97,7 +97,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 				DappInteractionCompletion()
 			}
 			Scope(state: \.pollPreAuthorizationStatus, action: \.pollPreAuthorizationStatus) {
-				PreAuthorizationReview.PollingStatus()
+				PollPreAuthorizationStatus()
 			}
 		}
 	}
