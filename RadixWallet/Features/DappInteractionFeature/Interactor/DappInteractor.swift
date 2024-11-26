@@ -20,7 +20,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		@PresentationState
 		var destination: Destination.State?
 
-		fileprivate var shouldIncrementOnCompletionDismiss = false
+		fileprivate var shouldIncrementNPSCounterOnCompletionDismiss = false
 	}
 
 	enum ViewAction: Sendable, Equatable {
@@ -131,7 +131,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			}
 
 		case .completionDismissed:
-			if state.shouldIncrementOnCompletionDismiss {
+			if state.shouldIncrementNPSCounterOnCompletionDismiss {
 				npsSurveyClient.incrementTransactionCompleteCounter()
 			}
 			return .none
@@ -214,7 +214,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			return .none
 
 		case let .presentResponseSuccessView(dappMetadata, kind, p2pRoute):
-			state.shouldIncrementOnCompletionDismiss = kind.shouldIncrementOnCompletionDismiss
+			state.shouldIncrementNPSCounterOnCompletionDismiss = kind.shouldIncrementNPSCounterOnCompletionDismiss
 			if !state.requestQueue.isEmpty {
 				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
 			}
@@ -510,7 +510,7 @@ extension DappInteractor {
 }
 
 private extension DappInteractionCompletionKind {
-	var shouldIncrementOnCompletionDismiss: Bool {
+	var shouldIncrementNPSCounterOnCompletionDismiss: Bool {
 		switch self {
 		case .transaction, .preAuthorization:
 			true
