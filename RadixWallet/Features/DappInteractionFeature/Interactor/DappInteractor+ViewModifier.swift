@@ -40,12 +40,13 @@ extension DappInteractor {
 			}
 		}
 
-		@MainActor
 		private var dappInteraction: some SwiftUI.View {
-			IfLetStore(store.scope(state: \.dappInteraction, action: \.child.dappInteraction)) { viewStore in
-				DappInteractionCoordinator.View(store: viewStore)
-					.transition(.move(edge: .bottom))
-				//					.animation(.linear, value: viewStore.state)
+			WithViewStore(store, observe: { $0 }) { viewStore in
+				IfLetStore(store.scope(state: \.dappInteraction, action: \.child.dappInteraction)) { viewStore in
+					DappInteractionCoordinator.View(store: viewStore)
+						.transition(.move(edge: .bottom))
+				}
+				.animation(.linear, value: viewStore.state)
 			}
 		}
 	}
