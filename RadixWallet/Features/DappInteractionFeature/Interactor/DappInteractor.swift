@@ -23,6 +23,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		var requestQueue: IdentifiedArrayOf<RequestEnvelope> = []
 
+		var dappInteraction: DappInteractionCoordinator.State?
+
 		@PresentationState
 		var destination: Destination.State?
 
@@ -34,6 +36,11 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case moveToBackground
 		case moveToForeground
 		case completionDismissed
+	}
+
+	@CasePathable
+	enum ChildAction: Sendable, Equatable {
+		case dappInteraction(DappInteractionCoordinator.Action)
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -64,7 +71,6 @@ struct DappInteractor: Sendable, FeatureReducer {
 	struct Destination: Sendable, DestinationReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
-			case dappInteraction(DappInteractionCoordinator.State)
 			case dappInteractionCompletion(DappInteractionCompletion.State)
 			case pollPreAuthorizationStatus(PollPreAuthorizationStatus.State)
 			case responseFailure(AlertState<Action.ResponseFailure>)
@@ -73,7 +79,6 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
-			case dappInteraction(DappInteractionCoordinator.Action)
 			case dappInteractionCompletion(DappInteractionCompletion.Action)
 			case pollPreAuthorizationStatus(PollPreAuthorizationStatus.Action)
 			case responseFailure(ResponseFailure)
@@ -90,9 +95,6 @@ struct DappInteractor: Sendable, FeatureReducer {
 		}
 
 		var body: some ReducerOf<Self> {
-			Scope(state: \.dappInteraction, action: \.dappInteraction) {
-				DappInteractionCoordinator()
-			}
 			Scope(state: \.dappInteractionCompletion, action: \.dappInteractionCompletion) {
 				DappInteractionCompletion()
 			}
@@ -116,6 +118,9 @@ struct DappInteractor: Sendable, FeatureReducer {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
+			}
+			.ifLet(\.dappInteraction, action: \.child.dappInteraction) {
+				DappInteractionCoordinator()
 			}
 	}
 
@@ -164,15 +169,17 @@ struct DappInteractor: Sendable, FeatureReducer {
 			return presentQueuedRequestIfNeededEffect(for: &state)
 
 		case let .sentResponseToDapp(response, for: request, dappMetadata, preAuthData):
-			dismissCurrentModalAndRequest(request, for: &state)
 			switch response {
 			case .success:
 				if let preAuthData {
+					dismissCurrentModalAndRequest(request, for: &state, clearDappInteraction: false)
 					return pollPreAuthorizationEffect(for: &state, request: request, dappMetadata: dappMetadata, preAuthData: preAuthData)
 				} else {
+					dismissCurrentModalAndRequest(request, for: &state)
 					return .send(.internal(.presentResponseSuccessView(dappMetadata, .personaData, request.route)))
 				}
 			case .failure:
+				dismissCurrentModalAndRequest(request, for: &state)
 				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
 			}
 
@@ -232,10 +239,10 @@ struct DappInteractor: Sendable, FeatureReducer {
 		}
 	}
 
-	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
-		switch presentedAction {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+		switch childAction {
 		case let .dappInteraction(.delegate(delegateAction)):
-			guard case let .dappInteraction(dappInteraction) = state.destination else {
+			guard let dappInteraction = state.dappInteraction else {
 				let message = "We should only get actions from this modal if it is showing"
 				assertionFailure(message)
 				loggerGlobal.error(.init(stringLiteral: message))
@@ -254,6 +261,13 @@ struct DappInteractor: Sendable, FeatureReducer {
 				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
 			}
 
+		default:
+			return .none
+		}
+	}
+
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
 		case .dappInteractionCompletion(.delegate(.dismiss)):
 			return onCompletionScreenDismissed(&state)
 
@@ -281,9 +295,9 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 		case let .pollPreAuthorizationStatus(.delegate(action)):
 			switch action {
-			case .dismiss:
-				state.destination = nil
-				return .none
+			case let .dismiss(request):
+				dismissCurrentModalAndRequest(request, for: &state)
+				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
 
 			case let .committedSuccessfully(intentHash, dappMetadata, request):
 				dismissCurrentModalAndRequest(request, for: &state)
@@ -298,12 +312,12 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
 		switch state.destination {
 		case .dappInteractionCompletion:
-			onCompletionScreenDismissed(&state)
+			return onCompletionScreenDismissed(&state)
 		case .pollPreAuthorizationStatus:
-			// TODO: confirm if this is correct
-			delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
+			state.dappInteraction = nil
+			return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
 		default:
-			.none
+			return .none
 		}
 	}
 
@@ -312,12 +326,13 @@ struct DappInteractor: Sendable, FeatureReducer {
 	) -> Effect<Action> {
 		guard
 			let next = state.requestQueue.first,
+			state.dappInteraction == nil,
 			state.destination == nil
 		else {
 			return .none
 		}
 
-		state.destination = .dappInteraction(.init(request: next))
+		state.dappInteraction = .init(request: next)
 
 		return .none
 	}
@@ -376,8 +391,11 @@ struct DappInteractor: Sendable, FeatureReducer {
 		}
 	}
 
-	func dismissCurrentModalAndRequest(_ request: RequestEnvelope, for state: inout State) {
+	func dismissCurrentModalAndRequest(_ request: RequestEnvelope, for state: inout State, clearDappInteraction: Bool = true) {
 		state.requestQueue.remove(id: request.id)
+		if clearDappInteraction {
+			state.dappInteraction = nil
+		}
 		state.destination = nil
 	}
 

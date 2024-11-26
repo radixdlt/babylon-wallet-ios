@@ -44,7 +44,7 @@ struct PollPreAuthorizationStatus: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case committedSuccessfully(TransactionIntentHash, DappMetadata, RequestEnvelope)
-		case dismiss
+		case dismiss(RequestEnvelope)
 	}
 
 	@Dependency(\.preAuthorizationClient) var preAuthorizationClient
@@ -56,7 +56,7 @@ struct PollPreAuthorizationStatus: Sendable, FeatureReducer {
 			pollStatus(state: &state)
 				.merge(with: startTimer())
 		case .closeButtonTapped:
-			.send(.delegate(.dismiss))
+			.send(.delegate(.dismiss(state.request)))
 		}
 	}
 

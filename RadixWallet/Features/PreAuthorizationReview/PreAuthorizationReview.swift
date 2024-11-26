@@ -271,7 +271,8 @@ private extension PreAuthorizationReview {
 	}
 
 	func handleSignedSubinent(state: inout State, signedSubintent: SignedSubintent) -> Effect<Action> {
-		.send(.delegate(.signedPreAuthorization(signedSubintent, state.expiration)))
+		state.destination = nil
+		return .send(.delegate(.signedPreAuthorization(signedSubintent, state.expiration)))
 	}
 }
 
