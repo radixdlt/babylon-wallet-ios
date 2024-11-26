@@ -125,9 +125,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	enum DelegateAction: Sendable, Equatable {
 		case dismissWithFailure(WalletToDappInteractionFailureResponse)
 		case dismissWithSuccess(DappMetadata, DappInteractionCompletionKind)
-		case submit(WalletToDappInteractionSuccessResponse, DappMetadata)
+		case submit(WalletToDappInteractionSuccessResponse, DappMetadata, PreAuthorizationData? = nil)
 		case dismiss
-		case pollPreAuthorizationStatus(PreAuthorizationReview.PollingStatus.Config)
 	}
 
 	struct Path: Sendable, Reducer {
@@ -519,15 +518,7 @@ extension DappInteractionFlow {
 			let preAuthResponse = newWalletToDappInteractionPreAuthorizationResponseItems(signedSubintent: signedSubintent)
 			state.responseItems[item] = .remote(.preAuthorization(preAuthResponse))
 
-			let config: PreAuthorizationReview.PollingStatus.Config = .init(
-				dAppMetadata: state.dappMetadata,
-				subintentHash: signedSubintent.subintent.hash(),
-				expiration: expiration,
-				isDeepLink: state.p2pRoute.isDeepLink
-			)
-
-			return continueEffect(for: &state)
-				.merge(with: .send(.delegate(.pollPreAuthorizationStatus(config))))
+			return continueEffect(for: &state, preAuthData: .init(subintentHash: signedSubintent.subintent.hash(), expiration: expiration))
 		}
 
 		func handlePreAuthorizationFailure(
@@ -755,7 +746,7 @@ extension DappInteractionFlow {
 		}
 	}
 
-	func continueEffect(for state: inout State) -> Effect<Action> {
+	func continueEffect(for state: inout State, preAuthData: PreAuthorizationData? = nil) -> Effect<Action> {
 		if
 			let nextRequest = state.interactionItems.first(where: { state.responseItems[$0] == nil }),
 			let destination = Path.State(
@@ -777,11 +768,11 @@ extension DappInteractionFlow {
 			}
 			return .none
 		} else {
-			return finishInteractionFlow(state)
+			return finishInteractionFlow(state, preAuthData: preAuthData)
 		}
 	}
 
-	func finishInteractionFlow(_ state: State) -> Effect<Action> {
+	func finishInteractionFlow(_ state: State, preAuthData: PreAuthorizationData?) -> Effect<Action> {
 		guard let response = WalletToDappInteractionSuccessResponse(
 			for: state.remoteInteraction,
 			with: state.responseItems.values.compactMap(/State.AnyInteractionResponseItem.remote)
@@ -805,7 +796,7 @@ extension DappInteractionFlow {
 				}
 			}
 
-			await send(.delegate(.submit(response, state.dappMetadata)))
+			await send(.delegate(.submit(response, state.dappMetadata, preAuthData)))
 		}
 	}
 

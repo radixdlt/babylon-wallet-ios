@@ -4,7 +4,13 @@ import SwiftUI
 
 typealias RequestEnvelope = DappInteractionClient.RequestEnvelope
 
-// MARK: Identifiable
+// MARK: - PreAuthorizationData
+struct PreAuthorizationData: Sendable, Hashable {
+	let subintentHash: SubintentHash
+	let expiration: DappToWalletInteractionSubintentExpiration
+}
+
+// MARK: - RequestEnvelope + Identifiable
 extension RequestEnvelope: Identifiable {
 	typealias ID = WalletInteractionId
 	var id: ID {
@@ -33,21 +39,18 @@ struct DappInteractor: Sendable, FeatureReducer {
 	enum InternalAction: Sendable, Equatable {
 		case receivedRequestFromDapp(RequestEnvelope)
 		case presentQueuedRequestIfNeeded
-		case sentPersonaDataResponseToDapp(
+		case sentResponseToDapp(
 			WalletToDappInteractionResponse,
 			for: RequestEnvelope,
-			DappMetadata
+			DappMetadata,
+			PreAuthorizationData?
 		)
 		case failedToSendResponseToDapp(
 			WalletToDappInteractionResponse,
 			for: RequestEnvelope,
 			DappMetadata,
-			reason: String
-		)
-		case presentResponseFailureAlert(
-			WalletToDappInteractionResponse,
-			for: RequestEnvelope,
-			DappMetadata, reason: String
+			reason: String,
+			preAuthData: PreAuthorizationData?
 		)
 		case presentResponseSuccessView(DappMetadata, DappInteractionCompletionKind, P2P.Route)
 		case presentInvalidRequest(
@@ -78,7 +81,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 			enum ResponseFailure: Sendable, Hashable {
 				case cancelButtonTapped(RequestEnvelope)
-				case retryButtonTapped(WalletToDappInteractionResponse, for: RequestEnvelope, DappMetadata)
+				case retryButtonTapped(WalletToDappInteractionResponse, for: RequestEnvelope, DappMetadata, PreAuthorizationData?)
 			}
 
 			enum InvalidRequest: Sendable, Hashable {
@@ -160,27 +163,28 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case .presentQueuedRequestIfNeeded:
 			return presentQueuedRequestIfNeededEffect(for: &state)
 
-		case let .sentPersonaDataResponseToDapp(response, for: request, dappMetadata):
+		case let .sentResponseToDapp(response, for: request, dappMetadata, preAuthData):
 			dismissCurrentModalAndRequest(request, for: &state)
 			switch response {
 			case .success:
-				return .send(.internal(.presentResponseSuccessView(dappMetadata, .personaData, request.route)))
+				if let preAuthData {
+					return pollPreAuthorizationEffect(for: &state, request: request, dappMetadata: dappMetadata, preAuthData: preAuthData)
+				} else {
+					return .send(.internal(.presentResponseSuccessView(dappMetadata, .personaData, request.route)))
+				}
 			case .failure:
 				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
 			}
 
-		case let .failedToSendResponseToDapp(response, for: request, metadata, reason):
+		case let .failedToSendResponseToDapp(response, for: request, dappMetadata, reason, preAuthData):
 			dismissCurrentModalAndRequest(request, for: &state)
-			return .send(.internal(.presentResponseFailureAlert(response, for: request, metadata, reason: reason)))
-
-		case let .presentResponseFailureAlert(response, for: request, dappMetadata, reason):
 			state.destination = .responseFailure(.init(
 				title: { TextState(L10n.Common.errorAlertTitle) },
 				actions: {
 					ButtonState(role: .cancel, action: .cancelButtonTapped(request)) {
 						TextState(L10n.Common.cancel)
 					}
-					ButtonState(action: .retryButtonTapped(response, for: request, dappMetadata)) {
+					ButtonState(action: .retryButtonTapped(response, for: request, dappMetadata, preAuthData)) {
 						TextState(L10n.Common.retry)
 					}
 				},
@@ -240,17 +244,14 @@ struct DappInteractor: Sendable, FeatureReducer {
 			let request = dappInteraction.request
 
 			switch delegateAction {
-			case let .submit(responseToDapp, dappMetadata):
-				return sendResponseToDappEffect(responseToDapp, for: request, dappMetadata: dappMetadata)
+			case let .submit(responseToDapp, dappMetadata, preAuthData):
+				return sendResponseToDappEffect(responseToDapp, for: request, dappMetadata: dappMetadata, preAuthData: preAuthData)
 			case let .dismiss(dappMetadata, txID):
 				dismissCurrentModalAndRequest(request, for: &state)
 				return delayedShortEffect(for: .internal(.presentResponseSuccessView(dappMetadata, txID, request.route)))
 			case .dismissSilently:
 				dismissCurrentModalAndRequest(request, for: &state)
 				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
-			case let .pollPreAuthorizationStatus(config):
-				state.destination = .pollPreAuthorizationStatus(.init(config: config, request: request))
-				return .none
 			}
 
 		case .dappInteractionCompletion(.delegate(.dismiss)):
@@ -261,8 +262,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 			case let .cancelButtonTapped(request):
 				dismissCurrentModalAndRequest(request, for: &state)
 				return .send(.internal(.presentQueuedRequestIfNeeded))
-			case let .retryButtonTapped(response, request, dappMetadata):
-				return sendResponseToDappEffect(response, for: request, dappMetadata: dappMetadata)
+			case let .retryButtonTapped(response, request, dappMetadata, preAuthData):
+				return sendResponseToDappEffect(response, for: request, dappMetadata: dappMetadata, preAuthData: preAuthData)
 			}
 
 		case let .invalidRequest(action):
@@ -324,49 +325,52 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func sendResponseToDappEffect(
 		_ responseToDapp: WalletToDappInteractionResponse,
 		for request: RequestEnvelope,
-		dappMetadata: DappMetadata
+		dappMetadata: DappMetadata,
+		preAuthData: PreAuthorizationData?
 	) -> Effect<Action> {
 		.run { send in
 
-			// In case of transaction/preAuthorization responses, sending it to the peer client is a silent operation.
+			// In case of transaction response, sending it to the peer client is a silent operation.
 			// The success or failures is determined based on the transaction polling status.
-			let isPersonaDataResponse = {
+			let isTransactionResponse = {
 				guard case let .success(successResponse) = responseToDapp else {
-					return true
+					return false
 				}
 				switch successResponse.items {
-				case .authorizedRequest, .unauthorizedRequest:
-					return true
-				case .transaction, .preAuthorization:
+				case .authorizedRequest, .unauthorizedRequest, .preAuthorization:
 					return false
+				case .transaction:
+					return true
 				}
 			}()
 
 			do {
 				_ = try await dappInteractionClient.completeInteraction(.response(.dapp(responseToDapp), origin: request.route))
-				if isPersonaDataResponse {
+				if !isTransactionResponse {
 					await send(.internal(
-						.sentPersonaDataResponseToDapp(
+						.sentResponseToDapp(
 							responseToDapp,
 							for: request,
-							dappMetadata
+							dappMetadata,
+							preAuthData
 						)
 					))
 				} else {
-					loggerGlobal.notice("Not delegating to `sentPersonaDataResponseToDapp`")
+					loggerGlobal.notice("Not delegating to `sentResponseToDapp`")
 				}
 			} catch {
-				if isPersonaDataResponse {
+				if !isTransactionResponse {
 					await send(.internal(
 						.failedToSendResponseToDapp(
 							responseToDapp,
 							for: request,
 							dappMetadata,
-							reason: error.localizedDescription
+							reason: error.localizedDescription,
+							preAuthData: preAuthData
 						)
 					))
 				} else {
-					loggerGlobal.notice("Failed to send response back to dapp, error: \(error), not delegating `sentPersonaDataResponseToDapp`.")
+					loggerGlobal.notice("Failed to send response back to dapp, error: \(error), not delegating `sentResponseToDapp`.")
 				}
 			}
 		}
@@ -380,6 +384,24 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func onCompletionScreenDismissed(_ state: inout State) -> Effect<Action> {
 		state.destination = nil
 		return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
+	}
+
+	func pollPreAuthorizationEffect(
+		for state: inout State,
+		request: RequestEnvelope,
+		dappMetadata: DappMetadata,
+		preAuthData: PreAuthorizationData
+	) -> Effect<Action> {
+		state.destination = .pollPreAuthorizationStatus(
+			.init(
+				dAppMetadata: dappMetadata,
+				subintentHash: preAuthData.subintentHash,
+				expiration: preAuthData.expiration,
+				isDeepLink: request.route.isDeepLink,
+				request: request
+			)
+		)
+		return .none
 	}
 }
 

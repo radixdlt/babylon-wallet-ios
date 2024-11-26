@@ -10,11 +10,17 @@ extension PreAuthorizationReview {
 			var status = Status.unknown
 			var secondsToExpiration: Int
 
-			init(config: Config, request: RequestEnvelope) {
-				self.dAppMetadata = config.dAppMetadata
-				self.subintentHash = config.subintentHash
-				self.expiration = config.expiration
-				self.isDeepLink = config.isDeepLink
+			init(
+				dAppMetadata: DappMetadata,
+				subintentHash: SubintentHash,
+				expiration: Expiration,
+				isDeepLink: Bool,
+				request: RequestEnvelope
+			) {
+				self.dAppMetadata = dAppMetadata
+				self.subintentHash = subintentHash
+				self.expiration = expiration
+				self.isDeepLink = isDeepLink
 				self.request = request
 				switch expiration {
 				case let .afterDelay(afterDelay):
@@ -94,13 +100,6 @@ extension PreAuthorizationReview {
 }
 
 extension PreAuthorizationReview.PollingStatus {
-	struct Config: Sendable, Equatable {
-		let dAppMetadata: DappMetadata
-		let subintentHash: SubintentHash
-		let expiration: DappToWalletInteractionSubintentExpiration
-		let isDeepLink: Bool
-	}
-
 	enum Status: Sendable, Hashable {
 		/// The Pre-Authorization hasn't been submitted within a Transaction yet. We are still polling until we get a final status (success or expired).
 		case unknown
