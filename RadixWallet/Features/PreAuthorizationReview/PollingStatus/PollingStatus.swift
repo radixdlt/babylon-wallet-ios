@@ -56,14 +56,14 @@ extension PreAuthorizationReview {
 		func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 			switch internalAction {
 			case let .setStatus(status):
-				var effects: [Effect<Action>] = [.cancel(id: CancellableId.expirationTimer)]
 				switch status {
 				case .expired:
 					state.status = .expired
+					return .cancel(id: CancellableId.expirationTimer)
 				case let .success(intentHash):
-					effects.append(.send(.delegate(.committedSuccessfully(intentHash, state.dAppMetadata, state.request))))
+					return .cancel(id: CancellableId.expirationTimer)
+						.merge(with: .send(.delegate(.committedSuccessfully(intentHash, state.dAppMetadata, state.request))))
 				}
-				return .merge(effects)
 
 			case .updateSecondsToExpiration:
 				state.secondsToExpiration -= 1
