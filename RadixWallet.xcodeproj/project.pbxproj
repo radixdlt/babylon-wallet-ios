@@ -1260,6 +1260,7 @@
 		E713204C2BCD372600AE6B3C /* UnknownCaseDecodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = E713204B2BCD372600AE6B3C /* UnknownCaseDecodable.swift */; };
 		E75C5F342C1C1632002E3DFF /* Stage1MigrateToSargon+SignedAuthChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E75C5F332C1C1632002E3DFF /* Stage1MigrateToSargon+SignedAuthChallenge.swift */; };
 		E76645A42C23138300065D9A /* Throwable.swift in Sources */ = {isa = PBXBuildFile; fileRef = E76645A32C23138300065D9A /* Throwable.swift */; };
+		E775A1B82CF4CA5500E72DB9 /* FactorSourceCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = E775A1B72CF4CA5500E72DB9 /* FactorSourceCard.swift */; };
 		E79DD1B12CE365CF00B1EB86 /* ChooseReceivingAccountOnDelete+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1B02CE365CF00B1EB86 /* ChooseReceivingAccountOnDelete+Reducer.swift */; };
 		E79DD1B32CE365D600B1EB86 /* ChooseReceivingAccountOnDelete+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1B22CE365D600B1EB86 /* ChooseReceivingAccountOnDelete+View.swift */; };
 		E79DD1B62CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1B52CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift */; };
@@ -2513,6 +2514,7 @@
 		E713204B2BCD372600AE6B3C /* UnknownCaseDecodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnknownCaseDecodable.swift; sourceTree = "<group>"; };
 		E75C5F332C1C1632002E3DFF /* Stage1MigrateToSargon+SignedAuthChallenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+SignedAuthChallenge.swift"; sourceTree = "<group>"; };
 		E76645A32C23138300065D9A /* Throwable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Throwable.swift; sourceTree = "<group>"; };
+		E775A1B72CF4CA5500E72DB9 /* FactorSourceCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FactorSourceCard.swift; sourceTree = "<group>"; };
 		E79DD1B02CE365CF00B1EB86 /* ChooseReceivingAccountOnDelete+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChooseReceivingAccountOnDelete+Reducer.swift"; sourceTree = "<group>"; };
 		E79DD1B22CE365D600B1EB86 /* ChooseReceivingAccountOnDelete+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChooseReceivingAccountOnDelete+View.swift"; sourceTree = "<group>"; };
 		E79DD1B52CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeleteAccountConfirmation+Reducer.swift"; sourceTree = "<group>"; };
@@ -5063,6 +5065,7 @@
 			isa = PBXGroup;
 			children = (
 				5B6E11462C45834C00C20F2D /* AccountCard */,
+				E775A1B62CF4CA0700E72DB9 /* FactorSourceCard */,
 				48CFC1332ADC10D900E77A5C /* LedgerRowView.swift */,
 				A4F30C932C7CA71400F983D6 /* WithNavigationBar.swift */,
 				48CFC22C2ADC10D900E77A5C /* Radix+Dashboard.swift */,
@@ -6942,6 +6945,14 @@
 			path = EditPersonaAddEntryKinds;
 			sourceTree = "<group>";
 		};
+		E775A1B62CF4CA0700E72DB9 /* FactorSourceCard */ = {
+			isa = PBXGroup;
+			children = (
+				E775A1B72CF4CA5500E72DB9 /* FactorSourceCard.swift */,
+			);
+			path = FactorSourceCard;
+			sourceTree = "<group>";
+		};
 		E79DD1B42CE492E800B1EB86 /* DeleteAccount */ = {
 			isa = PBXGroup;
 			children = (
@@ -7509,6 +7520,7 @@
 				5B4A1ABB2CBFEBB000679EE6 /* ProofOfOwnership.swift in Sources */,
 				48CFC3252ADC10D900E77A5C /* LocalNetworkPermission+View.swift in Sources */,
 				A40815B32C7E0D08005E65B9 /* NativeResourceMultiResourcePoolUnitValue.swift in Sources */,
+				E775A1B82CF4CA5500E72DB9 /* FactorSourceCard.swift in Sources */,
 				48CFC5D82ADC10DA00E77A5C /* TextStyleModifier.swift in Sources */,
 				A40816052C7E0D08005E65B9 /* StateEntityDetailsRequest.swift in Sources */,
 				48CFC6942ADC10DB00E77A5C /* MigratedSoftwareAccounts.swift in Sources */,
