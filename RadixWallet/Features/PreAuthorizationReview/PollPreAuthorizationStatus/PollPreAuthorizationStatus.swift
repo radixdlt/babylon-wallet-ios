@@ -43,7 +43,6 @@ struct PollPreAuthorizationStatus: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case committedSuccessfully(TransactionIntentHash, DappMetadata, RequestEnvelope)
 		case dismiss(RequestEnvelope)
 	}
 
@@ -66,11 +65,10 @@ struct PollPreAuthorizationStatus: Sendable, FeatureReducer {
 			switch status {
 			case .expired:
 				state.status = .expired
-				return .cancel(id: CancellableId.expirationTimer)
 			case let .success(intentHash):
-				return .cancel(id: CancellableId.expirationTimer)
-					.merge(with: .send(.delegate(.committedSuccessfully(intentHash, state.dAppMetadata, state.request))))
+				state.status = .success(intentHash)
 			}
+			return .cancel(id: CancellableId.expirationTimer)
 
 		case .updateSecondsToExpiration:
 			state.secondsToExpiration -= 1
@@ -106,6 +104,9 @@ extension PollPreAuthorizationStatus {
 
 		/// The Pre-Authorization wasn't committed successfully within a Transaction and it has now expired.
 		case expired
+
+		/// The Pre-Authorization was successfully commited within a Transaction.
+		case success(TransactionIntentHash)
 	}
 
 	private enum CancellableId: Hashable {

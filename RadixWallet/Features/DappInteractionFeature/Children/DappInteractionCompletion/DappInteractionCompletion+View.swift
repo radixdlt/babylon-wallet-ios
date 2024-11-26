@@ -24,7 +24,7 @@ extension DappInteractionCompletion {
 							.textStyle(.sheetTitle)
 							.padding([.top, .horizontal], .medium3)
 
-						Text(viewStore.subtitle)
+						Text(L10n.DAppRequest.Completion.subtitle(viewStore.dappMetadata.name))
 							.foregroundColor(.app.gray1)
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)
@@ -60,20 +60,11 @@ extension DappInteractionCompletion {
 }
 
 private extension DappInteractionCompletion.State {
-	var subtitle: String {
-		switch kind {
-		case .personaData, .transaction:
-			L10n.DAppRequest.Completion.subtitle(dappMetadata.name)
-		case .preAuthorization:
-			L10n.DAppRequest.Completion.subtitlePreAuthorization
-		}
-	}
-
 	var intentHash: TransactionIntentHash? {
 		switch kind {
 		case .personaData:
 			nil
-		case let .transaction(intentHash), let .preAuthorization(intentHash):
+		case let .transaction(intentHash):
 			intentHash
 		}
 	}

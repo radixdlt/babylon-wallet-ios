@@ -35,8 +35,5 @@ extension DappInteractionCompletion.State {
 
 		/// Completion view shown after a transaction dApp interaction.
 		case transaction(TransactionIntentHash)
-
-		/// Completion view shown after a preAuthorization dApp interaction.
-		case preAuthorization(TransactionIntentHash)
 	}
 }

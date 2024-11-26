@@ -25,8 +25,8 @@ extension PollPreAuthorizationStatus {
 									.textStyle(.body1Regular)
 									.foregroundStyle(.app.gray1)
 
-								if viewStore.showAddressView {
-									AddressView(.preAuthorization(viewStore.subintentHash))
+								if let ledgerIdentifiable = viewStore.ledgerIdentifiable {
+									AddressView(ledgerIdentifiable)
 										.foregroundColor(.app.blue1)
 										.textStyle(.body1Header)
 								}
@@ -41,6 +41,8 @@ extension PollPreAuthorizationStatus {
 							unknownBottom(text: viewStore.expirationMessage)
 						case .expired:
 							expiredBottom(showBrowserMessage: viewStore.isDeepLink)
+						case .success:
+							successBottom(showBrowserMessage: viewStore.isDeepLink)
 						}
 					}
 					.multilineTextAlignment(.center)
@@ -51,6 +53,7 @@ extension PollPreAuthorizationStatus {
 				.presentationDragIndicator(.visible)
 				.presentationDetents([.height(height), .large])
 				.presentationBackground(.blur)
+				.animation(.default, value: viewStore.status)
 			}
 		}
 
@@ -61,6 +64,8 @@ extension PollPreAuthorizationStatus {
 				InteractionReview.InteractionInProgressView()
 			case .expired:
 				Image(.errorLarge)
+			case .success:
+				Image(.successCheckmark)
 			}
 		}
 
@@ -84,6 +89,18 @@ extension PollPreAuthorizationStatus {
 					.background(.app.gray5)
 			}
 		}
+
+		@ViewBuilder
+		private func successBottom(showBrowserMessage: Bool) -> some SwiftUI.View {
+			if showBrowserMessage {
+				Text(L10n.MobileConnect.interactionSuccess)
+					.textStyle(.body1Regular)
+					.foregroundStyle(.app.gray1)
+					.padding(.medium1)
+					.frame(maxWidth: .infinity)
+					.background(.app.gray5)
+			}
+		}
 	}
 }
 
@@ -94,6 +111,8 @@ private extension PollPreAuthorizationStatus.State {
 			L10n.PreAuthorizationReview.UnknownStatus.title
 		case .expired:
 			L10n.PreAuthorizationReview.ExpiredStatus.title
+		case .success:
+			L10n.DAppRequest.Completion.title
 		}
 	}
 
@@ -103,11 +122,20 @@ private extension PollPreAuthorizationStatus.State {
 			L10n.PreAuthorizationReview.UnknownStatus.subtitle(dAppMetadata.name)
 		case .expired:
 			L10n.PreAuthorizationReview.ExpiredStatus.subtitle
+		case .success:
+			L10n.DAppRequest.Completion.subtitlePreAuthorization
 		}
 	}
 
-	var showAddressView: Bool {
-		status == .unknown
+	var ledgerIdentifiable: LedgerIdentifiable? {
+		switch status {
+		case .unknown:
+			.preAuthorization(subintentHash)
+		case .expired:
+			nil
+		case let .success(intentHash):
+			.transaction(intentHash)
+		}
 	}
 
 	var expirationMessage: String {

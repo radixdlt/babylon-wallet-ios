@@ -293,16 +293,9 @@ struct DappInteractor: Sendable, FeatureReducer {
 				}
 			}
 
-		case let .pollPreAuthorizationStatus(.delegate(action)):
-			switch action {
-			case let .dismiss(request):
-				dismissCurrentModalAndRequest(request, for: &state)
-				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
-
-			case let .committedSuccessfully(intentHash, dappMetadata, request):
-				dismissCurrentModalAndRequest(request, for: &state)
-				return delayedShortEffect(for: .internal(.presentResponseSuccessView(dappMetadata, .preAuthorization(intentHash), request.route)))
-			}
+		case let .pollPreAuthorizationStatus(.delegate(.dismiss(request))):
+			dismissCurrentModalAndRequest(request, for: &state)
+			return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
 
 		default:
 			return .none
@@ -572,7 +565,7 @@ extension DappInteractor {
 private extension DappInteractionCompletionKind {
 	var shouldIncrementNPSCounterOnCompletionDismiss: Bool {
 		switch self {
-		case .transaction, .preAuthorization:
+		case .transaction:
 			true
 		case .personaData:
 			false
