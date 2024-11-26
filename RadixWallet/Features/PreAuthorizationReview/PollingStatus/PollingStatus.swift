@@ -6,19 +6,16 @@ extension PreAuthorizationReview {
 			let subintentHash: SubintentHash
 			let expiration: Expiration
 			let isDeepLink: Bool
+			let request: RequestEnvelope
 			var status = Status.unknown
 			var secondsToExpiration: Int
 
-			init(
-				dAppMetadata: DappMetadata,
-				subintentHash: SubintentHash,
-				expiration: Expiration,
-				isDeepLink: Bool
-			) {
-				self.dAppMetadata = dAppMetadata
-				self.subintentHash = subintentHash
-				self.expiration = expiration
-				self.isDeepLink = isDeepLink
+			init(config: Config, request: RequestEnvelope) {
+				self.dAppMetadata = config.dAppMetadata
+				self.subintentHash = config.subintentHash
+				self.expiration = config.expiration
+				self.isDeepLink = config.isDeepLink
+				self.request = request
 				switch expiration {
 				case let .afterDelay(afterDelay):
 					secondsToExpiration = Int(afterDelay.expireAfterSeconds)
@@ -39,7 +36,7 @@ extension PreAuthorizationReview {
 		}
 
 		enum DelegateAction: Sendable, Equatable {
-			case committedSuccessfully(TransactionIntentHash)
+			case committedSuccessfully(TransactionIntentHash, DappMetadata, RequestEnvelope)
 			case dismiss
 		}
 
@@ -64,7 +61,7 @@ extension PreAuthorizationReview {
 				case .expired:
 					state.status = .expired
 				case let .success(intentHash):
-					effects.append(.send(.delegate(.committedSuccessfully(intentHash))))
+					effects.append(.send(.delegate(.committedSuccessfully(intentHash, state.dAppMetadata, state.request))))
 				}
 				return .merge(effects)
 
@@ -97,7 +94,14 @@ extension PreAuthorizationReview {
 }
 
 extension PreAuthorizationReview.PollingStatus {
-	enum Status {
+	struct Config: Sendable, Equatable {
+		let dAppMetadata: DappMetadata
+		let subintentHash: SubintentHash
+		let expiration: DappToWalletInteractionSubintentExpiration
+		let isDeepLink: Bool
+	}
+
+	enum Status: Sendable, Hashable {
 		/// The Pre-Authorization hasn't been submitted within a Transaction yet. We are still polling until we get a final status (success or expired).
 		case unknown
 

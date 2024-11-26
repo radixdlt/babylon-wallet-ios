@@ -127,6 +127,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		case dismissWithSuccess(DappMetadata, DappInteractionCompletionKind)
 		case submit(WalletToDappInteractionSuccessResponse, DappMetadata)
 		case dismiss
+		case pollPreAuthorizationStatus(PreAuthorizationReview.PollingStatus.Config)
 	}
 
 	struct Path: Sendable, Reducer {
@@ -512,11 +513,21 @@ extension DappInteractionFlow {
 
 		func handlePreAuthorizationSignature(
 			_ item: State.AnyInteractionItem,
-			_ signedSubintent: SignedSubintent
+			_ signedSubintent: SignedSubintent,
+			_ expiration: DappToWalletInteractionSubintentExpiration
 		) -> Effect<Action> {
 			let preAuthResponse = newWalletToDappInteractionPreAuthorizationResponseItems(signedSubintent: signedSubintent)
 			state.responseItems[item] = .remote(.preAuthorization(preAuthResponse))
+
+			let config: PreAuthorizationReview.PollingStatus.Config = .init(
+				dAppMetadata: state.dappMetadata,
+				subintentHash: signedSubintent.subintent.hash(),
+				expiration: expiration,
+				isDeepLink: state.p2pRoute.isDeepLink
+			)
+
 			return continueEffect(for: &state)
+				.merge(with: .send(.delegate(.pollPreAuthorizationStatus(config))))
 		}
 
 		func handlePreAuthorizationFailure(
@@ -586,17 +597,11 @@ extension DappInteractionFlow {
 		     .accountsProofOfOwnership(.delegate(.failedToSign)):
 			return dismissEffect(for: state, errorKind: .failedToSignAuthChallenge, message: nil)
 
-		case let .preAuthorizationReview(.delegate(.signedPreAuthorization(encoded))):
-			return handlePreAuthorizationSignature(item, encoded)
-
-		case let .preAuthorizationReview(.delegate(.committedSuccessfully(intentHash))):
-			return .send(.delegate(.dismissWithSuccess(state.dappMetadata, .preAuthorization(intentHash))))
+		case let .preAuthorizationReview(.delegate(.signedPreAuthorization(encoded, expiration))):
+			return handlePreAuthorizationSignature(item, encoded, expiration)
 
 		case let .preAuthorizationReview(.delegate(.failed(error))):
 			return handlePreAuthorizationFailure(error)
-
-		case .preAuthorizationReview(.delegate(.dismiss)):
-			return .send(.delegate(.dismiss))
 
 		default:
 			return .none
@@ -1060,8 +1065,7 @@ extension DappInteractionFlow.Path.State {
 				expiration: item.expiration,
 				nonce: .secureRandom(),
 				dAppMetadata: dappMetadata,
-				message: item.message,
-				isDeepLink: p2pRoute.isDeepLink
+				message: item.message
 			))
 		}
 	}

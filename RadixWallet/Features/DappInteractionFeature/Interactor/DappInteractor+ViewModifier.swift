@@ -72,6 +72,7 @@ private extension View {
 		return dappInteractionCompletion(with: destinationStore, store: store)
 			.invalidRequestAlert(with: destinationStore)
 			.responseFailureAlert(with: destinationStore)
+			.preAuthorizationPolling(with: destinationStore)
 	}
 
 	private func dappInteractionCompletion(with destinationStore: PresentationStoreOf<DappInteractor.Destination>, store: StoreOf<DappInteractor>) -> some View {
@@ -89,6 +90,12 @@ private extension View {
 
 	private func responseFailureAlert(with destinationStore: PresentationStoreOf<DappInteractor.Destination>) -> some View {
 		alert(store: destinationStore.scope(state: \.responseFailure, action: \.responseFailure))
+	}
+
+	private func preAuthorizationPolling(with destinationStore: PresentationStoreOf<DappInteractor.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.pollPreAuthorizationStatus, action: \.pollPreAuthorizationStatus)) {
+			PreAuthorizationReview.PollingStatus.View(store: $0)
+		}
 	}
 }
 

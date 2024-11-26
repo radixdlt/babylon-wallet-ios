@@ -63,7 +63,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		enum State: Sendable, Hashable {
 			case dappInteraction(DappInteractionCoordinator.State)
 			case dappInteractionCompletion(DappInteractionCompletion.State)
-			case new(String)
+			case pollPreAuthorizationStatus(PreAuthorizationReview.PollingStatus.State)
 			case responseFailure(AlertState<Action.ResponseFailure>)
 			case invalidRequest(AlertState<Action.InvalidRequest>)
 		}
@@ -72,7 +72,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		enum Action: Sendable, Equatable {
 			case dappInteraction(DappInteractionCoordinator.Action)
 			case dappInteractionCompletion(DappInteractionCompletion.Action)
-			case new
+			case pollPreAuthorizationStatus(PreAuthorizationReview.PollingStatus.Action)
 			case responseFailure(ResponseFailure)
 			case invalidRequest(InvalidRequest)
 
@@ -92,6 +92,9 @@ struct DappInteractor: Sendable, FeatureReducer {
 			}
 			Scope(state: \.dappInteractionCompletion, action: \.dappInteractionCompletion) {
 				DappInteractionCompletion()
+			}
+			Scope(state: \.pollPreAuthorizationStatus, action: \.pollPreAuthorizationStatus) {
+				PreAuthorizationReview.PollingStatus()
 			}
 		}
 	}
@@ -245,6 +248,9 @@ struct DappInteractor: Sendable, FeatureReducer {
 			case .dismissSilently:
 				dismissCurrentModalAndRequest(request, for: &state)
 				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
+			case let .pollPreAuthorizationStatus(config):
+				state.destination = .pollPreAuthorizationStatus(.init(config: config, request: request))
+				return .none
 			}
 
 		case .dappInteractionCompletion(.delegate(.dismiss)):
@@ -272,6 +278,17 @@ struct DappInteractor: Sendable, FeatureReducer {
 				}
 			}
 
+		case let .pollPreAuthorizationStatus(.delegate(action)):
+			switch action {
+			case .dismiss:
+				state.destination = nil
+				return .none
+
+			case let .committedSuccessfully(intentHash, dappMetadata, request):
+				dismissCurrentModalAndRequest(request, for: &state)
+				return delayedShortEffect(for: .internal(.presentResponseSuccessView(dappMetadata, .preAuthorization(intentHash), request.route)))
+			}
+
 		default:
 			return .none
 		}
@@ -281,6 +298,9 @@ struct DappInteractor: Sendable, FeatureReducer {
 		switch state.destination {
 		case .dappInteractionCompletion:
 			onCompletionScreenDismissed(&state)
+		case .pollPreAuthorizationStatus:
+			// TODO: confirm if this is correct
+			delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
 		default:
 			.none
 		}

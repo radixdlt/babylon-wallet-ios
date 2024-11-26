@@ -10,7 +10,6 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey = .init()
 		let dAppMetadata: DappMetadata
 		let message: String?
-		let isDeepLink: Bool
 
 		var preview: PreAuthorizationPreview?
 
@@ -45,33 +44,26 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case signedPreAuthorization(SignedSubintent)
-		case committedSuccessfully(TransactionIntentHash)
+		case signedPreAuthorization(SignedSubintent, DappToWalletInteractionSubintentExpiration)
 		case failed(PreAuthorizationFailure)
-		case dismiss
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
 			case signing(Signing.State)
-			case pollingStatus(PreAuthorizationReview.PollingStatus.State)
 			case rawManifestAlert(AlertState<Never>)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
 			case signing(Signing.Action)
-			case pollingStatus(PreAuthorizationReview.PollingStatus.Action)
 			case rawManifestAlert(Never)
 		}
 
 		var body: some ReducerOf<Self> {
 			Scope(state: \.signing, action: \.signing) {
 				Signing()
-			}
-			Scope(state: \.pollingStatus, action: \.pollingStatus) {
-				PreAuthorizationReview.PollingStatus()
 			}
 		}
 	}
@@ -214,17 +206,6 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 				return .none
 			}
 
-		case let .pollingStatus(.delegate(action)):
-			switch action {
-			case .dismiss:
-				state.destination = nil
-				return delayedShortEffect(for: .delegate(.dismiss))
-
-			case let .committedSuccessfully(intentHash):
-				state.destination = nil
-				return delayedShortEffect(for: .delegate(.committedSuccessfully(intentHash)))
-			}
-
 		default:
 			return .none
 		}
@@ -234,8 +215,6 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		switch state.destination {
 		case .signing:
 			resetToApprovable(&state)
-		case .pollingStatus:
-			delayedShortEffect(for: .delegate(.dismiss))
 		case .rawManifestAlert, .none:
 			.none
 		}
@@ -292,15 +271,7 @@ private extension PreAuthorizationReview {
 	}
 
 	func handleSignedSubinent(state: inout State, signedSubintent: SignedSubintent) -> Effect<Action> {
-		state.destination = .pollingStatus(
-			.init(
-				dAppMetadata: state.dAppMetadata,
-				subintentHash: signedSubintent.subintent.hash(),
-				expiration: state.expiration,
-				isDeepLink: state.isDeepLink
-			)
-		)
-		return .send(.delegate(.signedPreAuthorization(signedSubintent)))
+		.send(.delegate(.signedPreAuthorization(signedSubintent, state.expiration)))
 	}
 }
 
