@@ -20,11 +20,12 @@ struct WarningErrorView: View {
 	enum ViewType {
 		case warning
 		case error
+		case success
 	}
 
 	var body: some View {
 		HStack(spacing: spacing) {
-			Image(.error)
+			Image(icon)
 			Text(text)
 				.lineSpacing(-.small3)
 				.textStyle(textStyle)
@@ -33,12 +34,23 @@ struct WarningErrorView: View {
 		.foregroundColor(color)
 	}
 
+	var icon: ImageResource {
+		switch type {
+		case .warning, .error:
+			.error
+		case .success:
+			.checkCircleOutline
+		}
+	}
+
 	var color: Color {
 		switch type {
 		case .warning:
 			.app.alert
 		case .error:
 			.app.red1
+		case .success:
+			.app.green1
 		}
 	}
 }

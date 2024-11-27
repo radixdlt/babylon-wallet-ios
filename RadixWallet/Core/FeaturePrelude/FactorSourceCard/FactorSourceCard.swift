@@ -3,8 +3,10 @@ import SwiftUI
 
 // MARK: - FactorSourceCard
 struct FactorSourceCard: View {
+	private let kind: Kind
 	private let mode: Mode
 	private let dataSource: FactorSourceCardDataSource
+	private var isExpanded: Bool
 
 	var onRemoveTapped: (() -> Void)? = nil
 
@@ -33,11 +35,32 @@ struct FactorSourceCard: View {
 				.padding(.horizontal, .medium3)
 				.padding(.vertical, .medium2)
 
-			if dataSource.hasAccountsOrPersonas {}
+			if !dataSource.messages.isEmpty {
+				VStack(alignment: .leading, spacing: .small2) {
+					ForEach(dataSource.messages) { message in
+						WarningErrorView(
+							text: message.text,
+							type: message.type,
+							useNarrowSpacing: true,
+							useSmallerFontSize: true
+						)
+					}
+				}
+				.padding(.horizontal, .large3)
+				.padding(.bottom, .medium1)
+			}
+
+			if dataSource.hasAccountsOrPersonas {
+				LinkedEntitesView(
+					isExpanded: isExpanded,
+					accounts: dataSource.accounts,
+					personas: dataSource.personas
+				)
+			}
 		}
 		.background(.app.white)
 		.roundedCorners(radius: .small1)
-		.cardShadow
+		.tokenRowShadow()
 	}
 
 	private var topCard: some View {
@@ -65,7 +88,7 @@ struct FactorSourceCard: View {
 					.foregroundStyle(.app.gray2)
 				}
 			}
-            .flushedLeft
+			.flushedLeft
 
 			if case let .selection(type, isSelected) = mode {
 				switch type {
@@ -80,9 +103,147 @@ struct FactorSourceCard: View {
 			}
 		}
 	}
+
+	struct LinkedEntitesView: SwiftUI.View {
+		@SwiftUI.State var isExpanded: Bool = false
+		let accounts: [Account]
+		let personas: [Persona]
+
+		var body: some SwiftUI.View {
+			VStack(alignment: .leading, spacing: .medium2) {
+				Button {
+					withAnimation(.default) {
+						isExpanded.toggle()
+					}
+				} label: {
+					HStack(spacing: .zero) {
+						Text("Linked to \(accounts.count) Accounts and \(personas.count) Personas")
+							.textStyle(.body2Regular)
+							.foregroundStyle(.app.gray2)
+
+						Spacer(minLength: 0)
+
+						Image(isExpanded ? .chevronUp : .chevronDown)
+							.renderingMode(.original)
+					}
+				}
+
+				if isExpanded {
+					VStack(spacing: .small2) {
+						ForEach(accounts) { account in
+							AccountCard(kind: .compact, account: account)
+						}
+
+						ForEach(personas) { persona in
+							Card {
+								PlainListRow(
+									context: .compactPersona,
+									title: persona.displayName.value,
+									accessory: nil
+								) {
+									Thumbnail(.persona, url: nil)
+								}
+							}
+						}
+					}
+				}
+			}
+			.padding(.horizontal, .medium3)
+			.padding(.vertical, .small1)
+			.background(.app.gray5)
+		}
+	}
 }
 
 extension FactorSourceCard {
+	init?(
+		kind: Kind,
+		mode: Mode,
+		messages: [FactorSourceCardDataSource.Message] = [],
+		isExpanded: Bool = false
+	) {
+		guard
+			let icon = kind.factorSourceKind.icon,
+			let title = kind.title
+		else { return nil }
+
+		switch kind {
+		case let .genericDescription(factorSourceKind):
+			guard let details = factorSourceKind.details else { return nil }
+
+			self = .init(
+				kind: kind,
+				mode: mode,
+				dataSource: .init(
+					icon: icon,
+					title: title,
+					subtitle: details,
+					messages: messages
+				),
+				isExpanded: isExpanded
+			)
+		case let .instanceCompact(factorSource):
+			guard let name = factorSource.name else { return nil }
+
+			self = .init(
+				kind: kind,
+				mode: mode,
+				dataSource: .init(
+					icon: icon,
+					title: name,
+					messages: messages
+				),
+				isExpanded: isExpanded
+			)
+		case let .instanceRegular(factorSource):
+			guard
+				let name = factorSource.name,
+				let details = factorSource.factorSourceKind.details
+			else { return nil }
+
+			self = .init(
+				kind: kind,
+				mode: mode,
+				dataSource: .init(
+					icon: icon,
+					title: name,
+					subtitle: details,
+					messages: messages
+				),
+				isExpanded: isExpanded
+			)
+		case let .instanceLastUsed(factorSource, accounts, personas):
+			guard let name = factorSource.name else { return nil }
+
+			self = .init(
+				kind: kind,
+				mode: mode,
+				dataSource: .init(
+					icon: icon,
+					title: name,
+					lastUsedOn: factorSource.common.lastUsedOn,
+					messages: messages,
+					accounts: accounts,
+					personas: personas
+				),
+				isExpanded: isExpanded
+			)
+		}
+	}
+}
+
+extension FactorSourceCard {
+	enum Kind {
+		case genericDescription(FactorSourceKind)
+		case instanceCompact(factorSource: FactorSource)
+		case instanceRegular(factorSource: FactorSource)
+		case instanceLastUsed(
+			factorSource: FactorSource,
+			accounts: [Account] = [],
+			personas: [Persona] = []
+		)
+	}
+
 	enum Mode {
 		case display
 		case selection(type: SelectionType, isSelected: Bool)
@@ -95,163 +256,26 @@ extension FactorSourceCard {
 	}
 }
 
-// MARK: - FactorSourceCardDataSource
-struct FactorSourceCardDataSource {
-	let icon: ImageResource
-	let title: String
-	var subtitle: String?
-	var lastUsedOn: Timestamp?
-	var accounts: Accounts = []
-	var personas: Personas = []
-
-	var hasAccountsOrPersonas: Bool {
-		!accounts.isEmpty || !personas.isEmpty
-	}
-}
-
-extension FactorSourceCard {
-	static func kind(_ kind: FactorSourceKind, mode: Mode) -> Self? {
-		guard
-			let icon = kind.icon,
-			let title = kind.title,
-			let details = kind.details
-		else { return nil }
-
-		return Self(
-			mode: mode,
-			dataSource: .init(
-				icon: icon,
-				title: title,
-				subtitle: details
-			)
-		)
-	}
-
-	static func instanceCompact(factorSource: FactorSource, mode: Mode) -> Self? {
-		guard
-			let icon = factorSource.factorSourceKind.icon,
-			let name = factorSource.name
-		else { return nil }
-
-		return Self(
-			mode: mode,
-			dataSource: .init(
-				icon: icon,
-				title: name
-			)
-		)
-	}
-
-	static func instanceRegular(factorSource: FactorSource, mode: Mode) -> Self? {
-		guard
-			let icon = factorSource.factorSourceKind.icon,
-			let name = factorSource.name,
-			let details = factorSource.factorSourceKind.details
-		else { return nil }
-
-		return Self(
-			mode: mode,
-			dataSource: .init(
-				icon: icon,
-				title: name,
-				subtitle: details
-			)
-		)
-	}
-
-	static func instanceLastUsed(
-		factorSource: FactorSource,
-		mode: Mode,
-		accounts: Accounts = [],
-		personas: Personas = []
-	) -> Self? {
-		guard
-			let icon = factorSource.factorSourceKind.icon,
-			let name = factorSource.name
-		else { return nil }
-
-		return Self(
-			mode: mode,
-			dataSource: .init(
-				icon: icon,
-				title: name,
-				lastUsedOn: factorSource.common.lastUsedOn,
-				accounts: accounts,
-				personas: personas
-			)
-		)
-	}
-}
-
-extension FactorSourceKind {
-	var icon: ImageResource? {
+extension FactorSourceCard.Kind {
+	var factorSourceKind: FactorSourceKind {
 		switch self {
-		case .device:
-			.deviceFactor
-		case .ledgerHqHardwareWallet:
-			.ledgerFactor
-		case .offDeviceMnemonic:
-			.passphraseFactor
-		case .arculusCard:
-			.arculusFactor
-		case .passphrase:
-			.passwordFactor
-		case .trustedContact, .securityQuestions:
-			nil
+		case let .genericDescription(factorSourceKind):
+			factorSourceKind
+		case let .instanceCompact(factorSource),
+		     let .instanceRegular(factorSource),
+		     let .instanceLastUsed(factorSource, _, _):
+			factorSource.factorSourceKind
 		}
 	}
 
 	var title: String? {
 		switch self {
-		case .device:
-			"Biometrics/PIN"
-		case .ledgerHqHardwareWallet:
-			"Ledger Nano"
-		case .offDeviceMnemonic:
-			"Passphrase"
-		case .arculusCard:
-			"Arculus Card"
-		case .passphrase:
-			"Password"
-		case .trustedContact, .securityQuestions:
-			nil
-		}
-	}
-
-	var details: String? {
-		switch self {
-		case .device:
-			"Use phone biometrics/PIN to approve"
-		case .ledgerHqHardwareWallet:
-			"Connect via USB to approve"
-		case .offDeviceMnemonic:
-			"Enter a seed phrase to approve"
-		case .arculusCard:
-			"Tap to your phone to approve"
-		case .passphrase:
-			"Enter a decentralized password to approve"
-		case .trustedContact, .securityQuestions:
-			nil
-		}
-	}
-}
-
-// TODO: move to Sargon
-extension FactorSource {
-	var name: String? {
-		switch self {
-		case let .device(factorSource):
-			factorSource.hint.name
-		case let .ledger(factorSource):
-			factorSource.hint.name
-		case let .offDeviceMnemonic(factorSource):
-			factorSource.hint.displayName.value
-		case let .arculusCard(factorSource):
-			factorSource.hint.name
-		case let .trustedContact(factorSource):
-			factorSource.contact.name.value
-        case .securityQuestions, .passphrase:
-			nil
+		case let .genericDescription(factorSourceKind):
+			factorSourceKind.title
+		case let .instanceCompact(factorSource),
+		     let .instanceRegular(factorSource),
+		     let .instanceLastUsed(factorSource, _, _):
+			factorSource.name
 		}
 	}
 }

@@ -58,6 +58,7 @@ internal enum AssetResource {
   internal static let carouselBackgroundRadquest = ImageAsset(name: "carousel_background_radquest")
   internal static let arrowBack = ImageAsset(name: "arrow-back")
   internal static let check = ImageAsset(name: "check")
+  internal static let checkCircleOutline = ImageAsset(name: "checkCircleOutline")
   internal static let checkmarkDarkSelected = ImageAsset(name: "checkmark-dark-selected")
   internal static let checkmarkDarkUnselected = ImageAsset(name: "checkmark-dark-unselected")
   internal static let checkmarkLightSelected = ImageAsset(name: "checkmark-light-selected")
