@@ -80,7 +80,7 @@ struct FactorSourceCard: View {
 
 				if let lastUsedOn = dataSource.lastUsedOn {
 					Text(
-						markdown: "**Last Used:** \(lastUsedOn.formatted())",
+						markdown: "**Last Used:** \(RadixDateFormatter.string(from: lastUsedOn, dateStyle: .long))",
 						emphasizedColor: .app.gray2,
 						emphasizedFont: .app.body2Link
 					)
