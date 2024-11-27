@@ -2,12 +2,14 @@
 struct PreAuthorizationClient: Sendable {
 	var getPreview: GetPreview
 	var buildSubintent: BuildSubintent
+	var pollStatus: PollStatus
 }
 
 // MARK: PreAuthorizationClient.GetPreview
 extension PreAuthorizationClient {
 	typealias GetPreview = @Sendable (GetPreviewRequest) async throws -> PreAuthorizationPreview
 	typealias BuildSubintent = @Sendable (BuildSubintentRequest) async throws -> Subintent
+	typealias PollStatus = @Sendable (PollStatusRequest) async throws -> PreAuthorizationStatus
 }
 
 // MARK: PreAuthorizationClient.GetPreviewRequest
@@ -23,5 +25,10 @@ extension PreAuthorizationClient {
 		let manifest: SubintentManifest
 		let expiration: DappToWalletInteractionSubintentExpiration
 		let message: String?
+	}
+
+	struct PollStatusRequest: Sendable {
+		let subintentHash: SubintentHash
+		let expiration: DappToWalletInteractionSubintentExpiration
 	}
 }
