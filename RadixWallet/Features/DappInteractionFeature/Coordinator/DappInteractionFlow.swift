@@ -125,7 +125,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	enum DelegateAction: Sendable, Equatable {
 		case dismissWithFailure(WalletToDappInteractionFailureResponse)
 		case dismissWithSuccess(DappMetadata, DappInteractionCompletionKind)
-		case submit(WalletToDappInteractionSuccessResponse, DappMetadata, PreAuthorizationData? = nil)
+		case submit(WalletToDappInteractionSuccessResponse, DappMetadata)
 		case dismiss
 	}
 
@@ -515,10 +515,10 @@ extension DappInteractionFlow {
 			_ signedSubintent: SignedSubintent,
 			_ expiration: DappToWalletInteractionSubintentExpiration
 		) -> Effect<Action> {
-			let preAuthResponse = newWalletToDappInteractionPreAuthorizationResponseItems(signedSubintent: signedSubintent)
+			let preAuthResponse = newWalletToDappInteractionPreAuthorizationResponseItems(signedSubintent: signedSubintent, expirationTimestamp: expiration.timestamp)
 			state.responseItems[item] = .remote(.preAuthorization(preAuthResponse))
 
-			return continueEffect(for: &state, preAuthData: .init(subintentHash: signedSubintent.subintent.hash(), expiration: expiration))
+			return continueEffect(for: &state)
 		}
 
 		func handlePreAuthorizationFailure(
@@ -746,7 +746,7 @@ extension DappInteractionFlow {
 		}
 	}
 
-	func continueEffect(for state: inout State, preAuthData: PreAuthorizationData? = nil) -> Effect<Action> {
+	func continueEffect(for state: inout State) -> Effect<Action> {
 		if
 			let nextRequest = state.interactionItems.first(where: { state.responseItems[$0] == nil }),
 			let destination = Path.State(
@@ -768,11 +768,11 @@ extension DappInteractionFlow {
 			}
 			return .none
 		} else {
-			return finishInteractionFlow(state, preAuthData: preAuthData)
+			return finishInteractionFlow(state)
 		}
 	}
 
-	func finishInteractionFlow(_ state: State, preAuthData: PreAuthorizationData?) -> Effect<Action> {
+	func finishInteractionFlow(_ state: State) -> Effect<Action> {
 		guard let response = WalletToDappInteractionSuccessResponse(
 			for: state.remoteInteraction,
 			with: state.responseItems.values.compactMap(/State.AnyInteractionResponseItem.remote)
@@ -796,7 +796,7 @@ extension DappInteractionFlow {
 				}
 			}
 
-			await send(.delegate(.submit(response, state.dappMetadata, preAuthData)))
+			await send(.delegate(.submit(response, state.dappMetadata)))
 		}
 	}
 
@@ -1155,4 +1155,15 @@ struct SavedPersonaDataInPersonaDoesNotMatchWalletInteractionResponseItem: Swift
 // MARK: - PersonaDataEntryNotFoundInResponse
 struct PersonaDataEntryNotFoundInResponse: Swift.Error {
 	let kind: PersonaData.Entry.Kind
+}
+
+private extension DappToWalletInteractionSubintentExpiration {
+	var timestamp: Date {
+		switch self {
+		case let .afterDelay(afterDelay):
+			Date().addingTimeInterval(TimeInterval(afterDelay.expireAfterSeconds))
+		case let .atTime(atTime):
+			atTime.date
+		}
+	}
 }

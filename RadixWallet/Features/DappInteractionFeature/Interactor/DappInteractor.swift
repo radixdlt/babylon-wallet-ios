@@ -4,13 +4,7 @@ import SwiftUI
 
 typealias RequestEnvelope = DappInteractionClient.RequestEnvelope
 
-// MARK: - PreAuthorizationData
-struct PreAuthorizationData: Sendable, Hashable {
-	let subintentHash: SubintentHash
-	let expiration: DappToWalletInteractionSubintentExpiration
-}
-
-// MARK: - RequestEnvelope + Identifiable
+// MARK: Identifiable
 extension RequestEnvelope: Identifiable {
 	typealias ID = WalletInteractionId
 	var id: ID {
@@ -49,15 +43,13 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case sentResponseToDapp(
 			WalletToDappInteractionResponse,
 			for: RequestEnvelope,
-			DappMetadata,
-			PreAuthorizationData?
+			DappMetadata
 		)
 		case failedToSendResponseToDapp(
 			WalletToDappInteractionResponse,
 			for: RequestEnvelope,
 			DappMetadata,
-			reason: String,
-			preAuthData: PreAuthorizationData?
+			reason: String
 		)
 		case presentResponseSuccessView(DappMetadata, DappInteractionCompletionKind, P2P.Route)
 		case presentInvalidRequest(
@@ -86,7 +78,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 			enum ResponseFailure: Sendable, Hashable {
 				case cancelButtonTapped(RequestEnvelope)
-				case retryButtonTapped(WalletToDappInteractionResponse, for: RequestEnvelope, DappMetadata, PreAuthorizationData?)
+				case retryButtonTapped(WalletToDappInteractionResponse, for: RequestEnvelope, DappMetadata)
 			}
 
 			enum InvalidRequest: Sendable, Hashable {
@@ -168,12 +160,12 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case .presentQueuedRequestIfNeeded:
 			return presentQueuedRequestIfNeededEffect(for: &state)
 
-		case let .sentResponseToDapp(response, for: request, dappMetadata, preAuthData):
+		case let .sentResponseToDapp(response, for: request, dappMetadata):
 			switch response {
-			case .success:
-				if let preAuthData {
+			case let .success(success):
+				if let response = success.preAuthorizationResponse {
 					dismissCurrentModalAndRequest(request, for: &state, clearDappInteraction: false)
-					return pollPreAuthorizationEffect(for: &state, request: request, dappMetadata: dappMetadata, preAuthData: preAuthData)
+					return pollPreAuthorizationEffect(for: &state, request: request, dappMetadata: dappMetadata, response: response)
 				} else {
 					dismissCurrentModalAndRequest(request, for: &state)
 					return .send(.internal(.presentResponseSuccessView(dappMetadata, .personaData, request.route)))
@@ -183,7 +175,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
 			}
 
-		case let .failedToSendResponseToDapp(response, for: request, dappMetadata, reason, preAuthData):
+		case let .failedToSendResponseToDapp(response, for: request, dappMetadata, reason):
 			dismissCurrentModalAndRequest(request, for: &state)
 			state.destination = .responseFailure(.init(
 				title: { TextState(L10n.Common.errorAlertTitle) },
@@ -191,7 +183,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 					ButtonState(role: .cancel, action: .cancelButtonTapped(request)) {
 						TextState(L10n.Common.cancel)
 					}
-					ButtonState(action: .retryButtonTapped(response, for: request, dappMetadata, preAuthData)) {
+					ButtonState(action: .retryButtonTapped(response, for: request, dappMetadata)) {
 						TextState(L10n.Common.retry)
 					}
 				},
@@ -251,8 +243,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 			let request = dappInteraction.request
 
 			switch delegateAction {
-			case let .submit(responseToDapp, dappMetadata, preAuthData):
-				return sendResponseToDappEffect(responseToDapp, for: request, dappMetadata: dappMetadata, preAuthData: preAuthData)
+			case let .submit(responseToDapp, dappMetadata):
+				return sendResponseToDappEffect(responseToDapp, for: request, dappMetadata: dappMetadata)
 			case let .dismiss(dappMetadata, txID):
 				dismissCurrentModalAndRequest(request, for: &state)
 				return delayedShortEffect(for: .internal(.presentResponseSuccessView(dappMetadata, txID, request.route)))
@@ -276,8 +268,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 			case let .cancelButtonTapped(request):
 				dismissCurrentModalAndRequest(request, for: &state)
 				return .send(.internal(.presentQueuedRequestIfNeeded))
-			case let .retryButtonTapped(response, request, dappMetadata, preAuthData):
-				return sendResponseToDappEffect(response, for: request, dappMetadata: dappMetadata, preAuthData: preAuthData)
+			case let .retryButtonTapped(response, request, dappMetadata):
+				return sendResponseToDappEffect(response, for: request, dappMetadata: dappMetadata)
 			}
 
 		case let .invalidRequest(action):
@@ -333,8 +325,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func sendResponseToDappEffect(
 		_ responseToDapp: WalletToDappInteractionResponse,
 		for request: RequestEnvelope,
-		dappMetadata: DappMetadata,
-		preAuthData: PreAuthorizationData?
+		dappMetadata: DappMetadata
 	) -> Effect<Action> {
 		.run { send in
 
@@ -359,8 +350,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 						.sentResponseToDapp(
 							responseToDapp,
 							for: request,
-							dappMetadata,
-							preAuthData
+							dappMetadata
 						)
 					))
 				} else {
@@ -373,8 +363,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 							responseToDapp,
 							for: request,
 							dappMetadata,
-							reason: error.localizedDescription,
-							preAuthData: preAuthData
+							reason: error.localizedDescription
 						)
 					))
 				} else {
@@ -401,13 +390,13 @@ struct DappInteractor: Sendable, FeatureReducer {
 		for state: inout State,
 		request: RequestEnvelope,
 		dappMetadata: DappMetadata,
-		preAuthData: PreAuthorizationData
+		response: WalletToDappInteractionSubintentResponseItem
 	) -> Effect<Action> {
 		state.destination = .pollPreAuthorizationStatus(
 			.init(
 				dAppMetadata: dappMetadata,
-				subintentHash: preAuthData.subintentHash,
-				expiration: preAuthData.expiration,
+				subintentHash: response.signedSubintent.subintent.hash(),
+				expirationTimestamp: response.expirationTimestamp,
 				isDeepLink: request.route.isDeepLink,
 				request: request
 			)
@@ -569,6 +558,17 @@ private extension DappInteractionCompletionKind {
 			true
 		case .personaData:
 			false
+		}
+	}
+}
+
+private extension WalletToDappInteractionSuccessResponse {
+	var preAuthorizationResponse: WalletToDappInteractionSubintentResponseItem? {
+		switch items {
+		case let .preAuthorization(preAuthorization):
+			preAuthorization.response
+		case .authorizedRequest, .unauthorizedRequest, .transaction:
+			nil
 		}
 	}
 }

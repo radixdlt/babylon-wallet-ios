@@ -5,7 +5,7 @@ struct PollPreAuthorizationStatus: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		let dAppMetadata: DappMetadata
 		let subintentHash: SubintentHash
-		let expiration: Expiration
+		let expirationTimestamp: Date
 		let isDeepLink: Bool
 		let request: RequestEnvelope
 		var status = Status.unknown
@@ -14,21 +14,16 @@ struct PollPreAuthorizationStatus: Sendable, FeatureReducer {
 		init(
 			dAppMetadata: DappMetadata,
 			subintentHash: SubintentHash,
-			expiration: Expiration,
+			expirationTimestamp: Date,
 			isDeepLink: Bool,
 			request: RequestEnvelope
 		) {
 			self.dAppMetadata = dAppMetadata
 			self.subintentHash = subintentHash
-			self.expiration = expiration
+			self.expirationTimestamp = expirationTimestamp
 			self.isDeepLink = isDeepLink
 			self.request = request
-			switch expiration {
-			case let .afterDelay(afterDelay):
-				secondsToExpiration = Int(afterDelay.expireAfterSeconds)
-			case let .atTime(atTime):
-				secondsToExpiration = Int(atTime.date.timeIntervalSinceNow)
-			}
+			self.secondsToExpiration = Int(expirationTimestamp.timeIntervalSinceNow)
 		}
 	}
 
@@ -79,7 +74,7 @@ struct PollPreAuthorizationStatus: Sendable, FeatureReducer {
 	private func pollStatus(state: inout State) -> Effect<Action> {
 		let request = PreAuthorizationClient.PollStatusRequest(
 			subintentHash: state.subintentHash,
-			expiration: state.expiration
+			expirationTimestamp: state.expirationTimestamp
 		)
 		return .run { send in
 			let status = try await preAuthorizationClient.pollStatus(request)

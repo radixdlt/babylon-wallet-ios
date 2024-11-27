@@ -40,7 +40,7 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case submit(WalletToDappInteractionResponse, DappMetadata, PreAuthorizationData? = nil)
+		case submit(WalletToDappInteractionResponse, DappMetadata)
 		case dismiss(DappMetadata, DappInteractionCompletionKind)
 		case dismissSilently
 	}
@@ -102,8 +102,8 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 		case .flow(.delegate(.dismiss)):
 			return .send(.delegate(.dismissSilently))
 
-		case let .flow(.delegate(.submit(response, dappMetadata, preAuthData))):
-			return .send(.delegate(.submit(.success(response), dappMetadata, preAuthData)))
+		case let .flow(.delegate(.submit(response, dappMetadata))):
+			return .send(.delegate(.submit(.success(response), dappMetadata)))
 
 		default:
 			return .none
