@@ -1,5 +1,5 @@
-// MARK: - WarningErrorView
-struct WarningErrorView: View {
+// MARK: - StatusMessageView
+struct StatusMessageView: View {
 	let text: String
 	let type: ViewType
 	let spacing: CGFloat
@@ -55,10 +55,10 @@ struct WarningErrorView: View {
 	}
 }
 
-extension WarningErrorView {
+extension StatusMessageView {
 	static func transactionIntroducesNewAccount() -> some View {
 		HStack(alignment: .center, spacing: .small1) {
-			WarningErrorView(text: L10n.TransactionReview.FeePayerValidation.linksNewAccount, type: .warning)
+			StatusMessageView(text: L10n.TransactionReview.FeePayerValidation.linksNewAccount, type: .warning)
 			InfoButton(.payingaccount)
 		}
 	}

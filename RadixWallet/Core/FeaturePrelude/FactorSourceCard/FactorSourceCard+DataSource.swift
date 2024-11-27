@@ -19,7 +19,7 @@ extension FactorSourceCardDataSource {
 		var id: String { text }
 
 		let text: String
-		let type: WarningErrorView.ViewType
+		let type: StatusMessageView.ViewType
 	}
 }
 

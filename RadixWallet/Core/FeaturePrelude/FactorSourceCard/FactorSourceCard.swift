@@ -38,7 +38,7 @@ struct FactorSourceCard: View {
 			if !dataSource.messages.isEmpty {
 				VStack(alignment: .leading, spacing: .small2) {
 					ForEach(dataSource.messages) { message in
-						WarningErrorView(
+						StatusMessageView(
 							text: message.text,
 							type: message.type,
 							useNarrowSpacing: true,
