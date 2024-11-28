@@ -1790,6 +1790,32 @@ internal enum L10n {
     }
   }
   internal enum FactorSources {
+    internal enum Card {
+      /// %d Accounts
+      internal static func accountPlural(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "factorSources_card_accountPlural", p1, fallback: "%d Accounts")
+      }
+      /// 1 Account
+      internal static let accountSingular = L10n.tr("Localizable", "factorSources_card_accountSingular", fallback: "1 Account")
+      /// **Last Used:** %@
+      internal static func lastUsed(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "factorSources_card_lastUsed", String(describing: p1), fallback: "**Last Used:** %@")
+      }
+      /// Linked to %@ and %@
+      internal static func linkedAccountsAndPersonas(_ p1: Any, _ p2: Any) -> String {
+        return L10n.tr("Localizable", "factorSources_card_linkedAccountsAndPersonas", String(describing: p1), String(describing: p2), fallback: "Linked to %@ and %@")
+      }
+      /// Linked to %@
+      internal static func linkedAccountsOrPersonas(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "factorSources_card_linkedAccountsOrPersonas", String(describing: p1), fallback: "Linked to %@")
+      }
+      /// %d Personas
+      internal static func personaPlural(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "factorSources_card_personaPlural", p1, fallback: "%d Personas")
+      }
+      /// 1 Persona
+      internal static let personaSingular = L10n.tr("Localizable", "factorSources_card_personaSingular", fallback: "1 Persona")
+    }
     internal enum Kind {
       /// Phone
       internal static let device = L10n.tr("Localizable", "factorSources_kind_device", fallback: "Phone")

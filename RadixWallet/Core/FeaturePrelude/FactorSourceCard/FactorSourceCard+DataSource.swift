@@ -93,7 +93,7 @@ extension FactorSource {
 		case let .trustedContact(factorSource):
 			factorSource.contact.name.value
 		case let .securityQuestions(factorSource):
-			factorSource.factorSourceKind.title
+			nil
 		}
 	}
 }

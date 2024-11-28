@@ -1355,3 +1355,13 @@ Code: %@";
 "interactionReview_unknown_amount" = "Amount of deposit is unknown";
 "interactionReview_atLeast" = "At least";
 "interactionReview_noMoreThan" = "No more than";
+
+
+// TEMP
+"factorSources_card_linkedAccountsAndPersonas" = "Linked to %@ and %@";
+"factorSources_card_linkedAccountsOrPersonas" = "Linked to %@";
+"factorSources_card_accountSingular" = "1 Account";
+"factorSources_card_accountPlural" = "%d Accounts";
+"factorSources_card_personaSingular" = "1 Persona";
+"factorSources_card_personaPlural" = "%d Personas";
+"factorSources_card_lastUsed" = "**Last Used:** %@";

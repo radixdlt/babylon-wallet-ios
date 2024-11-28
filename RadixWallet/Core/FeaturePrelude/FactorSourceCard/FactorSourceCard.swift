@@ -46,6 +46,7 @@ struct FactorSourceCard: View {
 						)
 					}
 				}
+				.flushedLeft
 				.padding(.horizontal, .large3)
 				.padding(.bottom, .medium1)
 			}
@@ -80,7 +81,7 @@ struct FactorSourceCard: View {
 
 				if let lastUsedOn = dataSource.lastUsedOn {
 					Text(
-						markdown: "**Last Used:** \(RadixDateFormatter.string(from: lastUsedOn, dateStyle: .long))",
+						markdown: L10n.FactorSources.Card.lastUsed(RadixDateFormatter.string(from: lastUsedOn, dateStyle: .long)),
 						emphasizedColor: .app.gray2,
 						emphasizedFont: .app.body2Link
 					)
@@ -117,7 +118,7 @@ struct FactorSourceCard: View {
 					}
 				} label: {
 					HStack(spacing: .zero) {
-						Text("Linked to \(accounts.count) Accounts and \(personas.count) Personas")
+						Text(linkedTitle)
 							.textStyle(.body2Regular)
 							.foregroundStyle(.app.gray2)
 
@@ -151,6 +152,21 @@ struct FactorSourceCard: View {
 			.padding(.horizontal, .medium3)
 			.padding(.vertical, .small1)
 			.background(.app.gray5)
+		}
+
+		private var linkedTitle: String {
+			typealias Card = L10n.FactorSources.Card
+			let accountsString = accounts.count == 1 ? Card.accountSingular : Card.accountPlural(accounts.count)
+			let personasString = personas.count == 1 ? Card.personaSingular : Card.personaPlural(personas.count)
+
+			if accounts.count > 0, personas.count > 0 {
+				return Card.linkedAccountsAndPersonas(accountsString, personasString)
+			} else if accounts.count > 0 {
+				return Card.linkedAccountsOrPersonas(accountsString)
+			} else if personas.count > 0 {
+				return Card.linkedAccountsOrPersonas(personasString)
+			}
+			return ""
 		}
 	}
 }
