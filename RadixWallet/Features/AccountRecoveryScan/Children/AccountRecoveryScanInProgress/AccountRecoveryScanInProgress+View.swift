@@ -13,9 +13,9 @@ extension AccountRecoveryScanInProgress.State {
 
 	private var isManualScan: Bool {
 		switch mode {
-		case .privateHD:
+		case .createProfile:
 			false
-		case .factorSourceWithID:
+		case .addAccounts:
 			true
 		}
 	}
