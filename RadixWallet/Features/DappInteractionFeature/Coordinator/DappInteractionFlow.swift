@@ -512,10 +512,9 @@ extension DappInteractionFlow {
 
 		func handlePreAuthorizationSignature(
 			_ item: State.AnyInteractionItem,
-			_ signedSubintent: SignedSubintent,
-			_ expiration: DappToWalletInteractionSubintentExpiration
+			_ signedSubintent: SignedSubintent
 		) -> Effect<Action> {
-			let preAuthResponse = newWalletToDappInteractionPreAuthorizationResponseItems(signedSubintent: signedSubintent, expirationTimestamp: expiration.timestamp)
+			let preAuthResponse = newWalletToDappInteractionPreAuthorizationResponseItems(signedSubintent: signedSubintent)
 			state.responseItems[item] = .remote(.preAuthorization(preAuthResponse))
 
 			return continueEffect(for: &state)
@@ -588,8 +587,8 @@ extension DappInteractionFlow {
 		     .accountsProofOfOwnership(.delegate(.failedToSign)):
 			return dismissEffect(for: state, errorKind: .failedToSignAuthChallenge, message: nil)
 
-		case let .preAuthorizationReview(.delegate(.signedPreAuthorization(encoded, expiration))):
-			return handlePreAuthorizationSignature(item, encoded, expiration)
+		case let .preAuthorizationReview(.delegate(.signedPreAuthorization(encoded))):
+			return handlePreAuthorizationSignature(item, encoded)
 
 		case let .preAuthorizationReview(.delegate(.failed(error))):
 			return handlePreAuthorizationFailure(error)

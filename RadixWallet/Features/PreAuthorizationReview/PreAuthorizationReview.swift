@@ -44,7 +44,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case signedPreAuthorization(SignedSubintent, DappToWalletInteractionSubintentExpiration)
+		case signedPreAuthorization(SignedSubintent)
 		case failed(PreAuthorizationFailure)
 	}
 
@@ -272,7 +272,7 @@ private extension PreAuthorizationReview {
 
 	func handleSignedSubinent(state: inout State, signedSubintent: SignedSubintent) -> Effect<Action> {
 		state.destination = nil
-		return .send(.delegate(.signedPreAuthorization(signedSubintent, state.expiration)))
+		return .send(.delegate(.signedPreAuthorization(signedSubintent)))
 	}
 }
 
