@@ -35,6 +35,7 @@ final class MainFeatureTests: TestCase {
 				.dependency(\.securityCenterClient, .noop)
 				.dependency(\.deepLinkHandlerClient, .noop)
 				.dependency(\.accountLockersClient, .noop)
+				.dependency(\.radixConnectClient, .noop)
 		}
 
 		XCTAssertFalse(store.state.showIsUsingTestnetBanner)
