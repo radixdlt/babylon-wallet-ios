@@ -60,7 +60,7 @@ struct FactorSourceCard: View {
 		}
 		.background(.app.white)
 		.roundedCorners(radius: .small1)
-		.tokenRowShadow()
+		.cardShadow
 	}
 
 	private var topCard: some View {

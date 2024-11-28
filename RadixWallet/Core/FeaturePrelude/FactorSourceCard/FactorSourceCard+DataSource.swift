@@ -88,10 +88,12 @@ extension FactorSource {
 			factorSource.hint.displayName.value
 		case let .arculusCard(factorSource):
 			factorSource.hint.name
+		case let .passphrase(factorSource):
+			factorSource.factorSourceKind.title
 		case let .trustedContact(factorSource):
 			factorSource.contact.name.value
-		case .securityQuestions, .passphrase:
-			nil
+		case let .securityQuestions(factorSource):
+			factorSource.factorSourceKind.title
 		}
 	}
 }
