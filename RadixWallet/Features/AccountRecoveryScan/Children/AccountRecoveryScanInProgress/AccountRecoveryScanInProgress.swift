@@ -27,15 +27,15 @@ struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		var destination: Destination.State? = nil
 
 		enum Mode: Sendable, Hashable {
-			case privateHD(PrivateHierarchicalDeterministicFactorSource)
-			case factorSourceWithID(id: FactorSourceIDFromHash, Loadable<FactorSource> = .idle)
+			case createProfile(PrivateHierarchicalDeterministicFactorSource)
+			case addAccounts(factorSourceId: FactorSourceIDFromHash, Loadable<FactorSource> = .idle)
 		}
 
 		var factorSourceIDFromHash: FactorSourceIDFromHash {
 			switch mode {
-			case let .privateHD(privateHD):
+			case let .createProfile(privateHD):
 				privateHD.factorSource.id
-			case let .factorSourceWithID(id, _):
+			case let .addAccounts(id, _):
 				id
 			}
 		}
@@ -110,7 +110,6 @@ struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	@Dependency(\.dismiss) var dismiss
-	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 
@@ -118,12 +117,12 @@ struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		switch internalAction {
 		case .initiate:
 			switch state.mode {
-			case .privateHD:
+			case .createProfile:
 				return derivePublicKeys(state: &state)
-			case .factorSourceWithID:
+			case .addAccounts:
 				state.status = .loadingFactorSource
 				let id = state.factorSourceIDFromHash
-				state.mode = .factorSourceWithID(id: id, .loading)
+				state.mode = .addAccounts(factorSourceId: id, .loading)
 				return .run { [forOlympiaAccounts = state.forOlympiaAccounts] send in
 					let result = await TaskResult<IndicesUsedByFactorSource> {
 						try await factorSourcesClient.indicesOfEntitiesControlledByFactorSource(
@@ -151,8 +150,8 @@ struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 				state.networkID = networkID
 			}
 
-			state.mode = .factorSourceWithID(
-				id: state.factorSourceIDFromHash,
+			state.mode = .addAccounts(
+				factorSourceId: state.factorSourceIDFromHash,
 				.success(
 					indicesUsedByFactorSource.factorSource
 				)
@@ -217,10 +216,14 @@ struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 				assert(factorSourceID == id.asGeneral)
 				assert(networkID == state.networkID)
 				loggerGlobal.debug("Creating accounts with networkID: \(networkID)")
-				return .run { send in
+				return .run { [mode = state.mode] send in
 					let accounts = await publicHDKeys.enumerated().asyncMap { localOffset, publicHDKey in
 						let offset = localOffset + globalOffset
-						let appearanceID = await accountsClient.nextAppearanceID(networkID, offset)
+						let appearanceID = await getAccountAppearanceID(
+							mode: mode,
+							offset: offset,
+							networkID: networkID
+						)
 						return Account(
 							networkID: networkID,
 							factorInstance: .init(factorSourceId: id, publicKey: publicHDKey),
@@ -255,6 +258,20 @@ struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 
 	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
 		.run { _ in await dismiss() }
+	}
+
+	private func getAccountAppearanceID(
+		mode: State.Mode,
+		offset: Int,
+		networkID: NetworkID
+	) async -> AppearanceID {
+		switch mode {
+		case .createProfile:
+			return AppearanceID.fromNumberOfAccounts(offset)
+		case .addAccounts:
+			@Dependency(\.accountsClient) var accountsClient
+			return await accountsClient.nextAppearanceID(networkID, offset)
+		}
 	}
 }
 
@@ -305,7 +322,7 @@ extension AccountRecoveryScanInProgress {
 		}
 		let factorSourceOption: DerivePublicKeys.State.FactorSourceOption
 		switch state.mode {
-		case let .factorSourceWithID(_, loadableState):
+		case let .addAccounts(_, loadableState):
 			switch loadableState {
 			case let .success(factorSource):
 				factorSourceOption = .specific(factorSource)
@@ -315,7 +332,7 @@ extension AccountRecoveryScanInProgress {
 				assertionFailure(errorMsg)
 				return .send(.delegate(.failed))
 			}
-		case let .privateHD(privateHDFactorSource):
+		case let .createProfile(privateHDFactorSource):
 			factorSourceOption = .specificPrivateHDFactorSource(privateHDFactorSource)
 		}
 

@@ -56,6 +56,7 @@ struct Main: Sendable, FeatureReducer {
 	@Dependency(\.securityCenterClient) var securityCenterClient
 	@Dependency(\.accountLockersClient) var accountLockersClient
 	@Dependency(\.deepLinkHandlerClient) var deepLinkHandlerClient
+	@Dependency(\.radixConnectClient) var radixConnectClient
 
 	init() {}
 
@@ -82,6 +83,7 @@ struct Main: Sendable, FeatureReducer {
 				.merge(with: startMonitoringSecurityCenterEffect())
 				.merge(with: startMonitoringAccountLockersEffect())
 				.merge(with: gatewayValuesEffect())
+				.merge(with: startNotifyingConnectorWithAccounts())
 		}
 	}
 
@@ -121,6 +123,16 @@ struct Main: Sendable, FeatureReducer {
 				guard !Task.isCancelled else { return }
 				loggerGlobal.notice("Changed network to: \(gateway)")
 				await send(.internal(.currentGatewayChanged(to: gateway)))
+			}
+		}
+	}
+
+	private func startNotifyingConnectorWithAccounts() -> Effect<Action> {
+		.run { _ in
+			do {
+				try await radixConnectClient.startNotifyingConnectorWithAccounts()
+			} catch {
+				loggerGlobal.notice("radixConnectClient.startNotifyingConnectorWithAccounts failed: \(error)")
 			}
 		}
 	}

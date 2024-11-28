@@ -18,7 +18,8 @@ extension RadixConnectClient: TestDependencyKey {
 		receiveMessages: unimplemented("\(Self.self).receiveMessages"),
 		sendResponse: unimplemented("\(Self.self).sendResponse"),
 		sendRequest: unimplemented("\(Self.self).sendRequest"),
-		handleDappDeepLink: unimplemented("\(Self.self).sendRequest")
+		handleDappDeepLink: unimplemented("\(Self.self).sendRequest"),
+		startNotifyingConnectorWithAccounts: unimplemented("\(Self.self).startNotifyingConnectorWithAccounts")
 	)
 }
 
@@ -37,7 +38,8 @@ extension RadixConnectClient {
 		receiveMessages: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		sendResponse: { _, _ in },
 		sendRequest: { _, _ in 0 },
-		handleDappDeepLink: { _ in }
+		handleDappDeepLink: { _ in },
+		startNotifyingConnectorWithAccounts: {}
 	)
 }
 #endif // DEBUG

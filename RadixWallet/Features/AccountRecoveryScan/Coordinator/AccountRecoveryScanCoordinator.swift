@@ -37,13 +37,13 @@ struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 			switch purpose {
 			case let .addAccounts(id, forOlympiaAccounts):
 				AccountRecoveryScanInProgress.State(
-					mode: .factorSourceWithID(id: id),
+					mode: .addAccounts(factorSourceId: id),
 					forOlympiaAccounts: forOlympiaAccounts
 				)
 
 			case let .createProfile(privateHDFactorSource):
 				AccountRecoveryScanInProgress.State(
-					mode: .privateHD(privateHDFactorSource),
+					mode: .createProfile(privateHDFactorSource),
 					forOlympiaAccounts: false
 				)
 			}
