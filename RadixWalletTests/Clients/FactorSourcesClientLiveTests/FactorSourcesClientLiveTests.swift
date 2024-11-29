@@ -96,15 +96,15 @@ extension FactorSource {
 					lastUsedOn: .now,
 					flags: []
 				),
-                hint: DeviceFactorSourceHint(
-                    label: name,
-                    deviceName: "iPhone RED",
-                    model: "iPhone SE 2nd gen",
-                    mnemonicWordCount: .twentyFour,
-                    systemVersion: nil,
-                    hostAppVersion: nil,
-                    hostVendor: nil
-                )
+				hint: DeviceFactorSourceHint(
+					label: name,
+					deviceName: "iPhone RED",
+					model: "iPhone SE 2nd gen",
+					mnemonicWordCount: .twentyFour,
+					systemVersion: nil,
+					hostAppVersion: nil,
+					hostVendor: nil
+				)
 			).asGeneral
 		}
 	}

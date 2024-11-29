@@ -176,7 +176,8 @@ extension FactorSourceCard {
 		kind: Kind,
 		mode: Mode,
 		messages: [FactorSourceCardDataSource.Message] = [],
-		isExpanded: Bool = false
+		isExpanded: Bool = false,
+		onRemoveTapped: (() -> Void)? = nil
 	) {
 		guard
 			let icon = kind.factorSourceKind.icon,
@@ -196,7 +197,8 @@ extension FactorSourceCard {
 					subtitle: details,
 					messages: messages
 				),
-				isExpanded: isExpanded
+				isExpanded: isExpanded,
+				onRemoveTapped: onRemoveTapped
 			)
 		case let .instanceCompact(factorSource):
 			self = .init(
@@ -207,7 +209,8 @@ extension FactorSourceCard {
 					title: factorSource.name,
 					messages: messages
 				),
-				isExpanded: isExpanded
+				isExpanded: isExpanded,
+				onRemoveTapped: onRemoveTapped
 			)
 		case let .instanceRegular(factorSource):
 			guard let details = factorSource.factorSourceKind.details else { return nil }
@@ -221,7 +224,8 @@ extension FactorSourceCard {
 					subtitle: details,
 					messages: messages
 				),
-				isExpanded: isExpanded
+				isExpanded: isExpanded,
+				onRemoveTapped: onRemoveTapped
 			)
 		case let .instanceLastUsed(factorSource, accounts, personas):
 			self = .init(
@@ -235,7 +239,8 @@ extension FactorSourceCard {
 					accounts: accounts,
 					personas: personas
 				),
-				isExpanded: isExpanded
+				isExpanded: isExpanded,
+				onRemoveTapped: onRemoveTapped
 			)
 		}
 	}
