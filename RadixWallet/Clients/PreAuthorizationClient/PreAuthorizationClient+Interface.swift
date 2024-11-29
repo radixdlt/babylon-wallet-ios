@@ -29,6 +29,6 @@ extension PreAuthorizationClient {
 
 	struct PollStatusRequest: Sendable {
 		let subintentHash: SubintentHash
-		let expiration: DappToWalletInteractionSubintentExpiration
+		let expirationTimestamp: Instant
 	}
 }
