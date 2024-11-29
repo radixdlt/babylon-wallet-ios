@@ -34,7 +34,7 @@ extension FactorSourceKind {
 			.passphraseFactor
 		case .arculusCard:
 			.arculusFactor
-		case .passphrase:
+		case .password:
 			.passwordFactor
 		case .trustedContact, .securityQuestions:
 			nil
@@ -51,7 +51,7 @@ extension FactorSourceKind {
 			"Passphrase"
 		case .arculusCard:
 			"Arculus Card"
-		case .passphrase:
+		case .password:
 			"Password"
 		case .trustedContact, .securityQuestions:
 			nil
@@ -68,31 +68,9 @@ extension FactorSourceKind {
 			"Enter a seed phrase to approve"
 		case .arculusCard:
 			"Tap to your phone to approve"
-		case .passphrase:
+		case .password:
 			"Enter a decentralized password to approve"
 		case .trustedContact, .securityQuestions:
-			nil
-		}
-	}
-}
-
-// TODO: move to Sargon
-extension FactorSource {
-	var name: String? {
-		switch self {
-		case let .device(factorSource):
-			factorSource.hint.name
-		case let .ledger(factorSource):
-			factorSource.hint.name
-		case let .offDeviceMnemonic(factorSource):
-			factorSource.hint.displayName.value
-		case let .arculusCard(factorSource):
-			factorSource.hint.name
-		case let .passphrase(factorSource):
-			factorSource.factorSourceKind.title
-		case let .trustedContact(factorSource):
-			factorSource.contact.name.value
-		case let .securityQuestions(factorSource):
 			nil
 		}
 	}

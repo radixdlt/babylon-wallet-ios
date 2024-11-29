@@ -199,44 +199,37 @@ extension FactorSourceCard {
 				isExpanded: isExpanded
 			)
 		case let .instanceCompact(factorSource):
-			guard let name = factorSource.name else { return nil }
-
 			self = .init(
 				kind: kind,
 				mode: mode,
 				dataSource: .init(
 					icon: icon,
-					title: name,
+					title: factorSource.name,
 					messages: messages
 				),
 				isExpanded: isExpanded
 			)
 		case let .instanceRegular(factorSource):
-			guard
-				let name = factorSource.name,
-				let details = factorSource.factorSourceKind.details
-			else { return nil }
+			guard let details = factorSource.factorSourceKind.details else { return nil }
 
 			self = .init(
 				kind: kind,
 				mode: mode,
 				dataSource: .init(
 					icon: icon,
-					title: name,
+					title: factorSource.name,
 					subtitle: details,
 					messages: messages
 				),
 				isExpanded: isExpanded
 			)
 		case let .instanceLastUsed(factorSource, accounts, personas):
-			guard let name = factorSource.name else { return nil }
-
 			self = .init(
 				kind: kind,
 				mode: mode,
 				dataSource: .init(
 					icon: icon,
-					title: name,
+					title: factorSource.name,
 					lastUsedOn: factorSource.common.lastUsedOn,
 					messages: messages,
 					accounts: accounts,
