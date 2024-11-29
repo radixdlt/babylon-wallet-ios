@@ -59,6 +59,17 @@ extension DappMetadata {
 }
 
 extension DappMetadata {
+	var name: String {
+		switch self {
+		case let .ledger(ledger):
+			ledger.name?.rawValue ?? L10n.DAppRequest.Metadata.unknownName
+		case .request:
+			L10n.DAppRequest.Metadata.unknownName
+		case .wallet:
+			L10n.DAppRequest.Metadata.wallet
+		}
+	}
+
 	var origin: DappOrigin {
 		switch self {
 		case let .ledger(metadata): metadata.origin

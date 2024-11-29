@@ -68,9 +68,14 @@ extension PreAuthorizationClient: DependencyKey {
 			)
 		}
 
+		let pollStatus: PollStatus = { request in
+			try await SargonOS.shared.pollPreAuthorizationStatus(intentHash: request.subintentHash, expirationTimestamp: request.expirationTimestamp)
+		}
+
 		return Self(
 			getPreview: getPreview,
-			buildSubintent: buildSubintent
+			buildSubintent: buildSubintent,
+			pollStatus: pollStatus
 		)
 	}
 }

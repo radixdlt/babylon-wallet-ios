@@ -1426,6 +1426,8 @@ internal enum L10n {
       internal static func subtitle(_ p1: Any) -> String {
         return L10n.tr("Localizable", "dAppRequest_completion_subtitle", String(describing: p1), fallback: "Request from %@ complete")
       }
+      /// Your pre-authorization has been included in a successful transaction.
+      internal static let subtitlePreAuthorization = L10n.tr("Localizable", "dAppRequest_completion_subtitlePreAuthorization", fallback: "Your pre-authorization has been included in a successful transaction.")
       /// Success
       internal static let title = L10n.tr("Localizable", "dAppRequest_completion_title", fallback: "Success")
     }
@@ -2336,7 +2338,9 @@ internal enum L10n {
       /// When anyone creates a token or NFT on Radix, there is a list of behaviors they can apply to them. Things like being able to increase the token’s supply, being able to change an NFT’s image and description, or being able to remove a token from someone’s account. There are plenty of valid reasons for why someone might want to do these things, but it’s always good to know if they can. 
       /// 
       /// Just tap into any token in the Radix Wallet to get a full list of its behaviors.
-      internal static let behaviors = L10n.tr("Localizable", "infoLink_glossary_behaviors", fallback: "## Asset Behaviors\n\nAsset behaviors define the rules that were placed on a [token](?glossaryAnchor=tokens) or [NFT](?glossaryAnchor=nfts) when it was created. They ensure all users know exactly what actions can be performed on any asset. And they’re labeled in everyday language so everyone can read them, understand them and know the nature of the asset they’re holding.\n\n---\n\nThe [Radix Network](?glossaryAnchor=radixnetwork) is built differently to all other blockchains. One of the great benefits of this is that assets – tokens and NFTs – are native to the ecosystem. So unlike on networks such as Ethereum, where tokens are not really tokens but just balances on a smart contract, assets on Radix act like real-life assets. With real-life assets of different kinds, you know who can create it, destory it, take it away from you or freeze it within your bank account. Similarly with Radix, you’ll always know how assets will behave and what someone can do to them.\n\nWhen anyone creates a token or NFT on Radix, there is a list of behaviors they can apply to them. Things like being able to increase the token’s supply, being able to change an NFT’s image and description, or being able to remove a token from someone’s account. There are plenty of valid reasons for why someone might want to do these things, but it’s always good to know if they can. \n\nJust tap into any token in the Radix Wallet to get a full list of its behaviors.")
+      /// 
+      /// [Learn more about the asset behaviors ↗](https://learn.radixdlt.com/article/what-are-radix-asset-behaviors)
+      internal static let behaviors = L10n.tr("Localizable", "infoLink_glossary_behaviors", fallback: "## Asset Behaviors\n\nAsset behaviors define the rules that were placed on a [token](?glossaryAnchor=tokens) or [NFT](?glossaryAnchor=nfts) when it was created. They ensure all users know exactly what actions can be performed on any asset. And they’re labeled in everyday language so everyone can read them, understand them and know the nature of the asset they’re holding.\n\n---\n\nThe [Radix Network](?glossaryAnchor=radixnetwork) is built differently to all other blockchains. One of the great benefits of this is that assets – tokens and NFTs – are native to the ecosystem. So unlike on networks such as Ethereum, where tokens are not really tokens but just balances on a smart contract, assets on Radix act like real-life assets. With real-life assets of different kinds, you know who can create it, destory it, take it away from you or freeze it within your bank account. Similarly with Radix, you’ll always know how assets will behave and what someone can do to them.\n\nWhen anyone creates a token or NFT on Radix, there is a list of behaviors they can apply to them. Things like being able to increase the token’s supply, being able to change an NFT’s image and description, or being able to remove a token from someone’s account. There are plenty of valid reasons for why someone might want to do these things, but it’s always good to know if they can. \n\nJust tap into any token in the Radix Wallet to get a full list of its behaviors.\n\n[Learn more about the asset behaviors ↗](https://learn.radixdlt.com/article/what-are-radix-asset-behaviors)")
       /// ## Bridging
       /// 
       /// Bridging is the process of getting assets into and out of the [Radix Network](?glossaryAnchor=radixnetwork). Assets on Radix can be held by your [Radix Wallet](?glossaryAnchor=radixnetwork), and used with [dApps](?glossaryAnchor=dapps) on Radix. There are a variety of dApps that provide bridging in different ways, for different assets.
@@ -3070,6 +3074,14 @@ internal enum L10n {
       /// Pre-authorization is no longer valid
       internal static let expired = L10n.tr("Localizable", "preAuthorizationReview_expiration_expired", fallback: "Pre-authorization is no longer valid")
     }
+    internal enum ExpiredStatus {
+      /// Switch back to your browser to try again
+      internal static let retryInBrowser = L10n.tr("Localizable", "preAuthorizationReview_expiredStatus_retryInBrowser", fallback: "Switch back to your browser to try again")
+      /// Your pre-authorization has expired and can no longer be used.
+      internal static let subtitle = L10n.tr("Localizable", "preAuthorizationReview_expiredStatus_subtitle", fallback: "Your pre-authorization has expired and can no longer be used.")
+      /// Pre-Authorization Timed Out
+      internal static let title = L10n.tr("Localizable", "preAuthorizationReview_expiredStatus_title", fallback: "Pre-Authorization Timed Out")
+    }
     internal enum Fees {
       /// Network fees will be paid by the dApp
       internal static let subtitle = L10n.tr("Localizable", "preAuthorizationReview_fees_subtitle", fallback: "Network fees will be paid by the dApp")
@@ -3113,6 +3125,22 @@ internal enum L10n {
       internal static func seconds(_ p1: Int) -> String {
         return L10n.tr("Localizable", "preAuthorizationReview_timeFormat_seconds", p1, fallback: "%d seconds")
       }
+    }
+    internal enum UnknownStatus {
+      /// %@ has **%@** to use this pre-authorization
+      internal static func expiration(_ p1: Any, _ p2: Any) -> String {
+        return L10n.tr("Localizable", "preAuthorizationReview_unknownStatus_expiration", String(describing: p1), String(describing: p2), fallback: "%@ has **%@** to use this pre-authorization")
+      }
+      /// Pre-Authorization ID
+      internal static let identifier = L10n.tr("Localizable", "preAuthorizationReview_unknownStatus_identifier", fallback: "Pre-Authorization ID")
+      /// Checking one last time..
+      internal static let lastCheck = L10n.tr("Localizable", "preAuthorizationReview_unknownStatus_lastCheck", fallback: "Checking one last time..")
+      /// Your pre-authorization has been sent to %@
+      internal static func subtitle(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "preAuthorizationReview_unknownStatus_subtitle", String(describing: p1), fallback: "Your pre-authorization has been sent to %@")
+      }
+      /// Pre-Authorization Sent
+      internal static let title = L10n.tr("Localizable", "preAuthorizationReview_unknownStatus_title", fallback: "Pre-Authorization Sent")
     }
   }
   internal enum Preferences {

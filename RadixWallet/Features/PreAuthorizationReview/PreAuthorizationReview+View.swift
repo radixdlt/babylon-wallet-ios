@@ -18,7 +18,7 @@ extension PreAuthorizationReview.State {
 // MARK: - PreAuthorizationReview.View
 extension PreAuthorizationReview {
 	struct ViewState: Equatable {
-		let dAppMetadata: DappMetadata.Ledger?
+		let dAppMetadata: DappMetadata
 		let displayMode: Common.DisplayMode
 		let sliderResetDate: Date
 		let expiration: Expiration
@@ -26,10 +26,6 @@ extension PreAuthorizationReview {
 		let globalControlState: ControlState
 		let sliderControlState: ControlState
 		let showRawManifestButton: Bool
-
-		var dAppName: String? {
-			dAppMetadata?.name?.rawValue
-		}
 	}
 
 	@MainActor
@@ -50,7 +46,7 @@ extension PreAuthorizationReview {
 					.toolbar {
 						ToolbarItem(placement: .principal) {
 							if showNavigationTitle {
-								navigationTitle(dAppName: viewStore.dAppName)
+								navigationTitle(dAppName: viewStore.dAppMetadata.name)
 							}
 						}
 					}
@@ -91,7 +87,7 @@ extension PreAuthorizationReview {
 					.clipShape(RoundedRectangle(cornerRadius: .small1))
 					.padding(.horizontal, .small2)
 
-					feesInformation(dAppName: viewStore.dAppName)
+					feesInformation(dAppName: viewStore.dAppMetadata.name)
 						.padding(.top, .small2)
 						.padding(.horizontal, .small2)
 
@@ -123,11 +119,11 @@ extension PreAuthorizationReview {
 			}
 		}
 
-		private func header(dAppMetadata: DappMetadata.Ledger?) -> some SwiftUI.View {
+		private func header(dAppMetadata: DappMetadata) -> some SwiftUI.View {
 			Common.HeaderView(
 				kind: .preAuthorization,
-				name: dAppMetadata?.name?.rawValue,
-				thumbnail: dAppMetadata?.thumbnail
+				name: dAppMetadata.name,
+				thumbnail: dAppMetadata.thumbnail
 			)
 			.measurePosition(navTitleID, coordSpace: coordSpace)
 			.padding(.horizontal, .medium3)
@@ -233,13 +229,13 @@ private extension View {
 			.rawManifestAlert(with: destinationStore)
 	}
 
-	private func rawManifestAlert(with destinationStore: PresentationStoreOf<PreAuthorizationReview.Destination>) -> some View {
-		alert(store: destinationStore.scope(state: \.rawManifestAlert, action: \.rawManifestAlert))
-	}
-
 	private func signing(with destinationStore: PresentationStoreOf<PreAuthorizationReview.Destination>) -> some View {
 		sheet(store: destinationStore.scope(state: \.signing, action: \.signing)) {
 			Signing.View(store: $0)
 		}
+	}
+
+	private func rawManifestAlert(with destinationStore: PresentationStoreOf<PreAuthorizationReview.Destination>) -> some View {
+		alert(store: destinationStore.scope(state: \.rawManifestAlert, action: \.rawManifestAlert))
 	}
 }

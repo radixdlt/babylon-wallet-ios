@@ -40,16 +40,12 @@ extension DappInteractor {
 			}
 		}
 
-		@MainActor
 		private var dappInteraction: some SwiftUI.View {
-			WithViewStore(store, observe: { $0.destination }) { viewStore in
-				IfLetStore(
-					store.destination,
-					state: /DappInteractor.Destination.State.dappInteraction,
-					action: DappInteractor.Destination.Action.dappInteraction,
-					then: { DappInteractionCoordinator.View(store: $0) }
-				)
-				.transition(.move(edge: .bottom))
+			WithViewStore(store, observe: { $0 }) { viewStore in
+				IfLetStore(store.scope(state: \.dappInteraction, action: \.child.dappInteraction)) { viewStore in
+					DappInteractionCoordinator.View(store: viewStore)
+						.transition(.move(edge: .bottom))
+				}
 				.animation(.linear, value: viewStore.state)
 			}
 		}
@@ -72,6 +68,7 @@ private extension View {
 		return dappInteractionCompletion(with: destinationStore, store: store)
 			.invalidRequestAlert(with: destinationStore)
 			.responseFailureAlert(with: destinationStore)
+			.preAuthorizationPolling(with: destinationStore)
 	}
 
 	private func dappInteractionCompletion(with destinationStore: PresentationStoreOf<DappInteractor.Destination>, store: StoreOf<DappInteractor>) -> some View {
@@ -79,7 +76,7 @@ private extension View {
 			store: destinationStore.scope(state: \.dappInteractionCompletion, action: \.dappInteractionCompletion),
 			onDismiss: { store.send(.view(.completionDismissed)) }
 		) {
-			Completion.View(store: $0)
+			DappInteractionCompletion.View(store: $0)
 		}
 	}
 
@@ -89,6 +86,12 @@ private extension View {
 
 	private func responseFailureAlert(with destinationStore: PresentationStoreOf<DappInteractor.Destination>) -> some View {
 		alert(store: destinationStore.scope(state: \.responseFailure, action: \.responseFailure))
+	}
+
+	private func preAuthorizationPolling(with destinationStore: PresentationStoreOf<DappInteractor.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.pollPreAuthorizationStatus, action: \.pollPreAuthorizationStatus)) {
+			PollPreAuthorizationStatus.View(store: $0)
+		}
 	}
 }
 

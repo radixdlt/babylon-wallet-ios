@@ -14,25 +14,6 @@ extension RadixConnectClient {
 		let radixConnectMobile = RadixConnectMobile()
 		let localNetworkAuthorization = LocalNetworkAuthorization()
 
-		Task {
-			@Dependency(\.accountsClient) var accountsClient
-			for try await accounts in await accountsClient.accountsOnCurrentNetwork() {
-				guard !Task.isCancelled else { return }
-				try? await sendAccountListMessage(accounts: accounts)
-			}
-		}
-
-		Task {
-			let connectedClients = await rtcClients.connectClients()
-				.filter { updates in
-					!updates.flatMap(\.idsOfConnectedPeerConnections).isEmpty
-				}
-			for try await updates in connectedClients {
-				guard !Task.isCancelled else { return }
-				sendAccountListMessageAfterConnect()
-			}
-		}
-
 		@Sendable
 		func sendAccountListMessageAfterConnect() {
 			Task {
@@ -175,6 +156,28 @@ extension RadixConnectClient {
 					loggerGlobal.error("Failed to handle deep link \(error)")
 					errorQueue.schedule(error)
 					throw error
+				}
+			},
+			startNotifyingConnectorWithAccounts: {
+				try await withThrowingTaskGroup(of: Void.self) { group in
+					group.addTask {
+						@Dependency(\.accountsClient) var accountsClient
+						for try await accounts in await accountsClient.accountsOnCurrentNetwork() {
+							guard !Task.isCancelled else { return }
+							try? await sendAccountListMessage(accounts: accounts)
+						}
+					}
+
+					group.addTask {
+						let connectedClients = await rtcClients.connectClients()
+							.filter { updates in
+								!updates.flatMap(\.idsOfConnectedPeerConnections).isEmpty
+							}
+						for try await updates in connectedClients {
+							guard !Task.isCancelled else { return }
+							sendAccountListMessageAfterConnect()
+						}
+					}
 				}
 			}
 		)

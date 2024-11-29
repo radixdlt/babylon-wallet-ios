@@ -43,6 +43,8 @@ struct RadixConnectClient: DependencyKey, Sendable {
 	var sendRequest: SendRequest
 
 	var handleDappDeepLink: HandleDappDeepLink
+
+	var startNotifyingConnectorWithAccounts: StartNotifyingConnectorWithAccounts
 }
 
 extension RadixConnectClient {
@@ -70,4 +72,6 @@ extension RadixConnectClient {
 
 	typealias ConnectToP2PLinks = @Sendable (P2PLinks) async throws -> Void
 	typealias HandleDappDeepLink = @Sendable (URL) async throws -> Void
+
+	typealias StartNotifyingConnectorWithAccounts = @Sendable () async throws -> Void
 }

@@ -124,7 +124,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case dismissWithFailure(WalletToDappInteractionFailureResponse)
-		case dismissWithSuccess(DappMetadata, TransactionIntentHash)
+		case dismissWithSuccess(DappMetadata, DappInteractionCompletionKind)
 		case submit(WalletToDappInteractionSuccessResponse, DappMetadata)
 		case dismiss
 	}
@@ -516,6 +516,7 @@ extension DappInteractionFlow {
 		) -> Effect<Action> {
 			let preAuthResponse = newWalletToDappInteractionPreAuthorizationResponseItems(signedSubintent: signedSubintent)
 			state.responseItems[item] = .remote(.preAuthorization(preAuthResponse))
+
 			return continueEffect(for: &state)
 		}
 
@@ -564,7 +565,7 @@ extension DappInteractionFlow {
 			return handleSignAndSubmitTX(item, txID)
 
 		case let .reviewTransaction(.delegate(.transactionCompleted(txID))):
-			return .send(.delegate(.dismissWithSuccess(state.dappMetadata, txID)))
+			return .send(.delegate(.dismissWithSuccess(state.dappMetadata, .transaction(txID))))
 
 		case .reviewTransaction(.delegate(.dismiss)):
 			return .send(.delegate(.dismiss))
@@ -1053,7 +1054,7 @@ extension DappInteractionFlow.Path.State {
 				unvalidatedManifest: item.unvalidatedManifest,
 				expiration: item.expiration,
 				nonce: .secureRandom(),
-				dAppMetadata: dappMetadata.onLedger,
+				dAppMetadata: dappMetadata,
 				message: item.message
 			))
 		}

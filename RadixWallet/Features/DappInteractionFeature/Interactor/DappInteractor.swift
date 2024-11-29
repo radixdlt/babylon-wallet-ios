@@ -17,10 +17,12 @@ struct DappInteractor: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		var requestQueue: IdentifiedArrayOf<RequestEnvelope> = []
 
+		var dappInteraction: DappInteractionCoordinator.State?
+
 		@PresentationState
 		var destination: Destination.State?
 
-		fileprivate var shouldIncrementOnCompletionDismiss = false
+		fileprivate var shouldIncrementNPSCounterOnCompletionDismiss = false
 	}
 
 	enum ViewAction: Sendable, Equatable {
@@ -30,14 +32,18 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case completionDismissed
 	}
 
+	@CasePathable
+	enum ChildAction: Sendable, Equatable {
+		case dappInteraction(DappInteractionCoordinator.Action)
+	}
+
 	enum InternalAction: Sendable, Equatable {
 		case receivedRequestFromDapp(RequestEnvelope)
 		case presentQueuedRequestIfNeeded
 		case sentResponseToDapp(
 			WalletToDappInteractionResponse,
 			for: RequestEnvelope,
-			DappMetadata,
-			TransactionIntentHash?
+			DappMetadata
 		)
 		case failedToSendResponseToDapp(
 			WalletToDappInteractionResponse,
@@ -45,12 +51,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			DappMetadata,
 			reason: String
 		)
-		case presentResponseFailureAlert(
-			WalletToDappInteractionResponse,
-			for: RequestEnvelope,
-			DappMetadata, reason: String
-		)
-		case presentResponseSuccessView(DappMetadata, TransactionIntentHash?, P2P.Route)
+		case presentResponseSuccessView(DappMetadata, DappInteractionCompletionKind, P2P.Route)
 		case presentInvalidRequest(
 			DappToWalletInteractionUnvalidated,
 			reason: DappInteractionClient.ValidatedDappRequest.InvalidRequestReason,
@@ -62,16 +63,16 @@ struct DappInteractor: Sendable, FeatureReducer {
 	struct Destination: Sendable, DestinationReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
-			case dappInteraction(DappInteractionCoordinator.State)
-			case dappInteractionCompletion(Completion.State)
+			case dappInteractionCompletion(DappInteractionCompletion.State)
+			case pollPreAuthorizationStatus(PollPreAuthorizationStatus.State)
 			case responseFailure(AlertState<Action.ResponseFailure>)
 			case invalidRequest(AlertState<Action.InvalidRequest>)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
-			case dappInteraction(DappInteractionCoordinator.Action)
-			case dappInteractionCompletion(Completion.Action)
+			case dappInteractionCompletion(DappInteractionCompletion.Action)
+			case pollPreAuthorizationStatus(PollPreAuthorizationStatus.Action)
 			case responseFailure(ResponseFailure)
 			case invalidRequest(InvalidRequest)
 
@@ -86,11 +87,11 @@ struct DappInteractor: Sendable, FeatureReducer {
 		}
 
 		var body: some ReducerOf<Self> {
-			Scope(state: \.dappInteraction, action: \.dappInteraction) {
-				DappInteractionCoordinator()
-			}
 			Scope(state: \.dappInteractionCompletion, action: \.dappInteractionCompletion) {
-				Completion()
+				DappInteractionCompletion()
+			}
+			Scope(state: \.pollPreAuthorizationStatus, action: \.pollPreAuthorizationStatus) {
+				PollPreAuthorizationStatus()
 			}
 		}
 	}
@@ -109,6 +110,9 @@ struct DappInteractor: Sendable, FeatureReducer {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
+			}
+			.ifLet(\.dappInteraction, action: \.child.dappInteraction) {
+				DappInteractionCoordinator()
 			}
 	}
 
@@ -130,7 +134,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			}
 
 		case .completionDismissed:
-			if state.shouldIncrementOnCompletionDismiss {
+			if state.shouldIncrementNPSCounterOnCompletionDismiss {
 				npsSurveyClient.incrementTransactionCompleteCounter()
 			}
 			return .none
@@ -156,20 +160,23 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case .presentQueuedRequestIfNeeded:
 			return presentQueuedRequestIfNeededEffect(for: &state)
 
-		case let .sentResponseToDapp(response, for: request, dappMetadata, txID):
-			dismissCurrentModalAndRequest(request, for: &state)
+		case let .sentResponseToDapp(response, for: request, dappMetadata):
 			switch response {
-			case .success:
-				return .send(.internal(.presentResponseSuccessView(dappMetadata, txID, request.route)))
+			case let .success(success):
+				if let response = success.preAuthorizationResponse {
+					dismissCurrentModalAndRequest(request, for: &state, clearDappInteraction: false)
+					return pollPreAuthorizationEffect(for: &state, request: request, dappMetadata: dappMetadata, response: response)
+				} else {
+					dismissCurrentModalAndRequest(request, for: &state)
+					return .send(.internal(.presentResponseSuccessView(dappMetadata, .personaData, request.route)))
+				}
 			case .failure:
+				dismissCurrentModalAndRequest(request, for: &state)
 				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
 			}
 
-		case let .failedToSendResponseToDapp(response, for: request, metadata, reason):
+		case let .failedToSendResponseToDapp(response, for: request, dappMetadata, reason):
 			dismissCurrentModalAndRequest(request, for: &state)
-			return .send(.internal(.presentResponseFailureAlert(response, for: request, metadata, reason: reason)))
-
-		case let .presentResponseFailureAlert(response, for: request, dappMetadata, reason):
 			state.destination = .responseFailure(.init(
 				title: { TextState(L10n.Common.errorAlertTitle) },
 				actions: {
@@ -212,26 +219,22 @@ struct DappInteractor: Sendable, FeatureReducer {
 			))
 			return .none
 
-		case let .presentResponseSuccessView(dappMetadata, txID, p2pRoute):
-			state.shouldIncrementOnCompletionDismiss = txID != nil
+		case let .presentResponseSuccessView(dappMetadata, kind, p2pRoute):
+			state.shouldIncrementNPSCounterOnCompletionDismiss = kind.shouldIncrementNPSCounterOnCompletionDismiss
 			if !state.requestQueue.isEmpty {
 				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
 			}
 			state.destination = .dappInteractionCompletion(
-				.init(
-					txID: txID,
-					dappMetadata: dappMetadata,
-					p2pRoute: p2pRoute
-				)
+				.init(kind: kind, dappMetadata: dappMetadata, p2pRoute: p2pRoute)
 			)
 			return .none
 		}
 	}
 
-	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
-		switch presentedAction {
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+		switch childAction {
 		case let .dappInteraction(.delegate(delegateAction)):
-			guard case let .dappInteraction(dappInteraction) = state.destination else {
+			guard let dappInteraction = state.dappInteraction else {
 				let message = "We should only get actions from this modal if it is showing"
 				assertionFailure(message)
 				loggerGlobal.error(.init(stringLiteral: message))
@@ -250,6 +253,13 @@ struct DappInteractor: Sendable, FeatureReducer {
 				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
 			}
 
+		default:
+			return .none
+		}
+	}
+
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
 		case .dappInteractionCompletion(.delegate(.dismiss)):
 			return onCompletionScreenDismissed(&state)
 
@@ -275,6 +285,10 @@ struct DappInteractor: Sendable, FeatureReducer {
 				}
 			}
 
+		case let .pollPreAuthorizationStatus(.delegate(.dismiss(request))):
+			dismissCurrentModalAndRequest(request, for: &state)
+			return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
+
 		default:
 			return .none
 		}
@@ -283,9 +297,12 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
 		switch state.destination {
 		case .dappInteractionCompletion:
-			onCompletionScreenDismissed(&state)
+			return onCompletionScreenDismissed(&state)
+		case .pollPreAuthorizationStatus:
+			state.dappInteraction = nil
+			return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
 		default:
-			.none
+			return .none
 		}
 	}
 
@@ -294,12 +311,13 @@ struct DappInteractor: Sendable, FeatureReducer {
 	) -> Effect<Action> {
 		guard
 			let next = state.requestQueue.first,
+			state.dappInteraction == nil,
 			state.destination == nil
 		else {
 			return .none
 		}
 
-		state.destination = .dappInteraction(.init(request: next))
+		state.dappInteraction = .init(request: next)
 
 		return .none
 	}
@@ -313,15 +331,17 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 			// In case of transaction response, sending it to the peer client is a silent operation.
 			// The success or failures is determined based on the transaction polling status.
-			let txID: TransactionIntentHash? = {
-				if case let .success(successResponse) = responseToDapp,
-				   case let .transaction(txID) = successResponse.items
-				{
-					return txID.send.transactionIntentHash
+			let isTransactionResponse = {
+				guard case let .success(successResponse) = responseToDapp else {
+					return false
 				}
-				return nil
+				switch successResponse.items {
+				case .authorizedRequest, .unauthorizedRequest, .preAuthorization:
+					return false
+				case .transaction:
+					return true
+				}
 			}()
-			let isTransactionResponse = txID != nil
 
 			do {
 				_ = try await dappInteractionClient.completeInteraction(.response(.dapp(responseToDapp), origin: request.route))
@@ -330,8 +350,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 						.sentResponseToDapp(
 							responseToDapp,
 							for: request,
-							dappMetadata,
-							txID
+							dappMetadata
 						)
 					))
 				} else {
@@ -354,14 +373,35 @@ struct DappInteractor: Sendable, FeatureReducer {
 		}
 	}
 
-	func dismissCurrentModalAndRequest(_ request: RequestEnvelope, for state: inout State) {
+	func dismissCurrentModalAndRequest(_ request: RequestEnvelope, for state: inout State, clearDappInteraction: Bool = true) {
 		state.requestQueue.remove(id: request.id)
+		if clearDappInteraction {
+			state.dappInteraction = nil
+		}
 		state.destination = nil
 	}
 
 	func onCompletionScreenDismissed(_ state: inout State) -> Effect<Action> {
 		state.destination = nil
 		return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
+	}
+
+	func pollPreAuthorizationEffect(
+		for state: inout State,
+		request: RequestEnvelope,
+		dappMetadata: DappMetadata,
+		response: WalletToDappInteractionSubintentResponseItem
+	) -> Effect<Action> {
+		state.destination = .pollPreAuthorizationStatus(
+			.init(
+				dAppMetadata: dappMetadata,
+				subintentHash: response.signedSubintent.subintent.hash(),
+				expirationTimestamp: response.expirationTimestamp,
+				isDeepLink: request.route.isDeepLink,
+				request: request
+			)
+		)
+		return .none
 	}
 }
 
@@ -507,6 +547,28 @@ extension DappInteractor {
 			}
 		} catch: { error, _ in
 			errorQueue.schedule(error)
+		}
+	}
+}
+
+private extension DappInteractionCompletionKind {
+	var shouldIncrementNPSCounterOnCompletionDismiss: Bool {
+		switch self {
+		case .transaction:
+			true
+		case .personaData:
+			false
+		}
+	}
+}
+
+private extension WalletToDappInteractionSuccessResponse {
+	var preAuthorizationResponse: WalletToDappInteractionSubintentResponseItem? {
+		switch items {
+		case let .preAuthorization(preAuthorization):
+			preAuthorization.response
+		case .authorizedRequest, .unauthorizedRequest, .transaction:
+			nil
 		}
 	}
 }

@@ -55,8 +55,6 @@ extension SubmitTransaction {
 
 	@MainActor
 	struct View: SwiftUI.View {
-		@SwiftUI.State private var opacity: Double = 1.0
-
 		private let store: StoreOf<SubmitTransaction>
 
 		@ScaledMetric private var height: CGFloat = 360
@@ -81,19 +79,7 @@ extension SubmitTransaction {
 								.padding(.horizontal, .medium2)
 								.padding(.top, .medium3)
 						} else {
-							Image(asset: AssetResource.transactionInProgress)
-								.opacity(opacity)
-								.animation(
-									.easeInOut(duration: 0.3)
-										.delay(0.2)
-										.repeatForever(autoreverses: true),
-									value: opacity
-								)
-								.onAppear {
-									withAnimation {
-										opacity = 0.5
-									}
-								}
+							InteractionReview.InteractionInProgressView()
 						}
 
 						Text(viewStore.status.display)
@@ -103,15 +89,11 @@ extension SubmitTransaction {
 							.padding(.horizontal, .medium2)
 							.padding(.top, .medium3)
 
-						HStack {
-							Text(L10n.TransactionReview.SubmitTransaction.txID)
-								.foregroundColor(.app.gray1)
-							AddressView(.transaction(viewStore.txID), imageColor: .app.gray2)
-								.foregroundColor(.app.blue1)
-						}
-						.textStyle(.body1Header)
-						.padding(.horizontal, .medium2)
-						.padding(.top, .small2)
+						AddressView(.transaction(viewStore.txID), imageColor: .app.gray2)
+							.foregroundColor(.app.blue1)
+							.textStyle(.body1Header)
+							.padding(.horizontal, .medium2)
+							.padding(.top, .small2)
 
 						Spacer()
 						if viewStore.status.failed, viewStore.showSwitchBackToBrowserMessage {

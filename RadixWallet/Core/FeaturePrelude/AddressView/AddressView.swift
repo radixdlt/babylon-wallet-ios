@@ -56,6 +56,7 @@ extension AddressView {
 							AddressDetails.View(store: store)
 						}
 					}
+
 			case .transaction:
 				Menu {
 					Button(L10n.AddressAction.copyTransactionId, image: .copyBig) {
@@ -68,12 +69,20 @@ extension AddressView {
 				} label: {
 					addressView
 				}
+
+			case .preAuthorization:
+				addressView
+					.onTapGesture(perform: copyToPasteboard)
 			}
 		}
 	}
 
 	private var addressView: some View {
 		HStack(spacing: .small3) {
+			Text(prefix)
+				.textStyle(.body1Header)
+				.foregroundStyle(.app.gray1)
+
 			Text(formattedText)
 				.lineLimit(1)
 
@@ -88,9 +97,20 @@ extension AddressView {
 		}
 	}
 
-	private var imageResource: ImageResource {
+	private var prefix: String? {
 		switch identifiable {
 		case .address:
+			nil
+		case .transaction:
+			L10n.TransactionReview.SubmitTransaction.txID
+		case .preAuthorization:
+			L10n.PreAuthorizationReview.UnknownStatus.identifier
+		}
+	}
+
+	private var imageResource: ImageResource {
+		switch identifiable {
+		case .address, .preAuthorization:
 			.copy
 		case .transaction:
 			.iconLinkOut
