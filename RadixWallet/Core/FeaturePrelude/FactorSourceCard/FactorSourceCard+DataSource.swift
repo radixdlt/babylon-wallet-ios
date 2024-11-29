@@ -44,15 +44,15 @@ extension FactorSourceKind {
 	var title: String? {
 		switch self {
 		case .device:
-			"Biometrics/PIN"
+			L10n.FactorSources.Card.deviceTitle
 		case .ledgerHqHardwareWallet:
-			"Ledger Nano"
+			L10n.FactorSources.Card.ledgerTitle
 		case .offDeviceMnemonic:
-			"Passphrase"
+			L10n.FactorSources.Card.passphraseTitle
 		case .arculusCard:
-			"Arculus Card"
+			L10n.FactorSources.Card.arculusCardTitle
 		case .password:
-			"Password"
+			L10n.FactorSources.Card.passwordTitle
 		case .trustedContact, .securityQuestions:
 			nil
 		}
@@ -61,15 +61,15 @@ extension FactorSourceKind {
 	var details: String? {
 		switch self {
 		case .device:
-			"Use phone biometrics/PIN to approve"
+			L10n.FactorSources.Card.deviceDescription
 		case .ledgerHqHardwareWallet:
-			"Connect via USB to approve"
+			L10n.FactorSources.Card.ledgerDescription
 		case .offDeviceMnemonic:
-			"Enter a seed phrase to approve"
+			L10n.FactorSources.Card.passphraseDescription
 		case .arculusCard:
-			"Tap to your phone to approve"
+			L10n.FactorSources.Card.arculusCardDescription
 		case .password:
-			"Enter a decentralized password to approve"
+			L10n.FactorSources.Card.passwordDescription
 		case .trustedContact, .securityQuestions:
 			nil
 		}
