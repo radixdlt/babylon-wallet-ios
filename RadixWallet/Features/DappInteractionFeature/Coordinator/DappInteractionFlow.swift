@@ -1155,14 +1155,3 @@ struct SavedPersonaDataInPersonaDoesNotMatchWalletInteractionResponseItem: Swift
 struct PersonaDataEntryNotFoundInResponse: Swift.Error {
 	let kind: PersonaData.Entry.Kind
 }
-
-private extension DappToWalletInteractionSubintentExpiration {
-	var timestamp: Date {
-		switch self {
-		case let .afterDelay(afterDelay):
-			Date().addingTimeInterval(TimeInterval(afterDelay.expireAfterSeconds))
-		case let .atTime(atTime):
-			atTime.date
-		}
-	}
-}
