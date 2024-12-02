@@ -19,29 +19,8 @@ extension SecurityCenterClient {
 	typealias LastCloudBackup = @Sendable () async -> AnyAsyncSequence<BackupStatus?>
 }
 
-// MARK: - SecurityProblemKind + CaseIterable
-// TODO: Move to Sargon if possible
-extension SecurityProblemKind: CaseIterable {
-	public static var allCases: [SecurityProblemKind] {
-		[.configurationBackup, .securityFactors]
-	}
-}
-
-// MARK: - SecurityProblem + Identifiable
-// TODO: Move to Sargon if possible
-extension SecurityProblem: Identifiable {
-	public var id: Int { number }
-
-	var number: Int {
-		switch self {
-		case .problem3: 3
-		case .problem5: 5
-		case .problem6: 6
-		case .problem7: 7
-		case .problem9: 9
-		}
-	}
-
+// MARK: - SecurityProblem
+extension SecurityProblem {
 	var accountCard: String {
 		switch self {
 		case .problem3: L10n.SecurityProblems.No3.accountCard
