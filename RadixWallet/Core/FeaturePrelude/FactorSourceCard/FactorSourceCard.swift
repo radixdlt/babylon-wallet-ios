@@ -51,7 +51,7 @@ struct FactorSourceCard: View {
 				.padding(.bottom, .medium1)
 			}
 
-			if dataSource.hasAccountsOrPersonas {
+			if dataSource.hasEntities {
 				LinkedEntitesView(
 					isExpanded: isExpanded,
 					accounts: dataSource.accounts,
@@ -179,69 +179,53 @@ extension FactorSourceCard {
 		isExpanded: Bool = false,
 		onRemoveTapped: (() -> Void)? = nil
 	) {
-		guard
-			let icon = kind.factorSourceKind.icon,
-			let title = kind.title
-		else { return nil }
+		guard kind.factorSourceKind.isSupported else { return nil }
 
 		switch kind {
 		case let .genericDescription(factorSourceKind):
-			guard let details = factorSourceKind.details else { return nil }
-
 			self = .init(
 				kind: kind,
 				mode: mode,
 				dataSource: .init(
-					icon: icon,
-					title: title,
-					subtitle: details,
+					icon: factorSourceKind.icon,
+					title: factorSourceKind.title,
+					subtitle: factorSourceKind.details,
 					messages: messages
 				),
 				isExpanded: isExpanded,
 				onRemoveTapped: onRemoveTapped
 			)
-		case let .instanceCompact(factorSource):
-			self = .init(
-				kind: kind,
-				mode: mode,
-				dataSource: .init(
-					icon: icon,
-					title: factorSource.name,
-					messages: messages
-				),
-				isExpanded: isExpanded,
-				onRemoveTapped: onRemoveTapped
-			)
-		case let .instanceRegular(factorSource):
-			guard let details = factorSource.factorSourceKind.details else { return nil }
-
-			self = .init(
-				kind: kind,
-				mode: mode,
-				dataSource: .init(
-					icon: icon,
-					title: factorSource.name,
-					subtitle: details,
-					messages: messages
-				),
-				isExpanded: isExpanded,
-				onRemoveTapped: onRemoveTapped
-			)
-		case let .instanceLastUsed(factorSource, accounts, personas):
-			self = .init(
-				kind: kind,
-				mode: mode,
-				dataSource: .init(
-					icon: icon,
-					title: factorSource.name,
-					lastUsedOn: factorSource.common.lastUsedOn,
-					messages: messages,
-					accounts: accounts,
-					personas: personas
-				),
-				isExpanded: isExpanded,
-				onRemoveTapped: onRemoveTapped
-			)
+		case let .instance(factorSource, instanceKind):
+			switch instanceKind {
+			case let .short(showDetails):
+				self = .init(
+					kind: kind,
+					mode: mode,
+					dataSource: .init(
+						icon: kind.factorSourceKind.icon,
+						title: factorSource.name,
+						subtitle: showDetails ? factorSource.factorSourceKind.details : nil,
+						messages: messages
+					),
+					isExpanded: isExpanded,
+					onRemoveTapped: onRemoveTapped
+				)
+			case let .extended(accounts, personas):
+				self = .init(
+					kind: kind,
+					mode: mode,
+					dataSource: .init(
+						icon: kind.factorSourceKind.icon,
+						title: factorSource.name,
+						lastUsedOn: factorSource.common.lastUsedOn,
+						messages: messages,
+						accounts: accounts,
+						personas: personas
+					),
+					isExpanded: isExpanded,
+					onRemoveTapped: onRemoveTapped
+				)
+			}
 		}
 	}
 }
@@ -249,13 +233,12 @@ extension FactorSourceCard {
 extension FactorSourceCard {
 	enum Kind {
 		case genericDescription(FactorSourceKind)
-		case instanceCompact(factorSource: FactorSource)
-		case instanceRegular(factorSource: FactorSource)
-		case instanceLastUsed(
-			factorSource: FactorSource,
-			accounts: [Account] = [],
-			personas: [Persona] = []
-		)
+		case instance(factorSource: FactorSource, kind: InstanceKind)
+
+		enum InstanceKind {
+			case short(showDetails: Bool)
+			case extended(accounts: [Account] = [], personas: [Persona] = [])
+		}
 	}
 
 	enum Mode {
@@ -275,20 +258,16 @@ extension FactorSourceCard.Kind {
 		switch self {
 		case let .genericDescription(factorSourceKind):
 			factorSourceKind
-		case let .instanceCompact(factorSource),
-		     let .instanceRegular(factorSource),
-		     let .instanceLastUsed(factorSource, _, _):
+		case let .instance(factorSource, _):
 			factorSource.factorSourceKind
 		}
 	}
 
-	var title: String? {
+	var title: String {
 		switch self {
 		case let .genericDescription(factorSourceKind):
 			factorSourceKind.title
-		case let .instanceCompact(factorSource),
-		     let .instanceRegular(factorSource),
-		     let .instanceLastUsed(factorSource, _, _):
+		case let .instance(factorSource, _):
 			factorSource.name
 		}
 	}

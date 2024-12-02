@@ -8,7 +8,7 @@ struct FactorSourceCardDataSource {
 	var accounts: [Account] = []
 	var personas: [Persona] = []
 
-	var hasAccountsOrPersonas: Bool {
+	var hasEntities: Bool {
 		!accounts.isEmpty || !personas.isEmpty
 	}
 }
@@ -24,7 +24,20 @@ extension FactorSourceCardDataSource {
 }
 
 extension FactorSourceKind {
-	var icon: ImageResource? {
+	var isSupported: Bool {
+		switch self {
+		case .device,
+		     .ledgerHqHardwareWallet,
+		     .offDeviceMnemonic,
+		     .arculusCard,
+		     .password:
+			true
+		case .trustedContact, .securityQuestions:
+			false
+		}
+	}
+
+	var icon: ImageResource {
 		switch self {
 		case .device:
 			.deviceFactor
@@ -37,11 +50,11 @@ extension FactorSourceKind {
 		case .password:
 			.passwordFactor
 		case .trustedContact, .securityQuestions:
-			nil
+			fatalError("Not supported yet")
 		}
 	}
 
-	var title: String? {
+	var title: String {
 		switch self {
 		case .device:
 			L10n.FactorSources.Card.deviceTitle
@@ -54,11 +67,11 @@ extension FactorSourceKind {
 		case .password:
 			L10n.FactorSources.Card.passwordTitle
 		case .trustedContact, .securityQuestions:
-			nil
+			fatalError("Not supported yet")
 		}
 	}
 
-	var details: String? {
+	var details: String {
 		switch self {
 		case .device:
 			L10n.FactorSources.Card.deviceDescription
@@ -71,7 +84,7 @@ extension FactorSourceKind {
 		case .password:
 			L10n.FactorSources.Card.passwordDescription
 		case .trustedContact, .securityQuestions:
-			nil
+			fatalError("Not supported yet")
 		}
 	}
 }
