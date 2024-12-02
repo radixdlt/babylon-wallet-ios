@@ -33,7 +33,7 @@ extension LedgerHardwareWalletFactorSource {
 				// crypto parameters as well (since user is unable to "edit FactorSource").
 				cryptoParameters: .babylonOlympiaCompatible
 			),
-			hint: .init(name: name, model: model)
+			hint: .init(label: name, model: model)
 		)
 	}
 }
