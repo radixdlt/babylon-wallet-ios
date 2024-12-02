@@ -1792,52 +1792,6 @@ internal enum L10n {
     }
   }
   internal enum FactorSources {
-    internal enum Card {
-      /// %d Accounts
-      internal static func accountPlural(_ p1: Int) -> String {
-        return L10n.tr("Localizable", "factorSources_card_accountPlural", p1, fallback: "%d Accounts")
-      }
-      /// 1 Account
-      internal static let accountSingular = L10n.tr("Localizable", "factorSources_card_accountSingular", fallback: "1 Account")
-      /// Tap to your phone to approve
-      internal static let arculusCardDescription = L10n.tr("Localizable", "factorSources_card_arculusCardDescription", fallback: "Tap to your phone to approve")
-      /// Arculus Card
-      internal static let arculusCardTitle = L10n.tr("Localizable", "factorSources_card_arculusCardTitle", fallback: "Arculus Card")
-      /// Use phone biometrics/PIN to approve
-      internal static let deviceDescription = L10n.tr("Localizable", "factorSources_card_deviceDescription", fallback: "Use phone biometrics/PIN to approve")
-      /// Biometrics/PIN
-      internal static let deviceTitle = L10n.tr("Localizable", "factorSources_card_deviceTitle", fallback: "Biometrics/PIN")
-      /// **Last Used:** %@
-      internal static func lastUsed(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "factorSources_card_lastUsed", String(describing: p1), fallback: "**Last Used:** %@")
-      }
-      /// Connect via USB to approve
-      internal static let ledgerDescription = L10n.tr("Localizable", "factorSources_card_ledgerDescription", fallback: "Connect via USB to approve")
-      /// Ledger Nano
-      internal static let ledgerTitle = L10n.tr("Localizable", "factorSources_card_ledgerTitle", fallback: "Ledger Nano")
-      /// Linked to %@ and %@
-      internal static func linkedAccountsAndPersonas(_ p1: Any, _ p2: Any) -> String {
-        return L10n.tr("Localizable", "factorSources_card_linkedAccountsAndPersonas", String(describing: p1), String(describing: p2), fallback: "Linked to %@ and %@")
-      }
-      /// Linked to %@
-      internal static func linkedAccountsOrPersonas(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "factorSources_card_linkedAccountsOrPersonas", String(describing: p1), fallback: "Linked to %@")
-      }
-      /// Enter a seed phrase to approve
-      internal static let passphraseDescription = L10n.tr("Localizable", "factorSources_card_passphraseDescription", fallback: "Enter a seed phrase to approve")
-      /// Passphrase
-      internal static let passphraseTitle = L10n.tr("Localizable", "factorSources_card_passphraseTitle", fallback: "Passphrase")
-      /// Enter a decentralized password to approve
-      internal static let passwordDescription = L10n.tr("Localizable", "factorSources_card_passwordDescription", fallback: "Enter a decentralized password to approve")
-      /// Password
-      internal static let passwordTitle = L10n.tr("Localizable", "factorSources_card_passwordTitle", fallback: "Password")
-      /// %d Personas
-      internal static func personaPlural(_ p1: Int) -> String {
-        return L10n.tr("Localizable", "factorSources_card_personaPlural", p1, fallback: "%d Personas")
-      }
-      /// 1 Persona
-      internal static let personaSingular = L10n.tr("Localizable", "factorSources_card_personaSingular", fallback: "1 Persona")
-    }
     internal enum Kind {
       /// Phone
       internal static let device = L10n.tr("Localizable", "factorSources_kind_device", fallback: "Phone")
