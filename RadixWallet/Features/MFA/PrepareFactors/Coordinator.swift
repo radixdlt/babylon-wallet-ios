@@ -1,3 +1,4 @@
+// MARK: - PrepareFactors.Coordinator
 
 extension PrepareFactors {
 	@Reducer
@@ -6,12 +7,14 @@ extension PrepareFactors {
 		struct State: Sendable, Hashable {
 			var root: PrepareFactors.Intro.State = .init()
 			var path: StackState<Path.State> = .init()
+
+			@Presents
+			var destination: Destination.State?
 		}
 
 		@Reducer(state: .hashable, action: .equatable)
 		enum Path {
-			case addHardwareFactor(PrepareFactors.AddHardwareFactor)
-			case addAnotherFactor(PrepareFactors.AddAnotherFactor)
+			case addFactor(PrepareFactors.AddFactor)
 		}
 
 		typealias Action = FeatureAction<Self>
@@ -20,11 +23,39 @@ extension PrepareFactors {
 			case appeared
 		}
 
+		enum InternalAction: Sendable, Equatable {
+			case addHardwareFactor
+			case addAnyFactor
+			case showCompletion
+		}
+
 		@CasePathable
 		enum ChildAction: Sendable, Equatable {
 			case root(PrepareFactors.Intro.Action)
 			case path(StackAction<Path.State, Path.Action>)
 		}
+
+		struct Destination: DestinationReducer {
+			@CasePathable
+			enum State: Sendable, Hashable {
+				case addLedger(AddLedgerFactorSource.State)
+				case noDeviceAlert(AlertState<Never>)
+			}
+
+			@CasePathable
+			enum Action: Sendable, Equatable {
+				case addLedger(AddLedgerFactorSource.Action)
+				case noDeviceAlert(Never)
+			}
+
+			var body: some ReducerOf<Self> {
+				Scope(state: \.addLedger, action: \.addLedger) {
+					AddLedgerFactorSource()
+				}
+			}
+		}
+
+		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 		var body: some ReducerOf<Self> {
 			Scope(state: \.root, action: \.child.root) {
@@ -32,6 +63,9 @@ extension PrepareFactors {
 			}
 			Reduce(core)
 				.forEach(\.path, action: \.child.path)
+				.ifLet(\.$destination, action: \.destination) {
+					Destination()
+				}
 		}
 
 		func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
@@ -41,17 +75,87 @@ extension PrepareFactors {
 			}
 		}
 
+		func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+			switch internalAction {
+			case .addHardwareFactor:
+				state.path.append(.addFactor(.init(mode: .hardwareOnly)))
+				return .none
+			case .addAnyFactor:
+				state.path.append(.addFactor(.init(mode: .any)))
+				return .none
+			case .showCompletion:
+				// TODO: Handle
+				return .none
+			}
+		}
+
 		func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 			switch childAction {
 			case .root(.delegate(.start)):
-				state.path.append(.addHardwareFactor(.init()))
-				return .none
-			case .path(.element(id: _, action: .addHardwareFactor(.delegate(.addedFactorSource)))):
-				state.path.append(.addAnotherFactor(.init()))
-				return .none
+				determineNextStepEffect()
+			case let .path(.element(id: _, action: .addFactor(.delegate(action)))):
+				switch action {
+				case let .addFactorSource(kind):
+					addFactorSourceEffect(&state, kind: kind)
+				case .presentNoDeviceAlert:
+					presentNoDeviceAlertEffect(&state)
+				}
+			default:
+				.none
+			}
+		}
+
+		func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+			switch presentedAction {
+			case let .addLedger(.delegate(action)):
+				switch action {
+				case .completed:
+					state.destination = nil
+					return determineNextStepEffect()
+				case .failedToAddLedger, .dismiss:
+					state.destination = nil
+					return .none
+				}
+
 			default:
 				return .none
 			}
 		}
+	}
+}
+
+private extension PrepareFactors.Coordinator {
+	func determineNextStepEffect() -> Effect<Action> {
+		.run { send in
+			let status = try await factorSourcesClient.getShieldBuilderStatus()
+			switch status {
+			case .hardwareRequired:
+				await send(.internal(.addHardwareFactor))
+			case .anyRequired:
+				await send(.internal(.addAnyFactor))
+			case .valid:
+				await send(.internal(.showCompletion))
+			}
+		}
+	}
+
+	func addFactorSourceEffect(_ state: inout State, kind: FactorSourceKind) -> Effect<Action> {
+		switch kind {
+		case .ledgerHqHardwareWallet:
+			state.destination = .addLedger(.init())
+			return .none
+		default:
+			fatalError("Not implemented yet")
+		}
+	}
+
+	func presentNoDeviceAlertEffect(_ state: inout State) -> Effect<Action> {
+		state.destination = .noDeviceAlert(.init(
+			title: { TextState("Show something") },
+			actions: {
+				.default(TextState(L10n.Common.ok))
+			}
+		))
+		return .none
 	}
 }

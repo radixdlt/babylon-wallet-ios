@@ -770,6 +770,7 @@
 		5B6499B82BCFD0E8000F2176 /* SecurityFactors+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B62BCFD0E8000F2176 /* SecurityFactors+Reducer.swift */; };
 		5B6499BA2BCFDB1E000F2176 /* ShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B92BCFDB1E000F2176 /* ShareView.swift */; };
 		5B6E11482C45835900C20F2D /* AccountCard+DataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6E11472C45835900C20F2D /* AccountCard+DataSource.swift */; };
+		5B704C342CFF84D000AC758C /* AddFactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B704C332CFF84D000AC758C /* AddFactor.swift */; };
 		5B758D4F2BCD5BF700348722 /* Effect+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B758D4E2BCD5BF700348722 /* Effect+Extra.swift */; };
 		5B758D532BCD721D00348722 /* SettingsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B758D522BCD721D00348722 /* SettingsRow.swift */; };
 		5B758D572BCE7AEC00348722 /* Preferences+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B758D552BCE7AEC00348722 /* Preferences+View.swift */; };
@@ -784,10 +785,7 @@
 		5B813D092CFF2092001A291D /* Coordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D062CFF2092001A291D /* Coordinator.swift */; };
 		5B813D0F2CFF218B001A291D /* Intro+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D0E2CFF218B001A291D /* Intro+View.swift */; };
 		5B813D102CFF218B001A291D /* Intro.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D0D2CFF218B001A291D /* Intro.swift */; };
-		5B813D132CFF2C07001A291D /* AddHardwareFactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D112CFF2C07001A291D /* AddHardwareFactor.swift */; };
-		5B813D142CFF2C07001A291D /* AddHardwareFactor+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D122CFF2C07001A291D /* AddHardwareFactor+View.swift */; };
-		5B813D172CFF5161001A291D /* AddAnotherFactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D152CFF5161001A291D /* AddAnotherFactor.swift */; };
-		5B813D182CFF5161001A291D /* AddAnotherFactor+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D162CFF5161001A291D /* AddAnotherFactor+View.swift */; };
+		5B813D142CFF2C07001A291D /* AddFactor+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D122CFF2C07001A291D /* AddFactor+View.swift */; };
 		5B813D1A2CFF7400001A291D /* NameLedgerFactorSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D192CFF73FC001A291D /* NameLedgerFactorSource.swift */; };
 		5B813D1C2CFF7411001A291D /* NameLedgerFactorSource+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D1B2CFF740C001A291D /* NameLedgerFactorSource+View.swift */; };
 		5B8433A12CD010DD00CA00F5 /* PreAuthorizationClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8433A02CD010DD00CA00F5 /* PreAuthorizationClient+Interface.swift */; };
@@ -2033,6 +2031,7 @@
 		5B6499B62BCFD0E8000F2176 /* SecurityFactors+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityFactors+Reducer.swift"; sourceTree = "<group>"; };
 		5B6499B92BCFDB1E000F2176 /* ShareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareView.swift; sourceTree = "<group>"; };
 		5B6E11472C45835900C20F2D /* AccountCard+DataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountCard+DataSource.swift"; sourceTree = "<group>"; };
+		5B704C332CFF84D000AC758C /* AddFactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFactor.swift; sourceTree = "<group>"; };
 		5B758D4E2BCD5BF700348722 /* Effect+Extra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Effect+Extra.swift"; sourceTree = "<group>"; };
 		5B758D522BCD721D00348722 /* SettingsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRow.swift; sourceTree = "<group>"; };
 		5B758D552BCE7AEC00348722 /* Preferences+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Preferences+View.swift"; sourceTree = "<group>"; };
@@ -2047,10 +2046,7 @@
 		5B813D072CFF2092001A291D /* Coordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Coordinator+View.swift"; sourceTree = "<group>"; };
 		5B813D0D2CFF218B001A291D /* Intro.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Intro.swift; sourceTree = "<group>"; };
 		5B813D0E2CFF218B001A291D /* Intro+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Intro+View.swift"; sourceTree = "<group>"; };
-		5B813D112CFF2C07001A291D /* AddHardwareFactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddHardwareFactor.swift; sourceTree = "<group>"; };
-		5B813D122CFF2C07001A291D /* AddHardwareFactor+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddHardwareFactor+View.swift"; sourceTree = "<group>"; };
-		5B813D152CFF5161001A291D /* AddAnotherFactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddAnotherFactor.swift; sourceTree = "<group>"; };
-		5B813D162CFF5161001A291D /* AddAnotherFactor+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddAnotherFactor+View.swift"; sourceTree = "<group>"; };
+		5B813D122CFF2C07001A291D /* AddFactor+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactor+View.swift"; sourceTree = "<group>"; };
 		5B813D192CFF73FC001A291D /* NameLedgerFactorSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NameLedgerFactorSource.swift; sourceTree = "<group>"; };
 		5B813D1B2CFF740C001A291D /* NameLedgerFactorSource+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NameLedgerFactorSource+View.swift"; sourceTree = "<group>"; };
 		5B8433A02CD010DD00CA00F5 /* PreAuthorizationClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PreAuthorizationClient+Interface.swift"; sourceTree = "<group>"; };
@@ -5807,10 +5803,8 @@
 			children = (
 				5B813D0D2CFF218B001A291D /* Intro.swift */,
 				5B813D0E2CFF218B001A291D /* Intro+View.swift */,
-				5B813D112CFF2C07001A291D /* AddHardwareFactor.swift */,
-				5B813D122CFF2C07001A291D /* AddHardwareFactor+View.swift */,
-				5B813D152CFF5161001A291D /* AddAnotherFactor.swift */,
-				5B813D162CFF5161001A291D /* AddAnotherFactor+View.swift */,
+				5B704C332CFF84D000AC758C /* AddFactor.swift */,
+				5B813D122CFF2C07001A291D /* AddFactor+View.swift */,
 			);
 			path = Children;
 			sourceTree = "<group>";
@@ -7768,7 +7762,6 @@
 				48CFC3832ADC10D900E77A5C /* GeneralHelperViews.swift in Sources */,
 				48CFC34C2ADC10D900E77A5C /* OneTimePersonaData+View.swift in Sources */,
 				48CFC3F02ADC10D900E77A5C /* RTCPrimitive.swift in Sources */,
-				5B813D182CFF5161001A291D /* AddAnotherFactor+View.swift in Sources */,
 				A40815572C7E0D08005E65B9 /* AccountDepositPreValidationDecidingFactorsResourceSpecificDetailsItem.swift in Sources */,
 				A4ECE27B2BEEB01800468BF6 /* CloudBackupClient+Test.swift in Sources */,
 				48CFC2C02ADC10D900E77A5C /* AssetTransfer+View.swift in Sources */,
@@ -7904,7 +7897,6 @@
 				48CFC23F2ADC10D900E77A5C /* PreferenceList.swift in Sources */,
 				48CFC2A52ADC10D900E77A5C /* PersonaDetails+View.swift in Sources */,
 				48CFC5842ADC10DA00E77A5C /* SecureStorageClient+Interface.swift in Sources */,
-				5B813D172CFF5161001A291D /* AddAnotherFactor.swift in Sources */,
 				48CFC6022ADC10DA00E77A5C /* P2P+LedgerHardwareWallet.swift in Sources */,
 				48CFC46A2ADC10DA00E77A5C /* ImportLegacyWalletClient+Live.swift in Sources */,
 				5B1C4FD82BBB0C1E00B9436F /* AppsFlyerClient+Interface.swift in Sources */,
@@ -8269,8 +8261,7 @@
 				E7B7A0FD2BBBFB6100EEE900 /* HeaderListViewContainer.swift in Sources */,
 				48CFC3FA2ADC10D900E77A5C /* SignalingClient.swift in Sources */,
 				4813B0012BCA48CE0046BCAD /* Stage2MigrateToSargon+ProfileNetwork.swift in Sources */,
-				5B813D132CFF2C07001A291D /* AddHardwareFactor.swift in Sources */,
-				5B813D142CFF2C07001A291D /* AddHardwareFactor+View.swift in Sources */,
+				5B813D142CFF2C07001A291D /* AddFactor+View.swift in Sources */,
 				A40816332C7E0D08005E65B9 /* StatePackageCodePageRequest.swift in Sources */,
 				48CFC3692ADC10D900E77A5C /* NonFungibleAssetList+Reducer.swift in Sources */,
 				48CFC2752ADC10D900E77A5C /* Main+View.swift in Sources */,
@@ -8414,6 +8405,7 @@
 				A40815D22C7E0D08005E65B9 /* ProgrammaticScryptoSborValueBytes.swift in Sources */,
 				48CFC5802ADC10DA00E77A5C /* TransportProfileClient+Live.swift in Sources */,
 				48AE39E82B0CBEA800813CF3 /* SelectInactiveAccountsToAdd.swift in Sources */,
+				5B704C342CFF84D000AC758C /* AddFactor.swift in Sources */,
 				48CFC59A2ADC10DA00E77A5C /* HitTargetSize.swift in Sources */,
 				48CFC2C12ADC10D900E77A5C /* AssetTransfer+Reducer.swift in Sources */,
 				48CFC5A62ADC10DA00E77A5C /* BlueTextButtonStyle.swift in Sources */,
