@@ -787,7 +787,9 @@
 		5B813D132CFF2C07001A291D /* AddHardwareFactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D112CFF2C07001A291D /* AddHardwareFactor.swift */; };
 		5B813D142CFF2C07001A291D /* AddHardwareFactor+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D122CFF2C07001A291D /* AddHardwareFactor+View.swift */; };
 		5B813D172CFF5161001A291D /* AddAnotherFactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D152CFF5161001A291D /* AddAnotherFactor.swift */; };
-		5B813D182CFF5161001A291D /* AddAnotherFactor+View 2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D162CFF5161001A291D /* AddAnotherFactor+View 2.swift */; };
+		5B813D182CFF5161001A291D /* AddAnotherFactor+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D162CFF5161001A291D /* AddAnotherFactor+View.swift */; };
+		5B813D1A2CFF7400001A291D /* NameLedgerFactorSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D192CFF73FC001A291D /* NameLedgerFactorSource.swift */; };
+		5B813D1C2CFF7411001A291D /* NameLedgerFactorSource+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D1B2CFF740C001A291D /* NameLedgerFactorSource+View.swift */; };
 		5B8433A12CD010DD00CA00F5 /* PreAuthorizationClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8433A02CD010DD00CA00F5 /* PreAuthorizationClient+Interface.swift */; };
 		5B8433A42CD011B600CA00F5 /* PreAuthorizationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8433A32CD011B000CA00F5 /* PreAuthorizationModels.swift */; };
 		5B8433A62CD011DE00CA00F5 /* PreAuthorizationClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8433A52CD011DC00CA00F5 /* PreAuthorizationClient+Test.swift */; };
@@ -2048,7 +2050,9 @@
 		5B813D112CFF2C07001A291D /* AddHardwareFactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddHardwareFactor.swift; sourceTree = "<group>"; };
 		5B813D122CFF2C07001A291D /* AddHardwareFactor+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddHardwareFactor+View.swift"; sourceTree = "<group>"; };
 		5B813D152CFF5161001A291D /* AddAnotherFactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddAnotherFactor.swift; sourceTree = "<group>"; };
-		5B813D162CFF5161001A291D /* AddAnotherFactor+View 2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddAnotherFactor+View 2.swift"; sourceTree = "<group>"; };
+		5B813D162CFF5161001A291D /* AddAnotherFactor+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddAnotherFactor+View.swift"; sourceTree = "<group>"; };
+		5B813D192CFF73FC001A291D /* NameLedgerFactorSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NameLedgerFactorSource.swift; sourceTree = "<group>"; };
+		5B813D1B2CFF740C001A291D /* NameLedgerFactorSource+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NameLedgerFactorSource+View.swift"; sourceTree = "<group>"; };
 		5B8433A02CD010DD00CA00F5 /* PreAuthorizationClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PreAuthorizationClient+Interface.swift"; sourceTree = "<group>"; };
 		5B8433A32CD011B000CA00F5 /* PreAuthorizationModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreAuthorizationModels.swift; sourceTree = "<group>"; };
 		5B8433A52CD011DC00CA00F5 /* PreAuthorizationClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PreAuthorizationClient+Test.swift"; sourceTree = "<group>"; };
@@ -3490,6 +3494,8 @@
 			children = (
 				48CFBD792ADC10D800E77A5C /* AddLedgerFactorSource.swift */,
 				48CFBD7A2ADC10D800E77A5C /* AddLedgerFactorSource+View.swift */,
+				5B813D192CFF73FC001A291D /* NameLedgerFactorSource.swift */,
+				5B813D1B2CFF740C001A291D /* NameLedgerFactorSource+View.swift */,
 			);
 			path = AddLedgerFactorSource;
 			sourceTree = "<group>";
@@ -5804,7 +5810,7 @@
 				5B813D112CFF2C07001A291D /* AddHardwareFactor.swift */,
 				5B813D122CFF2C07001A291D /* AddHardwareFactor+View.swift */,
 				5B813D152CFF5161001A291D /* AddAnotherFactor.swift */,
-				5B813D162CFF5161001A291D /* AddAnotherFactor+View 2.swift */,
+				5B813D162CFF5161001A291D /* AddAnotherFactor+View.swift */,
 			);
 			path = Children;
 			sourceTree = "<group>";
@@ -7679,6 +7685,7 @@
 				5B45E3012BC5A491007C4C84 /* FactorSourceAccess+ViewState.swift in Sources */,
 				48CFC44A2ADC10DA00E77A5C /* AuthorizedDappsClient+Interface.swift in Sources */,
 				48CFC31E2ADC10D900E77A5C /* NewAccountCompletion+View.swift in Sources */,
+				5B813D1A2CFF7400001A291D /* NameLedgerFactorSource.swift in Sources */,
 				48CFC3E72ADC10D900E77A5C /* Types.swift in Sources */,
 				A408159F2C7E0D08005E65B9 /* MetadataPublicKeyValue.swift in Sources */,
 				A40816032C7E0D08005E65B9 /* StateAccountResourcePreferencesPageResponse.swift in Sources */,
@@ -7719,6 +7726,7 @@
 				48CFC5E52ADC10DA00E77A5C /* Selection+Extra.swift in Sources */,
 				A40815782C7E0D08005E65B9 /* FromLedgerStateMixin.swift in Sources */,
 				48CFC43F2ADC10DA00E77A5C /* DappInteractionClient+Interfce.swift in Sources */,
+				5B813D1C2CFF7411001A291D /* NameLedgerFactorSource+View.swift in Sources */,
 				A408162C2C7E0D08005E65B9 /* StateNonFungibleIdsRequest.swift in Sources */,
 				5B45E2FA2BC45770007C4C84 /* FactorSourceAccess+View.swift in Sources */,
 				5B45E2FB2BC45770007C4C84 /* FactorSourceAccess.swift in Sources */,
@@ -7760,7 +7768,7 @@
 				48CFC3832ADC10D900E77A5C /* GeneralHelperViews.swift in Sources */,
 				48CFC34C2ADC10D900E77A5C /* OneTimePersonaData+View.swift in Sources */,
 				48CFC3F02ADC10D900E77A5C /* RTCPrimitive.swift in Sources */,
-				5B813D182CFF5161001A291D /* AddAnotherFactor+View 2.swift in Sources */,
+				5B813D182CFF5161001A291D /* AddAnotherFactor+View.swift in Sources */,
 				A40815572C7E0D08005E65B9 /* AccountDepositPreValidationDecidingFactorsResourceSpecificDetailsItem.swift in Sources */,
 				A4ECE27B2BEEB01800468BF6 /* CloudBackupClient+Test.swift in Sources */,
 				48CFC2C02ADC10D900E77A5C /* AssetTransfer+View.swift in Sources */,

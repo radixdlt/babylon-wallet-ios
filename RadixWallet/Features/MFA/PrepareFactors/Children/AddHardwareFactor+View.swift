@@ -44,6 +44,7 @@ extension PrepareFactors.AddHardwareFactor {
 						.buttonStyle(.alternativeRectangular)
 					}
 				}
+				.destinations(with: store)
 			}
 		}
 
@@ -59,5 +60,24 @@ extension PrepareFactors.AddHardwareFactor {
 private extension PrepareFactors.AddHardwareFactor.State {
 	var controlState: ControlState {
 		selected == nil ? .disabled : .enabled
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<PrepareFactors.AddHardwareFactor>) -> some View {
+		let destinationStore = store.scope(state: \.$destination, action: \.destination)
+		return addLedger(with: destinationStore)
+			.noDeviceAlert(with: destinationStore)
+	}
+
+	private func addLedger(with destinationStore: PresentationStoreOf<PrepareFactors.AddHardwareFactor.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.addLedger, action: \.addLedger)) {
+			AddLedgerFactorSource.View(store: $0)
+		}
+	}
+
+	private func noDeviceAlert(with destinationStore: PresentationStoreOf<PrepareFactors.AddHardwareFactor.Destination>) -> some View {
+		alert(store: destinationStore.scope(state: \.noDeviceAlert, action: \.noDeviceAlert))
 	}
 }
