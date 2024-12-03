@@ -25,9 +25,9 @@ extension PrepareFactors.Intro {
 
 					Spacer()
 				}
-				.padding(.horizontal, .large2)
 				.foregroundStyle(.app.gray1)
 				.multilineTextAlignment(.center)
+				.padding(.horizontal, .large2)
 				.footer {
 					Button("Start") {
 						store.send(.view(.startButtonTapped))
