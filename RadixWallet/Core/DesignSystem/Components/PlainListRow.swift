@@ -192,7 +192,7 @@ struct PlainListRowCore: View {
 private extension PlainListRowCore.ViewState {
 	var titleTextStyle: TextStyle {
 		switch context {
-		case .toggle, .settings, .dappAndPersona:
+		case .toggle, .settings, .dappAndPersona, .compactPersona:
 			.body1Header
 		case .hiddenPersona:
 			.body1HighImportance
@@ -203,7 +203,7 @@ private extension PlainListRowCore.ViewState {
 		switch context {
 		case .toggle, .hiddenPersona:
 			.body2Regular
-		case .settings, .dappAndPersona:
+		case .settings, .dappAndPersona, .compactPersona:
 			detail == nil ? .body1Regular : .body2Regular
 		}
 	}
@@ -212,14 +212,14 @@ private extension PlainListRowCore.ViewState {
 		switch context {
 		case .toggle, .hiddenPersona:
 			.app.gray2
-		case .settings, .dappAndPersona:
+		case .settings, .dappAndPersona, .compactPersona:
 			.app.gray1
 		}
 	}
 
 	var titleLineLimit: Int? {
 		switch context {
-		case .settings, .dappAndPersona, .hiddenPersona:
+		case .settings, .dappAndPersona, .hiddenPersona, .compactPersona:
 			1
 		case .toggle:
 			nil
@@ -228,7 +228,7 @@ private extension PlainListRowCore.ViewState {
 
 	var subtitleLineLimit: Int {
 		switch context {
-		case .toggle, .hiddenPersona:
+		case .toggle, .hiddenPersona, .compactPersona:
 			2
 		case .settings, .dappAndPersona:
 			3
@@ -241,16 +241,16 @@ private extension PlainListRowCore.ViewState {
 			.zero
 		case .settings:
 			.medium1
-		case .dappAndPersona:
+		case .dappAndPersona, .hiddenPersona:
 			.medium3
-		case .hiddenPersona:
-			.medium3
+		case .compactPersona:
+			.small1
 		}
 	}
 
 	var horizontalPadding: CGFloat {
 		switch context {
-		case .toggle, .settings, .hiddenPersona:
+		case .toggle, .settings, .hiddenPersona, .compactPersona:
 			.medium3
 		case .dappAndPersona:
 			.medium1
@@ -265,6 +265,7 @@ extension PlainListRowCore.ViewState {
 		case toggle
 		case dappAndPersona
 		case hiddenPersona
+		case compactPersona
 	}
 }
 

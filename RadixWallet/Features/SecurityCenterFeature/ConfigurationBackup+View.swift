@@ -7,7 +7,7 @@ extension ConfigurationBackup.State {
 			nil
 		} else {
 			L10n.ConfigurationBackup.Automated.lastBackup(
-				lastCloudBackup?.result.lastSuccess.map(RadixDateFormatter.string) ?? L10n.Common.none
+				lastCloudBackup?.result.lastSuccess.map { RadixDateFormatter.string(from: $0) } ?? L10n.Common.none
 			)
 		}
 	}

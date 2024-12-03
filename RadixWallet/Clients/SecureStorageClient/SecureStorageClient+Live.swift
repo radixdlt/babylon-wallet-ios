@@ -227,7 +227,7 @@ extension SecureStorageClient: DependencyKey {
 					accessibility: mostSecureAccesibilityAndAuthenticationPolicy.accessibility,
 					authenticationPolicy: mostSecureAccesibilityAndAuthenticationPolicy.authenticationPolicy,
 					label: importantKeychainIdentifier("Radix Wallet Factor Secret")!,
-					comment: .init("Created on \(factorSource.hint.name) \(factorSource.supportsOlympia ? " (Olympia)" : "")")
+					comment: .init("Created on \(factorSource.hint.deviceName) \(factorSource.supportsOlympia ? " (Olympia)" : "")")
 				)
 			)
 		}

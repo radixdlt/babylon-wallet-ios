@@ -196,7 +196,7 @@ extension DeviceFactorSourceClient {
 				}
 				let curve = factorInstance.publicKey.curve
 
-				loggerGlobal.debug("🔏 Signing data with device, with entity=\(entity.displayName), curve=\(curve), factor source hint.name=\(deviceFactorSource.hint.name), hint.model=\(deviceFactorSource.hint.model)")
+				loggerGlobal.debug("🔏 Signing data with device, with entity=\(entity.displayName), curve=\(curve), factor source hint.label=\(deviceFactorSource.hint.label), hint.deviceName=\(deviceFactorSource.hint.deviceName), hint.model=\(deviceFactorSource.hint.model)")
 
 				let signatureWithPublicKey = try await self.signatureFromOnDeviceHD(SignatureFromOnDeviceHDRequest(
 					mnemonicWithPassphrase: loadedMnemonicWithPassphrase,

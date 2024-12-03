@@ -118,13 +118,13 @@ extension DisplayEntitiesControlledByMnemonic {
 				}
 
 				if viewState.promptUserToBackUpMnemonic {
-					WarningErrorView(
+					StatusMessageView(
 						text: L10n.SecurityProblems.No3.seedPhrases,
 						type: .warning,
 						useNarrowSpacing: true
 					)
 				} else if viewState.promptUserToImportMnemonic {
-					WarningErrorView(
+					StatusMessageView(
 						text: L10n.SecurityProblems.No9.seedPhrases,
 						type: .warning,
 						useNarrowSpacing: true

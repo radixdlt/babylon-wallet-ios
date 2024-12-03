@@ -228,7 +228,8 @@ struct DeviceFactorSouceView: View {
 	var body: some View {
 		Labeled("Is Main?", value: isMain)
 			.fontWeight(.heavy)
-		Labeled("Name", value: deviceFactorSource.hint.name)
+		Labeled("Name", value: deviceFactorSource.hint.label)
+		Labeled("Device Name", value: deviceFactorSource.hint.deviceName)
 		Labeled("Model", value: deviceFactorSource.hint.model)
 	}
 }
@@ -237,7 +238,7 @@ struct DeviceFactorSouceView: View {
 struct LedgerFactorSourceView: View {
 	let ledgerFactorSource: LedgerHardwareWalletFactorSource
 	var body: some View {
-		Labeled("Name", value: ledgerFactorSource.hint.name)
+		Labeled("Name", value: ledgerFactorSource.hint.label)
 		Labeled("Model", value: ledgerFactorSource.hint.model.rawValue)
 	}
 }

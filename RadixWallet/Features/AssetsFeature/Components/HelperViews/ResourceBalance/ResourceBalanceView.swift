@@ -470,7 +470,7 @@ extension ResourceBalanceView {
 					.textStyle(.body2HighImportance)
 					.foregroundStyle(.app.gray4)
 
-				WarningErrorView(
+				StatusMessageView(
 					text: L10n.InteractionReview.Unknown.deposits,
 					type: .warning,
 					useNarrowSpacing: true,
@@ -517,7 +517,7 @@ extension ResourceBalanceView {
 				}
 
 				if case .unknown = amount {
-					WarningErrorView(
+					StatusMessageView(
 						text: L10n.InteractionReview.Unknown.amount,
 						type: .warning,
 						useNarrowSpacing: true,
@@ -566,7 +566,7 @@ extension ResourceBalanceView {
 				}
 
 				if case .unknown = amount {
-					WarningErrorView(
+					StatusMessageView(
 						text: L10n.InteractionReview.Unknown.amount,
 						type: .warning,
 						useNarrowSpacing: true,

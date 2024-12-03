@@ -49,11 +49,11 @@ extension TransactionReviewNetworkFee {
 					loadable(viewStore.reviewedTransaction.feePayingValidation) { validation in
 						switch validation {
 						case .needsFeePayer:
-							WarningErrorView(text: L10n.TransactionReview.FeePayerValidation.feePayerRequired, type: .warning)
+							StatusMessageView(text: L10n.TransactionReview.FeePayerValidation.feePayerRequired, type: .warning)
 						case .insufficientBalance:
-							WarningErrorView(text: L10n.TransactionReview.FeePayerValidation.insufficientBalance, type: .error)
+							StatusMessageView(text: L10n.TransactionReview.FeePayerValidation.insufficientBalance, type: .error)
 						case .valid(.introducesNewAccount):
-							WarningErrorView.transactionIntroducesNewAccount()
+							StatusMessageView.transactionIntroducesNewAccount()
 						case .valid:
 							EmptyView()
 						}

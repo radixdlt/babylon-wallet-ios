@@ -66,7 +66,7 @@ extension VerifyMnemonic {
 						wordsGrid(viewStore: viewStore)
 
 						if viewStore.verificationFailed {
-							WarningErrorView(text: L10n.ImportMnemonic.checksumFailure, type: .error)
+							StatusMessageView(text: L10n.ImportMnemonic.checksumFailure, type: .error)
 						}
 
 						#if DEBUG
