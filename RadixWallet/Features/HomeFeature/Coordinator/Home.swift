@@ -88,6 +88,7 @@ struct Home: Sendable, FeatureReducer {
 			case relinkConnector(NewConnection.State)
 			case securityCenter(SecurityCenter.State)
 			case p2pLinks(P2PLinksFeature.State)
+			case prepareFactors(PrepareFactors.Coordinator.State)
 		}
 
 		@CasePathable
@@ -99,6 +100,7 @@ struct Home: Sendable, FeatureReducer {
 			case relinkConnector(NewConnection.Action)
 			case securityCenter(SecurityCenter.Action)
 			case p2pLinks(P2PLinksFeature.Action)
+			case prepareFactors(PrepareFactors.Coordinator.Action)
 
 			enum AcknowledgeJailbreakAlert: Sendable, Hashable {}
 		}
@@ -121,6 +123,9 @@ struct Home: Sendable, FeatureReducer {
 			}
 			Scope(state: \.p2pLinks, action: \.p2pLinks) {
 				P2PLinksFeature()
+			}
+			Scope(state: \.prepareFactors, action: \.prepareFactors) {
+				PrepareFactors.Coordinator()
 			}
 		}
 	}
@@ -197,11 +202,12 @@ struct Home: Sendable, FeatureReducer {
 			return .cancel(id: CancellableId.fetchAccountPortfolios)
 
 		case .createAccountButtonTapped:
-			state.destination = .createAccount(
-				.init(config: .init(
-					purpose: .newAccountFromHome
-				))
-			)
+//			state.destination = .createAccount(
+//				.init(config: .init(
+//					purpose: .newAccountFromHome
+//				))
+//			)
+			state.destination = .prepareFactors(.init())
 			return .none
 
 		case .pullToRefreshStarted:

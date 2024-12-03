@@ -780,6 +780,12 @@
 		5B80FCC42C298E68008444F5 /* ArbitraryDataFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B80FCC32C298E68008444F5 /* ArbitraryDataFieldView.swift */; };
 		5B80FCC72C298F13008444F5 /* ArbitraryDataField+Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B80FCC62C298F13008444F5 /* ArbitraryDataField+Models.swift */; };
 		5B80FCC92C299159008444F5 /* ArbitraryDataField+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B80FCC82C299159008444F5 /* ArbitraryDataField+Helpers.swift */; };
+		5B813D082CFF2092001A291D /* Coordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D072CFF2092001A291D /* Coordinator+View.swift */; };
+		5B813D092CFF2092001A291D /* Coordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D062CFF2092001A291D /* Coordinator.swift */; };
+		5B813D0F2CFF218B001A291D /* Intro+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D0E2CFF218B001A291D /* Intro+View.swift */; };
+		5B813D102CFF218B001A291D /* Intro.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D0D2CFF218B001A291D /* Intro.swift */; };
+		5B813D132CFF2C07001A291D /* AddHardwareFactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D112CFF2C07001A291D /* AddHardwareFactor.swift */; };
+		5B813D142CFF2C07001A291D /* AddHardwareFactor+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D122CFF2C07001A291D /* AddHardwareFactor+View.swift */; };
 		5B8433A12CD010DD00CA00F5 /* PreAuthorizationClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8433A02CD010DD00CA00F5 /* PreAuthorizationClient+Interface.swift */; };
 		5B8433A42CD011B600CA00F5 /* PreAuthorizationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8433A32CD011B000CA00F5 /* PreAuthorizationModels.swift */; };
 		5B8433A62CD011DE00CA00F5 /* PreAuthorizationClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8433A52CD011DC00CA00F5 /* PreAuthorizationClient+Test.swift */; };
@@ -2033,6 +2039,12 @@
 		5B80FCC32C298E68008444F5 /* ArbitraryDataFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArbitraryDataFieldView.swift; sourceTree = "<group>"; };
 		5B80FCC62C298F13008444F5 /* ArbitraryDataField+Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ArbitraryDataField+Models.swift"; sourceTree = "<group>"; };
 		5B80FCC82C299159008444F5 /* ArbitraryDataField+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ArbitraryDataField+Helpers.swift"; sourceTree = "<group>"; };
+		5B813D062CFF2092001A291D /* Coordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coordinator.swift; sourceTree = "<group>"; };
+		5B813D072CFF2092001A291D /* Coordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Coordinator+View.swift"; sourceTree = "<group>"; };
+		5B813D0D2CFF218B001A291D /* Intro.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Intro.swift; sourceTree = "<group>"; };
+		5B813D0E2CFF218B001A291D /* Intro+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Intro+View.swift"; sourceTree = "<group>"; };
+		5B813D112CFF2C07001A291D /* AddHardwareFactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddHardwareFactor.swift; sourceTree = "<group>"; };
+		5B813D122CFF2C07001A291D /* AddHardwareFactor+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddHardwareFactor+View.swift"; sourceTree = "<group>"; };
 		5B8433A02CD010DD00CA00F5 /* PreAuthorizationClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PreAuthorizationClient+Interface.swift"; sourceTree = "<group>"; };
 		5B8433A32CD011B000CA00F5 /* PreAuthorizationModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreAuthorizationModels.swift; sourceTree = "<group>"; };
 		5B8433A52CD011DC00CA00F5 /* PreAuthorizationClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PreAuthorizationClient+Test.swift"; sourceTree = "<group>"; };
@@ -2755,6 +2767,7 @@
 		48CFBC602ADC10D800E77A5C /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				5B813D042CFF2028001A291D /* MFA */,
 				A4DBBEB12C20302B00D0A59E /* CardCarousel */,
 				E7AE2D082C05F22700830BAA /* ClaimWallet */,
 				A43F1E242BC96EF2001DD3FA /* SecurityCenterFeature */,
@@ -5761,6 +5774,35 @@
 			path = ArbitraryDataField;
 			sourceTree = "<group>";
 		};
+		5B813D042CFF2028001A291D /* MFA */ = {
+			isa = PBXGroup;
+			children = (
+				5B813D052CFF202E001A291D /* PrepareFactors */,
+			);
+			path = MFA;
+			sourceTree = "<group>";
+		};
+		5B813D052CFF202E001A291D /* PrepareFactors */ = {
+			isa = PBXGroup;
+			children = (
+				5B813D062CFF2092001A291D /* Coordinator.swift */,
+				5B813D072CFF2092001A291D /* Coordinator+View.swift */,
+				5B813D0A2CFF20D0001A291D /* Children */,
+			);
+			path = PrepareFactors;
+			sourceTree = "<group>";
+		};
+		5B813D0A2CFF20D0001A291D /* Children */ = {
+			isa = PBXGroup;
+			children = (
+				5B813D0D2CFF218B001A291D /* Intro.swift */,
+				5B813D0E2CFF218B001A291D /* Intro+View.swift */,
+				5B813D112CFF2C07001A291D /* AddHardwareFactor.swift */,
+				5B813D122CFF2C07001A291D /* AddHardwareFactor+View.swift */,
+			);
+			path = Children;
+			sourceTree = "<group>";
+		};
 		5B84339F2CD010AD00CA00F5 /* PreAuthorizationClient */ = {
 			isa = PBXGroup;
 			children = (
@@ -7832,6 +7874,8 @@
 				4855B1B02BCA5E3100DD0A47 /* Stage1MigrateToSargon+DisplayName.swift in Sources */,
 				48CFC6952ADC10DB00E77A5C /* Olympia.swift in Sources */,
 				A40816242C7E0D08005E65B9 /* StateKeyValueStoreDataResponseItem.swift in Sources */,
+				5B813D082CFF2092001A291D /* Coordinator+View.swift in Sources */,
+				5B813D092CFF2092001A291D /* Coordinator.swift in Sources */,
 				48CFC5C02ADC10DA00E77A5C /* SelectionList.swift in Sources */,
 				48CFC59B2ADC10DA00E77A5C /* Geometry.swift in Sources */,
 				8308184A2B9F162B002D8351 /* HTTPClient+Mock.swift in Sources */,
@@ -8209,6 +8253,8 @@
 				E7B7A0FD2BBBFB6100EEE900 /* HeaderListViewContainer.swift in Sources */,
 				48CFC3FA2ADC10D900E77A5C /* SignalingClient.swift in Sources */,
 				4813B0012BCA48CE0046BCAD /* Stage2MigrateToSargon+ProfileNetwork.swift in Sources */,
+				5B813D132CFF2C07001A291D /* AddHardwareFactor.swift in Sources */,
+				5B813D142CFF2C07001A291D /* AddHardwareFactor+View.swift in Sources */,
 				A40816332C7E0D08005E65B9 /* StatePackageCodePageRequest.swift in Sources */,
 				48CFC3692ADC10D900E77A5C /* NonFungibleAssetList+Reducer.swift in Sources */,
 				48CFC2752ADC10D900E77A5C /* Main+View.swift in Sources */,
@@ -8466,6 +8512,8 @@
 				48CFC58F2ADC10DA00E77A5C /* CameraPermissionClient+Live.swift in Sources */,
 				48CFC3002ADC10D900E77A5C /* DebugSettingsCoordinator+View.swift in Sources */,
 				48CFC40E2ADC10DA00E77A5C /* InsecureRandomNumberGeneratorWithSeed.swift in Sources */,
+				5B813D0F2CFF218B001A291D /* Intro+View.swift in Sources */,
+				5B813D102CFF218B001A291D /* Intro.swift in Sources */,
 				48D5F38F2BD8DDB9000DE964 /* DebugManageFactorSources+View.swift in Sources */,
 				A40815F82C7E0D08005E65B9 /* RoleKey.swift in Sources */,
 				48CFC4672ADC10DA00E77A5C /* AccountPortfoliosClient+Interface.swift in Sources */,
