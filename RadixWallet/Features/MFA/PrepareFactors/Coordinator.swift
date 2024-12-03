@@ -8,24 +8,10 @@ extension PrepareFactors {
 			var path: StackState<Path.State> = .init()
 		}
 
-		// TOOD: Check using enum with @Reducer(state: .equatable)
-		struct Path: Sendable, Reducer {
-			@CasePathable
-			@ObservableState
-			enum State: Sendable, Hashable {
-				case addHardwareFactor(PrepareFactors.AddHardwareFactor.State)
-			}
-
-			@CasePathable
-			enum Action: Sendable, Equatable {
-				case addHardwareFactor(PrepareFactors.AddHardwareFactor.Action)
-			}
-
-			var body: some ReducerOf<Self> {
-				Scope(state: \.addHardwareFactor, action: \.addHardwareFactor) {
-					PrepareFactors.AddHardwareFactor()
-				}
-			}
+		@Reducer(state: .hashable, action: .equatable)
+		enum Path {
+			case addHardwareFactor(PrepareFactors.AddHardwareFactor)
+			case addAnotherFactor(PrepareFactors.AddAnotherFactor)
 		}
 
 		typealias Action = FeatureAction<Self>
@@ -37,7 +23,7 @@ extension PrepareFactors {
 		@CasePathable
 		enum ChildAction: Sendable, Equatable {
 			case root(PrepareFactors.Intro.Action)
-			case path(StackActionOf<Path>)
+			case path(StackAction<Path.State, Path.Action>)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -45,9 +31,7 @@ extension PrepareFactors {
 				PrepareFactors.Intro()
 			}
 			Reduce(core)
-				.forEach(\.path, action: \.child.path) {
-					Path()
-				}
+				.forEach(\.path, action: \.child.path)
 		}
 
 		func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
@@ -59,13 +43,11 @@ extension PrepareFactors {
 
 		func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 			switch childAction {
-			case let .root(.delegate(action)):
-				switch action {
-				case .start:
-					state.path.append(.addHardwareFactor(.init()))
-				case .dismiss:
-					break
-				}
+			case .root(.delegate(.start)):
+				state.path.append(.addHardwareFactor(.init()))
+				return .none
+			case .path(.element(id: _, action: .addHardwareFactor(.delegate(.addedFactorSource)))):
+				state.path.append(.addAnotherFactor(.init()))
 				return .none
 			default:
 				return .none

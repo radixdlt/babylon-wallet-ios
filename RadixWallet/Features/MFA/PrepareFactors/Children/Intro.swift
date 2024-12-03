@@ -10,12 +10,10 @@ extension PrepareFactors {
 
 		enum ViewAction: Sendable, Equatable {
 			case startButtonTapped
-			case closeButtonTapped
 		}
 
 		enum DelegateAction: Sendable, Equatable {
 			case start
-			case dismiss
 		}
 
 		var body: some ReducerOf<Self> {
@@ -26,8 +24,6 @@ extension PrepareFactors {
 			switch viewAction {
 			case .startButtonTapped:
 				.send(.delegate(.start))
-			case .closeButtonTapped:
-				.send(.delegate(.dismiss))
 			}
 		}
 	}

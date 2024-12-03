@@ -7,7 +7,16 @@ extension PrepareFactors.AddHardwareFactor {
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
-				Text("Add HW Factor")
+				VStack {
+					Text("Add a Hadware Device")
+					Spacer()
+				}
+				.footer {
+					Button("Add Hardware Device") {
+						store.send(.view(.addButtonTapped))
+					}
+					.buttonStyle(.primaryRectangular)
+				}
 			}
 		}
 	}

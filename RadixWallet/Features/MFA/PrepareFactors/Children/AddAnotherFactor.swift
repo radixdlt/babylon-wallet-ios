@@ -1,6 +1,6 @@
 extension PrepareFactors {
 	@Reducer
-	struct AddHardwareFactor: Sendable, FeatureReducer {
+	struct AddAnotherFactor: Sendable, FeatureReducer {
 		@ObservableState
 		struct State: Sendable, Hashable {
 			init() {}
@@ -9,11 +9,7 @@ extension PrepareFactors {
 		typealias Action = FeatureAction<Self>
 
 		enum ViewAction: Sendable, Equatable {
-			case addButtonTapped
-		}
-
-		enum DelegateAction: Sendable, Equatable {
-			case addedFactorSource
+			case appeared
 		}
 
 		var body: some ReducerOf<Self> {
@@ -22,9 +18,8 @@ extension PrepareFactors {
 
 		func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
-			case .addButtonTapped:
-				// Present flow to add Ledger or Arculus
-				.send(.delegate(.addedFactorSource))
+			case .appeared:
+				.none
 			}
 		}
 	}

@@ -9,14 +9,16 @@ extension PrepareFactors.Coordinator {
 		@Perception.Bindable var store: StoreOf<PrepareFactors.Coordinator>
 
 		var body: some SwiftUI.View {
-			NavigationStack(path: $store.scope(state: \.path, action: \.child.path)) {
-				PrepareFactors.Intro.View(store: store.scope(state: \.root, action: \.child.root))
-			} destination: { store in
-				switch store.state {
-				case .addHardwareFactor:
-//					if let store = store.scope(state: \.addHardwareFactor, action: \.addHardwareFactor) {
-					Color.red
-//					}
+			WithPerceptionTracking {
+				NavigationStack(path: $store.scope(state: \.path, action: \.child.path)) {
+					PrepareFactors.Intro.View(store: store.scope(state: \.root, action: \.child.root))
+				} destination: { store in
+					switch store.case {
+					case let .addHardwareFactor(store):
+						PrepareFactors.AddHardwareFactor.View(store: store)
+					case let .addAnotherFactor(store):
+						PrepareFactors.AddAnotherFactor.View(store: store)
+					}
 				}
 			}
 		}

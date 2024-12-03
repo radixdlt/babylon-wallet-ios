@@ -786,6 +786,8 @@
 		5B813D102CFF218B001A291D /* Intro.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D0D2CFF218B001A291D /* Intro.swift */; };
 		5B813D132CFF2C07001A291D /* AddHardwareFactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D112CFF2C07001A291D /* AddHardwareFactor.swift */; };
 		5B813D142CFF2C07001A291D /* AddHardwareFactor+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D122CFF2C07001A291D /* AddHardwareFactor+View.swift */; };
+		5B813D172CFF5161001A291D /* AddAnotherFactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D152CFF5161001A291D /* AddAnotherFactor.swift */; };
+		5B813D182CFF5161001A291D /* AddAnotherFactor+View 2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D162CFF5161001A291D /* AddAnotherFactor+View 2.swift */; };
 		5B8433A12CD010DD00CA00F5 /* PreAuthorizationClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8433A02CD010DD00CA00F5 /* PreAuthorizationClient+Interface.swift */; };
 		5B8433A42CD011B600CA00F5 /* PreAuthorizationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8433A32CD011B000CA00F5 /* PreAuthorizationModels.swift */; };
 		5B8433A62CD011DE00CA00F5 /* PreAuthorizationClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8433A52CD011DC00CA00F5 /* PreAuthorizationClient+Test.swift */; };
@@ -2045,6 +2047,8 @@
 		5B813D0E2CFF218B001A291D /* Intro+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Intro+View.swift"; sourceTree = "<group>"; };
 		5B813D112CFF2C07001A291D /* AddHardwareFactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddHardwareFactor.swift; sourceTree = "<group>"; };
 		5B813D122CFF2C07001A291D /* AddHardwareFactor+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddHardwareFactor+View.swift"; sourceTree = "<group>"; };
+		5B813D152CFF5161001A291D /* AddAnotherFactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddAnotherFactor.swift; sourceTree = "<group>"; };
+		5B813D162CFF5161001A291D /* AddAnotherFactor+View 2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddAnotherFactor+View 2.swift"; sourceTree = "<group>"; };
 		5B8433A02CD010DD00CA00F5 /* PreAuthorizationClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PreAuthorizationClient+Interface.swift"; sourceTree = "<group>"; };
 		5B8433A32CD011B000CA00F5 /* PreAuthorizationModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreAuthorizationModels.swift; sourceTree = "<group>"; };
 		5B8433A52CD011DC00CA00F5 /* PreAuthorizationClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PreAuthorizationClient+Test.swift"; sourceTree = "<group>"; };
@@ -5799,6 +5803,8 @@
 				5B813D0E2CFF218B001A291D /* Intro+View.swift */,
 				5B813D112CFF2C07001A291D /* AddHardwareFactor.swift */,
 				5B813D122CFF2C07001A291D /* AddHardwareFactor+View.swift */,
+				5B813D152CFF5161001A291D /* AddAnotherFactor.swift */,
+				5B813D162CFF5161001A291D /* AddAnotherFactor+View 2.swift */,
 			);
 			path = Children;
 			sourceTree = "<group>";
@@ -7754,6 +7760,7 @@
 				48CFC3832ADC10D900E77A5C /* GeneralHelperViews.swift in Sources */,
 				48CFC34C2ADC10D900E77A5C /* OneTimePersonaData+View.swift in Sources */,
 				48CFC3F02ADC10D900E77A5C /* RTCPrimitive.swift in Sources */,
+				5B813D182CFF5161001A291D /* AddAnotherFactor+View 2.swift in Sources */,
 				A40815572C7E0D08005E65B9 /* AccountDepositPreValidationDecidingFactorsResourceSpecificDetailsItem.swift in Sources */,
 				A4ECE27B2BEEB01800468BF6 /* CloudBackupClient+Test.swift in Sources */,
 				48CFC2C02ADC10D900E77A5C /* AssetTransfer+View.swift in Sources */,
@@ -7889,6 +7896,7 @@
 				48CFC23F2ADC10D900E77A5C /* PreferenceList.swift in Sources */,
 				48CFC2A52ADC10D900E77A5C /* PersonaDetails+View.swift in Sources */,
 				48CFC5842ADC10DA00E77A5C /* SecureStorageClient+Interface.swift in Sources */,
+				5B813D172CFF5161001A291D /* AddAnotherFactor.swift in Sources */,
 				48CFC6022ADC10DA00E77A5C /* P2P+LedgerHardwareWallet.swift in Sources */,
 				48CFC46A2ADC10DA00E77A5C /* ImportLegacyWalletClient+Live.swift in Sources */,
 				5B1C4FD82BBB0C1E00B9436F /* AppsFlyerClient+Interface.swift in Sources */,

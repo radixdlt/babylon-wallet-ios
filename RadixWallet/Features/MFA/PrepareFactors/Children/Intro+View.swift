@@ -34,11 +34,6 @@ extension PrepareFactors.Intro {
 					}
 					.buttonStyle(.primaryRectangular)
 				}
-				.toolbar {
-					ToolbarItem(placement: .cancellationAction) {
-						CloseButton {}
-					}
-				}
 			}
 		}
 	}
