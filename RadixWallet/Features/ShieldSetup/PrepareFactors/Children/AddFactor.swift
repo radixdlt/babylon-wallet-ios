@@ -41,7 +41,7 @@ extension PrepareFactors {
 // MARK: - PrepareFactors.AddFactor.State.Mode
 extension PrepareFactors.AddFactor.State {
 	enum Mode {
-		case hardwareOnly
+		case hardware
 		case any
 	}
 }

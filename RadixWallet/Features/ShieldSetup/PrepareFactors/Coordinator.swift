@@ -77,7 +77,7 @@ extension PrepareFactors {
 		func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 			switch internalAction {
 			case .addHardwareFactor:
-				state.path.append(.addFactor(.init(mode: .hardwareOnly)))
+				state.path.append(.addFactor(.init(mode: .hardware)))
 				return .none
 			case .addAnyFactor:
 				state.path.append(.addFactor(.init(mode: .any)))

@@ -74,7 +74,7 @@ extension PrepareFactors.AddFactor {
 private extension PrepareFactors.AddFactor.State {
 	var title: String {
 		switch mode {
-		case .hardwareOnly:
+		case .hardware:
 			"Add a Hardware Device"
 		case .any:
 			"Add Another Factor"
@@ -83,7 +83,7 @@ private extension PrepareFactors.AddFactor.State {
 
 	var subtitle: String {
 		switch mode {
-		case .hardwareOnly:
+		case .hardware:
 			"Choose a hardware device to use as a security factor in your Shield."
 		case .any:
 			"You need to add **1 more factor** to begin building your Shield."
@@ -92,7 +92,7 @@ private extension PrepareFactors.AddFactor.State {
 
 	var factorSources: [FactorSourceKind] {
 		switch mode {
-		case .hardwareOnly:
+		case .hardware:
 			[.arculusCard, .ledgerHqHardwareWallet]
 		case .any:
 			[.password, .arculusCard, .ledgerHqHardwareWallet, .offDeviceMnemonic]
@@ -101,7 +101,7 @@ private extension PrepareFactors.AddFactor.State {
 
 	var addButtonTitle: String {
 		switch mode {
-		case .hardwareOnly:
+		case .hardware:
 			"Add Hardware Device"
 		case .any:
 			"Add Factor"
@@ -110,7 +110,7 @@ private extension PrepareFactors.AddFactor.State {
 
 	var showNohardwareDeviceInfo: Bool {
 		switch mode {
-		case .hardwareOnly:
+		case .hardware:
 			true
 		case .any:
 			false
