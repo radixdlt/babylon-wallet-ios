@@ -9,18 +9,16 @@ extension ShieldSetupOnboarding {
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				coreView
-					.safeAreaInset(edge: .bottom, spacing: 0) {
-						VStack(spacing: 0) {
+					.safeAreaInset(edge: .bottom, spacing: .zero) {
+						VStack(spacing: .large3) {
 							positionIndicator
-								.padding(.vertical, .small1)
-
 							let title = store.isLastStep ? L10n.ShieldsSetupOnboarding.startButtonTitle : L10n.ShieldsSetupOnboarding.nextButtonTitle
 							Button(title) {
 								store.send(.view(.nextButtonTapped))
 							}
 							.buttonStyle(.primaryRectangular)
-							.padding(.medium3)
 						}
+						.padding([.horizontal, .bottom], .medium3)
 						.background(Color.app.background)
 					}
 					.withNavigationBar {
