@@ -113,6 +113,9 @@ internal enum AssetResource {
   internal static let unknownComponent = ImageAsset(name: "unknown-component")
   internal static let unknownDeposits = ImageAsset(name: "unknown_deposits")
   internal static let xrd = ImageAsset(name: "xrd")
+  internal static let configurationBackup = ImageAsset(name: "configuration_backup")
+  internal static let securityFactors = ImageAsset(name: "security_factors")
+  internal static let securityShields = ImageAsset(name: "security_shields")
   internal static let advancedLock = ImageAsset(name: "advancedLock")
   internal static let appSettings = ImageAsset(name: "appSettings")
   internal static let authorizedDapps = ImageAsset(name: "authorized-dapps")
@@ -134,6 +137,9 @@ internal enum AssetResource {
   internal static let seedPhrases = ImageAsset(name: "seedPhrases")
   internal static let tempLinkConnector = ImageAsset(name: "temp-link-connector")
   internal static let troubleshooting = ImageAsset(name: "troubleshooting")
+  internal static let shieldSetupOnboardingApply = ImageAsset(name: "shieldSetupOnboardingApply")
+  internal static let shieldSetupOnboardingBuild = ImageAsset(name: "shieldSetupOnboardingBuild")
+  internal static let shieldSetupOnboardingIntro = ImageAsset(name: "shieldSetupOnboardingIntro")
   internal static let splash = ImageAsset(name: "Splash")
   internal static let splashItem1 = ImageAsset(name: "splash-item-1")
   internal static let splashItem2 = ImageAsset(name: "splash-item-2")
@@ -158,7 +164,6 @@ internal enum AssetResource {
   internal static let transactionReviewWithdrawing = ImageAsset(name: "transactionReview_withdrawing")
   internal static let checkCircle = ImageAsset(name: "check_circle")
   internal static let cloud = ImageAsset(name: "cloud")
-  internal static let configurationBackup = ImageAsset(name: "configuration_backup")
   internal static let errorLarge = ImageAsset(name: "error_large")
   internal static let successCheckmark = ImageAsset(name: "success-checkmark")
   internal static let transactionInProgress = ImageAsset(name: "transaction_in_progress")
@@ -166,7 +171,6 @@ internal enum AssetResource {
   internal static let iconLiquidStakeUnits = ImageAsset(name: "iconLiquidStakeUnits")
   internal static let iconPackageOwnerBadge = ImageAsset(name: "iconPackageOwnerBadge")
   internal static let radixIconWhite = ImageAsset(name: "radix-icon-white")
-  internal static let securityFactors = ImageAsset(name: "security_factors")
 }
 // swiftlint:enable identifier_name line_length nesting type_body_length type_name
 
