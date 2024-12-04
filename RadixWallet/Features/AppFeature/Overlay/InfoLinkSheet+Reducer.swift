@@ -60,7 +60,7 @@ extension InfoLinkSheet {
 		case payingaccount
 		case preauthorizations
 		case possibledappcalls
-		case aboutsecurityshields
+		case securityshield
 		case buildsecurityshields
 	}
 }
@@ -161,7 +161,7 @@ extension InfoLinkSheet.GlossaryItem {
 			L10n.InfoLink.Glossary.preauthorizations
 		case .possibledappcalls:
 			L10n.InfoLink.Glossary.possibledappcalls
-		case .aboutsecurityshields:
+		case .securityshield:
 			"TODO" // TODO: update
 		case .buildsecurityshields:
 			"TODO" // TODO: update

@@ -45,16 +45,16 @@ extension ShieldSetupOnboardingStep {
 	var image: ImageResource {
 		switch self {
 		case .intro:
-			.shieldSetupOnboardingIntro
+			.shieldBuilderOnboardingIntro
 		case .buildShield:
-			.shieldSetupOnboardingBuild
+			.shieldBuilderOnboardingBuild
 		case .applyShield:
-			.shieldSetupOnboardingApply
+			.shieldBuilderOnboardingApply
 		}
 	}
 
 	var title: String {
-		typealias S = L10n.ShieldsSetupOnboarding
+		typealias S = L10n.ShieldSetupOnboarding
 		switch self {
 		case .intro:
 			return S.IntroStep.title
@@ -66,7 +66,7 @@ extension ShieldSetupOnboardingStep {
 	}
 
 	var subtitle: String {
-		typealias S = L10n.ShieldsSetupOnboarding
+		typealias S = L10n.ShieldSetupOnboarding
 		switch self {
 		case .intro:
 			return S.IntroStep.subtitle
@@ -80,7 +80,7 @@ extension ShieldSetupOnboardingStep {
 	var infoLink: (item: InfoLinkSheet.GlossaryItem, label: String)? {
 		switch self {
 		case .intro:
-			(.aboutsecurityshields, L10n.InfoLink.Title.aboutsecurityshields)
+			(.securityshield, L10n.InfoLink.Title.securityshield)
 		case .buildShield:
 			(.buildsecurityshields, L10n.InfoLink.Title.buildsecurityshields)
 		case .applyShield:
