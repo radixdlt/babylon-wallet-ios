@@ -50,11 +50,24 @@ extension PrepareFactors.AddFactor {
 			}
 		}
 
-		private func card(_ factorSource: FactorSourceKind) -> some SwiftUI.View {
-			FactorSourceCard(kind: .genericDescription(factorSource), mode: .selection(type: .radioButton, isSelected: store.selected == factorSource))
-				.onTapGesture {
-					store.send(.view(.selected(factorSource)))
-				}
+		private func card(_ kind: FactorSourceKind) -> some SwiftUI.View {
+			FactorSourceCard(
+				kind: .genericDescription(kind),
+				mode: .selection(type: .radioButton, isSelected: store.selected == kind),
+				messages: self.messages(for: kind)
+			)
+			.onTapGesture {
+				store.send(.view(.selected(kind)))
+			}
+		}
+
+		private func messages(for kind: FactorSourceKind) -> [FactorSourceCardDataSource.Message] {
+			switch (kind, store.selected) {
+			case (.offDeviceMnemonic, .offDeviceMnemonic):
+				[.init(text: "Choosing a passphrase is only recommended for advanced users", type: .warning)]
+			default:
+				[]
+			}
 		}
 	}
 }

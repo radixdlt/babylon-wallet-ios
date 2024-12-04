@@ -301,14 +301,14 @@ extension FactorSourcesClient {
 		case valid
 
 		/// At least one hardware Factor Source must be added in order to build a Shield.
-		/// Note: this doesn't mean that after adding a hardware Factor Source we would have `valid` status
+		/// Note: this doesn't mean that after adding a hardware Factor Source we would have `valid` status.
 		case hardwareRequired
 
 		/// One more Factor Source, of any kind, must be added in order to build a Shield.
 		case anyRequired
 	}
 
-	// TODO: Move to Sargon?
+	// TODO: Move to Sargon? Maybe we can get it from Alex's work
 	func getShieldBuilderStatus() async throws -> ShieldBuilderStatus {
 		let factorSources = try await getFactorSources()
 		let totalCount = factorSources.count

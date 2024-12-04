@@ -1,5 +1,4 @@
 // MARK: - PrepareFactors.Coordinator
-
 extension PrepareFactors {
 	@Reducer
 	struct Coordinator: Sendable, FeatureReducer {
@@ -15,12 +14,13 @@ extension PrepareFactors {
 		@Reducer(state: .hashable, action: .equatable)
 		enum Path {
 			case addFactor(PrepareFactors.AddFactor)
+			case completion
 		}
 
 		typealias Action = FeatureAction<Self>
 
 		enum ViewAction: Sendable, Equatable {
-			case appeared
+			case completionButtonTapped
 		}
 
 		enum InternalAction: Sendable, Equatable {
@@ -63,14 +63,17 @@ extension PrepareFactors {
 			}
 			Reduce(core)
 				.forEach(\.path, action: \.child.path)
-				.ifLet(\.$destination, action: \.destination) {
+				.ifLet(destinationPath, action: \.destination) {
 					Destination()
 				}
 		}
 
+		private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
+
 		func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
-			case .appeared:
+			case .completionButtonTapped:
+				// Inform via delegate that we are done
 				.none
 			}
 		}
@@ -84,7 +87,7 @@ extension PrepareFactors {
 				state.path.append(.addFactor(.init(mode: .any)))
 				return .none
 			case .showCompletion:
-				// TODO: Handle
+				state.path.append(.completion)
 				return .none
 			}
 		}
@@ -144,8 +147,11 @@ private extension PrepareFactors.Coordinator {
 		case .ledgerHqHardwareWallet:
 			state.destination = .addLedger(.init())
 			return .none
-		default:
-			fatalError("Not implemented yet")
+		case .arculusCard, .password, .offDeviceMnemonic:
+			loggerGlobal.info("Factor Source not implemented yet")
+			return .none
+		case .securityQuestions, .trustedContact, .device:
+			fatalError("Factor Source not supported")
 		}
 	}
 

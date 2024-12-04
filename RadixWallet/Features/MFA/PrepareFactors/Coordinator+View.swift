@@ -12,10 +12,14 @@ extension PrepareFactors.Coordinator {
 			WithPerceptionTracking {
 				NavigationStack(path: $store.scope(state: \.path, action: \.child.path)) {
 					PrepareFactors.Intro.View(store: store.scope(state: \.root, action: \.child.root))
-				} destination: { store in
-					switch store.case {
+				} destination: { destination in
+					switch destination.case {
 					case let .addFactor(store):
 						PrepareFactors.AddFactor.View(store: store)
+					case .completion:
+						PrepareFactors.CompletionView {
+							store.send(.view(.completionButtonTapped))
+						}
 					}
 				}
 				.destinations(with: store)
@@ -24,10 +28,19 @@ extension PrepareFactors.Coordinator {
 	}
 }
 
+private extension StoreOf<PrepareFactors.Coordinator> {
+	var destination: PresentationStoreOf<PrepareFactors.Coordinator.Destination> {
+		func scopeState(state: State) -> PresentationState<PrepareFactors.Coordinator.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
 @MainActor
 private extension View {
 	func destinations(with store: StoreOf<PrepareFactors.Coordinator>) -> some View {
-		let destinationStore = store.scope(state: \.$destination, action: \.destination)
+		let destinationStore = store.destination
 		return addLedger(with: destinationStore)
 			.noDeviceAlert(with: destinationStore)
 	}

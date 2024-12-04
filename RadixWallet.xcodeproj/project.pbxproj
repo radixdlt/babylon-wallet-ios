@@ -771,6 +771,7 @@
 		5B6499BA2BCFDB1E000F2176 /* ShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B92BCFDB1E000F2176 /* ShareView.swift */; };
 		5B6E11482C45835900C20F2D /* AccountCard+DataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6E11472C45835900C20F2D /* AccountCard+DataSource.swift */; };
 		5B704C342CFF84D000AC758C /* AddFactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B704C332CFF84D000AC758C /* AddFactor.swift */; };
+		5B704C362D006E7F00AC758C /* CompletionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B704C352D006E7C00AC758C /* CompletionView.swift */; };
 		5B758D4F2BCD5BF700348722 /* Effect+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B758D4E2BCD5BF700348722 /* Effect+Extra.swift */; };
 		5B758D532BCD721D00348722 /* SettingsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B758D522BCD721D00348722 /* SettingsRow.swift */; };
 		5B758D572BCE7AEC00348722 /* Preferences+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B758D552BCE7AEC00348722 /* Preferences+View.swift */; };
@@ -2032,6 +2033,7 @@
 		5B6499B92BCFDB1E000F2176 /* ShareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareView.swift; sourceTree = "<group>"; };
 		5B6E11472C45835900C20F2D /* AccountCard+DataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountCard+DataSource.swift"; sourceTree = "<group>"; };
 		5B704C332CFF84D000AC758C /* AddFactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFactor.swift; sourceTree = "<group>"; };
+		5B704C352D006E7C00AC758C /* CompletionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionView.swift; sourceTree = "<group>"; };
 		5B758D4E2BCD5BF700348722 /* Effect+Extra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Effect+Extra.swift"; sourceTree = "<group>"; };
 		5B758D522BCD721D00348722 /* SettingsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRow.swift; sourceTree = "<group>"; };
 		5B758D552BCE7AEC00348722 /* Preferences+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Preferences+View.swift"; sourceTree = "<group>"; };
@@ -5805,6 +5807,7 @@
 				5B813D0E2CFF218B001A291D /* Intro+View.swift */,
 				5B704C332CFF84D000AC758C /* AddFactor.swift */,
 				5B813D122CFF2C07001A291D /* AddFactor+View.swift */,
+				5B704C352D006E7C00AC758C /* CompletionView.swift */,
 			);
 			path = Children;
 			sourceTree = "<group>";
@@ -8305,6 +8308,7 @@
 				5B03E3D12CC127B100E10A64 /* RawManifestView.swift in Sources */,
 				48CFC3562ADC10D900E77A5C /* ImportOlympiaLedgerAccountsAndFactorSources.swift in Sources */,
 				48CFC5782ADC10DA00E77A5C /* GatewayError.swift in Sources */,
+				5B704C362D006E7F00AC758C /* CompletionView.swift in Sources */,
 				48CFC5E62ADC10DA00E77A5C /* SwiftUINavigation+Extra.swift in Sources */,
 				48CFC5962ADC10DA00E77A5C /* ControlRequirements.swift in Sources */,
 				48CFC4262ADC10DA00E77A5C /* LocalizedError+Equatable.swift in Sources */,
