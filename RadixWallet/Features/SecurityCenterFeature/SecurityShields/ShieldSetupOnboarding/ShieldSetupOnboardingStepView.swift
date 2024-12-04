@@ -45,11 +45,11 @@ extension ShieldSetupOnboardingStep {
 	var image: ImageResource {
 		switch self {
 		case .intro:
-			.shieldBuilderOnboardingIntro
+			.shieldSetupOnboardingIntro
 		case .buildShield:
-			.shieldBuilderOnboardingBuild
+			.shieldSetupOnboardingBuild
 		case .applyShield:
-			.shieldBuilderOnboardingApply
+			.shieldSetupOnboardingApply
 		}
 	}
 

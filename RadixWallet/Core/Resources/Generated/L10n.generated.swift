@@ -2695,8 +2695,6 @@ internal enum L10n {
     internal enum Title {
       /// What are behaviors?
       internal static let behaviors = L10n.tr("Localizable", "infoLink_title_behaviors", fallback: "What are behaviors?")
-      /// How your Security Shield is built
-      internal static let buildsecurityshields = L10n.tr("Localizable", "infoLink_title_buildsecurityshields", fallback: "How your Security Shield is built")
       /// What is a dApp?
       internal static let dapps = L10n.tr("Localizable", "infoLink_title_dapps", fallback: "What is a dApp?")
       /// What is a Gateway?
@@ -2715,8 +2713,6 @@ internal enum L10n {
       internal static let poolunits = L10n.tr("Localizable", "infoLink_title_poolunits", fallback: "What are Pool units?")
       /// Learn more about Radix Connect
       internal static let radixconnect = L10n.tr("Localizable", "infoLink_title_radixconnect", fallback: "Learn more about Radix Connect")
-      /// Learn about Security Shields
-      internal static let securityshield = L10n.tr("Localizable", "infoLink_title_securityshield", fallback: "Learn about Security Shields")
       /// What are Tokens?
       internal static let tokens = L10n.tr("Localizable", "infoLink_title_tokens", fallback: "What are Tokens?")
       /// How do fees work?
@@ -3484,14 +3480,6 @@ internal enum L10n {
       /// Security Factors
       internal static let title = L10n.tr("Localizable", "securityCenter_securityFactorsItem_title", fallback: "Security Factors")
     }
-    internal enum SecurityShieldsItem {
-      /// Shielded
-      internal static let shieldedStatus = L10n.tr("Localizable", "securityCenter_securityShieldsItem_shieldedStatus", fallback: "Shielded")
-      /// Decentralized multi-factor signing and recovery for your Accounts and Personas
-      internal static let subtitle = L10n.tr("Localizable", "securityCenter_securityShieldsItem_subtitle", fallback: "Decentralized multi-factor signing and recovery for your Accounts and Personas")
-      /// Security Shields
-      internal static let title = L10n.tr("Localizable", "securityCenter_securityShieldsItem_title", fallback: "Security Shields")
-    }
   }
   internal enum SecurityFactors {
     /// View and manage your security factors
@@ -3681,32 +3669,6 @@ internal enum L10n {
       internal static let subtitle = L10n.tr("Localizable", "settings_linkToConnectorHeader_subtitle", fallback: "Scan the QR code in the Radix Wallet Connector extension")
       /// Link your Wallet to a Desktop Browser
       internal static let title = L10n.tr("Localizable", "settings_linkToConnectorHeader_title", fallback: "Link your Wallet to a Desktop Browser")
-    }
-  }
-  internal enum ShieldSetupOnboarding {
-    /// Next
-    internal static let nextButtonTitle = L10n.tr("Localizable", "shieldSetupOnboarding_nextButtonTitle", fallback: "Next")
-    /// Start
-    internal static let startButtonTitle = L10n.tr("Localizable", "shieldSetupOnboarding_startButtonTitle", fallback: "Start")
-    internal enum ApplyShieldStep {
-      /// Sign a transaction to apply your Shield to your Accounts and Personas.
-      /// 
-      /// You can use the same Shield for all of them or create multiple Shields.
-      internal static let subtitle = L10n.tr("Localizable", "shieldSetupOnboarding_applyShieldStep_subtitle", fallback: "Sign a transaction to apply your Shield to your Accounts and Personas.\n\nYou can use the same Shield for all of them or create multiple Shields.")
-      /// Apply your Shield to your Accounts and Personas
-      internal static let title = L10n.tr("Localizable", "shieldSetupOnboarding_applyShieldStep_title", fallback: "Apply your Shield to your Accounts and Personas")
-    }
-    internal enum BuildShieldStep {
-      /// Add your security factors to your Radix Wallet and use them to build your Shield.
-      internal static let subtitle = L10n.tr("Localizable", "shieldSetupOnboarding_buildShieldStep_subtitle", fallback: "Add your security factors to your Radix Wallet and use them to build your Shield.")
-      /// Add your security factors and build your Shield
-      internal static let title = L10n.tr("Localizable", "shieldSetupOnboarding_buildShieldStep_title", fallback: "Add your security factors and build your Shield")
-    }
-    internal enum IntroStep {
-      /// Create your Security Shield by combining different security factors. Use it to safely sign transactions and recover Accounts if you’ve lost access.
-      internal static let subtitle = L10n.tr("Localizable", "shieldSetupOnboarding_introStep_subtitle", fallback: "Create your Security Shield by combining different security factors. Use it to safely sign transactions and recover Accounts if you’ve lost access.")
-      /// Multi-factor authentication for web3
-      internal static let title = L10n.tr("Localizable", "shieldSetupOnboarding_introStep_title", fallback: "Multi-factor authentication for web3")
     }
   }
   internal enum Splash {
