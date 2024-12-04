@@ -296,7 +296,7 @@ extension FactorSourcesClient {
 }
 
 extension FactorSourcesClient {
-	enum ShieldBuilderStatus {
+	enum ShieldFactorStatus {
 		/// A shield can be built from the available Factor Sources
 		case valid
 
@@ -309,7 +309,7 @@ extension FactorSourcesClient {
 	}
 
 	// TODO: Move to Sargon? Maybe we can get it from Alex's work
-	func getShieldBuilderStatus() async throws -> ShieldBuilderStatus {
+	func getShieldFactorStatus() async throws -> ShieldFactorStatus {
 		let factorSources = try await getFactorSources()
 		let totalCount = factorSources.count
 		let hardwareCount = factorSources.filter(\.kind.isHardware).count

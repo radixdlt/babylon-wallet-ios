@@ -21,7 +21,7 @@ struct SecurityCenter: Sendable, FeatureReducer {
 			case securityFactors(SecurityFactors.State)
 			case displayMnemonics(DisplayMnemonics.State)
 			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
-			case securityShields(ShieldSetupOnboarding.State)
+			case securityShields(ShieldSetupCoordinator.State)
 		}
 
 		@CasePathable
@@ -30,7 +30,7 @@ struct SecurityCenter: Sendable, FeatureReducer {
 			case securityFactors(SecurityFactors.Action)
 			case displayMnemonics(DisplayMnemonics.Action)
 			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
-			case securityShields(ShieldSetupOnboarding.Action)
+			case securityShields(ShieldSetupCoordinator.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -47,7 +47,7 @@ struct SecurityCenter: Sendable, FeatureReducer {
 				ImportMnemonicsFlowCoordinator()
 			}
 			Scope(state: \.securityShields, action: \.securityShields) {
-				ShieldSetupOnboarding()
+				ShieldSetupCoordinator()
 			}
 		}
 	}

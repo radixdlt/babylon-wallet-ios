@@ -34,6 +34,10 @@ extension PrepareFactors {
 			case path(StackActionOf<Path>)
 		}
 
+		enum DelegateAction: Sendable, Equatable {
+			case finished
+		}
+
 		struct Destination: DestinationReducer {
 			@CasePathable
 			enum State: Sendable, Hashable {
@@ -69,8 +73,7 @@ extension PrepareFactors {
 			case .introButtonTapped:
 				determineNextStepEffect()
 			case .completionButtonTapped:
-				// Inform via delegate that we are done
-				.none
+				.send(.delegate(.finished))
 			}
 		}
 
@@ -119,7 +122,7 @@ extension PrepareFactors {
 private extension PrepareFactors.Coordinator {
 	func determineNextStepEffect() -> Effect<Action> {
 		.run { send in
-			let status = try await factorSourcesClient.getShieldBuilderStatus()
+			let status = try await factorSourcesClient.getShieldFactorStatus()
 			switch status {
 			case .hardwareRequired:
 				await send(.internal(.addHardwareFactor))
