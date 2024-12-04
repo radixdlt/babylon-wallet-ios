@@ -32,18 +32,15 @@ extension PrepareFactors.AddFactor {
 					.padding(.horizontal, .medium3)
 				}
 				.footer {
-					VStack(spacing: .small2) {
-						Button(store.primaryButton) {
+					VStack(spacing: .medium2) {
+						Button(store.addButtonTitle) {
 							store.send(.view(.addButtonTapped))
 						}
 						.buttonStyle(.primaryRectangular)
 						.controlState(store.controlState)
 
-						if let text = store.secondaryButton {
-							Button(text) {
-								store.send(.view(.noDeviceButtonTapped))
-							}
-							.buttonStyle(.alternativeRectangular)
+						if store.showNohardwareDeviceInfo {
+							InfoButton(.accounts, label: "I don’t have a hardware device", showIcon: false)
 						}
 					}
 				}
@@ -51,13 +48,15 @@ extension PrepareFactors.AddFactor {
 		}
 
 		private func card(_ kind: FactorSourceKind) -> some SwiftUI.View {
-			FactorSourceCard(
-				kind: .genericDescription(kind),
-				mode: .selection(type: .radioButton, isSelected: store.selected == kind),
-				messages: self.messages(for: kind)
-			)
-			.onTapGesture {
-				store.send(.view(.selected(kind)))
+			WithPerceptionTracking {
+				FactorSourceCard(
+					kind: .genericDescription(kind),
+					mode: .selection(type: .radioButton, isSelected: store.selected == kind),
+					messages: self.messages(for: kind)
+				)
+				.onTapGesture {
+					store.send(.view(.selected(kind)))
+				}
 			}
 		}
 
@@ -100,7 +99,7 @@ private extension PrepareFactors.AddFactor.State {
 		}
 	}
 
-	var primaryButton: String {
+	var addButtonTitle: String {
 		switch mode {
 		case .hardwareOnly:
 			"Add Hardware Device"
@@ -109,12 +108,12 @@ private extension PrepareFactors.AddFactor.State {
 		}
 	}
 
-	var secondaryButton: String? {
+	var showNohardwareDeviceInfo: Bool {
 		switch mode {
 		case .hardwareOnly:
-			"I don’t have a hardware device"
+			true
 		case .any:
-			nil
+			false
 		}
 	}
 

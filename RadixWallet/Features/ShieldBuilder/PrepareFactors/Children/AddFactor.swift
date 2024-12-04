@@ -13,12 +13,10 @@ extension PrepareFactors {
 		enum ViewAction: Sendable, Equatable {
 			case selected(FactorSourceKind)
 			case addButtonTapped
-			case noDeviceButtonTapped
 		}
 
 		enum DelegateAction: Sendable, Equatable {
 			case addFactorSource(FactorSourceKind)
-			case presentNoDeviceAlert
 		}
 
 		var body: some ReducerOf<Self> {
@@ -35,8 +33,6 @@ extension PrepareFactors {
 					return .none
 				}
 				return .send(.delegate(.addFactorSource(selected)))
-			case .noDeviceButtonTapped:
-				return .send(.delegate(.presentNoDeviceAlert))
 			}
 		}
 	}

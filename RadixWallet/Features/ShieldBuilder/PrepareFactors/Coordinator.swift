@@ -31,20 +31,18 @@ extension PrepareFactors {
 
 		@CasePathable
 		enum ChildAction: Sendable, Equatable {
-			case path(StackAction<Path.State, Path.Action>)
+			case path(StackActionOf<Path>)
 		}
 
 		struct Destination: DestinationReducer {
 			@CasePathable
 			enum State: Sendable, Hashable {
 				case addLedger(AddLedgerFactorSource.State)
-				case noDeviceAlert(AlertState<Never>)
 			}
 
 			@CasePathable
 			enum Action: Sendable, Equatable {
 				case addLedger(AddLedgerFactorSource.Action)
-				case noDeviceAlert(Never)
 			}
 
 			var body: some ReducerOf<Self> {
@@ -92,13 +90,8 @@ extension PrepareFactors {
 
 		func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 			switch childAction {
-			case let .path(.element(id: _, action: .addFactor(.delegate(action)))):
-				switch action {
-				case let .addFactorSource(kind):
-					addFactorSourceEffect(&state, kind: kind)
-				case .presentNoDeviceAlert:
-					presentNoDeviceAlertEffect(&state)
-				}
+			case let .path(.element(id: _, action: .addFactor(.delegate(.addFactorSource(kind))))):
+				addFactorSourceEffect(&state, kind: kind)
 			default:
 				.none
 			}
@@ -149,15 +142,5 @@ private extension PrepareFactors.Coordinator {
 		case .securityQuestions, .trustedContact, .device:
 			fatalError("Factor Source not supported")
 		}
-	}
-
-	func presentNoDeviceAlertEffect(_ state: inout State) -> Effect<Action> {
-		state.destination = .noDeviceAlert(.init(
-			title: { TextState("Show something") },
-			actions: {
-				.default(TextState(L10n.Common.ok))
-			}
-		))
-		return .none
 	}
 }
