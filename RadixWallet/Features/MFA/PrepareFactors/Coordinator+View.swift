@@ -11,7 +11,9 @@ extension PrepareFactors.Coordinator {
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				NavigationStack(path: $store.scope(state: \.path, action: \.child.path)) {
-					PrepareFactors.Intro.View(store: store.scope(state: \.root, action: \.child.root))
+					PrepareFactors.IntroView {
+						store.send(.view(.introButtonTapped))
+					}
 				} destination: { destination in
 					switch destination.case {
 					case let .addFactor(store):

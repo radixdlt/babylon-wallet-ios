@@ -1,6 +1,5 @@
 import SwiftUI
 
-// MARK: - Intro.View
 extension PrepareFactors {
 	struct CompletionView: SwiftUI.View {
 		let action: () -> Void

@@ -784,8 +784,7 @@
 		5B80FCC92C299159008444F5 /* ArbitraryDataField+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B80FCC82C299159008444F5 /* ArbitraryDataField+Helpers.swift */; };
 		5B813D082CFF2092001A291D /* Coordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D072CFF2092001A291D /* Coordinator+View.swift */; };
 		5B813D092CFF2092001A291D /* Coordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D062CFF2092001A291D /* Coordinator.swift */; };
-		5B813D0F2CFF218B001A291D /* Intro+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D0E2CFF218B001A291D /* Intro+View.swift */; };
-		5B813D102CFF218B001A291D /* Intro.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D0D2CFF218B001A291D /* Intro.swift */; };
+		5B813D0F2CFF218B001A291D /* IntroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D0E2CFF218B001A291D /* IntroView.swift */; };
 		5B813D142CFF2C07001A291D /* AddFactor+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D122CFF2C07001A291D /* AddFactor+View.swift */; };
 		5B813D1A2CFF7400001A291D /* NameLedgerFactorSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D192CFF73FC001A291D /* NameLedgerFactorSource.swift */; };
 		5B813D1C2CFF7411001A291D /* NameLedgerFactorSource+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D1B2CFF740C001A291D /* NameLedgerFactorSource+View.swift */; };
@@ -2046,8 +2045,7 @@
 		5B80FCC82C299159008444F5 /* ArbitraryDataField+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ArbitraryDataField+Helpers.swift"; sourceTree = "<group>"; };
 		5B813D062CFF2092001A291D /* Coordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coordinator.swift; sourceTree = "<group>"; };
 		5B813D072CFF2092001A291D /* Coordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Coordinator+View.swift"; sourceTree = "<group>"; };
-		5B813D0D2CFF218B001A291D /* Intro.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Intro.swift; sourceTree = "<group>"; };
-		5B813D0E2CFF218B001A291D /* Intro+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Intro+View.swift"; sourceTree = "<group>"; };
+		5B813D0E2CFF218B001A291D /* IntroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroView.swift; sourceTree = "<group>"; };
 		5B813D122CFF2C07001A291D /* AddFactor+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactor+View.swift"; sourceTree = "<group>"; };
 		5B813D192CFF73FC001A291D /* NameLedgerFactorSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NameLedgerFactorSource.swift; sourceTree = "<group>"; };
 		5B813D1B2CFF740C001A291D /* NameLedgerFactorSource+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NameLedgerFactorSource+View.swift"; sourceTree = "<group>"; };
@@ -5803,8 +5801,7 @@
 		5B813D0A2CFF20D0001A291D /* Children */ = {
 			isa = PBXGroup;
 			children = (
-				5B813D0D2CFF218B001A291D /* Intro.swift */,
-				5B813D0E2CFF218B001A291D /* Intro+View.swift */,
+				5B813D0E2CFF218B001A291D /* IntroView.swift */,
 				5B704C332CFF84D000AC758C /* AddFactor.swift */,
 				5B813D122CFF2C07001A291D /* AddFactor+View.swift */,
 				5B704C352D006E7C00AC758C /* CompletionView.swift */,
@@ -8524,8 +8521,7 @@
 				48CFC58F2ADC10DA00E77A5C /* CameraPermissionClient+Live.swift in Sources */,
 				48CFC3002ADC10D900E77A5C /* DebugSettingsCoordinator+View.swift in Sources */,
 				48CFC40E2ADC10DA00E77A5C /* InsecureRandomNumberGeneratorWithSeed.swift in Sources */,
-				5B813D0F2CFF218B001A291D /* Intro+View.swift in Sources */,
-				5B813D102CFF218B001A291D /* Intro.swift in Sources */,
+				5B813D0F2CFF218B001A291D /* IntroView.swift in Sources */,
 				48D5F38F2BD8DDB9000DE964 /* DebugManageFactorSources+View.swift in Sources */,
 				A40815F82C7E0D08005E65B9 /* RoleKey.swift in Sources */,
 				48CFC4672ADC10DA00E77A5C /* AccountPortfoliosClient+Interface.swift in Sources */,

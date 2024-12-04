@@ -4,7 +4,6 @@ extension PrepareFactors {
 	struct Coordinator: Sendable, FeatureReducer {
 		@ObservableState
 		struct State: Sendable, Hashable {
-			var root: PrepareFactors.Intro.State = .init()
 			var path: StackState<Path.State> = .init()
 
 			@Presents
@@ -20,6 +19,7 @@ extension PrepareFactors {
 		typealias Action = FeatureAction<Self>
 
 		enum ViewAction: Sendable, Equatable {
+			case introButtonTapped
 			case completionButtonTapped
 		}
 
@@ -31,7 +31,6 @@ extension PrepareFactors {
 
 		@CasePathable
 		enum ChildAction: Sendable, Equatable {
-			case root(PrepareFactors.Intro.Action)
 			case path(StackAction<Path.State, Path.Action>)
 		}
 
@@ -58,9 +57,6 @@ extension PrepareFactors {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 		var body: some ReducerOf<Self> {
-			Scope(state: \.root, action: \.child.root) {
-				PrepareFactors.Intro()
-			}
 			Reduce(core)
 				.forEach(\.path, action: \.child.path)
 				.ifLet(destinationPath, action: \.destination) {
@@ -72,6 +68,8 @@ extension PrepareFactors {
 
 		func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
+			case .introButtonTapped:
+				determineNextStepEffect()
 			case .completionButtonTapped:
 				// Inform via delegate that we are done
 				.none
@@ -94,8 +92,6 @@ extension PrepareFactors {
 
 		func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 			switch childAction {
-			case .root(.delegate(.start)):
-				determineNextStepEffect()
 			case let .path(.element(id: _, action: .addFactor(.delegate(action)))):
 				switch action {
 				case let .addFactorSource(kind):
