@@ -21,6 +21,7 @@ struct SecurityCenter: Sendable, FeatureReducer {
 			case securityFactors(SecurityFactors.State)
 			case displayMnemonics(DisplayMnemonics.State)
 			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
+			case securityShields(ShieldSetupOnboarding.State)
 		}
 
 		@CasePathable
@@ -29,6 +30,7 @@ struct SecurityCenter: Sendable, FeatureReducer {
 			case securityFactors(SecurityFactors.Action)
 			case displayMnemonics(DisplayMnemonics.Action)
 			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
+			case securityShields(ShieldSetupOnboarding.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -43,6 +45,9 @@ struct SecurityCenter: Sendable, FeatureReducer {
 			}
 			Scope(state: \.importMnemonics, action: \.importMnemonics) {
 				ImportMnemonicsFlowCoordinator()
+			}
+			Scope(state: \.securityShields, action: \.securityShields) {
+				ShieldSetupOnboarding()
 			}
 		}
 	}
@@ -88,6 +93,10 @@ struct SecurityCenter: Sendable, FeatureReducer {
 
 		case let .cardTapped(type):
 			switch type {
+			case .securityShields:
+				state.destination = .securityShields(.init())
+				return .none
+
 			case .securityFactors:
 				state.destination = .securityFactors(.init())
 				return .none

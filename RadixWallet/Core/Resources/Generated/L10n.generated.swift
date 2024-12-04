@@ -2693,8 +2693,12 @@ internal enum L10n {
       internal static let xrd = L10n.tr("Localizable", "infoLink_glossary_xrd", fallback: "## XRD Token\n\nXRD is the official Radix Network token.\n\n---\n\n It is created by the [Radix Network](?glossaryAnchor=radixnetwork) itself and users and applications can use it to use features of the network. For example, [transaction fees](?glossaryAnchor=transactionfee) are always paid in XRD, and XRD is the only token that can be used to participate in [Radix Network staking](?glossaryAnchor=networkstaking).\n\nBecause XRD has a special role on Radix, XRD is also frequently used by [dApps](?glossaryAnchor=dapps) on Radix as a convenient form of money to pay for things and to enable exchanges with other tokens.\n\n[Buy XRD tokens](https://www.radixdlt.com/token) ↗\n\n[Learn more about the XRD token](https://learn.radixdlt.com/article/what-is-the-xrd-token) ↗")
     }
     internal enum Title {
+      /// Learn about Security Shields
+      internal static let aboutsecurityshields = L10n.tr("Localizable", "infoLink_title_aboutsecurityshields", fallback: "Learn about Security Shields")
       /// What are behaviors?
       internal static let behaviors = L10n.tr("Localizable", "infoLink_title_behaviors", fallback: "What are behaviors?")
+      /// How your Security Shield is built
+      internal static let buildsecurityshields = L10n.tr("Localizable", "infoLink_title_buildsecurityshields", fallback: "How your Security Shield is built")
       /// What is a dApp?
       internal static let dapps = L10n.tr("Localizable", "infoLink_title_dapps", fallback: "What is a dApp?")
       /// What is a Gateway?
@@ -3480,6 +3484,14 @@ internal enum L10n {
       /// Security Factors
       internal static let title = L10n.tr("Localizable", "securityCenter_securityFactorsItem_title", fallback: "Security Factors")
     }
+    internal enum SecurityShieldsItem {
+      /// Shielded
+      internal static let shieldedStatus = L10n.tr("Localizable", "securityCenter_securityShieldsItem_shieldedStatus", fallback: "Shielded")
+      /// Decentralized multi-factor signing and recovery for your Accounts and Personas
+      internal static let subtitle = L10n.tr("Localizable", "securityCenter_securityShieldsItem_subtitle", fallback: "Decentralized multi-factor signing and recovery for your Accounts and Personas")
+      /// Security Shields
+      internal static let title = L10n.tr("Localizable", "securityCenter_securityShieldsItem_title", fallback: "Security Shields")
+    }
   }
   internal enum SecurityFactors {
     /// View and manage your security factors
@@ -3669,6 +3681,32 @@ internal enum L10n {
       internal static let subtitle = L10n.tr("Localizable", "settings_linkToConnectorHeader_subtitle", fallback: "Scan the QR code in the Radix Wallet Connector extension")
       /// Link your Wallet to a Desktop Browser
       internal static let title = L10n.tr("Localizable", "settings_linkToConnectorHeader_title", fallback: "Link your Wallet to a Desktop Browser")
+    }
+  }
+  internal enum ShieldsSetupOnboarding {
+    /// Next
+    internal static let nextButtonTitle = L10n.tr("Localizable", "shieldsSetupOnboarding_nextButtonTitle", fallback: "Next")
+    /// Start
+    internal static let startButtonTitle = L10n.tr("Localizable", "shieldsSetupOnboarding_startButtonTitle", fallback: "Start")
+    internal enum ApplyShieldStep {
+      /// Sign a transaction to apply your Shield to your Accounts and Personas.
+      /// 
+      /// You can use the same Shield for all of them or create multiple Shields.
+      internal static let subtitle = L10n.tr("Localizable", "shieldsSetupOnboarding_applyShieldStep_subtitle", fallback: "Sign a transaction to apply your Shield to your Accounts and Personas.\n\nYou can use the same Shield for all of them or create multiple Shields.")
+      /// Apply your Shield to your Accounts and Personas
+      internal static let title = L10n.tr("Localizable", "shieldsSetupOnboarding_applyShieldStep_title", fallback: "Apply your Shield to your Accounts and Personas")
+    }
+    internal enum BuildShieldStep {
+      /// Add your security factors to your Radix Wallet and use them to build your Shield.
+      internal static let subtitle = L10n.tr("Localizable", "shieldsSetupOnboarding_buildShieldStep_subtitle", fallback: "Add your security factors to your Radix Wallet and use them to build your Shield.")
+      /// Add your security factors and build your Shield
+      internal static let title = L10n.tr("Localizable", "shieldsSetupOnboarding_buildShieldStep_title", fallback: "Add your security factors and build your Shield")
+    }
+    internal enum IntroStep {
+      /// Create your Security Shield by combining different security factors. Use it to safely sign transactions and recover Accounts if you’ve lost access.
+      internal static let subtitle = L10n.tr("Localizable", "shieldsSetupOnboarding_introStep_subtitle", fallback: "Create your Security Shield by combining different security factors. Use it to safely sign transactions and recover Accounts if you’ve lost access.")
+      /// Multi-factor authentication for web3
+      internal static let title = L10n.tr("Localizable", "shieldsSetupOnboarding_introStep_title", fallback: "Multi-factor authentication for web3")
     }
   }
   internal enum Splash {

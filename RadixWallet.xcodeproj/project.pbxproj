@@ -1263,6 +1263,9 @@
 		E713204C2BCD372600AE6B3C /* UnknownCaseDecodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = E713204B2BCD372600AE6B3C /* UnknownCaseDecodable.swift */; };
 		E75C5F342C1C1632002E3DFF /* Stage1MigrateToSargon+SignedAuthChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E75C5F332C1C1632002E3DFF /* Stage1MigrateToSargon+SignedAuthChallenge.swift */; };
 		E76645A42C23138300065D9A /* Throwable.swift in Sources */ = {isa = PBXBuildFile; fileRef = E76645A32C23138300065D9A /* Throwable.swift */; };
+		E775A1C12D005F1000E72DB9 /* ShieldSetupOnboarding+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E775A1C02D005F1000E72DB9 /* ShieldSetupOnboarding+View.swift */; };
+		E775A1C32D005F2A00E72DB9 /* ShieldSetupOnboarding+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E775A1C22D005F2A00E72DB9 /* ShieldSetupOnboarding+Reducer.swift */; };
+		E775A1C52D00878E00E72DB9 /* ShieldSetupOnboardingStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E775A1C42D00878E00E72DB9 /* ShieldSetupOnboardingStepView.swift */; };
 		E79DD1B12CE365CF00B1EB86 /* ChooseReceivingAccountOnDelete+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1B02CE365CF00B1EB86 /* ChooseReceivingAccountOnDelete+Reducer.swift */; };
 		E79DD1B32CE365D600B1EB86 /* ChooseReceivingAccountOnDelete+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1B22CE365D600B1EB86 /* ChooseReceivingAccountOnDelete+View.swift */; };
 		E79DD1B62CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1B52CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift */; };
@@ -2519,6 +2522,9 @@
 		E713204B2BCD372600AE6B3C /* UnknownCaseDecodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnknownCaseDecodable.swift; sourceTree = "<group>"; };
 		E75C5F332C1C1632002E3DFF /* Stage1MigrateToSargon+SignedAuthChallenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+SignedAuthChallenge.swift"; sourceTree = "<group>"; };
 		E76645A32C23138300065D9A /* Throwable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Throwable.swift; sourceTree = "<group>"; };
+		E775A1C02D005F1000E72DB9 /* ShieldSetupOnboarding+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShieldSetupOnboarding+View.swift"; sourceTree = "<group>"; };
+		E775A1C22D005F2A00E72DB9 /* ShieldSetupOnboarding+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShieldSetupOnboarding+Reducer.swift"; sourceTree = "<group>"; };
+		E775A1C42D00878E00E72DB9 /* ShieldSetupOnboardingStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldSetupOnboardingStepView.swift; sourceTree = "<group>"; };
 		E79DD1B02CE365CF00B1EB86 /* ChooseReceivingAccountOnDelete+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChooseReceivingAccountOnDelete+Reducer.swift"; sourceTree = "<group>"; };
 		E79DD1B22CE365D600B1EB86 /* ChooseReceivingAccountOnDelete+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChooseReceivingAccountOnDelete+View.swift"; sourceTree = "<group>"; };
 		E79DD1B52CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeleteAccountConfirmation+Reducer.swift"; sourceTree = "<group>"; };
@@ -3511,7 +3517,6 @@
 				48CFBDBB2ADC10D800E77A5C /* Settings+Reducer.swift */,
 				48CFBDA92ADC10D800E77A5C /* Settings+View.swift */,
 				5B758D522BCD721D00348722 /* SettingsRow.swift */,
-				5B6499B42BCFD0C7000F2176 /* SecurityFactors */,
 				5B758D542BCE7AD100348722 /* Preferences */,
 				5B758D592BCEC39B00348722 /* Troubleshooting */,
 				48CFBD942ADC10D800E77A5C /* DebugSettings */,
@@ -6294,8 +6299,9 @@
 			children = (
 				A43F1E252BC96F18001DD3FA /* SecurityCenter+Reducer.swift */,
 				A43F1E272BC96F27001DD3FA /* SecurityCenter+View.swift */,
-				A4EBB5D52BD0777C00D05FDE /* ConfigurationBackup+Reducer.swift */,
-				A4EBB5D72BD0777F00D05FDE /* ConfigurationBackup+View.swift */,
+				E775A1BF2D004FBC00E72DB9 /* ConfigurationBackup */,
+				5B6499B42BCFD0C7000F2176 /* SecurityFactors */,
+				E775A1BD2D004F9B00E72DB9 /* SecurityShields */,
 			);
 			path = SecurityCenterFeature;
 			sourceTree = "<group>";
@@ -6957,6 +6963,33 @@
 				48CFBC9F2ADC10D800E77A5C /* EditPersonaAddEntryKinds+View.swift */,
 			);
 			path = EditPersonaAddEntryKinds;
+			sourceTree = "<group>";
+		};
+		E775A1BD2D004F9B00E72DB9 /* SecurityShields */ = {
+			isa = PBXGroup;
+			children = (
+				E775A1C62D00936100E72DB9 /* ShieldSetupOnboarding */,
+			);
+			path = SecurityShields;
+			sourceTree = "<group>";
+		};
+		E775A1BF2D004FBC00E72DB9 /* ConfigurationBackup */ = {
+			isa = PBXGroup;
+			children = (
+				A4EBB5D52BD0777C00D05FDE /* ConfigurationBackup+Reducer.swift */,
+				A4EBB5D72BD0777F00D05FDE /* ConfigurationBackup+View.swift */,
+			);
+			path = ConfigurationBackup;
+			sourceTree = "<group>";
+		};
+		E775A1C62D00936100E72DB9 /* ShieldSetupOnboarding */ = {
+			isa = PBXGroup;
+			children = (
+				E775A1C02D005F1000E72DB9 /* ShieldSetupOnboarding+View.swift */,
+				E775A1C22D005F2A00E72DB9 /* ShieldSetupOnboarding+Reducer.swift */,
+				E775A1C42D00878E00E72DB9 /* ShieldSetupOnboardingStepView.swift */,
+			);
+			path = ShieldSetupOnboarding;
 			sourceTree = "<group>";
 		};
 		E79DD1B42CE492E800B1EB86 /* DeleteAccount */ = {
@@ -8299,6 +8332,7 @@
 				A462B5A32B8384FB00C26D20 /* CoreAPI_PlaintextTransactionMessage.swift in Sources */,
 				48CFC2A22ADC10D900E77A5C /* Persona+View.swift in Sources */,
 				48CFC57D2ADC10DA00E77A5C /* StateEntityDetailsResponseItemDetails.swift in Sources */,
+				E775A1C32D005F2A00E72DB9 /* ShieldSetupOnboarding+Reducer.swift in Sources */,
 				A40815D22C7E0D08005E65B9 /* ProgrammaticScryptoSborValueBytes.swift in Sources */,
 				48CFC5802ADC10DA00E77A5C /* TransportProfileClient+Live.swift in Sources */,
 				48AE39E82B0CBEA800813CF3 /* SelectInactiveAccountsToAdd.swift in Sources */,
@@ -8377,6 +8411,7 @@
 				484161592BCADA0A00D2B644 /* Stage1MigrateToSargon+BIP39+Lookup.swift in Sources */,
 				48CFC5EC2ADC10DA00E77A5C /* Loadable.swift in Sources */,
 				48CFC45F2ADC10DA00E77A5C /* TransactionFailure.swift in Sources */,
+				E775A1C52D00878E00E72DB9 /* ShieldSetupOnboardingStepView.swift in Sources */,
 				48CFC2B82ADC10D900E77A5C /* RestoreProfileFromBackupCoordinator+View.swift in Sources */,
 				48CFC2BA2ADC10D900E77A5C /* SelectBackup+View.swift in Sources */,
 				48CFC4432ADC10DA00E77A5C /* RadixConnectClient+Live.swift in Sources */,
@@ -8468,6 +8503,7 @@
 				48CFC4052ADC10D900E77A5C /* NoopError.swift in Sources */,
 				48076E402B14F5CA004575F8 /* OnFirstAppearViewModifier.swift in Sources */,
 				A40815642C7E0D08005E65B9 /* AccountResourcePreferenceRule.swift in Sources */,
+				E775A1C12D005F1000E72DB9 /* ShieldSetupOnboarding+View.swift in Sources */,
 				48CFC4692ADC10DA00E77A5C /* ImportLegacyWalletClient+Request+Response.swift in Sources */,
 				A40815CF2C7E0D08005E65B9 /* PackageVmType.swift in Sources */,
 				A40816592C7E0D08005E65B9 /* ValidationErrorsAtPath.swift in Sources */,

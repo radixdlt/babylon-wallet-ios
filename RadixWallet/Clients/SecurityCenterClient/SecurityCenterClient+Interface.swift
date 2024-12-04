@@ -153,6 +153,7 @@ enum SecurityProblem: Hashable, Sendable, Identifiable {
 	}
 
 	enum ProblemType: Hashable, Sendable, CaseIterable {
+		case securityShields
 		case securityFactors
 		case configurationBackup
 	}
