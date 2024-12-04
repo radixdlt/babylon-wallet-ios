@@ -22,7 +22,7 @@ extension ChooseReceivingAccountOnDelete {
 							.textStyle(.body1Regular)
 
 						if !viewStore.hasAccountsWithEnoughXRD {
-							WarningErrorView(
+							StatusMessageView(
 								text: L10n.AccountSettings.MoveAssets.noAccountsWarning,
 								type: .warning,
 								useNarrowSpacing: true,

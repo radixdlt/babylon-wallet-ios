@@ -172,7 +172,7 @@ extension AlertState<Never> {
 		AlertState {
 			TextState(L10n.AddLedgerDevice.AlreadyAddedAlert.title)
 		} message: {
-			TextState(L10n.AddLedgerDevice.AlreadyAddedAlert.message(ledger.hint.name))
+			TextState(L10n.AddLedgerDevice.AlreadyAddedAlert.message(ledger.hint.label))
 		}
 	}
 }

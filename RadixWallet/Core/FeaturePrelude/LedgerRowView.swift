@@ -9,7 +9,7 @@ struct LedgerRowView: View {
 		let lastUsedOn: Date
 
 		init(factorSource: LedgerHardwareWalletFactorSource) {
-			self.description = factorSource.hint.name
+			self.description = factorSource.hint.label
 			self.addedOn = factorSource.common.addedOn
 			self.lastUsedOn = factorSource.common.lastUsedOn
 		}

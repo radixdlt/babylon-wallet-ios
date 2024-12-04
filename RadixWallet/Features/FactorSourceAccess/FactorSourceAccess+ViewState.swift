@@ -58,7 +58,7 @@ extension FactorSourceAccess.State {
 		case .device:
 			nil
 		case let .ledger(value):
-			value?.hint.name
+			value?.hint.label
 		}
 	}
 

@@ -51,7 +51,7 @@ extension AuthorizedDappsFeature {
 											Thumbnail(.dapp, url: dApp.thumbnail)
 										}
 										if dApp.hasClaim {
-											WarningErrorView(text: L10n.AuthorizedDapps.pendingDeposit, type: .warning, useNarrowSpacing: true)
+											StatusMessageView(text: L10n.AuthorizedDapps.pendingDeposit, type: .warning, useNarrowSpacing: true)
 												.padding(.horizontal, .medium1)
 												.padding(.bottom, .medium3)
 										}

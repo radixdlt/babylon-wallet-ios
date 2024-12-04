@@ -159,9 +159,9 @@ extension CustomizeFees {
 				}
 
 				if viewState.insufficientBalance {
-					WarningErrorView(text: L10n.CustomizeNetworkFees.Warning.insufficientBalance, type: .error)
+					StatusMessageView(text: L10n.CustomizeNetworkFees.Warning.insufficientBalance, type: .error)
 				} else if viewState.linkingNewAccount {
-					WarningErrorView.transactionIntroducesNewAccount()
+					StatusMessageView.transactionIntroducesNewAccount()
 				}
 			}
 		}

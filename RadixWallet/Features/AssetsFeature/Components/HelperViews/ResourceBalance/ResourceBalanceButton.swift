@@ -33,7 +33,7 @@ struct ResourceBalanceButton: View {
 				ResourceBalanceView(viewState, appearance: .standard, isSelected: isSelected)
 
 				if let warning {
-					WarningErrorView(text: warning, type: .warning, useNarrowSpacing: true, useSmallerFontSize: true)
+					StatusMessageView(text: warning, type: .warning, useNarrowSpacing: true, useSmallerFontSize: true)
 				}
 			}
 			.padding(.top, topPadding)
