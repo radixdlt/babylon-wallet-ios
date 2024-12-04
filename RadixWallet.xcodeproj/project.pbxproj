@@ -2771,7 +2771,7 @@
 		48CFBC602ADC10D800E77A5C /* Features */ = {
 			isa = PBXGroup;
 			children = (
-				5B813D042CFF2028001A291D /* ShieldBuilder */,
+				5B813D042CFF2028001A291D /* ShieldSetup */,
 				A4DBBEB12C20302B00D0A59E /* CardCarousel */,
 				E7AE2D082C05F22700830BAA /* ClaimWallet */,
 				A43F1E242BC96EF2001DD3FA /* SecurityCenterFeature */,
@@ -5780,12 +5780,12 @@
 			path = ArbitraryDataField;
 			sourceTree = "<group>";
 		};
-		5B813D042CFF2028001A291D /* ShieldBuilder */ = {
+		5B813D042CFF2028001A291D /* ShieldSetup */ = {
 			isa = PBXGroup;
 			children = (
 				5B813D052CFF202E001A291D /* PrepareFactors */,
 			);
-			path = ShieldBuilder;
+			path = ShieldSetup;
 			sourceTree = "<group>";
 		};
 		5B813D052CFF202E001A291D /* PrepareFactors */ = {

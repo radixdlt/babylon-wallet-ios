@@ -2,8 +2,6 @@
 // MARK: - InfoButtonStyle
 
 extension ButtonStyle where Self == InfoButtonStyle {
-//	static var info: InfoButtonStyle { .info(showIcon: true) }
-
 	static func info(showIcon: Bool) -> InfoButtonStyle {
 		.init(showIcon: showIcon)
 	}
