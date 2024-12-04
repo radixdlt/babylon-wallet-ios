@@ -9,7 +9,7 @@ extension PrepareFactors.AddFactor {
 			WithPerceptionTracking {
 				ScrollView {
 					VStack(spacing: .large2) {
-						Image(.iconSecurityFactors)
+						Image(.prepareFactorsAdd)
 
 						Text(store.title)
 							.textStyle(.sheetTitle)

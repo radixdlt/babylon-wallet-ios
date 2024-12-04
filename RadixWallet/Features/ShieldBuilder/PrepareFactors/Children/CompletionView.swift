@@ -6,7 +6,7 @@ extension PrepareFactors {
 
 		var body: some SwiftUI.View {
 			VStack(spacing: .large2) {
-				Image(.securityFactors) // TODO: replace
+				Image(.prepareFactorsCompletion)
 
 				Text("Your Factors are Ready")
 					.textStyle(.sheetTitle)
