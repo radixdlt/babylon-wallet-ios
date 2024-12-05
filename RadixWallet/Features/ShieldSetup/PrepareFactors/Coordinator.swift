@@ -4,7 +4,7 @@ extension PrepareFactors {
 	struct Coordinator: Sendable, FeatureReducer {
 		@ObservableState
 		struct State: Sendable, Hashable {
-			var path: StackState<Path.State> = .init()
+			var path: Path.State
 
 			@Presents
 			var destination: Destination.State?
@@ -12,6 +12,7 @@ extension PrepareFactors {
 
 		@Reducer(state: .hashable, action: .equatable)
 		enum Path {
+			case intro
 			case addFactor(PrepareFactors.AddFactor)
 			case completion
 		}
@@ -23,19 +24,14 @@ extension PrepareFactors {
 			case completionButtonTapped
 		}
 
-		enum InternalAction: Sendable, Equatable {
-			case addHardwareFactor
-			case addAnyFactor
-			case showCompletion
-		}
-
 		@CasePathable
 		enum ChildAction: Sendable, Equatable {
-			case path(StackActionOf<Path>)
+			case path(Path.Action)
 		}
 
 		enum DelegateAction: Sendable, Equatable {
 			case finished
+			case push(Path.State)
 		}
 
 		struct Destination: DestinationReducer {
@@ -59,8 +55,12 @@ extension PrepareFactors {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 		var body: some ReducerOf<Self> {
+			Scope(state: \.path, action: \.child.path) {
+				// TODO: Fix this
+//				Path()
+				EmptyReducer()
+			}
 			Reduce(core)
-				.forEach(\.path, action: \.child.path)
 				.ifLet(destinationPath, action: \.destination) {
 					Destination()
 				}
@@ -77,23 +77,9 @@ extension PrepareFactors {
 			}
 		}
 
-		func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
-			switch internalAction {
-			case .addHardwareFactor:
-				state.path.append(.addFactor(.init(mode: .hardware)))
-				return .none
-			case .addAnyFactor:
-				state.path.append(.addFactor(.init(mode: .any)))
-				return .none
-			case .showCompletion:
-				state.path.append(.completion)
-				return .none
-			}
-		}
-
 		func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 			switch childAction {
-			case let .path(.element(id: _, action: .addFactor(.delegate(.addFactorSource(kind))))):
+			case let .path(.addFactor(.delegate(.addFactorSource(kind)))):
 				addFactorSourceEffect(&state, kind: kind)
 			default:
 				.none
@@ -125,11 +111,11 @@ private extension PrepareFactors.Coordinator {
 			let status = try await factorSourcesClient.getShieldFactorStatus()
 			switch status {
 			case .hardwareRequired:
-				await send(.internal(.addHardwareFactor))
+				await send(.delegate(.push(.addFactor(.init(mode: .hardware)))))
 			case .anyRequired:
-				await send(.internal(.addAnyFactor))
+				await send(.delegate(.push(.addFactor(.init(mode: .any)))))
 			case .valid:
-				await send(.internal(.showCompletion))
+				await send(.delegate(.push(.completion)))
 			}
 		}
 	}

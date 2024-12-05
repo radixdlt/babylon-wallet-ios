@@ -99,7 +99,6 @@ struct Home: Sendable, FeatureReducer {
 			case relinkConnector(NewConnection.Action)
 			case securityCenter(SecurityCenter.Action)
 			case p2pLinks(P2PLinksFeature.Action)
-			case prepareFactors(PrepareFactors.Coordinator.Action)
 
 			enum AcknowledgeJailbreakAlert: Sendable, Hashable {}
 		}

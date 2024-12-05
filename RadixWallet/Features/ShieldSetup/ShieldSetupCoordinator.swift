@@ -39,7 +39,7 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case .prepareFactors:
-			state.path.append(.prepareFactors(.init()))
+			state.path.append(.prepareFactors(.init(path: .intro)))
 			return .none
 		case .selectFactors:
 			state.path.append(.selectFactors)
@@ -50,11 +50,14 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .onboarding(.delegate(.finished)):
-			onboardingFinishedEffect()
+			return onboardingFinishedEffect()
+		case let .path(.element(id: _, action: .prepareFactors(.delegate(.push(path))))):
+			state.path.append(.prepareFactors(.init(path: path)))
+			return .none
 		case .path(.element(id: _, action: .prepareFactors(.delegate(.finished)))):
-			.send(.internal(.selectFactors))
+			return .send(.internal(.selectFactors))
 		default:
-			.none
+			return .none
 		}
 	}
 }

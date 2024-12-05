@@ -10,12 +10,12 @@ extension PrepareFactors.Coordinator {
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
-				NavigationStack(path: $store.scope(state: \.path, action: \.child.path)) {
-					PrepareFactors.IntroView {
-						store.send(.view(.introButtonTapped))
-					}
-				} destination: { destination in
-					switch destination.case {
+				Group {
+					switch store.path.case {
+					case .intro:
+						PrepareFactors.IntroView {
+							store.send(.view(.introButtonTapped))
+						}
 					case let .addFactor(store):
 						PrepareFactors.AddFactor.View(store: store)
 					case .completion:
@@ -31,6 +31,10 @@ extension PrepareFactors.Coordinator {
 }
 
 private extension StoreOf<PrepareFactors.Coordinator> {
+	var path: StoreOf<PrepareFactors.Coordinator.Path> {
+		scope(state: \.path, action: \.child.path)
+	}
+
 	var destination: PresentationStoreOf<PrepareFactors.Coordinator.Destination> {
 		func scopeState(state: State) -> PresentationState<PrepareFactors.Coordinator.Destination.State> {
 			state.$destination
