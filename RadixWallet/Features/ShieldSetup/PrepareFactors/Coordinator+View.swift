@@ -10,15 +10,28 @@ extension PrepareFactors.Coordinator {
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
-				PrepareFactors.Path.View(store: store.path)
-					.destinations(with: store)
+				Group {
+					switch store.path.case {
+					case .intro:
+						PrepareFactors.IntroView {
+							store.send(.view(.introButtonTapped))
+						}
+					case let .addFactor(store):
+						PrepareFactors.AddFactor.View(store: store)
+					case .completion:
+						PrepareFactors.CompletionView {
+							store.send(.view(.completionButtonTapped))
+						}
+					}
+				}
+				.destinations(with: store)
 			}
 		}
 	}
 }
 
 private extension StoreOf<PrepareFactors.Coordinator> {
-	var path: StoreOf<PrepareFactors.Path> {
+	var path: StoreOf<PrepareFactors.Coordinator.Path> {
 		scope(state: \.path, action: \.child.path)
 	}
 

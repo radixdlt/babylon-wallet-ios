@@ -802,8 +802,6 @@
 		5B98CD892D00D3C300C3C133 /* ShieldSetupCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B98CD882D00D3C300C3C133 /* ShieldSetupCoordinator+View.swift */; };
 		5B98CD8A2D00D3C300C3C133 /* ShieldSetupCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B98CD872D00D3C300C3C133 /* ShieldSetupCoordinator.swift */; };
 		5B98CD8C2D00D8C900C3C133 /* TodoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B98CD8B2D00D8C700C3C133 /* TodoView.swift */; };
-		5B98CD912D01BAFC00C3C133 /* Path+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B98CD902D01BAFC00C3C133 /* Path+View.swift */; };
-		5B98CD922D01BAFC00C3C133 /* Path.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B98CD8F2D01BAFC00C3C133 /* Path.swift */; };
 		5BB7C1762BC81F50001216EB /* ImportOlympiaNameLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB7C1752BC81F50001216EB /* ImportOlympiaNameLedger.swift */; };
 		5BB7C1782BC81F61001216EB /* ImportOlympiaNameLedger+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB7C1772BC81F61001216EB /* ImportOlympiaNameLedger+View.swift */; };
 		5BBC43A92BBAC6B0005747B1 /* AppTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC43A82BBAC6B0005747B1 /* AppTextEditor.swift */; };
@@ -2068,8 +2066,6 @@
 		5B98CD872D00D3C300C3C133 /* ShieldSetupCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldSetupCoordinator.swift; sourceTree = "<group>"; };
 		5B98CD882D00D3C300C3C133 /* ShieldSetupCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShieldSetupCoordinator+View.swift"; sourceTree = "<group>"; };
 		5B98CD8B2D00D8C700C3C133 /* TodoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoView.swift; sourceTree = "<group>"; };
-		5B98CD8F2D01BAFC00C3C133 /* Path.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Path.swift; sourceTree = "<group>"; };
-		5B98CD902D01BAFC00C3C133 /* Path+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Path+View.swift"; sourceTree = "<group>"; };
 		5BB7C1752BC81F50001216EB /* ImportOlympiaNameLedger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportOlympiaNameLedger.swift; sourceTree = "<group>"; };
 		5BB7C1772BC81F61001216EB /* ImportOlympiaNameLedger+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ImportOlympiaNameLedger+View.swift"; sourceTree = "<group>"; };
 		5BBC43A82BBAC6B0005747B1 /* AppTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTextEditor.swift; sourceTree = "<group>"; };
@@ -5807,8 +5803,6 @@
 			children = (
 				5B813D062CFF2092001A291D /* Coordinator.swift */,
 				5B813D072CFF2092001A291D /* Coordinator+View.swift */,
-				5B98CD8F2D01BAFC00C3C133 /* Path.swift */,
-				5B98CD902D01BAFC00C3C133 /* Path+View.swift */,
 				5B813D0A2CFF20D0001A291D /* Children */,
 			);
 			path = PrepareFactors;
@@ -7549,7 +7543,6 @@
 				5B96DD372BD917B300722882 /* Text+Extra.swift in Sources */,
 				A40816462C7E0D08005E65B9 /* TransactionNotFoundError.swift in Sources */,
 				A40815E32C7E0D08005E65B9 /* ProgrammaticScryptoSborValueU8.swift in Sources */,
-				5B98CD922D01BAFC00C3C133 /* Path.swift in Sources */,
 				A40815552C7E0D08005E65B9 /* AccountDefaultDepositRule.swift in Sources */,
 				5B80FCC92C299159008444F5 /* ArbitraryDataField+Helpers.swift in Sources */,
 				48CFC57F2ADC10DA00E77A5C /* GatewayAPI.swift in Sources */,
@@ -7673,7 +7666,6 @@
 				48CFC3192ADC10D900E77A5C /* CreateAccountCoordinator+View.swift in Sources */,
 				A4DBBEB32C20305000D0A59E /* CardCarousel+Reducer.swift in Sources */,
 				48CFC2492ADC10D900E77A5C /* ResourcesList+View.swift in Sources */,
-				5B98CD912D01BAFC00C3C133 /* Path+View.swift in Sources */,
 				4813AFE22BC9A9AD0046BCAD /* Stage1MigrateToSargon+NetworkDefinition.swift in Sources */,
 				A40816522C7E0D08005E65B9 /* TransactionSubmitRequest.swift in Sources */,
 				A40816012C7E0D08005E65B9 /* StateAccountLockersTouchedAtResponseItem.swift in Sources */,
