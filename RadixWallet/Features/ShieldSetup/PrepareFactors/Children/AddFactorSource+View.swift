@@ -1,9 +1,9 @@
 import SwiftUI
 
-// MARK: - PrepareFactors.AddFactor.View
-extension PrepareFactors.AddFactor {
+// MARK: - PrepareFactors.AddFactorSource.View
+extension PrepareFactors.AddFactorSource {
 	struct View: SwiftUI.View {
-		let store: StoreOf<PrepareFactors.AddFactor>
+		let store: StoreOf<PrepareFactors.AddFactorSource>
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
@@ -39,7 +39,7 @@ extension PrepareFactors.AddFactor {
 						.buttonStyle(.primaryRectangular)
 						.controlState(store.controlState)
 
-						if store.showNohardwareDeviceInfo {
+						if store.showNoHardwareDeviceInfo {
 							InfoButton(.nohardwaredevice, label: L10n.InfoLink.Title.nohardwaredevice, showIcon: false)
 						}
 					}
@@ -71,7 +71,7 @@ extension PrepareFactors.AddFactor {
 	}
 }
 
-private extension PrepareFactors.AddFactor.State {
+private extension PrepareFactors.AddFactorSource.State {
 	var title: String {
 		switch mode {
 		case .hardware:
@@ -108,7 +108,7 @@ private extension PrepareFactors.AddFactor.State {
 		}
 	}
 
-	var showNohardwareDeviceInfo: Bool {
+	var showNoHardwareDeviceInfo: Bool {
 		switch mode {
 		case .hardware:
 			true

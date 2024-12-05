@@ -17,7 +17,7 @@ extension PrepareFactors.Coordinator {
 							store.send(.view(.introButtonTapped))
 						}
 					case let .addFactor(store):
-						PrepareFactors.AddFactor.View(store: store)
+						PrepareFactors.AddFactorSource.View(store: store)
 					case .completion:
 						PrepareFactors.CompletionView {
 							store.send(.view(.completionButtonTapped))

@@ -1,7 +1,7 @@
-// MARK: - PrepareFactors.AddFactor
+// MARK: - PrepareFactors.AddFactorSource
 extension PrepareFactors {
 	@Reducer
-	struct AddFactor: Sendable, FeatureReducer {
+	struct AddFactorSource: Sendable, FeatureReducer {
 		@ObservableState
 		struct State: Sendable, Hashable {
 			let mode: Mode
@@ -38,8 +38,8 @@ extension PrepareFactors {
 	}
 }
 
-// MARK: - PrepareFactors.AddFactor.State.Mode
-extension PrepareFactors.AddFactor.State {
+// MARK: - PrepareFactors.AddFactorSource.State.Mode
+extension PrepareFactors.AddFactorSource.State {
 	enum Mode {
 		case hardware
 		case any

@@ -13,7 +13,7 @@ extension PrepareFactors {
 		@Reducer(state: .hashable, action: .equatable)
 		enum Path {
 			case intro
-			case addFactor(PrepareFactors.AddFactor)
+			case addFactor(PrepareFactors.AddFactorSource)
 			case completion
 		}
 
@@ -59,7 +59,7 @@ extension PrepareFactors {
 		var body: some ReducerOf<Self> {
 			Scope(state: \.path, action: \.child.path) {
 				Path.intro
-				Path.addFactor(PrepareFactors.AddFactor())
+				Path.addFactor(PrepareFactors.AddFactorSource())
 				Path.completion
 			}
 			Reduce(core)
