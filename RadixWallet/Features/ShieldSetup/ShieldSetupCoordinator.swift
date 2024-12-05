@@ -26,8 +26,6 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 		case path(StackActionOf<Path>)
 	}
 
-	@Dependency(\.factorSourcesClient) var factorSourcesClient
-
 	var body: some ReducerOf<Self> {
 		Scope(state: \.onboarding, action: \.child.onboarding) {
 			ShieldSetupOnboarding()
@@ -65,11 +63,11 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 private extension ShieldSetupCoordinator {
 	func onboardingFinishedEffect() -> Effect<Action> {
 		.run { send in
-			let status = try await factorSourcesClient.getShieldFactorStatus()
+			let status = try SargonOS.shared.getSecurityShieldPrerequisitesStatus()
 			switch status {
 			case .hardwareRequired, .anyRequired:
 				await send(.internal(.prepareFactors))
-			case .valid:
+			case .sufficient:
 				await send(.internal(.selectFactors))
 			}
 		}

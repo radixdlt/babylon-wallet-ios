@@ -295,48 +295,8 @@ extension FactorSourcesClient {
 	}
 }
 
-extension FactorSourcesClient {
-	enum ShieldFactorStatus {
-		/// A shield can be built from the available Factor Sources
-		case valid
-
-		/// At least one hardware Factor Source must be added in order to build a Shield.
-		/// Note: this doesn't mean that after adding a hardware Factor Source we would have `valid` status.
-		case hardwareRequired
-
-		/// One more Factor Source, of any kind, must be added in order to build a Shield.
-		case anyRequired
-	}
-
-	// TODO: Move to Sargon? Maybe we can get it from Alex's work
-	func getShieldFactorStatus() async throws -> ShieldFactorStatus {
-		let factorSources = try await getFactorSources()
-		let totalCount = factorSources.count
-		let hardwareCount = factorSources.filter(\.kind.isHardware).count
-		if hardwareCount < 1 {
-			return .hardwareRequired
-		} else if totalCount < 2 {
-			return .anyRequired
-		} else {
-			return .valid
-		}
-	}
-}
-
 // MARK: - OnDeviceMnemonicKind
 enum OnDeviceMnemonicKind: Sendable, Hashable {
 	case babylon(isMain: Bool)
 	case olympia
-}
-
-private extension FactorSourceKind {
-	// TODO: Move to Sargon?
-	var isHardware: Bool {
-		switch self {
-		case .arculusCard, .ledgerHqHardwareWallet:
-			true
-		case .device, .offDeviceMnemonic, .trustedContact, .securityQuestions, .password:
-			false
-		}
-	}
 }

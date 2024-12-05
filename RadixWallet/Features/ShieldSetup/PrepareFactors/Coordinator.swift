@@ -54,8 +54,6 @@ extension PrepareFactors {
 			}
 		}
 
-		@Dependency(\.factorSourcesClient) var factorSourcesClient
-
 		var body: some ReducerOf<Self> {
 			Scope(state: \.path, action: \.child.path) {
 				Path.intro
@@ -110,13 +108,13 @@ extension PrepareFactors {
 private extension PrepareFactors.Coordinator {
 	func determineNextStepEffect() -> Effect<Action> {
 		.run { send in
-			let status = try await factorSourcesClient.getShieldFactorStatus()
+			let status = try SargonOS.shared.getSecurityShieldPrerequisitesStatus()
 			switch status {
 			case .hardwareRequired:
 				await send(.delegate(.push(.addFactor(.init(mode: .hardware)))))
 			case .anyRequired:
 				await send(.delegate(.push(.addFactor(.init(mode: .any)))))
-			case .valid:
+			case .sufficient:
 				await send(.delegate(.push(.completion)))
 			}
 		}
