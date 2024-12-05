@@ -4,34 +4,22 @@ extension PrepareFactors {
 	struct Coordinator: Sendable, FeatureReducer {
 		@ObservableState
 		struct State: Sendable, Hashable {
-			var path: Path.State
+			var path: PrepareFactors.Path.State
 
 			@Presents
 			var destination: Destination.State?
 		}
 
-		@Reducer(state: .hashable, action: .equatable)
-		enum Path {
-			case intro
-			case addFactor(PrepareFactors.AddFactor)
-			case completion
-		}
-
 		typealias Action = FeatureAction<Self>
-
-		enum ViewAction: Sendable, Equatable {
-			case introButtonTapped
-			case completionButtonTapped
-		}
 
 		@CasePathable
 		enum ChildAction: Sendable, Equatable {
-			case path(Path.Action)
+			case path(PrepareFactors.Path.Action)
 		}
 
 		enum DelegateAction: Sendable, Equatable {
 			case finished
-			case push(Path.State)
+			case push(PrepareFactors.Path.State)
 		}
 
 		struct Destination: DestinationReducer {
@@ -56,9 +44,7 @@ extension PrepareFactors {
 
 		var body: some ReducerOf<Self> {
 			Scope(state: \.path, action: \.child.path) {
-				// TODO: Fix this
-//				Path()
-				EmptyReducer()
+				PrepareFactors.Path()
 			}
 			Reduce(core)
 				.ifLet(destinationPath, action: \.destination) {
@@ -68,19 +54,14 @@ extension PrepareFactors {
 
 		private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-		func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
-			switch viewAction {
-			case .introButtonTapped:
-				determineNextStepEffect()
-			case .completionButtonTapped:
-				.send(.delegate(.finished))
-			}
-		}
-
 		func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 			switch childAction {
+			case .path(.introFinished):
+				determineNextStepEffect()
 			case let .path(.addFactor(.delegate(.addFactorSource(kind)))):
 				addFactorSourceEffect(&state, kind: kind)
+			case .path(.completionFinished):
+				.send(.delegate(.finished))
 			default:
 				.none
 			}
