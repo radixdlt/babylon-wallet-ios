@@ -48,11 +48,18 @@ private extension View {
 	func destinations(with store: StoreOf<PrepareFactors.Coordinator>) -> some View {
 		let destinationStore = store.destination
 		return addLedger(with: destinationStore)
+			.todo(with: destinationStore)
 	}
 
 	private func addLedger(with destinationStore: PresentationStoreOf<PrepareFactors.Coordinator.Destination>) -> some View {
 		sheet(store: destinationStore.scope(state: \.addLedger, action: \.addLedger)) {
 			AddLedgerFactorSource.View(store: $0)
+		}
+	}
+
+	private func todo(with destinationStore: PresentationStoreOf<PrepareFactors.Coordinator.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.todo, action: \.todo)) { _ in
+			TodoView(feature: "Add factor")
 		}
 	}
 }

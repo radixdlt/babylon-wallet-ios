@@ -96,10 +96,8 @@ private extension View {
 	}
 
 	private func nameLedger(with destinationStore: PresentationStoreOf<AddLedgerFactorSource.Destination>) -> some View {
-		WithPerceptionTracking {
-			navigationDestination(store: destinationStore.scope(state: \.nameLedger, action: \.nameLedger)) {
-				NameLedgerFactorSource.View(store: $0)
-			}
+		navigationDestination(store: destinationStore.scope(state: \.nameLedger, action: \.nameLedger)) {
+			NameLedgerFactorSource.View(store: $0)
 		}
 	}
 }

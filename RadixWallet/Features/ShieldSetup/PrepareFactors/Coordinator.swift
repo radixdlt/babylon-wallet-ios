@@ -38,11 +38,13 @@ extension PrepareFactors {
 			@CasePathable
 			enum State: Sendable, Hashable {
 				case addLedger(AddLedgerFactorSource.State)
+				case todo
 			}
 
 			@CasePathable
 			enum Action: Sendable, Equatable {
 				case addLedger(AddLedgerFactorSource.Action)
+				case todo(Never)
 			}
 
 			var body: some ReducerOf<Self> {
@@ -126,7 +128,7 @@ private extension PrepareFactors.Coordinator {
 			state.destination = .addLedger(.init())
 			return .none
 		case .arculusCard, .password, .offDeviceMnemonic:
-			loggerGlobal.info("Factor Source not implemented yet")
+			state.destination = .todo
 			return .none
 		case .securityQuestions, .trustedContact, .device:
 			fatalError("Factor Source not supported")
