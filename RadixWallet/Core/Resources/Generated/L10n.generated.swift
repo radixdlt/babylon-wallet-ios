@@ -2707,6 +2707,8 @@ internal enum L10n {
       internal static let networkstaking = L10n.tr("Localizable", "infoLink_title_networkstaking", fallback: "What is Staking?")
       /// What are NFTs?
       internal static let nfts = L10n.tr("Localizable", "infoLink_title_nfts", fallback: "What are NFTs?")
+      /// I don’t have a hardware device
+      internal static let nohardwaredevice = L10n.tr("Localizable", "infoLink_title_nohardwaredevice", fallback: "I don’t have a hardware device")
       /// What is a Persona?
       internal static let personas = L10n.tr("Localizable", "infoLink_title_personas", fallback: "What is a Persona?")
       /// Learn about Personas
@@ -3707,6 +3709,46 @@ internal enum L10n {
       internal static let subtitle = L10n.tr("Localizable", "shieldSetupOnboarding_introStep_subtitle", fallback: "Create your Security Shield by combining different security factors. Use it to safely sign transactions and recover Accounts if you’ve lost access.")
       /// Multi-factor authentication for web3
       internal static let title = L10n.tr("Localizable", "shieldSetupOnboarding_introStep_title", fallback: "Multi-factor authentication for web3")
+    }
+  }
+  internal enum ShieldSetupPrepareFactors {
+    internal enum AddAnotherFactor {
+      /// Add Factor
+      internal static let button = L10n.tr("Localizable", "shieldSetupPrepareFactors_addAnotherFactor_button", fallback: "Add Factor")
+      /// Choosing a passphrase is only recommended for advanced users
+      internal static let passphraseHint = L10n.tr("Localizable", "shieldSetupPrepareFactors_addAnotherFactor_passphraseHint", fallback: "Choosing a passphrase is only recommended for advanced users")
+      /// You need to add **1 more factor** to begin building your Shield.
+      internal static let subtitle = L10n.tr("Localizable", "shieldSetupPrepareFactors_addAnotherFactor_subtitle", fallback: "You need to add **1 more factor** to begin building your Shield.")
+      /// Add Another Factor
+      internal static let title = L10n.tr("Localizable", "shieldSetupPrepareFactors_addAnotherFactor_title", fallback: "Add Another Factor")
+    }
+    internal enum AddHardwareFactor {
+      /// Add Hardware Device
+      internal static let button = L10n.tr("Localizable", "shieldSetupPrepareFactors_addHardwareFactor_button", fallback: "Add Hardware Device")
+      /// Choose a hardware device to use as a security factor in your Shield.
+      internal static let subtitle = L10n.tr("Localizable", "shieldSetupPrepareFactors_addHardwareFactor_subtitle", fallback: "Choose a hardware device to use as a security factor in your Shield.")
+      /// Add a Hardware Device
+      internal static let title = L10n.tr("Localizable", "shieldSetupPrepareFactors_addHardwareFactor_title", fallback: "Add a Hardware Device")
+    }
+    internal enum Completion {
+      /// Build Shield
+      internal static let button = L10n.tr("Localizable", "shieldSetupPrepareFactors_completion_button", fallback: "Build Shield")
+      /// Before it’s finished, you’ll have the chance to review it and make any changes.
+      internal static let subtitleBottom = L10n.tr("Localizable", "shieldSetupPrepareFactors_completion_subtitleBottom", fallback: "Before it’s finished, you’ll have the chance to review it and make any changes.")
+      /// Now let’s build your Shield.
+      internal static let subtitleTop = L10n.tr("Localizable", "shieldSetupPrepareFactors_completion_subtitleTop", fallback: "Now let’s build your Shield.")
+      /// Your Factors are Ready
+      internal static let title = L10n.tr("Localizable", "shieldSetupPrepareFactors_completion_title", fallback: "Your Factors are Ready")
+    }
+    internal enum Intro {
+      /// Start
+      internal static let button = L10n.tr("Localizable", "shieldSetupPrepareFactors_intro_button", fallback: "Start")
+      /// A future wallet update will enable Shields without needing a hardware device.
+      internal static let subtitleBottom = L10n.tr("Localizable", "shieldSetupPrepareFactors_intro_subtitleBottom", fallback: "A future wallet update will enable Shields without needing a hardware device.")
+      /// You need at least **2 factors** to build a Security Shield. 1 of your factors must be a hardware device.
+      internal static let subtitleTop = L10n.tr("Localizable", "shieldSetupPrepareFactors_intro_subtitleTop", fallback: "You need at least **2 factors** to build a Security Shield. 1 of your factors must be a hardware device.")
+      /// Let’s Prepare your Factors
+      internal static let title = L10n.tr("Localizable", "shieldSetupPrepareFactors_intro_title", fallback: "Let’s Prepare your Factors")
     }
   }
   internal enum Splash {
