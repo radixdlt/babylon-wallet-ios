@@ -40,7 +40,7 @@ extension PrepareFactors.AddFactor {
 						.controlState(store.controlState)
 
 						if store.showNohardwareDeviceInfo {
-							InfoButton(.accounts, label: "I don’t have a hardware device", showIcon: false)
+							InfoButton(.nohardwaredevice, label: L10n.InfoLink.Title.nohardwaredevice, showIcon: false)
 						}
 					}
 				}
@@ -63,7 +63,7 @@ extension PrepareFactors.AddFactor {
 		private func messages(for kind: FactorSourceKind) -> [FactorSourceCardDataSource.Message] {
 			switch (kind, store.selected) {
 			case (.offDeviceMnemonic, .offDeviceMnemonic):
-				[.init(text: "Choosing a passphrase is only recommended for advanced users", type: .warning)]
+				[.init(text: L10n.ShieldSetupPrepareFactors.AddAnotherFactor.passphraseHint, type: .warning)]
 			default:
 				[]
 			}
@@ -75,18 +75,18 @@ private extension PrepareFactors.AddFactor.State {
 	var title: String {
 		switch mode {
 		case .hardware:
-			"Add a Hardware Device"
+			L10n.ShieldSetupPrepareFactors.AddHardwareFactor.title
 		case .any:
-			"Add Another Factor"
+			L10n.ShieldSetupPrepareFactors.AddAnotherFactor.title
 		}
 	}
 
 	var subtitle: String {
 		switch mode {
 		case .hardware:
-			"Choose a hardware device to use as a security factor in your Shield."
+			L10n.ShieldSetupPrepareFactors.AddHardwareFactor.subtitle
 		case .any:
-			"You need to add **1 more factor** to begin building your Shield."
+			L10n.ShieldSetupPrepareFactors.AddAnotherFactor.subtitle
 		}
 	}
 
@@ -102,9 +102,9 @@ private extension PrepareFactors.AddFactor.State {
 	var addButtonTitle: String {
 		switch mode {
 		case .hardware:
-			"Add Hardware Device"
+			L10n.ShieldSetupPrepareFactors.AddHardwareFactor.button
 		case .any:
-			"Add Factor"
+			L10n.ShieldSetupPrepareFactors.AddAnotherFactor.button
 		}
 	}
 

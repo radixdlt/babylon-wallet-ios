@@ -8,18 +8,18 @@ extension PrepareFactors {
 			VStack(spacing: .large2) {
 				Image(.prepareFactorsIntro)
 
-				Text("Let’s Prepare your Factors")
+				Text(L10n.ShieldSetupPrepareFactors.Intro.title)
 					.textStyle(.sheetTitle)
 
 				VStack(spacing: .medium3) {
-					Text(markdown: "You need at least **2 factors** to build a Security Shield. 1 of your factors must be a hardware device.", emphasizedColor: .app.gray1, emphasizedFont: .app.body1Header)
+					Text(markdown: L10n.ShieldSetupPrepareFactors.Intro.subtitleTop, emphasizedColor: .app.gray1, emphasizedFont: .app.body1Header)
 
-					Text("A future wallet update will enable Shields without needing a hardware device.")
+					Text(L10n.ShieldSetupPrepareFactors.Intro.subtitleBottom)
 				}
 				.textStyle(.body1Regular)
 				.padding(.horizontal, .medium3)
 
-				InfoButton(.accounts, label: "How your Security Shield is built") // TODO: Replace
+				InfoButton(.buildsecurityshields, label: L10n.InfoLink.Title.buildsecurityshields)
 
 				Spacer()
 			}
@@ -27,7 +27,7 @@ extension PrepareFactors {
 			.multilineTextAlignment(.center)
 			.padding(.horizontal, .large2)
 			.footer {
-				Button("Start", action: action)
+				Button(L10n.ShieldSetupPrepareFactors.Intro.button, action: action)
 					.buttonStyle(.primaryRectangular)
 			}
 		}

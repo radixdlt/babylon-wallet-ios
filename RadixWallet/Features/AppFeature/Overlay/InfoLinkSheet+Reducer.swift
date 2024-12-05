@@ -62,6 +62,7 @@ extension InfoLinkSheet {
 		case possibledappcalls
 		case securityshield
 		case buildsecurityshields
+		case nohardwaredevice
 	}
 }
 
@@ -164,6 +165,8 @@ extension InfoLinkSheet.GlossaryItem {
 		case .securityshield:
 			"TODO" // TODO: update
 		case .buildsecurityshields:
+			"TODO" // TODO: update
+		case .nohardwaredevice:
 			"TODO" // TODO: update
 		}
 	}

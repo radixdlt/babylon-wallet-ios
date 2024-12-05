@@ -8,14 +8,14 @@ extension PrepareFactors {
 			VStack(spacing: .large2) {
 				Image(.prepareFactorsCompletion)
 
-				Text("Your Factors are Ready")
+				Text(L10n.ShieldSetupPrepareFactors.Completion.title)
 					.textStyle(.sheetTitle)
 
 				VStack(spacing: .medium3) {
-					Text("Now let’s build your Shield.")
+					Text(L10n.ShieldSetupPrepareFactors.Completion.subtitleTop)
 						.textStyle(.body1Header)
 
-					Text("Before it’s finished, you’ll have the chance to review it and make any changes.")
+					Text(L10n.ShieldSetupPrepareFactors.Completion.subtitleBottom)
 						.textStyle(.body1Regular)
 				}
 				.padding(.horizontal, .medium3)
@@ -26,7 +26,7 @@ extension PrepareFactors {
 			.multilineTextAlignment(.center)
 			.padding(.horizontal, .large2)
 			.footer {
-				Button("Build Shield", action: action)
+				Button(L10n.ShieldSetupPrepareFactors.Completion.button, action: action)
 					.buttonStyle(.primaryRectangular)
 			}
 		}
