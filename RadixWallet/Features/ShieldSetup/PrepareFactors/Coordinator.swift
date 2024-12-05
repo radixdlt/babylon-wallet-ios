@@ -56,9 +56,9 @@ extension PrepareFactors {
 
 		var body: some ReducerOf<Self> {
 			Scope(state: \.path, action: \.child.path) {
-				// TODO: Fix this
-//				Path()
-				EmptyReducer()
+				Path.intro
+				Path.addFactor(PrepareFactors.AddFactor())
+				Path.completion
 			}
 			Reduce(core)
 				.ifLet(destinationPath, action: \.destination) {
