@@ -1,6 +1,7 @@
 import ComposableArchitecture
 import SwiftUI
 
+// TODO: move to Sargon
 extension FactorSourceKind {
 	var displayOrder: Int {
 		switch self {
@@ -62,8 +63,8 @@ extension SelectFactorSources {
 		@MainActor
 		private var coreView: some SwiftUI.View {
 			VStack(spacing: .small1) {
-				VStack(spacing: .large3) {
-					Image(.signingKey)
+				VStack(spacing: .small1) {
+					Image(.selectFactorSources)
 
 					Text("Select Factors for Transactions")
 						.textStyle(.sheetTitle)
@@ -72,6 +73,7 @@ extension SelectFactorSources {
 					Text(markdown: "Choose the factors you’ll use to sign transactions. You’ll use **all** of these factors every time you send assets or log in to dApps.", emphasizedColor: .app.gray1, emphasizedFont: .app.body1Header)
 						.textStyle(.body1Regular)
 						.padding(.horizontal, .medium2)
+						.padding(.top, .medium3)
 
 					if let statusMessage = store.statusMessageInfo {
 						StatusMessageView(
@@ -81,6 +83,7 @@ extension SelectFactorSources {
 							useSmallerFontSize: true
 						)
 						.padding(.horizontal, .small1)
+						.padding(.top, .small1)
 						.flushedLeft
 					}
 				}
