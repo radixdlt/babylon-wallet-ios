@@ -62,6 +62,7 @@ struct FactorSourceCard: View {
 		.background(.app.white)
 		.roundedCorners(radius: .small1)
 		.cardShadow
+		.animation(.default, value: dataSource.messages.count)
 	}
 
 	private var topCard: some View {
