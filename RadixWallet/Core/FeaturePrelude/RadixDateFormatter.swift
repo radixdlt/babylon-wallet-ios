@@ -2,8 +2,11 @@ import Foundation
 
 // MARK: - RadixDateFormatter
 enum RadixDateFormatter {
-	static func string(from date: Date) -> String {
-		let dateString = { date.formatted(date: .abbreviated, time: .omitted) }
+	static func string(
+		from date: Date,
+		dateStyle: Date.FormatStyle.DateStyle = .abbreviated
+	) -> String {
+		let dateString = { date.formatted(date: dateStyle, time: .omitted) }
 
 		let calendar = Calendar.current
 

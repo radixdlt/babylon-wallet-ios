@@ -59,14 +59,14 @@ extension SigningFactor: Comparable {
 // MARK: - DeviceFactorSource + Comparable
 extension DeviceFactorSource: Comparable {
 	public static func < (lhs: Self, rhs: Self) -> Bool {
-		lhs.hint.name < rhs.hint.name
+		lhs.hint.label < rhs.hint.label
 	}
 }
 
 // MARK: - LedgerHardwareWalletFactorSource + Comparable
 extension LedgerHardwareWalletFactorSource: Comparable {
 	public static func < (lhs: Self, rhs: Self) -> Bool {
-		lhs.hint.name < rhs.hint.name
+		lhs.hint.label < rhs.hint.label
 	}
 }
 
@@ -96,7 +96,15 @@ extension FactorSource {
 					lastUsedOn: .now,
 					flags: []
 				),
-				hint: DeviceFactorSourceHint(name: name, model: "iPhone", mnemonicWordCount: .twentyFour, systemVersion: nil, hostAppVersion: nil, hostVendor: nil)
+				hint: DeviceFactorSourceHint(
+					label: name,
+					deviceName: "iPhone RED",
+					model: "iPhone SE 2nd gen",
+					mnemonicWordCount: .twentyFour,
+					systemVersion: nil,
+					hostAppVersion: nil,
+					hostVendor: nil
+				)
 			).asGeneral
 		}
 	}
@@ -113,7 +121,7 @@ extension FactorSource {
 					lastUsedOn: .now,
 					flags: []
 				),
-				hint: .init(name: .init(name), model: .nanoS)
+				hint: .init(label: .init(name), model: .nanoS)
 			).asGeneral
 		}
 	}

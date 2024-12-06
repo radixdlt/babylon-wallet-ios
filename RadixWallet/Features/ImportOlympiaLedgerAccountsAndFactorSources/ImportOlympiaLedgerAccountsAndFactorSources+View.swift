@@ -62,7 +62,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 
 							ForEach(viewStore.usedLedgers) { ledger in
 								Card(.app.gray5) {
-									Text(ledger.hint.name)
+									Text(ledger.hint.label)
 										.textStyle(.secondaryHeader)
 										.multilineTextAlignment(.leading)
 										.flushedLeft

@@ -1,5 +1,5 @@
-// MARK: - WarningErrorView
-struct WarningErrorView: View {
+// MARK: - StatusMessageView
+struct StatusMessageView: View {
 	let text: String
 	let type: ViewType
 	let spacing: CGFloat
@@ -20,11 +20,12 @@ struct WarningErrorView: View {
 	enum ViewType {
 		case warning
 		case error
+		case success
 	}
 
 	var body: some View {
 		HStack(spacing: spacing) {
-			Image(.error)
+			Image(icon)
 			Text(text)
 				.lineSpacing(-.small3)
 				.textStyle(textStyle)
@@ -33,20 +34,31 @@ struct WarningErrorView: View {
 		.foregroundColor(color)
 	}
 
+	var icon: ImageResource {
+		switch type {
+		case .warning, .error:
+			.error
+		case .success:
+			.checkCircleOutline
+		}
+	}
+
 	var color: Color {
 		switch type {
 		case .warning:
 			.app.alert
 		case .error:
 			.app.red1
+		case .success:
+			.app.green1
 		}
 	}
 }
 
-extension WarningErrorView {
+extension StatusMessageView {
 	static func transactionIntroducesNewAccount() -> some View {
 		HStack(alignment: .center, spacing: .small1) {
-			WarningErrorView(text: L10n.TransactionReview.FeePayerValidation.linksNewAccount, type: .warning)
+			StatusMessageView(text: L10n.TransactionReview.FeePayerValidation.linksNewAccount, type: .warning)
 			InfoButton(.payingaccount)
 		}
 	}

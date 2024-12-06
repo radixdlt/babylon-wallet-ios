@@ -141,7 +141,7 @@ enum SelectAccountToPayForFeeRow {
 						.padding(.medium3)
 
 						if viewState.isBalanceInsufficient {
-							WarningErrorView(text: L10n.TransactionReview.FeePayerValidation.insufficientBalance, type: .error)
+							StatusMessageView(text: L10n.TransactionReview.FeePayerValidation.insufficientBalance, type: .error)
 								.padding([.horizontal, .bottom], .medium3)
 						}
 					}

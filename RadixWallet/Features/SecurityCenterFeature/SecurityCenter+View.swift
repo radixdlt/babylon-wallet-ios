@@ -162,6 +162,7 @@ extension SecurityCenter {
 
 		private var image: ImageResource {
 			switch type {
+			case .securityShields: .securityShields
 			case .securityFactors: .securityFactors
 			case .configurationBackup: .configurationBackup
 			}
@@ -169,6 +170,7 @@ extension SecurityCenter {
 
 		private var title: String {
 			switch type {
+			case .securityShields: L10n.SecurityCenter.SecurityShieldsItem.title
 			case .securityFactors: L10n.SecurityCenter.SecurityFactorsItem.title
 			case .configurationBackup: L10n.SecurityCenter.ConfigurationBackupItem.title
 			}
@@ -176,6 +178,7 @@ extension SecurityCenter {
 
 		private var subtitle: String {
 			switch type {
+			case .securityShields: L10n.SecurityCenter.SecurityShieldsItem.subtitle
 			case .securityFactors: L10n.SecurityCenter.SecurityFactorsItem.subtitle
 			case .configurationBackup: L10n.SecurityCenter.ConfigurationBackupItem.subtitle
 			}
@@ -186,6 +189,7 @@ extension SecurityCenter {
 				L10n.SecurityCenter.AnyItem.actionRequiredStatus
 			} else {
 				switch type {
+				case .securityShields: L10n.SecurityCenter.SecurityShieldsItem.shieldedStatus
 				case .securityFactors: L10n.SecurityCenter.SecurityFactorsItem.activeStatus
 				case .configurationBackup: L10n.SecurityCenter.ConfigurationBackupItem.backedUpStatus
 				}
@@ -211,6 +215,7 @@ private extension View {
 			.securityFactors(with: destinationStore)
 			.displayMnemonics(with: destinationStore)
 			.importMnemonics(with: destinationStore)
+			.securityShields(with: destinationStore)
 	}
 
 	private func configurationBackup(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
@@ -234,6 +239,12 @@ private extension View {
 	private func importMnemonics(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
 		sheet(store: destinationStore.scope(state: \.importMnemonics, action: \.importMnemonics)) {
 			ImportMnemonicsFlowCoordinator.View(store: $0)
+		}
+	}
+
+	private func securityShields(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
+		fullScreenCover(store: destinationStore.scope(state: \.securityShields, action: \.securityShields)) {
+			ShieldSetupCoordinator.View(store: $0)
 		}
 	}
 }
