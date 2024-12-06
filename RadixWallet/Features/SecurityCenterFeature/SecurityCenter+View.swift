@@ -244,7 +244,7 @@ private extension View {
 
 	private func securityShields(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
 		fullScreenCover(store: destinationStore.scope(state: \.securityShields, action: \.securityShields)) {
-			ShieldSetupOnboarding.View(store: $0)
+			ShieldSetupCoordinator.View(store: $0)
 		}
 	}
 }

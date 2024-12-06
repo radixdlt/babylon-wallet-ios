@@ -22,7 +22,7 @@ struct ShieldSetupOnboarding: FeatureReducer, Sendable {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case start
+		case finished
 	}
 
 	var body: some ReducerOf<Self> {
@@ -36,7 +36,7 @@ struct ShieldSetupOnboarding: FeatureReducer, Sendable {
 			return .none
 		case .nextButtonTapped:
 			if state.isLastStep {
-				return .send(.delegate(.start))
+				return .send(.delegate(.finished))
 			} else {
 				state.selectedStepIndex += 1
 				return .none
