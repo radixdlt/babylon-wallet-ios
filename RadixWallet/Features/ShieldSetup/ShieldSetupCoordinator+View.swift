@@ -13,8 +13,8 @@ extension ShieldSetupCoordinator {
 					switch destination.case {
 					case let .prepareFactors(store):
 						PrepareFactorSources.Coordinator.View(store: store)
-					case .selectFactors:
-						TodoView(feature: "Select Factors")
+					case let .selectFactors(store):
+						SelectFactorSources.View(store: store)
 					}
 				}
 			}

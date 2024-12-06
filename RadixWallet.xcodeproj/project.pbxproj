@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -1280,6 +1280,8 @@
 		E775A1C12D005F1000E72DB9 /* ShieldSetupOnboarding+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E775A1C02D005F1000E72DB9 /* ShieldSetupOnboarding+View.swift */; };
 		E775A1C32D005F2A00E72DB9 /* ShieldSetupOnboarding+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E775A1C22D005F2A00E72DB9 /* ShieldSetupOnboarding+Reducer.swift */; };
 		E775A1C52D00878E00E72DB9 /* ShieldSetupOnboardingStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E775A1C42D00878E00E72DB9 /* ShieldSetupOnboardingStepView.swift */; };
+		E775A1D12D0327BF00E72DB9 /* SelectFactorSources+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E775A1D02D0327BF00E72DB9 /* SelectFactorSources+View.swift */; };
+		E775A1D22D0327BF00E72DB9 /* SelectFactorSources+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E775A1CF2D0327BF00E72DB9 /* SelectFactorSources+Reducer.swift */; };
 		E79DD1B12CE365CF00B1EB86 /* ChooseReceivingAccountOnDelete+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1B02CE365CF00B1EB86 /* ChooseReceivingAccountOnDelete+Reducer.swift */; };
 		E79DD1B32CE365D600B1EB86 /* ChooseReceivingAccountOnDelete+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1B22CE365D600B1EB86 /* ChooseReceivingAccountOnDelete+View.swift */; };
 		E79DD1B62CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1B52CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift */; };
@@ -2552,6 +2554,8 @@
 		E775A1C02D005F1000E72DB9 /* ShieldSetupOnboarding+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShieldSetupOnboarding+View.swift"; sourceTree = "<group>"; };
 		E775A1C22D005F2A00E72DB9 /* ShieldSetupOnboarding+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShieldSetupOnboarding+Reducer.swift"; sourceTree = "<group>"; };
 		E775A1C42D00878E00E72DB9 /* ShieldSetupOnboardingStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldSetupOnboardingStepView.swift; sourceTree = "<group>"; };
+		E775A1CF2D0327BF00E72DB9 /* SelectFactorSources+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SelectFactorSources+Reducer.swift"; sourceTree = "<group>"; };
+		E775A1D02D0327BF00E72DB9 /* SelectFactorSources+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SelectFactorSources+View.swift"; sourceTree = "<group>"; };
 		E79DD1B02CE365CF00B1EB86 /* ChooseReceivingAccountOnDelete+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChooseReceivingAccountOnDelete+Reducer.swift"; sourceTree = "<group>"; };
 		E79DD1B22CE365D600B1EB86 /* ChooseReceivingAccountOnDelete+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChooseReceivingAccountOnDelete+View.swift"; sourceTree = "<group>"; };
 		E79DD1B52CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeleteAccountConfirmation+Reducer.swift"; sourceTree = "<group>"; };
@@ -5796,6 +5800,7 @@
 				5B98CD8B2D00D8C700C3C133 /* TodoView.swift */,
 				5B98CD862D00D29C00C3C133 /* Onboarding */,
 				5B813D052CFF202E001A291D /* PrepareFactorSources */,
+				E775A1CE2D03279000E72DB9 /* SelectFactorSources */,
 			);
 			path = ShieldSetup;
 			sourceTree = "<group>";
@@ -7057,6 +7062,15 @@
 			path = ConfigurationBackup;
 			sourceTree = "<group>";
 		};
+		E775A1CE2D03279000E72DB9 /* SelectFactorSources */ = {
+			isa = PBXGroup;
+			children = (
+				E775A1CF2D0327BF00E72DB9 /* SelectFactorSources+Reducer.swift */,
+				E775A1D02D0327BF00E72DB9 /* SelectFactorSources+View.swift */,
+			);
+			path = SelectFactorSources;
+			sourceTree = "<group>";
+		};
 		E79DD1B42CE492E800B1EB86 /* DeleteAccount */ = {
 			isa = PBXGroup;
 			children = (
@@ -7262,7 +7276,7 @@
 				8318BB172BC8403800057BCB /* XCRemoteSwiftPackageReference "swift-custom-dump" */,
 				E6A0B0492BF23C7000617DAC /* XCRemoteSwiftPackageReference "swift-identified-collections" */,
 				5B634A922C91D2A0004B2FBC /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */,
-				5B98CD932D020B4600C3C133 /* XCLocalSwiftPackageReference "../sargon" */,
+				E775A1CD2D03272600E72DB9 /* XCRemoteSwiftPackageReference "sargon" */,
 			);
 			productRefGroup = 48CFBC502ADC106300E77A5C /* Products */;
 			projectDirPath = "";
@@ -7746,6 +7760,8 @@
 				A40816632C7E0D08005E65B9 /* ValidatorUptimeCollectionItem.swift in Sources */,
 				A40815D92C7E0D08005E65B9 /* ProgrammaticScryptoSborValueI128.swift in Sources */,
 				48CFC3142ADC10D900E77A5C /* CompletionMigrateOlympiaAccountsToBabylon.swift in Sources */,
+				E775A1D12D0327BF00E72DB9 /* SelectFactorSources+View.swift in Sources */,
+				E775A1D22D0327BF00E72DB9 /* SelectFactorSources+Reducer.swift in Sources */,
 				8308184E2B9F16AD002D8351 /* TokenPriceClient+Mock.swift in Sources */,
 				48CFC2852ADC10D900E77A5C /* SubmitTransaction+View.swift in Sources */,
 				A40815632C7E0D08005E65B9 /* AccountLockerVaultCollectionItemType.swift in Sources */,
@@ -9116,13 +9132,6 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		5B98CD932D020B4600C3C133 /* XCLocalSwiftPackageReference "../sargon" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../sargon;
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCRemoteSwiftPackageReference section */
 		48FFFA972ADC1EEC00B2B213 /* XCRemoteSwiftPackageReference "AsyncExtensions" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -9394,6 +9403,14 @@
 			requirement = {
 				kind = exactVersion;
 				version = 1.0.2;
+			};
+		};
+		E775A1CD2D03272600E72DB9 /* XCRemoteSwiftPackageReference "sargon" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/radixdlt/sargon";
+			requirement = {
+				kind = exactVersion;
+				version = 1.1.73;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

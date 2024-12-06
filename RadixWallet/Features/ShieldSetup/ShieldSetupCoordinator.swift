@@ -10,7 +10,7 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 	@Reducer(state: .hashable, action: .equatable)
 	enum Path {
 		case prepareFactors(PrepareFactorSources.Coordinator)
-		case selectFactors
+		case selectFactors(SelectFactorSources)
 	}
 
 	typealias Action = FeatureAction<Self>
@@ -40,7 +40,7 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 			state.path.append(.prepareFactors(.init(path: .intro)))
 			return .none
 		case .selectFactors:
-			state.path.append(.selectFactors)
+			state.path.append(.selectFactors(.init()))
 			return .none
 		}
 	}
@@ -63,13 +63,13 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 private extension ShieldSetupCoordinator {
 	func onboardingFinishedEffect() -> Effect<Action> {
 		.run { send in
-			let status = try SargonOS.shared.securityShieldPrerequisitesStatus()
-			switch status {
-			case .hardwareRequired, .anyRequired:
-				await send(.internal(.prepareFactors))
-			case .sufficient:
-				await send(.internal(.selectFactors))
-			}
+//			let status = try SargonOS.shared.securityShieldPrerequisitesStatus()
+//			switch status {
+//			case .hardwareRequired, .anyRequired:
+//				await send(.internal(.prepareFactors))
+//			case .sufficient:
+			await send(.internal(.selectFactors))
+//			}
 		}
 	}
 }
