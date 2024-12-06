@@ -5795,19 +5795,19 @@
 				5B98CD882D00D3C300C3C133 /* ShieldSetupCoordinator+View.swift */,
 				5B98CD8B2D00D8C700C3C133 /* TodoView.swift */,
 				5B98CD862D00D29C00C3C133 /* Onboarding */,
-				5B813D052CFF202E001A291D /* PrepareFactors */,
+				5B813D052CFF202E001A291D /* PrepareFactorSources */,
 			);
 			path = ShieldSetup;
 			sourceTree = "<group>";
 		};
-		5B813D052CFF202E001A291D /* PrepareFactors */ = {
+		5B813D052CFF202E001A291D /* PrepareFactorSources */ = {
 			isa = PBXGroup;
 			children = (
 				5B813D062CFF2092001A291D /* Coordinator.swift */,
 				5B813D072CFF2092001A291D /* Coordinator+View.swift */,
 				5B813D0A2CFF20D0001A291D /* Children */,
 			);
-			path = PrepareFactors;
+			path = PrepareFactorSources;
 			sourceTree = "<group>";
 		};
 		5B813D0A2CFF20D0001A291D /* Children */ = {

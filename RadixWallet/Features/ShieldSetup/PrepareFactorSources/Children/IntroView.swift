@@ -1,12 +1,12 @@
 import SwiftUI
 
-extension PrepareFactors {
+extension PrepareFactorSources {
 	struct IntroView: SwiftUI.View {
 		let action: () -> Void
 
 		var body: some SwiftUI.View {
 			VStack(spacing: .large2) {
-				Image(.prepareFactorsIntro)
+				Image(.prepareFactorSourcesIntro)
 
 				Text(L10n.ShieldSetupPrepareFactors.Intro.title)
 					.textStyle(.sheetTitle)

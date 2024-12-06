@@ -9,7 +9,7 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 
 	@Reducer(state: .hashable, action: .equatable)
 	enum Path {
-		case prepareFactors(PrepareFactors.Coordinator)
+		case prepareFactors(PrepareFactorSources.Coordinator)
 		case selectFactors
 	}
 

@@ -1,15 +1,15 @@
 import SwiftUI
 
-// MARK: - PrepareFactors.AddFactorSource.View
-extension PrepareFactors.AddFactorSource {
+// MARK: - PrepareFactorSources.AddFactorSource.View
+extension PrepareFactorSources.AddFactorSource {
 	struct View: SwiftUI.View {
-		let store: StoreOf<PrepareFactors.AddFactorSource>
+		let store: StoreOf<PrepareFactorSources.AddFactorSource>
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				ScrollView {
 					VStack(spacing: .large2) {
-						Image(.prepareFactorsAdd)
+						Image(.prepareFactorSourcesAdd)
 
 						Text(store.title)
 							.textStyle(.sheetTitle)
@@ -71,7 +71,7 @@ extension PrepareFactors.AddFactorSource {
 	}
 }
 
-private extension PrepareFactors.AddFactorSource.State {
+private extension PrepareFactorSources.AddFactorSource.State {
 	var title: String {
 		switch mode {
 		case .hardware:

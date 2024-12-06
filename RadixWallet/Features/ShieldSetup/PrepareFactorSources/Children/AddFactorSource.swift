@@ -1,5 +1,5 @@
-// MARK: - PrepareFactors.AddFactorSource
-extension PrepareFactors {
+// MARK: - PrepareFactorSources.AddFactorSource
+extension PrepareFactorSources {
 	@Reducer
 	struct AddFactorSource: Sendable, FeatureReducer {
 		@ObservableState
@@ -38,8 +38,8 @@ extension PrepareFactors {
 	}
 }
 
-// MARK: - PrepareFactors.AddFactorSource.State.Mode
-extension PrepareFactors.AddFactorSource.State {
+// MARK: - PrepareFactorSources.AddFactorSource.State.Mode
+extension PrepareFactorSources.AddFactorSource.State {
 	enum Mode {
 		case hardware
 		case any

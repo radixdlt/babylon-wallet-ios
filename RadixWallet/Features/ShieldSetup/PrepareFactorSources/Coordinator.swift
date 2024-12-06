@@ -1,5 +1,5 @@
-// MARK: - PrepareFactors.Coordinator
-extension PrepareFactors {
+// MARK: - PrepareFactorSources.Coordinator
+extension PrepareFactorSources {
 	@Reducer
 	struct Coordinator: Sendable, FeatureReducer {
 		@ObservableState
@@ -13,7 +13,7 @@ extension PrepareFactors {
 		@Reducer(state: .hashable, action: .equatable)
 		enum Path {
 			case intro
-			case addFactor(PrepareFactors.AddFactorSource)
+			case addFactor(PrepareFactorSources.AddFactorSource)
 			case completion
 		}
 
@@ -57,7 +57,7 @@ extension PrepareFactors {
 		var body: some ReducerOf<Self> {
 			Scope(state: \.path, action: \.child.path) {
 				Path.intro
-				Path.addFactor(PrepareFactors.AddFactorSource())
+				Path.addFactor(PrepareFactorSources.AddFactorSource())
 				Path.completion
 			}
 			Reduce(core)
@@ -105,7 +105,7 @@ extension PrepareFactors {
 	}
 }
 
-private extension PrepareFactors.Coordinator {
+private extension PrepareFactorSources.Coordinator {
 	func determineNextStepEffect() -> Effect<Action> {
 		.run { send in
 			let status = try SargonOS.shared.securityShieldPrerequisitesStatus()
