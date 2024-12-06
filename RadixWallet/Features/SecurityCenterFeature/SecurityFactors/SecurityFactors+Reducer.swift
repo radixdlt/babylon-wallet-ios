@@ -24,12 +24,14 @@ struct SecurityFactors: Sendable, FeatureReducer {
 		enum State: Sendable, Hashable {
 			case seedPhrases(DisplayMnemonics.State)
 			case ledgerWallets(LedgerHardwareDevices.State)
+			case todo
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
 			case seedPhrases(DisplayMnemonics.Action)
 			case ledgerWallets(LedgerHardwareDevices.Action)
+			case todo(Never)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -67,8 +69,10 @@ struct SecurityFactors: Sendable, FeatureReducer {
 				state.destination = .seedPhrases(.init())
 			case .ledgerHqHardwareWallet:
 				state.destination = .ledgerWallets(.init(context: .settings))
-			default:
-				break
+			case .arculusCard, .password, .offDeviceMnemonic:
+				state.destination = .todo
+			case .trustedContact, .securityQuestions:
+				fatalError("Unsupported Factor Source")
 			}
 			return .none
 		}
