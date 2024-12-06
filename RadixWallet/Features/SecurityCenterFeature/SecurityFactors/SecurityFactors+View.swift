@@ -42,7 +42,11 @@ private extension SecurityFactors.View {
 			.header("Manage the security factors you’ll use in your Security Shield."),
 			model(kind: .device, hints: viewStore.deviceHints),
 			.header("Hardware"),
+			model(kind: .arculusCard),
 			model(kind: .ledgerHqHardwareWallet),
+			.header("Things you know"),
+			model(kind: .password),
+			model(kind: .offDeviceMnemonic),
 		]
 	}
 
@@ -52,7 +56,7 @@ private extension SecurityFactors.View {
 			subtitle: kind.details,
 			hints: hints,
 			icon: .asset(kind.icon),
-			action: .rowTapped(kind)
+			action: .factorSourceRowTapped(kind)
 		)
 	}
 }
