@@ -39,7 +39,7 @@ private extension SecurityFactors.View {
 
 	func rows(viewStore: ViewStore<SecurityFactors.State, SecurityFactors.ViewAction>) -> [SettingsRow<SecurityFactors>.Kind] {
 		[
-			.header("Manage the security factors you’ll use in your Security Shield."),
+			.header("Manage the security factors you’ll use in your Security Shields."),
 			model(kind: .device, hints: viewStore.deviceHints),
 			.header("Hardware"),
 			model(kind: .arculusCard),
@@ -86,6 +86,7 @@ private extension View {
 		let destinationStore = store.destination
 		return seedPhrases(with: destinationStore)
 			.ledgerHardwareWallets(with: destinationStore)
+			.todo(with: destinationStore)
 	}
 
 	private func seedPhrases(with destinationStore: PresentationStoreOf<SecurityFactors.Destination>) -> some View {
@@ -99,6 +100,12 @@ private extension View {
 			LedgerHardwareDevices.View(store: $0)
 				.background(.app.gray5)
 				.radixToolbar(title: L10n.AccountSecuritySettings.LedgerHardwareWallets.title)
+		}
+	}
+
+	private func todo(with destinationStore: PresentationStoreOf<SecurityFactors.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.todo, action: \.todo)) { _ in
+			TodoView(feature: "Add factor")
 		}
 	}
 }
