@@ -12,9 +12,7 @@ struct SecurityFactors: Sendable, FeatureReducer {
 
 	enum ViewAction: Sendable, Equatable {
 		case task
-		case seedPhrasesButtonTapped
-		case ledgerWalletsButtonTapped
-		case rowTapped(FactorSourceKind)
+		case factorSourceRowTapped(FactorSourceKind)
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -63,15 +61,15 @@ struct SecurityFactors: Sendable, FeatureReducer {
 		case .task:
 			return securityProblemsEffect()
 
-		case .seedPhrasesButtonTapped:
-			state.destination = .seedPhrases(.init())
-			return .none
-
-		case .ledgerWalletsButtonTapped:
-			state.destination = .ledgerWallets(.init(context: .settings))
-			return .none
-
-		case .rowTapped:
+		case let .factorSourceRowTapped(kind):
+			switch kind {
+			case .device:
+				state.destination = .seedPhrases(.init())
+			case .ledgerHqHardwareWallet:
+				state.destination = .ledgerWallets(.init(context: .settings))
+			default:
+				break
+			}
 			return .none
 		}
 	}
