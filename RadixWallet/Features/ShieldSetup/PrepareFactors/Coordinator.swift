@@ -108,7 +108,7 @@ extension PrepareFactors {
 private extension PrepareFactors.Coordinator {
 	func determineNextStepEffect() -> Effect<Action> {
 		.run { send in
-			let status = try SargonOS.shared.getSecurityShieldPrerequisitesStatus()
+			let status = try SargonOS.shared.securityShieldPrerequisitesStatus()
 			switch status {
 			case .hardwareRequired:
 				await send(.delegate(.push(.addFactor(.init(mode: .hardware)))))
