@@ -36,7 +36,7 @@ extension InteractionReview {
 				pasteboardClient.copyString(manifest)
 			} label: {
 				HStack(spacing: .small3) {
-					AssetIcon(.asset(AssetResource.copy))
+					AssetIcon(.asset(.copy))
 					Text(L10n.Common.copy)
 						.textStyle(.body1Header)
 				}

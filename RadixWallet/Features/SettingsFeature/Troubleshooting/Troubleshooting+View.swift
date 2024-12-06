@@ -54,13 +54,13 @@ extension Troubleshooting.View {
 			.model(
 				title: L10n.Troubleshooting.AccountScan.title,
 				subtitle: L10n.Troubleshooting.AccountScan.subtitle,
-				icon: .asset(AssetResource.recovery),
+				icon: .asset(.recovery),
 				action: .accountScanButtonTapped
 			),
 			.model(
 				title: L10n.Troubleshooting.LegacyImport.title,
 				subtitle: L10n.Troubleshooting.LegacyImport.subtitle,
-				icon: .asset(AssetResource.recovery),
+				icon: .asset(.recovery),
 				action: .legacyImportButtonTapped
 			).valid(if: isLegacyImportEnabled),
 			.header(L10n.Troubleshooting.supportAndCommunity),
@@ -74,7 +74,7 @@ extension Troubleshooting.View {
 			.model(
 				title: L10n.Troubleshooting.Discord.title,
 				subtitle: L10n.Troubleshooting.Discord.subtitle,
-				icon: .asset(AssetResource.discord),
+				icon: .asset(.discord),
 				accessory: .iconLinkOut,
 				action: .discordButtonTapped
 			),

@@ -92,14 +92,14 @@ extension SettingsRow.Kind {
 
 	struct ToggleModel: Identifiable {
 		let id: String
-		let icon: ImageAsset?
+		let icon: ImageResource?
 		let title: String
 		let subtitle: String
 		let minHeight: CGFloat
 		let isOn: Binding<Bool>
 
 		init(
-			icon: ImageAsset? = nil,
+			icon: ImageResource? = nil,
 			title: String,
 			subtitle: String,
 			minHeight: CGFloat = .largeButtonHeight,
@@ -140,7 +140,7 @@ extension SettingsRow.Kind {
 	}
 
 	static func toggleModel(
-		icon: ImageAsset?,
+		icon: ImageResource?,
 		title: String,
 		subtitle: String,
 		minHeight: CGFloat,

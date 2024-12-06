@@ -90,7 +90,7 @@ extension Preferences.View {
 	private func rows(viewStore: ViewStoreOf<Preferences>) -> [SettingsRow<Preferences>.Kind] {
 		let advancedLockToggle: SettingsRow<Preferences>.Kind? = if #unavailable(iOS 18) {
 			.toggleModel(
-				icon: AssetResource.advancedLock,
+				icon: .advancedLock,
 				title: L10n.Preferences.AdvancedLock.title,
 				subtitle: L10n.Preferences.AdvancedLock.subtitle,
 				minHeight: .zero,
@@ -108,7 +108,7 @@ extension Preferences.View {
 			.model(
 				title: L10n.Preferences.DepositGuarantees.title,
 				subtitle: L10n.Preferences.DepositGuarantees.subtitle,
-				icon: .asset(AssetResource.depositGuarantees),
+				icon: .asset(.depositGuarantees),
 				action: .depositGuaranteesButtonTapped
 			),
 			.header(L10n.Preferences.displayPreferences),
@@ -128,11 +128,11 @@ extension Preferences.View {
 			.header(L10n.Preferences.advancedPreferences),
 			.model(
 				title: L10n.Preferences.gateways,
-				icon: .asset(AssetResource.gateway),
+				icon: .asset(.gateway),
 				action: .gatewaysButtonTapped
 			),
 			.toggleModel(
-				icon: AssetResource.developerMode,
+				icon: .developerMode,
 				title: L10n.Preferences.DeveloperMode.title,
 				subtitle: L10n.Preferences.DeveloperMode.subtitle,
 				minHeight: .zero,
@@ -151,7 +151,7 @@ extension Preferences.View {
 			kind: .model(
 				title: "Export logs",
 				subtitle: "Export and save debugging logs",
-				icon: .asset(AssetResource.appSettings),
+				icon: .asset(.appSettings),
 				action: .exportLogsButtonTapped
 			),
 			store: store

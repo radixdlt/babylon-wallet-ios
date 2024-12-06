@@ -2,8 +2,6 @@
 
 struct SecurityFactors: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
-		var seedPhrasesCount: Int?
-		var ledgerWalletsCount: Int?
 		var securityProblems: [SecurityProblem] = []
 
 		@PresentationState
@@ -16,11 +14,10 @@ struct SecurityFactors: Sendable, FeatureReducer {
 		case task
 		case seedPhrasesButtonTapped
 		case ledgerWalletsButtonTapped
+		case rowTapped(FactorSourceKind)
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case loadedSeedPhrasesCount(Int)
-		case loadedLedgerWalletsCount(Int)
 		case setSecurityProblems([SecurityProblem])
 	}
 
@@ -64,9 +61,7 @@ struct SecurityFactors: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			return loadSeedPhrasesCount()
-				.merge(with: loadLedgerWalletsCount())
-				.merge(with: securityProblemsEffect())
+			return securityProblemsEffect()
 
 		case .seedPhrasesButtonTapped:
 			state.destination = .seedPhrases(.init())
@@ -75,38 +70,17 @@ struct SecurityFactors: Sendable, FeatureReducer {
 		case .ledgerWalletsButtonTapped:
 			state.destination = .ledgerWallets(.init(context: .settings))
 			return .none
+
+		case .rowTapped:
+			return .none
 		}
 	}
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .loadedSeedPhrasesCount(count):
-			state.seedPhrasesCount = count
-			return .none
-
-		case let .loadedLedgerWalletsCount(count):
-			state.ledgerWalletsCount = count
-			return .none
-
 		case let .setSecurityProblems(problems):
 			state.securityProblems = problems
 			return .none
-		}
-	}
-
-	private func loadSeedPhrasesCount() -> Effect<Action> {
-		.run { send in
-			try await send(.internal(.loadedSeedPhrasesCount(
-				factorSourcesClient.getFactorSources(type: DeviceFactorSource.self).count
-			)))
-		}
-	}
-
-	private func loadLedgerWalletsCount() -> Effect<Action> {
-		.run { send in
-			try await send(.internal(.loadedLedgerWalletsCount(
-				factorSourcesClient.getFactorSources(type: LedgerHardwareWalletFactorSource.self).count
-			)))
 		}
 	}
 

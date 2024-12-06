@@ -212,7 +212,7 @@ extension PreferenceSection.Row where RowId == AccountPreferences.Section.Sectio
 			id: .personalize(.accountLabel),
 			title: L10n.AccountSettings.accountLabel,
 			subtitle: L10n.AccountSettings.accountLabelSubtitle,
-			icon: .asset(AssetResource.create)
+			icon: .asset(.create)
 		)
 	}
 
@@ -230,20 +230,20 @@ extension PreferenceSection.Row where RowId == AccountPreferences.Section.Sectio
 			id: .dev(.devPreferences),
 			title: L10n.AccountSettings.devPreferences,
 			subtitle: nil,
-			icon: .asset(AssetResource.appSettings)
+			icon: .asset(.appSettings)
 		)
 	}
 }
 
 extension DepositRule {
-	var icon: ImageAsset {
+	var icon: ImageResource {
 		switch self {
 		case .acceptAll:
-			AssetResource.iconAcceptAirdrop
+			.iconAcceptAirdrop
 		case .acceptKnown:
-			AssetResource.iconAcceptKnownAirdrop
+			.iconAcceptKnownAirdrop
 		case .denyAll:
-			AssetResource.iconDeclineAirdrop
+			.iconDeclineAirdrop
 		}
 	}
 }
