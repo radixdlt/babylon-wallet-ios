@@ -63,13 +63,13 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 private extension ShieldSetupCoordinator {
 	func onboardingFinishedEffect() -> Effect<Action> {
 		.run { send in
-//			let status = try SargonOS.shared.securityShieldPrerequisitesStatus()
-//			switch status {
-//			case .hardwareRequired, .anyRequired:
-//				await send(.internal(.prepareFactors))
-//			case .sufficient:
-			await send(.internal(.selectFactors))
-//			}
+			let status = try SargonOS.shared.securityShieldPrerequisitesStatus()
+			switch status {
+			case .hardwareRequired, .anyRequired:
+				await send(.internal(.prepareFactors))
+			case .sufficient:
+				await send(.internal(.selectFactors))
+			}
 		}
 	}
 }

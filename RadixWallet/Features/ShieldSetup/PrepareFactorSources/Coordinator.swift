@@ -108,15 +108,15 @@ extension PrepareFactorSources {
 private extension PrepareFactorSources.Coordinator {
 	func determineNextStepEffect() -> Effect<Action> {
 		.run { send in
-//			let status = try SargonOS.shared.securityShieldPrerequisitesStatus()
-//			switch status {
-//			case .hardwareRequired:
-//				await send(.delegate(.push(.addFactor(.init(mode: .hardware)))))
-//			case .anyRequired:
-//				await send(.delegate(.push(.addFactor(.init(mode: .any)))))
-//			case .sufficient:
-			await send(.delegate(.push(.completion)))
-//			}
+			let status = try SargonOS.shared.securityShieldPrerequisitesStatus()
+			switch status {
+			case .hardwareRequired:
+				await send(.delegate(.push(.addFactor(.init(mode: .hardware)))))
+			case .anyRequired:
+				await send(.delegate(.push(.addFactor(.init(mode: .any)))))
+			case .sufficient:
+				await send(.delegate(.push(.completion)))
+			}
 		}
 	}
 
