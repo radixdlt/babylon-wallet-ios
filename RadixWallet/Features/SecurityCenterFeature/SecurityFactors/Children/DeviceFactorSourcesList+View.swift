@@ -38,7 +38,7 @@ extension DeviceFactorSourcesList {
 		private func header(_ text: String) -> some SwiftUI.View {
 			Text(text)
 				.textStyle(.body1Header)
-				.foregroundStyle(.app.gray1)
+				.foregroundStyle(.app.gray2)
 				.flushedLeft
 		}
 
@@ -55,7 +55,8 @@ extension DeviceFactorSourcesList {
 		private func card(_ row: State.Row) -> some SwiftUI.View {
 			FactorSourceCard(
 				kind: .instance(factorSource: row.factorSource.asGeneral, kind: .extended(accounts: row.accounts, personas: row.personas)),
-				mode: .display
+				mode: .display,
+				messages: [row.message]
 			)
 			.onTapGesture {}
 		}

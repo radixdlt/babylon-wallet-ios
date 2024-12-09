@@ -22,21 +22,21 @@ struct SecurityFactors: Sendable, FeatureReducer {
 	struct Destination: DestinationReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
-			case seedPhrases(DisplayMnemonics.State)
+			case device(DeviceFactorSourcesList.State)
 			case ledgerWallets(LedgerHardwareDevices.State)
 			case todo
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
-			case seedPhrases(DisplayMnemonics.Action)
+			case device(DeviceFactorSourcesList.Action)
 			case ledgerWallets(LedgerHardwareDevices.Action)
 			case todo(Never)
 		}
 
 		var body: some ReducerOf<Self> {
-			Scope(state: \.seedPhrases, action: \.seedPhrases) {
-				DisplayMnemonics()
+			Scope(state: \.device, action: \.device) {
+				DeviceFactorSourcesList()
 			}
 			Scope(state: \.ledgerWallets, action: \.ledgerWallets) {
 				LedgerHardwareDevices()
@@ -66,7 +66,7 @@ struct SecurityFactors: Sendable, FeatureReducer {
 		case let .factorSourceRowTapped(kind):
 			switch kind {
 			case .device:
-				state.destination = .seedPhrases(.init())
+				state.destination = .device(.init())
 			case .ledgerHqHardwareWallet:
 				state.destination = .ledgerWallets(.init(context: .settings))
 			case .arculusCard, .password, .offDeviceMnemonic:

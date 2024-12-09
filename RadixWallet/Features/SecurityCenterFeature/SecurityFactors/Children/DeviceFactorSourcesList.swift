@@ -73,10 +73,10 @@ private extension DeviceFactorSourcesList {
 			let rows = entities.map { entity in
 				let accounts = entity.accounts + entity.hiddenAccounts
 				let personas = entity.personas
-				let message: FactorSourceCardDataSource.Message = if !entity.isMnemonicMarkedAsBackedUp {
-					.init(text: "Write down seed phrase to make this factor recoverable", type: .warning) // Problem 3
-				} else if !entity.isMnemonicPresentInKeychain {
+				let message: FactorSourceCardDataSource.Message = if !entity.isMnemonicPresentInKeychain {
 					.init(text: "This factor has been lost", type: .error) // Problem 9
+				} else if !entity.isMnemonicMarkedAsBackedUp {
+					.init(text: "Write down seed phrase to make this factor recoverable", type: .warning) // Problem 3
 				} else {
 					.init(text: "This seed phrase has been written down", type: .success)
 				}
