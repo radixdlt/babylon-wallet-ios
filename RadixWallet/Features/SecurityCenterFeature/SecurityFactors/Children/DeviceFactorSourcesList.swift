@@ -13,6 +13,7 @@ struct DeviceFactorSourcesList: Sendable, FeatureReducer {
 	enum ViewAction: Sendable, Equatable {
 		case task
 		case rowTapped(State.Row)
+		case rowMessageTapped(State.Row)
 		case addButtonTapped
 	}
 
@@ -68,7 +69,10 @@ struct DeviceFactorSourcesList: Sendable, FeatureReducer {
 			return securityProblemsEffect()
 				.merge(with: entitiesEffect())
 
-		case let .rowTapped(row):
+		case .rowTapped:
+			return .none
+
+		case let .rowMessageTapped(row):
 			switch row.status {
 			case .noProblem:
 				return .none

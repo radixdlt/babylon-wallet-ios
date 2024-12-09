@@ -60,7 +60,14 @@ extension DeviceFactorSourcesList {
 				kind: .instance(factorSource: row.factorSource.asGeneral, kind: .extended(accounts: row.accounts, personas: row.personas)),
 				mode: .display,
 				messages: [row.message]
-			)
+			) { action in
+				switch action {
+				case .removeTapped:
+					break
+				case .messageTapped:
+					store.send(.view(.rowMessageTapped(row)))
+				}
+			}
 			.onTapGesture {
 				store.send(.view(.rowTapped(row)))
 			}

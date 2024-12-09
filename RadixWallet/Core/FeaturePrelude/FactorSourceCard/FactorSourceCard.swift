@@ -8,7 +8,7 @@ struct FactorSourceCard: View {
 	private let dataSource: FactorSourceCardDataSource
 	private var isExpanded: Bool
 
-	var onRemoveTapped: (() -> Void)? = nil
+	var onAction: ((Action) -> Void)? = nil
 
 	var body: some View {
 		switch mode {
@@ -19,7 +19,7 @@ struct FactorSourceCard: View {
 				card
 
 				Button {
-					onRemoveTapped?()
+					onAction?(.removeTapped)
 				} label: {
 					Image(asset: AssetResource.close)
 						.frame(.smallest)
@@ -44,6 +44,9 @@ struct FactorSourceCard: View {
 							useNarrowSpacing: true,
 							useSmallerFontSize: true
 						)
+						.onTapGesture {
+							onAction?(.messageTapped)
+						}
 					}
 				}
 				.flushedLeft
@@ -178,7 +181,7 @@ extension FactorSourceCard {
 		mode: Mode,
 		messages: [FactorSourceCardDataSource.Message] = [],
 		isExpanded: Bool = false,
-		onRemoveTapped: (() -> Void)? = nil
+		onAction: ((Action) -> Void)? = nil
 	) {
 		guard kind.factorSourceKind.isSupported else { return nil }
 
@@ -194,7 +197,7 @@ extension FactorSourceCard {
 					messages: messages
 				),
 				isExpanded: isExpanded,
-				onRemoveTapped: onRemoveTapped
+				onAction: onAction
 			)
 		case let .instance(factorSource, instanceKind):
 			switch instanceKind {
@@ -209,7 +212,7 @@ extension FactorSourceCard {
 						messages: messages
 					),
 					isExpanded: isExpanded,
-					onRemoveTapped: onRemoveTapped
+					onAction: onAction
 				)
 			case let .extended(accounts, personas):
 				self = .init(
@@ -224,7 +227,7 @@ extension FactorSourceCard {
 						personas: personas
 					),
 					isExpanded: isExpanded,
-					onRemoveTapped: onRemoveTapped
+					onAction: onAction
 				)
 			}
 		}
@@ -251,6 +254,11 @@ extension FactorSourceCard {
 	enum SelectionType {
 		case radioButton
 		case checkmark
+	}
+
+	enum Action {
+		case removeTapped
+		case messageTapped
 	}
 }
 
