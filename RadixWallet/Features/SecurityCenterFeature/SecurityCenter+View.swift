@@ -36,7 +36,8 @@ extension SecurityCenter {
 								}
 							}
 
-							ForEach(SecurityProblemKind.allCases, id: \.self) { type in
+                            // TODO: fix Sargon
+							ForEach([SecurityProblemKind.securityShields, .securityFactors, .configurationBackup], id: \.self) { type in
 								ProblemTypeCard(type: type, actionRequired: viewStore.actionsRequired.contains(type)) {
 									store.send(.view(.cardTapped(type)))
 								}

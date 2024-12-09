@@ -2595,7 +2595,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E775A1D32D061D4600E72DB9 /* Sargon in Frameworks */,
 				E7AE2D052BF7844300830BAA /* Sargon in Frameworks */,
 				48FFFABE2ADC209100B2B213 /* NukeUI in Frameworks */,
 				48FFFAE72ADC223300B2B213 /* Overture in Frameworks */,
