@@ -179,7 +179,18 @@ private extension DeviceFactorSources {
 					// We need to do the trailing check because the SecurityCenterClient won't return `.problem9` if the user
 					// has a DeviceFactorSource whose seed phrase is not present in keychain but doesn't have any entity associated.
 					// The only way to reproduce this, is to restore a Wallet from a Profile without entering its seed phrase (so it creates a new one)
-					// and not backup the new seed phrase nor create an entity.
+					// and do not write down the new seed phrase nor create an entity.
+					//
+					// One could argue that we may just ignore `problems` and replace above logic with the following one:
+					// ```
+					// if !entity.isMnemonicPresentInKeychain {
+					// 		.hasProblem9
+					// } else if !entity.isMnemonicMarkedAsBackedUp {
+					// 		.hasProblem3
+					// }
+					// ```
+					// However, we prefer to rely on on SecurityCenterClient in case the logic to extend these problems is modified
+					// in the future (which for sure will be done on such place, but may be overlooked here).
 					.hasProblem9
 				} else {
 					.noProblem
