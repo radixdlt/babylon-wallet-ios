@@ -19,8 +19,10 @@ extension DeviceFactorSourcesList {
 							}
 						}
 
-						Button("Add Biometrics/PIN") {}
-							.buttonStyle(.secondaryRectangular)
+						Button("Add Biometrics/PIN") {
+							store.send(.view(.addButtonTapped))
+						}
+						.buttonStyle(.secondaryRectangular)
 
 						InfoButton(.accounts, label: "Learn about Biometrics/PIN") // TODO: Update
 					}
@@ -113,7 +115,8 @@ private extension View {
 	func destinations(with store: StoreOf<DeviceFactorSourcesList>) -> some View {
 		let destinationStore = store.destination
 		return displayMnemonic(with: destinationStore)
-			.importMnemonics(with: destinationStore)
+			.enterMnemonic(with: destinationStore)
+			.addMnemonic(with: destinationStore)
 	}
 
 	private func displayMnemonic(with destinationStore: PresentationStoreOf<DeviceFactorSourcesList.Destination>) -> some View {
@@ -122,9 +125,15 @@ private extension View {
 		}
 	}
 
-	private func importMnemonics(with destinationStore: PresentationStoreOf<DeviceFactorSourcesList.Destination>) -> some View {
-		navigationDestination(store: destinationStore.scope(state: \.importMnemonics, action: \.importMnemonics)) {
+	private func enterMnemonic(with destinationStore: PresentationStoreOf<DeviceFactorSourcesList.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.enterMnemonic, action: \.enterMnemonic)) {
 			ImportMnemonicsFlowCoordinator.View(store: $0)
+		}
+	}
+
+	private func addMnemonic(with destinationStore: PresentationStoreOf<DeviceFactorSourcesList.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.addMnemonic, action: \.addMnemonic)) {
+			ImportMnemonic.View(store: $0)
 		}
 	}
 }

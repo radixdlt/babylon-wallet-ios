@@ -13,6 +13,7 @@ struct DeviceFactorSourcesList: Sendable, FeatureReducer {
 	enum ViewAction: Sendable, Equatable {
 		case task
 		case rowTapped(State.Row)
+		case addButtonTapped
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -25,21 +26,26 @@ struct DeviceFactorSourcesList: Sendable, FeatureReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
 			case displayMnemonic(DisplayMnemonic.State)
-			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
+			case enterMnemonic(ImportMnemonicsFlowCoordinator.State)
+			case addMnemonic(ImportMnemonic.State)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
 			case displayMnemonic(DisplayMnemonic.Action)
-			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
+			case enterMnemonic(ImportMnemonicsFlowCoordinator.Action)
+			case addMnemonic(ImportMnemonic.Action)
 		}
 
 		var body: some ReducerOf<Self> {
-			Scope(state: /State.displayMnemonic, action: /Action.displayMnemonic) {
+			Scope(state: \.displayMnemonic, action: \.displayMnemonic) {
 				DisplayMnemonic()
 			}
-			Scope(state: /State.importMnemonics, action: /Action.importMnemonics) {
+			Scope(state: \.enterMnemonic, action: \.enterMnemonic) {
 				ImportMnemonicsFlowCoordinator()
+			}
+			Scope(state: \.addMnemonic, action: \.addMnemonic) {
+				ImportMnemonic()
 			}
 		}
 	}
@@ -61,6 +67,7 @@ struct DeviceFactorSourcesList: Sendable, FeatureReducer {
 		case .task:
 			return securityProblemsEffect()
 				.merge(with: entitiesEffect())
+
 		case let .rowTapped(row):
 			switch row.status {
 			case .noProblem:
@@ -70,9 +77,25 @@ struct DeviceFactorSourcesList: Sendable, FeatureReducer {
 					state.destination = .displayMnemonic(.export($0, title: L10n.RevealSeedPhrase.title, context: .fromSettings))
 				}
 			case .hasProblem9:
-				state.destination = .importMnemonics(.init())
+				state.destination = .enterMnemonic(.init())
 				return .none
 			}
+
+		case .addButtonTapped:
+			state.destination = .addMnemonic(
+				.init(
+					header: .init(title: "what should be the title here?"),
+					showCloseButton: false,
+					isWordCountFixed: true,
+					persistStrategy: .init(
+						factorSourceKindOfMnemonic: .babylon(isMain: false),
+						location: .intoKeychainAndProfile,
+						onMnemonicExistsStrategy: .appendWithCryptoParamaters
+					),
+					wordCount: .twentyFour
+				)
+			)
+			return .none
 		}
 	}
 
@@ -94,7 +117,7 @@ struct DeviceFactorSourcesList: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case .displayMnemonic(.delegate), .importMnemonics(.delegate):
+		case .displayMnemonic(.delegate), .enterMnemonic(.delegate), .addMnemonic(.delegate):
 			// We don't care about which delegate action was executed, since any corresponding
 			// updates to the warnings will be handled by securityProblemsEffect.
 			// We just need to dismiss the destination.
