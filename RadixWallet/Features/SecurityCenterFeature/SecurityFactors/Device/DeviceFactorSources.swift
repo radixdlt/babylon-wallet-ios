@@ -1,5 +1,5 @@
-// MARK: - DeviceFactorSourcesList
-struct DeviceFactorSourcesList: Sendable, FeatureReducer {
+// MARK: - DeviceFactorSources
+struct DeviceFactorSources: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		var rows: [Row] = []
 
@@ -141,7 +141,7 @@ struct DeviceFactorSourcesList: Sendable, FeatureReducer {
 	}
 }
 
-private extension DeviceFactorSourcesList {
+private extension DeviceFactorSources {
 	func securityProblemsEffect() -> Effect<Action> {
 		.run { send in
 			for try await problems in await securityCenterClient.problems(.securityFactors) {
@@ -197,7 +197,7 @@ private extension DeviceFactorSourcesList {
 }
 
 // MARK: - DeviceFactorSourcesList.State.Row
-extension DeviceFactorSourcesList.State {
+extension DeviceFactorSources.State {
 	struct Row: Sendable, Hashable {
 		let factorSource: DeviceFactorSource
 		let accounts: [Account]

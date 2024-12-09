@@ -84,14 +84,14 @@ private extension StoreOf<SecurityFactors> {
 private extension View {
 	func destinations(with store: StoreOf<SecurityFactors>) -> some View {
 		let destinationStore = store.destination
-		return device(with: destinationStore)
+		return deviceFactorSources(with: destinationStore)
 			.ledgerHardwareWallets(with: destinationStore)
 			.todo(with: destinationStore)
 	}
 
-	private func device(with destinationStore: PresentationStoreOf<SecurityFactors.Destination>) -> some View {
-		navigationDestination(store: destinationStore.scope(state: \.device, action: \.device)) {
-			DeviceFactorSourcesList.View(store: $0)
+	private func deviceFactorSources(with destinationStore: PresentationStoreOf<SecurityFactors.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.deviceFactorSources, action: \.deviceFactorSources)) {
+			DeviceFactorSources.View(store: $0)
 		}
 	}
 

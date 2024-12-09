@@ -84,16 +84,6 @@ extension SecurityProblem {
 		}
 	}
 
-	var seedPhrases: String? {
-		switch self {
-		case .problem3: L10n.SecurityProblems.No3.seedPhrases
-		case .problem5: nil
-		case .problem6: nil
-		case .problem7: nil
-		case .problem9: L10n.SecurityProblems.No9.seedPhrases
-		}
-	}
-
 	var walletSettingsPersonas: String {
 		switch self {
 		case .problem3: L10n.SecurityProblems.No3.walletSettingsPersonas

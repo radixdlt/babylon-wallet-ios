@@ -1,8 +1,8 @@
-// MARK: - DeviceFactorSourcesList.View
-extension DeviceFactorSourcesList {
+// MARK: - DeviceFactorSources.View
+extension DeviceFactorSources {
 	@MainActor
 	struct View: SwiftUI.View {
-		let store: StoreOf<DeviceFactorSourcesList>
+		let store: StoreOf<DeviceFactorSources>
 
 		var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }) { viewStore in
@@ -75,7 +75,7 @@ extension DeviceFactorSourcesList {
 	}
 }
 
-private extension DeviceFactorSourcesList.State {
+private extension DeviceFactorSources.State {
 	var main: Row? {
 		rows.first(where: \.factorSource.isExplicitMain)
 	}
@@ -95,7 +95,7 @@ private extension DeviceFactorSourcesList.State {
 	}
 }
 
-private extension DeviceFactorSourcesList.State.Row {
+private extension DeviceFactorSources.State.Row {
 	var message: FactorSourceCardDataSource.Message {
 		switch status {
 		case .noProblem:
@@ -108,9 +108,9 @@ private extension DeviceFactorSourcesList.State.Row {
 	}
 }
 
-private extension StoreOf<DeviceFactorSourcesList> {
-	var destination: PresentationStoreOf<DeviceFactorSourcesList.Destination> {
-		func scopeState(state: State) -> PresentationState<DeviceFactorSourcesList.Destination.State> {
+private extension StoreOf<DeviceFactorSources> {
+	var destination: PresentationStoreOf<DeviceFactorSources.Destination> {
+		func scopeState(state: State) -> PresentationState<DeviceFactorSources.Destination.State> {
 			state.$destination
 		}
 		return scope(state: scopeState, action: Action.destination)
@@ -119,7 +119,7 @@ private extension StoreOf<DeviceFactorSourcesList> {
 
 @MainActor
 private extension View {
-	func destinations(with store: StoreOf<DeviceFactorSourcesList>) -> some View {
+	func destinations(with store: StoreOf<DeviceFactorSources>) -> some View {
 		let destinationStore = store.destination
 		return detail(with: destinationStore)
 			.displayMnemonic(with: destinationStore)
@@ -127,25 +127,25 @@ private extension View {
 			.addMnemonic(with: destinationStore)
 	}
 
-	private func detail(with destinationStore: PresentationStoreOf<DeviceFactorSourcesList.Destination>) -> some View {
+	private func detail(with destinationStore: PresentationStoreOf<DeviceFactorSources.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.detail, action: \.detail)) {
 			DeviceFactorSourceDetail.View(store: $0)
 		}
 	}
 
-	private func displayMnemonic(with destinationStore: PresentationStoreOf<DeviceFactorSourcesList.Destination>) -> some View {
+	private func displayMnemonic(with destinationStore: PresentationStoreOf<DeviceFactorSources.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.displayMnemonic, action: \.displayMnemonic)) {
 			DisplayMnemonic.View(store: $0)
 		}
 	}
 
-	private func enterMnemonic(with destinationStore: PresentationStoreOf<DeviceFactorSourcesList.Destination>) -> some View {
+	private func enterMnemonic(with destinationStore: PresentationStoreOf<DeviceFactorSources.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.enterMnemonic, action: \.enterMnemonic)) {
 			ImportMnemonicsFlowCoordinator.View(store: $0)
 		}
 	}
 
-	private func addMnemonic(with destinationStore: PresentationStoreOf<DeviceFactorSourcesList.Destination>) -> some View {
+	private func addMnemonic(with destinationStore: PresentationStoreOf<DeviceFactorSources.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.addMnemonic, action: \.addMnemonic)) {
 			ImportMnemonic.View(store: $0)
 		}

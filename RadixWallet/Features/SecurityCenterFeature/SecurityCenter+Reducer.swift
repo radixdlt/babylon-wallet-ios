@@ -19,7 +19,7 @@ struct SecurityCenter: Sendable, FeatureReducer {
 		enum State: Sendable, Hashable {
 			case configurationBackup(ConfigurationBackup.State)
 			case securityFactors(SecurityFactors.State)
-			case deviceFactorSourcesList(DeviceFactorSourcesList.State)
+			case deviceFactorSources(DeviceFactorSources.State)
 			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
 			case securityShields(ShieldSetupCoordinator.State)
 		}
@@ -28,7 +28,7 @@ struct SecurityCenter: Sendable, FeatureReducer {
 		enum Action: Sendable, Equatable {
 			case configurationBackup(ConfigurationBackup.Action)
 			case securityFactors(SecurityFactors.Action)
-			case deviceFactorSourcesList(DeviceFactorSourcesList.Action)
+			case deviceFactorSources(DeviceFactorSources.Action)
 			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
 			case securityShields(ShieldSetupCoordinator.Action)
 		}
@@ -40,8 +40,8 @@ struct SecurityCenter: Sendable, FeatureReducer {
 			Scope(state: \.securityFactors, action: \.securityFactors) {
 				SecurityFactors()
 			}
-			Scope(state: \.deviceFactorSourcesList, action: \.deviceFactorSourcesList) {
-				DeviceFactorSourcesList()
+			Scope(state: \.deviceFactorSources, action: \.deviceFactorSources) {
+				DeviceFactorSources()
 			}
 			Scope(state: \.importMnemonics, action: \.importMnemonics) {
 				ImportMnemonicsFlowCoordinator()
@@ -81,7 +81,7 @@ struct SecurityCenter: Sendable, FeatureReducer {
 		case let .problemTapped(problem):
 			switch problem {
 			case .problem3:
-				state.destination = .deviceFactorSourcesList(.init())
+				state.destination = .deviceFactorSources(.init())
 
 			case .problem5, .problem6, .problem7:
 				state.destination = .configurationBackup(.init())

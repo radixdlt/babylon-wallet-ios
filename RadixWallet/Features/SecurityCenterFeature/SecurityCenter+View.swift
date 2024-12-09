@@ -213,7 +213,7 @@ private extension View {
 		let destinationStore = store.destination
 		return configurationBackup(with: destinationStore)
 			.securityFactors(with: destinationStore)
-			.deviceFactorSourcesList(with: destinationStore)
+			.deviceFactorSources(with: destinationStore)
 			.importMnemonics(with: destinationStore)
 			.securityShields(with: destinationStore)
 	}
@@ -230,9 +230,9 @@ private extension View {
 		}
 	}
 
-	private func deviceFactorSourcesList(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
-		navigationDestination(store: destinationStore.scope(state: \.deviceFactorSourcesList, action: \.deviceFactorSourcesList)) {
-			DeviceFactorSourcesList.View(store: $0)
+	private func deviceFactorSources(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.deviceFactorSources, action: \.deviceFactorSources)) {
+			DeviceFactorSources.View(store: $0)
 		}
 	}
 
