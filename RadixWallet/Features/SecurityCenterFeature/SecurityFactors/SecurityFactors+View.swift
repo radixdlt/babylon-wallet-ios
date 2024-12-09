@@ -39,12 +39,12 @@ private extension SecurityFactors.View {
 
 	func rows(viewStore: ViewStore<SecurityFactors.State, SecurityFactors.ViewAction>) -> [SettingsRow<SecurityFactors>.Kind] {
 		[
-			.header("Manage the security factors you’ll use in your Security Shields."),
+			.header(L10n.SecurityFactors.subtitle),
 			model(kind: .device, hints: viewStore.deviceHints),
-			.header("Hardware"),
+			.header(L10n.SecurityFactors.hardware),
 			model(kind: .arculusCard),
 			model(kind: .ledgerHqHardwareWallet),
-			.header("Things you know"),
+			.header(L10n.SecurityFactors.information),
 			model(kind: .password),
 			model(kind: .offDeviceMnemonic),
 		]
