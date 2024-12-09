@@ -137,7 +137,11 @@ private extension DeviceFactorSourcesList {
 				let personas = entity.personas
 				let status: State.Status = if problems.hasProblem3(accounts: accounts, personas: personas) {
 					.hasProblem3
-				} else if problems.hasProblem9(accounts: accounts, personas: personas) {
+				} else if problems.hasProblem9(accounts: accounts, personas: personas) || !entity.isMnemonicPresentInKeychain {
+					// We need to do the trailing check because the SecurityCenterClient won't return `.problem9` if the user
+					// has a DeviceFactorSource whose seed phrase is not present in keychain but doesn't have any entity associated.
+					// The only way to reproduce this, is to restore a Wallet from a Profile without entering its seed phrase (so it creates a new one)
+					// and not backup the new seed phrase nor create an entity.
 					.hasProblem9
 				} else {
 					.noProblem
