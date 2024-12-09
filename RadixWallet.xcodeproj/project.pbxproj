@@ -212,8 +212,6 @@
 		48CFC3052ADC10D900E77A5C /* DebugKeychainTest+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD9E2ADC10D800E77A5C /* DebugKeychainTest+View.swift */; };
 		48CFC3062ADC10D900E77A5C /* DebugUserDefaultsContents+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDA02ADC10D800E77A5C /* DebugUserDefaultsContents+View.swift */; };
 		48CFC3072ADC10D900E77A5C /* DebugUserDefaultsContents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDA12ADC10D800E77A5C /* DebugUserDefaultsContents.swift */; };
-		48CFC3082ADC10D900E77A5C /* DisplayMnemonics+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDA42ADC10D800E77A5C /* DisplayMnemonics+View.swift */; };
-		48CFC3092ADC10D900E77A5C /* DisplayMnemonics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDA52ADC10D800E77A5C /* DisplayMnemonics.swift */; };
 		48CFC30C2ADC10D900E77A5C /* Settings+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDA92ADC10D800E77A5C /* Settings+View.swift */; };
 		48CFC30F2ADC10D900E77A5C /* ImportOlympiaWalletCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDAF2ADC10D800E77A5C /* ImportOlympiaWalletCoordinator.swift */; };
 		48CFC3102ADC10D900E77A5C /* ImportOlympiaWalletCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDB02ADC10D800E77A5C /* ImportOlympiaWalletCoordinator+View.swift */; };
@@ -1513,8 +1511,6 @@
 		48CFBD9E2ADC10D800E77A5C /* DebugKeychainTest+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DebugKeychainTest+View.swift"; sourceTree = "<group>"; };
 		48CFBDA02ADC10D800E77A5C /* DebugUserDefaultsContents+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DebugUserDefaultsContents+View.swift"; sourceTree = "<group>"; };
 		48CFBDA12ADC10D800E77A5C /* DebugUserDefaultsContents.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DebugUserDefaultsContents.swift; sourceTree = "<group>"; };
-		48CFBDA42ADC10D800E77A5C /* DisplayMnemonics+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DisplayMnemonics+View.swift"; sourceTree = "<group>"; };
-		48CFBDA52ADC10D800E77A5C /* DisplayMnemonics.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisplayMnemonics.swift; sourceTree = "<group>"; };
 		48CFBDA92ADC10D800E77A5C /* Settings+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Settings+View.swift"; sourceTree = "<group>"; };
 		48CFBDAF2ADC10D800E77A5C /* ImportOlympiaWalletCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImportOlympiaWalletCoordinator.swift; sourceTree = "<group>"; };
 		48CFBDB02ADC10D800E77A5C /* ImportOlympiaWalletCoordinator+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ImportOlympiaWalletCoordinator+View.swift"; sourceTree = "<group>"; };
@@ -3555,7 +3551,6 @@
 				5B758D542BCE7AD100348722 /* Preferences */,
 				5B758D592BCEC39B00348722 /* Troubleshooting */,
 				48CFBD942ADC10D800E77A5C /* DebugSettings */,
-				48CFBDA22ADC10D800E77A5C /* DisplayMnemonics */,
 			);
 			path = SettingsFeature;
 			sourceTree = "<group>";
@@ -3613,23 +3608,6 @@
 				48CFBDA12ADC10D800E77A5C /* DebugUserDefaultsContents.swift */,
 			);
 			path = DebugUserDefaultsContents;
-			sourceTree = "<group>";
-		};
-		48CFBDA22ADC10D800E77A5C /* DisplayMnemonics */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBDA32ADC10D800E77A5C /* Coordinator */,
-			);
-			path = DisplayMnemonics;
-			sourceTree = "<group>";
-		};
-		48CFBDA32ADC10D800E77A5C /* Coordinator */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBDA42ADC10D800E77A5C /* DisplayMnemonics+View.swift */,
-				48CFBDA52ADC10D800E77A5C /* DisplayMnemonics.swift */,
-			);
-			path = Coordinator;
 			sourceTree = "<group>";
 		};
 		48CFBDAD2ADC10D800E77A5C /* ImportFromOlympiaLegacyWallet */ = {
@@ -7545,7 +7523,6 @@
 				A408166A2C7F14F1005E65B9 /* InfoLinkSheet+View.swift in Sources */,
 				48CFC4172ADC10DA00E77A5C /* PasteboardClient+Live.swift in Sources */,
 				48CFC61D2ADC10DA00E77A5C /* P2P+RTCIncomingMessage.swift in Sources */,
-				48CFC3092ADC10D900E77A5C /* DisplayMnemonics.swift in Sources */,
 				48CFC24D2ADC10D900E77A5C /* GatewayList+Reducer.swift in Sources */,
 				48CFC2C42ADC10D900E77A5C /* AssetTransferMessage+View.swift in Sources */,
 				5B8433A62CD011DE00CA00F5 /* PreAuthorizationClient+Test.swift in Sources */,
@@ -7572,7 +7549,6 @@
 				A40815A32C7E0D08005E65B9 /* MetadataU8Value.swift in Sources */,
 				48CFC3712ADC10D900E77A5C /* PoolUnitsList.swift in Sources */,
 				48CFC58B2ADC10DA00E77A5C /* SubmitTransactionClient+Test.swift in Sources */,
-				48CFC3082ADC10D900E77A5C /* DisplayMnemonics+View.swift in Sources */,
 				48CFC4492ADC10DA00E77A5C /* AuthorizedDappsClient+Test.swift in Sources */,
 				E713204C2BCD372600AE6B3C /* UnknownCaseDecodable.swift in Sources */,
 				48CFC27A2ADC10D900E77A5C /* App+View.swift in Sources */,
