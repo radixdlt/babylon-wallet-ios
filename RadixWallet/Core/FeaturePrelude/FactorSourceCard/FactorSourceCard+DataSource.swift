@@ -15,7 +15,7 @@ struct FactorSourceCardDataSource {
 
 // MARK: FactorSourceCardDataSource.Message
 extension FactorSourceCardDataSource {
-	struct Message: Identifiable {
+	struct Message: Identifiable, Sendable, Hashable {
 		var id: String { text }
 
 		let text: String
