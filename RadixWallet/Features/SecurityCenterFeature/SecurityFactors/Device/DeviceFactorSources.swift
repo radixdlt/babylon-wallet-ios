@@ -173,14 +173,25 @@ private extension DeviceFactorSources {
 			let rows = entities.map { entity in
 				let accounts = entity.accounts + entity.hiddenAccounts
 				let personas = entity.personas
-				let status: State.Status = if problems.hasProblem3(accounts: accounts, personas: personas) {
-					.hasProblem3
-				} else if problems.hasProblem9(accounts: accounts, personas: personas) || !entity.isMnemonicPresentInKeychain {
-					// We need to do the trailing check because the SecurityCenterClient won't return `.problem9` if the user
+				let status: State.Status = if problems.hasProblem9(accounts: accounts, personas: personas) {
+					.hasProblem9
+				} else if problems.hasProblem3(accounts: accounts, personas: personas) || !entity.isMnemonicMarkedAsBackedUp {
+					// We need to do the trailing check because the SecurityCenterClient won't return `.problem3` if the user
 					// has a DeviceFactorSource whose seed phrase is not present in keychain but doesn't have any entity associated.
 					// The only way to reproduce this, is to restore a Wallet from a Profile without entering its seed phrase (so it creates a new one)
-					// and not backup the new seed phrase nor create an entity.
-					.hasProblem9
+					// and do not write down the new seed phrase nor create an entity.
+					//
+					// One could argue that we may just ignore `problems` and replace above logic with the following one:
+					// ```
+					// if !entity.isMnemonicPresentInKeychain {
+					// 		.hasProblem9
+					// } else if !entity.isMnemonicMarkedAsBackedUp {
+					// 		.hasProblem3
+					// }
+					// ```
+					// However, we prefer to rely on on SecurityCenterClient in case the logic to extend these problems is modified
+					// in the future (which for sure will be done on such place, but may be overlooked here).
+					.hasProblem3
 				} else {
 					.noProblem
 				}
