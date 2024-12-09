@@ -53,6 +53,7 @@ struct DeviceFactorSourcesList: Sendable, FeatureReducer {
 
 	@Dependency(\.securityCenterClient) var securityCenterClient
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
+	@Dependency(\.errorQueue) var errorQueue
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -141,6 +142,8 @@ private extension DeviceFactorSourcesList {
 				guard !Task.isCancelled else { return }
 				await send(.internal(.setSecurityProblems(problems)))
 			}
+		} catch: { error, _ in
+			errorQueue.schedule(error)
 		}
 	}
 
@@ -151,6 +154,8 @@ private extension DeviceFactorSourcesList {
 				nil
 			)
 			await send(.internal(.setEntities(result.elements)))
+		} catch: { error, _ in
+			errorQueue.schedule(error)
 		}
 	}
 
