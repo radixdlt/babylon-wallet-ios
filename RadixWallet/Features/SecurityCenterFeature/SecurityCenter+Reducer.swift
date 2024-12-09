@@ -4,8 +4,8 @@ import ComposableArchitecture
 struct SecurityCenter: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		var problems: [SecurityProblem] = []
-		var actionsRequired: Set<SecurityProblem.ProblemType> {
-			Set(problems.map(\.type))
+		var actionsRequired: Set<SecurityProblemKind> {
+			Set(problems.map(\.kind))
 		}
 
 		@PresentationState
@@ -55,7 +55,7 @@ struct SecurityCenter: Sendable, FeatureReducer {
 	enum ViewAction: Sendable, Equatable {
 		case task
 		case problemTapped(SecurityProblem)
-		case cardTapped(SecurityProblem.ProblemType)
+		case cardTapped(SecurityProblemKind)
 	}
 
 	enum InternalAction: Sendable, Equatable {

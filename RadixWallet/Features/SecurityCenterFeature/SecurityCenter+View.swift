@@ -36,7 +36,7 @@ extension SecurityCenter {
 								}
 							}
 
-							ForEach(SecurityProblem.ProblemType.allCases, id: \.self) { type in
+							ForEach(SecurityProblemKind.allCases, id: \.self) { type in
 								ProblemTypeCard(type: type, actionRequired: viewStore.actionsRequired.contains(type)) {
 									store.send(.view(.cardTapped(type)))
 								}
@@ -120,7 +120,7 @@ extension SecurityCenter {
 	}
 
 	struct ProblemTypeCard: SwiftUI.View {
-		let type: SecurityProblem.ProblemType
+		let type: SecurityProblemKind
 		let actionRequired: Bool
 		let action: () -> Void
 

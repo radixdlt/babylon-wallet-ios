@@ -244,10 +244,14 @@ extension SigningPurpose {
 // MARK: - FactorInstanceDoesNotHaveADerivationPathUnableToSign
 struct FactorInstanceDoesNotHaveADerivationPathUnableToSign: Swift.Error {}
 
-// MARK: - AddressesOfEntitiesInBadState
-struct AddressesOfEntitiesInBadState: Sendable, Hashable {
-	let accounts: [AccountAddress]
-	let hiddenAccounts: [AccountAddress]
-	let personas: [IdentityAddress]
-	let hiddenPersonas: [IdentityAddress]
+extension DeviceFactorSourceHint {
+	var name: String {
+		label
+	}
+}
+
+extension LedgerHardwareWalletHint {
+	var name: String {
+		label
+	}
 }
