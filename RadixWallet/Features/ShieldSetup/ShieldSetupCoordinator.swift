@@ -10,7 +10,7 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 	@Reducer(state: .hashable, action: .equatable)
 	enum Path {
 		case prepareFactors(PrepareFactorSources.Coordinator)
-		case selectFactors(SelectFactorSources)
+		case selectFactors(SelectFactorSourcesCoordinator)
 	}
 
 	typealias Action = FeatureAction<Self>
@@ -40,7 +40,7 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 			state.path.append(.prepareFactors(.init(path: .intro)))
 			return .none
 		case .selectFactors:
-			state.path.append(.selectFactors(.init()))
+			state.path.append(.selectFactors(.init(path: .selectFactorSources(.init()))))
 			return .none
 		}
 	}
@@ -54,6 +54,8 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 			return .none
 		case .path(.element(id: _, action: .prepareFactors(.delegate(.finished)))):
 			return .send(.internal(.selectFactors))
+		case let .path(.element(id: _, action: .selectFactors(.delegate(.finished(factorSources))))):
+			return .none
 		default:
 			return .none
 		}

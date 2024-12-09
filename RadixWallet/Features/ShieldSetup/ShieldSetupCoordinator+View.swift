@@ -14,7 +14,7 @@ extension ShieldSetupCoordinator {
 					case let .prepareFactors(store):
 						PrepareFactorSources.Coordinator.View(store: store)
 					case let .selectFactors(store):
-						SelectFactorSources.View(store: store)
+						SelectFactorSourcesCoordinator.View(store: store)
 					}
 				}
 			}

@@ -25,9 +25,9 @@ extension SelectFactorSources.State {
 
 	var statusMessageInfo: (type: StatusMessageView.ViewType, text: String)? {
 		if (selectedFactorSources ?? []).isEmpty {
-			(.error, "You need to select at least 1 factor for signing transactions")
+			(.error, L10n.ShieldSetupSelectFactors.StatusMessage.atLeastOneFactor)
 		} else if selectedFactorSources?.count == 1 {
-			(.warning, "Choosing 2 factors will make your Shield more secure and reliable")
+			(.warning, L10n.ShieldSetupSelectFactors.StatusMessage.recommendedFactors)
 		} else {
 			nil
 		}
@@ -44,13 +44,14 @@ extension SelectFactorSources {
 				ScrollView {
 					coreView
 						.padding(.horizontal, .medium3)
+						.animation(.default, value: store.statusMessageInfo?.type)
 				}
 				.footer {
 					WithControlRequirements(
 						store.selectedFactorSources,
 						forAction: { store.send(.view(.buildButtonTapped($0))) }
 					) { action in
-						Button("Build Shield", action: action)
+						Button(L10n.ShieldSetupSelectFactors.buildButtonTitle, action: action)
 							.buttonStyle(.primaryRectangular)
 					}
 				}
@@ -63,33 +64,7 @@ extension SelectFactorSources {
 		@MainActor
 		private var coreView: some SwiftUI.View {
 			VStack(spacing: .small1) {
-				VStack(spacing: .small1) {
-					Image(.selectFactorSources)
-
-					Text("Select Factors for Transactions")
-						.textStyle(.sheetTitle)
-						.padding(.horizontal, .medium3)
-
-					Text(markdown: "Choose the factors you’ll use to sign transactions. You’ll use **all** of these factors every time you send assets or log in to dApps.", emphasizedColor: .app.gray1, emphasizedFont: .app.body1Header)
-						.textStyle(.body1Regular)
-						.padding(.horizontal, .medium2)
-						.padding(.top, .medium3)
-
-					if let statusMessage = store.statusMessageInfo {
-						StatusMessageView(
-							text: statusMessage.text,
-							type: statusMessage.type,
-							useNarrowSpacing: true,
-							useSmallerFontSize: true
-						)
-						.padding(.horizontal, .small1)
-						.padding(.top, .small1)
-						.flushedLeft
-					}
-				}
-				.foregroundStyle(.app.gray1)
-				.multilineTextAlignment(.center)
-				.padding(.bottom, .medium2)
+				topView
 
 				Selection(
 					$store.selectedFactorSources.sending(\.view.selectedFactorSourcesChanged),
@@ -124,6 +99,36 @@ extension SelectFactorSources {
 
 				Spacer()
 			}
+		}
+
+		private var topView: some SwiftUI.View {
+			VStack(spacing: .small1) {
+				Image(.selectFactorSources)
+
+				Text(L10n.ShieldSetupSelectFactors.title)
+					.textStyle(.sheetTitle)
+					.padding(.horizontal, .medium3)
+
+				Text(markdown: L10n.ShieldSetupSelectFactors.subtitle, emphasizedColor: .app.gray1, emphasizedFont: .app.body1Header)
+					.textStyle(.body1Regular)
+					.padding(.horizontal, .medium2)
+					.padding(.top, .medium3)
+
+				if let statusMessage = store.statusMessageInfo {
+					StatusMessageView(
+						text: statusMessage.text,
+						type: statusMessage.type,
+						useNarrowSpacing: true,
+						useSmallerFontSize: true
+					)
+					.padding(.horizontal, .small1)
+					.padding(.top, .small1)
+					.flushedLeft
+				}
+			}
+			.foregroundStyle(.app.gray1)
+			.multilineTextAlignment(.center)
+			.padding(.bottom, .medium2)
 		}
 	}
 }

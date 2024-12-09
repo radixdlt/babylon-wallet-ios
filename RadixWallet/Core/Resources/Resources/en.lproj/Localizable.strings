@@ -1410,3 +1410,12 @@ Code: %@";
 "shieldSetupPrepareFactors_completion_subtitleTop" = "Now let’s build your Shield.";
 "shieldSetupPrepareFactors_completion_subtitleBottom" = "Before it’s finished, you’ll have the chance to review it and make any changes.";
 "shieldSetupPrepareFactors_completion_button" = "Build Shield";
+
+
+
+// TEMP
+"shieldSetupSelectFactors_title" = "Select Factors for Transactions";
+"shieldSetupSelectFactors_subtitle" = "Choose the factors you’ll use to sign transactions. You’ll use **all** of these factors every time you send assets or log in to dApps.";
+"shieldSetupSelectFactors_statusMessage_atLeastOneFactor" = "You need to select at least 1 factor for signing transactions";
+"shieldSetupSelectFactors_statusMessage_recommendedFactors" = "Choosing 2 factors will make your Shield more secure and reliable";
+"shieldSetupSelectFactors_buildButtonTitle" = "Build Shield";

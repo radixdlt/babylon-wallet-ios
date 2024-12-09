@@ -3751,6 +3751,20 @@ internal enum L10n {
       internal static let title = L10n.tr("Localizable", "shieldSetupPrepareFactors_intro_title", fallback: "Let’s Prepare your Factors")
     }
   }
+  internal enum ShieldSetupSelectFactors {
+    /// Build Shield
+    internal static let buildButtonTitle = L10n.tr("Localizable", "shieldSetupSelectFactors_buildButtonTitle", fallback: "Build Shield")
+    /// Choose the factors you’ll use to sign transactions. You’ll use **all** of these factors every time you send assets or log in to dApps.
+    internal static let subtitle = L10n.tr("Localizable", "shieldSetupSelectFactors_subtitle", fallback: "Choose the factors you’ll use to sign transactions. You’ll use **all** of these factors every time you send assets or log in to dApps.")
+    /// Select Factors for Transactions
+    internal static let title = L10n.tr("Localizable", "shieldSetupSelectFactors_title", fallback: "Select Factors for Transactions")
+    internal enum StatusMessage {
+      /// You need to select at least 1 factor for signing transactions
+      internal static let atLeastOneFactor = L10n.tr("Localizable", "shieldSetupSelectFactors_statusMessage_atLeastOneFactor", fallback: "You need to select at least 1 factor for signing transactions")
+      /// Choosing 2 factors will make your Shield more secure and reliable
+      internal static let recommendedFactors = L10n.tr("Localizable", "shieldSetupSelectFactors_statusMessage_recommendedFactors", fallback: "Choosing 2 factors will make your Shield more secure and reliable")
+    }
+  }
   internal enum Splash {
     /// This app requires your phone to have a passcode set up
     internal static let passcodeNotSetMessage = L10n.tr("Localizable", "splash_passcodeNotSetMessage", fallback: "This app requires your phone to have a passcode set up")

@@ -1281,6 +1281,9 @@
 		E775A1C52D00878E00E72DB9 /* ShieldSetupOnboardingStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E775A1C42D00878E00E72DB9 /* ShieldSetupOnboardingStepView.swift */; };
 		E775A1D12D0327BF00E72DB9 /* SelectFactorSources+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E775A1D02D0327BF00E72DB9 /* SelectFactorSources+View.swift */; };
 		E775A1D22D0327BF00E72DB9 /* SelectFactorSources+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E775A1CF2D0327BF00E72DB9 /* SelectFactorSources+Reducer.swift */; };
+		E775A1D32D061D4600E72DB9 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 5B98CD942D020B4600C3C133 /* Sargon */; };
+		E775A1D62D0623AB00E72DB9 /* SelectFactorSourcesCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E775A1D52D0623AB00E72DB9 /* SelectFactorSourcesCoordinator.swift */; };
+		E775A1D82D0623B400E72DB9 /* SelectFactorSourcesCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E775A1D72D0623B400E72DB9 /* SelectFactorSourcesCoordinator+View.swift */; };
 		E79DD1B12CE365CF00B1EB86 /* ChooseReceivingAccountOnDelete+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1B02CE365CF00B1EB86 /* ChooseReceivingAccountOnDelete+Reducer.swift */; };
 		E79DD1B32CE365D600B1EB86 /* ChooseReceivingAccountOnDelete+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1B22CE365D600B1EB86 /* ChooseReceivingAccountOnDelete+View.swift */; };
 		E79DD1B62CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1B52CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift */; };
@@ -2555,6 +2558,8 @@
 		E775A1C42D00878E00E72DB9 /* ShieldSetupOnboardingStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldSetupOnboardingStepView.swift; sourceTree = "<group>"; };
 		E775A1CF2D0327BF00E72DB9 /* SelectFactorSources+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SelectFactorSources+Reducer.swift"; sourceTree = "<group>"; };
 		E775A1D02D0327BF00E72DB9 /* SelectFactorSources+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SelectFactorSources+View.swift"; sourceTree = "<group>"; };
+		E775A1D52D0623AB00E72DB9 /* SelectFactorSourcesCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectFactorSourcesCoordinator.swift; sourceTree = "<group>"; };
+		E775A1D72D0623B400E72DB9 /* SelectFactorSourcesCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SelectFactorSourcesCoordinator+View.swift"; sourceTree = "<group>"; };
 		E79DD1B02CE365CF00B1EB86 /* ChooseReceivingAccountOnDelete+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChooseReceivingAccountOnDelete+Reducer.swift"; sourceTree = "<group>"; };
 		E79DD1B22CE365D600B1EB86 /* ChooseReceivingAccountOnDelete+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChooseReceivingAccountOnDelete+View.swift"; sourceTree = "<group>"; };
 		E79DD1B52CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeleteAccountConfirmation+Reducer.swift"; sourceTree = "<group>"; };
@@ -2590,6 +2595,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E775A1D32D061D4600E72DB9 /* Sargon in Frameworks */,
 				E7AE2D052BF7844300830BAA /* Sargon in Frameworks */,
 				48FFFABE2ADC209100B2B213 /* NukeUI in Frameworks */,
 				48FFFAE72ADC223300B2B213 /* Overture in Frameworks */,
@@ -2600,7 +2606,6 @@
 				48FFFAAB2ADC1FE900B2B213 /* DependenciesAdditions in Frameworks */,
 				48FFFAA22ADC1F5D00B2B213 /* Algorithms in Frameworks */,
 				48FFFAC12ADC20C400B2B213 /* JSONPreview in Frameworks */,
-				5B98CD952D020B4600C3C133 /* Sargon in Frameworks */,
 				48FFFADB2ADC21E400B2B213 /* SwiftLogConsoleColors in Frameworks */,
 				48FFFADE2ADC21F500B2B213 /* FileLogging in Frameworks */,
 				48FFFACF2ADC216400B2B213 /* CollectionConcurrencyKit in Frameworks */,
@@ -7064,10 +7069,20 @@
 		E775A1CE2D03279000E72DB9 /* SelectFactorSources */ = {
 			isa = PBXGroup;
 			children = (
+				E775A1D52D0623AB00E72DB9 /* SelectFactorSourcesCoordinator.swift */,
+				E775A1D72D0623B400E72DB9 /* SelectFactorSourcesCoordinator+View.swift */,
+				E775A1D42D06237B00E72DB9 /* Children */,
+			);
+			path = SelectFactorSources;
+			sourceTree = "<group>";
+		};
+		E775A1D42D06237B00E72DB9 /* Children */ = {
+			isa = PBXGroup;
+			children = (
 				E775A1CF2D0327BF00E72DB9 /* SelectFactorSources+Reducer.swift */,
 				E775A1D02D0327BF00E72DB9 /* SelectFactorSources+View.swift */,
 			);
-			path = SelectFactorSources;
+			path = Children;
 			sourceTree = "<group>";
 		};
 		E79DD1B42CE492E800B1EB86 /* DeleteAccount */ = {
@@ -7870,6 +7885,7 @@
 				A408163F2C7E0D08005E65B9 /* TransactionConstructionResponse.swift in Sources */,
 				5B80FCC72C298F13008444F5 /* ArbitraryDataField+Models.swift in Sources */,
 				48CFC2A92ADC10D900E77A5C /* DappDetails+View.swift in Sources */,
+				E775A1D62D0623AB00E72DB9 /* SelectFactorSourcesCoordinator.swift in Sources */,
 				48CFC37C2ADC10D900E77A5C /* PoolUnitDetails+View.swift in Sources */,
 				48CFC5C52ADC10DA00E77A5C /* LoadingView.swift in Sources */,
 				48CFC59C2ADC10DA00E77A5C /* Button+Extra.swift in Sources */,
@@ -7878,6 +7894,7 @@
 				A408159E2C7E0D08005E65B9 /* MetadataPublicKeyHashValue.swift in Sources */,
 				48CFC4322ADC10DA00E77A5C /* Async+Extra.swift in Sources */,
 				48CFC3F72ADC10D900E77A5C /* IncomingMessage.swift in Sources */,
+				E775A1D82D0623B400E72DB9 /* SelectFactorSourcesCoordinator+View.swift in Sources */,
 				A462B5792B8210A400C26D20 /* TransactionHistoryClient+Interface.swift in Sources */,
 				48CFC45E2ADC10DA00E77A5C /* TransactionClient+Interface.swift in Sources */,
 				48CFC61C2ADC10DA00E77A5C /* P2P+RTCMessageFromPeer.swift in Sources */,
@@ -8285,7 +8302,6 @@
 				E7B7A0FD2BBBFB6100EEE900 /* HeaderListViewContainer.swift in Sources */,
 				48CFC3FA2ADC10D900E77A5C /* SignalingClient.swift in Sources */,
 				4813B0012BCA48CE0046BCAD /* Stage2MigrateToSargon+ProfileNetwork.swift in Sources */,
-				5B813D142CFF2C07001A291D /* AddFactorSource+View.swift in Sources */,
 				A40816332C7E0D08005E65B9 /* StatePackageCodePageRequest.swift in Sources */,
 				48CFC3692ADC10D900E77A5C /* NonFungibleAssetList+Reducer.swift in Sources */,
 				48CFC2752ADC10D900E77A5C /* Main+View.swift in Sources */,
@@ -8430,7 +8446,6 @@
 				A40815D22C7E0D08005E65B9 /* ProgrammaticScryptoSborValueBytes.swift in Sources */,
 				48CFC5802ADC10DA00E77A5C /* TransportProfileClient+Live.swift in Sources */,
 				48AE39E82B0CBEA800813CF3 /* SelectInactiveAccountsToAdd.swift in Sources */,
-				5B704C342CFF84D000AC758C /* AddFactorSource.swift in Sources */,
 				48CFC59A2ADC10DA00E77A5C /* HitTargetSize.swift in Sources */,
 				48CFC2C12ADC10D900E77A5C /* AssetTransfer+Reducer.swift in Sources */,
 				48CFC5A62ADC10DA00E77A5C /* BlueTextButtonStyle.swift in Sources */,
