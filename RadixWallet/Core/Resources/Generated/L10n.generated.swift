@@ -3496,8 +3496,12 @@ internal enum L10n {
     }
   }
   internal enum SecurityFactors {
-    /// View and manage your security factors
-    internal static let subtitle = L10n.tr("Localizable", "securityFactors_subtitle", fallback: "View and manage your security factors")
+    /// Hardware
+    internal static let hardware = L10n.tr("Localizable", "securityFactors_hardware", fallback: "Hardware")
+    /// Things you know
+    internal static let information = L10n.tr("Localizable", "securityFactors_information", fallback: "Things you know")
+    /// Manage the security factors you’ll use in your Security Shields.
+    internal static let subtitle = L10n.tr("Localizable", "securityFactors_subtitle", fallback: "Manage the security factors you’ll use in your Security Shields.")
     /// Security Factors
     internal static let title = L10n.tr("Localizable", "securityFactors_title", fallback: "Security Factors")
     internal enum LedgerWallet {
@@ -3615,8 +3619,8 @@ internal enum L10n {
       internal static let securityCenterBody = L10n.tr("Localizable", "securityProblems_no9_securityCenterBody", fallback: "Enter seed phrase to recover control.")
       /// Recovery required
       internal static let securityCenterTitle = L10n.tr("Localizable", "securityProblems_no9_securityCenterTitle", fallback: "Recovery required")
-      /// Enter seed phrase to recover control
-      internal static let securityFactors = L10n.tr("Localizable", "securityProblems_no9_securityFactors", fallback: "Enter seed phrase to recover control")
+      /// Enter seed phrase to recover use
+      internal static let securityFactors = L10n.tr("Localizable", "securityProblems_no9_securityFactors", fallback: "Enter seed phrase to recover use")
       /// Enter seed phrase to recover control
       internal static let seedPhrases = L10n.tr("Localizable", "securityProblems_no9_seedPhrases", fallback: "Enter seed phrase to recover control")
       /// Recovery required
@@ -3749,6 +3753,20 @@ internal enum L10n {
       internal static let subtitleTop = L10n.tr("Localizable", "shieldSetupPrepareFactors_intro_subtitleTop", fallback: "You need at least **2 factors** to build a Security Shield. 1 of your factors must be a hardware device.")
       /// Let’s Prepare your Factors
       internal static let title = L10n.tr("Localizable", "shieldSetupPrepareFactors_intro_title", fallback: "Let’s Prepare your Factors")
+    }
+  }
+  internal enum ShieldSetupSelectFactors {
+    /// Build Shield
+    internal static let buildButtonTitle = L10n.tr("Localizable", "shieldSetupSelectFactors_buildButtonTitle", fallback: "Build Shield")
+    /// Choose the factors you’ll use to sign transactions. You’ll use **all** of these factors every time you send assets or log in to dApps.
+    internal static let subtitle = L10n.tr("Localizable", "shieldSetupSelectFactors_subtitle", fallback: "Choose the factors you’ll use to sign transactions. You’ll use **all** of these factors every time you send assets or log in to dApps.")
+    /// Select Factors for Transactions
+    internal static let title = L10n.tr("Localizable", "shieldSetupSelectFactors_title", fallback: "Select Factors for Transactions")
+    internal enum StatusMessage {
+      /// You need to select at least 1 factor for signing transactions
+      internal static let atLeastOneFactor = L10n.tr("Localizable", "shieldSetupSelectFactors_statusMessage_atLeastOneFactor", fallback: "You need to select at least 1 factor for signing transactions")
+      /// Choosing 2 factors will make your Shield more secure and reliable
+      internal static let recommendedFactors = L10n.tr("Localizable", "shieldSetupSelectFactors_statusMessage_recommendedFactors", fallback: "Choosing 2 factors will make your Shield more secure and reliable")
     }
   }
   internal enum Splash {
