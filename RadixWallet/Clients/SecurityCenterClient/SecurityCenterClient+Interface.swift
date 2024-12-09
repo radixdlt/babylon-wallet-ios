@@ -14,44 +14,13 @@ struct SecurityCenterClient: DependencyKey, Sendable {
 // MARK: SecurityCenterClient.Problems
 extension SecurityCenterClient {
 	typealias StartMonitoring = @Sendable () async throws -> Void
-	typealias Problems = @Sendable (SecurityProblem.ProblemType?) async -> AnyAsyncSequence<[SecurityProblem]>
+	typealias Problems = @Sendable (SecurityProblemKind?) async -> AnyAsyncSequence<[SecurityProblem]>
 	typealias LastManualBackup = @Sendable () async -> AnyAsyncSequence<BackupStatus?>
 	typealias LastCloudBackup = @Sendable () async -> AnyAsyncSequence<BackupStatus?>
 }
 
 // MARK: - SecurityProblem
-/// As outlined in https://radixdlt.atlassian.net/wiki/spaces/AT/pages/3392569357/Security-related+Problem+States+in+the+Wallet
-enum SecurityProblem: Hashable, Sendable, Identifiable {
-	/// The given addresses of `accounts` and `personas` are unrecoverable if the user loses their phone, since their corresponding seed phrase has not been written down.
-	/// NOTE: This definition differs from the one at Confluence since we don't have shields implemented yet.
-	case problem3(addresses: AddressesOfEntitiesInBadState)
-	/// Wallet backups to the cloud aren’t working (wallet tried to do a backup and it didn’t work within, say, 5 minutes.)
-	/// This means that currently all accounts and personas are at risk of being practically unrecoverable if the user loses their phone.
-	/// Also they would lose all of their other non-security wallet settings and data.
-	case problem5
-	/// Cloud backups are turned off  and user has never done a manual file export. This means that currently all accounts and personas  are at risk of
-	/// being practically unrecoverable if the user loses their phone. Also they would lose all of their other non-security wallet settings and data.
-	case problem6
-	/// Cloud backups are turned off and user previously did a manual file export, but has made a change and haven’t yet re-exported a file backup that
-	/// includes that change. This means that any changes made will be lost if the user loses their phone - including control of new accounts/personas they’ve
-	/// created, as well as changed settings or changed/added data.
-	case problem7
-	/// User has gotten a new phone (and restored their wallet from backup) and the wallet sees that there are accounts without shields using a phone key,
-	/// meaning they can only be recovered with the seed phrase. (See problem 2) This would also be the state if a user disabled their PIN (and reenabled it), clearing phone keys.
-	case problem9(addresses: AddressesOfEntitiesInBadState)
-
-	var id: Int { number }
-
-	var number: Int {
-		switch self {
-		case .problem3: 3
-		case .problem5: 5
-		case .problem6: 6
-		case .problem7: 7
-		case .problem9: 9
-		}
-	}
-
+extension SecurityProblem {
 	var accountCard: String {
 		switch self {
 		case .problem3: L10n.SecurityProblems.No3.accountCard
@@ -143,19 +112,6 @@ enum SecurityProblem: Hashable, Sendable, Identifiable {
 		case .problem7: L10n.SecurityProblems.No7.personas
 		case .problem9: L10n.SecurityProblems.No9.personas
 		}
-	}
-
-	var type: ProblemType {
-		switch self {
-		case .problem3, .problem9: .securityFactors
-		case .problem5, .problem6, .problem7: .configurationBackup
-		}
-	}
-
-	enum ProblemType: Hashable, Sendable, CaseIterable {
-		case securityShields
-		case securityFactors
-		case configurationBackup
 	}
 }
 
