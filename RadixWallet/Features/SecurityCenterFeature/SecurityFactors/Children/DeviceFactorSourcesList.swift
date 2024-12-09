@@ -3,12 +3,16 @@ struct DeviceFactorSourcesList: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		var rows: [Row] = []
 
+		@PresentationState
+		var destination: Destination.State? = nil
+
 		fileprivate var problems: [SecurityProblem]?
 		fileprivate var entities: [EntitiesControlledByFactorSource]?
 	}
 
 	enum ViewAction: Sendable, Equatable {
 		case task
+		case rowTapped(State.Row)
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -17,14 +21,58 @@ struct DeviceFactorSourcesList: Sendable, FeatureReducer {
 		case setRows([State.Row])
 	}
 
+	struct Destination: DestinationReducer {
+		@CasePathable
+		enum State: Sendable, Hashable {
+			case displayMnemonic(DisplayMnemonic.State)
+			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
+		}
+
+		@CasePathable
+		enum Action: Sendable, Equatable {
+			case displayMnemonic(DisplayMnemonic.Action)
+			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
+		}
+
+		var body: some ReducerOf<Self> {
+			Scope(state: /State.displayMnemonic, action: /Action.displayMnemonic) {
+				DisplayMnemonic()
+			}
+			Scope(state: /State.importMnemonics, action: /Action.importMnemonics) {
+				ImportMnemonicsFlowCoordinator()
+			}
+		}
+	}
+
 	@Dependency(\.securityCenterClient) var securityCenterClient
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 
-	func reduce(into _: inout State, viewAction: ViewAction) -> Effect<Action> {
+	var body: some ReducerOf<Self> {
+		Reduce(core)
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
+			}
+	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
+
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			securityProblemsEffect()
+			return securityProblemsEffect()
 				.merge(with: entitiesEffect())
+		case let .rowTapped(row):
+			switch row.status {
+			case .noProblem:
+				return .none
+			case .hasProblem3:
+				return exportMnemonic(factorSourceID: row.factorSource.id) {
+					state.destination = .displayMnemonic(.export($0, title: L10n.RevealSeedPhrase.title, context: .fromSettings))
+				}
+			case .hasProblem9:
+				state.destination = .importMnemonics(.init())
+				return .none
+			}
 		}
 	}
 
@@ -40,6 +88,20 @@ struct DeviceFactorSourcesList: Sendable, FeatureReducer {
 
 		case let .setRows(rows):
 			state.rows = rows
+			return .none
+		}
+	}
+
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .displayMnemonic(.delegate), .importMnemonics(.delegate):
+			// We don't care about which delegate action was executed, since any corresponding
+			// updates to the warnings will be handled by securityProblemsEffect.
+			// We just need to dismiss the destination.
+			state.destination = nil
+			return .none
+
+		default:
 			return .none
 		}
 	}
@@ -73,7 +135,7 @@ private extension DeviceFactorSourcesList {
 			let rows = entities.map { entity in
 				let accounts = entity.accounts + entity.hiddenAccounts
 				let personas = entity.personas
-				let status: State.Row.Status = if problems.hasProblem3(accounts: accounts, personas: personas) {
+				let status: State.Status = if problems.hasProblem3(accounts: accounts, personas: personas) {
 					.hasProblem3
 				} else if problems.hasProblem9(accounts: accounts, personas: personas) {
 					.hasProblem9
@@ -99,11 +161,11 @@ extension DeviceFactorSourcesList.State {
 		let accounts: [Account]
 		let personas: [Persona]
 		let status: Status
+	}
 
-		enum Status: Sendable, Hashable {
-			case hasProblem3
-			case hasProblem9
-			case noProblem
-		}
+	enum Status: Sendable, Hashable {
+		case hasProblem3
+		case hasProblem9
+		case noProblem
 	}
 }

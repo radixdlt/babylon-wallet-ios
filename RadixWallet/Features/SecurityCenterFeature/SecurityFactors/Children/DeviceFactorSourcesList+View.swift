@@ -33,6 +33,7 @@ extension DeviceFactorSourcesList {
 					store.send(.view(.task))
 				}
 			}
+			.destinations(with: store)
 		}
 
 		private func header(_ text: String) -> some SwiftUI.View {
@@ -58,7 +59,9 @@ extension DeviceFactorSourcesList {
 				mode: .display,
 				messages: [row.message]
 			)
-			.onTapGesture {}
+			.onTapGesture {
+				store.send(.view(.rowTapped(row)))
+			}
 		}
 	}
 }
@@ -92,6 +95,36 @@ private extension DeviceFactorSourcesList.State.Row {
 			.init(text: "Write down seed phrase to make this factor recoverable", type: .warning)
 		case .hasProblem9:
 			.init(text: "This factor has been lost", type: .error)
+		}
+	}
+}
+
+private extension StoreOf<DeviceFactorSourcesList> {
+	var destination: PresentationStoreOf<DeviceFactorSourcesList.Destination> {
+		func scopeState(state: State) -> PresentationState<DeviceFactorSourcesList.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<DeviceFactorSourcesList>) -> some View {
+		let destinationStore = store.destination
+		return displayMnemonic(with: destinationStore)
+			.importMnemonics(with: destinationStore)
+	}
+
+	private func displayMnemonic(with destinationStore: PresentationStoreOf<DeviceFactorSourcesList.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.displayMnemonic, action: \.displayMnemonic)) {
+			DisplayMnemonic.View(store: $0)
+		}
+	}
+
+	private func importMnemonics(with destinationStore: PresentationStoreOf<DeviceFactorSourcesList.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.importMnemonics, action: \.importMnemonics)) {
+			ImportMnemonicsFlowCoordinator.View(store: $0)
 		}
 	}
 }
