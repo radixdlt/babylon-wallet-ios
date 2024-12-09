@@ -26,6 +26,7 @@ struct DeviceFactorSourcesList: Sendable, FeatureReducer {
 	struct Destination: DestinationReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
+			case detail(DeviceFactorSourceDetail.State)
 			case displayMnemonic(DisplayMnemonic.State)
 			case enterMnemonic(ImportMnemonicsFlowCoordinator.State)
 			case addMnemonic(ImportMnemonic.State)
@@ -33,12 +34,16 @@ struct DeviceFactorSourcesList: Sendable, FeatureReducer {
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
+			case detail(DeviceFactorSourceDetail.Action)
 			case displayMnemonic(DisplayMnemonic.Action)
 			case enterMnemonic(ImportMnemonicsFlowCoordinator.Action)
 			case addMnemonic(ImportMnemonic.Action)
 		}
 
 		var body: some ReducerOf<Self> {
+			Scope(state: \.detail, action: \.detail) {
+				DeviceFactorSourceDetail()
+			}
 			Scope(state: \.displayMnemonic, action: \.displayMnemonic) {
 				DisplayMnemonic()
 			}
@@ -71,6 +76,7 @@ struct DeviceFactorSourcesList: Sendable, FeatureReducer {
 				.merge(with: entitiesEffect())
 
 		case .rowTapped:
+			state.destination = .detail(.init())
 			return .none
 
 		case let .rowMessageTapped(row):

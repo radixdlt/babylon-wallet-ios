@@ -803,6 +803,8 @@
 		5B98CD9B2D033F7D00C3C133 /* AddFactorSource+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B98CD992D033F7D00C3C133 /* AddFactorSource+View.swift */; };
 		5B98CD9F2D070B8800C3C133 /* DeviceFactorSourcesList+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B98CD9E2D070B8800C3C133 /* DeviceFactorSourcesList+View.swift */; };
 		5B98CDA02D070B8800C3C133 /* DeviceFactorSourcesList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B98CD9D2D070B8800C3C133 /* DeviceFactorSourcesList.swift */; };
+		5B98CDA32D0752B200C3C133 /* DeviceFactorSourceDetail+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B98CDA22D0752B200C3C133 /* DeviceFactorSourceDetail+View.swift */; };
+		5B98CDA42D0752B200C3C133 /* DeviceFactorSourceDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B98CDA12D0752B200C3C133 /* DeviceFactorSourceDetail.swift */; };
 		5BB7C1762BC81F50001216EB /* ImportOlympiaNameLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB7C1752BC81F50001216EB /* ImportOlympiaNameLedger.swift */; };
 		5BB7C1782BC81F61001216EB /* ImportOlympiaNameLedger+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB7C1772BC81F61001216EB /* ImportOlympiaNameLedger+View.swift */; };
 		5BBC43A92BBAC6B0005747B1 /* AppTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC43A82BBAC6B0005747B1 /* AppTextEditor.swift */; };
@@ -2067,6 +2069,8 @@
 		5B98CD992D033F7D00C3C133 /* AddFactorSource+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSource+View.swift"; sourceTree = "<group>"; };
 		5B98CD9D2D070B8800C3C133 /* DeviceFactorSourcesList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceFactorSourcesList.swift; sourceTree = "<group>"; };
 		5B98CD9E2D070B8800C3C133 /* DeviceFactorSourcesList+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeviceFactorSourcesList+View.swift"; sourceTree = "<group>"; };
+		5B98CDA12D0752B200C3C133 /* DeviceFactorSourceDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceFactorSourceDetail.swift; sourceTree = "<group>"; };
+		5B98CDA22D0752B200C3C133 /* DeviceFactorSourceDetail+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeviceFactorSourceDetail+View.swift"; sourceTree = "<group>"; };
 		5BB7C1752BC81F50001216EB /* ImportOlympiaNameLedger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportOlympiaNameLedger.swift; sourceTree = "<group>"; };
 		5BB7C1772BC81F61001216EB /* ImportOlympiaNameLedger+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ImportOlympiaNameLedger+View.swift"; sourceTree = "<group>"; };
 		5BBC43A82BBAC6B0005747B1 /* AppTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTextEditor.swift; sourceTree = "<group>"; };
@@ -5723,7 +5727,7 @@
 			children = (
 				5B6499B52BCFD0E8000F2176 /* SecurityFactors+View.swift */,
 				5B6499B62BCFD0E8000F2176 /* SecurityFactors+Reducer.swift */,
-				5B98CD9C2D070B1A00C3C133 /* Children */,
+				5B98CD9C2D070B1A00C3C133 /* Device */,
 			);
 			path = SecurityFactors;
 			sourceTree = "<group>";
@@ -5859,13 +5863,15 @@
 			path = Onboarding;
 			sourceTree = "<group>";
 		};
-		5B98CD9C2D070B1A00C3C133 /* Children */ = {
+		5B98CD9C2D070B1A00C3C133 /* Device */ = {
 			isa = PBXGroup;
 			children = (
 				5B98CD9D2D070B8800C3C133 /* DeviceFactorSourcesList.swift */,
 				5B98CD9E2D070B8800C3C133 /* DeviceFactorSourcesList+View.swift */,
+				5B98CDA12D0752B200C3C133 /* DeviceFactorSourceDetail.swift */,
+				5B98CDA22D0752B200C3C133 /* DeviceFactorSourceDetail+View.swift */,
 			);
-			path = Children;
+			path = Device;
 			sourceTree = "<group>";
 		};
 		5BBC7D9D2C3D390D00B04BD6 /* BootstrapClient */ = {
@@ -7952,6 +7958,8 @@
 				48AE39E22B0CBE8200813CF3 /* AccountRecoveryScanInProgress.swift in Sources */,
 				48CFC3412ADC10D900E77A5C /* AccountPermissionChooseAccounts+View.swift in Sources */,
 				A40815A72C7E0D08005E65B9 /* MetadataU64Value.swift in Sources */,
+				5B98CDA32D0752B200C3C133 /* DeviceFactorSourceDetail+View.swift in Sources */,
+				5B98CDA42D0752B200C3C133 /* DeviceFactorSourceDetail.swift in Sources */,
 				A408160A2C7E0D08005E65B9 /* StateEntityDetailsResponseItem.swift in Sources */,
 				48CFC3892ADC10D900E77A5C /* DisplayEntitiesControlledByMnemonic+Reducer.swift in Sources */,
 				A40815AF2C7E0D08005E65B9 /* NativeResourceEd25519SignatureResourceValue.swift in Sources */,

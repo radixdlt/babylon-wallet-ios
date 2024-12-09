@@ -121,9 +121,16 @@ private extension StoreOf<DeviceFactorSourcesList> {
 private extension View {
 	func destinations(with store: StoreOf<DeviceFactorSourcesList>) -> some View {
 		let destinationStore = store.destination
-		return displayMnemonic(with: destinationStore)
+		return detail(with: destinationStore)
+			.displayMnemonic(with: destinationStore)
 			.enterMnemonic(with: destinationStore)
 			.addMnemonic(with: destinationStore)
+	}
+
+	private func detail(with destinationStore: PresentationStoreOf<DeviceFactorSourcesList.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.detail, action: \.detail)) {
+			DeviceFactorSourceDetail.View(store: $0)
+		}
 	}
 
 	private func displayMnemonic(with destinationStore: PresentationStoreOf<DeviceFactorSourcesList.Destination>) -> some View {

@@ -1,14 +1,14 @@
-// MARK: - ___VARIABLE_featureName___.View
+// MARK: - DeviceFactorSourceDetail.View
 
-extension ___VARIABLE_featureName___ {
+extension DeviceFactorSourceDetail {
 	@MainActor
 	struct View: SwiftUI.View {
-		let store: StoreOf<___VARIABLE_featureName___>
+		let store: StoreOf<DeviceFactorSourceDetail>
 
 		var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }) { _ in
 				// TODO: implement
-				Text("Implement: ___VARIABLE_featureName___")
+				Text("Implement: DeviceFactorSourceDetail")
 					.background(Color.yellow)
 					.foregroundColor(.red)
 					.onAppear { store.send(.view(.appeared)) }
