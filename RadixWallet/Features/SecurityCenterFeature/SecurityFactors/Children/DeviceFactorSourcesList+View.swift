@@ -82,3 +82,16 @@ private extension DeviceFactorSourcesList.State {
 			})
 	}
 }
+
+private extension DeviceFactorSourcesList.State.Row {
+	var message: FactorSourceCardDataSource.Message {
+		switch status {
+		case .noProblem:
+			.init(text: "This seed phrase has been written down", type: .success)
+		case .hasProblem3:
+			.init(text: "Write down seed phrase to make this factor recoverable", type: .warning)
+		case .hasProblem9:
+			.init(text: "This factor has been lost", type: .error)
+		}
+	}
+}

@@ -73,18 +73,18 @@ private extension DeviceFactorSourcesList {
 			let rows = entities.map { entity in
 				let accounts = entity.accounts + entity.hiddenAccounts
 				let personas = entity.personas
-				let message: FactorSourceCardDataSource.Message = if !entity.isMnemonicPresentInKeychain {
-					.init(text: "This factor has been lost", type: .error) // Problem 9
-				} else if !entity.isMnemonicMarkedAsBackedUp {
-					.init(text: "Write down seed phrase to make this factor recoverable", type: .warning) // Problem 3
+				let status: State.Row.Status = if problems.hasProblem3(accounts: accounts, personas: personas) {
+					.hasProblem3
+				} else if problems.hasProblem9(accounts: accounts, personas: personas) {
+					.hasProblem9
 				} else {
-					.init(text: "This seed phrase has been written down", type: .success)
+					.noProblem
 				}
 				return State.Row(
 					factorSource: entity.deviceFactorSource,
 					accounts: accounts,
 					personas: personas,
-					message: message
+					status: status
 				)
 			}
 			await send(.internal(.setRows(rows)))
@@ -98,6 +98,12 @@ extension DeviceFactorSourcesList.State {
 		let factorSource: DeviceFactorSource
 		let accounts: [Account]
 		let personas: [Persona]
-		let message: FactorSourceCardDataSource.Message
+		let status: Status
+
+		enum Status: Sendable, Hashable {
+			case hasProblem3
+			case hasProblem9
+			case noProblem
+		}
 	}
 }
