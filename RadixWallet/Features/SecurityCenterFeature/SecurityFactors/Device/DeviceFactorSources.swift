@@ -75,8 +75,8 @@ struct DeviceFactorSources: Sendable, FeatureReducer {
 			return securityProblemsEffect()
 				.merge(with: entitiesEffect())
 
-		case .rowTapped:
-			state.destination = .detail(.init())
+		case let .rowTapped(row):
+			state.destination = .detail(.init(factorSource: row.factorSource))
 			return .none
 
 		case let .rowMessageTapped(row):

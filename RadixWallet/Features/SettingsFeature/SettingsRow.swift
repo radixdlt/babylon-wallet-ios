@@ -74,6 +74,7 @@ extension SettingsRow.Kind {
 			title: String,
 			subtitle: String? = nil,
 			detail: String? = nil,
+			markdown: String? = nil,
 			hints: [Hint.ViewState] = [],
 			icon: AssetIcon.Content,
 			accessory: ImageResource? = .chevronRight,
@@ -82,7 +83,7 @@ extension SettingsRow.Kind {
 			self.id = title
 			self.rowViewState = .init(
 				icon,
-				rowCoreViewState: .init(title: title, subtitle: subtitle, detail: detail),
+				rowCoreViewState: .init(title: title, subtitle: subtitle, detail: detail, markdown: markdown),
 				accessory: accessory,
 				hints: hints
 			)
@@ -121,6 +122,7 @@ extension SettingsRow.Kind {
 		title: String,
 		subtitle: String? = nil,
 		detail: String? = nil,
+		markdown: String? = nil,
 		hints: [Hint.ViewState] = [],
 		icon: AssetIcon.Content,
 		accessory: ImageResource? = .chevronRight,
@@ -131,6 +133,7 @@ extension SettingsRow.Kind {
 				title: title,
 				subtitle: subtitle,
 				detail: detail,
+				markdown: markdown,
 				hints: hints,
 				icon: icon,
 				accessory: accessory,
