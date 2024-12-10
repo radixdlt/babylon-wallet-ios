@@ -81,7 +81,7 @@ struct DeviceFactorSources: Sendable, FeatureReducer {
 
 		case let .rowMessageTapped(row):
 			switch row.status {
-			case .noProblem:
+			case .backedUp, .notBackedUp:
 				return .none
 			case .hasProblem3:
 				return exportMnemonic(factorSourceID: row.factorSource.id) {
@@ -175,25 +175,15 @@ private extension DeviceFactorSources {
 				let personas = entity.personas
 				let status: State.Status = if problems.hasProblem9(accounts: accounts, personas: personas) {
 					.hasProblem9
-				} else if problems.hasProblem3(accounts: accounts, personas: personas) || !entity.isMnemonicMarkedAsBackedUp {
-					// We need to do the trailing check because the SecurityCenterClient won't return `.problem3` if the user
-					// has a DeviceFactorSource whose seed phrase is not present in keychain but doesn't have any entity associated.
-					// The only way to reproduce this, is to restore a Wallet from a Profile without entering its seed phrase (so it creates a new one)
-					// and do not write down the new seed phrase nor create an entity.
-					//
-					// One could argue that we may just ignore `problems` and replace above logic with the following one:
-					// ```
-					// if !entity.isMnemonicPresentInKeychain {
-					// 		.hasProblem9
-					// } else if !entity.isMnemonicMarkedAsBackedUp {
-					// 		.hasProblem3
-					// }
-					// ```
-					// However, we prefer to rely on on SecurityCenterClient in case the logic to extend these problems is modified
-					// in the future (which for sure will be done on such place, but may be overlooked here).
+				} else if problems.hasProblem3(accounts: accounts, personas: personas) {
 					.hasProblem3
+				} else if entity.isMnemonicMarkedAsBackedUp {
+					.backedUp
 				} else {
-					.noProblem
+					// A way to reproduce this, is to restore a Wallet from a Profile without entering its seed phrase (so it creates a new one)
+					// and do not write down the new seed phrase nor create an entity. In such case, we won't have any SecurityProblem but only because
+					// the non-backed up factor source didn't create any entity.
+					.notBackedUp
 				}
 				return State.Row(
 					factorSource: entity.deviceFactorSource,
@@ -217,8 +207,20 @@ extension DeviceFactorSources.State {
 	}
 
 	enum Status: Sendable, Hashable {
-		case hasProblem3
+		/// User has lost access to the given factor source (`SecurityProblem.problem9`).
+		/// We will show an error message.
 		case hasProblem9
-		case noProblem
+
+		/// User has access to the factor source, which has associated entities, but hasn't been backed up (`SecurityProblem.problem3`).
+		/// We will show a warning message.
+		case hasProblem3
+
+		/// User has access to the factor source, which doesn't have associated entities, and hasn't been backed up.
+		/// We won't show any message (since there are no entities associated).
+		case notBackedUp
+
+		/// User has access to the factor source, which has associated entities, and has backed it up.
+		/// We will show a success message.
+		case backedUp
 	}
 }

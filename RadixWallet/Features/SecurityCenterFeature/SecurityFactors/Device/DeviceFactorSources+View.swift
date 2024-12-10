@@ -59,7 +59,7 @@ extension DeviceFactorSources {
 			FactorSourceCard(
 				kind: .instance(factorSource: row.factorSource.asGeneral, kind: .extended(accounts: row.accounts, personas: row.personas)),
 				mode: .display,
-				messages: [row.message]
+				messages: row.messages
 			) { action in
 				switch action {
 				case .removeTapped:
@@ -96,14 +96,16 @@ private extension DeviceFactorSources.State {
 }
 
 private extension DeviceFactorSources.State.Row {
-	var message: FactorSourceCardDataSource.Message {
+	var messages: [FactorSourceCardDataSource.Message] {
 		switch status {
-		case .noProblem:
-			.init(text: "This seed phrase has been written down", type: .success)
-		case .hasProblem3:
-			.init(text: "Write down seed phrase to make this factor recoverable", type: .warning)
 		case .hasProblem9:
-			.init(text: "This factor has been lost", type: .error)
+			[.init(text: "This factor has been lost", type: .error)]
+		case .hasProblem3:
+			[.init(text: "Write down seed phrase to make this factor recoverable", type: .warning)]
+		case .backedUp:
+			[.init(text: "This seed phrase has been written down", type: .success)]
+		case .notBackedUp:
+			[]
 		}
 	}
 }
