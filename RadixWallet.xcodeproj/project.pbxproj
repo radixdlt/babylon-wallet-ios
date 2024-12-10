@@ -771,6 +771,8 @@
 		5B6499BA2BCFDB1E000F2176 /* ShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B92BCFDB1E000F2176 /* ShareView.swift */; };
 		5B6E11482C45835900C20F2D /* AccountCard+DataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6E11472C45835900C20F2D /* AccountCard+DataSource.swift */; };
 		5B704C362D006E7F00AC758C /* CompletionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B704C352D006E7C00AC758C /* CompletionView.swift */; };
+		5B725D4B2D107BE00040BA22 /* RenameLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B725D492D107BE00040BA22 /* RenameLabel.swift */; };
+		5B725D4C2D107BE00040BA22 /* RenameLabel+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B725D4A2D107BE00040BA22 /* RenameLabel+View.swift */; };
 		5B758D4F2BCD5BF700348722 /* Effect+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B758D4E2BCD5BF700348722 /* Effect+Extra.swift */; };
 		5B758D532BCD721D00348722 /* SettingsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B758D522BCD721D00348722 /* SettingsRow.swift */; };
 		5B758D572BCE7AEC00348722 /* Preferences+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B758D552BCE7AEC00348722 /* Preferences+View.swift */; };
@@ -2037,6 +2039,8 @@
 		5B6499B92BCFDB1E000F2176 /* ShareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareView.swift; sourceTree = "<group>"; };
 		5B6E11472C45835900C20F2D /* AccountCard+DataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountCard+DataSource.swift"; sourceTree = "<group>"; };
 		5B704C352D006E7C00AC758C /* CompletionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionView.swift; sourceTree = "<group>"; };
+		5B725D492D107BE00040BA22 /* RenameLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenameLabel.swift; sourceTree = "<group>"; };
+		5B725D4A2D107BE00040BA22 /* RenameLabel+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RenameLabel+View.swift"; sourceTree = "<group>"; };
 		5B758D4E2BCD5BF700348722 /* Effect+Extra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Effect+Extra.swift"; sourceTree = "<group>"; };
 		5B758D522BCD721D00348722 /* SettingsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRow.swift; sourceTree = "<group>"; };
 		5B758D552BCE7AEC00348722 /* Preferences+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Preferences+View.swift"; sourceTree = "<group>"; };
@@ -5092,6 +5096,7 @@
 		48CFC1322ADC10D900E77A5C /* FeaturePrelude */ = {
 			isa = PBXGroup;
 			children = (
+				5B725D482D107BCE0040BA22 /* RenameLabel */,
 				5B6E11462C45834C00C20F2D /* AccountCard */,
 				E775A1B62CF4CA0700E72DB9 /* FactorSourceCard */,
 				48CFC1332ADC10D900E77A5C /* LedgerRowView.swift */,
@@ -5744,6 +5749,15 @@
 				5B6E11472C45835900C20F2D /* AccountCard+DataSource.swift */,
 			);
 			path = AccountCard;
+			sourceTree = "<group>";
+		};
+		5B725D482D107BCE0040BA22 /* RenameLabel */ = {
+			isa = PBXGroup;
+			children = (
+				5B725D492D107BE00040BA22 /* RenameLabel.swift */,
+				5B725D4A2D107BE00040BA22 /* RenameLabel+View.swift */,
+			);
+			path = RenameLabel;
 			sourceTree = "<group>";
 		};
 		5B758D542BCE7AD100348722 /* Preferences */ = {
@@ -8511,6 +8525,8 @@
 				48CFC5BD2ADC10DA00E77A5C /* Hint.swift in Sources */,
 				5BBC7DA82C40278E00B04BD6 /* NonFungibleResourceAsset+Reducer.swift in Sources */,
 				48CFC3622ADC10D900E77A5C /* LedgerHardwareDevices+Reducer.swift in Sources */,
+				5B725D4B2D107BE00040BA22 /* RenameLabel.swift in Sources */,
+				5B725D4C2D107BE00040BA22 /* RenameLabel+View.swift in Sources */,
 				A40816392C7E0D08005E65B9 /* StreamTransactionsRequestEventFilterItem.swift in Sources */,
 				48CFC2B22ADC10D900E77A5C /* DerivePublicKeys.swift in Sources */,
 				A40815F02C7E0D08005E65B9 /* ResourceHoldersCollectionFungibleResourceItem.swift in Sources */,
