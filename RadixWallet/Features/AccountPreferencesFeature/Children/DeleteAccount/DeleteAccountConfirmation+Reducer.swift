@@ -16,7 +16,7 @@ struct DeleteAccountConfirmation: Sendable, FeatureReducer {
 
 	@CasePathable
 	enum InternalAction: Sendable, Equatable {
-		case fetchAccountPortfolioResult(TaskResult<OnLedgerEntity.OnLedgerAccount>)
+		case fetchAccountPortfolioResult(TaskResult<AccountPortfoliosClient.AccountPortfolio>)
 		case fetchReceivingAccounts
 		case fetchReceivingAccountsResult(TaskResult<[State.ReceivingAccountCandidate]>)
 	}
@@ -44,7 +44,7 @@ struct DeleteAccountConfirmation: Sendable, FeatureReducer {
 			state.footerButtonState = .loading(.local)
 			return .run { [address = state.account.address] send in
 				let result = await TaskResult {
-					try await accountPortfoliosClient.fetchAccountPortfolio(address, true).account
+					try await accountPortfoliosClient.fetchAccountPortfolio(address, true)
 				}
 				await send(.internal(.fetchAccountPortfolioResult(result)))
 			}
@@ -53,9 +53,9 @@ struct DeleteAccountConfirmation: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .fetchAccountPortfolioResult(.success(account)):
+		case let .fetchAccountPortfolioResult(.success(portfolio)):
 			state.footerButtonState = .enabled
-			return account.containsAnyAsset ? .send(.internal(.fetchReceivingAccounts)) : .send(.delegate(.deleteAccount))
+			return portfolio.containsAnyAsset ? .send(.internal(.fetchReceivingAccounts)) : .send(.delegate(.deleteAccount))
 
 		case .fetchReceivingAccounts:
 			return .run { send in

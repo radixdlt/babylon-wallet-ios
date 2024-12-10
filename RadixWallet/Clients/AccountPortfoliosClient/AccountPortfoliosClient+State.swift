@@ -51,6 +51,11 @@ extension AccountPortfoliosClient {
 
 			return modified
 		}
+
+		/// Returns if the original account (which doesn't remove the hidden resources) contains any asset
+		var containsAnyAsset: Bool {
+			originalAccount.containsAnyAsset
+		}
 	}
 
 	/// Internal state that holds all loaded portfolios.
