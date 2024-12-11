@@ -101,6 +101,6 @@ private extension AddressesOfEntitiesInBadState {
 
 private extension BackupStatus {
 	var asSargon: Sargon.BackupResult {
-		.init(saveIdentifier: result.saveIdentifier, isCurrent: isCurrent, isFailed: result.failed)
+		.init(isCurrent: isCurrent, isFailed: result.failed)
 	}
 }

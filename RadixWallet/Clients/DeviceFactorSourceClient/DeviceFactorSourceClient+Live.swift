@@ -15,61 +15,22 @@ extension DeviceFactorSourceClient: DependencyKey {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 		let entitiesControlledByFactorSource: GetEntitiesControlledByFactorSource = { factorSource, maybeSnapshot in
-
-			let (allNonHiddenEntities, allHiddenEntities) = try await { () -> (allNonHiddenEntities: [AccountOrPersona], allHiddenEntities: [AccountOrPersona]) in
-				let accountNonHidden: [Account]
-				let accountHidden: [Account]
-				let personasNonHidden: [Persona]
-				let personasHidden: [Persona]
-
-				if let overridingSnapshot = maybeSnapshot {
-					let networkID = NetworkID.mainnet
-					let profile = overridingSnapshot
-					let network = try profile.network(id: networkID)
-					accountNonHidden = network.getAccounts().elements
-					personasNonHidden = network.getPersonas().elements
-
-					accountHidden = network.getHiddenAccounts().elements
-					personasHidden = network.getHiddenPersonas().elements
-				} else {
-					accountNonHidden = try await accountsClient.getAccountsOnCurrentNetwork().elements
-					personasNonHidden = try await personasClient.getPersonas().elements
-
-					accountHidden = try await accountsClient.getHiddenAccountsOnCurrentNetwork().elements
-					personasHidden = try await personasClient.getHiddenPersonasOnCurrentNetwork().elements
-				}
-
-				var allNonHiddenEntities = accountNonHidden.map(AccountOrPersona.account)
-				allNonHiddenEntities.append(contentsOf: personasNonHidden.map(AccountOrPersona.persona))
-
-				var allHidden = accountHidden.map(AccountOrPersona.account)
-				allHidden.append(contentsOf: personasHidden.map(AccountOrPersona.persona))
-
-				return (allNonHiddenEntities, allHidden)
-			}()
-
-			let nonHiddenEntitiesForSource = allNonHiddenEntities.filter { entity in
-				switch entity.securityState {
-				case let .unsecured(unsecuredEntityControl):
-					unsecuredEntityControl.transactionSigning.factorSourceID == factorSource.id
-				}
+			let profileToCheck: ProfileToCheck = if let maybeSnapshot {
+				.specific(maybeSnapshot)
+			} else {
+				.current
 			}
-
-			let hiddenEntitiesForSource = allHiddenEntities.filter { entity in
-				switch entity.securityState {
-				case let .unsecured(unsecuredEntityControl):
-					unsecuredEntityControl.transactionSigning.factorSourceID == factorSource.id
-				}
+			let result = try await SargonOS.shared.entitiesLinkedToFactorSource(factorSource: factorSource.asGeneral, profileToCheck: profileToCheck)
+			guard case let .device(integrity) = result.integrity else {
+				struct UnexpectedFactorSource: Error {}
+				throw UnexpectedFactorSource()
 			}
-
-			let isMnemonicMarkedAsBackedUp = userDefaults.getFactorSourceIDOfBackedUpMnemonics().contains(factorSource.id)
-
 			return EntitiesControlledByFactorSource(
-				entities: nonHiddenEntitiesForSource,
-				hiddenEntities: hiddenEntitiesForSource,
+				entities: result.accounts.map(AccountOrPersona.account) + result.personas.map(AccountOrPersona.persona),
+				hiddenEntities: result.hiddenAccounts.map(AccountOrPersona.account) + result.hiddenPersonas.map(AccountOrPersona.persona),
 				deviceFactorSource: factorSource,
-				isMnemonicPresentInKeychain: secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(factorSource.id),
-				isMnemonicMarkedAsBackedUp: isMnemonicMarkedAsBackedUp
+				isMnemonicPresentInKeychain: integrity.isMnemonicPresentInKeychain,
+				isMnemonicMarkedAsBackedUp: integrity.isMnemonicMarkedAsBackedUp
 			)
 		}
 

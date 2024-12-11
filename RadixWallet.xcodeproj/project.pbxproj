@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -710,6 +710,7 @@
 		5B03E3D52CC1487900E10A64 /* TransferLineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B03E3D42CC1487400E10A64 /* TransferLineView.swift */; };
 		5B135B392C7636DA004AAD2E /* HiddenEntities+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B135B382C7636DA004AAD2E /* HiddenEntities+View.swift */; };
 		5B135B3B2C7636FD004AAD2E /* HiddenEntities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B135B3A2C7636FD004AAD2E /* HiddenEntities.swift */; };
+		5B1BE3912D09E62A00201E30 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 5B1BE3902D09E62A00201E30 /* Sargon */; };
 		5B1C4FD52BBB0B0C00B9436F /* AppsFlyerLib-Strict in Frameworks */ = {isa = PBXBuildFile; productRef = 5B1C4FD42BBB0B0C00B9436F /* AppsFlyerLib-Strict */; };
 		5B1C4FD82BBB0C1E00B9436F /* AppsFlyerClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1C4FD72BBB0C1E00B9436F /* AppsFlyerClient+Interface.swift */; };
 		5B1C4FDA2BBB0DCF00B9436F /* AppsFlyerClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1C4FD92BBB0DCF00B9436F /* AppsFlyerClient+Live.swift */; };
@@ -2619,6 +2620,7 @@
 				5B1C4FD52BBB0B0C00B9436F /* AppsFlyerLib-Strict in Frameworks */,
 				48FFFB032ADC6F8100B2B213 /* Builders in Frameworks */,
 				48FFFAB72ADC207B00B2B213 /* NavigationTransitions in Frameworks */,
+				5B1BE3912D09E62A00201E30 /* Sargon in Frameworks */,
 				5B634A942C91D2A0004B2FBC /* ScreenshotPreventing in Frameworks */,
 				48FFFA992ADC1EEC00B2B213 /* AsyncExtensions in Frameworks */,
 				83B783562C1764AE00AA7930 /* Sargon in Frameworks */,
@@ -7190,6 +7192,7 @@
 				5B447E0A2CAAFC2D0063AE39 /* Sargon */,
 				5B4E1D1E2CB7FE8E002FAC2E /* Sargon */,
 				5B3FDC1C2CFA2A4F0024BFAF /* Sargon */,
+				5B1BE3902D09E62A00201E30 /* Sargon */,
 			);
 			productName = RadixWallet;
 			productReference = 48CFBC4F2ADC106300E77A5C /* Radix Wallet Dev.app */;
@@ -7260,7 +7263,7 @@
 				8318BB172BC8403800057BCB /* XCRemoteSwiftPackageReference "swift-custom-dump" */,
 				E6A0B0492BF23C7000617DAC /* XCRemoteSwiftPackageReference "swift-identified-collections" */,
 				5B634A922C91D2A0004B2FBC /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */,
-				E775A1BC2CFA04B100E72DB9 /* XCRemoteSwiftPackageReference "sargon" */,
+				5B1BE38F2D09E62A00201E30 /* XCLocalSwiftPackageReference "../sargon" */,
 			);
 			productRefGroup = 48CFBC502ADC106300E77A5C /* Products */;
 			projectDirPath = "";
@@ -9116,6 +9119,13 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		5B1BE38F2D09E62A00201E30 /* XCLocalSwiftPackageReference "../sargon" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../sargon;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		48FFFA972ADC1EEC00B2B213 /* XCRemoteSwiftPackageReference "AsyncExtensions" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -9389,14 +9399,6 @@
 				version = 1.0.2;
 			};
 		};
-		E775A1BC2CFA04B100E72DB9 /* XCRemoteSwiftPackageReference "sargon" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/radixdlt/sargon";
-			requirement = {
-				kind = exactVersion;
-				version = 1.1.76;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -9582,6 +9584,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 48FFFB0B2ADC744700B2B213 /* XCRemoteSwiftPackageReference "TextBuilder" */;
 			productName = TextBuilder;
+		};
+		5B1BE3902D09E62A00201E30 /* Sargon */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Sargon;
 		};
 		5B1C4FD42BBB0B0C00B9436F /* AppsFlyerLib-Strict */ = {
 			isa = XCSwiftPackageProductDependency;
