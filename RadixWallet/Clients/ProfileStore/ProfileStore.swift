@@ -62,11 +62,7 @@ extension ProfileStore {
 
 extension ProfileStore {
 	func isThisDevice(deviceID: DeviceID) async -> Bool {
-		guard let hostId = try? await SargonOS.shared.resolveHostId().id else {
-			return false
-		}
-
-		return hostId == deviceID
+		SargonOS.shared.hostId().id == deviceID
 	}
 }
 
