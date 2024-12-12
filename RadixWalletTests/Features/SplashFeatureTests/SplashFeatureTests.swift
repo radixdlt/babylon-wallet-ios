@@ -30,6 +30,8 @@ final class SplashFeatureTests: TestCase {
 				return .loaded(profile)
 			}
 			$0.userDefaults = userDefaults
+			$0.secureStorageClient.saveDeviceInfo = { _ in }
+			$0.secureStorageClient.loadDeviceInfo = { nil }
 		}
 
 		// when
@@ -99,6 +101,9 @@ final class SplashFeatureTests: TestCase {
 			$0.secureStorageClient.loadProfileSnapshotData = { _ in
 				profile.jsonData()
 			}
+			$0.secureStorageClient.saveDeviceInfo = { _ in }
+			$0.secureStorageClient.loadDeviceInfo = { nil }
+			$0.secureStorageClient.deprecatedLoadDeviceID = { nil }
 		}
 
 		// when
