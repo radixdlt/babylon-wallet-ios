@@ -60,12 +60,6 @@ extension ProfileStore {
 	}
 }
 
-extension ProfileStore {
-	func isThisDevice(deviceID: DeviceID) async -> Bool {
-		SargonOS.shared.hostId().id == deviceID
-	}
-}
-
 // MARK: Public
 extension ProfileStore {
 	/// Mutates the in-memory copy of the Profile usung `transform`, and saves a
