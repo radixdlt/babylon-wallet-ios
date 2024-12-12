@@ -5,12 +5,7 @@ struct FactorSourceCardDataSource {
 	var subtitle: String?
 	var lastUsedOn: Timestamp?
 	var messages: [Message] = []
-	var accounts: [Account] = []
-	var personas: [Persona] = []
-
-	var hasEntities: Bool {
-		!accounts.isEmpty || !personas.isEmpty
-	}
+	var linkedEntities: LinkedEntities?
 }
 
 // MARK: FactorSourceCardDataSource.Message
@@ -20,6 +15,16 @@ extension FactorSourceCardDataSource {
 
 		let text: String
 		let type: StatusMessageView.ViewType
+	}
+
+	struct LinkedEntities: Sendable, Hashable {
+		let accounts: [Account]
+		let personas: [Persona]
+		let hasHiddenEntities: Bool
+
+		var isEmpty: Bool {
+			accounts.isEmpty && personas.isEmpty && !hasHiddenEntities
+		}
 	}
 }
 

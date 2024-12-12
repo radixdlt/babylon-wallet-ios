@@ -181,14 +181,14 @@ private extension DeviceFactorSources {
 					.backedUp
 				} else {
 					// A way to reproduce this, is to restore a Wallet from a Profile without entering its seed phrase (so it creates a new one)
-					// and do not write down the new seed phrase nor create an entity. In such case, we won't have any SecurityProblem but only because
-					// the non-backed up factor source didn't create any entity.
+					// and do not write down the new seed phrase nor create an entity. In such case, we don't want to show problem3 because the
+					// non-backed up factor source didn't create any entity. Yet, we don't want to show the success checkmark indicating the factor
+					// source was backed up.
 					.notBackedUp
 				}
 				return State.Row(
 					factorSource: entity.deviceFactorSource,
-					accounts: accounts,
-					personas: personas,
+					linkedEntities: entity.linkedEntities,
 					status: status
 				)
 			}
@@ -201,8 +201,7 @@ private extension DeviceFactorSources {
 extension DeviceFactorSources.State {
 	struct Row: Sendable, Hashable {
 		let factorSource: DeviceFactorSource
-		let accounts: [Account]
-		let personas: [Persona]
+		let linkedEntities: FactorSourceCardDataSource.LinkedEntities
 		let status: Status
 	}
 
@@ -222,5 +221,11 @@ extension DeviceFactorSources.State {
 		/// User has access to the factor source, which has associated entities, and has backed it up.
 		/// We will show a success message.
 		case backedUp
+	}
+}
+
+private extension EntitiesControlledByFactorSource {
+	var linkedEntities: FactorSourceCardDataSource.LinkedEntities {
+		.init(accounts: accounts, personas: personas, hasHiddenEntities: !hiddenAccounts.isEmpty || !hiddenPersonas.isEmpty)
 	}
 }

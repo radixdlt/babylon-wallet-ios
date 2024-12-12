@@ -57,7 +57,7 @@ extension DeviceFactorSources {
 
 		private func card(_ row: State.Row) -> some SwiftUI.View {
 			FactorSourceCard(
-				kind: .instance(factorSource: row.factorSource.asGeneral, kind: .extended(accounts: row.accounts, personas: row.personas)),
+				kind: .instance(factorSource: row.factorSource.asGeneral, kind: .extended(linkedEntities: row.linkedEntities)),
 				mode: .display,
 				messages: row.messages
 			) { action in

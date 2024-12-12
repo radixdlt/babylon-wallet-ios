@@ -54,11 +54,10 @@ struct FactorSourceCard: View {
 				.padding(.bottom, .medium1)
 			}
 
-			if dataSource.hasEntities {
+			if let linkedEntities = dataSource.linkedEntities, !linkedEntities.isEmpty {
 				LinkedEntitesView(
 					isExpanded: isExpanded,
-					accounts: dataSource.accounts,
-					personas: dataSource.personas
+					dataSource: linkedEntities
 				)
 			}
 		}
@@ -111,8 +110,7 @@ struct FactorSourceCard: View {
 
 	struct LinkedEntitesView: SwiftUI.View {
 		@SwiftUI.State var isExpanded: Bool = false
-		let accounts: [Account]
-		let personas: [Persona]
+		let dataSource: FactorSourceCardDataSource.LinkedEntities
 
 		var body: some SwiftUI.View {
 			VStack(alignment: .leading, spacing: .medium2) {
@@ -135,11 +133,11 @@ struct FactorSourceCard: View {
 
 				if isExpanded {
 					VStack(spacing: .small2) {
-						ForEach(accounts) { account in
-							AccountCard(kind: .compact, account: account)
+						ForEach(dataSource.accounts) { account in
+							AccountCard(kind: .display, account: account)
 						}
 
-						ForEach(personas) { persona in
+						ForEach(dataSource.personas) { persona in
 							Card {
 								PlainListRow(
 									context: .compactPersona,
@@ -149,6 +147,16 @@ struct FactorSourceCard: View {
 									Thumbnail(.persona, url: nil)
 								}
 							}
+						}
+
+						if dataSource.hasHiddenEntities {
+							Text("Hidden Accounts or Personas")
+								.textStyle(.body1HighImportance)
+								.foregroundStyle(.app.gray2)
+								.frame(maxWidth: .infinity)
+								.padding(.small1)
+								.background(Color.app.gray4)
+								.cornerRadius(.small1)
 						}
 					}
 				}
@@ -160,15 +168,20 @@ struct FactorSourceCard: View {
 
 		private var linkedTitle: String {
 			typealias Card = L10n.FactorSources.Card
-			let accountsString = accounts.count == 1 ? Card.accountSingular : Card.accountPlural(accounts.count)
-			let personasString = personas.count == 1 ? Card.personaSingular : Card.personaPlural(personas.count)
+			let accountsCount = dataSource.accounts.count
+			let personasCount = dataSource.personas.count
+			let hasHiddenEntities = dataSource.hasHiddenEntities
+			let accountsString = accountsCount == 1 ? Card.accountSingular : Card.accountPlural(accountsCount)
+			let personasString = personasCount == 1 ? Card.personaSingular : Card.personaPlural(personasCount)
 
-			if accounts.count > 0, personas.count > 0 {
-				return Card.linkedAccountsAndPersonas(accountsString, personasString)
-			} else if accounts.count > 0 {
-				return Card.linkedAccountsOrPersonas(accountsString)
-			} else if personas.count > 0 {
-				return Card.linkedAccountsOrPersonas(personasString)
+			if accountsCount > 0, personasCount > 0 {
+				return hasHiddenEntities ? "Linked to %@ and %@ (and some hidden)" : Card.linkedAccountsAndPersonas(accountsString, personasString)
+			} else if accountsCount > 0 {
+				return hasHiddenEntities ? "Linked to %@ (and some hidden)" : Card.linkedAccountsOrPersonas(accountsString)
+			} else if personasCount > 0 {
+				return hasHiddenEntities ? "Linked to %@ (and some hidden)" : Card.linkedAccountsOrPersonas(personasString)
+			} else if hasHiddenEntities {
+				return "Linked to %@ and %@ (and some hidden)"
 			}
 			return ""
 		}
@@ -214,7 +227,7 @@ extension FactorSourceCard {
 					isExpanded: isExpanded,
 					onAction: onAction
 				)
-			case let .extended(accounts, personas):
+			case let .extended(linkedEntities):
 				self = .init(
 					kind: kind,
 					mode: mode,
@@ -223,8 +236,7 @@ extension FactorSourceCard {
 						title: factorSource.name,
 						lastUsedOn: factorSource.common.lastUsedOn,
 						messages: messages,
-						accounts: accounts,
-						personas: personas
+						linkedEntities: linkedEntities
 					),
 					isExpanded: isExpanded,
 					onAction: onAction
@@ -241,7 +253,7 @@ extension FactorSourceCard {
 
 		enum InstanceKind {
 			case short(showDetails: Bool)
-			case extended(accounts: [Account] = [], personas: [Persona] = [])
+			case extended(linkedEntities: FactorSourceCardDataSource.LinkedEntities)
 		}
 	}
 
