@@ -156,6 +156,8 @@ final class TransactionClientTests: TestCase {
 					)
 				}))!]
 			}
+			$0.secureStorageClient.saveDeviceInfo = { _ in }
+			$0.secureStorageClient.loadDeviceInfo = { nil }
 		} operation: {
 			try await TransactionClient.feePayerSelectionAmongstCandidates(
 				request: .init(
