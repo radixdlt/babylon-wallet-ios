@@ -12,10 +12,11 @@ extension TransportProfileClient: DependencyKey {
 		return Self(
 			importProfile: { profile, factorSourceIDs, skippedMainBdfs, containsP2PLinks in
 				do {
+					try await profileStore.importProfile(profile, skippedMainBdfs: skippedMainBdfs)
+					let profile = await profileStore.profile()
 					if profile.appPreferences.security.isCloudProfileSyncEnabled {
 						try? await cloudBackupClient.claimProfileOnICloud(profile)
 					}
-					try await profileStore.importProfile(profile, skippedMainBdfs: skippedMainBdfs)
 					userDefaults.setShowRelinkConnectorsAfterProfileRestore(containsP2PLinks)
 				} catch {
 					// Revert the saved mnemonic
