@@ -1807,6 +1807,8 @@ internal enum L10n {
       internal static let deviceDescription = L10n.tr("Localizable", "factorSources_card_deviceDescription", fallback: "Use phone biometrics/PIN to approve")
       /// Biometrics/PIN
       internal static let deviceTitle = L10n.tr("Localizable", "factorSources_card_deviceTitle", fallback: "Biometrics/PIN")
+      /// Hidden Accounts or Personas
+      internal static let hiddenAccountsOrPersonas = L10n.tr("Localizable", "factorSources_card_hiddenAccountsOrPersonas", fallback: "Hidden Accounts or Personas")
       /// **Last Used:** %@
       internal static func lastUsed(_ p1: Any) -> String {
         return L10n.tr("Localizable", "factorSources_card_lastUsed", String(describing: p1), fallback: "**Last Used:** %@")
@@ -1819,9 +1821,17 @@ internal enum L10n {
       internal static func linkedAccountsAndPersonas(_ p1: Any, _ p2: Any) -> String {
         return L10n.tr("Localizable", "factorSources_card_linkedAccountsAndPersonas", String(describing: p1), String(describing: p2), fallback: "Linked to %@ and %@")
       }
+      /// Linked to %@ and %@ (and some hidden)
+      internal static func linkedAccountsAndPersonasSomeHidden(_ p1: Any, _ p2: Any) -> String {
+        return L10n.tr("Localizable", "factorSources_card_linkedAccountsAndPersonasSomeHidden", String(describing: p1), String(describing: p2), fallback: "Linked to %@ and %@ (and some hidden)")
+      }
       /// Linked to %@
       internal static func linkedAccountsOrPersonas(_ p1: Any) -> String {
         return L10n.tr("Localizable", "factorSources_card_linkedAccountsOrPersonas", String(describing: p1), fallback: "Linked to %@")
+      }
+      /// Linked to %@ (and some hidden)
+      internal static func linkedAccountsOrPersonasSomeHidden(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "factorSources_card_linkedAccountsOrPersonasSomeHidden", String(describing: p1), fallback: "Linked to %@ (and some hidden)")
       }
       /// Enter a seed phrase to approve
       internal static let passphraseDescription = L10n.tr("Localizable", "factorSources_card_passphraseDescription", fallback: "Enter a seed phrase to approve")
@@ -1849,6 +1859,26 @@ internal enum L10n {
       internal static let securityQuestions = L10n.tr("Localizable", "factorSources_kind_securityQuestions", fallback: "Security Questions")
       /// Third-party
       internal static let trustedContact = L10n.tr("Localizable", "factorSources_kind_trustedContact", fallback: "Third-party")
+    }
+    internal enum List {
+      /// Add Arculus Card
+      internal static let arculusCardAdd = L10n.tr("Localizable", "factorSources_list_arculusCardAdd", fallback: "Add Arculus Card")
+      /// Arculus not working. Try adding it again
+      internal static let arculusCardNotWorking = L10n.tr("Localizable", "factorSources_list_arculusCardNotWorking", fallback: "Arculus not working. Try adding it again")
+      /// Add Biometrics/PIN
+      internal static let deviceAdd = L10n.tr("Localizable", "factorSources_list_deviceAdd", fallback: "Add Biometrics/PIN")
+      /// Add New Ledger Nano
+      internal static let ledgerAdd = L10n.tr("Localizable", "factorSources_list_ledgerAdd", fallback: "Add New Ledger Nano")
+      /// This factor has been lost
+      internal static let lostFactorSource = L10n.tr("Localizable", "factorSources_list_lostFactorSource", fallback: "This factor has been lost")
+      /// Add New Passphrase
+      internal static let passphraseAdd = L10n.tr("Localizable", "factorSources_list_passphraseAdd", fallback: "Add New Passphrase")
+      /// Add New Password
+      internal static let passwordAdd = L10n.tr("Localizable", "factorSources_list_passwordAdd", fallback: "Add New Password")
+      /// Write down seed phrase to make this factor recoverable
+      internal static let seedPhraseNotRecoverable = L10n.tr("Localizable", "factorSources_list_seedPhraseNotRecoverable", fallback: "Write down seed phrase to make this factor recoverable")
+      /// This seed phrase has been written down
+      internal static let seedPhraseWrittenDown = L10n.tr("Localizable", "factorSources_list_seedPhraseWrittenDown", fallback: "This seed phrase has been written down")
     }
   }
   internal enum FactoryReset {
