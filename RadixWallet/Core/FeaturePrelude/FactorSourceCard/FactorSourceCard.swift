@@ -175,13 +175,13 @@ struct FactorSourceCard: View {
 			let personasString = personasCount == 1 ? Card.personaSingular : Card.personaPlural(personasCount)
 
 			if accountsCount > 0, personasCount > 0 {
-				return hasHiddenEntities ? "Linked to %@ and %@ (and some hidden)" : Card.linkedAccountsAndPersonas(accountsString, personasString)
+				return hasHiddenEntities ? Card.linkedAccountsAndPersonasSomeHidden(accountsString, personasString) : Card.linkedAccountsAndPersonas(accountsString, personasString)
 			} else if accountsCount > 0 {
-				return hasHiddenEntities ? "Linked to %@ (and some hidden)" : Card.linkedAccountsOrPersonas(accountsString)
+				return hasHiddenEntities ? Card.linkedAccountsOrPersonasSomeHidden(accountsString) : Card.linkedAccountsOrPersonas(accountsString)
 			} else if personasCount > 0 {
-				return hasHiddenEntities ? "Linked to %@ (and some hidden)" : Card.linkedAccountsOrPersonas(personasString)
+				return hasHiddenEntities ? Card.linkedAccountsOrPersonasSomeHidden(personasString) : Card.linkedAccountsOrPersonas(personasString)
 			} else if hasHiddenEntities {
-				return "Linked to %@ and %@ (and some hidden)"
+				return Card.linkedAccountsAndPersonasSomeHidden(accountsString, personasString)
 			}
 			return ""
 		}

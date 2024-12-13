@@ -82,15 +82,15 @@ private extension FactorSourcesList.State {
 	var addTitle: String {
 		switch kind {
 		case .device:
-			"Add Biometrics/PIN"
+			L10n.FactorSources.List.deviceAdd
 		case .ledgerHqHardwareWallet:
-			"Add New Ledger Nano"
+			L10n.FactorSources.List.ledgerAdd
 		case .offDeviceMnemonic:
-			"Add New Passphrase"
+			L10n.FactorSources.List.passphraseAdd
 		case .arculusCard:
-			"Add Arculus Card"
+			L10n.FactorSources.List.arculusCardAdd
 		case .password:
-			"Add New Password"
+			L10n.FactorSources.List.passwordAdd
 		case .trustedContact, .securityQuestions:
 			fatalError("Not implemented")
 		}
@@ -129,11 +129,11 @@ private extension FactorSourcesList.State.Row {
 	var messages: [FactorSourceCardDataSource.Message] {
 		switch status {
 		case .lostFactorSource:
-			[.init(text: "This factor has been lost", type: .error)]
+			[.init(text: L10n.FactorSources.List.lostFactorSource, type: .error)]
 		case .seedPhraseNotRecoverable:
-			[.init(text: "Write down seed phrase to make this factor recoverable", type: .warning)]
+			[.init(text: L10n.FactorSources.List.seedPhraseNotRecoverable, type: .warning)]
 		case .seedPhraseWrittenDown:
-			[.init(text: "This seed phrase has been written down", type: .success)]
+			[.init(text: L10n.FactorSources.List.seedPhraseWrittenDown, type: .success)]
 		case .notBackedUp:
 			[]
 		}
