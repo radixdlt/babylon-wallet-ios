@@ -912,6 +912,8 @@ Code: %@";
 "factorSources_list_passphraseAdd" = "Add New Passphrase";
 "factorSources_list_arculusCardAdd" = "Add Arculus Card";
 "factorSources_list_passwordAdd" = "Add New Password";
+"factorSources_list_default" = "Default";
+"factorSources_list_others" = "Others";
 "factorSources_list_seedPhraseWrittenDown" = "This seed phrase has been written down";
 "factorSources_list_seedPhraseNotRecoverable" = "Write down seed phrase to make this factor recoverable";
 "factorSources_list_arculusCardNotWorking" = "Arculus not working. Try adding it again";
