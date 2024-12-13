@@ -1865,12 +1865,16 @@ internal enum L10n {
       internal static let arculusCardAdd = L10n.tr("Localizable", "factorSources_list_arculusCardAdd", fallback: "Add Arculus Card")
       /// Arculus not working. Try adding it again
       internal static let arculusCardNotWorking = L10n.tr("Localizable", "factorSources_list_arculusCardNotWorking", fallback: "Arculus not working. Try adding it again")
+      /// Default
+      internal static let `default` = L10n.tr("Localizable", "factorSources_list_default", fallback: "Default")
       /// Add Biometrics/PIN
       internal static let deviceAdd = L10n.tr("Localizable", "factorSources_list_deviceAdd", fallback: "Add Biometrics/PIN")
       /// Add New Ledger Nano
       internal static let ledgerAdd = L10n.tr("Localizable", "factorSources_list_ledgerAdd", fallback: "Add New Ledger Nano")
       /// This factor has been lost
       internal static let lostFactorSource = L10n.tr("Localizable", "factorSources_list_lostFactorSource", fallback: "This factor has been lost")
+      /// Others
+      internal static let others = L10n.tr("Localizable", "factorSources_list_others", fallback: "Others")
       /// Add New Passphrase
       internal static let passphraseAdd = L10n.tr("Localizable", "factorSources_list_passphraseAdd", fallback: "Add New Passphrase")
       /// Add New Password
