@@ -104,18 +104,30 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			}
 
 		case .addButtonTapped:
-			state.destination = .addMnemonic(
-				.init(
-					showCloseButton: false,
-					isWordCountFixed: true,
-					persistStrategy: .init(
-						factorSourceKindOfMnemonic: .babylon(isMain: false),
-						location: .intoKeychainAndProfile,
-						onMnemonicExistsStrategy: .appendWithCryptoParamaters
-					),
-					wordCount: .twentyFour
+			switch state.kind {
+			case .device:
+				state.destination = .addMnemonic(
+					.init(
+						showCloseButton: false,
+						isWordCountFixed: true,
+						persistStrategy: .init(
+							factorSourceKindOfMnemonic: .babylon(isMain: false),
+							location: .intoKeychainAndProfile,
+							onMnemonicExistsStrategy: .appendWithCryptoParamaters
+						),
+						wordCount: .twentyFour
+					)
 				)
-			)
+			case .ledgerHqHardwareWallet:
+				// NOTE: Added `.device` support as placeholder, but not adding the logic to add ledger/connector extension
+				// since Matt mentioned we will probably always present this screen: https://zpl.io/wyqB6Bd
+				break
+			case .offDeviceMnemonic, .arculusCard, .password:
+				loggerGlobal.info("Add \(state.kind) not yet implemented")
+			case .trustedContact, .securityQuestions:
+				fatalError("Not supported")
+			}
+
 			return .none
 		}
 	}

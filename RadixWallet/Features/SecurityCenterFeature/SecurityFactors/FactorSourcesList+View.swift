@@ -21,12 +21,13 @@ extension FactorSourcesList {
 							section(text: nil, rows: viewStore.others)
 						}
 
-						Button("Add \(viewStore.kind.title)") {
+						Button(viewStore.addTitle) {
 							store.send(.view(.addButtonTapped))
 						}
 						.buttonStyle(.secondaryRectangular)
 
-						InfoButton(.accounts, label: "Learn about Biometrics/PIN") // TODO: Update
+						let infoContent = viewStore.kind.infoLinkContent
+						InfoButton(infoContent.item, label: infoContent.title)
 					}
 					.padding(.medium3)
 					.padding(.bottom, .medium2)
@@ -78,6 +79,23 @@ extension FactorSourcesList {
 }
 
 private extension FactorSourcesList.State {
+	var addTitle: String {
+		switch kind {
+		case .device:
+			"Add Biometrics/PIN"
+		case .ledgerHqHardwareWallet:
+			"Add New Ledger Nano"
+		case .offDeviceMnemonic:
+			"Add New Passphrase"
+		case .arculusCard:
+			"Add Arculus Card"
+		case .password:
+			"Add New Password"
+		case .trustedContact, .securityQuestions:
+			fatalError("Not implemented")
+		}
+	}
+
 	var main: Row? {
 		rows.first(where: \.integrity.isExplicitMain)
 	}

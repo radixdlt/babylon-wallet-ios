@@ -92,4 +92,21 @@ extension FactorSourceKind {
 			fatalError("Not supported yet")
 		}
 	}
+
+	var infoLinkContent: (item: InfoLinkSheet.GlossaryItem, title: String) {
+		switch self {
+		case .device:
+			(.device, "Learn about biometrics/PIN")
+		case .ledgerHqHardwareWallet:
+			(.ledger, "Learn about Ledger Nanos")
+		case .offDeviceMnemonic:
+			(.offdevicemnemonic, "Learn about passphrases")
+		case .arculusCard:
+			(.arculuscard, "Learn about Arculus Cards")
+		case .password:
+			(.password, "Learn about passwords")
+		default:
+			fatalError("Not supported yet")
+		}
+	}
 }
