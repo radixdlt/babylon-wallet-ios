@@ -29,7 +29,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 				entities: result.accounts.map(AccountOrPersona.account) + result.personas.map(AccountOrPersona.persona),
 				hiddenEntities: result.hiddenAccounts.map(AccountOrPersona.account) + result.hiddenPersonas.map(AccountOrPersona.persona),
 				deviceFactorSource: factorSource,
-				isMnemonicPresentInKeychain: integrity.isMnemonicPresentInKeychain,
+				isMnemonicPresentInKeychain: integrity.isMnemonicPresentInSecureStorage,
 				isMnemonicMarkedAsBackedUp: integrity.isMnemonicMarkedAsBackedUp
 			)
 		}
