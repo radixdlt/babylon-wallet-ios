@@ -31,7 +31,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 	struct Destination: DestinationReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
-			case detail(DeviceFactorSourceDetail.State)
+			case detail(FactorSourceDetail.State)
 			case displayMnemonic(DisplayMnemonic.State)
 			case enterMnemonic(ImportMnemonicsFlowCoordinator.State)
 			case addMnemonic(ImportMnemonic.State)
@@ -39,7 +39,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
-			case detail(DeviceFactorSourceDetail.Action)
+			case detail(FactorSourceDetail.Action)
 			case displayMnemonic(DisplayMnemonic.Action)
 			case enterMnemonic(ImportMnemonicsFlowCoordinator.Action)
 			case addMnemonic(ImportMnemonic.Action)
@@ -47,7 +47,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 
 		var body: some ReducerOf<Self> {
 			Scope(state: \.detail, action: \.detail) {
-				DeviceFactorSourceDetail()
+				FactorSourceDetail()
 			}
 			Scope(state: \.displayMnemonic, action: \.displayMnemonic) {
 				DisplayMnemonic()
@@ -80,8 +80,8 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			return securityProblemsEffect()
 				.merge(with: entitiesEffect(state: state))
 
-		case .rowTapped:
-			state.destination = .detail(.init())
+		case let .rowTapped(row):
+			state.destination = .detail(.init(integrity: row.integrity))
 			return .none
 
 		case let .rowMessageTapped(row):

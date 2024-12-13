@@ -1,7 +1,9 @@
 // MARK: - DeviceFactorSourceDetail
 
-struct DeviceFactorSourceDetail: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {}
+struct FactorSourceDetail: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		let integrity: FactorSourceIntegrity
+	}
 
 	enum ViewAction: Sendable, Equatable {
 		case appeared

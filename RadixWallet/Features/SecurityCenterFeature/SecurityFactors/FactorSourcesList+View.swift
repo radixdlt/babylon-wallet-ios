@@ -143,7 +143,7 @@ private extension View {
 
 	private func detail(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.detail, action: \.detail)) {
-			DeviceFactorSourceDetail.View(store: $0)
+			FactorSourceDetail.View(store: $0)
 		}
 	}
 
