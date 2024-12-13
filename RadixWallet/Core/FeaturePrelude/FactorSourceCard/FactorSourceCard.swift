@@ -150,7 +150,7 @@ struct FactorSourceCard: View {
 						}
 
 						if dataSource.hasHiddenEntities {
-							Text("Hidden Accounts or Personas")
+							Text(L10n.FactorSources.Card.hiddenAccountsOrPersonas)
 								.textStyle(.body1HighImportance)
 								.foregroundStyle(.app.gray2)
 								.frame(maxWidth: .infinity)

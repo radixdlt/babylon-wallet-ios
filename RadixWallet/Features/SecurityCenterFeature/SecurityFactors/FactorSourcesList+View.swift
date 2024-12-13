@@ -11,11 +11,11 @@ extension FactorSourcesList {
 						header(viewStore.kind.details)
 
 						if let main = viewStore.main {
-							section(text: "Default", rows: [main])
+							section(text: L10n.FactorSources.List.default, rows: [main])
 								.padding(.top, .medium3)
 
 							if !viewStore.others.isEmpty {
-								section(text: "Others", rows: viewStore.others)
+								section(text: L10n.FactorSources.List.others, rows: viewStore.others)
 							}
 						} else {
 							section(text: nil, rows: viewStore.others)
