@@ -128,11 +128,11 @@ private extension FactorSourcesList.State {
 private extension FactorSourcesList.State.Row {
 	var messages: [FactorSourceCardDataSource.Message] {
 		switch status {
-		case .hasProblem9:
+		case .lostFactorSource:
 			[.init(text: "This factor has been lost", type: .error)]
-		case .hasProblem3:
+		case .seedPhraseNotRecoverable:
 			[.init(text: "Write down seed phrase to make this factor recoverable", type: .warning)]
-		case .backedUp:
+		case .seedPhraseWrittenDown:
 			[.init(text: "This seed phrase has been written down", type: .success)]
 		case .notBackedUp:
 			[]

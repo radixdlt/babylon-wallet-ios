@@ -86,10 +86,10 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 
 		case let .rowMessageTapped(row):
 			switch row.status {
-			case .backedUp, .notBackedUp:
+			case .seedPhraseWrittenDown, .notBackedUp:
 				return .none
 
-			case .hasProblem3:
+			case .seedPhraseNotRecoverable:
 				if let factorSourceId = row.integrity.factorSourceIdOfMnemonicToExport {
 					return exportMnemonic(factorSourceID: factorSourceId) {
 						state.destination = .displayMnemonic(.export($0, title: L10n.RevealSeedPhrase.title, context: .fromSettings))
@@ -98,7 +98,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 					return .none
 				}
 
-			case .hasProblem9:
+			case .lostFactorSource:
 				state.destination = .enterMnemonic(.init())
 				return .none
 			}
@@ -118,11 +118,10 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 						wordCount: .twentyFour
 					)
 				)
-			case .ledgerHqHardwareWallet:
-				// NOTE: Added `.device` support as placeholder, but not adding the logic to add ledger/connector extension
+			case .ledgerHqHardwareWallet, .offDeviceMnemonic, .arculusCard, .password:
+				// NOTE: Added `.device` support as placeholder, but not adding the logic for ledger (which we already support)
 				// since Matt mentioned we will probably always present this screen: https://zpl.io/wyqB6Bd
-				break
-			case .offDeviceMnemonic, .arculusCard, .password:
+				// and I don't want to add all the logic for checking if there is a CE or not just to migrate it later.
 				loggerGlobal.info("Add \(state.kind) not yet implemented")
 			case .trustedContact, .securityQuestions:
 				fatalError("Not supported")
@@ -193,11 +192,11 @@ private extension FactorSourcesList {
 				let accounts = entity.accounts + entity.hiddenAccounts
 				let personas = entity.personas
 				let status: State.Status = if problems.hasProblem9(accounts: accounts, personas: personas) {
-					.hasProblem9
+					.lostFactorSource
 				} else if problems.hasProblem3(accounts: accounts, personas: personas) {
-					.hasProblem3
+					.seedPhraseNotRecoverable
 				} else if entity.integrity.isMnemonicMarkedAsBackedUp {
-					.backedUp
+					.seedPhraseWrittenDown
 				} else {
 					// A way to reproduce this, is to restore a Wallet from a Profile without entering its seed phrase (so it creates a new one)
 					// and do not write down the new seed phrase nor create an entity. In such case, we don't want to show problem3 because the
@@ -227,19 +226,19 @@ extension FactorSourcesList.State {
 	enum Status: Sendable, Hashable {
 		/// User has lost access to the given factor source (`SecurityProblem.problem9`).
 		/// We will show an error message.
-		case hasProblem9
+		case lostFactorSource
 
 		/// User has access to the factor source, which has associated entities, but hasn't been backed up (`SecurityProblem.problem3`).
 		/// We will show a warning message.
-		case hasProblem3
+		case seedPhraseNotRecoverable
+
+		/// User has access to the factor source, which has associated entities, and has backed it up.
+		/// We will show a success message.
+		case seedPhraseWrittenDown
 
 		/// User has access to the factor source, which doesn't have associated entities, and hasn't been backed up.
 		/// We won't show any message (since there are no entities associated).
 		case notBackedUp
-
-		/// User has access to the factor source, which has associated entities, and has backed it up.
-		/// We will show a success message.
-		case backedUp
 	}
 }
 
