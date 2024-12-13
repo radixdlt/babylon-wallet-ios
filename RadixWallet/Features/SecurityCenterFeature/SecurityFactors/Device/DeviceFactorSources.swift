@@ -95,7 +95,6 @@ struct DeviceFactorSources: Sendable, FeatureReducer {
 		case .addButtonTapped:
 			state.destination = .addMnemonic(
 				.init(
-					header: .init(title: "what should be the title here?"),
 					showCloseButton: false,
 					isWordCountFixed: true,
 					persistStrategy: .init(
