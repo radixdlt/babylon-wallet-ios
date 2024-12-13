@@ -232,7 +232,7 @@ private extension View {
 
 	private func deviceFactorSources(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.deviceFactorSources, action: \.deviceFactorSources)) {
-			DeviceFactorSources.View(store: $0)
+			FactorSourcesList.View(store: $0)
 		}
 	}
 

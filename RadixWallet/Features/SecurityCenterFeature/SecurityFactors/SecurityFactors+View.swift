@@ -85,27 +85,11 @@ private extension View {
 	func destinations(with store: StoreOf<SecurityFactors>) -> some View {
 		let destinationStore = store.destination
 		return deviceFactorSources(with: destinationStore)
-			.ledgerHardwareWallets(with: destinationStore)
-			.todo(with: destinationStore)
 	}
 
 	private func deviceFactorSources(with destinationStore: PresentationStoreOf<SecurityFactors.Destination>) -> some View {
-		navigationDestination(store: destinationStore.scope(state: \.deviceFactorSources, action: \.deviceFactorSources)) {
-			DeviceFactorSources.View(store: $0)
-		}
-	}
-
-	private func ledgerHardwareWallets(with destinationStore: PresentationStoreOf<SecurityFactors.Destination>) -> some View {
-		navigationDestination(store: destinationStore.scope(state: \.ledgerWallets, action: \.ledgerWallets)) {
-			LedgerHardwareDevices.View(store: $0)
-				.background(.app.gray5)
-				.radixToolbar(title: L10n.AccountSecuritySettings.LedgerHardwareWallets.title)
-		}
-	}
-
-	private func todo(with destinationStore: PresentationStoreOf<SecurityFactors.Destination>) -> some View {
-		sheet(store: destinationStore.scope(state: \.todo, action: \.todo)) { _ in
-			TodoView(feature: "Add factor")
+		navigationDestination(store: destinationStore.scope(state: \.factorSourcesList, action: \.factorSourcesList)) {
+			FactorSourcesList.View(store: $0)
 		}
 	}
 }

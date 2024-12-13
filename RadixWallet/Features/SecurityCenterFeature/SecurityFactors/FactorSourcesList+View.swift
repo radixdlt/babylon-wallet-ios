@@ -1,25 +1,27 @@
-// MARK: - DeviceFactorSources.View
-extension DeviceFactorSources {
+// MARK: - FactorSourcesList.View
+extension FactorSourcesList {
 	@MainActor
 	struct View: SwiftUI.View {
-		let store: StoreOf<DeviceFactorSources>
+		let store: StoreOf<FactorSourcesList>
 
 		var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }) { viewStore in
 				ScrollView {
 					VStack(spacing: .large3) {
-						header("Use phone biometrics/PIN to approve")
-							.padding(.bottom, .medium3)
+						header(viewStore.kind.details)
 
 						if let main = viewStore.main {
 							section(text: "Default", rows: [main])
+								.padding(.top, .medium3)
 
 							if !viewStore.others.isEmpty {
 								section(text: "Others", rows: viewStore.others)
 							}
+						} else {
+							section(text: nil, rows: viewStore.others)
 						}
 
-						Button("Add Biometrics/PIN") {
+						Button("Add \(viewStore.kind.title)") {
 							store.send(.view(.addButtonTapped))
 						}
 						.buttonStyle(.secondaryRectangular)
@@ -30,7 +32,7 @@ extension DeviceFactorSources {
 					.padding(.bottom, .medium2)
 				}
 				.background(.app.gray5)
-				.radixToolbar(title: "Biometrics/PIN")
+				.radixToolbar(title: viewStore.kind.title)
 				.task {
 					store.send(.view(.task))
 				}
@@ -38,14 +40,14 @@ extension DeviceFactorSources {
 			.destinations(with: store)
 		}
 
-		private func header(_ text: String) -> some SwiftUI.View {
+		private func header(_ text: String?) -> some SwiftUI.View {
 			Text(text)
 				.textStyle(.body1Header)
 				.foregroundStyle(.app.gray2)
 				.flushedLeft
 		}
 
-		private func section(text: String, rows: [State.Row]) -> some SwiftUI.View {
+		private func section(text: String?, rows: [State.Row]) -> some SwiftUI.View {
 			VStack(spacing: .small1) {
 				header(text)
 
@@ -57,7 +59,7 @@ extension DeviceFactorSources {
 
 		private func card(_ row: State.Row) -> some SwiftUI.View {
 			FactorSourceCard(
-				kind: .instance(factorSource: row.factorSource.asGeneral, kind: .extended(linkedEntities: row.linkedEntities)),
+				kind: .instance(factorSource: row.integrity.factorSource, kind: .extended(linkedEntities: row.linkedEntities)),
 				mode: .display,
 				messages: row.messages
 			) { action in
@@ -75,27 +77,37 @@ extension DeviceFactorSources {
 	}
 }
 
-private extension DeviceFactorSources.State {
+private extension FactorSourcesList.State {
 	var main: Row? {
-		rows.first(where: \.factorSource.isExplicitMain)
+		rows.first(where: \.integrity.isExplicitMain)
 	}
 
 	var others: [Row] {
 		rows
-			.filter { !$0.factorSource.isExplicitMain }
-			.sorted(by: { l, r in
-				let lhs = l.factorSource
-				let rhs = r.factorSource
-				if lhs.isBDFS, rhs.isBDFS {
-					return lhs.common.addedOn < rhs.common.addedOn
-				} else {
-					return lhs.isBDFS
+			.filter { !$0.integrity.isExplicitMain }
+			.sorted(by: { left, right in
+				let lhs = left.integrity
+				let rhs = right.integrity
+				switch (lhs, rhs) {
+				case let (.device(lDevice), .device(rDevice)):
+					if lDevice.factorSource.isBDFS, rDevice.factorSource.isBDFS {
+						return sort(lhs, rhs)
+					} else {
+						return lDevice.factorSource.isBDFS
+					}
+				default:
+					return sort(lhs, rhs)
 				}
+
 			})
+	}
+
+	private func sort(_ lhs: FactorSourceIntegrity, _ rhs: FactorSourceIntegrity) -> Bool {
+		lhs.factorSource.common.addedOn < rhs.factorSource.common.addedOn
 	}
 }
 
-private extension DeviceFactorSources.State.Row {
+private extension FactorSourcesList.State.Row {
 	var messages: [FactorSourceCardDataSource.Message] {
 		switch status {
 		case .hasProblem9:
@@ -110,9 +122,9 @@ private extension DeviceFactorSources.State.Row {
 	}
 }
 
-private extension StoreOf<DeviceFactorSources> {
-	var destination: PresentationStoreOf<DeviceFactorSources.Destination> {
-		func scopeState(state: State) -> PresentationState<DeviceFactorSources.Destination.State> {
+private extension StoreOf<FactorSourcesList> {
+	var destination: PresentationStoreOf<FactorSourcesList.Destination> {
+		func scopeState(state: State) -> PresentationState<FactorSourcesList.Destination.State> {
 			state.$destination
 		}
 		return scope(state: scopeState, action: Action.destination)
@@ -121,7 +133,7 @@ private extension StoreOf<DeviceFactorSources> {
 
 @MainActor
 private extension View {
-	func destinations(with store: StoreOf<DeviceFactorSources>) -> some View {
+	func destinations(with store: StoreOf<FactorSourcesList>) -> some View {
 		let destinationStore = store.destination
 		return detail(with: destinationStore)
 			.displayMnemonic(with: destinationStore)
@@ -129,27 +141,48 @@ private extension View {
 			.addMnemonic(with: destinationStore)
 	}
 
-	private func detail(with destinationStore: PresentationStoreOf<DeviceFactorSources.Destination>) -> some View {
+	private func detail(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.detail, action: \.detail)) {
 			DeviceFactorSourceDetail.View(store: $0)
 		}
 	}
 
-	private func displayMnemonic(with destinationStore: PresentationStoreOf<DeviceFactorSources.Destination>) -> some View {
+	private func displayMnemonic(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.displayMnemonic, action: \.displayMnemonic)) {
 			DisplayMnemonic.View(store: $0)
 		}
 	}
 
-	private func enterMnemonic(with destinationStore: PresentationStoreOf<DeviceFactorSources.Destination>) -> some View {
+	private func enterMnemonic(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.enterMnemonic, action: \.enterMnemonic)) {
 			ImportMnemonicsFlowCoordinator.View(store: $0)
 		}
 	}
 
-	private func addMnemonic(with destinationStore: PresentationStoreOf<DeviceFactorSources.Destination>) -> some View {
+	private func addMnemonic(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.addMnemonic, action: \.addMnemonic)) {
 			ImportMnemonic.View(store: $0)
+		}
+	}
+}
+
+extension FactorSourceIntegrity {
+	// TODO: Move to Sagron FactorSourceIntegrity+Wrap+Functions
+	var factorSource: FactorSource {
+		switch self {
+		case let .device(device):
+			device.factorSource.asGeneral
+		case let .ledger(ledger):
+			ledger.asGeneral
+		}
+	}
+
+	fileprivate var isExplicitMain: Bool {
+		switch self {
+		case let .device(device):
+			device.factorSource.isExplicitMain
+		case .ledger:
+			false
 		}
 	}
 }

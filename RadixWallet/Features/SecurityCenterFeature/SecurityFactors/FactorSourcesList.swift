@@ -1,13 +1,18 @@
-// MARK: - DeviceFactorSources
-struct DeviceFactorSources: Sendable, FeatureReducer {
+// MARK: - FactorSourcesList
+struct FactorSourcesList: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
+		let kind: FactorSourceKind
 		var rows: [Row] = []
+
+		init(kind: FactorSourceKind) {
+			self.kind = kind
+		}
 
 		@PresentationState
 		var destination: Destination.State? = nil
 
 		fileprivate var problems: [SecurityProblem]?
-		fileprivate var entities: [EntitiesControlledByFactorSource]?
+		fileprivate var entities: [EntitiesLinkedToFactorSource]?
 	}
 
 	enum ViewAction: Sendable, Equatable {
@@ -19,7 +24,7 @@ struct DeviceFactorSources: Sendable, FeatureReducer {
 
 	enum InternalAction: Sendable, Equatable {
 		case setSecurityProblems([SecurityProblem])
-		case setEntities([EntitiesControlledByFactorSource])
+		case setEntities([EntitiesLinkedToFactorSource])
 		case setRows([State.Row])
 	}
 
@@ -57,7 +62,7 @@ struct DeviceFactorSources: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.securityCenterClient) var securityCenterClient
-	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
+	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.errorQueue) var errorQueue
 
 	var body: some ReducerOf<Self> {
@@ -73,7 +78,7 @@ struct DeviceFactorSources: Sendable, FeatureReducer {
 		switch viewAction {
 		case .task:
 			return securityProblemsEffect()
-				.merge(with: entitiesEffect())
+				.merge(with: entitiesEffect(state: state))
 
 		case .rowTapped:
 			state.destination = .detail(.init())
@@ -83,10 +88,16 @@ struct DeviceFactorSources: Sendable, FeatureReducer {
 			switch row.status {
 			case .backedUp, .notBackedUp:
 				return .none
+
 			case .hasProblem3:
-				return exportMnemonic(factorSourceID: row.factorSource.id) {
-					state.destination = .displayMnemonic(.export($0, title: L10n.RevealSeedPhrase.title, context: .fromSettings))
+				if let factorSourceId = row.integrity.factorSourceIdOfMnemonicToExport {
+					return exportMnemonic(factorSourceID: factorSourceId) {
+						state.destination = .displayMnemonic(.export($0, title: L10n.RevealSeedPhrase.title, context: .fromSettings))
+					}
+				} else {
+					return .none
 				}
+
 			case .hasProblem9:
 				state.destination = .enterMnemonic(.init())
 				return .none
@@ -140,7 +151,7 @@ struct DeviceFactorSources: Sendable, FeatureReducer {
 	}
 }
 
-private extension DeviceFactorSources {
+private extension FactorSourcesList {
 	func securityProblemsEffect() -> Effect<Action> {
 		.run { send in
 			for try await problems in await securityCenterClient.problems(.securityFactors) {
@@ -152,13 +163,10 @@ private extension DeviceFactorSources {
 		}
 	}
 
-	func entitiesEffect() -> Effect<Action> {
+	func entitiesEffect(state: State) -> Effect<Action> {
 		.run { send in
-			let result = try await deviceFactorSourceClient.controlledEntities(
-				// `nil` means read profile in ProfileStore, instead of using an overriding profile
-				nil
-			)
-			await send(.internal(.setEntities(result.elements)))
+			let result = try await factorSourcesClient.entitiesLinkedToFactorSourceKind(kind: state.kind)
+			await send(.internal(.setEntities(result)))
 		} catch: { error, _ in
 			errorQueue.schedule(error)
 		}
@@ -176,7 +184,7 @@ private extension DeviceFactorSources {
 					.hasProblem9
 				} else if problems.hasProblem3(accounts: accounts, personas: personas) {
 					.hasProblem3
-				} else if entity.isMnemonicMarkedAsBackedUp {
+				} else if entity.integrity.isMnemonicMarkedAsBackedUp {
 					.backedUp
 				} else {
 					// A way to reproduce this, is to restore a Wallet from a Profile without entering its seed phrase (so it creates a new one)
@@ -186,7 +194,7 @@ private extension DeviceFactorSources {
 					.notBackedUp
 				}
 				return State.Row(
-					factorSource: entity.deviceFactorSource,
+					integrity: entity.integrity,
 					linkedEntities: entity.linkedEntities,
 					status: status
 				)
@@ -197,9 +205,9 @@ private extension DeviceFactorSources {
 }
 
 // MARK: - DeviceFactorSourcesList.State.Row
-extension DeviceFactorSources.State {
+extension FactorSourcesList.State {
 	struct Row: Sendable, Hashable {
-		let factorSource: DeviceFactorSource
+		let integrity: FactorSourceIntegrity
 		let linkedEntities: FactorSourceCardDataSource.LinkedEntities
 		let status: Status
 	}
@@ -223,8 +231,28 @@ extension DeviceFactorSources.State {
 	}
 }
 
-private extension EntitiesControlledByFactorSource {
+private extension EntitiesLinkedToFactorSource {
 	var linkedEntities: FactorSourceCardDataSource.LinkedEntities {
 		.init(accounts: accounts, personas: personas, hasHiddenEntities: !hiddenAccounts.isEmpty || !hiddenPersonas.isEmpty)
+	}
+}
+
+private extension FactorSourceIntegrity {
+	var isMnemonicMarkedAsBackedUp: Bool {
+		switch self {
+		case let .device(device):
+			device.isMnemonicMarkedAsBackedUp
+		case .ledger:
+			false
+		}
+	}
+
+	var factorSourceIdOfMnemonicToExport: FactorSourceIdFromHash? {
+		switch self {
+		case let .device(device):
+			device.factorSource.id
+		case .ledger:
+			nil
+		}
 	}
 }

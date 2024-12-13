@@ -802,8 +802,8 @@
 		5B98CD8C2D00D8C900C3C133 /* TodoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B98CD8B2D00D8C700C3C133 /* TodoView.swift */; };
 		5B98CD9A2D033F7D00C3C133 /* AddFactorSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B98CD982D033F7D00C3C133 /* AddFactorSource.swift */; };
 		5B98CD9B2D033F7D00C3C133 /* AddFactorSource+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B98CD992D033F7D00C3C133 /* AddFactorSource+View.swift */; };
-		5B98CD9F2D070B8800C3C133 /* DeviceFactorSources+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B98CD9E2D070B8800C3C133 /* DeviceFactorSources+View.swift */; };
-		5B98CDA02D070B8800C3C133 /* DeviceFactorSources.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B98CD9D2D070B8800C3C133 /* DeviceFactorSources.swift */; };
+		5B98CD9F2D070B8800C3C133 /* FactorSourcesList+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B98CD9E2D070B8800C3C133 /* FactorSourcesList+View.swift */; };
+		5B98CDA02D070B8800C3C133 /* FactorSourcesList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B98CD9D2D070B8800C3C133 /* FactorSourcesList.swift */; };
 		5B98CDA32D0752B200C3C133 /* DeviceFactorSourceDetail+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B98CDA22D0752B200C3C133 /* DeviceFactorSourceDetail+View.swift */; };
 		5B98CDA42D0752B200C3C133 /* DeviceFactorSourceDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B98CDA12D0752B200C3C133 /* DeviceFactorSourceDetail.swift */; };
 		5BB7C1762BC81F50001216EB /* ImportOlympiaNameLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB7C1752BC81F50001216EB /* ImportOlympiaNameLedger.swift */; };
@@ -2068,8 +2068,8 @@
 		5B98CD8B2D00D8C700C3C133 /* TodoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoView.swift; sourceTree = "<group>"; };
 		5B98CD982D033F7D00C3C133 /* AddFactorSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFactorSource.swift; sourceTree = "<group>"; };
 		5B98CD992D033F7D00C3C133 /* AddFactorSource+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSource+View.swift"; sourceTree = "<group>"; };
-		5B98CD9D2D070B8800C3C133 /* DeviceFactorSources.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceFactorSources.swift; sourceTree = "<group>"; };
-		5B98CD9E2D070B8800C3C133 /* DeviceFactorSources+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeviceFactorSources+View.swift"; sourceTree = "<group>"; };
+		5B98CD9D2D070B8800C3C133 /* FactorSourcesList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FactorSourcesList.swift; sourceTree = "<group>"; };
+		5B98CD9E2D070B8800C3C133 /* FactorSourcesList+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactorSourcesList+View.swift"; sourceTree = "<group>"; };
 		5B98CDA12D0752B200C3C133 /* DeviceFactorSourceDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceFactorSourceDetail.swift; sourceTree = "<group>"; };
 		5B98CDA22D0752B200C3C133 /* DeviceFactorSourceDetail+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeviceFactorSourceDetail+View.swift"; sourceTree = "<group>"; };
 		5BB7C1752BC81F50001216EB /* ImportOlympiaNameLedger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportOlympiaNameLedger.swift; sourceTree = "<group>"; };
@@ -5729,7 +5729,9 @@
 			children = (
 				5B6499B52BCFD0E8000F2176 /* SecurityFactors+View.swift */,
 				5B6499B62BCFD0E8000F2176 /* SecurityFactors+Reducer.swift */,
-				5B98CD9C2D070B1A00C3C133 /* Device */,
+				5B98CD9D2D070B8800C3C133 /* FactorSourcesList.swift */,
+				5B98CD9E2D070B8800C3C133 /* FactorSourcesList+View.swift */,
+				5B98CD9C2D070B1A00C3C133 /* Details */,
 			);
 			path = SecurityFactors;
 			sourceTree = "<group>";
@@ -5865,15 +5867,13 @@
 			path = Onboarding;
 			sourceTree = "<group>";
 		};
-		5B98CD9C2D070B1A00C3C133 /* Device */ = {
+		5B98CD9C2D070B1A00C3C133 /* Details */ = {
 			isa = PBXGroup;
 			children = (
-				5B98CD9D2D070B8800C3C133 /* DeviceFactorSources.swift */,
-				5B98CD9E2D070B8800C3C133 /* DeviceFactorSources+View.swift */,
 				5B98CDA12D0752B200C3C133 /* DeviceFactorSourceDetail.swift */,
 				5B98CDA22D0752B200C3C133 /* DeviceFactorSourceDetail+View.swift */,
 			);
-			path = Device;
+			path = Details;
 			sourceTree = "<group>";
 		};
 		5BBC7D9D2C3D390D00B04BD6 /* BootstrapClient */ = {
@@ -7681,8 +7681,8 @@
 				A40816382C7E0D08005E65B9 /* StreamTransactionsRequestAllOfManifestClassFilter.swift in Sources */,
 				5B45E3012BC5A491007C4C84 /* FactorSourceAccess+ViewState.swift in Sources */,
 				48CFC44A2ADC10DA00E77A5C /* AuthorizedDappsClient+Interface.swift in Sources */,
-				5B98CD9F2D070B8800C3C133 /* DeviceFactorSources+View.swift in Sources */,
-				5B98CDA02D070B8800C3C133 /* DeviceFactorSources.swift in Sources */,
+				5B98CD9F2D070B8800C3C133 /* FactorSourcesList+View.swift in Sources */,
+				5B98CDA02D070B8800C3C133 /* FactorSourcesList.swift in Sources */,
 				48CFC31E2ADC10D900E77A5C /* NewAccountCompletion+View.swift in Sources */,
 				5B813D1A2CFF7400001A291D /* NameLedgerFactorSource.swift in Sources */,
 				48CFC3E72ADC10D900E77A5C /* Types.swift in Sources */,
