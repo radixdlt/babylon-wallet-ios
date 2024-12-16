@@ -68,8 +68,6 @@
 		48CFC23F2ADC10D900E77A5C /* PreferenceList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBC6E2ADC10D800E77A5C /* PreferenceList.swift */; };
 		48CFC2402ADC10D900E77A5C /* AccountPreferences+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBC6F2ADC10D800E77A5C /* AccountPreferences+Reducer.swift */; };
 		48CFC2412ADC10D900E77A5C /* DevAccountPreferences+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBC712ADC10D800E77A5C /* DevAccountPreferences+Reducer.swift */; };
-		48CFC2422ADC10D900E77A5C /* UpdateAccountLabel+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBC722ADC10D800E77A5C /* UpdateAccountLabel+Reducer.swift */; };
-		48CFC2432ADC10D900E77A5C /* UpdateAccountLabel+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBC732ADC10D800E77A5C /* UpdateAccountLabel+View.swift */; };
 		48CFC2442ADC10D900E77A5C /* ThirdPartyDeposits+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBC752ADC10D800E77A5C /* ThirdPartyDeposits+Reducer.swift */; };
 		48CFC2452ADC10D900E77A5C /* AddAsset+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBC762ADC10D800E77A5C /* AddAsset+Reducer.swift */; };
 		48CFC2462ADC10D900E77A5C /* AddAssets+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBC772ADC10D800E77A5C /* AddAssets+View.swift */; };
@@ -764,8 +762,6 @@
 		5B526AED2C89C3C200AF8B72 /* ResourcesVisibilityClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B526AE92C89C3C200AF8B72 /* ResourcesVisibilityClient+Live.swift */; };
 		5B526AEE2C89C3C200AF8B72 /* ResourcesVisibilityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B526AEA2C89C3C200AF8B72 /* ResourcesVisibilityClient+Test.swift */; };
 		5B634A942C91D2A0004B2FBC /* ScreenshotPreventing in Frameworks */ = {isa = PBXBuildFile; productRef = 5B634A932C91D2A0004B2FBC /* ScreenshotPreventing */; };
-		5B634AAE2C92F6EC004B2FBC /* UpdateP2PLinkName+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B634AAD2C92F6EC004B2FBC /* UpdateP2PLinkName+Reducer.swift */; };
-		5B634AB02C92F6FA004B2FBC /* UpdateP2PLinkName+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B634AAF2C92F6FA004B2FBC /* UpdateP2PLinkName+View.swift */; };
 		5B6499B72BCFD0E8000F2176 /* SecurityFactors+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B52BCFD0E8000F2176 /* SecurityFactors+View.swift */; };
 		5B6499B82BCFD0E8000F2176 /* SecurityFactors+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B62BCFD0E8000F2176 /* SecurityFactors+Reducer.swift */; };
 		5B6499BA2BCFDB1E000F2176 /* ShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B92BCFDB1E000F2176 /* ShareView.swift */; };
@@ -1372,8 +1368,6 @@
 		48CFBC6E2ADC10D800E77A5C /* PreferenceList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferenceList.swift; sourceTree = "<group>"; };
 		48CFBC6F2ADC10D800E77A5C /* AccountPreferences+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AccountPreferences+Reducer.swift"; sourceTree = "<group>"; };
 		48CFBC712ADC10D800E77A5C /* DevAccountPreferences+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DevAccountPreferences+Reducer.swift"; sourceTree = "<group>"; };
-		48CFBC722ADC10D800E77A5C /* UpdateAccountLabel+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UpdateAccountLabel+Reducer.swift"; sourceTree = "<group>"; };
-		48CFBC732ADC10D800E77A5C /* UpdateAccountLabel+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UpdateAccountLabel+View.swift"; sourceTree = "<group>"; };
 		48CFBC752ADC10D800E77A5C /* ThirdPartyDeposits+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ThirdPartyDeposits+Reducer.swift"; sourceTree = "<group>"; };
 		48CFBC762ADC10D800E77A5C /* AddAsset+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AddAsset+Reducer.swift"; sourceTree = "<group>"; };
 		48CFBC772ADC10D800E77A5C /* AddAssets+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AddAssets+View.swift"; sourceTree = "<group>"; };
@@ -2032,8 +2026,6 @@
 		5B526AE82C89C3C200AF8B72 /* ResourcesVisibilityClient+Interface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ResourcesVisibilityClient+Interface.swift"; sourceTree = "<group>"; };
 		5B526AE92C89C3C200AF8B72 /* ResourcesVisibilityClient+Live.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ResourcesVisibilityClient+Live.swift"; sourceTree = "<group>"; };
 		5B526AEA2C89C3C200AF8B72 /* ResourcesVisibilityClient+Test.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ResourcesVisibilityClient+Test.swift"; sourceTree = "<group>"; };
-		5B634AAD2C92F6EC004B2FBC /* UpdateP2PLinkName+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UpdateP2PLinkName+Reducer.swift"; sourceTree = "<group>"; };
-		5B634AAF2C92F6FA004B2FBC /* UpdateP2PLinkName+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UpdateP2PLinkName+View.swift"; sourceTree = "<group>"; };
 		5B6499B52BCFD0E8000F2176 /* SecurityFactors+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityFactors+View.swift"; sourceTree = "<group>"; };
 		5B6499B62BCFD0E8000F2176 /* SecurityFactors+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityFactors+Reducer.swift"; sourceTree = "<group>"; };
 		5B6499B92BCFDB1E000F2176 /* ShareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareView.swift; sourceTree = "<group>"; };
@@ -2859,8 +2851,6 @@
 				48CFBC712ADC10D800E77A5C /* DevAccountPreferences+Reducer.swift */,
 				48CFBC7B2ADC10D800E77A5C /* DevAccountPreferences+View.swift */,
 				48CFBC742ADC10D800E77A5C /* ThirdPartyDeposits */,
-				48CFBC722ADC10D800E77A5C /* UpdateAccountLabel+Reducer.swift */,
-				48CFBC732ADC10D800E77A5C /* UpdateAccountLabel+View.swift */,
 			);
 			path = Children;
 			sourceTree = "<group>";
@@ -3040,7 +3030,6 @@
 		48CFBCBF2ADC10D800E77A5C /* P2PLinksFeature */ = {
 			isa = PBXGroup;
 			children = (
-				5B634AAC2C92F6C5004B2FBC /* UpdateP2PLinkName */,
 				48CFBCC02ADC10D800E77A5C /* Coordinator */,
 			);
 			path = P2PLinksFeature;
@@ -5720,15 +5709,6 @@
 			path = ResourcesVisibilityClient;
 			sourceTree = "<group>";
 		};
-		5B634AAC2C92F6C5004B2FBC /* UpdateP2PLinkName */ = {
-			isa = PBXGroup;
-			children = (
-				5B634AAD2C92F6EC004B2FBC /* UpdateP2PLinkName+Reducer.swift */,
-				5B634AAF2C92F6FA004B2FBC /* UpdateP2PLinkName+View.swift */,
-			);
-			path = UpdateP2PLinkName;
-			sourceTree = "<group>";
-		};
 		5B6499B42BCFD0C7000F2176 /* SecurityFactors */ = {
 			isa = PBXGroup;
 			children = (
@@ -7505,7 +7485,6 @@
 				48CFC25A2ADC10D900E77A5C /* OnboardingCoordinator+Reducer.swift in Sources */,
 				5BB7C1782BC81F61001216EB /* ImportOlympiaNameLedger+View.swift in Sources */,
 				48CFC3482ADC10D900E77A5C /* PersonaDataPermission.swift in Sources */,
-				48CFC2422ADC10D900E77A5C /* UpdateAccountLabel+Reducer.swift in Sources */,
 				48CFC3432ADC10D900E77A5C /* AccountPermission+View.swift in Sources */,
 				48CFC2452ADC10D900E77A5C /* AddAsset+Reducer.swift in Sources */,
 				48CFC42E2ADC10DA00E77A5C /* KeyPath+Sendable.swift in Sources */,
@@ -7529,7 +7508,6 @@
 				5B4A1AB32CBFC99200679EE6 /* SignProofOfOwnership.swift in Sources */,
 				E62449D62AFBA61100272C67 /* Home+AccountRow+View.swift in Sources */,
 				A40816682C7F14D4005E65B9 /* InfoLinkSheet+Reducer.swift in Sources */,
-				5B634AAE2C92F6EC004B2FBC /* UpdateP2PLinkName+Reducer.swift in Sources */,
 				A408154D2C7E0D08005E65B9 /* Extensions.swift in Sources */,
 				48CFC5FE2ADC10DA00E77A5C /* Account+PreviewValues.swift in Sources */,
 				A408157C2C7E0D08005E65B9 /* FungibleResourcesCollectionItemVaultAggregatedVault.swift in Sources */,
@@ -7838,7 +7816,6 @@
 				83823EA72B722DB000827211 /* HTTPClient+Interface.swift in Sources */,
 				A40816152C7E0D08005E65B9 /* StateEntityMetadataPageRequest.swift in Sources */,
 				48CFC5972ADC10DA00E77A5C /* ToggleView.swift in Sources */,
-				5B634AB02C92F6FA004B2FBC /* UpdateP2PLinkName+View.swift in Sources */,
 				5B03E3D32CC141D100E10A64 /* InteractionReview+Extra.swift in Sources */,
 				48CFC4892ADC10DA00E77A5C /* EntityMetadata+GWMetadata.swift in Sources */,
 				48CFC3512ADC10D900E77A5C /* DappHeader.swift in Sources */,
@@ -8027,7 +8004,6 @@
 				A40815D82C7E0D08005E65B9 /* ProgrammaticScryptoSborValueI64.swift in Sources */,
 				A40815EE2C7E0D08005E65B9 /* ResourceAggregationLevel.swift in Sources */,
 				48CFC5742ADC10DA00E77A5C /* GatewayAPI+Utils.swift in Sources */,
-				48CFC2432ADC10D900E77A5C /* UpdateAccountLabel+View.swift in Sources */,
 				48CFC3182ADC10D900E77A5C /* CreateAccountCoordinator+Models.swift in Sources */,
 				48CFC2822ADC10D900E77A5C /* SelectFeePayer.swift in Sources */,
 				48CFC5D52ADC10DA00E77A5C /* TokenShadowModifier.swift in Sources */,

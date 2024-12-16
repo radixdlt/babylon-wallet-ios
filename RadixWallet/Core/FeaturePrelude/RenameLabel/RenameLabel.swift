@@ -90,7 +90,7 @@ struct RenameLabel: Sendable, FeatureReducer {
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case .handleSuccess:
-			overlayWindowClient.scheduleHUD(.updatedAccount)
+			overlayWindowClient.scheduleHUD(.renamedLabel)
 			return .send(.delegate(.labelUpdated(state.kind)))
 		}
 	}
@@ -133,4 +133,8 @@ extension RenameLabel.State {
 			}
 		}
 	}
+}
+
+private extension OverlayWindowClient.Item.HUD {
+	static let renamedLabel = Self(text: L10n.RenameLabel.success)
 }

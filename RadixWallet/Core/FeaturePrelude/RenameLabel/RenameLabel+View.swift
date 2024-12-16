@@ -20,11 +20,11 @@ extension RenameLabel {
 			WithPerceptionTracking {
 				VStack(spacing: .zero) {
 					VStack(spacing: .medium1) {
-						Text(L10n.LinkedConnectors.RenameConnector.title)
+						Text(store.kind.title)
 							.textStyle(.sheetTitle)
 							.multilineTextAlignment(.center)
 
-						Text(L10n.LinkedConnectors.RenameConnector.subtitle)
+						Text(store.kind.subtitle)
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)
 
@@ -53,7 +53,7 @@ extension RenameLabel {
 						store.sanitizedLabel,
 						forAction: { store.send(.view(.updateTapped($0))) }
 					) { action in
-						Button(L10n.LinkedConnectors.RenameConnector.update, action: action)
+						Button(L10n.RenameLabel.update, action: action)
 							.buttonStyle(.primaryRectangular)
 							.controlState(store.controlState)
 					}
@@ -67,9 +67,9 @@ private extension RenameLabel.State {
 	var hint: Hint.ViewState? {
 		switch status {
 		case .empty:
-			.iconError(L10n.LinkedConnectors.RenameConnector.errorEmpty)
+			.iconError(kind.empty)
 		case .tooLong:
-			.iconError(L10n.Error.AccountLabel.tooLong)
+			.iconError(L10n.RenameLabel.Account.tooLong)
 		case .valid:
 			nil
 		}
@@ -77,5 +77,31 @@ private extension RenameLabel.State {
 
 	var controlState: ControlState {
 		status == .valid ? .enabled : .disabled
+	}
+}
+
+private extension RenameLabel.State.Kind {
+	var title: String {
+		switch self {
+		case .account: L10n.RenameLabel.Account.title
+		case .connector: L10n.RenameLabel.Connector.title
+		case .factorSource: L10n.RenameLabel.FactorSource.title
+		}
+	}
+
+	var subtitle: String {
+		switch self {
+		case .account: L10n.RenameLabel.Account.subtitle
+		case .connector: L10n.RenameLabel.Connector.subtitle
+		case .factorSource: L10n.RenameLabel.FactorSource.subtitle
+		}
+	}
+
+	var empty: String {
+		switch self {
+		case .account: L10n.RenameLabel.Account.empty
+		case .connector: L10n.RenameLabel.Connector.empty
+		case .factorSource: L10n.RenameLabel.FactorSource.empty
+		}
 	}
 }
