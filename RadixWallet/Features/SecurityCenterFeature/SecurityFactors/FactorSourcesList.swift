@@ -25,7 +25,6 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 	enum InternalAction: Sendable, Equatable {
 		case setSecurityProblems([SecurityProblem])
 		case setEntities([EntitiesLinkedToFactorSource])
-		case setRows([State.Row])
 	}
 
 	struct Destination: DestinationReducer {
@@ -135,14 +134,12 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .setSecurityProblems(problems):
 			state.problems = problems
-			return rowsEffect(state: state)
+			setRows(state: &state)
+			return .none
 
 		case let .setEntities(entities):
 			state.entities = entities
-			return rowsEffect(state: state)
-
-		case let .setRows(rows):
-			state.rows = rows
+			setRows(state: &state)
 			return .none
 		}
 	}
@@ -183,34 +180,31 @@ private extension FactorSourcesList {
 		}
 	}
 
-	func rowsEffect(state: State) -> Effect<Action> {
+	func setRows(state: inout State) {
 		guard let problems = state.problems, let entities = state.entities else {
-			return .none
+			return
 		}
-		return .run { send in
-			let rows = entities.map { entity in
-				let accounts = entity.accounts + entity.hiddenAccounts
-				let personas = entity.personas
-				let status: State.Status = if problems.hasProblem9(accounts: accounts, personas: personas) {
-					.lostFactorSource
-				} else if problems.hasProblem3(accounts: accounts, personas: personas) {
-					.seedPhraseNotRecoverable
-				} else if entity.integrity.isMnemonicMarkedAsBackedUp {
-					.seedPhraseWrittenDown
-				} else {
-					// A way to reproduce this, is to restore a Wallet from a Profile without entering its seed phrase (so it creates a new one)
-					// and do not write down the new seed phrase nor create an entity. In such case, we don't want to show problem3 because the
-					// non-backed up factor source didn't create any entity. Yet, we don't want to show the success checkmark indicating the factor
-					// source was backed up.
-					.notBackedUp
-				}
-				return State.Row(
-					integrity: entity.integrity,
-					linkedEntities: entity.linkedEntities,
-					status: status
-				)
+		state.rows = entities.map { entity in
+			let accounts = entity.accounts + entity.hiddenAccounts
+			let personas = entity.personas
+			let status: State.Status = if problems.hasProblem9(accounts: accounts, personas: personas) {
+				.lostFactorSource
+			} else if problems.hasProblem3(accounts: accounts, personas: personas) {
+				.seedPhraseNotRecoverable
+			} else if entity.integrity.isMnemonicMarkedAsBackedUp {
+				.seedPhraseWrittenDown
+			} else {
+				// A way to reproduce this, is to restore a Wallet from a Profile without entering its seed phrase (so it creates a new one)
+				// and do not write down the new seed phrase nor create an entity. In such case, we don't want to show problem3 because the
+				// non-backed up factor source didn't create any entity. Yet, we don't want to show the success checkmark indicating the factor
+				// source was backed up.
+				.notBackedUp
 			}
-			await send(.internal(.setRows(rows)))
+			return State.Row(
+				integrity: entity.integrity,
+				linkedEntities: entity.linkedEntities,
+				status: status
+			)
 		}
 	}
 }
