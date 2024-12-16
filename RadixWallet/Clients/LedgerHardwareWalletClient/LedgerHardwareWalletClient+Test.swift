@@ -11,7 +11,7 @@ extension LedgerHardwareWalletClient: TestDependencyKey {
 	static let previewValue = Self.noop
 
 	static let testValue = Self(
-		isConnectedToAnyConnectorExtension: unimplemented("\(Self.self).isConnectedToAnyConnectorExtension"),
+		isConnectedToAnyConnectorExtension: unimplemented("\(Self.self).isConnectedToAnyConnectorExtension", placeholder: noop.isConnectedToAnyConnectorExtension),
 		getDeviceInfo: unimplemented("\(Self.self).getDeviceInfo"),
 		derivePublicKeys: unimplemented("\(Self.self).derivePublicKeys"),
 		signTransaction: unimplemented("\(Self.self).signTransaction"),

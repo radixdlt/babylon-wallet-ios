@@ -21,8 +21,8 @@ extension AccountLockersClient: TestDependencyKey {
 
 	static let testValue = Self(
 		startMonitoring: unimplemented("\(Self.self).startMonitoring"),
-		claims: unimplemented("\(Self.self).claims"),
-		dappsWithClaims: unimplemented("\(Self.self).dappsWithClaims"),
+		claims: unimplemented("\(Self.self).claims", placeholder: noop.claims),
+		dappsWithClaims: unimplemented("\(Self.self).dappsWithClaims", placeholder: noop.dappsWithClaims),
 		claimContent: unimplemented("\(Self.self).claimContent"),
 		forceRefresh: unimplemented("\(Self.self).forceRefresh")
 	)

@@ -12,6 +12,6 @@ extension LocalAuthenticationClient: TestDependencyKey {
 		queryConfig: { .biometricsAndPasscodeSetUp },
 		authenticateWithBiometrics: { true },
 		setAuthenticatedSuccessfully: unimplemented("\(Self.self).setAuthenticatedSuccessfully"),
-		authenticatedSuccessfully: unimplemented("\(Self.self).authenticatedSuccessfully")
+		authenticatedSuccessfully: unimplemented("\(Self.self).authenticatedSuccessfully", placeholder: AsyncLazySequence([]).eraseToAnyAsyncSequence())
 	)
 }
