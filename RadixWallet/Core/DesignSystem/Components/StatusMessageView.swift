@@ -17,7 +17,7 @@ struct StatusMessageView: View {
 		self.textStyle = useSmallerFontSize ? .body2HighImportance : .body1Header
 	}
 
-	enum ViewType {
+	enum ViewType: Sendable, Hashable {
 		case warning
 		case error
 		case success

@@ -8,7 +8,7 @@ struct FactorSourceCard: View {
 	private let dataSource: FactorSourceCardDataSource
 	private var isExpanded: Bool
 
-	var onRemoveTapped: (() -> Void)? = nil
+	var onAction: ((Action) -> Void)? = nil
 
 	var body: some View {
 		switch mode {
@@ -19,7 +19,7 @@ struct FactorSourceCard: View {
 				card
 
 				Button {
-					onRemoveTapped?()
+					onAction?(.removeTapped)
 				} label: {
 					Image(asset: AssetResource.close)
 						.frame(.smallest)
@@ -44,6 +44,9 @@ struct FactorSourceCard: View {
 							useNarrowSpacing: true,
 							useSmallerFontSize: true
 						)
+						.onTapGesture {
+							onAction?(.messageTapped)
+						}
 					}
 				}
 				.flushedLeft
@@ -51,11 +54,10 @@ struct FactorSourceCard: View {
 				.padding(.bottom, .medium1)
 			}
 
-			if dataSource.hasEntities {
+			if let linkedEntities = dataSource.linkedEntities, !linkedEntities.isEmpty {
 				LinkedEntitesView(
 					isExpanded: isExpanded,
-					accounts: dataSource.accounts,
-					personas: dataSource.personas
+					dataSource: linkedEntities
 				)
 			}
 		}
@@ -108,8 +110,7 @@ struct FactorSourceCard: View {
 
 	struct LinkedEntitesView: SwiftUI.View {
 		@SwiftUI.State var isExpanded: Bool = false
-		let accounts: [Account]
-		let personas: [Persona]
+		let dataSource: FactorSourceCardDataSource.LinkedEntities
 
 		var body: some SwiftUI.View {
 			VStack(alignment: .leading, spacing: .medium2) {
@@ -132,11 +133,11 @@ struct FactorSourceCard: View {
 
 				if isExpanded {
 					VStack(spacing: .small2) {
-						ForEach(accounts) { account in
-							AccountCard(kind: .compact, account: account)
+						ForEach(dataSource.accounts) { account in
+							AccountCard(kind: .display, account: account)
 						}
 
-						ForEach(personas) { persona in
+						ForEach(dataSource.personas) { persona in
 							Card {
 								PlainListRow(
 									context: .compactPersona,
@@ -146,6 +147,16 @@ struct FactorSourceCard: View {
 									Thumbnail(.persona, url: nil)
 								}
 							}
+						}
+
+						if dataSource.hasHiddenEntities {
+							Text(L10n.FactorSources.Card.hiddenAccountsOrPersonas)
+								.textStyle(.body1HighImportance)
+								.foregroundStyle(.app.gray2)
+								.frame(maxWidth: .infinity)
+								.padding(.small1)
+								.background(Color.app.gray4)
+								.cornerRadius(.small1)
 						}
 					}
 				}
@@ -157,15 +168,20 @@ struct FactorSourceCard: View {
 
 		private var linkedTitle: String {
 			typealias Card = L10n.FactorSources.Card
-			let accountsString = accounts.count == 1 ? Card.accountSingular : Card.accountPlural(accounts.count)
-			let personasString = personas.count == 1 ? Card.personaSingular : Card.personaPlural(personas.count)
+			let accountsCount = dataSource.accounts.count
+			let personasCount = dataSource.personas.count
+			let hasHiddenEntities = dataSource.hasHiddenEntities
+			let accountsString = accountsCount == 1 ? Card.accountSingular : Card.accountPlural(accountsCount)
+			let personasString = personasCount == 1 ? Card.personaSingular : Card.personaPlural(personasCount)
 
-			if accounts.count > 0, personas.count > 0 {
-				return Card.linkedAccountsAndPersonas(accountsString, personasString)
-			} else if accounts.count > 0 {
-				return Card.linkedAccountsOrPersonas(accountsString)
-			} else if personas.count > 0 {
-				return Card.linkedAccountsOrPersonas(personasString)
+			if accountsCount > 0, personasCount > 0 {
+				return hasHiddenEntities ? Card.linkedAccountsAndPersonasSomeHidden(accountsString, personasString) : Card.linkedAccountsAndPersonas(accountsString, personasString)
+			} else if accountsCount > 0 {
+				return hasHiddenEntities ? Card.linkedAccountsOrPersonasSomeHidden(accountsString) : Card.linkedAccountsOrPersonas(accountsString)
+			} else if personasCount > 0 {
+				return hasHiddenEntities ? Card.linkedAccountsOrPersonasSomeHidden(personasString) : Card.linkedAccountsOrPersonas(personasString)
+			} else if hasHiddenEntities {
+				return Card.linkedAccountsAndPersonasSomeHidden(accountsString, personasString)
 			}
 			return ""
 		}
@@ -178,7 +194,7 @@ extension FactorSourceCard {
 		mode: Mode,
 		messages: [FactorSourceCardDataSource.Message] = [],
 		isExpanded: Bool = false,
-		onRemoveTapped: (() -> Void)? = nil
+		onAction: ((Action) -> Void)? = nil
 	) {
 		guard kind.factorSourceKind.isSupported else { return nil }
 
@@ -194,7 +210,7 @@ extension FactorSourceCard {
 					messages: messages
 				),
 				isExpanded: isExpanded,
-				onRemoveTapped: onRemoveTapped
+				onAction: onAction
 			)
 		case let .instance(factorSource, instanceKind):
 			switch instanceKind {
@@ -209,9 +225,9 @@ extension FactorSourceCard {
 						messages: messages
 					),
 					isExpanded: isExpanded,
-					onRemoveTapped: onRemoveTapped
+					onAction: onAction
 				)
-			case let .extended(accounts, personas):
+			case let .extended(linkedEntities):
 				self = .init(
 					kind: kind,
 					mode: mode,
@@ -220,11 +236,10 @@ extension FactorSourceCard {
 						title: factorSource.name,
 						lastUsedOn: factorSource.common.lastUsedOn,
 						messages: messages,
-						accounts: accounts,
-						personas: personas
+						linkedEntities: linkedEntities
 					),
 					isExpanded: isExpanded,
-					onRemoveTapped: onRemoveTapped
+					onAction: onAction
 				)
 			}
 		}
@@ -238,7 +253,7 @@ extension FactorSourceCard {
 
 		enum InstanceKind {
 			case short(showDetails: Bool)
-			case extended(accounts: [Account] = [], personas: [Persona] = [])
+			case extended(linkedEntities: FactorSourceCardDataSource.LinkedEntities)
 		}
 	}
 
@@ -251,6 +266,11 @@ extension FactorSourceCard {
 	enum SelectionType {
 		case radioButton
 		case checkmark
+	}
+
+	enum Action {
+		case removeTapped
+		case messageTapped
 	}
 }
 

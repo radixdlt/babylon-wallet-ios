@@ -35,7 +35,8 @@ extension SecureStorageClient: TestDependencyKey {
 		keychainChanged: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		getAllMnemonics: { [] },
 		loadMnemonicDataByFactorSourceID: { _ in nil },
-		saveMnemonicForFactorSourceData: { _, _ in }
+		saveMnemonicForFactorSourceData: { _, _ in },
+		containsDataForKey: { _ in false }
 	)
 	#else
 	static let noop = Self(
@@ -63,7 +64,8 @@ extension SecureStorageClient: TestDependencyKey {
 		saveP2PLinksPrivateKey: { _ in },
 		keychainChanged: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		loadMnemonicDataByFactorSourceID: { _ in nil },
-		saveMnemonicForFactorSourceData: { _, _ in }
+		saveMnemonicForFactorSourceData: { _, _ in },
+		containsDataForKey: { _ in false }
 	)
 	#endif // DEBUG
 
@@ -96,7 +98,8 @@ extension SecureStorageClient: TestDependencyKey {
 		keychainChanged: unimplemented("\(Self.self).keychainChanged"),
 		getAllMnemonics: unimplemented("\(Self.self).getAllMnemonics"),
 		loadMnemonicDataByFactorSourceID: unimplemented("\(Self.self).keychainChanged"),
-		saveMnemonicForFactorSourceData: unimplemented("\(Self.self).keychainChanged")
+		saveMnemonicForFactorSourceData: unimplemented("\(Self.self).saveMnemonicForFactorSourceData"),
+		containsDataForKey: unimplemented("\(Self.self).containsDataForKey")
 	)
 	#else
 	static let testValue = Self(
@@ -124,7 +127,8 @@ extension SecureStorageClient: TestDependencyKey {
 		saveP2PLinksPrivateKey: unimplemented("\(Self.self).saveP2PLinksPrivateKey"),
 		keychainChanged: unimplemented("\(Self.self).keychainChanged"),
 		loadMnemonicDataByFactorSourceID: unimplemented("\(Self.self).keychainChanged"),
-		saveMnemonicForFactorSourceData: unimplemented("\(Self.self).keychainChanged")
+		saveMnemonicForFactorSourceData: unimplemented("\(Self.self).saveMnemonicForFactorSourceData"),
+		containsDataForKey: unimplemented("\(Self.self).containsDataForKey")
 	)
 	#endif
 }

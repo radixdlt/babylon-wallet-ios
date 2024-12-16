@@ -184,6 +184,13 @@ extension FactorSourcesClient {
 	) async throws -> IdentifiedArrayOf<Source> {
 		try await IdentifiedArrayOf(uniqueElements: getFactorSources().compactMap { $0.extract(Source.self) })
 	}
+
+	func entitiesLinkedToFactorSourceKind(kind: FactorSourceKind) async throws -> [EntitiesLinkedToFactorSource] {
+		let sources = try await getFactorSources(matching: { $0.kind == kind })
+		return try await sources.asyncMap {
+			try await SargonOS.shared.entitiesLinkedToFactorSource(factorSource: $0, profileToCheck: .current)
+		}
+	}
 }
 
 // MARK: - UpdateFactorSourceLastUsedRequest

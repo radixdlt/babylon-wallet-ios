@@ -174,7 +174,7 @@ extension CloudBackupClient {
 			guard shouldBackUp || timeToCheckIfClaimed else { return }
 
 			let shouldReclaim: Bool
-			if let backedUpID = backedUpHeader?.lastUsedOnDevice.id, await !profileStore.isThisDevice(deviceID: backedUpID) {
+			if let backedUpID = backedUpHeader?.lastUsedOnDevice.id, SargonOS.shared.hostId().id != backedUpID {
 				let action = await overlayWindowClient.scheduleFullScreen(.init(root: .claimWallet(.init())))
 				switch action {
 				case .claimWallet(.transferBack):
