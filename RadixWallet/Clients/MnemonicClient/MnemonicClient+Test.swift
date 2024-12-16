@@ -8,8 +8,8 @@ extension DependencyValues {
 
 // MARK: - MnemonicClient + TestDependencyKey
 extension MnemonicClient: TestDependencyKey {
-    static let previewValue = Self.noop
-    
+	static let previewValue = Self.noop
+
 	static let testValue = Self(
 		generate: unimplemented("\(Self.self).generate", placeholder: noop.generate),
 		import: unimplemented("\(Self.self).import"),
