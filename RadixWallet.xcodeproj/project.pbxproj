@@ -7248,7 +7248,7 @@
 				8318BB172BC8403800057BCB /* XCRemoteSwiftPackageReference "swift-custom-dump" */,
 				E6A0B0492BF23C7000617DAC /* XCRemoteSwiftPackageReference "swift-identified-collections" */,
 				5B634A922C91D2A0004B2FBC /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */,
-				E76CA07E2D10670C0022197E /* XCRemoteSwiftPackageReference "sargon" */,
+				5B725D472D0C7F370040BA22 /* XCRemoteSwiftPackageReference "sargon" */,
 			);
 			productRefGroup = 48CFBC502ADC106300E77A5C /* Products */;
 			projectDirPath = "";
@@ -9337,6 +9337,14 @@
 				revision = 03769bcd1b1c9c24af424890f0a3e6d15bd3000c;
 			};
 		};
+		5B725D472D0C7F370040BA22 /* XCRemoteSwiftPackageReference "sargon" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/radixdlt/sargon/";
+			requirement = {
+				kind = exactVersion;
+				version = 1.1.88;
+			};
+		};
 		8318BB172BC8403800057BCB /* XCRemoteSwiftPackageReference "swift-custom-dump" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swift-custom-dump";
@@ -9367,14 +9375,6 @@
 			requirement = {
 				kind = exactVersion;
 				version = 1.1.0;
-			};
-		};
-		E76CA07E2D10670C0022197E /* XCRemoteSwiftPackageReference "sargon" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/radixdlt/sargon";
-			requirement = {
-				kind = exactVersion;
-				version = 1.1.85;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
