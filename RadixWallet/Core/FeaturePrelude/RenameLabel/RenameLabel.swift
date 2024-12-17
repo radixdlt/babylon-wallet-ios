@@ -27,6 +27,7 @@ struct RenameLabel: Sendable, FeatureReducer {
 
 	enum InternalAction: Equatable, Sendable {
 		case handleSuccess
+		case handleFactorSourceUpdate(FactorSource)
 	}
 
 	enum DelegateAction: Equatable, Sendable {
@@ -77,8 +78,13 @@ struct RenameLabel: Sendable, FeatureReducer {
 					errorQueue.schedule(error)
 				}
 
-			case var .factorSource(factorSource):
-				return .none
+			case let .factorSource(factorSource, _):
+				return .run { [factorSource = factorSource] send in
+					let updated = try await SargonOS.shared.updateFactorSourceName(factorSource: factorSource, name: nonEmpty.rawValue)
+					await send(.internal(.handleFactorSourceUpdate(updated)))
+				} catch: { error, _ in
+					errorQueue.schedule(error)
+				}
 			}
 
 		case let .focusChanged(value):
@@ -92,6 +98,9 @@ struct RenameLabel: Sendable, FeatureReducer {
 		case .handleSuccess:
 			overlayWindowClient.scheduleHUD(.renamedLabel)
 			return .send(.delegate(.labelUpdated(state.kind)))
+		case let .handleFactorSourceUpdate(factorSource):
+			state.kind = .factorSource(factorSource, name: factorSource.name)
+			return .send(.internal(.handleSuccess))
 		}
 	}
 }
@@ -120,7 +129,7 @@ extension RenameLabel.State {
 	enum Kind: Sendable, Hashable {
 		case account(Account)
 		case connector(P2PLink)
-		case factorSource(FactorSource)
+		case factorSource(FactorSource, name: String)
 
 		fileprivate var label: String {
 			switch self {
@@ -128,8 +137,8 @@ extension RenameLabel.State {
 				account.displayName.rawValue
 			case let .connector(connector):
 				connector.displayName
-			case let .factorSource(factorSource):
-				factorSource.name
+			case let .factorSource(_, name):
+				name
 			}
 		}
 	}

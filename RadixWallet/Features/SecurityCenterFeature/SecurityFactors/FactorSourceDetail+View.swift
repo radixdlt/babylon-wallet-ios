@@ -16,6 +16,7 @@ extension FactorSourceDetail {
 				.background(Color.app.gray5)
 				.radixToolbar(title: viewStore.name)
 				.foregroundStyle(.app.gray1)
+				.destination(store: store)
 			}
 		}
 
@@ -23,27 +24,26 @@ extension FactorSourceDetail {
 			switch viewStore.factorSource.kind {
 			case .device:
 				[
-					.header("Factor Settings"),
+					.header(L10n.FactorSources.Detail.settings),
 					renameRow(viewStore),
-					.header("Test"),
+					.header(L10n.FactorSources.Detail.test),
 					spotCheckRow(viewStore),
-					.header("Advanced"),
+					.header(L10n.FactorSources.Detail.advanced),
 					viewSeedPhraseRow(viewStore),
 				]
 			case .ledgerHqHardwareWallet, .offDeviceMnemonic, .password:
 				[
-					.header("Factor Settings"),
+					.header(L10n.FactorSources.Detail.settings),
 					renameRow(viewStore),
-					.header("Test"),
+					.header(L10n.FactorSources.Detail.test),
 					spotCheckRow(viewStore),
 				]
 			case .arculusCard:
 				[
-					.header("Factor Settings"),
+					.header(L10n.FactorSources.Detail.settings),
 					renameRow(viewStore),
-					togglePinRow(viewStore),
 					changePinRow(viewStore),
-					.header("Test"),
+					.header(L10n.FactorSources.Detail.test),
 					spotCheckRow(viewStore),
 				]
 			case .trustedContact, .securityQuestions:
@@ -54,7 +54,7 @@ extension FactorSourceDetail {
 		private func renameRow(_ viewStore: ViewStore<FactorSourceDetail.State, FactorSourceDetail.ViewAction>) -> SettingsRow<FactorSourceDetail>.Kind {
 			.model(
 				title: viewStore.name,
-				subtitle: "Rename this factor",
+				subtitle: L10n.FactorSources.Detail.rename,
 				icon: .asset(.create),
 				action: .renameTapped
 			)
@@ -62,8 +62,8 @@ extension FactorSourceDetail {
 
 		private func spotCheckRow(_ viewStore: ViewStore<FactorSourceDetail.State, FactorSourceDetail.ViewAction>) -> SettingsRow<FactorSourceDetail>.Kind {
 			.model(
-				title: "Spot Check",
-				subtitle: "Test that you can use this factor",
+				title: L10n.FactorSources.Detail.spotCheck,
+				subtitle: L10n.FactorSources.Detail.testCanUse,
 				markdown: viewStore.lastUsed,
 				icon: .systemImage("checkmark.circle"),
 				action: .renameTapped
@@ -72,25 +72,16 @@ extension FactorSourceDetail {
 
 		private func viewSeedPhraseRow(_ viewStore: ViewStore<FactorSourceDetail.State, FactorSourceDetail.ViewAction>) -> SettingsRow<FactorSourceDetail>.Kind {
 			.model(
-				title: "View Seed Phrase",
-				subtitle: "Write down the seed phrase for advanced recovery",
+				title: L10n.FactorSources.Detail.viewSeedPhrase,
+				subtitle: L10n.FactorSources.Detail.writeSeedPhrase,
 				icon: .systemImage("eye.fill"),
 				action: .viewSeedPhraseTapped
 			)
 		}
 
-		private func togglePinRow(_ viewStore: ViewStore<FactorSourceDetail.State, FactorSourceDetail.ViewAction>) -> SettingsRow<FactorSourceDetail>.Kind {
-			.toggleModel(
-				icon: .create,
-				title: "Turn PIN on/off",
-				minHeight: .zero,
-				isOn: .constant(true)
-			)
-		}
-
 		private func changePinRow(_ viewStore: ViewStore<FactorSourceDetail.State, FactorSourceDetail.ViewAction>) -> SettingsRow<FactorSourceDetail>.Kind {
 			.model(
-				title: "Change PIN",
+				title: L10n.FactorSources.Detail.changePin,
 				icon: .asset(.create),
 				action: .changePinTapped
 			)
@@ -99,12 +90,38 @@ extension FactorSourceDetail {
 }
 
 private extension FactorSourceDetail.State {
-	var name: String {
-		factorSource.asGeneral.name
-	}
-
 	var lastUsed: String {
 		let value = RadixDateFormatter.string(from: factorSource.asGeneral.common.lastUsedOn, dateStyle: .abbreviated)
-		return "**Last used:** \(value)"
+		return L10n.FactorSources.Detail.lastUsed(value)
+	}
+}
+
+private extension StoreOf<FactorSourceDetail> {
+	var destination: PresentationStoreOf<FactorSourceDetail.Destination> {
+		func scopeState(state: State) -> PresentationState<FactorSourceDetail.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destination(store: StoreOf<FactorSourceDetail>) -> some View {
+		let destinationStore = store.destination
+		return rename(with: destinationStore)
+			.displayMnemonic(with: destinationStore)
+	}
+
+	private func rename(with destinationStore: PresentationStoreOf<FactorSourceDetail.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.rename, action: \.rename)) {
+			RenameLabel.View(store: $0)
+		}
+	}
+
+	private func displayMnemonic(with destinationStore: PresentationStoreOf<FactorSourceDetail.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.displayMnemonic, action: \.displayMnemonic)) {
+			DisplayMnemonic.View(store: $0)
+		}
 	}
 }
