@@ -61,6 +61,10 @@ final class SargonSecureStorage: SecureStorageDriver {
 		}
 	}
 
+	func containsDataForKey(key: SecureStorageKey) async throws -> Bool {
+		false
+	}
+
 	private func loadHostId() -> BagOfBytes? {
 		let deviceInfo: DeviceInfo? = {
 			if let existing = try? secureStorageClient.loadDeviceInfo() {

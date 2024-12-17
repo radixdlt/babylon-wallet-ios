@@ -218,6 +218,7 @@ struct Splash: Sendable, FeatureReducer {
 						drivers: .init(
 							bundle: Bundle.main,
 							userDefaultsSuite: UserDefaults.Dependency.radixSuiteName,
+							unsafeStorageKeyMapping: [:],
 							secureStorageDriver: SargonSecureStorage()
 						)
 					)

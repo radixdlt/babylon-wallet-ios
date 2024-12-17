@@ -2,6 +2,11 @@ import Sargon
 
 extension InteractionReview.Sections {
 	func sections(for summary: ManifestSummary, networkID: NetworkID) async throws -> Common.SectionsData? {
+		/// Only GeneralSubintent classification is allowed for PreAuth transactions
+		guard summary.classification.first == .generalSubintent else {
+			return nil
+		}
+
 		let allWithdrawAddresses = summary.accountWithdrawals.values.flatMap { $0 }.map(\.resourceAddress)
 		let allDepositAddresses = summary.accountDeposits.values.flatMap(\.specifiedResources).map(\.resourceAddress)
 
