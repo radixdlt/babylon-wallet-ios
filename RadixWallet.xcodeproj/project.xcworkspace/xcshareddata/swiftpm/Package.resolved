@@ -1,5 +1,5 @@
 {
-  "originHash" : "03361118eb2c7d6f937fa0aa327973505bfd01900c306b353a09ba5232403bcf",
+  "originHash" : "33326f36b92b5b0e7c50c3a80a4e918aaeb187edd49f688889fd0c7bfc186e4b",
   "pins" : [
     {
       "identity" : "anycodable",
@@ -385,15 +385,6 @@
       "state" : {
         "revision" : "af76cf3ef710b6ca5f8c05f3a31307d44a3c5828",
         "version" : "5.0.2"
-      }
-    },
-    {
-      "identity" : "textbuilder",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/davdroman/TextBuilder",
-      "state" : {
-        "revision" : "65b7c7bb9b163f4fc2d755c52a89a6f3040300df",
-        "version" : "3.0.1"
       }
     },
     {
