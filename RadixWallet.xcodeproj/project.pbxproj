@@ -688,7 +688,6 @@
 		48FFFADE2ADC21F500B2B213 /* FileLogging in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFADD2ADC21F500B2B213 /* FileLogging */; };
 		48FFFAE12ADC220F00B2B213 /* Tagged in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAE02ADC220F00B2B213 /* Tagged */; };
 		48FFFAE42ADC222100B2B213 /* Validated in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAE32ADC222100B2B213 /* Validated */; };
-		48FFFAE72ADC223300B2B213 /* Overture in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAE62ADC223300B2B213 /* Overture */; };
 		48FFFAED2ADC226B00B2B213 /* CodeScanner in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAEC2ADC226B00B2B213 /* CodeScanner */; };
 		48FFFAF02ADC229900B2B213 /* AnyCodable in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAEF2ADC229900B2B213 /* AnyCodable */; };
 		48FFFAF22ADC23AC00B2B213 /* Exports.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48FFFAF12ADC23AC00B2B213 /* Exports.swift */; };
@@ -2588,7 +2587,6 @@
 			files = (
 				E7AE2D052BF7844300830BAA /* Sargon in Frameworks */,
 				48FFFABE2ADC209100B2B213 /* NukeUI in Frameworks */,
-				48FFFAE72ADC223300B2B213 /* Overture in Frameworks */,
 				48FFFA9F2ADC1F2700B2B213 /* KeychainAccess in Frameworks */,
 				48FFFAF72ADC241A00B2B213 /* Collections in Frameworks */,
 				48FFFAF92ADC241A00B2B213 /* DequeModule in Frameworks */,
@@ -7146,7 +7144,6 @@
 				48FFFADD2ADC21F500B2B213 /* FileLogging */,
 				48FFFAE02ADC220F00B2B213 /* Tagged */,
 				48FFFAE32ADC222100B2B213 /* Validated */,
-				48FFFAE62ADC223300B2B213 /* Overture */,
 				48FFFAEC2ADC226B00B2B213 /* CodeScanner */,
 				48FFFAEF2ADC229900B2B213 /* AnyCodable */,
 				48FFFAF42ADC241A00B2B213 /* BitCollections */,
@@ -7226,7 +7223,6 @@
 				48FFFADC2ADC21F500B2B213 /* XCRemoteSwiftPackageReference "swift-log-file" */,
 				48FFFADF2ADC220F00B2B213 /* XCRemoteSwiftPackageReference "swift-tagged" */,
 				48FFFAE22ADC222100B2B213 /* XCRemoteSwiftPackageReference "swift-validated" */,
-				48FFFAE52ADC223300B2B213 /* XCRemoteSwiftPackageReference "swift-overture" */,
 				48FFFAEB2ADC226B00B2B213 /* XCRemoteSwiftPackageReference "CodeScanner" */,
 				48FFFAEE2ADC229900B2B213 /* XCRemoteSwiftPackageReference "AnyCodable" */,
 				48FFFAF32ADC241A00B2B213 /* XCRemoteSwiftPackageReference "swift-collections" */,
@@ -9253,14 +9249,6 @@
 				version = 0.2.1;
 			};
 		};
-		48FFFAE52ADC223300B2B213 /* XCRemoteSwiftPackageReference "swift-overture" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/pointfreeco/swift-overture.git";
-			requirement = {
-				kind = exactVersion;
-				version = 0.5.0;
-			};
-		};
 		48FFFAEB2ADC226B00B2B213 /* XCRemoteSwiftPackageReference "CodeScanner" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/twostraws/CodeScanner";
@@ -9464,11 +9452,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 48FFFAE22ADC222100B2B213 /* XCRemoteSwiftPackageReference "swift-validated" */;
 			productName = Validated;
-		};
-		48FFFAE62ADC223300B2B213 /* Overture */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 48FFFAE52ADC223300B2B213 /* XCRemoteSwiftPackageReference "swift-overture" */;
-			productName = Overture;
 		};
 		48FFFAEC2ADC226B00B2B213 /* CodeScanner */ = {
 			isa = XCSwiftPackageProductDependency;
