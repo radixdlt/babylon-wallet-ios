@@ -153,7 +153,7 @@ extension UserDefaults.Dependency {
 
 	func appendMigratedKeychainProfiles(_ value: some Collection<ProfileID>) throws {
 		var migrated = getMigratedKeychainProfiles
-		migrated.append(contentsOf: value)
+		migrated.formUnion(value)
 		try save(codable: migrated, forKey: .migratedKeychainProfiles)
 	}
 

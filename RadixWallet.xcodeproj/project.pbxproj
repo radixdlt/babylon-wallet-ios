@@ -695,7 +695,6 @@
 		48FFFAF92ADC241A00B2B213 /* DequeModule in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAF82ADC241A00B2B213 /* DequeModule */; };
 		48FFFAFB2ADC241A00B2B213 /* HashTreeCollections in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAFA2ADC241A00B2B213 /* HashTreeCollections */; };
 		48FFFAFD2ADC241A00B2B213 /* HeapModule in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAFC2ADC241A00B2B213 /* HeapModule */; };
-		48FFFB032ADC6F8100B2B213 /* Builders in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB022ADC6F8100B2B213 /* Builders */; };
 		48FFFB0A2ADC721800B2B213 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB092ADC721800B2B213 /* Atomics */; };
 		5B03E3CF2CC1223000E10A64 /* DisplayMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B03E3CE2CC1222D00E10A64 /* DisplayMode.swift */; };
 		5B03E3D12CC127B100E10A64 /* RawManifestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B03E3D02CC127B100E10A64 /* RawManifestView.swift */; };
@@ -2605,7 +2604,6 @@
 				48FFFAFB2ADC241A00B2B213 /* HashTreeCollections in Frameworks */,
 				48FFFAC52ADC211700B2B213 /* JSONTesting in Frameworks */,
 				5B1C4FD52BBB0B0C00B9436F /* AppsFlyerLib-Strict in Frameworks */,
-				48FFFB032ADC6F8100B2B213 /* Builders in Frameworks */,
 				5B1BE3912D09E62A00201E30 /* Sargon in Frameworks */,
 				5B634A942C91D2A0004B2FBC /* ScreenshotPreventing in Frameworks */,
 				48FFFA992ADC1EEC00B2B213 /* AsyncExtensions in Frameworks */,
@@ -7146,7 +7144,6 @@
 				48FFFAF82ADC241A00B2B213 /* DequeModule */,
 				48FFFAFA2ADC241A00B2B213 /* HashTreeCollections */,
 				48FFFAFC2ADC241A00B2B213 /* HeapModule */,
-				48FFFB022ADC6F8100B2B213 /* Builders */,
 				48FFFB092ADC721800B2B213 /* Atomics */,
 				E63D123C2ADD1FC00001CBB1 /* SwiftUIIntrospect */,
 				A47571FE2B29B0860059A95D /* IOSSecuritySuite */,
@@ -7219,7 +7216,6 @@
 				48FFFAEB2ADC226B00B2B213 /* XCRemoteSwiftPackageReference "CodeScanner" */,
 				48FFFAEE2ADC229900B2B213 /* XCRemoteSwiftPackageReference "AnyCodable" */,
 				48FFFAF32ADC241A00B2B213 /* XCRemoteSwiftPackageReference "swift-collections" */,
-				48FFFB012ADC6F8100B2B213 /* XCRemoteSwiftPackageReference "swift-builders" */,
 				A47571FD2B29B0860059A95D /* XCRemoteSwiftPackageReference "IOSSecuritySuite" */,
 				A415574E2B757C5E0040AD4E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
 				5B1C4FD32BBB0B0C00B9436F /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Strict" */,
@@ -9257,14 +9253,6 @@
 				version = 1.1.0;
 			};
 		};
-		48FFFB012ADC6F8100B2B213 /* XCRemoteSwiftPackageReference "swift-builders" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/davdroman/swift-builders";
-			requirement = {
-				kind = exactVersion;
-				version = 0.6.0;
-			};
-		};
 		5B1C4FD32BBB0B0C00B9436F /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Strict" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/AppsFlyerSDK/AppsFlyerFramework-Strict";
@@ -9458,11 +9446,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 48FFFAF32ADC241A00B2B213 /* XCRemoteSwiftPackageReference "swift-collections" */;
 			productName = HeapModule;
-		};
-		48FFFB022ADC6F8100B2B213 /* Builders */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 48FFFB012ADC6F8100B2B213 /* XCRemoteSwiftPackageReference "swift-builders" */;
-			productName = Builders;
 		};
 		48FFFB092ADC721800B2B213 /* Atomics */ = {
 			isa = XCSwiftPackageProductDependency;
