@@ -77,7 +77,7 @@ extension Profile {
 					factorSourceId: privateHDFactorSource.factorSource.id,
 					publicKey: .sample
 				),
-				authenticationSigning: nil
+				provisionalSecurifiedConfig: nil
 			)
 		)
 
