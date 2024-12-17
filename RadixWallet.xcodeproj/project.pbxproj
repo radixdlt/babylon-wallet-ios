@@ -674,7 +674,6 @@
 		48FFFAA82ADC1FBE00B2B213 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAA72ADC1FBE00B2B213 /* Atomics */; };
 		48FFFAAB2ADC1FE900B2B213 /* DependenciesAdditions in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAAA2ADC1FE900B2B213 /* DependenciesAdditions */; };
 		48FFFAB12ADC203700B2B213 /* WebRTC in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAB02ADC203700B2B213 /* WebRTC */; };
-		48FFFAB72ADC207B00B2B213 /* NavigationTransitions in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAB62ADC207B00B2B213 /* NavigationTransitions */; };
 		48FFFABA2ADC209100B2B213 /* Nuke in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAB92ADC209100B2B213 /* Nuke */; };
 		48FFFABC2ADC209100B2B213 /* NukeExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFABB2ADC209100B2B213 /* NukeExtensions */; };
 		48FFFABE2ADC209100B2B213 /* NukeUI in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFABD2ADC209100B2B213 /* NukeUI */; };
@@ -2607,7 +2606,6 @@
 				48FFFAC52ADC211700B2B213 /* JSONTesting in Frameworks */,
 				5B1C4FD52BBB0B0C00B9436F /* AppsFlyerLib-Strict in Frameworks */,
 				48FFFB032ADC6F8100B2B213 /* Builders in Frameworks */,
-				48FFFAB72ADC207B00B2B213 /* NavigationTransitions in Frameworks */,
 				5B1BE3912D09E62A00201E30 /* Sargon in Frameworks */,
 				5B634A942C91D2A0004B2FBC /* ScreenshotPreventing in Frameworks */,
 				48FFFA992ADC1EEC00B2B213 /* AsyncExtensions in Frameworks */,
@@ -7128,7 +7126,6 @@
 				48FFFAA72ADC1FBE00B2B213 /* Atomics */,
 				48FFFAAA2ADC1FE900B2B213 /* DependenciesAdditions */,
 				48FFFAB02ADC203700B2B213 /* WebRTC */,
-				48FFFAB62ADC207B00B2B213 /* NavigationTransitions */,
 				48FFFAB92ADC209100B2B213 /* Nuke */,
 				48FFFABB2ADC209100B2B213 /* NukeExtensions */,
 				48FFFABD2ADC209100B2B213 /* NukeUI */,
@@ -7208,7 +7205,6 @@
 				48FFFAA92ADC1FE900B2B213 /* XCRemoteSwiftPackageReference "swift-dependencies-additions" */,
 				48FFFAAF2ADC203700B2B213 /* XCRemoteSwiftPackageReference "WebRTC" */,
 				48FFFAB22ADC206300B2B213 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
-				48FFFAB52ADC207B00B2B213 /* XCRemoteSwiftPackageReference "swiftui-navigation-transitions" */,
 				48FFFAB82ADC209100B2B213 /* XCRemoteSwiftPackageReference "Nuke" */,
 				48FFFABF2ADC20C400B2B213 /* XCRemoteSwiftPackageReference "JSONPreview" */,
 				48FFFAC32ADC211700B2B213 /* XCRemoteSwiftPackageReference "swift-json-testing" */,
@@ -9149,14 +9145,6 @@
 				version = 1.0.0;
 			};
 		};
-		48FFFAB52ADC207B00B2B213 /* XCRemoteSwiftPackageReference "swiftui-navigation-transitions" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/davdroman/swiftui-navigation-transitions";
-			requirement = {
-				kind = exactVersion;
-				version = 0.13.3;
-			};
-		};
 		48FFFAB82ADC209100B2B213 /* XCRemoteSwiftPackageReference "Nuke" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/kean/Nuke";
@@ -9370,11 +9358,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 48FFFAAF2ADC203700B2B213 /* XCRemoteSwiftPackageReference "WebRTC" */;
 			productName = WebRTC;
-		};
-		48FFFAB62ADC207B00B2B213 /* NavigationTransitions */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 48FFFAB52ADC207B00B2B213 /* XCRemoteSwiftPackageReference "swiftui-navigation-transitions" */;
-			productName = NavigationTransitions;
 		};
 		48FFFAB92ADC209100B2B213 /* Nuke */ = {
 			isa = XCSwiftPackageProductDependency;

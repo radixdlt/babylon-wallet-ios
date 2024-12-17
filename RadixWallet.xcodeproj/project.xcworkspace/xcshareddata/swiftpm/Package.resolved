@@ -1,5 +1,5 @@
 {
-  "originHash" : "1bb0dae378b6088bd3f28e0267de18edeb975f7bf487e2cd1e6b0d2d4efa8a4f",
+  "originHash" : "d891f8c37bcb58f1bcfb9a9c823d129a6a71c62c3bdc45b641fd447a0c2605c8",
   "pins" : [
     {
       "identity" : "anycodable",
@@ -358,15 +358,6 @@
       "state" : {
         "revision" : "3ba734dd20faada0e3234b68e78db97005315f0e",
         "version" : "1.0.0"
-      }
-    },
-    {
-      "identity" : "swiftui-navigation-transitions",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/davdroman/swiftui-navigation-transitions",
-      "state" : {
-        "revision" : "a6a3c70ad5d771bd1e927fb55897231cd9592024",
-        "version" : "0.13.3"
       }
     },
     {

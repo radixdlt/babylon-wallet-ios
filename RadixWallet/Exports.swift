@@ -1,8 +1,6 @@
 @_exported import Algorithms
 @_exported import AsyncAlgorithms
 @_exported import AsyncExtensions
-@_exported import BigInt
-@_exported import BitCollections
 @_exported import Builders
 @_exported import CasePaths
 @_exported import CollectionConcurrencyKit
@@ -14,14 +12,10 @@
 @_exported import DependenciesAdditions
 @_exported import Either
 @_exported import Foundation
-@_exported import IdentifiedCollections
 @_exported import KeychainAccess
 @_exported import LegibleError
 @_exported import Logging
-@_exported import NavigationTransitions
 @_exported import NonEmpty
-@_exported import Overture
 @_exported import Sargon
 @_exported import Tagged
-@_exported import TextBuilder
 @_exported import Validated
