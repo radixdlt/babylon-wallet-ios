@@ -11,7 +11,7 @@ extension ErrorQueue: TestDependencyKey {
 	static let previewValue = liveValue
 
 	static let testValue = Self(
-		errors: unimplemented("\(Self.self).errors", placeholder: noop.errors),
+		errors: unimplemented("\(Self.self).errors"),
 		schedule: unimplemented("\(Self.self).schedule")
 	)
 

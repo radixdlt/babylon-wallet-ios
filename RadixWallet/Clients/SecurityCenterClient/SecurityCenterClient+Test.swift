@@ -23,8 +23,8 @@ extension SecurityCenterClient: TestDependencyKey {
 
 	static let testValue = Self(
 		startMonitoring: unimplemented("\(Self.self).startMonitoring"),
-		problems: unimplemented("\(Self.self).problems", placeholder: noop.problems),
-		lastManualBackup: unimplemented("\(Self.self).lastManualBackup", placeholder: noop.lastManualBackup),
-		lastCloudBackup: unimplemented("\(Self.self).lastCloudBackup", placeholder: noop.lastCloudBackup)
+		problems: noop.problems,
+		lastManualBackup: noop.lastManualBackup,
+		lastCloudBackup: noop.lastCloudBackup
 	)
 }

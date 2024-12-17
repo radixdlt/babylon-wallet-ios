@@ -2,16 +2,16 @@
 // MARK: - BannerClient + TestDependencyKey
 extension OverlayWindowClient: TestDependencyKey {
 	static let testValue = Self(
-		scheduledItems: unimplemented("\(Self.self).scheduledItems", placeholder: noop.scheduledItems),
-		scheduleAlert: unimplemented("\(Self.self).scheduleAlert", placeholder: noop.scheduleAlert),
+		scheduledItems: noop.scheduledItems,
+		scheduleAlert: noop.scheduleAlert,
 		scheduleAlertAndIgnoreAction: unimplemented("\(Self.self).scheduleAlertAndIgnoreAction"),
 		scheduleHUD: unimplemented("\(Self.self).scheduleHUD"),
 		scheduleSheet: unimplemented("\(Self.self).scheduleSheet"),
-		scheduleFullScreen: unimplemented("\(Self.self).scheduleFullScreen", placeholder: noop.scheduleFullScreen),
+		scheduleFullScreen: noop.scheduleFullScreen,
 		sendAlertAction: unimplemented("\(Self.self).sendAlertAction"),
 		sendFullScreenAction: unimplemented("\(Self.self).sendFullScreenAction"),
 		setIsUserIteractionEnabled: unimplemented("\(Self.self).setIsUserIteractionEnabled"),
-		isUserInteractionEnabled: unimplemented("\(Self.self).isUserInteractionEnabled", placeholder: noop.isUserInteractionEnabled)
+		isUserInteractionEnabled: noop.isUserInteractionEnabled
 	)
 
 	static let noop = Self(

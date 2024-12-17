@@ -27,12 +27,12 @@ extension CloudBackupClient: TestDependencyKey {
 	)
 
 	static let testValue = Self(
-		isCloudProfileSyncEnabled: unimplemented("\(Self.self).isCloudProfileSyncEnabled", placeholder: noop.isCloudProfileSyncEnabled),
+		isCloudProfileSyncEnabled: noop.isCloudProfileSyncEnabled,
 		startAutomaticBackups: unimplemented("\(Self.self).startAutomaticBackups"),
 		migrateProfilesFromKeychain: unimplemented("\(Self.self).migrateProfilesFromKeychain"),
 		deleteProfileBackup: unimplemented("\(Self.self).deleteProfileBackup"),
 		checkAccountStatus: unimplemented("\(Self.self).checkAccountStatus"),
-		lastBackup: unimplemented("\(Self.self).lastBackup", placeholder: noop.lastBackup),
+		lastBackup: noop.lastBackup,
 		loadProfile: unimplemented("\(Self.self).loadProfile"),
 		loadProfileHeaders: unimplemented("\(Self.self).loadProfileHeaders"),
 		claimProfileOnICloud: unimplemented("\(Self.self).claimProfileOnICloud")

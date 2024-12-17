@@ -11,9 +11,9 @@ extension MnemonicClient: TestDependencyKey {
 	static let previewValue = Self.noop
 
 	static let testValue = Self(
-		generate: unimplemented("\(Self.self).generate", placeholder: noop.generate),
+		generate: noop.generate,
 		import: unimplemented("\(Self.self).import"),
-		lookup: unimplemented("\(Self.self).lookup", placeholder: noop.lookup)
+		lookup: noop.lookup
 	)
 
 	static let noop = Self(

@@ -5,17 +5,17 @@ extension RadixConnectClient: TestDependencyKey {
 	static let previewValue = Self.noop
 
 	static let testValue = Self(
-		loadP2PLinksAndConnectAll: unimplemented("\(Self.self).loadFromProfileAndConnectAll", placeholder: noop.loadP2PLinksAndConnectAll),
+		loadP2PLinksAndConnectAll: noop.loadP2PLinksAndConnectAll,
 		disconnectAll: unimplemented("\(Self.self).disconnectAll"),
 		connectToP2PLinks: unimplemented("\(Self.self).connectToP2PLinks"),
-		getLocalNetworkAccess: unimplemented("\(Self.self).getLocalNetworkAccess", placeholder: noop.getLocalNetworkAccess),
+		getLocalNetworkAccess: noop.getLocalNetworkAccess,
 		getP2PLinks: unimplemented("\(Self.self).getP2PLinks"),
-		getP2PLinksWithConnectionStatusUpdates: unimplemented("\(Self.self).getP2PLinksWithConnectionStatusUpdates", placeholder: noop.getP2PLinksWithConnectionStatusUpdates),
-		idsOfConnectedPeerConnections: unimplemented("\(Self.self).idsOfConnectedPeerConnections", placeholder: noop.idsOfConnectedPeerConnections),
+		getP2PLinksWithConnectionStatusUpdates: noop.getP2PLinksWithConnectionStatusUpdates,
+		idsOfConnectedPeerConnections: noop.idsOfConnectedPeerConnections,
 		updateOrAddP2PLink: unimplemented("\(Self.self).updateOrAddP2PLink"),
 		deleteP2PLinkByPassword: unimplemented("\(Self.self).deleteP2PLinkByPassword"),
 		connectP2PLink: unimplemented("\(Self.self).connectP2PLink"),
-		receiveMessages: unimplemented("\(Self.self).receiveMessages", placeholder: noop.receiveMessages),
+		receiveMessages: noop.receiveMessages,
 		sendResponse: unimplemented("\(Self.self).sendResponse"),
 		sendRequest: unimplemented("\(Self.self).sendRequest"),
 		handleDappDeepLink: unimplemented("\(Self.self).sendRequest"),

@@ -75,7 +75,7 @@ extension SecureStorageClient: TestDependencyKey {
 		saveProfileSnapshotData: unimplemented("\(Self.self).keychainChanged"),
 		saveMnemonicForFactorSource: unimplemented("\(Self.self).saveMnemonicForFactorSource"),
 		loadMnemonicByFactorSourceID: unimplemented("\(Self.self).loadMnemonicByFactorSourceID"),
-		containsMnemonicIdentifiedByFactorSourceID: unimplemented("\(Self.self).containsMnemonicIdentifiedByFactorSourceID", placeholder: noop.containsMnemonicIdentifiedByFactorSourceID),
+		containsMnemonicIdentifiedByFactorSourceID: noop.containsMnemonicIdentifiedByFactorSourceID,
 		deleteMnemonicByFactorSourceID: unimplemented("\(Self.self).deleteMnemonicByFactorSourceID"),
 		deleteProfileAndMnemonicsByFactorSourceIDs: unimplemented("\(Self.self).deleteProfileMnemonicsByFactorSourceIDs"),
 		disableCloudProfileSync: unimplemented("\(Self.self).disableCloudProfileSync"),
@@ -93,8 +93,8 @@ extension SecureStorageClient: TestDependencyKey {
 		saveP2PLinks: unimplemented("\(Self.self).saveP2PLinks"),
 		loadP2PLinksPrivateKey: unimplemented("\(Self.self).loadP2PLinksPrivateKey"),
 		saveP2PLinksPrivateKey: unimplemented("\(Self.self).saveP2PLinksPrivateKey"),
-		keychainChanged: unimplemented("\(Self.self).keychainChanged", placeholder: noop.keychainChanged),
-		getAllMnemonics: unimplemented("\(Self.self).getAllMnemonics", placeholder: noop.getAllMnemonics),
+		keychainChanged: noop.keychainChanged,
+		getAllMnemonics: noop.getAllMnemonics,
 		loadMnemonicDataByFactorSourceID: unimplemented("\(Self.self).keychainChanged"),
 		saveMnemonicForFactorSourceData: unimplemented("\(Self.self).keychainChanged")
 	)
@@ -104,7 +104,7 @@ extension SecureStorageClient: TestDependencyKey {
 		saveProfileSnapshotData: unimplemented("\(Self.self).keychainChanged"),
 		saveMnemonicForFactorSource: unimplemented("\(Self.self).saveMnemonicForFactorSource"),
 		loadMnemonicByFactorSourceID: unimplemented("\(Self.self).loadMnemonicByFactorSourceID"),
-		containsMnemonicIdentifiedByFactorSourceID: unimplemented("\(Self.self).containsMnemonicIdentifiedByFactorSourceID", placeholder: noop.containsMnemonicIdentifiedByFactorSourceID),
+		containsMnemonicIdentifiedByFactorSourceID: noop.containsMnemonicIdentifiedByFactorSourceID,
 		deleteMnemonicByFactorSourceID: unimplemented("\(Self.self).deleteMnemonicByFactorSourceID"),
 		deleteProfileAndMnemonicsByFactorSourceIDs: unimplemented("\(Self.self).deleteProfileMnemonicsByFactorSourceIDs"),
 		disableCloudProfileSync: unimplemented("\(Self.self).disableCloudProfileSync"),
@@ -122,7 +122,7 @@ extension SecureStorageClient: TestDependencyKey {
 		saveP2PLinks: unimplemented("\(Self.self).saveP2PLinks"),
 		loadP2PLinksPrivateKey: unimplemented("\(Self.self).loadP2PLinksPrivateKey"),
 		saveP2PLinksPrivateKey: unimplemented("\(Self.self).saveP2PLinksPrivateKey"),
-		keychainChanged: unimplemented("\(Self.self).keychainChanged", placeholder: noop.keychainChanged),
+		keychainChanged: noop.keychainChanged,
 		loadMnemonicDataByFactorSourceID: unimplemented("\(Self.self).keychainChanged"),
 		saveMnemonicForFactorSourceData: unimplemented("\(Self.self).keychainChanged")
 	)
