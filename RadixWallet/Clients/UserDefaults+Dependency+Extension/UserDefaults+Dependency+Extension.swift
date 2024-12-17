@@ -24,6 +24,14 @@ enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
 	case mnemonicsUserClaimsToHaveBackedUp
 }
 
+extension UnsafeStorageKeyMapping {
+	static var sargonOSMapping: Self {
+		[
+			.factorSourceUserHasWrittenDown: UserDefaultsKey.mnemonicsUserClaimsToHaveBackedUp.rawValue,
+		]
+	}
+}
+
 extension UserDefaults.Dependency {
 	typealias Key = UserDefaultsKey
 	static let radixSuiteName: String = "group.com.radixpublishing.preview"

@@ -1848,6 +1848,30 @@ internal enum L10n {
       /// 1 Persona
       internal static let personaSingular = L10n.tr("Localizable", "factorSources_card_personaSingular", fallback: "1 Persona")
     }
+    internal enum Detail {
+      /// Advanced
+      internal static let advanced = L10n.tr("Localizable", "factorSources_detail_advanced", fallback: "Advanced")
+      /// Change PIN
+      internal static let changePin = L10n.tr("Localizable", "factorSources_detail_changePin", fallback: "Change PIN")
+      /// **Last used:** %@
+      internal static func lastUsed(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "factorSources_detail_lastUsed", String(describing: p1), fallback: "**Last used:** %@")
+      }
+      /// Rename this factor
+      internal static let rename = L10n.tr("Localizable", "factorSources_detail_rename", fallback: "Rename this factor")
+      /// Factor Settings
+      internal static let settings = L10n.tr("Localizable", "factorSources_detail_settings", fallback: "Factor Settings")
+      /// Spot Check
+      internal static let spotCheck = L10n.tr("Localizable", "factorSources_detail_spotCheck", fallback: "Spot Check")
+      /// Test
+      internal static let test = L10n.tr("Localizable", "factorSources_detail_test", fallback: "Test")
+      /// Test that you can use this factor
+      internal static let testCanUse = L10n.tr("Localizable", "factorSources_detail_testCanUse", fallback: "Test that you can use this factor")
+      /// View Seed Phrase
+      internal static let viewSeedPhrase = L10n.tr("Localizable", "factorSources_detail_viewSeedPhrase", fallback: "View Seed Phrase")
+      /// Write down the seed phrase for advanced recovery
+      internal static let writeSeedPhrase = L10n.tr("Localizable", "factorSources_detail_writeSeedPhrase", fallback: "Write down the seed phrase for advanced recovery")
+    }
     internal enum Kind {
       /// Phone
       internal static let device = L10n.tr("Localizable", "factorSources_kind_device", fallback: "Phone")
@@ -3435,6 +3459,38 @@ internal enum L10n {
       internal static let useNewWalletAlertMessageOlympia = L10n.tr("Localizable", "recoverWalletWithoutProfile_start_useNewWalletAlertMessageOlympia", fallback: "Tap “I'm a New Wallet User”. After completing wallet creation, in Settings you can perform an “account recovery scan” using your Olympia seed phrase.")
       /// No Main Seed Phrase?
       internal static let useNewWalletAlertTitle = L10n.tr("Localizable", "recoverWalletWithoutProfile_start_useNewWalletAlertTitle", fallback: "No Main Seed Phrase?")
+    }
+  }
+  internal enum RenameLabel {
+    /// Updated
+    internal static let success = L10n.tr("Localizable", "renameLabel_success", fallback: "Updated")
+    /// Update
+    internal static let update = L10n.tr("Localizable", "renameLabel_update", fallback: "Update")
+    internal enum Account {
+      /// Account label required
+      internal static let empty = L10n.tr("Localizable", "renameLabel_account_empty", fallback: "Account label required")
+      /// Enter a new label for this Account
+      internal static let subtitle = L10n.tr("Localizable", "renameLabel_account_subtitle", fallback: "Enter a new label for this Account")
+      /// Rename Account
+      internal static let title = L10n.tr("Localizable", "renameLabel_account_title", fallback: "Rename Account")
+      /// Account label too long
+      internal static let tooLong = L10n.tr("Localizable", "renameLabel_account_tooLong", fallback: "Account label too long")
+    }
+    internal enum Connector {
+      /// Linked Connector name required
+      internal static let empty = L10n.tr("Localizable", "renameLabel_connector_empty", fallback: "Linked Connector name required")
+      /// Enter a new name for this Linked Connector
+      internal static let subtitle = L10n.tr("Localizable", "renameLabel_connector_subtitle", fallback: "Enter a new name for this Linked Connector")
+      /// Rename Connector
+      internal static let title = L10n.tr("Localizable", "renameLabel_connector_title", fallback: "Rename Connector")
+    }
+    internal enum FactorSource {
+      /// Factor Source name required
+      internal static let empty = L10n.tr("Localizable", "renameLabel_factorSource_empty", fallback: "Factor Source name required")
+      /// Enter a new name for this Factor Source
+      internal static let subtitle = L10n.tr("Localizable", "renameLabel_factorSource_subtitle", fallback: "Enter a new name for this Factor Source")
+      /// Rename Factor Source
+      internal static let title = L10n.tr("Localizable", "renameLabel_factorSource_title", fallback: "Rename Factor Source")
     }
   }
   internal enum RevealSeedPhrase {

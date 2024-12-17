@@ -22,24 +22,17 @@ struct SecurityFactors: Sendable, FeatureReducer {
 	struct Destination: DestinationReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
-			case seedPhrases(DisplayMnemonics.State)
-			case ledgerWallets(LedgerHardwareDevices.State)
-			case todo
+			case factorSourcesList(FactorSourcesList.State)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
-			case seedPhrases(DisplayMnemonics.Action)
-			case ledgerWallets(LedgerHardwareDevices.Action)
-			case todo(Never)
+			case factorSourcesList(FactorSourcesList.Action)
 		}
 
 		var body: some ReducerOf<Self> {
-			Scope(state: \.seedPhrases, action: \.seedPhrases) {
-				DisplayMnemonics()
-			}
-			Scope(state: \.ledgerWallets, action: \.ledgerWallets) {
-				LedgerHardwareDevices()
+			Scope(state: \.factorSourcesList, action: \.factorSourcesList) {
+				FactorSourcesList()
 			}
 		}
 	}
@@ -64,16 +57,7 @@ struct SecurityFactors: Sendable, FeatureReducer {
 			return securityProblemsEffect()
 
 		case let .factorSourceRowTapped(kind):
-			switch kind {
-			case .device:
-				state.destination = .seedPhrases(.init())
-			case .ledgerHqHardwareWallet:
-				state.destination = .ledgerWallets(.init(context: .settings))
-			case .arculusCard, .password, .offDeviceMnemonic:
-				state.destination = .todo
-			case .trustedContact, .securityQuestions:
-				fatalError("Unsupported Factor Source")
-			}
+			state.destination = .factorSourcesList(.init(kind: kind))
 			return .none
 		}
 	}

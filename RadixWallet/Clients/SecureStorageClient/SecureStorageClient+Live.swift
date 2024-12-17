@@ -317,6 +317,23 @@ extension SecureStorageClient: DependencyKey {
 			return (try? keychainClient.contains(key)) ?? false
 		}
 
+		let containsDataForKey: ContainsDataForKey = { sargonKey in
+			let keychainKey: KeychainClient.Key
+			switch sargonKey {
+			case .hostId:
+				keychainKey = deviceInfoKey
+			case .profileSnapshot:
+				let userDefaults = UserDefaults.Dependency.radix
+				guard let activeProfileId = userDefaults.getActiveProfileID() else {
+					return false
+				}
+				keychainKey = activeProfileId.keychainKey
+			case let .deviceFactorSourceMnemonic(factorSourceId):
+				keychainKey = key(factorSourceID: factorSourceId)
+			}
+			return try keychainClient.contains(keychainKey)
+		}
+
 		let deleteProfileAndMnemonicsByFactorSourceIDs: DeleteProfileAndMnemonicsByFactorSourceIDs = {
 			profileID,
 				requestedToKeepInIcloud in
@@ -460,7 +477,8 @@ extension SecureStorageClient: DependencyKey {
 			keychainChanged: keychainChanged,
 			getAllMnemonics: getAllMnemonics,
 			loadMnemonicDataByFactorSourceID: loadMnemonicDataByFactorSourceID,
-			saveMnemonicForFactorSourceData: saveMnemonicForFactorSourceData
+			saveMnemonicForFactorSourceData: saveMnemonicForFactorSourceData,
+			containsDataForKey: containsDataForKey
 		)
 		#else
 		return Self(
@@ -488,7 +506,8 @@ extension SecureStorageClient: DependencyKey {
 			saveP2PLinksPrivateKey: saveP2PLinksPrivateKey,
 			keychainChanged: keychainChanged,
 			loadMnemonicDataByFactorSourceID: loadMnemonicDataByFactorSourceID,
-			saveMnemonicForFactorSourceData: saveMnemonicForFactorSourceData
+			saveMnemonicForFactorSourceData: saveMnemonicForFactorSourceData,
+			containsDataForKey: containsDataForKey
 		)
 		#endif
 	}()
