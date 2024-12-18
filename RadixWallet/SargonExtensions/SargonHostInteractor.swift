@@ -1,28 +1,27 @@
 import Sargon
 
+// MARK: - SargonHostInteractor
 final class SargonHostInteractor: HostInteractor {
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
+
 	func signTransactions(request: SargonUniFFI.SignRequestOfTransactionIntent) async throws -> SargonUniFFI.SignWithFactorsOutcomeOfTransactionIntentHash {
 		var responses: [SignaturesPerFactorSourceOfTransactionIntentHash] = []
 
 		for request in request.perFactorSource {
 			for transaction in request.transactions {
-				let transactionIntent = transaction.payload.decompile()
-				let ownedFactorInstances = transaction.ownedFactorInstances
-
-				let result = try await SargonOS.shared.signTransaction(transactionIntent: transactionIntent, roleKind: .primary)
-				for signature in result.intentSignatures.signatures {
+				let action = await overlayWindowClient.requestSignatutures(state: .init(input: transaction))
+				switch action {
+				case .signing(.cancelSigning), .signing(.failedToSign), .dismiss:
+					return .neglected(.init(reason: .userExplicitlySkipped, factors: [transaction.factorSourceId]))
+				case let .signing(.finishedSigning(.signTransaction(response, origin))):
 					responses.append(
 						.init(
 							factorSourceId: transaction.factorSourceId,
-							hdSignatures: [.init(
-								input: .init(
-									payloadId: transactionIntent.hash(),
-									ownedFactorInstance: ownedFactorInstances.first! // what should go here?
-								),
-								signature: signature.signatureWithPublicKey
-							)]
+							hdSignatures: [] // TODO: We should get something like state.signatures from values to transform it here
 						)
 					)
+				case .signing(.finishedSigning(.signAuth)), .signing(.finishedSigning(.signPreAuthorization)):
+					fatalError("Unepected Signature when signing transactions")
 				}
 			}
 		}
@@ -40,5 +39,18 @@ final class SargonHostInteractor: HostInteractor {
 
 	func signAuth(request: SargonUniFFI.AuthenticationSigningRequest) async throws -> SargonUniFFI.AuthenticationSigningResponse {
 		throw CommonError.SigningRejected
+	}
+}
+
+private extension OwnedFactorInstance {
+	var factorSourceAccessKind: FactorSourceAccess.State.Kind {
+		switch factorInstance.factorSourceId.kind {
+		case .device:
+			.device
+		case .ledgerHqHardwareWallet:
+			.ledger(nil) // TODO: How to populate Ledger Nano details?
+		default:
+			fatalError("Not supported")
+		}
 	}
 }

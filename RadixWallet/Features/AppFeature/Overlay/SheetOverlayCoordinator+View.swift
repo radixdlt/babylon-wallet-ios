@@ -21,11 +21,11 @@ extension SheetOverlayCoordinator {
 								}
 						}
 					)
-				case .factorSourceAccess:
+				case .signing:
 					CaseLet(
-						/SheetOverlayCoordinator.Root.State.factorSourceAccess,
-						action: SheetOverlayCoordinator.Root.Action.factorSourceAccess,
-						then: { FactorSourceAccess.View(store: $0) }
+						/SheetOverlayCoordinator.Root.State.signing,
+						action: SheetOverlayCoordinator.Root.Action.signing,
+						then: { Signing.View(store: $0) }
 					)
 				}
 			}

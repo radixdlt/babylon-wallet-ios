@@ -135,3 +135,15 @@ extension DependencyValues {
 		set { self[OverlayWindowClient.self] = newValue }
 	}
 }
+
+extension OverlayWindowClient {
+	func showInfoLink(_ state: InfoLinkSheet.State) {
+		Task {
+			let _ = await scheduleSheet(.init(root: .infoLink(state)))
+		}
+	}
+
+	func requestSignatutures(state: Signing.State) async -> SheetAction {
+		await scheduleSheet(.init(root: .signing(state)))
+	}
+}

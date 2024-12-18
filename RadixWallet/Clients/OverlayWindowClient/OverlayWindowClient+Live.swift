@@ -67,14 +67,6 @@ extension OverlayWindowClient: DependencyKey {
 	}()
 }
 
-extension OverlayWindowClient {
-	func showInfoLink(_ state: InfoLinkSheet.State) {
-		Task {
-			let _ = await scheduleSheet(.init(root: .infoLink(state)))
-		}
-	}
-}
-
 extension OverlayWindowClient.Item.HUD {
 	static let updatedAccount = Self(text: L10n.AccountSettings.updatedAccountHUDMessage)
 	static let copied = Self(text: L10n.AddressAction.copiedToClipboard)
