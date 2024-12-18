@@ -21,7 +21,7 @@ extension FactorSourceDetail {
 		}
 
 		private func rows(_ viewStore: ViewStore<FactorSourceDetail.State, FactorSourceDetail.ViewAction>) -> [SettingsRow<FactorSourceDetail>.Kind] {
-			switch viewStore.factorSource.kind {
+			switch viewStore.integrity {
 			case .device:
 				[
 					.header(L10n.FactorSources.Detail.settings),
@@ -29,9 +29,11 @@ extension FactorSourceDetail {
 					.header(L10n.FactorSources.Detail.test),
 					spotCheckRow(viewStore),
 					.header(L10n.FactorSources.Detail.advanced),
+					// TODO: Define how to handle case where seed phrase was never entered
+					// Discussion: https://rdxworks.slack.com/archives/C031A0V1A1W/p1734452174675219
 					viewSeedPhraseRow(viewStore),
 				]
-			case .ledgerHqHardwareWallet, .offDeviceMnemonic, .password:
+			case .ledger, .offDeviceMnemonic, .password:
 				[
 					.header(L10n.FactorSources.Detail.settings),
 					renameRow(viewStore),
@@ -46,8 +48,6 @@ extension FactorSourceDetail {
 					.header(L10n.FactorSources.Detail.test),
 					spotCheckRow(viewStore),
 				]
-			case .trustedContact, .securityQuestions:
-				fatalError("Not implemented")
 			}
 		}
 

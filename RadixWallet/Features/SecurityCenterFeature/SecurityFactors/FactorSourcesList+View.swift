@@ -185,13 +185,19 @@ private extension View {
 }
 
 extension FactorSourceIntegrity {
-	// TODO: Move to Sagron FactorSourceIntegrity+Wrap+Functions
+	// TODO: Move to Sargon FactorSourceIntegrity+Wrap+Functions
 	var factorSource: FactorSource {
 		switch self {
 		case let .device(device):
 			device.factorSource.asGeneral
 		case let .ledger(ledger):
 			ledger.asGeneral
+		case let .offDeviceMnemonic(offDeviceMnemonic):
+			offDeviceMnemonic.asGeneral
+		case let .arculusCard(arculusCard):
+			arculusCard.asGeneral
+		case let .password(password):
+			password.asGeneral
 		}
 	}
 
@@ -199,7 +205,7 @@ extension FactorSourceIntegrity {
 		switch self {
 		case let .device(device):
 			device.factorSource.isExplicitMain
-		case .ledger:
+		case .ledger, .offDeviceMnemonic, .arculusCard, .password:
 			false
 		}
 	}
