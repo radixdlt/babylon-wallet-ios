@@ -129,7 +129,6 @@ func withTestClients<R>(
 	}, operation: operation)
 }
 
-@_unsafeInheritExecutor
 @discardableResult
 func withTestClients<R>(
 	userDefaults: UserDefaults.Dependency = .ephemeral(),

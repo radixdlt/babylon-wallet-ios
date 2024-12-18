@@ -26,12 +26,12 @@ extension AccountsClient: TestDependencyKey {
 	)
 
 	static let testValue = Self(
-		getCurrentNetworkID: unimplemented("\(Self.self).getCurrentNetworkID"),
-		nextAppearanceID: unimplemented("\(Self.self).nextAppearanceID"),
+		getCurrentNetworkID: unimplemented("\(Self.self).getCurrentNetworkID", placeholder: noop.getCurrentNetworkID),
+		nextAppearanceID: unimplemented("\(Self.self).nextAppearanceID", placeholder: noop.nextAppearanceID),
 		getAccountsOnCurrentNetwork: unimplemented("\(Self.self).getAccountsOnCurrentNetwork"),
 		getHiddenAccountsOnCurrentNetwork: unimplemented("\(Self.self).getHiddenAccountsOnCurrentNetwork"),
-		accountsOnCurrentNetwork: unimplemented("\(Self.self).accountsOnCurrentNetwork"),
-		accountUpdates: unimplemented("\(Self.self).accountUpdates"),
+		accountsOnCurrentNetwork: unimplemented("\(Self.self).accountsOnCurrentNetwork", placeholder: noop.accountsOnCurrentNetwork),
+		accountUpdates: unimplemented("\(Self.self).accountUpdates", placeholder: noop.accountUpdates),
 		newVirtualAccount: unimplemented("\(Self.self).newVirtualAccount"),
 		saveVirtualAccounts: unimplemented("\(Self.self).saveVirtualAccounts"),
 		getAccountByAddress: unimplemented("\(Self.self).getAccountByAddress"),

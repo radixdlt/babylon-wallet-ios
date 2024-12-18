@@ -12,6 +12,13 @@ extension LocalAuthenticationClient: TestDependencyKey {
 		queryConfig: { .biometricsAndPasscodeSetUp },
 		authenticateWithBiometrics: { true },
 		setAuthenticatedSuccessfully: unimplemented("\(Self.self).setAuthenticatedSuccessfully"),
-		authenticatedSuccessfully: unimplemented("\(Self.self).authenticatedSuccessfully")
+		authenticatedSuccessfully: noop.authenticatedSuccessfully
+	)
+
+	static let noop = Self(
+		queryConfig: { throw NoopError() },
+		authenticateWithBiometrics: { throw NoopError() },
+		setAuthenticatedSuccessfully: {},
+		authenticatedSuccessfully: { AsyncLazySequence([]).eraseToAnyAsyncSequence() }
 	)
 }
