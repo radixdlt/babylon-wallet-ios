@@ -48,7 +48,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 	struct Destination: DestinationReducer {
 		@CasePathable
 		enum State: Hashable, Sendable {
-			case updateAccountLabel(UpdateAccountLabel.State)
+			case updateAccountLabel(RenameLabel.State)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.State)
 			case devPreferences(DevAccountPreferences.State)
 			case hideAccount
@@ -57,7 +57,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 
 		@CasePathable
 		enum Action: Equatable, Sendable {
-			case updateAccountLabel(UpdateAccountLabel.Action)
+			case updateAccountLabel(RenameLabel.Action)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.Action)
 			case devPreferences(DevAccountPreferences.Action)
 			case hideAccount(ConfirmationAction)
@@ -66,7 +66,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 
 		var body: some ReducerOf<Self> {
 			Scope(state: \.updateAccountLabel, action: \.updateAccountLabel) {
-				UpdateAccountLabel()
+				RenameLabel()
 			}
 			Scope(state: \.thirdPartyDeposits, action: \.thirdPartyDeposits) {
 				ManageThirdPartyDeposits()
@@ -164,7 +164,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case .updateAccountLabel(.delegate(.accountLabelUpdated)),
+		case .updateAccountLabel(.delegate(.labelUpdated)),
 		     .thirdPartyDeposits(.delegate(.accountUpdated)):
 			state.destination = nil
 			return .none
@@ -239,7 +239,7 @@ extension AccountPreferences {
 	func destination(for row: AccountPreferences.Section.SectionRow, _ state: inout State) -> Effect<Action> {
 		switch row {
 		case .personalize(.accountLabel):
-			state.destination = .updateAccountLabel(.init(account: state.account))
+			state.destination = .updateAccountLabel(.init(kind: .account(state.account)))
 			return .none
 
 		case .personalize(.accountColor):

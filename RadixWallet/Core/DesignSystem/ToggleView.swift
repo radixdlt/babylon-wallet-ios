@@ -3,7 +3,7 @@ struct ToggleView: SwiftUI.View {
 	let context: Context
 	let icon: ImageResource?
 	let title: String
-	let subtitle: String
+	let subtitle: String?
 	let minHeight: CGFloat
 	let isOn: Binding<Bool>
 
@@ -11,7 +11,7 @@ struct ToggleView: SwiftUI.View {
 		context: Context = .toggle,
 		icon: ImageResource? = nil,
 		title: String,
-		subtitle: String,
+		subtitle: String?,
 		minHeight: CGFloat = .largeButtonHeight,
 		isOn: Binding<Bool>
 	) {

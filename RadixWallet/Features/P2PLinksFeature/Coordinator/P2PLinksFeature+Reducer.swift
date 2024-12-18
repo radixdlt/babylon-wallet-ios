@@ -42,14 +42,14 @@ struct P2PLinksFeature: Sendable, FeatureReducer {
 		enum State: Sendable, Hashable {
 			case newConnection(NewConnection.State)
 			case removeConnection(AlertState<Action.RemoveConnection>)
-			case updateName(UpdateP2PLinkName.State)
+			case updateName(RenameLabel.State)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
 			case newConnection(NewConnection.Action)
 			case removeConnection(RemoveConnection)
-			case updateName(UpdateP2PLinkName.Action)
+			case updateName(RenameLabel.Action)
 
 			enum RemoveConnection: Sendable, Hashable {
 				case removeTapped(P2PLink)
@@ -61,7 +61,7 @@ struct P2PLinksFeature: Sendable, FeatureReducer {
 				NewConnection()
 			}
 			Scope(state: \.updateName, action: \.updateName) {
-				UpdateP2PLinkName()
+				RenameLabel()
 			}
 		}
 	}
@@ -99,7 +99,7 @@ struct P2PLinksFeature: Sendable, FeatureReducer {
 			return .none
 
 		case let .editButtonTapped(link):
-			state.destination = .updateName(.init(link: link))
+			state.destination = .updateName(.init(kind: .connector(link)))
 			return .none
 		}
 	}
@@ -154,7 +154,7 @@ struct P2PLinksFeature: Sendable, FeatureReducer {
 				await send(.internal(.deleteConnectionResult(result)))
 			}
 
-		case let .updateName(.delegate(.linkNameUpdated(link))):
+		case let .updateName(.delegate(.labelUpdated(.connector(link)))):
 			state.links.updateOrAppend(link)
 			state.destination = nil
 			return .none

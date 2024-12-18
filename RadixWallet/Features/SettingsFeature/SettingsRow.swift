@@ -74,6 +74,7 @@ extension SettingsRow.Kind {
 			title: String,
 			subtitle: String? = nil,
 			detail: String? = nil,
+			markdown: String? = nil,
 			hints: [Hint.ViewState] = [],
 			icon: AssetIcon.Content,
 			accessory: ImageResource? = .chevronRight,
@@ -82,7 +83,7 @@ extension SettingsRow.Kind {
 			self.id = title
 			self.rowViewState = .init(
 				icon,
-				rowCoreViewState: .init(title: title, subtitle: subtitle, detail: detail),
+				rowCoreViewState: .init(title: title, subtitle: subtitle, detail: detail, markdown: markdown),
 				accessory: accessory,
 				hints: hints
 			)
@@ -94,14 +95,14 @@ extension SettingsRow.Kind {
 		let id: String
 		let icon: ImageResource?
 		let title: String
-		let subtitle: String
+		let subtitle: String?
 		let minHeight: CGFloat
 		let isOn: Binding<Bool>
 
 		init(
 			icon: ImageResource? = nil,
 			title: String,
-			subtitle: String,
+			subtitle: String?,
 			minHeight: CGFloat = .largeButtonHeight,
 			isOn: Binding<Bool>
 		) {
@@ -121,6 +122,7 @@ extension SettingsRow.Kind {
 		title: String,
 		subtitle: String? = nil,
 		detail: String? = nil,
+		markdown: String? = nil,
 		hints: [Hint.ViewState] = [],
 		icon: AssetIcon.Content,
 		accessory: ImageResource? = .chevronRight,
@@ -131,6 +133,7 @@ extension SettingsRow.Kind {
 				title: title,
 				subtitle: subtitle,
 				detail: detail,
+				markdown: markdown,
 				hints: hints,
 				icon: icon,
 				accessory: accessory,
@@ -142,7 +145,7 @@ extension SettingsRow.Kind {
 	static func toggleModel(
 		icon: ImageResource?,
 		title: String,
-		subtitle: String,
+		subtitle: String? = nil,
 		minHeight: CGFloat,
 		isOn: Binding<Bool>
 	) -> Self {

@@ -132,25 +132,26 @@ struct PlainListRowCore: View {
 		let title: String?
 		let subtitle: String?
 		let detail: String?
+		let markdown: String?
 
 		init(
 			context: Context = .settings,
 			title: String?,
 			subtitle: String? = nil,
-			detail: String? = nil
+			detail: String? = nil,
+			markdown: String? = nil
 		) {
 			self.context = context
 			self.title = title
 			self.subtitle = subtitle
 			self.detail = detail
+			self.markdown = markdown
 		}
 	}
 
 	let viewState: ViewState
 
-	init(
-		viewState: ViewState
-	) {
+	init(viewState: ViewState) {
 		self.viewState = viewState
 	}
 
@@ -183,6 +184,15 @@ struct PlainListRowCore: View {
 					.lineLimit(1)
 					.minimumScaleFactor(0.8)
 					.foregroundColor(.app.gray2)
+					.padding(.top, .small3)
+			}
+
+			if let markdown = viewState.markdown {
+				Text(markdown: markdown, emphasizedColor: .app.gray2, emphasizedFont: .app.body1Header)
+					.textStyle(.body1Regular)
+					.lineLimit(1)
+					.minimumScaleFactor(0.8)
+					.foregroundStyle(.app.gray2)
 					.padding(.top, .small3)
 			}
 		}
