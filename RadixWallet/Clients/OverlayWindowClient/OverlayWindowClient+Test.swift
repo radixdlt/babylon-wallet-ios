@@ -19,7 +19,7 @@ extension OverlayWindowClient: TestDependencyKey {
 		scheduleAlert: { _ in .dismissed },
 		scheduleAlertAndIgnoreAction: { _ in },
 		scheduleHUD: { _ in },
-		scheduleSheet: { _ in },
+		scheduleSheet: { _ in .dismiss },
 		scheduleFullScreen: { _ in .dismiss },
 		sendAlertAction: { _, _ in },
 		sendFullScreenAction: { _, _ in },

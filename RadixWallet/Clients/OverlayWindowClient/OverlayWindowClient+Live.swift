@@ -4,6 +4,7 @@ extension OverlayWindowClient: DependencyKey {
 		let items = AsyncPassthroughSubject<Item>()
 		let alertActions = AsyncPassthroughSubject<(action: Item.AlertAction, id: Item.AlertState.ID)>()
 		let fullScreenActions = AsyncPassthroughSubject<(action: FullScreenAction, id: FullScreenID)>()
+		let sheetActions = AsyncPassthroughSubject<(action: SheetAction, id: SheetID)>()
 		let isUserInteractionEnabled = AsyncPassthroughSubject<Bool>()
 
 		@Dependency(\.errorQueue) var errorQueue
@@ -50,7 +51,10 @@ extension OverlayWindowClient: DependencyKey {
 			},
 			scheduleAlertAndIgnoreAction: scheduleAlertAndIgnoreAction,
 			scheduleHUD: { items.send(.hud($0)) },
-			scheduleSheet: { items.send(.sheet($0)) },
+			scheduleSheet: { sheet in
+				items.send(.sheet(sheet))
+				return await sheetActions.first { $0.id == sheet.id }?.action ?? .dismiss
+			},
 			scheduleFullScreen: { fullScreen in
 				items.send(.fullScreen(fullScreen))
 				return await fullScreenActions.first { $0.id == fullScreen.id }?.action ?? .dismiss
@@ -65,7 +69,9 @@ extension OverlayWindowClient: DependencyKey {
 
 extension OverlayWindowClient {
 	func showInfoLink(_ state: InfoLinkSheet.State) {
-		scheduleSheet(.infoLink(state))
+		Task {
+			let _ = await scheduleSheet(.init(root: .infoLink(state)))
+		}
 	}
 }
 
