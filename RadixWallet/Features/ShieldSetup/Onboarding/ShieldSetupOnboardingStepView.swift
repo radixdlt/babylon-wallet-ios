@@ -80,9 +80,9 @@ extension ShieldSetupOnboardingStep {
 	var infoLink: (item: InfoLinkSheet.GlossaryItem, label: String)? {
 		switch self {
 		case .intro:
-			(.securityshield, L10n.InfoLink.Title.securityshield)
+			(.securityshields, L10n.InfoLink.Title.securityshields)
 		case .buildShield:
-			(.buildsecurityshields, L10n.InfoLink.Title.buildsecurityshields)
+			(.buildingshield, L10n.InfoLink.Title.buildingshield)
 		case .applyShield:
 			nil
 		}

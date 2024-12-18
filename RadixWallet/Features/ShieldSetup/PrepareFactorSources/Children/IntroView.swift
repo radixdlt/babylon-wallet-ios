@@ -19,7 +19,7 @@ extension PrepareFactorSources {
 				.textStyle(.body1Regular)
 				.padding(.horizontal, .medium3)
 
-				InfoButton(.buildsecurityshields, label: L10n.InfoLink.Title.buildsecurityshields)
+				InfoButton(.buildingshield, label: L10n.InfoLink.Title.buildingshield)
 
 				Spacer()
 			}
