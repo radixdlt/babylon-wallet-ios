@@ -192,6 +192,12 @@ extension FactorSourceIntegrity {
 			device.factorSource.asGeneral
 		case let .ledger(ledger):
 			ledger.asGeneral
+		case let .offDeviceMnemonic(offDeviceMnemonic):
+			offDeviceMnemonic.asGeneral
+		case let .arculusCard(arculusCard):
+			arculusCard.asGeneral
+		case let .password(password):
+			password.asGeneral
 		}
 	}
 
@@ -199,7 +205,7 @@ extension FactorSourceIntegrity {
 		switch self {
 		case let .device(device):
 			device.factorSource.isExplicitMain
-		case .ledger:
+		case .ledger, .offDeviceMnemonic, .arculusCard, .password:
 			false
 		}
 	}

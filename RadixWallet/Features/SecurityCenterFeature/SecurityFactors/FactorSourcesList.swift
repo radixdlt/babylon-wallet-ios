@@ -247,7 +247,7 @@ private extension FactorSourceIntegrity {
 		switch self {
 		case let .device(device):
 			device.isMnemonicMarkedAsBackedUp
-		case .ledger:
+		case .ledger, .offDeviceMnemonic, .arculusCard, .password:
 			false
 		}
 	}
@@ -256,7 +256,7 @@ private extension FactorSourceIntegrity {
 		switch self {
 		case let .device(device):
 			device.factorSource.id
-		case .ledger:
+		case .ledger, .offDeviceMnemonic, .arculusCard, .password:
 			nil
 		}
 	}
