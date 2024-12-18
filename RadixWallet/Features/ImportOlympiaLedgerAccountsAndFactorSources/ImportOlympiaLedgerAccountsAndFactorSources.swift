@@ -160,7 +160,7 @@ struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureReducer {
 		case let .processedOlympiaHardwareAccounts(validatedAccounts, migratedAccounts):
 			for validatedAccount in validatedAccounts {
 				state.olympiaAccounts.unvalidated.remove(validatedAccount)
-				state.olympiaAccounts.validated.append(contentsOf: validatedAccounts)
+				state.olympiaAccounts.validated.formUnion(validatedAccounts)
 			}
 
 			loggerGlobal.notice("Adding migrated accounts...")

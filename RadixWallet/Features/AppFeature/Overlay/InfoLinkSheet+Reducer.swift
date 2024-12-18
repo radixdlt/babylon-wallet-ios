@@ -63,6 +63,11 @@ extension InfoLinkSheet {
 		case securityshield
 		case buildsecurityshields
 		case nohardwaredevice
+		case device
+		case ledger
+		case offdevicemnemonic
+		case arculuscard
+		case password
 	}
 }
 
@@ -168,6 +173,8 @@ extension InfoLinkSheet.GlossaryItem {
 			"TODO" // TODO: update
 		case .nohardwaredevice:
 			"TODO" // TODO: update
+		case .device, .ledger, .offdevicemnemonic, .arculuscard, .password:
+			"TODO"
 		}
 	}
 }

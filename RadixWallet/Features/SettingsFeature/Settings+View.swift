@@ -106,7 +106,7 @@ extension Settings.View {
 		visibleRows.append(.separator)
 		visibleRows.append(.model(
 			title: "Debug Settings",
-			icon: .asset(AssetResource.appSettings), // FIXME: Find
+			icon: .asset(.appSettings), // FIXME: Find
 			action: .debugButtonTapped
 		))
 		#endif
@@ -120,7 +120,7 @@ extension Settings.View {
 				title: L10n.WalletSettings.SecurityCenter.title,
 				subtitle: L10n.WalletSettings.SecurityCenter.subtitle,
 				hints: securityCenterHints(problems: securityProblems),
-				icon: .asset(AssetResource.security),
+				icon: .asset(.security),
 				action: .securityCenterButtonTapped
 			),
 			.separator,
@@ -128,33 +128,33 @@ extension Settings.View {
 				title: L10n.WalletSettings.Personas.title,
 				subtitle: L10n.WalletSettings.Personas.subtitle,
 				hints: personasHints(problems: personasProblems),
-				icon: .asset(AssetResource.personas),
+				icon: .asset(.personas),
 				action: .personasButtonTapped
 			),
 			.model(
 				title: L10n.WalletSettings.Dapps.title,
 				subtitle: L10n.WalletSettings.Dapps.subtitle,
-				icon: .asset(AssetResource.authorizedDapps),
+				icon: .asset(.authorizedDapps),
 				action: .dappsButtonTapped
 			),
 			.model(
 				title: L10n.WalletSettings.Connectors.title,
 				subtitle: L10n.WalletSettings.Connectors.subtitle,
-				icon: .asset(AssetResource.desktopConnections),
+				icon: .asset(.desktopConnections),
 				action: .connectorsButtonTapped
 			),
 			.separator,
 			.model(
 				title: L10n.WalletSettings.Preferences.title,
 				subtitle: L10n.WalletSettings.Preferences.subtitle,
-				icon: .asset(AssetResource.depositGuarantees),
+				icon: .asset(.depositGuarantees),
 				action: .preferencesButtonTapped
 			),
 			.separator,
 			.model(
 				title: L10n.WalletSettings.Troubleshooting.title,
 				subtitle: L10n.WalletSettings.Troubleshooting.subtitle,
-				icon: .asset(AssetResource.troubleshooting),
+				icon: .asset(.troubleshooting),
 				action: .troubleshootingButtonTapped
 			),
 		]

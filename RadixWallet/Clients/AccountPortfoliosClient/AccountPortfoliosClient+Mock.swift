@@ -5,9 +5,9 @@ extension AccountPortfoliosClient: TestDependencyKey {
 	static let testValue = AccountPortfoliosClient(
 		fetchAccountPortfolios: unimplemented("\(AccountPortfoliosClient.self).fetchAccountPortfolios"),
 		fetchAccountPortfolio: unimplemented("\(AccountPortfoliosClient.self).fetchAccountPortfolio"),
-		portfolioUpdates: unimplemented("\(AccountPortfoliosClient.self).fetchAccountPortfolio"),
-		portfolioForAccount: unimplemented("\(AccountPortfoliosClient.self).portfolioForAccount"),
-		portfolios: unimplemented("\(AccountPortfoliosClient.self).portfolios"),
+		portfolioUpdates: unimplemented("\(AccountPortfoliosClient.self).portfolioUpdates", placeholder: noop.portfolioUpdates),
+		portfolioForAccount: unimplemented("\(AccountPortfoliosClient.self).portfolioForAccount", placeholder: noop.portfolioForAccount),
+		portfolios: unimplemented("\(AccountPortfoliosClient.self).portfolios", placeholder: noop.portfolios),
 		syncAccountsDeletedOnLedger: unimplemented("\(AccountPortfoliosClient.self).syncAccountsDeletedOnLedger")
 	)
 

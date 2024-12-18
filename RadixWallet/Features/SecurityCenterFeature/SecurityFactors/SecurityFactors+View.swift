@@ -1,22 +1,5 @@
-extension SecurityFactors.State {
-	var viewState: SecurityFactors.ViewState {
-		.init(
-			seedPhrasesCount: seedPhrasesCount,
-			ledgerWalletsCount: ledgerWalletsCount,
-			securityProblems: securityProblems
-		)
-	}
-}
-
 // MARK: - SecurityFactors.View
-
 extension SecurityFactors {
-	struct ViewState: Equatable {
-		let seedPhrasesCount: Int?
-		let ledgerWalletsCount: Int?
-		let securityProblems: [SecurityProblem]
-	}
-
 	@MainActor
 	struct View: SwiftUI.View {
 		private let store: StoreOf<SecurityFactors>
@@ -39,7 +22,7 @@ extension SecurityFactors {
 @MainActor
 private extension SecurityFactors.View {
 	var content: some View {
-		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(spacing: .zero) {
 					ForEachStatic(rows(viewStore: viewStore)) { kind in
@@ -54,49 +37,37 @@ private extension SecurityFactors.View {
 		}
 	}
 
-	func rows(viewStore: ViewStoreOf<SecurityFactors>) -> [SettingsRow<SecurityFactors>.Kind] {
+	func rows(viewStore: ViewStore<SecurityFactors.State, SecurityFactors.ViewAction>) -> [SettingsRow<SecurityFactors>.Kind] {
 		[
 			.header(L10n.SecurityFactors.subtitle),
-			.model(
-				title: L10n.SecurityFactors.SeedPhrases.title,
-				subtitle: L10n.SecurityFactors.SeedPhrases.subtitle,
-				detail: viewStore.seedPhrasesDetail,
-				hints: viewStore.seedPhraseHints,
-				icon: .asset(AssetResource.seedPhrases),
-				action: .seedPhrasesButtonTapped
-			),
-			.model(
-				title: L10n.SecurityFactors.LedgerWallet.title,
-				subtitle: L10n.SecurityFactors.LedgerWallet.subtitle,
-				detail: viewStore.ledgerWalletsDetail,
-				icon: .asset(AssetResource.ledger),
-				action: .ledgerWalletsButtonTapped
-			),
+			model(kind: .device, hints: viewStore.deviceHints),
+			.header(L10n.SecurityFactors.hardware),
+			model(kind: .arculusCard),
+			model(kind: .ledgerHqHardwareWallet),
+			.header(L10n.SecurityFactors.information),
+			model(kind: .password),
+			model(kind: .offDeviceMnemonic),
 		]
+	}
+
+	func model(kind: FactorSourceKind, hints: [Hint.ViewState] = []) -> SettingsRow<SecurityFactors>.Kind {
+		.model(
+			title: kind.title,
+			subtitle: kind.details,
+			hints: hints,
+			icon: .asset(kind.icon),
+			action: .factorSourceRowTapped(kind)
+		)
 	}
 }
 
 // MARK: - Extensions
 
-private extension SecurityFactors.ViewState {
-	var seedPhrasesDetail: String? {
-		guard let seedPhrasesCount else {
-			return nil
-		}
-		return seedPhrasesCount == 1 ? L10n.SecurityFactors.SeedPhrases.counterSingular : L10n.SecurityFactors.SeedPhrases.counterPlural(seedPhrasesCount)
-	}
-
-	var seedPhraseHints: [Hint.ViewState] {
+private extension SecurityFactors.State {
+	var deviceHints: [Hint.ViewState] {
 		securityProblems
 			.compactMap(\.securityFactors)
 			.map { .init(kind: .warning, text: $0) }
-	}
-
-	var ledgerWalletsDetail: String? {
-		guard let ledgerWalletsCount else {
-			return nil
-		}
-		return ledgerWalletsCount == 1 ? L10n.SecurityFactors.LedgerWallet.counterSingular : L10n.SecurityFactors.LedgerWallet.counterPlural(ledgerWalletsCount)
 	}
 }
 
@@ -113,26 +84,12 @@ private extension StoreOf<SecurityFactors> {
 private extension View {
 	func destinations(with store: StoreOf<SecurityFactors>) -> some View {
 		let destinationStore = store.destination
-		return seedPhrases(with: destinationStore)
-			.ledgerHardwareWallets(with: destinationStore)
+		return deviceFactorSources(with: destinationStore)
 	}
 
-	private func seedPhrases(with destinationStore: PresentationStoreOf<SecurityFactors.Destination>) -> some View {
-		navigationDestination(store: destinationStore.scope(state: \.seedPhrases, action: \.seedPhrases)) {
-			DisplayMnemonics.View(store: $0)
+	private func deviceFactorSources(with destinationStore: PresentationStoreOf<SecurityFactors.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.factorSourcesList, action: \.factorSourcesList)) {
+			FactorSourcesList.View(store: $0)
 		}
-	}
-
-	private func ledgerHardwareWallets(with destinationStore: PresentationStoreOf<SecurityFactors.Destination>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /SecurityFactors.Destination.State.ledgerWallets,
-			action: SecurityFactors.Destination.Action.ledgerWallets,
-			destination: {
-				LedgerHardwareDevices.View(store: $0)
-					.background(.app.gray5)
-					.radixToolbar(title: L10n.AccountSecuritySettings.LedgerHardwareWallets.title)
-			}
-		)
 	}
 }

@@ -77,7 +77,7 @@ extension Profile {
 					factorSourceId: privateHDFactorSource.factorSource.id,
 					publicKey: .sample
 				),
-				authenticationSigning: nil
+				provisionalSecurifiedConfig: nil
 			)
 		)
 
@@ -129,7 +129,6 @@ func withTestClients<R>(
 	}, operation: operation)
 }
 
-@_unsafeInheritExecutor
 @discardableResult
 func withTestClients<R>(
 	userDefaults: UserDefaults.Dependency = .ephemeral(),

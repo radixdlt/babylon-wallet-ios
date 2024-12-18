@@ -3,7 +3,7 @@ extension HomeCardsClient: TestDependencyKey {
 	static let previewValue = Self.noop
 
 	static let testValue = Self(
-		cards: unimplemented("\(Self.self).cards"),
+		cards: unimplemented("\(Self.self).cards", placeholder: noop.cards),
 		removeCard: unimplemented("\(Self.self).removeCard")
 	)
 }

@@ -657,13 +657,6 @@ extension UnsecuredEntityControlView {
 				factorInstance: unsecuredControl.transactionSigning,
 				indentation: inOneLevel
 			)
-			if let authenticationSigning = unsecuredControl.authenticationSigning {
-				HierarchicalDeterministicFactorInstanceView(
-					description: "Auth Signing",
-					factorInstance: authenticationSigning,
-					indentation: inOneLevel
-				)
-			}
 		}
 	}
 }

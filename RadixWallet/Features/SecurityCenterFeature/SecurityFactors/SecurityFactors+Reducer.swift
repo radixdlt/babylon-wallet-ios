@@ -2,8 +2,6 @@
 
 struct SecurityFactors: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
-		var seedPhrasesCount: Int?
-		var ledgerWalletsCount: Int?
 		var securityProblems: [SecurityProblem] = []
 
 		@PresentationState
@@ -14,35 +12,27 @@ struct SecurityFactors: Sendable, FeatureReducer {
 
 	enum ViewAction: Sendable, Equatable {
 		case task
-		case seedPhrasesButtonTapped
-		case ledgerWalletsButtonTapped
+		case factorSourceRowTapped(FactorSourceKind)
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case loadedSeedPhrasesCount(Int)
-		case loadedLedgerWalletsCount(Int)
 		case setSecurityProblems([SecurityProblem])
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
-			case seedPhrases(DisplayMnemonics.State)
-			case ledgerWallets(LedgerHardwareDevices.State)
+			case factorSourcesList(FactorSourcesList.State)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
-			case seedPhrases(DisplayMnemonics.Action)
-			case ledgerWallets(LedgerHardwareDevices.Action)
+			case factorSourcesList(FactorSourcesList.Action)
 		}
 
 		var body: some ReducerOf<Self> {
-			Scope(state: \.seedPhrases, action: \.seedPhrases) {
-				DisplayMnemonics()
-			}
-			Scope(state: \.ledgerWallets, action: \.ledgerWallets) {
-				LedgerHardwareDevices()
+			Scope(state: \.factorSourcesList, action: \.factorSourcesList) {
+				FactorSourcesList()
 			}
 		}
 	}
@@ -64,49 +54,19 @@ struct SecurityFactors: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			return loadSeedPhrasesCount()
-				.merge(with: loadLedgerWalletsCount())
-				.merge(with: securityProblemsEffect())
+			return securityProblemsEffect()
 
-		case .seedPhrasesButtonTapped:
-			state.destination = .seedPhrases(.init())
-			return .none
-
-		case .ledgerWalletsButtonTapped:
-			state.destination = .ledgerWallets(.init(context: .settings))
+		case let .factorSourceRowTapped(kind):
+			state.destination = .factorSourcesList(.init(kind: kind))
 			return .none
 		}
 	}
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .loadedSeedPhrasesCount(count):
-			state.seedPhrasesCount = count
-			return .none
-
-		case let .loadedLedgerWalletsCount(count):
-			state.ledgerWalletsCount = count
-			return .none
-
 		case let .setSecurityProblems(problems):
 			state.securityProblems = problems
 			return .none
-		}
-	}
-
-	private func loadSeedPhrasesCount() -> Effect<Action> {
-		.run { send in
-			try await send(.internal(.loadedSeedPhrasesCount(
-				factorSourcesClient.getFactorSources(type: DeviceFactorSource.self).count
-			)))
-		}
-	}
-
-	private func loadLedgerWalletsCount() -> Effect<Action> {
-		.run { send in
-			try await send(.internal(.loadedLedgerWalletsCount(
-				factorSourcesClient.getFactorSources(type: LedgerHardwareWalletFactorSource.self).count
-			)))
 		}
 	}
 
