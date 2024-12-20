@@ -377,15 +377,11 @@ extension TransactionFailure {
 		case let .InvalidInstructionsString(underlying):
 			.failedToPrepareTXReview(.failedTXPreview(underlying))
 
-		case let .InvalidInstructionsWrongNetwork(found, expected):
-			.failedToPrepareTXReview(.failedTXPreview(errorMessageFromError(error: commonError!)))
+		case let .some(err):
+			.failedToPrepareTXReview(.failedTXPreview(errorMessageFromError(error: err!)))
 
 		default:
-			if let code = commonError?.errorCode {
-				.failedToPrepareTXReview(.failedTXPreview("Unknown reason, code: \(code)"))
-			} else {
-				.failedToPrepareTXReview(.failedTXPreview("Unknown reason"))
-			}
+			.failedToPrepareTXReview(.failedTXPreview("Unknown reason"))
 		}
 	}
 }
