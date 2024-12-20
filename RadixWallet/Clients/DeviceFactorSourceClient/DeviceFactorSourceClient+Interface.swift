@@ -128,12 +128,7 @@ extension DeviceFactorSourceClient {
 
 		switch signerEntity.securityState {
 		case let .unsecured(control):
-			let factorInstance = switch purpose {
-			case .signAuth:
-				control.authenticationSigning ?? control.transactionSigning
-			case .signTransaction, .signPreAuthorization:
-				control.transactionSigning
-			}
+			let factorInstance = control.transactionSigning
 
 			guard
 				let deviceFactorSource = try await factorSourcesClient.getDeviceFactorSource(of: factorInstance)
@@ -180,12 +175,7 @@ extension DeviceFactorSourceClient {
 			switch entity.securityState {
 			case let .unsecured(unsecuredControl):
 
-				let factorInstance = switch purpose {
-				case .signAuth:
-					unsecuredControl.authenticationSigning ?? unsecuredControl.transactionSigning
-				case .signTransaction, .signPreAuthorization:
-					unsecuredControl.transactionSigning
-				}
+				let factorInstance = unsecuredControl.transactionSigning
 
 				let derivationPath = factorInstance.derivationPath
 

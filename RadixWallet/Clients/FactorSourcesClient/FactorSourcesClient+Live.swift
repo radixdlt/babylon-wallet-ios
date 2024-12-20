@@ -370,12 +370,7 @@ func signingFactors(
 		switch entity.securityState {
 		case let .unsecured(unsecuredEntityControl):
 
-			let factorInstance = switch signingPurpose {
-			case .signAuth:
-				unsecuredEntityControl.authenticationSigning ?? unsecuredEntityControl.transactionSigning
-			case .signTransaction, .signPreAuthorization:
-				unsecuredEntityControl.transactionSigning
-			}
+			let factorInstance = unsecuredEntityControl.transactionSigning
 
 			let id = factorInstance.factorSourceID
 			guard let factorSource = allFactorSources[id: id.asGeneral] else {
