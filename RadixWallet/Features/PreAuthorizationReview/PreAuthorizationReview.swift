@@ -117,12 +117,12 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .previewLoaded(.failure(error)):
 			loggerGlobal.error("PreAuthroization preview failed, error: \(error)")
-			errorQueue.schedule(error)
-			guard let failure = error as? TransactionFailure else {
-				assertionFailure("Failed with unexpected error \(error)")
-				return .none
+			errorQueue.schedule(TransactionReviewFailure(underylying: error))
+			if let txFailure = error as? TransactionFailure {
+				return .send(.delegate(.failed(txFailure)))
+			} else {
+				return .send(.delegate(.failed(TransactionFailure.failedToPrepareTXReview(.abortedTXReview(error)))))
 			}
-			return .send(.delegate(.failed(failure)))
 
 		case let .previewLoaded(.success(preview)):
 			state.preview = preview
