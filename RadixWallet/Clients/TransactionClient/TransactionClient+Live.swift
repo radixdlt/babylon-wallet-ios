@@ -378,7 +378,7 @@ extension TransactionFailure {
 			.failedToPrepareTXReview(.failedTXPreview(underlying))
 
 		case let .some(err):
-			.failedToPrepareTXReview(.failedTXPreview(errorMessageFromError(error: err!)))
+			.failedToPrepareTXReview(.failedTXPreview(errorMessageFromError(error: err)))
 
 		default:
 			.failedToPrepareTXReview(.failedTXPreview("Unknown reason"))

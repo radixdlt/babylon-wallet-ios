@@ -45,7 +45,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case signedPreAuthorization(SignedSubintent)
-		case failed(PreAuthorizationFailure)
+		case failed(TransactionFailure)
 	}
 
 	struct Destination: DestinationReducer {
@@ -118,7 +118,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		case let .previewLoaded(.failure(error)):
 			loggerGlobal.error("PreAuthroization preview failed, error: \(error)")
 			errorQueue.schedule(error)
-			guard let failure = error as? PreAuthorizationFailure else {
+			guard let failure = error as? TransactionFailure else {
 				assertionFailure("Failed with unexpected error \(error)")
 				return .none
 			}
