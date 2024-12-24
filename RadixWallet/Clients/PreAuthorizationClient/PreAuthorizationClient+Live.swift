@@ -16,7 +16,7 @@ extension PreAuthorizationClient: DependencyKey {
 					notaryPublicKey: Sargon.PublicKey.ed25519(request.notaryPublicKey.intoSargon())
 				)
 			} catch {
-				throw PreAuthorizationFailure.failedToGetPreview(.failedToAnalyse(error))
+				throw TransactionFailure.fromCommonError(error as? CommonError)
 			}
 		}
 
