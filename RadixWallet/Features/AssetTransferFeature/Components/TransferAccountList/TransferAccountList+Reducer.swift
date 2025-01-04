@@ -80,6 +80,7 @@ struct TransferAccountList: Sendable, FeatureReducer {
 
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.accountsClient) var accountsClient
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -303,7 +304,7 @@ private extension TransferAccountList {
 			await send(.internal(.setAllDepositStatus(accountId: receivingAccountId, status: .loading)))
 			let values = switch recipient {
 			case let .profileAccount(account):
-				await getStatusesForProfileAccount(account, assets: receivingAccount.assets)
+				await getStatusesForProfileAccountForDisplay(account, assets: receivingAccount.assets)
 
 			case let .addressOfExternalAccount(account):
 				try await getStatusesForExternalAccount(account, resourceAddresses: resourceAddresses)
@@ -315,9 +316,19 @@ private extension TransferAccountList {
 		}
 	}
 
-	func getStatusesForProfileAccount(_ account: Account, assets: IdentifiedArrayOf<ResourceAsset.State>) async -> DepositStatusPerResources {
-		await assets.parallelMap { asset in
-			let result = await needsSignatureForDepositting(into: account, resource: asset.resourceAddress)
+	func getStatusesForProfileAccountForDisplay(
+		_ accountForDisplay: AccountForDisplay,
+		assets: IdentifiedArrayOf<ResourceAsset.State>
+	) async -> DepositStatusPerResources {
+		// Shall never fail, the account has been identified as present in Profile in an
+		// earlier phase.
+		let account = try! await accountsClient.getAccountByAddress(accountForDisplay.address)
+
+		return await assets.parallelMap { asset in
+			let result = await needsSignatureForDepositting(
+				into: account,
+				resource: asset.resourceAddress
+			)
 			return DepositStatusPerResource(
 				resourceAddress: asset.resourceAddress,
 				depositStatus: result ? .additionalSignatureRequired : .allowed

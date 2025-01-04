@@ -244,10 +244,13 @@ func useTryDepositOrAbort(
 	if case let .profileAccount(value: userAccount) = receivingAccount {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.accountsClient) var accountsClient
+		// Shall never fail, the account has been identified as present in Profile in an
+		// earlier phase.
+		let account = try! await accountsClient.getAccountByAddress(userAccount.address)
 
-		let needsSignatureForDepositing = await needsSignatureForDepositting(into: userAccount, resource: resource)
-		let isSoftwareAccount = !userAccount.isLedgerControlled
-		let userHasAccessToMnemonic = userAccount.deviceFactorSourceID.map { deviceFactorSourceID in
+		let needsSignatureForDepositing = await needsSignatureForDepositting(into: account, resource: resource)
+		let isSoftwareAccount = !account.isLedgerControlled
+		let userHasAccessToMnemonic = account.deviceFactorSourceID.map { deviceFactorSourceID in
 			secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(deviceFactorSourceID)
 		} ?? false
 
