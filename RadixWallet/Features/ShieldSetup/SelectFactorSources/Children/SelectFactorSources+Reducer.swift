@@ -87,7 +87,7 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 			return .send(.delegate(.finished))
 
 		case .invalidReadMoreTapped:
-			overlayWindowClient.showInfoLink(.init(glossaryItem: .buildsecurityshields))
+			overlayWindowClient.showInfoLink(.init(glossaryItem: .buildingshield))
 			return .none
 		}
 	}
