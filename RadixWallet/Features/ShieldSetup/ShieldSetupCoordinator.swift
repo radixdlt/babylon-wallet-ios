@@ -54,7 +54,7 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 			return .none
 		case .path(.element(id: _, action: .prepareFactors(.delegate(.finished)))):
 			return .send(.internal(.selectFactors))
-		case let .path(.element(id: _, action: .selectFactors(.delegate(.finished(factorSources))))):
+		case .path(.element(id: _, action: .selectFactors(.delegate(.finished)))):
 			return .none
 		default:
 			return .none

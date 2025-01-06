@@ -20,7 +20,7 @@ struct SelectFactorSourcesCoordinator: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case finished([FactorSource])
+		case finished
 		case push(Path.State)
 	}
 
@@ -33,8 +33,8 @@ struct SelectFactorSourcesCoordinator: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .path(.selectFactorSources(.delegate(.finished(factorSources)))):
-			.send(.delegate(.finished(factorSources)))
+		case .path(.selectFactorSources(.delegate(.finished))):
+			.send(.delegate(.finished))
 		default:
 			.none
 		}

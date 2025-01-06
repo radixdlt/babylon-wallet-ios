@@ -1,11 +1,23 @@
 import ComposableArchitecture
 
+// MARK: - SelectFactorSources
 @Reducer
 struct SelectFactorSources: FeatureReducer, Sendable {
 	@ObservableState
 	struct State: Hashable, Sendable {
-		var factorSources: FactorSources = []
-		var selectedFactorSources: [FactorSource]?
+		@Shared(.shieldBuilder) var shieldBuilder
+		var factorSources: [FactorSource] = []
+		var selectedFactorSources: [FactorSource]? {
+			factorSources.filter { shieldBuilder.primaryRoleThresholdFactors.contains($0.factorSourceID) }
+		}
+
+		var didInteractWithSelection = false
+
+		init() {
+			$shieldBuilder.withLock { sharedValue in
+				sharedValue = SecurityShieldBuilder()
+			}
+		}
 	}
 
 	typealias Action = FeatureAction<Self>
@@ -14,15 +26,15 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 	enum ViewAction: Equatable, Sendable {
 		case task
 		case selectedFactorSourcesChanged([FactorSource]?)
-		case buildButtonTapped([FactorSource])
+		case buildButtonTapped
 	}
 
 	enum InternalAction: Equatable, Sendable {
-		case factorSourcesResult(TaskResult<FactorSources>)
+		case factorSourcesResult(TaskResult<[FactorSource]>)
 	}
 
 	enum DelegateAction: Equatable, Sendable {
-		case finished([FactorSource])
+		case finished
 	}
 
 	var body: some ReducerOf<Self> {
@@ -35,17 +47,38 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			return .run { send in
+			return .run { [shieldBuilder = state.shieldBuilder] send in
 				let result = await TaskResult {
-					try await factorSourcesClient.getFactorSources()
+					let factorSources = try await factorSourcesClient.getFactorSources().elements
+					return shieldBuilder.sortedFactorSourcesForPrimaryThresholdSelection(factorSources: factorSources)
 				}
 				await send(.internal(.factorSourcesResult(result)))
 			}
+
 		case let .selectedFactorSourcesChanged(factorSources):
-			state.selectedFactorSources = factorSources
+			let difference = (factorSources ?? []).difference(from: state.selectedFactorSources ?? [])
+
+			for change in difference {
+				switch change {
+				case let .remove(_, factorSource, _):
+					state.$shieldBuilder.withLock { builder in
+						builder = builder.removeFactorFromPrimary(factorSourceId: factorSource.factorSourceID)
+					}
+				case let .insert(_, factorSource, _):
+					state.$shieldBuilder.withLock { builder in
+						builder = builder.addFactorSourceToPrimaryThreshold(factorSourceId: factorSource.factorSourceID)
+					}
+				}
+			}
+
+			if !state.didInteractWithSelection, factorSources != nil {
+				state.didInteractWithSelection = true
+			}
+
 			return .none
-		case let .buildButtonTapped(factorSources):
-			return .send(.delegate(.finished(factorSources)))
+
+		case .buildButtonTapped:
+			return .send(.delegate(.finished))
 		}
 	}
 
@@ -58,5 +91,13 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 			errorQueue.schedule(error)
 			return .none
 		}
+	}
+}
+
+// MARK: - SelectFactorSources.State.StatusMessageInfo
+extension SelectFactorSources.State {
+	struct StatusMessageInfo: Hashable, Sendable {
+		let type: StatusMessageView.ViewType
+		let text: String
 	}
 }

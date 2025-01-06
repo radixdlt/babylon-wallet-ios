@@ -1,36 +1,31 @@
 import ComposableArchitecture
 import SwiftUI
 
-// TODO: move to Sargon
-extension FactorSourceKind {
-	var displayOrder: Int {
-		switch self {
-		case .device: 0
-		case .arculusCard: 1
-		case .ledgerHqHardwareWallet: 2
-		case .password: 3
-		case .offDeviceMnemonic: 4
-		case .trustedContact: 5
-		case .securityQuestions: 6
-		}
-	}
-}
-
 extension SelectFactorSources.State {
-	var sortedFactorSources: [FactorSource] {
-		factorSources.sorted(by: {
-			$0.factorSourceKind.displayOrder < $1.factorSourceKind.displayOrder
-		})
+	var selectedFactorSourcesStatus: SelectedFactorSourcesForRoleStatus {
+		shieldBuilder.selectedFactorSourcesForRoleStatus(role: .primary)
 	}
 
-	var statusMessageInfo: (type: StatusMessageView.ViewType, text: String)? {
-		if (selectedFactorSources ?? []).isEmpty {
-			(.error, L10n.ShieldSetupSelectFactors.StatusMessage.atLeastOneFactor)
-		} else if selectedFactorSources?.count == 1 {
-			(.warning, L10n.ShieldSetupSelectFactors.StatusMessage.recommendedFactors)
-		} else {
+	var statusMessageInfo: StatusMessageInfo? {
+		switch selectedFactorSourcesStatus {
+		case .invalid:
+			.init(type: .error, text: "You cannot create a Shield with this combination of factors. **Read more**")
+		case .insufficient:
+			.init(type: .error, text: L10n.ShieldSetupSelectFactors.StatusMessage.atLeastOneFactor)
+		case .suboptimal:
+			.init(type: .warning, text: L10n.ShieldSetupSelectFactors.StatusMessage.recommendedFactors)
+		case .optimal:
 			nil
 		}
+	}
+
+	var isValidShield: Bool {
+		selectedFactorSourcesStatus == .optimal || selectedFactorSourcesStatus == .suboptimal
+	}
+
+	var shouldShowPasswordMessage: Bool {
+		(selectedFactorSources ?? []).contains(where: { $0.factorSourceKind == .password }) &&
+			selectedFactorSourcesStatus == .invalid
 	}
 }
 
@@ -45,15 +40,14 @@ extension SelectFactorSources {
 					coreView
 						.padding(.horizontal, .medium3)
 						.animation(.default, value: store.statusMessageInfo?.type)
+						.animation(.default, value: store.shouldShowPasswordMessage)
 				}
 				.footer {
-					WithControlRequirements(
-						store.selectedFactorSources,
-						forAction: { store.send(.view(.buildButtonTapped($0))) }
-					) { action in
-						Button(L10n.ShieldSetupSelectFactors.buildButtonTitle, action: action)
-							.buttonStyle(.primaryRectangular)
+					Button(L10n.ShieldSetupSelectFactors.buildButtonTitle) {
+						store.send(.view(.buildButtonTapped))
 					}
+					.buttonStyle(.primaryRectangular)
+					.controlState(store.isValidShield ? .enabled : .disabled)
 				}
 				.task {
 					store.send(.view(.task))
@@ -68,17 +62,24 @@ extension SelectFactorSources {
 
 				Selection(
 					$store.selectedFactorSources.sending(\.view.selectedFactorSourcesChanged),
-					from: store.sortedFactorSources,
+					from: store.factorSources,
 					requiring: .atLeast(1)
 				) { item in
 					VStack {
-						let isFirstOfKind = store.sortedFactorSources.first(where: { $0.factorSourceKind == item.value.factorSourceKind }) == item.value
+						let isFirstOfKind = store.factorSources.first(where: { $0.factorSourceKind == item.value.factorSourceKind }) == item.value
 						if isFirstOfKind, item.value.factorSourceKind.isSupported {
 							VStack(alignment: .leading, spacing: .zero) {
 								Text(item.value.factorSourceKind.title)
 									.textStyle(.body1HighImportance)
 								Text(item.value.factorSourceKind.details)
 									.textStyle(.body1Regular)
+
+								if item.value.factorSourceKind == .password, store.shouldShowPasswordMessage {
+									Text("Cannot use this factor by itself")
+										.textStyle(.body2Regular)
+										.foregroundStyle(.app.alert)
+										.padding(.top, .small3)
+								}
 							}
 							.foregroundStyle(.app.gray2)
 							.padding(.top, .medium3)
@@ -114,12 +115,13 @@ extension SelectFactorSources {
 					.padding(.horizontal, .medium2)
 					.padding(.top, .medium3)
 
-				if let statusMessage = store.statusMessageInfo {
+				if let statusMessage = store.statusMessageInfo, store.didInteractWithSelection {
 					StatusMessageView(
 						text: statusMessage.text,
 						type: statusMessage.type,
 						useNarrowSpacing: true,
-						useSmallerFontSize: true
+						useSmallerFontSize: true,
+						emphasizedTextStyle: .body2Header
 					)
 					.padding(.horizontal, .small1)
 					.padding(.top, .small1)
