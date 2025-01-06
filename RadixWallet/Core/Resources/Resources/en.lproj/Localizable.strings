@@ -1501,6 +1501,7 @@ Code: %@";
 "shieldWizardRegularAccess_override_description" = "Or you can use the following:";
 "shieldWizardRegularAccess_override_button" = "Add an override";
 "shieldWizardRegularAccess_overrideCombination_label" = "OR";
+"shieldWizardRegularAccess_authentication_title" = "Single factor required to log in to dApps with Personas and prove ownership of Accounts.";
 "shieldWizardRegularAccess_setThreshold_title" = "Set the number of factors required to sign";
 "shieldWizardRegularAccess_setThreshold_all" = "All (Recommended)";
 "shieldWizardRegularAccess_setThreshold_button" = "Set";
