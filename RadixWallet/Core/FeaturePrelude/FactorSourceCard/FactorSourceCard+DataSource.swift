@@ -96,15 +96,15 @@ extension FactorSourceKind {
 	var infoLinkContent: (item: InfoLinkSheet.GlossaryItem, title: String) {
 		switch self {
 		case .device:
-			(.device, "Learn about biometrics/PIN")
+			(.biometricspin, L10n.InfoLink.Title.biometricspin)
 		case .ledgerHqHardwareWallet:
-			(.ledger, "Learn about Ledger Nanos")
+			(.ledgernano, L10n.InfoLink.Title.ledgernano)
 		case .offDeviceMnemonic:
-			(.offdevicemnemonic, "Learn about passphrases")
+			(.passphrases, L10n.InfoLink.Title.passphrases)
 		case .arculusCard:
-			(.arculuscard, "Learn about Arculus Cards")
+			(.arculus, L10n.InfoLink.Title.arculus)
 		case .password:
-			(.password, "Learn about passwords")
+			(.passwords, L10n.InfoLink.Title.passwords)
 		default:
 			fatalError("Not supported yet")
 		}
