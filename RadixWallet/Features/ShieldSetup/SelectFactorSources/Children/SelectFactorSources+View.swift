@@ -19,7 +19,7 @@ extension SelectFactorSources.State {
 		}
 	}
 
-	var isValidShield: Bool {
+	var isValidSelection: Bool {
 		selectedFactorSourcesStatus == .optimal || selectedFactorSourcesStatus == .suboptimal
 	}
 
@@ -47,7 +47,7 @@ extension SelectFactorSources {
 						store.send(.view(.buildButtonTapped))
 					}
 					.buttonStyle(.primaryRectangular)
-					.controlState(store.isValidShield ? .enabled : .disabled)
+					.controlState(store.isValidSelection ? .enabled : .disabled)
 				}
 				.task {
 					store.send(.view(.task))
@@ -126,6 +126,11 @@ extension SelectFactorSources {
 					.padding(.horizontal, .small1)
 					.padding(.top, .small1)
 					.flushedLeft
+					.onTapGesture {
+						if store.selectedFactorSourcesStatus == .invalid {
+							store.send(.view(.invalidReadMoreTapped))
+						}
+					}
 				}
 			}
 			.foregroundStyle(.app.gray1)

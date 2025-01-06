@@ -27,6 +27,7 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 		case task
 		case selectedFactorSourcesChanged([FactorSource]?)
 		case buildButtonTapped
+		case invalidReadMoreTapped
 	}
 
 	enum InternalAction: Equatable, Sendable {
@@ -42,6 +43,7 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 	}
 
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.errorQueue) var errorQueue
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
@@ -83,6 +85,10 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 
 		case .buildButtonTapped:
 			return .send(.delegate(.finished))
+
+		case .invalidReadMoreTapped:
+			overlayWindowClient.showInfoLink(.init(glossaryItem: .buildsecurityshields))
+			return .none
 		}
 	}
 
