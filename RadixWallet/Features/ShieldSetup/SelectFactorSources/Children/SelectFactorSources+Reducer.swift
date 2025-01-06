@@ -71,6 +71,10 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 				}
 			}
 
+			state.$shieldBuilder.withLock { builder in
+				builder = builder.setThreshold(threshold: UInt8(builder.primaryRoleThresholdFactors.count))
+			}
+
 			if !state.didInteractWithSelection, factorSources != nil {
 				state.didInteractWithSelection = true
 			}
