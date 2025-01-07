@@ -4,7 +4,7 @@ extension AppEventsClient: TestDependencyKey {
 
 	static let testValue = Self(
 		handleEvent: unimplemented("\(Self.self).handleEvent"),
-		events: unimplemented("\(Self.self).events")
+		events: unimplemented("\(Self.self).events", placeholder: noop.events)
 	)
 }
 

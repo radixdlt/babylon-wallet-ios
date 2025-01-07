@@ -27,7 +27,6 @@ extension ImportOlympiaWalletCoordinator {
 			} destination: {
 				Path.View(store: $0)
 			}
-			.navigationTransition(.slide, interactivity: .disabled)
 		}
 	}
 }

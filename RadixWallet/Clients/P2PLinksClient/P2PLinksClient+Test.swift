@@ -19,7 +19,7 @@ extension P2PLinksClient: TestDependencyKey {
 		storeP2PLinkPrivateKey: { _ in }
 	)
 	static let testValue = Self(
-		getP2PLinks: unimplemented("\(Self.self).getP2PLinks"),
+		getP2PLinks: unimplemented("\(Self.self).getP2PLinks", placeholder: noop.getP2PLinks),
 		updateOrAddP2PLink: unimplemented("\(Self.self).updateOrAddP2PLink"),
 		updateP2PLink: unimplemented("\(Self.self).updateP2PLink"),
 		deleteP2PLinkByPassword: unimplemented("\(Self.self).deleteP2PLinkByPassword"),
