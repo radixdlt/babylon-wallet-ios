@@ -67,7 +67,6 @@ extension InfoLinkSheet {
 		case passwords
 		case securityshields
 		case buildingshield
-		case nohardwaredevice
 	}
 }
 
@@ -181,8 +180,6 @@ extension InfoLinkSheet.GlossaryItem {
 			L10n.InfoLink.Glossary.securityshields
 		case .buildingshield:
 			L10n.InfoLink.Glossary.buildingshield
-		case .nohardwaredevice:
-			"TODO" // TODO: update
 		}
 	}
 }
