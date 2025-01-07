@@ -75,6 +75,9 @@ struct PlainListRow<Icon: View, Accessory: View>: View {
 			top
 			hints
 		}
+		.applyIf(viewState.rowCoreViewState.shouldTintAsError) {
+			$0.foregroundStyle(Color.app.error)
+		}
 		.padding(.vertical, viewState.rowCoreViewState.verticalPadding)
 		.padding(.horizontal, viewState.rowCoreViewState.horizontalPadding)
 		.frame(minHeight: .plainListRowMinHeight)
@@ -166,7 +169,7 @@ struct PlainListRowCore: View {
 					.lineSpacing(-6)
 					.lineLimit(viewState.titleLineLimit)
 					.textStyle(viewState.titleTextStyle)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(viewState.titleForegroundColor)
 			}
 
 			if let subtitle = viewState.subtitle {
@@ -218,12 +221,23 @@ private extension PlainListRowCore.ViewState {
 		}
 	}
 
+	var titleForegroundColor: Color {
+		switch context {
+		case .toggle, .hiddenPersona, .settings(isError: false), .dappAndPersona, .compactPersona:
+			.app.gray1
+		case .settings(isError: true):
+			.app.error
+		}
+	}
+
 	var subtitleForegroundColor: Color {
 		switch context {
 		case .toggle, .hiddenPersona:
 			.app.gray2
-		case .settings, .dappAndPersona, .compactPersona:
+		case .settings(isError: false), .dappAndPersona, .compactPersona:
 			.app.gray1
+		case .settings(isError: true):
+			.app.error
 		}
 	}
 
@@ -266,16 +280,29 @@ private extension PlainListRowCore.ViewState {
 			.medium1
 		}
 	}
+
+	var shouldTintAsError: Bool {
+		switch context {
+		case .settings(isError: true):
+			true
+		default:
+			false
+		}
+	}
 }
 
 // MARK: - PlainListRowCore.ViewState.Context
 extension PlainListRowCore.ViewState {
-	enum Context {
-		case settings
+	enum Context: Equatable {
+		case settings(isError: Bool)
 		case toggle
 		case dappAndPersona
 		case hiddenPersona
 		case compactPersona
+
+		static var settings: Self {
+			.settings(isError: false)
+		}
 	}
 }
 

@@ -71,6 +71,7 @@ extension SettingsRow.Kind {
 		let action: Feature.ViewAction
 
 		init(
+			isError: Bool = false,
 			title: String,
 			subtitle: String? = nil,
 			detail: String? = nil,
@@ -83,7 +84,7 @@ extension SettingsRow.Kind {
 			self.id = title
 			self.rowViewState = .init(
 				icon,
-				rowCoreViewState: .init(title: title, subtitle: subtitle, detail: detail, markdown: markdown),
+				rowCoreViewState: .init(context: .settings(isError: isError), title: title, subtitle: subtitle, detail: detail, markdown: markdown),
 				accessory: accessory,
 				hints: hints
 			)
@@ -119,6 +120,7 @@ extension SettingsRow.Kind {
 // MARK: - Helper
 extension SettingsRow.Kind {
 	static func model(
+		isError: Bool = false,
 		title: String,
 		subtitle: String? = nil,
 		detail: String? = nil,
@@ -130,6 +132,7 @@ extension SettingsRow.Kind {
 	) -> Self {
 		.model(
 			.init(
+				isError: isError,
 				title: title,
 				subtitle: subtitle,
 				detail: detail,

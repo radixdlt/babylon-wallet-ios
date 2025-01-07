@@ -21,6 +21,7 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 	enum ViewAction: Sendable, Equatable {
 		case renameTapped
 		case viewSeedPhraseTapped
+		case enterSeedPhraseTapped
 		case changePinTapped
 	}
 
@@ -29,12 +30,14 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 		enum State: Sendable, Hashable {
 			case rename(RenameLabel.State)
 			case displayMnemonic(DisplayMnemonic.State)
+			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
 			case rename(RenameLabel.Action)
 			case displayMnemonic(DisplayMnemonic.Action)
+			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -43,6 +46,9 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 			}
 			Scope(state: \.displayMnemonic, action: \.displayMnemonic) {
 				DisplayMnemonic()
+			}
+			Scope(state: \.importMnemonics, action: \.importMnemonics) {
+				ImportMnemonicsFlowCoordinator()
 			}
 		}
 	}
@@ -65,6 +71,9 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 			return exportMnemonic(integrity: state.integrity) {
 				state.destination = .displayMnemonic(.export($0, title: L10n.RevealSeedPhrase.title, context: .fromSettings))
 			}
+		case .enterSeedPhraseTapped:
+			state.destination = .importMnemonics(.init())
+			return .none
 		case .changePinTapped:
 			return .none
 		}
@@ -77,7 +86,7 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 			state.destination = nil
 			return .none
 
-		case .displayMnemonic(.delegate):
+		case .displayMnemonic(.delegate), .importMnemonics(.delegate):
 			state.destination = nil
 			return .none
 

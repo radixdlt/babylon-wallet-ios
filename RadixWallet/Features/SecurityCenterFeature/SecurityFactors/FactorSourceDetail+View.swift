@@ -22,16 +22,13 @@ extension FactorSourceDetail {
 
 		private func rows(_ viewStore: ViewStore<FactorSourceDetail.State, FactorSourceDetail.ViewAction>) -> [SettingsRow<FactorSourceDetail>.Kind] {
 			switch viewStore.integrity {
-			case .device:
+			case let .device(device):
 				[
-					.header(L10n.FactorSources.Detail.settings),
+					.header("Manage Factor"),
 					renameRow(viewStore),
+					deviceSeedPhraseRow(device),
 					.header(L10n.FactorSources.Detail.test),
 					spotCheckRow(viewStore),
-					.header(L10n.FactorSources.Detail.advanced),
-					// TODO: Define how to handle case where seed phrase was never entered
-					// Discussion: https://rdxworks.slack.com/archives/C031A0V1A1W/p1734452174675219
-					viewSeedPhraseRow(viewStore),
 				]
 			case .ledger, .offDeviceMnemonic, .password:
 				[
@@ -70,13 +67,23 @@ extension FactorSourceDetail {
 			)
 		}
 
-		private func viewSeedPhraseRow(_ viewStore: ViewStore<FactorSourceDetail.State, FactorSourceDetail.ViewAction>) -> SettingsRow<FactorSourceDetail>.Kind {
-			.model(
-				title: L10n.FactorSources.Detail.viewSeedPhrase,
-				subtitle: L10n.FactorSources.Detail.writeSeedPhrase,
-				icon: .systemImage("eye.fill"),
-				action: .viewSeedPhraseTapped
-			)
+		private func deviceSeedPhraseRow(_ integrity: DeviceFactorSourceIntegrity) -> SettingsRow<FactorSourceDetail>.Kind {
+			if integrity.isMnemonicPresentInSecureStorage {
+				.model(
+					title: L10n.FactorSources.Detail.viewSeedPhrase,
+					subtitle: L10n.FactorSources.Detail.writeSeedPhrase,
+					icon: .systemImage("eye.fill"),
+					action: .viewSeedPhraseTapped
+				)
+			} else {
+				.model(
+					isError: true,
+					title: "Seed Phrase Lost",
+					subtitle: "Enter seed phrase to recover use of this factor.",
+					icon: .systemImage("eye.fill"),
+					action: .enterSeedPhraseTapped
+				)
+			}
 		}
 
 		private func changePinRow(_ viewStore: ViewStore<FactorSourceDetail.State, FactorSourceDetail.ViewAction>) -> SettingsRow<FactorSourceDetail>.Kind {
@@ -111,6 +118,7 @@ private extension View {
 		let destinationStore = store.destination
 		return rename(with: destinationStore)
 			.displayMnemonic(with: destinationStore)
+			.importMnemonics(with: destinationStore)
 	}
 
 	private func rename(with destinationStore: PresentationStoreOf<FactorSourceDetail.Destination>) -> some View {
@@ -122,6 +130,12 @@ private extension View {
 	private func displayMnemonic(with destinationStore: PresentationStoreOf<FactorSourceDetail.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.displayMnemonic, action: \.displayMnemonic)) {
 			DisplayMnemonic.View(store: $0)
+		}
+	}
+
+	private func importMnemonics(with destinationStore: PresentationStoreOf<FactorSourceDetail.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.importMnemonics, action: \.importMnemonics)) {
+			ImportMnemonicsFlowCoordinator.View(store: $0)
 		}
 	}
 }
