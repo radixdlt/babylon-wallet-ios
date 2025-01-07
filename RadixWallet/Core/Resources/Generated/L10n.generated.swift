@@ -1853,14 +1853,18 @@ internal enum L10n {
       internal static let advanced = L10n.tr("Localizable", "factorSources_detail_advanced", fallback: "Advanced")
       /// Change PIN
       internal static let changePin = L10n.tr("Localizable", "factorSources_detail_changePin", fallback: "Change PIN")
+      /// Enter seed phrase to recover use of this factor
+      internal static let enterSeedPhrase = L10n.tr("Localizable", "factorSources_detail_enterSeedPhrase", fallback: "Enter seed phrase to recover use of this factor")
       /// **Last used:** %@
       internal static func lastUsed(_ p1: Any) -> String {
         return L10n.tr("Localizable", "factorSources_detail_lastUsed", String(describing: p1), fallback: "**Last used:** %@")
       }
+      /// Manage Factor
+      internal static let manage = L10n.tr("Localizable", "factorSources_detail_manage", fallback: "Manage Factor")
       /// Rename this factor
       internal static let rename = L10n.tr("Localizable", "factorSources_detail_rename", fallback: "Rename this factor")
-      /// Factor Settings
-      internal static let settings = L10n.tr("Localizable", "factorSources_detail_settings", fallback: "Factor Settings")
+      /// Seed Phrase Lost
+      internal static let seedPhraseLost = L10n.tr("Localizable", "factorSources_detail_seedPhraseLost", fallback: "Seed Phrase Lost")
       /// Spot Check
       internal static let spotCheck = L10n.tr("Localizable", "factorSources_detail_spotCheck", fallback: "Spot Check")
       /// Test
