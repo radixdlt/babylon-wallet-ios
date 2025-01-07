@@ -29,7 +29,7 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 	}
 
 	enum InternalAction: Equatable, Sendable {
-		case factorSourcesResult(TaskResult<[FactorSource]>)
+		case setFactorSources([FactorSource])
 	}
 
 	enum DelegateAction: Equatable, Sendable {
@@ -48,11 +48,11 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 		switch viewAction {
 		case .task:
 			return .run { [shieldBuilder = state.shieldBuilder] send in
-				let result = await TaskResult {
-					let factorSources = try await factorSourcesClient.getFactorSources().elements
-					return shieldBuilder.sortedFactorSourcesForPrimaryThresholdSelection(factorSources: factorSources)
-				}
-				await send(.internal(.factorSourcesResult(result)))
+				let factorSources = try await factorSourcesClient.getFactorSources().elements
+				let result = shieldBuilder.sortedFactorSourcesForPrimaryThresholdSelection(factorSources: factorSources)
+				await send(.internal(.setFactorSources(result)))
+			} catch: { error, _ in
+				errorQueue.schedule(error)
 			}
 
 		case let .selectedFactorSourcesChanged(factorSources):
@@ -91,11 +91,8 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .factorSourcesResult(.success(factorSources)):
+		case let .setFactorSources(factorSources):
 			state.factorSources = factorSources
-			return .none
-		case let .factorSourcesResult(.failure(error)):
-			errorQueue.schedule(error)
 			return .none
 		}
 	}

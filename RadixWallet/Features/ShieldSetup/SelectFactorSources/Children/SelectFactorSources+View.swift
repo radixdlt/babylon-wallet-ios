@@ -23,6 +23,7 @@ extension SelectFactorSources.State {
 		selectedFactorSourcesStatus == .optimal || selectedFactorSourcesStatus == .suboptimal
 	}
 
+	// TODO: Move to Sargon
 	var shouldShowPasswordMessage: Bool {
 		(selectedFactorSources ?? []).contains(where: { $0.factorSourceKind == .password }) &&
 			selectedFactorSourcesStatus == .invalid
