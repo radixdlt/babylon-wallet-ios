@@ -24,7 +24,7 @@ extension FactorSourceDetail {
 			switch viewStore.integrity {
 			case let .device(device):
 				[
-					.header("Manage Factor"),
+					.header(L10n.FactorSources.Detail.manage),
 					renameRow(viewStore),
 					deviceSeedPhraseRow(device),
 					.header(L10n.FactorSources.Detail.test),
@@ -32,14 +32,14 @@ extension FactorSourceDetail {
 				]
 			case .ledger, .offDeviceMnemonic, .password:
 				[
-					.header(L10n.FactorSources.Detail.settings),
+					.header(L10n.FactorSources.Detail.manage),
 					renameRow(viewStore),
 					.header(L10n.FactorSources.Detail.test),
 					spotCheckRow(viewStore),
 				]
 			case .arculusCard:
 				[
-					.header(L10n.FactorSources.Detail.settings),
+					.header(L10n.FactorSources.Detail.manage),
 					renameRow(viewStore),
 					changePinRow(viewStore),
 					.header(L10n.FactorSources.Detail.test),
@@ -78,8 +78,8 @@ extension FactorSourceDetail {
 			} else {
 				.model(
 					isError: true,
-					title: "Seed Phrase Lost",
-					subtitle: "Enter seed phrase to recover use of this factor.",
+					title: L10n.FactorSources.Detail.seedPhraseLost,
+					subtitle: L10n.FactorSources.Detail.enterSeedPhrase,
 					icon: .systemImage("eye.fill"),
 					action: .enterSeedPhraseTapped
 				)
