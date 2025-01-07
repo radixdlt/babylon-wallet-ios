@@ -11,6 +11,7 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 	enum Path {
 		case prepareFactors(PrepareFactorSources.Coordinator)
 		case selectFactors(SelectFactorSourcesCoordinator)
+		case regularAccessSetup(RegularAccessSetup)
 	}
 
 	typealias Action = FeatureAction<Self>
@@ -18,6 +19,7 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 	enum InternalAction: Sendable, Equatable {
 		case prepareFactors
 		case selectFactors
+		case regularAccessSetup
 	}
 
 	@CasePathable
@@ -42,6 +44,9 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 		case .selectFactors:
 			state.path.append(.selectFactors(.init(path: .selectFactorSources(.init()))))
 			return .none
+		case .regularAccessSetup:
+			state.path.append(.regularAccessSetup(.init()))
+			return .none
 		}
 	}
 
@@ -55,7 +60,7 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 		case .path(.element(id: _, action: .prepareFactors(.delegate(.finished)))):
 			return .send(.internal(.selectFactors))
 		case .path(.element(id: _, action: .selectFactors(.delegate(.finished)))):
-			return .none
+			return .send(.internal(.regularAccessSetup))
 		default:
 			return .none
 		}

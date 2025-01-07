@@ -101,10 +101,8 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 	}
 }
 
-// MARK: - SelectFactorSources.State.StatusMessageInfo
-extension SelectFactorSources.State {
-	struct StatusMessageInfo: Hashable, Sendable {
-		let type: StatusMessageView.ViewType
-		let text: String
-	}
+// MARK: - ShieldStatusMessageInfo
+struct ShieldStatusMessageInfo: Hashable, Sendable {
+	let type: StatusMessageView.ViewType
+	let text: String
 }

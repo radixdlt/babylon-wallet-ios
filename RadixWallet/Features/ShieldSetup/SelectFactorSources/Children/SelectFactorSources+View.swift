@@ -6,7 +6,7 @@ extension SelectFactorSources.State {
 		shieldBuilder.selectedFactorSourcesForRoleStatus(role: .primary)
 	}
 
-	var statusMessageInfo: StatusMessageInfo? {
+	var statusMessageInfo: ShieldStatusMessageInfo? {
 		switch selectedFactorSourcesStatus {
 		case .invalid:
 			.init(type: .error, text: L10n.ShieldSetupStatus.invalidCombination)

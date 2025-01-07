@@ -15,6 +15,8 @@ extension ShieldSetupCoordinator {
 						PrepareFactorSources.Coordinator.View(store: store)
 					case let .selectFactors(store):
 						SelectFactorSourcesCoordinator.View(store: store)
+					case let .regularAccessSetup(store):
+						RegularAccessSetup.View(store: store)
 					}
 				}
 			}
