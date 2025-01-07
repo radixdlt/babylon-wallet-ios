@@ -44,7 +44,7 @@ extension SelectFactorSources {
 				}
 				.footer {
 					Button(L10n.ShieldSetupSelectFactors.buildButtonTitle) {
-						store.send(.view(.buildButtonTapped))
+						store.send(.view(.continueButtonTapped))
 					}
 					.buttonStyle(.primaryRectangular)
 					.controlState(store.isValidSelection ? .enabled : .disabled)

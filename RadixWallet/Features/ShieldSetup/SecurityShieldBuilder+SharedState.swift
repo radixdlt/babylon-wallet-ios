@@ -4,6 +4,14 @@ extension SharedKey where Self == InMemoryKey<SecurityShieldBuilder>.Default {
 	}
 }
 
+extension Shared where Value == SecurityShieldBuilder {
+	func initialize() {
+		withLock { sharedValue in
+			sharedValue = SecurityShieldBuilder()
+		}
+	}
+}
+
 // MARK: - SecurityShieldBuilder + @unchecked Sendable
 extension SecurityShieldBuilder: @unchecked Sendable {}
 

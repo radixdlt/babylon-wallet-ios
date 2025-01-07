@@ -14,9 +14,7 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 		var didInteractWithSelection = false
 
 		init() {
-			$shieldBuilder.withLock { sharedValue in
-				sharedValue = SecurityShieldBuilder()
-			}
+			$shieldBuilder.initialize()
 		}
 	}
 
@@ -26,7 +24,7 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 	enum ViewAction: Equatable, Sendable {
 		case task
 		case selectedFactorSourcesChanged([FactorSource]?)
-		case buildButtonTapped
+		case continueButtonTapped
 		case invalidReadMoreTapped
 	}
 
@@ -61,29 +59,28 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 			let difference = (factorSources ?? []).difference(from: state.selectedFactorSources ?? [])
 
 			for change in difference {
-				switch change {
-				case let .remove(_, factorSource, _):
-					state.$shieldBuilder.withLock { builder in
+				state.$shieldBuilder.withLock { builder in
+					switch change {
+					case let .remove(_, factorSource, _):
 						builder = builder.removeFactorFromPrimary(factorSourceId: factorSource.factorSourceID)
-					}
-				case let .insert(_, factorSource, _):
-					state.$shieldBuilder.withLock { builder in
+					case let .insert(_, factorSource, _):
 						builder = builder.addFactorSourceToPrimaryThreshold(factorSourceId: factorSource.factorSourceID)
 					}
 				}
 			}
 
+			// TODO: Remove once https://radixdlt.atlassian.net/browse/ABW-4047 is implemented
 			state.$shieldBuilder.withLock { builder in
 				builder = builder.setThreshold(threshold: UInt8(builder.primaryRoleThresholdFactors.count))
 			}
 
-			if !state.didInteractWithSelection, factorSources != nil {
+			if !state.didInteractWithSelection, !difference.isEmpty {
 				state.didInteractWithSelection = true
 			}
 
 			return .none
 
-		case .buildButtonTapped:
+		case .continueButtonTapped:
 			return .send(.delegate(.finished))
 
 		case .invalidReadMoreTapped:
