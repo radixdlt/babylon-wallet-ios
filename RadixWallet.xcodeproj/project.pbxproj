@@ -1213,6 +1213,7 @@
 		E65D6CE72BC9815B001D8A39 /* Stage2MigrateToSargon+AppPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = E65D6CE62BC9815B001D8A39 /* Stage2MigrateToSargon+AppPreferences.swift */; };
 		E65D6CEC2BC98237001D8A39 /* Stage2MigrateToSargon+Gateways.swift in Sources */ = {isa = PBXBuildFile; fileRef = E65D6CEB2BC98237001D8A39 /* Stage2MigrateToSargon+Gateways.swift */; };
 		E65D6CEE2BC98267001D8A39 /* Stage2MigrateToSargon+AppPreferences+ViaProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = E65D6CED2BC98267001D8A39 /* Stage2MigrateToSargon+AppPreferences+ViaProfile.swift */; };
+		E65FDAD12D2D47860030F217 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = E65FDAD02D2D47860030F217 /* Sargon */; };
 		E66DCC402BD93EC000547CF4 /* Stage1MigrateToSargon+Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66DCC3F2BD93EC000547CF4 /* Stage1MigrateToSargon+Header.swift */; };
 		E66EEB9B2B06694E007624BC /* RecoverWalletWithoutProfileStart+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66EEB992B06694E007624BC /* RecoverWalletWithoutProfileStart+View.swift */; };
 		E66EEB9C2B06694E007624BC /* RecoverWalletWithoutProfileStart.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66EEB9A2B06694E007624BC /* RecoverWalletWithoutProfileStart.swift */; };
@@ -2616,6 +2617,7 @@
 				48FFFAD82ADC21D200B2B213 /* NonEmpty in Frameworks */,
 				48FFFAE12ADC220F00B2B213 /* Tagged in Frameworks */,
 				48FFFAD22ADC218400B2B213 /* Either in Frameworks */,
+				E65FDAD12D2D47860030F217 /* Sargon in Frameworks */,
 				48FFFAA52ADC1F9600B2B213 /* AsyncAlgorithms in Frameworks */,
 				48FFFAA82ADC1FBE00B2B213 /* Atomics in Frameworks */,
 				48FFFAF02ADC229900B2B213 /* AnyCodable in Frameworks */,
@@ -7155,6 +7157,7 @@
 				5B4E1D1E2CB7FE8E002FAC2E /* Sargon */,
 				5B3FDC1C2CFA2A4F0024BFAF /* Sargon */,
 				5B1BE3902D09E62A00201E30 /* Sargon */,
+				E65FDAD02D2D47860030F217 /* Sargon */,
 			);
 			productName = RadixWallet;
 			productReference = 48CFBC4F2ADC106300E77A5C /* Radix Wallet Dev.app */;
@@ -7218,7 +7221,7 @@
 				5B1C4FD32BBB0B0C00B9436F /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Strict" */,
 				8318BB172BC8403800057BCB /* XCRemoteSwiftPackageReference "swift-custom-dump" */,
 				5B634A922C91D2A0004B2FBC /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */,
-				5B725D472D0C7F370040BA22 /* XCRemoteSwiftPackageReference "sargon" */,
+				E65FDACF2D2D47860030F217 /* XCRemoteSwiftPackageReference "sargon" */,
 			);
 			productRefGroup = 48CFBC502ADC106300E77A5C /* Products */;
 			projectDirPath = "";
@@ -9265,14 +9268,6 @@
 				revision = 03769bcd1b1c9c24af424890f0a3e6d15bd3000c;
 			};
 		};
-		5B725D472D0C7F370040BA22 /* XCRemoteSwiftPackageReference "sargon" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/radixdlt/sargon/";
-			requirement = {
-				kind = exactVersion;
-				version = 1.1.88;
-			};
-		};
 		8318BB172BC8403800057BCB /* XCRemoteSwiftPackageReference "swift-custom-dump" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swift-custom-dump";
@@ -9295,6 +9290,14 @@
 			requirement = {
 				kind = exactVersion;
 				version = 1.9.11;
+			};
+		};
+		E65FDACF2D2D47860030F217 /* XCRemoteSwiftPackageReference "sargon" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/radixdlt/sargon";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.99;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -9500,6 +9503,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 48FFFAB22ADC206300B2B213 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
 			productName = SwiftUIIntrospect;
+		};
+		E65FDAD02D2D47860030F217 /* Sargon */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E65FDACF2D2D47860030F217 /* XCRemoteSwiftPackageReference "sargon" */;
+			productName = Sargon;
 		};
 		E695F2DD2BECDD7C00761ACE /* Sargon */ = {
 			isa = XCSwiftPackageProductDependency;
