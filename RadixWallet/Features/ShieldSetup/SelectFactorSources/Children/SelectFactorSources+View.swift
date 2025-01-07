@@ -9,11 +9,11 @@ extension SelectFactorSources.State {
 	var statusMessageInfo: StatusMessageInfo? {
 		switch selectedFactorSourcesStatus {
 		case .invalid:
-			.init(type: .error, text: "You cannot create a Shield with this combination of factors. **Read more**")
+			.init(type: .error, text: L10n.ShieldSetupStatus.invalidCombination)
 		case .insufficient:
-			.init(type: .error, text: L10n.ShieldSetupSelectFactors.StatusMessage.atLeastOneFactor)
+			.init(type: .error, text: L10n.ShieldSetupStatus.Transactions.atLeastOneFactor)
 		case .suboptimal:
-			.init(type: .warning, text: L10n.ShieldSetupSelectFactors.StatusMessage.recommendedFactors)
+			.init(type: .warning, text: L10n.ShieldSetupStatus.recommendedFactors)
 		case .optimal:
 			nil
 		}
@@ -75,7 +75,7 @@ extension SelectFactorSources {
 									.textStyle(.body1Regular)
 
 								if item.value.factorSourceKind == .password, store.shouldShowPasswordMessage {
-									Text("Cannot use this factor by itself")
+									Text(L10n.ShieldSetupStatus.factorCannotBeUsedByItself)
 										.textStyle(.body2Regular)
 										.foregroundStyle(.app.alert)
 										.padding(.top, .small3)
