@@ -1835,8 +1835,8 @@ internal enum L10n {
       }
       /// Enter a seed phrase to approve
       internal static let passphraseDescription = L10n.tr("Localizable", "factorSources_card_passphraseDescription", fallback: "Enter a seed phrase to approve")
-      /// Passphrase
-      internal static let passphraseTitle = L10n.tr("Localizable", "factorSources_card_passphraseTitle", fallback: "Passphrase")
+      /// Mnemonic
+      internal static let passphraseTitle = L10n.tr("Localizable", "factorSources_card_passphraseTitle", fallback: "Mnemonic")
       /// Enter a decentralized password to approve
       internal static let passwordDescription = L10n.tr("Localizable", "factorSources_card_passwordDescription", fallback: "Enter a decentralized password to approve")
       /// Password
@@ -2841,8 +2841,6 @@ internal enum L10n {
       internal static let networkstaking = L10n.tr("Localizable", "infoLink_title_networkstaking", fallback: "What is Staking?")
       /// What are NFTs?
       internal static let nfts = L10n.tr("Localizable", "infoLink_title_nfts", fallback: "What are NFTs?")
-      /// I don’t have a hardware device
-      internal static let nohardwaredevice = L10n.tr("Localizable", "infoLink_title_nohardwaredevice", fallback: "I don’t have a hardware device")
       /// Learn about passphrases
       internal static let passphrases = L10n.tr("Localizable", "infoLink_title_passphrases", fallback: "Learn about passphrases")
       /// Learn about passwords
@@ -3700,6 +3698,10 @@ internal enum L10n {
       /// Seed Phrases
       internal static let title = L10n.tr("Localizable", "securityFactors_seedPhrases_title", fallback: "Seed Phrases")
     }
+    internal enum SelectFactor {
+      /// Select Factor Type
+      internal static let title = L10n.tr("Localizable", "securityFactors_selectFactor_title", fallback: "Select Factor Type")
+    }
   }
   internal enum SecurityProblems {
     internal enum Common {
@@ -3899,6 +3901,8 @@ internal enum L10n {
     internal enum AddHardwareFactor {
       /// Add Hardware Device
       internal static let button = L10n.tr("Localizable", "shieldSetupPrepareFactors_addHardwareFactor_button", fallback: "Add Hardware Device")
+      /// I don’t have a hardware device
+      internal static let noDeviceButton = L10n.tr("Localizable", "shieldSetupPrepareFactors_addHardwareFactor_noDeviceButton", fallback: "I don’t have a hardware device")
       /// Choose a hardware device to use as a security factor in your Shield.
       internal static let subtitle = L10n.tr("Localizable", "shieldSetupPrepareFactors_addHardwareFactor_subtitle", fallback: "Choose a hardware device to use as a security factor in your Shield.")
       /// Add a Hardware Device
@@ -3932,11 +3936,133 @@ internal enum L10n {
     internal static let subtitle = L10n.tr("Localizable", "shieldSetupSelectFactors_subtitle", fallback: "Choose the factors you’ll use to sign transactions. You’ll use **all** of these factors every time you send assets or log in to dApps.")
     /// Select Factors for Transactions
     internal static let title = L10n.tr("Localizable", "shieldSetupSelectFactors_title", fallback: "Select Factors for Transactions")
-    internal enum StatusMessage {
+  }
+  internal enum ShieldSetupStatus {
+    /// Cannot use this factor by itself
+    internal static let factorCannotBeUsedByItself = L10n.tr("Localizable", "shieldSetupStatus_factorCannotBeUsedByItself", fallback: "Cannot use this factor by itself")
+    /// You cannot create a Shield with this combination of factors. **Read more**
+    internal static let invalidCombination = L10n.tr("Localizable", "shieldSetupStatus_invalidCombination", fallback: "You cannot create a Shield with this combination of factors. **Read more**")
+    /// Choosing 2 factors will make your Shield more secure and reliable
+    internal static let recommendedFactors = L10n.tr("Localizable", "shieldSetupStatus_recommendedFactors", fallback: "Choosing 2 factors will make your Shield more secure and reliable")
+    internal enum Authentication {
+      /// You need to choose a factor to continue
+      internal static let atLeastOneFactor = L10n.tr("Localizable", "shieldSetupStatus_authentication_atLeastOneFactor", fallback: "You need to choose a factor to continue")
+    }
+    internal enum Transactions {
       /// You need to select at least 1 factor for signing transactions
-      internal static let atLeastOneFactor = L10n.tr("Localizable", "shieldSetupSelectFactors_statusMessage_atLeastOneFactor", fallback: "You need to select at least 1 factor for signing transactions")
-      /// Choosing 2 factors will make your Shield more secure and reliable
-      internal static let recommendedFactors = L10n.tr("Localizable", "shieldSetupSelectFactors_statusMessage_recommendedFactors", fallback: "Choosing 2 factors will make your Shield more secure and reliable")
+      internal static let atLeastOneFactor = L10n.tr("Localizable", "shieldSetupStatus_transactions_atLeastOneFactor", fallback: "You need to select at least 1 factor for signing transactions")
+    }
+  }
+  internal enum ShieldWizardName {
+    /// Give this Security Shield a name, so you can identify it later.
+    internal static let subtitle = L10n.tr("Localizable", "shieldWizardName_subtitle", fallback: "Give this Security Shield a name, so you can identify it later.")
+    /// Name your Security Shield
+    internal static let title = L10n.tr("Localizable", "shieldWizardName_title", fallback: "Name your Security Shield")
+  }
+  internal enum ShieldWizardRecovery {
+    /// Recovery
+    internal static let title = L10n.tr("Localizable", "shieldWizardRecovery_title", fallback: "Recovery")
+    internal enum Combination {
+      /// OR
+      internal static let label = L10n.tr("Localizable", "shieldWizardRecovery_combination_label", fallback: "OR")
+    }
+    internal enum Confirm {
+      /// Factors you can use to complete the recovery of your Accounts and Personas.
+      internal static let subtitle = L10n.tr("Localizable", "shieldWizardRecovery_confirm_subtitle", fallback: "Factors you can use to complete the recovery of your Accounts and Personas.")
+      /// Confirming a Recovery
+      internal static let title = L10n.tr("Localizable", "shieldWizardRecovery_confirm_title", fallback: "Confirming a Recovery")
+    }
+    internal enum Factors {
+      /// You'll need to use the following:
+      internal static let title = L10n.tr("Localizable", "shieldWizardRecovery_factors_title", fallback: "You'll need to use the following:")
+    }
+    internal enum Fallback {
+      /// We recommend setting this for an extended period, so you have time to notice and cancel a recovery you don’t want.
+      internal static let note = L10n.tr("Localizable", "shieldWizardRecovery_fallback_note", fallback: "We recommend setting this for an extended period, so you have time to notice and cancel a recovery you don’t want.")
+      /// Set a time period to automatically confirm recovery **WITHOUT** presenting any of the above confirmation factors.
+      internal static let subtitle = L10n.tr("Localizable", "shieldWizardRecovery_fallback_subtitle", fallback: "Set a time period to automatically confirm recovery **WITHOUT** presenting any of the above confirmation factors.")
+      /// Emergency Fallback
+      internal static let title = L10n.tr("Localizable", "shieldWizardRecovery_fallback_title", fallback: "Emergency Fallback")
+      internal enum Day {
+        /// Day
+        internal static let label = L10n.tr("Localizable", "shieldWizardRecovery_fallback_day_label", fallback: "Day")
+      }
+      internal enum Days {
+        /// Days
+        internal static let label = L10n.tr("Localizable", "shieldWizardRecovery_fallback_days_label", fallback: "Days")
+      }
+      internal enum Week {
+        /// Week
+        internal static let label = L10n.tr("Localizable", "shieldWizardRecovery_fallback_week_label", fallback: "Week")
+      }
+      internal enum Weeks {
+        /// Weeks
+        internal static let label = L10n.tr("Localizable", "shieldWizardRecovery_fallback_weeks_label", fallback: "Weeks")
+      }
+    }
+    internal enum SetFallback {
+      /// Set
+      internal static let button = L10n.tr("Localizable", "shieldWizardRecovery_setFallback_button", fallback: "Set")
+      /// Set a time period to automatically confirm recovery **WITHOUT** presenting any confirmation factors.
+      internal static let subtitle = L10n.tr("Localizable", "shieldWizardRecovery_setFallback_subtitle", fallback: "Set a time period to automatically confirm recovery **WITHOUT** presenting any confirmation factors.")
+      /// Emergency Fallback
+      internal static let title = L10n.tr("Localizable", "shieldWizardRecovery_setFallback_title", fallback: "Emergency Fallback")
+    }
+    internal enum Start {
+      /// Factors you can use to start recovering, and temporarily lock, Accounts and Personas if you lose access.
+      internal static let subtitle = L10n.tr("Localizable", "shieldWizardRecovery_start_subtitle", fallback: "Factors you can use to start recovering, and temporarily lock, Accounts and Personas if you lose access.")
+      /// Starting a Recovery
+      internal static let title = L10n.tr("Localizable", "shieldWizardRecovery_start_title", fallback: "Starting a Recovery")
+    }
+    internal enum Step {
+      /// Step 2 of 2
+      internal static let title = L10n.tr("Localizable", "shieldWizardRecovery_step_title", fallback: "Step 2 of 2")
+    }
+  }
+  internal enum ShieldWizardRegularAccess {
+    /// Factors required to withdraw assets from Accounts.
+    internal static let subtitle = L10n.tr("Localizable", "shieldWizardRegularAccess_subtitle", fallback: "Factors required to withdraw assets from Accounts.")
+    /// Regular Access
+    internal static let title = L10n.tr("Localizable", "shieldWizardRegularAccess_title", fallback: "Regular Access")
+    internal enum Authentication {
+      /// Single factor required to log in to dApps with Personas and prove ownership of Accounts.
+      internal static let title = L10n.tr("Localizable", "shieldWizardRegularAccess_authentication_title", fallback: "Single factor required to log in to dApps with Personas and prove ownership of Accounts.")
+    }
+    internal enum Combination {
+      /// OR
+      internal static let label = L10n.tr("Localizable", "shieldWizardRegularAccess_combination_label", fallback: "OR")
+    }
+    internal enum Override {
+      /// Add an override
+      internal static let button = L10n.tr("Localizable", "shieldWizardRegularAccess_override_button", fallback: "Add an override")
+      /// Or you can use the following:
+      internal static let description = L10n.tr("Localizable", "shieldWizardRegularAccess_override_description", fallback: "Or you can use the following:")
+      /// Override (advanced)
+      internal static let title = L10n.tr("Localizable", "shieldWizardRegularAccess_override_title", fallback: "Override (advanced)")
+    }
+    internal enum OverrideCombination {
+      /// OR
+      internal static let label = L10n.tr("Localizable", "shieldWizardRegularAccess_overrideCombination_label", fallback: "OR")
+    }
+    internal enum SetThreshold {
+      /// All (Recommended)
+      internal static let all = L10n.tr("Localizable", "shieldWizardRegularAccess_setThreshold_all", fallback: "All (Recommended)")
+      /// Set
+      internal static let button = L10n.tr("Localizable", "shieldWizardRegularAccess_setThreshold_button", fallback: "Set")
+      /// Set the number of factors required to sign
+      internal static let title = L10n.tr("Localizable", "shieldWizardRegularAccess_setThreshold_title", fallback: "Set the number of factors required to sign")
+    }
+    internal enum Step {
+      /// Step 1 of 2
+      internal static let title = L10n.tr("Localizable", "shieldWizardRegularAccess_step_title", fallback: "Step 1 of 2")
+    }
+    internal enum ThresholdDescription {
+      /// All
+      internal static let all = L10n.tr("Localizable", "shieldWizardRegularAccess_thresholdDescription_all", fallback: "All")
+      /// You'll need to use **%@** of the following
+      internal static func title(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "shieldWizardRegularAccess_thresholdDescription_title", String(describing: p1), fallback: "You'll need to use **%@** of the following")
+      }
     }
   }
   internal enum Splash {

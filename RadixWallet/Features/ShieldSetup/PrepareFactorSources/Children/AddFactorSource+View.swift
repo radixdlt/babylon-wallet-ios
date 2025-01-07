@@ -40,7 +40,10 @@ extension PrepareFactorSources.AddFactorSource {
 						.controlState(store.controlState)
 
 						if store.showNoHardwareDeviceInfo {
-							InfoButton(.nohardwaredevice, label: L10n.InfoLink.Title.nohardwaredevice, showIcon: false)
+							Button(L10n.ShieldSetupPrepareFactors.AddHardwareFactor.noDeviceButton) {
+								// TODO: Handle the action and add a popup for skipping this step
+							}
+							.buttonStyle(.primaryText())
 						}
 					}
 				}
