@@ -60,14 +60,13 @@ extension InfoLinkSheet {
 		case payingaccount
 		case preauthorizations
 		case possibledappcalls
-		case securityshield
-		case buildsecurityshields
-		case nohardwaredevice
-		case device
-		case ledger
-		case offdevicemnemonic
-		case arculuscard
-		case password
+		case biometricspin
+		case ledgernano
+		case passphrases
+		case arculus
+		case passwords
+		case securityshields
+		case buildingshield
 	}
 }
 
@@ -167,14 +166,20 @@ extension InfoLinkSheet.GlossaryItem {
 			L10n.InfoLink.Glossary.preauthorizations
 		case .possibledappcalls:
 			L10n.InfoLink.Glossary.possibledappcalls
-		case .securityshield:
-			"TODO" // TODO: update
-		case .buildsecurityshields:
-			"TODO" // TODO: update
-		case .nohardwaredevice:
-			"TODO" // TODO: update
-		case .device, .ledger, .offdevicemnemonic, .arculuscard, .password:
-			"TODO"
+		case .biometricspin:
+			L10n.InfoLink.Glossary.biometricspin
+		case .ledgernano:
+			L10n.InfoLink.Glossary.ledgernano
+		case .passphrases:
+			L10n.InfoLink.Glossary.passphrases
+		case .arculus:
+			L10n.InfoLink.Glossary.arculus
+		case .passwords:
+			L10n.InfoLink.Glossary.passwords
+		case .securityshields:
+			L10n.InfoLink.Glossary.securityshields
+		case .buildingshield:
+			L10n.InfoLink.Glossary.buildingshield
 		}
 	}
 }
