@@ -4,17 +4,23 @@ struct StatusMessageView: View {
 	let type: ViewType
 	let spacing: CGFloat
 	let textStyle: TextStyle
+	let emphasizedColor: Color
+	let emphasizedTextStyle: TextStyle?
 
 	init(
 		text: String,
 		type: ViewType,
 		useNarrowSpacing: Bool = false,
-		useSmallerFontSize: Bool = false
+		useSmallerFontSize: Bool = false,
+		emphasizedColor: Color = .app.blue2,
+		emphasizedTextStyle: TextStyle? = nil
 	) {
 		self.text = text
 		self.type = type
 		self.spacing = useNarrowSpacing ? .small2 : .medium3
 		self.textStyle = useSmallerFontSize ? .body2HighImportance : .body1Header
+		self.emphasizedColor = emphasizedColor
+		self.emphasizedTextStyle = emphasizedTextStyle
 	}
 
 	enum ViewType: Sendable, Hashable {
@@ -26,7 +32,7 @@ struct StatusMessageView: View {
 	var body: some View {
 		HStack(spacing: spacing) {
 			Image(icon)
-			Text(text)
+			Text(markdown: text, emphasizedColor: emphasizedColor, emphasizedFont: emphasizedTextStyle?.font)
 				.lineSpacing(-.small3)
 				.textStyle(textStyle)
 				.multilineTextAlignment(.leading)
