@@ -20,7 +20,7 @@ enum ResourceAmount: Sendable, Hashable, Codable {
 				maximum: .init(nominalAmount: maxAmount)
 			)
 		case .atMost:
-			// AtMost is consider unknown in the Wallet UI as per https://radixdlt.atlassian.net/browse/ABW-4040
+			// AtMost is considered unknown in the Wallet as per https://radixdlt.atlassian.net/browse/ABW-4040
 			self = .unknown
 		case .unknownAmount:
 			self = .unknown
