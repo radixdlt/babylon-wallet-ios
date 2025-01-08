@@ -19,6 +19,7 @@ extension ShieldSetupOnboarding {
 							.buttonStyle(.primaryRectangular)
 						}
 						.padding([.horizontal, .bottom], .medium3)
+						.padding(.top, .small3)
 						.background(Color.app.background)
 					}
 					.withNavigationBar {
