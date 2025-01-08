@@ -14,8 +14,6 @@ struct CreateAccountCoordinator: Sendable, FeatureReducer {
 		let config: CreateAccountConfig
 		var name: NonEmptyString?
 
-		fileprivate var createdProfile = false
-
 		init(
 			root: Path.State? = nil,
 			config: CreateAccountConfig
@@ -94,7 +92,6 @@ struct CreateAccountCoordinator: Sendable, FeatureReducer {
 	enum InternalAction: Sendable, Equatable {
 		case createAccountResult(TaskResult<Account>)
 		case handleAccountCreated(TaskResult<Account>)
-		case handleProfileCreated(factorSourceOption: DerivePublicKeys.State.FactorSourceOption)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -106,7 +103,6 @@ struct CreateAccountCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
-	@Dependency(\.onboardingClient) var onboardingClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.isPresented) var isPresented
 	@Dependency(\.dismiss) var dismiss
@@ -150,11 +146,11 @@ extension CreateAccountCoordinator {
 				state.path.append(.selectLedger(.init(context: .createHardwareAccount)))
 				return .none
 			} else {
-				return createProfileIfNecessaryThenDerivePublicKey(state: &state, factorSourceOption: .device)
+				return derivePublicKey(state: &state, factorSourceOption: .device)
 			}
 
 		case let .path(.element(_, action: .selectLedger(.delegate(.choseLedger(ledger))))):
-			return createProfileIfNecessaryThenDerivePublicKey(
+			return derivePublicKey(
 				state: &state,
 				factorSourceOption: .specific(
 					ledger.asGeneral
@@ -198,10 +194,6 @@ extension CreateAccountCoordinator {
 				config: state.config
 			)))
 			return .send(.delegate(.accountCreated))
-
-		case let .handleProfileCreated(factorSourceOption):
-			state.createdProfile = true
-			return derivePublicKey(state: &state, factorSourceOption: factorSourceOption)
 		}
 	}
 
@@ -258,21 +250,6 @@ extension CreateAccountCoordinator {
 
 		default:
 			return .none
-		}
-	}
-
-	private func createProfileIfNecessaryThenDerivePublicKey(state: inout State, factorSourceOption: DerivePublicKeys.State.FactorSourceOption) -> Effect<Action> {
-		if state.config.isNewProfile, !state.createdProfile {
-			// We need to create the Profile before deriving the public key
-			.run { send in
-				try await onboardingClient.createNewProfile()
-				await send(.internal(.handleProfileCreated(factorSourceOption: factorSourceOption)))
-			} catch: { error, _ in
-				errorQueue.schedule(error)
-			}
-		} else {
-			// We can derive the public key since the Profile has been created already
-			derivePublicKey(state: &state, factorSourceOption: factorSourceOption)
 		}
 	}
 
