@@ -199,7 +199,6 @@ extension DebugInspectFactorSourceView {
 	}
 }
 
-
 // MARK: - FactorSourceCommonView
 struct FactorSourceCommonView: View {
 	let common: FactorSourceCommon

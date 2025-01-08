@@ -47,7 +47,7 @@ extension FactorSources {
 
 		return nonEmpty
 	}
-	
+
 	private func device(filter: (FactorSource) -> Bool) -> FactorSource? {
 		self.filter { $0.kind == .device }
 			.first(where: { filter($0) })

@@ -130,8 +130,8 @@ extension ChooseReceivingAccount {
 				forAction: { result in
 					let recipient: AccountOrAddressOf = switch result {
 					case let .left(account): .profileAccount(
-						value: account.forDisplay
-					)
+							value: account.forDisplay
+						)
 					case let .right(address): .addressOfExternalAccount(value: address)
 					}
 					store.send(.view(.chooseButtonTapped(recipient)))
