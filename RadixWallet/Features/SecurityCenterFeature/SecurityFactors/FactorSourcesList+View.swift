@@ -185,7 +185,7 @@ private extension View {
 }
 
 extension FactorSourceIntegrity {
-	// TODO: Move to Sagron FactorSourceIntegrity+Wrap+Functions
+	// TODO: Move to Sargon FactorSourceIntegrity+Wrap+Functions
 	var factorSource: FactorSource {
 		switch self {
 		case let .device(device):
