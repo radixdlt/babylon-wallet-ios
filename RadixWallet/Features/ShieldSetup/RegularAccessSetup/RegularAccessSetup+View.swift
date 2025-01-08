@@ -1,21 +1,21 @@
 extension RegularAccessSetup.State {
-	var validatedRoleStatus: SelectedFactorSourcesForRoleStatus {
-		shieldBuilder.selectedFactorSourcesForRoleStatus(role: .primary)
+	var validatedRoleStatus: SecurityShieldBuilderInvalidReason? {
+		shieldBuilder.validate()
 	}
 
 	var statusMessageInfo: ShieldStatusMessageInfo? {
 		switch validatedRoleStatus {
-		case .invalid:
-			.init(type: .warning, text: L10n.ShieldSetupStatus.invalidCombination)
-		case .insufficient:
-			.init(type: .error, text: L10n.ShieldSetupStatus.Transactions.atLeastOneFactor)
-		case .suboptimal, .optimal:
+		case .none:
 			nil
+		case .PrimaryRoleMustHaveAtLeastOneFactor:
+			.init(type: .error, text: L10n.ShieldSetupStatus.Transactions.atLeastOneFactor)
+		default:
+			.init(type: .warning, text: L10n.ShieldSetupStatus.invalidCombination)
 		}
 	}
 
 	var canContinue: Bool {
-		validatedRoleStatus != .insufficient
+		validatedRoleStatus != .PrimaryRoleMustHaveAtLeastOneFactor
 	}
 
 	var thresholdFactors: [FactorSource] {
