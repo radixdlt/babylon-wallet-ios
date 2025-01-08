@@ -5,15 +5,18 @@ struct PlainListRow<Icon: View, Accessory: View>: View {
 		let rowCoreViewState: PlainListRowCore.ViewState
 		let icon: Icon?
 		let hints: [Hint.ViewState]
+		let isDisabled: Bool
 
 		init(
 			rowCoreViewState: PlainListRowCore.ViewState,
 			hints: [Hint.ViewState] = [],
+			isDisabled: Bool = false,
 			@ViewBuilder accessory: () -> Accessory,
 			@ViewBuilder icon: () -> Icon
 		) {
 			self.rowCoreViewState = rowCoreViewState
 			self.hints = hints
+			self.isDisabled = isDisabled
 			self.accessory = accessory()
 			self.icon = icon()
 		}
@@ -22,10 +25,12 @@ struct PlainListRow<Icon: View, Accessory: View>: View {
 			rowCoreViewState: PlainListRowCore.ViewState,
 			accessory: ImageResource? = .chevronRight,
 			hints: [Hint.ViewState] = [],
+			isDisabled: Bool = false,
 			@ViewBuilder icon: () -> Icon
 		) where Accessory == Image {
 			self.accessory = accessory.map { Image($0) }
 			self.rowCoreViewState = rowCoreViewState
+			self.isDisabled = isDisabled
 			self.icon = icon()
 			self.hints = hints
 		}
@@ -34,12 +39,14 @@ struct PlainListRow<Icon: View, Accessory: View>: View {
 			_ content: AssetIcon.Content?,
 			rowCoreViewState: PlainListRowCore.ViewState,
 			accessory: ImageResource? = .chevronRight,
-			hints: [Hint.ViewState]
+			hints: [Hint.ViewState],
+			isDisabled: Bool = false
 		) where Icon == AssetIcon, Accessory == Image {
 			self.accessory = accessory.map { Image($0) }
 			self.rowCoreViewState = rowCoreViewState
 			self.icon = content.map { AssetIcon($0) }
 			self.hints = hints
+			self.isDisabled = isDisabled
 		}
 	}
 
@@ -73,6 +80,7 @@ struct PlainListRow<Icon: View, Accessory: View>: View {
 	var body: some View {
 		VStack(alignment: .leading, spacing: .small1) {
 			top
+				.opacity(viewState.isDisabled ? 0.5 : 1)
 			hints
 		}
 		.applyIf(viewState.rowCoreViewState.shouldTintAsError) {
@@ -104,6 +112,10 @@ struct PlainListRow<Icon: View, Accessory: View>: View {
 					ForEach(Array(viewState.hints.enumerated()), id: \.offset) { _, hint in
 						Hint(viewState: hint)
 					}
+					StatusMessageView(text: "This is a status **Learn why**", type: .warning)
+						.onTapGesture {
+							print("M- Tapped")
+						}
 				}
 
 				accessoryView

@@ -3,7 +3,9 @@
 struct ChooseFactorSourceKind: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
-		init() {}
+		@Shared(.shieldBuilder) var shieldBuilder
+
+		var aux: [FactorSourceKind: Bool] = [:]
 	}
 
 	typealias Action = FeatureAction<Self>
@@ -24,6 +26,7 @@ struct ChooseFactorSourceKind: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
+
 			.none
 		case let .kindTapped(kind):
 			.send(.delegate(.chosenKind(kind)))

@@ -3,6 +3,7 @@
 struct ChooseFactorSourceCoordinator: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
+		let role: RoleKind
 		var chooseKind: ChooseFactorSourceKind.State = .init()
 		var path: StackState<Path.State> = .init()
 	}

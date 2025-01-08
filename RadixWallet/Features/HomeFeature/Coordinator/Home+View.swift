@@ -118,6 +118,13 @@ private extension View {
 			.relinkConnector(with: destinationStore)
 			.securityCenter(with: destinationStore)
 			.p2pLinks(with: destinationStore)
+			.chooseFactorSource(with: destinationStore)
+	}
+
+	private func chooseFactorSource(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.chooseFactorSource, action: \.chooseFactorSource)) {
+			ChooseFactorSourceCoordinator.View(store: $0)
+		}
 	}
 
 	private func accountDetails(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {

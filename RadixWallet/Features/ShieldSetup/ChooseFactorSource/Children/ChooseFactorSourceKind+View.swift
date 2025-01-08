@@ -3,7 +3,7 @@ import SwiftUI
 // MARK: - ChooseFactorSourceKind.View
 extension ChooseFactorSourceKind {
 	struct View: SwiftUI.View {
-		let store: StoreOf<ChooseFactorSourceKind>
+		@Perception.Bindable var store: StoreOf<ChooseFactorSourceKind>
 
 		var body: some SwiftUI.View {
 			content
@@ -38,14 +38,21 @@ extension ChooseFactorSourceKind {
 			]
 		}
 
-		func model(kind: FactorSourceKind, hints: [Hint.ViewState] = []) -> SettingsRow<ChooseFactorSourceKind>.Kind {
-			.model(
+		func model(kind: FactorSourceKind) -> SettingsRow<ChooseFactorSourceKind>.Kind {
+			let hints = hints(kind: kind)
+			return .model(
+				isDisabled: !hints.isEmpty,
 				title: kind.title,
 				subtitle: kind.details,
 				hints: hints,
 				icon: .asset(kind.icon),
 				action: .kindTapped(kind)
 			)
+		}
+
+		private func hints(kind: FactorSourceKind) -> [Hint.ViewState] {
+			let isValidOrCanBe = store.shieldBuilder.additionOfFactorSourceOfKindToRecoveryIsValidOrCanBe(factorSourceKind: kind)
+			return isValidOrCanBe ? [] : [.init(kind: .warning, text: "Something")]
 		}
 	}
 }

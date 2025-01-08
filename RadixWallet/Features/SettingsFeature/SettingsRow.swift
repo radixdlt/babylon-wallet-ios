@@ -8,11 +8,17 @@ struct SettingsRow<Feature: FeatureReducer>: View {
 	var body: some View {
 		switch kind {
 		case let .model(model):
-			PlainListRow(viewState: model.rowViewState)
-				.tappable {
-					store.send(.view(model.action))
-				}
-				.withSeparator
+			if model.rowViewState.isDisabled {
+				PlainListRow(viewState: model.rowViewState)
+					.withSeparator
+					.background(Color.app.white)
+			} else {
+				PlainListRow(viewState: model.rowViewState)
+					.tappable {
+						store.send(.view(model.action))
+					}
+					.withSeparator
+			}
 
 		case let .toggle(model):
 			ToggleView(
@@ -72,6 +78,7 @@ extension SettingsRow.Kind {
 
 		init(
 			isError: Bool = false,
+			isDisabled: Bool = false,
 			title: String,
 			subtitle: String? = nil,
 			detail: String? = nil,
@@ -86,7 +93,8 @@ extension SettingsRow.Kind {
 				icon,
 				rowCoreViewState: .init(context: .settings(isError: isError), title: title, subtitle: subtitle, detail: detail, markdown: markdown),
 				accessory: accessory,
-				hints: hints
+				hints: hints,
+				isDisabled: isDisabled
 			)
 			self.action = action
 		}
@@ -121,6 +129,7 @@ extension SettingsRow.Kind {
 extension SettingsRow.Kind {
 	static func model(
 		isError: Bool = false,
+		isDisabled: Bool = false,
 		title: String,
 		subtitle: String? = nil,
 		detail: String? = nil,
@@ -133,6 +142,7 @@ extension SettingsRow.Kind {
 		.model(
 			.init(
 				isError: isError,
+				isDisabled: isDisabled,
 				title: title,
 				subtitle: subtitle,
 				detail: detail,
