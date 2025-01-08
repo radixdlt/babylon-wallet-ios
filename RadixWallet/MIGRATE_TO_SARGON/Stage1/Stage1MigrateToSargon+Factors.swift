@@ -1,22 +1,14 @@
-//
-//  Stage1MigrateToSargon+Factors.swift
-//  RadixWallet
-//
-//  Created by Alexander Cyon on 2025-01-04.
-//
-
-
 // MARK: - FactorSourceWithIDNotFound
 struct FactorSourceWithIDNotFound: Swift.Error {}
 extension FactorSources {
-	public mutating func updateFactorSource(
+	mutating func updateFactorSource(
 		id: some FactorSourceIDProtocol,
 		_ mutate: @escaping (inout FactorSource) throws -> Void
 	) throws {
 		try updateFactorSource(id: id.asGeneral, mutate)
 	}
 
-	public mutating func updateFactorSource(
+	mutating func updateFactorSource(
 		id: FactorSourceID,
 		_ mutate: (inout FactorSource) throws -> Void
 	) throws {
@@ -29,14 +21,8 @@ extension FactorSources {
 	}
 
 	/// Babylon `device` factor source
-	public var babylonDevice: DeviceFactorSource {
+	var babylonDevice: DeviceFactorSource {
 		babylonDeviceFactorSources().first
-	}
-
-	
-	private func device(filter: (FactorSource) -> Bool) -> FactorSource? {
-		self.filter { $0.kind == .device }
-			.first(where: { filter($0) })
 	}
 }
 
@@ -47,7 +33,7 @@ extension FactorSources {
 	// specifically which is never allowed to be empty. Then we can UniFFI export a method
 	// of FactorSources returning `DeviceFactorSources` (never empty) and maybe even in the future
 	// remove the `NonEmpty` Swift crate (which I've been over using since start...).
-	public func babylonDeviceFactorSources() -> NonEmpty<IdentifiedArrayOf<DeviceFactorSource>> {
+	func babylonDeviceFactorSources() -> NonEmpty<IdentifiedArrayOf<DeviceFactorSource>> {
 		let array = compactMap { $0.extract(DeviceFactorSource.self) }.filter(\.isBDFS)
 		let identifiedArray = array.asIdentified()
 
@@ -61,5 +47,9 @@ extension FactorSources {
 
 		return nonEmpty
 	}
-
+	
+	private func device(filter: (FactorSource) -> Bool) -> FactorSource? {
+		self.filter { $0.kind == .device }
+			.first(where: { filter($0) })
+	}
 }
