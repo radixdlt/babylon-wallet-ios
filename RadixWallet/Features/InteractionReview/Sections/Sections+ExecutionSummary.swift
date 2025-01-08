@@ -44,10 +44,6 @@ extension InteractionReview.Sections {
 			return nil
 
 		case .general, .transfer:
-			if summary.detailedManifestClass == .general {
-				guard !summary.deposits.isEmpty || !summary.withdrawals.isEmpty else { return nil }
-			}
-
 			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
 			let withdrawals = try await extractWithdrawals(
 				accountWithdraws: summary.withdrawals,

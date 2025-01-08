@@ -14,6 +14,10 @@ struct OnboardingCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
+	public enum InternalAction: Sendable, Equatable {
+		case newProfileCreated
+	}
+
 	@CasePathable
 	enum ChildAction: Sendable, Equatable {
 		case startup(OnboardingStartup.Action)
@@ -41,6 +45,7 @@ struct OnboardingCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
+	@Dependency(\.onboardingClient) var onboardingClient
 	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.appEventsClient) var appEventsClient
 	@Dependency(\.errorQueue) var errorQueue
@@ -60,15 +65,27 @@ struct OnboardingCoordinator: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case .startup(.delegate(.setupNewUser)):
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case .newProfileCreated:
 			state.destination = .createAccount(
 				.init(
 					config: .init(purpose: .firstAccountForNewProfile)
 				)
 			)
 			return .none
+		}
+	}
+
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+		switch childAction {
+		case .startup(.delegate(.setupNewUser)):
+			return .run { send in
+				try await onboardingClient.createNewProfile()
+				await send(.internal(.newProfileCreated))
+			} catch: { error, _ in
+				errorQueue.schedule(error)
+			}
 
 		case .startup(.delegate(.profileCreatedFromImportedBDFS)):
 			appEventsClient.handleEvent(.walletRestored)
@@ -92,6 +109,14 @@ struct OnboardingCoordinator: Sendable, FeatureReducer {
 			appEventsClient.handleEvent(.walletCreated)
 			return .run { _ in
 				_ = await radixConnectClient.loadP2PLinksAndConnectAll()
+			}
+
+		case .createAccount(.delegate(.dismissed)):
+			return .run { _ in
+				// Clear out the ephemeral profile created on `setupNewUser`
+				try await SargonOS.shared.deleteWallet()
+			} catch: { error, _ in
+				errorQueue.schedule(error)
 			}
 
 		default:
