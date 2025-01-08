@@ -653,13 +653,6 @@ extension ResourceBalanceView {
 						appearance: appearance,
 						symbol: symbol
 					)
-				case let .atMost(exactAmount):
-					SubAmountView(
-						title: L10n.InteractionReview.noMoreThan,
-						amount: exactAmount,
-						appearance: appearance,
-						symbol: symbol
-					)
 				case let .between(minAmount, maxAmount):
 					VStack(alignment: alignment, spacing: .small3) {
 						SubAmountView(
