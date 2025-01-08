@@ -1036,8 +1036,8 @@ internal enum L10n {
     /// Configuration Backup
     internal static let title = L10n.tr("Localizable", "configurationBackup_title", fallback: "Configuration Backup")
     internal enum Automated {
-      /// Your list of Accounts and the Factors required to recover them
-      internal static let accountsItemSubtitle = L10n.tr("Localizable", "configurationBackup_automated_accountsItemSubtitle", fallback: "Your list of Accounts and the Factors required to recover them")
+      /// Your list of Accounts and the factors required to recover them
+      internal static let accountsItemSubtitle = L10n.tr("Localizable", "configurationBackup_automated_accountsItemSubtitle", fallback: "Your list of Accounts and the factors required to recover them")
       /// Accounts
       internal static let accountsItemTitle = L10n.tr("Localizable", "configurationBackup_automated_accountsItemTitle", fallback: "Accounts")
       /// Login to Google Drive for Backups
@@ -1064,12 +1064,12 @@ internal enum L10n {
       internal static let logInAndroid = L10n.tr("Localizable", "configurationBackup_automated_logInAndroid", fallback: "Log in to Google Drive")
       /// Out-of-date backup still present on iCloud
       internal static let outdatedBackupIOS = L10n.tr("Localizable", "configurationBackup_automated_outdatedBackupIOS", fallback: "Out-of-date backup still present on iCloud")
-      /// Your list of Personas and the Factors required to recover them. Also your Persona data.
-      internal static let personasItemSubtitle = L10n.tr("Localizable", "configurationBackup_automated_personasItemSubtitle", fallback: "Your list of Personas and the Factors required to recover them. Also your Persona data.")
+      /// Your list of Personas and the factors required to recover them. Also your Persona data.
+      internal static let personasItemSubtitle = L10n.tr("Localizable", "configurationBackup_automated_personasItemSubtitle", fallback: "Your list of Personas and the factors required to recover them. Also your Persona data.")
       /// Personas
       internal static let personasItemTitle = L10n.tr("Localizable", "configurationBackup_automated_personasItemTitle", fallback: "Personas")
-      /// The list of Security Factors you need to recover your Accounts and Personas.
-      internal static let securityFactorsItemSubtitle = L10n.tr("Localizable", "configurationBackup_automated_securityFactorsItemSubtitle", fallback: "The list of Security Factors you need to recover your Accounts and Personas.")
+      /// The list of security factors you need to recover your Accounts and Personas.
+      internal static let securityFactorsItemSubtitle = L10n.tr("Localizable", "configurationBackup_automated_securityFactorsItemSubtitle", fallback: "The list of security factors you need to recover your Accounts and Personas.")
       /// Security Factors
       internal static let securityFactorsItemTitle = L10n.tr("Localizable", "configurationBackup_automated_securityFactorsItemTitle", fallback: "Security Factors")
       /// Configuration Backup status
@@ -3573,6 +3573,8 @@ internal enum L10n {
       internal static let subtitle = L10n.tr("Localizable", "renameLabel_factorSource_subtitle", fallback: "Enter a new name for this Factor Source")
       /// Rename Factor Source
       internal static let title = L10n.tr("Localizable", "renameLabel_factorSource_title", fallback: "Rename Factor Source")
+      /// Factor Source name too long
+      internal static let tooLong = L10n.tr("Localizable", "renameLabel_factorSource_tooLong", fallback: "Factor Source name too long")
     }
   }
   internal enum RevealSeedPhrase {
