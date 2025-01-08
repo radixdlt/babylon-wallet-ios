@@ -19,8 +19,10 @@ struct RegularAccessSetup: FeatureReducer, Sendable {
 		case continueButtonTapped
 		case addThresholdFactorButtonTapped
 		case addOverrideFactorButtonTapped
+		case addAuthenticationSigningFactorButtonTapped
 		case removeThresholdFactorTapped(FactorSourceID)
 		case removeOverrideFactorTapped(FactorSourceID)
+		case removeAuthenticationSigningFactorTapped
 		case showOverrideSectionButtonTapped
 		case hideOverrideSectionButtonTapped
 	}
@@ -64,6 +66,12 @@ struct RegularAccessSetup: FeatureReducer, Sendable {
 			}
 			return .none
 
+		case .removeAuthenticationSigningFactorTapped:
+			state.$shieldBuilder.withLock { builder in
+				builder = builder.setAuthenticationSigningFactor(new: nil)
+			}
+			return .none
+
 		case .showOverrideSectionButtonTapped:
 			state.isOverrideSectionExpanded = true
 			return .none
@@ -78,8 +86,12 @@ struct RegularAccessSetup: FeatureReducer, Sendable {
 			}
 			return .none
 
-		case .continueButtonTapped, .addThresholdFactorButtonTapped, .addOverrideFactorButtonTapped:
+		// TODO:
+		case .addThresholdFactorButtonTapped, .addOverrideFactorButtonTapped, .addAuthenticationSigningFactorButtonTapped:
 			return .none
+
+		case .continueButtonTapped:
+			return .send(.delegate(.finished))
 		}
 	}
 

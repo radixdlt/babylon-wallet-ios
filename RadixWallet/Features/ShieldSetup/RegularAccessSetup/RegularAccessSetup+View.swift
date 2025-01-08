@@ -15,7 +15,7 @@ extension RegularAccessSetup.State {
 	}
 
 	var canContinue: Bool {
-		validatedRoleStatus != .PrimaryRoleMustHaveAtLeastOneFactor
+		validatedRoleStatus != .PrimaryRoleMustHaveAtLeastOneFactor && authenticationSigningFactor != nil
 	}
 
 	var thresholdFactors: [FactorSource] {
@@ -41,9 +41,10 @@ extension RegularAccessSetup {
 				ScrollView {
 					coreView
 						.padding(.top, .small2)
-						.padding(.bottom, .medium2)
+						.padding(.bottom, .medium1)
 						.animation(.default, value: store.thresholdFactors)
 						.animation(.default, value: store.overrideFactors)
+						.animation(.default, value: store.authenticationSigningFactor)
 						.animation(.default, value: store.isOverrideSectionExpanded)
 				}
 				.radixToolbar(title: L10n.ShieldWizardRegularAccess.Step.title)
@@ -92,6 +93,9 @@ extension RegularAccessSetup {
 				.padding(.bottom, .small3)
 
 				Separator(color: .app.gray3)
+
+				authenticationSigningFactorView
+					.padding(.horizontal, .medium2)
 			}
 			.frame(maxWidth: .infinity)
 		}
@@ -131,7 +135,10 @@ extension RegularAccessSetup {
 			VStack(spacing: .small1) {
 				ForEach(store.thresholdFactors, id: \.self) { factorSource in
 					FactorSourceCard(
-						kind: .instance(factorSource: factorSource, kind: .short(showDetails: true)),
+						kind: .instance(
+							factorSource: factorSource,
+							kind: .short(showDetails: true)
+						),
 						mode: .removal
 					) { action in
 						switch action {
@@ -149,10 +156,7 @@ extension RegularAccessSetup {
 				.buttonStyle(.secondaryRectangular(font: .app.sectionHeader, shouldExpand: true))
 			}
 			.frame(maxWidth: .infinity)
-			.padding([.horizontal, .bottom], .medium3)
-			.padding(.top, .medium2)
-			.background(Color.containerContentBackground)
-			.roundedCorners(radius: .small1)
+			.embedInContainer
 		}
 
 		private var overrideFactorsView: some SwiftUI.View {
@@ -184,7 +188,10 @@ extension RegularAccessSetup {
 
 					ForEach(store.overrideFactors, id: \.self) { factorSource in
 						FactorSourceCard(
-							kind: .instance(factorSource: factorSource, kind: .short(showDetails: true)),
+							kind: .instance(
+								factorSource: factorSource,
+								kind: .short(showDetails: true)
+							),
 							mode: .removal
 						) { action in
 							switch action {
@@ -215,5 +222,57 @@ extension RegularAccessSetup {
 			.frame(maxWidth: .infinity)
 			.roundedCorners(radius: .small1)
 		}
+
+		private var authenticationSigningFactorView: some SwiftUI.View {
+			VStack(spacing: .small1) {
+				Text(L10n.ShieldWizardRegularAccess.Authentication.title)
+					.textStyle(.body1Regular)
+					.multilineTextAlignment(.leading)
+					.flushedLeft
+
+				if let factorSource = store.authenticationSigningFactor {
+					FactorSourceCard(
+						kind: .instance(
+							factorSource: factorSource,
+							kind: .short(showDetails: true)
+						),
+						mode: .removal
+					) { action in
+						switch action {
+						case .removeTapped:
+							store.send(.view(.removeAuthenticationSigningFactorTapped))
+						case .messageTapped:
+							break
+						}
+					}
+					.frame(maxWidth: .infinity)
+					.embedInContainer
+				} else {
+					StatusMessageView(
+						text: L10n.ShieldSetupStatus.Authentication.atLeastOneFactor,
+						type: .warning,
+						useNarrowSpacing: true,
+						useSmallerFontSize: true
+					)
+					.padding(.vertical, .small2)
+					.flushedLeft
+
+					Button("+") {
+						store.send(.view(.addAuthenticationSigningFactorButtonTapped))
+					}
+					.buttonStyle(.secondaryRectangular(font: .app.sectionHeader, shouldExpand: true))
+					.embedInContainer
+				}
+			}
+		}
+	}
+}
+
+extension View {
+	var embedInContainer: some View {
+		self
+			.padding(.medium3)
+			.background(Color.containerContentBackground)
+			.roundedCorners(radius: .small1)
 	}
 }
