@@ -200,17 +200,6 @@ extension DebugInspectFactorSourceView {
 }
 
 // MARK: - FactorSourceCommonView
-extension FactorSource {
-	var isExplicitMain: Bool {
-		switch self {
-		case let .device(deviceFactorSource):
-			deviceFactorSource.isExplicitMain
-		default: false
-		}
-	}
-}
-
-// MARK: - FactorSourceCommonView
 struct FactorSourceCommonView: View {
 	let common: FactorSourceCommon
 	var body: some View {
