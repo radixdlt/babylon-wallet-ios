@@ -108,12 +108,12 @@ struct RenameLabel: Sendable, FeatureReducer {
 extension RenameLabel.State {
 	var status: Status {
 		switch kind {
-		case .account:
+		case .account, .factorSource:
 			guard let sanitizedLabel else {
 				return .empty
 			}
 			return sanitizedLabel.count > Account.nameMaxLength ? .tooLong : .valid
-		case .connector, .factorSource:
+		case .connector:
 			return sanitizedLabel == nil ? .empty : .valid
 		}
 	}
