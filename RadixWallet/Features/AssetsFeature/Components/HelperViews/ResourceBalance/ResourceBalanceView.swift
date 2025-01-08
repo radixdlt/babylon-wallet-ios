@@ -563,12 +563,9 @@ extension ResourceBalanceView {
 				}
 
 				if case .unknown = amount {
-					StatusMessageView(
-						text: L10n.InteractionReview.Unknown.amount,
-						type: .warning,
-						useNarrowSpacing: true,
-						useSmallerFontSize: true
-					)
+					Text(L10n.InteractionReview.Unknown.amount)
+						.textStyle(.body2HighImportance)
+						.foregroundStyle(.app.gray2)
 				}
 			}
 		}
