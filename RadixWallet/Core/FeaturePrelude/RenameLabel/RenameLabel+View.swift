@@ -69,7 +69,7 @@ private extension RenameLabel.State {
 		case .empty:
 			.iconError(kind.empty)
 		case .tooLong:
-			.iconError(L10n.RenameLabel.Account.tooLong)
+			.iconError(kind.tooLong)
 		case .valid:
 			nil
 		}
@@ -102,6 +102,14 @@ private extension RenameLabel.State.Kind {
 		case .account: L10n.RenameLabel.Account.empty
 		case .connector: L10n.RenameLabel.Connector.empty
 		case .factorSource: L10n.RenameLabel.FactorSource.empty
+		}
+	}
+
+	var tooLong: String {
+		switch self {
+		case .account: L10n.RenameLabel.Account.tooLong
+		case .connector: ""
+		case .factorSource: L10n.RenameLabel.FactorSource.tooLong
 		}
 	}
 }
