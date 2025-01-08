@@ -89,12 +89,8 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 				return .none
 
 			case .seedPhraseNotRecoverable:
-				if let factorSourceId = row.integrity.factorSourceIdOfMnemonicToExport {
-					return exportMnemonic(factorSourceID: factorSourceId) {
-						state.destination = .displayMnemonic(.export($0, title: L10n.RevealSeedPhrase.title, context: .fromSettings))
-					}
-				} else {
-					return .none
+				return exportMnemonic(integrity: row.integrity) {
+					state.destination = .displayMnemonic(.export($0, title: L10n.RevealSeedPhrase.title, context: .fromSettings))
 				}
 
 			case .lostFactorSource:
@@ -249,15 +245,6 @@ private extension FactorSourceIntegrity {
 			device.isMnemonicMarkedAsBackedUp
 		case .ledger, .offDeviceMnemonic, .arculusCard, .password:
 			false
-		}
-	}
-
-	var factorSourceIdOfMnemonicToExport: FactorSourceIdFromHash? {
-		switch self {
-		case let .device(device):
-			device.factorSource.id
-		case .ledger, .offDeviceMnemonic, .arculusCard, .password:
-			nil
 		}
 	}
 }

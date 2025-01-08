@@ -75,6 +75,9 @@ struct PlainListRow<Icon: View, Accessory: View>: View {
 			top
 			hints
 		}
+		.applyIf(viewState.rowCoreViewState.shouldTintAsError) {
+			$0.foregroundStyle(Color.app.error)
+		}
 		.padding(.vertical, viewState.rowCoreViewState.verticalPadding)
 		.padding(.horizontal, viewState.rowCoreViewState.horizontalPadding)
 		.frame(minHeight: .plainListRowMinHeight)
@@ -132,25 +135,26 @@ struct PlainListRowCore: View {
 		let title: String?
 		let subtitle: String?
 		let detail: String?
+		let markdown: String?
 
 		init(
 			context: Context = .settings,
 			title: String?,
 			subtitle: String? = nil,
-			detail: String? = nil
+			detail: String? = nil,
+			markdown: String? = nil
 		) {
 			self.context = context
 			self.title = title
 			self.subtitle = subtitle
 			self.detail = detail
+			self.markdown = markdown
 		}
 	}
 
 	let viewState: ViewState
 
-	init(
-		viewState: ViewState
-	) {
+	init(viewState: ViewState) {
 		self.viewState = viewState
 	}
 
@@ -165,7 +169,7 @@ struct PlainListRowCore: View {
 					.lineSpacing(-6)
 					.lineLimit(viewState.titleLineLimit)
 					.textStyle(viewState.titleTextStyle)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(viewState.titleForegroundColor)
 			}
 
 			if let subtitle = viewState.subtitle {
@@ -183,6 +187,15 @@ struct PlainListRowCore: View {
 					.lineLimit(1)
 					.minimumScaleFactor(0.8)
 					.foregroundColor(.app.gray2)
+					.padding(.top, .small3)
+			}
+
+			if let markdown = viewState.markdown {
+				Text(markdown: markdown, emphasizedColor: .app.gray2, emphasizedFont: .app.body1Header)
+					.textStyle(.body1Regular)
+					.lineLimit(1)
+					.minimumScaleFactor(0.8)
+					.foregroundStyle(.app.gray2)
 					.padding(.top, .small3)
 			}
 		}
@@ -208,12 +221,23 @@ private extension PlainListRowCore.ViewState {
 		}
 	}
 
+	var titleForegroundColor: Color {
+		switch context {
+		case .toggle, .hiddenPersona, .settings(isError: false), .dappAndPersona, .compactPersona:
+			.app.gray1
+		case .settings(isError: true):
+			.app.error
+		}
+	}
+
 	var subtitleForegroundColor: Color {
 		switch context {
 		case .toggle, .hiddenPersona:
 			.app.gray2
-		case .settings, .dappAndPersona, .compactPersona:
+		case .settings(isError: false), .dappAndPersona, .compactPersona:
 			.app.gray1
+		case .settings(isError: true):
+			.app.error
 		}
 	}
 
@@ -256,16 +280,29 @@ private extension PlainListRowCore.ViewState {
 			.medium1
 		}
 	}
+
+	var shouldTintAsError: Bool {
+		switch context {
+		case .settings(isError: true):
+			true
+		default:
+			false
+		}
+	}
 }
 
 // MARK: - PlainListRowCore.ViewState.Context
 extension PlainListRowCore.ViewState {
-	enum Context {
-		case settings
+	enum Context: Equatable {
+		case settings(isError: Bool)
 		case toggle
 		case dappAndPersona
 		case hiddenPersona
 		case compactPersona
+
+		static var settings: Self {
+			.settings(isError: false)
+		}
 	}
 }
 

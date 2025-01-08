@@ -46,6 +46,16 @@ extension View {
 		}
 	}
 
+	/// Applies the given transform when the given conditions is met.
+	@ViewBuilder
+	func applyIf(_ condition: Bool, @ViewBuilder transform: (Self) -> some View) -> some View {
+		if condition {
+			transform(self)
+		} else {
+			self
+		}
+	}
+
 	/// Sets the List section spacing if possible.
 	@available(iOS, deprecated: 18.0, message: "Should use native `listSectionSpacing` once iOS 16 is no longer supported.")
 	func withListSectionSpacing(_ spacing: CGFloat) -> some SwiftUI.View {
