@@ -1,6 +1,3 @@
-import Foundation
-import Sargon
-
 // MARK: - FactorSourceWithIDNotFound
 struct FactorSourceWithIDNotFound: Swift.Error {}
 extension FactorSources {
@@ -27,7 +24,9 @@ extension FactorSources {
 	var babylonDevice: DeviceFactorSource {
 		babylonDeviceFactorSources().first
 	}
+}
 
+extension FactorSources {
 	// Cyon: We can migrate this to Sargon if we declare with the macro a NeverEmptyCollection
 	// of DeviceFactorSources, being a "cousing" to `FactorSources` which has `FactorSource` element,
 	// that is probably a good idea since it is actually the collection of DeviceFactorSources
