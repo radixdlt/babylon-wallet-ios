@@ -11,13 +11,15 @@ struct ChooseFactorSourceKind: Sendable, FeatureReducer {
 	typealias Action = FeatureAction<Self>
 
 	enum ViewAction: Sendable, Equatable {
-		case task
 		case kindTapped(FactorSourceKind)
+		case disabledKindTapped
 	}
 
 	enum DelegateAction: Sendable, Equatable {
 		case chosenKind(FactorSourceKind)
 	}
+
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -25,11 +27,11 @@ struct ChooseFactorSourceKind: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .task:
-
-			.none
 		case let .kindTapped(kind):
-			.send(.delegate(.chosenKind(kind)))
+			return .send(.delegate(.chosenKind(kind)))
+		case .disabledKindTapped:
+			overlayWindowClient.showInfoLink(.init(glossaryItem: .buildingshield))
+			return .none
 		}
 	}
 }

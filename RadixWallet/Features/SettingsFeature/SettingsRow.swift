@@ -8,17 +8,16 @@ struct SettingsRow<Feature: FeatureReducer>: View {
 	var body: some View {
 		switch kind {
 		case let .model(model):
-			if model.rowViewState.isDisabled {
-				PlainListRow(viewState: model.rowViewState)
-					.withSeparator
-					.background(Color.app.white)
-			} else {
-				PlainListRow(viewState: model.rowViewState)
-					.tappable {
-						store.send(.view(model.action))
-					}
-					.withSeparator
-			}
+			PlainListRow(viewState: model.rowViewState)
+				.tappable {
+					store.send(.view(model.action))
+				}
+				.withSeparator
+
+		case let .disabled(model):
+			PlainListRow(viewState: model.rowViewState)
+				.withSeparator
+				.background(Color.app.white)
 
 		case let .toggle(model):
 			ToggleView(
@@ -58,6 +57,9 @@ extension SettingsRow {
 		/// A standard tappable row with the details specified on the `Model`
 		case model(Model)
 
+		/// A disabled row with the details specified on the `DisabledModel`
+		case disabled(DisabledModel)
+
 		/// A non-tappable row with a toggle, with details specified in the `ToggleModel`
 		case toggle(ToggleModel)
 
@@ -73,12 +75,11 @@ extension SettingsRow {
 extension SettingsRow.Kind {
 	struct Model: Identifiable {
 		let id: String
-		let rowViewState: PlainListRow<AssetIcon, Image>.ViewState
+		let rowViewState: PlainListRow<AssetIcon, Image, StackedHints>.ViewState
 		let action: Feature.ViewAction
 
 		init(
 			isError: Bool = false,
-			isDisabled: Bool = false,
 			title: String,
 			subtitle: String? = nil,
 			detail: String? = nil,
@@ -93,10 +94,29 @@ extension SettingsRow.Kind {
 				icon,
 				rowCoreViewState: .init(context: .settings(isError: isError), title: title, subtitle: subtitle, detail: detail, markdown: markdown),
 				accessory: accessory,
-				hints: hints,
-				isDisabled: isDisabled
+				hints: hints
 			)
 			self.action = action
+		}
+	}
+
+	struct DisabledModel: Identifiable {
+		let id: String
+		let rowViewState: PlainListRow<AssetIcon, Image, AnyView>.ViewState
+
+		init(
+			title: String,
+			subtitle: String? = nil,
+			icon: AssetIcon.Content,
+			@ViewBuilder bottom: () -> AnyView
+		) {
+			self.id = title
+			self.rowViewState = .init(
+				icon,
+				rowCoreViewState: .init(context: .settings, title: title, subtitle: subtitle),
+				isDisabled: true,
+				bottom: bottom
+			)
 		}
 	}
 
@@ -129,7 +149,6 @@ extension SettingsRow.Kind {
 extension SettingsRow.Kind {
 	static func model(
 		isError: Bool = false,
-		isDisabled: Bool = false,
 		title: String,
 		subtitle: String? = nil,
 		detail: String? = nil,
@@ -142,7 +161,6 @@ extension SettingsRow.Kind {
 		.model(
 			.init(
 				isError: isError,
-				isDisabled: isDisabled,
 				title: title,
 				subtitle: subtitle,
 				detail: detail,
@@ -151,6 +169,22 @@ extension SettingsRow.Kind {
 				icon: icon,
 				accessory: accessory,
 				action: action
+			)
+		)
+	}
+
+	static func disabled(
+		title: String,
+		subtitle: String? = nil,
+		icon: AssetIcon.Content,
+		@ViewBuilder bottom: () -> AnyView
+	) -> Self {
+		.disabled(
+			.init(
+				title: title,
+				subtitle: subtitle,
+				icon: icon,
+				bottom: bottom
 			)
 		)
 	}

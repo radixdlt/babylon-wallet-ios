@@ -39,20 +39,38 @@ extension ChooseFactorSourceKind {
 		}
 
 		func model(kind: FactorSourceKind) -> SettingsRow<ChooseFactorSourceKind>.Kind {
-			let hints = hints(kind: kind)
-			return .model(
-				isDisabled: !hints.isEmpty,
-				title: kind.title,
-				subtitle: kind.details,
-				hints: hints,
-				icon: .asset(kind.icon),
-				action: .kindTapped(kind)
-			)
+			if canBeUsed(kind: kind) {
+				.model(
+					title: kind.title,
+					subtitle: kind.details,
+					icon: .asset(kind.icon),
+					action: .kindTapped(kind)
+				)
+			} else {
+				.disabled(
+					title: kind.title,
+					subtitle: kind.details,
+					icon: .asset(kind.icon),
+					bottom: { disabled.eraseToAnyView() }
+				)
+			}
 		}
 
-		private func hints(kind: FactorSourceKind) -> [Hint.ViewState] {
-			let isValidOrCanBe = store.shieldBuilder.additionOfFactorSourceOfKindToRecoveryIsValidOrCanBe(factorSourceKind: kind)
-			return isValidOrCanBe ? [] : [.init(kind: .warning, text: "Something")]
+		private var disabled: some SwiftUI.View {
+			StatusMessageView(
+				text: "Can't currently be used here. **Learn why**",
+				type: .warning,
+				useNarrowSpacing: true,
+				useSmallerFontSize: true,
+				emphasizedTextStyle: .body2HighImportance
+			)
+			.onTapGesture {
+				store.send(.view(.disabledKindTapped))
+			}
+		}
+
+		private func canBeUsed(kind: FactorSourceKind) -> Bool {
+			store.shieldBuilder.additionOfFactorSourceOfKindToRecoveryIsValidOrCanBe(factorSourceKind: kind)
 		}
 	}
 }
