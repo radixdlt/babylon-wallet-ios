@@ -304,7 +304,7 @@ private extension TransferAccountList {
 			await send(.internal(.setAllDepositStatus(accountId: receivingAccountId, status: .loading)))
 			let values = switch recipient {
 			case let .profileAccount(account):
-				await getStatusesForProfileAccountForDisplay(account, assets: receivingAccount.assets)
+				await getStatusesForProfileAccount(accountForDisplay: account, assets: receivingAccount.assets)
 
 			case let .addressOfExternalAccount(account):
 				try await getStatusesForExternalAccount(account, resourceAddresses: resourceAddresses)
@@ -316,8 +316,8 @@ private extension TransferAccountList {
 		}
 	}
 
-	func getStatusesForProfileAccountForDisplay(
-		_ accountForDisplay: AccountForDisplay,
+	func getStatusesForProfileAccount(
+		accountForDisplay: AccountForDisplay,
 		assets: IdentifiedArrayOf<ResourceAsset.State>
 	) async -> DepositStatusPerResources {
 		// Shall never fail, the account has been identified as present in Profile in an
