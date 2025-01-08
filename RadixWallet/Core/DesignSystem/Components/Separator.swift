@@ -35,10 +35,10 @@ private struct SeparatorModifier: ViewModifier {
 
 // MARK: - Separator
 struct Separator: View {
-	init() {}
+	var color: Color = .app.gray4
 
 	var body: some View {
-		Color.app.gray4
+		color
 			.frame(height: 1)
 	}
 }
