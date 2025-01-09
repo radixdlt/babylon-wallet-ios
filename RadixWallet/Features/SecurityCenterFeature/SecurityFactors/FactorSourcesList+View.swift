@@ -10,7 +10,7 @@ extension FactorSourcesList {
 						header(store.kind.details)
 
 						if let main = store.main {
-							section(text: L10n.FactorSources.List.default, rows: [main])
+							section(text: L10n.FactorSources.List.default, rows: [main], showChangeMain: true)
 								.padding(.top, .medium3)
 
 							if !store.others.isEmpty {
@@ -49,16 +49,27 @@ extension FactorSourcesList {
 			.destinations(with: store)
 		}
 
-		private func header(_ text: String?) -> some SwiftUI.View {
+		private func header(_ text: String) -> some SwiftUI.View {
 			Text(text)
 				.textStyle(.body1Header)
 				.foregroundStyle(.app.gray2)
 				.flushedLeft
 		}
 
-		private func section(text: String?, rows: [State.Row]) -> some SwiftUI.View {
+		private func section(text: String?, rows: [State.Row], showChangeMain: Bool = false) -> some SwiftUI.View {
 			VStack(spacing: .small1) {
-				header(text)
+				if let text {
+					HStack(spacing: .zero) {
+						header(text)
+						Spacer()
+						if showChangeMain {
+							Button("Change") {
+								store.send(.view(.changeMainButtonTapped))
+							}
+							.buttonStyle(.primaryText())
+						}
+					}
+				}
 
 				ForEachStatic(rows) { row in
 					card(row)
@@ -200,6 +211,7 @@ private extension View {
 			.displayMnemonic(with: destinationStore)
 			.enterMnemonic(with: destinationStore)
 			.addMnemonic(with: destinationStore)
+			.changeMain(with: destinationStore)
 	}
 
 	private func detail(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
@@ -223,6 +235,12 @@ private extension View {
 	private func addMnemonic(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.addMnemonic, action: \.addMnemonic)) {
 			ImportMnemonic.View(store: $0)
+		}
+	}
+
+	private func changeMain(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.changeMain, action: \.changeMain)) {
+			ChangeMainFactorSource.View(store: $0)
 		}
 	}
 }

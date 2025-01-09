@@ -29,6 +29,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 		case rowMessageTapped(State.Row)
 		case addButtonTapped
 		case continueButtonTapped(FactorSource)
+		case changeMainButtonTapped
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -47,6 +48,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			case displayMnemonic(DisplayMnemonic.State)
 			case enterMnemonic(ImportMnemonicsFlowCoordinator.State)
 			case addMnemonic(ImportMnemonic.State)
+			case changeMain(ChangeMainFactorSource.State)
 		}
 
 		@CasePathable
@@ -55,6 +57,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			case displayMnemonic(DisplayMnemonic.Action)
 			case enterMnemonic(ImportMnemonicsFlowCoordinator.Action)
 			case addMnemonic(ImportMnemonic.Action)
+			case changeMain(ChangeMainFactorSource.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -69,6 +72,9 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			}
 			Scope(state: \.addMnemonic, action: \.addMnemonic) {
 				ImportMnemonic()
+			}
+			Scope(state: \.changeMain, action: \.changeMain) {
+				ChangeMainFactorSource()
 			}
 		}
 	}
@@ -149,6 +155,10 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 
 		case let .continueButtonTapped(factorSource):
 			return .send(.delegate(.selectedFactorSource(factorSource)))
+
+		case .changeMainButtonTapped:
+			state.destination = .changeMain(.init(kind: state.kind))
+			return .none
 		}
 	}
 
