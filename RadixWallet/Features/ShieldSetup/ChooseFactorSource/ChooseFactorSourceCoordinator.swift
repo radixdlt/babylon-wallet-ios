@@ -32,7 +32,7 @@ struct ChooseFactorSourceCoordinator: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case finished(FactorSource)
+		case finished(FactorSource, ChooseFactorSourceContext) // TODO: Remove context after removing Home tests
 	}
 
 	var body: some ReducerOf<Self> {
@@ -56,7 +56,7 @@ struct ChooseFactorSourceCoordinator: Sendable, FeatureReducer {
 			state.path.append(.list(.init(context: .selection(state.context), kind: kind)))
 			return .none
 		case let .path(.element(id: _, action: .list(.delegate(.selectedFactorSource(factorSource))))):
-			return .send(.delegate(.finished(factorSource)))
+			return .send(.delegate(.finished(factorSource, state.context)))
 		default:
 			return .none
 		}

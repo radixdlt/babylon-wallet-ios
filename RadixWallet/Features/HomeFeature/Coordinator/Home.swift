@@ -21,7 +21,6 @@ struct Home: Sendable, FeatureReducer {
 		var showFiatWorth: Bool = true
 
 		var totalFiatWorth: Loadable<FiatWorth> = .idle
-		var count = 0
 
 		// MARK: - Destination
 		@PresentationState
@@ -60,6 +59,7 @@ struct Home: Sendable, FeatureReducer {
 		case createAccountButtonTapped
 		case settingsButtonTapped
 		case showFiatWorthToggled
+		case chooseFactorSource(ChooseFactorSourceContext)
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -207,15 +207,11 @@ struct Home: Sendable, FeatureReducer {
 			return .cancel(id: CancellableId.fetchAccountPortfolios)
 
 		case .createAccountButtonTapped:
-//			state.destination = .createAccount(
-//				.init(config: .init(
-//					purpose: .newAccountFromHome
-//				))
-//			)
-			let index = state.count % ChooseFactorSourceContext.allCases.count
-			let context = ChooseFactorSourceContext.allCases[index]
-			state.destination = .chooseFactorSource(.init(context: context))
-			state.count += 1
+			state.destination = .createAccount(
+				.init(config: .init(
+					purpose: .newAccountFromHome
+				))
+			)
 			return .none
 
 		case .pullToRefreshStarted:
@@ -229,6 +225,10 @@ struct Home: Sendable, FeatureReducer {
 			return .run { _ in
 				try await appPreferencesClient.toggleIsCurrencyAmountVisible()
 			}
+
+		case let .chooseFactorSource(context):
+			state.destination = .chooseFactorSource(.init(context: context))
+			return .none
 		}
 	}
 
@@ -362,9 +362,18 @@ struct Home: Sendable, FeatureReducer {
 				errorQueue.schedule(error)
 			}
 
-		case let .chooseFactorSource(.delegate(.finished(factorSource))):
+		case let .chooseFactorSource(.delegate(.finished(factorSource, context))):
 			state.$shieldBuilder.withLock { builder in
-				builder = builder.addFactorSourceToPrimaryThreshold(factorSourceId: factorSource.id)
+				switch context {
+				case .primaryThreshold:
+					builder = builder.addFactorSourceToPrimaryThreshold(factorSourceId: factorSource.id)
+				case .primaryOverride:
+					builder = builder.addFactorSourceToPrimaryOverride(factorSourceId: factorSource.id)
+				case .recovery:
+					builder = builder.addFactorSourceToRecoveryOverride(factorSourceId: factorSource.id)
+				case .confirmation:
+					builder = builder.addFactorSourceToConfirmationOverride(factorSourceId: factorSource.id)
+				}
 			}
 			state.destination = nil
 			return .none
