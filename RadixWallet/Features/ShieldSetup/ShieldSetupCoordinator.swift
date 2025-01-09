@@ -19,7 +19,6 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 	enum InternalAction: Sendable, Equatable {
 		case prepareFactors
 		case selectFactors
-		case rolesSetup
 	}
 
 	@CasePathable
@@ -44,9 +43,6 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 		case .selectFactors:
 			state.path.append(.selectFactors(.init(path: .selectFactorSources(.init()))))
 			return .none
-		case .rolesSetup:
-			state.path.append(.rolesSetup(.init()))
-			return .none
 		}
 	}
 
@@ -60,7 +56,8 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 		case .path(.element(id: _, action: .prepareFactors(.delegate(.finished)))):
 			return .send(.internal(.selectFactors))
 		case .path(.element(id: _, action: .selectFactors(.delegate(.finished)))):
-			return .send(.internal(.rolesSetup))
+			state.path.append(.rolesSetup(.init()))
+			return .none
 		default:
 			return .none
 		}
