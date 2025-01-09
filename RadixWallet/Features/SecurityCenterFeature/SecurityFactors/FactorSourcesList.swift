@@ -97,7 +97,12 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			case .display:
 				state.destination = .detail(.init(integrity: row.integrity))
 			case .selection:
-				state.selected = row
+				switch row.selectability {
+				case .selectable:
+					state.selected = row
+				case .alreadySelected, .invalid:
+					break
+				}
 			}
 			return .none
 
@@ -205,11 +210,12 @@ private extension FactorSourcesList {
 			return
 		}
 		let factorSourceIds = entities.map(\.integrity.factorSource.id)
-		let invalidFactorSourceIds = filterInvalidFactorSourceIds(state: state, factorSourceIds: factorSourceIds)
+		let selectedFactorSourceIds = getSelectedFactorSourceIds(state: state, factorSourceIds: factorSourceIds)
 		state.rows = entities.map { entity in
 			let accounts = entity.accounts + entity.hiddenAccounts
 			let personas = entity.personas
-			let status: State.Status = if problems.hasProblem9(accounts: accounts, personas: personas) {
+			// Determine row status
+			let status: State.Row.Status = if problems.hasProblem9(accounts: accounts, personas: personas) {
 				.lostFactorSource
 			} else if problems.hasProblem3(accounts: accounts, personas: personas) {
 				.seedPhraseNotRecoverable
@@ -222,16 +228,25 @@ private extension FactorSourcesList {
 				// source was backed up.
 				.notBackedUp
 			}
+
+			// Determine row selectability
+			let selectability: State.Row.Selectability = if status == .lostFactorSource {
+				.invalid
+			} else if selectedFactorSourceIds.contains(entity.integrity.factorSource.id) {
+				.alreadySelected
+			} else {
+				.selectable
+			}
 			return State.Row(
 				integrity: entity.integrity,
 				linkedEntities: entity.linkedEntities,
 				status: status,
-				isDisabled: invalidFactorSourceIds.contains(entity.integrity.factorSource.id)
+				selectability: selectability
 			)
 		}
 	}
 
-	func filterInvalidFactorSourceIds(state: State, factorSourceIds: [FactorSourceId]) -> [FactorSourceId] {
+	func getSelectedFactorSourceIds(state: State, factorSourceIds: [FactorSourceId]) -> [FactorSourceId] {
 		let status: [FactorSourceValidationStatus] =
 			switch state.context {
 			case .display:
@@ -246,11 +261,16 @@ private extension FactorSourcesList {
 				state.shieldBuilder.validationForAdditionOfFactorSourceToConfirmationOverrideForEach(factorSources: factorSourceIds)
 			}
 		return status.compactMap { status in
-			if status.reasonIfInvalid == nil {
-				nil
-			} else {
-				status.factorSourceId
+			guard let reason = status.reasonIfInvalid else {
+				return nil
 			}
+			switch reason {
+			case .nonBasic(.FactorSourceAlreadyPresent):
+				break
+			default:
+				assertionFailure("Sargon considered \(status.factorSourceId) invalid for a reason different than already selected: \(reason)")
+			}
+			return status.factorSourceId
 		}
 	}
 }
@@ -266,13 +286,15 @@ extension FactorSourcesList.State {
 		let integrity: FactorSourceIntegrity
 		let linkedEntities: FactorSourceCardDataSource.LinkedEntities
 		let status: Status
-		let isDisabled: Bool
+		let selectability: Selectability
 
 		var id: FactorSourceID {
 			integrity.factorSource.id
 		}
 	}
+}
 
+extension FactorSourcesList.State.Row {
 	enum Status: Sendable, Hashable {
 		/// User has lost access to the given factor source (`SecurityProblem.problem9`).
 		/// We will show an error message.
@@ -289,6 +311,18 @@ extension FactorSourcesList.State {
 		/// User has access to the factor source, which doesn't have associated entities, and hasn't been backed up.
 		/// We won't show any message (since there are no entities associated).
 		case notBackedUp
+	}
+
+	enum Selectability: Sendable, Hashable {
+		/// The row can be selected.
+		case selectable
+
+		/// The row cannot be selected because it was already selected for this context.
+		/// It will show greyed out with the checkmark already selected.
+		case alreadySelected
+
+		/// The row cannot be selected because it is in a invalid state (e.g. device factor source whose mnemonics are missing)
+		case invalid
 	}
 }
 

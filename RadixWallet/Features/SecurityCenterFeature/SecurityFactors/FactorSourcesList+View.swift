@@ -83,9 +83,7 @@ extension FactorSourcesList {
 			.onTapGesture {
 				store.send(.view(.rowTapped(row)))
 			}
-			.applyIf(row.isDisabled) {
-				$0.background(Color.red)
-			}
+			.opacity(row.opacity)
 		}
 
 		func mode(_ row: State.Row) -> FactorSourceCard.Mode {
@@ -93,7 +91,7 @@ extension FactorSourcesList {
 			case .display:
 				.display
 			case .selection:
-				.selection(type: .radioButton, isSelected: store.selected == row)
+				.selection(type: .radioButton, isSelected: store.selected == row || row.selectability == .alreadySelected)
 			}
 		}
 	}
@@ -176,6 +174,13 @@ private extension FactorSourcesList.State.Row {
 			[.init(text: L10n.FactorSources.List.seedPhraseWrittenDown, type: .success)]
 		case .notBackedUp:
 			[]
+		}
+	}
+
+	var opacity: CGFloat {
+		switch selectability {
+		case .selectable: 1.0
+		case .alreadySelected, .invalid: 0.5
 		}
 	}
 }
