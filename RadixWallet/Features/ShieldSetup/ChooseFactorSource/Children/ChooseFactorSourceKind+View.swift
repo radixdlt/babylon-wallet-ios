@@ -59,7 +59,7 @@ extension ChooseFactorSourceKind {
 
 		private var disabled: some SwiftUI.View {
 			StatusMessageView(
-				text: "Can't currently be used here. **Learn why**",
+				text: L10n.SecurityFactors.SelectFactor.disabled,
 				type: .warning,
 				useNarrowSpacing: true,
 				useSmallerFontSize: true,
