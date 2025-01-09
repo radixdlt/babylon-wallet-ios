@@ -34,11 +34,13 @@ extension FactorSourcesList {
 				.background(.app.gray5)
 				.radixToolbar(title: store.kind.title)
 				.footer(visible: store.showFooter) {
-					Button(L10n.Common.continue) {
-						store.send(.view(.continueButtonTapped))
+					WithControlRequirements(
+						store.selected,
+						forAction: { store.send(.view(.continueButtonTapped($0.integrity.factorSource))) }
+					) { action in
+						Button(L10n.Common.continue, action: action)
+							.buttonStyle(.primaryRectangular)
 					}
-					.buttonStyle(.primaryRectangular)
-					.controlState(store.buttonControlState)
 				}
 				.task {
 					store.send(.view(.task))
@@ -157,10 +159,6 @@ private extension FactorSourcesList.State {
 		case .selection: true
 		}
 	}
-
-	var buttonControlState: ControlState {
-		selected == nil ? .disabled : .enabled
-	}
 }
 
 private extension FactorSourcesList.State.Row {
@@ -180,7 +178,7 @@ private extension FactorSourcesList.State.Row {
 	var opacity: CGFloat {
 		switch selectability {
 		case .selectable: 1.0
-		case .alreadySelected, .invalid: 0.5
+		case .alreadySelected, .unselectable: 0.5
 		}
 	}
 }

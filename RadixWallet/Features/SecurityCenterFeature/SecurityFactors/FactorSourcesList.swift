@@ -3,7 +3,7 @@
 struct FactorSourcesList: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
-		@Shared(.shieldBuilder) var shieldBuilder
+		@SharedReader(.shieldBuilder) var shieldBuilder
 		let context: Context
 		let kind: FactorSourceKind
 		var rows: [Row] = []
@@ -28,7 +28,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 		case rowTapped(State.Row)
 		case rowMessageTapped(State.Row)
 		case addButtonTapped
-		case continueButtonTapped
+		case continueButtonTapped(FactorSource)
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -100,7 +100,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 				switch row.selectability {
 				case .selectable:
 					state.selected = row
-				case .alreadySelected, .invalid:
+				case .alreadySelected, .unselectable:
 					break
 				}
 			}
@@ -147,11 +147,8 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 
 			return .none
 
-		case .continueButtonTapped:
-			guard let selected = state.selected?.integrity.factorSource else {
-				return .none
-			}
-			return .send(.delegate(.selectedFactorSource(selected)))
+		case let .continueButtonTapped(factorSource):
+			return .send(.delegate(.selectedFactorSource(factorSource)))
 		}
 	}
 
@@ -210,7 +207,7 @@ private extension FactorSourcesList {
 			return
 		}
 		let factorSourceIds = entities.map(\.integrity.factorSource.id)
-		let selectedFactorSourceIds = getSelectedFactorSourceIds(state: state, factorSourceIds: factorSourceIds)
+		let invalidFactorSourceIds = filterInvalidFactorSourceIds(state: state, factorSourceIds: factorSourceIds)
 		state.rows = entities.map { entity in
 			let accounts = entity.accounts + entity.hiddenAccounts
 			let personas = entity.personas
@@ -231,8 +228,8 @@ private extension FactorSourcesList {
 
 			// Determine row selectability
 			let selectability: State.Row.Selectability = if status == .lostFactorSource {
-				.invalid
-			} else if selectedFactorSourceIds.contains(entity.integrity.factorSource.id) {
+				.unselectable
+			} else if invalidFactorSourceIds.contains(entity.integrity.factorSource.id) {
 				.alreadySelected
 			} else {
 				.selectable
@@ -246,7 +243,7 @@ private extension FactorSourcesList {
 		}
 	}
 
-	func getSelectedFactorSourceIds(state: State, factorSourceIds: [FactorSourceId]) -> [FactorSourceId] {
+	func filterInvalidFactorSourceIds(state: State, factorSourceIds: [FactorSourceId]) -> [FactorSourceId] {
 		let status: [FactorSourceValidationStatus] =
 			switch state.context {
 			case .display:
@@ -321,8 +318,9 @@ extension FactorSourcesList.State.Row {
 		/// It will show greyed out with the radio button already selected.
 		case alreadySelected
 
-		/// The row cannot be selected because it is in a invalid state (e.g. device factor source whose mnemonics are missing)
-		case invalid
+		/// The row cannot be selected because it is in an invalid state (e.g. device factor source whose mnemonics are missing)
+		/// It will show greyed out with the radio button unselected.
+		case unselectable
 	}
 }
 

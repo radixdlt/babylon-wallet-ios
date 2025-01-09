@@ -4,7 +4,7 @@ struct ChooseFactorSourceKind: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
 		let context: ChooseFactorSourceContext
-		@Shared(.shieldBuilder) var shieldBuilder
+		@SharedReader(.shieldBuilder) var shieldBuilder
 	}
 
 	typealias Action = FeatureAction<Self>
