@@ -1,7 +1,7 @@
 // MARK: - SecondaryRectangularButtonStyle
 struct SecondaryRectangularButtonStyle: ButtonStyle {
 	@Environment(\.controlState) var controlState
-	var font: SwiftUI.Font = .app.body1Header
+	let font: SwiftUI.Font
 	let backgroundColor: Color
 	let shouldExpand: Bool
 	let isDestructive: Bool
