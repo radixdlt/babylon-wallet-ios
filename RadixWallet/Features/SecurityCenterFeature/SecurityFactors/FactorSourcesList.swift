@@ -207,7 +207,7 @@ private extension FactorSourcesList {
 			return
 		}
 		let factorSourceIds = entities.map(\.integrity.factorSource.id)
-		let invalidFactorSourceIds = filterInvalidFactorSourceIds(state: state, factorSourceIds: factorSourceIds)
+		let alreadySelectedFactorSourceIds = filterAlreadySelectedFactorSourceIds(state: state, factorSourceIds: factorSourceIds)
 		state.rows = entities.map { entity in
 			let accounts = entity.accounts + entity.hiddenAccounts
 			let personas = entity.personas
@@ -229,7 +229,7 @@ private extension FactorSourcesList {
 			// Determine row selectability
 			let selectability: State.Row.Selectability = if status == .lostFactorSource {
 				.unselectable
-			} else if invalidFactorSourceIds.contains(entity.integrity.factorSource.id) {
+			} else if alreadySelectedFactorSourceIds.contains(entity.integrity.factorSource.id) {
 				.alreadySelected
 			} else {
 				.selectable
@@ -243,7 +243,7 @@ private extension FactorSourcesList {
 		}
 	}
 
-	func filterInvalidFactorSourceIds(state: State, factorSourceIds: [FactorSourceId]) -> [FactorSourceId] {
+	func filterAlreadySelectedFactorSourceIds(state: State, factorSourceIds: [FactorSourceId]) -> [FactorSourceId] {
 		let status: [FactorSourceValidationStatus] =
 			switch state.context {
 			case .display:
