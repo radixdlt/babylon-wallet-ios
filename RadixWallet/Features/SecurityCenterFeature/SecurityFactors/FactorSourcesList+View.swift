@@ -33,6 +33,13 @@ extension FactorSourcesList {
 				}
 				.background(.app.gray5)
 				.radixToolbar(title: store.kind.title)
+				.footer(visible: store.context == .selection) {
+					Button(L10n.Common.continue) {
+						store.send(.view(.continueButtonTapped))
+					}
+					.buttonStyle(.primaryRectangular)
+					.controlState(store.buttonControlState)
+				}
 				.task {
 					store.send(.view(.task))
 				}
@@ -141,6 +148,10 @@ private extension FactorSourcesList.State {
 
 	private func sort(_ lhs: FactorSourceIntegrity, _ rhs: FactorSourceIntegrity) -> Bool {
 		lhs.factorSource.common.addedOn < rhs.factorSource.common.addedOn
+	}
+
+	var buttonControlState: ControlState {
+		selected == nil ? .disabled : .enabled
 	}
 }
 

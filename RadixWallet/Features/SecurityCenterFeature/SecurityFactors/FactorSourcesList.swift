@@ -27,11 +27,16 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 		case rowTapped(State.Row)
 		case rowMessageTapped(State.Row)
 		case addButtonTapped
+		case continueButtonTapped
 	}
 
 	enum InternalAction: Sendable, Equatable {
 		case setSecurityProblems([SecurityProblem])
 		case setEntities([EntitiesLinkedToFactorSource])
+	}
+
+	enum DelegateAction: Sendable, Equatable {
+		case selectedFactorSource(FactorSource)
 	}
 
 	struct Destination: DestinationReducer {
@@ -135,6 +140,12 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			}
 
 			return .none
+
+		case .continueButtonTapped:
+			guard let selected = state.selected?.integrity.factorSource else {
+				return .none
+			}
+			return .send(.delegate(.selectedFactorSource(selected)))
 		}
 	}
 

@@ -9,10 +9,10 @@ extension ChooseFactorSourceCoordinator {
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				NavigationStack(path: $store.scope(state: \.path, action: \.child.path)) {
-					ChooseFactorSourceKind.View(store: store.chooseKind)
+					ChooseFactorSourceKind.View(store: store.kind)
 				} destination: { destination in
 					switch destination.case {
-					case let .chooseFactorSource(store):
+					case let .list(store):
 						FactorSourcesList.View(store: store)
 					}
 				}
@@ -25,7 +25,7 @@ extension ChooseFactorSourceCoordinator {
 }
 
 private extension StoreOf<ChooseFactorSourceCoordinator> {
-	var chooseKind: StoreOf<ChooseFactorSourceKind> {
-		scope(state: \.chooseKind, action: \.child.chooseKind)
+	var kind: StoreOf<ChooseFactorSourceKind> {
+		scope(state: \.kind, action: \.child.kind)
 	}
 }

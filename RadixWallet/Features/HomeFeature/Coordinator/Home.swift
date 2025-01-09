@@ -354,6 +354,10 @@ struct Home: Sendable, FeatureReducer {
 				errorQueue.schedule(error)
 			}
 
+		case .chooseFactorSource(.delegate(.finished)):
+			state.destination = nil
+			return .none
+
 		default:
 			return .none
 		}

@@ -4,13 +4,13 @@ struct ChooseFactorSourceCoordinator: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
 		let role: RoleKind
-		var chooseKind: ChooseFactorSourceKind.State = .init()
+		var kind: ChooseFactorSourceKind.State = .init()
 		var path: StackState<Path.State> = .init()
 	}
 
 	@Reducer(state: .hashable, action: .equatable)
 	enum Path {
-		case chooseFactorSource(FactorSourcesList)
+		case list(FactorSourcesList)
 	}
 
 	typealias Action = FeatureAction<Self>
@@ -21,7 +21,7 @@ struct ChooseFactorSourceCoordinator: Sendable, FeatureReducer {
 
 	@CasePathable
 	enum ChildAction: Sendable, Equatable {
-		case chooseKind(ChooseFactorSourceKind.Action)
+		case kind(ChooseFactorSourceKind.Action)
 		case path(StackActionOf<Path>)
 	}
 
@@ -30,7 +30,7 @@ struct ChooseFactorSourceCoordinator: Sendable, FeatureReducer {
 	}
 
 	var body: some ReducerOf<Self> {
-		Scope(state: \.chooseKind, action: \.child.chooseKind) {
+		Scope(state: \.kind, action: \.child.kind) {
 			ChooseFactorSourceKind()
 		}
 		Reduce(core)
@@ -46,9 +46,11 @@ struct ChooseFactorSourceCoordinator: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .chooseKind(.delegate(.chosenKind(kind))):
-			state.path.append(.chooseFactorSource(.init(context: .selection, kind: kind)))
+		case let .kind(.delegate(.chosenKind(kind))):
+			state.path.append(.list(.init(context: .selection, kind: kind)))
 			return .none
+		case let .path(.element(id: _, action: .list(.delegate(.selectedFactorSource(factorSource))))):
+			return .send(.delegate(.finished(factorSource)))
 		default:
 			return .none
 		}
