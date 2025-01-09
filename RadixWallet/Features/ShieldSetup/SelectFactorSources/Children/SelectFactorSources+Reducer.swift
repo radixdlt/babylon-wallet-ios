@@ -24,7 +24,7 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 
 	@CasePathable
 	enum ViewAction: Equatable, Sendable {
-		case task
+		case onFirstAppear
 		case selectedFactorSourcesChanged([FactorSource]?)
 		case continueButtonTapped
 		case invalidReadMoreTapped
@@ -48,7 +48,7 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .task:
+		case .onFirstAppear:
 			return .run { [shieldBuilder = state.shieldBuilder] send in
 				let factorSources = try await factorSourcesClient.getFactorSources().elements
 				let result = shieldBuilder.sortedFactorSourcesForPrimaryThresholdSelection(factorSources: factorSources)

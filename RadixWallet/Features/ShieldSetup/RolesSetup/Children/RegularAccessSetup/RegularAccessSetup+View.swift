@@ -296,7 +296,7 @@ extension RegularAccessSetup {
 				} else {
 					StatusMessageView(
 						text: L10n.ShieldSetupStatus.Authentication.atLeastOneFactor,
-						type: .warning,
+						type: .error,
 						useNarrowSpacing: true,
 						useSmallerFontSize: true
 					)
