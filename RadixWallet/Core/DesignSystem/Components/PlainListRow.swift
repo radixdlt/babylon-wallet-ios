@@ -66,9 +66,7 @@ struct PlainListRow<Icon: View, Accessory: View, Bottom: View>: View {
 
 	let viewState: ViewState
 
-	init(
-		viewState: ViewState
-	) {
+	init(viewState: ViewState) {
 		self.viewState = viewState
 	}
 
@@ -95,7 +93,8 @@ struct PlainListRow<Icon: View, Accessory: View, Bottom: View>: View {
 		VStack(alignment: .leading, spacing: .small1) {
 			top
 				.opacity(viewState.isDisabled ? 0.5 : 1)
-			hints
+
+			bottom
 		}
 		.applyIf(viewState.rowCoreViewState.shouldTintAsError) {
 			$0.foregroundStyle(Color.app.error)
@@ -116,7 +115,7 @@ struct PlainListRow<Icon: View, Accessory: View, Bottom: View>: View {
 	}
 
 	@ViewBuilder
-	private var hints: some View {
+	private var bottom: some View {
 		if let bottom = viewState.bottom {
 			HStack(spacing: .zero) {
 				iconView
@@ -359,7 +358,7 @@ extension View {
 struct StackedHints: View {
 	let hints: [Hint.ViewState]
 
-	init?(hints: [Hint.ViewState]) {
+	nonisolated init?(hints: [Hint.ViewState]) {
 		guard !hints.isEmpty else {
 			return nil
 		}
