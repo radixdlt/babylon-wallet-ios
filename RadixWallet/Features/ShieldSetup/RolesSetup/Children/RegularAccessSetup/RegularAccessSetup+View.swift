@@ -92,7 +92,7 @@ extension RegularAccessSetup {
 						Button {
 							store.send(.view(.showOverrideSectionButtonTapped))
 						} label: {
-							Label(L10n.ShieldWizardRegularAccess.Override.button, asset: AssetResource.addAccount) // add asset
+							Label(L10n.ShieldWizardRegularAccess.Override.button, asset: AssetResource.addAccount)
 								.font(.app.body1Header)
 								.foregroundColor(.app.blue2)
 								.padding([.vertical, .leading], .small2)
