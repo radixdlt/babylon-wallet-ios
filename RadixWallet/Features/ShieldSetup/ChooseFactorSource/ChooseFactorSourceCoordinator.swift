@@ -53,7 +53,7 @@ struct ChooseFactorSourceCoordinator: Sendable, FeatureReducer {
 	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .kind(.delegate(.chosenKind(kind))):
-			state.path.append(.list(.init(context: .selection, kind: kind)))
+			state.path.append(.list(.init(context: .selection(state.context), kind: kind)))
 			return .none
 		case let .path(.element(id: _, action: .list(.delegate(.selectedFactorSource(factorSource))))):
 			return .send(.delegate(.finished(factorSource)))

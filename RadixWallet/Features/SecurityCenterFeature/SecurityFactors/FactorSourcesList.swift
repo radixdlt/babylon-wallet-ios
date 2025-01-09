@@ -3,6 +3,7 @@
 struct FactorSourcesList: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
+		@Shared(.shieldBuilder) var shieldBuilder
 		let context: Context
 		let kind: FactorSourceKind
 		var rows: [Row] = []
@@ -203,6 +204,8 @@ private extension FactorSourcesList {
 		guard let problems = state.problems, let entities = state.entities else {
 			return
 		}
+		let factorSourceIds = entities.map(\.integrity.factorSource.id)
+		let invalidFactorSourceIds = filterInvalidFactorSourceIds(state: state, factorSourceIds: factorSourceIds)
 		state.rows = entities.map { entity in
 			let accounts = entity.accounts + entity.hiddenAccounts
 			let personas = entity.personas
@@ -222,8 +225,32 @@ private extension FactorSourcesList {
 			return State.Row(
 				integrity: entity.integrity,
 				linkedEntities: entity.linkedEntities,
-				status: status
+				status: status,
+				isDisabled: invalidFactorSourceIds.contains(entity.integrity.factorSource.id)
 			)
+		}
+	}
+
+	func filterInvalidFactorSourceIds(state: State, factorSourceIds: [FactorSourceId]) -> [FactorSourceId] {
+		let status: [FactorSourceValidationStatus] =
+			switch state.context {
+			case .display:
+				[]
+			case .selection(.primaryThreshold):
+				state.shieldBuilder.validationForAdditionOfFactorSourceToPrimaryThresholdForEach(factorSources: factorSourceIds)
+			case .selection(.primaryOverride):
+				state.shieldBuilder.validationForAdditionOfFactorSourceToPrimaryOverrideForEach(factorSources: factorSourceIds)
+			case .selection(.recovery):
+				state.shieldBuilder.validationForAdditionOfFactorSourceToRecoveryOverrideForEach(factorSources: factorSourceIds)
+			case .selection(.confirmation):
+				state.shieldBuilder.validationForAdditionOfFactorSourceToConfirmationOverrideForEach(factorSources: factorSourceIds)
+			}
+		return status.compactMap { status in
+			if status.reasonIfInvalid == nil {
+				nil
+			} else {
+				status.factorSourceId
+			}
 		}
 	}
 }
@@ -232,13 +259,14 @@ private extension FactorSourcesList {
 extension FactorSourcesList.State {
 	enum Context: Sendable, Hashable {
 		case display
-		case selection
+		case selection(ChooseFactorSourceContext)
 	}
 
 	struct Row: Sendable, Hashable, Identifiable {
 		let integrity: FactorSourceIntegrity
 		let linkedEntities: FactorSourceCardDataSource.LinkedEntities
 		let status: Status
+		let isDisabled: Bool
 
 		var id: FactorSourceID {
 			integrity.factorSource.id

@@ -9,6 +9,8 @@ struct Home: Sendable, FeatureReducer {
 	}
 
 	struct State: Sendable, Hashable {
+		@Shared(.shieldBuilder) var shieldBuilder
+
 		// MARK: - Components
 		var carousel: CardCarousel.State = .init()
 
@@ -32,7 +34,9 @@ struct Home: Sendable, FeatureReducer {
 
 		private var destinationsQueue: [Destination.State] = []
 
-		init() {}
+		init() {
+			$shieldBuilder.initialize()
+		}
 
 		mutating func addDestination(_ destination: Destination.State) {
 			if self.destination == nil {
@@ -358,7 +362,10 @@ struct Home: Sendable, FeatureReducer {
 				errorQueue.schedule(error)
 			}
 
-		case .chooseFactorSource(.delegate(.finished)):
+		case let .chooseFactorSource(.delegate(.finished(factorSource))):
+			state.$shieldBuilder.withLock { builder in
+				builder = builder.addFactorSourceToPrimaryThreshold(factorSourceId: factorSource.id)
+			}
 			state.destination = nil
 			return .none
 
