@@ -3705,6 +3705,8 @@ internal enum L10n {
       internal static let title = L10n.tr("Localizable", "securityFactors_seedPhrases_title", fallback: "Seed Phrases")
     }
     internal enum SelectFactor {
+      /// Can't currently be used here. **Learn why**
+      internal static let disabled = L10n.tr("Localizable", "securityFactors_selectFactor_disabled", fallback: "Can't currently be used here. **Learn why**")
       /// Select Factor Type
       internal static let title = L10n.tr("Localizable", "securityFactors_selectFactor_title", fallback: "Select Factor Type")
     }
@@ -3897,8 +3899,8 @@ internal enum L10n {
     internal enum AddAnotherFactor {
       /// Add Factor
       internal static let button = L10n.tr("Localizable", "shieldSetupPrepareFactors_addAnotherFactor_button", fallback: "Add Factor")
-      /// Choosing a passphrase is only recommended for advanced users
-      internal static let passphraseHint = L10n.tr("Localizable", "shieldSetupPrepareFactors_addAnotherFactor_passphraseHint", fallback: "Choosing a passphrase is only recommended for advanced users")
+      /// Choosing a mnemonic is only recommended for advanced users
+      internal static let passphraseHint = L10n.tr("Localizable", "shieldSetupPrepareFactors_addAnotherFactor_passphraseHint", fallback: "Choosing a mnemonic is only recommended for advanced users")
       /// You need to add **1 more factor** to begin building your Shield.
       internal static let subtitle = L10n.tr("Localizable", "shieldSetupPrepareFactors_addAnotherFactor_subtitle", fallback: "You need to add **1 more factor** to begin building your Shield.")
       /// Add Another Factor
@@ -3938,10 +3940,10 @@ internal enum L10n {
   internal enum ShieldSetupSelectFactors {
     /// Build Shield
     internal static let buildButtonTitle = L10n.tr("Localizable", "shieldSetupSelectFactors_buildButtonTitle", fallback: "Build Shield")
-    /// Choose the factors you’ll use to sign transactions. You’ll use **all** of these factors every time you send assets or log in to dApps.
-    internal static let subtitle = L10n.tr("Localizable", "shieldSetupSelectFactors_subtitle", fallback: "Choose the factors you’ll use to sign transactions. You’ll use **all** of these factors every time you send assets or log in to dApps.")
-    /// Select Factors for Transactions
-    internal static let title = L10n.tr("Localizable", "shieldSetupSelectFactors_title", fallback: "Select Factors for Transactions")
+    /// Choose the factors you’ll use for regular access. You’ll use **all** of these factors every time you send assets.
+    internal static let subtitle = L10n.tr("Localizable", "shieldSetupSelectFactors_subtitle", fallback: "Choose the factors you’ll use for regular access. You’ll use **all** of these factors every time you send assets.")
+    /// Select Factors for Regular Access
+    internal static let title = L10n.tr("Localizable", "shieldSetupSelectFactors_title", fallback: "Select Factors for Regular Access")
   }
   internal enum ShieldSetupStatus {
     /// Cannot use this factor by itself
