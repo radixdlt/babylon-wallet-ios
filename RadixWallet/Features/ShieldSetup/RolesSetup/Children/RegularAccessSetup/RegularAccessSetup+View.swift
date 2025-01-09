@@ -31,8 +31,8 @@ extension RegularAccessSetup.State {
 	}
 
 	var threshold: Threshold {
+		// TODO: Use Sargon - https://radixdlt.atlassian.net/browse/ABW-4047
 		let threshold = Int(shieldBuilder.getPrimaryThreshold())
-
 		if threshold == shieldBuilder.primaryRoleThresholdFactors.count {
 			return .all
 		} else {
@@ -347,10 +347,10 @@ private extension StoreOf<RegularAccessSetup> {
 private extension View {
 	func destination(store: StoreOf<RegularAccessSetup>) -> some View {
 		let destinationStore = store.destination
-		return confirmation(with: destinationStore, store: store)
+		return selectNumberOfFactors(with: destinationStore, store: store)
 	}
 
-	private func confirmation(with destinationStore: PresentationStoreOf<RegularAccessSetup.Destination>, store: StoreOf<RegularAccessSetup>) -> some View {
+	private func selectNumberOfFactors(with destinationStore: PresentationStoreOf<RegularAccessSetup.Destination>, store: StoreOf<RegularAccessSetup>) -> some View {
 		WithPerceptionTracking {
 			sheet(store: destinationStore.scope(state: \.selectNumberOfFactorsView, action: \.selectNumberOfFactorsView)) { _ in
 				SelectNumberOfFactorsView(
