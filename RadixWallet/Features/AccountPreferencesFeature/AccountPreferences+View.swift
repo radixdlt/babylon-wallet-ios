@@ -145,7 +145,7 @@ private extension View {
 
 	private func updateAccountLabel(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
 		sheet(store: destinationStore.scope(state: \.updateAccountLabel, action: \.updateAccountLabel)) {
-			UpdateAccountLabel.View(store: $0)
+			RenameLabel.View(store: $0)
 		}
 	}
 

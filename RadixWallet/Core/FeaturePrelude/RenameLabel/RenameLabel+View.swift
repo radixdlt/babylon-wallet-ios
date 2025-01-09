@@ -1,15 +1,10 @@
 import SwiftUI
 
-// MARK: - UpdateP2PLinkName.View
-extension UpdateP2PLinkName {
-	@MainActor
+// MARK: - RenameLabel.View
+extension RenameLabel {
 	struct View: SwiftUI.View {
-		@Perception.Bindable var store: StoreOf<UpdateP2PLinkName>
+		@Perception.Bindable var store: StoreOf<RenameLabel>
 		@FocusState private var textFieldFocus: Bool
-
-		init(store: StoreOf<UpdateP2PLinkName>) {
-			self.store = store
-		}
 
 		var body: some SwiftUI.View {
 			content
@@ -25,17 +20,17 @@ extension UpdateP2PLinkName {
 			WithPerceptionTracking {
 				VStack(spacing: .zero) {
 					VStack(spacing: .medium1) {
-						Text(L10n.LinkedConnectors.RenameConnector.title)
+						Text(store.kind.title)
 							.textStyle(.sheetTitle)
 							.multilineTextAlignment(.center)
 
-						Text(L10n.LinkedConnectors.RenameConnector.subtitle)
+						Text(store.kind.subtitle)
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)
 
 						AppTextField(
 							placeholder: "",
-							text: $store.linkName.sending(\.view.linkNameChanged),
+							text: $store.label.sending(\.view.labelChanged),
 							hint: store.hint,
 							focus: .on(
 								true,
@@ -55,10 +50,10 @@ extension UpdateP2PLinkName {
 				.padding(.horizontal, .medium3)
 				.footer {
 					WithControlRequirements(
-						store.sanitizedName,
+						store.sanitizedLabel,
 						forAction: { store.send(.view(.updateTapped($0))) }
 					) { action in
-						Button(L10n.LinkedConnectors.RenameConnector.update, action: action)
+						Button(L10n.RenameLabel.update, action: action)
 							.buttonStyle(.primaryRectangular)
 							.controlState(store.controlState)
 					}
@@ -68,12 +63,53 @@ extension UpdateP2PLinkName {
 	}
 }
 
-private extension UpdateP2PLinkName.State {
+private extension RenameLabel.State {
 	var hint: Hint.ViewState? {
-		sanitizedName == nil ? .iconError(L10n.LinkedConnectors.RenameConnector.errorEmpty) : nil
+		switch status {
+		case .empty:
+			.iconError(kind.empty)
+		case .tooLong:
+			.iconError(kind.tooLong)
+		case .valid:
+			nil
+		}
 	}
 
 	var controlState: ControlState {
-		sanitizedName == nil ? .disabled : .enabled
+		status == .valid ? .enabled : .disabled
+	}
+}
+
+private extension RenameLabel.State.Kind {
+	var title: String {
+		switch self {
+		case .account: L10n.RenameLabel.Account.title
+		case .connector: L10n.RenameLabel.Connector.title
+		case .factorSource: L10n.RenameLabel.FactorSource.title
+		}
+	}
+
+	var subtitle: String {
+		switch self {
+		case .account: L10n.RenameLabel.Account.subtitle
+		case .connector: L10n.RenameLabel.Connector.subtitle
+		case .factorSource: L10n.RenameLabel.FactorSource.subtitle
+		}
+	}
+
+	var empty: String {
+		switch self {
+		case .account: L10n.RenameLabel.Account.empty
+		case .connector: L10n.RenameLabel.Connector.empty
+		case .factorSource: L10n.RenameLabel.FactorSource.empty
+		}
+	}
+
+	var tooLong: String {
+		switch self {
+		case .account: L10n.RenameLabel.Account.tooLong
+		case .connector: ""
+		case .factorSource: L10n.RenameLabel.FactorSource.tooLong
+		}
 	}
 }

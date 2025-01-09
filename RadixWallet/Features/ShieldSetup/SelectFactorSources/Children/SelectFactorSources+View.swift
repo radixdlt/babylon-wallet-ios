@@ -63,11 +63,11 @@ extension SelectFactorSources {
 
 				Selection(
 					$store.selectedFactorSources.sending(\.view.selectedFactorSourcesChanged),
-					from: store.factorSources,
+					from: store.factorSourcesCandidates,
 					requiring: .atLeast(1)
 				) { item in
 					VStack {
-						let isFirstOfKind = store.factorSources.first(where: { $0.factorSourceKind == item.value.factorSourceKind }) == item.value
+						let isFirstOfKind = store.factorSourcesCandidates.first(where: { $0.factorSourceKind == item.value.factorSourceKind }) == item.value
 						if isFirstOfKind, item.value.factorSourceKind.isSupported {
 							VStack(alignment: .leading, spacing: .zero) {
 								Text(item.value.factorSourceKind.title)

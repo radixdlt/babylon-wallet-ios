@@ -60,7 +60,10 @@ extension FactorSourcesList {
 
 		private func card(_ row: State.Row) -> some SwiftUI.View {
 			FactorSourceCard(
-				kind: .instance(factorSource: row.integrity.factorSource, kind: .extended(linkedEntities: row.linkedEntities)),
+				kind: .instance(
+					factorSource: row.integrity.factorSource,
+					kind: .extended(linkedEntities: row.linkedEntities)
+				),
 				mode: .display,
 				messages: row.messages
 			) { action in
@@ -180,33 +183,6 @@ private extension View {
 	private func addMnemonic(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.addMnemonic, action: \.addMnemonic)) {
 			ImportMnemonic.View(store: $0)
-		}
-	}
-}
-
-extension FactorSourceIntegrity {
-	// TODO: Move to Sagron FactorSourceIntegrity+Wrap+Functions
-	var factorSource: FactorSource {
-		switch self {
-		case let .device(device):
-			device.factorSource.asGeneral
-		case let .ledger(ledger):
-			ledger.asGeneral
-		case let .offDeviceMnemonic(offDeviceMnemonic):
-			offDeviceMnemonic.asGeneral
-		case let .arculusCard(arculusCard):
-			arculusCard.asGeneral
-		case let .password(password):
-			password.asGeneral
-		}
-	}
-
-	fileprivate var isExplicitMain: Bool {
-		switch self {
-		case let .device(device):
-			device.factorSource.isExplicitMain
-		case .ledger, .offDeviceMnemonic, .arculusCard, .password:
-			false
 		}
 	}
 }

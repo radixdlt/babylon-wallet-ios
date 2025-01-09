@@ -6,9 +6,11 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 	@ObservableState
 	struct State: Hashable, Sendable {
 		@Shared(.shieldBuilder) var shieldBuilder
-		var factorSources: [FactorSource] = []
+
+		/// Factor sources from the profile, sorted and filtered for eligibility in the primary threshold role
+		var factorSourcesCandidates: [FactorSource] = []
 		var selectedFactorSources: [FactorSource]? {
-			factorSources.filter { shieldBuilder.primaryRoleThresholdFactors.contains($0.factorSourceID) }
+			factorSourcesCandidates.filter { shieldBuilder.primaryRoleThresholdFactors.contains($0.factorSourceID) }
 		}
 
 		var didInteractWithSelection = false
@@ -82,7 +84,7 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 
 		case .continueButtonTapped:
 			state.$shieldBuilder.withLock { builder in
-				builder = builder.autoAssignFactorsToRecoveryAndConfirmationBasedOnPrimary(allFactors: state.factorSources)
+                builder = builder.autoAssignFactorsToRecoveryAndConfirmationBasedOnPrimary(allFactors: state.factorSourcesCandidates)
 			}
 			return .send(.delegate(.finished))
 
@@ -95,7 +97,7 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .setFactorSources(factorSources):
-			state.factorSources = factorSources
+			state.factorSourcesCandidates = factorSources
 			return .none
 		}
 	}
