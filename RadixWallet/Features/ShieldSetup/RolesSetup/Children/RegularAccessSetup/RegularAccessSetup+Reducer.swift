@@ -9,6 +9,9 @@ struct RegularAccessSetup: FeatureReducer, Sendable {
 
 		var factorSourcesFromProfile: [FactorSource] = []
 		var isOverrideSectionExpanded = false
+
+		@Presents
+		var destination: Destination.State? = nil
 	}
 
 	typealias Action = FeatureAction<Self>
@@ -25,6 +28,7 @@ struct RegularAccessSetup: FeatureReducer, Sendable {
 		case removeAuthenticationSigningFactorTapped
 		case showOverrideSectionButtonTapped
 		case hideOverrideSectionButtonTapped
+		case thresholdSelectorButtonTapped
 	}
 
 	enum InternalAction: Equatable, Sendable {
@@ -35,9 +39,30 @@ struct RegularAccessSetup: FeatureReducer, Sendable {
 		case finished
 	}
 
+	struct Destination: DestinationReducer {
+		@CasePathable
+		enum State: Sendable, Hashable {
+			case selectNumberOfFactorsView
+		}
+
+		@CasePathable
+		enum Action: Sendable, Equatable {
+			case selectNumberOfFactorsView(SelectNumberOfFactorsView.Action)
+		}
+
+		var body: some ReducerOf<Self> {
+			EmptyReducer()
+		}
+	}
+
 	var body: some ReducerOf<Self> {
 		Reduce(core)
+			.ifLet(destinationPath, action: \.destination) {
+				Destination()
+			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.errorQueue) var errorQueue
@@ -86,6 +111,10 @@ struct RegularAccessSetup: FeatureReducer, Sendable {
 			}
 			return .none
 
+		case .thresholdSelectorButtonTapped:
+			state.destination = .selectNumberOfFactorsView
+			return .none
+
 		// TODO:
 		case .addThresholdFactorButtonTapped, .addOverrideFactorButtonTapped, .addAuthenticationSigningFactorButtonTapped:
 			return .none
@@ -99,6 +128,25 @@ struct RegularAccessSetup: FeatureReducer, Sendable {
 		switch internalAction {
 		case let .setFactorSources(factorSources):
 			state.factorSourcesFromProfile = factorSources
+			return .none
+		}
+	}
+
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .selectNumberOfFactorsView(.close):
+			state.destination = nil
+			return .none
+		case let .selectNumberOfFactorsView(.set(value)):
+			state.destination = nil
+			state.$shieldBuilder.withLock { builder in
+				switch value {
+				case .all:
+					builder = builder.setThreshold(threshold: UInt8(builder.primaryRoleThresholdFactors.count))
+				case let .specific(numberOfFactors):
+					builder = builder.setThreshold(threshold: UInt8(numberOfFactors))
+				}
+			}
 			return .none
 		}
 	}

@@ -29,6 +29,16 @@ extension RegularAccessSetup.State {
 	var authenticationSigningFactor: FactorSource? {
 		factorSourcesFromProfile.first { $0.factorSourceID == shieldBuilder.getAuthenticationSigningFactor() }
 	}
+
+	var threshold: Threshold {
+		let threshold = Int(shieldBuilder.getPrimaryThreshold())
+
+		if threshold == shieldBuilder.primaryRoleThresholdFactors.count {
+			return .all
+		} else {
+			return .specific(threshold)
+		}
+	}
 }
 
 // MARK: - RegularAccessSetup.View
@@ -59,6 +69,7 @@ extension RegularAccessSetup {
 					store.send(.view(.task))
 				}
 			}
+			.destination(store: store)
 		}
 
 		@MainActor
@@ -133,6 +144,9 @@ extension RegularAccessSetup {
 
 		private var thresholdFactorsView: some SwiftUI.View {
 			VStack(spacing: .small1) {
+				thresholdSelectorView
+					.flushedLeft
+
 				ForEach(store.thresholdFactors, id: \.self) { factorSource in
 					FactorSourceCard(
 						kind: .instance(
@@ -157,6 +171,33 @@ extension RegularAccessSetup {
 			}
 			.frame(maxWidth: .infinity)
 			.embedInContainer
+		}
+
+		private var thresholdSelectorView: some SwiftUI.View {
+			HStack(spacing: .zero) {
+				let thresholdTitle = store.threshold.titleShort
+				let title = L10n.ShieldWizardRegularAccess.ThresholdDescription.title(thresholdTitle)
+				let parts = title.components(separatedBy: "**\(thresholdTitle)**")
+
+				if parts.count == 2 {
+					Text(parts[0])
+
+					Button {
+						store.send(.view(.thresholdSelectorButtonTapped))
+					} label: {
+						HStack(spacing: .small3) {
+							Text(thresholdTitle)
+								.textStyle(.body2Link)
+							Image(.chevronDown)
+						}
+					}
+					.foregroundStyle(.app.blue2)
+
+					Text(parts[1])
+				}
+			}
+			.textStyle(.body2Regular)
+			.foregroundStyle(.app.gray1)
 		}
 
 		private var overrideFactorsView: some SwiftUI.View {
@@ -274,5 +315,46 @@ extension View {
 			.padding(.medium3)
 			.background(Color.containerContentBackground)
 			.roundedCorners(radius: .small1)
+	}
+}
+
+private extension Threshold {
+	var titleShort: String {
+		switch self {
+		case .all:
+			L10n.ShieldWizardRegularAccess.ThresholdDescription.all
+		case let .specific(value):
+			"\(value)"
+		}
+	}
+}
+
+private extension StoreOf<RegularAccessSetup> {
+	var destination: PresentationStoreOf<RegularAccessSetup.Destination> {
+		func scopeState(state: State) -> PresentationState<RegularAccessSetup.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destination(store: StoreOf<RegularAccessSetup>) -> some View {
+		let destinationStore = store.destination
+		return confirmation(with: destinationStore, store: store)
+	}
+
+	private func confirmation(with destinationStore: PresentationStoreOf<RegularAccessSetup.Destination>, store: StoreOf<RegularAccessSetup>) -> some View {
+		WithPerceptionTracking {
+			sheet(store: destinationStore.scope(state: \.selectNumberOfFactorsView, action: \.selectNumberOfFactorsView)) { _ in
+				SelectNumberOfFactorsView(
+					selectedNumberOfFactors: store.threshold,
+					maxAvailableFactors: store.thresholdFactors.count
+				) { action in
+					store.send(.destination(.presented(.selectNumberOfFactorsView(action))))
+				}
+			}
+		}
 	}
 }

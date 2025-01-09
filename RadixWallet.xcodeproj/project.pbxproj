@@ -1281,6 +1281,7 @@
 		E791F2982D2BD64F001A007B /* SecurityShieldBuilder+SharedState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E791F2972D2BD64F001A007B /* SecurityShieldBuilder+SharedState.swift */; };
 		E791F29B2D2BEF59001A007B /* RegularAccessSetup+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E791F29A2D2BEF59001A007B /* RegularAccessSetup+Reducer.swift */; };
 		E791F29D2D2BEF5F001A007B /* RegularAccessSetup+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E791F29C2D2BEF5F001A007B /* RegularAccessSetup+View.swift */; };
+		E791F2A32D2EDFDE001A007B /* SelectNumberOfFactorsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E791F2A22D2EDFDE001A007B /* SelectNumberOfFactorsView.swift */; };
 		E79DD1B12CE365CF00B1EB86 /* ChooseReceivingAccountOnDelete+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1B02CE365CF00B1EB86 /* ChooseReceivingAccountOnDelete+Reducer.swift */; };
 		E79DD1B32CE365D600B1EB86 /* ChooseReceivingAccountOnDelete+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1B22CE365D600B1EB86 /* ChooseReceivingAccountOnDelete+View.swift */; };
 		E79DD1B62CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1B52CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift */; };
@@ -2561,6 +2562,7 @@
 		E791F2972D2BD64F001A007B /* SecurityShieldBuilder+SharedState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityShieldBuilder+SharedState.swift"; sourceTree = "<group>"; };
 		E791F29A2D2BEF59001A007B /* RegularAccessSetup+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RegularAccessSetup+Reducer.swift"; sourceTree = "<group>"; };
 		E791F29C2D2BEF5F001A007B /* RegularAccessSetup+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RegularAccessSetup+View.swift"; sourceTree = "<group>"; };
+		E791F2A22D2EDFDE001A007B /* SelectNumberOfFactorsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectNumberOfFactorsView.swift; sourceTree = "<group>"; };
 		E79DD1B02CE365CF00B1EB86 /* ChooseReceivingAccountOnDelete+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChooseReceivingAccountOnDelete+Reducer.swift"; sourceTree = "<group>"; };
 		E79DD1B22CE365D600B1EB86 /* ChooseReceivingAccountOnDelete+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChooseReceivingAccountOnDelete+View.swift"; sourceTree = "<group>"; };
 		E79DD1B52CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeleteAccountConfirmation+Reducer.swift"; sourceTree = "<group>"; };
@@ -5785,7 +5787,7 @@
 				5B98CD862D00D29C00C3C133 /* Onboarding */,
 				5B813D052CFF202E001A291D /* PrepareFactorSources */,
 				E775A1CE2D03279000E72DB9 /* SelectFactorSources */,
-				E791F2992D2BEF1A001A007B /* RegularAccessSetup */,
+				E791F29F2D2ED68D001A007B /* RolesSetup */,
 			);
 			path = ShieldSetup;
 			sourceTree = "<group>";
@@ -7071,8 +7073,25 @@
 			children = (
 				E791F29A2D2BEF59001A007B /* RegularAccessSetup+Reducer.swift */,
 				E791F29C2D2BEF5F001A007B /* RegularAccessSetup+View.swift */,
+				E791F2A22D2EDFDE001A007B /* SelectNumberOfFactorsView.swift */,
 			);
 			path = RegularAccessSetup;
+			sourceTree = "<group>";
+		};
+		E791F29F2D2ED68D001A007B /* RolesSetup */ = {
+			isa = PBXGroup;
+			children = (
+				E791F2A02D2ED697001A007B /* Children */,
+			);
+			path = RolesSetup;
+			sourceTree = "<group>";
+		};
+		E791F2A02D2ED697001A007B /* Children */ = {
+			isa = PBXGroup;
+			children = (
+				E791F2992D2BEF1A001A007B /* RegularAccessSetup */,
+			);
+			path = Children;
 			sourceTree = "<group>";
 		};
 		E79DD1B42CE492E800B1EB86 /* DeleteAccount */ = {
@@ -8492,6 +8511,7 @@
 				A40815C32C7E0D08005E65B9 /* NonFungibleResourcesCollection.swift in Sources */,
 				A40816252C7E0D08005E65B9 /* StateKeyValueStoreKeysCollection.swift in Sources */,
 				48CFC5A02ADC10DA00E77A5C /* Binding+Extra.swift in Sources */,
+				E791F2A32D2EDFDE001A007B /* SelectNumberOfFactorsView.swift in Sources */,
 				A40815662C7E0D08005E65B9 /* AccountResourcePreferencesResponseItem.swift in Sources */,
 				48CFC2992ADC10D900E77A5C /* CustomizeFees.swift in Sources */,
 				48CFC68C2ADC10DB00E77A5C /* Radix+Dashboard.swift in Sources */,
