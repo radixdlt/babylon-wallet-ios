@@ -3,6 +3,7 @@
 struct ChooseFactorSourceCoordinator: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
+		@Shared(.shieldBuilder) var shieldBuilder
 		let context: ChooseFactorSourceContext
 		var kind: ChooseFactorSourceKind.State
 		var path: StackState<Path.State>
@@ -32,7 +33,7 @@ struct ChooseFactorSourceCoordinator: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case finished(FactorSource, ChooseFactorSourceContext) // TODO: Remove context after removing Home tests
+		case finished
 	}
 
 	var body: some ReducerOf<Self> {
@@ -56,10 +57,28 @@ struct ChooseFactorSourceCoordinator: Sendable, FeatureReducer {
 			state.path.append(.list(.init(context: .selection(state.context), kind: kind)))
 			return .none
 		case let .path(.element(id: _, action: .list(.delegate(.selectedFactorSource(factorSource))))):
-			return .send(.delegate(.finished(factorSource, state.context)))
+			return selectedFactorSourceEffect(state: state, factorSourceId: factorSource.id)
 		default:
 			return .none
 		}
+	}
+}
+
+private extension ChooseFactorSourceCoordinator {
+	func selectedFactorSourceEffect(state: State, factorSourceId: FactorSourceID) -> Effect<Action> {
+		state.$shieldBuilder.withLock { builder in
+			switch state.context {
+			case .primaryThreshold:
+				builder = builder.addFactorSourceToPrimaryThreshold(factorSourceId: factorSourceId)
+			case .primaryOverride:
+				builder = builder.addFactorSourceToPrimaryOverride(factorSourceId: factorSourceId)
+			case .recovery:
+				builder = builder.addFactorSourceToRecoveryOverride(factorSourceId: factorSourceId)
+			case .confirmation:
+				builder = builder.addFactorSourceToConfirmationOverride(factorSourceId: factorSourceId)
+			}
+		}
+		return .send(.delegate(.finished))
 	}
 }
 

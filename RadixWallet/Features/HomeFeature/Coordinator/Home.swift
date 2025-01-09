@@ -362,19 +362,7 @@ struct Home: Sendable, FeatureReducer {
 				errorQueue.schedule(error)
 			}
 
-		case let .chooseFactorSource(.delegate(.finished(factorSource, context))):
-			state.$shieldBuilder.withLock { builder in
-				switch context {
-				case .primaryThreshold:
-					builder = builder.addFactorSourceToPrimaryThreshold(factorSourceId: factorSource.id)
-				case .primaryOverride:
-					builder = builder.addFactorSourceToPrimaryOverride(factorSourceId: factorSource.id)
-				case .recovery:
-					builder = builder.addFactorSourceToRecoveryOverride(factorSourceId: factorSource.id)
-				case .confirmation:
-					builder = builder.addFactorSourceToConfirmationOverride(factorSourceId: factorSource.id)
-				}
-			}
+		case let .chooseFactorSource(.delegate(.finished)):
 			state.destination = nil
 			return .none
 
