@@ -3,9 +3,15 @@
 struct ChooseFactorSourceCoordinator: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
-		let role: RoleKind
-		var kind: ChooseFactorSourceKind.State = .init()
-		var path: StackState<Path.State> = .init()
+		let context: ChooseFactorSourceContext
+		var kind: ChooseFactorSourceKind.State
+		var path: StackState<Path.State>
+
+		init(context: ChooseFactorSourceContext) {
+			self.context = context
+			self.kind = .init(context: context)
+			self.path = .init()
+		}
 	}
 
 	@Reducer(state: .hashable, action: .equatable)
@@ -55,4 +61,12 @@ struct ChooseFactorSourceCoordinator: Sendable, FeatureReducer {
 			return .none
 		}
 	}
+}
+
+// MARK: - ChooseFactorSourceContext
+enum ChooseFactorSourceContext: Sendable, Hashable {
+	case primaryThreshold
+	case primaryOverride
+	case recovery
+	case confirmation
 }

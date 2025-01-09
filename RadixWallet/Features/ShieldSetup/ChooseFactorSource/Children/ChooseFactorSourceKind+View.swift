@@ -7,7 +7,7 @@ extension ChooseFactorSourceKind {
 
 		var body: some SwiftUI.View {
 			content
-				.radixToolbar(title: "Select Factor Type")
+				.radixToolbar(title: L10n.SecurityFactors.SelectFactor.title)
 				.tint(.app.gray1)
 				.foregroundColor(.app.gray1)
 		}
@@ -39,15 +39,16 @@ extension ChooseFactorSourceKind {
 		}
 
 		func model(kind: FactorSourceKind) -> SettingsRow<ChooseFactorSourceKind>.Kind {
-			if canBeUsed(kind: kind) {
-				.model(
+			let isValidOrCanBe = store.shieldBuilder.isValidOrCanBe(context: store.context, kind: kind)
+			if isValidOrCanBe {
+				return .model(
 					title: kind.title,
 					subtitle: kind.details,
 					icon: .asset(kind.icon),
 					action: .kindTapped(kind)
 				)
 			} else {
-				.disabled(
+				return .disabled(
 					title: kind.title,
 					subtitle: kind.details,
 					icon: .asset(kind.icon),
@@ -68,9 +69,20 @@ extension ChooseFactorSourceKind {
 				store.send(.view(.disabledKindTapped))
 			}
 		}
+	}
+}
 
-		private func canBeUsed(kind: FactorSourceKind) -> Bool {
-			store.shieldBuilder.additionOfFactorSourceOfKindToRecoveryIsValidOrCanBe(factorSourceKind: kind)
+extension SecurityShieldBuilder {
+	func isValidOrCanBe(context: ChooseFactorSourceContext, kind: FactorSourceKind) -> Bool {
+		switch context {
+		case .primaryThreshold:
+			additionOfFactorSourceOfKindToPrimaryThresholdIsValidOrCanBe(factorSourceKind: kind)
+		case .primaryOverride:
+			additionOfFactorSourceOfKindToPrimaryOverrideIsValidOrCanBe(factorSourceKind: kind)
+		case .recovery:
+			additionOfFactorSourceOfKindToRecoveryIsValidOrCanBe(factorSourceKind: kind)
+		case .confirmation:
+			additionOfFactorSourceOfKindToConfirmationIsValidOrCanBe(factorSourceKind: kind)
 		}
 	}
 }

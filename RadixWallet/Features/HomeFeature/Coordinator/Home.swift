@@ -207,7 +207,7 @@ struct Home: Sendable, FeatureReducer {
 //					purpose: .newAccountFromHome
 //				))
 //			)
-			state.destination = .chooseFactorSource(.init(role: .primary))
+			state.destination = .chooseFactorSource(.init(context: .primaryThreshold))
 			return .none
 
 		case .pullToRefreshStarted:
