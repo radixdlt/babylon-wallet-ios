@@ -2,12 +2,12 @@
 struct RolesSetupCoordinator: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
-		var path: Path.State = .regularAccessSetup(.init())
+		var path: Path.State = .primaryRoleSetup(.init())
 	}
 
 	@Reducer(state: .hashable, action: .equatable)
 	enum Path {
-		case regularAccessSetup(RegularAccessSetup)
+		case primaryRoleSetup(PrimaryRoleSetup)
 	}
 
 	typealias Action = FeatureAction<Self>
@@ -28,7 +28,7 @@ struct RolesSetupCoordinator: Sendable, FeatureReducer {
 
 	var body: some ReducerOf<Self> {
 		Scope(state: \.path, action: \.child.path) {
-			Path.regularAccessSetup(RegularAccessSetup())
+			Path.primaryRoleSetup(PrimaryRoleSetup())
 		}
 		Reduce(core)
 	}
@@ -42,7 +42,7 @@ struct RolesSetupCoordinator: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case .path(.regularAccessSetup(.delegate(.finished))):
+		case .path(.primaryRoleSetup(.delegate(.finished))):
 			.none
 		default:
 			.none

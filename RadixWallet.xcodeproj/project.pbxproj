@@ -1268,8 +1268,8 @@
 		E775A1D62D0623AB00E72DB9 /* SelectFactorSourcesCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E775A1D52D0623AB00E72DB9 /* SelectFactorSourcesCoordinator.swift */; };
 		E775A1D82D0623B400E72DB9 /* SelectFactorSourcesCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E775A1D72D0623B400E72DB9 /* SelectFactorSourcesCoordinator+View.swift */; };
 		E791F2982D2BD64F001A007B /* SecurityShieldBuilder+SharedState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E791F2972D2BD64F001A007B /* SecurityShieldBuilder+SharedState.swift */; };
-		E791F29B2D2BEF59001A007B /* RegularAccessSetup+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E791F29A2D2BEF59001A007B /* RegularAccessSetup+Reducer.swift */; };
-		E791F29D2D2BEF5F001A007B /* RegularAccessSetup+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E791F29C2D2BEF5F001A007B /* RegularAccessSetup+View.swift */; };
+		E791F29B2D2BEF59001A007B /* PrimaryRoleSetup+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E791F29A2D2BEF59001A007B /* PrimaryRoleSetup+Reducer.swift */; };
+		E791F29D2D2BEF5F001A007B /* PrimaryRoleSetup+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E791F29C2D2BEF5F001A007B /* PrimaryRoleSetup+View.swift */; };
 		E791F2A32D2EDFDE001A007B /* SelectNumberOfFactorsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E791F2A22D2EDFDE001A007B /* SelectNumberOfFactorsView.swift */; };
 		E791F2A52D2FED42001A007B /* RolesSetupCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E791F2A42D2FED42001A007B /* RolesSetupCoordinator.swift */; };
 		E791F2A72D2FED51001A007B /* RolesSetupCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E791F2A62D2FED51001A007B /* RolesSetupCoordinator+View.swift */; };
@@ -2547,8 +2547,8 @@
 		E775A1D52D0623AB00E72DB9 /* SelectFactorSourcesCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectFactorSourcesCoordinator.swift; sourceTree = "<group>"; };
 		E775A1D72D0623B400E72DB9 /* SelectFactorSourcesCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SelectFactorSourcesCoordinator+View.swift"; sourceTree = "<group>"; };
 		E791F2972D2BD64F001A007B /* SecurityShieldBuilder+SharedState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityShieldBuilder+SharedState.swift"; sourceTree = "<group>"; };
-		E791F29A2D2BEF59001A007B /* RegularAccessSetup+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RegularAccessSetup+Reducer.swift"; sourceTree = "<group>"; };
-		E791F29C2D2BEF5F001A007B /* RegularAccessSetup+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RegularAccessSetup+View.swift"; sourceTree = "<group>"; };
+		E791F29A2D2BEF59001A007B /* PrimaryRoleSetup+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PrimaryRoleSetup+Reducer.swift"; sourceTree = "<group>"; };
+		E791F29C2D2BEF5F001A007B /* PrimaryRoleSetup+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PrimaryRoleSetup+View.swift"; sourceTree = "<group>"; };
 		E791F2A22D2EDFDE001A007B /* SelectNumberOfFactorsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectNumberOfFactorsView.swift; sourceTree = "<group>"; };
 		E791F2A42D2FED42001A007B /* RolesSetupCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RolesSetupCoordinator.swift; sourceTree = "<group>"; };
 		E791F2A62D2FED51001A007B /* RolesSetupCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RolesSetupCoordinator+View.swift"; sourceTree = "<group>"; };
@@ -7045,14 +7045,14 @@
 			path = Children;
 			sourceTree = "<group>";
 		};
-		E791F2992D2BEF1A001A007B /* RegularAccessSetup */ = {
+		E791F2992D2BEF1A001A007B /* PrimaryRoleSetup */ = {
 			isa = PBXGroup;
 			children = (
-				E791F29A2D2BEF59001A007B /* RegularAccessSetup+Reducer.swift */,
-				E791F29C2D2BEF5F001A007B /* RegularAccessSetup+View.swift */,
+				E791F29A2D2BEF59001A007B /* PrimaryRoleSetup+Reducer.swift */,
+				E791F29C2D2BEF5F001A007B /* PrimaryRoleSetup+View.swift */,
 				E791F2A22D2EDFDE001A007B /* SelectNumberOfFactorsView.swift */,
 			);
-			path = RegularAccessSetup;
+			path = PrimaryRoleSetup;
 			sourceTree = "<group>";
 		};
 		E791F29F2D2ED68D001A007B /* RolesSetup */ = {
@@ -7068,7 +7068,7 @@
 		E791F2A02D2ED697001A007B /* Children */ = {
 			isa = PBXGroup;
 			children = (
-				E791F2992D2BEF1A001A007B /* RegularAccessSetup */,
+				E791F2992D2BEF1A001A007B /* PrimaryRoleSetup */,
 			);
 			path = Children;
 			sourceTree = "<group>";
@@ -7708,7 +7708,7 @@
 				E6A98FA82AE15324003953E2 /* BuildConfiguration.swift in Sources */,
 				A40816042C7E0D08005E65B9 /* StateEntityDetailsOptIns.swift in Sources */,
 				48CFC2C62ADC10D900E77A5C /* MessageMode+Reducer.swift in Sources */,
-				E791F29B2D2BEF59001A007B /* RegularAccessSetup+Reducer.swift in Sources */,
+				E791F29B2D2BEF59001A007B /* PrimaryRoleSetup+Reducer.swift in Sources */,
 				48CFC5862ADC10DA00E77A5C /* FaucetClient+Interface.swift in Sources */,
 				48CFC6202ADC10DA00E77A5C /* OnLedgerEntity.swift in Sources */,
 				5B80FCC42C298E68008444F5 /* ArbitraryDataFieldView.swift in Sources */,
@@ -7844,7 +7844,7 @@
 				A40815882C7E0D08005E65B9 /* ManifestClass.swift in Sources */,
 				48CFC5A42ADC10DA00E77A5C /* PrimaryTextButtonStyle.swift in Sources */,
 				5B526AEE2C89C3C200AF8B72 /* ResourcesVisibilityClient+Test.swift in Sources */,
-				E791F29D2D2BEF5F001A007B /* RegularAccessSetup+View.swift in Sources */,
+				E791F29D2D2BEF5F001A007B /* PrimaryRoleSetup+View.swift in Sources */,
 				A408160B2C7E0D08005E65B9 /* StateEntityDetailsResponseItemAncestorIdentities.swift in Sources */,
 				A4DCCC522C2DA33300438A7B /* HomeCardsClient+Test.swift in Sources */,
 				A40815DA2C7E0D08005E65B9 /* ProgrammaticScryptoSborValueKind.swift in Sources */,

@@ -1,8 +1,8 @@
 import ComposableArchitecture
 
-// MARK: - SelectFactorSources
+// MARK: - PrimaryRoleSetup
 @Reducer
-struct RegularAccessSetup: FeatureReducer, Sendable {
+struct PrimaryRoleSetup: FeatureReducer, Sendable {
 	@ObservableState
 	struct State: Hashable, Sendable {
 		@Shared(.shieldBuilder) var shieldBuilder

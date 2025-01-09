@@ -1,4 +1,4 @@
-extension RegularAccessSetup.State {
+extension PrimaryRoleSetup.State {
 	var validatedRoleStatus: SecurityShieldBuilderInvalidReason? {
 		shieldBuilder.validate()
 	}
@@ -41,10 +41,10 @@ extension RegularAccessSetup.State {
 	}
 }
 
-// MARK: - RegularAccessSetup.View
-extension RegularAccessSetup {
+// MARK: - PrimaryRoleSetup.View
+extension PrimaryRoleSetup {
 	struct View: SwiftUI.View {
-		@Perception.Bindable var store: StoreOf<RegularAccessSetup>
+		@Perception.Bindable var store: StoreOf<PrimaryRoleSetup>
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
@@ -334,9 +334,9 @@ private extension Threshold {
 	}
 }
 
-private extension StoreOf<RegularAccessSetup> {
-	var destination: PresentationStoreOf<RegularAccessSetup.Destination> {
-		func scopeState(state: State) -> PresentationState<RegularAccessSetup.Destination.State> {
+private extension StoreOf<PrimaryRoleSetup> {
+	var destination: PresentationStoreOf<PrimaryRoleSetup.Destination> {
+		func scopeState(state: State) -> PresentationState<PrimaryRoleSetup.Destination.State> {
 			state.$destination
 		}
 		return scope(state: scopeState, action: Action.destination)
@@ -345,12 +345,12 @@ private extension StoreOf<RegularAccessSetup> {
 
 @MainActor
 private extension View {
-	func destination(store: StoreOf<RegularAccessSetup>) -> some View {
+	func destination(store: StoreOf<PrimaryRoleSetup>) -> some View {
 		let destinationStore = store.destination
 		return selectNumberOfFactors(with: destinationStore, store: store)
 	}
 
-	private func selectNumberOfFactors(with destinationStore: PresentationStoreOf<RegularAccessSetup.Destination>, store: StoreOf<RegularAccessSetup>) -> some View {
+	private func selectNumberOfFactors(with destinationStore: PresentationStoreOf<PrimaryRoleSetup.Destination>, store: StoreOf<PrimaryRoleSetup>) -> some View {
 		WithPerceptionTracking {
 			sheet(store: destinationStore.scope(state: \.selectNumberOfFactorsView, action: \.selectNumberOfFactorsView)) { _ in
 				SelectNumberOfFactorsView(

@@ -7,8 +7,8 @@ extension RolesSetupCoordinator {
 			WithPerceptionTracking {
 				Group {
 					switch store.path.case {
-					case let .regularAccessSetup(store):
-						RegularAccessSetup.View(store: store)
+					case let .primaryRoleSetup(store):
+						PrimaryRoleSetup.View(store: store)
 					}
 				}
 			}
