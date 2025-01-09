@@ -318,7 +318,7 @@ extension FactorSourcesList.State.Row {
 		case selectable
 
 		/// The row cannot be selected because it was already selected for this context.
-		/// It will show greyed out with the checkmark already selected.
+		/// It will show greyed out with the radio button already selected.
 		case alreadySelected
 
 		/// The row cannot be selected because it is in a invalid state (e.g. device factor source whose mnemonics are missing)
