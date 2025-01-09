@@ -9,8 +9,6 @@ struct Home: Sendable, FeatureReducer {
 	}
 
 	struct State: Sendable, Hashable {
-		@Shared(.shieldBuilder) var shieldBuilder
-
 		// MARK: - Components
 		var carousel: CardCarousel.State = .init()
 
@@ -33,9 +31,7 @@ struct Home: Sendable, FeatureReducer {
 
 		private var destinationsQueue: [Destination.State] = []
 
-		init() {
-			$shieldBuilder.initialize()
-		}
+		init() {}
 
 		mutating func addDestination(_ destination: Destination.State) {
 			if self.destination == nil {
@@ -59,7 +55,6 @@ struct Home: Sendable, FeatureReducer {
 		case createAccountButtonTapped
 		case settingsButtonTapped
 		case showFiatWorthToggled
-		case chooseFactorSource(ChooseFactorSourceContext)
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -93,7 +88,6 @@ struct Home: Sendable, FeatureReducer {
 			case relinkConnector(NewConnection.State)
 			case securityCenter(SecurityCenter.State)
 			case p2pLinks(P2PLinksFeature.State)
-			case chooseFactorSource(ChooseFactorSourceCoordinator.State)
 		}
 
 		@CasePathable
@@ -105,7 +99,6 @@ struct Home: Sendable, FeatureReducer {
 			case relinkConnector(NewConnection.Action)
 			case securityCenter(SecurityCenter.Action)
 			case p2pLinks(P2PLinksFeature.Action)
-			case chooseFactorSource(ChooseFactorSourceCoordinator.Action)
 
 			enum AcknowledgeJailbreakAlert: Sendable, Hashable {}
 		}
@@ -128,9 +121,6 @@ struct Home: Sendable, FeatureReducer {
 			}
 			Scope(state: \.p2pLinks, action: \.p2pLinks) {
 				P2PLinksFeature()
-			}
-			Scope(state: \.chooseFactorSource, action: \.chooseFactorSource) {
-				ChooseFactorSourceCoordinator()
 			}
 		}
 	}
@@ -225,10 +215,6 @@ struct Home: Sendable, FeatureReducer {
 			return .run { _ in
 				try await appPreferencesClient.toggleIsCurrencyAmountVisible()
 			}
-
-		case let .chooseFactorSource(context):
-			state.destination = .chooseFactorSource(.init(context: context))
-			return .none
 		}
 	}
 
@@ -361,10 +347,6 @@ struct Home: Sendable, FeatureReducer {
 				loggerGlobal.error("Failed P2PLink, error \(error)")
 				errorQueue.schedule(error)
 			}
-
-		case let .chooseFactorSource(.delegate(.finished)):
-			state.destination = nil
-			return .none
 
 		default:
 			return .none

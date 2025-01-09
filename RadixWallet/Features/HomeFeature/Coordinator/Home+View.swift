@@ -21,24 +21,11 @@ extension Home {
 			self.store = store
 		}
 
-		func add(context: ChooseFactorSourceContext) -> some SwiftUI.View {
-			Button("Choose \(context.rawValue)") {
-				store.send(.view(.chooseFactorSource(context)))
-			}
-			.buttonStyle(.secondaryRectangular())
-		}
-
 		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState) { viewStore in
 				ScrollView {
 					VStack(spacing: .medium3) {
 						CardCarousel.View(store: store.scope(state: \.carousel, action: \.child.carousel))
-
-						VStack(spacing: .small1) {
-							ForEachStatic(ChooseFactorSourceContext.allCases) {
-								add(context: $0)
-							}
-						}
 
 						if let fiatWorth = viewStore.totalFiatWorth {
 							VStack(spacing: .small2) {
@@ -131,13 +118,6 @@ private extension View {
 			.relinkConnector(with: destinationStore)
 			.securityCenter(with: destinationStore)
 			.p2pLinks(with: destinationStore)
-			.chooseFactorSource(with: destinationStore)
-	}
-
-	private func chooseFactorSource(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
-		sheet(store: destinationStore.scope(state: \.chooseFactorSource, action: \.chooseFactorSource)) {
-			ChooseFactorSourceCoordinator.View(store: $0)
-		}
 	}
 
 	private func accountDetails(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
