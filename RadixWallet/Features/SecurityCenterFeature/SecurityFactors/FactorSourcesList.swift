@@ -1,19 +1,26 @@
 // MARK: - FactorSourcesList
+@Reducer
 struct FactorSourcesList: Sendable, FeatureReducer {
+	@ObservableState
 	struct State: Sendable, Hashable {
+		let context: Context
 		let kind: FactorSourceKind
 		var rows: [Row] = []
+		var selected: Row?
 
-		init(kind: FactorSourceKind) {
+		init(context: Context = .display, kind: FactorSourceKind) {
+			self.context = context
 			self.kind = kind
 		}
 
-		@PresentationState
+		@Presents
 		var destination: Destination.State? = nil
 
 		fileprivate var problems: [SecurityProblem]?
 		fileprivate var entities: [EntitiesLinkedToFactorSource]?
 	}
+
+	typealias Action = FeatureAction<Self>
 
 	enum ViewAction: Sendable, Equatable {
 		case task
@@ -80,7 +87,12 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 				.merge(with: entitiesEffect(state: state))
 
 		case let .rowTapped(row):
-			state.destination = .detail(.init(integrity: row.integrity))
+			switch state.context {
+			case .display:
+				state.destination = .detail(.init(integrity: row.integrity))
+			case .selection:
+				state.selected = row
+			}
 			return .none
 
 		case let .rowMessageTapped(row):
@@ -207,10 +219,19 @@ private extension FactorSourcesList {
 
 // MARK: - DeviceFactorSourcesList.State.Row
 extension FactorSourcesList.State {
-	struct Row: Sendable, Hashable {
+	enum Context: Sendable, Hashable {
+		case display
+		case selection
+	}
+
+	struct Row: Sendable, Hashable, Identifiable {
 		let integrity: FactorSourceIntegrity
 		let linkedEntities: FactorSourceCardDataSource.LinkedEntities
 		let status: Status
+
+		var id: FactorSourceID {
+			integrity.factorSource.id
+		}
 	}
 
 	enum Status: Sendable, Hashable {

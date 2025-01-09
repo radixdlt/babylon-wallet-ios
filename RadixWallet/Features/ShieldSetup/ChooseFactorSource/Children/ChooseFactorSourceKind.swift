@@ -4,8 +4,6 @@ struct ChooseFactorSourceKind: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
 		@Shared(.shieldBuilder) var shieldBuilder
-
-		var aux: [FactorSourceKind: Bool] = [:]
 	}
 
 	typealias Action = FeatureAction<Self>

@@ -1,39 +1,38 @@
 // MARK: - FactorSourcesList.View
 extension FactorSourcesList {
-	@MainActor
 	struct View: SwiftUI.View {
 		let store: StoreOf<FactorSourcesList>
 
 		var body: some SwiftUI.View {
-			WithViewStore(store, observe: { $0 }) { viewStore in
+			WithPerceptionTracking {
 				ScrollView {
 					VStack(spacing: .large3) {
-						header(viewStore.kind.details)
+						header(store.kind.details)
 
-						if let main = viewStore.main {
+						if let main = store.main {
 							section(text: L10n.FactorSources.List.default, rows: [main])
 								.padding(.top, .medium3)
 
-							if !viewStore.others.isEmpty {
-								section(text: L10n.FactorSources.List.others, rows: viewStore.others)
+							if !store.others.isEmpty {
+								section(text: L10n.FactorSources.List.others, rows: store.others)
 							}
 						} else {
-							section(text: nil, rows: viewStore.others)
+							section(text: nil, rows: store.others)
 						}
 
-						Button(viewStore.addTitle) {
+						Button(store.addTitle) {
 							store.send(.view(.addButtonTapped))
 						}
 						.buttonStyle(.secondaryRectangular)
 
-						let infoContent = viewStore.kind.infoLinkContent
+						let infoContent = store.kind.infoLinkContent
 						InfoButton(infoContent.item, label: infoContent.title)
 					}
 					.padding(.medium3)
 					.padding(.bottom, .medium2)
 				}
 				.background(.app.gray5)
-				.radixToolbar(title: viewStore.kind.title)
+				.radixToolbar(title: store.kind.title)
 				.task {
 					store.send(.view(.task))
 				}
@@ -64,7 +63,7 @@ extension FactorSourcesList {
 					factorSource: row.integrity.factorSource,
 					kind: .extended(linkedEntities: row.linkedEntities)
 				),
-				mode: .display,
+				mode: mode(row),
 				messages: row.messages
 			) { action in
 				switch action {
@@ -76,6 +75,15 @@ extension FactorSourcesList {
 			}
 			.onTapGesture {
 				store.send(.view(.rowTapped(row)))
+			}
+		}
+
+		func mode(_ row: State.Row) -> FactorSourceCard.Mode {
+			switch store.context {
+			case .display:
+				.display
+			case .selection:
+				.selection(type: .radioButton, isSelected: store.selected == row)
 			}
 		}
 	}
@@ -100,18 +108,26 @@ private extension FactorSourcesList.State {
 	}
 
 	var main: Row? {
-		rows.first(where: \.integrity.isExplicitMain)
+		switch context {
+		case .display:
+			rows.first(where: \.integrity.isExplicitMain)
+		case .selection:
+			nil
+		}
 	}
 
 	var others: [Row] {
-		rows
-			.filter { !$0.integrity.isExplicitMain }
+		let main = main
+		return rows
+			.filter { $0 != main }
 			.sorted(by: { left, right in
 				let lhs = left.integrity
 				let rhs = right.integrity
 				switch (lhs, rhs) {
 				case let (.device(lDevice), .device(rDevice)):
-					if lDevice.factorSource.isBDFS, rDevice.factorSource.isBDFS {
+					if lhs.isExplicitMain {
+						return true
+					} else if lDevice.factorSource.isBDFS, rDevice.factorSource.isBDFS {
 						return sort(lhs, rhs)
 					} else {
 						return lDevice.factorSource.isBDFS
