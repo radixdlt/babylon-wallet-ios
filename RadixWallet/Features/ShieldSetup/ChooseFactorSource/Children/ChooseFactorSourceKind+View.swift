@@ -7,7 +7,7 @@ extension ChooseFactorSourceKind {
 
 		var body: some SwiftUI.View {
 			content
-				.radixToolbar(title: L10n.SecurityFactors.SelectFactor.title)
+				.radixToolbar(title: "Select Factor Type")
 				.tint(.app.gray1)
 				.foregroundColor(.app.gray1)
 		}
@@ -27,7 +27,8 @@ extension ChooseFactorSourceKind {
 
 		private var rows: [SettingsRow<ChooseFactorSourceKind>.Kind] {
 			[
-				.header(""),
+				//				.header(""),
+				.header(store.context.rawValue),
 				model(kind: .device),
 				.header(L10n.SecurityFactors.hardware),
 				model(kind: .arculusCard),

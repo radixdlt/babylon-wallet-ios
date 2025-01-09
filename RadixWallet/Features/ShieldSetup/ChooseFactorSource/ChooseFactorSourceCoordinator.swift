@@ -64,7 +64,8 @@ struct ChooseFactorSourceCoordinator: Sendable, FeatureReducer {
 }
 
 // MARK: - ChooseFactorSourceContext
-enum ChooseFactorSourceContext: Sendable, Hashable {
+// TODO: Remove String & CaseIterable added for tests
+enum ChooseFactorSourceContext: String, Sendable, Hashable, CaseIterable {
 	case primaryThreshold
 	case primaryOverride
 	case recovery

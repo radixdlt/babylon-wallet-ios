@@ -19,6 +19,7 @@ struct Home: Sendable, FeatureReducer {
 		var showFiatWorth: Bool = true
 
 		var totalFiatWorth: Loadable<FiatWorth> = .idle
+		var count = 0
 
 		// MARK: - Destination
 		@PresentationState
@@ -207,7 +208,10 @@ struct Home: Sendable, FeatureReducer {
 //					purpose: .newAccountFromHome
 //				))
 //			)
-			state.destination = .chooseFactorSource(.init(context: .primaryThreshold))
+			let index = state.count % ChooseFactorSourceContext.allCases.count
+			let context = ChooseFactorSourceContext.allCases[index]
+			state.destination = .chooseFactorSource(.init(context: context))
+			state.count += 1
 			return .none
 
 		case .pullToRefreshStarted:
