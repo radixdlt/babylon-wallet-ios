@@ -29,6 +29,7 @@ struct RegularAccessSetup: FeatureReducer, Sendable {
 		case showOverrideSectionButtonTapped
 		case hideOverrideSectionButtonTapped
 		case thresholdSelectorButtonTapped
+		case invalidCombinationReadMoreTapped
 	}
 
 	enum InternalAction: Equatable, Sendable {
@@ -65,6 +66,7 @@ struct RegularAccessSetup: FeatureReducer, Sendable {
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.errorQueue) var errorQueue
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
@@ -76,6 +78,10 @@ struct RegularAccessSetup: FeatureReducer, Sendable {
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
+
+		case .invalidCombinationReadMoreTapped:
+			overlayWindowClient.showInfoLink(.init(glossaryItem: .buildingshield))
+			return .none
 
 		case let .removeThresholdFactorTapped(id):
 			state.$shieldBuilder.withLock { builder in

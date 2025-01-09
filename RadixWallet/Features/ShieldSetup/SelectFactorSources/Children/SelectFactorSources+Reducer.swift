@@ -84,7 +84,7 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 
 		case .continueButtonTapped:
 			state.$shieldBuilder.withLock { builder in
-                builder = builder.autoAssignFactorsToRecoveryAndConfirmationBasedOnPrimary(allFactors: state.factorSourcesCandidates)
+				builder = builder.autoAssignFactorsToRecoveryAndConfirmationBasedOnPrimary(allFactors: state.factorSourcesCandidates)
 			}
 			return .send(.delegate(.finished))
 

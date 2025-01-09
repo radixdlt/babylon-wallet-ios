@@ -136,6 +136,11 @@ extension RegularAccessSetup {
 					.padding(.horizontal, .small1)
 					.padding(.vertical, .medium3)
 					.flushedLeft
+					.onTapGesture {
+						if statusMessage.type == .warning {
+							store.send(.view(.invalidCombinationReadMoreTapped))
+						}
+					}
 				}
 			}
 			.foregroundStyle(.app.gray1)
