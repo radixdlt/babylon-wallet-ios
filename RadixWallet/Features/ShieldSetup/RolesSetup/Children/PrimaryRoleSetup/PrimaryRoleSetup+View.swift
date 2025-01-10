@@ -170,7 +170,7 @@ extension PrimaryRoleSetup {
 				}
 
 				Button("+") {
-					store.send(.view(.addThresholdFactorButtonTapped))
+					store.send(.view(.addFactorSourceButtonTapped(.primaryThreshold)))
 				}
 				.buttonStyle(.secondaryRectangular(font: .app.sectionHeader, shouldExpand: true))
 			}
@@ -257,7 +257,7 @@ extension PrimaryRoleSetup {
 					}
 
 					Button("+") {
-						store.send(.view(.addOverrideFactorButtonTapped))
+						store.send(.view(.addFactorSourceButtonTapped(.primaryOverride)))
 					}
 					.buttonStyle(.secondaryRectangular(font: .app.sectionHeader, shouldExpand: true))
 				}
@@ -304,7 +304,7 @@ extension PrimaryRoleSetup {
 					.flushedLeft
 
 					Button("+") {
-						store.send(.view(.addAuthenticationSigningFactorButtonTapped))
+						store.send(.view(.addFactorSourceButtonTapped(.authenticationSigning)))
 					}
 					.buttonStyle(.secondaryRectangular(font: .app.sectionHeader, shouldExpand: true))
 					.embedInContainer

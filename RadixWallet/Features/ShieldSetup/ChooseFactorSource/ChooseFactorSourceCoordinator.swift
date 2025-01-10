@@ -76,6 +76,8 @@ private extension ChooseFactorSourceCoordinator {
 				builder = builder.addFactorSourceToRecoveryOverride(factorSourceId: factorSourceId)
 			case .confirmation:
 				builder = builder.addFactorSourceToConfirmationOverride(factorSourceId: factorSourceId)
+			case .authenticationSigning:
+				builder = builder.setAuthenticationSigningFactor(new: factorSourceId)
 			}
 		}
 		return .send(.delegate(.finished))
@@ -83,10 +85,10 @@ private extension ChooseFactorSourceCoordinator {
 }
 
 // MARK: - ChooseFactorSourceContext
-// TODO: Remove String & CaseIterable added for tests
-enum ChooseFactorSourceContext: String, Sendable, Hashable, CaseIterable {
+enum ChooseFactorSourceContext: Sendable, Hashable {
 	case primaryThreshold
 	case primaryOverride
 	case recovery
 	case confirmation
+	case authenticationSigning
 }

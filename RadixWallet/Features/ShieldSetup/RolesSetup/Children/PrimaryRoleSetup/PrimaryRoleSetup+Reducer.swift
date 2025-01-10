@@ -20,9 +20,7 @@ struct PrimaryRoleSetup: FeatureReducer, Sendable {
 	enum ViewAction: Equatable, Sendable {
 		case task
 		case continueButtonTapped
-		case addThresholdFactorButtonTapped
-		case addOverrideFactorButtonTapped
-		case addAuthenticationSigningFactorButtonTapped
+		case addFactorSourceButtonTapped(ChooseFactorSourceContext)
 		case removeThresholdFactorTapped(FactorSourceID)
 		case removeOverrideFactorTapped(FactorSourceID)
 		case removeAuthenticationSigningFactorTapped
@@ -37,6 +35,7 @@ struct PrimaryRoleSetup: FeatureReducer, Sendable {
 	}
 
 	enum DelegateAction: Equatable, Sendable {
+		case chooseFactorSource(ChooseFactorSourceContext)
 		case finished
 	}
 
@@ -110,8 +109,8 @@ struct PrimaryRoleSetup: FeatureReducer, Sendable {
 		case .hideOverrideSectionButtonTapped:
 			state.isOverrideSectionExpanded = false
 			state.$shieldBuilder.withLock { builder in
+				// TODO: use removeAllFactorsFromPrimaryOverride
 				for overrideFactor in state.overrideFactors {
-					// TODO: use removeFactorFromPrimaryOverride
 					builder = builder.removeFactorFromPrimary(factorSourceId: overrideFactor.factorSourceID)
 				}
 			}
@@ -121,9 +120,8 @@ struct PrimaryRoleSetup: FeatureReducer, Sendable {
 			state.destination = .selectNumberOfFactorsView
 			return .none
 
-		// TODO:
-		case .addThresholdFactorButtonTapped, .addOverrideFactorButtonTapped, .addAuthenticationSigningFactorButtonTapped:
-			return .none
+		case let .addFactorSourceButtonTapped(context):
+			return .send(.delegate(.chooseFactorSource(context)))
 
 		case .continueButtonTapped:
 			return .send(.delegate(.finished))
