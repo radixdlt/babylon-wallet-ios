@@ -9,7 +9,7 @@ struct AssetIcon: View {
 		case systemImage(String)
 	}
 
-	init(_ content: Content, verySmall: Bool = true) {
+	nonisolated init(_ content: Content, verySmall: Bool = true) {
 		self.init(content, size: verySmall ? .verySmall : .small)
 	}
 
