@@ -825,6 +825,11 @@
 		834B651F2B972E5100B7E1E8 /* NPSSurvey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834B651E2B972E5100B7E1E8 /* NPSSurvey.swift */; };
 		835DFF932D19855A00229DB0 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 835DFF922D19855A00229DB0 /* Sargon */; };
 		835F196D2B3581C300E0B71D /* UnknownDappComponents+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835F196C2B3581C300E0B71D /* UnknownDappComponents+View.swift */; };
+		8365836A2D312E9300435DBD /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = E695F2DD2BECDD7C00761ACE /* Sargon */; };
+		8365836B2D312E9300435DBD /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 83B783552C1764AE00AA7930 /* Sargon */; };
+		8365836C2D312E9300435DBD /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 831F0CEC2C21819000D6F5BF /* Sargon */; };
+		8365836D2D312E9300435DBD /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 5B447E0A2CAAFC2D0063AE39 /* Sargon */; };
+		8365836E2D312E9300435DBD /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 5B4E1D1E2CB7FE8E002FAC2E /* Sargon */; };
 		8370FC5C2B99C780007AD882 /* NPSSurveyClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8370FC5B2B99C780007AD882 /* NPSSurveyClient+Interface.swift */; };
 		8381C8B02BBD2CD400A470B4 /* TokenPriceCientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8381C8AF2BBD2CD400A470B4 /* TokenPriceCientTests.swift */; };
 		8381C8B32BC0619100A470B4 /* RadixConnectMobile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8381C8B22BC0619100A470B4 /* RadixConnectMobile.swift */; };
@@ -838,7 +843,6 @@
 		8397D82D2B46ACB50016365A /* StakeUnitList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8397D82B2B46ACB50016365A /* StakeUnitList.swift */; };
 		839B6C542B21D28400402651 /* ExpandableTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 839B6C532B21D28400402651 /* ExpandableTextView.swift */; };
 		83AAAC6D2B483D1B00222B64 /* StakeSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83AAAC6B2B483D1B00222B64 /* StakeSummaryView.swift */; };
-		83B783562C1764AE00AA7930 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 83B783552C1764AE00AA7930 /* Sargon */; };
 		83D3F3C32D15C9CA00CA976D /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 83D3F3C22D15C9CA00CA976D /* Sargon */; };
 		83D663B02B271D0100D1AB9E /* TruncationMask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D663AF2B271D0100D1AB9E /* TruncationMask.swift */; };
 		83D908AD2C931A7100822CC4 /* SargonSecureStorageDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D908AC2C931A7100822CC4 /* SargonSecureStorageDriver.swift */; };
@@ -2552,6 +2556,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8365836E2D312E9300435DBD /* Sargon in Frameworks */,
+				8365836D2D312E9300435DBD /* Sargon in Frameworks */,
+				8365836C2D312E9300435DBD /* Sargon in Frameworks */,
+				8365836B2D312E9300435DBD /* Sargon in Frameworks */,
+				8365836A2D312E9300435DBD /* Sargon in Frameworks */,
 				48FFFABE2ADC209100B2B213 /* NukeUI in Frameworks */,
 				48FFFAE72ADC223300B2B213 /* Overture in Frameworks */,
 				48FFFA9F2ADC1F2700B2B213 /* KeychainAccess in Frameworks */,
@@ -2565,10 +2574,7 @@
 				48FFFADE2ADC21F500B2B213 /* FileLogging in Frameworks */,
 				48FFFACF2ADC216400B2B213 /* CollectionConcurrencyKit in Frameworks */,
 				48FFFAB12ADC203700B2B213 /* WebRTC in Frameworks */,
-				5B4E1D1F2CB7FE8E002FAC2E /* Sargon in Frameworks */,
-				831F0CED2C21819000D6F5BF /* Sargon in Frameworks */,
 				48FFFB0D2ADC744700B2B213 /* TextBuilder in Frameworks */,
-				5B447E0B2CAAFC2D0063AE39 /* Sargon in Frameworks */,
 				48FFFB0A2ADC721800B2B213 /* Atomics in Frameworks */,
 				48FFFB002ADC25A200B2B213 /* BigInt in Frameworks */,
 				A47571FF2B29B0860059A95D /* IOSSecuritySuite in Frameworks */,
@@ -2587,7 +2593,6 @@
 				A41557502B757C5E0040AD4E /* ComposableArchitecture in Frameworks */,
 				48FFFAFD2ADC241A00B2B213 /* HeapModule in Frameworks */,
 				48FFFAD52ADC21B900B2B213 /* LegibleError in Frameworks */,
-				E60D5E1F2C2EFAA2008BCF1F /* Sargon in Frameworks */,
 				48FFFB082ADC6FD300B2B213 /* SwiftUINavigationCore in Frameworks */,
 				48FFFAD82ADC21D200B2B213 /* NonEmpty in Frameworks */,
 				48FFFAE12ADC220F00B2B213 /* Tagged in Frameworks */,
@@ -7095,7 +7100,6 @@
 				E6A0B04A2BF23C7000617DAC /* IdentifiedCollections */,
 				83B783552C1764AE00AA7930 /* Sargon */,
 				831F0CEC2C21819000D6F5BF /* Sargon */,
-				E60D5E1E2C2EFAA2008BCF1F /* Sargon */,
 				5B634A932C91D2A0004B2FBC /* ScreenshotPreventing */,
 				5B447E0A2CAAFC2D0063AE39 /* Sargon */,
 				5B4E1D1E2CB7FE8E002FAC2E /* Sargon */,
@@ -9272,7 +9276,7 @@
 			repositoryURL = "https://github.com/radixdlt/sargon";
 			requirement = {
 				kind = exactVersion;
-				version = 1.1.96;
+				version = 1.1.99;
 			};
 		};
 		A415574E2B757C5E0040AD4E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
