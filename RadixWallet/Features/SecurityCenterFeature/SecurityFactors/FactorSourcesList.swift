@@ -1,30 +1,43 @@
 // MARK: - FactorSourcesList
+@Reducer
 struct FactorSourcesList: Sendable, FeatureReducer {
+	@ObservableState
 	struct State: Sendable, Hashable {
+		@SharedReader(.shieldBuilder) var shieldBuilder
+		let context: Context
 		let kind: FactorSourceKind
 		var rows: [Row] = []
+		var selected: Row?
 
-		init(kind: FactorSourceKind) {
+		init(context: Context = .display, kind: FactorSourceKind) {
+			self.context = context
 			self.kind = kind
 		}
 
-		@PresentationState
+		@Presents
 		var destination: Destination.State? = nil
 
 		fileprivate var problems: [SecurityProblem]?
 		fileprivate var entities: [EntitiesLinkedToFactorSource]?
 	}
 
+	typealias Action = FeatureAction<Self>
+
 	enum ViewAction: Sendable, Equatable {
 		case task
 		case rowTapped(State.Row)
 		case rowMessageTapped(State.Row)
 		case addButtonTapped
+		case continueButtonTapped(FactorSource)
 	}
 
 	enum InternalAction: Sendable, Equatable {
 		case setSecurityProblems([SecurityProblem])
 		case setEntities([EntitiesLinkedToFactorSource])
+	}
+
+	enum DelegateAction: Sendable, Equatable {
+		case selectedFactorSource(FactorSource)
 	}
 
 	struct Destination: DestinationReducer {
@@ -66,7 +79,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(destinationPath, action: /Action.destination) {
+			.ifLet(destinationPath, action: \.destination) {
 				Destination()
 			}
 	}
@@ -80,7 +93,17 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 				.merge(with: entitiesEffect(state: state))
 
 		case let .rowTapped(row):
-			state.destination = .detail(.init(integrity: row.integrity))
+			switch state.context {
+			case .display:
+				state.destination = .detail(.init(integrity: row.integrity))
+			case .selection:
+				switch row.selectability {
+				case .selectable:
+					state.selected = row
+				case .alreadySelected, .unselectable:
+					break
+				}
+			}
 			return .none
 
 		case let .rowMessageTapped(row):
@@ -123,6 +146,9 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			}
 
 			return .none
+
+		case let .continueButtonTapped(factorSource):
+			return .send(.delegate(.selectedFactorSource(factorSource)))
 		}
 	}
 
@@ -180,10 +206,13 @@ private extension FactorSourcesList {
 		guard let problems = state.problems, let entities = state.entities else {
 			return
 		}
+		let factorSourceIds = entities.map(\.integrity.factorSource.id)
+		let alreadySelectedFactorSourceIds = filterAlreadySelectedFactorSourceIds(state: state, factorSourceIds: factorSourceIds)
 		state.rows = entities.map { entity in
 			let accounts = entity.accounts + entity.hiddenAccounts
 			let personas = entity.personas
-			let status: State.Status = if problems.hasProblem9(accounts: accounts, personas: personas) {
+			// Determine row status
+			let status: State.Row.Status = if problems.hasProblem9(accounts: accounts, personas: personas) {
 				.lostFactorSource
 			} else if problems.hasProblem3(accounts: accounts, personas: personas) {
 				.seedPhraseNotRecoverable
@@ -196,23 +225,73 @@ private extension FactorSourcesList {
 				// source was backed up.
 				.notBackedUp
 			}
+
+			// Determine row selectability
+			let selectability: State.Row.Selectability = if status == .lostFactorSource {
+				.unselectable
+			} else if alreadySelectedFactorSourceIds.contains(entity.integrity.factorSource.id) {
+				.alreadySelected
+			} else {
+				.selectable
+			}
 			return State.Row(
 				integrity: entity.integrity,
 				linkedEntities: entity.linkedEntities,
-				status: status
+				status: status,
+				selectability: selectability
 			)
+		}
+	}
+
+	func filterAlreadySelectedFactorSourceIds(state: State, factorSourceIds: [FactorSourceId]) -> [FactorSourceId] {
+		let status: [FactorSourceValidationStatus] =
+			switch state.context {
+			case .display:
+				[]
+			case .selection(.primaryThreshold):
+				state.shieldBuilder.validationForAdditionOfFactorSourceToPrimaryThresholdForEach(factorSources: factorSourceIds)
+			case .selection(.primaryOverride):
+				state.shieldBuilder.validationForAdditionOfFactorSourceToPrimaryOverrideForEach(factorSources: factorSourceIds)
+			case .selection(.recovery):
+				state.shieldBuilder.validationForAdditionOfFactorSourceToRecoveryOverrideForEach(factorSources: factorSourceIds)
+			case .selection(.confirmation):
+				state.shieldBuilder.validationForAdditionOfFactorSourceToConfirmationOverrideForEach(factorSources: factorSourceIds)
+			}
+		return status.compactMap { status in
+			guard let reason = status.reasonIfInvalid else {
+				return nil
+			}
+			switch reason {
+			case .nonBasic(.FactorSourceAlreadyPresent):
+				break
+			default:
+				assertionFailure("Sargon considered \(status.factorSourceId) invalid for a reason different than already selected: \(reason)")
+			}
+			return status.factorSourceId
 		}
 	}
 }
 
 // MARK: - DeviceFactorSourcesList.State.Row
 extension FactorSourcesList.State {
-	struct Row: Sendable, Hashable {
+	enum Context: Sendable, Hashable {
+		case display
+		case selection(ChooseFactorSourceContext)
+	}
+
+	struct Row: Sendable, Hashable, Identifiable {
 		let integrity: FactorSourceIntegrity
 		let linkedEntities: FactorSourceCardDataSource.LinkedEntities
 		let status: Status
-	}
+		let selectability: Selectability
 
+		var id: FactorSourceID {
+			integrity.factorSource.id
+		}
+	}
+}
+
+extension FactorSourcesList.State.Row {
 	enum Status: Sendable, Hashable {
 		/// User has lost access to the given factor source (`SecurityProblem.problem9`).
 		/// We will show an error message.
@@ -229,6 +308,19 @@ extension FactorSourcesList.State {
 		/// User has access to the factor source, which doesn't have associated entities, and hasn't been backed up.
 		/// We won't show any message (since there are no entities associated).
 		case notBackedUp
+	}
+
+	enum Selectability: Sendable, Hashable {
+		/// The row can be selected.
+		case selectable
+
+		/// The row cannot be selected because it was already selected for this context.
+		/// It will show greyed out with the radio button already selected.
+		case alreadySelected
+
+		/// The row cannot be selected because it is in an invalid state (e.g. device factor source whose mnemonics are missing)
+		/// It will show greyed out with the radio button unselected.
+		case unselectable
 	}
 }
 

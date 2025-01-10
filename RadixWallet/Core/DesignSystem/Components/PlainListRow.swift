@@ -1,19 +1,22 @@
 // MARK: - PlainListRow
-struct PlainListRow<Icon: View, Accessory: View>: View {
+struct PlainListRow<Icon: View, Accessory: View, Bottom: View>: View {
 	struct ViewState {
 		let accessory: Accessory?
 		let rowCoreViewState: PlainListRowCore.ViewState
 		let icon: Icon?
-		let hints: [Hint.ViewState]
+		let bottom: Bottom?
+		let isDisabled: Bool
 
 		init(
 			rowCoreViewState: PlainListRowCore.ViewState,
 			hints: [Hint.ViewState] = [],
+			isDisabled: Bool = false,
 			@ViewBuilder accessory: () -> Accessory,
 			@ViewBuilder icon: () -> Icon
-		) {
+		) where Bottom == StackedHints {
 			self.rowCoreViewState = rowCoreViewState
-			self.hints = hints
+			self.bottom = StackedHints(hints: hints)
+			self.isDisabled = isDisabled
 			self.accessory = accessory()
 			self.icon = icon()
 		}
@@ -22,32 +25,48 @@ struct PlainListRow<Icon: View, Accessory: View>: View {
 			rowCoreViewState: PlainListRowCore.ViewState,
 			accessory: ImageResource? = .chevronRight,
 			hints: [Hint.ViewState] = [],
+			isDisabled: Bool = false,
 			@ViewBuilder icon: () -> Icon
-		) where Accessory == Image {
+		) where Accessory == Image, Bottom == StackedHints {
 			self.accessory = accessory.map { Image($0) }
 			self.rowCoreViewState = rowCoreViewState
+			self.isDisabled = isDisabled
 			self.icon = icon()
-			self.hints = hints
+			self.bottom = StackedHints(hints: hints)
 		}
 
 		init(
 			_ content: AssetIcon.Content?,
 			rowCoreViewState: PlainListRowCore.ViewState,
 			accessory: ImageResource? = .chevronRight,
-			hints: [Hint.ViewState]
+			hints: [Hint.ViewState],
+			isDisabled: Bool = false
+		) where Icon == AssetIcon, Accessory == Image, Bottom == StackedHints {
+			self.accessory = accessory.map { Image($0) }
+			self.rowCoreViewState = rowCoreViewState
+			self.icon = content.map { AssetIcon($0) }
+			self.bottom = StackedHints(hints: hints)
+			self.isDisabled = isDisabled
+		}
+
+		init(
+			_ content: AssetIcon.Content?,
+			rowCoreViewState: PlainListRowCore.ViewState,
+			accessory: ImageResource? = .chevronRight,
+			isDisabled: Bool = false,
+			@ViewBuilder bottom: () -> Bottom
 		) where Icon == AssetIcon, Accessory == Image {
 			self.accessory = accessory.map { Image($0) }
 			self.rowCoreViewState = rowCoreViewState
 			self.icon = content.map { AssetIcon($0) }
-			self.hints = hints
+			self.bottom = bottom()
+			self.isDisabled = isDisabled
 		}
 	}
 
 	let viewState: ViewState
 
-	init(
-		viewState: ViewState
-	) {
+	init(viewState: ViewState) {
 		self.viewState = viewState
 	}
 
@@ -57,7 +76,7 @@ struct PlainListRow<Icon: View, Accessory: View>: View {
 		subtitle: String? = nil,
 		accessory: ImageResource? = .chevronRight,
 		@ViewBuilder icon: () -> Icon
-	) where Accessory == Image {
+	) where Accessory == Image, Bottom == StackedHints {
 		self.viewState = ViewState(rowCoreViewState: .init(context: context, title: title, subtitle: subtitle), accessory: accessory, icon: icon)
 	}
 
@@ -66,14 +85,16 @@ struct PlainListRow<Icon: View, Accessory: View>: View {
 		title: String?,
 		subtitle: String? = nil,
 		@ViewBuilder accessory: () -> Accessory
-	) where Icon == EmptyView {
+	) where Icon == EmptyView, Bottom == StackedHints {
 		self.viewState = ViewState(rowCoreViewState: .init(context: context, title: title, subtitle: subtitle), accessory: accessory, icon: { EmptyView() })
 	}
 
 	var body: some View {
 		VStack(alignment: .leading, spacing: .small1) {
 			top
-			hints
+				.opacity(viewState.isDisabled ? 0.5 : 1)
+
+			bottom
 		}
 		.applyIf(viewState.rowCoreViewState.shouldTintAsError) {
 			$0.foregroundStyle(Color.app.error)
@@ -94,17 +115,13 @@ struct PlainListRow<Icon: View, Accessory: View>: View {
 	}
 
 	@ViewBuilder
-	private var hints: some View {
-		if !viewState.hints.isEmpty {
+	private var bottom: some View {
+		if let bottom = viewState.bottom {
 			HStack(spacing: .zero) {
 				iconView
 					.hidden() // to leave the same leading padding than on top view
 
-				VStack(alignment: .leading, spacing: .small1) {
-					ForEach(Array(viewState.hints.enumerated()), id: \.offset) { _, hint in
-						Hint(viewState: hint)
-					}
-				}
+				bottom
 
 				accessoryView
 					.hidden() // to leave the same trailing padding than on top view
@@ -333,6 +350,26 @@ extension View {
 	func tappable(_ action: @escaping () -> Void) -> some View {
 		Button(action: action) {
 			self
+		}
+	}
+}
+
+// MARK: - StackedHints
+struct StackedHints: View {
+	let hints: [Hint.ViewState]
+
+	nonisolated init?(hints: [Hint.ViewState]) {
+		guard !hints.isEmpty else {
+			return nil
+		}
+		self.hints = hints
+	}
+
+	var body: some View {
+		VStack(alignment: .leading, spacing: .small1) {
+			ForEachStatic(hints) { hint in
+				Hint(viewState: hint)
+			}
 		}
 	}
 }

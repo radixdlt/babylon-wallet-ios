@@ -777,6 +777,10 @@
 		5B8F77132CDA41F800154A76 /* PreAuthorizationReviewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8F77122CDA41F800154A76 /* PreAuthorizationReviewTests.swift */; };
 		5B92AAB62D2E97E600486A9B /* RenameLabel+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92AAB42D2E97E600486A9B /* RenameLabel+View.swift */; };
 		5B92AAB72D2E97E600486A9B /* RenameLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92AAB32D2E97E600486A9B /* RenameLabel.swift */; };
+		5B92AAC02D2ED09F00486A9B /* ChooseFactorSourceCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92AABF2D2ED09F00486A9B /* ChooseFactorSourceCoordinator+View.swift */; };
+		5B92AAC12D2ED09F00486A9B /* ChooseFactorSourceCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92AABE2D2ED09F00486A9B /* ChooseFactorSourceCoordinator.swift */; };
+		5B92AAC42D2ED0BE00486A9B /* ChooseFactorSourceKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92AAC22D2ED0BE00486A9B /* ChooseFactorSourceKind.swift */; };
+		5B92AAC52D2ED0BE00486A9B /* ChooseFactorSourceKind+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92AAC32D2ED0BE00486A9B /* ChooseFactorSourceKind+View.swift */; };
 		5B96DD372BD917B300722882 /* Text+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B96DD362BD917B300722882 /* Text+Extra.swift */; };
 		5B9846BD2BBD5C8800E814F3 /* SensitiveInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B9846BC2BBD5C8800E814F3 /* SensitiveInfo.plist */; };
 		5B9846C02BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9846BF2BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift */; };
@@ -2039,6 +2043,10 @@
 		5B8F77122CDA41F800154A76 /* PreAuthorizationReviewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreAuthorizationReviewTests.swift; sourceTree = "<group>"; };
 		5B92AAB32D2E97E600486A9B /* RenameLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenameLabel.swift; sourceTree = "<group>"; };
 		5B92AAB42D2E97E600486A9B /* RenameLabel+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RenameLabel+View.swift"; sourceTree = "<group>"; };
+		5B92AABE2D2ED09F00486A9B /* ChooseFactorSourceCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseFactorSourceCoordinator.swift; sourceTree = "<group>"; };
+		5B92AABF2D2ED09F00486A9B /* ChooseFactorSourceCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChooseFactorSourceCoordinator+View.swift"; sourceTree = "<group>"; };
+		5B92AAC22D2ED0BE00486A9B /* ChooseFactorSourceKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseFactorSourceKind.swift; sourceTree = "<group>"; };
+		5B92AAC32D2ED0BE00486A9B /* ChooseFactorSourceKind+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChooseFactorSourceKind+View.swift"; sourceTree = "<group>"; };
 		5B96DD362BD917B300722882 /* Text+Extra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Text+Extra.swift"; sourceTree = "<group>"; };
 		5B9846BC2BBD5C8800E814F3 /* SensitiveInfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = SensitiveInfo.plist; sourceTree = "<group>"; };
 		5B9846BF2BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SensitiveInfoClient+Interface.swift"; sourceTree = "<group>"; };
@@ -5746,6 +5754,7 @@
 				5B98CD862D00D29C00C3C133 /* Onboarding */,
 				5B813D052CFF202E001A291D /* PrepareFactorSources */,
 				E775A1CE2D03279000E72DB9 /* SelectFactorSources */,
+				5B92AAB82D2ECFEE00486A9B /* ChooseFactorSource */,
 			);
 			path = ShieldSetup;
 			sourceTree = "<group>";
@@ -5814,6 +5823,25 @@
 				5B92AAB42D2E97E600486A9B /* RenameLabel+View.swift */,
 			);
 			path = RenameLabel;
+			sourceTree = "<group>";
+		};
+		5B92AAB82D2ECFEE00486A9B /* ChooseFactorSource */ = {
+			isa = PBXGroup;
+			children = (
+				5B92AABE2D2ED09F00486A9B /* ChooseFactorSourceCoordinator.swift */,
+				5B92AABF2D2ED09F00486A9B /* ChooseFactorSourceCoordinator+View.swift */,
+				5B92AABD2D2ED06F00486A9B /* Children */,
+			);
+			path = ChooseFactorSource;
+			sourceTree = "<group>";
+		};
+		5B92AABD2D2ED06F00486A9B /* Children */ = {
+			isa = PBXGroup;
+			children = (
+				5B92AAC22D2ED0BE00486A9B /* ChooseFactorSourceKind.swift */,
+				5B92AAC32D2ED0BE00486A9B /* ChooseFactorSourceKind+View.swift */,
+			);
+			path = Children;
 			sourceTree = "<group>";
 		};
 		5B9846BE2BBD5EF600E814F3 /* SensitiveInfoClient */ = {
@@ -7523,6 +7551,8 @@
 				48CFC5DA2ADC10DA00E77A5C /* PresentationDetentIntrinsicHeight.swift in Sources */,
 				A40815AA2C7E0D08005E65B9 /* MetadataValueType.swift in Sources */,
 				48CFC2BE2ADC10D900E77A5C /* ImportMnemonicControllingAccounts.swift in Sources */,
+				5B92AAC42D2ED0BE00486A9B /* ChooseFactorSourceKind.swift in Sources */,
+				5B92AAC52D2ED0BE00486A9B /* ChooseFactorSourceKind+View.swift in Sources */,
 				5BB7C1762BC81F50001216EB /* ImportOlympiaNameLedger.swift in Sources */,
 				48CFC4022ADC10D900E77A5C /* KeychainClient+Interface.swift in Sources */,
 				48CFC44E2ADC10DA00E77A5C /* AppPreferencesClient+Interface.swift in Sources */,
@@ -8317,6 +8347,8 @@
 				A408157D2C7E0D08005E65B9 /* FungibleResourcesCollectionItemVaultAggregatedVaultItem.swift in Sources */,
 				83D908AD2C931A7100822CC4 /* SargonSecureStorageDriver.swift in Sources */,
 				83377A052B9DDB5C00D8AA36 /* NPSSurveyClient+Live.swift in Sources */,
+				5B92AAC02D2ED09F00486A9B /* ChooseFactorSourceCoordinator+View.swift in Sources */,
+				5B92AAC12D2ED09F00486A9B /* ChooseFactorSourceCoordinator.swift in Sources */,
 				A40815A52C7E0D08005E65B9 /* MetadataU32Value.swift in Sources */,
 				A462B5B22B8407D300C26D20 /* CoreAPI_BinaryPlaintextMessageContent.swift in Sources */,
 				48CFC3242ADC10D900E77A5C /* NewConnectionName+View.swift in Sources */,
