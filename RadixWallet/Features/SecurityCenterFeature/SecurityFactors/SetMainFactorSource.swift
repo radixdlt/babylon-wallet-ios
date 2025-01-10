@@ -1,6 +1,6 @@
-// MARK: - ChangeMainFactorSource
+// MARK: - SetMainFactorSource
 @Reducer
-struct ChangeMainFactorSource: Sendable, FeatureReducer {
+struct SetMainFactorSource: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
 		let kind: FactorSourceKind
@@ -18,6 +18,10 @@ struct ChangeMainFactorSource: Sendable, FeatureReducer {
 
 	enum InternalAction: Sendable, Equatable {
 		case setFactorSources([FactorSource])
+	}
+
+	enum DelegateAction: Sendable, Equatable {
+		case updated
 	}
 
 	var body: some ReducerOf<Self> {
@@ -42,7 +46,13 @@ struct ChangeMainFactorSource: Sendable, FeatureReducer {
 			return .none
 
 		case let .continueButtonTapped(factorSource):
-			return .none
+			return .run { send in
+				// TODO: Send just Factor Source
+				try await SargonOS.shared.setMainFactorSourceOfKind(factorSourceId: factorSource.id, kind: factorSource.kind)
+				await send(.delegate(.updated))
+			} catch: { error, _ in
+				errorQueue.schedule(error)
+			}
 		}
 	}
 

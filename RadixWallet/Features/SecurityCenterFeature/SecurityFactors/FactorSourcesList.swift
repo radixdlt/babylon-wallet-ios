@@ -48,7 +48,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			case displayMnemonic(DisplayMnemonic.State)
 			case enterMnemonic(ImportMnemonicsFlowCoordinator.State)
 			case addMnemonic(ImportMnemonic.State)
-			case changeMain(ChangeMainFactorSource.State)
+			case changeMain(SetMainFactorSource.State)
 		}
 
 		@CasePathable
@@ -57,7 +57,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			case displayMnemonic(DisplayMnemonic.Action)
 			case enterMnemonic(ImportMnemonicsFlowCoordinator.Action)
 			case addMnemonic(ImportMnemonic.Action)
-			case changeMain(ChangeMainFactorSource.Action)
+			case changeMain(SetMainFactorSource.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -74,7 +74,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 				ImportMnemonic()
 			}
 			Scope(state: \.changeMain, action: \.changeMain) {
-				ChangeMainFactorSource()
+				SetMainFactorSource()
 			}
 		}
 	}
@@ -184,6 +184,10 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			// We just need to dismiss the destination.
 			state.destination = nil
 			return .none
+
+		case .changeMain(.delegate(.updated)):
+			state.destination = nil
+			return entitiesEffect(state: state)
 
 		default:
 			return .none

@@ -1,9 +1,9 @@
 import SwiftUI
 
-// MARK: - ChangeMainFactorSource.View
-extension ChangeMainFactorSource {
+// MARK: - SetMainFactorSource.View
+extension SetMainFactorSource {
 	struct View: SwiftUI.View {
-		let store: StoreOf<ChangeMainFactorSource>
+		let store: StoreOf<SetMainFactorSource>
 		@Environment(\.dismiss) var dismiss
 
 		var body: some SwiftUI.View {
