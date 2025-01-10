@@ -15,7 +15,7 @@ extension PrimaryRoleSetup.State {
 	}
 
 	var canContinue: Bool {
-		validatedRoleStatus != .PrimaryRoleMustHaveAtLeastOneFactor && authenticationSigningFactor != nil
+		validatedRoleStatus != .PrimaryRoleMustHaveAtLeastOneFactor && validatedRoleStatus != .MissingAuthSigningFactor
 	}
 
 	var thresholdFactors: [FactorSource] {
