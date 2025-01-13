@@ -103,7 +103,10 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		case .hud(.delegate(.dismiss)):
 			return dismiss(&state)
 
-		case .sheet(.delegate(.dismiss)):
+		case let .sheet(.delegate(action)):
+			if case let .sheet(state) = state.itemsQueue.first {
+				overlayWindowClient.sendSheetAction(action, state.id)
+			}
 			return dismiss(&state)
 
 		case let .fullScreen(.delegate(action)):

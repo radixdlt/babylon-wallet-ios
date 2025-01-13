@@ -61,6 +61,7 @@ extension OverlayWindowClient: DependencyKey {
 			},
 			sendAlertAction: { action, id in alertActions.send((action, id)) },
 			sendFullScreenAction: { action, id in fullScreenActions.send((action, id)) },
+			sendSheetAction: { action, id in sheetActions.send((action, id)) },
 			setIsUserIteractionEnabled: { isUserInteractionEnabled.send($0) },
 			isUserInteractionEnabled: { isUserInteractionEnabled.eraseToAnyAsyncSequence() }
 		)

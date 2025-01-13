@@ -23,6 +23,7 @@ struct SheetOverlayCoordinator: Sendable, FeatureReducer {
 	enum DelegateAction: Sendable, Equatable {
 		case dismiss
 		case signing(Signing.DelegateAction)
+		case newSigning(NewSigning.DelegateAction)
 	}
 
 	struct Root: Sendable, Hashable, Reducer {
@@ -30,12 +31,14 @@ struct SheetOverlayCoordinator: Sendable, FeatureReducer {
 		enum State: Sendable, Hashable {
 			case infoLink(InfoLinkSheet.State)
 			case signing(Signing.State)
+			case newSigning(NewSigning.State)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
 			case infoLink(InfoLinkSheet.Action)
 			case signing(Signing.Action)
+			case newSigning(NewSigning.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -44,6 +47,9 @@ struct SheetOverlayCoordinator: Sendable, FeatureReducer {
 			}
 			Scope(state: \.signing, action: \.signing) {
 				Signing()
+			}
+			Scope(state: \.newSigning, action: \.newSigning) {
+				NewSigning()
 			}
 		}
 	}
@@ -69,6 +75,9 @@ struct SheetOverlayCoordinator: Sendable, FeatureReducer {
 		// Forward all delegate actions, re-wrapped
 		case let .root(.signing(.delegate(action))):
 			.send(.delegate(.signing(action)))
+
+		case let .root(.newSigning(.delegate(action))):
+			.send(.delegate(.newSigning(action)))
 
 		default:
 			.none

@@ -29,32 +29,11 @@ struct OverlayWindowClient: Sendable {
 	/// Used by the Overlay Window to send actions from an FullScreenOverlay back to the client
 	var sendFullScreenAction: SendFullScreenAction
 
+	/// Used by the Overlay Window to send actions from an SheetAction back to the client
+	var sendSheetAction: SendSheetAction
+
 	var setIsUserIteractionEnabled: SetIsUserIteractionEnabled
 	var isUserInteractionEnabled: IsUserInteractionEnabled
-
-	init(
-		scheduledItems: @escaping ScheduledItems,
-		scheduleAlert: @escaping ScheduleAlert,
-		scheduleAlertAndIgnoreAction: @escaping ScheduleAlertAndIgnoreAction,
-		scheduleHUD: @escaping ScheduleHUD,
-		scheduleSheet: @escaping ScheduleSheet,
-		scheduleFullScreen: @escaping ScheduleFullScreen,
-		sendAlertAction: @escaping SendAlertAction,
-		sendFullScreenAction: @escaping SendFullScreenAction,
-		setIsUserIteractionEnabled: @escaping SetIsUserIteractionEnabled,
-		isUserInteractionEnabled: @escaping IsUserInteractionEnabled
-	) {
-		self.scheduledItems = scheduledItems
-		self.scheduleAlert = scheduleAlert
-		self.scheduleAlertAndIgnoreAction = scheduleAlertAndIgnoreAction
-		self.scheduleHUD = scheduleHUD
-		self.scheduleSheet = scheduleSheet
-		self.scheduleFullScreen = scheduleFullScreen
-		self.sendAlertAction = sendAlertAction
-		self.sendFullScreenAction = sendFullScreenAction
-		self.setIsUserIteractionEnabled = setIsUserIteractionEnabled
-		self.isUserInteractionEnabled = isUserInteractionEnabled
-	}
 }
 
 extension OverlayWindowClient {
@@ -70,6 +49,7 @@ extension OverlayWindowClient {
 	typealias ScheduleFullScreen = @Sendable (FullScreenOverlayCoordinator.State) async -> FullScreenAction
 	typealias SendAlertAction = @Sendable (Item.AlertAction, Item.AlertState.ID) -> Void
 	typealias SendFullScreenAction = @Sendable (FullScreenAction, FullScreenID) -> Void
+	typealias SendSheetAction = @Sendable (SheetAction, SheetID) -> Void
 	typealias ScheduledItems = @Sendable () -> AnyAsyncSequence<Item>
 
 	typealias SetIsUserIteractionEnabled = @Sendable (Bool) -> Void
@@ -145,5 +125,9 @@ extension OverlayWindowClient {
 
 	func requestSignatutures(state: Signing.State) async -> SheetAction {
 		await scheduleSheet(.init(root: .signing(state)))
+	}
+
+	func signTransaction(input: PerFactorSourceInputOfTransactionIntent) async -> SheetAction {
+		await scheduleSheet(.init(root: .newSigning(.init(input: input))))
 	}
 }

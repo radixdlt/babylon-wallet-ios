@@ -716,6 +716,8 @@
 		5B27FC022CC7ECC9002975BE /* Sections+ManifestSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B27FC012CC7ECC2002975BE /* Sections+ManifestSummary.swift */; };
 		5B2A0D792D354D4E0049C702 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 5B2A0D782D354D4E0049C702 /* Sargon */; };
 		5B2A0D7D2D354E820049C702 /* SargonHostInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2A0D7C2D354E7F0049C702 /* SargonHostInteractor.swift */; };
+		5B2A0D812D358DBB0049C702 /* NewSigning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2A0D7F2D358DBB0049C702 /* NewSigning.swift */; };
+		5B2A0D822D358DBB0049C702 /* NewSigning+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2A0D802D358DBB0049C702 /* NewSigning+View.swift */; };
 		5B2A45022BD6680400AEC8AD /* ContactSupportClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2A45012BD6680400AEC8AD /* ContactSupportClient.swift */; };
 		5B2A45042BD6689100AEC8AD /* ContactSupportClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2A45032BD6689100AEC8AD /* ContactSupportClient+Live.swift */; };
 		5B3C48A92C7E190C00DB160D /* AssetRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3C48A82C7E190C00DB160D /* AssetRow.swift */; };
@@ -1984,6 +1986,8 @@
 		5B27FBFF2CC7E77B002975BE /* Sections+ExecutionSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sections+ExecutionSummary.swift"; sourceTree = "<group>"; };
 		5B27FC012CC7ECC2002975BE /* Sections+ManifestSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sections+ManifestSummary.swift"; sourceTree = "<group>"; };
 		5B2A0D7C2D354E7F0049C702 /* SargonHostInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SargonHostInteractor.swift; sourceTree = "<group>"; };
+		5B2A0D7F2D358DBB0049C702 /* NewSigning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSigning.swift; sourceTree = "<group>"; };
+		5B2A0D802D358DBB0049C702 /* NewSigning+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NewSigning+View.swift"; sourceTree = "<group>"; };
 		5B2A45012BD6680400AEC8AD /* ContactSupportClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactSupportClient.swift; sourceTree = "<group>"; };
 		5B2A45032BD6689100AEC8AD /* ContactSupportClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ContactSupportClient+Live.swift"; sourceTree = "<group>"; };
 		5B3C48A82C7E190C00DB160D /* AssetRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetRow.swift; sourceTree = "<group>"; };
@@ -2969,6 +2973,8 @@
 				489FEF922BDD0BA7003EC10D /* Signer.swift */,
 				48CFBCA82ADC10D800E77A5C /* Coordinator */,
 				48CFBCAB2ADC10D800E77A5C /* Children */,
+				5B2A0D7F2D358DBB0049C702 /* NewSigning.swift */,
+				5B2A0D802D358DBB0049C702 /* NewSigning+View.swift */,
 			);
 			path = Signing;
 			sourceTree = "<group>";
@@ -7782,6 +7788,8 @@
 				48CFC65C2ADC10DB00E77A5C /* Profile+Persona+Add.swift in Sources */,
 				48CFC5B52ADC10DA00E77A5C /* AppTextField.swift in Sources */,
 				5B135B3B2C7636FD004AAD2E /* HiddenEntities.swift in Sources */,
+				5B2A0D812D358DBB0049C702 /* NewSigning.swift in Sources */,
+				5B2A0D822D358DBB0049C702 /* NewSigning+View.swift in Sources */,
 				A408165D2C7E0D08005E65B9 /* ValidatorCollectionItemEffectiveFeeFactor.swift in Sources */,
 				A40815762C7E0D08005E65B9 /* EntitySchemaCollectionItem.swift in Sources */,
 				48CFC5E32ADC10DA00E77A5C /* AttributedString+Extra.swift in Sources */,

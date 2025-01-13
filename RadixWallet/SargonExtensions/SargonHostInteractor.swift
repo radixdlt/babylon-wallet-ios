@@ -7,45 +7,19 @@ final class SargonHostInteractor: HostInteractor {
 		var perFactorOutcome: [PerFactorOutcomeOfTransactionIntentHash] = []
 
 		for perFactorSource in request.perFactorSource {
-//			let outcome = FactorOutcomeOfTransactionIntentHash.signed(
-//				producedSignatures: [HdSignatureOfTransactionIntentHash(
-//					input: .init(
-//						payloadId: <#T##TransactionIntentHash#>, // perTransaction[0].payload.decompile().hash()
-//						ownedFactorInstance: <#T##OwnedFactorInstance#> // have it in perTransaction[0].ownedFactorInstances
-//					),
-//					signature: <#T##SignatureWithPublicKey#> // have it in SigantureOfEntity
-//				)]
-//			)
+			let action = await overlayWindowClient.signTransaction(input: perFactorSource)
+			let outcome: FactorOutcomeOfTransactionIntentHash = switch action {
+			case .newSigning(.cancelled):
+				throw CommonError.SigningRejected
+			case .newSigning(.skippedFactorSource):
+				.neglected(.init(reason: .userExplicitlySkipped, factor: perFactorSource.factorSourceId))
+			case let .newSigning(.producedSignatures(signatures)):
+				.signed(producedSignatures: signatures)
+			case .dismiss, .signing:
+				fatalError("Unexpected action")
+			}
+			perFactorOutcome.append(.init(factorSourceId: perFactorSource.factorSourceId, outcome: outcome))
 		}
-
-//		for perFactorSource in request.perFactorSource {
-//			// let action = await overlayWindowClient.requestSignatutures(state: .init(input: perFactorSource))
-//
-//			for transaction in perFactorSource.perTransaction {
-//				let action = await overlayWindowClient.requestSignatutures(state: .init(input: transaction))
-//				let factorSourceId = transaction.factorSourceId
-//				let outcome: FactorOutcomeOfTransactionIntentHash
-//				switch action {
-//				case .signing(.cancelSigning), .dismiss:
-//					throw CommonError.SigningRejected
-//				//case .signing(.skip):
-//					//outcome = .neglected(.init(reason: .userExplicitlySkipped, factor: factorSourceId))
-//
-//				case .signing(.failedToSign):
-//					outcome = .neglected(.init(reason: .failure, factor: factorSourceId)) // this won't actually be possible
-//
-//				case let .signing(.finishedSigning(.signTransaction(response, _))):
-//					// TODO: We should get something like state.signatures from values to transform it here
-//					transaction.
-//					outcome = .signed(producedSignatures: [])
-//
-//				case .signing(.finishedSigning(.signAuth)), .signing(.finishedSigning(.signPreAuthorization)):
-//					fatalError("Unexpected Signature when signing transactions")
-//				}
-//
-//				perFactorOutcome.append(.init(factorSourceId: perFactorSource.factorSourceId, outcome: outcome))
-//			}
-//		}
 
 		return .init(perFactorOutcome: perFactorOutcome)
 	}

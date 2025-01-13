@@ -20,3 +20,9 @@ struct SignatureOfEntity: Sendable, Hashable {
 		self.signatureWithPublicKey = signatureWithPublicKey
 	}
 }
+
+// MARK: - SignatureOfEntity2
+struct SignatureOfEntity2: Sendable, Hashable {
+	let ownedFactorInstance: OwnedFactorInstance
+	let signatureWithPublicKey: SignatureWithPublicKey
+}

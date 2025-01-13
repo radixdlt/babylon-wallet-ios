@@ -207,6 +207,48 @@ extension DeviceFactorSourceClient {
 
 		return signatures
 	}
+
+	func signUsingDeviceFactorSource(
+		factorSourceId: FactorSourceIdFromHash,
+		perTransaction: [TransactionSignRequestInputOfTransactionIntent],
+		hashedDataToSign: Hash
+	) async throws -> Set<SignatureOfEntity2> {
+		@Dependency(\.factorSourcesClient) var factorSourcesClient
+		@Dependency(\.secureStorageClient) var secureStorageClient
+
+		guard
+			let loadedMnemonicWithPassphrase = try secureStorageClient.loadMnemonic(factorSourceID: factorSourceId)
+		else {
+			throw FailedToFindDeviceFactorSourceForSigning()
+		}
+
+		var signatures = Set<SignatureOfEntity2>()
+
+		for transaction in perTransaction {
+			for ownedFactorInstance in transaction.ownedFactorInstances {
+				let factorInstance = ownedFactorInstance.factorInstance
+				let derivationPath = factorInstance.derivationPath
+
+				if factorInstance.factorSourceID != factorSourceId {
+					let errMsg = "Discrepancy, you specified to use a device factor source you beleived to be the one controlling the entity, but it does not match the genesis factor source id."
+					loggerGlobal.critical(.init(stringLiteral: errMsg))
+					assertionFailure(errMsg)
+				}
+				let curve = factorInstance.publicKey.curve
+
+				let signatureWithPublicKey = try await self.signatureFromOnDeviceHD(SignatureFromOnDeviceHDRequest(
+					mnemonicWithPassphrase: loadedMnemonicWithPassphrase,
+					derivationPath: derivationPath,
+					curve: curve,
+					hashedData: hashedDataToSign
+				))
+
+				signatures.insert(.init(ownedFactorInstance: ownedFactorInstance, signatureWithPublicKey: signatureWithPublicKey))
+			}
+		}
+
+		return signatures
+	}
 }
 
 extension SigningPurpose {

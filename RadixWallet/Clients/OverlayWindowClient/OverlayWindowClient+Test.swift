@@ -10,6 +10,7 @@ extension OverlayWindowClient: TestDependencyKey {
 		scheduleFullScreen: noop.scheduleFullScreen,
 		sendAlertAction: unimplemented("\(Self.self).sendAlertAction"),
 		sendFullScreenAction: unimplemented("\(Self.self).sendFullScreenAction"),
+		sendSheetAction: unimplemented("\(Self.self).sendSheetAction"),
 		setIsUserIteractionEnabled: unimplemented("\(Self.self).setIsUserIteractionEnabled"),
 		isUserInteractionEnabled: noop.isUserInteractionEnabled
 	)
@@ -23,6 +24,7 @@ extension OverlayWindowClient: TestDependencyKey {
 		scheduleFullScreen: { _ in .dismiss },
 		sendAlertAction: { _, _ in },
 		sendFullScreenAction: { _, _ in },
+		sendSheetAction: { _, _ in },
 		setIsUserIteractionEnabled: { _ in },
 		isUserInteractionEnabled: { AsyncLazySequence([]).eraseToAnyAsyncSequence() }
 	)
