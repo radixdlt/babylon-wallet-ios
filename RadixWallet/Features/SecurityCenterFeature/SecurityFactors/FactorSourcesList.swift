@@ -157,7 +157,8 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			return .send(.delegate(.selectedFactorSource(factorSource)))
 
 		case .changeMainButtonTapped:
-			state.destination = .changeMain(.init(kind: state.kind))
+			let currentMain = state.main?.integrity.factorSource
+			state.destination = .changeMain(.init(kind: state.kind, currentMain: currentMain))
 			return .none
 		}
 	}
@@ -302,6 +303,42 @@ extension FactorSourcesList.State {
 		var id: FactorSourceID {
 			integrity.factorSource.id
 		}
+	}
+
+	var main: Row? {
+		switch context {
+		case .display:
+			rows.first(where: \.integrity.isExplicitMain)
+		case .selection:
+			nil
+		}
+	}
+
+	var others: [Row] {
+		let main = main
+		return rows
+			.filter { $0 != main }
+			.sorted(by: { left, right in
+				let lhs = left.integrity
+				let rhs = right.integrity
+				switch (lhs, rhs) {
+				case let (.device(lDevice), .device(rDevice)):
+					if lhs.isExplicitMain {
+						return true
+					} else if lDevice.factorSource.isBDFS, rDevice.factorSource.isBDFS {
+						return sort(lhs, rhs)
+					} else {
+						return lDevice.factorSource.isBDFS
+					}
+				default:
+					return sort(lhs, rhs)
+				}
+
+			})
+	}
+
+	private func sort(_ lhs: FactorSourceIntegrity, _ rhs: FactorSourceIntegrity) -> Bool {
+		lhs.factorSource.common.addedOn < rhs.factorSource.common.addedOn
 	}
 }
 

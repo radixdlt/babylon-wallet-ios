@@ -4,6 +4,7 @@ struct SetMainFactorSource: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
 		let kind: FactorSourceKind
+		let currentMain: FactorSource?
 		var factorSources: [FactorSource] = []
 		var selected: FactorSource?
 	}
@@ -47,8 +48,7 @@ struct SetMainFactorSource: Sendable, FeatureReducer {
 
 		case let .continueButtonTapped(factorSource):
 			return .run { send in
-				// TODO: Send just Factor Source
-				try await SargonOS.shared.setMainFactorSourceOfKind(factorSourceId: factorSource.id, kind: factorSource.kind)
+				try await SargonOS.shared.setMainFactorSource(factorSourceId: factorSource.id)
 				await send(.delegate(.updated))
 			} catch: { error, _ in
 				errorQueue.schedule(error)
@@ -59,7 +59,7 @@ struct SetMainFactorSource: Sendable, FeatureReducer {
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .setFactorSources(factorSources):
-			state.factorSources = factorSources
+			state.factorSources = factorSources.filter { $0 != state.currentMain }
 			return .none
 		}
 	}

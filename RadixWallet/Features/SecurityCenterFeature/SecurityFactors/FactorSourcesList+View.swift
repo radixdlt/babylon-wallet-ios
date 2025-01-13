@@ -10,7 +10,7 @@ extension FactorSourcesList {
 						header(store.kind.details)
 
 						if let main = store.main {
-							section(text: L10n.FactorSources.List.default, rows: [main], showChangeMain: true)
+							section(text: L10n.FactorSources.List.default, rows: [main], showChangeMain: !store.others.isEmpty)
 								.padding(.top, .medium3)
 
 							if !store.others.isEmpty {
@@ -126,42 +126,6 @@ private extension FactorSourcesList.State {
 		case .trustedContact, .securityQuestions:
 			fatalError("Not implemented")
 		}
-	}
-
-	var main: Row? {
-		switch context {
-		case .display:
-			rows.first(where: \.integrity.isExplicitMain)
-		case .selection:
-			nil
-		}
-	}
-
-	var others: [Row] {
-		let main = main
-		return rows
-			.filter { $0 != main }
-			.sorted(by: { left, right in
-				let lhs = left.integrity
-				let rhs = right.integrity
-				switch (lhs, rhs) {
-				case let (.device(lDevice), .device(rDevice)):
-					if lhs.isExplicitMain {
-						return true
-					} else if lDevice.factorSource.isBDFS, rDevice.factorSource.isBDFS {
-						return sort(lhs, rhs)
-					} else {
-						return lDevice.factorSource.isBDFS
-					}
-				default:
-					return sort(lhs, rhs)
-				}
-
-			})
-	}
-
-	private func sort(_ lhs: FactorSourceIntegrity, _ rhs: FactorSourceIntegrity) -> Bool {
-		lhs.factorSource.common.addedOn < rhs.factorSource.common.addedOn
 	}
 
 	var showFooter: Bool {
