@@ -1848,6 +1848,12 @@ internal enum L10n {
       /// 1 Persona
       internal static let personaSingular = L10n.tr("Localizable", "factorSources_card_personaSingular", fallback: "1 Persona")
     }
+    internal enum ChangeMain {
+      /// Select the biometrics/PIN factor that will be automatically selected when you create a new Account or Persona.
+      internal static let subtitle = L10n.tr("Localizable", "factorSources_changeMain_subtitle", fallback: "Select the biometrics/PIN factor that will be automatically selected when you create a new Account or Persona.")
+      /// Change Default Biometrics/PIN
+      internal static let title = L10n.tr("Localizable", "factorSources_changeMain_title", fallback: "Change Default Biometrics/PIN")
+    }
     internal enum Detail {
       /// Advanced
       internal static let advanced = L10n.tr("Localizable", "factorSources_detail_advanced", fallback: "Advanced")
@@ -1893,6 +1899,8 @@ internal enum L10n {
       internal static let arculusCardAdd = L10n.tr("Localizable", "factorSources_list_arculusCardAdd", fallback: "Add Arculus Card")
       /// Arculus not working. Try adding it again
       internal static let arculusCardNotWorking = L10n.tr("Localizable", "factorSources_list_arculusCardNotWorking", fallback: "Arculus not working. Try adding it again")
+      /// Change
+      internal static let change = L10n.tr("Localizable", "factorSources_list_change", fallback: "Change")
       /// Default
       internal static let `default` = L10n.tr("Localizable", "factorSources_list_default", fallback: "Default")
       /// Add Biometrics/PIN
@@ -3946,8 +3954,8 @@ internal enum L10n {
     internal static let title = L10n.tr("Localizable", "shieldSetupSelectFactors_title", fallback: "Select Factors for Regular Access")
   }
   internal enum ShieldSetupStatus {
-    /// Cannot use this factor by itself
-    internal static let factorCannotBeUsedByItself = L10n.tr("Localizable", "shieldSetupStatus_factorCannotBeUsedByItself", fallback: "Cannot use this factor by itself")
+    /// Cannot use this factor type by itself
+    internal static let factorCannotBeUsedByItself = L10n.tr("Localizable", "shieldSetupStatus_factorCannotBeUsedByItself", fallback: "Cannot use this factor type by itself")
     /// You cannot create a Shield with this combination of factors. **Read more**
     internal static let invalidCombination = L10n.tr("Localizable", "shieldSetupStatus_invalidCombination", fallback: "You cannot create a Shield with this combination of factors. **Read more**")
     /// Choosing 2 factors will make your Shield more secure and reliable
