@@ -7,7 +7,6 @@ struct SignWithFactorSource: Sendable, FeatureReducer {
 		let kind: Kind
 		let signingFactors: NonEmpty<Set<SigningFactor>>
 		let signingPurposeWithPayload: SigningPurposeWithPayload
-		var currentSigningFactor: SigningFactor?
 		var factorSourceAccess: FactorSourceAccess.State
 
 		init(
@@ -29,6 +28,28 @@ struct SignWithFactorSource: Sendable, FeatureReducer {
 				let ledger: LedgerHardwareWalletFactorSource? = signingFactors.first?.factorSource.extract()
 				self.factorSourceAccess = .init(kind: .ledger(ledger), purpose: purpose)
 			}
+		}
+
+		init(input: PerFactorSourceInputOfTransactionIntent) {
+			let kind: Kind = switch input.factorSourceId.kind {
+			case .device:
+				.device
+			case .ledgerHqHardwareWallet:
+				.ledger
+			default:
+				fatalError("Unsupported")
+			}
+
+			// TODO: How to handle multiple transaction at once?
+			let transactionIntent = input.perTransaction.first!.payload.decompile()
+
+			var signingFactors = Set<SigningFactor>()
+			for perTransaction in input.perTransaction {
+//				let factorInstancesRequiredToSign = Set(perTransaction.ownedFactorInstances.map(\.factorInstance))
+//				signingFactors.insert(.init(factorSource: <#T##FactorSource#>, signer: .init(factorInstancesRequiredToSign: factorInstancesRequiredToSign, of: <#T##AccountOrPersona#>)))
+			}
+
+			self.init(kind: kind, signingFactors: .init(signingFactors)!, signingPurposeWithPayload: .signTransaction(ephemeralNotaryPrivateKey: .init(), transactionIntent, origin: .manifestFromDapp))
 		}
 	}
 
@@ -53,7 +74,7 @@ struct SignWithFactorSource: Sendable, FeatureReducer {
 	init() {}
 
 	var body: some ReducerOf<Self> {
-		Scope(state: \.factorSourceAccess, action: /Action.child .. ChildAction.factorSourceAccess) {
+		Scope(state: \.factorSourceAccess, action: \.child.factorSourceAccess) {
 			FactorSourceAccess()
 		}
 		Reduce(core)
@@ -73,7 +94,6 @@ struct SignWithFactorSource: Sendable, FeatureReducer {
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .signingWithFactor(factor):
-			state.currentSigningFactor = factor
 			switch state.kind {
 			case .device:
 				break
