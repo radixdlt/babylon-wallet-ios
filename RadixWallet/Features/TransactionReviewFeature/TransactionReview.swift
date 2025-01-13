@@ -137,16 +137,16 @@ struct TransactionReview: Sendable, FeatureReducer {
 		}
 
 		var body: some ReducerOf<Self> {
-			Scope(state: /State.customizeGuarantees, action: /Action.customizeGuarantees) {
+			Scope(state: \.customizeGuarantees, action: \.customizeGuarantees) {
 				TransactionReviewGuarantees()
 			}
-			Scope(state: /State.customizeFees, action: /Action.customizeFees) {
+			Scope(state: \.customizeFees, action: \.customizeFees) {
 				CustomizeFees()
 			}
-			Scope(state: /State.signing, action: /Action.signing) {
+			Scope(state: \.signing, action: \.signing) {
 				Signing()
 			}
-			Scope(state: /State.submitting, action: /Action.submitting) {
+			Scope(state: \.submitting, action: \.submitting) {
 				SubmitTransaction()
 			}
 		}
@@ -167,13 +167,13 @@ struct TransactionReview: Sendable, FeatureReducer {
 			Common.Sections()
 		}
 		Reduce(core)
-			.ifLet(\.networkFee, action: /Action.child .. ChildAction.networkFee) {
+			.ifLet(\.networkFee, action: \.child.networkFee) {
 				TransactionReviewNetworkFee()
 			}
-			.ifLet(\.proofs, action: /Action.child .. ChildAction.proofs) {
+			.ifLet(\.proofs, action: \.child.proofs) {
 				Common.Proofs()
 			}
-			.ifLet(destinationPath, action: /Action.destination) {
+			.ifLet(destinationPath, action: \.destination) {
 				Destination()
 			}
 	}
@@ -271,11 +271,10 @@ struct TransactionReview: Sendable, FeatureReducer {
 			return .send(.child(.sections(.internal(.parent(.showResourceDetails(resource, details))))))
 
 		case .networkFee(.delegate(.showCustomizeFees)):
-			guard let reviewedTransaction = state.reviewedTransaction,
-			      let summary = try? reviewedTransaction.transactionManifest.summary
-			else {
+			guard let reviewedTransaction = state.reviewedTransaction else {
 				return .none
 			}
+			let summary = reviewedTransaction.transactionManifest.summary
 			state.destination = .customizeFees(.init(
 				reviewedTransaction: reviewedTransaction,
 				manifestSummary: summary,
