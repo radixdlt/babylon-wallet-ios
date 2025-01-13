@@ -11,6 +11,7 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 	enum Path {
 		case prepareFactors(PrepareFactorSources.Coordinator)
 		case selectFactors(SelectFactorSourcesCoordinator)
+		case rolesSetup(RolesSetupCoordinator)
 	}
 
 	typealias Action = FeatureAction<Self>
@@ -55,6 +56,7 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 		case .path(.element(id: _, action: .prepareFactors(.delegate(.finished)))):
 			return .send(.internal(.selectFactors))
 		case .path(.element(id: _, action: .selectFactors(.delegate(.finished)))):
+			state.path.append(.rolesSetup(.init()))
 			return .none
 		default:
 			return .none
