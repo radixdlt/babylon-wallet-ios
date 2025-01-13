@@ -14,6 +14,7 @@ extension PrimaryRoleSetup.State {
 		}
 	}
 
+	// TODO: Move to Sargon
 	var canContinue: Bool {
 		validatedRoleStatus != .PrimaryRoleMustHaveAtLeastOneFactor && validatedRoleStatus != .MissingAuthSigningFactor
 	}
@@ -180,6 +181,7 @@ extension PrimaryRoleSetup {
 
 		private var thresholdSelectorView: some SwiftUI.View {
 			HStack(spacing: .zero) {
+				// TODO: Add a new key for "**%@**"
 				let thresholdTitle = store.threshold.titleShort
 				let title = L10n.ShieldWizardRegularAccess.ThresholdDescription.title(thresholdTitle)
 				let parts = title.components(separatedBy: "**\(thresholdTitle)**")
