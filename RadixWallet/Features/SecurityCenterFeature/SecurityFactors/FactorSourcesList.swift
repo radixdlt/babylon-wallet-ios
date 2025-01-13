@@ -261,7 +261,7 @@ private extension FactorSourcesList {
 	func filterAlreadySelectedFactorSourceIds(state: State, factorSourceIds: [FactorSourceId]) -> [FactorSourceId] {
 		let status: [FactorSourceValidationStatus] =
 			switch state.context {
-			case .display:
+			case .display, .selection(.authenticationSigning):
 				[]
 			case .selection(.primaryThreshold):
 				state.shieldBuilder.validationForAdditionOfFactorSourceToPrimaryThresholdForEach(factorSources: factorSourceIds)
