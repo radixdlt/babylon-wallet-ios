@@ -11,6 +11,7 @@ struct RolesSetupCoordinator: Sendable, FeatureReducer {
 	@Reducer(state: .hashable, action: .equatable)
 	enum Path {
 		case primaryRoleSetup(PrimaryRoleSetup)
+		case recoveryRoleSetup(RecoveryRoleSetup)
 	}
 
 	typealias Action = FeatureAction<Self>
@@ -68,11 +69,12 @@ struct RolesSetupCoordinator: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .path(.primaryRoleSetup(.delegate(.chooseFactorSource(context)))):
+		case let .path(.primaryRoleSetup(.delegate(.chooseFactorSource(context)))),
+		     let .path(.recoveryRoleSetup(.delegate(.chooseFactorSource(context)))):
 			state.destination = .chooseFactorSource(.init(context: context))
 			return .none
 		case .path(.primaryRoleSetup(.delegate(.finished))):
-			return .none
+			return .send(.delegate(.push(.recoveryRoleSetup(.init()))))
 		default:
 			return .none
 		}

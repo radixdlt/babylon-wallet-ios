@@ -1277,6 +1277,8 @@
 		E791F2A32D2EDFDE001A007B /* SelectNumberOfFactorsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E791F2A22D2EDFDE001A007B /* SelectNumberOfFactorsView.swift */; };
 		E791F2A52D2FED42001A007B /* RolesSetupCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E791F2A42D2FED42001A007B /* RolesSetupCoordinator.swift */; };
 		E791F2A72D2FED51001A007B /* RolesSetupCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E791F2A62D2FED51001A007B /* RolesSetupCoordinator+View.swift */; };
+		E791F2AA2D3151E7001A007B /* RecoveryRoleSetup+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E791F2A92D3151E7001A007B /* RecoveryRoleSetup+Reducer.swift */; };
+		E791F2AC2D3151ED001A007B /* RecoveryRoleSetup+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E791F2AB2D3151ED001A007B /* RecoveryRoleSetup+View.swift */; };
 		E79DD1B12CE365CF00B1EB86 /* ChooseReceivingAccountOnDelete+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1B02CE365CF00B1EB86 /* ChooseReceivingAccountOnDelete+Reducer.swift */; };
 		E79DD1B32CE365D600B1EB86 /* ChooseReceivingAccountOnDelete+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1B22CE365D600B1EB86 /* ChooseReceivingAccountOnDelete+View.swift */; };
 		E79DD1B62CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1B52CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift */; };
@@ -2560,6 +2562,8 @@
 		E791F2A22D2EDFDE001A007B /* SelectNumberOfFactorsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectNumberOfFactorsView.swift; sourceTree = "<group>"; };
 		E791F2A42D2FED42001A007B /* RolesSetupCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RolesSetupCoordinator.swift; sourceTree = "<group>"; };
 		E791F2A62D2FED51001A007B /* RolesSetupCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RolesSetupCoordinator+View.swift"; sourceTree = "<group>"; };
+		E791F2A92D3151E7001A007B /* RecoveryRoleSetup+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecoveryRoleSetup+Reducer.swift"; sourceTree = "<group>"; };
+		E791F2AB2D3151ED001A007B /* RecoveryRoleSetup+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecoveryRoleSetup+View.swift"; sourceTree = "<group>"; };
 		E79DD1B02CE365CF00B1EB86 /* ChooseReceivingAccountOnDelete+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChooseReceivingAccountOnDelete+Reducer.swift"; sourceTree = "<group>"; };
 		E79DD1B22CE365D600B1EB86 /* ChooseReceivingAccountOnDelete+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChooseReceivingAccountOnDelete+View.swift"; sourceTree = "<group>"; };
 		E79DD1B52CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeleteAccountConfirmation+Reducer.swift"; sourceTree = "<group>"; };
@@ -7097,8 +7101,18 @@
 			isa = PBXGroup;
 			children = (
 				E791F2992D2BEF1A001A007B /* PrimaryRoleSetup */,
+				E791F2A82D300E3B001A007B /* RecoveryRoleSetup */,
 			);
 			path = Children;
+			sourceTree = "<group>";
+		};
+		E791F2A82D300E3B001A007B /* RecoveryRoleSetup */ = {
+			isa = PBXGroup;
+			children = (
+				E791F2A92D3151E7001A007B /* RecoveryRoleSetup+Reducer.swift */,
+				E791F2AB2D3151ED001A007B /* RecoveryRoleSetup+View.swift */,
+			);
+			path = RecoveryRoleSetup;
 			sourceTree = "<group>";
 		};
 		E79DD1B42CE492E800B1EB86 /* DeleteAccount */ = {
@@ -7642,6 +7656,7 @@
 				A41557532B7645E70040AD4E /* TransactionHistory+Reducer.swift in Sources */,
 				A408165B2C7E0D08005E65B9 /* ValidatorCollectionItem.swift in Sources */,
 				E6A2D9E72AFA7132001857EC /* Mnemonics+Utils.swift in Sources */,
+				E791F2AA2D3151E7001A007B /* RecoveryRoleSetup+Reducer.swift in Sources */,
 				48CFC28A2ADC10D900E77A5C /* TransactionReviewGuarantees.swift in Sources */,
 				48CFC5772ADC10DA00E77A5C /* MetadataTypedValue.swift in Sources */,
 				48CFC44B2ADC10DA00E77A5C /* MnemonicClient+Interface.swift in Sources */,
@@ -7851,6 +7866,7 @@
 				48CFC26A2ADC10D900E77A5C /* Signing+View.swift in Sources */,
 				48CFC3262ADC10D900E77A5C /* LocalNetworkPermission+Reducer.swift in Sources */,
 				E657773D2B0BAB35002DB237 /* RecoverWalletControlWithBDFSOnly.swift in Sources */,
+				E791F2AC2D3151ED001A007B /* RecoveryRoleSetup+View.swift in Sources */,
 				48CFC4482ADC10DA00E77A5C /* AccountsClient+Test.swift in Sources */,
 				A408158C2C7E0D08005E65B9 /* MetadataDecimalValue.swift in Sources */,
 				48CFC42D2ADC10DA00E77A5C /* AsyncExtension+Sendable.swift in Sources */,
