@@ -25,6 +25,8 @@ struct RecoveryRoleSetup: FeatureReducer, Sendable {
 		case removeAuthenticationSigningFactorTapped
 		case thresholdSelectorButtonTapped
 		case invalidCombinationReadMoreTapped
+		case setFallbackButtonTapped
+		case fallbackInfoButtonTapped
 	}
 
 	enum InternalAction: Equatable, Sendable {
@@ -103,6 +105,13 @@ struct RecoveryRoleSetup: FeatureReducer, Sendable {
 
 		case let .addFactorSourceButtonTapped(context):
 			return .send(.delegate(.chooseFactorSource(context)))
+
+		case .setFallbackButtonTapped:
+			return .none
+
+		case .fallbackInfoButtonTapped:
+			overlayWindowClient.showInfoLink(.init(glossaryItem: .buildingshield)) // TODO: add corresponding GlossaryItem
+			return .none
 
 		case .continueButtonTapped:
 			return .send(.delegate(.finished))

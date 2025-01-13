@@ -16,7 +16,7 @@ extension RecoveryRoleSetup.State {
 
 	// TODO: Move to Sargon
 	var canContinue: Bool {
-		validatedRoleStatus != nil
+		validatedRoleStatus == nil
 	}
 
 	var recoveryFactors: [FactorSource] {
@@ -127,6 +127,12 @@ extension RecoveryRoleSetup {
 				.padding(.bottom, .small2)
 
 				factorSourcesContainer(factorSources: store.confirmationFactors, section: .confirmation)
+
+				Text(L10n.ShieldWizardRecovery.Combination.label)
+					.textStyle(.body1Link)
+					.foregroundStyle(.app.gray1)
+
+				emergencyFallbackView
 			}
 		}
 
@@ -176,6 +182,63 @@ extension RecoveryRoleSetup {
 			}
 			.frame(maxWidth: .infinity)
 			.embedInContainer
+		}
+
+		private var emergencyFallbackView: some SwiftUI.View {
+			VStack(spacing: .zero) {
+				HStack {
+					Text(L10n.ShieldWizardRecovery.Fallback.title)
+						.textStyle(.body1Header)
+
+					Spacer()
+
+					Button {
+						store.send(.view(.fallbackInfoButtonTapped))
+					} label: {
+						Image(.info)
+							.resizable()
+							.frame(.smallest)
+					}
+				}
+				.padding(.horizontal, .medium3)
+				.padding(.vertical, .small1)
+				.foregroundStyle(.app.white)
+				.background(.app.red1)
+
+				VStack(spacing: .medium2) {
+					Text(
+						markdown: L10n.ShieldWizardRecovery.Fallback.subtitle,
+						emphasizedColor: .app.gray1,
+						emphasizedFont: .app.body2Header
+					)
+					.textStyle(.body2Regular)
+					.foregroundStyle(.app.gray1)
+					.flushedLeft
+
+					Label("10 " + L10n.ShieldWizardRecovery.Fallback.Days.label, asset: AssetResource.emergencyFallbackCalendar)
+						.textStyle(.body1Header)
+						.foregroundStyle(.app.gray1)
+						.flushedLeft
+						.padding(.horizontal, .medium3)
+						.padding(.vertical, .small1)
+						.background(.app.white)
+						.roundedCorners(radius: .small2)
+						.cardShadow
+						.onTapGesture {
+							store.send(.view(.setFallbackButtonTapped))
+						}
+
+					Text(L10n.ShieldWizardRecovery.Fallback.note)
+						.textStyle(.body2HighImportance)
+						.foregroundStyle(.app.error)
+						.flushedLeft
+				}
+				.padding([.horizontal, .bottom], .medium3)
+				.padding(.top, .medium3)
+				.background(.app.lightError)
+			}
+			.frame(maxWidth: .infinity)
+			.roundedCorners(radius: .small1)
 		}
 	}
 }
