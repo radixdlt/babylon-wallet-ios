@@ -2,7 +2,8 @@ import Foundation
 
 // MARK: - SheetOverlayCoordinator
 struct SheetOverlayCoordinator: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+	struct State: Sendable, Hashable, Identifiable {
+		let id: UUID = .init()
 		var root: Root.State
 
 		init(root: Root.State) {
@@ -21,22 +22,28 @@ struct SheetOverlayCoordinator: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case dismiss
+		case signing(Signing.DelegateAction)
 	}
 
 	struct Root: Sendable, Hashable, Reducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
 			case infoLink(InfoLinkSheet.State)
+			case signing(Signing.State)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
 			case infoLink(InfoLinkSheet.Action)
+			case signing(Signing.Action)
 		}
 
 		var body: some ReducerOf<Self> {
 			Scope(state: \.infoLink, action: \.infoLink) {
 				InfoLinkSheet()
+			}
+			Scope(state: \.signing, action: \.signing) {
+				Signing()
 			}
 		}
 	}
@@ -54,6 +61,17 @@ struct SheetOverlayCoordinator: Sendable, FeatureReducer {
 		switch viewAction {
 		case .closeButtonTapped:
 			.send(.delegate(.dismiss))
+		}
+	}
+
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+		switch childAction {
+		// Forward all delegate actions, re-wrapped
+		case let .root(.signing(.delegate(action))):
+			.send(.delegate(.signing(action)))
+
+		default:
+			.none
 		}
 	}
 }

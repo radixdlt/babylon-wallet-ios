@@ -5,30 +5,27 @@ import SwiftUI
 extension SheetOverlayCoordinator {
 	@MainActor
 	struct View: SwiftUI.View {
-		private let store: StoreOf<SheetOverlayCoordinator>
-
-		init(store: StoreOf<SheetOverlayCoordinator>) {
-			self.store = store
-		}
+		let store: StoreOf<SheetOverlayCoordinator>
 
 		var body: some SwiftUI.View {
-			WithNavigationBar {
-				store.send(.view(.closeButtonTapped))
-			} content: {
-				root(for: store.scope(state: \.root, action: \.child.root))
-			}
-		}
-
-		private func root(
-			for store: StoreOf<SheetOverlayCoordinator.Root>
-		) -> some SwiftUI.View {
-			SwitchStore(store) { state in
+			SwitchStore(store.scope(state: \.root, action: \.child.root)) { state in
 				switch state {
 				case .infoLink:
 					CaseLet(
 						/SheetOverlayCoordinator.Root.State.infoLink,
 						action: SheetOverlayCoordinator.Root.Action.infoLink,
-						then: { InfoLinkSheet.View(store: $0) }
+						then: {
+							InfoLinkSheet.View(store: $0)
+								.withNavigationBar {
+									store.send(.view(.closeButtonTapped))
+								}
+						}
+					)
+				case .signing:
+					CaseLet(
+						/SheetOverlayCoordinator.Root.State.signing,
+						action: SheetOverlayCoordinator.Root.Action.signing,
+						then: { Signing.View(store: $0) }
 					)
 				}
 			}

@@ -155,8 +155,8 @@ struct OverlayReducer: Sendable, FeatureReducer {
 			state.destination = .hud(.init(content: hud))
 			return .none
 
-		case let .sheet(sheetState):
-			state.destination = .sheet(.init(root: sheetState))
+		case let .sheet(sheet):
+			state.destination = .sheet(sheet)
 			return setIsUserInteractionEnabled(&state, isEnabled: true)
 
 		case let .alert(alert):

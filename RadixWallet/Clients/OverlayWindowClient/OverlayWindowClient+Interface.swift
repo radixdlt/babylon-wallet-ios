@@ -60,11 +60,13 @@ struct OverlayWindowClient: Sendable {
 extension OverlayWindowClient {
 	typealias FullScreenAction = FullScreenOverlayCoordinator.DelegateAction
 	typealias FullScreenID = FullScreenOverlayCoordinator.State.ID
+	typealias SheetID = SheetOverlayCoordinator.State.ID
+	typealias SheetAction = SheetOverlayCoordinator.DelegateAction
 
 	typealias ScheduleAlert = @Sendable (Item.AlertState) async -> Item.AlertAction
 	typealias ScheduleAlertAndIgnoreAction = @Sendable (Item.AlertState) -> Void
 	typealias ScheduleHUD = @Sendable (Item.HUD) -> Void
-	typealias ScheduleSheet = @Sendable (SheetOverlayCoordinator.Root.State) -> Void
+	typealias ScheduleSheet = @Sendable (SheetOverlayCoordinator.State) async -> SheetAction
 	typealias ScheduleFullScreen = @Sendable (FullScreenOverlayCoordinator.State) async -> FullScreenAction
 	typealias SendAlertAction = @Sendable (Item.AlertAction, Item.AlertState.ID) -> Void
 	typealias SendFullScreenAction = @Sendable (FullScreenAction, FullScreenID) -> Void
@@ -122,7 +124,7 @@ extension OverlayWindowClient {
 
 		case hud(HUD)
 		case alert(AlertState)
-		case sheet(SheetOverlayCoordinator.Root.State)
+		case sheet(SheetOverlayCoordinator.State)
 		case fullScreen(FullScreenOverlayCoordinator.State)
 	}
 }
@@ -131,5 +133,17 @@ extension DependencyValues {
 	var overlayWindowClient: OverlayWindowClient {
 		get { self[OverlayWindowClient.self] }
 		set { self[OverlayWindowClient.self] = newValue }
+	}
+}
+
+extension OverlayWindowClient {
+	func showInfoLink(_ state: InfoLinkSheet.State) {
+		Task {
+			let _ = await scheduleSheet(.init(root: .infoLink(state)))
+		}
+	}
+
+	func requestSignatutures(state: Signing.State) async -> SheetAction {
+		await scheduleSheet(.init(root: .signing(state)))
 	}
 }
