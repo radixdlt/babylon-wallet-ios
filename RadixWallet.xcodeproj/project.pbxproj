@@ -715,6 +715,7 @@
 		5B27FC002CC7E783002975BE /* Sections+ExecutionSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B27FBFF2CC7E77B002975BE /* Sections+ExecutionSummary.swift */; };
 		5B27FC022CC7ECC9002975BE /* Sections+ManifestSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B27FC012CC7ECC2002975BE /* Sections+ManifestSummary.swift */; };
 		5B2A0D792D354D4E0049C702 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 5B2A0D782D354D4E0049C702 /* Sargon */; };
+		5B2A0D7D2D354E820049C702 /* SargonHostInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2A0D7C2D354E7F0049C702 /* SargonHostInteractor.swift */; };
 		5B2A45022BD6680400AEC8AD /* ContactSupportClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2A45012BD6680400AEC8AD /* ContactSupportClient.swift */; };
 		5B2A45042BD6689100AEC8AD /* ContactSupportClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2A45032BD6689100AEC8AD /* ContactSupportClient+Live.swift */; };
 		5B3C48A92C7E190C00DB160D /* AssetRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3C48A82C7E190C00DB160D /* AssetRow.swift */; };
@@ -1982,6 +1983,7 @@
 		5B27FBFC2CC7E6C1002975BE /* Sections+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sections+View.swift"; sourceTree = "<group>"; };
 		5B27FBFF2CC7E77B002975BE /* Sections+ExecutionSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sections+ExecutionSummary.swift"; sourceTree = "<group>"; };
 		5B27FC012CC7ECC2002975BE /* Sections+ManifestSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sections+ManifestSummary.swift"; sourceTree = "<group>"; };
+		5B2A0D7C2D354E7F0049C702 /* SargonHostInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SargonHostInteractor.swift; sourceTree = "<group>"; };
 		5B2A45012BD6680400AEC8AD /* ContactSupportClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactSupportClient.swift; sourceTree = "<group>"; };
 		5B2A45032BD6689100AEC8AD /* ContactSupportClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ContactSupportClient+Live.swift"; sourceTree = "<group>"; };
 		5B3C48A82C7E190C00DB160D /* AssetRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetRow.swift; sourceTree = "<group>"; };
@@ -6012,6 +6014,7 @@
 		83D908AB2C931A5600822CC4 /* SargonExtensions */ = {
 			isa = PBXGroup;
 			children = (
+				5B2A0D7C2D354E7F0049C702 /* SargonHostInteractor.swift */,
 				83D908AC2C931A7100822CC4 /* SargonSecureStorageDriver.swift */,
 			);
 			path = SargonExtensions;
@@ -8158,6 +8161,7 @@
 				48CFC4602ADC10DA00E77A5C /* TransactionModels.swift in Sources */,
 				48D5F38A2BD8DDB9000DE964 /* DebugKeychainContents.swift in Sources */,
 				83EA887E2B7E68EE00FF8424 /* TotalCurrencyWorthView.swift in Sources */,
+				5B2A0D7D2D354E820049C702 /* SargonHostInteractor.swift in Sources */,
 				48CFC2982ADC10D900E77A5C /* CustomizeFees+View.swift in Sources */,
 				A40815A02C7E0D08005E65B9 /* MetadataStringArrayValue.swift in Sources */,
 				A40816292C7E0D08005E65B9 /* StateNonFungibleDataRequest.swift in Sources */,

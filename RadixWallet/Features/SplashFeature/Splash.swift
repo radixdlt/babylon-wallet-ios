@@ -221,7 +221,7 @@ struct Splash: Sendable, FeatureReducer {
 							unsafeStorageKeyMapping: .sargonOSMapping,
 							secureStorageDriver: SargonSecureStorage()
 						)
-					)
+					), hostInteractor: SargonHostInteractor()
 				)
 			} catch {
 				// Ignore error.

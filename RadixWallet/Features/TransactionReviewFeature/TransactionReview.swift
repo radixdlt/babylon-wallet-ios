@@ -317,34 +317,38 @@ struct TransactionReview: Sendable, FeatureReducer {
 				.concatenate(with: determineFeePayer(state, reviewedTransaction: reviewedTransaction))
 
 		case let .buildTransactionIntentResult(.success(intent)):
-			guard let reviewedTransaction = state.reviewedTransaction else {
-				return .none
+			return .run { _ in
+				let result = try await SargonOS.shared.signTransaction(transactionIntent: intent, roleKind: .primary)
+				print("Result \(result)")
 			}
-
-			if reviewedTransaction.transactionSigners.notaryIsSignatory {
-				let notaryKey = state.ephemeralNotaryPrivateKey
-
-				/// Silently sign the transaction with notary keys.
-				return .run { send in
-					await send(.internal(.notarizeResult(TaskResult {
-						try await transactionClient.notarizeTransaction(.init(
-							intentSignatures: [],
-							transactionIntent: intent,
-							notary: notaryKey
-						))
-					})))
-				}
-			}
-
-			state.destination = .signing(.init(
-				factorsLeftToSignWith: reviewedTransaction.signingFactors,
-				signingPurposeWithPayload: .signTransaction(
-					ephemeralNotaryPrivateKey: state.ephemeralNotaryPrivateKey,
-					intent,
-					origin: state.signTransactionPurpose
-				)
-			))
-			return .none
+//			guard let reviewedTransaction = state.reviewedTransaction else {
+//				return .none
+//			}
+//
+//			if reviewedTransaction.transactionSigners.notaryIsSignatory {
+//				let notaryKey = state.ephemeralNotaryPrivateKey
+//
+//				/// Silently sign the transaction with notary keys.
+//				return .run { send in
+//					await send(.internal(.notarizeResult(TaskResult {
+//						try await transactionClient.notarizeTransaction(.init(
+//							intentSignatures: [],
+//							transactionIntent: intent,
+//							notary: notaryKey
+//						))
+//					})))
+//				}
+//			}
+//
+//			state.destination = .signing(.init(
+//				factorsLeftToSignWith: reviewedTransaction.signingFactors,
+//				signingPurposeWithPayload: .signTransaction(
+//					ephemeralNotaryPrivateKey: state.ephemeralNotaryPrivateKey,
+//					intent,
+//					origin: state.signTransactionPurpose
+//				)
+//			))
+//			return .none
 
 		case let .notarizeResult(.success(notarizedTX)):
 			state.destination = .submitting(.init(
