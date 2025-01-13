@@ -1,6 +1,6 @@
-// MARK: - SetMainFactorSource
+// MARK: - ChangeMainFactorSource
 @Reducer
-struct SetMainFactorSource: Sendable, FeatureReducer {
+struct ChangeMainFactorSource: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
 		let kind: FactorSourceKind
@@ -35,8 +35,8 @@ struct SetMainFactorSource: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			return .run { [kind = state.kind] send in
-				let factorSources = try await factorSourcesClient.getFactorSources(matching: { $0.kind == kind })
+			return .run { [kind = state.kind, current = state.currentMain] send in
+				let factorSources = try await factorSourcesClient.getFactorSources(matching: { $0.kind == kind && $0 != current })
 				await send(.internal(.setFactorSources(factorSources.elements)))
 			} catch: { error, _ in
 				errorQueue.schedule(error)
@@ -59,7 +59,7 @@ struct SetMainFactorSource: Sendable, FeatureReducer {
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .setFactorSources(factorSources):
-			state.factorSources = factorSources.filter { $0 != state.currentMain }
+			state.factorSources = factorSources
 			return .none
 		}
 	}

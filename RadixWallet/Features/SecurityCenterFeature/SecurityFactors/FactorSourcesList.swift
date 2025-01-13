@@ -48,7 +48,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			case displayMnemonic(DisplayMnemonic.State)
 			case enterMnemonic(ImportMnemonicsFlowCoordinator.State)
 			case addMnemonic(ImportMnemonic.State)
-			case changeMain(SetMainFactorSource.State)
+			case changeMain(ChangeMainFactorSource.State)
 		}
 
 		@CasePathable
@@ -57,7 +57,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			case displayMnemonic(DisplayMnemonic.Action)
 			case enterMnemonic(ImportMnemonicsFlowCoordinator.Action)
 			case addMnemonic(ImportMnemonic.Action)
-			case changeMain(SetMainFactorSource.Action)
+			case changeMain(ChangeMainFactorSource.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -74,7 +74,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 				ImportMnemonic()
 			}
 			Scope(state: \.changeMain, action: \.changeMain) {
-				SetMainFactorSource()
+				ChangeMainFactorSource()
 			}
 		}
 	}

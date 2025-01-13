@@ -204,7 +204,7 @@ private extension View {
 
 	private func changeMain(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
 		sheet(store: destinationStore.scope(state: \.changeMain, action: \.changeMain)) {
-			SetMainFactorSource.View(store: $0)
+			ChangeMainFactorSource.View(store: $0)
 		}
 	}
 }
