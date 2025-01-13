@@ -63,7 +63,7 @@ extension FactorSourcesList {
 						header(text)
 						Spacer()
 						if showChangeMain {
-							Button("Change") {
+							Button(L10n.FactorSources.List.change) {
 								store.send(.view(.changeMainButtonTapped))
 							}
 							.buttonStyle(.primaryText())

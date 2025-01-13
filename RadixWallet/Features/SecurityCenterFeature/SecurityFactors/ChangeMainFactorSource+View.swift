@@ -10,11 +10,11 @@ extension ChangeMainFactorSource {
 			WithPerceptionTracking {
 				ScrollView {
 					VStack(spacing: .large2) {
-						Text("Change Default Biometrics/PIN")
+						Text(L10n.FactorSources.ChangeMain.title)
 							.textStyle(.sheetTitle)
 							.padding(.horizontal, .medium3)
 
-						Text("Select the biometrics/PIN factor that will be automatically selected when you create a new Account or Persona.")
+						Text(L10n.FactorSources.ChangeMain.subtitle)
 							.textStyle(.body1Regular)
 							.padding(.horizontal, .medium3)
 
