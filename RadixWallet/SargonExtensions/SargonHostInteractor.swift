@@ -2,11 +2,14 @@ import Sargon
 
 final class SargonHostInteractor: HostInteractor {
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
+	@Dependency(\.continuousClock) var clock
 
 	func signTransactions(request: SargonUniFFI.SignRequestOfTransactionIntent) async throws -> SargonUniFFI.SignResponseOfTransactionIntentHash {
 		var perFactorOutcome: [PerFactorOutcomeOfTransactionIntentHash] = []
 
 		for perFactorSource in request.perFactorSource {
+			// NOTE: Adding this delay among factor sources as a workaround for it to work
+			try? await clock.sleep(for: .seconds(0.5))
 			let action = await overlayWindowClient.signTransaction(input: perFactorSource)
 			let outcome: FactorOutcomeOfTransactionIntentHash = switch action {
 			case .newSigning(.cancelled):
