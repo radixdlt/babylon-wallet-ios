@@ -11,7 +11,7 @@ extension NewSigning {
 				/// Otherwise, only the first of them would have the `.onFirstTask()` triggered, and the logic for the remaining ones
 				/// wouldn't be performed.
 				FactorSourceAccess.View(store: store.factorSourceAccess)
-					.id(store.input.factorSourceId)
+					.id(store.factorSourceId)
 			}
 		}
 	}
@@ -20,5 +20,14 @@ extension NewSigning {
 private extension StoreOf<NewSigning> {
 	var factorSourceAccess: StoreOf<FactorSourceAccess> {
 		scope(state: \.factorSourceAccess, action: \.child.factorSourceAccess)
+	}
+}
+
+private extension NewSigning.State {
+	var factorSourceId: FactorSourceIdFromHash {
+		switch purpose {
+		case let .transaction(input):
+			input.factorSourceId
+		}
 	}
 }

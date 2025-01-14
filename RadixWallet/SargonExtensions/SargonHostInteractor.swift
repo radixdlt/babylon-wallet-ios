@@ -13,7 +13,7 @@ final class SargonHostInteractor: HostInteractor {
 				throw CommonError.SigningRejected
 			case .newSigning(.skippedFactorSource):
 				.neglected(.init(reason: .userExplicitlySkipped, factor: perFactorSource.factorSourceId))
-			case let .newSigning(.producedSignatures(signatures)):
+			case let .newSigning(.finished(.transaction(signatures))):
 				.signed(producedSignatures: signatures)
 			case .dismiss, .signing:
 				fatalError("Unexpected action")
