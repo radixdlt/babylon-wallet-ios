@@ -109,6 +109,49 @@ extension LedgerHardwareWalletClient: DependencyKey {
 			return signatures
 		}
 
+		@Sendable func sign(
+			payloadId: TransactionIntentHash,
+			ownedFactorInstances: [OwnedFactorInstance],
+			signOnLedgerRequest: () async throws -> [P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.SignatureOfSigner]
+		) async throws -> Set<HdSignatureOfTransactionIntentHash> {
+			let signaturesRaw = try await signOnLedgerRequest()
+
+			let expectedHashedMessage = payloadId.hash.data
+			let signaturesValidated = try signaturesRaw.map { try $0.validate(hashed: expectedHashedMessage) }
+			var signatures = Set<HdSignatureOfTransactionIntentHash>()
+
+			for ownedFactorInstance in ownedFactorInstances {
+				let factorInstance = ownedFactorInstance.factorInstance
+				guard let signature = signaturesValidated.first(where: {
+					$0.signature.publicKey == factorInstance.publicKey.publicKey
+				}) else {
+					loggerGlobal.error("Missing signature from required signer with publicKey: \(factorInstance.publicKey.publicKey.hex)")
+					throw MissingSignatureFromRequiredSigner()
+				}
+				assert(factorInstance.derivationPath == signature.derivationPath)
+
+				signatures.insert(.init(input: .init(payloadId: payloadId, ownedFactorInstance: ownedFactorInstance), signature: signature.signature))
+			}
+
+			return signatures
+		}
+
+		let newSignTransaction: NewSignTransaction = { request in
+			let compiledIntent = request.input.payload
+			let payloadId = compiledIntent.decompile().hash()
+			return try await sign(payloadId: payloadId, ownedFactorInstances: request.input.ownedFactorInstances) {
+				try await makeRequest(
+					.signTransaction(.init(
+						signers: request.signers,
+						ledgerDevice: request.ledger.device(),
+						compiledTransactionIntent: .init(data: compiledIntent.data),
+						displayHash: false
+					)),
+					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.signTransaction
+				)
+			}
+		}
+
 		return Self(
 			isConnectedToAnyConnectorExtension: {
 				await radixConnectClient.getP2PLinksWithConnectionStatusUpdates()
@@ -153,6 +196,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					)
 				}
 			},
+			newSignTransaction: newSignTransaction,
 			signPreAuthorization: { request in
 				let hashedMsg = request.subintent.hash()
 				return try await sign(
@@ -299,3 +343,14 @@ struct FailedToReceiveAnyResponseFromAnyClient: Swift.Error {}
 
 // MARK: - CasePath + Sendable
 extension CasePath: Sendable where Root: Sendable, Value: Sendable {}
+
+extension LedgerHardwareWalletClient.NewSignTransactionRequest {
+	var signers: [P2P.LedgerHardwareWallet.KeyParameters] {
+		input.ownedFactorInstances.map {
+			.init(
+				curve: $0.factorInstance.publicKey.curve.toLedger(),
+				derivationPath: $0.factorInstance.derivationPath.toString()
+			)
+		}
+	}
+}

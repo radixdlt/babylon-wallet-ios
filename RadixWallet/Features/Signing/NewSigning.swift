@@ -23,17 +23,22 @@ struct NewSigning: Sendable, FeatureReducer {
 
 	typealias Action = FeatureAction<Self>
 
+	@CasePathable
+	enum ChildAction: Sendable, Hashable {
+		case factorSourceAccess(FactorSourceAccess.Action)
+	}
+
+	enum InternalAction: Sendable, Hashable {
+		case fetchedFactorSource(FactorSource)
+	}
+
 	enum DelegateAction: Sendable, Equatable {
 		case skippedFactorSource
 		case cancelled
 		case finished(Output)
 	}
 
-	@CasePathable
-	enum ChildAction: Sendable, Hashable {
-		case factorSourceAccess(FactorSourceAccess.Action)
-	}
-
+	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 	@Dependency(\.errorQueue) var errorQueue
@@ -57,6 +62,16 @@ struct NewSigning: Sendable, FeatureReducer {
 			.none
 		}
 	}
+
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case let .fetchedFactorSource(.ledger(ledger)):
+			state.factorSourceAccess = .init(kind: .ledger(ledger), purpose: .signature)
+			return .none
+		default:
+			return .none
+		}
+	}
 }
 
 private extension NewSigning {
@@ -69,11 +84,20 @@ private extension NewSigning {
 
 	func signTransaction(input: PerFactorSourceInputOfTransactionIntent) -> Effect<Action> {
 		.run { send in
-			let producedSignatures: [HdSignatureOfTransactionIntentHash] = switch input.factorSourceId.kind {
+			let producedSignatures: [HdSignatureOfTransactionIntentHash]
+			switch input.factorSourceId.kind {
 			case .device:
-				try await deviceFactorSourceClient.signUsingDeviceFactorSource(input: input)
+				producedSignatures = try await deviceFactorSourceClient.signUsingDeviceFactorSource(input: input)
 			case .ledgerHqHardwareWallet:
-				try await signTransactionLedger(input: input)
+				guard let ledger = try await factorSourcesClient.getFactorSource(
+					id: input.factorSourceId.asGeneral,
+					as: LedgerHardwareWalletFactorSource.self
+				) else {
+					struct LedgerFactorSourcenNotFound: Swift.Error {}
+					throw LedgerFactorSourcenNotFound()
+				}
+				await send(.internal(.fetchedFactorSource(ledger.asGeneral)))
+				producedSignatures = try await signTransactionLedger(ledger: ledger, input: input)
 			default:
 				fatalError("Not implemented")
 			}
@@ -85,13 +109,13 @@ private extension NewSigning {
 		}
 	}
 
-	func signTransactionLedger(input: PerFactorSourceInputOfTransactionIntent) async throws -> [HdSignatureOfTransactionIntentHash] {
+	func signTransactionLedger(ledger: LedgerHardwareWalletFactorSource, input: PerFactorSourceInputOfTransactionIntent) async throws -> [HdSignatureOfTransactionIntentHash] {
 		var result: [HdSignatureOfTransactionIntentHash] = []
 
 		for transaction in input.perTransaction {
-			let payloadId = transaction.payload.decompile().hash()
-			let hash = payloadId.hash
-			// TODO:
+			let signatures = try await ledgerHardwareWalletClient.newSignTransaction(.init(ledger: ledger, input: transaction))
+			// let payloadId = transaction.payload.decompile().hash()
+			result.append(contentsOf: signatures)
 		}
 
 		return result

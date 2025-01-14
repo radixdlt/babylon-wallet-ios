@@ -6,6 +6,7 @@ struct LedgerHardwareWalletClient: Sendable {
 	var getDeviceInfo: GetDeviceInfo
 	var derivePublicKeys: DerivePublicKeys
 	var signTransaction: SignTransaction
+	var newSignTransaction: NewSignTransaction
 	var signPreAuthorization: SignPreAuthorization
 	var signAuthChallenge: SignAuthChallenge
 	var deriveAndDisplayAddress: DeriveAndDisplayAddress
@@ -19,8 +20,17 @@ extension LedgerHardwareWalletClient {
 	typealias DeriveAndDisplayAddress = @Sendable (P2P.LedgerHardwareWallet.KeyParameters, LedgerHardwareWalletFactorSource) async throws -> (HierarchicalDeterministicPublicKey, String)
 
 	typealias SignTransaction = @Sendable (SignTransactionWithLedgerRequest) async throws -> Set<SignatureOfEntity>
+	typealias NewSignTransaction = @Sendable (NewSignTransactionRequest) async throws -> Set<HdSignatureOfTransactionIntentHash>
 	typealias SignPreAuthorization = @Sendable (SignPreAuthorizationWithLedgerRequest) async throws -> Set<SignatureOfEntity>
 	typealias SignAuthChallenge = @Sendable (SignAuthChallengeWithLedgerRequest) async throws -> Set<SignatureOfEntity>
+}
+
+// MARK: LedgerHardwareWalletClient.NewSignTransactionRequest
+extension LedgerHardwareWalletClient {
+	struct NewSignTransactionRequest: Sendable, Hashable {
+		let ledger: LedgerHardwareWalletFactorSource
+		let input: TransactionSignRequestInputOfTransactionIntent
+	}
 }
 
 // MARK: - VerifyAddressOutcome
