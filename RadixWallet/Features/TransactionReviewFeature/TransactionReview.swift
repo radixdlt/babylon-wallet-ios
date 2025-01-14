@@ -316,9 +316,18 @@ struct TransactionReview: Sendable, FeatureReducer {
 				.concatenate(with: determineFeePayer(state, reviewedTransaction: reviewedTransaction))
 
 		case let .buildTransactionIntentResult(.success(intent)):
-			return .run { _ in
-				let result = try await SargonOS.shared.signTransaction(transactionIntent: intent, roleKind: .primary)
-				print("Result \(result)")
+			return .run { [notary = state.ephemeralNotaryPrivateKey] send in
+				let signedIntent = try await SargonOS.shared.signTransaction(transactionIntent: intent, roleKind: .primary)
+				let notarizedTransaction = try await transactionClient.newNotarizeTransaction(
+					.init(
+						transactionIntent: intent,
+						signedIntent: signedIntent,
+						notary: notary
+					)
+				)
+				await send(.internal(.notarizeResult(.success(notarizedTransaction))))
+			} catch: { error, _ in
+				errorQueue.schedule(error)
 			}
 //			guard let reviewedTransaction = state.reviewedTransaction else {
 //				return .none

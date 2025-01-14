@@ -5,6 +5,7 @@ extension TransactionClient: TestDependencyKey {
 		getTransactionReview: unimplemented("\(Self.self).getTransactionReview"),
 		buildTransactionIntent: unimplemented("\(Self.self).buildTransactionIntent"),
 		notarizeTransaction: unimplemented("\(Self.self).notarizeTransaction"),
+		newNotarizeTransaction: unimplemented("\(Self.self).newNotarizeTransaction"),
 		myInvolvedEntities: unimplemented("\(Self.self).myInvolvedEntities"),
 		determineFeePayer: unimplemented("\(Self.self).determineFeePayer"),
 		getFeePayerCandidates: unimplemented("\(Self.self).getFeePayerCandidates")

@@ -60,7 +60,7 @@ extension TransactionClient {
 				try await .init(validating: addresses.asyncMap(identityFromComponentAddress))
 			}
 
-			let summary = try manifest.summary
+			let summary = manifest.summary
 
 			return try await MyEntitiesInvolvedInTransaction(
 				identitiesRequiringAuth: mapIdentity(summary.addressesOfPersonasRequiringAuth),
@@ -143,6 +143,25 @@ extension TransactionClient {
 
 			let notarizedTransaction = try NotarizedTransaction(
 				signedIntent: signedTransactionIntent,
+				notarySignature: NotarySignature(signature: .ed25519(value: .init(bytes: .init(bytes: notarySignature))))
+			)
+
+			let txID = request.transactionIntent.hash()
+
+			return .init(
+				notarized: notarizedTransaction,
+				intent: request.transactionIntent,
+				txID: txID
+			)
+		}
+
+		let newNotarizeTransaction: NewNotarizeTransaction = { request in
+			let signedIntentHash = request.signedIntent.hash()
+
+			let notarySignature = try request.notary.signature(for: signedIntentHash.hash.data)
+
+			let notarizedTransaction = try NotarizedTransaction(
+				signedIntent: request.signedIntent,
 				notarySignature: NotarySignature(signature: .ed25519(value: .init(bytes: .init(bytes: notarySignature))))
 			)
 
@@ -250,6 +269,7 @@ extension TransactionClient {
 			getTransactionReview: getTransactionReview,
 			buildTransactionIntent: buildTransactionIntent,
 			notarizeTransaction: notarizeTransaction,
+			newNotarizeTransaction: newNotarizeTransaction,
 			myInvolvedEntities: myInvolvedEntities,
 			determineFeePayer: determineFeePayer,
 			getFeePayerCandidates: { refresh in
