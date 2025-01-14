@@ -62,34 +62,6 @@ struct Signing: Sendable, FeatureReducer {
 				signingPurposeWithPayload: signingPurposeWithPayload
 			)!
 		}
-
-		init(input: TransactionSignRequestInputOfTransactionIntent) {
-			self.signingPurposeWithPayload = .signTransaction(ephemeralNotaryPrivateKey: .init(), input.payload.decompile(), origin: .manifestFromDapp)
-			// TODO: Here we should build the `factorsLeftToSignWith` based on the `input.ownedFactorInstances`
-			var result: SigningFactors = [:]
-			for instance in input.ownedFactorInstances {
-				let kind = instance.factorInstance.factorSourceId.kind
-//				let signer = SigningFactor(
-//					factorSource: <#T##FactorSource#>, // what should be the FactorSource?
-//					signer: .init(
-//						factorInstanceRequiredToSign: instance.factorInstance,
-//						entity: <#T##AccountOrPersona#> // we have Address on instance.owner, should we migrate all to use AddressOfAccountOrPersonas rather than AccountOrPersona?
-//					)
-//				)
-//				if var existent = result[kind] {
-//					existent.insert(signer)
-//					result[kind] = existent
-//				} else {
-//					result[kind] = .init([signer])
-//				}
-			}
-			self.factorsLeftToSignWith = result
-			self.expectedSignatureCount = input.ownedFactorInstances.count
-			self.signWithFactorSource = Signing.nextFactorSource(
-				factorsLeftToSignWith: factorsLeftToSignWith,
-				signingPurposeWithPayload: signingPurposeWithPayload
-			)!
-		}
 	}
 
 	enum InternalAction: Sendable, Equatable {
