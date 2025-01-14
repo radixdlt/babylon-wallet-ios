@@ -110,15 +110,14 @@ extension LedgerHardwareWalletClient: DependencyKey {
 		}
 
 		@Sendable func sign(
-			payloadId: TransactionIntentHash,
+			expectedHashedMessage: Data,
 			ownedFactorInstances: [OwnedFactorInstance],
 			signOnLedgerRequest: () async throws -> [P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.SignatureOfSigner]
-		) async throws -> Set<HdSignatureOfTransactionIntentHash> {
+		) async throws -> Set<SignatureOfEntity2> {
 			let signaturesRaw = try await signOnLedgerRequest()
 
-			let expectedHashedMessage = payloadId.hash.data
 			let signaturesValidated = try signaturesRaw.map { try $0.validate(hashed: expectedHashedMessage) }
-			var signatures = Set<HdSignatureOfTransactionIntentHash>()
+			var signatures = Set<SignatureOfEntity2>()
 
 			for ownedFactorInstance in ownedFactorInstances {
 				let factorInstance = ownedFactorInstance.factorInstance
@@ -130,7 +129,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 				}
 				assert(factorInstance.derivationPath == signature.derivationPath)
 
-				signatures.insert(.init(input: .init(payloadId: payloadId, ownedFactorInstance: ownedFactorInstance), signature: signature.signature))
+				signatures.insert(.init(ownedFactorInstance: ownedFactorInstance, signatureWithPublicKey: signature.signature))
 			}
 
 			return signatures
@@ -139,7 +138,8 @@ extension LedgerHardwareWalletClient: DependencyKey {
 		let newSignTransaction: NewSignTransaction = { request in
 			let compiledIntent = request.input.payload
 			let payloadId = compiledIntent.decompile().hash()
-			return try await sign(payloadId: payloadId, ownedFactorInstances: request.input.ownedFactorInstances) {
+			let expectedHashedMessage = payloadId.hash.data
+			let result = try await sign(expectedHashedMessage: expectedHashedMessage, ownedFactorInstances: request.input.ownedFactorInstances) {
 				try await makeRequest(
 					.signTransaction(.init(
 						signers: request.signers,
@@ -149,6 +149,9 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					)),
 					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.signTransaction
 				)
+			}
+			return result.map { item in
+				.init(input: .init(payloadId: payloadId, ownedFactorInstance: item.ownedFactorInstance), signature: item.signatureWithPublicKey)
 			}
 		}
 
@@ -352,5 +355,11 @@ extension LedgerHardwareWalletClient.NewSignTransactionRequest {
 				derivationPath: $0.factorInstance.derivationPath.toString()
 			)
 		}
+	}
+}
+
+extension Set {
+	func map<U>(transform: (Element) -> U) -> Set<U> {
+		Set<U>(self.lazy.map(transform))
 	}
 }
