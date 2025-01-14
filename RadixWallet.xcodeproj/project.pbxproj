@@ -1279,6 +1279,7 @@
 		E791F2A72D2FED51001A007B /* RolesSetupCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E791F2A62D2FED51001A007B /* RolesSetupCoordinator+View.swift */; };
 		E791F2AA2D3151E7001A007B /* RecoveryRoleSetup+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E791F2A92D3151E7001A007B /* RecoveryRoleSetup+Reducer.swift */; };
 		E791F2AC2D3151ED001A007B /* RecoveryRoleSetup+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E791F2AB2D3151ED001A007B /* RecoveryRoleSetup+View.swift */; };
+		E791F2AE2D365A76001A007B /* SelectEmergencyFallbackPeriodView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E791F2AD2D365A76001A007B /* SelectEmergencyFallbackPeriodView.swift */; };
 		E79DD1B12CE365CF00B1EB86 /* ChooseReceivingAccountOnDelete+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1B02CE365CF00B1EB86 /* ChooseReceivingAccountOnDelete+Reducer.swift */; };
 		E79DD1B32CE365D600B1EB86 /* ChooseReceivingAccountOnDelete+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1B22CE365D600B1EB86 /* ChooseReceivingAccountOnDelete+View.swift */; };
 		E79DD1B62CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1B52CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift */; };
@@ -2564,6 +2565,7 @@
 		E791F2A62D2FED51001A007B /* RolesSetupCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RolesSetupCoordinator+View.swift"; sourceTree = "<group>"; };
 		E791F2A92D3151E7001A007B /* RecoveryRoleSetup+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecoveryRoleSetup+Reducer.swift"; sourceTree = "<group>"; };
 		E791F2AB2D3151ED001A007B /* RecoveryRoleSetup+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecoveryRoleSetup+View.swift"; sourceTree = "<group>"; };
+		E791F2AD2D365A76001A007B /* SelectEmergencyFallbackPeriodView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectEmergencyFallbackPeriodView.swift; sourceTree = "<group>"; };
 		E79DD1B02CE365CF00B1EB86 /* ChooseReceivingAccountOnDelete+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChooseReceivingAccountOnDelete+Reducer.swift"; sourceTree = "<group>"; };
 		E79DD1B22CE365D600B1EB86 /* ChooseReceivingAccountOnDelete+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChooseReceivingAccountOnDelete+View.swift"; sourceTree = "<group>"; };
 		E79DD1B52CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeleteAccountConfirmation+Reducer.swift"; sourceTree = "<group>"; };
@@ -7111,6 +7113,7 @@
 			children = (
 				E791F2A92D3151E7001A007B /* RecoveryRoleSetup+Reducer.swift */,
 				E791F2AB2D3151ED001A007B /* RecoveryRoleSetup+View.swift */,
+				E791F2AD2D365A76001A007B /* SelectEmergencyFallbackPeriodView.swift */,
 			);
 			path = RecoveryRoleSetup;
 			sourceTree = "<group>";
@@ -7672,6 +7675,7 @@
 				48CFC4772ADC10DA00E77A5C /* GatewaysClient+Interface.swift in Sources */,
 				A408161E2C7E0D08005E65B9 /* StateEntityNonFungiblesPageResponse.swift in Sources */,
 				A40816432C7E0D08005E65B9 /* TransactionFungibleFeeBalanceChangeType.swift in Sources */,
+				E791F2AE2D365A76001A007B /* SelectEmergencyFallbackPeriodView.swift in Sources */,
 				A40815862C7E0D08005E65B9 /* LedgerStateMixin.swift in Sources */,
 				48CFC59D2ADC10DA00E77A5C /* UIKeyboardType+Extra.swift in Sources */,
 				48CFC5E12ADC10DA00E77A5C /* Validation+Extra.swift in Sources */,

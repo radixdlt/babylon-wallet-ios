@@ -26,6 +26,11 @@ extension RecoveryRoleSetup.State {
 	var confirmationFactors: [FactorSource] {
 		factorSourcesFromProfile.filter { shieldBuilder.confirmationRoleFactors.contains($0.factorSourceID) }
 	}
+
+	// TODO: Add in Sargon - `shieldBuilder.periodUntilAutoConfirm`
+	var periodUntilAutoConfirm: FallbackPeriod {
+		.init(days: Int(shieldBuilder.numberOfDaysUntilAutoConfirm))
+	}
 }
 
 // MARK: - RecoveryRoleSetup.View
@@ -54,7 +59,7 @@ extension RecoveryRoleSetup {
 					store.send(.view(.task))
 				}
 			}
-			//            .destination(store: store)
+			.destination(store: store)
 		}
 
 		@MainActor
@@ -173,6 +178,13 @@ extension RecoveryRoleSetup {
 							break
 						}
 					}
+
+					let isLastFactor = factorSource == factorSources.last
+					if !isLastFactor {
+						Text(L10n.ShieldWizardRecovery.Combination.label)
+							.textStyle(.body1Link)
+							.foregroundStyle(.app.gray1)
+					}
 				}
 
 				Button("+") {
@@ -215,7 +227,7 @@ extension RecoveryRoleSetup {
 					.foregroundStyle(.app.gray1)
 					.flushedLeft
 
-					Label("10 " + L10n.ShieldWizardRecovery.Fallback.Days.label, asset: AssetResource.emergencyFallbackCalendar)
+					Label(store.periodUntilAutoConfirm.title, asset: AssetResource.emergencyFallbackCalendar)
 						.textStyle(.body1Header)
 						.foregroundStyle(.app.gray1)
 						.flushedLeft
@@ -225,7 +237,7 @@ extension RecoveryRoleSetup {
 						.roundedCorners(radius: .small2)
 						.cardShadow
 						.onTapGesture {
-							store.send(.view(.setFallbackButtonTapped))
+							store.send(.view(.selectFallbackButtonTapped))
 						}
 
 					Text(L10n.ShieldWizardRecovery.Fallback.note)
@@ -260,27 +272,47 @@ private extension RecoveryRoleSetup.View {
 	}
 }
 
-// private extension StoreOf<RecoveryRoleSetup> {
-//    var destination: PresentationStoreOf<PrimaryRoleSetup.Destination> {
-//        func scopeState(state: State) -> PresentationState<PrimaryRoleSetup.Destination.State> {
-//            state.$destination
-//        }
-//        return scope(state: scopeState, action: Action.destination)
-//    }
-// }
-//
-// @MainActor
-// private extension View {
-//    func destination(store: StoreOf<RecoveryRoleSetup>) -> some View {
-//        let destinationStore = store.destination
-//        return selectEmergencyFallback(with: destinationStore, store: store)
-//    }
-//
-//    private func selectEmergencyFallback(with destinationStore: PresentationStoreOf<RecoveryRoleSetup.Destination>, store: StoreOf<RecoveryRoleSetup>) -> some View {
-//        WithPerceptionTracking {
-//            sheet(store: destinationStore.scope(state: \.selectNumberOfFactorsView, action: \.selectNumberOfFactorsView)) { _ in
-//
-//            }
-//        }
-//    }
-// }
+private extension FallbackPeriod {
+	// TODO: Add new Crowdin keys: "%d <unit_name>"
+	var title: String {
+		switch (value, unit) {
+		case (1, .days):
+			"\(value) " + L10n.ShieldWizardRecovery.Fallback.Day.label // "shieldWizardRecovery_fallback_day_period"
+		case (_, .days):
+			"\(value) " + L10n.ShieldWizardRecovery.Fallback.Days.label // "shieldWizardRecovery_fallback_days_period"
+		case (1, .weeks):
+			"\(value) " + L10n.ShieldWizardRecovery.Fallback.Week.label // "shieldWizardRecovery_fallback_week_period"
+		case (_, .weeks):
+			"\(value) " + L10n.ShieldWizardRecovery.Fallback.Weeks.label // "shieldWizardRecovery_fallback_weeks_period"
+		}
+	}
+}
+
+private extension StoreOf<RecoveryRoleSetup> {
+	var destination: PresentationStoreOf<RecoveryRoleSetup.Destination> {
+		func scopeState(state: State) -> PresentationState<RecoveryRoleSetup.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destination(store: StoreOf<RecoveryRoleSetup>) -> some View {
+		let destinationStore = store.destination
+		return selectEmergencyFallback(with: destinationStore, store: store)
+	}
+
+	private func selectEmergencyFallback(with destinationStore: PresentationStoreOf<RecoveryRoleSetup.Destination>, store: StoreOf<RecoveryRoleSetup>) -> some View {
+		WithPerceptionTracking {
+			sheet(store: destinationStore.scope(state: \.selectEmergencyFallbackPeriod, action: \.selectEmergencyFallbackPeriod)) { _ in
+				SelectEmergencyFallbackPeriodView(
+					selectedPeriod: store.periodUntilAutoConfirm
+				) { action in
+					store.send(.destination(.presented(.selectEmergencyFallbackPeriod(action))))
+				}
+			}
+		}
+	}
+}

@@ -22,10 +22,8 @@ struct RecoveryRoleSetup: FeatureReducer, Sendable {
 		case addFactorSourceButtonTapped(ChooseFactorSourceContext)
 		case removeRecoveryFactorTapped(FactorSourceID)
 		case removeConfirmationFactorTapped(FactorSourceID)
-		case removeAuthenticationSigningFactorTapped
-		case thresholdSelectorButtonTapped
 		case invalidCombinationReadMoreTapped
-		case setFallbackButtonTapped
+		case selectFallbackButtonTapped
 		case fallbackInfoButtonTapped
 	}
 
@@ -41,12 +39,12 @@ struct RecoveryRoleSetup: FeatureReducer, Sendable {
 	struct Destination: DestinationReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
-			case selectNumberOfFactorsView
+			case selectEmergencyFallbackPeriod
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
-			case selectNumberOfFactorsView(SelectNumberOfFactorsView.Action)
+			case selectEmergencyFallbackPeriod(SelectEmergencyFallbackPeriodView.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -93,20 +91,11 @@ struct RecoveryRoleSetup: FeatureReducer, Sendable {
 			}
 			return .none
 
-		case .removeAuthenticationSigningFactorTapped:
-			state.$shieldBuilder.withLock { builder in
-				builder = builder.setAuthenticationSigningFactor(new: nil)
-			}
-			return .none
-
-		case .thresholdSelectorButtonTapped:
-			state.destination = .selectNumberOfFactorsView
-			return .none
-
 		case let .addFactorSourceButtonTapped(context):
 			return .send(.delegate(.chooseFactorSource(context)))
 
-		case .setFallbackButtonTapped:
+		case .selectFallbackButtonTapped:
+			state.destination = .selectEmergencyFallbackPeriod
 			return .none
 
 		case .fallbackInfoButtonTapped:
@@ -128,18 +117,13 @@ struct RecoveryRoleSetup: FeatureReducer, Sendable {
 
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case .selectNumberOfFactorsView(.close):
+		case .selectEmergencyFallbackPeriod(.close):
 			state.destination = nil
 			return .none
-		case let .selectNumberOfFactorsView(.set(value)):
+		case let .selectEmergencyFallbackPeriod(.set(period)):
 			state.destination = nil
 			state.$shieldBuilder.withLock { builder in
-				switch value {
-				case .all:
-					builder = builder.setThreshold(threshold: UInt8(builder.primaryRoleThresholdFactors.count))
-				case let .specific(numberOfFactors):
-					builder = builder.setThreshold(threshold: UInt8(numberOfFactors))
-				}
+				builder = builder.setNumberOfDaysUntilAutoConfirm(numberOfDays: UInt16(period.days))
 			}
 			return .none
 		}

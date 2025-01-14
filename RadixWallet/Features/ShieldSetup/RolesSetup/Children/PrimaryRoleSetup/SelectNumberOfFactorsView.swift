@@ -32,6 +32,8 @@ struct SelectNumberOfFactorsView: View {
 				ForEach(pickerItems, id: \.self) { threshold in
 					Text(threshold.title)
 						.tag(threshold)
+						.foregroundStyle(.app.gray1)
+						.textStyle(.body1Regular)
 				}
 			}
 			.pickerStyle(.wheel)
