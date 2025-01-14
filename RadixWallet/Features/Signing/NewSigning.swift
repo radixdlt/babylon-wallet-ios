@@ -77,8 +77,13 @@ private extension NewSigning {
 
 			await send(.delegate(.finished(.transaction(producedSignatures))))
 
-		} catch: { error, _ in
-			errorQueue.schedule(error)
+		} catch: { error, send in
+			if let error = error as? P2P.ConnectorExtension.Response.LedgerHardwareWallet.Failure, error.code == .userRejectedSigningOfTransaction {
+				// If user rejected transaction on ledger device, we will inform the delegate to dismiss the signing sheet.
+				await send(.delegate(.cancelled))
+			} else {
+				errorQueue.schedule(error)
+			}
 		}
 	}
 

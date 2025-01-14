@@ -108,6 +108,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 		case buildTransactionIntentResult(TaskResult<TransactionIntent>)
 		case notarizeResult(TaskResult<NotarizeTransactionResponse>)
 		case determineFeePayerResult(TaskResult<FeePayerSelectionResult?>)
+		case resetToApprovable
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -326,37 +327,13 @@ struct TransactionReview: Sendable, FeatureReducer {
 					)
 				)
 				await send(.internal(.notarizeResult(.success(notarizedTransaction))))
-			} catch: { error, _ in
-				errorQueue.schedule(error)
+			} catch: { error, send in
+				if let error = error as? CommonError, error == .SigningRejected {
+					await send(.internal(.resetToApprovable))
+				} else {
+					errorQueue.schedule(error)
+				}
 			}
-//			guard let reviewedTransaction = state.reviewedTransaction else {
-//				return .none
-//			}
-//
-//			if reviewedTransaction.transactionSigners.notaryIsSignatory {
-//				let notaryKey = state.ephemeralNotaryPrivateKey
-//
-//				/// Silently sign the transaction with notary keys.
-//				return .run { send in
-//					await send(.internal(.notarizeResult(TaskResult {
-//						try await transactionClient.notarizeTransaction(.init(
-//							intentSignatures: [],
-//							transactionIntent: intent,
-//							notary: notaryKey
-//						))
-//					})))
-//				}
-//			}
-//
-//			state.destination = .signing(.init(
-//				factorsLeftToSignWith: reviewedTransaction.signingFactors,
-//				signingPurposeWithPayload: .signTransaction(
-//					ephemeralNotaryPrivateKey: state.ephemeralNotaryPrivateKey,
-//					intent,
-//					origin: state.signTransactionPurpose
-//				)
-//			))
-//			return .none
 
 		case let .notarizeResult(.success(notarizedTX)):
 			state.destination = .submitting(.init(
@@ -397,6 +374,9 @@ struct TransactionReview: Sendable, FeatureReducer {
 			errorQueue.schedule(error)
 			state.reviewedTransaction?.feePayer = .success(nil)
 			return .none
+
+		case .resetToApprovable:
+			return resetToApprovable(&state)
 		}
 	}
 
