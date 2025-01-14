@@ -29,28 +29,6 @@ struct SignWithFactorSource: Sendable, FeatureReducer {
 				self.factorSourceAccess = .init(kind: .ledger(ledger), purpose: purpose)
 			}
 		}
-
-		init(input: PerFactorSourceInputOfTransactionIntent) {
-			let kind: Kind = switch input.factorSourceId.kind {
-			case .device:
-				.device
-			case .ledgerHqHardwareWallet:
-				.ledger
-			default:
-				fatalError("Unsupported")
-			}
-
-			// TODO: How to handle multiple transaction at once?
-			let transactionIntent = input.perTransaction.first!.payload.decompile()
-
-			var signingFactors = Set<SigningFactor>()
-			for perTransaction in input.perTransaction {
-//				let factorInstancesRequiredToSign = Set(perTransaction.ownedFactorInstances.map(\.factorInstance))
-//				signingFactors.insert(.init(factorSource: <#T##FactorSource#>, signer: .init(factorInstancesRequiredToSign: factorInstancesRequiredToSign, of: <#T##AccountOrPersona#>)))
-			}
-
-			self.init(kind: kind, signingFactors: .init(signingFactors)!, signingPurposeWithPayload: .signTransaction(ephemeralNotaryPrivateKey: .init(), transactionIntent, origin: .manifestFromDapp))
-		}
 	}
 
 	enum InternalAction: Sendable, Equatable {

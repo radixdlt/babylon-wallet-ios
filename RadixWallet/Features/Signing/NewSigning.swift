@@ -36,6 +36,7 @@ struct NewSigning: Sendable, FeatureReducer {
 
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
+	@Dependency(\.errorQueue) var errorQueue
 
 	var body: some ReducerOf<Self> {
 		Scope(state: \.factorSourceAccess, action: \.child.factorSourceAccess) {
@@ -62,47 +63,38 @@ private extension NewSigning {
 	func sign(state: State) -> Effect<Action> {
 		switch state.purpose {
 		case let .transaction(input):
-			switch input.factorSourceId.kind {
+			signTransaction(input: input)
+		}
+	}
+
+	func signTransaction(input: PerFactorSourceInputOfTransactionIntent) -> Effect<Action> {
+		.run { send in
+			let producedSignatures: [HdSignatureOfTransactionIntentHash] = switch input.factorSourceId.kind {
 			case .device:
-				signTransactionDevice(input: input)
+				try await deviceFactorSourceClient.signUsingDeviceFactorSource(input: input)
 			case .ledgerHqHardwareWallet:
-				fatalError("Not implemented")
+				try await signTransactionLedger(input: input)
 			default:
 				fatalError("Not implemented")
 			}
+
+			await send(.delegate(.finished(.transaction(producedSignatures))))
+
+		} catch: { error, _ in
+			errorQueue.schedule(error)
 		}
 	}
 
-	func signTransactionDevice(input: PerFactorSourceInputOfTransactionIntent) -> Effect<Action> {
-		.run { [input = input] send in
-			var producedSignatures: [HdSignatureOfTransactionIntentHash] = []
+	func signTransactionLedger(input: PerFactorSourceInputOfTransactionIntent) async throws -> [HdSignatureOfTransactionIntentHash] {
+		var result: [HdSignatureOfTransactionIntentHash] = []
 
-			for transaction in input.perTransaction {
-				let payloadId = transaction.payload.decompile().hash()
-				let hash = payloadId.hash
-				let signatures = try await deviceFactorSourceClient.signUsingDeviceFactorSource(factorSourceId: input.factorSourceId, ownedFactorInstances: transaction.ownedFactorInstances, hashedDataToSign: hash)
-
-				for signature in signatures {
-					producedSignatures.append(.init(input: .init(payloadId: payloadId, ownedFactorInstance: signature.ownedFactorInstance), signature: signature.signatureWithPublicKey))
-				}
-			}
-
-			await send(.delegate(.finished(.transaction(producedSignatures))))
+		for transaction in input.perTransaction {
+			let payloadId = transaction.payload.decompile().hash()
+			let hash = payloadId.hash
+			// TODO:
 		}
-	}
 
-	func signTransactionLedger(input: PerFactorSourceInputOfTransactionIntent) -> Effect<Action> {
-		.run { [input = input] send in
-			var producedSignatures: [HdSignatureOfTransactionIntentHash] = []
-
-			for transaction in input.perTransaction {
-				let payloadId = transaction.payload.decompile().hash()
-				let hash = payloadId.hash
-				// TODO:
-			}
-
-			await send(.delegate(.finished(.transaction(producedSignatures))))
-		}
+		return result
 	}
 }
 

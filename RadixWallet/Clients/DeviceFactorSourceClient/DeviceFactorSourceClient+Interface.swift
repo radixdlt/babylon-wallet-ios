@@ -209,43 +209,46 @@ extension DeviceFactorSourceClient {
 	}
 
 	func signUsingDeviceFactorSource(
-		factorSourceId: FactorSourceIdFromHash,
-		ownedFactorInstances: [OwnedFactorInstance],
-		hashedDataToSign: Hash
-	) async throws -> Set<SignatureOfEntity2> {
-		@Dependency(\.factorSourcesClient) var factorSourcesClient
+		input: PerFactorSourceInputOfTransactionIntent
+	) async throws -> [HdSignatureOfTransactionIntentHash] {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 
+		let factorSourceId = input.factorSourceId
 		guard
 			let loadedMnemonicWithPassphrase = try secureStorageClient.loadMnemonic(factorSourceID: factorSourceId)
 		else {
 			throw FailedToFindDeviceFactorSourceForSigning()
 		}
 
-		var signatures = Set<SignatureOfEntity2>()
+		var signatures = Set<HdSignatureOfTransactionIntentHash>()
 
-		for ownedFactorInstance in ownedFactorInstances {
-			let factorInstance = ownedFactorInstance.factorInstance
-			let derivationPath = factorInstance.derivationPath
+		for transaction in input.perTransaction {
+			let payloadId = transaction.payload.decompile().hash()
+			let hash = payloadId.hash
 
-			if factorInstance.factorSourceID != factorSourceId {
-				let errMsg = "Discrepancy, you specified to use a device factor source you beleived to be the one controlling the entity, but it does not match the genesis factor source id."
-				loggerGlobal.critical(.init(stringLiteral: errMsg))
-				assertionFailure(errMsg)
+			for ownedFactorInstance in transaction.ownedFactorInstances {
+				let factorInstance = ownedFactorInstance.factorInstance
+				let derivationPath = factorInstance.derivationPath
+
+				if factorInstance.factorSourceID != factorSourceId {
+					let errMsg = "Discrepancy, you specified to use a device factor source you beleived to be the one controlling the entity, but it does not match the genesis factor source id."
+					loggerGlobal.critical(.init(stringLiteral: errMsg))
+					assertionFailure(errMsg)
+				}
+				let curve = factorInstance.publicKey.curve
+
+				let signatureWithPublicKey = try await self.signatureFromOnDeviceHD(SignatureFromOnDeviceHDRequest(
+					mnemonicWithPassphrase: loadedMnemonicWithPassphrase,
+					derivationPath: derivationPath,
+					curve: curve,
+					hashedData: hash
+				))
+
+				signatures.insert(.init(input: .init(payloadId: payloadId, ownedFactorInstance: ownedFactorInstance), signature: signatureWithPublicKey))
 			}
-			let curve = factorInstance.publicKey.curve
-
-			let signatureWithPublicKey = try await self.signatureFromOnDeviceHD(SignatureFromOnDeviceHDRequest(
-				mnemonicWithPassphrase: loadedMnemonicWithPassphrase,
-				derivationPath: derivationPath,
-				curve: curve,
-				hashedData: hashedDataToSign
-			))
-
-			signatures.insert(.init(ownedFactorInstance: ownedFactorInstance, signatureWithPublicKey: signatureWithPublicKey))
 		}
 
-		return signatures
+		return Array(signatures)
 	}
 }
 
