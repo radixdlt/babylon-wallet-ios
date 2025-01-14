@@ -252,7 +252,7 @@
 "gateways_addNewGateway_addGatewayButtonTitle" = "Add Gateway";
 "gateways_addNewGateway_errorDuplicateURL" = "This gateway is already added";
 "gateways_addNewGateway_errorNoGatewayFound" = "No gateway found at specified URL";
-"gateways_addNewGateway_establishingConnectionErrorMessage" = "There was an error establishing a connection";
+"gateways_addNewGateway_establishingConnectionErrorMessage" = "Error establishing connection";
 "gateways_removeGatewayAlert_title" = "Remove Gateway";
 "gateways_removeGatewayAlert_message" = "You will no longer be able to connect to this gateway.";
 "authorizedDapps_title" = "Approved dApps";
