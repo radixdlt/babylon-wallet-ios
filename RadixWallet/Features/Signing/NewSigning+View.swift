@@ -7,11 +7,7 @@ extension NewSigning {
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
-				/// We set the `.id` to the `factorSourceId` so that, when multiple factor sources are required, each of them has its own view created.
-				/// Otherwise, only the first of them would have the `.onFirstTask()` triggered, and the logic for the remaining ones
-				/// wouldn't be performed.
 				NewFactorSourceAccess.View(store: store.factorSourceAccess)
-					.id(store.factorSourceId)
 			}
 		}
 	}
@@ -20,14 +16,5 @@ extension NewSigning {
 private extension StoreOf<NewSigning> {
 	var factorSourceAccess: StoreOf<NewFactorSourceAccess> {
 		scope(state: \.factorSourceAccess, action: \.child.factorSourceAccess)
-	}
-}
-
-private extension NewSigning.State {
-	var factorSourceId: FactorSourceIdFromHash {
-		switch purpose {
-		case let .transaction(input):
-			input.factorSourceId
-		}
 	}
 }
