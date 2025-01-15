@@ -37,7 +37,7 @@ extension PrimaryRoleSetup.State {
 		if threshold == shieldBuilder.primaryRoleThresholdFactors.count {
 			return .all
 		} else {
-			return .specific(threshold)
+			return .specific(UInt8(threshold))
 		}
 	}
 }
