@@ -61,6 +61,9 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 		case let .path(.element(id: _, action: .rolesSetup(.delegate(.push(path))))):
 			state.path.append(.rolesSetup(.init(path: path)))
 			return .none
+		case .path(.element(id: _, action: .rolesSetup(.delegate(.finished)))):
+			// TODO: push Name Shield screen
+			return .none
 		default:
 			return .none
 		}
