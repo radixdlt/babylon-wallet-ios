@@ -8,17 +8,21 @@ final class SargonHostInteractor: HostInteractor {
 		var perFactorOutcome: [PerFactorOutcomeOfTransactionIntentHash] = []
 
 		for perFactorSource in request.perFactorSource {
-			// NOTE: Adding this delay among factor sources as a workaround for it to work
+			// NOTE: Adding this delay among factor sources so that it gives time of dismissing previous factor source before presenting new one
 			try? await clock.sleep(for: .seconds(0.5))
 			let action = await overlayWindowClient.signTransaction(input: perFactorSource)
+
 			let outcome: FactorOutcomeOfTransactionIntentHash = switch action {
 			case .newSigning(.cancelled):
 				throw CommonError.SigningRejected
+
 			case .newSigning(.skippedFactorSource):
 				.neglected(.init(reason: .userExplicitlySkipped, factor: perFactorSource.factorSourceId))
+
 			case let .newSigning(.finished(.transaction(signatures))):
 				.signed(producedSignatures: signatures)
-			case .dismiss, .signing:
+
+			default:
 				fatalError("Unexpected action")
 			}
 			perFactorOutcome.append(.init(factorSourceId: perFactorSource.factorSourceId, outcome: outcome))
@@ -28,7 +32,30 @@ final class SargonHostInteractor: HostInteractor {
 	}
 
 	func signSubintents(request: SargonUniFFI.SignRequestOfSubintent) async throws -> SargonUniFFI.SignResponseOfSubintentHash {
-		throw CommonError.SigningRejected
+		var perFactorOutcome: [PerFactorOutcomeOfSubintentHash] = []
+
+		for perFactorSource in request.perFactorSource {
+			// NOTE: Adding this delay among factor sources so that it gives time of dismissing previous factor source before presenting new one
+			try? await clock.sleep(for: .seconds(0.5))
+			let action = await overlayWindowClient.signSubintent(input: perFactorSource)
+
+			let outcome: FactorOutcomeOfSubintentHash = switch action {
+			case .newSigning(.cancelled):
+				throw CommonError.SigningRejected
+
+			case .newSigning(.skippedFactorSource):
+				.neglected(.init(reason: .userExplicitlySkipped, factor: perFactorSource.factorSourceId))
+
+			case let .newSigning(.finished(.subintent(signatures))):
+				.signed(producedSignatures: signatures)
+
+			default:
+				fatalError("Unexpected action")
+			}
+			perFactorOutcome.append(.init(factorSourceId: perFactorSource.factorSourceId, outcome: outcome))
+		}
+
+		return .init(perFactorOutcome: perFactorOutcome)
 	}
 
 	func deriveKeys(request: SargonUniFFI.KeyDerivationRequest) async throws -> SargonUniFFI.KeyDerivationResponse {

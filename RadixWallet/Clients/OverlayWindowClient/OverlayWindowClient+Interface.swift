@@ -123,11 +123,11 @@ extension OverlayWindowClient {
 		}
 	}
 
-	func requestSignatutures(state: Signing.State) async -> SheetAction {
-		await scheduleSheet(.init(root: .signing(state)))
+	func signTransaction(input: PerFactorSourceInputOfTransactionIntent) async -> SheetAction {
+		await scheduleSheet(.init(root: .newSigning(.init(input: input))))
 	}
 
-	func signTransaction(input: PerFactorSourceInputOfTransactionIntent) async -> SheetAction {
+	func signSubintent(input: PerFactorSourceInputOfSubintent) async -> SheetAction {
 		await scheduleSheet(.init(root: .newSigning(.init(input: input))))
 	}
 }

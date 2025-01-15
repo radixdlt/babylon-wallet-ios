@@ -159,11 +159,17 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 				return handleSignedSubinent(state: &state, signedSubintent: .init(subintent: subintent, subintentSignatures: .init(signatures: [])))
 			}
 
-			state.destination = .signing(.init(
-				factorsLeftToSignWith: preview.signingFactors,
-				signingPurposeWithPayload: .signPreAuthorization(subintent)
-			))
-			return .none
+			return .run { send in
+				let signedSubintent = try await SargonOS.shared.signSubintent(transactionIntent: subintent, roleKind: .primary)
+				await send(.delegate(.signedPreAuthorization(signedSubintent)))
+
+			} catch: { error, send in
+				if let error = error as? CommonError, error == .SigningRejected {
+					await send(.internal(.resetToApprovable))
+				} else {
+					errorQueue.schedule(error)
+				}
+			}
 
 		case let .updateSecondsToExpiration(expiration):
 			let secondsToExpiration = Int(expiration.timeIntervalSinceNow)

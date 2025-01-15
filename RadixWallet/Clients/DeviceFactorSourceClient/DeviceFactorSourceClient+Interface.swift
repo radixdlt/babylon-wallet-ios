@@ -208,47 +208,107 @@ extension DeviceFactorSourceClient {
 		return signatures
 	}
 
-	func signUsingDeviceFactorSource(
+	func signTransaction(
 		input: PerFactorSourceInputOfTransactionIntent
 	) async throws -> [HdSignatureOfTransactionIntentHash] {
-		@Dependency(\.secureStorageClient) var secureStorageClient
-
 		let factorSourceId = input.factorSourceId
-		guard
-			let loadedMnemonicWithPassphrase = try secureStorageClient.loadMnemonic(factorSourceID: factorSourceId)
-		else {
-			throw FailedToFindDeviceFactorSourceForSigning()
-		}
+		let mnemonicWithPassphrase = try loadMnemonic(factorSourceId: factorSourceId)
 
 		var signatures = Set<HdSignatureOfTransactionIntentHash>()
 
 		for transaction in input.perTransaction {
 			let payloadId = transaction.payload.decompile().hash()
-			let hash = payloadId.hash
+			let hashedData = payloadId.hash
+			let transactionSignatures = try await sign(
+				factorSourceId: factorSourceId,
+				mnemonicWithPassphrase: mnemonicWithPassphrase,
+				hashedData: hashedData,
+				ownedFactorInstances: transaction.ownedFactorInstances
+			)
 
-			for ownedFactorInstance in transaction.ownedFactorInstances {
-				let factorInstance = ownedFactorInstance.factorInstance
-				let derivationPath = factorInstance.derivationPath
-
-				if factorInstance.factorSourceID != factorSourceId {
-					let errMsg = "Discrepancy, you specified to use a device factor source you beleived to be the one controlling the entity, but it does not match the genesis factor source id."
-					loggerGlobal.critical(.init(stringLiteral: errMsg))
-					assertionFailure(errMsg)
-				}
-				let curve = factorInstance.publicKey.curve
-
-				let signatureWithPublicKey = try await self.signatureFromOnDeviceHD(SignatureFromOnDeviceHDRequest(
-					mnemonicWithPassphrase: loadedMnemonicWithPassphrase,
-					derivationPath: derivationPath,
-					curve: curve,
-					hashedData: hash
-				))
-
-				signatures.insert(.init(input: .init(payloadId: payloadId, ownedFactorInstance: ownedFactorInstance), signature: signatureWithPublicKey))
-			}
+			signatures.formUnion(
+				transactionSignatures.map {
+					.init(
+						input: .init(payloadId: payloadId, ownedFactorInstance: $0.ownedFactorInstance),
+						signature: $0.signatureWithPublicKey
+					)
+				})
 		}
 
 		return Array(signatures)
+	}
+
+	func signSubintent(
+		input: PerFactorSourceInputOfSubintent
+	) async throws -> [HdSignatureOfSubintentHash] {
+		let factorSourceId = input.factorSourceId
+		let mnemonicWithPassphrase = try loadMnemonic(factorSourceId: factorSourceId)
+
+		var signatures = Set<HdSignatureOfSubintentHash>()
+
+		for transaction in input.perTransaction {
+			let payloadId = transaction.payload.decompile().hash()
+			let hashedData = payloadId.hash
+			let transactionSignatures = try await sign(
+				factorSourceId: factorSourceId,
+				mnemonicWithPassphrase: mnemonicWithPassphrase,
+				hashedData: hashedData,
+				ownedFactorInstances: transaction.ownedFactorInstances
+			)
+
+			signatures.formUnion(
+				transactionSignatures.map {
+					.init(
+						input: .init(payloadId: payloadId, ownedFactorInstance: $0.ownedFactorInstance),
+						signature: $0.signatureWithPublicKey
+					)
+				})
+		}
+
+		return Array(signatures)
+	}
+
+	private func loadMnemonic(factorSourceId: FactorSourceIdFromHash) throws -> MnemonicWithPassphrase {
+		@Dependency(\.secureStorageClient) var secureStorageClient
+
+		guard
+			let mnemonicWithPassphrase = try secureStorageClient.loadMnemonic(factorSourceID: factorSourceId)
+		else {
+			throw FailedToFindDeviceFactorSourceForSigning()
+		}
+		return mnemonicWithPassphrase
+	}
+
+	private func sign(
+		factorSourceId: FactorSourceIDFromHash,
+		mnemonicWithPassphrase: MnemonicWithPassphrase,
+		hashedData: Hash,
+		ownedFactorInstances: [OwnedFactorInstance]
+	) async throws -> Set<SignatureOfEntity2> {
+		var signatures = Set<SignatureOfEntity2>()
+
+		for ownedFactorInstance in ownedFactorInstances {
+			let factorInstance = ownedFactorInstance.factorInstance
+			let derivationPath = factorInstance.derivationPath
+
+			if factorInstance.factorSourceID != factorSourceId {
+				let errMsg = "Discrepancy, you specified to use a device factor source you beleived to be the one controlling the entity, but it does not match the genesis factor source id."
+				loggerGlobal.critical(.init(stringLiteral: errMsg))
+				assertionFailure(errMsg)
+			}
+			let curve = factorInstance.publicKey.curve
+
+			let signatureWithPublicKey = try await self.signatureFromOnDeviceHD(SignatureFromOnDeviceHDRequest(
+				mnemonicWithPassphrase: mnemonicWithPassphrase,
+				derivationPath: derivationPath,
+				curve: curve,
+				hashedData: hashedData
+			))
+
+			signatures.insert(.init(ownedFactorInstance: ownedFactorInstance, signatureWithPublicKey: signatureWithPublicKey))
+		}
+
+		return signatures
 	}
 }
 

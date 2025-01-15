@@ -10,6 +10,11 @@ struct NewSigning: Sendable, FeatureReducer {
 			self.purpose = .transaction(input)
 			self.factorSourceAccess = .init(id: input.factorSourceId, purpose: .signature)
 		}
+
+		init(input: PerFactorSourceInputOfSubintent) {
+			self.purpose = .subintent(input)
+			self.factorSourceAccess = .init(id: input.factorSourceId, purpose: .signature)
+		}
 	}
 
 	typealias Action = FeatureAction<Self>
@@ -56,6 +61,8 @@ private extension NewSigning {
 		switch purpose {
 		case let .transaction(input):
 			signTransaction(input: input, factorSource: factorSource)
+		case let .subintent(input):
+			signSubintent(input: input, factorSource: factorSource)
 		}
 	}
 
@@ -64,19 +71,42 @@ private extension NewSigning {
 			let producedSignatures: [HdSignatureOfTransactionIntentHash]
 			switch input.factorSourceId.kind {
 			case .device:
-				producedSignatures = try await deviceFactorSourceClient.signUsingDeviceFactorSource(input: input)
+				producedSignatures = try await deviceFactorSourceClient.signTransaction(input: input)
+
 			case .ledgerHqHardwareWallet:
 				guard let ledger = factorSource.asLedger else {
 					struct WrongFactorSource: Swift.Error {}
 					throw WrongFactorSource()
 				}
 				producedSignatures = try await signTransactionLedger(ledger: ledger, input: input)
+
 			default:
 				fatalError("Not implemented")
 			}
 
 			await send(.delegate(.finished(.transaction(producedSignatures))))
 
+		} catch: { error, send in
+			if let error = error as? P2P.ConnectorExtension.Response.LedgerHardwareWallet.Failure, error.code == .userRejectedSigningOfTransaction {
+				// If user rejected transaction on ledger device, we will inform the delegate to dismiss the signing sheet.
+				await send(.delegate(.cancelled))
+			} else {
+				errorQueue.schedule(error)
+			}
+		}
+	}
+
+	func signSubintent(input: PerFactorSourceInputOfSubintent, factorSource: FactorSource) -> Effect<Action> {
+		.run { send in
+			let producedSignatures: [HdSignatureOfSubintentHash]
+			switch input.factorSourceId.kind {
+			case .device:
+				producedSignatures = try await deviceFactorSourceClient.signSubintent(input: input)
+			default:
+				fatalError("Not implemented")
+			}
+
+			await send(.delegate(.finished(.subintent(producedSignatures))))
 		} catch: { error, send in
 			if let error = error as? P2P.ConnectorExtension.Response.LedgerHardwareWallet.Failure, error.code == .userRejectedSigningOfTransaction {
 				// If user rejected transaction on ledger device, we will inform the delegate to dismiss the signing sheet.
@@ -103,6 +133,7 @@ private extension NewSigning {
 extension NewSigning.State {
 	enum Purpose: Sendable, Hashable {
 		case transaction(PerFactorSourceInputOfTransactionIntent)
+		case subintent(PerFactorSourceInputOfSubintent)
 	}
 }
 
@@ -110,5 +141,6 @@ extension NewSigning.State {
 extension NewSigning {
 	enum Output: Sendable, Hashable {
 		case transaction([HdSignatureOfTransactionIntentHash])
+		case subintent([HdSignatureOfSubintentHash])
 	}
 }
