@@ -16,10 +16,6 @@ struct RolesSetupCoordinator: Sendable, FeatureReducer {
 
 	typealias Action = FeatureAction<Self>
 
-	enum ViewAction: Sendable, Equatable {
-		case completionButtonTapped
-	}
-
 	@CasePathable
 	enum ChildAction: Sendable, Equatable {
 		case path(Path.Action)
@@ -60,13 +56,6 @@ struct RolesSetupCoordinator: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
-		switch viewAction {
-		case .completionButtonTapped:
-			.send(.delegate(.finished))
-		}
-	}
-
 	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .path(.primaryRoleSetup(.delegate(.chooseFactorSource(context)))),
@@ -75,6 +64,8 @@ struct RolesSetupCoordinator: Sendable, FeatureReducer {
 			return .none
 		case .path(.primaryRoleSetup(.delegate(.finished))):
 			return .send(.delegate(.push(.recoveryRoleSetup(.init()))))
+		case .path(.recoveryRoleSetup(.delegate(.finished))):
+			return .send(.delegate(.finished))
 		default:
 			return .none
 		}
