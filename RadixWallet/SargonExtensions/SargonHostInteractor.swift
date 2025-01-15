@@ -9,7 +9,7 @@ final class SargonHostInteractor: HostInteractor {
 
 		for perFactorSource in request.perFactorSource {
 			// NOTE: Adding this delay among factor sources so that it gives time of dismissing previous factor source before presenting new one
-			try? await clock.sleep(for: .seconds(0.5))
+			try? await clock.sleep(for: .seconds(0.9))
 			let action = await overlayWindowClient.signTransaction(input: perFactorSource)
 
 			let outcome: FactorOutcomeOfTransactionIntentHash = switch action {
@@ -36,7 +36,7 @@ final class SargonHostInteractor: HostInteractor {
 
 		for perFactorSource in request.perFactorSource {
 			// NOTE: Adding this delay among factor sources so that it gives time of dismissing previous factor source before presenting new one
-			try? await clock.sleep(for: .seconds(0.5))
+			try? await clock.sleep(for: .seconds(0.9))
 			let action = await overlayWindowClient.signSubintent(input: perFactorSource)
 
 			let outcome: FactorOutcomeOfSubintentHash = switch action {
