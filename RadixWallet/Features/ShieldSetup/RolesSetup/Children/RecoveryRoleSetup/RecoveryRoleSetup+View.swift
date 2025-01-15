@@ -3,6 +3,7 @@ extension RecoveryRoleSetup.State {
 		shieldBuilder.validate()
 	}
 
+	// TODO: Move to Sargon & adapt to weak shields
 	var statusMessageInfo: ShieldStatusMessageInfo? {
 		switch validatedRoleStatus {
 		case .none:
@@ -14,7 +15,7 @@ extension RecoveryRoleSetup.State {
 		}
 	}
 
-	// TODO: Move to Sargon
+	// TODO: Move to Sargon & adapt to weak shields
 	var canContinue: Bool {
 		validatedRoleStatus == nil
 	}
