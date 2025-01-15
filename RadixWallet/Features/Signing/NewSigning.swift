@@ -58,93 +58,61 @@ struct NewSigning: Sendable, FeatureReducer {
 
 private extension NewSigning {
 	func sign(purpose: State.Purpose, factorSource: FactorSource) -> Effect<Action> {
+		.run { send in
+			switch factorSource.kind {
+			case .device:
+				let output = try await signDevice(purpose: purpose)
+				await send(.delegate(.finished(output)))
+
+			case .ledgerHqHardwareWallet:
+				guard let ledger = factorSource.asLedger else {
+					throw WrongFactorSource()
+				}
+				do {
+					let output = try await signLedger(purpose: purpose, ledger: ledger)
+					await send(.delegate(.finished(output)))
+				} catch {
+					if error.isUserRejectedSigningOnLedgerDevice {
+						// If user rejected signature on ledger device, we will inform the delegate to dismiss the signing sheet.
+						await send(.delegate(.cancelled))
+					} else {
+						throw error
+					}
+				}
+
+			default:
+				fatalError("Not implemented")
+			}
+		} catch: { error, _ in
+			errorQueue.schedule(error)
+		}
+	}
+
+	func signDevice(purpose: State.Purpose) async throws -> Output {
 		switch purpose {
 		case let .transaction(input):
-			signTransaction(input: input, factorSource: factorSource)
+			try await .transaction(deviceFactorSourceClient.signTransaction(input: input))
 		case let .subintent(input):
-			signSubintent(input: input, factorSource: factorSource)
+			try await .subintent(deviceFactorSourceClient.signSubintent(input: input))
 		}
 	}
 
-	func signTransaction(input: PerFactorSourceInputOfTransactionIntent, factorSource: FactorSource) -> Effect<Action> {
-		.run { send in
-			let producedSignatures: [HdSignatureOfTransactionIntentHash]
-			switch input.factorSourceId.kind {
-			case .device:
-				producedSignatures = try await deviceFactorSourceClient.signTransaction(input: input)
+	func signLedger(purpose: State.Purpose, ledger: LedgerHardwareWalletFactorSource) async throws -> Output {
+		switch purpose {
+		case let .transaction(input):
+			let result = try await input.perTransaction.asyncMap { transaction in
+				try await ledgerHardwareWalletClient.newSignTransaction(.init(ledger: ledger, input: transaction))
+			}.flatMap { $0 }
 
-			case .ledgerHqHardwareWallet:
-				guard let ledger = factorSource.asLedger else {
-					struct WrongFactorSource: Swift.Error {}
-					throw WrongFactorSource()
-				}
-				producedSignatures = try await signTransactionLedger(ledger: ledger, input: input)
+			return .transaction(result)
 
-			default:
-				fatalError("Not implemented")
-			}
+		case let .subintent(input):
+			let result = try await input.perTransaction.asyncCompactMap { transaction in
+				try await ledgerHardwareWalletClient.signSubintent(.init(ledger: ledger, input: transaction))
+			}.flatMap { $0 }
 
-			await send(.delegate(.finished(.transaction(producedSignatures))))
-
-		} catch: { error, send in
-			if let error = error as? P2P.ConnectorExtension.Response.LedgerHardwareWallet.Failure, error.code == .userRejectedSigningOfTransaction {
-				// If user rejected transaction on ledger device, we will inform the delegate to dismiss the signing sheet.
-				await send(.delegate(.cancelled))
-			} else {
-				errorQueue.schedule(error)
-			}
+			return .subintent(result)
 		}
-	}
-
-	func signSubintent(input: PerFactorSourceInputOfSubintent, factorSource: FactorSource) -> Effect<Action> {
-		.run { send in
-			let producedSignatures: [HdSignatureOfSubintentHash]
-			switch input.factorSourceId.kind {
-			case .device:
-				producedSignatures = try await deviceFactorSourceClient.signSubintent(input: input)
-
-			case .ledgerHqHardwareWallet:
-				guard let ledger = factorSource.asLedger else {
-					struct WrongFactorSource: Swift.Error {}
-					throw WrongFactorSource()
-				}
-				producedSignatures = try await signSubintentLedger(ledger: ledger, input: input)
-
-			default:
-				fatalError("Not implemented")
-			}
-
-			await send(.delegate(.finished(.subintent(producedSignatures))))
-		} catch: { error, send in
-			if let error = error as? P2P.ConnectorExtension.Response.LedgerHardwareWallet.Failure, error.code == .userRejectedSigningOfTransaction {
-				// If user rejected transaction on ledger device, we will inform the delegate to dismiss the signing sheet.
-				await send(.delegate(.cancelled))
-			} else {
-				errorQueue.schedule(error)
-			}
-		}
-	}
-
-	func signTransactionLedger(ledger: LedgerHardwareWalletFactorSource, input: PerFactorSourceInputOfTransactionIntent) async throws -> [HdSignatureOfTransactionIntentHash] {
-		var result: [HdSignatureOfTransactionIntentHash] = []
-
-		for transaction in input.perTransaction {
-			let signatures = try await ledgerHardwareWalletClient.newSignTransaction(.init(ledger: ledger, input: transaction))
-			result.append(contentsOf: signatures)
-		}
-
-		return result
-	}
-
-	func signSubintentLedger(ledger: LedgerHardwareWalletFactorSource, input: PerFactorSourceInputOfSubintent) async throws -> [HdSignatureOfSubintentHash] {
-		var result: [HdSignatureOfSubintentHash] = []
-
-		for transaction in input.perTransaction {
-			let signatures = try await ledgerHardwareWalletClient.signSubintent(.init(ledger: ledger, input: transaction))
-			result.append(contentsOf: signatures)
-		}
-
-		return result
 	}
 }
 
@@ -163,3 +131,15 @@ extension NewSigning {
 		case subintent([HdSignatureOfSubintentHash])
 	}
 }
+
+private extension Error {
+	var isUserRejectedSigningOnLedgerDevice: Bool {
+		guard let error = self as? P2P.ConnectorExtension.Response.LedgerHardwareWallet.Failure else {
+			return false
+		}
+		return error.code == .userRejectedSigningOfTransaction
+	}
+}
+
+// MARK: - WrongFactorSource
+struct WrongFactorSource: Swift.Error {}
