@@ -102,6 +102,14 @@ private extension NewSigning {
 			switch input.factorSourceId.kind {
 			case .device:
 				producedSignatures = try await deviceFactorSourceClient.signSubintent(input: input)
+
+			case .ledgerHqHardwareWallet:
+				guard let ledger = factorSource.asLedger else {
+					struct WrongFactorSource: Swift.Error {}
+					throw WrongFactorSource()
+				}
+				producedSignatures = try await signSubintentLedger(ledger: ledger, input: input)
+
 			default:
 				fatalError("Not implemented")
 			}
@@ -122,6 +130,17 @@ private extension NewSigning {
 
 		for transaction in input.perTransaction {
 			let signatures = try await ledgerHardwareWalletClient.newSignTransaction(.init(ledger: ledger, input: transaction))
+			result.append(contentsOf: signatures)
+		}
+
+		return result
+	}
+
+	func signSubintentLedger(ledger: LedgerHardwareWalletFactorSource, input: PerFactorSourceInputOfSubintent) async throws -> [HdSignatureOfSubintentHash] {
+		var result: [HdSignatureOfSubintentHash] = []
+
+		for transaction in input.perTransaction {
+			let signatures = try await ledgerHardwareWalletClient.signSubintent(.init(ledger: ledger, input: transaction))
 			result.append(contentsOf: signatures)
 		}
 
