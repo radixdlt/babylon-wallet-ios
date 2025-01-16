@@ -5,6 +5,7 @@ struct ProofOfOwnership: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		let kind: Kind
 		let dappMetadata: DappMetadata
+		let challenge: DappToWalletInteractionAuthChallengeNonce
 		var sign: SignProofOfOwnership.State
 
 		var persona: Persona?
@@ -18,6 +19,7 @@ struct ProofOfOwnership: Sendable, FeatureReducer {
 			self.kind = .persona(identityAddress)
 			self.dappMetadata = dappMetadata
 			self.sign = .init(dappMetadata: dappMetadata, challenge: challenge)
+			self.challenge = challenge
 		}
 
 		init(
@@ -28,6 +30,7 @@ struct ProofOfOwnership: Sendable, FeatureReducer {
 			self.kind = .accounts(accountAddresses)
 			self.dappMetadata = dappMetadata
 			self.sign = .init(dappMetadata: dappMetadata, challenge: challenge)
+			self.challenge = challenge
 		}
 	}
 
@@ -44,8 +47,8 @@ struct ProofOfOwnership: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case provenPersonaOwnership(Persona, SignedAuthChallenge)
-		case provenAccountsOwnership([AccountAuthProof], SignedAuthChallenge)
+		case provenPersonaOwnership(IdentityAddress, SignedAuthIntent)
+		case provenAccountsOwnership([AccountAddress], SignedAuthIntent)
 		case failedToGetEntities
 		case failedToSign
 	}
@@ -76,7 +79,7 @@ struct ProofOfOwnership: Sendable, FeatureReducer {
 				loadAccountsEffect(accountAddresses: accountAddresses)
 			}
 		case .continueButtonTapped:
-			gatherSignaturePayloadsEffect(state: state)
+			triggerSignaturesEffect(state: state)
 		}
 	}
 
@@ -87,45 +90,6 @@ struct ProofOfOwnership: Sendable, FeatureReducer {
 			return .none
 		case let .setAccounts(accounts):
 			state.accounts = accounts
-			return .none
-		}
-	}
-
-	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .sign(.delegate(action)):
-			switch action {
-			case let .signedChallenge(signedAuthChallenge):
-				switch state.kind {
-				case .persona:
-					guard let persona = state.persona else {
-						return .none
-					}
-
-					return .send(.delegate(.provenPersonaOwnership(persona, signedAuthChallenge)))
-
-				case .accounts:
-					let accountAuthProofs: [AccountAuthProof] = signedAuthChallenge.entitySignatures.compactMap { signature in
-						guard let account = try? signature.signerEntity.asAccount() else {
-							return nil
-						}
-						let proof = WalletToDappInteractionAuthProof(entitySignature: signature)
-						return .init(account: account, proof: proof)
-					}
-
-					guard Set(state.accounts.map(\.id)) == Set(accountAuthProofs.map(\.account.id)) else {
-						loggerGlobal.error("Failed to sign with all accounts")
-						return .send(.delegate(.failedToSign))
-					}
-
-					return .send(.delegate(.provenAccountsOwnership(accountAuthProofs, signedAuthChallenge)))
-				}
-
-			case .failedToSign:
-				return .send(.delegate(.failedToSign))
-			}
-
-		default:
 			return .none
 		}
 	}
@@ -160,11 +124,28 @@ private extension ProofOfOwnership {
 		}
 	}
 
-	func gatherSignaturePayloadsEffect(state: State) -> Effect<Action> {
-		guard let signers = NonEmpty<Set<AccountOrPersona>>(rawValue: Set(state.signers)) else {
-			return .send(.delegate(.failedToGetEntities))
+	func triggerSignaturesEffect(state: State) -> Effect<Action> {
+		guard let metadata = state.dappMetadata.requestMetadata else {
+			assertionFailure("Unable to sign Proof of Ownership without the request metadata")
+			return .none
 		}
-		return .send(.child(.sign(.internal(.handle(signers: signers)))))
+		switch state.kind {
+		case let .persona(identityAddress):
+			return .run { [challenge = state.challenge] send in
+				let signedAuthIntent = try await SargonOS.shared.signAuthPersona(identityAddress: identityAddress, challengeNonce: challenge, metadata: metadata)
+				await send(.delegate(.provenPersonaOwnership(identityAddress, signedAuthIntent)))
+			} catch: { _, send in
+				await send(.delegate(.failedToSign))
+			}
+
+		case let .accounts(accountAddresses):
+			return .run { [challenge = state.challenge] send in
+				let signedAuthIntent = try await SargonOS.shared.signAuthAccounts(accountAddresses: accountAddresses, challengeNonce: challenge, metadata: metadata)
+				await send(.delegate(.provenAccountsOwnership(accountAddresses, signedAuthIntent)))
+			} catch: { _, send in
+				await send(.delegate(.failedToSign))
+			}
+		}
 	}
 }
 
@@ -185,10 +166,4 @@ extension ProofOfOwnership.State {
 			return accounts.map { .account($0) }
 		}
 	}
-}
-
-// MARK: - AccountAuthProof
-struct AccountAuthProof: Sendable, Hashable {
-	let account: Account
-	let proof: WalletToDappInteractionAuthProof
 }

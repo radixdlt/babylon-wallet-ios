@@ -449,21 +449,21 @@ extension DappInteractionFlow {
 
 		func handlePersonaProofOfOwnership(
 			_ item: State.AnyInteractionItem,
-			_ persona: Persona,
-			_ signedAuthChallenge: SignedAuthChallenge
+			_ identityAddress: IdentityAddress,
+			_ signedAuthIntent: SignedAuthIntent
 		) -> Effect<Action> {
 			guard
 				// A **single** signature expected, since we prove ownership of a single Persona.
-				let entitySignature = signedAuthChallenge.entitySignatures.first,
-				signedAuthChallenge.entitySignatures.count == 1
+				let intentSignatureOfOwner = signedAuthIntent.intentSignaturesPerOwner.first,
+				signedAuthIntent.intentSignaturesPerOwner.count == 1
 			else {
 				return dismissEffect(for: state, errorKind: .failedToSignAuthChallenge, message: "Failed to serialize signature")
 			}
-			let authProof = WalletToDappInteractionAuthProof(entitySignature: entitySignature)
-			let proof = WalletToDappInteractionProofOfOwnership.persona(.init(identityAddress: persona.address, proof: authProof))
+			let authProof = WalletToDappInteractionAuthProof(intentSignatureOfOwner: intentSignatureOfOwner)
+			let proof = WalletToDappInteractionProofOfOwnership.persona(.init(identityAddress: identityAddress, proof: authProof))
 
 			state.responseItems[item] = .remote(.proofOfOwnership(.init(
-				challenge: signedAuthChallenge.challenge,
+				challenge: signedAuthIntent.intent.challengeNonce,
 				proofs: [proof]
 			)))
 
@@ -472,17 +472,27 @@ extension DappInteractionFlow {
 
 		func handleAccountsProofOfOwnership(
 			_ item: State.AnyInteractionItem,
-			_ accountAuthProofs: [AccountAuthProof],
-			_ signedAuthChallenge: SignedAuthChallenge
+			_ accountAddresses: [AccountAddress],
+			_ signedAuthIntent: SignedAuthIntent
 		) -> Effect<Action> {
-			let proofs = accountAuthProofs.map {
-				WalletToDappInteractionProofOfOwnership.account(.init(
-					accountAddress: $0.account.address,
-					proof: $0.proof
-				))
+			// Build account proofs
+			let accountProofs: [WalletToDappInteractionAccountProof] = signedAuthIntent.intentSignaturesPerOwner.compactMap { item in
+				guard let accountAddress = item.owner.accountAddress else {
+					return nil
+				}
+				return .init(
+					accountAddress: accountAddress,
+					proof: .init(intentSignatureOfOwner: item)
+				)
 			}
 
-			let challenge = signedAuthChallenge.challenge
+			// Verify there is a signature for each address
+			guard Set(accountAddresses) == Set(accountProofs.map(\.accountAddress)) else {
+				return dismissEffect(for: state, errorKind: .failedToSignAuthChallenge, message: nil)
+			}
+
+			let proofs = accountProofs.map { WalletToDappInteractionProofOfOwnership.account($0) }
+			let challenge = signedAuthIntent.intent.challengeNonce
 
 			// A predicate that checks if a given response item matches the challenge.
 			func isMatchingChallenge(_ item: State.AnyInteractionResponseItem) -> Bool {
@@ -573,11 +583,11 @@ extension DappInteractionFlow {
 		case let .reviewTransaction(.delegate(.failed(error))):
 			return handleSignAndSubmitTXFailed(error)
 
-		case let .personaProofOfOwnership(.delegate(.provenPersonaOwnership(persona, challenge))):
-			return handlePersonaProofOfOwnership(item, persona, challenge)
+		case let .personaProofOfOwnership(.delegate(.provenPersonaOwnership(persona, signedAuthIntent))):
+			return handlePersonaProofOfOwnership(item, persona, signedAuthIntent)
 
-		case let .accountsProofOfOwnership(.delegate(.provenAccountsOwnership(accountAuthProofs, challenge))):
-			return handleAccountsProofOfOwnership(item, accountAuthProofs, challenge)
+		case let .accountsProofOfOwnership(.delegate(.provenAccountsOwnership(accountAddresses, signedAuthIntent))):
+			return handleAccountsProofOfOwnership(item, accountAddresses, signedAuthIntent)
 
 		case .personaProofOfOwnership(.delegate(.failedToGetEntities)),
 		     .accountsProofOfOwnership(.delegate(.failedToGetEntities)):
