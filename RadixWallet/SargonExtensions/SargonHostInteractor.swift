@@ -79,6 +79,7 @@ final class SargonHostInteractor: HostInteractor {
 			default:
 				fatalError("Unexpected action")
 			}
+			perFactorOutcome.append(.init(factorSourceId: perFactorSource.factorSourceId, outcome: outcome))
 		}
 
 		return .init(perFactorOutcome: perFactorOutcome)

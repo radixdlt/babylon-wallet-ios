@@ -74,6 +74,23 @@ extension WalletToDappInteractionAuthProof {
 			signature: signature
 		)
 	}
+
+	init(intentSignatureOfOwner: IntentSignatureOfOwner) {
+		switch intentSignatureOfOwner.intentSignature.signatureWithPublicKey {
+		case let .secp256k1(publicKey, signature):
+			self.init(
+				publicKey: .secp256k1(publicKey),
+				curve: .secp256k1,
+				signature: .secp256k1(value: signature)
+			)
+		case let .ed25519(publicKey, signature):
+			self.init(
+				publicKey: .ed25519(publicKey),
+				curve: .curve25519,
+				signature: .ed25519(value: signature)
+			)
+		}
+	}
 }
 
 extension DappWalletInteractionPersona {

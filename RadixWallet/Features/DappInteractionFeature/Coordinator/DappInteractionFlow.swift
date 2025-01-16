@@ -341,7 +341,7 @@ extension DappInteractionFlow {
 			_ persona: Persona,
 			_ authorizedDapp: AuthorizedDapp?,
 			_ authorizedPersona: AuthorizedPersonaSimple?,
-			_ signedAuthChallenge: SignedAuthChallenge?
+			_ signedAuthIntent: SignedAuthIntent?
 		) -> Effect<Action> {
 			state.persona = persona
 			state.authorizedDapp = authorizedDapp
@@ -352,19 +352,19 @@ extension DappInteractionFlow {
 				label: persona.displayName.value
 			)
 
-			if let signedAuthChallenge {
+			if let signedAuthIntent {
 				guard
 					// A **single** signature expected, since we sign auth with a single Persona.
-					let entitySignature = signedAuthChallenge.entitySignatures.first,
-					signedAuthChallenge.entitySignatures.count == 1
+					let intentSignatureOfOwner = signedAuthIntent.intentSignaturesPerOwner.first,
+					signedAuthIntent.intentSignaturesPerOwner.count == 1
 				else {
 					return dismissEffect(for: state, errorKind: .failedToSignAuthChallenge, message: "Failed to serialize signature")
 				}
-				let proof = WalletToDappInteractionAuthProof(entitySignature: entitySignature)
+				let proof = WalletToDappInteractionAuthProof(intentSignatureOfOwner: intentSignatureOfOwner)
 
 				state.responseItems[item] = .remote(.auth(.loginWithChallenge(.init(
 					persona: responsePersona,
-					challenge: signedAuthChallenge.challenge,
+					challenge: signedAuthIntent.intent.challengeNonce,
 					proof: proof
 				))))
 
@@ -538,8 +538,8 @@ extension DappInteractionFlow {
 				message: nil
 			)
 
-		case let .login(.delegate(.continueButtonTapped(persona, authorizedDapp, authorizedPersona, signedAuthChallenge))):
-			return handleLogin(item, persona, authorizedDapp, authorizedPersona, signedAuthChallenge)
+		case let .login(.delegate(.continueButtonTapped(persona, authorizedDapp, authorizedPersona, signedAuthIntent))):
+			return handleLogin(item, persona, authorizedDapp, authorizedPersona, signedAuthIntent)
 
 		case .accountPermission(.delegate(.continueButtonTapped)):
 			return handleAccountPermission(item)

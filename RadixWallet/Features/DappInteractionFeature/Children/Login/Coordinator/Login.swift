@@ -49,6 +49,7 @@ struct Login: Sendable, FeatureReducer {
 		case personaPrimacyDetermined(PersonaPrimacy)
 	}
 
+	@CasePathable
 	enum ChildAction: Sendable, Equatable {
 		case createPersonaCoordinator(PresentationAction<CreatePersonaCoordinator.Action>)
 	}
@@ -58,7 +59,7 @@ struct Login: Sendable, FeatureReducer {
 			Persona,
 			AuthorizedDapp?,
 			AuthorizedPersonaSimple?,
-			SignedAuthChallenge?
+			SignedAuthIntent?
 		)
 		case failedToSignAuthChallenge
 	}
@@ -71,7 +72,7 @@ struct Login: Sendable, FeatureReducer {
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$createPersonaCoordinator, action: /Action.child .. ChildAction.createPersonaCoordinator) {
+			.ifLet(\.$createPersonaCoordinator, action: \.child.createPersonaCoordinator) {
 				CreatePersonaCoordinator()
 			}
 	}
@@ -104,24 +105,11 @@ struct Login: Sendable, FeatureReducer {
 
 			let challenge = loginWithChallenge.challenge
 
-			let createAuthPayloadRequest = AuthenticationDataToSignForChallengeRequest(
-				challenge: challenge,
-				origin: state.dappMetadata.origin,
-				dAppDefinitionAddress: state.dappMetadata.dAppDefinitionAddress
-			)
-
 			return .run { [authorizedDapp = state.authorizedDapp] send in
-				let result = try await SargonOS.shared.signAuthPersona(identityAddress: persona.address, challengeNonce: challenge, metadata: metadata)
-
-				let authToSignResponse = try rolaClient.authenticationDataToSignForChallenge(createAuthPayloadRequest)
-
-				let signature = try await deviceFactorSourceClient.signUsingDeviceFactorSource(
-					signerEntity: .persona(persona),
-					hashedDataToSign: authToSignResponse.payloadToHashAndSign.hash(),
-					purpose: .signAuth
-				)
-				let signedAuthChallenge = SignedAuthChallenge(challenge: challenge, entitySignatures: Set([signature]))
-				await send(.delegate(.continueButtonTapped(persona, authorizedDapp, authorizedPersona, signedAuthChallenge)))
+				let signedAuthIntent = try await SargonOS.shared.signAuthPersona(identityAddress: persona.address, challengeNonce: challenge, metadata: metadata)
+				await send(.delegate(.continueButtonTapped(persona, authorizedDapp, authorizedPersona, signedAuthIntent)))
+			} catch: { error, _ in
+				errorQueue.schedule(error)
 			}
 		}
 	}
