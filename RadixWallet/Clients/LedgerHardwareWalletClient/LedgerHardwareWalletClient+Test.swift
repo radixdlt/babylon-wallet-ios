@@ -19,6 +19,7 @@ extension LedgerHardwareWalletClient: TestDependencyKey {
 		signPreAuthorization: unimplemented("\(Self.self).signPreAuthorization"),
 		signSubintent: unimplemented("\(Self.self).signSubintent"),
 		signAuthChallenge: unimplemented("\(Self.self).signAuthChallenge"),
+		signAuth: unimplemented("\(Self.self).signAuth"),
 		deriveAndDisplayAddress: unimplemented("\(Self.self).deriveAndDisplayAddress")
 	)
 
@@ -38,6 +39,7 @@ extension LedgerHardwareWalletClient: TestDependencyKey {
 		signPreAuthorization: { _ in [] },
 		signSubintent: { _ in [] },
 		signAuthChallenge: { _ in [] },
+		signAuth: { _ in [] },
 		deriveAndDisplayAddress: { _, _ in throw NoopError() }
 	)
 }

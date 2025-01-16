@@ -140,7 +140,10 @@ extension LedgerHardwareWalletClient: DependencyKey {
 			let payloadId = compiledIntent.decompile().hash()
 			let expectedHashedMessage = payloadId.hash.data
 
-			let result = try await sign(expectedHashedMessage: expectedHashedMessage, ownedFactorInstances: request.input.ownedFactorInstances) {
+			let result = try await sign(
+				expectedHashedMessage: expectedHashedMessage,
+				ownedFactorInstances: request.input.ownedFactorInstances
+			) {
 				try await makeRequest(
 					.signTransaction(.init(
 						signers: request.input.ownedFactorInstances.map(\.keyParams),
@@ -162,7 +165,10 @@ extension LedgerHardwareWalletClient: DependencyKey {
 			let payloadId = compiledSubintent.decompile().hash()
 			let expectedHashedMessage = payloadId.hash.data
 
-			let result = try await sign(expectedHashedMessage: expectedHashedMessage, ownedFactorInstances: request.input.ownedFactorInstances) {
+			let result = try await sign(
+				expectedHashedMessage: expectedHashedMessage,
+				ownedFactorInstances: request.input.ownedFactorInstances
+			) {
 				try await makeRequest(
 					.signSubintentHash(.init(
 						signers: request.input.ownedFactorInstances.map(\.keyParams),
@@ -170,6 +176,32 @@ extension LedgerHardwareWalletClient: DependencyKey {
 						subintentHash: .init(data: expectedHashedMessage)
 					)),
 					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.signSubintentHash
+				)
+			}
+
+			return result.map { item in
+				.init(input: .init(payloadId: payloadId, ownedFactorInstance: item.ownedFactorInstance), signature: item.signatureWithPublicKey)
+			}
+		}
+
+		let signAuth: SignAuth = { request in
+			let payload = request.input.payload
+			let payloadId = payload.hash()
+			let expectedHashedMessage = payloadId.payload.data
+
+			let result = try await sign(
+				expectedHashedMessage: expectedHashedMessage,
+				ownedFactorInstances: request.input.ownedFactorInstances
+			) {
+				try await makeRequest(
+					.signChallenge(.init(
+						signers: request.input.ownedFactorInstances.map(\.keyParams),
+						ledgerDevice: request.ledger.device(),
+						challenge: payload.challengeNonce,
+						origin: payload.origin,
+						dAppDefinitionAddress: payload.dappDefinitionAddress
+					)),
+					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.signChallenge
 				)
 			}
 
@@ -265,6 +297,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					)
 				}
 			},
+			signAuth: signAuth,
 			deriveAndDisplayAddress: { keyParams, factorSource in
 				let response = try await makeRequest(
 					.deriveAndDisplayAddress(.init(

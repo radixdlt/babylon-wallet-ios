@@ -10,6 +10,7 @@ struct LedgerHardwareWalletClient: Sendable {
 	var signPreAuthorization: SignPreAuthorization
 	var signSubintent: SignSubintent
 	var signAuthChallenge: SignAuthChallenge
+	var signAuth: SignAuth
 	var deriveAndDisplayAddress: DeriveAndDisplayAddress
 }
 
@@ -25,6 +26,7 @@ extension LedgerHardwareWalletClient {
 	typealias SignPreAuthorization = @Sendable (SignPreAuthorizationWithLedgerRequest) async throws -> Set<SignatureOfEntity>
 	typealias SignSubintent = @Sendable (SignSubintentRequest) async throws -> Set<HdSignatureOfSubintentHash>
 	typealias SignAuthChallenge = @Sendable (SignAuthChallengeWithLedgerRequest) async throws -> Set<SignatureOfEntity>
+	typealias SignAuth = @Sendable (SignAuthRequest) async throws -> Set<HdSignatureOfAuthIntentHash>
 }
 
 // MARK: LedgerHardwareWalletClient.NewSignTransactionRequest
@@ -37,6 +39,11 @@ extension LedgerHardwareWalletClient {
 	struct SignSubintentRequest: Sendable, Hashable {
 		let ledger: LedgerHardwareWalletFactorSource
 		let input: TransactionSignRequestInputOfSubintent
+	}
+
+	struct SignAuthRequest: Sendable, Hashable {
+		let ledger: LedgerHardwareWalletFactorSource
+		let input: TransactionSignRequestInputOfAuthIntent
 	}
 }
 

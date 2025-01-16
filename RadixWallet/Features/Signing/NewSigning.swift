@@ -123,7 +123,11 @@ private extension NewSigning {
 			return .subintent(result)
 
 		case let .auth(input):
-			return .auth([])
+			let result = try await input.perTransaction.asyncCompactMap { transaction in
+				try await ledgerHardwareWalletClient.signAuth(.init(ledger: ledger, input: transaction))
+			}.flatMap { $0 }
+
+			return .auth(result)
 		}
 	}
 }
