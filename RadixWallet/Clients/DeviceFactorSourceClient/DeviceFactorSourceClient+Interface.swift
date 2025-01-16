@@ -268,6 +268,38 @@ extension DeviceFactorSourceClient {
 		return Array(signatures)
 	}
 
+	func signAuth(
+		input: PerFactorSourceInputOfAuthIntent
+	) async throws -> [HdSignatureOfAuthIntentHash] {
+		let factorSourceId = input.factorSourceId
+		let mnemonicWithPassphrase = try loadMnemonic(factorSourceId: factorSourceId)
+
+		var signatures = Set<HdSignatureOfAuthIntentHash>()
+
+		for transaction in input.perTransaction {
+			let data = ROLAClient.payloadToHash(payload: transaction.payload)
+			let hashedData = data.hash()
+			let payloadId = AuthIntentHash(payload: data)
+
+			let transactionSignatures = try await sign(
+				factorSourceId: factorSourceId,
+				mnemonicWithPassphrase: mnemonicWithPassphrase,
+				hashedData: hashedData,
+				ownedFactorInstances: transaction.ownedFactorInstances
+			)
+
+			signatures.formUnion(
+				transactionSignatures.map {
+					.init(
+						input: .init(payloadId: payloadId, ownedFactorInstance: $0.ownedFactorInstance),
+						signature: $0.signatureWithPublicKey
+					)
+				})
+		}
+
+		return Array(signatures)
+	}
+
 	private func loadMnemonic(factorSourceId: FactorSourceIdFromHash) throws -> MnemonicWithPassphrase {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 

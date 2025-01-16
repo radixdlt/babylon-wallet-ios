@@ -15,6 +15,11 @@ struct NewSigning: Sendable, FeatureReducer {
 			self.purpose = .subintent(input)
 			self.factorSourceAccess = .init(id: input.factorSourceId, purpose: .signature)
 		}
+
+		init(input: PerFactorSourceInputOfAuthIntent) {
+			self.purpose = .auth(input)
+			self.factorSourceAccess = .init(id: input.factorSourceId, purpose: .proveOwnership)
+		}
 	}
 
 	typealias Action = FeatureAction<Self>
@@ -92,8 +97,12 @@ private extension NewSigning {
 		switch purpose {
 		case let .transaction(input):
 			try await .transaction(deviceFactorSourceClient.signTransaction(input: input))
+
 		case let .subintent(input):
 			try await .subintent(deviceFactorSourceClient.signSubintent(input: input))
+
+		case let .auth(input):
+			try await .auth(deviceFactorSourceClient.signAuth(input: input))
 		}
 	}
 
@@ -112,6 +121,9 @@ private extension NewSigning {
 			}.flatMap { $0 }
 
 			return .subintent(result)
+
+		case let .auth(input):
+			return .auth([])
 		}
 	}
 }
@@ -121,6 +133,7 @@ extension NewSigning.State {
 	enum Purpose: Sendable, Hashable {
 		case transaction(PerFactorSourceInputOfTransactionIntent)
 		case subintent(PerFactorSourceInputOfSubintent)
+		case auth(PerFactorSourceInputOfAuthIntent)
 	}
 }
 
@@ -129,6 +142,7 @@ extension NewSigning {
 	enum Output: Sendable, Hashable {
 		case transaction([HdSignatureOfTransactionIntentHash])
 		case subintent([HdSignatureOfSubintentHash])
+		case auth([HdSignatureOfAuthIntentHash])
 	}
 }
 

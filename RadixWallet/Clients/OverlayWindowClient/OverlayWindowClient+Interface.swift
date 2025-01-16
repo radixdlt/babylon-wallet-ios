@@ -130,4 +130,8 @@ extension OverlayWindowClient {
 	func signSubintent(input: PerFactorSourceInputOfSubintent) async -> SheetAction {
 		await scheduleSheet(.init(root: .newSigning(.init(input: input))))
 	}
+
+	func signAuth(input: PerFactorSourceInputOfAuthIntent) async -> SheetAction {
+		await scheduleSheet(.init(root: .newSigning(.init(input: input))))
+	}
 }

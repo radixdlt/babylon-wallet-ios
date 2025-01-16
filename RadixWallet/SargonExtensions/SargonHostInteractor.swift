@@ -58,11 +58,33 @@ final class SargonHostInteractor: HostInteractor {
 		return .init(perFactorOutcome: perFactorOutcome)
 	}
 
-	func deriveKeys(request: SargonUniFFI.KeyDerivationRequest) async throws -> SargonUniFFI.KeyDerivationResponse {
-		throw CommonError.SigningRejected
+	func signAuth(request: SargonUniFFI.SignRequestOfAuthIntent) async throws -> SargonUniFFI.SignResponseOfAuthIntentHash {
+		var perFactorOutcome: [PerFactorOutcomeOfAuthIntentHash] = []
+
+		for perFactorSource in request.perFactorSource {
+			// NOTE: Adding this delay among factor sources so that it gives time of dismissing previous factor source before presenting new one
+			try? await clock.sleep(for: .seconds(0.9))
+			let action = await overlayWindowClient.signAuth(input: perFactorSource)
+
+			let outcome: FactorOutcomeOfAuthIntentHash = switch action {
+			case .newSigning(.cancelled):
+				throw CommonError.SigningRejected
+
+			case .newSigning(.skippedFactorSource):
+				.neglected(.init(reason: .userExplicitlySkipped, factor: perFactorSource.factorSourceId))
+
+			case let .newSigning(.finished(.auth(signatures))):
+				.signed(producedSignatures: signatures)
+
+			default:
+				fatalError("Unexpected action")
+			}
+		}
+
+		return .init(perFactorOutcome: perFactorOutcome)
 	}
 
-	func signAuth(request: SargonUniFFI.SignRequestOfAuthIntent) async throws -> SargonUniFFI.SignResponseOfAuthIntentHash {
+	func deriveKeys(request: SargonUniFFI.KeyDerivationRequest) async throws -> SargonUniFFI.KeyDerivationResponse {
 		throw CommonError.SigningRejected
 	}
 }
