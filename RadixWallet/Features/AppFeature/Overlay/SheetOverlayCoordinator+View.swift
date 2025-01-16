@@ -22,13 +22,6 @@ extension SheetOverlayCoordinator {
 						}
 					)
 
-				case .signing:
-					CaseLet(
-						/SheetOverlayCoordinator.Root.State.signing,
-						action: SheetOverlayCoordinator.Root.Action.signing,
-						then: { Signing.View(store: $0) }
-					)
-
 				case .newSigning:
 					CaseLet(
 						/SheetOverlayCoordinator.Root.State.newSigning,
