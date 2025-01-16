@@ -10,7 +10,7 @@ extension FactorSourcesList {
 						header(store.kind.details)
 
 						if let main = store.main {
-							section(text: L10n.FactorSources.List.default, rows: [main])
+							section(text: L10n.FactorSources.List.default, rows: [main], showChangeMain: !store.others.isEmpty)
 								.padding(.top, .medium3)
 
 							if !store.others.isEmpty {
@@ -49,16 +49,27 @@ extension FactorSourcesList {
 			.destinations(with: store)
 		}
 
-		private func header(_ text: String?) -> some SwiftUI.View {
+		private func header(_ text: String) -> some SwiftUI.View {
 			Text(text)
 				.textStyle(.body1Header)
 				.foregroundStyle(.app.gray2)
 				.flushedLeft
 		}
 
-		private func section(text: String?, rows: [State.Row]) -> some SwiftUI.View {
+		private func section(text: String?, rows: [State.Row], showChangeMain: Bool = false) -> some SwiftUI.View {
 			VStack(spacing: .small1) {
-				header(text)
+				if let text {
+					HStack(spacing: .zero) {
+						header(text)
+						Spacer()
+						if showChangeMain {
+							Button(L10n.FactorSources.List.change) {
+								store.send(.view(.changeMainButtonTapped))
+							}
+							.buttonStyle(.primaryText())
+						}
+					}
+				}
 
 				ForEachStatic(rows) { row in
 					card(row)
@@ -117,42 +128,6 @@ private extension FactorSourcesList.State {
 		}
 	}
 
-	var main: Row? {
-		switch context {
-		case .display:
-			rows.first(where: \.integrity.isExplicitMain)
-		case .selection:
-			nil
-		}
-	}
-
-	var others: [Row] {
-		let main = main
-		return rows
-			.filter { $0 != main }
-			.sorted(by: { left, right in
-				let lhs = left.integrity
-				let rhs = right.integrity
-				switch (lhs, rhs) {
-				case let (.device(lDevice), .device(rDevice)):
-					if lhs.isExplicitMain {
-						return true
-					} else if lDevice.factorSource.isBDFS, rDevice.factorSource.isBDFS {
-						return sort(lhs, rhs)
-					} else {
-						return lDevice.factorSource.isBDFS
-					}
-				default:
-					return sort(lhs, rhs)
-				}
-
-			})
-	}
-
-	private func sort(_ lhs: FactorSourceIntegrity, _ rhs: FactorSourceIntegrity) -> Bool {
-		lhs.factorSource.common.addedOn < rhs.factorSource.common.addedOn
-	}
-
 	var showFooter: Bool {
 		switch context {
 		case .display: false
@@ -200,6 +175,7 @@ private extension View {
 			.displayMnemonic(with: destinationStore)
 			.enterMnemonic(with: destinationStore)
 			.addMnemonic(with: destinationStore)
+			.changeMain(with: destinationStore)
 	}
 
 	private func detail(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
@@ -223,6 +199,12 @@ private extension View {
 	private func addMnemonic(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.addMnemonic, action: \.addMnemonic)) {
 			ImportMnemonic.View(store: $0)
+		}
+	}
+
+	private func changeMain(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.changeMain, action: \.changeMain)) {
+			ChangeMainFactorSource.View(store: $0)
 		}
 	}
 }
