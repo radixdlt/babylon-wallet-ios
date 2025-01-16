@@ -29,10 +29,14 @@ struct NewSigning: Sendable, FeatureReducer {
 		case factorSourceAccess(NewFactorSourceAccess.Action)
 	}
 
+	enum InternalAction: Sendable, Hashable {
+		case handleSignatures(FactorSource, Signatures)
+	}
+
 	enum DelegateAction: Sendable, Equatable {
 		case skippedFactorSource
 		case cancelled
-		case finished(Output)
+		case finished(Signatures)
 	}
 
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
@@ -59,6 +63,14 @@ struct NewSigning: Sendable, FeatureReducer {
 			.none
 		}
 	}
+
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case let .handleSignatures(factorSource, signatures):
+			.send(.delegate(.finished(signatures)))
+				.merge(with: updateLastUsed(factorSource: factorSource))
+		}
+	}
 }
 
 private extension NewSigning {
@@ -66,16 +78,16 @@ private extension NewSigning {
 		.run { send in
 			switch factorSource.kind {
 			case .device:
-				let output = try await signDevice(purpose: purpose)
-				await send(.delegate(.finished(output)))
+				let signatures = try await signDevice(purpose: purpose)
+				await send(.internal(.handleSignatures(factorSource, signatures)))
 
 			case .ledgerHqHardwareWallet:
 				guard let ledger = factorSource.asLedger else {
 					throw WrongFactorSource()
 				}
 				do {
-					let output = try await signLedger(purpose: purpose, ledger: ledger)
-					await send(.delegate(.finished(output)))
+					let signatures = try await signLedger(purpose: purpose, ledger: ledger)
+					await send(.internal(.handleSignatures(factorSource, signatures)))
 				} catch {
 					if error.isUserRejectedSigningOnLedgerDevice {
 						// If user rejected signature on ledger device, we will inform the delegate to dismiss the signing sheet.
@@ -93,7 +105,7 @@ private extension NewSigning {
 		}
 	}
 
-	func signDevice(purpose: State.Purpose) async throws -> Output {
+	func signDevice(purpose: State.Purpose) async throws -> Signatures {
 		switch purpose {
 		case let .transaction(input):
 			try await .transaction(deviceFactorSourceClient.signTransaction(input: input))
@@ -106,7 +118,7 @@ private extension NewSigning {
 		}
 	}
 
-	func signLedger(purpose: State.Purpose, ledger: LedgerHardwareWalletFactorSource) async throws -> Output {
+	func signLedger(purpose: State.Purpose, ledger: LedgerHardwareWalletFactorSource) async throws -> Signatures {
 		switch purpose {
 		case let .transaction(input):
 			let result = try await input.perTransaction.asyncMap { transaction in
@@ -130,6 +142,12 @@ private extension NewSigning {
 			return .auth(result)
 		}
 	}
+
+	func updateLastUsed(factorSource: FactorSource) -> Effect<Action> {
+		.run { _ in
+			try? await factorSourcesClient.updateLastUsed(.init(factorSourceId: factorSource.id))
+		}
+	}
 }
 
 // MARK: - NewSigning.State.Purpose
@@ -141,9 +159,9 @@ extension NewSigning.State {
 	}
 }
 
-// MARK: - NewSigning.Output
+// MARK: - NewSigning.Signatures
 extension NewSigning {
-	enum Output: Sendable, Hashable {
+	enum Signatures: Sendable, Hashable {
 		case transaction([HdSignatureOfTransactionIntentHash])
 		case subintent([HdSignatureOfSubintentHash])
 		case auth([HdSignatureOfAuthIntentHash])

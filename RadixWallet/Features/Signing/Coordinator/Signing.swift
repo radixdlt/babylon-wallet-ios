@@ -166,10 +166,9 @@ struct Signing: Sendable, FeatureReducer {
 		precondition(signingFactors.allSatisfy { $0.factorSource.kind == kind })
 		state.factorsLeftToSignWith.removeValue(forKey: kind)
 
-		return .run { [purpose = state.signingPurposeWithPayload.purpose] _ in
+		return .run { _ in
 			try? await factorSourcesClient.updateLastUsed(.init(
-				factorSourceIDs: signingFactors.map(\.factorSource.id),
-				usagePurpose: purpose
+				factorSourceIDs: signingFactors.map(\.factorSource.id)
 			))
 		}.concatenate(with: proceedWithNextFactorSource(&state))
 	}
