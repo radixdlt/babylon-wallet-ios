@@ -97,6 +97,10 @@ struct Login: Sendable, FeatureReducer {
 			guard case let .loginWithChallenge(loginWithChallenge) = state.loginRequest else {
 				return .send(.delegate(.continueButtonTapped(persona, state.authorizedDapp, authorizedPersona, nil)))
 			}
+			guard let metadata = state.dappMetadata.requestMetadata else {
+				assertionFailure("Unable to sign Login without the request metadata")
+				return .none
+			}
 
 			let challenge = loginWithChallenge.challenge
 
@@ -107,6 +111,8 @@ struct Login: Sendable, FeatureReducer {
 			)
 
 			return .run { [authorizedDapp = state.authorizedDapp] send in
+				let result = try await SargonOS.shared.signAuthPersona(identityAddress: persona.address, challengeNonce: challenge, metadata: metadata)
+
 				let authToSignResponse = try rolaClient.authenticationDataToSignForChallenge(createAuthPayloadRequest)
 
 				let signature = try await deviceFactorSourceClient.signUsingDeviceFactorSource(

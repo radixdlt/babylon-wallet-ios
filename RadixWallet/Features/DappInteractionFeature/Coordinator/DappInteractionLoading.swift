@@ -94,9 +94,8 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 						request: {
 							let entityMetadataForDapp = try await gatewayAPIClient.getEntityMetadata(dappDefinitionAddress.address, .dappMetadataKeys)
 							return DappMetadata.Ledger(
-								entityMetadataForDapp: entityMetadataForDapp,
-								dAppDefinintionAddress: dappDefinitionAddress,
-								origin: request.origin
+								request: request,
+								entityMetadataForDapp: entityMetadataForDapp
 							)
 						}
 					)
@@ -151,9 +150,8 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 
 extension DappMetadata.Ledger {
 	init(
-		entityMetadataForDapp: GatewayAPI.EntityMetadataCollection,
-		dAppDefinintionAddress: AccountAddress,
-		origin: DappOrigin
+		request: DappToWalletInteractionMetadata,
+		entityMetadataForDapp: GatewayAPI.EntityMetadataCollection
 	) {
 		let items = entityMetadataForDapp.items
 		let maybeName: String? = items[.name]?.value.asString
@@ -164,8 +162,7 @@ extension DappMetadata.Ledger {
 			return NonEmptyString(rawValue: name)
 		}()
 		self.init(
-			origin: origin,
-			dAppDefinintionAddress: dAppDefinintionAddress,
+			request: request,
 			name: name,
 			description: items[.description]?.value.asString,
 			thumbnail: items[.iconURL]?.value.asURL

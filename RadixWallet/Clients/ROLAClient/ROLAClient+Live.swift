@@ -131,10 +131,6 @@ extension ROLAClient {
 
 		return Data(data)
 	}
-
-	static func payloadToHash(payload: AuthIntent) -> Data {
-		payloadToHash(challenge: payload.challengeNonce, dAppDefinitionAddress: payload.dappDefinitionAddress, origin: payload.origin)
-	}
 }
 
 extension OnLedgerEntity.Metadata {

@@ -277,9 +277,8 @@ extension DeviceFactorSourceClient {
 		var signatures = Set<HdSignatureOfAuthIntentHash>()
 
 		for transaction in input.perTransaction {
-			let data = ROLAClient.payloadToHash(payload: transaction.payload)
-			let hashedData = data.hash()
-			let payloadId = AuthIntentHash(payload: data)
+			let payloadId = transaction.payload.hash()
+			let hashedData = payloadId.payload.hash()
 
 			let transactionSignatures = try await sign(
 				factorSourceId: factorSourceId,
