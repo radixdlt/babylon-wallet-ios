@@ -30,6 +30,8 @@ final class SplashFeatureTests: TestCase {
 				return .loaded(profile)
 			}
 			$0.userDefaults = userDefaults
+			$0.secureStorageClient.saveDeviceInfo = { _ in }
+			$0.secureStorageClient.loadDeviceInfo = { nil }
 		}
 
 		// when
