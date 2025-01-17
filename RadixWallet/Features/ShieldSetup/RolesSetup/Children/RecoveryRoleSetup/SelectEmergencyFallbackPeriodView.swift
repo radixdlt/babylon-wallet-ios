@@ -73,7 +73,7 @@ struct SelectEmergencyFallbackPeriodView: View {
 
 // MARK: SelectEmergencyFallbackPeriodView.Action
 extension SelectEmergencyFallbackPeriodView {
-	enum Action: Sendable, Hashable {
+	enum Action: Sendable, Equatable {
 		case close
 		case set(FallbackPeriod)
 	}
@@ -92,7 +92,7 @@ private extension FallbackPeriod.Unit {
 
 // MARK: - FallbackPeriod
 // TODO: - Move to Sargon -
-struct FallbackPeriod: Sendable, Hashable {
+struct FallbackPeriod: Sendable, Equatable {
 	var value: Int
 	var unit: Unit
 

@@ -17,6 +17,8 @@ extension ShieldSetupCoordinator {
 						SelectFactorSourcesCoordinator.View(store: store)
 					case let .rolesSetup(store):
 						RolesSetupCoordinator.View(store: store)
+					case let .nameShield(store):
+						NameShield.View(store: store)
 					}
 				}
 			}

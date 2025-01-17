@@ -12,6 +12,7 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 		case prepareFactors(PrepareFactorSources.Coordinator)
 		case selectFactors(SelectFactorSourcesCoordinator)
 		case rolesSetup(RolesSetupCoordinator)
+		case nameShield(NameShield)
 	}
 
 	typealias Action = FeatureAction<Self>
@@ -25,6 +26,10 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 	enum ChildAction: Sendable, Equatable {
 		case onboarding(ShieldSetupOnboarding.Action)
 		case path(StackActionOf<Path>)
+	}
+
+	enum DelegateAction: Equatable, Sendable {
+		case finished
 	}
 
 	var body: some ReducerOf<Self> {
@@ -62,8 +67,11 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 			state.path.append(.rolesSetup(.init(path: path)))
 			return .none
 		case .path(.element(id: _, action: .rolesSetup(.delegate(.finished)))):
-			// TODO: push Name Shield screen
+			state.path.append(.nameShield(.init()))
 			return .none
+		case .path(.element(id: _, action: .nameShield(.delegate(.finished)))):
+			// TODO: Apply shield flow
+			return .send(.delegate(.finished))
 		default:
 			return .none
 		}

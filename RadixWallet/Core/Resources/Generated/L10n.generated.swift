@@ -3974,6 +3974,8 @@ internal enum L10n {
     internal static let subtitle = L10n.tr("Localizable", "shieldWizardName_subtitle", fallback: "Give this Security Shield a name, so you can identify it later.")
     /// Name your Security Shield
     internal static let title = L10n.tr("Localizable", "shieldWizardName_title", fallback: "Name your Security Shield")
+    /// Security Shield name too long
+    internal static let tooLong = L10n.tr("Localizable", "shieldWizardName_tooLong", fallback: "Security Shield name too long")
   }
   internal enum ShieldWizardRecovery {
     /// Recovery

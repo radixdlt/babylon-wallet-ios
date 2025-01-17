@@ -1512,3 +1512,6 @@ Code: %@";
 "shieldWizardRegularAccess_setThreshold_title" = "Set the number of factors required to sign";
 "shieldWizardRegularAccess_setThreshold_all" = "All (Recommended)";
 "shieldWizardRegularAccess_setThreshold_button" = "Set";
+
+// TODO:
+"shieldWizardName_tooLong" = "Security Shield name too long";
