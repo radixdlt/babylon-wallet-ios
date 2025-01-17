@@ -4,8 +4,8 @@ import ComposableArchitecture
 struct SecurityCenter: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		var problems: [SecurityProblem] = []
-		var actionsRequired: Set<SecurityProblem.ProblemType> {
-			Set(problems.map(\.type))
+		var actionsRequired: Set<SecurityProblemKind> {
+			Set(problems.map(\.kind))
 		}
 
 		@PresentationState
@@ -19,16 +19,18 @@ struct SecurityCenter: Sendable, FeatureReducer {
 		enum State: Sendable, Hashable {
 			case configurationBackup(ConfigurationBackup.State)
 			case securityFactors(SecurityFactors.State)
-			case displayMnemonics(DisplayMnemonics.State)
+			case deviceFactorSources(FactorSourcesList.State)
 			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
+			case securityShields(ShieldSetupCoordinator.State)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
 			case configurationBackup(ConfigurationBackup.Action)
 			case securityFactors(SecurityFactors.Action)
-			case displayMnemonics(DisplayMnemonics.Action)
+			case deviceFactorSources(FactorSourcesList.Action)
 			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
+			case securityShields(ShieldSetupCoordinator.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -38,11 +40,14 @@ struct SecurityCenter: Sendable, FeatureReducer {
 			Scope(state: \.securityFactors, action: \.securityFactors) {
 				SecurityFactors()
 			}
-			Scope(state: \.displayMnemonics, action: \.displayMnemonics) {
-				DisplayMnemonics()
+			Scope(state: \.deviceFactorSources, action: \.deviceFactorSources) {
+				FactorSourcesList()
 			}
 			Scope(state: \.importMnemonics, action: \.importMnemonics) {
 				ImportMnemonicsFlowCoordinator()
+			}
+			Scope(state: \.securityShields, action: \.securityShields) {
+				ShieldSetupCoordinator()
 			}
 		}
 	}
@@ -50,7 +55,7 @@ struct SecurityCenter: Sendable, FeatureReducer {
 	enum ViewAction: Sendable, Equatable {
 		case task
 		case problemTapped(SecurityProblem)
-		case cardTapped(SecurityProblem.ProblemType)
+		case cardTapped(SecurityProblemKind)
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -76,7 +81,7 @@ struct SecurityCenter: Sendable, FeatureReducer {
 		case let .problemTapped(problem):
 			switch problem {
 			case .problem3:
-				state.destination = .displayMnemonics(.init())
+				state.destination = .deviceFactorSources(.init(kind: .device))
 
 			case .problem5, .problem6, .problem7:
 				state.destination = .configurationBackup(.init())
@@ -88,6 +93,10 @@ struct SecurityCenter: Sendable, FeatureReducer {
 
 		case let .cardTapped(type):
 			switch type {
+			case .securityShields:
+				state.destination = .securityShields(.init())
+				return .none
+
 			case .securityFactors:
 				state.destination = .securityFactors(.init())
 				return .none

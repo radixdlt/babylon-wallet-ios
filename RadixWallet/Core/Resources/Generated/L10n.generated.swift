@@ -1036,8 +1036,8 @@ internal enum L10n {
     /// Configuration Backup
     internal static let title = L10n.tr("Localizable", "configurationBackup_title", fallback: "Configuration Backup")
     internal enum Automated {
-      /// Your list of Accounts and the Factors required to recover them
-      internal static let accountsItemSubtitle = L10n.tr("Localizable", "configurationBackup_automated_accountsItemSubtitle", fallback: "Your list of Accounts and the Factors required to recover them")
+      /// Your list of Accounts and the factors required to recover them
+      internal static let accountsItemSubtitle = L10n.tr("Localizable", "configurationBackup_automated_accountsItemSubtitle", fallback: "Your list of Accounts and the factors required to recover them")
       /// Accounts
       internal static let accountsItemTitle = L10n.tr("Localizable", "configurationBackup_automated_accountsItemTitle", fallback: "Accounts")
       /// Login to Google Drive for Backups
@@ -1064,12 +1064,12 @@ internal enum L10n {
       internal static let logInAndroid = L10n.tr("Localizable", "configurationBackup_automated_logInAndroid", fallback: "Log in to Google Drive")
       /// Out-of-date backup still present on iCloud
       internal static let outdatedBackupIOS = L10n.tr("Localizable", "configurationBackup_automated_outdatedBackupIOS", fallback: "Out-of-date backup still present on iCloud")
-      /// Your list of Personas and the Factors required to recover them. Also your Persona data.
-      internal static let personasItemSubtitle = L10n.tr("Localizable", "configurationBackup_automated_personasItemSubtitle", fallback: "Your list of Personas and the Factors required to recover them. Also your Persona data.")
+      /// Your list of Personas and the factors required to recover them. Also your Persona data.
+      internal static let personasItemSubtitle = L10n.tr("Localizable", "configurationBackup_automated_personasItemSubtitle", fallback: "Your list of Personas and the factors required to recover them. Also your Persona data.")
       /// Personas
       internal static let personasItemTitle = L10n.tr("Localizable", "configurationBackup_automated_personasItemTitle", fallback: "Personas")
-      /// The list of Security Factors you need to recover your Accounts and Personas.
-      internal static let securityFactorsItemSubtitle = L10n.tr("Localizable", "configurationBackup_automated_securityFactorsItemSubtitle", fallback: "The list of Security Factors you need to recover your Accounts and Personas.")
+      /// The list of security factors you need to recover your Accounts and Personas.
+      internal static let securityFactorsItemSubtitle = L10n.tr("Localizable", "configurationBackup_automated_securityFactorsItemSubtitle", fallback: "The list of security factors you need to recover your Accounts and Personas.")
       /// Security Factors
       internal static let securityFactorsItemTitle = L10n.tr("Localizable", "configurationBackup_automated_securityFactorsItemTitle", fallback: "Security Factors")
       /// Configuration Backup status
@@ -1807,6 +1807,8 @@ internal enum L10n {
       internal static let deviceDescription = L10n.tr("Localizable", "factorSources_card_deviceDescription", fallback: "Use phone biometrics/PIN to approve")
       /// Biometrics/PIN
       internal static let deviceTitle = L10n.tr("Localizable", "factorSources_card_deviceTitle", fallback: "Biometrics/PIN")
+      /// Hidden Accounts or Personas
+      internal static let hiddenAccountsOrPersonas = L10n.tr("Localizable", "factorSources_card_hiddenAccountsOrPersonas", fallback: "Hidden Accounts or Personas")
       /// **Last Used:** %@
       internal static func lastUsed(_ p1: Any) -> String {
         return L10n.tr("Localizable", "factorSources_card_lastUsed", String(describing: p1), fallback: "**Last Used:** %@")
@@ -1819,14 +1821,22 @@ internal enum L10n {
       internal static func linkedAccountsAndPersonas(_ p1: Any, _ p2: Any) -> String {
         return L10n.tr("Localizable", "factorSources_card_linkedAccountsAndPersonas", String(describing: p1), String(describing: p2), fallback: "Linked to %@ and %@")
       }
+      /// Linked to %@ and %@ (and some hidden)
+      internal static func linkedAccountsAndPersonasSomeHidden(_ p1: Any, _ p2: Any) -> String {
+        return L10n.tr("Localizable", "factorSources_card_linkedAccountsAndPersonasSomeHidden", String(describing: p1), String(describing: p2), fallback: "Linked to %@ and %@ (and some hidden)")
+      }
       /// Linked to %@
       internal static func linkedAccountsOrPersonas(_ p1: Any) -> String {
         return L10n.tr("Localizable", "factorSources_card_linkedAccountsOrPersonas", String(describing: p1), fallback: "Linked to %@")
       }
+      /// Linked to %@ (and some hidden)
+      internal static func linkedAccountsOrPersonasSomeHidden(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "factorSources_card_linkedAccountsOrPersonasSomeHidden", String(describing: p1), fallback: "Linked to %@ (and some hidden)")
+      }
       /// Enter a seed phrase to approve
       internal static let passphraseDescription = L10n.tr("Localizable", "factorSources_card_passphraseDescription", fallback: "Enter a seed phrase to approve")
-      /// Passphrase
-      internal static let passphraseTitle = L10n.tr("Localizable", "factorSources_card_passphraseTitle", fallback: "Passphrase")
+      /// Mnemonic
+      internal static let passphraseTitle = L10n.tr("Localizable", "factorSources_card_passphraseTitle", fallback: "Mnemonic")
       /// Enter a decentralized password to approve
       internal static let passwordDescription = L10n.tr("Localizable", "factorSources_card_passwordDescription", fallback: "Enter a decentralized password to approve")
       /// Password
@@ -1837,6 +1847,40 @@ internal enum L10n {
       }
       /// 1 Persona
       internal static let personaSingular = L10n.tr("Localizable", "factorSources_card_personaSingular", fallback: "1 Persona")
+    }
+    internal enum ChangeMain {
+      /// Select the biometrics/PIN factor that will be automatically selected when you create a new Account or Persona.
+      internal static let subtitle = L10n.tr("Localizable", "factorSources_changeMain_subtitle", fallback: "Select the biometrics/PIN factor that will be automatically selected when you create a new Account or Persona.")
+      /// Change Default Biometrics/PIN
+      internal static let title = L10n.tr("Localizable", "factorSources_changeMain_title", fallback: "Change Default Biometrics/PIN")
+    }
+    internal enum Detail {
+      /// Advanced
+      internal static let advanced = L10n.tr("Localizable", "factorSources_detail_advanced", fallback: "Advanced")
+      /// Change PIN
+      internal static let changePin = L10n.tr("Localizable", "factorSources_detail_changePin", fallback: "Change PIN")
+      /// Enter seed phrase to recover use of this factor
+      internal static let enterSeedPhrase = L10n.tr("Localizable", "factorSources_detail_enterSeedPhrase", fallback: "Enter seed phrase to recover use of this factor")
+      /// **Last used:** %@
+      internal static func lastUsed(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "factorSources_detail_lastUsed", String(describing: p1), fallback: "**Last used:** %@")
+      }
+      /// Manage Factor
+      internal static let manage = L10n.tr("Localizable", "factorSources_detail_manage", fallback: "Manage Factor")
+      /// Rename this factor
+      internal static let rename = L10n.tr("Localizable", "factorSources_detail_rename", fallback: "Rename this factor")
+      /// Seed Phrase Lost
+      internal static let seedPhraseLost = L10n.tr("Localizable", "factorSources_detail_seedPhraseLost", fallback: "Seed Phrase Lost")
+      /// Spot Check
+      internal static let spotCheck = L10n.tr("Localizable", "factorSources_detail_spotCheck", fallback: "Spot Check")
+      /// Test
+      internal static let test = L10n.tr("Localizable", "factorSources_detail_test", fallback: "Test")
+      /// Test that you can use this factor
+      internal static let testCanUse = L10n.tr("Localizable", "factorSources_detail_testCanUse", fallback: "Test that you can use this factor")
+      /// View Seed Phrase
+      internal static let viewSeedPhrase = L10n.tr("Localizable", "factorSources_detail_viewSeedPhrase", fallback: "View Seed Phrase")
+      /// Write down the seed phrase for advanced recovery
+      internal static let writeSeedPhrase = L10n.tr("Localizable", "factorSources_detail_writeSeedPhrase", fallback: "Write down the seed phrase for advanced recovery")
     }
     internal enum Kind {
       /// Phone
@@ -1849,6 +1893,32 @@ internal enum L10n {
       internal static let securityQuestions = L10n.tr("Localizable", "factorSources_kind_securityQuestions", fallback: "Security Questions")
       /// Third-party
       internal static let trustedContact = L10n.tr("Localizable", "factorSources_kind_trustedContact", fallback: "Third-party")
+    }
+    internal enum List {
+      /// Add Arculus Card
+      internal static let arculusCardAdd = L10n.tr("Localizable", "factorSources_list_arculusCardAdd", fallback: "Add Arculus Card")
+      /// Arculus not working. Try adding it again
+      internal static let arculusCardNotWorking = L10n.tr("Localizable", "factorSources_list_arculusCardNotWorking", fallback: "Arculus not working. Try adding it again")
+      /// Change
+      internal static let change = L10n.tr("Localizable", "factorSources_list_change", fallback: "Change")
+      /// Default
+      internal static let `default` = L10n.tr("Localizable", "factorSources_list_default", fallback: "Default")
+      /// Add Biometrics/PIN
+      internal static let deviceAdd = L10n.tr("Localizable", "factorSources_list_deviceAdd", fallback: "Add Biometrics/PIN")
+      /// Add New Ledger Nano
+      internal static let ledgerAdd = L10n.tr("Localizable", "factorSources_list_ledgerAdd", fallback: "Add New Ledger Nano")
+      /// This factor has been lost
+      internal static let lostFactorSource = L10n.tr("Localizable", "factorSources_list_lostFactorSource", fallback: "This factor has been lost")
+      /// Others
+      internal static let others = L10n.tr("Localizable", "factorSources_list_others", fallback: "Others")
+      /// Add New Passphrase
+      internal static let passphraseAdd = L10n.tr("Localizable", "factorSources_list_passphraseAdd", fallback: "Add New Passphrase")
+      /// Add New Password
+      internal static let passwordAdd = L10n.tr("Localizable", "factorSources_list_passwordAdd", fallback: "Add New Password")
+      /// Write down seed phrase to make this factor recoverable
+      internal static let seedPhraseNotRecoverable = L10n.tr("Localizable", "factorSources_list_seedPhraseNotRecoverable", fallback: "Write down seed phrase to make this factor recoverable")
+      /// This seed phrase has been written down
+      internal static let seedPhraseWrittenDown = L10n.tr("Localizable", "factorSources_list_seedPhraseWrittenDown", fallback: "This seed phrase has been written down")
     }
   }
   internal enum FactoryReset {
@@ -2315,6 +2385,12 @@ internal enum L10n {
       /// 
       /// [Read about Smart Account multi-factor and other features](https://www.radixdlt.com/blog/how-radix-multi-factor-smart-accounts-work-and-what-they-can-do) ↗
       internal static let accounts = L10n.tr("Localizable", "infoLink_glossary_accounts", fallback: "## Radix Accounts\n\nAccounts are secure containers for any kind of digital asset on the [Radix Network](?glossaryAnchor=radixnetwork).\n\n---\n\nUnlike an account on a bank or other service, there is no company that controls your Radix Accounts for you. Your [Radix Wallet](?glossaryAnchor=radixwallet) app on your phone gives you direct access to your Accounts on the network, and can help you regain access to your Accounts if you lose your phone.\n\nCompared to accounts on other crypto networks, Radix Accounts are so much more clever, they’re sometimes called “Smart Accounts”.\n\n[Learn more about Smart Accounts](https://learn.radixdlt.com/article/what-are-smart-accounts) ↗\n\n[Read about Smart Account multi-factor and other features](https://www.radixdlt.com/blog/how-radix-multi-factor-smart-accounts-work-and-what-they-can-do) ↗")
+      /// ## Arculus Card
+      /// 
+      /// Arculus Cards are secure third-party "hardware wallet" cryptographic signing devices in a convenient credit card form factor. To use it, you only need to tap it to the NFC reader on your phone.
+      /// 
+      /// Using a hardware signing device like an Arculus Card provides strong security because it requires physical access to the card to use it. If you use it in a [Security Shields](?glossaryAnchor=securityshields), you can combine it with other factors you have so that even if the card is lost or stolen, your funds are safe and you can reconfigure the Shield to remove the lost Arculus Card, and carry on as before. No seed phrase backup needed.
+      internal static let arculus = L10n.tr("Localizable", "infoLink_glossary_arculus", fallback: "## Arculus Card\n\nArculus Cards are secure third-party \"hardware wallet\" cryptographic signing devices in a convenient credit card form factor. To use it, you only need to tap it to the NFC reader on your phone.\n\nUsing a hardware signing device like an Arculus Card provides strong security because it requires physical access to the card to use it. If you use it in a [Security Shields](?glossaryAnchor=securityshields), you can combine it with other factors you have so that even if the card is lost or stolen, your funds are safe and you can reconfigure the Shield to remove the lost Arculus Card, and carry on as before. No seed phrase backup needed.")
       /// ## Badges
       /// 
       /// Radix Badges are tokens or NFTs that are used to prove their holder is authorized to claim something, access something or perform a certain action within the Radix Network. Any token on Radix can be used as a badge, but dApps may often create special tokens specifically for use as a badge.
@@ -2341,6 +2417,12 @@ internal enum L10n {
       /// 
       /// [Learn more about the asset behaviors ↗](https://learn.radixdlt.com/article/what-are-radix-asset-behaviors)
       internal static let behaviors = L10n.tr("Localizable", "infoLink_glossary_behaviors", fallback: "## Asset Behaviors\n\nAsset behaviors define the rules that were placed on a [token](?glossaryAnchor=tokens) or [NFT](?glossaryAnchor=nfts) when it was created. They ensure all users know exactly what actions can be performed on any asset. And they’re labeled in everyday language so everyone can read them, understand them and know the nature of the asset they’re holding.\n\n---\n\nThe [Radix Network](?glossaryAnchor=radixnetwork) is built differently to all other blockchains. One of the great benefits of this is that assets – tokens and NFTs – are native to the ecosystem. So unlike on networks such as Ethereum, where tokens are not really tokens but just balances on a smart contract, assets on Radix act like real-life assets. With real-life assets of different kinds, you know who can create it, destory it, take it away from you or freeze it within your bank account. Similarly with Radix, you’ll always know how assets will behave and what someone can do to them.\n\nWhen anyone creates a token or NFT on Radix, there is a list of behaviors they can apply to them. Things like being able to increase the token’s supply, being able to change an NFT’s image and description, or being able to remove a token from someone’s account. There are plenty of valid reasons for why someone might want to do these things, but it’s always good to know if they can. \n\nJust tap into any token in the Radix Wallet to get a full list of its behaviors.\n\n[Learn more about the asset behaviors ↗](https://learn.radixdlt.com/article/what-are-radix-asset-behaviors)")
+      /// ## Biometrics/PIN
+      /// 
+      /// A biometrics/PIN factor is a 24-word seed phrase protected and accessed via your phone's biometrics or PIN security feature. Unlike most crypto wallets, there isn't a single seed phrase controlling all of your stuff – it's just 1 type of factor you can use to protect [Accounts](?glossaryAnchor=accounts) and [Personas](?glossaryAnchor=personas) or use as part of multi-factor [Security Shields](?glossaryAnchor=securityshields).
+      /// 
+      /// Because this is the only kind of factor held on your phone, it won't automatically transfer if you move to a different phone with your [Radix Wallet](?glossaryAnchor=radixwallet). Using a Security Shield for your Accounts and Personas enables easy transfer of wallet control without having to write down and enter a seed phrase. If you create Accounts or Personas with a biometrics/PIN factor, and you don't apply a Security Shield, you'll need to enter the seed phrase to recover access on a different phone.
+      internal static let biometricspin = L10n.tr("Localizable", "infoLink_glossary_biometricspin", fallback: "## Biometrics/PIN\n\nA biometrics/PIN factor is a 24-word seed phrase protected and accessed via your phone's biometrics or PIN security feature. Unlike most crypto wallets, there isn't a single seed phrase controlling all of your stuff – it's just 1 type of factor you can use to protect [Accounts](?glossaryAnchor=accounts) and [Personas](?glossaryAnchor=personas) or use as part of multi-factor [Security Shields](?glossaryAnchor=securityshields).\n\nBecause this is the only kind of factor held on your phone, it won't automatically transfer if you move to a different phone with your [Radix Wallet](?glossaryAnchor=radixwallet). Using a Security Shield for your Accounts and Personas enables easy transfer of wallet control without having to write down and enter a seed phrase. If you create Accounts or Personas with a biometrics/PIN factor, and you don't apply a Security Shield, you'll need to enter the seed phrase to recover access on a different phone.")
       /// ## Bridging
       /// 
       /// Bridging is the process of getting assets into and out of the [Radix Network](?glossaryAnchor=radixnetwork). Assets on Radix can be held by your [Radix Wallet](?glossaryAnchor=radixnetwork), and used with [dApps](?glossaryAnchor=dapps) on Radix. There are a variety of dApps that provide bridging in different ways, for different assets.
@@ -2349,6 +2431,18 @@ internal enum L10n {
       /// 
       /// Sometimes bridging works as a swap, similar to a [DEX](?glossaryAnchor=dex). In this case you might swap one asset outside Radix for a different asset within Radix. Maybe you swap ETH (on the Ethereum network) for XRD tokens (on the Radix Network) at a current market price.
       internal static let bridging = L10n.tr("Localizable", "infoLink_glossary_bridging", fallback: "## Bridging\n\nBridging is the process of getting assets into and out of the [Radix Network](?glossaryAnchor=radixnetwork). Assets on Radix can be held by your [Radix Wallet](?glossaryAnchor=radixnetwork), and used with [dApps](?glossaryAnchor=dapps) on Radix. There are a variety of dApps that provide bridging in different ways, for different assets.\n\nSometimes bridging involves converting an asset into a different form that can live on Radix. For example, dollars (USD) in your bank account might be bridged into Radix and become xUSDC tokens in your Radix Wallet. Or your Bitcoin (BTC) might be bridged into xwBTC tokens.\n\nSometimes bridging works as a swap, similar to a [DEX](?glossaryAnchor=dex). In this case you might swap one asset outside Radix for a different asset within Radix. Maybe you swap ETH (on the Ethereum network) for XRD tokens (on the Radix Network) at a current market price.")
+      /// ## How your Security Shield is Built
+      /// 
+      /// A good [Security Shield](?glossaryAnchor=securityshields) combines safety and reliability. No one else should be able to access it and even if you lose your phone you should always be able to recover access to your [Accounts](?glossaryAnchor=accounts) and [Personas](?glossaryAnchor=personas).
+      /// 
+      /// Your [Radix Wallet](?glossaryAnchor=radixwallet) will help you by suggesting a good Shield configuration once you’ve added the required security factors. Once this is done, you can edit it to suit your requirements and the Radix Wallet has 3 rules in place to ensure those edits don't make your Shield unsafe or innaccessible.
+      /// 
+      /// 1. [Password](?glossaryAnchor=passwords) cannot be used alone. They are useful factors but aren't secure enough to be used by themselves.
+      /// 2. To make sure you won't lose access if you lose 1 of your factors, you must always have at least 2 factors options to start a Shield recovery.
+      /// 3. To make sure nobody can take away your Shield by stealing just 1 factor, if you are only using 1 factor for regular access, you cannot use that factor again for recovery. And you also cannot use the same factor to both start and confirm a recovery.
+      /// 
+      /// Once you've finalized the setup of factors for a Shield, you’ll be ready to apply it to your chosen Accounts and Personas on the [Radix Network](?glossaryAnchor=radixnetwork) with 1 or more [transactions](?glossaryAnchor=transactions).
+      internal static let buildingshield = L10n.tr("Localizable", "infoLink_glossary_buildingshield", fallback: "## How your Security Shield is Built\n\nA good [Security Shield](?glossaryAnchor=securityshields) combines safety and reliability. No one else should be able to access it and even if you lose your phone you should always be able to recover access to your [Accounts](?glossaryAnchor=accounts) and [Personas](?glossaryAnchor=personas).\n\nYour [Radix Wallet](?glossaryAnchor=radixwallet) will help you by suggesting a good Shield configuration once you’ve added the required security factors. Once this is done, you can edit it to suit your requirements and the Radix Wallet has 3 rules in place to ensure those edits don't make your Shield unsafe or innaccessible.\n\n1. [Password](?glossaryAnchor=passwords) cannot be used alone. They are useful factors but aren't secure enough to be used by themselves.\n2. To make sure you won't lose access if you lose 1 of your factors, you must always have at least 2 factors options to start a Shield recovery.\n3. To make sure nobody can take away your Shield by stealing just 1 factor, if you are only using 1 factor for regular access, you cannot use that factor again for recovery. And you also cannot use the same factor to both start and confirm a recovery.\n\nOnce you've finalized the setup of factors for a Shield, you’ll be ready to apply it to your chosen Accounts and Personas on the [Radix Network](?glossaryAnchor=radixnetwork) with 1 or more [transactions](?glossaryAnchor=transactions).")
       /// ## Stake Claim NFTs
       /// 
       /// Stake claim [NFTs](?glossaryAnchor=NFTs) are tokens that represent a quantity of unstaked XRD that the user can claim from a [validator](?glossaryAnchor=validators) to receive back [XRD](?glossaryAnchor=xrd).
@@ -2425,6 +2519,12 @@ internal enum L10n {
       /// 
       /// [Learn more about deposit guarantees](https://learn.radixdlt.com/article/what-are-customizable-transaction-guarantees-on-radix) ↗
       internal static let guarantees = L10n.tr("Localizable", "infoLink_glossary_guarantees", fallback: "## Deposit Guarantees\n\nSome Radix [transactions](?glossaryAnchor=transactions) may have unpredictable results. In these cases, deposit guarantees make sure you never get less than you expect when you do a transaction.\n\n---\n\nFor example, the result of a swap between assets using a [DEX](?glossaryAnchor=dex) depends on a current market price of the assets involved. You may see one price when considering the swap, but it typically changes by the time the network processes it. Deposit guarantees protect you by letting you specify a minimum amount that must be deposited to your account at the end of the swap transaction.\n\nTo make this possible, the [Radix Network](?glossaryAnchor=radixnetwork) app and [Radix Wallet](?glossaryAnchor=radixwallet) work together. The wallet will show you whenever a deposit to your account is “estimated” rather than of a known quantity. And whenever that's true, you can set your own “guarantees” in the wallet on those estimated deposits – putting a limit on how much you expect to get for you to be willing to go through with the transaction. If that guarantee isn't met at the time the transaction is processed, the deal is off! The transaction is rejected by the Radix Network and no assets change hands.\n\n[Learn more about deposit guarantees](https://learn.radixdlt.com/article/what-are-customizable-transaction-guarantees-on-radix) ↗")
+      /// ## Ledger Nano
+      /// 
+      /// A Ledger Nano is a secure third-party "hardware wallet" cryptographic signing device popular with many crypto users. To use it, you need to connect it via USB to a computer with a linked [Radix Connector](?glossaryAnchor=radixconnector) browser extension. From here, you can approve signatures by following the Nano's on-screen instructions.
+      /// 
+      /// Using a hardware signing device like a Ledger Nano provides strong security because it requires physical access to the device to use it. If you use it in a [Security Shields](?glossaryAnchor=securityshields), you can combine it with other factors you have so that even if the device is lost or stolen, your funds are safe and you can reconfigure the Shield to remove the lost device from it. No seed phrase backup needed.
+      internal static let ledgernano = L10n.tr("Localizable", "infoLink_glossary_ledgernano", fallback: "## Ledger Nano\n\nA Ledger Nano is a secure third-party \"hardware wallet\" cryptographic signing device popular with many crypto users. To use it, you need to connect it via USB to a computer with a linked [Radix Connector](?glossaryAnchor=radixconnector) browser extension. From here, you can approve signatures by following the Nano's on-screen instructions.\n\nUsing a hardware signing device like a Ledger Nano provides strong security because it requires physical access to the device to use it. If you use it in a [Security Shields](?glossaryAnchor=securityshields), you can combine it with other factors you have so that even if the device is lost or stolen, your funds are safe and you can reconfigure the Shield to remove the lost device from it. No seed phrase backup needed.")
       /// ## Liquid Stake Unit
       /// 
       /// A liquid stake unit (LSU) is a type of token within the [Radix Network](?glossaryAnchor=radixnetwork) that represents the amount of [XRD](?glossaryAnchor=xrd) a user has staked to a certain validator. LSUs are freely transferable in Radix’s DeFi ecosystem and can be traded as assets.
@@ -2473,6 +2573,18 @@ internal enum L10n {
       /// 
       /// [Find out why tokens on Radix are better than other crypto networks](https://www.radixdlt.com/blog/its-10pm-do-you-know-where-your-tokens-are) ↗
       internal static let nfts = L10n.tr("Localizable", "infoLink_glossary_nfts", fallback: "## Non-fungible Token (NFT)\n\nNon-fungible tokens are a special class of web3 [token](?glossaryAnchor=tokens) where each token has a unique identity.\n\nLike other tokens, they can represent many things. But NFTs are used to represent things where each is different from another, like pieces of art, loan positions, treasury bonds, tickets to assigned-seating events, collectible cards, or equipment in games.\n\n---\n\nThe [Radix Network](?glossaryAnchor=radixnetwork) has special features specifically to make the creation and use of non-fungible tokens on Radix safe and predictable, and the [Radix Wallet](?glossaryAnchor=radixwallet) can automatically provide useful information about the NFTs you hold in your [Accounts](?glossaryAnchor=accounts).\n\n[Learn more about NFTs](https://learn.radixdlt.com/article/what-is-an-nft) ↗\n\n[Find out why tokens on Radix are better than other crypto networks](https://www.radixdlt.com/blog/its-10pm-do-you-know-where-your-tokens-are) ↗")
+      /// ## Passphrases
+      /// 
+      /// A passphrase is a 24-word BIP39 seed phrase. Unlike with most crypto wallets though, it's a specific type of seed phrase that isn't held on your phone so it can't be accessed with the help of your phone's biometrics or PIN features. It must be typed in word by word every time you use it to sign [transactions](?glossaryAnchor=transactions). This means it must be written down and should be stored (ideally not electronically) in a secret location. For this reason, this factor source is best left to experienced users.
+      /// 
+      /// If you prefer to use a seed phrase held on this device for easy usage, like a typical crypto wallet, please see the [biometrics/PIN](?glossaryAnchor=biometricspin) factor type.
+      internal static let passphrases = L10n.tr("Localizable", "infoLink_glossary_passphrases", fallback: "## Passphrases\n\nA passphrase is a 24-word BIP39 seed phrase. Unlike with most crypto wallets though, it's a specific type of seed phrase that isn't held on your phone so it can't be accessed with the help of your phone's biometrics or PIN features. It must be typed in word by word every time you use it to sign [transactions](?glossaryAnchor=transactions). This means it must be written down and should be stored (ideally not electronically) in a secret location. For this reason, this factor source is best left to experienced users.\n\nIf you prefer to use a seed phrase held on this device for easy usage, like a typical crypto wallet, please see the [biometrics/PIN](?glossaryAnchor=biometricspin) factor type.")
+      /// ## Passwords
+      /// 
+      /// Password can be used as a type of security factor in the [Radix Wallet](?glossaryAnchor=radixwallet). A password can be useful to add additional security to your [Security Shields](?glossaryAnchor=securityshields) in combination with other factors. To be secure, your password must be at least 16-characters long and it should be impossible for someone else to guess. If you write it down, make sure you don't do this electronically and keep it stored in a safe place.
+      /// 
+      /// Passwords on Radix are different from normal passwords because they're decentralized. They're not held in a central server or even in your Radix Wallet app. Through some cryptographic magic, the [Radix Network](?glossaryAnchor=radixnetwork) itself can check if your password is correct without storing it. It's provides the security of [web3](?glossaryAnchor=web3) with the easy functionality of web2.
+      internal static let passwords = L10n.tr("Localizable", "infoLink_glossary_passwords", fallback: "## Passwords\n\nPassword can be used as a type of security factor in the [Radix Wallet](?glossaryAnchor=radixwallet). A password can be useful to add additional security to your [Security Shields](?glossaryAnchor=securityshields) in combination with other factors. To be secure, your password must be at least 16-characters long and it should be impossible for someone else to guess. If you write it down, make sure you don't do this electronically and keep it stored in a safe place.\n\nPasswords on Radix are different from normal passwords because they're decentralized. They're not held in a central server or even in your Radix Wallet app. Through some cryptographic magic, the [Radix Network](?glossaryAnchor=radixnetwork) itself can check if your password is correct without storing it. It's provides the security of [web3](?glossaryAnchor=web3) with the easy functionality of web2.")
       /// ## Why your Accounts will be linked
       /// 
       /// Paying your transaction fee from this Account will make you identifiable on ledger as both the owner of the fee-paying Account and all other Accounts you use in this transaction.
@@ -2589,6 +2701,34 @@ internal enum L10n {
       /// 
       /// [Learn more about the Radix Wallet](https://learn.radixdlt.com/article/what-is-the-radix-wallet) ↗
       internal static let radixwallet = L10n.tr("Localizable", "infoLink_glossary_radixwallet", fallback: "## Radix Wallet\n\nThe Radix Wallet is an iOS and Android mobile app that is your gateway to the capabilities of the Radix Network.\n\n---\n\nIt helps you create and use [Accounts](?glossaryAnchor=accounts) that can hold all of your digital assets on Radix, and [Personas](?glossaryAnchor=personas) that you can use to securely log in to [dApps](?glossaryAnchor=dapps) built on Radix without a password.\n\nThe Radix Wallet also makes sure that you are always in control of [transactions](?glossaryAnchor=transactions) that interact with your Accounts and assets.\n\nThink of the Radix Wallet as your companion as you move between dApps on Radix – keeping your assets safe, and letting you choose who you are and what you bring with you on each dApp.\n\nThe Radix Wallet was created by the team who created the Radix Network’s technology, and is offered for free (and open-source) to let anyone use Radix and dApps built on Radix.\n\n[Get the Radix Wallet](https://wallet.radixdlt.com/) ↗\n\n[Learn more about the Radix Wallet](https://learn.radixdlt.com/article/what-is-the-radix-wallet) ↗")
+      /// ## Security Shields
+      /// 
+      /// Security Shields give users multi-factor access to their [Accounts](?glossaryAnchor=accounts) and [Personas](?glossaryAnchor=personas) while maintaining decentralization and full self-custody. They provide 2 critical functions. They allow users to rely on more than 1 security factor for regular access and for recoveries in the event that another security factor is lost.
+      /// 
+      /// The process to create a Shield is simple and once it’s finished, it can be applied to Accounts and Personas on the [Radix Network](?glossaryAnchor=radixnetwork) itself, providing robust and reliable security without compromising true trustless decentralization. There are no central servers that hold your Security Shield or secret keys – on Radix, it’s all done on the blockchain directly, so you're always in control. It's "your keys, your crypto", but without being stuck with 1 key you can't change.
+      /// 
+      /// ---
+      /// 
+      /// Shields are made up of 2 groups of factors.
+      /// 
+      /// **Regular Access**
+      /// 
+      /// This part of your Security Shield defines the factors you'll use for normal usage, like signing [transactions](?glossaryAnchor=transactions) to withdrawing assets from your Accounts.
+      /// 
+      /// When choosing your factors for regular access, consider how often you’ll be using them. If it’s every day, choose ones you can access easily. A single factor can be used, but it's recommended to use more than one for additional security. For example, a [password](?glossaryAnchor=passwords) is an easy second factor to add security for more sensitive Accounts.
+      /// 
+      /// For convenience, you'll also choose a single factor you'll use to prove ownerhip – like when you log in to [dApps](?glossaryAnchor=dapps) or if they request access to your Accounts.
+      /// 
+      /// **Recovery**
+      /// 
+      /// This part of your Security Shield is made up of the factors that help you recover access to shielded Accounts and Personas in the event that you lose access to them or want to transfer control. For example, if you move your wallet to a new phone, you'll use the Shield's recovery feature to change the biometrics/PIN factor to a new one on your new phone.
+      /// 
+      /// You'll need to choose 1 or more factors that can start a recovery and 1 or more factors that can confirm the recovery. In most cases, you'll start and confirm the recovery in a single step, but in the worst case, a timed "emergency fallback" will let you start a recovery with just 1 factor and confirm it after a safe delay.
+      /// 
+      /// You can choose the time period for your emergency fallback factor. Make sure you choose a time period long enough that you'll be likely to open your [Radix Wallet](?glossaryAnchor=radixwallet) and cancel the recovery if anyone ever steals 1 of your factors and attempts to take control of your Accounts and Personas.
+      /// 
+      /// Your Radix Wallet will help you build your Security Shield and once it’s finished, you’ll need to sign some transactions to apply it on the Radix Network to the Accounts and Personas of your choice.
+      internal static let securityshields = L10n.tr("Localizable", "infoLink_glossary_securityshields", fallback: "## Security Shields\n\nSecurity Shields give users multi-factor access to their [Accounts](?glossaryAnchor=accounts) and [Personas](?glossaryAnchor=personas) while maintaining decentralization and full self-custody. They provide 2 critical functions. They allow users to rely on more than 1 security factor for regular access and for recoveries in the event that another security factor is lost.\n\nThe process to create a Shield is simple and once it’s finished, it can be applied to Accounts and Personas on the [Radix Network](?glossaryAnchor=radixnetwork) itself, providing robust and reliable security without compromising true trustless decentralization. There are no central servers that hold your Security Shield or secret keys – on Radix, it’s all done on the blockchain directly, so you're always in control. It's \"your keys, your crypto\", but without being stuck with 1 key you can't change.\n\n---\n\nShields are made up of 2 groups of factors.\n\n**Regular Access**\n\nThis part of your Security Shield defines the factors you'll use for normal usage, like signing [transactions](?glossaryAnchor=transactions) to withdrawing assets from your Accounts.\n\nWhen choosing your factors for regular access, consider how often you’ll be using them. If it’s every day, choose ones you can access easily. A single factor can be used, but it's recommended to use more than one for additional security. For example, a [password](?glossaryAnchor=passwords) is an easy second factor to add security for more sensitive Accounts.\n\nFor convenience, you'll also choose a single factor you'll use to prove ownerhip – like when you log in to [dApps](?glossaryAnchor=dapps) or if they request access to your Accounts.\n\n**Recovery**\n\nThis part of your Security Shield is made up of the factors that help you recover access to shielded Accounts and Personas in the event that you lose access to them or want to transfer control. For example, if you move your wallet to a new phone, you'll use the Shield's recovery feature to change the biometrics/PIN factor to a new one on your new phone.\n\nYou'll need to choose 1 or more factors that can start a recovery and 1 or more factors that can confirm the recovery. In most cases, you'll start and confirm the recovery in a single step, but in the worst case, a timed \"emergency fallback\" will let you start a recovery with just 1 factor and confirm it after a safe delay.\n\nYou can choose the time period for your emergency fallback factor. Make sure you choose a time period long enough that you'll be likely to open your [Radix Wallet](?glossaryAnchor=radixwallet) and cancel the recovery if anyone ever steals 1 of your factors and attempts to take control of your Accounts and Personas.\n\nYour Radix Wallet will help you build your Security Shield and once it’s finished, you’ll need to sign some transactions to apply it on the Radix Network to the Accounts and Personas of your choice.")
       /// ## Token
       /// 
       /// Token is the general term for any kind of web3 asset that you can hold in a crypto wallet.
@@ -2693,18 +2833,30 @@ internal enum L10n {
       internal static let xrd = L10n.tr("Localizable", "infoLink_glossary_xrd", fallback: "## XRD Token\n\nXRD is the official Radix Network token.\n\n---\n\n It is created by the [Radix Network](?glossaryAnchor=radixnetwork) itself and users and applications can use it to use features of the network. For example, [transaction fees](?glossaryAnchor=transactionfee) are always paid in XRD, and XRD is the only token that can be used to participate in [Radix Network staking](?glossaryAnchor=networkstaking).\n\nBecause XRD has a special role on Radix, XRD is also frequently used by [dApps](?glossaryAnchor=dapps) on Radix as a convenient form of money to pay for things and to enable exchanges with other tokens.\n\n[Buy XRD tokens](https://www.radixdlt.com/token) ↗\n\n[Learn more about the XRD token](https://learn.radixdlt.com/article/what-is-the-xrd-token) ↗")
     }
     internal enum Title {
+      /// Learn about Arculus Cards
+      internal static let arculus = L10n.tr("Localizable", "infoLink_title_arculus", fallback: "Learn about Arculus Cards")
       /// What are behaviors?
       internal static let behaviors = L10n.tr("Localizable", "infoLink_title_behaviors", fallback: "What are behaviors?")
+      /// Learn about biometrics/PIN
+      internal static let biometricspin = L10n.tr("Localizable", "infoLink_title_biometricspin", fallback: "Learn about biometrics/PIN")
+      /// How your Security Shield is built
+      internal static let buildingshield = L10n.tr("Localizable", "infoLink_title_buildingshield", fallback: "How your Security Shield is built")
       /// What is a dApp?
       internal static let dapps = L10n.tr("Localizable", "infoLink_title_dapps", fallback: "What is a dApp?")
       /// What is a Gateway?
       internal static let gateways = L10n.tr("Localizable", "infoLink_title_gateways", fallback: "What is a Gateway?")
       /// How do guarantees work?
       internal static let guarantees = L10n.tr("Localizable", "infoLink_title_guarantees", fallback: "How do guarantees work?")
+      /// Learn about Ledger Nanos
+      internal static let ledgernano = L10n.tr("Localizable", "infoLink_title_ledgernano", fallback: "Learn about Ledger Nanos")
       /// What is Staking?
       internal static let networkstaking = L10n.tr("Localizable", "infoLink_title_networkstaking", fallback: "What is Staking?")
       /// What are NFTs?
       internal static let nfts = L10n.tr("Localizable", "infoLink_title_nfts", fallback: "What are NFTs?")
+      /// Learn about passphrases
+      internal static let passphrases = L10n.tr("Localizable", "infoLink_title_passphrases", fallback: "Learn about passphrases")
+      /// Learn about passwords
+      internal static let passwords = L10n.tr("Localizable", "infoLink_title_passwords", fallback: "Learn about passwords")
       /// What is a Persona?
       internal static let personas = L10n.tr("Localizable", "infoLink_title_personas", fallback: "What is a Persona?")
       /// Learn about Personas
@@ -2713,6 +2865,8 @@ internal enum L10n {
       internal static let poolunits = L10n.tr("Localizable", "infoLink_title_poolunits", fallback: "What are Pool units?")
       /// Learn more about Radix Connect
       internal static let radixconnect = L10n.tr("Localizable", "infoLink_title_radixconnect", fallback: "Learn more about Radix Connect")
+      /// Learn about Security Shields
+      internal static let securityshields = L10n.tr("Localizable", "infoLink_title_securityshields", fallback: "Learn about Security Shields")
       /// What are Tokens?
       internal static let tokens = L10n.tr("Localizable", "infoLink_title_tokens", fallback: "What are Tokens?")
       /// How do fees work?
@@ -3397,6 +3551,40 @@ internal enum L10n {
       internal static let useNewWalletAlertTitle = L10n.tr("Localizable", "recoverWalletWithoutProfile_start_useNewWalletAlertTitle", fallback: "No Main Seed Phrase?")
     }
   }
+  internal enum RenameLabel {
+    /// Updated
+    internal static let success = L10n.tr("Localizable", "renameLabel_success", fallback: "Updated")
+    /// Update
+    internal static let update = L10n.tr("Localizable", "renameLabel_update", fallback: "Update")
+    internal enum Account {
+      /// Account label required
+      internal static let empty = L10n.tr("Localizable", "renameLabel_account_empty", fallback: "Account label required")
+      /// Enter a new label for this Account
+      internal static let subtitle = L10n.tr("Localizable", "renameLabel_account_subtitle", fallback: "Enter a new label for this Account")
+      /// Rename Account
+      internal static let title = L10n.tr("Localizable", "renameLabel_account_title", fallback: "Rename Account")
+      /// Account label too long
+      internal static let tooLong = L10n.tr("Localizable", "renameLabel_account_tooLong", fallback: "Account label too long")
+    }
+    internal enum Connector {
+      /// Linked Connector name required
+      internal static let empty = L10n.tr("Localizable", "renameLabel_connector_empty", fallback: "Linked Connector name required")
+      /// Enter a new name for this Linked Connector
+      internal static let subtitle = L10n.tr("Localizable", "renameLabel_connector_subtitle", fallback: "Enter a new name for this Linked Connector")
+      /// Rename Connector
+      internal static let title = L10n.tr("Localizable", "renameLabel_connector_title", fallback: "Rename Connector")
+    }
+    internal enum FactorSource {
+      /// Factor Source name required
+      internal static let empty = L10n.tr("Localizable", "renameLabel_factorSource_empty", fallback: "Factor Source name required")
+      /// Enter a new name for this Factor Source
+      internal static let subtitle = L10n.tr("Localizable", "renameLabel_factorSource_subtitle", fallback: "Enter a new name for this Factor Source")
+      /// Rename Factor Source
+      internal static let title = L10n.tr("Localizable", "renameLabel_factorSource_title", fallback: "Rename Factor Source")
+      /// Factor Source name too long
+      internal static let tooLong = L10n.tr("Localizable", "renameLabel_factorSource_tooLong", fallback: "Factor Source name too long")
+    }
+  }
   internal enum RevealSeedPhrase {
     /// Passphrase
     internal static let passphrase = L10n.tr("Localizable", "revealSeedPhrase_passphrase", fallback: "Passphrase")
@@ -3480,10 +3668,22 @@ internal enum L10n {
       /// Security Factors
       internal static let title = L10n.tr("Localizable", "securityCenter_securityFactorsItem_title", fallback: "Security Factors")
     }
+    internal enum SecurityShieldsItem {
+      /// Shielded
+      internal static let shieldedStatus = L10n.tr("Localizable", "securityCenter_securityShieldsItem_shieldedStatus", fallback: "Shielded")
+      /// Decentralized multi-factor signing and recovery for your Accounts and Personas
+      internal static let subtitle = L10n.tr("Localizable", "securityCenter_securityShieldsItem_subtitle", fallback: "Decentralized multi-factor signing and recovery for your Accounts and Personas")
+      /// Security Shields
+      internal static let title = L10n.tr("Localizable", "securityCenter_securityShieldsItem_title", fallback: "Security Shields")
+    }
   }
   internal enum SecurityFactors {
-    /// View and manage your security factors
-    internal static let subtitle = L10n.tr("Localizable", "securityFactors_subtitle", fallback: "View and manage your security factors")
+    /// Hardware
+    internal static let hardware = L10n.tr("Localizable", "securityFactors_hardware", fallback: "Hardware")
+    /// Things you know
+    internal static let information = L10n.tr("Localizable", "securityFactors_information", fallback: "Things you know")
+    /// Manage the security factors you’ll use in your Security Shields.
+    internal static let subtitle = L10n.tr("Localizable", "securityFactors_subtitle", fallback: "Manage the security factors you’ll use in your Security Shields.")
     /// Security Factors
     internal static let title = L10n.tr("Localizable", "securityFactors_title", fallback: "Security Factors")
     internal enum LedgerWallet {
@@ -3511,6 +3711,12 @@ internal enum L10n {
       internal static let subtitle = L10n.tr("Localizable", "securityFactors_seedPhrases_subtitle", fallback: "Your seedphrases connected to your account")
       /// Seed Phrases
       internal static let title = L10n.tr("Localizable", "securityFactors_seedPhrases_title", fallback: "Seed Phrases")
+    }
+    internal enum SelectFactor {
+      /// Can't currently be used here. **Learn why**
+      internal static let disabled = L10n.tr("Localizable", "securityFactors_selectFactor_disabled", fallback: "Can't currently be used here. **Learn why**")
+      /// Select Factor Type
+      internal static let title = L10n.tr("Localizable", "securityFactors_selectFactor_title", fallback: "Select Factor Type")
     }
   }
   internal enum SecurityProblems {
@@ -3601,8 +3807,8 @@ internal enum L10n {
       internal static let securityCenterBody = L10n.tr("Localizable", "securityProblems_no9_securityCenterBody", fallback: "Enter seed phrase to recover control.")
       /// Recovery required
       internal static let securityCenterTitle = L10n.tr("Localizable", "securityProblems_no9_securityCenterTitle", fallback: "Recovery required")
-      /// Enter seed phrase to recover control
-      internal static let securityFactors = L10n.tr("Localizable", "securityProblems_no9_securityFactors", fallback: "Enter seed phrase to recover control")
+      /// Enter seed phrase to recover use
+      internal static let securityFactors = L10n.tr("Localizable", "securityProblems_no9_securityFactors", fallback: "Enter seed phrase to recover use")
       /// Enter seed phrase to recover control
       internal static let seedPhrases = L10n.tr("Localizable", "securityProblems_no9_seedPhrases", fallback: "Enter seed phrase to recover control")
       /// Recovery required
@@ -3669,6 +3875,210 @@ internal enum L10n {
       internal static let subtitle = L10n.tr("Localizable", "settings_linkToConnectorHeader_subtitle", fallback: "Scan the QR code in the Radix Wallet Connector extension")
       /// Link your Wallet to a Desktop Browser
       internal static let title = L10n.tr("Localizable", "settings_linkToConnectorHeader_title", fallback: "Link your Wallet to a Desktop Browser")
+    }
+  }
+  internal enum ShieldSetupOnboarding {
+    /// Next
+    internal static let nextButtonTitle = L10n.tr("Localizable", "shieldSetupOnboarding_nextButtonTitle", fallback: "Next")
+    /// Start
+    internal static let startButtonTitle = L10n.tr("Localizable", "shieldSetupOnboarding_startButtonTitle", fallback: "Start")
+    internal enum ApplyShieldStep {
+      /// Sign a transaction to apply your Shield to your Accounts and Personas.
+      /// 
+      /// You can use the same Shield for all of them or create multiple Shields.
+      internal static let subtitle = L10n.tr("Localizable", "shieldSetupOnboarding_applyShieldStep_subtitle", fallback: "Sign a transaction to apply your Shield to your Accounts and Personas.\n\nYou can use the same Shield for all of them or create multiple Shields.")
+      /// Apply your Shield to your Accounts and Personas
+      internal static let title = L10n.tr("Localizable", "shieldSetupOnboarding_applyShieldStep_title", fallback: "Apply your Shield to your Accounts and Personas")
+    }
+    internal enum BuildShieldStep {
+      /// Add your security factors to your Radix Wallet and use them to build your Shield.
+      internal static let subtitle = L10n.tr("Localizable", "shieldSetupOnboarding_buildShieldStep_subtitle", fallback: "Add your security factors to your Radix Wallet and use them to build your Shield.")
+      /// Add your security factors and build your Shield
+      internal static let title = L10n.tr("Localizable", "shieldSetupOnboarding_buildShieldStep_title", fallback: "Add your security factors and build your Shield")
+    }
+    internal enum IntroStep {
+      /// Create your Security Shield by combining different security factors. Use it to safely sign transactions and recover Accounts if you’ve lost access.
+      internal static let subtitle = L10n.tr("Localizable", "shieldSetupOnboarding_introStep_subtitle", fallback: "Create your Security Shield by combining different security factors. Use it to safely sign transactions and recover Accounts if you’ve lost access.")
+      /// Multi-factor authentication for web3
+      internal static let title = L10n.tr("Localizable", "shieldSetupOnboarding_introStep_title", fallback: "Multi-factor authentication for web3")
+    }
+  }
+  internal enum ShieldSetupPrepareFactors {
+    internal enum AddAnotherFactor {
+      /// Add Factor
+      internal static let button = L10n.tr("Localizable", "shieldSetupPrepareFactors_addAnotherFactor_button", fallback: "Add Factor")
+      /// Choosing a mnemonic is only recommended for advanced users
+      internal static let passphraseHint = L10n.tr("Localizable", "shieldSetupPrepareFactors_addAnotherFactor_passphraseHint", fallback: "Choosing a mnemonic is only recommended for advanced users")
+      /// You need to add **1 more factor** to begin building your Shield.
+      internal static let subtitle = L10n.tr("Localizable", "shieldSetupPrepareFactors_addAnotherFactor_subtitle", fallback: "You need to add **1 more factor** to begin building your Shield.")
+      /// Add Another Factor
+      internal static let title = L10n.tr("Localizable", "shieldSetupPrepareFactors_addAnotherFactor_title", fallback: "Add Another Factor")
+    }
+    internal enum AddHardwareFactor {
+      /// Add Hardware Device
+      internal static let button = L10n.tr("Localizable", "shieldSetupPrepareFactors_addHardwareFactor_button", fallback: "Add Hardware Device")
+      /// I don’t have a hardware device
+      internal static let noDeviceButton = L10n.tr("Localizable", "shieldSetupPrepareFactors_addHardwareFactor_noDeviceButton", fallback: "I don’t have a hardware device")
+      /// Choose a hardware device to use as a security factor in your Shield.
+      internal static let subtitle = L10n.tr("Localizable", "shieldSetupPrepareFactors_addHardwareFactor_subtitle", fallback: "Choose a hardware device to use as a security factor in your Shield.")
+      /// Add a Hardware Device
+      internal static let title = L10n.tr("Localizable", "shieldSetupPrepareFactors_addHardwareFactor_title", fallback: "Add a Hardware Device")
+    }
+    internal enum Completion {
+      /// Build Shield
+      internal static let button = L10n.tr("Localizable", "shieldSetupPrepareFactors_completion_button", fallback: "Build Shield")
+      /// Before it’s finished, you’ll have the chance to review it and make any changes.
+      internal static let subtitleBottom = L10n.tr("Localizable", "shieldSetupPrepareFactors_completion_subtitleBottom", fallback: "Before it’s finished, you’ll have the chance to review it and make any changes.")
+      /// Now let’s build your Shield.
+      internal static let subtitleTop = L10n.tr("Localizable", "shieldSetupPrepareFactors_completion_subtitleTop", fallback: "Now let’s build your Shield.")
+      /// Your Factors are Ready
+      internal static let title = L10n.tr("Localizable", "shieldSetupPrepareFactors_completion_title", fallback: "Your Factors are Ready")
+    }
+    internal enum Intro {
+      /// Start
+      internal static let button = L10n.tr("Localizable", "shieldSetupPrepareFactors_intro_button", fallback: "Start")
+      /// A future wallet update will enable Shields without needing a hardware device.
+      internal static let subtitleBottom = L10n.tr("Localizable", "shieldSetupPrepareFactors_intro_subtitleBottom", fallback: "A future wallet update will enable Shields without needing a hardware device.")
+      /// You need at least **2 factors** to build a Security Shield. 1 of your factors must be a hardware device.
+      internal static let subtitleTop = L10n.tr("Localizable", "shieldSetupPrepareFactors_intro_subtitleTop", fallback: "You need at least **2 factors** to build a Security Shield. 1 of your factors must be a hardware device.")
+      /// Let’s Prepare your Factors
+      internal static let title = L10n.tr("Localizable", "shieldSetupPrepareFactors_intro_title", fallback: "Let’s Prepare your Factors")
+    }
+  }
+  internal enum ShieldSetupSelectFactors {
+    /// Build Shield
+    internal static let buildButtonTitle = L10n.tr("Localizable", "shieldSetupSelectFactors_buildButtonTitle", fallback: "Build Shield")
+    /// Choose the factors you’ll use for regular access. You’ll use **all** of these factors every time you send assets.
+    internal static let subtitle = L10n.tr("Localizable", "shieldSetupSelectFactors_subtitle", fallback: "Choose the factors you’ll use for regular access. You’ll use **all** of these factors every time you send assets.")
+    /// Select Factors for Regular Access
+    internal static let title = L10n.tr("Localizable", "shieldSetupSelectFactors_title", fallback: "Select Factors for Regular Access")
+  }
+  internal enum ShieldSetupStatus {
+    /// Cannot use this factor type by itself
+    internal static let factorCannotBeUsedByItself = L10n.tr("Localizable", "shieldSetupStatus_factorCannotBeUsedByItself", fallback: "Cannot use this factor type by itself")
+    /// You cannot create a Shield with this combination of factors. **Read more**
+    internal static let invalidCombination = L10n.tr("Localizable", "shieldSetupStatus_invalidCombination", fallback: "You cannot create a Shield with this combination of factors. **Read more**")
+    /// Choosing 2 factors will make your Shield more secure and reliable
+    internal static let recommendedFactors = L10n.tr("Localizable", "shieldSetupStatus_recommendedFactors", fallback: "Choosing 2 factors will make your Shield more secure and reliable")
+    internal enum Authentication {
+      /// You need to choose a factor to continue
+      internal static let atLeastOneFactor = L10n.tr("Localizable", "shieldSetupStatus_authentication_atLeastOneFactor", fallback: "You need to choose a factor to continue")
+    }
+    internal enum Transactions {
+      /// You need to select at least 1 factor for signing transactions
+      internal static let atLeastOneFactor = L10n.tr("Localizable", "shieldSetupStatus_transactions_atLeastOneFactor", fallback: "You need to select at least 1 factor for signing transactions")
+    }
+  }
+  internal enum ShieldWizardName {
+    /// Give this Security Shield a name, so you can identify it later.
+    internal static let subtitle = L10n.tr("Localizable", "shieldWizardName_subtitle", fallback: "Give this Security Shield a name, so you can identify it later.")
+    /// Name your Security Shield
+    internal static let title = L10n.tr("Localizable", "shieldWizardName_title", fallback: "Name your Security Shield")
+  }
+  internal enum ShieldWizardRecovery {
+    /// Recovery
+    internal static let title = L10n.tr("Localizable", "shieldWizardRecovery_title", fallback: "Recovery")
+    internal enum Combination {
+      /// OR
+      internal static let label = L10n.tr("Localizable", "shieldWizardRecovery_combination_label", fallback: "OR")
+    }
+    internal enum Confirm {
+      /// Factors you can use to complete the recovery of your Accounts and Personas.
+      internal static let subtitle = L10n.tr("Localizable", "shieldWizardRecovery_confirm_subtitle", fallback: "Factors you can use to complete the recovery of your Accounts and Personas.")
+      /// Confirming a Recovery
+      internal static let title = L10n.tr("Localizable", "shieldWizardRecovery_confirm_title", fallback: "Confirming a Recovery")
+    }
+    internal enum Factors {
+      /// You'll need to use the following:
+      internal static let title = L10n.tr("Localizable", "shieldWizardRecovery_factors_title", fallback: "You'll need to use the following:")
+    }
+    internal enum Fallback {
+      /// We recommend setting this for an extended period, so you have time to notice and cancel a recovery you don’t want.
+      internal static let note = L10n.tr("Localizable", "shieldWizardRecovery_fallback_note", fallback: "We recommend setting this for an extended period, so you have time to notice and cancel a recovery you don’t want.")
+      /// Set a time period to automatically confirm recovery **WITHOUT** presenting any of the above confirmation factors.
+      internal static let subtitle = L10n.tr("Localizable", "shieldWizardRecovery_fallback_subtitle", fallback: "Set a time period to automatically confirm recovery **WITHOUT** presenting any of the above confirmation factors.")
+      /// Emergency Fallback
+      internal static let title = L10n.tr("Localizable", "shieldWizardRecovery_fallback_title", fallback: "Emergency Fallback")
+      internal enum Day {
+        /// Day
+        internal static let label = L10n.tr("Localizable", "shieldWizardRecovery_fallback_day_label", fallback: "Day")
+      }
+      internal enum Days {
+        /// Days
+        internal static let label = L10n.tr("Localizable", "shieldWizardRecovery_fallback_days_label", fallback: "Days")
+      }
+      internal enum Week {
+        /// Week
+        internal static let label = L10n.tr("Localizable", "shieldWizardRecovery_fallback_week_label", fallback: "Week")
+      }
+      internal enum Weeks {
+        /// Weeks
+        internal static let label = L10n.tr("Localizable", "shieldWizardRecovery_fallback_weeks_label", fallback: "Weeks")
+      }
+    }
+    internal enum SetFallback {
+      /// Set
+      internal static let button = L10n.tr("Localizable", "shieldWizardRecovery_setFallback_button", fallback: "Set")
+      /// Set a time period to automatically confirm recovery **WITHOUT** presenting any confirmation factors.
+      internal static let subtitle = L10n.tr("Localizable", "shieldWizardRecovery_setFallback_subtitle", fallback: "Set a time period to automatically confirm recovery **WITHOUT** presenting any confirmation factors.")
+      /// Emergency Fallback
+      internal static let title = L10n.tr("Localizable", "shieldWizardRecovery_setFallback_title", fallback: "Emergency Fallback")
+    }
+    internal enum Start {
+      /// Factors you can use to start recovering, and temporarily lock, Accounts and Personas if you lose access.
+      internal static let subtitle = L10n.tr("Localizable", "shieldWizardRecovery_start_subtitle", fallback: "Factors you can use to start recovering, and temporarily lock, Accounts and Personas if you lose access.")
+      /// Starting a Recovery
+      internal static let title = L10n.tr("Localizable", "shieldWizardRecovery_start_title", fallback: "Starting a Recovery")
+    }
+    internal enum Step {
+      /// Step 2 of 2
+      internal static let title = L10n.tr("Localizable", "shieldWizardRecovery_step_title", fallback: "Step 2 of 2")
+    }
+  }
+  internal enum ShieldWizardRegularAccess {
+    /// Factors required to withdraw assets from Accounts.
+    internal static let subtitle = L10n.tr("Localizable", "shieldWizardRegularAccess_subtitle", fallback: "Factors required to withdraw assets from Accounts.")
+    /// Regular Access
+    internal static let title = L10n.tr("Localizable", "shieldWizardRegularAccess_title", fallback: "Regular Access")
+    internal enum Authentication {
+      /// Single factor required to log in to dApps with Personas and prove ownership of Accounts.
+      internal static let title = L10n.tr("Localizable", "shieldWizardRegularAccess_authentication_title", fallback: "Single factor required to log in to dApps with Personas and prove ownership of Accounts.")
+    }
+    internal enum Combination {
+      /// OR
+      internal static let label = L10n.tr("Localizable", "shieldWizardRegularAccess_combination_label", fallback: "OR")
+    }
+    internal enum Override {
+      /// Add an override
+      internal static let button = L10n.tr("Localizable", "shieldWizardRegularAccess_override_button", fallback: "Add an override")
+      /// Or you can use the following:
+      internal static let description = L10n.tr("Localizable", "shieldWizardRegularAccess_override_description", fallback: "Or you can use the following:")
+      /// Override (advanced)
+      internal static let title = L10n.tr("Localizable", "shieldWizardRegularAccess_override_title", fallback: "Override (advanced)")
+    }
+    internal enum OverrideCombination {
+      /// OR
+      internal static let label = L10n.tr("Localizable", "shieldWizardRegularAccess_overrideCombination_label", fallback: "OR")
+    }
+    internal enum SetThreshold {
+      /// All (Recommended)
+      internal static let all = L10n.tr("Localizable", "shieldWizardRegularAccess_setThreshold_all", fallback: "All (Recommended)")
+      /// Set
+      internal static let button = L10n.tr("Localizable", "shieldWizardRegularAccess_setThreshold_button", fallback: "Set")
+      /// Set the number of factors required to sign
+      internal static let title = L10n.tr("Localizable", "shieldWizardRegularAccess_setThreshold_title", fallback: "Set the number of factors required to sign")
+    }
+    internal enum Step {
+      /// Step 1 of 2
+      internal static let title = L10n.tr("Localizable", "shieldWizardRegularAccess_step_title", fallback: "Step 1 of 2")
+    }
+    internal enum ThresholdDescription {
+      /// All
+      internal static let all = L10n.tr("Localizable", "shieldWizardRegularAccess_thresholdDescription_all", fallback: "All")
+      /// You'll need to use **%@** of the following
+      internal static func title(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "shieldWizardRegularAccess_thresholdDescription_title", String(describing: p1), fallback: "You'll need to use **%@** of the following")
+      }
     }
   }
   internal enum Splash {

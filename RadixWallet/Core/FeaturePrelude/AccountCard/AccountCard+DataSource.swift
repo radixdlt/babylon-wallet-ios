@@ -128,7 +128,7 @@ private extension AccountOrAddressOf {
 	private var gradient: Gradient {
 		switch self {
 		case let .profileAccount(value: account):
-			.init(account.appearanceID)
+			.init(account.appearanceId)
 		case .addressOfExternalAccount:
 			.external
 		}

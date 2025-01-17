@@ -45,6 +45,8 @@ struct SecureStorageClient: Sendable {
 	var loadMnemonicDataByFactorSourceID: LoadMnemonicDataByFactorSourceID
 	var saveMnemonicForFactorSourceData: SaveMnemonicForFactorSourceData
 
+	var containsDataForKey: ContainsDataForKey
+
 	#if DEBUG
 	var getAllMnemonics: GetAllMnemonics
 	#endif
@@ -76,7 +78,8 @@ struct SecureStorageClient: Sendable {
 		keychainChanged: @escaping KeychainChanged,
 		getAllMnemonics: @escaping GetAllMnemonics,
 		loadMnemonicDataByFactorSourceID: @escaping LoadMnemonicDataByFactorSourceID,
-		saveMnemonicForFactorSourceData: @escaping SaveMnemonicForFactorSourceData
+		saveMnemonicForFactorSourceData: @escaping SaveMnemonicForFactorSourceData,
+		containsDataForKey: @escaping ContainsDataForKey
 	) {
 		self.loadProfileSnapshotData = loadProfileSnapshotData
 		self.saveProfileSnapshotData = saveProfileSnapshotData
@@ -104,6 +107,7 @@ struct SecureStorageClient: Sendable {
 		self.keychainChanged = keychainChanged
 		self.loadMnemonicDataByFactorSourceID = loadMnemonicDataByFactorSourceID
 		self.saveMnemonicForFactorSourceData = saveMnemonicForFactorSourceData
+		self.containsDataForKey = containsDataForKey
 	}
 	#else
 
@@ -132,7 +136,8 @@ struct SecureStorageClient: Sendable {
 		saveP2PLinksPrivateKey: @escaping SaveP2PLinksPrivateKey,
 		keychainChanged: @escaping KeychainChanged,
 		loadMnemonicDataByFactorSourceID: @escaping LoadMnemonicDataByFactorSourceID,
-		saveMnemonicForFactorSourceData: @escaping SaveMnemonicForFactorSourceData
+		saveMnemonicForFactorSourceData: @escaping SaveMnemonicForFactorSourceData,
+		containsDataForKey: @escaping ContainsDataForKey
 	) {
 		self.loadProfileSnapshotData = loadProfileSnapshotData
 		self.saveProfileSnapshotData = saveProfileSnapshotData
@@ -159,6 +164,7 @@ struct SecureStorageClient: Sendable {
 		self.keychainChanged = keychainChanged
 		self.loadMnemonicDataByFactorSourceID = loadMnemonicDataByFactorSourceID
 		self.saveMnemonicForFactorSourceData = saveMnemonicForFactorSourceData
+		self.containsDataForKey = containsDataForKey
 	}
 	#endif // DEBUG
 }
@@ -211,6 +217,8 @@ extension SecureStorageClient {
 	typealias SaveP2PLinksPrivateKey = @Sendable (Curve25519.PrivateKey) throws -> Void
 
 	typealias KeychainChanged = @Sendable () -> AnyAsyncSequence<Void>
+
+	typealias ContainsDataForKey = @Sendable (SargonUniFFI.SecureStorageKey) throws -> Bool
 
 	enum LoadMnemonicPurpose: Sendable, Hashable, CustomStringConvertible {
 		case signTransaction

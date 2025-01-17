@@ -371,7 +371,6 @@ func signingFactors(
 		case let .unsecured(unsecuredEntityControl):
 
 			let factorInstance = unsecuredEntityControl.transactionSigning
-
 			let id = factorInstance.factorSourceID
 			guard let factorSource = allFactorSources[id: id.asGeneral] else {
 				assertionFailure("Bad! factor source not found")

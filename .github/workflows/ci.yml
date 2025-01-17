@@ -39,6 +39,8 @@ jobs:
           secret_prefix: 'SNYK'
           secret_name: ${{ secrets.AWS_SECRET_NAME_SNYK }}
           parse_json: true
+      - name: Create .snyk file
+        run: echo "${{ vars.DOT_SNYK_FILE }}" > .snyk
       - name: Install snyk
         run: |
           npm install snyk -g

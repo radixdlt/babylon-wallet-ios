@@ -145,7 +145,7 @@ private extension View {
 
 	private func updateAccountLabel(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
 		sheet(store: destinationStore.scope(state: \.updateAccountLabel, action: \.updateAccountLabel)) {
-			UpdateAccountLabel.View(store: $0)
+			RenameLabel.View(store: $0)
 		}
 	}
 
@@ -212,7 +212,7 @@ extension PreferenceSection.Row where RowId == AccountPreferences.Section.Sectio
 			id: .personalize(.accountLabel),
 			title: L10n.AccountSettings.accountLabel,
 			subtitle: L10n.AccountSettings.accountLabelSubtitle,
-			icon: .asset(AssetResource.create)
+			icon: .asset(.create)
 		)
 	}
 
@@ -230,20 +230,20 @@ extension PreferenceSection.Row where RowId == AccountPreferences.Section.Sectio
 			id: .dev(.devPreferences),
 			title: L10n.AccountSettings.devPreferences,
 			subtitle: nil,
-			icon: .asset(AssetResource.appSettings)
+			icon: .asset(.appSettings)
 		)
 	}
 }
 
 extension DepositRule {
-	var icon: ImageAsset {
+	var icon: ImageResource {
 		switch self {
 		case .acceptAll:
-			AssetResource.iconAcceptAirdrop
+			.iconAcceptAirdrop
 		case .acceptKnown:
-			AssetResource.iconAcceptKnownAirdrop
+			.iconAcceptKnownAirdrop
 		case .denyAll:
-			AssetResource.iconDeclineAirdrop
+			.iconDeclineAirdrop
 		}
 	}
 }

@@ -5,18 +5,18 @@ struct AssetIcon: View {
 	private let cornerRadius: CGFloat
 
 	enum Content: Equatable {
-		case asset(ImageAsset)
+		case asset(ImageResource)
 		case systemImage(String)
 	}
 
-	init(_ content: Content, verySmall: Bool = true) {
+	nonisolated init(_ content: Content, verySmall: Bool = true) {
 		self.init(content, size: verySmall ? .verySmall : .small)
 	}
 
 	init(_ content: Content, size: HitTargetSize) {
 		switch content {
 		case let .asset(asset):
-			self.image = Image(asset: asset)
+			self.image = Image(asset)
 		case let .systemImage(systemName):
 			self.image = Image(systemName: systemName)
 		}

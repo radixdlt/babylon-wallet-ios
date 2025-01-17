@@ -5,21 +5,26 @@ struct FactorSourceCardDataSource {
 	var subtitle: String?
 	var lastUsedOn: Timestamp?
 	var messages: [Message] = []
-	var accounts: [Account] = []
-	var personas: [Persona] = []
-
-	var hasEntities: Bool {
-		!accounts.isEmpty || !personas.isEmpty
-	}
+	var linkedEntities: LinkedEntities?
 }
 
 // MARK: FactorSourceCardDataSource.Message
 extension FactorSourceCardDataSource {
-	struct Message: Identifiable {
+	struct Message: Identifiable, Sendable, Hashable {
 		var id: String { text }
 
 		let text: String
 		let type: StatusMessageView.ViewType
+	}
+
+	struct LinkedEntities: Sendable, Hashable {
+		let accounts: [Account]
+		let personas: [Persona]
+		let hasHiddenEntities: Bool
+
+		var isEmpty: Bool {
+			accounts.isEmpty && personas.isEmpty && !hasHiddenEntities
+		}
 	}
 }
 
@@ -84,6 +89,23 @@ extension FactorSourceKind {
 		case .password:
 			L10n.FactorSources.Card.passwordDescription
 		case .trustedContact, .securityQuestions:
+			fatalError("Not supported yet")
+		}
+	}
+
+	var infoLinkContent: (item: InfoLinkSheet.GlossaryItem, title: String) {
+		switch self {
+		case .device:
+			(.biometricspin, L10n.InfoLink.Title.biometricspin)
+		case .ledgerHqHardwareWallet:
+			(.ledgernano, L10n.InfoLink.Title.ledgernano)
+		case .offDeviceMnemonic:
+			(.passphrases, L10n.InfoLink.Title.passphrases)
+		case .arculusCard:
+			(.arculus, L10n.InfoLink.Title.arculus)
+		case .password:
+			(.passwords, L10n.InfoLink.Title.passwords)
+		default:
 			fatalError("Not supported yet")
 		}
 	}
