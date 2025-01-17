@@ -38,6 +38,7 @@ extension SelectFactorSources {
 				ScrollView {
 					coreView
 						.padding(.horizontal, .medium3)
+						.padding(.bottom, .medium2)
 						.animation(.default, value: store.statusMessageInfo?.type)
 						.animation(.default, value: store.shouldShowPasswordMessage)
 				}
@@ -96,6 +97,12 @@ extension SelectFactorSources {
 							.buttonStyle(.inert)
 					}
 				}
+
+				Button("Skip and create an empty shield") {
+					store.send(.view(.skipButtonTapped))
+				}
+				.buttonStyle(.primaryText())
+				.padding(.vertical, .medium2)
 
 				Spacer()
 			}

@@ -30,7 +30,7 @@ extension PrepareFactorSources {
 		}
 
 		enum DelegateAction: Sendable, Equatable {
-			case finished
+			case finished(shouldBuildEmptyShield: Bool)
 			case push(Path.State)
 		}
 
@@ -57,8 +57,6 @@ extension PrepareFactorSources {
 		var body: some ReducerOf<Self> {
 			Scope(state: \.path, action: \.child.path) {
 				Path.intro
-				Path.addFactor(PrepareFactorSources.AddFactorSource())
-				Path.completion
 			}
 			Reduce(core)
 				.ifLet(destinationPath, action: \.destination) {
@@ -73,7 +71,7 @@ extension PrepareFactorSources {
 			case .introButtonTapped:
 				determineNextStepEffect()
 			case .completionButtonTapped:
-				.send(.delegate(.finished))
+				.send(.delegate(.finished(shouldBuildEmptyShield: false)))
 			}
 		}
 
@@ -81,6 +79,8 @@ extension PrepareFactorSources {
 			switch childAction {
 			case let .path(.addFactor(.delegate(.addFactorSource(kind)))):
 				addFactorSourceEffect(&state, kind: kind)
+			case let .path(.addFactor(.delegate(.skipAndCreateEmptyShield))):
+				.send(.delegate(.finished(shouldBuildEmptyShield: true)))
 			default:
 				.none
 			}

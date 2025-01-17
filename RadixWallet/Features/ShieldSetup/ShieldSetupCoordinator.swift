@@ -3,6 +3,8 @@
 struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
+		@Shared(.shieldBuilder) var shieldBuilder
+
 		var onboarding: ShieldSetupOnboarding.State = .init()
 		var path: StackState<Path.State> = .init()
 	}
@@ -58,8 +60,14 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 		case let .path(.element(id: _, action: .prepareFactors(.delegate(.push(path))))):
 			state.path.append(.prepareFactors(.init(path: path)))
 			return .none
-		case .path(.element(id: _, action: .prepareFactors(.delegate(.finished)))):
-			return .send(.internal(.selectFactors))
+		case let .path(.element(id: _, action: .prepareFactors(.delegate(.finished(shouldBuildEmptyShield))))):
+			if shouldBuildEmptyShield {
+				state.$shieldBuilder.initialize()
+				state.path.append(.rolesSetup(.init()))
+				return .none
+			} else {
+				return .send(.internal(.selectFactors))
+			}
 		case .path(.element(id: _, action: .selectFactors(.delegate(.finished)))):
 			state.path.append(.rolesSetup(.init()))
 			return .none

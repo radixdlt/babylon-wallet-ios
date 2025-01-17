@@ -28,6 +28,7 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 		case selectedFactorSourcesChanged([FactorSource]?)
 		case continueButtonTapped
 		case invalidReadMoreTapped
+		case skipButtonTapped
 	}
 
 	enum InternalAction: Equatable, Sendable {
@@ -86,6 +87,10 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 		case .invalidReadMoreTapped:
 			overlayWindowClient.showInfoLink(.init(glossaryItem: .buildingshield))
 			return .none
+
+		case .skipButtonTapped:
+			state.$shieldBuilder.initialize()
+			return .send(.delegate(.finished))
 		}
 	}
 

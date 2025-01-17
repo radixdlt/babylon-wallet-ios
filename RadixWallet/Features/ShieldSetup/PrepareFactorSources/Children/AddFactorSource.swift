@@ -13,10 +13,12 @@ extension PrepareFactorSources {
 		enum ViewAction: Sendable, Equatable {
 			case selected(FactorSourceKind)
 			case addButtonTapped
+			case skipButtonTapped
 		}
 
 		enum DelegateAction: Sendable, Equatable {
 			case addFactorSource(FactorSourceKind)
+			case skipAndCreateEmptyShield
 		}
 
 		var body: some ReducerOf<Self> {
@@ -33,6 +35,8 @@ extension PrepareFactorSources {
 					return .none
 				}
 				return .send(.delegate(.addFactorSource(selected)))
+			case .skipButtonTapped:
+				return .send(.delegate(.skipAndCreateEmptyShield))
 			}
 		}
 	}

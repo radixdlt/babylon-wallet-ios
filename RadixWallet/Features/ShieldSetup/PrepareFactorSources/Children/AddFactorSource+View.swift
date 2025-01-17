@@ -23,6 +23,11 @@ extension PrepareFactorSources.AddFactorSource {
 							ForEachStatic(store.factorSources) { factorSource in
 								card(factorSource)
 							}
+
+							if store.showNoHardwareDeviceInfo {
+								InfoButton(.nohardwaredevice, label: "L10n.InfoLink.Title.nohardwaredevice") // TODO: localization
+									.padding(.vertical, .medium3)
+							}
 						}
 
 						Spacer()
@@ -39,12 +44,11 @@ extension PrepareFactorSources.AddFactorSource {
 						.buttonStyle(.primaryRectangular)
 						.controlState(store.controlState)
 
-						if store.showNoHardwareDeviceInfo {
-							Button(L10n.ShieldSetupPrepareFactors.AddHardwareFactor.noDeviceButton) {
-								// TODO: Handle the action and add a popup for skipping this step
-							}
-							.buttonStyle(.primaryText())
+						// TODO: localization
+						Button("Skip and create an empty shield") {
+							store.send(.view(.skipButtonTapped))
 						}
+						.buttonStyle(.primaryText())
 					}
 				}
 			}
