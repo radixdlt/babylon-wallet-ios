@@ -187,7 +187,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 		let signAuth: SignAuth = { request in
 			let payload = request.input.payload
 			let payloadId = payload.hash()
-			let expectedHashedMessage = payloadId.hash().data
+			let expectedHashedMessage = payloadId.payload.hash().data
 
 			let result = try await sign(
 				expectedHashedMessage: expectedHashedMessage,
