@@ -124,14 +124,18 @@ extension OverlayWindowClient {
 	}
 
 	func signTransaction(input: PerFactorSourceInputOfTransactionIntent) async -> SheetAction {
-		await scheduleSheet(.init(root: .newSigning(.init(input: input))))
+		await scheduleSheet(.init(root: .signing(.init(input: input))))
 	}
 
 	func signSubintent(input: PerFactorSourceInputOfSubintent) async -> SheetAction {
-		await scheduleSheet(.init(root: .newSigning(.init(input: input))))
+		await scheduleSheet(.init(root: .signing(.init(input: input))))
 	}
 
 	func signAuth(input: PerFactorSourceInputOfAuthIntent) async -> SheetAction {
-		await scheduleSheet(.init(root: .newSigning(.init(input: input))))
+		await scheduleSheet(.init(root: .signing(.init(input: input))))
+	}
+
+	func derivePublicKeys(input: KeyDerivationRequestPerFactorSource, purpose: DerivationPurpose) async -> SheetAction {
+		await scheduleSheet(.init(root: .derivePublicKeys(.init(input: input, purpose: purpose))))
 	}
 }

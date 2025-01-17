@@ -22,11 +22,18 @@ extension SheetOverlayCoordinator {
 						}
 					)
 
-				case .newSigning:
+				case .signing:
 					CaseLet(
-						/SheetOverlayCoordinator.Root.State.newSigning,
-						action: SheetOverlayCoordinator.Root.Action.newSigning,
+						/SheetOverlayCoordinator.Root.State.signing,
+						action: SheetOverlayCoordinator.Root.Action.signing,
 						then: { NewSigning.View(store: $0) }
+					)
+
+				case .derivePublicKeys:
+					CaseLet(
+						/SheetOverlayCoordinator.Root.State.derivePublicKeys,
+						action: SheetOverlayCoordinator.Root.Action.derivePublicKeys,
+						then: { NewDerivePublicKeys.View(store: $0) }
 					)
 				}
 			}

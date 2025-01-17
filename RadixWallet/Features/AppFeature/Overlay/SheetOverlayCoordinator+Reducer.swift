@@ -22,29 +22,34 @@ struct SheetOverlayCoordinator: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case dismiss
-		case newSigning(NewSigning.DelegateAction)
+		case signing(NewSigning.DelegateAction)
+		case derivePublicKeys(NewDerivePublicKeys.DelegateAction)
 	}
 
 	struct Root: Sendable, Hashable, Reducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
 			case infoLink(InfoLinkSheet.State)
-			case newSigning(NewSigning.State)
+			case signing(NewSigning.State)
+			case derivePublicKeys(NewDerivePublicKeys.State)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
 			case infoLink(InfoLinkSheet.Action)
-			case signing(Signing.Action)
-			case newSigning(NewSigning.Action)
+			case signing(NewSigning.Action)
+			case derivePublicKeys(NewDerivePublicKeys.Action)
 		}
 
 		var body: some ReducerOf<Self> {
 			Scope(state: \.infoLink, action: \.infoLink) {
 				InfoLinkSheet()
 			}
-			Scope(state: \.newSigning, action: \.newSigning) {
+			Scope(state: \.signing, action: \.signing) {
 				NewSigning()
+			}
+			Scope(state: \.derivePublicKeys, action: \.derivePublicKeys) {
+				NewDerivePublicKeys()
 			}
 		}
 	}
@@ -68,8 +73,11 @@ struct SheetOverlayCoordinator: Sendable, FeatureReducer {
 	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		// Forward all delegate actions, re-wrapped
-		case let .root(.newSigning(.delegate(action))):
-			.send(.delegate(.newSigning(action)))
+		case let .root(.signing(.delegate(action))):
+			.send(.delegate(.signing(action)))
+
+		case let .root(.derivePublicKeys(.delegate(action))):
+			.send(.delegate(.derivePublicKeys(action)))
 
 		default:
 			.none

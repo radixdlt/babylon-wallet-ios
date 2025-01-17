@@ -17,21 +17,7 @@ struct DeviceFactorSourceClient: Sendable {
 	/// - their mnmemonic is not backed up (entity was created but seed phrase never written down).
 	var entitiesInBadState: EntitiesInBadState
 
-	init(
-		publicKeysFromOnDeviceHD: @escaping PublicKeysFromOnDeviceHD,
-		signatureFromOnDeviceHD: @escaping SignatureFromOnDeviceHD,
-		isAccountRecoveryNeeded: @escaping IsAccountRecoveryNeeded,
-		entitiesControlledByFactorSource: @escaping GetEntitiesControlledByFactorSource,
-		controlledEntities: @escaping GetControlledEntities,
-		entitiesInBadState: @escaping EntitiesInBadState
-	) {
-		self.publicKeysFromOnDeviceHD = publicKeysFromOnDeviceHD
-		self.signatureFromOnDeviceHD = signatureFromOnDeviceHD
-		self.isAccountRecoveryNeeded = isAccountRecoveryNeeded
-		self.entitiesControlledByFactorSource = entitiesControlledByFactorSource
-		self.controlledEntities = controlledEntities
-		self.entitiesInBadState = entitiesInBadState
-	}
+	var getHDFactorInstances: GetHDFactorInstances
 }
 
 // MARK: DeviceFactorSourceClient.onDeviceHDPublicKey
@@ -43,6 +29,7 @@ extension DeviceFactorSourceClient {
 	typealias SignatureFromOnDeviceHD = @Sendable (SignatureFromOnDeviceHDRequest) async throws -> SignatureWithPublicKey
 	typealias IsAccountRecoveryNeeded = @Sendable () async throws -> Bool
 	typealias EntitiesInBadState = @Sendable () async throws -> AnyAsyncSequence<(withoutControl: AddressesOfEntitiesInBadState, unrecoverable: AddressesOfEntitiesInBadState)>
+	typealias GetHDFactorInstances = @Sendable (KeyDerivationRequestPerFactorSource) async throws -> [HierarchicalDeterministicFactorInstance]
 }
 
 // MARK: - DiscrepancyUnsupportedCurve

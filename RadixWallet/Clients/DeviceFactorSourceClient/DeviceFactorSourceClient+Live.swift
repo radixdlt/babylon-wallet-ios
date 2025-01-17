@@ -106,6 +106,18 @@ extension DeviceFactorSourceClient: DependencyKey {
 			.eraseToAnyAsyncSequence()
 		}
 
+		let getHDFactorInstances: GetHDFactorInstances = { request in
+			let factorSourceId = request.factorSourceId
+			guard let mnemonicWithPassphrase = try secureStorageClient.loadMnemonic(factorSourceID: factorSourceId, notifyIfMissing: false) else {
+				loggerGlobal.critical("Failed to find factor source with ID: '\(factorSourceId)'")
+				throw FailedToFindFactorSource()
+			}
+			let publicKeys = mnemonicWithPassphrase.derivePublicKeys(paths: request.derivationPaths)
+			return publicKeys.map {
+				.init(factorSourceId: factorSourceId, publicKey: $0)
+			}
+		}
+
 		return Self(
 			publicKeysFromOnDeviceHD: { request in
 				let factorSourceID = request.deviceFactorSource.id
@@ -166,7 +178,8 @@ extension DeviceFactorSourceClient: DependencyKey {
 					try await entitiesControlledByFactorSource($0, maybeOverridingSnapshot)
 				})
 			},
-			entitiesInBadState: entitiesInBadState
+			entitiesInBadState: entitiesInBadState,
+			getHDFactorInstances: getHDFactorInstances
 		)
 	}
 }

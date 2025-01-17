@@ -13,13 +13,13 @@ final class SargonHostInteractor: HostInteractor {
 			let action = await overlayWindowClient.signTransaction(input: perFactorSource)
 
 			let outcome: FactorOutcomeOfTransactionIntentHash = switch action {
-			case .newSigning(.cancelled):
+			case .signing(.cancelled):
 				throw CommonError.SigningRejected
 
-			case .newSigning(.skippedFactorSource):
+			case .signing(.skippedFactorSource):
 				.neglected(.init(reason: .userExplicitlySkipped, factor: perFactorSource.factorSourceId))
 
-			case let .newSigning(.finished(.transaction(signatures))):
+			case let .signing(.finished(.transaction(signatures))):
 				.signed(producedSignatures: signatures)
 
 			default:
@@ -40,13 +40,13 @@ final class SargonHostInteractor: HostInteractor {
 			let action = await overlayWindowClient.signSubintent(input: perFactorSource)
 
 			let outcome: FactorOutcomeOfSubintentHash = switch action {
-			case .newSigning(.cancelled):
+			case .signing(.cancelled):
 				throw CommonError.SigningRejected
 
-			case .newSigning(.skippedFactorSource):
+			case .signing(.skippedFactorSource):
 				.neglected(.init(reason: .userExplicitlySkipped, factor: perFactorSource.factorSourceId))
 
-			case let .newSigning(.finished(.subintent(signatures))):
+			case let .signing(.finished(.subintent(signatures))):
 				.signed(producedSignatures: signatures)
 
 			default:
@@ -67,13 +67,13 @@ final class SargonHostInteractor: HostInteractor {
 			let action = await overlayWindowClient.signAuth(input: perFactorSource)
 
 			let outcome: FactorOutcomeOfAuthIntentHash = switch action {
-			case .newSigning(.cancelled):
+			case .signing(.cancelled):
 				throw CommonError.SigningRejected
 
-			case .newSigning(.skippedFactorSource):
+			case .signing(.skippedFactorSource):
 				.neglected(.init(reason: .userExplicitlySkipped, factor: perFactorSource.factorSourceId))
 
-			case let .newSigning(.finished(.auth(signatures))):
+			case let .signing(.finished(.auth(signatures))):
 				.signed(producedSignatures: signatures)
 
 			default:
@@ -86,6 +86,25 @@ final class SargonHostInteractor: HostInteractor {
 	}
 
 	func deriveKeys(request: SargonUniFFI.KeyDerivationRequest) async throws -> SargonUniFFI.KeyDerivationResponse {
-		throw CommonError.SigningRejected
+		var perFactorOutcome: [KeyDerivationResponsePerFactorSource] = []
+
+		for perFactorSource in request.perFactorSource {
+			// NOTE: Adding this delay among factor sources so that it gives time of dismissing previous factor source before presenting new one
+			try? await clock.sleep(for: .seconds(0.9))
+			let action = await overlayWindowClient.derivePublicKeys(input: perFactorSource, purpose: request.derivationPurpose)
+
+			switch action {
+			case .derivePublicKeys(.cancelled):
+				throw CommonError.SigningRejected // TODO: What should be the error?
+
+			case let .derivePublicKeys(.finished(factorInstances)):
+				perFactorOutcome.append(.init(factorSourceId: perFactorSource.factorSourceId, factorInstances: factorInstances))
+
+			default:
+				fatalError("Unexpected action")
+			}
+		}
+
+		return .init(perFactorSource: perFactorOutcome)
 	}
 }

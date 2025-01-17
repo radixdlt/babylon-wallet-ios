@@ -254,18 +254,33 @@ extension CreateAccountCoordinator {
 	}
 
 	private func derivePublicKey(state: inout State, factorSourceOption: DerivePublicKeys.State.FactorSourceOption) -> Effect<Action> {
-		state.destination = .derivePublicKey(
-			.init(
-				derivationPathOption: .next(
-					for: .account,
-					networkID: state.config.specificNetworkID,
-					curve: .curve25519,
-					scheme: .cap26
-				),
-				factorSourceOption: factorSourceOption,
-				purpose: .createNewEntity(kind: .account)
-			))
-		return .none
+		guard let name = state.name else {
+			fatalError("Derived keys without account name set")
+		}
+		return .run { send in
+			let account = try await SargonOS.shared.createAccount(named: .init(nonEmpty: name))
+			let updated = await getThirdPartyDepositSettings(account: account)
+			await send(.internal(.handleAccountCreated(.success(updated))))
+		} catch: { error, _ in
+			errorQueue.schedule(error)
+		}
+	}
+
+	private func getThirdPartyDepositSettings(account: Account) async -> Account {
+		do {
+			if let updated = try await doAsync(
+				withTimeout: .seconds(5),
+				work: { try await onLedgerEntitiesClient.syncThirdPartyDepositWithOnLedgerSettings(account: account) }
+			) {
+				loggerGlobal.notice("Used OnLedger ThirdParty Deposit Settings")
+				return updated
+			} else {
+				return account
+			}
+		} catch {
+			loggerGlobal.notice("Failed to get OnLedger state for newly created account: \(account). Will add it with default third party deposit settings...")
+			return account
+		}
 	}
 }
 
