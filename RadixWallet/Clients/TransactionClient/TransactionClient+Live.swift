@@ -368,12 +368,20 @@ extension TransactionFailure {
 		case .FailedToExtractTransactionReceiptBytes:
 			.failedToPrepareTXReview(.failedToExtractTXReceiptBytes)
 
+		case let .ExecutionSummaryFail(underlying):
+			.failedToPrepareTXReview(.failedTXPreview(underlying))
+
+		case let .FailedToGenerateManifestSummary(underlying):
+			.failedToPrepareTXReview(.failedTXPreview(underlying))
+
+		case let .InvalidInstructionsString(underlying):
+			.failedToPrepareTXReview(.failedTXPreview(underlying))
+
+		case let .some(err):
+			.failedToPrepareTXReview(.failedTXPreview(errorMessageFromError(error: err)))
+
 		default:
-			if let code = commonError?.errorCode {
-				.failedToPrepareTXReview(.failedTXPreview("Unknown reason, code: \(code)"))
-			} else {
-				.failedToPrepareTXReview(.failedTXPreview("Unknown reason"))
-			}
+			.failedToPrepareTXReview(.failedTXPreview("Unknown reason"))
 		}
 	}
 }
