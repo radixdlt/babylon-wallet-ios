@@ -5,6 +5,7 @@ struct LedgerHardwareWalletClient: Sendable {
 	var isConnectedToAnyConnectorExtension: IsConnectedToAnyConnectorExtension
 	var getDeviceInfo: GetDeviceInfo
 	var derivePublicKeys: DerivePublicKeys
+	var newDerivePublicKeys: NewDerivePublicKeys
 	var signTransaction: SignTransaction
 	var newSignTransaction: NewSignTransaction
 	var signPreAuthorization: SignPreAuthorization
@@ -18,6 +19,7 @@ extension LedgerHardwareWalletClient {
 	typealias IsConnectedToAnyConnectorExtension = @Sendable () async -> AnyAsyncSequence<Bool>
 	typealias GetDeviceInfo = @Sendable () async throws -> P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo
 	typealias DerivePublicKeys = @Sendable ([P2P.LedgerHardwareWallet.KeyParameters], LedgerHardwareWalletFactorSource) async throws -> [HierarchicalDeterministicPublicKey]
+	typealias NewDerivePublicKeys = @Sendable (DerivePublicKeysRequest) async throws -> [HierarchicalDeterministicFactorInstance]
 
 	typealias DeriveAndDisplayAddress = @Sendable (P2P.LedgerHardwareWallet.KeyParameters, LedgerHardwareWalletFactorSource) async throws -> (HierarchicalDeterministicPublicKey, String)
 
@@ -31,6 +33,11 @@ extension LedgerHardwareWalletClient {
 
 // MARK: LedgerHardwareWalletClient.NewSignTransactionRequest
 extension LedgerHardwareWalletClient {
+	struct DerivePublicKeysRequest: Sendable, Hashable {
+		let ledger: LedgerHardwareWalletFactorSource
+		let input: KeyDerivationRequestPerFactorSource
+	}
+
 	struct NewSignTransactionRequest: Sendable, Hashable {
 		let ledger: LedgerHardwareWalletFactorSource
 		let input: TransactionSignRequestInputOfTransactionIntent

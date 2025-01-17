@@ -76,15 +76,12 @@ struct NewSigning: Sendable, FeatureReducer {
 private extension NewSigning {
 	func sign(purpose: State.Purpose, factorSource: FactorSource) -> Effect<Action> {
 		.run { send in
-			switch factorSource.kind {
+			switch factorSource {
 			case .device:
 				let signatures = try await signDevice(purpose: purpose)
 				await send(.internal(.handleSignatures(factorSource, signatures)))
 
-			case .ledgerHqHardwareWallet:
-				guard let ledger = factorSource.asLedger else {
-					throw WrongFactorSource()
-				}
+			case let .ledger(ledger):
 				do {
 					let signatures = try await signLedger(purpose: purpose, ledger: ledger)
 					await send(.internal(.handleSignatures(factorSource, signatures)))
@@ -176,6 +173,3 @@ private extension Error {
 		return error.code == .userRejectedSigningOfTransaction
 	}
 }
-
-// MARK: - WrongFactorSource
-struct WrongFactorSource: Swift.Error {}

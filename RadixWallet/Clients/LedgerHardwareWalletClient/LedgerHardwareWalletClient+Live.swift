@@ -109,6 +109,22 @@ extension LedgerHardwareWalletClient: DependencyKey {
 			return signatures
 		}
 
+		let newDerivePublicKeys: NewDerivePublicKeys = { request in
+			try await makeRequest(
+				.derivePublicKeys(.init(
+					keysParameters: request.input.derivationPaths.map(\.keyParams),
+					ledgerDevice: request.ledger.device()
+				)),
+				responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.derivePublicKeys
+			)
+			.map {
+				try $0.hdPubKey()
+			}
+			.map {
+				.init(factorSourceId: request.input.factorSourceId, publicKey: $0)
+			}
+		}
+
 		@Sendable func sign(
 			expectedHashedMessage: Data,
 			ownedFactorInstances: [OwnedFactorInstance],
@@ -236,6 +252,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					try $0.hdPubKey()
 				}
 			},
+			newDerivePublicKeys: newDerivePublicKeys,
 			signTransaction: { request in
 				let hashedMsg = request.transactionIntent.hash()
 				let compiledTransactionIntent = request.transactionIntent.compile()
@@ -413,8 +430,11 @@ private extension OwnedFactorInstance {
 	}
 }
 
-extension Set {
-	func map<U>(transform: (Element) -> U) -> Set<U> {
-		Set<U>(self.lazy.map(transform))
+private extension DerivationPath {
+	var keyParams: P2P.LedgerHardwareWallet.KeyParameters {
+		.init(
+			curve: curve.p2pCurve,
+			derivationPath: toString()
+		)
 	}
 }

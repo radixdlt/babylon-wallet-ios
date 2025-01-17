@@ -29,6 +29,8 @@ struct NewDerivePublicKeys: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
+	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
+	@Dependency(\.errorQueue) var errorQueue
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -52,14 +54,19 @@ struct NewDerivePublicKeys: Sendable, FeatureReducer {
 private extension NewDerivePublicKeys {
 	func derivePublicKeys(factorSource: FactorSource, input: KeyDerivationRequestPerFactorSource) -> Effect<Action> {
 		.run { send in
-			switch factorSource.kind {
+			let factorInstances = switch factorSource {
 			case .device:
-				let factorInstances = try await deviceFactorSourceClient.getHDFactorInstances(input)
-				await send(.delegate(.finished(factorInstances)))
+				try await deviceFactorSourceClient.getHDFactorInstances(input)
+
+			case let .ledger(ledger):
+				try await ledgerHardwareWalletClient.newDerivePublicKeys(.init(ledger: ledger, input: input))
 
 			default:
 				fatalError("Not implemented")
 			}
+			await send(.delegate(.finished(factorInstances)))
+		} catch: { error, _ in
+			errorQueue.schedule(error)
 		}
 	}
 }
