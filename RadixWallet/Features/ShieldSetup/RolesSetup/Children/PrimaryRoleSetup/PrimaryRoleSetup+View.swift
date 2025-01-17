@@ -32,13 +32,11 @@ extension PrimaryRoleSetup.State {
 	}
 
 	var threshold: Threshold {
-		// TODO: Use Sargon - https://radixdlt.atlassian.net/browse/ABW-4047
-		let threshold = Int(shieldBuilder.getPrimaryThreshold())
-		if threshold == shieldBuilder.primaryRoleThresholdFactors.count {
-			return .all
-		} else {
-			return .specific(UInt8(threshold))
-		}
+		shieldBuilder.getPrimaryThreshold()
+	}
+
+	var thresholdValues: [Threshold] {
+		shieldBuilder.getPrimaryThresholdValues()
 	}
 }
 
@@ -357,7 +355,7 @@ private extension View {
 			sheet(store: destinationStore.scope(state: \.selectNumberOfFactorsView, action: \.selectNumberOfFactorsView)) { _ in
 				SelectNumberOfFactorsView(
 					selectedNumberOfFactors: store.threshold,
-					maxAvailableFactors: store.thresholdFactors.count
+					thresholdValues: store.thresholdValues
 				) { action in
 					store.send(.destination(.presented(.selectNumberOfFactorsView(action))))
 				}

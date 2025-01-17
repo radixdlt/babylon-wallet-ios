@@ -1,6 +1,6 @@
 // MARK: - SelectEmergencyFallbackPeriodView
 struct SelectEmergencyFallbackPeriodView: View {
-	@State var selectedPeriod: FallbackPeriod
+	@State var selectedPeriod: TimePeriod
 
 	var onAction: (Action) -> Void
 
@@ -50,7 +50,7 @@ struct SelectEmergencyFallbackPeriodView: View {
 				.padding(.trailing, -.medium3)
 
 				Picker("", selection: $selectedPeriod.unit) {
-					ForEach(FallbackPeriod.Unit.allCases, id: \.self) { unit in
+					ForEach(TimePeriodUnit.allCases, id: \.self) { unit in
 						Text("\(unit.title)")
 							.tag(unit)
 							.foregroundStyle(.app.gray1)
@@ -75,67 +75,25 @@ struct SelectEmergencyFallbackPeriodView: View {
 extension SelectEmergencyFallbackPeriodView {
 	enum Action: Sendable, Equatable {
 		case close
-		case set(FallbackPeriod)
+		case set(TimePeriod)
 	}
 }
 
-private extension FallbackPeriod.Unit {
+private extension TimePeriodUnit {
 	var title: String {
 		switch self {
 		case .days:
 			L10n.ShieldWizardRecovery.Fallback.Days.label
 		case .weeks:
 			L10n.ShieldWizardRecovery.Fallback.Weeks.label
+		case .years:
+			// TODO:
+			"L10n.ShieldWizardRecovery.Fallback.Years.label"
 		}
 	}
 }
 
-// MARK: - FallbackPeriod
-// TODO: - Move to Sargon -
-struct FallbackPeriod: Sendable, Equatable {
-	var value: Int
-	var unit: Unit
-
-	var days: Int {
-		switch self.unit {
-		case .days:
-			value
-		case .weeks:
-			value * Self.DAYS_IN_A_WEEK
-		}
-	}
-
-	init(days: Int) {
-		if days % Self.DAYS_IN_A_WEEK == 0 {
-			value = days / Self.DAYS_IN_A_WEEK
-			unit = .weeks
-		} else {
-			value = days
-			unit = .days
-		}
-	}
-
-	private static let DAYS_IN_A_WEEK = 7
+// MARK: - TimePeriodUnit + CaseIterable
+extension TimePeriodUnit: CaseIterable {
+	public static let allCases: [Self] = [.days, .weeks, .years]
 }
-
-// MARK: FallbackPeriod.Unit
-extension FallbackPeriod {
-	enum Unit: CaseIterable {
-		case days
-		case weeks
-
-		var values: [Int] {
-			switch self {
-			case .days:
-				Self.FALLBACK_PERIOD_DAYS
-			case .weeks:
-				Self.FALLBACK_PERIOD_WEEKS
-			}
-		}
-
-		private static let FALLBACK_PERIOD_DAYS = Array(1 ... 14)
-		private static let FALLBACK_PERIOD_WEEKS = Array(1 ... 4)
-	}
-}
-
-// ------------------------------------------------------------------

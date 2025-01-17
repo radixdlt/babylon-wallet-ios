@@ -107,10 +107,7 @@ struct PrimaryRoleSetup: FeatureReducer, Sendable {
 		case .hideOverrideSectionButtonTapped:
 			state.isOverrideSectionExpanded = false
 			state.$shieldBuilder.withLock { builder in
-				// TODO: use removeAllFactorsFromPrimaryOverride
-				for overrideFactor in state.overrideFactors {
-					builder = builder.removeFactorFromPrimary(factorSourceId: overrideFactor.factorSourceID, factorListKind: .override)
-				}
+				builder = builder.removeAllFactorsFromPrimaryOverride()
 			}
 			return .none
 

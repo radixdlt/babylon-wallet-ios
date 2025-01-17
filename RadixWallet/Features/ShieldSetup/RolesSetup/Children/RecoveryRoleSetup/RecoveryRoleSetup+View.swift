@@ -28,9 +28,8 @@ extension RecoveryRoleSetup.State {
 		factorSourcesFromProfile.filter { shieldBuilder.confirmationRoleFactors.contains($0.factorSourceID) }
 	}
 
-	// TODO: Add in Sargon - `shieldBuilder.periodUntilAutoConfirm`
-	var periodUntilAutoConfirm: FallbackPeriod {
-		.init(days: Int(shieldBuilder.numberOfDaysUntilAutoConfirm))
+	var periodUntilAutoConfirm: TimePeriod {
+		shieldBuilder.timePeriodUntilAutoConfirm
 	}
 }
 
@@ -273,7 +272,7 @@ private extension RecoveryRoleSetup.View {
 	}
 }
 
-private extension FallbackPeriod {
+private extension TimePeriod {
 	// TODO: Add new Crowdin keys: "%d <unit_name>"
 	var title: String {
 		switch (value, unit) {
@@ -285,6 +284,10 @@ private extension FallbackPeriod {
 			"\(value) " + L10n.ShieldWizardRecovery.Fallback.Week.label // "shieldWizardRecovery_fallback_week_period"
 		case (_, .weeks):
 			"\(value) " + L10n.ShieldWizardRecovery.Fallback.Weeks.label // "shieldWizardRecovery_fallback_weeks_period"
+		case (1, .years):
+			"\(value) " + "L10n.ShieldWizardRecovery.Fallback.Year.label" // "shieldWizardRecovery_fallback_year_period"
+		case (_, .years):
+			"\(value) " + "L10n.ShieldWizardRecovery.Fallback.Years.label" // "shieldWizardRecovery_fallback_years_period"
 		}
 	}
 }

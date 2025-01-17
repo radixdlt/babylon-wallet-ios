@@ -25,7 +25,7 @@ extension PrepareFactorSources.AddFactorSource {
 							}
 
 							if store.showNoHardwareDeviceInfo {
-								InfoButton(.nohardwaredevice, label: "L10n.InfoLink.Title.nohardwaredevice") // TODO: localization
+								InfoButton(.nohardwaredevice, label: "I don’t have a hardware device") // TODO: localization
 									.padding(.vertical, .medium3)
 							}
 						}
