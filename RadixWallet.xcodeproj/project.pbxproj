@@ -832,7 +832,6 @@
 		83377A052B9DDB5C00D8AA36 /* NPSSurveyClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83377A042B9DDB5C00D8AA36 /* NPSSurveyClient+Live.swift */; };
 		8338B9E52AFAB20700D1D8EA /* TransactionFee.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8338B9E42AFAB20700D1D8EA /* TransactionFee.swift */; };
 		834B651F2B972E5100B7E1E8 /* NPSSurvey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834B651E2B972E5100B7E1E8 /* NPSSurvey.swift */; };
-		835DFF932D19855A00229DB0 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 835DFF922D19855A00229DB0 /* Sargon */; };
 		835F196D2B3581C300E0B71D /* UnknownDappComponents+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835F196C2B3581C300E0B71D /* UnknownDappComponents+View.swift */; };
 		8370FC5C2B99C780007AD882 /* NPSSurveyClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8370FC5B2B99C780007AD882 /* NPSSurveyClient+Interface.swift */; };
 		8381C8B02BBD2CD400A470B4 /* TokenPriceCientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8381C8AF2BBD2CD400A470B4 /* TokenPriceCientTests.swift */; };
@@ -9370,14 +9369,6 @@
 				version = 1.3.2;
 			};
 		};
-		835DFF912D19855A00229DB0 /* XCRemoteSwiftPackageReference "sargon" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/radixdlt/sargon";
-			requirement = {
-				kind = exactVersion;
-				version = 1.1.96;
-			};
-		};
 		A415574E2B757C5E0040AD4E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture";
@@ -9548,10 +9539,6 @@
 			productName = ScreenshotPreventing;
 		};
 		5B92AACB2D314CC400486A9B /* Sargon */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Sargon;
-		};
-		83D3F3C22D15C9CA00CA976D /* Sargon */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Sargon;
 		};
