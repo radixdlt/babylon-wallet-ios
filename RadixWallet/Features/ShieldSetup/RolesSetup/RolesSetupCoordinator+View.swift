@@ -9,6 +9,8 @@ extension RolesSetupCoordinator {
 					switch store.path.case {
 					case let .primaryRoleSetup(store):
 						PrimaryRoleSetup.View(store: store)
+					case let .recoveryRoleSetup(store):
+						RecoveryRoleSetup.View(store: store)
 					}
 				}
 				.destinations(with: store)

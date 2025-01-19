@@ -64,16 +64,11 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 				state.$shieldBuilder.withLock { builder in
 					switch change {
 					case let .remove(_, factorSource, _):
-						builder = builder.removeFactorFromPrimary(factorSourceId: factorSource.factorSourceID)
+						builder = builder.removeFactorFromPrimary(factorSourceId: factorSource.factorSourceID, factorListKind: .threshold)
 					case let .insert(_, factorSource, _):
 						builder = builder.addFactorSourceToPrimaryThreshold(factorSourceId: factorSource.factorSourceID)
 					}
 				}
-			}
-
-			// TODO: Remove once https://radixdlt.atlassian.net/browse/ABW-4047 is implemented
-			state.$shieldBuilder.withLock { builder in
-				builder = builder.setThreshold(threshold: UInt8(builder.primaryRoleThresholdFactors.count))
 			}
 
 			if !state.didInteractWithSelection, !difference.isEmpty {

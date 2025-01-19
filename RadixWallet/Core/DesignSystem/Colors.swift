@@ -89,6 +89,7 @@ extension Color.App {
 	var alert: Color { .init(hex: .alert) }
 	var lightAlert: Color { .init(hex: .lightAlert) }
 	var error: Color { .init(hex: .error) }
+	var lightError: Color { .init(hex: .lightError) }
 	var notification: Color { .init(hex: .notification) }
 
 	var background: Color { .dynamic(light: .white, dark: .black) }
@@ -164,6 +165,8 @@ extension Color {
 		case lightAlert = 0xFFF4DF
 
 		case error = 0xC82020
+
+		case lightError = 0xFCEBEB
 
 		case notification = 0xF81B1B
 

@@ -2,8 +2,8 @@ import ComposableArchitecture
 import SwiftUI
 
 extension SelectFactorSources.State {
-	var selectedFactorSourcesStatus: SelectedFactorSourcesForRoleStatus {
-		shieldBuilder.selectedFactorSourcesForRoleStatus(role: .primary)
+	var selectedFactorSourcesStatus: SelectedPrimaryThresholdFactorsStatus {
+		shieldBuilder.selectedPrimaryThresholdFactorsStatus()
 	}
 
 	var statusMessageInfo: ShieldStatusMessageInfo? {
@@ -23,10 +23,8 @@ extension SelectFactorSources.State {
 		selectedFactorSourcesStatus == .optimal || selectedFactorSourcesStatus == .suboptimal
 	}
 
-	// TODO: Move to Sargon
 	var shouldShowPasswordMessage: Bool {
-		(selectedFactorSources ?? []).contains(where: { $0.factorSourceKind == .password }) &&
-			selectedFactorSourcesStatus == .invalid
+		selectedFactorSourcesStatus == .invalid(reason: .cannotBeUsedAlone(factorSourceKind: .password))
 	}
 }
 
@@ -128,7 +126,7 @@ extension SelectFactorSources {
 					.padding(.top, .small1)
 					.flushedLeft
 					.onTapGesture {
-						if store.selectedFactorSourcesStatus == .invalid {
+						if case .invalid = store.selectedFactorSourcesStatus {
 							store.send(.view(.invalidReadMoreTapped))
 						}
 					}

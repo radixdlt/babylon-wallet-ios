@@ -32,6 +32,8 @@ struct SelectNumberOfFactorsView: View {
 				ForEach(pickerItems, id: \.self) { threshold in
 					Text(threshold.title)
 						.tag(threshold)
+						.foregroundStyle(.app.gray1)
+						.textStyle(.body1Regular)
 				}
 			}
 			.pickerStyle(.wheel)
@@ -45,7 +47,7 @@ struct SelectNumberOfFactorsView: View {
 		var values: [Threshold] = []
 
 		for i in 1 ..< maxAvailableFactors {
-			values.insert(.specific(i), at: 0)
+			values.insert(.specific(UInt8(i)), at: 0)
 		}
 
 		values.insert(.all, at: 0)
@@ -60,13 +62,6 @@ extension SelectNumberOfFactorsView {
 		case close
 		case set(Threshold)
 	}
-}
-
-// MARK: - Threshold
-// TODO: Move to Sargon - https://radixdlt.atlassian.net/browse/ABW-4047
-enum Threshold: Hashable {
-	case all
-	case specific(Int)
 }
 
 private extension Threshold {
