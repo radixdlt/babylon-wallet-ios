@@ -216,7 +216,7 @@ extension LedgerHardwareWalletFactorSource {
 		}
 
 		return P2P.LedgerHardwareWallet.LedgerDevice(
-			name: NonEmptyString(maybeString: hint.name),
+            name: NonEmptyString(maybeString: hint.label),
 			id: id.body.data.data.hex,
 			model: model
 		)
