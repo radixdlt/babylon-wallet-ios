@@ -1,3 +1,4 @@
+#if DEBUG
 import Sargon
 import SwiftUI
 
@@ -72,3 +73,4 @@ extension FactorSourceIDFromHash {
 		String(toString().prefix(10))
 	}
 }
+#endif // DEBUG

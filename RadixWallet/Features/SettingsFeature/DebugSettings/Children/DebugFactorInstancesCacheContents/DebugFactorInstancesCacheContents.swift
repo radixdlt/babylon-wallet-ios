@@ -1,3 +1,4 @@
+#if DEBUG
 import Sargon
 
 public typealias Instances = [FactorSourceIDFromHash: [[FactorInstanceForDebugPurposes]]]
@@ -59,3 +60,4 @@ struct DebugFactorInstancesCacheContents: Sendable, FeatureReducer {
 		}
 	}
 }
+#endif // DEBUG
