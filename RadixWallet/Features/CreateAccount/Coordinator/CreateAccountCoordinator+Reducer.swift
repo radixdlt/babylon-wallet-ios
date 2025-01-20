@@ -128,11 +128,11 @@ extension CreateAccountCoordinator {
 				state.path.append(.selectLedger(.init(context: .createHardwareAccount)))
 				return .none
 			} else {
-				return createProfileIfNecessaryThenDerivePublicKey(state: &state, option: .bdfs)
+				return createProfileIfNecessaryThenCreateAccount(state: &state, option: .bdfs)
 			}
 
 		case let .path(.element(_, action: .selectLedger(.delegate(.choseLedger(ledger))))):
-			return createProfileIfNecessaryThenDerivePublicKey(
+			return createProfileIfNecessaryThenCreateAccount(
 				state: &state,
 				option: .specific(
 					ledger.asGeneral
@@ -163,13 +163,13 @@ extension CreateAccountCoordinator {
 
 		case let .handleProfileCreated(option):
 			state.createdProfile = true
-			return derivePublicKey(state: &state, option: option)
+			return createAccount(state: &state, option: option)
 		}
 	}
 
-	private func createProfileIfNecessaryThenDerivePublicKey(state: inout State, option: Option) -> Effect<Action> {
+	private func createProfileIfNecessaryThenCreateAccount(state: inout State, option: Option) -> Effect<Action> {
 		if state.config.isNewProfile, !state.createdProfile {
-			// We need to create the Profile before deriving the public key
+			// We need to create the Profile before creating the Account
 			.run { send in
 				try await onboardingClient.createNewProfile()
 				await send(.internal(.handleProfileCreated(option)))
@@ -177,12 +177,12 @@ extension CreateAccountCoordinator {
 				errorQueue.schedule(error)
 			}
 		} else {
-			// We can derive the public key since the Profile has been created already
-			derivePublicKey(state: &state, option: option)
+			// We can create the Account since the Profile has been created already
+			createAccount(state: &state, option: option)
 		}
 	}
 
-	private func derivePublicKey(state: inout State, option: Option) -> Effect<Action> {
+	private func createAccount(state: inout State, option: Option) -> Effect<Action> {
 		guard let name = state.name else {
 			fatalError("Name should be set before creating account")
 		}
@@ -190,9 +190,9 @@ extension CreateAccountCoordinator {
 		return .run { send in
 			let account = switch option {
 			case .bdfs:
-				try await SargonOS.shared.createAccountWithBDFS(named: displayName)
+				try await SargonOS.shared.createAccountWithBDFS(name: displayName)
 			case let .specific(factorSource):
-				try await SargonOS.shared.createAccount(named: displayName, factorSource: factorSource)
+				try await SargonOS.shared.createAccount(factorSource: factorSource, name: displayName)
 			}
 
 			let updated = await getThirdPartyDepositSettings(account: account)
