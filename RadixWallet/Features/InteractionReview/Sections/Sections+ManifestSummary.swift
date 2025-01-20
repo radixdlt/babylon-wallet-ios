@@ -2,6 +2,11 @@ import Sargon
 
 extension InteractionReview.Sections {
 	func sections(for summary: ManifestSummary, networkID: NetworkID) async throws -> Common.SectionsData? {
+		/// Only GeneralSubintent classification is allowed for PreAuth transactions
+		guard summary.classification.first == .generalSubintent else {
+			return nil
+		}
+
 		let allWithdrawAddresses = summary.accountWithdrawals.values.flatMap { $0 }.map(\.resourceAddress)
 		let allDepositAddresses = summary.accountDeposits.values.flatMap(\.specifiedResources).map(\.resourceAddress)
 
@@ -32,7 +37,8 @@ extension InteractionReview.Sections {
 		let dappAddresses = extractDappAddresses(encounteredAddresses: summary.encounteredEntities)
 		let dAppsUsed = try await extractDapps(
 			addresses: dappAddresses,
-			unknownTitle: L10n.TransactionReview.unknownComponents
+			unknownTitle: L10n.TransactionReview.unknownComponents,
+			showPossibleDappCalls: true
 		)
 
 		let proofs = try await exctractProofs(summary.presentedProofs)
@@ -41,8 +47,7 @@ extension InteractionReview.Sections {
 			withdrawals: withdrawals,
 			dAppsUsed: dAppsUsed,
 			deposits: deposits,
-			proofs: proofs,
-			showPossibleDappCalls: true
+			proofs: proofs
 		)
 	}
 
@@ -71,7 +76,7 @@ extension InteractionReview.Sections {
 		guard !withdrawals.isEmpty else { return nil }
 
 		let withdrawalAccounts = withdrawals.map {
-			Common.Account.State(account: $0.key, transfers: $0.value, isDeposit: false)
+			Common.Account.State(account: $0.key, transfers: $0.value, purpose: .withdrawal)
 		}
 		.asIdentified()
 
@@ -103,7 +108,7 @@ extension InteractionReview.Sections {
 
 		let depositAccounts = deposits
 			.filter { !$0.value.isEmpty }
-			.map { Common.Account.State(account: $0.key, transfers: $0.value, isDeposit: true) }
+			.map { Common.Account.State(account: $0.key, transfers: $0.value, purpose: .deposit) }
 			.asIdentified()
 
 		guard !depositAccounts.isEmpty else { return nil }
@@ -133,7 +138,9 @@ extension InteractionReview.Sections {
 						networkID: networkID
 					))]
 				} else {
-					return [.known(.init(resource: resource, details: .nonFungible(.amount(amount: .exact(amount)))))]
+					@Dependency(\.resourcesVisibilityClient) var resourcesVisibilityClient
+					let isHidden = try await resourcesVisibilityClient.isHidden(.nonFungible(resourceAddress))
+					return [.known(.init(resource: resource, details: .nonFungible(.amount(amount: .exact(amount))), isHidden: isHidden))]
 				}
 			case .right:
 				return []

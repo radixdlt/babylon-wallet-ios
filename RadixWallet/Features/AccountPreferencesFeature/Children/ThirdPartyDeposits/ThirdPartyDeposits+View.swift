@@ -89,7 +89,7 @@ extension PreferenceSection.Row where SectionId == ManageThirdPartyDeposits.Sect
 			id: .depositRule(.acceptAll),
 			title: L10n.AccountSettings.ThirdPartyDeposits.acceptAll,
 			subtitle: L10n.AccountSettings.ThirdPartyDeposits.acceptAllSubtitle,
-			icon: .asset(AssetResource.iconAcceptAirdrop)
+			icon: .asset(.iconAcceptAirdrop)
 		)
 	}
 
@@ -98,7 +98,7 @@ extension PreferenceSection.Row where SectionId == ManageThirdPartyDeposits.Sect
 			id: .depositRule(.acceptKnown),
 			title: L10n.AccountSettings.ThirdPartyDeposits.onlyKnown,
 			subtitle: L10n.AccountSettings.ThirdPartyDeposits.onlyKnownSubtitle,
-			icon: .asset(AssetResource.iconAcceptKnownAirdrop)
+			icon: .asset(.iconAcceptKnownAirdrop)
 		)
 	}
 
@@ -108,7 +108,7 @@ extension PreferenceSection.Row where SectionId == ManageThirdPartyDeposits.Sect
 			title: L10n.AccountSettings.ThirdPartyDeposits.denyAll,
 			subtitle: L10n.AccountSettings.ThirdPartyDeposits.denyAllSubtitle,
 			hint: L10n.AccountSettings.ThirdPartyDeposits.denyAllWarning,
-			icon: .asset(AssetResource.iconDeclineAirdrop)
+			icon: .asset(.iconDeclineAirdrop)
 		)
 	}
 

@@ -27,6 +27,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 		case task
 		case rowTapped(AccountPreferences.Section.SectionRow)
 		case hideAccountTapped
+		case deleteAccountTapped
 		case faucetButtonTapped
 	}
 
@@ -40,35 +41,41 @@ struct AccountPreferences: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case accountHidden
+		case goHomeAfterAccountDeleted
 	}
 
 	// MARK: - Destination
 	struct Destination: DestinationReducer {
 		@CasePathable
 		enum State: Hashable, Sendable {
-			case updateAccountLabel(UpdateAccountLabel.State)
+			case updateAccountLabel(RenameLabel.State)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.State)
 			case devPreferences(DevAccountPreferences.State)
 			case hideAccount
+			case deleteAccount(DeleteAccountCoordinator.State)
 		}
 
 		@CasePathable
 		enum Action: Equatable, Sendable {
-			case updateAccountLabel(UpdateAccountLabel.Action)
+			case updateAccountLabel(RenameLabel.Action)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.Action)
 			case devPreferences(DevAccountPreferences.Action)
 			case hideAccount(ConfirmationAction)
+			case deleteAccount(DeleteAccountCoordinator.Action)
 		}
 
 		var body: some ReducerOf<Self> {
-			Scope(state: /State.updateAccountLabel, action: /Action.updateAccountLabel) {
-				UpdateAccountLabel()
+			Scope(state: \.updateAccountLabel, action: \.updateAccountLabel) {
+				RenameLabel()
 			}
-			Scope(state: /State.thirdPartyDeposits, action: /Action.thirdPartyDeposits) {
+			Scope(state: \.thirdPartyDeposits, action: \.thirdPartyDeposits) {
 				ManageThirdPartyDeposits()
 			}
-			Scope(state: /State.devPreferences, action: /Action.devPreferences) {
+			Scope(state: \.devPreferences, action: \.devPreferences) {
 				DevAccountPreferences()
+			}
+			Scope(state: \.deleteAccount, action: \.deleteAccount) {
+				DeleteAccountCoordinator()
 			}
 		}
 	}
@@ -108,6 +115,10 @@ struct AccountPreferences: Sendable, FeatureReducer {
 
 		case .hideAccountTapped:
 			state.destination = .hideAccount
+			return .none
+
+		case .deleteAccountTapped:
+			state.destination = .deleteAccount(.init(account: state.account))
 			return .none
 
 		case .faucetButtonTapped:
@@ -153,17 +164,15 @@ struct AccountPreferences: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case .updateAccountLabel(.delegate(.accountLabelUpdated)),
+		case .updateAccountLabel(.delegate(.labelUpdated)),
 		     .thirdPartyDeposits(.delegate(.accountUpdated)):
 			state.destination = nil
 			return .none
-		#if DEBUG
-		case .devPreferences(DevAccountPreferences.Action.delegate(.debugOnlyAccountWasDeleted)):
-			return .send(.delegate(.accountHidden))
-		#endif
 		case .hideAccount(.confirm):
 			state.destination = nil
 			return hideAccountEffect(state: state)
+		case .deleteAccount(.delegate(.goHomeAfterAccountDeleted)):
+			return .send(.delegate(.goHomeAfterAccountDeleted))
 		case .hideAccount(.cancel):
 			state.destination = nil
 			return .none
@@ -230,7 +239,7 @@ extension AccountPreferences {
 	func destination(for row: AccountPreferences.Section.SectionRow, _ state: inout State) -> Effect<Action> {
 		switch row {
 		case .personalize(.accountLabel):
-			state.destination = .updateAccountLabel(.init(account: state.account))
+			state.destination = .updateAccountLabel(.init(kind: .account(state.account)))
 			return .none
 
 		case .personalize(.accountColor):

@@ -7,7 +7,8 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		let unvalidatedManifest: UnvalidatedSubintentManifest
 		let expiration: Expiration
 		let nonce: Nonce
-		let dAppMetadata: DappMetadata.Ledger?
+		let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey = .init()
+		let dAppMetadata: DappMetadata
 		let message: String?
 
 		var preview: PreAuthorizationPreview?
@@ -44,7 +45,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case signedPreAuthorization(SignedSubintent)
-		case failed(PreAuthorizationFailure)
+		case failed(TransactionFailure)
 	}
 
 	struct Destination: DestinationReducer {
@@ -90,7 +91,8 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 				let preview = await TaskResult {
 					try await preAuthorizationClient.getPreview(.init(
 						unvalidatedManifest: state.unvalidatedManifest,
-						nonce: state.nonce
+						nonce: state.nonce,
+						notaryPublicKey: state.ephemeralNotaryPrivateKey.publicKey
 					))
 				}
 				await send(.internal(.previewLoaded(preview)))
@@ -115,12 +117,12 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .previewLoaded(.failure(error)):
 			loggerGlobal.error("PreAuthroization preview failed, error: \(error)")
-			errorQueue.schedule(error)
-			guard let failure = error as? PreAuthorizationFailure else {
-				assertionFailure("Failed with unexpected error \(error)")
-				return .none
+			errorQueue.schedule(TransactionReviewFailure(underylying: error))
+			if let txFailure = error as? TransactionFailure {
+				return .send(.delegate(.failed(txFailure)))
+			} else {
+				return .send(.delegate(.failed(TransactionFailure.failedToPrepareTXReview(.abortedTXReview(error)))))
 			}
-			return .send(.delegate(.failed(failure)))
 
 		case let .previewLoaded(.success(preview)):
 			state.preview = preview
@@ -154,7 +156,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 			}
 
 			guard !preview.signingFactors.isEmpty else {
-				return .send(.delegate(.signedPreAuthorization(.init(subintent: subintent, subintentSignatures: .init(signatures: [])))))
+				return handleSignedSubinent(state: &state, signedSubintent: .init(subintent: subintent, subintentSignatures: .init(signatures: [])))
 			}
 
 			state.destination = .signing(.init(
@@ -164,8 +166,9 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .updateSecondsToExpiration(expiration):
-			state.secondsToExpiration = Int(expiration.timeIntervalSinceNow)
-			return .none
+			let secondsToExpiration = Int(expiration.timeIntervalSinceNow)
+			state.secondsToExpiration = secondsToExpiration
+			return secondsToExpiration > 0 ? .none : .cancel(id: CancellableId.expirationTimer)
 
 		case .resetToApprovable:
 			return resetToApprovable(&state)
@@ -196,7 +199,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 				return resetToApprovable(&state)
 
 			case let .finishedSigning(.signPreAuthorization(encoded)):
-				return .send(.delegate(.signedPreAuthorization(encoded)))
+				return handleSignedSubinent(state: &state, signedSubintent: encoded)
 
 			case .finishedSigning:
 				assertionFailure("Unexpected signature instead of .signPreAuthorization")
@@ -205,6 +208,15 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 
 		default:
 			return .none
+		}
+	}
+
+	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+		switch state.destination {
+		case .signing:
+			resetToApprovable(&state)
+		case .rawManifestAlert, .none:
+			.none
 		}
 	}
 }
@@ -254,7 +266,13 @@ private extension PreAuthorizationReview {
 	func resetToApprovable(_ state: inout State) -> Effect<Action> {
 		state.isApprovalInProgress = false
 		state.sliderResetDate = .now
+		state.destination = nil
 		return .none
+	}
+
+	func handleSignedSubinent(state: inout State, signedSubintent: SignedSubintent) -> Effect<Action> {
+		state.destination = nil
+		return .send(.delegate(.signedPreAuthorization(signedSubintent)))
 	}
 }
 

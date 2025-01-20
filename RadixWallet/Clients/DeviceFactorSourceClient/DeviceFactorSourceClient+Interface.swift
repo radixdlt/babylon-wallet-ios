@@ -128,12 +128,7 @@ extension DeviceFactorSourceClient {
 
 		switch signerEntity.securityState {
 		case let .unsecured(control):
-			let factorInstance = switch purpose {
-			case .signAuth:
-				control.authenticationSigning ?? control.transactionSigning
-			case .signTransaction, .signPreAuthorization:
-				control.transactionSigning
-			}
+			let factorInstance = control.transactionSigning
 
 			guard
 				let deviceFactorSource = try await factorSourcesClient.getDeviceFactorSource(of: factorInstance)
@@ -180,13 +175,7 @@ extension DeviceFactorSourceClient {
 			switch entity.securityState {
 			case let .unsecured(unsecuredControl):
 
-				let factorInstance = switch purpose {
-				case .signAuth:
-					unsecuredControl.authenticationSigning ?? unsecuredControl.transactionSigning
-				case .signTransaction, .signPreAuthorization:
-					unsecuredControl.transactionSigning
-				}
-
+				let factorInstance = unsecuredControl.transactionSigning
 				let derivationPath = factorInstance.derivationPath
 
 				if factorInstance.factorSourceID != factorSourceID {
@@ -196,7 +185,7 @@ extension DeviceFactorSourceClient {
 				}
 				let curve = factorInstance.publicKey.curve
 
-				loggerGlobal.debug("🔏 Signing data with device, with entity=\(entity.displayName), curve=\(curve), factor source hint.name=\(deviceFactorSource.hint.name), hint.model=\(deviceFactorSource.hint.model)")
+				loggerGlobal.debug("🔏 Signing data with device, with entity=\(entity.displayName), curve=\(curve), factor source hint.label=\(deviceFactorSource.hint.label), hint.deviceName=\(deviceFactorSource.hint.deviceName), hint.model=\(deviceFactorSource.hint.model)")
 
 				let signatureWithPublicKey = try await self.signatureFromOnDeviceHD(SignatureFromOnDeviceHDRequest(
 					mnemonicWithPassphrase: loadedMnemonicWithPassphrase,
@@ -244,10 +233,14 @@ extension SigningPurpose {
 // MARK: - FactorInstanceDoesNotHaveADerivationPathUnableToSign
 struct FactorInstanceDoesNotHaveADerivationPathUnableToSign: Swift.Error {}
 
-// MARK: - AddressesOfEntitiesInBadState
-struct AddressesOfEntitiesInBadState: Sendable, Hashable {
-	let accounts: [AccountAddress]
-	let hiddenAccounts: [AccountAddress]
-	let personas: [IdentityAddress]
-	let hiddenPersonas: [IdentityAddress]
+extension DeviceFactorSourceHint {
+	var name: String {
+		label
+	}
+}
+
+extension LedgerHardwareWalletHint {
+	var name: String {
+		label
+	}
 }

@@ -12,10 +12,11 @@ extension PreAuthorizationClient: DependencyKey {
 				return try await SargonOS.shared.analysePreAuthPreview(
 					instructions: request.unvalidatedManifest.subintentManifestString,
 					blobs: request.unvalidatedManifest.blobs,
-					nonce: request.nonce
+					nonce: request.nonce,
+					notaryPublicKey: Sargon.PublicKey.ed25519(request.notaryPublicKey.intoSargon())
 				)
 			} catch {
-				throw PreAuthorizationFailure.failedToGetPreview(.failedToAnalyse(error))
+				throw TransactionFailure.fromCommonError(error as? CommonError)
 			}
 		}
 
@@ -67,9 +68,14 @@ extension PreAuthorizationClient: DependencyKey {
 			)
 		}
 
+		let pollStatus: PollStatus = { request in
+			try await SargonOS.shared.pollPreAuthorizationStatus(intentHash: request.subintentHash, expirationTimestamp: request.expirationTimestamp)
+		}
+
 		return Self(
 			getPreview: getPreview,
-			buildSubintent: buildSubintent
+			buildSubintent: buildSubintent,
+			pollStatus: pollStatus
 		)
 	}
 }

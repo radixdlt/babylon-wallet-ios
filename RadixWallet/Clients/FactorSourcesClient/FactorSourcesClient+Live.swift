@@ -370,13 +370,7 @@ func signingFactors(
 		switch entity.securityState {
 		case let .unsecured(unsecuredEntityControl):
 
-			let factorInstance = switch signingPurpose {
-			case .signAuth:
-				unsecuredEntityControl.authenticationSigning ?? unsecuredEntityControl.transactionSigning
-			case .signTransaction, .signPreAuthorization:
-				unsecuredEntityControl.transactionSigning
-			}
-
+			let factorInstance = unsecuredEntityControl.transactionSigning
 			let id = factorInstance.factorSourceID
 			guard let factorSource = allFactorSources[id: id.asGeneral] else {
 				assertionFailure("Bad! factor source not found")
@@ -430,7 +424,7 @@ extension FactorSourceKind: Comparable {
 		case .offDeviceMnemonic: 2
 		case .securityQuestions: 3
 		case .trustedContact: 4
-		case .passphrase: 5
+		case .password: 5
 		// we want to sign with device last, since it would allow for us to stop using
 		// ephemeral notary and allow us to implement a AutoPurgingMnemonicCache which
 		// deletes items after 1 sec, thus `device` must come last.

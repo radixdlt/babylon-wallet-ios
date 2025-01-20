@@ -12,7 +12,7 @@ struct EntitySecurityProblemsView: SwiftUI.View {
 						case .account:
 							AccountBannerView(kind: .securityProblem(message: problem.accountCard))
 						case .persona:
-							WarningErrorView(text: problem.personas, type: .warning, useNarrowSpacing: true)
+							StatusMessageView(text: problem.personas, type: .warning, useNarrowSpacing: true)
 								.frame(maxWidth: .infinity, alignment: .leading)
 								.padding(.bottom, .small3)
 						}

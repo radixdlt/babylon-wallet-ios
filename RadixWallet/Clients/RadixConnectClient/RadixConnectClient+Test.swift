@@ -5,20 +5,21 @@ extension RadixConnectClient: TestDependencyKey {
 	static let previewValue = Self.noop
 
 	static let testValue = Self(
-		loadP2PLinksAndConnectAll: unimplemented("\(Self.self).loadFromProfileAndConnectAll"),
+		loadP2PLinksAndConnectAll: noop.loadP2PLinksAndConnectAll,
 		disconnectAll: unimplemented("\(Self.self).disconnectAll"),
 		connectToP2PLinks: unimplemented("\(Self.self).connectToP2PLinks"),
-		getLocalNetworkAccess: unimplemented("\(Self.self).getLocalNetworkAccess"),
+		getLocalNetworkAccess: noop.getLocalNetworkAccess,
 		getP2PLinks: unimplemented("\(Self.self).getP2PLinks"),
-		getP2PLinksWithConnectionStatusUpdates: unimplemented("\(Self.self).getP2PLinksWithConnectionStatusUpdates"),
-		idsOfConnectedPeerConnections: unimplemented("\(Self.self).idsOfConnectedPeerConnections"),
+		getP2PLinksWithConnectionStatusUpdates: noop.getP2PLinksWithConnectionStatusUpdates,
+		idsOfConnectedPeerConnections: noop.idsOfConnectedPeerConnections,
 		updateOrAddP2PLink: unimplemented("\(Self.self).updateOrAddP2PLink"),
 		deleteP2PLinkByPassword: unimplemented("\(Self.self).deleteP2PLinkByPassword"),
 		connectP2PLink: unimplemented("\(Self.self).connectP2PLink"),
-		receiveMessages: unimplemented("\(Self.self).receiveMessages"),
+		receiveMessages: noop.receiveMessages,
 		sendResponse: unimplemented("\(Self.self).sendResponse"),
 		sendRequest: unimplemented("\(Self.self).sendRequest"),
-		handleDappDeepLink: unimplemented("\(Self.self).sendRequest")
+		handleDappDeepLink: unimplemented("\(Self.self).sendRequest"),
+		startNotifyingConnectorWithAccounts: unimplemented("\(Self.self).startNotifyingConnectorWithAccounts")
 	)
 }
 
@@ -37,7 +38,8 @@ extension RadixConnectClient {
 		receiveMessages: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		sendResponse: { _, _ in },
 		sendRequest: { _, _ in 0 },
-		handleDappDeepLink: { _ in }
+		handleDappDeepLink: { _ in },
+		startNotifyingConnectorWithAccounts: {}
 	)
 }
 #endif // DEBUG

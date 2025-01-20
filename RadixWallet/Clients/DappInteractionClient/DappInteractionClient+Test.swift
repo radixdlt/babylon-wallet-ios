@@ -11,8 +11,8 @@ extension DappInteractionClient: TestDependencyKey {
 	static let previewValue = Self.noop
 
 	static let testValue = Self(
-		interactions: unimplemented("\(Self.self).requests"),
-		addWalletInteraction: unimplemented("\(Self.self).addWalletRequest"),
+		interactions: unimplemented("\(Self.self).requests", placeholder: noop.interactions),
+		addWalletInteraction: unimplemented("\(Self.self).addWalletRequest", placeholder: noop.addWalletInteraction),
 		completeInteraction: unimplemented("\(Self.self).sendResponse")
 	)
 

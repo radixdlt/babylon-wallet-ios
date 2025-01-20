@@ -156,6 +156,8 @@ final class TransactionClientTests: TestCase {
 					)
 				}))!]
 			}
+			$0.secureStorageClient.saveDeviceInfo = { _ in }
+			$0.secureStorageClient.loadDeviceInfo = { nil }
 		} operation: {
 			try await TransactionClient.feePayerSelectionAmongstCandidates(
 				request: .init(
@@ -164,7 +166,8 @@ final class TransactionClientTests: TestCase {
 					transactionSigners: defaultSigners,
 					signingFactors: [.device: .init(rawValue: Set(defaultFactors))!],
 					signingPurpose: .signTransaction(.manifestFromDapp),
-					manifest: TransactionManifest.sample
+					manifest: TransactionManifest.sample,
+					accountWithdraws: [:]
 				),
 				allFeePayerCandidates: .init(rawValue: .init(uncheckedUniqueElements: allFeePayerCandidates))!,
 				involvedEntities: .init(
@@ -172,7 +175,8 @@ final class TransactionClientTests: TestCase {
 					accountsRequiringAuth: OrderedSet(signersAfterAnalysis),
 					accountsWithdrawnFrom: OrderedSet(signersAfterAnalysis),
 					accountsDepositedInto: OrderedSet(accounts.suffix(2))
-				)
+				),
+				accountWithdraws: [:]
 			)
 		}
 

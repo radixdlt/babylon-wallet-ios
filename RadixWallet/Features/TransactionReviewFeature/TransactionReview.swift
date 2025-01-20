@@ -12,8 +12,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 		let unvalidatedManifest: UnvalidatedTransactionManifest
 		let message: Message
 		let signTransactionPurpose: SigningPurpose.SignTransactionPurpose
-		let waitsForTransactionToBeComitted: Bool
-		let isWalletTransaction: Bool
+		let interactionId: WalletInteractionId
 		let proposingDappMetadata: DappMetadata.Ledger?
 		let p2pRoute: P2P.Route
 
@@ -28,6 +27,14 @@ struct TransactionReview: Sendable, FeatureReducer {
 		let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey
 		var canApproveTX: Bool = true
 		var sliderResetDate: Date = .now
+
+		var waitsForTransactionToBeComitted: Bool {
+			interactionId.isWalletAccountDepositSettingsInteraction || interactionId.isWalletAccountDeleteInteraction
+		}
+
+		var isWalletTransaction: Bool {
+			interactionId.isWalletInteraction
+		}
 
 		@PresentationState
 		var destination: Destination.State? = nil
@@ -68,8 +75,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 			signTransactionPurpose: SigningPurpose.SignTransactionPurpose,
 			message: Message,
 			ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey = .init(),
-			waitsForTransactionToBeComitted: Bool = false,
-			isWalletTransaction: Bool,
+			interactionId: WalletInteractionId,
 			proposingDappMetadata: DappMetadata.Ledger?,
 			p2pRoute: P2P.Route
 		) {
@@ -78,8 +84,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 			self.signTransactionPurpose = signTransactionPurpose
 			self.message = message
 			self.ephemeralNotaryPrivateKey = ephemeralNotaryPrivateKey
-			self.waitsForTransactionToBeComitted = waitsForTransactionToBeComitted
-			self.isWalletTransaction = isWalletTransaction
+			self.interactionId = interactionId
 			self.proposingDappMetadata = proposingDappMetadata
 			self.p2pRoute = p2pRoute
 		}
@@ -521,7 +526,8 @@ extension TransactionReview {
 						transactionSigners: reviewedTransaction.transactionSigners,
 						signingFactors: reviewedTransaction.signingFactors,
 						signingPurpose: .signTransaction(state.signTransactionPurpose),
-						manifest: reviewedTransaction.transactionManifest
+						manifest: reviewedTransaction.transactionManifest,
+						accountWithdraws: reviewedTransaction.accountWithdraws
 					))
 				}
 
@@ -593,21 +599,28 @@ extension ResourceBalance {
 			}
 		}
 		set {
+			guard let newValue else {
+				return
+			}
+
 			switch self {
 			case let .known(knownResourceBalance):
 				switch knownResourceBalance.details {
 				case var .fungible(fungible):
 					fungible.guarantee = newValue
+					fungible.amount.setGuaranteedAmount(newValue.amount)
 					var known = knownResourceBalance
 					known.details = .fungible(fungible)
 					self = .known(known)
 				case var .liquidStakeUnit(liquidStakeUnit):
 					liquidStakeUnit.guarantee = newValue
+					liquidStakeUnit.amount.setGuaranteedAmount(newValue.amount)
 					var known = knownResourceBalance
 					known.details = .liquidStakeUnit(liquidStakeUnit)
 					self = .known(known)
 				case var .poolUnit(poolUnit):
 					poolUnit.guarantee = newValue
+					poolUnit.details.poolUnitResource.amount.setGuaranteedAmount(newValue.amount)
 					var known = knownResourceBalance
 					known.details = .poolUnit(poolUnit)
 					self = .known(known)
@@ -621,14 +634,14 @@ extension ResourceBalance {
 	}
 
 	/// The transferred amount, for a fungible resource
-	var fungibleTransferAmount: Decimal192? {
+	var fungiblePredictedTransferAmount: Decimal192? {
 		switch details {
 		case let .fungible(fungible):
-			fungible.amount.exactAmount?.nominalAmount
+			fungible.amount.predictedAmount?.nominalAmount
 		case let .liquidStakeUnit(liquidStakeUnit):
-			liquidStakeUnit.amount.exactAmount?.nominalAmount
+			liquidStakeUnit.amount.predictedAmount?.nominalAmount
 		case let .poolUnit(poolUnit):
-			poolUnit.details.poolUnitResource.amount.exactAmount?.nominalAmount
+			poolUnit.details.poolUnitResource.amount.predictedAmount?.nominalAmount
 		case .nonFungible, .stakeClaimNFT, .none:
 			nil
 		}

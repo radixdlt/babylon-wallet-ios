@@ -77,7 +77,7 @@ extension Profile {
 					factorSourceId: privateHDFactorSource.factorSource.id,
 					publicKey: .sample
 				),
-				authenticationSigning: nil
+				provisionalSecurifiedConfig: nil
 			)
 		)
 
@@ -129,7 +129,6 @@ func withTestClients<R>(
 	}, operation: operation)
 }
 
-@_unsafeInheritExecutor
 @discardableResult
 func withTestClients<R>(
 	userDefaults: UserDefaults.Dependency = .ephemeral(),
@@ -241,7 +240,7 @@ extension PrivateHierarchicalDeterministicFactorSource {
 			hostInfo: .sample
 		)
 		bdfs.hint.model = model
-		bdfs.hint.name = name
+		bdfs.hint.label = name
 		bdfs.common.addedOn = .init(timeIntervalSince1970: 0)
 		bdfs.common.lastUsedOn = .init(timeIntervalSince1970: 0)
 		return Self(mnemonicWithPassphrase: mnemonicWithPassphrase, factorSource: bdfs)

@@ -37,13 +37,13 @@ struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 			switch purpose {
 			case let .addAccounts(id, forOlympiaAccounts):
 				AccountRecoveryScanInProgress.State(
-					mode: .factorSourceWithID(id: id),
+					mode: .addAccounts(factorSourceId: id),
 					forOlympiaAccounts: forOlympiaAccounts
 				)
 
 			case let .createProfile(privateHDFactorSource):
 				AccountRecoveryScanInProgress.State(
-					mode: .privateHD(privateHDFactorSource),
+					mode: .createProfile(privateHDFactorSource),
 					forOlympiaAccounts: false
 				)
 			}
@@ -109,17 +109,26 @@ struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .accountRecoveryScanInProgress(.delegate(.foundAccounts(active, inactive))):
+		case let .accountRecoveryScanInProgress(.delegate(.foundAccounts(active, inactive, deleted))):
 			switch state.root {
 			case let .accountRecoveryScanInProgress(childState):
 				state.backTo = childState
 			case .selectInactiveAccountsToAdd: assertionFailure("Discrepancy, wrong state")
 			}
 			if inactive.isEmpty {
-				return completed(purpose: state.purpose, active: active, inactive: inactive)
+				return completed(
+					purpose: state.purpose,
+					active: active,
+					inactive: inactive,
+					deleted: deleted
+				)
 			} else {
 				withAnimation {
-					state.root = .selectInactiveAccountsToAdd(.init(active: active, inactive: inactive))
+					state.root = .selectInactiveAccountsToAdd(.init(
+						active: active,
+						deleted: deleted,
+						inactive: inactive
+					))
 				}
 				return .none
 			}
@@ -133,8 +142,13 @@ struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 			state.root = .accountRecoveryScanInProgress(childState)
 			return .none
 
-		case let .selectInactiveAccountsToAdd(.delegate(.finished(selectedInactive, active))):
-			return completed(purpose: state.purpose, active: active, inactive: selectedInactive)
+		case let .selectInactiveAccountsToAdd(.delegate(.finished(selectedInactive, active, deleted))):
+			return completed(
+				purpose: state.purpose,
+				active: active,
+				inactive: selectedInactive,
+				deleted: deleted
+			)
 
 		default:
 			return .none
@@ -144,11 +158,13 @@ struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 	private func completed(
 		purpose: State.Purpose,
 		active: IdentifiedArrayOf<Account>,
-		inactive: IdentifiedArrayOf<Account>
+		inactive: IdentifiedArrayOf<Account>,
+		deleted: IdentifiedArrayOf<Account>
 	) -> Effect<Action> {
 		let sortedAccounts: Accounts = { () -> IdentifiedArrayOf<Account> in
 			var accounts = active
 			accounts.append(contentsOf: inactive)
+			accounts.append(contentsOf: deleted)
 			accounts.sort() // by index
 			loggerGlobal.debug("Successfully discovered and created #\(active.count) accounts and #\(inactive.count) inactive accounts that was chosen by user, sorted by index, these are all the accounts we are gonna use:\n\(accounts)")
 			return accounts

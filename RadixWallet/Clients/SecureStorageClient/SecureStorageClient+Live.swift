@@ -1,9 +1,9 @@
 import Sargon
 
-// MARK: - KeychainAccess.Accessibility + Sendable
+// MARK: - KeychainAccess.Accessibility + @unchecked Sendable
 extension KeychainAccess.Accessibility: @unchecked Sendable {}
 
-// MARK: - KeychainAccess.AuthenticationPolicy + Sendable
+// MARK: - KeychainAccess.AuthenticationPolicy + @unchecked Sendable
 extension KeychainAccess.AuthenticationPolicy: @unchecked Sendable {}
 
 // MARK: - SecureStorageError
@@ -227,7 +227,7 @@ extension SecureStorageClient: DependencyKey {
 					accessibility: mostSecureAccesibilityAndAuthenticationPolicy.accessibility,
 					authenticationPolicy: mostSecureAccesibilityAndAuthenticationPolicy.authenticationPolicy,
 					label: importantKeychainIdentifier("Radix Wallet Factor Secret")!,
-					comment: .init("Created on \(factorSource.hint.name) \(factorSource.supportsOlympia ? " (Olympia)" : "")")
+					comment: .init("Created on \(factorSource.hint.deviceName) \(factorSource.supportsOlympia ? " (Olympia)" : "")")
 				)
 			)
 		}
@@ -315,6 +315,23 @@ extension SecureStorageClient: DependencyKey {
 		let containsMnemonicIdentifiedByFactorSourceID: ContainsMnemonicIdentifiedByFactorSourceID = { factorSourceID in
 			let key = key(factorSourceID: factorSourceID)
 			return (try? keychainClient.contains(key)) ?? false
+		}
+
+		let containsDataForKey: ContainsDataForKey = { sargonKey in
+			let keychainKey: KeychainClient.Key
+			switch sargonKey {
+			case .hostId:
+				keychainKey = deviceInfoKey
+			case .profileSnapshot:
+				let userDefaults = UserDefaults.Dependency.radix
+				guard let activeProfileId = userDefaults.getActiveProfileID() else {
+					return false
+				}
+				keychainKey = activeProfileId.keychainKey
+			case let .deviceFactorSourceMnemonic(factorSourceId):
+				keychainKey = key(factorSourceID: factorSourceId)
+			}
+			return try keychainClient.contains(keychainKey)
 		}
 
 		let deleteProfileAndMnemonicsByFactorSourceIDs: DeleteProfileAndMnemonicsByFactorSourceIDs = {
@@ -460,7 +477,8 @@ extension SecureStorageClient: DependencyKey {
 			keychainChanged: keychainChanged,
 			getAllMnemonics: getAllMnemonics,
 			loadMnemonicDataByFactorSourceID: loadMnemonicDataByFactorSourceID,
-			saveMnemonicForFactorSourceData: saveMnemonicForFactorSourceData
+			saveMnemonicForFactorSourceData: saveMnemonicForFactorSourceData,
+			containsDataForKey: containsDataForKey
 		)
 		#else
 		return Self(
@@ -488,7 +506,8 @@ extension SecureStorageClient: DependencyKey {
 			saveP2PLinksPrivateKey: saveP2PLinksPrivateKey,
 			keychainChanged: keychainChanged,
 			loadMnemonicDataByFactorSourceID: loadMnemonicDataByFactorSourceID,
-			saveMnemonicForFactorSourceData: saveMnemonicForFactorSourceData
+			saveMnemonicForFactorSourceData: saveMnemonicForFactorSourceData,
+			containsDataForKey: containsDataForKey
 		)
 		#endif
 	}()

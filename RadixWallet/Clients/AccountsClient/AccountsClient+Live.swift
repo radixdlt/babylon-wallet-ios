@@ -80,7 +80,6 @@ extension AccountsClient: DependencyKey {
 			}
 		}
 
-		#if DEBUG
 		return Self(
 			getCurrentNetworkID: getCurrentNetworkID,
 			nextAppearanceID: nextAppearanceID,
@@ -88,34 +87,13 @@ extension AccountsClient: DependencyKey {
 			getHiddenAccountsOnCurrentNetwork: getHiddenAccountsOnCurrentNetwork,
 			accountsOnCurrentNetwork: accountsOnCurrentNetwork,
 			accountUpdates: accountUpdates,
-			getAccountsOnNetwork: getAccountsOnNetwork,
 			newVirtualAccount: newVirtualAccount,
 			saveVirtualAccounts: saveVirtualAccounts,
 			getAccountByAddress: getAccountByAddress,
-			hasAccountOnNetwork: hasAccountOnNetwork,
-			updateAccount: updateAccount,
-			debugOnlyDeleteAccount: { account in
-				try await profileStore.updating {
-					try $0.deleteAccount(account)
-				}
-			}
-		)
-		#else
-		return Self(
-			getCurrentNetworkID: getCurrentNetworkID,
-			nextAppearanceID: nextAppearanceID,
-			getAccountsOnCurrentNetwork: getAccountsOnCurrentNetwork,
-			getHiddenAccountsOnCurrentNetwork: getHiddenAccountsOnCurrentNetwork,
-			accountsOnCurrentNetwork: accountsOnCurrentNetwork,
-			accountUpdates: accountUpdates,
 			getAccountsOnNetwork: getAccountsOnNetwork,
-			newVirtualAccount: newVirtualAccount,
-			saveVirtualAccounts: saveVirtualAccounts,
-			getAccountByAddress: getAccountByAddress,
 			hasAccountOnNetwork: hasAccountOnNetwork,
 			updateAccount: updateAccount
 		)
-		#endif
 	}
 
 	static let liveValue: Self = .live()

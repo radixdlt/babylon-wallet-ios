@@ -64,8 +64,8 @@ struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 			problems: [SecurityProblem]
 		) {
 			let accounts = entitiesSet.accounts.elements + entitiesSet.hiddenAccounts.elements
-			let isMnemonicMarkedAsBackedUp = problems.isMnemonicMarkedAsBackedUp(accounts: accounts, personas: entitiesSet.personas)
-			let isMnemonicPresentInKeychain = problems.isMnemonicPresentInKeychain(accounts: accounts, personas: entitiesSet.personas)
+			let isMnemonicMarkedAsBackedUp = !problems.hasProblem3(accounts: accounts, personas: entitiesSet.personas)
+			let isMnemonicPresentInKeychain = !problems.hasProblem9(accounts: accounts, personas: entitiesSet.personas)
 			self.init(
 				id: .singleCurve(entitiesSet.id.factorSourceID, isOlympia: entitiesSet.id.isOlympia),
 				isMnemonicMarkedAsBackedUp: isMnemonicMarkedAsBackedUp,
@@ -108,27 +108,29 @@ struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 	}
 }
 
-private extension [SecurityProblem] {
-	func isMnemonicMarkedAsBackedUp(accounts: [Account], personas: [Persona]) -> Bool {
-		allSatisfy { problem in
+extension [SecurityProblem] {
+	/// Returns if the given collection of `SecurityProblem` has any `.problem3` for at least one of the entities provided
+	func hasProblem3(accounts: [Account], personas: [Persona]) -> Bool {
+		contains { problem in
 			switch problem {
 			case let .problem3(addresses):
-				addresses.problematicAccounts.isDisjoint(with: accounts.map(\.address)) &&
-					Set(addresses.personas).isDisjoint(with: personas.map(\.address))
+				!addresses.problematicAccounts.isDisjoint(with: accounts.map(\.address)) ||
+					!Set(addresses.personas).isDisjoint(with: personas.map(\.address))
 			default:
-				true
+				false
 			}
 		}
 	}
 
-	func isMnemonicPresentInKeychain(accounts: [Account], personas: [Persona]) -> Bool {
-		allSatisfy { problem in
+	/// Returns if the given collection of `SecurityProblem` has any `.problem9` for at least one of the entities provided
+	func hasProblem9(accounts: [Account], personas: [Persona]) -> Bool {
+		contains { problem in
 			switch problem {
 			case let .problem9(addresses):
-				addresses.problematicAccounts.isDisjoint(with: accounts.map(\.address)) &&
-					Set(addresses.personas).isDisjoint(with: personas.map(\.address))
+				!addresses.problematicAccounts.isDisjoint(with: accounts.map(\.address)) ||
+					!Set(addresses.personas).isDisjoint(with: personas.map(\.address))
 			default:
-				true
+				false
 			}
 		}
 	}

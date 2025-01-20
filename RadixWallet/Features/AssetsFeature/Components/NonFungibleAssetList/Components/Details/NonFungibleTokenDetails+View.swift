@@ -8,6 +8,14 @@ extension NonFungibleTokenDetails.State {
 		}
 	}
 
+	var title: Loadable<String?> {
+		if let name = tokenDetails?.name {
+			.success(name)
+		} else {
+			resourceDetails.metadata.name
+		}
+	}
+
 	var resourceThumbnail: Loadable<URL?> {
 		ownedResource.map { .success($0.metadata.iconURL) } ?? resourceDetails.metadata.iconURL
 	}
@@ -66,7 +74,7 @@ extension NonFungibleTokenDetails {
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
-				DetailsContainer(title: .success(store.tokenDetails?.name ?? "")) {
+				DetailsContainer(title: store.title) {
 					store.send(.view(.closeButtonTapped))
 				} contents: {
 					WithPerceptionTracking {

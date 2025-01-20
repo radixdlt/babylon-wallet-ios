@@ -128,7 +128,7 @@ extension ImportMnemonic {
 						}
 
 						if let warning = viewStore.warning {
-							WarningErrorView(text: warning, type: .warning)
+							StatusMessageView(text: warning, type: .warning)
 						}
 
 						if !viewStore.isWordCountFixed {
@@ -296,7 +296,7 @@ extension ImportMnemonic.View {
 				forAction: { viewStore.send(.continueButtonTapped($0)) }
 			) { action in
 				if viewStore.isNonChecksummed {
-					WarningErrorView(text: L10n.ImportMnemonic.checksumFailure, type: .error)
+					StatusMessageView(text: L10n.ImportMnemonic.checksumFailure, type: .error)
 				}
 				Button(L10n.ImportMnemonic.importSeedPhrase, action: action)
 					.buttonStyle(.primaryRectangular)

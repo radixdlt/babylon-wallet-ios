@@ -10,14 +10,14 @@ extension DependencyValues {
 extension PersonasClient: TestDependencyKey {
 	static let previewValue = Self.noop
 	static let testValue = Self(
-		personas: unimplemented("\(Self.self).personas"),
+		personas: unimplemented("\(Self.self).personas", placeholder: noop.personas),
 		getPersonas: unimplemented("\(Self.self).getPersonas"),
-		getPersonasOnNetwork: unimplemented("\(Self.self).getPersonasOnNetwork"),
+		getPersonasOnNetwork: unimplemented("\(Self.self).getPersonasOnNetwork", placeholder: noop.getPersonasOnNetwork),
 		getHiddenPersonasOnCurrentNetwork: unimplemented("\(Self.self).getHiddenPersonasOnCurrentNetwork"),
 		updatePersona: unimplemented("\(Self.self).updatePersona"),
 		saveVirtualPersona: unimplemented("\(Self.self).saveVirtualPersona"),
-		hasSomePersonaOnAnyNetwork: unimplemented("\(Self.self).hasAnyPersonaOnAnyNetwork"),
-		hasSomePersonaOnCurrentNetwork: unimplemented("\(Self.self).hasAnyPersonaOnCurrentNetwork")
+		hasSomePersonaOnAnyNetwork: unimplemented("\(Self.self).hasSomePersonaOnAnyNetwork", placeholder: noop.hasSomePersonaOnAnyNetwork),
+		hasSomePersonaOnCurrentNetwork: unimplemented("\(Self.self).hasSomePersonaOnCurrentNetwork", placeholder: noop.hasSomePersonaOnCurrentNetwork)
 	)
 	static let noop = Self(
 		personas: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },

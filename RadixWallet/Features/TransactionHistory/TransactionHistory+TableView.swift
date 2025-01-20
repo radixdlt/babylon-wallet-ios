@@ -328,7 +328,7 @@ extension TransactionHistory {
 						EventHeader(event: .deposited)
 					}
 
-					ResourceBalancesView(resources)
+					ResourceBalancesView(resources, appearance: .compact)
 						.environment(\.resourceBalanceHideDetails, true)
 				}
 			}

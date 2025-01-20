@@ -12,7 +12,7 @@ extension AuthorizedDappsClient: TestDependencyKey {
 
 	static let testValue = Self(
 		getAuthorizedDapps: unimplemented("\(Self.self).getAuthorizedDapps"),
-		authorizedDappValues: unimplemented("\(Self.self).authorizedDappValues"),
+		authorizedDappValues: unimplemented("\(Self.self).authorizedDappValues", placeholder: noop.authorizedDappValues),
 		addAuthorizedDapp: unimplemented("\(Self.self).addAuthorizedDapp"),
 		forgetAuthorizedDapp: unimplemented("\(Self.self).forgetAuthorizedDapp"),
 		updateAuthorizedDapp: unimplemented("\(Self.self).updateAuthorizedDapp"),

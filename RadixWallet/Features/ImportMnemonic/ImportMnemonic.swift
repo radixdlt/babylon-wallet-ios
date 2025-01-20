@@ -2,6 +2,9 @@ import ComposableArchitecture
 import Sargon
 import SwiftUI
 
+// FIXME: Refactor ImportMnemonic
+typealias DisplayMnemonic = ImportMnemonic
+
 // MARK: - ImportMnemonic
 struct ImportMnemonic: Sendable, FeatureReducer {
 	static let wordsPerRow = 3

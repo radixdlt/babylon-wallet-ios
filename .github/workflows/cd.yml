@@ -28,7 +28,7 @@ jobs:
       contents: read
     name: "Test Flight Deploy"
     if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' && !(contains(github.event.head_commit.message, '[skip cd]') || contains(github.event.head_commit.message, '[cd skip]')) }}
-    runs-on: macos-14-xlarge
+    runs-on: macos-15-xlarge
 
     steps:
       - uses: RDXWorks-actions/checkout@main
@@ -71,7 +71,7 @@ jobs:
         with:
           token: ${{ env.WALLET_RADIX_BOT_PAT }}
 
-      - uses: RDXWorks-actions/setup-ruby@master-upgrade-to-v1-171-0
+      - uses: RDXWorks-actions/setup-ruby@master
         with:
           ruby-version: 3.1.2
           bundler-cache: true

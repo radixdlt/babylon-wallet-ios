@@ -124,7 +124,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case dismissWithFailure(WalletToDappInteractionFailureResponse)
-		case dismissWithSuccess(DappMetadata, TransactionIntentHash)
+		case dismissWithSuccess(DappMetadata, DappInteractionCompletionKind)
 		case submit(WalletToDappInteractionSuccessResponse, DappMetadata)
 		case dismiss
 	}
@@ -440,7 +440,7 @@ extension DappInteractionFlow {
 			return continueEffect(for: &state)
 		}
 
-		func handleSignAndSubmitTXFailed(
+		func handleTransactionFailure(
 			_ error: TransactionFailure
 		) -> Effect<Action> {
 			let (errorKind, message) = error.errorKindAndMessage
@@ -516,14 +516,8 @@ extension DappInteractionFlow {
 		) -> Effect<Action> {
 			let preAuthResponse = newWalletToDappInteractionPreAuthorizationResponseItems(signedSubintent: signedSubintent)
 			state.responseItems[item] = .remote(.preAuthorization(preAuthResponse))
-			return continueEffect(for: &state)
-		}
 
-		func handlePreAuthorizationFailure(
-			_ error: PreAuthorizationFailure
-		) -> Effect<Action> {
-			let (errorKind, message) = error.errorKindAndMessage
-			return dismissEffect(for: state, errorKind: errorKind, message: message)
+			return continueEffect(for: &state)
 		}
 
 		let item = state.currentItem
@@ -564,13 +558,13 @@ extension DappInteractionFlow {
 			return handleSignAndSubmitTX(item, txID)
 
 		case let .reviewTransaction(.delegate(.transactionCompleted(txID))):
-			return .send(.delegate(.dismissWithSuccess(state.dappMetadata, txID)))
+			return .send(.delegate(.dismissWithSuccess(state.dappMetadata, .transaction(txID))))
 
 		case .reviewTransaction(.delegate(.dismiss)):
 			return .send(.delegate(.dismiss))
 
 		case let .reviewTransaction(.delegate(.failed(error))):
-			return handleSignAndSubmitTXFailed(error)
+			return handleTransactionFailure(error)
 
 		case let .personaProofOfOwnership(.delegate(.provenPersonaOwnership(persona, challenge))):
 			return handlePersonaProofOfOwnership(item, persona, challenge)
@@ -590,7 +584,7 @@ extension DappInteractionFlow {
 			return handlePreAuthorizationSignature(item, encoded)
 
 		case let .preAuthorizationReview(.delegate(.failed(error))):
-			return handlePreAuthorizationFailure(error)
+			return handleTransactionFailure(error)
 
 		default:
 			return .none
@@ -1043,8 +1037,7 @@ extension DappInteractionFlow.Path.State {
 				message: item.message.map {
 					Message.plaintext(string: $0)
 				} ?? Message.none,
-				waitsForTransactionToBeComitted: interaction.interactionId.isWalletAccountDepositSettingsInteraction,
-				isWalletTransaction: interaction.interactionId.isWalletInteraction,
+				interactionId: interaction.interactionId,
 				proposingDappMetadata: dappMetadata.onLedger,
 				p2pRoute: p2pRoute
 			))
@@ -1054,7 +1047,7 @@ extension DappInteractionFlow.Path.State {
 				unvalidatedManifest: item.unvalidatedManifest,
 				expiration: item.expiration,
 				nonce: .secureRandom(),
-				dAppMetadata: dappMetadata.onLedger,
+				dAppMetadata: dappMetadata,
 				message: item.message
 			))
 		}

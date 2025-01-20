@@ -1,24 +1,23 @@
-import ComposableArchitecture
-import Sargon
-import SwiftUI
 
 typealias LedgerDeviceInfo = P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo
 
 // MARK: - AddLedgerFactorSource
+@Reducer
 struct AddLedgerFactorSource: Sendable, FeatureReducer {
 	// MARK: AddLedgerFactorSource
 
+	@ObservableState
 	struct State: Sendable, Hashable {
 		var isWaitingForResponseFromLedger = false
 		var unnamedDeviceToAdd: LedgerDeviceInfo?
 
-		@PresentationState
+		@Presents
 		var destination: Destination.State? = nil
 
 		init() {}
 	}
 
-	// MARK: Action
+	typealias Action = FeatureAction<Self>
 
 	enum ViewAction: Sendable, Equatable {
 		case sendAddLedgerRequestButtonTapped
@@ -40,18 +39,20 @@ struct AddLedgerFactorSource: Sendable, FeatureReducer {
 	// MARK: Destination
 
 	struct Destination: DestinationReducer {
+		@CasePathable
 		enum State: Sendable, Hashable {
 			case ledgerAlreadyExistsAlert(AlertState<Never>)
 			case nameLedger(NameLedgerFactorSource.State)
 		}
 
+		@CasePathable
 		enum Action: Sendable, Equatable {
 			case ledgerAlreadyExistsAlert(Never)
 			case nameLedger(NameLedgerFactorSource.Action)
 		}
 
 		var body: some ReducerOf<Self> {
-			Scope(state: /State.nameLedger, action: /Action.nameLedger) {
+			Scope(state: \.nameLedger, action: \.nameLedger) {
 				NameLedgerFactorSource()
 			}
 		}
@@ -172,59 +173,7 @@ extension AlertState<Never> {
 		AlertState {
 			TextState(L10n.AddLedgerDevice.AlreadyAddedAlert.title)
 		} message: {
-			TextState(L10n.AddLedgerDevice.AlreadyAddedAlert.message(ledger.hint.name))
-		}
-	}
-}
-
-// MARK: - NameLedgerFactorSource
-struct NameLedgerFactorSource: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
-		let deviceInfo: LedgerDeviceInfo
-		var ledgerName = ""
-
-		init(deviceInfo: LedgerDeviceInfo) {
-			self.deviceInfo = deviceInfo
-		}
-
-		var nameIsValid: Bool {
-			!ledgerName.isEmpty
-		}
-	}
-
-	enum ViewAction: Sendable, Equatable {
-		case ledgerNameChanged(String)
-		case confirmNameButtonTapped
-	}
-
-	enum DelegateAction: Sendable, Equatable {
-		case complete(LedgerHardwareWalletFactorSource)
-		case failedToCreateLedgerFactorSource
-	}
-
-	@Dependency(\.errorQueue) var errorQueue
-	init() {}
-
-	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
-		switch viewAction {
-		case let .ledgerNameChanged(name):
-			state.ledgerName = name
-			return .none
-
-		case .confirmNameButtonTapped:
-			loggerGlobal.notice("Confirmed ledger name: '\(state.ledgerName)', creating factor source")
-
-			do {
-				let ledger = try LedgerHardwareWalletFactorSource.from(
-					device: state.deviceInfo,
-					name: state.ledgerName
-				)
-				return .send(.delegate(.complete(ledger)))
-			} catch {
-				loggerGlobal.error("Failed to created Ledger FactorSource, error: \(error)")
-				errorQueue.schedule(error)
-				return .send(.delegate(.failedToCreateLedgerFactorSource))
-			}
+			TextState(L10n.AddLedgerDevice.AlreadyAddedAlert.message(ledger.hint.label))
 		}
 	}
 }

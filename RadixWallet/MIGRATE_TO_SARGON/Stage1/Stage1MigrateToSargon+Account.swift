@@ -51,6 +51,10 @@ extension Account {
 }
 
 extension Accounts {
+	var nonDeleted: Accounts {
+		filter(not(\.isDeleted))
+	}
+
 	var nonHidden: Accounts {
 		filter(not(\.isHidden))
 	}
@@ -61,6 +65,10 @@ extension Accounts {
 }
 
 extension [Account] {
+	var nonDeleted: Accounts {
+		asIdentified().nonDeleted
+	}
+
 	var nonHidden: Accounts {
 		asIdentified().nonHidden
 	}

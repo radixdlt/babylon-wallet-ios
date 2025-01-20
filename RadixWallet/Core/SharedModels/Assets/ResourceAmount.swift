@@ -50,6 +50,24 @@ extension ResourceAmount {
 		}
 	}
 
+	var predictedAmount: ExactResourceAmount? {
+		switch self {
+		case let .predicted(amount, _):
+			amount
+		default:
+			nil
+		}
+	}
+
+	var guaranteedAmount: ExactResourceAmount? {
+		switch self {
+		case let .predicted(_, amount):
+			amount
+		default:
+			nil
+		}
+	}
+
 	func adjustedNominalAmount(_ adjust: (Decimal192) -> Decimal192) -> Self {
 		switch self {
 		case let .exact(amount):
@@ -75,6 +93,14 @@ extension ResourceAmount {
 		case .unknown:
 			return .unknown
 		}
+	}
+
+	mutating func setGuaranteedAmount(_ newGuaranteed: Decimal192) {
+		guard case let .predicted(predicted, _) = self else {
+			return
+		}
+
+		self = .predicted(predicted: predicted, guaranteed: .init(nominalAmount: newGuaranteed))
 	}
 }
 

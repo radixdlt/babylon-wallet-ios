@@ -8,7 +8,7 @@ extension InteractionReview.Sections.State {
 			isExpandedRedeemingFromPools: redeemingFromPools?.isExpanded == true,
 			showTransferLine: withdrawals != nil && deposits != nil,
 			showProofs: kind == .preAuthorization,
-			showPossibleDappCalls: showPossibleDappCalls,
+			showPossibleDappCalls: dAppsUsed?.showPossibleDappCalls == true,
 			stakingToValidators: stakingToValidators,
 			unstakingFromValidators: unstakingFromValidators,
 			claimingFromValidators: claimingFromValidators,
@@ -46,6 +46,7 @@ extension InteractionReview.Sections {
 		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading, spacing: .medium1) {
+					accountDeletion
 					withdrawals
 
 					VStack(alignment: .leading, spacing: .medium1) {
@@ -179,11 +180,15 @@ extension InteractionReview.Sections {
 						store.send(.view(.expandableItemToggled(.dAppsUsed)))
 					}
 					if isExpanded {
-						InteractionReviewDappsUsed.View(store: childStore)
-							.transition(.opacity.combined(with: .scale(scale: 0.95)))
-					}
-					if showPossibleDappCalls {
-						possibleDappCalls
+						if !childStore.rows.isEmpty {
+							InteractionReviewDappsUsed.View(store: childStore)
+								.transition(.opacity.combined(with: .scale(scale: 0.95)))
+						}
+
+						if showPossibleDappCalls {
+							possibleDappCalls
+								.transition(.opacity.combined(with: .scale(scale: 0.95)))
+						}
 					}
 				}
 			}
@@ -229,6 +234,16 @@ extension InteractionReview.Sections {
 			IfLetStore(store.scope(state: \.proofs, action: \.child.proofs)) { childStore in
 				Common.Proofs.View(store: childStore)
 					.padding(.horizontal, .small3)
+			}
+		}
+
+		@ViewBuilder
+		private var accountDeletion: some SwiftUI.View {
+			IfLetStore(store.scope(state: \.accountDeletion, action: \.child.accountDeletion)) { childStore in
+				VStack(alignment: .leading, spacing: .small2) {
+					Common.HeadingView.deletingAccount
+					Common.Accounts.View(store: childStore)
+				}
 			}
 		}
 	}

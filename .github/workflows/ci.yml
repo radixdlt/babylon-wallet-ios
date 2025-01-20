@@ -39,6 +39,8 @@ jobs:
           secret_prefix: 'SNYK'
           secret_name: ${{ secrets.AWS_SECRET_NAME_SNYK }}
           parse_json: true
+      - name: Create .snyk file
+        run: echo "${{ vars.DOT_SNYK_FILE }}" > .snyk
       - name: Install snyk
         run: |
           npm install snyk -g
@@ -112,7 +114,7 @@ jobs:
       ( github.event.pull_request.draft == false && github.event.action == 'synchronize' ) ||
       ( github.event.action == 'ready_for_review' ) ||
       ( github.event_name == 'push' && github.ref == 'refs/heads/main' )
-    runs-on: macos-14-xlarge
+    runs-on: macos-15-xlarge
 
     steps:
       - uses: RDXWorks-actions/checkout@main
@@ -134,7 +136,7 @@ jobs:
       contents: read
       checks: write
     name: "Unit test"
-    runs-on: macos-14-xlarge
+    runs-on: macos-15-xlarge
     timeout-minutes: 20
 
     needs:
@@ -177,7 +179,7 @@ jobs:
           xcode-version: "16.0.0"
 
       - name: "Set up ruby"
-        uses: RDXWorks-actions/setup-ruby@master-upgrade-to-v1-171-0
+        uses: RDXWorks-actions/setup-ruby@master
         with:
           ruby-version: 3.1.2
           bundler-cache: true

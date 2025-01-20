@@ -34,7 +34,7 @@ extension InteractionReview.Sections {
 					partialResult[next.resourceAddress] = .left(next)
 				}
 
-			newlyCreatedMetadata.append(contentsOf: existingResourceDetails)
+			newlyCreatedMetadata.merge(existingResourceDetails) { $1 }
 
 			return newlyCreatedMetadata
 		}
@@ -273,8 +273,27 @@ extension InteractionReview.Sections {
 				accountDepositSetting: accountDepositSetting,
 				accountDepositExceptions: accountDepositExceptions
 			)
-		case .some(.deleteAccounts(accountAddresses: let accountAddresses)):
-			fatalError()
+
+		case let .deleteAccounts(accountAddresses):
+			let deleteAccounts: Common.Accounts.State? = try await extractDeleteAccounts(accountAddresses: accountAddresses)
+
+			var summary = summary
+			for accountAddress in accountAddresses {
+				summary.deposits[accountAddress] = nil
+			}
+
+			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
+			let deposits = try await extractDeposits(
+				accountDeposits: summary.deposits,
+				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
+				entities: resourcesInfo,
+				networkID: networkID
+			)
+
+			return Common.SectionsData(
+				deposits: deposits,
+				accountDeletion: deleteAccounts
+			)
 		}
 	}
 
@@ -307,23 +326,34 @@ extension InteractionReview.Sections {
 
 	func extractDapps(
 		addresses: [Address],
-		unknownTitle: (Int) -> String
+		unknownTitle: (Int) -> String,
+		showPossibleDappCalls: Bool = false
 	) async throws -> InteractionReviewDapps<ComponentAddress>.State? {
 		let dApps = await extractDappEntities(addresses)
-		return try await extractDapps(dApps, unknownTitle: unknownTitle)
+		return try await extractDapps(
+			dApps,
+			unknownTitle: unknownTitle,
+			showPossibleDappCalls: showPossibleDappCalls
+		)
 	}
 
 	private func extractDapps<A: AddressProtocol>(
 		_ dAppEntities: [(address: Address, entity: InteractionReview.DappEntity?)],
-		unknownTitle: (Int) -> String
+		unknownTitle: (Int) -> String,
+		showPossibleDappCalls: Bool = false
 	) async throws -> InteractionReviewDapps<A>.State? {
 		let knownDapps = dAppEntities.compactMap(\.entity).asIdentified()
 		let unknownDapps = try dAppEntities.filter { $0.entity == nil }
 			.map { try $0.address.asSpecific(type: A.self) }.asIdentified()
 
-		guard knownDapps.count + unknownDapps.count > 0 else { return nil }
+		guard knownDapps.count + unknownDapps.count > 0 || showPossibleDappCalls else { return nil }
 
-		return .init(knownDapps: knownDapps, unknownDapps: unknownDapps, unknownTitle: unknownTitle)
+		return .init(
+			knownDapps: knownDapps,
+			unknownDapps: unknownDapps,
+			unknownTitle: unknownTitle,
+			showPossibleDappCalls: showPossibleDappCalls
+		)
 	}
 
 	private func extractDappEntities(_ addresses: [Address]) async -> [(address: Address, entity: InteractionReview.DappEntity?)] {
@@ -412,7 +442,7 @@ extension InteractionReview.Sections {
 		guard !withdrawals.isEmpty else { return nil }
 
 		let withdrawalAccounts = withdrawals.map {
-			Common.Account.State(account: $0.key, transfers: $0.value, isDeposit: false)
+			Common.Account.State(account: $0.key, transfers: $0.value, purpose: .withdrawal)
 		}
 		.asIdentified()
 
@@ -458,13 +488,29 @@ extension InteractionReview.Sections {
 
 		let depositAccounts = deposits
 			.filter { !$0.value.isEmpty }
-			.map { Common.Account.State(account: $0.key, transfers: $0.value, isDeposit: true) }
+			.map { Common.Account.State(account: $0.key, transfers: $0.value, purpose: .deposit) }
 			.asIdentified()
 
 		guard !depositAccounts.isEmpty else { return nil }
 
 		let requiresGuarantees = !depositAccounts.customizableGuarantees.isEmpty
 		return .init(accounts: depositAccounts, enableCustomizeGuarantees: requiresGuarantees)
+	}
+
+	private func extractDeleteAccounts(accountAddresses: [AccountAddress]) async throws -> Common.Accounts.State? {
+		let userAccounts: [Common.ReviewAccount] = try await extractUserAccounts(accountAddresses)
+		let accounts = try accountAddresses
+			.map {
+				let account = try userAccounts.account(for: $0)
+				return Common.Account.State(
+					account: account,
+					transfers: [],
+					purpose: .accountDeletion
+				)
+			}
+			.asIdentified()
+
+		return .init(accounts: accounts, enableCustomizeGuarantees: false)
 	}
 
 	func extractValidators(for addresses: [ValidatorAddress]) async throws -> Common.ValidatorsState? {

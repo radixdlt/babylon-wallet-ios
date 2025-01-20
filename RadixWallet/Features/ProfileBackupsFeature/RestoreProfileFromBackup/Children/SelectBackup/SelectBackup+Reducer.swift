@@ -215,7 +215,7 @@ struct SelectBackup: Sendable, FeatureReducer {
 		case let .inputEncryptionPassword(.delegate(.successfullyDecrypted(_, decrypted, containsP2PLinks))):
 			state.destination = nil
 			overlayWindowClient.scheduleHUD(.decryptedProfile)
-			return .send(.delegate(.selectedProfile(decrypted, containsLegacyP2PLinks: containsP2PLinks)))
+			return delayedShortEffect(for: .delegate(.selectedProfile(decrypted, containsLegacyP2PLinks: containsP2PLinks)))
 
 		case .inputEncryptionPassword(.delegate(.successfullyEncrypted)):
 			preconditionFailure("Incorrect implementation, expected decryption")

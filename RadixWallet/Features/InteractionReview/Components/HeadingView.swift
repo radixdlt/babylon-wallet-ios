@@ -39,6 +39,11 @@ extension InteractionReview {
 			icon: AssetResource.transactionReviewWithdrawing
 		)
 
+		static let deletingAccount = HeadingView(
+			L10n.TransactionReview.DeletingAccount.title,
+			icon: AssetResource.transactionReviewDeletingAccount
+		)
+
 		static let depositing = HeadingView(
 			L10n.InteractionReview.depositsHeading,
 			icon: AssetResource.transactionReviewDepositing

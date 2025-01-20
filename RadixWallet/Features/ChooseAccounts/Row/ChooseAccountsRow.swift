@@ -11,13 +11,16 @@ enum ChooseAccountsRow {
 
 		let account: Account
 		let mode: Mode
+		let isEnabled: Bool
 
 		init(
 			account: Account,
-			mode: Mode
+			mode: Mode,
+			isEnabled: Bool = true
 		) {
 			self.account = account
 			self.mode = mode
+			self.isEnabled = isEnabled
 		}
 	}
 }

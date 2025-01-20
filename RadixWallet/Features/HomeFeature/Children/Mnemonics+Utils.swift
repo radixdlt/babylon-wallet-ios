@@ -1,4 +1,4 @@
-extension ExportMnemonic.State {
+extension ImportMnemonic.State {
 	static func export(
 		_ input: SimplePrivateFactorSource,
 		title: String,

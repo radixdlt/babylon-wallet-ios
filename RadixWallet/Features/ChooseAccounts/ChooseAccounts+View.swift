@@ -15,7 +15,8 @@ extension ChooseAccounts {
 			self.availableAccounts = state.availableAccounts.map { account in
 				ChooseAccountsRow.State(
 					account: account,
-					mode: selectionRequirement == .exactly(1) ? .radioButton : .checkmark
+					mode: selectionRequirement == .exactly(1) ? .radioButton : .checkmark,
+					isEnabled: !state.disabledAccounts.contains(account.address)
 				)
 			}
 			self.selectionRequirement = selectionRequirement
@@ -64,6 +65,8 @@ extension ChooseAccounts {
 									isSelected: item.isSelected,
 									action: item.action
 								)
+								.opacity(item.value.isEnabled ? 1 : 0.5)
+								.allowsHitTesting(item.value.isEnabled)
 							}
 						}
 
@@ -84,19 +87,10 @@ extension ChooseAccounts {
 	}
 }
 
-private extension StoreOf<ChooseAccounts> {
-	var destination: PresentationStoreOf<ChooseAccounts.Destination> {
-		func scopeState(state: State) -> PresentationState<ChooseAccounts.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
-	}
-}
-
 @MainActor
 private extension View {
 	func destinations(with store: StoreOf<ChooseAccounts>) -> some View {
-		let destinationStore = store.destination
+		let destinationStore = store.scope(state: \.$destination, action: \.destination)
 		return sheet(
 			store: destinationStore,
 			state: /ChooseAccounts.Destination.State.createAccount,
