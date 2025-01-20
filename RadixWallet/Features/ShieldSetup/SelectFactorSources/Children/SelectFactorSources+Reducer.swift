@@ -24,7 +24,7 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 
 	@CasePathable
 	enum ViewAction: Equatable, Sendable {
-		case task
+		case onFirstAppear
 		case selectedFactorSourcesChanged([FactorSource]?)
 		case continueButtonTapped
 		case invalidReadMoreTapped
@@ -48,7 +48,7 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .task:
+		case .onFirstAppear:
 			return .run { [shieldBuilder = state.shieldBuilder] send in
 				let factorSources = try await factorSourcesClient.getFactorSources().elements
 				let result = shieldBuilder.sortedFactorSourcesForPrimaryThresholdSelection(factorSources: factorSources)
@@ -83,6 +83,9 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 			return .none
 
 		case .continueButtonTapped:
+			state.$shieldBuilder.withLock { builder in
+				builder = builder.autoAssignFactorsToRecoveryAndConfirmationBasedOnPrimary(allFactors: state.factorSourcesCandidates)
+			}
 			return .send(.delegate(.finished))
 
 		case .invalidReadMoreTapped:
@@ -100,10 +103,8 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 	}
 }
 
-// MARK: - SelectFactorSources.State.StatusMessageInfo
-extension SelectFactorSources.State {
-	struct StatusMessageInfo: Hashable, Sendable {
-		let type: StatusMessageView.ViewType
-		let text: String
-	}
+// MARK: - ShieldStatusMessageInfo
+struct ShieldStatusMessageInfo: Hashable, Sendable {
+	let type: StatusMessageView.ViewType
+	let text: String
 }

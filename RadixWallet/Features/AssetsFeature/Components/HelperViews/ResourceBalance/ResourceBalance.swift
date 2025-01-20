@@ -81,13 +81,13 @@ struct KnownResourceBalance: Sendable, Hashable {
 
 	struct Fungible: Sendable, Hashable {
 		let isXRD: Bool
-		let amount: ResourceAmount
+		var amount: ResourceAmount
 		var guarantee: TransactionGuarantee?
 	}
 
 	struct LiquidStakeUnit: Sendable, Hashable {
 		let resource: OnLedgerEntity.Resource
-		let amount: ResourceAmount
+		var amount: ResourceAmount
 		let worth: ResourceAmount
 		let validator: OnLedgerEntity.Validator
 		var guarantee: TransactionGuarantee?
@@ -109,7 +109,7 @@ struct KnownResourceBalance: Sendable, Hashable {
 	}
 
 	struct PoolUnit: Sendable, Hashable {
-		let details: OnLedgerEntitiesClient.OwnedResourcePoolDetails
+		var details: OnLedgerEntitiesClient.OwnedResourcePoolDetails
 		var guarantee: TransactionGuarantee?
 	}
 

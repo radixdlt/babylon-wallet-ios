@@ -83,6 +83,8 @@ extension SecurityShieldBuilder {
 			additionOfFactorSourceOfKindToRecoveryIsValidOrCanBe(factorSourceKind: kind)
 		case .confirmation:
 			additionOfFactorSourceOfKindToConfirmationIsValidOrCanBe(factorSourceKind: kind)
+		case .authenticationSigning:
+			isAllowedFactorSourceKindForAuthenticationSigning(factorSourceKind: kind)
 		}
 	}
 }

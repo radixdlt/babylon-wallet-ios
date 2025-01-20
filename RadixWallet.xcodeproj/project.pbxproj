@@ -786,6 +786,9 @@
 		5B92AAC12D2ED09F00486A9B /* ChooseFactorSourceCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92AABE2D2ED09F00486A9B /* ChooseFactorSourceCoordinator.swift */; };
 		5B92AAC42D2ED0BE00486A9B /* ChooseFactorSourceKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92AAC22D2ED0BE00486A9B /* ChooseFactorSourceKind.swift */; };
 		5B92AAC52D2ED0BE00486A9B /* ChooseFactorSourceKind+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92AAC32D2ED0BE00486A9B /* ChooseFactorSourceKind+View.swift */; };
+		5B92AAC82D302A0E00486A9B /* ChangeMainFactorSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92AAC62D302A0E00486A9B /* ChangeMainFactorSource.swift */; };
+		5B92AAC92D302A0E00486A9B /* ChangeMainFactorSource+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92AAC72D302A0E00486A9B /* ChangeMainFactorSource+View.swift */; };
+		5B92AACC2D314CC400486A9B /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 5B92AACB2D314CC400486A9B /* Sargon */; };
 		5B96DD372BD917B300722882 /* Text+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B96DD362BD917B300722882 /* Text+Extra.swift */; };
 		5B9846BD2BBD5C8800E814F3 /* SensitiveInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B9846BC2BBD5C8800E814F3 /* SensitiveInfo.plist */; };
 		5B9846C02BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9846BF2BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift */; };
@@ -1280,6 +1283,11 @@
 		E775A1D62D0623AB00E72DB9 /* SelectFactorSourcesCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E775A1D52D0623AB00E72DB9 /* SelectFactorSourcesCoordinator.swift */; };
 		E775A1D82D0623B400E72DB9 /* SelectFactorSourcesCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E775A1D72D0623B400E72DB9 /* SelectFactorSourcesCoordinator+View.swift */; };
 		E791F2982D2BD64F001A007B /* SecurityShieldBuilder+SharedState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E791F2972D2BD64F001A007B /* SecurityShieldBuilder+SharedState.swift */; };
+		E791F29B2D2BEF59001A007B /* PrimaryRoleSetup+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E791F29A2D2BEF59001A007B /* PrimaryRoleSetup+Reducer.swift */; };
+		E791F29D2D2BEF5F001A007B /* PrimaryRoleSetup+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E791F29C2D2BEF5F001A007B /* PrimaryRoleSetup+View.swift */; };
+		E791F2A32D2EDFDE001A007B /* SelectNumberOfFactorsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E791F2A22D2EDFDE001A007B /* SelectNumberOfFactorsView.swift */; };
+		E791F2A52D2FED42001A007B /* RolesSetupCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E791F2A42D2FED42001A007B /* RolesSetupCoordinator.swift */; };
+		E791F2A72D2FED51001A007B /* RolesSetupCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E791F2A62D2FED51001A007B /* RolesSetupCoordinator+View.swift */; };
 		E79DD1B12CE365CF00B1EB86 /* ChooseReceivingAccountOnDelete+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1B02CE365CF00B1EB86 /* ChooseReceivingAccountOnDelete+Reducer.swift */; };
 		E79DD1B32CE365D600B1EB86 /* ChooseReceivingAccountOnDelete+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1B22CE365D600B1EB86 /* ChooseReceivingAccountOnDelete+View.swift */; };
 		E79DD1B62CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79DD1B52CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift */; };
@@ -2060,6 +2068,8 @@
 		5B92AABF2D2ED09F00486A9B /* ChooseFactorSourceCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChooseFactorSourceCoordinator+View.swift"; sourceTree = "<group>"; };
 		5B92AAC22D2ED0BE00486A9B /* ChooseFactorSourceKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseFactorSourceKind.swift; sourceTree = "<group>"; };
 		5B92AAC32D2ED0BE00486A9B /* ChooseFactorSourceKind+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChooseFactorSourceKind+View.swift"; sourceTree = "<group>"; };
+		5B92AAC62D302A0E00486A9B /* ChangeMainFactorSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeMainFactorSource.swift; sourceTree = "<group>"; };
+		5B92AAC72D302A0E00486A9B /* ChangeMainFactorSource+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChangeMainFactorSource+View.swift"; sourceTree = "<group>"; };
 		5B96DD362BD917B300722882 /* Text+Extra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Text+Extra.swift"; sourceTree = "<group>"; };
 		5B9846BC2BBD5C8800E814F3 /* SensitiveInfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = SensitiveInfo.plist; sourceTree = "<group>"; };
 		5B9846BF2BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SensitiveInfoClient+Interface.swift"; sourceTree = "<group>"; };
@@ -2566,6 +2576,11 @@
 		E775A1D52D0623AB00E72DB9 /* SelectFactorSourcesCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectFactorSourcesCoordinator.swift; sourceTree = "<group>"; };
 		E775A1D72D0623B400E72DB9 /* SelectFactorSourcesCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SelectFactorSourcesCoordinator+View.swift"; sourceTree = "<group>"; };
 		E791F2972D2BD64F001A007B /* SecurityShieldBuilder+SharedState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityShieldBuilder+SharedState.swift"; sourceTree = "<group>"; };
+		E791F29A2D2BEF59001A007B /* PrimaryRoleSetup+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PrimaryRoleSetup+Reducer.swift"; sourceTree = "<group>"; };
+		E791F29C2D2BEF5F001A007B /* PrimaryRoleSetup+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PrimaryRoleSetup+View.swift"; sourceTree = "<group>"; };
+		E791F2A22D2EDFDE001A007B /* SelectNumberOfFactorsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectNumberOfFactorsView.swift; sourceTree = "<group>"; };
+		E791F2A42D2FED42001A007B /* RolesSetupCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RolesSetupCoordinator.swift; sourceTree = "<group>"; };
+		E791F2A62D2FED51001A007B /* RolesSetupCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RolesSetupCoordinator+View.swift"; sourceTree = "<group>"; };
 		E79DD1B02CE365CF00B1EB86 /* ChooseReceivingAccountOnDelete+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChooseReceivingAccountOnDelete+Reducer.swift"; sourceTree = "<group>"; };
 		E79DD1B22CE365D600B1EB86 /* ChooseReceivingAccountOnDelete+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChooseReceivingAccountOnDelete+View.swift"; sourceTree = "<group>"; };
 		E79DD1B52CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeleteAccountConfirmation+Reducer.swift"; sourceTree = "<group>"; };
@@ -5718,6 +5733,8 @@
 				5B98CD9E2D070B8800C3C133 /* FactorSourcesList+View.swift */,
 				5B98CDA12D0752B200C3C133 /* FactorSourceDetail.swift */,
 				5B98CDA22D0752B200C3C133 /* FactorSourceDetail+View.swift */,
+				5B92AAC62D302A0E00486A9B /* ChangeMainFactorSource.swift */,
+				5B92AAC72D302A0E00486A9B /* ChangeMainFactorSource+View.swift */,
 			);
 			path = SecurityFactors;
 			sourceTree = "<group>";
@@ -5775,6 +5792,7 @@
 				5B98CD862D00D29C00C3C133 /* Onboarding */,
 				5B813D052CFF202E001A291D /* PrepareFactorSources */,
 				E775A1CE2D03279000E72DB9 /* SelectFactorSources */,
+				E791F29F2D2ED68D001A007B /* RolesSetup */,
 				5B92AAB82D2ECFEE00486A9B /* ChooseFactorSource */,
 			);
 			path = ShieldSetup;
@@ -7094,6 +7112,34 @@
 			path = Children;
 			sourceTree = "<group>";
 		};
+		E791F2992D2BEF1A001A007B /* PrimaryRoleSetup */ = {
+			isa = PBXGroup;
+			children = (
+				E791F29A2D2BEF59001A007B /* PrimaryRoleSetup+Reducer.swift */,
+				E791F29C2D2BEF5F001A007B /* PrimaryRoleSetup+View.swift */,
+				E791F2A22D2EDFDE001A007B /* SelectNumberOfFactorsView.swift */,
+			);
+			path = PrimaryRoleSetup;
+			sourceTree = "<group>";
+		};
+		E791F29F2D2ED68D001A007B /* RolesSetup */ = {
+			isa = PBXGroup;
+			children = (
+				E791F2A42D2FED42001A007B /* RolesSetupCoordinator.swift */,
+				E791F2A62D2FED51001A007B /* RolesSetupCoordinator+View.swift */,
+				E791F2A02D2ED697001A007B /* Children */,
+			);
+			path = RolesSetup;
+			sourceTree = "<group>";
+		};
+		E791F2A02D2ED697001A007B /* Children */ = {
+			isa = PBXGroup;
+			children = (
+				E791F2992D2BEF1A001A007B /* PrimaryRoleSetup */,
+			);
+			path = Children;
+			sourceTree = "<group>";
+		};
 		E79DD1B42CE492E800B1EB86 /* DeleteAccount */ = {
 			isa = PBXGroup;
 			children = (
@@ -7731,6 +7777,7 @@
 				E6A98FA82AE15324003953E2 /* BuildConfiguration.swift in Sources */,
 				A40816042C7E0D08005E65B9 /* StateEntityDetailsOptIns.swift in Sources */,
 				48CFC2C62ADC10D900E77A5C /* MessageMode+Reducer.swift in Sources */,
+				E791F29B2D2BEF59001A007B /* PrimaryRoleSetup+Reducer.swift in Sources */,
 				48CFC5862ADC10DA00E77A5C /* FaucetClient+Interface.swift in Sources */,
 				48CFC6202ADC10DA00E77A5C /* OnLedgerEntity.swift in Sources */,
 				5B80FCC42C298E68008444F5 /* ArbitraryDataFieldView.swift in Sources */,
@@ -7868,6 +7915,7 @@
 				A40815882C7E0D08005E65B9 /* ManifestClass.swift in Sources */,
 				48CFC5A42ADC10DA00E77A5C /* PrimaryTextButtonStyle.swift in Sources */,
 				5B526AEE2C89C3C200AF8B72 /* ResourcesVisibilityClient+Test.swift in Sources */,
+				E791F29D2D2BEF5F001A007B /* PrimaryRoleSetup+View.swift in Sources */,
 				A408160B2C7E0D08005E65B9 /* StateEntityDetailsResponseItemAncestorIdentities.swift in Sources */,
 				A4DCCC522C2DA33300438A7B /* HomeCardsClient+Test.swift in Sources */,
 				A40815DA2C7E0D08005E65B9 /* ProgrammaticScryptoSborValueKind.swift in Sources */,
@@ -8163,6 +8211,8 @@
 				A40815A12C7E0D08005E65B9 /* MetadataStringValue.swift in Sources */,
 				A40815F62C7E0D08005E65B9 /* ResultSetCursorMixin.swift in Sources */,
 				48CFC2B92ADC10D900E77A5C /* RestoreProfileFromBackupCoordinator.swift in Sources */,
+				5B92AAC82D302A0E00486A9B /* ChangeMainFactorSource.swift in Sources */,
+				5B92AAC92D302A0E00486A9B /* ChangeMainFactorSource+View.swift in Sources */,
 				A408160E2C7E0D08005E65B9 /* StateEntityDetailsResponseNonFungibleVaultDetails.swift in Sources */,
 				A40816412C7E0D08005E65B9 /* TransactionFungibleBalanceChanges.swift in Sources */,
 				E65D6CEE2BC98267001D8A39 /* Stage2MigrateToSargon+AppPreferences+ViaProfile.swift in Sources */,
@@ -8268,6 +8318,7 @@
 				A408164D2C7E0D08005E65B9 /* TransactionReceipt.swift in Sources */,
 				A408156A2C7E0D08005E65B9 /* CommittedTransactionInfo.swift in Sources */,
 				A408162D2C7E0D08005E65B9 /* StateNonFungibleIdsResponse.swift in Sources */,
+				E791F2A52D2FED42001A007B /* RolesSetupCoordinator.swift in Sources */,
 				A40816372C7E0D08005E65B9 /* StreamTransactionsRequest.swift in Sources */,
 				48CFC4792ADC10DA00E77A5C /* LocalAuthenticationClient+Live.swift in Sources */,
 				48CFC2F42ADC10D900E77A5C /* IntroductionToPersonasView.swift in Sources */,
@@ -8289,6 +8340,7 @@
 				48CFC37A2ADC10D900E77A5C /* PoolUnitDetails.swift in Sources */,
 				48CFC6042ADC10DA00E77A5C /* ConnectorExtension+Messages.swift in Sources */,
 				48CFC65D2ADC10DB00E77A5C /* Profile+AuthorizedDapps+Edit.swift in Sources */,
+				E791F2A72D2FED51001A007B /* RolesSetupCoordinator+View.swift in Sources */,
 				E7A5AC9D2C108F2F006CB6EC /* WalletInteraction+Extensions.swift in Sources */,
 				48CFC2522ADC10D900E77A5C /* AddNewGateway+Reducer.swift in Sources */,
 				E7B7A0FD2BBBFB6100EEE900 /* HeaderListViewContainer.swift in Sources */,
@@ -8509,6 +8561,7 @@
 				A40815C32C7E0D08005E65B9 /* NonFungibleResourcesCollection.swift in Sources */,
 				A40816252C7E0D08005E65B9 /* StateKeyValueStoreKeysCollection.swift in Sources */,
 				48CFC5A02ADC10DA00E77A5C /* Binding+Extra.swift in Sources */,
+				E791F2A32D2EDFDE001A007B /* SelectNumberOfFactorsView.swift in Sources */,
 				A40815662C7E0D08005E65B9 /* AccountResourcePreferencesResponseItem.swift in Sources */,
 				48CFC2992ADC10D900E77A5C /* CustomizeFees.swift in Sources */,
 				48CFC68C2ADC10DB00E77A5C /* Radix+Dashboard.swift in Sources */,
@@ -9339,6 +9392,14 @@
 				version = 6.13.2;
 			};
 		};
+		5B2A0D7E2D3559100049C702 /* XCRemoteSwiftPackageReference "sargon" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/radixdlt/sargon/";
+			requirement = {
+				kind = exactVersion;
+				version = 1.1.106;
+			};
+		};
 		5B634A922C91D2A0004B2FBC /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Sajjon/ScreenshotPreventing-iOS";
@@ -9527,6 +9588,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5B634A922C91D2A0004B2FBC /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */;
 			productName = ScreenshotPreventing;
+		};
+		5B92AACB2D314CC400486A9B /* Sargon */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Sargon;
 		};
 		A415574F2B757C5E0040AD4E /* ComposableArchitecture */ = {
 			isa = XCSwiftPackageProductDependency;

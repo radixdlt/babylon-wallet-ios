@@ -29,6 +29,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 		case rowMessageTapped(State.Row)
 		case addButtonTapped
 		case continueButtonTapped(FactorSource)
+		case changeMainButtonTapped
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -47,6 +48,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			case displayMnemonic(DisplayMnemonic.State)
 			case enterMnemonic(ImportMnemonicsFlowCoordinator.State)
 			case addMnemonic(ImportMnemonic.State)
+			case changeMain(ChangeMainFactorSource.State)
 		}
 
 		@CasePathable
@@ -55,6 +57,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			case displayMnemonic(DisplayMnemonic.Action)
 			case enterMnemonic(ImportMnemonicsFlowCoordinator.Action)
 			case addMnemonic(ImportMnemonic.Action)
+			case changeMain(ChangeMainFactorSource.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -69,6 +72,9 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			}
 			Scope(state: \.addMnemonic, action: \.addMnemonic) {
 				ImportMnemonic()
+			}
+			Scope(state: \.changeMain, action: \.changeMain) {
+				ChangeMainFactorSource()
 			}
 		}
 	}
@@ -149,6 +155,11 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 
 		case let .continueButtonTapped(factorSource):
 			return .send(.delegate(.selectedFactorSource(factorSource)))
+
+		case .changeMainButtonTapped:
+			let currentMain = state.main?.integrity.factorSource
+			state.destination = .changeMain(.init(kind: state.kind, currentMain: currentMain))
+			return .none
 		}
 	}
 
@@ -174,6 +185,10 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			// We just need to dismiss the destination.
 			state.destination = nil
 			return .none
+
+		case .changeMain(.delegate(.updated)):
+			state.destination = nil
+			return entitiesEffect(state: state)
 
 		default:
 			return .none
@@ -246,7 +261,7 @@ private extension FactorSourcesList {
 	func filterAlreadySelectedFactorSourceIds(state: State, factorSourceIds: [FactorSourceId]) -> [FactorSourceId] {
 		let status: [FactorSourceValidationStatus] =
 			switch state.context {
-			case .display:
+			case .display, .selection(.authenticationSigning):
 				[]
 			case .selection(.primaryThreshold):
 				state.shieldBuilder.validationForAdditionOfFactorSourceToPrimaryThresholdForEach(factorSources: factorSourceIds)
@@ -288,6 +303,42 @@ extension FactorSourcesList.State {
 		var id: FactorSourceID {
 			integrity.factorSource.id
 		}
+	}
+
+	var main: Row? {
+		switch context {
+		case .display:
+			rows.first(where: \.integrity.isExplicitMain)
+		case .selection:
+			nil
+		}
+	}
+
+	var others: [Row] {
+		let main = main
+		return rows
+			.filter { $0 != main }
+			.sorted(by: { left, right in
+				let lhs = left.integrity
+				let rhs = right.integrity
+				switch (lhs, rhs) {
+				case let (.device(lDevice), .device(rDevice)):
+					if lhs.isExplicitMain {
+						return true
+					} else if lDevice.factorSource.isBDFS, rDevice.factorSource.isBDFS {
+						return sort(lhs, rhs)
+					} else {
+						return lDevice.factorSource.isBDFS
+					}
+				default:
+					return sort(lhs, rhs)
+				}
+
+			})
+	}
+
+	private func sort(_ lhs: FactorSourceIntegrity, _ rhs: FactorSourceIntegrity) -> Bool {
+		lhs.factorSource.common.addedOn < rhs.factorSource.common.addedOn
 	}
 }
 

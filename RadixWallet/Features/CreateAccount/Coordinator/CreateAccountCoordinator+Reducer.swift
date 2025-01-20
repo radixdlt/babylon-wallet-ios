@@ -11,6 +11,8 @@ struct CreateAccountCoordinator: Sendable, FeatureReducer {
 		let config: CreateAccountConfig
 		var name: NonEmptyString?
 
+		fileprivate var createdProfile = false
+
 		init(
 			root: Path.State? = nil,
 			config: CreateAccountConfig
@@ -75,6 +77,7 @@ struct CreateAccountCoordinator: Sendable, FeatureReducer {
 
 	enum InternalAction: Sendable, Equatable {
 		case handleAccountCreated(Account)
+		case handleProfileCreated(Option)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -86,6 +89,7 @@ struct CreateAccountCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
+	@Dependency(\.onboardingClient) var onboardingClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.isPresented) var isPresented
 	@Dependency(\.dismiss) var dismiss
@@ -124,11 +128,16 @@ extension CreateAccountCoordinator {
 				state.path.append(.selectLedger(.init(context: .createHardwareAccount)))
 				return .none
 			} else {
-				return derivePublicKey(state: &state, option: .bdfs)
+				return createProfileIfNecessaryThenDerivePublicKey(state: &state, option: .bdfs)
 			}
 
 		case let .path(.element(_, action: .selectLedger(.delegate(.choseLedger(ledger))))):
-			return derivePublicKey(state: &state, option: .specific(ledger.asGeneral))
+			return createProfileIfNecessaryThenDerivePublicKey(
+				state: &state,
+				option: .specific(
+					ledger.asGeneral
+				)
+			)
 
 		case .path(.element(_, action: .completion(.delegate(.completed)))):
 			return .run { send in
@@ -151,6 +160,25 @@ extension CreateAccountCoordinator {
 				config: state.config
 			)))
 			return .send(.delegate(.accountCreated))
+
+		case let .handleProfileCreated(option):
+			state.createdProfile = true
+			return derivePublicKey(state: &state, option: option)
+		}
+	}
+
+	private func createProfileIfNecessaryThenDerivePublicKey(state: inout State, option: Option) -> Effect<Action> {
+		if state.config.isNewProfile, !state.createdProfile {
+			// We need to create the Profile before deriving the public key
+			.run { send in
+				try await onboardingClient.createNewProfile()
+				await send(.internal(.handleProfileCreated(option)))
+			} catch: { error, _ in
+				errorQueue.schedule(error)
+			}
+		} else {
+			// We can derive the public key since the Profile has been created already
+			derivePublicKey(state: &state, option: option)
 		}
 	}
 
@@ -193,8 +221,8 @@ extension CreateAccountCoordinator {
 }
 
 // MARK: CreateAccountCoordinator.Option
-private extension CreateAccountCoordinator {
-	enum Option {
+extension CreateAccountCoordinator {
+	enum Option: Sendable, Hashable {
 		case bdfs
 		case specific(FactorSource)
 	}
