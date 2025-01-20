@@ -184,7 +184,7 @@ extension CreateAccountCoordinator {
 
 	private func createAccount(state: inout State, option: Option) -> Effect<Action> {
 		guard let name = state.name else {
-			fatalError("Name should be set before creating account")
+			fatalError("Name should be set before creating Account")
 		}
 		let displayName = DisplayName(nonEmpty: name)
 		return .run { send in
