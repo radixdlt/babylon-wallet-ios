@@ -666,7 +666,6 @@
 		48FFFA9F2ADC1F2700B2B213 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFA9E2ADC1F2700B2B213 /* KeychainAccess */; };
 		48FFFAA22ADC1F5D00B2B213 /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAA12ADC1F5D00B2B213 /* Algorithms */; };
 		48FFFAA52ADC1F9600B2B213 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAA42ADC1F9600B2B213 /* AsyncAlgorithms */; };
-		48FFFAA82ADC1FBE00B2B213 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAA72ADC1FBE00B2B213 /* Atomics */; };
 		48FFFAAB2ADC1FE900B2B213 /* DependenciesAdditions in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAAA2ADC1FE900B2B213 /* DependenciesAdditions */; };
 		48FFFAB12ADC203700B2B213 /* WebRTC in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAB02ADC203700B2B213 /* WebRTC */; };
 		48FFFABA2ADC209100B2B213 /* Nuke in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAB92ADC209100B2B213 /* Nuke */; };
@@ -690,7 +689,6 @@
 		48FFFAF92ADC241A00B2B213 /* DequeModule in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAF82ADC241A00B2B213 /* DequeModule */; };
 		48FFFAFB2ADC241A00B2B213 /* HashTreeCollections in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAFA2ADC241A00B2B213 /* HashTreeCollections */; };
 		48FFFAFD2ADC241A00B2B213 /* HeapModule in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAFC2ADC241A00B2B213 /* HeapModule */; };
-		48FFFB0A2ADC721800B2B213 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB092ADC721800B2B213 /* Atomics */; };
 		5B03E3CF2CC1223000E10A64 /* DisplayMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B03E3CE2CC1222D00E10A64 /* DisplayMode.swift */; };
 		5B03E3D12CC127B100E10A64 /* RawManifestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B03E3D02CC127B100E10A64 /* RawManifestView.swift */; };
 		5B03E3D32CC141D100E10A64 /* InteractionReview+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B03E3D22CC141C200E10A64 /* InteractionReview+Extra.swift */; };
@@ -782,7 +780,6 @@
 		5B92AAC52D2ED0BE00486A9B /* ChooseFactorSourceKind+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92AAC32D2ED0BE00486A9B /* ChooseFactorSourceKind+View.swift */; };
 		5B92AAC82D302A0E00486A9B /* ChangeMainFactorSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92AAC62D302A0E00486A9B /* ChangeMainFactorSource.swift */; };
 		5B92AAC92D302A0E00486A9B /* ChangeMainFactorSource+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92AAC72D302A0E00486A9B /* ChangeMainFactorSource+View.swift */; };
-		5B92AACC2D314CC400486A9B /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 5B92AACB2D314CC400486A9B /* Sargon */; };
 		5B96DD372BD917B300722882 /* Text+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B96DD362BD917B300722882 /* Text+Extra.swift */; };
 		5B9846BD2BBD5C8800E814F3 /* SensitiveInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B9846BC2BBD5C8800E814F3 /* SensitiveInfo.plist */; };
 		5B9846C02BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9846BF2BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift */; };
@@ -1214,7 +1211,6 @@
 		E66DCC402BD93EC000547CF4 /* Stage1MigrateToSargon+Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66DCC3F2BD93EC000547CF4 /* Stage1MigrateToSargon+Header.swift */; };
 		E66EEB9B2B06694E007624BC /* RecoverWalletWithoutProfileStart+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66EEB992B06694E007624BC /* RecoverWalletWithoutProfileStart+View.swift */; };
 		E66EEB9C2B06694E007624BC /* RecoverWalletWithoutProfileStart.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66EEB9A2B06694E007624BC /* RecoverWalletWithoutProfileStart.swift */; };
-		E677C1512D3E47F900952E29 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = E677C1502D3E47F900952E29 /* Sargon */; };
 		E67F14452AE029BA00738BE1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E67F14442AE029BA00738BE1 /* Assets.xcassets */; };
 		E68878592BDBFD42003F3393 /* Stage2MigrateToSargon+LedgerHardwareWalletFactorSource+New.swift in Sources */ = {isa = PBXBuildFile; fileRef = E68878582BDBFD42003F3393 /* Stage2MigrateToSargon+LedgerHardwareWalletFactorSource+New.swift */; };
 		E6A0B04D2BF23D6E00617DAC /* IdentifiedArrayOf+Mutation+Position.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A0B04C2BF23D6E00617DAC /* IdentifiedArrayOf+Mutation+Position.swift */; };
@@ -1222,6 +1218,7 @@
 		E6A2D9E52AFA6C1E001857EC /* AccountWithInfoHolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A2D9E42AFA6C1E001857EC /* AccountWithInfoHolder.swift */; };
 		E6A2D9E72AFA7132001857EC /* Mnemonics+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A2D9E62AFA7132001857EC /* Mnemonics+Utils.swift */; };
 		E6A98FA82AE15324003953E2 /* BuildConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A98FA72AE15324003953E2 /* BuildConfiguration.swift */; };
+		E6BD41012D3E4A1B00D210DF /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = E6BD41002D3E4A1B00D210DF /* Sargon */; };
 		E6DBA3192ADEBFB300A38425 /* PackagesEncodingDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA25A2ADEBFB200A38425 /* PackagesEncodingDecodingTests.swift */; };
 		E6DBA31A2ADEBFB300A38425 /* DataChannelClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA25B2ADEBFB200A38425 /* DataChannelClientTests.swift */; };
 		E6DBA31C2ADEBFB300A38425 /* RadixConnectE2E.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA25F2ADEBFB200A38425 /* RadixConnectE2E.swift */; };
@@ -2615,31 +2612,27 @@
 				48FFFADE2ADC21F500B2B213 /* FileLogging in Frameworks */,
 				48FFFACF2ADC216400B2B213 /* CollectionConcurrencyKit in Frameworks */,
 				48FFFAB12ADC203700B2B213 /* WebRTC in Frameworks */,
-				48FFFB0A2ADC721800B2B213 /* Atomics in Frameworks */,
 				A47571FF2B29B0860059A95D /* IOSSecuritySuite in Frameworks */,
 				48FFFAFB2ADC241A00B2B213 /* HashTreeCollections in Frameworks */,
 				48FFFAC52ADC211700B2B213 /* JSONTesting in Frameworks */,
 				5B1C4FD52BBB0B0C00B9436F /* AppsFlyerLib-Strict in Frameworks */,
 				5B634A942C91D2A0004B2FBC /* ScreenshotPreventing in Frameworks */,
+				E6BD41012D3E4A1B00D210DF /* Sargon in Frameworks */,
 				48FFFA992ADC1EEC00B2B213 /* AsyncExtensions in Frameworks */,
 				E63D123D2ADD1FC00001CBB1 /* SwiftUIIntrospect in Frameworks */,
 				48FFFABC2ADC209100B2B213 /* NukeExtensions in Frameworks */,
 				A41557502B757C5E0040AD4E /* ComposableArchitecture in Frameworks */,
-				E6027F1E2CE7887A0094139A /* Sargon in Frameworks */,
 				48FFFAFD2ADC241A00B2B213 /* HeapModule in Frameworks */,
 				48FFFAD52ADC21B900B2B213 /* LegibleError in Frameworks */,
 				48FFFAD82ADC21D200B2B213 /* NonEmpty in Frameworks */,
 				48FFFAE12ADC220F00B2B213 /* Tagged in Frameworks */,
 				48FFFAD22ADC218400B2B213 /* Either in Frameworks */,
 				48FFFAA52ADC1F9600B2B213 /* AsyncAlgorithms in Frameworks */,
-				48FFFAA82ADC1FBE00B2B213 /* Atomics in Frameworks */,
-				5B92AACC2D314CC400486A9B /* Sargon in Frameworks */,
 				48FFFAF02ADC229900B2B213 /* AnyCodable in Frameworks */,
 				48FFFAF52ADC241A00B2B213 /* BitCollections in Frameworks */,
 				48FFFABA2ADC209100B2B213 /* Nuke in Frameworks */,
 				48FFFAE42ADC222100B2B213 /* Validated in Frameworks */,
 				48FFFAED2ADC226B00B2B213 /* CodeScanner in Frameworks */,
-				E677C1512D3E47F900952E29 /* Sargon in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7215,7 +7208,6 @@
 				48FFFA9E2ADC1F2700B2B213 /* KeychainAccess */,
 				48FFFAA12ADC1F5D00B2B213 /* Algorithms */,
 				48FFFAA42ADC1F9600B2B213 /* AsyncAlgorithms */,
-				48FFFAA72ADC1FBE00B2B213 /* Atomics */,
 				48FFFAAA2ADC1FE900B2B213 /* DependenciesAdditions */,
 				48FFFAB02ADC203700B2B213 /* WebRTC */,
 				48FFFAB92ADC209100B2B213 /* Nuke */,
@@ -7238,13 +7230,12 @@
 				48FFFAF82ADC241A00B2B213 /* DequeModule */,
 				48FFFAFA2ADC241A00B2B213 /* HashTreeCollections */,
 				48FFFAFC2ADC241A00B2B213 /* HeapModule */,
-				48FFFB092ADC721800B2B213 /* Atomics */,
 				E63D123C2ADD1FC00001CBB1 /* SwiftUIIntrospect */,
 				A47571FE2B29B0860059A95D /* IOSSecuritySuite */,
 				A415574F2B757C5E0040AD4E /* ComposableArchitecture */,
 				5B1C4FD42BBB0B0C00B9436F /* AppsFlyerLib-Strict */,
 				5B634A932C91D2A0004B2FBC /* ScreenshotPreventing */,
-				5B92AACB2D314CC400486A9B /* Sargon */,
+				E6BD41002D3E4A1B00D210DF /* Sargon */,
 			);
 			productName = RadixWallet;
 			productReference = 48CFBC4F2ADC106300E77A5C /* Radix Wallet Dev.app */;
@@ -7285,7 +7276,6 @@
 				48FFFA9D2ADC1F2700B2B213 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
 				48FFFAA02ADC1F5D00B2B213 /* XCRemoteSwiftPackageReference "swift-algorithms" */,
 				48FFFAA32ADC1F9600B2B213 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
-				48FFFAA62ADC1FBE00B2B213 /* XCRemoteSwiftPackageReference "swift-atomics" */,
 				48FFFAA92ADC1FE900B2B213 /* XCRemoteSwiftPackageReference "swift-dependencies-additions" */,
 				48FFFAAF2ADC203700B2B213 /* XCRemoteSwiftPackageReference "WebRTC" */,
 				48FFFAB22ADC206300B2B213 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
@@ -7308,7 +7298,7 @@
 				5B1C4FD32BBB0B0C00B9436F /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Strict" */,
 				8318BB172BC8403800057BCB /* XCRemoteSwiftPackageReference "swift-custom-dump" */,
 				5B634A922C91D2A0004B2FBC /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */,
-				5B2A0D7E2D3559100049C702 /* XCRemoteSwiftPackageReference "sargon" */,
+				E6BD40FF2D3E4A1B00D210DF /* XCRemoteSwiftPackageReference "sargon" */,
 			);
 			productRefGroup = 48CFBC502ADC106300E77A5C /* Products */;
 			projectDirPath = "";
@@ -9211,14 +9201,6 @@
 				version = 0.1.0;
 			};
 		};
-		48FFFAA62ADC1FBE00B2B213 /* XCRemoteSwiftPackageReference "swift-atomics" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/apple/swift-atomics.git";
-			requirement = {
-				kind = exactVersion;
-				version = 1.1.0;
-			};
-		};
 		48FFFAA92ADC1FE900B2B213 /* XCRemoteSwiftPackageReference "swift-dependencies-additions" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/tgrapperon/swift-dependencies-additions";
@@ -9363,14 +9345,6 @@
 				version = 6.13.2;
 			};
 		};
-		5B2A0D7E2D3559100049C702 /* XCRemoteSwiftPackageReference "sargon" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/radixdlt/sargon/";
-			requirement = {
-				kind = exactVersion;
-				version = 1.1.106;
-			};
-		};
 		5B634A922C91D2A0004B2FBC /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Sajjon/ScreenshotPreventing-iOS";
@@ -9403,6 +9377,14 @@
 				version = 1.9.11;
 			};
 		};
+		E6BD40FF2D3E4A1B00D210DF /* XCRemoteSwiftPackageReference "sargon" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/radixdlt/sargon";
+			requirement = {
+				kind = exactVersion;
+				version = 1.1.106;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -9425,11 +9407,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 48FFFAA32ADC1F9600B2B213 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
 			productName = AsyncAlgorithms;
-		};
-		48FFFAA72ADC1FBE00B2B213 /* Atomics */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 48FFFAA62ADC1FBE00B2B213 /* XCRemoteSwiftPackageReference "swift-atomics" */;
-			productName = Atomics;
 		};
 		48FFFAAA2ADC1FE900B2B213 /* DependenciesAdditions */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -9541,11 +9518,6 @@
 			package = 48FFFAF32ADC241A00B2B213 /* XCRemoteSwiftPackageReference "swift-collections" */;
 			productName = HeapModule;
 		};
-		48FFFB092ADC721800B2B213 /* Atomics */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 48FFFAA62ADC1FBE00B2B213 /* XCRemoteSwiftPackageReference "swift-atomics" */;
-			productName = Atomics;
-		};
 		5B1C4FD42BBB0B0C00B9436F /* AppsFlyerLib-Strict */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 5B1C4FD32BBB0B0C00B9436F /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Strict" */;
@@ -9555,10 +9527,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5B634A922C91D2A0004B2FBC /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */;
 			productName = ScreenshotPreventing;
-		};
-		5B92AACB2D314CC400486A9B /* Sargon */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Sargon;
 		};
 		A415574F2B757C5E0040AD4E /* ComposableArchitecture */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -9574,6 +9542,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 48FFFAB22ADC206300B2B213 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
 			productName = SwiftUIIntrospect;
+		};
+		E6BD41002D3E4A1B00D210DF /* Sargon */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E6BD40FF2D3E4A1B00D210DF /* XCRemoteSwiftPackageReference "sargon" */;
+			productName = Sargon;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
