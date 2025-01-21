@@ -34,35 +34,25 @@ struct SelectEmergencyFallbackPeriodView: View {
 			.textStyle(.body2Regular)
 			.foregroundStyle(.app.gray1)
 
-			HStack(spacing: 0) {
-				Picker("", selection: $selectedPeriod.value) {
-					ForEach(selectedPeriod.unit.values, id: \.self) { value in
-						Text("\(value)")
-							.tag(value)
-							.foregroundStyle(.app.gray1)
-							.textStyle(.body1Regular)
-							.padding(.trailing, .large2)
-							.flushedRight
+			MultiPickerView(
+				data: [
+					selectedPeriod.unit.values.map { "\($0)" },
+					TimePeriodUnit.allCases.map(\.title),
+				],
+				selections: Binding(
+					get: {
+						[
+							selectedPeriod.unit.values.firstIndex(of: Int(selectedPeriod.value)) ?? 0,
+							TimePeriodUnit.allCases.firstIndex(of: selectedPeriod.unit) ?? 0,
+						]
+					},
+					set: { newSelections in
+						selectedPeriod.value = UInt16(selectedPeriod.unit.values[newSelections[0]])
+						selectedPeriod.unit = TimePeriodUnit.allCases[newSelections[1]]
 					}
-				}
-				.pickerStyle(.wheel)
-				.clipShape(.rect.offset(x: -.medium3))
-				.padding(.trailing, -.medium3)
-
-				Picker("", selection: $selectedPeriod.unit) {
-					ForEach(TimePeriodUnit.allCases, id: \.self) { unit in
-						Text("\(unit.title)")
-							.tag(unit)
-							.foregroundStyle(.app.gray1)
-							.textStyle(.body1Regular)
-							.padding(.leading, .medium3)
-							.flushedLeft
-					}
-				}
-				.pickerStyle(.wheel)
-				.clipShape(.rect.offset(x: .medium3))
-				.padding(.leading, -.medium3)
-			}
+				)
+			)
+			.frame(height: 200)
 
 			Spacer()
 		}

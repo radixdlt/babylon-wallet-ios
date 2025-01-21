@@ -1261,6 +1261,7 @@
 		E6FA984A2B04B9AC00748F20 /* ConfirmSkippingBDFS+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA98482B04B9AC00748F20 /* ConfirmSkippingBDFS+View.swift */; };
 		E6FA984B2B04B9AC00748F20 /* ConfirmSkippingBDFS.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA98492B04B9AC00748F20 /* ConfirmSkippingBDFS.swift */; };
 		E6FA984E2B04E3D500748F20 /* NoContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA984D2B04E3D500748F20 /* NoContentView.swift */; };
+		E703C0272D3F8D81006DF199 /* MultiPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E703C0262D3F8D81006DF199 /* MultiPickerView.swift */; };
 		E713204C2BCD372600AE6B3C /* UnknownCaseDecodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = E713204B2BCD372600AE6B3C /* UnknownCaseDecodable.swift */; };
 		E75C5F342C1C1632002E3DFF /* Stage1MigrateToSargon+SignedAuthChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E75C5F332C1C1632002E3DFF /* Stage1MigrateToSargon+SignedAuthChallenge.swift */; };
 		E76645A42C23138300065D9A /* Throwable.swift in Sources */ = {isa = PBXBuildFile; fileRef = E76645A32C23138300065D9A /* Throwable.swift */; };
@@ -2551,6 +2552,7 @@
 		E6FA98482B04B9AC00748F20 /* ConfirmSkippingBDFS+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConfirmSkippingBDFS+View.swift"; sourceTree = "<group>"; };
 		E6FA98492B04B9AC00748F20 /* ConfirmSkippingBDFS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmSkippingBDFS.swift; sourceTree = "<group>"; };
 		E6FA984D2B04E3D500748F20 /* NoContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoContentView.swift; sourceTree = "<group>"; };
+		E703C0262D3F8D81006DF199 /* MultiPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiPickerView.swift; sourceTree = "<group>"; };
 		E713204B2BCD372600AE6B3C /* UnknownCaseDecodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnknownCaseDecodable.swift; sourceTree = "<group>"; };
 		E75C5F332C1C1632002E3DFF /* Stage1MigrateToSargon+SignedAuthChallenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+SignedAuthChallenge.swift"; sourceTree = "<group>"; };
 		E76645A32C23138300065D9A /* Throwable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Throwable.swift; sourceTree = "<group>"; };
@@ -4985,6 +4987,7 @@
 				E7B7A0FC2BBBFB6100EEE900 /* HeaderListViewContainer.swift */,
 				5B77D7B12C0DFE8300F5F215 /* EntitySecurityProblemsView.swift */,
 				5B3C48C02C85CEAA00DB160D /* AccountBannerView.swift */,
+				E703C0262D3F8D81006DF199 /* MultiPickerView.swift */,
 			);
 			path = DesignSystem;
 			sourceTree = "<group>";
@@ -8056,6 +8059,7 @@
 				48CFC47E2ADC10DA00E77A5C /* OverlayWindowClient+Live.swift in Sources */,
 				A408158B2C7E0D08005E65B9 /* MetadataDecimalArrayValue.swift in Sources */,
 				48CFC4722ADC10DA00E77A5C /* P2PLinksClient+Live.swift in Sources */,
+				E703C0272D3F8D81006DF199 /* MultiPickerView.swift in Sources */,
 				A40815692C7E0D08005E65B9 /* BlueprintRoyaltyConfig.swift in Sources */,
 				A40815D42C7E0D08005E65B9 /* ProgrammaticScryptoSborValueEnum.swift in Sources */,
 				A40815CE2C7E0D08005E65B9 /* PackageCodeCollectionItem.swift in Sources */,
