@@ -78,6 +78,8 @@ private extension DerivationPurpose {
 			.createAccount
 		case .creatingNewPersona:
 			.createPersona
+		case .accountRecovery:
+			.deriveAccounts
 		case .securifyingAccount, .securifyingPersona, .securifyingAccountsAndPersonas, .preDerivingKeys:
 			fatalError("Not yet supported")
 		}

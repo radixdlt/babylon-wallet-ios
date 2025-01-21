@@ -23,9 +23,6 @@ struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		var inactive: IdentifiedArrayOf<Account> = []
 		var deleted: IdentifiedArrayOf<Account> = []
 
-		@PresentationState
-		var destination: Destination.State? = nil
-
 		enum Mode: Sendable, Hashable {
 			case createProfile(PrivateHierarchicalDeterministicFactorSource)
 			case addAccounts(factorSourceId: FactorSourceIDFromHash, Loadable<FactorSource> = .idle)
@@ -54,6 +51,7 @@ struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 	enum InternalAction: Sendable, Equatable {
 		case loadIndicesUsedByFactorSourceResult(TaskResult<IndicesUsedByFactorSource>)
 		case startScan(accounts: IdentifiedArrayOf<Account>)
+		case derivedPublicKeys([HierarchicalDeterministicPublicKey])
 		case foundAccounts(
 			active: IdentifiedArrayOf<Account>,
 			inactive: IdentifiedArrayOf<Account>,
@@ -79,35 +77,9 @@ struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		case close
 	}
 
-	// MARK: - Destination
-	struct Destination: DestinationReducer {
-		@CasePathable
-		enum State: Hashable, Sendable {
-			case derivePublicKeys(DerivePublicKeys.State)
-		}
-
-		@CasePathable
-		enum Action: Equatable, Sendable {
-			case derivePublicKeys(DerivePublicKeys.Action)
-		}
-
-		var body: some ReducerOf<Self> {
-			Scope(state: /State.derivePublicKeys, action: /Action.derivePublicKeys) {
-				DerivePublicKeys()
-			}
-		}
-	}
-
-	init() {}
-
 	var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(destinationPath, action: /Action.destination) {
-				Destination()
-			}
 	}
-
-	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
@@ -163,6 +135,9 @@ struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		case let .startScan(accounts):
 			return scanOnLedger(accounts: accounts, state: &state)
 
+		case let .derivedPublicKeys(publicKeys):
+			return handleDerivedPublicKeys(state: state, publicKeys: publicKeys)
+
 		case let .foundAccounts(active, inactive, deleted):
 			state.batchNumber += 1
 			state.status = .scanComplete
@@ -206,58 +181,39 @@ struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		}
 	}
 
-	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+	private func handleDerivedPublicKeys(state: State, publicKeys: [HierarchicalDeterministicPublicKey]) -> Effect<Action> {
+		// TODO: Shouldn't we filter by networkId?
+		let networkID = state.networkID
 		let globalOffset = state.active.count + state.inactive.count
-		switch presentedAction {
-		case let .derivePublicKeys(.delegate(delegateAction)):
-			switch delegateAction {
-			case let .derivedPublicKeys(publicHDKeys, factorSourceID, networkID):
-				let id = state.factorSourceIDFromHash
-				assert(factorSourceID == id.asGeneral)
-				assert(networkID == state.networkID)
-				loggerGlobal.debug("Creating accounts with networkID: \(networkID)")
-				return .run { [mode = state.mode] send in
-					let accounts = await publicHDKeys.enumerated().asyncMap { localOffset, publicHDKey in
-						let offset = localOffset + globalOffset
-						let appearanceID = await getAccountAppearanceID(
-							mode: mode,
-							offset: offset,
-							networkID: networkID
-						)
-						return Account(
-							networkID: networkID,
-							factorInstance: .init(factorSourceId: id, publicKey: publicHDKey),
-							displayName: .init(value: L10n.AccountRecoveryScan.InProgress.nameOfRecoveredAccount),
-							extraProperties: .init(
-								appearanceID: appearanceID,
-								// We will be replacing the `depositRule` with one fetched from GW
-								// in `scan` step later on.
-								onLedgerSettings: .unknown
-							)
-						)
-					}.asIdentified()
+		loggerGlobal.debug("Creating accounts with networkID: \(networkID)")
+		return .run { [mode = state.mode, factorSourceId = state.factorSourceIDFromHash] send in
+			let accounts = await publicKeys.enumerated().asyncMap { localOffset, publicHDKey in
+				let offset = localOffset + globalOffset
+				let appearanceID = await getAccountAppearanceID(
+					mode: mode,
+					offset: offset,
+					networkID: networkID
+				)
+				return Account(
+					networkID: networkID,
+					factorInstance: .init(factorSourceId: factorSourceId, publicKey: publicHDKey),
+					displayName: .init(value: L10n.AccountRecoveryScan.InProgress.nameOfRecoveredAccount),
+					extraProperties: .init(
+						appearanceID: appearanceID,
+						// We will be replacing the `depositRule` with one fetched from GW
+						// in `scan` step later on.
+						onLedgerSettings: .unknown
+					)
+				)
+			}.asIdentified()
 
-					await send(.internal(.startScan(accounts: accounts)))
-				} catch: { error, send in
-					let errorMsg = "Failed to create account, error: \(error)"
-					loggerGlobal.critical(.init(stringLiteral: errorMsg))
-					assertionFailure(errorMsg)
-					await send(.delegate(.failed))
-				}
-
-			case .failedToDerivePublicKey:
-				return .send(.delegate(.failed))
-
-			case .cancel:
-				return .send(.delegate(.close))
-			}
-
-		default: return .none
+			await send(.internal(.startScan(accounts: accounts)))
+		} catch: { error, send in
+			let errorMsg = "Failed to create account, error: \(error)"
+			loggerGlobal.critical(.init(stringLiteral: errorMsg))
+			assertionFailure(errorMsg)
+			await send(.delegate(.failed))
 		}
-	}
-
-	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
-		.run { _ in await dismiss() }
 	}
 
 	private func getAccountAppearanceID(
@@ -311,6 +267,7 @@ extension AccountRecoveryScanInProgress {
 	private func derivePublicKeys(
 		state: inout State
 	) -> Effect<Action> {
+		state.status = .derivingPublicKeys
 		let derivationPaths: OrderedSet<DerivationPath>
 		do {
 			derivationPaths = try nextDerivationPaths(state: &state)
@@ -320,12 +277,12 @@ extension AccountRecoveryScanInProgress {
 			assertionFailure(errorMsg)
 			return .send(.delegate(.failed))
 		}
-		let factorSourceOption: DerivePublicKeys.State.FactorSourceOption
+		let source: DerivePublicKeysSource
 		switch state.mode {
-		case let .addAccounts(_, loadableState):
+		case let .addAccounts(id, loadableState):
 			switch loadableState {
-			case let .success(factorSource):
-				factorSourceOption = .specific(factorSource)
+			case .success:
+				source = .factorSource(id)
 			default:
 				let errorMsg = "Discrepancy! Expected to loaded the factor source"
 				loggerGlobal.error(.init(stringLiteral: errorMsg))
@@ -333,20 +290,15 @@ extension AccountRecoveryScanInProgress {
 				return .send(.delegate(.failed))
 			}
 		case let .createProfile(privateHDFactorSource):
-			factorSourceOption = .specificPrivateHDFactorSource(privateHDFactorSource)
+			source = .mnemonicWithPassphrase(privateHDFactorSource.mnemonicWithPassphrase)
 		}
 
-		state.status = .derivingPublicKeys
-		state.destination = .derivePublicKeys(.init(
-			derivationPathOption: .knownPaths(
-				Array(derivationPaths),
-				networkID: state.networkID
-			),
-			factorSourceOption: factorSourceOption,
-			purpose: .accountRecoveryScan
-		))
-
-		return .none
+		return .run { send in
+			let result = try await SargonOS.shared.derivePublicKeys(derivationPaths: Array(derivationPaths), source: source)
+			await send(.internal(.derivedPublicKeys(result)))
+		} catch: { _, send in
+			await send(.delegate(.failed))
+		}
 	}
 
 	private func scanOnLedger(
@@ -355,7 +307,6 @@ extension AccountRecoveryScanInProgress {
 	) -> Effect<Action> {
 		assert(accounts.count == batchSize)
 		state.status = .scanningNetworkForActiveAccounts
-		state.destination = nil
 		loggerGlobal.debug("Scanning ledger with accounts with addresses: \(accounts.map(\.address))")
 		return .run { [networkID = state.networkID] send in
 			let deletedAccountAddresses: [AccountAddress] = try await SargonOS.shared
