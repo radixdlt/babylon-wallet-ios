@@ -37,16 +37,16 @@ extension FactorSourceAccess.State {
 		case .device:
 			switch purpose {
 			case .signature:
-				return S.Device.messageSignature
+				return S.Device.signMessage
 			case .createAccount, .createPersona, .deriveAccounts, .proveOwnership, .encryptMessage, .createKey:
 				return S.Device.message
 			}
 		case .ledger:
 			switch purpose {
 			case .signature:
-				return S.Ledger.messageSignature
+				return S.Ledger.signMessage
 			case .deriveAccounts:
-				return S.Ledger.messageDeriveAccounts
+				return S.Ledger.deriveAccountsMessage
 			case .createAccount, .createPersona, .proveOwnership, .encryptMessage, .createKey:
 				return S.Ledger.message
 			}
