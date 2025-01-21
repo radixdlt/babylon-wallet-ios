@@ -278,15 +278,15 @@ private extension TimePeriod {
 		case (1, .days):
 			L10n.ShieldWizardRecovery.Fallback.Day.period
 		case (_, .days):
-			L10n.ShieldWizardRecovery.Fallback.Days.period(value)
+			L10n.ShieldWizardRecovery.Fallback.Days.period(Int(value))
 		case (1, .weeks):
 			L10n.ShieldWizardRecovery.Fallback.Week.period
 		case (_, .weeks):
-			L10n.ShieldWizardRecovery.Fallback.Weeks.period(value)
+			L10n.ShieldWizardRecovery.Fallback.Weeks.period(Int(value))
         case (1, .years):
             L10n.ShieldWizardRecovery.Fallback.Year.period
         case (_, .years):
-            L10n.ShieldWizardRecovery.Fallback.Years.period(value)
+            L10n.ShieldWizardRecovery.Fallback.Years.period(Int(value))
 		}
 	}
 }
