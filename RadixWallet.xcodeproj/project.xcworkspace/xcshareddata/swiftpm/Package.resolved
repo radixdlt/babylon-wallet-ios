@@ -1,5 +1,5 @@
 {
-  "originHash" : "9acc45fd9bb9f6dbfbd5e42547edff7df05244137d9f42e606975bb445ac1225",
+  "originHash" : "07ce6e755e876609763519b759f734223d793640b402e06aedef4571a7f65e19",
   "pins" : [
     {
       "identity" : "anycodable",
@@ -103,10 +103,10 @@
     {
       "identity" : "sargon",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/radixdlt/sargon/",
+      "location" : "https://github.com/radixdlt/sargon",
       "state" : {
-        "revision" : "807564dba4dc6947c62677208e920ecbf88bd82e",
-        "version" : "1.1.109"
+        "revision" : "84acb9525993de833fc16cfddfb2ccb12706efbf",
+        "version" : "1.1.107"
       }
     },
     {
@@ -133,15 +133,6 @@
       "state" : {
         "revision" : "9cfed92b026c524674ed869a4ff2dcfdeedf8a2a",
         "version" : "0.1.0"
-      }
-    },
-    {
-      "identity" : "swift-atomics",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-atomics.git",
-      "state" : {
-        "revision" : "6c89474e62719ddcc1e9614989fff2f68208fe10",
-        "version" : "1.1.0"
       }
     },
     {

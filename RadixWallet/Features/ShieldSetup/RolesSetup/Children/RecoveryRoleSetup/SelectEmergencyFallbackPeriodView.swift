@@ -77,8 +77,7 @@ private extension TimePeriodUnit {
 		case .weeks:
 			L10n.ShieldWizardRecovery.Fallback.Weeks.label
 		case .years:
-			// TODO:
-			"L10n.ShieldWizardRecovery.Fallback.Years.label"
+			L10n.ShieldWizardRecovery.Fallback.Years.label
 		}
 	}
 }

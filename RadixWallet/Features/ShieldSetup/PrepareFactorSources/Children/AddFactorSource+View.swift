@@ -70,7 +70,7 @@ extension PrepareFactorSources.AddFactorSource {
 		private func messages(for kind: FactorSourceKind) -> [FactorSourceCardDataSource.Message] {
 			switch (kind, store.selected) {
 			case (.offDeviceMnemonic, .offDeviceMnemonic):
-				[.init(text: L10n.ShieldSetupPrepareFactors.AddAnotherFactor.passphraseHint, type: .warning)]
+				[.init(text: L10n.ShieldSetupPrepareFactors.AddAnotherFactor.offDeviceMnemonicHint, type: .warning)]
 			default:
 				[]
 			}

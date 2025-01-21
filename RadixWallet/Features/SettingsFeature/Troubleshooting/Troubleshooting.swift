@@ -87,7 +87,7 @@ struct Troubleshooting: Sendable, FeatureReducer {
 			}
 
 		case .discordButtonTapped:
-			guard let url = URL(string: "http://discord.gg/radixdlt") else {
+			guard let url = URL(string: "https://go.radixdlt.com/Discord") else {
 				return .none
 			}
 			return .run { _ in

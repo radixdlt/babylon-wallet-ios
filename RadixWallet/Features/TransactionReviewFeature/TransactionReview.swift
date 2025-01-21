@@ -599,21 +599,28 @@ extension ResourceBalance {
 			}
 		}
 		set {
+			guard let newValue else {
+				return
+			}
+
 			switch self {
 			case let .known(knownResourceBalance):
 				switch knownResourceBalance.details {
 				case var .fungible(fungible):
 					fungible.guarantee = newValue
+					fungible.amount.setGuaranteedAmount(newValue.amount)
 					var known = knownResourceBalance
 					known.details = .fungible(fungible)
 					self = .known(known)
 				case var .liquidStakeUnit(liquidStakeUnit):
 					liquidStakeUnit.guarantee = newValue
+					liquidStakeUnit.amount.setGuaranteedAmount(newValue.amount)
 					var known = knownResourceBalance
 					known.details = .liquidStakeUnit(liquidStakeUnit)
 					self = .known(known)
 				case var .poolUnit(poolUnit):
 					poolUnit.guarantee = newValue
+					poolUnit.details.poolUnitResource.amount.setGuaranteedAmount(newValue.amount)
 					var known = knownResourceBalance
 					known.details = .poolUnit(poolUnit)
 					self = .known(known)

@@ -9,7 +9,7 @@ extension RecoveryRoleSetup.State {
 		case .none:
 			nil
 		case .RecoveryRoleMustHaveAtLeastOneFactor, .ConfirmationRoleMustHaveAtLeastOneFactor:
-			.init(type: .error, text: L10n.ShieldSetupStatus.Transactions.atLeastOneFactor)
+			.init(type: .error, text: L10n.ShieldSetupStatus.Roles.atLeastOneFactor)
 		default:
 			.init(type: .warning, text: L10n.ShieldSetupStatus.invalidCombination)
 		}
@@ -273,21 +273,20 @@ private extension RecoveryRoleSetup.View {
 }
 
 private extension TimePeriod {
-	// TODO: Add new Crowdin keys: "%d <unit_name>"
 	var title: String {
 		switch (value, unit) {
 		case (1, .days):
-			"\(value) " + L10n.ShieldWizardRecovery.Fallback.Day.label // "shieldWizardRecovery_fallback_day_period"
+			L10n.ShieldWizardRecovery.Fallback.Day.period
 		case (_, .days):
-			"\(value) " + L10n.ShieldWizardRecovery.Fallback.Days.label // "shieldWizardRecovery_fallback_days_period"
+			L10n.ShieldWizardRecovery.Fallback.Days.period(value)
 		case (1, .weeks):
-			"\(value) " + L10n.ShieldWizardRecovery.Fallback.Week.label // "shieldWizardRecovery_fallback_week_period"
+			L10n.ShieldWizardRecovery.Fallback.Week.period
 		case (_, .weeks):
-			"\(value) " + L10n.ShieldWizardRecovery.Fallback.Weeks.label // "shieldWizardRecovery_fallback_weeks_period"
-		case (1, .years):
-			"\(value) " + "L10n.ShieldWizardRecovery.Fallback.Year.label" // "shieldWizardRecovery_fallback_year_period"
-		case (_, .years):
-			"\(value) " + "L10n.ShieldWizardRecovery.Fallback.Years.label" // "shieldWizardRecovery_fallback_years_period"
+			L10n.ShieldWizardRecovery.Fallback.Weeks.period(value)
+        case (1, .years):
+            L10n.ShieldWizardRecovery.Fallback.Year.period
+        case (_, .years):
+            L10n.ShieldWizardRecovery.Fallback.Years.period(value)
 		}
 	}
 }

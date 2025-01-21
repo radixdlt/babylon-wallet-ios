@@ -8,7 +8,7 @@ extension PrimaryRoleSetup.State {
 		case .none:
 			nil
 		case .PrimaryRoleMustHaveAtLeastOneFactor:
-			.init(type: .error, text: L10n.ShieldSetupStatus.Transactions.atLeastOneFactor)
+			.init(type: .error, text: L10n.ShieldSetupStatus.Roles.atLeastOneFactor)
 		default:
 			.init(type: .warning, text: L10n.ShieldSetupStatus.invalidCombination)
 		}
@@ -179,10 +179,10 @@ extension PrimaryRoleSetup {
 
 		private var thresholdSelectorView: some SwiftUI.View {
 			HStack(spacing: .zero) {
-				// TODO: Add a new key for "**%@**"
 				let thresholdTitle = store.threshold.titleShort
-				let title = L10n.ShieldWizardRegularAccess.ThresholdDescription.title(thresholdTitle)
-				let parts = title.components(separatedBy: "**\(thresholdTitle)**")
+				let separator = L10n.ShieldWizardRegularAccess.ThresholdDescription.selection(thresholdTitle)
+				let title = L10n.ShieldWizardRegularAccess.ThresholdDescription.title(separator)
+				let parts = title.components(separatedBy: separator)
 
 				if parts.count == 2 {
 					Text(parts[0])
@@ -295,7 +295,7 @@ extension PrimaryRoleSetup {
 					.embedInContainer
 				} else {
 					StatusMessageView(
-						text: L10n.ShieldSetupStatus.Authentication.atLeastOneFactor,
+						text: L10n.ShieldSetupStatus.Roles.atLeastOneFactor,
 						type: .error,
 						useNarrowSpacing: true,
 						useSmallerFontSize: true
