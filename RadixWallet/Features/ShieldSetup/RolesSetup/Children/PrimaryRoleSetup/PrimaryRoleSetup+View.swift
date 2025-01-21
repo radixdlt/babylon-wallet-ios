@@ -8,7 +8,7 @@ extension PrimaryRoleSetup.State {
 		case .none:
 			nil
 		case .PrimaryRoleMustHaveAtLeastOneFactor:
-			.init(type: .error, text: L10n.ShieldSetupStatus.Transactions.atLeastOneFactor)
+			.init(type: .error, text: L10n.ShieldSetupStatus.Roles.atLeastOneFactor)
 		default:
 			.init(type: .warning, text: L10n.ShieldSetupStatus.invalidCombination)
 		}
@@ -297,7 +297,7 @@ extension PrimaryRoleSetup {
 					.embedInContainer
 				} else {
 					StatusMessageView(
-						text: L10n.ShieldSetupStatus.Authentication.atLeastOneFactor,
+						text: L10n.ShieldSetupStatus.Roles.atLeastOneFactor,
 						type: .error,
 						useNarrowSpacing: true,
 						useSmallerFontSize: true

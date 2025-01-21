@@ -11,7 +11,7 @@ extension SelectFactorSources.State {
 		case .invalid:
 			.init(type: .error, text: L10n.ShieldSetupStatus.invalidCombination)
 		case .insufficient:
-			.init(type: .error, text: L10n.ShieldSetupStatus.Transactions.atLeastOneFactor)
+			.init(type: .error, text: L10n.ShieldSetupStatus.SelectFactors.atLeastOneFactor)
 		case .suboptimal:
 			.init(type: .warning, text: L10n.ShieldSetupStatus.recommendedFactors)
 		case .optimal:
