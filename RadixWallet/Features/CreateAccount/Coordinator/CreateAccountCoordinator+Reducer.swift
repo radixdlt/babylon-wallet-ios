@@ -187,12 +187,12 @@ extension CreateAccountCoordinator {
 			fatalError("Name should be set before creating Account")
 		}
 		let displayName = DisplayName(nonEmpty: name)
-		return .run { send in
+		return .run { [networkId = state.config.specificNetworkID] send in
 			let account = switch option {
 			case .bdfs:
-				try await SargonOS.shared.createAccountWithBDFS(name: displayName)
+				try await SargonOS.shared.createAccountWithBDFS(networkId: networkId, name: displayName)
 			case let .specific(factorSource):
-				try await SargonOS.shared.createAccount(factorSource: factorSource, name: displayName)
+				try await SargonOS.shared.createAccount(factorSource: factorSource, networkId: networkId, name: displayName)
 			}
 
 			let updated = await getThirdPartyDepositSettings(account: account)
