@@ -90,7 +90,7 @@ struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		case .initiate:
 			switch state.mode {
 			case .createProfile:
-				return derivePublicKeys(state: &state)
+				return derivePublicKeysEffect(state: &state)
 			case .addAccounts:
 				state.status = .loadingFactorSource
 				let id = state.factorSourceIDFromHash
@@ -130,13 +130,13 @@ struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 			)
 
 			state.indicesOfAlreadyUsedEntities = indicesUsedByFactorSource.indices
-			return derivePublicKeys(state: &state)
+			return derivePublicKeysEffect(state: &state)
 
 		case let .startScan(accounts):
 			return scanOnLedger(accounts: accounts, state: &state)
 
 		case let .derivedPublicKeys(publicKeys):
-			return handleDerivedPublicKeys(state: state, publicKeys: publicKeys)
+			return handleDerivedPublicKeysEffect(state: state, publicKeys: publicKeys)
 
 		case let .foundAccounts(active, inactive, deleted):
 			state.batchNumber += 1
@@ -160,7 +160,7 @@ struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 
 		case .scanMore:
 			loggerGlobal.debug("Scan more requested.")
-			return derivePublicKeys(state: &state)
+			return derivePublicKeysEffect(state: &state)
 
 		case .continueTapped:
 			if let maxActive = state.active.max() {
@@ -181,8 +181,7 @@ struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		}
 	}
 
-	private func handleDerivedPublicKeys(state: State, publicKeys: [HierarchicalDeterministicPublicKey]) -> Effect<Action> {
-		// TODO: Shouldn't we filter by networkId?
+	private func handleDerivedPublicKeysEffect(state: State, publicKeys: [HierarchicalDeterministicPublicKey]) -> Effect<Action> {
 		let networkID = state.networkID
 		let globalOffset = state.active.count + state.inactive.count
 		loggerGlobal.debug("Creating accounts with networkID: \(networkID)")
@@ -264,7 +263,7 @@ extension AccountRecoveryScanInProgress {
 		return try OrderedSet(validating: paths)
 	}
 
-	private func derivePublicKeys(
+	private func derivePublicKeysEffect(
 		state: inout State
 	) -> Effect<Action> {
 		state.status = .derivingPublicKeys

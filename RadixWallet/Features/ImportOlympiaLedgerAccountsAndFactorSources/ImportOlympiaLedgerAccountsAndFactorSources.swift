@@ -38,7 +38,6 @@ struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureReducer {
 			case noP2PLink(AlertState<NoP2PLinkAlert>)
 			case addNewP2PLink(NewConnection.State)
 			case nameLedger(ImportOlympiaNameLedger.State)
-			case derivePublicKeys(DerivePublicKeys.State)
 		}
 
 		enum Action: Sendable, Equatable {
@@ -54,9 +53,6 @@ struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.nameLedger, action: /Action.nameLedger) {
 				ImportOlympiaNameLedger()
-			}
-			Scope(state: /State.derivePublicKeys, action: /Action.derivePublicKeys) {
-				DerivePublicKeys()
 			}
 		}
 	}
@@ -74,6 +70,8 @@ struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureReducer {
 
 		/// Adds a previously saved device to the list and continues
 		case useExistingLedger(LedgerHardwareWalletFactorSource)
+
+		case derivedPublicKeys(FactorSourceIdFromHash, [HierarchicalDeterministicPublicKey])
 
 		// Validates and migrates Olympia hardware accounts
 		case processedOlympiaHardwareAccounts(ValidatedAccounts, MigratedHardwareAccounts)
@@ -100,7 +98,7 @@ struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureReducer {
 
 	var body: some ReducerOf<ImportOlympiaLedgerAccountsAndFactorSources> {
 		Reduce(core)
-			.ifLet(destinationPath, action: /Action.destination) {
+			.ifLet(destinationPath, action: \.destination) {
 				Destination()
 			}
 	}
@@ -149,13 +147,10 @@ struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureReducer {
 
 		case let .useExistingLedger(ledger):
 			state.knownLedgers.append(ledger)
-			state.destination = .derivePublicKeys(.init(
-				ledger: ledger,
-				olympiaAccounts: state.olympiaAccounts.unvalidated,
-				networkID: state.networkID
-			))
+			return derivePublicKeysEffect(state: state, factorSourceId: ledger.id)
 
-			return .none
+		case let .derivedPublicKeys(factorSourceId, publicKeys):
+			return handleDerivedPublicKeysEffect(state: state, factorSourceId: factorSourceId, publicKeys: publicKeys)
 
 		case let .processedOlympiaHardwareAccounts(validatedAccounts, migratedAccounts):
 			for validatedAccount in validatedAccounts {
@@ -213,33 +208,6 @@ struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureReducer {
 				return .send(.internal(.useExistingLedger(ledger)))
 			}
 
-		case let .derivePublicKeys(.delegate(.derivedPublicKeys(publicKeys, factorSourceID, _))):
-			state.destination = nil
-			guard let ledgerID = factorSourceID.extract(FactorSourceIDFromHash.self) else {
-				loggerGlobal.error("Failed to find ledger with factor sourceID in local state: \(factorSourceID)")
-				return .none
-			}
-
-			return .run { [unvalidated = state.olympiaAccounts.unvalidated] send in
-				let (validated, migrated) = try await process(
-					derivedPublicKeys: publicKeys,
-					ledgerID: ledgerID,
-					olympiaAccountsToValidate: unvalidated
-				)
-				await send(.internal(.processedOlympiaHardwareAccounts(validated, migrated)))
-			} catch: { error, _ in
-				loggerGlobal.error("Failed to process Olympia hardware accounts: \(error)")
-				errorQueue.schedule(error)
-			}
-
-		case .derivePublicKeys(.delegate(.failedToDerivePublicKey)):
-			state.destination = nil
-			return .send(.delegate(.failed(.failedToDerivePublicKey)))
-
-		case .derivePublicKeys(.delegate(.cancel)):
-			state.destination = nil
-			return .none
-
 		default:
 			return .none
 		}
@@ -257,6 +225,30 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 			}
 		} catch: { error, _ in
 			loggerGlobal.error("failed to get links updates, error: \(error)")
+		}
+	}
+
+	private func derivePublicKeysEffect(state: State, factorSourceId: FactorSourceIdFromHash) -> Effect<Action> {
+		let derivationPaths = state.olympiaAccounts.unvalidated.map(\.path.asDerivationPath)
+		return .run { send in
+			let result = try await SargonOS.shared.derivePublicKeys(derivationPaths: derivationPaths, source: .factorSource(factorSourceId))
+			await send(.internal(.derivedPublicKeys(factorSourceId, result)))
+		} catch: { _, send in
+			await send(.delegate(.failed(.failedToDerivePublicKey)))
+		}
+	}
+
+	private func handleDerivedPublicKeysEffect(state: State, factorSourceId: FactorSourceIdFromHash, publicKeys: [HierarchicalDeterministicPublicKey]) -> Effect<Action> {
+		.run { [unvalidated = state.olympiaAccounts.unvalidated] send in
+			let (validated, migrated) = try await process(
+				derivedPublicKeys: publicKeys,
+				ledgerID: factorSourceId,
+				olympiaAccountsToValidate: unvalidated
+			)
+			await send(.internal(.processedOlympiaHardwareAccounts(validated, migrated)))
+		} catch: { error, _ in
+			loggerGlobal.error("Failed to process Olympia hardware accounts: \(error)")
+			errorQueue.schedule(error)
 		}
 	}
 
