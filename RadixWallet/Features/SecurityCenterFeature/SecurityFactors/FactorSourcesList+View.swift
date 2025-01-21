@@ -118,7 +118,7 @@ private extension FactorSourcesList.State {
 		case .ledgerHqHardwareWallet:
 			L10n.FactorSources.List.ledgerAdd
 		case .offDeviceMnemonic:
-			L10n.FactorSources.List.passphraseAdd
+			L10n.FactorSources.List.offDeviceMnemonicAdd
 		case .arculusCard:
 			L10n.FactorSources.List.arculusCardAdd
 		case .password:

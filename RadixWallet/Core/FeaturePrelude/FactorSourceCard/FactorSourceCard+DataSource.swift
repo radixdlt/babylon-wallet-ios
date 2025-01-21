@@ -66,7 +66,7 @@ extension FactorSourceKind {
 		case .ledgerHqHardwareWallet:
 			L10n.FactorSources.Card.ledgerTitle
 		case .offDeviceMnemonic:
-			L10n.FactorSources.Card.passphraseTitle
+			L10n.FactorSources.Card.offDeviceMnemonicTitle
 		case .arculusCard:
 			L10n.FactorSources.Card.arculusCardTitle
 		case .password:
@@ -83,7 +83,7 @@ extension FactorSourceKind {
 		case .ledgerHqHardwareWallet:
 			L10n.FactorSources.Card.ledgerDescription
 		case .offDeviceMnemonic:
-			L10n.FactorSources.Card.passphraseDescription
+			L10n.FactorSources.Card.offDeviceMnemonicDescription
 		case .arculusCard:
 			L10n.FactorSources.Card.arculusCardDescription
 		case .password:
