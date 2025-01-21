@@ -37,7 +37,7 @@ extension PrimaryRoleSetup.State {
 		if threshold == shieldBuilder.primaryRoleThresholdFactors.count {
 			return .all
 		} else {
-			return .specific(threshold)
+			return .specific(UInt8(threshold))
 		}
 	}
 }
@@ -181,10 +181,10 @@ extension PrimaryRoleSetup {
 
 		private var thresholdSelectorView: some SwiftUI.View {
 			HStack(spacing: .zero) {
-				// TODO: Add a new key for "**%@**"
 				let thresholdTitle = store.threshold.titleShort
-				let title = L10n.ShieldWizardRegularAccess.ThresholdDescription.title(thresholdTitle)
-				let parts = title.components(separatedBy: "**\(thresholdTitle)**")
+				let separator = L10n.ShieldWizardRegularAccess.ThresholdDescription.selection(thresholdTitle)
+				let title = L10n.ShieldWizardRegularAccess.ThresholdDescription.title(separator)
+				let parts = title.components(separatedBy: separator)
 
 				if parts.count == 2 {
 					Text(parts[0])
