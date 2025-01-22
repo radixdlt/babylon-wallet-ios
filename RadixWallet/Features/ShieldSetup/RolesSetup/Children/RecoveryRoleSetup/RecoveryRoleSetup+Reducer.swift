@@ -22,7 +22,7 @@ struct RecoveryRoleSetup: FeatureReducer, Sendable {
 		case addFactorSourceButtonTapped(ChooseFactorSourceContext)
 		case removeRecoveryFactorTapped(FactorSourceID)
 		case removeConfirmationFactorTapped(FactorSourceID)
-		case invalidCombinationReadMoreTapped
+		case unsafeCombinationReadMoreTapped
 		case selectFallbackButtonTapped
 		case fallbackInfoButtonTapped
 	}
@@ -75,7 +75,7 @@ struct RecoveryRoleSetup: FeatureReducer, Sendable {
 				errorQueue.schedule(error)
 			}
 
-		case .invalidCombinationReadMoreTapped:
+		case .unsafeCombinationReadMoreTapped:
 			overlayWindowClient.showInfoLink(.init(glossaryItem: .buildingshield))
 			return .none
 

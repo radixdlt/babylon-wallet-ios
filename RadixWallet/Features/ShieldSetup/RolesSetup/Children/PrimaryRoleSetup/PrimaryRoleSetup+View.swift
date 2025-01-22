@@ -1,22 +1,42 @@
 extension PrimaryRoleSetup.State {
-	var validatedRoleStatus: SecurityShieldBuilderInvalidReason? {
-		shieldBuilder.validate()
+	var validatedRoleStatus: SecurityShieldBuilderStatus {
+		shieldBuilder.status()
 	}
 
 	var statusMessageInfo: ShieldStatusMessageInfo? {
 		switch validatedRoleStatus {
-		case .none:
-			nil
-		case .PrimaryRoleMustHaveAtLeastOneFactor:
-			.init(type: .error, text: L10n.ShieldSetupStatus.Roles.atLeastOneFactor)
-		default:
-			.init(type: .warning, text: L10n.ShieldSetupStatus.invalidCombination)
+		case .strong:
+			return nil
+		case .weak:
+			return .init(
+				type: .warning,
+				text: L10n.ShieldSetupStatus.unsafeCombination,
+				contexts: [.general]
+			)
+		case let .invalid(reason):
+			var contexts: [ShieldStatusMessageInfo.Context] = []
+
+			if reason.isPrimaryRoleFactorListEmpty {
+				contexts.append(.primaryRole)
+			}
+			if reason.isAuthSigningFactorMissing {
+				contexts.append(.authenticationRole)
+			}
+			if contexts.isEmpty {
+				return nil
+			}
+
+			return .init(
+				type: .error,
+				text: L10n.ShieldSetupStatus.Roles.atLeastOneFactor,
+				contexts: contexts
+			)
 		}
 	}
 
-	// TODO: Move to Sargon
 	var canContinue: Bool {
-		validatedRoleStatus != .PrimaryRoleMustHaveAtLeastOneFactor && validatedRoleStatus != .MissingAuthSigningFactor
+		guard case .invalid = validatedRoleStatus, statusMessageInfo != nil else { return true }
+		return false
 	}
 
 	var thresholdFactors: [FactorSource] {
@@ -124,22 +144,17 @@ extension PrimaryRoleSetup {
 					.multilineTextAlignment(.leading)
 					.flushedLeft
 
-				if let statusMessage = store.statusMessageInfo {
-					StatusMessageView(
-						text: statusMessage.text,
-						type: statusMessage.type,
-						useNarrowSpacing: true,
-						useSmallerFontSize: true,
-						emphasizedTextStyle: .body2Header
-					)
-					.padding(.horizontal, .small1)
-					.padding(.vertical, .medium3)
-					.flushedLeft
-					.onTapGesture {
-						if statusMessage.type == .warning {
-							store.send(.view(.invalidCombinationReadMoreTapped))
+				if let statusMessage = store.statusMessageInfo,
+				   statusMessage.contexts.contains(where: [ShieldStatusMessageInfo.Context.general, .primaryRole].contains)
+				{
+					statusMessageView(statusMessage)
+						.padding(.horizontal, .small1)
+						.padding(.vertical, .small2)
+						.onTapGesture {
+							if statusMessage.type == .warning {
+								store.send(.view(.unsafeCombinationReadMoreTapped))
+							}
 						}
-					}
 				}
 			}
 			.foregroundStyle(.app.gray1)
@@ -276,6 +291,12 @@ extension PrimaryRoleSetup {
 					.multilineTextAlignment(.leading)
 					.flushedLeft
 
+				if let statusMessage = store.statusMessageInfo,
+				   statusMessage.contexts.contains(.authenticationRole)
+				{
+					statusMessageView(statusMessage)
+				}
+
 				if let factorSource = store.authenticationSigningFactor {
 					FactorSourceCard(
 						kind: .instance(
@@ -294,15 +315,6 @@ extension PrimaryRoleSetup {
 					.frame(maxWidth: .infinity)
 					.embedInContainer
 				} else {
-					StatusMessageView(
-						text: L10n.ShieldSetupStatus.Roles.atLeastOneFactor,
-						type: .error,
-						useNarrowSpacing: true,
-						useSmallerFontSize: true
-					)
-					.padding(.vertical, .small2)
-					.flushedLeft
-
 					Button("+") {
 						store.send(.view(.addFactorSourceButtonTapped(.authenticationSigning)))
 					}
@@ -310,6 +322,18 @@ extension PrimaryRoleSetup {
 					.embedInContainer
 				}
 			}
+		}
+
+		private func statusMessageView(_ statusMessage: ShieldStatusMessageInfo) -> some SwiftUI.View {
+			StatusMessageView(
+				text: statusMessage.text,
+				type: statusMessage.type,
+				useNarrowSpacing: true,
+				useSmallerFontSize: true,
+				emphasizedTextStyle: .body2Header
+			)
+			.padding(.vertical, .small2)
+			.flushedLeft
 		}
 	}
 }

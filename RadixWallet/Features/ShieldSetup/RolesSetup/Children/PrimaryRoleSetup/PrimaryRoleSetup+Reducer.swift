@@ -27,7 +27,7 @@ struct PrimaryRoleSetup: FeatureReducer, Sendable {
 		case showOverrideSectionButtonTapped
 		case hideOverrideSectionButtonTapped
 		case thresholdSelectorButtonTapped
-		case invalidCombinationReadMoreTapped
+		case unsafeCombinationReadMoreTapped
 	}
 
 	enum InternalAction: Equatable, Sendable {
@@ -78,7 +78,7 @@ struct PrimaryRoleSetup: FeatureReducer, Sendable {
 				errorQueue.schedule(error)
 			}
 
-		case .invalidCombinationReadMoreTapped:
+		case .unsafeCombinationReadMoreTapped:
 			overlayWindowClient.showInfoLink(.init(glossaryItem: .buildingshield))
 			return .none
 

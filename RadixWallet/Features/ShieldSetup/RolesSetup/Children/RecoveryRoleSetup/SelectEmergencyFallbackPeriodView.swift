@@ -76,13 +76,11 @@ private extension TimePeriodUnit {
 			L10n.ShieldWizardRecovery.Fallback.Days.label
 		case .weeks:
 			L10n.ShieldWizardRecovery.Fallback.Weeks.label
-		case .years:
-			L10n.ShieldWizardRecovery.Fallback.Years.label
 		}
 	}
 }
 
 // MARK: - TimePeriodUnit + CaseIterable
 extension TimePeriodUnit: CaseIterable {
-	public static let allCases: [Self] = [.days, .weeks, .years]
+	public static let allCases: [Self] = [.days, .weeks]
 }

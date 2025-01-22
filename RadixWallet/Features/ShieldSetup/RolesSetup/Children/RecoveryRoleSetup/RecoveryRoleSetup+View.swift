@@ -1,23 +1,35 @@
 extension RecoveryRoleSetup.State {
-	var validatedRoleStatus: SecurityShieldBuilderInvalidReason? {
-		shieldBuilder.validate()
+	var validatedRoleStatus: SecurityShieldBuilderStatus {
+		shieldBuilder.status()
 	}
 
-	// TODO: Move to Sargon & adapt to weak shields
 	var statusMessageInfo: ShieldStatusMessageInfo? {
 		switch validatedRoleStatus {
-		case .none:
-			nil
-		case .RecoveryRoleMustHaveAtLeastOneFactor, .ConfirmationRoleMustHaveAtLeastOneFactor:
-			.init(type: .error, text: L10n.ShieldSetupStatus.Roles.atLeastOneFactor)
-		default:
-			.init(type: .warning, text: L10n.ShieldSetupStatus.invalidCombination)
+		case .strong:
+			return nil
+		case .weak:
+			return .init(type: .warning, text: L10n.ShieldSetupStatus.unsafeCombination, contexts: [.general])
+		case let .invalid(reason):
+			var contexts: [ShieldStatusMessageInfo.Context] = []
+
+			if reason.isRecoveryRoleFactorListEmpty {
+				contexts.append(.recoveryRole)
+			}
+			if reason.isConfirmationRoleFactorListEmpty {
+				contexts.append(.confirmationRole)
+			}
+
+			return .init(
+				type: .error,
+				text: L10n.ShieldSetupStatus.Roles.atLeastOneFactor,
+				contexts: contexts
+			)
 		}
 	}
 
-	// TODO: Move to Sargon & adapt to weak shields
 	var canContinue: Bool {
-		validatedRoleStatus == nil
+		guard case .invalid = validatedRoleStatus else { return true }
+		return false
 	}
 
 	var recoveryFactors: [FactorSource] {
@@ -101,22 +113,15 @@ extension RecoveryRoleSetup {
 				)
 				.padding(.bottom, .small2)
 
-				if let statusMessage = store.statusMessageInfo {
-					StatusMessageView(
-						text: statusMessage.text,
-						type: statusMessage.type,
-						useNarrowSpacing: true,
-						useSmallerFontSize: true,
-						emphasizedTextStyle: .body2Header
-					)
-					.padding(.horizontal, .small1)
-					.padding(.vertical, .medium3)
-					.flushedLeft
-					.onTapGesture {
-						if statusMessage.type == .warning {
-							store.send(.view(.invalidCombinationReadMoreTapped))
+				if let statusMessage = store.statusMessageInfo,
+				   statusMessage.contexts.contains(where: [ShieldStatusMessageInfo.Context.general, .recoveryRole].contains)
+				{
+					statusMessageView(statusMessage)
+						.onTapGesture {
+							if statusMessage.type == .warning {
+								store.send(.view(.unsafeCombinationReadMoreTapped))
+							}
 						}
-					}
 				}
 
 				factorSourcesContainer(factorSources: store.recoveryFactors, section: .recovery)
@@ -131,6 +136,12 @@ extension RecoveryRoleSetup {
 				)
 				.padding(.bottom, .small2)
 
+				if let statusMessage = store.statusMessageInfo,
+				   statusMessage.contexts.contains(.confirmationRole)
+				{
+					statusMessageView(statusMessage)
+				}
+
 				factorSourcesContainer(factorSources: store.confirmationFactors, section: .confirmation)
 
 				Text(L10n.ShieldWizardRecovery.Combination.label)
@@ -139,6 +150,19 @@ extension RecoveryRoleSetup {
 
 				emergencyFallbackView
 			}
+		}
+
+		private func statusMessageView(_ statusMessage: ShieldStatusMessageInfo) -> some SwiftUI.View {
+			StatusMessageView(
+				text: statusMessage.text,
+				type: statusMessage.type,
+				useNarrowSpacing: true,
+				useSmallerFontSize: true,
+				emphasizedTextStyle: .body2Header
+			)
+			.padding(.horizontal, .small1)
+			.padding(.vertical, .medium3)
+			.flushedLeft
 		}
 
 		private func sectionHeader(title: String, subtitle: String) -> some SwiftUI.View {
@@ -283,10 +307,6 @@ private extension TimePeriod {
 			L10n.ShieldWizardRecovery.Fallback.Week.period
 		case (_, .weeks):
 			L10n.ShieldWizardRecovery.Fallback.Weeks.period(Int(value))
-        case (1, .years):
-            L10n.ShieldWizardRecovery.Fallback.Year.period
-        case (_, .years):
-            L10n.ShieldWizardRecovery.Fallback.Years.period(Int(value))
 		}
 	}
 }

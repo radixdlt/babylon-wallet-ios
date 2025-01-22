@@ -9,11 +9,11 @@ extension SelectFactorSources.State {
 	var statusMessageInfo: ShieldStatusMessageInfo? {
 		switch selectedFactorSourcesStatus {
 		case .invalid:
-			.init(type: .error, text: L10n.ShieldSetupStatus.invalidCombination)
+			.general(type: .error, text: L10n.ShieldSetupStatus.invalidCombination)
 		case .insufficient:
-			.init(type: .error, text: L10n.ShieldSetupStatus.SelectFactors.atLeastOneFactor)
+			.general(type: .error, text: L10n.ShieldSetupStatus.SelectFactors.atLeastOneFactor)
 		case .suboptimal:
-			.init(type: .warning, text: L10n.ShieldSetupStatus.recommendedFactors)
+			.general(type: .warning, text: L10n.ShieldSetupStatus.recommendedFactors)
 		case .optimal:
 			nil
 		}
@@ -98,7 +98,7 @@ extension SelectFactorSources {
 					}
 				}
 
-				Button("Skip and create an empty shield") {
+				Button(L10n.ShieldSetupSelectFactors.skipButtonTitle) {
 					store.send(.view(.skipButtonTapped))
 				}
 				.buttonStyle(.primaryText())

@@ -48,7 +48,7 @@ struct NameShield: FeatureReducer, Sendable {
 			}
 			return .run { [shieldBuilder = state.shieldBuilder] send in
 				let shield = try shieldBuilder.build()
-				let success = try await SargonOs.shared.addSecurityStructureOfFactorSourceIds(structureIds: shield)
+				try await SargonOs.shared.addSecurityStructureOfFactorSourceIds(structureIds: shield)
 				await send(.delegate(.finished))
 			} catch: { error, _ in
 				errorQueue.schedule(error)

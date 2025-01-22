@@ -25,7 +25,7 @@ extension PrepareFactorSources.AddFactorSource {
 							}
 
 							if store.showNoHardwareDeviceInfo {
-								InfoButton(.nohardwaredevice, label: "I don’t have a hardware device") // TODO: localization
+								InfoButton(.nohardwaredevice, label: L10n.InfoLink.Title.nohardwaredevice)
 									.padding(.vertical, .medium3)
 							}
 						}
@@ -44,8 +44,7 @@ extension PrepareFactorSources.AddFactorSource {
 						.buttonStyle(.primaryRectangular)
 						.controlState(store.controlState)
 
-						// TODO: localization
-						Button("Skip and create an empty shield") {
+						Button(L10n.ShieldSetupPrepareFactors.Skip.button) {
 							store.send(.view(.skipButtonTapped))
 						}
 						.buttonStyle(.primaryText())

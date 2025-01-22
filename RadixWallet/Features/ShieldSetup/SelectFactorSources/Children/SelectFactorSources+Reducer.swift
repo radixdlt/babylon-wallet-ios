@@ -107,4 +107,26 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 struct ShieldStatusMessageInfo: Hashable, Sendable {
 	let type: StatusMessageView.ViewType
 	let text: String
+	let contexts: [Context]
+}
+
+// MARK: ShieldStatusMessageInfo.Context
+extension ShieldStatusMessageInfo {
+	enum Context {
+		case general
+		case primaryRole
+		case recoveryRole
+		case confirmationRole
+		case authenticationRole
+	}
+}
+
+extension ShieldStatusMessageInfo {
+	static func general(type: StatusMessageView.ViewType, text: String) -> Self {
+		.init(
+			type: type,
+			text: text,
+			contexts: [.general]
+		)
+	}
 }
