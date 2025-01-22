@@ -1746,6 +1746,14 @@ internal enum L10n {
     }
   }
   internal enum FactorSourceActions {
+    /// Use a different factor
+    internal static let useDifferentFactor = L10n.tr("Localizable", "factorSourceActions_useDifferentFactor", fallback: "Use a different factor")
+    internal enum Arculus {
+      /// Tap and hold this **Arculus Card** to your phone. **This may take up to a minute.**
+      internal static let deriveKeysMessage = L10n.tr("Localizable", "factorSourceActions_arculus_deriveKeysMessage", fallback: "Tap and hold this **Arculus Card** to your phone. **This may take up to a minute.**")
+      /// Tap and hold this **Arculus Card** to your phone.
+      internal static let signMessage = L10n.tr("Localizable", "factorSourceActions_arculus_signMessage", fallback: "Tap and hold this **Arculus Card** to your phone.")
+    }
     internal enum CreateAccount {
       /// Creating Account
       internal static let title = L10n.tr("Localizable", "factorSourceActions_createAccount_title", fallback: "Creating Account")
@@ -1763,10 +1771,12 @@ internal enum L10n {
       internal static let title = L10n.tr("Localizable", "factorSourceActions_deriveAccounts_title", fallback: "Deriving Accounts")
     }
     internal enum Device {
-      /// Authenticate to your phone to complete using your phone's signing key.
-      internal static let message = L10n.tr("Localizable", "factorSourceActions_device_message", fallback: "Authenticate to your phone to complete using your phone's signing key.")
       /// Authenticate to your phone to sign.
-      internal static let messageSignature = L10n.tr("Localizable", "factorSourceActions_device_messageSignature", fallback: "Authenticate to your phone to sign.")
+      internal static let deriveAccountsMessage = L10n.tr("Localizable", "factorSourceActions_device_deriveAccountsMessage", fallback: "Authenticate to your phone to sign.")
+      /// Use your phone’s biometrics or PIN
+      internal static let message = L10n.tr("Localizable", "factorSourceActions_device_message", fallback: "Use your phone’s biometrics or PIN")
+      /// Use your phone’s biometrics or PIN to sign
+      internal static let signMessage = L10n.tr("Localizable", "factorSourceActions_device_signMessage", fallback: "Use your phone’s biometrics or PIN to sign")
     }
     internal enum EncryptMessage {
       /// Encrypting Message
@@ -1774,13 +1784,31 @@ internal enum L10n {
     }
     internal enum Ledger {
       /// Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.
-      internal static let message = L10n.tr("Localizable", "factorSourceActions_ledger_message", fallback: "Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.")
-      /// Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.
       /// **Derivation may take up to a minute.**
-      internal static let messageDeriveAccounts = L10n.tr("Localizable", "factorSourceActions_ledger_messageDeriveAccounts", fallback: "Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.\n**Derivation may take up to a minute.**")
-      /// Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.
+      internal static let deriveAccountsMessage = L10n.tr("Localizable", "factorSourceActions_ledger_deriveAccountsMessage", fallback: "Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.\n**Derivation may take up to a minute.**")
+      /// Use your **Ledger Nano**. Make sure it’s connected to a computer with a linked Radix Connector browser extension. **This may take up to a minute.**
+      internal static let deriveKeysMessage = L10n.tr("Localizable", "factorSourceActions_ledger_deriveKeysMessage", fallback: "Use your **Ledger Nano**. Make sure it’s connected to a computer with a linked Radix Connector browser extension. **This may take up to a minute.**")
+      /// Use your **Ledger Nano**. Make sure it’s connected to a computer with a linked Radix Connector browser extension.
+      internal static let message = L10n.tr("Localizable", "factorSourceActions_ledger_message", fallback: "Use your **Ledger Nano**. Make sure it’s connected to a computer with a linked Radix Connector browser extension.")
+      /// Use your **Ledger Nano** to sign. Make sure it’s connected to a computer with a linked Radix Connector browser extension.
       /// **Complete signing on the device.**
-      internal static let messageSignature = L10n.tr("Localizable", "factorSourceActions_ledger_messageSignature", fallback: "Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.\n**Complete signing on the device.**")
+      internal static let signMessage = L10n.tr("Localizable", "factorSourceActions_ledger_signMessage", fallback: "Use your **Ledger Nano** to sign. Make sure it’s connected to a computer with a linked Radix Connector browser extension.\n**Complete signing on the device.**")
+    }
+    internal enum OffDeviceMnemonic {
+      /// Incorrect mnemonic
+      internal static let incorrect = L10n.tr("Localizable", "factorSourceActions_offDeviceMnemonic_incorrect", fallback: "Incorrect mnemonic")
+      /// Enter this **mnemonic**
+      internal static let message = L10n.tr("Localizable", "factorSourceActions_offDeviceMnemonic_message", fallback: "Enter this **mnemonic**")
+      /// Enter this **mnemonic** to sign
+      internal static let signMessage = L10n.tr("Localizable", "factorSourceActions_offDeviceMnemonic_signMessage", fallback: "Enter this **mnemonic** to sign")
+    }
+    internal enum Password {
+      /// Incorrect password
+      internal static let incorrect = L10n.tr("Localizable", "factorSourceActions_password_incorrect", fallback: "Incorrect password")
+      /// Enter this **password**
+      internal static let message = L10n.tr("Localizable", "factorSourceActions_password_message", fallback: "Enter this **password**")
+      /// Enter this **password** to sign
+      internal static let signMessage = L10n.tr("Localizable", "factorSourceActions_password_signMessage", fallback: "Enter this **password** to sign")
     }
     internal enum ProveOwnership {
       /// Proving Ownership
@@ -1789,6 +1817,10 @@ internal enum L10n {
     internal enum Signature {
       /// Signature Request
       internal static let title = L10n.tr("Localizable", "factorSourceActions_signature_title", fallback: "Signature Request")
+    }
+    internal enum UpdatingFactorConfig {
+      /// Updating Factor Config
+      internal static let title = L10n.tr("Localizable", "factorSourceActions_updatingFactorConfig_title", fallback: "Updating Factor Config")
     }
   }
   internal enum FactorSources {
@@ -4010,6 +4042,8 @@ internal enum L10n {
       /// Emergency Fallback
       internal static let title = L10n.tr("Localizable", "shieldWizardRecovery_fallback_title", fallback: "Emergency Fallback")
       internal enum Day {
+        /// Day
+        internal static let label = L10n.tr("Localizable", "shieldWizardRecovery_fallback_day_label", fallback: "Day")
         /// 1 day
         internal static let period = L10n.tr("Localizable", "shieldWizardRecovery_fallback_day_period", fallback: "1 day")
       }
@@ -4022,6 +4056,8 @@ internal enum L10n {
         }
       }
       internal enum Week {
+        /// Week
+        internal static let label = L10n.tr("Localizable", "shieldWizardRecovery_fallback_week_label", fallback: "Week")
         /// 1 week
         internal static let period = L10n.tr("Localizable", "shieldWizardRecovery_fallback_week_period", fallback: "1 week")
       }
@@ -4034,16 +4070,14 @@ internal enum L10n {
         }
       }
       internal enum Year {
-        /// 1 year
-        internal static let period = L10n.tr("Localizable", "shieldWizardRecovery_fallback_year_period", fallback: "1 year")
+        /// Year
+        internal static let label = L10n.tr("Localizable", "shieldWizardRecovery_fallback_year_label", fallback: "Year")
       }
       internal enum Years {
         /// Years
         internal static let label = L10n.tr("Localizable", "shieldWizardRecovery_fallback_years_label", fallback: "Years")
-        /// %d years
-        internal static func period(_ p1: Int) -> String {
-          return L10n.tr("Localizable", "shieldWizardRecovery_fallback_years_period", p1, fallback: "%d years")
-        }
+        /// 1 year
+        internal static let period = L10n.tr("Localizable", "shieldWizardRecovery_fallback_years_period", fallback: "1 year")
       }
     }
     internal enum SetFallback {
@@ -4267,6 +4301,18 @@ internal enum L10n {
       internal static let transfer = L10n.tr("Localizable", "transactionHistory_manifestClass_Transfer", fallback: "Transfer")
       /// Request Unstake
       internal static let unstaking = L10n.tr("Localizable", "transactionHistory_manifestClass_Unstaking", fallback: "Request Unstake")
+    }
+  }
+  internal enum TransactionRecovery {
+    internal enum Transaction {
+      /// Cancel Transaction
+      internal static let cancel = L10n.tr("Localizable", "transactionRecovery_transaction_cancel", fallback: "Cancel Transaction")
+      /// You’ve skipped too many factors and cannot sign the transaction. You can restart the signing process, or cancel it.
+      internal static let message = L10n.tr("Localizable", "transactionRecovery_transaction_message", fallback: "You’ve skipped too many factors and cannot sign the transaction. You can restart the signing process, or cancel it.")
+      /// Restart Signing
+      internal static let restart = L10n.tr("Localizable", "transactionRecovery_transaction_restart", fallback: "Restart Signing")
+      /// Cannot Sign Transaction
+      internal static let title = L10n.tr("Localizable", "transactionRecovery_transaction_title", fallback: "Cannot Sign Transaction")
     }
   }
   internal enum TransactionReview {
