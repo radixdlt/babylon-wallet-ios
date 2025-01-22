@@ -1752,7 +1752,9 @@ internal enum L10n {
       /// Tap and hold this **Arculus Card** to your phone. **This may take up to a minute.**
       internal static let deriveKeysMessage = L10n.tr("Localizable", "factorSourceActions_arculus_deriveKeysMessage", fallback: "Tap and hold this **Arculus Card** to your phone. **This may take up to a minute.**")
       /// Tap and hold this **Arculus Card** to your phone.
-      internal static let signMessage = L10n.tr("Localizable", "factorSourceActions_arculus_signMessage", fallback: "Tap and hold this **Arculus Card** to your phone.")
+      internal static let message = L10n.tr("Localizable", "factorSourceActions_arculus_message", fallback: "Tap and hold this **Arculus Card** to your phone.")
+      /// Tap and hold this **Arculus Card** to your phone to sign.
+      internal static let signMessage = L10n.tr("Localizable", "factorSourceActions_arculus_signMessage", fallback: "Tap and hold this **Arculus Card** to your phone to sign.")
     }
     internal enum CreateAccount {
       /// Creating Account
