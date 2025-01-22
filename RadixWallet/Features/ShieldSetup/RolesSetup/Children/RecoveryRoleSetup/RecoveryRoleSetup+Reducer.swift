@@ -1,14 +1,13 @@
 import ComposableArchitecture
 
-// MARK: - PrimaryRoleSetup
+// MARK: - RecoveryRoleSetup
 @Reducer
-struct PrimaryRoleSetup: FeatureReducer, Sendable {
+struct RecoveryRoleSetup: FeatureReducer, Sendable {
 	@ObservableState
 	struct State: Hashable, Sendable {
 		@Shared(.shieldBuilder) var shieldBuilder
 
 		var factorSourcesFromProfile: [FactorSource] = []
-		var isOverrideSectionExpanded = false
 
 		@Presents
 		var destination: Destination.State? = nil
@@ -21,13 +20,11 @@ struct PrimaryRoleSetup: FeatureReducer, Sendable {
 		case task
 		case continueButtonTapped
 		case addFactorSourceButtonTapped(ChooseFactorSourceContext)
-		case removeThresholdFactorTapped(FactorSourceID)
-		case removeOverrideFactorTapped(FactorSourceID)
-		case removeAuthenticationSigningFactorTapped
-		case showOverrideSectionButtonTapped
-		case hideOverrideSectionButtonTapped
-		case thresholdSelectorButtonTapped
+		case removeRecoveryFactorTapped(FactorSourceID)
+		case removeConfirmationFactorTapped(FactorSourceID)
 		case invalidCombinationReadMoreTapped
+		case selectFallbackButtonTapped
+		case fallbackInfoButtonTapped
 	}
 
 	enum InternalAction: Equatable, Sendable {
@@ -42,12 +39,12 @@ struct PrimaryRoleSetup: FeatureReducer, Sendable {
 	struct Destination: DestinationReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
-			case selectNumberOfFactorsView
+			case selectEmergencyFallbackPeriod
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
-			case selectNumberOfFactorsView(SelectNumberOfFactorsView.Action)
+			case selectEmergencyFallbackPeriod(SelectEmergencyFallbackPeriodView.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -82,44 +79,28 @@ struct PrimaryRoleSetup: FeatureReducer, Sendable {
 			overlayWindowClient.showInfoLink(.init(glossaryItem: .buildingshield))
 			return .none
 
-		case let .removeThresholdFactorTapped(id):
+		case let .removeRecoveryFactorTapped(id):
 			state.$shieldBuilder.withLock { builder in
-				builder = builder.removeFactorFromPrimary(factorSourceId: id, factorListKind: .threshold)
+				builder = builder.removeFactorFromRecovery(factorSourceId: id)
 			}
 			return .none
 
-		case let .removeOverrideFactorTapped(id):
+		case let .removeConfirmationFactorTapped(id):
 			state.$shieldBuilder.withLock { builder in
-				builder = builder.removeFactorFromPrimary(factorSourceId: id, factorListKind: .override)
+				builder = builder.removeFactorFromConfirmation(factorSourceId: id)
 			}
-			return .none
-
-		case .removeAuthenticationSigningFactorTapped:
-			state.$shieldBuilder.withLock { builder in
-				builder = builder.setAuthenticationSigningFactor(new: nil)
-			}
-			return .none
-
-		case .showOverrideSectionButtonTapped:
-			state.isOverrideSectionExpanded = true
-			return .none
-
-		case .hideOverrideSectionButtonTapped:
-			state.isOverrideSectionExpanded = false
-			state.$shieldBuilder.withLock { builder in
-				// TODO: use removeAllFactorsFromPrimaryOverride
-				for overrideFactor in state.overrideFactors {
-					builder = builder.removeFactorFromPrimary(factorSourceId: overrideFactor.factorSourceID, factorListKind: .override)
-				}
-			}
-			return .none
-
-		case .thresholdSelectorButtonTapped:
-			state.destination = .selectNumberOfFactorsView
 			return .none
 
 		case let .addFactorSourceButtonTapped(context):
 			return .send(.delegate(.chooseFactorSource(context)))
+
+		case .selectFallbackButtonTapped:
+			state.destination = .selectEmergencyFallbackPeriod
+			return .none
+
+		case .fallbackInfoButtonTapped:
+			overlayWindowClient.showInfoLink(.init(glossaryItem: .emergencyfallback))
+			return .none
 
 		case .continueButtonTapped:
 			return .send(.delegate(.finished))
@@ -136,13 +117,14 @@ struct PrimaryRoleSetup: FeatureReducer, Sendable {
 
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case .selectNumberOfFactorsView(.close):
+		case .selectEmergencyFallbackPeriod(.close):
 			state.destination = nil
 			return .none
-		case let .selectNumberOfFactorsView(.set(threshold)):
+		case let .selectEmergencyFallbackPeriod(.set(period)):
 			state.destination = nil
 			state.$shieldBuilder.withLock { builder in
-				builder = builder.setThreshold(threshold: threshold)
+				// TODO: use `builder.setPeriodUntilAutoConfirm(..)`
+				builder = builder.setNumberOfDaysUntilAutoConfirm(numberOfDays: UInt16(period.days))
 			}
 			return .none
 		}

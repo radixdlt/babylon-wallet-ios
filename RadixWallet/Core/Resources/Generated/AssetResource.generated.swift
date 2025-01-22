@@ -143,6 +143,7 @@ internal enum AssetResource {
   internal static let prepareFactorSourcesAdd = ImageAsset(name: "prepareFactorSourcesAdd")
   internal static let prepareFactorSourcesCompletion = ImageAsset(name: "prepareFactorSourcesCompletion")
   internal static let prepareFactorSourcesIntro = ImageAsset(name: "prepareFactorSourcesIntro")
+  internal static let emergencyFallbackCalendar = ImageAsset(name: "emergencyFallbackCalendar")
   internal static let recoverySetup = ImageAsset(name: "recoverySetup")
   internal static let regularAccessSetup = ImageAsset(name: "regularAccessSetup")
   internal static let selectFactorSources = ImageAsset(name: "selectFactorSources")

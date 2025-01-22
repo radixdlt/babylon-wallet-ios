@@ -40,7 +40,7 @@ extension PrepareFactorSources.AddFactorSource {
 						.controlState(store.controlState)
 
 						if store.showNoHardwareDeviceInfo {
-							Button(L10n.ShieldSetupPrepareFactors.AddHardwareFactor.noDeviceButton) {
+							Button(L10n.InfoLink.Title.nohardwaredevice) {
 								// TODO: Handle the action and add a popup for skipping this step
 							}
 							.buttonStyle(.primaryText())
@@ -66,7 +66,7 @@ extension PrepareFactorSources.AddFactorSource {
 		private func messages(for kind: FactorSourceKind) -> [FactorSourceCardDataSource.Message] {
 			switch (kind, store.selected) {
 			case (.offDeviceMnemonic, .offDeviceMnemonic):
-				[.init(text: L10n.ShieldSetupPrepareFactors.AddAnotherFactor.passphraseHint, type: .warning)]
+				[.init(text: L10n.ShieldSetupPrepareFactors.AddAnotherFactor.offDeviceMnemonicHint, type: .warning)]
 			default:
 				[]
 			}
