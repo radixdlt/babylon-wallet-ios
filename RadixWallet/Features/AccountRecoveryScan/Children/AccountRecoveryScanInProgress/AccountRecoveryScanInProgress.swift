@@ -289,7 +289,7 @@ extension AccountRecoveryScanInProgress {
 				return .send(.delegate(.failed))
 			}
 		case let .createProfile(privateHDFactorSource):
-			source = .mnemonicWithPassphrase(privateHDFactorSource.mnemonicWithPassphrase)
+			source = .mnemonic(privateHDFactorSource.mnemonicWithPassphrase)
 		}
 
 		return .run { send in
