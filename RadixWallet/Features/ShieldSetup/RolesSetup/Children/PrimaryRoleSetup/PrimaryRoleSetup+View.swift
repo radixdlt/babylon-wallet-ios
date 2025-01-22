@@ -149,7 +149,6 @@ extension PrimaryRoleSetup {
 				{
 					statusMessageView(statusMessage)
 						.padding(.horizontal, .small1)
-						.padding(.vertical, .small2)
 						.onTapGesture {
 							if statusMessage.type == .warning {
 								store.send(.view(.unsafeCombinationReadMoreTapped))
@@ -158,7 +157,6 @@ extension PrimaryRoleSetup {
 				}
 			}
 			.foregroundStyle(.app.gray1)
-			.padding(.bottom, .medium2)
 		}
 
 		private var thresholdFactorsView: some SwiftUI.View {

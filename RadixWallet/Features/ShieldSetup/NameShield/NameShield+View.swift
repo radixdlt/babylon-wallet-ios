@@ -1,6 +1,6 @@
 extension NameShield.State {
 	var hint: Hint.ViewState? {
-		guard let sanitizedName, sanitizedName.count > Account.nameMaxLength else { return nil }
+		guard let sanitizedName, sanitizedName.count > DisplayName.maxLength else { return nil }
 		return .iconError(L10n.ShieldWizardName.tooLong)
 	}
 

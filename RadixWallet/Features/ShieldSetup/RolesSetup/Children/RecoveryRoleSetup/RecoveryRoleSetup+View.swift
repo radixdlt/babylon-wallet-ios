@@ -161,7 +161,6 @@ extension RecoveryRoleSetup {
 				emphasizedTextStyle: .body2Header
 			)
 			.padding(.horizontal, .small1)
-			.padding(.vertical, .medium3)
 			.flushedLeft
 		}
 
