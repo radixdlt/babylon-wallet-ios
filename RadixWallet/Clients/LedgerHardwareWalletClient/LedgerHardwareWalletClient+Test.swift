@@ -14,7 +14,6 @@ extension LedgerHardwareWalletClient: TestDependencyKey {
 		isConnectedToAnyConnectorExtension: unimplemented("\(Self.self).isConnectedToAnyConnectorExtension", placeholder: noop.isConnectedToAnyConnectorExtension),
 		getDeviceInfo: unimplemented("\(Self.self).getDeviceInfo"),
 		derivePublicKeys: unimplemented("\(Self.self).derivePublicKeys"),
-		newDerivePublicKeys: unimplemented("\(Self.self).newDerivePublicKeys"),
 		signTransaction: unimplemented("\(Self.self).signTransaction"),
 		newSignTransaction: unimplemented("\(Self.self).newSignTransaction"),
 		signPreAuthorization: unimplemented("\(Self.self).signPreAuthorization"),
@@ -32,10 +31,7 @@ extension LedgerHardwareWalletClient: TestDependencyKey {
 				model: .nanoS
 			)
 		},
-		derivePublicKeys: { _, _ in
-			[]
-		},
-		newDerivePublicKeys: { _ in [] },
+		derivePublicKeys: { _ in [] },
 		signTransaction: { _ in [] },
 		newSignTransaction: { _ in [] },
 		signPreAuthorization: { _ in [] },

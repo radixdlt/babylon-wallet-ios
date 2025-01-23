@@ -109,7 +109,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 			return signatures
 		}
 
-		let newDerivePublicKeys: NewDerivePublicKeys = { request in
+		let derivePublicKeys: DerivePublicKeys = { request in
 			try await makeRequest(
 				.derivePublicKeys(.init(
 					keysParameters: request.input.derivationPaths.map(\.keyParams),
@@ -239,20 +239,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.getDeviceInfo
 				)
 			},
-			derivePublicKeys: { keysParams, factorSource in
-				let response = try await makeRequest(
-					.derivePublicKeys(.init(
-						keysParameters: keysParams,
-						ledgerDevice: factorSource.device()
-					)),
-					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.derivePublicKeys
-				)
-
-				return try response.map {
-					try $0.hdPubKey()
-				}
-			},
-			newDerivePublicKeys: newDerivePublicKeys,
+			derivePublicKeys: derivePublicKeys,
 			signTransaction: { request in
 				let hashedMsg = request.transactionIntent.hash()
 				let compiledTransactionIntent = request.transactionIntent.compile()
@@ -404,6 +391,7 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.Signature
 // MARK: - InvalidSignature
 struct InvalidSignature: Swift.Error {}
 
+// TODO: Delete
 extension Signer {
 	var keyParams: [P2P.LedgerHardwareWallet.KeyParameters] {
 		factorInstancesRequiredToSign.compactMap {
@@ -433,7 +421,7 @@ private extension OwnedFactorInstance {
 private extension DerivationPath {
 	var keyParams: P2P.LedgerHardwareWallet.KeyParameters {
 		.init(
-			curve: curve.p2pCurve,
+			curve: curve.toLedger(),
 			derivationPath: toBip32String()
 		)
 	}

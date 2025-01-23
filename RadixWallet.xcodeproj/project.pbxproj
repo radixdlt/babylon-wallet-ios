@@ -152,8 +152,6 @@
 		48CFC2AA2ADC10D900E77A5C /* DappDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD0D2ADC10D800E77A5C /* DappDetails.swift */; };
 		48CFC2AB2ADC10D900E77A5C /* Home.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD102ADC10D800E77A5C /* Home.swift */; };
 		48CFC2AC2ADC10D900E77A5C /* Home+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD112ADC10D800E77A5C /* Home+View.swift */; };
-		48CFC2B12ADC10D900E77A5C /* DerivePublicKeys+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD1A2ADC10D800E77A5C /* DerivePublicKeys+View.swift */; };
-		48CFC2B22ADC10D900E77A5C /* DerivePublicKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD1B2ADC10D800E77A5C /* DerivePublicKeys.swift */; };
 		48CFC2B52ADC10D900E77A5C /* EncryptOrDecryptProfile+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD212ADC10D800E77A5C /* EncryptOrDecryptProfile+View.swift */; };
 		48CFC2B62ADC10D900E77A5C /* EncryptOrDecryptProfile+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD222ADC10D800E77A5C /* EncryptOrDecryptProfile+Reducer.swift */; };
 		48CFC2B72ADC10D900E77A5C /* ExportableProfileFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD232ADC10D800E77A5C /* ExportableProfileFile.swift */; };
@@ -698,8 +696,8 @@
 		5B1C4FD52BBB0B0C00B9436F /* AppsFlyerLib-Strict in Frameworks */ = {isa = PBXBuildFile; productRef = 5B1C4FD42BBB0B0C00B9436F /* AppsFlyerLib-Strict */; };
 		5B1C4FD82BBB0C1E00B9436F /* AppsFlyerClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1C4FD72BBB0C1E00B9436F /* AppsFlyerClient+Interface.swift */; };
 		5B1C4FDA2BBB0DCF00B9436F /* AppsFlyerClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1C4FD92BBB0DCF00B9436F /* AppsFlyerClient+Live.swift */; };
-		5B237A092D3A78AD00913209 /* NewDerivePublicKeys+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B237A082D3A78AD00913209 /* NewDerivePublicKeys+View.swift */; };
-		5B237A0A2D3A78AD00913209 /* NewDerivePublicKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B237A072D3A78AD00913209 /* NewDerivePublicKeys.swift */; };
+		5B237A092D3A78AD00913209 /* DerivePublicKeys+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B237A082D3A78AD00913209 /* DerivePublicKeys+View.swift */; };
+		5B237A0A2D3A78AD00913209 /* DerivePublicKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B237A072D3A78AD00913209 /* DerivePublicKeys.swift */; };
 		5B272DD72C36E89600B74F1F /* AppEventsClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B272DD62C36E89600B74F1F /* AppEventsClient+Interface.swift */; };
 		5B272DD92C36E93100B74F1F /* AppEventsClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B272DD82C36E93100B74F1F /* AppEventsClient+Live.swift */; };
 		5B272DDB2C36E9D300B74F1F /* AppEventsClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B272DDA2C36E9D300B74F1F /* AppEventsClient+Test.swift */; };
@@ -1467,8 +1465,6 @@
 		48CFBD0D2ADC10D800E77A5C /* DappDetails.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DappDetails.swift; sourceTree = "<group>"; };
 		48CFBD102ADC10D800E77A5C /* Home.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Home.swift; sourceTree = "<group>"; };
 		48CFBD112ADC10D800E77A5C /* Home+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+View.swift"; sourceTree = "<group>"; };
-		48CFBD1A2ADC10D800E77A5C /* DerivePublicKeys+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DerivePublicKeys+View.swift"; sourceTree = "<group>"; };
-		48CFBD1B2ADC10D800E77A5C /* DerivePublicKeys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DerivePublicKeys.swift; sourceTree = "<group>"; };
 		48CFBD212ADC10D800E77A5C /* EncryptOrDecryptProfile+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "EncryptOrDecryptProfile+View.swift"; sourceTree = "<group>"; };
 		48CFBD222ADC10D800E77A5C /* EncryptOrDecryptProfile+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "EncryptOrDecryptProfile+Reducer.swift"; sourceTree = "<group>"; };
 		48CFBD232ADC10D800E77A5C /* ExportableProfileFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExportableProfileFile.swift; sourceTree = "<group>"; };
@@ -1991,8 +1987,8 @@
 		5B135B3A2C7636FD004AAD2E /* HiddenEntities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HiddenEntities.swift; sourceTree = "<group>"; };
 		5B1C4FD72BBB0C1E00B9436F /* AppsFlyerClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppsFlyerClient+Interface.swift"; sourceTree = "<group>"; };
 		5B1C4FD92BBB0DCF00B9436F /* AppsFlyerClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppsFlyerClient+Live.swift"; sourceTree = "<group>"; };
-		5B237A072D3A78AD00913209 /* NewDerivePublicKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewDerivePublicKeys.swift; sourceTree = "<group>"; };
-		5B237A082D3A78AD00913209 /* NewDerivePublicKeys+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NewDerivePublicKeys+View.swift"; sourceTree = "<group>"; };
+		5B237A072D3A78AD00913209 /* DerivePublicKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerivePublicKeys.swift; sourceTree = "<group>"; };
+		5B237A082D3A78AD00913209 /* DerivePublicKeys+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DerivePublicKeys+View.swift"; sourceTree = "<group>"; };
 		5B272DD62C36E89600B74F1F /* AppEventsClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppEventsClient+Interface.swift"; sourceTree = "<group>"; };
 		5B272DD82C36E93100B74F1F /* AppEventsClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppEventsClient+Live.swift"; sourceTree = "<group>"; };
 		5B272DDA2C36E9D300B74F1F /* AppEventsClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppEventsClient+Test.swift"; sourceTree = "<group>"; };
@@ -3319,10 +3315,8 @@
 		48CFBD192ADC10D800E77A5C /* DerivePublicKeys */ = {
 			isa = PBXGroup;
 			children = (
-				48CFBD1A2ADC10D800E77A5C /* DerivePublicKeys+View.swift */,
-				48CFBD1B2ADC10D800E77A5C /* DerivePublicKeys.swift */,
-				5B237A072D3A78AD00913209 /* NewDerivePublicKeys.swift */,
-				5B237A082D3A78AD00913209 /* NewDerivePublicKeys+View.swift */,
+				5B237A072D3A78AD00913209 /* DerivePublicKeys.swift */,
+				5B237A082D3A78AD00913209 /* DerivePublicKeys+View.swift */,
 			);
 			path = DerivePublicKeys;
 			sourceTree = "<group>";
@@ -7556,7 +7550,6 @@
 				A40815AD2C7E0D08005E65B9 /* NativeResourceAccountOwnerBadgeValue.swift in Sources */,
 				48CFC36F2ADC10D900E77A5C /* FungibleAssetList+View.swift in Sources */,
 				48CFC4032ADC10D900E77A5C /* KeychainClient+Mocked.swift in Sources */,
-				48CFC2B12ADC10D900E77A5C /* DerivePublicKeys+View.swift in Sources */,
 				48CFC3212ADC10D900E77A5C /* NewConnection+Reducer.swift in Sources */,
 				A40816482C7E0D08005E65B9 /* TransactionPayloadStatus.swift in Sources */,
 				48CFC5C92ADC10DA00E77A5C /* StackedViewsLayout.swift in Sources */,
@@ -8652,7 +8645,6 @@
 				5BBC7DA82C40278E00B04BD6 /* NonFungibleResourceAsset+Reducer.swift in Sources */,
 				48CFC3622ADC10D900E77A5C /* LedgerHardwareDevices+Reducer.swift in Sources */,
 				A40816392C7E0D08005E65B9 /* StreamTransactionsRequestEventFilterItem.swift in Sources */,
-				48CFC2B22ADC10D900E77A5C /* DerivePublicKeys.swift in Sources */,
 				A40815F02C7E0D08005E65B9 /* ResourceHoldersCollectionFungibleResourceItem.swift in Sources */,
 				A40816622C7E0D08005E65B9 /* ValidatorUptimeCollection.swift in Sources */,
 				48CFC34D2ADC10D900E77A5C /* Login.swift in Sources */,
@@ -8671,8 +8663,8 @@
 				48CFC45A2ADC10DA00E77A5C /* LedgerHardwareWalletClient+Test.swift in Sources */,
 				48CFC29B2ADC10D900E77A5C /* InteractionReviewDapps.swift in Sources */,
 				48CFC3532ADC10D900E77A5C /* DappInteractor+ViewModifier.swift in Sources */,
-				5B237A092D3A78AD00913209 /* NewDerivePublicKeys+View.swift in Sources */,
-				5B237A0A2D3A78AD00913209 /* NewDerivePublicKeys.swift in Sources */,
+				5B237A092D3A78AD00913209 /* DerivePublicKeys+View.swift in Sources */,
+				5B237A0A2D3A78AD00913209 /* DerivePublicKeys.swift in Sources */,
 				48CFC40C2ADC10DA00E77A5C /* UserDefaults+Dependency+Extension.swift in Sources */,
 				48CFC2442ADC10D900E77A5C /* ThirdPartyDeposits+Reducer.swift in Sources */,
 				48CFC3F62ADC10D900E77A5C /* ClientMessage.swift in Sources */,

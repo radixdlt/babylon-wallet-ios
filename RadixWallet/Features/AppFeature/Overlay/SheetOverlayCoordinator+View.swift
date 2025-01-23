@@ -33,7 +33,7 @@ extension SheetOverlayCoordinator {
 					CaseLet(
 						/SheetOverlayCoordinator.Root.State.derivePublicKeys,
 						action: SheetOverlayCoordinator.Root.Action.derivePublicKeys,
-						then: { NewDerivePublicKeys.View(store: $0) }
+						then: { DerivePublicKeys.View(store: $0) }
 					)
 				}
 			}
