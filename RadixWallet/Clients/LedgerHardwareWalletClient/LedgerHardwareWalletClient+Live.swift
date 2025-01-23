@@ -411,10 +411,7 @@ extension CasePath: Sendable where Root: Sendable, Value: Sendable {}
 
 private extension OwnedFactorInstance {
 	var keyParams: P2P.LedgerHardwareWallet.KeyParameters {
-		.init(
-			curve: factorInstance.publicKey.curve.toLedger(),
-			derivationPath: factorInstance.derivationPath.toString()
-		)
+		factorInstance.derivationPath.keyParams
 	}
 }
 
