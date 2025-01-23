@@ -196,6 +196,8 @@ extension CreateAccountCoordinator {
 			}
 
 			let updated = await getThirdPartyDepositSettings(account: account)
+			// TODO: Remove once this is implemented in Sargon (https://radixdlt.atlassian.net/browse/ABW-4147)
+			try? await SargonOS.shared.updateAccount(updated: updated)
 			await send(.internal(.handleAccountCreated(updated)))
 		} catch: { error, _ in
 			errorQueue.schedule(error)
