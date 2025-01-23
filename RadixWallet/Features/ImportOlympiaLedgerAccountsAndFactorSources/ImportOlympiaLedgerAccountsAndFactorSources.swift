@@ -44,7 +44,6 @@ struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureReducer {
 			case noP2PLink(NoP2PLinkAlert)
 			case addNewP2PLink(NewConnection.Action)
 			case nameLedger(ImportOlympiaNameLedger.Action)
-			case derivePublicKeys(DerivePublicKeys.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -354,19 +353,5 @@ struct OlympiaAccountsValidation: Sendable, Hashable {
 	init(validated: Set<OlympiaAccountToMigrate>, unvalidated: Set<OlympiaAccountToMigrate>) {
 		self.validated = validated
 		self.unvalidated = unvalidated
-	}
-}
-
-// MARK: - DerivePublicKeys.State
-extension DerivePublicKeys.State {
-	fileprivate init(ledger: LedgerHardwareWalletFactorSource, olympiaAccounts: Set<OlympiaAccountToMigrate>, networkID: NetworkID) {
-		self.init(
-			derivationPathOption: .knownPaths(
-				olympiaAccounts.map(\.path.asDerivationPath),
-				networkID: networkID
-			),
-			factorSourceOption: .specific(ledger.asGeneral),
-			purpose: .importLegacyAccounts
-		)
 	}
 }
