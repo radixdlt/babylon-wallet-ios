@@ -102,6 +102,7 @@ extension SelectFactorSources {
 					store.send(.view(.skipButtonTapped))
 				}
 				.buttonStyle(.primaryText())
+				.multilineTextAlignment(.center)
 				.padding(.vertical, .medium2)
 
 				Spacer()

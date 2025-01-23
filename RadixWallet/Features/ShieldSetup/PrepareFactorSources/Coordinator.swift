@@ -30,7 +30,7 @@ extension PrepareFactorSources {
 		}
 
 		enum DelegateAction: Sendable, Equatable {
-			case finished(shouldBuildEmptyShield: Bool)
+			case finished(shouldSkipAutomaticShield: Bool)
 			case push(Path.State)
 		}
 
@@ -71,7 +71,7 @@ extension PrepareFactorSources {
 			case .introButtonTapped:
 				determineNextStepEffect()
 			case .completionButtonTapped:
-				.send(.delegate(.finished(shouldBuildEmptyShield: false)))
+				.send(.delegate(.finished(shouldSkipAutomaticShield: false)))
 			}
 		}
 
@@ -79,8 +79,8 @@ extension PrepareFactorSources {
 			switch childAction {
 			case let .path(.addFactor(.delegate(.addFactorSource(kind)))):
 				addFactorSourceEffect(&state, kind: kind)
-			case let .path(.addFactor(.delegate(.skipAndCreateEmptyShield))):
-				.send(.delegate(.finished(shouldBuildEmptyShield: true)))
+			case .path(.addFactor(.delegate(.skipAutomaticShield))):
+				.send(.delegate(.finished(shouldSkipAutomaticShield: true)))
 			default:
 				.none
 			}

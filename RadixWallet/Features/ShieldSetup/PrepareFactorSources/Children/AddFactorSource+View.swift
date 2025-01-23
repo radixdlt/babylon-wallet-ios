@@ -48,6 +48,7 @@ extension PrepareFactorSources.AddFactorSource {
 							store.send(.view(.skipButtonTapped))
 						}
 						.buttonStyle(.primaryText())
+						.multilineTextAlignment(.center)
 					}
 				}
 			}

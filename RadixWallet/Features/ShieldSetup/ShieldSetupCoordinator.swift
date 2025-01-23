@@ -60,8 +60,8 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 		case let .path(.element(id: _, action: .prepareFactors(.delegate(.push(path))))):
 			state.path.append(.prepareFactors(.init(path: path)))
 			return .none
-		case let .path(.element(id: _, action: .prepareFactors(.delegate(.finished(shouldBuildEmptyShield))))):
-			if shouldBuildEmptyShield {
+		case let .path(.element(id: _, action: .prepareFactors(.delegate(.finished(shouldSkipAutomaticShield))))):
+			if shouldSkipAutomaticShield {
 				state.$shieldBuilder.initialize()
 				state.path.append(.rolesSetup(.init()))
 				return .none
