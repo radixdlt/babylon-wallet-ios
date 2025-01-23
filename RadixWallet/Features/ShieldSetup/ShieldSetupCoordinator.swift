@@ -78,7 +78,6 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 			state.path.append(.nameShield(.init()))
 			return .none
 		case .path(.element(id: _, action: .nameShield(.delegate(.finished)))):
-			// TODO: Apply shield flow
 			return .send(.delegate(.finished))
 		default:
 			return .none
