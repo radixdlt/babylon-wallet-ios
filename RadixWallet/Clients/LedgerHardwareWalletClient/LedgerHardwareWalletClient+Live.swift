@@ -434,7 +434,7 @@ private extension DerivationPath {
 	var keyParams: P2P.LedgerHardwareWallet.KeyParameters {
 		.init(
 			curve: curve.p2pCurve,
-			derivationPath: toString()
+			derivationPath: toBip32String()
 		)
 	}
 }
