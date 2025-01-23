@@ -1,15 +1,15 @@
 import SwiftUI
 
-// MARK: - PrepareFactorSources.AddFactorSource.View
-extension PrepareFactorSources.AddFactorSource {
+// MARK: - AddShieldBuilderSeedingFactors.AddFactorSource.View
+extension AddShieldBuilderSeedingFactors.AddFactorSource {
 	struct View: SwiftUI.View {
-		let store: StoreOf<PrepareFactorSources.AddFactorSource>
+		let store: StoreOf<AddShieldBuilderSeedingFactors.AddFactorSource>
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				ScrollView {
 					VStack(spacing: .large2) {
-						Image(.prepareFactorSourcesAdd)
+						Image(.addShieldBuilderSeedingFactorsAdd)
 
 						Text(store.title)
 							.textStyle(.sheetTitle)
@@ -78,7 +78,7 @@ extension PrepareFactorSources.AddFactorSource {
 	}
 }
 
-private extension PrepareFactorSources.AddFactorSource.State {
+private extension AddShieldBuilderSeedingFactors.AddFactorSource.State {
 	var title: String {
 		switch mode {
 		case .hardware:

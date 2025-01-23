@@ -1,5 +1,5 @@
-// MARK: - PrepareFactorSources.AddFactorSource
-extension PrepareFactorSources {
+// MARK: - AddShieldBuilderSeedingFactors.AddFactorSource
+extension AddShieldBuilderSeedingFactors {
 	@Reducer
 	struct AddFactorSource: Sendable, FeatureReducer {
 		@ObservableState
@@ -42,8 +42,8 @@ extension PrepareFactorSources {
 	}
 }
 
-// MARK: - PrepareFactorSources.AddFactorSource.State.Mode
-extension PrepareFactorSources.AddFactorSource.State {
+// MARK: - AddShieldBuilderSeedingFactors.AddFactorSource.State.Mode
+extension AddShieldBuilderSeedingFactors.AddFactorSource.State {
 	enum Mode {
 		case hardware
 		case any

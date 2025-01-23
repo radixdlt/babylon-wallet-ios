@@ -1,7 +1,7 @@
 import ComposableArchitecture
 import SwiftUI
 
-extension SelectFactorSources.State {
+extension PickShieldBuilderSeedingFactors.State {
 	var selectedFactorSourcesStatus: SelectedPrimaryThresholdFactorsStatus {
 		shieldBuilder.selectedPrimaryThresholdFactorsStatus()
 	}
@@ -28,10 +28,10 @@ extension SelectFactorSources.State {
 	}
 }
 
-// MARK: - SelectFactorSources.View
-extension SelectFactorSources {
+// MARK: - PickShieldBuilderSeedingFactors.View
+extension PickShieldBuilderSeedingFactors {
 	struct View: SwiftUI.View {
-		@Perception.Bindable var store: StoreOf<SelectFactorSources>
+		@Perception.Bindable var store: StoreOf<PickShieldBuilderSeedingFactors>
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
@@ -111,7 +111,7 @@ extension SelectFactorSources {
 
 		private var topView: some SwiftUI.View {
 			VStack(spacing: .small1) {
-				Image(.selectFactorSources)
+				Image(.pickShieldBuilderSeedingFactors)
 
 				Text(L10n.ShieldSetupSelectFactors.title)
 					.textStyle(.sheetTitle)

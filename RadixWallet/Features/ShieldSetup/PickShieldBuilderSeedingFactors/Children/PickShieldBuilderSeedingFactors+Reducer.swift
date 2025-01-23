@@ -1,8 +1,8 @@
 import ComposableArchitecture
 
-// MARK: - SelectFactorSources
+// MARK: - PickShieldBuilderSeedingFactors
 @Reducer
-struct SelectFactorSources: FeatureReducer, Sendable {
+struct PickShieldBuilderSeedingFactors: FeatureReducer, Sendable {
 	@ObservableState
 	struct State: Hashable, Sendable {
 		@Shared(.shieldBuilder) var shieldBuilder
