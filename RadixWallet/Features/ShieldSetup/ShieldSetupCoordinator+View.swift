@@ -11,12 +11,14 @@ extension ShieldSetupCoordinator {
 					ShieldSetupOnboarding.View(store: store.onboarding)
 				} destination: { destination in
 					switch destination.case {
-					case let .prepareFactors(store):
-						PrepareFactorSources.Coordinator.View(store: store)
-					case let .selectFactors(store):
-						SelectFactorSourcesCoordinator.View(store: store)
+					case let .addShieldBuilderSeedingFactors(store):
+						AddShieldBuilderSeedingFactors.Coordinator.View(store: store)
+					case let .pickShieldBuilderSeedingFactors(store):
+						PickShieldBuilderSeedingFactorsCoordinator.View(store: store)
 					case let .rolesSetup(store):
 						RolesSetupCoordinator.View(store: store)
+					case let .nameShield(store):
+						NameShield.View(store: store)
 					}
 				}
 			}

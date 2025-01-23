@@ -16,8 +16,6 @@ extension HdPathComponent: Comparable {
 }
 
 extension Account {
-	static let nameMaxLength = 30
-
 	var derivationIndex: HdPathComponent {
 		switch securityState {
 		case let .unsecured(uec): uec.transactionSigning.derivationPath.lastPathComponent

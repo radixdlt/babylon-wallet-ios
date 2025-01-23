@@ -1,5 +1,5 @@
-// MARK: - PrepareFactorSources.AddFactorSource
-extension PrepareFactorSources {
+// MARK: - AddShieldBuilderSeedingFactors.AddFactorSource
+extension AddShieldBuilderSeedingFactors {
 	@Reducer
 	struct AddFactorSource: Sendable, FeatureReducer {
 		@ObservableState
@@ -13,10 +13,12 @@ extension PrepareFactorSources {
 		enum ViewAction: Sendable, Equatable {
 			case selected(FactorSourceKind)
 			case addButtonTapped
+			case skipButtonTapped
 		}
 
 		enum DelegateAction: Sendable, Equatable {
 			case addFactorSource(FactorSourceKind)
+			case skipAutomaticShield
 		}
 
 		var body: some ReducerOf<Self> {
@@ -33,13 +35,15 @@ extension PrepareFactorSources {
 					return .none
 				}
 				return .send(.delegate(.addFactorSource(selected)))
+			case .skipButtonTapped:
+				return .send(.delegate(.skipAutomaticShield))
 			}
 		}
 	}
 }
 
-// MARK: - PrepareFactorSources.AddFactorSource.State.Mode
-extension PrepareFactorSources.AddFactorSource.State {
+// MARK: - AddShieldBuilderSeedingFactors.AddFactorSource.State.Mode
+extension AddShieldBuilderSeedingFactors.AddFactorSource.State {
 	enum Mode {
 		case hardware
 		case any

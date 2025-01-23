@@ -1,7 +1,7 @@
 import ComposableArchitecture
 import SwiftUI
 
-extension SelectFactorSources.State {
+extension PickShieldBuilderSeedingFactors.State {
 	var selectedFactorSourcesStatus: SelectedPrimaryThresholdFactorsStatus {
 		shieldBuilder.selectedPrimaryThresholdFactorsStatus()
 	}
@@ -9,11 +9,11 @@ extension SelectFactorSources.State {
 	var statusMessageInfo: ShieldStatusMessageInfo? {
 		switch selectedFactorSourcesStatus {
 		case .invalid:
-			.init(type: .error, text: L10n.ShieldSetupStatus.invalidCombination)
+			.general(type: .error, text: L10n.ShieldSetupStatus.invalidCombination)
 		case .insufficient:
-			.init(type: .error, text: L10n.ShieldSetupStatus.SelectFactors.atLeastOneFactor)
+			.general(type: .error, text: L10n.ShieldSetupStatus.SelectFactors.atLeastOneFactor)
 		case .suboptimal:
-			.init(type: .warning, text: L10n.ShieldSetupStatus.recommendedFactors)
+			.general(type: .warning, text: L10n.ShieldSetupStatus.recommendedFactors)
 		case .optimal:
 			nil
 		}
@@ -28,16 +28,17 @@ extension SelectFactorSources.State {
 	}
 }
 
-// MARK: - SelectFactorSources.View
-extension SelectFactorSources {
+// MARK: - PickShieldBuilderSeedingFactors.View
+extension PickShieldBuilderSeedingFactors {
 	struct View: SwiftUI.View {
-		@Perception.Bindable var store: StoreOf<SelectFactorSources>
+		@Perception.Bindable var store: StoreOf<PickShieldBuilderSeedingFactors>
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				ScrollView {
 					coreView
 						.padding(.horizontal, .medium3)
+						.padding(.bottom, .medium2)
 						.animation(.default, value: store.statusMessageInfo?.type)
 						.animation(.default, value: store.shouldShowPasswordMessage)
 				}
@@ -97,13 +98,20 @@ extension SelectFactorSources {
 					}
 				}
 
+				Button(L10n.ShieldSetupSelectFactors.skipButtonTitle) {
+					store.send(.view(.skipButtonTapped))
+				}
+				.buttonStyle(.primaryText())
+				.multilineTextAlignment(.center)
+				.padding(.vertical, .medium2)
+
 				Spacer()
 			}
 		}
 
 		private var topView: some SwiftUI.View {
 			VStack(spacing: .small1) {
-				Image(.selectFactorSources)
+				Image(.pickShieldBuilderSeedingFactors)
 
 				Text(L10n.ShieldSetupSelectFactors.title)
 					.textStyle(.sheetTitle)

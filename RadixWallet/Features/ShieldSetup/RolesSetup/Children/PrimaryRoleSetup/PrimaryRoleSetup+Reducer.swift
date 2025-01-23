@@ -27,7 +27,7 @@ struct PrimaryRoleSetup: FeatureReducer, Sendable {
 		case showOverrideSectionButtonTapped
 		case hideOverrideSectionButtonTapped
 		case thresholdSelectorButtonTapped
-		case invalidCombinationReadMoreTapped
+		case unsafeCombinationReadMoreTapped
 	}
 
 	enum InternalAction: Equatable, Sendable {
@@ -78,7 +78,7 @@ struct PrimaryRoleSetup: FeatureReducer, Sendable {
 				errorQueue.schedule(error)
 			}
 
-		case .invalidCombinationReadMoreTapped:
+		case .unsafeCombinationReadMoreTapped:
 			overlayWindowClient.showInfoLink(.init(glossaryItem: .buildingshield))
 			return .none
 
@@ -107,10 +107,7 @@ struct PrimaryRoleSetup: FeatureReducer, Sendable {
 		case .hideOverrideSectionButtonTapped:
 			state.isOverrideSectionExpanded = false
 			state.$shieldBuilder.withLock { builder in
-				// TODO: use removeAllFactorsFromPrimaryOverride
-				for overrideFactor in state.overrideFactors {
-					builder = builder.removeFactorFromPrimary(factorSourceId: overrideFactor.factorSourceID, factorListKind: .override)
-				}
+				builder = builder.removeAllFactorsFromPrimaryOverride()
 			}
 			return .none
 
