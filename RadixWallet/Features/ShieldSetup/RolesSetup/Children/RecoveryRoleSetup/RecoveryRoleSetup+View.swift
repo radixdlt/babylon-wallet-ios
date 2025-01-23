@@ -79,6 +79,18 @@ extension RecoveryRoleSetup {
 			VStack(spacing: .medium2) {
 				VStack(spacing: .medium1) {
 					topView
+
+					if let statusMessage = store.statusMessageInfo,
+					   statusMessage.contexts.contains(.general)
+					{
+						statusMessageView(statusMessage)
+							.onTapGesture {
+								if statusMessage.type == .warning {
+									store.send(.view(.unsafeCombinationReadMoreTapped))
+								}
+							}
+					}
+
 					recoverySection
 				}
 				.padding(.horizontal, .medium2)
@@ -102,7 +114,6 @@ extension RecoveryRoleSetup {
 					.multilineTextAlignment(.center)
 			}
 			.foregroundStyle(.app.gray1)
-			.padding(.bottom, .medium2)
 		}
 
 		private var recoverySection: some SwiftUI.View {
@@ -114,14 +125,9 @@ extension RecoveryRoleSetup {
 				.padding(.bottom, .small2)
 
 				if let statusMessage = store.statusMessageInfo,
-				   statusMessage.contexts.contains(where: [ShieldStatusMessageInfo.Context.general, .recoveryRole].contains)
+				   statusMessage.contexts.contains(.recoveryRole)
 				{
 					statusMessageView(statusMessage)
-						.onTapGesture {
-							if statusMessage.type == .warning {
-								store.send(.view(.unsafeCombinationReadMoreTapped))
-							}
-						}
 				}
 
 				factorSourcesContainer(factorSources: store.recoveryFactors, section: .recovery)
