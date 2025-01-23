@@ -197,6 +197,8 @@ extension DappToWalletInteraction {
 			[
 				.signSubintent(items.request),
 			]
+		case let .batchOfTransactions(items):
+			fatalError("TODO")
 		}
 	}
 }
@@ -346,6 +348,9 @@ extension WalletToDappInteractionSuccessResponse {
 				interactionId: interaction.interactionId,
 				items: .preAuthorization(preAuthorization)
 			)
+
+		case .batchOfTransactions:
+			fatalError("TODO")
 		}
 	}
 }

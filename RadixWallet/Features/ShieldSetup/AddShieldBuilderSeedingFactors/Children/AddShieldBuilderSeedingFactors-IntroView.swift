@@ -1,12 +1,12 @@
 import SwiftUI
 
-extension PrepareFactorSources {
+extension AddShieldBuilderSeedingFactors {
 	struct IntroView: SwiftUI.View {
 		let action: () -> Void
 
 		var body: some SwiftUI.View {
 			VStack(spacing: .large2) {
-				Image(.prepareFactorSourcesIntro)
+				Image(.addShieldBuilderSeedingFactorsIntro)
 
 				Text(L10n.ShieldSetupPrepareFactors.Intro.title)
 					.textStyle(.sheetTitle)

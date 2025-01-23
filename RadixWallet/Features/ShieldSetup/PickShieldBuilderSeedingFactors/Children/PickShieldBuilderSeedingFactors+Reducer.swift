@@ -1,8 +1,8 @@
 import ComposableArchitecture
 
-// MARK: - SelectFactorSources
+// MARK: - PickShieldBuilderSeedingFactors
 @Reducer
-struct SelectFactorSources: FeatureReducer, Sendable {
+struct PickShieldBuilderSeedingFactors: FeatureReducer, Sendable {
 	@ObservableState
 	struct State: Hashable, Sendable {
 		@Shared(.shieldBuilder) var shieldBuilder
@@ -28,6 +28,7 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 		case selectedFactorSourcesChanged([FactorSource]?)
 		case continueButtonTapped
 		case invalidReadMoreTapped
+		case skipButtonTapped
 	}
 
 	enum InternalAction: Equatable, Sendable {
@@ -86,6 +87,10 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 		case .invalidReadMoreTapped:
 			overlayWindowClient.showInfoLink(.init(glossaryItem: .buildingshield))
 			return .none
+
+		case .skipButtonTapped:
+			state.$shieldBuilder.initialize()
+			return .send(.delegate(.finished))
 		}
 	}
 
@@ -102,4 +107,26 @@ struct SelectFactorSources: FeatureReducer, Sendable {
 struct ShieldStatusMessageInfo: Hashable, Sendable {
 	let type: StatusMessageView.ViewType
 	let text: String
+	let contexts: [Context]
+}
+
+// MARK: ShieldStatusMessageInfo.Context
+extension ShieldStatusMessageInfo {
+	enum Context {
+		case general
+		case primaryRole
+		case recoveryRole
+		case confirmationRole
+		case authenticationRole
+	}
+}
+
+extension ShieldStatusMessageInfo {
+	static func general(type: StatusMessageView.ViewType, text: String) -> Self {
+		.init(
+			type: type,
+			text: text,
+			contexts: [.general]
+		)
+	}
 }
