@@ -6,7 +6,6 @@ struct ProofOfOwnership: Sendable, FeatureReducer {
 		let kind: Kind
 		let dappMetadata: DappMetadata
 		let challenge: DappToWalletInteractionAuthChallengeNonce
-		var sign: SignProofOfOwnership.State
 
 		var persona: Persona?
 		var accounts: Accounts = []
@@ -18,7 +17,6 @@ struct ProofOfOwnership: Sendable, FeatureReducer {
 		) {
 			self.kind = .persona(identityAddress)
 			self.dappMetadata = dappMetadata
-			self.sign = .init(dappMetadata: dappMetadata, challenge: challenge)
 			self.challenge = challenge
 		}
 
@@ -29,7 +27,6 @@ struct ProofOfOwnership: Sendable, FeatureReducer {
 		) {
 			self.kind = .accounts(accountAddresses)
 			self.dappMetadata = dappMetadata
-			self.sign = .init(dappMetadata: dappMetadata, challenge: challenge)
 			self.challenge = challenge
 		}
 	}
@@ -53,19 +50,10 @@ struct ProofOfOwnership: Sendable, FeatureReducer {
 		case failedToSign
 	}
 
-	@CasePathable
-	enum ChildAction: Sendable, Equatable {
-		case sign(SignProofOfOwnership.Action)
-	}
-
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.accountsClient) var accountsClient
 
 	var body: some ReducerOf<Self> {
-		Scope(state: \.sign, action: \.child.sign) {
-			SignProofOfOwnership()
-		}
-
 		Reduce(core)
 	}
 

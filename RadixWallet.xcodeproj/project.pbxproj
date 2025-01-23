@@ -734,8 +734,6 @@
 		5B45E2FF2BC59780007C4C84 /* SignWithFactorSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B45E2FD2BC59780007C4C84 /* SignWithFactorSource.swift */; };
 		5B45E3012BC5A491007C4C84 /* FactorSourceAccess+ViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B45E3002BC5A491007C4C84 /* FactorSourceAccess+ViewState.swift */; };
 		5B4712CC2C526146003B4712 /* HeaderButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4712CB2C526146003B4712 /* HeaderButtonStyle.swift */; };
-		5B4A1AB32CBFC99200679EE6 /* SignProofOfOwnership.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4A1AB22CBFC98B00679EE6 /* SignProofOfOwnership.swift */; };
-		5B4A1AB62CBFCFCF00679EE6 /* SignProofOfOwnership+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4A1AB52CBFCFC200679EE6 /* SignProofOfOwnership+View.swift */; };
 		5B4A1ABA2CBFEBB000679EE6 /* ProofOfOwnership+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4A1AB92CBFEBB000679EE6 /* ProofOfOwnership+View.swift */; };
 		5B4A1ABB2CBFEBB000679EE6 /* ProofOfOwnership.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4A1AB82CBFEBB000679EE6 /* ProofOfOwnership.swift */; };
 		5B4A1ABF2CC00FB800679EE6 /* PreAuthorizationReview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4A1ABD2CC00FB800679EE6 /* PreAuthorizationReview.swift */; };
@@ -2025,8 +2023,6 @@
 		5B45E2FD2BC59780007C4C84 /* SignWithFactorSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignWithFactorSource.swift; sourceTree = "<group>"; };
 		5B45E3002BC5A491007C4C84 /* FactorSourceAccess+ViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactorSourceAccess+ViewState.swift"; sourceTree = "<group>"; };
 		5B4712CB2C526146003B4712 /* HeaderButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderButtonStyle.swift; sourceTree = "<group>"; };
-		5B4A1AB22CBFC98B00679EE6 /* SignProofOfOwnership.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignProofOfOwnership.swift; sourceTree = "<group>"; };
-		5B4A1AB52CBFCFC200679EE6 /* SignProofOfOwnership+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SignProofOfOwnership+View.swift"; sourceTree = "<group>"; };
 		5B4A1AB82CBFEBB000679EE6 /* ProofOfOwnership.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProofOfOwnership.swift; sourceTree = "<group>"; };
 		5B4A1AB92CBFEBB000679EE6 /* ProofOfOwnership+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProofOfOwnership+View.swift"; sourceTree = "<group>"; };
 		5B4A1ABD2CC00FB800679EE6 /* PreAuthorizationReview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreAuthorizationReview.swift; sourceTree = "<group>"; };
@@ -5683,21 +5679,11 @@
 			path = FactorSourceAccess;
 			sourceTree = "<group>";
 		};
-		5B4A1AB42CBFCFA100679EE6 /* SignProofOfOwnership */ = {
-			isa = PBXGroup;
-			children = (
-				5B4A1AB22CBFC98B00679EE6 /* SignProofOfOwnership.swift */,
-				5B4A1AB52CBFCFC200679EE6 /* SignProofOfOwnership+View.swift */,
-			);
-			path = SignProofOfOwnership;
-			sourceTree = "<group>";
-		};
 		5B4A1AB72CBFEB9700679EE6 /* ProofOfOwnership */ = {
 			isa = PBXGroup;
 			children = (
 				5B4A1AB82CBFEBB000679EE6 /* ProofOfOwnership.swift */,
 				5B4A1AB92CBFEBB000679EE6 /* ProofOfOwnership+View.swift */,
-				5B4A1AB42CBFCFA100679EE6 /* SignProofOfOwnership */,
 			);
 			path = ProofOfOwnership;
 			sourceTree = "<group>";
@@ -7618,7 +7604,6 @@
 				A40816472C7E0D08005E65B9 /* TransactionPayloadGatewayHandlingStatus.swift in Sources */,
 				48CFC34E2ADC10D900E77A5C /* Login+View.swift in Sources */,
 				48CFC3122ADC10D900E77A5C /* AccountsToImport.swift in Sources */,
-				5B4A1AB32CBFC99200679EE6 /* SignProofOfOwnership.swift in Sources */,
 				E62449D62AFBA61100272C67 /* Home+AccountRow+View.swift in Sources */,
 				A40816682C7F14D4005E65B9 /* InfoLinkSheet+Reducer.swift in Sources */,
 				A408154D2C7E0D08005E65B9 /* Extensions.swift in Sources */,
@@ -8154,7 +8139,6 @@
 				A40815592C7E0D08005E65B9 /* AccountDepositPreValidationRequest.swift in Sources */,
 				A40815BA2C7E0D08005E65B9 /* NativeResourceTwoResourcePoolUnitValue.swift in Sources */,
 				48CFC4372ADC10DA00E77A5C /* JSONDecoder+Live.swift in Sources */,
-				5B4A1AB62CBFCFCF00679EE6 /* SignProofOfOwnership+View.swift in Sources */,
 				A40815CC2C7E0D08005E65B9 /* PackageBlueprintCollectionItem.swift in Sources */,
 				83EE48E22B8F69D6006CE672 /* ResourceAmount.swift in Sources */,
 				48CFC6032ADC10DA00E77A5C /* P2P+ConnectorExtension+Response.swift in Sources */,

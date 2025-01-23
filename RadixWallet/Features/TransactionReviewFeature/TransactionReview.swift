@@ -122,7 +122,6 @@ struct TransactionReview: Sendable, FeatureReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
 			case customizeGuarantees(TransactionReviewGuarantees.State)
-			case signing(Signing.State)
 			case submitting(SubmitTransaction.State)
 			case customizeFees(CustomizeFees.State)
 			case rawTransactionAlert(AlertState<Never>)
@@ -131,7 +130,6 @@ struct TransactionReview: Sendable, FeatureReducer {
 		@CasePathable
 		enum Action: Sendable, Equatable {
 			case customizeGuarantees(TransactionReviewGuarantees.Action)
-			case signing(Signing.Action)
 			case submitting(SubmitTransaction.Action)
 			case customizeFees(CustomizeFees.Action)
 			case rawTransactionAlert(Never)
@@ -143,9 +141,6 @@ struct TransactionReview: Sendable, FeatureReducer {
 			}
 			Scope(state: \.customizeFees, action: \.customizeFees) {
 				CustomizeFees()
-			}
-			Scope(state: \.signing, action: \.signing) {
-				Signing()
 			}
 			Scope(state: \.submitting, action: \.submitting) {
 				SubmitTransaction()
@@ -395,27 +390,6 @@ struct TransactionReview: Sendable, FeatureReducer {
 			state.printFeePayerInfo()
 			return .none
 
-		case .signing(.delegate(.cancelSigning)):
-			loggerGlobal.notice("Cancelled signing")
-			return resetToApprovable(&state)
-
-		case .signing(.delegate(.failedToSign)):
-			loggerGlobal.error("Failed sign tx")
-			return resetToApprovable(&state)
-
-		case let .signing(.delegate(.finishedSigning(.signTransaction(notarizedTX, origin: _)))):
-			state.destination = .submitting(.init(
-				notarizedTX: notarizedTX,
-				inProgressDismissalDisabled: state.waitsForTransactionToBeComitted,
-				route: state.p2pRoute
-			))
-			return .none
-
-		case .signing(.delegate(.finishedSigning(.signAuth))):
-			state.canApproveTX = true
-			assertionFailure("Did not expect to have sign auth data...")
-			return .none
-
 		case let .submitting(.delegate(.submittedButNotCompleted(txID))):
 			return .send(.delegate(.signedTXAndSubmittedToGateway(txID)))
 
@@ -437,10 +411,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 	}
 
 	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
-		if case .signing = state.destination {
-			loggerGlobal.notice("Cancelled signing")
-			return resetToApprovable(&state)
-		} else if case .submitting = state.destination {
+		if case .submitting = state.destination {
 			// This is used when tapping outside the Submitting sheet, no need to set destination to nil
 			return delayedShortEffect(for: .delegate(.dismiss))
 		}
