@@ -1752,7 +1752,9 @@ internal enum L10n {
       /// Tap and hold this **Arculus Card** to your phone. **This may take up to a minute.**
       internal static let deriveKeysMessage = L10n.tr("Localizable", "factorSourceActions_arculus_deriveKeysMessage", fallback: "Tap and hold this **Arculus Card** to your phone. **This may take up to a minute.**")
       /// Tap and hold this **Arculus Card** to your phone.
-      internal static let signMessage = L10n.tr("Localizable", "factorSourceActions_arculus_signMessage", fallback: "Tap and hold this **Arculus Card** to your phone.")
+      internal static let message = L10n.tr("Localizable", "factorSourceActions_arculus_message", fallback: "Tap and hold this **Arculus Card** to your phone.")
+      /// Tap and hold this **Arculus Card** to your phone to sign.
+      internal static let signMessage = L10n.tr("Localizable", "factorSourceActions_arculus_signMessage", fallback: "Tap and hold this **Arculus Card** to your phone to sign.")
     }
     internal enum CreateAccount {
       /// Creating Account
@@ -3977,15 +3979,15 @@ internal enum L10n {
       internal static let title = L10n.tr("Localizable", "shieldSetupPrepareFactors_intro_title", fallback: "Let’s Prepare your Factors")
     }
     internal enum Skip {
-      /// Skip and create an empty shield
-      internal static let button = L10n.tr("Localizable", "shieldSetupPrepareFactors_skip_button", fallback: "Skip and create an empty shield")
+      /// Skip automatic Shield recommendation (advanced)
+      internal static let button = L10n.tr("Localizable", "shieldSetupPrepareFactors_skip_button", fallback: "Skip automatic Shield recommendation (advanced)")
     }
   }
   internal enum ShieldSetupSelectFactors {
     /// Build Shield
     internal static let buildButtonTitle = L10n.tr("Localizable", "shieldSetupSelectFactors_buildButtonTitle", fallback: "Build Shield")
-    /// Skip and create an empty shield
-    internal static let skipButtonTitle = L10n.tr("Localizable", "shieldSetupSelectFactors_skipButtonTitle", fallback: "Skip and create an empty shield")
+    /// Skip automatic Shield recommendation (advanced)
+    internal static let skipButtonTitle = L10n.tr("Localizable", "shieldSetupSelectFactors_skipButtonTitle", fallback: "Skip automatic Shield recommendation (advanced)")
     /// Choose the factors you’ll use for regular access. You’ll use **all** of these factors every time you send assets.
     internal static let subtitle = L10n.tr("Localizable", "shieldSetupSelectFactors_subtitle", fallback: "Choose the factors you’ll use for regular access. You’ll use **all** of these factors every time you send assets.")
     /// Select Factors for Regular Access
@@ -4042,8 +4044,6 @@ internal enum L10n {
       /// Emergency Fallback
       internal static let title = L10n.tr("Localizable", "shieldWizardRecovery_fallback_title", fallback: "Emergency Fallback")
       internal enum Day {
-        /// Day
-        internal static let label = L10n.tr("Localizable", "shieldWizardRecovery_fallback_day_label", fallback: "Day")
         /// 1 day
         internal static let period = L10n.tr("Localizable", "shieldWizardRecovery_fallback_day_period", fallback: "1 day")
       }
@@ -4056,8 +4056,6 @@ internal enum L10n {
         }
       }
       internal enum Week {
-        /// Week
-        internal static let label = L10n.tr("Localizable", "shieldWizardRecovery_fallback_week_label", fallback: "Week")
         /// 1 week
         internal static let period = L10n.tr("Localizable", "shieldWizardRecovery_fallback_week_period", fallback: "1 week")
       }
@@ -4068,16 +4066,6 @@ internal enum L10n {
         internal static func period(_ p1: Int) -> String {
           return L10n.tr("Localizable", "shieldWizardRecovery_fallback_weeks_period", p1, fallback: "%d weeks")
         }
-      }
-      internal enum Year {
-        /// Year
-        internal static let label = L10n.tr("Localizable", "shieldWizardRecovery_fallback_year_label", fallback: "Year")
-      }
-      internal enum Years {
-        /// Years
-        internal static let label = L10n.tr("Localizable", "shieldWizardRecovery_fallback_years_label", fallback: "Years")
-        /// 1 year
-        internal static let period = L10n.tr("Localizable", "shieldWizardRecovery_fallback_years_period", fallback: "1 year")
       }
     }
     internal enum SetFallback {
