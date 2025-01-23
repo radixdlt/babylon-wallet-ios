@@ -1,9 +1,9 @@
 import SwiftUI
 
-// MARK: - NewSigning.View
-extension NewSigning {
+// MARK: - Signing.View
+extension Signing {
 	struct View: SwiftUI.View {
-		let store: StoreOf<NewSigning>
+		let store: StoreOf<Signing>
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
@@ -13,7 +13,7 @@ extension NewSigning {
 	}
 }
 
-private extension StoreOf<NewSigning> {
+private extension StoreOf<Signing> {
 	var factorSourceAccess: StoreOf<NewFactorSourceAccess> {
 		scope(state: \.factorSourceAccess, action: \.child.factorSourceAccess)
 	}

@@ -106,7 +106,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 			.eraseToAnyAsyncSequence()
 		}
 
-		let getHDFactorInstances: GetHDFactorInstances = { request in
+		let derivePublicKeys: DerivePublicKeys = { request in
 			let factorSourceId = request.factorSourceId
 			guard let mnemonicWithPassphrase = try secureStorageClient.loadMnemonic(factorSourceID: factorSourceId, notifyIfMissing: false) else {
 				loggerGlobal.critical("Failed to find factor source with ID: '\(factorSourceId)'")
@@ -119,14 +119,6 @@ extension DeviceFactorSourceClient: DependencyKey {
 		}
 
 		return Self(
-			publicKeysFromOnDeviceHD: { request in
-				let factorSourceID = request.deviceFactorSource.id
-				let mnemonicWithPassphrase = try request.getMnemonicWithPassphrase()
-				return mnemonicWithPassphrase.derivePublicKeys(paths: request.derivationPaths)
-			},
-			signatureFromOnDeviceHD: { request in
-				request.mnemonicWithPassphrase.sign(hash: request.hashedData, path: request.derivationPath)
-			},
 			isAccountRecoveryNeeded: {
 				do {
 					let deviceFactorSource = try await factorSourcesClient.getFactorSources().babylonDeviceFactorSources().sorted(by: \.lastUsedOn).first
@@ -179,7 +171,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 				})
 			},
 			entitiesInBadState: entitiesInBadState,
-			getHDFactorInstances: getHDFactorInstances
+			derivePublicKeys: derivePublicKeys
 		)
 	}
 }

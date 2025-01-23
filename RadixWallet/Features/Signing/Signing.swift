@@ -1,6 +1,6 @@
-// MARK: - NewSigning
+// MARK: - Signing
 @Reducer
-struct NewSigning: Sendable, FeatureReducer {
+struct Signing: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
 		let purpose: Purpose
@@ -73,7 +73,7 @@ struct NewSigning: Sendable, FeatureReducer {
 	}
 }
 
-private extension NewSigning {
+private extension Signing {
 	func sign(purpose: State.Purpose, factorSource: FactorSource) -> Effect<Action> {
 		.run { send in
 			switch factorSource {
@@ -119,7 +119,7 @@ private extension NewSigning {
 		switch purpose {
 		case let .transaction(input):
 			let result = try await input.perTransaction.asyncMap { transaction in
-				try await ledgerHardwareWalletClient.newSignTransaction(.init(ledger: ledger, input: transaction))
+				try await ledgerHardwareWalletClient.signTransaction(.init(ledger: ledger, input: transaction))
 			}.flatMap { $0 }
 
 			return .transaction(result)
@@ -147,8 +147,8 @@ private extension NewSigning {
 	}
 }
 
-// MARK: - NewSigning.State.Purpose
-extension NewSigning.State {
+// MARK: - Signing.State.Purpose
+extension Signing.State {
 	enum Purpose: Sendable, Hashable {
 		case transaction(PerFactorSourceInputOfTransactionIntent)
 		case subintent(PerFactorSourceInputOfSubintent)
@@ -156,8 +156,8 @@ extension NewSigning.State {
 	}
 }
 
-// MARK: - NewSigning.Signatures
-extension NewSigning {
+// MARK: - Signing.Signatures
+extension Signing {
 	enum Signatures: Sendable, Hashable {
 		case transaction([HdSignatureOfTransactionIntentHash])
 		case subintent([HdSignatureOfSubintentHash])

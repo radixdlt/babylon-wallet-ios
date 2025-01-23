@@ -11,23 +11,19 @@ extension DeviceFactorSourceClient: TestDependencyKey {
 	static let previewValue = Self.noop
 
 	static let noop = Self(
-		publicKeysFromOnDeviceHD: { _ in throw NoopError() },
-		signatureFromOnDeviceHD: { _ in throw NoopError() },
 		isAccountRecoveryNeeded: { false },
 		entitiesControlledByFactorSource: { _, _ in throw NoopError() },
 		controlledEntities: { _ in [] },
 		entitiesInBadState: { throw NoopError() },
-		getHDFactorInstances: { _ in throw NoopError() }
+		derivePublicKeys: { _ in throw NoopError() }
 	)
 
 	static let testValue = Self(
-		publicKeysFromOnDeviceHD: unimplemented("\(Self.self).publicKeysFromOnDeviceHD"),
-		signatureFromOnDeviceHD: unimplemented("\(Self.self).signatureFromOnDeviceHD"),
 		isAccountRecoveryNeeded: unimplemented("\(Self.self).isAccountRecoveryNeeded"),
 		entitiesControlledByFactorSource: unimplemented("\(Self.self).entitiesControlledByFactorSource"),
 		controlledEntities: unimplemented("\(Self.self).controlledEntities"),
 		entitiesInBadState: unimplemented("\(Self.self).entitiesInBadState"),
-		getHDFactorInstances: unimplemented("\(Self.self).getHDFactorInstances")
+		derivePublicKeys: unimplemented("\(Self.self).derivePublicKeys")
 	)
 }
 

@@ -65,16 +65,6 @@ extension WalletInteractionWalletAccount {
 }
 
 extension WalletToDappInteractionAuthProof {
-	init(entitySignature: SignatureOfEntity) {
-		let sigPub = entitySignature.signatureWithPublicKey
-		let signature = sigPub.signature
-		self.init(
-			publicKey: sigPub.publicKey,
-			curve: sigPub.publicKey.curve,
-			signature: signature
-		)
-	}
-
 	init(intentSignatureOfOwner: IntentSignatureOfOwner) {
 		switch intentSignatureOfOwner.intentSignature.signatureWithPublicKey {
 		case let .secp256k1(publicKey, signature):

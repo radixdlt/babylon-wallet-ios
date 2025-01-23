@@ -26,7 +26,7 @@ extension SheetOverlayCoordinator {
 					CaseLet(
 						/SheetOverlayCoordinator.Root.State.signing,
 						action: SheetOverlayCoordinator.Root.Action.signing,
-						then: { NewSigning.View(store: $0) }
+						then: { Signing.View(store: $0) }
 					)
 
 				case .derivePublicKeys:

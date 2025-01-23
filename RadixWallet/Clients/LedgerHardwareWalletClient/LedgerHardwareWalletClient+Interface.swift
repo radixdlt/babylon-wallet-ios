@@ -6,10 +6,7 @@ struct LedgerHardwareWalletClient: Sendable {
 	var getDeviceInfo: GetDeviceInfo
 	var derivePublicKeys: DerivePublicKeys
 	var signTransaction: SignTransaction
-	var newSignTransaction: NewSignTransaction
-	var signPreAuthorization: SignPreAuthorization
 	var signSubintent: SignSubintent
-	var signAuthChallenge: SignAuthChallenge
 	var signAuth: SignAuth
 	var deriveAndDisplayAddress: DeriveAndDisplayAddress
 }
@@ -21,11 +18,8 @@ extension LedgerHardwareWalletClient {
 
 	typealias DeriveAndDisplayAddress = @Sendable (P2P.LedgerHardwareWallet.KeyParameters, LedgerHardwareWalletFactorSource) async throws -> (HierarchicalDeterministicPublicKey, String)
 
-	typealias SignTransaction = @Sendable (SignTransactionWithLedgerRequest) async throws -> Set<SignatureOfEntity>
-	typealias NewSignTransaction = @Sendable (NewSignTransactionRequest) async throws -> Set<HdSignatureOfTransactionIntentHash>
-	typealias SignPreAuthorization = @Sendable (SignPreAuthorizationWithLedgerRequest) async throws -> Set<SignatureOfEntity>
+	typealias SignTransaction = @Sendable (SignTransactionRequest) async throws -> Set<HdSignatureOfTransactionIntentHash>
 	typealias SignSubintent = @Sendable (SignSubintentRequest) async throws -> Set<HdSignatureOfSubintentHash>
-	typealias SignAuthChallenge = @Sendable (SignAuthChallengeWithLedgerRequest) async throws -> Set<SignatureOfEntity>
 	typealias SignAuth = @Sendable (SignAuthRequest) async throws -> Set<HdSignatureOfAuthIntentHash>
 }
 
@@ -36,7 +30,7 @@ extension LedgerHardwareWalletClient {
 		let input: KeyDerivationRequestPerFactorSource
 	}
 
-	struct NewSignTransactionRequest: Sendable, Hashable {
+	struct SignTransactionRequest: Sendable, Hashable {
 		let ledger: LedgerHardwareWalletFactorSource
 		let input: TransactionSignRequestInputOfTransactionIntent
 	}
@@ -62,31 +56,6 @@ enum VerifyAddressOutcome: Sendable, Hashable {
 	/// Either addresses do not match, or key do not match.
 	case mismatch(Mismatch)
 	case verifiedSame
-}
-
-// MARK: - SignTransactionWithLedgerRequest
-struct SignTransactionWithLedgerRequest: Sendable, Hashable {
-	let ledger: LedgerHardwareWalletFactorSource
-	let signers: NonEmpty<IdentifiedArrayOf<Signer>>
-	let transactionIntent: TransactionIntent
-	let displayHashOnLedgerDisplay: Bool
-}
-
-// MARK: - SignPreAuthorizationWithLedgerRequest
-struct SignPreAuthorizationWithLedgerRequest: Sendable, Hashable {
-	let ledger: LedgerHardwareWalletFactorSource
-	let signers: NonEmpty<IdentifiedArrayOf<Signer>>
-	let subintent: Subintent
-	let displayHashOnLedgerDisplay: Bool
-}
-
-// MARK: - SignAuthChallengeWithLedgerRequest
-struct SignAuthChallengeWithLedgerRequest: Sendable, Hashable {
-	let ledger: LedgerHardwareWalletFactorSource
-	let signers: NonEmpty<IdentifiedArrayOf<Signer>>
-	let challenge: DappToWalletInteractionAuthChallengeNonce
-	let origin: DappOrigin
-	let dAppDefinitionAddress: AccountAddress
 }
 
 // MARK: - FailedToFindLedger

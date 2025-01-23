@@ -2,8 +2,6 @@ import Sargon
 
 // MARK: - DeviceFactorSourceClient
 struct DeviceFactorSourceClient: Sendable {
-	var publicKeysFromOnDeviceHD: PublicKeysFromOnDeviceHD
-	var signatureFromOnDeviceHD: SignatureFromOnDeviceHD
 	var isAccountRecoveryNeeded: IsAccountRecoveryNeeded
 
 	// FIXME: Find a better home for this...
@@ -17,7 +15,7 @@ struct DeviceFactorSourceClient: Sendable {
 	/// - their mnmemonic is not backed up (entity was created but seed phrase never written down).
 	var entitiesInBadState: EntitiesInBadState
 
-	var getHDFactorInstances: GetHDFactorInstances
+	var derivePublicKeys: DerivePublicKeys
 }
 
 // MARK: DeviceFactorSourceClient.onDeviceHDPublicKey
@@ -25,78 +23,9 @@ extension DeviceFactorSourceClient {
 	typealias GetEntitiesControlledByFactorSource = @Sendable (DeviceFactorSource, Profile?) async throws -> EntitiesControlledByFactorSource
 	typealias GetControlledEntities = @Sendable (Profile?) async throws -> IdentifiedArrayOf<EntitiesControlledByFactorSource>
 
-	typealias PublicKeysFromOnDeviceHD = @Sendable (PublicKeysFromOnDeviceHDRequest) async throws -> [HierarchicalDeterministicPublicKey]
-	typealias SignatureFromOnDeviceHD = @Sendable (SignatureFromOnDeviceHDRequest) async throws -> SignatureWithPublicKey
 	typealias IsAccountRecoveryNeeded = @Sendable () async throws -> Bool
 	typealias EntitiesInBadState = @Sendable () async throws -> AnyAsyncSequence<(withoutControl: AddressesOfEntitiesInBadState, unrecoverable: AddressesOfEntitiesInBadState)>
-	typealias GetHDFactorInstances = @Sendable (KeyDerivationRequestPerFactorSource) async throws -> [HierarchicalDeterministicFactorInstance]
-}
-
-// MARK: - DiscrepancyUnsupportedCurve
-struct DiscrepancyUnsupportedCurve: Swift.Error {}
-
-// MARK: - PublicKeysFromOnDeviceHDRequest
-struct PublicKeysFromOnDeviceHDRequest: Sendable, Hashable {
-	let derivationPaths: [DerivationPath]
-
-	func getMnemonicWithPassphrase() throws -> MnemonicWithPassphrase {
-		@Dependency(\.secureStorageClient) var secureStorageClient
-		switch source {
-		case let .privateHDFactorSource(privateHD):
-			return privateHD.mnemonicWithPassphrase
-		case let .loadMnemonicFor(deviceFactorSource, loadMnemonicPurpose):
-			let factorSourceID = deviceFactorSource.id
-			guard
-				let mnemonicWithPassphrase = try secureStorageClient.loadMnemonic(factorSourceID: factorSourceID, notifyIfMissing: false)
-			else {
-				loggerGlobal.critical("Failed to find factor source with ID: '\(factorSourceID)'")
-				throw FailedToFindFactorSource()
-			}
-			return mnemonicWithPassphrase
-		}
-	}
-
-	enum Source: Sendable, Hashable {
-		case privateHDFactorSource(PrivateHierarchicalDeterministicFactorSource)
-		case loadMnemonicFor(DeviceFactorSource, purpose: SecureStorageClient.LoadMnemonicPurpose)
-
-		var deviceFactorSource: DeviceFactorSource {
-			switch self {
-			case let .loadMnemonicFor(deviceFactorSource, _):
-				deviceFactorSource
-			case let .privateHDFactorSource(privateHDFactorSource):
-				privateHDFactorSource.factorSource
-			}
-		}
-	}
-
-	let source: Source
-	var deviceFactorSource: DeviceFactorSource {
-		source.deviceFactorSource
-	}
-
-	init(
-		derivationPaths: [DerivationPath],
-		source: Source
-	) throws {
-		for derivationPath in derivationPaths {
-			guard source.deviceFactorSource.cryptoParameters.supportedCurves.contains(derivationPath.curve) else {
-				throw DiscrepancyUnsupportedCurve()
-			}
-		}
-		self.derivationPaths = derivationPaths
-		self.source = source
-	}
-}
-
-// MARK: - SignatureFromOnDeviceHDRequest
-struct SignatureFromOnDeviceHDRequest: Sendable, Hashable {
-	let mnemonicWithPassphrase: MnemonicWithPassphrase
-	let derivationPath: DerivationPath
-	let curve: SLIP10Curve
-
-	/// The data to sign
-	let hashedData: Hash
+	typealias DerivePublicKeys = @Sendable (KeyDerivationRequestPerFactorSource) async throws -> [HierarchicalDeterministicFactorInstance]
 }
 
 // MARK: - FailedToFindDeviceFactorSourceForSigning
@@ -105,96 +34,6 @@ struct FailedToFindDeviceFactorSourceForSigning: Swift.Error {}
 // MARK: - IncorrectSignatureCountExpectedExactlyOne
 struct IncorrectSignatureCountExpectedExactlyOne: Swift.Error {}
 extension DeviceFactorSourceClient {
-	func signUsingDeviceFactorSource(
-		signerEntity: AccountOrPersona,
-		hashedDataToSign: Hash,
-		purpose: SigningPurpose
-	) async throws -> SignatureOfEntity {
-		@Dependency(\.factorSourcesClient) var factorSourcesClient
-		@Dependency(\.secureStorageClient) var secureStorageClient
-
-		switch signerEntity.securityState {
-		case let .unsecured(control):
-			let factorInstance = control.transactionSigning
-
-			guard
-				let deviceFactorSource = try await factorSourcesClient.getDeviceFactorSource(of: factorInstance)
-			else {
-				throw FailedToFindDeviceFactorSourceForSigning()
-			}
-
-			let signatures = try await signUsingDeviceFactorSource(
-				deviceFactorSource: deviceFactorSource,
-				signerEntities: [signerEntity],
-				hashedDataToSign: hashedDataToSign,
-				purpose: purpose
-			)
-
-			guard let signature = signatures.first, signatures.count == 1 else {
-				throw IncorrectSignatureCountExpectedExactlyOne()
-			}
-			return signature
-		}
-	}
-
-	func signUsingDeviceFactorSource(
-		deviceFactorSource: DeviceFactorSource,
-		signerEntities: Set<AccountOrPersona>,
-		hashedDataToSign: Hash,
-		purpose: SigningPurpose
-	) async throws -> Set<SignatureOfEntity> {
-		@Dependency(\.factorSourcesClient) var factorSourcesClient
-		@Dependency(\.secureStorageClient) var secureStorageClient
-
-		let factorSourceID = deviceFactorSource.id
-
-		guard
-			let loadedMnemonicWithPassphrase = try await secureStorageClient.loadMnemonic(
-				factorSourceID: factorSourceID
-			)
-		else {
-			throw FailedToFindDeviceFactorSourceForSigning()
-		}
-
-		var signatures = Set<SignatureOfEntity>()
-
-		for entity in signerEntities {
-			switch entity.securityState {
-			case let .unsecured(unsecuredControl):
-
-				let factorInstance = unsecuredControl.transactionSigning
-				let derivationPath = factorInstance.derivationPath
-
-				if factorInstance.factorSourceID != factorSourceID {
-					let errMsg = "Discrepancy, you specified to use a device factor source you beleived to be the one controlling the entity, but it does not match the genesis factor source id."
-					loggerGlobal.critical(.init(stringLiteral: errMsg))
-					assertionFailure(errMsg)
-				}
-				let curve = factorInstance.publicKey.curve
-
-				loggerGlobal.debug("🔏 Signing data with device, with entity=\(entity.displayName), curve=\(curve), factor source hint.label=\(deviceFactorSource.hint.label), hint.deviceName=\(deviceFactorSource.hint.deviceName), hint.model=\(deviceFactorSource.hint.model)")
-
-				let signatureWithPublicKey = try await self.signatureFromOnDeviceHD(SignatureFromOnDeviceHDRequest(
-					mnemonicWithPassphrase: loadedMnemonicWithPassphrase,
-					derivationPath: derivationPath,
-					curve: curve,
-					hashedData: hashedDataToSign
-				))
-
-				let entitySignature = SignatureOfEntity(
-					signerEntity: entity,
-					derivationPath: derivationPath,
-					factorSourceID: factorSourceID.asGeneral,
-					signatureWithPublicKey: signatureWithPublicKey
-				)
-
-				signatures.insert(entitySignature)
-			}
-		}
-
-		return signatures
-	}
-
 	func signTransaction(
 		input: PerFactorSourceInputOfTransactionIntent
 	) async throws -> [HdSignatureOfTransactionIntentHash] {
@@ -302,26 +141,18 @@ extension DeviceFactorSourceClient {
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
 		hashedData: Hash,
 		ownedFactorInstances: [OwnedFactorInstance]
-	) async throws -> Set<SignatureOfEntity2> {
-		var signatures = Set<SignatureOfEntity2>()
+	) async throws -> Set<SignatureOfEntity> {
+		var signatures = Set<SignatureOfEntity>()
 
 		for ownedFactorInstance in ownedFactorInstances {
 			let factorInstance = ownedFactorInstance.factorInstance
-			let derivationPath = factorInstance.derivationPath
-
 			if factorInstance.factorSourceID != factorSourceId {
 				let errMsg = "Discrepancy, you specified to use a device factor source you beleived to be the one controlling the entity, but it does not match the genesis factor source id."
 				loggerGlobal.critical(.init(stringLiteral: errMsg))
 				assertionFailure(errMsg)
 			}
-			let curve = factorInstance.publicKey.curve
 
-			let signatureWithPublicKey = try await self.signatureFromOnDeviceHD(SignatureFromOnDeviceHDRequest(
-				mnemonicWithPassphrase: mnemonicWithPassphrase,
-				derivationPath: derivationPath,
-				curve: curve,
-				hashedData: hashedData
-			))
+			let signatureWithPublicKey = mnemonicWithPassphrase.sign(hash: hashedData, path: factorInstance.derivationPath)
 
 			signatures.insert(.init(ownedFactorInstance: ownedFactorInstance, signatureWithPublicKey: signatureWithPublicKey))
 		}

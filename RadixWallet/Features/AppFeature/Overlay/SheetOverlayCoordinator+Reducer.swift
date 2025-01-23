@@ -22,7 +22,7 @@ struct SheetOverlayCoordinator: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case dismiss
-		case signing(NewSigning.DelegateAction)
+		case signing(Signing.DelegateAction)
 		case derivePublicKeys(DerivePublicKeys.DelegateAction)
 	}
 
@@ -30,14 +30,14 @@ struct SheetOverlayCoordinator: Sendable, FeatureReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
 			case infoLink(InfoLinkSheet.State)
-			case signing(NewSigning.State)
+			case signing(Signing.State)
 			case derivePublicKeys(DerivePublicKeys.State)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
 			case infoLink(InfoLinkSheet.Action)
-			case signing(NewSigning.Action)
+			case signing(Signing.Action)
 			case derivePublicKeys(DerivePublicKeys.Action)
 		}
 
@@ -46,7 +46,7 @@ struct SheetOverlayCoordinator: Sendable, FeatureReducer {
 				InfoLinkSheet()
 			}
 			Scope(state: \.signing, action: \.signing) {
-				NewSigning()
+				Signing()
 			}
 			Scope(state: \.derivePublicKeys, action: \.derivePublicKeys) {
 				DerivePublicKeys()

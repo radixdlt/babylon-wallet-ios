@@ -75,20 +75,7 @@ extension ROLAClient {
 					throw ROLAFailure.unknownDappDefinitionAddress
 				}
 			},
-			manifestForAuthKeyCreation: manifestForAuthKeyCreation,
-			authenticationDataToSignForChallenge: { request in
-
-				let payload = payloadToHash(
-					challenge: request.challenge,
-					dAppDefinitionAddress: request.dAppDefinitionAddress,
-					origin: request.origin
-				)
-
-				return AuthenticationDataToSignForChallengeResponse(
-					input: request,
-					payloadToHashAndSign: payload
-				)
-			}
+			manifestForAuthKeyCreation: manifestForAuthKeyCreation
 		)
 	}()
 

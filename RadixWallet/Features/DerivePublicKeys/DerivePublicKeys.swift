@@ -56,7 +56,7 @@ private extension DerivePublicKeys {
 		.run { send in
 			let factorInstances = switch factorSource {
 			case .device:
-				try await deviceFactorSourceClient.getHDFactorInstances(input)
+				try await deviceFactorSourceClient.derivePublicKeys(input)
 
 			case let .ledger(ledger):
 				try await ledgerHardwareWalletClient.derivePublicKeys(.init(ledger: ledger, input: input))
