@@ -314,9 +314,8 @@ struct TransactionReview: Sendable, FeatureReducer {
 		case let .buildTransactionIntentResult(.success(intent)):
 			return .run { [notary = state.ephemeralNotaryPrivateKey] send in
 				let signedIntent = try await SargonOS.shared.signTransaction(transactionIntent: intent, roleKind: .primary)
-				let notarizedTransaction = try await transactionClient.newNotarizeTransaction(
+				let notarizedTransaction = try await transactionClient.notarizeTransaction(
 					.init(
-						transactionIntent: intent,
 						signedIntent: signedIntent,
 						notary: notary
 					)
@@ -729,12 +728,9 @@ enum FeePayerValidationOutcome: Sendable, Hashable {
 
 extension ReviewedTransaction {
 	var involvedAccounts: Set<AccountAddress> {
-		guard let summary = try? transactionManifest.summary else {
-			return Set()
-		}
-		return Set(accountWithdraws.keys)
+		Set(accountWithdraws.keys)
 			.union(accountDeposits.keys)
-			.union(summary.addressesOfAccountsRequiringAuth)
+			.union(transactionManifest.summary.addressesOfAccountsRequiringAuth)
 	}
 
 	var feePayingValidation: Loadable<FeePayerValidationOutcome> {

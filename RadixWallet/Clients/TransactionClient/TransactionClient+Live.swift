@@ -132,30 +132,6 @@ extension TransactionClient {
 		}
 
 		let notarizeTransaction: NotarizeTransaction = { request in
-			let signedTransactionIntent = SignedIntent(
-				intent: request.transactionIntent,
-				intentSignatures: IntentSignatures(signatures: Array(request.intentSignatures.map { IntentSignature(signatureWithPublicKey: $0) }))
-			)
-
-			let signedIntentHash = signedTransactionIntent.hash()
-
-			let notarySignature = try request.notary.signature(for: signedIntentHash.hash.data)
-
-			let notarizedTransaction = try NotarizedTransaction(
-				signedIntent: signedTransactionIntent,
-				notarySignature: NotarySignature(signature: .ed25519(value: .init(bytes: .init(bytes: notarySignature))))
-			)
-
-			let txID = request.transactionIntent.hash()
-
-			return .init(
-				notarized: notarizedTransaction,
-				intent: request.transactionIntent,
-				txID: txID
-			)
-		}
-
-		let newNotarizeTransaction: NewNotarizeTransaction = { request in
 			let signedIntentHash = request.signedIntent.hash()
 
 			let notarySignature = try request.notary.signature(for: signedIntentHash.hash.data)
@@ -165,11 +141,12 @@ extension TransactionClient {
 				notarySignature: NotarySignature(signature: .ed25519(value: .init(bytes: .init(bytes: notarySignature))))
 			)
 
-			let txID = request.transactionIntent.hash()
+			let intent = request.signedIntent.intent
+			let txID = intent.hash()
 
 			return .init(
 				notarized: notarizedTransaction,
-				intent: request.transactionIntent,
+				intent: intent,
 				txID: txID
 			)
 		}
@@ -269,7 +246,6 @@ extension TransactionClient {
 			getTransactionReview: getTransactionReview,
 			buildTransactionIntent: buildTransactionIntent,
 			notarizeTransaction: notarizeTransaction,
-			newNotarizeTransaction: newNotarizeTransaction,
 			myInvolvedEntities: myInvolvedEntities,
 			determineFeePayer: determineFeePayer,
 			getFeePayerCandidates: { refresh in

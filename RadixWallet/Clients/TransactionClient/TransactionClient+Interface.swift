@@ -3,7 +3,6 @@ struct TransactionClient: Sendable, DependencyKey {
 	var getTransactionReview: GetTransactionReview
 	var buildTransactionIntent: BuildTransactionIntent
 	var notarizeTransaction: NotarizeTransaction
-	var newNotarizeTransaction: NewNotarizeTransaction
 	var myInvolvedEntities: MyInvolvedEntities
 	var determineFeePayer: DetermineFeePayer
 	var getFeePayerCandidates: GetFeePayerCandidates
@@ -14,7 +13,6 @@ extension TransactionClient {
 	typealias GetTransactionReview = @Sendable (ManifestReviewRequest) async throws -> TransactionToReview
 	typealias BuildTransactionIntent = @Sendable (BuildTransactionIntentRequest) async throws -> TransactionIntent
 	typealias NotarizeTransaction = @Sendable (NotarizeTransactionRequest) async throws -> NotarizeTransactionResponse
-	typealias NewNotarizeTransaction = @Sendable (NewNotarizeTransactionRequest) async throws -> NotarizeTransactionResponse
 
 	typealias MyInvolvedEntities = @Sendable (TransactionManifest) async throws -> MyEntitiesInvolvedInTransaction
 	typealias DetermineFeePayer = @Sendable (DetermineFeePayerRequest) async throws -> FeePayerSelectionResult?
@@ -28,11 +26,24 @@ extension DependencyValues {
 	}
 }
 
-// MARK: - TransactionClient.NewNotarizeTransactionRequest
+// MARK: - TransactionClient.NotarizeTransactionRequest
 extension TransactionClient {
-	struct NewNotarizeTransactionRequest: Sendable {
-		let transactionIntent: TransactionIntent
+	struct NotarizeTransactionRequest: Sendable {
 		let signedIntent: SignedIntent
 		let notary: Curve25519.Signing.PrivateKey
+	}
+}
+
+extension TransactionClient.NotarizeTransactionRequest {
+	init(
+		intentSignatures: Set<SignatureWithPublicKey>,
+		transactionIntent: TransactionIntent,
+		notary: Curve25519.Signing.PrivateKey
+	) {
+		self.notary = notary
+		self.signedIntent = .init(
+			intent: transactionIntent,
+			intentSignatures: IntentSignatures(signatures: Array(intentSignatures.map { IntentSignature(signatureWithPublicKey: $0) }))
+		)
 	}
 }
