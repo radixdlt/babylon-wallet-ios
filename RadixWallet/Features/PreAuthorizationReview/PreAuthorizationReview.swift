@@ -151,7 +151,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 				return .none
 			}
 
-			guard !preview.signingFactors.isEmpty else {
+			guard preview.requiresSignatures else {
 				return handleSignedSubinent(state: &state, signedSubintent: .init(subintent: subintent, subintentSignatures: .init(signatures: [])))
 			}
 
