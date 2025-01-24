@@ -33,16 +33,21 @@ struct ShieldsList: FeatureReducer, Sendable {
 		@CasePathable
 		enum State: Sendable, Hashable {
 			case securityShieldsSetup(ShieldSetupCoordinator.State)
+			case changeMain(ChangeMainShield.State)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
 			case securityShieldsSetup(ShieldSetupCoordinator.Action)
+			case changeMain(ChangeMainShield.Action)
 		}
 
 		var body: some ReducerOf<Self> {
 			Scope(state: \.securityShieldsSetup, action: \.securityShieldsSetup) {
 				ShieldSetupCoordinator()
+			}
+			Scope(state: \.changeMain, action: \.changeMain) {
+				ChangeMainShield()
 			}
 		}
 	}
@@ -63,6 +68,7 @@ struct ShieldsList: FeatureReducer, Sendable {
 		case .task:
 			return shieldsEffect()
 		case .changeMainButtonTapped:
+			state.destination = .changeMain(.init(currentMain: state.main))
 			return .none
 		case .createShieldButtonTapped:
 			state.destination = .securityShieldsSetup(.init())
@@ -83,6 +89,9 @@ struct ShieldsList: FeatureReducer, Sendable {
 		case .securityShieldsSetup(.delegate(.finished)):
 			state.destination = nil
 			return shieldsEffect()
+		case .changeMain(.delegate(.updated)):
+			state.destination = nil
+			return shieldsEffect()
 		default:
 			return .none
 		}
@@ -93,7 +102,7 @@ struct ShieldsList: FeatureReducer, Sendable {
 			let shields = try SargonOS.shared.securityStructuresOfFactorSources()
 				.map {
 					if $0.metadata.displayName == "Test shield" {
-						ShieldForDisplay(shield: $0, isMain: true)
+						ShieldForDisplay(shield: $0, status: .applied, isMain: true)
 					} else {
 						ShieldForDisplay(shield: $0)
 					}
@@ -108,11 +117,19 @@ struct ShieldsList: FeatureReducer, Sendable {
 // MARK: - ShieldForDisplay
 // TEMP
 struct ShieldForDisplay: Hashable, Sendable {
+	let id: SecurityStructureId
 	let name: DisplayName
+	let status: ShieldCardStatus
 	let isMain: Bool
 
-	init(shield: SecurityStructureOfFactorSources, isMain: Bool = false) {
+	init(
+		shield: SecurityStructureOfFactorSources,
+		status: ShieldCardStatus = .notApplied,
+		isMain: Bool = false
+	) {
+		self.id = shield.metadata.id
 		self.name = shield.metadata.displayName
+		self.status = status
 		self.isMain = isMain
 	}
 }

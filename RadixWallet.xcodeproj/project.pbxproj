@@ -1266,6 +1266,9 @@
 		E75C5F342C1C1632002E3DFF /* Stage1MigrateToSargon+SignedAuthChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E75C5F332C1C1632002E3DFF /* Stage1MigrateToSargon+SignedAuthChallenge.swift */; };
 		E7607DBD2D4252420083B3A5 /* ShieldsList+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7607DBC2D4252420083B3A5 /* ShieldsList+Reducer.swift */; };
 		E7607DBF2D4252470083B3A5 /* ShieldsList+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7607DBE2D4252470083B3A5 /* ShieldsList+View.swift */; };
+		E7607DC12D439D780083B3A5 /* ChangeMainShield+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7607DC02D439D780083B3A5 /* ChangeMainShield+Reducer.swift */; };
+		E7607DC32D439D7F0083B3A5 /* ChangeMainShield+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7607DC22D439D7F0083B3A5 /* ChangeMainShield+View.swift */; };
+		E7607DC62D43A1240083B3A5 /* ShieldCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7607DC52D43A1240083B3A5 /* ShieldCard.swift */; };
 		E76645A42C23138300065D9A /* Throwable.swift in Sources */ = {isa = PBXBuildFile; fileRef = E76645A32C23138300065D9A /* Throwable.swift */; };
 		E775A1B82CF4CA5500E72DB9 /* FactorSourceCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = E775A1B72CF4CA5500E72DB9 /* FactorSourceCard.swift */; };
 		E775A1BA2CF7326000E72DB9 /* FactorSourceCard+DataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = E775A1B92CF7326000E72DB9 /* FactorSourceCard+DataSource.swift */; };
@@ -2561,6 +2564,9 @@
 		E75C5F332C1C1632002E3DFF /* Stage1MigrateToSargon+SignedAuthChallenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+SignedAuthChallenge.swift"; sourceTree = "<group>"; };
 		E7607DBC2D4252420083B3A5 /* ShieldsList+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShieldsList+Reducer.swift"; sourceTree = "<group>"; };
 		E7607DBE2D4252470083B3A5 /* ShieldsList+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShieldsList+View.swift"; sourceTree = "<group>"; };
+		E7607DC02D439D780083B3A5 /* ChangeMainShield+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChangeMainShield+Reducer.swift"; sourceTree = "<group>"; };
+		E7607DC22D439D7F0083B3A5 /* ChangeMainShield+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChangeMainShield+View.swift"; sourceTree = "<group>"; };
+		E7607DC52D43A1240083B3A5 /* ShieldCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldCard.swift; sourceTree = "<group>"; };
 		E76645A32C23138300065D9A /* Throwable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Throwable.swift; sourceTree = "<group>"; };
 		E775A1B72CF4CA5500E72DB9 /* FactorSourceCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FactorSourceCard.swift; sourceTree = "<group>"; };
 		E775A1B92CF7326000E72DB9 /* FactorSourceCard+DataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactorSourceCard+DataSource.swift"; sourceTree = "<group>"; };
@@ -5099,6 +5105,7 @@
 				5B92AAB52D2E97E600486A9B /* RenameLabel */,
 				5B6E11462C45834C00C20F2D /* AccountCard */,
 				E775A1B62CF4CA0700E72DB9 /* FactorSourceCard */,
+				E7607DC42D43A10E0083B3A5 /* ShieldCard */,
 				48CFC1332ADC10D900E77A5C /* LedgerRowView.swift */,
 				A4F30C932C7CA71400F983D6 /* WithNavigationBar.swift */,
 				48CFC22C2ADC10D900E77A5C /* Radix+Dashboard.swift */,
@@ -7022,8 +7029,18 @@
 			children = (
 				E7607DBC2D4252420083B3A5 /* ShieldsList+Reducer.swift */,
 				E7607DBE2D4252470083B3A5 /* ShieldsList+View.swift */,
+				E7607DC02D439D780083B3A5 /* ChangeMainShield+Reducer.swift */,
+				E7607DC22D439D7F0083B3A5 /* ChangeMainShield+View.swift */,
 			);
 			path = ShieldsList;
+			sourceTree = "<group>";
+		};
+		E7607DC42D43A10E0083B3A5 /* ShieldCard */ = {
+			isa = PBXGroup;
+			children = (
+				E7607DC52D43A1240083B3A5 /* ShieldCard.swift */,
+			);
+			path = ShieldCard;
 			sourceTree = "<group>";
 		};
 		E76F56BF2C538061001EDC63 /* EditPersonaField */ = {
@@ -8159,6 +8176,7 @@
 				5B4E1D132CB421EB002FAC2E /* DepositStatus.swift in Sources */,
 				48CFC2F22ADC10D900E77A5C /* CreatePersonaCoordinator+View.swift in Sources */,
 				48CFC4652ADC10DA00E77A5C /* AccountPortfoliosClient+Live.swift in Sources */,
+				E7607DC62D43A1240083B3A5 /* ShieldCard.swift in Sources */,
 				48CFC5832ADC10DA00E77A5C /* SecureStorageClient+Test.swift in Sources */,
 				83FDF7EC2AF260D600D9AA8B /* ProgrammaticScryptoSborValue.swift in Sources */,
 				E7A5AC962C09F447006CB6EC /* ResetWalletClient+Interface.swift in Sources */,
@@ -8506,6 +8524,7 @@
 				48CFC3F32ADC10D900E77A5C /* PeerConnectionClient.swift in Sources */,
 				48CFC33E2ADC10D900E77A5C /* DappInteractionFlow+View.swift in Sources */,
 				48CFC3642ADC10D900E77A5C /* NonFungibleAssetList+View.swift in Sources */,
+				E7607DC32D439D7F0083B3A5 /* ChangeMainShield+View.swift in Sources */,
 				48CFC4102ADC10DA00E77A5C /* Functions.swift in Sources */,
 				A40815DB2C7E0D08005E65B9 /* ProgrammaticScryptoSborValueMap.swift in Sources */,
 				A408161B2C7E0D08005E65B9 /* StateEntityNonFungibleResourceVaultsPageResponse.swift in Sources */,
@@ -8672,6 +8691,7 @@
 				4855B1B42BCA60C400DD0A47 /* EmailAddress.swift in Sources */,
 				48CFC4532ADC10DA00E77A5C /* NetworkSwitchingClient+Live.swift in Sources */,
 				48AE39D12B0CBC3400813CF3 /* RecoverWalletWithoutProfileCoordinator.swift in Sources */,
+				E7607DC12D439D780083B3A5 /* ChangeMainShield+Reducer.swift in Sources */,
 				A40816492C7E0D08005E65B9 /* TransactionPreviewRequest.swift in Sources */,
 				A40815892C7E0D08005E65B9 /* MetadataBoolArrayValue.swift in Sources */,
 				A40815702C7E0D08005E65B9 /* CursorLimitMixin.swift in Sources */,

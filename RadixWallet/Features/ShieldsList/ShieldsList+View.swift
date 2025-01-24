@@ -80,46 +80,10 @@ extension ShieldsList {
 
 				VStack(spacing: .medium3) {
 					ForEachStatic(rows) { row in
-						shieldCard(row)
+						ShieldCard(shield: row, mode: .display)
 					}
 				}
 			}
-		}
-
-		private func shieldCard(_ shield: ShieldForDisplay) -> some SwiftUI.View {
-			HStack(spacing: .zero) {
-				Image(.shieldStatusNotApplied)
-					.padding(.vertical, .small2)
-
-				VStack(alignment: .leading, spacing: .small2) {
-					Text(shield.name.rawValue)
-						.textStyle(.body1Header)
-						.foregroundStyle(.app.gray1)
-
-					VStack(alignment: .leading, spacing: .zero) {
-						Text("Assigned to:")
-							.textStyle(.body2HighImportance)
-
-						Text("None")
-							.textStyle(.body2Regular)
-					}
-					.foregroundStyle(.app.gray2)
-
-					StatusMessageView(
-						text: "Action required",
-						type: .warning,
-						useNarrowSpacing: true,
-						useSmallerFontSize: true
-					)
-				}
-
-				Spacer()
-			}
-			.centered
-			.padding(.medium2)
-			.background(.app.white)
-			.roundedCorners(radius: .small1)
-			.cardShadow
 		}
 	}
 }
@@ -138,11 +102,18 @@ private extension View {
 	func destinations(with store: StoreOf<ShieldsList>) -> some View {
 		let destinationStore = store.destination
 		return securityShieldsSetup(with: destinationStore)
+			.changeMain(with: destinationStore)
 	}
 
 	private func securityShieldsSetup(with destinationStore: PresentationStoreOf<ShieldsList.Destination>) -> some View {
 		fullScreenCover(store: destinationStore.scope(state: \.securityShieldsSetup, action: \.securityShieldsSetup)) {
 			ShieldSetupCoordinator.View(store: $0)
+		}
+	}
+
+	private func changeMain(with destinationStore: PresentationStoreOf<ShieldsList.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.changeMain, action: \.changeMain)) {
+			ChangeMainShield.View(store: $0)
 		}
 	}
 }

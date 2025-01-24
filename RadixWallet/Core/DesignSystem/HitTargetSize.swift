@@ -24,6 +24,9 @@ public enum HitTargetSize: CGFloat, Sendable {
 	/// 64
 	case medium = 64
 
+	/// 80
+	case large = 80
+
 	/// 104
 	case veryLarge = 104
 
@@ -55,6 +58,8 @@ public enum HitTargetSize: CGFloat, Sendable {
 			.small2
 		case .medium:
 			.small1
+		case .large:
+			.medium3
 		case .veryLarge:
 			.medium3
 		case .huge:
