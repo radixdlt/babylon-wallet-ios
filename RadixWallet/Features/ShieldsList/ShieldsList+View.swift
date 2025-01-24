@@ -1,4 +1,14 @@
-extension ShieldsList.State {}
+extension ShieldsList.State {
+	var main: ShieldForDisplay? {
+		shields.first(where: \.isMain)
+	}
+
+	var others: [ShieldForDisplay] {
+		let main = main
+		return shields
+			.filter { $0 != main }
+	}
+}
 
 // MARK: - ShieldsList.View
 extension ShieldsList {
@@ -23,8 +33,16 @@ extension ShieldsList {
 		@MainActor
 		private var coreView: some SwiftUI.View {
 			VStack(spacing: .medium3) {
-				ForEach(store.shields, id: \.self) { shield in
-					shieldCard(shield)
+				// TODO:
+				if let main = store.main {
+					section(text: "Default Shield", rows: [main], showChangeMain: !store.others.isEmpty)
+
+					if !store.others.isEmpty {
+						section(text: "Others", rows: store.others)
+							.padding(.top, .medium3)
+					}
+				} else {
+					section(text: nil, rows: store.others)
 				}
 
 				Button("Create New Security Shield") {
@@ -38,9 +56,64 @@ extension ShieldsList {
 			.frame(maxWidth: .infinity)
 		}
 
+		private func header(_ text: String) -> some SwiftUI.View {
+			Text(text)
+				.textStyle(.secondaryHeader)
+				.foregroundStyle(.app.gray2)
+				.flushedLeft
+		}
+
+		private func section(text: String?, rows: [ShieldForDisplay], showChangeMain: Bool = false) -> some SwiftUI.View {
+			VStack(spacing: .small1) {
+				if let text {
+					HStack(spacing: .zero) {
+						header(text)
+						Spacer()
+						if showChangeMain {
+							Button(L10n.FactorSources.List.change) {
+								store.send(.view(.changeMainButtonTapped))
+							}
+							.buttonStyle(.primaryText())
+						}
+					}
+				}
+
+				VStack(spacing: .medium3) {
+					ForEachStatic(rows) { row in
+						shieldCard(row)
+					}
+				}
+			}
+		}
+
 		private func shieldCard(_ shield: ShieldForDisplay) -> some SwiftUI.View {
-			VStack {
-				Text(shield.name.rawValue)
+			HStack(spacing: .zero) {
+				Image(.shieldStatusNotApplied)
+					.padding(.vertical, .small2)
+
+				VStack(alignment: .leading, spacing: .small2) {
+					Text(shield.name.rawValue)
+						.textStyle(.body1Header)
+						.foregroundStyle(.app.gray1)
+
+					VStack(alignment: .leading, spacing: .zero) {
+						Text("Assigned to:")
+							.textStyle(.body2HighImportance)
+
+						Text("None")
+							.textStyle(.body2Regular)
+					}
+					.foregroundStyle(.app.gray2)
+
+					StatusMessageView(
+						text: "Action required",
+						type: .warning,
+						useNarrowSpacing: true,
+						useSmallerFontSize: true
+					)
+				}
+
+				Spacer()
 			}
 			.centered
 			.padding(.medium2)

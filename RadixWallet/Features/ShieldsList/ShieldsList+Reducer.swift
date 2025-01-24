@@ -17,6 +17,7 @@ struct ShieldsList: FeatureReducer, Sendable {
 	@CasePathable
 	enum ViewAction: Equatable, Sendable {
 		case task
+		case changeMainButtonTapped
 		case createShieldButtonTapped
 	}
 
@@ -61,6 +62,8 @@ struct ShieldsList: FeatureReducer, Sendable {
 		switch viewAction {
 		case .task:
 			return shieldsEffect()
+		case .changeMainButtonTapped:
+			return .none
 		case .createShieldButtonTapped:
 			state.destination = .securityShieldsSetup(.init())
 			return .none
@@ -88,7 +91,13 @@ struct ShieldsList: FeatureReducer, Sendable {
 	private func shieldsEffect() -> Effect<Action> {
 		.run { send in
 			let shields = try SargonOS.shared.securityStructuresOfFactorSources()
-				.map { ShieldForDisplay(shield: $0) }
+				.map {
+					if $0.metadata.displayName == "Test shield" {
+						ShieldForDisplay(shield: $0, isMain: true)
+					} else {
+						ShieldForDisplay(shield: $0)
+					}
+				}
 			await send(.internal(.setShields(shields)))
 		} catch: { error, _ in
 			errorQueue.schedule(error)
@@ -100,8 +109,10 @@ struct ShieldsList: FeatureReducer, Sendable {
 // TEMP
 struct ShieldForDisplay: Hashable, Sendable {
 	let name: DisplayName
+	let isMain: Bool
 
-	init(shield: SecurityStructureOfFactorSources) {
+	init(shield: SecurityStructureOfFactorSources, isMain: Bool = false) {
 		self.name = shield.metadata.displayName
+		self.isMain = isMain
 	}
 }
