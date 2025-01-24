@@ -1,17 +1,5 @@
-
-// MARK: - ViewState
 extension FactorSourceAccess.State {
-	var viewState: FactorSourceAccess.ViewState {
-		.init(
-			title: title,
-			message: message,
-			externalDevice: externalDevice,
-			isRetryEnabled: isRetryEnabled,
-			height: height
-		)
-	}
-
-	private var title: String {
+	var title: String {
 		typealias S = L10n.FactorSourceActions
 		switch purpose {
 		case .signature:
@@ -31,7 +19,7 @@ extension FactorSourceAccess.State {
 		}
 	}
 
-	private var message: String {
+	var message: String {
 		typealias S = L10n.FactorSourceActions
 		switch kind {
 		case .device:
@@ -41,7 +29,7 @@ extension FactorSourceAccess.State {
 			case .createAccount, .createPersona, .deriveAccounts, .proveOwnership, .encryptMessage, .createKey:
 				return S.Device.message
 			}
-		case .ledger:
+		case .ledgerHqHardwareWallet:
 			switch purpose {
 			case .signature:
 				return S.Ledger.signMessage
@@ -50,38 +38,51 @@ extension FactorSourceAccess.State {
 			case .createAccount, .createPersona, .proveOwnership, .encryptMessage, .createKey:
 				return S.Ledger.message
 			}
+		default:
+			fatalError("Not supported yet")
 		}
 	}
 
-	private var externalDevice: String? {
-		switch kind {
-		case .device:
+	var label: String? {
+		switch factorSource {
+		case .none:
 			nil
-		case let .ledger(value):
-			value?.hint.label
+		case let .device(device):
+			device.hint.label
+		case let .ledger(ledger):
+			ledger.hint.label
+		default:
+			fatalError("Not supported yet")
 		}
 	}
 
-	private var isRetryEnabled: Bool {
+	var isRetryEnabled: Bool {
+		guard factorSource != nil else {
+			return false
+		}
 		switch kind {
 		case .device:
-			false
-		case .ledger:
-			true
+			return false
+		case .ledgerHqHardwareWallet:
+			return true
+		default:
+			fatalError("Not supported yet")
 		}
 	}
 
-	private var height: CGFloat {
+	var height: CGFloat {
 		switch kind {
 		case .device:
 			0.55
-		case .ledger:
+		case .ledgerHqHardwareWallet:
 			switch purpose {
 			case .signature, .deriveAccounts:
 				0.74
 			case .createAccount, .createPersona, .proveOwnership, .encryptMessage, .createKey:
 				0.70
 			}
+		default:
+			fatalError("Not supported yet")
 		}
 	}
 }

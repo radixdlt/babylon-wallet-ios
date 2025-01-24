@@ -4,7 +4,7 @@ struct Signing: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
 		let purpose: Purpose
-		var factorSourceAccess: NewFactorSourceAccess.State
+		var factorSourceAccess: FactorSourceAccess.State
 
 		init(input: PerFactorSourceInputOfTransactionIntent) {
 			self.purpose = .transaction(input)
@@ -26,7 +26,7 @@ struct Signing: Sendable, FeatureReducer {
 
 	@CasePathable
 	enum ChildAction: Sendable, Hashable {
-		case factorSourceAccess(NewFactorSourceAccess.Action)
+		case factorSourceAccess(FactorSourceAccess.Action)
 	}
 
 	enum InternalAction: Sendable, Hashable {
@@ -46,7 +46,7 @@ struct Signing: Sendable, FeatureReducer {
 
 	var body: some ReducerOf<Self> {
 		Scope(state: \.factorSourceAccess, action: \.child.factorSourceAccess) {
-			NewFactorSourceAccess()
+			FactorSourceAccess()
 		}
 		Reduce(core)
 	}

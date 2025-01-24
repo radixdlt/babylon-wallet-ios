@@ -7,14 +7,14 @@ extension Signing {
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
-				NewFactorSourceAccess.View(store: store.factorSourceAccess)
+				FactorSourceAccess.View(store: store.factorSourceAccess)
 			}
 		}
 	}
 }
 
 private extension StoreOf<Signing> {
-	var factorSourceAccess: StoreOf<NewFactorSourceAccess> {
+	var factorSourceAccess: StoreOf<FactorSourceAccess> {
 		scope(state: \.factorSourceAccess, action: \.child.factorSourceAccess)
 	}
 }

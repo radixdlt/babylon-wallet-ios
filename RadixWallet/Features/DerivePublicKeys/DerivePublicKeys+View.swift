@@ -8,7 +8,7 @@ extension DerivePublicKeys {
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				if let child = store.scope(state: \.factorSourceAccess, action: \.child.factorSourceAccess) {
-					NewFactorSourceAccess.View(store: child)
+					FactorSourceAccess.View(store: child)
 				} else {
 					// We don't need the FactorSourceAccess, so we can start the derivation right away
 					Rectangle()

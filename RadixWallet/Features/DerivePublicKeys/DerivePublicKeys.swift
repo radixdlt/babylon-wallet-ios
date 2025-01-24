@@ -4,7 +4,7 @@ struct DerivePublicKeys: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
 		let input: KeyDerivationRequestPerFactorSource
-		var factorSourceAccess: NewFactorSourceAccess.State?
+		var factorSourceAccess: FactorSourceAccess.State?
 
 		init(input: KeyDerivationRequestPerFactorSource, purpose: DerivationPurpose) {
 			self.input = input
@@ -20,7 +20,7 @@ struct DerivePublicKeys: Sendable, FeatureReducer {
 
 	@CasePathable
 	enum ChildAction: Sendable, Hashable {
-		case factorSourceAccess(NewFactorSourceAccess.Action)
+		case factorSourceAccess(FactorSourceAccess.Action)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -35,7 +35,7 @@ struct DerivePublicKeys: Sendable, FeatureReducer {
 	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.factorSourceAccess, action: \.child.factorSourceAccess) {
-				NewFactorSourceAccess()
+				FactorSourceAccess()
 			}
 	}
 
@@ -72,7 +72,7 @@ private extension DerivePublicKeys {
 }
 
 private extension DerivationPurpose {
-	var factorSourceAccessPurpose: NewFactorSourceAccess.State.Purpose {
+	var factorSourceAccessPurpose: FactorSourceAccess.State.Purpose {
 		switch self {
 		case .creatingNewAccount:
 			.createAccount
