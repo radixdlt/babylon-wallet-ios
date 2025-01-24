@@ -1539,3 +1539,6 @@ Code: %@";
 "transactionRecovery_preAuthorization_message" = "You’ve skipped too many factors and cannot sign the pre-authorization. You can restart the signing process, or cancel it.";
 "transactionRecovery_preAuthorization_cancel" = "Cancel Pre-Authorization";
 "transactionRecovery_restart" = "Restart Signing";
+"authorization_createAccount_title" = "Creating Account";
+"authorization_createPersona_title" = "Creating Persona";
+"authorization_createEntity_message" = "Use your phone’s biometrics or PIN to confirm you want to do this.";
