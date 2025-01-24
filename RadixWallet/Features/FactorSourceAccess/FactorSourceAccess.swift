@@ -88,8 +88,8 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 				state.factorSource = factorSource
 				return .send(.delegate(.perform(factorSource)))
 			} else {
-				state.destination = .errorAlert(.factorSourceMissing)
-				return .none
+				assertionFailure("No Factor Source found on Profile for id: \(state.id)")
+				return .send(.delegate(.cancel))
 			}
 
 		case let .hasP2PLinks(hasP2PLinks):
@@ -118,9 +118,6 @@ private extension FactorSourceAccess {
 		.run { [id = state.id] send in
 			let factorSource = try await factorSourcesClient.getFactorSource(id: id.asGeneral)
 			await send(.internal(.setFactorSource(factorSource)))
-		} catch: { error, _ in
-			// TODO: Define how to handle this case
-			errorQueue.schedule(error)
 		}
 	}
 
@@ -164,19 +161,6 @@ extension FactorSourceAccess.State {
 }
 
 private extension AlertState<FactorSourceAccess.Destination.ErrorAlert> {
-	static var factorSourceMissing: AlertState {
-		// TODO: Define this error handling
-		AlertState {
-			TextState("Unable to find Factor Source")
-		} actions: {
-			ButtonState(action: .okTapped) {
-				TextState(L10n.Common.ok)
-			}
-		} message: {
-			TextState("We don't have access to the required Factor Source")
-		}
-	}
-
 	static var noP2Plink: AlertState {
 		AlertState {
 			TextState(L10n.LedgerHardwareDevices.LinkConnectorAlert.title)

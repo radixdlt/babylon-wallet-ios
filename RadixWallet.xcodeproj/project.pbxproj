@@ -738,6 +738,7 @@
 		5B526AEC2C89C3C200AF8B72 /* ResourcesVisibilityClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B526AE82C89C3C200AF8B72 /* ResourcesVisibilityClient+Interface.swift */; };
 		5B526AED2C89C3C200AF8B72 /* ResourcesVisibilityClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B526AE92C89C3C200AF8B72 /* ResourcesVisibilityClient+Live.swift */; };
 		5B526AEE2C89C3C200AF8B72 /* ResourcesVisibilityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B526AEA2C89C3C200AF8B72 /* ResourcesVisibilityClient+Test.swift */; };
+		5B5484F42D43F6410008AEE0 /* Error+FactorSources.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5484F32D43F63A0008AEE0 /* Error+FactorSources.swift */; };
 		5B634A942C91D2A0004B2FBC /* ScreenshotPreventing in Frameworks */ = {isa = PBXBuildFile; productRef = 5B634A932C91D2A0004B2FBC /* ScreenshotPreventing */; };
 		5B6499B72BCFD0E8000F2176 /* SecurityFactors+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B52BCFD0E8000F2176 /* SecurityFactors+View.swift */; };
 		5B6499B82BCFD0E8000F2176 /* SecurityFactors+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B62BCFD0E8000F2176 /* SecurityFactors+Reducer.swift */; };
@@ -2019,6 +2020,7 @@
 		5B526AE82C89C3C200AF8B72 /* ResourcesVisibilityClient+Interface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ResourcesVisibilityClient+Interface.swift"; sourceTree = "<group>"; };
 		5B526AE92C89C3C200AF8B72 /* ResourcesVisibilityClient+Live.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ResourcesVisibilityClient+Live.swift"; sourceTree = "<group>"; };
 		5B526AEA2C89C3C200AF8B72 /* ResourcesVisibilityClient+Test.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ResourcesVisibilityClient+Test.swift"; sourceTree = "<group>"; };
+		5B5484F32D43F63A0008AEE0 /* Error+FactorSources.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Error+FactorSources.swift"; sourceTree = "<group>"; };
 		5B6499B52BCFD0E8000F2176 /* SecurityFactors+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityFactors+View.swift"; sourceTree = "<group>"; };
 		5B6499B62BCFD0E8000F2176 /* SecurityFactors+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityFactors+Reducer.swift"; sourceTree = "<group>"; };
 		5B6499B92BCFDB1E000F2176 /* ShareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareView.swift; sourceTree = "<group>"; };
@@ -2985,6 +2987,7 @@
 		48CFBCA72ADC10D800E77A5C /* Signing */ = {
 			isa = PBXGroup;
 			children = (
+				5B5484F32D43F63A0008AEE0 /* Error+FactorSources.swift */,
 				489FEF942BDD0BEA003EC10D /* SigningPurpose.swift */,
 				489FEF922BDD0BA7003EC10D /* Signer.swift */,
 				5B2A0D7F2D358DBB0049C702 /* Signing.swift */,
@@ -7967,6 +7970,7 @@
 				48CFC2CC2ADC10D900E77A5C /* FungibleResourceAsset+Reducer.swift in Sources */,
 				A40815B72C7E0D08005E65B9 /* NativeResourceRedemptionValueItem.swift in Sources */,
 				48CFC29A2ADC10D900E77A5C /* InteractionReviewDapps+View.swift in Sources */,
+				5B5484F42D43F6410008AEE0 /* Error+FactorSources.swift in Sources */,
 				5BB2C2482D36C66A00286B6B /* FactorSourceAccess.swift in Sources */,
 				5BB2C2492D36C66A00286B6B /* FactorSourceAccess+View.swift in Sources */,
 				483A3DE62BD2678900055932 /* Stage1MigrateToSargon+FactorSourceCryptoParameters.swift in Sources */,

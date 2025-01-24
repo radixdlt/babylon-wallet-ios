@@ -65,7 +65,21 @@ private extension DerivePublicKeys {
 				fatalError("Not implemented")
 			}
 			await send(.delegate(.finished(factorInstances)))
-		} catch: { error, _ in
+		} catch: { error, send in
+			await handleError(factorSource: factorSource, error: error, send: send)
+		}
+	}
+
+	private func handleError(factorSource: FactorSource, error: Error, send: Send<DerivePublicKeys.Action>) async {
+		switch factorSource.kind {
+		case .device:
+			if !error.isUserCanceledKeychainAccess {
+				// If user cancelled the operation, we will allow them to retry.
+				// In any other situation we handle the error.
+				errorQueue.schedule(error)
+			}
+
+		default:
 			errorQueue.schedule(error)
 		}
 	}

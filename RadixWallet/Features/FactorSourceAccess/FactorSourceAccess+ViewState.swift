@@ -62,7 +62,7 @@ extension FactorSourceAccess.State {
 		}
 		switch kind {
 		case .device:
-			return false
+			return true
 		case .ledgerHqHardwareWallet:
 			return true
 		default:

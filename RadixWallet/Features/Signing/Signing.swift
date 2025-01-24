@@ -76,29 +76,20 @@ struct Signing: Sendable, FeatureReducer {
 private extension Signing {
 	func sign(purpose: State.Purpose, factorSource: FactorSource) -> Effect<Action> {
 		.run { send in
-			switch factorSource {
+			let signatures = switch factorSource {
 			case .device:
-				let signatures = try await signDevice(purpose: purpose)
-				await send(.internal(.handleSignatures(factorSource, signatures)))
+				try await signDevice(purpose: purpose)
 
 			case let .ledger(ledger):
-				do {
-					let signatures = try await signLedger(purpose: purpose, ledger: ledger)
-					await send(.internal(.handleSignatures(factorSource, signatures)))
-				} catch {
-					if error.isUserRejectedSigningOnLedgerDevice {
-						// If user rejected signature on ledger device, we will inform the delegate to dismiss the signing sheet.
-						await send(.delegate(.cancelled))
-					} else {
-						throw error
-					}
-				}
+				try await signLedger(purpose: purpose, ledger: ledger)
 
 			default:
 				fatalError("Not implemented")
 			}
-		} catch: { error, _ in
-			errorQueue.schedule(error)
+			await send(.internal(.handleSignatures(factorSource, signatures)))
+
+		} catch: { error, send in
+			await handleError(factorSource: factorSource, error: error, send: send)
 		}
 	}
 
@@ -140,6 +131,29 @@ private extension Signing {
 		}
 	}
 
+	private func handleError(factorSource: FactorSource, error: Error, send: Send<Signing.Action>) async {
+		switch factorSource.kind {
+		case .device:
+			if !error.isUserCanceledKeychainAccess {
+				// If user cancelled the operation, we will allow them to retry.
+				// In any other situation we handle the error.
+				errorQueue.schedule(error)
+			}
+
+		case .ledgerHqHardwareWallet:
+			if error.isUserRejectedSigningOnLedgerDevice {
+				// If user rejected signature on ledger device, we will inform the delegate to dismiss the signing sheet.
+				await send(.delegate(.cancelled))
+			} else {
+				// Otherwise, we will handle the error
+				errorQueue.schedule(error)
+			}
+
+		default:
+			errorQueue.schedule(error)
+		}
+	}
+
 	func updateLastUsed(factorSource: FactorSource) -> Effect<Action> {
 		.run { _ in
 			try? await factorSourcesClient.updateLastUsed(.init(factorSourceId: factorSource.id))
@@ -162,14 +176,5 @@ extension Signing {
 		case transaction([HdSignatureOfTransactionIntentHash])
 		case subintent([HdSignatureOfSubintentHash])
 		case auth([HdSignatureOfAuthIntentHash])
-	}
-}
-
-private extension Error {
-	var isUserRejectedSigningOnLedgerDevice: Bool {
-		guard let error = self as? P2P.ConnectorExtension.Response.LedgerHardwareWallet.Failure else {
-			return false
-		}
-		return error.code == .userRejectedSigningOfTransaction
 	}
 }
