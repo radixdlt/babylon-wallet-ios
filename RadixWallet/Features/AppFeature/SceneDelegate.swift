@@ -125,7 +125,7 @@ final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObject {
 
 		biometricsSplashWindow = UIWindow(windowScene: scene)
 		biometricsSplashWindow?.rootViewController = UIHostingController(rootView: splashView)
-		biometricsSplashWindow?.windowLevel = .normal + 2
+		biometricsSplashWindow?.windowLevel = .normal + 3
 		biometricsSplashWindow?.makeKeyAndVisible()
 	}
 
