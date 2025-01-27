@@ -19,7 +19,6 @@ struct ContentOverlay: Sendable, FeatureReducer {
 
 	enum InternalAction: Sendable, Equatable {
 		case scheduleItem(OverlayWindowClient.Item.Content)
-		case showNextItemIfPossible
 	}
 
 	struct Destination: DestinationReducer {
@@ -73,8 +72,6 @@ struct ContentOverlay: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .scheduleItem(event):
 			state.itemsQueue.append(event)
-			return showItemIfPossible(state: &state)
-		case .showNextItemIfPossible:
 			return showItemIfPossible(state: &state)
 		}
 	}
@@ -137,7 +134,7 @@ struct ContentOverlay: Sendable, FeatureReducer {
 	}
 
 	/// Sets the interaction enabled on the window, by implication this will also enable/disable the interaction
-	/// with the main app window. When showing an Alert, we don't want users to be able to interact with the main app window for example.
+	/// with the main app window. When showing a Sheet , we don't want users to be able to interact with the main app window for example.
 	private func setIsUserInteractionEnabled(_ state: inout State, isEnabled: Bool) -> Effect<Action> {
 		overlayWindowClient.setIsContentUserIteractionEnabled(isEnabled)
 		return .none
