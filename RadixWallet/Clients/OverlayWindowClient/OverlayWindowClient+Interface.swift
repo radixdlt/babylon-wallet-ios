@@ -152,4 +152,8 @@ extension OverlayWindowClient {
 	func derivePublicKeys(input: KeyDerivationRequestPerFactorSource, purpose: DerivationPurpose) async -> SheetAction {
 		await scheduleSheet(.init(root: .derivePublicKeys(.init(input: input, purpose: purpose))))
 	}
+
+	func authorize(purpose: AuthorizationPurpose) async -> SheetAction {
+		await scheduleSheet(.init(root: .authorization(.init(purpose: purpose))))
+	}
 }

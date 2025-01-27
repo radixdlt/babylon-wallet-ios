@@ -101,7 +101,17 @@ final class SargonHostInteractor: HostInteractor {
 	}
 
 	func requestAuthorization(purpose: SargonUniFFI.AuthorizationPurpose) async -> SargonUniFFI.AuthorizationResponse {
-		// TODO: Implement authorization UI
-		.authorized
+		let action = await overlayWindowClient.authorize(purpose: purpose)
+
+		switch action {
+		case .authorization(.cancelled):
+			return .rejected
+
+		case .authorization(.authorized):
+			return .authorized
+
+		default:
+			fatalError("Unexpected action")
+		}
 	}
 }

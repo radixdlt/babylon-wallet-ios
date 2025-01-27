@@ -763,6 +763,9 @@
 		5B813D1C2CFF7411001A291D /* NameLedgerFactorSource+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B813D1B2CFF740C001A291D /* NameLedgerFactorSource+View.swift */; };
 		5B83D2C92D47D37E007111B0 /* StatusOverlay+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B83D2C82D47D376007111B0 /* StatusOverlay+Reducer.swift */; };
 		5B83D2CB2D47D384007111B0 /* StatusOverlay+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B83D2CA2D47D382007111B0 /* StatusOverlay+View.swift */; };
+		5B83D2CF2D47F15E007111B0 /* FactorSourceAccess+Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B83D2CE2D47F158007111B0 /* FactorSourceAccess+Models.swift */; };
+		5B83D2D82D47FC1E007111B0 /* Authorization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B83D2D52D47FC1E007111B0 /* Authorization.swift */; };
+		5B83D2D92D47FC1E007111B0 /* Authorization+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B83D2D62D47FC1E007111B0 /* Authorization+View.swift */; };
 		5B8433A12CD010DD00CA00F5 /* PreAuthorizationClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8433A02CD010DD00CA00F5 /* PreAuthorizationClient+Interface.swift */; };
 		5B8433A42CD011B600CA00F5 /* PreAuthorizationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8433A32CD011B000CA00F5 /* PreAuthorizationModels.swift */; };
 		5B8433A62CD011DE00CA00F5 /* PreAuthorizationClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8433A52CD011DC00CA00F5 /* PreAuthorizationClient+Test.swift */; };
@@ -2045,6 +2048,9 @@
 		5B813D1B2CFF740C001A291D /* NameLedgerFactorSource+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NameLedgerFactorSource+View.swift"; sourceTree = "<group>"; };
 		5B83D2C82D47D376007111B0 /* StatusOverlay+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "StatusOverlay+Reducer.swift"; sourceTree = "<group>"; };
 		5B83D2CA2D47D382007111B0 /* StatusOverlay+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "StatusOverlay+View.swift"; sourceTree = "<group>"; };
+		5B83D2CE2D47F158007111B0 /* FactorSourceAccess+Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactorSourceAccess+Models.swift"; sourceTree = "<group>"; };
+		5B83D2D52D47FC1E007111B0 /* Authorization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Authorization.swift; sourceTree = "<group>"; };
+		5B83D2D62D47FC1E007111B0 /* Authorization+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Authorization+View.swift"; sourceTree = "<group>"; };
 		5B8433A02CD010DD00CA00F5 /* PreAuthorizationClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PreAuthorizationClient+Interface.swift"; sourceTree = "<group>"; };
 		5B8433A32CD011B000CA00F5 /* PreAuthorizationModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreAuthorizationModels.swift; sourceTree = "<group>"; };
 		5B8433A52CD011DC00CA00F5 /* PreAuthorizationClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PreAuthorizationClient+Test.swift"; sourceTree = "<group>"; };
@@ -2789,6 +2795,7 @@
 		48CFBC602ADC10D800E77A5C /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				5B83D2D72D47FC1E007111B0 /* Authorization */,
 				5B813D042CFF2028001A291D /* ShieldSetup */,
 				A4DBBEB12C20302B00D0A59E /* CardCarousel */,
 				E7AE2D082C05F22700830BAA /* ClaimWallet */,
@@ -5787,6 +5794,15 @@
 			path = Children;
 			sourceTree = "<group>";
 		};
+		5B83D2D72D47FC1E007111B0 /* Authorization */ = {
+			isa = PBXGroup;
+			children = (
+				5B83D2D52D47FC1E007111B0 /* Authorization.swift */,
+				5B83D2D62D47FC1E007111B0 /* Authorization+View.swift */,
+			);
+			path = Authorization;
+			sourceTree = "<group>";
+		};
 		5B84339F2CD010AD00CA00F5 /* PreAuthorizationClient */ = {
 			isa = PBXGroup;
 			children = (
@@ -5875,6 +5891,7 @@
 			children = (
 				5BB2C2462D36C66A00286B6B /* FactorSourceAccess.swift */,
 				5BB2C2472D36C66A00286B6B /* FactorSourceAccess+View.swift */,
+				5B83D2CE2D47F158007111B0 /* FactorSourceAccess+Models.swift */,
 				5BB2C24A2D36C9D200286B6B /* FactorSourceAccess+ViewState.swift */,
 			);
 			path = FactorSourceAccess;
@@ -7549,6 +7566,7 @@
 				83D663B02B271D0100D1AB9E /* TruncationMask.swift in Sources */,
 				E79DD1B62CE4933100B1EB86 /* DeleteAccountConfirmation+Reducer.swift in Sources */,
 				48CFC3462ADC10D900E77A5C /* DappInteractionCompletion.swift in Sources */,
+				5B83D2CF2D47F15E007111B0 /* FactorSourceAccess+Models.swift in Sources */,
 				A40816002C7E0D08005E65B9 /* StateAccountLockersTouchedAtResponse.swift in Sources */,
 				48CFC25A2ADC10D900E77A5C /* OnboardingCoordinator+Reducer.swift in Sources */,
 				5BB7C1782BC81F61001216EB /* ImportOlympiaNameLedger+View.swift in Sources */,
@@ -7655,6 +7673,8 @@
 				48CFC4002ADC10D900E77A5C /* Constants.swift in Sources */,
 				5B3C48C32C874C8D00DB160D /* Dispatch+Extra.swift in Sources */,
 				A40815842C7E0D08005E65B9 /* InvalidTransactionError.swift in Sources */,
+				5B83D2D82D47FC1E007111B0 /* Authorization.swift in Sources */,
+				5B83D2D92D47FC1E007111B0 /* Authorization+View.swift in Sources */,
 				83823EAA2B72365000827211 /* TokenPriceClient+Interface.swift in Sources */,
 				48CFC46D2ADC10DA00E77A5C /* PersonasClient+Interface.swift in Sources */,
 				48CFC2BB2ADC10D900E77A5C /* SelectBackup+Reducer.swift in Sources */,

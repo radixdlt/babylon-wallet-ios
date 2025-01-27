@@ -55,25 +55,27 @@ extension FactorSourceAccess {
 
 		@ViewBuilder
 		private var description: some SwiftUI.View {
-			if let label = store.label {
-				HStack(spacing: .medium2) {
-					Image(store.kind.icon)
-						.resizable()
-						.frame(.smallest)
-						.foregroundColor(.app.gray3)
+			if store.showDescription {
+				if let label = store.label {
+					HStack(spacing: .medium2) {
+						Image(store.kind.icon)
+							.resizable()
+							.frame(.smallest)
+							.foregroundColor(.app.gray3)
 
-					Text(label)
-						.textStyle(.secondaryHeader)
-						.foregroundColor(.app.gray1)
-						.padding(.trailing, .small2)
+						Text(label)
+							.textStyle(.secondaryHeader)
+							.foregroundColor(.app.gray1)
+							.padding(.trailing, .small2)
 
-					Spacer()
+						Spacer()
+					}
+					.padding(.medium2)
+					.background(Color.app.gray5)
+					.cornerRadius(.small1)
+				} else {
+					ProgressView()
 				}
-				.padding(.medium2)
-				.background(Color.app.gray5)
-				.cornerRadius(.small1)
-			} else {
-				ProgressView()
 			}
 		}
 	}

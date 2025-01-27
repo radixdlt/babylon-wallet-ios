@@ -24,6 +24,7 @@ struct SheetOverlayCoordinator: Sendable, FeatureReducer {
 		case dismiss
 		case signing(Signing.DelegateAction)
 		case derivePublicKeys(DerivePublicKeys.DelegateAction)
+		case authorization(Authorization.DelegateAction)
 	}
 
 	struct Root: Sendable, Hashable, Reducer {
@@ -32,6 +33,7 @@ struct SheetOverlayCoordinator: Sendable, FeatureReducer {
 			case infoLink(InfoLinkSheet.State)
 			case signing(Signing.State)
 			case derivePublicKeys(DerivePublicKeys.State)
+			case authorization(Authorization.State)
 		}
 
 		@CasePathable
@@ -39,6 +41,7 @@ struct SheetOverlayCoordinator: Sendable, FeatureReducer {
 			case infoLink(InfoLinkSheet.Action)
 			case signing(Signing.Action)
 			case derivePublicKeys(DerivePublicKeys.Action)
+			case authorization(Authorization.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -50,6 +53,9 @@ struct SheetOverlayCoordinator: Sendable, FeatureReducer {
 			}
 			Scope(state: \.derivePublicKeys, action: \.derivePublicKeys) {
 				DerivePublicKeys()
+			}
+			Scope(state: \.authorization, action: \.authorization) {
+				Authorization()
 			}
 		}
 	}
@@ -78,6 +84,9 @@ struct SheetOverlayCoordinator: Sendable, FeatureReducer {
 
 		case let .root(.derivePublicKeys(.delegate(action))):
 			.send(.delegate(.derivePublicKeys(action)))
+
+		case let .root(.authorization(.delegate(action))):
+			.send(.delegate(.authorization(action)))
 
 		default:
 			.none

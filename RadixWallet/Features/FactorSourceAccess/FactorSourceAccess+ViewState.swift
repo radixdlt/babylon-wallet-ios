@@ -16,6 +16,13 @@ extension FactorSourceAccess.State {
 			return S.EncryptMessage.title
 		case .createKey:
 			return S.CreateKey.title
+		case let .authorization(authorization):
+			switch authorization {
+			case .creatingAccount, .creatingAccounts:
+				return S.CreateAccount.title
+			case .creatingPersona, .creatingPersonas:
+				return S.CreatePersona.title
+			}
 		}
 	}
 
@@ -28,6 +35,8 @@ extension FactorSourceAccess.State {
 				return S.Device.signMessage
 			case .createAccount, .createPersona, .deriveAccounts, .proveOwnership, .encryptMessage, .createKey:
 				return S.Device.message
+			case .authorization:
+				return "Use your phone’s biometrics or PIN to confirm you want to do this."
 			}
 		case .ledgerHqHardwareWallet:
 			switch purpose {
@@ -37,9 +46,20 @@ extension FactorSourceAccess.State {
 				return S.Ledger.deriveAccountsMessage
 			case .createAccount, .createPersona, .proveOwnership, .encryptMessage, .createKey:
 				return S.Ledger.message
+			case .authorization:
+				return "Use your phone’s biometrics or PIN to confirm you want to do this."
 			}
 		default:
 			fatalError("Not supported yet")
+		}
+	}
+
+	var showDescription: Bool {
+		switch purpose {
+		case .authorization:
+			false
+		default:
+			true
 		}
 	}
 
@@ -78,7 +98,7 @@ extension FactorSourceAccess.State {
 			switch purpose {
 			case .signature, .deriveAccounts:
 				0.74
-			case .createAccount, .createPersona, .proveOwnership, .encryptMessage, .createKey:
+			case .createAccount, .createPersona, .proveOwnership, .encryptMessage, .createKey, .authorization:
 				0.70
 			}
 		default:

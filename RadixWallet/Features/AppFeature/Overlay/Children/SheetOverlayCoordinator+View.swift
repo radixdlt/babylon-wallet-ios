@@ -35,6 +35,13 @@ extension SheetOverlayCoordinator {
 						action: SheetOverlayCoordinator.Root.Action.derivePublicKeys,
 						then: { DerivePublicKeys.View(store: $0) }
 					)
+
+				case .authorization:
+					CaseLet(
+						/SheetOverlayCoordinator.Root.State.authorization,
+						action: SheetOverlayCoordinator.Root.Action.authorization,
+						then: { Authorization.View(store: $0) }
+					)
 				}
 			}
 		}

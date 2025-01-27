@@ -3,7 +3,7 @@
 struct FactorSourceAccess: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
-		let id: FactorSourceIdFromHash
+		let id: FactorSourceIdFromHash?
 		let purpose: Purpose
 		var factorSource: FactorSource?
 
@@ -11,7 +11,7 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 		var destination: Destination.State? = nil
 
 		var kind: FactorSourceKind {
-			id.kind
+			id?.kind ?? .device
 		}
 	}
 
@@ -88,7 +88,7 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 				state.factorSource = factorSource
 				return .send(.delegate(.perform(factorSource)))
 			} else {
-				assertionFailure("No Factor Source found on Profile for id: \(state.id)")
+				assertionFailure("No Factor Source found on Profile for id: \(String(describing: state.id))")
 				return .send(.delegate(.cancel))
 			}
 
@@ -116,8 +116,14 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 private extension FactorSourceAccess {
 	func fetchFactorSource(state: State) -> Effect<Action> {
 		.run { [id = state.id] send in
-			let factorSource = try await factorSourcesClient.getFactorSource(id: id.asGeneral)
-			await send(.internal(.setFactorSource(factorSource)))
+			if let id {
+				let factorSource = try await factorSourcesClient.getFactorSource(id: id.asGeneral)
+				await send(.internal(.setFactorSource(factorSource)))
+			} else {
+				// If no id is set, we need to get main BDFS
+				let mainBdfs = try SargonOS.shared.mainBdfs()
+				await send(.internal(.setFactorSource(mainBdfs.asGeneral)))
+			}
 		}
 	}
 
@@ -131,32 +137,6 @@ private extension FactorSourceAccess {
 		} catch: { error, _ in
 			loggerGlobal.error("failed to check if has p2p links, error: \(error)")
 		}
-	}
-}
-
-// MARK: - FactorSourceAccess.State.Purpose
-extension FactorSourceAccess.State {
-	enum Purpose: Sendable, Hashable {
-		/// Signing transactions.
-		case signature
-
-		/// Adding a new account.
-		case createAccount
-
-		/// Adding a new persona.
-		case createPersona
-
-		/// Recovery of existing accounts.
-		case deriveAccounts
-
-		/// ROLA proof of accounts/personas.
-		case proveOwnership
-
-		/// Encrypting messages on transactions.
-		case encryptMessage
-
-		/// MFA signing, ROLA or encryption.
-		case createKey
 	}
 }
 
