@@ -3,7 +3,6 @@ import SwiftUI
 
 final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObject {
 	weak var windowScene: UIWindowScene?
-	var overlayWindow: UIWindow?
 	private var didEnterBackground = false
 
 	func scene(
@@ -17,7 +16,8 @@ final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObject {
 			// avoids unimplemented("OverlayWindowClient.isUserInteractionEnabled")
 			!_XCTIsTesting
 		{
-			overlayWindow(in: windowScene)
+			contentOverlayWindow(in: windowScene)
+			statusOverlayWindow(in: windowScene)
 		}
 
 		// avoids unimplemented("LocalAuthenticationClient.authenticatedSuccessfully")
@@ -56,13 +56,15 @@ final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObject {
 		showPrivacyProtectionWindow(in: scene)
 	}
 
-	// MARK: Overlay
+	// MARK: Content Overlay
 
-	func overlayWindow(in scene: UIWindowScene) {
-		let overlayView = OverlayReducer.View(
+	private var contentOverlayWindow: UIWindow?
+
+	func contentOverlayWindow(in scene: UIWindowScene) {
+		let overlayView = ContentOverlay.View(
 			store: .init(
 				initialState: .init(),
-				reducer: OverlayReducer.init
+				reducer: ContentOverlay.init
 			))
 
 		let overlayWindow = UIWindow(windowScene: scene)
@@ -74,12 +76,40 @@ final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObject {
 
 		@Dependency(\.overlayWindowClient) var overlayWindowClient
 		Task { @MainActor [overlayWindow] in
-			for try await isUserInteractionEnabled in overlayWindowClient.isUserInteractionEnabled() {
+			for try await isUserInteractionEnabled in overlayWindowClient.isContentUserInteractionEnabled() {
 				overlayWindow.isUserInteractionEnabled = isUserInteractionEnabled
 			}
 		}
 
-		self.overlayWindow = overlayWindow
+		self.contentOverlayWindow = overlayWindow
+	}
+
+	// MARK: Status Overlay
+
+	private var statusOverlayWindow: UIWindow?
+
+	func statusOverlayWindow(in scene: UIWindowScene) {
+		let overlayView = StatusOverlay.View(
+			store: .init(
+				initialState: .init(),
+				reducer: StatusOverlay.init
+			))
+
+		let overlayWindow = UIWindow(windowScene: scene)
+		overlayWindow.rootViewController = UIHostingController(rootView: overlayView)
+		overlayWindow.rootViewController?.view.backgroundColor = .clear
+		overlayWindow.windowLevel = .normal + 2
+		overlayWindow.isUserInteractionEnabled = false
+		overlayWindow.makeKeyAndVisible()
+
+		@Dependency(\.overlayWindowClient) var overlayWindowClient
+		Task { @MainActor [overlayWindow] in
+			for try await isUserInteractionEnabled in overlayWindowClient.isStatusUserInteractionEnabled() {
+				overlayWindow.isUserInteractionEnabled = isUserInteractionEnabled
+			}
+		}
+
+		self.statusOverlayWindow = overlayWindow
 	}
 
 	// MARK: Biometrics
@@ -95,7 +125,7 @@ final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObject {
 
 		biometricsSplashWindow = UIWindow(windowScene: scene)
 		biometricsSplashWindow?.rootViewController = UIHostingController(rootView: splashView)
-		biometricsSplashWindow?.windowLevel = .normal + 2
+		biometricsSplashWindow?.windowLevel = .normal + 3
 		biometricsSplashWindow?.makeKeyAndVisible()
 	}
 

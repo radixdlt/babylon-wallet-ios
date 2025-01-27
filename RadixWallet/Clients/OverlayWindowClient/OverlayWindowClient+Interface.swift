@@ -1,8 +1,11 @@
 // MARK: - OverlayWindowClient
 /// This client is the intermediary between Main Window and the Overlay Window.
 struct OverlayWindowClient: Sendable {
-	/// All scheduled items to be shown in Overlay Window.
-	var scheduledItems: ScheduledItems
+	/// All scheduled items to be shown in Content Overlay Window.
+	var scheduledContent: ScheduledContent
+
+	/// All scheduled items to be shown in Status Overlay Window.
+	var scheduledStatus: ScheduledStatus
 
 	/// Schedule an Alert to be shown in the Overlay Window.
 	/// Usually to be called from the Main Window.
@@ -32,8 +35,10 @@ struct OverlayWindowClient: Sendable {
 	/// Used by the Overlay Window to send actions from an SheetAction back to the client
 	var sendSheetAction: SendSheetAction
 
-	var setIsUserIteractionEnabled: SetIsUserIteractionEnabled
-	var isUserInteractionEnabled: IsUserInteractionEnabled
+	var setIsContentUserIteractionEnabled: SetIsUserIteractionEnabled
+	var isContentUserInteractionEnabled: IsUserInteractionEnabled
+	var setIsStatusUserIteractionEnabled: SetIsUserIteractionEnabled
+	var isStatusUserInteractionEnabled: IsUserInteractionEnabled
 }
 
 extension OverlayWindowClient {
@@ -50,7 +55,8 @@ extension OverlayWindowClient {
 	typealias SendAlertAction = @Sendable (Item.AlertAction, Item.AlertState.ID) -> Void
 	typealias SendFullScreenAction = @Sendable (FullScreenAction, FullScreenID) -> Void
 	typealias SendSheetAction = @Sendable (SheetAction, SheetID) -> Void
-	typealias ScheduledItems = @Sendable () -> AnyAsyncSequence<Item>
+	typealias ScheduledContent = @Sendable () -> AnyAsyncSequence<Item.Content>
+	typealias ScheduledStatus = @Sendable () -> AnyAsyncSequence<Item.Status>
 
 	typealias SetIsUserIteractionEnabled = @Sendable (Bool) -> Void
 	typealias IsUserInteractionEnabled = @Sendable () -> AnyAsyncSequence<Bool>
@@ -102,10 +108,18 @@ extension OverlayWindowClient {
 			}
 		}
 
-		case hud(HUD)
-		case alert(AlertState)
-		case sheet(SheetOverlayCoordinator.State)
-		case fullScreen(FullScreenOverlayCoordinator.State)
+		enum Content: Sendable, Hashable {
+			case sheet(SheetOverlayCoordinator.State)
+			case fullScreen(FullScreenOverlayCoordinator.State)
+		}
+
+		enum Status: Sendable, Hashable {
+			case hud(HUD)
+			case alert(AlertState)
+		}
+
+		case content(Content)
+		case status(Status)
 	}
 }
 

@@ -1,9 +1,9 @@
 import ComposableArchitecture
 import SwiftUI
 
-struct OverlayReducer: Sendable, FeatureReducer {
+struct StatusOverlay: Sendable, FeatureReducer {
 	struct State: Hashable, Sendable {
-		var itemsQueue: OrderedSet<OverlayWindowClient.Item> = []
+		var itemsQueue: OrderedSet<OverlayWindowClient.Item.Status> = []
 
 		var isPresenting: Bool {
 			destination != nil
@@ -18,7 +18,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case scheduleItem(OverlayWindowClient.Item)
+		case scheduleItem(OverlayWindowClient.Item.Status)
 		case showNextItemIfPossible
 	}
 
@@ -26,28 +26,18 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
 			case hud(HUD.State)
-			case sheet(SheetOverlayCoordinator.State)
 			case alert(OverlayWindowClient.Item.AlertState)
-			case fullScreen(FullScreenOverlayCoordinator.State)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
 			case hud(HUD.Action)
-			case sheet(SheetOverlayCoordinator.Action)
 			case alert(OverlayWindowClient.Item.AlertAction)
-			case fullScreen(FullScreenOverlayCoordinator.Action)
 		}
 
 		var body: some Reducer<State, Action> {
 			Scope(state: \.hud, action: \.hud) {
 				HUD()
-			}
-			Scope(state: \.sheet, action: \.sheet) {
-				SheetOverlayCoordinator()
-			}
-			Scope(state: \.fullScreen, action: \.fullScreen) {
-				FullScreenOverlayCoordinator()
 			}
 		}
 	}
@@ -58,7 +48,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(destinationPath, action: /Action.destination) {
+			.ifLet(destinationPath, action: \.destination) {
 				Destination()
 			}
 	}
@@ -69,7 +59,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		switch viewAction {
 		case .task:
 			.run { send in
-				for try await item in overlayWindowClient.scheduledItems() {
+				for try await item in overlayWindowClient.scheduledStatus() {
 					await send(.internal(.scheduleItem(item)))
 				}
 			}
@@ -103,18 +93,6 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		case .hud(.delegate(.dismiss)):
 			return dismiss(&state)
 
-		case let .sheet(.delegate(action)):
-			if case let .sheet(state) = state.itemsQueue.first {
-				overlayWindowClient.sendSheetAction(action, state.id)
-			}
-			return dismiss(&state)
-
-		case let .fullScreen(.delegate(action)):
-			if case let .fullScreen(state) = state.itemsQueue.first {
-				overlayWindowClient.sendFullScreenAction(action, state.id)
-			}
-			return dismiss(&state)
-
 		default:
 			return .none
 		}
@@ -124,8 +102,6 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		switch state.itemsQueue.first {
 		case let .alert(state):
 			overlayWindowClient.sendAlertAction(.dismissed, state.id)
-		case let .fullScreen(state):
-			overlayWindowClient.sendFullScreenAction(.dismiss, state.id)
 		default:
 			break
 		}
@@ -158,16 +134,8 @@ struct OverlayReducer: Sendable, FeatureReducer {
 			state.destination = .hud(.init(content: hud))
 			return .none
 
-		case let .sheet(sheet):
-			state.destination = .sheet(sheet)
-			return setIsUserInteractionEnabled(&state, isEnabled: true)
-
 		case let .alert(alert):
 			state.destination = .alert(alert)
-			return setIsUserInteractionEnabled(&state, isEnabled: true)
-
-		case let .fullScreen(fullScreen):
-			state.destination = .fullScreen(fullScreen)
 			return setIsUserInteractionEnabled(&state, isEnabled: true)
 		}
 	}
@@ -182,7 +150,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 	/// Sets the interaction enabled on the window, by implication this will also enable/disable the interaction
 	/// with the main app window. When showing an Alert, we don't want users to be able to interact with the main app window for example.
 	private func setIsUserInteractionEnabled(_ state: inout State, isEnabled: Bool) -> Effect<Action> {
-		overlayWindowClient.setIsUserIteractionEnabled(isEnabled)
+		overlayWindowClient.setIsStatusUserIteractionEnabled(isEnabled)
 		return .none
 	}
 }
