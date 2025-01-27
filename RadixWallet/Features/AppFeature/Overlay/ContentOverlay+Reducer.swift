@@ -5,20 +5,23 @@ struct ContentOverlay: Sendable, FeatureReducer {
 	struct State: Hashable, Sendable {
 		var itemsQueue: OrderedSet<OverlayWindowClient.Item.Content> = []
 
-		var isPresenting: Bool {
-			destination != nil
-		}
-
 		@PresentationState
 		var destination: Destination.State?
+
+		/// This flag is set to `false` when presenting `destination`, and set to `true` when the destination has been dismissed.
+		/// This allows us to wait until the previous content has been dismissed before attempting to present a new one.
+		/// Otherwise, unexpected behavior would happen (e.g. sheets presented as full screen while loosing scope of its reducer).
+		var destinationDismissed = true
 	}
 
 	enum ViewAction: Sendable, Equatable {
 		case task
+		case destinationDismissed
 	}
 
 	enum InternalAction: Sendable, Equatable {
 		case scheduleItem(OverlayWindowClient.Item.Content)
+		case showItemIfPossible
 	}
 
 	struct Destination: DestinationReducer {
@@ -60,11 +63,14 @@ struct ContentOverlay: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			.run { send in
+			return .run { send in
 				for try await item in overlayWindowClient.scheduledContent() {
 					await send(.internal(.scheduleItem(item)))
 				}
 			}
+		case .destinationDismissed:
+			state.destinationDismissed = true
+			return .none
 		}
 	}
 
@@ -72,6 +78,8 @@ struct ContentOverlay: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .scheduleItem(event):
 			state.itemsQueue.append(event)
+			return showItemIfPossible(state: &state)
+		case .showItemIfPossible:
 			return showItemIfPossible(state: &state)
 		}
 	}
@@ -111,10 +119,15 @@ struct ContentOverlay: Sendable, FeatureReducer {
 			return .none
 		}
 
-		if state.isPresenting {
+		if state.destination != nil {
+			// We are currently presenting content
 			return .none
+		} else if !state.destinationDismissed {
+			// We are in the process of dismissing previous content, so we check again after small delay
+			return delayedShortEffect(for: .internal(.showItemIfPossible))
 		}
 
+		state.destinationDismissed = false
 		switch presentedItem {
 		case let .sheet(sheet):
 			state.destination = .sheet(sheet)

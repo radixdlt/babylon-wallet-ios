@@ -31,21 +31,27 @@ private extension StoreOf<ContentOverlay> {
 private extension View {
 	func destinations(with store: StoreOf<ContentOverlay>) -> some View {
 		let destinationStore = store.destination
-		return sheet(with: destinationStore)
-			.fullScreenCover(with: destinationStore)
+		return sheet(with: destinationStore, store: store)
+			.fullScreenCover(with: destinationStore, store: store)
 	}
 
-	private func sheet(with destinationStore: PresentationStoreOf<ContentOverlay.Destination>) -> some View {
+	private func sheet(with destinationStore: PresentationStoreOf<ContentOverlay.Destination>, store: StoreOf<ContentOverlay>) -> some View {
 		sheet(store: destinationStore.scope(state: \.sheet, action: \.sheet)) {
 			SheetOverlayCoordinator.View(store: $0)
 				.presentationDetents([.fraction(0.75), .large])
 				.presentationBackground(.blur)
+				.onDisappear {
+					store.send(.view(.destinationDismissed))
+				}
 		}
 	}
 
-	private func fullScreenCover(with destinationStore: PresentationStoreOf<ContentOverlay.Destination>) -> some View {
+	private func fullScreenCover(with destinationStore: PresentationStoreOf<ContentOverlay.Destination>, store: StoreOf<ContentOverlay>) -> some View {
 		fullScreenCover(store: destinationStore.scope(state: \.fullScreen, action: \.fullScreen)) {
 			FullScreenOverlayCoordinator.View(store: $0)
+				.onDisappear {
+					store.send(.view(.destinationDismissed))
+				}
 		}
 	}
 }

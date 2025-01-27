@@ -24,9 +24,6 @@ final class SargonHostInteractor: HostInteractor {
 				fatalError("Unexpected action")
 			}
 			perFactorOutcome.append(.init(factorSourceId: perFactorSource.factorSourceId, outcome: outcome))
-
-			// NOTE: Adding this delay among factor sources so that it gives time of dismissing previous factor source before presenting new one
-			try? await clock.sleep(for: .seconds(0.9))
 		}
 
 		return .init(perFactorOutcome: perFactorOutcome)
@@ -52,9 +49,6 @@ final class SargonHostInteractor: HostInteractor {
 				fatalError("Unexpected action")
 			}
 			perFactorOutcome.append(.init(factorSourceId: perFactorSource.factorSourceId, outcome: outcome))
-
-			// NOTE: Adding this delay among factor sources so that it gives time of dismissing previous factor source before presenting new one
-			try? await clock.sleep(for: .seconds(0.9))
 		}
 
 		return .init(perFactorOutcome: perFactorOutcome)
@@ -80,9 +74,6 @@ final class SargonHostInteractor: HostInteractor {
 				fatalError("Unexpected action")
 			}
 			perFactorOutcome.append(.init(factorSourceId: perFactorSource.factorSourceId, outcome: outcome))
-
-			// NOTE: Adding this delay among factor sources so that it gives time of dismissing previous factor source before presenting new one
-			try? await clock.sleep(for: .seconds(0.9))
 		}
 
 		return .init(perFactorOutcome: perFactorOutcome)
@@ -104,9 +95,6 @@ final class SargonHostInteractor: HostInteractor {
 			default:
 				fatalError("Unexpected action")
 			}
-
-			// NOTE: Adding this delay among factor sources so that it gives time of dismissing previous factor source before presenting new one
-			try? await clock.sleep(for: .seconds(0.9))
 		}
 
 		return .init(perFactorSource: perFactorOutcome)
