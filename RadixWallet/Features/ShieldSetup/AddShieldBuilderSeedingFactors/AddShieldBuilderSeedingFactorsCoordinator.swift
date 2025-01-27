@@ -1,5 +1,5 @@
-// MARK: - PrepareFactorSources.Coordinator
-extension PrepareFactorSources {
+// MARK: - AddShieldBuilderSeedingFactors.Coordinator
+extension AddShieldBuilderSeedingFactors {
 	@Reducer
 	struct Coordinator: Sendable, FeatureReducer {
 		@ObservableState
@@ -13,7 +13,7 @@ extension PrepareFactorSources {
 		@Reducer(state: .hashable, action: .equatable)
 		enum Path {
 			case intro
-			case addFactor(PrepareFactorSources.AddFactorSource)
+			case addFactor(AddShieldBuilderSeedingFactors.AddFactorSource)
 			case completion
 		}
 
@@ -30,7 +30,7 @@ extension PrepareFactorSources {
 		}
 
 		enum DelegateAction: Sendable, Equatable {
-			case finished
+			case finished(shouldSkipAutomaticShield: Bool)
 			case push(Path.State)
 		}
 
@@ -57,8 +57,6 @@ extension PrepareFactorSources {
 		var body: some ReducerOf<Self> {
 			Scope(state: \.path, action: \.child.path) {
 				Path.intro
-				Path.addFactor(PrepareFactorSources.AddFactorSource())
-				Path.completion
 			}
 			Reduce(core)
 				.ifLet(destinationPath, action: \.destination) {
@@ -73,7 +71,7 @@ extension PrepareFactorSources {
 			case .introButtonTapped:
 				determineNextStepEffect()
 			case .completionButtonTapped:
-				.send(.delegate(.finished))
+				.send(.delegate(.finished(shouldSkipAutomaticShield: false)))
 			}
 		}
 
@@ -81,6 +79,8 @@ extension PrepareFactorSources {
 			switch childAction {
 			case let .path(.addFactor(.delegate(.addFactorSource(kind)))):
 				addFactorSourceEffect(&state, kind: kind)
+			case .path(.addFactor(.delegate(.skipAutomaticShield))):
+				.send(.delegate(.finished(shouldSkipAutomaticShield: true)))
 			default:
 				.none
 			}
@@ -105,7 +105,7 @@ extension PrepareFactorSources {
 	}
 }
 
-private extension PrepareFactorSources.Coordinator {
+private extension AddShieldBuilderSeedingFactors.Coordinator {
 	func determineNextStepEffect() -> Effect<Action> {
 		.run { send in
 			let status = try SargonOS.shared.securityShieldPrerequisitesStatus()

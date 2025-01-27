@@ -1,6 +1,6 @@
 // MARK: - SelectEmergencyFallbackPeriodView
 struct SelectEmergencyFallbackPeriodView: View {
-	@State var selectedPeriod: FallbackPeriod
+	@State var selectedPeriod: TimePeriod
 
 	var onAction: (Action) -> Void
 
@@ -34,35 +34,25 @@ struct SelectEmergencyFallbackPeriodView: View {
 			.textStyle(.body2Regular)
 			.foregroundStyle(.app.gray1)
 
-			HStack(spacing: 0) {
-				Picker("", selection: $selectedPeriod.value) {
-					ForEach(selectedPeriod.unit.values, id: \.self) { value in
-						Text("\(value)")
-							.tag(value)
-							.foregroundStyle(.app.gray1)
-							.textStyle(.body1Regular)
-							.padding(.trailing, .large2)
-							.flushedRight
+			MultiPickerView(
+				data: [
+					selectedPeriod.unit.values.map { "\($0)" },
+					TimePeriodUnit.allCases.map(\.title),
+				],
+				selections: Binding(
+					get: {
+						[
+							selectedPeriod.unit.values.firstIndex(of: Int(selectedPeriod.value)) ?? 0,
+							TimePeriodUnit.allCases.firstIndex(of: selectedPeriod.unit) ?? 0,
+						]
+					},
+					set: { newSelections in
+						selectedPeriod.value = UInt16(selectedPeriod.unit.values[newSelections[0]])
+						selectedPeriod.unit = TimePeriodUnit.allCases[newSelections[1]]
 					}
-				}
-				.pickerStyle(.wheel)
-				.clipShape(.rect.offset(x: -.medium3))
-				.padding(.trailing, -.medium3)
-
-				Picker("", selection: $selectedPeriod.unit) {
-					ForEach(FallbackPeriod.Unit.allCases, id: \.self) { unit in
-						Text("\(unit.title)")
-							.tag(unit)
-							.foregroundStyle(.app.gray1)
-							.textStyle(.body1Regular)
-							.padding(.leading, .medium3)
-							.flushedLeft
-					}
-				}
-				.pickerStyle(.wheel)
-				.clipShape(.rect.offset(x: .medium3))
-				.padding(.leading, -.medium3)
-			}
+				)
+			)
+			.frame(height: 200)
 
 			Spacer()
 		}
@@ -73,13 +63,13 @@ struct SelectEmergencyFallbackPeriodView: View {
 
 // MARK: SelectEmergencyFallbackPeriodView.Action
 extension SelectEmergencyFallbackPeriodView {
-	enum Action: Sendable, Hashable {
+	enum Action: Sendable, Equatable {
 		case close
-		case set(FallbackPeriod)
+		case set(TimePeriod)
 	}
 }
 
-private extension FallbackPeriod.Unit {
+private extension TimePeriodUnit {
 	var title: String {
 		switch self {
 		case .days:
@@ -90,52 +80,7 @@ private extension FallbackPeriod.Unit {
 	}
 }
 
-// MARK: - FallbackPeriod
-// TODO: - Move to Sargon -
-struct FallbackPeriod: Sendable, Hashable {
-	var value: Int
-	var unit: Unit
-
-	var days: Int {
-		switch self.unit {
-		case .days:
-			value
-		case .weeks:
-			value * Self.DAYS_IN_A_WEEK
-		}
-	}
-
-	init(days: Int) {
-		if days % Self.DAYS_IN_A_WEEK == 0 {
-			value = days / Self.DAYS_IN_A_WEEK
-			unit = .weeks
-		} else {
-			value = days
-			unit = .days
-		}
-	}
-
-	private static let DAYS_IN_A_WEEK = 7
+// MARK: - TimePeriodUnit + CaseIterable
+extension TimePeriodUnit: CaseIterable {
+	public static let allCases: [Self] = [.days, .weeks]
 }
-
-// MARK: FallbackPeriod.Unit
-extension FallbackPeriod {
-	enum Unit: CaseIterable {
-		case days
-		case weeks
-
-		var values: [Int] {
-			switch self {
-			case .days:
-				Self.FALLBACK_PERIOD_DAYS
-			case .weeks:
-				Self.FALLBACK_PERIOD_WEEKS
-			}
-		}
-
-		private static let FALLBACK_PERIOD_DAYS = Array(1 ... 14)
-		private static let FALLBACK_PERIOD_WEEKS = Array(1 ... 4)
-	}
-}
-
-// ------------------------------------------------------------------

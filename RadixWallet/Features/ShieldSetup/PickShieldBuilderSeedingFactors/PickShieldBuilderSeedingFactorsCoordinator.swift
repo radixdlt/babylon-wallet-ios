@@ -1,7 +1,7 @@
 import ComposableArchitecture
 
 @Reducer
-struct SelectFactorSourcesCoordinator: Sendable, FeatureReducer {
+struct PickShieldBuilderSeedingFactorsCoordinator: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
 		var path: Path.State
@@ -9,7 +9,7 @@ struct SelectFactorSourcesCoordinator: Sendable, FeatureReducer {
 
 	@Reducer(state: .hashable, action: .equatable)
 	enum Path {
-		case selectFactorSources(SelectFactorSources)
+		case pickShieldBuilderSeedingFactors(PickShieldBuilderSeedingFactors)
 	}
 
 	typealias Action = FeatureAction<Self>
@@ -26,14 +26,14 @@ struct SelectFactorSourcesCoordinator: Sendable, FeatureReducer {
 
 	var body: some ReducerOf<Self> {
 		Scope(state: \.path, action: \.child.path) {
-			Path.selectFactorSources(SelectFactorSources())
+			Path.pickShieldBuilderSeedingFactors(PickShieldBuilderSeedingFactors())
 		}
 		Reduce(core)
 	}
 
 	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case .path(.selectFactorSources(.delegate(.finished))):
+		case .path(.pickShieldBuilderSeedingFactors(.delegate(.finished))):
 			.send(.delegate(.finished))
 		default:
 			.none

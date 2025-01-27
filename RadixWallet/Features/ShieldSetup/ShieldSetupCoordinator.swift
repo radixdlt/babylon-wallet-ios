@@ -3,28 +3,35 @@
 struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
+		@Shared(.shieldBuilder) var shieldBuilder
+
 		var onboarding: ShieldSetupOnboarding.State = .init()
 		var path: StackState<Path.State> = .init()
 	}
 
 	@Reducer(state: .hashable, action: .equatable)
 	enum Path {
-		case prepareFactors(PrepareFactorSources.Coordinator)
-		case selectFactors(SelectFactorSourcesCoordinator)
+		case addShieldBuilderSeedingFactors(AddShieldBuilderSeedingFactors.Coordinator)
+		case pickShieldBuilderSeedingFactors(PickShieldBuilderSeedingFactorsCoordinator)
 		case rolesSetup(RolesSetupCoordinator)
+		case nameShield(NameShield)
 	}
 
 	typealias Action = FeatureAction<Self>
 
 	enum InternalAction: Sendable, Equatable {
-		case prepareFactors
-		case selectFactors
+		case addShieldBuilderSeedingFactors
+		case pickShieldBuilderSeedingFactors
 	}
 
 	@CasePathable
 	enum ChildAction: Sendable, Equatable {
 		case onboarding(ShieldSetupOnboarding.Action)
 		case path(StackActionOf<Path>)
+	}
+
+	enum DelegateAction: Equatable, Sendable {
+		case finished
 	}
 
 	var body: some ReducerOf<Self> {
@@ -37,11 +44,11 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case .prepareFactors:
-			state.path.append(.prepareFactors(.init(path: .intro)))
+		case .addShieldBuilderSeedingFactors:
+			state.path.append(.addShieldBuilderSeedingFactors(.init(path: .intro)))
 			return .none
-		case .selectFactors:
-			state.path.append(.selectFactors(.init(path: .selectFactorSources(.init()))))
+		case .pickShieldBuilderSeedingFactors:
+			state.path.append(.pickShieldBuilderSeedingFactors(.init(path: .pickShieldBuilderSeedingFactors(.init()))))
 			return .none
 		}
 	}
@@ -50,20 +57,29 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 		switch childAction {
 		case .onboarding(.delegate(.finished)):
 			return onboardingFinishedEffect()
-		case let .path(.element(id: _, action: .prepareFactors(.delegate(.push(path))))):
-			state.path.append(.prepareFactors(.init(path: path)))
+		case let .path(.element(id: _, action: .addShieldBuilderSeedingFactors(.delegate(.push(path))))):
+			state.path.append(.addShieldBuilderSeedingFactors(.init(path: path)))
 			return .none
-		case .path(.element(id: _, action: .prepareFactors(.delegate(.finished)))):
-			return .send(.internal(.selectFactors))
-		case .path(.element(id: _, action: .selectFactors(.delegate(.finished)))):
+		case let .path(.element(id: _, action: .addShieldBuilderSeedingFactors(.delegate(.finished(shouldSkipAutomaticShield))))):
+			if shouldSkipAutomaticShield {
+				state.$shieldBuilder.initialize()
+				state.path.append(.rolesSetup(.init()))
+				return .none
+			} else {
+				return .send(.internal(.pickShieldBuilderSeedingFactors))
+			}
+		case .path(.element(id: _, action: .pickShieldBuilderSeedingFactors(.delegate(.finished)))):
 			state.path.append(.rolesSetup(.init()))
 			return .none
 		case let .path(.element(id: _, action: .rolesSetup(.delegate(.push(path))))):
 			state.path.append(.rolesSetup(.init(path: path)))
 			return .none
 		case .path(.element(id: _, action: .rolesSetup(.delegate(.finished)))):
-			// TODO: push Name Shield screen
+			state.path.append(.nameShield(.init()))
 			return .none
+		case .path(.element(id: _, action: .nameShield(.delegate(.finished)))):
+			// TODO: Apply shield flow
+			return .send(.delegate(.finished))
 		default:
 			return .none
 		}
@@ -76,9 +92,9 @@ private extension ShieldSetupCoordinator {
 			let status = try SargonOS.shared.securityShieldPrerequisitesStatus()
 			switch status {
 			case .hardwareRequired, .anyRequired:
-				await send(.internal(.prepareFactors))
+				await send(.internal(.addShieldBuilderSeedingFactors))
 			case .sufficient:
-				await send(.internal(.selectFactors))
+				await send(.internal(.pickShieldBuilderSeedingFactors))
 			}
 		}
 	}

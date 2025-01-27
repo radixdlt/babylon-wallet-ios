@@ -1,15 +1,15 @@
 import SwiftUI
 
-// MARK: - PrepareFactorSources.AddFactorSource.View
-extension PrepareFactorSources.AddFactorSource {
+// MARK: - AddShieldBuilderSeedingFactors.AddFactorSource.View
+extension AddShieldBuilderSeedingFactors.AddFactorSource {
 	struct View: SwiftUI.View {
-		let store: StoreOf<PrepareFactorSources.AddFactorSource>
+		let store: StoreOf<AddShieldBuilderSeedingFactors.AddFactorSource>
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				ScrollView {
 					VStack(spacing: .large2) {
-						Image(.prepareFactorSourcesAdd)
+						Image(.addShieldBuilderSeedingFactorsAdd)
 
 						Text(store.title)
 							.textStyle(.sheetTitle)
@@ -22,6 +22,11 @@ extension PrepareFactorSources.AddFactorSource {
 						VStack(spacing: .medium3) {
 							ForEachStatic(store.factorSources) { factorSource in
 								card(factorSource)
+							}
+
+							if store.showNoHardwareDeviceInfo {
+								InfoButton(.nohardwaredevice, label: L10n.InfoLink.Title.nohardwaredevice)
+									.padding(.vertical, .medium3)
 							}
 						}
 
@@ -39,12 +44,11 @@ extension PrepareFactorSources.AddFactorSource {
 						.buttonStyle(.primaryRectangular)
 						.controlState(store.controlState)
 
-						if store.showNoHardwareDeviceInfo {
-							Button(L10n.InfoLink.Title.nohardwaredevice) {
-								// TODO: Handle the action and add a popup for skipping this step
-							}
-							.buttonStyle(.primaryText())
+						Button(L10n.ShieldSetupPrepareFactors.Skip.button) {
+							store.send(.view(.skipButtonTapped))
 						}
+						.buttonStyle(.primaryText())
+						.multilineTextAlignment(.center)
 					}
 				}
 			}
@@ -74,7 +78,7 @@ extension PrepareFactorSources.AddFactorSource {
 	}
 }
 
-private extension PrepareFactorSources.AddFactorSource.State {
+private extension AddShieldBuilderSeedingFactors.AddFactorSource.State {
 	var title: String {
 		switch mode {
 		case .hardware:

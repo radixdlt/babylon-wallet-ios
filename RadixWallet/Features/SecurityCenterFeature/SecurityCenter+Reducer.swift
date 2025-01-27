@@ -118,7 +118,9 @@ struct SecurityCenter: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case .importMnemonics(.delegate(.finishedEarly)), .importMnemonics(.delegate(.finishedImportingMnemonics)):
+		case .importMnemonics(.delegate(.finishedEarly)),
+		     .importMnemonics(.delegate(.finishedImportingMnemonics)),
+		     .securityShields(.delegate(.finished)):
 			state.destination = nil
 			return .none
 		default:
