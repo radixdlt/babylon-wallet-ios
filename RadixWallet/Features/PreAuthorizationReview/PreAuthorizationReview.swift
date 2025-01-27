@@ -160,7 +160,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 				await send(.delegate(.signedPreAuthorization(signedSubintent)))
 
 			} catch: { error, send in
-				if let error = error as? CommonError, error == .SigningRejected {
+				if let error = error as? CommonError, error == .HostInteractionAborted {
 					await send(.internal(.resetToApprovable))
 				} else {
 					errorQueue.schedule(error)

@@ -12,7 +12,7 @@ final class SargonHostInteractor: HostInteractor {
 
 			let outcome: FactorOutcomeOfTransactionIntentHash = switch action {
 			case .signing(.cancelled):
-				throw CommonError.SigningRejected
+				throw CommonError.HostInteractionAborted
 
 			case .signing(.skippedFactorSource):
 				.neglected(.init(reason: .userExplicitlySkipped, factor: perFactorSource.factorSourceId))
@@ -40,7 +40,7 @@ final class SargonHostInteractor: HostInteractor {
 
 			let outcome: FactorOutcomeOfSubintentHash = switch action {
 			case .signing(.cancelled):
-				throw CommonError.SigningRejected
+				throw CommonError.HostInteractionAborted
 
 			case .signing(.skippedFactorSource):
 				.neglected(.init(reason: .userExplicitlySkipped, factor: perFactorSource.factorSourceId))
@@ -68,7 +68,7 @@ final class SargonHostInteractor: HostInteractor {
 
 			let outcome: FactorOutcomeOfAuthIntentHash = switch action {
 			case .signing(.cancelled):
-				throw CommonError.SigningRejected
+				throw CommonError.HostInteractionAborted
 
 			case .signing(.skippedFactorSource):
 				.neglected(.init(reason: .userExplicitlySkipped, factor: perFactorSource.factorSourceId))
@@ -96,7 +96,7 @@ final class SargonHostInteractor: HostInteractor {
 
 			switch action {
 			case .derivePublicKeys(.cancelled):
-				throw CommonError.SigningRejected // TODO: What should be the error?
+				throw CommonError.HostInteractionAborted
 
 			case let .derivePublicKeys(.finished(factorInstances)):
 				perFactorOutcome.append(.init(factorSourceId: perFactorSource.factorSourceId, factorInstances: factorInstances))
@@ -110,5 +110,10 @@ final class SargonHostInteractor: HostInteractor {
 		}
 
 		return .init(perFactorSource: perFactorOutcome)
+	}
+
+	func requestAuthorization(purpose: SargonUniFFI.AuthorizationPurpose) async -> SargonUniFFI.AuthorizationResponse {
+		// TODO: Implement authorization UI
+		.authorized
 	}
 }
