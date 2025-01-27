@@ -2,7 +2,8 @@
 // MARK: - BannerClient + TestDependencyKey
 extension OverlayWindowClient: TestDependencyKey {
 	static let testValue = Self(
-		scheduledItems: noop.scheduledItems,
+		scheduledContent: noop.scheduledContent,
+		scheduledStatus: noop.scheduledStatus,
 		scheduleAlert: noop.scheduleAlert,
 		scheduleAlertAndIgnoreAction: unimplemented("\(Self.self).scheduleAlertAndIgnoreAction"),
 		scheduleHUD: unimplemented("\(Self.self).scheduleHUD"),
@@ -18,7 +19,8 @@ extension OverlayWindowClient: TestDependencyKey {
 	)
 
 	static let noop = Self(
-		scheduledItems: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
+		scheduledContent: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
+		scheduledStatus: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		scheduleAlert: { _ in .dismissed },
 		scheduleAlertAndIgnoreAction: { _ in },
 		scheduleHUD: { _ in },

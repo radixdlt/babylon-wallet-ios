@@ -3,7 +3,7 @@ import SwiftUI
 
 struct ContentOverlay: Sendable, FeatureReducer {
 	struct State: Hashable, Sendable {
-		var itemsQueue: OrderedSet<OverlayWindowClient.Item> = []
+		var itemsQueue: OrderedSet<OverlayWindowClient.Item.Content> = []
 
 		var isPresenting: Bool {
 			destination != nil
@@ -18,7 +18,7 @@ struct ContentOverlay: Sendable, FeatureReducer {
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case scheduleItem(OverlayWindowClient.Item)
+		case scheduleItem(OverlayWindowClient.Item.Content)
 		case showNextItemIfPossible
 	}
 
@@ -62,7 +62,7 @@ struct ContentOverlay: Sendable, FeatureReducer {
 		switch viewAction {
 		case .task:
 			.run { send in
-				for try await item in overlayWindowClient.scheduledItems() {
+				for try await item in overlayWindowClient.scheduledContent() {
 					await send(.internal(.scheduleItem(item)))
 				}
 			}
@@ -72,13 +72,8 @@ struct ContentOverlay: Sendable, FeatureReducer {
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .scheduleItem(event):
-			switch event {
-			case .sheet, .fullScreen:
-				state.itemsQueue.append(event)
-				return showItemIfPossible(state: &state)
-			default:
-				return .none
-			}
+			state.itemsQueue.append(event)
+			return showItemIfPossible(state: &state)
 		case .showNextItemIfPossible:
 			return showItemIfPossible(state: &state)
 		}
@@ -131,9 +126,6 @@ struct ContentOverlay: Sendable, FeatureReducer {
 		case let .fullScreen(fullScreen):
 			state.destination = .fullScreen(fullScreen)
 			return setIsUserInteractionEnabled(&state, isEnabled: true)
-
-		case .hud, .alert:
-			fatalError("Incorrect item, should be handled in Status+Reducer")
 		}
 	}
 

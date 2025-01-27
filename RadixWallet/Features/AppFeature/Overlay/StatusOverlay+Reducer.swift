@@ -3,7 +3,7 @@ import SwiftUI
 
 struct StatusOverlay: Sendable, FeatureReducer {
 	struct State: Hashable, Sendable {
-		var itemsQueue: OrderedSet<OverlayWindowClient.Item> = []
+		var itemsQueue: OrderedSet<OverlayWindowClient.Item.Status> = []
 
 		var isPresenting: Bool {
 			destination != nil
@@ -18,7 +18,7 @@ struct StatusOverlay: Sendable, FeatureReducer {
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case scheduleItem(OverlayWindowClient.Item)
+		case scheduleItem(OverlayWindowClient.Item.Status)
 		case showNextItemIfPossible
 	}
 
@@ -59,7 +59,7 @@ struct StatusOverlay: Sendable, FeatureReducer {
 		switch viewAction {
 		case .task:
 			.run { send in
-				for try await item in overlayWindowClient.scheduledItems() {
+				for try await item in overlayWindowClient.scheduledStatus() {
 					await send(.internal(.scheduleItem(item)))
 				}
 			}
@@ -69,13 +69,8 @@ struct StatusOverlay: Sendable, FeatureReducer {
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .scheduleItem(event):
-			switch event {
-			case .hud, .alert:
-				state.itemsQueue.append(event)
-				return showItemIfPossible(state: &state)
-			default:
-				return .none
-			}
+			state.itemsQueue.append(event)
+			return showItemIfPossible(state: &state)
 		case .showNextItemIfPossible:
 			return showItemIfPossible(state: &state)
 		}
@@ -142,9 +137,6 @@ struct StatusOverlay: Sendable, FeatureReducer {
 		case let .alert(alert):
 			state.destination = .alert(alert)
 			return setIsUserInteractionEnabled(&state, isEnabled: true)
-
-		case .sheet, .fullScreen:
-			fatalError("Incorrect item, should be handled in Overlay+Reducer")
 		}
 	}
 

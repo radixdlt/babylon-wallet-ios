@@ -1,7 +1,8 @@
 // MARK: - OverlayWindowClient + DependencyKey
 extension OverlayWindowClient: DependencyKey {
 	static let liveValue: Self = {
-		let items = AsyncPassthroughSubject<Item>()
+		let contentItems = AsyncPassthroughSubject<Item.Content>()
+		let statusItems = AsyncPassthroughSubject<Item.Status>()
 		let alertActions = AsyncPassthroughSubject<(action: Item.AlertAction, id: Item.AlertState.ID)>()
 		let fullScreenActions = AsyncPassthroughSubject<(action: FullScreenAction, id: FullScreenID)>()
 		let sheetActions = AsyncPassthroughSubject<(action: SheetAction, id: SheetID)>()
@@ -18,7 +19,7 @@ extension OverlayWindowClient: DependencyKey {
 				#else
 				let message = L10n.Error.emailSupportMessage(sargonError.errorCode)
 				#endif
-				return Item.alert(.init(
+				return Item.Status.alert(.init(
 					title: { TextState(L10n.Common.errorAlertTitle) },
 					actions: {
 						ButtonState(role: .cancel, action: .dismissed) {
@@ -30,34 +31,35 @@ extension OverlayWindowClient: DependencyKey {
 					message: { TextState(message) }
 				))
 			} else {
-				return Item.alert(.init(
+				return Item.Status.alert(.init(
 					title: { TextState(L10n.Common.errorAlertTitle) },
 					message: { TextState(error.localizedDescription) }
 				))
 			}
 		}
-		.subscribe(items)
+		.subscribe(statusItems)
 
-		pasteBoardClient.copyEvents().map { _ in Item.hud(.copied) }.subscribe(items)
+		pasteBoardClient.copyEvents().map { _ in Item.Status.hud(.copied) }.subscribe(statusItems)
 
 		let scheduleAlertAndIgnoreAction: ScheduleAlertAndIgnoreAction = { alert in
-			items.send(.alert(alert))
+			statusItems.send(.alert(alert))
 		}
 
 		return .init(
-			scheduledItems: { items.eraseToAnyAsyncSequence() },
+			scheduledContent: { contentItems.eraseToAnyAsyncSequence() },
+			scheduledStatus: { statusItems.eraseToAnyAsyncSequence() },
 			scheduleAlert: { alert in
 				scheduleAlertAndIgnoreAction(alert)
 				return await alertActions.first { $0.id == alert.id }?.action ?? .dismissed
 			},
 			scheduleAlertAndIgnoreAction: scheduleAlertAndIgnoreAction,
-			scheduleHUD: { items.send(.hud($0)) },
+			scheduleHUD: { statusItems.send(.hud($0)) },
 			scheduleSheet: { sheet in
-				items.send(.sheet(sheet))
+				contentItems.send(.sheet(sheet))
 				return await sheetActions.first { $0.id == sheet.id }?.action ?? .dismiss
 			},
 			scheduleFullScreen: { fullScreen in
-				items.send(.fullScreen(fullScreen))
+				contentItems.send(.fullScreen(fullScreen))
 				return await fullScreenActions.first { $0.id == fullScreen.id }?.action ?? .dismiss
 			},
 			sendAlertAction: { action, id in alertActions.send((action, id)) },
