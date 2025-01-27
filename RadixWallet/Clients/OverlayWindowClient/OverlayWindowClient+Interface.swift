@@ -32,8 +32,10 @@ struct OverlayWindowClient: Sendable {
 	/// Used by the Overlay Window to send actions from an SheetAction back to the client
 	var sendSheetAction: SendSheetAction
 
-	var setIsUserIteractionEnabled: SetIsUserIteractionEnabled
-	var isUserInteractionEnabled: IsUserInteractionEnabled
+	var setIsContentUserIteractionEnabled: SetIsUserIteractionEnabled
+	var isContentUserInteractionEnabled: IsUserInteractionEnabled
+	var setIsStatusUserIteractionEnabled: SetIsUserIteractionEnabled
+	var isStatusUserInteractionEnabled: IsUserInteractionEnabled
 }
 
 extension OverlayWindowClient {

@@ -11,8 +11,10 @@ extension OverlayWindowClient: TestDependencyKey {
 		sendAlertAction: unimplemented("\(Self.self).sendAlertAction"),
 		sendFullScreenAction: unimplemented("\(Self.self).sendFullScreenAction"),
 		sendSheetAction: unimplemented("\(Self.self).sendSheetAction"),
-		setIsUserIteractionEnabled: unimplemented("\(Self.self).setIsUserIteractionEnabled"),
-		isUserInteractionEnabled: noop.isUserInteractionEnabled
+		setIsContentUserIteractionEnabled: unimplemented("\(Self.self).setIsContentUserIteractionEnabled"),
+		isContentUserInteractionEnabled: noop.isContentUserInteractionEnabled,
+		setIsStatusUserIteractionEnabled: unimplemented("\(Self.self).setIsStatusUserIteractionEnabled"),
+		isStatusUserInteractionEnabled: noop.isStatusUserInteractionEnabled
 	)
 
 	static let noop = Self(
@@ -25,7 +27,9 @@ extension OverlayWindowClient: TestDependencyKey {
 		sendAlertAction: { _, _ in },
 		sendFullScreenAction: { _, _ in },
 		sendSheetAction: { _, _ in },
-		setIsUserIteractionEnabled: { _ in },
-		isUserInteractionEnabled: { AsyncLazySequence([]).eraseToAnyAsyncSequence() }
+		setIsContentUserIteractionEnabled: { _ in },
+		isContentUserInteractionEnabled: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
+		setIsStatusUserIteractionEnabled: { _ in },
+		isStatusUserInteractionEnabled: { AsyncLazySequence([]).eraseToAnyAsyncSequence() }
 	)
 }

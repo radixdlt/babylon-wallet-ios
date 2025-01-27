@@ -5,7 +5,8 @@ extension OverlayWindowClient: DependencyKey {
 		let alertActions = AsyncPassthroughSubject<(action: Item.AlertAction, id: Item.AlertState.ID)>()
 		let fullScreenActions = AsyncPassthroughSubject<(action: FullScreenAction, id: FullScreenID)>()
 		let sheetActions = AsyncPassthroughSubject<(action: SheetAction, id: SheetID)>()
-		let isUserInteractionEnabled = AsyncPassthroughSubject<Bool>()
+		let isContentUserInteractionEnabled = AsyncPassthroughSubject<Bool>()
+		let isStatusUserInteractionEnabled = AsyncPassthroughSubject<Bool>()
 
 		@Dependency(\.errorQueue) var errorQueue
 		@Dependency(\.pasteboardClient) var pasteBoardClient
@@ -62,8 +63,10 @@ extension OverlayWindowClient: DependencyKey {
 			sendAlertAction: { action, id in alertActions.send((action, id)) },
 			sendFullScreenAction: { action, id in fullScreenActions.send((action, id)) },
 			sendSheetAction: { action, id in sheetActions.send((action, id)) },
-			setIsUserIteractionEnabled: { isUserInteractionEnabled.send($0) },
-			isUserInteractionEnabled: { isUserInteractionEnabled.eraseToAnyAsyncSequence() }
+			setIsContentUserIteractionEnabled: { isContentUserInteractionEnabled.send($0) },
+			isContentUserInteractionEnabled: { isContentUserInteractionEnabled.eraseToAnyAsyncSequence() },
+			setIsStatusUserIteractionEnabled: { isStatusUserInteractionEnabled.send($0) },
+			isStatusUserInteractionEnabled: { isStatusUserInteractionEnabled.eraseToAnyAsyncSequence() }
 		)
 	}()
 }
