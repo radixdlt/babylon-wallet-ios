@@ -1,4 +1,5 @@
 // MARK: - Authorization
+/// A modal dialog that requests user authorization -by providing biometrics- before proceeding to perform an operation (e.g. Create Account).
 @Reducer
 struct Authorization: Sendable, FeatureReducer {
 	@ObservableState

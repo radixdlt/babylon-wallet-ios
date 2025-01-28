@@ -77,7 +77,7 @@ struct CreateAccountCoordinator: Sendable, FeatureReducer {
 
 	enum InternalAction: Sendable, Equatable {
 		case handleAccountCreated(Account)
-		case handleProfileCreated(Option)
+		case handleProfileCreated(Mode)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -128,13 +128,13 @@ extension CreateAccountCoordinator {
 				state.path.append(.selectLedger(.init(context: .createHardwareAccount)))
 				return .none
 			} else {
-				return createProfileIfNecessaryThenCreateAccount(state: &state, option: .bdfs)
+				return createProfileIfNecessaryThenCreateAccount(state: &state, mode: .bdfs)
 			}
 
 		case let .path(.element(_, action: .selectLedger(.delegate(.choseLedger(ledger))))):
 			return createProfileIfNecessaryThenCreateAccount(
 				state: &state,
-				option: .specific(
+				mode: .specific(
 					ledger.asGeneral
 				)
 			)
@@ -161,34 +161,34 @@ extension CreateAccountCoordinator {
 			)))
 			return .send(.delegate(.accountCreated))
 
-		case let .handleProfileCreated(option):
+		case let .handleProfileCreated(mode):
 			state.createdProfile = true
-			return createAccount(state: &state, option: option)
+			return createAccount(state: &state, mode: mode)
 		}
 	}
 
-	private func createProfileIfNecessaryThenCreateAccount(state: inout State, option: Option) -> Effect<Action> {
+	private func createProfileIfNecessaryThenCreateAccount(state: inout State, mode: Mode) -> Effect<Action> {
 		if state.config.isNewProfile, !state.createdProfile {
 			// We need to create the Profile before creating the Account
 			.run { send in
 				try await onboardingClient.createNewProfile()
-				await send(.internal(.handleProfileCreated(option)))
+				await send(.internal(.handleProfileCreated(mode)))
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
 		} else {
 			// We can create the Account since the Profile has been created already
-			createAccount(state: &state, option: option)
+			createAccount(state: &state, mode: mode)
 		}
 	}
 
-	private func createAccount(state: inout State, option: Option) -> Effect<Action> {
+	private func createAccount(state: inout State, mode: Mode) -> Effect<Action> {
 		guard let name = state.name else {
 			fatalError("Name should be set before creating Account")
 		}
 		let displayName = DisplayName(nonEmpty: name)
 		return .run { [networkId = state.config.specificNetworkID] send in
-			let account = switch option {
+			let account = switch mode {
 			case .bdfs:
 				try await SargonOS.shared.createAccountWithBDFS(networkId: networkId, name: displayName)
 			case let .specific(factorSource):
@@ -222,9 +222,9 @@ extension CreateAccountCoordinator {
 	}
 }
 
-// MARK: CreateAccountCoordinator.Option
+// MARK: CreateAccountCoordinator.Mode
 extension CreateAccountCoordinator {
-	enum Option: Sendable, Hashable {
+	enum Mode: Sendable, Hashable {
 		case bdfs
 		case specific(FactorSource)
 	}

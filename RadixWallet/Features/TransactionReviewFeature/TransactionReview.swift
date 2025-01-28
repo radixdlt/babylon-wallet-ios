@@ -313,6 +313,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .buildTransactionIntentResult(.success(intent)):
 			return .run { [notary = state.ephemeralNotaryPrivateKey] send in
+				// TODO: Hardcoding `.primary` role, this will change once we have MFA
 				let signedIntent = try await SargonOS.shared.signTransaction(transactionIntent: intent, roleKind: .primary)
 				let notarizedTransaction = try await transactionClient.notarizeTransaction(
 					.init(

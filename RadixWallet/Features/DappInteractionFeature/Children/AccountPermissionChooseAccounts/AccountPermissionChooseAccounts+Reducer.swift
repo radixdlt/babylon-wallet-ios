@@ -99,7 +99,11 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 			}
 
 			return .run { send in
-				let signedAuthIntent = try await SargonOS.shared.signAuthAccounts(accountAddresses: selectedAccounts.map(\.address), challengeNonce: challenge, metadata: metadata)
+				let signedAuthIntent = try await SargonOS.shared.signAuthAccounts(
+					accountAddresses: selectedAccounts.map(\.address),
+					challengeNonce: challenge,
+					metadata: metadata
+				)
 				await send(.internal(.handleSignedAuthIntent(signedAuthIntent, selectedAccounts: selectedAccounts)))
 			} catch: { _, send in
 				loggerGlobal.error("Failed to sign proof of ownership")

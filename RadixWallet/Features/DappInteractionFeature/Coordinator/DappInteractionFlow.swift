@@ -476,14 +476,13 @@ extension DappInteractionFlow {
 			_ signedAuthIntent: SignedAuthIntent
 		) -> Effect<Action> {
 			// Build account proofs
-			let accountProofs: [WalletToDappInteractionAccountProof] = signedAuthIntent.intentSignaturesPerOwner.compactMap { item in
-				guard let accountAddress = item.owner.accountAddress else {
-					return nil
+			let accountProofs = signedAuthIntent.intentSignaturesPerOwner.compactMap { item in
+				item.owner.accountAddress.map {
+					WalletToDappInteractionAccountProof(
+						accountAddress: $0,
+						proof: .init(intentSignatureOfOwner: item)
+					)
 				}
-				return .init(
-					accountAddress: accountAddress,
-					proof: .init(intentSignatureOfOwner: item)
-				)
 			}
 
 			// Verify there is a signature for each address
@@ -491,7 +490,7 @@ extension DappInteractionFlow {
 				return dismissEffect(for: state, errorKind: .failedToSignAuthChallenge, message: nil)
 			}
 
-			let proofs = accountProofs.map { WalletToDappInteractionProofOfOwnership.account($0) }
+			let proofs = accountProofs.map(WalletToDappInteractionProofOfOwnership.account)
 			let challenge = signedAuthIntent.intent.challengeNonce
 
 			// A predicate that checks if a given response item matches the challenge.

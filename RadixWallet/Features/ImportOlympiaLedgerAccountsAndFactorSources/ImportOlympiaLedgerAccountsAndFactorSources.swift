@@ -237,7 +237,11 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 		}
 	}
 
-	private func handleDerivedPublicKeysEffect(state: State, factorSourceId: FactorSourceIdFromHash, publicKeys: [HierarchicalDeterministicPublicKey]) -> Effect<Action> {
+	private func handleDerivedPublicKeysEffect(
+		state: State,
+		factorSourceId: FactorSourceIdFromHash,
+		publicKeys: [HierarchicalDeterministicPublicKey]
+	) -> Effect<Action> {
 		.run { [unvalidated = state.olympiaAccounts.unvalidated] send in
 			let (validated, migrated) = try await process(
 				derivedPublicKeys: publicKeys,

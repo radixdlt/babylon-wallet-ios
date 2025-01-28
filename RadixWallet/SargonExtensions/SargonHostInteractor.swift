@@ -4,7 +4,7 @@ final class SargonHostInteractor: HostInteractor {
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.continuousClock) var clock
 
-	func signTransactions(request: SargonUniFFI.SignRequestOfTransactionIntent) async throws -> SargonUniFFI.SignResponseOfTransactionIntentHash {
+	func signTransactions(request: SignRequestOfTransactionIntent) async throws -> SignResponseOfTransactionIntentHash {
 		var perFactorOutcome: [PerFactorOutcomeOfTransactionIntentHash] = []
 
 		for perFactorSource in request.perFactorSource {
@@ -29,7 +29,7 @@ final class SargonHostInteractor: HostInteractor {
 		return .init(perFactorOutcome: perFactorOutcome)
 	}
 
-	func signSubintents(request: SargonUniFFI.SignRequestOfSubintent) async throws -> SargonUniFFI.SignResponseOfSubintentHash {
+	func signSubintents(request: SignRequestOfSubintent) async throws -> SignResponseOfSubintentHash {
 		var perFactorOutcome: [PerFactorOutcomeOfSubintentHash] = []
 
 		for perFactorSource in request.perFactorSource {
@@ -54,7 +54,7 @@ final class SargonHostInteractor: HostInteractor {
 		return .init(perFactorOutcome: perFactorOutcome)
 	}
 
-	func signAuth(request: SargonUniFFI.SignRequestOfAuthIntent) async throws -> SargonUniFFI.SignResponseOfAuthIntentHash {
+	func signAuth(request: SignRequestOfAuthIntent) async throws -> SignResponseOfAuthIntentHash {
 		var perFactorOutcome: [PerFactorOutcomeOfAuthIntentHash] = []
 
 		for perFactorSource in request.perFactorSource {
@@ -79,7 +79,7 @@ final class SargonHostInteractor: HostInteractor {
 		return .init(perFactorOutcome: perFactorOutcome)
 	}
 
-	func deriveKeys(request: SargonUniFFI.KeyDerivationRequest) async throws -> SargonUniFFI.KeyDerivationResponse {
+	func deriveKeys(request: KeyDerivationRequest) async throws -> KeyDerivationResponse {
 		var perFactorOutcome: [KeyDerivationResponsePerFactorSource] = []
 
 		for perFactorSource in request.perFactorSource {
@@ -100,7 +100,7 @@ final class SargonHostInteractor: HostInteractor {
 		return .init(perFactorSource: perFactorOutcome)
 	}
 
-	func requestAuthorization(purpose: SargonUniFFI.AuthorizationPurpose) async -> SargonUniFFI.AuthorizationResponse {
+	func requestAuthorization(purpose: AuthorizationPurpose) async -> AuthorizationResponse {
 		let action = await overlayWindowClient.authorize(purpose: purpose)
 
 		switch action {
