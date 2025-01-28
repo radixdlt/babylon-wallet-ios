@@ -55,12 +55,14 @@ struct ShieldCard: View {
 			}
 			.foregroundStyle(.app.gray2)
 
-			StatusMessageView(
-				text: "Action required",
-				type: .warning,
-				useNarrowSpacing: true,
-				useSmallerFontSize: true
-			)
+			if let statusMessage = shield.status.statusMessageInfo {
+				StatusMessageView(
+					text: statusMessage.text,
+					type: statusMessage.type,
+					useNarrowSpacing: true,
+					useSmallerFontSize: true
+				)
+			}
 		}
 	}
 }
@@ -121,6 +123,17 @@ private extension ShieldCardStatus {
 			.shieldStatusActionRequired
 		case .notApplied:
 			.shieldStatusNotApplied
+		}
+	}
+
+	var statusMessageInfo: ShieldStatusMessageInfo? {
+		switch self {
+		case .applied:
+			.general(type: .success, text: "Applied and working")
+		case .actionRequired:
+			.general(type: .warning, text: "Action required")
+		case .notApplied:
+			nil
 		}
 	}
 }
