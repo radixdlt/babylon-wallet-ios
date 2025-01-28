@@ -88,14 +88,10 @@ private extension DerivePublicKeys {
 private extension DerivationPurpose {
 	var factorSourceAccessPurpose: FactorSourceAccess.State.Purpose {
 		switch self {
-		case .creatingNewAccount:
-			.createAccount
-		case .creatingNewPersona:
-			.createPersona
 		case .accountRecovery:
 			.deriveAccounts
-		case .securifyingAccount, .securifyingPersona, .securifyingAccountsAndPersonas, .preDerivingKeys:
-			fatalError("Not yet supported")
+		case .creatingNewAccount, .creatingNewPersona, .securifyingAccount, .securifyingPersona, .securifyingAccountsAndPersonas, .preDerivingKeys:
+			.updateFactorConfig
 		}
 	}
 }

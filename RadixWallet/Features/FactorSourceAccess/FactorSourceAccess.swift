@@ -20,6 +20,7 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 	enum ViewAction: Sendable, Hashable {
 		case onFirstTask
 		case retryButtonTapped
+		case skipButtonTapped
 		case closeButtonTapped
 	}
 
@@ -31,6 +32,7 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 	enum DelegateAction: Sendable, Hashable {
 		case perform(FactorSource)
 		case cancel
+		case skip
 	}
 
 	struct Destination: DestinationReducer {
@@ -71,11 +73,16 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 		case .onFirstTask:
 			return fetchFactorSource(state: state)
 				.merge(with: checkP2PLinksEffect(state: state))
+
 		case .retryButtonTapped:
 			guard let factorSource = state.factorSource else {
 				return .none
 			}
 			return .send(.delegate(.perform(factorSource)))
+
+		case .skipButtonTapped:
+			return .send(.delegate(.skip))
+
 		case .closeButtonTapped:
 			return .send(.delegate(.cancel))
 		}

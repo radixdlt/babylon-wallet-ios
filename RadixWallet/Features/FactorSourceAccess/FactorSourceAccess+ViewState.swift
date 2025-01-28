@@ -4,25 +4,20 @@ extension FactorSourceAccess.State {
 		switch purpose {
 		case .signature:
 			return S.Signature.title
-		case .createAccount:
-			return S.CreateAccount.title
-		case .createPersona:
-			return S.CreatePersona.title
-		case .deriveAccounts:
-			return S.DeriveAccounts.title
+		case .spotCheck:
+			return "Check Factor"
 		case .proveOwnership:
 			return S.ProveOwnership.title
 		case .encryptMessage:
 			return S.EncryptMessage.title
-		case .createKey:
-			return S.CreateKey.title
-		case let .authorization(authorization):
-			switch authorization {
-			case .creatingAccount, .creatingAccounts:
-				return S.CreateAccount.title
-			case .creatingPersona, .creatingPersonas:
-				return S.CreatePersona.title
-			}
+		case .updateFactorConfig:
+			return S.UpdatingFactorConfig.title
+		case .deriveAccounts:
+			return S.DeriveAccounts.title
+		case .createAccountAuthorization:
+			return S.CreateAccount.title
+		case .createPersonaAuthorization:
+			return S.CreatePersona.title
 		}
 	}
 
@@ -33,76 +28,94 @@ extension FactorSourceAccess.State {
 			switch purpose {
 			case .signature:
 				return S.Device.signMessage
-			case .createAccount, .createPersona, .deriveAccounts, .proveOwnership, .encryptMessage, .createKey:
+			case .spotCheck, .proveOwnership, .encryptMessage, .updateFactorConfig, .deriveAccounts:
 				return S.Device.message
-			case .authorization:
+			case .createAccountAuthorization, .createPersonaAuthorization:
 				return "Use your phone’s biometrics or PIN to confirm you want to do this."
 			}
+
 		case .ledgerHqHardwareWallet:
 			switch purpose {
 			case .signature:
 				return S.Ledger.signMessage
-			case .deriveAccounts:
-				return S.Ledger.deriveAccountsMessage
-			case .createAccount, .createPersona, .proveOwnership, .encryptMessage, .createKey:
+			case .spotCheck, .proveOwnership, .encryptMessage:
 				return S.Ledger.message
-			case .authorization:
-				return "Use your phone’s biometrics or PIN to confirm you want to do this."
+			case .updateFactorConfig, .deriveAccounts:
+				return S.Ledger.deriveKeysMessage
+			case .createAccountAuthorization, .createPersonaAuthorization:
+				fatalError("Not supported")
 			}
+
+		case .arculusCard:
+			switch purpose {
+			case .signature:
+				return S.Arculus.signMessage
+			case .spotCheck, .proveOwnership, .encryptMessage:
+				return S.Arculus.message
+			case .updateFactorConfig, .deriveAccounts:
+				return S.Arculus.deriveKeysMessage
+			case .createAccountAuthorization, .createPersonaAuthorization:
+				fatalError("Not supported")
+			}
+
+		case .password:
+			switch purpose {
+			case .signature:
+				return S.Password.signMessage
+			case .spotCheck, .proveOwnership, .encryptMessage, .updateFactorConfig, .deriveAccounts:
+				return S.Password.message
+			case .createAccountAuthorization, .createPersonaAuthorization:
+				fatalError("Not supported")
+			}
+
+		case .offDeviceMnemonic:
+			switch purpose {
+			case .signature:
+				return S.OffDeviceMnemonic.signMessage
+			case .spotCheck, .proveOwnership, .encryptMessage, .updateFactorConfig, .deriveAccounts:
+				return S.OffDeviceMnemonic.message
+			case .createAccountAuthorization, .createPersonaAuthorization:
+				fatalError("Not supported")
+			}
+
 		default:
 			fatalError("Not supported yet")
 		}
 	}
 
-	var showDescription: Bool {
+	var showCard: Bool {
 		switch purpose {
-		case .authorization:
-			false
-		default:
+		case .signature, .spotCheck, .proveOwnership, .encryptMessage, .updateFactorConfig, .deriveAccounts:
 			true
-		}
-	}
-
-	var label: String? {
-		switch factorSource {
-		case .none:
-			nil
-		case let .device(device):
-			device.hint.label
-		case let .ledger(ledger):
-			ledger.hint.label
-		default:
-			fatalError("Not supported yet")
+		case .createAccountAuthorization, .createPersonaAuthorization:
+			false
 		}
 	}
 
 	var isRetryEnabled: Bool {
-		guard factorSource != nil else {
+		guard let factorSource else {
 			return false
 		}
-		switch kind {
-		case .device:
+		switch factorSource.kind {
+		case .device, .ledgerHqHardwareWallet, .arculusCard:
 			return true
-		case .ledgerHqHardwareWallet:
-			return true
-		default:
+		case .password, .offDeviceMnemonic:
+			return false
+		case .trustedContact, .securityQuestions:
 			fatalError("Not supported yet")
 		}
 	}
 
-	var height: CGFloat {
-		switch kind {
-		case .device:
-			0.55
-		case .ledgerHqHardwareWallet:
-			switch purpose {
-			case .signature, .deriveAccounts:
-				0.74
-			case .createAccount, .createPersona, .proveOwnership, .encryptMessage, .createKey, .authorization:
-				0.70
-			}
-		default:
-			fatalError("Not supported yet")
+	var isSkipEnabled: Bool {
+		switch purpose {
+		case .signature:
+			true
+		case .spotCheck, .proveOwnership, .encryptMessage, .updateFactorConfig, .deriveAccounts, .createAccountAuthorization, .createPersonaAuthorization:
+			false
 		}
+	}
+
+	var height: CGFloat {
+		0.74
 	}
 }
