@@ -7,7 +7,7 @@ extension PasswordFactorSourceAccess {
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
-				VStack(spacing: .medium3) {
+				VStack(alignment: .leading, spacing: .medium3) {
 					AppTextField(
 						useSecureField: true,
 						primaryHeading: .init(text: "Password"),
@@ -16,10 +16,13 @@ extension PasswordFactorSourceAccess {
 						hint: nil,
 						preventScreenshot: false
 					)
+					.keyboardType(.asciiCapable)
+					.autocorrectionDisabled()
 
 					Button(L10n.Common.confirm) {
 						store.send(.view(.confirmButtonTapped))
 					}
+					.buttonStyle(.primaryRectangular)
 				}
 			}
 		}

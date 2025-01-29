@@ -8,6 +8,7 @@ extension FactorSourceAccess {
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				content
+					.scrollableWithBottomSpacer()
 					.withNavigationBar {
 						store.send(.view(.closeButtonTapped))
 					}
@@ -22,31 +23,43 @@ extension FactorSourceAccess {
 			}
 		}
 
-		private var content: some SwiftUI.View {
-			VStack(spacing: .zero) {
-				VStack(spacing: .medium3) {
-					Image(.signingKey)
-						.foregroundColor(.app.gray3)
+		private var scrollView: some SwiftUI.View {
+			GeometryReader { proxy in
+				WithPerceptionTracking {
+					ScrollView(showsIndicators: false) {
+						VStack(spacing: .zero) {
+							content
 
-					VStack(spacing: .small2) {
-						Text(store.title)
-							.textStyle(.sheetTitle)
-
-						Text(LocalizedStringKey(store.message))
-							.textStyle(.body1Regular)
+							Spacer()
+						}
+						.frame(minHeight: proxy.size.height)
 					}
-					.foregroundColor(.app.gray1)
-
-					card
-					retry
-					input
-					skip
+					.frame(width: proxy.size.width)
 				}
-				.multilineTextAlignment(.center)
-				.padding(.horizontal, .large2)
-
-				Spacer()
 			}
+		}
+
+		private var content: some SwiftUI.View {
+			VStack(spacing: .medium3) {
+				Image(.signingKey)
+					.foregroundColor(.app.gray3)
+
+				VStack(spacing: .small2) {
+					Text(store.title)
+						.textStyle(.sheetTitle)
+
+					Text(LocalizedStringKey(store.message))
+						.textStyle(.body1Regular)
+				}
+				.foregroundColor(.app.gray1)
+
+				card
+				retry
+				input
+				skip
+			}
+			.multilineTextAlignment(.center)
+			.padding(.horizontal, .large2)
 		}
 
 		@ViewBuilder
