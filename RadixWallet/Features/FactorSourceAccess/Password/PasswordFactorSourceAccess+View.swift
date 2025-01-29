@@ -7,14 +7,15 @@ extension PasswordFactorSourceAccess {
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
-				VStack(alignment: .leading, spacing: .medium3) {
+				VStack(spacing: .medium3) {
 					AppTextField(
-						useSecureField: true,
+						useSecureField: store.useSecureField,
 						primaryHeading: .init(text: "Password"),
 						placeholder: "",
 						text: $store.input.sending(\.view.inputChanged),
 						hint: nil,
-						preventScreenshot: false
+						preventScreenshot: false,
+						innerAccessory: { visibility }
 					)
 					.keyboardType(.asciiCapable)
 					.autocorrectionDisabled()
@@ -24,7 +25,15 @@ extension PasswordFactorSourceAccess {
 					}
 					.buttonStyle(.primaryRectangular)
 				}
+				.multilineTextAlignment(.leading)
 			}
+		}
+
+		private var visibility: some SwiftUI.View {
+			Image(store.useSecureField ? .homeAggregatedValueHidden : .homeAggregatedValueShown)
+				.onTapGesture {
+					store.send(.view(.visibilityToggled))
+				}
 		}
 	}
 }
