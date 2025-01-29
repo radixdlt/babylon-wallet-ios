@@ -330,6 +330,7 @@ private extension View {
 	func destination(store: StoreOf<RecoveryRoleSetup>) -> some View {
 		let destinationStore = store.destination
 		return selectEmergencyFallback(with: destinationStore, store: store)
+			.confirmUnsafeShield(with: destinationStore)
 	}
 
 	private func selectEmergencyFallback(with destinationStore: PresentationStoreOf<RecoveryRoleSetup.Destination>, store: StoreOf<RecoveryRoleSetup>) -> some View {
@@ -342,5 +343,9 @@ private extension View {
 				}
 			}
 		}
+	}
+
+	private func confirmUnsafeShield(with destinationStore: PresentationStoreOf<RecoveryRoleSetup.Destination>) -> some View {
+		alert(store: destinationStore.scope(state: \.confirmUnsafeShield, action: \.confirmUnsafeShield))
 	}
 }

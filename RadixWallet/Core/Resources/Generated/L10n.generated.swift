@@ -812,6 +812,20 @@ internal enum L10n {
       internal static let chooseAccountButton = L10n.tr("Localizable", "assetTransfer_receivingAccount_chooseAccountButton", fallback: "Choose Account")
     }
   }
+  internal enum Authorization {
+    internal enum CreateAccount {
+      /// Creating Account
+      internal static let title = L10n.tr("Localizable", "authorization_createAccount_title", fallback: "Creating Account")
+    }
+    internal enum CreateEntity {
+      /// Use your phone’s biometrics or PIN to confirm you want to do this.
+      internal static let message = L10n.tr("Localizable", "authorization_createEntity_message", fallback: "Use your phone’s biometrics or PIN to confirm you want to do this.")
+    }
+    internal enum CreatePersona {
+      /// Creating Persona
+      internal static let title = L10n.tr("Localizable", "authorization_createPersona_title", fallback: "Creating Persona")
+    }
+  }
   internal enum AuthorizedDapps {
     /// A deposit from this dApp is available. Go to your Accounts to view and claim.
     internal static let pendingDeposit = L10n.tr("Localizable", "authorizedDapps_pendingDeposit", fallback: "A deposit from this dApp is available. Go to your Accounts to view and claim.")
@@ -2531,6 +2545,14 @@ internal enum L10n {
       /// 
       /// [Learn more about DEX dApps](https://learn.radixdlt.com/article/whats-a-dex) ↗
       internal static let dex = L10n.tr("Localizable", "infoLink_glossary_dex", fallback: "## Decentralized Exchange (DEX)\n\nA decentralized exchange, or “DEX” for short, is a [dApp](?glossaryAnchor=dapps) that offers something a bit like a much more powerful web3 version of a foreign currency exchange counter at the airport.\n\n---\n\nA DEX dApp lets users do instant and fully automated swaps between a huge variety of tokens or other digital assets. The exchange logic runs right on the [Radix Network](?glossaryAnchor=radixnetwork) itself. This means that a DEX swap is done with a [transaction](?glossaryAnchor=transactions) and the [Radix Wallet](?glossaryAnchor=radixwallet) can show you exactly what’s going to happen, and let you apply [deposit guarantees](?glossaryAnchor=guarantees) to the results.\n\n[Learn more about DEX dApps](https://learn.radixdlt.com/article/whats-a-dex) ↗")
+      /// ## Emergency Fallback
+      /// 
+      /// Emergency fallbacks are time-based security factors you can use to confirm a recovery, even if you’ve lost the factor that would normally perform that role. Every [Security Shield](?glossaryAnchor=securityshields) must contain an emergency fallback and they can be set for any length of time up 9,999 days.
+      /// 
+      /// When you [create a Security Shield](?glossaryAnchor=buildingshield), it will automatically include an emergency fallback. You'll need to preset a time period that determines how long you'll need wait to complete a recovery, in the event that you start one but do not have the factors required to confirm it. In his situation, where you begin a recovery as normal but can't confirm it, your [Radix Wallet](?glossaryAnchor=radixwallet) will prompt you to activate your emergency fallback. Once you've done this, wait for the preset time period to elapse and then confirm the recovery with a single tap.
+      /// 
+      /// Once you start a timed recovery, you'll see a countdown for it on your Radix Wallet homescreen. It’s recommended that you set your emergency fallback for long enough that you'll have time to notice (and cancel it) if someone other than you has activated it and is attempting to take control of your [Accounts](?glossaryAnchor=accounts) and [Personas](?glossaryAnchor=personas).
+      internal static let emergencyfallback = L10n.tr("Localizable", "infoLink_glossary_emergencyfallback", fallback: "## Emergency Fallback\n\nEmergency fallbacks are time-based security factors you can use to confirm a recovery, even if you’ve lost the factor that would normally perform that role. Every [Security Shield](?glossaryAnchor=securityshields) must contain an emergency fallback and they can be set for any length of time up 9,999 days.\n\nWhen you [create a Security Shield](?glossaryAnchor=buildingshield), it will automatically include an emergency fallback. You'll need to preset a time period that determines how long you'll need wait to complete a recovery, in the event that you start one but do not have the factors required to confirm it. In his situation, where you begin a recovery as normal but can't confirm it, your [Radix Wallet](?glossaryAnchor=radixwallet) will prompt you to activate your emergency fallback. Once you've done this, wait for the preset time period to elapse and then confirm the recovery with a single tap.\n\nOnce you start a timed recovery, you'll see a countdown for it on your Radix Wallet homescreen. It’s recommended that you set your emergency fallback for long enough that you'll have time to notice (and cancel it) if someone other than you has activated it and is attempting to take control of your [Accounts](?glossaryAnchor=accounts) and [Personas](?glossaryAnchor=personas).")
       /// ## Gateways
       /// 
       /// A gateway is your pathway to connect to the [Radix Network](?glossaryAnchor=radixnetwork) – it enables users to communicate with the Radix Network and transfer data to and from it. 
@@ -3998,6 +4020,8 @@ internal enum L10n {
     internal static let factorCannotBeUsedByItself = L10n.tr("Localizable", "shieldSetupStatus_factorCannotBeUsedByItself", fallback: "Cannot use this factor type by itself")
     /// You cannot create a Shield with this combination of factors. **Read more**
     internal static let invalidCombination = L10n.tr("Localizable", "shieldSetupStatus_invalidCombination", fallback: "You cannot create a Shield with this combination of factors. **Read more**")
+    /// You haven’t chosen enough factors to build a Shield. Learn about **Factors required for Shield**
+    internal static let notEnoughFactors = L10n.tr("Localizable", "shieldSetupStatus_notEnoughFactors", fallback: "You haven’t chosen enough factors to build a Shield. Learn about **Factors required for Shield**")
     /// Choosing 2 factors will make your Shield more secure and reliable
     internal static let recommendedFactors = L10n.tr("Localizable", "shieldSetupStatus_recommendedFactors", fallback: "Choosing 2 factors will make your Shield more secure and reliable")
     /// This combination of factors may be unsafe. **Read more**
@@ -4009,6 +4033,14 @@ internal enum L10n {
     internal enum SelectFactors {
       /// You need to select at least 1 factor for signing transactions
       internal static let atLeastOneFactor = L10n.tr("Localizable", "shieldSetupStatus_selectFactors_atLeastOneFactor", fallback: "You need to select at least 1 factor for signing transactions")
+    }
+    internal enum UnsafeCombination {
+      /// Go back
+      internal static let cancel = L10n.tr("Localizable", "shieldSetupStatus_unsafeCombination_cancel", fallback: "Go back")
+      /// I understand
+      internal static let confirm = L10n.tr("Localizable", "shieldSetupStatus_unsafeCombination_confirm", fallback: "I understand")
+      /// The combination of factors you have chosen may make this Shield unsafe or easily lost without special precautions. Only proceed if you are certain you understand how you will use this Shield.
+      internal static let message = L10n.tr("Localizable", "shieldSetupStatus_unsafeCombination_message", fallback: "The combination of factors you have chosen may make this Shield unsafe or easily lost without special precautions. Only proceed if you are certain you understand how you will use this Shield.")
     }
   }
   internal enum ShieldWizardName {
@@ -4117,8 +4149,8 @@ internal enum L10n {
       internal static let all = L10n.tr("Localizable", "shieldWizardRegularAccess_setThreshold_all", fallback: "All (Recommended)")
       /// Set
       internal static let button = L10n.tr("Localizable", "shieldWizardRegularAccess_setThreshold_button", fallback: "Set")
-      /// Set the number of factors required to sign
-      internal static let title = L10n.tr("Localizable", "shieldWizardRegularAccess_setThreshold_title", fallback: "Set the number of factors required to sign")
+      /// Set the number of factors required for regular access
+      internal static let title = L10n.tr("Localizable", "shieldWizardRegularAccess_setThreshold_title", fallback: "Set the number of factors required for regular access")
     }
     internal enum Step {
       /// Step 1 of 2
@@ -4292,13 +4324,21 @@ internal enum L10n {
     }
   }
   internal enum TransactionRecovery {
+    /// Restart Signing
+    internal static let restart = L10n.tr("Localizable", "transactionRecovery_restart", fallback: "Restart Signing")
+    internal enum PreAuthorization {
+      /// Cancel Pre-Authorization
+      internal static let cancel = L10n.tr("Localizable", "transactionRecovery_preAuthorization_cancel", fallback: "Cancel Pre-Authorization")
+      /// You’ve skipped too many factors and cannot sign the pre-authorization. You can restart the signing process, or cancel it.
+      internal static let message = L10n.tr("Localizable", "transactionRecovery_preAuthorization_message", fallback: "You’ve skipped too many factors and cannot sign the pre-authorization. You can restart the signing process, or cancel it.")
+      /// Cannot Sign Pre-Authorization
+      internal static let title = L10n.tr("Localizable", "transactionRecovery_preAuthorization_title", fallback: "Cannot Sign Pre-Authorization")
+    }
     internal enum Transaction {
       /// Cancel Transaction
       internal static let cancel = L10n.tr("Localizable", "transactionRecovery_transaction_cancel", fallback: "Cancel Transaction")
       /// You’ve skipped too many factors and cannot sign the transaction. You can restart the signing process, or cancel it.
       internal static let message = L10n.tr("Localizable", "transactionRecovery_transaction_message", fallback: "You’ve skipped too many factors and cannot sign the transaction. You can restart the signing process, or cancel it.")
-      /// Restart Signing
-      internal static let restart = L10n.tr("Localizable", "transactionRecovery_transaction_restart", fallback: "Restart Signing")
       /// Cannot Sign Transaction
       internal static let title = L10n.tr("Localizable", "transactionRecovery_transaction_title", fallback: "Cannot Sign Transaction")
     }

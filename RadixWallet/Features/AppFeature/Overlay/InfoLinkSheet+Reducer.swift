@@ -183,7 +183,7 @@ extension InfoLinkSheet.GlossaryItem {
 		case .buildingshield:
 			L10n.InfoLink.Glossary.buildingshield
 		case .emergencyfallback:
-			"TODO" // TODO: update
+			L10n.InfoLink.Glossary.emergencyfallback
 		case .nohardwaredevice:
 			"TODO" // TODO: update
 		}
