@@ -40,11 +40,18 @@ struct RecoveryRoleSetup: FeatureReducer, Sendable {
 		@CasePathable
 		enum State: Sendable, Hashable {
 			case selectEmergencyFallbackPeriod
+			case confirmUnsafeShield(AlertState<Action.ConfirmUnsafeShield>)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
 			case selectEmergencyFallbackPeriod(SelectEmergencyFallbackPeriodView.Action)
+			case confirmUnsafeShield(ConfirmUnsafeShield)
+
+			enum ConfirmUnsafeShield: Sendable, Hashable {
+				case cancel
+				case confirm
+			}
 		}
 
 		var body: some ReducerOf<Self> {
@@ -103,6 +110,10 @@ struct RecoveryRoleSetup: FeatureReducer, Sendable {
 			return .none
 
 		case .continueButtonTapped:
+			if case .weak = state.validatedRoleStatus {
+				state.destination = Destination.confirmUnsafeShieldState
+				return .none
+			}
 			return .send(.delegate(.finished))
 		}
 	}
@@ -126,6 +137,29 @@ struct RecoveryRoleSetup: FeatureReducer, Sendable {
 				builder = builder.setTimePeriodUntilAutoConfirm(timePeriod: period)
 			}
 			return .none
+		case .confirmUnsafeShield(.confirm):
+			return .send(.delegate(.finished))
+		default:
+			return .none
 		}
 	}
+}
+
+extension RecoveryRoleSetup.Destination {
+	static let confirmUnsafeShieldState: State = .confirmUnsafeShield(.init(
+		title: {
+			TextState("")
+		},
+		actions: {
+			ButtonState(role: .cancel, action: .cancel) {
+				TextState(L10n.ShieldSetupStatus.UnsafeCombination.cancel)
+			}
+			ButtonState(action: .confirm) {
+				TextState(L10n.ShieldSetupStatus.UnsafeCombination.confirm)
+			}
+		},
+		message: {
+			TextState(L10n.ShieldSetupStatus.UnsafeCombination.message)
+		}
+	))
 }

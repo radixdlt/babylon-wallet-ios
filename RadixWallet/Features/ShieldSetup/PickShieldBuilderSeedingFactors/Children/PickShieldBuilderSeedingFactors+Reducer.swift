@@ -80,6 +80,8 @@ struct PickShieldBuilderSeedingFactors: FeatureReducer, Sendable {
 
 		case .continueButtonTapped:
 			state.$shieldBuilder.withLock { builder in
+				builder = builder.removeAllFactorsFromPrimaryOverride()
+				builder = builder.resetRecoveryAndConfirmationRoleState()
 				builder = builder.autoAssignFactorsToRecoveryAndConfirmationBasedOnPrimary(allFactors: state.factorSourcesCandidates)
 			}
 			return .send(.delegate(.finished))

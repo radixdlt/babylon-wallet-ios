@@ -22,8 +22,12 @@ extension PrimaryRoleSetup.State {
 			if reason.isAuthSigningFactorMissing {
 				contexts.append(.authenticationRole)
 			}
-			if contexts.isEmpty {
-				return nil
+			if contexts.isEmpty, reason.isRecoveryRoleFactorListEmpty || reason.isConfirmationRoleFactorListEmpty {
+				return .init(
+					type: .warning,
+					text: L10n.ShieldSetupStatus.notEnoughFactors,
+					contexts: [.general]
+				)
 			}
 
 			return .init(
@@ -35,7 +39,7 @@ extension PrimaryRoleSetup.State {
 	}
 
 	var canContinue: Bool {
-		guard case .invalid = validatedRoleStatus, statusMessageInfo != nil else { return true }
+		guard case .invalid = validatedRoleStatus, statusMessageInfo?.type == .error else { return true }
 		return false
 	}
 
