@@ -360,7 +360,7 @@ extension DappInteractionFlow {
 				else {
 					return dismissEffect(for: state, errorKind: .failedToSignAuthChallenge, message: "Failed to serialize signature")
 				}
-				let proof = WalletToDappInteractionAuthProof(intentSignatureOfOwner: intentSignatureOfOwner)
+				let proof = WalletToDappInteractionAuthProof(signatureWithPublicKey: intentSignatureOfOwner.intentSignature.value)
 
 				state.responseItems[item] = .remote(.auth(.loginWithChallenge(.init(
 					persona: responsePersona,
@@ -459,8 +459,7 @@ extension DappInteractionFlow {
 			else {
 				return dismissEffect(for: state, errorKind: .failedToSignAuthChallenge, message: "Failed to serialize signature")
 			}
-			let authProof = WalletToDappInteractionAuthProof(intentSignatureOfOwner: intentSignatureOfOwner)
-			let proof = WalletToDappInteractionProofOfOwnership.persona(.init(identityAddress: identityAddress, proof: authProof))
+			let proof = WalletToDappInteractionProofOfOwnership(intentSignatureOfOwner: intentSignatureOfOwner)
 
 			state.responseItems[item] = .remote(.proofOfOwnership(.init(
 				challenge: signedAuthIntent.intent.challengeNonce,
