@@ -32,34 +32,13 @@ extension AccountPermissionChooseAccounts {
 					}
 				}
 			}
-			.destinations(with: store)
 		}
 	}
 }
 
 private extension StoreOf<AccountPermissionChooseAccounts> {
-	var destination: PresentationStoreOf<AccountPermissionChooseAccounts.Destination> {
-		func scopeState(state: State) -> PresentationState<AccountPermissionChooseAccounts.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
-	}
-
 	var chooseAccounts: StoreOf<ChooseAccounts> {
 		scope(state: \.chooseAccounts) { .child(.chooseAccounts($0)) }
-	}
-}
-
-@MainActor
-private extension View {
-	func destinations(with store: StoreOf<AccountPermissionChooseAccounts>) -> some View {
-		let destinationStore = store.destination
-		return sheet(
-			store: destinationStore,
-			state: /AccountPermissionChooseAccounts.Destination.State.signing,
-			action: AccountPermissionChooseAccounts.Destination.Action.signing,
-			content: { Signing.View(store: $0) }
-		)
 	}
 }
 

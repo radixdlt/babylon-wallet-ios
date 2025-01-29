@@ -197,15 +197,17 @@ extension FactorSourcesClient {
 struct UpdateFactorSourceLastUsedRequest: Sendable, Hashable {
 	let factorSourceIDs: [FactorSourceID]
 	let lastUsedOn: Date
-	let usagePurpose: SigningPurpose
+
 	init(
 		factorSourceIDs: [FactorSourceID],
-		usagePurpose: SigningPurpose,
 		lastUsedOn: Date = .init()
 	) {
 		self.factorSourceIDs = factorSourceIDs
-		self.usagePurpose = usagePurpose
 		self.lastUsedOn = lastUsedOn
+	}
+
+	init(factorSourceId: FactorSourceID) {
+		self.init(factorSourceIDs: [factorSourceId])
 	}
 }
 
