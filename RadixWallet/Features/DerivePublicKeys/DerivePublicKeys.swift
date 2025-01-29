@@ -4,7 +4,7 @@ struct DerivePublicKeys: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
 		let input: KeyDerivationRequestPerFactorSource
-		var factorSourceAccess: FactorSourceAccess.State?
+		var factorSourceAccess: FactorSourceAccess.State
 
 		init(input: KeyDerivationRequestPerFactorSource, purpose: DerivationPurpose) {
 			self.input = input
@@ -13,10 +13,6 @@ struct DerivePublicKeys: Sendable, FeatureReducer {
 	}
 
 	typealias Action = FeatureAction<Self>
-
-	enum InternalAction: Sendable, Hashable {
-		case deriveWithSpecificPrivateHD__MustImplement
-	}
 
 	@CasePathable
 	enum ChildAction: Sendable, Hashable {
@@ -33,10 +29,10 @@ struct DerivePublicKeys: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 
 	var body: some ReducerOf<Self> {
+		Scope(state: \.factorSourceAccess, action: \.child.factorSourceAccess) {
+			FactorSourceAccess()
+		}
 		Reduce(core)
-			.ifLet(\.factorSourceAccess, action: \.child.factorSourceAccess) {
-				FactorSourceAccess()
-			}
 	}
 
 	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {

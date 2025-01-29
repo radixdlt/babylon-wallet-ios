@@ -10,6 +10,8 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 		@Presents
 		var destination: Destination.State? = nil
 
+		var password: PasswordFactorSourceAccess.State?
+
 		var kind: FactorSourceKind {
 			id?.kind ?? .device
 		}
@@ -27,6 +29,11 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 	enum InternalAction: Sendable, Hashable {
 		case setFactorSource(FactorSource?)
 		case hasP2PLinks(Bool)
+	}
+
+	@CasePathable
+	enum ChildAction: Sendable, Hashable {
+		case password(PasswordFactorSourceAccess.Action)
 	}
 
 	enum DelegateAction: Sendable, Hashable {
@@ -64,6 +71,9 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 			.ifLet(destinationPath, action: \.destination) {
 				Destination()
 			}
+			.ifLet(\.password, action: \.child.password) {
+				PasswordFactorSourceAccess()
+			}
 	}
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
@@ -91,12 +101,22 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .setFactorSource(factorSource):
-			if let factorSource {
-				state.factorSource = factorSource
-				return .send(.delegate(.perform(factorSource)))
-			} else {
+			guard let factorSource else {
 				assertionFailure("No Factor Source found on Profile for id: \(String(describing: state.id))")
 				return .send(.delegate(.cancel))
+			}
+
+			state.factorSource = factorSource
+			switch factorSource {
+			case .device, .ledger, .arculusCard:
+				return .send(.delegate(.perform(factorSource)))
+
+			case let .password(value):
+				state.password = .init(factorSource: value)
+				return .none
+
+			case .offDeviceMnemonic, .trustedContact, .securityQuestions:
+				fatalError("")
 			}
 
 		case let .hasP2PLinks(hasP2PLinks):

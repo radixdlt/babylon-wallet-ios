@@ -814,6 +814,8 @@
 		5BFA4FBA2C736B740030B517 /* HiddenAssets+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFA4FB82C736B740030B517 /* HiddenAssets+View.swift */; };
 		5BFA4FBB2C736B740030B517 /* HiddenAssets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFA4FB92C736B740030B517 /* HiddenAssets.swift */; };
 		5BFC108F2D42AD1500ACAAD4 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 5BFC108E2D42AD1500ACAAD4 /* Sargon */; };
+		5BFED68B2D4A8C6D00380E7D /* PasswordFactorSourceAccess+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFED68A2D4A8C6D00380E7D /* PasswordFactorSourceAccess+View.swift */; };
+		5BFED68C2D4A8C6D00380E7D /* PasswordFactorSourceAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFED6892D4A8C6D00380E7D /* PasswordFactorSourceAccess.swift */; };
 		830818482B9F1621002D8351 /* HTTPClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830818472B9F1621002D8351 /* HTTPClient+Live.swift */; };
 		8308184A2B9F162B002D8351 /* HTTPClient+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830818492B9F162B002D8351 /* HTTPClient+Mock.swift */; };
 		8308184C2B9F169B002D8351 /* TokenPriceClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8308184B2B9F169B002D8351 /* TokenPriceClient+Live.swift */; };
@@ -2098,6 +2100,8 @@
 		5BEB9CD42C6F6CC9001FD9D4 /* ConfirmationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmationView.swift; sourceTree = "<group>"; };
 		5BFA4FB82C736B740030B517 /* HiddenAssets+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HiddenAssets+View.swift"; sourceTree = "<group>"; };
 		5BFA4FB92C736B740030B517 /* HiddenAssets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HiddenAssets.swift; sourceTree = "<group>"; };
+		5BFED6892D4A8C6D00380E7D /* PasswordFactorSourceAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordFactorSourceAccess.swift; sourceTree = "<group>"; };
+		5BFED68A2D4A8C6D00380E7D /* PasswordFactorSourceAccess+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PasswordFactorSourceAccess+View.swift"; sourceTree = "<group>"; };
 		830818472B9F1621002D8351 /* HTTPClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPClient+Live.swift"; sourceTree = "<group>"; };
 		830818492B9F162B002D8351 /* HTTPClient+Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPClient+Mock.swift"; sourceTree = "<group>"; };
 		8308184B2B9F169B002D8351 /* TokenPriceClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TokenPriceClient+Live.swift"; sourceTree = "<group>"; };
@@ -5893,6 +5897,7 @@
 				5BB2C2472D36C66A00286B6B /* FactorSourceAccess+View.swift */,
 				5B83D2CE2D47F158007111B0 /* FactorSourceAccess+Models.swift */,
 				5BB2C24A2D36C9D200286B6B /* FactorSourceAccess+ViewState.swift */,
+				5BFED6882D4A8C4E00380E7D /* Password */,
 			);
 			path = FactorSourceAccess;
 			sourceTree = "<group>";
@@ -5922,6 +5927,15 @@
 				5BFA4FB92C736B740030B517 /* HiddenAssets.swift */,
 			);
 			path = HiddenAssets;
+			sourceTree = "<group>";
+		};
+		5BFED6882D4A8C4E00380E7D /* Password */ = {
+			isa = PBXGroup;
+			children = (
+				5BFED6892D4A8C6D00380E7D /* PasswordFactorSourceAccess.swift */,
+				5BFED68A2D4A8C6D00380E7D /* PasswordFactorSourceAccess+View.swift */,
+			);
+			path = Password;
 			sourceTree = "<group>";
 		};
 		830E43AD2C2D8B3800B6E95F /* Mobile */ = {
@@ -8539,6 +8553,8 @@
 				48CFC5BA2ADC10DA00E77A5C /* RadioButton.swift in Sources */,
 				A40815A92C7E0D08005E65B9 /* MetadataUrlValue.swift in Sources */,
 				48CFC5852ADC10DA00E77A5C /* SecureStorageClient+Live.swift in Sources */,
+				5BFED68B2D4A8C6D00380E7D /* PasswordFactorSourceAccess+View.swift in Sources */,
+				5BFED68C2D4A8C6D00380E7D /* PasswordFactorSourceAccess.swift in Sources */,
 				48CFC2C52ADC10D900E77A5C /* AssetTransferMessage+Reducer.swift in Sources */,
 				48CFC5D32ADC10DA00E77A5C /* PresentationBackground.swift in Sources */,
 				48CFC4342ADC10DA00E77A5C /* CustomDumpConformance.swift in Sources */,

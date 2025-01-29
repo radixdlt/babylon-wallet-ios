@@ -39,6 +39,7 @@ extension FactorSourceAccess {
 
 					card
 					retry
+					input
 					skip
 				}
 				.multilineTextAlignment(.center)
@@ -76,6 +77,13 @@ extension FactorSourceAccess {
 		}
 
 		@ViewBuilder
+		private var input: some SwiftUI.View {
+			if let password = store.password {
+				PasswordFactorSourceAccess.View(store: password)
+			}
+		}
+
+		@ViewBuilder
 		private var skip: some SwiftUI.View {
 			if store.isSkipEnabled {
 				Button(L10n.FactorSourceActions.useDifferentFactor) {
@@ -93,6 +101,10 @@ private extension StoreOf<FactorSourceAccess> {
 			state.$destination
 		}
 		return scope(state: scopeState, action: Action.destination)
+	}
+
+	var password: Store<PasswordFactorSourceAccess.State, PasswordFactorSourceAccess.Action>? {
+		scope(state: \.password, action: \.child.password)
 	}
 }
 
