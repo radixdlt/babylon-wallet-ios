@@ -77,9 +77,6 @@ extension FactorSourceAccess.State {
 			case .createAccountAuthorization, .createPersonaAuthorization:
 				fatalError("Not supported")
 			}
-
-		default:
-			fatalError("Not supported yet")
 		}
 	}
 
@@ -101,8 +98,6 @@ extension FactorSourceAccess.State {
 			return true
 		case .password, .offDeviceMnemonic:
 			return false
-		case .trustedContact, .securityQuestions:
-			fatalError("Not supported yet")
 		}
 	}
 

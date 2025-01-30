@@ -115,7 +115,7 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 				state.password = .init(factorSource: value)
 				return .none
 
-			case .offDeviceMnemonic, .trustedContact, .securityQuestions:
+			case .offDeviceMnemonic:
 				fatalError("")
 			}
 
