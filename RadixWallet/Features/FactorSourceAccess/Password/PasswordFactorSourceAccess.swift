@@ -5,7 +5,6 @@ struct PasswordFactorSourceAccess: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		let factorSource: PasswordFactorSource
 		var input: String = ""
-		var useSecureField = true
 	}
 
 	typealias Action = FeatureAction<Self>
@@ -13,7 +12,6 @@ struct PasswordFactorSourceAccess: Sendable, FeatureReducer {
 	@CasePathable
 	enum ViewAction: Sendable, Hashable {
 		case inputChanged(String)
-		case visibilityToggled
 		case confirmButtonTapped
 	}
 
@@ -29,10 +27,6 @@ struct PasswordFactorSourceAccess: Sendable, FeatureReducer {
 		switch viewAction {
 		case let .inputChanged(input):
 			state.input = input
-			return .none
-
-		case .visibilityToggled:
-			state.useSecureField.toggle()
 			return .none
 
 		case .confirmButtonTapped:
