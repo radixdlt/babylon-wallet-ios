@@ -172,15 +172,13 @@ struct FactorSourceCard: View {
 }
 
 extension FactorSourceCard {
-	init?(
+	init(
 		kind: Kind,
 		mode: Mode,
 		messages: [FactorSourceCardDataSource.Message] = [],
 		isExpanded: Bool = false,
 		onRemoveTapped: (() -> Void)? = nil
 	) {
-		guard kind.factorSourceKind.isSupported else { return nil }
-
 		switch kind {
 		case let .genericDescription(factorSourceKind):
 			self = .init(
