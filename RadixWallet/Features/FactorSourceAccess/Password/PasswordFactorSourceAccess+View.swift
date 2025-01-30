@@ -13,7 +13,7 @@ extension PasswordFactorSourceAccess {
 						primaryHeading: .init(text: "Password"),
 						placeholder: "",
 						text: $store.input.sending(\.view.inputChanged),
-						hint: nil,
+						hint: store.hint,
 						preventScreenshot: false
 					)
 					.keyboardType(.asciiCapable)
@@ -23,9 +23,20 @@ extension PasswordFactorSourceAccess {
 						store.send(.view(.confirmButtonTapped))
 					}
 					.buttonStyle(.primaryRectangular)
+					.controlState(store.controlState)
 				}
 				.multilineTextAlignment(.leading)
 			}
 		}
+	}
+}
+
+private extension PasswordFactorSourceAccess.State {
+	var controlState: ControlState {
+		input.isEmpty || showError ? .disabled : .enabled
+	}
+
+	var hint: Hint.ViewState? {
+		showError ? Hint.ViewState.iconError("Incorrect password") : nil
 	}
 }
