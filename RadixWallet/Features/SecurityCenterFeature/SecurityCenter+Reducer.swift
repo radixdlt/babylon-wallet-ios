@@ -56,6 +56,9 @@ struct SecurityCenter: Sendable, FeatureReducer {
 			Scope(state: \.securityShieldsList, action: \.securityShieldsList) {
 				ShieldsList()
 			}
+			Scope(state: \.applyShield, action: \.applyShield) {
+				ApplyShield.Coordinator()
+			}
 		}
 	}
 
@@ -103,11 +106,13 @@ struct SecurityCenter: Sendable, FeatureReducer {
 			case .securityShields:
 				let shields = (try? SargonOs.shared.securityStructuresOfFactorSourceIds()) ?? []
 
-				if shields.isEmpty {
-					state.destination = .securityShieldsSetup(.init())
-				} else {
-					state.destination = .securityShieldsList(.init())
-				}
+				state.destination = .applyShield(.init(shieldID: shields.first!.id))
+
+//				if shields.isEmpty {
+//					state.destination = .securityShieldsSetup(.init())
+//				} else {
+//					state.destination = .securityShieldsList(.init())
+//				}
 
 				return .none
 
