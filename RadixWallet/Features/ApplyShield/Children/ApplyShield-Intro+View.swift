@@ -10,7 +10,6 @@ extension ApplyShield.Intro.State {
 extension ApplyShield.Intro {
 	struct View: SwiftUI.View {
 		let store: StoreOf<ApplyShield.Intro>
-		@Environment(\.dismiss) var dismiss
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
@@ -72,9 +71,6 @@ extension ApplyShield.Intro {
 						.buttonStyle(.primaryText())
 						.multilineTextAlignment(.center)
 					}
-				}
-				.withNavigationBar {
-					dismiss()
 				}
 				.task {
 					store.send(.view(.task))

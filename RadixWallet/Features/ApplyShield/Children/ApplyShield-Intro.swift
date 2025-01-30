@@ -5,7 +5,7 @@ extension ApplyShield {
 		struct State: Sendable, Hashable {
 			let shieldID: SecurityStructureId
 			var shieldName: DisplayName?
-			var hasEnoughXRD = false
+			var hasEnoughXRD = true
 		}
 
 		typealias Action = FeatureAction<Self>

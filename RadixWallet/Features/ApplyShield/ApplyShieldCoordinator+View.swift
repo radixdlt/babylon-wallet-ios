@@ -7,11 +7,19 @@ enum ApplyShield {}
 extension ApplyShield.Coordinator {
 	struct View: SwiftUI.View {
 		@Perception.Bindable var store: StoreOf<ApplyShield.Coordinator>
+		@Environment(\.dismiss) var dismiss
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				NavigationStack(path: $store.scope(state: \.path, action: \.child.path)) {
 					path(for: store.scope(state: \.root, action: \.child.root))
+						.toolbar {
+							ToolbarItem(placement: .navigationBarLeading) {
+								CloseButton {
+									dismiss()
+								}
+							}
+						}
 				} destination: { destination in
 					path(for: destination)
 				}
