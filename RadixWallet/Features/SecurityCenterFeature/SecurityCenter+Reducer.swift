@@ -23,6 +23,7 @@ struct SecurityCenter: Sendable, FeatureReducer {
 			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
 			case securityShieldsSetup(ShieldSetupCoordinator.State)
 			case securityShieldsList(ShieldsList.State)
+			case applyShield(ApplyShield.Coordinator.State)
 		}
 
 		@CasePathable
@@ -33,6 +34,7 @@ struct SecurityCenter: Sendable, FeatureReducer {
 			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
 			case securityShieldsSetup(ShieldSetupCoordinator.Action)
 			case securityShieldsList(ShieldsList.Action)
+			case applyShield(ApplyShield.Coordinator.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -69,7 +71,7 @@ struct SecurityCenter: Sendable, FeatureReducer {
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(destinationPath, action: /Action.destination) {
+			.ifLet(destinationPath, action: \.destination) {
 				Destination()
 			}
 	}
@@ -134,9 +136,8 @@ struct SecurityCenter: Sendable, FeatureReducer {
 		     .importMnemonics(.delegate(.finishedImportingMnemonics)):
 			state.destination = nil
 			return .none
-		case .securityShieldsSetup(.delegate(.finished)):
-			// TODO: Apply shield flow
-			state.destination = .securityShieldsList(.init())
+		case let .securityShieldsSetup(.delegate(.finished(shieldID))):
+			state.destination = .applyShield(.init(shieldID: shieldID))
 			return .none
 		default:
 			return .none
