@@ -5,6 +5,7 @@ extension ApplyShield {
 		struct State: Sendable, Hashable {
 			let shieldID: SecurityStructureId
 			var shieldName: DisplayName?
+			var hasEnoughXRD = false
 		}
 
 		typealias Action = FeatureAction<Self>
@@ -33,6 +34,7 @@ extension ApplyShield {
 			switch viewAction {
 			case .task:
 				.run { [shieldID = state.shieldID] send in
+					// TODO: expose `security_structure_of_factor_source_ids_by_security_structure_id` in Sargon
 					guard let shield = try SargonOs.shared.securityStructuresOfFactorSourceIds()
 						.first(where: { $0.metadata.id == shieldID }) else { return }
 					await send(.internal(.setShieldName(shield.metadata.displayName)))
