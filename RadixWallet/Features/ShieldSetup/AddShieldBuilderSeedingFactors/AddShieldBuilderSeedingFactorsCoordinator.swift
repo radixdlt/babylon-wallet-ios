@@ -128,7 +128,7 @@ private extension AddShieldBuilderSeedingFactors.Coordinator {
 		case .arculusCard, .password, .offDeviceMnemonic:
 			state.destination = .todo
 			return .none
-		case .securityQuestions, .trustedContact, .device:
+		case .device:
 			fatalError("Factor Source not supported")
 		}
 	}

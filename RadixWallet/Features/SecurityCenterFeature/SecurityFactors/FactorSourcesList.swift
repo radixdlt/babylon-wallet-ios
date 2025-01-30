@@ -147,8 +147,6 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 				// since Matt mentioned we will probably always present this screen: https://zpl.io/wyqB6Bd
 				// and I don't want to add all the logic for checking if there is a CE or not just to migrate it later.
 				loggerGlobal.info("Add \(state.kind) not yet implemented")
-			case .trustedContact, .securityQuestions:
-				fatalError("Not supported")
 			}
 
 			return .none

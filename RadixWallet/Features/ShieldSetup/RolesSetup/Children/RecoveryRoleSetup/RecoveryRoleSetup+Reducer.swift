@@ -134,7 +134,7 @@ struct RecoveryRoleSetup: FeatureReducer, Sendable {
 		case let .selectEmergencyFallbackPeriod(.set(period)):
 			state.destination = nil
 			state.$shieldBuilder.withLock { builder in
-				builder = builder.setTimePeriodUntilAutoConfirm(timePeriod: period)
+				builder = builder.setTimeUntilDelayedConfirmationIsCallable(timePeriod: period)
 			}
 			return .none
 		case .confirmUnsafeShield(.confirm):

@@ -29,19 +29,6 @@ extension FactorSourceCardDataSource {
 }
 
 extension FactorSourceKind {
-	var isSupported: Bool {
-		switch self {
-		case .device,
-		     .ledgerHqHardwareWallet,
-		     .offDeviceMnemonic,
-		     .arculusCard,
-		     .password:
-			true
-		case .trustedContact, .securityQuestions:
-			false
-		}
-	}
-
 	var icon: ImageResource {
 		switch self {
 		case .device:
@@ -54,8 +41,6 @@ extension FactorSourceKind {
 			.arculusFactor
 		case .password:
 			.passwordFactor
-		case .trustedContact, .securityQuestions:
-			fatalError("Not supported yet")
 		}
 	}
 
@@ -71,8 +56,6 @@ extension FactorSourceKind {
 			L10n.FactorSources.Card.arculusCardTitle
 		case .password:
 			L10n.FactorSources.Card.passwordTitle
-		case .trustedContact, .securityQuestions:
-			fatalError("Not supported yet")
 		}
 	}
 
@@ -88,8 +71,6 @@ extension FactorSourceKind {
 			L10n.FactorSources.Card.arculusCardDescription
 		case .password:
 			L10n.FactorSources.Card.passwordDescription
-		case .trustedContact, .securityQuestions:
-			fatalError("Not supported yet")
 		}
 	}
 
@@ -105,8 +86,6 @@ extension FactorSourceKind {
 			(.arculus, L10n.InfoLink.Title.arculus)
 		case .password:
 			(.passwords, L10n.InfoLink.Title.passwords)
-		default:
-			fatalError("Not supported yet")
 		}
 	}
 }
