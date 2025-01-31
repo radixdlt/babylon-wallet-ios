@@ -1273,6 +1273,8 @@
 		E7607DCB2D4A30210083B3A5 /* ApplyShieldCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7607DCA2D4A30210083B3A5 /* ApplyShieldCoordinator+View.swift */; };
 		E7607DCE2D4A7D440083B3A5 /* ApplyShield-Intro+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7607DCD2D4A7D440083B3A5 /* ApplyShield-Intro+View.swift */; };
 		E7607DD02D4A7D4E0083B3A5 /* ApplyShield-Intro.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7607DCF2D4A7D4E0083B3A5 /* ApplyShield-Intro.swift */; };
+		E7607DD42D4BB5BB0083B3A5 /* ChooseAccountsForShield.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7607DD32D4BB5BB0083B3A5 /* ChooseAccountsForShield.swift */; };
+		E7607DD62D4BB5C30083B3A5 /* ChooseAccountsForShield+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7607DD52D4BB5C30083B3A5 /* ChooseAccountsForShield+View.swift */; };
 		E76645A42C23138300065D9A /* Throwable.swift in Sources */ = {isa = PBXBuildFile; fileRef = E76645A32C23138300065D9A /* Throwable.swift */; };
 		E775A1B82CF4CA5500E72DB9 /* FactorSourceCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = E775A1B72CF4CA5500E72DB9 /* FactorSourceCard.swift */; };
 		E775A1BA2CF7326000E72DB9 /* FactorSourceCard+DataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = E775A1B92CF7326000E72DB9 /* FactorSourceCard+DataSource.swift */; };
@@ -2575,6 +2577,8 @@
 		E7607DCA2D4A30210083B3A5 /* ApplyShieldCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ApplyShieldCoordinator+View.swift"; sourceTree = "<group>"; };
 		E7607DCD2D4A7D440083B3A5 /* ApplyShield-Intro+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ApplyShield-Intro+View.swift"; sourceTree = "<group>"; };
 		E7607DCF2D4A7D4E0083B3A5 /* ApplyShield-Intro.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ApplyShield-Intro.swift"; sourceTree = "<group>"; };
+		E7607DD32D4BB5BB0083B3A5 /* ChooseAccountsForShield.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseAccountsForShield.swift; sourceTree = "<group>"; };
+		E7607DD52D4BB5C30083B3A5 /* ChooseAccountsForShield+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChooseAccountsForShield+View.swift"; sourceTree = "<group>"; };
 		E76645A32C23138300065D9A /* Throwable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Throwable.swift; sourceTree = "<group>"; };
 		E775A1B72CF4CA5500E72DB9 /* FactorSourceCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FactorSourceCard.swift; sourceTree = "<group>"; };
 		E775A1B92CF7326000E72DB9 /* FactorSourceCard+DataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactorSourceCard+DataSource.swift"; sourceTree = "<group>"; };
@@ -7065,10 +7069,28 @@
 		E7607DCC2D4A7D130083B3A5 /* Children */ = {
 			isa = PBXGroup;
 			children = (
+				E7607DD22D4BB53E0083B3A5 /* Intro */,
+				E7607DD12D4BB5310083B3A5 /* ChooseAccountsForShield */,
+			);
+			path = Children;
+			sourceTree = "<group>";
+		};
+		E7607DD12D4BB5310083B3A5 /* ChooseAccountsForShield */ = {
+			isa = PBXGroup;
+			children = (
+				E7607DD32D4BB5BB0083B3A5 /* ChooseAccountsForShield.swift */,
+				E7607DD52D4BB5C30083B3A5 /* ChooseAccountsForShield+View.swift */,
+			);
+			path = ChooseAccountsForShield;
+			sourceTree = "<group>";
+		};
+		E7607DD22D4BB53E0083B3A5 /* Intro */ = {
+			isa = PBXGroup;
+			children = (
 				E7607DCF2D4A7D4E0083B3A5 /* ApplyShield-Intro.swift */,
 				E7607DCD2D4A7D440083B3A5 /* ApplyShield-Intro+View.swift */,
 			);
-			path = Children;
+			path = Intro;
 			sourceTree = "<group>";
 		};
 		E76F56BF2C538061001EDC63 /* EditPersonaField */ = {
@@ -8549,6 +8571,7 @@
 				48CFC3852ADC10D900E77A5C /* EmptyAssetListView.swift in Sources */,
 				A408164F2C7E0D08005E65B9 /* TransactionStatusRequest.swift in Sources */,
 				A41266F72B160F3F00EA38E9 /* ManualAccountRecoveryCoordinator+Reducer.swift in Sources */,
+				E7607DD42D4BB5BB0083B3A5 /* ChooseAccountsForShield.swift in Sources */,
 				5B2A45042BD6689100AEC8AD /* ContactSupportClient+Live.swift in Sources */,
 				48CFC4552ADC10DA00E77A5C /* CacheClient+Live.swift in Sources */,
 				48CFC3F32ADC10D900E77A5C /* PeerConnectionClient.swift in Sources */,
@@ -8595,6 +8618,7 @@
 				48CFC2FD2ADC10D900E77A5C /* DefaultDepositGuarantees+View.swift in Sources */,
 				48CFC5E02ADC10DA00E77A5C /* LoadableView.swift in Sources */,
 				5B3C48C12C85CEAA00DB160D /* AccountBannerView.swift in Sources */,
+				E7607DD62D4BB5C30083B3A5 /* ChooseAccountsForShield+View.swift in Sources */,
 				48CFC6012ADC10DA00E77A5C /* P2P+ConnectorExtension+Request.swift in Sources */,
 				A40815832C7E0D08005E65B9 /* InvalidRequestError.swift in Sources */,
 				48CFC5C22ADC10DA00E77A5C /* Shapes.swift in Sources */,

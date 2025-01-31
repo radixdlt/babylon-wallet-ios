@@ -21,7 +21,8 @@ extension ApplyShield {
 		}
 
 		enum DelegateAction: Sendable, Equatable {
-			case skip
+			case started
+			case skipped
 		}
 
 		@Dependency(\.errorQueue) var errorQueue
@@ -42,9 +43,9 @@ extension ApplyShield {
 					errorQueue.schedule(error)
 				}
 			case .startApplyingButtonTapped:
-				.none
+				.send(.delegate(.started))
 			case .skipButtonTapped:
-				.send(.delegate(.skip))
+				.send(.delegate(.skipped))
 			}
 		}
 

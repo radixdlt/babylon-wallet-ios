@@ -20,6 +20,7 @@ extension ApplyShield {
 		@Reducer(state: .hashable, action: .equatable)
 		enum Path {
 			case intro(Intro)
+			case chooseAccounts(ChooseAccountsForShield)
 		}
 
 		typealias Action = FeatureAction<Self>
@@ -31,6 +32,7 @@ extension ApplyShield {
 		}
 
 		enum DelegateAction: Sendable, Equatable {
+			case skipped
 			case finished
 		}
 
@@ -40,6 +42,24 @@ extension ApplyShield {
 			}
 			Reduce(core)
 				.forEach(\.path, action: \.child.path)
+		}
+
+		func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+			switch childAction {
+			case .root(.intro(.delegate(.started))):
+				state.path.append(.chooseAccounts(.init(
+					chooseAccounts: .init(
+						context: .permission(.atLeast(1)),
+						canCreateNewAccount: false,
+						showSelectAllAccounts: true
+					)
+				)))
+				return .none
+			case .root(.intro(.delegate(.skipped))):
+				return .send(.delegate(.skipped))
+			default:
+				return .none
+			}
 		}
 	}
 }

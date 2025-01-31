@@ -144,6 +144,10 @@ struct SecurityCenter: Sendable, FeatureReducer {
 		case let .securityShieldsSetup(.delegate(.finished(shieldID))):
 			state.destination = .applyShield(.init(shieldID: shieldID))
 			return .none
+		case .applyShield(.delegate(.skipped)):
+			// TODO: check if destination == .securityShieldsList
+			state.destination = .securityShieldsList(.init())
+			return .none
 		default:
 			return .none
 		}
