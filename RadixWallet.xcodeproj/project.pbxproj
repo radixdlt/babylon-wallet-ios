@@ -805,6 +805,10 @@
 		5BBC7DA42C3D442800B04BD6 /* URLRequest+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC7DA32C3D442800B04BD6 /* URLRequest+Extra.swift */; };
 		5BBC7DA82C40278E00B04BD6 /* NonFungibleResourceAsset+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC7DA72C40278E00B04BD6 /* NonFungibleResourceAsset+Reducer.swift */; };
 		5BBC7DAA2C403F3400B04BD6 /* AccountCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC7DA92C403F3400B04BD6 /* AccountCard.swift */; };
+		5BC18AB22D4BDB84008F25A5 /* OffDeviceMnemonicFactorSourceAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC18AB02D4BDB84008F25A5 /* OffDeviceMnemonicFactorSourceAccess.swift */; };
+		5BC18AB32D4BDB84008F25A5 /* OffDeviceMnemonicFactorSourceAccess+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC18AB12D4BDB84008F25A5 /* OffDeviceMnemonicFactorSourceAccess+View.swift */; };
+		5BC18AB72D4BE570008F25A5 /* ImportMnemonicGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC18AB52D4BE570008F25A5 /* ImportMnemonicGrid.swift */; };
+		5BC18AB82D4BE570008F25A5 /* ImportMnemonicGrid+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC18AB62D4BE570008F25A5 /* ImportMnemonicGrid+View.swift */; };
 		5BC82B6C2BED18A1009AC162 /* FactoryReset+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC82B6A2BED18A1009AC162 /* FactoryReset+View.swift */; };
 		5BC82B6D2BED18A1009AC162 /* FactoryReset+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC82B6B2BED18A1009AC162 /* FactoryReset+Reducer.swift */; };
 		5BE2776B2C9C7FE0005FF976 /* TransactionPreviewOptIns.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE2776A2C9C7FE0005FF976 /* TransactionPreviewOptIns.swift */; };
@@ -2092,6 +2096,10 @@
 		5BBC7DA32C3D442800B04BD6 /* URLRequest+Extra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URLRequest+Extra.swift"; sourceTree = "<group>"; };
 		5BBC7DA72C40278E00B04BD6 /* NonFungibleResourceAsset+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NonFungibleResourceAsset+Reducer.swift"; sourceTree = "<group>"; };
 		5BBC7DA92C403F3400B04BD6 /* AccountCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountCard.swift; sourceTree = "<group>"; };
+		5BC18AB02D4BDB84008F25A5 /* OffDeviceMnemonicFactorSourceAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OffDeviceMnemonicFactorSourceAccess.swift; sourceTree = "<group>"; };
+		5BC18AB12D4BDB84008F25A5 /* OffDeviceMnemonicFactorSourceAccess+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OffDeviceMnemonicFactorSourceAccess+View.swift"; sourceTree = "<group>"; };
+		5BC18AB52D4BE570008F25A5 /* ImportMnemonicGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportMnemonicGrid.swift; sourceTree = "<group>"; };
+		5BC18AB62D4BE570008F25A5 /* ImportMnemonicGrid+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ImportMnemonicGrid+View.swift"; sourceTree = "<group>"; };
 		5BC82B6A2BED18A1009AC162 /* FactoryReset+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactoryReset+View.swift"; sourceTree = "<group>"; };
 		5BC82B6B2BED18A1009AC162 /* FactoryReset+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactoryReset+Reducer.swift"; sourceTree = "<group>"; };
 		5BE2776A2C9C7FE0005FF976 /* TransactionPreviewOptIns.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionPreviewOptIns.swift; sourceTree = "<group>"; };
@@ -3803,6 +3811,7 @@
 			children = (
 				83856D642B0279100026452A /* VerifyMnemonic */,
 				48CFBDE62ADC10D800E77A5C /* ImportWord */,
+				5BC18AB42D4BE548008F25A5 /* ImportMnemonicGrid */,
 				48CFBDE92ADC10D800E77A5C /* ImportMnemonic.swift */,
 				48CFBDEA2ADC10D800E77A5C /* ImportMnemonic+View.swift */,
 			);
@@ -5897,6 +5906,7 @@
 				5BB2C2472D36C66A00286B6B /* FactorSourceAccess+View.swift */,
 				5B83D2CE2D47F158007111B0 /* FactorSourceAccess+Models.swift */,
 				5BB2C24A2D36C9D200286B6B /* FactorSourceAccess+ViewState.swift */,
+				5BC18AAF2D4BDB65008F25A5 /* OffDeviceMnemonic */,
 				5BFED6882D4A8C4E00380E7D /* Password */,
 			);
 			path = FactorSourceAccess;
@@ -5909,6 +5919,24 @@
 				5BBC7D9C2C3D390D00B04BD6 /* BootstrapClient+Live.swift */,
 			);
 			path = BootstrapClient;
+			sourceTree = "<group>";
+		};
+		5BC18AAF2D4BDB65008F25A5 /* OffDeviceMnemonic */ = {
+			isa = PBXGroup;
+			children = (
+				5BC18AB02D4BDB84008F25A5 /* OffDeviceMnemonicFactorSourceAccess.swift */,
+				5BC18AB12D4BDB84008F25A5 /* OffDeviceMnemonicFactorSourceAccess+View.swift */,
+			);
+			path = OffDeviceMnemonic;
+			sourceTree = "<group>";
+		};
+		5BC18AB42D4BE548008F25A5 /* ImportMnemonicGrid */ = {
+			isa = PBXGroup;
+			children = (
+				5BC18AB52D4BE570008F25A5 /* ImportMnemonicGrid.swift */,
+				5BC18AB62D4BE570008F25A5 /* ImportMnemonicGrid+View.swift */,
+			);
+			path = ImportMnemonicGrid;
 			sourceTree = "<group>";
 		};
 		5BEB9CCF2C6F6AFD001FD9D4 /* HideResource */ = {
@@ -7665,6 +7693,8 @@
 				E791F2B12D391376001A007B /* NameShield+Reducer.swift in Sources */,
 				48CFC6902ADC10DB00E77A5C /* MigratedHardwareAccounts.swift in Sources */,
 				48CFC3202ADC10D900E77A5C /* NameAccount+View.swift in Sources */,
+				5BC18AB22D4BDB84008F25A5 /* OffDeviceMnemonicFactorSourceAccess.swift in Sources */,
+				5BC18AB32D4BDB84008F25A5 /* OffDeviceMnemonicFactorSourceAccess+View.swift in Sources */,
 				48CFC27D2ADC10D900E77A5C /* ContentOverlay+Reducer.swift in Sources */,
 				A40816162C7E0D08005E65B9 /* StateEntityMetadataPageResponse.swift in Sources */,
 				48CFC2A42ADC10D900E77A5C /* PersonaList+Reducer.swift in Sources */,
@@ -7858,6 +7888,8 @@
 				A408159A2C7E0D08005E65B9 /* MetadataOriginArrayValue.swift in Sources */,
 				48CFC3832ADC10D900E77A5C /* GeneralHelperViews.swift in Sources */,
 				48CFC34C2ADC10D900E77A5C /* OneTimePersonaData+View.swift in Sources */,
+				5BC18AB72D4BE570008F25A5 /* ImportMnemonicGrid.swift in Sources */,
+				5BC18AB82D4BE570008F25A5 /* ImportMnemonicGrid+View.swift in Sources */,
 				48CFC3F02ADC10D900E77A5C /* RTCPrimitive.swift in Sources */,
 				A40815572C7E0D08005E65B9 /* AccountDepositPreValidationDecidingFactorsResourceSpecificDetailsItem.swift in Sources */,
 				A4ECE27B2BEEB01800468BF6 /* CloudBackupClient+Test.swift in Sources */,

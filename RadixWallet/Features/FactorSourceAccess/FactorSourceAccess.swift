@@ -11,6 +11,7 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 		var destination: Destination.State? = nil
 
 		var password: PasswordFactorSourceAccess.State?
+		var offDeviceMnemonic: OffDeviceMnemonicFactorSourceAccess.State?
 
 		var kind: FactorSourceKind {
 			id?.kind ?? .device
@@ -34,6 +35,7 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 	@CasePathable
 	enum ChildAction: Sendable, Hashable {
 		case password(PasswordFactorSourceAccess.Action)
+		case offDeviceMnemonic(OffDeviceMnemonicFactorSourceAccess.Action)
 	}
 
 	enum DelegateAction: Sendable, Hashable {
@@ -73,6 +75,9 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 			}
 			.ifLet(\.password, action: \.child.password) {
 				PasswordFactorSourceAccess()
+			}
+			.ifLet(\.offDeviceMnemonic, action: \.child.offDeviceMnemonic) {
+				OffDeviceMnemonicFactorSourceAccess()
 			}
 	}
 
@@ -115,8 +120,9 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 				state.password = .init(factorSource: value)
 				return .none
 
-			case .offDeviceMnemonic:
-				fatalError("")
+			case let .offDeviceMnemonic(value):
+				state.offDeviceMnemonic = .init(factorSource: value)
+				return .none
 			}
 
 		case let .hasP2PLinks(hasP2PLinks):

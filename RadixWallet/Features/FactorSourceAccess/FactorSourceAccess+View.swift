@@ -91,8 +91,10 @@ extension FactorSourceAccess {
 
 		@ViewBuilder
 		private var input: some SwiftUI.View {
-			if let password = store.password {
-				PasswordFactorSourceAccess.View(store: password)
+			if let child = store.password {
+				PasswordFactorSourceAccess.View(store: child)
+			} else if let child = store.offDeviceMnemonic {
+				OffDeviceMnemonicFactorSourceAccess.View(store: child)
 			}
 		}
 
@@ -118,6 +120,10 @@ private extension StoreOf<FactorSourceAccess> {
 
 	var password: Store<PasswordFactorSourceAccess.State, PasswordFactorSourceAccess.Action>? {
 		scope(state: \.password, action: \.child.password)
+	}
+
+	var offDeviceMnemonic: Store<OffDeviceMnemonicFactorSourceAccess.State, OffDeviceMnemonicFactorSourceAccess.Action>? {
+		scope(state: \.offDeviceMnemonic, action: \.child.offDeviceMnemonic)
 	}
 }
 
