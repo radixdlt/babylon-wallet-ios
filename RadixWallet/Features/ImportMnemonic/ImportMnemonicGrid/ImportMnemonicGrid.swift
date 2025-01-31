@@ -57,6 +57,10 @@ struct ImportMnemonicGrid: Sendable, FeatureReducer {
 		case word(ImportMnemonicWord.State.ID, ImportMnemonicWord.Action)
 	}
 
+	enum DelegateAction: Sendable, Hashable {
+		case didUpdateGrid
+	}
+
 	@Dependency(\.mnemonicClient) var mnemonicClient
 	#if DEBUG
 	@Dependency(\.pasteboardClient) var pasteboardClient
@@ -177,7 +181,7 @@ private extension ImportMnemonicGrid {
 		_ state: inout State
 	) -> Effect<Action> {
 		state.words[id: id]?.value = .complete(text: input, word: word, completion: completion)
-		return .none
+		return notifyUpdate()
 	}
 
 	func updateWord(
@@ -201,7 +205,7 @@ private extension ImportMnemonicGrid {
 		case let .known(.ambigous(candidates, nonEmptyInput)):
 			guard let userInput = candidates.first(where: { $0.word == nonEmptyInput.rawValue }) else {
 				state.words[id: id]?.value = .incomplete(text: input, hasFailedValidation: false)
-				return .none
+				return notifyUpdate()
 			}
 
 			return completeWith(word: userInput, completion: .user, id: id, input: input, &state)
@@ -209,17 +213,17 @@ private extension ImportMnemonicGrid {
 		case let .known(.unambiguous(word, _, _)):
 			guard word.word == input else {
 				state.words[id: id]?.value = .incomplete(text: input, hasFailedValidation: false)
-				return .none
+				return notifyUpdate()
 			}
 			return completeWith(word: word, completion: .user, id: id, input: input, &state)
 
 		case .unknown(.notInList):
 			state.words[id: id]?.value = .incomplete(text: input, hasFailedValidation: true)
-			return .none
+			return notifyUpdate()
 
 		case .unknown(.tooShort):
 			state.words[id: id]?.value = .incomplete(text: input, hasFailedValidation: false)
-			return .none
+			return notifyUpdate()
 		}
 	}
 
@@ -232,6 +236,10 @@ private extension ImportMnemonicGrid {
 		} else {
 			return .none
 		}
+	}
+
+	func notifyUpdate() -> Effect<Action> {
+		.send(.delegate(.didUpdateGrid))
 	}
 }
 

@@ -7,9 +7,13 @@ extension OffDeviceMnemonicFactorSourceAccess {
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
-				VStack(spacing: .medium3) {
+				VStack(alignment: .leading, spacing: .medium3) {
 					ImportMnemonicGrid.View(store: store.grid)
 						.padding(.horizontal, -.small1)
+
+					if let hint = store.hint {
+						Hint(viewState: hint)
+					}
 
 					Button(L10n.Common.confirm) {
 						store.send(.view(.confirmButtonTapped))
@@ -30,7 +34,6 @@ private extension StoreOf<OffDeviceMnemonicFactorSourceAccess> {
 
 private extension OffDeviceMnemonicFactorSourceAccess.State {
 	var hint: Hint.ViewState? {
-		nil
-		// showError ? Hint.ViewState.iconError("Incorrect password") : nil
+		showError ? Hint.ViewState.iconError("Incorrect mnemonic") : nil
 	}
 }

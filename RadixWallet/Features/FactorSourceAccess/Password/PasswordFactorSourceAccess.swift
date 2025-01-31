@@ -22,7 +22,7 @@ struct PasswordFactorSourceAccess: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Hashable {
-		case inputtedPassword(String)
+		case validated(String)
 	}
 
 	var body: some ReducerOf<Self> {
@@ -41,7 +41,7 @@ struct PasswordFactorSourceAccess: Sendable, FeatureReducer {
 				state.showError = true
 				return .none
 			} else {
-				return .send(.delegate(.inputtedPassword(state.input)))
+				return .send(.delegate(.validated(state.input)))
 			}
 		}
 	}
