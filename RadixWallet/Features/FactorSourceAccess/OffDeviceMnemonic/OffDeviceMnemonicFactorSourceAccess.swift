@@ -13,7 +13,7 @@ struct OffDeviceMnemonicFactorSourceAccess: Sendable, FeatureReducer {
 		}
 
 		var confirmButtonControlState: ControlState {
-			isComplete ? .enabled : .disabled
+			!isComplete || showError ? .disabled : .enabled
 		}
 	}
 
