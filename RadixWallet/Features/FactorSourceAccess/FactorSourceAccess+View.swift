@@ -23,22 +23,6 @@ extension FactorSourceAccess {
 			}
 		}
 
-		private var scrollView: some SwiftUI.View {
-			GeometryReader { proxy in
-				WithPerceptionTracking {
-					ScrollView(showsIndicators: false) {
-						VStack(spacing: .zero) {
-							content
-
-							Spacer()
-						}
-						.frame(minHeight: proxy.size.height)
-					}
-					.frame(width: proxy.size.width)
-				}
-			}
-		}
-
 		private var content: some SwiftUI.View {
 			VStack(spacing: .medium3) {
 				Image(.signingKey)
