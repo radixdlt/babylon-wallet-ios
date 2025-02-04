@@ -1,17 +1,21 @@
 // MARK: - FactorSourceAccess
+@Reducer
 struct FactorSourceAccess: Sendable, FeatureReducer {
+	@ObservableState
 	struct State: Sendable, Hashable {
-		let kind: Kind
+		let id: FactorSourceIdFromHash?
 		let purpose: Purpose
+		var factorSource: FactorSource?
 
-		@PresentationState
+		@Presents
 		var destination: Destination.State? = nil
 
-		init(kind: Kind, purpose: Purpose) {
-			self.kind = kind
-			self.purpose = purpose
+		var kind: FactorSourceKind {
+			id?.kind ?? .device
 		}
 	}
+
+	typealias Action = FeatureAction<Self>
 
 	enum ViewAction: Sendable, Hashable {
 		case onFirstTask
@@ -20,64 +24,77 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 	}
 
 	enum InternalAction: Sendable, Hashable {
+		case setFactorSource(FactorSource?)
 		case hasP2PLinks(Bool)
 	}
 
 	enum DelegateAction: Sendable, Hashable {
-		case perform
+		case perform(FactorSource)
 		case cancel
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
-			case noP2PLink(AlertState<NoP2PLinkAlert>)
+			case errorAlert(AlertState<ErrorAlert>)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Hashable {
-			case noP2PLink(NoP2PLinkAlert)
+			case errorAlert(ErrorAlert)
 		}
 
 		var body: some ReducerOf<Self> {
 			EmptyReducer()
 		}
 
-		enum NoP2PLinkAlert: Sendable, Hashable {
+		enum ErrorAlert: Sendable, Hashable {
 			case okTapped
 		}
 	}
 
+	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.p2pLinksClient) var p2pLinksClient
+	@Dependency(\.errorQueue) var errorQueue
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(destinationPath, action: /Action.destination) {
+			.ifLet(destinationPath, action: \.destination) {
 				Destination()
 			}
 	}
-
-	init() {}
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onFirstTask:
-			.send(.delegate(.perform))
+			return fetchFactorSource(state: state)
 				.merge(with: checkP2PLinksEffect(state: state))
 		case .retryButtonTapped:
-			.send(.delegate(.perform))
+			guard let factorSource = state.factorSource else {
+				return .none
+			}
+			return .send(.delegate(.perform(factorSource)))
 		case .closeButtonTapped:
-			.send(.delegate(.cancel))
+			return .send(.delegate(.cancel))
 		}
 	}
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
+		case let .setFactorSource(factorSource):
+			if let factorSource {
+				state.factorSource = factorSource
+				return .send(.delegate(.perform(factorSource)))
+			} else {
+				assertionFailure("No Factor Source found on Profile for id: \(String(describing: state.id))")
+				return .send(.delegate(.cancel))
+			}
+
 		case let .hasP2PLinks(hasP2PLinks):
 			if !hasP2PLinks {
-				state.destination = .noP2PLink(.noP2Plink)
+				state.destination = .errorAlert(.noP2Plink)
 			}
 			return .none
 		}
@@ -85,7 +102,7 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case .noP2PLink(.okTapped):
+		case .errorAlert(.okTapped):
 			state.destination = nil
 			return .run { send in
 				// Dispatching this in an async process is enough for it to take place after alert has been dismissed.
@@ -94,9 +111,24 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 			}
 		}
 	}
+}
 
-	private func checkP2PLinksEffect(state: State) -> Effect<Action> {
-		guard case .ledger = state.kind else {
+private extension FactorSourceAccess {
+	func fetchFactorSource(state: State) -> Effect<Action> {
+		.run { [id = state.id] send in
+			if let id {
+				let factorSource = try await factorSourcesClient.getFactorSource(id: id.asGeneral)
+				await send(.internal(.setFactorSource(factorSource)))
+			} else {
+				// If no id is set, we need to get main BDFS
+				let mainBdfs = try SargonOS.shared.mainBdfs()
+				await send(.internal(.setFactorSource(mainBdfs.asGeneral)))
+			}
+		}
+	}
+
+	func checkP2PLinksEffect(state: State) -> Effect<Action> {
+		guard case .ledgerHqHardwareWallet = state.kind else {
 			return .none
 		}
 		return .run { send in
@@ -108,37 +140,7 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 	}
 }
 
-extension FactorSourceAccess.State {
-	enum Kind: Sendable, Hashable {
-		case device
-		case ledger(LedgerHardwareWalletFactorSource?)
-	}
-
-	enum Purpose: Sendable, Hashable {
-		/// Signing transactions.
-		case signature
-
-		/// Adding a new account.
-		case createAccount
-
-		/// Adding a new persona.
-		case createPersona
-
-		/// Recovery of existing accounts.
-		case deriveAccounts
-
-		/// ROLA proof of accounts/personas.
-		case proveOwnership
-
-		/// Encrypting messages on transactions.
-		case encryptMessage
-
-		/// MFA signing, ROLA or encryption.
-		case createKey
-	}
-}
-
-private extension AlertState<FactorSourceAccess.Destination.NoP2PLinkAlert> {
+private extension AlertState<FactorSourceAccess.Destination.ErrorAlert> {
 	static var noP2Plink: AlertState {
 		AlertState {
 			TextState(L10n.LedgerHardwareDevices.LinkConnectorAlert.title)

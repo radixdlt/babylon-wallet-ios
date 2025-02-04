@@ -8,9 +8,6 @@ struct CreateAccountCoordinator: Sendable, FeatureReducer {
 		var root: Path.State?
 		var path: StackState<Path.State> = .init()
 
-		@PresentationState
-		var destination: Destination.State? = nil
-
 		let config: CreateAccountConfig
 		var name: NonEmptyString?
 
@@ -41,12 +38,14 @@ struct CreateAccountCoordinator: Sendable, FeatureReducer {
 	}
 
 	struct Path: Sendable, Reducer {
+		@CasePathable
 		enum State: Sendable, Hashable {
 			case nameAccount(NameAccount.State)
 			case selectLedger(LedgerHardwareDevices.State)
 			case completion(NewAccountCompletion.State)
 		}
 
+		@CasePathable
 		enum Action: Sendable, Equatable {
 			case nameAccount(NameAccount.Action)
 			case selectLedger(LedgerHardwareDevices.Action)
@@ -54,30 +53,14 @@ struct CreateAccountCoordinator: Sendable, FeatureReducer {
 		}
 
 		var body: some ReducerOf<Self> {
-			Scope(state: /State.nameAccount, action: /Action.nameAccount) {
+			Scope(state: \.nameAccount, action: \.nameAccount) {
 				NameAccount()
 			}
-			Scope(state: /State.selectLedger, action: /Action.selectLedger) {
+			Scope(state: \.selectLedger, action: \.selectLedger) {
 				LedgerHardwareDevices()
 			}
-			Scope(state: /State.completion, action: /Action.completion) {
+			Scope(state: \.completion, action: \.completion) {
 				NewAccountCompletion()
-			}
-		}
-	}
-
-	struct Destination: DestinationReducer {
-		enum State: Sendable, Hashable {
-			case derivePublicKey(DerivePublicKeys.State)
-		}
-
-		enum Action: Sendable, Hashable {
-			case derivePublicKey(DerivePublicKeys.Action)
-		}
-
-		var body: some ReducerOf<Self> {
-			Scope(state: /State.derivePublicKey, action: /Action.derivePublicKey) {
-				DerivePublicKeys()
 			}
 		}
 	}
@@ -86,15 +69,15 @@ struct CreateAccountCoordinator: Sendable, FeatureReducer {
 		case closeButtonTapped
 	}
 
+	@CasePathable
 	enum ChildAction: Sendable, Equatable {
 		case root(Path.Action)
 		case path(StackActionOf<Path>)
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case createAccountResult(TaskResult<Account>)
-		case handleAccountCreated(TaskResult<Account>)
-		case handleProfileCreated(factorSourceOption: DerivePublicKeys.State.FactorSourceOption)
+		case handleAccountCreated(Account)
+		case handleProfileCreated(Mode)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -115,18 +98,13 @@ struct CreateAccountCoordinator: Sendable, FeatureReducer {
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.root, action: /Action.child .. ChildAction.root) {
+			.ifLet(\.root, action: \.child.root) {
 				Path()
 			}
-			.forEach(\.path, action: /Action.child .. ChildAction.path) {
+			.forEach(\.path, action: \.child.path) {
 				Path()
-			}
-			.ifLet(destinationPath, action: /Action.destination) {
-				Destination()
 			}
 	}
-
-	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 }
 
 extension CreateAccountCoordinator {
@@ -150,13 +128,13 @@ extension CreateAccountCoordinator {
 				state.path.append(.selectLedger(.init(context: .createHardwareAccount)))
 				return .none
 			} else {
-				return createProfileIfNecessaryThenDerivePublicKey(state: &state, factorSourceOption: .device)
+				return createProfileIfNecessaryThenCreateAccount(state: &state, mode: .bdfs)
 			}
 
 		case let .path(.element(_, action: .selectLedger(.delegate(.choseLedger(ledger))))):
-			return createProfileIfNecessaryThenDerivePublicKey(
+			return createProfileIfNecessaryThenCreateAccount(
 				state: &state,
-				factorSourceOption: .specific(
+				mode: .specific(
 					ledger.asGeneral
 				)
 			)
@@ -176,124 +154,78 @@ extension CreateAccountCoordinator {
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .createAccountResult(.success(account)):
-			return .run { send in
-				await send(.internal(.handleAccountCreated(TaskResult {
-					try await accountsClient.saveVirtualAccount(account)
-					return account
-				})))
-			}
-
-		case
-			let .createAccountResult(.failure(error)),
-			let .handleAccountCreated(.failure(error)):
-			errorQueue.schedule(error)
-			state.destination = nil
-			return .none
-
-		case let .handleAccountCreated(.success(account)):
-			state.destination = nil
+		case let .handleAccountCreated(account):
 			state.path.append(.completion(.init(
 				account: account,
 				config: state.config
 			)))
 			return .send(.delegate(.accountCreated))
 
-		case let .handleProfileCreated(factorSourceOption):
+		case let .handleProfileCreated(mode):
 			state.createdProfile = true
-			return derivePublicKey(state: &state, factorSourceOption: factorSourceOption)
+			return createAccount(state: &state, mode: mode)
 		}
 	}
 
-	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
-		switch presentedAction {
-		case let .derivePublicKey(.delegate(.derivedPublicKeys(hdKeys, factorSourceID, networkID))):
-			guard let hdKey = hdKeys.first else {
-				loggerGlobal.error("Failed to create account expected one single key, got: \(hdKeys.count)")
-				state.destination = nil
-				return .none
-			}
-			guard let name = state.name else {
-				fatalError("Derived keys without account name set")
-			}
-
-			return .run { send in
-				await send(.internal(.createAccountResult(TaskResult {
-					let factorSourceIDFromHash = try factorSourceID.extract(as: FactorSourceIDFromHash.self)
-
-					let account = try await accountsClient.newVirtualAccount(.init(
-						name: name,
-						factorInstance: HierarchicalDeterministicFactorInstance(
-							factorSourceId: factorSourceIDFromHash,
-							publicKey: hdKey
-						),
-						networkID: networkID
-					))
-
-					do {
-						if let updated = try await doAsync(
-							withTimeout: .seconds(5),
-							work: { try await onLedgerEntitiesClient.syncThirdPartyDepositWithOnLedgerSettings(account: account) }
-						) {
-							loggerGlobal.notice("Used OnLedger ThirdParty Deposit Settings")
-							return updated
-						} else {
-							return account
-						}
-					} catch {
-						loggerGlobal.notice("Failed to get OnLedger state for newly created account: \(account). Will add it with default third party deposit settings...")
-						return account
-					}
-
-				})))
-			}
-
-		case .derivePublicKey(.delegate(.failedToDerivePublicKey)):
-			state.destination = nil
-			return .none
-
-		case .derivePublicKey(.delegate(.cancel)):
-			state.destination = nil
-			return .none
-
-		default:
-			return .none
-		}
-	}
-
-	private func createProfileIfNecessaryThenDerivePublicKey(state: inout State, factorSourceOption: DerivePublicKeys.State.FactorSourceOption) -> Effect<Action> {
+	private func createProfileIfNecessaryThenCreateAccount(state: inout State, mode: Mode) -> Effect<Action> {
 		if state.config.isNewProfile, !state.createdProfile {
-			// We need to create the Profile before deriving the public key
+			// We need to create the Profile before creating the Account
 			.run { send in
 				try await onboardingClient.createNewProfile()
-				await send(.internal(.handleProfileCreated(factorSourceOption: factorSourceOption)))
+				await send(.internal(.handleProfileCreated(mode)))
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
 		} else {
-			// We can derive the public key since the Profile has been created already
-			derivePublicKey(state: &state, factorSourceOption: factorSourceOption)
+			// We can create the Account since the Profile has been created already
+			createAccount(state: &state, mode: mode)
 		}
 	}
 
-	private func derivePublicKey(state: inout State, factorSourceOption: DerivePublicKeys.State.FactorSourceOption) -> Effect<Action> {
-		state.destination = .derivePublicKey(
-			.init(
-				derivationPathOption: .next(
-					for: .account,
-					networkID: state.config.specificNetworkID,
-					curve: .curve25519,
-					scheme: .cap26
-				),
-				factorSourceOption: factorSourceOption,
-				purpose: .createNewEntity(kind: .account)
-			))
-		return .none
+	private func createAccount(state: inout State, mode: Mode) -> Effect<Action> {
+		guard let name = state.name else {
+			fatalError("Name should be set before creating Account")
+		}
+		let displayName = DisplayName(nonEmpty: name)
+		return .run { [networkId = state.config.specificNetworkID] send in
+			let account = switch mode {
+			case .bdfs:
+				try await SargonOS.shared.createAccountWithBDFS(networkId: networkId, name: displayName)
+			case let .specific(factorSource):
+				try await SargonOS.shared.createAccount(factorSource: factorSource, networkId: networkId, name: displayName)
+			}
+
+			let updated = await getThirdPartyDepositSettings(account: account)
+			// TODO: Remove once this is implemented in Sargon (https://radixdlt.atlassian.net/browse/ABW-4147)
+			try? await SargonOS.shared.updateAccount(updated: updated)
+			await send(.internal(.handleAccountCreated(updated)))
+		} catch: { error, _ in
+			errorQueue.schedule(error)
+		}
+	}
+
+	private func getThirdPartyDepositSettings(account: Account) async -> Account {
+		do {
+			if let updated = try await doAsync(
+				withTimeout: .seconds(5),
+				work: { try await onLedgerEntitiesClient.syncThirdPartyDepositWithOnLedgerSettings(account: account) }
+			) {
+				loggerGlobal.notice("Used OnLedger ThirdParty Deposit Settings")
+				return updated
+			} else {
+				return account
+			}
+		} catch {
+			loggerGlobal.notice("Failed to get OnLedger state for newly created account: \(account). Will add it with default third party deposit settings...")
+			return account
+		}
 	}
 }
 
-extension CreateAccountCoordinator.State {
-	var lastStepState: CreateAccountCoordinator.Path.State? {
-		path.last
+// MARK: CreateAccountCoordinator.Mode
+extension CreateAccountCoordinator {
+	enum Mode: Sendable, Hashable {
+		case bdfs
+		case specific(FactorSource)
 	}
 }

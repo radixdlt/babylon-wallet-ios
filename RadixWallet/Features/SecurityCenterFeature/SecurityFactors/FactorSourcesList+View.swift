@@ -123,8 +123,6 @@ private extension FactorSourcesList.State {
 			L10n.FactorSources.List.arculusCardAdd
 		case .password:
 			L10n.FactorSources.List.passwordAdd
-		case .trustedContact, .securityQuestions:
-			fatalError("Not implemented")
 		}
 	}
 

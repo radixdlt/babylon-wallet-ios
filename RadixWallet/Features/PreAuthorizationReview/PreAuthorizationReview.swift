@@ -51,20 +51,16 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 	struct Destination: DestinationReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
-			case signing(Signing.State)
 			case rawManifestAlert(AlertState<Never>)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
-			case signing(Signing.Action)
 			case rawManifestAlert(Never)
 		}
 
 		var body: some ReducerOf<Self> {
-			Scope(state: \.signing, action: \.signing) {
-				Signing()
-			}
+			EmptyReducer()
 		}
 	}
 
@@ -155,15 +151,21 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 				return .none
 			}
 
-			guard !preview.signingFactors.isEmpty else {
+			guard preview.requiresSignatures else {
 				return handleSignedSubinent(state: &state, signedSubintent: .init(subintent: subintent, subintentSignatures: .init(signatures: [])))
 			}
 
-			state.destination = .signing(.init(
-				factorsLeftToSignWith: preview.signingFactors,
-				signingPurposeWithPayload: .signPreAuthorization(subintent)
-			))
-			return .none
+			return .run { send in
+				let signedSubintent = try await SargonOS.shared.signSubintent(transactionIntent: subintent, roleKind: .primary)
+				await send(.delegate(.signedPreAuthorization(signedSubintent)))
+
+			} catch: { error, send in
+				if let error = error as? CommonError, error == .HostInteractionAborted {
+					await send(.internal(.resetToApprovable))
+				} else {
+					errorQueue.schedule(error)
+				}
+			}
 
 		case let .updateSecondsToExpiration(expiration):
 			let secondsToExpiration = Int(expiration.timeIntervalSinceNow)
@@ -183,40 +185,6 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 
 		default:
 			return .none
-		}
-	}
-
-	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
-		switch presentedAction {
-		case let .signing(.delegate(action)):
-			switch action {
-			case .cancelSigning:
-				loggerGlobal.notice("Cancelled signing")
-				return resetToApprovable(&state)
-
-			case .failedToSign:
-				loggerGlobal.error("Failed to sign PreAuthoriation")
-				return resetToApprovable(&state)
-
-			case let .finishedSigning(.signPreAuthorization(encoded)):
-				return handleSignedSubinent(state: &state, signedSubintent: encoded)
-
-			case .finishedSigning:
-				assertionFailure("Unexpected signature instead of .signPreAuthorization")
-				return .none
-			}
-
-		default:
-			return .none
-		}
-	}
-
-	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
-		switch state.destination {
-		case .signing:
-			resetToApprovable(&state)
-		case .rawManifestAlert, .none:
-			.none
 		}
 	}
 }

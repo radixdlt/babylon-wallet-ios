@@ -39,7 +39,6 @@ extension ProofOfOwnership {
 					.buttonStyle(.primaryRectangular)
 				}
 				.task { store.send(.view(.task)) }
-				.signProofOfOwnership(store: store.sign)
 			}
 		}
 	}
@@ -69,11 +68,5 @@ private extension ProofOfOwnership.State {
 			return nil
 		}
 		return .init(state: .init(persona: persona, lastLogin: nil))
-	}
-}
-
-private extension StoreOf<ProofOfOwnership> {
-	var sign: StoreOf<SignProofOfOwnership> {
-		scope(state: \.sign, action: \.child.sign)
 	}
 }

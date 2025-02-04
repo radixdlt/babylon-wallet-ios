@@ -225,14 +225,7 @@ private extension PreAuthorizationReview.State {
 private extension View {
 	func destinations(with store: StoreOf<PreAuthorizationReview>) -> some View {
 		let destinationStore = store.scope(state: \.$destination, action: \.destination)
-		return signing(with: destinationStore)
-			.rawManifestAlert(with: destinationStore)
-	}
-
-	private func signing(with destinationStore: PresentationStoreOf<PreAuthorizationReview.Destination>) -> some View {
-		sheet(store: destinationStore.scope(state: \.signing, action: \.signing)) {
-			Signing.View(store: $0)
-		}
+		return rawManifestAlert(with: destinationStore)
 	}
 
 	private func rawManifestAlert(with destinationStore: PresentationStoreOf<PreAuthorizationReview.Destination>) -> some View {
