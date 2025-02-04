@@ -34,6 +34,6 @@ private extension StoreOf<OffDeviceMnemonicFactorSourceAccess> {
 
 private extension OffDeviceMnemonicFactorSourceAccess.State {
 	var hint: Hint.ViewState? {
-		showError ? Hint.ViewState.iconError("Incorrect mnemonic") : nil
+		showError ? Hint.ViewState.iconError(L10n.FactorSourceActions.OffDeviceMnemonic.incorrect) : nil
 	}
 }

@@ -109,8 +109,4 @@ extension FactorSourceAccess.State {
 			false
 		}
 	}
-
-	var height: CGFloat {
-		0.74
-	}
 }

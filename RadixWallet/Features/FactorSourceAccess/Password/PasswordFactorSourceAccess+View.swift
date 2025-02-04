@@ -37,6 +37,6 @@ private extension PasswordFactorSourceAccess.State {
 	}
 
 	var hint: Hint.ViewState? {
-		showError ? Hint.ViewState.iconError("Incorrect password") : nil
+		showError ? Hint.ViewState.iconError(L10n.FactorSourceActions.Password.incorrect) : nil
 	}
 }

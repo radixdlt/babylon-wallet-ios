@@ -12,7 +12,7 @@ extension FactorSourceAccess {
 					.withNavigationBar {
 						store.send(.view(.closeButtonTapped))
 					}
-					.presentationDetents([.fraction(store.height), .large])
+					.presentationDetents([.fraction(0.75), .large])
 					.presentationDragIndicator(.visible)
 					.interactiveDismissDisabled()
 					.presentationBackground(.blur)
