@@ -64,18 +64,6 @@ extension WalletInteractionWalletAccount {
 	}
 }
 
-extension WalletToDappInteractionAuthProof {
-	init(entitySignature: SignatureOfEntity) {
-		let sigPub = entitySignature.signatureWithPublicKey
-		let signature = sigPub.signature
-		self.init(
-			publicKey: sigPub.publicKey,
-			curve: sigPub.publicKey.curve,
-			signature: signature
-		)
-	}
-}
-
 extension DappWalletInteractionPersona {
 	init(persona: Persona) {
 		self.init(identityAddress: persona.address, label: persona.displayName.rawValue)

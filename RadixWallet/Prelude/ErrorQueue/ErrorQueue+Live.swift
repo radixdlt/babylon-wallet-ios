@@ -13,6 +13,11 @@ extension ErrorQueue: DependencyKey {
 					return
 				}
 
+				if let commonError = error as? CommonError, commonError == .HostInteractionAborted {
+					loggerGlobal.info("Ignroing HostInteractionAborted error ")
+					return
+				}
+
 				if
 					case let nsError = error as NSError,
 					nsError.domain == NSURLErrorDomain,

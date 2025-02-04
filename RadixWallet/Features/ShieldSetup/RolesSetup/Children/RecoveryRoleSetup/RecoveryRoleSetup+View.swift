@@ -41,7 +41,7 @@ extension RecoveryRoleSetup.State {
 	}
 
 	var periodUntilAutoConfirm: TimePeriod {
-		shieldBuilder.timePeriodUntilAutoConfirm
+		shieldBuilder.getTimeUntilTimedConfirmationIsCallable()
 	}
 }
 

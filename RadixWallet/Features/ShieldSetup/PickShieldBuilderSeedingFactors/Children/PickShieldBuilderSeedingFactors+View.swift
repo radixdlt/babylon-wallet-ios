@@ -67,7 +67,7 @@ extension PickShieldBuilderSeedingFactors {
 				) { item in
 					VStack {
 						let isFirstOfKind = store.factorSourcesCandidates.first(where: { $0.factorSourceKind == item.value.factorSourceKind }) == item.value
-						if isFirstOfKind, item.value.factorSourceKind.isSupported {
+						if isFirstOfKind {
 							VStack(alignment: .leading, spacing: .zero) {
 								Text(item.value.factorSourceKind.title)
 									.textStyle(.body1HighImportance)
@@ -92,9 +92,9 @@ extension PickShieldBuilderSeedingFactors {
 								type: .checkmark,
 								isSelected: item.isSelected
 							)
-						)?
-							.embedInButton(when: item.action)
-							.buttonStyle(.inert)
+						)
+						.embedInButton(when: item.action)
+						.buttonStyle(.inert)
 					}
 				}
 

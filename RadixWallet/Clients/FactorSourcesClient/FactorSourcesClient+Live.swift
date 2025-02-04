@@ -422,9 +422,7 @@ extension FactorSourceKind: Comparable {
 		case .ledgerHqHardwareWallet: 0
 		case .arculusCard: 1
 		case .offDeviceMnemonic: 2
-		case .securityQuestions: 3
-		case .trustedContact: 4
-		case .password: 5
+		case .password: 3
 		// we want to sign with device last, since it would allow for us to stop using
 		// ephemeral notary and allow us to implement a AutoPurgingMnemonicCache which
 		// deletes items after 1 sec, thus `device` must come last.
