@@ -21,6 +21,10 @@ extension ImportMnemonicGrid {
 					}
 				}
 				.multilineTextAlignment(.leading)
+				.animation(.default, value: store.wordCount)
+				.onAppear {
+					store.send(.view(.appeared))
+				}
 			}
 		}
 

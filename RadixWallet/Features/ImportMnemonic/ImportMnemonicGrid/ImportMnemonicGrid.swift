@@ -39,6 +39,7 @@ struct ImportMnemonicGrid: Sendable, FeatureReducer {
 
 	@CasePathable
 	enum ViewAction: Sendable, Hashable {
+		case appeared
 		case wordCountChanged(BIP39WordCount)
 
 		#if DEBUG
@@ -75,6 +76,9 @@ struct ImportMnemonicGrid: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
+		case .appeared:
+			return focusNext(&state, after: nil)
+
 		case let .wordCountChanged(value):
 			state.changeWordCount(to: value)
 			return .none
