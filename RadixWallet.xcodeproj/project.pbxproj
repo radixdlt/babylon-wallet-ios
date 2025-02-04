@@ -1275,6 +1275,10 @@
 		E7607DD02D4A7D4E0083B3A5 /* ApplyShield-Intro.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7607DCF2D4A7D4E0083B3A5 /* ApplyShield-Intro.swift */; };
 		E7607DD42D4BB5BB0083B3A5 /* ChooseAccountsForShield.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7607DD32D4BB5BB0083B3A5 /* ChooseAccountsForShield.swift */; };
 		E7607DD62D4BB5C30083B3A5 /* ChooseAccountsForShield+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7607DD52D4BB5C30083B3A5 /* ChooseAccountsForShield+View.swift */; };
+		E7607DDB2D4CE30D0083B3A5 /* ChoosePersonas.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7607DDA2D4CE30D0083B3A5 /* ChoosePersonas.swift */; };
+		E7607DDE2D4CE3E80083B3A5 /* ChoosePersonasForShield.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7607DDD2D4CE3E80083B3A5 /* ChoosePersonasForShield.swift */; };
+		E7607DE02D4CE3ED0083B3A5 /* ChoosePersonasForShield+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7607DDF2D4CE3ED0083B3A5 /* ChoosePersonasForShield+View.swift */; };
+		E7607DE22D4CF9B10083B3A5 /* ChoosePersonas+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7607DE12D4CF9B10083B3A5 /* ChoosePersonas+View.swift */; };
 		E76645A42C23138300065D9A /* Throwable.swift in Sources */ = {isa = PBXBuildFile; fileRef = E76645A32C23138300065D9A /* Throwable.swift */; };
 		E775A1B82CF4CA5500E72DB9 /* FactorSourceCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = E775A1B72CF4CA5500E72DB9 /* FactorSourceCard.swift */; };
 		E775A1BA2CF7326000E72DB9 /* FactorSourceCard+DataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = E775A1B92CF7326000E72DB9 /* FactorSourceCard+DataSource.swift */; };
@@ -2579,6 +2583,10 @@
 		E7607DCF2D4A7D4E0083B3A5 /* ApplyShield-Intro.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ApplyShield-Intro.swift"; sourceTree = "<group>"; };
 		E7607DD32D4BB5BB0083B3A5 /* ChooseAccountsForShield.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseAccountsForShield.swift; sourceTree = "<group>"; };
 		E7607DD52D4BB5C30083B3A5 /* ChooseAccountsForShield+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChooseAccountsForShield+View.swift"; sourceTree = "<group>"; };
+		E7607DDA2D4CE30D0083B3A5 /* ChoosePersonas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoosePersonas.swift; sourceTree = "<group>"; };
+		E7607DDD2D4CE3E80083B3A5 /* ChoosePersonasForShield.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoosePersonasForShield.swift; sourceTree = "<group>"; };
+		E7607DDF2D4CE3ED0083B3A5 /* ChoosePersonasForShield+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChoosePersonasForShield+View.swift"; sourceTree = "<group>"; };
+		E7607DE12D4CF9B10083B3A5 /* ChoosePersonas+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChoosePersonas+View.swift"; sourceTree = "<group>"; };
 		E76645A32C23138300065D9A /* Throwable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Throwable.swift; sourceTree = "<group>"; };
 		E775A1B72CF4CA5500E72DB9 /* FactorSourceCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FactorSourceCard.swift; sourceTree = "<group>"; };
 		E775A1B92CF7326000E72DB9 /* FactorSourceCard+DataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactorSourceCard+DataSource.swift"; sourceTree = "<group>"; };
@@ -2809,6 +2817,7 @@
 		48CFBC602ADC10D800E77A5C /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				E7607DD92D4CE2D20083B3A5 /* ChoosePersonas */,
 				E7607DC72D4A2ECD0083B3A5 /* ApplyShield */,
 				E7607DBB2D4251510083B3A5 /* ShieldsList */,
 				5B813D042CFF2028001A291D /* ShieldSetup */,
@@ -7071,6 +7080,7 @@
 			children = (
 				E7607DD22D4BB53E0083B3A5 /* Intro */,
 				E7607DD12D4BB5310083B3A5 /* ChooseAccountsForShield */,
+				E7607DDC2D4CE3D60083B3A5 /* ChoosePersonasForShield */,
 			);
 			path = Children;
 			sourceTree = "<group>";
@@ -7091,6 +7101,24 @@
 				E7607DCD2D4A7D440083B3A5 /* ApplyShield-Intro+View.swift */,
 			);
 			path = Intro;
+			sourceTree = "<group>";
+		};
+		E7607DD92D4CE2D20083B3A5 /* ChoosePersonas */ = {
+			isa = PBXGroup;
+			children = (
+				E7607DDA2D4CE30D0083B3A5 /* ChoosePersonas.swift */,
+				E7607DE12D4CF9B10083B3A5 /* ChoosePersonas+View.swift */,
+			);
+			path = ChoosePersonas;
+			sourceTree = "<group>";
+		};
+		E7607DDC2D4CE3D60083B3A5 /* ChoosePersonasForShield */ = {
+			isa = PBXGroup;
+			children = (
+				E7607DDD2D4CE3E80083B3A5 /* ChoosePersonasForShield.swift */,
+				E7607DDF2D4CE3ED0083B3A5 /* ChoosePersonasForShield+View.swift */,
+			);
+			path = ChoosePersonasForShield;
 			sourceTree = "<group>";
 		};
 		E76F56BF2C538061001EDC63 /* EditPersonaField */ = {
@@ -7789,6 +7817,7 @@
 				48CFC4772ADC10DA00E77A5C /* GatewaysClient+Interface.swift in Sources */,
 				A408161E2C7E0D08005E65B9 /* StateEntityNonFungiblesPageResponse.swift in Sources */,
 				A40816432C7E0D08005E65B9 /* TransactionFungibleFeeBalanceChangeType.swift in Sources */,
+				E7607DDB2D4CE30D0083B3A5 /* ChoosePersonas.swift in Sources */,
 				E791F2AE2D365A76001A007B /* SelectEmergencyFallbackPeriodView.swift in Sources */,
 				A40815862C7E0D08005E65B9 /* LedgerStateMixin.swift in Sources */,
 				48CFC59D2ADC10DA00E77A5C /* UIKeyboardType+Extra.swift in Sources */,
@@ -7942,6 +7971,7 @@
 				48CFC3402ADC10D900E77A5C /* DappInteractionCoordinator+View.swift in Sources */,
 				48CFC3152ADC10D900E77A5C /* ScanMultipleOlympiaQRCodes+View.swift in Sources */,
 				48CFC2922ADC10D900E77A5C /* TransactionReviewNetworkFee.swift in Sources */,
+				E7607DE22D4CF9B10083B3A5 /* ChoosePersonas+View.swift in Sources */,
 				4813AFF52BC9B2D70046BCAD /* Stage2MigrateToSargon+SharedPersonaData.swift in Sources */,
 				48CFC2892ADC10D900E77A5C /* TransactionReviewGuarantees+View.swift in Sources */,
 				48CFC4232ADC10DA00E77A5C /* Identified+Extensions.swift in Sources */,
@@ -7963,6 +7993,7 @@
 				A408154C2C7E0D08005E65B9 /* CodableHelper.swift in Sources */,
 				48CFC3662ADC10D900E77A5C /* NonFungibleTokenDetails+Reducer.swift in Sources */,
 				A48FD15F2B55E671009295E9 /* TrackedPoolInteraction.swift in Sources */,
+				E7607DE02D4CE3ED0083B3A5 /* ChoosePersonasForShield+View.swift in Sources */,
 				A47572042B29B4EE0059A95D /* IOSSecurityClient+Interface.swift in Sources */,
 				E6FA984E2B04E3D500748F20 /* NoContentView.swift in Sources */,
 				48CFC27E2ADC10D900E77A5C /* HUD+View.swift in Sources */,
@@ -8241,6 +8272,7 @@
 				83377A032B9DDAF000D8AA36 /* NPSSurvey+View.swift in Sources */,
 				48CFC3112ADC10D900E77A5C /* AccountsToImport+View.swift in Sources */,
 				48CFC5A12ADC10DA00E77A5C /* Stroke.swift in Sources */,
+				E7607DDE2D4CE3E80083B3A5 /* ChoosePersonasForShield.swift in Sources */,
 				48CFC3812ADC10D900E77A5C /* NFTHelperViews.swift in Sources */,
 				5B8433A42CD011B600CA00F5 /* PreAuthorizationModels.swift in Sources */,
 				48CFC61B2ADC10DA00E77A5C /* P2P+RTCOutgoingMessage.swift in Sources */,

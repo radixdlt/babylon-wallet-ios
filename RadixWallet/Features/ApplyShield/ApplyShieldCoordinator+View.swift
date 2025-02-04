@@ -37,6 +37,10 @@ extension ApplyShield.Coordinator {
 				if let store = store.scope(state: \.chooseAccounts, action: \.chooseAccounts) {
 					ChooseAccountsForShield.View(store: store)
 				}
+			case .choosePersonas:
+				if let store = store.scope(state: \.choosePersonas, action: \.choosePersonas) {
+					ChoosePersonasForShield.View(store: store)
+				}
 			}
 		}
 	}

@@ -19,6 +19,7 @@ extension ProofOfOwnership {
 						case .persona:
 							if let viewState = store.personaViewState {
 								PersonaRow.View(viewState: viewState, mode: .display)
+									.cardShadow
 							}
 						case .accounts:
 							VStack(spacing: .small1) {

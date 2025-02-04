@@ -4,7 +4,6 @@ struct ChooseAccountsForShield: Sendable, FeatureReducer {
 		var footerControlState: ControlState = .enabled
 	}
 
-	@CasePathable
 	enum ViewAction: Sendable, Equatable {
 		case continueButtonTapped([ChooseAccountsRow.State])
 	}
@@ -14,7 +13,6 @@ struct ChooseAccountsForShield: Sendable, FeatureReducer {
 		case chooseAccounts(ChooseAccounts.Action)
 	}
 
-	@CasePathable
 	enum DelegateAction: Sendable, Equatable {
 		case finished([AccountAddress])
 	}

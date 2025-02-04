@@ -4,6 +4,7 @@ extension ApplyShield {
 		@ObservableState
 		struct State: Sendable, Hashable {
 			let shieldID: SecurityStructureId
+			var selectedAccounts: [AccountAddress] = []
 
 			var root: Path.State
 			var path: StackState<Path.State> = .init()
@@ -21,6 +22,7 @@ extension ApplyShield {
 		enum Path {
 			case intro(Intro)
 			case chooseAccounts(ChooseAccountsForShield)
+			case choosePersonas(ChoosePersonasForShield)
 		}
 
 		typealias Action = FeatureAction<Self>
@@ -57,6 +59,15 @@ extension ApplyShield {
 				return .none
 			case .root(.intro(.delegate(.skipped))):
 				return .send(.delegate(.skipped))
+			case let .path(.element(id: _, action: .chooseAccounts(.delegate(.finished(accountAddresses))))):
+				state.selectedAccounts = accountAddresses
+				state.path.append(.choosePersonas(.init(
+					choosePersonas: .init(
+						selectionRequirement: .atLeast(1),
+						showSelectAllPersonas: true
+					)
+				)))
+				return .none
 			default:
 				return .none
 			}
