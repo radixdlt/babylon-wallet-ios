@@ -1279,6 +1279,7 @@
 		E7607DDE2D4CE3E80083B3A5 /* ChoosePersonasForShield.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7607DDD2D4CE3E80083B3A5 /* ChoosePersonasForShield.swift */; };
 		E7607DE02D4CE3ED0083B3A5 /* ChoosePersonasForShield+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7607DDF2D4CE3ED0083B3A5 /* ChoosePersonasForShield+View.swift */; };
 		E7607DE22D4CF9B10083B3A5 /* ChoosePersonas+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7607DE12D4CF9B10083B3A5 /* ChoosePersonas+View.swift */; };
+		E7607DE72D5231A50083B3A5 /* ApplyShield-CompletionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7607DE62D5231A50083B3A5 /* ApplyShield-CompletionView.swift */; };
 		E76645A42C23138300065D9A /* Throwable.swift in Sources */ = {isa = PBXBuildFile; fileRef = E76645A32C23138300065D9A /* Throwable.swift */; };
 		E775A1B82CF4CA5500E72DB9 /* FactorSourceCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = E775A1B72CF4CA5500E72DB9 /* FactorSourceCard.swift */; };
 		E775A1BA2CF7326000E72DB9 /* FactorSourceCard+DataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = E775A1B92CF7326000E72DB9 /* FactorSourceCard+DataSource.swift */; };
@@ -2587,6 +2588,7 @@
 		E7607DDD2D4CE3E80083B3A5 /* ChoosePersonasForShield.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoosePersonasForShield.swift; sourceTree = "<group>"; };
 		E7607DDF2D4CE3ED0083B3A5 /* ChoosePersonasForShield+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChoosePersonasForShield+View.swift"; sourceTree = "<group>"; };
 		E7607DE12D4CF9B10083B3A5 /* ChoosePersonas+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChoosePersonas+View.swift"; sourceTree = "<group>"; };
+		E7607DE62D5231A50083B3A5 /* ApplyShield-CompletionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ApplyShield-CompletionView.swift"; sourceTree = "<group>"; };
 		E76645A32C23138300065D9A /* Throwable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Throwable.swift; sourceTree = "<group>"; };
 		E775A1B72CF4CA5500E72DB9 /* FactorSourceCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FactorSourceCard.swift; sourceTree = "<group>"; };
 		E775A1B92CF7326000E72DB9 /* FactorSourceCard+DataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactorSourceCard+DataSource.swift"; sourceTree = "<group>"; };
@@ -7081,6 +7083,7 @@
 				E7607DD22D4BB53E0083B3A5 /* Intro */,
 				E7607DD12D4BB5310083B3A5 /* ChooseAccountsForShield */,
 				E7607DDC2D4CE3D60083B3A5 /* ChoosePersonasForShield */,
+				E7607DE32D52311F0083B3A5 /* Completion */,
 			);
 			path = Children;
 			sourceTree = "<group>";
@@ -7119,6 +7122,14 @@
 				E7607DDF2D4CE3ED0083B3A5 /* ChoosePersonasForShield+View.swift */,
 			);
 			path = ChoosePersonasForShield;
+			sourceTree = "<group>";
+		};
+		E7607DE32D52311F0083B3A5 /* Completion */ = {
+			isa = PBXGroup;
+			children = (
+				E7607DE62D5231A50083B3A5 /* ApplyShield-CompletionView.swift */,
+			);
+			path = Completion;
 			sourceTree = "<group>";
 		};
 		E76F56BF2C538061001EDC63 /* EditPersonaField */ = {
@@ -7802,6 +7813,7 @@
 				A408165B2C7E0D08005E65B9 /* ValidatorCollectionItem.swift in Sources */,
 				E6A2D9E72AFA7132001857EC /* Mnemonics+Utils.swift in Sources */,
 				E791F2AA2D3151E7001A007B /* RecoveryRoleSetup+Reducer.swift in Sources */,
+				E7607DE72D5231A50083B3A5 /* ApplyShield-CompletionView.swift in Sources */,
 				48CFC28A2ADC10D900E77A5C /* TransactionReviewGuarantees.swift in Sources */,
 				48CFC5772ADC10DA00E77A5C /* MetadataTypedValue.swift in Sources */,
 				48CFC44B2ADC10DA00E77A5C /* MnemonicClient+Interface.swift in Sources */,

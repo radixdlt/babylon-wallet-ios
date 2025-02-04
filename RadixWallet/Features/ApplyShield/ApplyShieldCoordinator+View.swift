@@ -41,6 +41,10 @@ extension ApplyShield.Coordinator {
 				if let store = store.scope(state: \.choosePersonas, action: \.choosePersonas) {
 					ChoosePersonasForShield.View(store: store)
 				}
+			case .completion:
+				ApplyShield.CompletionView {
+					self.store.send(.view(.saveAndApplyButtonTapped))
+				}
 			}
 		}
 	}

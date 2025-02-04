@@ -148,6 +148,9 @@ struct SecurityCenter: Sendable, FeatureReducer {
 			// TODO: check if destination == .securityShieldsList
 			state.destination = .securityShieldsList(.init())
 			return .none
+		case .applyShield(.delegate(.finished)):
+			state.destination = nil
+			return .none
 		default:
 			return .none
 		}
