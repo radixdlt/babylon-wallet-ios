@@ -32,7 +32,7 @@ extension ApplyShield {
 		typealias Action = FeatureAction<Self>
 
 		enum ViewAction: Sendable, Equatable {
-			case saveAndApplyButtonTapped
+			case applyButtonTapped
 		}
 
 		@CasePathable
@@ -58,7 +58,7 @@ extension ApplyShield {
 
 		func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
-			case .saveAndApplyButtonTapped:
+			case .applyButtonTapped:
 				let addresses: [AddressOfAccountOrPersona] = state.selectedAccounts.map { .account($0) } + state.selectedPersonas.map { .identity($0) }
 				return .run { [shieldID = state.shieldID] send in
 					let interaction = try await SargonOs.shared.makeInteractionForApplyingSecurityShield(securityShieldId: shieldID, addresses: addresses)

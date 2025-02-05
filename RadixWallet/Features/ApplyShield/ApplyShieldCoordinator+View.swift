@@ -43,7 +43,7 @@ extension ApplyShield.Coordinator {
 				}
 			case .completion:
 				ApplyShield.CompletionView {
-					self.store.send(.view(.saveAndApplyButtonTapped))
+					self.store.send(.view(.applyButtonTapped))
 				}
 			}
 		}
