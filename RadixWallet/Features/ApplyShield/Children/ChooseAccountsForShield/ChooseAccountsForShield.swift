@@ -1,11 +1,11 @@
 struct ChooseAccountsForShield: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		var chooseAccounts: ChooseAccounts.State
-		var footerControlState: ControlState = .enabled
 	}
 
 	enum ViewAction: Sendable, Equatable {
 		case continueButtonTapped([ChooseAccountsRow.State])
+		case skipButtonTapped
 	}
 
 	@CasePathable
@@ -31,6 +31,8 @@ struct ChooseAccountsForShield: Sendable, FeatureReducer {
 		case let .continueButtonTapped(selectedAccounts):
 			let addresses = selectedAccounts.map(\.account.address)
 			return .send(.delegate(.finished(addresses)))
+		case .skipButtonTapped:
+			return .send(.delegate(.finished([])))
 		}
 	}
 }

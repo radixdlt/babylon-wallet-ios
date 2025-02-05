@@ -26,14 +26,20 @@ extension ChooseAccountsForShield {
 					.foregroundStyle(.app.gray1)
 				}
 				.footer {
-					WithControlRequirements(
-						viewStore.chooseAccounts.selectedAccounts,
-						forAction: { viewStore.send(.view(.continueButtonTapped($0))) }
-					) { action in
-						Button(L10n.DAppRequest.ChooseAccounts.continue, action: action)
-							.buttonStyle(.primaryRectangular)
+					VStack(spacing: .medium3) {
+						WithControlRequirements(
+							viewStore.chooseAccounts.selectedAccounts,
+							forAction: { viewStore.send(.view(.continueButtonTapped($0))) }
+						) { action in
+							Button(L10n.DAppRequest.ChooseAccounts.continue, action: action)
+								.buttonStyle(.primaryRectangular)
+						}
+
+						Button("Skip") {
+							viewStore.send(.view(.skipButtonTapped))
+						}
+						.buttonStyle(.primaryText())
 					}
-					.controlState(viewStore.footerControlState)
 				}
 			}
 		}

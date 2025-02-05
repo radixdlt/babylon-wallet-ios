@@ -3,13 +3,14 @@ struct ChoosePersonasForShield: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
 		var choosePersonas: ChoosePersonas.State
-		var footerControlState: ControlState = .enabled
+		let canBeSkipped: Bool
 	}
 
 	typealias Action = FeatureAction<Self>
 
 	enum ViewAction: Sendable, Equatable {
 		case continueButtonTapped([PersonaRow.State])
+		case skipButtonTapped
 	}
 
 	@CasePathable
@@ -33,6 +34,8 @@ struct ChoosePersonasForShield: Sendable, FeatureReducer {
 		case let .continueButtonTapped(selectedPersonas):
 			let addresses = selectedPersonas.map(\.persona.address)
 			return .send(.delegate(.finished(addresses)))
+		case .skipButtonTapped:
+			return .send(.delegate(.finished([])))
 		}
 	}
 }

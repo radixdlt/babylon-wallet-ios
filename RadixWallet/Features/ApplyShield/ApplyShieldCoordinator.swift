@@ -1,3 +1,5 @@
+import Sargon
+
 extension ApplyShield {
 	@Reducer
 	struct Coordinator: Sendable, FeatureReducer {
@@ -59,7 +61,7 @@ extension ApplyShield {
 			case .saveAndApplyButtonTapped:
 				let addresses: [AddressOfAccountOrPersona] = state.selectedAccounts.map { .account($0) } + state.selectedPersonas.map { .identity($0) }
 				return .run { [shieldID = state.shieldID] send in
-					// TODO:
+					let interaction = try await SargonOs.shared.makeInteractionForApplyingSecurityShield(securityShieldId: shieldID, addresses: addresses)
 					await send(.delegate(.finished))
 				} catch: { error, _ in
 					errorQueue.schedule(error)
@@ -86,7 +88,8 @@ extension ApplyShield {
 					choosePersonas: .init(
 						selectionRequirement: .atLeast(1),
 						showSelectAllPersonas: true
-					)
+					),
+					canBeSkipped: !accounts.isEmpty
 				)))
 				return .none
 			case let .path(.element(id: _, action: .choosePersonas(.delegate(.finished(personas))))):

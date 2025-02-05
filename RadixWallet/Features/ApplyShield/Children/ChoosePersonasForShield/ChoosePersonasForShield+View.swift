@@ -26,16 +26,24 @@ extension ChoosePersonasForShield {
 					.foregroundStyle(.app.gray1)
 				}
 				.footer {
-//					WithControlRequirements(
-//						store.choosePersonas.selectedPersonas,
-//						forAction: { store.send(.view(.continueButtonTapped($0))) }
-//					) { action in
-					Button(L10n.Common.continue, action: {
-						store.send(.view(.continueButtonTapped([])))
-					})
-					.buttonStyle(.primaryRectangular)
-//					}
-					//                    .controlState(.enabled)
+					VStack(spacing: .medium3) {
+						WithControlRequirements(
+							store.choosePersonas.selectedPersonas,
+							forAction: { store.send(.view(.continueButtonTapped($0))) }
+						) { action in
+							Button(L10n.Common.continue, action: {
+								store.send(.view(.continueButtonTapped([])))
+							})
+							.buttonStyle(.primaryRectangular)
+						}
+
+						if store.canBeSkipped {
+							Button("Skip") {
+								store.send(.view(.skipButtonTapped))
+							}
+							.buttonStyle(.primaryText())
+						}
+					}
 				}
 			}
 		}
