@@ -101,11 +101,7 @@ struct ShieldsList: FeatureReducer, Sendable {
 		.run { send in
 			let shields = try SargonOS.shared.securityStructuresOfFactorSources()
 				.map {
-					if $0.metadata.displayName == "Test shield" {
-						ShieldForDisplay(shield: $0, status: .applied, isMain: true)
-					} else {
-						ShieldForDisplay(shield: $0)
-					}
+					ShieldForDisplay(shield: $0, status: .applied, isMain: $0.metadata.flags.contains(.main))
 				}
 			await send(.internal(.setShields(shields)))
 		} catch: { error, _ in

@@ -48,7 +48,7 @@ struct ChangeMainShield: Sendable, FeatureReducer {
 
 		case let .confirmButtonTapped(shield):
 			return .run { send in
-				//                try await SargonOS.shared.setMainShield(shieldId: shield.id)
+				try await SargonOS.shared.setMainSecurityStructure(shieldId: shield.id)
 				await send(.delegate(.updated))
 			} catch: { error, _ in
 				errorQueue.schedule(error)
