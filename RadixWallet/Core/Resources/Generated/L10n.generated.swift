@@ -1770,17 +1770,9 @@ internal enum L10n {
       /// Tap and hold this **Arculus Card** to your phone to sign.
       internal static let signMessage = L10n.tr("Localizable", "factorSourceActions_arculus_signMessage", fallback: "Tap and hold this **Arculus Card** to your phone to sign.")
     }
-    internal enum CreateAccount {
-      /// Creating Account
-      internal static let title = L10n.tr("Localizable", "factorSourceActions_createAccount_title", fallback: "Creating Account")
-    }
     internal enum CreateKey {
       /// Creating Key
       internal static let title = L10n.tr("Localizable", "factorSourceActions_createKey_title", fallback: "Creating Key")
-    }
-    internal enum CreatePersona {
-      /// Creating Persona
-      internal static let title = L10n.tr("Localizable", "factorSourceActions_createPersona_title", fallback: "Creating Persona")
     }
     internal enum DeriveAccounts {
       /// Deriving Accounts
@@ -1819,6 +1811,8 @@ internal enum L10n {
       internal static let signMessage = L10n.tr("Localizable", "factorSourceActions_offDeviceMnemonic_signMessage", fallback: "Enter this **mnemonic** to sign")
     }
     internal enum Password {
+      /// Password
+      internal static let heading = L10n.tr("Localizable", "factorSourceActions_password_heading", fallback: "Password")
       /// Incorrect password
       internal static let incorrect = L10n.tr("Localizable", "factorSourceActions_password_incorrect", fallback: "Incorrect password")
       /// Enter this **password**
@@ -1833,6 +1827,10 @@ internal enum L10n {
     internal enum Signature {
       /// Signature Request
       internal static let title = L10n.tr("Localizable", "factorSourceActions_signature_title", fallback: "Signature Request")
+    }
+    internal enum SpotCheck {
+      /// Check Factor
+      internal static let title = L10n.tr("Localizable", "factorSourceActions_spotCheck_title", fallback: "Check Factor")
     }
     internal enum UpdatingFactorConfig {
       /// Updating Factor Config
