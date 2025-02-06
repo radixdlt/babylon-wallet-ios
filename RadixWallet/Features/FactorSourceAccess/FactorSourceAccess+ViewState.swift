@@ -1,17 +1,5 @@
-
-// MARK: - ViewState
 extension FactorSourceAccess.State {
-	var viewState: FactorSourceAccess.ViewState {
-		.init(
-			title: title,
-			message: message,
-			externalDevice: externalDevice,
-			isRetryEnabled: isRetryEnabled,
-			height: height
-		)
-	}
-
-	private var title: String {
+	var title: String {
 		switch purpose {
 		case .signature:
 			L10n.FactorSourceActions.Signature.title
@@ -27,10 +15,17 @@ extension FactorSourceAccess.State {
 			L10n.FactorSourceActions.EncryptMessage.title
 		case .createKey:
 			L10n.FactorSourceActions.CreateKey.title
+		case let .authorization(authorization):
+			switch authorization {
+			case .creatingAccount, .creatingAccounts:
+				L10n.Authorization.CreateAccount.title
+			case .creatingPersona, .creatingPersonas:
+				L10n.Authorization.CreatePersona.title
+			}
 		}
 	}
 
-	private var message: String {
+	var message: String {
 		typealias S = L10n.FactorSourceActions
 		switch kind {
 		case .device:
@@ -39,8 +34,10 @@ extension FactorSourceAccess.State {
 				return S.Device.signMessage
 			case .createAccount, .createPersona, .deriveAccounts, .proveOwnership, .encryptMessage, .createKey:
 				return S.Device.message
+			case .authorization:
+				return "Use your phone’s biometrics or PIN to confirm you want to do this."
 			}
-		case .ledger:
+		case .ledgerHqHardwareWallet:
 			switch purpose {
 			case .signature:
 				return S.Ledger.signMessage
@@ -48,39 +45,63 @@ extension FactorSourceAccess.State {
 				return S.Ledger.deriveAccountsMessage
 			case .createAccount, .createPersona, .proveOwnership, .encryptMessage, .createKey:
 				return S.Ledger.message
+			case .authorization:
+				return "Use your phone’s biometrics or PIN to confirm you want to do this."
 			}
+		default:
+			fatalError("Not supported yet")
 		}
 	}
 
-	private var externalDevice: String? {
-		switch kind {
-		case .device:
-			nil
-		case let .ledger(value):
-			value?.hint.label
-		}
-	}
-
-	private var isRetryEnabled: Bool {
-		switch kind {
-		case .device:
+	var showDescription: Bool {
+		switch purpose {
+		case .authorization:
 			false
-		case .ledger:
+		default:
 			true
 		}
 	}
 
-	private var height: CGFloat {
+	var label: String? {
+		switch factorSource {
+		case .none:
+			nil
+		case let .device(device):
+			device.hint.label
+		case let .ledger(ledger):
+			ledger.hint.label
+		default:
+			fatalError("Not supported yet")
+		}
+	}
+
+	var isRetryEnabled: Bool {
+		guard factorSource != nil else {
+			return false
+		}
+		switch kind {
+		case .device:
+			return true
+		case .ledgerHqHardwareWallet:
+			return true
+		default:
+			fatalError("Not supported yet")
+		}
+	}
+
+	var height: CGFloat {
 		switch kind {
 		case .device:
 			0.55
-		case .ledger:
+		case .ledgerHqHardwareWallet:
 			switch purpose {
 			case .signature, .deriveAccounts:
 				0.74
-			case .createAccount, .createPersona, .proveOwnership, .encryptMessage, .createKey:
+			case .createAccount, .createPersona, .proveOwnership, .encryptMessage, .createKey, .authorization:
 				0.70
 			}
+		default:
+			fatalError("Not supported yet")
 		}
 	}
 }

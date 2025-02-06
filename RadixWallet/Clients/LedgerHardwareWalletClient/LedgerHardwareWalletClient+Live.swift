@@ -71,9 +71,25 @@ extension LedgerHardwareWalletClient: DependencyKey {
 			throw FailedToReceiveAnyResponseFromAnyClient()
 		}
 
+		let derivePublicKeys: DerivePublicKeys = { request in
+			try await makeRequest(
+				.derivePublicKeys(.init(
+					keysParameters: request.input.derivationPaths.map(\.keyParams),
+					ledgerDevice: request.ledger.device()
+				)),
+				responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.derivePublicKeys
+			)
+			.map {
+				try $0.hdPubKey()
+			}
+			.map {
+				.init(factorSourceId: request.input.factorSourceId, publicKey: $0)
+			}
+		}
+
 		@Sendable func sign(
-			signers: NonEmpty<IdentifiedArrayOf<Signer>>,
 			expectedHashedMessage: Data,
+			ownedFactorInstances: [OwnedFactorInstance],
 			signOnLedgerRequest: () async throws -> [P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.SignatureOfSigner]
 		) async throws -> Set<SignatureOfEntity> {
 			let signaturesRaw = try await signOnLedgerRequest()
@@ -81,32 +97,95 @@ extension LedgerHardwareWalletClient: DependencyKey {
 			let signaturesValidated = try signaturesRaw.map { try $0.validate(hashed: expectedHashedMessage) }
 			var signatures = Set<SignatureOfEntity>()
 
-			let signerEntities = Set(signers.map(\.entity))
-
-			for requiredSigner in signers {
-				for requiredSigningFactor in requiredSigner.factorInstancesRequiredToSign {
-					guard
-						let signature = signaturesValidated.first(where: {
-							$0.signature.publicKey == requiredSigningFactor.publicKey.publicKey
-						})
-					else {
-						loggerGlobal.error("Missing signature from required signer with publicKey: \(requiredSigningFactor.publicKey.publicKey.hex)")
-						throw MissingSignatureFromRequiredSigner()
-					}
-					assert(requiredSigningFactor.derivationPath == signature.derivationPath)
-
-					let entitySignature = SignatureOfEntity(
-						signerEntity: requiredSigner.entity,
-						derivationPath: signature.derivationPath,
-						factorSourceID: requiredSigningFactor.factorSourceID.asGeneral,
-						signatureWithPublicKey: signature.signature
-					)
-
-					signatures.insert(entitySignature)
+			for ownedFactorInstance in ownedFactorInstances {
+				let factorInstance = ownedFactorInstance.factorInstance
+				guard let signature = signaturesValidated.first(where: {
+					$0.signature.publicKey == factorInstance.publicKey.publicKey
+				}) else {
+					loggerGlobal.error("Missing signature from required signer with publicKey: \(factorInstance.publicKey.publicKey.hex)")
+					throw MissingSignatureFromRequiredSigner()
 				}
+				assert(factorInstance.derivationPath == signature.derivationPath)
+
+				signatures.insert(.init(ownedFactorInstance: ownedFactorInstance, signatureWithPublicKey: signature.signature))
 			}
 
 			return signatures
+		}
+
+		let signTransaction: SignTransaction = { request in
+			let compiledIntent = request.input.payload
+			let payloadId = compiledIntent.decompile().hash()
+			let expectedHashedMessage = payloadId.hash.data
+
+			let result = try await sign(
+				expectedHashedMessage: expectedHashedMessage,
+				ownedFactorInstances: request.input.ownedFactorInstances
+			) {
+				try await makeRequest(
+					.signTransaction(.init(
+						signers: request.input.ownedFactorInstances.map(\.keyParams),
+						ledgerDevice: request.ledger.device(),
+						compiledTransactionIntent: .init(data: compiledIntent.data),
+						displayHash: false
+					)),
+					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.signTransaction
+				)
+			}
+
+			return result.map { item in
+				.init(input: .init(payloadId: payloadId, ownedFactorInstance: item.ownedFactorInstance), signature: item.signatureWithPublicKey)
+			}
+		}
+
+		let signSubintent: SignSubintent = { request in
+			let compiledSubintent = request.input.payload
+			let payloadId = compiledSubintent.decompile().hash()
+			let expectedHashedMessage = payloadId.hash.data
+
+			let result = try await sign(
+				expectedHashedMessage: expectedHashedMessage,
+				ownedFactorInstances: request.input.ownedFactorInstances
+			) {
+				try await makeRequest(
+					.signSubintentHash(.init(
+						signers: request.input.ownedFactorInstances.map(\.keyParams),
+						ledgerDevice: request.ledger.device(),
+						subintentHash: .init(data: expectedHashedMessage)
+					)),
+					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.signSubintentHash
+				)
+			}
+
+			return result.map { item in
+				.init(input: .init(payloadId: payloadId, ownedFactorInstance: item.ownedFactorInstance), signature: item.signatureWithPublicKey)
+			}
+		}
+
+		let signAuth: SignAuth = { request in
+			let payload = request.input.payload
+			let payloadId = payload.hash()
+			let expectedHashedMessage = payloadId.payload.hash().data
+
+			let result = try await sign(
+				expectedHashedMessage: expectedHashedMessage,
+				ownedFactorInstances: request.input.ownedFactorInstances
+			) {
+				try await makeRequest(
+					.signChallenge(.init(
+						signers: request.input.ownedFactorInstances.map(\.keyParams),
+						ledgerDevice: request.ledger.device(),
+						challenge: payload.challengeNonce,
+						origin: payload.origin,
+						dAppDefinitionAddress: payload.dappDefinitionAddress
+					)),
+					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.signChallenge
+				)
+			}
+
+			return result.map { item in
+				.init(input: .init(payloadId: payloadId, ownedFactorInstance: item.ownedFactorInstance), signature: item.signatureWithPublicKey)
+			}
 		}
 
 		return Self(
@@ -122,78 +201,10 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.getDeviceInfo
 				)
 			},
-			derivePublicKeys: { keysParams, factorSource in
-				let response = try await makeRequest(
-					.derivePublicKeys(.init(
-						keysParameters: keysParams,
-						ledgerDevice: factorSource.device()
-					)),
-					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.derivePublicKeys
-				)
-
-				return try response.map {
-					try $0.hdPubKey()
-				}
-			},
-			signTransaction: { request in
-				let hashedMsg = request.transactionIntent.hash()
-				let compiledTransactionIntent = request.transactionIntent.compile()
-				return try await sign(
-					signers: request.signers,
-					expectedHashedMessage: hashedMsg.hash.data
-				) {
-					try await makeRequest(
-						.signTransaction(.init(
-							signers: request.signers.flatMap(\.keyParams),
-							ledgerDevice: request.ledger.device(),
-							compiledTransactionIntent: .init(data: compiledTransactionIntent.data),
-							displayHash: request.displayHashOnLedgerDisplay
-						)),
-						responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.signTransaction
-					)
-				}
-			},
-			signPreAuthorization: { request in
-				let hashedMsg = request.subintent.hash()
-				return try await sign(
-					signers: request.signers,
-					expectedHashedMessage: hashedMsg.hash.data
-				) {
-					try await makeRequest(
-						.signSubintentHash(.init(
-							signers: request.signers.flatMap(\.keyParams),
-							ledgerDevice: request.ledger.device(),
-							subintentHash: .init(data: hashedMsg.hash.data)
-						)),
-						responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.signSubintentHash
-					)
-				}
-			},
-			signAuthChallenge: { request in
-				@Dependency(\.rolaClient) var rolaClient
-
-				let rolaPayload = try rolaClient.authenticationDataToSignForChallenge(.init(
-					challenge: request.challenge,
-					origin: request.origin,
-					dAppDefinitionAddress: request.dAppDefinitionAddress
-				))
-				let hash = rolaPayload.payloadToHashAndSign.hash()
-				return try await sign(
-					signers: request.signers,
-					expectedHashedMessage: hash.data
-				) {
-					try await makeRequest(
-						.signChallenge(.init(
-							signers: request.signers.flatMap(\.keyParams),
-							ledgerDevice: request.ledger.device(),
-							challenge: request.challenge,
-							origin: request.origin,
-							dAppDefinitionAddress: request.dAppDefinitionAddress
-						)),
-						responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.signChallenge
-					)
-				}
-			},
+			derivePublicKeys: derivePublicKeys,
+			signTransaction: signTransaction,
+			signSubintent: signSubintent,
+			signAuth: signAuth,
 			deriveAndDisplayAddress: { keyParams, factorSource in
 				let response = try await makeRequest(
 					.deriveAndDisplayAddress(.init(
@@ -283,6 +294,7 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.Signature
 // MARK: - InvalidSignature
 struct InvalidSignature: Swift.Error {}
 
+// TODO: Delete
 extension Signer {
 	var keyParams: [P2P.LedgerHardwareWallet.KeyParameters] {
 		factorInstancesRequiredToSign.compactMap {
@@ -299,3 +311,18 @@ struct FailedToReceiveAnyResponseFromAnyClient: Swift.Error {}
 
 // MARK: - CasePath + Sendable
 extension CasePath: Sendable where Root: Sendable, Value: Sendable {}
+
+private extension OwnedFactorInstance {
+	var keyParams: P2P.LedgerHardwareWallet.KeyParameters {
+		factorInstance.derivationPath.keyParams
+	}
+}
+
+private extension DerivationPath {
+	var keyParams: P2P.LedgerHardwareWallet.KeyParameters {
+		.init(
+			curve: curve.toLedger(),
+			derivationPath: toBip32String()
+		)
+	}
+}

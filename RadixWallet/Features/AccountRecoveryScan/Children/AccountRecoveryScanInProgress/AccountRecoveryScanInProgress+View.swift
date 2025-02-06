@@ -97,7 +97,6 @@ extension AccountRecoveryScanInProgress {
 							}
 						}
 					}
-					.destinations(with: store)
 			}
 		}
 
@@ -181,29 +180,6 @@ extension AccountRecoveryScanInProgress {
 			}
 			.buttonStyle(.primaryRectangular)
 			.controlState(viewStore.buttonControlState)
-		}
-	}
-}
-
-private extension StoreOf<AccountRecoveryScanInProgress> {
-	var destination: PresentationStoreOf<AccountRecoveryScanInProgress.Destination> {
-		func scopeState(state: State) -> PresentationState<AccountRecoveryScanInProgress.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
-	}
-}
-
-@MainActor
-private extension View {
-	func destinations(with store: StoreOf<AccountRecoveryScanInProgress>) -> some View {
-		let destinationStore = store.destination
-		return derivePublicKeys(with: destinationStore)
-	}
-
-	private func derivePublicKeys(with destinationStore: PresentationStoreOf<AccountRecoveryScanInProgress.Destination>) -> some View {
-		sheet(store: destinationStore.scope(state: \.derivePublicKeys, action: \.derivePublicKeys)) {
-			DerivePublicKeys.View(store: $0)
 		}
 	}
 }
