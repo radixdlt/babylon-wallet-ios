@@ -194,14 +194,6 @@ jobs:
           defaults write com.apple.dt.Xcode IDESkipMacroFingerprintValidation -bool YES
           bundle exec fastlane tests
 
-      - name: Upload results
-        uses: RDXWorks-actions/xcresulttool-xcode16@v1.8.0
-        with:
-          path: build/test_output/results.xcresult
-          show-passed-tests: false
-          show-code-coverage: true
-        if: success() || failure()
-
   snyk_online_monitor:
     permissions:
       id-token: write
