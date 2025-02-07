@@ -155,7 +155,7 @@ jobs:
 
       - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
         with:
-          role-to-assume: 'arn:aws:iam::${{ secrets.SECRETS_ACCOUNT_ID }}:role/gh-babylon-wallet-ios-secrets-read-access'
+          role_name: 'arn:aws:iam::${{ secrets.SECRETS_ACCOUNT_ID }}:role/gh-babylon-wallet-ios-secrets-read-access'
           app_name: 'babylon-wallet-ios'
           step_name: 'babylon-wallet-ios-fastlane-repo-ssh'
           secret_prefix: FASTLANE_MATCH_REPO_SSH_KEY
@@ -164,7 +164,7 @@ jobs:
 
       - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
         with:
-          role-to-assume: 'arn:aws:iam::${{ secrets.SECRETS_ACCOUNT_ID }}:role/gh-babylon-wallet-ios-secrets-read-access'
+          role_name: 'arn:aws:iam::${{ secrets.SECRETS_ACCOUNT_ID }}:role/gh-babylon-wallet-ios-secrets-read-access'
           app_name: 'babylon-wallet-ios'
           step_name: 'babylon-wallet-ios-swift-engine-toolkit-ssh'
           secret_prefix: SWIFT_ENGINE_TOOLKIT_SSH_KEY
