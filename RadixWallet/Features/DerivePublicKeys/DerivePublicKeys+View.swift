@@ -7,18 +7,14 @@ extension DerivePublicKeys {
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
-				if let child = store.scope(state: \.factorSourceAccess, action: \.child.factorSourceAccess) {
-					FactorSourceAccess.View(store: child)
-				} else {
-					// We don't need the FactorSourceAccess, so we can start the derivation right away
-					Rectangle()
-						.presentationDetents([.height(1)])
-						.presentationDragIndicator(.hidden)
-						.onFirstTask { @MainActor in
-							store.send(.internal(.deriveWithSpecificPrivateHD__MustImplement))
-						}
-				}
+				FactorSourceAccess.View(store: store.factorSourceAccess)
 			}
 		}
+	}
+}
+
+private extension StoreOf<DerivePublicKeys> {
+	var factorSourceAccess: StoreOf<FactorSourceAccess> {
+		scope(state: \.factorSourceAccess, action: \.child.factorSourceAccess)
 	}
 }
