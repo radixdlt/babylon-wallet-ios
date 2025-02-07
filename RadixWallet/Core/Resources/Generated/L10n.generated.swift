@@ -3871,6 +3871,46 @@ internal enum L10n {
       internal static let walletSettingsPersonas = L10n.tr("Localizable", "securityProblems_no9_walletSettingsPersonas", fallback: "Recovery required")
     }
   }
+  internal enum SecurityShields {
+    /// Change
+    internal static let change = L10n.tr("Localizable", "securityShields_change", fallback: "Change")
+    /// Create New Security Shield
+    internal static let createShieldButton = L10n.tr("Localizable", "securityShields_createShieldButton", fallback: "Create New Security Shield")
+    /// Default Shield
+    internal static let `default` = L10n.tr("Localizable", "securityShields_default", fallback: "Default Shield")
+    /// Others
+    internal static let others = L10n.tr("Localizable", "securityShields_others", fallback: "Others")
+    /// Security Shields
+    internal static let title = L10n.tr("Localizable", "securityShields_title", fallback: "Security Shields")
+    internal enum Assigned {
+      /// %d Accounts
+      internal static func accountPlural(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "securityShields_assigned_accountPlural", p1, fallback: "%d Accounts")
+      }
+      /// 1 Account
+      internal static let accountSingular = L10n.tr("Localizable", "securityShields_assigned_accountSingular", fallback: "1 Account")
+      /// %d Personas
+      internal static func personaPlural(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "securityShields_assigned_personaPlural", p1, fallback: "%d Personas")
+      }
+      /// 1 Persona
+      internal static let personaSingular = L10n.tr("Localizable", "securityShields_assigned_personaSingular", fallback: "1 Persona")
+      /// Assigned to:
+      internal static let title = L10n.tr("Localizable", "securityShields_assigned_title", fallback: "Assigned to:")
+    }
+    internal enum ChangeMain {
+      /// Choose which Security Shield will be pre-selected when you want to use one for an Account or Persona.
+      internal static let subtitle = L10n.tr("Localizable", "securityShields_changeMain_subtitle", fallback: "Choose which Security Shield will be pre-selected when you want to use one for an Account or Persona.")
+      /// Change Default Shield
+      internal static let title = L10n.tr("Localizable", "securityShields_changeMain_title", fallback: "Change Default Shield")
+    }
+    internal enum Status {
+      /// Action required
+      internal static let actionRequired = L10n.tr("Localizable", "securityShields_status_actionRequired", fallback: "Action required")
+      /// Applied and working
+      internal static let applied = L10n.tr("Localizable", "securityShields_status_applied", fallback: "Applied and working")
+    }
+  }
   internal enum SeedPhrases {
     /// Please write down your Seed Phrase
     internal static let backupWarning = L10n.tr("Localizable", "seedPhrases_backupWarning", fallback: "Please write down your Seed Phrase")
