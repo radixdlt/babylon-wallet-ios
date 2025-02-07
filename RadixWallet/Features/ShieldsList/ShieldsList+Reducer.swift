@@ -111,7 +111,7 @@ struct ShieldsList: FeatureReducer, Sendable {
 }
 
 // MARK: - ShieldForDisplay
-// TEMP
+// TODO: use Sargon model
 struct ShieldForDisplay: Hashable, Sendable {
 	let metadata: SecurityStructureMetadata
 	let numberOfLinkedAccounts: Int = 3
