@@ -32,36 +32,45 @@ jobs:
 
     steps:
       - uses: RDXWorks-actions/checkout@main
-      - name: Configure AWS credentials to fetch secrets
-        uses: RDXWorks-actions/configure-aws-credentials@main
+
+      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
         with:
-          role-to-assume: ${{ secrets.GH_WALLET_SECRET_ACCESS }}
-          aws-region: "eu-west-2"
-          role-session-name: 'babylon-wallet-ios-${{ github.run_id }}-${{ github.run_attempt }}'
-      - name: Fetch AWS secrets
-        uses: RDXWorks-actions/aws-secretsmanager-get-secrets@main
+          role_name: 'arn:aws:iam::${{ secrets.SECRETS_ACCOUNT_ID }}:role/gh-babylon-wallet-ios-secrets-read-access'
+          app_name: 'babylon-wallet-ios'
+          step_name: 'babylon-wallet-ios-wallet-secrets'
+          secret_prefix: WALLET
+          secret_name: 'arn:aws:secretsmanager:eu-west-2:${{ secrets.SECRETS_ACCOUNT_ID }}:secret:github-actions/radixdlt/babylon-wallet-ios/secret-vTE3y0'
+          parse_json: true
+
+      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
         with:
-          secret-ids: |
-            WALLET, ${{ secrets.AWS_SECRET_NAME_WALLET }}
-          parse-json-secrets: true
-      - name: Fetch AWS secrets
-        uses: RDXWorks-actions/aws-secretsmanager-get-secrets@main
+          role-to-assume: 'arn:aws:iam::${{ secrets.SECRETS_ACCOUNT_ID }}:role/gh-babylon-wallet-ios-secrets-read-access'
+          app_name: 'babylon-wallet-ios'
+          step_name: 'babylon-wallet-ios-swift-ssh'
+          secret_prefix: SWIFT_SSH
+          secret_name: 'arn:aws:secretsmanager:eu-west-2:${{ secrets.SECRETS_ACCOUNT_ID }}:secret:github-actions/radixdlt/babylon-wallet-ios/swift-ssh-dLcxg6'
+          parse_json: true
+
+
+      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
         with:
-          secret-ids: |
-            SWIFT_SSH, ${{ secrets.AWS_SECRET_NAME_WALLET_SWIFT_SSH }}
-          parse-json-secrets: true
-      - name: Fetch AWS secrets
-        uses: RDXWorks-actions/aws-secretsmanager-get-secrets@main
+          role-to-assume: 'arn:aws:iam::${{ secrets.SECRETS_ACCOUNT_ID }}:role/gh-babylon-wallet-ios-secrets-read-access'
+          app_name: 'babylon-wallet-ios'
+          step_name: 'babylon-wallet-ios-fastlane-repo-ssh'
+          secret_prefix: FASTLANE_MATCH_REPO_SSH_KEY
+          secret_name: 'arn:aws:secretsmanager:eu-west-2:${{ secrets.SECRETS_ACCOUNT_ID }}:secret:github-actions/radixdlt/babylon-wallet-ios/fastlane-ssh-OKSWFa'
+          parse_json: true
+
+
+      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
         with:
-          secret-ids: |
-            FASTLANE_MATCH_REPO_SSH_KEY, ${{ secrets.AWS_SECRET_NAME_WALLET_FASTLANE_SSH }}
-          parse-json-secrets: true
-      - name: Fetch webhook AWS secrets
-        uses: RDXWorks-actions/aws-secretsmanager-get-secrets@main
-        with:
-          secret-ids: |
-            WEBHOOK, ${{ secrets.AWS_SECRET_NAME_SLACK_WEBHOOK }}
-          parse-json-secrets: true
+          role-to-assume: 'arn:aws:iam::${{ secrets.SECRETS_ACCOUNT_ID }}:role/gh-babylon-wallet-ios-secrets-read-access'
+          app_name: 'babylon-wallet-ios'
+          step_name: 'babylon-wallet-ios-webhook'
+          secret_prefix: WEBHOOK
+          secret_name: 'arn:aws:secretsmanager:eu-west-2:${{ secrets.SECRETS_ACCOUNT_ID }}:secret:github-actions/radixdlt/babylon-wallet-ios/slack-webhook-emaxJx'
+          parse_json: true
+
       - uses: RDXWorks-actions/ssh-agent@master
         with:
           ssh-private-key: |
