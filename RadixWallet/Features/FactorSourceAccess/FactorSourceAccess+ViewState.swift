@@ -1,23 +1,22 @@
 extension FactorSourceAccess.State {
 	var title: String {
-		typealias S = L10n.FactorSourceActions
 		switch purpose {
 		case .signature:
-			return S.Signature.title
+			S.Signature.title
 		case .spotCheck:
-			return "Check Factor"
+			"Check Factor"
 		case .proveOwnership:
-			return S.ProveOwnership.title
+			L10n.FactorSourceActions.ProveOwnership.title
 		case .encryptMessage:
-			return S.EncryptMessage.title
+			S.EncryptMessage.title
 		case .updateFactorConfig:
-			return S.UpdatingFactorConfig.title
+			S.UpdatingFactorConfig.title
 		case .deriveAccounts:
-			return S.DeriveAccounts.title
+			S.DeriveAccounts.title
 		case .createAccountAuthorization:
-			return S.CreateAccount.title
+			S.CreateAccount.title
 		case .createPersonaAuthorization:
-			return S.CreatePersona.title
+			S.CreatePersona.title
 		}
 	}
 
