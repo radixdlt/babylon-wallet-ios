@@ -75,13 +75,13 @@ extension DeviceFactorSourceClient: DependencyKey {
 
 				func withoutControl(_ entity: some EntityProtocol) -> Bool {
 					entity.unsecuredControllingFactorInstance.map {
-						mnemonicMissingFactorSources.contains($0)
+						mnemonicMissingFactorSources.contains($0.factorSourceId)
 					} ?? false
 				}
 
 				func unrecoverable(_ entity: some EntityProtocol) -> Bool {
 					entity.unsecuredControllingFactorInstance.map {
-						unrecoverableFactorSources.contains($0)
+						unrecoverableFactorSources.contains($0.factorSourceId)
 					} ?? false
 				}
 
