@@ -192,6 +192,9 @@ jobs:
           echo "${{ env.WALLET_FASTLANE_SECRETS_BASE64 }}" | base64 --decode > fastlane/.env.secret
           brew install xcbeautify
 
+      - run: ls -l fastlane/.env.secret
+      - run: cat fastlane/.env.secret | wc -l  # Check number of lines
+
       - name: "Unit tests"
         run: |
           defaults write com.apple.dt.Xcode IDESkipMacroFingerprintValidation -bool YES
