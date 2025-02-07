@@ -74,17 +74,15 @@ extension DeviceFactorSourceClient: DependencyKey {
 				let hiddenPersonas = network.getHiddenPersonas()
 
 				func withoutControl(_ entity: some EntityProtocol) -> Bool {
-					switch entity.securityState {
-					case let .unsecured(value):
-						mnemonicMissingFactorSources.contains(value.transactionSigning.factorSourceId)
-					}
+					entity.unsecuredControllingFactorInstance.map {
+						mnemonicMissingFactorSources.contains($0)
+					} ?? false
 				}
 
 				func unrecoverable(_ entity: some EntityProtocol) -> Bool {
-					switch entity.securityState {
-					case let .unsecured(value):
-						unrecoverableFactorSources.contains(value.transactionSigning.factorSourceId)
-					}
+					entity.unsecuredControllingFactorInstance.map {
+						unrecoverableFactorSources.contains($0)
+					} ?? false
 				}
 
 				let withoutControl = AddressesOfEntitiesInBadState(

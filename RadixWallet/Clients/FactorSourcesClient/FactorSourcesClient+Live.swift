@@ -139,9 +139,7 @@ extension FactorSourcesClient: DependencyKey {
 			) throws -> OrderedSet<HdPathComponent> {
 				let indicesOfEntitiesControlledByAccount = entitiesControlledByFactorSource
 					.compactMap { entity -> HdPathComponent? in
-						switch entity.securityState {
-						case let .unsecured(unsecuredControl):
-							let factorInstance = unsecuredControl.transactionSigning
+						entity.unsecuredControllingFactorInstance.flatMap { factorInstance -> HdPathComponent? in
 							guard factorInstance.factorSourceID.asGeneral == factorSourceID else {
 								return nil
 							}
