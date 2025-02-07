@@ -31,10 +31,8 @@ extension ChoosePersonasForShield {
 							store.choosePersonas.selectedPersonas,
 							forAction: { store.send(.view(.continueButtonTapped($0))) }
 						) { action in
-							Button(L10n.Common.continue, action: {
-								store.send(.view(.continueButtonTapped([])))
-							})
-							.buttonStyle(.primaryRectangular)
+							Button(L10n.Common.continue, action: action)
+								.buttonStyle(.primaryRectangular)
 						}
 
 						if store.canBeSkipped {
