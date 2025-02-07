@@ -10,7 +10,7 @@ extension PasswordFactorSourceAccess {
 				VStack(spacing: .medium3) {
 					AppTextField(
 						useSecureField: true,
-						primaryHeading: .init(text: "Password"),
+						primaryHeading: .init(text: L10n.FactorSourceActions.Password.heading),
 						placeholder: "",
 						text: $store.input.sending(\.view.inputChanged),
 						hint: store.hint,

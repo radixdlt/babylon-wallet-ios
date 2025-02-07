@@ -2,21 +2,21 @@ extension FactorSourceAccess.State {
 	var title: String {
 		switch purpose {
 		case .signature:
-			S.Signature.title
+			L10n.FactorSourceActions.Signature.title
 		case .spotCheck:
-			"Check Factor"
+			L10n.FactorSourceActions.SpotCheck.title
 		case .proveOwnership:
 			L10n.FactorSourceActions.ProveOwnership.title
 		case .encryptMessage:
-			S.EncryptMessage.title
+			L10n.FactorSourceActions.EncryptMessage.title
 		case .updateFactorConfig:
-			S.UpdatingFactorConfig.title
+			L10n.FactorSourceActions.UpdatingFactorConfig.title
 		case .deriveAccounts:
-			S.DeriveAccounts.title
+			L10n.FactorSourceActions.DeriveAccounts.title
 		case .createAccountAuthorization:
-			S.CreateAccount.title
+			L10n.Authorization.CreateAccount.title
 		case .createPersonaAuthorization:
-			S.CreatePersona.title
+			L10n.Authorization.CreatePersona.title
 		}
 	}
 
@@ -30,7 +30,7 @@ extension FactorSourceAccess.State {
 			case .spotCheck, .proveOwnership, .encryptMessage, .updateFactorConfig, .deriveAccounts:
 				return S.Device.message
 			case .createAccountAuthorization, .createPersonaAuthorization:
-				return "Use your phone’s biometrics or PIN to confirm you want to do this."
+				return L10n.Authorization.CreateEntity.message
 			}
 
 		case .ledgerHqHardwareWallet:
