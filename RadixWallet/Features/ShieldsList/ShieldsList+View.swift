@@ -22,7 +22,7 @@ extension ShieldsList {
 						.padding(.horizontal, .medium3)
 						.padding(.vertical, .large2)
 				}
-				.radixToolbar(title: "Security Shields")
+				.radixToolbar(title: L10n.SecurityShields.title)
 				.task {
 					store.send(.view(.task))
 				}
@@ -33,19 +33,18 @@ extension ShieldsList {
 		@MainActor
 		private var coreView: some SwiftUI.View {
 			VStack(spacing: .medium3) {
-				// TODO:
 				if let main = store.main {
-					section(text: "Default Shield", rows: [main], showChangeMain: !store.others.isEmpty)
+					section(text: L10n.SecurityShields.default, rows: [main], showChangeMain: !store.others.isEmpty)
 
 					if !store.others.isEmpty {
-						section(text: "Others", rows: store.others)
+						section(text: L10n.SecurityShields.others, rows: store.others)
 							.padding(.top, .medium3)
 					}
 				} else {
 					section(text: nil, rows: store.others)
 				}
 
-				Button("Create New Security Shield") {
+				Button(L10n.SecurityShields.createShieldButton) {
 					store.send(.view(.createShieldButtonTapped))
 				}
 				.buttonStyle(.secondaryRectangular)
@@ -70,7 +69,7 @@ extension ShieldsList {
 						header(text)
 						Spacer()
 						if showChangeMain {
-							Button(L10n.FactorSources.List.change) {
+							Button(L10n.SecurityShields.change) {
 								store.send(.view(.changeMainButtonTapped))
 							}
 							.buttonStyle(.primaryText())

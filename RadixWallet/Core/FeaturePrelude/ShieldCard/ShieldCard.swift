@@ -18,7 +18,7 @@ struct ShieldCard: View {
 				.padding(.vertical, iconVerticalPadding)
 
 			VStack(alignment: .leading, spacing: .small2) {
-				Text(shield.name.rawValue)
+				Text(shield.metadata.displayName.rawValue)
 					.textStyle(.body1Header)
 					.foregroundStyle(.app.gray1)
 
@@ -47,10 +47,10 @@ struct ShieldCard: View {
 	private var displayInfo: some SwiftUI.View {
 		VStack(alignment: .leading, spacing: .small2) {
 			VStack(alignment: .leading, spacing: .zero) {
-				Text("Assigned to:")
+				Text(L10n.SecurityShields.Assigned.title)
 					.textStyle(.body2HighImportance)
 
-				Text("None")
+				Text(assignedEntitiesText)
 					.textStyle(.body2Regular)
 			}
 			.foregroundStyle(.app.gray2)
@@ -102,6 +102,28 @@ private extension ShieldCard {
 			.slightlySmaller
 		}
 	}
+
+	private var assignedEntitiesText: String {
+		typealias Assigned = L10n.SecurityShields.Assigned
+		let accountsCount = shield.numberOfLinkedAccounts
+		let personasCount = shield.numberOfLinkedPersonas
+
+		var accountsString: String?
+		if accountsCount > 0 {
+			accountsString = accountsCount == 1 ? Assigned.accountSingular : Assigned.accountPlural(accountsCount)
+		}
+
+		var personasString: String?
+		if personasCount > 0 {
+			personasString = personasCount == 1 ? Assigned.personaSingular : Assigned.personaPlural(personasCount)
+		}
+
+		let entitiesText = [accountsString, personasString]
+			.compactMap { $0 }
+			.joined(separator: " • ")
+
+		return entitiesText.isEmpty ? L10n.Common.none : entitiesText
+	}
 }
 
 // MARK: - ShieldCardStatus
@@ -129,9 +151,9 @@ private extension ShieldCardStatus {
 	var statusMessageInfo: ShieldStatusMessageInfo? {
 		switch self {
 		case .applied:
-			.general(type: .success, text: "Applied and working")
+			.general(type: .success, text: L10n.SecurityShields.Status.applied)
 		case .actionRequired:
-			.general(type: .warning, text: "Action required")
+			.general(type: .warning, text: L10n.SecurityShields.Status.actionRequired)
 		case .notApplied:
 			nil
 		}

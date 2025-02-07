@@ -101,7 +101,7 @@ struct ShieldsList: FeatureReducer, Sendable {
 		.run { send in
 			let shields = try SargonOS.shared.securityStructuresOfFactorSources()
 				.map {
-					ShieldForDisplay(shield: $0, status: .applied, isMain: $0.metadata.flags.contains(.main))
+					ShieldForDisplay(metadata: $0.metadata)
 				}
 			await send(.internal(.setShields(shields)))
 		} catch: { error, _ in
@@ -113,19 +113,21 @@ struct ShieldsList: FeatureReducer, Sendable {
 // MARK: - ShieldForDisplay
 // TEMP
 struct ShieldForDisplay: Hashable, Sendable {
-	let id: SecurityStructureId
-	let name: DisplayName
+	let metadata: SecurityStructureMetadata
+	let numberOfLinkedAccounts: Int = 3
+	let numberOfLinkedPersonas: Int = 2
+
 	let status: ShieldCardStatus
-	let isMain: Bool
+
+	var isMain: Bool {
+		metadata.flags.contains(.main)
+	}
 
 	init(
-		shield: SecurityStructureOfFactorSources,
-		status: ShieldCardStatus = .notApplied,
-		isMain: Bool = false
+		metadata: SecurityStructureMetadata,
+		status: ShieldCardStatus = .notApplied
 	) {
-		self.id = shield.metadata.id
-		self.name = shield.metadata.displayName
+		self.metadata = metadata
 		self.status = status
-		self.isMain = isMain
 	}
 }
