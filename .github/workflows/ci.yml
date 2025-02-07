@@ -144,14 +144,18 @@ jobs:
 
     steps:
       - uses: RDXWorks-actions/checkout@main
-      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
+      - name: Configure AWS credentials to fetch secrets
+        uses: RDXWorks-actions/configure-aws-credentials@main
         with:
-          role_name: 'arn:aws:iam::${{ secrets.SECRETS_ACCOUNT_ID }}:role/gh-babylon-wallet-ios-secrets-read-access'
-          app_name: 'babylon-wallet-ios'
-          step_name: 'babylon-wallet-ios-wallet-secrets'
-          secret_prefix: WALLET
-          secret_name: 'arn:aws:secretsmanager:eu-west-2:${{ secrets.SECRETS_ACCOUNT_ID }}:secret:github-actions/radixdlt/babylon-wallet-ios/secret-vTE3y0'
-          parse_json: true
+          role-to-assume: ${{ secrets.GH_WALLET_SECRET_ACCESS }}
+          aws-region: "eu-west-2"
+          role-session-name: 'babylon-wallet-ios-${{ github.run_id }}-${{ github.run_attempt }}'
+      - name: Fetch AWS secrets
+        uses: RDXWorks-actions/aws-secretsmanager-get-secrets@main
+        with:
+          secret-ids: |
+            WALLET, ${{ secrets.AWS_SECRET_NAME_WALLET }}
+          parse-json-secrets: true
 
       - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
         with:
@@ -229,18 +233,14 @@ jobs:
           secret_prefix: 'SNYK'
           secret_name: 'arn:aws:secretsmanager:eu-west-2:${{ secrets.SECRETS_ACCOUNT_ID }}:secret:github-actions/common/snyk-credentials-rXRpuX'
           parse_json: true
-      - name: Configure AWS credentials to fetch secrets
-        uses: RDXWorks-actions/configure-aws-credentials@main
+      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
         with:
-          role-to-assume: ${{ secrets.GH_WALLET_SECRET_ACCESS }}
-          aws-region: "eu-west-2"
-          role-session-name: 'babylon-wallet-ios-${{ github.run_id }}-${{ github.run_attempt }}'
-      - name: Fetch AWS secrets
-        uses: RDXWorks-actions/aws-secretsmanager-get-secrets@main
-        with:
-          secret-ids: |
-            WALLET, ${{ secrets.AWS_SECRET_NAME_WALLET }}
-          parse-json-secrets: true
+          role_name: 'arn:aws:iam::${{ secrets.SECRETS_ACCOUNT_ID }}:role/gh-babylon-wallet-ios-secrets-read-access'
+          app_name: 'babylon-wallet-ios'
+          step_name: 'snyk_online_monitor'
+          secret_prefix: WALLET
+          secret_name: 'arn:aws:secretsmanager:eu-west-2:${{ secrets.SECRETS_ACCOUNT_ID }}:secret:github-actions/radixdlt/babylon-wallet-ios/secret-vTE3y0'
+          parse_json: true      
       - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
         with:
           role_name: 'arn:aws:iam::${{ secrets.SECRETS_ACCOUNT_ID }}:role/gh-babylon-wallet-ios-secrets-read-access'
