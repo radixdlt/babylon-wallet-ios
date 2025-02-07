@@ -5,7 +5,7 @@ extension ApplyShield {
 		struct State: Sendable, Hashable {
 			let shieldID: SecurityStructureId
 			var shieldName: DisplayName?
-			var hasEnoughXRD = true
+			var hasEnoughXRD: Bool?
 		}
 
 		typealias Action = FeatureAction<Self>
@@ -18,6 +18,7 @@ extension ApplyShield {
 
 		enum InternalAction: Sendable, Equatable {
 			case setShieldName(DisplayName)
+			case setHasEnoughXRD(Bool)
 		}
 
 		enum DelegateAction: Sendable, Equatable {
@@ -25,6 +26,8 @@ extension ApplyShield {
 			case skipped
 		}
 
+		@Dependency(\.accountsClient) var accountsClient
+		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 		@Dependency(\.errorQueue) var errorQueue
 
 		var body: some ReducerOf<Self> {
@@ -34,14 +37,8 @@ extension ApplyShield {
 		func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
 			case .task:
-				.run { [shieldID = state.shieldID] send in
-					// TODO: expose `security_structure_of_factor_source_ids_by_security_structure_id` in Sargon
-					guard let shield = try SargonOs.shared.securityStructuresOfFactorSourceIds()
-						.first(where: { $0.metadata.id == shieldID }) else { return }
-					await send(.internal(.setShieldName(shield.metadata.displayName)))
-				} catch: { error, _ in
-					errorQueue.schedule(error)
-				}
+				setShieldNameEffect(shieldID: state.shieldID)
+					.merge(with: checkXRDBalanceEffect())
 			case .startApplyingButtonTapped:
 				.send(.delegate(.started))
 			case .skipButtonTapped:
@@ -54,6 +51,42 @@ extension ApplyShield {
 			case let .setShieldName(name):
 				state.shieldName = name
 				return .none
+			case let .setHasEnoughXRD(hasEnoughXRD):
+				state.hasEnoughXRD = hasEnoughXRD
+				return .none
+			}
+		}
+
+		private func setShieldNameEffect(shieldID: SecurityStructureId) -> Effect<Action> {
+			.run { send in
+				// TODO: expose `security_structure_of_factor_source_ids_by_security_structure_id` in Sargon
+				guard let shield = try SargonOs.shared.securityStructuresOfFactorSourceIds()
+					.first(where: { $0.metadata.id == shieldID }) else { return }
+				await send(.internal(.setShieldName(shield.metadata.displayName)))
+			} catch: { error, _ in
+				errorQueue.schedule(error)
+			}
+		}
+
+		private func checkXRDBalanceEffect() -> Effect<Action> {
+			.run { send in
+				let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
+				let entities = try await onLedgerEntitiesClient.getAccounts(accounts.map(\.address), cachingStrategy: .forceUpdate)
+				let hasEnoughXRD = accounts.contains { account in
+					guard let entity = entities.first(where: { $0.address == account.address }) else {
+						assertionFailure("Failed to find account, this should never happen.")
+						return false
+					}
+
+					let xrdBalance = entity.fungibleResources.xrdResource?.amount.exactAmount?.nominalAmount ?? 0
+					let hasEnoughXRD = xrdBalance >= 10 // TODO: define a constant in Sargon
+
+					return hasEnoughXRD
+				}
+
+				await send(.internal(.setHasEnoughXRD(hasEnoughXRD)))
+			} catch: { error, _ in
+				errorQueue.schedule(error)
 			}
 		}
 	}

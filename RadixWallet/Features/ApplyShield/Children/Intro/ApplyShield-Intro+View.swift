@@ -2,7 +2,7 @@ import SwiftUI
 
 extension ApplyShield.Intro.State {
 	var controlState: ControlState {
-		hasEnoughXRD ? .enabled : .disabled
+		hasEnoughXRD == true ? .enabled : .disabled
 	}
 }
 
@@ -40,7 +40,7 @@ extension ApplyShield.Intro {
 						.embedInContainer
 						.padding(.top, .small1)
 
-						if !store.hasEnoughXRD {
+						if store.hasEnoughXRD == false {
 							StatusMessageView(
 								text: L10n.ShieldWizardApplyShield.ShieldCreated.notEnoughXrd,
 								type: .warning,
