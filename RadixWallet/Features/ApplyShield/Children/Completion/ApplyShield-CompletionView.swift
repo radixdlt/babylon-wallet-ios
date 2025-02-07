@@ -13,10 +13,10 @@ extension ApplyShield {
 					.padding(.bottom, .small3)
 
 				VStack(spacing: .medium2) {
-					Text("Apply your Shield")
+					Text(L10n.ShieldWizardApplyShield.ApplyShield.title)
 						.textStyle(.sheetTitle)
 
-					Text("Now let’s save your Shield settings to your wallet and apply them on the Radix Network with a transaction.")
+					Text(L10n.ShieldWizardApplyShield.ApplyShield.subtitle)
 						.textStyle(.body1HighImportance)
 				}
 				.foregroundStyle(.app.gray1)
@@ -26,7 +26,7 @@ extension ApplyShield {
 				Spacer()
 			}
 			.footer {
-				Button("Save and Apply", action: action)
+				Button(L10n.ShieldWizardApplyShield.ApplyShield.saveButton, action: action)
 					.buttonStyle(.primaryRectangular)
 			}
 		}

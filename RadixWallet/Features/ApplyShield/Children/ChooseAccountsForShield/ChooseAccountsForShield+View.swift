@@ -11,11 +11,11 @@ extension ChooseAccountsForShield {
 			WithViewStore(store, observe: { $0 }) { viewStore in
 				ScrollView {
 					VStack(spacing: .medium2) {
-						Text("Choose Accounts")
+						Text(L10n.ShieldWizardApplyShield.ChooseAccounts.title)
 							.lineSpacing(0)
 							.textStyle(.sheetTitle)
 
-						Text("Choose the Accounts you want to apply this Shield to.")
+						Text(L10n.ShieldWizardApplyShield.ChooseAccounts.subtitle)
 							.textStyle(.body1HighImportance)
 
 						ChooseAccounts.View(store: store.chooseAccounts)
@@ -35,7 +35,7 @@ extension ChooseAccountsForShield {
 								.buttonStyle(.primaryRectangular)
 						}
 
-						Button("Skip") {
+						Button(L10n.ShieldWizardApplyShield.ChooseEntities.skipButton) {
 							viewStore.send(.view(.skipButtonTapped))
 						}
 						.buttonStyle(.primaryText())

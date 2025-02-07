@@ -51,6 +51,9 @@ struct ShieldsList: FeatureReducer, Sendable {
 			Scope(state: \.changeMain, action: \.changeMain) {
 				ChangeMainShield()
 			}
+			Scope(state: \.applyShield, action: \.applyShield) {
+				ApplyShield.Coordinator()
+			}
 		}
 	}
 
@@ -94,6 +97,10 @@ struct ShieldsList: FeatureReducer, Sendable {
 		case .changeMain(.delegate(.updated)):
 			state.destination = nil
 			return shieldsEffect()
+		case .applyShield(.delegate(.skipped)),
+		     .applyShield(.delegate(.finished)):
+			state.destination = nil
+			return .none
 		default:
 			return .none
 		}
@@ -113,7 +120,7 @@ struct ShieldsList: FeatureReducer, Sendable {
 }
 
 // MARK: - ShieldForDisplay
-// TEMP
+// TODO: use Sargon model
 struct ShieldForDisplay: Hashable, Sendable {
 	let metadata: SecurityStructureMetadata
 	let numberOfLinkedAccounts: Int = 3

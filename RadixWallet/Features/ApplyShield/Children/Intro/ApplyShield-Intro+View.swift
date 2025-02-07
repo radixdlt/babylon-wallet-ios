@@ -18,11 +18,11 @@ extension ApplyShield.Intro {
 						Image(.applyShieldIntro)
 
 						if let shieldName = store.shieldName {
-							Text("\(shieldName.rawValue) Created")
+							Text(L10n.ShieldWizardApplyShield.ShieldCreated.title(shieldName.rawValue))
 								.textStyle(.sheetTitle)
 						}
 
-						Text("Apply this Shield to Accounts and Personas. You can update it any time.")
+						Text(L10n.ShieldWizardApplyShield.ShieldCreated.subtitle)
 							.textStyle(.body1Link)
 							.padding(.horizontal, .small2)
 							.padding(.top, .small3)
@@ -31,7 +31,7 @@ extension ApplyShield.Intro {
 							Image(.info)
 								.resizable()
 								.frame(.smallest)
-							Text("To apply your Shield on the Radix Network, you’ll need to sign a transaction")
+							Text(L10n.ShieldWizardApplyShield.ShieldCreated.note)
 								.textStyle(.body2HighImportance)
 								.multilineTextAlignment(.leading)
 								.flushedLeft
@@ -42,7 +42,7 @@ extension ApplyShield.Intro {
 
 						if !store.hasEnoughXRD {
 							StatusMessageView(
-								text: "Not enough XRD to pay transaction. Get some XRD tokens first to apply Shields.",
+								text: L10n.ShieldWizardApplyShield.ShieldCreated.notEnoughXrd,
 								type: .warning,
 								useNarrowSpacing: true,
 								useSmallerFontSize: true
@@ -59,13 +59,13 @@ extension ApplyShield.Intro {
 				}
 				.footer {
 					VStack(spacing: .medium2) {
-						Button("Apply to Accounts and Personas") {
+						Button(L10n.ShieldWizardApplyShield.ShieldCreated.applyButton) {
 							self.store.send(.view(.startApplyingButtonTapped))
 						}
 						.buttonStyle(.primaryRectangular)
 						.controlState(store.controlState)
 
-						Button("Skip For Now") {
+						Button(L10n.ShieldWizardApplyShield.ShieldCreated.skipButton) {
 							store.send(.view(.skipButtonTapped))
 						}
 						.buttonStyle(.primaryText())

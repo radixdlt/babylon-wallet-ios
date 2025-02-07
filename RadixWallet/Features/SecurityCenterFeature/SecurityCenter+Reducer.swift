@@ -106,13 +106,11 @@ struct SecurityCenter: Sendable, FeatureReducer {
 			case .securityShields:
 				let shields = (try? SargonOs.shared.securityStructuresOfFactorSourceIds()) ?? []
 
-				state.destination = .applyShield(.init(shieldID: shields.first!.id))
-
-//				if shields.isEmpty {
-//					state.destination = .securityShieldsSetup(.init())
-//				} else {
-//					state.destination = .securityShieldsList(.init())
-//				}
+				if shields.isEmpty {
+					state.destination = .securityShieldsSetup(.init())
+				} else {
+					state.destination = .securityShieldsList(.init())
+				}
 
 				return .none
 
@@ -145,7 +143,6 @@ struct SecurityCenter: Sendable, FeatureReducer {
 			state.destination = .applyShield(.init(shieldID: shieldID))
 			return .none
 		case .applyShield(.delegate(.skipped)):
-			// TODO: check if destination == .securityShieldsList
 			state.destination = .securityShieldsList(.init())
 			return .none
 		case .applyShield(.delegate(.finished)):

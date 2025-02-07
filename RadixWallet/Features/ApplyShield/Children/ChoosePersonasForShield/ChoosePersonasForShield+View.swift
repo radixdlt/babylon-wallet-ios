@@ -11,11 +11,11 @@ extension ChoosePersonasForShield {
 			WithPerceptionTracking {
 				ScrollView {
 					VStack(spacing: .medium2) {
-						Text("Choose Personas")
+						Text(L10n.ShieldWizardApplyShield.ChoosePersonas.title)
 							.lineSpacing(0)
 							.textStyle(.sheetTitle)
 
-						Text("Choose the Personas you want to apply this Shield to.")
+						Text(L10n.ShieldWizardApplyShield.ChoosePersonas.subtitle)
 							.textStyle(.body1HighImportance)
 
 						ChoosePersonas.View(store: store.choosePersonas)
@@ -38,7 +38,7 @@ extension ChoosePersonasForShield {
 						}
 
 						if store.canBeSkipped {
-							Button("Skip") {
+							Button(L10n.ShieldWizardApplyShield.ChooseEntities.skipButton) {
 								store.send(.view(.skipButtonTapped))
 							}
 							.buttonStyle(.primaryText())
