@@ -34,9 +34,10 @@ struct ChangeMainShield: Sendable, FeatureReducer {
 		switch viewAction {
 		case .task:
 			return .run { [current = state.currentMain] send in
+				// TODO: use getShieldsForDisplay
 				let shields = try SargonOS.shared.securityStructuresOfFactorSources()
-					.map { ShieldForDisplay(shield: $0) }
-					.filter { $0.id != current?.id }
+					.map { ShieldForDisplay(metadata: $0.metadata) }
+					.filter { $0.metadata.id != current?.metadata.id }
 				await send(.internal(.setShields(shields)))
 			} catch: { error, _ in
 				errorQueue.schedule(error)
@@ -48,7 +49,7 @@ struct ChangeMainShield: Sendable, FeatureReducer {
 
 		case let .confirmButtonTapped(shield):
 			return .run { send in
-				try await SargonOS.shared.setMainSecurityStructure(shieldId: shield.id)
+				try await SargonOS.shared.setMainSecurityStructure(shieldId: shield.metadata.id)
 				await send(.delegate(.updated))
 			} catch: { error, _ in
 				errorQueue.schedule(error)

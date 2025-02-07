@@ -1770,17 +1770,9 @@ internal enum L10n {
       /// Tap and hold this **Arculus Card** to your phone to sign.
       internal static let signMessage = L10n.tr("Localizable", "factorSourceActions_arculus_signMessage", fallback: "Tap and hold this **Arculus Card** to your phone to sign.")
     }
-    internal enum CreateAccount {
-      /// Creating Account
-      internal static let title = L10n.tr("Localizable", "factorSourceActions_createAccount_title", fallback: "Creating Account")
-    }
     internal enum CreateKey {
       /// Creating Key
       internal static let title = L10n.tr("Localizable", "factorSourceActions_createKey_title", fallback: "Creating Key")
-    }
-    internal enum CreatePersona {
-      /// Creating Persona
-      internal static let title = L10n.tr("Localizable", "factorSourceActions_createPersona_title", fallback: "Creating Persona")
     }
     internal enum DeriveAccounts {
       /// Deriving Accounts
@@ -1819,6 +1811,8 @@ internal enum L10n {
       internal static let signMessage = L10n.tr("Localizable", "factorSourceActions_offDeviceMnemonic_signMessage", fallback: "Enter this **mnemonic** to sign")
     }
     internal enum Password {
+      /// Password
+      internal static let heading = L10n.tr("Localizable", "factorSourceActions_password_heading", fallback: "Password")
       /// Incorrect password
       internal static let incorrect = L10n.tr("Localizable", "factorSourceActions_password_incorrect", fallback: "Incorrect password")
       /// Enter this **password**
@@ -1833,6 +1827,10 @@ internal enum L10n {
     internal enum Signature {
       /// Signature Request
       internal static let title = L10n.tr("Localizable", "factorSourceActions_signature_title", fallback: "Signature Request")
+    }
+    internal enum SpotCheck {
+      /// Check Factor
+      internal static let title = L10n.tr("Localizable", "factorSourceActions_spotCheck_title", fallback: "Check Factor")
     }
     internal enum UpdatingFactorConfig {
       /// Updating Factor Config
@@ -3873,6 +3871,46 @@ internal enum L10n {
       internal static let walletSettingsPersonas = L10n.tr("Localizable", "securityProblems_no9_walletSettingsPersonas", fallback: "Recovery required")
     }
   }
+  internal enum SecurityShields {
+    /// Change
+    internal static let change = L10n.tr("Localizable", "securityShields_change", fallback: "Change")
+    /// Create New Security Shield
+    internal static let createShieldButton = L10n.tr("Localizable", "securityShields_createShieldButton", fallback: "Create New Security Shield")
+    /// Default Shield
+    internal static let `default` = L10n.tr("Localizable", "securityShields_default", fallback: "Default Shield")
+    /// Others
+    internal static let others = L10n.tr("Localizable", "securityShields_others", fallback: "Others")
+    /// Security Shields
+    internal static let title = L10n.tr("Localizable", "securityShields_title", fallback: "Security Shields")
+    internal enum Assigned {
+      /// %d Accounts
+      internal static func accountPlural(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "securityShields_assigned_accountPlural", p1, fallback: "%d Accounts")
+      }
+      /// 1 Account
+      internal static let accountSingular = L10n.tr("Localizable", "securityShields_assigned_accountSingular", fallback: "1 Account")
+      /// %d Personas
+      internal static func personaPlural(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "securityShields_assigned_personaPlural", p1, fallback: "%d Personas")
+      }
+      /// 1 Persona
+      internal static let personaSingular = L10n.tr("Localizable", "securityShields_assigned_personaSingular", fallback: "1 Persona")
+      /// Assigned to:
+      internal static let title = L10n.tr("Localizable", "securityShields_assigned_title", fallback: "Assigned to:")
+    }
+    internal enum ChangeMain {
+      /// Choose which Security Shield will be pre-selected when you want to use one for an Account or Persona.
+      internal static let subtitle = L10n.tr("Localizable", "securityShields_changeMain_subtitle", fallback: "Choose which Security Shield will be pre-selected when you want to use one for an Account or Persona.")
+      /// Change Default Shield
+      internal static let title = L10n.tr("Localizable", "securityShields_changeMain_title", fallback: "Change Default Shield")
+    }
+    internal enum Status {
+      /// Action required
+      internal static let actionRequired = L10n.tr("Localizable", "securityShields_status_actionRequired", fallback: "Action required")
+      /// Applied and working
+      internal static let applied = L10n.tr("Localizable", "securityShields_status_applied", fallback: "Applied and working")
+    }
+  }
   internal enum SeedPhrases {
     /// Please write down your Seed Phrase
     internal static let backupWarning = L10n.tr("Localizable", "seedPhrases_backupWarning", fallback: "Please write down your Seed Phrase")
@@ -4041,6 +4079,52 @@ internal enum L10n {
       internal static let confirm = L10n.tr("Localizable", "shieldSetupStatus_unsafeCombination_confirm", fallback: "I understand")
       /// The combination of factors you have chosen may make this Shield unsafe or easily lost without special precautions. Only proceed if you are certain you understand how you will use this Shield.
       internal static let message = L10n.tr("Localizable", "shieldSetupStatus_unsafeCombination_message", fallback: "The combination of factors you have chosen may make this Shield unsafe or easily lost without special precautions. Only proceed if you are certain you understand how you will use this Shield.")
+    }
+  }
+  internal enum ShieldWizardApplyShield {
+    internal enum ApplyShield {
+      /// Save and Apply
+      internal static let saveButton = L10n.tr("Localizable", "shieldWizardApplyShield_applyShield_saveButton", fallback: "Save and Apply")
+      /// Now let’s save your Shield settings to your wallet and apply them on the Radix Network with a transaction.
+      internal static let subtitle = L10n.tr("Localizable", "shieldWizardApplyShield_applyShield_subtitle", fallback: "Now let’s save your Shield settings to your wallet and apply them on the Radix Network with a transaction.")
+      /// Apply your Shield
+      internal static let title = L10n.tr("Localizable", "shieldWizardApplyShield_applyShield_title", fallback: "Apply your Shield")
+    }
+    internal enum ChooseAccounts {
+      /// Choose the Accounts you want to apply this Shield to.
+      internal static let subtitle = L10n.tr("Localizable", "shieldWizardApplyShield_chooseAccounts_subtitle", fallback: "Choose the Accounts you want to apply this Shield to.")
+      /// Choose Accounts
+      internal static let title = L10n.tr("Localizable", "shieldWizardApplyShield_chooseAccounts_title", fallback: "Choose Accounts")
+    }
+    internal enum ChooseEntities {
+      /// Deselect all
+      internal static let deselectAllButton = L10n.tr("Localizable", "shieldWizardApplyShield_chooseEntities_deselectAllButton", fallback: "Deselect all")
+      /// Select all
+      internal static let selectAllButton = L10n.tr("Localizable", "shieldWizardApplyShield_chooseEntities_selectAllButton", fallback: "Select all")
+      /// Skip
+      internal static let skipButton = L10n.tr("Localizable", "shieldWizardApplyShield_chooseEntities_skipButton", fallback: "Skip")
+    }
+    internal enum ChoosePersonas {
+      /// Choose the Personas you want to apply this Shield to.
+      internal static let subtitle = L10n.tr("Localizable", "shieldWizardApplyShield_choosePersonas_subtitle", fallback: "Choose the Personas you want to apply this Shield to.")
+      /// Choose Personas
+      internal static let title = L10n.tr("Localizable", "shieldWizardApplyShield_choosePersonas_title", fallback: "Choose Personas")
+    }
+    internal enum ShieldCreated {
+      /// Apply to Accounts and Personas
+      internal static let applyButton = L10n.tr("Localizable", "shieldWizardApplyShield_shieldCreated_applyButton", fallback: "Apply to Accounts and Personas")
+      /// To apply your Shield on the Radix Network, you’ll need to sign a transaction
+      internal static let note = L10n.tr("Localizable", "shieldWizardApplyShield_shieldCreated_note", fallback: "To apply your Shield on the Radix Network, you’ll need to sign a transaction")
+      /// Not enough XRD to pay transaction. Get some XRD tokens first to apply Shields.
+      internal static let notEnoughXrd = L10n.tr("Localizable", "shieldWizardApplyShield_shieldCreated_notEnoughXrd", fallback: "Not enough XRD to pay transaction. Get some XRD tokens first to apply Shields.")
+      /// Skip For Now
+      internal static let skipButton = L10n.tr("Localizable", "shieldWizardApplyShield_shieldCreated_skipButton", fallback: "Skip For Now")
+      /// Apply this Shield to Accounts and Personas. You can update it any time.
+      internal static let subtitle = L10n.tr("Localizable", "shieldWizardApplyShield_shieldCreated_subtitle", fallback: "Apply this Shield to Accounts and Personas. You can update it any time.")
+      /// %@ Created
+      internal static func title(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "shieldWizardApplyShield_shieldCreated_title", String(describing: p1), fallback: "%@ Created")
+      }
     }
   }
   internal enum ShieldWizardName {
