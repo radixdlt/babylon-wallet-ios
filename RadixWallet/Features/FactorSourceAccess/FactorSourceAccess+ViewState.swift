@@ -104,7 +104,9 @@ extension FactorSourceAccess.State {
 		switch purpose {
 		case .signature:
 			true
-		case .spotCheck, .proveOwnership, .encryptMessage, .updateFactorConfig, .deriveAccounts, .createAccountAuthorization, .createPersonaAuthorization:
+		case let .spotCheck(allowSkip):
+			allowSkip
+		case .proveOwnership, .encryptMessage, .updateFactorConfig, .deriveAccounts, .createAccountAuthorization, .createPersonaAuthorization:
 			false
 		}
 	}

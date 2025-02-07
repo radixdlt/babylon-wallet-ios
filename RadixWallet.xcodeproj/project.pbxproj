@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -797,6 +797,7 @@
 		5BB2C2482D36C66A00286B6B /* FactorSourceAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB2C2462D36C66A00286B6B /* FactorSourceAccess.swift */; };
 		5BB2C2492D36C66A00286B6B /* FactorSourceAccess+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB2C2472D36C66A00286B6B /* FactorSourceAccess+View.swift */; };
 		5BB2C24B2D36C9DB00286B6B /* FactorSourceAccess+ViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB2C24A2D36C9D200286B6B /* FactorSourceAccess+ViewState.swift */; };
+		5BB65C522D53C33D00052430 /* FactorSourcePerformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB65C512D53C33D00052430 /* FactorSourcePerformer.swift */; };
 		5BB7C1762BC81F50001216EB /* ImportOlympiaNameLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB7C1752BC81F50001216EB /* ImportOlympiaNameLedger.swift */; };
 		5BB7C1782BC81F61001216EB /* ImportOlympiaNameLedger+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB7C1772BC81F61001216EB /* ImportOlympiaNameLedger+View.swift */; };
 		5BBC43A92BBAC6B0005747B1 /* AppTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC43A82BBAC6B0005747B1 /* AppTextEditor.swift */; };
@@ -811,6 +812,9 @@
 		5BC18AB82D4BE570008F25A5 /* ImportMnemonicGrid+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC18AB62D4BE570008F25A5 /* ImportMnemonicGrid+View.swift */; };
 		5BC82B6C2BED18A1009AC162 /* FactoryReset+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC82B6A2BED18A1009AC162 /* FactoryReset+View.swift */; };
 		5BC82B6D2BED18A1009AC162 /* FactoryReset+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC82B6B2BED18A1009AC162 /* FactoryReset+Reducer.swift */; };
+		5BD1E6DB2D527910004145D4 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 5BD1E6DA2D527910004145D4 /* Sargon */; };
+		5BD1E6DF2D527C87004145D4 /* SpotCheck+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD1E6DE2D527C87004145D4 /* SpotCheck+View.swift */; };
+		5BD1E6E02D527C87004145D4 /* SpotCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD1E6DD2D527C87004145D4 /* SpotCheck.swift */; };
 		5BE2776B2C9C7FE0005FF976 /* TransactionPreviewOptIns.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE2776A2C9C7FE0005FF976 /* TransactionPreviewOptIns.swift */; };
 		5BEB9CD22C6F6B24001FD9D4 /* HideResource+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEB9CD02C6F6B24001FD9D4 /* HideResource+View.swift */; };
 		5BEB9CD32C6F6B24001FD9D4 /* HIdeResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEB9CD12C6F6B24001FD9D4 /* HIdeResource.swift */; };
@@ -2089,6 +2093,7 @@
 		5BB2C2462D36C66A00286B6B /* FactorSourceAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FactorSourceAccess.swift; sourceTree = "<group>"; };
 		5BB2C2472D36C66A00286B6B /* FactorSourceAccess+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactorSourceAccess+View.swift"; sourceTree = "<group>"; };
 		5BB2C24A2D36C9D200286B6B /* FactorSourceAccess+ViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactorSourceAccess+ViewState.swift"; sourceTree = "<group>"; };
+		5BB65C512D53C33D00052430 /* FactorSourcePerformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FactorSourcePerformer.swift; sourceTree = "<group>"; };
 		5BB7C1752BC81F50001216EB /* ImportOlympiaNameLedger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportOlympiaNameLedger.swift; sourceTree = "<group>"; };
 		5BB7C1772BC81F61001216EB /* ImportOlympiaNameLedger+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ImportOlympiaNameLedger+View.swift"; sourceTree = "<group>"; };
 		5BBC43A82BBAC6B0005747B1 /* AppTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTextEditor.swift; sourceTree = "<group>"; };
@@ -2103,6 +2108,8 @@
 		5BC18AB62D4BE570008F25A5 /* ImportMnemonicGrid+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ImportMnemonicGrid+View.swift"; sourceTree = "<group>"; };
 		5BC82B6A2BED18A1009AC162 /* FactoryReset+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactoryReset+View.swift"; sourceTree = "<group>"; };
 		5BC82B6B2BED18A1009AC162 /* FactoryReset+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactoryReset+Reducer.swift"; sourceTree = "<group>"; };
+		5BD1E6DD2D527C87004145D4 /* SpotCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotCheck.swift; sourceTree = "<group>"; };
+		5BD1E6DE2D527C87004145D4 /* SpotCheck+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SpotCheck+View.swift"; sourceTree = "<group>"; };
 		5BE2776A2C9C7FE0005FF976 /* TransactionPreviewOptIns.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionPreviewOptIns.swift; sourceTree = "<group>"; };
 		5BEB9CD02C6F6B24001FD9D4 /* HideResource+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HideResource+View.swift"; sourceTree = "<group>"; };
 		5BEB9CD12C6F6B24001FD9D4 /* HIdeResource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HIdeResource.swift; sourceTree = "<group>"; };
@@ -2809,6 +2816,7 @@
 		48CFBC602ADC10D800E77A5C /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				5BD1E6DC2D527C70004145D4 /* SpotCheck */,
 				5B83D2D72D47FC1E007111B0 /* Authorization */,
 				5B813D042CFF2028001A291D /* ShieldSetup */,
 				A4DBBEB12C20302B00D0A59E /* CardCarousel */,
@@ -5904,6 +5912,7 @@
 		5BB2C2452D36C65400286B6B /* FactorSourceAccess */ = {
 			isa = PBXGroup;
 			children = (
+				5BB65C512D53C33D00052430 /* FactorSourcePerformer.swift */,
 				5BB2C2462D36C66A00286B6B /* FactorSourceAccess.swift */,
 				5BB2C2472D36C66A00286B6B /* FactorSourceAccess+View.swift */,
 				5B83D2CE2D47F158007111B0 /* FactorSourceAccess+Models.swift */,
@@ -5939,6 +5948,15 @@
 				5BC18AB62D4BE570008F25A5 /* ImportMnemonicGrid+View.swift */,
 			);
 			path = ImportMnemonicGrid;
+			sourceTree = "<group>";
+		};
+		5BD1E6DC2D527C70004145D4 /* SpotCheck */ = {
+			isa = PBXGroup;
+			children = (
+				5BD1E6DD2D527C87004145D4 /* SpotCheck.swift */,
+				5BD1E6DE2D527C87004145D4 /* SpotCheck+View.swift */,
+			);
+			path = SpotCheck;
 			sourceTree = "<group>";
 		};
 		5BEB9CCF2C6F6AFD001FD9D4 /* HideResource */ = {
@@ -7316,7 +7334,6 @@
 				5B1C4FD42BBB0B0C00B9436F /* AppsFlyerLib-Strict */,
 				5B634A932C91D2A0004B2FBC /* ScreenshotPreventing */,
 				5B2A0D782D354D4E0049C702 /* Sargon */,
-				83BE7C522D51F40100AF5D28 /* Sargon */,
 				83DE95422D5A390A00D7A690 /* Sargon */,
 			);
 			productName = RadixWallet;
@@ -8029,6 +8046,7 @@
 				E7B7A1052BC904E800EEE900 /* NewConnectionApproval+Reducer.swift in Sources */,
 				48CFC4132ADC10DA00E77A5C /* ErrorQueue+Test.swift in Sources */,
 				48CFC2D02ADC10D900E77A5C /* TransferAccountList+View.swift in Sources */,
+				5BB65C522D53C33D00052430 /* FactorSourcePerformer.swift in Sources */,
 				48CFC23F2ADC10D900E77A5C /* PreferenceList.swift in Sources */,
 				48CFC2A52ADC10D900E77A5C /* PersonaDetails+View.swift in Sources */,
 				48CFC5842ADC10DA00E77A5C /* SecureStorageClient+Interface.swift in Sources */,
@@ -8567,6 +8585,8 @@
 				48CFC3492ADC10D900E77A5C /* PersonaDataPermissionBox.swift in Sources */,
 				5B27FC022CC7ECC9002975BE /* Sections+ManifestSummary.swift in Sources */,
 				A408164E2C7E0D08005E65B9 /* TransactionStatus.swift in Sources */,
+				5BD1E6DF2D527C87004145D4 /* SpotCheck+View.swift in Sources */,
+				5BD1E6E02D527C87004145D4 /* SpotCheck.swift in Sources */,
 				5BBC43A92BBAC6B0005747B1 /* AppTextEditor.swift in Sources */,
 				A41266F12B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift in Sources */,
 				48CFC2652ADC10D900E77A5C /* EditPersonaAddEntryKinds.swift in Sources */,
@@ -9264,6 +9284,13 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		5BD1E6D92D527910004145D4 /* XCLocalSwiftPackageReference "../sargon" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../sargon;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		48FFFA972ADC1EEC00B2B213 /* XCRemoteSwiftPackageReference "AsyncExtensions" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -9626,10 +9653,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5B1C4FD32BBB0B0C00B9436F /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Strict" */;
 			productName = "AppsFlyerLib-Strict";
-		};
-		5B2A0D782D354D4E0049C702 /* Sargon */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Sargon;
 		};
 		5B634A932C91D2A0004B2FBC /* ScreenshotPreventing */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -29,7 +29,7 @@ struct OffDeviceMnemonicFactorSourceAccess: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Hashable {
-		case validated(MnemonicWithPassphrase)
+		case perform(FactorSourcePerformer)
 	}
 
 	var body: some ReducerOf<Self> {
@@ -46,12 +46,11 @@ struct OffDeviceMnemonicFactorSourceAccess: Sendable, FeatureReducer {
 				state.showError = true
 				return .none
 			}
-			let id = FactorSourceIdFromHash(kind: .offDeviceMnemonic, mnemonicWithPassphrase: mnemonicWithPassphrase)
-			if id != state.factorSource.id {
+			if state.factorSource.id.spotCheck(input: .software(mnemonicWithPassphrase: mnemonicWithPassphrase)) {
+				return .send(.delegate(.perform(.offDeviceMnemonic(mnemonicWithPassphrase, state.factorSource))))
+			} else {
 				state.showError = true
 				return .none
-			} else {
-				return .send(.delegate(.validated(mnemonicWithPassphrase)))
 			}
 		}
 	}
@@ -79,7 +78,7 @@ private extension OffDeviceMnemonicFactorSourceAccess.State {
 		guard let mnemonic = try? Mnemonic(words: completedWords) else {
 			return nil
 		}
-		return .init(mnemonic: mnemonic, passphrase: "")
+		return .init(mnemonic: mnemonic)
 	}
 
 	var isComplete: Bool {

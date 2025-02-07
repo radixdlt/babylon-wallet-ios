@@ -6,8 +6,11 @@ struct Authorization: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		var factorSourceAccess: FactorSourceAccess.State
 
-		init(purpose: AuthorizationPurpose) {
-			self.factorSourceAccess = .init(id: nil, purpose: purpose.factorSourceAccessPurpose)
+		init?(purpose: AuthorizationPurpose) {
+			guard let factorSource = try? SargonOS.shared.mainBdfs() else {
+				return nil
+			}
+			self.factorSourceAccess = .init(factorSource: factorSource.asGeneral, purpose: purpose.factorSourceAccessPurpose)
 		}
 	}
 
@@ -44,7 +47,7 @@ struct Authorization: Sendable, FeatureReducer {
 		}
 	}
 
-	func authorize(factorSource: FactorSource) -> Effect<Action> {
+	func authorize(factorSource: FactorSourcePerformer) -> Effect<Action> {
 		.run { send in
 			switch factorSource {
 			case let .device(device):

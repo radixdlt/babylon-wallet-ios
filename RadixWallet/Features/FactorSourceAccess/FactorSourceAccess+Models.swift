@@ -7,7 +7,7 @@ extension FactorSourceAccess.State {
 		case signature
 
 		/// Checking that user has access to the given Factor Source.
-		case spotCheck
+		case spotCheck(allowSkip: Bool)
 
 		/// ROLA proof of accounts/personas.
 		case proveOwnership
