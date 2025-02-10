@@ -132,8 +132,6 @@ private extension AlertState<Never> {
 	static var spotCheckSuccess: AlertState {
 		AlertState {
 			TextState("")
-//		} actions: {
-//			.default(TextState(L10n.Common.continue))
 		} message: {
 			TextState("Factor access spot check was successful.")
 		}
@@ -142,8 +140,6 @@ private extension AlertState<Never> {
 	static var spotCheckFailure: AlertState {
 		AlertState {
 			TextState("")
-//		} actions: {
-//			.default(TextState(L10n.Common.continue))
 		} message: {
 			TextState("Factor access spot check failed! Please try again if you want to verify that you are able to use this factor.")
 		}
