@@ -111,12 +111,7 @@ struct DevAccountPreferences: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			#if DEBUG
-			return loadCanCreateAuthSigningKey(state)
-				.concatenate(with: loadCanTurnIntoDappDefAccountType(state))
-			#else
 			return .none
-			#endif
 
 		case .closeButtonTapped:
 			return .run { send in
@@ -238,14 +233,6 @@ struct DevAccountPreferences: Sendable, FeatureReducer {
 
 extension DevAccountPreferences {
 	#if DEBUG
-	private func loadCanCreateAuthSigningKey(_ state: State) -> Effect<Action> {
-		.run { [address = state.address] send in
-			let account = try await accountsClient.getAccountByAddress(address)
-
-			await send(.internal(.canCreateAuthSigningKey(!account.hasAuthenticationSigningKey)))
-		}
-	}
-
 	private func loadCanTurnIntoDappDefAccountType(_ state: State) -> Effect<Action> {
 		.run { [address = state.address] send in
 

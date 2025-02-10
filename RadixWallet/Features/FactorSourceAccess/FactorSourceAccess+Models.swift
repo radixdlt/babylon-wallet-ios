@@ -3,16 +3,11 @@ import Foundation
 // MARK: - FactorSourceAccess.State.Purpose
 extension FactorSourceAccess.State {
 	enum Purpose: Sendable, Hashable {
+		/// Signing a transaction or a subintent.
 		case signature
 
-		/// Adding a new account.
-		case createAccount
-
-		/// Adding a new persona.
-		case createPersona
-
-		/// Recovery of existing accounts.
-		case deriveAccounts
+		/// Checking that user has access to the given Factor Source.
+		case spotCheck
 
 		/// ROLA proof of accounts/personas.
 		case proveOwnership
@@ -20,9 +15,16 @@ extension FactorSourceAccess.State {
 		/// Encrypting messages on transactions.
 		case encryptMessage
 
-		/// MFA signing, ROLA or encryption.
-		case createKey
+		/// Filling key cache.
+		case updateFactorConfig
 
-		case authorization(AuthorizationPurpose)
+		/// Scanning of existing accounts for recovery.
+		case deriveAccounts
+
+		/// Authorization before creating an Account.
+		case createAccountAuthorization
+
+		/// Authorization before creating a Persona.
+		case createPersonaAuthorization
 	}
 }
