@@ -91,7 +91,7 @@ struct Selection<Value: Hashable, Content: View>: View {
 
 	var body: some View {
 		VStack(spacing: .medium2) {
-			if showSelectAll, requirement != .exactly(1), !values.isEmpty {
+			if showSelectAll, requirement != .exactly(1), values.count > 1 {
 				Button(isFullySelected ? L10n.ShieldWizardApplyShield.ChooseEntities.deselectAllButton : L10n.ShieldWizardApplyShield.ChooseEntities.selectAllButton) {
 					if isFullySelected {
 						selectedValues = []
