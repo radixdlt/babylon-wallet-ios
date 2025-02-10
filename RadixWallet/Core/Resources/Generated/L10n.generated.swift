@@ -1919,6 +1919,10 @@ internal enum L10n {
       internal static let seedPhraseLost = L10n.tr("Localizable", "factorSources_detail_seedPhraseLost", fallback: "Seed Phrase Lost")
       /// Spot Check
       internal static let spotCheck = L10n.tr("Localizable", "factorSources_detail_spotCheck", fallback: "Spot Check")
+      /// Factor access spot check failed! Please try again if you want to verify that you are able to use this factor.
+      internal static let spotCheckFailure = L10n.tr("Localizable", "factorSources_detail_spotCheckFailure", fallback: "Factor access spot check failed! Please try again if you want to verify that you are able to use this factor.")
+      /// Factor access spot check was successful.
+      internal static let spotCheckSuccess = L10n.tr("Localizable", "factorSources_detail_spotCheckSuccess", fallback: "Factor access spot check was successful.")
       /// Test
       internal static let test = L10n.tr("Localizable", "factorSources_detail_test", fallback: "Test")
       /// Test that you can use this factor
@@ -4495,6 +4499,50 @@ internal enum L10n {
     internal enum UnacceptableManifest {
       /// A proposed transaction was rejected because it contains one or more reserved instructions.
       internal static let rejected = L10n.tr("Localizable", "transactionReview_unacceptableManifest_rejected", fallback: "A proposed transaction was rejected because it contains one or more reserved instructions.")
+    }
+    internal enum UpdateShield {
+      /// Applying %@
+      internal static func applyTitle(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "transactionReview_updateShield_applyTitle", String(describing: p1), fallback: "Applying %@")
+      }
+      /// Factors required to log into dApps with Personas and prove ownership of Accounts.
+      internal static let authSigningMessage = L10n.tr("Localizable", "transactionReview_updateShield_authSigningMessage", fallback: "Factors required to log into dApps with Personas and prove ownership of Accounts.")
+      /// Must present this factor
+      internal static let authSigningThreshold = L10n.tr("Localizable", "transactionReview_updateShield_authSigningThreshold", fallback: "Must present this factor")
+      /// Log In and Prove Ownership
+      internal static let authSigningTitle = L10n.tr("Localizable", "transactionReview_updateShield_authSigningTitle", fallback: "Log In and Prove Ownership")
+      /// OR
+      internal static let combinationLabel = L10n.tr("Localizable", "transactionReview_updateShield_combinationLabel", fallback: "OR")
+      /// Time period to automatically confirm recovery WITHOUT presenting any confirmation factors
+      internal static let confirmationDelayMessage = L10n.tr("Localizable", "transactionReview_updateShield_confirmationDelayMessage", fallback: "Time period to automatically confirm recovery WITHOUT presenting any confirmation factors")
+      /// To confirm a recovery
+      internal static let confirmRecoveryTitle = L10n.tr("Localizable", "transactionReview_updateShield_confirmRecoveryTitle", fallback: "To confirm a recovery")
+      /// Must present **ANY** of these factors
+      internal static let nonPrimaryOverrideMessage = L10n.tr("Localizable", "transactionReview_updateShield_nonPrimaryOverrideMessage", fallback: "Must present **ANY** of these factors")
+      /// Or present **ANY** one of these override factors
+      internal static let primaryOverrideMessage = L10n.tr("Localizable", "transactionReview_updateShield_primaryOverrideMessage", fallback: "Or present **ANY** one of these override factors")
+      /// Must present **%@** of these factors
+      internal static func primaryThersholdMessage(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "transactionReview_updateShield_primaryThersholdMessage", String(describing: p1), fallback: "Must present **%@** of these factors")
+      }
+      /// Factors required to log into dApps with Personas and prove ownership of Accounts.
+      internal static let proveOwnerhipMessage = L10n.tr("Localizable", "transactionReview_updateShield_proveOwnerhipMessage", fallback: "Factors required to log into dApps with Personas and prove ownership of Accounts.")
+      /// Must present this factor
+      internal static let proveOwnerhipThreshold = L10n.tr("Localizable", "transactionReview_updateShield_proveOwnerhipThreshold", fallback: "Must present this factor")
+      /// Log In and Prove Ownership
+      internal static let proveOwnerhipTitle = L10n.tr("Localizable", "transactionReview_updateShield_proveOwnerhipTitle", fallback: "Log In and Prove Ownership")
+      /// Factors required to withdraw assets, log in to dApps and prove ownership.
+      internal static let regularAccessMessage = L10n.tr("Localizable", "transactionReview_updateShield_regularAccessMessage", fallback: "Factors required to withdraw assets, log in to dApps and prove ownership.")
+      /// Regular Access
+      internal static let regularAccessTitle = L10n.tr("Localizable", "transactionReview_updateShield_regularAccessTitle", fallback: "Regular Access")
+      /// Update shield
+      internal static let sectionTitle = L10n.tr("Localizable", "transactionReview_updateShield_sectionTitle", fallback: "Update shield")
+      /// The factors you’ll need to lock and recover your Accounts or Personas if you lose access.
+      internal static let startConfirmMessage = L10n.tr("Localizable", "transactionReview_updateShield_startConfirmMessage", fallback: "The factors you’ll need to lock and recover your Accounts or Personas if you lose access.")
+      /// Starting and Confirming Recovery
+      internal static let startConfirmTitle = L10n.tr("Localizable", "transactionReview_updateShield_startConfirmTitle", fallback: "Starting and Confirming Recovery")
+      /// To start a recovery
+      internal static let startRecoveryTitle = L10n.tr("Localizable", "transactionReview_updateShield_startRecoveryTitle", fallback: "To start a recovery")
     }
   }
   internal enum TransactionSigning {
