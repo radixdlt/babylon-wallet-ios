@@ -14,7 +14,7 @@ final class SargonHostInteractor: HostInteractor {
 			case .signing(.cancelled):
 				throw CommonError.HostInteractionAborted
 
-			case .signing(.skippedFactorSource):
+			case .signing(.skipped):
 				.neglected(.init(reason: .userExplicitlySkipped, factor: perFactorSource.factorSourceId))
 
 			case let .signing(.finished(.transaction(signatures))):
@@ -39,7 +39,7 @@ final class SargonHostInteractor: HostInteractor {
 			case .signing(.cancelled):
 				throw CommonError.HostInteractionAborted
 
-			case .signing(.skippedFactorSource):
+			case .signing(.skipped):
 				.neglected(.init(reason: .userExplicitlySkipped, factor: perFactorSource.factorSourceId))
 
 			case let .signing(.finished(.subintent(signatures))):
@@ -64,7 +64,7 @@ final class SargonHostInteractor: HostInteractor {
 			case .signing(.cancelled):
 				throw CommonError.HostInteractionAborted
 
-			case .signing(.skippedFactorSource):
+			case .signing(.skipped):
 				.neglected(.init(reason: .userExplicitlySkipped, factor: perFactorSource.factorSourceId))
 
 			case let .signing(.finished(.auth(signatures))):

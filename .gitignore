@@ -18,3 +18,4 @@ fastlane/test_output/
 vendor
 .design
 Aux/SensitiveInfo.plist
+AWSCLIV2.pkg

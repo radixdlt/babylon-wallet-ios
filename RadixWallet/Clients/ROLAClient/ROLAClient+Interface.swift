@@ -7,14 +7,12 @@ struct ROLAClient: Sendable, DependencyKey {
 
 	/// verifies that the wellknown file found at metadata.origin contains the dDappDefinitionAddress
 	var performWellKnownFileCheck: PerformWellKnownFileCheck
-	var manifestForAuthKeyCreation: ManifestForAuthKeyCreation
 }
 
 // MARK: ROLAClient.PerformWellKnownFileCheck
 extension ROLAClient {
 	typealias PerformDappDefinitionVerification = @Sendable (DappToWalletInteractionMetadata) async throws -> Void
 	typealias PerformWellKnownFileCheck = @Sendable (URL, DappDefinitionAddress) async throws -> Void
-	typealias ManifestForAuthKeyCreation = @Sendable (ManifestForAuthKeyCreationRequest) async throws -> TransactionManifest
 }
 
 extension DependencyValues {
@@ -23,23 +21,3 @@ extension DependencyValues {
 		set { self[ROLAClient.self] = newValue }
 	}
 }
-
-// MARK: - ManifestForAuthKeyCreationRequest
-struct ManifestForAuthKeyCreationRequest: Sendable, Hashable {
-	let entity: AccountOrPersona
-	let newPublicKey: Sargon.PublicKey
-
-	init(
-		entity: AccountOrPersona,
-		newPublicKey: Sargon.PublicKey
-	) throws {
-		guard !entity.hasAuthenticationSigningKey else {
-			throw EntityHasAuthSigningKeyAlready()
-		}
-		self.entity = entity
-		self.newPublicKey = newPublicKey
-	}
-}
-
-// MARK: - EntityHasAuthSigningKeyAlready
-struct EntityHasAuthSigningKeyAlready: Swift.Error {}

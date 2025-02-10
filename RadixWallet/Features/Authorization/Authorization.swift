@@ -7,7 +7,7 @@ struct Authorization: Sendable, FeatureReducer {
 		var factorSourceAccess: FactorSourceAccess.State
 
 		init(purpose: AuthorizationPurpose) {
-			self.factorSourceAccess = .init(id: nil, purpose: .authorization(purpose))
+			self.factorSourceAccess = .init(id: nil, purpose: purpose.factorSourceAccessPurpose)
 		}
 	}
 
@@ -59,6 +59,17 @@ struct Authorization: Sendable, FeatureReducer {
 				// In any other situation we handle the error.
 				errorQueue.schedule(error)
 			}
+		}
+	}
+}
+
+private extension AuthorizationPurpose {
+	var factorSourceAccessPurpose: FactorSourceAccess.State.Purpose {
+		switch self {
+		case .creatingAccount, .creatingAccounts:
+			.createAccountAuthorization
+		case .creatingPersona, .creatingPersonas:
+			.createPersonaAuthorization
 		}
 	}
 }

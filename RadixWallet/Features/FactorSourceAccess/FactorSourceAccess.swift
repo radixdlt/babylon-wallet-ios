@@ -10,6 +10,9 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 		@Presents
 		var destination: Destination.State? = nil
 
+		var password: PasswordFactorSourceAccess.State?
+		var offDeviceMnemonic: OffDeviceMnemonicFactorSourceAccess.State?
+
 		var kind: FactorSourceKind {
 			id?.kind ?? .device
 		}
@@ -20,6 +23,7 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 	enum ViewAction: Sendable, Hashable {
 		case onFirstTask
 		case retryButtonTapped
+		case skipButtonTapped
 		case closeButtonTapped
 	}
 
@@ -28,9 +32,16 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 		case hasP2PLinks(Bool)
 	}
 
+	@CasePathable
+	enum ChildAction: Sendable, Hashable {
+		case password(PasswordFactorSourceAccess.Action)
+		case offDeviceMnemonic(OffDeviceMnemonicFactorSourceAccess.Action)
+	}
+
 	enum DelegateAction: Sendable, Hashable {
 		case perform(FactorSource)
 		case cancel
+		case skip
 	}
 
 	struct Destination: DestinationReducer {
@@ -62,6 +73,12 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 			.ifLet(destinationPath, action: \.destination) {
 				Destination()
 			}
+			.ifLet(\.password, action: \.child.password) {
+				PasswordFactorSourceAccess()
+			}
+			.ifLet(\.offDeviceMnemonic, action: \.child.offDeviceMnemonic) {
+				OffDeviceMnemonicFactorSourceAccess()
+			}
 	}
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
@@ -71,11 +88,16 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 		case .onFirstTask:
 			return fetchFactorSource(state: state)
 				.merge(with: checkP2PLinksEffect(state: state))
+
 		case .retryButtonTapped:
 			guard let factorSource = state.factorSource else {
 				return .none
 			}
 			return .send(.delegate(.perform(factorSource)))
+
+		case .skipButtonTapped:
+			return .send(.delegate(.skip))
+
 		case .closeButtonTapped:
 			return .send(.delegate(.cancel))
 		}
@@ -84,12 +106,23 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .setFactorSource(factorSource):
-			if let factorSource {
-				state.factorSource = factorSource
-				return .send(.delegate(.perform(factorSource)))
-			} else {
+			guard let factorSource else {
 				assertionFailure("No Factor Source found on Profile for id: \(String(describing: state.id))")
 				return .send(.delegate(.cancel))
+			}
+
+			state.factorSource = factorSource
+			switch factorSource {
+			case .device, .ledger, .arculusCard:
+				return .send(.delegate(.perform(factorSource)))
+
+			case let .password(value):
+				state.password = .init(factorSource: value)
+				return .none
+
+			case let .offDeviceMnemonic(value):
+				state.offDeviceMnemonic = .init(factorSource: value)
+				return .none
 			}
 
 		case let .hasP2PLinks(hasP2PLinks):
