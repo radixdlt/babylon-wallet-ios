@@ -931,6 +931,8 @@ Code: %@";
 "factorSources_detail_seedPhraseLost" = "Seed Phrase Lost";
 "factorSources_detail_enterSeedPhrase" = "Enter seed phrase to recover use of this factor";
 "factorSources_detail_changePin" = "Change PIN";
+"factorSources_detail_spotCheckSuccess" = "Factor access spot check was successful.";
+"factorSources_detail_spotCheckFailure" = "Factor access spot check failed! Please try again if you want to verify that you are able to use this factor.";
 "factorSources_changeMain_title" = "Change Default Biometrics/PIN";
 "factorSources_changeMain_subtitle" = "Select the biometrics/PIN factor that will be automatically selected when you create a new Account or Persona.";
 "customizeNetworkFees_normalMode_title" = "Customize Fees";
