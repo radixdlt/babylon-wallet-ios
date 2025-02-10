@@ -595,10 +595,9 @@ extension EntityView {
 			Labeled("DisplayName", value: entity.displayName.rawValue)
 			Labeled("Address", value: entity.address.address)
 
-			switch entity.securityState {
-			case let .unsecured(unsecuredControl):
+			if let factorInstance = entity.unsecuredControllingFactorInstance {
 				UnsecuredEntityControlView(
-					unsecuredControl: unsecuredControl,
+					unsecuredControl: UnsecuredEntityControl(transactionSigning: factorInstance, provisionalSecurifiedConfig: nil),
 					indentation: inOneLevel
 				)
 			}

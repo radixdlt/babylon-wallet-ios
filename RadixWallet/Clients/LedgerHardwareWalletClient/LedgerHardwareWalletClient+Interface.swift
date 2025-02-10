@@ -123,38 +123,39 @@ extension LedgerHardwareWalletClient {
 
 	@discardableResult
 	func verifyAddress(of account: Account) async throws -> VerifyAddressOutcome {
-		@Dependency(\.factorSourcesClient) var factorSourcesClient
-		switch account.securityState {
-		case let .unsecured(unsecuredEntityControl):
-			let signTXFactorInstance = unsecuredEntityControl.transactionSigning
-			let factorSourceID = signTXFactorInstance.factorSourceID.asGeneral
-			guard let ledger = try await factorSourcesClient.getFactorSource(
-				id: factorSourceID,
-				as: LedgerHardwareWalletFactorSource.self
-			) else {
-				throw FailedToFindLedger(factorSourceID: factorSourceID)
-			}
-			let keyParams = P2P.LedgerHardwareWallet.KeyParameters(
-				curve: signTXFactorInstance.derivationPath.curve.toLedger(),
-				derivationPath: signTXFactorInstance.derivationPath.toString()
-			)
-
-			let (derivedKey, address) = try await deriveAndDisplayAddress(keyParams, ledger)
-
-			if derivedKey != signTXFactorInstance.publicKey {
-				let errMsg = "Re-derived key on Ledger does not matched the transactionSigning factor instance of the account. \(derivedKey) != \(signTXFactorInstance.publicKey)"
-				loggerGlobal.error(.init(stringLiteral: errMsg))
-				return .mismatch(.publicKeyMismatch)
-			}
-
-			if address != account.address.address {
-				let errMsg = "Re-derived Address on Ledger does not matched the account. \(address) != \(account.address.address)"
-				loggerGlobal.error(.init(stringLiteral: errMsg))
-				return .mismatch(.addressMismatch)
-			}
-
-			return .verifiedSame
+		guard let signTXFactorInstance = account.unsecuredControllingFactorInstance else {
+			fatalError("Should not be called for securified entity")
 		}
+
+		@Dependency(\.factorSourcesClient) var factorSourcesClient
+
+		let factorSourceID = signTXFactorInstance.factorSourceID.asGeneral
+		guard let ledger = try await factorSourcesClient.getFactorSource(
+			id: factorSourceID,
+			as: LedgerHardwareWalletFactorSource.self
+		) else {
+			throw FailedToFindLedger(factorSourceID: factorSourceID)
+		}
+		let keyParams = P2P.LedgerHardwareWallet.KeyParameters(
+			curve: signTXFactorInstance.derivationPath.curve.toLedger(),
+			derivationPath: signTXFactorInstance.derivationPath.toString()
+		)
+
+		let (derivedKey, address) = try await deriveAndDisplayAddress(keyParams, ledger)
+
+		if derivedKey != signTXFactorInstance.publicKey {
+			let errMsg = "Re-derived key on Ledger does not matched the transactionSigning factor instance of the account. \(derivedKey) != \(signTXFactorInstance.publicKey)"
+			loggerGlobal.error(.init(stringLiteral: errMsg))
+			return .mismatch(.publicKeyMismatch)
+		}
+
+		if address != account.address.address {
+			let errMsg = "Re-derived Address on Ledger does not matched the account. \(address) != \(account.address.address)"
+			loggerGlobal.error(.init(stringLiteral: errMsg))
+			return .mismatch(.addressMismatch)
+		}
+
+		return .verifiedSame
 	}
 }
 
