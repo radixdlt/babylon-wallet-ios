@@ -160,8 +160,9 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 				await send(.delegate(.signedPreAuthorization(signedSubintent)))
 
 			} catch: { error, send in
+				await send(.internal(.resetToApprovable))
 				if let error = error as? CommonError, error == .HostInteractionAborted {
-					await send(.internal(.resetToApprovable))
+					// We don't show any error since user aborted signing intentionally
 				} else {
 					errorQueue.schedule(error)
 				}

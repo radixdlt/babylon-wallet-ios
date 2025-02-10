@@ -3,12 +3,12 @@ import Foundation
 import Sargon
 import XCTest
 
-// MARK: - ImportMnemonicTests
+// MARK: - ImportMnemonicGridTests
 // These a great mnemonics I've manually crafted (with valid checksum)
 // which contains `add` and `act` being valid words, but with "friends"
 // that are longer, starting with the same letter.
 @MainActor
-final class ImportMnemonicTests: TestCase {
+final class ImportMnemonicGridTests: TestCase {
 	func test_3_letterword_12_words() async throws {
 		try await doTest(
 			mnemonic: "add addict address pen penalty pencil act action actor actress zoo wreck"
@@ -29,13 +29,12 @@ final class ImportMnemonicTests: TestCase {
 		let wordsBIP39 = mnemonic.words
 		let testClock = TestClock()
 		let store = TestStore(
-			initialState: ImportMnemonic.State(
-				isWordCountFixed: false,
-				persistStrategy: nil,
-				wordCount: .twelve
+			initialState: ImportMnemonicGrid.State(
+				count: .twelve,
+				isWordCountFixed: false
 			)
 		) {
-			ImportMnemonic()
+			ImportMnemonicGrid()
 		} withDependencies: {
 			$0.continuousClock = testClock
 			$0.mnemonicClient = .liveValue
@@ -50,16 +49,16 @@ final class ImportMnemonicTests: TestCase {
 				await store.send(
 					.child(
 						.word(
-							id: index,
-							child: .view(.wordChanged(input: "addi")) // => addict, incorrect, erasing..
+							index,
+							.view(.wordChanged(input: "addi")) // => addict, incorrect, erasing..
 						)
 					)
 				)
 				await store.send(
 					.child(
 						.word(
-							id: index,
-							child: .view(.wordChanged(input: "add")) // corrected to "add"
+							index,
+							.view(.wordChanged(input: "add")) // corrected to "add"
 						)
 					)
 				)
@@ -67,8 +66,8 @@ final class ImportMnemonicTests: TestCase {
 				await store.send(
 					.child(
 						.word(
-							id: index,
-							child: .view(.wordChanged(input: word4Letters))
+							index,
+							.view(.wordChanged(input: word4Letters))
 						)
 					)
 				)
@@ -76,8 +75,8 @@ final class ImportMnemonicTests: TestCase {
 			await store.send(
 				.child(
 					.word(
-						id: index,
-						child: .delegate(.lostFocus(displayText: word4Letters))
+						index,
+						.delegate(.lostFocus(displayText: word4Letters))
 					)
 				)
 			)
@@ -86,7 +85,7 @@ final class ImportMnemonicTests: TestCase {
 	}
 }
 
-extension ImportMnemonicTests {
+extension ImportMnemonicGridTests {
 	private func doTest(mnemonic phrase: String) async throws {
 		let mnemonic = try Mnemonic(phrase: phrase, language: .english)
 		let wordsBIP39 = mnemonic.words
@@ -94,13 +93,12 @@ extension ImportMnemonicTests {
 		XCTAssertEqual(phrase, wordStrings.joined(separator: " "))
 		let testClock = TestClock()
 		let store = TestStore(
-			initialState: ImportMnemonic.State(
-				isWordCountFixed: false,
-				persistStrategy: nil,
-				wordCount: mnemonic.wordCount
+			initialState: ImportMnemonicGrid.State(
+				count: mnemonic.wordCount,
+				isWordCountFixed: false
 			)
 		) {
-			ImportMnemonic()
+			ImportMnemonicGrid()
 		} withDependencies: {
 			$0.continuousClock = testClock
 			$0.mnemonicClient = .liveValue
@@ -113,20 +111,29 @@ extension ImportMnemonicTests {
 			await store.send(
 				.child(
 					.word(
-						id: index,
-						child: .view(.wordChanged(input: word4Letters))
+						index,
+						.view(.wordChanged(input: word4Letters))
 					)
 				)
 			)
 			await store.send(
 				.child(
 					.word(
-						id: index,
-						child: .delegate(.lostFocus(displayText: word4Letters))
+						index,
+						.delegate(.lostFocus(displayText: word4Letters))
 					)
 				)
 			)
 		}
 		XCTAssertEqual(store.state.mnemonic, mnemonic)
+	}
+}
+
+private extension ImportMnemonicGrid.State {
+	var mnemonic: Mnemonic? {
+		let completedWords = words.compactMap(\.completeWord)
+		return try? Mnemonic(
+			words: completedWords
+		)
 	}
 }

@@ -8,10 +8,11 @@ extension FactorSourceAccess {
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				content
+					.scrollableWithBottomSpacer()
 					.withNavigationBar {
 						store.send(.view(.closeButtonTapped))
 					}
-					.presentationDetents([.fraction(store.height), .large])
+					.presentationDetents([.fraction(0.75), .large])
 					.presentationDragIndicator(.visible)
 					.interactiveDismissDisabled()
 					.presentationBackground(.blur)
@@ -27,55 +28,67 @@ extension FactorSourceAccess {
 				Image(.signingKey)
 					.foregroundColor(.app.gray3)
 
-				Text(store.title)
-					.textStyle(.sheetTitle)
-					.foregroundColor(.app.gray1)
+				VStack(spacing: .small2) {
+					Text(store.title)
+						.textStyle(.sheetTitle)
 
-				Text(LocalizedStringKey(store.message))
-					.textStyle(.body1Regular)
-					.foregroundColor(.app.gray1)
-
-				description
-
-				if store.isRetryEnabled {
-					Button {
-						store.send(.view(.retryButtonTapped))
-					} label: {
-						Text(L10n.Common.retry)
-							.textStyle(.body1Header)
-							.foregroundColor(.app.blue2)
-							.frame(height: .standardButtonHeight)
-							.frame(maxWidth: .infinity)
-					}
+					Text(LocalizedStringKey(store.message))
+						.textStyle(.body1Regular)
 				}
+				.foregroundColor(.app.gray1)
+
+				card
+				retry
+				input
+				skip
 			}
 			.multilineTextAlignment(.center)
 			.padding(.horizontal, .large2)
 		}
 
 		@ViewBuilder
-		private var description: some SwiftUI.View {
-			if store.showDescription {
-				if let label = store.label {
-					HStack(spacing: .medium2) {
-						Image(store.kind.icon)
-							.resizable()
-							.frame(.smallest)
-							.foregroundColor(.app.gray3)
-
-						Text(label)
-							.textStyle(.secondaryHeader)
-							.foregroundColor(.app.gray1)
-							.padding(.trailing, .small2)
-
-						Spacer()
-					}
-					.padding(.medium2)
-					.background(Color.app.gray5)
-					.cornerRadius(.small1)
+		private var card: some SwiftUI.View {
+			if store.showCard {
+				if let factorSource = store.factorSource {
+					FactorSourceCard(
+						kind: .instance(
+							factorSource: factorSource,
+							kind: .short(showDetails: false)
+						),
+						mode: .display
+					)
 				} else {
 					ProgressView()
 				}
+			}
+		}
+
+		@ViewBuilder
+		private var retry: some SwiftUI.View {
+			if store.isRetryEnabled {
+				Button(L10n.Common.retry) {
+					store.send(.view(.retryButtonTapped))
+				}
+				.buttonStyle(.primaryText(height: .standardButtonHeight))
+			}
+		}
+
+		@ViewBuilder
+		private var input: some SwiftUI.View {
+			if let child = store.password {
+				PasswordFactorSourceAccess.View(store: child)
+			} else if let child = store.offDeviceMnemonic {
+				OffDeviceMnemonicFactorSourceAccess.View(store: child)
+			}
+		}
+
+		@ViewBuilder
+		private var skip: some SwiftUI.View {
+			if store.isSkipEnabled {
+				Button(L10n.FactorSourceActions.useDifferentFactor) {
+					store.send(.view(.skipButtonTapped))
+				}
+				.buttonStyle(.primaryText(height: .standardButtonHeight))
 			}
 		}
 	}
@@ -87,6 +100,14 @@ private extension StoreOf<FactorSourceAccess> {
 			state.$destination
 		}
 		return scope(state: scopeState, action: Action.destination)
+	}
+
+	var password: Store<PasswordFactorSourceAccess.State, PasswordFactorSourceAccess.Action>? {
+		scope(state: \.password, action: \.child.password)
+	}
+
+	var offDeviceMnemonic: Store<OffDeviceMnemonicFactorSourceAccess.State, OffDeviceMnemonicFactorSourceAccess.Action>? {
+		scope(state: \.offDeviceMnemonic, action: \.child.offDeviceMnemonic)
 	}
 }
 
