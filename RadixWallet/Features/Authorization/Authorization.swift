@@ -47,7 +47,7 @@ struct Authorization: Sendable, FeatureReducer {
 		}
 	}
 
-	func authorize(factorSource: FactorSourcePerformer) -> Effect<Action> {
+	func authorize(factorSource: PrivateFactorSource) -> Effect<Action> {
 		.run { send in
 			switch factorSource {
 			case let .device(device):

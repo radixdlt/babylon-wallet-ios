@@ -798,7 +798,7 @@
 		5BB2C2482D36C66A00286B6B /* FactorSourceAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB2C2462D36C66A00286B6B /* FactorSourceAccess.swift */; };
 		5BB2C2492D36C66A00286B6B /* FactorSourceAccess+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB2C2472D36C66A00286B6B /* FactorSourceAccess+View.swift */; };
 		5BB2C24B2D36C9DB00286B6B /* FactorSourceAccess+ViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB2C24A2D36C9D200286B6B /* FactorSourceAccess+ViewState.swift */; };
-		5BB65C522D53C33D00052430 /* FactorSourcePerformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB65C512D53C33D00052430 /* FactorSourcePerformer.swift */; };
+		5BB65C522D53C33D00052430 /* PrivateFactorSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB65C512D53C33D00052430 /* PrivateFactorSource.swift */; };
 		5BB7C1762BC81F50001216EB /* ImportOlympiaNameLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB7C1752BC81F50001216EB /* ImportOlympiaNameLedger.swift */; };
 		5BB7C1782BC81F61001216EB /* ImportOlympiaNameLedger+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB7C1772BC81F61001216EB /* ImportOlympiaNameLedger+View.swift */; };
 		5BBC43A92BBAC6B0005747B1 /* AppTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC43A82BBAC6B0005747B1 /* AppTextEditor.swift */; };
@@ -2092,7 +2092,7 @@
 		5BB2C2462D36C66A00286B6B /* FactorSourceAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FactorSourceAccess.swift; sourceTree = "<group>"; };
 		5BB2C2472D36C66A00286B6B /* FactorSourceAccess+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactorSourceAccess+View.swift"; sourceTree = "<group>"; };
 		5BB2C24A2D36C9D200286B6B /* FactorSourceAccess+ViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactorSourceAccess+ViewState.swift"; sourceTree = "<group>"; };
-		5BB65C512D53C33D00052430 /* FactorSourcePerformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FactorSourcePerformer.swift; sourceTree = "<group>"; };
+		5BB65C512D53C33D00052430 /* PrivateFactorSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivateFactorSource.swift; sourceTree = "<group>"; };
 		5BB7C1752BC81F50001216EB /* ImportOlympiaNameLedger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportOlympiaNameLedger.swift; sourceTree = "<group>"; };
 		5BB7C1772BC81F61001216EB /* ImportOlympiaNameLedger+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ImportOlympiaNameLedger+View.swift"; sourceTree = "<group>"; };
 		5BBC43A82BBAC6B0005747B1 /* AppTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTextEditor.swift; sourceTree = "<group>"; };
@@ -5911,7 +5911,7 @@
 		5BB2C2452D36C65400286B6B /* FactorSourceAccess */ = {
 			isa = PBXGroup;
 			children = (
-				5BB65C512D53C33D00052430 /* FactorSourcePerformer.swift */,
+				5BB65C512D53C33D00052430 /* PrivateFactorSource.swift */,
 				5BB2C2462D36C66A00286B6B /* FactorSourceAccess.swift */,
 				5BB2C2472D36C66A00286B6B /* FactorSourceAccess+View.swift */,
 				5B83D2CE2D47F158007111B0 /* FactorSourceAccess+Models.swift */,
@@ -8044,7 +8044,7 @@
 				E7B7A1052BC904E800EEE900 /* NewConnectionApproval+Reducer.swift in Sources */,
 				48CFC4132ADC10DA00E77A5C /* ErrorQueue+Test.swift in Sources */,
 				48CFC2D02ADC10D900E77A5C /* TransferAccountList+View.swift in Sources */,
-				5BB65C522D53C33D00052430 /* FactorSourcePerformer.swift in Sources */,
+				5BB65C522D53C33D00052430 /* PrivateFactorSource.swift in Sources */,
 				48CFC23F2ADC10D900E77A5C /* PreferenceList.swift in Sources */,
 				48CFC2A52ADC10D900E77A5C /* PersonaDetails+View.swift in Sources */,
 				48CFC5842ADC10DA00E77A5C /* SecureStorageClient+Interface.swift in Sources */,

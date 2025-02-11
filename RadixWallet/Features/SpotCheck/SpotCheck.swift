@@ -47,7 +47,7 @@ struct SpotCheck: Sendable, FeatureReducer {
 }
 
 private extension SpotCheck {
-	func perform(factorSource: FactorSourcePerformer) -> Effect<Action> {
+	func perform(factorSource: PrivateFactorSource) -> Effect<Action> {
 		.run { send in
 			let input: SpotCheckInput
 			switch factorSource {
@@ -73,7 +73,7 @@ private extension SpotCheck {
 		}
 	}
 
-	private func handleError(factorSource: FactorSourcePerformer, error: Error, send: Send<SpotCheck.Action>) async {
+	private func handleError(factorSource: PrivateFactorSource, error: Error, send: Send<SpotCheck.Action>) async {
 		switch factorSource {
 		case .device:
 			if !error.isUserCanceledKeychainAccess {
@@ -89,8 +89,7 @@ private extension SpotCheck {
 
 	private func loadMnemonic(id: FactorSourceIdFromHash) throws -> MnemonicWithPassphrase {
 		guard let result = try secureStorageClient.loadMnemonic(factorSourceID: id, notifyIfMissing: false) else {
-			struct MissingMnmemonicError: Error {}
-			throw MissingMnmemonicError()
+			throw CommonError.UnableToLoadMnemonicFromSecureStorage(badValue: id.toString())
 		}
 		return result
 	}

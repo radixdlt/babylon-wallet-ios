@@ -30,7 +30,7 @@ struct Signing: Sendable, FeatureReducer {
 	}
 
 	enum InternalAction: Sendable, Hashable {
-		case handleSignatures(FactorSourcePerformer, Signatures)
+		case handleSignatures(PrivateFactorSource, Signatures)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -66,15 +66,15 @@ struct Signing: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .handleSignatures(performer, signatures):
+		case let .handleSignatures(privateFactorSource, signatures):
 			.send(.delegate(.finished(signatures)))
-				.merge(with: updateLastUsed(factorSource: performer.factorSource))
+				.merge(with: updateLastUsed(factorSource: privateFactorSource.factorSource))
 		}
 	}
 }
 
 private extension Signing {
-	func sign(purpose: State.Purpose, factorSource: FactorSourcePerformer) -> Effect<Action> {
+	func sign(purpose: State.Purpose, factorSource: PrivateFactorSource) -> Effect<Action> {
 		.run { send in
 			let signatures = switch factorSource {
 			case .device:
@@ -131,7 +131,11 @@ private extension Signing {
 		}
 	}
 
-	private func handleError(factorSource: FactorSourcePerformer, error: Error, send: Send<Signing.Action>) async {
+	private func handleError(
+		factorSource: PrivateFactorSource,
+		error: Error,
+		send: Send<Signing.Action>
+	) async {
 		switch factorSource {
 		case .device:
 			if !error.isUserCanceledKeychainAccess {

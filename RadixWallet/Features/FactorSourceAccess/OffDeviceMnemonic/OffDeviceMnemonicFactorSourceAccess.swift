@@ -29,7 +29,7 @@ struct OffDeviceMnemonicFactorSourceAccess: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Hashable {
-		case perform(FactorSourcePerformer)
+		case perform(PrivateFactorSource)
 	}
 
 	var body: some ReducerOf<Self> {

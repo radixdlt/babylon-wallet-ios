@@ -50,7 +50,7 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Hashable {
-		case perform(FactorSourcePerformer)
+		case perform(PrivateFactorSource)
 		case cancel
 		case skip
 	}
@@ -101,10 +101,10 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 				.merge(with: checkP2PLinksEffect(state: state))
 
 		case .retryButtonTapped:
-			guard let performer = state.factorSource?.performer else {
+			guard let privateFactorSource = state.factorSource?.asPrivate else {
 				return .none
 			}
-			return .send(.delegate(.perform(performer)))
+			return .send(.delegate(.perform(privateFactorSource)))
 
 		case .skipButtonTapped:
 			return .send(.delegate(.skip))
@@ -151,8 +151,8 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .offDeviceMnemonic(.delegate(.perform(performer))):
-			.send(.delegate(.perform(performer)))
+		case let .offDeviceMnemonic(.delegate(.perform(factorSource))):
+			.send(.delegate(.perform(factorSource)))
 
 		default:
 			.none
@@ -214,7 +214,7 @@ private extension AlertState<FactorSourceAccess.Destination.ErrorAlert> {
 }
 
 private extension FactorSource {
-	var performer: FactorSourcePerformer? {
+	var asPrivate: PrivateFactorSource? {
 		switch self {
 		case let .device(value):
 			.device(value)

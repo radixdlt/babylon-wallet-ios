@@ -48,7 +48,7 @@ struct DerivePublicKeys: Sendable, FeatureReducer {
 }
 
 private extension DerivePublicKeys {
-	func derivePublicKeys(factorSource: FactorSourcePerformer, input: KeyDerivationRequestPerFactorSource) -> Effect<Action> {
+	func derivePublicKeys(factorSource: PrivateFactorSource, input: KeyDerivationRequestPerFactorSource) -> Effect<Action> {
 		.run { send in
 			let factorInstances = switch factorSource {
 			case .device:
@@ -66,7 +66,7 @@ private extension DerivePublicKeys {
 		}
 	}
 
-	private func handleError(factorSource: FactorSourcePerformer, error: Error, send: Send<DerivePublicKeys.Action>) async {
+	private func handleError(factorSource: PrivateFactorSource, error: Error, send: Send<DerivePublicKeys.Action>) async {
 		switch factorSource {
 		case .device:
 			if !error.isUserCanceledKeychainAccess {
