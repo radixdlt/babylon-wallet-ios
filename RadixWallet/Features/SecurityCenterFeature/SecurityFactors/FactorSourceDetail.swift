@@ -133,7 +133,7 @@ private extension AlertState<Never> {
 		AlertState {
 			TextState("")
 		} message: {
-			TextState("Factor access spot check was successful.")
+			TextState(L10n.FactorSources.Detail.spotCheckSuccess)
 		}
 	}
 
@@ -141,7 +141,7 @@ private extension AlertState<Never> {
 		AlertState {
 			TextState("")
 		} message: {
-			TextState("Factor access spot check failed! Please try again if you want to verify that you are able to use this factor.")
+			TextState(L10n.FactorSources.Detail.spotCheckFailure)
 		}
 	}
 }
