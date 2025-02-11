@@ -5,7 +5,8 @@ struct OffDeviceMnemonicFactorSourceAccess: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		let factorSource: OffDeviceMnemonicFactorSource
 		var grid: ImportMnemonicGrid.State
-		var showError = false
+
+		fileprivate var lastSpotCheckFailed = false
 
 		init(factorSource: OffDeviceMnemonicFactorSource) {
 			self.factorSource = factorSource
@@ -13,7 +14,15 @@ struct OffDeviceMnemonicFactorSourceAccess: Sendable, FeatureReducer {
 		}
 
 		var confirmButtonControlState: ControlState {
-			!isComplete || showError ? .disabled : .enabled
+			if lastSpotCheckFailed {
+				return .disabled
+			}
+			switch status {
+			case .incomplete, .invalid:
+				return .disabled
+			case .readyForSpotCheck:
+				return .enabled
+			}
 		}
 	}
 
@@ -43,13 +52,12 @@ struct OffDeviceMnemonicFactorSourceAccess: Sendable, FeatureReducer {
 		switch viewAction {
 		case .confirmButtonTapped:
 			guard let mnemonicWithPassphrase = state.mnemonicWithPassphrase else {
-				state.showError = true
 				return .none
 			}
 			if state.factorSource.id.spotCheck(input: .software(mnemonicWithPassphrase: mnemonicWithPassphrase)) {
 				return .send(.delegate(.perform(.offDeviceMnemonic(state.factorSource, mnemonicWithPassphrase))))
 			} else {
-				state.showError = true
+				state.lastSpotCheckFailed = true
 				return .none
 			}
 		}
@@ -58,7 +66,7 @@ struct OffDeviceMnemonicFactorSourceAccess: Sendable, FeatureReducer {
 	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .grid(.delegate(.didUpdateGrid)):
-			state.showError = false
+			state.lastSpotCheckFailed = false
 			return .none
 
 		default:
@@ -67,14 +75,43 @@ struct OffDeviceMnemonicFactorSourceAccess: Sendable, FeatureReducer {
 	}
 }
 
+extension OffDeviceMnemonicFactorSourceAccess.State {
+	/// An enum describing the different errors that can take place from user's input.
+	enum Status: Sendable, Hashable {
+		/// User hasn't entered every word yet.
+		case incomplete
+
+		/// User has entered every word but a Mnemonic cannot be built from it (checksum fails).
+		case invalid
+
+		/// The entered mnemonic is complete (checksum succeeds), now user needs to tap on Continue
+		/// button to perform the spot check.
+		case readyForSpotCheck(MnemonicWithPassphrase)
+	}
+
+	var status: Status {
+		if !isComplete {
+			.incomplete
+		} else if let mnemonicWithPassphrase {
+			.readyForSpotCheck(mnemonicWithPassphrase)
+		} else {
+			.invalid
+		}
+	}
+
+	var hint: Hint.ViewState? {
+		if lastSpotCheckFailed {
+			Hint.ViewState.iconError(L10n.FactorSourceActions.OffDeviceMnemonic.incorrect)
+		} else if status == .invalid {
+			Hint.ViewState.iconError("Invalid mnemonic")
+		} else {
+			nil
+		}
+	}
+}
+
 private extension OffDeviceMnemonicFactorSourceAccess.State {
 	var mnemonicWithPassphrase: MnemonicWithPassphrase? {
-		let completedWords = self.completedWords
-		let expectedCount = Int(factorSource.hint.wordCount.rawValue)
-		guard completedWords.count == expectedCount else {
-			// Verify it is complete
-			return nil
-		}
 		guard let mnemonic = try? Mnemonic(words: completedWords) else {
 			return nil
 		}
