@@ -59,9 +59,7 @@ extension ApplyShield {
 
 		private func setShieldNameEffect(shieldID: SecurityStructureId) -> Effect<Action> {
 			.run { send in
-				// TODO: expose `security_structure_of_factor_source_ids_by_security_structure_id` in Sargon
-				guard let shield = try SargonOs.shared.securityStructuresOfFactorSourceIds()
-					.first(where: { $0.metadata.id == shieldID }) else { return }
+				let shield = try SargonOs.shared.securityStructureOfFactorSourceIdsBySecurityStructureId(shieldId: shieldID)
 				await send(.internal(.setShieldName(shield.metadata.displayName)))
 			} catch: { error, _ in
 				errorQueue.schedule(error)
