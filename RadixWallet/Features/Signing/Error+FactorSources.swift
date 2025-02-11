@@ -12,4 +12,11 @@ extension Error {
 		}
 		return error.code == .userRejectedSigningOfTransaction
 	}
+
+	var isHostInteractionAborted: Bool {
+		guard let error = self as? CommonError else {
+			return false
+		}
+		return error == CommonError.HostInteractionAborted
+	}
 }

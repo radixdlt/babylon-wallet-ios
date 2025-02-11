@@ -88,6 +88,16 @@ extension OverlayWindowClient {
 				self.text = text
 				self.icon = icon
 			}
+
+			static func failure(text: String) -> Self {
+				.init(
+					text: text,
+					icon: .init(
+						kind: .system("exclamationmark.octagon"),
+						foregroundColor: Color.app.red1
+					)
+				)
+			}
 		}
 
 		struct Icon: Hashable, Sendable {
@@ -154,6 +164,14 @@ extension OverlayWindowClient {
 	}
 
 	func authorize(purpose: AuthorizationPurpose) async -> SheetAction {
-		await scheduleSheet(.init(root: .authorization(.init(purpose: purpose))))
+		guard let state = Authorization.State(purpose: purpose) else {
+			assertionFailure("Unable to present Authorization")
+			return .authorization(.cancelled)
+		}
+		return await scheduleSheet(.init(root: .authorization(state)))
+	}
+
+	func spotCheck(factorSource: FactorSource, allowSkip: Bool) async -> SheetAction {
+		await scheduleSheet(.init(root: .spotCheck(.init(factorSource: factorSource, allowSkip: allowSkip))))
 	}
 }

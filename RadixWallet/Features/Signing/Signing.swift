@@ -30,7 +30,7 @@ struct Signing: Sendable, FeatureReducer {
 	}
 
 	enum InternalAction: Sendable, Hashable {
-		case handleSignatures(FactorSource, Signatures)
+		case handleSignatures(PrivateFactorSource, Signatures)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -66,15 +66,15 @@ struct Signing: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .handleSignatures(factorSource, signatures):
+		case let .handleSignatures(privateFactorSource, signatures):
 			.send(.delegate(.finished(signatures)))
-				.merge(with: updateLastUsed(factorSource: factorSource))
+				.merge(with: updateLastUsed(factorSource: privateFactorSource.factorSource))
 		}
 	}
 }
 
 private extension Signing {
-	func sign(purpose: State.Purpose, factorSource: FactorSource) -> Effect<Action> {
+	func sign(purpose: State.Purpose, factorSource: PrivateFactorSource) -> Effect<Action> {
 		.run { send in
 			let signatures = switch factorSource {
 			case .device:
@@ -131,8 +131,12 @@ private extension Signing {
 		}
 	}
 
-	private func handleError(factorSource: FactorSource, error: Error, send: Send<Signing.Action>) async {
-		switch factorSource.kind {
+	private func handleError(
+		factorSource: PrivateFactorSource,
+		error: Error,
+		send: Send<Signing.Action>
+	) async {
+		switch factorSource {
 		case .device:
 			if !error.isUserCanceledKeychainAccess {
 				// If user cancelled the operation, we will allow them to retry.
@@ -140,7 +144,7 @@ private extension Signing {
 				errorQueue.schedule(error)
 			}
 
-		case .ledgerHqHardwareWallet:
+		case .ledger:
 			if error.isUserRejectedSigningOnLedgerDevice {
 				// If user rejected signature on ledger device, we will inform the delegate to dismiss the signing sheet.
 				await send(.delegate(.cancelled))

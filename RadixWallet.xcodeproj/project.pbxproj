@@ -721,6 +721,7 @@
 		5B3C48B92C80D23F00DB160D /* AccountLockersClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3C48B82C80D23F00DB160D /* AccountLockersClient+Test.swift */; };
 		5B3C48C12C85CEAA00DB160D /* AccountBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3C48C02C85CEAA00DB160D /* AccountBannerView.swift */; };
 		5B3C48C32C874C8D00DB160D /* Dispatch+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3C48C22C874C8D00DB160D /* Dispatch+Extra.swift */; };
+		5B3FBB132D5B436A001D071E /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 5B3FBB122D5B436A001D071E /* Sargon */; };
 		5B3FDC0E2CF0A4D40024BFAF /* PollPreAuthorizationStatus+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FDC0D2CF0A4D40024BFAF /* PollPreAuthorizationStatus+View.swift */; };
 		5B3FDC0F2CF0A4D40024BFAF /* PollPreAuthorizationStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FDC0C2CF0A4D40024BFAF /* PollPreAuthorizationStatus.swift */; };
 		5B3FDC112CF0B9DB0024BFAF /* InteractionInProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3FDC102CF0B9C60024BFAF /* InteractionInProgressView.swift */; };
@@ -743,7 +744,7 @@
 		5B6499B72BCFD0E8000F2176 /* SecurityFactors+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B52BCFD0E8000F2176 /* SecurityFactors+View.swift */; };
 		5B6499B82BCFD0E8000F2176 /* SecurityFactors+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B62BCFD0E8000F2176 /* SecurityFactors+Reducer.swift */; };
 		5B6499BA2BCFDB1E000F2176 /* ShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B92BCFDB1E000F2176 /* ShareView.swift */; };
-		5B68F2A12D4118B000181CD7 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 5B2A0D782D354D4E0049C702 /* Sargon */; };
+		5B68F2A12D4118B000181CD7 /* (null) in Frameworks */ = {isa = PBXBuildFile; };
 		5B6E11482C45835900C20F2D /* AccountCard+DataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6E11472C45835900C20F2D /* AccountCard+DataSource.swift */; };
 		5B704C362D006E7F00AC758C /* AddShieldBuilderSeedingFactors-CompletionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B704C352D006E7C00AC758C /* AddShieldBuilderSeedingFactors-CompletionView.swift */; };
 		5B758D4F2BCD5BF700348722 /* Effect+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B758D4E2BCD5BF700348722 /* Effect+Extra.swift */; };
@@ -797,6 +798,7 @@
 		5BB2C2482D36C66A00286B6B /* FactorSourceAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB2C2462D36C66A00286B6B /* FactorSourceAccess.swift */; };
 		5BB2C2492D36C66A00286B6B /* FactorSourceAccess+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB2C2472D36C66A00286B6B /* FactorSourceAccess+View.swift */; };
 		5BB2C24B2D36C9DB00286B6B /* FactorSourceAccess+ViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB2C24A2D36C9D200286B6B /* FactorSourceAccess+ViewState.swift */; };
+		5BB65C522D53C33D00052430 /* PrivateFactorSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB65C512D53C33D00052430 /* PrivateFactorSource.swift */; };
 		5BB7C1762BC81F50001216EB /* ImportOlympiaNameLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB7C1752BC81F50001216EB /* ImportOlympiaNameLedger.swift */; };
 		5BB7C1782BC81F61001216EB /* ImportOlympiaNameLedger+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB7C1772BC81F61001216EB /* ImportOlympiaNameLedger+View.swift */; };
 		5BBC43A92BBAC6B0005747B1 /* AppTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC43A82BBAC6B0005747B1 /* AppTextEditor.swift */; };
@@ -811,6 +813,8 @@
 		5BC18AB82D4BE570008F25A5 /* ImportMnemonicGrid+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC18AB62D4BE570008F25A5 /* ImportMnemonicGrid+View.swift */; };
 		5BC82B6C2BED18A1009AC162 /* FactoryReset+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC82B6A2BED18A1009AC162 /* FactoryReset+View.swift */; };
 		5BC82B6D2BED18A1009AC162 /* FactoryReset+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC82B6B2BED18A1009AC162 /* FactoryReset+Reducer.swift */; };
+		5BD1E6DF2D527C87004145D4 /* SpotCheck+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD1E6DE2D527C87004145D4 /* SpotCheck+View.swift */; };
+		5BD1E6E02D527C87004145D4 /* SpotCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BD1E6DD2D527C87004145D4 /* SpotCheck.swift */; };
 		5BE2776B2C9C7FE0005FF976 /* TransactionPreviewOptIns.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE2776A2C9C7FE0005FF976 /* TransactionPreviewOptIns.swift */; };
 		5BEB9CD22C6F6B24001FD9D4 /* HideResource+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEB9CD02C6F6B24001FD9D4 /* HideResource+View.swift */; };
 		5BEB9CD32C6F6B24001FD9D4 /* HIdeResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEB9CD12C6F6B24001FD9D4 /* HIdeResource.swift */; };
@@ -856,7 +860,6 @@
 		83BE7C532D51F40100AF5D28 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 83BE7C522D51F40100AF5D28 /* Sargon */; };
 		83D663B02B271D0100D1AB9E /* TruncationMask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D663AF2B271D0100D1AB9E /* TruncationMask.swift */; };
 		83D908AD2C931A7100822CC4 /* SargonSecureStorageDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D908AC2C931A7100822CC4 /* SargonSecureStorageDriver.swift */; };
-		83DE95432D5A390A00D7A690 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 83DE95422D5A390A00D7A690 /* Sargon */; };
 		83DFAF2E2B4E8A51008B70CE /* View+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83DFAF2D2B4E8A51008B70CE /* View+Extra.swift */; };
 		83EA887E2B7E68EE00FF8424 /* TotalCurrencyWorthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EA887D2B7E68EE00FF8424 /* TotalCurrencyWorthView.swift */; };
 		83EE47502AF027DF00155F03 /* AssetTransferDepositRuleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE474F2AF027DF00155F03 /* AssetTransferDepositRuleTests.swift */; };
@@ -2089,6 +2092,7 @@
 		5BB2C2462D36C66A00286B6B /* FactorSourceAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FactorSourceAccess.swift; sourceTree = "<group>"; };
 		5BB2C2472D36C66A00286B6B /* FactorSourceAccess+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactorSourceAccess+View.swift"; sourceTree = "<group>"; };
 		5BB2C24A2D36C9D200286B6B /* FactorSourceAccess+ViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactorSourceAccess+ViewState.swift"; sourceTree = "<group>"; };
+		5BB65C512D53C33D00052430 /* PrivateFactorSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivateFactorSource.swift; sourceTree = "<group>"; };
 		5BB7C1752BC81F50001216EB /* ImportOlympiaNameLedger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportOlympiaNameLedger.swift; sourceTree = "<group>"; };
 		5BB7C1772BC81F61001216EB /* ImportOlympiaNameLedger+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ImportOlympiaNameLedger+View.swift"; sourceTree = "<group>"; };
 		5BBC43A82BBAC6B0005747B1 /* AppTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTextEditor.swift; sourceTree = "<group>"; };
@@ -2103,6 +2107,8 @@
 		5BC18AB62D4BE570008F25A5 /* ImportMnemonicGrid+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ImportMnemonicGrid+View.swift"; sourceTree = "<group>"; };
 		5BC82B6A2BED18A1009AC162 /* FactoryReset+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactoryReset+View.swift"; sourceTree = "<group>"; };
 		5BC82B6B2BED18A1009AC162 /* FactoryReset+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactoryReset+Reducer.swift"; sourceTree = "<group>"; };
+		5BD1E6DD2D527C87004145D4 /* SpotCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotCheck.swift; sourceTree = "<group>"; };
+		5BD1E6DE2D527C87004145D4 /* SpotCheck+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SpotCheck+View.swift"; sourceTree = "<group>"; };
 		5BE2776A2C9C7FE0005FF976 /* TransactionPreviewOptIns.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionPreviewOptIns.swift; sourceTree = "<group>"; };
 		5BEB9CD02C6F6B24001FD9D4 /* HideResource+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HideResource+View.swift"; sourceTree = "<group>"; };
 		5BEB9CD12C6F6B24001FD9D4 /* HIdeResource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HIdeResource.swift; sourceTree = "<group>"; };
@@ -2632,8 +2638,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				83DE95432D5A390A00D7A690 /* Sargon in Frameworks */,
-				5B68F2A12D4118B000181CD7 /* Sargon in Frameworks */,
+				5B3FBB132D5B436A001D071E /* Sargon in Frameworks */,
+				5B68F2A12D4118B000181CD7 /* (null) in Frameworks */,
 				48FFFABE2ADC209100B2B213 /* NukeUI in Frameworks */,
 				48FFFA9F2ADC1F2700B2B213 /* KeychainAccess in Frameworks */,
 				48FFFAF72ADC241A00B2B213 /* Collections in Frameworks */,
@@ -2809,6 +2815,7 @@
 		48CFBC602ADC10D800E77A5C /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				5BD1E6DC2D527C70004145D4 /* SpotCheck */,
 				5B83D2D72D47FC1E007111B0 /* Authorization */,
 				5B813D042CFF2028001A291D /* ShieldSetup */,
 				A4DBBEB12C20302B00D0A59E /* CardCarousel */,
@@ -5904,6 +5911,7 @@
 		5BB2C2452D36C65400286B6B /* FactorSourceAccess */ = {
 			isa = PBXGroup;
 			children = (
+				5BB65C512D53C33D00052430 /* PrivateFactorSource.swift */,
 				5BB2C2462D36C66A00286B6B /* FactorSourceAccess.swift */,
 				5BB2C2472D36C66A00286B6B /* FactorSourceAccess+View.swift */,
 				5B83D2CE2D47F158007111B0 /* FactorSourceAccess+Models.swift */,
@@ -5939,6 +5947,15 @@
 				5BC18AB62D4BE570008F25A5 /* ImportMnemonicGrid+View.swift */,
 			);
 			path = ImportMnemonicGrid;
+			sourceTree = "<group>";
+		};
+		5BD1E6DC2D527C70004145D4 /* SpotCheck */ = {
+			isa = PBXGroup;
+			children = (
+				5BD1E6DD2D527C87004145D4 /* SpotCheck.swift */,
+				5BD1E6DE2D527C87004145D4 /* SpotCheck+View.swift */,
+			);
+			path = SpotCheck;
 			sourceTree = "<group>";
 		};
 		5BEB9CCF2C6F6AFD001FD9D4 /* HideResource */ = {
@@ -7315,9 +7332,7 @@
 				A415574F2B757C5E0040AD4E /* ComposableArchitecture */,
 				5B1C4FD42BBB0B0C00B9436F /* AppsFlyerLib-Strict */,
 				5B634A932C91D2A0004B2FBC /* ScreenshotPreventing */,
-				5B2A0D782D354D4E0049C702 /* Sargon */,
-				83BE7C522D51F40100AF5D28 /* Sargon */,
-				83DE95422D5A390A00D7A690 /* Sargon */,
+				5B3FBB122D5B436A001D071E /* Sargon */,
 			);
 			productName = RadixWallet;
 			productReference = 48CFBC4F2ADC106300E77A5C /* Radix Wallet Dev.app */;
@@ -7380,7 +7395,7 @@
 				5B1C4FD32BBB0B0C00B9436F /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Strict" */,
 				8318BB172BC8403800057BCB /* XCRemoteSwiftPackageReference "swift-custom-dump" */,
 				5B634A922C91D2A0004B2FBC /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */,
-				83DE95412D5A390A00D7A690 /* XCRemoteSwiftPackageReference "sargon" */,
+				5B3FBB112D5B436A001D071E /* XCRemoteSwiftPackageReference "sargon" */,
 			);
 			productRefGroup = 48CFBC502ADC106300E77A5C /* Products */;
 			projectDirPath = "";
@@ -8029,6 +8044,7 @@
 				E7B7A1052BC904E800EEE900 /* NewConnectionApproval+Reducer.swift in Sources */,
 				48CFC4132ADC10DA00E77A5C /* ErrorQueue+Test.swift in Sources */,
 				48CFC2D02ADC10D900E77A5C /* TransferAccountList+View.swift in Sources */,
+				5BB65C522D53C33D00052430 /* PrivateFactorSource.swift in Sources */,
 				48CFC23F2ADC10D900E77A5C /* PreferenceList.swift in Sources */,
 				48CFC2A52ADC10D900E77A5C /* PersonaDetails+View.swift in Sources */,
 				48CFC5842ADC10DA00E77A5C /* SecureStorageClient+Interface.swift in Sources */,
@@ -8567,6 +8583,8 @@
 				48CFC3492ADC10D900E77A5C /* PersonaDataPermissionBox.swift in Sources */,
 				5B27FC022CC7ECC9002975BE /* Sections+ManifestSummary.swift in Sources */,
 				A408164E2C7E0D08005E65B9 /* TransactionStatus.swift in Sources */,
+				5BD1E6DF2D527C87004145D4 /* SpotCheck+View.swift in Sources */,
+				5BD1E6E02D527C87004145D4 /* SpotCheck.swift in Sources */,
 				5BBC43A92BBAC6B0005747B1 /* AppTextEditor.swift in Sources */,
 				A41266F12B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift in Sources */,
 				48CFC2652ADC10D900E77A5C /* EditPersonaAddEntryKinds.swift in Sources */,
@@ -9441,6 +9459,14 @@
 				version = 6.13.2;
 			};
 		};
+		5B3FBB112D5B436A001D071E /* XCRemoteSwiftPackageReference "sargon" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/radixdlt/sargon/";
+			requirement = {
+				kind = exactVersion;
+				version = 1.1.134;
+			};
+		};
 		5B634A922C91D2A0004B2FBC /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Sajjon/ScreenshotPreventing-iOS";
@@ -9455,14 +9481,6 @@
 			requirement = {
 				kind = exactVersion;
 				version = 1.3.2;
-			};
-		};
-		83DE95412D5A390A00D7A690 /* XCRemoteSwiftPackageReference "sargon" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/radixdlt/sargon";
-			requirement = {
-				kind = exactVersion;
-				version = 1.1.133;
 			};
 		};
 		A415574E2B757C5E0040AD4E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
@@ -9627,8 +9645,9 @@
 			package = 5B1C4FD32BBB0B0C00B9436F /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Strict" */;
 			productName = "AppsFlyerLib-Strict";
 		};
-		5B2A0D782D354D4E0049C702 /* Sargon */ = {
+		5B3FBB122D5B436A001D071E /* Sargon */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 5B3FBB112D5B436A001D071E /* XCRemoteSwiftPackageReference "sargon" */;
 			productName = Sargon;
 		};
 		5B634A932C91D2A0004B2FBC /* ScreenshotPreventing */ = {
@@ -9638,11 +9657,6 @@
 		};
 		83BE7C522D51F40100AF5D28 /* Sargon */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = Sargon;
-		};
-		83DE95422D5A390A00D7A690 /* Sargon */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 83DE95412D5A390A00D7A690 /* XCRemoteSwiftPackageReference "sargon" */;
 			productName = Sargon;
 		};
 		A415574F2B757C5E0040AD4E /* ComposableArchitecture */ = {
