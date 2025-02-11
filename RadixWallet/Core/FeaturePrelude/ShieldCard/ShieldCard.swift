@@ -105,8 +105,8 @@ private extension ShieldCard {
 
 	private var assignedEntitiesText: String {
 		typealias Assigned = L10n.SecurityShields.Assigned
-		let accountsCount = shield.numberOfLinkedAccounts
-		let personasCount = shield.numberOfLinkedPersonas
+		let accountsCount = Int(shield.numberOfLinkedAccounts)
+		let personasCount = Int(shield.numberOfLinkedPersonas)
 
 		var accountsString: String?
 		if accountsCount > 0 {
@@ -132,6 +132,12 @@ enum ShieldCardStatus {
 	case applied
 	case actionRequired
 	case notApplied
+}
+
+extension ShieldForDisplay {
+	var status: ShieldCardStatus {
+		.notApplied
+	}
 }
 
 // -----------------------------------------

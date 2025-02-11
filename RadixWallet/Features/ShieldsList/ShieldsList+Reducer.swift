@@ -108,10 +108,7 @@ struct ShieldsList: FeatureReducer, Sendable {
 
 	private func shieldsEffect() -> Effect<Action> {
 		.run { send in
-			let shields = try SargonOS.shared.securityStructuresOfFactorSources()
-				.map {
-					ShieldForDisplay(metadata: $0.metadata)
-				}
+			let shields = try await SargonOS.shared.getShieldsForDisplay()
 			await send(.internal(.setShields(shields)))
 		} catch: { error, _ in
 			errorQueue.schedule(error)
@@ -119,24 +116,9 @@ struct ShieldsList: FeatureReducer, Sendable {
 	}
 }
 
-// MARK: - ShieldForDisplay
-// TODO: use Sargon model
-struct ShieldForDisplay: Hashable, Sendable {
-	let metadata: SecurityStructureMetadata
-	let numberOfLinkedAccounts: Int = 3
-	let numberOfLinkedPersonas: Int = 2
-
-	let status: ShieldCardStatus
-
+// TODO: use Sargon
+extension ShieldForDisplay {
 	var isMain: Bool {
 		metadata.flags.contains(.main)
-	}
-
-	init(
-		metadata: SecurityStructureMetadata,
-		status: ShieldCardStatus = .notApplied
-	) {
-		self.metadata = metadata
-		self.status = status
 	}
 }
