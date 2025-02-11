@@ -47,7 +47,7 @@ struct OffDeviceMnemonicFactorSourceAccess: Sendable, FeatureReducer {
 				return .none
 			}
 			if state.factorSource.id.spotCheck(input: .software(mnemonicWithPassphrase: mnemonicWithPassphrase)) {
-				return .send(.delegate(.perform(.offDeviceMnemonic(mnemonicWithPassphrase, state.factorSource))))
+				return .send(.delegate(.perform(.offDeviceMnemonic(state.factorSource, mnemonicWithPassphrase))))
 			} else {
 				state.showError = true
 				return .none

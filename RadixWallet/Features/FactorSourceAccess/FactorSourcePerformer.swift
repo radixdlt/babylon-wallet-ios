@@ -9,8 +9,8 @@ enum FactorSourcePerformer: Sendable, Hashable {
 	case device(DeviceFactorSource)
 	case ledger(LedgerHardwareWalletFactorSource)
 	case arculusCard(ArculusCardFactorSource)
-	case offDeviceMnemonic(MnemonicWithPassphrase, OffDeviceMnemonicFactorSource)
-	case password(MnemonicWithPassphrase, PasswordFactorSource)
+	case offDeviceMnemonic(OffDeviceMnemonicFactorSource, MnemonicWithPassphrase)
+	case password(PasswordFactorSource, MnemonicWithPassphrase)
 }
 
 extension FactorSourcePerformer {
@@ -22,9 +22,9 @@ extension FactorSourcePerformer {
 			ledger.asGeneral
 		case let .arculusCard(arculusCard):
 			arculusCard.asGeneral
-		case let .offDeviceMnemonic(_, offDeviceMnemonic):
+		case let .offDeviceMnemonic(offDeviceMnemonic, _):
 			offDeviceMnemonic.asGeneral
-		case let .password(_, password):
+		case let .password(password, _):
 			password.asGeneral
 		}
 	}

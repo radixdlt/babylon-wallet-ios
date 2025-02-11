@@ -59,11 +59,11 @@ private extension SpotCheck {
 				let deviceInfo = try await ledgerHardwareWalletClient.getDeviceInfo()
 				input = .ledger(id: deviceInfo.id)
 
-			case let .offDeviceMnemonic(mnemonicWithPassphrase, _):
+			case let .offDeviceMnemonic(_, mnemonicWithPassphrase):
 				input = .software(mnemonicWithPassphrase: mnemonicWithPassphrase)
 
 			default:
-				fatalError("")
+				fatalError("Not supported")
 			}
 			if factorSource.factorSource.spotCheck(input: input) {
 				await send(.delegate(.validated))
