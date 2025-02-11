@@ -101,9 +101,9 @@ extension OffDeviceMnemonicFactorSourceAccess.State {
 
 	var hint: Hint.ViewState? {
 		if lastSpotCheckFailed {
-			Hint.ViewState.iconError(L10n.FactorSourceActions.OffDeviceMnemonic.incorrect)
+			Hint.ViewState.iconError(L10n.FactorSourceActions.OffDeviceMnemonic.wrong)
 		} else if status == .invalid {
-			Hint.ViewState.iconError("Invalid mnemonic")
+			Hint.ViewState.iconError(L10n.FactorSourceActions.OffDeviceMnemonic.invalid)
 		} else {
 			nil
 		}

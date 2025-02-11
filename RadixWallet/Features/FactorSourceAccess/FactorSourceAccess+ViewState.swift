@@ -106,7 +106,7 @@ extension FactorSourceAccess.State {
 		case .signature:
 			L10n.FactorSourceActions.useDifferentFactor
 		case let .spotCheck(allowSkip):
-			allowSkip ? "Ignore" : nil
+			allowSkip ? L10n.FactorSourceActions.ignore : nil
 		case .proveOwnership, .encryptMessage, .updateFactorConfig, .deriveAccounts, .createAccountAuthorization, .createPersonaAuthorization:
 			nil
 		}
