@@ -34,7 +34,7 @@ struct Signing: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case skippedFactorSource
+		case skipped
 		case cancelled
 		case finished(Signatures)
 	}
@@ -57,8 +57,8 @@ struct Signing: Sendable, FeatureReducer {
 			sign(purpose: state.purpose, factorSource: factorSource)
 		case .factorSourceAccess(.delegate(.cancel)):
 			.send(.delegate(.cancelled))
-//		case .factorSourceAccess(.delegate(.skip)):
-//			.send(.delegate(.skipped))
+		case .factorSourceAccess(.delegate(.skip)):
+			.send(.delegate(.skipped))
 		default:
 			.none
 		}

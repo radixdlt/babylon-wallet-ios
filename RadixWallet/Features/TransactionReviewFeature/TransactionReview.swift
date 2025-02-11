@@ -323,8 +323,9 @@ struct TransactionReview: Sendable, FeatureReducer {
 				)
 				await send(.internal(.notarizeResult(.success(notarizedTransaction))))
 			} catch: { error, send in
+				await send(.internal(.resetToApprovable))
 				if let error = error as? CommonError, error == .HostInteractionAborted {
-					await send(.internal(.resetToApprovable))
+					// We don't show any error since user aborted signing intentionally
 				} else {
 					errorQueue.schedule(error)
 				}
