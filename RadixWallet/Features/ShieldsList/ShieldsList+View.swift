@@ -1,6 +1,6 @@
 extension ShieldsList.State {
 	var main: ShieldForDisplay? {
-		shields.first(where: \.isMain)
+		shields.first(where: \.metadata.isMain)
 	}
 
 	var others: [ShieldForDisplay] {

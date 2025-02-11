@@ -115,10 +115,3 @@ struct ShieldsList: FeatureReducer, Sendable {
 		}
 	}
 }
-
-// TODO: use Sargon
-extension ShieldForDisplay {
-	var isMain: Bool {
-		metadata.flags.contains(.main)
-	}
-}
