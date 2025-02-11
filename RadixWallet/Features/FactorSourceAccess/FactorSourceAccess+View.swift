@@ -84,8 +84,8 @@ extension FactorSourceAccess {
 
 		@ViewBuilder
 		private var skip: some SwiftUI.View {
-			if store.isSkipEnabled {
-				Button(L10n.FactorSourceActions.useDifferentFactor) {
+			if let text = store.skipButtonText {
+				Button(text) {
 					store.send(.view(.skipButtonTapped))
 				}
 				.buttonStyle(.primaryText(height: .standardButtonHeight))

@@ -219,8 +219,8 @@ extension DeviceInfo {
 }
 
 extension MnemonicWithPassphrase {
-	static let testValueZooVote: Self = .init(mnemonic: .testValueZooVote, passphrase: "")
-	static let testValueAbandonArt: Self = .init(mnemonic: .testValueAbandonArt, passphrase: "")
+	static let testValueZooVote: Self = .init(mnemonic: .testValueZooVote)
+	static let testValueAbandonArt: Self = .init(mnemonic: .testValueAbandonArt)
 }
 
 extension PrivateHierarchicalDeterministicFactorSource {

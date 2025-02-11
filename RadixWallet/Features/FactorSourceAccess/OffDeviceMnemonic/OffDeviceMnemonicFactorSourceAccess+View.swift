@@ -31,9 +31,3 @@ private extension StoreOf<OffDeviceMnemonicFactorSourceAccess> {
 		scope(state: \.grid, action: \.child.grid)
 	}
 }
-
-private extension OffDeviceMnemonicFactorSourceAccess.State {
-	var hint: Hint.ViewState? {
-		showError ? Hint.ViewState.iconError(L10n.FactorSourceActions.OffDeviceMnemonic.incorrect) : nil
-	}
-}

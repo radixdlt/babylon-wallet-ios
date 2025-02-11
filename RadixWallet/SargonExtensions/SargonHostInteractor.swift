@@ -116,6 +116,20 @@ final class SargonHostInteractor: HostInteractor {
 	}
 
 	func spotCheck(factorSource: FactorSource, allowSkip: Bool) async throws -> SpotCheckResponse {
-		fatalError()
+		let action = await overlayWindowClient.spotCheck(factorSource: factorSource, allowSkip: allowSkip)
+
+		switch action {
+		case .spotCheck(.cancelled):
+			throw CommonError.HostInteractionAborted
+
+		case .spotCheck(.skipped):
+			return .skipped
+
+		case .spotCheck(.validated):
+			return .valid
+
+		default:
+			fatalError("Unexpected action")
+		}
 	}
 }

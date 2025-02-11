@@ -217,7 +217,7 @@ struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 				return fail(error: nil)
 			}
 
-			let privateHDFactorSource = try PrivateHierarchicalDeterministicFactorSource(
+			let privateHDFactorSource = PrivateHierarchicalDeterministicFactorSource(
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
 				factorSource: factorSource
 			)
@@ -238,11 +238,5 @@ struct MnemonicDidNotValidateAllAccounts: LocalizedError {
 }
 
 extension OverlayWindowClient.Item.HUD {
-	fileprivate static let wrongMnemonic = Self(
-		text: L10n.ImportMnemonic.wrongMnemonicHUD,
-		icon: .init(
-			kind: .system("exclamationmark.octagon"),
-			foregroundColor: Color.app.red1
-		)
-	)
+	fileprivate static let wrongMnemonic = Self.failure(text: L10n.ImportMnemonic.wrongMnemonicHUD)
 }
