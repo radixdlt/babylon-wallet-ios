@@ -1760,6 +1760,8 @@ internal enum L10n {
     }
   }
   internal enum FactorSourceActions {
+    /// Ignore
+    internal static let ignore = L10n.tr("Localizable", "factorSourceActions_ignore", fallback: "Ignore")
     /// Use a different factor
     internal static let useDifferentFactor = L10n.tr("Localizable", "factorSourceActions_useDifferentFactor", fallback: "Use a different factor")
     internal enum Arculus {
@@ -1803,12 +1805,14 @@ internal enum L10n {
       internal static let signMessage = L10n.tr("Localizable", "factorSourceActions_ledger_signMessage", fallback: "Use your **Ledger Nano** to sign. Make sure it’s connected to a computer with a linked Radix Connector browser extension.\n**Complete signing on the device.**")
     }
     internal enum OffDeviceMnemonic {
-      /// Incorrect mnemonic
-      internal static let incorrect = L10n.tr("Localizable", "factorSourceActions_offDeviceMnemonic_incorrect", fallback: "Incorrect mnemonic")
+      /// Invalid mnemonic
+      internal static let invalid = L10n.tr("Localizable", "factorSourceActions_offDeviceMnemonic_invalid", fallback: "Invalid mnemonic")
       /// Enter this **mnemonic**
       internal static let message = L10n.tr("Localizable", "factorSourceActions_offDeviceMnemonic_message", fallback: "Enter this **mnemonic**")
       /// Enter this **mnemonic** to sign
       internal static let signMessage = L10n.tr("Localizable", "factorSourceActions_offDeviceMnemonic_signMessage", fallback: "Enter this **mnemonic** to sign")
+      /// Wrong mnemonic
+      internal static let wrong = L10n.tr("Localizable", "factorSourceActions_offDeviceMnemonic_wrong", fallback: "Wrong mnemonic")
     }
     internal enum Password {
       /// Password
