@@ -114,4 +114,8 @@ final class SargonHostInteractor: HostInteractor {
 			fatalError("Unexpected action")
 		}
 	}
+
+	func spotCheck(factorSource: FactorSource, allowSkip: Bool) async throws -> SpotCheckResponse {
+		fatalError()
+	}
 }
