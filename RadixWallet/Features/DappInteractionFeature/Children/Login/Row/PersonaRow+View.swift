@@ -53,12 +53,12 @@ extension PersonaRow {
 
 					Spacer()
 
-					if let isSelected, let selectionType {
+					if case let .selection(selectionType, isSelected, _) = mode {
 						switch selectionType {
 						case .radioButton:
 							RadioButton(
 								appearance: .dark,
-								state: isSelected ? .selected : .unselected
+								isSelected: isSelected
 							)
 							.padding(.leading, .small3)
 						case .checkmark:
@@ -92,24 +92,6 @@ extension PersonaRow {
 }
 
 extension PersonaRow.View {
-	var selectionType: SelectionType? {
-		switch mode {
-		case let .selection(selectionType, _, _):
-			selectionType
-		case .display:
-			nil
-		}
-	}
-
-	var isSelected: Bool? {
-		switch mode {
-		case let .selection(_, isSelected, _):
-			isSelected
-		case .display:
-			nil
-		}
-	}
-
 	var action: (() -> Void)? {
 		switch mode {
 		case let .selection(_, _, action):

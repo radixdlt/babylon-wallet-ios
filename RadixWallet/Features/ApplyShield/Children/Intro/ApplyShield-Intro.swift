@@ -68,19 +68,14 @@ extension ApplyShield {
 			}
 		}
 
+		// TODO: replace this whole function with a call to Sargon
 		private func checkXRDBalanceEffect() -> Effect<Action> {
 			.run { send in
 				let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
 				let entities = try await onLedgerEntitiesClient.getAccounts(accounts.map(\.address), cachingStrategy: .forceUpdate)
-				let hasEnoughXRD = accounts.contains { account in
-					guard let entity = entities.first(where: { $0.address == account.address }) else {
-						assertionFailure("Failed to find account, this should never happen.")
-						return false
-					}
-
+				let hasEnoughXRD = entities.contains { entity in
 					let xrdBalance = entity.fungibleResources.xrdResource?.amount.exactAmount?.nominalAmount ?? 0
 					let hasEnoughXRD = xrdBalance >= 10 // TODO: define a constant in Sargon
-
 					return hasEnoughXRD
 				}
 

@@ -84,7 +84,7 @@ extension OneTimePersonaData {
 					accessory: {
 						RadioButton(
 							appearance: .dark,
-							state: item.isSelected ? .selected : .unselected
+							isSelected: item.isSelected
 						)
 					}
 				)

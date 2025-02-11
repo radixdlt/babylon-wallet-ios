@@ -32,7 +32,7 @@ struct ShieldCard: View {
 			if case let .selection(isSelected) = mode {
 				RadioButton(
 					appearance: .dark,
-					state: isSelected ? .selected : .unselected
+					isSelected: isSelected
 				)
 			}
 		}

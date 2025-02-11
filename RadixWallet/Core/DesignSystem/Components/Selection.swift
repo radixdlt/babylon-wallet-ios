@@ -47,7 +47,7 @@ struct Selection<Value: Hashable, Content: View>: View {
 	var showSelectAll: Bool = false
 	let content: (Item) -> Content
 
-	private var isFullySelected: Bool {
+	private var haveSelectedAll: Bool {
 		selectedValues == Set(values)
 	}
 
@@ -92,8 +92,8 @@ struct Selection<Value: Hashable, Content: View>: View {
 	var body: some View {
 		VStack(spacing: .medium2) {
 			if showSelectAll, requirement != .exactly(1), values.count > 1 {
-				Button(isFullySelected ? L10n.ShieldWizardApplyShield.ChooseEntities.deselectAllButton : L10n.ShieldWizardApplyShield.ChooseEntities.selectAllButton) {
-					if isFullySelected {
+				Button(haveSelectedAll ? L10n.ShieldWizardApplyShield.ChooseEntities.deselectAllButton : L10n.ShieldWizardApplyShield.ChooseEntities.selectAllButton) {
+					if haveSelectedAll {
 						selectedValues = []
 					} else {
 						selectedValues = Set(values)
