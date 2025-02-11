@@ -5,13 +5,13 @@ extension ApplyShield {
 		struct State: Sendable, Hashable {
 			let shieldID: SecurityStructureId
 			var shieldName: DisplayName?
-			var hasEnoughXRD: Bool?
+			var hasEnoughXRD: Loadable<Bool> = .idle
 		}
 
 		typealias Action = FeatureAction<Self>
 
 		enum ViewAction: Sendable, Equatable {
-			case task
+			case onFirstAppear
 			case startApplyingButtonTapped
 			case skipButtonTapped
 		}
@@ -36,9 +36,9 @@ extension ApplyShield {
 
 		func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
-			case .task:
+			case .onFirstAppear:
 				setShieldNameEffect(shieldID: state.shieldID)
-					.merge(with: checkXRDBalanceEffect())
+					.merge(with: checkXRDBalanceEffect(state: &state))
 			case .startApplyingButtonTapped:
 				.send(.delegate(.started))
 			case .skipButtonTapped:
@@ -52,7 +52,7 @@ extension ApplyShield {
 				state.shieldName = name
 				return .none
 			case let .setHasEnoughXRD(hasEnoughXRD):
-				state.hasEnoughXRD = hasEnoughXRD
+				state.hasEnoughXRD = .success(hasEnoughXRD)
 				return .none
 			}
 		}
@@ -69,8 +69,9 @@ extension ApplyShield {
 		}
 
 		// TODO: replace this whole function with a call to Sargon
-		private func checkXRDBalanceEffect() -> Effect<Action> {
-			.run { send in
+		private func checkXRDBalanceEffect(state: inout State) -> Effect<Action> {
+			state.hasEnoughXRD = .loading
+			return .run { send in
 				let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
 				let entities = try await onLedgerEntitiesClient.getAccounts(accounts.map(\.address), cachingStrategy: .forceUpdate)
 				let hasEnoughXRD = entities.contains { entity in
