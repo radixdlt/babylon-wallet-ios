@@ -3,7 +3,7 @@
 struct FactorSourceAccess: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
-		let id: FactorSourceIdFromHash?
+		let id: FactorSourceId
 		let purpose: Purpose
 		var factorSource: FactorSource?
 
@@ -14,7 +14,18 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 		var offDeviceMnemonic: OffDeviceMnemonicFactorSourceAccess.State?
 
 		var kind: FactorSourceKind {
-			id?.kind ?? .device
+			id.kind
+		}
+
+		init(id: FactorSourceIdFromHash, purpose: Purpose) {
+			self.id = id.asGeneral
+			self.purpose = purpose
+		}
+
+		init(factorSource: FactorSource, purpose: Purpose) {
+			self.id = factorSource.id
+			self.factorSource = factorSource
+			self.purpose = purpose
 		}
 	}
 
@@ -39,7 +50,7 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Hashable {
-		case perform(FactorSource)
+		case perform(PrivateFactorSource)
 		case cancel
 		case skip
 	}
@@ -90,10 +101,10 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 				.merge(with: checkP2PLinksEffect(state: state))
 
 		case .retryButtonTapped:
-			guard let factorSource = state.factorSource else {
+			guard let privateFactorSource = state.factorSource?.asPrivate else {
 				return .none
 			}
-			return .send(.delegate(.perform(factorSource)))
+			return .send(.delegate(.perform(privateFactorSource)))
 
 		case .skipButtonTapped:
 			return .send(.delegate(.skip))
@@ -110,11 +121,16 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 				assertionFailure("No Factor Source found on Profile for id: \(String(describing: state.id))")
 				return .send(.delegate(.cancel))
 			}
-
 			state.factorSource = factorSource
 			switch factorSource {
-			case .device, .ledger, .arculusCard:
-				return .send(.delegate(.perform(factorSource)))
+			case let .device(value):
+				return .send(.delegate(.perform(.device(value))))
+
+			case let .ledger(value):
+				return .send(.delegate(.perform(.ledger(value))))
+
+			case let .arculusCard(value):
+				return .send(.delegate(.perform(.arculusCard(value))))
 
 			case let .password(value):
 				state.password = .init(factorSource: value)
@@ -133,6 +149,16 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 		}
 	}
 
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+		switch childAction {
+		case let .offDeviceMnemonic(.delegate(.perform(factorSource))):
+			.send(.delegate(.perform(factorSource)))
+
+		default:
+			.none
+		}
+	}
+
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .errorAlert(.okTapped):
@@ -148,14 +174,14 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 
 private extension FactorSourceAccess {
 	func fetchFactorSource(state: State) -> Effect<Action> {
-		.run { [id = state.id] send in
-			if let id {
-				let factorSource = try await factorSourcesClient.getFactorSource(id: id.asGeneral)
+		if let factorSource = state.factorSource {
+			// FactorSource was provided on init, no need to fetch it
+			.send(.internal(.setFactorSource(factorSource)))
+		} else {
+			// Fetch FactorSource from its id
+			.run { [id = state.id] send in
+				let factorSource = try await factorSourcesClient.getFactorSource(id: id)
 				await send(.internal(.setFactorSource(factorSource)))
-			} else {
-				// If no id is set, we need to get main BDFS
-				let mainBdfs = try SargonOS.shared.mainBdfs()
-				await send(.internal(.setFactorSource(mainBdfs.asGeneral)))
 			}
 		}
 	}
@@ -183,6 +209,21 @@ private extension AlertState<FactorSourceAccess.Destination.ErrorAlert> {
 			}
 		} message: {
 			TextState(L10n.LedgerHardwareDevices.LinkConnectorAlert.message)
+		}
+	}
+}
+
+private extension FactorSource {
+	var asPrivate: PrivateFactorSource? {
+		switch self {
+		case let .device(value):
+			.device(value)
+		case let .ledger(value):
+			.ledger(value)
+		case let .arculusCard(value):
+			.arculusCard(value)
+		case .offDeviceMnemonic, .password:
+			nil // User needs to manually input it
 		}
 	}
 }

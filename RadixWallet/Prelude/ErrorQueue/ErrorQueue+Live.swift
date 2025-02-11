@@ -13,8 +13,8 @@ extension ErrorQueue: DependencyKey {
 					return
 				}
 
-				if let commonError = error as? CommonError, commonError == .HostInteractionAborted {
-					loggerGlobal.info("Ignroing HostInteractionAborted error ")
+				if error.isHostInteractionAborted {
+					loggerGlobal.info("Ignoring HostInteractionAborted error ")
 					return
 				}
 

@@ -63,7 +63,7 @@ extension FactorSourceDetail {
 				subtitle: L10n.FactorSources.Detail.testCanUse,
 				markdown: viewStore.lastUsed,
 				icon: .systemImage("checkmark.circle"),
-				action: .renameTapped
+				action: .spotCheckTapped
 			)
 		}
 
@@ -119,6 +119,7 @@ private extension View {
 		return rename(with: destinationStore)
 			.displayMnemonic(with: destinationStore)
 			.importMnemonics(with: destinationStore)
+			.spotCheckAlert(with: destinationStore)
 	}
 
 	private func rename(with destinationStore: PresentationStoreOf<FactorSourceDetail.Destination>) -> some View {
@@ -137,5 +138,9 @@ private extension View {
 		sheet(store: destinationStore.scope(state: \.importMnemonics, action: \.importMnemonics)) {
 			ImportMnemonicsFlowCoordinator.View(store: $0)
 		}
+	}
+
+	private func spotCheckAlert(with destinationStore: PresentationStoreOf<FactorSourceDetail.Destination>) -> some View {
+		alert(store: destinationStore.scope(state: \.spotCheckAlert, action: \.spotCheckAlert))
 	}
 }

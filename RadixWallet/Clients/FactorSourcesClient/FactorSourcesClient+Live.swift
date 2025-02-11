@@ -190,7 +190,7 @@ extension FactorSourcesClient: DependencyKey {
 					mnemonic: mnemonicClient.generate(
 						BIP39WordCount.twentyFour,
 						BIP39Language.english
-					), passphrase: ""
+					)
 				)
 
 				loggerGlobal.info("Creating new main BDFS")
