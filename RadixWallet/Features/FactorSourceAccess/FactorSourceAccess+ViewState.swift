@@ -100,14 +100,15 @@ extension FactorSourceAccess.State {
 		}
 	}
 
-	var isSkipEnabled: Bool {
+	/// Returns the text to use for the Skip button, nil if is such button shouldn't be visible
+	var skipButtonText: String? {
 		switch purpose {
 		case .signature:
-			true
+			L10n.FactorSourceActions.useDifferentFactor
 		case let .spotCheck(allowSkip):
-			allowSkip
+			allowSkip ? "Ignore" : nil
 		case .proveOwnership, .encryptMessage, .updateFactorConfig, .deriveAccounts, .createAccountAuthorization, .createPersonaAuthorization:
-			false
+			nil
 		}
 	}
 }

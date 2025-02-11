@@ -38,6 +38,8 @@ struct SpotCheck: Sendable, FeatureReducer {
 		switch childAction {
 		case let .factorSourceAccess(.delegate(.perform(factorSource))):
 			perform(factorSource: factorSource)
+		case .factorSourceAccess(.delegate(.skip)):
+			.send(.delegate(.skipped))
 		case .factorSourceAccess(.delegate(.cancel)):
 			.send(.delegate(.cancelled))
 		default:
