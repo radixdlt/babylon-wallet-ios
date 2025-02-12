@@ -183,6 +183,8 @@ extension DappToWalletInteraction {
 			[
 				.signSubintent(items.request),
 			]
+		case .batchOfTransactions:
+			unimplemented("Batch of TX not supported yet")
 		}
 	}
 }
@@ -332,6 +334,9 @@ extension WalletToDappInteractionSuccessResponse {
 				interactionId: interaction.interactionId,
 				items: .preAuthorization(preAuthorization)
 			)
+
+		case .batchOfTransactions:
+			unimplemented("Batch of TX not supported yet")
 		}
 	}
 }
