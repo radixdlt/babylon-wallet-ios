@@ -294,6 +294,12 @@ extension InteractionReview.Sections {
 				deposits: deposits,
 				accountDeletion: deleteAccounts
 			)
+
+		case let .securifyEntity(entityAddress, provisionalSecurityStructureMetadata):
+			fatalError("TODO")
+
+		case .generalSubintent:
+			fatalError("TODO")
 		}
 	}
 
@@ -742,7 +748,7 @@ extension [AccountAddress: [ResourceIndicator]] {
 extension ResourceIndicator {
 	var isGuaranteedAmount: Bool {
 		switch self {
-		case .fungible(_, .guaranteed), .nonFungible(_, .byIds):
+		case .fungible(_, .guaranteed), .nonFungible(_, .guaranteed):
 			return true
 		default:
 			assertionFailure("Cannot sum up the predicted amounts")
@@ -788,8 +794,8 @@ extension FungibleResourceIndicator {
 extension NonFungibleResourceIndicator {
 	func adding(_ other: Self) -> Self {
 		switch (self, other) {
-		case let (.byIds(ids), .byIds(otherIds)):
-			return .byIds(ids: ids + otherIds)
+		case let (.guaranteed(ids), .guaranteed(otherIds)):
+			return .guaranteed(ids: ids + otherIds)
 		default:
 			assertionFailure("Cannot sum up the predicted amounts")
 			return self

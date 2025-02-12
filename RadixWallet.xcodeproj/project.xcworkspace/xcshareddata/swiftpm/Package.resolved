@@ -1,5 +1,5 @@
 {
-  "originHash" : "cdc115bb25c110d5ce0486734b8147ec53e0b1fd94eb0bdd237449443ec30408",
+  "originHash" : "f85946075d666a0d79181631b2a2feca09d3d1abec048a8a14a0097dd6697c61",
   "pins" : [
     {
       "identity" : "anycodable",
@@ -98,15 +98,6 @@
       "state" : {
         "revision" : "33f7e93be5d4ec027d42af77a8ec4680d1862ad2",
         "version" : "11.6.4"
-      }
-    },
-    {
-      "identity" : "sargon",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/radixdlt/sargon",
-      "state" : {
-        "revision" : "0cf5b6fc5e7cce6d0847500eb7571724f21b1920",
-        "version" : "1.1.137"
       }
     },
     {
