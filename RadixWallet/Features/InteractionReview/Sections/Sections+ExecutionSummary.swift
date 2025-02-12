@@ -43,6 +43,9 @@ extension InteractionReview.Sections {
 		case nil:
 			return nil
 
+		case .generalSubintent:
+			return nil
+
 		case .general, .transfer:
 			if summary.detailedManifestClass == .general {
 				guard !summary.deposits.isEmpty || !summary.withdrawals.isEmpty else { return nil }
@@ -742,7 +745,7 @@ extension [AccountAddress: [ResourceIndicator]] {
 extension ResourceIndicator {
 	var isGuaranteedAmount: Bool {
 		switch self {
-		case .fungible(_, .guaranteed), .nonFungible(_, .byIds):
+		case .fungible(_, .guaranteed), .nonFungible(_, .guaranteed):
 			return true
 		default:
 			assertionFailure("Cannot sum up the predicted amounts")
@@ -788,8 +791,8 @@ extension FungibleResourceIndicator {
 extension NonFungibleResourceIndicator {
 	func adding(_ other: Self) -> Self {
 		switch (self, other) {
-		case let (.byIds(ids), .byIds(otherIds)):
-			return .byIds(ids: ids + otherIds)
+		case let (.guaranteed(ids), .guaranteed(otherIds)):
+			return .guaranteed(ids: ids + otherIds)
 		default:
 			assertionFailure("Cannot sum up the predicted amounts")
 			return self
