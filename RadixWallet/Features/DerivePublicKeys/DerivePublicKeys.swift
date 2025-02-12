@@ -70,6 +70,12 @@ private extension DerivePublicKeys {
 			case let .ledger(ledger):
 				try await ledgerHardwareWalletClient.derivePublicKeys(.init(ledger: ledger, input: input))
 
+			case let .offDeviceMnemonic(_, mnemonicWithPassphrase):
+				mnemonicWithPassphrase.derivePublicKeys(
+					paths: input.derivationPaths,
+					factorSourceId: input.factorSourceId
+				)
+
 			default:
 				fatalError("Not implemented")
 			}
