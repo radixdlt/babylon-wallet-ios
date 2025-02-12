@@ -21,7 +21,7 @@ extension Account {
 	var derivationIndex: HdPathComponent {
 		guard let unsecuredControllingFactorInstance else {
 			// TODO: Remove, temporary to accomodate securified state
-			return HdPathComponent.securifiedComponent(.init(localKeySpace: 0))
+			return try! HdPathComponent.securifiedComponent(.init(localKeySpace: 0))
 		}
 
 		return unsecuredControllingFactorInstance.derivationPath.lastPathComponent
