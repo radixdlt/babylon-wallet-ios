@@ -44,18 +44,25 @@ struct Selection<Value: Hashable, Content: View>: View {
 	var selectedValues: Set<Value>
 	let values: OrderedSet<Value>
 	let requirement: SelectionRequirement
+	var showSelectAll: Bool = false
 	let content: (Item) -> Content
+
+	private var haveSelectedAll: Bool {
+		selectedValues == Set(values)
+	}
 
 	init(
 		_ selection: Binding<[Value]?>,
 		from values: some Sequence<Value>,
 		requiring requirement: SelectionRequirement,
+		showSelectAll: Bool = false,
 		@ViewBuilder content: @escaping (Item) -> Content
 	) {
 		self._selection = selection
 		self.selectedValues = selection.wrappedValue.map(Set.init) ?? []
 		self.values = OrderedSet(values)
 		self.requirement = requirement
+		self.showSelectAll = showSelectAll
 		self.content = content
 	}
 
@@ -83,44 +90,59 @@ struct Selection<Value: Hashable, Content: View>: View {
 	}
 
 	var body: some View {
-		ForEach(values, id: \.self) { value in
-			let isDisabled: Bool = {
-				guard !selectedValues.contains(value) else {
-					return false
-				}
-				switch requirement {
-				case let .exactly(count):
-					if count == 1 {
-						return false
+		VStack(spacing: .medium2) {
+			if showSelectAll, requirement != .exactly(1), values.count > 1 {
+				Button(haveSelectedAll ? L10n.ShieldWizardApplyShield.ChooseEntities.deselectAllButton : L10n.ShieldWizardApplyShield.ChooseEntities.selectAllButton) {
+					if haveSelectedAll {
+						selectedValues = []
 					} else {
-						return selectedValues.count >= count
+						selectedValues = Set(values)
 					}
-				case .atLeast:
-					return false
 				}
-			}()
-			content(
-				Item(
-					value: value,
-					isSelected: selectedValues.contains(value),
-					isDisabled: isDisabled,
-					action: {
-						if requirement == .exactly(1) {
-							if !selectedValues.contains(value) {
-								selectedValues.removeAll()
-								selectedValues.insert(value)
-							}
+				.buttonStyle(.blueText(textStyle: .secondaryHeader))
+				.flushedRight
+				.padding(.trailing, .small1)
+			}
+
+			ForEach(values, id: \.self) { value in
+				let isDisabled: Bool = {
+					guard !selectedValues.contains(value) else {
+						return false
+					}
+					switch requirement {
+					case let .exactly(count):
+						if count == 1 {
+							return false
 						} else {
-							if selectedValues.contains(value) {
-								selectedValues.remove(value)
+							return selectedValues.count >= count
+						}
+					case .atLeast:
+						return false
+					}
+				}()
+				content(
+					Item(
+						value: value,
+						isSelected: selectedValues.contains(value),
+						isDisabled: isDisabled,
+						action: {
+							if requirement == .exactly(1) {
+								if !selectedValues.contains(value) {
+									selectedValues.removeAll()
+									selectedValues.insert(value)
+								}
 							} else {
-								selectedValues.insert(value)
+								if selectedValues.contains(value) {
+									selectedValues.remove(value)
+								} else {
+									selectedValues.insert(value)
+								}
 							}
 						}
-					}
+					)
 				)
-			)
-			.disabled(isDisabled)
+				.disabled(isDisabled)
+			}
 		}
 		.onAppear {
 			updateResult(with: selectedValues, in: values, requiring: requirement)

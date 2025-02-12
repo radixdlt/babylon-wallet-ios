@@ -62,14 +62,14 @@ struct DeleteAccountConfirmation: Sendable, FeatureReducer {
 				let result = await TaskResult {
 					let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
 					let entities = try await onLedgerEntitiesClient.getAccounts(accounts.map(\.address), cachingStrategy: .forceUpdate)
-					return accounts.compactMap { account -> State.ReceivingAccountCandidate? in
+					return try accounts.compactMap { account -> State.ReceivingAccountCandidate? in
 						guard let entity = entities.first(where: { $0.address == account.address }) else {
 							assertionFailure("Failed to find account, this should never happen.")
 							return nil
 						}
 
 						let xrdBalance = entity.fungibleResources.xrdResource?.amount.exactAmount?.nominalAmount ?? 0
-						let hasEnoughXRD = xrdBalance >= State.ReceivingAccountCandidate.minimumRequiredXRD
+						let hasEnoughXRD = try xrdBalance >= Decimal192(SharedConstants.minRequiredXrdForAccountDeletion)
 
 						return .init(account: account, hasEnoughXRD: hasEnoughXRD)
 					}
@@ -99,7 +99,5 @@ extension DeleteAccountConfirmation.State {
 	struct ReceivingAccountCandidate: Sendable, Hashable {
 		let account: Account
 		let hasEnoughXRD: Bool
-
-		static let minimumRequiredXRD: Decimal192 = 4
 	}
 }

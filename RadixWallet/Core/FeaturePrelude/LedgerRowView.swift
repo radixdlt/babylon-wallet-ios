@@ -53,7 +53,7 @@ struct LedgerRowView: View {
 				if let isSelected {
 					RadioButton(
 						appearance: .light,
-						state: isSelected ? .selected : .unselected
+						isSelected: isSelected
 					)
 				}
 			}
