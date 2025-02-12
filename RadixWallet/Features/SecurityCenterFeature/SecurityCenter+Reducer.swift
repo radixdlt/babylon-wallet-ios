@@ -23,6 +23,7 @@ struct SecurityCenter: Sendable, FeatureReducer {
 			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
 			case securityShieldsSetup(ShieldSetupCoordinator.State)
 			case securityShieldsList(ShieldsList.State)
+			case applyShield(ApplyShield.Coordinator.State)
 		}
 
 		@CasePathable
@@ -33,6 +34,7 @@ struct SecurityCenter: Sendable, FeatureReducer {
 			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
 			case securityShieldsSetup(ShieldSetupCoordinator.Action)
 			case securityShieldsList(ShieldsList.Action)
+			case applyShield(ApplyShield.Coordinator.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -54,6 +56,9 @@ struct SecurityCenter: Sendable, FeatureReducer {
 			Scope(state: \.securityShieldsList, action: \.securityShieldsList) {
 				ShieldsList()
 			}
+			Scope(state: \.applyShield, action: \.applyShield) {
+				ApplyShield.Coordinator()
+			}
 		}
 	}
 
@@ -69,7 +74,7 @@ struct SecurityCenter: Sendable, FeatureReducer {
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(destinationPath, action: /Action.destination) {
+			.ifLet(destinationPath, action: \.destination) {
 				Destination()
 			}
 	}
@@ -134,9 +139,14 @@ struct SecurityCenter: Sendable, FeatureReducer {
 		     .importMnemonics(.delegate(.finishedImportingMnemonics)):
 			state.destination = nil
 			return .none
-		case .securityShieldsSetup(.delegate(.finished)):
-			// TODO: Apply shield flow
+		case let .securityShieldsSetup(.delegate(.finished(shieldID))):
+			state.destination = .applyShield(.init(shieldID: shieldID))
+			return .none
+		case .applyShield(.delegate(.skipped)):
 			state.destination = .securityShieldsList(.init())
+			return .none
+		case .applyShield(.delegate(.finished)):
+			state.destination = nil
 			return .none
 		default:
 			return .none

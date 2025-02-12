@@ -217,6 +217,7 @@ private extension View {
 			.importMnemonics(with: destinationStore)
 			.securityShieldsSetup(with: destinationStore)
 			.securityShieldsList(with: destinationStore)
+			.applyShield(with: destinationStore)
 	}
 
 	private func configurationBackup(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
@@ -252,6 +253,12 @@ private extension View {
 	private func securityShieldsList(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.securityShieldsList, action: \.securityShieldsList)) {
 			ShieldsList.View(store: $0)
+		}
+	}
+
+	private func applyShield(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
+		fullScreenCover(store: destinationStore.scope(state: \.applyShield, action: \.applyShield)) {
+			ApplyShield.Coordinator.View(store: $0)
 		}
 	}
 }

@@ -102,6 +102,7 @@ private extension View {
 		let destinationStore = store.destination
 		return securityShieldsSetup(with: destinationStore)
 			.changeMain(with: destinationStore)
+			.applyShield(with: destinationStore)
 	}
 
 	private func securityShieldsSetup(with destinationStore: PresentationStoreOf<ShieldsList.Destination>) -> some View {
@@ -113,6 +114,12 @@ private extension View {
 	private func changeMain(with destinationStore: PresentationStoreOf<ShieldsList.Destination>) -> some View {
 		sheet(store: destinationStore.scope(state: \.changeMain, action: \.changeMain)) {
 			ChangeMainShield.View(store: $0)
+		}
+	}
+
+	private func applyShield(with destinationStore: PresentationStoreOf<ShieldsList.Destination>) -> some View {
+		fullScreenCover(store: destinationStore.scope(state: \.applyShield, action: \.applyShield)) {
+			ApplyShield.Coordinator.View(store: $0)
 		}
 	}
 }

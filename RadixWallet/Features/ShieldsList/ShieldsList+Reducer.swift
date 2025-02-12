@@ -34,12 +34,14 @@ struct ShieldsList: FeatureReducer, Sendable {
 		enum State: Sendable, Hashable {
 			case securityShieldsSetup(ShieldSetupCoordinator.State)
 			case changeMain(ChangeMainShield.State)
+			case applyShield(ApplyShield.Coordinator.State)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
 			case securityShieldsSetup(ShieldSetupCoordinator.Action)
 			case changeMain(ChangeMainShield.Action)
+			case applyShield(ApplyShield.Coordinator.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -48,6 +50,9 @@ struct ShieldsList: FeatureReducer, Sendable {
 			}
 			Scope(state: \.changeMain, action: \.changeMain) {
 				ChangeMainShield()
+			}
+			Scope(state: \.applyShield, action: \.applyShield) {
+				ApplyShield.Coordinator()
 			}
 		}
 	}
@@ -86,12 +91,16 @@ struct ShieldsList: FeatureReducer, Sendable {
 
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case .securityShieldsSetup(.delegate(.finished)):
-			state.destination = nil
+		case let .securityShieldsSetup(.delegate(.finished(shieldID))):
+			state.destination = .applyShield(.init(shieldID: shieldID))
 			return shieldsEffect()
 		case .changeMain(.delegate(.updated)):
 			state.destination = nil
 			return shieldsEffect()
+		case .applyShield(.delegate(.skipped)),
+		     .applyShield(.delegate(.finished)):
+			state.destination = nil
+			return .none
 		default:
 			return .none
 		}

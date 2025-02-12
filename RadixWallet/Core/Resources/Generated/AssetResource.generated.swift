@@ -27,6 +27,7 @@ internal enum AssetResource {
   internal static let iconDeclineAirdrop = ImageAsset(name: "icon-decline-airdrop")
   internal static let iconMinusCircle = ImageAsset(name: "icon-minus-circle")
   internal static let iconPlusCircle = ImageAsset(name: "icon-plus-circle")
+  internal static let applyShieldIntro = ImageAsset(name: "applyShieldIntro")
   internal static let addAccount = ImageAsset(name: "addAccount")
   internal static let addMessage = ImageAsset(name: "addMessage")
   internal static let chooseAccount = ImageAsset(name: "chooseAccount")
