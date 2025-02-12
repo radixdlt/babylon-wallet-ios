@@ -241,7 +241,7 @@ extension OnLedgerEntity.OwnedFungibleResource {
 
 extension OnLedgerEntity.NonFungibleToken {
 	fileprivate var resourceQuantifier: NonFungibleResourceIndicator {
-		.byIds(ids: [id.nonFungibleLocalId])
+		.guaranteed(ids: [id.nonFungibleLocalId])
 	}
 }
 
