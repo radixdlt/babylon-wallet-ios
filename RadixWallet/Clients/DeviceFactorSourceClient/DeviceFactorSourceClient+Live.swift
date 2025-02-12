@@ -49,17 +49,11 @@ extension DeviceFactorSourceClient: DependencyKey {
 			}()
 
 			let nonHiddenEntitiesForSource = allNonHiddenEntities.filter { entity in
-				switch entity.securityState {
-				case let .unsecured(unsecuredEntityControl):
-					unsecuredEntityControl.transactionSigning.factorSourceID == factorSource.id
-				}
+				entity.unsecuredControllingFactorInstance?.factorSourceID == factorSource.id
 			}
 
 			let hiddenEntitiesForSource = allHiddenEntities.filter { entity in
-				switch entity.securityState {
-				case let .unsecured(unsecuredEntityControl):
-					unsecuredEntityControl.transactionSigning.factorSourceID == factorSource.id
-				}
+				entity.unsecuredControllingFactorInstance?.factorSourceID == factorSource.id
 			}
 
 			let isMnemonicMarkedAsBackedUp = userDefaults.getFactorSourceIDOfBackedUpMnemonics().contains(factorSource.id)

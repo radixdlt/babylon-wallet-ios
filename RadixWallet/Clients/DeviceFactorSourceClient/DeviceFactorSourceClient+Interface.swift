@@ -126,28 +126,24 @@ extension DeviceFactorSourceClient {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 		@Dependency(\.secureStorageClient) var secureStorageClient
 
-		switch signerEntity.securityState {
-		case let .unsecured(control):
-			let factorInstance = control.transactionSigning
-
-			guard
-				let deviceFactorSource = try await factorSourcesClient.getDeviceFactorSource(of: factorInstance)
-			else {
-				throw FailedToFindDeviceFactorSourceForSigning()
-			}
-
-			let signatures = try await signUsingDeviceFactorSource(
-				deviceFactorSource: deviceFactorSource,
-				signerEntities: [signerEntity],
-				hashedDataToSign: hashedDataToSign,
-				purpose: purpose
-			)
-
-			guard let signature = signatures.first, signatures.count == 1 else {
-				throw IncorrectSignatureCountExpectedExactlyOne()
-			}
-			return signature
+		guard
+			let factorInstance = signerEntity.unsecuredControllingFactorInstance,
+			let deviceFactorSource = try await factorSourcesClient.getDeviceFactorSource(of: factorInstance)
+		else {
+			throw FailedToFindDeviceFactorSourceForSigning()
 		}
+
+		let signatures = try await signUsingDeviceFactorSource(
+			deviceFactorSource: deviceFactorSource,
+			signerEntities: [signerEntity],
+			hashedDataToSign: hashedDataToSign,
+			purpose: purpose
+		)
+
+		guard let signature = signatures.first, signatures.count == 1 else {
+			throw IncorrectSignatureCountExpectedExactlyOne()
+		}
+		return signature
 	}
 
 	func signUsingDeviceFactorSource(
@@ -172,38 +168,36 @@ extension DeviceFactorSourceClient {
 		var signatures = Set<SignatureOfEntity>()
 
 		for entity in signerEntities {
-			switch entity.securityState {
-			case let .unsecured(unsecuredControl):
-
-				let factorInstance = unsecuredControl.transactionSigning
-
-				let derivationPath = factorInstance.derivationPath
-
-				if factorInstance.factorSourceID != factorSourceID {
-					let errMsg = "Discrepancy, you specified to use a device factor source you beleived to be the one controlling the entity, but it does not match the genesis factor source id."
-					loggerGlobal.critical(.init(stringLiteral: errMsg))
-					assertionFailure(errMsg)
-				}
-				let curve = factorInstance.publicKey.curve
-
-				loggerGlobal.debug("🔏 Signing data with device, with entity=\(entity.displayName), curve=\(curve), factor source hint.label=\(deviceFactorSource.hint.label), hint.deviceName=\(deviceFactorSource.hint.deviceName), hint.model=\(deviceFactorSource.hint.model)")
-
-				let signatureWithPublicKey = try await self.signatureFromOnDeviceHD(SignatureFromOnDeviceHDRequest(
-					mnemonicWithPassphrase: loadedMnemonicWithPassphrase,
-					derivationPath: derivationPath,
-					curve: curve,
-					hashedData: hashedDataToSign
-				))
-
-				let entitySignature = SignatureOfEntity(
-					signerEntity: entity,
-					derivationPath: derivationPath,
-					factorSourceID: factorSourceID.asGeneral,
-					signatureWithPublicKey: signatureWithPublicKey
-				)
-
-				signatures.insert(entitySignature)
+			guard let factorInstance = entity.unsecuredControllingFactorInstance else {
+				continue
 			}
+
+			let derivationPath = factorInstance.derivationPath
+
+			if factorInstance.factorSourceID != factorSourceID {
+				let errMsg = "Discrepancy, you specified to use a device factor source you beleived to be the one controlling the entity, but it does not match the genesis factor source id."
+				loggerGlobal.critical(.init(stringLiteral: errMsg))
+				assertionFailure(errMsg)
+			}
+			let curve = factorInstance.publicKey.curve
+
+			loggerGlobal.debug("🔏 Signing data with device, with entity=\(entity.displayName), curve=\(curve), factor source hint.label=\(deviceFactorSource.hint.label), hint.deviceName=\(deviceFactorSource.hint.deviceName), hint.model=\(deviceFactorSource.hint.model)")
+
+			let signatureWithPublicKey = try await self.signatureFromOnDeviceHD(SignatureFromOnDeviceHDRequest(
+				mnemonicWithPassphrase: loadedMnemonicWithPassphrase,
+				derivationPath: derivationPath,
+				curve: curve,
+				hashedData: hashedDataToSign
+			))
+
+			let entitySignature = SignatureOfEntity(
+				signerEntity: entity,
+				derivationPath: derivationPath,
+				factorSourceID: factorSourceID.asGeneral,
+				signatureWithPublicKey: signatureWithPublicKey
+			)
+
+			signatures.insert(entitySignature)
 		}
 
 		return signatures
