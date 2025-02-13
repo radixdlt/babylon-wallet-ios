@@ -309,7 +309,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 				signingFactors: preview.signingFactors,
 				accountWithdraws: preview.analyzedManifestToReview.withdrawals,
 				accountDeposits: preview.analyzedManifestToReview.deposits,
-				isNonConforming: preview.analyzedManifestToReview.detailedManifestClass == nil
+				isNonConforming: preview.analyzedManifestToReview.detailedClassification == nil
 			)
 
 			state.reviewedTransaction = reviewedTransaction

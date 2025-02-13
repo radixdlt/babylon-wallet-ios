@@ -161,7 +161,7 @@ extension TransactionClient {
 				return try await SargonOS.shared.analyseTransactionPreview(
 					instructions: request.unvalidatedManifest.transactionManifestString,
 					blobs: request.unvalidatedManifest.blobs,
-					areInstructionsOriginatingFromHost: request.isWalletTransaction,
+					areInstructionsOriginatingFromHost: true,
 					nonce: request.nonce,
 					notaryPublicKey: .ed25519(request.ephemeralNotaryPublicKey.intoSargon())
 				)

@@ -39,11 +39,11 @@ extension InteractionReview.Sections {
 			return newlyCreatedMetadata
 		}
 
-		switch summary.detailedManifestClass {
+		switch summary.detailedClassification {
 		case nil:
 			return nil
 
-		case .generalSubintent:
+		case .securifyEntity:
 			return nil
 
 		case .general, .transfer:
