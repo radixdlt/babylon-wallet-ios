@@ -287,7 +287,7 @@ extension PreAuthorizationReview.State {
 	var isExpired: Bool {
 		switch expiration {
 		case let .atTime(value):
-			value.date <= Date.now
+			value.date <= Date.now || secondsToExpiration == 0
 		case .afterDelay:
 			false
 		}
