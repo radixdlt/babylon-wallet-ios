@@ -17,6 +17,10 @@ struct SpotCheck: Sendable, FeatureReducer {
 		case factorSourceAccess(FactorSourceAccess.Action)
 	}
 
+	enum InternalAction: Sendable, Hashable {
+		case spotCheckSucceeded(FactorSourceID)
+	}
+
 	enum DelegateAction: Sendable, Equatable {
 		case cancelled
 		case skipped
@@ -46,6 +50,14 @@ struct SpotCheck: Sendable, FeatureReducer {
 			.none
 		}
 	}
+
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case let .spotCheckSucceeded(factorSourceId):
+			.send(.delegate(.validated))
+				.merge(with: updateFactorSourceLastUsedEffect(factorSourceId: factorSourceId))
+		}
+	}
 }
 
 private extension SpotCheck {
@@ -68,7 +80,7 @@ private extension SpotCheck {
 				fatalError("Not supported")
 			}
 			if factorSource.factorSource.spotCheck(input: input) {
-				await send(.delegate(.validated))
+				await send(.internal(.spotCheckSucceeded(factorSource.factorSource.id)))
 			}
 		} catch: { error, send in
 			await handleError(factorSource: factorSource, error: error, send: send)

@@ -219,6 +219,13 @@ extension FeatureReducer {
 		}
 		return exportMnemonic(factorSourceID: factorSourceId, onSuccess: onSuccess)
 	}
+
+	func updateFactorSourceLastUsedEffect(factorSourceId: FactorSourceID) -> Effect<Action> {
+		@Dependency(\.factorSourcesClient) var factorSourcesClient
+		return .run { _ in
+			try? await factorSourcesClient.updateLastUsed(.init(factorSourceId: factorSourceId))
+		}
+	}
 }
 
 private extension FactorSourceIntegrity {

@@ -39,7 +39,6 @@ struct Signing: Sendable, FeatureReducer {
 		case finished(Signatures)
 	}
 
-	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 	@Dependency(\.errorQueue) var errorQueue
@@ -68,7 +67,7 @@ struct Signing: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .handleSignatures(privateFactorSource, signatures):
 			.send(.delegate(.finished(signatures)))
-				.merge(with: updateLastUsed(factorSource: privateFactorSource.factorSource))
+				.merge(with: updateFactorSourceLastUsedEffect(factorSourceId: privateFactorSource.factorSource.id))
 		}
 	}
 }
@@ -155,12 +154,6 @@ private extension Signing {
 
 		default:
 			errorQueue.schedule(error)
-		}
-	}
-
-	func updateLastUsed(factorSource: FactorSource) -> Effect<Action> {
-		.run { _ in
-			try? await factorSourcesClient.updateLastUsed(.init(factorSourceId: factorSource.id))
 		}
 	}
 }

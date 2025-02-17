@@ -24,6 +24,10 @@ struct DerivePublicKeys: Sendable, FeatureReducer {
 		case finished([HierarchicalDeterministicFactorInstance])
 	}
 
+	enum InternalAction: Sendable, Hashable {
+		case handleFactorInstances([HierarchicalDeterministicFactorInstance])
+	}
+
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 	@Dependency(\.errorQueue) var errorQueue
@@ -45,6 +49,15 @@ struct DerivePublicKeys: Sendable, FeatureReducer {
 			.none
 		}
 	}
+
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case let .handleFactorInstances(factorInstances):
+			let factorSourceId = state.input.factorSourceId.asGeneral
+			return .send(.delegate(.finished(factorInstances)))
+				.merge(with: updateFactorSourceLastUsedEffect(factorSourceId: factorSourceId))
+		}
+	}
 }
 
 private extension DerivePublicKeys {
@@ -57,10 +70,16 @@ private extension DerivePublicKeys {
 			case let .ledger(ledger):
 				try await ledgerHardwareWalletClient.derivePublicKeys(.init(ledger: ledger, input: input))
 
+			case let .offDeviceMnemonic(_, mnemonicWithPassphrase):
+				mnemonicWithPassphrase.derivePublicKeys(
+					paths: input.derivationPaths,
+					factorSourceId: input.factorSourceId
+				)
+
 			default:
 				fatalError("Not implemented")
 			}
-			await send(.delegate(.finished(factorInstances)))
+			await send(.internal(.handleFactorInstances(factorInstances)))
 		} catch: { error, send in
 			await handleError(factorSource: factorSource, error: error, send: send)
 		}
