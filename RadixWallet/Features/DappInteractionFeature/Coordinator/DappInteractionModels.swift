@@ -197,11 +197,17 @@ extension DappToWalletInteraction {
 			[
 				.signSubintent(items.request),
 			]
-		case let .batchOfTransactions(items): // TODO: 4063
+		case let .batchOfTransactions(items):
+			// Temporary - currently handling only a single item
 			[
-				try! .submitTransaction(.init(transactionManifest: items.transactions.first!.transactionManifest(onNetwork: .stokenet))),
+				items.transactions.first,
 			]
 			.compactMap { $0 }
+			.compactMap {
+				try? .submitTransaction(.init(
+					transactionManifest: $0.transactionManifest(onNetwork: SargonOs.shared.currentNetworkId())
+				))
+			}
 		}
 	}
 }
@@ -311,7 +317,7 @@ extension WalletToDappInteractionSuccessResponse {
 				)
 			}
 
-		case .transaction, .batchOfTransactions: // TODO: 4063
+		case .transaction, .batchOfTransactions:
 			var send: WalletToDappInteractionSendTransactionResponseItem? = nil
 			for item in items {
 				switch item {

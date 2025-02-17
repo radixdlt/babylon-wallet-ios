@@ -67,7 +67,7 @@ extension ApplyShield {
 					Task {
 						_ = await dappInteractionClient.addWalletInteraction(
 							.batchOfTransactions(interaction),
-							.accountTransfer // TODO: 4063
+							.shieldUpdate
 						)
 					}
 					await send(.delegate(.finished))
