@@ -198,15 +198,15 @@ extension DappToWalletInteraction {
 				.signSubintent(items.request),
 			]
 		case let .batchOfTransactions(items):
-			// Temporary - currently handling only a single item
-			[
-				items.transactions.first,
-			]
-			.compactMap { $0 }
-			.compactMap {
-				try? .submitTransaction(.init(
-					transactionManifest: $0.transactionManifest(onNetwork: SargonOs.shared.currentNetworkId())
-				))
+			if items.transactions.count == 1, let transaction = items.transactions.first {
+				[
+					try? .submitTransaction(.init(
+						transactionManifest: transaction.transactionManifest(onNetwork: SargonOs.shared.currentNetworkId())
+					)),
+				]
+				.compactMap { $0 }
+			} else {
+				fatalError("TODO: handle multiple transactions")
 			}
 		}
 	}

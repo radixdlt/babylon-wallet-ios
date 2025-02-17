@@ -47,6 +47,7 @@ extension ApplyShield {
 		}
 
 		@Dependency(\.dappInteractionClient) var dappInteractionClient
+		@Dependency(\.submitTXClient) var submitTXClient
 		@Dependency(\.errorQueue) var errorQueue
 
 		var body: some ReducerOf<Self> {
@@ -65,10 +66,27 @@ extension ApplyShield {
 					let interaction = try await SargonOs.shared.makeInteractionForApplyingSecurityShield(securityShieldId: shieldID, addresses: addresses)
 
 					Task {
-						_ = await dappInteractionClient.addWalletInteraction(
+						let result = await dappInteractionClient.addWalletInteraction(
 							.batchOfTransactions(interaction),
 							.shieldUpdate
 						)
+
+						// Temporary - will be handled by Sargon once batch transactions are implemented
+						switch result {
+						case let .dapp(.success(success)):
+							if case let .transaction(tx) = success.items {
+								/// Wait for the transaction to be committed
+								let txID = tx.send.transactionIntentHash
+								if try await submitTXClient.hasTXBeenCommittedSuccessfully(txID) {
+									try await SargonOs.shared.markEntitiesAsSecurified(entityAddresses: addresses)
+								}
+								return
+							}
+
+							assertionFailure("Not a transaction Response?")
+						case .dapp(.failure), .none:
+							break
+						}
 					}
 					await send(.delegate(.finished))
 				} catch: { error, _ in
