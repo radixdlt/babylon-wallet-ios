@@ -2,12 +2,14 @@
 struct PrimaryTextButtonStyle: ButtonStyle {
 	@Environment(\.isEnabled) var isEnabled: Bool
 	let isDestructive: Bool
+	let height: CGFloat?
 
 	func makeBody(configuration: ButtonStyle.Configuration) -> some View {
 		configuration.label
 			.foregroundColor(foregroundColor)
 			.font(.app.body1StandaloneLink)
 			.brightness(configuration.isPressed ? -0.3 : 0)
+			.frame(height: height)
 	}
 }
 
@@ -22,7 +24,7 @@ extension PrimaryTextButtonStyle {
 }
 
 extension ButtonStyle where Self == PrimaryTextButtonStyle {
-	static func primaryText(isDestructive: Bool = false) -> Self {
-		Self(isDestructive: isDestructive)
+	static func primaryText(isDestructive: Bool = false, height: CGFloat? = nil) -> Self {
+		Self(isDestructive: isDestructive, height: height)
 	}
 }

@@ -5,21 +5,26 @@ struct FactorSourceCardDataSource {
 	var subtitle: String?
 	var lastUsedOn: Timestamp?
 	var messages: [Message] = []
-	var accounts: [Account] = []
-	var personas: [Persona] = []
-
-	var hasEntities: Bool {
-		!accounts.isEmpty || !personas.isEmpty
-	}
+	var linkedEntities: LinkedEntities?
 }
 
 // MARK: FactorSourceCardDataSource.Message
 extension FactorSourceCardDataSource {
-	struct Message: Identifiable {
+	struct Message: Identifiable, Sendable, Hashable {
 		var id: String { text }
 
 		let text: String
 		let type: StatusMessageView.ViewType
+	}
+
+	struct LinkedEntities: Sendable, Hashable {
+		let accounts: [Account]
+		let personas: [Persona]
+		let hasHiddenEntities: Bool
+
+		var isEmpty: Bool {
+			accounts.isEmpty && personas.isEmpty && !hasHiddenEntities
+		}
 	}
 }
 
@@ -46,7 +51,7 @@ extension FactorSourceKind {
 		case .ledgerHqHardwareWallet:
 			L10n.FactorSources.Card.ledgerTitle
 		case .offDeviceMnemonic:
-			L10n.FactorSources.Card.passphraseTitle
+			L10n.FactorSources.Card.offDeviceMnemonicTitle
 		case .arculusCard:
 			L10n.FactorSources.Card.arculusCardTitle
 		case .password:
@@ -61,11 +66,26 @@ extension FactorSourceKind {
 		case .ledgerHqHardwareWallet:
 			L10n.FactorSources.Card.ledgerDescription
 		case .offDeviceMnemonic:
-			L10n.FactorSources.Card.passphraseDescription
+			L10n.FactorSources.Card.offDeviceMnemonicDescription
 		case .arculusCard:
 			L10n.FactorSources.Card.arculusCardDescription
 		case .password:
 			L10n.FactorSources.Card.passwordDescription
+		}
+	}
+
+	var infoLinkContent: (item: InfoLinkSheet.GlossaryItem, title: String) {
+		switch self {
+		case .device:
+			(.biometricspin, L10n.InfoLink.Title.biometricspin)
+		case .ledgerHqHardwareWallet:
+			(.ledgernano, L10n.InfoLink.Title.ledgernano)
+		case .offDeviceMnemonic:
+			(.passphrases, L10n.InfoLink.Title.passphrases)
+		case .arculusCard:
+			(.arculus, L10n.InfoLink.Title.arculus)
+		case .password:
+			(.passwords, L10n.InfoLink.Title.passwords)
 		}
 	}
 }

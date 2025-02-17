@@ -23,6 +23,7 @@ struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 		case debugUserDefaultsContentsButtonTapped
 		case debugTestKeychainButtonTapped
 		case debugKeychainContentsButtonTapped
+		case debugFactorInstancesCacheContentsButtonTapped
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -30,6 +31,7 @@ struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 	}
 
 	struct Destination: DestinationReducer {
+		@CasePathable
 		enum State: Sendable, Hashable {
 			case debugUserDefaultsContents(DebugUserDefaultsContents.State)
 			case debugInspectProfile(DebugInspectProfile.State)
@@ -37,24 +39,33 @@ struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 			#if DEBUG
 			case debugKeychainTest(DebugKeychainTest.State)
 			case debugKeychainContents(DebugKeychainContents.State)
+			case debugFactorInstancesCacheContents(DebugFactorInstancesCacheContents.State)
 			#endif // DEBUG
 		}
 
+		@CasePathable
 		enum Action: Sendable, Equatable {
 			case debugUserDefaultsContents(DebugUserDefaultsContents.Action)
 			case debugInspectProfile(DebugInspectProfile.Action)
 			#if DEBUG
 			case debugKeychainTest(DebugKeychainTest.Action)
 			case debugKeychainContents(DebugKeychainContents.Action)
+			case debugFactorInstancesCacheContents(DebugFactorInstancesCacheContents.Action)
 			#endif // DEBUG
 			case debugManageFactorSources(DebugManageFactorSources.Action)
 		}
 
 		var body: some ReducerOf<Self> {
-			Scope(state: /State.debugUserDefaultsContents, action: /Action.debugUserDefaultsContents) {
+			Scope(
+				state: \.debugUserDefaultsContents,
+				action: \.debugUserDefaultsContents
+			) {
 				DebugUserDefaultsContents()
 			}
-			Scope(state: /State.debugInspectProfile, action: /Action.debugInspectProfile) {
+			Scope(
+				state: \.debugInspectProfile,
+				action: \.debugInspectProfile
+			) {
 				DebugInspectProfile()
 			}
 			#if DEBUG
@@ -63,6 +74,9 @@ struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.debugKeychainContents, action: /Action.debugKeychainContents) {
 				DebugKeychainContents()
+			}
+			Scope(state: /State.debugFactorInstancesCacheContents, action: /Action.debugFactorInstancesCacheContents) {
+				DebugFactorInstancesCacheContents()
 			}
 			#endif // DEBUG
 			Scope(state: /State.debugManageFactorSources, action: /Action.debugManageFactorSources) {
@@ -107,6 +121,12 @@ struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 		case .debugKeychainContentsButtonTapped:
 			#if DEBUG
 			state.destination = .debugKeychainContents(.init())
+			#endif // DEBUG
+			return .none
+
+		case .debugFactorInstancesCacheContentsButtonTapped:
+			#if DEBUG
+			state.destination = .debugFactorInstancesCacheContents(.init())
 			#endif // DEBUG
 			return .none
 

@@ -25,3 +25,25 @@ extension DependencyValues {
 		set { self[TransactionClient.self] = newValue }
 	}
 }
+
+// MARK: - TransactionClient.NotarizeTransactionRequest
+extension TransactionClient {
+	struct NotarizeTransactionRequest: Sendable {
+		let signedIntent: SignedIntent
+		let notary: Curve25519.Signing.PrivateKey
+	}
+}
+
+extension TransactionClient.NotarizeTransactionRequest {
+	init(
+		intentSignatures: Set<SignatureWithPublicKey>,
+		transactionIntent: TransactionIntent,
+		notary: Curve25519.Signing.PrivateKey
+	) {
+		self.notary = notary
+		self.signedIntent = .init(
+			intent: transactionIntent,
+			intentSignatures: IntentSignatures(signatures: Array(intentSignatures.map { IntentSignature(signatureWithPublicKey: $0) }))
+		)
+	}
+}

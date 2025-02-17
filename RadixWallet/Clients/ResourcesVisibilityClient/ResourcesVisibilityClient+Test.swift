@@ -18,6 +18,6 @@ extension ResourcesVisibilityClient: TestDependencyKey {
 	static let testValue = Self(
 		hide: unimplemented("\(Self.self).hide"),
 		getHidden: unimplemented("\(Self.self).getHidden"),
-		hiddenValues: unimplemented("\(Self.self).hiddenValues")
+		hiddenValues: unimplemented("\(Self.self).hiddenValues", placeholder: noop.hiddenValues)
 	)
 }

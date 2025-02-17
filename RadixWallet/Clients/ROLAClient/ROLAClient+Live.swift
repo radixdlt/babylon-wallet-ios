@@ -47,19 +47,6 @@ extension ROLAClient {
 				guard dAppDefinitionAddresses.contains(dappDefinitionAddress) else {
 					throw ROLAFailure.unknownDappDefinitionAddress
 				}
-			},
-			authenticationDataToSignForChallenge: { request in
-
-				let payload = payloadToHash(
-					challenge: request.challenge,
-					dAppDefinitionAddress: request.dAppDefinitionAddress,
-					origin: request.origin
-				)
-
-				return AuthenticationDataToSignForChallengeResponse(
-					input: request,
-					payloadToHashAndSign: payload
-				)
 			}
 		)
 	}()

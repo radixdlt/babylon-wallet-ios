@@ -46,6 +46,16 @@ extension View {
 		}
 	}
 
+	/// Applies the given transform when the given conditions is met.
+	@ViewBuilder
+	func applyIf(_ condition: Bool, @ViewBuilder transform: (Self) -> some View) -> some View {
+		if condition {
+			transform(self)
+		} else {
+			self
+		}
+	}
+
 	/// Sets the List section spacing if possible.
 	@available(iOS, deprecated: 18.0, message: "Should use native `listSectionSpacing` once iOS 16 is no longer supported.")
 	func withListSectionSpacing(_ spacing: CGFloat) -> some SwiftUI.View {
@@ -55,6 +65,23 @@ extension View {
 					.listSectionSpacing(spacing)
 			} else {
 				self
+			}
+		}
+	}
+
+	/// Makes the given view scrollable, while adding some space into the bottom if there is more height available.
+	func scrollableWithBottomSpacer() -> some View {
+		GeometryReader { proxy in
+			WithPerceptionTracking {
+				ScrollView(showsIndicators: false) {
+					VStack(spacing: .zero) {
+						self
+
+						Spacer()
+					}
+					.frame(minHeight: proxy.size.height)
+				}
+				.frame(width: proxy.size.width)
 			}
 		}
 	}

@@ -171,7 +171,7 @@ extension DisplayEntitiesControlledByMnemonic {
 					Image(.chevronRight)
 						.foregroundColor(headingState.foregroundColor)
 				case let .scanning(isSelected):
-					RadioButton(appearance: .dark, state: isSelected ? .selected : .unselected)
+					RadioButton(appearance: .dark, isSelected: isSelected)
 				}
 			}
 		}

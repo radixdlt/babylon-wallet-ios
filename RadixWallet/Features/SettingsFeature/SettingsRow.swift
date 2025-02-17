@@ -14,6 +14,11 @@ struct SettingsRow<Feature: FeatureReducer>: View {
 				}
 				.withSeparator
 
+		case let .disabled(model):
+			PlainListRow(viewState: model.rowViewState)
+				.withSeparator
+				.background(Color.app.white)
+
 		case let .toggle(model):
 			ToggleView(
 				context: .settings,
@@ -52,6 +57,9 @@ extension SettingsRow {
 		/// A standard tappable row with the details specified on the `Model`
 		case model(Model)
 
+		/// A disabled row with the details specified on the `DisabledModel`
+		case disabled(DisabledModel)
+
 		/// A non-tappable row with a toggle, with details specified in the `ToggleModel`
 		case toggle(ToggleModel)
 
@@ -67,13 +75,15 @@ extension SettingsRow {
 extension SettingsRow.Kind {
 	struct Model: Identifiable {
 		let id: String
-		let rowViewState: PlainListRow<AssetIcon, Image>.ViewState
+		let rowViewState: PlainListRow<AssetIcon, Image, StackedHints>.ViewState
 		let action: Feature.ViewAction
 
 		init(
+			isError: Bool = false,
 			title: String,
 			subtitle: String? = nil,
 			detail: String? = nil,
+			markdown: String? = nil,
 			hints: [Hint.ViewState] = [],
 			icon: AssetIcon.Content,
 			accessory: ImageResource? = .chevronRight,
@@ -82,7 +92,7 @@ extension SettingsRow.Kind {
 			self.id = title
 			self.rowViewState = .init(
 				icon,
-				rowCoreViewState: .init(title: title, subtitle: subtitle, detail: detail),
+				rowCoreViewState: .init(context: .settings(isError: isError), title: title, subtitle: subtitle, detail: detail, markdown: markdown),
 				accessory: accessory,
 				hints: hints
 			)
@@ -90,18 +100,38 @@ extension SettingsRow.Kind {
 		}
 	}
 
+	struct DisabledModel: Identifiable {
+		let id: String
+		let rowViewState: PlainListRow<AssetIcon, Image, AnyView>.ViewState
+
+		init(
+			title: String,
+			subtitle: String? = nil,
+			icon: AssetIcon.Content,
+			@ViewBuilder bottom: () -> AnyView
+		) {
+			self.id = title
+			self.rowViewState = .init(
+				icon,
+				rowCoreViewState: .init(context: .settings, title: title, subtitle: subtitle),
+				isDisabled: true,
+				bottom: bottom
+			)
+		}
+	}
+
 	struct ToggleModel: Identifiable {
 		let id: String
-		let icon: ImageAsset?
+		let icon: ImageResource?
 		let title: String
-		let subtitle: String
+		let subtitle: String?
 		let minHeight: CGFloat
 		let isOn: Binding<Bool>
 
 		init(
-			icon: ImageAsset? = nil,
+			icon: ImageResource? = nil,
 			title: String,
-			subtitle: String,
+			subtitle: String?,
 			minHeight: CGFloat = .largeButtonHeight,
 			isOn: Binding<Bool>
 		) {
@@ -118,9 +148,11 @@ extension SettingsRow.Kind {
 // MARK: - Helper
 extension SettingsRow.Kind {
 	static func model(
+		isError: Bool = false,
 		title: String,
 		subtitle: String? = nil,
 		detail: String? = nil,
+		markdown: String? = nil,
 		hints: [Hint.ViewState] = [],
 		icon: AssetIcon.Content,
 		accessory: ImageResource? = .chevronRight,
@@ -128,9 +160,11 @@ extension SettingsRow.Kind {
 	) -> Self {
 		.model(
 			.init(
+				isError: isError,
 				title: title,
 				subtitle: subtitle,
 				detail: detail,
+				markdown: markdown,
 				hints: hints,
 				icon: icon,
 				accessory: accessory,
@@ -139,10 +173,26 @@ extension SettingsRow.Kind {
 		)
 	}
 
-	static func toggleModel(
-		icon: ImageAsset?,
+	static func disabled(
 		title: String,
-		subtitle: String,
+		subtitle: String? = nil,
+		icon: AssetIcon.Content,
+		@ViewBuilder bottom: () -> AnyView
+	) -> Self {
+		.disabled(
+			.init(
+				title: title,
+				subtitle: subtitle,
+				icon: icon,
+				bottom: bottom
+			)
+		)
+	}
+
+	static func toggleModel(
+		icon: ImageResource?,
+		title: String,
+		subtitle: String? = nil,
 		minHeight: CGFloat,
 		isOn: Binding<Bool>
 	) -> Self {

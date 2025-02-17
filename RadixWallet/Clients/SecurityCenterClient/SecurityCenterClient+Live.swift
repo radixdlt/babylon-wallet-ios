@@ -65,44 +65,14 @@ extension SecurityCenterClient {
 			for try await (profile, entitiesInBadState, backups) in combineLatest(profileValues, entitiesInBadState, backupValues) {
 				let isCloudProfileSyncEnabled = profile.appPreferences.security.isCloudProfileSyncEnabled
 
-				func hasProblem3() async -> AddressesOfEntitiesInBadState? {
-					entitiesInBadState.unrecoverable.isEmpty ? nil : entitiesInBadState.unrecoverable
-				}
-
-				func hasProblem5() -> Bool {
-					guard isCloudProfileSyncEnabled else {
-						return false
-					}
-					guard let cloudBackup = backups.cloud else {
-						return true
-					}
-					return cloudBackup.result.failed
-				}
-
-				func hasProblem6() -> Bool {
-					!isCloudProfileSyncEnabled && backups.manual == nil
-				}
-
-				func hasProblem7() -> Bool {
-					!isCloudProfileSyncEnabled && backups.manual?.isCurrent == false
-				}
-
-				func hasProblem9() async -> AddressesOfEntitiesInBadState? {
-					entitiesInBadState.withoutControl.isEmpty ? nil : entitiesInBadState.withoutControl
-				}
-
-				var result: [SecurityProblem] = []
-
-				if let addresses = await hasProblem3() {
-					result.append(.problem3(addresses: addresses))
-				}
-
-				if let addresses = await hasProblem9() {
-					result.append(.problem9(addresses: addresses))
-				}
-				if hasProblem5() { result.append(.problem5) }
-				if hasProblem6() { result.append(.problem6) }
-				if hasProblem7() { result.append(.problem7) }
+				let input = CheckSecurityProblemsInput(
+					isCloudProfileSyncEnabled: isCloudProfileSyncEnabled,
+					unrecoverableEntities: entitiesInBadState.unrecoverable,
+					withoutControlEntities: entitiesInBadState.withoutControl,
+					lastCloudBackup: backups.cloud?.asSargon,
+					lastManualBackup: backups.manual?.asSargon
+				)
+				let result = try SargonOS.shared.checkSecurityProblems(input: input)
 
 				problemsSubject.send(result)
 			}
@@ -110,10 +80,10 @@ extension SecurityCenterClient {
 
 		return .init(
 			startMonitoring: startMonitoring,
-			problems: { type in
+			problems: { kind in
 				problemsSubject
 					.share()
-					.map { $0.filter { type == nil || $0.type == type } }
+					.map { $0.filter { kind == nil || $0.kind == kind } }
 					.removeDuplicates()
 					.eraseToAnyAsyncSequence()
 			},
@@ -126,5 +96,11 @@ extension SecurityCenterClient {
 private extension AddressesOfEntitiesInBadState {
 	var isEmpty: Bool {
 		accounts.count + hiddenAccounts.count + personas.count == 0
+	}
+}
+
+private extension BackupStatus {
+	var asSargon: Sargon.BackupResult {
+		.init(isCurrent: isCurrent, isFailed: result.failed)
 	}
 }

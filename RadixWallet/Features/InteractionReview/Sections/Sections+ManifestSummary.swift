@@ -138,7 +138,9 @@ extension InteractionReview.Sections {
 						networkID: networkID
 					))]
 				} else {
-					return [.known(.init(resource: resource, details: .nonFungible(.amount(amount: .exact(amount)))))]
+					@Dependency(\.resourcesVisibilityClient) var resourcesVisibilityClient
+					let isHidden = try await resourcesVisibilityClient.isHidden(.nonFungible(resourceAddress))
+					return [.known(.init(resource: resource, details: .nonFungible(.amount(amount: .exact(amount))), isHidden: isHidden))]
 				}
 			case .right:
 				return []

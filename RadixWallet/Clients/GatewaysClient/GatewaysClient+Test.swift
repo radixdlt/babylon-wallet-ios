@@ -11,14 +11,14 @@ extension GatewaysClient: TestDependencyKey {
 	static let previewValue = Self.noop
 
 	static let testValue = Self(
-		currentGatewayValues: unimplemented("\(Self.self).currentGatewayValues"),
-		gatewaysValues: unimplemented("\(Self.self).gatewaysValues"),
-		getAllGateways: unimplemented("\(Self.self).getAllGateways"),
-		getCurrentGateway: unimplemented("\(Self.self).getCurrentGateway"),
+		currentGatewayValues: noop.currentGatewayValues,
+		gatewaysValues: noop.gatewaysValues,
+		getAllGateways: noop.getAllGateways,
+		getCurrentGateway: noop.getCurrentGateway,
 		addGateway: unimplemented("\(Self.self).addGateway"),
 		removeGateway: unimplemented("\(Self.self).removeGateway"),
 		changeGateway: unimplemented("\(Self.self).changeGateway"),
-		hasGateway: unimplemented("\(Self.self).hasGateway")
+		hasGateway: noop.hasGateway
 	)
 
 	static let noop = Self(

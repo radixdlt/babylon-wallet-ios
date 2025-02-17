@@ -23,6 +23,16 @@ struct RadioButton: View {
 		self.state = state
 		self.isDisabled = disabled
 	}
+
+	init(
+		appearance: Appearance,
+		isSelected: Bool,
+		disabled: Bool = false
+	) {
+		self.appearance = appearance
+		self.state = isSelected ? .selected : .unselected
+		self.isDisabled = disabled
+	}
 }
 
 extension RadioButton {

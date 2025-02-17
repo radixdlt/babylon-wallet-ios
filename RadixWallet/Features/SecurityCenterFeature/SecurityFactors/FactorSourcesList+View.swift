@@ -1,39 +1,47 @@
 // MARK: - FactorSourcesList.View
 extension FactorSourcesList {
-	@MainActor
 	struct View: SwiftUI.View {
 		let store: StoreOf<FactorSourcesList>
 
 		var body: some SwiftUI.View {
-			WithViewStore(store, observe: { $0 }) { viewStore in
+			WithPerceptionTracking {
 				ScrollView {
 					VStack(spacing: .large3) {
-						header(viewStore.kind.details)
+						header(store.kind.details)
 
-						if let main = viewStore.main {
-							section(text: L10n.FactorSources.List.default, rows: [main])
+						if let main = store.main {
+							section(text: L10n.FactorSources.List.default, rows: [main], showChangeMain: !store.others.isEmpty)
 								.padding(.top, .medium3)
 
-							if !viewStore.others.isEmpty {
-								section(text: L10n.FactorSources.List.others, rows: viewStore.others)
+							if !store.others.isEmpty {
+								section(text: L10n.FactorSources.List.others, rows: store.others)
 							}
 						} else {
-							section(text: nil, rows: viewStore.others)
+							section(text: nil, rows: store.others)
 						}
 
-						Button(viewStore.addTitle) {
+						Button(store.addTitle) {
 							store.send(.view(.addButtonTapped))
 						}
 						.buttonStyle(.secondaryRectangular)
 
-						let infoContent = viewStore.kind.infoLinkContent
+						let infoContent = store.kind.infoLinkContent
 						InfoButton(infoContent.item, label: infoContent.title)
 					}
 					.padding(.medium3)
 					.padding(.bottom, .medium2)
 				}
 				.background(.app.gray5)
-				.radixToolbar(title: viewStore.kind.title)
+				.radixToolbar(title: store.kind.title)
+				.footer(visible: store.showFooter) {
+					WithControlRequirements(
+						store.selected,
+						forAction: { store.send(.view(.continueButtonTapped($0.integrity.factorSource))) }
+					) { action in
+						Button(L10n.Common.continue, action: action)
+							.buttonStyle(.primaryRectangular)
+					}
+				}
 				.task {
 					store.send(.view(.task))
 				}
@@ -41,16 +49,27 @@ extension FactorSourcesList {
 			.destinations(with: store)
 		}
 
-		private func header(_ text: String?) -> some SwiftUI.View {
+		private func header(_ text: String) -> some SwiftUI.View {
 			Text(text)
 				.textStyle(.body1Header)
 				.foregroundStyle(.app.gray2)
 				.flushedLeft
 		}
 
-		private func section(text: String?, rows: [State.Row]) -> some SwiftUI.View {
+		private func section(text: String?, rows: [State.Row], showChangeMain: Bool = false) -> some SwiftUI.View {
 			VStack(spacing: .small1) {
-				header(text)
+				if let text {
+					HStack(spacing: .zero) {
+						header(text)
+						Spacer()
+						if showChangeMain {
+							Button(L10n.FactorSources.List.change) {
+								store.send(.view(.changeMainButtonTapped))
+							}
+							.buttonStyle(.primaryText())
+						}
+					}
+				}
 
 				ForEachStatic(rows) { row in
 					card(row)
@@ -64,7 +83,7 @@ extension FactorSourcesList {
 					factorSource: row.integrity.factorSource,
 					kind: .extended(linkedEntities: row.linkedEntities)
 				),
-				mode: .display,
+				mode: mode(row),
 				messages: row.messages
 			) { action in
 				switch action {
@@ -76,6 +95,16 @@ extension FactorSourcesList {
 			}
 			.onTapGesture {
 				store.send(.view(.rowTapped(row)))
+			}
+			.opacity(row.opacity)
+		}
+
+		func mode(_ row: State.Row) -> FactorSourceCard.Mode {
+			switch store.context {
+			case .display:
+				.display
+			case .selection:
+				.selection(type: .radioButton, isSelected: store.selected == row || row.selectability == .alreadySelected)
 			}
 		}
 	}
@@ -89,7 +118,7 @@ private extension FactorSourcesList.State {
 		case .ledgerHqHardwareWallet:
 			L10n.FactorSources.List.ledgerAdd
 		case .offDeviceMnemonic:
-			L10n.FactorSources.List.passphraseAdd
+			L10n.FactorSources.List.offDeviceMnemonicAdd
 		case .arculusCard:
 			L10n.FactorSources.List.arculusCardAdd
 		case .password:
@@ -97,32 +126,11 @@ private extension FactorSourcesList.State {
 		}
 	}
 
-	var main: Row? {
-		rows.first(where: \.integrity.isExplicitMain)
-	}
-
-	var others: [Row] {
-		rows
-			.filter { !$0.integrity.isExplicitMain }
-			.sorted(by: { left, right in
-				let lhs = left.integrity
-				let rhs = right.integrity
-				switch (lhs, rhs) {
-				case let (.device(lDevice), .device(rDevice)):
-					if lDevice.factorSource.isBDFS, rDevice.factorSource.isBDFS {
-						return sort(lhs, rhs)
-					} else {
-						return lDevice.factorSource.isBDFS
-					}
-				default:
-					return sort(lhs, rhs)
-				}
-
-			})
-	}
-
-	private func sort(_ lhs: FactorSourceIntegrity, _ rhs: FactorSourceIntegrity) -> Bool {
-		lhs.factorSource.common.addedOn < rhs.factorSource.common.addedOn
+	var showFooter: Bool {
+		switch context {
+		case .display: false
+		case .selection: true
+		}
 	}
 }
 
@@ -137,6 +145,13 @@ private extension FactorSourcesList.State.Row {
 			[.init(text: L10n.FactorSources.List.seedPhraseWrittenDown, type: .success)]
 		case .notBackedUp:
 			[]
+		}
+	}
+
+	var opacity: CGFloat {
+		switch selectability {
+		case .selectable: 1.0
+		case .alreadySelected, .unselectable: 0.5
 		}
 	}
 }
@@ -158,6 +173,7 @@ private extension View {
 			.displayMnemonic(with: destinationStore)
 			.enterMnemonic(with: destinationStore)
 			.addMnemonic(with: destinationStore)
+			.changeMain(with: destinationStore)
 	}
 
 	private func detail(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
@@ -181,6 +197,12 @@ private extension View {
 	private func addMnemonic(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.addMnemonic, action: \.addMnemonic)) {
 			ImportMnemonic.View(store: $0)
+		}
+	}
+
+	private func changeMain(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.changeMain, action: \.changeMain)) {
+			ChangeMainFactorSource.View(store: $0)
 		}
 	}
 }

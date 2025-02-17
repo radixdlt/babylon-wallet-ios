@@ -11,7 +11,7 @@ extension CameraPermissionClient: TestDependencyKey {
 	static let previewValue = Self.noop
 
 	static let testValue = Self(
-		getCameraAccess: unimplemented("\(Self.self).getCameraAccess")
+		getCameraAccess: unimplemented("\(Self.self).getCameraAccess", placeholder: noop.getCameraAccess)
 	)
 }
 

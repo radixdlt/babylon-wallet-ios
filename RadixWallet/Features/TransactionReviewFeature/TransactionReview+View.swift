@@ -232,7 +232,6 @@ private extension View {
 		let destinationStore = store.destination
 		return customizeGuarantees(with: destinationStore)
 			.customizeFees(with: destinationStore)
-			.signing(with: destinationStore)
 			.submitting(with: destinationStore)
 			.rawTransactionAlert(with: destinationStore)
 	}
@@ -252,15 +251,6 @@ private extension View {
 			state: /TransactionReview.Destination.State.customizeFees,
 			action: TransactionReview.Destination.Action.customizeFees,
 			content: { CustomizeFees.View(store: $0).inNavigationView }
-		)
-	}
-
-	private func signing(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /TransactionReview.Destination.State.signing,
-			action: TransactionReview.Destination.Action.signing,
-			content: { Signing.View(store: $0) }
 		)
 	}
 

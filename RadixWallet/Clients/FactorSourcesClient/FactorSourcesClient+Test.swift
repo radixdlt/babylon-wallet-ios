@@ -12,14 +12,14 @@ extension FactorSourcesClient: TestDependencyKey {
 
 	static let testValue = Self(
 		indicesOfEntitiesControlledByFactorSource: unimplemented("\(Self.self).indicesOfEntitiesControlledByFactorSource"),
-		getCurrentNetworkID: unimplemented("\(Self.self).getCurrentNetworkID"),
+		getCurrentNetworkID: noop.getCurrentNetworkID,
 		getMainDeviceFactorSource: unimplemented("\(Self.self).getMainDeviceFactorSource"),
 		createNewMainDeviceFactorSource: unimplemented("\(Self.self).createNewMainDeviceFactorSource"),
 		getFactorSources: unimplemented("\(Self.self).getFactorSources"),
-		factorSourcesAsyncSequence: unimplemented("\(Self.self).factorSourcesAsyncSequence"),
+		factorSourcesAsyncSequence: noop.factorSourcesAsyncSequence,
 		nextEntityIndexForFactorSource: unimplemented("\(Self.self).nextEntityIndexForFactorSource"),
 		addPrivateHDFactorSource: unimplemented("\(Self.self).addPrivateHDFactorSource"),
-		checkIfHasOlympiaFactorSourceForAccounts: unimplemented("\(Self.self).checkIfHasOlympiaFactorSourceForAccounts"),
+		checkIfHasOlympiaFactorSourceForAccounts: noop.checkIfHasOlympiaFactorSourceForAccounts,
 		saveFactorSource: unimplemented("\(Self.self).saveFactorSource"),
 		updateFactorSource: unimplemented("\(Self.self).updateFactorSource"),
 		getSigningFactors: unimplemented("\(Self.self).getSigningFactors"),

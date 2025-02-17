@@ -11,12 +11,12 @@ extension LedgerHardwareWalletClient: TestDependencyKey {
 	static let previewValue = Self.noop
 
 	static let testValue = Self(
-		isConnectedToAnyConnectorExtension: unimplemented("\(Self.self).isConnectedToAnyConnectorExtension"),
+		isConnectedToAnyConnectorExtension: unimplemented("\(Self.self).isConnectedToAnyConnectorExtension", placeholder: noop.isConnectedToAnyConnectorExtension),
 		getDeviceInfo: unimplemented("\(Self.self).getDeviceInfo"),
 		derivePublicKeys: unimplemented("\(Self.self).derivePublicKeys"),
 		signTransaction: unimplemented("\(Self.self).signTransaction"),
-		signPreAuthorization: unimplemented("\(Self.self).signPreAuthorization"),
-		signAuthChallenge: unimplemented("\(Self.self).signAuthChallenge"),
+		signSubintent: unimplemented("\(Self.self).signSubintent"),
+		signAuth: unimplemented("\(Self.self).signAuth"),
 		deriveAndDisplayAddress: unimplemented("\(Self.self).deriveAndDisplayAddress")
 	)
 
@@ -28,12 +28,10 @@ extension LedgerHardwareWalletClient: TestDependencyKey {
 				model: .nanoS
 			)
 		},
-		derivePublicKeys: { _, _ in
-			[]
-		},
+		derivePublicKeys: { _ in [] },
 		signTransaction: { _ in [] },
-		signPreAuthorization: { _ in [] },
-		signAuthChallenge: { _ in [] },
+		signSubintent: { _ in [] },
+		signAuth: { _ in [] },
 		deriveAndDisplayAddress: { _, _ in throw NoopError() }
 	)
 }

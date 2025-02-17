@@ -1,17 +1,17 @@
 // MARK: - ToggleView
 struct ToggleView: SwiftUI.View {
 	let context: Context
-	let icon: ImageAsset?
+	let icon: ImageResource?
 	let title: String
-	let subtitle: String
+	let subtitle: String?
 	let minHeight: CGFloat
 	let isOn: Binding<Bool>
 
 	init(
 		context: Context = .toggle,
-		icon: ImageAsset? = nil,
+		icon: ImageResource? = nil,
 		title: String,
-		subtitle: String,
+		subtitle: String?,
 		minHeight: CGFloat = .largeButtonHeight,
 		isOn: Binding<Bool>
 	) {

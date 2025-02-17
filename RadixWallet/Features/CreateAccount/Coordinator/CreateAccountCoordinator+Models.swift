@@ -5,15 +5,18 @@ import SwiftUI
 struct CreateAccountConfig: Sendable, Hashable {
 	let specificNetworkID: NetworkID?
 	let isFirstAccount: Bool
+	let isNewProfile: Bool
 	let navigationButtonCTA: CreateAccountNavigationButtonCTA
 
 	fileprivate init(
 		isFirstAccount: Bool,
+		isNewProfile: Bool = false,
 		navigationButtonCTA: CreateAccountNavigationButtonCTA,
 		specificNetworkID: NetworkID? = nil
 	) {
 		self.specificNetworkID = specificNetworkID
 		self.isFirstAccount = isFirstAccount
+		self.isNewProfile = isNewProfile
 		self.navigationButtonCTA = navigationButtonCTA
 	}
 }
@@ -31,6 +34,7 @@ extension CreateAccountConfig {
 		case .firstAccountForNewProfile:
 			self.init(
 				isFirstAccount: true,
+				isNewProfile: true,
 				navigationButtonCTA: .goHome
 			)
 		case let .firstAccountOnNewNetwork(specificNetworkID):

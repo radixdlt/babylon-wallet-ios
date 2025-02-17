@@ -16,8 +16,6 @@ extension HdPathComponent: Comparable {
 }
 
 extension Account {
-	static let nameMaxLength = 30
-
 	var derivationIndex: HdPathComponent {
 		guard let unsecuredControllingFactorInstance else {
 			// TODO: Remove, temporary to accomodate securified state

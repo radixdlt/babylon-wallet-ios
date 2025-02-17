@@ -39,6 +39,8 @@ jobs:
           secret_prefix: 'SNYK'
           secret_name: 'arn:aws:secretsmanager:eu-west-2:${{ secrets.SECRETS_ACCOUNT_ID }}:secret:github-actions/common/snyk-credentials-rXRpuX'
           parse_json: true
+      - name: Create .snyk file
+        run: echo "${{ vars.DOT_SNYK_FILE }}" > .snyk
       - name: Install snyk
         run: |
           npm install snyk -g
@@ -194,14 +196,6 @@ jobs:
         run: |
           defaults write com.apple.dt.Xcode IDESkipMacroFingerprintValidation -bool YES
           bundle exec fastlane tests
-
-      - name: Upload results
-        uses: RDXWorks-actions/xcresulttool-xcode16@v1.8.0
-        with:
-          path: build/test_output/results.xcresult
-          show-passed-tests: false
-          show-code-coverage: true
-        if: success() || failure()
 
   snyk_online_monitor:
     permissions:

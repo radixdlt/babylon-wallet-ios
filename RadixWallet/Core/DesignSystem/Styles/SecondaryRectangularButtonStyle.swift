@@ -1,6 +1,7 @@
 // MARK: - SecondaryRectangularButtonStyle
 struct SecondaryRectangularButtonStyle: ButtonStyle {
 	@Environment(\.controlState) var controlState
+	let font: SwiftUI.Font
 	let backgroundColor: Color
 	let shouldExpand: Bool
 	let isDestructive: Bool
@@ -16,7 +17,7 @@ struct SecondaryRectangularButtonStyle: ButtonStyle {
 				trailingImage
 			}
 			.foregroundColor(foregroundColor)
-			.font(.app.body1Header)
+			.font(font)
 			.frame(height: isInToolbar ? .toolbarButtonHeight : .standardButtonHeight)
 			.frame(maxWidth: shouldExpand ? .infinity : nil)
 			.padding(.horizontal, isInToolbar ? .small1 : .medium1)
@@ -53,6 +54,7 @@ extension ButtonStyle where Self == SecondaryRectangularButtonStyle {
 	static var secondaryRectangular: Self { .secondaryRectangular() }
 
 	static func secondaryRectangular(
+		font: SwiftUI.Font = .app.body1Header,
 		backgroundColor: Color = .app.gray4,
 		shouldExpand: Bool = false,
 		isDestructive: Bool = false,
@@ -61,6 +63,7 @@ extension ButtonStyle where Self == SecondaryRectangularButtonStyle {
 		trailingImage: Image? = nil
 	) -> Self {
 		Self(
+			font: font,
 			backgroundColor: backgroundColor,
 			shouldExpand: shouldExpand,
 			isDestructive: isDestructive,

@@ -122,7 +122,7 @@ final class ROLAClientTests: TestCase {
 
 	func test_sign_auth() throws {
 		let mnemonic = try Mnemonic(phrase: "equip will roof matter pink blind book anxiety banner elbow sun young", language: .english)
-		let mnemonicWithPassphrase = MnemonicWithPassphrase(mnemonic: mnemonic, passphrase: "")
+		let mnemonicWithPassphrase = MnemonicWithPassphrase(mnemonic: mnemonic)
 		let accountPath = try AccountPath(string: "m/44H/1022H/12H/525H/1460H/1H")
 		let publicKey = mnemonicWithPassphrase.derivePublicKey(path: accountPath)
 		XCTAssertEqual(publicKey.publicKey.hex, "0a4b894208a1f6b1bd7e823b59909f01aae0172b534baa2905b25f1bcbbb4f0a")

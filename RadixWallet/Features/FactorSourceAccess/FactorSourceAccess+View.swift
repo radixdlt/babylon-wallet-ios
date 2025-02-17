@@ -1,29 +1,18 @@
+import SwiftUI
+
 // MARK: - FactorSourceAccess.View
-
 extension FactorSourceAccess {
-	struct ViewState: Equatable {
-		let title: String
-		let message: String
-		let externalDevice: String?
-		let isRetryEnabled: Bool
-		let height: CGFloat
-	}
-
-	@MainActor
 	struct View: SwiftUI.View {
-		private let store: StoreOf<FactorSourceAccess>
-
-		init(store: StoreOf<FactorSourceAccess>) {
-			self.store = store
-		}
+		let store: StoreOf<FactorSourceAccess>
 
 		var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				content(viewStore)
+			WithPerceptionTracking {
+				content
+					.scrollableWithBottomSpacer()
 					.withNavigationBar {
-						viewStore.send(.closeButtonTapped)
+						store.send(.view(.closeButtonTapped))
 					}
-					.presentationDetents([.fraction(viewStore.height), .large])
+					.presentationDetents([.fraction(0.75), .large])
 					.presentationDragIndicator(.visible)
 					.interactiveDismissDisabled()
 					.presentationBackground(.blur)
@@ -34,55 +23,72 @@ extension FactorSourceAccess {
 			}
 		}
 
-		@ViewBuilder
-		private func content(_ viewStore: ViewStoreOf<FactorSourceAccess>) -> some SwiftUI.View {
+		private var content: some SwiftUI.View {
 			VStack(spacing: .medium3) {
-				Image(asset: AssetResource.signingKey)
+				Image(.signingKey)
 					.foregroundColor(.app.gray3)
 
-				Text(viewStore.title)
-					.textStyle(.sheetTitle)
-					.foregroundColor(.app.gray1)
+				VStack(spacing: .small2) {
+					Text(store.title)
+						.textStyle(.sheetTitle)
 
-				Text(LocalizedStringKey(viewStore.message))
-					.textStyle(.body1Regular)
-					.foregroundColor(.app.gray1)
-
-				externalDevice(viewStore.externalDevice)
-
-				if viewStore.isRetryEnabled {
-					Button {
-						viewStore.send(.retryButtonTapped)
-					} label: {
-						Text(L10n.Common.retry)
-							.textStyle(.body1Header)
-							.foregroundColor(.app.blue2)
-							.frame(height: .standardButtonHeight)
-							.frame(maxWidth: .infinity)
-					}
+					Text(LocalizedStringKey(store.message))
+						.textStyle(.body1Regular)
 				}
+				.foregroundColor(.app.gray1)
+
+				card
+				retry
+				input
+				skip
 			}
 			.multilineTextAlignment(.center)
 			.padding(.horizontal, .large2)
 		}
 
 		@ViewBuilder
-		private func externalDevice(_ value: String?) -> some SwiftUI.View {
-			if let value {
-				HStack(spacing: .medium3) {
-					Image(asset: AssetResource.signingKey)
-						.resizable()
-						.frame(.smallest)
-						.foregroundColor(.app.gray3)
-
-					Text(value)
-						.textStyle(.secondaryHeader)
-						.foregroundColor(.app.gray1)
-						.padding(.trailing, .small2)
+		private var card: some SwiftUI.View {
+			if store.showCard {
+				if let factorSource = store.factorSource {
+					FactorSourceCard(
+						kind: .instance(
+							factorSource: factorSource,
+							kind: .short(showDetails: false)
+						),
+						mode: .display
+					)
+				} else {
+					ProgressView()
 				}
-				.padding(.medium2)
-				.background(Color.app.gray5)
-				.cornerRadius(.large1)
+			}
+		}
+
+		@ViewBuilder
+		private var retry: some SwiftUI.View {
+			if store.isRetryEnabled {
+				Button(L10n.Common.retry) {
+					store.send(.view(.retryButtonTapped))
+				}
+				.buttonStyle(.primaryText(height: .standardButtonHeight))
+			}
+		}
+
+		@ViewBuilder
+		private var input: some SwiftUI.View {
+			if let child = store.password {
+				PasswordFactorSourceAccess.View(store: child)
+			} else if let child = store.offDeviceMnemonic {
+				OffDeviceMnemonicFactorSourceAccess.View(store: child)
+			}
+		}
+
+		@ViewBuilder
+		private var skip: some SwiftUI.View {
+			if let text = store.skipButtonText {
+				Button(text) {
+					store.send(.view(.skipButtonTapped))
+				}
+				.buttonStyle(.primaryText(height: .standardButtonHeight))
 			}
 		}
 	}
@@ -95,16 +101,24 @@ private extension StoreOf<FactorSourceAccess> {
 		}
 		return scope(state: scopeState, action: Action.destination)
 	}
+
+	var password: Store<PasswordFactorSourceAccess.State, PasswordFactorSourceAccess.Action>? {
+		scope(state: \.password, action: \.child.password)
+	}
+
+	var offDeviceMnemonic: Store<OffDeviceMnemonicFactorSourceAccess.State, OffDeviceMnemonicFactorSourceAccess.Action>? {
+		scope(state: \.offDeviceMnemonic, action: \.child.offDeviceMnemonic)
+	}
 }
 
 @MainActor
 private extension View {
 	func destinations(with store: StoreOf<FactorSourceAccess>) -> some View {
 		let destinationStore = store.destination
-		return noP2PLinkAlert(with: destinationStore)
+		return errorAlert(with: destinationStore)
 	}
 
-	private func noP2PLinkAlert(with destinationStore: PresentationStoreOf<FactorSourceAccess.Destination>) -> some View {
-		alert(store: destinationStore.scope(state: \.noP2PLink, action: \.noP2PLink))
+	private func errorAlert(with destinationStore: PresentationStoreOf<FactorSourceAccess.Destination>) -> some View {
+		alert(store: destinationStore.scope(state: \.errorAlert, action: \.errorAlert))
 	}
 }

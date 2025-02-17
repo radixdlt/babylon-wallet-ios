@@ -5,7 +5,7 @@ extension DeepLinkHandlerClient: TestDependencyKey {
 	static let testValue = Self(
 		handleDeepLink: unimplemented("\(Self.self).handleDeepLink"),
 		setDeepLink: unimplemented("\(Self.self).setDeepLink"),
-		hasDeepLink: unimplemented("\(Self.self).hasDeepLink")
+		hasDeepLink: noop.hasDeepLink
 	)
 }
 

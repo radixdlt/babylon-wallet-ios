@@ -2,44 +2,20 @@ import ComposableArchitecture
 import Sargon
 import SwiftUI
 
+// FIXME: Refactor ImportMnemonic
+typealias DisplayMnemonic = ImportMnemonic
+
 // MARK: - ImportMnemonic
 struct ImportMnemonic: Sendable, FeatureReducer {
 	static let wordsPerRow = 3
 
 	struct State: Sendable, Hashable {
-		typealias Words = IdentifiedArrayOf<ImportMnemonicWord.State>
-		var words: Words
-
-		var language: BIP39Language
-		var wordCount: BIP39WordCount {
-			guard let wordCount = BIP39WordCount(wordCount: words.count) else {
-				assertionFailure("Should never happen")
-				return .twentyFour
-			}
-			return wordCount
-		}
-
-		mutating func changeWordCount(to newWordCount: BIP39WordCount) {
-			let wordCount = words.count
-			let delta = Int(newWordCount.rawValue) - wordCount
-			if delta > 0 {
-				// is increasing word count
-				words.append(contentsOf: (wordCount ..< Int(newWordCount.rawValue)).map {
-					.init(
-						id: $0,
-						isReadonlyMode: mode.readonly != nil
-					)
-				})
-			} else if delta < 0 {
-				// is decreasing word count
-				words.removeLast(-delta)
-			}
-		}
-
+		var grid: ImportMnemonicGrid.State
 		var bip39Passphrase: String = ""
 
 		var mnemonic: Mnemonic? {
-			guard completedWords.count == words.count else {
+			let completedWords = self.completedWords
+			guard completedWords.count == grid.words.count else {
 				return nil
 			}
 			return try? Mnemonic(
@@ -47,8 +23,12 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 			)
 		}
 
+		var isComplete: Bool {
+			completedWords.count == grid.words.count
+		}
+
 		var completedWords: [BIP39Word] {
-			words.compactMap(\.completeWord)
+			grid.words.compactMap(\.completeWord)
 		}
 
 		let isWordCountFixed: Bool
@@ -114,10 +94,6 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 
 		var mode: Mode
 
-		#if DEBUG
-		var debugMnemonicPhraseSingleField = ""
-		#endif
-
 		@PresentationState
 		var destination: Destination.State?
 
@@ -178,15 +154,13 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 					showCloseButton: showCloseButton
 				)
 			)
-			self.language = language
+			self.grid = .init(count: wordCount, language: language, isWordCountFixed: isWordCountFixed)
+			self.isWordCountFixed = isWordCountFixed
 			self.bip39Passphrase = bip39Passphrase
 
-			self.isWordCountFixed = isWordCountFixed
-			self.words = []
 			self.header = header
 			self.warning = warning
 			self.warningOnContinue = warningOnContinue
-			changeWordCount(to: wordCount)
 		}
 
 		init(
@@ -200,32 +174,10 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 			self.warningOnContinue = nil
 
 			let mnemonic = mnemonicWithPassphrase.mnemonic
-			self.language = mnemonic.language
+			self.grid = .init(mnemonic: mnemonic)
 			self.mode = .readonly(readonlyMode)
 			self.isWordCountFixed = true
-			self.words = Self.words(from: mnemonic, isReadonlyMode: true)
 			self.bip39Passphrase = mnemonicWithPassphrase.passphrase
-		}
-
-		static func words(
-			from mnemonic: Mnemonic,
-			isReadonlyMode: Bool
-		) -> Words {
-			.init(
-				uniqueElements: mnemonic.words
-					.enumerated()
-					.map {
-						ImportMnemonicWord.State(
-							id: $0.offset,
-							value: .complete(
-								text: $0.element.word,
-								word: $0.element,
-								completion: .auto(match: .exact)
-							),
-							isReadonlyMode: isReadonlyMode
-						)
-					}
-			)
 		}
 
 		struct Header: Sendable, Hashable {
@@ -240,24 +192,12 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 	}
 
 	enum ViewAction: Sendable, Equatable {
-		case appeared
-
 		case toggleModeButtonTapped
 		case passphraseChanged(String)
-		case changedWordCountTo(BIP39WordCount)
 		case doneViewing
 		case closeButtonTapped
 		case backButtonTapped
 		case continueButtonTapped(Mnemonic)
-
-		#if DEBUG
-		case debugCopyMnemonic
-		case debugMnemonicChanged(String, continue: Bool = false)
-		case debugUseBabylonTestingMnemonicWithActiveAccounts(continue: Bool)
-		case debugUseOlympiaTestingMnemonicWithActiveAccounts(continue: Bool)
-		case debugUseTestingMnemonicZooVote(continue: Bool)
-		case debugPasteMnemonic
-		#endif
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -266,12 +206,12 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 			let savedIntoProfile: Bool
 		}
 
-		case focusOn(ImportMnemonicWord.State.ID)
 		case saveFactorSourceResult(TaskResult<IntermediaryResult>)
 	}
 
+	@CasePathable
 	enum ChildAction: Sendable, Equatable {
-		case word(id: ImportMnemonicWord.State.ID, child: ImportMnemonicWord.Action)
+		case grid(ImportMnemonicGrid.Action)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -327,10 +267,11 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 	init() {}
 
 	var body: some ReducerOf<Self> {
+		Scope(state: \.grid, action: \.child.grid) {
+			ImportMnemonicGrid()
+		}
+
 		Reduce(core)
-			.forEach(\.words, action: /Action.child .. ChildAction.word) {
-				ImportMnemonicWord()
-			}
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
 			}
@@ -338,78 +279,14 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .word(id, child: .delegate(.lookupWord(input))):
-			let lookUpResult = lookup(input: input, state)
-			return updateWord(id: id, input: input, &state, lookupResult: lookUpResult)
-
-		case let .word(id, child: .delegate(.lostFocus(displayText))):
-			let lookupResult = lookup(input: displayText, state)
-			switch lookupResult {
-			case let .known(.ambigous(candidates, input)):
-				if let exactMatch = candidates.first(where: { $0.word == input.rawValue }) {
-					state.words[id: id]?.value = .complete(
-						text: displayText,
-						word: exactMatch,
-						completion: ImportMnemonicWord.State.WordValue.Completion.auto(
-							match: .exact
-						)
-					)
-				} else {
-					state.words[id: id]?.value = .incomplete(
-						text: displayText,
-						hasFailedValidation: true
-					)
-				}
-				return .none
-
-			case .unknown(.notInList):
-				state.words[id: id]?.value = .incomplete(
-					text: displayText,
-					hasFailedValidation: true
-				)
-				return .none
-
-			case let .known(.unambiguous(word, match, input)):
-				return completeWith(word: word, completion: .auto(match: match), id: id, input: input.rawValue, &state)
-
-			case .unknown(.tooShort):
-				return .none
-			}
-
-		case let .word(id, child: .delegate(.userSelectedCandidate(candidate, input))):
-			return completeWith(
-				word: candidate,
-				completion: .user,
-				id: id,
-				input: input,
-				&state
-			)
-
-		case let .word(id, child: .delegate(.didSubmit)):
-			return focusNext(&state, after: id)
-
-		default:
-			return .none
-		}
-	}
-
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .appeared:
-			return focusNext(&state, after: nil)
-
 		case let .passphraseChanged(passphrase):
 			state.bip39Passphrase = passphrase
 			return .none
 
 		case .toggleModeButtonTapped:
 			state.isAdvancedMode.toggle()
-			return .none
-
-		case let .changedWordCountTo(newWordCount):
-			state.changeWordCount(to: newWordCount)
 			return .none
 
 		case let .continueButtonTapped(mnemonic):
@@ -437,39 +314,6 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 				assertionFailure("Invalid mode: No close button should be visible")
 				return .none
 			}
-
-		#if DEBUG
-		case .debugCopyMnemonic:
-			if let mnemonic = state.mnemonic?.phrase {
-				pasteboardClient.copyString(mnemonic)
-			}
-			return .none
-
-		case let .debugMnemonicChanged(mnemonic, continueAutomatically):
-			state.debugMnemonicPhraseSingleField = mnemonic
-			if let mnemonic = try? Mnemonic(phrase: mnemonic, language: state.language) {
-				state.words = State.words(from: mnemonic, isReadonlyMode: state.mode.readonly != nil)
-				if continueAutomatically {
-					state.mode.update(isProgressing: true)
-					return .send(.view(.continueButtonTapped(mnemonic)))
-				}
-			}
-
-			return .none
-
-		case .debugPasteMnemonic:
-			let toPaste = pasteboardClient.getString() ?? ""
-			return .send(.view(.debugMnemonicChanged(toPaste)))
-
-		case let .debugUseOlympiaTestingMnemonicWithActiveAccounts(continueAutomatically):
-			return .send(.view(.debugMnemonicChanged("section canoe half crystal crew balcony duty scout half robot avocado gas all effort piece", continue: continueAutomatically)))
-
-		case let .debugUseBabylonTestingMnemonicWithActiveAccounts(continueAutomatically):
-			return .send(.view(.debugMnemonicChanged("wine over village stage barrel strategy cushion decline echo fiber salad carry empower fun awful cereal galaxy laundry practice appear bean flat mansion license", continue: continueAutomatically)))
-
-		case let .debugUseTestingMnemonicZooVote(continueAutomatically):
-			return .send(.view(.debugMnemonicChanged(Mnemonic.sample24ZooVote.phrase, continue: continueAutomatically)))
-		#endif
 		}
 	}
 
@@ -521,10 +365,6 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .focusOn(id):
-			state.words[id: id]?.focus()
-			return .none
-
 		case let .saveFactorSourceResult(.failure(error)):
 			state.mode.update(isProgressing: false)
 			errorQueue.schedule(error)
@@ -579,81 +419,6 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 			}
 
 		default:
-			return .none
-		}
-	}
-}
-
-extension ImportMnemonic {
-	private func lookup(input: String, _ state: State) -> BIP39LookupResult {
-		mnemonicClient.lookup(.init(
-			language: state.language,
-			input: input,
-			minLenghForCandidatesLookup: 2
-		))
-	}
-
-	private func completeWith(
-		word: BIP39Word,
-		completion: ImportMnemonicWord.State.WordValue.Completion,
-		id: ImportMnemonicWord.State.ID,
-		input: String,
-		_ state: inout State
-	) -> Effect<Action> {
-		state.words[id: id]?.value = .complete(text: input, word: word, completion: completion)
-		return .none
-	}
-
-	private func updateWord(
-		id: ImportMnemonicWord.State.ID,
-		input: String,
-		_ state: inout State,
-		lookupResult: BIP39LookupResult
-	) -> Effect<Action> {
-		// FIXME: - 1.5.4 hot fix
-		/// Words strip is broken in latest iOS versions, so we don't count on users selecting the word
-		/// dissambiguate between them. Rather the Wallet will validate the word eagerly if it is a valid one.
-		/// Behaviour:
-		/// - User enters the first two characters, having the word `en` - the word is incomplete.
-		/// - User enters another character, having the word`end` - the word is valid.
-		/// - User enters additional character, having the word `endl` - the word is incomplete.
-		/// - User enters additional characters, having the word `endless` - the word is considered valid.
-		/// - User removes some characters, having the word `endle` - the word is incomplete.
-		/// - User removes more characters, having the word `end` - the word is valid.
-		/// - User removes another character, having the word `en` - the word is incomplete.
-		switch lookupResult {
-		case let .known(.ambigous(candidates, nonEmptyInput)):
-			guard let userInput = candidates.first(where: { $0.word == nonEmptyInput.rawValue }) else {
-				state.words[id: id]?.value = .incomplete(text: input, hasFailedValidation: false)
-				return .none
-			}
-
-			return completeWith(word: userInput, completion: .user, id: id, input: input, &state)
-
-		case let .known(.unambiguous(word, _, _)):
-			guard word.word == input else {
-				state.words[id: id]?.value = .incomplete(text: input, hasFailedValidation: false)
-				return .none
-			}
-			return completeWith(word: word, completion: .user, id: id, input: input, &state)
-
-		case .unknown(.notInList):
-			state.words[id: id]?.value = .incomplete(text: input, hasFailedValidation: true)
-			return .none
-
-		case .unknown(.tooShort):
-			state.words[id: id]?.value = .incomplete(text: input, hasFailedValidation: false)
-			return .none
-		}
-	}
-
-	private func focusNext(_ state: inout State, after current: Int?) -> Effect<Action> {
-		if let current {
-			state.words[id: current]?.resignFocus()
-			return delayedEffect(delay: .milliseconds(75), for: .internal(.focusOn(current + 1)))
-		} else if let firstIncomplete = state.words.first(where: { !$0.isComplete })?.id {
-			return delayedEffect(delay: .milliseconds(75), for: .internal(.focusOn(firstIncomplete)))
-		} else {
 			return .none
 		}
 	}
