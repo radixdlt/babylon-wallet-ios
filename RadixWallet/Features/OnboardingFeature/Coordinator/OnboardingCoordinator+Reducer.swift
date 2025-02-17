@@ -94,6 +94,14 @@ struct OnboardingCoordinator: Sendable, FeatureReducer {
 				_ = await radixConnectClient.loadP2PLinksAndConnectAll()
 			}
 
+		case .createAccount(.delegate(.dismissed)):
+			return .run { _ in
+				// Clear out the ephemeral profile created on `setupNewUser`
+				try await SargonOS.shared.deleteWallet()
+			} catch: { error, _ in
+				errorQueue.schedule(error)
+			}
+
 		default:
 			return .none
 		}

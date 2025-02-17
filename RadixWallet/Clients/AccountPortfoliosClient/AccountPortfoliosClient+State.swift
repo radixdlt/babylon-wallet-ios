@@ -271,9 +271,6 @@ extension ResourceAmount {
 		case var .atLeast(exactAmount):
 			exactAmount.fiatWorth = change(resourceAddress, exactAmount)
 			self = .atLeast(exactAmount)
-		case var .atMost(exactAmount):
-			exactAmount.fiatWorth = change(resourceAddress, exactAmount)
-			self = .atMost(exactAmount)
 		case var .between(minExactAmount, maxExactAmount):
 			minExactAmount.fiatWorth = change(resourceAddress, minExactAmount)
 			maxExactAmount.fiatWorth = change(resourceAddress, maxExactAmount)
