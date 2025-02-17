@@ -1597,6 +1597,8 @@ Code: %@";
 "securityShields_assigned_accountPlural" = "%d Accounts";
 "securityShields_assigned_personaSingular" = "1 Persona";
 "securityShields_assigned_personaPlural" = "%d Personas";
+"securityShields_assigned_someHiddenEntities" = "(and some hidden)";
+"securityShields_assigned_onlyHiddenEntities" = "Hidden Accounts or Personas";
 "securityShields_changeMain_title" = "Change Default Shield";
 "securityShields_changeMain_subtitle" = "Choose which Security Shield will be pre-selected when you want to use one for an Account or Persona.";
 "securityShields_createShieldButton" = "Create New Security Shield";
