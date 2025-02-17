@@ -46,6 +46,7 @@ extension ApplyShield {
 			case finished
 		}
 
+		@Dependency(\.dappInteractionClient) var dappInteractionClient
 		@Dependency(\.errorQueue) var errorQueue
 
 		var body: some ReducerOf<Self> {
@@ -62,6 +63,13 @@ extension ApplyShield {
 				let addresses: [AddressOfAccountOrPersona] = state.selectedAccounts.map { .account($0) } + state.selectedPersonas.map { .identity($0) }
 				return .run { [shieldID = state.shieldID] send in
 					let interaction = try await SargonOs.shared.makeInteractionForApplyingSecurityShield(securityShieldId: shieldID, addresses: addresses)
+
+					Task {
+						_ = await dappInteractionClient.addWalletInteraction(
+							.batchOfTransactions(interaction),
+							.accountTransfer // TODO: 4063
+						)
+					}
 					await send(.delegate(.finished))
 				} catch: { error, _ in
 					errorQueue.schedule(error)

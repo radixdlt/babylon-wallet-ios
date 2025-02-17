@@ -295,8 +295,22 @@ extension InteractionReview.Sections {
 				accountDeletion: deleteAccounts
 			)
 
-		case let .securifyEntity(entityAddress, provisionalSecurityStructureMetadata):
-			fatalError("TODO")
+		case let .securifyEntity(entityAddress, metadata):
+			guard let entity = try await extractEntity(entityAddress) else { return nil }
+
+			let shield = try SargonOs.shared.securityStructureOfFactorSourceIdsBySecurityStructureId(
+				shieldId: metadata.id
+			)
+
+			let allFactorSourcesFromProfile = try await factorSourcesClient.getFactorSources().elements
+
+			return Common.SectionsData(
+				shieldUpdate: .init(
+					entity: entity,
+					shield: shield,
+					allFactorSourcesFromProfile: allFactorSourcesFromProfile
+				)
+			)
 
 		case .generalSubintent:
 			fatalError("TODO")
@@ -317,6 +331,20 @@ extension InteractionReview.Sections {
 					return .external(address, approved: false)
 				}
 			}
+	}
+
+	func extractEntity(_ address: AddressOfAccountOrPersona) async throws -> AccountOrPersona? {
+		let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
+		if let account = accounts.first(where: { $0.address == address.accountAddress }) {
+			return .account(account)
+		}
+
+		let personas = try await personasClient.getPersonas()
+		if let persona = personas.first(where: { $0.address.address == address.address }) {
+			return .persona(persona)
+		}
+
+		return nil
 	}
 
 	func extractDappAddresses(encounteredAddresses: [ManifestEncounteredComponentAddress]) -> [Address] {

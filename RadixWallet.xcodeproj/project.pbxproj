@@ -1277,6 +1277,8 @@
 		E6FA984E2B04E3D500748F20 /* NoContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA984D2B04E3D500748F20 /* NoContentView.swift */; };
 		E703C0272D3F8D81006DF199 /* MultiPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E703C0262D3F8D81006DF199 /* MultiPickerView.swift */; };
 		E713204C2BCD372600AE6B3C /* UnknownCaseDecodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = E713204B2BCD372600AE6B3C /* UnknownCaseDecodable.swift */; };
+		E7392AC22D5DFBCD002FABDA /* InteractionReview-ShieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7392AC12D5DFBCD002FABDA /* InteractionReview-ShieldView.swift */; };
+		E7392AC42D5F58C5002FABDA /* FactorSourcePreviewCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7392AC32D5F58C5002FABDA /* FactorSourcePreviewCard.swift */; };
 		E7607DBD2D4252420083B3A5 /* ShieldsList+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7607DBC2D4252420083B3A5 /* ShieldsList+Reducer.swift */; };
 		E7607DBF2D4252470083B3A5 /* ShieldsList+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7607DBE2D4252470083B3A5 /* ShieldsList+View.swift */; };
 		E7607DC12D439D780083B3A5 /* ChangeMainShield+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7607DC02D439D780083B3A5 /* ChangeMainShield+Reducer.swift */; };
@@ -2597,6 +2599,8 @@
 		E6FA984D2B04E3D500748F20 /* NoContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoContentView.swift; sourceTree = "<group>"; };
 		E703C0262D3F8D81006DF199 /* MultiPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiPickerView.swift; sourceTree = "<group>"; };
 		E713204B2BCD372600AE6B3C /* UnknownCaseDecodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnknownCaseDecodable.swift; sourceTree = "<group>"; };
+		E7392AC12D5DFBCD002FABDA /* InteractionReview-ShieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InteractionReview-ShieldView.swift"; sourceTree = "<group>"; };
+		E7392AC32D5F58C5002FABDA /* FactorSourcePreviewCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FactorSourcePreviewCard.swift; sourceTree = "<group>"; };
 		E7607DBC2D4252420083B3A5 /* ShieldsList+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShieldsList+Reducer.swift"; sourceTree = "<group>"; };
 		E7607DBE2D4252470083B3A5 /* ShieldsList+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShieldsList+View.swift"; sourceTree = "<group>"; };
 		E7607DC02D439D780083B3A5 /* ChangeMainShield+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChangeMainShield+Reducer.swift"; sourceTree = "<group>"; };
@@ -5137,6 +5141,7 @@
 				5B6E11462C45834C00C20F2D /* AccountCard */,
 				E775A1B62CF4CA0700E72DB9 /* FactorSourceCard */,
 				E7607DC42D43A10E0083B3A5 /* ShieldCard */,
+				E7392AC32D5F58C5002FABDA /* FactorSourcePreviewCard.swift */,
 				48CFC1332ADC10D900E77A5C /* LedgerRowView.swift */,
 				A4F30C932C7CA71400F983D6 /* WithNavigationBar.swift */,
 				48CFC22C2ADC10D900E77A5C /* Radix+Dashboard.swift */,
@@ -5604,6 +5609,7 @@
 				5B27FBF62CC716BC002975BE /* Dapps */,
 				A4B017F32B4BF57B00B42B8E /* DepositSetting */,
 				48CFBCF62ADC10D800E77A5C /* DepositExceptions */,
+				E7392AC02D5DE096002FABDA /* Shield */,
 			);
 			path = Sections;
 			sourceTree = "<group>";
@@ -7109,6 +7115,14 @@
 			path = ConfirmSkippingBDFS;
 			sourceTree = "<group>";
 		};
+		E7392AC02D5DE096002FABDA /* Shield */ = {
+			isa = PBXGroup;
+			children = (
+				E7392AC12D5DFBCD002FABDA /* InteractionReview-ShieldView.swift */,
+			);
+			path = Shield;
+			sourceTree = "<group>";
+		};
 		E7607DBB2D4251510083B3A5 /* ShieldsList */ = {
 			isa = PBXGroup;
 			children = (
@@ -7857,6 +7871,7 @@
 				5B83D2D82D47FC1E007111B0 /* Authorization.swift in Sources */,
 				5B83D2D92D47FC1E007111B0 /* Authorization+View.swift in Sources */,
 				83823EAA2B72365000827211 /* TokenPriceClient+Interface.swift in Sources */,
+				E7392AC22D5DFBCD002FABDA /* InteractionReview-ShieldView.swift in Sources */,
 				48CFC46D2ADC10DA00E77A5C /* PersonasClient+Interface.swift in Sources */,
 				48CFC2BB2ADC10D900E77A5C /* SelectBackup+Reducer.swift in Sources */,
 				48CFC4082ADC10DA00E77A5C /* UInt11.swift in Sources */,
@@ -8483,6 +8498,7 @@
 				A40815E92C7E0D08005E65B9 /* PublicKeyEddsaEd25519.swift in Sources */,
 				48CFC3672ADC10D900E77A5C /* NonFungbileAssetRow+Reducer.swift in Sources */,
 				48CFC25C2ADC10D900E77A5C /* OnboardingStartup+View.swift in Sources */,
+				E7392AC42D5F58C5002FABDA /* FactorSourcePreviewCard.swift in Sources */,
 				48CFC2642ADC10D900E77A5C /* EditPersona.swift in Sources */,
 				831F0CF62C294C0D00D6F5BF /* DeepLinkHandlerClient+Test.swift in Sources */,
 				5BBC7DA42C3D442800B04BD6 /* URLRequest+Extra.swift in Sources */,

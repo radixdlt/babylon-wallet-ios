@@ -172,6 +172,7 @@ internal enum AssetResource {
   internal static let transactionReviewDeletingAccount = ImageAsset(name: "transactionReview_deletingAccount")
   internal static let transactionReviewDepositSetting = ImageAsset(name: "transactionReview_depositSetting")
   internal static let transactionReviewDepositing = ImageAsset(name: "transactionReview_depositing")
+  internal static let transactionReviewUpdateShield = ImageAsset(name: "transactionReview_updateShield")
   internal static let transactionReviewWithdrawing = ImageAsset(name: "transactionReview_withdrawing")
   internal static let checkCircle = ImageAsset(name: "check_circle")
   internal static let cloud = ImageAsset(name: "cloud")
