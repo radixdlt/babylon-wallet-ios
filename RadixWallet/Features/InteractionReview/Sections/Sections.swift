@@ -305,7 +305,7 @@ private extension InteractionReview.Sections {
 			state.destination = .nonFungibleTokenDetails(.init(
 				resourceAddress: resource.resourceAddress,
 				resourceDetails: .success(resource),
-				details: nft.map(KnownResourceBalance.NonFungible.token),
+				details: nft.map { KnownResourceBalance.NonFungible.token(.init(token: $0)) },
 				ledgerState: resource.atLedgerState,
 				stakeClaim: details.stakeClaimTokens.stakeClaims.first,
 				isClaimStakeEnabled: false

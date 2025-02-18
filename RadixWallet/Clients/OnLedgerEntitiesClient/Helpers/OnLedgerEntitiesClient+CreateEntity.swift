@@ -584,7 +584,7 @@ extension OnLedgerEntitiesClient {
 
 		let validatorAddress: ValidatorAddress
 		let token: OnLedgerEntity.NonFungibleToken
-		var claimAmount: ExactResourceAmount
+		var claimAmount: ResourceAmount
 		let reamainingEpochsUntilClaim: Int?
 
 		var isReadyToBeClaimed: Bool {

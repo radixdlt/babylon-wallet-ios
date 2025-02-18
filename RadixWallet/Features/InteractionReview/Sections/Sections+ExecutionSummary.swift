@@ -47,35 +47,40 @@ extension InteractionReview.Sections {
 			return nil
 
 		case .general, .transfer:
-			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
-			let withdrawals = try await extractWithdrawals(
-				accountWithdraws: summary.withdrawals,
-				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
-				entities: resourcesInfo,
-				networkID: networkID
-			)
+			do {
+				let resourcesInfo = try await resourcesInfo(allAddresses.elements)
+				let withdrawals = try await extractWithdrawals(
+					accountWithdraws: summary.withdrawals,
+					newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
+					entities: resourcesInfo,
+					networkID: networkID
+				)
 
-			let dappAddresses = extractDappAddresses(encounteredAddresses: summary.encounteredAddresses)
-			let dAppsUsed = try await extractDapps(
-				addresses: dappAddresses,
-				unknownTitle: L10n.TransactionReview.unknownComponents
-			)
+				let dappAddresses = extractDappAddresses(encounteredAddresses: summary.encounteredAddresses)
+				let dAppsUsed = try await extractDapps(
+					addresses: dappAddresses,
+					unknownTitle: L10n.TransactionReview.unknownComponents
+				)
 
-			let deposits = try await extractDeposits(
-				accountDeposits: summary.deposits,
-				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
-				entities: resourcesInfo,
-				networkID: networkID
-			)
+				let deposits = try await extractDeposits(
+					accountDeposits: summary.deposits,
+					newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
+					entities: resourcesInfo,
+					networkID: networkID
+				)
 
-			let proofs = try await exctractProofs(summary.presentedProofs)
+				let proofs = try await exctractProofs(summary.presentedProofs)
 
-			return Common.SectionsData(
-				withdrawals: withdrawals,
-				dAppsUsed: dAppsUsed,
-				deposits: deposits,
-				proofs: proofs
-			)
+				return Common.SectionsData(
+					withdrawals: withdrawals,
+					dAppsUsed: dAppsUsed,
+					deposits: deposits,
+					proofs: proofs
+				)
+			} catch {
+				print("error \(error)")
+				return nil
+			}
 
 		case let .poolContribution(poolAddresses, poolContributions):
 			// All resources that are part of the pool
@@ -396,7 +401,7 @@ extension InteractionReview.Sections {
 			let tokens = try await onLedgerEntitiesClient.getNonFungibleTokenData(
 				.init(resource: resourceAddress, nonFungibleIds: globalIds)
 			)
-			return tokens.map { (resourceAddress, .nonFungible(.token($0))) }
+			return tokens.map { (resourceAddress, .nonFungible(.token(.init(token: $0)))) }
 		}
 	}
 
@@ -691,8 +696,8 @@ extension InteractionReview.Sections {
 		case let .nonFungible(_, indicator):
 			return try await onLedgerEntitiesClient.nonFungibleResourceBalances(
 				resourceInfo,
+				resourceQuantifier: indicator,
 				resourceAddress: resourceAddress,
-				ids: indicator.ids,
 				unstakeData: unstakeData,
 				newlyCreatedNonFungibles: newlyCreatedNonFungibles
 			)
