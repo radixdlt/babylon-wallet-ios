@@ -141,7 +141,7 @@ struct ApprovalSlider: View {
 	}
 }
 
-private extension Gradient {
+extension Gradient {
 	static let approvalSlider: Gradient = .init(stops: [
 		.init(color: .app.account11green, location: 0),
 		.init(color: .app.blue2, location: 0.41),
