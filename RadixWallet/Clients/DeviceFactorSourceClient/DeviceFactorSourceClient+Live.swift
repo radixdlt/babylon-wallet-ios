@@ -110,10 +110,10 @@ extension DeviceFactorSourceClient: DependencyKey {
 				loggerGlobal.critical("Failed to find factor source with ID: '\(factorSourceId)'")
 				throw FailedToFindFactorSource()
 			}
-			let publicKeys = mnemonicWithPassphrase.derivePublicKeys(paths: request.derivationPaths)
-			return publicKeys.map {
-				.init(factorSourceId: factorSourceId, publicKey: $0)
-			}
+			return mnemonicWithPassphrase.derivePublicKeys(
+				paths: request.derivationPaths,
+				factorSourceId: factorSourceId
+			)
 		}
 
 		return Self(

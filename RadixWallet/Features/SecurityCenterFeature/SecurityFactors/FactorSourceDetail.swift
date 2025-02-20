@@ -3,10 +3,12 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		let integrity: FactorSourceIntegrity
 		var name: String
+		var lastUsed: Timestamp
 
 		init(integrity: FactorSourceIntegrity) {
 			self.integrity = integrity
 			self.name = integrity.factorSource.asGeneral.name
+			self.lastUsed = integrity.factorSource.asGeneral.common.lastUsedOn
 		}
 
 		@PresentationState
@@ -105,8 +107,12 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .spotCheckResult(success):
-			state.destination = .spotCheckAlert(success ? .spotCheckSuccess : .spotCheckFailure)
+		case .spotCheckResult(true):
+			state.lastUsed = .init()
+			state.destination = .spotCheckAlert(.spotCheckSuccess)
+			return .none
+		case .spotCheckResult(false):
+			state.destination = .spotCheckAlert(.spotCheckFailure)
 			return .none
 		}
 	}

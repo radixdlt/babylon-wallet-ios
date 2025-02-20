@@ -61,7 +61,7 @@ extension FactorSourceDetail {
 			.model(
 				title: L10n.FactorSources.Detail.spotCheck,
 				subtitle: L10n.FactorSources.Detail.testCanUse,
-				markdown: viewStore.lastUsed,
+				markdown: viewStore.lastUsedMessage,
 				icon: .systemImage("checkmark.circle"),
 				action: .spotCheckTapped
 			)
@@ -97,8 +97,8 @@ extension FactorSourceDetail {
 }
 
 private extension FactorSourceDetail.State {
-	var lastUsed: String {
-		let value = RadixDateFormatter.string(from: factorSource.asGeneral.common.lastUsedOn, dateStyle: .abbreviated)
+	var lastUsedMessage: String {
+		let value = RadixDateFormatter.string(from: lastUsed, dateStyle: .abbreviated)
 		return L10n.FactorSources.Detail.lastUsed(value)
 	}
 }

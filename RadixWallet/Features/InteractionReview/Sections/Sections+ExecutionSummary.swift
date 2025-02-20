@@ -39,12 +39,15 @@ extension InteractionReview.Sections {
 			return newlyCreatedMetadata
 		}
 
-		switch summary.detailedManifestClass {
+		switch summary.detailedClassification {
 		case nil:
 			return nil
 
+		case .securifyEntity:
+			return nil
+
 		case .general, .transfer:
-			if summary.detailedManifestClass == .general {
+			if summary.detailedClassification == .general {
 				guard !summary.deposits.isEmpty || !summary.withdrawals.isEmpty else { return nil }
 			}
 
