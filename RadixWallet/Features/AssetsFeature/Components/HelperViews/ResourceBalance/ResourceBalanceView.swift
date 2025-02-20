@@ -517,12 +517,9 @@ extension ResourceBalanceView {
 				}
 
 				if case .unknown = amount {
-					StatusMessageView(
-						text: L10n.InteractionReview.Unknown.amount,
-						type: .warning,
-						useNarrowSpacing: true,
-						useSmallerFontSize: true
-					)
+					Text(L10n.InteractionReview.Unknown.amount)
+						.textStyle(.body2HighImportance)
+						.foregroundStyle(.app.gray2)
 				}
 			}
 		}
@@ -566,12 +563,9 @@ extension ResourceBalanceView {
 				}
 
 				if case .unknown = amount {
-					StatusMessageView(
-						text: L10n.InteractionReview.Unknown.amount,
-						type: .warning,
-						useNarrowSpacing: true,
-						useSmallerFontSize: true
-					)
+					Text(L10n.InteractionReview.Unknown.amount)
+						.textStyle(.body2HighImportance)
+						.foregroundStyle(.app.gray2)
 				}
 			}
 		}
@@ -649,13 +643,6 @@ extension ResourceBalanceView {
 				case let .atLeast(exactAmount):
 					SubAmountView(
 						title: L10n.InteractionReview.atLeast,
-						amount: exactAmount,
-						appearance: appearance,
-						symbol: symbol
-					)
-				case let .atMost(exactAmount):
-					SubAmountView(
-						title: L10n.InteractionReview.noMoreThan,
 						amount: exactAmount,
 						appearance: appearance,
 						symbol: symbol
