@@ -215,7 +215,9 @@ private extension View {
 			.securityFactors(with: destinationStore)
 			.deviceFactorSources(with: destinationStore)
 			.importMnemonics(with: destinationStore)
-			.securityShields(with: destinationStore)
+			.securityShieldsSetup(with: destinationStore)
+			.securityShieldsList(with: destinationStore)
+			.applyShield(with: destinationStore)
 	}
 
 	private func configurationBackup(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
@@ -242,9 +244,21 @@ private extension View {
 		}
 	}
 
-	private func securityShields(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
-		fullScreenCover(store: destinationStore.scope(state: \.securityShields, action: \.securityShields)) {
+	private func securityShieldsSetup(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
+		fullScreenCover(store: destinationStore.scope(state: \.securityShieldsSetup, action: \.securityShieldsSetup)) {
 			ShieldSetupCoordinator.View(store: $0)
+		}
+	}
+
+	private func securityShieldsList(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.securityShieldsList, action: \.securityShieldsList)) {
+			ShieldsList.View(store: $0)
+		}
+	}
+
+	private func applyShield(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
+		fullScreenCover(store: destinationStore.scope(state: \.applyShield, action: \.applyShield)) {
+			ApplyShield.Coordinator.View(store: $0)
 		}
 	}
 }

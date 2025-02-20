@@ -42,6 +42,13 @@ extension SheetOverlayCoordinator {
 						action: SheetOverlayCoordinator.Root.Action.authorization,
 						then: { Authorization.View(store: $0) }
 					)
+
+				case .spotCheck:
+					CaseLet(
+						/SheetOverlayCoordinator.Root.State.spotCheck,
+						action: SheetOverlayCoordinator.Root.Action.spotCheck,
+						then: { SpotCheck.View(store: $0) }
+					)
 				}
 			}
 		}

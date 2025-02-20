@@ -31,7 +31,7 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Equatable, Sendable {
-		case finished
+		case finished(SecurityStructureId)
 	}
 
 	var body: some ReducerOf<Self> {
@@ -77,9 +77,8 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 		case .path(.element(id: _, action: .rolesSetup(.delegate(.finished)))):
 			state.path.append(.nameShield(.init()))
 			return .none
-		case .path(.element(id: _, action: .nameShield(.delegate(.finished)))):
-			// TODO: Apply shield flow
-			return .send(.delegate(.finished))
+		case let .path(.element(id: _, action: .nameShield(.delegate(.finished(shieldID))))):
+			return .send(.delegate(.finished(shieldID)))
 		default:
 			return .none
 		}

@@ -39,7 +39,7 @@ extension ChooseAccountsRow {
 					case .radioButton:
 						RadioButton(
 							appearance: .light,
-							state: isSelected ? .selected : .unselected
+							isSelected: isSelected
 						)
 					}
 				}

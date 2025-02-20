@@ -99,7 +99,7 @@ struct FactorSourceCard: View {
 				case .radioButton:
 					RadioButton(
 						appearance: .dark,
-						state: isSelected ? .selected : .unselected
+						isSelected: isSelected
 					)
 				case .checkmark:
 					CheckmarkView(appearance: .dark, isChecked: isSelected)

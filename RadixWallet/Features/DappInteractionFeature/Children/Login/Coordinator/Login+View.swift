@@ -81,9 +81,11 @@ extension Login {
 							) { item in
 								PersonaRow.View(
 									viewState: .init(state: item.value),
+									selectionType: .radioButton,
 									isSelected: item.isSelected,
 									action: item.action
 								)
+								.cardShadow
 							}
 						}
 
