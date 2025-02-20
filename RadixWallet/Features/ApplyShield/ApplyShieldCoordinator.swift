@@ -71,13 +71,14 @@ extension ApplyShield {
 							.shieldUpdate
 						)
 
-						// Temporary - will be handled by Sargon once batch transactions are implemented
+						// TODO: Remove this temporary - will be handled by Sargon once batch transactions are implemented
 						switch result {
 						case let .dapp(.success(success)):
 							if case let .transaction(tx) = success.items {
 								/// Wait for the transaction to be committed
 								let txID = tx.send.transactionIntentHash
 								if try await submitTXClient.hasTXBeenCommittedSuccessfully(txID) {
+									// TODO: Use a client which wraps SargonOS so this features becomes testable
 									try await SargonOs.shared.markEntitiesAsSecurified(entityAddresses: addresses)
 								}
 								return

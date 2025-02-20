@@ -9,47 +9,26 @@ extension InteractionReview {
 
 		var body: some View {
 			Card {
-				coreView
-					.padding(.small1)
+				InnerCard {
+					coreView
+						.padding(.small1)
+				}
 			}
 		}
 
 		@MainActor
+		@ViewBuilder
 		private var coreView: some SwiftUI.View {
-			InnerCard {
-				entity
-
-				VStack(spacing: .medium3) {
-					Text(L10n.TransactionReview.UpdateShield.applyTitle(viewState.shield.metadata.displayName.rawValue))
-						.textStyle(.secondaryHeader)
-						.foregroundStyle(.app.gray1)
-						.flushedLeft
-						.padding(.horizontal, .medium3)
-
-					Separator()
-
-					primaryRoleFactors
-
-					Separator()
-
-					VStack(spacing: .medium3) {
-						sectionHeader(
-							title: L10n.TransactionReview.UpdateShield.startConfirmTitle,
-							description: L10n.TransactionReview.UpdateShield.startConfirmMessage
-						)
-
-						Separator()
-						recoveryRoleFactors
-						Separator()
-						confirmationRoleFactors
-						Separator()
-						confirmationDelay
-					}
-					.padding(.horizontal, .medium3)
-				}
-				.padding(.vertical, .medium3)
-				.background(.app.gray5)
+			entity
+			VStack(spacing: .medium3) {
+				factorsHeader
+				Separator()
+				primaryRoleFactors
+				Separator()
+				performShieldRecoveryFactors
 			}
+			.padding(.vertical, .medium3)
+			.background(.app.gray5)
 		}
 
 		@ViewBuilder
@@ -72,6 +51,16 @@ extension InteractionReview {
 				.padding(.vertical, .small1)
 				.roundedCorners(.top, strokeColor: .borderColor, radius: .small1)
 			}
+		}
+
+		@ViewBuilder
+		private var factorsHeader: some SwiftUI.View {
+			let shieldName = viewState.shieldName.rawValue
+			Text(L10n.TransactionReview.UpdateShield.applyTitle(shieldName))
+				.textStyle(.secondaryHeader)
+				.foregroundStyle(.app.gray1)
+				.flushedLeft
+				.padding(.horizontal, .medium3)
 		}
 
 		private func sectionHeader(
@@ -140,6 +129,23 @@ extension InteractionReview {
 
 				factorsList([factorSource])
 			}
+		}
+
+		private var performShieldRecoveryFactors: some View {
+			VStack(spacing: .medium3) {
+				sectionHeader(
+					title: L10n.TransactionReview.UpdateShield.startConfirmTitle,
+					description: L10n.TransactionReview.UpdateShield.startConfirmMessage
+				)
+
+				Separator()
+				recoveryRoleFactors
+				Separator()
+				confirmationRoleFactors
+				Separator()
+				confirmationDelay
+			}
+			.padding(.horizontal, .medium3)
 		}
 
 		private var recoveryRoleFactors: some SwiftUI.View {
@@ -214,24 +220,24 @@ extension InteractionReview.ShieldView {
 }
 
 extension InteractionReview.ShieldView.ViewState {
-	private func filteredFactors(for roleFactors: [FactorSourceId]) -> [FactorSource] {
-		allFactorSourcesFromProfile.filter { roleFactors.contains($0.factorSourceID) }
+	private func filteredFactors(for roleFactors: KeyPath<MatrixOfFactorSourceIDs, [FactorSourceId]>) -> [FactorSource] {
+		allFactorSourcesFromProfile.filter { shield.matrixOfFactors[keyPath: roleFactors].contains($0.factorSourceID) }
 	}
 
 	var primaryThresholdFactors: [FactorSource] {
-		filteredFactors(for: shield.matrixOfFactors.primaryRole.thresholdFactors)
+		filteredFactors(for: \.primaryRole.thresholdFactors)
 	}
 
 	var primaryOverrideFactors: [FactorSource] {
-		filteredFactors(for: shield.matrixOfFactors.primaryRole.overrideFactors)
+		filteredFactors(for: \.primaryRole.overrideFactors)
 	}
 
 	var recoveryFactors: [FactorSource] {
-		filteredFactors(for: shield.matrixOfFactors.recoveryRole.overrideFactors)
+		filteredFactors(for: \.recoveryRole.overrideFactors)
 	}
 
 	var confirmationFactors: [FactorSource] {
-		filteredFactors(for: shield.matrixOfFactors.confirmationRole.overrideFactors)
+		filteredFactors(for: \.confirmationRole.overrideFactors)
 	}
 
 	var authenticationSigningFactor: FactorSource? {
@@ -244,5 +250,9 @@ extension InteractionReview.ShieldView.ViewState {
 
 	var threshold: Threshold {
 		shield.matrixOfFactors.primaryRole.threshold
+	}
+
+	var shieldName: DisplayName {
+		shield.metadata.displayName
 	}
 }

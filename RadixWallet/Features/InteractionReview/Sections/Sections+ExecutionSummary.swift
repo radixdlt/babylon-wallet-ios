@@ -331,17 +331,14 @@ extension InteractionReview.Sections {
 	}
 
 	func extractEntity(_ address: AddressOfAccountOrPersona) async throws -> AccountOrPersona? {
-		let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
-		if let account = accounts.first(where: { $0.address == address.accountAddress }) {
+		switch address {
+		case let .account(accountAddress):
+			let account = try await accountsClient.getAccountByAddress(accountAddress)
 			return .account(account)
-		}
-
-		let personas = try await personasClient.getPersonas()
-		if let persona = personas.first(where: { $0.address.address == address.address }) {
+		case let .identity(identityAddress):
+			let persona = try await personasClient.getPersona(id: identityAddress)
 			return .persona(persona)
 		}
-
-		return nil
 	}
 
 	func extractDappAddresses(encounteredAddresses: [ManifestEncounteredComponentAddress]) -> [Address] {
