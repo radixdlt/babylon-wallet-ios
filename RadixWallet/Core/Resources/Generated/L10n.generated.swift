@@ -3897,12 +3897,16 @@ internal enum L10n {
       }
       /// 1 Account
       internal static let accountSingular = L10n.tr("Localizable", "securityShields_assigned_accountSingular", fallback: "1 Account")
+      /// Hidden Accounts or Personas
+      internal static let onlyHiddenEntities = L10n.tr("Localizable", "securityShields_assigned_onlyHiddenEntities", fallback: "Hidden Accounts or Personas")
       /// %d Personas
       internal static func personaPlural(_ p1: Int) -> String {
         return L10n.tr("Localizable", "securityShields_assigned_personaPlural", p1, fallback: "%d Personas")
       }
       /// 1 Persona
       internal static let personaSingular = L10n.tr("Localizable", "securityShields_assigned_personaSingular", fallback: "1 Persona")
+      /// (and some hidden)
+      internal static let someHiddenEntities = L10n.tr("Localizable", "securityShields_assigned_someHiddenEntities", fallback: "(and some hidden)")
       /// Assigned to:
       internal static let title = L10n.tr("Localizable", "securityShields_assigned_title", fallback: "Assigned to:")
     }
