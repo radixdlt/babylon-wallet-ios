@@ -43,9 +43,6 @@ extension InteractionReview.Sections {
 		case nil:
 			return nil
 
-		case .securifyEntity:
-			return nil
-
 		case .general, .transfer:
 			if summary.detailedClassification == .general {
 				guard !summary.deposits.isEmpty || !summary.withdrawals.isEmpty else { return nil }
