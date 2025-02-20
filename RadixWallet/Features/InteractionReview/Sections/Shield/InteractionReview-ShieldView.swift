@@ -11,8 +11,8 @@ extension InteractionReview {
 			Card {
 				InnerCard {
 					coreView
-						.padding(.small1)
 				}
+				.padding(.small1)
 			}
 		}
 
@@ -22,9 +22,7 @@ extension InteractionReview {
 			entity
 			VStack(spacing: .medium3) {
 				factorsHeader
-				Separator()
 				primaryRoleFactors
-				Separator()
 				performShieldRecoveryFactors
 			}
 			.padding(.vertical, .medium3)
@@ -61,6 +59,7 @@ extension InteractionReview {
 				.foregroundStyle(.app.gray1)
 				.flushedLeft
 				.padding(.horizontal, .medium3)
+			Separator()
 		}
 
 		private func sectionHeader(
@@ -93,6 +92,7 @@ extension InteractionReview {
 			.flushedLeft
 		}
 
+		@ViewBuilder
 		private var primaryRoleFactors: some SwiftUI.View {
 			VStack(spacing: .medium3) {
 				sectionHeader(
@@ -117,6 +117,7 @@ extension InteractionReview {
 				}
 			}
 			.padding(.horizontal, .medium3)
+			Separator()
 		}
 
 		private func authenticationSigningFactor(_ factorSource: FactorSource) -> some SwiftUI.View {
