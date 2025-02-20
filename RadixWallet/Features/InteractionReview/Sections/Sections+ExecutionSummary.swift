@@ -314,9 +314,6 @@ extension InteractionReview.Sections {
 					allFactorSourcesFromProfile: allFactorSourcesFromProfile
 				)
 			)
-
-		case .generalSubintent:
-			fatalError("TODO")
 		}
 	}
 
