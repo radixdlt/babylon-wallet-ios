@@ -567,7 +567,7 @@ extension ResourceBalanceView {
 						AmountView(amount: amount, appearance: compact ? .compact : .standard)
 					} else if isPredicted {
 						Text(L10n.InteractionReview.estimated)
-							.textStyle(.body1HighImportance)
+							.textStyle(.body3Regular)
 							.foregroundStyle(.app.gray1)
 					}
 				}
