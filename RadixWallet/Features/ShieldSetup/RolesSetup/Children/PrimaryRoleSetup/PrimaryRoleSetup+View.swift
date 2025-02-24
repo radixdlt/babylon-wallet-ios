@@ -349,7 +349,7 @@ extension View {
 	}
 }
 
-private extension Threshold {
+extension Threshold {
 	var titleShort: String {
 		switch self {
 		case .all:

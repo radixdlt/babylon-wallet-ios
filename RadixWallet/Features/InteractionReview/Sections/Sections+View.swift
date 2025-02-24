@@ -13,7 +13,8 @@ extension InteractionReview.Sections.State {
 			unstakingFromValidators: unstakingFromValidators,
 			claimingFromValidators: claimingFromValidators,
 			accountDepositSetting: accountDepositSetting,
-			accountDepositExceptions: accountDepositExceptions
+			accountDepositExceptions: accountDepositExceptions,
+			shieldUpdate: shieldUpdate
 		)
 	}
 }
@@ -33,6 +34,7 @@ extension InteractionReview.Sections {
 		let claimingFromValidators: InteractionReview.ValidatorsState?
 		let accountDepositSetting: InteractionReview.DepositSettingState?
 		let accountDepositExceptions: InteractionReview.DepositExceptionsState?
+		let shieldUpdate: InteractionReview.ShieldState?
 
 		var isExpandedStakingToValidators: Bool { stakingToValidators?.isExpanded == true }
 		var isExpandedUnstakingFromValidators: Bool { unstakingFromValidators?.isExpanded == true }
@@ -74,6 +76,7 @@ extension InteractionReview.Sections {
 
 					accountDepositSetting(viewStore.accountDepositSetting)
 					accountDepositExceptions(viewStore.accountDepositExceptions)
+					shieldUpdate(viewStore.shieldUpdate)
 				}
 				.animation(.easeInOut, value: viewStore.isExpandedDappsUsed)
 				.animation(.easeInOut, value: viewStore.isExpandedContributingToPools)
@@ -243,6 +246,16 @@ extension InteractionReview.Sections {
 				VStack(alignment: .leading, spacing: .small2) {
 					Common.HeadingView.deletingAccount
 					Common.Accounts.View(store: childStore)
+				}
+			}
+		}
+
+		@ViewBuilder
+		private func shieldUpdate(_ viewState: InteractionReview.ShieldState?) -> some SwiftUI.View {
+			if let viewState {
+				VStack(alignment: .leading, spacing: .small2) {
+					Common.HeadingView.shieldUpdate
+					Common.ShieldView(viewState: viewState)
 				}
 			}
 		}

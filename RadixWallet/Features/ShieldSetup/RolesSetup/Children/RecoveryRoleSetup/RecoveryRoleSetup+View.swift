@@ -301,7 +301,7 @@ private extension RecoveryRoleSetup.View {
 	}
 }
 
-private extension TimePeriod {
+extension TimePeriod {
 	var title: String {
 		switch (value, unit) {
 		case (1, .days):

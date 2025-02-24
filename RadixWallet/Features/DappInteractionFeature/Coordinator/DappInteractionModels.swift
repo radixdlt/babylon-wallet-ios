@@ -198,7 +198,16 @@ extension DappToWalletInteraction {
 				.signSubintent(items.request),
 			]
 		case let .batchOfTransactions(items):
-			fatalError("TODO")
+			if items.transactions.count == 1, let transaction = items.transactions.first {
+				[
+					try? .submitTransaction(.init(
+						transactionManifest: transaction.transactionManifest(onNetwork: SargonOs.shared.currentNetworkId())
+					)),
+				]
+				.compactMap { $0 }
+			} else {
+				fatalError("TODO: handle multiple transactions")
+			}
 		}
 	}
 }
@@ -308,7 +317,7 @@ extension WalletToDappInteractionSuccessResponse {
 				)
 			}
 
-		case .transaction:
+		case .transaction, .batchOfTransactions:
 			var send: WalletToDappInteractionSendTransactionResponseItem? = nil
 			for item in items {
 				switch item {
@@ -348,9 +357,6 @@ extension WalletToDappInteractionSuccessResponse {
 				interactionId: interaction.interactionId,
 				items: .preAuthorization(preAuthorization)
 			)
-
-		case .batchOfTransactions:
-			fatalError("TODO")
 		}
 	}
 }

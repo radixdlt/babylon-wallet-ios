@@ -24,6 +24,8 @@ extension InteractionReview {
 			// The proofs are set here (within the resolve logic) but may be rendered and handled by the parent view, in the case they are placed outside the Sections (TransactionReview).
 			var proofs: Proofs.State? = nil
 
+			var shieldUpdate: InteractionReview.ShieldState? = nil
+
 			@PresentationState
 			var destination: Destination.State? = nil
 		}
@@ -111,7 +113,9 @@ extension InteractionReview {
 
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 		@Dependency(\.accountsClient) var accountsClient
+		@Dependency(\.personasClient) var personasClient
 		@Dependency(\.appPreferencesClient) var appPreferencesClient
+		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 		var body: some ReducerOf<Self> {
 			Reduce(core)
@@ -185,6 +189,7 @@ extension InteractionReview {
 				state.accountDepositExceptions = sections.accountDepositExceptions
 				state.proofs = sections.proofs
 				state.accountDeletion = sections.accountDeletion
+				state.shieldUpdate = sections.shieldUpdate
 				return .none
 			}
 		}

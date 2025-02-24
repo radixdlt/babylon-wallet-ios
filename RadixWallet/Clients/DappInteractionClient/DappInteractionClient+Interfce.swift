@@ -21,6 +21,7 @@ extension DappInteractionClient {
 		case accountTransfer
 		case accountLockerClaim
 		case accountDelete
+		case shieldUpdate
 	}
 
 	typealias AddWalletInteraction = @Sendable (_ items: DappToWalletInteractionItems, _ interaction: WalletInteraction) async -> P2P.RTCOutgoingMessage.Response?
@@ -48,11 +49,16 @@ extension WalletInteractionId {
 		hasPrefix(DappInteractionClient.WalletInteraction.accountDelete.rawValue)
 	}
 
+	var isWalletShieldUpdateInteraction: Bool {
+		hasPrefix(DappInteractionClient.WalletInteraction.shieldUpdate.rawValue)
+	}
+
 	var isWalletInteraction: Bool {
 		isWalletAccountTransferInteraction
 			|| isWalletAccountDepositSettingsInteraction
 			|| isWalletAccountLockerClaimInteraction
 			|| isWalletAccountDeleteInteraction
+			|| isWalletShieldUpdateInteraction
 	}
 }
 
