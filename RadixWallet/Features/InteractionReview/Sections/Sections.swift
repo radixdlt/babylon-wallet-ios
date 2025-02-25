@@ -112,6 +112,7 @@ extension InteractionReview {
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 		@Dependency(\.accountsClient) var accountsClient
 		@Dependency(\.appPreferencesClient) var appPreferencesClient
+		@Dependency(\.errorQueue) var errorQueue
 
 		var body: some ReducerOf<Self> {
 			Reduce(core)
@@ -195,18 +196,16 @@ extension InteractionReview {
 				.run { send in
 					let sections = try await sections(for: executionSummary, networkID: networkID)
 					await send(.internal(.setSections(sections)))
-				} catch: { error, send in
-					loggerGlobal.error("Failed to extract sections from ExecutionSummary, error: \(error)")
-					await send(.internal(.setSections(nil)))
+				} catch: { error, _ in
+					errorQueue.schedule(error)
 				}
 
 			case let .resolveManifestSummary(manifestSummary, networkID):
 				.run { send in
 					let sections = try await sections(for: manifestSummary, networkID: networkID)
 					await send(.internal(.setSections(sections)))
-				} catch: { error, send in
-					loggerGlobal.error("Failed to extract sections from ManifestSummary, error: \(error)")
-					await send(.internal(.setSections(nil)))
+				} catch: { error, _ in
+					errorQueue.schedule(error)
 				}
 
 			case let .showResourceDetails(resource, details):
