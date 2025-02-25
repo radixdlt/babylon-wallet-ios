@@ -546,6 +546,7 @@
 "common_dismiss" = "Dismiss";
 "common_noMnemonicAlert_title" = "Could Not Complete";
 "common_noMnemonicAlert_text" = "The required seed phrase is missing. Please return to the account and begin the recovery process.";
+"common_close" = "Close";
 "error_dappRequest_invalidPersonaId" = "Invalid Persona specified by dApp";
 "error_dappRequest_invalidRequest" = "Invalid request";
 "error_profileLoad_decodingError" = "Failed to import Radix Wallet backup: %@";
