@@ -172,8 +172,8 @@ private extension View {
 		return detail(with: destinationStore)
 			.displayMnemonic(with: destinationStore)
 			.enterMnemonic(with: destinationStore)
-			.addMnemonic(with: destinationStore)
 			.changeMain(with: destinationStore)
+			.addFactorSource(with: destinationStore)
 	}
 
 	private func detail(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
@@ -194,15 +194,15 @@ private extension View {
 		}
 	}
 
-	private func addMnemonic(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
-		navigationDestination(store: destinationStore.scope(state: \.addMnemonic, action: \.addMnemonic)) {
-			ImportMnemonic.View(store: $0)
-		}
-	}
-
 	private func changeMain(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
 		sheet(store: destinationStore.scope(state: \.changeMain, action: \.changeMain)) {
 			ChangeMainFactorSource.View(store: $0)
+		}
+	}
+
+	private func addFactorSource(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.addFactorSource, action: \.addFactorSource)) {
+			AddFactorSource.Coordinator.View(store: $0)
 		}
 	}
 }

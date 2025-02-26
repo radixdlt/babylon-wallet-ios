@@ -23,11 +23,15 @@ struct ImportMnemonicGrid: Sendable, FeatureReducer {
 			changeWordCount(to: count)
 		}
 
-		init(mnemonic: Mnemonic) {
-			self.words = Self.words(from: mnemonic, isReadOnlyMode: true)
+		init(
+			mnemonic: Mnemonic,
+			isReadOnlyMode: Bool = true,
+			isWordCountFixed: Bool = true
+		) {
+			self.words = Self.words(from: mnemonic, isReadOnlyMode: isReadOnlyMode)
 			self.language = mnemonic.language
-			self.isWordCountFixed = true
-			self.isReadOnlyMode = true
+			self.isWordCountFixed = isWordCountFixed
+			self.isReadOnlyMode = isReadOnlyMode
 		}
 
 		var wordCount: BIP39WordCount {

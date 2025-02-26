@@ -70,6 +70,8 @@ struct FactorSourceCard: View {
 	private var topCard: some View {
 		HStack(spacing: .medium3) {
 			Image(dataSource.icon)
+				.resizable()
+				.frame(.smallest)
 
 			VStack(alignment: .leading, spacing: .small3) {
 				Text(dataSource.title)

@@ -105,8 +105,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/radixdlt/sargon",
       "state" : {
-        "revision" : "337610420d42b38b049be64022295687cc931188",
-        "version" : "1.2.1"
+        "revision" : "377837854dcdb97afc011271e8acd37b77b67b5a",
+        "version" : "1.2.3"
       }
     },
     {

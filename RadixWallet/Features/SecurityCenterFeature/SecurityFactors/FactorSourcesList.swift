@@ -49,6 +49,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			case enterMnemonic(ImportMnemonicsFlowCoordinator.State)
 			case addMnemonic(ImportMnemonic.State)
 			case changeMain(ChangeMainFactorSource.State)
+			case addFactorSource(AddFactorSource.Coordinator.State)
 		}
 
 		@CasePathable
@@ -56,8 +57,8 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			case detail(FactorSourceDetail.Action)
 			case displayMnemonic(DisplayMnemonic.Action)
 			case enterMnemonic(ImportMnemonicsFlowCoordinator.Action)
-			case addMnemonic(ImportMnemonic.Action)
 			case changeMain(ChangeMainFactorSource.Action)
+			case addFactorSource(AddFactorSource.Coordinator.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -70,11 +71,11 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			Scope(state: \.enterMnemonic, action: \.enterMnemonic) {
 				ImportMnemonicsFlowCoordinator()
 			}
-			Scope(state: \.addMnemonic, action: \.addMnemonic) {
-				ImportMnemonic()
-			}
 			Scope(state: \.changeMain, action: \.changeMain) {
 				ChangeMainFactorSource()
+			}
+			Scope(state: \.addFactorSource, action: \.addFactorSource) {
+				AddFactorSource.Coordinator()
 			}
 		}
 	}
@@ -128,27 +129,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			}
 
 		case .addButtonTapped:
-			switch state.kind {
-			case .device:
-				state.destination = .addMnemonic(
-					.init(
-						showCloseButton: false,
-						isWordCountFixed: true,
-						persistStrategy: .init(
-							factorSourceKindOfMnemonic: .babylon(isMain: false),
-							location: .intoKeychainAndProfile,
-							onMnemonicExistsStrategy: .appendWithCryptoParamaters
-						),
-						wordCount: .twentyFour
-					)
-				)
-			case .ledgerHqHardwareWallet, .offDeviceMnemonic, .arculusCard, .password:
-				// NOTE: Added `.device` support as placeholder, but not adding the logic for ledger (which we already support)
-				// since Matt mentioned we will probably always present this screen: https://zpl.io/wyqB6Bd
-				// and I don't want to add all the logic for checking if there is a CE or not just to migrate it later.
-				loggerGlobal.info("Add \(state.kind) not yet implemented")
-			}
-
+			state.destination = .addFactorSource(.init(kind: state.kind))
 			return .none
 
 		case let .continueButtonTapped(factorSource):
@@ -177,7 +158,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case .displayMnemonic(.delegate), .enterMnemonic(.delegate), .addMnemonic(.delegate):
+		case .displayMnemonic(.delegate), .enterMnemonic(.delegate):
 			// We don't care about which delegate action was executed, since any corresponding
 			// updates to the warnings will be handled by securityProblemsEffect.
 			// We just need to dismiss the destination.
