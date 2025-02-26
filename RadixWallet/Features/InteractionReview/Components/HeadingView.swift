@@ -88,5 +88,10 @@ extension InteractionReview {
 			L10n.InteractionReview.thirdPartyDepositExceptionsHeading,
 			icon: AssetResource.transactionReviewDepositSetting
 		)
+
+		static let shieldUpdate = HeadingView(
+			L10n.TransactionReview.UpdateShield.sectionTitle,
+			icon: AssetResource.transactionReviewUpdateShield
+		)
 	}
 }
