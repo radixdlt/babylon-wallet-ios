@@ -51,6 +51,11 @@ extension AccountPortfoliosClient {
 
 			return modified
 		}
+
+		/// Returns if the original account (which doesn't remove the hidden resources) contains any asset
+		var containsAnyAsset: Bool {
+			originalAccount.containsAnyAsset
+		}
 	}
 
 	/// Internal state that holds all loaded portfolios.
@@ -266,9 +271,6 @@ extension ResourceAmount {
 		case var .atLeast(exactAmount):
 			exactAmount.fiatWorth = change(resourceAddress, exactAmount)
 			self = .atLeast(exactAmount)
-		case var .atMost(exactAmount):
-			exactAmount.fiatWorth = change(resourceAddress, exactAmount)
-			self = .atMost(exactAmount)
 		case var .between(minExactAmount, maxExactAmount):
 			minExactAmount.fiatWorth = change(resourceAddress, minExactAmount)
 			maxExactAmount.fiatWorth = change(resourceAddress, maxExactAmount)

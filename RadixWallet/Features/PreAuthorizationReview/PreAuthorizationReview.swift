@@ -45,26 +45,22 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case signedPreAuthorization(SignedSubintent)
-		case failed(PreAuthorizationFailure)
+		case failed(TransactionFailure)
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
-			case signing(Signing.State)
 			case rawManifestAlert(AlertState<Never>)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
-			case signing(Signing.Action)
 			case rawManifestAlert(Never)
 		}
 
 		var body: some ReducerOf<Self> {
-			Scope(state: \.signing, action: \.signing) {
-				Signing()
-			}
+			EmptyReducer()
 		}
 	}
 
@@ -117,12 +113,12 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .previewLoaded(.failure(error)):
 			loggerGlobal.error("PreAuthroization preview failed, error: \(error)")
-			errorQueue.schedule(error)
-			guard let failure = error as? PreAuthorizationFailure else {
-				assertionFailure("Failed with unexpected error \(error)")
-				return .none
+			errorQueue.schedule(TransactionReviewFailure(underylying: error))
+			if let txFailure = error as? TransactionFailure {
+				return .send(.delegate(.failed(txFailure)))
+			} else {
+				return .send(.delegate(.failed(TransactionFailure.failedToPrepareTXReview(.abortedTXReview(error)))))
 			}
-			return .send(.delegate(.failed(failure)))
 
 		case let .previewLoaded(.success(preview)):
 			state.preview = preview
@@ -155,15 +151,22 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 				return .none
 			}
 
-			guard !preview.signingFactors.isEmpty else {
+			guard preview.requiresSignatures else {
 				return handleSignedSubinent(state: &state, signedSubintent: .init(subintent: subintent, subintentSignatures: .init(signatures: [])))
 			}
 
-			state.destination = .signing(.init(
-				factorsLeftToSignWith: preview.signingFactors,
-				signingPurposeWithPayload: .signPreAuthorization(subintent)
-			))
-			return .none
+			return .run { send in
+				let signedSubintent = try await SargonOS.shared.signSubintent(transactionIntent: subintent, roleKind: .primary)
+				await send(.delegate(.signedPreAuthorization(signedSubintent)))
+
+			} catch: { error, send in
+				await send(.internal(.resetToApprovable))
+				if let error = error as? CommonError, error == .HostInteractionAborted {
+					// We don't show any error since user aborted signing intentionally
+				} else {
+					errorQueue.schedule(error)
+				}
+			}
 
 		case let .updateSecondsToExpiration(expiration):
 			let secondsToExpiration = Int(expiration.timeIntervalSinceNow)
@@ -183,40 +186,6 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 
 		default:
 			return .none
-		}
-	}
-
-	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
-		switch presentedAction {
-		case let .signing(.delegate(action)):
-			switch action {
-			case .cancelSigning:
-				loggerGlobal.notice("Cancelled signing")
-				return resetToApprovable(&state)
-
-			case .failedToSign:
-				loggerGlobal.error("Failed to sign PreAuthoriation")
-				return resetToApprovable(&state)
-
-			case let .finishedSigning(.signPreAuthorization(encoded)):
-				return handleSignedSubinent(state: &state, signedSubintent: encoded)
-
-			case .finishedSigning:
-				assertionFailure("Unexpected signature instead of .signPreAuthorization")
-				return .none
-			}
-
-		default:
-			return .none
-		}
-	}
-
-	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
-		switch state.destination {
-		case .signing:
-			resetToApprovable(&state)
-		case .rawManifestAlert, .none:
-			.none
 		}
 	}
 }
@@ -287,7 +256,7 @@ extension PreAuthorizationReview.State {
 	var isExpired: Bool {
 		switch expiration {
 		case let .atTime(value):
-			value.date <= Date.now
+			value.date <= Date.now || secondsToExpiration == 0
 		case .afterDelay:
 			false
 		}

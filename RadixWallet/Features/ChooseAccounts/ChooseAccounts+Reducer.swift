@@ -10,6 +10,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		var availableAccounts: IdentifiedArrayOf<Account>
 		var selectedAccounts: [ChooseAccountsRow.State]?
 		var canCreateNewAccount: Bool
+		let showSelectAllAccounts: Bool
 
 		@PresentationState
 		var destination: Destination.State? = nil
@@ -29,7 +30,8 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			disabledAccounts: [AccountAddress] = [],
 			availableAccounts: IdentifiedArrayOf<Account> = [],
 			selectedAccounts: [ChooseAccountsRow.State]? = nil,
-			canCreateNewAccount: Bool = true
+			canCreateNewAccount: Bool = true,
+			showSelectAllAccounts: Bool = false
 		) {
 			self.context = context
 			self.filteredAccounts = filteredAccounts
@@ -37,6 +39,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			self.availableAccounts = availableAccounts
 			self.selectedAccounts = selectedAccounts
 			self.canCreateNewAccount = canCreateNewAccount
+			self.showSelectAllAccounts = showSelectAllAccounts
 		}
 	}
 

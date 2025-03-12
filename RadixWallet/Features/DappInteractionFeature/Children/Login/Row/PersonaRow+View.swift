@@ -29,9 +29,14 @@ extension PersonaRow {
 			self.mode = mode
 		}
 
-		init(viewState: ViewState, isSelected: Bool, action: @escaping () -> Void) {
+		init(
+			viewState: ViewState,
+			selectionType: SelectionType,
+			isSelected: Bool,
+			action: @escaping () -> Void
+		) {
 			self.viewState = viewState
-			self.mode = .selection(isSelected: isSelected, action: action)
+			self.mode = .selection(type: selectionType, isSelected: isSelected, action: action)
 		}
 
 		var body: some SwiftUI.View {
@@ -48,17 +53,24 @@ extension PersonaRow {
 
 					Spacer()
 
-					if let isSelected {
-						RadioButton(
-							appearance: .dark,
-							state: isSelected ? .selected : .unselected
-						)
-						.padding(.leading, .small3)
+					if case let .selection(selectionType, isSelected, _) = mode {
+						switch selectionType {
+						case .radioButton:
+							RadioButton(
+								appearance: .dark,
+								isSelected: isSelected
+							)
+							.padding(.leading, .small3)
+						case .checkmark:
+							CheckmarkView(
+								appearance: .dark,
+								isChecked: isSelected
+							)
+						}
 					}
 				}
 				.padding(.medium2)
 
-				Separator()
 				if let lastLogin = viewState.lastLogin {
 					VStack(alignment: .leading, spacing: .zero) {
 						Separator()
@@ -73,7 +85,6 @@ extension PersonaRow {
 			}
 			.background(Color.app.gray5)
 			.cornerRadius(.small1)
-			.cardShadow
 			.embedInButton(when: action)
 			.buttonStyle(.inert)
 		}
@@ -81,18 +92,9 @@ extension PersonaRow {
 }
 
 extension PersonaRow.View {
-	var isSelected: Bool? {
-		switch mode {
-		case let .selection(isSelected, _):
-			isSelected
-		case .display:
-			nil
-		}
-	}
-
 	var action: (() -> Void)? {
 		switch mode {
-		case let .selection(_, action):
+		case let .selection(_, _, action):
 			action
 		case .display:
 			nil
@@ -100,8 +102,13 @@ extension PersonaRow.View {
 	}
 
 	enum Mode {
-		case selection(isSelected: Bool, action: () -> Void)
+		case selection(type: SelectionType, isSelected: Bool, action: () -> Void)
 		case display
+	}
+
+	enum SelectionType {
+		case radioButton
+		case checkmark
 	}
 }
 
@@ -114,6 +121,7 @@ struct PersonaRow_Preview: PreviewProvider {
 		WithState(initialValue: false) { $isSelected in
 			PersonaRow.View(
 				viewState: .init(state: .previewValue),
+				selectionType: .radioButton,
 				isSelected: isSelected,
 				action: { isSelected = true }
 			)

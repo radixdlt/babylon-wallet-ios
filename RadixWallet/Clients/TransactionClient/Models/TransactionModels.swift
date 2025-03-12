@@ -282,7 +282,7 @@ struct FeePayerSelectionResult: Equatable, Sendable {
 
 extension ExecutionSummary {
 	func guranteesCost() throws -> Decimal192 {
-		switch detailedManifestClass {
+		switch detailedClassification {
 		case .general, .transfer:
 			deposits.flatMap(\.value).reduce(.zero) { result, resource in
 				switch resource {

@@ -16,12 +16,13 @@ extension HdPathComponent: Comparable {
 }
 
 extension Account {
-	static let nameMaxLength = 30
-
 	var derivationIndex: HdPathComponent {
-		switch securityState {
-		case let .unsecured(uec): uec.transactionSigning.derivationPath.lastPathComponent
+		guard let unsecuredControllingFactorInstance else {
+			// TODO: Remove, temporary to accomodate securified state
+			return try! HdPathComponent.securifiedComponent(.init(localKeySpace: 0))
 		}
+
+		return unsecuredControllingFactorInstance.derivationPath.lastPathComponent
 	}
 
 	var isLegacy: Bool {
@@ -29,10 +30,10 @@ extension Account {
 	}
 
 	var isLedgerControlled: Bool {
-		switch self.securityState {
-		case let .unsecured(control):
-			control.transactionSigning.factorSourceID.kind == .ledgerHqHardwareWallet
+		guard let unsecuredControllingFactorInstance else {
+			return false
 		}
+		return unsecuredControllingFactorInstance.factorSourceID.kind == .ledgerHqHardwareWallet
 	}
 }
 

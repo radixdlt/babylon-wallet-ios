@@ -95,3 +95,9 @@ extension Sequence {
 		try Dictionary(grouping: self, by: value)
 	}
 }
+
+extension Set {
+	func map<U>(transform: (Element) -> U) -> Set<U> {
+		Set<U>(self.lazy.map(transform))
+	}
+}

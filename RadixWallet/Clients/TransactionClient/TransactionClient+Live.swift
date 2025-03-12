@@ -60,7 +60,7 @@ extension TransactionClient {
 				try await .init(validating: addresses.asyncMap(identityFromComponentAddress))
 			}
 
-			let summary = try manifest.summary
+			let summary = manifest.summary
 
 			return try await MyEntitiesInvolvedInTransaction(
 				identitiesRequiringAuth: mapIdentity(summary.addressesOfPersonasRequiringAuth),
@@ -132,25 +132,21 @@ extension TransactionClient {
 		}
 
 		let notarizeTransaction: NotarizeTransaction = { request in
-			let signedTransactionIntent = SignedIntent(
-				intent: request.transactionIntent,
-				intentSignatures: IntentSignatures(signatures: Array(request.intentSignatures.map { IntentSignature(signatureWithPublicKey: $0) }))
-			)
-
-			let signedIntentHash = signedTransactionIntent.hash()
+			let signedIntentHash = request.signedIntent.hash()
 
 			let notarySignature = try request.notary.signature(for: signedIntentHash.hash.data)
 
 			let notarizedTransaction = try NotarizedTransaction(
-				signedIntent: signedTransactionIntent,
+				signedIntent: request.signedIntent,
 				notarySignature: NotarySignature(signature: .ed25519(value: .init(bytes: .init(bytes: notarySignature))))
 			)
 
-			let txID = request.transactionIntent.hash()
+			let intent = request.signedIntent.intent
+			let txID = intent.hash()
 
 			return .init(
 				notarized: notarizedTransaction,
-				intent: request.transactionIntent,
+				intent: intent,
 				txID: txID
 			)
 		}
@@ -368,12 +364,20 @@ extension TransactionFailure {
 		case .FailedToExtractTransactionReceiptBytes:
 			.failedToPrepareTXReview(.failedToExtractTXReceiptBytes)
 
+		case let .ExecutionSummaryFail(underlying):
+			.failedToPrepareTXReview(.failedTXPreview(underlying))
+
+		case let .FailedToGenerateManifestSummary(underlying):
+			.failedToPrepareTXReview(.failedTXPreview(underlying))
+
+		case let .InvalidInstructionsString(underlying):
+			.failedToPrepareTXReview(.failedTXPreview(underlying))
+
+		case let .some(err):
+			.failedToPrepareTXReview(.failedTXPreview(errorMessageFromError(error: err)))
+
 		default:
-			if let code = commonError?.errorCode {
-				.failedToPrepareTXReview(.failedTXPreview("Unknown reason, code: \(code)"))
-			} else {
-				.failedToPrepareTXReview(.failedTXPreview("Unknown reason"))
-			}
+			.failedToPrepareTXReview(.failedTXPreview("Unknown reason"))
 		}
 	}
 }

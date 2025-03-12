@@ -139,9 +139,7 @@ extension FactorSourcesClient: DependencyKey {
 			) throws -> OrderedSet<HdPathComponent> {
 				let indicesOfEntitiesControlledByAccount = entitiesControlledByFactorSource
 					.compactMap { entity -> HdPathComponent? in
-						switch entity.securityState {
-						case let .unsecured(unsecuredControl):
-							let factorInstance = unsecuredControl.transactionSigning
+						entity.unsecuredControllingFactorInstance.flatMap { factorInstance -> HdPathComponent? in
 							guard factorInstance.factorSourceID.asGeneral == factorSourceID else {
 								return nil
 							}
@@ -192,7 +190,7 @@ extension FactorSourcesClient: DependencyKey {
 					mnemonic: mnemonicClient.generate(
 						BIP39WordCount.twentyFour,
 						BIP39Language.english
-					), passphrase: ""
+					)
 				)
 
 				loggerGlobal.info("Creating new main BDFS")
@@ -367,32 +365,31 @@ func signingFactors(
 	var signingFactors: [FactorSourceKind: IdentifiedArrayOf<SigningFactor>] = [:]
 
 	for entity in entities {
-		switch entity.securityState {
-		case let .unsecured(unsecuredEntityControl):
+		guard let factorInstance = entity.unsecuredControllingFactorInstance else {
+			continue
+		}
 
-			let factorInstance = unsecuredEntityControl.transactionSigning
-			let id = factorInstance.factorSourceID
-			guard let factorSource = allFactorSources[id: id.asGeneral] else {
-				assertionFailure("Bad! factor source not found")
-				throw FactorSourceNotFound()
-			}
-			let signer = try Signer(factorInstanceRequiredToSign: factorInstance, entity: entity)
-			let sigingFactor = SigningFactor(factorSource: factorSource, signer: signer)
+		let id = factorInstance.factorSourceID
+		guard let factorSource = allFactorSources[id: id.asGeneral] else {
+			assertionFailure("Bad! factor source not found")
+			throw FactorSourceNotFound()
+		}
+		let signer = try Signer(factorInstanceRequiredToSign: factorInstance, entity: entity)
+		let sigingFactor = SigningFactor(factorSource: factorSource, signer: signer)
 
-			if var existingArray: IdentifiedArrayOf<SigningFactor> = signingFactors[factorSource.kind] {
-				if var existingSigningFactor = existingArray[id: factorSource.id] {
-					var signers = existingSigningFactor.signers.rawValue
-					signers[id: signer.id] = signer // update copy of `signers`
-					existingSigningFactor.signers = .init(rawValue: signers)! // write back `signers`
-					existingArray[id: factorSource.id] = existingSigningFactor // write back to IdentifiedArray
-				} else {
-					existingArray[id: factorSource.id] = sigingFactor // write back to IdentifiedArray
-				}
-				signingFactors[factorSource.kind] = existingArray // write back to Dictionary
+		if var existingArray: IdentifiedArrayOf<SigningFactor> = signingFactors[factorSource.kind] {
+			if var existingSigningFactor = existingArray[id: factorSource.id] {
+				var signers = existingSigningFactor.signers.rawValue
+				signers[id: signer.id] = signer // update copy of `signers`
+				existingSigningFactor.signers = .init(rawValue: signers)! // write back `signers`
+				existingArray[id: factorSource.id] = existingSigningFactor // write back to IdentifiedArray
 			} else {
-				// trivial case,
-				signingFactors[factorSource.kind] = [sigingFactor].asIdentified()
+				existingArray[id: factorSource.id] = sigingFactor // write back to IdentifiedArray
 			}
+			signingFactors[factorSource.kind] = existingArray // write back to Dictionary
+		} else {
+			// trivial case,
+			signingFactors[factorSource.kind] = [sigingFactor].asIdentified()
 		}
 	}
 
@@ -422,9 +419,7 @@ extension FactorSourceKind: Comparable {
 		case .ledgerHqHardwareWallet: 0
 		case .arculusCard: 1
 		case .offDeviceMnemonic: 2
-		case .securityQuestions: 3
-		case .trustedContact: 4
-		case .password: 5
+		case .password: 3
 		// we want to sign with device last, since it would allow for us to stop using
 		// ephemeral notary and allow us to implement a AutoPurgingMnemonicCache which
 		// deletes items after 1 sec, thus `device` must come last.

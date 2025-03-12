@@ -90,16 +90,8 @@ extension FontConvertible.Font {
 	static let app = App()
 }
 
-extension FontConvertible.Font.App {
-	var sheetTitle: FontConvertible.Font {
-		FontFamily.IBMPlexSans.bold.font(size: 32)
-	}
-
-	var secondaryHeader: FontConvertible.Font {
-		FontFamily.IBMPlexSans.semiBold.font(size: 18)
-	}
-
-	var backButton: FontConvertible.Font {
-		FontFamily.IBMPlexSans.medium.font(size: 18)
+extension UIFont {
+	static var body1Regular: UIFont {
+		UIFont(font: FontFamily.IBMPlexSans.regular, size: 16)!
 	}
 }

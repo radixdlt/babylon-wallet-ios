@@ -68,4 +68,21 @@ extension View {
 			}
 		}
 	}
+
+	/// Makes the given view scrollable, while adding some space into the bottom if there is more height available.
+	func scrollableWithBottomSpacer() -> some View {
+		GeometryReader { proxy in
+			WithPerceptionTracking {
+				ScrollView(showsIndicators: false) {
+					VStack(spacing: .zero) {
+						self
+
+						Spacer()
+					}
+					.frame(minHeight: proxy.size.height)
+				}
+				.frame(width: proxy.size.width)
+			}
+		}
+	}
 }

@@ -1,87 +1,114 @@
-
-// MARK: - ViewState
 extension FactorSourceAccess.State {
-	var viewState: FactorSourceAccess.ViewState {
-		.init(
-			title: title,
-			message: message,
-			externalDevice: externalDevice,
-			isRetryEnabled: isRetryEnabled,
-			height: height
-		)
-	}
-
-	private var title: String {
-		typealias S = L10n.FactorSourceActions
+	var title: String {
 		switch purpose {
 		case .signature:
-			return S.Signature.title
-		case .createAccount:
-			return S.CreateAccount.title
-		case .createPersona:
-			return S.CreatePersona.title
-		case .deriveAccounts:
-			return S.DeriveAccounts.title
+			L10n.FactorSourceActions.Signature.title
+		case .spotCheck:
+			L10n.FactorSourceActions.SpotCheck.title
 		case .proveOwnership:
-			return S.ProveOwnership.title
+			L10n.FactorSourceActions.ProveOwnership.title
 		case .encryptMessage:
-			return S.EncryptMessage.title
-		case .createKey:
-			return S.CreateKey.title
+			L10n.FactorSourceActions.EncryptMessage.title
+		case .updateFactorConfig:
+			L10n.FactorSourceActions.UpdatingFactorConfig.title
+		case .deriveAccounts:
+			L10n.FactorSourceActions.DeriveAccounts.title
+		case .createAccountAuthorization:
+			L10n.Authorization.CreateAccount.title
+		case .createPersonaAuthorization:
+			L10n.Authorization.CreatePersona.title
 		}
 	}
 
-	private var message: String {
+	var message: String {
 		typealias S = L10n.FactorSourceActions
 		switch kind {
 		case .device:
 			switch purpose {
 			case .signature:
-				return S.Device.messageSignature
-			case .createAccount, .createPersona, .deriveAccounts, .proveOwnership, .encryptMessage, .createKey:
+				return S.Device.signMessage
+			case .spotCheck, .proveOwnership, .encryptMessage, .updateFactorConfig, .deriveAccounts:
 				return S.Device.message
+			case .createAccountAuthorization, .createPersonaAuthorization:
+				return L10n.Authorization.CreateEntity.message
 			}
-		case .ledger:
+
+		case .ledgerHqHardwareWallet:
 			switch purpose {
 			case .signature:
-				return S.Ledger.messageSignature
-			case .deriveAccounts:
-				return S.Ledger.messageDeriveAccounts
-			case .createAccount, .createPersona, .proveOwnership, .encryptMessage, .createKey:
+				return S.Ledger.signMessage
+			case .spotCheck, .proveOwnership, .encryptMessage:
 				return S.Ledger.message
+			case .updateFactorConfig, .deriveAccounts:
+				return S.Ledger.deriveKeysMessage
+			case .createAccountAuthorization, .createPersonaAuthorization:
+				fatalError("Not supported")
 			}
-		}
-	}
 
-	private var externalDevice: String? {
-		switch kind {
-		case .device:
-			nil
-		case let .ledger(value):
-			value?.hint.label
-		}
-	}
-
-	private var isRetryEnabled: Bool {
-		switch kind {
-		case .device:
-			false
-		case .ledger:
-			true
-		}
-	}
-
-	private var height: CGFloat {
-		switch kind {
-		case .device:
-			0.55
-		case .ledger:
+		case .arculusCard:
 			switch purpose {
-			case .signature, .deriveAccounts:
-				0.74
-			case .createAccount, .createPersona, .proveOwnership, .encryptMessage, .createKey:
-				0.70
+			case .signature:
+				return S.Arculus.signMessage
+			case .spotCheck, .proveOwnership, .encryptMessage:
+				return S.Arculus.message
+			case .updateFactorConfig, .deriveAccounts:
+				return S.Arculus.deriveKeysMessage
+			case .createAccountAuthorization, .createPersonaAuthorization:
+				fatalError("Not supported")
 			}
+
+		case .password:
+			switch purpose {
+			case .signature:
+				return S.Password.signMessage
+			case .spotCheck, .proveOwnership, .encryptMessage, .updateFactorConfig, .deriveAccounts:
+				return S.Password.message
+			case .createAccountAuthorization, .createPersonaAuthorization:
+				fatalError("Not supported")
+			}
+
+		case .offDeviceMnemonic:
+			switch purpose {
+			case .signature:
+				return S.OffDeviceMnemonic.signMessage
+			case .spotCheck, .proveOwnership, .encryptMessage, .updateFactorConfig, .deriveAccounts:
+				return S.OffDeviceMnemonic.message
+			case .createAccountAuthorization, .createPersonaAuthorization:
+				fatalError("Not supported")
+			}
+		}
+	}
+
+	var showCard: Bool {
+		switch purpose {
+		case .signature, .spotCheck, .proveOwnership, .encryptMessage, .updateFactorConfig, .deriveAccounts:
+			true
+		case .createAccountAuthorization, .createPersonaAuthorization:
+			false
+		}
+	}
+
+	var isRetryEnabled: Bool {
+		guard let factorSource else {
+			return false
+		}
+		switch factorSource.kind {
+		case .device, .ledgerHqHardwareWallet, .arculusCard:
+			return true
+		case .password, .offDeviceMnemonic:
+			return false
+		}
+	}
+
+	/// Returns the text to use for the Skip button, nil if is such button shouldn't be visible
+	var skipButtonText: String? {
+		switch purpose {
+		case .signature:
+			L10n.FactorSourceActions.useDifferentFactor
+		case let .spotCheck(allowSkip):
+			allowSkip ? L10n.FactorSourceActions.ignore : nil
+		case .proveOwnership, .encryptMessage, .updateFactorConfig, .deriveAccounts, .createAccountAuthorization, .createPersonaAuthorization:
+			nil
 		}
 	}
 }

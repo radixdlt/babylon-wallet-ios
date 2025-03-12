@@ -21,7 +21,9 @@ struct SecurityCenter: Sendable, FeatureReducer {
 			case securityFactors(SecurityFactors.State)
 			case deviceFactorSources(FactorSourcesList.State)
 			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
-			case securityShields(ShieldSetupCoordinator.State)
+			case securityShieldsSetup(ShieldSetupCoordinator.State)
+			case securityShieldsList(ShieldsList.State)
+			case applyShield(ApplyShield.Coordinator.State)
 		}
 
 		@CasePathable
@@ -30,7 +32,9 @@ struct SecurityCenter: Sendable, FeatureReducer {
 			case securityFactors(SecurityFactors.Action)
 			case deviceFactorSources(FactorSourcesList.Action)
 			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
-			case securityShields(ShieldSetupCoordinator.Action)
+			case securityShieldsSetup(ShieldSetupCoordinator.Action)
+			case securityShieldsList(ShieldsList.Action)
+			case applyShield(ApplyShield.Coordinator.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -46,8 +50,14 @@ struct SecurityCenter: Sendable, FeatureReducer {
 			Scope(state: \.importMnemonics, action: \.importMnemonics) {
 				ImportMnemonicsFlowCoordinator()
 			}
-			Scope(state: \.securityShields, action: \.securityShields) {
+			Scope(state: \.securityShieldsSetup, action: \.securityShieldsSetup) {
 				ShieldSetupCoordinator()
+			}
+			Scope(state: \.securityShieldsList, action: \.securityShieldsList) {
+				ShieldsList()
+			}
+			Scope(state: \.applyShield, action: \.applyShield) {
+				ApplyShield.Coordinator()
 			}
 		}
 	}
@@ -64,7 +74,7 @@ struct SecurityCenter: Sendable, FeatureReducer {
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(destinationPath, action: /Action.destination) {
+			.ifLet(destinationPath, action: \.destination) {
 				Destination()
 			}
 	}
@@ -94,7 +104,14 @@ struct SecurityCenter: Sendable, FeatureReducer {
 		case let .cardTapped(type):
 			switch type {
 			case .securityShields:
-				state.destination = .securityShields(.init())
+				let shields = (try? SargonOs.shared.securityStructuresOfFactorSourceIds()) ?? []
+
+				if shields.isEmpty {
+					state.destination = .securityShieldsSetup(.init())
+				} else {
+					state.destination = .securityShieldsList(.init())
+				}
+
 				return .none
 
 			case .securityFactors:
@@ -118,7 +135,17 @@ struct SecurityCenter: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case .importMnemonics(.delegate(.finishedEarly)), .importMnemonics(.delegate(.finishedImportingMnemonics)):
+		case .importMnemonics(.delegate(.finishedEarly)),
+		     .importMnemonics(.delegate(.finishedImportingMnemonics)):
+			state.destination = nil
+			return .none
+		case let .securityShieldsSetup(.delegate(.finished(shieldID))):
+			state.destination = .applyShield(.init(shieldID: shieldID))
+			return .none
+		case .applyShield(.delegate(.skipped)):
+			state.destination = .securityShieldsList(.init())
+			return .none
+		case .applyShield(.delegate(.finished)):
 			state.destination = nil
 			return .none
 		default:

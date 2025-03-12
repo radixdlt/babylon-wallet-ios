@@ -13,7 +13,7 @@ enum DappMetadata: Sendable, Hashable {
 	/// We only allow this case `request` to be passed around if `isDeveloperModeEnabled` is `true`.
 	case request(DappToWalletInteractionMetadata)
 
-	/// A detailed DappMetaData fetched from Ledger.
+	/// An extension of `request` with detailed data fetched from Ledger.
 	case ledger(Ledger)
 
 	case wallet(Wallet)
@@ -35,25 +35,29 @@ extension DappMetadata {
 	struct Ledger: Sendable, Hashable, Codable {
 		static let defaultName = NonEmptyString(rawValue: L10n.DAppRequest.Metadata.unknownName)!
 
-		let origin: DappOrigin
-
-		let dAppDefinintionAddress: DappDefinitionAddress
+		let request: DappToWalletInteractionMetadata
 		let name: NonEmptyString?
 		let description: String?
 		let thumbnail: URL?
 
 		init(
-			origin: DappOrigin,
-			dAppDefinintionAddress: DappDefinitionAddress,
+			request: DappToWalletInteractionMetadata,
 			name: NonEmptyString?,
 			description: String? = nil,
 			thumbnail: URL? = nil
 		) {
-			self.dAppDefinintionAddress = dAppDefinintionAddress
-			self.origin = origin
+			self.request = request
 			self.name = name
-			self.thumbnail = thumbnail
 			self.description = description
+			self.thumbnail = thumbnail
+		}
+
+		var origin: DappOrigin {
+			request.origin
+		}
+
+		var dAppDefinintionAddress: DappDefinitionAddress {
+			request.dappDefinitionAddress
 		}
 	}
 }
@@ -91,13 +95,23 @@ extension DappMetadata {
 		}
 		return fromLedgerDappMetadata
 	}
+
+	var requestMetadata: DappToWalletInteractionMetadata? {
+		switch self {
+		case let .request(value):
+			value
+		case let .ledger(value):
+			value.request
+		case .wallet:
+			nil
+		}
+	}
 }
 
 #if DEBUG
 extension DappMetadata {
 	static let previewValue: Self = try! .ledger(.init(
-		origin: "https://radfi.com",
-		dAppDefinintionAddress: .init(validatingAddress: "account_tdx_b_1p95nal0nmrqyl5r4phcspg8ahwnamaduzdd3kaklw3vqeavrwa"),
+		request: .sample,
 		name: "Collabo.Fi",
 		description: "A very collaby finance dapp",
 		thumbnail: nil
@@ -183,6 +197,17 @@ extension DappToWalletInteraction {
 			[
 				.signSubintent(items.request),
 			]
+		case let .batchOfTransactions(items):
+			if items.transactions.count == 1, let transaction = items.transactions.first {
+				[
+					try? .submitTransaction(.init(
+						transactionManifest: transaction.transactionManifest(onNetwork: SargonOs.shared.currentNetworkId())
+					)),
+				]
+				.compactMap { $0 }
+			} else {
+				fatalError("TODO: handle multiple transactions")
+			}
 		}
 	}
 }
@@ -292,7 +317,7 @@ extension WalletToDappInteractionSuccessResponse {
 				)
 			}
 
-		case .transaction:
+		case .transaction, .batchOfTransactions:
 			var send: WalletToDappInteractionSendTransactionResponseItem? = nil
 			for item in items {
 				switch item {

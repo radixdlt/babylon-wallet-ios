@@ -4,7 +4,6 @@ import Sargon
 enum ResourceAmount: Sendable, Hashable, Codable {
 	case exact(ExactResourceAmount)
 	case atLeast(ExactResourceAmount)
-	case atMost(ExactResourceAmount)
 	case between(minimum: ExactResourceAmount, maximum: ExactResourceAmount)
 	case predicted(predicted: ExactResourceAmount, guaranteed: ExactResourceAmount)
 	case unknown
@@ -15,13 +14,14 @@ enum ResourceAmount: Sendable, Hashable, Codable {
 			self = .exact(amount)
 		case let .atLeast(amount):
 			self = .atLeast(.init(nominalAmount: amount))
-		case let .atMost(amount):
-			self = .atMost(.init(nominalAmount: amount))
 		case let .between(minAmount, maxAmount):
 			self = .between(
 				minimum: .init(nominalAmount: minAmount),
 				maximum: .init(nominalAmount: maxAmount)
 			)
+		case .atMost:
+			// AtMost is considered unknown in the Wallet as per https://radixdlt.atlassian.net/browse/ABW-4040
+			self = .unknown
 		case .unknownAmount:
 			self = .unknown
 		}
@@ -59,14 +59,21 @@ extension ResourceAmount {
 		}
 	}
 
+	var guaranteedAmount: ExactResourceAmount? {
+		switch self {
+		case let .predicted(_, amount):
+			amount
+		default:
+			nil
+		}
+	}
+
 	func adjustedNominalAmount(_ adjust: (Decimal192) -> Decimal192) -> Self {
 		switch self {
 		case let .exact(amount):
 			return .exact(adjust(amount.nominalAmount))
 		case let .atLeast(amount):
 			return .atLeast(.init(nominalAmount: adjust(amount.nominalAmount)))
-		case let .atMost(amount):
-			return .atMost(.init(nominalAmount: adjust(amount.nominalAmount)))
 		case let .between(minAmount, maxAmount):
 			let min = adjust(minAmount.nominalAmount)
 			let max = adjust(maxAmount.nominalAmount)
@@ -85,6 +92,14 @@ extension ResourceAmount {
 			return .unknown
 		}
 	}
+
+	mutating func setGuaranteedAmount(_ newGuaranteed: Decimal192) {
+		guard case let .predicted(predicted, _) = self else {
+			return
+		}
+
+		self = .predicted(predicted: predicted, guaranteed: .init(nominalAmount: newGuaranteed))
+	}
 }
 
 // MARK: CustomDebugStringConvertible
@@ -95,8 +110,6 @@ extension ResourceAmount: CustomDebugStringConvertible {
 			amount.nominalAmount.formatted()
 		case let .atLeast(amount):
 			"At least \(amount.nominalAmount.formatted())"
-		case let .atMost(amount):
-			"No more than \(amount.nominalAmount.formatted())"
 		case let .between(minAmount, maxAmount):
 			"Min: \(minAmount.nominalAmount.formatted()); Max: \(maxAmount.nominalAmount.formatted())"
 		case let .predicted(predicted, guaranteed):

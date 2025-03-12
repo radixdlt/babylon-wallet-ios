@@ -670,8 +670,8 @@ internal enum L10n {
       internal static let supplyIncreasableByAnyone = L10n.tr("Localizable", "assetDetails_behaviors_supplyIncreasableByAnyone", fallback: "Anyone can increase the supply of this asset.")
     }
     internal enum PoolUnitDetails {
-      /// You have no Pool units
-      internal static let noPoolUnits = L10n.tr("Localizable", "assetDetails_poolUnitDetails_noPoolUnits", fallback: "You have no Pool units")
+      /// You have no pool units
+      internal static let noPoolUnits = L10n.tr("Localizable", "assetDetails_poolUnitDetails_noPoolUnits", fallback: "You have no pool units")
     }
     internal enum Staking {
       /// Current Redeemable Value
@@ -700,16 +700,16 @@ internal enum L10n {
       }
     }
     internal enum StakingDetails {
-      /// You have no Stakes
-      internal static let noStakes = L10n.tr("Localizable", "assetDetails_stakingDetails_noStakes", fallback: "You have no Stakes")
+      /// You have no stakes
+      internal static let noStakes = L10n.tr("Localizable", "assetDetails_stakingDetails_noStakes", fallback: "You have no stakes")
     }
     internal enum Tags {
       /// Official Radix
       internal static let officialRadix = L10n.tr("Localizable", "assetDetails_tags_officialRadix", fallback: "Official Radix")
     }
     internal enum TokenDetails {
-      /// You have no Tokens
-      internal static let noTokens = L10n.tr("Localizable", "assetDetails_tokenDetails_noTokens", fallback: "You have no Tokens")
+      /// You have no tokens
+      internal static let noTokens = L10n.tr("Localizable", "assetDetails_tokenDetails_noTokens", fallback: "You have no tokens")
     }
   }
   internal enum AssetTransfer {
@@ -786,8 +786,8 @@ internal enum L10n {
       internal static let totalExceedsBalance = L10n.tr("Localizable", "assetTransfer_fungibleResource_totalExceedsBalance", fallback: "Total exceeds your current balance")
     }
     internal enum Header {
-      /// Add Message
-      internal static let addMessageButton = L10n.tr("Localizable", "assetTransfer_header_addMessageButton", fallback: "Add Message")
+      /// Add message
+      internal static let addMessageButton = L10n.tr("Localizable", "assetTransfer_header_addMessageButton", fallback: "Add message")
       /// Transfer
       internal static let transfer = L10n.tr("Localizable", "assetTransfer_header_transfer", fallback: "Transfer")
     }
@@ -806,10 +806,24 @@ internal enum L10n {
       internal static let title = L10n.tr("Localizable", "assetTransfer_maxAmountDialog_title", fallback: "Sending All XRD")
     }
     internal enum ReceivingAccount {
-      /// Add Assets
-      internal static let addAssetsButton = L10n.tr("Localizable", "assetTransfer_receivingAccount_addAssetsButton", fallback: "Add Assets")
+      /// Add assets
+      internal static let addAssetsButton = L10n.tr("Localizable", "assetTransfer_receivingAccount_addAssetsButton", fallback: "Add assets")
       /// Choose Account
       internal static let chooseAccountButton = L10n.tr("Localizable", "assetTransfer_receivingAccount_chooseAccountButton", fallback: "Choose Account")
+    }
+  }
+  internal enum Authorization {
+    internal enum CreateAccount {
+      /// Creating Account
+      internal static let title = L10n.tr("Localizable", "authorization_createAccount_title", fallback: "Creating Account")
+    }
+    internal enum CreateEntity {
+      /// Use your phone’s biometrics or PIN to confirm you want to do this.
+      internal static let message = L10n.tr("Localizable", "authorization_createEntity_message", fallback: "Use your phone’s biometrics or PIN to confirm you want to do this.")
+    }
+    internal enum CreatePersona {
+      /// Creating Persona
+      internal static let title = L10n.tr("Localizable", "authorization_createPersona_title", fallback: "Creating Persona")
     }
   }
   internal enum AuthorizedDapps {
@@ -1029,10 +1043,10 @@ internal enum L10n {
     }
   }
   internal enum ConfigurationBackup {
-    /// You need an up-to-date Configuration Backup to recover your Accounts and Personas if you lose access to them.
+    /// You need an up-to-date configuration backup to recover your Accounts and Personas if you lose access to them.
     /// 
-    /// Your Backup does not contain your keys or seed phrase.
-    internal static let heading = L10n.tr("Localizable", "configurationBackup_heading", fallback: "You need an up-to-date Configuration Backup to recover your Accounts and Personas if you lose access to them.\n\nYour Backup does not contain your keys or seed phrase.")
+    /// Your backup does not contain your keys or seed phrase.
+    internal static let heading = L10n.tr("Localizable", "configurationBackup_heading", fallback: "You need an up-to-date configuration backup to recover your Accounts and Personas if you lose access to them.\n\nYour backup does not contain your keys or seed phrase.")
     /// Configuration Backup
     internal static let title = L10n.tr("Localizable", "configurationBackup_title", fallback: "Configuration Backup")
     internal enum Automated {
@@ -1094,8 +1108,8 @@ internal enum L10n {
       internal static let walletTransferredTitle = L10n.tr("Localizable", "configurationBackup_automated_walletTransferredTitle", fallback: "Wallet Control Has Been Transferred")
       /// Transfer Control Back to This Phone
       internal static let walletTransferredTransferBackButton = L10n.tr("Localizable", "configurationBackup_automated_walletTransferredTransferBackButton", fallback: "Transfer Control Back to This Phone")
-      /// Without an updated Configuration Backup, you cannot recover your Accounts and Personas.
-      internal static let warning = L10n.tr("Localizable", "configurationBackup_automated_warning", fallback: "Without an updated Configuration Backup, you cannot recover your Accounts and Personas.")
+      /// Without an updated configuration backup, you cannot recover your Accounts and Personas.
+      internal static let warning = L10n.tr("Localizable", "configurationBackup_automated_warning", fallback: "Without an updated configuration backup, you cannot recover your Accounts and Personas.")
     }
     internal enum Manual {
       /// Export Backup File
@@ -1106,10 +1120,10 @@ internal enum L10n {
       internal static func lastBackup(_ p1: Any) -> String {
         return L10n.tr("Localizable", "configurationBackup_manual_lastBackup", String(describing: p1), fallback: "Last backup: %@")
       }
-      /// You can export your own Configuration Backup file and save it locally
-      internal static let text = L10n.tr("Localizable", "configurationBackup_manual_text", fallback: "You can export your own Configuration Backup file and save it locally")
-      /// You’ll need to export a new Backup file each time you make a change in your wallet.
-      internal static let warning = L10n.tr("Localizable", "configurationBackup_manual_warning", fallback: "You’ll need to export a new Backup file each time you make a change in your wallet.")
+      /// You can export your own configuration backup file and save it locally
+      internal static let text = L10n.tr("Localizable", "configurationBackup_manual_text", fallback: "You can export your own configuration backup file and save it locally")
+      /// You’ll need to export a new backup file each time you make a change in your wallet.
+      internal static let warning = L10n.tr("Localizable", "configurationBackup_manual_warning", fallback: "You’ll need to export a new backup file each time you make a change in your wallet.")
     }
   }
   internal enum ConfirmMnemonicBackedUp {
@@ -1746,27 +1760,33 @@ internal enum L10n {
     }
   }
   internal enum FactorSourceActions {
-    internal enum CreateAccount {
-      /// Creating Account
-      internal static let title = L10n.tr("Localizable", "factorSourceActions_createAccount_title", fallback: "Creating Account")
+    /// Ignore
+    internal static let ignore = L10n.tr("Localizable", "factorSourceActions_ignore", fallback: "Ignore")
+    /// Use a different factor
+    internal static let useDifferentFactor = L10n.tr("Localizable", "factorSourceActions_useDifferentFactor", fallback: "Use a different factor")
+    internal enum Arculus {
+      /// Tap and hold this **Arculus Card** to your phone. **This may take up to a minute.**
+      internal static let deriveKeysMessage = L10n.tr("Localizable", "factorSourceActions_arculus_deriveKeysMessage", fallback: "Tap and hold this **Arculus Card** to your phone. **This may take up to a minute.**")
+      /// Tap and hold this **Arculus Card** to your phone.
+      internal static let message = L10n.tr("Localizable", "factorSourceActions_arculus_message", fallback: "Tap and hold this **Arculus Card** to your phone.")
+      /// Tap and hold this **Arculus Card** to your phone to sign.
+      internal static let signMessage = L10n.tr("Localizable", "factorSourceActions_arculus_signMessage", fallback: "Tap and hold this **Arculus Card** to your phone to sign.")
     }
     internal enum CreateKey {
       /// Creating Key
       internal static let title = L10n.tr("Localizable", "factorSourceActions_createKey_title", fallback: "Creating Key")
-    }
-    internal enum CreatePersona {
-      /// Creating Persona
-      internal static let title = L10n.tr("Localizable", "factorSourceActions_createPersona_title", fallback: "Creating Persona")
     }
     internal enum DeriveAccounts {
       /// Deriving Accounts
       internal static let title = L10n.tr("Localizable", "factorSourceActions_deriveAccounts_title", fallback: "Deriving Accounts")
     }
     internal enum Device {
-      /// Authenticate to your phone to complete using your phone's signing key.
-      internal static let message = L10n.tr("Localizable", "factorSourceActions_device_message", fallback: "Authenticate to your phone to complete using your phone's signing key.")
       /// Authenticate to your phone to sign.
-      internal static let messageSignature = L10n.tr("Localizable", "factorSourceActions_device_messageSignature", fallback: "Authenticate to your phone to sign.")
+      internal static let deriveAccountsMessage = L10n.tr("Localizable", "factorSourceActions_device_deriveAccountsMessage", fallback: "Authenticate to your phone to sign.")
+      /// Use your phone’s biometrics or PIN
+      internal static let message = L10n.tr("Localizable", "factorSourceActions_device_message", fallback: "Use your phone’s biometrics or PIN")
+      /// Use your phone’s biometrics or PIN to sign
+      internal static let signMessage = L10n.tr("Localizable", "factorSourceActions_device_signMessage", fallback: "Use your phone’s biometrics or PIN to sign")
     }
     internal enum EncryptMessage {
       /// Encrypting Message
@@ -1774,13 +1794,35 @@ internal enum L10n {
     }
     internal enum Ledger {
       /// Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.
-      internal static let message = L10n.tr("Localizable", "factorSourceActions_ledger_message", fallback: "Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.")
-      /// Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.
       /// **Derivation may take up to a minute.**
-      internal static let messageDeriveAccounts = L10n.tr("Localizable", "factorSourceActions_ledger_messageDeriveAccounts", fallback: "Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.\n**Derivation may take up to a minute.**")
-      /// Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.
+      internal static let deriveAccountsMessage = L10n.tr("Localizable", "factorSourceActions_ledger_deriveAccountsMessage", fallback: "Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.\n**Derivation may take up to a minute.**")
+      /// Use your **Ledger Nano**. Make sure it’s connected to a computer with a linked Radix Connector browser extension. **This may take up to a minute.**
+      internal static let deriveKeysMessage = L10n.tr("Localizable", "factorSourceActions_ledger_deriveKeysMessage", fallback: "Use your **Ledger Nano**. Make sure it’s connected to a computer with a linked Radix Connector browser extension. **This may take up to a minute.**")
+      /// Use your **Ledger Nano**. Make sure it’s connected to a computer with a linked Radix Connector browser extension.
+      internal static let message = L10n.tr("Localizable", "factorSourceActions_ledger_message", fallback: "Use your **Ledger Nano**. Make sure it’s connected to a computer with a linked Radix Connector browser extension.")
+      /// Use your **Ledger Nano** to sign. Make sure it’s connected to a computer with a linked Radix Connector browser extension.
       /// **Complete signing on the device.**
-      internal static let messageSignature = L10n.tr("Localizable", "factorSourceActions_ledger_messageSignature", fallback: "Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.\n**Complete signing on the device.**")
+      internal static let signMessage = L10n.tr("Localizable", "factorSourceActions_ledger_signMessage", fallback: "Use your **Ledger Nano** to sign. Make sure it’s connected to a computer with a linked Radix Connector browser extension.\n**Complete signing on the device.**")
+    }
+    internal enum OffDeviceMnemonic {
+      /// Invalid mnemonic
+      internal static let invalid = L10n.tr("Localizable", "factorSourceActions_offDeviceMnemonic_invalid", fallback: "Invalid mnemonic")
+      /// Enter this **mnemonic**
+      internal static let message = L10n.tr("Localizable", "factorSourceActions_offDeviceMnemonic_message", fallback: "Enter this **mnemonic**")
+      /// Enter this **mnemonic** to sign
+      internal static let signMessage = L10n.tr("Localizable", "factorSourceActions_offDeviceMnemonic_signMessage", fallback: "Enter this **mnemonic** to sign")
+      /// Wrong mnemonic
+      internal static let wrong = L10n.tr("Localizable", "factorSourceActions_offDeviceMnemonic_wrong", fallback: "Wrong mnemonic")
+    }
+    internal enum Password {
+      /// Password
+      internal static let heading = L10n.tr("Localizable", "factorSourceActions_password_heading", fallback: "Password")
+      /// Incorrect password
+      internal static let incorrect = L10n.tr("Localizable", "factorSourceActions_password_incorrect", fallback: "Incorrect password")
+      /// Enter this **password**
+      internal static let message = L10n.tr("Localizable", "factorSourceActions_password_message", fallback: "Enter this **password**")
+      /// Enter this **password** to sign
+      internal static let signMessage = L10n.tr("Localizable", "factorSourceActions_password_signMessage", fallback: "Enter this **password** to sign")
     }
     internal enum ProveOwnership {
       /// Proving Ownership
@@ -1789,6 +1831,14 @@ internal enum L10n {
     internal enum Signature {
       /// Signature Request
       internal static let title = L10n.tr("Localizable", "factorSourceActions_signature_title", fallback: "Signature Request")
+    }
+    internal enum SpotCheck {
+      /// Check Factor
+      internal static let title = L10n.tr("Localizable", "factorSourceActions_spotCheck_title", fallback: "Check Factor")
+    }
+    internal enum UpdatingFactorConfig {
+      /// Updating Factor Config
+      internal static let title = L10n.tr("Localizable", "factorSourceActions_updatingFactorConfig_title", fallback: "Updating Factor Config")
     }
   }
   internal enum FactorSources {
@@ -1834,9 +1884,9 @@ internal enum L10n {
         return L10n.tr("Localizable", "factorSources_card_linkedAccountsOrPersonasSomeHidden", String(describing: p1), fallback: "Linked to %@ (and some hidden)")
       }
       /// Enter a seed phrase to approve
-      internal static let passphraseDescription = L10n.tr("Localizable", "factorSources_card_passphraseDescription", fallback: "Enter a seed phrase to approve")
+      internal static let offDeviceMnemonicDescription = L10n.tr("Localizable", "factorSources_card_offDeviceMnemonicDescription", fallback: "Enter a seed phrase to approve")
       /// Mnemonic
-      internal static let passphraseTitle = L10n.tr("Localizable", "factorSources_card_passphraseTitle", fallback: "Mnemonic")
+      internal static let offDeviceMnemonicTitle = L10n.tr("Localizable", "factorSources_card_offDeviceMnemonicTitle", fallback: "Mnemonic")
       /// Enter a decentralized password to approve
       internal static let passwordDescription = L10n.tr("Localizable", "factorSources_card_passwordDescription", fallback: "Enter a decentralized password to approve")
       /// Password
@@ -1873,6 +1923,10 @@ internal enum L10n {
       internal static let seedPhraseLost = L10n.tr("Localizable", "factorSources_detail_seedPhraseLost", fallback: "Seed Phrase Lost")
       /// Spot Check
       internal static let spotCheck = L10n.tr("Localizable", "factorSources_detail_spotCheck", fallback: "Spot Check")
+      /// Factor access spot check failed! Please try again if you want to verify that you are able to use this factor.
+      internal static let spotCheckFailure = L10n.tr("Localizable", "factorSources_detail_spotCheckFailure", fallback: "Factor access spot check failed! Please try again if you want to verify that you are able to use this factor.")
+      /// Factor access spot check was successful.
+      internal static let spotCheckSuccess = L10n.tr("Localizable", "factorSources_detail_spotCheckSuccess", fallback: "Factor access spot check was successful.")
       /// Test
       internal static let test = L10n.tr("Localizable", "factorSources_detail_test", fallback: "Test")
       /// Test that you can use this factor
@@ -1909,10 +1963,10 @@ internal enum L10n {
       internal static let ledgerAdd = L10n.tr("Localizable", "factorSources_list_ledgerAdd", fallback: "Add New Ledger Nano")
       /// This factor has been lost
       internal static let lostFactorSource = L10n.tr("Localizable", "factorSources_list_lostFactorSource", fallback: "This factor has been lost")
+      /// Add New Passphrase
+      internal static let offDeviceMnemonicAdd = L10n.tr("Localizable", "factorSources_list_offDeviceMnemonicAdd", fallback: "Add New Passphrase")
       /// Others
       internal static let others = L10n.tr("Localizable", "factorSources_list_others", fallback: "Others")
-      /// Add New Passphrase
-      internal static let passphraseAdd = L10n.tr("Localizable", "factorSources_list_passphraseAdd", fallback: "Add New Passphrase")
       /// Add New Password
       internal static let passwordAdd = L10n.tr("Localizable", "factorSources_list_passwordAdd", fallback: "Add New Password")
       /// Write down seed phrase to make this factor recoverable
@@ -1963,8 +2017,8 @@ internal enum L10n {
       internal static let errorDuplicateURL = L10n.tr("Localizable", "gateways_addNewGateway_errorDuplicateURL", fallback: "This gateway is already added")
       /// No gateway found at specified URL
       internal static let errorNoGatewayFound = L10n.tr("Localizable", "gateways_addNewGateway_errorNoGatewayFound", fallback: "No gateway found at specified URL")
-      /// There was an error establishing a connection
-      internal static let establishingConnectionErrorMessage = L10n.tr("Localizable", "gateways_addNewGateway_establishingConnectionErrorMessage", fallback: "There was an error establishing a connection")
+      /// Error establishing connection
+      internal static let establishingConnectionErrorMessage = L10n.tr("Localizable", "gateways_addNewGateway_establishingConnectionErrorMessage", fallback: "Error establishing connection")
       /// Enter a gateway URL
       internal static let subtitle = L10n.tr("Localizable", "gateways_addNewGateway_subtitle", fallback: "Enter a gateway URL")
       /// Enter full URL
@@ -2497,6 +2551,14 @@ internal enum L10n {
       /// 
       /// [Learn more about DEX dApps](https://learn.radixdlt.com/article/whats-a-dex) ↗
       internal static let dex = L10n.tr("Localizable", "infoLink_glossary_dex", fallback: "## Decentralized Exchange (DEX)\n\nA decentralized exchange, or “DEX” for short, is a [dApp](?glossaryAnchor=dapps) that offers something a bit like a much more powerful web3 version of a foreign currency exchange counter at the airport.\n\n---\n\nA DEX dApp lets users do instant and fully automated swaps between a huge variety of tokens or other digital assets. The exchange logic runs right on the [Radix Network](?glossaryAnchor=radixnetwork) itself. This means that a DEX swap is done with a [transaction](?glossaryAnchor=transactions) and the [Radix Wallet](?glossaryAnchor=radixwallet) can show you exactly what’s going to happen, and let you apply [deposit guarantees](?glossaryAnchor=guarantees) to the results.\n\n[Learn more about DEX dApps](https://learn.radixdlt.com/article/whats-a-dex) ↗")
+      /// ## Emergency Fallback
+      /// 
+      /// Emergency fallbacks are time-based security factors you can use to confirm a recovery, even if you’ve lost the factor that would normally perform that role. Every [Security Shield](?glossaryAnchor=securityshields) must contain an emergency fallback and they can be set for any length of time up 9,999 days.
+      /// 
+      /// When you [create a Security Shield](?glossaryAnchor=buildingshield), it will automatically include an emergency fallback. You'll need to preset a time period that determines how long you'll need wait to complete a recovery, in the event that you start one but do not have the factors required to confirm it. In his situation, where you begin a recovery as normal but can't confirm it, your [Radix Wallet](?glossaryAnchor=radixwallet) will prompt you to activate your emergency fallback. Once you've done this, wait for the preset time period to elapse and then confirm the recovery with a single tap.
+      /// 
+      /// Once you start a timed recovery, you'll see a countdown for it on your Radix Wallet homescreen. It’s recommended that you set your emergency fallback for long enough that you'll have time to notice (and cancel it) if someone other than you has activated it and is attempting to take control of your [Accounts](?glossaryAnchor=accounts) and [Personas](?glossaryAnchor=personas).
+      internal static let emergencyfallback = L10n.tr("Localizable", "infoLink_glossary_emergencyfallback", fallback: "## Emergency Fallback\n\nEmergency fallbacks are time-based security factors you can use to confirm a recovery, even if you’ve lost the factor that would normally perform that role. Every [Security Shield](?glossaryAnchor=securityshields) must contain an emergency fallback and they can be set for any length of time up 9,999 days.\n\nWhen you [create a Security Shield](?glossaryAnchor=buildingshield), it will automatically include an emergency fallback. You'll need to preset a time period that determines how long you'll need wait to complete a recovery, in the event that you start one but do not have the factors required to confirm it. In his situation, where you begin a recovery as normal but can't confirm it, your [Radix Wallet](?glossaryAnchor=radixwallet) will prompt you to activate your emergency fallback. Once you've done this, wait for the preset time period to elapse and then confirm the recovery with a single tap.\n\nOnce you start a timed recovery, you'll see a countdown for it on your Radix Wallet homescreen. It’s recommended that you set your emergency fallback for long enough that you'll have time to notice (and cancel it) if someone other than you has activated it and is attempting to take control of your [Accounts](?glossaryAnchor=accounts) and [Personas](?glossaryAnchor=personas).")
       /// ## Gateways
       /// 
       /// A gateway is your pathway to connect to the [Radix Network](?glossaryAnchor=radixnetwork) – it enables users to communicate with the Radix Network and transfer data to and from it. 
@@ -2835,42 +2897,44 @@ internal enum L10n {
     internal enum Title {
       /// Learn about Arculus Cards
       internal static let arculus = L10n.tr("Localizable", "infoLink_title_arculus", fallback: "Learn about Arculus Cards")
-      /// What are behaviors?
-      internal static let behaviors = L10n.tr("Localizable", "infoLink_title_behaviors", fallback: "What are behaviors?")
+      /// Learn about behaviors
+      internal static let behaviors = L10n.tr("Localizable", "infoLink_title_behaviors", fallback: "Learn about behaviors")
       /// Learn about biometrics/PIN
       internal static let biometricspin = L10n.tr("Localizable", "infoLink_title_biometricspin", fallback: "Learn about biometrics/PIN")
       /// How your Security Shield is built
       internal static let buildingshield = L10n.tr("Localizable", "infoLink_title_buildingshield", fallback: "How your Security Shield is built")
-      /// What is a dApp?
-      internal static let dapps = L10n.tr("Localizable", "infoLink_title_dapps", fallback: "What is a dApp?")
-      /// What is a Gateway?
-      internal static let gateways = L10n.tr("Localizable", "infoLink_title_gateways", fallback: "What is a Gateway?")
-      /// How do guarantees work?
-      internal static let guarantees = L10n.tr("Localizable", "infoLink_title_guarantees", fallback: "How do guarantees work?")
+      /// Learn about dApps
+      internal static let dapps = L10n.tr("Localizable", "infoLink_title_dapps", fallback: "Learn about dApps")
+      /// Learn about gateways
+      internal static let gateways = L10n.tr("Localizable", "infoLink_title_gateways", fallback: "Learn about gateways")
+      /// Learn how guarantees work
+      internal static let guarantees = L10n.tr("Localizable", "infoLink_title_guarantees", fallback: "Learn how guarantees work")
       /// Learn about Ledger Nanos
       internal static let ledgernano = L10n.tr("Localizable", "infoLink_title_ledgernano", fallback: "Learn about Ledger Nanos")
-      /// What is Staking?
-      internal static let networkstaking = L10n.tr("Localizable", "infoLink_title_networkstaking", fallback: "What is Staking?")
-      /// What are NFTs?
-      internal static let nfts = L10n.tr("Localizable", "infoLink_title_nfts", fallback: "What are NFTs?")
+      /// Learn about staking
+      internal static let networkstaking = L10n.tr("Localizable", "infoLink_title_networkstaking", fallback: "Learn about staking")
+      /// Learn about NFTs
+      internal static let nfts = L10n.tr("Localizable", "infoLink_title_nfts", fallback: "Learn about NFTs")
+      /// I don’t have a hardware device
+      internal static let nohardwaredevice = L10n.tr("Localizable", "infoLink_title_nohardwaredevice", fallback: "I don’t have a hardware device")
       /// Learn about passphrases
       internal static let passphrases = L10n.tr("Localizable", "infoLink_title_passphrases", fallback: "Learn about passphrases")
       /// Learn about passwords
       internal static let passwords = L10n.tr("Localizable", "infoLink_title_passwords", fallback: "Learn about passwords")
-      /// What is a Persona?
-      internal static let personas = L10n.tr("Localizable", "infoLink_title_personas", fallback: "What is a Persona?")
+      /// Learn about Personas
+      internal static let personas = L10n.tr("Localizable", "infoLink_title_personas", fallback: "Learn about Personas")
       /// Learn about Personas
       internal static let personasLearnAbout = L10n.tr("Localizable", "infoLink_title_personasLearnAbout", fallback: "Learn about Personas")
-      /// What are Pool units?
-      internal static let poolunits = L10n.tr("Localizable", "infoLink_title_poolunits", fallback: "What are Pool units?")
-      /// Learn more about Radix Connect
-      internal static let radixconnect = L10n.tr("Localizable", "infoLink_title_radixconnect", fallback: "Learn more about Radix Connect")
+      /// Learn about pool units
+      internal static let poolunits = L10n.tr("Localizable", "infoLink_title_poolunits", fallback: "Learn about pool units")
+      /// Learn about Radix Connect
+      internal static let radixconnect = L10n.tr("Localizable", "infoLink_title_radixconnect", fallback: "Learn about Radix Connect")
       /// Learn about Security Shields
       internal static let securityshields = L10n.tr("Localizable", "infoLink_title_securityshields", fallback: "Learn about Security Shields")
-      /// What are Tokens?
-      internal static let tokens = L10n.tr("Localizable", "infoLink_title_tokens", fallback: "What are Tokens?")
-      /// How do fees work?
-      internal static let transactionfee = L10n.tr("Localizable", "infoLink_title_transactionfee", fallback: "How do fees work?")
+      /// Learn about tokens
+      internal static let tokens = L10n.tr("Localizable", "infoLink_title_tokens", fallback: "Learn about tokens")
+      /// Learn how fees work
+      internal static let transactionfee = L10n.tr("Localizable", "infoLink_title_transactionfee", fallback: "Learn how fees work")
     }
   }
   internal enum InteractionReview {
@@ -3757,14 +3821,14 @@ internal enum L10n {
       internal static let walletSettingsPersonas = L10n.tr("Localizable", "securityProblems_no3_walletSettingsPersonas", fallback: "Personas are not recoverable")
     }
     internal enum No5 {
-      /// Problem with Configuration Backup
-      internal static let accountCard = L10n.tr("Localizable", "securityProblems_no5_accountCard", fallback: "Problem with Configuration Backup")
-      /// Automated Configuration Backup not working. Check internet connection and cloud settings.
-      internal static let configurationBackup = L10n.tr("Localizable", "securityProblems_no5_configurationBackup", fallback: "Automated Configuration Backup not working. Check internet connection and cloud settings.")
-      /// Problem with Configuration Backup
-      internal static let personas = L10n.tr("Localizable", "securityProblems_no5_personas", fallback: "Problem with Configuration Backup")
-      /// Automated Configuration Backup has stopped working. Check internet and cloud settings.
-      internal static let securityCenterBody = L10n.tr("Localizable", "securityProblems_no5_securityCenterBody", fallback: "Automated Configuration Backup has stopped working. Check internet and cloud settings.")
+      /// Problem with configuration backup
+      internal static let accountCard = L10n.tr("Localizable", "securityProblems_no5_accountCard", fallback: "Problem with configuration backup")
+      /// Automated configuration backup not working. Check internet connection and cloud settings.
+      internal static let configurationBackup = L10n.tr("Localizable", "securityProblems_no5_configurationBackup", fallback: "Automated configuration backup not working. Check internet connection and cloud settings.")
+      /// Problem with configuration backup
+      internal static let personas = L10n.tr("Localizable", "securityProblems_no5_personas", fallback: "Problem with configuration backup")
+      /// Automated configuration backup has stopped working. Check internet and cloud settings.
+      internal static let securityCenterBody = L10n.tr("Localizable", "securityProblems_no5_securityCenterBody", fallback: "Automated configuration backup has stopped working. Check internet and cloud settings.")
       /// Your wallet is not recoverable
       internal static let securityCenterTitle = L10n.tr("Localizable", "securityProblems_no5_securityCenterTitle", fallback: "Your wallet is not recoverable")
       /// Personas are not recoverable
@@ -3777,22 +3841,22 @@ internal enum L10n {
       internal static let configurationBackup = L10n.tr("Localizable", "securityProblems_no6_configurationBackup", fallback: "To secure your wallet, turn on automated backups or manually export backup file.")
       /// Your wallet is not recoverable
       internal static let personas = L10n.tr("Localizable", "securityProblems_no6_personas", fallback: "Your wallet is not recoverable")
-      /// Configuration Backup is not up to date. Create backup now.
-      internal static let securityCenterBody = L10n.tr("Localizable", "securityProblems_no6_securityCenterBody", fallback: "Configuration Backup is not up to date. Create backup now.")
+      /// Configuration backup is not up to date. Create backup now.
+      internal static let securityCenterBody = L10n.tr("Localizable", "securityProblems_no6_securityCenterBody", fallback: "Configuration backup is not up to date. Create backup now.")
       /// Your wallet is not recoverable
       internal static let securityCenterTitle = L10n.tr("Localizable", "securityProblems_no6_securityCenterTitle", fallback: "Your wallet is not recoverable")
       /// Personas are not recoverable
       internal static let walletSettingsPersonas = L10n.tr("Localizable", "securityProblems_no6_walletSettingsPersonas", fallback: "Personas are not recoverable")
     }
     internal enum No7 {
-      /// Configuration Backup not up to date
-      internal static let accountCard = L10n.tr("Localizable", "securityProblems_no7_accountCard", fallback: "Configuration Backup not up to date")
-      /// Configuration Backup not up to date. Turn on automated backups or manually export backup file.
-      internal static let configurationBackup = L10n.tr("Localizable", "securityProblems_no7_configurationBackup", fallback: "Configuration Backup not up to date. Turn on automated backups or manually export backup file.")
-      /// Configuration Backup not up to date
-      internal static let personas = L10n.tr("Localizable", "securityProblems_no7_personas", fallback: "Configuration Backup not up to date")
-      /// Accounts and Personas not recoverable. Create Configuration Backup now.
-      internal static let securityCenterBody = L10n.tr("Localizable", "securityProblems_no7_securityCenterBody", fallback: "Accounts and Personas not recoverable. Create Configuration Backup now.")
+      /// Configuration backup not up to date
+      internal static let accountCard = L10n.tr("Localizable", "securityProblems_no7_accountCard", fallback: "Configuration backup not up to date")
+      /// Configuration backup not up to date. Turn on automated backups or manually export backup file.
+      internal static let configurationBackup = L10n.tr("Localizable", "securityProblems_no7_configurationBackup", fallback: "Configuration backup not up to date. Turn on automated backups or manually export backup file.")
+      /// Configuration backup not up to date
+      internal static let personas = L10n.tr("Localizable", "securityProblems_no7_personas", fallback: "Configuration backup not up to date")
+      /// Accounts and Personas not recoverable. Create configuration backup now.
+      internal static let securityCenterBody = L10n.tr("Localizable", "securityProblems_no7_securityCenterBody", fallback: "Accounts and Personas not recoverable. Create configuration backup now.")
       /// Your wallet is not recoverable
       internal static let securityCenterTitle = L10n.tr("Localizable", "securityProblems_no7_securityCenterTitle", fallback: "Your wallet is not recoverable")
       /// Personas are not recoverable
@@ -3813,6 +3877,50 @@ internal enum L10n {
       internal static let seedPhrases = L10n.tr("Localizable", "securityProblems_no9_seedPhrases", fallback: "Enter seed phrase to recover control")
       /// Recovery required
       internal static let walletSettingsPersonas = L10n.tr("Localizable", "securityProblems_no9_walletSettingsPersonas", fallback: "Recovery required")
+    }
+  }
+  internal enum SecurityShields {
+    /// Change
+    internal static let change = L10n.tr("Localizable", "securityShields_change", fallback: "Change")
+    /// Create New Security Shield
+    internal static let createShieldButton = L10n.tr("Localizable", "securityShields_createShieldButton", fallback: "Create New Security Shield")
+    /// Default Shield
+    internal static let `default` = L10n.tr("Localizable", "securityShields_default", fallback: "Default Shield")
+    /// Others
+    internal static let others = L10n.tr("Localizable", "securityShields_others", fallback: "Others")
+    /// Security Shields
+    internal static let title = L10n.tr("Localizable", "securityShields_title", fallback: "Security Shields")
+    internal enum Assigned {
+      /// %d Accounts
+      internal static func accountPlural(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "securityShields_assigned_accountPlural", p1, fallback: "%d Accounts")
+      }
+      /// 1 Account
+      internal static let accountSingular = L10n.tr("Localizable", "securityShields_assigned_accountSingular", fallback: "1 Account")
+      /// Hidden Accounts or Personas
+      internal static let onlyHiddenEntities = L10n.tr("Localizable", "securityShields_assigned_onlyHiddenEntities", fallback: "Hidden Accounts or Personas")
+      /// %d Personas
+      internal static func personaPlural(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "securityShields_assigned_personaPlural", p1, fallback: "%d Personas")
+      }
+      /// 1 Persona
+      internal static let personaSingular = L10n.tr("Localizable", "securityShields_assigned_personaSingular", fallback: "1 Persona")
+      /// (and some hidden)
+      internal static let someHiddenEntities = L10n.tr("Localizable", "securityShields_assigned_someHiddenEntities", fallback: "(and some hidden)")
+      /// Assigned to:
+      internal static let title = L10n.tr("Localizable", "securityShields_assigned_title", fallback: "Assigned to:")
+    }
+    internal enum ChangeMain {
+      /// Choose which Security Shield will be pre-selected when you want to use one for an Account or Persona.
+      internal static let subtitle = L10n.tr("Localizable", "securityShields_changeMain_subtitle", fallback: "Choose which Security Shield will be pre-selected when you want to use one for an Account or Persona.")
+      /// Change Default Shield
+      internal static let title = L10n.tr("Localizable", "securityShields_changeMain_title", fallback: "Change Default Shield")
+    }
+    internal enum Status {
+      /// Action required
+      internal static let actionRequired = L10n.tr("Localizable", "securityShields_status_actionRequired", fallback: "Action required")
+      /// Applied and working
+      internal static let applied = L10n.tr("Localizable", "securityShields_status_applied", fallback: "Applied and working")
     }
   }
   internal enum SeedPhrases {
@@ -3908,7 +4016,7 @@ internal enum L10n {
       /// Add Factor
       internal static let button = L10n.tr("Localizable", "shieldSetupPrepareFactors_addAnotherFactor_button", fallback: "Add Factor")
       /// Choosing a mnemonic is only recommended for advanced users
-      internal static let passphraseHint = L10n.tr("Localizable", "shieldSetupPrepareFactors_addAnotherFactor_passphraseHint", fallback: "Choosing a mnemonic is only recommended for advanced users")
+      internal static let offDeviceMnemonicHint = L10n.tr("Localizable", "shieldSetupPrepareFactors_addAnotherFactor_offDeviceMnemonicHint", fallback: "Choosing a mnemonic is only recommended for advanced users")
       /// You need to add **1 more factor** to begin building your Shield.
       internal static let subtitle = L10n.tr("Localizable", "shieldSetupPrepareFactors_addAnotherFactor_subtitle", fallback: "You need to add **1 more factor** to begin building your Shield.")
       /// Add Another Factor
@@ -3917,8 +4025,6 @@ internal enum L10n {
     internal enum AddHardwareFactor {
       /// Add Hardware Device
       internal static let button = L10n.tr("Localizable", "shieldSetupPrepareFactors_addHardwareFactor_button", fallback: "Add Hardware Device")
-      /// I don’t have a hardware device
-      internal static let noDeviceButton = L10n.tr("Localizable", "shieldSetupPrepareFactors_addHardwareFactor_noDeviceButton", fallback: "I don’t have a hardware device")
       /// Choose a hardware device to use as a security factor in your Shield.
       internal static let subtitle = L10n.tr("Localizable", "shieldSetupPrepareFactors_addHardwareFactor_subtitle", fallback: "Choose a hardware device to use as a security factor in your Shield.")
       /// Add a Hardware Device
@@ -3944,10 +4050,16 @@ internal enum L10n {
       /// Let’s Prepare your Factors
       internal static let title = L10n.tr("Localizable", "shieldSetupPrepareFactors_intro_title", fallback: "Let’s Prepare your Factors")
     }
+    internal enum Skip {
+      /// Skip automatic Shield recommendation (advanced)
+      internal static let button = L10n.tr("Localizable", "shieldSetupPrepareFactors_skip_button", fallback: "Skip automatic Shield recommendation (advanced)")
+    }
   }
   internal enum ShieldSetupSelectFactors {
     /// Build Shield
     internal static let buildButtonTitle = L10n.tr("Localizable", "shieldSetupSelectFactors_buildButtonTitle", fallback: "Build Shield")
+    /// Skip automatic Shield recommendation (advanced)
+    internal static let skipButtonTitle = L10n.tr("Localizable", "shieldSetupSelectFactors_skipButtonTitle", fallback: "Skip automatic Shield recommendation (advanced)")
     /// Choose the factors you’ll use for regular access. You’ll use **all** of these factors every time you send assets.
     internal static let subtitle = L10n.tr("Localizable", "shieldSetupSelectFactors_subtitle", fallback: "Choose the factors you’ll use for regular access. You’ll use **all** of these factors every time you send assets.")
     /// Select Factors for Regular Access
@@ -3958,15 +4070,73 @@ internal enum L10n {
     internal static let factorCannotBeUsedByItself = L10n.tr("Localizable", "shieldSetupStatus_factorCannotBeUsedByItself", fallback: "Cannot use this factor type by itself")
     /// You cannot create a Shield with this combination of factors. **Read more**
     internal static let invalidCombination = L10n.tr("Localizable", "shieldSetupStatus_invalidCombination", fallback: "You cannot create a Shield with this combination of factors. **Read more**")
+    /// You haven’t chosen enough factors to build a Shield. Learn about **Factors required for Shield**
+    internal static let notEnoughFactors = L10n.tr("Localizable", "shieldSetupStatus_notEnoughFactors", fallback: "You haven’t chosen enough factors to build a Shield. Learn about **Factors required for Shield**")
     /// Choosing 2 factors will make your Shield more secure and reliable
     internal static let recommendedFactors = L10n.tr("Localizable", "shieldSetupStatus_recommendedFactors", fallback: "Choosing 2 factors will make your Shield more secure and reliable")
-    internal enum Authentication {
+    /// This combination of factors may be unsafe. **Read more**
+    internal static let unsafeCombination = L10n.tr("Localizable", "shieldSetupStatus_unsafeCombination", fallback: "This combination of factors may be unsafe. **Read more**")
+    internal enum Roles {
       /// You need to choose a factor to continue
-      internal static let atLeastOneFactor = L10n.tr("Localizable", "shieldSetupStatus_authentication_atLeastOneFactor", fallback: "You need to choose a factor to continue")
+      internal static let atLeastOneFactor = L10n.tr("Localizable", "shieldSetupStatus_roles_atLeastOneFactor", fallback: "You need to choose a factor to continue")
     }
-    internal enum Transactions {
+    internal enum SelectFactors {
       /// You need to select at least 1 factor for signing transactions
-      internal static let atLeastOneFactor = L10n.tr("Localizable", "shieldSetupStatus_transactions_atLeastOneFactor", fallback: "You need to select at least 1 factor for signing transactions")
+      internal static let atLeastOneFactor = L10n.tr("Localizable", "shieldSetupStatus_selectFactors_atLeastOneFactor", fallback: "You need to select at least 1 factor for signing transactions")
+    }
+    internal enum UnsafeCombination {
+      /// Go back
+      internal static let cancel = L10n.tr("Localizable", "shieldSetupStatus_unsafeCombination_cancel", fallback: "Go back")
+      /// I understand
+      internal static let confirm = L10n.tr("Localizable", "shieldSetupStatus_unsafeCombination_confirm", fallback: "I understand")
+      /// The combination of factors you have chosen may make this Shield unsafe or easily lost without special precautions. Only proceed if you are certain you understand how you will use this Shield.
+      internal static let message = L10n.tr("Localizable", "shieldSetupStatus_unsafeCombination_message", fallback: "The combination of factors you have chosen may make this Shield unsafe or easily lost without special precautions. Only proceed if you are certain you understand how you will use this Shield.")
+    }
+  }
+  internal enum ShieldWizardApplyShield {
+    internal enum ApplyShield {
+      /// Save and Apply
+      internal static let saveButton = L10n.tr("Localizable", "shieldWizardApplyShield_applyShield_saveButton", fallback: "Save and Apply")
+      /// Now let’s save your Shield settings to your wallet and apply them on the Radix Network with a transaction.
+      internal static let subtitle = L10n.tr("Localizable", "shieldWizardApplyShield_applyShield_subtitle", fallback: "Now let’s save your Shield settings to your wallet and apply them on the Radix Network with a transaction.")
+      /// Apply your Shield
+      internal static let title = L10n.tr("Localizable", "shieldWizardApplyShield_applyShield_title", fallback: "Apply your Shield")
+    }
+    internal enum ChooseAccounts {
+      /// Choose the Accounts you want to apply this Shield to.
+      internal static let subtitle = L10n.tr("Localizable", "shieldWizardApplyShield_chooseAccounts_subtitle", fallback: "Choose the Accounts you want to apply this Shield to.")
+      /// Choose Accounts
+      internal static let title = L10n.tr("Localizable", "shieldWizardApplyShield_chooseAccounts_title", fallback: "Choose Accounts")
+    }
+    internal enum ChooseEntities {
+      /// Deselect all
+      internal static let deselectAllButton = L10n.tr("Localizable", "shieldWizardApplyShield_chooseEntities_deselectAllButton", fallback: "Deselect all")
+      /// Select all
+      internal static let selectAllButton = L10n.tr("Localizable", "shieldWizardApplyShield_chooseEntities_selectAllButton", fallback: "Select all")
+      /// Skip
+      internal static let skipButton = L10n.tr("Localizable", "shieldWizardApplyShield_chooseEntities_skipButton", fallback: "Skip")
+    }
+    internal enum ChoosePersonas {
+      /// Choose the Personas you want to apply this Shield to.
+      internal static let subtitle = L10n.tr("Localizable", "shieldWizardApplyShield_choosePersonas_subtitle", fallback: "Choose the Personas you want to apply this Shield to.")
+      /// Choose Personas
+      internal static let title = L10n.tr("Localizable", "shieldWizardApplyShield_choosePersonas_title", fallback: "Choose Personas")
+    }
+    internal enum ShieldCreated {
+      /// Apply to Accounts and Personas
+      internal static let applyButton = L10n.tr("Localizable", "shieldWizardApplyShield_shieldCreated_applyButton", fallback: "Apply to Accounts and Personas")
+      /// To apply your Shield on the Radix Network, you’ll need to sign a transaction
+      internal static let note = L10n.tr("Localizable", "shieldWizardApplyShield_shieldCreated_note", fallback: "To apply your Shield on the Radix Network, you’ll need to sign a transaction")
+      /// Not enough XRD to pay transaction. Get some XRD tokens first to apply Shields.
+      internal static let notEnoughXrd = L10n.tr("Localizable", "shieldWizardApplyShield_shieldCreated_notEnoughXrd", fallback: "Not enough XRD to pay transaction. Get some XRD tokens first to apply Shields.")
+      /// Skip For Now
+      internal static let skipButton = L10n.tr("Localizable", "shieldWizardApplyShield_shieldCreated_skipButton", fallback: "Skip For Now")
+      /// Apply this Shield to Accounts and Personas. You can update it any time.
+      internal static let subtitle = L10n.tr("Localizable", "shieldWizardApplyShield_shieldCreated_subtitle", fallback: "Apply this Shield to Accounts and Personas. You can update it any time.")
+      /// %@ Created
+      internal static func title(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "shieldWizardApplyShield_shieldCreated_title", String(describing: p1), fallback: "%@ Created")
+      }
     }
   }
   internal enum ShieldWizardName {
@@ -3974,6 +4144,8 @@ internal enum L10n {
     internal static let subtitle = L10n.tr("Localizable", "shieldWizardName_subtitle", fallback: "Give this Security Shield a name, so you can identify it later.")
     /// Name your Security Shield
     internal static let title = L10n.tr("Localizable", "shieldWizardName_title", fallback: "Name your Security Shield")
+    /// Security Shield name too long
+    internal static let tooLong = L10n.tr("Localizable", "shieldWizardName_tooLong", fallback: "Security Shield name too long")
   }
   internal enum ShieldWizardRecovery {
     /// Recovery
@@ -4000,20 +4172,28 @@ internal enum L10n {
       /// Emergency Fallback
       internal static let title = L10n.tr("Localizable", "shieldWizardRecovery_fallback_title", fallback: "Emergency Fallback")
       internal enum Day {
-        /// Day
-        internal static let label = L10n.tr("Localizable", "shieldWizardRecovery_fallback_day_label", fallback: "Day")
+        /// 1 day
+        internal static let period = L10n.tr("Localizable", "shieldWizardRecovery_fallback_day_period", fallback: "1 day")
       }
       internal enum Days {
         /// Days
         internal static let label = L10n.tr("Localizable", "shieldWizardRecovery_fallback_days_label", fallback: "Days")
+        /// %d days
+        internal static func period(_ p1: Int) -> String {
+          return L10n.tr("Localizable", "shieldWizardRecovery_fallback_days_period", p1, fallback: "%d days")
+        }
       }
       internal enum Week {
-        /// Week
-        internal static let label = L10n.tr("Localizable", "shieldWizardRecovery_fallback_week_label", fallback: "Week")
+        /// 1 week
+        internal static let period = L10n.tr("Localizable", "shieldWizardRecovery_fallback_week_period", fallback: "1 week")
       }
       internal enum Weeks {
         /// Weeks
         internal static let label = L10n.tr("Localizable", "shieldWizardRecovery_fallback_weeks_label", fallback: "Weeks")
+        /// %d weeks
+        internal static func period(_ p1: Int) -> String {
+          return L10n.tr("Localizable", "shieldWizardRecovery_fallback_weeks_period", p1, fallback: "%d weeks")
+        }
       }
     }
     internal enum SetFallback {
@@ -4065,8 +4245,8 @@ internal enum L10n {
       internal static let all = L10n.tr("Localizable", "shieldWizardRegularAccess_setThreshold_all", fallback: "All (Recommended)")
       /// Set
       internal static let button = L10n.tr("Localizable", "shieldWizardRegularAccess_setThreshold_button", fallback: "Set")
-      /// Set the number of factors required to sign
-      internal static let title = L10n.tr("Localizable", "shieldWizardRegularAccess_setThreshold_title", fallback: "Set the number of factors required to sign")
+      /// Set the number of factors required for regular access
+      internal static let title = L10n.tr("Localizable", "shieldWizardRegularAccess_setThreshold_title", fallback: "Set the number of factors required for regular access")
     }
     internal enum Step {
       /// Step 1 of 2
@@ -4075,9 +4255,13 @@ internal enum L10n {
     internal enum ThresholdDescription {
       /// All
       internal static let all = L10n.tr("Localizable", "shieldWizardRegularAccess_thresholdDescription_all", fallback: "All")
-      /// You'll need to use **%@** of the following
+      /// **%@**
+      internal static func selection(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "shieldWizardRegularAccess_thresholdDescription_selection", String(describing: p1), fallback: "**%@**")
+      }
+      /// You'll need to use %@ of the following:
       internal static func title(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "shieldWizardRegularAccess_thresholdDescription_title", String(describing: p1), fallback: "You'll need to use **%@** of the following")
+        return L10n.tr("Localizable", "shieldWizardRegularAccess_thresholdDescription_title", String(describing: p1), fallback: "You'll need to use %@ of the following:")
       }
     }
   }
@@ -4235,6 +4419,26 @@ internal enum L10n {
       internal static let unstaking = L10n.tr("Localizable", "transactionHistory_manifestClass_Unstaking", fallback: "Request Unstake")
     }
   }
+  internal enum TransactionRecovery {
+    /// Restart Signing
+    internal static let restart = L10n.tr("Localizable", "transactionRecovery_restart", fallback: "Restart Signing")
+    internal enum PreAuthorization {
+      /// Cancel Pre-Authorization
+      internal static let cancel = L10n.tr("Localizable", "transactionRecovery_preAuthorization_cancel", fallback: "Cancel Pre-Authorization")
+      /// You’ve skipped too many factors and cannot sign the pre-authorization. You can restart the signing process, or cancel it.
+      internal static let message = L10n.tr("Localizable", "transactionRecovery_preAuthorization_message", fallback: "You’ve skipped too many factors and cannot sign the pre-authorization. You can restart the signing process, or cancel it.")
+      /// Cannot Sign Pre-Authorization
+      internal static let title = L10n.tr("Localizable", "transactionRecovery_preAuthorization_title", fallback: "Cannot Sign Pre-Authorization")
+    }
+    internal enum Transaction {
+      /// Cancel Transaction
+      internal static let cancel = L10n.tr("Localizable", "transactionRecovery_transaction_cancel", fallback: "Cancel Transaction")
+      /// You’ve skipped too many factors and cannot sign the transaction. You can restart the signing process, or cancel it.
+      internal static let message = L10n.tr("Localizable", "transactionRecovery_transaction_message", fallback: "You’ve skipped too many factors and cannot sign the transaction. You can restart the signing process, or cancel it.")
+      /// Cannot Sign Transaction
+      internal static let title = L10n.tr("Localizable", "transactionRecovery_transaction_title", fallback: "Cannot Sign Transaction")
+    }
+  }
   internal enum TransactionReview {
     /// Unknown pool
     internal static let poolNameUnknown = L10n.tr("Localizable", "transactionReview_poolNameUnknown", fallback: "Unknown pool")
@@ -4303,6 +4507,50 @@ internal enum L10n {
     internal enum UnacceptableManifest {
       /// A proposed transaction was rejected because it contains one or more reserved instructions.
       internal static let rejected = L10n.tr("Localizable", "transactionReview_unacceptableManifest_rejected", fallback: "A proposed transaction was rejected because it contains one or more reserved instructions.")
+    }
+    internal enum UpdateShield {
+      /// Applying %@
+      internal static func applyTitle(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "transactionReview_updateShield_applyTitle", String(describing: p1), fallback: "Applying %@")
+      }
+      /// Factors required to log into dApps with Personas and prove ownership of Accounts.
+      internal static let authSigningMessage = L10n.tr("Localizable", "transactionReview_updateShield_authSigningMessage", fallback: "Factors required to log into dApps with Personas and prove ownership of Accounts.")
+      /// Must present this factor
+      internal static let authSigningThreshold = L10n.tr("Localizable", "transactionReview_updateShield_authSigningThreshold", fallback: "Must present this factor")
+      /// Log In and Prove Ownership
+      internal static let authSigningTitle = L10n.tr("Localizable", "transactionReview_updateShield_authSigningTitle", fallback: "Log In and Prove Ownership")
+      /// OR
+      internal static let combinationLabel = L10n.tr("Localizable", "transactionReview_updateShield_combinationLabel", fallback: "OR")
+      /// Time period to automatically confirm recovery WITHOUT presenting any confirmation factors
+      internal static let confirmationDelayMessage = L10n.tr("Localizable", "transactionReview_updateShield_confirmationDelayMessage", fallback: "Time period to automatically confirm recovery WITHOUT presenting any confirmation factors")
+      /// To confirm a recovery
+      internal static let confirmRecoveryTitle = L10n.tr("Localizable", "transactionReview_updateShield_confirmRecoveryTitle", fallback: "To confirm a recovery")
+      /// Must present **ANY** of these factors
+      internal static let nonPrimaryOverrideMessage = L10n.tr("Localizable", "transactionReview_updateShield_nonPrimaryOverrideMessage", fallback: "Must present **ANY** of these factors")
+      /// Or present **ANY** one of these override factors
+      internal static let primaryOverrideMessage = L10n.tr("Localizable", "transactionReview_updateShield_primaryOverrideMessage", fallback: "Or present **ANY** one of these override factors")
+      /// Must present **%@** of these factors
+      internal static func primaryThersholdMessage(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "transactionReview_updateShield_primaryThersholdMessage", String(describing: p1), fallback: "Must present **%@** of these factors")
+      }
+      /// Factors required to log into dApps with Personas and prove ownership of Accounts.
+      internal static let proveOwnerhipMessage = L10n.tr("Localizable", "transactionReview_updateShield_proveOwnerhipMessage", fallback: "Factors required to log into dApps with Personas and prove ownership of Accounts.")
+      /// Must present this factor
+      internal static let proveOwnerhipThreshold = L10n.tr("Localizable", "transactionReview_updateShield_proveOwnerhipThreshold", fallback: "Must present this factor")
+      /// Log In and Prove Ownership
+      internal static let proveOwnerhipTitle = L10n.tr("Localizable", "transactionReview_updateShield_proveOwnerhipTitle", fallback: "Log In and Prove Ownership")
+      /// Factors required to withdraw assets, log in to dApps and prove ownership.
+      internal static let regularAccessMessage = L10n.tr("Localizable", "transactionReview_updateShield_regularAccessMessage", fallback: "Factors required to withdraw assets, log in to dApps and prove ownership.")
+      /// Regular Access
+      internal static let regularAccessTitle = L10n.tr("Localizable", "transactionReview_updateShield_regularAccessTitle", fallback: "Regular Access")
+      /// Update shield
+      internal static let sectionTitle = L10n.tr("Localizable", "transactionReview_updateShield_sectionTitle", fallback: "Update shield")
+      /// The factors you’ll need to lock and recover your Accounts or Personas if you lose access.
+      internal static let startConfirmMessage = L10n.tr("Localizable", "transactionReview_updateShield_startConfirmMessage", fallback: "The factors you’ll need to lock and recover your Accounts or Personas if you lose access.")
+      /// Starting and Confirming Recovery
+      internal static let startConfirmTitle = L10n.tr("Localizable", "transactionReview_updateShield_startConfirmTitle", fallback: "Starting and Confirming Recovery")
+      /// To start a recovery
+      internal static let startRecoveryTitle = L10n.tr("Localizable", "transactionReview_updateShield_startRecoveryTitle", fallback: "To start a recovery")
     }
   }
   internal enum TransactionSigning {

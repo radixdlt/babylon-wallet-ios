@@ -7,16 +7,12 @@ struct ROLAClient: Sendable, DependencyKey {
 
 	/// verifies that the wellknown file found at metadata.origin contains the dDappDefinitionAddress
 	var performWellKnownFileCheck: PerformWellKnownFileCheck
-	var manifestForAuthKeyCreation: ManifestForAuthKeyCreation
-	var authenticationDataToSignForChallenge: AuthenticationDataToSignForChallenge
 }
 
 // MARK: ROLAClient.PerformWellKnownFileCheck
 extension ROLAClient {
 	typealias PerformDappDefinitionVerification = @Sendable (DappToWalletInteractionMetadata) async throws -> Void
 	typealias PerformWellKnownFileCheck = @Sendable (URL, DappDefinitionAddress) async throws -> Void
-	typealias ManifestForAuthKeyCreation = @Sendable (ManifestForAuthKeyCreationRequest) async throws -> TransactionManifest
-	typealias AuthenticationDataToSignForChallenge = @Sendable (AuthenticationDataToSignForChallengeRequest) throws -> AuthenticationDataToSignForChallengeResponse
 }
 
 extension DependencyValues {
@@ -25,54 +21,3 @@ extension DependencyValues {
 		set { self[ROLAClient.self] = newValue }
 	}
 }
-
-// MARK: - AuthenticationDataToSignForChallengeRequest
-struct AuthenticationDataToSignForChallengeRequest: Sendable, Hashable {
-	let challenge: DappToWalletInteractionAuthChallengeNonce
-	let origin: DappOrigin
-	let dAppDefinitionAddress: DappDefinitionAddress
-
-	init(
-		challenge: DappToWalletInteractionAuthChallengeNonce,
-		origin: DappOrigin,
-		dAppDefinitionAddress: DappDefinitionAddress
-	) {
-		self.challenge = challenge
-		self.origin = origin
-		self.dAppDefinitionAddress = dAppDefinitionAddress
-	}
-}
-
-// MARK: - AuthenticationDataToSignForChallengeResponse
-struct AuthenticationDataToSignForChallengeResponse: Sendable, Hashable {
-	let input: AuthenticationDataToSignForChallengeRequest
-	let payloadToHashAndSign: Data
-
-	init(
-		input: AuthenticationDataToSignForChallengeRequest,
-		payloadToHashAndSign: Data
-	) {
-		self.input = input
-		self.payloadToHashAndSign = payloadToHashAndSign
-	}
-}
-
-// MARK: - ManifestForAuthKeyCreationRequest
-struct ManifestForAuthKeyCreationRequest: Sendable, Hashable {
-	let entity: AccountOrPersona
-	let newPublicKey: Sargon.PublicKey
-
-	init(
-		entity: AccountOrPersona,
-		newPublicKey: Sargon.PublicKey
-	) throws {
-		guard !entity.hasAuthenticationSigningKey else {
-			throw EntityHasAuthSigningKeyAlready()
-		}
-		self.entity = entity
-		self.newPublicKey = newPublicKey
-	}
-}
-
-// MARK: - EntityHasAuthSigningKeyAlready
-struct EntityHasAuthSigningKeyAlready: Swift.Error {}

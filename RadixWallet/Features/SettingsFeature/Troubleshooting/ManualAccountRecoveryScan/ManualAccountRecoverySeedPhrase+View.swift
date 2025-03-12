@@ -133,11 +133,13 @@ private extension ManualAccountRecoverySeedPhrase.View {
 						promptUserToBackUpMnemonic: false,
 						promptUserToImportMnemonic: false,
 						accounts: item.value.accounts.filter {
-							switch $0.securityState {
-							case let .unsecured(unsecuredEntityControl):
-								let curve = unsecuredEntityControl.transactionSigning.derivationPath.curve
-								return viewStore.isOlympia && curve == .secp256k1 || !viewStore.isOlympia && curve == .curve25519
+							guard let transactionSigning = $0.unsecuredControllingFactorInstance else {
+								return false
 							}
+
+							let curve = transactionSigning.derivationPath.curve
+							return viewStore.isOlympia && curve == .secp256k1 || !viewStore.isOlympia && curve == .curve25519
+
 						},
 						hiddenAccountsCount: item.value.hiddenAccounts.count,
 						personasCount: item.value.personas.count

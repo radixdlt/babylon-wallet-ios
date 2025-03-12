@@ -108,6 +108,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 		case buildTransactionIntentResult(TaskResult<TransactionIntent>)
 		case notarizeResult(TaskResult<NotarizeTransactionResponse>)
 		case determineFeePayerResult(TaskResult<FeePayerSelectionResult?>)
+		case resetToApprovable
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -121,7 +122,6 @@ struct TransactionReview: Sendable, FeatureReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
 			case customizeGuarantees(TransactionReviewGuarantees.State)
-			case signing(Signing.State)
 			case submitting(SubmitTransaction.State)
 			case customizeFees(CustomizeFees.State)
 			case rawTransactionAlert(AlertState<Never>)
@@ -130,23 +130,19 @@ struct TransactionReview: Sendable, FeatureReducer {
 		@CasePathable
 		enum Action: Sendable, Equatable {
 			case customizeGuarantees(TransactionReviewGuarantees.Action)
-			case signing(Signing.Action)
 			case submitting(SubmitTransaction.Action)
 			case customizeFees(CustomizeFees.Action)
 			case rawTransactionAlert(Never)
 		}
 
 		var body: some ReducerOf<Self> {
-			Scope(state: /State.customizeGuarantees, action: /Action.customizeGuarantees) {
+			Scope(state: \.customizeGuarantees, action: \.customizeGuarantees) {
 				TransactionReviewGuarantees()
 			}
-			Scope(state: /State.customizeFees, action: /Action.customizeFees) {
+			Scope(state: \.customizeFees, action: \.customizeFees) {
 				CustomizeFees()
 			}
-			Scope(state: /State.signing, action: /Action.signing) {
-				Signing()
-			}
-			Scope(state: /State.submitting, action: /Action.submitting) {
+			Scope(state: \.submitting, action: \.submitting) {
 				SubmitTransaction()
 			}
 		}
@@ -167,13 +163,13 @@ struct TransactionReview: Sendable, FeatureReducer {
 			Common.Sections()
 		}
 		Reduce(core)
-			.ifLet(\.networkFee, action: /Action.child .. ChildAction.networkFee) {
+			.ifLet(\.networkFee, action: \.child.networkFee) {
 				TransactionReviewNetworkFee()
 			}
-			.ifLet(\.proofs, action: /Action.child .. ChildAction.proofs) {
+			.ifLet(\.proofs, action: \.child.proofs) {
 				Common.Proofs()
 			}
-			.ifLet(destinationPath, action: /Action.destination) {
+			.ifLet(destinationPath, action: \.destination) {
 				Destination()
 			}
 	}
@@ -271,11 +267,10 @@ struct TransactionReview: Sendable, FeatureReducer {
 			return .send(.child(.sections(.internal(.parent(.showResourceDetails(resource, details))))))
 
 		case .networkFee(.delegate(.showCustomizeFees)):
-			guard let reviewedTransaction = state.reviewedTransaction,
-			      let summary = try? reviewedTransaction.transactionManifest.summary
-			else {
+			guard let reviewedTransaction = state.reviewedTransaction else {
 				return .none
 			}
+			let summary = reviewedTransaction.transactionManifest.summary
 			state.destination = .customizeFees(.init(
 				reviewedTransaction: reviewedTransaction,
 				manifestSummary: summary,
@@ -309,7 +304,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 				signingFactors: preview.signingFactors,
 				accountWithdraws: preview.analyzedManifestToReview.withdrawals,
 				accountDeposits: preview.analyzedManifestToReview.deposits,
-				isNonConforming: preview.analyzedManifestToReview.detailedManifestClass == nil
+				isNonConforming: preview.analyzedManifestToReview.detailedClassification == nil
 			)
 
 			state.reviewedTransaction = reviewedTransaction
@@ -317,34 +312,24 @@ struct TransactionReview: Sendable, FeatureReducer {
 				.concatenate(with: determineFeePayer(state, reviewedTransaction: reviewedTransaction))
 
 		case let .buildTransactionIntentResult(.success(intent)):
-			guard let reviewedTransaction = state.reviewedTransaction else {
-				return .none
-			}
-
-			if reviewedTransaction.transactionSigners.notaryIsSignatory {
-				let notaryKey = state.ephemeralNotaryPrivateKey
-
-				/// Silently sign the transaction with notary keys.
-				return .run { send in
-					await send(.internal(.notarizeResult(TaskResult {
-						try await transactionClient.notarizeTransaction(.init(
-							intentSignatures: [],
-							transactionIntent: intent,
-							notary: notaryKey
-						))
-					})))
+			return .run { [notary = state.ephemeralNotaryPrivateKey] send in
+				// TODO: Hardcoding `.primary` role, this will change once we have MFA
+				let signedIntent = try await SargonOS.shared.signTransaction(transactionIntent: intent, roleKind: .primary)
+				let notarizedTransaction = try await transactionClient.notarizeTransaction(
+					.init(
+						signedIntent: signedIntent,
+						notary: notary
+					)
+				)
+				await send(.internal(.notarizeResult(.success(notarizedTransaction))))
+			} catch: { error, send in
+				await send(.internal(.resetToApprovable))
+				if let error = error as? CommonError, error == .HostInteractionAborted {
+					// We don't show any error since user aborted signing intentionally
+				} else {
+					errorQueue.schedule(error)
 				}
 			}
-
-			state.destination = .signing(.init(
-				factorsLeftToSignWith: reviewedTransaction.signingFactors,
-				signingPurposeWithPayload: .signTransaction(
-					ephemeralNotaryPrivateKey: state.ephemeralNotaryPrivateKey,
-					intent,
-					origin: state.signTransactionPurpose
-				)
-			))
-			return .none
 
 		case let .notarizeResult(.success(notarizedTX)):
 			state.destination = .submitting(.init(
@@ -385,6 +370,9 @@ struct TransactionReview: Sendable, FeatureReducer {
 			errorQueue.schedule(error)
 			state.reviewedTransaction?.feePayer = .success(nil)
 			return .none
+
+		case .resetToApprovable:
+			return resetToApprovable(&state)
 		}
 	}
 
@@ -401,27 +389,6 @@ struct TransactionReview: Sendable, FeatureReducer {
 			state.reviewedTransaction = reviewedTransaction
 			state.networkFee = .init(reviewedTransaction: reviewedTransaction)
 			state.printFeePayerInfo()
-			return .none
-
-		case .signing(.delegate(.cancelSigning)):
-			loggerGlobal.notice("Cancelled signing")
-			return resetToApprovable(&state)
-
-		case .signing(.delegate(.failedToSign)):
-			loggerGlobal.error("Failed sign tx")
-			return resetToApprovable(&state)
-
-		case let .signing(.delegate(.finishedSigning(.signTransaction(notarizedTX, origin: _)))):
-			state.destination = .submitting(.init(
-				notarizedTX: notarizedTX,
-				inProgressDismissalDisabled: state.waitsForTransactionToBeComitted,
-				route: state.p2pRoute
-			))
-			return .none
-
-		case .signing(.delegate(.finishedSigning(.signAuth))):
-			state.canApproveTX = true
-			assertionFailure("Did not expect to have sign auth data...")
 			return .none
 
 		case let .submitting(.delegate(.submittedButNotCompleted(txID))):
@@ -445,10 +412,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 	}
 
 	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
-		if case .signing = state.destination {
-			loggerGlobal.notice("Cancelled signing")
-			return resetToApprovable(&state)
-		} else if case .submitting = state.destination {
+		if case .submitting = state.destination {
 			// This is used when tapping outside the Submitting sheet, no need to set destination to nil
 			return delayedShortEffect(for: .delegate(.dismiss))
 		}
@@ -599,21 +563,28 @@ extension ResourceBalance {
 			}
 		}
 		set {
+			guard let newValue else {
+				return
+			}
+
 			switch self {
 			case let .known(knownResourceBalance):
 				switch knownResourceBalance.details {
 				case var .fungible(fungible):
 					fungible.guarantee = newValue
+					fungible.amount.setGuaranteedAmount(newValue.amount)
 					var known = knownResourceBalance
 					known.details = .fungible(fungible)
 					self = .known(known)
 				case var .liquidStakeUnit(liquidStakeUnit):
 					liquidStakeUnit.guarantee = newValue
+					liquidStakeUnit.amount.setGuaranteedAmount(newValue.amount)
 					var known = knownResourceBalance
 					known.details = .liquidStakeUnit(liquidStakeUnit)
 					self = .known(known)
 				case var .poolUnit(poolUnit):
 					poolUnit.guarantee = newValue
+					poolUnit.details.poolUnitResource.amount.setGuaranteedAmount(newValue.amount)
 					var known = knownResourceBalance
 					known.details = .poolUnit(poolUnit)
 					self = .known(known)
@@ -759,12 +730,9 @@ enum FeePayerValidationOutcome: Sendable, Hashable {
 
 extension ReviewedTransaction {
 	var involvedAccounts: Set<AccountAddress> {
-		guard let summary = try? transactionManifest.summary else {
-			return Set()
-		}
-		return Set(accountWithdraws.keys)
+		Set(accountWithdraws.keys)
 			.union(accountDeposits.keys)
-			.union(summary.addressesOfAccountsRequiringAuth)
+			.union(transactionManifest.summary.addressesOfAccountsRequiringAuth)
 	}
 
 	var feePayingValidation: Loadable<FeePayerValidationOutcome> {

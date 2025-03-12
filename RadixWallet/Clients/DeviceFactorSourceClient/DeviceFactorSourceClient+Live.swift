@@ -74,17 +74,15 @@ extension DeviceFactorSourceClient: DependencyKey {
 				let hiddenPersonas = network.getHiddenPersonas()
 
 				func withoutControl(_ entity: some EntityProtocol) -> Bool {
-					switch entity.securityState {
-					case let .unsecured(value):
-						mnemonicMissingFactorSources.contains(value.transactionSigning.factorSourceId)
-					}
+					entity.unsecuredControllingFactorInstance.map {
+						mnemonicMissingFactorSources.contains($0.factorSourceId)
+					} ?? false
 				}
 
 				func unrecoverable(_ entity: some EntityProtocol) -> Bool {
-					switch entity.securityState {
-					case let .unsecured(value):
-						unrecoverableFactorSources.contains(value.transactionSigning.factorSourceId)
-					}
+					entity.unsecuredControllingFactorInstance.map {
+						unrecoverableFactorSources.contains($0.factorSourceId)
+					} ?? false
 				}
 
 				let withoutControl = AddressesOfEntitiesInBadState(
@@ -106,15 +104,19 @@ extension DeviceFactorSourceClient: DependencyKey {
 			.eraseToAnyAsyncSequence()
 		}
 
+		let derivePublicKeys: DerivePublicKeys = { request in
+			let factorSourceId = request.factorSourceId
+			guard let mnemonicWithPassphrase = try secureStorageClient.loadMnemonic(factorSourceID: factorSourceId, notifyIfMissing: false) else {
+				loggerGlobal.critical("Failed to find factor source with ID: '\(factorSourceId)'")
+				throw FailedToFindFactorSource()
+			}
+			return mnemonicWithPassphrase.derivePublicKeys(
+				paths: request.derivationPaths,
+				factorSourceId: factorSourceId
+			)
+		}
+
 		return Self(
-			publicKeysFromOnDeviceHD: { request in
-				let factorSourceID = request.deviceFactorSource.id
-				let mnemonicWithPassphrase = try request.getMnemonicWithPassphrase()
-				return mnemonicWithPassphrase.derivePublicKeys(paths: request.derivationPaths)
-			},
-			signatureFromOnDeviceHD: { request in
-				request.mnemonicWithPassphrase.sign(hash: request.hashedData, path: request.derivationPath)
-			},
 			isAccountRecoveryNeeded: {
 				do {
 					let deviceFactorSource = try await factorSourcesClient.getFactorSources().babylonDeviceFactorSources().sorted(by: \.lastUsedOn).first
@@ -166,7 +168,8 @@ extension DeviceFactorSourceClient: DependencyKey {
 					try await entitiesControlledByFactorSource($0, maybeOverridingSnapshot)
 				})
 			},
-			entitiesInBadState: entitiesInBadState
+			entitiesInBadState: entitiesInBadState,
+			derivePublicKeys: derivePublicKeys
 		)
 	}
 }

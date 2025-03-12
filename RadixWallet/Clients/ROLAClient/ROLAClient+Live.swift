@@ -6,33 +6,6 @@ extension ROLAClient {
 		@Dependency(\.cacheClient) var cacheClient
 		@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 
-		let manifestForAuthKeyCreation: ManifestForAuthKeyCreation = { request in
-			let entity = request.entity
-			let newPublicKey = request.newPublicKey
-			let entityAddress = entity.address
-			let metadata = try await onLedgerEntitiesClient.getEntity(entityAddress.asGeneral, metadataKeys: [.ownerKeys]).genericComponent?.metadata
-			var ownerKeyHashes = try metadata?.ownerKeyHashes() ?? []
-
-			let transactionSigningKeyHash: PublicKeyHash = switch entity.securityState {
-			case let .unsecured(control):
-				.init(hashing: control.transactionSigning.publicKey.publicKey)
-			}
-
-			loggerGlobal.debug("ownerKeyHashes: \(ownerKeyHashes)")
-			ownerKeyHashes.append(.init(hashing: newPublicKey))
-
-			if !ownerKeyHashes.contains(transactionSigningKeyHash) {
-				loggerGlobal.debug("Did not contain transactionSigningKey hash, re-adding it: \(transactionSigningKeyHash)")
-				ownerKeyHashes.append(transactionSigningKeyHash)
-			}
-
-			loggerGlobal.notice("Setting ownerKeyHashes to: \(ownerKeyHashes)")
-			return TransactionManifest.setOwnerKeys(
-				addressOfAccountOrPersona: entityAddress,
-				ownerKeyHashes: ownerKeyHashes
-			)
-		}
-
 		return Self(
 			performDappDefinitionVerification: { metadata async throws in
 				_ = try await onLedgerEntitiesClient.getDappMetadata(
@@ -74,20 +47,6 @@ extension ROLAClient {
 				guard dAppDefinitionAddresses.contains(dappDefinitionAddress) else {
 					throw ROLAFailure.unknownDappDefinitionAddress
 				}
-			},
-			manifestForAuthKeyCreation: manifestForAuthKeyCreation,
-			authenticationDataToSignForChallenge: { request in
-
-				let payload = payloadToHash(
-					challenge: request.challenge,
-					dAppDefinitionAddress: request.dAppDefinitionAddress,
-					origin: request.origin
-				)
-
-				return AuthenticationDataToSignForChallengeResponse(
-					input: request,
-					payloadToHashAndSign: payload
-				)
 			}
 		)
 	}()

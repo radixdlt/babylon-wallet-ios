@@ -39,15 +39,11 @@ extension InteractionReview.Sections {
 			return newlyCreatedMetadata
 		}
 
-		switch summary.detailedManifestClass {
+		switch summary.detailedClassification {
 		case nil:
 			return nil
 
 		case .general, .transfer:
-			if summary.detailedManifestClass == .general {
-				guard !summary.deposits.isEmpty || !summary.withdrawals.isEmpty else { return nil }
-			}
-
 			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
 			let withdrawals = try await extractWithdrawals(
 				accountWithdraws: summary.withdrawals,
@@ -294,6 +290,23 @@ extension InteractionReview.Sections {
 				deposits: deposits,
 				accountDeletion: deleteAccounts
 			)
+
+		case let .securifyEntity(entityAddress, metadata):
+			guard let entity = try await extractEntity(entityAddress) else { return nil }
+
+			let shield = try SargonOs.shared.securityStructureOfFactorSourceIdsBySecurityStructureId(
+				shieldId: metadata.id
+			)
+
+			let allFactorSourcesFromProfile = try await factorSourcesClient.getFactorSources().elements
+
+			return Common.SectionsData(
+				shieldUpdate: .init(
+					entity: entity,
+					shield: shield,
+					allFactorSourcesFromProfile: allFactorSourcesFromProfile
+				)
+			)
 		}
 	}
 
@@ -311,6 +324,17 @@ extension InteractionReview.Sections {
 					return .external(address, approved: false)
 				}
 			}
+	}
+
+	func extractEntity(_ address: AddressOfAccountOrPersona) async throws -> AccountOrPersona? {
+		switch address {
+		case let .account(accountAddress):
+			let account = try await accountsClient.getAccountByAddress(accountAddress)
+			return .account(account)
+		case let .identity(identityAddress):
+			let persona = try await personasClient.getPersona(id: identityAddress)
+			return .persona(persona)
+		}
 	}
 
 	func extractDappAddresses(encounteredAddresses: [ManifestEncounteredComponentAddress]) -> [Address] {
@@ -742,7 +766,7 @@ extension [AccountAddress: [ResourceIndicator]] {
 extension ResourceIndicator {
 	var isGuaranteedAmount: Bool {
 		switch self {
-		case .fungible(_, .guaranteed), .nonFungible(_, .byIds):
+		case .fungible(_, .guaranteed), .nonFungible(_, .guaranteed):
 			return true
 		default:
 			assertionFailure("Cannot sum up the predicted amounts")
@@ -788,8 +812,8 @@ extension FungibleResourceIndicator {
 extension NonFungibleResourceIndicator {
 	func adding(_ other: Self) -> Self {
 		switch (self, other) {
-		case let (.byIds(ids), .byIds(otherIds)):
-			return .byIds(ids: ids + otherIds)
+		case let (.guaranteed(ids), .guaranteed(otherIds)):
+			return .guaranteed(ids: ids + otherIds)
 		default:
 			assertionFailure("Cannot sum up the predicted amounts")
 			return self

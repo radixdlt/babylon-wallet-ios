@@ -27,7 +27,7 @@ struct PrimaryRoleSetup: FeatureReducer, Sendable {
 		case showOverrideSectionButtonTapped
 		case hideOverrideSectionButtonTapped
 		case thresholdSelectorButtonTapped
-		case invalidCombinationReadMoreTapped
+		case unsafeCombinationReadMoreTapped
 	}
 
 	enum InternalAction: Equatable, Sendable {
@@ -78,21 +78,19 @@ struct PrimaryRoleSetup: FeatureReducer, Sendable {
 				errorQueue.schedule(error)
 			}
 
-		case .invalidCombinationReadMoreTapped:
+		case .unsafeCombinationReadMoreTapped:
 			overlayWindowClient.showInfoLink(.init(glossaryItem: .buildingshield))
 			return .none
 
 		case let .removeThresholdFactorTapped(id):
 			state.$shieldBuilder.withLock { builder in
-				// TODO: use removeFactorFromPrimaryThreshold
-				builder = builder.removeFactorFromPrimary(factorSourceId: id)
+				builder = builder.removeFactorFromPrimary(factorSourceId: id, factorListKind: .threshold)
 			}
 			return .none
 
 		case let .removeOverrideFactorTapped(id):
 			state.$shieldBuilder.withLock { builder in
-				// TODO: use removeFactorFromPrimaryOverride
-				builder = builder.removeFactorFromPrimary(factorSourceId: id)
+				builder = builder.removeFactorFromPrimary(factorSourceId: id, factorListKind: .override)
 			}
 			return .none
 
@@ -109,10 +107,7 @@ struct PrimaryRoleSetup: FeatureReducer, Sendable {
 		case .hideOverrideSectionButtonTapped:
 			state.isOverrideSectionExpanded = false
 			state.$shieldBuilder.withLock { builder in
-				// TODO: use removeAllFactorsFromPrimaryOverride
-				for overrideFactor in state.overrideFactors {
-					builder = builder.removeFactorFromPrimary(factorSourceId: overrideFactor.factorSourceID)
-				}
+				builder = builder.removeAllFactorsFromPrimaryOverride()
 			}
 			return .none
 
@@ -141,15 +136,10 @@ struct PrimaryRoleSetup: FeatureReducer, Sendable {
 		case .selectNumberOfFactorsView(.close):
 			state.destination = nil
 			return .none
-		case let .selectNumberOfFactorsView(.set(value)):
+		case let .selectNumberOfFactorsView(.set(threshold)):
 			state.destination = nil
 			state.$shieldBuilder.withLock { builder in
-				switch value {
-				case .all:
-					builder = builder.setThreshold(threshold: UInt8(builder.primaryRoleThresholdFactors.count))
-				case let .specific(numberOfFactors):
-					builder = builder.setThreshold(threshold: UInt8(numberOfFactors))
-				}
+				builder = builder.setThreshold(threshold: threshold)
 			}
 			return .none
 		}

@@ -1,22 +1,46 @@
 extension PrimaryRoleSetup.State {
-	var validatedRoleStatus: SecurityShieldBuilderInvalidReason? {
-		shieldBuilder.validate()
+	var validatedRoleStatus: SecurityShieldBuilderStatus {
+		shieldBuilder.status()
 	}
 
 	var statusMessageInfo: ShieldStatusMessageInfo? {
 		switch validatedRoleStatus {
-		case .none:
-			nil
-		case .PrimaryRoleMustHaveAtLeastOneFactor:
-			.init(type: .error, text: L10n.ShieldSetupStatus.Transactions.atLeastOneFactor)
-		default:
-			.init(type: .warning, text: L10n.ShieldSetupStatus.invalidCombination)
+		case .strong:
+			return nil
+		case .weak:
+			return .init(
+				type: .warning,
+				text: L10n.ShieldSetupStatus.unsafeCombination,
+				contexts: [.general]
+			)
+		case let .invalid(reason):
+			var contexts: [ShieldStatusMessageInfo.Context] = []
+
+			if reason.isPrimaryRoleFactorListEmpty {
+				contexts.append(.primaryRole)
+			}
+			if reason.isAuthSigningFactorMissing {
+				contexts.append(.authenticationRole)
+			}
+			if contexts.isEmpty, reason.isRecoveryRoleFactorListEmpty || reason.isConfirmationRoleFactorListEmpty {
+				return .init(
+					type: .warning,
+					text: L10n.ShieldSetupStatus.notEnoughFactors,
+					contexts: [.general]
+				)
+			}
+
+			return .init(
+				type: .error,
+				text: L10n.ShieldSetupStatus.Roles.atLeastOneFactor,
+				contexts: contexts
+			)
 		}
 	}
 
-	// TODO: Move to Sargon
 	var canContinue: Bool {
-		validatedRoleStatus != .PrimaryRoleMustHaveAtLeastOneFactor && validatedRoleStatus != .MissingAuthSigningFactor
+		guard case .invalid = validatedRoleStatus, statusMessageInfo?.type == .error else { return true }
+		return false
 	}
 
 	var thresholdFactors: [FactorSource] {
@@ -32,13 +56,11 @@ extension PrimaryRoleSetup.State {
 	}
 
 	var threshold: Threshold {
-		// TODO: Use Sargon - https://radixdlt.atlassian.net/browse/ABW-4047
-		let threshold = Int(shieldBuilder.getPrimaryThreshold())
-		if threshold == shieldBuilder.primaryRoleThresholdFactors.count {
-			return .all
-		} else {
-			return .specific(threshold)
-		}
+		shieldBuilder.getPrimaryThreshold()
+	}
+
+	var thresholdValues: [Threshold] {
+		shieldBuilder.getPrimaryThresholdValues()
 	}
 }
 
@@ -126,26 +148,19 @@ extension PrimaryRoleSetup {
 					.multilineTextAlignment(.leading)
 					.flushedLeft
 
-				if let statusMessage = store.statusMessageInfo {
-					StatusMessageView(
-						text: statusMessage.text,
-						type: statusMessage.type,
-						useNarrowSpacing: true,
-						useSmallerFontSize: true,
-						emphasizedTextStyle: .body2Header
-					)
-					.padding(.horizontal, .small1)
-					.padding(.vertical, .medium3)
-					.flushedLeft
-					.onTapGesture {
-						if statusMessage.type == .warning {
-							store.send(.view(.invalidCombinationReadMoreTapped))
+				if let statusMessage = store.statusMessageInfo,
+				   statusMessage.contexts.contains(where: [ShieldStatusMessageInfo.Context.general, .primaryRole].contains)
+				{
+					statusMessageView(statusMessage)
+						.padding(.horizontal, .small1)
+						.onTapGesture {
+							if statusMessage.type == .warning {
+								store.send(.view(.unsafeCombinationReadMoreTapped))
+							}
 						}
-					}
 				}
 			}
 			.foregroundStyle(.app.gray1)
-			.padding(.bottom, .medium2)
 		}
 
 		private var thresholdFactorsView: some SwiftUI.View {
@@ -181,10 +196,10 @@ extension PrimaryRoleSetup {
 
 		private var thresholdSelectorView: some SwiftUI.View {
 			HStack(spacing: .zero) {
-				// TODO: Add a new key for "**%@**"
 				let thresholdTitle = store.threshold.titleShort
-				let title = L10n.ShieldWizardRegularAccess.ThresholdDescription.title(thresholdTitle)
-				let parts = title.components(separatedBy: "**\(thresholdTitle)**")
+				let separator = L10n.ShieldWizardRegularAccess.ThresholdDescription.selection(thresholdTitle)
+				let title = L10n.ShieldWizardRegularAccess.ThresholdDescription.title(separator)
+				let parts = title.components(separatedBy: separator)
 
 				if parts.count == 2 {
 					Text(parts[0])
@@ -278,6 +293,12 @@ extension PrimaryRoleSetup {
 					.multilineTextAlignment(.leading)
 					.flushedLeft
 
+				if let statusMessage = store.statusMessageInfo,
+				   statusMessage.contexts.contains(.authenticationRole)
+				{
+					statusMessageView(statusMessage)
+				}
+
 				if let factorSource = store.authenticationSigningFactor {
 					FactorSourceCard(
 						kind: .instance(
@@ -296,15 +317,6 @@ extension PrimaryRoleSetup {
 					.frame(maxWidth: .infinity)
 					.embedInContainer
 				} else {
-					StatusMessageView(
-						text: L10n.ShieldSetupStatus.Authentication.atLeastOneFactor,
-						type: .error,
-						useNarrowSpacing: true,
-						useSmallerFontSize: true
-					)
-					.padding(.vertical, .small2)
-					.flushedLeft
-
 					Button("+") {
 						store.send(.view(.addFactorSourceButtonTapped(.authenticationSigning)))
 					}
@@ -312,6 +324,18 @@ extension PrimaryRoleSetup {
 					.embedInContainer
 				}
 			}
+		}
+
+		private func statusMessageView(_ statusMessage: ShieldStatusMessageInfo) -> some SwiftUI.View {
+			StatusMessageView(
+				text: statusMessage.text,
+				type: statusMessage.type,
+				useNarrowSpacing: true,
+				useSmallerFontSize: true,
+				emphasizedTextStyle: .body2Header
+			)
+			.padding(.vertical, .small2)
+			.flushedLeft
 		}
 	}
 }
@@ -325,7 +349,7 @@ extension View {
 	}
 }
 
-private extension Threshold {
+extension Threshold {
 	var titleShort: String {
 		switch self {
 		case .all:
@@ -357,7 +381,7 @@ private extension View {
 			sheet(store: destinationStore.scope(state: \.selectNumberOfFactorsView, action: \.selectNumberOfFactorsView)) { _ in
 				SelectNumberOfFactorsView(
 					selectedNumberOfFactors: store.threshold,
-					maxAvailableFactors: store.thresholdFactors.count
+					thresholdValues: store.thresholdValues
 				) { action in
 					store.send(.destination(.presented(.selectNumberOfFactorsView(action))))
 				}
