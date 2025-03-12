@@ -15,97 +15,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  snyk_scan:
-    if: >
-      ( github.event.action == 'opened' && github.event.pull_request.draft == false ) ||
-      ( github.event.pull_request.draft == false && github.event.action == 'synchronize' ) ||
-      ( github.event.action == 'ready_for_review' ) ||
-      ( github.event_name == 'push' && github.ref == 'refs/heads/main' )
-    permissions:
-      id-token: write
-      contents: read
-    name: "Snyk scan"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: RDXWorks-actions/checkout@main
-      - uses: RDXWorks-actions/setup-node@main
-        with:
-          node-version: '14'
-      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
-        with:
-          role_name: 'arn:aws:iam::${{ secrets.SECRETS_ACCOUNT_ID }}:role/gh-common-secrets-read-access'
-          app_name: 'babylon-wallet-ios'
-          step_name: 'snyk_online_monitor'
-          secret_prefix: 'SNYK'
-          secret_name: 'arn:aws:secretsmanager:eu-west-2:${{ secrets.SECRETS_ACCOUNT_ID }}:secret:github-actions/common/snyk-credentials-rXRpuX'
-          parse_json: true
-      - name: Create .snyk file
-        run: echo "${{ vars.DOT_SNYK_FILE }}" > .snyk
-      - name: Install snyk
-        run: |
-          npm install snyk -g
-          snyk -v
-          snyk auth ${{ env.SNYK_TOKEN }}
-      - name: Snyk deps and licences scan
-        run: |
-          timeout 300 snyk test --all-projects --org=${{ env.SNYK_COREAPPS_ORG_ID }} --severity-threshold=high || [ "$?" = "124" ]
-      - name: Snyk code scan
-        continue-on-error: true
-        run: |
-          timeout 300 snyk code test --all-projects --org=${{ env.SNYK_COREAPPS_ORG_ID }} --severity-threshold=high || [ "$?" = "124" ]
-
-  snyk_sbom:
-    if: >
-      ( github.event.action == 'opened' && github.event.pull_request.draft == false ) ||
-      ( github.event.pull_request.draft == false && github.event.action == 'synchronize' ) ||
-      ( github.event.action == 'ready_for_review' ) ||
-      ( github.event_name == 'push' && github.ref == 'refs/heads/main' )
-    permissions:
-      id-token: write
-      contents: read
-    name: "Snyk SBOM"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: RDXWorks-actions/checkout@main
-      - uses: RDXWorks-actions/setup-node@main
-        with:
-          node-version: '14'
-      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
-        with:
-          role_name: 'arn:aws:iam::${{ secrets.SECRETS_ACCOUNT_ID }}:role/gh-common-secrets-read-access'
-          app_name: 'babylon-wallet-ios'
-          step_name: 'snyk_sbom'
-          secret_prefix: 'SNYK'
-          secret_name: 'arn:aws:secretsmanager:eu-west-2:${{ secrets.SECRETS_ACCOUNT_ID }}:secret:github-actions/common/snyk-credentials-rXRpuX'
-          parse_json: true
-      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
-        with:
-          role_name: 'arn:aws:iam::${{ secrets.SECRETS_ACCOUNT_ID }}:role/gh-babylon-wallet-ios-secrets-read-access'
-          app_name: 'babylon-wallet-ios'
-          step_name: 'snyk_sbom'
-          secret_prefix: WALLET
-          secret_name: 'arn:aws:secretsmanager:eu-west-2:${{ secrets.SECRETS_ACCOUNT_ID }}:secret:github-actions/radixdlt/babylon-wallet-ios/secret-vTE3y0'
-          parse_json: true
-      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
-        with:
-          role_name: 'arn:aws:iam::${{ secrets.SECRETS_ACCOUNT_ID }}:role/gh-babylon-wallet-ios-secrets-read-access'
-          app_name: 'babylon-wallet-ios'
-          step_name: 'unit_test'
-          secret_prefix: 'SWIFT_ENGINE_TOOLKIT_SSH_KEY'
-          secret_name: 'arn:aws:secretsmanager:eu-west-2:${{ secrets.SECRETS_ACCOUNT_ID }}:secret:github-actions/radixdlt/babylon-wallet-ios/swift-ssh-dLcxg6'
-          parse_json: true
-      - uses: RDXWorks-actions/ssh-agent@master
-        with:
-          ssh-private-key: |
-            ${{ env.SWIFT_ENGINE_TOOLKIT_SSH_KEY }}
-      - name: Install snyk
-        run: |
-          npm install snyk -g
-          snyk -v
-          snyk auth ${{ env.SNYK_TOKEN }}
-      - name: Generate SBOM # check SBOM can be generated but nothing is done with it
-        run: |
-          snyk sbom --all-projects --org=${{ env.SNYK_COREAPPS_ORG_ID }} --format=cyclonedx1.4+json > sbom.json
 
   linting:
     name: "Linting"
@@ -197,58 +106,14 @@ jobs:
           defaults write com.apple.dt.Xcode IDESkipMacroFingerprintValidation -bool YES
           bundle exec fastlane tests
 
-  snyk_online_monitor:
-    permissions:
-      id-token: write
-      contents: read
-    name: "Snyk monitoring"
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs:
-      - unit_test
-      - snyk_scan
-      - snyk_sbom
-    steps:
-      - uses: RDXWorks-actions/checkout@main
-      - uses: RDXWorks-actions/setup-node@main
+      - name: Upload results
+        uses: RDXWorks-actions/xcresulttool-xcode16@v1.8.0
         with:
-          node-version: '14'
-      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
-        with:
-          role_name: 'arn:aws:iam::${{ secrets.SECRETS_ACCOUNT_ID }}:role/gh-common-secrets-read-access'
-          app_name: 'babylon-wallet-ios'
-          step_name: 'snyk_online_monitor'
-          secret_prefix: 'SNYK'
-          secret_name: 'arn:aws:secretsmanager:eu-west-2:${{ secrets.SECRETS_ACCOUNT_ID }}:secret:github-actions/common/snyk-credentials-rXRpuX'
-          parse_json: true
-      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
-        with:
-          role_name: 'arn:aws:iam::${{ secrets.SECRETS_ACCOUNT_ID }}:role/gh-babylon-wallet-ios-secrets-read-access'
-          app_name: 'babylon-wallet-ios'
-          step_name: 'snyk_online_monitor'
-          secret_prefix: WALLET
-          secret_name: 'arn:aws:secretsmanager:eu-west-2:${{ secrets.SECRETS_ACCOUNT_ID }}:secret:github-actions/radixdlt/babylon-wallet-ios/secret-vTE3y0'
-          parse_json: true      
-      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
-        with:
-          role_name: 'arn:aws:iam::${{ secrets.SECRETS_ACCOUNT_ID }}:role/gh-babylon-wallet-ios-secrets-read-access'
-          app_name: 'babylon-wallet-ios'
-          step_name: 'unit_test'
-          secret_prefix: 'SWIFT_ENGINE_TOOLKIT_SSH_KEY'
-          secret_name: 'arn:aws:secretsmanager:eu-west-2:${{ secrets.SECRETS_ACCOUNT_ID }}:secret:github-actions/radixdlt/babylon-wallet-ios/swift-ssh-dLcxg6'
-          parse_json: true
-      - uses: RDXWorks-actions/ssh-agent@master
-        with:
-          ssh-private-key: |
-            ${{ env.SWIFT_ENGINE_TOOLKIT_SSH_KEY }}
-      - name: Install snyk
-        run: |
-          npm install snyk -g
-          snyk -v
-          snyk auth ${{ env.SNYK_TOKEN }}
-      - name: Enable Snyk online monitoring to check for vulnerabilities
-        run: |
-          snyk monitor --all-projects --org=${{ env.SNYK_COREAPPS_ORG_ID }}
+          path: build/test_output/results.xcresult
+          show-passed-tests: false
+          show-code-coverage: true
+        if: success() || failure()
+
 
   # snapshot_tests:
   #   name: "Snapshot tests"
