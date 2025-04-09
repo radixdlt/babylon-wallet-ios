@@ -218,13 +218,14 @@ GEM
 
 PLATFORMS
   arm64-darwin-22
+  arm64-darwin-24
   universal-darwin-23
   x86_64-darwin-19
   x86_64-darwin-20
 
 DEPENDENCIES
   dotenv (~> 2.8)
-  fastlane (~> 2.225.0)
+  fastlane
   fastlane-plugin-json
   fastlane-plugin-xcconfig (~> 2.0)
   xcode-install

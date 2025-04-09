@@ -19,3 +19,5 @@ vendor
 .design
 Aux/SensitiveInfo.plist
 AWSCLIV2.pkg
+buildServer.json
+settings.json
