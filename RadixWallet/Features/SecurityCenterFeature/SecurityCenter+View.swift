@@ -36,7 +36,7 @@ extension SecurityCenter {
 								}
 							}
 
-							ForEach(SecurityProblemKind.allCases, id: \.self) { type in
+							ForEach(SecurityProblemKind.allCases.filter { $0 != .securityShields }, id: \.self) { type in
 								ProblemTypeCard(type: type, actionRequired: viewStore.actionsRequired.contains(type)) {
 									store.send(.view(.cardTapped(type)))
 								}
@@ -188,7 +188,7 @@ extension SecurityCenter {
 			if actionRequired {
 				L10n.SecurityCenter.AnyItem.actionRequiredStatus
 			} else {
-				switch type {
+			switch type {
 				case .securityShields: L10n.SecurityCenter.SecurityShieldsItem.shieldedStatus
 				case .securityFactors: L10n.SecurityCenter.SecurityFactorsItem.activeStatus
 				case .configurationBackup: L10n.SecurityCenter.ConfigurationBackupItem.backedUpStatus
@@ -215,9 +215,9 @@ private extension View {
 			.securityFactors(with: destinationStore)
 			.deviceFactorSources(with: destinationStore)
 			.importMnemonics(with: destinationStore)
-			.securityShieldsSetup(with: destinationStore)
-			.securityShieldsList(with: destinationStore)
-			.applyShield(with: destinationStore)
+			// .securityShieldsSetup(with: destinationStore)
+			// .securityShieldsList(with: destinationStore)
+			// .applyShield(with: destinationStore)
 	}
 
 	private func configurationBackup(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
@@ -244,21 +244,21 @@ private extension View {
 		}
 	}
 
-	private func securityShieldsSetup(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
-		fullScreenCover(store: destinationStore.scope(state: \.securityShieldsSetup, action: \.securityShieldsSetup)) {
-			ShieldSetupCoordinator.View(store: $0)
-		}
-	}
+	// private func securityShieldsSetup(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
+	// 	fullScreenCover(store: destinationStore.scope(state: \.securityShieldsSetup, action: \.securityShieldsSetup)) {
+	// 		ShieldSetupCoordinator.View(store: $0)
+	// 	}
+	// }
 
-	private func securityShieldsList(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
-		navigationDestination(store: destinationStore.scope(state: \.securityShieldsList, action: \.securityShieldsList)) {
-			ShieldsList.View(store: $0)
-		}
-	}
+	// private func securityShieldsList(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
+	// 	navigationDestination(store: destinationStore.scope(state: \.securityShieldsList, action: \.securityShieldsList)) {
+	// 		ShieldsList.View(store: $0)
+	// 	}
+	// }
 
-	private func applyShield(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
-		fullScreenCover(store: destinationStore.scope(state: \.applyShield, action: \.applyShield)) {
-			ApplyShield.Coordinator.View(store: $0)
-		}
-	}
+	// private func applyShield(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
+	// 	fullScreenCover(store: destinationStore.scope(state: \.applyShield, action: \.applyShield)) {
+	// 		ApplyShield.Coordinator.View(store: $0)
+	// 	}
+	// }
 }
