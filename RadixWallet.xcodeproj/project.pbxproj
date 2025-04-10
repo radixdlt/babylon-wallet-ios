@@ -9626,7 +9626,7 @@
 			repositoryURL = "https://github.com/GhenadieVP/ScreenshotPreventing-iOS";
 			requirement = {
 				kind = revision;
-				revision = 31a6294d0758899885b61ea6e30b58c547b7bfa0;
+				revision = 783b968ed2c6a6318896589d108de1141d434939;
 			};
 		};
 		A415574E2B757C5E0040AD4E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {

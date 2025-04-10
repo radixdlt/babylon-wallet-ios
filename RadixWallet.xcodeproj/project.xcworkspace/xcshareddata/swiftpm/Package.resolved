@@ -1,5 +1,5 @@
 {
-  "originHash" : "659e9262fa85161c34f7cdf8562d44a2ef5475b1d531fcbb453bb320fc04be8c",
+  "originHash" : "b8ee3da3a22e60384d3ee48f81fcfd096336c885424fa54663ae3ca91c2e391c",
   "pins" : [
     {
       "identity" : "anycodable",
@@ -101,15 +101,6 @@
       }
     },
     {
-      "identity" : "rxswift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ReactiveX/RxSwift.git",
-      "state" : {
-        "revision" : "5dd1907d64f0d36f158f61a466bab75067224893",
-        "version" : "6.9.0"
-      }
-    },
-    {
       "identity" : "sargon",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/radixdlt/sargon.git",
@@ -123,7 +114,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/GhenadieVP/ScreenshotPreventing-iOS",
       "state" : {
-        "revision" : "31a6294d0758899885b61ea6e30b58c547b7bfa0"
+        "revision" : "783b968ed2c6a6318896589d108de1141d434939"
       }
     },
     {
