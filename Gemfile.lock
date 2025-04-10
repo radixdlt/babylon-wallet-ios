@@ -225,7 +225,7 @@ PLATFORMS
 
 DEPENDENCIES
   dotenv (~> 2.8)
-  fastlane
+  fastlane (~> 2.225.0)
   fastlane-plugin-json
   fastlane-plugin-xcconfig (~> 2.0)
   xcode-install
