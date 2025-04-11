@@ -1,5 +1,5 @@
 {
-  "originHash" : "07ce6e755e876609763519b759f734223d793640b402e06aedef4571a7f65e19",
+  "originHash" : "b8ee3da3a22e60384d3ee48f81fcfd096336c885424fa54663ae3ca91c2e391c",
   "pins" : [
     {
       "identity" : "anycodable",
@@ -112,9 +112,9 @@
     {
       "identity" : "screenshotpreventing-ios",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Sajjon/ScreenshotPreventing-iOS",
+      "location" : "https://github.com/GhenadieVP/ScreenshotPreventing-iOS",
       "state" : {
-        "revision" : "03769bcd1b1c9c24af424890f0a3e6d15bd3000c"
+        "revision" : "783b968ed2c6a6318896589d108de1141d434939"
       }
     },
     {
