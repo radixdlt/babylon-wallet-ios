@@ -158,10 +158,7 @@ private extension FactorSourcesList.State.Row {
 
 private extension StoreOf<FactorSourcesList> {
 	var destination: PresentationStoreOf<FactorSourcesList.Destination> {
-		func scopeState(state: State) -> PresentationState<FactorSourcesList.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
+        scope(state: \.$destination, action: \.destination)
 	}
 }
 
