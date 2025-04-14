@@ -169,11 +169,11 @@ private extension View {
 		return detail(with: destinationStore)
 			.displayMnemonic(with: destinationStore)
 			.enterMnemonic(with: destinationStore)
-			.addMnemonic(with: destinationStore)
 			.changeMain(with: destinationStore)
 			.addNewP2PLinkSheet(with: destinationStore)
 			.noP2PLinkAlert(with: destinationStore)
 			.addNewLedgerSheet(with: destinationStore)
+			.addFactorSource(with: destinationStore)
 	}
 
 	private func detail(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
@@ -191,12 +191,6 @@ private extension View {
 	private func enterMnemonic(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.enterMnemonic, action: \.enterMnemonic)) {
 			ImportMnemonicsFlowCoordinator.View(store: $0)
-		}
-	}
-
-	private func addMnemonic(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
-		navigationDestination(store: destinationStore.scope(state: \.addMnemonic, action: \.addMnemonic)) {
-			ImportMnemonic.View(store: $0)
 		}
 	}
 
@@ -220,5 +214,10 @@ private extension View {
 
 	private func noP2PLinkAlert(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
 		alert(store: destinationStore.scope(state: \.noP2PLink, action: \.noP2PLink))
+	}
+	private func addFactorSource(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.addFactorSource, action: \.addFactorSource)) {
+			AddFactorSource.Coordinator.View(store: $0)
+		}
 	}
 }

@@ -1277,6 +1277,12 @@
 		E713204C2BCD372600AE6B3C /* UnknownCaseDecodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = E713204B2BCD372600AE6B3C /* UnknownCaseDecodable.swift */; };
 		E7392AC22D5DFBCD002FABDA /* InteractionReview-ShieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7392AC12D5DFBCD002FABDA /* InteractionReview-ShieldView.swift */; };
 		E7392AC42D5F58C5002FABDA /* FactorSourcePreviewCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7392AC32D5F58C5002FABDA /* FactorSourcePreviewCard.swift */; };
+		E7392ACB2D6C7973002FABDA /* AddFactorSourceCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7392ACA2D6C7973002FABDA /* AddFactorSourceCoordinator.swift */; };
+		E7392ACD2D6C7978002FABDA /* AddFactorSourceCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7392ACC2D6C7978002FABDA /* AddFactorSourceCoordinator+View.swift */; };
+		E7392AD12D6C7BE7002FABDA /* AddFactorSource-IntroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7392AD02D6C7BE7002FABDA /* AddFactorSource-IntroView.swift */; };
+		E7392AD42D6CD022002FABDA /* AddFactorSource-DeviceSeedPhrase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7392AD32D6CD022002FABDA /* AddFactorSource-DeviceSeedPhrase.swift */; };
+		E7392AD62D6CD02A002FABDA /* AddFactorSource-DeviceSeedPhrase+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7392AD52D6CD02A002FABDA /* AddFactorSource-DeviceSeedPhrase+View.swift */; };
+		E7392AD82D6F18FB002FABDA /* DeviceMnemonicBuilder+SharedState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7392AD72D6F18FB002FABDA /* DeviceMnemonicBuilder+SharedState.swift */; };
 		E7607DBD2D4252420083B3A5 /* ShieldsList+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7607DBC2D4252420083B3A5 /* ShieldsList+Reducer.swift */; };
 		E7607DBF2D4252470083B3A5 /* ShieldsList+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7607DBE2D4252470083B3A5 /* ShieldsList+View.swift */; };
 		E7607DC12D439D780083B3A5 /* ChangeMainShield+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7607DC02D439D780083B3A5 /* ChangeMainShield+Reducer.swift */; };
@@ -2594,6 +2600,12 @@
 		E713204B2BCD372600AE6B3C /* UnknownCaseDecodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnknownCaseDecodable.swift; sourceTree = "<group>"; };
 		E7392AC12D5DFBCD002FABDA /* InteractionReview-ShieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InteractionReview-ShieldView.swift"; sourceTree = "<group>"; };
 		E7392AC32D5F58C5002FABDA /* FactorSourcePreviewCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FactorSourcePreviewCard.swift; sourceTree = "<group>"; };
+		E7392ACA2D6C7973002FABDA /* AddFactorSourceCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFactorSourceCoordinator.swift; sourceTree = "<group>"; };
+		E7392ACC2D6C7978002FABDA /* AddFactorSourceCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSourceCoordinator+View.swift"; sourceTree = "<group>"; };
+		E7392AD02D6C7BE7002FABDA /* AddFactorSource-IntroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSource-IntroView.swift"; sourceTree = "<group>"; };
+		E7392AD32D6CD022002FABDA /* AddFactorSource-DeviceSeedPhrase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSource-DeviceSeedPhrase.swift"; sourceTree = "<group>"; };
+		E7392AD52D6CD02A002FABDA /* AddFactorSource-DeviceSeedPhrase+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSource-DeviceSeedPhrase+View.swift"; sourceTree = "<group>"; };
+		E7392AD72D6F18FB002FABDA /* DeviceMnemonicBuilder+SharedState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeviceMnemonicBuilder+SharedState.swift"; sourceTree = "<group>"; };
 		E7607DBC2D4252420083B3A5 /* ShieldsList+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShieldsList+Reducer.swift"; sourceTree = "<group>"; };
 		E7607DBE2D4252470083B3A5 /* ShieldsList+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShieldsList+View.swift"; sourceTree = "<group>"; };
 		E7607DC02D439D780083B3A5 /* ChangeMainShield+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChangeMainShield+Reducer.swift"; sourceTree = "<group>"; };
@@ -2844,6 +2856,7 @@
 		48CFBC602ADC10D800E77A5C /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				E7392AC92D68BE0E002FABDA /* AddFactorSource */,
 				E7607DD92D4CE2D20083B3A5 /* ChoosePersonas */,
 				E7607DC72D4A2ECD0083B3A5 /* ApplyShield */,
 				E7607DBB2D4251510083B3A5 /* ShieldsList */,
@@ -7104,6 +7117,42 @@
 				E7392AC12D5DFBCD002FABDA /* InteractionReview-ShieldView.swift */,
 			);
 			path = Shield;
+		};
+		E7392AC92D68BE0E002FABDA /* AddFactorSource */ = {
+			isa = PBXGroup;
+			children = (
+				E7392ACA2D6C7973002FABDA /* AddFactorSourceCoordinator.swift */,
+				E7392ACC2D6C7978002FABDA /* AddFactorSourceCoordinator+View.swift */,
+				E7392ACE2D6C7BD1002FABDA /* Children */,
+			);
+			path = AddFactorSource;
+			sourceTree = "<group>";
+		};
+		E7392ACE2D6C7BD1002FABDA /* Children */ = {
+			isa = PBXGroup;
+			children = (
+				E7392ACF2D6C7BD7002FABDA /* Intro */,
+				E7392AD22D6CB282002FABDA /* DeviceSeedPhrase */,
+			);
+			path = Children;
+			sourceTree = "<group>";
+		};
+		E7392ACF2D6C7BD7002FABDA /* Intro */ = {
+			isa = PBXGroup;
+			children = (
+				E7392AD02D6C7BE7002FABDA /* AddFactorSource-IntroView.swift */,
+			);
+			path = Intro;
+			sourceTree = "<group>";
+		};
+		E7392AD22D6CB282002FABDA /* DeviceSeedPhrase */ = {
+			isa = PBXGroup;
+			children = (
+				E7392AD72D6F18FB002FABDA /* DeviceMnemonicBuilder+SharedState.swift */,
+				E7392AD32D6CD022002FABDA /* AddFactorSource-DeviceSeedPhrase.swift */,
+				E7392AD52D6CD02A002FABDA /* AddFactorSource-DeviceSeedPhrase+View.swift */,
+			);
+			path = DeviceSeedPhrase;
 			sourceTree = "<group>";
 		};
 		E7607DBB2D4251510083B3A5 /* ShieldsList */ = {
@@ -7991,6 +8040,7 @@
 				48CFC2552ADC10D900E77A5C /* Splash.swift in Sources */,
 				48CFC6232ADC10DA00E77A5C /* AccountPortfolio+Extensions.swift in Sources */,
 				48CFC3292ADC10D900E77A5C /* CameraPermission+Reducer.swift in Sources */,
+				E7392AD82D6F18FB002FABDA /* DeviceMnemonicBuilder+SharedState.swift in Sources */,
 				5B3C48A92C7E190C00DB160D /* AssetRow.swift in Sources */,
 				A40816172C7E0D08005E65B9 /* StateEntityNonFungibleIdsPageRequest.swift in Sources */,
 				A40815812C7E0D08005E65B9 /* InternalServerError.swift in Sources */,
@@ -8078,6 +8128,7 @@
 				A41557572B7D4BF10040AD4E /* ResourceBalanceView.swift in Sources */,
 				48CFC4852ADC10DA00E77A5C /* OnLedgerEntitiesClient+Live.swift in Sources */,
 				A40815DF2C7E0D08005E65B9 /* ProgrammaticScryptoSborValuePreciseDecimal.swift in Sources */,
+				E7392AD42D6CD022002FABDA /* AddFactorSource-DeviceSeedPhrase.swift in Sources */,
 				48DD0FF72BCBCBB900C54C43 /* Stage1MigrateToSargon+AssetException.swift in Sources */,
 				48CFC2832ADC10D900E77A5C /* SelectFeePayer+View.swift in Sources */,
 				A408156E2C7E0D08005E65B9 /* ComponentMethodRoyalty.swift in Sources */,
@@ -8442,6 +8493,7 @@
 				48CFC4592ADC10DA00E77A5C /* LedgerHardwareWalletClient+Interface.swift in Sources */,
 				5B27FBFD2CC7E6C1002975BE /* Sections.swift in Sources */,
 				5B27FBFE2CC7E6C1002975BE /* Sections+View.swift in Sources */,
+				E7392AD12D6C7BE7002FABDA /* AddFactorSource-IntroView.swift in Sources */,
 				E6F460132BDBE56800B122DB /* Stage2MigrateToSargon+RadixConnectModels+Logic.swift in Sources */,
 				4841614D2BCAD3D400D2B644 /* Stage1MigrateToSargon+MnemonicWithPassphrase.swift in Sources */,
 				48CFC5A82ADC10DA00E77A5C /* URLButtonStyle.swift in Sources */,
@@ -8450,6 +8502,7 @@
 				83EA887E2B7E68EE00FF8424 /* TotalCurrencyWorthView.swift in Sources */,
 				5B2A0D7D2D354E820049C702 /* SargonHostInteractor.swift in Sources */,
 				48CFC2982ADC10D900E77A5C /* CustomizeFees+View.swift in Sources */,
+				E7392ACB2D6C7973002FABDA /* AddFactorSourceCoordinator.swift in Sources */,
 				A40815A02C7E0D08005E65B9 /* MetadataStringArrayValue.swift in Sources */,
 				A40816292C7E0D08005E65B9 /* StateNonFungibleDataRequest.swift in Sources */,
 				48CFC3312ADC10D900E77A5C /* ImportMnemonicWord+View.swift in Sources */,
@@ -8606,6 +8659,7 @@
 				830EA9E92AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift in Sources */,
 				A43F1E282BC96F27001DD3FA /* SecurityCenter+View.swift in Sources */,
 				A462B5B42B8F25BC00C26D20 /* ResourceBalance.swift in Sources */,
+				E7392AD62D6CD02A002FABDA /* AddFactorSource-DeviceSeedPhrase+View.swift in Sources */,
 				E79DD1B12CE365CF00B1EB86 /* ChooseReceivingAccountOnDelete+Reducer.swift in Sources */,
 				48CFC5CF2ADC10DA00E77A5C /* LinearGradients.swift in Sources */,
 				48CFC3F82ADC10D900E77A5C /* IncomingMessage+Decoding.swift in Sources */,
@@ -8770,6 +8824,7 @@
 				48CFC48B2ADC10DA00E77A5C /* DiskPersistenceClient+Interface.swift in Sources */,
 				A40816642C7E0D08005E65B9 /* ValidatorVaultItem.swift in Sources */,
 				48CFC3E92ADC10D900E77A5C /* Hashing.swift in Sources */,
+				E7392ACD2D6C7978002FABDA /* AddFactorSourceCoordinator+View.swift in Sources */,
 				48CFC2B72ADC10D900E77A5C /* ExportableProfileFile.swift in Sources */,
 				A40815C32C7E0D08005E65B9 /* NonFungibleResourcesCollection.swift in Sources */,
 				A40816252C7E0D08005E65B9 /* StateKeyValueStoreKeysCollection.swift in Sources */,
