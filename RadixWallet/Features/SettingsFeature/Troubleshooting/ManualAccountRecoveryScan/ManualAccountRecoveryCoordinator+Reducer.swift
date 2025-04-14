@@ -8,6 +8,7 @@ struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		var path: StackState<Path.State> = .init()
 		var isMainnet: Bool = false
+		var isOlympia: Bool = false
 
 		init() {}
 	}
@@ -17,8 +18,7 @@ struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 	struct Path: Sendable, Hashable, Reducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
-			case seedPhrase(ManualAccountRecoverySeedPhrase.State)
-			case ledger(LedgerHardwareDevices.State)
+			case selectFactorSource(FactorSourcesList.State)
 
 			case accountRecoveryScan(AccountRecoveryScanCoordinator.State)
 			case recoveryComplete(RecoverWalletControlWithBDFSComplete.State)
@@ -26,19 +26,15 @@ struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
-			case seedPhrase(ManualAccountRecoverySeedPhrase.Action)
-			case ledger(LedgerHardwareDevices.Action)
+			case selectFactorSource(FactorSourcesList.Action)
 
 			case accountRecoveryScan(AccountRecoveryScanCoordinator.Action)
 			case recoveryComplete(RecoverWalletControlWithBDFSComplete.Action)
 		}
 
 		var body: some ReducerOf<Self> {
-			Scope(state: \.seedPhrase, action: \.seedPhrase) {
-				ManualAccountRecoverySeedPhrase()
-			}
-			Scope(state: \.ledger, action: \.ledger) {
-				LedgerHardwareDevices()
+			Scope(state: \.selectFactorSource, action: \.selectFactorSource) {
+				FactorSourcesList()
 			}
 			Scope(state: \.accountRecoveryScan, action: \.accountRecoveryScan) {
 				AccountRecoveryScanCoordinator()
@@ -90,11 +86,13 @@ struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 			return .run { _ in await dismiss() }
 
 		case let .useSeedPhraseTapped(isOlympia):
-			state.path = .init([.seedPhrase(.init(isOlympia: isOlympia))])
+			state.isOlympia = isOlympia
+			state.path = .init([.selectFactorSource(.init(context: .selection(.authenticationSigning), kind: .device))])
 			return .none
 
 		case let .useLedgerTapped(isOlympia):
-			state.path = .init([.ledger(.init(context: .accountRecovery(olympia: isOlympia)))])
+			state.isOlympia = isOlympia
+			state.path = .init([.selectFactorSource(.init(context: .selection(.authenticationSigning), kind: .ledgerHqHardwareWallet))])
 			return .none
 		}
 	}
@@ -118,12 +116,11 @@ struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 
 	private func reduce(into state: inout State, id: StackElementID, pathAction: Path.Action) -> Effect<Action> {
 		switch pathAction {
-		case let .seedPhrase(.delegate(.recover(factorSourceID, isOlympia))):
-			state.path.append(.accountRecoveryScan(.init(purpose: .addAccounts(factorSourceID: factorSourceID, olympia: isOlympia))))
-			return .none
-
-		case let .ledger(.delegate(.choseLedgerForRecovery(ledger, isOlympia: isOlympia))):
-			state.path.append(.accountRecoveryScan(.init(purpose: .addAccounts(factorSourceID: ledger.id, olympia: isOlympia))))
+		case let .selectFactorSource(.delegate(.selectedFactorSource(source))):
+			switch source.factorSourceID {
+			case let .hash(value):
+				state.path.append(.accountRecoveryScan(.init(purpose: .addAccounts(factorSourceID: value, olympia: state.isOlympia))))
+			}
 			return .none
 
 		case .accountRecoveryScan(.delegate(.dismissed)):

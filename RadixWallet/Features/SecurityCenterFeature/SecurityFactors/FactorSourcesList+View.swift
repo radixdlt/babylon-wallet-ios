@@ -158,7 +158,7 @@ private extension FactorSourcesList.State.Row {
 
 private extension StoreOf<FactorSourcesList> {
 	var destination: PresentationStoreOf<FactorSourcesList.Destination> {
-        scope(state: \.$destination, action: \.destination)
+		scope(state: \.$destination, action: \.destination)
 	}
 }
 
@@ -171,8 +171,9 @@ private extension View {
 			.enterMnemonic(with: destinationStore)
 			.addMnemonic(with: destinationStore)
 			.changeMain(with: destinationStore)
-            .addNewP2PLinkSheet(with: destinationStore)
-            .noP2PLinkAlert(with: destinationStore)
+			.addNewP2PLinkSheet(with: destinationStore)
+			.noP2PLinkAlert(with: destinationStore)
+			.addNewLedgerSheet(with: destinationStore)
 	}
 
 	private func detail(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
@@ -204,14 +205,20 @@ private extension View {
 			ChangeMainFactorSource.View(store: $0)
 		}
 	}
-    
-    private func addNewP2PLinkSheet(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
-        sheet(store: destinationStore.scope(state: \.addNewP2PLink, action: \.addNewP2PLink)) {
-            NewConnection.View(store: $0)
-        }
-    }
-    
-    private func noP2PLinkAlert(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
-        alert(store: destinationStore.scope(state: \.noP2PLink, action: \.noP2PLink))
-    }
+
+	private func addNewLedgerSheet(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.addNewLedger, action: \.addNewLedger)) {
+			AddLedgerFactorSource.View(store: $0)
+		}
+	}
+
+	private func addNewP2PLinkSheet(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.addNewP2PLink, action: \.addNewP2PLink)) {
+			NewConnection.View(store: $0)
+		}
+	}
+
+	private func noP2PLinkAlert(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
+		alert(store: destinationStore.scope(state: \.noP2PLink, action: \.noP2PLink))
+	}
 }

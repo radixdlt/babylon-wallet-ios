@@ -125,17 +125,17 @@ extension CreateAccountCoordinator {
 		case let .root(.nameAccount(.delegate(.proceed(accountName, useLedgerAsFactorSource)))):
 			state.name = accountName
 			if useLedgerAsFactorSource {
-                state.path.append(.selectLedger(FactorSourcesList.State.init(context: .selection(.authenticationSigning), kind: .ledgerHqHardwareWallet)))
+				state.path.append(.selectLedger(.init(context: .selection(.authenticationSigning), kind: .ledgerHqHardwareWallet)))
 				return .none
 			} else {
 				return createProfileIfNecessaryThenCreateAccount(state: &state, mode: .bdfs)
 			}
 
-        case let .path(.element(_, action: .selectLedger(.delegate(.selectedFactorSource(source))))):
+		case let .path(.element(_, action: .selectLedger(.delegate(.selectedFactorSource(source))))):
 			return createProfileIfNecessaryThenCreateAccount(
 				state: &state,
 				mode: .specific(
-                    source
+					source
 				)
 			)
 

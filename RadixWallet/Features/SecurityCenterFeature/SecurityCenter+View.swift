@@ -188,7 +188,7 @@ extension SecurityCenter {
 			if actionRequired {
 				L10n.SecurityCenter.AnyItem.actionRequiredStatus
 			} else {
-			switch type {
+				switch type {
 				case .securityShields: L10n.SecurityCenter.SecurityShieldsItem.shieldedStatus
 				case .securityFactors: L10n.SecurityCenter.SecurityFactorsItem.activeStatus
 				case .configurationBackup: L10n.SecurityCenter.ConfigurationBackupItem.backedUpStatus
@@ -215,9 +215,9 @@ private extension View {
 			.securityFactors(with: destinationStore)
 			.deviceFactorSources(with: destinationStore)
 			.importMnemonics(with: destinationStore)
-			// .securityShieldsSetup(with: destinationStore)
-			// .securityShieldsList(with: destinationStore)
-			// .applyShield(with: destinationStore)
+		// .securityShieldsSetup(with: destinationStore)
+		// .securityShieldsList(with: destinationStore)
+		// .applyShield(with: destinationStore)
 	}
 
 	private func configurationBackup(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {

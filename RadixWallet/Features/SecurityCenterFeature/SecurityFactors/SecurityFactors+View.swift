@@ -42,7 +42,7 @@ private extension SecurityFactors.View {
 			.header("View and manage your security factors"),
 			model(kind: .device, hints: viewStore.deviceHints),
 			.header(L10n.SecurityFactors.hardware),
-			//model(kind: .arculusCard),
+			// model(kind: .arculusCard),
 			model(kind: .ledgerHqHardwareWallet),
 //			.header(L10n.SecurityFactors.information),
 //			model(kind: .password),
@@ -73,7 +73,7 @@ private extension SecurityFactors.State {
 
 private extension StoreOf<SecurityFactors> {
 	var destination: PresentationStoreOf<SecurityFactors.Destination> {
-        scope(state: \.$destination, action: \.destination)
+		scope(state: \.$destination, action: \.destination)
 	}
 }
 
