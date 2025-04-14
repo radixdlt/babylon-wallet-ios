@@ -41,14 +41,14 @@ struct CreateAccountCoordinator: Sendable, FeatureReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
 			case nameAccount(NameAccount.State)
-			case selectLedger(LedgerHardwareDevices.State)
+			case selectLedger(FactorSourcesList.State)
 			case completion(NewAccountCompletion.State)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
 			case nameAccount(NameAccount.Action)
-			case selectLedger(LedgerHardwareDevices.Action)
+			case selectLedger(FactorSourcesList.Action)
 			case completion(NewAccountCompletion.Action)
 		}
 
@@ -57,7 +57,7 @@ struct CreateAccountCoordinator: Sendable, FeatureReducer {
 				NameAccount()
 			}
 			Scope(state: \.selectLedger, action: \.selectLedger) {
-				LedgerHardwareDevices()
+				FactorSourcesList()
 			}
 			Scope(state: \.completion, action: \.completion) {
 				NewAccountCompletion()
@@ -125,17 +125,17 @@ extension CreateAccountCoordinator {
 		case let .root(.nameAccount(.delegate(.proceed(accountName, useLedgerAsFactorSource)))):
 			state.name = accountName
 			if useLedgerAsFactorSource {
-				state.path.append(.selectLedger(.init(context: .createHardwareAccount)))
+                state.path.append(.selectLedger(FactorSourcesList.State.init(context: .selection(.authenticationSigning), kind: .ledgerHqHardwareWallet)))
 				return .none
 			} else {
 				return createProfileIfNecessaryThenCreateAccount(state: &state, mode: .bdfs)
 			}
 
-		case let .path(.element(_, action: .selectLedger(.delegate(.choseLedger(ledger))))):
+        case let .path(.element(_, action: .selectLedger(.delegate(.selectedFactorSource(source))))):
 			return createProfileIfNecessaryThenCreateAccount(
 				state: &state,
 				mode: .specific(
-					ledger.asGeneral
+                    source
 				)
 			)
 

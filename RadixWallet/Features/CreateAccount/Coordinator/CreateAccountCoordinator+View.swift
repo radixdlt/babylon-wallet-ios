@@ -23,10 +23,10 @@ extension CreateAccountCoordinator {
 		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				NavigationStackStore(
-					store.scope(state: \.path, action: { .child(.path($0)) })
+					store.scope(state: \.path, action: \.child.path)
 				) {
 					IfLetStore(
-						store.scope(state: \.root, action: { .child(.root($0)) })
+						store.scope(state: \.root, action: \.child.root)
 					) {
 						destinations(for: $0, shouldDisplayNavBar: viewStore.shouldDisplayNavBar)
 							.toolbar {
@@ -64,7 +64,7 @@ extension CreateAccountCoordinator {
 						CaseLet(
 							/CreateAccountCoordinator.Path.State.selectLedger,
 							action: CreateAccountCoordinator.Path.Action.selectLedger,
-							then: { LedgerHardwareDevices.View(store: $0) }
+							then: { FactorSourcesList.View(store: $0) }
 						)
 					case .completion:
 						CaseLet(
