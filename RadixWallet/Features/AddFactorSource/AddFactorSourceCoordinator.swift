@@ -6,6 +6,7 @@ extension AddFactorSource {
 	struct Coordinator: Sendable, FeatureReducer {
 		@ObservableState
 		struct State: Sendable, Hashable {
+            @Shared(.deviceMnemonicBuilder) var deviceMnemonicBuilder
 			let kind: FactorSourceKind
 
 			var root: Path.State = .intro
@@ -16,6 +17,8 @@ extension AddFactorSource {
 		enum Path {
 			case intro
 			case deviceSeedPhrase(AddFactorSource.DeviceSeedPhrase)
+            case confirmSeedPhrase(AddFactorSource.ConfirmSeedPhrase)
+            case nameFactorSource(AddFactorSource.NameFactorSource)
 		}
 
 		typealias Action = FeatureAction<Self>
@@ -29,12 +32,10 @@ extension AddFactorSource {
 			case root(Path.Action)
 			case path(StackActionOf<Path>)
 		}
-
+       
 		enum DelegateAction: Sendable, Equatable {
 			case finished
 		}
-
-		@Dependency(\.errorQueue) var errorQueue
 
 		var body: some ReducerOf<Self> {
 			Scope(state: \.root, action: \.child.root) {
@@ -49,7 +50,12 @@ extension AddFactorSource {
 			case .continueButtonTapped:
 				switch state.kind {
 				case .device:
-					state.path.append(.deviceSeedPhrase(.init()))
+                    state.$deviceMnemonicBuilder.withLock { builder in
+                        builder = builder.generateNewMnemonic()
+                    }
+                    if let mnemonic = try? Mnemonic(words: state.deviceMnemonicBuilder.getWords()) {
+                        state.path.append(.deviceSeedPhrase(.init(mnemonic: mnemonic)))
+                    }
 				case .ledgerHqHardwareWallet, .offDeviceMnemonic, .arculusCard, .password:
 					break
 				}
@@ -57,19 +63,24 @@ extension AddFactorSource {
 				return .none
 			}
 		}
-
-		//        func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		//            switch childAction {
-		//            case .root(.intro(.delegate(.finished))):
-		//                state.path.append(...)
-		//                return .none
-		//            case let .path(.element(id: _, action: .choosePersonas(.delegate(.finished(personas))))):
-		//                state.selectedPersonas = personas
-		//                state.path.append(.completion)
-		//                return .none
-		//            default:
-		//                return .none
-		//            }
-		//        }
+        
+        func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+            switch childAction {
+            case let .path(.element(id: _, action: .deviceSeedPhrase(.delegate(.completed(withCustomSeedPhrase))))):
+                if withCustomSeedPhrase {
+                    state.path.append(.nameFactorSource(.init(kind: state.kind)))
+                } else {
+                    state.path.append(.confirmSeedPhrase(.init(factorSourceKind: state.kind)))
+                }
+                return .none
+            case .path(.element(id: _, action: .confirmSeedPhrase(.delegate(.validated)))):
+                state.path.append(.nameFactorSource(.init(kind: state.kind)))
+                return .none
+            case .path(.element(id: _, action: .nameFactorSource(.delegate(.saved)))):
+                return .send(.delegate(.finished))
+            default:
+                return .none
+            }
+        }
 	}
 }

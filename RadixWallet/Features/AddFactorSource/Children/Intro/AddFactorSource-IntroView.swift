@@ -34,7 +34,7 @@ extension AddFactorSource {
 	}
 }
 
-private extension FactorSourceKind {
+extension FactorSourceKind {
 	var addFactorTitle: String {
 		switch self {
 		case .device:

@@ -92,8 +92,9 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			Scope(state: \.addNewP2PLink, action: \.addNewP2PLink) {
 				NewConnection()
 			}
-			Scope(state: \.addNewLedger, action: \.addNewLedger) {
-				AddLedgerFactorSource()
+            Scope(state: \.addNewLedger, action: \.addNewLedger) {
+                AddLedgerFactorSource()
+            }
 			Scope(state: \.addFactorSource, action: \.addFactorSource) {
 				AddFactorSource.Coordinator()
 			}
@@ -155,7 +156,15 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			}
 
 		case .addButtonTapped:
-			state.destination = .addFactorSource(.init(kind: state.kind))
+            switch state.kind {
+            case .device:
+                state.destination = .addFactorSource(.init(kind: state.kind))
+            case .ledgerHqHardwareWallet:
+                state.destination = .addNewLedger(.init())
+            default:
+                assertionFailure("Unsupported factor source kind \(state.kind)")
+            }
+			
 			return .none
 
 		case let .continueButtonTapped(factorSource):
@@ -223,6 +232,10 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 					errorQueue.schedule(error)
 				}
 			}
+            
+        case .addFactorSource(.delegate(.finished)):
+            state.destination = nil
+            return entitiesEffect(state: state)
 
 		default:
 			return .none
@@ -257,11 +270,6 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			return .none
 		case let .continueWithFactorsource(fs):
 			return .send(.delegate(.selectedFactorSource(fs)))
-			//            if case let .accountRecovery(olympia: olympia) = state.context {
-			//                return .send(.delegate(.choseLedgerForRecovery(ledger, isOlympia: olympia)))
-			//            } else {
-			//                return .send(.delegate(.choseLedger(ledger)))
-			//            }
 		}
 	}
 }
