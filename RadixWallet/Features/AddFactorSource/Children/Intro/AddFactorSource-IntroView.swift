@@ -18,8 +18,8 @@ extension AddFactorSource {
 				Text(kind.addFactorDescription)
 					.textStyle(.body1Regular)
 
-				InfoButton(kind.infoLinkContent.item, label: kind.infoLinkContent.title)
-					.padding(.top, .medium1)
+//				InfoButton(kind.infoLinkContent.item, label: kind.infoLinkContent.title)
+//					.padding(.top, .medium1)
 
 				Spacer()
 			}

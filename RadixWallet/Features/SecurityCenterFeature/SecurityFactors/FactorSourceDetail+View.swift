@@ -26,24 +26,24 @@ extension FactorSourceDetail {
 				[
 					.header(L10n.FactorSources.Detail.manage),
 					renameRow(viewStore),
-					deviceSeedPhraseRow(device),
-					.header(L10n.FactorSources.Detail.test),
-					spotCheckRow(viewStore),
+					deviceSeedPhraseRow(device)
+					// .header(L10n.FactorSources.Detail.test),
+					// spotCheckRow(viewStore),
 				]
 			case .ledger, .offDeviceMnemonic, .password:
 				[
 					.header(L10n.FactorSources.Detail.manage),
-					renameRow(viewStore),
-					.header(L10n.FactorSources.Detail.test),
-					spotCheckRow(viewStore),
+					renameRow(viewStore)
+//					.header(L10n.FactorSources.Detail.test),
+//					spotCheckRow(viewStore),
 				]
 			case .arculusCard:
 				[
 					.header(L10n.FactorSources.Detail.manage),
 					renameRow(viewStore),
-					changePinRow(viewStore),
-					.header(L10n.FactorSources.Detail.test),
-					spotCheckRow(viewStore),
+					changePinRow(viewStore)
+//					.header(L10n.FactorSources.Detail.test),
+//					spotCheckRow(viewStore),
 				]
 			}
 		}
@@ -57,15 +57,15 @@ extension FactorSourceDetail {
 			)
 		}
 
-		private func spotCheckRow(_ viewStore: ViewStore<FactorSourceDetail.State, FactorSourceDetail.ViewAction>) -> SettingsRow<FactorSourceDetail>.Kind {
-			.model(
-				title: L10n.FactorSources.Detail.spotCheck,
-				subtitle: L10n.FactorSources.Detail.testCanUse,
-				markdown: viewStore.lastUsedMessage,
-				icon: .systemImage("checkmark.circle"),
-				action: .spotCheckTapped
-			)
-		}
+//		private func spotCheckRow(_ viewStore: ViewStore<FactorSourceDetail.State, FactorSourceDetail.ViewAction>) -> SettingsRow<FactorSourceDetail>.Kind {
+//			.model(
+//				title: L10n.FactorSources.Detail.spotCheck,
+//				subtitle: L10n.FactorSources.Detail.testCanUse,
+//				markdown: viewStore.lastUsedMessage,
+//				icon: .systemImage("checkmark.circle"),
+//				action: .spotCheckTapped
+//			)
+//		}
 
 		private func deviceSeedPhraseRow(_ integrity: DeviceFactorSourceIntegrity) -> SettingsRow<FactorSourceDetail>.Kind {
 			if integrity.isMnemonicPresentInSecureStorage {
@@ -119,7 +119,7 @@ private extension View {
 		return rename(with: destinationStore)
 			.displayMnemonic(with: destinationStore)
 			.importMnemonics(with: destinationStore)
-			.spotCheckAlert(with: destinationStore)
+			//.spotCheckAlert(with: destinationStore)
 	}
 
 	private func rename(with destinationStore: PresentationStoreOf<FactorSourceDetail.Destination>) -> some View {
@@ -140,7 +140,7 @@ private extension View {
 		}
 	}
 
-	private func spotCheckAlert(with destinationStore: PresentationStoreOf<FactorSourceDetail.Destination>) -> some View {
-		alert(store: destinationStore.scope(state: \.spotCheckAlert, action: \.spotCheckAlert))
-	}
+//	private func spotCheckAlert(with destinationStore: PresentationStoreOf<FactorSourceDetail.Destination>) -> some View {
+//		alert(store: destinationStore.scope(state: \.spotCheckAlert, action: \.spotCheckAlert))
+//	}
 }
