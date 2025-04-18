@@ -79,15 +79,6 @@ extension FactorSourceAccess.State {
 		}
 	}
 
-	var showCard: Bool {
-		switch purpose {
-		case .signature, .spotCheck, .proveOwnership, .encryptMessage, .updateFactorConfig, .deriveAccounts:
-			true
-		case .createAccountAuthorization, .createPersonaAuthorization:
-			false
-		}
-	}
-
 	var isRetryEnabled: Bool {
 		guard let factorSource else {
 			return false
