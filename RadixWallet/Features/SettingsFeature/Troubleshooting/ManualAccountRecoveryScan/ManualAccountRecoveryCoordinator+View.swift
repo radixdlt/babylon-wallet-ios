@@ -150,11 +150,17 @@ private extension ManualAccountRecoveryCoordinator.View {
 		var body: some View {
 			SwitchStore(store) { state in
 				switch state {
-				case .selectFactorSource:
+				case .seedPhrase:
 					CaseLet(
-						/ManualAccountRecoveryCoordinator.Path.State.selectFactorSource,
-						action: ManualAccountRecoveryCoordinator.Path.Action.selectFactorSource,
-						then: { FactorSourcesList.View(store: $0) }
+						/ManualAccountRecoveryCoordinator.Path.State.seedPhrase,
+						action: ManualAccountRecoveryCoordinator.Path.Action.seedPhrase,
+						then: { ManualAccountRecoverySeedPhrase.View(store: $0) }
+					)
+				case .ledger:
+					CaseLet(
+						/ManualAccountRecoveryCoordinator.Path.State.ledger,
+						action: ManualAccountRecoveryCoordinator.Path.Action.ledger,
+						then: { LedgerHardwareDevices.View(store: $0) }
 					)
 				case .accountRecoveryScan:
 					CaseLet(
