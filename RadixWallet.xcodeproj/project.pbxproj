@@ -870,6 +870,8 @@
 		A08BBA682DAE50CE00534B67 /* AddFactorSource-NameFactorSource+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08BBA672DAE50C700534B67 /* AddFactorSource-NameFactorSource+View.swift */; };
 		A08BBA6B2DAE973700534B67 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A08BBA6A2DAE973700534B67 /* Sargon */; };
 		A08BBA6E2DAF937D00534B67 /* AddFactorSource-SuccessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08BBA6D2DAF937400534B67 /* AddFactorSource-SuccessView.swift */; };
+		A08BBA752DB232D000534B67 /* LedgerHardwareDevices+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08BBA732DB232D000534B67 /* LedgerHardwareDevices+View.swift */; };
+		A08BBA762DB232D000534B67 /* LedgerHardwareDevices+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08BBA722DB232D000534B67 /* LedgerHardwareDevices+Reducer.swift */; };
 		A0C673002DA6BBEA0071606B /* ScreenshotPreventing in Frameworks */ = {isa = PBXBuildFile; productRef = A0C672FF2DA6BBEA0071606B /* ScreenshotPreventing */; };
 		A0C673022DA6BBEA0071606B /* ScreenshotPreventingSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = A0C673012DA6BBEA0071606B /* ScreenshotPreventingSwiftUI */; };
 		A0C673052DA6BD7F0071606B /* ScreenshotPreventing in Frameworks */ = {isa = PBXBuildFile; productRef = A0C673042DA6BD7F0071606B /* ScreenshotPreventing */; };
@@ -2192,6 +2194,8 @@
 		A08BBA652DAE501300534B67 /* AddFactorSource-NameFactorSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSource-NameFactorSource.swift"; sourceTree = "<group>"; };
 		A08BBA672DAE50C700534B67 /* AddFactorSource-NameFactorSource+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSource-NameFactorSource+View.swift"; sourceTree = "<group>"; };
 		A08BBA6D2DAF937400534B67 /* AddFactorSource-SuccessView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSource-SuccessView.swift"; sourceTree = "<group>"; };
+		A08BBA722DB232D000534B67 /* LedgerHardwareDevices+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LedgerHardwareDevices+Reducer.swift"; sourceTree = "<group>"; };
+		A08BBA732DB232D000534B67 /* LedgerHardwareDevices+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LedgerHardwareDevices+View.swift"; sourceTree = "<group>"; };
 		A40814312C7E0D08005E65B9 /* CodableHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CodableHelper.swift; sourceTree = "<group>"; };
 		A40814322C7E0D08005E65B9 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		A40814332C7E0D08005E65B9 /* Models.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
@@ -2868,6 +2872,7 @@
 		48CFBC602ADC10D800E77A5C /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				A08BBA742DB232D000534B67 /* LedgerHardwareDevices */,
 				E7392AC92D68BE0E002FABDA /* AddFactorSource */,
 				E7607DD92D4CE2D20083B3A5 /* ChoosePersonas */,
 				E7607DC72D4A2ECD0083B3A5 /* ApplyShield */,
@@ -6199,6 +6204,15 @@
 			path = Success;
 			sourceTree = "<group>";
 		};
+		A08BBA742DB232D000534B67 /* LedgerHardwareDevices */ = {
+			isa = PBXGroup;
+			children = (
+				A08BBA722DB232D000534B67 /* LedgerHardwareDevices+Reducer.swift */,
+				A08BBA732DB232D000534B67 /* LedgerHardwareDevices+View.swift */,
+			);
+			path = LedgerHardwareDevices;
+			sourceTree = "<group>";
+		};
 		A40814352C7E0D08005E65B9 /* AUXILARY */ = {
 			isa = PBXGroup;
 			children = (
@@ -8005,6 +8019,8 @@
 				A4DBBEB32C20305000D0A59E /* CardCarousel+Reducer.swift in Sources */,
 				48CFC2492ADC10D900E77A5C /* ResourcesList+View.swift in Sources */,
 				4813AFE22BC9A9AD0046BCAD /* Stage1MigrateToSargon+NetworkDefinition.swift in Sources */,
+				A08BBA752DB232D000534B67 /* LedgerHardwareDevices+View.swift in Sources */,
+				A08BBA762DB232D000534B67 /* LedgerHardwareDevices+Reducer.swift in Sources */,
 				A40816522C7E0D08005E65B9 /* TransactionSubmitRequest.swift in Sources */,
 				A40816012C7E0D08005E65B9 /* StateAccountLockersTouchedAtResponseItem.swift in Sources */,
 				5B3FDC112CF0B9DB0024BFAF /* InteractionInProgressView.swift in Sources */,
