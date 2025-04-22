@@ -215,7 +215,7 @@ private extension View {
 	private func noP2PLinkAlert(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
 		alert(store: destinationStore.scope(state: \.noP2PLink, action: \.noP2PLink))
 	}
-    
+
 	private func addFactorSource(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
 		sheet(store: destinationStore.scope(state: \.addFactorSource, action: \.addFactorSource)) {
 			AddFactorSource.Coordinator.View(store: $0)

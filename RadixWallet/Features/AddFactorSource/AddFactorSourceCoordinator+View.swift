@@ -37,15 +37,15 @@ extension AddFactorSource.Coordinator {
 				if let store = store.scope(state: \.deviceSeedPhrase, action: \.deviceSeedPhrase) {
 					AddFactorSource.DeviceSeedPhrase.View(store: store)
 				}
-            case .confirmSeedPhrase:
-                if let store = store.scope(state: \.confirmSeedPhrase, action: \.confirmSeedPhrase) {
-                    AddFactorSource.ConfirmSeedPhrase.View(store: store)
-                }
-            case .nameFactorSource:
-                if let store = store.scope(state: \.nameFactorSource, action: \.nameFactorSource) {
-                    AddFactorSource.NameFactorSource.View(store: store)
-                }
-            }
+			case .confirmSeedPhrase:
+				if let store = store.scope(state: \.confirmSeedPhrase, action: \.confirmSeedPhrase) {
+					AddFactorSource.ConfirmSeedPhrase.View(store: store)
+				}
+			case .nameFactorSource:
+				if let store = store.scope(state: \.nameFactorSource, action: \.nameFactorSource) {
+					AddFactorSource.NameFactorSource.View(store: store)
+				}
+			}
 		}
 	}
 }

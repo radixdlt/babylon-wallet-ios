@@ -26,14 +26,14 @@ extension FactorSourceDetail {
 				[
 					.header(L10n.FactorSources.Detail.manage),
 					renameRow(viewStore),
-					deviceSeedPhraseRow(device)
+					deviceSeedPhraseRow(device),
 					// .header(L10n.FactorSources.Detail.test),
 					// spotCheckRow(viewStore),
 				]
 			case .ledger, .offDeviceMnemonic, .password:
 				[
 					.header(L10n.FactorSources.Detail.manage),
-					renameRow(viewStore)
+					renameRow(viewStore),
 //					.header(L10n.FactorSources.Detail.test),
 //					spotCheckRow(viewStore),
 				]
@@ -41,7 +41,7 @@ extension FactorSourceDetail {
 				[
 					.header(L10n.FactorSources.Detail.manage),
 					renameRow(viewStore),
-					changePinRow(viewStore)
+					changePinRow(viewStore),
 //					.header(L10n.FactorSources.Detail.test),
 //					spotCheckRow(viewStore),
 				]
@@ -119,7 +119,7 @@ private extension View {
 		return rename(with: destinationStore)
 			.displayMnemonic(with: destinationStore)
 			.importMnemonics(with: destinationStore)
-			//.spotCheckAlert(with: destinationStore)
+		// .spotCheckAlert(with: destinationStore)
 	}
 
 	private func rename(with destinationStore: PresentationStoreOf<FactorSourceDetail.Destination>) -> some View {

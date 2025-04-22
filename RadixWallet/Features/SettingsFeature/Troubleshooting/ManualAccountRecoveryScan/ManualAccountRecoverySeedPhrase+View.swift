@@ -126,7 +126,7 @@ private extension ManualAccountRecoverySeedPhrase.View {
 				DisplayEntitiesControlledByMnemonic.MnemonicView(
 					viewState: .init(
 						headingState: .init(
-                            title: item.value.deviceFactorSource.hint.label,
+							title: item.value.deviceFactorSource.hint.label,
 							type: .scanning(selected: item.isSelected),
 							isError: false
 						),

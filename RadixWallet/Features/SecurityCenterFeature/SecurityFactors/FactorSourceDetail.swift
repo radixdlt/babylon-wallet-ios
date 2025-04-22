@@ -54,7 +54,7 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 			}
 			Scope(state: \.displayMnemonic, action: \.displayMnemonic) {
 				DisplayMnemonic()
-                    ._printChanges()
+					._printChanges()
 			}
 			Scope(state: \.importMnemonics, action: \.importMnemonics) {
 				ImportMnemonicsFlowCoordinator()
@@ -90,7 +90,6 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 
 		case .changePinTapped:
 			return .none
-
 //		case .spotCheckTapped:
 //			return .run { [factorSource = state.factorSource] send in
 //				let result = try await SargonOS.shared.triggerSpotCheck(factorSource: factorSource)

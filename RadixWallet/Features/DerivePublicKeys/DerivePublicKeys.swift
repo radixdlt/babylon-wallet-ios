@@ -101,16 +101,16 @@ private extension DerivePublicKeys {
 }
 
 private extension DerivationPurpose {
-    var factorSourceAccessPurpose: FactorSourceAccess.State.Purpose {
-        switch self {
-        case .accountRecovery:
-                .deriveAccounts
-        case .creatingNewAccount:
-                .createAccountAuthorization
-        case .creatingNewPersona:
-                .createPersonaAuthorization
-        case  .securifyingAccount, .securifyingPersona, .securifyingAccountsAndPersonas, .preDerivingKeys:
-                .updateFactorConfig
-        }
-    }
+	var factorSourceAccessPurpose: FactorSourceAccess.State.Purpose {
+		switch self {
+		case .accountRecovery:
+			.deriveAccounts
+		case .creatingNewAccount:
+			.createAccountAuthorization
+		case .creatingNewPersona:
+			.createPersonaAuthorization
+		case .securifyingAccount, .securifyingPersona, .securifyingAccountsAndPersonas, .preDerivingKeys:
+			.updateFactorConfig
+		}
+	}
 }

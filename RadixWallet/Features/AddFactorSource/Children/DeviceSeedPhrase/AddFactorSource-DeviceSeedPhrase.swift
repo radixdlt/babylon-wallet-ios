@@ -10,7 +10,7 @@ extension AddFactorSource {
 			@Shared(.deviceMnemonicBuilder) var deviceMnemonicBuilder
 
 			var grid: ImportMnemonicGrid.State
-            var isEnteringCustomSeedPhrase: Bool = false
+			var isEnteringCustomSeedPhrase: Bool = false
 
 			var confirmButtonControlState: ControlState {
 				switch status {
@@ -24,8 +24,8 @@ extension AddFactorSource {
 			@Presents
 			var destination: Destination.State? = nil
 
-            init(mnemonic: Mnemonic) {
-                grid = .init(mnemonic: mnemonic)
+			init(mnemonic: Mnemonic) {
+				grid = .init(mnemonic: mnemonic)
 			}
 		}
 
@@ -34,7 +34,7 @@ extension AddFactorSource {
 		enum ViewAction: Sendable, Hashable {
 			case onFirstAppear
 			case confirmButtonTapped
-            case enterCustomSeedPhraseButtonTapped
+			case enterCustomSeedPhraseButtonTapped
 		}
 
 		@CasePathable
@@ -47,7 +47,7 @@ extension AddFactorSource {
 		}
 
 		enum DelegateAction: Sendable, Hashable {
-            case completed(withCustomSeedPhrase: Bool)
+			case completed(withCustomSeedPhrase: Bool)
 		}
 
 		struct Destination: DestinationReducer {
@@ -90,29 +90,29 @@ extension AddFactorSource {
 				}
 				return .none
 			case .confirmButtonTapped:
-                let isEnteringCustomSeedPhrase = state.isEnteringCustomSeedPhrase
-                if isEnteringCustomSeedPhrase {
-                    state.$deviceMnemonicBuilder.withLock { builder in
-                        if let builderWithMnemonic = try? builder.createMnemonicFromWords(words: state.completedWords.map(\.word)) {
-                            builder = builderWithMnemonic
-                        }
-                    }
-                }
-                let factorSourceId = state.deviceMnemonicBuilder.getFactorSourceId()
+				let isEnteringCustomSeedPhrase = state.isEnteringCustomSeedPhrase
+				if isEnteringCustomSeedPhrase {
+					state.$deviceMnemonicBuilder.withLock { builder in
+						if let builderWithMnemonic = try? builder.createMnemonicFromWords(words: state.completedWords.map(\.word)) {
+							builder = builderWithMnemonic
+						}
+					}
+				}
+				let factorSourceId = state.deviceMnemonicBuilder.getFactorSourceId()
 				return .run { send in
 					let isInUse = try await SargonOs.shared.isFactorSourceAlreadyInUse(factorSourceId: factorSourceId)
 					if isInUse {
 						await send(.internal(.factorAlreadyInUse))
-                    } else {
-                        await send(.delegate(.completed(withCustomSeedPhrase: isEnteringCustomSeedPhrase)))
-                    }
+					} else {
+						await send(.delegate(.completed(withCustomSeedPhrase: isEnteringCustomSeedPhrase)))
+					}
 				} catch: { error, _ in
 					errorQueue.schedule(error)
 				}
-            case .enterCustomSeedPhraseButtonTapped:
-                state.grid = .init(count: .twentyFour, isWordCountFixed: true)
-                state.isEnteringCustomSeedPhrase = true
-                return .none
+			case .enterCustomSeedPhraseButtonTapped:
+				state.grid = .init(count: .twentyFour, isWordCountFixed: true)
+				state.isEnteringCustomSeedPhrase = true
+				return .none
 			}
 		}
 

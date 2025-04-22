@@ -6,30 +6,30 @@ extension AddFactorSource.DeviceSeedPhrase {
 		let store: StoreOf<AddFactorSource.DeviceSeedPhrase>
 
 		var body: some SwiftUI.View {
-            WithPerceptionTracking {
-                ScrollViewReader { proxy in
-                    WithPerceptionTracking {
-                        ScrollView {
-                            Color.clear.frame(height: 0).id("top_anchor")
-                            
-                            coreView(scrollViewProxy: proxy)
-                                .padding(.medium2)
-                        }
-                        .footer {
-                            Button(L10n.Common.confirm) {
-                                store.send(.view(.confirmButtonTapped))
-                            }
-                            .buttonStyle(.primaryRectangular)
-                            .controlState(store.confirmButtonControlState)
-                        }
-                        .onFirstAppear {
-                            store.send(.view(.onFirstAppear))
-                        }
-                    }
-                }
-            }
-            .destination(store: store)
-        }
+			WithPerceptionTracking {
+				ScrollViewReader { proxy in
+					WithPerceptionTracking {
+						ScrollView {
+							Color.clear.frame(height: 0).id("top_anchor")
+
+							coreView(scrollViewProxy: proxy)
+								.padding(.medium2)
+						}
+						.footer {
+							Button(L10n.Common.confirm) {
+								store.send(.view(.confirmButtonTapped))
+							}
+							.buttonStyle(.primaryRectangular)
+							.controlState(store.confirmButtonControlState)
+						}
+						.onFirstAppear {
+							store.send(.view(.onFirstAppear))
+						}
+					}
+				}
+			}
+			.destination(store: store)
+		}
 
 		@MainActor
 		private func coreView(scrollViewProxy: ScrollViewProxy) -> some SwiftUI.View {
@@ -37,16 +37,16 @@ extension AddFactorSource.DeviceSeedPhrase {
 				headerView
 
 				ImportMnemonicGrid.View(store: store.grid)
-                
-                if !store.isEnteringCustomSeedPhrase {
-                    Button("Clear and enter custom seed phrase") {
-                        store.send(.view(.enterCustomSeedPhraseButtonTapped))
-                        withAnimation {
-                            scrollViewProxy.scrollTo("top_anchor", anchor: .top)
-                        }
-                    }
-                    .buttonStyle(.blueText)
-                }
+
+				if !store.isEnteringCustomSeedPhrase {
+					Button("Clear and enter custom seed phrase") {
+						store.send(.view(.enterCustomSeedPhraseButtonTapped))
+						withAnimation {
+							scrollViewProxy.scrollTo("top_anchor", anchor: .top)
+						}
+					}
+					.buttonStyle(.blueText)
+				}
 			}
 		}
 
@@ -71,7 +71,7 @@ private extension StoreOf<AddFactorSource.DeviceSeedPhrase> {
 	}
 
 	var destination: PresentationStoreOf<AddFactorSource.DeviceSeedPhrase.Destination> {
-        scope(state: \.$destination, action: \.destination)
+		scope(state: \.$destination, action: \.destination)
 	}
 }
 

@@ -48,13 +48,13 @@ extension OrderedDictionary {
 }
 
 extension OrderedDictionary {
-    var asDictionary: [Key: Value] {
-        var dictionary = [Key: Value]()
-        
-        for (key, value) in self {
-            dictionary[key] = value
-        }
-        
-        return dictionary
-    }
+	var asDictionary: [Key: Value] {
+		var dictionary = [Key: Value]()
+
+		for (key, value) in self {
+			dictionary[key] = value
+		}
+
+		return dictionary
+	}
 }
