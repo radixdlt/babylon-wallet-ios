@@ -148,7 +148,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 
 			case .seedPhraseNotRecoverable:
 				return exportMnemonic(integrity: row.integrity) {
-					state.destination = .displayMnemonic(.init(mnemonic: $0.mnemonicWithPassphrase.mnemonic, context: .fromSettings, factorSourceID: $0.factorSourceID))
+					state.destination = .displayMnemonic(.init(mnemonic: $0.mnemonicWithPassphrase.mnemonic, factorSourceID: $0.factorSourceID))
 				}
 
 			case .lostFactorSource:
@@ -201,12 +201,16 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case .displayMnemonic(.delegate), .enterMnemonic(.delegate):
+		case .enterMnemonic(.delegate):
 			// We don't care about which delegate action was executed, since any corresponding
 			// updates to the warnings will be handled by securityProblemsEffect.
 			// We just need to dismiss the destination.
 			state.destination = nil
 			return .none
+
+		case .displayMnemonic(.delegate(.backedUp)):
+			state.destination = nil
+			return entitiesEffect(state: state)
 
 		case .changeMain(.delegate(.updated)):
 			state.destination = nil

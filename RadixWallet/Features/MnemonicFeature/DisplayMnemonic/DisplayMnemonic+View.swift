@@ -14,10 +14,11 @@ extension DisplayMnemonic {
 			WithPerceptionTracking {
 				ScrollView {
 					VStack(spacing: .medium1) {
-						Text(L10n.ConfirmMnemonicBackedUp.subtitle)
-							.foregroundStyle(.app.gray1)
-							.textStyle(.body1Regular)
-							.multilineTextAlignment(.center)
+						StatusMessageView(text: L10n.RevealSeedPhrase.warning, type: .warning)
+
+						#if DEBUG
+						debugSection
+						#endif
 
 						wordsGrid()
 
@@ -26,13 +27,21 @@ extension DisplayMnemonic {
 						}
 						.buttonStyle(.primaryRectangular)
 					}
-					.padding(.horizontal, .medium2)
+					.padding([.horizontal, .top], .medium2)
 					.padding(.bottom, .large3)
 				}
 				.scrollIndicators(.hidden)
 				.destinations(with: store)
+				.navigationBarBackButtonHidden(true) // need to be able to hook "back" button press
+				.toolbar {
+					ToolbarItem(placement: .navigationBarLeading) {
+						BackButton {
+							store.send(.view(.backButtonTapped))
+						}
+					}
+				}
 			}
-			.radixToolbar(title: L10n.ConfirmMnemonicBackedUp.title)
+			.radixToolbar(title: L10n.RevealSeedPhrase.title)
 		}
 
 		@ViewBuilder
@@ -41,9 +50,7 @@ extension DisplayMnemonic {
 				ForEach(Array(store.words.chunks(ofCount: 3).enumerated()), id: \.offset) { _, row in
 					GridRow {
 						ForEach(row) { word in
-							VStack {
-								wordBox(word)
-							}
+							wordBox(word)
 						}
 					}
 				}
@@ -59,10 +66,22 @@ extension DisplayMnemonic {
 				),
 				placeholder: "",
 				text: .constant(word.element.word),
+				preventScreenshot: true,
 			)
-			.disabled(true)
+			.allowsHitTesting(false)
 			.minimumScaleFactor(0.9)
 		}
+
+		#if DEBUG
+		private var debugSection: some SwiftUI.View {
+			VStack(spacing: .small1) {
+				Button("DEBUG Copy") {
+					store.send(.view(.debugCopy))
+				}
+			}
+			.buttonStyle(.secondaryRectangular(shouldExpand: true, isDestructive: true))
+		}
+		#endif
 	}
 }
 

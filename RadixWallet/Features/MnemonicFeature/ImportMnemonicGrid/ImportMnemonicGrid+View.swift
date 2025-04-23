@@ -51,18 +51,12 @@ extension ImportMnemonicGrid {
 		#if DEBUG
 		private var debugSection: some SwiftUI.View {
 			VStack(spacing: .small1) {
-				if store.isReadOnlyMode {
-					Button("DEBUG Copy") {
-						store.send(.view(.debugCopy))
-					}
-				} else {
-					Button("DEBUG Paste") {
-						store.send(.view(.debugPaste))
-					}
+				Button("DEBUG Paste") {
+					store.send(.view(.debugPaste))
+				}
 
-					Button("DEBUG Sample") {
-						store.send(.view(.debugSetSample))
-					}
+				Button("DEBUG Sample") {
+					store.send(.view(.debugSetSample))
 				}
 			}
 			.buttonStyle(.secondaryRectangular(shouldExpand: true, isDestructive: true))

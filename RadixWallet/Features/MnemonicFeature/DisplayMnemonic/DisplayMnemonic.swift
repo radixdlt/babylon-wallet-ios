@@ -8,12 +8,7 @@ struct DisplayMnemonic: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
 		let mnemonic: Mnemonic
-		enum Context: Sendable, Hashable {
-			case fromSettings
-			case fromBackupPrompt
-		}
 
-		let context: Context
 		let factorSourceID: FactorSourceIDFromHash
 		var words: NonEmpty<IdentifiedArrayOf<OffsetIdentified<BIP39Word>>> {
 			let identifiedWords = mnemonic.words.identifiablyEnumerated()
@@ -30,10 +25,13 @@ struct DisplayMnemonic: Sendable, FeatureReducer {
 		case doneViewingButtonTapped
 		case closeButtonTapped
 		case backButtonTapped
+		#if DEBUG
+		case debugCopy
+		#endif
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case doneViewing(idOfBackedUpFactorSource: FactorSourceIdFromHash?) // `nil` means it was already marked as backed up
+		case backedUp(FactorSourceIdFromHash)
 	}
 
 	struct Destination: DestinationReducer {
@@ -79,6 +77,10 @@ struct DisplayMnemonic: Sendable, FeatureReducer {
 	@Dependency(\.userDefaults) var userDefaults
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.dismiss) var dismiss
+	#if DEBUG
+	@Dependency(\.pasteboardClient) var pasteboardClient
+	#endif
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -89,10 +91,13 @@ struct DisplayMnemonic: Sendable, FeatureReducer {
 			return markAsBackedUpIfNeeded(&state)
 
 		case .closeButtonTapped:
-			if state.context == .fromBackupPrompt {
-				return markAsBackedUpIfNeeded(&state)
-			}
+			return markAsBackedUpIfNeeded(&state)
+		#if DEBUG
+		case .debugCopy:
+			let phrase = state.words.elements.map(\.element.word).joined(separator: " ")
+			pasteboardClient.copyString(phrase)
 			return .none
+		#endif
 		}
 	}
 
@@ -103,14 +108,15 @@ struct DisplayMnemonic: Sendable, FeatureReducer {
 			return .none
 
 		case .backupConfirmation(.userHasNotBackedUp):
-			loggerGlobal.notice("User have not backed up")
-			return .send(.delegate(.doneViewing(idOfBackedUpFactorSource: nil)))
+			return .run { _ in
+				await dismiss()
+			}
 
 		case .verifyMnemonic(.delegate(.mnemonicVerified)):
 			let factorSourceID = state.factorSourceID
 			return .run { send in
 				try userDefaults.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
-				await send(.delegate(.doneViewing(idOfBackedUpFactorSource: factorSourceID)))
+				await send(.delegate(.backedUp(factorSourceID)))
 			} catch: { error, _ in
 				loggerGlobal.error("Failed to save mnemonic as backed up")
 				errorQueue.schedule(error)
@@ -124,7 +130,9 @@ struct DisplayMnemonic: Sendable, FeatureReducer {
 	private func markAsBackedUpIfNeeded(_ state: inout State) -> Effect<Action> {
 		let listOfBackedUpMnemonics = userDefaults.getFactorSourceIDOfBackedUpMnemonics()
 		if listOfBackedUpMnemonics.contains(state.factorSourceID) {
-			return .send(.delegate(.doneViewing(idOfBackedUpFactorSource: nil))) // user has already marked this mnemonic as "backed up"
+			return .run { _ in
+				await dismiss()
+			}
 		} else {
 			state.destination = .askUserIfTheyHaveBackedUpMnemonic()
 			return .none

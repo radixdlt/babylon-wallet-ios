@@ -35,61 +35,9 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 		let warning: String?
 		let warningOnContinue: OnContinueWarning?
 
-		struct ReadonlyMode: Sendable, Hashable {
-			enum Context: Sendable, Hashable {
-				case fromSettings
-				case fromBackupPrompt
-			}
-
-			let context: Context
-
-			// FIXME: This aint pretty... but we are short on time, forgive me... we are putting WAY
-			// to much logic and responsibility into this reducer here... for when a mnemonic is displayed
-			// either from settings or from AccountDetails after user have pressed "Back up this mnemonic"
-			// prompt, we need to able to mark a mnemonic as "backed up by user", we do so by use of
-			// `FactorSourceIDFromHash` - which require a FactorSourceKind....
-			let factorSourceID: FactorSourceIDFromHash
-
-			init(context: Context, factorSourceID: FactorSourceIDFromHash) {
-				self.context = context
-				self.factorSourceID = factorSourceID
-			}
-		}
-
-		struct WriteMode: Sendable, Hashable {
-			var isProgressing: Bool
-			let persistStrategy: PersistStrategy?
-			let showCloseButton: Bool
-		}
-
-		enum Mode: Sendable, Hashable {
-			case readonly(ReadonlyMode)
-			case write(WriteMode)
-			var readonly: ReadonlyMode? {
-				switch self {
-				case let .readonly(value): value
-				case .write: nil
-				}
-			}
-
-			var write: WriteMode? {
-				switch self {
-				case .readonly: nil
-				case let .write(value): value
-				}
-			}
-
-			mutating func update(isProgressing: Bool) {
-				guard var write = self.write else {
-					assertionFailure("Expected write mode")
-					return
-				}
-				write.isProgressing = isProgressing
-				self = .write(write)
-			}
-		}
-
-		var mode: Mode
+		var isProgressing: Bool
+		let persistStrategy: PersistStrategy?
+		let showCloseButton: Bool
 
 		@PresentationState
 		var destination: Destination.State?
@@ -144,13 +92,9 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 		) {
 			precondition(wordCount.rawValue.isMultiple(of: UInt8(ImportMnemonic.wordsPerRow)))
 
-			self.mode = .write(
-				.init(
-					isProgressing: false,
-					persistStrategy: persistStrategy,
-					showCloseButton: showCloseButton
-				)
-			)
+			self.isProgressing = false
+			self.persistStrategy = persistStrategy
+			self.showCloseButton = showCloseButton
 			self.grid = .init(count: wordCount, language: language, isWordCountFixed: isWordCountFixed)
 			self.isWordCountFixed = isWordCountFixed
 			self.bip39Passphrase = bip39Passphrase
@@ -158,23 +102,6 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 			self.header = header
 			self.warning = warning
 			self.warningOnContinue = warningOnContinue
-		}
-
-		init(
-			header: Header? = nil,
-			warning: String? = nil,
-			mnemonicWithPassphrase: MnemonicWithPassphrase,
-			readonlyMode: ReadonlyMode
-		) {
-			self.header = header
-			self.warning = warning
-			self.warningOnContinue = nil
-
-			let mnemonic = mnemonicWithPassphrase.mnemonic
-			self.grid = .init(mnemonic: mnemonic)
-			self.mode = .readonly(readonlyMode)
-			self.isWordCountFixed = true
-			self.bip39Passphrase = mnemonicWithPassphrase.passphrase
 		}
 
 		struct Header: Sendable, Hashable {
@@ -191,9 +118,7 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 	enum ViewAction: Sendable, Equatable {
 		case toggleModeButtonTapped
 		case passphraseChanged(String)
-		case doneViewing
 		case closeButtonTapped
-		case backButtonTapped
 		case continueButtonTapped(Mnemonic)
 	}
 
@@ -215,27 +140,17 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 		case persistedNewFactorSourceInProfile(FactorSource)
 		case persistedMnemonicInKeychainOnly(FactorSource)
 		case notPersisted(MnemonicWithPassphrase)
-		case doneViewing(idOfBackedUpFactorSource: FactorSourceIdFromHash?) // `nil` means it was already marked as backed up
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
-			case backupConfirmation(AlertState<Action.BackupConfirmation>)
 			case onContinueWarning(AlertState<Action.OnContinueWarning>)
-			case verifyMnemonic(VerifyMnemonic.State)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
-			case backupConfirmation(BackupConfirmation)
 			case onContinueWarning(OnContinueWarning)
-			case verifyMnemonic(VerifyMnemonic.Action)
-
-			enum BackupConfirmation: Sendable, Hashable {
-				case userHasBackedUp
-				case userHasNotBackedUp
-			}
 
 			enum OnContinueWarning: Sendable, Hashable {
 				case buttonTapped
@@ -243,9 +158,7 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 		}
 
 		var body: some Reducer<State, Action> {
-			Scope(state: \.verifyMnemonic, action: \.verifyMnemonic) {
-				VerifyMnemonic()
-			}
+			EmptyReducer()
 		}
 	}
 
@@ -294,18 +207,8 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 
 			return continueWithMnemonic(mnemonic: mnemonic, in: &state)
 
-		case .doneViewing:
-			assert(state.mode.readonly != nil)
-			return markAsBackedUpIfNeeded(&state)
-
-		case .backButtonTapped:
-			assert(state.mode.readonly?.context == .fromSettings)
-			return markAsBackedUpIfNeeded(&state)
-
 		case .closeButtonTapped:
-			if state.mode.readonly?.context == .fromBackupPrompt {
-				return markAsBackedUpIfNeeded(&state)
-			} else if state.mode.write?.showCloseButton == true {
+			if state.showCloseButton == true {
 				return .run { _ in await dismiss() }
 			} else {
 				assertionFailure("Invalid mode: No close button should be visible")
@@ -315,16 +218,13 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 	}
 
 	private func continueWithMnemonic(mnemonic: Mnemonic, in state: inout State) -> Effect<Action> {
-		guard let write = state.mode.write else {
-			preconditionFailure("expected write mode")
-		}
-		state.mode.update(isProgressing: true)
+		state.isProgressing = true
 		let mnemonicWithPassphrase = MnemonicWithPassphrase(
 			mnemonic: mnemonic,
 			passphrase: state.bip39Passphrase
 		)
-		guard let persistStrategy = write.persistStrategy else {
-			state.mode.update(isProgressing: false)
+		guard let persistStrategy = state.persistStrategy else {
+			state.isProgressing = false
 			return .send(.delegate(.notPersisted(mnemonicWithPassphrase)))
 		}
 		switch persistStrategy.location {
@@ -346,30 +246,16 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 		}
 	}
 
-	private func markAsBackedUpIfNeeded(_ state: inout State) -> Effect<Action> {
-		guard let factorSourceID = state.mode.readonly?.factorSourceID else {
-			return .none
-		}
-
-		let listOfBackedUpMnemonics = userDefaults.getFactorSourceIDOfBackedUpMnemonics()
-		if listOfBackedUpMnemonics.contains(factorSourceID) {
-			return .send(.delegate(.doneViewing(idOfBackedUpFactorSource: nil))) // user has already marked this mnemonic as "backed up"
-		} else {
-			state.destination = .askUserIfSheHasBackedUpMnemonic()
-			return .none
-		}
-	}
-
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .saveFactorSourceResult(.failure(error)):
-			state.mode.update(isProgressing: false)
+			state.isProgressing = false
 			errorQueue.schedule(error)
 			loggerGlobal.error("Failed to save mnemonic in profile, error: \(error)")
 			return .none
 
 		case let .saveFactorSourceResult(.success(saved)):
-			state.mode.update(isProgressing: false)
+			state.isProgressing = false
 			overlayWindowClient.scheduleHUD(.seedPhraseImported)
 			let factorSource = saved.factorSource
 
@@ -383,17 +269,6 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case .backupConfirmation(.userHasBackedUp):
-			guard let mnemonic = state.mnemonic else {
-				return .none
-			}
-			state.destination = .verifyMnemonic(.init(mnemonic: mnemonic))
-			return .none
-
-		case .backupConfirmation(.userHasNotBackedUp):
-			loggerGlobal.notice("User have not backed up")
-			return .send(.delegate(.doneViewing(idOfBackedUpFactorSource: nil)))
-
 		case .onContinueWarning(.buttonTapped):
 			guard let mnemonic = state.mnemonic else {
 				loggerGlobal.error("Can't read mnemonic")
@@ -402,37 +277,11 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 				return .none
 			}
 			return continueWithMnemonic(mnemonic: mnemonic, in: &state)
-
-		case .verifyMnemonic(.delegate(.mnemonicVerified)):
-			guard let factorSourceID = state.mode.readonly?.factorSourceID else {
-				return .none
-			}
-			return .run { send in
-				try userDefaults.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
-				await send(.delegate(.doneViewing(idOfBackedUpFactorSource: factorSourceID)))
-			} catch: { error, _ in
-				loggerGlobal.error("Failed to save mnemonic as backed up")
-				errorQueue.schedule(error)
-			}
-
-		default:
-			return .none
 		}
 	}
 }
 
 extension ImportMnemonic.Destination.State {
-	fileprivate static func askUserIfSheHasBackedUpMnemonic() -> Self {
-		.backupConfirmation(.init(
-			title: { TextState(L10n.ImportMnemonic.BackedUpAlert.title) },
-			actions: {
-				ButtonState(action: .userHasBackedUp, label: { TextState(L10n.ImportMnemonic.BackedUpAlert.confirmAction) })
-				ButtonState(action: .userHasNotBackedUp, label: { TextState(L10n.ImportMnemonic.BackedUpAlert.noAction) })
-			},
-			message: { TextState(L10n.ImportMnemonic.BackedUpAlert.message) }
-		))
-	}
-
 	fileprivate static func onContinueWarning(
 		_ warning: ImportMnemonic.State.OnContinueWarning
 	) -> Self {

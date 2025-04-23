@@ -86,7 +86,7 @@ extension AddFactorSource {
 					builder = builder.generateNewMnemonic()
 				}
 				if let mnemonic = try? Mnemonic(words: state.deviceMnemonicBuilder.getWords()) {
-					state.grid = .init(mnemonic: mnemonic, isReadOnlyMode: true)
+					state.grid = .init(mnemonic: mnemonic)
 				}
 				return .none
 			case .confirmButtonTapped:

@@ -84,7 +84,7 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 
 		case .viewSeedPhraseTapped:
 			return exportMnemonic(integrity: state.integrity) {
-				state.destination = .displayMnemonic(.init(mnemonic: $0.mnemonicWithPassphrase.mnemonic, context: .fromSettings, factorSourceID: $0.factorSourceID))
+				state.destination = .displayMnemonic(.init(mnemonic: $0.mnemonicWithPassphrase.mnemonic, factorSourceID: $0.factorSourceID))
 			}
 
 		case .enterSeedPhraseTapped:
