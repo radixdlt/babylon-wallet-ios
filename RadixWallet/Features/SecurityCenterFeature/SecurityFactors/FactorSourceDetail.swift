@@ -1,5 +1,7 @@
 // MARK: - FactorSourceDetail
+@Reducer
 struct FactorSourceDetail: Sendable, FeatureReducer {
+	@ObservableState
 	struct State: Sendable, Hashable {
 		let integrity: FactorSourceIntegrity
 		var name: String
@@ -11,13 +13,15 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 			self.lastUsed = integrity.factorSource.asGeneral.common.lastUsedOn
 		}
 
-		@PresentationState
+		@Presents
 		var destination: Destination.State?
 
 		var factorSource: FactorSource {
 			integrity.factorSource
 		}
 	}
+
+	typealias Action = FeatureAction<Self>
 
 	enum ViewAction: Sendable, Equatable {
 		case renameTapped
@@ -54,7 +58,6 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 			}
 			Scope(state: \.displayMnemonic, action: \.displayMnemonic) {
 				DisplayMnemonic()
-					._printChanges()
 			}
 			Scope(state: \.importMnemonics, action: \.importMnemonics) {
 				ImportMnemonicsFlowCoordinator()
@@ -81,7 +84,7 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 
 		case .viewSeedPhraseTapped:
 			return exportMnemonic(integrity: state.integrity) {
-				state.destination = .displayMnemonic(.export($0, title: L10n.RevealSeedPhrase.title, context: .fromSettings))
+				state.destination = .displayMnemonic(.init(mnemonic: $0.mnemonicWithPassphrase.mnemonic, context: .fromSettings, factorSourceID: $0.factorSourceID))
 			}
 
 		case .enterSeedPhraseTapped:

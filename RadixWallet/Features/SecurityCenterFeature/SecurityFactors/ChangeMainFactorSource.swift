@@ -36,7 +36,17 @@ struct ChangeMainFactorSource: Sendable, FeatureReducer {
 		switch viewAction {
 		case .task:
 			return .run { [kind = state.kind, current = state.currentMain] send in
-				let factorSources = try await factorSourcesClient.getFactorSources(matching: { $0.kind == kind && $0 != current })
+				let factorSources = try await factorSourcesClient.getFactorSources(matching: {
+					guard $0.kind == kind, $0 != current else {
+						return false
+					}
+
+					if case let .device(device) = $0 {
+						return device.supportsBabylon
+					}
+
+					return true
+				})
 				await send(.internal(.setFactorSources(factorSources.elements)))
 			} catch: { error, _ in
 				errorQueue.schedule(error)

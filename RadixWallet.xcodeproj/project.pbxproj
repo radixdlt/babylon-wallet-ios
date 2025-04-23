@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -863,6 +863,9 @@
 		83EE48E02B8F68B5006CE672 /* FiatWorth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE48DF2B8F68B5006CE672 /* FiatWorth.swift */; };
 		83EE48E22B8F69D6006CE672 /* ResourceAmount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE48E12B8F69D6006CE672 /* ResourceAmount.swift */; };
 		83FDF7EC2AF260D600D9AA8B /* ProgrammaticScryptoSborValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FDF7EB2AF260D600D9AA8B /* ProgrammaticScryptoSborValue.swift */; };
+		A00697C72DB8BE8900810D36 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A00697C62DB8BE8900810D36 /* Sargon */; };
+		A00697CB2DB8D3A900810D36 /* DisplayMnemonic.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00697C92DB8D3A900810D36 /* DisplayMnemonic.swift */; };
+		A00697CC2DB8D3A900810D36 /* DisplayMnemonic+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00697CA2DB8D3A900810D36 /* DisplayMnemonic+View.swift */; };
 		A08BBA602DAD49D500534B67 /* InteractionReview-ShieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08BBA5E2DAD49D500534B67 /* InteractionReview-ShieldView.swift */; };
 		A08BBA622DAE330700534B67 /* AddFactorSource-ConfirmSeedPhrase.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08BBA612DAE330700534B67 /* AddFactorSource-ConfirmSeedPhrase.swift */; };
 		A08BBA642DAE348700534B67 /* AddFactorSource-ConfirmSeedPhrase+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08BBA632DAE347E00534B67 /* AddFactorSource-ConfirmSeedPhrase+View.swift */; };
@@ -2191,6 +2194,8 @@
 		83EE48DF2B8F68B5006CE672 /* FiatWorth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiatWorth.swift; sourceTree = "<group>"; };
 		83EE48E12B8F69D6006CE672 /* ResourceAmount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceAmount.swift; sourceTree = "<group>"; };
 		83FDF7EB2AF260D600D9AA8B /* ProgrammaticScryptoSborValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValue.swift; sourceTree = "<group>"; };
+		A00697C92DB8D3A900810D36 /* DisplayMnemonic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayMnemonic.swift; sourceTree = "<group>"; };
+		A00697CA2DB8D3A900810D36 /* DisplayMnemonic+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DisplayMnemonic+View.swift"; sourceTree = "<group>"; };
 		A08BBA5E2DAD49D500534B67 /* InteractionReview-ShieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InteractionReview-ShieldView.swift"; sourceTree = "<group>"; };
 		A08BBA612DAE330700534B67 /* AddFactorSource-ConfirmSeedPhrase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSource-ConfirmSeedPhrase.swift"; sourceTree = "<group>"; };
 		A08BBA632DAE347E00534B67 /* AddFactorSource-ConfirmSeedPhrase+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSource-ConfirmSeedPhrase+View.swift"; sourceTree = "<group>"; };
@@ -2698,6 +2703,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A00697C72DB8BE8900810D36 /* Sargon in Frameworks */,
 				5B68F2A12D4118B000181CD7 /* (null) in Frameworks */,
 				48FFFABE2ADC209100B2B213 /* NukeUI in Frameworks */,
 				48FFFA9F2ADC1F2700B2B213 /* KeychainAccess in Frameworks */,
@@ -2918,7 +2924,7 @@
 				48CFBDBC2ADC10D800E77A5C /* CreateAccount */,
 				48CFBDCB2ADC10D800E77A5C /* NewConnectionFeature */,
 				48CFBDD62ADC10D800E77A5C /* ScanQR */,
-				48CFBDE12ADC10D800E77A5C /* ImportMnemonic */,
+				48CFBDE12ADC10D800E77A5C /* MnemonicFeature */,
 				48CFBDEB2ADC10D800E77A5C /* FeaturesPreviewer */,
 				48CFBDF42ADC10D800E77A5C /* DappInteractionFeature */,
 				48CFBE1C2ADC10D800E77A5C /* ImportOlympiaLedgerAccountsAndFactorSources */,
@@ -3882,16 +3888,17 @@
 			path = ScanQR;
 			sourceTree = "<group>";
 		};
-		48CFBDE12ADC10D800E77A5C /* ImportMnemonic */ = {
+		48CFBDE12ADC10D800E77A5C /* MnemonicFeature */ = {
 			isa = PBXGroup;
 			children = (
+				A00697C82DB8D38C00810D36 /* DisplayMnemonic */,
 				83856D642B0279100026452A /* VerifyMnemonic */,
 				48CFBDE62ADC10D800E77A5C /* ImportWord */,
 				5BC18AB42D4BE548008F25A5 /* ImportMnemonicGrid */,
 				48CFBDE92ADC10D800E77A5C /* ImportMnemonic.swift */,
 				48CFBDEA2ADC10D800E77A5C /* ImportMnemonic+View.swift */,
 			);
-			path = ImportMnemonic;
+			path = MnemonicFeature;
 			sourceTree = "<group>";
 		};
 		48CFBDE62ADC10D800E77A5C /* ImportWord */ = {
@@ -6194,6 +6201,15 @@
 			path = AssetTransferTests;
 			sourceTree = "<group>";
 		};
+		A00697C82DB8D38C00810D36 /* DisplayMnemonic */ = {
+			isa = PBXGroup;
+			children = (
+				A00697C92DB8D3A900810D36 /* DisplayMnemonic.swift */,
+				A00697CA2DB8D3A900810D36 /* DisplayMnemonic+View.swift */,
+			);
+			path = DisplayMnemonic;
+			sourceTree = "<group>";
+		};
 		A08BBA5F2DAD49D500534B67 /* Shield */ = {
 			isa = PBXGroup;
 			children = (
@@ -7549,6 +7565,7 @@
 				A0C673062DA6BD7F0071606B /* ScreenshotPreventingSwiftUI */,
 				A08BBA6A2DAE973700534B67 /* Sargon */,
 				A0FDC0152DB7BAE900F571BA /* Sargon */,
+				A00697C62DB8BE8900810D36 /* Sargon */,
 			);
 			productName = RadixWallet;
 			productReference = 48CFBC4F2ADC106300E77A5C /* Radix Wallet Dev.app */;
@@ -7611,7 +7628,7 @@
 				5B1C4FD32BBB0B0C00B9436F /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Strict" */,
 				8318BB172BC8403800057BCB /* XCRemoteSwiftPackageReference "swift-custom-dump" */,
 				A0C673032DA6BD7F0071606B /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */,
-				A0FDC0142DB7BAE900F571BA /* XCLocalSwiftPackageReference "../sargon" */,
+				A00697C52DB8BE8900810D36 /* XCRemoteSwiftPackageReference "sargon" */,
 			);
 			productRefGroup = 48CFBC502ADC106300E77A5C /* Products */;
 			projectDirPath = "";
@@ -8826,6 +8843,8 @@
 				5BD1E6E02D527C87004145D4 /* SpotCheck.swift in Sources */,
 				5BBC43A92BBAC6B0005747B1 /* AppTextEditor.swift in Sources */,
 				A41266F12B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift in Sources */,
+				A00697CB2DB8D3A900810D36 /* DisplayMnemonic.swift in Sources */,
+				A00697CC2DB8D3A900810D36 /* DisplayMnemonic+View.swift in Sources */,
 				48CFC2652ADC10D900E77A5C /* EditPersonaAddEntryKinds.swift in Sources */,
 				48CFC5E42ADC10DA00E77A5C /* AppearanceID+Extra.swift in Sources */,
 				A40815532C7E0D08005E65B9 /* AccountAuthorizedDepositorsResourceBadge.swift in Sources */,
@@ -9526,13 +9545,6 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		A0FDC0142DB7BAE900F571BA /* XCLocalSwiftPackageReference "../sargon" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../sargon;
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCRemoteSwiftPackageReference section */
 		48FFFA972ADC1EEC00B2B213 /* XCRemoteSwiftPackageReference "AsyncExtensions" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -9718,6 +9730,14 @@
 				version = 1.3.2;
 			};
 		};
+		A00697C52DB8BE8900810D36 /* XCRemoteSwiftPackageReference "sargon" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/radixdlt/sargon";
+			requirement = {
+				kind = exactVersion;
+				version = 1.2.13;
+			};
+		};
 		A0C673032DA6BD7F0071606B /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/GhenadieVP/ScreenshotPreventing-iOS";
@@ -9882,6 +9902,11 @@
 		};
 		83BE7C522D51F40100AF5D28 /* Sargon */ = {
 			isa = XCSwiftPackageProductDependency;
+			productName = Sargon;
+		};
+		A00697C62DB8BE8900810D36 /* Sargon */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A00697C52DB8BE8900810D36 /* XCRemoteSwiftPackageReference "sargon" */;
 			productName = Sargon;
 		};
 		A08BBA6A2DAE973700534B67 /* Sargon */ = {

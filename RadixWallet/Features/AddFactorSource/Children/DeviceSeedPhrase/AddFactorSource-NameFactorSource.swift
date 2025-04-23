@@ -69,7 +69,6 @@ extension AddFactorSource {
 				state.sanitizedName = NonEmpty(rawValue: name.trimmingWhitespacesAndNewlines())
 				return .none
 			case let .saveTapped(name):
-				let kind = state.kind
 				let mwp = state.deviceMnemonicBuilder.getMnemonicWithPassphrase()
 				let fsId = state.deviceMnemonicBuilder.getFactorSourceId()
 				state.isAddingFactorSource = true

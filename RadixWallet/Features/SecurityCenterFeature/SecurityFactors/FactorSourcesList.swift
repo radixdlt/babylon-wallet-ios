@@ -79,6 +79,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 		var body: some ReducerOf<Self> {
 			Scope(state: \.detail, action: \.detail) {
 				FactorSourceDetail()
+					._printChanges()
 			}
 			Scope(state: \.displayMnemonic, action: \.displayMnemonic) {
 				DisplayMnemonic()
@@ -147,7 +148,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 
 			case .seedPhraseNotRecoverable:
 				return exportMnemonic(integrity: row.integrity) {
-					state.destination = .displayMnemonic(.export($0, title: L10n.RevealSeedPhrase.title, context: .fromSettings))
+					state.destination = .displayMnemonic(.init(mnemonic: $0.mnemonicWithPassphrase.mnemonic, context: .fromSettings, factorSourceID: $0.factorSourceID))
 				}
 
 			case .lostFactorSource:
@@ -320,7 +321,9 @@ private extension FactorSourcesList {
 			}
 
 			// Determine row selectability
-			let selectability: State.Row.Selectability = if status == .lostFactorSource {
+			let selectability: State.Row.Selectability = if state.context == .display {
+				.selectable
+			} else if status == .lostFactorSource {
 				.unselectable
 			} else if alreadySelectedFactorSourceIds.contains(entity.integrity.factorSource.id) {
 				.alreadySelected
