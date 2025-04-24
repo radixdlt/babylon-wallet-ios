@@ -148,8 +148,8 @@ extension InteractionReview.Sections {
 		case let .ids(resourceAddress, ids):
 			return try await onLedgerEntitiesClient.nonFungibleResourceBalances(
 				resourceInfo,
-				resourceAddress: resourceAddress,
-				ids: ids
+				resourceQuantifier: .guaranteed(ids: ids),
+				resourceAddress: resourceAddress
 			)
 			.map(\.toResourceBalance)
 		}
@@ -185,8 +185,8 @@ extension InteractionReview.Sections {
 							contentsOf:
 							onLedgerEntitiesClient.nonFungibleResourceBalances(
 								resourceInfo,
-								resourceAddress: resourceAddress,
-								ids: bounds.certainIds
+								resourceQuantifier: .guaranteed(ids: bounds.certainIds),
+								resourceAddress: resourceAddress
 							)
 							.map(\.toResourceBalance)
 						)
