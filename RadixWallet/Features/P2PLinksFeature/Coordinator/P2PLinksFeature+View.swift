@@ -109,7 +109,7 @@ private extension View {
 
 	private func updateName(with destinationStore: PresentationStoreOf<P2PLinksFeature.Destination>) -> some View {
 		sheet(store: destinationStore.scope(state: \.updateName, action: \.updateName)) {
-			UpdateP2PLinkName.View(store: $0)
+			RenameLabel.View(store: $0)
 		}
 	}
 }

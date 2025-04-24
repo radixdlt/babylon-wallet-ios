@@ -34,7 +34,7 @@ extension InteractionReview.Sections {
 					partialResult[next.resourceAddress] = .left(next)
 				}
 
-			newlyCreatedMetadata.append(contentsOf: existingResourceDetails)
+			newlyCreatedMetadata.merge(existingResourceDetails) { $1 }
 
 			return newlyCreatedMetadata
 		}
@@ -298,6 +298,23 @@ extension InteractionReview.Sections {
 				deposits: deposits,
 				accountDeletion: deleteAccounts
 			)
+
+		case let .securifyEntity(entityAddress, metadata):
+			guard let entity = try await extractEntity(entityAddress) else { return nil }
+
+			let shield = try SargonOs.shared.securityStructureOfFactorSourceIdsBySecurityStructureId(
+				shieldId: metadata.id
+			)
+
+			let allFactorSourcesFromProfile = try await factorSourcesClient.getFactorSources().elements
+
+			return Common.SectionsData(
+				shieldUpdate: .init(
+					entity: entity,
+					shield: shield,
+					allFactorSourcesFromProfile: allFactorSourcesFromProfile
+				)
+			)
 		}
 	}
 
@@ -315,6 +332,17 @@ extension InteractionReview.Sections {
 					return .external(address, approved: false)
 				}
 			}
+	}
+
+	func extractEntity(_ address: AddressOfAccountOrPersona) async throws -> AccountOrPersona? {
+		switch address {
+		case let .account(accountAddress):
+			let account = try await accountsClient.getAccountByAddress(accountAddress)
+			return .account(account)
+		case let .identity(identityAddress):
+			let persona = try await personasClient.getPersona(id: identityAddress)
+			return .persona(persona)
+		}
 	}
 
 	func extractDappAddresses(encounteredAddresses: [ManifestEncounteredComponentAddress]) -> [Address] {

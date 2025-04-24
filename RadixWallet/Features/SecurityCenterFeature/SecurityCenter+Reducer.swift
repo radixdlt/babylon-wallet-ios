@@ -4,8 +4,8 @@ import ComposableArchitecture
 struct SecurityCenter: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		var problems: [SecurityProblem] = []
-		var actionsRequired: Set<SecurityProblem.ProblemType> {
-			Set(problems.map(\.type))
+		var actionsRequired: Set<SecurityProblemKind> {
+			Set(problems.map(\.kind))
 		}
 
 		@PresentationState
@@ -19,16 +19,22 @@ struct SecurityCenter: Sendable, FeatureReducer {
 		enum State: Sendable, Hashable {
 			case configurationBackup(ConfigurationBackup.State)
 			case securityFactors(SecurityFactors.State)
-			case displayMnemonics(DisplayMnemonics.State)
+			case deviceFactorSources(FactorSourcesList.State)
 			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
+			case securityShieldsSetup(ShieldSetupCoordinator.State)
+			case securityShieldsList(ShieldsList.State)
+			case applyShield(ApplyShield.Coordinator.State)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
 			case configurationBackup(ConfigurationBackup.Action)
 			case securityFactors(SecurityFactors.Action)
-			case displayMnemonics(DisplayMnemonics.Action)
+			case deviceFactorSources(FactorSourcesList.Action)
 			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
+			case securityShieldsSetup(ShieldSetupCoordinator.Action)
+			case securityShieldsList(ShieldsList.Action)
+			case applyShield(ApplyShield.Coordinator.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -38,11 +44,20 @@ struct SecurityCenter: Sendable, FeatureReducer {
 			Scope(state: \.securityFactors, action: \.securityFactors) {
 				SecurityFactors()
 			}
-			Scope(state: \.displayMnemonics, action: \.displayMnemonics) {
-				DisplayMnemonics()
+			Scope(state: \.deviceFactorSources, action: \.deviceFactorSources) {
+				FactorSourcesList()
 			}
 			Scope(state: \.importMnemonics, action: \.importMnemonics) {
 				ImportMnemonicsFlowCoordinator()
+			}
+			Scope(state: \.securityShieldsSetup, action: \.securityShieldsSetup) {
+				ShieldSetupCoordinator()
+			}
+			Scope(state: \.securityShieldsList, action: \.securityShieldsList) {
+				ShieldsList()
+			}
+			Scope(state: \.applyShield, action: \.applyShield) {
+				ApplyShield.Coordinator()
 			}
 		}
 	}
@@ -50,7 +65,7 @@ struct SecurityCenter: Sendable, FeatureReducer {
 	enum ViewAction: Sendable, Equatable {
 		case task
 		case problemTapped(SecurityProblem)
-		case cardTapped(SecurityProblem.ProblemType)
+		case cardTapped(SecurityProblemKind)
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -59,7 +74,7 @@ struct SecurityCenter: Sendable, FeatureReducer {
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(destinationPath, action: /Action.destination) {
+			.ifLet(destinationPath, action: \.destination) {
 				Destination()
 			}
 	}
@@ -76,7 +91,7 @@ struct SecurityCenter: Sendable, FeatureReducer {
 		case let .problemTapped(problem):
 			switch problem {
 			case .problem3:
-				state.destination = .displayMnemonics(.init())
+				state.destination = .deviceFactorSources(.init(kind: .device))
 
 			case .problem5, .problem6, .problem7:
 				state.destination = .configurationBackup(.init())
@@ -88,6 +103,17 @@ struct SecurityCenter: Sendable, FeatureReducer {
 
 		case let .cardTapped(type):
 			switch type {
+			case .securityShields:
+				let shields = (try? SargonOs.shared.securityStructuresOfFactorSourceIds()) ?? []
+
+				if shields.isEmpty {
+					state.destination = .securityShieldsSetup(.init())
+				} else {
+					state.destination = .securityShieldsList(.init())
+				}
+
+				return .none
+
 			case .securityFactors:
 				state.destination = .securityFactors(.init())
 				return .none
@@ -109,7 +135,17 @@ struct SecurityCenter: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case .importMnemonics(.delegate(.finishedEarly)), .importMnemonics(.delegate(.finishedImportingMnemonics)):
+		case .importMnemonics(.delegate(.finishedEarly)),
+		     .importMnemonics(.delegate(.finishedImportingMnemonics)):
+			state.destination = nil
+			return .none
+		case let .securityShieldsSetup(.delegate(.finished(shieldID))):
+			state.destination = .applyShield(.init(shieldID: shieldID))
+			return .none
+		case .applyShield(.delegate(.skipped)):
+			state.destination = .securityShieldsList(.init())
+			return .none
+		case .applyShield(.delegate(.finished)):
 			state.destination = nil
 			return .none
 		default:

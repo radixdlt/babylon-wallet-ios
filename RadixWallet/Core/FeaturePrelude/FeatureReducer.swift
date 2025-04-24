@@ -209,4 +209,32 @@ extension FeatureReducer {
 		}
 		return .none
 	}
+
+	func exportMnemonic(
+		integrity: FactorSourceIntegrity,
+		onSuccess: (SimplePrivateFactorSource) -> Void
+	) -> Effect<Action> {
+		guard let factorSourceId = integrity.factorSourceIdOfMnemonicToExport else {
+			return .none
+		}
+		return exportMnemonic(factorSourceID: factorSourceId, onSuccess: onSuccess)
+	}
+
+	func updateFactorSourceLastUsedEffect(factorSourceId: FactorSourceID) -> Effect<Action> {
+		@Dependency(\.factorSourcesClient) var factorSourcesClient
+		return .run { _ in
+			try? await factorSourcesClient.updateLastUsed(.init(factorSourceId: factorSourceId))
+		}
+	}
+}
+
+private extension FactorSourceIntegrity {
+	var factorSourceIdOfMnemonicToExport: FactorSourceIdFromHash? {
+		switch self {
+		case let .device(device):
+			device.factorSource.id
+		case .ledger, .offDeviceMnemonic, .arculusCard, .password:
+			nil
+		}
+	}
 }

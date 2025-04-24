@@ -1,4 +1,4 @@
-import ScreenshotPreventing
+import ScreenshotPreventingSwiftUI
 import SwiftUINavigation
 
 // MARK: - AppTextField

@@ -35,7 +35,8 @@ extension SecureStorageClient: TestDependencyKey {
 		keychainChanged: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		getAllMnemonics: { [] },
 		loadMnemonicDataByFactorSourceID: { _ in nil },
-		saveMnemonicForFactorSourceData: { _, _ in }
+		saveMnemonicForFactorSourceData: { _, _ in },
+		containsDataForKey: { _ in false }
 	)
 	#else
 	static let noop = Self(
@@ -63,7 +64,8 @@ extension SecureStorageClient: TestDependencyKey {
 		saveP2PLinksPrivateKey: { _ in },
 		keychainChanged: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		loadMnemonicDataByFactorSourceID: { _ in nil },
-		saveMnemonicForFactorSourceData: { _, _ in }
+		saveMnemonicForFactorSourceData: { _, _ in },
+		containsDataForKey: { _ in false }
 	)
 	#endif // DEBUG
 
@@ -75,7 +77,7 @@ extension SecureStorageClient: TestDependencyKey {
 		saveProfileSnapshotData: unimplemented("\(Self.self).keychainChanged"),
 		saveMnemonicForFactorSource: unimplemented("\(Self.self).saveMnemonicForFactorSource"),
 		loadMnemonicByFactorSourceID: unimplemented("\(Self.self).loadMnemonicByFactorSourceID"),
-		containsMnemonicIdentifiedByFactorSourceID: unimplemented("\(Self.self).containsMnemonicIdentifiedByFactorSourceID"),
+		containsMnemonicIdentifiedByFactorSourceID: noop.containsMnemonicIdentifiedByFactorSourceID,
 		deleteMnemonicByFactorSourceID: unimplemented("\(Self.self).deleteMnemonicByFactorSourceID"),
 		deleteProfileAndMnemonicsByFactorSourceIDs: unimplemented("\(Self.self).deleteProfileMnemonicsByFactorSourceIDs"),
 		disableCloudProfileSync: unimplemented("\(Self.self).disableCloudProfileSync"),
@@ -93,10 +95,11 @@ extension SecureStorageClient: TestDependencyKey {
 		saveP2PLinks: unimplemented("\(Self.self).saveP2PLinks"),
 		loadP2PLinksPrivateKey: unimplemented("\(Self.self).loadP2PLinksPrivateKey"),
 		saveP2PLinksPrivateKey: unimplemented("\(Self.self).saveP2PLinksPrivateKey"),
-		keychainChanged: unimplemented("\(Self.self).keychainChanged"),
-		getAllMnemonics: unimplemented("\(Self.self).getAllMnemonics"),
+		keychainChanged: noop.keychainChanged,
+		getAllMnemonics: noop.getAllMnemonics,
 		loadMnemonicDataByFactorSourceID: unimplemented("\(Self.self).keychainChanged"),
-		saveMnemonicForFactorSourceData: unimplemented("\(Self.self).keychainChanged")
+		saveMnemonicForFactorSourceData: unimplemented("\(Self.self).saveMnemonicForFactorSourceData"),
+		containsDataForKey: unimplemented("\(Self.self).containsDataForKey")
 	)
 	#else
 	static let testValue = Self(
@@ -104,7 +107,7 @@ extension SecureStorageClient: TestDependencyKey {
 		saveProfileSnapshotData: unimplemented("\(Self.self).keychainChanged"),
 		saveMnemonicForFactorSource: unimplemented("\(Self.self).saveMnemonicForFactorSource"),
 		loadMnemonicByFactorSourceID: unimplemented("\(Self.self).loadMnemonicByFactorSourceID"),
-		containsMnemonicIdentifiedByFactorSourceID: unimplemented("\(Self.self).containsMnemonicIdentifiedByFactorSourceID"),
+		containsMnemonicIdentifiedByFactorSourceID: noop.containsMnemonicIdentifiedByFactorSourceID,
 		deleteMnemonicByFactorSourceID: unimplemented("\(Self.self).deleteMnemonicByFactorSourceID"),
 		deleteProfileAndMnemonicsByFactorSourceIDs: unimplemented("\(Self.self).deleteProfileMnemonicsByFactorSourceIDs"),
 		disableCloudProfileSync: unimplemented("\(Self.self).disableCloudProfileSync"),
@@ -122,9 +125,10 @@ extension SecureStorageClient: TestDependencyKey {
 		saveP2PLinks: unimplemented("\(Self.self).saveP2PLinks"),
 		loadP2PLinksPrivateKey: unimplemented("\(Self.self).loadP2PLinksPrivateKey"),
 		saveP2PLinksPrivateKey: unimplemented("\(Self.self).saveP2PLinksPrivateKey"),
-		keychainChanged: unimplemented("\(Self.self).keychainChanged"),
+		keychainChanged: noop.keychainChanged,
 		loadMnemonicDataByFactorSourceID: unimplemented("\(Self.self).keychainChanged"),
-		saveMnemonicForFactorSourceData: unimplemented("\(Self.self).keychainChanged")
+		saveMnemonicForFactorSourceData: unimplemented("\(Self.self).saveMnemonicForFactorSourceData"),
+		containsDataForKey: unimplemented("\(Self.self).containsDataForKey")
 	)
 	#endif
 }

@@ -184,21 +184,30 @@ extension FactorSourcesClient {
 	) async throws -> IdentifiedArrayOf<Source> {
 		try await IdentifiedArrayOf(uniqueElements: getFactorSources().compactMap { $0.extract(Source.self) })
 	}
+
+	func entitiesLinkedToFactorSourceKind(kind: FactorSourceKind) async throws -> [EntitiesLinkedToFactorSource] {
+		let sources = try await getFactorSources(matching: { $0.kind == kind })
+		return try await sources.asyncMap {
+			try await SargonOS.shared.entitiesLinkedToFactorSource(factorSource: $0, profileToCheck: .current)
+		}
+	}
 }
 
 // MARK: - UpdateFactorSourceLastUsedRequest
 struct UpdateFactorSourceLastUsedRequest: Sendable, Hashable {
 	let factorSourceIDs: [FactorSourceID]
 	let lastUsedOn: Date
-	let usagePurpose: SigningPurpose
+
 	init(
 		factorSourceIDs: [FactorSourceID],
-		usagePurpose: SigningPurpose,
 		lastUsedOn: Date = .init()
 	) {
 		self.factorSourceIDs = factorSourceIDs
-		self.usagePurpose = usagePurpose
 		self.lastUsedOn = lastUsedOn
+	}
+
+	init(factorSourceId: FactorSourceID) {
+		self.init(factorSourceIDs: [factorSourceId])
 	}
 }
 

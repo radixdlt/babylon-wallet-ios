@@ -8,6 +8,7 @@ extension ChooseAccounts {
 		let selectionRequirement: SelectionRequirement
 		let selectedAccounts: [ChooseAccountsRow.State]?
 		let canCreateNewAccount: Bool
+		let showSelectAllAccounts: Bool
 
 		init(state: ChooseAccounts.State) {
 			let selectionRequirement = state.selectionRequirement
@@ -21,6 +22,7 @@ extension ChooseAccounts {
 			}
 			self.selectionRequirement = selectionRequirement
 			self.canCreateNewAccount = state.canCreateNewAccount
+			self.showSelectAllAccounts = state.showSelectAllAccounts
 
 			// If the dApp is asking for exactly(1) account and user has only one account, pre-select it
 			if case .permission = state.context,
@@ -58,7 +60,8 @@ extension ChooseAccounts {
 									send: { .selectedAccountsChanged($0) }
 								),
 								from: viewStore.availableAccounts,
-								requiring: viewStore.selectionRequirement
+								requiring: viewStore.selectionRequirement,
+								showSelectAll: viewStore.showSelectAllAccounts
 							) { item in
 								ChooseAccountsRow.View(
 									viewState: .init(state: item.value),

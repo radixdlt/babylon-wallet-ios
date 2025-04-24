@@ -2,29 +2,20 @@ import ComposableArchitecture
 import SwiftUI
 
 extension AddLedgerFactorSource.State {
-	var viewState: AddLedgerFactorSource.ViewState {
-		.init(continueButtonControlState: isWaitingForResponseFromLedger ? .loading(.local) : .enabled)
+	var continueButtonControlState: ControlState {
+		isWaitingForResponseFromLedger ? .loading(.local) : .enabled
 	}
 }
 
 // MARK: - AddLedgerFactorSource.View
 extension AddLedgerFactorSource {
-	struct ViewState: Equatable {
-		let continueButtonControlState: ControlState
-	}
-
-	@MainActor
 	struct View: SwiftUI.View {
-		private let store: StoreOf<AddLedgerFactorSource>
-
-		init(store: StoreOf<AddLedgerFactorSource>) {
-			self.store = store
-		}
+		let store: StoreOf<AddLedgerFactorSource>
 
 		var body: some SwiftUI.View {
-			NavigationStack {
-				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-					VStack(spacing: 0) {
+			WithPerceptionTracking {
+				NavigationStack {
+					VStack(spacing: .zero) {
 						ViewThatFits(in: .vertical) {
 							InnerView(small: false)
 							InnerView(small: true)
@@ -33,22 +24,22 @@ extension AddLedgerFactorSource {
 						Spacer(minLength: .small1)
 
 						Button(L10n.AddLedgerDevice.AddDevice.continue) {
-							viewStore.send(.sendAddLedgerRequestButtonTapped)
+							store.send(.view(.sendAddLedgerRequestButtonTapped))
 						}
 						.buttonStyle(.primaryRectangular)
-						.controlState(viewStore.continueButtonControlState)
+						.controlState(store.continueButtonControlState)
 						.padding(.horizontal, .medium3)
 						.padding(.bottom, .large2)
 					}
 					.toolbar {
 						ToolbarItem(placement: .cancellationAction) {
 							CloseButton {
-								viewStore.send(.closeButtonTapped)
+								store.send(.view(.closeButtonTapped))
 							}
 						}
 					}
+					.destination(store: store)
 				}
-				.destination(store: store)
 			}
 		}
 	}
@@ -57,7 +48,7 @@ extension AddLedgerFactorSource {
 		let small: Bool
 
 		var body: some SwiftUI.View {
-			VStack(spacing: 0) {
+			VStack(spacing: .zero) {
 				Image(asset: AssetResource.iconHardwareLedger)
 					.resizable()
 					.frame(small ? .veryLarge : .huge)
@@ -101,108 +92,12 @@ private extension View {
 	}
 
 	private func ledgerAlreadyExistsAlert(with destinationStore: PresentationStoreOf<AddLedgerFactorSource.Destination>) -> some View {
-		alert(
-			store: destinationStore,
-			state: /AddLedgerFactorSource.Destination.State.ledgerAlreadyExistsAlert,
-			action: AddLedgerFactorSource.Destination.Action.ledgerAlreadyExistsAlert
-		)
+		alert(store: destinationStore.scope(state: \.ledgerAlreadyExistsAlert, action: \.ledgerAlreadyExistsAlert))
 	}
 
 	private func nameLedger(with destinationStore: PresentationStoreOf<AddLedgerFactorSource.Destination>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /AddLedgerFactorSource.Destination.State.nameLedger,
-			action: AddLedgerFactorSource.Destination.Action.nameLedger,
-			destination: { NameLedgerFactorSource.View(store: $0) }
-		)
-	}
-}
-
-// MARK: - NameLedgerFactorSource
-
-extension NameLedgerFactorSource.State {
-	var viewState: NameLedgerFactorSource.ViewState {
-		.init(
-			ledgerName: ledgerName,
-			model: deviceInfo.model,
-			confirmButtonControlState: nameIsValid ? .enabled : .disabled
-		)
-	}
-}
-
-extension NameLedgerFactorSource {
-	struct ViewState: Equatable {
-		let ledgerName: String
-		let model: P2P.LedgerHardwareWallet.Model
-		let confirmButtonControlState: ControlState
-	}
-
-	@MainActor
-	struct View: SwiftUI.View {
-		private let store: StoreOf<NameLedgerFactorSource>
-
-		init(store: StoreOf<NameLedgerFactorSource>) {
-			self.store = store
-		}
-
-		var body: some SwiftUI.View {
-			NavigationStack {
-				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-					ScrollView(showsIndicators: false) {
-						VStack(spacing: 0) {
-							Text(L10n.AddLedgerDevice.NameLedger.title)
-								.textStyle(.sheetTitle)
-								.padding(.top, .small1)
-								.padding(.horizontal, .large3)
-								.padding(.bottom, .small2)
-
-							Text(L10n.AddLedgerDevice.NameLedger.subtitle)
-								.textStyle(.body1Regular)
-								.multilineTextAlignment(.center)
-								.padding(.horizontal, .large1)
-								.padding(.bottom, .large1)
-
-							Text(L10n.AddLedgerDevice.NameLedger.detectedType(viewStore.model.displayName))
-								.textStyle(.body1Header)
-								.multilineTextAlignment(.center)
-								.padding(.horizontal, .large1)
-								.padding(.bottom, .medium1)
-
-							AppTextField(
-								placeholder: "",
-								text: Binding(
-									get: { viewStore.ledgerName },
-									set: { viewStore.send(.ledgerNameChanged($0)) }
-								),
-								hint: .info(L10n.AddLedgerDevice.NameLedger.fieldHint)
-							)
-							.padding(.horizontal, .medium3)
-							.padding(.bottom, .small1)
-						}
-					}
-					.foregroundColor(.app.gray1)
-					.footer {
-						Button(L10n.AddLedgerDevice.NameLedger.continueButtonTitle) {
-							viewStore.send(.confirmNameButtonTapped)
-						}
-						.controlState(viewStore.confirmButtonControlState)
-						.buttonStyle(.primaryRectangular)
-					}
-				}
-			}
-		}
-	}
-}
-
-extension P2P.LedgerHardwareWallet.Model {
-	var displayName: String {
-		switch self {
-		case .nanoS:
-			"Ledger Nano S"
-		case .nanoSPlus:
-			"Ledger Nano S+"
-		case .nanoX:
-			"Ledger Nano X"
+		navigationDestination(store: destinationStore.scope(state: \.nameLedger, action: \.nameLedger)) {
+			NameLedgerFactorSource.View(store: $0)
 		}
 	}
 }

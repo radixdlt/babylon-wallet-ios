@@ -101,9 +101,7 @@ final class SplashFeatureTests: TestCase {
 			$0.secureStorageClient.loadProfileSnapshotData = { _ in
 				profile.jsonData()
 			}
-			$0.secureStorageClient.saveDeviceInfo = { _ in }
-			$0.secureStorageClient.loadDeviceInfo = { nil }
-			$0.secureStorageClient.deprecatedLoadDeviceID = { nil }
+			$0.secureStorageClient = .previewValue
 		}
 
 		// when

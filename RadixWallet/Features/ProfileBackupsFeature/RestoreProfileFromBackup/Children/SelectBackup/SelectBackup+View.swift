@@ -169,7 +169,7 @@ extension SelectBackup.View {
 				if isVersionCompatible {
 					RadioButton(
 						appearance: .dark,
-						state: item.isSelected ? .selected : .unselected
+						isSelected: item.isSelected
 					)
 				}
 			}

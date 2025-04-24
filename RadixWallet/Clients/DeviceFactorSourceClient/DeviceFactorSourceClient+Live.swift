@@ -15,55 +15,22 @@ extension DeviceFactorSourceClient: DependencyKey {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 		let entitiesControlledByFactorSource: GetEntitiesControlledByFactorSource = { factorSource, maybeSnapshot in
-
-			let (allNonHiddenEntities, allHiddenEntities) = try await { () -> (allNonHiddenEntities: [AccountOrPersona], allHiddenEntities: [AccountOrPersona]) in
-				let accountNonHidden: [Account]
-				let accountHidden: [Account]
-				let personasNonHidden: [Persona]
-				let personasHidden: [Persona]
-
-				if let overridingSnapshot = maybeSnapshot {
-					let networkID = NetworkID.mainnet
-					let profile = overridingSnapshot
-					let network = try profile.network(id: networkID)
-					accountNonHidden = network.getAccounts().elements
-					personasNonHidden = network.getPersonas().elements
-
-					accountHidden = network.getHiddenAccounts().elements
-					personasHidden = network.getHiddenPersonas().elements
-				} else {
-					accountNonHidden = try await accountsClient.getAccountsOnCurrentNetwork().elements
-					personasNonHidden = try await personasClient.getPersonas().elements
-
-					accountHidden = try await accountsClient.getHiddenAccountsOnCurrentNetwork().elements
-					personasHidden = try await personasClient.getHiddenPersonasOnCurrentNetwork().elements
-				}
-
-				var allNonHiddenEntities = accountNonHidden.map(AccountOrPersona.account)
-				allNonHiddenEntities.append(contentsOf: personasNonHidden.map(AccountOrPersona.persona))
-
-				var allHidden = accountHidden.map(AccountOrPersona.account)
-				allHidden.append(contentsOf: personasHidden.map(AccountOrPersona.persona))
-
-				return (allNonHiddenEntities, allHidden)
-			}()
-
-			let nonHiddenEntitiesForSource = allNonHiddenEntities.filter { entity in
-				entity.unsecuredControllingFactorInstance?.factorSourceID == factorSource.id
+			let profileToCheck: ProfileToCheck = if let maybeSnapshot {
+				.specific(maybeSnapshot)
+			} else {
+				.current
 			}
-
-			let hiddenEntitiesForSource = allHiddenEntities.filter { entity in
-				entity.unsecuredControllingFactorInstance?.factorSourceID == factorSource.id
+			let result = try await SargonOS.shared.entitiesLinkedToFactorSource(factorSource: factorSource.asGeneral, profileToCheck: profileToCheck)
+			guard case let .device(integrity) = result.integrity else {
+				struct UnexpectedFactorSource: Error {}
+				throw UnexpectedFactorSource()
 			}
-
-			let isMnemonicMarkedAsBackedUp = userDefaults.getFactorSourceIDOfBackedUpMnemonics().contains(factorSource.id)
-
 			return EntitiesControlledByFactorSource(
-				entities: nonHiddenEntitiesForSource,
-				hiddenEntities: hiddenEntitiesForSource,
+				entities: result.accounts.map(AccountOrPersona.account) + result.personas.map(AccountOrPersona.persona),
+				hiddenEntities: result.hiddenAccounts.map(AccountOrPersona.account) + result.hiddenPersonas.map(AccountOrPersona.persona),
 				deviceFactorSource: factorSource,
-				isMnemonicPresentInKeychain: secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(factorSource.id),
-				isMnemonicMarkedAsBackedUp: isMnemonicMarkedAsBackedUp
+				isMnemonicPresentInKeychain: integrity.isMnemonicPresentInSecureStorage,
+				isMnemonicMarkedAsBackedUp: integrity.isMnemonicMarkedAsBackedUp
 			)
 		}
 
@@ -137,15 +104,19 @@ extension DeviceFactorSourceClient: DependencyKey {
 			.eraseToAnyAsyncSequence()
 		}
 
+		let derivePublicKeys: DerivePublicKeys = { request in
+			let factorSourceId = request.factorSourceId
+			guard let mnemonicWithPassphrase = try secureStorageClient.loadMnemonic(factorSourceID: factorSourceId, notifyIfMissing: false) else {
+				loggerGlobal.critical("Failed to find factor source with ID: '\(factorSourceId)'")
+				throw FailedToFindFactorSource()
+			}
+			return mnemonicWithPassphrase.derivePublicKeys(
+				paths: request.derivationPaths,
+				factorSourceId: factorSourceId
+			)
+		}
+
 		return Self(
-			publicKeysFromOnDeviceHD: { request in
-				let factorSourceID = request.deviceFactorSource.id
-				let mnemonicWithPassphrase = try request.getMnemonicWithPassphrase()
-				return mnemonicWithPassphrase.derivePublicKeys(paths: request.derivationPaths)
-			},
-			signatureFromOnDeviceHD: { request in
-				request.mnemonicWithPassphrase.sign(hash: request.hashedData, path: request.derivationPath)
-			},
 			isAccountRecoveryNeeded: {
 				do {
 					let deviceFactorSource = try await factorSourcesClient.getFactorSources().babylonDeviceFactorSources().sorted(by: \.lastUsedOn).first
@@ -197,7 +168,8 @@ extension DeviceFactorSourceClient: DependencyKey {
 					try await entitiesControlledByFactorSource($0, maybeOverridingSnapshot)
 				})
 			},
-			entitiesInBadState: entitiesInBadState
+			entitiesInBadState: entitiesInBadState,
+			derivePublicKeys: derivePublicKeys
 		)
 	}
 }

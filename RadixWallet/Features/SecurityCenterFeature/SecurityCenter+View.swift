@@ -36,7 +36,7 @@ extension SecurityCenter {
 								}
 							}
 
-							ForEach(SecurityProblem.ProblemType.allCases, id: \.self) { type in
+							ForEach(SecurityProblemKind.allCases, id: \.self) { type in
 								ProblemTypeCard(type: type, actionRequired: viewStore.actionsRequired.contains(type)) {
 									store.send(.view(.cardTapped(type)))
 								}
@@ -120,7 +120,7 @@ extension SecurityCenter {
 	}
 
 	struct ProblemTypeCard: SwiftUI.View {
-		let type: SecurityProblem.ProblemType
+		let type: SecurityProblemKind
 		let actionRequired: Bool
 		let action: () -> Void
 
@@ -162,6 +162,7 @@ extension SecurityCenter {
 
 		private var image: ImageResource {
 			switch type {
+			case .securityShields: .securityShields
 			case .securityFactors: .securityFactors
 			case .configurationBackup: .configurationBackup
 			}
@@ -169,6 +170,7 @@ extension SecurityCenter {
 
 		private var title: String {
 			switch type {
+			case .securityShields: L10n.SecurityCenter.SecurityShieldsItem.title
 			case .securityFactors: L10n.SecurityCenter.SecurityFactorsItem.title
 			case .configurationBackup: L10n.SecurityCenter.ConfigurationBackupItem.title
 			}
@@ -176,6 +178,7 @@ extension SecurityCenter {
 
 		private var subtitle: String {
 			switch type {
+			case .securityShields: L10n.SecurityCenter.SecurityShieldsItem.subtitle
 			case .securityFactors: L10n.SecurityCenter.SecurityFactorsItem.subtitle
 			case .configurationBackup: L10n.SecurityCenter.ConfigurationBackupItem.subtitle
 			}
@@ -186,6 +189,7 @@ extension SecurityCenter {
 				L10n.SecurityCenter.AnyItem.actionRequiredStatus
 			} else {
 				switch type {
+				case .securityShields: L10n.SecurityCenter.SecurityShieldsItem.shieldedStatus
 				case .securityFactors: L10n.SecurityCenter.SecurityFactorsItem.activeStatus
 				case .configurationBackup: L10n.SecurityCenter.ConfigurationBackupItem.backedUpStatus
 				}
@@ -209,8 +213,11 @@ private extension View {
 		let destinationStore = store.destination
 		return configurationBackup(with: destinationStore)
 			.securityFactors(with: destinationStore)
-			.displayMnemonics(with: destinationStore)
+			.deviceFactorSources(with: destinationStore)
 			.importMnemonics(with: destinationStore)
+			.securityShieldsSetup(with: destinationStore)
+			.securityShieldsList(with: destinationStore)
+			.applyShield(with: destinationStore)
 	}
 
 	private func configurationBackup(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
@@ -225,15 +232,33 @@ private extension View {
 		}
 	}
 
-	private func displayMnemonics(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
-		navigationDestination(store: destinationStore.scope(state: \.displayMnemonics, action: \.displayMnemonics)) {
-			DisplayMnemonics.View(store: $0)
+	private func deviceFactorSources(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.deviceFactorSources, action: \.deviceFactorSources)) {
+			FactorSourcesList.View(store: $0)
 		}
 	}
 
 	private func importMnemonics(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
 		sheet(store: destinationStore.scope(state: \.importMnemonics, action: \.importMnemonics)) {
 			ImportMnemonicsFlowCoordinator.View(store: $0)
+		}
+	}
+
+	private func securityShieldsSetup(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
+		fullScreenCover(store: destinationStore.scope(state: \.securityShieldsSetup, action: \.securityShieldsSetup)) {
+			ShieldSetupCoordinator.View(store: $0)
+		}
+	}
+
+	private func securityShieldsList(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.securityShieldsList, action: \.securityShieldsList)) {
+			ShieldsList.View(store: $0)
+		}
+	}
+
+	private func applyShield(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
+		fullScreenCover(store: destinationStore.scope(state: \.applyShield, action: \.applyShield)) {
+			ApplyShield.Coordinator.View(store: $0)
 		}
 	}
 }

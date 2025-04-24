@@ -4,7 +4,7 @@ extension FaucetClient: TestDependencyKey {
 
 	static let testValue: FaucetClient = Self(
 		getFreeXRD: unimplemented("\(Self.self).getFreeXRD"),
-		isAllowedToUseFaucet: unimplemented("\(Self.self).isAllowedToUseFaucet")
+		isAllowedToUseFaucet: unimplemented("\(Self.self).isAllowedToUseFaucet", placeholder: noop.isAllowedToUseFaucet)
 	)
 }
 

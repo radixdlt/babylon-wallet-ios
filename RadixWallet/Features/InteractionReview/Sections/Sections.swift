@@ -111,8 +111,10 @@ extension InteractionReview {
 
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 		@Dependency(\.accountsClient) var accountsClient
+		@Dependency(\.personasClient) var personasClient
 		@Dependency(\.appPreferencesClient) var appPreferencesClient
 		@Dependency(\.errorQueue) var errorQueue
+		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 		var body: some ReducerOf<Self> {
 			Reduce(core)

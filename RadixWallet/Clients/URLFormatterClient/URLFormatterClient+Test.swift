@@ -11,8 +11,8 @@ extension URLFormatterClient: TestDependencyKey {
 	static let previewValue = Self.noop
 
 	static let testValue = Self(
-		fixedSizeImage: unimplemented("\(Self.self).fixedSize"),
-		generalImage: unimplemented("\(Self.self).general")
+		fixedSizeImage: unimplemented("\(Self.self).fixedSize", placeholder: noop.fixedSizeImage),
+		generalImage: unimplemented("\(Self.self).general", placeholder: noop.generalImage)
 	)
 
 	static let noop = Self(
