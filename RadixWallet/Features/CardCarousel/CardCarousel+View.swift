@@ -99,7 +99,9 @@ struct CarouselCardView: View {
 				.cornerRadius(.small1)
 			}
 
-			CloseButton(kind: .homeCard, action: closeAction)
+			if card != .discoverRadixDapps {
+				CloseButton(kind: .homeCard, action: closeAction)
+			}
 		}
 	}
 

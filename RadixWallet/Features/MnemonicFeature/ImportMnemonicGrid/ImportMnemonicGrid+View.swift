@@ -51,6 +51,10 @@ extension ImportMnemonicGrid {
 		#if DEBUG
 		private var debugSection: some SwiftUI.View {
 			VStack(spacing: .small1) {
+				Button("DEBUG Copy") {
+					store.send(.view(.debugCopy))
+				}
+
 				Button("DEBUG Paste") {
 					store.send(.view(.debugPaste))
 				}
