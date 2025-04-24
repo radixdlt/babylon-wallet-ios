@@ -353,7 +353,7 @@ extension Threshold {
 	var titleShort: String {
 		switch self {
 		case .all:
-			L10n.ShieldWizardRegularAccess.ThresholdDescription.all
+			L10n.Common.all
 		case let .specific(value):
 			"\(value)"
 		}

@@ -9938,6 +9938,24 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = Sargon;
 		};
+		A0C672FF2DA6BBEA0071606B /* ScreenshotPreventing */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ScreenshotPreventing;
+		};
+		A0C673012DA6BBEA0071606B /* ScreenshotPreventingSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ScreenshotPreventingSwiftUI;
+		};
+		A0C673042DA6BD7F0071606B /* ScreenshotPreventing */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A0C673032DA6BD7F0071606B /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */;
+			productName = ScreenshotPreventing;
+		};
+		A0C673062DA6BD7F0071606B /* ScreenshotPreventingSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A0C673032DA6BD7F0071606B /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */;
+			productName = ScreenshotPreventingSwiftUI;
+		};
 		A415574F2B757C5E0040AD4E /* ComposableArchitecture */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A415574E2B757C5E0040AD4E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
