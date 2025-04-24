@@ -79,7 +79,6 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 		var body: some ReducerOf<Self> {
 			Scope(state: \.detail, action: \.detail) {
 				FactorSourceDetail()
-					._printChanges()
 			}
 			Scope(state: \.displayMnemonic, action: \.displayMnemonic) {
 				DisplayMnemonic()

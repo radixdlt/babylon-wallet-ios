@@ -11,7 +11,7 @@ extension RenameLabel {
 				.withNavigationBar {
 					store.send(.view(.closeButtonTapped))
 				}
-				.presentationDetents([.fraction(0.55), .large])
+				.presentationDetents([.fraction(0.6), .large])
 				.presentationDragIndicator(.visible)
 				.presentationBackground(.blur)
 		}
