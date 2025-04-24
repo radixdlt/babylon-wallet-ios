@@ -38,7 +38,7 @@ extension FactorSourceKind {
 	var addFactorTitle: String {
 		switch self {
 		case .device:
-			"Add a New Biometrics/PIN Seed Phrase"
+			L10n.NewBiometricFactor.Intro.title
 		case .ledgerHqHardwareWallet:
 			L10n.FactorSources.Card.ledgerTitle
 		case .offDeviceMnemonic:
@@ -53,7 +53,7 @@ extension FactorSourceKind {
 	var addFactorDescription: String {
 		switch self {
 		case .device:
-			"This factor is a seed phrase held by your phone and unlocked by your biometrics/PIN."
+			L10n.NewBiometricFactor.Intro.subtitle
 		case .ledgerHqHardwareWallet:
 			L10n.FactorSources.Card.ledgerDescription
 		case .offDeviceMnemonic:
@@ -62,6 +62,21 @@ extension FactorSourceKind {
 			L10n.FactorSources.Card.arculusCardDescription
 		case .password:
 			L10n.FactorSources.Card.passwordDescription
+		}
+	}
+
+	var nameFactorTitle: String {
+		switch self {
+		case .device:
+			L10n.NewBiometricFactor.Name.title
+		case .ledgerHqHardwareWallet:
+			L10n.FactorSources.Card.ledgerTitle
+		case .offDeviceMnemonic:
+			L10n.FactorSources.Card.offDeviceMnemonicTitle
+		case .arculusCard:
+			L10n.FactorSources.Card.arculusCardTitle
+		case .password:
+			L10n.FactorSources.Card.passwordTitle
 		}
 	}
 }

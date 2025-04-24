@@ -8,9 +8,9 @@ extension AddFactorSource.NameFactorSource {
 					VStack {
 						header
 						AppTextField(
-							placeholder: "Enter name",
+							placeholder: L10n.NewBiometricFactor.Name.label,
 							text: $store.name.sending(\.view.nameChanged),
-							hint: .info("This can be changed anytime")
+							hint: .info(L10n.NewBiometricFactor.Name.note)
 						)
 						Spacer()
 					}
@@ -21,7 +21,7 @@ extension AddFactorSource.NameFactorSource {
 						store.sanitizedName,
 						forAction: { store.send(.view(.saveTapped($0))) }
 					) { action in
-						Button("Save", action: action)
+						Button(L10n.Common.save, action: action)
 							.buttonStyle(.primaryRectangular)
 							.controlState(store.saveButtonControlState)
 					}
@@ -38,7 +38,7 @@ extension AddFactorSource.NameFactorSource {
 					.resizable()
 					.frame(.large)
 
-				Text(store.kind.addFactorTitle)
+				Text(store.kind.nameFactorTitle)
 					.textStyle(.sheetTitle)
 			}
 			.foregroundStyle(.app.gray1)

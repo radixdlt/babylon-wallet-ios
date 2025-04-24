@@ -14,12 +14,12 @@ extension AddFactorSource {
 
 				Image(asset: AssetResource.successCheckmark)
 
-				Text("Success")
+				Text(L10n.NewFactor.Success.title)
 					.foregroundColor(.app.gray1)
 					.textStyle(.sheetTitle)
 					.padding([.top, .horizontal], .medium3)
 
-				Text("Security factor added successfully")
+				Text(L10n.NewFactor.Success.subtitle)
 					.foregroundColor(.app.gray1)
 					.textStyle(.body1Regular)
 					.multilineTextAlignment(.center)
@@ -28,7 +28,7 @@ extension AddFactorSource {
 				Spacer()
 			}
 			.footer {
-				Button("Close", action: {
+				Button(L10n.Common.close, action: {
 					dismiss()
 				})
 				.buttonStyle(.primaryRectangular)

@@ -36,10 +36,10 @@ extension AddFactorSource.ConfirmSeedPhrase {
 					.resizable()
 					.frame(.large)
 
-				Text("Confirm Seed Phrase")
+				Text(L10n.NewBiometricFactor.ConfirmSeedPhrase.title)
 					.textStyle(.sheetTitle)
 
-				Text("Enter 4 words from your seed phrase to confirm you've recorded it correctly")
+				Text(L10n.NewBiometricFactor.ConfirmSeedPhrase.subtitle(4))
 					.textStyle(.body1Regular)
 			}
 			.foregroundStyle(.app.gray1)
@@ -50,7 +50,7 @@ extension AddFactorSource.ConfirmSeedPhrase {
 			VStack(spacing: .medium3) {
 				ForEachStatic(Array(store.confirmationWords.keys)) { idx in
 					AppTextField(
-						primaryHeading: .init(stringLiteral: "Word \(idx + 1)"),
+						primaryHeading: .init(stringLiteral: L10n.NewBiometricFactor.SeedPhrase.wordLabel(Int(idx) + 1)),
 						placeholder: "",
 						text: .init(get: {
 							store.confirmationWords[idx]!
@@ -74,7 +74,7 @@ extension AddFactorSource.ConfirmSeedPhrase {
 
 		func hintForWord(at idx: UInt16) -> Hint.ViewState? {
 			if store.wrongWordIndices.contains(idx) {
-				.error("Invalid word. Try again.")
+				.error(L10n.NewBiometricFactor.ConfirmSeedPhrase.incorrectWord)
 			} else {
 				nil
 			}

@@ -39,7 +39,7 @@ extension AddFactorSource.DeviceSeedPhrase {
 				ImportMnemonicGrid.View(store: store.grid)
 
 				if !store.isEnteringCustomSeedPhrase {
-					Button("Clear and enter custom seed phrase") {
+					Button(L10n.NewBiometricFactor.SeedPhrase.enterCustomButton) {
 						store.send(.view(.enterCustomSeedPhraseButtonTapped))
 						withAnimation {
 							scrollViewProxy.scrollTo("top_anchor", anchor: .top)
@@ -52,10 +52,10 @@ extension AddFactorSource.DeviceSeedPhrase {
 
 		private var headerView: some SwiftUI.View {
 			VStack(spacing: .medium2) {
-				Text("Write Down Seed Phrase")
+				Text(L10n.NewBiometricFactor.SeedPhrase.title)
 					.textStyle(.sheetTitle)
 
-				Text("Write down this BIP39 seed phrase and store safely for future use. Avoid storing electronically so no one can steal it online.")
+				Text(L10n.NewBiometricFactor.SeedPhrase.subtitle)
 					.textStyle(.body1Regular)
 			}
 			.foregroundColor(.app.gray1)
