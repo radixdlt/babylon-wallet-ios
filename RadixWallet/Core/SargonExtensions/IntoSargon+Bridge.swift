@@ -8,7 +8,7 @@ extension OnLedgerEntitiesClient.StakeClaim {
 			validatorAddress: validatorAddress,
 			resourceAddress: token.id.resourceAddress.asNonFungibleResourceAddress!,
 			ids: [id.nonFungibleLocalId],
-			amount: claimAmount.nominalAmount
+			amount: claimAmount.exactAmount?.nominalAmount ?? .zero
 		)
 	}
 }

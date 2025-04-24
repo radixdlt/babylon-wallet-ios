@@ -190,7 +190,7 @@ extension CloudBackupClient {
 
 			var profileToUpload = profile
 			if shouldReclaim {
-				claimOwnership(of: &profileToUpload)
+				await claimOwnership(of: &profileToUpload)
 			}
 
 			try? await backupProfileAndSaveResult(profileToUpload, existingRecord: existingRecord)
@@ -198,13 +198,9 @@ extension CloudBackupClient {
 
 		/// Updates the `lastUsedOnDevice` to use this device, on `profile`
 		/// - Parameter profile: Profile to update `lastUsedOnDevice` of
-		func claimOwnership(of profile: inout Profile) {
-			@Dependency(\.date) var date
-			let deviceInfo = (try? secureStorageClient.loadDeviceInfo()) ?? DeviceInfo(id: .init())
-
-			profile.header.lastUsedOnDevice = deviceInfo
-			profile.header.lastUsedOnDevice.date = date()
-			profile.header.lastModified = date()
+		@Sendable
+		func claimOwnership(of profile: inout Profile) async {
+			profile = await SargonOS.shared.claimProfile(profile: profile)
 		}
 
 		let retryBackupInterval: DispatchTimeInterval = .seconds(60)
