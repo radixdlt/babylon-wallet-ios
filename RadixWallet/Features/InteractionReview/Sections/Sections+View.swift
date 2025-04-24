@@ -14,7 +14,6 @@ extension InteractionReview.Sections.State {
 			claimingFromValidators: claimingFromValidators,
 			accountDepositSetting: accountDepositSetting,
 			accountDepositExceptions: accountDepositExceptions,
-			shieldUpdate: shieldUpdate
 		)
 	}
 }
@@ -34,7 +33,6 @@ extension InteractionReview.Sections {
 		let claimingFromValidators: InteractionReview.ValidatorsState?
 		let accountDepositSetting: InteractionReview.DepositSettingState?
 		let accountDepositExceptions: InteractionReview.DepositExceptionsState?
-		let shieldUpdate: InteractionReview.ShieldState?
 
 		var isExpandedStakingToValidators: Bool { stakingToValidators?.isExpanded == true }
 		var isExpandedUnstakingFromValidators: Bool { unstakingFromValidators?.isExpanded == true }
@@ -76,7 +74,6 @@ extension InteractionReview.Sections {
 
 					accountDepositSetting(viewStore.accountDepositSetting)
 					accountDepositExceptions(viewStore.accountDepositExceptions)
-					shieldUpdate(viewStore.shieldUpdate)
 				}
 				.animation(.easeInOut, value: viewStore.isExpandedDappsUsed)
 				.animation(.easeInOut, value: viewStore.isExpandedContributingToPools)
