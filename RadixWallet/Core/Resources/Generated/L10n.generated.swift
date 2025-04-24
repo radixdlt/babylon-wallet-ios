@@ -975,6 +975,8 @@ internal enum L10n {
   internal enum Common {
     /// Account
     internal static let account = L10n.tr("Localizable", "common_account", fallback: "Account")
+    /// All
+    internal static let all = L10n.tr("Localizable", "common_all", fallback: "All")
     /// Bad HTTP response status code %d
     internal static func badHttpResponseStatusCode(_ p1: Int) -> String {
       return L10n.tr("Localizable", "common_badHttpResponseStatusCode", p1, fallback: "Bad HTTP response status code %d")
@@ -983,6 +985,8 @@ internal enum L10n {
     internal static let cancel = L10n.tr("Localizable", "common_cancel", fallback: "Cancel")
     /// Choose
     internal static let choose = L10n.tr("Localizable", "common_choose", fallback: "Choose")
+    /// Close
+    internal static let close = L10n.tr("Localizable", "common_close", fallback: "Close")
     /// Component
     internal static let component = L10n.tr("Localizable", "common_component", fallback: "Component")
     /// Confirm
@@ -999,6 +1003,8 @@ internal enum L10n {
     internal static let done = L10n.tr("Localizable", "common_done", fallback: "Done")
     /// An Error Occurred
     internal static let errorAlertTitle = L10n.tr("Localizable", "common_errorAlertTitle", fallback: "An Error Occurred")
+    /// Hidden Accounts or Personas
+    internal static let hiddenAccountsOrPersonas = L10n.tr("Localizable", "common_hiddenAccountsOrPersonas", fallback: "Hidden Accounts or Personas")
     /// History
     internal static let history = L10n.tr("Localizable", "common_history", fallback: "History")
     /// Invalid
@@ -1857,8 +1863,6 @@ internal enum L10n {
       internal static let deviceDescription = L10n.tr("Localizable", "factorSources_card_deviceDescription", fallback: "Use phone biometrics/PIN to approve")
       /// Biometrics/PIN
       internal static let deviceTitle = L10n.tr("Localizable", "factorSources_card_deviceTitle", fallback: "Biometrics/PIN")
-      /// Hidden Accounts or Personas
-      internal static let hiddenAccountsOrPersonas = L10n.tr("Localizable", "factorSources_card_hiddenAccountsOrPersonas", fallback: "Hidden Accounts or Personas")
       /// **Last Used:** %@
       internal static func lastUsed(_ p1: Any) -> String {
         return L10n.tr("Localizable", "factorSources_card_lastUsed", String(describing: p1), fallback: "**Last Used:** %@")
@@ -3211,6 +3215,60 @@ internal enum L10n {
       internal static let title = L10n.tr("Localizable", "mobileConnect_noProfileDialog_title", fallback: "dApp Request")
     }
   }
+  internal enum NewBiometricFactor {
+    internal enum ConfirmSeedPhrase {
+      /// Incorrect. Try again.
+      internal static let incorrectWord = L10n.tr("Localizable", "newBiometricFactor_confirmSeedPhrase_incorrectWord", fallback: "Incorrect. Try again.")
+      /// Enter %d words from your seed phrase to confirm you’ve recorded it correctly.
+      internal static func subtitle(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "newBiometricFactor_confirmSeedPhrase_subtitle", p1, fallback: "Enter %d words from your seed phrase to confirm you’ve recorded it correctly.")
+      }
+      /// Confirm Seed Phrase
+      internal static let title = L10n.tr("Localizable", "newBiometricFactor_confirmSeedPhrase_title", fallback: "Confirm Seed Phrase")
+    }
+    internal enum Intro {
+      /// This factor is a seed phrase held by your phone and unlocked by your biometrics/PIN.
+      internal static let subtitle = L10n.tr("Localizable", "newBiometricFactor_intro_subtitle", fallback: "This factor is a seed phrase held by your phone and unlocked by your biometrics/PIN.")
+      /// Add a New Biometrics/PIN Seed Phrase
+      internal static let title = L10n.tr("Localizable", "newBiometricFactor_intro_title", fallback: "Add a New Biometrics/PIN Seed Phrase")
+    }
+    internal enum Name {
+      /// Enter name
+      internal static let label = L10n.tr("Localizable", "newBiometricFactor_name_label", fallback: "Enter name")
+      /// This can be changed any time
+      internal static let note = L10n.tr("Localizable", "newBiometricFactor_name_note", fallback: "This can be changed any time")
+      /// Save
+      internal static let saveButton = L10n.tr("Localizable", "newBiometricFactor_name_saveButton", fallback: "Save")
+      /// Name your New Biometrics/PIN Seed Phrase
+      internal static let title = L10n.tr("Localizable", "newBiometricFactor_name_title", fallback: "Name your New Biometrics/PIN Seed Phrase")
+    }
+    internal enum SeedPhrase {
+      /// Clear and enter custom seed phrase
+      internal static let enterCustomButton = L10n.tr("Localizable", "newBiometricFactor_seedPhrase_enterCustomButton", fallback: "Clear and enter custom seed phrase")
+      /// Write down this BIP39 seed phrase and store safely for future use. Avoid storing electronically so no one can steal it online.
+      internal static let subtitle = L10n.tr("Localizable", "newBiometricFactor_seedPhrase_subtitle", fallback: "Write down this BIP39 seed phrase and store safely for future use. Avoid storing electronically so no one can steal it online.")
+      /// Write Down Seed Phrase
+      internal static let title = L10n.tr("Localizable", "newBiometricFactor_seedPhrase_title", fallback: "Write Down Seed Phrase")
+      /// Word %d
+      internal static func wordLabel(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "newBiometricFactor_seedPhrase_wordLabel", p1, fallback: "Word %d")
+      }
+    }
+  }
+  internal enum NewFactor {
+    internal enum Error {
+      /// Factor Already In Use
+      internal static let alreadyInUse = L10n.tr("Localizable", "newFactor_error_alreadyInUse", fallback: "Factor Already In Use")
+      /// Factor not created
+      internal static let notCreated = L10n.tr("Localizable", "newFactor_error_notCreated", fallback: "Factor not created")
+    }
+    internal enum Success {
+      /// Security factor added successfully
+      internal static let subtitle = L10n.tr("Localizable", "newFactor_success_subtitle", fallback: "Security factor added successfully")
+      /// Success
+      internal static let title = L10n.tr("Localizable", "newFactor_success_title", fallback: "Success")
+    }
+  }
   internal enum Onboarding {
     /// I'm a New Radix Wallet User
     internal static let newUser = L10n.tr("Localizable", "onboarding_newUser", fallback: "I'm a New Radix Wallet User")
@@ -3648,6 +3706,16 @@ internal enum L10n {
       /// Factor Source name too long
       internal static let tooLong = L10n.tr("Localizable", "renameLabel_factorSource_tooLong", fallback: "Factor Source name too long")
     }
+    internal enum SecurityShield {
+      /// Security Shield name required
+      internal static let empty = L10n.tr("Localizable", "renameLabel_securityShield_empty", fallback: "Security Shield name required")
+      /// Enter a new name for this Security Shield
+      internal static let subtitle = L10n.tr("Localizable", "renameLabel_securityShield_subtitle", fallback: "Enter a new name for this Security Shield")
+      /// Rename
+      internal static let title = L10n.tr("Localizable", "renameLabel_securityShield_title", fallback: "Rename")
+      /// Security Shield name too long
+      internal static let tooLong = L10n.tr("Localizable", "renameLabel_securityShield_tooLong", fallback: "Security Shield name too long")
+    }
   }
   internal enum RevealSeedPhrase {
     /// Passphrase
@@ -3746,8 +3814,8 @@ internal enum L10n {
     internal static let hardware = L10n.tr("Localizable", "securityFactors_hardware", fallback: "Hardware")
     /// Things you know
     internal static let information = L10n.tr("Localizable", "securityFactors_information", fallback: "Things you know")
-    /// Manage the security factors you’ll use in your Security Shields.
-    internal static let subtitle = L10n.tr("Localizable", "securityFactors_subtitle", fallback: "Manage the security factors you’ll use in your Security Shields.")
+    /// View and manage your security factors.
+    internal static let subtitle = L10n.tr("Localizable", "securityFactors_subtitle", fallback: "View and manage your security factors.")
     /// Security Factors
     internal static let title = L10n.tr("Localizable", "securityFactors_title", fallback: "Security Factors")
     internal enum LedgerWallet {
@@ -3880,16 +3948,30 @@ internal enum L10n {
     }
   }
   internal enum SecurityShields {
+    /// Accounts
+    internal static let accounts = L10n.tr("Localizable", "securityShields_accounts", fallback: "Accounts")
     /// Change
     internal static let change = L10n.tr("Localizable", "securityShields_change", fallback: "Change")
     /// Create New Security Shield
     internal static let createShieldButton = L10n.tr("Localizable", "securityShields_createShieldButton", fallback: "Create New Security Shield")
     /// Default Shield
     internal static let `default` = L10n.tr("Localizable", "securityShields_default", fallback: "Default Shield")
+    /// Edit Factors
+    internal static let editFactors = L10n.tr("Localizable", "securityShields_editFactors", fallback: "Edit Factors")
+    /// No Accounts
+    internal static let noAccounts = L10n.tr("Localizable", "securityShields_noAccounts", fallback: "No Accounts")
+    /// No Personas
+    internal static let noPersonas = L10n.tr("Localizable", "securityShields_noPersonas", fallback: "No Personas")
     /// Others
     internal static let others = L10n.tr("Localizable", "securityShields_others", fallback: "Others")
+    /// Personas
+    internal static let personas = L10n.tr("Localizable", "securityShields_personas", fallback: "Personas")
     /// Security Shields
     internal static let title = L10n.tr("Localizable", "securityShields_title", fallback: "Security Shields")
+    internal enum Applied {
+      /// This Security Shield is applied to these Accounts and Personas
+      internal static let accountsAndPersonas = L10n.tr("Localizable", "securityShields_applied_accountsAndPersonas", fallback: "This Security Shield is applied to these Accounts and Personas")
+    }
     internal enum Assigned {
       /// %d Accounts
       internal static func accountPlural(_ p1: Int) -> String {
@@ -3897,8 +3979,6 @@ internal enum L10n {
       }
       /// 1 Account
       internal static let accountSingular = L10n.tr("Localizable", "securityShields_assigned_accountSingular", fallback: "1 Account")
-      /// Hidden Accounts or Personas
-      internal static let onlyHiddenEntities = L10n.tr("Localizable", "securityShields_assigned_onlyHiddenEntities", fallback: "Hidden Accounts or Personas")
       /// %d Personas
       internal static func personaPlural(_ p1: Int) -> String {
         return L10n.tr("Localizable", "securityShields_assigned_personaPlural", p1, fallback: "%d Personas")
@@ -4253,8 +4333,6 @@ internal enum L10n {
       internal static let title = L10n.tr("Localizable", "shieldWizardRegularAccess_step_title", fallback: "Step 1 of 2")
     }
     internal enum ThresholdDescription {
-      /// All
-      internal static let all = L10n.tr("Localizable", "shieldWizardRegularAccess_thresholdDescription_all", fallback: "All")
       /// **%@**
       internal static func selection(_ p1: Any) -> String {
         return L10n.tr("Localizable", "shieldWizardRegularAccess_thresholdDescription_selection", String(describing: p1), fallback: "**%@**")
