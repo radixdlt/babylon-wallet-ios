@@ -1144,7 +1144,7 @@ Code: %@";
 "securityCenter_encryptWalletBackup_passwordMismatchError" = "Passwords do not match";
 "securityCenter_encryptWalletBackup_continue" = "Continue";
 "securityFactors_title" = "Security Factors";
-"securityFactors_subtitle" = "Manage the security factors you’ll use in your Security Shields.";
+"securityFactors_subtitle" = "View and manage your security factors.";
 "securityFactors_hardware" = "Hardware";
 "securityFactors_information" = "Things you know";
 "securityFactors_seedPhrases_title" = "Seed Phrases";
