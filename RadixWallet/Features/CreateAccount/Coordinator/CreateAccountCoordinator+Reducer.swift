@@ -128,16 +128,11 @@ extension CreateAccountCoordinator {
 				state.path.append(.selectLedger(.init(context: .createHardwareAccount)))
 				return .none
 			} else {
-				return createProfileIfNecessaryThenCreateAccount(state: &state, mode: .bdfs)
+				return createAccount(state: &state, mode: .bdfs)
 			}
 
 		case let .path(.element(_, action: .selectLedger(.delegate(.choseLedger(ledger))))):
-			return createProfileIfNecessaryThenCreateAccount(
-				state: &state,
-				mode: .specific(
-					ledger.asGeneral
-				)
-			)
+			return createAccount(state: &state, mode: .specific(ledger.asGeneral))
 
 		case .path(.element(_, action: .completion(.delegate(.completed)))):
 			return .run { send in

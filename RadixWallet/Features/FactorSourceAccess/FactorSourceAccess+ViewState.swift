@@ -42,7 +42,7 @@ extension FactorSourceAccess.State {
 			case .updateFactorConfig, .deriveAccounts:
 				return S.Ledger.deriveKeysMessage
 			case .createAccountAuthorization, .createPersonaAuthorization:
-				fatalError("Not supported")
+				return L10n.Authorization.CreateEntity.message
 			}
 
 		case .arculusCard:
