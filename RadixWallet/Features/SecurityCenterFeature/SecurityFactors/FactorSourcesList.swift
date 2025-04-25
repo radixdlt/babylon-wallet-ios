@@ -160,7 +160,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			case .device:
 				state.destination = .addFactorSource(.init(kind: state.kind))
 			case .ledgerHqHardwareWallet:
-				state.destination = .addNewLedger(.init())
+				return performActionRequiringP2PEffect(.addLedger, in: &state)
 			default:
 				assertionFailure("Unsupported factor source kind \(state.kind)")
 			}

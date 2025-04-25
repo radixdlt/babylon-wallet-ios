@@ -298,23 +298,6 @@ extension InteractionReview.Sections {
 				deposits: deposits,
 				accountDeletion: deleteAccounts
 			)
-
-		case let .securifyEntity(entityAddress, metadata):
-			guard let entity = try await extractEntity(entityAddress) else { return nil }
-
-			let shield = try SargonOs.shared.securityStructureOfFactorSourceIdsBySecurityStructureId(
-				shieldId: metadata.id
-			)
-
-			let allFactorSourcesFromProfile = try await factorSourcesClient.getFactorSources().elements
-
-			return Common.SectionsData(
-				shieldUpdate: .init(
-					entity: entity,
-					shield: shield,
-					allFactorSourcesFromProfile: allFactorSourcesFromProfile
-				)
-			)
 		}
 	}
 
