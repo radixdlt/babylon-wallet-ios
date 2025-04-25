@@ -25,8 +25,8 @@ extension FactorSourcesList {
 						}
 						.buttonStyle(.secondaryRectangular)
 
-						let infoContent = store.kind.infoLinkContent
-						InfoButton(infoContent.item, label: infoContent.title)
+//						let infoContent = store.kind.infoLinkContent
+//						InfoButton(infoContent.item, label: infoContent.title)
 					}
 					.padding(.medium3)
 					.padding(.bottom, .medium2)
@@ -158,10 +158,7 @@ private extension FactorSourcesList.State.Row {
 
 private extension StoreOf<FactorSourcesList> {
 	var destination: PresentationStoreOf<FactorSourcesList.Destination> {
-		func scopeState(state: State) -> PresentationState<FactorSourcesList.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
+		scope(state: \.$destination, action: \.destination)
 	}
 }
 
@@ -172,8 +169,11 @@ private extension View {
 		return detail(with: destinationStore)
 			.displayMnemonic(with: destinationStore)
 			.enterMnemonic(with: destinationStore)
-			.addMnemonic(with: destinationStore)
 			.changeMain(with: destinationStore)
+			.addNewP2PLinkSheet(with: destinationStore)
+			.noP2PLinkAlert(with: destinationStore)
+			.addNewLedgerSheet(with: destinationStore)
+			.addFactorSource(with: destinationStore)
 	}
 
 	private func detail(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
@@ -194,15 +194,31 @@ private extension View {
 		}
 	}
 
-	private func addMnemonic(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
-		navigationDestination(store: destinationStore.scope(state: \.addMnemonic, action: \.addMnemonic)) {
-			ImportMnemonic.View(store: $0)
-		}
-	}
-
 	private func changeMain(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
 		sheet(store: destinationStore.scope(state: \.changeMain, action: \.changeMain)) {
 			ChangeMainFactorSource.View(store: $0)
+		}
+	}
+
+	private func addNewLedgerSheet(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.addNewLedger, action: \.addNewLedger)) {
+			AddLedgerFactorSource.View(store: $0)
+		}
+	}
+
+	private func addNewP2PLinkSheet(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.addNewP2PLink, action: \.addNewP2PLink)) {
+			NewConnection.View(store: $0)
+		}
+	}
+
+	private func noP2PLinkAlert(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
+		alert(store: destinationStore.scope(state: \.noP2PLink, action: \.noP2PLink))
+	}
+
+	private func addFactorSource(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.addFactorSource, action: \.addFactorSource)) {
+			AddFactorSource.Coordinator.View(store: $0)
 		}
 	}
 }

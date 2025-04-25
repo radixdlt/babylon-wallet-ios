@@ -93,7 +93,7 @@ extension AddShieldBuilderSeedingFactors {
 				case .completed:
 					state.destination = nil
 					return determineNextStepEffect()
-				case .failedToAddLedger, .dismiss:
+				case .failedToAddLedger:
 					state.destination = nil
 					return .none
 				}

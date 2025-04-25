@@ -5,7 +5,6 @@ import SwiftUI
 extension ImportMnemonicWord.State {
 	var viewState: ImportMnemonicWord.ViewState {
 		.init(
-			isReadonlyMode: isReadonlyMode,
 			index: id,
 			displayText: value.text,
 			autocompletionCandidates: autocompletionCandidates,
@@ -34,7 +33,6 @@ enum MnemonicValidation: Sendable, Hashable {
 
 extension ImportMnemonicWord {
 	struct ViewState: Equatable {
-		let isReadonlyMode: Bool
 		let index: Int
 		let displayText: String
 		let autocompletionCandidates: ImportMnemonicWord.State.AutocompletionCandidates?
@@ -54,7 +52,7 @@ extension ImportMnemonicWord {
 		}
 
 		var displayValidAccessory: Bool {
-			!isReadonlyMode && validation == .valid && focusedField == nil
+			validation == .valid && focusedField == nil
 		}
 	}
 
@@ -96,7 +94,6 @@ extension ImportMnemonicWord {
 							}
 						}
 					)
-					.allowsHitTesting(!viewStore.isReadonlyMode)
 					.minimumScaleFactor(0.9)
 					.keyboardType(.alphabet)
 					.textInputAutocapitalization(.never)

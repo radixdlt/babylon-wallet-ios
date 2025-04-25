@@ -193,29 +193,28 @@ struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	func reduce(into state: inout State, pathAction: Path.Action) -> Effect<Action> {
 		switch pathAction {
 		case .accountsToImport(.delegate(.viewAppeared)):
-			return accountsToImportViewAppeared(in: &state)
+			accountsToImportViewAppeared(in: &state)
 
 		case .accountsToImport(.delegate(.continueImport)):
-			return continueImporting(in: &state)
+			continueImporting(in: &state)
 
 		case let .importMnemonic(.delegate(.notPersisted(mnemonicWithPassphrase))):
-			return importedMnemonic(in: &state, mnemonicWithPassphrase: mnemonicWithPassphrase)
+			importedMnemonic(in: &state, mnemonicWithPassphrase: mnemonicWithPassphrase)
 
-		case .importMnemonic(.delegate(.persistedMnemonicInKeychainOnly)), .importMnemonic(.delegate(.doneViewing)), .importMnemonic(.delegate(.persistedNewFactorSourceInProfile)):
+		case .importMnemonic(.delegate(.persistedMnemonicInKeychainOnly)), .importMnemonic(.delegate(.persistedNewFactorSourceInProfile)):
 			preconditionFailure("Incorrect implementation")
-			return .none
 
 		case let .importOlympiaLedgerAccountsAndFactorSources(.delegate(.completed(migratedAccounts))):
-			return importedOlympiaLedgerAccountsAndFactorSources(in: &state, migratedAccounts: migratedAccounts)
+			importedOlympiaLedgerAccountsAndFactorSources(in: &state, migratedAccounts: migratedAccounts)
 
 		case let .importOlympiaLedgerAccountsAndFactorSources(.delegate(.failed(failure))):
-			return cancelOlympiaLedgerAccountsAndFactorSources(in: &state, failure: failure)
+			cancelOlympiaLedgerAccountsAndFactorSources(in: &state, failure: failure)
 
 		case let .completion(.delegate(.finishedMigration(gotoAccountList: gotoAccountList))):
-			return .send(.delegate(.finishedMigration(gotoAccountList: gotoAccountList)))
+			.send(.delegate(.finishedMigration(gotoAccountList: gotoAccountList)))
 
 		default:
-			return .none
+			.none
 		}
 	}
 

@@ -5,10 +5,9 @@ import SwiftUI
 extension ImportMnemonic.State {
 	var viewState: ImportMnemonic.ViewState {
 		.init(
-			readonlyMode: mode.readonly?.context,
 			hideAdvancedMode: hideAdvancedMode,
 			showCloseButton: showCloseButton,
-			isProgressing: mode.write?.isProgressing ?? false,
+			isProgressing: isProgressing,
 			isAdvancedMode: isAdvancedMode,
 			isComplete: isComplete,
 			header: header,
@@ -19,33 +18,14 @@ extension ImportMnemonic.State {
 		)
 	}
 
-	private var showCloseButton: Bool {
-		switch mode {
-		case let .readonly(readOnlyMode):
-			readOnlyMode.context == .fromBackupPrompt
-		case let .write(writeMode):
-			writeMode.showCloseButton
-		}
-	}
-
 	private var hideAdvancedMode: Bool {
-		switch mode {
-		case .readonly:
-			true
-		case .write:
-			isWordCountFixed
-		}
+		isWordCountFixed
 	}
 }
 
 // MARK: - ImportMnemonic.ViewState
 extension ImportMnemonic {
 	struct ViewState: Equatable {
-		var isReadonlyMode: Bool {
-			readonlyMode != nil
-		}
-
-		let readonlyMode: ImportMnemonic.State.ReadonlyMode.Context?
 		let hideAdvancedMode: Bool
 		let showCloseButton: Bool
 		let isProgressing: Bool // irrelevant for read only mode
@@ -58,12 +38,7 @@ extension ImportMnemonic {
 		let bip39Passphrase: String
 
 		var showModeButton: Bool {
-			!isReadonlyMode && !hideAdvancedMode
-		}
-
-		var showBackButton: Bool {
-			guard let readonlyMode, case .fromSettings = readonlyMode else { return false }
-			return true
+			!hideAdvancedMode
 		}
 	}
 }
@@ -74,10 +49,7 @@ extension ImportMnemonic.ViewState {
 	}
 
 	var isShowingPassphrase: Bool {
-		if isReadonlyMode, !bip39Passphrase.isEmpty {
-			return true
-		}
-		return isAdvancedMode && !(isReadonlyMode && bip39Passphrase.isEmpty)
+		isAdvancedMode
 	}
 
 	var modeButtonTitle: String {
@@ -127,15 +99,8 @@ extension ImportMnemonic {
 					}
 					.padding(.medium3)
 				}
-				.navigationBarBackButtonHidden(viewStore.showBackButton || viewStore.showCloseButton) // need to be able to hook "back" button press
+				.navigationBarBackButtonHidden(viewStore.showCloseButton) // need to be able to hook "back" button press
 				.toolbar {
-					if viewStore.showBackButton {
-						ToolbarItem(placement: .navigationBarLeading) {
-							BackButton {
-								viewStore.send(.backButtonTapped)
-							}
-						}
-					}
 					if viewStore.showCloseButton {
 						ToolbarItem(placement: .navigationBarLeading) {
 							CloseButton {
@@ -188,22 +153,10 @@ private extension View {
 	func destinations(with store: StoreOf<ImportMnemonic>) -> some View {
 		let destinationStore = store.destination
 		return onContinueWarning(with: destinationStore)
-			.backupConfirmation(with: destinationStore)
-			.verifyMnemonic(with: destinationStore)
-	}
-
-	private func backupConfirmation(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination>) -> some View {
-		alert(store: destinationStore.scope(state: \.backupConfirmation, action: \.backupConfirmation))
 	}
 
 	private func onContinueWarning(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination>) -> some View {
 		alert(store: destinationStore.scope(state: \.onContinueWarning, action: \.onContinueWarning))
-	}
-
-	private func verifyMnemonic(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination>) -> some View {
-		navigationDestination(store: destinationStore.scope(state: \.verifyMnemonic, action: \.verifyMnemonic)) {
-			VerifyMnemonic.View(store: $0)
-		}
 	}
 }
 
@@ -217,31 +170,23 @@ extension ImportMnemonic.View {
 				get: \.bip39Passphrase,
 				send: { .passphraseChanged($0) }
 			),
-			hint: viewStore.isReadonlyMode ? nil : .info(L10n.ImportMnemonic.passphraseHint)
+			hint: .info(L10n.ImportMnemonic.passphraseHint)
 		)
-		.disabled(viewStore.isReadonlyMode)
 		.autocorrectionDisabled()
 	}
 
 	@ViewBuilder
 	private func footer(with viewStore: ViewStoreOf<ImportMnemonic>) -> some View {
-		if viewStore.isReadonlyMode {
-			Button(L10n.Common.done) {
-				viewStore.send(.doneViewing)
+		WithControlRequirements(
+			viewStore.mnemonic,
+			forAction: { viewStore.send(.continueButtonTapped($0)) }
+		) { action in
+			if viewStore.isNonChecksummed {
+				StatusMessageView(text: L10n.ImportMnemonic.checksumFailure, type: .error)
 			}
-			.buttonStyle(.primaryRectangular)
-		} else {
-			WithControlRequirements(
-				viewStore.mnemonic,
-				forAction: { viewStore.send(.continueButtonTapped($0)) }
-			) { action in
-				if viewStore.isNonChecksummed {
-					StatusMessageView(text: L10n.ImportMnemonic.checksumFailure, type: .error)
-				}
-				Button(L10n.ImportMnemonic.importSeedPhrase, action: action)
-					.buttonStyle(.primaryRectangular)
-			}
-			.controlState(viewStore.isProgressing ? .loading(.local) : .enabled)
+			Button(L10n.ImportMnemonic.importSeedPhrase, action: action)
+				.buttonStyle(.primaryRectangular)
 		}
+		.controlState(viewStore.isProgressing ? .loading(.local) : .enabled)
 	}
 }

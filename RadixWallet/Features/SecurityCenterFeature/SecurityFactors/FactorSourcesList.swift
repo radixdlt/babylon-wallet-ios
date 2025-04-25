@@ -9,6 +9,9 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 		var rows: [Row] = []
 		var selected: Row?
 
+		var hasAConnectorExtension: Bool = false
+		var pendingAction: ActionRequiringP2P? = nil
+
 		init(context: Context = .display, kind: FactorSourceKind) {
 			self.context = context
 			self.kind = kind
@@ -23,6 +26,11 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 
 	typealias Action = FeatureAction<Self>
 
+	enum ActionRequiringP2P: Sendable, Hashable {
+		case addLedger
+		case continueWithFactorsource(FactorSource)
+	}
+
 	enum ViewAction: Sendable, Equatable {
 		case task
 		case rowTapped(State.Row)
@@ -35,6 +43,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 	enum InternalAction: Sendable, Equatable {
 		case setSecurityProblems([SecurityProblem])
 		case setEntities([EntitiesLinkedToFactorSource])
+		case hasAConnectorExtension(Bool)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -49,6 +58,10 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			case enterMnemonic(ImportMnemonicsFlowCoordinator.State)
 			case addMnemonic(ImportMnemonic.State)
 			case changeMain(ChangeMainFactorSource.State)
+			case noP2PLink(AlertState<NoP2PLinkAlert>)
+			case addNewP2PLink(NewConnection.State)
+			case addNewLedger(AddLedgerFactorSource.State)
+			case addFactorSource(AddFactorSource.Coordinator.State)
 		}
 
 		@CasePathable
@@ -56,8 +69,11 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			case detail(FactorSourceDetail.Action)
 			case displayMnemonic(DisplayMnemonic.Action)
 			case enterMnemonic(ImportMnemonicsFlowCoordinator.Action)
-			case addMnemonic(ImportMnemonic.Action)
 			case changeMain(ChangeMainFactorSource.Action)
+			case noP2PLink(NoP2PLinkAlert)
+			case addNewP2PLink(NewConnection.Action)
+			case addNewLedger(AddLedgerFactorSource.Action)
+			case addFactorSource(AddFactorSource.Coordinator.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -70,18 +86,26 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			Scope(state: \.enterMnemonic, action: \.enterMnemonic) {
 				ImportMnemonicsFlowCoordinator()
 			}
-			Scope(state: \.addMnemonic, action: \.addMnemonic) {
-				ImportMnemonic()
-			}
 			Scope(state: \.changeMain, action: \.changeMain) {
 				ChangeMainFactorSource()
+			}
+			Scope(state: \.addNewP2PLink, action: \.addNewP2PLink) {
+				NewConnection()
+			}
+			Scope(state: \.addNewLedger, action: \.addNewLedger) {
+				AddLedgerFactorSource()
+			}
+			Scope(state: \.addFactorSource, action: \.addFactorSource) {
+				AddFactorSource.Coordinator()
 			}
 		}
 	}
 
 	@Dependency(\.securityCenterClient) var securityCenterClient
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
+	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -95,8 +119,12 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			return securityProblemsEffect()
+			var effects = securityProblemsEffect()
 				.merge(with: entitiesEffect(state: state))
+			if state.kind == .ledgerHqHardwareWallet {
+				effects = effects.merge(with: checkP2PLinkEffect())
+			}
+			return effects
 
 		case let .rowTapped(row):
 			switch state.context {
@@ -119,7 +147,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 
 			case .seedPhraseNotRecoverable:
 				return exportMnemonic(integrity: row.integrity) {
-					state.destination = .displayMnemonic(.export($0, title: L10n.RevealSeedPhrase.title, context: .fromSettings))
+					state.destination = .displayMnemonic(.init(mnemonic: $0.mnemonicWithPassphrase.mnemonic, factorSourceID: $0.factorSourceID))
 				}
 
 			case .lostFactorSource:
@@ -130,28 +158,19 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 		case .addButtonTapped:
 			switch state.kind {
 			case .device:
-				state.destination = .addMnemonic(
-					.init(
-						showCloseButton: false,
-						isWordCountFixed: true,
-						persistStrategy: .init(
-							factorSourceKindOfMnemonic: .babylon(isMain: false),
-							location: .intoKeychainAndProfile,
-							onMnemonicExistsStrategy: .appendWithCryptoParamaters
-						),
-						wordCount: .twentyFour
-					)
-				)
-			case .ledgerHqHardwareWallet, .offDeviceMnemonic, .arculusCard, .password:
-				// NOTE: Added `.device` support as placeholder, but not adding the logic for ledger (which we already support)
-				// since Matt mentioned we will probably always present this screen: https://zpl.io/wyqB6Bd
-				// and I don't want to add all the logic for checking if there is a CE or not just to migrate it later.
-				loggerGlobal.info("Add \(state.kind) not yet implemented")
+				state.destination = .addFactorSource(.init(kind: state.kind))
+			case .ledgerHqHardwareWallet:
+				state.destination = .addNewLedger(.init())
+			default:
+				assertionFailure("Unsupported factor source kind \(state.kind)")
 			}
 
 			return .none
 
 		case let .continueButtonTapped(factorSource):
+			if state.kind == .ledgerHqHardwareWallet {
+				return performActionRequiringP2PEffect(.continueWithFactorsource(factorSource), in: &state)
+			}
 			return .send(.delegate(.selectedFactorSource(factorSource)))
 
 		case .changeMainButtonTapped:
@@ -172,24 +191,89 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			state.entities = entities
 			setRows(state: &state)
 			return .none
+
+		case let .hasAConnectorExtension(hasCE):
+			state.hasAConnectorExtension = hasCE
+			return .none
 		}
 	}
 
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case .displayMnemonic(.delegate), .enterMnemonic(.delegate), .addMnemonic(.delegate):
+		case .enterMnemonic(.delegate):
 			// We don't care about which delegate action was executed, since any corresponding
 			// updates to the warnings will be handled by securityProblemsEffect.
 			// We just need to dismiss the destination.
 			state.destination = nil
 			return .none
 
+		case .displayMnemonic(.delegate(.backedUp)):
+			state.destination = nil
+			return entitiesEffect(state: state)
+
 		case .changeMain(.delegate(.updated)):
+			state.destination = nil
+			return entitiesEffect(state: state)
+
+		case let .noP2PLink(alertAction):
+			switch alertAction {
+			case .addNewP2PLinkTapped:
+				state.destination = .addNewP2PLink(.init())
+				return .none
+
+			case .cancelTapped:
+				return .none
+			}
+
+		case let .addNewP2PLink(.delegate(newP2PAction)):
+			switch newP2PAction {
+			case let .newConnection(connectedClient):
+				state.destination = nil
+				return .run { _ in
+					try await radixConnectClient.updateOrAddP2PLink(connectedClient)
+				} catch: { error, _ in
+					loggerGlobal.error("Failed P2PLink, error \(error)")
+					errorQueue.schedule(error)
+				}
+			}
+
+		case .addFactorSource(.delegate(.finished)):
 			state.destination = nil
 			return entitiesEffect(state: state)
 
 		default:
 			return .none
+		}
+	}
+
+	private func checkP2PLinkEffect() -> Effect<Action> {
+		.run { send in
+			for try await isConnected in await ledgerHardwareWalletClient.isConnectedToAnyConnectorExtension() {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.hasAConnectorExtension(isConnected)))
+			}
+		} catch: { error, _ in
+			loggerGlobal.error("failed to get links updates, error: \(error)")
+		}
+	}
+
+	private func performActionRequiringP2PEffect(_ action: ActionRequiringP2P, in state: inout State) -> Effect<Action> {
+		// If we don't have a connection, we remember what we were trying to do and then ask if they want to link one
+		guard state.hasAConnectorExtension else {
+			state.pendingAction = action
+			state.destination = .noP2PLink(.noP2Plink)
+			return .none
+		}
+
+		state.pendingAction = nil
+
+		// If we have a connection, we can proceed directly
+		switch action {
+		case .addLedger:
+			state.destination = .addNewLedger(.init())
+			return .none
+		case let .continueWithFactorsource(fs):
+			return .send(.delegate(.selectedFactorSource(fs)))
 		}
 	}
 }
@@ -240,7 +324,9 @@ private extension FactorSourcesList {
 			}
 
 			// Determine row selectability
-			let selectability: State.Row.Selectability = if status == .lostFactorSource {
+			let selectability: State.Row.Selectability = if state.context == .display {
+				.selectable
+			} else if status == .lostFactorSource {
 				.unselectable
 			} else if alreadySelectedFactorSourceIds.contains(entity.integrity.factorSource.id) {
 				.alreadySelected
@@ -386,6 +472,29 @@ private extension FactorSourceIntegrity {
 			device.isMnemonicMarkedAsBackedUp
 		case .ledger, .offDeviceMnemonic, .arculusCard, .password:
 			false
+		}
+	}
+}
+
+// MARK: - NoP2PLinkAlert
+enum NoP2PLinkAlert: Sendable, Hashable {
+	case addNewP2PLinkTapped
+	case cancelTapped
+}
+
+extension AlertState<NoP2PLinkAlert> {
+	static var noP2Plink: AlertState {
+		AlertState {
+			TextState(L10n.LedgerHardwareDevices.LinkConnectorAlert.title)
+		} actions: {
+			ButtonState(role: .cancel, action: .cancelTapped) {
+				TextState(L10n.Common.cancel)
+			}
+			ButtonState(action: .addNewP2PLinkTapped) {
+				TextState(L10n.LedgerHardwareDevices.LinkConnectorAlert.continue)
+			}
+		} message: {
+			TextState(L10n.LedgerHardwareDevices.LinkConnectorAlert.message)
 		}
 	}
 }
