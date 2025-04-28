@@ -133,6 +133,13 @@ extension Color.App {
 	var gradientPurple: Color { .init(hex: 0xFF07E6) }
 }
 
+extension Color {
+	var primaryBackground: Color { .init("PrimaryBackground") }
+	var primaryText: Color { .init("PrimaryText") }
+	var secondaryText: Color { .init("SecondaryText") }
+	var textButton: Color { .init("TextButton") }
+}
+
 // MARK: - Color.Hex
 extension Color {
 	fileprivate enum Hex: UInt32 {

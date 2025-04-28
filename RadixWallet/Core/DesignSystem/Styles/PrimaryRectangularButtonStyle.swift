@@ -33,7 +33,7 @@ struct PrimaryRectangularButtonStyle: ButtonStyle {
 	var backgroundColor: Color {
 		controlState.isEnabled
 			? isDestructive ? .app.red1 : .app.blue2
-			: .app.gray4
+			: .app.gray5
 	}
 }
 

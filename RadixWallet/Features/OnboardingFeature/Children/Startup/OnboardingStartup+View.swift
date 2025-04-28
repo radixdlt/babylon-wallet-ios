@@ -20,14 +20,14 @@ extension OnboardingStartup.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				VStack(spacing: 0) {
 					Text(L10n.Onboarding.Step1.title)
-						.foregroundColor(.app.gray1)
+						.foregroundColor(Color.primaryText)
 						.textStyle(.sheetTitle)
 						.padding(.top, .large1)
 						.padding(.horizontal, .large1)
 						.padding(.bottom, .medium3)
 
 					Text(L10n.Onboarding.Step1.subtitle)
-						.foregroundColor(.app.gray2)
+						.foregroundColor(Color.secondaryText)
 						.textStyle(.secondaryHeader)
 						.padding(.horizontal, .huge3)
 
@@ -50,6 +50,7 @@ extension OnboardingStartup.View {
 					}
 					.buttonStyle(.primaryText())
 				}
+				.background(Color.primaryBackground)
 			}
 			.destinations(with: store)
 		}
@@ -103,7 +104,7 @@ struct SplashGraphic: View {
 							.blur(radius: 5)
 
 						RoundedRectangle(cornerRadius: maskRadius)
-							.fill(.white)
+							.fill(Color.primaryBackground)
 							.frame(width: maskWidth, height: maskHeight)
 
 						items(offset: offset)
@@ -118,7 +119,6 @@ struct SplashGraphic: View {
 				}
 				.padding(.vertical, verticalPadding)
 			}
-
 			.coordinateSpace(name: coordinateName)
 		}
 		.frame(height: height + 2 * verticalPadding)

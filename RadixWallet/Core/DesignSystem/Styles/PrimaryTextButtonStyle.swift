@@ -16,7 +16,7 @@ struct PrimaryTextButtonStyle: ButtonStyle {
 extension PrimaryTextButtonStyle {
 	private var foregroundColor: Color {
 		if isEnabled {
-			isDestructive ? .app.red1 : .app.blue2
+			isDestructive ? .app.red1 : Color.textButton
 		} else {
 			.app.gray3
 		}
