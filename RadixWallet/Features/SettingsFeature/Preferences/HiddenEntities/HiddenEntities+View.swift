@@ -11,7 +11,7 @@ extension HiddenEntities {
 					LazyVStack(alignment: .leading, spacing: .large3) {
 						Text(L10n.HiddenEntities.text)
 							.textStyle(.body1HighImportance)
-							.foregroundColor(.app.gray2)
+							.foregroundColor(Color.secondaryText)
 
 						header(L10n.HiddenEntities.personas)
 						personas
@@ -21,7 +21,7 @@ extension HiddenEntities {
 					}
 					.padding(.medium3)
 				}
-				.background(Color.app.gray5)
+				.background(Color.primaryBackground)
 				.radixToolbar(title: L10n.HiddenEntities.title)
 				.task {
 					store.send(.view(.task))

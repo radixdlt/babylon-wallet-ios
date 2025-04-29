@@ -55,6 +55,7 @@ extension InfoLinkSheet {
 						.padding(.vertical, .small2)
 						.id(scrollViewTopID)
 					}
+					.background(Color.primaryBackground)
 					.coordinateSpace(name: coordSpace)
 					.animation(.default.speed(2), value: viewStore.text)
 					.onChange(of: viewStore.text) { _ in
@@ -88,20 +89,20 @@ extension InfoLinkSheet {
 			case let .heading2(heading2):
 				Text(heading2)
 					.textStyle(.sheetTitle)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(Color.primaryText)
 					.multilineTextAlignment(.center)
 					.padding(.bottom, .large1)
 			case let .heading3(heading3):
 				Text(heading3)
 					.textStyle(.body1Header)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(Color.primaryText)
 					.multilineTextAlignment(.center)
 					.padding(.bottom, .medium3)
 			case let .text(text):
 				Text(text)
 					.textStyle(.body1Regular)
-					.foregroundColor(.app.gray1)
-					.tint(.app.blue2)
+					.foregroundColor(Color.primaryText)
+					.tint(Color.textButton)
 					.multilineTextAlignment(.leading)
 					.flushedLeft
 					.padding(.bottom, .small3)

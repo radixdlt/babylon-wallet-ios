@@ -53,7 +53,7 @@ extension CloseButton {
 
 		var tint: Color {
 			switch self {
-			case .toolbar: .app.gray1
+			case .toolbar: Color.primaryText
 			case .homeCard: .app.gray2
 			}
 		}

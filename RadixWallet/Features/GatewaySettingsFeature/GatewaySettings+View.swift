@@ -18,7 +18,7 @@ extension GatewaySettings {
 						.padding(.bottom, .medium1)
 						.radixToolbar(title: L10n.Gateways.title)
 				}
-				.background(.app.gray5)
+				.background(Color.secondaryBackground)
 				.task { @MainActor in await viewStore.send(.view(.task)).finish() }
 				.destinations(with: store)
 			}
@@ -48,7 +48,7 @@ extension GatewaySettings {
 
 		private var subtitle: some SwiftUI.View {
 			Text(L10n.Gateways.subtitle)
-				.foregroundColor(.app.gray2)
+				.foregroundColor(Color.secondaryText)
 				.textStyle(.body1HighImportance)
 		}
 	}

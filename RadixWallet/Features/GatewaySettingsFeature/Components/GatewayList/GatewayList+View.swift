@@ -22,7 +22,7 @@ extension GatewayList {
 							Separator()
 								.padding(.horizontal, isLastRow ? 0 : .medium3)
 						}
-						.background(.app.white)
+						.background(Color.secondaryBackground)
 					}
 				}
 				.buttonStyle(.tappableRowStyle)
