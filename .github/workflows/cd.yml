@@ -78,6 +78,26 @@ jobs:
         with:
           token: ${{ env.WALLET_RADIX_BOT_PAT }}
 
+      - name: Decode Firebase Crashlytics json
+        uses: RDXWorks-actions/base64-to-file@main
+        id: crashlytics_credentials
+        with:
+          fileName: "GoogleService-Info.plist"
+          fileDir: "Aux/"
+          encodedString: ${{ github.event.inputs.flavour == 'release' && secrets.GH_CRASHLYTICS_GOOGLE_SERVICES_JSON_FILE_BASE64_RELEASE }}
+
+      - name: Verify GoogleService-Info.plist exists
+        run: |
+          if [ -f "Aux/GoogleService-Info.plist" ]; then
+            echo "✅ GoogleService-Info.plist successfully created:"
+            ls -l Aux/GoogleService-Info.plist
+            echo "📄 File content preview:"
+            head -n 20 Aux/GoogleService-Info.plist
+          else
+            echo "❌ GoogleService-Info.plist is missing after decoding!"
+            exit 1
+          fi
+          
       - uses: RDXWorks-actions/setup-ruby@master
         with:
           ruby-version: 3.1.2
@@ -102,14 +122,6 @@ jobs:
           brew install xcbeautify
         env:
           GIT_USER: ${{ env.WALLET_RADIX_BOT_USERNAME }}
-
-      - name: Decode Firebase Crashlytics json
-        uses: RDXWorks-actions/base64-to-file@main
-        id: crashlytics_credentials
-        with:
-          fileName: "GoogleService-Info.plist"
-          fileDir: "Aux/"
-          encodedString: ${{ github.event.inputs.flavour == 'release' && secrets.GH_CRASHLYTICS_GOOGLE_SERVICES_JSON_FILE_BASE64_RELEASE }}
 
       - name: "Deploy"
         run: |
