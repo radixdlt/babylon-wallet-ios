@@ -57,7 +57,7 @@ extension Home {
 						.padding(.horizontal, .medium1)
 
 						Button(L10n.HomePage.createNewAccount) {
-							fatalError()
+							store.send(.view(.createAccountButtonTapped))
 						}
 						.buttonStyle(.secondaryRectangular())
 					}
