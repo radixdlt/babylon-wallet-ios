@@ -867,6 +867,8 @@
 		A00697CC2DB8D3A900810D36 /* DisplayMnemonic+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00697CA2DB8D3A900810D36 /* DisplayMnemonic+View.swift */; };
 		A00697CF2DBA304F00810D36 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A00697CE2DBA304F00810D36 /* Sargon */; };
 		A00697D22DBA4C7B00810D36 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A00697D12DBA4C7B00810D36 /* Sargon */; };
+		A0323FCD2DC0DC5700CA31CE /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A0323FCC2DC0DC5700CA31CE /* GoogleService-Info.plist */; };
+		A0323FD02DC0DCEB00CA31CE /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = A0323FCF2DC0DCEB00CA31CE /* FirebaseCrashlytics */; };
 		A08BBA602DAD49D500534B67 /* InteractionReview-ShieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08BBA5E2DAD49D500534B67 /* InteractionReview-ShieldView.swift */; };
 		A08BBA622DAE330700534B67 /* AddFactorSource-ConfirmSeedPhrase.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08BBA612DAE330700534B67 /* AddFactorSource-ConfirmSeedPhrase.swift */; };
 		A08BBA642DAE348700534B67 /* AddFactorSource-ConfirmSeedPhrase+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08BBA632DAE347E00534B67 /* AddFactorSource-ConfirmSeedPhrase+View.swift */; };
@@ -2196,6 +2198,7 @@
 		83FDF7EB2AF260D600D9AA8B /* ProgrammaticScryptoSborValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValue.swift; sourceTree = "<group>"; };
 		A00697C92DB8D3A900810D36 /* DisplayMnemonic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayMnemonic.swift; sourceTree = "<group>"; };
 		A00697CA2DB8D3A900810D36 /* DisplayMnemonic+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DisplayMnemonic+View.swift"; sourceTree = "<group>"; };
+		A0323FCC2DC0DC5700CA31CE /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		A08BBA5E2DAD49D500534B67 /* InteractionReview-ShieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InteractionReview-ShieldView.swift"; sourceTree = "<group>"; };
 		A08BBA612DAE330700534B67 /* AddFactorSource-ConfirmSeedPhrase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSource-ConfirmSeedPhrase.swift"; sourceTree = "<group>"; };
 		A08BBA632DAE347E00534B67 /* AddFactorSource-ConfirmSeedPhrase+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSource-ConfirmSeedPhrase+View.swift"; sourceTree = "<group>"; };
@@ -2705,6 +2708,7 @@
 				A00697CF2DBA304F00810D36 /* Sargon in Frameworks */,
 				5B68F2A12D4118B000181CD7 /* (null) in Frameworks */,
 				48FFFABE2ADC209100B2B213 /* NukeUI in Frameworks */,
+				A0323FD02DC0DCEB00CA31CE /* FirebaseCrashlytics in Frameworks */,
 				48FFFA9F2ADC1F2700B2B213 /* KeychainAccess in Frameworks */,
 				48FFFAF72ADC241A00B2B213 /* Collections in Frameworks */,
 				A00697D22DBA4C7B00810D36 /* Sargon in Frameworks */,
@@ -5433,6 +5437,7 @@
 		48CFC6962ADC110800E77A5C /* Aux */ = {
 			isa = PBXGroup;
 			children = (
+				A0323FCC2DC0DC5700CA31CE /* GoogleService-Info.plist */,
 				48CFC6972ADC110800E77A5C /* InfoPlist.strings */,
 				48CFC6992ADC110800E77A5C /* Config */,
 				48CFC6AD2ADC110800E77A5C /* Radix-Wallet--iOS--Info.plist */,
@@ -7566,6 +7571,7 @@
 				A0FDC0152DB7BAE900F571BA /* Sargon */,
 				A00697CE2DBA304F00810D36 /* Sargon */,
 				A00697D12DBA4C7B00810D36 /* Sargon */,
+				A0323FCF2DC0DCEB00CA31CE /* FirebaseCrashlytics */,
 			);
 			productName = RadixWallet;
 			productReference = 48CFBC4F2ADC106300E77A5C /* Radix Wallet Dev.app */;
@@ -7629,6 +7635,7 @@
 				8318BB172BC8403800057BCB /* XCRemoteSwiftPackageReference "swift-custom-dump" */,
 				A0C673032DA6BD7F0071606B /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */,
 				A00697D02DBA4C7B00810D36 /* XCRemoteSwiftPackageReference "sargon" */,
+				A0323FCE2DC0DCEB00CA31CE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			productRefGroup = 48CFBC502ADC106300E77A5C /* Products */;
 			projectDirPath = "";
@@ -7660,6 +7667,7 @@
 				48CFC6B72ADC110800E77A5C /* Project-Alpha.xcconfig in Resources */,
 				48CFC6BA2ADC110800E77A5C /* Project-Shared.xcconfig in Resources */,
 				48CFC6AF2ADC110800E77A5C /* Common.xcconfig in Resources */,
+				A0323FCD2DC0DC5700CA31CE /* GoogleService-Info.plist in Resources */,
 				48CFC5712ADC10DA00E77A5C /* gateway-api-schema.yml in Resources */,
 				48CFC5FA2ADC10DA00E77A5C /* IBMPlexSans-Bold.ttf in Resources */,
 				48CFC6B62ADC110800E77A5C /* iOS-preAlpha.xcconfig in Resources */,
@@ -9737,6 +9745,14 @@
 				version = 1.2.14;
 			};
 		};
+		A0323FCE2DC0DCEB00CA31CE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = exactVersion;
+				version = 11.12.0;
+			};
+		};
 		A0C673032DA6BD7F0071606B /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/GhenadieVP/ScreenshotPreventing-iOS";
@@ -9912,6 +9928,11 @@
 			package = A00697D02DBA4C7B00810D36 /* XCRemoteSwiftPackageReference "sargon" */;
 			productName = Sargon;
 		};
+		A0323FCF2DC0DCEB00CA31CE /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A0323FCE2DC0DCEB00CA31CE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
+		};
 		A08BBA6A2DAE973700534B67 /* Sargon */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Sargon;
@@ -9937,24 +9958,6 @@
 		A0FDC0152DB7BAE900F571BA /* Sargon */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Sargon;
-		};
-		A0C672FF2DA6BBEA0071606B /* ScreenshotPreventing */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = ScreenshotPreventing;
-		};
-		A0C673012DA6BBEA0071606B /* ScreenshotPreventingSwiftUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = ScreenshotPreventingSwiftUI;
-		};
-		A0C673042DA6BD7F0071606B /* ScreenshotPreventing */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A0C673032DA6BD7F0071606B /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */;
-			productName = ScreenshotPreventing;
-		};
-		A0C673062DA6BD7F0071606B /* ScreenshotPreventingSwiftUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A0C673032DA6BD7F0071606B /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */;
-			productName = ScreenshotPreventingSwiftUI;
 		};
 		A415574F2B757C5E0040AD4E /* ComposableArchitecture */ = {
 			isa = XCSwiftPackageProductDependency;
