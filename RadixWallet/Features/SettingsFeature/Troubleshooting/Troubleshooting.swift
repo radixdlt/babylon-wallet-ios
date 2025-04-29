@@ -1,8 +1,10 @@
 // MARK: - Troubleshooting
+import FirebaseCrashlytics
 
 struct Troubleshooting: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		var isLegacyImportEnabled = true
+		var shareCrashReportsIsEnabled = false
 
 		@PresentationState
 		var destination: Destination.State?
@@ -17,6 +19,7 @@ struct Troubleshooting: Sendable, FeatureReducer {
 		case contactSupportButtonTapped
 		case discordButtonTapped
 		case factoryResetButtonTapped
+		case crashReportingToggled(Bool)
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -56,6 +59,7 @@ struct Troubleshooting: Sendable, FeatureReducer {
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.contactSupportClient) var contactSupport
+	@Dependency(\.userDefaults) var userDefaults
 
 	init() {}
 
@@ -71,6 +75,7 @@ struct Troubleshooting: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onFirstTask:
+			state.shareCrashReportsIsEnabled = userDefaults.shareCrashReportsIsEnabled
 			return loadIsLegacyImportEnabled()
 
 		case .accountScanButtonTapped:
@@ -96,6 +101,12 @@ struct Troubleshooting: Sendable, FeatureReducer {
 
 		case .factoryResetButtonTapped:
 			state.destination = .factoryReset(.init())
+			return .none
+
+		case let .crashReportingToggled(isEnabled):
+			userDefaults.setShareCrashReportsIsEnabled(isEnabled)
+			Crashlytics.crashlytics().setCrashlyticsCollectionEnabled(userDefaults.shareCrashReportsIsEnabled)
+			state.shareCrashReportsIsEnabled = isEnabled
 			return .none
 		}
 	}

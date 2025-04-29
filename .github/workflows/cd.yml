@@ -103,6 +103,24 @@ jobs:
         env:
           GIT_USER: ${{ env.WALLET_RADIX_BOT_USERNAME }}
 
+      - name: Decode Firebase Crashlytics json
+        if: env.FLAVOUR == 'alpha'
+        uses: RDXWorks-actions/base64-to-file@main
+        id: crashlytics_credentials
+        with:
+          fileName: "GoogleService-Info.plist"
+          fileDir: "Aux/"
+          encodedString: ${{ env.GH_CRASHLYTICS_GOOGLE_SERVICES_JSON_FILE_BASE64_ALPHA }}
+
+      - name: Decode Firebase Crashlytics json
+        if: env.FLAVOUR == 'release'
+        uses: RDXWorks-actions/base64-to-file@main
+        id: crashlytics_credentials
+        with:
+          fileName: "GoogleService-Info.plist"
+          fileDir: "Aux/"
+          encodedString: ${{ env.GH_CRASHLYTICS_GOOGLE_SERVICES_JSON_FILE_BASE64_RELEASE }}
+
       - name: "Deploy"
         run: |
           FLAVOUR=alpha

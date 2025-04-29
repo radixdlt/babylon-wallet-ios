@@ -22,6 +22,12 @@ extension DebugSettingsCoordinator.View {
 				ForEachStatic(rows) { kind in
 					SettingsRow(kind: kind, store: store)
 				}
+
+				Button("Simulate crash") {
+					fatalError()
+				}
+				.buttonStyle(.primaryRectangular(isDestructive: true))
+				.padding(.medium1)
 			}
 		}
 		.padding(.bottom, .large3)

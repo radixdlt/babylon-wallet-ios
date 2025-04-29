@@ -1,3 +1,4 @@
+import FirebaseCrashlytics
 
 extension OnboardingClient: DependencyKey {
 	typealias Value = OnboardingClient
@@ -7,7 +8,13 @@ extension OnboardingClient: DependencyKey {
 	static func live(profileStore: ProfileStore = .shared) -> Self {
 		Self(
 			loadProfileState: {
-				try await profileStore.profileStateSequence().first()
+				Crashlytics.crashlytics().log("Loading profile")
+				do {
+					return try await profileStore.profileStateSequence().first()
+				} catch {
+					Crashlytics.crashlytics().log("Failed to load profile \(error)")
+					throw error
+				}
 			},
 			createNewProfile: {
 				try await profileStore.createNewProfile()
