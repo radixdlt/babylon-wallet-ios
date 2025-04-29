@@ -13,11 +13,12 @@ struct SettingsRow<Feature: FeatureReducer>: View {
 					store.send(.view(model.action))
 				}
 				.withSeparator
+				.background(Color.primaryBackground)
 
 		case let .disabled(model):
 			PlainListRow(viewState: model.rowViewState)
 				.withSeparator
-				.background(Color.app.white)
+				.background(Color.primaryBackground)
 
 		case let .toggle(model):
 			ToggleView(
@@ -30,17 +31,19 @@ struct SettingsRow<Feature: FeatureReducer>: View {
 			)
 			.padding(.horizontal, .medium3)
 			.padding(.vertical, .medium1)
-			.background(Color.app.white)
+			.background(Color.primaryBackground)
+			.foregroundStyle(Color.primaryText)
 			.withSeparator
 
 		case let .header(title):
 			HStack(spacing: .zero) {
 				Text(title)
 					.textStyle(.body1Link)
-					.foregroundColor(.app.gray2)
+					.foregroundColor(Color.secondaryText)
 				Spacer()
 			}
 			.padding(.medium3)
+			.background(Color.secondaryBackground)
 
 		case .separator:
 			Rectangle()

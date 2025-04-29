@@ -102,6 +102,8 @@ struct PlainListRow<Icon: View, Accessory: View, Bottom: View>: View {
 		.padding(.vertical, viewState.rowCoreViewState.verticalPadding)
 		.padding(.horizontal, viewState.rowCoreViewState.horizontalPadding)
 		.frame(minHeight: .plainListRowMinHeight)
+		.background(Color.primaryBackground)
+		.foregroundStyle(Color.primaryText)
 		.contentShape(Rectangle())
 	}
 
@@ -241,7 +243,7 @@ private extension PlainListRowCore.ViewState {
 	var titleForegroundColor: Color {
 		switch context {
 		case .toggle, .hiddenPersona, .settings(isError: false), .dappAndPersona, .compactPersona:
-			.app.gray1
+			Color.primaryText
 		case .settings(isError: true):
 			.app.error
 		}
@@ -252,7 +254,7 @@ private extension PlainListRowCore.ViewState {
 		case .toggle, .hiddenPersona:
 			.app.gray2
 		case .settings(isError: false), .dappAndPersona, .compactPersona:
-			.app.gray1
+			Color.primaryText
 		case .settings(isError: true):
 			.app.error
 		}

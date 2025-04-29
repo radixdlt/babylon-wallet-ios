@@ -79,7 +79,7 @@ extension Preferences.View {
 					#endif
 				}
 			}
-			.background(Color.app.gray5)
+			.background(Color.secondaryBackground)
 			.onAppear {
 				viewStore.send(.appeared)
 			}

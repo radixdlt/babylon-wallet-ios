@@ -87,7 +87,7 @@ struct CarouselCardView: View {
 						.textStyle(.body2Regular)
 				}
 				.multilineTextAlignment(.leading)
-				.foregroundStyle(.app.gray1)
+				.foregroundStyle(Color.primaryText)
 				.padding([.top, .leading], .medium2)
 				.padding(.trailing, trailingPadding)
 				.padding(.bottom, .small1)
@@ -95,7 +95,7 @@ struct CarouselCardView: View {
 				.background(alignment: .trailing) {
 					background
 				}
-				.background(.app.gray5)
+				.background(Color.primaryBackground)
 				.cornerRadius(.small1)
 			}
 
@@ -180,7 +180,7 @@ struct CarouselCardView: View {
 				.resizable()
 				.aspectRatio(contentMode: .fill)
 				.mask {
-					LinearGradient(colors: [.clear, .white, .white], startPoint: .leading, endPoint: .trailing)
+					LinearGradient(colors: [.clear, Color.primaryBackground, Color.primaryBackground], startPoint: .leading, endPoint: .trailing)
 				}
 		}
 	}

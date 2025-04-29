@@ -13,7 +13,7 @@ extension View {
 		toolbar {
 			ToolbarItem(placement: .principal) {
 				Text(title)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(Color.primaryText)
 					.textStyle(.body1Header)
 			}
 
@@ -24,7 +24,7 @@ extension View {
 			}
 		}
 		.navigationBarTitleDisplayMode(.inline)
-		.toolbarBackground(.app.background, for: .navigationBar)
+		.toolbarBackground(Color.primaryBackground, for: .navigationBar)
 		.toolbarBackground(alwaysVisible ? .visible : .automatic, for: .navigationBar)
 	}
 

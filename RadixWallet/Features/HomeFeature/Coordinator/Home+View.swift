@@ -67,7 +67,7 @@ extension Home {
 				.toolbar {
 					ToolbarItem(placement: .topBarLeading) {
 						Text(L10n.HomePage.title)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(Color.primaryText)
 							.textStyle(.sheetTitle)
 							.padding(.leading, .medium3)
 					}
@@ -77,6 +77,7 @@ extension Home {
 						} label: {
 							Image(.homeHeaderSettings)
 						}
+						.tint(Color.primaryText)
 						.padding(.trailing, .medium3)
 					}
 				}
@@ -94,6 +95,7 @@ extension Home {
 			.onDisappear {
 				store.send(.view(.onDisappear))
 			}
+			.background(Color.primaryBackground)
 		}
 	}
 }
