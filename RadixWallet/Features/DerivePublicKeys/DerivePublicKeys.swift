@@ -105,7 +105,11 @@ private extension DerivationPurpose {
 		switch self {
 		case .accountRecovery:
 			.deriveAccounts
-		case .creatingNewAccount, .creatingNewPersona, .securifyingAccount, .securifyingPersona, .securifyingAccountsAndPersonas, .preDerivingKeys:
+		case .creatingNewAccount:
+			.createAccountAuthorization
+		case .creatingNewPersona:
+			.createPersonaAuthorization
+		case .securifyingAccount, .securifyingPersona, .securifyingAccountsAndPersonas, .preDerivingKeys:
 			.updateFactorConfig
 		}
 	}

@@ -164,7 +164,7 @@ struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 					factorSource: state.entitiesControlledByFactorSource.deviceFactorSource
 				)
 
-			case .persistedMnemonicInKeychainOnly, .doneViewing, .persistedNewFactorSourceInProfile:
+			case .persistedMnemonicInKeychainOnly, .persistedNewFactorSourceInProfile:
 				preconditionFailure("Incorrect implementation")
 			}
 

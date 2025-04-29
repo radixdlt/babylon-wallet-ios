@@ -224,7 +224,7 @@ struct AccountDetails: Sendable, FeatureReducer {
 				state.destination = .nonFungibleDetails(.init(
 					resourceAddress: resource.resourceAddress,
 					ownedResource: resource,
-					details: .token(token),
+					details: .token(.init(token: token)),
 					ledgerState: resource.atLedgerState
 				))
 
@@ -246,7 +246,7 @@ struct AccountDetails: Sendable, FeatureReducer {
 				state.destination = .stakeClaimDetails(.init(
 					resourceAddress: resource.resourceAddress,
 					resourceDetails: .success(resource),
-					details: .token(claim.token),
+					details: .token(.init(token: claim.token)),
 					ledgerState: resource.atLedgerState,
 					stakeClaim: claim
 				))

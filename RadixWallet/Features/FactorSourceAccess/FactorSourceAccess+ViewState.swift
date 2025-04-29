@@ -42,7 +42,7 @@ extension FactorSourceAccess.State {
 			case .updateFactorConfig, .deriveAccounts:
 				return S.Ledger.deriveKeysMessage
 			case .createAccountAuthorization, .createPersonaAuthorization:
-				fatalError("Not supported")
+				return L10n.Authorization.CreateEntity.message
 			}
 
 		case .arculusCard:
@@ -76,15 +76,6 @@ extension FactorSourceAccess.State {
 			case .createAccountAuthorization, .createPersonaAuthorization:
 				fatalError("Not supported")
 			}
-		}
-	}
-
-	var showCard: Bool {
-		switch purpose {
-		case .signature, .spotCheck, .proveOwnership, .encryptMessage, .updateFactorConfig, .deriveAccounts:
-			true
-		case .createAccountAuthorization, .createPersonaAuthorization:
-			false
 		}
 	}
 

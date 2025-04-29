@@ -25,6 +25,7 @@ extension ResourceBalance {
 			let resourceName: String?
 			let nonFungibleName: String?
 			let amount: ResourceAmount?
+			let isPredicted: Bool
 		}
 
 		struct LiquidStakeUnit: Sendable, Hashable {
@@ -86,11 +87,12 @@ private extension ResourceBalance.ViewState.NonFungible {
 		switch details {
 		case let .token(token):
 			self.init(
-				id: token.id,
+				id: token.token.id,
 				resourceImage: resource.metadata.iconURL,
 				resourceName: resource.metadata.name,
-				nonFungibleName: token.data?.name,
-				amount: nil
+				nonFungibleName: token.token.data?.name,
+				amount: nil,
+				isPredicted: token.isPredicted
 			)
 		case let .amount(amount):
 			self.init(
@@ -98,7 +100,8 @@ private extension ResourceBalance.ViewState.NonFungible {
 				resourceImage: resource.metadata.iconURL,
 				resourceName: resource.metadata.name,
 				nonFungibleName: resource.resourceAddress.formatted(),
-				amount: .init(amount)
+				amount: .init(amount),
+				isPredicted: false
 			)
 		}
 	}
@@ -241,7 +244,8 @@ extension ResourceBalanceView {
 				caption1: viewState.resourceName ?? viewState.id?.resourceAddress.formatted(),
 				caption2: viewState.nonFungibleName ?? viewState.id?.localID.formatted(),
 				compact: compact,
-				amount: viewState.amount
+				amount: viewState.amount,
+				isPredicted: viewState.isPredicted
 			)
 		}
 	}
@@ -341,7 +345,8 @@ extension ResourceBalanceView {
 					caption1: viewState.resourceMetadata.title,
 					caption2: viewState.validatorName,
 					compact: compact,
-					amount: nil
+					amount: nil,
+					isPredicted: viewState.isPredicted
 				)
 
 				if !hideDetails {
@@ -444,7 +449,7 @@ extension ResourceBalanceView {
 							} label: {
 								let isSelected = viewState.selectedStakeClaims?.contains(claim.id)
 								ResourceBalanceView(
-									.fungible(.xrd(balance: .exact(claim.claimAmount), network: claim.validatorAddress.networkID)),
+									.fungible(.xrd(balance: claim.claimAmount, network: claim.validatorAddress.networkID)),
 									appearance: .compact,
 									isSelected: isSelected
 								)
@@ -543,6 +548,7 @@ extension ResourceBalanceView {
 		let caption2: String?
 		let compact: Bool
 		let amount: ResourceAmount?
+		let isPredicted: Bool
 
 		var body: some View {
 			VStack(alignment: .leading) {
@@ -555,10 +561,14 @@ extension ResourceBalanceView {
 						compact: compact
 					)
 
-					Spacer(minLength: amount != nil ? .small2 : 0)
+					Spacer(minLength: amount != nil || isPredicted ? .small2 : 0)
 
 					if let amount {
 						AmountView(amount: amount, appearance: compact ? .compact : .standard)
+					} else if isPredicted {
+						Text(L10n.InteractionReview.estimated)
+							.textStyle(.body3Regular)
+							.foregroundStyle(.app.gray1)
 					}
 				}
 

@@ -49,9 +49,9 @@ struct StakeUnitList: Sendable, FeatureReducer {
 					)
 				}.reduce(.zero, +)
 
-				let unstakingAmount = stakeClaims.filter(not(\.isReadyToBeClaimed)).map(\.claimAmount)
+				let unstakingAmount = stakeClaims.filter(not(\.isReadyToBeClaimed)).compactMap(\.claimAmount.exactAmount)
 					.reduce(.zero, +)
-				let readyToClaimAmount = stakeClaims.filter(\.isReadyToBeClaimed).map(\.claimAmount)
+				let readyToClaimAmount = stakeClaims.filter(\.isReadyToBeClaimed).compactMap(\.claimAmount.exactAmount)
 					.reduce(.zero, +)
 
 				let validatorStakes = details.map { stake in
@@ -204,7 +204,7 @@ struct StakeUnitList: Sendable, FeatureReducer {
 						validatorAddress: validatorAddress,
 						resourceAddress: nonFungibleResourceAddress,
 						ids: stakeClaims.map(\.id.nonFungibleLocalId),
-						amount: stakeClaims.map(\.claimAmount.nominalAmount).reduce(0, +)
+						amount: stakeClaims.compactMap(\.claimAmount.exactAmount?.nominalAmount).reduce(0, +)
 					),
 				]
 			)
@@ -227,7 +227,7 @@ struct StakeUnitList: Sendable, FeatureReducer {
 						validatorAddress: stake.validator.address,
 						resourceAddress: nonFungibleResourceAddress,
 						ids: stakeClaims.map(\.id.nonFungibleLocalId),
-						amount: stakeClaims.map(\.claimAmount.nominalAmount).reduce(0, +)
+						amount: stakeClaims.compactMap(\.claimAmount.exactAmount?.nominalAmount).reduce(0, +)
 					)
 				}
 			)

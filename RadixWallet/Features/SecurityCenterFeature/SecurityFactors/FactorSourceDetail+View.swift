@@ -5,67 +5,63 @@ extension FactorSourceDetail {
 		let store: StoreOf<FactorSourceDetail>
 
 		var body: some SwiftUI.View {
-			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+			WithPerceptionTracking {
 				ScrollView {
 					VStack(spacing: .zero) {
-						ForEachStatic(rows(viewStore)) { kind in
+						ForEachStatic(rows()) { kind in
 							SettingsRow(kind: kind, store: store)
 						}
 					}
 				}
 				.background(Color.app.gray5)
-				.radixToolbar(title: viewStore.name)
+				.radixToolbar(title: store.name)
 				.foregroundStyle(.app.gray1)
 				.destination(store: store)
 			}
 		}
 
-		private func rows(_ viewStore: ViewStore<FactorSourceDetail.State, FactorSourceDetail.ViewAction>) -> [SettingsRow<FactorSourceDetail>.Kind] {
-			switch viewStore.integrity {
+		private func rows() -> [SettingsRow<FactorSourceDetail>.Kind] {
+			switch store.integrity {
 			case let .device(device):
 				[
 					.header(L10n.FactorSources.Detail.manage),
-					renameRow(viewStore),
+					renameRow(),
 					deviceSeedPhraseRow(device),
-					.header(L10n.FactorSources.Detail.test),
-					spotCheckRow(viewStore),
+					// .header(L10n.FactorSources.Detail.test),
+					// spotCheckRow(viewStore),
 				]
-			case .ledger, .offDeviceMnemonic, .password:
+			case .ledger:
 				[
 					.header(L10n.FactorSources.Detail.manage),
-					renameRow(viewStore),
-					.header(L10n.FactorSources.Detail.test),
-					spotCheckRow(viewStore),
+					renameRow(),
+//					.header(L10n.FactorSources.Detail.test),
+//					spotCheckRow(viewStore),
 				]
-			case .arculusCard:
+			default:
 				[
 					.header(L10n.FactorSources.Detail.manage),
-					renameRow(viewStore),
-					changePinRow(viewStore),
-					.header(L10n.FactorSources.Detail.test),
-					spotCheckRow(viewStore),
 				]
 			}
 		}
 
-		private func renameRow(_ viewStore: ViewStore<FactorSourceDetail.State, FactorSourceDetail.ViewAction>) -> SettingsRow<FactorSourceDetail>.Kind {
+		private func renameRow() -> SettingsRow<FactorSourceDetail>.Kind {
 			.model(
-				title: viewStore.name,
+				title: store.name,
 				subtitle: L10n.FactorSources.Detail.rename,
 				icon: .asset(.create),
 				action: .renameTapped
 			)
 		}
 
-		private func spotCheckRow(_ viewStore: ViewStore<FactorSourceDetail.State, FactorSourceDetail.ViewAction>) -> SettingsRow<FactorSourceDetail>.Kind {
-			.model(
-				title: L10n.FactorSources.Detail.spotCheck,
-				subtitle: L10n.FactorSources.Detail.testCanUse,
-				markdown: viewStore.lastUsedMessage,
-				icon: .systemImage("checkmark.circle"),
-				action: .spotCheckTapped
-			)
-		}
+//		private func spotCheckRow(_ viewStore: ViewStore<FactorSourceDetail.State, FactorSourceDetail.ViewAction>) -> SettingsRow<FactorSourceDetail>.Kind {
+//			.model(
+//				title: L10n.FactorSources.Detail.spotCheck,
+//				subtitle: L10n.FactorSources.Detail.testCanUse,
+//				markdown: viewStore.lastUsedMessage,
+//				icon: .systemImage("checkmark.circle"),
+//				action: .spotCheckTapped
+//			)
+//		}
 
 		private func deviceSeedPhraseRow(_ integrity: DeviceFactorSourceIntegrity) -> SettingsRow<FactorSourceDetail>.Kind {
 			if integrity.isMnemonicPresentInSecureStorage {
@@ -105,10 +101,7 @@ private extension FactorSourceDetail.State {
 
 private extension StoreOf<FactorSourceDetail> {
 	var destination: PresentationStoreOf<FactorSourceDetail.Destination> {
-		func scopeState(state: State) -> PresentationState<FactorSourceDetail.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
+		scope(state: \.$destination, action: \.destination)
 	}
 }
 
@@ -119,7 +112,7 @@ private extension View {
 		return rename(with: destinationStore)
 			.displayMnemonic(with: destinationStore)
 			.importMnemonics(with: destinationStore)
-			.spotCheckAlert(with: destinationStore)
+		// .spotCheckAlert(with: destinationStore)
 	}
 
 	private func rename(with destinationStore: PresentationStoreOf<FactorSourceDetail.Destination>) -> some View {
@@ -140,7 +133,7 @@ private extension View {
 		}
 	}
 
-	private func spotCheckAlert(with destinationStore: PresentationStoreOf<FactorSourceDetail.Destination>) -> some View {
-		alert(store: destinationStore.scope(state: \.spotCheckAlert, action: \.spotCheckAlert))
-	}
+//	private func spotCheckAlert(with destinationStore: PresentationStoreOf<FactorSourceDetail.Destination>) -> some View {
+//		alert(store: destinationStore.scope(state: \.spotCheckAlert, action: \.spotCheckAlert))
+//	}
 }

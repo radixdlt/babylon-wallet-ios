@@ -21,7 +21,7 @@ extension NonFungibleTokenDetails.State {
 	}
 
 	var token: OnLedgerEntity.NonFungibleToken? {
-		details?.token
+		details?.token?.token
 	}
 
 	var amount: ResourceAmount? {
@@ -168,7 +168,7 @@ extension NonFungibleTokenDetails.View {
 				.foregroundColor(.app.gray1)
 
 			ResourceBalanceView(
-				.fungible(.xrd(balance: .exact(stakeClaim.claimAmount), network: stakeClaim.validatorAddress.networkID)),
+				.fungible(.xrd(balance: stakeClaim.claimAmount, network: stakeClaim.validatorAddress.networkID)),
 				appearance: .standard
 			)
 			.padding(.horizontal, .medium3)

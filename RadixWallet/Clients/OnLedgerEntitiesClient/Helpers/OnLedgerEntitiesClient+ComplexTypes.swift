@@ -267,12 +267,14 @@ extension OnLedgerEntitiesClient {
 
 	func nonFungibleResourceBalances(
 		_ resourceInfo: InteractionReview.Sections.ResourceInfo,
+		resourceQuantifier: NonFungibleResourceIndicator,
 		resourceAddress: ResourceAddress,
-		ids: [NonFungibleLocalId],
 		unstakeData: [NonFungibleGlobalId: UnstakeData] = [:],
 		newlyCreatedNonFungibles: [NonFungibleGlobalId] = []
 	) async throws -> [KnownResourceBalance] {
 		let result: [KnownResourceBalance]
+		let ids = resourceQuantifier.ids
+		let isPredicted = resourceQuantifier.isPredicted
 
 		switch resourceInfo {
 		case let .left(resource):
@@ -306,6 +308,7 @@ extension OnLedgerEntitiesClient {
 			if let stakeClaimValidator = await isStakeClaimNFT(resource) {
 				result = try stakeClaims(
 					resource,
+					isPredicted: isPredicted,
 					stakeClaimValidator: stakeClaimValidator,
 					unstakeData: unstakeData,
 					tokens: tokens
@@ -315,7 +318,7 @@ extension OnLedgerEntitiesClient {
 					let isHidden = hiddenResources.contains(.nonFungible(token.id.resourceAddress))
 					return KnownResourceBalance(
 						resource: resource,
-						details: .nonFungible(.token(token)),
+						details: .nonFungible(.token(.init(token: token, isPredicted: isPredicted))),
 						isHidden: isHidden
 					)
 				}
@@ -340,7 +343,12 @@ extension OnLedgerEntitiesClient {
 				.map { id in
 					KnownResourceBalance(
 						resource: resource,
-						details: .nonFungible(.token(.init(id: id, data: nil))),
+						details: .nonFungible(.token(
+							.init(
+								token: .init(id: id, data: nil),
+								isPredicted: isPredicted
+							)
+						)),
 						isHidden: false
 					)
 				}
@@ -373,13 +381,15 @@ extension OnLedgerEntitiesClient {
 					resource: resource,
 					stakeClaims: stakeClaimTokens.asIdentified()
 				),
-				validatorName: stakeClaimValidator.metadata.name
+				validatorName: stakeClaimValidator.metadata.name,
+				isPredicted: false
 			))
 		)
 	}
 
 	private func stakeClaims(
 		_ resource: OnLedgerEntity.Resource,
+		isPredicted: Bool,
 		stakeClaimValidator: OnLedgerEntity.Validator,
 		unstakeData: [NonFungibleGlobalId: UnstakeData],
 		tokens: [OnLedgerEntity.NonFungibleToken]
@@ -399,7 +409,8 @@ extension OnLedgerEntitiesClient {
 						resource: resource,
 						stakeClaims: [$0].asIdentified()
 					),
-					validatorName: stakeClaimValidator.metadata.name
+					validatorName: stakeClaimValidator.metadata.name,
+					isPredicted: isPredicted
 				))
 			)
 		}
@@ -413,31 +424,32 @@ extension OnLedgerEntitiesClient {
 	) throws -> [OnLedgerEntitiesClient.StakeClaim] {
 		let stakeClaimTokens: [OnLedgerEntitiesClient.StakeClaim] = if unstakeData.isEmpty {
 			try tokens.map { token in
-				guard let data = token.data else {
+				guard token.id.resourceAddress == resource.resourceAddress else {
 					throw InvalidStakeClaimToken()
 				}
 
-				guard let claimAmount = data.claimAmount, token.id.resourceAddress == resource.resourceAddress else {
-					throw InvalidStakeClaimToken()
-				}
+				let claimAmount = token.data.flatMap(\.claimAmount).map { ResourceAmount(nominalAmount: $0) } ?? ResourceAmount.unknown
+				let claimEpoch = token.data.flatMap(\.claimEpoch).map { Int($0) - Int(resource.atLedgerState.epoch) }
 
 				return OnLedgerEntitiesClient.StakeClaim(
 					validatorAddress: stakeClaimValidator.address,
 					token: token,
-					claimAmount: .init(nominalAmount: claimAmount),
-					reamainingEpochsUntilClaim: data.claimEpoch.map { Int($0) - Int(resource.atLedgerState.epoch) }
+					claimAmount: claimAmount,
+					reamainingEpochsUntilClaim: claimEpoch
 				)
 			}
 		} else {
 			try tokens.map { token in
-				guard let data = unstakeData[token.id] else {
-					throw MissingStakeClaimTokenData()
+				guard token.id.resourceAddress == resource.resourceAddress else {
+					throw InvalidStakeClaimToken()
 				}
+
+				let claimAmount = unstakeData[token.id].map { ResourceAmount(nominalAmount: $0.claimAmount) } ?? ResourceAmount.unknown
 
 				return OnLedgerEntitiesClient.StakeClaim(
 					validatorAddress: stakeClaimValidator.address,
 					token: token,
-					claimAmount: .init(nominalAmount: data.claimAmount),
+					claimAmount: claimAmount,
 					reamainingEpochsUntilClaim: nil
 				)
 			}
@@ -454,6 +466,17 @@ extension InteractionReview.Sections.ResourceInfo {
 			resource.metadata
 		case let .right(metadata):
 			metadata
+		}
+	}
+}
+
+extension NonFungibleResourceIndicator {
+	var isPredicted: Bool {
+		switch self {
+		case .guaranteed:
+			false
+		case .predicted:
+			true
 		}
 	}
 }

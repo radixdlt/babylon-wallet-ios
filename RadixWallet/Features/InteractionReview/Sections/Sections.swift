@@ -24,8 +24,6 @@ extension InteractionReview {
 			// The proofs are set here (within the resolve logic) but may be rendered and handled by the parent view, in the case they are placed outside the Sections (TransactionReview).
 			var proofs: Proofs.State? = nil
 
-			var shieldUpdate: InteractionReview.ShieldState? = nil
-
 			@PresentationState
 			var destination: Destination.State? = nil
 		}
@@ -115,6 +113,7 @@ extension InteractionReview {
 		@Dependency(\.accountsClient) var accountsClient
 		@Dependency(\.personasClient) var personasClient
 		@Dependency(\.appPreferencesClient) var appPreferencesClient
+		@Dependency(\.errorQueue) var errorQueue
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 		var body: some ReducerOf<Self> {
@@ -189,7 +188,6 @@ extension InteractionReview {
 				state.accountDepositExceptions = sections.accountDepositExceptions
 				state.proofs = sections.proofs
 				state.accountDeletion = sections.accountDeletion
-				state.shieldUpdate = sections.shieldUpdate
 				return .none
 			}
 		}
@@ -200,18 +198,16 @@ extension InteractionReview {
 				.run { send in
 					let sections = try await sections(for: executionSummary, networkID: networkID)
 					await send(.internal(.setSections(sections)))
-				} catch: { error, send in
-					loggerGlobal.error("Failed to extract sections from ExecutionSummary, error: \(error)")
-					await send(.internal(.setSections(nil)))
+				} catch: { error, _ in
+					errorQueue.schedule(error)
 				}
 
 			case let .resolveManifestSummary(manifestSummary, networkID):
 				.run { send in
 					let sections = try await sections(for: manifestSummary, networkID: networkID)
 					await send(.internal(.setSections(sections)))
-				} catch: { error, send in
-					loggerGlobal.error("Failed to extract sections from ManifestSummary, error: \(error)")
-					await send(.internal(.setSections(nil)))
+				} catch: { error, _ in
+					errorQueue.schedule(error)
 				}
 
 			case let .showResourceDetails(resource, details):
@@ -310,7 +306,7 @@ private extension InteractionReview.Sections {
 			state.destination = .nonFungibleTokenDetails(.init(
 				resourceAddress: resource.resourceAddress,
 				resourceDetails: .success(resource),
-				details: nft.map(KnownResourceBalance.NonFungible.token),
+				details: nft.map { KnownResourceBalance.NonFungible.token(.init(token: $0)) },
 				ledgerState: resource.atLedgerState,
 				stakeClaim: details.stakeClaimTokens.stakeClaims.first,
 				isClaimStakeEnabled: false

@@ -94,10 +94,24 @@ struct KnownResourceBalance: Sendable, Hashable {
 	}
 
 	enum NonFungible: Sendable, Hashable {
-		case token(OnLedgerEntity.NonFungibleToken)
+		struct Token: Sendable, Hashable {
+			let token: OnLedgerEntity.NonFungibleToken
+			let isPredicted: Bool
+
+			var id: NonFungibleGlobalID {
+				token.id
+			}
+
+			init(token: OnLedgerEntity.NonFungibleToken, isPredicted: Bool = false) {
+				self.token = token
+				self.isPredicted = isPredicted
+			}
+		}
+
+		case token(Token)
 		case amount(amount: ResourceAmount)
 
-		var token: OnLedgerEntity.NonFungibleToken? {
+		var token: Token? {
 			guard case let .token(token) = self else { return nil }
 			return token
 		}
@@ -115,6 +129,7 @@ struct KnownResourceBalance: Sendable, Hashable {
 
 	struct StakeClaimNFT: Sendable, Hashable {
 		let validatorName: String?
+		let isPredicted: Bool
 		var stakeClaimTokens: Tokens
 		let stakeClaimResource: OnLedgerEntity.Resource
 
@@ -126,9 +141,11 @@ struct KnownResourceBalance: Sendable, Hashable {
 			canClaimTokens: Bool,
 			stakeClaimTokens: OnLedgerEntitiesClient.NonFungibleResourceWithTokens,
 			validatorName: String? = nil,
+			isPredicted: Bool = false,
 			selectedStakeClaims: IdentifiedArrayOf<NonFungibleGlobalId>? = nil
 		) {
 			self.validatorName = validatorName
+			self.isPredicted = isPredicted
 			self.stakeClaimResource = stakeClaimTokens.resource
 			self.stakeClaimTokens = .init(
 				canClaimTokens: canClaimTokens,

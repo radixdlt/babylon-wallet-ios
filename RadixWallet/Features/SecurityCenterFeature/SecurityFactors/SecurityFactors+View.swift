@@ -42,11 +42,11 @@ private extension SecurityFactors.View {
 			.header(L10n.SecurityFactors.subtitle),
 			model(kind: .device, hints: viewStore.deviceHints),
 			.header(L10n.SecurityFactors.hardware),
-			model(kind: .arculusCard),
+			// model(kind: .arculusCard),
 			model(kind: .ledgerHqHardwareWallet),
-			.header(L10n.SecurityFactors.information),
-			model(kind: .password),
-			model(kind: .offDeviceMnemonic),
+//			.header(L10n.SecurityFactors.information),
+//			model(kind: .password),
+//			model(kind: .offDeviceMnemonic),
 		]
 	}
 
@@ -73,10 +73,7 @@ private extension SecurityFactors.State {
 
 private extension StoreOf<SecurityFactors> {
 	var destination: PresentationStoreOf<SecurityFactors.Destination> {
-		func scopeState(state: State) -> PresentationState<SecurityFactors.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
+		scope(state: \.$destination, action: \.destination)
 	}
 }
 

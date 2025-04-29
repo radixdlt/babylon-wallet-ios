@@ -8,7 +8,6 @@ struct ImportMnemonicGrid: Sendable, FeatureReducer {
 		var words: Words
 		let language: BIP39Language
 		let isWordCountFixed: Bool
-		let isReadOnlyMode: Bool
 
 		init(
 			count: Bip39WordCount,
@@ -18,16 +17,17 @@ struct ImportMnemonicGrid: Sendable, FeatureReducer {
 			self.words = []
 			self.language = language
 			self.isWordCountFixed = isWordCountFixed
-			self.isReadOnlyMode = false
 
 			changeWordCount(to: count)
 		}
 
-		init(mnemonic: Mnemonic) {
-			self.words = Self.words(from: mnemonic, isReadOnlyMode: true)
+		init(
+			mnemonic: Mnemonic,
+			isWordCountFixed: Bool = true
+		) {
+			self.words = Self.words(from: mnemonic)
 			self.language = mnemonic.language
-			self.isWordCountFixed = true
-			self.isReadOnlyMode = true
+			self.isWordCountFixed = isWordCountFixed
 		}
 
 		var wordCount: BIP39WordCount {
@@ -91,12 +91,12 @@ struct ImportMnemonicGrid: Sendable, FeatureReducer {
 
 		case .debugPaste:
 			if let phrase = pasteboardClient.getString(), let mnemonic = try? Mnemonic(phrase: phrase, language: state.language) {
-				state.words = State.words(from: mnemonic, isReadOnlyMode: state.isReadOnlyMode)
+				state.words = State.words(from: mnemonic)
 			}
 			return .none
 
 		case .debugSetSample:
-			state.words = State.words(from: .sampleDevice, isReadOnlyMode: state.isReadOnlyMode)
+			state.words = State.words(from: .sampleDevice)
 			return .none
 		#endif
 		}
@@ -256,7 +256,6 @@ private extension ImportMnemonicGrid.State {
 			words.append(contentsOf: (wordCount ..< Int(newWordCount.rawValue)).map {
 				.init(
 					id: $0,
-					isReadonlyMode: isReadOnlyMode
 				)
 			})
 		} else if delta < 0 {
@@ -265,7 +264,7 @@ private extension ImportMnemonicGrid.State {
 		}
 	}
 
-	static func words(from mnemonic: Mnemonic, isReadOnlyMode: Bool) -> Words {
+	static func words(from mnemonic: Mnemonic) -> Words {
 		.init(
 			uniqueElements: mnemonic.words
 				.enumerated()
@@ -277,7 +276,6 @@ private extension ImportMnemonicGrid.State {
 							word: $0.element,
 							completion: .auto(match: .exact)
 						),
-						isReadonlyMode: isReadOnlyMode
 					)
 				}
 		)

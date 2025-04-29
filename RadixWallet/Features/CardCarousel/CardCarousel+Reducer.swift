@@ -60,6 +60,9 @@ struct CardCarousel: FeatureReducer, Sendable {
 	}
 
 	private func removeCardEffect(_ card: HomeCard) -> Effect<Action> {
+		guard card != .discoverRadixDapps else {
+			return .none
+		}
 		homeCardsClient.removeCard(card)
 		return .none
 	}

@@ -1,5 +1,7 @@
 // MARK: - FactorSourceDetail
+@Reducer
 struct FactorSourceDetail: Sendable, FeatureReducer {
+	@ObservableState
 	struct State: Sendable, Hashable {
 		let integrity: FactorSourceIntegrity
 		var name: String
@@ -11,7 +13,7 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 			self.lastUsed = integrity.factorSource.asGeneral.common.lastUsedOn
 		}
 
-		@PresentationState
+		@Presents
 		var destination: Destination.State?
 
 		var factorSource: FactorSource {
@@ -19,17 +21,19 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 		}
 	}
 
+	typealias Action = FeatureAction<Self>
+
 	enum ViewAction: Sendable, Equatable {
 		case renameTapped
 		case viewSeedPhraseTapped
 		case enterSeedPhraseTapped
 		case changePinTapped
-		case spotCheckTapped
+		// case spotCheckTapped
 	}
 
-	enum InternalAction: Sendable, Hashable {
-		case spotCheckResult(Bool)
-	}
+//	enum InternalAction: Sendable, Hashable {
+//		case spotCheckResult(Bool)
+//	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
@@ -37,7 +41,7 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 			case rename(RenameLabel.State)
 			case displayMnemonic(DisplayMnemonic.State)
 			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
-			case spotCheckAlert(AlertState<Never>)
+			// case spotCheckAlert(AlertState<Never>)
 		}
 
 		@CasePathable
@@ -45,7 +49,7 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 			case rename(RenameLabel.Action)
 			case displayMnemonic(DisplayMnemonic.Action)
 			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
-			case spotCheckAlert(Never)
+			// case spotCheckAlert(Never)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -80,7 +84,7 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 
 		case .viewSeedPhraseTapped:
 			return exportMnemonic(integrity: state.integrity) {
-				state.destination = .displayMnemonic(.export($0, title: L10n.RevealSeedPhrase.title, context: .fromSettings))
+				state.destination = .displayMnemonic(.init(mnemonic: $0.mnemonicWithPassphrase.mnemonic, factorSourceID: $0.factorSourceID))
 			}
 
 		case .enterSeedPhraseTapped:
@@ -89,33 +93,32 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 
 		case .changePinTapped:
 			return .none
-
-		case .spotCheckTapped:
-			return .run { [factorSource = state.factorSource] send in
-				let result = try await SargonOS.shared.triggerSpotCheck(factorSource: factorSource)
-				await send(.internal(.spotCheckResult(result)))
-			} catch: { error, send in
-				if error.isHostInteractionAborted {
-					// Tapping on Close button is considered a failure
-					await send(.internal(.spotCheckResult(false)))
-				} else {
-					errorQueue.schedule(error)
-				}
-			}
+//		case .spotCheckTapped:
+//			return .run { [factorSource = state.factorSource] send in
+//				let result = try await SargonOS.shared.triggerSpotCheck(factorSource: factorSource)
+//				await send(.internal(.spotCheckResult(result)))
+//			} catch: { error, send in
+//				if error.isHostInteractionAborted {
+//					// Tapping on Close button is considered a failure
+//					await send(.internal(.spotCheckResult(false)))
+//				} else {
+//					errorQueue.schedule(error)
+//				}
+//			}
 		}
 	}
 
-	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
-		switch internalAction {
-		case .spotCheckResult(true):
-			state.lastUsed = .init()
-			state.destination = .spotCheckAlert(.spotCheckSuccess)
-			return .none
-		case .spotCheckResult(false):
-			state.destination = .spotCheckAlert(.spotCheckFailure)
-			return .none
-		}
-	}
+//	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+//		switch internalAction {
+//		case .spotCheckResult(true):
+//			state.lastUsed = .init()
+//			state.destination = .spotCheckAlert(.spotCheckSuccess)
+//			return .none
+//		case .spotCheckResult(false):
+//			state.destination = .spotCheckAlert(.spotCheckFailure)
+//			return .none
+//		}
+//	}
 
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
