@@ -7777,7 +7777,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [[ \"$CONFIGURATION_LOWERCASE\" == \"release\" ]]; then\n\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\nfi\n\n\n";
+			shellScript = "if [[ \"$CONFIGURATION_LOWERCASE\" == \"release\" ]]; then\n\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

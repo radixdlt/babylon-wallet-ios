@@ -66,7 +66,7 @@ extension DisplayMnemonic {
 				),
 				placeholder: "",
 				text: .constant(word.element.word),
-				preventScreenshot: true,
+				preventScreenshot: true
 			)
 			.allowsHitTesting(false)
 			.minimumScaleFactor(0.9)

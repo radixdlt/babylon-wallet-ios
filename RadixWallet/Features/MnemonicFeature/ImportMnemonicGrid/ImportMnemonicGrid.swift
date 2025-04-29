@@ -255,7 +255,7 @@ private extension ImportMnemonicGrid.State {
 			// is increasing word count
 			words.append(contentsOf: (wordCount ..< Int(newWordCount.rawValue)).map {
 				.init(
-					id: $0,
+					id: $0
 				)
 			})
 		} else if delta < 0 {
@@ -275,7 +275,7 @@ private extension ImportMnemonicGrid.State {
 							text: $0.element.word,
 							word: $0.element,
 							completion: .auto(match: .exact)
-						),
+						)
 					)
 				}
 		)
