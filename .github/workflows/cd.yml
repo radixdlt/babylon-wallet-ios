@@ -86,18 +86,11 @@ jobs:
           fileDir: "Aux/"
           encodedString: ${{ github.event.inputs.flavour == 'release' && secrets.GH_CRASHLYTICS_GOOGLE_SERVICES_JSON_FILE_BASE64_RELEASE }}
 
-      - name: Verify GoogleService-Info.plist exists
+      - name: Verify GoogleService-Info.plist
         run: |
-          if [ -f "Aux/GoogleService-Info.plist" ]; then
-            echo "✅ GoogleService-Info.plist successfully created:"
-            ls -l Aux/GoogleService-Info.plist
-            echo "📄 File content preview:"
-            head -n 20 Aux/GoogleService-Info.plist
-          else
-            echo "❌ GoogleService-Info.plist is missing after decoding!"
-            exit 1
-          fi
-          
+          VALUE=$(plutil -extract PROJECT_ID xml1 -o - Aux/GoogleService-Info.plist | xmllint --xpath "string(//string)" -)
+          echo "✅ Extracted PROJECT_ID: $VALUE"
+
       - uses: RDXWorks-actions/setup-ruby@master
         with:
           ruby-version: 3.1.2
