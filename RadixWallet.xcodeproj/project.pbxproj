@@ -867,6 +867,7 @@
 		A00697CC2DB8D3A900810D36 /* DisplayMnemonic+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00697CA2DB8D3A900810D36 /* DisplayMnemonic+View.swift */; };
 		A00697CF2DBA304F00810D36 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A00697CE2DBA304F00810D36 /* Sargon */; };
 		A00697D22DBA4C7B00810D36 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A00697D12DBA4C7B00810D36 /* Sargon */; };
+		A0091AA22DC12229004F5161 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A0091AA12DC12229004F5161 /* GoogleService-Info.plist */; };
 		A0323FD02DC0DCEB00CA31CE /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = A0323FCF2DC0DCEB00CA31CE /* FirebaseCrashlytics */; };
 		A08BBA602DAD49D500534B67 /* InteractionReview-ShieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08BBA5E2DAD49D500534B67 /* InteractionReview-ShieldView.swift */; };
 		A08BBA622DAE330700534B67 /* AddFactorSource-ConfirmSeedPhrase.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08BBA612DAE330700534B67 /* AddFactorSource-ConfirmSeedPhrase.swift */; };
@@ -2197,6 +2198,7 @@
 		83FDF7EB2AF260D600D9AA8B /* ProgrammaticScryptoSborValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValue.swift; sourceTree = "<group>"; };
 		A00697C92DB8D3A900810D36 /* DisplayMnemonic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayMnemonic.swift; sourceTree = "<group>"; };
 		A00697CA2DB8D3A900810D36 /* DisplayMnemonic+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DisplayMnemonic+View.swift"; sourceTree = "<group>"; };
+		A0091AA12DC12229004F5161 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		A08BBA5E2DAD49D500534B67 /* InteractionReview-ShieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InteractionReview-ShieldView.swift"; sourceTree = "<group>"; };
 		A08BBA612DAE330700534B67 /* AddFactorSource-ConfirmSeedPhrase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSource-ConfirmSeedPhrase.swift"; sourceTree = "<group>"; };
 		A08BBA632DAE347E00534B67 /* AddFactorSource-ConfirmSeedPhrase+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSource-ConfirmSeedPhrase+View.swift"; sourceTree = "<group>"; };
@@ -5439,6 +5441,7 @@
 				48CFC6992ADC110800E77A5C /* Config */,
 				48CFC6AD2ADC110800E77A5C /* Radix-Wallet--iOS--Info.plist */,
 				5B9846BC2BBD5C8800E814F3 /* SensitiveInfo.plist */,
+				A0091AA12DC12229004F5161 /* GoogleService-Info.plist */,
 				8381C8B62BC3D80100A470B4 /* PrivacyInfo.xcprivacy */,
 			);
 			path = Aux;
@@ -7519,6 +7522,7 @@
 			buildConfigurationList = 48CFBC5D2ADC106400E77A5C /* Build configuration list for PBXNativeTarget "RadixWallet" */;
 			buildPhases = (
 				5B9846C32BBD643700E814F3 /* Create SensitiveInfo Sample */,
+				A0091AA42DC122AD004F5161 /* GoogleService-Info */,
 				5B4E1D142CB423C9002FAC2E /* Custom linter */,
 				48CFBC4B2ADC106300E77A5C /* Sources */,
 				48CFBC4C2ADC106300E77A5C /* Frameworks */,
@@ -7665,6 +7669,7 @@
 				48CFC6B72ADC110800E77A5C /* Project-Alpha.xcconfig in Resources */,
 				48CFC6BA2ADC110800E77A5C /* Project-Shared.xcconfig in Resources */,
 				48CFC6AF2ADC110800E77A5C /* Common.xcconfig in Resources */,
+				A0091AA22DC12229004F5161 /* GoogleService-Info.plist in Resources */,
 				48CFC5712ADC10DA00E77A5C /* gateway-api-schema.yml in Resources */,
 				48CFC5FA2ADC10DA00E77A5C /* IBMPlexSans-Bold.ttf in Resources */,
 				48CFC6B62ADC110800E77A5C /* iOS-preAlpha.xcconfig in Resources */,
@@ -7732,6 +7737,25 @@
 			shellPath = /bin/sh;
 			shellScript = "# The SensitiveInfo.plist contains the secret tokens that we don't want publicly available.\n# As this file is ignored from SourceControl, this script will create a placeholder version\n# of it if it isn't already present.\nCONFIG_FILE_BASE_NAME=\"SensitiveInfo\"\n \nCONFIG_FILE_NAME=${CONFIG_FILE_BASE_NAME}.plist\nSAMPLE_CONFIG_FILE_NAME=${CONFIG_FILE_BASE_NAME}-Sample.plist\n \nCONFIG_FILE_PATH=$SRCROOT/Aux/$CONFIG_FILE_NAME\nSAMPLE_CONFIG_FILE_PATH=$SRCROOT/Aux/$SAMPLE_CONFIG_FILE_NAME\n \nif [ -f \"$CONFIG_FILE_PATH\" ]; then\n  echo \"$CONFIG_FILE_PATH exists.\"\nelse\n  echo \"$CONFIG_FILE_PATH does not exist, copying sample\"\n  cp -v \"${SAMPLE_CONFIG_FILE_PATH}\" \"${CONFIG_FILE_PATH}\"\nfi\n";
 		};
+		A0091AA42DC122AD004F5161 /* GoogleService-Info */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "GoogleService-Info";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/GoogleService-Info.plist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# The SensitiveInfo.plist contains the secret tokens that we don't want publicly available.\n# As this file is ignored from SourceControl, this script will create a placeholder version\n# of it if it isn't already present.\nCONFIG_FILE_BASE_NAME=\"GoogleService-Info\"\n \nCONFIG_FILE_NAME=${CONFIG_FILE_BASE_NAME}.plist\nSAMPLE_CONFIG_FILE_NAME=${CONFIG_FILE_BASE_NAME}-Sample.plist\n \nCONFIG_FILE_PATH=$SRCROOT/Aux/$CONFIG_FILE_NAME\nSAMPLE_CONFIG_FILE_PATH=$SRCROOT/Aux/$SAMPLE_CONFIG_FILE_NAME\n \nif [ -f \"$CONFIG_FILE_PATH\" ]; then\n  echo \"$CONFIG_FILE_PATH exists.\"\nelse\n  echo \"$CONFIG_FILE_PATH does not exist, copying sample\"\n  cp -v \"${SAMPLE_CONFIG_FILE_PATH}\" \"${CONFIG_FILE_PATH}\"\nfi\n";
+		};
 		A0323FD32DC0EADD00CA31CE /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -7753,7 +7777,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nCONFIG_FILE_BASE_NAME=\"GoogleService-Info\"\nCONFIG_FILE_NAME=${CONFIG_FILE_BASE_NAME}.plist\nCONFIG_FILE_PATH=$SRCROOT/Aux/$CONFIG_FILE_NAME\nDST_PLIST=\"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist\"\n\nCONFIGURATION_LOWERCASE=$(echo \"$CONFIGURATION\" | tr '[:upper:]' '[:lower:]')\n\nif [ ! -f \"$PLIST_PATH\" ]; then\n  if [[ \"$CONFIGURATION_LOWERCASE\" == \"release\" ]]; then\n    echo \"❌ Error: GoogleService-Info.plist is missing or empty in Release build. Failing build.\"\n    exit 1\n  else\n    echo \"⚠️ Warning: GoogleService-Info.plist is missing or empty in $CONFIGURATION build. Continuing...\"\n    exit 0\n  fi\nfi\n\ncp \"$CONFIG_FILE_PATH\" \"$DST_PLIST\"\n\n\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n";
+			shellScript = "if [[ \"$CONFIGURATION_LOWERCASE\" == \"release\" ]]; then\n\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\nfi\n\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
