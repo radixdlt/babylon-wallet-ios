@@ -103,7 +103,7 @@ jobs:
         env:
           GIT_USER: ${{ env.WALLET_RADIX_BOT_USERNAME }}
 
-      - name: Decode Firebase Crashlytics plist
+      - name: Decode Firebase Crashlytics json
         uses: RDXWorks-actions/base64-to-file@main
         id: crashlytics_credentials
         with:
@@ -113,7 +113,6 @@ jobs:
             github.event.inputs.flavour == 'release' && secrets.GH_CRASHLYTICS_GOOGLE_SERVICES_JSON_FILE_BASE64_RELEASE ||
             github.event.inputs.flavour == 'alpha' && secrets.GH_CRASHLYTICS_GOOGLE_SERVICES_JSON_FILE_BASE64_ALPHA
           }}
-
 
       - name: "Deploy"
         run: |
