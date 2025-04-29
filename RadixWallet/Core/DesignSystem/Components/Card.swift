@@ -5,7 +5,7 @@ struct Card<Contents: View>: View {
 	let contents: Contents
 
 	init(
-		_ color: Color = .app.white,
+		_ color: Color = Color.primaryBackground,
 		action: (() -> Void)? = nil,
 		@ViewBuilder contents: () -> Contents
 	) {
@@ -85,7 +85,7 @@ extension View {
 	fileprivate func inCard(_ color: Color = .white, isPressed: Bool = false) -> some View {
 		background(isPressed ? .app.gray4 : color)
 			.clipShape(RoundedRectangle(cornerRadius: .medium3))
-			.cardShadow
+		// .cardShadow
 	}
 
 	var inSpeechbubble: some View {

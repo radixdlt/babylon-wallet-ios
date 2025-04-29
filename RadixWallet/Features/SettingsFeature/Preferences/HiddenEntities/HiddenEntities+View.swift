@@ -21,7 +21,7 @@ extension HiddenEntities {
 					}
 					.padding(.medium3)
 				}
-				.background(Color.primaryBackground)
+				.background(Color.secondaryBackground)
 				.radixToolbar(title: L10n.HiddenEntities.title)
 				.task {
 					store.send(.view(.task))
