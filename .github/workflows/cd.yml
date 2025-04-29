@@ -109,10 +109,7 @@ jobs:
         with:
           fileName: "GoogleService-Info.plist"
           fileDir: "Aux/"
-          encodedString: ${{ 
-            github.event.inputs.flavour == 'release' && secrets.GH_CRASHLYTICS_GOOGLE_SERVICES_JSON_FILE_BASE64_RELEASE ||
-            github.event.inputs.flavour == 'alpha' && secrets.GH_CRASHLYTICS_GOOGLE_SERVICES_JSON_FILE_BASE64_ALPHA
-          }}
+          encodedString: ${{ github.event.inputs.flavour == 'release' && secrets.GH_CRASHLYTICS_GOOGLE_SERVICES_JSON_FILE_BASE64_RELEASE }}
 
       - name: "Deploy"
         run: |
