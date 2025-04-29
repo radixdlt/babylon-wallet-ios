@@ -106,7 +106,7 @@ jobs:
       - name: Decode Firebase Crashlytics json
         if: env.FLAVOUR == 'alpha'
         uses: RDXWorks-actions/base64-to-file@main
-        id: crashlytics_credentials
+        id: crashlytics_credentials_alpha
         with:
           fileName: "GoogleService-Info.plist"
           fileDir: "Aux/"
@@ -115,7 +115,7 @@ jobs:
       - name: Decode Firebase Crashlytics json
         if: env.FLAVOUR == 'release'
         uses: RDXWorks-actions/base64-to-file@main
-        id: crashlytics_credentials
+        id: crashlytics_credentials_release
         with:
           fileName: "GoogleService-Info.plist"
           fileDir: "Aux/"
