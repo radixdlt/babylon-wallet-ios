@@ -72,7 +72,6 @@ extension NewAccountCompletion {
 
 					Spacer()
 				}
-				.background(.primaryBackground)
 				.padding(.medium1)
 				.footer {
 					Button(L10n.CreateEntity.Completion.goToDestination(viewStore.destinationDisplayText)) {

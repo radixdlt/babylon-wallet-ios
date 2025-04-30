@@ -107,7 +107,7 @@ extension AssetsView {
 						ForEach(viewStore.assetKinds) { kind in
 							let isSelected = viewStore.activeAssetKind == kind
 							Text(kind.displayText)
-								.foregroundColor(isSelected ? .app.white : .primaryText)
+								.foregroundColor(isSelected ? .primaryText : .primaryText)
 								.textStyle(.body1HighImportance)
 								.frame(height: .large1)
 								.padding(.horizontal, .medium2)

@@ -77,6 +77,7 @@ extension CreateAccountCoordinator {
 			}
 			.navigationBarBackButtonHidden(!shouldDisplayNavBar)
 			.navigationBarHidden(!shouldDisplayNavBar)
+			.background(.primaryBackground)
 		}
 	}
 }
