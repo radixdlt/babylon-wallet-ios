@@ -198,6 +198,7 @@ struct ResourceBalanceView: View {
 				CheckmarkView(appearance: .dark, isChecked: isSelected)
 			}
 		}
+		.background(.primaryBackground)
 	}
 
 	var compact: Bool {
@@ -276,7 +277,7 @@ extension ResourceBalanceView {
 					VStack(alignment: .leading, spacing: .small3) {
 						Text(L10n.Account.Staking.worth.uppercased())
 							.textStyle(.body2HighImportance)
-							.foregroundColor(.app.gray2)
+							.foregroundColor(.secondaryText)
 
 						ResourceBalanceView(
 							.fungible(fungible),
@@ -312,7 +313,7 @@ extension ResourceBalanceView {
 				if !hideDetails {
 					Text(L10n.InteractionReview.worth.uppercased())
 						.textStyle(.body2HighImportance)
-						.foregroundColor(.app.gray2)
+						.foregroundColor(.secondaryText)
 						.padding(.top, .small2)
 						.padding(.bottom, .small3)
 
@@ -424,7 +425,7 @@ extension ResourceBalanceView {
 					HStack {
 						Text(kind.title)
 							.textStyle(.body2HighImportance)
-							.foregroundColor(.app.gray2)
+							.foregroundColor(.secondaryText)
 							.textCase(.uppercase)
 
 						Spacer()
@@ -568,7 +569,7 @@ extension ResourceBalanceView {
 					} else if isPredicted {
 						Text(L10n.InteractionReview.estimated)
 							.textStyle(.body3Regular)
-							.foregroundStyle(.app.gray1)
+							.foregroundStyle(.primaryText)
 					}
 				}
 
@@ -596,12 +597,12 @@ extension ResourceBalanceView {
 				if let caption1 {
 					Text(caption1)
 						.textStyle(titleTextStyle)
-						.foregroundColor(.app.gray1)
+						.foregroundColor(.primaryText)
 				}
 				if let caption2 {
 					Text(caption2)
 						.textStyle(.body2Regular)
-						.foregroundColor(.app.gray2)
+						.foregroundColor(.secondaryText)
 				}
 			}
 			.lineLimit(1)
@@ -685,7 +686,7 @@ extension ResourceBalanceView {
 			} else if let fallback {
 				Text(fallback)
 					.textStyle(amountTextStyle)
-					.foregroundColor(.app.gray2)
+					.foregroundColor(.secondaryText)
 			}
 		}
 
@@ -736,11 +737,11 @@ extension ResourceBalanceView {
 					if let title {
 						Text(title)
 							.textStyle(titleTextStyle)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 					}
 					amountView(amount: amount.nominalAmount, isGuaranteed: false)
 						.textStyle(amountTextStyle)
-						.foregroundColor(.app.gray1)
+						.foregroundColor(.primaryText)
 					if !resourceBalanceHideFiatValue, let fiatWorth = amount.fiatWorth?.currencyFormatted(applyCustomFont: false) {
 						Text(fiatWorth)
 							.textStyle(.body2HighImportance)
@@ -753,16 +754,16 @@ extension ResourceBalanceView {
 					if guaranteed != nil {
 						Text(L10n.InteractionReview.estimated)
 							.textStyle(titleTextStyle)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 					} else if let title {
 						Text(title)
 							.textStyle(titleTextStyle)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 					}
 
 					amountView(amount: amount.nominalAmount, isGuaranteed: false)
 						.textStyle(amountTextStyle)
-						.foregroundColor(.app.gray1)
+						.foregroundColor(.primaryText)
 
 					if !resourceBalanceHideFiatValue, let fiatWorth = amount.fiatWorth?.currencyFormatted(applyCustomFont: false) {
 						Text(fiatWorth)
@@ -774,12 +775,12 @@ extension ResourceBalanceView {
 					if let guaranteedAmount = guaranteed?.nominalAmount {
 						Text(L10n.InteractionReview.guaranteed)
 							.textStyle(.body3Regular)
-							.foregroundColor(.app.gray2)
+							.foregroundColor(.secondaryText)
 							.padding(.top, .small3)
 
 						amountView(amount: guaranteedAmount, isGuaranteed: true)
 							.textStyle(guaranteedAmountTextStyle)
-							.foregroundColor(.app.gray2)
+							.foregroundColor(.secondaryText)
 					}
 				}
 			}

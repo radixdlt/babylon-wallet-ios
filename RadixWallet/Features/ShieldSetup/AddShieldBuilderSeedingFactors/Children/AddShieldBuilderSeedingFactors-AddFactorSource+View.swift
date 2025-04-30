@@ -15,7 +15,7 @@ extension AddShieldBuilderSeedingFactors.AddFactorSource {
 							.textStyle(.sheetTitle)
 							.padding(.horizontal, .medium3)
 
-						Text(markdown: store.subtitle, emphasizedColor: .app.gray1, emphasizedFont: .app.body1Header)
+						Text(markdown: store.subtitle, emphasizedColor: .primaryText, emphasizedFont: .app.body1Header)
 							.textStyle(.body1Regular)
 							.padding(.horizontal, .medium2)
 
@@ -32,7 +32,7 @@ extension AddShieldBuilderSeedingFactors.AddFactorSource {
 
 						Spacer()
 					}
-					.foregroundStyle(.app.gray1)
+					.foregroundStyle(.primaryText)
 					.multilineTextAlignment(.center)
 					.padding(.horizontal, .medium3)
 				}

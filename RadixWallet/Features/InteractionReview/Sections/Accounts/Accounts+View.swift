@@ -53,7 +53,7 @@ extension InteractionReview.Account {
 						.padding(.horizontal, .medium3)
 						.padding(.vertical, .medium2)
 						.foregroundColor(.app.red1)
-						.background(.app.gray5)
+						.background(.secondaryBackground)
 					} else {
 						VStack(spacing: .zero) {
 							ForEach(store.transfers) { transfer in

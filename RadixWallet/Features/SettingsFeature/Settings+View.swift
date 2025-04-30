@@ -76,12 +76,12 @@ extension Settings.View {
 
 				VStack(spacing: .medium1) {
 					Text(viewStore.appVersion)
-						.foregroundColor(.app.gray2)
+						.foregroundColor(.secondaryText)
 						.textStyle(.body1Regular)
 
 					#if DEBUG
 					Text(viewStore.debugAppInfo)
-						.foregroundColor(.app.gray2)
+						.foregroundColor(.secondaryText)
 						.textStyle(.body2Regular)
 						.multilineTextAlignment(.leading)
 					#endif

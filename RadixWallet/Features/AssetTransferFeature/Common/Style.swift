@@ -18,7 +18,7 @@ extension View {
 
 extension Color {
 	static let borderColor: Color = .app.gray4
-	static let focusedBorderColor: Color = .app.gray1
+	static let focusedBorderColor: Color = .primaryText
 
 	static let containerContentBackground: Color = .app.gray5
 }

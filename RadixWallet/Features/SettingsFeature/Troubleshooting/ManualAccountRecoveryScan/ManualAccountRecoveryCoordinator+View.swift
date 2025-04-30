@@ -46,10 +46,10 @@ extension ManualAccountRecoveryCoordinator.View {
 						.controlState(viewStore.olympiaControlState)
 				}
 			}
-			.foregroundStyle(.app.gray1)
+			.foregroundStyle(.primaryText)
 			.padding(.bottom, .small1)
 		}
-		.background(.app.white)
+		.background(.primaryBackground)
 		.toolbar {
 			ToolbarItem(placement: .cancellationAction) {
 				CloseButton {

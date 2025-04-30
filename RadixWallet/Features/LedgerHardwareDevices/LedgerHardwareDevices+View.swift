@@ -80,12 +80,12 @@ extension LedgerHardwareDevices {
 
 								Text(L10n.LedgerHardwareDevices.navigationTitleAllowSelection)
 									.textStyle(.sheetTitle)
-									.foregroundColor(.app.gray1)
+									.foregroundColor(.primaryText)
 							}
 
 							if let subtitle = viewStore.subtitle {
 								Text(subtitle)
-									.foregroundColor(.app.gray1)
+									.foregroundColor(.primaryText)
 									.textStyle(.secondaryHeader)
 									.padding(.horizontal, .medium1)
 									.padding(.vertical, .medium1)

@@ -112,12 +112,12 @@ struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory: View>
 							VStack(alignment: .leading, spacing: 0) {
 								Text(primaryHeading.text)
 									.textStyle(primaryHeading.isProminent ? .body1HighImportance : .body2Regular)
-									.foregroundColor(primaryHeading.isProminent && isEnabled ? accentColor(isFocused: true) : .app.gray2)
+									.foregroundColor(primaryHeading.isProminent && isEnabled ? accentColor(isFocused: true) : Color.secondaryText)
 									.multilineTextAlignment(.leading)
 								if let subHeading {
 									Text(subHeading)
 										.textStyle(.body2Regular)
-										.foregroundColor(.app.gray2)
+										.foregroundColor(Color.secondaryText)
 										.multilineTextAlignment(.trailing)
 								}
 							}
@@ -128,7 +128,7 @@ struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory: View>
 						if let secondaryHeading {
 							Text(secondaryHeading)
 								.textStyle(.body2Regular)
-								.foregroundColor(.app.gray2)
+								.foregroundColor(Color.secondaryText)
 								.multilineTextAlignment(.trailing)
 						}
 					}
@@ -145,6 +145,7 @@ struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory: View>
 							) { value in
 								isFocused = value
 							}
+							.tint(Color.primaryText)
 							.screenshotProtected(isProtected: isScreenshotProtected)
 						}
 					}
@@ -157,7 +158,7 @@ struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory: View>
 							view
 						}
 					}
-					.foregroundColor(isEnabled ? .app.gray1 : .app.gray2)
+					.foregroundColor(isEnabled ? Color.primaryText : Color.secondaryText)
 					.textStyle(.body1Regular)
 					.alignmentGuide(.textFieldAlignment, computeValue: { $0[VerticalAlignment.center] })
 
@@ -177,7 +178,7 @@ struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory: View>
 				}
 				.padding(.medium3)
 				.frame(height: .standardButtonHeight)
-				.background(Color.app.gray5)
+				.background(Color.tertiaryBackground)
 				.cornerRadius(.small2)
 				.overlay(
 					RoundedRectangle(cornerRadius: .small2)
@@ -205,7 +206,7 @@ struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory: View>
 	private func accentColor(isFocused: Bool) -> Color {
 		switch hint?.kind {
 		case .none, .info:
-			isFocused ? .app.gray1 : .app.gray4
+			isFocused ? Color.primaryText : Color.secondaryText
 		case .error:
 			.app.red1
 		case .warning, .detail:

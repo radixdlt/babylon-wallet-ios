@@ -34,12 +34,12 @@ extension InteractionReview {
 							.frame(.smallest)
 
 						Text(LocalizedStringKey(change.ruleChange.string))
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.textStyle(.body1Regular)
 							.frame(maxWidth: .infinity, alignment: .leading)
 					}
 					.padding(.medium3)
-					.background(.app.gray5)
+					.background(.secondaryBackground)
 				}
 			}
 		}

@@ -15,13 +15,13 @@ extension ConfirmSkippingBDFS {
 						Text(L10n.RecoverSeedPhrase.Header.titleNoMainSeedPhrase)
 							.multilineTextAlignment(.center)
 							.textStyle(.sheetTitle)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.padding(.horizontal, .large3)
 
 						Text(LocalizedStringKey(L10n.RecoverSeedPhrase.Header.subtitleNoMainSeedPhrase))
 							.multilineTextAlignment(.leading)
 							.textStyle(.body1Regular)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.padding(.horizontal, .large3)
 
 						Button(L10n.RecoverSeedPhrase.skipMainSeedPhraseButton) {

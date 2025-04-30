@@ -136,6 +136,7 @@ extension Color.App {
 extension Color {
 	var primaryBackground: Color { .init("PrimaryBackground") }
 	var secondaryBackground: Color { .init("SecondaryBackground") }
+	var tertiaryBackground: Color { .init("TertiaryBackground") }
 	var primaryText: Color { .init("PrimaryText") }
 	var secondaryText: Color { .init("SecondaryText") }
 	var textButton: Color { .init("TextButton") }

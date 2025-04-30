@@ -214,7 +214,7 @@ extension InteractionReview.Sections {
 			.padding(.leading, .medium3)
 			.padding(.vertical, .small1)
 			.padding(.trailing, .medium2)
-			.background(.app.white)
+			.background(.primaryBackground)
 			.clipShape(RoundedRectangle(cornerRadius: .small1))
 			.cardShadow
 		}

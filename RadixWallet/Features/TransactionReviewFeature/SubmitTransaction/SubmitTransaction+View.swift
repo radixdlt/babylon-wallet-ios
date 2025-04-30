@@ -73,7 +73,7 @@ extension SubmitTransaction {
 						if viewStore.status.failed {
 							Image(.errorLarge)
 							Text(viewStore.status.errorTitle)
-								.foregroundColor(.app.gray1)
+								.foregroundColor(.primaryText)
 								.textStyle(.sheetTitle)
 								.multilineTextAlignment(.center)
 								.padding(.horizontal, .medium2)
@@ -83,7 +83,7 @@ extension SubmitTransaction {
 						}
 
 						Text(viewStore.status.display)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)
 							.padding(.horizontal, .medium2)
@@ -98,12 +98,12 @@ extension SubmitTransaction {
 						Spacer()
 						if viewStore.status.failed, viewStore.showSwitchBackToBrowserMessage {
 							Text(L10n.MobileConnect.interactionSuccess)
-								.foregroundColor(.app.gray1)
+								.foregroundColor(.primaryText)
 								.textStyle(.body1Regular)
 								.multilineTextAlignment(.center)
 								.padding(.vertical, .medium1)
 								.frame(maxWidth: .infinity)
-								.background(.app.gray5)
+								.background(.secondaryBackground)
 						}
 					}
 					.frame(maxWidth: .infinity)

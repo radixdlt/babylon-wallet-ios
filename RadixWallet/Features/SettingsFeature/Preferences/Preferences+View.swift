@@ -56,8 +56,8 @@ extension Preferences {
 		var body: some SwiftUI.View {
 			content
 				.radixToolbar(title: L10n.Preferences.title)
-				.tint(.app.gray1)
-				.foregroundColor(.app.gray1)
+				.tint(.primaryText)
+				.foregroundColor(.primaryText)
 				.presentsLoadingViewOverlay()
 				.destinations(with: store)
 		}

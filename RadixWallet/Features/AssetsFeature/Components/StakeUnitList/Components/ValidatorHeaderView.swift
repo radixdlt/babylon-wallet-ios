@@ -20,14 +20,14 @@ struct ValidatorHeaderView: View {
 				if let name = viewState.name {
 					Text(name)
 						.textStyle(.secondaryHeader)
-						.foregroundColor(.app.gray1)
+						.foregroundColor(.primaryText)
 						.multilineTextAlignment(.leading)
 				}
 
 				if let stakedAmount = viewState.stakedAmount {
 					Text(L10n.Account.Staking.currentStake("\(stakedAmount.formatted()) XRD"))
 						.textStyle(.body2HighImportance)
-						.foregroundColor(.app.gray2)
+						.foregroundColor(.secondaryText)
 				}
 			}
 

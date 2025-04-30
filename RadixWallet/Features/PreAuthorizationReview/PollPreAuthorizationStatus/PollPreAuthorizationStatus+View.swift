@@ -18,12 +18,12 @@ extension PollPreAuthorizationStatus {
 
 							Text(viewStore.title)
 								.textStyle(.sheetTitle)
-								.foregroundStyle(.app.gray1)
+								.foregroundStyle(.primaryText)
 
 							VStack(spacing: .small1) {
 								Text(viewStore.subtitle)
 									.textStyle(.body1Regular)
-									.foregroundStyle(.app.gray1)
+									.foregroundStyle(.primaryText)
 
 								if let ledgerIdentifiable = viewStore.ledgerIdentifiable {
 									AddressView(ledgerIdentifiable)
@@ -75,7 +75,7 @@ extension PollPreAuthorizationStatus {
 				.foregroundStyle(.app.account4pink)
 				.padding(.medium1)
 				.frame(maxWidth: .infinity)
-				.background(.app.gray5)
+				.background(.secondaryBackground)
 		}
 
 		@ViewBuilder
@@ -83,10 +83,10 @@ extension PollPreAuthorizationStatus {
 			if showBrowserMessage {
 				Text(L10n.PreAuthorizationReview.ExpiredStatus.retryInBrowser)
 					.textStyle(.body1Regular)
-					.foregroundStyle(.app.gray1)
+					.foregroundStyle(.primaryText)
 					.padding(.medium1)
 					.frame(maxWidth: .infinity)
-					.background(.app.gray5)
+					.background(.secondaryBackground)
 			}
 		}
 
@@ -95,10 +95,10 @@ extension PollPreAuthorizationStatus {
 			if showBrowserMessage {
 				Text(L10n.MobileConnect.interactionSuccess)
 					.textStyle(.body1Regular)
-					.foregroundStyle(.app.gray1)
+					.foregroundStyle(.primaryText)
 					.padding(.medium1)
 					.frame(maxWidth: .infinity)
-					.background(.app.gray5)
+					.background(.secondaryBackground)
 			}
 		}
 	}

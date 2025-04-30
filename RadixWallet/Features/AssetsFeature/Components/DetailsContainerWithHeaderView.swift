@@ -99,8 +99,8 @@ struct DetailsContainer<Contents: View>: View {
 				}
 			}
 		}
-		.tint(.app.gray1)
-		.foregroundColor(.app.gray1)
+		.tint(.primaryText)
+		.foregroundColor(.primaryText)
 	}
 
 	private var titleString: String {

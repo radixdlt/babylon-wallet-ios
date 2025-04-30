@@ -26,7 +26,7 @@ extension InteractionReview {
 				performShieldRecoveryFactors
 			}
 			.padding(.vertical, .medium3)
-			.background(.app.gray5)
+			.background(.secondaryBackground)
 		}
 
 		@ViewBuilder
@@ -42,7 +42,7 @@ extension InteractionReview {
 
 					Text(persona.displayName.rawValue)
 						.textStyle(.secondaryHeader)
-						.foregroundStyle(.app.gray1)
+						.foregroundStyle(.primaryText)
 						.flushedLeft
 				}
 				.padding(.horizontal, .medium1)
@@ -56,7 +56,7 @@ extension InteractionReview {
 			let shieldName = viewState.shieldName.rawValue
 			Text(L10n.TransactionReview.UpdateShield.applyTitle(shieldName))
 				.textStyle(.secondaryHeader)
-				.foregroundStyle(.app.gray1)
+				.foregroundStyle(.primaryText)
 				.flushedLeft
 				.padding(.horizontal, .medium3)
 			Separator()
@@ -71,7 +71,7 @@ extension InteractionReview {
 				if let title {
 					Text(title)
 						.textStyle(.body1Header)
-						.foregroundStyle(.app.gray1)
+						.foregroundStyle(.primaryText)
 				}
 
 				if let description {
@@ -82,10 +82,10 @@ extension InteractionReview {
 				}
 
 				if let note {
-					Text(markdown: note, emphasizedColor: .app.gray1, emphasizedFont: .app.body2Header)
+					Text(markdown: note, emphasizedColor: .primaryText, emphasizedFont: .app.body2Header)
 						.multilineTextAlignment(.leading)
 						.textStyle(.body2Regular)
-						.foregroundStyle(.app.gray1)
+						.foregroundStyle(.primaryText)
 				}
 			}
 			.multilineTextAlignment(.leading)
@@ -180,7 +180,7 @@ extension InteractionReview {
 					if !isLastFactor {
 						Text(L10n.TransactionReview.UpdateShield.combinationLabel)
 							.textStyle(.body1Link)
-							.foregroundStyle(.app.gray1)
+							.foregroundStyle(.primaryText)
 					}
 				}
 			}
@@ -191,16 +191,16 @@ extension InteractionReview {
 			VStack(spacing: .small1) {
 				Text(L10n.TransactionReview.UpdateShield.confirmationDelayMessage)
 					.textStyle(.body1Regular)
-					.foregroundStyle(.app.gray1)
+					.foregroundStyle(.primaryText)
 					.flushedLeft
 
 				Label(viewState.periodUntilAutoConfirm.title, asset: AssetResource.emergencyFallbackCalendar)
 					.textStyle(.body1Link)
-					.foregroundStyle(.app.gray1)
+					.foregroundStyle(.primaryText)
 					.flushedLeft
 					.padding(.horizontal, .medium3)
 					.padding(.vertical, .medium3)
-					.background(.app.white)
+					.background(.primaryBackground)
 					.roundedCorners(strokeColor: .borderColor, radius: .small2)
 			}
 			.padding(.medium3)

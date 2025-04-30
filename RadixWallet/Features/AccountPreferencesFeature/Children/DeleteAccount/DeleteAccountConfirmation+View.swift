@@ -17,11 +17,11 @@ extension DeleteAccountConfirmation {
 
 						Text(L10n.AccountSettings.DeleteAccount.title)
 							.textStyle(.sheetTitle)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 
 						Text(L10n.AccountSettings.DeleteAccount.message)
 							.textStyle(.body1HighImportance)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 
 						Spacer()
 					}

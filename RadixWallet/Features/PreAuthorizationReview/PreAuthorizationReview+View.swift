@@ -42,7 +42,7 @@ extension PreAuthorizationReview {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				content(viewStore)
 					.controlState(viewStore.globalControlState)
-					.background(.app.white)
+					.background(.primaryBackground)
 					.toolbar {
 						ToolbarItem(placement: .principal) {
 							if showNavigationTitle {
@@ -61,12 +61,12 @@ extension PreAuthorizationReview {
 			VStack(spacing: .zero) {
 				Text(L10n.PreAuthorizationReview.title)
 					.textStyle(.body2Header)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 
 				if let dAppName {
 					Text(L10n.InteractionReview.subtitle(dAppName))
 						.textStyle(.body2Regular)
-						.foregroundColor(.app.gray2)
+						.foregroundColor(.secondaryText)
 				}
 			}
 		}
@@ -162,7 +162,7 @@ extension PreAuthorizationReview {
 			HStack(spacing: .zero) {
 				VStack(alignment: .leading, spacing: .zero) {
 					Text(L10n.PreAuthorizationReview.Fees.title(dAppName ?? "dApp"))
-						.foregroundStyle(.app.gray1)
+						.foregroundStyle(.primaryText)
 
 					Text(L10n.PreAuthorizationReview.Fees.subtitle)
 						.foregroundStyle(.app.gray2)
@@ -176,7 +176,7 @@ extension PreAuthorizationReview {
 			}
 			.padding(.vertical, .medium3)
 			.padding(.horizontal, .medium2)
-			.background(Color.app.gray5)
+			.background(.secondaryBackground)
 			.clipShape(RoundedRectangle(cornerRadius: .small1))
 		}
 

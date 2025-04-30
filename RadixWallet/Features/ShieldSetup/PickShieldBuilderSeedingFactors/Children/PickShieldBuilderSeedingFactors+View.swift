@@ -117,7 +117,7 @@ extension PickShieldBuilderSeedingFactors {
 					.textStyle(.sheetTitle)
 					.padding(.horizontal, .medium3)
 
-				Text(markdown: L10n.ShieldSetupSelectFactors.subtitle, emphasizedColor: .app.gray1, emphasizedFont: .app.body1Header)
+				Text(markdown: L10n.ShieldSetupSelectFactors.subtitle, emphasizedColor: .primaryText, emphasizedFont: .app.body1Header)
 					.textStyle(.body1Regular)
 					.padding(.horizontal, .medium2)
 					.padding(.top, .medium3)
@@ -140,7 +140,7 @@ extension PickShieldBuilderSeedingFactors {
 					}
 				}
 			}
-			.foregroundStyle(.app.gray1)
+			.foregroundStyle(.primaryText)
 			.multilineTextAlignment(.center)
 			.padding(.bottom, .medium2)
 		}

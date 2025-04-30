@@ -67,7 +67,7 @@ extension Login {
 
 						if viewStore.showChoosePersonaTitle {
 							Text(L10n.DAppRequest.Login.choosePersona)
-								.foregroundColor(.app.gray1)
+								.foregroundColor(.primaryText)
 								.textStyle(.body1Header)
 						}
 

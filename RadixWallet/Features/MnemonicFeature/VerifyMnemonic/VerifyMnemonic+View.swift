@@ -59,7 +59,7 @@ extension VerifyMnemonic {
 				ScrollView {
 					VStack(spacing: .medium1) {
 						Text(L10n.ConfirmMnemonicBackedUp.subtitle)
-							.foregroundStyle(.app.gray1)
+							.foregroundStyle(.primaryText)
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)
 
@@ -87,6 +87,7 @@ extension VerifyMnemonic {
 				}
 				.scrollIndicators(.hidden)
 			}
+			.background(.primaryBackground)
 			.radixToolbar(title: L10n.ConfirmMnemonicBackedUp.title)
 		}
 

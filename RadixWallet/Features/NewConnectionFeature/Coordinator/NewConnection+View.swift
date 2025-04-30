@@ -25,8 +25,8 @@ extension NewConnection {
 				}
 				.destination(with: store)
 			}
-			.tint(.app.gray1)
-			.foregroundColor(.app.gray1)
+			.tint(.primaryText)
+			.foregroundColor(.primaryText)
 		}
 
 		private func root(
@@ -74,7 +74,7 @@ extension View {
 	func withTitle(_ title: String) -> some View {
 		VStack(spacing: .zero) {
 			Text(title)
-				.foregroundColor(.app.gray1)
+				.foregroundColor(.primaryText)
 				.textStyle(.sheetTitle)
 				.padding(.bottom, .medium3)
 

@@ -44,7 +44,7 @@ extension DappDetails.View {
 					NonFungiblesListList(store: store)
 
 					Personas(store: store.personas, tappablePersonas: viewStore.tappablePersonas)
-						.background(.app.gray5)
+						.background(.secondaryBackground)
 
 					if viewStore.showConfiguration {
 						Configuration(store: store)
@@ -160,7 +160,7 @@ extension DappDetails.View {
 					if let description = viewStore.description {
 						Text(description)
 							.textStyle(.body1Regular)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.multilineTextAlignment(.leading)
 							.padding(.horizontal, .small2)
 
@@ -225,7 +225,7 @@ extension DappDetails.View {
 				VStack(alignment: .leading, spacing: .medium3) {
 					Text(heading)
 						.textStyle(.body1Regular)
-						.foregroundColor(.app.gray2)
+						.foregroundColor(.secondaryText)
 						.padding(.horizontal, .medium3)
 
 					ForEach(elements) { element in

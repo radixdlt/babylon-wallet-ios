@@ -10,7 +10,7 @@ struct AssetTagsView: View {
 			Group {
 				Text(L10n.AssetDetails.tags)
 					.textStyle(.body1Regular)
-					.foregroundColor(.app.gray2)
+					.foregroundColor(.secondaryText)
 
 				FlowLayout(spacing: .small2) {
 					ForEach(tags, id: \.self) { tag in
@@ -33,7 +33,7 @@ struct AssetTagView: View {
 
 			Text(tag.name)
 				.textStyle(.body2HighImportance)
-				.foregroundColor(.app.gray2)
+				.foregroundColor(.secondaryText)
 		}
 		.padding(.vertical, .small3)
 		.padding(.horizontal, .small1)

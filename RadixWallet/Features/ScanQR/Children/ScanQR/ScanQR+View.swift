@@ -36,7 +36,7 @@ extension ScanQR.View {
 		#if !targetEnvironment(simulator)
 
 		Text(store.kind.instructions)
-			.foregroundColor(.app.gray1)
+			.foregroundColor(.primaryText)
 			.textStyle(.body1Regular)
 			.multilineTextAlignment(.center)
 
@@ -69,16 +69,16 @@ extension ScanQR.View {
 		VStack(alignment: .leading, spacing: .small1) {
 			Text(disclosure.title)
 				.font(.app.body2Header)
-				.foregroundColor(.app.gray1)
+				.foregroundColor(.primaryText)
 			VStack(alignment: .leading, spacing: .small3) {
 				ForEach(Array(disclosure.items.enumerated()), id: \.0) { index, message in
 					HStack(alignment: .top, spacing: .small3) {
 						Text("\(index + 1).")
-						Text(markdown: message, emphasizedColor: .app.gray1, emphasizedFont: .app.body2HighImportance)
+						Text(markdown: message, emphasizedColor: .primaryText, emphasizedFont: .app.body2HighImportance)
 					}
 					.multilineTextAlignment(.leading)
 					.font(.app.body2Regular)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 				}
 			}
 

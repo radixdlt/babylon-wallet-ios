@@ -43,7 +43,7 @@ extension NewConnectionName {
 				ScrollView(showsIndicators: false) {
 					VStack(spacing: 0) {
 						Text(L10n.LinkedConnectors.NameNewConnector.title)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.textStyle(.sheetTitle)
 							.padding(.bottom, .small1)
 

@@ -12,11 +12,11 @@ public struct AccountDeletedView: View {
 
 				Text(L10n.AccountSettings.AccountDeleted.title)
 					.textStyle(.sheetTitle)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 
 				Text(L10n.AccountSettings.AccountDeleted.message)
 					.textStyle(.body1Regular)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 
 				Spacer()
 			}

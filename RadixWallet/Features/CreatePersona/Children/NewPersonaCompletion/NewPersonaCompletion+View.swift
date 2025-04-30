@@ -47,15 +47,15 @@ extension NewPersonaCompletion {
 
 					VStack(spacing: .medium1) {
 						Text(L10n.CreateEntity.Completion.title)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.textStyle(.sheetTitle)
 
 						Text(viewStore.subtitle)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.textStyle(.body1Regular)
 
 						Text(viewStore.explanation)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)
 					}
@@ -63,6 +63,7 @@ extension NewPersonaCompletion {
 
 					Spacer()
 				}
+				.background(.primaryBackground)
 				.padding(.medium1)
 				.safeAreaInset(edge: .bottom, spacing: 0) {
 					Button(L10n.CreateEntity.Completion.goToDestination(viewStore.destinationDisplayText)) {

@@ -74,7 +74,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 						}
 						Spacer(minLength: 0)
 					}
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 					.multilineTextAlignment(.center)
 				}
 				.navigationBarBackButtonHidden()

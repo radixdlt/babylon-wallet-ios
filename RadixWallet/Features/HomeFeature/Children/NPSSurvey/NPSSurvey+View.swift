@@ -58,13 +58,13 @@ extension NPSSurvey.View {
 	private func headerView() -> some SwiftUI.View {
 		Text(L10n.Survey.title)
 			.textStyle(.sheetTitle)
-			.foregroundStyle(.app.gray1)
+			.foregroundStyle(.primaryText)
 			.padding(.bottom, .medium3)
 
 		Text(L10n.Survey.subtitle)
 			.multilineTextAlignment(.center)
 			.textStyle(.body1Regular)
-			.foregroundStyle(.app.gray1)
+			.foregroundStyle(.primaryText)
 			.padding(.bottom, .large2)
 	}
 
@@ -99,7 +99,7 @@ extension NPSSurvey.View {
 	private func scoreReasonView() -> some SwiftUI.View {
 		Text(L10n.Survey.Reason.heading)
 			.textStyle(.body1Regular)
-			.foregroundStyle(.app.gray1)
+			.foregroundStyle(.primaryText)
 			.padding(.bottom, .small2)
 
 		Text(L10n.Common.optional)
@@ -125,13 +125,13 @@ extension NPSSurvey.View {
 		}) {
 			Text("\(score)")
 				.textStyle(.body1HighImportance)
-				.foregroundColor(isSelected ? .app.white : .app.gray1)
+				.foregroundColor(isSelected ? .app.white : .primaryText)
 				.frame(.small)
-				.background(isSelected ? .app.gray1 : .clear)
+				.background(isSelected ? .primaryText : .clear)
 				.clipShape(Circle())
 				.overlay(
 					Circle()
-						.stroke(isSelected ? .app.gray1 : .app.gray3, lineWidth: 1)
+						.stroke(isSelected ? .primaryText : .app.gray3, lineWidth: 1)
 				)
 		}
 	}

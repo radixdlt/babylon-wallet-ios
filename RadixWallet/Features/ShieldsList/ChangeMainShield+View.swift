@@ -49,7 +49,7 @@ extension ChangeMainShield {
 
 				Spacer()
 			}
-			.foregroundStyle(.app.gray1)
+			.foregroundStyle(.primaryText)
 			.multilineTextAlignment(.center)
 		}
 

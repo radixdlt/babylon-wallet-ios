@@ -44,7 +44,7 @@ extension PersonaDataPermission {
 						)
 
 						Text(L10n.DAppRequest.AccountPermission.updateInSettingsExplanation)
-							.foregroundColor(.app.gray2)
+							.foregroundColor(.secondaryText)
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)
 							.padding(.horizontal, .medium2)

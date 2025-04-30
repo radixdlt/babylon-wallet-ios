@@ -12,7 +12,7 @@ struct ExpandableTextView: View {
 	@State private var moreTextSize: CGSize = .zero
 
 	private var textStyle: TextStyle = .body1Regular
-	private var foregroundColor: Color = .app.gray1
+	private var foregroundColor: Color = .primaryText
 	private var textForDisplay: String {
 		if isExpanded {
 			text + "\n" // Add additional new line to make sure that "Show Less" does not overlay some actual text

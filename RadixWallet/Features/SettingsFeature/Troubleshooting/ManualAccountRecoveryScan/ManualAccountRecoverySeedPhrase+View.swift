@@ -56,7 +56,7 @@ extension ManualAccountRecoverySeedPhrase.View {
 					.buttonStyle(.secondaryRectangular)
 				}
 			}
-			.foregroundStyle(.app.gray1)
+			.foregroundStyle(.primaryText)
 			.padding(.bottom, .medium3)
 		}
 		.footer {

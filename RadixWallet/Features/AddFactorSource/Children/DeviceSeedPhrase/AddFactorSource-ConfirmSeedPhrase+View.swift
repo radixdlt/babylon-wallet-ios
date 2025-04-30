@@ -13,6 +13,7 @@ extension AddFactorSource.ConfirmSeedPhrase {
 					}
 					.padding(.medium2)
 				}
+				.background(Color.primaryBackground)
 				.footer {
 					Button(L10n.Common.confirm) {
 						store.send(.view(.confirmButtonTapped))
@@ -42,7 +43,7 @@ extension AddFactorSource.ConfirmSeedPhrase {
 				Text(L10n.NewBiometricFactor.ConfirmSeedPhrase.subtitle(4))
 					.textStyle(.body1Regular)
 			}
-			.foregroundStyle(.app.gray1)
+			.foregroundStyle(Color.primaryText)
 			.multilineTextAlignment(.center)
 		}
 

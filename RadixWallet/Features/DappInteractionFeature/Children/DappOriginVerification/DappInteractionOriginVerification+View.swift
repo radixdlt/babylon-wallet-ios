@@ -34,13 +34,13 @@ extension DappInteractionOriginVerification {
 					.padding(.bottom, .small1)
 
 				Text(L10n.MobileConnect.linkTitle)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 					.kerning(-0.5)
 					.textStyle(.sheetTitle)
 					.padding(.bottom, .large2)
 
-				Text(markdown: L10n.MobileConnect.linkSubtitle(store.dAppMetadata.name), emphasizedColor: .app.gray1, emphasizedFont: .app.body1Header)
-					.foregroundColor(.app.gray1)
+				Text(markdown: L10n.MobileConnect.linkSubtitle(store.dAppMetadata.name), emphasizedColor: .primaryText, emphasizedFont: .app.body1Header)
+					.foregroundColor(.primaryText)
 					.textStyle(.body1Link)
 			}
 			.multilineTextAlignment(.center)
@@ -53,7 +53,7 @@ extension DappInteractionOriginVerification {
 				infoPointView(2, info: L10n.MobileConnect.linkBody2)
 			}
 			.padding()
-			.background(.app.gray5)
+			.background(.secondaryBackground)
 			.roundedCorners(radius: 10)
 		}
 
@@ -61,18 +61,18 @@ extension DappInteractionOriginVerification {
 			HStack(spacing: .medium3) {
 				Text("\(index)")
 					.textStyle(.body1HighImportance)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 					.frame(.smallest)
 					.background(.clear)
 					.clipShape(Circle())
 					.overlay(
 						Circle()
-							.stroke(.app.gray1, lineWidth: 1)
+							.stroke(.primaryText, lineWidth: 1)
 					)
 
 				Text(info)
 					.lineSpacing(-4)
-					.foregroundStyle(.app.gray1)
+					.foregroundStyle(.primaryText)
 					.textStyle(.body1Regular)
 			}
 		}

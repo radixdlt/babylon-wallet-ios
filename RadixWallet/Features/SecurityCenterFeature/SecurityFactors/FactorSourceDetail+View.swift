@@ -13,9 +13,9 @@ extension FactorSourceDetail {
 						}
 					}
 				}
-				.background(Color.app.gray5)
+				.background(Color.secondaryBackground)
 				.radixToolbar(title: store.name)
-				.foregroundStyle(.app.gray1)
+				.foregroundStyle(Color.primaryText)
 				.destination(store: store)
 			}
 		}

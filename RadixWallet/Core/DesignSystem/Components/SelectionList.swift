@@ -28,7 +28,7 @@ struct SelectionList<Choices: Sequence>: View where Choices.Element: Hashable {
 						HStack(spacing: 0) {
 							Text(title(item.value))
 								.textStyle(.body1HighImportance)
-								.foregroundColor(.app.gray1)
+								.foregroundColor(.primaryText)
 							Spacer()
 							// Need to disable, since broken in swiftformat 0.52.7
 							// swiftformat:disable redundantClosure

@@ -23,7 +23,7 @@ extension ChooseAccountsForShield {
 					.padding(.horizontal, .medium1)
 					.padding(.bottom, .medium2)
 					.multilineTextAlignment(.center)
-					.foregroundStyle(.app.gray1)
+					.foregroundStyle(.primaryText)
 				}
 				.footer {
 					VStack(spacing: .medium3) {

@@ -110,14 +110,14 @@ extension TransactionHistoryFilters {
 						HStack(spacing: .zero) {
 							Text(name)
 								.textStyle(.body1Header)
-								.foregroundStyle(.app.gray1)
+								.foregroundStyle(.primaryText)
 
 							Spacer()
 
 							Image(expanded ? .chevronUp : .chevronDown)
 						}
 					}
-					.background(.app.white)
+					.background(.primaryBackground)
 
 					if expanded {
 						content
@@ -250,7 +250,7 @@ struct TransactionFilterView: SwiftUI.View {
 		.padding(.trailing, showCross ? .medium1 : 0)
 		.background {
 			ZStack {
-				Capsule().fill(filter.isActive ? .app.gray1 : .app.white)
+				Capsule().fill(filter.isActive ? .primaryText : .app.white)
 				Capsule().stroke(filter.isActive ? .clear : .app.gray3)
 			}
 		}
@@ -273,7 +273,7 @@ struct TransactionFilterView: SwiftUI.View {
 	}
 
 	private var textColor: Color {
-		filter.isActive ? .app.white : .app.gray1
+		filter.isActive ? .app.white : .primaryText
 	}
 
 	struct Dummy: SwiftUI.View {

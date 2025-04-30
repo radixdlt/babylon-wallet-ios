@@ -58,7 +58,7 @@ extension RecoverWalletWithoutProfileStart {
 						.padding(.horizontal, .medium3)
 					}
 					.buttonStyle(.secondaryRectangular(shouldExpand: true))
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 					.multilineTextAlignment(.center)
 					.padding(.vertical, .small1)
 				}

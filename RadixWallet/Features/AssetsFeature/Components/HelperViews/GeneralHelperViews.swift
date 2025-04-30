@@ -50,7 +50,7 @@ struct KeyValueView<Content: View>: View {
 				content
 					.multilineTextAlignment(.trailing)
 					.textStyle(.body1HighImportance)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 					.lineLimit(nil)
 			}
 		case .vertical:
@@ -60,7 +60,7 @@ struct KeyValueView<Content: View>: View {
 				content
 					.multilineTextAlignment(.trailing)
 					.textStyle(.body1HighImportance)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 					.lineLimit(nil)
 			}
 			.flushedLeft
@@ -85,7 +85,7 @@ struct KeyValueTruncatedView: View {
 			Text(value)
 				.multilineTextAlignment(.trailing)
 				.textStyle(.body1HighImportance)
-				.foregroundColor(.app.gray1)
+				.foregroundColor(.primaryText)
 				.lineLimit(1)
 				.onTapGesture {
 					pasteboardClient.copyString(value)
@@ -133,6 +133,6 @@ private struct KeyText: View {
 				Image(.lockMetadata)
 			}
 		}
-		.foregroundColor(.app.gray2)
+		.foregroundColor(.secondaryText)
 	}
 }

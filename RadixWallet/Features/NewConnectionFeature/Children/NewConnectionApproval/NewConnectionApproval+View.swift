@@ -71,7 +71,7 @@ extension NewConnectionApproval {
 						.padding(.bottom, .large1)
 
 					Text(viewStore.title)
-						.foregroundColor(.app.gray1)
+						.foregroundColor(.primaryText)
 						.textStyle(.sheetTitle)
 						.padding(.bottom, .medium1)
 

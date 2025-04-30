@@ -45,13 +45,13 @@ extension ImportMnemonicControllingAccounts {
 					VStack(spacing: 0) {
 						Text(viewStore.navigationTitle)
 							.textStyle(.sheetTitle)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.multilineTextAlignment(.center)
 							.padding(.bottom, .medium2)
 
 						Text(viewStore.subtitle)
 							.textStyle(.body1Regular)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.padding(.bottom, .medium3)
 
 						DisplayEntitiesControlledByMnemonic.View(
@@ -83,7 +83,7 @@ extension ImportMnemonicControllingAccounts {
 			.font(.app.body1Header)
 			.frame(height: .standardButtonHeight)
 			.frame(maxWidth: .infinity)
-			.background(.app.white)
+			.background(.primaryBackground)
 			.cornerRadius(.small2)
 		}
 	}

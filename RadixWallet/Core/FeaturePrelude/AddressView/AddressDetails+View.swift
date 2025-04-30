@@ -56,13 +56,13 @@ extension AddressDetails {
 				} successContent: { title in
 					Text(title)
 						.textStyle(.sheetTitle)
-						.foregroundColor(.app.gray1)
+						.foregroundColor(.primaryText)
 				}
 
 				if store.showQrCode {
 					Text(L10n.AddressDetails.qrCode)
 						.textStyle(.secondaryHeader)
-						.foregroundColor(.app.gray1)
+						.foregroundColor(.primaryText)
 
 					qrCode
 				}
@@ -116,9 +116,9 @@ extension AddressDetails {
 						.renderingMode(.template)
 						.resizable()
 						.frame(.icon)
-						.foregroundColor(.app.gray2)
+						.foregroundColor(.secondaryText)
 					Text(title)
-						.foregroundColor(.app.gray1)
+						.foregroundColor(.primaryText)
 				}
 			}
 		}
@@ -150,7 +150,7 @@ private extension AddressDetails.View {
 		VStack(spacing: .medium2) {
 			VStack(spacing: .small2) {
 				Text(L10n.AddressDetails.fullAddress)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 				Text(colorisedText)
 					.fixedSize(horizontal: false, vertical: true)
 			}
@@ -159,7 +159,7 @@ private extension AddressDetails.View {
 		.textStyle(.body1Header)
 		.padding(.vertical, .medium1)
 		.padding(.horizontal, .medium3)
-		.background(Color.app.gray5)
+		.background(.secondaryBackground)
 		.cornerRadius(.small1)
 	}
 
@@ -181,10 +181,10 @@ private extension AddressDetails.View {
 			var attributed = AttributedString(part.raw, foregroundColor: .app.gray2)
 			let boldChars = part.trimmed.split(separator: "...")
 			if let range = attributed.range(of: boldChars[0]) {
-				attributed[range].foregroundColor = .app.gray1
+				attributed[range].foregroundColor = .primaryText
 			}
 			if boldChars.count == 2, let range = attributed.range(of: boldChars[1], options: .backwards) {
-				attributed[range].foregroundColor = .app.gray1
+				attributed[range].foregroundColor = .primaryText
 			}
 			result.append(.init(attributed))
 			if (index + 1) != parts.count {
@@ -204,7 +204,7 @@ private extension AddressDetails.View {
 			.foregroundColor(.app.white)
 			.multilineTextAlignment(.center)
 			.padding(.small1)
-			.background(.app.gray1.opacity(0.8))
+			.background(.primaryText.opacity(0.8))
 			.cornerRadius(.small1)
 			.padding(.horizontal, .large2)
 			.onTapGesture {

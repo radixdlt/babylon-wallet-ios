@@ -55,14 +55,14 @@ extension NonFungibleAssetList.Row.View {
 				VStack(alignment: .leading, spacing: .small2) {
 					if let title = viewStore.resource.metadata.name {
 						Text(title)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.lineSpacing(-4)
 							.textStyle(.secondaryHeader)
 					}
 
 					Text(L10n.Account.Nfts.itemsCount(viewStore.resource.nonFungibleIdsCount))
 						.font(.app.body2HighImportance)
-						.foregroundColor(.app.gray2)
+						.foregroundColor(.secondaryText)
 				}
 				.padding(.leading, .small1)
 
@@ -71,7 +71,7 @@ extension NonFungibleAssetList.Row.View {
 			.padding(.horizontal, .medium1)
 			.padding(.top, .large3)
 			.padding(.bottom, .medium1)
-			.background(.app.white)
+			.background(.primaryBackground)
 		}
 	}
 
@@ -116,7 +116,7 @@ extension NonFungibleAssetList.Row.View {
 				.padding(.vertical, .medium1)
 				.padding(.horizontal, .medium3)
 				.frame(minHeight: headerHeight)
-				.background(.app.white)
+				.background(.primaryBackground)
 			}
 			.onTapGesture { viewStore.send(.assetTapped(asset)) }
 		}

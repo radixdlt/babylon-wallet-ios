@@ -47,7 +47,7 @@ extension PersonaRow {
 						.frame(.small)
 
 					Text(viewState.name)
-						.foregroundColor(.app.gray1)
+						.foregroundColor(.primaryText)
 						.textStyle(.secondaryHeader)
 						.padding(.leading, .medium3)
 
@@ -76,14 +76,14 @@ extension PersonaRow {
 						Separator()
 
 						Text(lastLogin)
-							.foregroundColor(.app.gray2)
+							.foregroundColor(.secondaryText)
 							.textStyle(.body2Regular)
 							.padding(.horizontal, .medium2)
 							.padding(.vertical, .small2)
 					}
 				}
 			}
-			.background(Color.app.gray5)
+			.background(.secondaryBackground)
 			.cornerRadius(.small1)
 			.embedInButton(when: action)
 			.buttonStyle(.inert)

@@ -33,7 +33,7 @@ extension HiddenEntities {
 		private func header(_ value: String) -> some SwiftUI.View {
 			Text(value)
 				.textStyle(.secondaryHeader)
-				.foregroundColor(.app.gray2)
+				.foregroundColor(.secondaryText)
 		}
 
 		@ViewBuilder
@@ -91,9 +91,9 @@ extension HiddenEntities {
 
 				Text(L10n.Common.none)
 					.textStyle(.secondaryHeader)
-					.foregroundColor(.app.gray2)
+					.foregroundColor(.secondaryText)
 			}
-			.background(Color.app.gray4)
+			.background(.tertiaryBackground)
 			.clipShape(RoundedRectangle(cornerRadius: .medium3))
 		}
 	}

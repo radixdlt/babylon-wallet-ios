@@ -91,7 +91,7 @@ extension AssetsView {
 					)
 				}
 				.background {
-					Color.app.gray5
+					Color.secondaryBackground
 						.ignoresSafeArea(edges: .bottom)
 				}
 				.onFirstTask { @MainActor in
@@ -107,13 +107,13 @@ extension AssetsView {
 						ForEach(viewStore.assetKinds) { kind in
 							let isSelected = viewStore.activeAssetKind == kind
 							Text(kind.displayText)
-								.foregroundColor(isSelected ? .app.white : .app.gray1)
+								.foregroundColor(isSelected ? .app.white : .primaryText)
 								.textStyle(.body1HighImportance)
 								.frame(height: .large1)
 								.padding(.horizontal, .medium2)
 								.background(
 									isSelected
-										? RoundedRectangle(cornerRadius: .medium2).fill(.app.gray1)
+										? RoundedRectangle(cornerRadius: .medium2).fill(.primaryText)
 										: nil
 								)
 								.id(kind)

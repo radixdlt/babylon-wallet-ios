@@ -69,7 +69,7 @@ extension AddLedgerFactorSource {
 					.padding(.horizontal, .large3)
 			}
 			.multilineTextAlignment(.center)
-			.foregroundColor(.app.gray1)
+			.foregroundColor(.primaryText)
 		}
 	}
 }

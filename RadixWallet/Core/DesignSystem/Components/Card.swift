@@ -90,7 +90,7 @@ extension View {
 
 	var inSpeechbubble: some View {
 		padding(.bottom, SpeechbubbleShape.triangleSize.height)
-			.background(.app.white)
+			.background(.primaryBackground)
 			.clipShape(SpeechbubbleShape(cornerRadius: .medium3))
 			.cardShadow
 	}

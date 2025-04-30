@@ -7,7 +7,7 @@ struct URLButtonStyle: ButtonStyle {
 				.foregroundColor(.app.blue2)
 		} icon: {
 			Image(asset: AssetResource.iconLinkOut)
-				.foregroundColor(.app.gray2)
+				.foregroundColor(.secondaryText)
 		}
 		.labelStyle(.trailingIcon)
 	}

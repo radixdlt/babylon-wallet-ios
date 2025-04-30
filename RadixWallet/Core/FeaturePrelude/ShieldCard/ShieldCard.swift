@@ -20,7 +20,7 @@ struct ShieldCard: View {
 			VStack(alignment: .leading, spacing: .small2) {
 				Text(shield.metadata.displayName.rawValue)
 					.textStyle(.body1Header)
-					.foregroundStyle(.app.gray1)
+					.foregroundStyle(.primaryText)
 
 				if mode == .display {
 					displayInfo
@@ -39,7 +39,7 @@ struct ShieldCard: View {
 		.padding(.vertical, verticalPadding)
 		.padding(.leading, .medium2)
 		.padding(.trailing, .medium3)
-		.background(.app.white)
+		.background(.primaryBackground)
 		.roundedCorners(radius: .small1)
 		.cardShadow
 	}

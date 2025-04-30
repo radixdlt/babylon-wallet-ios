@@ -28,11 +28,11 @@ extension InteractionReview.UnknownDappComponents {
 				VStack(alignment: .leading, spacing: .zero) {
 					Text(heading)
 						.textStyle(.body1Header)
-						.foregroundColor(.app.gray1)
+						.foregroundColor(.primaryText)
 
 					AddressView(.address(address))
 						.textStyle(.body2Regular)
-						.foregroundColor(.app.gray2)
+						.foregroundColor(.secondaryText)
 				}
 				Spacer()
 			}

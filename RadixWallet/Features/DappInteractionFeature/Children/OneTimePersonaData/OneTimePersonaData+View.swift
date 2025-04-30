@@ -38,7 +38,7 @@ extension OneTimePersonaData {
 
 						if viewStore.shouldShowChooseDataToProvideTitle {
 							Text(L10n.DAppRequest.PersonalDataOneTime.chooseDataToProvide)
-								.foregroundColor(.app.gray1)
+								.foregroundColor(.primaryText)
 								.textStyle(.body1Header)
 						}
 

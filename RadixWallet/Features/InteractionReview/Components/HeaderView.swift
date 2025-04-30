@@ -12,7 +12,7 @@ extension InteractionReview {
 					.textStyle(.sheetTitle)
 					.lineLimit(2)
 					.multilineTextAlignment(.leading)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 
 				if showBottom {
 					HStack(spacing: .small2) {
@@ -21,7 +21,7 @@ extension InteractionReview {
 						}
 						Text(subtitle)
 							.textStyle(.body2HighImportance)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 					}
 				}
 			}

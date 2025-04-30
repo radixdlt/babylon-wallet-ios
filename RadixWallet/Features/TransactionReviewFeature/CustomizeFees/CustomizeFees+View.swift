@@ -117,12 +117,12 @@ extension CustomizeFees {
 			VStack {
 				Text(viewState.title)
 					.textStyle(.sheetTitle)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 					.multilineTextAlignment(.center)
 					.padding(.bottom, .small1)
 				Text(viewState.description)
 					.textStyle(.body1Regular)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 					.multilineTextAlignment(.center)
 					.padding(.bottom, .medium2)
 
@@ -137,7 +137,7 @@ extension CustomizeFees {
 				HStack {
 					Text(L10n.CustomizeNetworkFees.payFeeFrom)
 						.textStyle(.body1Link)
-						.foregroundColor(.app.gray2)
+						.foregroundColor(.secondaryText)
 						.textCase(.uppercase)
 
 					Spacer()

@@ -11,11 +11,11 @@ struct FactorSourcePreviewCard: View {
 
 			Text(factorSource.name)
 				.textStyle(.body1Header)
-				.foregroundStyle(.app.gray1)
+				.foregroundStyle(.primaryText)
 				.flushedLeft
 		}
 		.padding(.medium3)
-		.background(.app.white)
+		.background(.primaryBackground)
 		.roundedCorners(strokeColor: .borderColor, radius: .small1)
 	}
 }

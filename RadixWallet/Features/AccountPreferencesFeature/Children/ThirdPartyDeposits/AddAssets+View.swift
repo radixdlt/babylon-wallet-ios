@@ -82,7 +82,7 @@ extension AddAsset.View {
 		Text(text)
 			.multilineTextAlignment(.center)
 			.textStyle(.sheetTitle)
-			.foregroundColor(.app.gray1)
+			.foregroundColor(.primaryText)
 	}
 
 	@ViewBuilder
@@ -90,7 +90,7 @@ extension AddAsset.View {
 		Text(text)
 			.lineLimit(nil)
 			.textStyle(.body1Regular)
-			.foregroundColor(.app.gray1)
+			.foregroundColor(.primaryText)
 			.multilineTextAlignment(.center)
 			.fixedSize(horizontal: false, vertical: true)
 	}

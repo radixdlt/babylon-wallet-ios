@@ -34,14 +34,14 @@ extension TransactionReviewNetworkFee {
 						VStack(alignment: .trailing, spacing: .small3) {
 							Text(viewStore.displayedTotalFee)
 								.textStyle(.body1HighImportance)
-								.foregroundColor(.app.gray1)
+								.foregroundColor(.primaryText)
 
 							loadable(viewStore.fiatValue) {
 								ProgressView()
 							} successContent: { value in
 								Text(value)
 									.textStyle(.body2HighImportance)
-									.foregroundColor(.app.gray2)
+									.foregroundColor(.secondaryText)
 							}
 						}
 					}

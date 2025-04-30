@@ -24,7 +24,7 @@ extension AccountsToImport {
 								.textStyle(.body1Regular)
 								.padding(.horizontal, .large2)
 						}
-						.foregroundColor(.app.gray1)
+						.foregroundColor(.primaryText)
 						.multilineTextAlignment(.center)
 
 						ForEach(viewStore.scannedAccounts) { account in

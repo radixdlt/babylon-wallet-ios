@@ -11,7 +11,7 @@ struct AlternativeRectangularButtonStyle: ButtonStyle {
 			.font(.app.body1Header)
 			.frame(height: height)
 			.frame(maxWidth: .infinity)
-			.background(.app.white)
+			.background(.primaryBackground)
 			.brightness(configuration.isPressed ? -0.1 : 0)
 			.cornerRadius(.small2)
 	}

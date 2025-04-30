@@ -75,7 +75,7 @@ extension ChooseReceivingAccount {
 						VStack(spacing: .medium2) {
 							Text(L10n.AssetTransfer.ChooseReceivingAccount.enterManually)
 								.textStyle(.body1Regular)
-								.foregroundColor(.app.gray1)
+								.foregroundColor(.primaryText)
 
 							addressField
 

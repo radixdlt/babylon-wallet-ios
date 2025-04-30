@@ -6,7 +6,7 @@ struct LoadingView: View {
 	init(
 		rotationDegrees: CGFloat = 0.0,
 		lineWidth: CGFloat = 2,
-		stroke: Color = Color.app.white
+		stroke: Color = .primaryBackground
 	) {
 		self.stroke = stroke
 		_rotationDegrees = .init(initialValue: rotationDegrees)

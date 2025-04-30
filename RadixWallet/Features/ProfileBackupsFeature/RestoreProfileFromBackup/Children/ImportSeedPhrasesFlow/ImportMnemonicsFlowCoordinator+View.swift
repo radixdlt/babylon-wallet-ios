@@ -12,7 +12,7 @@ extension ImportMnemonicsFlowCoordinator {
 		}
 
 		var body: some SwiftUI.View {
-			Color.app.white
+			Color.primaryBackground
 				.onFirstTask { @MainActor in
 					await store.send(.view(.onFirstTask)).finish()
 				}

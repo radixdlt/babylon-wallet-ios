@@ -35,7 +35,7 @@ extension FactorSourceAccess {
 					Text(LocalizedStringKey(store.message))
 						.textStyle(.body1Regular)
 				}
-				.foregroundColor(.app.gray1)
+				.foregroundColor(.primaryText)
 
 				card
 				retry

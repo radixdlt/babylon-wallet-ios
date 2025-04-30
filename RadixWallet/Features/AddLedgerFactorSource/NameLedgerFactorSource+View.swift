@@ -44,7 +44,7 @@ extension NameLedgerFactorSource {
 							.padding(.bottom, .small1)
 						}
 					}
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 					.footer {
 						Button(L10n.AddLedgerDevice.NameLedger.continueButtonTitle) {
 							store.send(.view(.confirmNameButtonTapped))

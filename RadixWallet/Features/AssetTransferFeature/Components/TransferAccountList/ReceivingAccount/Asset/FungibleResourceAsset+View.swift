@@ -52,7 +52,7 @@ extension FungibleResourceAsset.View {
 					.multilineTextAlignment(.trailing)
 					.lineLimit(1)
 					.minimumScaleFactor(0.7)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 					.textStyle(.sectionHeader)
 					.focused($focused)
 					.bind(viewStore.focusedBinding, to: $focused)
@@ -81,7 +81,7 @@ extension FungibleResourceAsset.View {
 							Text(L10n.AssetTransfer.FungibleResource.balance(viewStore.balance.formatted()))
 						}
 						.textStyle(.body3HighImportance)
-						.foregroundColor(.app.gray2)
+						.foregroundColor(.secondaryText)
 					}
 				}
 			}

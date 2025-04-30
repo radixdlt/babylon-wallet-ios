@@ -101,7 +101,7 @@ extension SelectBackup.View {
 			}
 			.padding(.horizontal, .medium1)
 			.padding(.bottom, .medium1)
-			.foregroundColor(.app.gray1)
+			.foregroundColor(.primaryText)
 		}
 	}
 
@@ -112,7 +112,7 @@ extension SelectBackup.View {
 			.padding(.vertical, .large1)
 			.padding(.horizontal, .large2)
 			.frame(maxWidth: .infinity)
-			.background(.app.gray5)
+			.background(.secondaryBackground)
 			.roundedCorners(radius: .small1)
 	}
 
@@ -154,7 +154,7 @@ extension SelectBackup.View {
 					ForEachStatic(values) {
 						Text(markdown: $0, emphasizedColor: .app.gray2, emphasizedFont: .app.body2Link)
 					}
-					.foregroundColor(.app.gray2)
+					.foregroundColor(.secondaryText)
 					.textStyle(.body2Regular)
 
 					if !isVersionCompatible {

@@ -63,7 +63,7 @@ extension ReceivingAccount.View {
 					}
 				}
 				.padding(.horizontal, .medium3)
-				.foregroundColor(.app.gray2)
+				.foregroundColor(.secondaryText)
 			}
 		}
 		.frame(height: .standardButtonHeight)

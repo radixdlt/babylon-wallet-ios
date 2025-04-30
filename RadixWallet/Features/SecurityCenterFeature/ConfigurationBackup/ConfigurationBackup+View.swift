@@ -33,7 +33,7 @@ extension ConfigurationBackup {
 				ScrollView {
 					VStack(alignment: .leading, spacing: .zero) {
 						Text(L10n.ConfigurationBackup.heading)
-							.foregroundStyle(.app.gray2)
+							.foregroundStyle(Color.secondaryText)
 							.textStyle(.body1Header)
 							.padding(.bottom, .medium2)
 
@@ -55,7 +55,7 @@ extension ConfigurationBackup {
 						.padding(.bottom, .medium1)
 
 						Text(L10n.ConfigurationBackup.Manual.heading)
-							.foregroundStyle(.app.gray2)
+							.foregroundStyle(Color.secondaryText)
 							.textStyle(.body1Header)
 							.padding(.bottom, .medium2)
 
@@ -68,7 +68,7 @@ extension ConfigurationBackup {
 				}
 				.exportFileSheet(store: store, exportable: viewStore.exportable)
 			}
-			.background(.app.gray5)
+			.background(Color.secondaryBackground)
 			.onAppear {
 				store.send(.view(.didAppear))
 			}
@@ -172,12 +172,12 @@ extension ConfigurationBackup {
 									Text(L10n.ConfigurationBackup.Automated.toggleIOS)
 										.multilineTextAlignment(.leading)
 										.textStyle(.body1Header)
-										.foregroundStyle(.app.gray1)
+										.foregroundStyle(Color.primaryText)
 
 									if let lastBackupString {
 										Text(lastBackupString)
 											.textStyle(.body2Regular)
-											.foregroundStyle(.app.gray2)
+											.foregroundStyle(Color.secondaryText)
 									}
 								}
 							}
@@ -188,7 +188,7 @@ extension ConfigurationBackup {
 
 						Text(L10n.ConfigurationBackup.Automated.text)
 							.textStyle(.body1Regular)
-							.foregroundStyle(.app.gray1)
+							.foregroundStyle(Color.primaryText)
 
 						VStack(spacing: .small1) {
 							ForEach(Item.allCases, id: \.self) { item in
@@ -259,7 +259,7 @@ extension ConfigurationBackup {
 							.multilineTextAlignment(.leading)
 							.lineSpacing(0)
 							.textStyle(.body2Regular)
-							.foregroundStyle(.app.gray2)
+							.foregroundStyle(Color.secondaryText)
 					}
 				}
 				.clipped()
@@ -296,7 +296,7 @@ extension ConfigurationBackup {
 						.lineSpacing(0)
 						.multilineTextAlignment(.leading)
 						.textStyle(.body1Regular)
-						.foregroundStyle(.app.gray1)
+						.foregroundStyle(Color.primaryText)
 						.padding(.top, .medium2)
 						.padding(.horizontal, .medium2)
 
@@ -307,7 +307,7 @@ extension ConfigurationBackup {
 					if let lastBackupString {
 						Text(lastBackupString)
 							.textStyle(.body2Regular)
-							.foregroundStyle(.app.gray2)
+							.foregroundStyle(Color.secondaryText)
 							.padding(.horizontal, .medium2)
 					}
 
@@ -323,20 +323,20 @@ extension ConfigurationBackup {
 		var body: some SwiftUI.View {
 			HStack(spacing: 0) {
 				Image(.error)
-					.foregroundStyle(.app.gray1)
+					.foregroundStyle(Color.primaryText)
 					.padding(.trailing, .medium3)
 
 				Text(text)
 					.multilineTextAlignment(.leading)
 					.lineSpacing(0)
 					.textStyle(.body1Regular)
-					.foregroundStyle(.app.gray1)
+					.foregroundStyle(Color.primaryText)
 
 				Spacer(minLength: 0)
 			}
 			.padding(.horizontal, .medium2)
 			.padding(.vertical, .medium3)
-			.background(.app.gray5)
+			.background(Color.tertiaryBackground)
 		}
 	}
 }

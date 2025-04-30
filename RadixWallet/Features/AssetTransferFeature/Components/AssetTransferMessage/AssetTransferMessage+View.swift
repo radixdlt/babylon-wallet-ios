@@ -44,14 +44,14 @@ extension AssetTransferMessage.View {
 						//	}
 						Text(L10n.Common.public)
 							.textStyle(.body1HighImportance)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 
 						Spacer()
 
 						Button("", asset: AssetResource.close) {
 							viewStore.send(.removeMessageTapped)
 						}
-						.foregroundColor(.app.gray2)
+						.foregroundColor(.secondaryText)
 					}
 					.padding(.medium3)
 					.roundedCorners(.top, strokeColor: .borderColor)

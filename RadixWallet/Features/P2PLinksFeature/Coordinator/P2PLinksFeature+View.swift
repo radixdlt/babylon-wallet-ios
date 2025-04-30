@@ -47,7 +47,7 @@ extension P2PLinksFeature {
 								.withSeparator(horizontalPadding: link == viewStore.linkRows.last ? .zero : .medium3)
 							}
 						}
-						.background(Color.app.white)
+						.background(.primaryBackground)
 
 						Button(L10n.LinkedConnectors.linkNewConnector) {
 							viewStore.send(.addNewConnectionButtonTapped)
@@ -61,7 +61,7 @@ extension P2PLinksFeature {
 					}
 					.padding(.vertical, .medium3)
 				}
-				.background(Color.app.gray5)
+				.background(.secondaryBackground)
 				.radixToolbar(title: L10n.LinkedConnectors.title)
 				.task { @MainActor in
 					await store.send(.view(.task)).finish()

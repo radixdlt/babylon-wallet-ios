@@ -44,7 +44,7 @@ struct MultiPickerView: UIViewRepresentable {
 			let label = UILabel()
 			label.text = parent.data[component][row]
 			label.font = .body1Regular
-			label.textColor = UIColor(.app.gray1)
+			label.textColor = UIColor(.primaryText)
 			label.textAlignment = .center
 			return label
 		}

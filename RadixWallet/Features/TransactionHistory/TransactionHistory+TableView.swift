@@ -206,7 +206,7 @@ extension TransactionHistory {
 				.padding(.horizontal, .medium3)
 				.padding(.vertical, .small2)
 				.frame(maxWidth: .infinity, alignment: .leading)
-				.background(.app.gray5)
+				.background(.secondaryBackground)
 		}
 	}
 
@@ -282,7 +282,7 @@ extension TransactionHistory {
 				let inset: CGFloat = 2
 				ExpandableTextView(fullText: message, lineLimit: 2)
 					.textStyle(.body2Regular)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 					.multilineTextAlignment(.leading)
 					.padding(.medium3)
 					.inFlatBottomSpeechbubble(inset: inset)
@@ -298,7 +298,7 @@ extension TransactionHistory {
 			var body: some SwiftUI.View {
 				Text("\(manifestClassLabel) • \(timeLabel)")
 					.textStyle(.body2HighImportance)
-					.foregroundColor(.app.gray2)
+					.foregroundColor(.secondaryText)
 			}
 
 			private var manifestClassLabel: String {
@@ -341,7 +341,7 @@ extension TransactionHistory {
 
 					Text(L10n.TransactionHistory.updatedDepositSettings)
 						.textStyle(.body2HighImportance)
-						.foregroundColor(.app.gray1)
+						.foregroundColor(.primaryText)
 						.flushedLeft
 						.padding(.small1)
 						.roundedCorners(strokeColor: .app.gray3)
@@ -378,7 +378,7 @@ extension TransactionHistory {
 					Text(L10n.TransactionHistory.noBalanceChanges)
 						.multilineTextAlignment(.leading)
 						.textStyle(.body2HighImportance)
-						.foregroundColor(.app.gray1)
+						.foregroundColor(.primaryText)
 						.flushedLeft
 						.padding(.small1)
 						.roundedCorners(strokeColor: .app.gray3)
@@ -392,11 +392,11 @@ extension TransactionHistory {
 				Text(L10n.TransactionHistory.complexTransaction)
 					.multilineTextAlignment(.leading)
 					.textStyle(.body2Regular)
-					.foregroundColor(.app.gray2)
+					.foregroundColor(.secondaryText)
 					.padding(.vertical, .small2)
 					.padding(.horizontal, .medium3)
 					.frame(maxWidth: .infinity, alignment: .leading)
-					.background(.app.gray5)
+					.background(.secondaryBackground)
 					.roundedCorners(.bottom, radius: .medium3 - inset)
 					.padding(.horizontal, inset)
 					.padding(.bottom, inset)
@@ -446,7 +446,7 @@ extension TransactionHistory {
 				case .deposited:
 					.app.green1
 				case .withdrawn, .settings:
-					.app.gray1
+					.primaryText
 				}
 			}
 

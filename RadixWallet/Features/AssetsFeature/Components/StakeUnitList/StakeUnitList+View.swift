@@ -102,7 +102,7 @@ extension StakeUnitList {
 					.withDottedCircleOverlay()
 				Text(L10n.Account.Staking.stakedValidators(validatorsCount))
 					.textStyle(.body1Link)
-					.foregroundColor(.app.gray2)
+					.foregroundColor(.secondaryText)
 			}
 			.rowStyle()
 		}

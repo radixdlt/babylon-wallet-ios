@@ -88,7 +88,7 @@ extension NonFungibleTokenDetails {
 									if let description = tokenDetails.description {
 										ExpandableTextView(fullText: description)
 											.textStyle(.body1Regular)
-											.foregroundColor(.app.gray1)
+											.foregroundColor(.primaryText)
 										AssetDetailsSeparator()
 											.padding(.horizontal, -.large2)
 									}
@@ -144,7 +144,7 @@ extension NonFungibleTokenDetails {
 						}
 					}
 				}
-				.foregroundColor(.app.gray1)
+				.foregroundColor(.primaryText)
 				.task { @MainActor in
 					await store.send(.view(.task)).finish()
 				}
@@ -165,7 +165,7 @@ extension NonFungibleTokenDetails.View {
 
 			Text(L10n.AssetDetails.Staking.currentRedeemableValue)
 				.textStyle(.secondaryHeader)
-				.foregroundColor(.app.gray1)
+				.foregroundColor(.primaryText)
 
 			ResourceBalanceView(
 				.fungible(.xrd(balance: stakeClaim.claimAmount, network: stakeClaim.validatorAddress.networkID)),

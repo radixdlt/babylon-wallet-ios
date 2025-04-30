@@ -26,10 +26,11 @@ extension ChangeMainFactorSource {
 
 						Spacer()
 					}
-					.foregroundStyle(.app.gray1)
+					.foregroundStyle(.primaryText)
 					.multilineTextAlignment(.center)
 					.padding(.horizontal, .medium3)
 				}
+				.background(.secondaryBackground)
 				.footer {
 					WithControlRequirements(
 						store.selected,

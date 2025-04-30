@@ -37,7 +37,7 @@ extension SelectInactiveAccountsToAdd {
 						Text(L10n.AccountRecoveryScan.SelectInactiveAccounts.Header.title)
 							.multilineTextAlignment(.center)
 							.textStyle(.sheetTitle)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.padding(.top, .medium3)
 							.padding(.horizontal, .medium1)
 							.padding(.bottom, .medium1)
@@ -45,7 +45,7 @@ extension SelectInactiveAccountsToAdd {
 						Text(L10n.AccountRecoveryScan.SelectInactiveAccounts.Header.subtitle)
 							.multilineTextAlignment(.center)
 							.textStyle(.body1Regular)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.padding(.horizontal, .large2)
 							.padding(.bottom, .medium1)
 

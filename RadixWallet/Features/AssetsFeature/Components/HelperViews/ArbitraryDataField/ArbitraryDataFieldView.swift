@@ -14,12 +14,12 @@ struct ArbitraryDataFieldView: View {
 				VStack(alignment: .leading, spacing: .small3) {
 					Text(field.name)
 						.textStyle(.body1Regular)
-						.foregroundColor(.app.gray2)
+						.foregroundColor(.secondaryText)
 					ExpandableTextView(
 						fullText: value
 					)
 					.textStyle(.body1HighImportance)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 				}
 				.flushedLeft
 			}

@@ -205,7 +205,7 @@ struct PlainListRowCore: View {
 					.textStyle(.body2Regular)
 					.lineLimit(1)
 					.minimumScaleFactor(0.8)
-					.foregroundColor(.app.gray2)
+					.foregroundColor(.secondaryText)
 					.padding(.top, .small3)
 			}
 

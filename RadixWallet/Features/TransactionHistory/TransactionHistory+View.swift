@@ -34,11 +34,11 @@ extension TransactionHistory {
 							}
 
 							HScrollBar(items: viewStore.availableMonths, selection: selection)
-								.background(.app.white)
+								.background(.primaryBackground)
 						}
 						.padding(.top, .small3)
 						.padding(.bottom, .small1)
-						.background(.app.white)
+						.background(.primaryBackground)
 
 						TableView(
 							sections: viewStore.sections,
@@ -62,7 +62,7 @@ extension TransactionHistory {
 								.foregroundStyle(.app.gray2)
 						}
 					}
-					.background(.app.gray5)
+					.background(.secondaryBackground)
 					.toolbar {
 						ToolbarItem(placement: .topBarLeading) {
 							CloseButton {

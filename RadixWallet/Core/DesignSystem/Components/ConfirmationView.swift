@@ -29,11 +29,11 @@ struct ConfirmationView: View {
 
 				Text(title)
 					.textStyle(.sheetTitle)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 
-				Text(markdown: message, emphasizedColor: .app.gray1, emphasizedFont: .app.body1Header)
+				Text(markdown: message, emphasizedColor: .primaryText, emphasizedFont: .app.body1Header)
 					.textStyle(.body1Regular)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 			}
 			.padding(.horizontal, .small2)
 

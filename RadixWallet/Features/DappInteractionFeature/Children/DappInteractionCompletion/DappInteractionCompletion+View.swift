@@ -20,12 +20,12 @@ extension DappInteractionCompletion {
 						Image(asset: AssetResource.successCheckmark)
 
 						Text(L10n.DAppRequest.Completion.title)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.textStyle(.sheetTitle)
 							.padding([.top, .horizontal], .medium3)
 
 						Text(L10n.DAppRequest.Completion.subtitle(viewStore.dappMetadata.name))
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)
 							.padding([.top, .horizontal], .medium3)
@@ -41,12 +41,12 @@ extension DappInteractionCompletion {
 
 						if viewStore.showSwitchBackToBrowserMessage {
 							Text(L10n.MobileConnect.interactionSuccess)
-								.foregroundColor(.app.gray1)
+								.foregroundColor(.primaryText)
 								.textStyle(.body1Regular)
 								.multilineTextAlignment(.center)
 								.padding(.vertical, .medium1)
 								.frame(maxWidth: .infinity)
-								.background(.app.gray5)
+								.background(.secondaryBackground)
 						}
 					}
 					.frame(maxWidth: .infinity)

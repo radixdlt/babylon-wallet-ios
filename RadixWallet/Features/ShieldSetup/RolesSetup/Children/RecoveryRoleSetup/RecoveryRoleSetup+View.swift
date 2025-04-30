@@ -113,7 +113,7 @@ extension RecoveryRoleSetup {
 					.textStyle(.sheetTitle)
 					.multilineTextAlignment(.center)
 			}
-			.foregroundStyle(.app.gray1)
+			.foregroundStyle(.primaryText)
 		}
 
 		private var recoverySection: some SwiftUI.View {
@@ -152,7 +152,7 @@ extension RecoveryRoleSetup {
 
 				Text(L10n.ShieldWizardRecovery.Combination.label)
 					.textStyle(.body1Link)
-					.foregroundStyle(.app.gray1)
+					.foregroundStyle(.primaryText)
 
 				emergencyFallbackView
 			}
@@ -179,7 +179,7 @@ extension RecoveryRoleSetup {
 					.textStyle(.body2Regular)
 			}
 			.multilineTextAlignment(.leading)
-			.foregroundStyle(.app.gray1)
+			.foregroundStyle(.primaryText)
 		}
 
 		private func factorSourcesContainer(
@@ -212,7 +212,7 @@ extension RecoveryRoleSetup {
 					if !isLastFactor {
 						Text(L10n.ShieldWizardRecovery.Combination.label)
 							.textStyle(.body1Link)
-							.foregroundStyle(.app.gray1)
+							.foregroundStyle(.primaryText)
 					}
 				}
 
@@ -249,20 +249,20 @@ extension RecoveryRoleSetup {
 				VStack(spacing: .medium2) {
 					Text(
 						markdown: L10n.ShieldWizardRecovery.Fallback.subtitle,
-						emphasizedColor: .app.gray1,
+						emphasizedColor: .primaryText,
 						emphasizedFont: .app.body2Header
 					)
 					.textStyle(.body2Regular)
-					.foregroundStyle(.app.gray1)
+					.foregroundStyle(.primaryText)
 					.flushedLeft
 
 					Label(store.periodUntilAutoConfirm.title, asset: AssetResource.emergencyFallbackCalendar)
 						.textStyle(.body1Header)
-						.foregroundStyle(.app.gray1)
+						.foregroundStyle(.primaryText)
 						.flushedLeft
 						.padding(.horizontal, .medium3)
 						.padding(.vertical, .small1)
-						.background(.app.white)
+						.background(.primaryBackground)
 						.roundedCorners(radius: .small2)
 						.cardShadow
 						.onTapGesture {

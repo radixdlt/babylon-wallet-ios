@@ -71,7 +71,7 @@ extension AccountPreferences {
 					viewStore.send(.task)
 				}
 				.destination(store: store)
-				.background(.app.gray5)
+				.background(.secondaryBackground)
 				.radixToolbar(title: L10n.AccountSettings.title)
 			}
 		}
@@ -102,7 +102,7 @@ extension AccountPreferences.View {
 		if viewStore.faucetButtonState.isLoading {
 			Text(L10n.AccountSettings.loadingPrompt)
 				.font(.app.body2Regular)
-				.foregroundColor(.app.gray1)
+				.foregroundColor(.primaryText)
 		}
 	}
 

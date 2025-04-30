@@ -27,7 +27,7 @@ struct StakeSummaryView: View {
 					.frame(.smallish)
 				Text(L10n.Account.Staking.lsuResourceHeader)
 					.textStyle(.secondaryHeader)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 			}
 
 			VStack(spacing: .zero) {
@@ -70,7 +70,7 @@ extension StakeSummaryView {
 		HStack(alignment: .firstTextBaseline) {
 			Text(name)
 				.textStyle(.body2HighImportance)
-				.foregroundColor(.app.gray2)
+				.foregroundColor(.secondaryText)
 				.padding(.trailing, .medium3)
 
 			Spacer()
@@ -78,7 +78,7 @@ extension StakeSummaryView {
 			loadable(amount, loadingViewHeight: .small1) { amount in
 				VStack(alignment: .trailing, spacing: .zero) {
 					Text("\(amount.nominalAmount.formatted()) XRD")
-						.foregroundColor(amount.nominalAmount > 0 ? .app.gray1 : .app.gray3)
+						.foregroundColor(amount.nominalAmount > 0 ? .primaryText : .app.gray3)
 					if !resourceBalanceHideFiatValue, let fiatWorth = amount.fiatWorth?.currencyFormatted(applyCustomFont: false) {
 						Text(fiatWorth)
 							.foregroundStyle(.app.gray2)

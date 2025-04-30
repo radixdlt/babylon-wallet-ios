@@ -73,19 +73,19 @@ extension Text {
 	/// Text formatted as a section heading
 	var sectionHeading: some View {
 		textStyle(.body1Header)
-			.foregroundColor(.app.gray2)
+			.foregroundColor(.secondaryText)
 	}
 
 	/// Text formatted as an info item
 	var infoItem: some View {
 		textStyle(.body1HighImportance)
-			.foregroundColor(.app.gray1)
+			.foregroundColor(.primaryText)
 	}
 
 	/// An informative block of text
 	var textBlock: some View {
 		textStyle(.body1HighImportance)
-			.foregroundColor(.app.gray2)
+			.foregroundColor(.secondaryText)
 	}
 
 	/// A url

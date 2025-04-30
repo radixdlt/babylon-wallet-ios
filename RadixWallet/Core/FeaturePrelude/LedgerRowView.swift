@@ -38,7 +38,7 @@ struct LedgerRowView: View {
 			HStack(spacing: 0) {
 				VStack(alignment: .leading, spacing: 0) {
 					Text(viewState.description)
-						.foregroundColor(.app.gray1)
+						.foregroundColor(.primaryText)
 						.textStyle(.secondaryHeader)
 						.padding(.bottom, .small1)
 
@@ -57,7 +57,7 @@ struct LedgerRowView: View {
 					)
 				}
 			}
-			.foregroundColor(.app.gray1)
+			.foregroundColor(.primaryText)
 			.padding(.horizontal, .large3)
 			.padding(.vertical, .medium1)
 		}

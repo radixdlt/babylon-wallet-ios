@@ -36,7 +36,8 @@ extension App {
 					)
 				}
 			}
-			.tint(.app.gray1)
+			.tint(.primaryText)
+			.background(.primaryBackground)
 			.presentsLoadingViewOverlay()
 			.onOpenURL { url in
 				store.send(.view(.urlOpened(url)))

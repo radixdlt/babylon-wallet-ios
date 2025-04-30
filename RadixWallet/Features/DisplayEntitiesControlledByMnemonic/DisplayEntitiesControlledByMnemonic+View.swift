@@ -33,7 +33,7 @@ extension DisplayEntitiesControlledByMnemonic {
 			let type: HeadingType
 			let isError: Bool
 			var foregroundColor: Color {
-				isError ? .app.gray2 : .app.gray1
+				isError ? .app.gray2 : .primaryText
 			}
 
 			enum HeadingType: Equatable {
@@ -161,7 +161,7 @@ extension DisplayEntitiesControlledByMnemonic {
 
 					Text(headingState.connectedAccountsLabel(accounts: viewState.totalAccountsCount, personas: viewState.personasCount))
 						.textStyle(.body2Regular)
-						.foregroundColor(.app.gray2)
+						.foregroundColor(.secondaryText)
 				}
 
 				Spacer(minLength: 0)

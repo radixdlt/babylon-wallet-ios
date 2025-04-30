@@ -40,7 +40,7 @@ extension Home {
 								) {
 									viewStore.send(.view(.showFiatWorthToggled))
 								}
-								.foregroundColor(.app.gray1)
+								.foregroundColor(.primaryText)
 							}
 							.padding(.horizontal, .medium1)
 						}

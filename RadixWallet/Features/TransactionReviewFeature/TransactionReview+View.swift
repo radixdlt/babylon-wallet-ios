@@ -4,12 +4,12 @@ import SwiftUI
 extension View {
 	var sectionHeading: some View {
 		textStyle(.body1Header)
-			.foregroundColor(.app.gray2)
+			.foregroundColor(.secondaryText)
 	}
 
 	var message: some View {
 		textStyle(.body1Regular)
-			.foregroundColor(.app.gray1)
+			.foregroundColor(.primaryText)
 	}
 }
 
@@ -95,12 +95,12 @@ extension TransactionReview {
 								VStack(spacing: 0) {
 									Text(L10n.TransactionReview.title)
 										.textStyle(.body2Header)
-										.foregroundColor(.app.gray1)
+										.foregroundColor(.primaryText)
 
 									if let name = viewStore.proposingDappMetadata?.name {
 										Text(L10n.InteractionReview.subtitle(name.rawValue))
 											.textStyle(.body2Regular)
-											.foregroundColor(.app.gray2)
+											.foregroundColor(.secondaryText)
 									}
 								}
 							}

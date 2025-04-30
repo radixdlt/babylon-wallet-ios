@@ -24,7 +24,7 @@ struct FactorSourceCard: View {
 					Image(asset: AssetResource.close)
 						.frame(.smallest)
 				}
-				.foregroundColor(.app.gray2)
+				.foregroundColor(Color.secondaryText)
 			}
 		}
 	}
@@ -61,9 +61,9 @@ struct FactorSourceCard: View {
 				)
 			}
 		}
-		.background(.app.white)
+		.background(Color.primaryBackground)
 		.roundedCorners(radius: .small1)
-		.cardShadow
+		// .cardShadow
 		.animation(.default, value: dataSource.messages.count)
 	}
 
@@ -76,22 +76,22 @@ struct FactorSourceCard: View {
 			VStack(alignment: .leading, spacing: .small3) {
 				Text(dataSource.title)
 					.textStyle(.body1Header)
-					.foregroundStyle(.app.gray1)
+					.foregroundStyle(Color.primaryText)
 
 				if let subtitle = dataSource.subtitle {
 					Text(subtitle)
 						.textStyle(.body2Regular)
-						.foregroundStyle(.app.gray2)
+						.foregroundStyle(Color.secondaryText)
 				}
 
 				if let lastUsedOn = dataSource.lastUsedOn {
 					Text(
 						markdown: L10n.FactorSources.Card.lastUsed(RadixDateFormatter.string(from: lastUsedOn, dateStyle: .long)),
-						emphasizedColor: .app.gray2,
+						emphasizedColor: Color.secondaryText,
 						emphasizedFont: .app.body2Link
 					)
 					.textStyle(.body2Regular)
-					.foregroundStyle(.app.gray2)
+					.foregroundStyle(Color.secondaryText)
 				}
 			}
 			.flushedLeft
@@ -124,7 +124,7 @@ struct FactorSourceCard: View {
 					HStack(spacing: .zero) {
 						Text(linkedTitle)
 							.textStyle(.body2Regular)
-							.foregroundStyle(.app.gray2)
+							.foregroundStyle(Color.secondaryText)
 
 						Spacer(minLength: 0)
 
@@ -154,10 +154,10 @@ struct FactorSourceCard: View {
 						if dataSource.hasHiddenEntities {
 							Text(L10n.Common.hiddenAccountsOrPersonas)
 								.textStyle(.body1HighImportance)
-								.foregroundStyle(.app.gray2)
+								.foregroundStyle(Color.secondaryText)
 								.frame(maxWidth: .infinity)
 								.padding(.small1)
-								.background(Color.app.gray4)
+								.background(Color.secondaryText)
 								.cornerRadius(.small1)
 						}
 					}
@@ -165,7 +165,7 @@ struct FactorSourceCard: View {
 			}
 			.padding(.horizontal, .medium3)
 			.padding(.vertical, .small1)
-			.background(.app.gray5)
+			.background(Color.tertiaryBackground)
 		}
 
 		private var linkedTitle: String {

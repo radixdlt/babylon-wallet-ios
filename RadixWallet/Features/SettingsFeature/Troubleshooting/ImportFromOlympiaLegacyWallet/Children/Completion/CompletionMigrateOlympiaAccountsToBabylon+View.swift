@@ -81,7 +81,7 @@ extension CompletionMigrateOlympiaAccountsToBabylon {
 									.textStyle(.body1Regular)
 									.padding(.bottom, .medium3)
 							}
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.multilineTextAlignment(.center)
 
 							VStack(spacing: .small2) {
@@ -95,7 +95,7 @@ extension CompletionMigrateOlympiaAccountsToBabylon {
 
 							Text(L10n.ImportOlympiaAccounts.Completion.explanation)
 								.textStyle(.body1Regular)
-								.foregroundColor(.app.gray1)
+								.foregroundColor(.primaryText)
 								.multilineTextAlignment(.center)
 								.padding(.horizontal, .medium1)
 								.padding(.bottom, .medium1)

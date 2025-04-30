@@ -11,8 +11,8 @@ extension FactoryReset {
 		var body: some SwiftUI.View {
 			content
 				.radixToolbar(title: L10n.FactoryReset.title)
-				.tint(.app.gray1)
-				.foregroundColor(.app.gray1)
+				.tint(.primaryText)
+				.foregroundColor(.primaryText)
 				.presentsLoadingViewOverlay()
 				.destinations(with: store)
 		}
@@ -26,7 +26,7 @@ extension FactoryReset.View {
 			VStack(alignment: .leading, spacing: .large3) {
 				Text(L10n.FactoryReset.message)
 					.textStyle(.body1Link)
-					.foregroundColor(.app.gray2)
+					.foregroundColor(.secondaryText)
 					.padding(.horizontal, .small3)
 
 				securityCenter()
@@ -36,7 +36,7 @@ extension FactoryReset.View {
 			.padding(.horizontal, .medium2)
 			.padding(.vertical, .medium3)
 		}
-		.background(Color.app.gray5)
+		.background(.secondaryBackground)
 		.footer { resetWallet }
 		.onFirstTask { @MainActor in
 			await store.send(.view(.onFirstTask)).finish()
@@ -48,13 +48,13 @@ extension FactoryReset.View {
 			VStack(spacing: .medium2) {
 				Text(L10n.FactoryReset.status)
 					.textStyle(.body1Header)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 
 				status()
 			}
 			.padding(.horizontal, .medium3)
 			.padding(.vertical, .large3)
-			.background(Color.app.white)
+			.background(.primaryBackground)
 
 			disclosure
 		}
@@ -97,10 +97,10 @@ extension FactoryReset.View {
 			Text(L10n.FactoryReset.disclosure)
 				.textStyle(.body1Regular)
 		}
-		.foregroundColor(.app.gray1)
+		.foregroundColor(.primaryText)
 		.padding(.medium2)
 		.frame(maxWidth: .infinity)
-		.background(Color.app.gray5)
+		.background(.secondaryBackground)
 	}
 
 	private var resetWallet: some View {

@@ -34,14 +34,14 @@ extension SelectFeePayer {
 					Text(L10n.CustomizeNetworkFees.SelectFeePayer.navigationTitle)
 						.multilineTextAlignment(.center)
 						.textStyle(.sheetTitle)
-						.foregroundColor(.app.gray1)
+						.foregroundColor(.primaryText)
 						.padding(.horizontal, .medium1)
 						.padding(.bottom, .small2)
 
 					Text(L10n.CustomizeNetworkFees.SelectFeePayer.subtitle(viewStore.feeString))
 						.multilineTextAlignment(.center)
 						.textStyle(.body1HighImportance)
-						.foregroundColor(.app.gray2)
+						.foregroundColor(.secondaryText)
 						.padding(.horizontal, .large3)
 						.padding(.bottom, .small1)
 
