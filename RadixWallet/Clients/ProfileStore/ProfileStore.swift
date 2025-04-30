@@ -33,6 +33,10 @@ extension ProfileStore {
 		return profile
 	}
 
+	func tryGetProfile() -> Profile? {
+		profileSubject.value
+	}
+
 	func profileStateSequence() async -> AnyAsyncSequence<ProfileState> {
 		profileStateSubject.share().eraseToAnyAsyncSequence()
 	}
