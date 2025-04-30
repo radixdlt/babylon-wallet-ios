@@ -22,8 +22,8 @@ extension Main {
 				Home.View(store: store.home)
 					.destinations(with: store)
 			}
-			.task { @MainActor in
-				await store.send(.view(.task)).finish()
+			.task {
+				store.send(.view(.task))
 			}
 			.showDeveloperDisclaimerBanner(store.banner)
 			.presentsDappInteractions()
