@@ -41,7 +41,7 @@ extension PrimaryRectangularButtonStyle {
 	private var foregroundColor: Color {
 		switch controlState {
 		case .enabled:
-			Color.primaryText
+			.textOnButton
 		case .loading:
 			.clear
 		case .disabled:

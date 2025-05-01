@@ -133,16 +133,18 @@ extension Color.App {
 	var gradientPurple: Color { .init(hex: 0xFF07E6) }
 }
 
-extension Color {
-	var primaryBackground: Color { .init("PrimaryBackground") }
-	var secondaryBackground: Color { .init("SecondaryBackground") }
-	var tertiaryBackground: Color { .init("TertiaryBackground") }
-	var primaryText: Color { .init("PrimaryText") }
-	var secondaryText: Color { .init("SecondaryText") }
-	var textButton: Color { .init("TextButton") }
-}
-
 // MARK: - Color.Hex
+// extension Color {
+//	var primaryBackground: Color { .init("PrimaryBackground") }
+//	var secondaryBackground: Color { .init("SecondaryBackground") }
+//	var tertiaryBackground: Color { .init("TertiaryBackground") }
+//	var primaryText: Color { .init("PrimaryText") }
+//	var secondaryText: Color { .init("SecondaryText") }
+//	var textButton: Color { .init("TextButton") }
+//    var button: Color { .init("Button") }
+//    var textOnButton: Color { .init("TextOnButton") }
+// }
+
 extension Color {
 	fileprivate enum Hex: UInt32 {
 		// blue

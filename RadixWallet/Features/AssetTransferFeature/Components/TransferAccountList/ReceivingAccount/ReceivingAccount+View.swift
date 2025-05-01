@@ -53,7 +53,7 @@ extension ReceivingAccount.View {
 					} label: {
 						Label(L10n.AssetTransfer.ReceivingAccount.chooseAccountButton, asset: AssetResource.chooseAccount)
 							.font(.app.body1Header)
-							.foregroundColor(.app.blue2)
+							.foregroundColor(.textButton)
 							.flushedLeft
 							.padding(.vertical, .medium3)
 					}
@@ -84,12 +84,12 @@ extension ReceivingAccount.View {
 				Text("+ " + L10n.AssetTransfer.ReceivingAccount.addAssetsButton)
 					.frame(height: .standardButtonHeight)
 					.frame(maxWidth: .infinity)
-					.foregroundColor(.app.blue2)
+					.foregroundColor(.textButton)
 					.font(.app.body1StandaloneLink)
 			}
 		}
 		.frame(maxWidth: .infinity)
 		.padding([.top, .horizontal], .medium3)
-		.background(Color.containerContentBackground)
+		.background(.tertiaryBackground)
 	}
 }

@@ -65,13 +65,14 @@ extension AssetTransfer.View {
 				}
 				.padding(.horizontal, .medium3)
 				.background {
-					Color.white
+					Color.primaryBackground
 						.onTapGesture {
 							viewStore.send(.backgroundTapped)
 						}
 				}
 			}
 		}
+		.background(.primaryBackground)
 		.scrollDismissesKeyboard(.interactively)
 	}
 
