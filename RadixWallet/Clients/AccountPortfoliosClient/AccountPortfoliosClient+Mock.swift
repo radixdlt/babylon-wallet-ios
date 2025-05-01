@@ -9,7 +9,7 @@ extension AccountPortfoliosClient: TestDependencyKey {
 		portfolioForAccount: unimplemented("\(AccountPortfoliosClient.self).portfolioForAccount", placeholder: noop.portfolioForAccount),
 		portfolios: unimplemented("\(AccountPortfoliosClient.self).portfolios", placeholder: noop.portfolios),
 		syncAccountsDeletedOnLedger: unimplemented("\(AccountPortfoliosClient.self).syncAccountsDeletedOnLedger"),
-		bootstrap: unimplemented("\(AccountPortfoliosClient.self).bootstrap"),
+		bootstrap: unimplemented("\(AccountPortfoliosClient.self).bootstrap")
 	)
 
 	static let noop = AccountPortfoliosClient(
