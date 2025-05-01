@@ -75,6 +75,7 @@ extension AccountPermission {
 					}
 					.frame(width: geometry.size.width)
 				}
+				.background(.primaryBackground)
 				.footer {
 					Button(L10n.DAppRequest.AccountPermission.continue) {
 						viewStore.send(.continueButtonTapped)

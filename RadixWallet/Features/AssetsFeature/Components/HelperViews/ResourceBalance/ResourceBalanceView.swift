@@ -198,7 +198,6 @@ struct ResourceBalanceView: View {
 				CheckmarkView(appearance: .dark, isChecked: isSelected)
 			}
 		}
-		.background(.primaryBackground)
 	}
 
 	var compact: Bool {

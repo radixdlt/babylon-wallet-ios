@@ -22,6 +22,7 @@ extension AccountPermissionChooseAccounts {
 					.padding(.horizontal, .medium1)
 					.padding(.bottom, .medium2)
 				}
+				.background(.primaryBackground)
 				.footer {
 					WithControlRequirements(
 						viewStore.chooseAccounts.selectedAccounts,

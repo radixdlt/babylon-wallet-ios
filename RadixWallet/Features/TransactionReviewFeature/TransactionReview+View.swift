@@ -77,7 +77,7 @@ extension TransactionReview {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				coreView(with: viewStore)
 					.controlState(viewStore.viewControlState)
-					.background(.white)
+					.background(.primaryBackground)
 					.toolbar {
 						ToolbarItem(placement: .automatic) {
 							if viewStore.canToggleViewMode {
@@ -155,7 +155,8 @@ extension TransactionReview {
 						JaggedEdge(shadowColor: shadowColor, isTopEdge: false)
 					}
 				}
-				.background(Common.gradientBackground)
+				.background(.secondaryBackground)
+//				.background(Common.gradientBackground)
 				.animation(.easeInOut, value: viewStore.canToggleViewMode ? viewStore.rawManifest : nil)
 			}
 			.coordinateSpace(name: coordSpace)
