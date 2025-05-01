@@ -41,8 +41,8 @@ extension App {
 			.onOpenURL { url in
 				store.send(.view(.urlOpened(url)))
 			}
-			.task { @MainActor in
-				await store.send(.view(.task)).finish()
+			.task {
+				store.send(.view(.task))
 			}
 		}
 	}
