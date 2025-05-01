@@ -85,7 +85,6 @@ extension Login {
 									isSelected: item.isSelected,
 									action: item.action
 								)
-								.cardShadow
 							}
 						}
 
@@ -118,6 +117,7 @@ extension Login {
 					content: { CreatePersonaCoordinator.View(store: $0) }
 				)
 			}
+			.background(.primaryBackground)
 		}
 	}
 }

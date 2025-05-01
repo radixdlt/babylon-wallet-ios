@@ -89,7 +89,7 @@ extension AssetTransfer.View {
 					viewStore.send(.addMessageTapped)
 				}
 				.textStyle(.button)
-				.foregroundColor(.app.blue2)
+				.foregroundColor(.textButton)
 			}
 		}
 	}

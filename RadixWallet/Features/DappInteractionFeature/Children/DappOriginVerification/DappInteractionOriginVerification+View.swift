@@ -11,7 +11,7 @@ extension DappInteractionOriginVerification {
 					Spacer()
 				}
 				.padding(.medium1)
-				.background(.app.background)
+				.background(.primaryBackground)
 				.toolbar {
 					ToolbarItem(placement: .cancellationAction) {
 						CloseButton {
@@ -53,7 +53,7 @@ extension DappInteractionOriginVerification {
 				infoPointView(2, info: L10n.MobileConnect.linkBody2)
 			}
 			.padding()
-			.background(.secondaryBackground)
+			.background(.tertiaryBackground)
 			.roundedCorners(radius: 10)
 		}
 
