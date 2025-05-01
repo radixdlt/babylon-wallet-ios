@@ -11,13 +11,6 @@ extension HomeCardsClient: DependencyKey {
 		// observing the current gateway and defining the networkId to use.
 		let manager = HomeCardsManager(networkingDriver: URLSession.shared, networkId: .mainnet, cardsStorage: HomeCardsStorage(), observer: observer)
 
-		Task {
-			for try await event in appEventsClient.events() {
-				guard !Task.isCancelled else { return }
-				await handle(event: event)
-			}
-		}
-
 		@Sendable
 		func handle(event: AppEvent) async {
 			switch event {
@@ -41,6 +34,14 @@ extension HomeCardsClient: DependencyKey {
 			removeCard: { card in
 				Task {
 					try? await manager.cardDismissed(card: card)
+				}
+			},
+			bootstrap: {
+				Task {
+					for try await event in appEventsClient.events() {
+						guard !Task.isCancelled else { return }
+						await handle(event: event)
+					}
 				}
 			}
 		)

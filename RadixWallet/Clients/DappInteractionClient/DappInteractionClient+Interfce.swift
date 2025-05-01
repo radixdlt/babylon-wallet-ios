@@ -3,15 +3,18 @@ struct DappInteractionClient: Sendable {
 	let interactions: AnyAsyncSequence<Result<ValidatedDappRequest, Error>>
 	let addWalletInteraction: AddWalletInteraction
 	let completeInteraction: CompleteInteraction
+	let bootstrap: Bootstrap
 
 	init(
 		interactions: AnyAsyncSequence<Result<ValidatedDappRequest, Error>>,
 		addWalletInteraction: @escaping AddWalletInteraction,
-		completeInteraction: @escaping CompleteInteraction
+		completeInteraction: @escaping CompleteInteraction,
+		bootstrap: @escaping Bootstrap
 	) {
 		self.interactions = interactions
 		self.addWalletInteraction = addWalletInteraction
 		self.completeInteraction = completeInteraction
+		self.bootstrap = bootstrap
 	}
 }
 
@@ -26,6 +29,7 @@ extension DappInteractionClient {
 
 	typealias AddWalletInteraction = @Sendable (_ items: DappToWalletInteractionItems, _ interaction: WalletInteraction) async -> P2P.RTCOutgoingMessage.Response?
 	typealias CompleteInteraction = @Sendable (P2P.RTCOutgoingMessage) async throws -> Void
+	typealias Bootstrap = @Sendable () -> Void
 }
 
 extension WalletInteractionId {

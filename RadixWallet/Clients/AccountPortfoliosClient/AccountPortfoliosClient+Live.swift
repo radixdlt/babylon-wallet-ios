@@ -40,8 +40,6 @@ extension AccountPortfoliosClient: DependencyKey {
 		@Dependency(\.gatewaysClient) var gatewaysClient
 		@Dependency(\.overlayWindowClient) var overlayWindowClient
 
-		Self.registerSubscribers(state: state)
-
 		/// Fetches the pool and stake units details for a given account; Will update the portfolio accordingly
 		@Sendable
 		func fetchPoolAndStakeUnitsDetails(_ account: OnLedgerEntity.OnLedgerAccount, hiddenResources: [ResourceIdentifier], cachingStrategy: OnLedgerEntitiesClient.CachingStrategy) async {
@@ -203,6 +201,9 @@ extension AccountPortfoliosClient: DependencyKey {
 				if isDeletedAccountDetected == true {
 					overlayWindowClient.scheduleAlertAndIgnoreAction(.deletedAccountDetectedAlert)
 				}
+			},
+			bootstrap: {
+				Self.registerSubscribers(state: state)
 			}
 		)
 	}()

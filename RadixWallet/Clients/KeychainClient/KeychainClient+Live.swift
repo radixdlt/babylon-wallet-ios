@@ -1,3 +1,4 @@
+import FirebaseCrashlytics
 
 // MARK: - KeychainClient + DependencyKey
 extension KeychainClient: DependencyKey {
@@ -15,18 +16,28 @@ extension KeychainClient: DependencyKey {
 				try keychainHolder.contains(key, showAuthPrompt: showAuthPrompt)
 			},
 			setDataWithoutAuthForKey: { data, key, attributes in
-				try keychainHolder.setDataWithoutAuth(
-					data,
-					forKey: key,
-					attributes: attributes
-				)
+				do {
+					try keychainHolder.setDataWithoutAuth(
+						data,
+						forKey: key,
+						attributes: attributes
+					)
+				} catch {
+					Crashlytics.crashlytics().record(error: error)
+					throw error
+				}
 			},
 			setDataWithAuthForKey: { data, key, attributes in
-				try keychainHolder.setDataWithAuth(
-					data,
-					forKey: key,
-					attributes: attributes
-				)
+				do {
+					try keychainHolder.setDataWithAuth(
+						data,
+						forKey: key,
+						attributes: attributes
+					)
+				} catch {
+					Crashlytics.crashlytics().record(error: error)
+					throw error
+				}
 			},
 			getDataWithoutAuthForKeySetIfNil: { key, ifNilSet in
 				try keychainHolder.getDataWithoutAuth(

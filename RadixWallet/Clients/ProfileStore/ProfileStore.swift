@@ -10,7 +10,9 @@ final actor ProfileStore {
 	private let profileSubject: AsyncCurrentValueSubject<Profile?> = .init(nil)
 	private let profileStateSubject: AsyncReplaySubject<ProfileState> = .init(bufferSize: 1)
 
-	private init() {
+	private init() {}
+
+	nonisolated func bootstrap() {
 		Crashlytics.crashlytics().log("Initializing profile store")
 		Task {
 			for try await state in await ProfileStateChangeEventPublisher.shared.eventStream() {
@@ -56,6 +58,7 @@ extension ProfileStore {
 	func finishOnboarding(
 		with accountsRecoveredFromScanningUsingMnemonic: AccountsRecoveredFromScanningUsingMnemonic
 	) async throws {
+		Crashlytics.crashlytics().setCustomValue("Creating profile from mnemonic", forKey: "ProfileState")
 		try await SargonOS.shared.newWalletWithDerivedBdfs(
 			hdFactorSource: accountsRecoveredFromScanningUsingMnemonic.factorSource,
 			accounts: accountsRecoveredFromScanningUsingMnemonic.accounts.elements
@@ -63,6 +66,7 @@ extension ProfileStore {
 	}
 
 	func importProfile(_ profileToImport: Profile, skippedMainBdfs: Bool) async throws {
+		Crashlytics.crashlytics().setCustomValue("Importing Profile", forKey: "ProfileState")
 		var profileToImport = profileToImport
 		profileToImport.changeCurrentToMainnetIfNeeded()
 		try await SargonOS.shared.importWallet(profile: profileToImport, bdfsSkipped: skippedMainBdfs)

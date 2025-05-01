@@ -8,7 +8,8 @@ extension AccountPortfoliosClient: TestDependencyKey {
 		portfolioUpdates: unimplemented("\(AccountPortfoliosClient.self).portfolioUpdates", placeholder: noop.portfolioUpdates),
 		portfolioForAccount: unimplemented("\(AccountPortfoliosClient.self).portfolioForAccount", placeholder: noop.portfolioForAccount),
 		portfolios: unimplemented("\(AccountPortfoliosClient.self).portfolios", placeholder: noop.portfolios),
-		syncAccountsDeletedOnLedger: unimplemented("\(AccountPortfoliosClient.self).syncAccountsDeletedOnLedger")
+		syncAccountsDeletedOnLedger: unimplemented("\(AccountPortfoliosClient.self).syncAccountsDeletedOnLedger"),
+		bootstrap: unimplemented("\(AccountPortfoliosClient.self).bootstrap"),
 	)
 
 	static let noop = AccountPortfoliosClient(
@@ -17,6 +18,7 @@ extension AccountPortfoliosClient: TestDependencyKey {
 		portfolioUpdates: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		portfolioForAccount: { _ in fatalError() },
 		portfolios: { fatalError() },
-		syncAccountsDeletedOnLedger: {}
+		syncAccountsDeletedOnLedger: {},
+		bootstrap: {}
 	)
 }

@@ -58,6 +58,7 @@ struct App: Sendable, FeatureReducer {
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.homeCardsClient) var homeCardsClient
 	@Dependency(\.appEventsClient) var appEventsClient
+	@Dependency(\.bootstrapClient) var bootstrapClient
 
 	init() {}
 
@@ -91,6 +92,7 @@ struct App: Sendable, FeatureReducer {
 			}
 			return .none
 		case .task:
+			bootstrapClient.bootstrap()
 			appEventsClient.handleEvent(.appStarted)
 			return walletDidResetEffect()
 		}
