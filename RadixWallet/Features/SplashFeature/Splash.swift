@@ -86,8 +86,7 @@ struct Splash: Sendable, FeatureReducer {
 			Crashlytics.crashlytics().log("Splash appeared")
 			switch state.context {
 			case .appStarted:
-				return .none
-			// return bootSargonOS().concatenate(with: loadAdvancedLockState())
+				return bootSargonOS().concatenate(with: loadAdvancedLockState())
 			case .appForegrounded:
 				return loadAdvancedLockState()
 			}
@@ -259,7 +258,6 @@ struct Splash: Sendable, FeatureReducer {
 		.run { send in
 			switch context {
 			case .appStarted:
-				// fatalError("Sargon booted")
 				try await send(.delegate(.completed(onboardingClient.loadProfileState())))
 			case .appForegrounded:
 				localAuthenticationClient.setAuthenticatedSuccessfully()
