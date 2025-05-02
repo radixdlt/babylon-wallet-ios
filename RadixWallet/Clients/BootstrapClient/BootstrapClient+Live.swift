@@ -4,6 +4,9 @@ extension BootstrapClient: DependencyKey {
 		@Dependency(\.homeCardsClient) var homeCardsClient
 		@Dependency(\.dappInteractionClient) var dappInteractionClient
 		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
+		@Dependency(\.localAuthenticationClient) var localAuthenticationClient
+
+		var sceneDelegateManager: SceneDelegateManager?
 
 		return .init(
 			bootstrap: {
@@ -12,6 +15,10 @@ extension BootstrapClient: DependencyKey {
 				homeCardsClient.bootstrap()
 				dappInteractionClient.bootstrap()
 				accountPortfoliosClient.bootstrap()
+				sceneDelegateManager?.bootstrap()
+			},
+			configureSceneDelegate: {
+				sceneDelegateManager = $0
 			}
 		)
 	}

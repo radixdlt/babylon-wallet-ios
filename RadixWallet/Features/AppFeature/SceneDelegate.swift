@@ -1,7 +1,9 @@
 import ComposableArchitecture
 import SwiftUI
 
+// MARK: - SceneDelegate
 final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObject {
+	@Dependency(\.bootstrapClient) var bootstrapClient
 	weak var windowScene: UIWindowScene?
 	private var didEnterBackground = false
 
@@ -22,12 +24,7 @@ final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObject {
 
 		// avoids unimplemented("LocalAuthenticationClient.authenticatedSuccessfully")
 		if !_XCTIsTesting {
-			@Dependency(\.localAuthenticationClient) var localAuthenticationClient
-			Task { @MainActor in
-				for try await _ in localAuthenticationClient.authenticatedSuccessfully() {
-					hideBiometricsSplashWindow()
-				}
-			}
+			bootstrapClient.configureSceneDelegate(SceneDelegateManager(sceneDelegate: self))
 		}
 	}
 
@@ -74,13 +71,6 @@ final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObject {
 		overlayWindow.isUserInteractionEnabled = false
 		overlayWindow.makeKeyAndVisible()
 
-		@Dependency(\.overlayWindowClient) var overlayWindowClient
-		Task { @MainActor [overlayWindow] in
-			for try await isUserInteractionEnabled in overlayWindowClient.isContentUserInteractionEnabled() {
-				overlayWindow.isUserInteractionEnabled = isUserInteractionEnabled
-			}
-		}
-
 		self.contentOverlayWindow = overlayWindow
 	}
 
@@ -102,14 +92,12 @@ final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObject {
 		overlayWindow.isUserInteractionEnabled = false
 		overlayWindow.makeKeyAndVisible()
 
-		@Dependency(\.overlayWindowClient) var overlayWindowClient
-		Task { @MainActor [overlayWindow] in
-			for try await isUserInteractionEnabled in overlayWindowClient.isStatusUserInteractionEnabled() {
-				overlayWindow.isUserInteractionEnabled = isUserInteractionEnabled
-			}
-		}
-
 		self.statusOverlayWindow = overlayWindow
+	}
+
+	func setOverlayWindowInteractionEnabled(_ isEnabled: Bool) {
+		self.statusOverlayWindow?.isUserInteractionEnabled = isEnabled
+		self.contentOverlayWindow?.isUserInteractionEnabled = isEnabled
 	}
 
 	// MARK: Biometrics
@@ -129,7 +117,7 @@ final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObject {
 		biometricsSplashWindow?.makeKeyAndVisible()
 	}
 
-	private func hideBiometricsSplashWindow() {
+	func hideBiometricsSplashWindow() {
 		biometricsSplashWindow?.isHidden = true
 		biometricsSplashWindow = nil
 	}
@@ -145,8 +133,46 @@ final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObject {
 		privacyProtectionWindow?.makeKeyAndVisible()
 	}
 
-	private func hidePrivacyProtectionWindow() {
+	@MainActor
+	func hidePrivacyProtectionWindow() {
 		privacyProtectionWindow?.isHidden = true
 		privacyProtectionWindow = nil
+	}
+}
+
+// MARK: - SceneDelegateManager
+actor SceneDelegateManager {
+	@Dependency(\.localAuthenticationClient) var localAuthenticationClient
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
+	let sceneDelegate: SceneDelegate
+
+	init(sceneDelegate: SceneDelegate) {
+		self.sceneDelegate = sceneDelegate
+	}
+
+	nonisolated func bootstrap() {
+		Task {
+			for try await _ in await localAuthenticationClient.authenticatedSuccessfully() {
+				await hideBiometricsSplashWindow()
+			}
+		}
+
+		Task {
+			for try await isUserInteractionEnabled in await overlayWindowClient.isStatusUserInteractionEnabled() {
+				await setOverlayWindowInteractionEnabled(isUserInteractionEnabled)
+			}
+		}
+	}
+
+	func hideBiometricsSplashWindow() async {
+		await sceneDelegate.hideBiometricsSplashWindow()
+	}
+
+	func hidePrivacyProtectionWindow() async {
+		await sceneDelegate.hidePrivacyProtectionWindow()
+	}
+
+	func setOverlayWindowInteractionEnabled(_ isEnabled: Bool) async {
+		await sceneDelegate.setOverlayWindowInteractionEnabled(isEnabled)
 	}
 }
