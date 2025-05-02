@@ -42,7 +42,6 @@ extension App {
 				store.send(.view(.urlOpened(url)))
 			}
 			.task {
-				fatalError("Checkpoint B: App.View .task triggered")
 				store.send(.view(.task))
 			}
 		}
