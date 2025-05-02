@@ -86,7 +86,8 @@ struct Splash: Sendable, FeatureReducer {
 			Crashlytics.crashlytics().log("Splash appeared")
 			switch state.context {
 			case .appStarted:
-				return bootSargonOS().concatenate(with: loadAdvancedLockState())
+				return .none
+			// return bootSargonOS().concatenate(with: loadAdvancedLockState())
 			case .appForegrounded:
 				return loadAdvancedLockState()
 			}
