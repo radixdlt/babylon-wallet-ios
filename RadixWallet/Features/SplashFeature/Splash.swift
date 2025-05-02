@@ -229,7 +229,7 @@ struct Splash: Sendable, FeatureReducer {
 					hostInteractor: SargonHostInteractor()
 				)
 			} catch {
-				Crashlytics.crashlytics().log("Failed to boot Sargon \(error)")
+				Crashlytics.crashlytics().record(error: error)
 				// Ignore error.
 				// The only error that can be thrown is SargonOSAlreadyBooted.
 				loggerGlobal.error("Did try to boot SargonOS more than once")

@@ -1,5 +1,5 @@
 {
-  "originHash" : "9da67540e8da31c30a392b9affb22cc64cf5caeadab36c84c53722413bfc4016",
+  "originHash" : "f1f4c7b37482622771f79a02a8d756153fb063fbd96d6efc1a802e68f7a64477",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -213,8 +213,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/radixdlt/sargon",
       "state" : {
-        "revision" : "47cb0059efb434266ad821d786cebcb391eba9eb",
-        "version" : "1.2.14"
+        "revision" : "4592d85a31448647f25b532fcc050b16ab255de4",
+        "version" : "1.2.15"
       }
     },
     {
