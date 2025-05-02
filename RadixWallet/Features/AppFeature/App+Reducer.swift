@@ -92,10 +92,9 @@ struct App: Sendable, FeatureReducer {
 			}
 			return .none
 		case .task:
-			fatalError("Checkpoint: Crash in task")
 			bootstrapClient.bootstrap()
-			appEventsClient.handleEvent(.appStarted)
-			return walletDidResetEffect()
+			// appEventsClient.handleEvent(.appStarted)
+			return .none // walletDidResetEffect()
 		}
 	}
 
