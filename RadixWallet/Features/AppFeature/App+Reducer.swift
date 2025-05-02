@@ -92,7 +92,7 @@ struct App: Sendable, FeatureReducer {
 			}
 			return .none
 		case .task:
-			bootstrapClient.bootstrap()
+			// bootstrapClient.bootstrap()
 			// appEventsClient.handleEvent(.appStarted)
 			return .none // walletDidResetEffect()
 		}
