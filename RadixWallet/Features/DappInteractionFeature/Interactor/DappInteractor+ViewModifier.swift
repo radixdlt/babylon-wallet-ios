@@ -29,9 +29,9 @@ extension DappInteractor {
 				dappInteraction
 			}
 			.destinations(with: store)
-//			.task {
-//				store.send(.view(.task))
-//			}
+			.task {
+				store.send(.view(.task))
+			}
 			.onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
 				store.send(.view(.moveToForeground))
 			}
