@@ -6,6 +6,10 @@ import SwiftUI
 struct WalletApp: SwiftUI.App {
 	@UIApplicationDelegateAdaptor var delegate: AppDelegate
 
+	init() {
+		fatalError("Checkpoint A: WalletApp.init() reached")
+	}
+
 	var body: some SwiftUI.Scene {
 		WindowGroup {
 			if !_XCTIsTesting {
