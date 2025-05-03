@@ -1,5 +1,4 @@
 import ComposableArchitecture
-import FirebaseCrashlytics
 import SwiftUI
 
 // MARK: - Splash
@@ -84,7 +83,6 @@ struct Splash: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			Crashlytics.crashlytics().log("Splash appeared")
 			switch state.context {
 			case .appStarted:
 				return bootSargonOS().concatenate(with: loadAdvancedLockState())
@@ -216,7 +214,6 @@ struct Splash: Sendable, FeatureReducer {
 	private func bootSargonOS() -> Effect<Action> {
 		.run { _ in
 			do {
-				Crashlytics.crashlytics().log("Booting Sargon")
 				try await SargonOS.creatingShared(
 					bootingWith: .creatingShared(
 						drivers: .init(
@@ -229,7 +226,6 @@ struct Splash: Sendable, FeatureReducer {
 					hostInteractor: SargonHostInteractor()
 				)
 			} catch {
-				Crashlytics.crashlytics().record(error: error)
 				// Ignore error.
 				// The only error that can be thrown is SargonOSAlreadyBooted.
 				loggerGlobal.error("Did try to boot SargonOS more than once")

@@ -1,4 +1,3 @@
-import FirebaseCrashlytics
 import Sargon
 
 // MARK: - ProfileStore
@@ -11,7 +10,6 @@ final actor ProfileStore {
 	private let profileStateSubject: AsyncReplaySubject<ProfileState> = .init(bufferSize: 1)
 
 	private init() {
-		Crashlytics.crashlytics().log("Initializing profile store")
 		Task {
 			for try await state in await ProfileStateChangeEventPublisher.shared.eventStream() {
 				if case let .loaded(profile) = state {
@@ -27,7 +25,6 @@ final actor ProfileStore {
 extension ProfileStore {
 	func profile() -> Profile {
 		guard let profile = profileSubject.value else {
-			Crashlytics.crashlytics().log("Bad state: accessed profile when it was not loaded")
 			fatalError("Programmer error - tried to access profile when it was not loaded yet.")
 		}
 		return profile

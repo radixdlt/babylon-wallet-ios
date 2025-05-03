@@ -1,5 +1,4 @@
 import ComposableArchitecture
-import FirebaseCrashlytics
 import SwiftUI
 
 struct Main: Sendable, FeatureReducer {
@@ -76,7 +75,6 @@ struct Main: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			Crashlytics.crashlytics().log("Main view task started")
 			// At fresh app start, handle deepLink only when app goes to main state.
 			// While splash screen is shown, or during the onboarding, the deepLink is buffered.
 			deepLinkHandlerClient.handleDeepLink()
