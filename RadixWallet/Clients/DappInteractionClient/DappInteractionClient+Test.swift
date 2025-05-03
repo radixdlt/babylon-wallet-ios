@@ -13,14 +13,12 @@ extension DappInteractionClient: TestDependencyKey {
 	static let testValue = Self(
 		interactions: unimplemented("\(Self.self).requests", placeholder: noop.interactions),
 		addWalletInteraction: unimplemented("\(Self.self).addWalletRequest", placeholder: noop.addWalletInteraction),
-		completeInteraction: unimplemented("\(Self.self).sendResponse"),
-		bootstrap: unimplemented("\(Self.self).bootstrap")
+		completeInteraction: unimplemented("\(Self.self).sendResponse")
 	)
 
 	static let noop = Self(
 		interactions: AsyncLazySequence([]).eraseToAnyAsyncSequence(),
 		addWalletInteraction: { _, _ in .none },
-		completeInteraction: { _ in },
-		bootstrap: {}
+		completeInteraction: { _ in }
 	)
 }

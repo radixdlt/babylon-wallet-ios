@@ -5,6 +5,7 @@ import SwiftUI
 
 // MARK: - AppDelegate
 final class AppDelegate: NSObject, UIApplicationDelegate {
+	@Dependency(\.bootstrapClient) var bootstrapClient
 	@Dependency(\.appsFlyerClient) var appsFlyerClient
 	@Dependency(\.userDefaults) var userDefaults
 
@@ -20,6 +21,7 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
 
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
 		configureFirebase()
+		bootstrapClient.bootstrap()
 		Crashlytics.crashlytics().log("Clients bootstrapped")
 		return true
 	}

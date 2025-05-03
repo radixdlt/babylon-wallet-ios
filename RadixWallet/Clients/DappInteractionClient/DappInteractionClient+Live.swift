@@ -8,6 +8,17 @@ extension DappInteractionClient: DependencyKey {
 
 		@Dependency(\.radixConnectClient) var radixConnectClient
 
+		Task {
+			_ = await radixConnectClient.loadP2PLinksAndConnectAll()
+
+			for try await incomingRequest in await radixConnectClient.receiveRequests(/P2P.RTCMessageFromPeer.Request.dapp) {
+				guard !Task.isCancelled else {
+					return
+				}
+				await interactionsSubject.send(validate(incomingRequest))
+			}
+		}
+
 		return .init(
 			interactions: interactionsSubject.share().eraseToAnyAsyncSequence(),
 			addWalletInteraction: { items, interaction in
@@ -48,18 +59,6 @@ extension DappInteractionClient: DependencyKey {
 					try await radixConnectClient.sendResponse(response, route)
 				default:
 					break
-				}
-			},
-			bootstrap: {
-				Task {
-					_ = await radixConnectClient.loadP2PLinksAndConnectAll()
-
-					for try await incomingRequest in await radixConnectClient.receiveRequests(/P2P.RTCMessageFromPeer.Request.dapp) {
-						guard !Task.isCancelled else {
-							return
-						}
-						await interactionsSubject.send(validate(incomingRequest))
-					}
 				}
 			}
 		)

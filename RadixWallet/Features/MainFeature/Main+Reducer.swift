@@ -58,7 +58,6 @@ struct Main: Sendable, FeatureReducer {
 	@Dependency(\.accountLockersClient) var accountLockersClient
 	@Dependency(\.deepLinkHandlerClient) var deepLinkHandlerClient
 	@Dependency(\.radixConnectClient) var radixConnectClient
-	@Dependency(\.continuousClock) var clock
 
 	init() {}
 
@@ -82,18 +81,12 @@ struct Main: Sendable, FeatureReducer {
 			// While splash screen is shown, or during the onboarding, the deepLink is buffered.
 			deepLinkHandlerClient.handleDeepLink()
 
-			return .run { _ in
-				try await clock.sleep(for: .seconds(1))
-			}.concatenate(with: startEventsMonitoring())
+			return startAutomaticBackupsEffect()
+				.merge(with: startMonitoringSecurityCenterEffect())
+				.merge(with: startMonitoringAccountLockersEffect())
+				.merge(with: gatewayValuesEffect())
+				.merge(with: startNotifyingConnectorWithAccounts())
 		}
-	}
-
-	private func startEventsMonitoring() -> Effect<Action> {
-		startAutomaticBackupsEffect()
-			.merge(with: startMonitoringSecurityCenterEffect())
-			.merge(with: startMonitoringAccountLockersEffect())
-			.merge(with: gatewayValuesEffect())
-			.merge(with: startNotifyingConnectorWithAccounts())
 	}
 
 	private func startAutomaticBackupsEffect() -> Effect<Action> {

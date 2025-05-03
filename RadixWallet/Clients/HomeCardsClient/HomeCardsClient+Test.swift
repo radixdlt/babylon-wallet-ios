@@ -4,15 +4,13 @@ extension HomeCardsClient: TestDependencyKey {
 
 	static let testValue = Self(
 		cards: unimplemented("\(Self.self).cards", placeholder: noop.cards),
-		removeCard: unimplemented("\(Self.self).removeCard"),
-		bootstrap: unimplemented("\(Self.self).bootstrap")
+		removeCard: unimplemented("\(Self.self).removeCard")
 	)
 }
 
 extension HomeCardsClient {
 	static let noop = Self(
 		cards: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
-		removeCard: { _ in },
-		bootstrap: {}
+		removeCard: { _ in }
 	)
 }
