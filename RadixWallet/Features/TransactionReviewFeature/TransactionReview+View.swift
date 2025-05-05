@@ -151,9 +151,9 @@ extension TransactionReview {
 					.frame(maxWidth: .infinity)
 					.padding(.vertical, .large3)
 					.padding(.horizontal, .large2)
-					.background {
-						JaggedEdge(shadowColor: shadowColor, isTopEdge: false)
-					}
+//					.background {
+//						JaggedEdge(shadowColor: shadowColor, isTopEdge: false)
+//					}
 				}
 				.background(.secondaryBackground)
 //				.background(Common.gradientBackground)

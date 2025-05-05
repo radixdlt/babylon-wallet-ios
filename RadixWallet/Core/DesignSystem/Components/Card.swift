@@ -92,7 +92,7 @@ extension View {
 		padding(.bottom, SpeechbubbleShape.triangleSize.height)
 			.background(.primaryBackground)
 			.clipShape(SpeechbubbleShape(cornerRadius: .medium3))
-			.cardShadow
+		// .cardShadow
 	}
 
 	func inFlatBottomSpeechbubble(inset: CGFloat = 0) -> some View {
@@ -108,7 +108,7 @@ extension View {
 	}
 
 	var cardShadow: some View {
-		shadow(color: .app.gray2.opacity(0.26), radius: .medium3, x: .zero, y: .small2)
+		shadow(color: .primaryBackground.opacity(0.26), radius: .medium3, x: .zero, y: .small2)
 	}
 }
 
