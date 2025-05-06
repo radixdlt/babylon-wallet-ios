@@ -144,7 +144,7 @@ extension LedgerHardwareDevices {
 			switch viewStore.ledgers {
 			case .idle, .loading, .failure, .success([]):
 				if viewStore.allowSelection {
-					Card(.app.gray5) {
+					Card {
 						Text(L10n.LedgerHardwareDevices.subtitleNoLedgers)
 							.textStyle(.secondaryHeader)
 							.foregroundColor(viewStore.loadedEmptyLedgersList ? .app.gray2 : .clear)
