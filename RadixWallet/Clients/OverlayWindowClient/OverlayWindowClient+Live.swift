@@ -14,11 +14,11 @@ extension OverlayWindowClient: DependencyKey {
 
 		errorQueue.errors().map { error in
 			if let sargonError = error as? SargonError {
-				// #if DEBUG
+				#if DEBUG
 				let message = error.localizedDescription
-//				#else
-//				let message = L10n.Error.emailSupportMessage(sargonError.errorCode)
-//				#endif
+				#else
+				let message = L10n.Error.emailSupportMessage(sargonError.errorCode)
+				#endif
 				return Item.Status.alert(.init(
 					title: { TextState(L10n.Common.errorAlertTitle) },
 					actions: {
