@@ -67,6 +67,7 @@ struct Splash: Sendable, FeatureReducer {
 	@Dependency(\.onboardingClient) var onboardingClient
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.userDefaults) var userDefaults
+	@Dependency(\.errorQueue) var errorQueue
 
 	init() {}
 
@@ -228,6 +229,7 @@ struct Splash: Sendable, FeatureReducer {
 				// Ignore error.
 				// The only error that can be thrown is SargonOSAlreadyBooted.
 				loggerGlobal.error("Did try to boot SargonOS more than once")
+				errorQueue.schedule(error)
 			}
 		}
 	}

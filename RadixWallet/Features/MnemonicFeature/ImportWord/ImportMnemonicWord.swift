@@ -75,7 +75,7 @@ struct ImportMnemonicWord: Sendable, FeatureReducer {
 
 		init(
 			id: ID,
-			value: WordValue = .incomplete(text: "", hasFailedValidation: false),
+			value: WordValue = .incomplete(text: "", hasFailedValidation: false)
 		) {
 			self.id = id
 			self.value = value

@@ -1,3 +1,5 @@
+import FirebaseCrashlytics
+import KeychainAccess
 import Sargon
 
 // MARK: - SargonSecureStorage
@@ -38,8 +40,48 @@ final class SargonSecureStorage: SecureStorageDriver {
 			try secureStorageClient.saveMnemonicForFactorSourceData(factorSourceId, data)
 
 		case let .profileSnapshot(profileId):
-			try secureStorageClient.saveProfileSnapshotData(profileId, data)
-			userDefaults.setActiveProfileID(profileId)
+			let activeProfileId = userDefaults.getActiveProfileID()
+			func cleanupOldTemporaryProfile() {
+				if let activeProfileId, activeProfileId != profileId {
+					try? secureStorageClient.deleteProfile(activeProfileId)
+				}
+			}
+
+			do {
+				try secureStorageClient.saveProfileSnapshotData(profileId, data)
+				userDefaults.setActiveProfileID(profileId)
+			} catch {
+				Crashlytics.crashlytics().record(error: error)
+				if let err = error as? KeychainAccess.Status, err == .duplicateItem {
+					// Recover from duplicateItem error
+					// 1. Save the profile under new keychain key and set as active.
+					loggerGlobal.info("duplicateItem - saving temp profile")
+					let tempId = ProfileID()
+					try secureStorageClient.saveProfileSnapshotData(tempId, data)
+					userDefaults.setActiveProfileID(tempId)
+					cleanupOldTemporaryProfile()
+					Crashlytics.crashlytics().log("Temporary profile created and set as active")
+
+					do {
+						// 2. Delete the broken record
+						try secureStorageClient.deleteProfile(profileId)
+						Crashlytics.crashlytics().log("Deleted broken record")
+
+						// 3. Recreate the original record
+						try secureStorageClient.saveProfileSnapshotData(profileId, data)
+						userDefaults.setActiveProfileID(profileId)
+						Crashlytics.crashlytics().log("Recreated the original key, and set as active")
+
+						// 4. Delete the temporary record
+						try secureStorageClient.deleteProfile(tempId)
+						Crashlytics.crashlytics().log("Deleted the temporary profile")
+					} catch {
+						Crashlytics.crashlytics().record(error: error)
+					}
+				} else {
+					throw error
+				}
+			}
 		}
 	}
 

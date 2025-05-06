@@ -88,7 +88,7 @@ jobs:
 
       - uses: RDXWorks-actions/setup-xcode@master
         with:
-          xcode-version: "16.3"
+          xcode-version: "16.0.0"
 
       - name: "Set up ruby"
         uses: RDXWorks-actions/setup-ruby@master

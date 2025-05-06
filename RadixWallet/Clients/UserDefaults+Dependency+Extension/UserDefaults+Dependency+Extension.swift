@@ -22,6 +22,8 @@ enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
 	case activeProfileID
 
 	case mnemonicsUserClaimsToHaveBackedUp
+
+	case shareCrashReportsIsEnabled
 }
 
 extension UnsafeStorageKeyMapping {
@@ -250,6 +252,14 @@ extension UserDefaults.Dependency {
 
 	func setAppLockMessageShown(_ value: Bool) {
 		set(value, forKey: Key.appLockMessageShown.rawValue)
+	}
+
+	var shareCrashReportsIsEnabled: Bool {
+		bool(key: .shareCrashReportsIsEnabled, default: true)
+	}
+
+	func setShareCrashReportsIsEnabled(_ value: Bool) {
+		set(value, forKey: Key.shareCrashReportsIsEnabled.rawValue)
 	}
 }
 

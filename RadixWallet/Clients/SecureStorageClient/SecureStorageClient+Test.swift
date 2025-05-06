@@ -12,6 +12,7 @@ extension SecureStorageClient: TestDependencyKey {
 	static let noop = Self(
 		loadProfileSnapshotData: { _ in nil },
 		saveProfileSnapshotData: { _, _ in },
+		deleteProfile: { _ in },
 		saveMnemonicForFactorSource: { _ in },
 		loadMnemonicByFactorSourceID: { _ in nil },
 		containsMnemonicIdentifiedByFactorSourceID: { _ in false },
@@ -42,6 +43,7 @@ extension SecureStorageClient: TestDependencyKey {
 	static let noop = Self(
 		loadProfileSnapshotData: { _ in nil },
 		saveProfileSnapshotData: { _, _ in },
+		deleteProfile: { _ in },
 		saveMnemonicForFactorSource: { _ in },
 		loadMnemonicByFactorSourceID: { _ in nil },
 		containsMnemonicIdentifiedByFactorSourceID: { _ in false },
@@ -74,7 +76,8 @@ extension SecureStorageClient: TestDependencyKey {
 	#if DEBUG
 	static let testValue = Self(
 		loadProfileSnapshotData: unimplemented("\(Self.self).loadProfileSnapshotData"),
-		saveProfileSnapshotData: unimplemented("\(Self.self).keychainChanged"),
+		saveProfileSnapshotData: unimplemented("\(Self.self).saveProfileSnapshotData"),
+		deleteProfile: unimplemented("\(Self.self).deleteProfile"),
 		saveMnemonicForFactorSource: unimplemented("\(Self.self).saveMnemonicForFactorSource"),
 		loadMnemonicByFactorSourceID: unimplemented("\(Self.self).loadMnemonicByFactorSourceID"),
 		containsMnemonicIdentifiedByFactorSourceID: noop.containsMnemonicIdentifiedByFactorSourceID,
@@ -104,7 +107,8 @@ extension SecureStorageClient: TestDependencyKey {
 	#else
 	static let testValue = Self(
 		loadProfileSnapshotData: unimplemented("\(Self.self).loadProfileSnapshotData"),
-		saveProfileSnapshotData: unimplemented("\(Self.self).keychainChanged"),
+		saveProfileSnapshotData: unimplemented("\(Self.self).saveProfileSnapshotData"),
+		deleteProfile: unimplemented("\(Self.self).deleteProfile"),
 		saveMnemonicForFactorSource: unimplemented("\(Self.self).saveMnemonicForFactorSource"),
 		loadMnemonicByFactorSourceID: unimplemented("\(Self.self).loadMnemonicByFactorSourceID"),
 		containsMnemonicIdentifiedByFactorSourceID: noop.containsMnemonicIdentifiedByFactorSourceID,

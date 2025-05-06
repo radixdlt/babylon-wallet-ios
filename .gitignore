@@ -18,6 +18,7 @@ fastlane/test_output/
 vendor
 .design
 Aux/SensitiveInfo.plist
+Aux/GoogleService-Info.plist
 AWSCLIV2.pkg
 buildServer.json
 settings.json

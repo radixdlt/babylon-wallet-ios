@@ -148,7 +148,6 @@ struct TransactionReview: Sendable, FeatureReducer {
 		}
 	}
 
-	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.transactionClient) var transactionClient
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	@Dependency(\.accountsClient) var accountsClient

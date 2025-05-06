@@ -93,7 +93,6 @@ struct SelectBackup: Sendable, FeatureReducer {
 	@Dependency(\.dataReader) var dataReader
 	@Dependency(\.jsonDecoder) var jsonDecoder
 	@Dependency(\.cloudBackupClient) var cloudBackupClient
-	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.secureStorageClient) var secureStorageClient
 	@Dependency(\.userDefaults) var userDefaults

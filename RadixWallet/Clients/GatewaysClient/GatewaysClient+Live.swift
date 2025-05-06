@@ -11,7 +11,7 @@ extension GatewaysClient: DependencyKey {
 			currentGatewayValues: { await profileStore.currentGatewayValues() },
 			gatewaysValues: { await profileStore.gatewaysValues() },
 			getAllGateways: { await appPreferencesClient.getPreferences().gateways.all.asIdentified() },
-			getCurrentGateway: { await appPreferencesClient.getPreferences().gateways.current },
+			getCurrentGateway: { await profileStore.tryGetProfile()?.appPreferences.gateways.current ?? .mainnet },
 			addGateway: { gateway in
 				try await profileStore.updating { profile in
 					try profile.addNewGateway(gateway)
