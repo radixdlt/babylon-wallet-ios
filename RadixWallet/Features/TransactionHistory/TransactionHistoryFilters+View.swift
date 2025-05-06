@@ -250,7 +250,7 @@ struct TransactionFilterView: SwiftUI.View {
 		.padding(.trailing, showCross ? .medium1 : 0)
 		.background {
 			ZStack {
-				Capsule().fill(filter.isActive ? .primaryText : .app.white)
+				Capsule().fill(filter.isActive ? .tertiaryBackground : .primaryBackground)
 				Capsule().stroke(filter.isActive ? .clear : .app.gray3)
 			}
 		}

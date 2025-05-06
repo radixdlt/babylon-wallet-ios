@@ -87,7 +87,7 @@ extension TransactionHistory {
 				let cell = tableView.dequeueReusableCell(withIdentifier: TableView.cellIdentifier, for: indexPath)
 				let item = sections[indexPath.section].transactions[indexPath.row]
 
-				cell.backgroundColor = .init(.app.gray5)
+				cell.backgroundColor = .init(.secondaryBackground)
 				cell.contentConfiguration = UIHostingConfiguration { [weak self] in
 					Button {
 						self?.action(.transactionTapped(item.id))
@@ -218,7 +218,7 @@ extension TransactionHistory {
 		}
 
 		var body: some SwiftUI.View {
-			Card(.app.white) {
+			Card(.primaryBackground) {
 				VStack(spacing: 0) {
 					if let message = transaction.message, !message.isEmpty {
 						MessageView(message: message)

@@ -113,7 +113,7 @@ extension AssetsView {
 								.padding(.horizontal, .medium2)
 								.background(
 									isSelected
-										? RoundedRectangle(cornerRadius: .medium2).fill(.primaryText)
+										? RoundedRectangle(cornerRadius: .medium2).fill(.tertiaryBackground)
 										: nil
 								)
 								.id(kind)

@@ -82,8 +82,8 @@ struct InnerCard<Contents: View>: View {
 
 extension View {
 	/// Gives the view a white background, rounded corners (16 px), and a shadow, useful for root level cards
-	fileprivate func inCard(_ color: Color = .white, isPressed: Bool = false) -> some View {
-		background(isPressed ? .app.gray4 : color)
+	fileprivate func inCard(_ color: Color = .primaryBackground, isPressed: Bool = false) -> some View {
+		background(isPressed ? .tertiaryBackground : color)
 			.clipShape(RoundedRectangle(cornerRadius: .medium3))
 		// .cardShadow
 	}
@@ -98,7 +98,7 @@ extension View {
 	func inFlatBottomSpeechbubble(inset: CGFloat = 0) -> some View {
 		frame(minHeight: 2 * (.medium3 - inset))
 			.padding(.bottom, SpeechbubbleShape.triangleSize.height)
-			.background(.app.gray4)
+			.background(.tertiaryBackground)
 			.clipShape(SpeechbubbleShape(cornerRadius: .medium3 - inset, flatBottom: true))
 	}
 

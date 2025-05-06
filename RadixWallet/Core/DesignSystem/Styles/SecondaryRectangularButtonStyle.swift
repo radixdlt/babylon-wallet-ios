@@ -55,7 +55,7 @@ extension ButtonStyle where Self == SecondaryRectangularButtonStyle {
 
 	static func secondaryRectangular(
 		font: SwiftUI.Font = .app.body1Header,
-		backgroundColor: Color = .app.gray4,
+		backgroundColor: Color = .secondaryButton,
 		shouldExpand: Bool = false,
 		isDestructive: Bool = false,
 		isInToolbar: Bool = false,

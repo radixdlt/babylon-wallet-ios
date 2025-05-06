@@ -47,6 +47,7 @@ extension AddressDetails {
 				}
 				.animation(.easeInOut, value: store.showEnlarged)
 			}
+			.background(.secondaryBackground)
 		}
 
 		private var top: some SwiftUI.View {
@@ -159,7 +160,7 @@ private extension AddressDetails.View {
 		.textStyle(.body1Header)
 		.padding(.vertical, .medium1)
 		.padding(.horizontal, .medium3)
-		.background(.secondaryBackground)
+		.background(.primaryBackground)
 		.cornerRadius(.small1)
 	}
 
