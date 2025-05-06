@@ -49,33 +49,35 @@ final class SargonSecureStorage: SecureStorageDriver {
 
 			do {
 				try secureStorageClient.saveProfileSnapshotData(profileId, data)
-				cleanupOldTemporaryProfile()
 				userDefaults.setActiveProfileID(profileId)
 			} catch {
+				Crashlytics.crashlytics().record(error: error)
 				if let err = error as? KeychainAccess.Status, err == .duplicateItem {
 					// Recover from duplicateItem error
-					Crashlytics.crashlytics().record(error: error)
 					// 1. Save the profile under new keychain key and set as active.
 					loggerGlobal.info("duplicateItem - saving temp profile")
 					let tempId = ProfileID()
 					try secureStorageClient.saveProfileSnapshotData(tempId, data)
 					userDefaults.setActiveProfileID(tempId)
 					cleanupOldTemporaryProfile()
-
 					Crashlytics.crashlytics().log("Temporary profile created and set as active")
 
-					// 2. Delete the broken record
-					try secureStorageClient.deleteProfile(profileId)
-					Crashlytics.crashlytics().log("Deleted broken record")
+					do {
+						// 2. Delete the broken record
+						try secureStorageClient.deleteProfile(profileId)
+						Crashlytics.crashlytics().log("Deleted broken record")
 
-					// 3. Recreate the original record
-					try secureStorageClient.saveProfileSnapshotData(profileId, data)
-					userDefaults.setActiveProfileID(profileId)
-					Crashlytics.crashlytics().log("Recreated the original key, and set as active")
+						// 3. Recreate the original record
+						try secureStorageClient.saveProfileSnapshotData(profileId, data)
+						userDefaults.setActiveProfileID(profileId)
+						Crashlytics.crashlytics().log("Recreated the original key, and set as active")
 
-					// 4. Delete the temporary record
-					try secureStorageClient.deleteProfile(tempId)
-					Crashlytics.crashlytics().log("Deleted the temporary profile")
+						// 4. Delete the temporary record
+						try secureStorageClient.deleteProfile(tempId)
+						Crashlytics.crashlytics().log("Deleted the temporary profile")
+					} catch {
+						Crashlytics.crashlytics().record(error: error)
+					}
 				} else {
 					throw error
 				}
