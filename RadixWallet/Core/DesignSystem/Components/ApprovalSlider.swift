@@ -57,7 +57,7 @@ struct ApprovalSlider: View {
 		}
 
 		private var background: Color {
-			controlState.isDisabled ? .app.gray4 : .app.blue2
+			controlState.isDisabled ? .app.gray4 : .gradientBlue2
 		}
 
 		private var textOpacity: CGFloat {
@@ -143,9 +143,9 @@ struct ApprovalSlider: View {
 
 private extension Gradient {
 	static let approvalSlider: Gradient = .init(stops: [
-		.init(color: .app.account11green, location: 0),
-		.init(color: .app.blue2, location: 0.41),
-		.init(color: .app.gradientPurple, location: 0.81),
-		.init(color: .app.gradientPurple.opacity(0), location: 1),
+		.init(color: .gradientAccount11Green, location: 0),
+		.init(color: .gradientBlue2, location: 0.41),
+		.init(color: .gradientPurple, location: 0.81),
+		.init(color: .gradientPurple.opacity(0), location: 1),
 	])
 }

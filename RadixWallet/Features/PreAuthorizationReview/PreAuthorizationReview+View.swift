@@ -188,7 +188,7 @@ extension PreAuthorizationReview {
 					if let seconds = secondsToExpiration {
 						if seconds > 0 {
 							let value = TimeFormatter.format(seconds: seconds)
-							Text(markdown: L10n.PreAuthorizationReview.Expiration.atTime(value), emphasizedColor: .app.account4pink, emphasizedFont: .app.body2Link)
+							Text(markdown: L10n.PreAuthorizationReview.Expiration.atTime(value), emphasizedColor: .gradientAccount4Pink, emphasizedFont: .app.body2Link)
 						} else {
 							Text(L10n.PreAuthorizationReview.Expiration.expired)
 						}
@@ -196,11 +196,11 @@ extension PreAuthorizationReview {
 
 				case let .afterDelay(value):
 					let value = TimeFormatter.format(seconds: Int(value.expireAfterSeconds))
-					Text(markdown: L10n.PreAuthorizationReview.Expiration.afterDelay(value), emphasizedColor: .app.account4pink, emphasizedFont: .app.body2Link)
+					Text(markdown: L10n.PreAuthorizationReview.Expiration.afterDelay(value), emphasizedColor: .gradientAccount4Pink, emphasizedFont: .app.body2Link)
 				}
 			}
 			.textStyle(.body2Regular)
-			.foregroundStyle(.app.account4pink)
+			.foregroundStyle(.gradientAccount4Pink)
 			.padding(.horizontal, .medium1)
 			.frame(minHeight: .huge2)
 		}

@@ -16,34 +16,19 @@ extension Gradient {
 	}
 
 	private static let colors: [[Color]] = [
-		[.app.blue2, .app.account0green],
-		[.app.blue2, .app.account1pink],
-		[.app.blue2, .app.blue3],
-		[.app.green1, .app.blue2],
-		[.app.account4pink, .app.blue2],
-		[.app.account5blue, .app.blue2],
-		[.primaryText, .app.account6green],
-		[.primaryText, .app.account7pink],
-		[.app.blue2, .primaryText],
-		[.app.account9green1, .app.account9green2],
-		[.app.account10pink1, .app.account10pink2],
-		[.app.account11green, .app.account11blue1, .app.account11pink],
+		[.gradientBlue2, .gradientGreen0],
+		[.gradientBlue2, .gradientPink1],
+		[.gradientBlue2, .gradientBlue3],
+		[.gradientGreen1, .gradientBlue2],
+		[.gradientAccount4Pink, .gradientBlue2],
+		[.gradientAccount5Blue, .gradientBlue2],
+		[.gradientGray1, .gradientAccount6Green],
+		[.gradientGray1, .gradientAccount7Pink],
+		[.gradientBlue2, .gradientGray1],
+		[.gradientAccount9Green1, .gradientAccount9Green2],
+		[.gradientAccount10Pink1, .gradientAccount10Pink2],
+		[.gradientAccount11Green, .gradientAccount11Blue1, .gradientAccount11Pink],
 	]
-}
-
-extension LinearGradient.App {
-	var brand1: LinearGradient {
-		.init(
-			colors: [
-				.app.account11green,
-				.app.account11blue1,
-				.app.gradientPurple,
-				.app.blue1,
-			],
-			startPoint: .bottomLeading,
-			endPoint: .topTrailing
-		)
-	}
 }
 
 #if DEBUG

@@ -3,6 +3,16 @@
     {
       "filename" : "configuration_backup.pdf",
       "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "configuration_backup 1.pdf",
+      "idiom" : "universal"
     }
   ],
   "info" : {

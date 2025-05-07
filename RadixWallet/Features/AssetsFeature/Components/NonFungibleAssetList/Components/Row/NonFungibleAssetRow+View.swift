@@ -100,7 +100,7 @@ extension NonFungibleAssetList.Row.View {
 			VStack(spacing: .zero) {
 				Divider()
 					.frame(height: .assetDividerHeight)
-					.overlay(.app.gray5)
+					.overlay(.secondaryBackground)
 
 				HStack {
 					NFTIDView(

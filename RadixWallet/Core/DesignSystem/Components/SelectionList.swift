@@ -1,5 +1,6 @@
 // MARK: - SelectionList
 struct SelectionList<Choices: Sequence>: View where Choices.Element: Hashable {
+	@Environment(\.colorScheme) private var colorScheme
 	typealias Element = Choices.Element
 
 	let choices: Choices
@@ -32,19 +33,19 @@ struct SelectionList<Choices: Sequence>: View where Choices.Element: Hashable {
 							Spacer()
 							// Need to disable, since broken in swiftformat 0.52.7
 							// swiftformat:disable redundantClosure
-							Image(
-								asset: {
-									if requirement == .exactly(1) {
-										item.isSelected
-											? AssetResource.radioButtonDarkSelected
-											: AssetResource.radioButtonDarkUnselected
-									} else {
-										item.isSelected
-											? AssetResource.checkmarkDarkSelected
-											: AssetResource.checkmarkDarkUnselected
-									}
-								}()
-							)
+							Group {
+								if requirement == .exactly(1) {
+									RadioButton(
+										appearance: colorScheme == .light ? .dark : .light,
+										isSelected: item.isSelected
+									)
+								} else {
+									CheckmarkView(
+										appearance: colorScheme == .light ? .dark : .light,
+										isChecked: item.isSelected
+									)
+								}
+							}
 							.padding(.trailing, .small3)
 							.opacity(item.isDisabled ? 0.3 : 1)
 							// swiftformat:enable redundantClosure

@@ -70,9 +70,9 @@ extension PollPreAuthorizationStatus {
 		}
 
 		private func unknownBottom(text: String) -> some SwiftUI.View {
-			Text(markdown: text, emphasizedColor: .app.account4pink, emphasizedFont: .app.button)
+			Text(markdown: text, emphasizedColor: .gradientAccount4Pink, emphasizedFont: .app.button)
 				.textStyle(.body1Regular)
-				.foregroundStyle(.app.account4pink)
+				.foregroundStyle(.gradientAccount4Pink)
 				.padding(.medium1)
 				.frame(maxWidth: .infinity)
 				.background(.secondaryBackground)

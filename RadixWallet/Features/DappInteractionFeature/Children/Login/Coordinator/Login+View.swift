@@ -117,7 +117,7 @@ extension Login {
 					content: { CreatePersonaCoordinator.View(store: $0) }
 				)
 			}
-			.background(.primaryBackground)
+			.background(.secondaryBackground)
 		}
 	}
 }

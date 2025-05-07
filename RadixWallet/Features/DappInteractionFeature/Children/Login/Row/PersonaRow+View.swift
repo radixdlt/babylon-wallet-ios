@@ -21,6 +21,7 @@ extension PersonaRow {
 
 	@MainActor
 	struct View: SwiftUI.View {
+		@Environment(\.colorScheme) private var colorScheme
 		let viewState: ViewState
 		let mode: Mode
 
@@ -57,13 +58,13 @@ extension PersonaRow {
 						switch selectionType {
 						case .radioButton:
 							RadioButton(
-								appearance: .dark,
+								appearance: colorScheme == .light ? .dark : .light,
 								isSelected: isSelected
 							)
 							.padding(.leading, .small3)
 						case .checkmark:
 							CheckmarkView(
-								appearance: .dark,
+								appearance: colorScheme == .light ? .dark : .light,
 								isChecked: isSelected
 							)
 						}
@@ -83,7 +84,7 @@ extension PersonaRow {
 					}
 				}
 			}
-			.background(.tertiaryBackground)
+			.background(.primaryBackground)
 			.cornerRadius(.small1)
 			.embedInButton(when: action)
 			.buttonStyle(.inert)

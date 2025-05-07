@@ -105,46 +105,12 @@ extension Color.App {
 
 	var cardShadowBlack: Color { .black.opacity(0.15) }
 
-	// Account gradient
-	var account0green: Color { .init(hex: .account0green) }
-
-	var account1pink: Color { .init(hex: .account1pink) }
-
-	var account4pink: Color { .init(hex: .account4pink) }
-
-	var account5blue: Color { .init(hex: .account5blue) }
-
-	var account6green: Color { .init(hex: .account6green) }
-
-	var account7pink: Color { .init(hex: .account7pink) }
-
-	var account9green1: Color { .init(hex: .account9green1) }
-	var account9green2: Color { .init(hex: .account9green2) }
-
-	var account10pink1: Color { .init(hex: .account10pink1) }
-	var account10pink2: Color { .init(hex: .account10pink2) }
-
-	var account11green: Color { .init(hex: .account11green) }
-	var account11blue1: Color { .init(hex: .account11blue1) }
-	var account11pink: Color { .init(hex: .account11pink) }
-
 	// Approval gradient
 
 	var gradientPurple: Color { .init(hex: 0xFF07E6) }
 }
 
 // MARK: - Color.Hex
-// extension Color {
-//	var primaryBackground: Color { .init("PrimaryBackground") }
-//	var secondaryBackground: Color { .init("SecondaryBackground") }
-//	var tertiaryBackground: Color { .init("TertiaryBackground") }
-//	var primaryText: Color { .init("PrimaryText") }
-//	var secondaryText: Color { .init("SecondaryText") }
-//	var textButton: Color { .init("TextButton") }
-//    var button: Color { .init("Button") }
-//    var textOnButton: Color { .init("TextOnButton") }
-// }
-
 extension Color {
 	fileprivate enum Hex: UInt32 {
 		// blue
@@ -180,29 +146,6 @@ extension Color {
 		case lightError = 0xFCEBEB
 
 		case notification = 0xF81B1B
-
-		// gradient
-		case account0green = 0x01E2A0
-
-		case account1pink = 0xFF43CA
-
-		case account4pink = 0xCE0D98
-
-		case account5blue = 0x0DCAE4
-
-		case account6green = 0x03D497
-
-		case account7pink = 0xF31DBE
-
-		case account9green1 = 0x0BA97D
-		case account9green2 = 0x1AF4B5
-
-		case account10pink1 = 0x7E0D5F
-		case account10pink2 = 0xE225B3
-
-		case account11green = 0x03B797
-		case account11blue1 = 0x1544F5
-		case account11pink = 0x9937E3
 	}
 }
 
