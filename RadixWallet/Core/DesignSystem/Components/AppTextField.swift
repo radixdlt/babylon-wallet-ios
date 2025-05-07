@@ -210,7 +210,7 @@ struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory: View>
 		case .error:
 			.app.red1
 		case .warning, .detail:
-			.app.alert
+			.alert
 		}
 	}
 }

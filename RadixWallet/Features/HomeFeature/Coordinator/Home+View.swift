@@ -30,7 +30,7 @@ extension Home {
 						if let fiatWorth = viewStore.totalFiatWorth {
 							VStack(spacing: .small2) {
 								Text(L10n.HomePage.totalValue)
-									.foregroundStyle(.app.gray2)
+									.foregroundStyle(.secondaryText)
 									.textStyle(.body1Header)
 									.textCase(.uppercase)
 
@@ -159,19 +159,6 @@ private extension View {
 	private func p2pLinks(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.p2pLinks, action: \.p2pLinks)) {
 			P2PLinksFeature.View(store: $0)
-		}
-	}
-}
-
-extension View {
-	func badged(_ showBadge: Bool) -> some View {
-		overlay(alignment: .topTrailing) {
-			if showBadge {
-				Circle()
-					.fill(.app.notification)
-					.frame(width: .small1, height: .small1) // we should probably have the frame size aligned with the unit size.
-					.offset(x: .small3, y: -.small3)
-			}
 		}
 	}
 }

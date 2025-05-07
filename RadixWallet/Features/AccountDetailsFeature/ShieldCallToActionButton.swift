@@ -21,7 +21,7 @@ extension View {
 				.frame(width: .small2, height: .small2)
 		}
 		.padding(.small2)
-		.background(.app.whiteTransparent2)
+		.background(.backgroundTransparent1)
 		.cornerRadius(.small2)
 		.onTapGesture {
 			onTapGesture()

@@ -252,7 +252,7 @@ private extension PlainListRowCore.ViewState {
 	var subtitleForegroundColor: Color {
 		switch context {
 		case .toggle, .hiddenPersona:
-			.app.gray2
+			.secondaryText
 		case .settings(isError: false), .dappAndPersona, .compactPersona:
 			Color.primaryText
 		case .settings(isError: true):

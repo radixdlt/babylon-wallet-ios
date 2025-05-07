@@ -79,13 +79,13 @@ extension FactoryReset.View {
 				.padding(.horizontal, .medium2)
 				.padding(.vertical, .small2)
 				.frame(maxWidth: .infinity)
-				.background(isRecoverable ? .app.green2 : .app.alert)
+				.background(isRecoverable ? .app.green2 : .alert)
 				.cornerRadius(.small1)
 
 				if !isRecoverable {
 					Text(L10n.FactoryReset.Unrecoverable.message)
 						.textStyle(.body1Link)
-						.foregroundColor(.app.alert)
+						.foregroundColor(.alert)
 				}
 			}
 		}

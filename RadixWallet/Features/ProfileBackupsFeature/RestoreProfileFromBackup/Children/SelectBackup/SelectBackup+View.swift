@@ -103,6 +103,7 @@ extension SelectBackup.View {
 			.padding(.bottom, .medium1)
 			.foregroundColor(.primaryText)
 		}
+		.background(.secondaryBackground)
 	}
 
 	private func failureBox(message: String) -> some View {
@@ -148,7 +149,7 @@ extension SelectBackup.View {
 			L10n.RecoverProfileBackup.numberOfPersonas(Int(header.contentHint.numberOfPersonasOnAllNetworksInTotal)),
 		]
 
-		return Card(.app.gray5) {
+		return Card {
 			HStack(spacing: .zero) {
 				VStack(alignment: .leading, spacing: .small3) {
 					ForEachStatic(values) {

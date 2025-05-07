@@ -144,10 +144,10 @@ extension ConfigurationBackup {
 
 					Spacer(minLength: 0)
 				}
-				.foregroundStyle(.app.alert)
+				.foregroundStyle(.alert)
 				.padding(.vertical, .small1)
 				.padding(.horizontal, .medium3)
-				.background(.app.lightAlert)
+				.background(.lightAlert)
 				.roundedCorners(radius: .small1)
 			}
 		}
@@ -239,7 +239,7 @@ extension ConfigurationBackup {
 						}
 					} label: {
 						HStack(spacing: .zero) {
-							let style: Color = actionRequired ? .app.alert : .app.green1
+							let style: Color = actionRequired ? .alert : .app.green1
 							Image(actionRequired ? .error : .checkCircle)
 								.padding(.trailing, .small3)
 								.foregroundStyle(style)

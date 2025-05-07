@@ -19,7 +19,7 @@ struct AccountBannerView: View {
 		}
 		.foregroundColor(.app.white)
 		.padding(.small1)
-		.background(.app.whiteTransparent2)
+		.background(.backgroundTransparent1)
 		.cornerRadius(.small2)
 	}
 

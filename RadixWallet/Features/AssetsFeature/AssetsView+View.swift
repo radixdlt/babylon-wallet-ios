@@ -107,13 +107,13 @@ extension AssetsView {
 						ForEach(viewStore.assetKinds) { kind in
 							let isSelected = viewStore.activeAssetKind == kind
 							Text(kind.displayText)
-								.foregroundColor(isSelected ? .primaryText : .primaryText)
+								.foregroundColor(.primaryText)
 								.textStyle(.body1HighImportance)
 								.frame(height: .large1)
 								.padding(.horizontal, .medium2)
 								.background(
 									isSelected
-										? RoundedRectangle(cornerRadius: .medium2).fill(.tertiaryBackground)
+										? RoundedRectangle(cornerRadius: .medium2).fill(.chipBackground)
 										: nil
 								)
 								.id(kind)

@@ -216,7 +216,7 @@ extension Home.AccountRow.View {
 		var body: some View {
 			ZStack {
 				Circle()
-					.fill(.app.whiteTransparent2)
+					.fill(.backgroundTransparent1)
 
 				Thumbnail(token: icon, size: Constants.iconSize)
 					.padding(Constants.borderWidth)
@@ -253,7 +253,7 @@ extension Home.AccountRow.View {
 					.padding([.leading, .vertical], Constants.borderWidth)
 
 				outerShape
-					.fill(.app.whiteTransparent2)
+					.fill(.backgroundTransparent1)
 					.frame(width: Constants.diameter, height: Constants.diameter)
 
 				innerShape
@@ -278,11 +278,11 @@ extension Home.AccountRow.View {
 				.lineLimit(1)
 				.textStyle(.resourceLabel)
 				.fixedSize()
-				.foregroundColor(.white)
+				// .foregroundColor(.)
 				.padding(.horizontal, .small2)
 				.frame(minWidth: .medium1, minHeight: Constants.iconSize.rawValue)
 				.padding(.leading, Constants.diameter - Constants.borderWidth - (tighten ? .small3 : 0))
-				.background(.app.whiteTransparent2)
+				.background(.backgroundTransparent1)
 				.cornerRadius(Constants.iconSize.rawValue / 2)
 				.layoutPriority(100)
 		}

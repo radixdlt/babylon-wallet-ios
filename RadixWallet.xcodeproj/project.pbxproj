@@ -539,7 +539,6 @@
 		48CFC5B92ADC10DA00E77A5C /* BackButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC10C2ADC10D900E77A5C /* BackButton.swift */; };
 		48CFC5BA2ADC10DA00E77A5C /* RadioButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC10D2ADC10D900E77A5C /* RadioButton.swift */; };
 		48CFC5BB2ADC10DA00E77A5C /* PlainListRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC10E2ADC10D900E77A5C /* PlainListRow.swift */; };
-		48CFC5BC2ADC10DA00E77A5C /* ConfirmationFooter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC10F2ADC10D900E77A5C /* ConfirmationFooter.swift */; };
 		48CFC5BD2ADC10DA00E77A5C /* Hint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1102ADC10D900E77A5C /* Hint.swift */; };
 		48CFC5BE2ADC10DA00E77A5C /* RoundedCornerBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1112ADC10D900E77A5C /* RoundedCornerBackground.swift */; };
 		48CFC5BF2ADC10DA00E77A5C /* LoadingOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1122ADC10D900E77A5C /* LoadingOverlayView.swift */; };
@@ -1893,7 +1892,6 @@
 		48CFC10C2ADC10D900E77A5C /* BackButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackButton.swift; sourceTree = "<group>"; };
 		48CFC10D2ADC10D900E77A5C /* RadioButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RadioButton.swift; sourceTree = "<group>"; };
 		48CFC10E2ADC10D900E77A5C /* PlainListRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlainListRow.swift; sourceTree = "<group>"; };
-		48CFC10F2ADC10D900E77A5C /* ConfirmationFooter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfirmationFooter.swift; sourceTree = "<group>"; };
 		48CFC1102ADC10D900E77A5C /* Hint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Hint.swift; sourceTree = "<group>"; };
 		48CFC1112ADC10D900E77A5C /* RoundedCornerBackground.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RoundedCornerBackground.swift; sourceTree = "<group>"; };
 		48CFC1122ADC10D900E77A5C /* LoadingOverlayView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoadingOverlayView.swift; sourceTree = "<group>"; };
@@ -5117,7 +5115,6 @@
 				48CFC10C2ADC10D900E77A5C /* BackButton.swift */,
 				48CFC10D2ADC10D900E77A5C /* RadioButton.swift */,
 				48CFC10E2ADC10D900E77A5C /* PlainListRow.swift */,
-				48CFC10F2ADC10D900E77A5C /* ConfirmationFooter.swift */,
 				48CFC1102ADC10D900E77A5C /* Hint.swift */,
 				48CFC1112ADC10D900E77A5C /* RoundedCornerBackground.swift */,
 				48CFC1122ADC10D900E77A5C /* LoadingOverlayView.swift */,
@@ -8081,7 +8078,6 @@
 				48CFC2532ADC10D900E77A5C /* AddNewGateway+View.swift in Sources */,
 				A40816602C7E0D08005E65B9 /* ValidatorsUptimeRequest.swift in Sources */,
 				A40815942C7E0D08005E65B9 /* MetadataInstantValue.swift in Sources */,
-				48CFC5BC2ADC10DA00E77A5C /* ConfirmationFooter.swift in Sources */,
 				48CFC2C22ADC10D900E77A5C /* ChooseReceivingAccount+View.swift in Sources */,
 				48CFC3862ADC10D900E77A5C /* DetailsContainerWithHeaderView.swift in Sources */,
 				A40815BE2C7E0D08005E65B9 /* NativeResourceXrdValue.swift in Sources */,
@@ -9937,24 +9933,6 @@
 		A0FDC0152DB7BAE900F571BA /* Sargon */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Sargon;
-		};
-		A0C672FF2DA6BBEA0071606B /* ScreenshotPreventing */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = ScreenshotPreventing;
-		};
-		A0C673012DA6BBEA0071606B /* ScreenshotPreventingSwiftUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = ScreenshotPreventingSwiftUI;
-		};
-		A0C673042DA6BD7F0071606B /* ScreenshotPreventing */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A0C673032DA6BD7F0071606B /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */;
-			productName = ScreenshotPreventing;
-		};
-		A0C673062DA6BD7F0071606B /* ScreenshotPreventingSwiftUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A0C673032DA6BD7F0071606B /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */;
-			productName = ScreenshotPreventingSwiftUI;
 		};
 		A415574F2B757C5E0040AD4E /* ComposableArchitecture */ = {
 			isa = XCSwiftPackageProductDependency;

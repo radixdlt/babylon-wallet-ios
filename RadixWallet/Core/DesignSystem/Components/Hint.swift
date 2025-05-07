@@ -75,7 +75,7 @@ private extension Hint {
 		case .error:
 			.app.red1
 		case .warning, .detail:
-			.app.alert
+			.alert
 		}
 	}
 

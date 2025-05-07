@@ -47,7 +47,7 @@ extension HUD {
 					.padding(.horizontal, .medium3)
 					.background(
 						Capsule()
-							.foregroundColor(.app.background)
+							.foregroundColor(.primaryBackground)
 							.shadow(
 								color: .primaryText.opacity(0.16),
 								radius: 12,

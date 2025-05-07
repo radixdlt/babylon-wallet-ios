@@ -74,10 +74,6 @@ extension Color.App {
 	var white: Color { .init(hex: .white) }
 	/// white with 0.8 opacity
 	var whiteTransparent: Color { .white.opacity(0.8) }
-	/// white with 0.3 opacity
-	var whiteTransparent2: Color { .white.opacity(0.3) }
-	/// white with 0.2 opacity
-	var whiteTransparent3: Color { .white.opacity(0.2) }
 
 	// orange
 	var orange1: Color { .init(hex: .orange1) }
@@ -86,17 +82,8 @@ extension Color.App {
 	var red1: Color { .init(hex: .error) }
 
 	// alert
-	var alert: Color { .init(hex: .alert) }
-	var lightAlert: Color { .init(hex: .lightAlert) }
 	var error: Color { .init(hex: .error) }
 	var lightError: Color { .init(hex: .lightError) }
-	var notification: Color { .init(hex: .notification) }
-
-	var background: Color { .dynamic(light: .white, dark: .black) }
-	@available(*, deprecated, message: "Use dynamic 'background' color instead")
-	var backgroundDark: Color { .black }
-	@available(*, deprecated, message: "Use dynamic 'background' color instead")
-	var backgroundLight: Color { .white }
 
 	var buttonTextBlack: Color { .black }
 	var buttonTextBlackTransparent: Color { .black.opacity(0.6) }
@@ -136,10 +123,6 @@ extension Color {
 		// orange
 		case orange1 = 0xF2AD21
 		case orange2 = 0xEC633E
-
-		case alert = 0xE59700
-
-		case lightAlert = 0xFFF4DF
 
 		case error = 0xC82020
 
