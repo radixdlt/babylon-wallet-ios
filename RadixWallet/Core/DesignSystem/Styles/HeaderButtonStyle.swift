@@ -10,7 +10,7 @@ struct HeaderButtonStyle: ButtonStyle {
 			.frame(maxWidth: .infinity)
 			.foregroundColor(.app.white)
 			.frame(height: .standardButtonHeight)
-			.background(.backgroundTransparent2)
+			.background(.backgroundTransparent)
 			.cornerRadius(.large2)
 			.opacity(configuration.isPressed ? 0.4 : 1)
 	}

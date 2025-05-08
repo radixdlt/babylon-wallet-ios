@@ -73,7 +73,7 @@ extension FungibleResourceAsset.View {
 							Text(L10n.Common.max)
 								.underline()
 								.textStyle(.body3HighImportance)
-								.foregroundColor(.app.blue2)
+								.foregroundColor(.textButton)
 						}
 
 						Group {

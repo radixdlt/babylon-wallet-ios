@@ -50,6 +50,7 @@ struct DetailsContainerWithHeaderView<ThumbnailView: View, DetailsView: View>: V
 					.padding(.bottom, .medium3)
 			}
 		}
+		.background(.red)
 	}
 
 	@ViewBuilder

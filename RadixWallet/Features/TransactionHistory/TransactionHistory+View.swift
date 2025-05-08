@@ -63,6 +63,7 @@ extension TransactionHistory {
 								.foregroundStyle(.app.gray2)
 						}
 					}
+					.background(.secondaryBackground)
 					.toolbar {
 						ToolbarItem(placement: .topBarLeading) {
 							CloseButton {
@@ -78,7 +79,6 @@ extension TransactionHistory {
 				}
 				.radixToolbar(title: L10n.TransactionHistory.title, alwaysVisible: false)
 			}
-			.background(.secondaryBackground)
 			.onAppear {
 				store.send(.view(.onAppear))
 			}

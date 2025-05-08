@@ -64,6 +64,7 @@ extension ReceivingAccount.View {
 				}
 				.padding(.horizontal, .medium3)
 				.foregroundColor(.secondaryText)
+				.background(.primaryBackground)
 			}
 		}
 		.frame(height: .standardButtonHeight)
@@ -90,6 +91,6 @@ extension ReceivingAccount.View {
 		}
 		.frame(maxWidth: .infinity)
 		.padding([.top, .horizontal], .medium3)
-		.background(.tertiaryBackground)
+		.background(.secondaryBackground)
 	}
 }

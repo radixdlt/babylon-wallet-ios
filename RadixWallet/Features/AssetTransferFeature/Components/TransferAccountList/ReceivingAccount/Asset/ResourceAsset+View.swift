@@ -39,7 +39,7 @@ extension ResourceAsset.View {
 				}
 				.background(.primaryBackground)
 				.focused($focused)
-				.roundedCorners(strokeColor: focused ? .primaryText : .app.white)
+				.roundedCorners(strokeColor: focused ? .primaryText : .primaryBackground)
 				.tokenRowShadow()
 
 				Spacer()
