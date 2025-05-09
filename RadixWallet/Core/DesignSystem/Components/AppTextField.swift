@@ -178,7 +178,7 @@ struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory: View>
 				}
 				.padding(.medium3)
 				.frame(height: .standardButtonHeight)
-				.background(Color.tertiaryBackground)
+				.background(.textFieldBackground)
 				.cornerRadius(.small2)
 				.overlay(
 					RoundedRectangle(cornerRadius: .small2)
@@ -206,7 +206,7 @@ struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory: View>
 	private func accentColor(isFocused: Bool) -> Color {
 		switch hint?.kind {
 		case .none, .info:
-			isFocused ? Color.primaryText : Color.secondaryText
+			isFocused ? .textFieldFocusedBorder : .textFieldBorder
 		case .error:
 			.app.red1
 		case .warning, .detail:

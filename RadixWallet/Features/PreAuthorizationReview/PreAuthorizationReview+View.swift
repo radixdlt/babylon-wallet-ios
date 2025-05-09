@@ -165,7 +165,7 @@ extension PreAuthorizationReview {
 						.foregroundStyle(.primaryText)
 
 					Text(L10n.PreAuthorizationReview.Fees.subtitle)
-						.foregroundStyle(.app.gray2)
+						.foregroundStyle(.secondaryText)
 				}
 				.lineSpacing(0)
 				.textStyle(.body2Regular)

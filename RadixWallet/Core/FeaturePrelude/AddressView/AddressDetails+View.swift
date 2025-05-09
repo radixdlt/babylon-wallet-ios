@@ -179,7 +179,7 @@ private extension AddressDetails.View {
 
 		let result = NSMutableAttributedString()
 		for (index, part) in parts.enumerated() {
-			var attributed = AttributedString(part.raw, foregroundColor: .app.gray2)
+			var attributed = AttributedString(part.raw, foregroundColor: .secondaryText)
 			let boldChars = part.trimmed.split(separator: "...")
 			if let range = attributed.range(of: boldChars[0]) {
 				attributed[range].foregroundColor = .primaryText
@@ -189,7 +189,7 @@ private extension AddressDetails.View {
 			}
 			result.append(.init(attributed))
 			if (index + 1) != parts.count {
-				result.append(.init(AttributedString(":", foregroundColor: .app.gray2)))
+				result.append(.init(AttributedString(":", foregroundColor: .secondaryText)))
 			}
 		}
 
@@ -202,7 +202,7 @@ private extension AddressDetails.View {
 	var enlargedView: some SwiftUI.View {
 		Text(enlargedText)
 			.textStyle(.enlarged)
-			.foregroundColor(.app.white)
+			.foregroundColor(.primaryText)
 			.multilineTextAlignment(.center)
 			.padding(.small1)
 			.background(.primaryText.opacity(0.8))

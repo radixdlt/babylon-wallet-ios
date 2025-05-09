@@ -136,6 +136,8 @@ private extension ResourceBalance.ViewState.PoolUnit {
 
 // MARK: - ResourceBalanceView
 struct ResourceBalanceView: View {
+	@Environment(\.colorScheme) private var colorScheme
+
 	let viewState: ResourceBalance.ViewState
 	let appearance: Appearance
 	let hasBorder: Bool
@@ -195,7 +197,7 @@ struct ResourceBalanceView: View {
 			}
 
 			if !delegateSelection, let isSelected {
-				CheckmarkView(appearance: .dark, isChecked: isSelected)
+				CheckmarkView(appearance: colorScheme == .light ? .dark : .light, isChecked: isSelected)
 			}
 		}
 	}
@@ -524,7 +526,7 @@ extension ResourceBalanceView {
 				if case .unknown = amount {
 					Text(L10n.InteractionReview.Unknown.amount)
 						.textStyle(.body2HighImportance)
-						.foregroundStyle(.app.gray2)
+						.foregroundStyle(.secondaryText)
 				}
 			}
 		}
@@ -575,7 +577,7 @@ extension ResourceBalanceView {
 				if case .unknown = amount {
 					Text(L10n.InteractionReview.Unknown.amount)
 						.textStyle(.body2HighImportance)
-						.foregroundStyle(.app.gray2)
+						.foregroundStyle(.secondaryText)
 				}
 			}
 		}
@@ -744,7 +746,7 @@ extension ResourceBalanceView {
 					if !resourceBalanceHideFiatValue, let fiatWorth = amount.fiatWorth?.currencyFormatted(applyCustomFont: false) {
 						Text(fiatWorth)
 							.textStyle(.body2HighImportance)
-							.foregroundStyle(.app.gray2)
+							.foregroundStyle(.secondaryText)
 							.padding(.top, .small3)
 					}
 				}
@@ -767,7 +769,7 @@ extension ResourceBalanceView {
 					if !resourceBalanceHideFiatValue, let fiatWorth = amount.fiatWorth?.currencyFormatted(applyCustomFont: false) {
 						Text(fiatWorth)
 							.textStyle(.body2HighImportance)
-							.foregroundStyle(.app.gray2)
+							.foregroundStyle(.secondaryText)
 							.padding(.top, .small3)
 					}
 

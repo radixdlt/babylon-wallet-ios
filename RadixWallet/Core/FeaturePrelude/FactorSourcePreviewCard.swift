@@ -16,6 +16,6 @@ struct FactorSourcePreviewCard: View {
 		}
 		.padding(.medium3)
 		.background(.primaryBackground)
-		.roundedCorners(strokeColor: .borderColor, radius: .small1)
+		.roundedCorners(strokeColor: .border, radius: .small1)
 	}
 }

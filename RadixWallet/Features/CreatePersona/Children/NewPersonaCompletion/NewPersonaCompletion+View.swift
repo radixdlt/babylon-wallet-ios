@@ -63,16 +63,15 @@ extension NewPersonaCompletion {
 
 					Spacer()
 				}
-				.background(.primaryBackground)
 				.padding(.medium1)
-				.safeAreaInset(edge: .bottom, spacing: 0) {
+				.footer {
 					Button(L10n.CreateEntity.Completion.goToDestination(viewStore.destinationDisplayText)) {
 						viewStore.send(.goToDestination)
 					}
 					.buttonStyle(.primaryRectangular)
-					.padding(.medium1)
 				}
 			}
+			.background(.primaryBackground)
 		}
 	}
 }

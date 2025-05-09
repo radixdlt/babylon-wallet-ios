@@ -126,6 +126,7 @@ extension LedgerHardwareDevices {
 							.padding(.bottom, .medium1)
 					}
 				}
+				.background(.secondaryBackground)
 				.onFirstTask { @MainActor in
 					await viewStore.send(.onFirstTask).finish()
 				}
@@ -147,7 +148,7 @@ extension LedgerHardwareDevices {
 					Card {
 						Text(L10n.LedgerHardwareDevices.subtitleNoLedgers)
 							.textStyle(.secondaryHeader)
-							.foregroundColor(viewStore.loadedEmptyLedgersList ? .app.gray2 : .clear)
+							.foregroundColor(viewStore.loadedEmptyLedgersList ? .secondaryText : .clear)
 							.padding(.horizontal, .large2)
 							.padding(.vertical, .large2 + .small3)
 					}

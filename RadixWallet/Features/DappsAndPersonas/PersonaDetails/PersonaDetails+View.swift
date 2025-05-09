@@ -210,6 +210,7 @@ extension PersonaDetails.View {
 					//	.buttonStyle(.secondaryRectangular)
 					//	.padding(.vertical, .large3)
 				}
+				.padding(.vertical, .medium2)
 			}
 		}
 	}

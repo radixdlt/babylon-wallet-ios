@@ -91,7 +91,7 @@ extension NPSSurvey.View {
 			Text(L10n.Survey.highestScoreLabel)
 		}
 		.textStyle(.body2Regular)
-		.foregroundStyle(.app.gray2)
+		.foregroundStyle(.secondaryText)
 		.padding(.bottom, .large2)
 	}
 
@@ -104,7 +104,7 @@ extension NPSSurvey.View {
 
 		Text(L10n.Common.optional)
 			.textStyle(.body1Regular)
-			.foregroundStyle(.app.gray2)
+			.foregroundStyle(.secondaryText)
 			.padding(.bottom, .medium3)
 
 		AppTextField(

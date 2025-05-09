@@ -31,8 +31,8 @@ extension DappInteractionCompletion {
 							.padding([.top, .horizontal], .medium3)
 
 						if let intentHash = viewStore.intentHash {
-							AddressView(.transaction(intentHash), imageColor: .app.gray2)
-								.foregroundColor(.app.blue1)
+							AddressView(.transaction(intentHash), imageColor: .secondaryText)
+								.foregroundColor(.textButton)
 								.textStyle(.body1Header)
 								.padding(.top, .small2)
 						}
@@ -50,6 +50,7 @@ extension DappInteractionCompletion {
 						}
 					}
 					.frame(maxWidth: .infinity)
+					.background(.primaryBackground)
 				}
 			}
 			.presentationDragIndicator(.visible)

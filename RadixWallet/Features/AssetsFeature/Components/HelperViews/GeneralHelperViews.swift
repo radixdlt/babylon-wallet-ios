@@ -9,19 +9,19 @@ struct KeyValueView<Content: View>: View {
 	let content: Content
 	let isLocked: Bool
 
-	init(resourceAddress: ResourceAddress, imageColor: Color? = .app.gray2) where Content == AddressView {
+	init(resourceAddress: ResourceAddress, imageColor: Color? = .secondaryText) where Content == AddressView {
 		self.init(key: L10n.AssetDetails.resourceAddress, isLocked: false) {
 			AddressView(.address(.resource(resourceAddress)), imageColor: imageColor)
 		}
 	}
 
-	init(validatorAddress: ValidatorAddress, imageColor: Color? = .app.gray2) where Content == AddressView {
+	init(validatorAddress: ValidatorAddress, imageColor: Color? = .secondaryText) where Content == AddressView {
 		self.init(key: L10n.AssetDetails.validator, isLocked: false) {
 			AddressView(.address(.validator(validatorAddress)), imageColor: imageColor)
 		}
 	}
 
-	init(nonFungibleGlobalID: NonFungibleGlobalId, showLocalIdOnly: Bool, imageColor: Color? = .app.gray2) where Content == AddressView {
+	init(nonFungibleGlobalID: NonFungibleGlobalId, showLocalIdOnly: Bool, imageColor: Color? = .secondaryText) where Content == AddressView {
 		self.init(key: L10n.AssetDetails.NFTDetails.id, isLocked: false) {
 			AddressView(.address(.nonFungibleGlobalID(nonFungibleGlobalID)), showLocalIdOnly: showLocalIdOnly, imageColor: imageColor)
 		}

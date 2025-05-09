@@ -140,7 +140,7 @@ extension NonFungibleTokenDetails {
 								}
 							}
 							.padding(.vertical, .medium1)
-							.background(.app.gray5, ignoresSafeAreaEdges: .bottom)
+							.background(.secondaryBackground)
 						}
 					}
 				}

@@ -71,7 +71,7 @@ private extension Hint {
 	var foregroundColor: Color {
 		switch viewState.kind {
 		case .info:
-			.app.gray2
+			.secondaryText
 		case .error:
 			.app.red1
 		case .warning, .detail:

@@ -5,7 +5,7 @@ struct Card<Contents: View>: View {
 	let contents: Contents
 
 	init(
-		_ color: Color = Color.primaryBackground,
+		_ color: Color = .primaryBackground,
 		action: (() -> Void)? = nil,
 		@ViewBuilder contents: () -> Contents
 	) {
@@ -85,14 +85,14 @@ extension View {
 	fileprivate func inCard(_ color: Color = .primaryBackground, isPressed: Bool = false) -> some View {
 		background(isPressed ? .tertiaryBackground : color)
 			.clipShape(RoundedRectangle(cornerRadius: .medium3))
-		// .cardShadow
+			.cardShadow
 	}
 
 	var inSpeechbubble: some View {
 		padding(.bottom, SpeechbubbleShape.triangleSize.height)
 			.background(.primaryBackground)
 			.clipShape(SpeechbubbleShape(cornerRadius: .medium3))
-		// .cardShadow
+			.cardShadow
 	}
 
 	func inFlatBottomSpeechbubble(inset: CGFloat = 0) -> some View {
@@ -108,7 +108,7 @@ extension View {
 	}
 
 	var cardShadow: some View {
-		shadow(color: .primaryBackground.opacity(0.26), radius: .medium3, x: .zero, y: .small2)
+		shadow(color: .shadow.opacity(0.26), radius: .medium3, x: .zero, y: .small2)
 	}
 }
 

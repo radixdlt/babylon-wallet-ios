@@ -81,7 +81,7 @@ extension StakeSummaryView {
 						.foregroundColor(amount.nominalAmount > 0 ? .primaryText : .app.gray3)
 					if !resourceBalanceHideFiatValue, let fiatWorth = amount.fiatWorth?.currencyFormatted(applyCustomFont: false) {
 						Text(fiatWorth)
-							.foregroundStyle(.app.gray2)
+							.foregroundStyle(.secondaryText)
 					}
 				}
 				.textStyle(.body2HighImportance)

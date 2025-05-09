@@ -99,6 +99,7 @@ struct DetailsContainer<Contents: View>: View {
 					CloseButton(action: closeButtonAction)
 				}
 			}
+			.background(.primaryBackground)
 		}
 		.tint(.primaryText)
 		.foregroundColor(.primaryText)

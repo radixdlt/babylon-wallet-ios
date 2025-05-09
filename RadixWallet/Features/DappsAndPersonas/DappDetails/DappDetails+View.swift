@@ -52,6 +52,7 @@ extension DappDetails.View {
 				}
 				.radixToolbar(title: viewStore.title)
 			}
+			.background(.primaryBackground)
 		}
 		.onAppear {
 			store.send(.view(.appeared))
@@ -169,7 +170,7 @@ extension DappDetails.View {
 
 					VStack(spacing: .medium3) {
 						KeyValueView(key: L10n.AuthorizedDapps.DAppDetails.dAppDefinition) {
-							AddressView(.address(.account(viewStore.address)), imageColor: .app.gray2)
+							AddressView(.address(.account(viewStore.address)), imageColor: .secondaryText)
 						}
 
 						if let domain = viewStore.domain {

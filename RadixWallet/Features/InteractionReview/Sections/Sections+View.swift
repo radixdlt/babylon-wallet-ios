@@ -204,7 +204,7 @@ extension InteractionReview.Sections {
 
 				Text(L10n.InteractionReview.possibleDappCalls)
 					.textStyle(.body2HighImportance)
-					.foregroundStyle(.app.gray2)
+					.foregroundStyle(.secondaryText)
 					.padding(.leading, .small2)
 
 				Spacer()

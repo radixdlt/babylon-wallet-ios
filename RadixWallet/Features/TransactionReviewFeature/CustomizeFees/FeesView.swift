@@ -27,7 +27,7 @@ struct FeesView: View {
 					feeView(state: viewState)
 				}
 
-				Divider()
+				Separator()
 
 				transactionFeeView(fee: viewState.totalFee.formatted(), isAdvancedMode: viewState.isAdvancedMode)
 			}
@@ -67,7 +67,7 @@ struct FeesView: View {
 			Spacer()
 			Text(state.amount.formatted(showsZero: state.isUserConfigurable))
 				.textStyle(.body1HighImportance)
-				.foregroundColor(state.amount == .zero ? .app.gray2 : .primaryText)
+				.foregroundColor(state.amount == .zero ? .secondaryText : .primaryText)
 		}
 	}
 }

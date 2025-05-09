@@ -29,7 +29,7 @@ extension P2PLinksFeature {
 					VStack(alignment: .leading, spacing: .medium3) {
 						Text(L10n.LinkedConnectors.subtitle)
 							.textStyle(.body1Header)
-							.foregroundStyle(.app.gray2)
+							.foregroundStyle(.secondaryText)
 							.padding(.horizontal, .medium3)
 
 						VStack(spacing: .zero) {

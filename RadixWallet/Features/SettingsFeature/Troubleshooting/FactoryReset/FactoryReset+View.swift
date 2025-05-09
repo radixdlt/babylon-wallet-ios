@@ -59,7 +59,7 @@ extension FactoryReset.View {
 			disclosure
 		}
 		.cornerRadius(.small1)
-		.shadow(color: .app.gray2.opacity(0.26), radius: .medium3, x: 0, y: 6)
+		.shadow(color: .secondaryText.opacity(0.26), radius: .medium3, x: 0, y: 6)
 	}
 
 	private func status() -> some View {

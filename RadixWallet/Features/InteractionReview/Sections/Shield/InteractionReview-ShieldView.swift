@@ -47,7 +47,7 @@ extension InteractionReview {
 				}
 				.padding(.horizontal, .medium1)
 				.padding(.vertical, .small1)
-				.roundedCorners(.top, strokeColor: .borderColor, radius: .small1)
+				.roundedCorners(.top, strokeColor: .border, radius: .small1)
 			}
 		}
 
@@ -201,7 +201,7 @@ extension InteractionReview {
 					.padding(.horizontal, .medium3)
 					.padding(.vertical, .medium3)
 					.background(.primaryBackground)
-					.roundedCorners(strokeColor: .borderColor, radius: .small2)
+					.roundedCorners(strokeColor: .border, radius: .small2)
 			}
 			.padding(.medium3)
 			.background(.app.lightError)

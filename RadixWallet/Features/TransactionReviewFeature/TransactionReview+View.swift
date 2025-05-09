@@ -67,7 +67,7 @@ extension TransactionReview {
 		private let navTitleID: String = "TransactionReview.title"
 		private let showTitleHysteresis: CGFloat = .small3
 
-		private let shadowColor: Color = .app.gray2.opacity(0.4)
+		private let shadowColor: Color = .secondaryBackground.opacity(0.4)
 
 		init(store: StoreOf<TransactionReview>) {
 			self.store = store
@@ -151,9 +151,9 @@ extension TransactionReview {
 					.frame(maxWidth: .infinity)
 					.padding(.vertical, .large3)
 					.padding(.horizontal, .large2)
-//					.background {
-//						JaggedEdge(shadowColor: shadowColor, isTopEdge: false)
-//					}
+					.background {
+						JaggedEdge(shadowColor: shadowColor, isTopEdge: false)
+					}
 				}
 				.background(.secondaryBackground)
 //				.background(Common.gradientBackground)

@@ -3,6 +3,7 @@ import SwiftUI
 
 // MARK: - FactorSourceCard
 struct FactorSourceCard: View {
+	@Environment(\.colorScheme) private var colorScheme
 	private let kind: Kind
 	private let mode: Mode
 	private let dataSource: FactorSourceCardDataSource
@@ -24,7 +25,7 @@ struct FactorSourceCard: View {
 					Image(asset: AssetResource.close)
 						.frame(.smallest)
 				}
-				.foregroundColor(Color.secondaryText)
+				.foregroundColor(.secondaryText)
 			}
 		}
 	}
@@ -63,7 +64,7 @@ struct FactorSourceCard: View {
 		}
 		.background(Color.primaryBackground)
 		.roundedCorners(radius: .small1)
-		// .cardShadow
+		.cardShadow
 		.animation(.default, value: dataSource.messages.count)
 	}
 
@@ -76,22 +77,22 @@ struct FactorSourceCard: View {
 			VStack(alignment: .leading, spacing: .small3) {
 				Text(dataSource.title)
 					.textStyle(.body1Header)
-					.foregroundStyle(Color.primaryText)
+					.foregroundStyle(.primaryText)
 
 				if let subtitle = dataSource.subtitle {
 					Text(subtitle)
 						.textStyle(.body2Regular)
-						.foregroundStyle(Color.secondaryText)
+						.foregroundStyle(.secondaryText)
 				}
 
 				if let lastUsedOn = dataSource.lastUsedOn {
 					Text(
 						markdown: L10n.FactorSources.Card.lastUsed(RadixDateFormatter.string(from: lastUsedOn, dateStyle: .long)),
-						emphasizedColor: Color.secondaryText,
+						emphasizedColor: .secondaryText,
 						emphasizedFont: .app.body2Link
 					)
 					.textStyle(.body2Regular)
-					.foregroundStyle(Color.secondaryText)
+					.foregroundStyle(.secondaryText)
 				}
 			}
 			.flushedLeft
@@ -100,11 +101,14 @@ struct FactorSourceCard: View {
 				switch type {
 				case .radioButton:
 					RadioButton(
-						appearance: .dark,
+						appearance: colorScheme == .light ? .dark : .light,
 						isSelected: isSelected
 					)
 				case .checkmark:
-					CheckmarkView(appearance: .dark, isChecked: isSelected)
+					CheckmarkView(
+						appearance: colorScheme == .light ? .dark : .light,
+						isChecked: isSelected
+					)
 				}
 			}
 		}
@@ -124,7 +128,7 @@ struct FactorSourceCard: View {
 					HStack(spacing: .zero) {
 						Text(linkedTitle)
 							.textStyle(.body2Regular)
-							.foregroundStyle(Color.secondaryText)
+							.foregroundStyle(.secondaryText)
 
 						Spacer(minLength: 0)
 
@@ -154,10 +158,10 @@ struct FactorSourceCard: View {
 						if dataSource.hasHiddenEntities {
 							Text(L10n.Common.hiddenAccountsOrPersonas)
 								.textStyle(.body1HighImportance)
-								.foregroundStyle(Color.secondaryText)
+								.foregroundStyle(.secondaryText)
 								.frame(maxWidth: .infinity)
 								.padding(.small1)
-								.background(Color.secondaryText)
+								.background(.primaryBackground)
 								.cornerRadius(.small1)
 						}
 					}
@@ -165,7 +169,7 @@ struct FactorSourceCard: View {
 			}
 			.padding(.horizontal, .medium3)
 			.padding(.vertical, .small1)
-			.background(Color.tertiaryBackground)
+			.background(.tertiaryBackground)
 		}
 
 		private var linkedTitle: String {

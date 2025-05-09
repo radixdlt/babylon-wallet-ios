@@ -20,12 +20,10 @@ extension ReceivingAccount.View {
 		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 			VStack(alignment: .leading, spacing: .zero) {
 				account(viewStore)
-				Divider()
-					.frame(height: 1)
-					.background(Color.borderColor)
+				Separator()
 				assets(viewStore)
 			}
-			.roundedCorners(strokeColor: .borderColor)
+			.roundedCorners(strokeColor: .border)
 		}
 	}
 

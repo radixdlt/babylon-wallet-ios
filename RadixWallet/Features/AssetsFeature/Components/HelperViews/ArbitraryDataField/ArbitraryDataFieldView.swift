@@ -35,7 +35,7 @@ struct ArbitraryDataFieldView: View {
 
 		case let .address(address):
 			KeyValueView(axis: address.axis, key: field.name, isLocked: field.isLocked) {
-				AddressView(.address(address), imageColor: .app.gray2)
+				AddressView(.address(address), imageColor: .secondaryText)
 			}
 
 		case let .decimal(value):

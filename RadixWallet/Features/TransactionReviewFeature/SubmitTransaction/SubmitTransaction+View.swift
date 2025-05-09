@@ -89,8 +89,8 @@ extension SubmitTransaction {
 							.padding(.horizontal, .medium2)
 							.padding(.top, .medium3)
 
-						AddressView(.transaction(viewStore.txID), imageColor: .app.gray2)
-							.foregroundColor(.app.blue1)
+						AddressView(.transaction(viewStore.txID), imageColor: .secondaryText)
+							.foregroundColor(.textButton)
 							.textStyle(.body1Header)
 							.padding(.horizontal, .medium2)
 							.padding(.top, .small2)
@@ -108,6 +108,7 @@ extension SubmitTransaction {
 					}
 					.frame(maxWidth: .infinity)
 				}
+				.background(.primaryBackground)
 				.onFirstTask { @MainActor in
 					viewStore.send(.appeared)
 				}

@@ -38,7 +38,7 @@ struct ToggleView: SwiftUI.View {
 			}
 		)
 		.frame(maxWidth: .infinity, minHeight: minHeight)
-		.tint(Color.primaryText)
+		.tint(.toggleActive)
 	}
 }
 

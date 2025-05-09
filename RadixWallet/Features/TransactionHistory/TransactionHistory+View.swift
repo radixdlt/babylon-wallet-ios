@@ -60,7 +60,7 @@ extension TransactionHistory {
 						if viewStore.showEmptyState {
 							Text(L10n.TransactionHistory.noTransactions)
 								.textStyle(.sectionHeader)
-								.foregroundStyle(.app.gray2)
+								.foregroundStyle(.secondaryText)
 						}
 					}
 					.background(.secondaryBackground)

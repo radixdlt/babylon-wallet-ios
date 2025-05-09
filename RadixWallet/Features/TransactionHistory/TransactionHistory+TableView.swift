@@ -202,7 +202,7 @@ extension TransactionHistory {
 		var body: some SwiftUI.View {
 			Text(title)
 				.textStyle(.body2Header)
-				.foregroundStyle(.app.gray2)
+				.foregroundStyle(.secondaryText)
 				.padding(.horizontal, .medium3)
 				.padding(.vertical, .small2)
 				.frame(maxWidth: .infinity, alignment: .leading)
@@ -218,7 +218,7 @@ extension TransactionHistory {
 		}
 
 		var body: some SwiftUI.View {
-			Card(.primaryBackground) {
+			Card {
 				VStack(spacing: 0) {
 					if let message = transaction.message, !message.isEmpty {
 						MessageView(message: message)

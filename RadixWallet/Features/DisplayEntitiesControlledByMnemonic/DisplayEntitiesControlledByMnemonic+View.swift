@@ -33,7 +33,7 @@ extension DisplayEntitiesControlledByMnemonic {
 			let type: HeadingType
 			let isError: Bool
 			var foregroundColor: Color {
-				isError ? .app.gray2 : .primaryText
+				isError ? .secondaryText : .primaryText
 			}
 
 			enum HeadingType: Equatable {

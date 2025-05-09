@@ -43,7 +43,7 @@ struct ResourceBalancesView: View {
 					}
 			}
 		}
-		.roundedCorners(strokeColor: .app.gray3)
+		.roundedCorners(strokeColor: .border)
 	}
 
 	private let dividerHeight: CGFloat = 1

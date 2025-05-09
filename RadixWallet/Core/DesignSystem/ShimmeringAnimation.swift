@@ -72,8 +72,8 @@ extension ShimmerModifier.Config {
 		opacity: 0.5,
 		gradient: Gradient(stops: [
 			.init(color: .clear, location: 0),
-			.init(color: .white, location: 0.33),
-			.init(color: .white, location: 0.66),
+			.init(color: .primaryBackground, location: 0.33),
+			.init(color: .primaryBackground, location: 0.66),
 			.init(color: .clear, location: 1),
 		]),
 		duration: 2

@@ -109,7 +109,7 @@ extension SelectBackup.View {
 	private func failureBox(message: String) -> some View {
 		Text(message)
 			.textStyle(.body1Regular)
-			.foregroundStyle(.app.gray2)
+			.foregroundStyle(.secondaryText)
 			.padding(.vertical, .large1)
 			.padding(.horizontal, .large2)
 			.frame(maxWidth: .infinity)
@@ -153,7 +153,7 @@ extension SelectBackup.View {
 			HStack(spacing: .zero) {
 				VStack(alignment: .leading, spacing: .small3) {
 					ForEachStatic(values) {
-						Text(markdown: $0, emphasizedColor: .app.gray2, emphasizedFont: .app.body2Link)
+						Text(markdown: $0, emphasizedColor: .secondaryText, emphasizedFont: .app.body2Link)
 					}
 					.foregroundColor(.secondaryText)
 					.textStyle(.body2Regular)

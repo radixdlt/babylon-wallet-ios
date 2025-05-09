@@ -210,11 +210,11 @@ struct PlainListRowCore: View {
 			}
 
 			if let markdown = viewState.markdown {
-				Text(markdown: markdown, emphasizedColor: .app.gray2, emphasizedFont: .app.body1Header)
+				Text(markdown: markdown, emphasizedColor: .secondaryText, emphasizedFont: .app.body1Header)
 					.textStyle(.body1Regular)
 					.lineLimit(1)
 					.minimumScaleFactor(0.8)
-					.foregroundStyle(.app.gray2)
+					.foregroundStyle(.secondaryText)
 					.padding(.top, .small3)
 			}
 		}

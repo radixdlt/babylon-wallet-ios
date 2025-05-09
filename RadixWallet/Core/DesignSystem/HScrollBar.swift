@@ -20,7 +20,7 @@ struct HScrollBar<Item: ScrollBarItem>: View {
 							selection = item.id
 						} label: {
 							Text(item.caption.localizedUppercase)
-								.foregroundStyle(isSelected ? .primaryText : .app.gray2)
+								.foregroundStyle(isSelected ? .primaryText : .secondaryText)
 						}
 						.padding(.horizontal, .medium3)
 						.padding(.vertical, .small2)

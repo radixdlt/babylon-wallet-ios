@@ -62,7 +62,7 @@ extension TransactionReviewNetworkFee {
 							viewStore.send(.customizeTapped)
 						}
 						.textStyle(.body1StandaloneLink)
-						.foregroundColor(.app.blue2)
+						.foregroundColor(.textButton)
 						.padding(.top, .small2)
 					}
 				}

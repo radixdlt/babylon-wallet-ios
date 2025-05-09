@@ -72,7 +72,7 @@ extension CustomizeFees {
 						VStack(spacing: .zero) {
 							VStack {
 								infoView(viewStore.state)
-								Divider()
+								Separator()
 								feePayerView(viewStore.state)
 									.padding(.top, .small1)
 							}
@@ -100,11 +100,11 @@ extension CustomizeFees {
 						Button(viewStore.modeSwitchTitle) {
 							viewStore.send(.toggleMode)
 						}
-						.textStyle(.body1StandaloneLink)
-						.foregroundColor(.app.blue2)
+						.buttonStyle(.blueText)
 						.padding(.bottom, .medium1)
 					}
 				}
+				.background(.primaryBackground)
 				.withNavigationBar {
 					store.send(.view(.closeButtonTapped))
 				}
@@ -145,8 +145,7 @@ extension CustomizeFees {
 					Button(L10n.CustomizeNetworkFees.changeButtonTitle) {
 						store.send(.view(.changeFeePayerTapped))
 					}
-					.textStyle(.body1StandaloneLink)
-					.foregroundColor(.app.blue2)
+					.buttonStyle(.blueText)
 				}
 				if let feePayer = viewState.feePayer {
 					AccountCard(account: feePayer)

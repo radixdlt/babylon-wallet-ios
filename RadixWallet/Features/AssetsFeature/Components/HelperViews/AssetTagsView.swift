@@ -39,7 +39,7 @@ struct AssetTagView: View {
 		.padding(.horizontal, .small1)
 		.background {
 			Bullet()
-				.stroke(.app.gray4)
+				.stroke(.border)
 		}
 	}
 }

@@ -4,7 +4,7 @@ struct URLButtonStyle: ButtonStyle {
 		Label {
 			configuration.label
 				.textStyle(.body1HighImportance)
-				.foregroundColor(.app.blue2)
+				.foregroundColor(.textButton)
 		} icon: {
 			Image(asset: AssetResource.iconLinkOut)
 				.foregroundColor(.secondaryText)
