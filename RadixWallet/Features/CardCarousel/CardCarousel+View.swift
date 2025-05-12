@@ -95,7 +95,7 @@ struct CarouselCardView: View {
 				.background(alignment: .trailing) {
 					background
 				}
-				.background(Color.primaryBackground)
+				.background(.secondaryBackground)
 				.cornerRadius(.small1)
 			}
 
