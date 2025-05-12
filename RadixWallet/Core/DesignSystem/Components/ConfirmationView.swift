@@ -54,6 +54,7 @@ struct ConfirmationView: View {
 		.multilineTextAlignment(.center)
 		.padding(.horizontal, .medium1)
 		.padding(.bottom, .medium2)
+		.background(.primaryBackground)
 	}
 }
 

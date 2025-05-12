@@ -30,6 +30,7 @@ extension RecoverWalletControlWithBDFSComplete {
 					Spacer(minLength: 0)
 				}
 			}
+			.background(.primaryBackground)
 			.footer {
 				Button(L10n.RecoverWalletWithoutProfile.Complete.continueButton) {
 					store.send(.view(.continueButtonTapped))

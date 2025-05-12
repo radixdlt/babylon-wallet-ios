@@ -97,6 +97,7 @@ extension NewConnectionApproval {
 					.padding([.horizontal, .bottom], .medium1)
 				}
 				.padding(.top, .large2)
+				.background(.primaryBackground)
 				.controlState(viewStore.screenState)
 			}
 		}

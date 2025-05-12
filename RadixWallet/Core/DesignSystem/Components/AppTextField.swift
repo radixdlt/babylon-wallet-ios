@@ -208,9 +208,9 @@ struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory: View>
 		case .none, .info:
 			isFocused ? .textFieldFocusedBorder : .textFieldBorder
 		case .error:
-			.app.red1
+			.error
 		case .warning, .detail:
-			.alert
+			.warning
 		}
 	}
 }

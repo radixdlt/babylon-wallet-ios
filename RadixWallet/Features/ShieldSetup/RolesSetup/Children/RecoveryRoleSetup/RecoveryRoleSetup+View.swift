@@ -244,7 +244,7 @@ extension RecoveryRoleSetup {
 				.padding(.horizontal, .medium3)
 				.padding(.vertical, .small1)
 				.foregroundStyle(.app.white)
-				.background(.app.red1)
+				.background(.error)
 
 				VStack(spacing: .medium2) {
 					Text(
@@ -271,7 +271,7 @@ extension RecoveryRoleSetup {
 
 					Text(L10n.ShieldWizardRecovery.Fallback.note)
 						.textStyle(.body2HighImportance)
-						.foregroundStyle(.app.error)
+						.foregroundStyle(.error)
 						.flushedLeft
 				}
 				.padding([.horizontal, .bottom], .medium3)

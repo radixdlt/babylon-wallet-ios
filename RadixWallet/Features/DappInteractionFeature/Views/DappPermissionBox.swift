@@ -21,7 +21,7 @@ struct DappPermissionBox<Header: View, Content: View>: View {
 			}
 			content.frame(maxWidth: .infinity, alignment: .leading)
 		}
-		.background(.tertiaryBackground)
+		.background(.secondaryBackground)
 		.cornerRadius(.medium3)
 	}
 }

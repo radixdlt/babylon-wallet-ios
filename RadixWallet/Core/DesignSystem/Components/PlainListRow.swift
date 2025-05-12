@@ -97,7 +97,7 @@ struct PlainListRow<Icon: View, Accessory: View, Bottom: View>: View {
 			bottom
 		}
 		.applyIf(viewState.rowCoreViewState.shouldTintAsError) {
-			$0.foregroundStyle(Color.app.error)
+			$0.foregroundStyle(.error)
 		}
 		.padding(.vertical, viewState.rowCoreViewState.verticalPadding)
 		.padding(.horizontal, viewState.rowCoreViewState.horizontalPadding)
@@ -245,7 +245,7 @@ private extension PlainListRowCore.ViewState {
 		case .toggle, .hiddenPersona, .settings(isError: false), .dappAndPersona, .compactPersona:
 			Color.primaryText
 		case .settings(isError: true):
-			.app.error
+			.error
 		}
 	}
 
@@ -256,7 +256,7 @@ private extension PlainListRowCore.ViewState {
 		case .settings(isError: false), .dappAndPersona, .compactPersona:
 			Color.primaryText
 		case .settings(isError: true):
-			.app.error
+			.error
 		}
 	}
 

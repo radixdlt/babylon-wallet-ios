@@ -85,7 +85,7 @@ extension AddressDetails {
 				case .failure:
 					Text(L10n.AddressDetails.qrCodeFailure)
 						.textStyle(.body1HighImportance)
-						.foregroundColor(.alert)
+						.foregroundColor(.warning)
 				case .loading:
 					ProgressView()
 				case .idle:

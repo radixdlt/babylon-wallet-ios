@@ -98,7 +98,7 @@ extension SecurityCenter {
 					.foregroundStyle(.white)
 					.padding(.vertical, .small2)
 					.padding(.horizontal, .medium2)
-					.background(.alert)
+					.background(.warning)
 
 					HStack(spacing: 0) {
 						Text(problem.securityCenterBody)
@@ -109,10 +109,10 @@ extension SecurityCenter {
 
 						Image(.chevronRight)
 					}
-					.foregroundStyle(.alert)
+					.foregroundStyle(.warning)
 					.padding(.top, .small1)
 					.padding([.bottom, .horizontal], .medium2)
-					.background(.lightAlert)
+					.background(.warningSecondary)
 				}
 				.roundedCorners(radius: .small1)
 			}
@@ -149,7 +149,7 @@ extension SecurityCenter {
 							Text(status)
 								.textStyle(.body2HighImportance)
 						}
-						.foregroundStyle(actionRequired ? .alert : .app.green1)
+						.foregroundStyle(actionRequired ? .warning : .app.green1)
 					}
 
 					Spacer(minLength: .zero)

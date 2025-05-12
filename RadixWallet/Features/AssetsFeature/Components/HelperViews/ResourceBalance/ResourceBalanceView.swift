@@ -173,7 +173,7 @@ struct ResourceBalanceView: View {
 		if hasBorder {
 			core
 				.padding(.small1)
-				.roundedCorners(strokeColor: .app.gray3)
+				.roundedCorners(strokeColor: .border)
 		} else {
 			core
 		}
@@ -374,8 +374,8 @@ extension ResourceBalanceView {
 
 		private var background: Color {
 			switch appearance {
-			case .standalone: .white
-			case .transactionReview: .app.gray5
+			case .standalone: .primaryBackground
+			case .transactionReview: .secondaryBackground
 			}
 		}
 
@@ -434,7 +434,7 @@ extension ResourceBalanceView {
 						if case .readyToBeClaimed = kind, viewState.canClaimTokens {
 							let label = Text(L10n.Account.Staking.claim)
 								.textStyle(.body2Link)
-								.foregroundColor(.app.blue1)
+								.foregroundColor(.textButton)
 							if let onClaimAllTapped {
 								Button(action: onClaimAllTapped) { label }
 							} else {

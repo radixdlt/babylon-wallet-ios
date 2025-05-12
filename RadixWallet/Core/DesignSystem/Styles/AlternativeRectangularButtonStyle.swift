@@ -17,9 +17,7 @@ struct AlternativeRectangularButtonStyle: ButtonStyle {
 	}
 
 	var forgroundColor: Color {
-		controlState.isEnabled
-			? .app.blue2
-			: .app.gray4
+		.textButton
 	}
 }
 

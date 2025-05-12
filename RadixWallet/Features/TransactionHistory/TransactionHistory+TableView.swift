@@ -344,7 +344,7 @@ extension TransactionHistory {
 						.foregroundColor(.primaryText)
 						.flushedLeft
 						.padding(.small1)
-						.roundedCorners(strokeColor: .app.gray3)
+						.roundedCorners(strokeColor: .border)
 				}
 			}
 		}
@@ -362,10 +362,10 @@ extension TransactionHistory {
 
 						Spacer(minLength: 0)
 					}
-					.foregroundColor(.app.red1)
+					.foregroundColor(.error)
 					.padding(.horizontal, .small1)
 					.padding(.vertical, .medium3)
-					.roundedCorners(strokeColor: .app.gray3)
+					.roundedCorners(strokeColor: .border)
 				}
 			}
 		}
@@ -381,7 +381,7 @@ extension TransactionHistory {
 						.foregroundColor(.primaryText)
 						.flushedLeft
 						.padding(.small1)
-						.roundedCorners(strokeColor: .app.gray3)
+						.roundedCorners(strokeColor: .border)
 				}
 			}
 		}

@@ -101,7 +101,7 @@ extension LedgerHardwareWalletClient {
 						text: reason,
 						icon: .init(
 							kind: .asset(AssetResource.error),
-							foregroundColor: Color.app.red1
+							foregroundColor: .error
 						)
 					))
 				}
@@ -112,7 +112,7 @@ extension LedgerHardwareWalletClient {
 					text: L10n.LedgerHardwareDevices.Verification.requestFailed,
 					icon: .init(
 						kind: .asset(AssetResource.error),
-						foregroundColor: Color.app.red1
+						foregroundColor: .error
 					)
 				))
 			}

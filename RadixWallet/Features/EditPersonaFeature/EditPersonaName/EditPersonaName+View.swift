@@ -67,11 +67,11 @@ extension EditPersonaName {
 					.padding([.top, .bottom])
 					.padding([.leading, .trailing], 6)
 					.frame(height: .standardButtonHeight)
-					.background(.secondaryBackground)
+					.background(.textFieldBackground)
 					.cornerRadius(.small2)
 					.overlay(
 						RoundedRectangle(cornerRadius: .small2)
-							.stroke(.app.gray4, lineWidth: 1)
+							.stroke(.border, lineWidth: 1)
 					)
 				}
 			}

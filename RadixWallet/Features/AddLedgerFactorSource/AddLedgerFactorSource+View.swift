@@ -31,6 +31,7 @@ extension AddLedgerFactorSource {
 						.padding(.horizontal, .medium3)
 						.padding(.bottom, .large2)
 					}
+					.background(.primaryBackground)
 					.toolbar {
 						ToolbarItem(placement: .cancellationAction) {
 							CloseButton {

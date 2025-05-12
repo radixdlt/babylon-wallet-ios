@@ -36,9 +36,7 @@ struct ResourceBalancesView: View {
 					.padding(.bottom, isNotLast ? dividerHeight : 0)
 					.overlay(alignment: .bottom) {
 						if isNotLast {
-							Rectangle()
-								.fill(.app.gray3)
-								.frame(height: dividerHeight)
+							Separator()
 						}
 					}
 			}

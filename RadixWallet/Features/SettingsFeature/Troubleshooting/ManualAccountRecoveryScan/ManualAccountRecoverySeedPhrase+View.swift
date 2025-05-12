@@ -59,6 +59,7 @@ extension ManualAccountRecoverySeedPhrase.View {
 			.foregroundStyle(.primaryText)
 			.padding(.bottom, .medium3)
 		}
+		.background(.secondaryBackground)
 		.footer {
 			WithViewStore(store, observe: \.selected) { viewStore in
 				WithControlRequirements(viewStore.state) { selection in
@@ -120,7 +121,7 @@ private extension ManualAccountRecoverySeedPhrase.View {
 		)
 
 		return Selection(binding, from: viewStore.deviceFactorSources) { item in
-			Card(.app.gray5) {
+			Card {
 				viewStore.send(.selected(item.value))
 			} contents: {
 				DisplayEntitiesControlledByMnemonic.MnemonicView(

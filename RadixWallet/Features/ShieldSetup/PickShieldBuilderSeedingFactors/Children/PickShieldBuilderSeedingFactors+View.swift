@@ -77,7 +77,7 @@ extension PickShieldBuilderSeedingFactors {
 								if item.value.factorSourceKind == .password, store.shouldShowPasswordMessage {
 									Text(L10n.ShieldSetupStatus.factorCannotBeUsedByItself)
 										.textStyle(.body2Regular)
-										.foregroundStyle(.alert)
+										.foregroundStyle(.warning)
 										.padding(.top, .small3)
 								}
 							}

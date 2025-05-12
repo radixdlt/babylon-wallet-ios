@@ -58,6 +58,7 @@ struct StakeSummaryView: View {
 		.padding(.leading, .medium3)
 		.padding(.vertical, .medium2)
 		.padding(.trailing, .medium1)
+		.background(.primaryBackground)
 	}
 }
 

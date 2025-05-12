@@ -91,7 +91,7 @@ extension Text {
 	/// A url
 	var urlLink: some View {
 		textStyle(.body1HighImportance)
-			.foregroundColor(.app.blue2)
+			.foregroundColor(.textButton)
 	}
 }
 

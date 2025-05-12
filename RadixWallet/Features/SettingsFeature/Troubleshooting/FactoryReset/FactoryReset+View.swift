@@ -59,7 +59,7 @@ extension FactoryReset.View {
 			disclosure
 		}
 		.cornerRadius(.small1)
-		.shadow(color: .secondaryText.opacity(0.26), radius: .medium3, x: 0, y: 6)
+		.shadow(color: .shadow.opacity(0.26), radius: .medium3, x: 0, y: 6)
 	}
 
 	private func status() -> some View {
@@ -79,13 +79,13 @@ extension FactoryReset.View {
 				.padding(.horizontal, .medium2)
 				.padding(.vertical, .small2)
 				.frame(maxWidth: .infinity)
-				.background(isRecoverable ? .app.green2 : .alert)
+				.background(isRecoverable ? .app.green2 : .warning)
 				.cornerRadius(.small1)
 
 				if !isRecoverable {
 					Text(L10n.FactoryReset.Unrecoverable.message)
 						.textStyle(.body1Link)
-						.foregroundColor(.alert)
+						.foregroundColor(.warning)
 				}
 			}
 		}
@@ -100,7 +100,7 @@ extension FactoryReset.View {
 		.foregroundColor(.primaryText)
 		.padding(.medium2)
 		.frame(maxWidth: .infinity)
-		.background(.secondaryBackground)
+		.background(.tertiaryBackground)
 	}
 
 	private var resetWallet: some View {

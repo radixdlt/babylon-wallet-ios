@@ -107,8 +107,8 @@ extension SubmitTransaction {
 						}
 					}
 					.frame(maxWidth: .infinity)
+					.background(.primaryBackground)
 				}
-				.background(.primaryBackground)
 				.onFirstTask { @MainActor in
 					viewStore.send(.appeared)
 				}

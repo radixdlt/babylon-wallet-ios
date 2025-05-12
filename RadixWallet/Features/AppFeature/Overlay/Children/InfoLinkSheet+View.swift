@@ -55,7 +55,7 @@ extension InfoLinkSheet {
 						.padding(.vertical, .small2)
 						.id(scrollViewTopID)
 					}
-					.background(.secondaryBackground)
+					.background(.primaryBackground)
 					.coordinateSpace(name: coordSpace)
 					.animation(.default.speed(2), value: viewStore.text)
 					.onChange(of: viewStore.text) { _ in

@@ -96,6 +96,7 @@ extension DisplayEntitiesControlledByMnemonic {
 	}
 
 	struct MnemonicView: SwiftUI.View {
+		@Environment(\.colorScheme) private var colorScheme
 		let viewState: ViewState
 		let action: () -> Void
 
@@ -171,7 +172,10 @@ extension DisplayEntitiesControlledByMnemonic {
 					Image(.chevronRight)
 						.foregroundColor(headingState.foregroundColor)
 				case let .scanning(isSelected):
-					RadioButton(appearance: .dark, isSelected: isSelected)
+					RadioButton(
+						appearance: colorScheme == .light ? .dark : .light,
+						isSelected: isSelected
+					)
 				}
 			}
 		}

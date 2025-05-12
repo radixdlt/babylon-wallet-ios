@@ -44,6 +44,7 @@ extension NameLedgerFactorSource {
 							.padding(.bottom, .small1)
 						}
 					}
+					.background(.primaryBackground)
 					.foregroundColor(.primaryText)
 					.footer {
 						Button(L10n.AddLedgerDevice.NameLedger.continueButtonTitle) {

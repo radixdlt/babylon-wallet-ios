@@ -73,9 +73,9 @@ private extension Hint {
 		case .info:
 			.secondaryText
 		case .error:
-			.app.red1
+			.error
 		case .warning, .detail:
-			.alert
+			.warning
 		}
 	}
 

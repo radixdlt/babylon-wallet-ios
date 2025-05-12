@@ -41,7 +41,7 @@ extension SecondaryRectangularButtonStyle {
 	private var foregroundColor: Color {
 		switch controlState {
 		case .enabled:
-			isDestructive ? .app.red1 : .primaryText
+			isDestructive ? .error : .primaryText
 		case .loading:
 			.clear
 		case .disabled:

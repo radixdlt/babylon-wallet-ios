@@ -144,10 +144,10 @@ extension ConfigurationBackup {
 
 					Spacer(minLength: 0)
 				}
-				.foregroundStyle(.alert)
+				.foregroundStyle(.warning)
 				.padding(.vertical, .small1)
 				.padding(.horizontal, .medium3)
-				.background(.lightAlert)
+				.background(.warningSecondary)
 				.roundedCorners(radius: .small1)
 			}
 		}
@@ -181,6 +181,7 @@ extension ConfigurationBackup {
 									}
 								}
 							}
+							.tint(.toggleActive)
 						}
 						.padding(.top, .medium2)
 
@@ -210,7 +211,7 @@ extension ConfigurationBackup {
 								.multilineTextAlignment(.leading)
 								.lineSpacing(0)
 								.textStyle(.body1Link)
-								.foregroundStyle(.app.red1)
+								.foregroundStyle(.error)
 
 							Spacer(minLength: .small2)
 
@@ -239,7 +240,7 @@ extension ConfigurationBackup {
 						}
 					} label: {
 						HStack(spacing: .zero) {
-							let style: Color = actionRequired ? .alert : .app.green1
+							let style: Color = actionRequired ? .warning : .app.green1
 							Image(actionRequired ? .error : .checkCircle)
 								.padding(.trailing, .small3)
 								.foregroundStyle(style)

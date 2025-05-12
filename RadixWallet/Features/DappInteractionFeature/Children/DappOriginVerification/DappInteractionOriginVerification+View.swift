@@ -53,7 +53,7 @@ extension DappInteractionOriginVerification {
 				infoPointView(2, info: L10n.MobileConnect.linkBody2)
 			}
 			.padding()
-			.background(.tertiaryBackground)
+			.background(.secondaryBackground)
 			.roundedCorners(radius: 10)
 		}
 

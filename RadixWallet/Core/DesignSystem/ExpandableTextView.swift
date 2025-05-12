@@ -64,7 +64,7 @@ struct ExpandableTextView: View {
 						Text(isExpanded ? L10n.Common.showLess : L10n.Common.showMore)
 							.textStyle(.body2Regular)
 							.bold()
-							.foregroundColor(.app.blue2)
+							.foregroundColor(.textButton)
 					}
 				}
 			}

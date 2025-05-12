@@ -98,9 +98,7 @@ extension NonFungibleAssetList.Row.View {
 		} successContent: { asset in
 			let isDisabled = viewStore.disabled.contains(asset.id)
 			VStack(spacing: .zero) {
-				Divider()
-					.frame(height: .assetDividerHeight)
-					.overlay(.secondaryBackground)
+				AssetListSeparator()
 
 				HStack {
 					NFTIDView(

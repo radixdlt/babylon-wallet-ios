@@ -98,6 +98,7 @@ extension AccountRecoveryScanInProgress {
 						}
 					}
 			}
+			.background(.primaryBackground)
 		}
 
 		@ViewBuilder

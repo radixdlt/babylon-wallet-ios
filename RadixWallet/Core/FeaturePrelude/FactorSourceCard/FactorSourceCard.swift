@@ -62,7 +62,7 @@ struct FactorSourceCard: View {
 				)
 			}
 		}
-		.background(Color.primaryBackground)
+		.background(.primaryBackground)
 		.roundedCorners(radius: .small1)
 		.cardShadow
 		.animation(.default, value: dataSource.messages.count)

@@ -84,7 +84,7 @@ extension PersonaRow {
 					}
 				}
 			}
-			.background(.primaryBackground)
+			.background(.secondaryBackground)
 			.cornerRadius(.small1)
 			.embedInButton(when: action)
 			.buttonStyle(.inert)

@@ -14,6 +14,7 @@ extension NewConnection {
 		var body: some SwiftUI.View {
 			NavigationStack {
 				ZStack {
+					Color.primaryBackground
 					root(for: store.scope(state: \.root, action: { .child(.root($0)) }))
 				}
 				.toolbar {
@@ -23,6 +24,7 @@ extension NewConnection {
 						}
 					}
 				}
+				.background(.primaryBackground)
 				.destination(with: store)
 			}
 			.tint(.primaryText)
@@ -40,7 +42,8 @@ extension NewConnection {
 						action: NewConnection.Root.Action.localNetworkPermission,
 						then: {
 							LocalNetworkPermission.View(store: $0)
-								.withTitle(L10n.LinkedConnectors.NewConnection.title)
+								// .withTitle(L10n.LinkedConnectors.NewConnection.title)
+								.background(.primaryBackground)
 						}
 					)
 				case .scanQR:
@@ -49,7 +52,8 @@ extension NewConnection {
 						action: NewConnection.Root.Action.scanQR,
 						then: {
 							ScanQRCoordinator.View(store: $0)
-								.withTitle(L10n.LinkedConnectors.NewConnection.title)
+								// .withTitle(L10n.LinkedConnectors.NewConnection.title)
+								.background(.primaryBackground)
 						}
 					)
 				case .connectionApproval:

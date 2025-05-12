@@ -27,7 +27,7 @@ extension PollPreAuthorizationStatus {
 
 								if let ledgerIdentifiable = viewStore.ledgerIdentifiable {
 									AddressView(ledgerIdentifiable)
-										.foregroundColor(.app.blue1)
+										.foregroundColor(.textButton)
 										.textStyle(.body1Header)
 								}
 							}

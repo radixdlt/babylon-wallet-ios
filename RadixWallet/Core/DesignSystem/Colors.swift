@@ -54,7 +54,6 @@ extension ShapeStyle where Self == Color {
 
 extension Color.App {
 	// blue
-	var blue1: Color { .init(hex: .blue1) }
 	var blue2: Color { .init(hex: .blue2) }
 	var blue3: Color { .init(hex: .blue3) }
 
@@ -79,10 +78,7 @@ extension Color.App {
 	var orange1: Color { .init(hex: .orange1) }
 	var orange2: Color { .init(hex: .orange2) }
 
-	var red1: Color { .init(hex: .error) }
-
 	// alert
-	var error: Color { .init(hex: .error) }
 	var lightError: Color { .init(hex: .lightError) }
 
 	var buttonTextBlack: Color { .black }

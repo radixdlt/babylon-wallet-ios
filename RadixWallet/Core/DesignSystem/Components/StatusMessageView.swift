@@ -52,9 +52,9 @@ struct StatusMessageView: View {
 	var color: Color {
 		switch type {
 		case .warning:
-			.alert
+			.warning
 		case .error:
-			.app.red1
+			.error
 		case .success:
 			.app.green1
 		}

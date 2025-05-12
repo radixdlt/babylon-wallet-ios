@@ -24,15 +24,15 @@ private struct LoadingOverlayView: View {
 					Text(text)
 						.lineLimit(nil)
 						.textStyle(.body1Regular)
-						.foregroundColor(.app.white)
+						.foregroundColor(.primaryText)
 						.multilineTextAlignment(.center)
 				}
 			}
 			.padding(.medium2)
 		}
 		.frame(minWidth: 180)
-		.background(Color.app.gray2.cornerRadius(.small1))
-		.frame(maxWidth: 240)
+		// .background(Color.tertiaryBackground.cornerRadius(.small1))
+		// .frame(maxWidth: 240)
 	}
 }
 

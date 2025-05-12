@@ -79,7 +79,7 @@ extension ImportMnemonicControllingAccounts {
 			Button(title) {
 				store.send(.view(.skipButtonTapped))
 			}
-			.foregroundColor(.app.blue2)
+			.foregroundColor(.textButton)
 			.font(.app.body1Header)
 			.frame(height: .standardButtonHeight)
 			.frame(maxWidth: .infinity)

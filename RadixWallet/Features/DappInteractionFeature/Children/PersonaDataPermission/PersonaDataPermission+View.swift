@@ -62,6 +62,7 @@ extension PersonaDataPermission {
 					}
 				}
 			}
+			.background(.primaryBackground)
 			.task {
 				store.send(.view(.task))
 			}

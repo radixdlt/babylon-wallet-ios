@@ -62,7 +62,7 @@ extension FungibleResourceAsset.View {
 					// TODO: Add better style
 					Text(L10n.AssetTransfer.FungibleResource.totalExceedsBalance)
 						.textStyle(.body2HighImportance)
-						.foregroundColor(.app.red1)
+						.foregroundColor(.error)
 				}
 
 				if focused {

@@ -93,6 +93,7 @@ extension StakeUnitList {
 					store.send(.view(.didTapClaimAll(forValidator: viewState.id)))
 				}
 			)
+			.background(.primaryBackground)
 		}
 
 		@ViewBuilder

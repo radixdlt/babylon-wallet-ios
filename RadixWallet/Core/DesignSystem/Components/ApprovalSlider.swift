@@ -36,7 +36,7 @@ struct ApprovalSlider: View {
 
 					if controlState.isDisabled {
 						if approved {
-							Color.app.gray4
+							Color.tertiaryBackground
 						}
 					} else {
 						Color.app.gradientPurple
@@ -57,7 +57,7 @@ struct ApprovalSlider: View {
 		}
 
 		private var background: Color {
-			controlState.isDisabled ? .app.gray4 : .gradientBlue2
+			controlState.isDisabled ? .tertiaryBackground : .gradientBlue2
 		}
 
 		private var textOpacity: CGFloat {

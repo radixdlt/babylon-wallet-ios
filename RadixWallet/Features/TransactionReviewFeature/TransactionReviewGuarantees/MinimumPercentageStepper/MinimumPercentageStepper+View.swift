@@ -83,7 +83,7 @@ extension MinimumPercentageStepper {
 
 		private let disabledOpacity: CGFloat = 0.2
 
-		private let transparentErrorRed: Color = .app.red1.opacity(0.6)
+		private let transparentErrorRed: Color = .error.opacity(0.6)
 
 		private let textFieldSize: CGSize = .init(width: 68, height: 48)
 	}

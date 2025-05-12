@@ -91,12 +91,9 @@ private extension View {
 	}
 
 	private func newConnection(with destinationStore: PresentationStoreOf<P2PLinksFeature.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /P2PLinksFeature.Destination.State.newConnection,
-			action: P2PLinksFeature.Destination.Action.newConnection,
-			content: { NewConnection.View(store: $0) }
-		)
+		sheet(store: destinationStore.scope(state: \.newConnection, action: \.newConnection)) {
+			NewConnection.View(store: $0)
+		}
 	}
 
 	private func confirmDeletionAlert(with destinationStore: PresentationStoreOf<P2PLinksFeature.Destination>) -> some View {
