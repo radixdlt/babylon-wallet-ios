@@ -41,7 +41,7 @@ extension ReceivingAccount.View {
 			if let account = viewStore.recipient {
 				AccountCard(kind: .display(addCornerRadius: false), account: account) {
 					removeAccountButton(viewStore)
-						.foregroundColor(.app.white)
+						.foregroundColor(.white)
 						.padding(.leading, .medium3)
 				}
 			} else {

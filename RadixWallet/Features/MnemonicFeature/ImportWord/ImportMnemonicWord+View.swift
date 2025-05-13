@@ -90,6 +90,7 @@ extension ImportMnemonicWord {
 							if viewStore.displayValidAccessory {
 								Image(asset: AssetResource.successCheckmark)
 									.resizable()
+									.darkModeTinted()
 									.frame(.smallest)
 							}
 						}

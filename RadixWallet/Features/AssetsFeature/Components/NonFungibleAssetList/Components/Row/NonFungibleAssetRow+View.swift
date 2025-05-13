@@ -7,6 +7,7 @@ extension NonFungibleAssetList.Row {
 
 	@MainActor
 	struct View: SwiftUI.View {
+		@Environment(\.colorScheme) private var colorScheme
 		private let store: StoreOf<NonFungibleAssetList.Row>
 
 		init(store: StoreOf<NonFungibleAssetList.Row>) {
@@ -107,7 +108,10 @@ extension NonFungibleAssetList.Row.View {
 						thumbnail: asset.data?.keyImageURL
 					)
 					if let selectedAssets = viewStore.selectedAssets {
-						CheckmarkView(appearance: .dark, isChecked: selectedAssets.contains(asset))
+						CheckmarkView(
+							appearance: colorScheme == .light ? .dark : .light,
+							isChecked: selectedAssets.contains(asset)
+						)
 					}
 				}
 				.opacity(isDisabled ? 0.35 : 1)

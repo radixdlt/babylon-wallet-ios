@@ -55,7 +55,6 @@ extension ShapeStyle where Self == Color {
 extension Color.App {
 	// blue
 	var blue2: Color { .init(hex: .blue2) }
-	var blue3: Color { .init(hex: .blue3) }
 
 	// green
 	var green1: Color { .init(hex: .green1) }
@@ -63,11 +62,7 @@ extension Color.App {
 	var green3: Color { .init(hex: .green3) }
 
 	// gray
-	var gray1: Color { .init(hex: .gray1) }
-	var gray2: Color { .init(hex: .gray2) }
 	var gray3: Color { .init(hex: .gray3) }
-	var gray4: Color { .init(hex: .gray4) }
-	var gray5: Color { .init(hex: .gray5) }
 
 	// white
 	var white: Color { .init(hex: .white) }
@@ -80,9 +75,6 @@ extension Color.App {
 
 	// alert
 	var lightError: Color { .init(hex: .lightError) }
-
-	var buttonTextBlack: Color { .black }
-	var buttonTextBlackTransparent: Color { .black.opacity(0.6) }
 
 	var shadowBlack: Color { .black.opacity(0.08) }
 
@@ -97,9 +89,7 @@ extension Color.App {
 extension Color {
 	fileprivate enum Hex: UInt32 {
 		// blue
-		case blue1 = 0x060F8F
 		case blue2 = 0x052CC0
-		case blue3 = 0x20E4FF
 
 		// green
 		case green1 = 0x00AB84
@@ -107,10 +97,8 @@ extension Color {
 		case green3 = 0x21FFBE
 
 		// gray
-		case gray1 = 0x003057
 		case gray2 = 0x8A8FA4
 		case gray3 = 0xCED0D6
-		case gray4 = 0xE2E5ED
 		case gray5 = 0xF4F5F9
 
 		// white

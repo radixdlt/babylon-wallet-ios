@@ -6,7 +6,7 @@ extension InteractionReview {
 	struct TransferLineView: View {
 		var body: some View {
 			VLine()
-				.stroke(.app.gray3, style: .interactionReview)
+				.stroke(.iconTertiary, style: .interactionReview)
 				.frame(width: 1)
 				.padding(.trailing, Common.transferLineTrailingPadding)
 				.padding(.top, -.medium1)

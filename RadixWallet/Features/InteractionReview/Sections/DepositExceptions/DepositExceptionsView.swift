@@ -34,7 +34,7 @@ extension InteractionReview {
 							ResourceChangeView(resource: change.resource, image: change.change.image, text: change.change.text)
 						}
 					}
-					.background(.app.gray4)
+					.background(.tertiaryBackground)
 				}
 			}
 

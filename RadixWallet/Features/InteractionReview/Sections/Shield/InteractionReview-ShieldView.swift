@@ -77,7 +77,7 @@ extension InteractionReview {
 				if let description {
 					Text(description)
 						.textStyle(.body2Regular)
-						.foregroundStyle(.app.gray2)
+						.foregroundStyle(.secondaryText)
 						.padding(.bottom, .small2)
 				}
 

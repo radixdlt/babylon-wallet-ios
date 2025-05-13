@@ -126,7 +126,7 @@ extension CompletionMigrateOlympiaAccountsToBabylon {
 				AddressView(.address(.account(account.address)))
 					.opacity(0.8)
 			}
-			.foregroundColor(.app.white)
+			.foregroundColor(.white)
 			.frame(maxWidth: .infinity)
 			.padding(.vertical, .medium1)
 			.background {

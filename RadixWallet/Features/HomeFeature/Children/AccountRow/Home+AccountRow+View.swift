@@ -278,7 +278,7 @@ extension Home.AccountRow.View {
 				.lineLimit(1)
 				.textStyle(.resourceLabel)
 				.fixedSize()
-				// .foregroundColor(.)
+				.foregroundColor(.white)
 				.padding(.horizontal, .small2)
 				.frame(minWidth: .medium1, minHeight: Constants.iconSize.rawValue)
 				.padding(.leading, Constants.diameter - Constants.borderWidth - (tighten ? .small3 : 0))

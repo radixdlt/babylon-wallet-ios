@@ -47,7 +47,7 @@ extension ShieldSetupOnboarding {
 				ForEach(0 ..< store.steps.count, id: \.self) { index in
 					let isSelected = store.selectedStepIndex == index
 					Capsule()
-						.fill(isSelected ? .app.blue2 : .app.gray4)
+						.fill(isSelected ? .app.blue2 : .tertiaryBackground)
 						.frame(.small2)
 				}
 			}

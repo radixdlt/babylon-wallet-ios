@@ -13,6 +13,7 @@ extension AddFactorSource {
 				Spacer()
 
 				Image(asset: AssetResource.successCheckmark)
+					.darkModeTinted()
 
 				Text(L10n.NewFactor.Success.title)
 					.foregroundColor(.primaryText)

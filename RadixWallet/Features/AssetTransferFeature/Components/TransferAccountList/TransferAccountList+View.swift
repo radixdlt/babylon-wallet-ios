@@ -34,7 +34,7 @@ extension TransferAccountList.View {
 					.frame(height: .dottedLineHeight, alignment: .bottom)
 					.background(alignment: .trailing) {
 						VLine()
-							.stroke(.app.gray3, style: .transfer)
+							.stroke(.iconTertiary, style: .transfer)
 							.frame(width: 1)
 							.padding(.trailing, .large1)
 					}

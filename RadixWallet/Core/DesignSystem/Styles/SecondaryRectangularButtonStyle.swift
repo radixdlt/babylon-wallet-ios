@@ -45,7 +45,7 @@ extension SecondaryRectangularButtonStyle {
 		case .loading:
 			.clear
 		case .disabled:
-			.app.gray3
+			.iconTertiary
 		}
 	}
 }

@@ -199,7 +199,7 @@ extension InteractionReview.Sections {
 				Image(.transactionReviewDapps)
 					.renderingMode(.template)
 					.resizable()
-					.foregroundStyle(.app.gray3)
+					.foregroundStyle(.iconTertiary)
 					.frame(.smallest)
 
 				Text(L10n.InteractionReview.possibleDappCalls)

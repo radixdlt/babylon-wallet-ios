@@ -227,7 +227,7 @@ extension PrimaryRoleSetup {
 				HStack {
 					Text(L10n.ShieldWizardRegularAccess.Override.title)
 						.textStyle(.body1Header)
-						.foregroundStyle(.app.white)
+						.foregroundStyle(.primaryText)
 
 					Spacer()
 
@@ -280,7 +280,7 @@ extension PrimaryRoleSetup {
 				}
 				.padding([.horizontal, .bottom], .medium3)
 				.padding(.top, .medium3)
-				.background(Color.containerContentBackground)
+				.background(.secondaryBackground)
 			}
 			.frame(maxWidth: .infinity)
 			.roundedCorners(radius: .small1)
@@ -344,7 +344,7 @@ extension View {
 	var embedInContainer: some View {
 		self
 			.padding(.medium3)
-			.background(Color.containerContentBackground)
+			.background(.secondaryBackground)
 			.roundedCorners(radius: .small1)
 	}
 }

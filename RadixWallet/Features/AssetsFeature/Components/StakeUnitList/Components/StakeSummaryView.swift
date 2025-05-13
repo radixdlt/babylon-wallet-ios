@@ -79,7 +79,7 @@ extension StakeSummaryView {
 			loadable(amount, loadingViewHeight: .small1) { amount in
 				VStack(alignment: .trailing, spacing: .zero) {
 					Text("\(amount.nominalAmount.formatted()) XRD")
-						.foregroundColor(amount.nominalAmount > 0 ? .primaryText : .app.gray3)
+						.foregroundColor(amount.nominalAmount > 0 ? .primaryText : .tertiaryText)
 					if !resourceBalanceHideFiatValue, let fiatWorth = amount.fiatWorth?.currencyFormatted(applyCustomFont: false) {
 						Text(fiatWorth)
 							.foregroundStyle(.secondaryText)

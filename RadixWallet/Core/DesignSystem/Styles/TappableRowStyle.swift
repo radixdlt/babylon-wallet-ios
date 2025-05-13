@@ -7,7 +7,7 @@ extension ButtonStyle where Self == TappableRowStyle {
 struct TappableRowStyle: ButtonStyle {
 	func makeBody(configuration: ButtonStyle.Configuration) -> some View {
 		configuration.label
-			.background(configuration.isPressed ? .app.gray4 : .app.white)
+			.background(configuration.isPressed ? .tertiaryBackground : .primaryBackground)
 	}
 }
 

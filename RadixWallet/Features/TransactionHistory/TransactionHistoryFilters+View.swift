@@ -261,7 +261,7 @@ struct TransactionFilterView: SwiftUI.View {
 				Button(asset: AssetResource.close) {
 					crossAction(filter.id)
 				}
-				.tint(.app.gray3)
+				.tint(.iconTertiary)
 				.padding(.vertical, -.small3)
 				.padding(.trailing, .small2)
 				.transition(.scale.combined(with: .opacity))

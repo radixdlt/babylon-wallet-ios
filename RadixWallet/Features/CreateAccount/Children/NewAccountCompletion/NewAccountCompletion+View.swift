@@ -101,7 +101,7 @@ private extension NewAccountCompletion.View {
 
 			VStack(spacing: .small2) {
 				Text(viewStore.entityName)
-					.foregroundColor(.app.white)
+					.foregroundColor(.white)
 					.textStyle(.body1Header)
 					.multilineTextAlignment(.center)
 

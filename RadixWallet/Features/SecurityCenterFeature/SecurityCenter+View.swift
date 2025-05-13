@@ -128,6 +128,7 @@ extension SecurityCenter {
 			Card(action: action) {
 				HStack(spacing: .zero) {
 					Image(image)
+						.darkModeTinted()
 						.frame(width: 80, height: 80)
 						.padding(.trailing, .medium3)
 

@@ -16,18 +16,18 @@ extension Gradient {
 	}
 
 	private static let colors: [[Color]] = [
-		[.gradientBlue2, .gradientGreen0],
-		[.gradientBlue2, .gradientPink1],
-		[.gradientBlue2, .gradientBlue3],
-		[.gradientGreen1, .gradientBlue2],
-		[.gradientAccount4Pink, .gradientBlue2],
-		[.gradientAccount5Blue, .gradientBlue2],
-		[.gradientGray1, .gradientAccount6Green],
-		[.gradientGray1, .gradientAccount7Pink],
-		[.gradientBlue2, .gradientGray1],
-		[.gradientAccount9Green1, .gradientAccount9Green2],
-		[.gradientAccount10Pink1, .gradientAccount10Pink2],
-		[.gradientAccount11Green, .gradientAccount11Blue1, .gradientAccount11Pink],
+		[Color.gradientBlue3, Color.gradientGreen4], // GradientAccount1
+		[Color.gradientBlue3, Color.gradientPink5], // GradientAccount2
+		[Color.gradientBlue3, Color.gradientBlue6], // GradientAccount3
+		[Color.gradientGreen1, Color.gradientBlue3], // GradientAccount4
+		[Color.gradientPink2, Color.gradientBlue3], // GradientAccount5
+		[Color.gradientBlue5, Color.gradientBlue3], // GradientAccount6
+		[Color.gradientBlue2, Color.gradientGreen3], // GradientAccount7
+		[Color.gradientBlue2, Color.gradientPink3], // GradientAccount8
+		[Color.gradientBlue3, Color.gradientBlue2], // GradientAccount9
+		[Color.gradientGreen2, Color.gradientGreen5], // GradientAccount10
+		[Color.gradientPink1, Color.gradientPink4], // GradientAccount11
+		[Color.gradientBlue1, Color.gradientBlue4], // GradientAccount12
 	]
 }
 

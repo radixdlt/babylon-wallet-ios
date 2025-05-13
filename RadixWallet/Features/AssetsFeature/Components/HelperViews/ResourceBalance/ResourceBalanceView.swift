@@ -460,7 +460,7 @@ extension ResourceBalanceView {
 							}
 							.disabled(onTap == nil)
 							.buttonStyle(.borderless)
-							.roundedCorners(strokeColor: .app.gray3)
+							.roundedCorners(strokeColor: .iconTertiary)
 						}
 					}
 				}
@@ -475,7 +475,7 @@ extension ResourceBalanceView {
 
 				Text("----")
 					.textStyle(.body2HighImportance)
-					.foregroundStyle(.app.gray4)
+					.foregroundStyle(.tertiaryBackground)
 
 				StatusMessageView(
 					text: L10n.InteractionReview.Unknown.deposits,
@@ -491,6 +491,7 @@ extension ResourceBalanceView {
 	// Helper Views
 
 	private struct FungibleView: View {
+		@Environment(\.colorScheme) private var colorScheme
 		let thumbnail: Thumbnail.FungibleContent
 		let caption1: String?
 		let caption2: String?
@@ -519,7 +520,10 @@ extension ResourceBalanceView {
 
 					if let isSelected {
 						Spacer(minLength: .small2)
-						CheckmarkView(appearance: .dark, isChecked: isSelected)
+						CheckmarkView(
+							appearance: colorScheme == .light ? .dark : .light,
+							isChecked: isSelected
+						)
 					}
 				}
 

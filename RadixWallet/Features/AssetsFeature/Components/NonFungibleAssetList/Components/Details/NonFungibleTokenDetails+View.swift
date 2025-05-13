@@ -173,7 +173,7 @@ extension NonFungibleTokenDetails.View {
 			)
 			.padding(.horizontal, .medium3)
 			.padding(.vertical, .medium2)
-			.roundedCorners(strokeColor: .app.gray4)
+			.roundedCorners(strokeColor: .border)
 
 			if stakeClaim.isReadyToBeClaimed, isClaimStakeEnabled {
 				Button(L10n.AssetDetails.Staking.readyToClaim, action: onClaimTap)

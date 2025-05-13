@@ -75,7 +75,7 @@ extension FactoryReset.View {
 						.lineLimit(1)
 					Spacer()
 				}
-				.foregroundColor(.app.white)
+				.foregroundColor(.white)
 				.padding(.horizontal, .medium2)
 				.padding(.vertical, .small2)
 				.frame(maxWidth: .infinity)

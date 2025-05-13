@@ -52,6 +52,7 @@ extension AddLedgerFactorSource {
 			VStack(spacing: .zero) {
 				Image(asset: AssetResource.iconHardwareLedger)
 					.resizable()
+					.darkModeTinted()
 					.frame(small ? .veryLarge : .huge)
 					.padding(.top, small ? .large3 : .huge2)
 					.padding(.bottom, small ? .large2 : .huge1)

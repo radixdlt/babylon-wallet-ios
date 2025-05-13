@@ -66,13 +66,14 @@ extension PollPreAuthorizationStatus {
 				Image(.errorLarge)
 			case .success:
 				Image(.successCheckmark)
+					.darkModeTinted()
 			}
 		}
 
 		private func unknownBottom(text: String) -> some SwiftUI.View {
-			Text(markdown: text, emphasizedColor: .gradientAccount4Pink, emphasizedFont: .app.button)
+			Text(markdown: text, emphasizedColor: .gradientPink4, emphasizedFont: .app.button)
 				.textStyle(.body1Regular)
-				.foregroundStyle(.gradientAccount4Pink)
+				.foregroundStyle(.gradientPink4)
 				.padding(.medium1)
 				.frame(maxWidth: .infinity)
 				.background(.secondaryBackground)

@@ -99,7 +99,7 @@ struct AccountView: View {
 
 				Text(value)
 					.textStyle(.body2Regular)
-					.foregroundColor(.app.gray4)
+					.foregroundColor(.tertiaryBackground)
 			}
 			.padding(.bottom, large ? .small3 : 0)
 		}

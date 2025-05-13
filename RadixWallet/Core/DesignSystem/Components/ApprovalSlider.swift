@@ -31,7 +31,7 @@ struct ApprovalSlider: View {
 
 					Text(title)
 						.textStyle(.body1Header)
-						.foregroundColor(controlState.isDisabled ? .app.gray3 : .white)
+						.foregroundColor(controlState.isDisabled ? .tertiaryText : .white)
 						.opacity(textOpacity)
 
 					if controlState.isDisabled {
@@ -57,7 +57,7 @@ struct ApprovalSlider: View {
 		}
 
 		private var background: Color {
-			controlState.isDisabled ? .tertiaryBackground : .gradientBlue2
+			controlState.isDisabled ? .tertiaryBackground : .button
 		}
 
 		private var textOpacity: CGFloat {
@@ -86,7 +86,7 @@ struct ApprovalSlider: View {
 
 		private func handle(for width: CGFloat) -> some View {
 			Circle()
-				.fill(controlState.isDisabled ? .app.gray3 : .white)
+				.fill(controlState.isDisabled ? .tertiaryText : .white)
 				.overlay {
 					if controlState.isLoading {
 						ProgressView()
@@ -107,7 +107,7 @@ struct ApprovalSlider: View {
 						}
 					}
 				}
-				.foregroundColor(controlState.isDisabled ? .app.gray4 : .app.blue2)
+				.foregroundColor(controlState.isDisabled ? .tertiaryBackground : .textButton)
 				.padding(padding)
 				.offset(x: (position - 0.5) * width)
 				.gesture(drag(width: width))
@@ -143,9 +143,9 @@ struct ApprovalSlider: View {
 
 private extension Gradient {
 	static let approvalSlider: Gradient = .init(stops: [
-		.init(color: .gradientAccount11Green, location: 0),
-		.init(color: .gradientBlue2, location: 0.41),
-		.init(color: .gradientPurple, location: 0.81),
-		.init(color: .gradientPurple.opacity(0), location: 1),
+		.init(color: .gradientGreen3, location: 0),
+		.init(color: .gradientBlue3, location: 0.41),
+		.init(color: .gradientPink3, location: 0.81),
+		.init(color: .gradientBlue3, location: 1),
 	])
 }

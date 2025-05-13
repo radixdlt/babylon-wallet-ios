@@ -75,6 +75,7 @@ extension LedgerHardwareDevices {
 						Group {
 							if viewStore.allowSelection {
 								Image(asset: AssetResource.iconHardwareLedger)
+									.darkModeTinted()
 									.frame(.medium)
 									.padding(.vertical, .medium2)
 

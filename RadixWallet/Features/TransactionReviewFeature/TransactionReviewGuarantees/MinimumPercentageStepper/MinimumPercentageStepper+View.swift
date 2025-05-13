@@ -70,7 +70,7 @@ extension MinimumPercentageStepper {
 							RoundedRectangle(cornerRadius: 8)
 								.fill(Color.tertiaryBackground)
 							RoundedRectangle(cornerRadius: 8)
-								.stroke(viewStore.isValid ? .app.gray4 : transparentErrorRed)
+								.stroke(viewStore.isValid ? .tertiaryBackground : transparentErrorRed)
 						}
 
 					Button(asset: AssetResource.plusCircle) {

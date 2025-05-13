@@ -243,7 +243,7 @@ extension RecoveryRoleSetup {
 				}
 				.padding(.horizontal, .medium3)
 				.padding(.vertical, .small1)
-				.foregroundStyle(.app.white)
+				.foregroundStyle(.primaryText)
 				.background(.error)
 
 				VStack(spacing: .medium2) {

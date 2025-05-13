@@ -53,7 +53,7 @@ struct ShieldCard: View {
 				Text(assignedEntitiesText)
 					.textStyle(.body2Regular)
 			}
-			.foregroundStyle(.app.gray2)
+			.foregroundStyle(.secondaryText)
 
 			if let statusMessage = shield.status.statusMessageInfo {
 				StatusMessageView(

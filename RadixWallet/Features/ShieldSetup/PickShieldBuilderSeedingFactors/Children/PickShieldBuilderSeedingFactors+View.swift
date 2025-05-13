@@ -81,7 +81,7 @@ extension PickShieldBuilderSeedingFactors {
 										.padding(.top, .small3)
 								}
 							}
-							.foregroundStyle(.app.gray2)
+							.foregroundStyle(.secondaryText)
 							.padding(.top, .medium3)
 							.flushedLeft
 						}

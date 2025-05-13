@@ -131,7 +131,7 @@ extension NPSSurvey.View {
 				.clipShape(Circle())
 				.overlay(
 					Circle()
-						.stroke(isSelected ? .primaryText : .app.gray3, lineWidth: 1)
+						.stroke(isSelected ? .primaryText : .iconTertiary, lineWidth: 1)
 				)
 		}
 	}

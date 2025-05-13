@@ -48,7 +48,7 @@ extension CardCarousel {
 					ForEach(0 ..< store.cards.count, id: \.self) { index in
 						let isSelected = selectedCardIndex == index
 						Capsule()
-							.fill(isSelected ? .app.gray2 : .app.gray4)
+							.fill(isSelected ? .iconSecondary : .iconTertiary)
 							.frame(isSelected ? spacing : .small3)
 					}
 				}
@@ -76,7 +76,7 @@ struct CarouselCardView: View {
 							Image(.iconLinkOut)
 								.resizable()
 								.frame(.icon)
-								.foregroundStyle(.app.gray2)
+								.foregroundStyle(.iconSecondary)
 						}
 					}
 

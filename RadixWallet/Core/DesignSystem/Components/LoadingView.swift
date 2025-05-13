@@ -39,13 +39,3 @@ extension LoadingView {
 		}
 	}
 }
-
-// MARK: - LoaderView_Previews
-struct LoaderView_Previews: PreviewProvider {
-	static var previews: some View {
-		ZStack {
-			Color.app.blue2
-			LoadingView()
-		}
-	}
-}

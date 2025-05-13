@@ -61,7 +61,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 								.padding(.horizontal, .large2)
 
 							ForEach(viewStore.usedLedgers) { ledger in
-								Card(.app.gray5) {
+								Card {
 									Text(ledger.hint.label)
 										.textStyle(.secondaryHeader)
 										.multilineTextAlignment(.leading)

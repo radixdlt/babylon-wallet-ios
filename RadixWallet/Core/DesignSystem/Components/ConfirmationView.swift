@@ -25,7 +25,7 @@ struct ConfirmationView: View {
 					.resizable()
 					.scaledToFit()
 					.frame(.small)
-					.foregroundColor(.app.gray3)
+					.foregroundColor(.iconTertiary)
 
 				Text(title)
 					.textStyle(.sheetTitle)

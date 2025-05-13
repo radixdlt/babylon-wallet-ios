@@ -36,7 +36,7 @@ extension Home {
 
 								TotalCurrencyWorthView(
 									state: .init(totalCurrencyWorth: fiatWorth),
-									backgroundColor: .app.gray4
+									backgroundColor: .tertiaryBackground
 								) {
 									viewStore.send(.view(.showFiatWorthToggled))
 								}

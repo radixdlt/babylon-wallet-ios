@@ -18,6 +18,7 @@ extension DappInteractionCompletion {
 						Spacer()
 
 						Image(asset: AssetResource.successCheckmark)
+							.darkModeTinted()
 
 						Text(L10n.DAppRequest.Completion.title)
 							.foregroundColor(.primaryText)

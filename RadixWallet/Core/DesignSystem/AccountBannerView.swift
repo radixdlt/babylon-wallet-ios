@@ -17,7 +17,7 @@ struct AccountBannerView: View {
 
 			Spacer()
 		}
-		.foregroundColor(.app.white)
+		.foregroundColor(.white)
 		.padding(.small1)
 		.background(.backgroundTransparent)
 		.cornerRadius(.small2)

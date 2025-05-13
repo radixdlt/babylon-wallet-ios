@@ -18,7 +18,7 @@ extension PrimaryTextButtonStyle {
 		if isEnabled {
 			isDestructive ? .error : Color.textButton
 		} else {
-			.app.gray3
+			.tertiaryText
 		}
 	}
 }

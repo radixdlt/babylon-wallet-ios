@@ -5,7 +5,7 @@ extension View {
 			.overlay {
 				Circle()
 					.stroke(style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
-					.foregroundColor(.app.gray3)
+					.foregroundColor(.iconTertiary)
 			}
 	}
 

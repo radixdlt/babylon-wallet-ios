@@ -26,7 +26,7 @@ extension FactorSourceAccess {
 		private var content: some SwiftUI.View {
 			VStack(spacing: .medium3) {
 				Image(.signingKey)
-					.foregroundColor(.app.gray3)
+					.foregroundColor(.iconTertiary)
 
 				VStack(spacing: .small2) {
 					Text(store.title)

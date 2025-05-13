@@ -90,7 +90,7 @@ struct SplashView: View {
 			}
 		}
 		.padding(.bottom, .medium1)
-		.foregroundColor(.app.white)
+		.foregroundColor(.white)
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.background(
 			Image(.splash)

@@ -65,8 +65,8 @@ extension PersonaDataPermissionBox {
 					Button(action: action) {
 						HStack(spacing: .medium2) {
 							Circle()
-								.strokeBorder(Color.app.gray3, lineWidth: 1)
-								.background(Circle().fill(Color.app.gray4))
+								.strokeBorder(.iconTertiary, lineWidth: 1)
+								.background(Circle().fill(Color.tertiaryBackground))
 								.frame(.small)
 							Text(viewStore.personaLabel)
 								.foregroundColor(.primaryText)

@@ -6,6 +6,8 @@ extension SelectBackup {
 
 	@MainActor
 	struct View: SwiftUI.View {
+		@Environment(\.colorScheme) private var colorScheme
+
 		private let store: StoreOf<SelectBackup>
 
 		init(store: StoreOf<SelectBackup>) {
@@ -169,7 +171,7 @@ extension SelectBackup.View {
 
 				if isVersionCompatible {
 					RadioButton(
-						appearance: .dark,
+						appearance: colorScheme == .light ? .dark : .light,
 						isSelected: item.isSelected
 					)
 				}
