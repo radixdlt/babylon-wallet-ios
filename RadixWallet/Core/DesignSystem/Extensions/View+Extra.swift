@@ -82,6 +82,7 @@ extension View {
 					.frame(minHeight: proxy.size.height)
 				}
 				.frame(width: proxy.size.width)
+				.background(.secondaryBackground)
 			}
 		}
 	}
