@@ -92,7 +92,7 @@ extension Home.AccountRow {
 								Text(fiatWorth.currencyFormatted())
 									.lineLimit(1)
 									.textStyle(.secondaryHeader)
-									.foregroundStyle(.app.white)
+									.foregroundStyle(.white)
 							}
 						}
 						.padding(.leading, .small1)

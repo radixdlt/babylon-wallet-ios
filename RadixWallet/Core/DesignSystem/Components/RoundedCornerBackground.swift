@@ -9,7 +9,7 @@ struct RoundedCornerBackground: View {
 
 	var body: some View {
 		Rectangle()
-			.fill(.app.white)
+			.fill(.white)
 			.padding(excludedEdges, cornerRadius)
 			.cornerRadius(cornerRadius)
 			.padding(excludedEdges, -cornerRadius)

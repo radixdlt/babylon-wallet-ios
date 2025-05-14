@@ -8,7 +8,7 @@ struct HeaderButtonStyle: ButtonStyle {
 		configuration.label
 			.textStyle(.body1Header)
 			.frame(maxWidth: .infinity)
-			.foregroundColor(.app.white)
+			.foregroundColor(.white)
 			.frame(height: .standardButtonHeight)
 			.background(.backgroundTransparent)
 			.cornerRadius(.large2)

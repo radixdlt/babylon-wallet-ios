@@ -96,7 +96,7 @@ extension RecoveryRoleSetup {
 				.padding(.horizontal, .medium2)
 				.padding(.bottom, .small3)
 
-				Separator(color: .app.gray3)
+				Separator()
 
 				confirmationSection
 					.padding(.horizontal, .medium2)

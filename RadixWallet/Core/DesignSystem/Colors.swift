@@ -1,46 +1,3 @@
-
-#if os(iOS)
-typealias PlatformSpecificColor = UIColor
-extension UIColor {
-	static func dynamic(
-		light lightModeColor: UIColor,
-		dark darkModeColor: UIColor
-	) -> UIColor {
-		UIColor { $0.userInterfaceStyle == .dark ? darkModeColor : lightModeColor }
-	}
-}
-
-#elseif os(macOS)
-typealias PlatformSpecificColor = NSColor
-extension NSColor {
-	static func dynamic(
-		light lightModeColor: NSColor,
-		dark darkModeColor: NSColor
-	) -> NSColor {
-		NSColor(name: nil, dynamicProvider: { $0.name == .darkAqua ? darkModeColor : lightModeColor })
-	}
-}
-#endif
-
-extension Color {
-	#if os(iOS)
-	static func dynamic(
-		light lightModeColor: UIColor,
-		dark darkModeColor: UIColor
-	) -> Color {
-		self.init(uiColor: .dynamic(light: lightModeColor, dark: darkModeColor))
-	}
-
-	#elseif os(macOS)
-	static func dynamic(
-		light lightModeColor: NSColor,
-		dark darkModeColor: NSColor
-	) -> Color {
-		self.init(nsColor: .dynamic(light: lightModeColor, dark: darkModeColor))
-	}
-	#endif
-}
-
 extension Color {
 	/// Namespace only
 	struct App { fileprivate init() {} }
@@ -53,32 +10,21 @@ extension ShapeStyle where Self == Color {
 }
 
 extension Color.App {
-	// blue
-	var blue2: Color { .init(hex: .blue2) }
-
 	// green
 	var green1: Color { .init(hex: .green1) }
 	var green2: Color { .init(hex: .green2) }
 	var green3: Color { .init(hex: .green3) }
 
-	// gray
-	var gray3: Color { .init(hex: .gray3) }
-
-	// white
-	var white: Color { .init(hex: .white) }
 	/// white with 0.8 opacity
 	var whiteTransparent: Color { .white.opacity(0.8) }
 
 	// orange
-	var orange1: Color { .init(hex: .orange1) }
 	var orange2: Color { .init(hex: .orange2) }
 
 	// alert
 	var lightError: Color { .init(hex: .lightError) }
 
 	var shadowBlack: Color { .black.opacity(0.08) }
-
-	var cardShadowBlack: Color { .black.opacity(0.15) }
 
 	// Approval gradient
 
@@ -88,31 +34,15 @@ extension Color.App {
 // MARK: - Color.Hex
 extension Color {
 	fileprivate enum Hex: UInt32 {
-		// blue
-		case blue2 = 0x052CC0
-
 		// green
 		case green1 = 0x00AB84
 		case green2 = 0x00C389
 		case green3 = 0x21FFBE
 
-		// gray
-		case gray2 = 0x8A8FA4
-		case gray3 = 0xCED0D6
-		case gray5 = 0xF4F5F9
-
-		// white
-		case white = 0xFFFFFF
-
 		// orange
-		case orange1 = 0xF2AD21
 		case orange2 = 0xEC633E
 
-		case error = 0xC82020
-
 		case lightError = 0xFCEBEB
-
-		case notification = 0xF81B1B
 	}
 }
 

@@ -117,7 +117,7 @@ extension PrimaryRoleSetup {
 						} label: {
 							Label(L10n.ShieldWizardRegularAccess.Override.button, asset: AssetResource.addAccount)
 								.font(.app.body1Header)
-								.foregroundColor(.app.blue2)
+								.foregroundColor(.textButton)
 								.padding([.vertical, .leading], .small2)
 						}
 						.flushedRight
@@ -126,7 +126,7 @@ extension PrimaryRoleSetup {
 				.padding(.horizontal, .medium2)
 				.padding(.bottom, .small3)
 
-				Separator(color: .app.gray3)
+				Separator()
 
 				authenticationSigningFactorView
 					.padding(.horizontal, .medium2)
@@ -213,7 +213,7 @@ extension PrimaryRoleSetup {
 							Image(.chevronDown)
 						}
 					}
-					.foregroundStyle(.app.blue2)
+					.foregroundStyle(.textButton)
 
 					Text(parts[1])
 				}

@@ -275,7 +275,7 @@ struct TransactionFilterView: SwiftUI.View {
 	}
 
 	private var textColor: Color {
-		filter.isActive ? .app.white : .primaryText
+		filter.isActive ? .white : .primaryText
 	}
 
 	struct Dummy: SwiftUI.View {
