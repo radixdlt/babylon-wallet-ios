@@ -26,13 +26,14 @@ extension NPSSurvey {
 							headerView()
 							scoreSelectionView()
 
-							Divider()
+							Separator()
 								.padding(.bottom, .medium1)
 
 							scoreReasonView()
 						}
 						.padding([.horizontal, .bottom], .large3)
 					}
+					.background(.primaryBackground)
 					.withNavigationBar {
 						store.send(.view(.closeButtonTapped))
 					}
@@ -125,13 +126,13 @@ extension NPSSurvey.View {
 		}) {
 			Text("\(score)")
 				.textStyle(.body1HighImportance)
-				.foregroundColor(isSelected ? .app.white : .primaryText)
+				.foregroundColor(isSelected ? .white : .primaryText)
 				.frame(.small)
-				.background(isSelected ? .primaryText : .clear)
+				.background(isSelected ? .chipBackground : .clear)
 				.clipShape(Circle())
 				.overlay(
 					Circle()
-						.stroke(isSelected ? .primaryText : .iconTertiary, lineWidth: 1)
+						.stroke(isSelected ? .chipBackground : .border, lineWidth: 1)
 				)
 		}
 	}

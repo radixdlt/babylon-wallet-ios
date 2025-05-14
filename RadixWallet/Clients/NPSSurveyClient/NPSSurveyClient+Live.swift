@@ -10,7 +10,7 @@ extension NPSSurveyClient: DependencyKey {
 	static var liveValue: NPSSurveyClient {
 		@Dependency(\.userDefaults) var userDefaults
 
-		let shouldAskForFeedbackSubject: AsyncCurrentValueSubject<Bool> = .init(false)
+		let shouldAskForFeedbackSubject: AsyncCurrentValueSubject<Bool> = .init(true)
 
 		return .init(
 			uploadUserFeedback: { feedback in

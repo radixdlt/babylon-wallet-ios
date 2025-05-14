@@ -3,6 +3,7 @@ extension AddressDetails {
 	@MainActor
 	struct View: SwiftUI.View {
 		@Perception.Bindable var store: StoreOf<AddressDetails>
+		@Environment(\.colorScheme) var colorScheme
 		@Environment(\.dismiss) var dismiss
 
 		init(store: StoreOf<AddressDetails>) {
@@ -202,7 +203,7 @@ private extension AddressDetails.View {
 	var enlargedView: some SwiftUI.View {
 		Text(enlargedText)
 			.textStyle(.enlarged)
-			.foregroundColor(.primaryText)
+			.foregroundColor(.primaryTextInverse)
 			.multilineTextAlignment(.center)
 			.padding(.small1)
 			.background(.primaryText.opacity(0.8))
@@ -223,7 +224,8 @@ private extension AddressDetails.View {
 	}
 
 	private var enlargedText: AttributedString {
-		let attributes = [NSAttributedString.Key.foregroundColor: UIColor(Color.app.green3)]
+		let color: Color = colorScheme == .light ? .app.green3 : .app.green1
+		let attributes = [NSAttributedString.Key.foregroundColor: UIColor(color)]
 		let result = NSMutableAttributedString()
 		for letter in store.address.address.unicodeScalars {
 			let isDigit = CharacterSet.decimalDigits.contains(letter)

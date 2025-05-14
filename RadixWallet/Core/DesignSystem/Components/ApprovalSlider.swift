@@ -86,7 +86,7 @@ struct ApprovalSlider: View {
 
 		private func handle(for width: CGFloat) -> some View {
 			Circle()
-				.fill(controlState.isDisabled ? .tertiaryText : .white)
+				.fill(controlState.isDisabled ? .tertiaryText : .primaryBackground)
 				.overlay {
 					if controlState.isLoading {
 						ProgressView()

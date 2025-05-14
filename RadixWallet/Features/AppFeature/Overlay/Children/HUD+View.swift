@@ -49,7 +49,7 @@ extension HUD {
 						Capsule()
 							.foregroundColor(.primaryBackground)
 							.shadow(
-								color: .primaryText.opacity(0.16),
+								color: .shadow.opacity(0.16),
 								radius: 12,
 								x: 0,
 								y: 5
