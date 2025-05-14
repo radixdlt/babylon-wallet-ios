@@ -21,7 +21,6 @@ struct WalletApp: SwiftUI.App {
 						#endif
 					}
 				)
-				.background(.primaryBackground)
 			} else {
 				Text("Running tests")
 			}

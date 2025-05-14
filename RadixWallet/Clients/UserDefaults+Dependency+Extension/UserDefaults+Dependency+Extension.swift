@@ -17,6 +17,7 @@ enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
 	case showRelinkConnectorsAfterProfileRestore
 	case homeCards
 	case appLockMessageShown
+	case preferredTheme
 
 	/// DO NOT CHANGE THIS KEY
 	case activeProfileID
@@ -260,6 +261,23 @@ extension UserDefaults.Dependency {
 
 	func setShareCrashReportsIsEnabled(_ value: Bool) {
 		set(value, forKey: Key.shareCrashReportsIsEnabled.rawValue)
+	}
+
+	func setPreferredTheme(_ theme: AppTheme) {
+		set(theme.rawValue, forKey: Key.preferredTheme.rawValue)
+	}
+
+	func getPreferredTheme() -> AppTheme {
+		integer(forKey: Key.preferredTheme.rawValue).flatMap(AppTheme.init) ?? .system
+	}
+
+	func preferredThemeValues() -> AnyAsyncSequence<AppTheme> {
+		self.integerValues(forKey: Key.preferredTheme.rawValue)
+			.eraseToAnyAsyncSequence()
+			.map {
+				$0.flatMap(AppTheme.init) ?? .system
+			}
+			.eraseToAnyAsyncSequence()
 	}
 }
 

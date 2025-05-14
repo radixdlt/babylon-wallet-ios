@@ -883,6 +883,9 @@
 		A0C673052DA6BD7F0071606B /* ScreenshotPreventing in Frameworks */ = {isa = PBXBuildFile; productRef = A0C673042DA6BD7F0071606B /* ScreenshotPreventing */; };
 		A0C673072DA6BD7F0071606B /* ScreenshotPreventingSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = A0C673062DA6BD7F0071606B /* ScreenshotPreventingSwiftUI */; };
 		A0D742A52DD46C3F0062DB01 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A0D742A42DD46C3F0062DB01 /* GoogleService-Info.plist */; };
+		A0D742A92DD478FA0062DB01 /* ThemeSelection+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0D742A82DD478FA0062DB01 /* ThemeSelection+View.swift */; };
+		A0D742AA2DD478FA0062DB01 /* ThemeSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0D742A72DD478FA0062DB01 /* ThemeSelection.swift */; };
+		A0D742AC2DD480900062DB01 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0D742AB2DD480890062DB01 /* AppTheme.swift */; };
 		A0FDC0162DB7BAE900F571BA /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A0FDC0152DB7BAE900F571BA /* Sargon */; };
 		A408154C2C7E0D08005E65B9 /* CodableHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40814312C7E0D08005E65B9 /* CodableHelper.swift */; };
 		A408154D2C7E0D08005E65B9 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40814322C7E0D08005E65B9 /* Extensions.swift */; };
@@ -2209,6 +2212,9 @@
 		A08BBA722DB232D000534B67 /* LedgerHardwareDevices+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LedgerHardwareDevices+Reducer.swift"; sourceTree = "<group>"; };
 		A08BBA732DB232D000534B67 /* LedgerHardwareDevices+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LedgerHardwareDevices+View.swift"; sourceTree = "<group>"; };
 		A0D742A42DD46C3F0062DB01 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		A0D742A72DD478FA0062DB01 /* ThemeSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeSelection.swift; sourceTree = "<group>"; };
+		A0D742A82DD478FA0062DB01 /* ThemeSelection+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ThemeSelection+View.swift"; sourceTree = "<group>"; };
+		A0D742AB2DD480890062DB01 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 		A40814312C7E0D08005E65B9 /* CodableHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CodableHelper.swift; sourceTree = "<group>"; };
 		A40814322C7E0D08005E65B9 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		A40814332C7E0D08005E65B9 /* Models.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
@@ -5262,6 +5268,7 @@
 		48CFC15A2ADC10D900E77A5C /* SharedModels */ = {
 			isa = PBXGroup;
 			children = (
+				A0D742AB2DD480890062DB01 /* AppTheme.swift */,
 				48CFC15B2ADC10D900E77A5C /* Asset */,
 				48CFC15E2ADC10D900E77A5C /* HTTPURLSessionResponse */,
 				48CFC1602ADC10D900E77A5C /* PreviewValues */,
@@ -5812,6 +5819,7 @@
 				48CFBD8F2ADC10D800E77A5C /* DefaultDepositGuarantees */,
 				5B135B372C7636B6004AAD2E /* HiddenEntities */,
 				5BFA4FB72C736B500030B517 /* HiddenAssets */,
+				A0D742A62DD478BD0062DB01 /* ThemeSelection */,
 			);
 			path = Preferences;
 			sourceTree = "<group>";
@@ -6240,6 +6248,15 @@
 				A08BBA732DB232D000534B67 /* LedgerHardwareDevices+View.swift */,
 			);
 			path = LedgerHardwareDevices;
+			sourceTree = "<group>";
+		};
+		A0D742A62DD478BD0062DB01 /* ThemeSelection */ = {
+			isa = PBXGroup;
+			children = (
+				A0D742A72DD478FA0062DB01 /* ThemeSelection.swift */,
+				A0D742A82DD478FA0062DB01 /* ThemeSelection+View.swift */,
+			);
+			path = ThemeSelection;
 			sourceTree = "<group>";
 		};
 		A40814352C7E0D08005E65B9 /* AUXILARY */ = {
@@ -8598,6 +8615,8 @@
 				5B92AAC92D302A0E00486A9B /* ChangeMainFactorSource+View.swift in Sources */,
 				A408160E2C7E0D08005E65B9 /* StateEntityDetailsResponseNonFungibleVaultDetails.swift in Sources */,
 				A40816412C7E0D08005E65B9 /* TransactionFungibleBalanceChanges.swift in Sources */,
+				A0D742A92DD478FA0062DB01 /* ThemeSelection+View.swift in Sources */,
+				A0D742AA2DD478FA0062DB01 /* ThemeSelection.swift in Sources */,
 				E65D6CEE2BC98267001D8A39 /* Stage2MigrateToSargon+AppPreferences+ViaProfile.swift in Sources */,
 				E634CA2F2AFD25B100C43DB7 /* DebugKeychainContents+View.swift in Sources */,
 				48CFC3132ADC10D900E77A5C /* CompletionMigrateOlympiaAccountsToBabylon+View.swift in Sources */,
@@ -9022,6 +9041,7 @@
 				48CFC40C2ADC10DA00E77A5C /* UserDefaults+Dependency+Extension.swift in Sources */,
 				48CFC2442ADC10D900E77A5C /* ThirdPartyDeposits+Reducer.swift in Sources */,
 				48CFC3F62ADC10D900E77A5C /* ClientMessage.swift in Sources */,
+				A0D742AC2DD480900062DB01 /* AppTheme.swift in Sources */,
 				48CFC5EB2ADC10DA00E77A5C /* AddressView.swift in Sources */,
 				48CFC2A82ADC10D900E77A5C /* AuthorizedDApps.swift in Sources */,
 				8397D82C2B46ACB50016365A /* StakeUnitList+View.swift in Sources */,

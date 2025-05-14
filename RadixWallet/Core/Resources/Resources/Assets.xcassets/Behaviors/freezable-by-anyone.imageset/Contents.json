@@ -3,6 +3,16 @@
     {
       "filename" : "freezable-by-anyone.pdf",
       "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "ic_freeze_asset_anyone.pdf",
+      "idiom" : "universal"
     }
   ],
   "info" : {

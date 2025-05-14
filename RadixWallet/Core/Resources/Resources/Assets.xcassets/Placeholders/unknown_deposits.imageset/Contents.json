@@ -3,6 +3,16 @@
     {
       "filename" : "unknown_deposits.pdf",
       "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "unknown_resources.pdf",
+      "idiom" : "universal"
     }
   ],
   "info" : {

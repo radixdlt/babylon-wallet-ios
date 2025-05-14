@@ -125,6 +125,12 @@ extension Preferences.View {
 				action: .hiddenAssetsButtonTapped
 			),
 			advancedLockToggle,
+			.model(
+				title: L10n.Preferences.ThemeSelection.title,
+				subtitle: L10n.Preferences.ThemeSelection.subtitle,
+				icon: .systemImage("circle.righthalf.filled"),
+				action: .themeSelectionButtonTapped
+			),
 			.header(L10n.Preferences.advancedPreferences),
 			.model(
 				title: L10n.Preferences.gateways,

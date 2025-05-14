@@ -93,6 +93,7 @@ extension ResourcesList.View {
 						Text($0.text)
 					}
 				}
+				.tint(.primaryBackground)
 				.pickerStyle(.segmented)
 				.padding(.horizontal, .small3)
 			}

@@ -3,6 +3,16 @@
     {
       "filename" : "persona-icon.pdf",
       "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "ic_persona.pdf",
+      "idiom" : "universal"
     }
   ],
   "info" : {

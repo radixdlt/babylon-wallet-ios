@@ -1,6 +1,7 @@
 // MARK: - Preferences
 
 struct Preferences: Sendable, FeatureReducer {
+	@Environment(\.colorScheme) var colorScheme
 	struct State: Sendable, Hashable {
 		var appPreferences: AppPreferences?
 		var exportLogsUrl: URL?
@@ -16,6 +17,7 @@ struct Preferences: Sendable, FeatureReducer {
 		case depositGuaranteesButtonTapped
 		case hiddenEntitiesButtonTapped
 		case hiddenAssetsButtonTapped
+		case themeSelectionButtonTapped
 		case gatewaysButtonTapped
 		case developerModeToogled(Bool)
 		case advancedLockToogled(Bool)
@@ -34,6 +36,7 @@ struct Preferences: Sendable, FeatureReducer {
 			case depositGuarantees(DefaultDepositGuarantees.State)
 			case hiddenEntities(HiddenEntities.State)
 			case hiddenAssets(HiddenAssets.State)
+			case themeSelection(ThemeSelection.State)
 			case gateways(GatewaySettings.State)
 		}
 
@@ -64,6 +67,7 @@ struct Preferences: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.localAuthenticationClient) var localAuthenticationClient
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.userDefaults) var userDefaults
 
 	init() {}
 
@@ -97,11 +101,16 @@ struct Preferences: Sendable, FeatureReducer {
 			state.destination = .hiddenAssets(.init())
 			return .none
 
+		case .themeSelectionButtonTapped:
+			state.destination =
+				return .none
+
 		case .gatewaysButtonTapped:
 			state.destination = .gateways(.init())
 			return .none
 
 		case let .developerModeToogled(isEnabled):
+			userDefaults.setPreferredTheme(isEnabled ? .light : .dark)
 			state.appPreferences?.security.isDeveloperModeEnabled = isEnabled
 			guard let preferences = state.appPreferences else { return .none }
 			return .run { _ in
