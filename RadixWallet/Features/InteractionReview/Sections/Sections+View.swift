@@ -13,7 +13,7 @@ extension InteractionReview.Sections.State {
 			unstakingFromValidators: unstakingFromValidators,
 			claimingFromValidators: claimingFromValidators,
 			accountDepositSetting: accountDepositSetting,
-			accountDepositExceptions: accountDepositExceptions,
+			accountDepositExceptions: accountDepositExceptions
 		)
 	}
 }
