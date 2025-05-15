@@ -32,7 +32,7 @@ extension ThemeSelection {
 					Spacer()
 				}
 				.padding(.medium1)
-				.navigationTitle("Theme Selection")
+				.navigationTitle(L10n.Preferences.ThemeSelection.title)
 			}
 			.withNavigationBar {
 				store.send(.view(.closeButtonTapped))
@@ -50,11 +50,11 @@ extension AppTheme {
 	var text: String {
 		switch self {
 		case .light:
-			"Light"
+			L10n.Preferences.ThemeSelection.light
 		case .dark:
-			"Dark"
+			L10n.Preferences.ThemeSelection.dark
 		case .system:
-			"System"
+			L10n.Preferences.ThemeSelection.system
 		}
 	}
 
