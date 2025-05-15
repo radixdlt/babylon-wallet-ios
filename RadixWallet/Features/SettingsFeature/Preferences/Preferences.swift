@@ -114,7 +114,6 @@ struct Preferences: Sendable, FeatureReducer {
 			return .none
 
 		case let .developerModeToogled(isEnabled):
-			userDefaults.setPreferredTheme(isEnabled ? .light : .dark)
 			state.appPreferences?.security.isDeveloperModeEnabled = isEnabled
 			guard let preferences = state.appPreferences else { return .none }
 			return .run { _ in

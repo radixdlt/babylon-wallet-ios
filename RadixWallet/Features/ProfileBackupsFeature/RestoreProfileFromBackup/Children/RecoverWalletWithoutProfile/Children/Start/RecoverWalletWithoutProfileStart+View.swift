@@ -69,6 +69,7 @@ extension RecoverWalletWithoutProfileStart {
 						}
 					}
 				}
+				.background(.primaryBackground)
 				.destinations(with: store)
 			}
 		}

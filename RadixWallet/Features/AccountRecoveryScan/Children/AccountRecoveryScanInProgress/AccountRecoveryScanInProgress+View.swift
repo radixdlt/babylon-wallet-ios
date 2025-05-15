@@ -173,7 +173,7 @@ extension AccountRecoveryScanInProgress {
 			Button(L10n.AccountRecoveryScan.ScanComplete.scanNextBatchButton(batchSize)) {
 				store.send(.view(.scanMore))
 			}
-			.buttonStyle(.alternativeRectangular)
+			.buttonStyle(.blueText)
 			.controlState(viewStore.buttonControlState)
 
 			Button(L10n.AccountRecoveryScan.ScanComplete.continueButton) {

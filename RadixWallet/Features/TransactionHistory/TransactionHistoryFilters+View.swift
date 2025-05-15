@@ -253,7 +253,7 @@ struct TransactionFilterView: SwiftUI.View {
 		.background {
 			ZStack {
 				Capsule().fill(filter.isActive ? .chipBackground : .primaryBackground)
-				Capsule().stroke(filter.isActive ? .clear : .tertiaryBackground)
+				Capsule().stroke(filter.isActive ? .clear : .border)
 			}
 		}
 		.overlay(alignment: .trailing) {

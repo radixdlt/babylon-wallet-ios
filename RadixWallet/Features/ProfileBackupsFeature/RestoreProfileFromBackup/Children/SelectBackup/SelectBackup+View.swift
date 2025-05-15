@@ -86,9 +86,9 @@ extension SelectBackup.View {
 				Button(L10n.RecoverProfileBackup.ImportFileButton.title) {
 					store.send(.view(.importFromFileInstead))
 				}
-				.buttonStyle(.alternativeRectangular)
+				.buttonStyle(.blueText)
 
-				Divider()
+				Separator()
 
 				VStack(spacing: .medium3) {
 					Text(L10n.RecoverProfileBackup.backupNotAvailable)
@@ -115,7 +115,7 @@ extension SelectBackup.View {
 			.padding(.vertical, .large1)
 			.padding(.horizontal, .large2)
 			.frame(maxWidth: .infinity)
-			.background(.secondaryBackground)
+			.background(.tertiaryBackground)
 			.roundedCorners(radius: .small1)
 	}
 
