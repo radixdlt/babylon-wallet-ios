@@ -39,12 +39,14 @@ extension DappDetails.View {
 
 					InfoBlock(store: store)
 
-					FungiblesList(store: store)
-
-					NonFungiblesListList(store: store)
-
-					Personas(store: store.personas, tappablePersonas: viewStore.tappablePersonas)
-						.background(.secondaryBackground)
+					VStack(spacing: .medium1) {
+						Separator()
+						FungiblesList(store: store)
+						NonFungiblesListList(store: store)
+						Separator()
+						Personas(store: store.personas, tappablePersonas: viewStore.tappablePersonas)
+					}
+					.background(.secondaryBackground)
 
 					if viewStore.showConfiguration {
 						Configuration(store: store)
@@ -259,29 +261,25 @@ extension DappDetails.View {
 
 		var body: some View {
 			WithViewStore(store, observe: ViewState.init) { viewStore in
-				VStack(spacing: .medium2) {
-					Separator()
+				VStack(spacing: .medium3) {
+					if viewStore.hasPersonas {
+						Text(L10n.AuthorizedDapps.DAppDetails.personasHeading)
+							.textBlock
+							.flushedLeft
+							.padding(.horizontal, .small2)
 
-					VStack(spacing: .medium3) {
-						if viewStore.hasPersonas {
-							Text(L10n.AuthorizedDapps.DAppDetails.personasHeading)
-								.textBlock
-								.flushedLeft
-								.padding(.horizontal, .small2)
+						PersonaListCoreView(store: store, tappable: tappablePersonas, showShield: false)
+							.padding(.top, .small1)
 
-							PersonaListCoreView(store: store, tappable: tappablePersonas, showShield: false)
-								.padding(.top, .small1)
-
-						} else {
-							Text(L10n.AuthorizedDapps.DAppDetails.noPersonasHeading)
-								.textBlock
-								.flushedLeft
-								.padding(.horizontal, .small2)
-						}
+					} else {
+						Text(L10n.AuthorizedDapps.DAppDetails.noPersonasHeading)
+							.textBlock
+							.flushedLeft
+							.padding(.horizontal, .small2)
 					}
-					.padding(.horizontal, .medium3)
-					.padding(.bottom, .large1)
 				}
+				.padding(.horizontal, .medium3)
+				.padding(.bottom, .large1)
 			}
 		}
 	}

@@ -83,7 +83,7 @@ extension PreAuthorizationReview {
 							details(viewStore.showRawManifestButton)
 						}
 					}
-					.background(Common.gradientBackground)
+					.background(.secondaryBackground)
 					.clipShape(RoundedRectangle(cornerRadius: .small1))
 					.padding(.horizontal, .small2)
 

@@ -156,7 +156,6 @@ extension TransactionReview {
 					}
 				}
 				.background(.secondaryBackground)
-//				.background(Common.gradientBackground)
 				.animation(.easeInOut, value: viewStore.canToggleViewMode ? viewStore.rawManifest : nil)
 			}
 			.coordinateSpace(name: coordSpace)
