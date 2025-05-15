@@ -3,26 +3,44 @@ import SwiftUI
 // MARK: - ThemeSelection.View
 extension ThemeSelection {
 	struct View: SwiftUI.View {
+		@Environment(\.colorScheme) var colorScheme
 		@Perception.Bindable var store: StoreOf<ThemeSelection>
 
 		var body: some SwiftUI.View {
-			WithPerceptionTracking {
-				Picker(
-					L10n.AccountSettings.SpecificAssetsDeposits.resourceListPicker,
-					selection: $store.appTheme.sending(\.view.themeChanged)
-				) {
-					ForEach(AppTheme.allCases, id: \.self) {
-						Text($0.text)
+			ZStack {
+				Color.secondaryBackground.ignoresSafeArea()
+				VStack(alignment: .leading) {
+					Spacer()
+					ForEach(AppTheme.allCases, id: \.self) { variant in
+						WithPerceptionTracking {
+							Card {
+								store.send(.view(.themeChanged(variant)))
+							} contents: {
+								HStack {
+									Image(systemName: variant.imageName)
+									Text(variant.text)
+									Spacer()
+									RadioButton(
+										appearance: colorScheme == .dark ? .light : .dark,
+										isSelected: variant == store.appTheme
+									)
+								}
+								.padding(.medium1)
+							}
+						}
 					}
+					Spacer()
 				}
-				.pickerStyle(.segmented)
-				.padding(.horizontal, .small3)
-
-				// TODO: implement
-				Text("Implement: ThemeSelection")
-					.background(Color.yellow)
-					.foregroundColor(.red)
-					.onAppear { store.send(.view(.appeared)) }
+				.padding(.medium1)
+				.navigationTitle("Theme Selection")
+			}
+			.withNavigationBar {
+				store.send(.view(.closeButtonTapped))
+			}
+			.presentationDetents([.fraction(0.6)])
+			.presentationBackground(.blur)
+			.onAppear {
+				store.send(.view(.appeared))
 			}
 		}
 	}
@@ -37,6 +55,17 @@ extension AppTheme {
 			"Dark"
 		case .system:
 			"System"
+		}
+	}
+
+	var imageName: String {
+		switch self {
+		case .light:
+			"sun.max"
+		case .dark:
+			"moon"
+		case .system:
+			"swirl.circle.righthalf.filled"
 		}
 	}
 }

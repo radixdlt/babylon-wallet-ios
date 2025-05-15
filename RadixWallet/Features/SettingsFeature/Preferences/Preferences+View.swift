@@ -185,6 +185,7 @@ private extension View {
 		return depositGuarantees(with: destinationStore)
 			.hiddenEntities(with: destinationStore)
 			.hiddenAssets(with: destinationStore)
+			.themeSelection(with: destinationStore)
 			.gateways(with: destinationStore)
 	}
 
@@ -209,6 +210,12 @@ private extension View {
 	private func gateways(with destinationStore: PresentationStoreOf<Preferences.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.gateways, action: \.gateways)) {
 			GatewaySettings.View(store: $0)
+		}
+	}
+
+	private func themeSelection(with destinationStore: PresentationStoreOf<Preferences.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.themeSelection, action: \.themeSelection)) {
+			ThemeSelection.View(store: $0)
 		}
 	}
 }

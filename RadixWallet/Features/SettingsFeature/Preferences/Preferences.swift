@@ -45,6 +45,7 @@ struct Preferences: Sendable, FeatureReducer {
 			case depositGuarantees(DefaultDepositGuarantees.Action)
 			case hiddenEntities(HiddenEntities.Action)
 			case hiddenAssets(HiddenAssets.Action)
+			case themeSelection(ThemeSelection.Action)
 			case gateways(GatewaySettings.Action)
 		}
 
@@ -57,6 +58,9 @@ struct Preferences: Sendable, FeatureReducer {
 			}
 			Scope(state: \.hiddenAssets, action: \.hiddenAssets) {
 				HiddenAssets()
+			}
+			Scope(state: \.themeSelection, action: \.themeSelection) {
+				ThemeSelection()
 			}
 			Scope(state: \.gateways, action: \.gateways) {
 				GatewaySettings()
@@ -102,8 +106,8 @@ struct Preferences: Sendable, FeatureReducer {
 			return .none
 
 		case .themeSelectionButtonTapped:
-			state.destination =
-				return .none
+			state.destination = .themeSelection(.init())
+			return .none
 
 		case .gatewaysButtonTapped:
 			state.destination = .gateways(.init())
