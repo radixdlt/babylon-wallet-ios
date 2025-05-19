@@ -11,6 +11,7 @@ end
 platform :ios do
     before_all do
         create_sensitive_info
+        create_google_service_info
         Dotenv.load ".env.ios"
         dir_to_del = ENV["SCAN_OUTPUT_DIRECTORY"]
         puts "deleting '#{dir_to_del}'"
