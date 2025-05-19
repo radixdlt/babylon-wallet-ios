@@ -125,7 +125,6 @@ struct DevAccountPreferences: Sendable, FeatureReducer {
 		#if DEBUG
 		case .turnIntoDappDefinitionAccountTypeButtonTapped:
 			return .run { [accountAddress = state.address] send in
-
 				let manifest = TransactionManifest.markingAccountAsDappDefinitionType(
 					accountAddress: accountAddress
 				)
@@ -137,7 +136,6 @@ struct DevAccountPreferences: Sendable, FeatureReducer {
 
 		case .createFungibleTokenButtonTapped:
 			return .run { [accountAddress = state.address] send in
-
 				let manifest = TransactionManifest.createFungibleToken(
 					addressOfOwner: accountAddress
 				)
@@ -149,7 +147,6 @@ struct DevAccountPreferences: Sendable, FeatureReducer {
 
 		case .createNonFungibleTokenButtonTapped:
 			return .run { [accountAddress = state.address] send in
-
 				let manifest = TransactionManifest.createNonFungibleToken(
 					addressOfOwner: accountAddress,
 					nftsPerCollection: 10
@@ -161,7 +158,6 @@ struct DevAccountPreferences: Sendable, FeatureReducer {
 			}
 		case .createMultipleFungibleTokenButtonTapped:
 			return .run { [accountAddress = state.address] send in
-
 				let manifest = TransactionManifest.createMultipleFungibleTokens(
 					addressOfOwner: accountAddress,
 					count: 10
@@ -173,7 +169,6 @@ struct DevAccountPreferences: Sendable, FeatureReducer {
 			}
 		case .createMultipleNonFungibleTokenButtonTapped:
 			return .run { [accountAddress = state.address] send in
-
 				let manifest = TransactionManifest.createMultipleNonFungibleTokens(
 					addressOfOwner: accountAddress,
 					collectionCount: 1,
@@ -235,7 +230,6 @@ extension DevAccountPreferences {
 	#if DEBUG
 	private func loadCanTurnIntoDappDefAccountType(_ state: State) -> Effect<Action> {
 		.run { [address = state.address] send in
-
 			do {
 				let isDappDefinitionAccount: Bool = try await gatewayAPIClient
 					.getEntityMetadata(address.address, [.accountType])

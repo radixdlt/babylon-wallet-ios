@@ -102,7 +102,6 @@ extension ImportLegacyWalletClient: DependencyKey {
 				)
 			},
 			migrateOlympiaSoftwareAccountsToBabylon: { request in
-
 				let olympiaFactorSource = request.olympiaFactorSource
 				let factorSource = olympiaFactorSource?.factorSource
 
