@@ -150,7 +150,6 @@ struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		case let .importMnemonic(.delegate(delegateAction)):
 			switch delegateAction {
 			case let .notPersisted(mnemonicWithPassphrase):
-
 				let factorSourceID = FactorSourceIDFromHash(kind: .device, mnemonicWithPassphrase: mnemonicWithPassphrase)
 
 				guard factorSourceID == state.entitiesControlledByFactorSource.factorSourceID else {

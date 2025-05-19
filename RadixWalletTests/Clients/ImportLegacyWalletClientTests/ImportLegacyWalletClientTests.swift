@@ -70,7 +70,6 @@ extension CAP33 {
 
 		// 5. Prepend each "contentOfPayload| with a header, with a unique header specifying the index of the resulting payload
 		let payloadsArray: [NonEmptyString] = contentsOfPayloads.enumerated().map { payloadIndex, payloadContent in
-
 			// Construct header, being the tripple (payloadCount, payloadIndex, mnemonicWordCount)
 			let header: String = [payloadCount, payloadIndex, wordCount]
 				.map { "\($0)" } // stringify the three integers (base 10)
@@ -248,7 +247,6 @@ final class ImportLegacyWalletClientTests: TestCase {
 			bundle: Bundle(for: Self.self),
 			jsonName: "import_olympia_wallet_parse_test"
 		) { (testVectors: [TestVector]) in
-
 			for vector in testVectors {
 				try doTestDeserialize(vector)
 				// By default omit soundness check of serialize

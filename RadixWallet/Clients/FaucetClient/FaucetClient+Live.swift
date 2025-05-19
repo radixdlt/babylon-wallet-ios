@@ -69,7 +69,6 @@ extension FaucetClient: DependencyKey {
 		}
 
 		let getFreeXRD: GetFreeXRD = { faucetRequest in
-
 			let accountAddress = faucetRequest.recipientAccountAddress
 
 			guard let epochsAndMaybeCurrent = await isAllowedToUseFaucetIfSoGetEpochs(

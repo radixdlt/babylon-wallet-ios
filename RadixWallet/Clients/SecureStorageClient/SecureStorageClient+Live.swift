@@ -454,6 +454,7 @@ extension SecureStorageClient: DependencyKey {
 		return Self(
 			loadProfileSnapshotData: loadProfileSnapshotData,
 			saveProfileSnapshotData: saveProfileSnapshotData,
+			deleteProfile: deleteProfile,
 			saveMnemonicForFactorSource: saveMnemonicForFactorSource,
 			loadMnemonicByFactorSourceID: loadMnemonicByFactorSourceID,
 			containsMnemonicIdentifiedByFactorSourceID: containsMnemonicIdentifiedByFactorSourceID,
@@ -484,6 +485,7 @@ extension SecureStorageClient: DependencyKey {
 		return Self(
 			loadProfileSnapshotData: loadProfileSnapshotData,
 			saveProfileSnapshotData: saveProfileSnapshotData,
+			deleteProfile: deleteProfile,
 			saveMnemonicForFactorSource: saveMnemonicForFactorSource,
 			loadMnemonicByFactorSourceID: loadMnemonicByFactorSourceID,
 			containsMnemonicIdentifiedByFactorSourceID: containsMnemonicIdentifiedByFactorSourceID,

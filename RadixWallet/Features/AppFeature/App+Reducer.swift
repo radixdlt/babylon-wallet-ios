@@ -54,7 +54,6 @@ struct App: Sendable, FeatureReducer {
 
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.deepLinkHandlerClient) var deepLinkHandlerClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.homeCardsClient) var homeCardsClient

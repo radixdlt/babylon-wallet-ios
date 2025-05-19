@@ -70,7 +70,6 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 		}
 
 		return .run { [request = state.interaction.metadata] send in
-
 			let result: TaskResult<DappMetadata> = await {
 				let isDeveloperModeEnabled = await appPreferencesClient.getPreferences().security.isDeveloperModeEnabled
 				let dappDefinitionAddress = request.dappDefinitionAddress

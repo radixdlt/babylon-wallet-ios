@@ -95,7 +95,6 @@ extension SharedPersonaData {
 		try self.init(
 			name: {
 				() -> PersonaDataEntryID? in
-
 				let kind = PersonaData.Entry.Kind.fullName
 
 				// Check if incoming Dapp requested this persona data entry kind
