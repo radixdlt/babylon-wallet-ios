@@ -47,9 +47,9 @@ extension AuthorizedDappsFeature {
 									viewStore.send(.view(.didSelectDapp(dApp.id)))
 								} contents: {
 									VStack(alignment: .leading, spacing: .zero) {
-										PlainListRow(context: .dappAndPersona, title: dApp.name) {
+										PlainListRow(context: .dappAndPersona, title: dApp.name, icon: {
 											Thumbnail(.dapp, url: dApp.thumbnail)
-										}
+										})
 										if dApp.hasClaim {
 											StatusMessageView(text: L10n.AuthorizedDapps.pendingDeposit, type: .warning, useNarrowSpacing: true)
 												.padding(.horizontal, .medium1)
