@@ -39,6 +39,15 @@ platform :ios do
         end
     end
 
+    desc "Creates GoogleService-Info.plist if it doesn't exist"
+    lane :create_google_service_info do
+        if File.exist?("../Aux/GoogleService-Info.plist")
+            puts "GoogleService-Info.plist already available"
+        elsif
+            sh("cp -v '../Aux/GoogleService-Info-Sample.plist' '../Aux/GoogleService-Info.plist'")
+        end
+    end
+
     desc "Populates SensitiveInfo.plist with environment values"
     lane :populate_sensitive_info do |options|
         appIdKey = "APPS_FLYER_APP_ID_%s" % options[:flavour].downcase
