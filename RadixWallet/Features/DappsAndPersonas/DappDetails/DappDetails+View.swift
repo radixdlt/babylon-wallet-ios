@@ -65,10 +65,7 @@ extension DappDetails.View {
 
 private extension StoreOf<DappDetails> {
 	var destination: PresentationStoreOf<DappDetails.Destination> {
-		func scopeState(state: State) -> PresentationState<DappDetails.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
+		scope(state: \.$destination, action: \.destination)
 	}
 
 	var personas: StoreOf<PersonaList> {

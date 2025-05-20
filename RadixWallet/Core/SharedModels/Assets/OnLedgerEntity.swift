@@ -529,7 +529,11 @@ extension OnLedgerEntity {
 
 // MARK: - OnLedgerEntity.AssociatedDapp
 extension OnLedgerEntity {
-	struct AssociatedDapp: Sendable, Hashable, Codable {
+	struct AssociatedDapp: Sendable, Hashable, Codable, Identifiable {
+		var id: DappDefinitionAddress {
+			address
+		}
+
 		let address: DappDefinitionAddress
 		let metadata: Metadata
 

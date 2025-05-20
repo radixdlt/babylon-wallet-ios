@@ -24,6 +24,7 @@ struct CardCarousel: FeatureReducer, Sendable {
 
 	enum DelegateAction: Sendable, Equatable {
 		case addConnector
+		case showDAppsDirectory
 	}
 
 	@Dependency(\.homeCardsClient) var homeCardsClient
@@ -78,9 +79,7 @@ struct CardCarousel: FeatureReducer, Sendable {
 		case .connector:
 			.send(.delegate(.addConnector))
 		case .discoverRadixDapps:
-			.run { _ in
-				await openURL(Constants.radixEcosystemURL)
-			}
+			.send(.delegate(.showDAppsDirectory))
 		}
 	}
 

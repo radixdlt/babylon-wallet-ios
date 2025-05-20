@@ -888,6 +888,11 @@
 		A0D742A92DD478FA0062DB01 /* ThemeSelection+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0D742A82DD478FA0062DB01 /* ThemeSelection+View.swift */; };
 		A0D742AA2DD478FA0062DB01 /* ThemeSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0D742A72DD478FA0062DB01 /* ThemeSelection.swift */; };
 		A0D742AC2DD480900062DB01 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0D742AB2DD480890062DB01 /* AppTheme.swift */; };
+		A0F223762DDC6C3600035389 /* DAppsDirectory+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0F223752DDC6C3600035389 /* DAppsDirectory+View.swift */; };
+		A0F223772DDC6C3600035389 /* DAppsDirectory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0F223742DDC6C3600035389 /* DAppsDirectory.swift */; };
+		A0F2237C2DDC6D1C00035389 /* DAppsDirectoryClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0F2237A2DDC6D1C00035389 /* DAppsDirectoryClient+Live.swift */; };
+		A0F2237D2DDC6D1C00035389 /* DAppsDirectoryClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0F2237B2DDC6D1C00035389 /* DAppsDirectoryClient+Test.swift */; };
+		A0F2237E2DDC6D1C00035389 /* DAppsDirectoryClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0F223792DDC6D1C00035389 /* DAppsDirectoryClient+Interface.swift */; };
 		A0FDC0162DB7BAE900F571BA /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A0FDC0152DB7BAE900F571BA /* Sargon */; };
 		A408154C2C7E0D08005E65B9 /* CodableHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40814312C7E0D08005E65B9 /* CodableHelper.swift */; };
 		A408154D2C7E0D08005E65B9 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40814322C7E0D08005E65B9 /* Extensions.swift */; };
@@ -2219,6 +2224,11 @@
 		A0D742A72DD478FA0062DB01 /* ThemeSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeSelection.swift; sourceTree = "<group>"; };
 		A0D742A82DD478FA0062DB01 /* ThemeSelection+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ThemeSelection+View.swift"; sourceTree = "<group>"; };
 		A0D742AB2DD480890062DB01 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
+		A0F223742DDC6C3600035389 /* DAppsDirectory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DAppsDirectory.swift; sourceTree = "<group>"; };
+		A0F223752DDC6C3600035389 /* DAppsDirectory+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DAppsDirectory+View.swift"; sourceTree = "<group>"; };
+		A0F223792DDC6D1C00035389 /* DAppsDirectoryClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DAppsDirectoryClient+Interface.swift"; sourceTree = "<group>"; };
+		A0F2237A2DDC6D1C00035389 /* DAppsDirectoryClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DAppsDirectoryClient+Live.swift"; sourceTree = "<group>"; };
+		A0F2237B2DDC6D1C00035389 /* DAppsDirectoryClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DAppsDirectoryClient+Test.swift"; sourceTree = "<group>"; };
 		A40814312C7E0D08005E65B9 /* CodableHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CodableHelper.swift; sourceTree = "<group>"; };
 		A40814322C7E0D08005E65B9 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		A40814332C7E0D08005E65B9 /* Models.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
@@ -4554,6 +4564,7 @@
 		48CFBF522ADC10D900E77A5C /* Clients */ = {
 			isa = PBXGroup;
 			children = (
+				A0F223782DDC6CF700035389 /* DAppsDirectoryClient */,
 				5B3C48B32C80D0FF00DB160D /* AccountLockersClient */,
 				48CFBF8D2ADC10D900E77A5C /* AccountPortfoliosClient */,
 				48CFBF622ADC10D900E77A5C /* AccountsClient */,
@@ -6260,6 +6271,8 @@
 				A08BF04E2DDB67900065766A /* DAppsListView.swift */,
 				A08BF0512DDB95E00065766A /* DAppsList.swift */,
 				A08BF0522DDB95E00065766A /* DAppsList+View.swift */,
+				A0F223742DDC6C3600035389 /* DAppsDirectory.swift */,
+				A0F223752DDC6C3600035389 /* DAppsDirectory+View.swift */,
 			);
 			path = DApps;
 			sourceTree = "<group>";
@@ -6271,6 +6284,16 @@
 				A0D742A82DD478FA0062DB01 /* ThemeSelection+View.swift */,
 			);
 			path = ThemeSelection;
+			sourceTree = "<group>";
+		};
+		A0F223782DDC6CF700035389 /* DAppsDirectoryClient */ = {
+			isa = PBXGroup;
+			children = (
+				A0F223792DDC6D1C00035389 /* DAppsDirectoryClient+Interface.swift */,
+				A0F2237A2DDC6D1C00035389 /* DAppsDirectoryClient+Live.swift */,
+				A0F2237B2DDC6D1C00035389 /* DAppsDirectoryClient+Test.swift */,
+			);
+			path = DAppsDirectoryClient;
 			sourceTree = "<group>";
 		};
 		A40814352C7E0D08005E65B9 /* AUXILARY */ = {
@@ -8159,6 +8182,8 @@
 				A40815772C7E0D08005E65B9 /* EventsItem.swift in Sources */,
 				48CFC2BF2ADC10D900E77A5C /* ImportMnemonicsFlowCoordinator.swift in Sources */,
 				48CFC3632ADC10D900E77A5C /* AssetsView+Reducer.swift in Sources */,
+				A0F223762DDC6C3600035389 /* DAppsDirectory+View.swift in Sources */,
+				A0F223772DDC6C3600035389 /* DAppsDirectory.swift in Sources */,
 				A408162F2C7E0D08005E65B9 /* StateNonFungibleLocationResponse.swift in Sources */,
 				48CFC30F2ADC10D900E77A5C /* ImportOlympiaWalletCoordinator.swift in Sources */,
 				E68878592BDBFD42003F3393 /* Stage2MigrateToSargon+LedgerHardwareWalletFactorSource+New.swift in Sources */,
@@ -8951,6 +8976,9 @@
 				5B3C48C12C85CEAA00DB160D /* AccountBannerView.swift in Sources */,
 				E7607DD62D4BB5C30083B3A5 /* ChooseAccountsForShield+View.swift in Sources */,
 				48CFC6012ADC10DA00E77A5C /* P2P+ConnectorExtension+Request.swift in Sources */,
+				A0F2237C2DDC6D1C00035389 /* DAppsDirectoryClient+Live.swift in Sources */,
+				A0F2237D2DDC6D1C00035389 /* DAppsDirectoryClient+Test.swift in Sources */,
+				A0F2237E2DDC6D1C00035389 /* DAppsDirectoryClient+Interface.swift in Sources */,
 				A40815832C7E0D08005E65B9 /* InvalidRequestError.swift in Sources */,
 				48CFC5C22ADC10DA00E77A5C /* Shapes.swift in Sources */,
 				48CFC5BA2ADC10DA00E77A5C /* RadioButton.swift in Sources */,

@@ -88,6 +88,7 @@ struct Home: Sendable, FeatureReducer {
 			case relinkConnector(NewConnection.State)
 			case securityCenter(SecurityCenter.State)
 			case p2pLinks(P2PLinksFeature.State)
+			case dAppsDirectory(DAppsDirectory.State)
 		}
 
 		@CasePathable
@@ -99,6 +100,7 @@ struct Home: Sendable, FeatureReducer {
 			case relinkConnector(NewConnection.Action)
 			case securityCenter(SecurityCenter.Action)
 			case p2pLinks(P2PLinksFeature.Action)
+			case dAppsDirectory(DAppsDirectory.Action)
 
 			enum AcknowledgeJailbreakAlert: Sendable, Hashable {}
 		}
@@ -121,6 +123,9 @@ struct Home: Sendable, FeatureReducer {
 			}
 			Scope(state: \.p2pLinks, action: \.p2pLinks) {
 				P2PLinksFeature()
+			}
+			Scope(state: \.dAppsDirectory, action: \.dAppsDirectory) {
+				DAppsDirectory()
 			}
 		}
 	}
@@ -320,6 +325,10 @@ struct Home: Sendable, FeatureReducer {
 
 		case .carousel(.delegate(.addConnector)):
 			state.destination = .p2pLinks(.init(destination: .newConnection(.init())))
+			return .none
+
+		case .carousel(.delegate(.showDAppsDirectory)):
+			state.destination = .dAppsDirectory(.init())
 			return .none
 
 		default:
