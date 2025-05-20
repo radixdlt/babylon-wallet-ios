@@ -1634,3 +1634,6 @@ Code: %@";
 "newFactor_error_notCreated" = "Factor not created";
 "newFactor_success_title" = "Success";
 "newFactor_success_subtitle" = "Security factor added successfully";
+"dappDirectory_title" = "DApp Directory";
+"dappDirectory_search_placeholder" = "Search for a dApp...";
+"dappDirectory_filters_title" = "Tags";
