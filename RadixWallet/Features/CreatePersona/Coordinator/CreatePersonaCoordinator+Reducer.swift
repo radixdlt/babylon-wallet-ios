@@ -120,7 +120,6 @@ extension CreatePersonaCoordinator {
 		case
 			let .root(.step1_createPersona(.delegate(.personaInfoSet(name, personaData)))),
 			let .path(.element(_, action: .step1_createPersona(.delegate(.personaInfoSet(name, personaData))))):
-
 			createPersona(name: name, personaData: personaData)
 
 		case let .path(.element(_, action: .step2_completion(.delegate(.completed(persona))))):

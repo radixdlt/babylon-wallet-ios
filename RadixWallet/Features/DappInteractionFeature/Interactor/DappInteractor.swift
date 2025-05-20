@@ -144,7 +144,6 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .receivedRequestFromDapp(request):
-
 			switch state.destination {
 			case .some(.dappInteractionCompletion):
 				if state.requestQueue.isEmpty {
@@ -328,7 +327,6 @@ struct DappInteractor: Sendable, FeatureReducer {
 		dappMetadata: DappMetadata
 	) -> Effect<Action> {
 		.run { send in
-
 			// In case of transaction response, sending it to the peer client is a silent operation.
 			// The success or failures is determined based on the transaction polling status.
 			let isTransactionResponse = {

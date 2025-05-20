@@ -245,7 +245,6 @@ struct DappDetails: Sendable, FeatureReducer {
 	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .personaList(.delegate(.openDetails(persona))):
-
 			guard
 				let dApp = state.authorizedDapp,
 				let detailedPersona = dApp.detailedAuthorizedPersonas.asIdentified()[id: persona.id]

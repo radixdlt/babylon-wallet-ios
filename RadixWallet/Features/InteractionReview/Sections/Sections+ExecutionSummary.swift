@@ -250,7 +250,6 @@ extension InteractionReview.Sections {
 			authorizedDepositorsAdded,
 			authorizedDepositorsRemoved
 		):
-
 			let allAccountAddress = Set(authorizedDepositorsAdded.keys)
 				.union(authorizedDepositorsRemoved.keys)
 				.union(depositModeUpdates.keys)

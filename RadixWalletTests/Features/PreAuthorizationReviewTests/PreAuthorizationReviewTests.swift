@@ -2,7 +2,7 @@
 import Testing
 
 struct PreAuthorizationReviewTests {
-	@Test func testTimeFormatter() async throws {
+	@Test func timeFormatter() async throws {
 		func verify(_ seconds: Int, _ expected: String) {
 			let result = PreAuthorizationReview.TimeFormatter.format(seconds: seconds)
 			#expect(result == expected)

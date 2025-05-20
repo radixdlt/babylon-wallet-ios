@@ -126,7 +126,6 @@ extension FactorSourcesClient: DependencyKey {
 		}
 
 		let indicesOfEntitiesControlledByFactorSource: IndicesOfEntitiesControlledByFactorSource = { request in
-
 			let factorSourceID = request.factorSourceID
 			guard let factorSource = try await getFactorSources().first(where: { $0.id == factorSourceID }) else { throw FailedToFindFactorSource() }
 

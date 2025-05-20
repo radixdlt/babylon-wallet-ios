@@ -36,7 +36,6 @@ extension DebugUserDefaultsContents {
 								} else {
 									VStack(alignment: .leading) {
 										ForEach(keyValue.values, id: \.self) { value in
-
 											HStack(spacing: .small1) {
 												Text("*")
 												Text("`\"\(value)\"`")
