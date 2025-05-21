@@ -18,9 +18,27 @@ extension Main {
 		}
 
 		var body: some SwiftUI.View {
-			NavigationStack {
-				Home.View(store: store.home)
-					.destinations(with: store)
+			TabView {
+				NavigationStack {
+					Home.View(store: store.home)
+				}
+				.tabItem {
+					Label("Home", systemImage: "house")
+				}
+
+				NavigationStack {
+					DAppsDirectory.View(store: store.dAppsDirectory)
+				}
+				.tabItem {
+					Label("DApps", image: .authorizedDapps)
+				}
+
+				NavigationStack {
+					Settings.View(store: store.settings)
+				}
+				.tabItem {
+					Label("Settings", systemImage: "gearshape")
+				}
 			}
 			.task { @MainActor in
 				await store.send(.view(.task)).finish()
@@ -32,13 +50,6 @@ extension Main {
 }
 
 private extension StoreOf<Main> {
-	var destination: PresentationStoreOf<Main.Destination> {
-		func scopeState(state: State) -> PresentationState<Main.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
-	}
-
 	var banner: Store<Bool, Never> {
 		scope(state: \.showIsUsingTestnetBanner, action: actionless)
 	}
@@ -46,34 +57,12 @@ private extension StoreOf<Main> {
 	var home: StoreOf<Home> {
 		scope(state: \.home, action: \.child.home)
 	}
-}
 
-@MainActor
-private extension View {
-	func destinations(with store: StoreOf<Main>) -> some View {
-		let destinationStore = store.destination
-		return navigationDestination(store: destinationStore.scope(state: \.settings, action: \.settings)) {
-			Settings.View(store: $0)
-		}
+	var settings: StoreOf<Settings> {
+		scope(state: \.settings, action: \.child.settings)
+	}
+
+	var dAppsDirectory: StoreOf<DAppsDirectory> {
+		scope(state: \.dAppsDirectory, action: \.child.dAppsDirectory)
 	}
 }
-
-#if DEBUG
-import ComposableArchitecture
-import SwiftUI
-
-struct MainView_Previews: PreviewProvider {
-	static var previews: some SwiftUI.View {
-		Main.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: Main.init
-			)
-		)
-	}
-}
-
-extension Main.State {
-	static let previewValue = Self(home: .previewValue)
-}
-#endif

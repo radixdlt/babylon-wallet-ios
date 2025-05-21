@@ -53,7 +53,6 @@ struct Home: Sendable, FeatureReducer {
 		case onDisappear
 		case pullToRefreshStarted
 		case createAccountButtonTapped
-		case settingsButtonTapped
 		case showFiatWorthToggled
 	}
 
@@ -72,10 +71,6 @@ struct Home: Sendable, FeatureReducer {
 	enum ChildAction: Sendable, Equatable {
 		case carousel(CardCarousel.Action)
 		case account(id: Home.AccountRow.State.ID, action: Home.AccountRow.Action)
-	}
-
-	enum DelegateAction: Sendable, Equatable {
-		case displaySettings
 	}
 
 	struct Destination: DestinationReducer {
@@ -212,9 +207,6 @@ struct Home: Sendable, FeatureReducer {
 		case .pullToRefreshStarted:
 			accountLockersClient.forceRefresh()
 			return fetchAccountPortfolios(state, forceRefresh: true)
-
-		case .settingsButtonTapped:
-			return .send(.delegate(.displaySettings))
 
 		case .showFiatWorthToggled:
 			return .run { _ in

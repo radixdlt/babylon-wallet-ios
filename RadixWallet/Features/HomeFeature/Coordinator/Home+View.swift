@@ -71,15 +71,6 @@ extension Home {
 							.textStyle(.sheetTitle)
 							.padding(.leading, .medium3)
 					}
-					ToolbarItem(placement: .navigationBarTrailing) {
-						Button {
-							store.send(.view(.settingsButtonTapped))
-						} label: {
-							Image(.homeHeaderSettings)
-						}
-						.tint(Color.primaryText)
-						.padding(.trailing, .medium3)
-					}
 				}
 			}
 			.refreshable {
@@ -125,7 +116,14 @@ private extension View {
 
 	private func accountDetails(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.accountDetails, action: \.accountDetails)) {
-			AccountDetails.View(store: $0)
+			if #available(iOS 18.0, *) {
+				AccountDetails.View(store: $0)
+					.toolbarVisibility(.hidden, for: .tabBar)
+			} else {
+				AccountDetails.View(store: $0)
+					.toolbar(.hidden, for: .tabBar)
+				// Fallback on earlier versions
+			}
 		}
 	}
 

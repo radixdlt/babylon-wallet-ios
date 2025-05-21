@@ -38,6 +38,7 @@ struct DAppsDirectory: Sendable, FeatureReducer {
 		case pullToRefreshStarted
 	}
 
+	@CasePathable
 	enum InternalAction: Sendable, Equatable {
 		case loadedDApps(TaskResult<State.DApps>)
 	}
