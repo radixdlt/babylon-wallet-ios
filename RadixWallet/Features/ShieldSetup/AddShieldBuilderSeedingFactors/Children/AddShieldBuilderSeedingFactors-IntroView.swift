@@ -12,7 +12,7 @@ extension AddShieldBuilderSeedingFactors {
 					.textStyle(.sheetTitle)
 
 				VStack(spacing: .medium3) {
-					Text(markdown: L10n.ShieldSetupPrepareFactors.Intro.subtitleTop, emphasizedColor: .app.gray1, emphasizedFont: .app.body1Header)
+					Text(markdown: L10n.ShieldSetupPrepareFactors.Intro.subtitleTop, emphasizedColor: .primaryText, emphasizedFont: .app.body1Header)
 
 					Text(L10n.ShieldSetupPrepareFactors.Intro.subtitleBottom)
 				}
@@ -23,7 +23,7 @@ extension AddShieldBuilderSeedingFactors {
 
 				Spacer()
 			}
-			.foregroundStyle(.app.gray1)
+			.foregroundStyle(.primaryText)
 			.multilineTextAlignment(.center)
 			.padding(.horizontal, .large2)
 			.footer {

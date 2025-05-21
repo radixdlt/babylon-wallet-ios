@@ -20,8 +20,9 @@ extension RecoverWalletControlWithBDFSOnly {
 				Spacer(minLength: 0)
 			}
 			.textStyle(.body1Regular)
-			.foregroundColor(.app.gray1)
+			.foregroundColor(.primaryText)
 			.padding()
+			.background(.primaryBackground)
 			.footer {
 				Button(L10n.RecoverWalletWithoutProfile.Info.continueButton) {
 					store.send(.view(.continueTapped))

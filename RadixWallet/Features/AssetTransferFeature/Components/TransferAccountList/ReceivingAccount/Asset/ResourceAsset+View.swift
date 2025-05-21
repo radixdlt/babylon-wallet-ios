@@ -37,9 +37,9 @@ extension ResourceAsset.View {
 						)
 					}
 				}
-				.background(.app.white)
+				.background(.primaryBackground)
 				.focused($focused)
-				.roundedCorners(strokeColor: focused ? .app.gray1 : .app.white)
+				.roundedCorners(strokeColor: focused ? .primaryText : .primaryBackground)
 				.tokenRowShadow()
 
 				Spacer()
@@ -50,7 +50,7 @@ extension ResourceAsset.View {
 					Image(asset: AssetResource.close)
 						.frame(.smallest)
 				}
-				.foregroundColor(.app.gray2)
+				.foregroundColor(.secondaryText)
 			}
 
 			depositStatus

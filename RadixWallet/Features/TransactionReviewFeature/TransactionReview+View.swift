@@ -4,12 +4,12 @@ import SwiftUI
 extension View {
 	var sectionHeading: some View {
 		textStyle(.body1Header)
-			.foregroundColor(.app.gray2)
+			.foregroundColor(.secondaryText)
 	}
 
 	var message: some View {
 		textStyle(.body1Regular)
-			.foregroundColor(.app.gray1)
+			.foregroundColor(.primaryText)
 	}
 }
 
@@ -67,7 +67,7 @@ extension TransactionReview {
 		private let navTitleID: String = "TransactionReview.title"
 		private let showTitleHysteresis: CGFloat = .small3
 
-		private let shadowColor: Color = .app.gray2.opacity(0.4)
+		private let shadowColor: Color = .secondaryBackground.opacity(0.4)
 
 		init(store: StoreOf<TransactionReview>) {
 			self.store = store
@@ -77,7 +77,7 @@ extension TransactionReview {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				coreView(with: viewStore)
 					.controlState(viewStore.viewControlState)
-					.background(.white)
+					.background(.primaryBackground)
 					.toolbar {
 						ToolbarItem(placement: .automatic) {
 							if viewStore.canToggleViewMode {
@@ -95,12 +95,12 @@ extension TransactionReview {
 								VStack(spacing: 0) {
 									Text(L10n.TransactionReview.title)
 										.textStyle(.body2Header)
-										.foregroundColor(.app.gray1)
+										.foregroundColor(.primaryText)
 
 									if let name = viewStore.proposingDappMetadata?.name {
 										Text(L10n.InteractionReview.subtitle(name.rawValue))
 											.textStyle(.body2Regular)
-											.foregroundColor(.app.gray2)
+											.foregroundColor(.secondaryText)
 									}
 								}
 							}
@@ -155,7 +155,7 @@ extension TransactionReview {
 						JaggedEdge(shadowColor: shadowColor, isTopEdge: false)
 					}
 				}
-				.background(Common.gradientBackground)
+				.background(.secondaryBackground)
 				.animation(.easeInOut, value: viewStore.canToggleViewMode ? viewStore.rawManifest : nil)
 			}
 			.coordinateSpace(name: coordSpace)

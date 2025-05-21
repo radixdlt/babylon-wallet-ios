@@ -45,7 +45,7 @@ extension ManageThirdPartyDeposits {
 					viewState: .init(sections: viewStore.sections),
 					onRowSelected: { _, row in viewStore.send(.rowTapped(row)) }
 				)
-				.background(.app.gray5)
+				.background(.secondaryBackground)
 				.radixToolbar(title: L10n.AccountSettings.thirdPartyDeposits)
 				.destinations(with: store)
 				.footer {

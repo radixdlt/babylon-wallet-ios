@@ -12,38 +12,55 @@ extension App {
 		}
 
 		var body: some SwiftUI.View {
-			SwitchStore(store.scope(state: \.root, action: \.child)) { state in
-				switch state {
-				case .main:
-					CaseLet(
-						/App.State.Root.main,
-						action: App.ChildAction.main,
-						then: { Main.View(store: $0) }
-					)
+			WithViewStore(store, observe: { $0 }) { viewStore in
+				SwitchStore(store.scope(state: \.root, action: \.child)) { state in
+					switch state {
+					case .main:
+						CaseLet(
+							/App.State.Root.main,
+							action: App.ChildAction.main,
+							then: { Main.View(store: $0) }
+						)
 
-				case .onboardingCoordinator:
-					CaseLet(
-						/App.State.Root.onboardingCoordinator,
-						action: App.ChildAction.onboardingCoordinator,
-						then: { OnboardingCoordinator.View(store: $0) }
-					)
+					case .onboardingCoordinator:
+						CaseLet(
+							/App.State.Root.onboardingCoordinator,
+							action: App.ChildAction.onboardingCoordinator,
+							then: { OnboardingCoordinator.View(store: $0) }
+						)
 
-				case .splash:
-					CaseLet(
-						/App.State.Root.splash,
-						action: App.ChildAction.splash,
-						then: { Splash.View(store: $0) }
-					)
+					case .splash:
+						CaseLet(
+							/App.State.Root.splash,
+							action: App.ChildAction.splash,
+							then: { Splash.View(store: $0) }
+						)
+					}
+				}
+				.tint(.primaryText)
+				.background(.primaryBackground)
+				.presentsLoadingViewOverlay()
+				.preferredColorScheme(viewStore.preferredTheme.colorScheme)
+				.onOpenURL { url in
+					store.send(.view(.urlOpened(url)))
+				}
+				.task { @MainActor in
+					await store.send(.view(.task)).finish()
 				}
 			}
-			.tint(.app.gray1)
-			.presentsLoadingViewOverlay()
-			.onOpenURL { url in
-				store.send(.view(.urlOpened(url)))
-			}
-			.task { @MainActor in
-				await store.send(.view(.task)).finish()
-			}
+		}
+	}
+}
+
+extension AppTheme {
+	var colorScheme: ColorScheme? {
+		switch self {
+		case .light:
+			.light
+		case .dark:
+			.dark
+		case .system:
+			nil
 		}
 	}
 }

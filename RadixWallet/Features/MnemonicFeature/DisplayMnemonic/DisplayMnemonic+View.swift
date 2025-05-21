@@ -41,6 +41,7 @@ extension DisplayMnemonic {
 					}
 				}
 			}
+			.background(Color.primaryBackground)
 			.radixToolbar(title: L10n.RevealSeedPhrase.title)
 		}
 

@@ -6,7 +6,7 @@ struct LoadingView: View {
 	init(
 		rotationDegrees: CGFloat = 0.0,
 		lineWidth: CGFloat = 2,
-		stroke: Color = Color.app.white
+		stroke: Color = .primaryBackground
 	) {
 		self.stroke = stroke
 		_rotationDegrees = .init(initialValue: rotationDegrees)
@@ -36,16 +36,6 @@ extension LoadingView {
 		)
 		.onAppear {
 			rotationDegrees = 360.0
-		}
-	}
-}
-
-// MARK: - LoaderView_Previews
-struct LoaderView_Previews: PreviewProvider {
-	static var previews: some View {
-		ZStack {
-			Color.app.blue2
-			LoadingView()
 		}
 	}
 }

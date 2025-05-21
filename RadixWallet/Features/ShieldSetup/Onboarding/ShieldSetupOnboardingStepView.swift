@@ -24,7 +24,7 @@ struct ShieldSetupOnboardingStepView: View {
 						InfoButton(item, label: label)
 					}
 				}
-				.foregroundStyle(.app.gray1)
+				.foregroundStyle(.primaryText)
 				.multilineTextAlignment(.center)
 				.padding(.horizontal, .large2)
 

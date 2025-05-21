@@ -95,11 +95,11 @@ extension EncryptOrDecryptProfile {
 							.multilineTextAlignment(.center)
 							.lineLimit(2)
 							.textStyle(.sheetTitle)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 
 						Text(viewStore.subtitle)
 							.multilineTextAlignment(.center)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.textStyle(.body1Regular)
 							.padding(.horizontal, .large2)
 

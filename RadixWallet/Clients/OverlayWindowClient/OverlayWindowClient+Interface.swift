@@ -94,7 +94,7 @@ extension OverlayWindowClient {
 					text: text,
 					icon: .init(
 						kind: .system("exclamationmark.octagon"),
-						foregroundColor: Color.app.red1
+						foregroundColor: .error
 					)
 				)
 			}

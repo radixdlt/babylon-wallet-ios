@@ -3462,6 +3462,18 @@ internal enum L10n {
       /// Hidden Personas & Accounts
       internal static let title = L10n.tr("Localizable", "preferences_hiddenEntities_title", fallback: "Hidden Personas & Accounts")
     }
+    internal enum ThemeSelection {
+      /// Dark
+      internal static let dark = L10n.tr("Localizable", "preferences_themeSelection_dark", fallback: "Dark")
+      /// Light
+      internal static let light = L10n.tr("Localizable", "preferences_themeSelection_light", fallback: "Light")
+      /// Change the app theme
+      internal static let subtitle = L10n.tr("Localizable", "preferences_themeSelection_subtitle", fallback: "Change the app theme")
+      /// System
+      internal static let system = L10n.tr("Localizable", "preferences_themeSelection_system", fallback: "System")
+      /// Theme Selection
+      internal static let title = L10n.tr("Localizable", "preferences_themeSelection_title", fallback: "Theme Selection")
+    }
   }
   internal enum ProfileBackup {
     /// Backing up your wallet ensures that you can restore access to your Accounts, Personas, and wallet settings on a new phone by re-entering your seed phrase(s).

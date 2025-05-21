@@ -58,7 +58,7 @@ extension ShieldsList {
 		private func header(_ text: String) -> some SwiftUI.View {
 			Text(text)
 				.textStyle(.secondaryHeader)
-				.foregroundStyle(.app.gray2)
+				.foregroundStyle(.secondaryText)
 				.flushedLeft
 		}
 

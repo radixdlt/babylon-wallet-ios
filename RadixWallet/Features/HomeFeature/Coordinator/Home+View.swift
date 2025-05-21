@@ -30,17 +30,17 @@ extension Home {
 						if let fiatWorth = viewStore.totalFiatWorth {
 							VStack(spacing: .small2) {
 								Text(L10n.HomePage.totalValue)
-									.foregroundStyle(.app.gray2)
+									.foregroundStyle(.secondaryText)
 									.textStyle(.body1Header)
 									.textCase(.uppercase)
 
 								TotalCurrencyWorthView(
 									state: .init(totalCurrencyWorth: fiatWorth),
-									backgroundColor: .app.gray4
+									backgroundColor: .tertiaryBackground
 								) {
 									viewStore.send(.view(.showFiatWorthToggled))
 								}
-								.foregroundColor(.app.gray1)
+								.foregroundColor(.primaryText)
 							}
 							.padding(.horizontal, .medium1)
 						}
@@ -67,7 +67,7 @@ extension Home {
 				.toolbar {
 					ToolbarItem(placement: .topBarLeading) {
 						Text(L10n.HomePage.title)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(Color.primaryText)
 							.textStyle(.sheetTitle)
 							.padding(.leading, .medium3)
 					}
@@ -77,6 +77,7 @@ extension Home {
 						} label: {
 							Image(.homeHeaderSettings)
 						}
+						.tint(Color.primaryText)
 						.padding(.trailing, .medium3)
 					}
 				}
@@ -94,6 +95,7 @@ extension Home {
 			.onDisappear {
 				store.send(.view(.onDisappear))
 			}
+			.background(Color.primaryBackground)
 		}
 	}
 }
@@ -157,19 +159,6 @@ private extension View {
 	private func p2pLinks(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.p2pLinks, action: \.p2pLinks)) {
 			P2PLinksFeature.View(store: $0)
-		}
-	}
-}
-
-extension View {
-	func badged(_ showBadge: Bool) -> some View {
-		overlay(alignment: .topTrailing) {
-			if showBadge {
-				Circle()
-					.fill(.app.notification)
-					.frame(width: .small1, height: .small1) // we should probably have the frame size aligned with the unit size.
-					.offset(x: .small3, y: -.small3)
-			}
 		}
 	}
 }

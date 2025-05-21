@@ -2,7 +2,17 @@
   "images" : [
     {
       "filename" : "movement-restricted-future-anyone.pdf",
-      "idiom" : "universal",
+      "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "ic_movement_restricted_future_anyone.pdf",
+      "idiom" : "universal"
     }
   ],
   "info" : {

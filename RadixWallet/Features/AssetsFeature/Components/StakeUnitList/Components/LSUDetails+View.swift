@@ -57,7 +57,7 @@ extension LSUDetails {
 
 						Text(L10n.Account.PoolUnits.Details.currentRedeemableValue)
 							.textStyle(.secondaryHeader)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 
 						ValidatorHeaderView(viewState: store.validatorNameViewState)
 							.padding(.horizontal, .large2)

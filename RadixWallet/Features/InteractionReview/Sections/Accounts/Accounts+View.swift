@@ -20,7 +20,7 @@ extension InteractionReview.Accounts {
 								store.send(.view(.customizeGuaranteesTapped))
 							}
 							.textStyle(.body1Header)
-							.foregroundColor(.app.blue2)
+							.foregroundColor(.textButton)
 							.padding(.vertical, .small3)
 						}
 					}
@@ -52,8 +52,8 @@ extension InteractionReview.Account {
 						.flushedLeft
 						.padding(.horizontal, .medium3)
 						.padding(.vertical, .medium2)
-						.foregroundColor(.app.red1)
-						.background(.app.gray5)
+						.foregroundColor(.error)
+						.background(.secondaryBackground)
 					} else {
 						VStack(spacing: .zero) {
 							ForEach(store.transfers) { transfer in
@@ -63,9 +63,7 @@ extension InteractionReview.Account {
 
 								WithPerceptionTracking {
 									if transfer.id != store.transfers.last?.id {
-										Rectangle()
-											.fill(.app.gray4)
-											.frame(height: 1)
+										Separator()
 									}
 								}
 							}

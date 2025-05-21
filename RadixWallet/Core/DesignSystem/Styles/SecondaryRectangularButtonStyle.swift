@@ -41,11 +41,11 @@ extension SecondaryRectangularButtonStyle {
 	private var foregroundColor: Color {
 		switch controlState {
 		case .enabled:
-			isDestructive ? .app.red1 : .app.gray1
+			isDestructive ? .error : .primaryText
 		case .loading:
 			.clear
 		case .disabled:
-			.app.gray3
+			.iconTertiary
 		}
 	}
 }
@@ -55,7 +55,7 @@ extension ButtonStyle where Self == SecondaryRectangularButtonStyle {
 
 	static func secondaryRectangular(
 		font: SwiftUI.Font = .app.body1Header,
-		backgroundColor: Color = .app.gray4,
+		backgroundColor: Color = .secondaryButton,
 		shouldExpand: Bool = false,
 		isDestructive: Bool = false,
 		isInToolbar: Bool = false,

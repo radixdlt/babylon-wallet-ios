@@ -40,16 +40,16 @@ extension HUD {
 						}
 
 						Text(viewStore.text)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.font(.footnote)
 					}
 					.padding(.vertical, .small1)
 					.padding(.horizontal, .medium3)
 					.background(
 						Capsule()
-							.foregroundColor(.app.background)
+							.foregroundColor(.primaryBackground)
 							.shadow(
-								color: .app.gray1.opacity(0.16),
+								color: .shadow.opacity(0.16),
 								radius: 12,
 								x: 0,
 								y: 5

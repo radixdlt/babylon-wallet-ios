@@ -35,7 +35,7 @@ extension ImportMnemonicGrid {
 					let label = L10n.ImportMnemonic.numberOfWordsPicker
 					Text(label)
 						.textStyle(.body1HighImportance)
-						.foregroundStyle(.app.gray1)
+						.foregroundStyle(Color.primaryText)
 
 					Picker(label, selection: $store.wordCount.sending(\.view.wordCountChanged)) {
 						ForEach(BIP39WordCount.allCases, id: \.self) { wordCount in

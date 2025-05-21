@@ -42,7 +42,7 @@ extension PersonaDetails.View {
 					if viewStore.isDappPersona {
 						IfLetStore(store.scope(state: \.accountSection, action: PersonaDetails.Action.view)) {
 							AccountSection(store: $0)
-								.background(.app.gray5)
+								.background(.secondaryBackground)
 						}
 
 						Button(L10n.AuthorizedDapps.PersonaDetails.removeAuthorization) {
@@ -54,7 +54,7 @@ extension PersonaDetails.View {
 					} else {
 						IfLetStore(store.scope(state: \.dAppsSection, action: PersonaDetails.Action.view)) {
 							DappsSection(store: $0)
-								.background(.app.gray5)
+								.background(.secondaryBackground)
 						}
 
 						Button(L10n.AuthorizedDapps.PersonaDetails.hideThisPersona) {
@@ -71,6 +71,7 @@ extension PersonaDetails.View {
 				}
 			}
 		}
+		.background(.primaryBackground)
 		.destinations(with: store)
 	}
 }
@@ -209,6 +210,7 @@ extension PersonaDetails.View {
 					//	.buttonStyle(.secondaryRectangular)
 					//	.padding(.vertical, .large3)
 				}
+				.padding(.vertical, .medium2)
 			}
 		}
 	}

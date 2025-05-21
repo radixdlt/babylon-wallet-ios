@@ -25,6 +25,7 @@ extension AddFactorSource.DeviceSeedPhrase {
 						.onFirstAppear {
 							store.send(.view(.onFirstAppear))
 						}
+						.background(Color.primaryBackground)
 					}
 				}
 			}
@@ -58,7 +59,7 @@ extension AddFactorSource.DeviceSeedPhrase {
 				Text(L10n.NewBiometricFactor.SeedPhrase.subtitle)
 					.textStyle(.body1Regular)
 			}
-			.foregroundColor(.app.gray1)
+			.foregroundColor(Color.primaryText)
 			.multilineTextAlignment(.center)
 			.padding(.horizontal, .small2)
 		}

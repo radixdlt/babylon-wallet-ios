@@ -29,7 +29,7 @@ extension ScanMultipleOlympiaQRCodes {
 			VStack(spacing: 0) {
 				Text(L10n.ImportOlympiaAccounts.ScanQR.title)
 					.textStyle(.sheetTitle)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 					.multilineTextAlignment(.center)
 					.padding(.horizontal, .large2)
 

@@ -58,10 +58,7 @@ struct ValidatorStakeView: View {
 	@ViewBuilder
 	private func liquidStakeUnitView(viewState: ViewState.LiquidStakeUnit, action: @escaping () -> Void) -> some SwiftUI.View {
 		VStack(spacing: .zero) {
-			Divider()
-				.frame(height: .assetDividerHeight)
-				.overlay(.app.gray5)
-
+			AssetListSeparator()
 			ResourceBalanceButton(.liquidStakeUnit(viewState.lsu), appearance: .assetList, isSelected: viewState.isSelected, onTap: action)
 		}
 	}
@@ -72,10 +69,7 @@ struct ValidatorStakeView: View {
 		onClaimAllTapped: @escaping () -> Void
 	) -> some SwiftUI.View {
 		VStack(spacing: .zero) {
-			Divider()
-				.frame(height: .assetDividerHeight)
-				.overlay(.app.gray5)
-
+			AssetListSeparator()
 			ResourceBalanceView.StakeClaimNFT(
 				viewState: viewState,
 				appearance: .standalone,

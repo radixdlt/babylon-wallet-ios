@@ -16,6 +16,7 @@ extension AddFactorSource.NameFactorSource {
 					}
 					.padding(.medium3)
 				}
+				.background(Color.primaryBackground)
 				.footer {
 					WithControlRequirements(
 						store.sanitizedName,
@@ -41,7 +42,7 @@ extension AddFactorSource.NameFactorSource {
 				Text(store.kind.nameFactorTitle)
 					.textStyle(.sheetTitle)
 			}
-			.foregroundStyle(.app.gray1)
+			.foregroundStyle(Color.primaryText)
 			.multilineTextAlignment(.center)
 		}
 	}

@@ -6,6 +6,8 @@ extension SelectBackup {
 
 	@MainActor
 	struct View: SwiftUI.View {
+		@Environment(\.colorScheme) private var colorScheme
+
 		private let store: StoreOf<SelectBackup>
 
 		init(store: StoreOf<SelectBackup>) {
@@ -84,9 +86,9 @@ extension SelectBackup.View {
 				Button(L10n.RecoverProfileBackup.ImportFileButton.title) {
 					store.send(.view(.importFromFileInstead))
 				}
-				.buttonStyle(.alternativeRectangular)
+				.buttonStyle(.blueText)
 
-				Divider()
+				Separator()
 
 				VStack(spacing: .medium3) {
 					Text(L10n.RecoverProfileBackup.backupNotAvailable)
@@ -101,18 +103,19 @@ extension SelectBackup.View {
 			}
 			.padding(.horizontal, .medium1)
 			.padding(.bottom, .medium1)
-			.foregroundColor(.app.gray1)
+			.foregroundColor(.primaryText)
 		}
+		.background(.secondaryBackground)
 	}
 
 	private func failureBox(message: String) -> some View {
 		Text(message)
 			.textStyle(.body1Regular)
-			.foregroundStyle(.app.gray2)
+			.foregroundStyle(.secondaryText)
 			.padding(.vertical, .large1)
 			.padding(.horizontal, .large2)
 			.frame(maxWidth: .infinity)
-			.background(.app.gray5)
+			.background(.tertiaryBackground)
 			.roundedCorners(radius: .small1)
 	}
 
@@ -148,13 +151,13 @@ extension SelectBackup.View {
 			L10n.RecoverProfileBackup.numberOfPersonas(Int(header.contentHint.numberOfPersonasOnAllNetworksInTotal)),
 		]
 
-		return Card(.app.gray5) {
+		return Card {
 			HStack(spacing: .zero) {
 				VStack(alignment: .leading, spacing: .small3) {
 					ForEachStatic(values) {
-						Text(markdown: $0, emphasizedColor: .app.gray2, emphasizedFont: .app.body2Link)
+						Text(markdown: $0, emphasizedColor: .secondaryText, emphasizedFont: .app.body2Link)
 					}
-					.foregroundColor(.app.gray2)
+					.foregroundColor(.secondaryText)
 					.textStyle(.body2Regular)
 
 					if !isVersionCompatible {
@@ -168,7 +171,7 @@ extension SelectBackup.View {
 
 				if isVersionCompatible {
 					RadioButton(
-						appearance: .dark,
+						appearance: colorScheme == .light ? .dark : .light,
 						isSelected: item.isSelected
 					)
 				}

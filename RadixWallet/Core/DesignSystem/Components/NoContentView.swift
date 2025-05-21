@@ -8,9 +8,9 @@ struct NoContentView: SwiftUI.View {
 
 	var body: some SwiftUI.View {
 		Text(text)
-			.foregroundColor(.app.gray2)
+			.foregroundColor(.secondaryText)
 			.padding(.large2)
-			.background(.app.gray5)
+			.background(.secondaryBackground)
 			.cornerRadius(.small1)
 	}
 }

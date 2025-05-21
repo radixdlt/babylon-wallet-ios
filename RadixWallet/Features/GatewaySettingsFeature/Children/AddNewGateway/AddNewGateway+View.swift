@@ -35,12 +35,12 @@ extension AddNewGateway {
 				ScrollView {
 					VStack(spacing: .medium2) {
 						Text(L10n.Gateways.AddNewGateway.title)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.textStyle(.sheetTitle)
 							.multilineTextAlignment(.center)
 
 						Text(L10n.Gateways.AddNewGateway.subtitle)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)
 

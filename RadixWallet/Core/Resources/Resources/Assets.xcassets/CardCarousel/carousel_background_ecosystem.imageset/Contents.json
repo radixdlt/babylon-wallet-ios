@@ -1,19 +1,8 @@
 {
   "images" : [
     {
-      "filename" : "carousel_background_ecosystem.png",
-      "idiom" : "universal",
-      "scale" : "1x"
-    },
-    {
-      "filename" : "carousel_background_ecosystem@2x.png",
-      "idiom" : "universal",
-      "scale" : "2x"
-    },
-    {
-      "filename" : "carousel_background_ecosystem@3x.png",
-      "idiom" : "universal",
-      "scale" : "3x"
+      "filename" : "carousel_background_ecosystem.pdf",
+      "idiom" : "universal"
     }
   ],
   "info" : {

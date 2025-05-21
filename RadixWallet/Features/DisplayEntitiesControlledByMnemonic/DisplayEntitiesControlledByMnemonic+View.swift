@@ -33,7 +33,7 @@ extension DisplayEntitiesControlledByMnemonic {
 			let type: HeadingType
 			let isError: Bool
 			var foregroundColor: Color {
-				isError ? .app.gray2 : .app.gray1
+				isError ? .secondaryText : .primaryText
 			}
 
 			enum HeadingType: Equatable {
@@ -96,6 +96,7 @@ extension DisplayEntitiesControlledByMnemonic {
 	}
 
 	struct MnemonicView: SwiftUI.View {
+		@Environment(\.colorScheme) private var colorScheme
 		let viewState: ViewState
 		let action: () -> Void
 
@@ -161,7 +162,7 @@ extension DisplayEntitiesControlledByMnemonic {
 
 					Text(headingState.connectedAccountsLabel(accounts: viewState.totalAccountsCount, personas: viewState.personasCount))
 						.textStyle(.body2Regular)
-						.foregroundColor(.app.gray2)
+						.foregroundColor(.secondaryText)
 				}
 
 				Spacer(minLength: 0)
@@ -171,7 +172,10 @@ extension DisplayEntitiesControlledByMnemonic {
 					Image(.chevronRight)
 						.foregroundColor(headingState.foregroundColor)
 				case let .scanning(isSelected):
-					RadioButton(appearance: .dark, isSelected: isSelected)
+					RadioButton(
+						appearance: colorScheme == .light ? .dark : .light,
+						isSelected: isSelected
+					)
 				}
 			}
 		}

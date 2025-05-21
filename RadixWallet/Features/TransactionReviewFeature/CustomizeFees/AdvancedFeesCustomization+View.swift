@@ -45,7 +45,7 @@ extension AdvancedFeesCustomization {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: .zero) {
 					Group {
-						Divider()
+						Separator()
 						AppTextField(
 							primaryHeading: .init(text: L10n.CustomizeNetworkFees.paddingFieldLabel),
 							placeholder: "",
@@ -98,7 +98,7 @@ extension AdvancedFeesCustomization {
 						Button(L10n.Common.done) {
 							viewStore.send(.focusChanged(nil))
 						}
-						.foregroundColor(.app.blue1)
+						.foregroundColor(.button)
 					}
 				}
 			}

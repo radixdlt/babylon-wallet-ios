@@ -21,7 +21,7 @@ extension View {
 	func loadable<T>(
 		_ loadable: Loadable<T>,
 		loadingViewHeight: CGFloat = .large1,
-		backgroundColor: Color = .app.gray4,
+		backgroundColor: Color = .tertiaryBackground,
 		@ViewBuilder successContent: (T) -> some View
 	) -> some View {
 		self.loadable(
@@ -34,7 +34,7 @@ extension View {
 	}
 
 	@ViewBuilder
-	func shimmeringLoadingView(height: CGFloat = .large1, backgroundColor: Color = .app.gray4) -> some View {
+	func shimmeringLoadingView(height: CGFloat = .large1, backgroundColor: Color = .tertiaryBackground) -> some View {
 		Spacer()
 			.background(backgroundColor)
 			.shimmer(active: true, config: .accountResourcesLoading)

@@ -44,34 +44,34 @@ extension EditPersonaName {
 					ForEach(PersonaDataEntryName.Variant.allCases, id: \.self) {
 						Text($0.text)
 							.textStyle(.body1Regular)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 					}
 				}
 			} label: {
 				VStack(alignment: .leading, spacing: .small3) {
 					Text(L10n.AuthorizedDapps.PersonaDetails.nameVariant)
 						.textStyle(.body1HighImportance)
-						.foregroundColor(.app.gray1)
+						.foregroundColor(.primaryText)
 						.multilineTextAlignment(.leading)
 
 					HStack(spacing: .small2) {
 						Text(viewStore.variant.text)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.textStyle(.body1Regular)
 
 						Spacer()
 						Image(asset: AssetResource.chevronDown)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.frame(.smallest)
 					}
 					.padding([.top, .bottom])
 					.padding([.leading, .trailing], 6)
 					.frame(height: .standardButtonHeight)
-					.background(Color.app.gray5)
+					.background(.textFieldBackground)
 					.cornerRadius(.small2)
 					.overlay(
 						RoundedRectangle(cornerRadius: .small2)
-							.stroke(.app.gray4, lineWidth: 1)
+							.stroke(.border, lineWidth: 1)
 					)
 				}
 			}

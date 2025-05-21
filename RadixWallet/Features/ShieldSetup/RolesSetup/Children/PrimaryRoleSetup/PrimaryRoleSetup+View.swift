@@ -106,7 +106,7 @@ extension PrimaryRoleSetup {
 						VStack(spacing: .small2) {
 							Text(L10n.ShieldWizardRegularAccess.Combination.label)
 								.textStyle(.body1Link)
-								.foregroundStyle(.app.gray1)
+								.foregroundStyle(.primaryText)
 
 							overrideFactorsView
 						}
@@ -117,7 +117,7 @@ extension PrimaryRoleSetup {
 						} label: {
 							Label(L10n.ShieldWizardRegularAccess.Override.button, asset: AssetResource.addAccount)
 								.font(.app.body1Header)
-								.foregroundColor(.app.blue2)
+								.foregroundColor(.textButton)
 								.padding([.vertical, .leading], .small2)
 						}
 						.flushedRight
@@ -126,7 +126,7 @@ extension PrimaryRoleSetup {
 				.padding(.horizontal, .medium2)
 				.padding(.bottom, .small3)
 
-				Separator(color: .app.gray3)
+				Separator()
 
 				authenticationSigningFactorView
 					.padding(.horizontal, .medium2)
@@ -160,7 +160,7 @@ extension PrimaryRoleSetup {
 						}
 				}
 			}
-			.foregroundStyle(.app.gray1)
+			.foregroundStyle(.primaryText)
 		}
 
 		private var thresholdFactorsView: some SwiftUI.View {
@@ -213,13 +213,13 @@ extension PrimaryRoleSetup {
 							Image(.chevronDown)
 						}
 					}
-					.foregroundStyle(.app.blue2)
+					.foregroundStyle(.textButton)
 
 					Text(parts[1])
 				}
 			}
 			.textStyle(.body2Regular)
-			.foregroundStyle(.app.gray1)
+			.foregroundStyle(.primaryText)
 		}
 
 		private var overrideFactorsView: some SwiftUI.View {
@@ -227,7 +227,7 @@ extension PrimaryRoleSetup {
 				HStack {
 					Text(L10n.ShieldWizardRegularAccess.Override.title)
 						.textStyle(.body1Header)
-						.foregroundStyle(.app.white)
+						.foregroundStyle(.primaryText)
 
 					Spacer()
 
@@ -237,16 +237,16 @@ extension PrimaryRoleSetup {
 						Image(.close)
 							.frame(.smallest)
 					}
-					.foregroundColor(.app.gray2)
+					.foregroundColor(.secondaryText)
 				}
 				.padding(.horizontal, .medium3)
 				.padding(.vertical, .small1)
-				.background(.app.gray1)
+				.background(.primaryText)
 
 				VStack(spacing: .small1) {
 					Text(L10n.ShieldWizardRegularAccess.Override.description)
 						.textStyle(.body2Regular)
-						.foregroundStyle(.app.gray1)
+						.foregroundStyle(.primaryText)
 						.flushedLeft
 
 					ForEach(store.overrideFactors, id: \.self) { factorSource in
@@ -269,7 +269,7 @@ extension PrimaryRoleSetup {
 						if !isLastFactor {
 							Text(L10n.ShieldWizardRegularAccess.OverrideCombination.label)
 								.textStyle(.body1Link)
-								.foregroundStyle(.app.gray1)
+								.foregroundStyle(.primaryText)
 						}
 					}
 
@@ -280,7 +280,7 @@ extension PrimaryRoleSetup {
 				}
 				.padding([.horizontal, .bottom], .medium3)
 				.padding(.top, .medium3)
-				.background(Color.containerContentBackground)
+				.background(.secondaryBackground)
 			}
 			.frame(maxWidth: .infinity)
 			.roundedCorners(radius: .small1)
@@ -344,7 +344,7 @@ extension View {
 	var embedInContainer: some View {
 		self
 			.padding(.medium3)
-			.background(Color.containerContentBackground)
+			.background(.secondaryBackground)
 			.roundedCorners(radius: .small1)
 	}
 }

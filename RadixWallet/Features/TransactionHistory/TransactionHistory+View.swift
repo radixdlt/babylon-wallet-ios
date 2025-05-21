@@ -34,11 +34,11 @@ extension TransactionHistory {
 							}
 
 							HScrollBar(items: viewStore.availableMonths, selection: selection)
-								.background(.app.white)
+								.background(.primaryBackground)
 						}
 						.padding(.top, .small3)
 						.padding(.bottom, .small1)
-						.background(.app.white)
+						.background(.primaryBackground)
 
 						TableView(
 							sections: viewStore.sections,
@@ -46,6 +46,7 @@ extension TransactionHistory {
 						) { action in
 							store.send(.view(.transactionsTableAction(action)))
 						}
+						.background(.secondaryBackground)
 						.ignoresSafeArea(edges: .bottom)
 						.opacity(viewStore.sections == [] ? 0 : 1)
 						.background(alignment: .top) {
@@ -59,10 +60,10 @@ extension TransactionHistory {
 						if viewStore.showEmptyState {
 							Text(L10n.TransactionHistory.noTransactions)
 								.textStyle(.sectionHeader)
-								.foregroundStyle(.app.gray2)
+								.foregroundStyle(.secondaryText)
 						}
 					}
-					.background(.app.gray5)
+					.background(.secondaryBackground)
 					.toolbar {
 						ToolbarItem(placement: .topBarLeading) {
 							CloseButton {

@@ -16,12 +16,12 @@ extension SecurityCenter {
 				ScrollView {
 					VStack(alignment: .leading, spacing: .zero) {
 						Text(L10n.SecurityCenter.title)
-							.foregroundStyle(.app.gray1)
+							.foregroundStyle(Color.primaryText)
 							.textStyle(.sheetTitle)
 							.padding(.bottom, .small1)
 
 						Text(L10n.SecurityCenter.subtitle)
-							.foregroundStyle(.app.gray1)
+							.foregroundStyle(Color.primaryText)
 							.textStyle(.body1Regular)
 							.padding(.bottom, .medium1)
 
@@ -47,7 +47,7 @@ extension SecurityCenter {
 					.padding(.horizontal, .medium2)
 					.padding(.bottom, .medium3)
 				}
-				.background(.app.gray5)
+				.background(Color.secondaryBackground)
 			}
 			.task {
 				store.send(.view(.task))
@@ -98,7 +98,7 @@ extension SecurityCenter {
 					.foregroundStyle(.white)
 					.padding(.vertical, .small2)
 					.padding(.horizontal, .medium2)
-					.background(.app.alert)
+					.background(.warning)
 
 					HStack(spacing: 0) {
 						Text(problem.securityCenterBody)
@@ -109,10 +109,10 @@ extension SecurityCenter {
 
 						Image(.chevronRight)
 					}
-					.foregroundStyle(.app.alert)
+					.foregroundStyle(.warning)
 					.padding(.top, .small1)
 					.padding([.bottom, .horizontal], .medium2)
-					.background(.app.lightAlert)
+					.background(.warningSecondary)
 				}
 				.roundedCorners(radius: .small1)
 			}
@@ -128,18 +128,19 @@ extension SecurityCenter {
 			Card(action: action) {
 				HStack(spacing: .zero) {
 					Image(image)
+						.darkModeTinted()
 						.frame(width: 80, height: 80)
 						.padding(.trailing, .medium3)
 
 					VStack(alignment: .leading, spacing: .small3) {
 						Text(title)
-							.foregroundStyle(.app.gray1)
+							.foregroundStyle(Color.primaryText)
 							.textStyle(.body1Header)
 
 						Text(subtitle)
 							.multilineTextAlignment(.leading)
 							.lineSpacing(-.small3)
-							.foregroundStyle(.app.gray2)
+							.foregroundStyle(Color.secondaryText)
 							.textStyle(.body2Regular)
 
 						HStack(spacing: .zero) {
@@ -149,7 +150,7 @@ extension SecurityCenter {
 							Text(status)
 								.textStyle(.body2HighImportance)
 						}
-						.foregroundStyle(actionRequired ? .app.alert : .app.green1)
+						.foregroundStyle(actionRequired ? .warning : .app.green1)
 					}
 
 					Spacer(minLength: .zero)

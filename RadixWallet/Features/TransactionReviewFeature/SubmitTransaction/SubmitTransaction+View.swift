@@ -73,7 +73,7 @@ extension SubmitTransaction {
 						if viewStore.status.failed {
 							Image(.errorLarge)
 							Text(viewStore.status.errorTitle)
-								.foregroundColor(.app.gray1)
+								.foregroundColor(.primaryText)
 								.textStyle(.sheetTitle)
 								.multilineTextAlignment(.center)
 								.padding(.horizontal, .medium2)
@@ -83,14 +83,14 @@ extension SubmitTransaction {
 						}
 
 						Text(viewStore.status.display)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)
 							.padding(.horizontal, .medium2)
 							.padding(.top, .medium3)
 
-						AddressView(.transaction(viewStore.txID), imageColor: .app.gray2)
-							.foregroundColor(.app.blue1)
+						AddressView(.transaction(viewStore.txID), imageColor: .secondaryText)
+							.foregroundColor(.textButton)
 							.textStyle(.body1Header)
 							.padding(.horizontal, .medium2)
 							.padding(.top, .small2)
@@ -98,15 +98,16 @@ extension SubmitTransaction {
 						Spacer()
 						if viewStore.status.failed, viewStore.showSwitchBackToBrowserMessage {
 							Text(L10n.MobileConnect.interactionSuccess)
-								.foregroundColor(.app.gray1)
+								.foregroundColor(.primaryText)
 								.textStyle(.body1Regular)
 								.multilineTextAlignment(.center)
 								.padding(.vertical, .medium1)
 								.frame(maxWidth: .infinity)
-								.background(.app.gray5)
+								.background(.secondaryBackground)
 						}
 					}
 					.frame(maxWidth: .infinity)
+					.background(.primaryBackground)
 				}
 				.onFirstTask { @MainActor in
 					viewStore.send(.appeared)

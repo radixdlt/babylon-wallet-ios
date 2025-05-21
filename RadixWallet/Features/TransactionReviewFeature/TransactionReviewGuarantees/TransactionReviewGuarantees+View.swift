@@ -27,7 +27,7 @@ extension TransactionReviewGuarantees {
 					VStack(spacing: 0) {
 						Text(L10n.TransactionReview.Guarantees.title)
 							.textStyle(.sheetTitle)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.multilineTextAlignment(.center)
 							.padding(.vertical, .medium3)
 
@@ -38,7 +38,7 @@ extension TransactionReviewGuarantees {
 						Text(L10n.TransactionReview.Guarantees.subtitle)
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.padding(.horizontal, .large2)
 							.padding(.bottom, .medium1)
 					}
@@ -50,7 +50,7 @@ extension TransactionReviewGuarantees {
 						}
 					}
 					.padding(.medium1)
-					.background(.app.gray5)
+					.background(.secondaryBackground)
 				}
 				.footer {
 					WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in

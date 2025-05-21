@@ -31,7 +31,7 @@ extension FactorSourcesList {
 					.padding(.medium3)
 					.padding(.bottom, .medium2)
 				}
-				.background(.app.gray5)
+				.background(Color.secondaryBackground)
 				.radixToolbar(title: store.kind.title)
 				.footer(visible: store.showFooter) {
 					WithControlRequirements(
@@ -52,7 +52,7 @@ extension FactorSourcesList {
 		private func header(_ text: String) -> some SwiftUI.View {
 			Text(text)
 				.textStyle(.body1Header)
-				.foregroundStyle(.app.gray2)
+				.foregroundStyle(Color.secondaryText)
 				.flushedLeft
 		}
 

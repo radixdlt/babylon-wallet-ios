@@ -19,7 +19,7 @@ extension ApplyShield {
 					Text(L10n.ShieldWizardApplyShield.ApplyShield.subtitle)
 						.textStyle(.body1HighImportance)
 				}
-				.foregroundStyle(.app.gray1)
+				.foregroundStyle(.primaryText)
 				.multilineTextAlignment(.center)
 				.padding(.horizontal, .large2)
 

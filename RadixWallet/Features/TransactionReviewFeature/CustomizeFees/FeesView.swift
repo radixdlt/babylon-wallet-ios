@@ -16,7 +16,7 @@ struct FeesView: View {
 			HStack {
 				Text(L10n.CustomizeNetworkFees.feeBreakdownTitle)
 					.textStyle(.body1Link)
-					.foregroundColor(.app.gray2)
+					.foregroundColor(.secondaryText)
 					.textCase(.uppercase)
 				Spacer()
 			}
@@ -27,12 +27,12 @@ struct FeesView: View {
 					feeView(state: viewState)
 				}
 
-				Divider()
+				Separator()
 
 				transactionFeeView(fee: viewState.totalFee.formatted(), isAdvancedMode: viewState.isAdvancedMode)
 			}
 			.padding(.medium1)
-			.background(.app.gray5)
+			.background(.secondaryBackground)
 		}
 	}
 
@@ -42,18 +42,18 @@ struct FeesView: View {
 			VStack(spacing: .zero) {
 				Text(L10n.CustomizeNetworkFees.totalFee)
 					.textStyle(.body1Link)
-					.foregroundColor(.app.gray2)
+					.foregroundColor(.secondaryText)
 					.textCase(.uppercase)
 				if isAdvancedMode {
 					Text(L10n.CustomizeNetworkFees.TotalFee.info)
 						.textStyle(.body1Link)
-						.foregroundColor(.app.gray2)
+						.foregroundColor(.secondaryText)
 				}
 			}
 			Spacer()
 			Text(L10n.TransactionReview.xrdAmount(fee))
 				.textStyle(.body1Header)
-				.foregroundColor(.app.gray1)
+				.foregroundColor(.primaryText)
 		}
 	}
 
@@ -62,12 +62,12 @@ struct FeesView: View {
 		HStack {
 			Text(state.name)
 				.textStyle(.body1Link)
-				.foregroundColor(.app.gray2)
+				.foregroundColor(.secondaryText)
 				.textCase(.uppercase)
 			Spacer()
 			Text(state.amount.formatted(showsZero: state.isUserConfigurable))
 				.textStyle(.body1HighImportance)
-				.foregroundColor(state.amount == .zero ? .app.gray2 : .app.gray1)
+				.foregroundColor(state.amount == .zero ? .secondaryText : .primaryText)
 		}
 	}
 }

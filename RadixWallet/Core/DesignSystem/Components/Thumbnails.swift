@@ -77,7 +77,7 @@ struct Thumbnail: View {
 			ZStack {
 				if placeholderBackground {
 					Rectangle()
-						.fill(.app.gray4)
+						.fill(.tertiaryBackground)
 						.frame(size)
 					Image(asset: placeholder)
 						.resizable()
@@ -254,7 +254,7 @@ struct LoadableImage<Placeholder: View>: View {
 	private var loadingView: some View {
 		switch placeholderBehaviour.loading {
 		case .shimmer:
-			Color.app.gray4
+			Color.tertiaryBackground
 				.shimmer(active: true, config: .accountResourcesLoading)
 		case let .color(color):
 			color
@@ -287,7 +287,7 @@ struct LoadableImage<Placeholder: View>: View {
 				Spacer(minLength: .small2)
 			}
 			.frame(width: brokenImageSize.width, height: brokenImageSize.height)
-			.background(.app.gray4)
+			.background(.tertiaryBackground)
 		case .standard:
 			placeholder
 				.frame(width: brokenImageSize.width, height: brokenImageSize.height)

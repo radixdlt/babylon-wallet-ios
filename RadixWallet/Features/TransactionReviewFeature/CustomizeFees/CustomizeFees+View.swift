@@ -72,7 +72,7 @@ extension CustomizeFees {
 						VStack(spacing: .zero) {
 							VStack {
 								infoView(viewStore.state)
-								Divider()
+								Separator()
 								feePayerView(viewStore.state)
 									.padding(.top, .small1)
 							}
@@ -100,11 +100,11 @@ extension CustomizeFees {
 						Button(viewStore.modeSwitchTitle) {
 							viewStore.send(.toggleMode)
 						}
-						.textStyle(.body1StandaloneLink)
-						.foregroundColor(.app.blue2)
+						.buttonStyle(.blueText)
 						.padding(.bottom, .medium1)
 					}
 				}
+				.background(.primaryBackground)
 				.withNavigationBar {
 					store.send(.view(.closeButtonTapped))
 				}
@@ -117,12 +117,12 @@ extension CustomizeFees {
 			VStack {
 				Text(viewState.title)
 					.textStyle(.sheetTitle)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 					.multilineTextAlignment(.center)
 					.padding(.bottom, .small1)
 				Text(viewState.description)
 					.textStyle(.body1Regular)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 					.multilineTextAlignment(.center)
 					.padding(.bottom, .medium2)
 
@@ -137,7 +137,7 @@ extension CustomizeFees {
 				HStack {
 					Text(L10n.CustomizeNetworkFees.payFeeFrom)
 						.textStyle(.body1Link)
-						.foregroundColor(.app.gray2)
+						.foregroundColor(.secondaryText)
 						.textCase(.uppercase)
 
 					Spacer()
@@ -145,8 +145,7 @@ extension CustomizeFees {
 					Button(L10n.CustomizeNetworkFees.changeButtonTitle) {
 						store.send(.view(.changeFeePayerTapped))
 					}
-					.textStyle(.body1StandaloneLink)
-					.foregroundColor(.app.blue2)
+					.buttonStyle(.blueText)
 				}
 				if let feePayer = viewState.feePayer {
 					AccountCard(account: feePayer)

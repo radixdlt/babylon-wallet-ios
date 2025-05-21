@@ -39,6 +39,7 @@ extension AddAsset {
 
 	@MainActor
 	struct View: SwiftUI.View {
+		@Environment(\.colorScheme) private var colorScheme
 		let store: StoreOf<AddAsset>
 
 		@FocusState private var resourceAddressFieldFocus: Bool
@@ -62,6 +63,7 @@ extension AddAsset {
 					Spacer()
 				}
 				.padding(.horizontal, .medium3)
+				.background(.primaryBackground)
 				.footer {
 					addAssetButton(viewStore)
 				}
@@ -82,7 +84,7 @@ extension AddAsset.View {
 		Text(text)
 			.multilineTextAlignment(.center)
 			.textStyle(.sheetTitle)
-			.foregroundColor(.app.gray1)
+			.foregroundColor(.primaryText)
 	}
 
 	@ViewBuilder
@@ -90,7 +92,7 @@ extension AddAsset.View {
 		Text(text)
 			.lineLimit(nil)
 			.textStyle(.body1Regular)
-			.foregroundColor(.app.gray1)
+			.foregroundColor(.primaryText)
 			.multilineTextAlignment(.center)
 			.fixedSize(horizontal: false, vertical: true)
 	}
@@ -128,7 +130,7 @@ extension AddAsset.View {
 	func depositExceptionSelectionView(_ exception: ResourcesListMode.ExceptionRule, _ viewStore: ViewStoreOf<AddAsset>) -> some SwiftUI.View {
 		HStack(spacing: .small3) {
 			RadioButton(
-				appearance: .dark,
+				appearance: colorScheme == .light ? .dark : .light,
 				state: viewStore.mode.allowDenyAssets == exception ? .selected : .unselected
 			)
 			Text(exception.selectionText)

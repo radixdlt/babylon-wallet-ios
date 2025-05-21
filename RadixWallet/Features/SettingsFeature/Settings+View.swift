@@ -48,8 +48,8 @@ extension Settings.View {
 	var body: some View {
 		settingsView()
 			.radixToolbar(title: L10n.WalletSettings.title)
-			.tint(.app.gray1)
-			.foregroundColor(.app.gray1)
+			.tint(Color.primaryText)
+			.foregroundColor(Color.primaryBackground)
 			.destinations(with: store)
 			.presentsLoadingViewOverlay()
 	}
@@ -76,19 +76,19 @@ extension Settings.View {
 
 				VStack(spacing: .medium1) {
 					Text(viewStore.appVersion)
-						.foregroundColor(.app.gray2)
+						.foregroundColor(.secondaryText)
 						.textStyle(.body1Regular)
 
 					#if DEBUG
 					Text(viewStore.debugAppInfo)
-						.foregroundColor(.app.gray2)
+						.foregroundColor(.secondaryText)
 						.textStyle(.body2Regular)
 						.multilineTextAlignment(.leading)
 					#endif
 				}
 				.frame(minHeight: .huge1)
 			}
-			.background(Color.app.gray5)
+			.background(Color.secondaryBackground)
 			.task {
 				store.send(.view(.task))
 			}

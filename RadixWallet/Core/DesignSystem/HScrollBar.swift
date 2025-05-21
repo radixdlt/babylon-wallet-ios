@@ -20,7 +20,7 @@ struct HScrollBar<Item: ScrollBarItem>: View {
 							selection = item.id
 						} label: {
 							Text(item.caption.localizedUppercase)
-								.foregroundStyle(isSelected ? .app.gray1 : .app.gray2)
+								.foregroundStyle(isSelected ? .primaryText : .secondaryText)
 						}
 						.padding(.horizontal, .medium3)
 						.padding(.vertical, .small2)
@@ -33,7 +33,7 @@ struct HScrollBar<Item: ScrollBarItem>: View {
 				.backgroundPreferenceValue(PositionsPreferenceKey.self) { positions in
 					if let rect = positions[selection] {
 						Capsule()
-							.fill(.app.gray4)
+							.fill(.tertiaryBackground)
 							.frame(width: rect.width, height: rect.height)
 							.position(x: rect.midX, y: rect.midY)
 							.animation(.default, value: rect)

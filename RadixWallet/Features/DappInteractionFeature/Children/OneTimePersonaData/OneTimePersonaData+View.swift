@@ -24,6 +24,7 @@ extension OneTimePersonaData {
 
 	@MainActor
 	struct View: SwiftUI.View {
+		@Environment(\.colorScheme) private var colorScheme
 		let store: StoreOf<OneTimePersonaData>
 
 		var body: some SwiftUI.View {
@@ -38,7 +39,7 @@ extension OneTimePersonaData {
 
 						if viewStore.shouldShowChooseDataToProvideTitle {
 							Text(L10n.DAppRequest.PersonalDataOneTime.chooseDataToProvide)
-								.foregroundColor(.app.gray1)
+								.foregroundColor(.primaryText)
 								.textStyle(.body1Header)
 						}
 
@@ -83,7 +84,7 @@ extension OneTimePersonaData {
 					action: item.action,
 					accessory: {
 						RadioButton(
-							appearance: .dark,
+							appearance: colorScheme == .light ? .dark : .light,
 							isSelected: item.isSelected
 						)
 					}

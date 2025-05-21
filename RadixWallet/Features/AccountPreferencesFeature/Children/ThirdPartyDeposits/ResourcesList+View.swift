@@ -60,7 +60,7 @@ extension ResourcesList {
 					await viewStore.send(.view(.task)).finish()
 				}
 				.padding(.top, .medium1)
-				.background(.app.gray5)
+				.background(.secondaryBackground)
 				.destinations(with: store)
 				.radixToolbar(title: viewStore.mode.navigationTitle)
 				.footer {
@@ -93,13 +93,14 @@ extension ResourcesList.View {
 						Text($0.text)
 					}
 				}
+				.tint(.primaryBackground)
 				.pickerStyle(.segmented)
 				.padding(.horizontal, .small3)
 			}
 
 			Text(viewStore.info)
 				.textStyle(.body1HighImportance)
-				.foregroundColor(.app.gray2)
+				.foregroundColor(.secondaryText)
 				.multilineTextAlignment(.center)
 		}
 		.padding(.horizontal, .medium3)

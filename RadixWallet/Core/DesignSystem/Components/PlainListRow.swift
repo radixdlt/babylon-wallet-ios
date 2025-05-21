@@ -97,11 +97,13 @@ struct PlainListRow<Icon: View, Accessory: View, Bottom: View>: View {
 			bottom
 		}
 		.applyIf(viewState.rowCoreViewState.shouldTintAsError) {
-			$0.foregroundStyle(Color.app.error)
+			$0.foregroundStyle(.error)
 		}
 		.padding(.vertical, viewState.rowCoreViewState.verticalPadding)
 		.padding(.horizontal, viewState.rowCoreViewState.horizontalPadding)
 		.frame(minHeight: .plainListRowMinHeight)
+		.background(Color.primaryBackground)
+		.foregroundStyle(Color.primaryText)
 		.contentShape(Rectangle())
 	}
 
@@ -203,16 +205,16 @@ struct PlainListRowCore: View {
 					.textStyle(.body2Regular)
 					.lineLimit(1)
 					.minimumScaleFactor(0.8)
-					.foregroundColor(.app.gray2)
+					.foregroundColor(.secondaryText)
 					.padding(.top, .small3)
 			}
 
 			if let markdown = viewState.markdown {
-				Text(markdown: markdown, emphasizedColor: .app.gray2, emphasizedFont: .app.body1Header)
+				Text(markdown: markdown, emphasizedColor: .secondaryText, emphasizedFont: .app.body1Header)
 					.textStyle(.body1Regular)
 					.lineLimit(1)
 					.minimumScaleFactor(0.8)
-					.foregroundStyle(.app.gray2)
+					.foregroundStyle(.secondaryText)
 					.padding(.top, .small3)
 			}
 		}
@@ -241,20 +243,20 @@ private extension PlainListRowCore.ViewState {
 	var titleForegroundColor: Color {
 		switch context {
 		case .toggle, .hiddenPersona, .settings(isError: false), .dappAndPersona, .compactPersona:
-			.app.gray1
+			Color.primaryText
 		case .settings(isError: true):
-			.app.error
+			.error
 		}
 	}
 
 	var subtitleForegroundColor: Color {
 		switch context {
 		case .toggle, .hiddenPersona:
-			.app.gray2
+			.secondaryText
 		case .settings(isError: false), .dappAndPersona, .compactPersona:
-			.app.gray1
+			Color.primaryText
 		case .settings(isError: true):
-			.app.error
+			.error
 		}
 	}
 

@@ -14,6 +14,7 @@ extension NewConnection {
 		var body: some SwiftUI.View {
 			NavigationStack {
 				ZStack {
+					Color.primaryBackground
 					root(for: store.scope(state: \.root, action: { .child(.root($0)) }))
 				}
 				.toolbar {
@@ -23,10 +24,11 @@ extension NewConnection {
 						}
 					}
 				}
+				.background(.primaryBackground)
 				.destination(with: store)
 			}
-			.tint(.app.gray1)
-			.foregroundColor(.app.gray1)
+			.tint(.primaryText)
+			.foregroundColor(.primaryText)
 		}
 
 		private func root(
@@ -40,7 +42,8 @@ extension NewConnection {
 						action: NewConnection.Root.Action.localNetworkPermission,
 						then: {
 							LocalNetworkPermission.View(store: $0)
-								.withTitle(L10n.LinkedConnectors.NewConnection.title)
+								// .withTitle(L10n.LinkedConnectors.NewConnection.title)
+								.background(.primaryBackground)
 						}
 					)
 				case .scanQR:
@@ -49,7 +52,8 @@ extension NewConnection {
 						action: NewConnection.Root.Action.scanQR,
 						then: {
 							ScanQRCoordinator.View(store: $0)
-								.withTitle(L10n.LinkedConnectors.NewConnection.title)
+								// .withTitle(L10n.LinkedConnectors.NewConnection.title)
+								.background(.primaryBackground)
 						}
 					)
 				case .connectionApproval:
@@ -74,7 +78,7 @@ extension View {
 	func withTitle(_ title: String) -> some View {
 		VStack(spacing: .zero) {
 			Text(title)
-				.foregroundColor(.app.gray1)
+				.foregroundColor(.primaryText)
 				.textStyle(.sheetTitle)
 				.padding(.bottom, .medium3)
 

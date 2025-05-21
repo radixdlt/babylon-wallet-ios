@@ -188,7 +188,7 @@ extension DebugInspectFactorSourceView {
 		.background {
 			Color.randomDark(seed: factorSource.id.description.data(using: .utf8)!)
 		}
-		.foregroundColor(.white)
+		.foregroundColor(.primaryText)
 		.padding(.leading, leadingPadding)
 		.overlay {
 			if factorSource.isExplicitMain {

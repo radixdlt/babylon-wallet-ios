@@ -81,7 +81,7 @@ extension AddressView {
 		HStack(spacing: .small3) {
 			Text(prefix)
 				.textStyle(.body1Header)
-				.foregroundStyle(.app.gray1)
+				.foregroundStyle(.primaryText)
 
 			Text(formattedText)
 				.lineLimit(1)

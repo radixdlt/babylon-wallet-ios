@@ -24,15 +24,15 @@ struct SelectEmergencyFallbackPeriodView: View {
 		VStack(spacing: .small2) {
 			Text(L10n.ShieldWizardRecovery.SetFallback.title)
 				.textStyle(.sectionHeader)
-				.foregroundStyle(.app.gray1)
+				.foregroundStyle(.primaryText)
 
 			Text(
 				markdown: L10n.ShieldWizardRecovery.SetFallback.subtitle,
-				emphasizedColor: .app.gray1,
+				emphasizedColor: .primaryText,
 				emphasizedFont: .app.body2Header
 			)
 			.textStyle(.body2Regular)
-			.foregroundStyle(.app.gray1)
+			.foregroundStyle(.primaryText)
 
 			MultiPickerView(
 				data: [

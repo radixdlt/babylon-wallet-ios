@@ -65,7 +65,7 @@ extension AuthorizedDappsFeature {
 					.padding(.horizontal, .medium3)
 				}
 				.frame(maxWidth: .infinity, alignment: .leading)
-				.background(.app.gray5)
+				.background(.secondaryBackground)
 				.radixToolbar(title: L10n.AuthorizedDapps.title)
 				.destinations(with: store)
 				.task {

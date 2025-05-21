@@ -5,7 +5,7 @@ struct Card<Contents: View>: View {
 	let contents: Contents
 
 	init(
-		_ color: Color = .app.white,
+		_ color: Color = .primaryBackground,
 		action: (() -> Void)? = nil,
 		@ViewBuilder contents: () -> Contents
 	) {
@@ -82,15 +82,15 @@ struct InnerCard<Contents: View>: View {
 
 extension View {
 	/// Gives the view a white background, rounded corners (16 px), and a shadow, useful for root level cards
-	fileprivate func inCard(_ color: Color = .white, isPressed: Bool = false) -> some View {
-		background(isPressed ? .app.gray4 : color)
+	fileprivate func inCard(_ color: Color = .primaryBackground, isPressed: Bool = false) -> some View {
+		background(isPressed ? .tertiaryBackground : color)
 			.clipShape(RoundedRectangle(cornerRadius: .medium3))
 			.cardShadow
 	}
 
 	var inSpeechbubble: some View {
 		padding(.bottom, SpeechbubbleShape.triangleSize.height)
-			.background(.app.white)
+			.background(.primaryBackground)
 			.clipShape(SpeechbubbleShape(cornerRadius: .medium3))
 			.cardShadow
 	}
@@ -98,7 +98,7 @@ extension View {
 	func inFlatBottomSpeechbubble(inset: CGFloat = 0) -> some View {
 		frame(minHeight: 2 * (.medium3 - inset))
 			.padding(.bottom, SpeechbubbleShape.triangleSize.height)
-			.background(.app.gray4)
+			.background(.tertiaryBackground)
 			.clipShape(SpeechbubbleShape(cornerRadius: .medium3 - inset, flatBottom: true))
 	}
 
@@ -108,7 +108,7 @@ extension View {
 	}
 
 	var cardShadow: some View {
-		shadow(color: .app.gray2.opacity(0.26), radius: .medium3, x: .zero, y: .small2)
+		shadow(color: .shadow.opacity(0.26), radius: .medium3, x: .zero, y: .small2)
 	}
 }
 

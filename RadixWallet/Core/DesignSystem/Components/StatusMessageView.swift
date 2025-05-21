@@ -12,7 +12,7 @@ struct StatusMessageView: View {
 		type: ViewType,
 		useNarrowSpacing: Bool = false,
 		useSmallerFontSize: Bool = false,
-		emphasizedColor: Color = .app.blue2,
+		emphasizedColor: Color = .textButton,
 		emphasizedTextStyle: TextStyle? = nil
 	) {
 		self.text = text
@@ -52,9 +52,9 @@ struct StatusMessageView: View {
 	var color: Color {
 		switch type {
 		case .warning:
-			.app.alert
+			.warning
 		case .error:
-			.app.red1
+			.error
 		case .success:
 			.app.green1
 		}

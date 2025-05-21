@@ -34,14 +34,16 @@ extension TransactionHistoryFilters {
 										store: store
 									)
 
-									Divider()
+									if !viewStore.nonFungibles.isEmpty {
+										Divider()
 
-									SubSection(
-										L10n.TransactionHistory.Filters.assetTypeNFTsLabel,
-										filters: viewStore.nonFungibles,
-										labels: nftLabels,
-										store: store
-									)
+										SubSection(
+											L10n.TransactionHistory.Filters.assetTypeNFTsLabel,
+											filters: viewStore.nonFungibles,
+											labels: nftLabels,
+											store: store
+										)
+									}
 								}
 
 								Divider()
@@ -56,6 +58,7 @@ extension TransactionHistoryFilters {
 						.padding(.horizontal, .medium1)
 					}
 				}
+				.background(.primaryBackground)
 				.footer {
 					Button(L10n.TransactionHistory.Filters.showResultsButton) {
 						store.send(.view(.showResultsTapped))
@@ -110,14 +113,13 @@ extension TransactionHistoryFilters {
 						HStack(spacing: .zero) {
 							Text(name)
 								.textStyle(.body1Header)
-								.foregroundStyle(.app.gray1)
+								.foregroundStyle(.primaryText)
 
 							Spacer()
 
 							Image(expanded ? .chevronUp : .chevronDown)
 						}
 					}
-					.background(.app.white)
 
 					if expanded {
 						content
@@ -168,7 +170,7 @@ extension TransactionHistoryFilters {
 					VStack(alignment: .leading, spacing: .medium3) {
 						Text(heading)
 							.textStyle(.body1HighImportance)
-							.foregroundStyle(.app.gray2)
+							.foregroundStyle(.secondaryText)
 
 						FlowLayout(spacing: spacing) {
 							FiltersView(filters: filters, store: store)
@@ -250,8 +252,8 @@ struct TransactionFilterView: SwiftUI.View {
 		.padding(.trailing, showCross ? .medium1 : 0)
 		.background {
 			ZStack {
-				Capsule().fill(filter.isActive ? .app.gray1 : .app.white)
-				Capsule().stroke(filter.isActive ? .clear : .app.gray3)
+				Capsule().fill(filter.isActive ? .chipBackground : .primaryBackground)
+				Capsule().stroke(filter.isActive ? .clear : .border)
 			}
 		}
 		.overlay(alignment: .trailing) {
@@ -259,7 +261,7 @@ struct TransactionFilterView: SwiftUI.View {
 				Button(asset: AssetResource.close) {
 					crossAction(filter.id)
 				}
-				.tint(.app.gray3)
+				.tint(.iconTertiary)
 				.padding(.vertical, -.small3)
 				.padding(.trailing, .small2)
 				.transition(.scale.combined(with: .opacity))
@@ -273,7 +275,7 @@ struct TransactionFilterView: SwiftUI.View {
 	}
 
 	private var textColor: Color {
-		filter.isActive ? .app.white : .app.gray1
+		filter.isActive ? .white : .primaryText
 	}
 
 	struct Dummy: SwiftUI.View {

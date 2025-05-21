@@ -99,6 +99,7 @@ extension ImportMnemonic {
 					}
 					.padding(.medium3)
 				}
+				.background(Color.primaryBackground)
 				.navigationBarBackButtonHidden(viewStore.showCloseButton) // need to be able to hook "back" button press
 				.toolbar {
 					if viewStore.showCloseButton {
@@ -127,7 +128,7 @@ extension ImportMnemonic {
 							.textStyle(.body1Regular)
 					}
 				}
-				.foregroundColor(.app.gray1)
+				.foregroundColor(Color.primaryText)
 				.multilineTextAlignment(.center)
 				.padding(.horizontal, .small1)
 			}

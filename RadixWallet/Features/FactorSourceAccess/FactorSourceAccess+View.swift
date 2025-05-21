@@ -26,7 +26,7 @@ extension FactorSourceAccess {
 		private var content: some SwiftUI.View {
 			VStack(spacing: .medium3) {
 				Image(.signingKey)
-					.foregroundColor(.app.gray3)
+					.foregroundColor(.iconTertiary)
 
 				VStack(spacing: .small2) {
 					Text(store.title)
@@ -35,7 +35,7 @@ extension FactorSourceAccess {
 					Text(LocalizedStringKey(store.message))
 						.textStyle(.body1Regular)
 				}
-				.foregroundColor(.app.gray1)
+				.foregroundColor(.primaryText)
 
 				card
 				retry

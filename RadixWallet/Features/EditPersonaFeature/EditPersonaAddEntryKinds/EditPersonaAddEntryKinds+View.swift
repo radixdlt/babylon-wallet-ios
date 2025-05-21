@@ -29,7 +29,7 @@ extension EditPersonaAddEntryKinds {
 					VStack(spacing: .medium3) {
 						Text(L10n.EditPersona.AddAField.subtitle)
 							.textStyle(.body1HighImportance)
-							.foregroundColor(.app.gray2)
+							.foregroundColor(.secondaryText)
 							.frame(maxWidth: .infinity, alignment: .leading)
 							.padding([.top, .horizontal], .medium3)
 
@@ -59,6 +59,7 @@ extension EditPersonaAddEntryKinds {
 								.buttonStyle(.primaryRectangular)
 						}
 					}
+					.background(.primaryBackground)
 				}
 			}
 		}

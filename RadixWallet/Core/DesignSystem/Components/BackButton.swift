@@ -10,7 +10,7 @@ struct BackButton: SwiftUI.View {
 extension BackButton {
 	var body: some SwiftUI.View {
 		Button(action: action) {
-			Image(asset: AssetResource.arrowBack).tint(.app.gray1)
+			Image(asset: AssetResource.arrowBack).tint(.primaryText)
 		}
 		.frame(.small)
 	}

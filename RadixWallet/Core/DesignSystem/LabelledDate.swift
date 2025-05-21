@@ -17,7 +17,7 @@ struct LabelledDate: View {
 				.textStyle(.body2Regular)
 				.frame(maxWidth: .infinity, alignment: .leading)
 		}
-		.foregroundColor(.app.gray2)
+		.foregroundColor(.secondaryText)
 	}
 
 	private let dateFormat: Date.FormatStyle = .dateTime.day().month(.wide).year()

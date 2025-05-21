@@ -18,7 +18,7 @@ extension InteractionReview {
 					.overlay {
 						Circle()
 							.stroke(style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
-							.foregroundColor(.app.gray3)
+							.foregroundColor(.iconTertiary)
 					}
 				Text(heading)
 					.minimumScaleFactor(0.7)

@@ -14,7 +14,7 @@ struct AppTextEditor: View {
 					.padding(.top, 10)
 					.padding(.leading, 6)
 					.disabled(true)
-					.foregroundColor(.app.gray2)
+					.foregroundColor(.secondaryText)
 			}
 
 			TextEditor(text: $text)

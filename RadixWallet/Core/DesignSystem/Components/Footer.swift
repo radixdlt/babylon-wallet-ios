@@ -25,7 +25,7 @@ private struct FooterModifier<FooterContent: View>: ViewModifier {
 					}
 					.padding(.medium3)
 				}
-				.background(Color.app.background)
+				.background(Color.primaryBackground)
 			}
 	}
 }

@@ -56,8 +56,8 @@ extension Preferences {
 		var body: some SwiftUI.View {
 			content
 				.radixToolbar(title: L10n.Preferences.title)
-				.tint(.app.gray1)
-				.foregroundColor(.app.gray1)
+				.tint(.primaryText)
+				.foregroundColor(.primaryText)
 				.presentsLoadingViewOverlay()
 				.destinations(with: store)
 		}
@@ -79,7 +79,7 @@ extension Preferences.View {
 					#endif
 				}
 			}
-			.background(Color.app.gray5)
+			.background(Color.secondaryBackground)
 			.onAppear {
 				viewStore.send(.appeared)
 			}
@@ -125,6 +125,12 @@ extension Preferences.View {
 				action: .hiddenAssetsButtonTapped
 			),
 			advancedLockToggle,
+			.model(
+				title: L10n.Preferences.ThemeSelection.title,
+				subtitle: L10n.Preferences.ThemeSelection.subtitle,
+				icon: .systemImage("circle.righthalf.filled"),
+				action: .themeSelectionButtonTapped
+			),
 			.header(L10n.Preferences.advancedPreferences),
 			.model(
 				title: L10n.Preferences.gateways,
@@ -179,6 +185,7 @@ private extension View {
 		return depositGuarantees(with: destinationStore)
 			.hiddenEntities(with: destinationStore)
 			.hiddenAssets(with: destinationStore)
+			.themeSelection(with: destinationStore)
 			.gateways(with: destinationStore)
 	}
 
@@ -203,6 +210,12 @@ private extension View {
 	private func gateways(with destinationStore: PresentationStoreOf<Preferences.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.gateways, action: \.gateways)) {
 			GatewaySettings.View(store: $0)
+		}
+	}
+
+	private func themeSelection(with destinationStore: PresentationStoreOf<Preferences.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.themeSelection, action: \.themeSelection)) {
+			ThemeSelection.View(store: $0)
 		}
 	}
 }

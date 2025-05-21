@@ -11,7 +11,7 @@ extension HiddenAssets {
 					LazyVStack(alignment: .leading, spacing: .large3) {
 						Text(L10n.HiddenAssets.text)
 							.textStyle(.body1HighImportance)
-							.foregroundColor(.app.gray2)
+							.foregroundColor(.secondaryText)
 
 						header(L10n.HiddenAssets.fungibles)
 						fungibles
@@ -24,7 +24,7 @@ extension HiddenAssets {
 					}
 					.padding(.medium3)
 				}
-				.background(Color.app.gray5)
+				.background(.secondaryBackground)
 				.radixToolbar(title: L10n.HiddenAssets.title)
 				.task {
 					store.send(.view(.task))
@@ -36,7 +36,7 @@ extension HiddenAssets {
 		private func header(_ value: String) -> some SwiftUI.View {
 			Text(value)
 				.textStyle(.secondaryHeader)
-				.foregroundColor(.app.gray2)
+				.foregroundColor(.secondaryText)
 		}
 
 		@ViewBuilder
@@ -116,9 +116,9 @@ extension HiddenAssets {
 
 				Text(L10n.Common.none)
 					.textStyle(.secondaryHeader)
-					.foregroundColor(.app.gray2)
+					.foregroundColor(.secondaryText)
 			}
-			.background(Color.app.gray4)
+			.background(.tertiaryBackground)
 			.clipShape(RoundedRectangle(cornerRadius: .medium3))
 		}
 	}

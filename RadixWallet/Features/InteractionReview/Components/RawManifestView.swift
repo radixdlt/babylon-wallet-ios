@@ -40,7 +40,7 @@ extension InteractionReview {
 					Text(L10n.Common.copy)
 						.textStyle(.body1Header)
 				}
-				.foregroundColor(.app.gray1)
+				.foregroundColor(.primaryText)
 			}
 			.buttonStyle(.secondaryRectangular)
 		}
@@ -57,7 +57,7 @@ extension InteractionReview {
 		private var content: some View {
 			Text(manifest)
 				.textStyle(.monospace)
-				.foregroundColor(.app.gray1)
+				.foregroundColor(.primaryText)
 				.multilineTextAlignment(.leading)
 				.textSelection(.enabled)
 		}

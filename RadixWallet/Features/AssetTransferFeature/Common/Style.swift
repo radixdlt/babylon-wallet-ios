@@ -16,13 +16,6 @@ extension View {
 	}
 }
 
-extension Color {
-	static let borderColor: Color = .app.gray4
-	static let focusedBorderColor: Color = .app.gray1
-
-	static let containerContentBackground: Color = .app.gray5
-}
-
 extension CGFloat {
 	static let dottedLineHeight: CGFloat = 64.0
 	static let transferMessageDefaultHeight: Self = 64

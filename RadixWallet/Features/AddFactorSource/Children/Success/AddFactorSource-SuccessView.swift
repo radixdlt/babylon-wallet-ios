@@ -13,20 +13,22 @@ extension AddFactorSource {
 				Spacer()
 
 				Image(asset: AssetResource.successCheckmark)
+					.darkModeTinted()
 
 				Text(L10n.NewFactor.Success.title)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 					.textStyle(.sheetTitle)
 					.padding([.top, .horizontal], .medium3)
 
 				Text(L10n.NewFactor.Success.subtitle)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 					.textStyle(.body1Regular)
 					.multilineTextAlignment(.center)
 					.padding([.top, .horizontal], .medium3)
 
 				Spacer()
 			}
+			.background(Color.primaryBackground)
 			.footer {
 				Button(L10n.Common.close, action: {
 					dismiss()

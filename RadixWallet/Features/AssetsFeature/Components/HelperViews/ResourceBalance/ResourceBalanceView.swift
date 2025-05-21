@@ -136,6 +136,8 @@ private extension ResourceBalance.ViewState.PoolUnit {
 
 // MARK: - ResourceBalanceView
 struct ResourceBalanceView: View {
+	@Environment(\.colorScheme) private var colorScheme
+
 	let viewState: ResourceBalance.ViewState
 	let appearance: Appearance
 	let hasBorder: Bool
@@ -171,7 +173,7 @@ struct ResourceBalanceView: View {
 		if hasBorder {
 			core
 				.padding(.small1)
-				.roundedCorners(strokeColor: .app.gray3)
+				.roundedCorners(strokeColor: .border)
 		} else {
 			core
 		}
@@ -195,7 +197,7 @@ struct ResourceBalanceView: View {
 			}
 
 			if !delegateSelection, let isSelected {
-				CheckmarkView(appearance: .dark, isChecked: isSelected)
+				CheckmarkView(appearance: colorScheme == .light ? .dark : .light, isChecked: isSelected)
 			}
 		}
 	}
@@ -276,7 +278,7 @@ extension ResourceBalanceView {
 					VStack(alignment: .leading, spacing: .small3) {
 						Text(L10n.Account.Staking.worth.uppercased())
 							.textStyle(.body2HighImportance)
-							.foregroundColor(.app.gray2)
+							.foregroundColor(.secondaryText)
 
 						ResourceBalanceView(
 							.fungible(fungible),
@@ -312,7 +314,7 @@ extension ResourceBalanceView {
 				if !hideDetails {
 					Text(L10n.InteractionReview.worth.uppercased())
 						.textStyle(.body2HighImportance)
-						.foregroundColor(.app.gray2)
+						.foregroundColor(.secondaryText)
 						.padding(.top, .small2)
 						.padding(.bottom, .small3)
 
@@ -372,8 +374,8 @@ extension ResourceBalanceView {
 
 		private var background: Color {
 			switch appearance {
-			case .standalone: .white
-			case .transactionReview: .app.gray5
+			case .standalone: .primaryBackground
+			case .transactionReview: .secondaryBackground
 			}
 		}
 
@@ -424,7 +426,7 @@ extension ResourceBalanceView {
 					HStack {
 						Text(kind.title)
 							.textStyle(.body2HighImportance)
-							.foregroundColor(.app.gray2)
+							.foregroundColor(.secondaryText)
 							.textCase(.uppercase)
 
 						Spacer()
@@ -432,7 +434,7 @@ extension ResourceBalanceView {
 						if case .readyToBeClaimed = kind, viewState.canClaimTokens {
 							let label = Text(L10n.Account.Staking.claim)
 								.textStyle(.body2Link)
-								.foregroundColor(.app.blue1)
+								.foregroundColor(.textButton)
 							if let onClaimAllTapped {
 								Button(action: onClaimAllTapped) { label }
 							} else {
@@ -458,7 +460,7 @@ extension ResourceBalanceView {
 							}
 							.disabled(onTap == nil)
 							.buttonStyle(.borderless)
-							.roundedCorners(strokeColor: .app.gray3)
+							.roundedCorners(strokeColor: .iconTertiary)
 						}
 					}
 				}
@@ -473,7 +475,7 @@ extension ResourceBalanceView {
 
 				Text("----")
 					.textStyle(.body2HighImportance)
-					.foregroundStyle(.app.gray4)
+					.foregroundStyle(.tertiaryBackground)
 
 				StatusMessageView(
 					text: L10n.InteractionReview.Unknown.deposits,
@@ -489,6 +491,7 @@ extension ResourceBalanceView {
 	// Helper Views
 
 	private struct FungibleView: View {
+		@Environment(\.colorScheme) private var colorScheme
 		let thumbnail: Thumbnail.FungibleContent
 		let caption1: String?
 		let caption2: String?
@@ -517,14 +520,17 @@ extension ResourceBalanceView {
 
 					if let isSelected {
 						Spacer(minLength: .small2)
-						CheckmarkView(appearance: .dark, isChecked: isSelected)
+						CheckmarkView(
+							appearance: colorScheme == .light ? .dark : .light,
+							isChecked: isSelected
+						)
 					}
 				}
 
 				if case .unknown = amount {
 					Text(L10n.InteractionReview.Unknown.amount)
 						.textStyle(.body2HighImportance)
-						.foregroundStyle(.app.gray2)
+						.foregroundStyle(.secondaryText)
 				}
 			}
 		}
@@ -568,14 +574,14 @@ extension ResourceBalanceView {
 					} else if isPredicted {
 						Text(L10n.InteractionReview.estimated)
 							.textStyle(.body3Regular)
-							.foregroundStyle(.app.gray1)
+							.foregroundStyle(.primaryText)
 					}
 				}
 
 				if case .unknown = amount {
 					Text(L10n.InteractionReview.Unknown.amount)
 						.textStyle(.body2HighImportance)
-						.foregroundStyle(.app.gray2)
+						.foregroundStyle(.secondaryText)
 				}
 			}
 		}
@@ -596,12 +602,12 @@ extension ResourceBalanceView {
 				if let caption1 {
 					Text(caption1)
 						.textStyle(titleTextStyle)
-						.foregroundColor(.app.gray1)
+						.foregroundColor(.primaryText)
 				}
 				if let caption2 {
 					Text(caption2)
 						.textStyle(.body2Regular)
-						.foregroundColor(.app.gray2)
+						.foregroundColor(.secondaryText)
 				}
 			}
 			.lineLimit(1)
@@ -685,7 +691,7 @@ extension ResourceBalanceView {
 			} else if let fallback {
 				Text(fallback)
 					.textStyle(amountTextStyle)
-					.foregroundColor(.app.gray2)
+					.foregroundColor(.secondaryText)
 			}
 		}
 
@@ -736,15 +742,15 @@ extension ResourceBalanceView {
 					if let title {
 						Text(title)
 							.textStyle(titleTextStyle)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 					}
 					amountView(amount: amount.nominalAmount, isGuaranteed: false)
 						.textStyle(amountTextStyle)
-						.foregroundColor(.app.gray1)
+						.foregroundColor(.primaryText)
 					if !resourceBalanceHideFiatValue, let fiatWorth = amount.fiatWorth?.currencyFormatted(applyCustomFont: false) {
 						Text(fiatWorth)
 							.textStyle(.body2HighImportance)
-							.foregroundStyle(.app.gray2)
+							.foregroundStyle(.secondaryText)
 							.padding(.top, .small3)
 					}
 				}
@@ -753,33 +759,33 @@ extension ResourceBalanceView {
 					if guaranteed != nil {
 						Text(L10n.InteractionReview.estimated)
 							.textStyle(titleTextStyle)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 					} else if let title {
 						Text(title)
 							.textStyle(titleTextStyle)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 					}
 
 					amountView(amount: amount.nominalAmount, isGuaranteed: false)
 						.textStyle(amountTextStyle)
-						.foregroundColor(.app.gray1)
+						.foregroundColor(.primaryText)
 
 					if !resourceBalanceHideFiatValue, let fiatWorth = amount.fiatWorth?.currencyFormatted(applyCustomFont: false) {
 						Text(fiatWorth)
 							.textStyle(.body2HighImportance)
-							.foregroundStyle(.app.gray2)
+							.foregroundStyle(.secondaryText)
 							.padding(.top, .small3)
 					}
 
 					if let guaranteedAmount = guaranteed?.nominalAmount {
 						Text(L10n.InteractionReview.guaranteed)
 							.textStyle(.body3Regular)
-							.foregroundColor(.app.gray2)
+							.foregroundColor(.secondaryText)
 							.padding(.top, .small3)
 
 						amountView(amount: guaranteedAmount, isGuaranteed: true)
 							.textStyle(guaranteedAmountTextStyle)
-							.foregroundColor(.app.gray2)
+							.foregroundColor(.secondaryText)
 					}
 				}
 			}

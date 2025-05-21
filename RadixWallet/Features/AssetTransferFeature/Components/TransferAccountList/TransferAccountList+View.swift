@@ -34,7 +34,7 @@ extension TransferAccountList.View {
 					.frame(height: .dottedLineHeight, alignment: .bottom)
 					.background(alignment: .trailing) {
 						VLine()
-							.stroke(.app.gray3, style: .transfer)
+							.stroke(.iconTertiary, style: .transfer)
 							.frame(width: 1)
 							.padding(.trailing, .large1)
 					}
@@ -51,7 +51,7 @@ extension TransferAccountList.View {
 				} label: {
 					Label(L10n.AssetTransfer.AccountList.addAccountButton, asset: AssetResource.addAccount)
 						.font(.app.button)
-						.foregroundColor(.app.blue2)
+						.foregroundColor(.textButton)
 						.padding([.vertical, .leading], .medium1)
 				}
 				.flushedRight

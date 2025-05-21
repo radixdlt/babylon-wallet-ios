@@ -53,7 +53,7 @@ extension AccountPermission {
 
 							DappPermissionBox {
 								Text(viewStore.numberOfAccounts)
-									.foregroundColor(.app.gray1)
+									.foregroundColor(.primaryText)
 									.textStyle(.body1Regular)
 									.padding(.medium1)
 							}
@@ -61,7 +61,7 @@ extension AccountPermission {
 							.padding(.top, .large1)
 
 							Text(L10n.DAppRequest.AccountPermission.updateInSettingsExplanation)
-								.foregroundColor(.app.gray2)
+								.foregroundColor(.secondaryText)
 								.textStyle(.body1Regular)
 								.multilineTextAlignment(.center)
 								.padding(.horizontal, .medium2)
@@ -75,6 +75,7 @@ extension AccountPermission {
 					}
 					.frame(width: geometry.size.width)
 				}
+				.background(.primaryBackground)
 				.footer {
 					Button(L10n.DAppRequest.AccountPermission.continue) {
 						viewStore.send(.continueButtonTapped)

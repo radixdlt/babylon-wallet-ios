@@ -13,6 +13,7 @@ extension LocalNetworkPermission {
 
 		var body: some SwiftUI.View {
 			ZStack {}
+				.background(.red)
 				.alert(
 					store: store.scope(
 						state: \.$permissionDeniedAlert,

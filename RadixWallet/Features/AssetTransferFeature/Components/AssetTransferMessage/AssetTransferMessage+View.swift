@@ -44,17 +44,17 @@ extension AssetTransferMessage.View {
 						//	}
 						Text(L10n.Common.public)
 							.textStyle(.body1HighImportance)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 
 						Spacer()
 
 						Button("", asset: AssetResource.close) {
 							viewStore.send(.removeMessageTapped)
 						}
-						.foregroundColor(.app.gray2)
+						.foregroundColor(.secondaryText)
 					}
 					.padding(.medium3)
-					.roundedCorners(.top, strokeColor: .borderColor)
+					.roundedCorners(.top, strokeColor: .border)
 
 					AppTextEditor(
 						placeholder: L10n.AssetTransfer.transactionMessagePlaceholder,
@@ -68,8 +68,8 @@ extension AssetTransferMessage.View {
 					.padding(.medium3)
 					.multilineTextAlignment(.leading)
 					.scrollContentBackground(.hidden) // Remove the default background to allow customization
-					.background(Color.containerContentBackground)
-					.roundedCorners(.bottom, strokeColor: focused ? .focusedBorderColor : .borderColor)
+					.background(.secondaryBackground)
+					.roundedCorners(.bottom, strokeColor: focused ? .textFieldBorder : .border)
 					.bind(viewStore.focusedBinding, to: $focused)
 				}
 			}

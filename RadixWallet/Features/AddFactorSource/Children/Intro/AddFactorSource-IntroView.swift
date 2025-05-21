@@ -23,13 +23,14 @@ extension AddFactorSource {
 
 				Spacer()
 			}
-			.foregroundStyle(.app.gray1)
+			.foregroundStyle(Color.primaryText)
 			.multilineTextAlignment(.center)
 			.padding(.horizontal, .large2)
 			.footer {
 				Button(L10n.Common.continue, action: action)
 					.buttonStyle(.primaryRectangular)
 			}
+			.background(Color.primaryBackground)
 		}
 	}
 }

@@ -199,12 +199,12 @@ extension InteractionReview.Sections {
 				Image(.transactionReviewDapps)
 					.renderingMode(.template)
 					.resizable()
-					.foregroundStyle(.app.gray3)
+					.foregroundStyle(.iconTertiary)
 					.frame(.smallest)
 
 				Text(L10n.InteractionReview.possibleDappCalls)
 					.textStyle(.body2HighImportance)
-					.foregroundStyle(.app.gray2)
+					.foregroundStyle(.secondaryText)
 					.padding(.leading, .small2)
 
 				Spacer()
@@ -214,7 +214,7 @@ extension InteractionReview.Sections {
 			.padding(.leading, .medium3)
 			.padding(.vertical, .small1)
 			.padding(.trailing, .medium2)
-			.background(.app.white)
+			.background(.primaryBackground)
 			.clipShape(RoundedRectangle(cornerRadius: .small1))
 			.cardShadow
 		}

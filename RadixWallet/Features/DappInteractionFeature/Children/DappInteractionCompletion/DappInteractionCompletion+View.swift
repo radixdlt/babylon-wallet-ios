@@ -18,21 +18,22 @@ extension DappInteractionCompletion {
 						Spacer()
 
 						Image(asset: AssetResource.successCheckmark)
+							.darkModeTinted()
 
 						Text(L10n.DAppRequest.Completion.title)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.textStyle(.sheetTitle)
 							.padding([.top, .horizontal], .medium3)
 
 						Text(L10n.DAppRequest.Completion.subtitle(viewStore.dappMetadata.name))
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)
 							.padding([.top, .horizontal], .medium3)
 
 						if let intentHash = viewStore.intentHash {
-							AddressView(.transaction(intentHash), imageColor: .app.gray2)
-								.foregroundColor(.app.blue1)
+							AddressView(.transaction(intentHash), imageColor: .secondaryText)
+								.foregroundColor(.textButton)
 								.textStyle(.body1Header)
 								.padding(.top, .small2)
 						}
@@ -41,15 +42,16 @@ extension DappInteractionCompletion {
 
 						if viewStore.showSwitchBackToBrowserMessage {
 							Text(L10n.MobileConnect.interactionSuccess)
-								.foregroundColor(.app.gray1)
+								.foregroundColor(.primaryText)
 								.textStyle(.body1Regular)
 								.multilineTextAlignment(.center)
 								.padding(.vertical, .medium1)
 								.frame(maxWidth: .infinity)
-								.background(.app.gray5)
+								.background(.secondaryBackground)
 						}
 					}
 					.frame(maxWidth: .infinity)
+					.background(.primaryBackground)
 				}
 			}
 			.presentationDragIndicator(.visible)
