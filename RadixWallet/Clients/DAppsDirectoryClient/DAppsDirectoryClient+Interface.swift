@@ -20,7 +20,7 @@ extension DAppsDirectoryClient {
 }
 
 extension DAppsDirectoryClient.DApp {
-	enum Tag: String, Identifiable {
+	enum Tag: String, Identifiable, CaseIterable {
 		case defi = "DeFi"
 		case dex = "DEX"
 		case token = "Token"

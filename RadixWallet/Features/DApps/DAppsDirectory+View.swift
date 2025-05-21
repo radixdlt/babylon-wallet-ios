@@ -11,10 +11,25 @@ extension DAppsDirectory {
 				VStack(spacing: .zero) {
 					VStack {
 						searchView()
+							.padding(.horizontal, .medium3)
+						if let filters = store.filterTags.asFilterItems.nilIfEmpty {
+							ScrollView(.horizontal) {
+								HStack {
+									ForEach(filters) { filter in
+										ItemFilterView(filter: filter, action: { _ in }, crossAction: { tag in
+											store.send(.view(.filterRemoved(tag)))
+										})
+									}
+
+									Spacer(minLength: 0)
+								}
+								.padding(.horizontal, .medium3)
+							}
+							.scrollIndicators(.hidden)
+						}
 					}
 					.padding(.top, .small3)
 					.padding(.bottom, .small1)
-					.padding(.horizontal, .medium3)
 					.background(.primaryBackground)
 
 					Separator()
@@ -132,9 +147,13 @@ private extension StoreOf<DAppsDirectory> {
 private extension View {
 	func destinations(with store: StoreOf<DAppsDirectory>) -> some View {
 		let destinationStore = store.destination
-		return navigationDestination(store: destinationStore.scope(state: \.presentedDapp, action: \.presentedDapp)) {
-			DappDetails.View(store: $0)
-		}
+		return
+			navigationDestination(store: destinationStore.scope(state: \.presentedDapp, action: \.presentedDapp)) {
+				DappDetails.View(store: $0)
+			}
+			.sheet(store: destinationStore.scope(state: \.tagSelection, action: \.tagSelection)) {
+				DAppTagsSelection.View(store: $0)
+			}
 	}
 }
 

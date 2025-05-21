@@ -22,7 +22,7 @@ struct DappDetails: Sendable, FeatureReducer {
 
 			enum SettingsContext: Sendable, Hashable {
 				case personaDetails
-				case authorizedDapps
+				case dAppsList
 			}
 		}
 
@@ -89,6 +89,10 @@ struct DappDetails: Sendable, FeatureReducer {
 		struct Resources: Hashable, Sendable {
 			var fungible: IdentifiedArrayOf<OnLedgerEntity.Resource>
 			var nonFungible: IdentifiedArrayOf<OnLedgerEntity.Resource>
+
+			var isEmpty: Bool {
+				fungible.isEmpty && nonFungible.isEmpty
+			}
 		}
 	}
 
@@ -337,7 +341,10 @@ struct DappDetails: Sendable, FeatureReducer {
 
 		let result = await TaskResult {
 			let items = try await onLedgerEntitiesClient.getResources(resources)
-				.filter { $0.metadata.dappDefinitions?.contains(dAppDefinitionAddress) == true }
+				.filter {
+					$0.metadata.dappDefinition == dAppDefinitionAddress ||
+						$0.metadata.dappDefinitions?.contains(dAppDefinitionAddress) == true
+				}
 			let fungible: IdentifiedArray = .init(items.filter { $0.fungibility == .fungible }) { $1 }
 			let nonFungible: IdentifiedArray = .init(items.filter { $0.fungibility == .nonFungible }) { $1 }
 

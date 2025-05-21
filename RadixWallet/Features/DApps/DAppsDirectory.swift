@@ -13,13 +13,13 @@ struct DAppsDirectory: Sendable, FeatureReducer {
 			let name: String
 			let thumbnail: URL?
 			let description: String?
-
 			let tags: IdentifiedArrayOf<DAppsDirectoryClient.DApp.Tag>
 		}
 
 		var searchBarFocused: Bool = false
 		var dApps: Loadable<DApps> = .idle
 		var searchTerm: String = ""
+		var filterTags: OrderedSet<DAppsDirectoryClient.DApp.Tag> = []
 
 		@Presents
 		var destination: Destination.State? = nil
@@ -34,6 +34,7 @@ struct DAppsDirectory: Sendable, FeatureReducer {
 		case didSelectDapp(State.DApp.ID)
 		case focusChanged(Bool)
 		case filtersTapped
+		case filterRemoved(DAppsDirectoryClient.DApp.Tag)
 		case pullToRefreshStarted
 	}
 
@@ -41,25 +42,26 @@ struct DAppsDirectory: Sendable, FeatureReducer {
 		case loadedDApps(TaskResult<State.DApps>)
 	}
 
-	@CasePathable
-	enum ChildAction: Sendable, Equatable {
-		case dAppsList(DAppsList.Action)
-	}
-
 	struct Destination: DestinationReducer {
 		@CasePathable
 		enum State: Hashable, Sendable {
 			case presentedDapp(DappDetails.State)
+			case tagSelection(DAppTagsSelection.State)
 		}
 
 		@CasePathable
 		enum Action: Equatable, Sendable {
 			case presentedDapp(DappDetails.Action)
+			case tagSelection(DAppTagsSelection.Action)
 		}
 
 		var body: some ReducerOf<Self> {
 			Scope(state: \.presentedDapp, action: \.presentedDapp) {
 				DappDetails()
+			}
+
+			Scope(state: \.tagSelection, action: \.tagSelection) {
+				DAppTagsSelection()
 			}
 		}
 	}
@@ -117,6 +119,11 @@ struct DAppsDirectory: Sendable, FeatureReducer {
 			return .none
 
 		case .filtersTapped:
+			state.destination = .tagSelection(.init(selectedTags: state.filterTags))
+			return .none
+
+		case let .filterRemoved(tag):
+			state.filterTags.remove(tag)
 			return .none
 
 		case .pullToRefreshStarted:
@@ -134,18 +141,45 @@ struct DAppsDirectory: Sendable, FeatureReducer {
 			return .none
 		}
 	}
+
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .tagSelection(.delegate(.selectedTags(tags))):
+			state.filterTags = tags
+			return .none
+		default:
+			return .none
+		}
+	}
 }
 
 extension DAppsDirectory.State {
 	var displayedDApps: Loadable<DApps> {
-		dApps.filter { dApp in
-			if !searchTerm.isEmpty {
-				dApp.name.range(of: searchTerm, options: .caseInsensitive) != nil ||
-					dApp.description?.range(of: searchTerm, options: .caseInsensitive) != nil
-			} else {
-				true
+		dApps
+			.filter { dApp in
+				guard !filterTags.isEmpty else {
+					return true
+				}
+
+				return dApp.tags.contains { filterTags.contains($0) }
 			}
-		}
-		.map { $0.asIdentified() }
+			.filter { dApp in
+				if !searchTerm.isEmpty {
+					dApp.name.range(of: searchTerm, options: .caseInsensitive) != nil ||
+						dApp.description?.range(of: searchTerm, options: .caseInsensitive) != nil
+				} else {
+					true
+				}
+			}
+
+			.map { $0.asIdentified() }
+	}
+}
+
+extension OrderedSet<DAppsDirectoryClient.DApp.Tag> {
+	var asFilterItems: IdentifiedArrayOf<ItemFilter<DAppsDirectoryClient.DApp.Tag>> {
+		self.elements.map {
+			$0.asItemFilter(isActive: true)
+		}.asIdentified()
 	}
 }
