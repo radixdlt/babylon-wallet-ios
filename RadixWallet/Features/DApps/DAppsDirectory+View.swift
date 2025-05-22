@@ -50,9 +50,7 @@ extension DAppsDirectory {
 						store.send(.view(.pullToRefreshStarted))
 					}
 				}
-				.ignoresSafeArea(edges: .bottom)
 				.background(.primaryBackground)
-				.navigationTitle("DApp Directory")
 				.toolbar {
 					ToolbarItem(placement: .topBarTrailing) {
 						Button(asset: AssetResource.transactionHistoryFilterList) {
@@ -65,6 +63,7 @@ extension DAppsDirectory {
 					store.send(.view(.task))
 				}
 			}
+			.radixToolbar(title: "dApp Directory", alwaysVisible: false)
 		}
 
 		@ViewBuilder
@@ -150,6 +149,7 @@ private extension View {
 		return
 			navigationDestination(store: destinationStore.scope(state: \.presentedDapp, action: \.presentedDapp)) {
 				DappDetails.View(store: $0)
+					.toolbar(.hidden, for: .tabBar)
 			}
 			.sheet(store: destinationStore.scope(state: \.tagSelection, action: \.tagSelection)) {
 				DAppTagsSelection.View(store: $0)

@@ -19,26 +19,30 @@ extension Main {
 
 		var body: some SwiftUI.View {
 			TabView {
-				NavigationStack {
-					Home.View(store: store.home)
-				}
-				.tabItem {
-					Label("Home", systemImage: "house")
-				}
+				Group {
+					NavigationStack {
+						Home.View(store: store.home)
+					}
+					.tabItem {
+						Label("Home", systemImage: "house")
+					}
 
-				NavigationStack {
-					DAppsDirectory.View(store: store.dAppsDirectory)
-				}
-				.tabItem {
-					Label("DApps", image: .authorizedDapps)
-				}
+					NavigationStack {
+						DAppsDirectory.View(store: store.dAppsDirectory)
+					}
+					.tabItem {
+						Label("DApps", image: .authorizedDapps)
+					}
 
-				NavigationStack {
-					Settings.View(store: store.settings)
+					NavigationStack {
+						Settings.View(store: store.settings)
+					}
+					.tabItem {
+						Label("Settings", systemImage: "gearshape")
+					}
 				}
-				.tabItem {
-					Label("Settings", systemImage: "gearshape")
-				}
+				.toolbarBackground(.visible, for: .tabBar)
+				.toolbarBackground(Color.secondaryBackground, for: .tabBar)
 			}
 			.task { @MainActor in
 				await store.send(.view(.task)).finish()

@@ -52,6 +52,8 @@ struct Main: Sendable, FeatureReducer {
 		Scope(state: \.dAppsDirectory, action: \.child.dAppsDirectory) {
 			DAppsDirectory()
 		}
+
+		Reduce(core)
 	}
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {

@@ -276,12 +276,15 @@ struct DappDetails: Sendable, FeatureReducer {
 				let associatedDapps = await metadata.flatMap { await loadDapps(metadata: $0, validated: dAppDefinitionAddress) }
 				await send(.internal(.associatedDappsLoaded(associatedDapps)))
 
-				if let url = metadata.wrappedValue?.claimedWebsites?.first {
-					do {
-						try await rolaClient.performWellKnownFileCheck(url, dAppDefinitionAddress)
-						await send(.internal(.mainWebsiteValidated(url)))
-					} catch {
-						loggerGlobal.error("Failed to validate dapp main website: \(error)")
+				if let websites = metadata.wrappedValue?.claimedWebsites {
+					for website in websites {
+						do {
+							try await rolaClient.performWellKnownFileCheck(website, dAppDefinitionAddress)
+							await send(.internal(.mainWebsiteValidated(website)))
+							return
+						} catch {
+							loggerGlobal.error("Failed to validate dapp main website: \(error)")
+						}
 					}
 				}
 			}
