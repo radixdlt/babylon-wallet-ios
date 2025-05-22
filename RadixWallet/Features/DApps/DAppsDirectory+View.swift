@@ -10,6 +10,17 @@ extension DAppsDirectory {
 			WithPerceptionTracking {
 				VStack(spacing: .zero) {
 					VStack {
+						HStack {
+							Spacer()
+							Text("dApp Directory")
+								.foregroundColor(Color.primaryText)
+								.textStyle(.body1Header)
+							Spacer()
+							Button(asset: AssetResource.transactionHistoryFilterList) {
+								store.send(.view(.filtersTapped))
+							}
+						}
+						.padding(.horizontal, .medium3)
 						searchView()
 							.padding(.horizontal, .medium3)
 						if let filters = store.filterTags.asFilterItems.nilIfEmpty {
@@ -51,19 +62,11 @@ extension DAppsDirectory {
 					}
 				}
 				.background(.primaryBackground)
-				.toolbar {
-					ToolbarItem(placement: .topBarTrailing) {
-						Button(asset: AssetResource.transactionHistoryFilterList) {
-							store.send(.view(.filtersTapped))
-						}
-					}
-				}
 				.destinations(with: store)
 				.task {
 					store.send(.view(.task))
 				}
 			}
-			.radixToolbar(title: "dApp Directory", alwaysVisible: false)
 		}
 
 		@ViewBuilder
@@ -124,9 +127,6 @@ extension DAppsDirectory {
 				showClearButton: true,
 				innerAccessory: {
 					Image(systemName: "magnifyingglass")
-					//                    Button(asset: AssetResource.qrCodeScanner) {
-					//                        store.send(.view(.scanQRCode))
-					//                    }
 				}
 			)
 			.autocorrectionDisabled()
@@ -149,7 +149,6 @@ private extension View {
 		return
 			navigationDestination(store: destinationStore.scope(state: \.presentedDapp, action: \.presentedDapp)) {
 				DappDetails.View(store: $0)
-					.toolbar(.hidden, for: .tabBar)
 			}
 			.sheet(store: destinationStore.scope(state: \.tagSelection, action: \.tagSelection)) {
 				DAppTagsSelection.View(store: $0)
