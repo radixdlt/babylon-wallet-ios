@@ -18,32 +18,11 @@ extension Main {
 		}
 
 		var body: some SwiftUI.View {
-			NavigationStack {
-				TabView {
-					Group {
-						NavigationStack {
-							Home.View(store: store.home)
-						}
-						.tabItem {
-							Label(L10n.HomePage.Tab.wallet, image: .radixIcon)
-						}
-
-						NavigationStack {
-							DAppsDirectory.View(store: store.dAppsDirectory)
-						}
-						.tabItem {
-							Label(L10n.HomePage.Tab.dapps, image: .authorizedDapps)
-						}
-
-						NavigationStack {
-							Settings.View(store: store.settings)
-						}
-						.tabItem {
-							Label(L10n.HomePage.Tab.settings, image: .settings)
-						}
+			WithViewStore(store, observe: { $0 }) { viewStore in
+				NavigationStack {
+					TabView {
+						tabs(isOnMainnet: viewStore.isOnMainnet)
 					}
-					.toolbarBackground(.visible, for: .tabBar)
-					.toolbarBackground(Color.secondaryBackground, for: .tabBar)
 				}
 			}
 			.task { @MainActor in
@@ -51,6 +30,45 @@ extension Main {
 			}
 			.showDeveloperDisclaimerBanner(store.banner)
 			.presentsDappInteractions()
+		}
+
+		func tabs(isOnMainnet: Bool) -> some SwiftUI.View {
+			Group {
+				walletTab
+				if isOnMainnet {
+					dAppDirectoryTab
+				}
+				settingsTab
+			}
+			.toolbarBackground(.visible, for: .tabBar)
+			.toolbarBackground(Color.secondaryBackground, for: .tabBar)
+		}
+
+		var walletTab: some SwiftUI.View {
+			NavigationStack {
+				Home.View(store: store.home)
+			}
+			.tabItem {
+				Label(L10n.HomePage.Tab.wallet, image: .radixIcon)
+			}
+		}
+
+		var dAppDirectoryTab: some SwiftUI.View {
+			NavigationStack {
+				DAppsDirectory.View(store: store.dAppsDirectory)
+			}
+			.tabItem {
+				Label(L10n.HomePage.Tab.dapps, image: .authorizedDapps)
+			}
+		}
+
+		var settingsTab: some SwiftUI.View {
+			NavigationStack {
+				Settings.View(store: store.settings)
+			}
+			.tabItem {
+				Label(L10n.HomePage.Tab.settings, image: .settings)
+			}
 		}
 	}
 }
