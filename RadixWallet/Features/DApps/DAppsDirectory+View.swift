@@ -9,64 +9,74 @@ extension DAppsDirectory {
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				VStack(spacing: .zero) {
-					VStack {
-						HStack {
-							Spacer()
-							Text("dApp Directory")
-								.foregroundColor(Color.primaryText)
-								.textStyle(.body1Header)
-							Spacer()
-							Button(asset: AssetResource.transactionHistoryFilterList) {
-								store.send(.view(.filtersTapped))
-							}
-						}
-						.padding(.horizontal, .medium3)
-						searchView()
-							.padding(.horizontal, .medium3)
-						if let filters = store.filterTags.asFilterItems.nilIfEmpty {
-							ScrollView(.horizontal) {
-								HStack {
-									ForEach(filters) { filter in
-										ItemFilterView(filter: filter, action: { _ in }, crossAction: { tag in
-											store.send(.view(.filterRemoved(tag)))
-										})
-									}
-
-									Spacer(minLength: 0)
-								}
-								.padding(.horizontal, .medium3)
-							}
-							.scrollIndicators(.hidden)
-						}
-					}
-					.padding(.top, .small3)
-					.padding(.bottom, .small1)
-					.background(.primaryBackground)
-
+					headerView()
 					Separator()
-
-					ScrollView {
-						VStack(spacing: .small1) {
-							loadable(
-								store.displayedDApps,
-								loadingView: loadingView,
-								errorView: failedView,
-								successContent: loadedView
-							)
-						}
-						.padding(.horizontal, .medium3)
-						.padding(.vertical, .medium1)
-					}
-					.background(.secondaryBackground)
-					.refreshable { @MainActor in
-						await store.send(.view(.pullToRefreshStarted)).finish()
-					}
+					dAppsView()
 				}
 				.background(.primaryBackground)
 				.destinations(with: store)
-				.task {
-					store.send(.view(.task))
+				.onFirstTask {
+					await store.send(.view(.task)).finish()
 				}
+			}
+		}
+
+		@ViewBuilder
+		func headerView() -> some SwiftUI.View {
+			VStack {
+				HStack {
+					Spacer()
+					Text("dApp Directory")
+						.foregroundColor(Color.primaryText)
+						.textStyle(.body1Header)
+					Spacer()
+					Button(asset: AssetResource.transactionHistoryFilterList) {
+						store.send(.view(.filtersTapped))
+					}
+				}
+				.padding(.horizontal, .medium3)
+
+				searchView()
+					.padding(.horizontal, .medium3)
+
+				if let filters = store.filterTags.asFilterItems.nilIfEmpty {
+					ScrollView(.horizontal) {
+						HStack {
+							ForEach(filters) { filter in
+								ItemFilterView(filter: filter, action: { _ in }, crossAction: { tag in
+									store.send(.view(.filterRemoved(tag)))
+								})
+							}
+
+							Spacer(minLength: 0)
+						}
+						.padding(.horizontal, .medium3)
+					}
+					.scrollIndicators(.hidden)
+				}
+			}
+			.padding(.top, .small3)
+			.padding(.bottom, .small1)
+			.background(.primaryBackground)
+		}
+
+		@ViewBuilder
+		func dAppsView() -> some SwiftUI.View {
+			ScrollView {
+				VStack(spacing: .small1) {
+					loadable(
+						store.displayedDApps,
+						loadingView: loadingView,
+						errorView: failedView,
+						successContent: loadedView
+					)
+				}
+				.padding(.horizontal, .medium3)
+				.padding(.vertical, .medium1)
+			}
+			.background(.secondaryBackground)
+			.refreshable {
+				store.send(.view(.pullToRefreshStarted))
 			}
 		}
 
@@ -170,13 +180,5 @@ private extension View {
 			.sheet(store: destinationStore.scope(state: \.tagSelection, action: \.tagSelection)) {
 				DAppTagsSelection.View(store: $0)
 			}
-	}
-}
-
-#Preview {
-	NavigationStack {
-		DAppsDirectory.View(
-			store: .init(initialState: .init(), reducer: DAppsDirectory.init),
-		)
 	}
 }

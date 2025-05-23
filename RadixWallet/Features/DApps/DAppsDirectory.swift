@@ -114,6 +114,7 @@ struct DAppsDirectory: Sendable, FeatureReducer {
 			if case .failure = state.dApps {
 				state.dApps = .loading
 			}
+
 			return loadDapps()
 		}
 	}
@@ -124,6 +125,10 @@ struct DAppsDirectory: Sendable, FeatureReducer {
 			state.dApps = .success(dApps)
 			return .none
 		case let .loadedDApps(.failure(error)):
+			errorQueue.schedule(error)
+			guard !state.dApps.isSuccess else {
+				return .none
+			}
 			state.dApps = .failure(error)
 			return .none
 		}
@@ -141,27 +146,26 @@ struct DAppsDirectory: Sendable, FeatureReducer {
 
 	func loadDapps() -> Effect<Action> {
 		.run { send in
-			let dAppList = try await dAppsDirectoryClient.fetchDApps()
-			let dAppDetails = try await onLedgerEntitiesClient
-				.getAssociatedDapps(dAppList.map(\.address))
+			let result = await TaskResult {
+				let dAppList = try await dAppsDirectoryClient.fetchDApps()
+				let dAppDetails = try await onLedgerEntitiesClient
+					.getAssociatedDapps(dAppList.map(\.address))
+					.asIdentified()
+
+				return dAppList.map { dApp in
+					let details = dAppDetails[id: dApp.id]
+					return State.DApp(
+						dAppDefinitionAddress: dApp.address,
+						name: details?.metadata.name ?? dApp.name,
+						thumbnail: details?.metadata.iconURL,
+						description: details?.metadata.description,
+						tags: dApp.tags
+					)
+				}
 				.asIdentified()
-
-			let dApps = dAppList.map { dApp in
-				let details = dAppDetails[id: dApp.id]
-				return State.DApp(
-					dAppDefinitionAddress: dApp.address,
-					name: details?.metadata.name ?? "Unknown dApp",
-					thumbnail: details?.metadata.iconURL,
-					description: details?.metadata.description,
-					tags: dApp.tags
-				)
 			}
-			.asIdentified()
 
-			await send(.internal(.loadedDApps(.success(dApps))))
-		} catch: { error, send in
-			errorQueue.schedule(error)
-			await send(.internal(.loadedDApps(.failure(error))))
+			await send(.internal(.loadedDApps(result)))
 		}
 	}
 }
