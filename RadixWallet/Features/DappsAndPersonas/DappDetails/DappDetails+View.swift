@@ -23,6 +23,7 @@ extension DappDetails {
 		let showConfiguration: Bool
 		let tappablePersonas: Bool
 		let isDepositsVisible: Bool
+		let hasResources: Bool
 	}
 }
 
@@ -43,7 +44,9 @@ extension DappDetails.View {
 						Separator()
 						FungiblesList(store: store)
 						NonFungiblesListList(store: store)
-						Separator()
+						if viewStore.hasResources {
+							Separator()
+						}
 						Personas(store: store.personas, tappablePersonas: viewStore.tappablePersonas)
 					}
 					.background(.secondaryBackground)
@@ -65,10 +68,7 @@ extension DappDetails.View {
 
 private extension StoreOf<DappDetails> {
 	var destination: PresentationStoreOf<DappDetails.Destination> {
-		func scopeState(state: State) -> PresentationState<DappDetails.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
+		scope(state: \.$destination, action: \.destination)
 	}
 
 	var personas: StoreOf<PersonaList> {
@@ -134,8 +134,9 @@ private extension DappDetails.State {
 			address: dAppDefinitionAddress,
 			associatedDapps: associatedDapps,
 			showConfiguration: context != .general,
-			tappablePersonas: context == .settings(.authorizedDapps),
-			isDepositsVisible: authorizedDapp?.isDepositsVisible ?? true
+			tappablePersonas: context == .settings(.dAppsList),
+			isDepositsVisible: authorizedDapp?.isDepositsVisible ?? true,
+			hasResources: resources?.isEmpty == false
 		)
 	}
 

@@ -162,6 +162,7 @@ extension CacheClient {
 		case tokenPrices(_ currency: FiatCurrency)
 		case dateOfFirstTransaction(_ accountAddress: AccountAddress)
 		case accountLockerClaimDetails(_ accountAddress: AccountAddress, _ lockerAddress: LockerAddress)
+		case dAppsDirectory
 
 		var filesystemFilePath: String {
 			switch self {
@@ -181,6 +182,8 @@ extension CacheClient {
 				"\(filesystemFolderPath)/account-\(address.address)"
 			case let .accountLockerClaimDetails(accountAddress, lockerAddress):
 				"\(filesystemFolderPath)/\(accountAddress.address)/\(lockerAddress.address)"
+			case .dAppsDirectory:
+				"\(filesystemFolderPath)/dApps"
 			}
 		}
 
@@ -202,6 +205,8 @@ extension CacheClient {
 				"DateOfFirstTransaction"
 			case .accountLockerClaimDetails:
 				"AccountLockerClaimDetails"
+			case .dAppsDirectory:
+				"DAppsDirectory"
 			}
 
 			return "\(Self.root)/\(path)"
@@ -213,7 +218,7 @@ extension CacheClient {
 
 		var lifetime: TimeInterval {
 			switch self {
-			case .networkName, .onLedgerEntity:
+			case .networkName, .onLedgerEntity, .dAppsDirectory:
 				60 * 60 * 24 // One day cache
 			case .dAppRequestMetadata, .rolaDappVerificationMetadata, .rolaWellKnownFileVerification:
 				60

@@ -108,7 +108,7 @@ internal enum AssetResource {
   internal static let homeAccountSecurity = ImageAsset(name: "home-account-security")
   internal static let homeAggregatedValueHidden = ImageAsset(name: "home-aggregatedValue-hidden")
   internal static let homeAggregatedValueShown = ImageAsset(name: "home-aggregatedValue-shown")
-  internal static let homeHeaderSettings = ImageAsset(name: "home-header-settings")
+  internal static let settings = ImageAsset(name: "settings")
   internal static let placeholderSecurityStructure = ImageAsset(name: "PLACEHOLDER_SecurityStructure")
   internal static let brokenImagePlaceholder = ImageAsset(name: "broken-image-placeholder")
   internal static let persona = ImageAsset(name: "persona")
@@ -161,6 +161,7 @@ internal enum AssetResource {
   internal static let splashPhoneFrame = ImageAsset(name: "splash-phone-frame")
   internal static let officialTagIcon = ImageAsset(name: "official-tag-icon")
   internal static let tagIcon = ImageAsset(name: "tag-icon")
+  internal static let externalAccountBackground = ColorAsset(name: "ExternalAccountBackground")
   internal static let primaryBackground = ColorAsset(name: "PrimaryBackground")
   internal static let secondaryBackground = ColorAsset(name: "SecondaryBackground")
   internal static let tertiaryBackground = ColorAsset(name: "TertiaryBackground")
@@ -191,7 +192,9 @@ internal enum AssetResource {
   internal static let chipBackground = ColorAsset(name: "ChipBackground")
   internal static let separator = ColorAsset(name: "Separator")
   internal static let shadow = ColorAsset(name: "Shadow")
+  internal static let shimmer = ColorAsset(name: "Shimmer")
   internal static let toggleActive = ColorAsset(name: "ToggleActive")
+  internal static let fiatWorthHidden = ColorAsset(name: "FiatWorthHidden")
   internal static let primaryText = ColorAsset(name: "PrimaryText")
   internal static let primaryTextInverse = ColorAsset(name: "PrimaryTextInverse")
   internal static let secondaryText = ColorAsset(name: "SecondaryText")
@@ -223,7 +226,7 @@ internal enum AssetResource {
   internal static let folder = ImageAsset(name: "folder")
   internal static let iconLiquidStakeUnits = ImageAsset(name: "iconLiquidStakeUnits")
   internal static let iconPackageOwnerBadge = ImageAsset(name: "iconPackageOwnerBadge")
-  internal static let radixIconWhite = ImageAsset(name: "radix-icon-white")
+  internal static let radixIcon = ImageAsset(name: "radix-icon")
 }
 // swiftlint:enable identifier_name line_length nesting type_body_length type_name
 

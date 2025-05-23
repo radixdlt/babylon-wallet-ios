@@ -129,7 +129,7 @@ struct App: Sendable, FeatureReducer {
 			case let .incompatible(error):
 				errorQueue.schedule(error)
 				return goToOnboarding(state: &state)
-			case let .loaded(profile):
+			case .loaded:
 				return goToMain(state: &state)
 			}
 
@@ -140,8 +140,10 @@ struct App: Sendable, FeatureReducer {
 
 	private func goToMain(state: inout State) -> Effect<Action> {
 		state.root = .main(.init(
-			home: .init())
-		)
+			home: .init(),
+			settings: .init(),
+			dAppsDirectory: .init()
+		))
 		return .none
 	}
 

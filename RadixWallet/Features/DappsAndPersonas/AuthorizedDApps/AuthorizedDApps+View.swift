@@ -2,19 +2,13 @@ import ComposableArchitecture
 import SwiftUI
 
 extension AuthorizedDappsFeature.State {
-	struct Dapp: Equatable, Identifiable {
-		let id: AuthorizedDapp.ID
-		let name: String
-		let thumbnail: URL?
-		let hasClaim: Bool
-	}
-
-	var dAppsDetails: IdentifiedArrayOf<Dapp> {
+	var dAppsDetails: IdentifiedArrayOf<DAppsListView.DApp> {
 		dApps.map {
-			Dapp(
+			DAppsListView.DApp(
 				id: $0.id,
 				name: $0.displayName ?? L10n.DAppRequest.Metadata.unknownName,
 				thumbnail: thumbnails[$0.id],
+				description: nil,
 				hasClaim: dappsWithClaims.contains($0.id)
 			)
 		}
@@ -41,25 +35,9 @@ extension AuthorizedDappsFeature {
 
 						InfoButton(.dapps, label: L10n.InfoLink.Title.dapps)
 
-						VStack(spacing: .small1) {
-							ForEach(viewStore.dAppsDetails) { dApp in
-								Card {
-									viewStore.send(.view(.didSelectDapp(dApp.id)))
-								} contents: {
-									VStack(alignment: .leading, spacing: .zero) {
-										PlainListRow(context: .dappAndPersona, title: dApp.name) {
-											Thumbnail(.dapp, url: dApp.thumbnail)
-										}
-										if dApp.hasClaim {
-											StatusMessageView(text: L10n.AuthorizedDapps.pendingDeposit, type: .warning, useNarrowSpacing: true)
-												.padding(.horizontal, .medium1)
-												.padding(.bottom, .medium3)
-										}
-									}
-								}
-							}
+						DAppsListView(dApps: viewStore.dAppsDetails) { id in
+							viewStore.send(.view(.didSelectDapp(id)))
 						}
-						.animation(.easeInOut, value: viewStore.dApps)
 					}
 					.padding(.vertical, .small1)
 					.padding(.horizontal, .medium3)

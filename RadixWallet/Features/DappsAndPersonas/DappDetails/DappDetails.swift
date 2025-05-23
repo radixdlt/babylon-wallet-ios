@@ -22,7 +22,7 @@ struct DappDetails: Sendable, FeatureReducer {
 
 			enum SettingsContext: Sendable, Hashable {
 				case personaDetails
-				case authorizedDapps
+				case dAppsList
 			}
 		}
 
@@ -89,6 +89,10 @@ struct DappDetails: Sendable, FeatureReducer {
 		struct Resources: Hashable, Sendable {
 			var fungible: IdentifiedArrayOf<OnLedgerEntity.Resource>
 			var nonFungible: IdentifiedArrayOf<OnLedgerEntity.Resource>
+
+			var isEmpty: Bool {
+				fungible.isEmpty && nonFungible.isEmpty
+			}
 		}
 	}
 
@@ -272,12 +276,15 @@ struct DappDetails: Sendable, FeatureReducer {
 				let associatedDapps = await metadata.flatMap { await loadDapps(metadata: $0, validated: dAppDefinitionAddress) }
 				await send(.internal(.associatedDappsLoaded(associatedDapps)))
 
-				if let url = metadata.wrappedValue?.claimedWebsites?.first {
-					do {
-						try await rolaClient.performWellKnownFileCheck(url, dAppDefinitionAddress)
-						await send(.internal(.mainWebsiteValidated(url)))
-					} catch {
-						loggerGlobal.error("Failed to validate dapp main website: \(error)")
+				if let websites = metadata.wrappedValue?.claimedWebsites {
+					for website in websites {
+						do {
+							try await rolaClient.performWellKnownFileCheck(website, dAppDefinitionAddress)
+							await send(.internal(.mainWebsiteValidated(website)))
+							return
+						} catch {
+							loggerGlobal.error("Failed to validate dapp main website: \(error)")
+						}
 					}
 				}
 			}
@@ -337,7 +344,10 @@ struct DappDetails: Sendable, FeatureReducer {
 
 		let result = await TaskResult {
 			let items = try await onLedgerEntitiesClient.getResources(resources)
-				.filter { $0.metadata.dappDefinitions?.contains(dAppDefinitionAddress) == true }
+				.filter {
+					$0.metadata.dappDefinition == dAppDefinitionAddress ||
+						$0.metadata.dappDefinitions?.contains(dAppDefinitionAddress) == true
+				}
 			let fungible: IdentifiedArray = .init(items.filter { $0.fungibility == .fungible }) { $1 }
 			let nonFungible: IdentifiedArray = .init(items.filter { $0.fungibility == .nonFungible }) { $1 }
 

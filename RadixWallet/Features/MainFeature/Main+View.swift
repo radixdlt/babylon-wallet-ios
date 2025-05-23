@@ -18,9 +18,12 @@ extension Main {
 		}
 
 		var body: some SwiftUI.View {
-			NavigationStack {
-				Home.View(store: store.home)
-					.destinations(with: store)
+			WithViewStore(store, observe: { $0 }) { viewStore in
+				NavigationStack {
+					TabView {
+						tabs(isOnMainnet: viewStore.isOnMainnet)
+					}
+				}
 			}
 			.task { @MainActor in
 				await store.send(.view(.task)).finish()
@@ -28,17 +31,49 @@ extension Main {
 			.showDeveloperDisclaimerBanner(store.banner)
 			.presentsDappInteractions()
 		}
+
+		func tabs(isOnMainnet: Bool) -> some SwiftUI.View {
+			Group {
+				walletTab
+				if isOnMainnet {
+					dAppDirectoryTab
+				}
+				settingsTab
+			}
+			.toolbarBackground(.visible, for: .tabBar)
+			.toolbarBackground(Color.secondaryBackground, for: .tabBar)
+		}
+
+		var walletTab: some SwiftUI.View {
+			NavigationStack {
+				Home.View(store: store.home)
+			}
+			.tabItem {
+				Label(L10n.HomePage.Tab.wallet, image: .radixIcon)
+			}
+		}
+
+		var dAppDirectoryTab: some SwiftUI.View {
+			NavigationStack {
+				DAppsDirectory.View(store: store.dAppDirectory)
+			}
+			.tabItem {
+				Label(L10n.HomePage.Tab.dapps, image: .authorizedDapps)
+			}
+		}
+
+		var settingsTab: some SwiftUI.View {
+			NavigationStack {
+				Settings.View(store: store.settings)
+			}
+			.tabItem {
+				Label(L10n.HomePage.Tab.settings, image: .settings)
+			}
+		}
 	}
 }
 
 private extension StoreOf<Main> {
-	var destination: PresentationStoreOf<Main.Destination> {
-		func scopeState(state: State) -> PresentationState<Main.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
-	}
-
 	var banner: Store<Bool, Never> {
 		scope(state: \.showIsUsingTestnetBanner, action: actionless)
 	}
@@ -46,34 +81,12 @@ private extension StoreOf<Main> {
 	var home: StoreOf<Home> {
 		scope(state: \.home, action: \.child.home)
 	}
-}
 
-@MainActor
-private extension View {
-	func destinations(with store: StoreOf<Main>) -> some View {
-		let destinationStore = store.destination
-		return navigationDestination(store: destinationStore.scope(state: \.settings, action: \.settings)) {
-			Settings.View(store: $0)
-		}
+	var settings: StoreOf<Settings> {
+		scope(state: \.settings, action: \.child.settings)
+	}
+
+	var dAppDirectory: StoreOf<DAppsDirectory> {
+		scope(state: \.dAppsDirectory, action: \.child.dAppsDirectory)
 	}
 }
-
-#if DEBUG
-import ComposableArchitecture
-import SwiftUI
-
-struct MainView_Previews: PreviewProvider {
-	static var previews: some SwiftUI.View {
-		Main.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: Main.init
-			)
-		)
-	}
-}
-
-extension Main.State {
-	static let previewValue = Self(home: .previewValue)
-}
-#endif

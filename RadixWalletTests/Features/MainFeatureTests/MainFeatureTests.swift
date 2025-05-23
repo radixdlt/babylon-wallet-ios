@@ -4,29 +4,9 @@ import XCTest
 
 @MainActor
 final class MainFeatureTests: TestCase {
-	func test_displayAndDismissSettings() async {
-		// given
-		let store = TestStore(initialState: Main.State(home: .previewValue)) {
-			Main()
-//				.dependency(\.userDefaults, .eph)
-		}
-
-		// when
-		await store.send(.child(.home(.delegate(.displaySettings)))) {
-			// then
-			$0.destination = .settings(.init())
-		}
-
-		// when
-		await store.send(.destination(.dismiss)) {
-			// then
-			$0.destination = nil
-		}
-	}
-
 	func test_displayTestBanner() async {
 		// given
-		let store = TestStore(initialState: Main.State(home: .previewValue)) {
+		let store = TestStore(initialState: Main.State(home: .previewValue, settings: .init(), dAppsDirectory: .init())) {
 			Main()
 //				.dependency(\.userDefaults, .noop)
 				.dependency(\.cloudBackupClient, .noop)

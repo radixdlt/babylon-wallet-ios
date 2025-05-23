@@ -99,7 +99,7 @@ struct ApprovalSlider: View {
 								.rotationEffect(showRadixIcon ? .radians(0.5 * .pi) : .zero)
 								.offset(y: showRadixIcon ? 4 : 0)
 								.scaleEffect(showRadixIcon ? 1.2 : 1)
-							Image(asset: AssetResource.radixIconWhite)
+							Image(asset: AssetResource.radixIcon)
 								.renderingMode(.template)
 								.opacity(showRadixIcon ? 1 : 0)
 								.rotationEffect(showRadixIcon ? .zero : .radians(-0.5 * .pi))
