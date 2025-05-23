@@ -86,13 +86,13 @@ struct DAppsDirectory: Sendable, FeatureReducer {
 			return .run { send in
 				let dAppList = try await dAppsDirectoryClient.fetchDApps()
 				let dAppDetails = try await onLedgerEntitiesClient
-					.getAssociatedDapps(dAppList.map(\.dAppDefinitionAddress))
+					.getAssociatedDapps(dAppList.map(\.address))
 					.asIdentified()
 
 				let dApps = dAppList.map { dApp in
 					let details = dAppDetails[id: dApp.id]
 					return State.DApp(
-						dAppDefinitionAddress: dApp.dAppDefinitionAddress,
+						dAppDefinitionAddress: dApp.address,
 						name: details?.metadata.name ?? "Unknown dApp",
 						thumbnail: details?.metadata.iconURL,
 						description: details?.metadata.description,
