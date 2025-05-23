@@ -14,9 +14,12 @@ extension DAppsDirectoryClient: DependencyKey {
 			return try JSONDecoder().decode(CategorizedDApps.self, from: data)
 		}
 
-		return Self(fetchDApps: {
-			try await fetchDAppsFromRemote().allDApps
-		})
+		@Sendable
+		func fetchdDApps() async throws -> DApps {
+			try await cacheClient.withCaching(cacheEntry: .dAppsDirectory, request: fetchDAppsFromRemote).allDApps
+		}
+
+		return Self(fetchDApps: fetchdDApps)
 	}()
 }
 

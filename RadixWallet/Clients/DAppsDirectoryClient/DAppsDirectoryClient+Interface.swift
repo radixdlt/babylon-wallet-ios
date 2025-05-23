@@ -8,13 +8,13 @@ extension DAppsDirectoryClient {
 }
 
 extension DAppsDirectoryClient {
-	struct CategorizedDApps: Decodable, Sendable {
+	struct CategorizedDApps: Codable, Sendable {
 		let highlighted: DApps
 		let others: DApps
 	}
 
 	typealias DApps = IdentifiedArrayOf<DApp>
-	struct DApp: Decodable, Sendable, Hashable, Identifiable {
+	struct DApp: Codable, Sendable, Hashable, Identifiable {
 		var id: DappDefinitionAddress {
 			address
 		}
@@ -26,7 +26,7 @@ extension DAppsDirectoryClient {
 }
 
 extension DAppsDirectoryClient.DApp {
-	enum Tag: String, Identifiable, CaseIterable, Decodable {
+	enum Tag: String, Identifiable, CaseIterable, Codable {
 		case defi = "DeFi"
 		case dex = "DEX"
 		case token = "Token"
