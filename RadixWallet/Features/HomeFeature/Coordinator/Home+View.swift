@@ -110,7 +110,6 @@ private extension View {
 			.relinkConnector(with: destinationStore)
 			.securityCenter(with: destinationStore)
 			.p2pLinks(with: destinationStore)
-			.dAppsDirectory(with: destinationStore)
 	}
 
 	private func accountDetails(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
@@ -150,12 +149,6 @@ private extension View {
 	private func p2pLinks(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.p2pLinks, action: \.p2pLinks)) {
 			P2PLinksFeature.View(store: $0)
-		}
-	}
-
-	private func dAppsDirectory(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
-		navigationDestination(store: destinationStore.scope(state: \.dAppsDirectory, action: \.dAppsDirectory)) {
-			DAppsDirectory.View(store: $0)
 		}
 	}
 }

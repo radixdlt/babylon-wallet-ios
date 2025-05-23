@@ -319,10 +319,6 @@ struct Home: Sendable, FeatureReducer {
 			state.destination = .p2pLinks(.init(destination: .newConnection(.init())))
 			return .none
 
-		case .carousel(.delegate(.showDAppsDirectory)):
-			state.destination = .dAppsDirectory(.init())
-			return .none
-
 		default:
 			return .none
 		}
