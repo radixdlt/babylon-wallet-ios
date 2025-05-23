@@ -26,7 +26,7 @@ extension DAppsDirectory {
 			VStack {
 				HStack {
 					Spacer()
-					Text("dApp Directory")
+					Text(L10n.DappDirectory.title)
 						.foregroundColor(Color.primaryText)
 						.textStyle(.body1Header)
 					Spacer()
@@ -129,11 +129,11 @@ extension DAppsDirectory {
 					.aspectRatio(contentMode: .fit)
 					.frame(.small)
 
-				Text("Failed to load dApps.")
+				Text(L10n.DappDirectory.Error.heading)
 					.foregroundStyle(.primaryText)
 					.textStyle(.body1Header)
 					.padding(.top, .medium3)
-				Text("Pull to refresh")
+				Text(L10n.DappDirectory.Error.message)
 					.foregroundStyle(.secondaryText)
 					.textStyle(.body1HighImportance)
 					.padding(.top, .small3)
@@ -144,7 +144,7 @@ extension DAppsDirectory {
 
 		private func searchView() -> some SwiftUI.View {
 			AppTextField(
-				placeholder: "Search for dApp",
+				placeholder: L10n.DappDirectory.Search.placeholder,
 				text: $store.searchTerm.sending(\.view.searchTermChanged),
 				focus: .on(
 					true,

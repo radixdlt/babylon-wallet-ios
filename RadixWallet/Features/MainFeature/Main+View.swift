@@ -25,21 +25,21 @@ extension Main {
 							Home.View(store: store.home)
 						}
 						.tabItem {
-							Label("Wallet", image: .radixIcon)
+							Label(L10n.HomePage.Tab.wallet, image: .radixIcon)
 						}
 
 						NavigationStack {
 							DAppsDirectory.View(store: store.dAppsDirectory)
 						}
 						.tabItem {
-							Label("dApps", image: .authorizedDapps)
+							Label(L10n.HomePage.Tab.dapps, image: .authorizedDapps)
 						}
 
 						NavigationStack {
 							Settings.View(store: store.settings)
 						}
 						.tabItem {
-							Label("Settings", image: .settings)
+							Label(L10n.HomePage.Tab.settings, image: .settings)
 						}
 					}
 					.toolbarBackground(.visible, for: .tabBar)

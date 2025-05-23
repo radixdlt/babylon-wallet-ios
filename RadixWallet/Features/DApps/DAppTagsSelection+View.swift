@@ -28,7 +28,7 @@ extension DAppTagsSelection {
 							.buttonStyle(.blueText)
 						}
 					}
-					.radixToolbar(title: "Tags", alwaysVisible: false)
+					.radixToolbar(title: L10n.DappDirectory.Filters.title, alwaysVisible: false)
 				}
 			}
 		}
