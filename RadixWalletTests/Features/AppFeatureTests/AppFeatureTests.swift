@@ -45,7 +45,7 @@ final class AppFeatureTests: TestCase {
 
 		// THEN: navigate to main
 		await store.send(.child(.splash(.delegate(.completed(.loaded(Profile.withOneAccount)))))) {
-			$0.root = .main(.init(home: .init(), dAppDirectory: .init(), settings: .init()))
+			$0.root = .main(.init(home: .init(), settings: .init(), dAppsDirectory: .init()))
 		}
 
 		await clock.run() // fast-forward clock to the end of time
