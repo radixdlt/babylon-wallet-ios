@@ -2,9 +2,9 @@ fastlane_require 'dotenv'
 default_platform(:ios)
 
 before_all do
-    # ensure_xcode_version
+    ensure_xcode_version
     Dotenv.load ".env.secret"
-    # ensure_git_status_clean
+    ensure_git_status_clean
 end
 
 
