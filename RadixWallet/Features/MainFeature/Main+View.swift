@@ -55,7 +55,7 @@ extension Main {
 
 		var dAppDirectoryTab: some SwiftUI.View {
 			NavigationStack {
-				DAppsDirectory.View(store: store.dAppsDirectory)
+				DAppsDirectory.View(store: store.dAppDirectory)
 			}
 			.tabItem {
 				Label(L10n.HomePage.Tab.dapps, image: .authorizedDapps)
@@ -86,7 +86,7 @@ private extension StoreOf<Main> {
 		scope(state: \.settings, action: \.child.settings)
 	}
 
-	var dAppsDirectory: StoreOf<DAppsDirectory> {
+	var dAppDirectory: StoreOf<DAppsDirectory> {
 		scope(state: \.dAppsDirectory, action: \.child.dAppsDirectory)
 	}
 }
