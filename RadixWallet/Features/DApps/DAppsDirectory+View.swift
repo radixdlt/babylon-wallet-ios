@@ -73,6 +73,7 @@ extension DAppsDirectory {
 				}
 				.padding(.horizontal, .medium3)
 				.padding(.vertical, .medium1)
+				.frame(maxWidth: .infinity)
 			}
 			.background(.secondaryBackground)
 			.refreshable {
