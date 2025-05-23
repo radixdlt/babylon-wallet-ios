@@ -83,29 +83,8 @@ struct DAppsDirectory: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			return .run { send in
-				let dAppList = try await dAppsDirectoryClient.fetchDApps()
-				let dAppDetails = try await onLedgerEntitiesClient
-					.getAssociatedDapps(dAppList.map(\.address))
-					.asIdentified()
-
-				let dApps = dAppList.map { dApp in
-					let details = dAppDetails[id: dApp.id]
-					return State.DApp(
-						dAppDefinitionAddress: dApp.address,
-						name: details?.metadata.name ?? "Unknown dApp",
-						thumbnail: details?.metadata.iconURL,
-						description: details?.metadata.description,
-						tags: dApp.tags
-					)
-				}
-				.asIdentified()
-
-				await send(.internal(.loadedDApps(.success(dApps))))
-			} catch: { error, send in
-				errorQueue.schedule(error)
-				await send(.internal(.loadedDApps(.failure(error))))
-			}
+			state.dApps = .loading
+			return loadDapps()
 
 		case let .didSelectDapp(id):
 			state.destination = .presentedDapp(.init(dAppDefinitionAddress: id))
@@ -128,7 +107,14 @@ struct DAppsDirectory: Sendable, FeatureReducer {
 			return .none
 
 		case .pullToRefreshStarted:
-			return .none
+			guard !state.dApps.isLoading else {
+				return .none
+			}
+
+			if case .failure = state.dApps {
+				state.dApps = .loading
+			}
+			return loadDapps()
 		}
 	}
 
@@ -150,6 +136,32 @@ struct DAppsDirectory: Sendable, FeatureReducer {
 			return .none
 		default:
 			return .none
+		}
+	}
+
+	func loadDapps() -> Effect<Action> {
+		.run { send in
+			let dAppList = try await dAppsDirectoryClient.fetchDApps()
+			let dAppDetails = try await onLedgerEntitiesClient
+				.getAssociatedDapps(dAppList.map(\.address))
+				.asIdentified()
+
+			let dApps = dAppList.map { dApp in
+				let details = dAppDetails[id: dApp.id]
+				return State.DApp(
+					dAppDefinitionAddress: dApp.address,
+					name: details?.metadata.name ?? "Unknown dApp",
+					thumbnail: details?.metadata.iconURL,
+					description: details?.metadata.description,
+					tags: dApp.tags
+				)
+			}
+			.asIdentified()
+
+			await send(.internal(.loadedDApps(.success(dApps))))
+		} catch: { error, send in
+			errorQueue.schedule(error)
+			await send(.internal(.loadedDApps(.failure(error))))
 		}
 	}
 }

@@ -25,7 +25,7 @@ extension DAppsDirectoryClient: DependencyKey {
 
 extension DAppsDirectoryClient.CategorizedDApps {
 	var allDApps: DAppsDirectoryClient.DApps {
-		highlighted.shuffled() + others
+		(highlighted.shuffled() + others.shuffled()).asIdentified()
 	}
 }
 

@@ -50,6 +50,7 @@ extension DAppsDirectory {
 							loadable(
 								store.displayedDApps,
 								loadingView: loadingView,
+								errorView: failedView,
 								successContent: loadedView
 							)
 						}
@@ -58,7 +59,7 @@ extension DAppsDirectory {
 					}
 					.background(.secondaryBackground)
 					.refreshable { @MainActor in
-						store.send(.view(.pullToRefreshStarted))
+						await store.send(.view(.pullToRefreshStarted)).finish()
 					}
 				}
 				.background(.primaryBackground)
@@ -111,8 +112,24 @@ extension DAppsDirectory {
 		}
 
 		@ViewBuilder
-		func failedView() -> some SwiftUI.View {
-			VStack {}
+		func failedView(err: Error) -> some SwiftUI.View {
+			VStack(spacing: .zero) {
+				Image(systemName: "arrow.clockwise")
+					.resizable()
+					.aspectRatio(contentMode: .fit)
+					.frame(.small)
+
+				Text("Failed to load dApps.")
+					.foregroundStyle(.primaryText)
+					.textStyle(.body1Header)
+					.padding(.top, .medium3)
+				Text("Pull to refresh")
+					.foregroundStyle(.secondaryText)
+					.textStyle(.body1HighImportance)
+					.padding(.top, .small3)
+			}
+			.padding(.top, .huge1)
+			.frame(maxWidth: .infinity)
 		}
 
 		private func searchView() -> some SwiftUI.View {
