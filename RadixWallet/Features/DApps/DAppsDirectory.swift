@@ -115,7 +115,7 @@ struct DAppsDirectory: Sendable, FeatureReducer {
 				state.dApps = .loading
 			}
 
-			return loadDapps()
+			return loadDapps(forceRefresh: true)
 		}
 	}
 
@@ -144,10 +144,10 @@ struct DAppsDirectory: Sendable, FeatureReducer {
 		}
 	}
 
-	func loadDapps() -> Effect<Action> {
+	func loadDapps(forceRefresh: Bool = false) -> Effect<Action> {
 		.run { send in
 			let result = await TaskResult {
-				let dAppList = try await dAppsDirectoryClient.fetchDApps()
+				let dAppList = try await dAppsDirectoryClient.fetchDApps(forceRefresh)
 				let dAppDetails = try await onLedgerEntitiesClient
 					.getAssociatedDapps(dAppList.map(\.address))
 					.asIdentified()

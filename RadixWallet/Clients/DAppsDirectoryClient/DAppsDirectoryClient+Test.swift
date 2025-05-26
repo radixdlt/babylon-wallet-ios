@@ -7,6 +7,6 @@ extension DependencyValues {
 
 // MARK: - DAppsDirectoryClient + TestDependencyKey
 extension DAppsDirectoryClient: TestDependencyKey {
-	public static let previewValue = Self(fetchDApps: { [] })
-	public static let testValue = Self(fetchDApps: { [] })
+	public static let previewValue = Self(fetchDApps: { _ in [] })
+	public static let testValue = Self(fetchDApps: { _ in [] })
 }
