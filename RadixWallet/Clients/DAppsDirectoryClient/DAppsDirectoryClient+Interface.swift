@@ -4,7 +4,7 @@ public struct DAppsDirectoryClient: Sendable {
 }
 
 extension DAppsDirectoryClient {
-	typealias FetchDApps = @Sendable () async throws -> DApps
+	typealias FetchDApps = @Sendable (_ forceRefresh: Bool) async throws -> DApps
 }
 
 extension DAppsDirectoryClient {
