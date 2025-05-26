@@ -23,67 +23,57 @@ extension Home {
 
 		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState) { viewStore in
-				ScrollView {
-					VStack(spacing: .medium3) {
-						CardCarousel.View(store: store.scope(state: \.carousel, action: \.child.carousel))
-
-						if let fiatWorth = viewStore.totalFiatWorth {
-							VStack(spacing: .small2) {
-								Text(L10n.HomePage.totalValue)
-									.foregroundStyle(.secondaryText)
-									.textStyle(.body1Header)
-									.textCase(.uppercase)
-
-								TotalCurrencyWorthView(
-									state: .init(totalCurrencyWorth: fiatWorth),
-									backgroundColor: .tertiaryBackground
-								) {
-									viewStore.send(.view(.showFiatWorthToggled))
-								}
-								.foregroundColor(.primaryText)
-							}
-							.padding(.horizontal, .medium1)
-						}
-
-						VStack(spacing: .medium3) {
-							ForEachStore(
-								store.scope(
-									state: \.accountRows,
-									action: { .child(.account(id: $0, action: $1)) }
-								),
-								content: { Home.AccountRow.View(store: $0) }
-							)
-						}
+				VStack(alignment: .leading, spacing: .small3) {
+					Text(L10n.HomePage.title)
+						.foregroundColor(Color.primaryText)
+						.textStyle(.sheetTitle)
 						.padding(.horizontal, .medium1)
 
-						Button(L10n.HomePage.createNewAccount) {
-							store.send(.view(.createAccountButtonTapped))
+					ScrollView {
+						VStack(spacing: .medium3) {
+							CardCarousel.View(store: store.scope(state: \.carousel, action: \.child.carousel))
+
+							if let fiatWorth = viewStore.totalFiatWorth {
+								VStack(spacing: .small2) {
+									Text(L10n.HomePage.totalValue)
+										.foregroundStyle(.secondaryText)
+										.textStyle(.body1Header)
+										.textCase(.uppercase)
+
+									TotalCurrencyWorthView(
+										state: .init(totalCurrencyWorth: fiatWorth),
+										backgroundColor: .tertiaryBackground
+									) {
+										viewStore.send(.view(.showFiatWorthToggled))
+									}
+									.foregroundColor(.primaryText)
+								}
+								.padding(.horizontal, .medium1)
+							}
+
+							VStack(spacing: .medium3) {
+								ForEachStore(
+									store.scope(
+										state: \.accountRows,
+										action: { .child(.account(id: $0, action: $1)) }
+									),
+									content: { Home.AccountRow.View(store: $0) }
+								)
+							}
+							.padding(.horizontal, .medium1)
+
+							Button(L10n.HomePage.createNewAccount) {
+								store.send(.view(.createAccountButtonTapped))
+							}
+							.buttonStyle(.secondaryRectangular())
 						}
-						.buttonStyle(.secondaryRectangular())
-					}
-					.padding(.bottom, .medium3)
-					.padding(.top, .small1)
-				}
-				.toolbar {
-					ToolbarItem(placement: .topBarLeading) {
-						Text(L10n.HomePage.title)
-							.foregroundColor(Color.primaryText)
-							.textStyle(.sheetTitle)
-							.padding(.leading, .medium3)
-					}
-					ToolbarItem(placement: .navigationBarTrailing) {
-						Button {
-							store.send(.view(.settingsButtonTapped))
-						} label: {
-							Image(.homeHeaderSettings)
-						}
-						.tint(Color.primaryText)
-						.padding(.trailing, .medium3)
+						.padding(.bottom, .medium3)
+						.padding(.top, .small1)
 					}
 				}
-			}
-			.refreshable {
-				await store.send(.view(.pullToRefreshStarted)).finish()
+				.refreshable {
+					await store.send(.view(.pullToRefreshStarted)).finish()
+				}
 			}
 			.task { @MainActor in
 				await store.send(.view(.task)).finish()

@@ -97,7 +97,7 @@ extension TransactionHistory {
 			ScrollView(.horizontal) {
 				HStack {
 					ForEach(filters) { filter in
-						TransactionFilterView(filter: filter, action: { _ in }, crossAction: crossAction)
+						ItemFilterView(filter: filter, action: { _ in }, crossAction: crossAction)
 					}
 
 					Spacer(minLength: 0)

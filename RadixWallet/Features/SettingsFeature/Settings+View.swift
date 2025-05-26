@@ -46,12 +46,18 @@ extension Settings {
 
 extension Settings.View {
 	var body: some View {
-		settingsView()
-			.radixToolbar(title: L10n.WalletSettings.title)
-			.tint(Color.primaryText)
-			.foregroundColor(Color.primaryBackground)
-			.destinations(with: store)
-			.presentsLoadingViewOverlay()
+		VStack(spacing: .zero) {
+			Text(L10n.WalletSettings.title)
+				.foregroundColor(Color.primaryText)
+				.background(.primaryBackground)
+				.textStyle(.body1Header)
+				.padding(.vertical, .small1)
+			Separator()
+			settingsView()
+		}
+		.background(.primaryBackground)
+		.destinations(with: store)
+		.presentsLoadingViewOverlay()
 	}
 }
 

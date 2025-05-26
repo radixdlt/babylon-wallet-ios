@@ -20,16 +20,7 @@ struct TransactionHistoryFilters: Sendable, FeatureReducer {
 			}
 		}
 
-		struct Filter: Hashable, Sendable, Identifiable {
-			let id: TransactionFilter
-			let icon: ImageResource?
-			let label: String
-			var isActive: Bool
-
-			func hash(into hasher: inout Hasher) {
-				hasher.combine(id)
-			}
-		}
+		typealias Filter = ItemFilter<TransactionFilter>
 
 		init(portfolio: OnLedgerEntity.OnLedgerAccount, filters: [Filter.ID]) {
 			let transferTypes = TransactionFilter.TransferType.allCases.map { Filter($0, isActive: filters.contains(.transferType($0))) }
