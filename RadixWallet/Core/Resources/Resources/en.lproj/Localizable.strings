@@ -24,6 +24,9 @@
 "homePage_secureFolder_warning" = "Your wallet has encountered a problem that should be resolved before you continue use. If you have a Samsung phone, this may be caused by putting the Radix Wallet in the \"Secure Folder\". Please contact support at hello@radixdlt.com for assistance.";
 "homePage_deletedAccountWarning_title" = "Previously Deleted Account Detected";
 "homePage_deletedAccountWarning_message" = "Your Radix Wallet is syncing, and removing the Account from view.";
+"homePage_tab_wallet" = "Wallet";
+"homePage_tab_dapps" = "dApps";
+"homePage_tab_settings" = "Settings";
 "account_transfer" = "Transfer";
 "account_tokens" = "Tokens";
 "account_nfts" = "NFTs";
