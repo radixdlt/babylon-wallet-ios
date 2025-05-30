@@ -4,7 +4,7 @@ import SwiftUI
 
 // MARK: - ChooseReceivingAccount
 @Reducer
-struct ChooseReceivingAccount: Sendable, FeatureReducer {
+struct ChooseTransferReceiver: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
 		var chooseAccounts: ChooseAccounts.State

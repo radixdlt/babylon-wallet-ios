@@ -1,7 +1,7 @@
 import ComposableArchitecture
 import SwiftUI
 
-extension ChooseReceivingAccount.State {
+extension ChooseTransferReceiver.State {
 	enum AddressValidation: Sendable, Hashable {
 		case valid(AccountAddress)
 		case wrongNetwork(AccountAddress, incorrectNetwork: UInt8)
@@ -58,13 +58,13 @@ extension ChooseReceivingAccount.State {
 }
 
 // MARK: - ChooseReceivingAccount.View
-extension ChooseReceivingAccount {
+extension ChooseTransferReceiver {
 	@MainActor
 	struct View: SwiftUI.View {
-		@Perception.Bindable private var store: StoreOf<ChooseReceivingAccount>
+		@Perception.Bindable private var store: StoreOf<ChooseTransferReceiver>
 		@FocusState private var focusedField: Bool
 
-		init(store: StoreOf<ChooseReceivingAccount>) {
+		init(store: StoreOf<ChooseTransferReceiver>) {
 			self.store = store
 		}
 
@@ -146,9 +146,9 @@ extension ChooseReceivingAccount {
 	}
 }
 
-private extension StoreOf<ChooseReceivingAccount> {
-	var destination: PresentationStoreOf<ChooseReceivingAccount.Destination> {
-		func scopeState(state: State) -> PresentationState<ChooseReceivingAccount.Destination.State> {
+private extension StoreOf<ChooseTransferReceiver> {
+	var destination: PresentationStoreOf<ChooseTransferReceiver.Destination> {
+		func scopeState(state: State) -> PresentationState<ChooseTransferReceiver.Destination.State> {
 			state.$destination
 		}
 		return scope(state: scopeState, action: Action.destination)
@@ -157,7 +157,7 @@ private extension StoreOf<ChooseReceivingAccount> {
 
 @MainActor
 private extension View {
-	func destinations(with store: StoreOf<ChooseReceivingAccount>) -> some View {
+	func destinations(with store: StoreOf<ChooseTransferReceiver>) -> some View {
 		let destinationStore = store.destination
 		return navigationDestination(store: destinationStore.scope(state: \.scanAccountAddress, action: \.scanAccountAddress)) {
 			ScanQRCoordinator.View(store: $0)
