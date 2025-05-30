@@ -8,15 +8,15 @@ struct ChooseTransferReceiver: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
 		var chooseAccounts: ChooseAccounts.State
-		var manualAccountAddress: String = "" {
+		var manualTransferReceiver: String = "" {
 			didSet {
-				if !manualAccountAddress.isEmpty {
+				if !manualTransferReceiver.isEmpty {
 					chooseAccounts.selectedAccounts = nil
 				}
 			}
 		}
 
-		var manualAccountAddressFocused: Bool = false
+		var manualTransferReceiverFocused: Bool = false
 
 		let networkID: NetworkID
 
@@ -35,7 +35,7 @@ struct ChooseTransferReceiver: Sendable, FeatureReducer {
 	enum ViewAction: Sendable, Equatable {
 		case scanQRCode
 		case closeButtonTapped
-		case manualAccountAddressChanged(String)
+		case manualTransferReceiverChanged(String)
 		case focusChanged(Bool)
 		case chooseButtonTapped(AccountOrAddressOf)
 	}
@@ -92,12 +92,12 @@ struct ChooseTransferReceiver: Sendable, FeatureReducer {
 		case .closeButtonTapped:
 			return .send(.delegate(.dismiss))
 
-		case let .manualAccountAddressChanged(address):
-			state.manualAccountAddress = address
+		case let .manualTransferReceiverChanged(address):
+			state.manualTransferReceiver = address
 			return .none
 
 		case let .focusChanged(isFocused):
-			state.manualAccountAddressFocused = isFocused
+			state.manualTransferReceiverFocused = isFocused
 			return .none
 
 		case let .chooseButtonTapped(result):
@@ -117,7 +117,7 @@ struct ChooseTransferReceiver: Sendable, FeatureReducer {
 
 			QR.removeAddressPrefixIfNeeded(from: &address)
 
-			state.manualAccountAddress = address
+			state.manualTransferReceiver = address
 			return .none
 
 		default:

@@ -2,20 +2,25 @@ import ComposableArchitecture
 import SwiftUI
 
 extension ChooseTransferReceiver.State {
-	enum AddressValidation: Sendable, Hashable {
-		case valid(AccountAddress)
+	enum ReceiverValidation: Sendable, Hashable {
+		case valid(TransferReceiver)
 		case wrongNetwork(AccountAddress, incorrectNetwork: UInt8)
 		case invalid
 	}
 
-	var validatedManualAccountAddress: AddressValidation {
-		guard !manualAccountAddress.isEmpty,
-		      !chooseAccounts.filteredAccounts.contains(where: { $0.address == manualAccountAddress })
+	enum TransferReceiver: Sendable, Hashable {
+		case accountAddress(AccountAddress)
+		case rnsDomain(RnsDomain)
+	}
+
+	var validatedManualReceiverValidation: ReceiverValidation {
+		guard !manualTransferReceiver.isEmpty,
+		      !chooseAccounts.filteredAccounts.contains(where: { $0.address == manualTransferReceiver })
 		else {
 			return .invalid
 		}
 		guard
-			let addressOnSomeNetwork = try? AccountAddress(validatingAddress: manualAccountAddress)
+			let addressOnSomeNetwork = try? AccountAddress(validatingAddress: manualTransferReceiver)
 		else {
 			return .invalid
 		}
@@ -24,34 +29,36 @@ extension ChooseTransferReceiver.State {
 			loggerGlobal.warning("Manually inputted address is valid, but is on the WRONG network, inputted: \(networkOfAddress), but current network is: \(networkID.rawValue)")
 			return .wrongNetwork(addressOnSomeNetwork, incorrectNetwork: networkOfAddress.rawValue)
 		}
-		return .valid(addressOnSomeNetwork)
+		return .valid(.accountAddress(addressOnSomeNetwork))
 	}
 
 	var validatedAccountAddress: AccountAddress? {
-		guard case let .valid(address) = validatedManualAccountAddress else {
+		guard case let .valid(.accountAddress(address)) = validatedManualReceiverValidation else {
 			return nil
 		}
 		return address
 	}
 
 	var canSelectOwnAccount: Bool {
-		manualAccountAddress.isEmpty
+		manualTransferReceiver.isEmpty
 	}
 
-	var manualAddressHint: Hint.ViewState? {
-		guard !manualAccountAddressFocused, !manualAccountAddress.isEmpty else {
+	var manualReceiverHint: Hint.ViewState? {
+		guard !manualTransferReceiverFocused, !manualTransferReceiver.isEmpty else {
 			return .none
 		}
 
-		switch validatedManualAccountAddress {
+		switch validatedManualReceiverValidation {
 		case .invalid:
 			return .error(L10n.AssetTransfer.ChooseReceivingAccount.invalidAddressError)
 		case .wrongNetwork:
 			return .error(L10n.AssetTransfer.Error.wrongNetwork)
-		case let .valid(validAddress):
+		case let .valid(.accountAddress(validAddress)):
 			if chooseAccounts.filteredAccounts.contains(where: { $0 == validAddress }) {
 				return .error(L10n.AssetTransfer.ChooseReceivingAccount.alreadyAddedError)
 			}
+			return .none
+		case let .valid(.rnsDomain(domain)):
 			return .none
 		}
 	}
@@ -106,11 +113,11 @@ extension ChooseTransferReceiver {
 		private var addressField: some SwiftUI.View {
 			AppTextField(
 				placeholder: L10n.AssetTransfer.ChooseReceivingAccount.addressFieldPlaceholder,
-				text: $store.manualAccountAddress.sending(\.view.manualAccountAddressChanged),
-				hint: store.manualAddressHint,
+				text: $store.manualTransferReceiver.sending(\.view.manualTransferReceiverChanged),
+				hint: store.manualReceiverHint,
 				focus: .on(
 					true,
-					binding: $store.manualAccountAddressFocused.sending(\.view.focusChanged),
+					binding: $store.manualTransferReceiverFocused.sending(\.view.focusChanged),
 					to: $focusedField
 				),
 				showClearButton: true,
