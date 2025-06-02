@@ -80,7 +80,7 @@ private extension View {
 
 	private func chooseAccount(with destinationStore: PresentationStoreOf<TransferAccountList.Destination>) -> some View {
 		sheet(store: destinationStore.scope(state: \.state.chooseTransferReceiver, action: \.chooseTransferReceiver)) {
-			ChooseTransferReceiver.View(store: $0)
+			ChooseTransferRecipient.View(store: $0)
 		}
 	}
 

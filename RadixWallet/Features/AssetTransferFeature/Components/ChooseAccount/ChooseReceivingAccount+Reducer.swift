@@ -4,7 +4,7 @@ import SwiftUI
 
 // MARK: - ChooseReceivingAccount
 @Reducer
-struct ChooseTransferReceiver: Sendable, FeatureReducer {
+struct ChooseTransferRecipient: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
 		var chooseAccounts: ChooseAccounts.State
@@ -53,16 +53,16 @@ struct ChooseTransferReceiver: Sendable, FeatureReducer {
 	struct Destination: DestinationReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
-			case scanAccountAddress(ScanQRCoordinator.State)
+			case scanTransferReceiver(ScanQRCoordinator.State)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
-			case scanAccountAddress(ScanQRCoordinator.Action)
+			case scanTransferReceiver(ScanQRCoordinator.Action)
 		}
 
 		var body: some ReducerOf<Self> {
-			Scope(state: \.scanAccountAddress, action: \.scanAccountAddress) {
+			Scope(state: \.scanTransferReceiver, action: \.scanTransferReceiver) {
 				ScanQRCoordinator()
 			}
 		}
@@ -86,7 +86,7 @@ struct ChooseTransferReceiver: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .scanQRCode:
-			state.destination = .scanAccountAddress(.init(kind: .account))
+			state.destination = .scanTransferReceiver(.init(kind: .account))
 			return .none
 
 		case .closeButtonTapped:
@@ -112,7 +112,7 @@ struct ChooseTransferReceiver: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case var .scanAccountAddress(.delegate(.scanned(address))):
+		case var .scanTransferReceiver(.delegate(.scanned(address))):
 			state.destination = nil
 
 			QR.removeAddressPrefixIfNeeded(from: &address)

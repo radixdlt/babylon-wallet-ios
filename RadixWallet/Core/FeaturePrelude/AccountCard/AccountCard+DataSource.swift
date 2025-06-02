@@ -113,6 +113,8 @@ private extension AccountOrAddressOf {
 			account.displayName.value
 		case .addressOfExternalAccount:
 			L10n.Common.account
+		case let .rnsDomainConfiguredReceiver(value):
+			value.domain.domain
 		}
 	}
 
@@ -122,6 +124,8 @@ private extension AccountOrAddressOf {
 			.address(.account(account.address))
 		case let .addressOfExternalAccount(address):
 			.address(.account(address))
+		case let .rnsDomainConfiguredReceiver(value):
+			.address(.account(value.receiver))
 		}
 	}
 
@@ -131,6 +135,8 @@ private extension AccountOrAddressOf {
 			.init(account.appearanceId)
 		case .addressOfExternalAccount:
 			.external
+		case let .rnsDomainConfiguredReceiver(value):
+			.init(colors: [.init(hex: value.domain.gradientColorStart), .init(hex: value.domain.gradientColorEnd)])
 		}
 	}
 }

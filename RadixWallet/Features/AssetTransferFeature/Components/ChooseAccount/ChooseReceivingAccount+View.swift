@@ -1,7 +1,7 @@
 import ComposableArchitecture
 import SwiftUI
 
-extension ChooseTransferReceiver.State {
+extension ChooseTransferRecipient.State {
 	enum ReceiverValidation: Sendable, Hashable {
 		case valid(TransferReceiver)
 		case wrongNetwork(AccountAddress, incorrectNetwork: UInt8)
@@ -65,13 +65,13 @@ extension ChooseTransferReceiver.State {
 }
 
 // MARK: - ChooseReceivingAccount.View
-extension ChooseTransferReceiver {
+extension ChooseTransferRecipient {
 	@MainActor
 	struct View: SwiftUI.View {
-		@Perception.Bindable private var store: StoreOf<ChooseTransferReceiver>
+		@Perception.Bindable private var store: StoreOf<ChooseTransferRecipient>
 		@FocusState private var focusedField: Bool
 
-		init(store: StoreOf<ChooseTransferReceiver>) {
+		init(store: StoreOf<ChooseTransferRecipient>) {
 			self.store = store
 		}
 
@@ -153,9 +153,9 @@ extension ChooseTransferReceiver {
 	}
 }
 
-private extension StoreOf<ChooseTransferReceiver> {
-	var destination: PresentationStoreOf<ChooseTransferReceiver.Destination> {
-		func scopeState(state: State) -> PresentationState<ChooseTransferReceiver.Destination.State> {
+private extension StoreOf<ChooseTransferRecipient> {
+	var destination: PresentationStoreOf<ChooseTransferRecipient.Destination> {
+		func scopeState(state: State) -> PresentationState<ChooseTransferRecipient.Destination.State> {
 			state.$destination
 		}
 		return scope(state: scopeState, action: Action.destination)
@@ -164,9 +164,9 @@ private extension StoreOf<ChooseTransferReceiver> {
 
 @MainActor
 private extension View {
-	func destinations(with store: StoreOf<ChooseTransferReceiver>) -> some View {
+	func destinations(with store: StoreOf<ChooseTransferRecipient>) -> some View {
 		let destinationStore = store.destination
-		return navigationDestination(store: destinationStore.scope(state: \.scanAccountAddress, action: \.scanAccountAddress)) {
+		return navigationDestination(store: destinationStore.scope(state: \.scanTransferReceiver, action: \.scanTransferReceiver)) {
 			ScanQRCoordinator.View(store: $0)
 				.radixToolbar(title: L10n.AssetTransfer.ChooseReceivingAccount.scanQRNavigationTitle, alwaysVisible: false)
 		}

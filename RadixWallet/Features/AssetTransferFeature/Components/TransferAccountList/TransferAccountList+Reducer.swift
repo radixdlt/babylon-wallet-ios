@@ -56,20 +56,20 @@ struct TransferAccountList: Sendable, FeatureReducer {
 
 		@CasePathable
 		enum MainState: Sendable, Hashable {
-			case chooseTransferReceiver(ChooseTransferReceiver.State)
+			case chooseTransferReceiver(ChooseTransferRecipient.State)
 			case addAsset(AssetsView.State)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
-			case chooseTransferReceiver(ChooseTransferReceiver.Action)
+			case chooseTransferReceiver(ChooseTransferRecipient.Action)
 			case addAsset(AssetsView.Action)
 		}
 
 		var body: some ReducerOf<Self> {
 			Scope(state: \.state, action: \.self) {
 				Scope(state: \.chooseTransferReceiver, action: \.chooseTransferReceiver) {
-					ChooseTransferReceiver()
+					ChooseTransferRecipient()
 				}
 				Scope(state: \.addAsset, action: \.addAsset) {
 					AssetsView()
@@ -228,7 +228,7 @@ private extension TransferAccountList {
 
 	func navigateToChooseAccounts(_ state: inout State, id: ReceivingAccount.State.ID) -> Effect<Action> {
 		let filteredAccounts = state.receivingAccounts.compactMap(\.recipient?.accountAddress) + [state.fromAccount.address]
-		let chooseAccount: ChooseTransferReceiver.State = .init(
+		let chooseAccount: ChooseTransferRecipient.State = .init(
 			networkID: state.fromAccount.networkID,
 			chooseAccounts: .init(
 				context: .assetTransfer,
@@ -305,9 +305,10 @@ private extension TransferAccountList {
 			let values = switch recipient {
 			case let .profileAccount(account):
 				await getStatusesForProfileAccount(accountForDisplay: account, assets: receivingAccount.assets)
-
 			case let .addressOfExternalAccount(account):
 				try await getStatusesForExternalAccount(account, resourceAddresses: resourceAddresses)
+			case let .rnsDomainConfiguredReceiver(domain):
+				try await getStatusesForExternalAccount(domain.receiver, resourceAddresses: resourceAddresses)
 			}
 			await send(.internal(.setDepositStatus(accountId: receivingAccountId, values: values)))
 		} catch: { error, send in
