@@ -2,7 +2,7 @@ import ComposableArchitecture
 import Sargon
 import SwiftUI
 
-// MARK: - ChooseReceivingAccount
+// MARK: - ChooseTransferRecipient
 @Reducer
 struct ChooseTransferRecipient: Sendable, FeatureReducer {
 	@ObservableState
@@ -17,6 +17,7 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 		}
 
 		var manualTransferRecipientFocused: Bool = false
+		var isDeterminingRnsDomainRecipient: Bool = false
 
 		let networkID: NetworkID
 
@@ -37,7 +38,11 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 		case closeButtonTapped
 		case manualTransferRecipientChanged(String)
 		case focusChanged(Bool)
-		case chooseButtonTapped(AccountOrAddressOf)
+		case chooseButtonTapped(Either<Account, State.ManualTransferRecipient>)
+	}
+
+	enum InternalAction: Sendable, Equatable {
+		case rnsDomainConfiguredRecieverResult(TaskResult<RnsDomainConfiguredReceiver>)
 	}
 
 	@CasePathable
@@ -67,6 +72,8 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 			}
 		}
 	}
+
+	@Dependency(\.errorQueue) var errorQueue
 
 	init() {}
 
@@ -101,12 +108,42 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 			return .none
 
 		case let .chooseButtonTapped(result):
-			// While we allow to easily selected the owned account, user is still able to paste the address of an owned account.
-			// This be sure to check if the manually introduced address matches any of the user owned accounts.
-			if case let .addressOfExternalAccount(address) = result, let ownedAccount = state.chooseAccounts.availableAccounts.first(where: { $0.address == address }) {
-				return .send(.delegate(.handleResult(.profileAccount(value: ownedAccount.forDisplay))))
+			switch result {
+			case let .left(account):
+				return .send(.delegate(.handleResult(.profileAccount(value: account.forDisplay))))
+			case let .right(.accountAddress(address)):
+				if let ownedAccount = state.chooseAccounts.availableAccounts.first(where: { $0.address == address }) {
+					return .send(.delegate(.handleResult(.profileAccount(value: ownedAccount.forDisplay))))
+				} else {
+					return .send(.delegate(.handleResult(.addressOfExternalAccount(value: address))))
+				}
+			case let .right(.rnsDomain(domain)):
+				state.isDeterminingRnsDomainRecipient = true
+				return .run { send in
+					let result = await TaskResult {
+						let rns = try RadixNameService(
+							networkingDriver: URLSession.shared,
+							networkId: .mainnet
+						)
+
+						return try await rns.resolveReceiverAccountForDomain(domain: domain)
+					}
+					return await send(.internal(.rnsDomainConfiguredRecieverResult(result)))
+				}
 			}
-			return .send(.delegate(.handleResult(result)))
+		}
+	}
+
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case let .rnsDomainConfiguredRecieverResult(.success(recipient)):
+			state.isDeterminingRnsDomainRecipient = false
+			return .send(.delegate(.handleResult(.rnsDomainConfiguredReceiver(value: recipient))))
+
+		case let .rnsDomainConfiguredRecieverResult(.failure(error)):
+			state.isDeterminingRnsDomainRecipient = false
+			errorQueue.schedule(error)
+			return .none
 		}
 	}
 
@@ -123,5 +160,11 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 		default:
 			return .none
 		}
+	}
+}
+
+extension String {
+	var isRnsDomain: Bool {
+		self.hasSuffix(".xrd")
 	}
 }

@@ -19,7 +19,7 @@ extension ChooseTransferRecipient.State {
 			return .invalidAccountAddress
 		}
 
-		if manualTransferRecipient.hasSuffix(".xrd") {
+		if manualTransferRecipient.isRnsDomain {
 			do {
 				let domain = try rnsDomainValidated(domain: manualTransferRecipient)
 				return .valid(.rnsDomain(domain))
@@ -45,11 +45,11 @@ extension ChooseTransferRecipient.State {
 		return .valid(.accountAddress(addressOnSomeNetwork))
 	}
 
-	var validatedAccountAddress: AccountAddress? {
-		guard case let .valid(.accountAddress(address)) = validatedManualRecipientValidation else {
+	var validatedManualTransferRecipient: ManualTransferRecipient? {
+		guard case let .valid(recipient) = validatedManualRecipientValidation else {
 			return nil
 		}
-		return address
+		return recipient
 	}
 
 	var canSelectOwnAccount: Bool {
@@ -149,21 +149,16 @@ extension ChooseTransferRecipient {
 		private var chooseButton: some SwiftUI.View {
 			WithControlRequirements(
 				store.chooseAccounts.selectedAccounts?.first?.account,
-				or: store.validatedAccountAddress,
+				or: store.validatedManualTransferRecipient,
 				forAction: { result in
-					let recipient: AccountOrAddressOf = switch result {
-					case let .left(account): .profileAccount(
-							value: account.forDisplay
-						)
-					case let .right(address): .addressOfExternalAccount(value: address)
-					}
-					store.send(.view(.chooseButtonTapped(recipient)))
+					store.send(.view(.chooseButtonTapped(result)))
 				},
 				control: { action in
 					Button(L10n.Common.choose, action: action)
 						.buttonStyle(.primaryRectangular)
 				}
 			)
+			.controlState(store.isDeterminingRnsDomainRecipient ? .loading(.local) : .enabled)
 		}
 	}
 }
