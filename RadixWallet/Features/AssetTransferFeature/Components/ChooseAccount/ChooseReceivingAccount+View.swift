@@ -2,27 +2,40 @@ import ComposableArchitecture
 import SwiftUI
 
 extension ChooseTransferRecipient.State {
-	enum ReceiverValidation: Sendable, Hashable {
-		case valid(TransferReceiver)
+	enum ManualRecipientValidation: Sendable, Hashable {
+		case valid(ManualTransferRecipient)
 		case wrongNetwork(AccountAddress, incorrectNetwork: UInt8)
-		case invalid
+		case invalidAccountAddress
+		case invalidRnsDomain
 	}
 
-	enum TransferReceiver: Sendable, Hashable {
+	enum ManualTransferRecipient: Sendable, Hashable {
 		case accountAddress(AccountAddress)
 		case rnsDomain(RnsDomain)
 	}
 
-	var validatedManualReceiverValidation: ReceiverValidation {
-		guard !manualTransferReceiver.isEmpty,
-		      !chooseAccounts.filteredAccounts.contains(where: { $0.address == manualTransferReceiver })
+	var validatedManualRecipientValidation: ManualRecipientValidation {
+		guard !manualTransferRecipient.isEmpty else {
+			return .invalidAccountAddress
+		}
+
+		if manualTransferRecipient.hasSuffix(".xrd") {
+			do {
+				let domain = try rnsDomainValidated(domain: manualTransferRecipient)
+				return .valid(.rnsDomain(domain))
+			} catch {
+				return .invalidRnsDomain
+			}
+		}
+
+		guard !chooseAccounts.filteredAccounts.contains(where: { $0.address == manualTransferRecipient })
 		else {
-			return .invalid
+			return .invalidAccountAddress
 		}
 		guard
-			let addressOnSomeNetwork = try? AccountAddress(validatingAddress: manualTransferReceiver)
+			let addressOnSomeNetwork = try? AccountAddress(validatingAddress: manualTransferRecipient)
 		else {
-			return .invalid
+			return .invalidAccountAddress
 		}
 		let networkOfAddress = addressOnSomeNetwork.networkID
 		guard networkOfAddress == networkID else {
@@ -33,24 +46,26 @@ extension ChooseTransferRecipient.State {
 	}
 
 	var validatedAccountAddress: AccountAddress? {
-		guard case let .valid(.accountAddress(address)) = validatedManualReceiverValidation else {
+		guard case let .valid(.accountAddress(address)) = validatedManualRecipientValidation else {
 			return nil
 		}
 		return address
 	}
 
 	var canSelectOwnAccount: Bool {
-		manualTransferReceiver.isEmpty
+		manualTransferRecipient.isEmpty
 	}
 
 	var manualReceiverHint: Hint.ViewState? {
-		guard !manualTransferReceiverFocused, !manualTransferReceiver.isEmpty else {
+		guard !manualTransferRecipientFocused, !manualTransferRecipient.isEmpty else {
 			return .none
 		}
 
-		switch validatedManualReceiverValidation {
-		case .invalid:
+		switch validatedManualRecipientValidation {
+		case .invalidAccountAddress:
 			return .error(L10n.AssetTransfer.ChooseReceivingAccount.invalidAddressError)
+		case .invalidRnsDomain:
+			return .error("Invalid Domain")
 		case .wrongNetwork:
 			return .error(L10n.AssetTransfer.Error.wrongNetwork)
 		case let .valid(.accountAddress(validAddress)):
@@ -113,11 +128,11 @@ extension ChooseTransferRecipient {
 		private var addressField: some SwiftUI.View {
 			AppTextField(
 				placeholder: L10n.AssetTransfer.ChooseReceivingAccount.addressFieldPlaceholder,
-				text: $store.manualTransferReceiver.sending(\.view.manualTransferReceiverChanged),
+				text: $store.manualTransferRecipient.sending(\.view.manualTransferRecipientChanged),
 				hint: store.manualReceiverHint,
 				focus: .on(
 					true,
-					binding: $store.manualTransferReceiverFocused.sending(\.view.focusChanged),
+					binding: $store.manualTransferRecipientFocused.sending(\.view.focusChanged),
 					to: $focusedField
 				),
 				showClearButton: true,
@@ -158,7 +173,7 @@ private extension StoreOf<ChooseTransferRecipient> {
 		func scopeState(state: State) -> PresentationState<ChooseTransferRecipient.Destination.State> {
 			state.$destination
 		}
-		return scope(state: scopeState, action: Action.destination)
+		return scope(state: \.$destination, action: \.destination)
 	}
 }
 
@@ -166,7 +181,7 @@ private extension StoreOf<ChooseTransferRecipient> {
 private extension View {
 	func destinations(with store: StoreOf<ChooseTransferRecipient>) -> some View {
 		let destinationStore = store.destination
-		return navigationDestination(store: destinationStore.scope(state: \.scanTransferReceiver, action: \.scanTransferReceiver)) {
+		return navigationDestination(store: destinationStore.scope(state: \.scanTransferRecipient, action: \.scanTransferRecipient)) {
 			ScanQRCoordinator.View(store: $0)
 				.radixToolbar(title: L10n.AssetTransfer.ChooseReceivingAccount.scanQRNavigationTitle, alwaysVisible: false)
 		}

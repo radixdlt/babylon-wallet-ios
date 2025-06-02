@@ -8,15 +8,15 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
 		var chooseAccounts: ChooseAccounts.State
-		var manualTransferReceiver: String = "" {
+		var manualTransferRecipient: String = "" {
 			didSet {
-				if !manualTransferReceiver.isEmpty {
+				if !manualTransferRecipient.isEmpty {
 					chooseAccounts.selectedAccounts = nil
 				}
 			}
 		}
 
-		var manualTransferReceiverFocused: Bool = false
+		var manualTransferRecipientFocused: Bool = false
 
 		let networkID: NetworkID
 
@@ -35,7 +35,7 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 	enum ViewAction: Sendable, Equatable {
 		case scanQRCode
 		case closeButtonTapped
-		case manualTransferReceiverChanged(String)
+		case manualTransferRecipientChanged(String)
 		case focusChanged(Bool)
 		case chooseButtonTapped(AccountOrAddressOf)
 	}
@@ -53,16 +53,16 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 	struct Destination: DestinationReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
-			case scanTransferReceiver(ScanQRCoordinator.State)
+			case scanTransferRecipient(ScanQRCoordinator.State)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
-			case scanTransferReceiver(ScanQRCoordinator.Action)
+			case scanTransferRecipient(ScanQRCoordinator.Action)
 		}
 
 		var body: some ReducerOf<Self> {
-			Scope(state: \.scanTransferReceiver, action: \.scanTransferReceiver) {
+			Scope(state: \.scanTransferRecipient, action: \.scanTransferRecipient) {
 				ScanQRCoordinator()
 			}
 		}
@@ -86,18 +86,18 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .scanQRCode:
-			state.destination = .scanTransferReceiver(.init(kind: .account))
+			state.destination = .scanTransferRecipient(.init(kind: .account))
 			return .none
 
 		case .closeButtonTapped:
 			return .send(.delegate(.dismiss))
 
-		case let .manualTransferReceiverChanged(address):
-			state.manualTransferReceiver = address
+		case let .manualTransferRecipientChanged(address):
+			state.manualTransferRecipient = address
 			return .none
 
 		case let .focusChanged(isFocused):
-			state.manualTransferReceiverFocused = isFocused
+			state.manualTransferRecipientFocused = isFocused
 			return .none
 
 		case let .chooseButtonTapped(result):
@@ -112,12 +112,12 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case var .scanTransferReceiver(.delegate(.scanned(address))):
+		case var .scanTransferRecipient(.delegate(.scanned(address))):
 			state.destination = nil
 
 			QR.removeAddressPrefixIfNeeded(from: &address)
 
-			state.manualTransferReceiver = address
+			state.manualTransferRecipient = address
 			return .none
 
 		default:
