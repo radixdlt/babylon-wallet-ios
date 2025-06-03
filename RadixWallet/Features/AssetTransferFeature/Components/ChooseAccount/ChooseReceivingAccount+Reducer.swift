@@ -73,6 +73,7 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 		}
 	}
 
+	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.errorQueue) var errorQueue
 
 	init() {}
@@ -121,9 +122,10 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 				state.isDeterminingRnsDomainRecipient = true
 				return .run { send in
 					let result = await TaskResult {
+						let network = await gatewaysClient.getCurrentNetworkID()
 						let rns = try RadixNameService(
 							networkingDriver: URLSession.shared,
-							networkId: .mainnet
+							networkId: network
 						)
 
 						return try await rns.resolveReceiverAccountForDomain(domain: domain)
@@ -138,6 +140,9 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .rnsDomainConfiguredRecieverResult(.success(recipient)):
 			state.isDeterminingRnsDomainRecipient = false
+			if let ownedAccount = state.chooseAccounts.availableAccounts.first(where: { $0.address == recipient.receiver }) {
+				return .send(.delegate(.handleResult(.profileAccount(value: ownedAccount.forDisplay))))
+			}
 			return .send(.delegate(.handleResult(.rnsDomainConfiguredReceiver(value: recipient))))
 
 		case let .rnsDomainConfiguredRecieverResult(.failure(error)):
@@ -152,7 +157,7 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 		case var .scanTransferRecipient(.delegate(.scanned(address))):
 			state.destination = nil
 
-			QR.removeAddressPrefixIfNeeded(from: &address)
+			QR.removeTransferRecipientPrefixIfNeeded(from: &address)
 
 			state.manualTransferRecipient = address
 			return .none
