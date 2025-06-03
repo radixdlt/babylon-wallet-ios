@@ -202,7 +202,6 @@ internal enum AssetResource {
   internal static let textFieldBackground = ColorAsset(name: "TextFieldBackground")
   internal static let textFieldBorder = ColorAsset(name: "TextFieldBorder")
   internal static let textFieldFocusedBorder = ColorAsset(name: "TextFieldFocusedBorder")
-  internal static let error = ColorAsset(name: "Error")
   internal static let warning = ColorAsset(name: "Warning")
   internal static let warningSecondary = ColorAsset(name: "WarningSecondary")
   internal static let transactionHistoryDeposit = ImageAsset(name: "transactionHistory_deposit")
