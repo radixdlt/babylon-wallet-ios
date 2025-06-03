@@ -881,6 +881,9 @@
 		A08BBA752DB232D000534B67 /* LedgerHardwareDevices+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08BBA732DB232D000534B67 /* LedgerHardwareDevices+View.swift */; };
 		A08BBA762DB232D000534B67 /* LedgerHardwareDevices+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08BBA722DB232D000534B67 /* LedgerHardwareDevices+Reducer.swift */; };
 		A08BF04F2DDB67900065766A /* DAppsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08BF04E2DDB67900065766A /* DAppsListView.swift */; };
+		A09F8FD62DEF4DAA00DB5614 /* RadixNameService+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09F8FD32DEF4DAA00DB5614 /* RadixNameService+Interface.swift */; };
+		A09F8FD72DEF4DAA00DB5614 /* RadixNameService+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09F8FD42DEF4DAA00DB5614 /* RadixNameService+Live.swift */; };
+		A09F8FD82DEF4DAA00DB5614 /* RadixNameService+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09F8FD52DEF4DAA00DB5614 /* RadixNameService+Test.swift */; };
 		A0C673002DA6BBEA0071606B /* ScreenshotPreventing in Frameworks */ = {isa = PBXBuildFile; productRef = A0C672FF2DA6BBEA0071606B /* ScreenshotPreventing */; };
 		A0C673022DA6BBEA0071606B /* ScreenshotPreventingSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = A0C673012DA6BBEA0071606B /* ScreenshotPreventingSwiftUI */; };
 		A0C673052DA6BD7F0071606B /* ScreenshotPreventing in Frameworks */ = {isa = PBXBuildFile; productRef = A0C673042DA6BD7F0071606B /* ScreenshotPreventing */; };
@@ -2221,6 +2224,9 @@
 		A08BBA722DB232D000534B67 /* LedgerHardwareDevices+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LedgerHardwareDevices+Reducer.swift"; sourceTree = "<group>"; };
 		A08BBA732DB232D000534B67 /* LedgerHardwareDevices+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LedgerHardwareDevices+View.swift"; sourceTree = "<group>"; };
 		A08BF04E2DDB67900065766A /* DAppsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DAppsListView.swift; sourceTree = "<group>"; };
+		A09F8FD32DEF4DAA00DB5614 /* RadixNameService+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RadixNameService+Interface.swift"; sourceTree = "<group>"; };
+		A09F8FD42DEF4DAA00DB5614 /* RadixNameService+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RadixNameService+Live.swift"; sourceTree = "<group>"; };
+		A09F8FD52DEF4DAA00DB5614 /* RadixNameService+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RadixNameService+Test.swift"; sourceTree = "<group>"; };
 		A0D742A42DD46C3F0062DB01 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		A0D742A72DD478FA0062DB01 /* ThemeSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeSelection.swift; sourceTree = "<group>"; };
 		A0D742A82DD478FA0062DB01 /* ThemeSelection+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ThemeSelection+View.swift"; sourceTree = "<group>"; };
@@ -4567,6 +4573,7 @@
 		48CFBF522ADC10D900E77A5C /* Clients */ = {
 			isa = PBXGroup;
 			children = (
+				A09F8FD22DEF4D8500DB5614 /* RadixNameServiceClient */,
 				A0F223782DDC6CF700035389 /* DAppsDirectoryClient */,
 				5B3C48B32C80D0FF00DB160D /* AccountLockersClient */,
 				48CFBF8D2ADC10D900E77A5C /* AccountPortfoliosClient */,
@@ -6277,6 +6284,16 @@
 				A03DD84A2DDD9150008F7723 /* DAppTagsSelection+View.swift */,
 			);
 			path = DApps;
+			sourceTree = "<group>";
+		};
+		A09F8FD22DEF4D8500DB5614 /* RadixNameServiceClient */ = {
+			isa = PBXGroup;
+			children = (
+				A09F8FD32DEF4DAA00DB5614 /* RadixNameService+Interface.swift */,
+				A09F8FD42DEF4DAA00DB5614 /* RadixNameService+Live.swift */,
+				A09F8FD52DEF4DAA00DB5614 /* RadixNameService+Test.swift */,
+			);
+			path = RadixNameServiceClient;
 			sourceTree = "<group>";
 		};
 		A0D742A62DD478BD0062DB01 /* ThemeSelection */ = {
@@ -8044,6 +8061,9 @@
 				48CFC27A2ADC10D900E77A5C /* App+View.swift in Sources */,
 				A40815E72C7E0D08005E65B9 /* ProgrammaticScryptoSborValueU128.swift in Sources */,
 				E7AE2D0E2C07359500830BAA /* FullScreenOverlayCoordinator+Reducer.swift in Sources */,
+				A09F8FD62DEF4DAA00DB5614 /* RadixNameService+Interface.swift in Sources */,
+				A09F8FD72DEF4DAA00DB5614 /* RadixNameService+Live.swift in Sources */,
+				A09F8FD82DEF4DAA00DB5614 /* RadixNameService+Test.swift in Sources */,
 				5B4A1AC42CC0125700679EE6 /* InteractionReview.swift in Sources */,
 				E791F2982D2BD64F001A007B /* SecurityShieldBuilder+SharedState.swift in Sources */,
 				48CFC3ED2ADC10D900E77A5C /* DataChannelMessage+Codable.swift in Sources */,
