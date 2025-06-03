@@ -114,19 +114,20 @@ private extension ScanQR.Kind {
 		case .connectorExtension: L10n.ScanQR.ConnectorExtension.instructions
 		case .account: L10n.ScanQR.Account.instructions
 		case .importOlympia: L10n.ScanQR.ImportOlympia.instructions
+		case .transferRecipient: "Scan Account or XRD domain QR code"
 		}
 	}
 
 	var scanMode: ScanMode {
 		switch self {
-		case .connectorExtension, .account, .importOlympia:
+		case .connectorExtension, .account, .importOlympia, .transferRecipient:
 			.oncePerCode
 		}
 	}
 
 	var disclosure: Disclosure? {
 		switch self {
-		case .account, .importOlympia:
+		case .account, .importOlympia, .transferRecipient:
 			nil
 		case .connectorExtension:
 			.init(

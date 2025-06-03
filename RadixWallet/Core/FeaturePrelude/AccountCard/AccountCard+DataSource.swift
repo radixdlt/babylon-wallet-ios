@@ -70,7 +70,7 @@ extension AccountCard where Bottom == EmptyView {
 		)
 	}
 
-	init(kind: Kind = .display, account: AccountOrAddressOf, @ViewBuilder trailing: () -> Trailing) {
+	init(kind: Kind = .display, account: TransferRecipient, @ViewBuilder trailing: () -> Trailing) {
 		self.init(
 			kind: kind,
 			account: account.asDataSource,
@@ -102,7 +102,7 @@ private extension AccountAddress {
 	}
 }
 
-private extension AccountOrAddressOf {
+private extension TransferRecipient {
 	var asDataSource: AccountCardDataSource {
 		.init(title: title, ledgerIdentifiable: ledgerIdentifiable, gradient: gradient)
 	}
@@ -113,7 +113,7 @@ private extension AccountOrAddressOf {
 			account.displayName.value
 		case .addressOfExternalAccount:
 			L10n.Common.account
-		case let .rnsDomainConfiguredReceiver(value):
+		case let .rnsDomain(value):
 			value.domain.domain
 		}
 	}
@@ -124,7 +124,7 @@ private extension AccountOrAddressOf {
 			.address(.account(account.address))
 		case let .addressOfExternalAccount(address):
 			.address(.account(address))
-		case let .rnsDomainConfiguredReceiver(value):
+		case let .rnsDomain(value):
 			.address(.account(value.receiver))
 		}
 	}
@@ -135,7 +135,7 @@ private extension AccountOrAddressOf {
 			.init(account.appearanceId)
 		case .addressOfExternalAccount:
 			.external
-		case let .rnsDomainConfiguredReceiver(value):
+		case let .rnsDomain(value):
 			.init(colors: [.init(hex: value.domain.gradientColorStart), .init(hex: value.domain.gradientColorEnd)])
 		}
 	}

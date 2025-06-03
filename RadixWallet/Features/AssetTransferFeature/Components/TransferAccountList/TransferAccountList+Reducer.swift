@@ -307,7 +307,7 @@ private extension TransferAccountList {
 				await getStatusesForProfileAccount(accountForDisplay: account, assets: receivingAccount.assets)
 			case let .addressOfExternalAccount(account):
 				try await getStatusesForExternalAccount(account, resourceAddresses: resourceAddresses)
-			case let .rnsDomainConfiguredReceiver(domain):
+			case let .rnsDomain(domain):
 				try await getStatusesForExternalAccount(domain.receiver, resourceAddresses: resourceAddresses)
 			}
 			await send(.internal(.setDepositStatus(accountId: receivingAccountId, values: values)))

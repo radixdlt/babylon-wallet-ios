@@ -52,7 +52,7 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case dismiss
-		case handleResult(AccountOrAddressOf)
+		case handleResult(TransferRecipient)
 	}
 
 	struct Destination: DestinationReducer {
@@ -94,7 +94,7 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .scanQRCode:
-			state.destination = .scanTransferRecipient(.init(kind: .account))
+			state.destination = .scanTransferRecipient(.init(kind: .transferRecipient))
 			return .none
 
 		case .closeButtonTapped:
@@ -143,7 +143,7 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 			if let ownedAccount = state.chooseAccounts.availableAccounts.first(where: { $0.address == recipient.receiver }) {
 				return .send(.delegate(.handleResult(.profileAccount(value: ownedAccount.forDisplay))))
 			}
-			return .send(.delegate(.handleResult(.rnsDomainConfiguredReceiver(value: recipient))))
+			return .send(.delegate(.handleResult(.rnsDomain(value: recipient))))
 
 		case let .rnsDomainConfiguredRecieverResult(.failure(error)):
 			state.isDeterminingRnsDomainRecipient = false

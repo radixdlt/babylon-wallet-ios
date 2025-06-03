@@ -95,7 +95,7 @@ extension ChooseTransferRecipient {
 				NavigationStack {
 					ScrollView {
 						VStack(spacing: .medium2) {
-							Text(L10n.AssetTransfer.ChooseReceivingAccount.enterManually)
+							Text("Enter or scan an Account address or XRD domain")
 								.textStyle(.body1Regular)
 								.foregroundColor(.primaryText)
 
@@ -118,7 +118,7 @@ extension ChooseTransferRecipient {
 					.background(.primaryBackground)
 					.destinations(with: store)
 					.footer { chooseButton }
-					.radixToolbar(title: L10n.AssetTransfer.ChooseReceivingAccount.navigationTitle) {
+					.radixToolbar(title: "Choose Transfer Recipient") {
 						store.send(.view(.closeButtonTapped))
 					}
 				}
@@ -127,7 +127,7 @@ extension ChooseTransferRecipient {
 
 		private var addressField: some SwiftUI.View {
 			AppTextField(
-				placeholder: L10n.AssetTransfer.ChooseReceivingAccount.addressFieldPlaceholder,
+				placeholder: "Enter Radix Account address or XRD domain",
 				text: $store.manualTransferRecipient.sending(\.view.manualTransferRecipientChanged),
 				hint: store.manualReceiverHint,
 				focus: .on(
@@ -178,7 +178,7 @@ private extension View {
 		let destinationStore = store.destination
 		return navigationDestination(store: destinationStore.scope(state: \.scanTransferRecipient, action: \.scanTransferRecipient)) {
 			ScanQRCoordinator.View(store: $0)
-				.radixToolbar(title: L10n.AssetTransfer.ChooseReceivingAccount.scanQRNavigationTitle, alwaysVisible: false)
+				.radixToolbar(title: "Scan Account or XRD Domain QR CIde", alwaysVisible: false)
 		}
 	}
 }
