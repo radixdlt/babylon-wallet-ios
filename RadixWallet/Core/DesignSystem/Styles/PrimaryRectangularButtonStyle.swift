@@ -32,8 +32,8 @@ struct PrimaryRectangularButtonStyle: ButtonStyle {
 
 	var backgroundColor: Color {
 		controlState.isEnabled
-			? isDestructive ? .app.red1 : .app.blue2
-			: .app.gray4
+			? isDestructive ? .error : Color.button
+			: Color.tertiaryBackground
 	}
 }
 
@@ -41,11 +41,11 @@ extension PrimaryRectangularButtonStyle {
 	private var foregroundColor: Color {
 		switch controlState {
 		case .enabled:
-			.app.white
+			.white
 		case .loading:
 			.clear
 		case .disabled:
-			.app.gray2
+			Color.secondaryText
 		}
 	}
 }

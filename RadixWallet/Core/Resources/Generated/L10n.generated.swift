@@ -1584,6 +1584,24 @@ internal enum L10n {
       internal static let subtitleWrongNetworkID = L10n.tr("Localizable", "dAppRequest_validationOutcome_subtitleWrongNetworkID", fallback: "Network mismatch")
     }
   }
+  internal enum DappDirectory {
+    /// dApp Directory
+    internal static let title = L10n.tr("Localizable", "dappDirectory_title", fallback: "dApp Directory")
+    internal enum Error {
+      /// Failed to load dApps.
+      internal static let heading = L10n.tr("Localizable", "dappDirectory_error_heading", fallback: "Failed to load dApps.")
+      /// Pull to refresh
+      internal static let message = L10n.tr("Localizable", "dappDirectory_error_message", fallback: "Pull to refresh")
+    }
+    internal enum Filters {
+      /// Tags
+      internal static let title = L10n.tr("Localizable", "dappDirectory_filters_title", fallback: "Tags")
+    }
+    internal enum Search {
+      /// Search for a dApp...
+      internal static let placeholder = L10n.tr("Localizable", "dappDirectory_search_placeholder", fallback: "Search for a dApp...")
+    }
+  }
   internal enum DisplayMnemonics {
     /// Write Down this Seed Phrase
     internal static let backUpWarning = L10n.tr("Localizable", "displayMnemonics_backUpWarning", fallback: "Write Down this Seed Phrase")
@@ -2141,6 +2159,14 @@ internal enum L10n {
     internal enum SecureFolder {
       /// Your wallet has encountered a problem that should be resolved before you continue use. If you have a Samsung phone, this may be caused by putting the Radix Wallet in the "Secure Folder". Please contact support at hello@radixdlt.com for assistance.
       internal static let warning = L10n.tr("Localizable", "homePage_secureFolder_warning", fallback: "Your wallet has encountered a problem that should be resolved before you continue use. If you have a Samsung phone, this may be caused by putting the Radix Wallet in the \"Secure Folder\". Please contact support at hello@radixdlt.com for assistance.")
+    }
+    internal enum Tab {
+      /// dApps
+      internal static let dapps = L10n.tr("Localizable", "homePage_tab_dapps", fallback: "dApps")
+      /// Settings
+      internal static let settings = L10n.tr("Localizable", "homePage_tab_settings", fallback: "Settings")
+      /// Wallet
+      internal static let wallet = L10n.tr("Localizable", "homePage_tab_wallet", fallback: "Wallet")
     }
     internal enum VisitDashboard {
       /// Ready to get started using the Radix Network and your Wallet?
@@ -3461,6 +3487,18 @@ internal enum L10n {
       internal static let subtitle = L10n.tr("Localizable", "preferences_hiddenEntities_subtitle", fallback: "Manage hidden Personas and Accounts")
       /// Hidden Personas & Accounts
       internal static let title = L10n.tr("Localizable", "preferences_hiddenEntities_title", fallback: "Hidden Personas & Accounts")
+    }
+    internal enum ThemeSelection {
+      /// Dark
+      internal static let dark = L10n.tr("Localizable", "preferences_themeSelection_dark", fallback: "Dark")
+      /// Light
+      internal static let light = L10n.tr("Localizable", "preferences_themeSelection_light", fallback: "Light")
+      /// Change the app theme
+      internal static let subtitle = L10n.tr("Localizable", "preferences_themeSelection_subtitle", fallback: "Change the app theme")
+      /// System
+      internal static let system = L10n.tr("Localizable", "preferences_themeSelection_system", fallback: "System")
+      /// Theme Selection
+      internal static let title = L10n.tr("Localizable", "preferences_themeSelection_title", fallback: "Theme Selection")
     }
   }
   internal enum ProfileBackup {

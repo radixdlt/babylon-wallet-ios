@@ -64,7 +64,7 @@ extension ApplyShield.Intro {
 							.multilineTextAlignment(.leading)
 							.flushedLeft
 					}
-					.foregroundStyle(.app.gray1)
+					.foregroundStyle(.primaryText)
 					.embedInContainer
 					.padding(.top, .small1)
 
@@ -81,7 +81,7 @@ extension ApplyShield.Intro {
 
 					Spacer()
 				}
-				.foregroundStyle(.app.gray1)
+				.foregroundStyle(.primaryText)
 				.multilineTextAlignment(.center)
 				.padding([.horizontal, .bottom], .large2)
 			}

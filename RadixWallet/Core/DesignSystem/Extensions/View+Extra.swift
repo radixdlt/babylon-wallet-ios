@@ -5,7 +5,7 @@ extension View {
 			.overlay {
 				Circle()
 					.stroke(style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
-					.foregroundColor(.app.gray3)
+					.foregroundColor(.iconTertiary)
 			}
 	}
 
@@ -13,7 +13,7 @@ extension View {
 		toolbar {
 			ToolbarItem(placement: .principal) {
 				Text(title)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(Color.primaryText)
 					.textStyle(.body1Header)
 			}
 
@@ -24,7 +24,7 @@ extension View {
 			}
 		}
 		.navigationBarTitleDisplayMode(.inline)
-		.toolbarBackground(.app.background, for: .navigationBar)
+		.toolbarBackground(Color.primaryBackground, for: .navigationBar)
 		.toolbarBackground(alwaysVisible ? .visible : .automatic, for: .navigationBar)
 	}
 
@@ -82,6 +82,7 @@ extension View {
 					.frame(minHeight: proxy.size.height)
 				}
 				.frame(width: proxy.size.width)
+				.background(.secondaryBackground)
 			}
 		}
 	}

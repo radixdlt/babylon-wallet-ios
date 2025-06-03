@@ -13,8 +13,7 @@ extension InteractionReview.Sections.State {
 			unstakingFromValidators: unstakingFromValidators,
 			claimingFromValidators: claimingFromValidators,
 			accountDepositSetting: accountDepositSetting,
-			accountDepositExceptions: accountDepositExceptions,
-			shieldUpdate: shieldUpdate
+			accountDepositExceptions: accountDepositExceptions
 		)
 	}
 }
@@ -34,7 +33,6 @@ extension InteractionReview.Sections {
 		let claimingFromValidators: InteractionReview.ValidatorsState?
 		let accountDepositSetting: InteractionReview.DepositSettingState?
 		let accountDepositExceptions: InteractionReview.DepositExceptionsState?
-		let shieldUpdate: InteractionReview.ShieldState?
 
 		var isExpandedStakingToValidators: Bool { stakingToValidators?.isExpanded == true }
 		var isExpandedUnstakingFromValidators: Bool { unstakingFromValidators?.isExpanded == true }
@@ -76,7 +74,6 @@ extension InteractionReview.Sections {
 
 					accountDepositSetting(viewStore.accountDepositSetting)
 					accountDepositExceptions(viewStore.accountDepositExceptions)
-					shieldUpdate(viewStore.shieldUpdate)
 				}
 				.animation(.easeInOut, value: viewStore.isExpandedDappsUsed)
 				.animation(.easeInOut, value: viewStore.isExpandedContributingToPools)
@@ -202,12 +199,12 @@ extension InteractionReview.Sections {
 				Image(.transactionReviewDapps)
 					.renderingMode(.template)
 					.resizable()
-					.foregroundStyle(.app.gray3)
+					.foregroundStyle(.iconTertiary)
 					.frame(.smallest)
 
 				Text(L10n.InteractionReview.possibleDappCalls)
 					.textStyle(.body2HighImportance)
-					.foregroundStyle(.app.gray2)
+					.foregroundStyle(.secondaryText)
 					.padding(.leading, .small2)
 
 				Spacer()
@@ -217,7 +214,7 @@ extension InteractionReview.Sections {
 			.padding(.leading, .medium3)
 			.padding(.vertical, .small1)
 			.padding(.trailing, .medium2)
-			.background(.app.white)
+			.background(.primaryBackground)
 			.clipShape(RoundedRectangle(cornerRadius: .small1))
 			.cardShadow
 		}

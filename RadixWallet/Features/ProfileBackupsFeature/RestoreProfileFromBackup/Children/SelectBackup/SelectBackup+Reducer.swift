@@ -39,7 +39,7 @@ struct SelectBackup: Sendable, FeatureReducer {
 			thisDeviceID: UUID? = nil
 		) {
 			self.isDisplayingFileImporter = isDisplayingFileImporter
-			self.thisDeviceID = thisDeviceID
+			self.thisDeviceID = thisDeviceID ?? SargonOS.shared.hostId().id
 		}
 	}
 
@@ -80,7 +80,6 @@ struct SelectBackup: Sendable, FeatureReducer {
 	enum InternalAction: Sendable, Equatable {
 		case setStatus(State.Status)
 		case loadedProfileHeadersFromCloudBackup([Profile.Header]?)
-		case loadedThisDeviceID(UUID?)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -94,7 +93,6 @@ struct SelectBackup: Sendable, FeatureReducer {
 	@Dependency(\.dataReader) var dataReader
 	@Dependency(\.jsonDecoder) var jsonDecoder
 	@Dependency(\.cloudBackupClient) var cloudBackupClient
-	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.secureStorageClient) var secureStorageClient
 	@Dependency(\.userDefaults) var userDefaults
@@ -185,10 +183,6 @@ struct SelectBackup: Sendable, FeatureReducer {
 		case let .loadedProfileHeadersFromCloudBackup(headers):
 			state.backedUpProfiles = headers?.sorted(by: \.lastModified).reversed()
 			return .none
-
-		case let .loadedThisDeviceID(identifier):
-			state.thisDeviceID = identifier
-			return .none
 		}
 	}
 
@@ -235,10 +229,6 @@ struct SelectBackup: Sendable, FeatureReducer {
 			do {
 				await send(.internal(.setStatus(.migrating)))
 				_ = try await cloudBackupClient.migrateProfilesFromKeychain()
-
-				try await send(.internal(.loadedThisDeviceID(
-					secureStorageClient.loadDeviceInfo()?.id
-				)))
 
 				await send(.internal(.setStatus(.loading)))
 

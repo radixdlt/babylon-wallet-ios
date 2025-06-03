@@ -183,7 +183,7 @@ struct ResourceAsset: Sendable, FeatureReducer {
 					resourceAddress: details.stakeClaimResource.resourceAddress,
 					resourceDetails: .success(balance.resource),
 					ownedResource: state.kind.nonFungible?.resource,
-					details: token.map(KnownResourceBalance.NonFungible.token),
+					details: token.map { KnownResourceBalance.NonFungible.token(.init(token: $0)) },
 					ledgerState: details.stakeClaimResource.atLedgerState,
 					stakeClaim: details.stakeClaimTokens.stakeClaims.first,
 					isClaimStakeEnabled: false
@@ -214,7 +214,11 @@ struct ResourceAsset: Sendable, FeatureReducer {
 		.run { [resourceAddress = resource.resourceAddress, resourceQuantifier = token.resourceQuantifier] send in
 			do {
 				let resource = try await onLedgerEntitiesClient.getResource(resourceAddress)
-				if let balance = try await onLedgerEntitiesClient.nonFungibleResourceBalances(.left(resource), resourceAddress: resourceAddress, ids: resourceQuantifier.ids).first {
+				if let balance = try await onLedgerEntitiesClient.nonFungibleResourceBalances(
+					.left(resource),
+					resourceQuantifier: resourceQuantifier,
+					resourceAddress: resourceAddress
+				).first {
 					await send(.internal(.loadedBalance(balance, token)))
 				}
 			} catch {

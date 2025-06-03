@@ -95,7 +95,7 @@ struct AssetResourceDetailsSection: View {
 // MARK: - AssetDetailsSeparator
 struct AssetDetailsSeparator: View {
 	var body: some View {
-		Color.app.gray4
+		Color.separator
 			.frame(height: 1)
 			.padding(.horizontal, .medium1)
 	}

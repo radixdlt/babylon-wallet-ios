@@ -98,6 +98,7 @@ extension AccountRecoveryScanInProgress {
 						}
 					}
 			}
+			.background(.primaryBackground)
 		}
 
 		@ViewBuilder
@@ -110,7 +111,7 @@ extension AccountRecoveryScanInProgress {
 				}
 			}
 			.textStyle(.body1Regular)
-			.foregroundColor(.app.gray1)
+			.foregroundColor(.primaryText)
 			.controlState(viewStore.loadingState)
 		}
 
@@ -119,17 +120,17 @@ extension AccountRecoveryScanInProgress {
 			VStack(alignment: .center, spacing: 0) {
 				Text(L10n.AccountRecoveryScan.InProgress.headerTitle)
 					.textStyle(.sheetTitle)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 					.padding(.bottom, .medium1)
 
 				Text(L10n.AccountRecoveryScan.InProgress.headerSubtitle)
 					.textStyle(.body1Regular)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 					.padding(.bottom, .medium2)
 
 				Text(LocalizedStringKey(viewStore.factorSourceDescription))
 					.textStyle(.body1HighImportance)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 
 				Spacer()
 			}
@@ -143,13 +144,13 @@ extension AccountRecoveryScanInProgress {
 				VStack(alignment: .center, spacing: 0) {
 					Text(L10n.AccountRecoveryScan.ScanComplete.headerTitle)
 						.textStyle(.sheetTitle)
-						.foregroundColor(.app.gray1)
+						.foregroundColor(.primaryText)
 						.padding(.bottom, .medium1)
 
 					Text(LocalizedStringKey(L10n.AccountRecoveryScan.ScanComplete.headerSubtitle(viewStore.maxIndex)))
 						.multilineTextAlignment(.center)
 						.textStyle(.body1Regular)
-						.foregroundColor(.app.gray1)
+						.foregroundColor(.primaryText)
 						.padding(.bottom, .medium1)
 
 					if viewStore.active.isEmpty {
@@ -172,7 +173,7 @@ extension AccountRecoveryScanInProgress {
 			Button(L10n.AccountRecoveryScan.ScanComplete.scanNextBatchButton(batchSize)) {
 				store.send(.view(.scanMore))
 			}
-			.buttonStyle(.alternativeRectangular)
+			.buttonStyle(.blueText)
 			.controlState(viewStore.buttonControlState)
 
 			Button(L10n.AccountRecoveryScan.ScanComplete.continueButton) {

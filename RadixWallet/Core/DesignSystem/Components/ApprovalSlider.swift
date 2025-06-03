@@ -31,12 +31,12 @@ struct ApprovalSlider: View {
 
 					Text(title)
 						.textStyle(.body1Header)
-						.foregroundColor(controlState.isDisabled ? .app.gray3 : .white)
+						.foregroundColor(controlState.isDisabled ? .tertiaryText : .white)
 						.opacity(textOpacity)
 
 					if controlState.isDisabled {
 						if approved {
-							Color.app.gray4
+							Color.tertiaryBackground
 						}
 					} else {
 						Color.app.gradientPurple
@@ -57,7 +57,7 @@ struct ApprovalSlider: View {
 		}
 
 		private var background: Color {
-			controlState.isDisabled ? .app.gray4 : .app.blue2
+			controlState.isDisabled ? .tertiaryBackground : .button
 		}
 
 		private var textOpacity: CGFloat {
@@ -86,7 +86,7 @@ struct ApprovalSlider: View {
 
 		private func handle(for width: CGFloat) -> some View {
 			Circle()
-				.fill(controlState.isDisabled ? .app.gray3 : .white)
+				.fill(controlState.isDisabled ? .tertiaryText : .primaryBackground)
 				.overlay {
 					if controlState.isLoading {
 						ProgressView()
@@ -99,7 +99,7 @@ struct ApprovalSlider: View {
 								.rotationEffect(showRadixIcon ? .radians(0.5 * .pi) : .zero)
 								.offset(y: showRadixIcon ? 4 : 0)
 								.scaleEffect(showRadixIcon ? 1.2 : 1)
-							Image(asset: AssetResource.radixIconWhite)
+							Image(asset: AssetResource.radixIcon)
 								.renderingMode(.template)
 								.opacity(showRadixIcon ? 1 : 0)
 								.rotationEffect(showRadixIcon ? .zero : .radians(-0.5 * .pi))
@@ -107,7 +107,7 @@ struct ApprovalSlider: View {
 						}
 					}
 				}
-				.foregroundColor(controlState.isDisabled ? .app.gray4 : .app.blue2)
+				.foregroundColor(controlState.isDisabled ? .tertiaryBackground : .textButton)
 				.padding(padding)
 				.offset(x: (position - 0.5) * width)
 				.gesture(drag(width: width))
@@ -143,9 +143,9 @@ struct ApprovalSlider: View {
 
 private extension Gradient {
 	static let approvalSlider: Gradient = .init(stops: [
-		.init(color: .app.account11green, location: 0),
-		.init(color: .app.blue2, location: 0.41),
-		.init(color: .app.gradientPurple, location: 0.81),
-		.init(color: .app.gradientPurple.opacity(0), location: 1),
+		.init(color: .gradientGreen3, location: 0),
+		.init(color: .gradientBlue3, location: 0.41),
+		.init(color: .gradientPink3, location: 0.81),
+		.init(color: .gradientBlue3, location: 1),
 	])
 }

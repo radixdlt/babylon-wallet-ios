@@ -41,9 +41,10 @@ extension NameShield {
 						.autocorrectionDisabled()
 						.padding(.top, .huge2)
 					}
-					.foregroundStyle(.app.gray1)
+					.foregroundStyle(Color.primaryText)
 					.padding(.horizontal, .medium3)
 				}
+				.background(Color.primaryBackground)
 				.footer {
 					WithControlRequirements(
 						store.sanitizedName,

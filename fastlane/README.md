@@ -39,6 +39,14 @@ Runs test
 
 Creates SensitiveInfo.plist if it doesn't exist
 
+### ios create_google_service_info
+
+```sh
+[bundle exec] fastlane ios create_google_service_info
+```
+
+Creates GoogleService-Info.plist if it doesn't exist
+
 ### ios populate_sensitive_info
 
 ```sh

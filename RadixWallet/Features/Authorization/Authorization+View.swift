@@ -7,7 +7,10 @@ extension Authorization {
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
-				FactorSourceAccess.View(store: store.factorSourceAccess)
+				ZStack {
+					Color.primaryBackground
+					FactorSourceAccess.View(store: store.factorSourceAccess)
+				}
 			}
 		}
 	}

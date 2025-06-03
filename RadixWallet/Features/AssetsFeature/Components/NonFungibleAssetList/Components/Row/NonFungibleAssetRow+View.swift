@@ -7,6 +7,7 @@ extension NonFungibleAssetList.Row {
 
 	@MainActor
 	struct View: SwiftUI.View {
+		@Environment(\.colorScheme) private var colorScheme
 		private let store: StoreOf<NonFungibleAssetList.Row>
 
 		init(store: StoreOf<NonFungibleAssetList.Row>) {
@@ -55,14 +56,14 @@ extension NonFungibleAssetList.Row.View {
 				VStack(alignment: .leading, spacing: .small2) {
 					if let title = viewStore.resource.metadata.name {
 						Text(title)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.lineSpacing(-4)
 							.textStyle(.secondaryHeader)
 					}
 
 					Text(L10n.Account.Nfts.itemsCount(viewStore.resource.nonFungibleIdsCount))
 						.font(.app.body2HighImportance)
-						.foregroundColor(.app.gray2)
+						.foregroundColor(.secondaryText)
 				}
 				.padding(.leading, .small1)
 
@@ -71,7 +72,7 @@ extension NonFungibleAssetList.Row.View {
 			.padding(.horizontal, .medium1)
 			.padding(.top, .large3)
 			.padding(.bottom, .medium1)
-			.background(.app.white)
+			.background(.primaryBackground)
 		}
 	}
 
@@ -98,9 +99,7 @@ extension NonFungibleAssetList.Row.View {
 		} successContent: { asset in
 			let isDisabled = viewStore.disabled.contains(asset.id)
 			VStack(spacing: .zero) {
-				Divider()
-					.frame(height: .assetDividerHeight)
-					.overlay(.app.gray5)
+				AssetListSeparator()
 
 				HStack {
 					NFTIDView(
@@ -109,14 +108,17 @@ extension NonFungibleAssetList.Row.View {
 						thumbnail: asset.data?.keyImageURL
 					)
 					if let selectedAssets = viewStore.selectedAssets {
-						CheckmarkView(appearance: .dark, isChecked: selectedAssets.contains(asset))
+						CheckmarkView(
+							appearance: colorScheme == .light ? .dark : .light,
+							isChecked: selectedAssets.contains(asset)
+						)
 					}
 				}
 				.opacity(isDisabled ? 0.35 : 1)
 				.padding(.vertical, .medium1)
 				.padding(.horizontal, .medium3)
 				.frame(minHeight: headerHeight)
-				.background(.app.white)
+				.background(.primaryBackground)
 			}
 			.onTapGesture { viewStore.send(.assetTapped(asset)) }
 		}

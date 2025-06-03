@@ -19,7 +19,9 @@ extension TransactionHistoryFilters {
 					WithViewStore(store, observe: \.filters, send: { .view($0) }) { viewStore in
 						VStack(spacing: .medium1) {
 							FlowLayout(spacing: .small2) {
-								FiltersView(filters: viewStore.transferTypes, store: store)
+								ItemFilterPickerView(filters: viewStore.transferTypes) { id in
+									store.send(.view(.filterTapped(id)))
+								}
 							}
 							.padding(.bottom, .small3)
 
@@ -34,14 +36,16 @@ extension TransactionHistoryFilters {
 										store: store
 									)
 
-									Divider()
+									if !viewStore.nonFungibles.isEmpty {
+										Divider()
 
-									SubSection(
-										L10n.TransactionHistory.Filters.assetTypeNFTsLabel,
-										filters: viewStore.nonFungibles,
-										labels: nftLabels,
-										store: store
-									)
+										SubSection(
+											L10n.TransactionHistory.Filters.assetTypeNFTsLabel,
+											filters: viewStore.nonFungibles,
+											labels: nftLabels,
+											store: store
+										)
+									}
 								}
 
 								Divider()
@@ -56,6 +60,7 @@ extension TransactionHistoryFilters {
 						.padding(.horizontal, .medium1)
 					}
 				}
+				.background(.primaryBackground)
 				.footer {
 					Button(L10n.TransactionHistory.Filters.showResultsButton) {
 						store.send(.view(.showResultsTapped))
@@ -110,14 +115,13 @@ extension TransactionHistoryFilters {
 						HStack(spacing: .zero) {
 							Text(name)
 								.textStyle(.body1Header)
-								.foregroundStyle(.app.gray1)
+								.foregroundStyle(.primaryText)
 
 							Spacer()
 
 							Image(expanded ? .chevronUp : .chevronDown)
 						}
 					}
-					.background(.app.white)
 
 					if expanded {
 						content
@@ -168,14 +172,16 @@ extension TransactionHistoryFilters {
 					VStack(alignment: .leading, spacing: .medium3) {
 						Text(heading)
 							.textStyle(.body1HighImportance)
-							.foregroundStyle(.app.gray2)
+							.foregroundStyle(.secondaryText)
 
 						FlowLayout(spacing: spacing) {
-							FiltersView(filters: filters, store: store)
+							ItemFilterPickerView(filters: filters) { id in
+								store.send(.view(.filterTapped(id)))
+							}
 						}
 						.measureSize(flowLayoutID)
 						.overlay {
-							TransactionFilterView.Dummy()
+							DummyFilter()
 								.measureSize(flowDummyID)
 						}
 						.padding(clippedPadding)
@@ -206,26 +212,55 @@ extension TransactionHistoryFilters {
 			private let flowDummyID = "FlowDummy"
 		}
 
-		private struct FiltersView: SwiftUI.View {
-			let filters: IdentifiedArrayOf<State.Filter>
-			let store: StoreOf<TransactionHistoryFilters>
-
+		struct DummyFilter: SwiftUI.View {
 			var body: some SwiftUI.View {
-				ForEach(filters) { filter in
-					TransactionFilterView(filter: filter) { id in
-						store.send(.view(.filterTapped(id)))
-					}
-				}
+				Text("DUMMY")
+					.textStyle(.body1HighImportance)
+					.foregroundStyle(.clear)
+					.padding(.vertical, .small2)
 			}
 		}
 	}
 }
 
-// MARK: - TransactionFilterView
-struct TransactionFilterView: SwiftUI.View {
-	let filter: TransactionHistoryFilters.State.Filter
-	let action: (TransactionFilter) -> Void
-	var crossAction: ((TransactionFilter) -> Void)? = nil
+struct ItemFilterPickerView<ID: Hashable & Sendable>: SwiftUI.View {
+	let filters: IdentifiedArrayOf<ItemFilter<ID>>
+	let onAction: (ID) -> Void
+
+	var body: some SwiftUI.View {
+		ForEach(filters) { filter in
+			ItemFilterView(filter: filter, action: onAction)
+		}
+	}
+}
+
+struct ItemFilter<ID: Hashable & Sendable>: Hashable, Sendable, Identifiable {
+	let id: ID
+	let icon: ImageResource?
+	let label: String
+	var isActive: Bool
+
+	func hash(into hasher: inout Hasher) {
+		hasher.combine(id)
+	}
+}
+
+struct ItemFilterView<ID: Hashable & Sendable>: SwiftUI.View {
+	typealias Filter = ItemFilter<ID>
+
+	let filter: Filter
+	let action: (ID) -> Void
+	var crossAction: ((ID) -> Void)? = nil
+
+	init(
+		filter: Filter,
+		action: @escaping (ID) -> Void,
+		crossAction: ((ID) -> Void)? = nil
+	) {
+		self.filter = filter
+		self.action = action
+		self.crossAction = crossAction
+	}
 
 	var body: some SwiftUI.View {
 		Button {
@@ -250,8 +285,8 @@ struct TransactionFilterView: SwiftUI.View {
 		.padding(.trailing, showCross ? .medium1 : 0)
 		.background {
 			ZStack {
-				Capsule().fill(filter.isActive ? .app.gray1 : .app.white)
-				Capsule().stroke(filter.isActive ? .clear : .app.gray3)
+				Capsule().fill(filter.isActive ? .chipBackground : .primaryBackground)
+				Capsule().stroke(filter.isActive ? .clear : .border)
 			}
 		}
 		.overlay(alignment: .trailing) {
@@ -259,7 +294,7 @@ struct TransactionFilterView: SwiftUI.View {
 				Button(asset: AssetResource.close) {
 					crossAction(filter.id)
 				}
-				.tint(.app.gray3)
+				.tint(.iconTertiary)
 				.padding(.vertical, -.small3)
 				.padding(.trailing, .small2)
 				.transition(.scale.combined(with: .opacity))
@@ -273,15 +308,6 @@ struct TransactionFilterView: SwiftUI.View {
 	}
 
 	private var textColor: Color {
-		filter.isActive ? .app.white : .app.gray1
-	}
-
-	struct Dummy: SwiftUI.View {
-		var body: some SwiftUI.View {
-			Text("DUMMY")
-				.textStyle(.body1HighImportance)
-				.foregroundStyle(.clear)
-				.padding(.vertical, .small2)
-		}
+		filter.isActive ? .white : .primaryText
 	}
 }

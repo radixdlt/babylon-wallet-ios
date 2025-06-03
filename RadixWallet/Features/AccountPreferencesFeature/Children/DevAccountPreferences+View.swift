@@ -136,7 +136,7 @@ extension DevAccountPreferences.View {
 		if viewStore.createFungibleTokenButtonState.isLoading {
 			Text("Creating Token")
 				.font(.app.body2Regular)
-				.foregroundColor(.app.gray1)
+				.foregroundColor(.primaryText)
 		}
 	}
 
@@ -151,7 +151,7 @@ extension DevAccountPreferences.View {
 		if viewStore.createNonFungibleTokenButtonState.isLoading {
 			Text("Creating NFT")
 				.font(.app.body2Regular)
-				.foregroundColor(.app.gray1)
+				.foregroundColor(.primaryText)
 		}
 	}
 
@@ -166,7 +166,7 @@ extension DevAccountPreferences.View {
 		if viewStore.createMultipleFungibleTokenButtonState.isLoading {
 			Text("Creating Tokens")
 				.font(.app.body2Regular)
-				.foregroundColor(.app.gray1)
+				.foregroundColor(.primaryText)
 		}
 	}
 
@@ -181,7 +181,7 @@ extension DevAccountPreferences.View {
 		if viewStore.createMultipleNonFungibleTokenButtonState.isLoading {
 			Text("Creating NFTs")
 				.font(.app.body2Regular)
-				.foregroundColor(.app.gray1)
+				.foregroundColor(.primaryText)
 		}
 	}
 }

@@ -1,6 +1,6 @@
 extension Troubleshooting.State {
 	var viewState: Troubleshooting.ViewState {
-		.init(isLegacyImportEnabled: isLegacyImportEnabled)
+		.init(isLegacyImportEnabled: isLegacyImportEnabled, shareCrashReportsIsEnabled: shareCrashReportsIsEnabled)
 	}
 }
 
@@ -8,6 +8,7 @@ extension Troubleshooting.State {
 extension Troubleshooting {
 	struct ViewState: Equatable {
 		let isLegacyImportEnabled: Bool
+		let shareCrashReportsIsEnabled: Bool
 	}
 
 	@MainActor
@@ -21,8 +22,8 @@ extension Troubleshooting {
 		var body: some SwiftUI.View {
 			content
 				.radixToolbar(title: L10n.Troubleshooting.title)
-				.tint(.app.gray1)
-				.foregroundColor(.app.gray1)
+				.tint(.primaryText)
+				.foregroundColor(.primaryText)
 				.presentsLoadingViewOverlay()
 				.destinations(with: store)
 		}
@@ -35,12 +36,12 @@ extension Troubleshooting.View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(spacing: .zero) {
-					ForEachStatic(rows(isLegacyImportEnabled: viewStore.isLegacyImportEnabled)) { kind in
+					ForEachStatic(rows(isLegacyImportEnabled: viewStore.isLegacyImportEnabled, viewStore: viewStore)) { kind in
 						SettingsRow(kind: kind, store: store)
 					}
 				}
 			}
-			.background(Color.app.gray5)
+			.background(.secondaryBackground)
 			.onFirstTask { @MainActor in
 				await viewStore.send(.onFirstTask).finish()
 			}
@@ -48,7 +49,7 @@ extension Troubleshooting.View {
 	}
 
 	@MainActor
-	private func rows(isLegacyImportEnabled: Bool) -> [SettingsRow<Troubleshooting>.Kind] {
+	private func rows(isLegacyImportEnabled: Bool, viewStore: ViewStoreOf<Troubleshooting>) -> [SettingsRow<Troubleshooting>.Kind] {
 		[
 			.header(L10n.Troubleshooting.accountRecovery),
 			.model(
@@ -77,6 +78,16 @@ extension Troubleshooting.View {
 				icon: .asset(.discord),
 				accessory: .iconLinkOut,
 				action: .discordButtonTapped
+			),
+			.toggleModel(
+				icon: nil,
+				title: L10n.AppSettings.CrashReporting.title,
+				subtitle: L10n.AppSettings.CrashReporting.subtitle,
+				minHeight: .zero,
+				isOn: viewStore.binding(
+					get: \.shareCrashReportsIsEnabled,
+					send: { .crashReportingToggled($0) }
+				)
 			),
 			.header(L10n.Troubleshooting.resetAccount),
 			.model(

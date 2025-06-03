@@ -2,7 +2,17 @@
   "images" : [
     {
       "filename" : "renaming-anyone.pdf",
-      "idiom" : "universal",
+      "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "ic_change_update_metadata.pdf",
+      "idiom" : "universal"
     }
   ],
   "info" : {

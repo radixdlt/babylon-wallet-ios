@@ -8,10 +8,11 @@ extension RenameLabel {
 
 		var body: some SwiftUI.View {
 			content
+				.background(Color.primaryBackground)
 				.withNavigationBar {
 					store.send(.view(.closeButtonTapped))
 				}
-				.presentationDetents([.fraction(0.55), .large])
+				.presentationDetents([.fraction(0.6), .large])
 				.presentationDragIndicator(.visible)
 				.presentationBackground(.blur)
 		}
@@ -41,7 +42,7 @@ extension RenameLabel {
 						.keyboardType(.asciiCapable)
 						.autocorrectionDisabled()
 					}
-					.foregroundColor(.app.gray1)
+					.foregroundColor(Color.primaryText)
 					.padding(.horizontal, .medium3)
 
 					Spacer()

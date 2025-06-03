@@ -34,7 +34,7 @@ extension InteractionReview {
 							ResourceChangeView(resource: change.resource, image: change.change.image, text: change.change.text)
 						}
 					}
-					.background(.app.gray4)
+					.background(.tertiaryBackground)
 				}
 			}
 
@@ -58,13 +58,13 @@ extension InteractionReview {
 								.lineLimit(2)
 								.lineSpacing(-3)
 								.textStyle(.body2HighImportance)
-								.foregroundColor(.app.gray1)
+								.foregroundColor(.primaryText)
 						}
 						.frame(width: .huge1)
 					}
 					.padding(.medium3)
 					.frame(maxWidth: .infinity)
-					.background(.app.gray5)
+					.background(.secondaryBackground)
 				}
 			}
 		}
@@ -158,7 +158,7 @@ struct ResourceIconNameView: View {
 			}
 			if let title = resource.metadata.title {
 				Text(title)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 					.textStyle(.body1HighImportance)
 			}
 		}

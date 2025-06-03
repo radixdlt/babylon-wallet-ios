@@ -238,3 +238,9 @@ private extension FactorSourceIntegrity {
 		}
 	}
 }
+
+// MARK: - SimplePrivateFactorSource
+struct SimplePrivateFactorSource: Sendable, Hashable {
+	let mnemonicWithPassphrase: MnemonicWithPassphrase
+	let factorSourceID: FactorSourceIdFromHash
+}

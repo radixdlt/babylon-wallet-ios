@@ -43,36 +43,44 @@ extension InteractionReview.Sections {
 		case nil:
 			return nil
 
+		case .securifyEntity:
+			return nil
+
 		case .general, .transfer:
-			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
-			let withdrawals = try await extractWithdrawals(
-				accountWithdraws: summary.withdrawals,
-				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
-				entities: resourcesInfo,
-				networkID: networkID
-			)
+			do {
+				let resourcesInfo = try await resourcesInfo(allAddresses.elements)
+				let withdrawals = try await extractWithdrawals(
+					accountWithdraws: summary.withdrawals,
+					newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
+					entities: resourcesInfo,
+					networkID: networkID
+				)
 
-			let dappAddresses = extractDappAddresses(encounteredAddresses: summary.encounteredAddresses)
-			let dAppsUsed = try await extractDapps(
-				addresses: dappAddresses,
-				unknownTitle: L10n.TransactionReview.unknownComponents
-			)
+				let dappAddresses = extractDappAddresses(encounteredAddresses: summary.encounteredAddresses)
+				let dAppsUsed = try await extractDapps(
+					addresses: dappAddresses,
+					unknownTitle: L10n.TransactionReview.unknownComponents
+				)
 
-			let deposits = try await extractDeposits(
-				accountDeposits: summary.deposits,
-				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
-				entities: resourcesInfo,
-				networkID: networkID
-			)
+				let deposits = try await extractDeposits(
+					accountDeposits: summary.deposits,
+					newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
+					entities: resourcesInfo,
+					networkID: networkID
+				)
 
-			let proofs = try await exctractProofs(summary.presentedProofs)
+				let proofs = try await exctractProofs(summary.presentedProofs)
 
-			return Common.SectionsData(
-				withdrawals: withdrawals,
-				dAppsUsed: dAppsUsed,
-				deposits: deposits,
-				proofs: proofs
-			)
+				return Common.SectionsData(
+					withdrawals: withdrawals,
+					dAppsUsed: dAppsUsed,
+					deposits: deposits,
+					proofs: proofs
+				)
+			} catch {
+				print("error \(error)")
+				return nil
+			}
 
 		case let .poolContribution(poolAddresses, poolContributions):
 			// All resources that are part of the pool
@@ -242,7 +250,6 @@ extension InteractionReview.Sections {
 			authorizedDepositorsAdded,
 			authorizedDepositorsRemoved
 		):
-
 			let allAccountAddress = Set(authorizedDepositorsAdded.keys)
 				.union(authorizedDepositorsRemoved.keys)
 				.union(depositModeUpdates.keys)
@@ -289,23 +296,6 @@ extension InteractionReview.Sections {
 			return Common.SectionsData(
 				deposits: deposits,
 				accountDeletion: deleteAccounts
-			)
-
-		case let .securifyEntity(entityAddress, metadata):
-			guard let entity = try await extractEntity(entityAddress) else { return nil }
-
-			let shield = try SargonOs.shared.securityStructureOfFactorSourceIdsBySecurityStructureId(
-				shieldId: metadata.id
-			)
-
-			let allFactorSourcesFromProfile = try await factorSourcesClient.getFactorSources().elements
-
-			return Common.SectionsData(
-				shieldUpdate: .init(
-					entity: entity,
-					shield: shield,
-					allFactorSourcesFromProfile: allFactorSourcesFromProfile
-				)
 			)
 		}
 	}
@@ -421,7 +411,7 @@ extension InteractionReview.Sections {
 			let tokens = try await onLedgerEntitiesClient.getNonFungibleTokenData(
 				.init(resource: resourceAddress, nonFungibleIds: globalIds)
 			)
-			return tokens.map { (resourceAddress, .nonFungible(.token($0))) }
+			return tokens.map { (resourceAddress, .nonFungible(.token(.init(token: $0)))) }
 		}
 	}
 
@@ -716,8 +706,8 @@ extension InteractionReview.Sections {
 		case let .nonFungible(_, indicator):
 			return try await onLedgerEntitiesClient.nonFungibleResourceBalances(
 				resourceInfo,
+				resourceQuantifier: indicator,
 				resourceAddress: resourceAddress,
-				ids: indicator.ids,
 				unstakeData: unstakeData,
 				newlyCreatedNonFungibles: newlyCreatedNonFungibles
 			)

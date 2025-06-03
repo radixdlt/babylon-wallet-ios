@@ -42,7 +42,7 @@ extension PreAuthorizationReview {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				content(viewStore)
 					.controlState(viewStore.globalControlState)
-					.background(.app.white)
+					.background(.primaryBackground)
 					.toolbar {
 						ToolbarItem(placement: .principal) {
 							if showNavigationTitle {
@@ -61,12 +61,12 @@ extension PreAuthorizationReview {
 			VStack(spacing: .zero) {
 				Text(L10n.PreAuthorizationReview.title)
 					.textStyle(.body2Header)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 
 				if let dAppName {
 					Text(L10n.InteractionReview.subtitle(dAppName))
 						.textStyle(.body2Regular)
-						.foregroundColor(.app.gray2)
+						.foregroundColor(.secondaryText)
 				}
 			}
 		}
@@ -83,7 +83,7 @@ extension PreAuthorizationReview {
 							details(viewStore.showRawManifestButton)
 						}
 					}
-					.background(Common.gradientBackground)
+					.background(.secondaryBackground)
 					.clipShape(RoundedRectangle(cornerRadius: .small1))
 					.padding(.horizontal, .small2)
 
@@ -162,10 +162,10 @@ extension PreAuthorizationReview {
 			HStack(spacing: .zero) {
 				VStack(alignment: .leading, spacing: .zero) {
 					Text(L10n.PreAuthorizationReview.Fees.title(dAppName ?? "dApp"))
-						.foregroundStyle(.app.gray1)
+						.foregroundStyle(.primaryText)
 
 					Text(L10n.PreAuthorizationReview.Fees.subtitle)
-						.foregroundStyle(.app.gray2)
+						.foregroundStyle(.secondaryText)
 				}
 				.lineSpacing(0)
 				.textStyle(.body2Regular)
@@ -176,7 +176,7 @@ extension PreAuthorizationReview {
 			}
 			.padding(.vertical, .medium3)
 			.padding(.horizontal, .medium2)
-			.background(Color.app.gray5)
+			.background(.secondaryBackground)
 			.clipShape(RoundedRectangle(cornerRadius: .small1))
 		}
 
@@ -188,7 +188,7 @@ extension PreAuthorizationReview {
 					if let seconds = secondsToExpiration {
 						if seconds > 0 {
 							let value = TimeFormatter.format(seconds: seconds)
-							Text(markdown: L10n.PreAuthorizationReview.Expiration.atTime(value), emphasizedColor: .app.account4pink, emphasizedFont: .app.body2Link)
+							Text(markdown: L10n.PreAuthorizationReview.Expiration.atTime(value), emphasizedColor: .gradientPink4, emphasizedFont: .app.body2Link)
 						} else {
 							Text(L10n.PreAuthorizationReview.Expiration.expired)
 						}
@@ -196,11 +196,11 @@ extension PreAuthorizationReview {
 
 				case let .afterDelay(value):
 					let value = TimeFormatter.format(seconds: Int(value.expireAfterSeconds))
-					Text(markdown: L10n.PreAuthorizationReview.Expiration.afterDelay(value), emphasizedColor: .app.account4pink, emphasizedFont: .app.body2Link)
+					Text(markdown: L10n.PreAuthorizationReview.Expiration.afterDelay(value), emphasizedColor: .gradientPink4, emphasizedFont: .app.body2Link)
 				}
 			}
 			.textStyle(.body2Regular)
-			.foregroundStyle(.app.account4pink)
+			.foregroundStyle(.gradientPink4)
 			.padding(.horizontal, .medium1)
 			.frame(minHeight: .huge2)
 		}

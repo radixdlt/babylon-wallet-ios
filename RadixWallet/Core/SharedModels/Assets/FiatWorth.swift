@@ -138,7 +138,7 @@ extension FiatWorth {
 		}()
 
 		if !isVisible || worth.isUnknown || value == .zero {
-			attributedString.foregroundColor = .app.gray3
+			attributedString.foregroundColor = .fiatWorthHidden
 		}
 
 		guard applyCustomFont else {

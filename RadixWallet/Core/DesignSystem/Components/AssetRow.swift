@@ -28,12 +28,12 @@ struct AssetRow<Accessory: View>: View {
 			VStack(alignment: .leading, spacing: .zero) {
 				Text(name ?? "-")
 					.textStyle(.body1HighImportance)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 					.lineLimit(1)
 
 				AddressView(.address(address))
 					.textStyle(.body2Regular)
-					.foregroundColor(.app.gray2)
+					.foregroundColor(.secondaryText)
 			}
 			.padding(.horizontal, .small2)
 

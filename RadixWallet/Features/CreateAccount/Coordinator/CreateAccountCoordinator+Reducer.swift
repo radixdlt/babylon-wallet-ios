@@ -11,8 +11,6 @@ struct CreateAccountCoordinator: Sendable, FeatureReducer {
 		let config: CreateAccountConfig
 		var name: NonEmptyString?
 
-		fileprivate var createdProfile = false
-
 		init(
 			root: Path.State? = nil,
 			config: CreateAccountConfig
@@ -77,7 +75,6 @@ struct CreateAccountCoordinator: Sendable, FeatureReducer {
 
 	enum InternalAction: Sendable, Equatable {
 		case handleAccountCreated(Account)
-		case handleProfileCreated(Mode)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -128,16 +125,11 @@ extension CreateAccountCoordinator {
 				state.path.append(.selectLedger(.init(context: .createHardwareAccount)))
 				return .none
 			} else {
-				return createProfileIfNecessaryThenCreateAccount(state: &state, mode: .bdfs)
+				return createAccount(state: &state, mode: .bdfs)
 			}
 
 		case let .path(.element(_, action: .selectLedger(.delegate(.choseLedger(ledger))))):
-			return createProfileIfNecessaryThenCreateAccount(
-				state: &state,
-				mode: .specific(
-					ledger.asGeneral
-				)
-			)
+			return createAccount(state: &state, mode: .specific(ledger.asGeneral))
 
 		case .path(.element(_, action: .completion(.delegate(.completed)))):
 			return .run { send in
@@ -160,25 +152,6 @@ extension CreateAccountCoordinator {
 				config: state.config
 			)))
 			return .send(.delegate(.accountCreated))
-
-		case let .handleProfileCreated(mode):
-			state.createdProfile = true
-			return createAccount(state: &state, mode: mode)
-		}
-	}
-
-	private func createProfileIfNecessaryThenCreateAccount(state: inout State, mode: Mode) -> Effect<Action> {
-		if state.config.isNewProfile, !state.createdProfile {
-			// We need to create the Profile before creating the Account
-			.run { send in
-				try await onboardingClient.createNewProfile()
-				await send(.internal(.handleProfileCreated(mode)))
-			} catch: { error, _ in
-				errorQueue.schedule(error)
-			}
-		} else {
-			// We can create the Account since the Profile has been created already
-			createAccount(state: &state, mode: mode)
 		}
 	}
 

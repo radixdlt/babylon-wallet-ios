@@ -11,6 +11,7 @@ end
 platform :ios do
     before_all do
         create_sensitive_info
+        create_google_service_info
         Dotenv.load ".env.ios"
         dir_to_del = ENV["SCAN_OUTPUT_DIRECTORY"]
         puts "deleting '#{dir_to_del}'"
@@ -36,6 +37,15 @@ platform :ios do
             puts "SensitiveInfo.plist already available"
         elsif
             sh("cp -v '../Aux/SensitiveInfo-Sample.plist' '../Aux/SensitiveInfo.plist'")
+        end
+    end
+
+    desc "Creates GoogleService-Info.plist if it doesn't exist"
+    lane :create_google_service_info do
+        if File.exist?("../Aux/GoogleService-Info.plist")
+            puts "GoogleService-Info.plist already available"
+        elsif
+            sh("cp -v '../Aux/GoogleService-Info-Sample.plist' '../Aux/GoogleService-Info.plist'")
         end
     end
 

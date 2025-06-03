@@ -11,7 +11,7 @@ struct AssetBehaviorsView: View {
 			Group {
 				Text(L10n.AssetDetails.behavior)
 					.textStyle(.body1Regular)
-					.foregroundColor(.app.gray2)
+					.foregroundColor(.secondaryText)
 
 				VStack(alignment: .leading, spacing: .small1) {
 					ForEach(filteredBehaviors, id: \.self) { behavior in
@@ -44,7 +44,7 @@ struct AssetBehaviorRow: View {
 			Text(behavior.text(isXRD: isXRD))
 				.lineLimit(2)
 				.textStyle(.body2Regular)
-				.foregroundColor(.app.gray1)
+				.foregroundColor(.primaryText)
 		}
 	}
 }

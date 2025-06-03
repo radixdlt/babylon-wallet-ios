@@ -17,7 +17,7 @@ struct BlueTextButtonStyle: ButtonStyle {
 	func makeBody(configuration: ButtonStyle.Configuration) -> some View {
 		configuration.label
 			.textStyle(textStyle)
-			.foregroundColor(.app.blue2)
+			.foregroundColor(Color.textButton)
 			.opacity(configuration.isPressed ? 0.5 : 1)
 	}
 }

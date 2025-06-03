@@ -56,15 +56,15 @@ extension NewAccountCompletion {
 
 					VStack(spacing: .medium1) {
 						Text(L10n.CreateEntity.Completion.title)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.textStyle(.sheetTitle)
 
 						Text(viewStore.subtitle)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.textStyle(.body1Regular)
 
 						Text(viewStore.explanation)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)
 					}
@@ -101,7 +101,7 @@ private extension NewAccountCompletion.View {
 
 			VStack(spacing: .small2) {
 				Text(viewStore.entityName)
-					.foregroundColor(.app.white)
+					.foregroundColor(.white)
 					.textStyle(.body1Header)
 					.multilineTextAlignment(.center)
 

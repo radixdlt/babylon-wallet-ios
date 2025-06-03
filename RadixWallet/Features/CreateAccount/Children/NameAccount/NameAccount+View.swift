@@ -79,6 +79,7 @@ extension NameAccount {
 					}
 					.padding([.bottom, .horizontal], .medium1)
 				}
+				.background(.primaryBackground)
 				.toolbar(.visible, for: .navigationBar)
 				.footer {
 					WithControlRequirements(
@@ -97,7 +98,7 @@ extension NameAccount {
 extension NameAccount.View {
 	private func title(with viewState: NameAccount.ViewState) -> some View {
 		Text(viewState.titleText)
-			.foregroundColor(.app.gray1)
+			.foregroundColor(.primaryText)
 			.textStyle(.sheetTitle)
 	}
 
@@ -107,11 +108,11 @@ extension NameAccount.View {
 				.fixedSize(horizontal: false, vertical: true)
 				.padding(.horizontal, .large1)
 				.multilineTextAlignment(.center)
-				.foregroundColor(.app.gray1)
+				.foregroundColor(.primaryText)
 				.textStyle(.body1Regular)
 
 			Text(L10n.CreateAccount.NameNewAccount.explanation)
-				.foregroundColor(.app.gray2)
+				.foregroundColor(.secondaryText)
 				.textStyle(.body1Regular)
 		}
 	}

@@ -18,16 +18,16 @@ extension PollPreAuthorizationStatus {
 
 							Text(viewStore.title)
 								.textStyle(.sheetTitle)
-								.foregroundStyle(.app.gray1)
+								.foregroundStyle(.primaryText)
 
 							VStack(spacing: .small1) {
 								Text(viewStore.subtitle)
 									.textStyle(.body1Regular)
-									.foregroundStyle(.app.gray1)
+									.foregroundStyle(.primaryText)
 
 								if let ledgerIdentifiable = viewStore.ledgerIdentifiable {
 									AddressView(ledgerIdentifiable)
-										.foregroundColor(.app.blue1)
+										.foregroundColor(.textButton)
 										.textStyle(.body1Header)
 								}
 							}
@@ -66,16 +66,17 @@ extension PollPreAuthorizationStatus {
 				Image(.errorLarge)
 			case .success:
 				Image(.successCheckmark)
+					.darkModeTinted()
 			}
 		}
 
 		private func unknownBottom(text: String) -> some SwiftUI.View {
-			Text(markdown: text, emphasizedColor: .app.account4pink, emphasizedFont: .app.button)
+			Text(markdown: text, emphasizedColor: .gradientPink4, emphasizedFont: .app.button)
 				.textStyle(.body1Regular)
-				.foregroundStyle(.app.account4pink)
+				.foregroundStyle(.gradientPink4)
 				.padding(.medium1)
 				.frame(maxWidth: .infinity)
-				.background(.app.gray5)
+				.background(.secondaryBackground)
 		}
 
 		@ViewBuilder
@@ -83,10 +84,10 @@ extension PollPreAuthorizationStatus {
 			if showBrowserMessage {
 				Text(L10n.PreAuthorizationReview.ExpiredStatus.retryInBrowser)
 					.textStyle(.body1Regular)
-					.foregroundStyle(.app.gray1)
+					.foregroundStyle(.primaryText)
 					.padding(.medium1)
 					.frame(maxWidth: .infinity)
-					.background(.app.gray5)
+					.background(.secondaryBackground)
 			}
 		}
 
@@ -95,10 +96,10 @@ extension PollPreAuthorizationStatus {
 			if showBrowserMessage {
 				Text(L10n.MobileConnect.interactionSuccess)
 					.textStyle(.body1Regular)
-					.foregroundStyle(.app.gray1)
+					.foregroundStyle(.primaryText)
 					.padding(.medium1)
 					.frame(maxWidth: .infinity)
-					.background(.app.gray5)
+					.background(.secondaryBackground)
 			}
 		}
 	}

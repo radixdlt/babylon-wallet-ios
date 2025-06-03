@@ -26,13 +26,14 @@ extension NPSSurvey {
 							headerView()
 							scoreSelectionView()
 
-							Divider()
+							Separator()
 								.padding(.bottom, .medium1)
 
 							scoreReasonView()
 						}
 						.padding([.horizontal, .bottom], .large3)
 					}
+					.background(.primaryBackground)
 					.withNavigationBar {
 						store.send(.view(.closeButtonTapped))
 					}
@@ -58,13 +59,13 @@ extension NPSSurvey.View {
 	private func headerView() -> some SwiftUI.View {
 		Text(L10n.Survey.title)
 			.textStyle(.sheetTitle)
-			.foregroundStyle(.app.gray1)
+			.foregroundStyle(.primaryText)
 			.padding(.bottom, .medium3)
 
 		Text(L10n.Survey.subtitle)
 			.multilineTextAlignment(.center)
 			.textStyle(.body1Regular)
-			.foregroundStyle(.app.gray1)
+			.foregroundStyle(.primaryText)
 			.padding(.bottom, .large2)
 	}
 
@@ -91,7 +92,7 @@ extension NPSSurvey.View {
 			Text(L10n.Survey.highestScoreLabel)
 		}
 		.textStyle(.body2Regular)
-		.foregroundStyle(.app.gray2)
+		.foregroundStyle(.secondaryText)
 		.padding(.bottom, .large2)
 	}
 
@@ -99,12 +100,12 @@ extension NPSSurvey.View {
 	private func scoreReasonView() -> some SwiftUI.View {
 		Text(L10n.Survey.Reason.heading)
 			.textStyle(.body1Regular)
-			.foregroundStyle(.app.gray1)
+			.foregroundStyle(.primaryText)
 			.padding(.bottom, .small2)
 
 		Text(L10n.Common.optional)
 			.textStyle(.body1Regular)
-			.foregroundStyle(.app.gray2)
+			.foregroundStyle(.secondaryText)
 			.padding(.bottom, .medium3)
 
 		AppTextField(
@@ -125,13 +126,13 @@ extension NPSSurvey.View {
 		}) {
 			Text("\(score)")
 				.textStyle(.body1HighImportance)
-				.foregroundColor(isSelected ? .app.white : .app.gray1)
+				.foregroundColor(isSelected ? .white : .primaryText)
 				.frame(.small)
-				.background(isSelected ? .app.gray1 : .clear)
+				.background(isSelected ? .chipBackground : .clear)
 				.clipShape(Circle())
 				.overlay(
 					Circle()
-						.stroke(isSelected ? .app.gray1 : .app.gray3, lineWidth: 1)
+						.stroke(isSelected ? .chipBackground : .border, lineWidth: 1)
 				)
 		}
 	}

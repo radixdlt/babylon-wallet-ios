@@ -21,7 +21,6 @@ struct WalletApp: SwiftUI.App {
 						#endif
 					}
 				)
-				.environment(\.colorScheme, .light) // TODO: implement dark mode and remove this
 			} else {
 				Text("Running tests")
 			}

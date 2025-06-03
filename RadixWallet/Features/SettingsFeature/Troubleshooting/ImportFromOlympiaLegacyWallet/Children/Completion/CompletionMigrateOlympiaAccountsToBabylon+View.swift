@@ -81,7 +81,7 @@ extension CompletionMigrateOlympiaAccountsToBabylon {
 									.textStyle(.body1Regular)
 									.padding(.bottom, .medium3)
 							}
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.multilineTextAlignment(.center)
 
 							VStack(spacing: .small2) {
@@ -95,7 +95,7 @@ extension CompletionMigrateOlympiaAccountsToBabylon {
 
 							Text(L10n.ImportOlympiaAccounts.Completion.explanation)
 								.textStyle(.body1Regular)
-								.foregroundColor(.app.gray1)
+								.foregroundColor(.primaryText)
 								.multilineTextAlignment(.center)
 								.padding(.horizontal, .medium1)
 								.padding(.bottom, .medium1)
@@ -126,7 +126,7 @@ extension CompletionMigrateOlympiaAccountsToBabylon {
 				AddressView(.address(.account(account.address)))
 					.opacity(0.8)
 			}
-			.foregroundColor(.app.white)
+			.foregroundColor(.white)
 			.frame(maxWidth: .infinity)
 			.padding(.vertical, .medium1)
 			.background {

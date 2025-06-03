@@ -78,6 +78,19 @@ jobs:
         with:
           token: ${{ env.WALLET_RADIX_BOT_PAT }}
 
+      - name: Decode Firebase Crashlytics json
+        uses: RDXWorks-actions/base64-to-file@main
+        id: crashlytics_credentials
+        with:
+          fileName: "GoogleService-Info.plist"
+          fileDir: "Aux/"
+          encodedString: ${{ github.event.inputs.flavour == 'release' && secrets.GH_CRASHLYTICS_GOOGLE_SERVICES_JSON_FILE_BASE64_RELEASE }}
+
+      - name: Verify GoogleService-Info.plist
+        run: |
+          VALUE=$(plutil -extract PROJECT_ID xml1 -o - Aux/GoogleService-Info.plist | xmllint --xpath "string(//string)" -)
+          echo "✅ Extracted PROJECT_ID: $VALUE"
+
       - uses: RDXWorks-actions/setup-ruby@master
         with:
           ruby-version: 3.1.2
@@ -85,7 +98,7 @@ jobs:
 
       - uses: RDXWorks-actions/setup-xcode@master
         with:
-          xcode-version: "16.3"
+          xcode-version: "16.0.0"
 
       - uses: RDXWorks-actions/ssh-agent@master
         with:

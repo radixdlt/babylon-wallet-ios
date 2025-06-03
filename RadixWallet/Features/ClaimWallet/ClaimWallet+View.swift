@@ -20,13 +20,13 @@ extension ClaimWallet {
 						.padding(.bottom, .large1)
 
 					Text(L10n.ConfigurationBackup.Automated.walletTransferredTitle)
-						.foregroundColor(.app.gray1)
+						.foregroundColor(.primaryText)
 						.textStyle(.sheetTitle)
 						.multilineTextAlignment(.center)
 						.padding(.bottom, .medium1)
 
 					Text(L10n.ConfigurationBackup.Automated.walletTransferredSubtitle)
-						.foregroundColor(.app.gray2)
+						.foregroundColor(.secondaryText)
 						.textStyle(.secondaryHeader)
 						.multilineTextAlignment(.center)
 						.padding(.bottom, .small1)

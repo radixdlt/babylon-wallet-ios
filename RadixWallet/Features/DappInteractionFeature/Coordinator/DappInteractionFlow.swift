@@ -654,7 +654,6 @@ extension DappInteractionFlow {
 			}()
 
 			payload.ongoingPersonaDataPayload = try await { () async throws -> InternalAction.AutofillOngoingResponseItemsPayload.PersonaDataPayload? in
-
 				guard
 					let personaDataRequested = state.ongoingPersonaDataRequestItem,
 					let authorizedPersonaID = state.authorizedPersona?.id,

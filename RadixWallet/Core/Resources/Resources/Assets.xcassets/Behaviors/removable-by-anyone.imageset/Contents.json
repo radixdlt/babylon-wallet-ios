@@ -2,7 +2,17 @@
   "images" : [
     {
       "filename" : "removing-anyone.pdf",
-      "idiom" : "universal",
+      "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "ic_change_recall.pdf",
+      "idiom" : "universal"
     }
   ],
   "info" : {

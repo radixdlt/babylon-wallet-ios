@@ -75,17 +75,18 @@ extension LedgerHardwareDevices {
 						Group {
 							if viewStore.allowSelection {
 								Image(asset: AssetResource.iconHardwareLedger)
+									.darkModeTinted()
 									.frame(.medium)
 									.padding(.vertical, .medium2)
 
 								Text(L10n.LedgerHardwareDevices.navigationTitleAllowSelection)
 									.textStyle(.sheetTitle)
-									.foregroundColor(.app.gray1)
+									.foregroundColor(.primaryText)
 							}
 
 							if let subtitle = viewStore.subtitle {
 								Text(subtitle)
-									.foregroundColor(.app.gray1)
+									.foregroundColor(.primaryText)
 									.textStyle(.secondaryHeader)
 									.padding(.horizontal, .medium1)
 									.padding(.vertical, .medium1)
@@ -126,6 +127,7 @@ extension LedgerHardwareDevices {
 							.padding(.bottom, .medium1)
 					}
 				}
+				.background(.secondaryBackground)
 				.onFirstTask { @MainActor in
 					await viewStore.send(.onFirstTask).finish()
 				}
@@ -144,10 +146,10 @@ extension LedgerHardwareDevices {
 			switch viewStore.ledgers {
 			case .idle, .loading, .failure, .success([]):
 				if viewStore.allowSelection {
-					Card(.app.gray5) {
+					Card {
 						Text(L10n.LedgerHardwareDevices.subtitleNoLedgers)
 							.textStyle(.secondaryHeader)
-							.foregroundColor(viewStore.loadedEmptyLedgersList ? .app.gray2 : .clear)
+							.foregroundColor(viewStore.loadedEmptyLedgersList ? .secondaryText : .clear)
 							.padding(.horizontal, .large2)
 							.padding(.vertical, .large2 + .small3)
 					}

@@ -490,7 +490,7 @@ extension OnLedgerEntitiesClient {
 	func getPoolUnitDetails(
 		_ poolUnitResource: OnLedgerEntity.Resource,
 		forAmount amount: ResourceAmount
-	) async throws -> OwnedResourcePoolDetails? {
+	) async -> OwnedResourcePoolDetails? {
 		guard let poolAddress = poolUnitResource.metadata.poolUnit?.asGeneral else {
 			return nil
 		}

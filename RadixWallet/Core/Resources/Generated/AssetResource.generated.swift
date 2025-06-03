@@ -13,6 +13,8 @@
 #endif
 
 // Deprecated typealiases
+@available(*, deprecated, renamed: "ColorAsset.Color", message: "This typealias will be removed in SwiftGen 7.0")
+internal typealias AssetColorTypeAlias = ColorAsset.Color
 @available(*, deprecated, renamed: "ImageAsset.Image", message: "This typealias will be removed in SwiftGen 7.0")
 internal typealias AssetImageTypeAlias = ImageAsset.Image
 
@@ -106,7 +108,7 @@ internal enum AssetResource {
   internal static let homeAccountSecurity = ImageAsset(name: "home-account-security")
   internal static let homeAggregatedValueHidden = ImageAsset(name: "home-aggregatedValue-hidden")
   internal static let homeAggregatedValueShown = ImageAsset(name: "home-aggregatedValue-shown")
-  internal static let homeHeaderSettings = ImageAsset(name: "home-header-settings")
+  internal static let settings = ImageAsset(name: "settings")
   internal static let placeholderSecurityStructure = ImageAsset(name: "PLACEHOLDER_SecurityStructure")
   internal static let brokenImagePlaceholder = ImageAsset(name: "broken-image-placeholder")
   internal static let persona = ImageAsset(name: "persona")
@@ -121,7 +123,6 @@ internal enum AssetResource {
   internal static let appSettings = ImageAsset(name: "appSettings")
   internal static let authorizedDapps = ImageAsset(name: "authorized-dapps")
   internal static let backups = ImageAsset(name: "backups")
-  internal static let browsers = ImageAsset(name: "browsers")
   internal static let delete = ImageAsset(name: "delete")
   internal static let depositGuarantees = ImageAsset(name: "depositGuarantees")
   internal static let desktopConnections = ImageAsset(name: "desktop-connections")
@@ -160,6 +161,49 @@ internal enum AssetResource {
   internal static let splashPhoneFrame = ImageAsset(name: "splash-phone-frame")
   internal static let officialTagIcon = ImageAsset(name: "official-tag-icon")
   internal static let tagIcon = ImageAsset(name: "tag-icon")
+  internal static let externalAccountBackground = ColorAsset(name: "ExternalAccountBackground")
+  internal static let primaryBackground = ColorAsset(name: "PrimaryBackground")
+  internal static let secondaryBackground = ColorAsset(name: "SecondaryBackground")
+  internal static let tertiaryBackground = ColorAsset(name: "TertiaryBackground")
+  internal static let button = ColorAsset(name: "Button")
+  internal static let secondaryButton = ColorAsset(name: "SecondaryButton")
+  internal static let textButton = ColorAsset(name: "TextButton")
+  internal static let gradientBlue1 = ColorAsset(name: "GradientBlue1")
+  internal static let gradientBlue2 = ColorAsset(name: "GradientBlue2")
+  internal static let gradientBlue3 = ColorAsset(name: "GradientBlue3")
+  internal static let gradientBlue4 = ColorAsset(name: "GradientBlue4")
+  internal static let gradientBlue5 = ColorAsset(name: "GradientBlue5")
+  internal static let gradientBlue6 = ColorAsset(name: "GradientBlue6")
+  internal static let gradientGreen1 = ColorAsset(name: "GradientGreen1")
+  internal static let gradientGreen2 = ColorAsset(name: "GradientGreen2")
+  internal static let gradientGreen3 = ColorAsset(name: "GradientGreen3")
+  internal static let gradientGreen4 = ColorAsset(name: "GradientGreen4")
+  internal static let gradientGreen5 = ColorAsset(name: "GradientGreen5")
+  internal static let gradientPink1 = ColorAsset(name: "GradientPink1")
+  internal static let gradientPink2 = ColorAsset(name: "GradientPink2")
+  internal static let gradientPink3 = ColorAsset(name: "GradientPink3")
+  internal static let gradientPink4 = ColorAsset(name: "GradientPink4")
+  internal static let gradientPink5 = ColorAsset(name: "GradientPink5")
+  internal static let iconPrimary = ColorAsset(name: "IconPrimary")
+  internal static let iconSecondary = ColorAsset(name: "IconSecondary")
+  internal static let iconTertiary = ColorAsset(name: "IconTertiary")
+  internal static let backgroundTransparent = ColorAsset(name: "BackgroundTransparent")
+  internal static let border = ColorAsset(name: "Border")
+  internal static let chipBackground = ColorAsset(name: "ChipBackground")
+  internal static let separator = ColorAsset(name: "Separator")
+  internal static let shadow = ColorAsset(name: "Shadow")
+  internal static let shimmer = ColorAsset(name: "Shimmer")
+  internal static let toggleActive = ColorAsset(name: "ToggleActive")
+  internal static let fiatWorthHidden = ColorAsset(name: "FiatWorthHidden")
+  internal static let primaryText = ColorAsset(name: "PrimaryText")
+  internal static let primaryTextInverse = ColorAsset(name: "PrimaryTextInverse")
+  internal static let secondaryText = ColorAsset(name: "SecondaryText")
+  internal static let tertiaryText = ColorAsset(name: "TertiaryText")
+  internal static let textFieldBackground = ColorAsset(name: "TextFieldBackground")
+  internal static let textFieldBorder = ColorAsset(name: "TextFieldBorder")
+  internal static let textFieldFocusedBorder = ColorAsset(name: "TextFieldFocusedBorder")
+  internal static let warning = ColorAsset(name: "Warning")
+  internal static let warningSecondary = ColorAsset(name: "WarningSecondary")
   internal static let transactionHistoryDeposit = ImageAsset(name: "transactionHistory_deposit")
   internal static let transactionHistoryFilterList = ImageAsset(name: "transactionHistory_filter-list")
   internal static let transactionHistoryFilterDeposit = ImageAsset(name: "transactionHistory_filter_deposit")
@@ -182,11 +226,75 @@ internal enum AssetResource {
   internal static let folder = ImageAsset(name: "folder")
   internal static let iconLiquidStakeUnits = ImageAsset(name: "iconLiquidStakeUnits")
   internal static let iconPackageOwnerBadge = ImageAsset(name: "iconPackageOwnerBadge")
-  internal static let radixIconWhite = ImageAsset(name: "radix-icon-white")
+  internal static let radixIcon = ImageAsset(name: "radix-icon")
 }
 // swiftlint:enable identifier_name line_length nesting type_body_length type_name
 
 // MARK: - Implementation Details
+
+internal final class ColorAsset {
+  internal fileprivate(set) var name: String
+
+  #if os(macOS)
+  internal typealias Color = NSColor
+  #elseif os(iOS) || os(tvOS) || os(watchOS)
+  internal typealias Color = UIColor
+  #endif
+
+  @available(iOS 11.0, tvOS 11.0, watchOS 4.0, macOS 10.13, *)
+  internal private(set) lazy var color: Color = {
+    guard let color = Color(asset: self) else {
+      fatalError("Unable to load color asset named \(name).")
+    }
+    return color
+  }()
+
+  #if os(iOS) || os(tvOS)
+  @available(iOS 11.0, tvOS 11.0, *)
+  internal func color(compatibleWith traitCollection: UITraitCollection) -> Color {
+    let bundle = BundleToken.bundle
+    guard let color = Color(named: name, in: bundle, compatibleWith: traitCollection) else {
+      fatalError("Unable to load color asset named \(name).")
+    }
+    return color
+  }
+  #endif
+
+  #if canImport(SwiftUI)
+  @available(iOS 13.0, tvOS 13.0, watchOS 6.0, macOS 10.15, *)
+  internal private(set) lazy var swiftUIColor: SwiftUI.Color = {
+    SwiftUI.Color(asset: self)
+  }()
+  #endif
+
+  fileprivate init(name: String) {
+    self.name = name
+  }
+}
+
+internal extension ColorAsset.Color {
+  @available(iOS 11.0, tvOS 11.0, watchOS 4.0, macOS 10.13, *)
+  convenience init?(asset: ColorAsset) {
+    let bundle = BundleToken.bundle
+    #if os(iOS) || os(tvOS)
+    self.init(named: asset.name, in: bundle, compatibleWith: nil)
+    #elseif os(macOS)
+    self.init(named: NSColor.Name(asset.name), bundle: bundle)
+    #elseif os(watchOS)
+    self.init(named: asset.name)
+    #endif
+  }
+}
+
+#if canImport(SwiftUI)
+@available(iOS 13.0, tvOS 13.0, watchOS 6.0, macOS 10.15, *)
+internal extension SwiftUI.Color {
+  init(asset: ColorAsset) {
+    let bundle = BundleToken.bundle
+    self.init(asset.name, bundle: bundle)
+  }
+}
+#endif
 
 internal struct ImageAsset {
   internal fileprivate(set) var name: String

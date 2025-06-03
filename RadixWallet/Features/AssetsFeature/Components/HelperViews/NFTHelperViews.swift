@@ -56,12 +56,12 @@ private struct NFTNameAndIDView: View {
 			if let name {
 				Text(name)
 					.textStyle(.body1HighImportance)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 			}
 
 			Text(id)
 				.textStyle(.body2HighImportance)
-				.foregroundColor(.app.gray2)
+				.foregroundColor(.secondaryText)
 		}
 		.flushedLeft
 	}

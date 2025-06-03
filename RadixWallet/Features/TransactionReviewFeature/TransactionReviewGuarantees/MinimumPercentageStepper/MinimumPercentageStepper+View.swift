@@ -27,7 +27,7 @@ extension MinimumPercentageStepper {
 				Text(title)
 					.lineLimit(2)
 					.textStyle(.body2Header)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 
 				if !vertical {
 					Spacer(minLength: 0)
@@ -64,13 +64,13 @@ extension MinimumPercentageStepper {
 						.multilineTextAlignment(.center)
 						.lineLimit(1)
 						.textStyle(.body2Regular)
-						.foregroundColor(.app.gray1)
+						.foregroundColor(.primaryText)
 						.frame(width: expands ? nil : textFieldSize.width, height: textFieldSize.height)
 						.background {
 							RoundedRectangle(cornerRadius: 8)
-								.fill(.app.gray5)
+								.fill(Color.tertiaryBackground)
 							RoundedRectangle(cornerRadius: 8)
-								.stroke(viewStore.isValid ? .app.gray4 : transparentErrorRed)
+								.stroke(viewStore.isValid ? .tertiaryBackground : transparentErrorRed)
 						}
 
 					Button(asset: AssetResource.plusCircle) {
@@ -83,7 +83,7 @@ extension MinimumPercentageStepper {
 
 		private let disabledOpacity: CGFloat = 0.2
 
-		private let transparentErrorRed: Color = .app.red1.opacity(0.6)
+		private let transparentErrorRed: Color = .error.opacity(0.6)
 
 		private let textFieldSize: CGSize = .init(width: 68, height: 48)
 	}

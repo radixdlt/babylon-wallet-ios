@@ -6,6 +6,7 @@ extension InteractionReview {
 
 		var body: some View {
 			Image(asset: AssetResource.transactionInProgress)
+				.darkModeTinted()
 				.opacity(opacity)
 				.animation(
 					.easeInOut(duration: 0.3)

@@ -65,11 +65,11 @@ extension PersonaDataPermissionBox {
 					Button(action: action) {
 						HStack(spacing: .medium2) {
 							Circle()
-								.strokeBorder(Color.app.gray3, lineWidth: 1)
-								.background(Circle().fill(Color.app.gray4))
+								.strokeBorder(.iconTertiary, lineWidth: 1)
+								.background(Circle().fill(Color.tertiaryBackground))
 								.frame(.small)
 							Text(viewStore.personaLabel)
-								.foregroundColor(.app.gray1)
+								.foregroundColor(.primaryText)
 								.textStyle(.secondaryHeader)
 							Spacer()
 							accessory
@@ -81,7 +81,7 @@ extension PersonaDataPermissionBox {
 					VStack(alignment: .leading, spacing: .small1) {
 						if let existingRequiredFields = viewStore.existingRequiredEntries {
 							Text(existingRequiredFields)
-								.foregroundColor(.app.gray2)
+								.foregroundColor(.secondaryText)
 								.textStyle(.body2Regular)
 						}
 

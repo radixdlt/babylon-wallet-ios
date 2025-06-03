@@ -49,7 +49,7 @@ extension PoolUnitDetails {
 
 						Text(L10n.Account.PoolUnits.Details.currentRedeemableValue)
 							.textStyle(.secondaryHeader)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 
 						ResourceBalancesView(fungibles: store.resources, appearance: .standard)
 							.padding(.horizontal, .large2)

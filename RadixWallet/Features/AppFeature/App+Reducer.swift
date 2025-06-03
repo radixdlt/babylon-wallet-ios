@@ -18,6 +18,7 @@ struct App: Sendable, FeatureReducer {
 			}
 		}
 
+		var preferredTheme: AppTheme = .system
 		var root: Root
 		var deferredDeepLink: URL?
 
@@ -43,6 +44,7 @@ struct App: Sendable, FeatureReducer {
 		case toMain(isAccountRecoveryNeeded: Bool)
 		case toOnboarding
 		case didResetWallet
+		case didChangePreferredTheme(AppTheme)
 	}
 
 	@CasePathable
@@ -54,11 +56,11 @@ struct App: Sendable, FeatureReducer {
 
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.deepLinkHandlerClient) var deepLinkHandlerClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.homeCardsClient) var homeCardsClient
 	@Dependency(\.appEventsClient) var appEventsClient
+	@Dependency(\.userDefaults) var userDefaults
 
 	init() {}
 
@@ -92,21 +94,26 @@ struct App: Sendable, FeatureReducer {
 			}
 			return .none
 		case .task:
+			state.preferredTheme = userDefaults.getPreferredTheme()
 			appEventsClient.handleEvent(.appStarted)
-			return walletDidResetEffect()
+			return walletDidResetEffect().merge(with: preferredThemeChangeEffect())
 		}
 	}
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case .incompatibleProfileDeleted:
-			goToOnboarding(state: &state)
+			return goToOnboarding(state: &state)
 
 		case .toMain:
-			goToMain(state: &state)
+			return goToMain(state: &state)
 
 		case .toOnboarding, .didResetWallet:
-			goToOnboarding(state: &state)
+			return goToOnboarding(state: &state)
+
+		case let .didChangePreferredTheme(theme):
+			state.preferredTheme = theme
+			return .none
 		}
 	}
 
@@ -122,7 +129,7 @@ struct App: Sendable, FeatureReducer {
 			case let .incompatible(error):
 				errorQueue.schedule(error)
 				return goToOnboarding(state: &state)
-			case let .loaded(profile):
+			case .loaded:
 				return goToMain(state: &state)
 			}
 
@@ -133,8 +140,10 @@ struct App: Sendable, FeatureReducer {
 
 	private func goToMain(state: inout State) -> Effect<Action> {
 		state.root = .main(.init(
-			home: .init())
-		)
+			home: .init(),
+			settings: .init(),
+			dAppsDirectory: .init()
+		))
 		return .none
 	}
 
@@ -155,6 +164,19 @@ struct App: Sendable, FeatureReducer {
 				}
 			} catch {
 				loggerGlobal.error("Failed to iterate over walletDidReset: \(error)")
+			}
+		}
+	}
+
+	private func preferredThemeChangeEffect() -> Effect<Action> {
+		.run { send in
+			do {
+				for try await value in userDefaults.preferredThemeValues() {
+					guard !Task.isCancelled else { return }
+					await send(.internal(.didChangePreferredTheme(value)))
+				}
+			} catch {
+				loggerGlobal.error("Failed to iterate over preferredThemeValues: \(error)")
 			}
 		}
 	}

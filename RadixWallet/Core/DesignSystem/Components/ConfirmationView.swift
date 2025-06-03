@@ -25,15 +25,15 @@ struct ConfirmationView: View {
 					.resizable()
 					.scaledToFit()
 					.frame(.small)
-					.foregroundColor(.app.gray3)
+					.foregroundColor(.iconTertiary)
 
 				Text(title)
 					.textStyle(.sheetTitle)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 
-				Text(markdown: message, emphasizedColor: .app.gray1, emphasizedFont: .app.body1Header)
+				Text(markdown: message, emphasizedColor: .primaryText, emphasizedFont: .app.body1Header)
 					.textStyle(.body1Regular)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 			}
 			.padding(.horizontal, .small2)
 
@@ -54,6 +54,7 @@ struct ConfirmationView: View {
 		.multilineTextAlignment(.center)
 		.padding(.horizontal, .medium1)
 		.padding(.bottom, .medium2)
+		.background(.primaryBackground)
 	}
 }
 

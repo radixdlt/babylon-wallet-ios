@@ -2,7 +2,17 @@
   "images" : [
     {
       "filename" : "change-data-anyone.pdf",
-      "idiom" : "universal",
+      "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "ic_change_update_non_fungible_data.pdf",
+      "idiom" : "universal"
     }
   ],
   "info" : {

@@ -31,6 +31,7 @@ extension AddLedgerFactorSource {
 						.padding(.horizontal, .medium3)
 						.padding(.bottom, .large2)
 					}
+					.background(.primaryBackground)
 					.toolbar {
 						ToolbarItem(placement: .cancellationAction) {
 							CloseButton {
@@ -51,6 +52,7 @@ extension AddLedgerFactorSource {
 			VStack(spacing: .zero) {
 				Image(asset: AssetResource.iconHardwareLedger)
 					.resizable()
+					.darkModeTinted()
 					.frame(small ? .veryLarge : .huge)
 					.padding(.top, small ? .large3 : .huge2)
 					.padding(.bottom, small ? .large2 : .huge1)
@@ -69,7 +71,7 @@ extension AddLedgerFactorSource {
 					.padding(.horizontal, .large3)
 			}
 			.multilineTextAlignment(.center)
-			.foregroundColor(.app.gray1)
+			.foregroundColor(.primaryText)
 		}
 	}
 }

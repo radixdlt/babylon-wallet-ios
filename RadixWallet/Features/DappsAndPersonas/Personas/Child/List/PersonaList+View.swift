@@ -17,7 +17,7 @@ extension PersonaList {
 					VStack(alignment: .leading, spacing: .medium3) {
 						Text(L10n.Personas.subtitle)
 							.textStyle(.body1Link)
-							.foregroundColor(.app.gray2)
+							.foregroundColor(.secondaryText)
 
 						InfoButton(.personas, label: L10n.InfoLink.Title.personas)
 
@@ -32,7 +32,7 @@ extension PersonaList {
 					}
 					.padding(.medium3)
 				}
-				.background(Color.app.gray5)
+				.background(.secondaryBackground)
 				.radixToolbar(title: L10n.Personas.title)
 			}
 		}

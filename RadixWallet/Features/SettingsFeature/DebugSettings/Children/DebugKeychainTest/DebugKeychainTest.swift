@@ -89,7 +89,6 @@ struct DebugKeychainTest: Sendable, FeatureReducer {
 
 	private func check(key: KeychainClient.Key) -> Effect<Action> {
 		.run { send in
-
 			let contains = try? await keychainClient.contains(key)
 			await send(.internal(.containsResult(contains: contains ?? false, key: key)))
 		}

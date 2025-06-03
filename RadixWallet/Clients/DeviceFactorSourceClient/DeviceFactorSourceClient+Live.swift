@@ -55,7 +55,6 @@ extension DeviceFactorSourceClient: DependencyKey {
 
 		let entitiesInBadState: @Sendable () async throws -> AnyAsyncSequence<(withoutControl: AddressesOfEntitiesInBadState, unrecoverable: AddressesOfEntitiesInBadState)> = {
 			await combineLatest(factorSourcesMnemonicPresence(), userDefaults.factorSourceIDOfBackedUpMnemonics(), profileStore.values()).map { presencesOfMnemonics, backedUpFactorSources, profile in
-
 				let mnemonicMissingFactorSources = presencesOfMnemonics
 					.filter(not(\.present))
 					.map(\.id)

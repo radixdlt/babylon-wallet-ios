@@ -50,6 +50,7 @@ struct DetailsContainerWithHeaderView<ThumbnailView: View, DetailsView: View>: V
 					.padding(.bottom, .medium3)
 			}
 		}
+		.background(.red)
 	}
 
 	@ViewBuilder
@@ -98,9 +99,10 @@ struct DetailsContainer<Contents: View>: View {
 					CloseButton(action: closeButtonAction)
 				}
 			}
+			.background(.primaryBackground)
 		}
-		.tint(.app.gray1)
-		.foregroundColor(.app.gray1)
+		.tint(.primaryText)
+		.foregroundColor(.primaryText)
 	}
 
 	private var titleString: String {

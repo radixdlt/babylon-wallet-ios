@@ -23,6 +23,7 @@ extension DappDetails {
 		let showConfiguration: Bool
 		let tappablePersonas: Bool
 		let isDepositsVisible: Bool
+		let hasResources: Bool
 	}
 }
 
@@ -39,12 +40,16 @@ extension DappDetails.View {
 
 					InfoBlock(store: store)
 
-					FungiblesList(store: store)
-
-					NonFungiblesListList(store: store)
-
-					Personas(store: store.personas, tappablePersonas: viewStore.tappablePersonas)
-						.background(.app.gray5)
+					VStack(spacing: .medium1) {
+						Separator()
+						FungiblesList(store: store)
+						NonFungiblesListList(store: store)
+						if viewStore.hasResources {
+							Separator()
+						}
+						Personas(store: store.personas, tappablePersonas: viewStore.tappablePersonas)
+					}
+					.background(.secondaryBackground)
 
 					if viewStore.showConfiguration {
 						Configuration(store: store)
@@ -52,6 +57,7 @@ extension DappDetails.View {
 				}
 				.radixToolbar(title: viewStore.title)
 			}
+			.background(.primaryBackground)
 		}
 		.onAppear {
 			store.send(.view(.appeared))
@@ -62,10 +68,7 @@ extension DappDetails.View {
 
 private extension StoreOf<DappDetails> {
 	var destination: PresentationStoreOf<DappDetails.Destination> {
-		func scopeState(state: State) -> PresentationState<DappDetails.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
+		scope(state: \.$destination, action: \.destination)
 	}
 
 	var personas: StoreOf<PersonaList> {
@@ -131,8 +134,9 @@ private extension DappDetails.State {
 			address: dAppDefinitionAddress,
 			associatedDapps: associatedDapps,
 			showConfiguration: context != .general,
-			tappablePersonas: context == .settings(.authorizedDapps),
-			isDepositsVisible: authorizedDapp?.isDepositsVisible ?? true
+			tappablePersonas: context == .settings(.dAppsList),
+			isDepositsVisible: authorizedDapp?.isDepositsVisible ?? true,
+			hasResources: resources?.isEmpty == false
 		)
 	}
 
@@ -160,7 +164,7 @@ extension DappDetails.View {
 					if let description = viewStore.description {
 						Text(description)
 							.textStyle(.body1Regular)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.multilineTextAlignment(.leading)
 							.padding(.horizontal, .small2)
 
@@ -169,7 +173,7 @@ extension DappDetails.View {
 
 					VStack(spacing: .medium3) {
 						KeyValueView(key: L10n.AuthorizedDapps.DAppDetails.dAppDefinition) {
-							AddressView(.address(.account(viewStore.address)), imageColor: .app.gray2)
+							AddressView(.address(.account(viewStore.address)), imageColor: .secondaryText)
 						}
 
 						if let domain = viewStore.domain {
@@ -225,7 +229,7 @@ extension DappDetails.View {
 				VStack(alignment: .leading, spacing: .medium3) {
 					Text(heading)
 						.textStyle(.body1Regular)
-						.foregroundColor(.app.gray2)
+						.foregroundColor(.secondaryText)
 						.padding(.horizontal, .medium3)
 
 					ForEach(elements) { element in
@@ -258,29 +262,25 @@ extension DappDetails.View {
 
 		var body: some View {
 			WithViewStore(store, observe: ViewState.init) { viewStore in
-				VStack(spacing: .medium2) {
-					Separator()
+				VStack(spacing: .medium3) {
+					if viewStore.hasPersonas {
+						Text(L10n.AuthorizedDapps.DAppDetails.personasHeading)
+							.textBlock
+							.flushedLeft
+							.padding(.horizontal, .small2)
 
-					VStack(spacing: .medium3) {
-						if viewStore.hasPersonas {
-							Text(L10n.AuthorizedDapps.DAppDetails.personasHeading)
-								.textBlock
-								.flushedLeft
-								.padding(.horizontal, .small2)
+						PersonaListCoreView(store: store, tappable: tappablePersonas, showShield: false)
+							.padding(.top, .small1)
 
-							PersonaListCoreView(store: store, tappable: tappablePersonas, showShield: false)
-								.padding(.top, .small1)
-
-						} else {
-							Text(L10n.AuthorizedDapps.DAppDetails.noPersonasHeading)
-								.textBlock
-								.flushedLeft
-								.padding(.horizontal, .small2)
-						}
+					} else {
+						Text(L10n.AuthorizedDapps.DAppDetails.noPersonasHeading)
+							.textBlock
+							.flushedLeft
+							.padding(.horizontal, .small2)
 					}
-					.padding(.horizontal, .medium3)
-					.padding(.bottom, .large1)
 				}
+				.padding(.horizontal, .medium3)
+				.padding(.bottom, .large1)
 			}
 		}
 	}

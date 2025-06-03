@@ -2,7 +2,17 @@
   "images" : [
     {
       "filename" : "supply-increase.pdf",
-      "idiom" : "universal",
+      "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "ic_supply_increase.pdf",
+      "idiom" : "universal"
     }
   ],
   "info" : {

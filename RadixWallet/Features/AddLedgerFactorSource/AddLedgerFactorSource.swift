@@ -33,7 +33,6 @@ struct AddLedgerFactorSource: Sendable, FeatureReducer {
 	enum DelegateAction: Sendable, Equatable {
 		case completed(LedgerHardwareWalletFactorSource)
 		case failedToAddLedger
-		case dismiss
 	}
 
 	// MARK: Destination
@@ -64,6 +63,7 @@ struct AddLedgerFactorSource: Sendable, FeatureReducer {
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 	@Dependency(\.radixConnectClient) var radixConnectClient
+	@Dependency(\.dismiss) var dismiss
 
 	init() {}
 
@@ -82,7 +82,9 @@ struct AddLedgerFactorSource: Sendable, FeatureReducer {
 			sendAddLedgerRequestEffect(&state)
 
 		case .closeButtonTapped:
-			.send(.delegate(.dismiss))
+			.run { _ in
+				await dismiss()
+			}
 		}
 	}
 
@@ -134,7 +136,6 @@ struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		state.isWaitingForResponseFromLedger = false
 		loggerGlobal.notice("Successfully received response from CE! \(ledgerDeviceInfo) ✅")
 		return .run { send in
-
 			if let ledger = try await factorSourcesClient.getFactorSource(
 				id: FactorSourceID.hash(value: FactorSourceIdFromHash(kind: .ledgerHqHardwareWallet, body: Exactly32Bytes(bytes: ledgerDeviceInfo.id.data.data))),
 				as: LedgerHardwareWalletFactorSource.self

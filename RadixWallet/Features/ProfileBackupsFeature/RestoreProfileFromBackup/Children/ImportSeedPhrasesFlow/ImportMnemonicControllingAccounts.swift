@@ -150,7 +150,6 @@ struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		case let .importMnemonic(.delegate(delegateAction)):
 			switch delegateAction {
 			case let .notPersisted(mnemonicWithPassphrase):
-
 				let factorSourceID = FactorSourceIDFromHash(kind: .device, mnemonicWithPassphrase: mnemonicWithPassphrase)
 
 				guard factorSourceID == state.entitiesControlledByFactorSource.factorSourceID else {
@@ -164,7 +163,7 @@ struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 					factorSource: state.entitiesControlledByFactorSource.deviceFactorSource
 				)
 
-			case .persistedMnemonicInKeychainOnly, .doneViewing, .persistedNewFactorSourceInProfile:
+			case .persistedMnemonicInKeychainOnly, .persistedNewFactorSourceInProfile:
 				preconditionFailure("Incorrect implementation")
 			}
 

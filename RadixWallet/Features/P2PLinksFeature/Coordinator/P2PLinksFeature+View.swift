@@ -29,7 +29,7 @@ extension P2PLinksFeature {
 					VStack(alignment: .leading, spacing: .medium3) {
 						Text(L10n.LinkedConnectors.subtitle)
 							.textStyle(.body1Header)
-							.foregroundStyle(.app.gray2)
+							.foregroundStyle(.secondaryText)
 							.padding(.horizontal, .medium3)
 
 						VStack(spacing: .zero) {
@@ -47,7 +47,7 @@ extension P2PLinksFeature {
 								.withSeparator(horizontalPadding: link == viewStore.linkRows.last ? .zero : .medium3)
 							}
 						}
-						.background(Color.app.white)
+						.background(.primaryBackground)
 
 						Button(L10n.LinkedConnectors.linkNewConnector) {
 							viewStore.send(.addNewConnectionButtonTapped)
@@ -61,7 +61,7 @@ extension P2PLinksFeature {
 					}
 					.padding(.vertical, .medium3)
 				}
-				.background(Color.app.gray5)
+				.background(.secondaryBackground)
 				.radixToolbar(title: L10n.LinkedConnectors.title)
 				.task { @MainActor in
 					await store.send(.view(.task)).finish()
@@ -91,12 +91,9 @@ private extension View {
 	}
 
 	private func newConnection(with destinationStore: PresentationStoreOf<P2PLinksFeature.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /P2PLinksFeature.Destination.State.newConnection,
-			action: P2PLinksFeature.Destination.Action.newConnection,
-			content: { NewConnection.View(store: $0) }
-		)
+		sheet(store: destinationStore.scope(state: \.newConnection, action: \.newConnection)) {
+			NewConnection.View(store: $0)
+		}
 	}
 
 	private func confirmDeletionAlert(with destinationStore: PresentationStoreOf<P2PLinksFeature.Destination>) -> some View {

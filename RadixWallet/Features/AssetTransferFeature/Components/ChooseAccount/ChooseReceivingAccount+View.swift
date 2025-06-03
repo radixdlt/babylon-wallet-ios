@@ -75,7 +75,7 @@ extension ChooseReceivingAccount {
 						VStack(spacing: .medium2) {
 							Text(L10n.AssetTransfer.ChooseReceivingAccount.enterManually)
 								.textStyle(.body1Regular)
-								.foregroundColor(.app.gray1)
+								.foregroundColor(.primaryText)
 
 							addressField
 
@@ -93,6 +93,7 @@ extension ChooseReceivingAccount {
 						}
 						.padding(.medium3)
 					}
+					.background(.primaryBackground)
 					.destinations(with: store)
 					.footer { chooseButton }
 					.radixToolbar(title: L10n.AssetTransfer.ChooseReceivingAccount.navigationTitle) {

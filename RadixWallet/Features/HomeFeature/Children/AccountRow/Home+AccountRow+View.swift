@@ -92,7 +92,7 @@ extension Home.AccountRow {
 								Text(fiatWorth.currencyFormatted())
 									.lineLimit(1)
 									.textStyle(.secondaryHeader)
-									.foregroundStyle(.app.white)
+									.foregroundStyle(.white)
 							}
 						}
 						.padding(.leading, .small1)
@@ -216,7 +216,7 @@ extension Home.AccountRow.View {
 		var body: some View {
 			ZStack {
 				Circle()
-					.fill(.app.whiteTransparent2)
+					.fill(.backgroundTransparent)
 
 				Thumbnail(token: icon, size: Constants.iconSize)
 					.padding(Constants.borderWidth)
@@ -253,7 +253,7 @@ extension Home.AccountRow.View {
 					.padding([.leading, .vertical], Constants.borderWidth)
 
 				outerShape
-					.fill(.app.whiteTransparent2)
+					.fill(.backgroundTransparent)
 					.frame(width: Constants.diameter, height: Constants.diameter)
 
 				innerShape
@@ -282,7 +282,7 @@ extension Home.AccountRow.View {
 				.padding(.horizontal, .small2)
 				.frame(minWidth: .medium1, minHeight: Constants.iconSize.rawValue)
 				.padding(.leading, Constants.diameter - Constants.borderWidth - (tighten ? .small3 : 0))
-				.background(.app.whiteTransparent2)
+				.background(.backgroundTransparent)
 				.cornerRadius(Constants.iconSize.rawValue / 2)
 				.layoutPriority(100)
 		}

@@ -48,7 +48,7 @@ extension CardCarousel {
 					ForEach(0 ..< store.cards.count, id: \.self) { index in
 						let isSelected = selectedCardIndex == index
 						Capsule()
-							.fill(isSelected ? .app.gray2 : .app.gray4)
+							.fill(isSelected ? .iconSecondary : .iconTertiary)
 							.frame(isSelected ? spacing : .small3)
 					}
 				}
@@ -76,7 +76,7 @@ struct CarouselCardView: View {
 							Image(.iconLinkOut)
 								.resizable()
 								.frame(.icon)
-								.foregroundStyle(.app.gray2)
+								.foregroundStyle(.iconSecondary)
 						}
 					}
 
@@ -87,7 +87,7 @@ struct CarouselCardView: View {
 						.textStyle(.body2Regular)
 				}
 				.multilineTextAlignment(.leading)
-				.foregroundStyle(.app.gray1)
+				.foregroundStyle(Color.primaryText)
 				.padding([.top, .leading], .medium2)
 				.padding(.trailing, trailingPadding)
 				.padding(.bottom, .small1)
@@ -95,17 +95,16 @@ struct CarouselCardView: View {
 				.background(alignment: .trailing) {
 					background
 				}
-				.background(.app.gray5)
+				.background(.secondaryBackground)
 				.cornerRadius(.small1)
 			}
-
 			CloseButton(kind: .homeCard, action: closeAction)
 		}
 	}
 
 	private var trailingPadding: CGFloat {
 		switch card {
-		case .continueRadQuest, .startRadQuest, .discoverRadixDapps:
+		case .continueRadQuest, .startRadQuest:
 			95
 		case .dapp:
 			85
@@ -124,8 +123,6 @@ struct CarouselCardView: View {
 			L10n.HomePageCarousel.ContinueOnDapp.title
 		case .connector:
 			L10n.HomePageCarousel.UseDappsOnDesktop.title
-		case .discoverRadixDapps:
-			L10n.HomePageCarousel.DiscoverRadixDapps.title
 		}
 	}
 
@@ -139,8 +136,6 @@ struct CarouselCardView: View {
 			L10n.HomePageCarousel.ContinueOnDapp.text
 		case .connector:
 			L10n.HomePageCarousel.UseDappsOnDesktop.text
-		case .discoverRadixDapps:
-			L10n.HomePageCarousel.DiscoverRadixDapps.text
 		}
 	}
 
@@ -154,14 +149,12 @@ struct CarouselCardView: View {
 			cardBackground(.thumbnail(.dapp, url))
 		case .connector:
 			cardBackground(.gradient(.carouselBackgroundConnect))
-		case .discoverRadixDapps:
-			cardBackground(.gradient(.carouselBackgroundEcosystem))
 		}
 	}
 
 	private var showLinkIcon: Bool {
 		switch card {
-		case .startRadQuest, .discoverRadixDapps:
+		case .startRadQuest:
 			true
 		case .continueRadQuest, .dapp, .connector:
 			false
@@ -180,7 +173,7 @@ struct CarouselCardView: View {
 				.resizable()
 				.aspectRatio(contentMode: .fill)
 				.mask {
-					LinearGradient(colors: [.clear, .white, .white], startPoint: .leading, endPoint: .trailing)
+					LinearGradient(colors: [.clear, Color.primaryBackground, Color.primaryBackground], startPoint: .leading, endPoint: .trailing)
 				}
 		}
 	}

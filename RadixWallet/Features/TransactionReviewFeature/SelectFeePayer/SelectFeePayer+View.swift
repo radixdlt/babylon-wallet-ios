@@ -34,14 +34,14 @@ extension SelectFeePayer {
 					Text(L10n.CustomizeNetworkFees.SelectFeePayer.navigationTitle)
 						.multilineTextAlignment(.center)
 						.textStyle(.sheetTitle)
-						.foregroundColor(.app.gray1)
+						.foregroundColor(.primaryText)
 						.padding(.horizontal, .medium1)
 						.padding(.bottom, .small2)
 
 					Text(L10n.CustomizeNetworkFees.SelectFeePayer.subtitle(viewStore.feeString))
 						.multilineTextAlignment(.center)
 						.textStyle(.body1HighImportance)
-						.foregroundColor(.app.gray2)
+						.foregroundColor(.secondaryText)
 						.padding(.horizontal, .large3)
 						.padding(.bottom, .small1)
 
@@ -78,6 +78,7 @@ extension SelectFeePayer {
 						await viewStore.send(.pullToRefreshStarted).finish()
 					}
 				}
+				.background(.secondaryBackground)
 				.task { @MainActor in
 					await viewStore.send(.task).finish()
 				}
@@ -115,6 +116,7 @@ enum SelectAccountToPayForFeeRow {
 
 	@MainActor
 	struct View: SwiftUI.View {
+		@Environment(\.colorScheme) private var colorScheme
 		let viewState: ViewState
 		let isSelected: Bool
 		let action: () -> Void
@@ -136,7 +138,11 @@ enum SelectAccountToPayForFeeRow {
 						HStack {
 							ResourceBalanceView(.fungible(viewState.fungible), appearance: .compact)
 
-							RadioButton(appearance: .dark, state: buttonState, disabled: isDisabled)
+							RadioButton(
+								appearance: colorScheme == .light ? .dark : .light,
+								state: buttonState,
+								disabled: isDisabled
+							)
 						}
 						.padding(.medium3)
 

@@ -53,7 +53,7 @@ extension AccountCard {
 		HStack(spacing: .zero) {
 			if let title = account.title {
 				Text(title)
-					.foregroundColor(.app.white)
+					.foregroundColor(.white)
 					.textStyle(.body1Header)
 
 				Spacer(minLength: .zero)
@@ -70,7 +70,7 @@ extension AccountCard {
 	private var verticalCore: some View {
 		VStack(alignment: .leading, spacing: .small2) {
 			Text(account.title)
-				.foregroundColor(.app.white)
+				.foregroundColor(.white)
 				.textStyle(.body1Header)
 
 			addressView

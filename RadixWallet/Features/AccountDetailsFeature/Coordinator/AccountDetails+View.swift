@@ -61,7 +61,7 @@ extension AccountDetails {
 						BackButton {
 							viewStore.send(.backButtonTapped)
 						}
-						.foregroundColor(.app.white)
+						.foregroundColor(.white)
 					}
 
 					ToolbarItem(placement: .navigationBarTrailing) {
@@ -69,7 +69,7 @@ extension AccountDetails {
 							viewStore.send(.preferencesButtonTapped)
 						}
 						.frame(.small)
-						.foregroundColor(.app.white)
+						.foregroundColor(.white)
 					}
 				}
 			}
@@ -90,7 +90,7 @@ extension AccountDetails {
 					) {
 						viewStore.send(.showFiatWorthToggled)
 					}
-					.foregroundColor(.app.white)
+					.foregroundColor(.white)
 					.padding(.bottom, .small3)
 				}
 

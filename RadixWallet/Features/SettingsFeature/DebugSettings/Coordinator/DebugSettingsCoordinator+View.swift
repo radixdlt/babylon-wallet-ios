@@ -22,13 +22,19 @@ extension DebugSettingsCoordinator.View {
 				ForEachStatic(rows) { kind in
 					SettingsRow(kind: kind, store: store)
 				}
+
+				Button("Simulate crash") {
+					fatalError()
+				}
+				.buttonStyle(.primaryRectangular(isDestructive: true))
+				.padding(.medium1)
 			}
 		}
 		.padding(.bottom, .large3)
 		.radixToolbar(title: "Debug Settings")
 		.destinations(with: store)
-		.tint(.app.gray1)
-		.foregroundColor(.app.gray1)
+		.tint(.primaryText)
+		.foregroundColor(.primaryText)
 		.presentsLoadingViewOverlay()
 	}
 

@@ -71,7 +71,7 @@ extension FactorSourceView {
 			}
 		}
 		.padding()
-		.border(Color.app.gray1, width: 2)
+		.border(Color.primaryText, width: 2)
 	}
 }
 

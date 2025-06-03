@@ -74,15 +74,10 @@ struct CardCarousel: FeatureReducer, Sendable {
 			}
 		case .connector:
 			.send(.delegate(.addConnector))
-		case .discoverRadixDapps:
-			.run { _ in
-				await openURL(Constants.radixEcosystemURL)
-			}
 		}
 	}
 
 	private enum Constants {
 		static let radquestURL = URL(string: "https://radquest.io")!
-		static let radixEcosystemURL = URL(string: "https://www.radixdlt.com/ecosystem-directory")!
 	}
 }

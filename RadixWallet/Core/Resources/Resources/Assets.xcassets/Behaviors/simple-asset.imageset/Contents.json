@@ -2,7 +2,17 @@
   "images" : [
     {
       "filename" : "simple-asset.pdf",
-      "idiom" : "universal",
+      "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "ic_simple_resource_behaviour.pdf",
+      "idiom" : "universal"
     }
   ],
   "info" : {

@@ -36,14 +36,12 @@ struct ResourceBalancesView: View {
 					.padding(.bottom, isNotLast ? dividerHeight : 0)
 					.overlay(alignment: .bottom) {
 						if isNotLast {
-							Rectangle()
-								.fill(.app.gray3)
-								.frame(height: dividerHeight)
+							Separator()
 						}
 					}
 			}
 		}
-		.roundedCorners(strokeColor: .app.gray3)
+		.roundedCorners(strokeColor: .border)
 	}
 
 	private let dividerHeight: CGFloat = 1

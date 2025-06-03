@@ -122,6 +122,10 @@ extension UserDefaults.Dependency.Key {
 			return [userDefaults.getHomeCards() == nil ? "No Data available" : "Data available"]
 		case .appLockMessageShown:
 			return [userDefaults.appLockMessageShown].map(String.init(describing:))
+		case .shareCrashReportsIsEnabled:
+			return [userDefaults.shareCrashReportsIsEnabled].map(String.init(describing:))
+		case .preferredTheme:
+			return [userDefaults.getPreferredTheme()].map(String.init(describing:))
 		}
 	}
 }

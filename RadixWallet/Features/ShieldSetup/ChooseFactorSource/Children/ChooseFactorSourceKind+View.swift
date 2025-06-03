@@ -8,8 +8,8 @@ extension ChooseFactorSourceKind {
 		var body: some SwiftUI.View {
 			content
 				.radixToolbar(title: L10n.SecurityFactors.SelectFactor.title)
-				.tint(.app.gray1)
-				.foregroundColor(.app.gray1)
+				.tint(.primaryText)
+				.foregroundColor(.primaryText)
 		}
 
 		private var content: some SwiftUI.View {
@@ -21,7 +21,7 @@ extension ChooseFactorSourceKind {
 						}
 					}
 				}
-				.background(Color.app.gray5)
+				.background(.secondaryBackground)
 			}
 		}
 

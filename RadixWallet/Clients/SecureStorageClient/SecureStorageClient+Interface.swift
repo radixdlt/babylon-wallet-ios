@@ -9,6 +9,7 @@ extension Profile {
 struct SecureStorageClient: Sendable {
 	var loadProfileSnapshotData: LoadProfileSnapshotData
 	var saveProfileSnapshotData: SaveProfileSnapshotData
+	var deleteProfile: DeleteProfile
 
 	var saveMnemonicForFactorSource: SaveMnemonicForFactorSource
 	var loadMnemonicByFactorSourceID: LoadMnemonicByFactorSourceID
@@ -55,6 +56,7 @@ struct SecureStorageClient: Sendable {
 	init(
 		loadProfileSnapshotData: @escaping LoadProfileSnapshotData,
 		saveProfileSnapshotData: @escaping SaveProfileSnapshotData,
+		deleteProfile: @escaping DeleteProfile,
 		saveMnemonicForFactorSource: @escaping SaveMnemonicForFactorSource,
 		loadMnemonicByFactorSourceID: @escaping LoadMnemonicByFactorSourceID,
 		containsMnemonicIdentifiedByFactorSourceID: @escaping ContainsMnemonicIdentifiedByFactorSourceID,
@@ -83,6 +85,7 @@ struct SecureStorageClient: Sendable {
 	) {
 		self.loadProfileSnapshotData = loadProfileSnapshotData
 		self.saveProfileSnapshotData = saveProfileSnapshotData
+		self.deleteProfile = deleteProfile
 		self.saveMnemonicForFactorSource = saveMnemonicForFactorSource
 		self.loadMnemonicByFactorSourceID = loadMnemonicByFactorSourceID
 		self.containsMnemonicIdentifiedByFactorSourceID = containsMnemonicIdentifiedByFactorSourceID
@@ -114,6 +117,7 @@ struct SecureStorageClient: Sendable {
 	init(
 		loadProfileSnapshotData: @escaping LoadProfileSnapshotData,
 		saveProfileSnapshotData: @escaping SaveProfileSnapshotData,
+		deleteProfile: @escaping DeleteProfile,
 		saveMnemonicForFactorSource: @escaping SaveMnemonicForFactorSource,
 		loadMnemonicByFactorSourceID: @escaping LoadMnemonicByFactorSourceID,
 		containsMnemonicIdentifiedByFactorSourceID: @escaping ContainsMnemonicIdentifiedByFactorSourceID,
@@ -141,6 +145,7 @@ struct SecureStorageClient: Sendable {
 	) {
 		self.loadProfileSnapshotData = loadProfileSnapshotData
 		self.saveProfileSnapshotData = saveProfileSnapshotData
+		self.deleteProfile = deleteProfile
 		self.saveMnemonicForFactorSource = saveMnemonicForFactorSource
 		self.loadMnemonicByFactorSourceID = loadMnemonicByFactorSourceID
 		self.containsMnemonicIdentifiedByFactorSourceID = containsMnemonicIdentifiedByFactorSourceID

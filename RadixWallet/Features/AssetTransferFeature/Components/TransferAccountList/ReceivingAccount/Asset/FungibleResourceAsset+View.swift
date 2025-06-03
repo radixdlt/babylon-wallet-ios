@@ -52,7 +52,7 @@ extension FungibleResourceAsset.View {
 					.multilineTextAlignment(.trailing)
 					.lineLimit(1)
 					.minimumScaleFactor(0.7)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(.primaryText)
 					.textStyle(.sectionHeader)
 					.focused($focused)
 					.bind(viewStore.focusedBinding, to: $focused)
@@ -62,7 +62,7 @@ extension FungibleResourceAsset.View {
 					// TODO: Add better style
 					Text(L10n.AssetTransfer.FungibleResource.totalExceedsBalance)
 						.textStyle(.body2HighImportance)
-						.foregroundColor(.app.red1)
+						.foregroundColor(.error)
 				}
 
 				if focused {
@@ -73,7 +73,7 @@ extension FungibleResourceAsset.View {
 							Text(L10n.Common.max)
 								.underline()
 								.textStyle(.body3HighImportance)
-								.foregroundColor(.app.blue2)
+								.foregroundColor(.textButton)
 						}
 
 						Group {
@@ -81,7 +81,7 @@ extension FungibleResourceAsset.View {
 							Text(L10n.AssetTransfer.FungibleResource.balance(viewStore.balance.formatted()))
 						}
 						.textStyle(.body3HighImportance)
-						.foregroundColor(.app.gray2)
+						.foregroundColor(.secondaryText)
 					}
 				}
 			}

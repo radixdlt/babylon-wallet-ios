@@ -40,14 +40,14 @@ struct SelectNumberOfFactorsView: View {
 		VStack {
 			Text(L10n.ShieldWizardRegularAccess.SetThreshold.title)
 				.textStyle(.sectionHeader)
-				.foregroundStyle(.app.gray1)
+				.foregroundStyle(.primaryText)
 				.multilineTextAlignment(.center)
 
 			Picker("", selection: $selectedNumberOfFactors) {
 				ForEach(thresholdValues, id: \.self) { threshold in
 					Text(threshold.title)
 						.tag(threshold)
-						.foregroundStyle(.app.gray1)
+						.foregroundStyle(.primaryText)
 						.textStyle(.body1Regular)
 				}
 			}

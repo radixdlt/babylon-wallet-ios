@@ -3,6 +3,7 @@ import SwiftUI
 
 // MARK: - FactorSourceCard
 struct FactorSourceCard: View {
+	@Environment(\.colorScheme) private var colorScheme
 	private let kind: Kind
 	private let mode: Mode
 	private let dataSource: FactorSourceCardDataSource
@@ -24,7 +25,7 @@ struct FactorSourceCard: View {
 					Image(asset: AssetResource.close)
 						.frame(.smallest)
 				}
-				.foregroundColor(.app.gray2)
+				.foregroundColor(.secondaryText)
 			}
 		}
 	}
@@ -61,7 +62,7 @@ struct FactorSourceCard: View {
 				)
 			}
 		}
-		.background(.app.white)
+		.background(.primaryBackground)
 		.roundedCorners(radius: .small1)
 		.cardShadow
 		.animation(.default, value: dataSource.messages.count)
@@ -70,26 +71,28 @@ struct FactorSourceCard: View {
 	private var topCard: some View {
 		HStack(spacing: .medium3) {
 			Image(dataSource.icon)
+				.resizable()
+				.frame(.smallest)
 
 			VStack(alignment: .leading, spacing: .small3) {
 				Text(dataSource.title)
 					.textStyle(.body1Header)
-					.foregroundStyle(.app.gray1)
+					.foregroundStyle(.primaryText)
 
 				if let subtitle = dataSource.subtitle {
 					Text(subtitle)
 						.textStyle(.body2Regular)
-						.foregroundStyle(.app.gray2)
+						.foregroundStyle(.secondaryText)
 				}
 
 				if let lastUsedOn = dataSource.lastUsedOn {
 					Text(
 						markdown: L10n.FactorSources.Card.lastUsed(RadixDateFormatter.string(from: lastUsedOn, dateStyle: .long)),
-						emphasizedColor: .app.gray2,
+						emphasizedColor: .secondaryText,
 						emphasizedFont: .app.body2Link
 					)
 					.textStyle(.body2Regular)
-					.foregroundStyle(.app.gray2)
+					.foregroundStyle(.secondaryText)
 				}
 			}
 			.flushedLeft
@@ -98,14 +101,18 @@ struct FactorSourceCard: View {
 				switch type {
 				case .radioButton:
 					RadioButton(
-						appearance: .dark,
+						appearance: colorScheme == .light ? .dark : .light,
 						isSelected: isSelected
 					)
 				case .checkmark:
-					CheckmarkView(appearance: .dark, isChecked: isSelected)
+					CheckmarkView(
+						appearance: colorScheme == .light ? .dark : .light,
+						isChecked: isSelected
+					)
 				}
 			}
 		}
+		.background(.primaryBackground)
 	}
 
 	struct LinkedEntitesView: SwiftUI.View {
@@ -122,7 +129,7 @@ struct FactorSourceCard: View {
 					HStack(spacing: .zero) {
 						Text(linkedTitle)
 							.textStyle(.body2Regular)
-							.foregroundStyle(.app.gray2)
+							.foregroundStyle(.secondaryText)
 
 						Spacer(minLength: 0)
 
@@ -152,10 +159,10 @@ struct FactorSourceCard: View {
 						if dataSource.hasHiddenEntities {
 							Text(L10n.Common.hiddenAccountsOrPersonas)
 								.textStyle(.body1HighImportance)
-								.foregroundStyle(.app.gray2)
+								.foregroundStyle(.secondaryText)
 								.frame(maxWidth: .infinity)
 								.padding(.small1)
-								.background(Color.app.gray4)
+								.background(.primaryBackground)
 								.cornerRadius(.small1)
 						}
 					}
@@ -163,7 +170,7 @@ struct FactorSourceCard: View {
 			}
 			.padding(.horizontal, .medium3)
 			.padding(.vertical, .small1)
-			.background(.app.gray5)
+			.background(.tertiaryBackground)
 		}
 
 		private var linkedTitle: String {

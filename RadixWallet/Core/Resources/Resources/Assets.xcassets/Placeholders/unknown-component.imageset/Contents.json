@@ -3,6 +3,16 @@
     {
       "filename" : "icon-unknown-component.pdf",
       "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "ic_dapp.pdf",
+      "idiom" : "universal"
     }
   ],
   "info" : {

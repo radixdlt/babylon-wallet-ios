@@ -22,7 +22,7 @@ struct JaggedEdge: View {
 				.frame(maxHeight: .infinity, alignment: isTopEdge ? .bottom : .top)
 				.shadow(color: shadowColor, radius: 5)
 			edgeShape
-				.fill(.white)
+				.fill(.primaryBackground)
 		}
 	}
 }

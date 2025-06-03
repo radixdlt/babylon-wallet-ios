@@ -23,66 +23,57 @@ extension Home {
 
 		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState) { viewStore in
-				ScrollView {
-					VStack(spacing: .medium3) {
-						CardCarousel.View(store: store.scope(state: \.carousel, action: \.child.carousel))
-
-						if let fiatWorth = viewStore.totalFiatWorth {
-							VStack(spacing: .small2) {
-								Text(L10n.HomePage.totalValue)
-									.foregroundStyle(.app.gray2)
-									.textStyle(.body1Header)
-									.textCase(.uppercase)
-
-								TotalCurrencyWorthView(
-									state: .init(totalCurrencyWorth: fiatWorth),
-									backgroundColor: .app.gray4
-								) {
-									viewStore.send(.view(.showFiatWorthToggled))
-								}
-								.foregroundColor(.app.gray1)
-							}
-							.padding(.horizontal, .medium1)
-						}
-
-						VStack(spacing: .medium3) {
-							ForEachStore(
-								store.scope(
-									state: \.accountRows,
-									action: { .child(.account(id: $0, action: $1)) }
-								),
-								content: { Home.AccountRow.View(store: $0) }
-							)
-						}
+				VStack(alignment: .leading, spacing: .small3) {
+					Text(L10n.HomePage.title)
+						.foregroundColor(Color.primaryText)
+						.textStyle(.sheetTitle)
 						.padding(.horizontal, .medium1)
 
-						Button(L10n.HomePage.createNewAccount) {
-							store.send(.view(.createAccountButtonTapped))
+					ScrollView {
+						VStack(spacing: .medium3) {
+							CardCarousel.View(store: store.scope(state: \.carousel, action: \.child.carousel))
+
+							if let fiatWorth = viewStore.totalFiatWorth {
+								VStack(spacing: .small2) {
+									Text(L10n.HomePage.totalValue)
+										.foregroundStyle(.secondaryText)
+										.textStyle(.body1Header)
+										.textCase(.uppercase)
+
+									TotalCurrencyWorthView(
+										state: .init(totalCurrencyWorth: fiatWorth),
+										backgroundColor: .tertiaryBackground
+									) {
+										viewStore.send(.view(.showFiatWorthToggled))
+									}
+									.foregroundColor(.primaryText)
+								}
+								.padding(.horizontal, .medium1)
+							}
+
+							VStack(spacing: .medium3) {
+								ForEachStore(
+									store.scope(
+										state: \.accountRows,
+										action: { .child(.account(id: $0, action: $1)) }
+									),
+									content: { Home.AccountRow.View(store: $0) }
+								)
+							}
+							.padding(.horizontal, .medium1)
+
+							Button(L10n.HomePage.createNewAccount) {
+								store.send(.view(.createAccountButtonTapped))
+							}
+							.buttonStyle(.secondaryRectangular())
 						}
-						.buttonStyle(.secondaryRectangular())
-					}
-					.padding(.bottom, .medium3)
-					.padding(.top, .small1)
-				}
-				.toolbar {
-					ToolbarItem(placement: .topBarLeading) {
-						Text(L10n.HomePage.title)
-							.foregroundColor(.app.gray1)
-							.textStyle(.sheetTitle)
-							.padding(.leading, .medium3)
-					}
-					ToolbarItem(placement: .navigationBarTrailing) {
-						Button {
-							store.send(.view(.settingsButtonTapped))
-						} label: {
-							Image(.homeHeaderSettings)
-						}
-						.padding(.trailing, .medium3)
+						.padding(.bottom, .medium3)
+						.padding(.top, .small1)
 					}
 				}
-			}
-			.refreshable {
-				await store.send(.view(.pullToRefreshStarted)).finish()
+				.refreshable {
+					await store.send(.view(.pullToRefreshStarted)).finish()
+				}
 			}
 			.task { @MainActor in
 				await store.send(.view(.task)).finish()
@@ -94,6 +85,7 @@ extension Home {
 			.onDisappear {
 				store.send(.view(.onDisappear))
 			}
+			.background(Color.primaryBackground)
 		}
 	}
 }
@@ -157,19 +149,6 @@ private extension View {
 	private func p2pLinks(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.p2pLinks, action: \.p2pLinks)) {
 			P2PLinksFeature.View(store: $0)
-		}
-	}
-}
-
-extension View {
-	func badged(_ showBadge: Bool) -> some View {
-		overlay(alignment: .topTrailing) {
-			if showBadge {
-				Circle()
-					.fill(.app.notification)
-					.frame(width: .small1, height: .small1) // we should probably have the frame size aligned with the unit size.
-					.offset(x: .small3, y: -.small3)
-			}
 		}
 	}
 }

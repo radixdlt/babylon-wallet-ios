@@ -81,7 +81,7 @@ extension EditPersona {
 				VStack(spacing: .large2) {
 					if viewStore.mode == .create {
 						Text(L10n.CreatePersona.Introduction.title)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 							.textStyle(.sheetTitle)
 
 						InfoButton(.personas, label: L10n.InfoLink.Title.personasLearnAbout)
@@ -97,7 +97,7 @@ extension EditPersona {
 						Text(viewStore.description)
 							.multilineTextAlignment(.leading)
 							.textStyle(.body1HighImportance)
-							.foregroundColor(.app.gray2)
+							.foregroundColor(.secondaryText)
 							.flushedLeft
 
 						if !viewStore.entries.isEmpty {
@@ -119,6 +119,7 @@ extension EditPersona {
 				.padding(.horizontal, .medium1)
 				.padding(.vertical, .medium1)
 			}
+			.background(.primaryBackground)
 			.scrollDismissesKeyboard(.interactively)
 			.footer {
 				WithControlRequirements(

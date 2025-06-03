@@ -21,7 +21,7 @@ extension DefaultDepositGuarantees.View {
 		VStack(alignment: .leading, spacing: .medium1) {
 			Text(L10n.AccountSecuritySettings.DepositGuarantees.text)
 				.textStyle(.body1HighImportance)
-				.foregroundColor(.app.gray2)
+				.foregroundColor(.secondaryText)
 				.allowsHitTesting(false)
 
 			InfoButton(.guarantees, label: L10n.InfoLink.Title.guarantees)
@@ -37,7 +37,7 @@ extension DefaultDepositGuarantees.View {
 		}
 		.padding(.medium3)
 		.background {
-			Color.app.gray5
+			Color.secondaryBackground
 				.onTapGesture {
 					focused = false
 				}

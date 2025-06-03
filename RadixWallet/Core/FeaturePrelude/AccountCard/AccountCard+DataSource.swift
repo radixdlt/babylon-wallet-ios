@@ -137,6 +137,6 @@ private extension AccountOrAddressOf {
 
 private extension Gradient {
 	static var external: Self {
-		.init(colors: [.app.gray2])
+		.init(colors: [.externalAccountBackground])
 	}
 }

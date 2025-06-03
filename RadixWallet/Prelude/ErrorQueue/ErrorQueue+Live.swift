@@ -7,7 +7,6 @@ extension ErrorQueue: DependencyKey {
 		return Self(
 			errors: { errors.share().eraseToAnyAsyncSequence() },
 			schedule: { error in
-
 				if error is CancellationError {
 					loggerGlobal.warning("Suppressed `CancellationError`, i.e. preventing scheduling of this error on the ErrorQueue")
 					return

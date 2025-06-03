@@ -57,7 +57,7 @@ extension InteractionReview {
 								.lineSpacing(-6)
 								.lineLimit(1)
 								.textStyle(.secondaryHeader)
-								.foregroundColor(.app.gray1)
+								.foregroundColor(.primaryText)
 						}
 
 						AddressView(.address(.validator(viewState.address)))

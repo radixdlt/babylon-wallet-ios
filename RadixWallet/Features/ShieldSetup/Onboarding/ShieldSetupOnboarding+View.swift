@@ -20,7 +20,7 @@ extension ShieldSetupOnboarding {
 						}
 						.padding([.horizontal, .bottom], .medium3)
 						.padding(.top, .small3)
-						.background(Color.app.background)
+						.background(.primaryBackground)
 					}
 					.withNavigationBar {
 						dismiss()
@@ -47,7 +47,7 @@ extension ShieldSetupOnboarding {
 				ForEach(0 ..< store.steps.count, id: \.self) { index in
 					let isSelected = store.selectedStepIndex == index
 					Capsule()
-						.fill(isSelected ? .app.blue2 : .app.gray4)
+						.fill(isSelected ? .textButton : .tertiaryBackground)
 						.frame(.small2)
 				}
 			}

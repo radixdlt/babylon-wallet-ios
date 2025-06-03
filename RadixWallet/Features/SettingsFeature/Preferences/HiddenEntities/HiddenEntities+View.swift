@@ -11,7 +11,7 @@ extension HiddenEntities {
 					LazyVStack(alignment: .leading, spacing: .large3) {
 						Text(L10n.HiddenEntities.text)
 							.textStyle(.body1HighImportance)
-							.foregroundColor(.app.gray2)
+							.foregroundColor(Color.secondaryText)
 
 						header(L10n.HiddenEntities.personas)
 						personas
@@ -21,7 +21,7 @@ extension HiddenEntities {
 					}
 					.padding(.medium3)
 				}
-				.background(Color.app.gray5)
+				.background(Color.secondaryBackground)
 				.radixToolbar(title: L10n.HiddenEntities.title)
 				.task {
 					store.send(.view(.task))
@@ -33,7 +33,7 @@ extension HiddenEntities {
 		private func header(_ value: String) -> some SwiftUI.View {
 			Text(value)
 				.textStyle(.secondaryHeader)
-				.foregroundColor(.app.gray2)
+				.foregroundColor(.secondaryText)
 		}
 
 		@ViewBuilder
@@ -91,9 +91,9 @@ extension HiddenEntities {
 
 				Text(L10n.Common.none)
 					.textStyle(.secondaryHeader)
-					.foregroundColor(.app.gray2)
+					.foregroundColor(.secondaryText)
 			}
-			.background(Color.app.gray4)
+			.background(.tertiaryBackground)
 			.clipShape(RoundedRectangle(cornerRadius: .medium3))
 		}
 	}

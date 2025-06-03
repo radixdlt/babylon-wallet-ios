@@ -70,7 +70,7 @@ struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 			if let title = viewState.title {
 				Text(title)
 					.textStyle(.body1HighImportance)
-					.foregroundColor(.app.gray2)
+					.foregroundColor(.secondaryText)
 					.listRowInsets(.init(top: .small1, leading: .medium3, bottom: .medium3, trailing: .medium3))
 			}
 		} footer: {

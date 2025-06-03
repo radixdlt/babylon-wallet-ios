@@ -330,7 +330,7 @@ private extension MutableCollection where Element == OnLedgerEntitiesClient.Owne
 			}
 			detail.stakeClaimTokens.mutate {
 				$0.stakeClaims.mutateAll { token in
-					token.claimAmount.fiatWorth = change(.mainnetXRD, token.claimAmount)
+					token.claimAmount.updateFiatWorth(resourceAddress: .mainnetXRD, change: change)
 				}
 			}
 			detail.stakeUnitResource = stakeUnitResource
@@ -364,7 +364,7 @@ private extension Collection<OnLedgerEntitiesClient.OwnedStakeDetails> {
 			let stakeClaimsFiatWorth = stakeUnitDetail
 				.stakeClaimTokens?
 				.stakeClaims
-				.compactMap(\.claimAmount.fiatWorth?.worth)
+				.compactMap(\.claimAmount.exactAmount?.fiatWorth?.worth)
 				.reduce(.zero, +) ?? .zero
 			return partialResult + stakeUnitFiatWorth + stakeClaimsFiatWorth
 		}

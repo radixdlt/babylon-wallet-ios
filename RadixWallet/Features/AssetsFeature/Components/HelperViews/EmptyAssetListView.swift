@@ -20,7 +20,7 @@ struct EmptyAssetListView: View {
 		VStack(spacing: .large2) {
 			Image(asset: viewState.imageAsset)
 			Text(viewState.description)
-				.foregroundColor(.app.gray1)
+				.foregroundColor(.primaryText)
 				.textStyle(.sectionHeader)
 
 			InfoButton(viewState.glossaryItem, label: viewState.glossaryLabel)

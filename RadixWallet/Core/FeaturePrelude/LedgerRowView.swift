@@ -3,6 +3,7 @@ import Sargon
 // MARK: - LedgerRowView
 @MainActor
 struct LedgerRowView: View {
+	@Environment(\.colorScheme) private var colorScheme
 	struct ViewState: Equatable {
 		let description: String
 		let addedOn: Date
@@ -34,11 +35,11 @@ struct LedgerRowView: View {
 	}
 
 	var body: some View {
-		Card(.app.gray5, action: action) {
+		Card(action: action) {
 			HStack(spacing: 0) {
 				VStack(alignment: .leading, spacing: 0) {
 					Text(viewState.description)
-						.foregroundColor(.app.gray1)
+						.foregroundColor(.primaryText)
 						.textStyle(.secondaryHeader)
 						.padding(.bottom, .small1)
 
@@ -52,12 +53,12 @@ struct LedgerRowView: View {
 
 				if let isSelected {
 					RadioButton(
-						appearance: .light,
+						appearance: colorScheme == .light ? .dark : .light,
 						isSelected: isSelected
 					)
 				}
 			}
-			.foregroundColor(.app.gray1)
+			.foregroundColor(.primaryText)
 			.padding(.horizontal, .large3)
 			.padding(.vertical, .medium1)
 		}

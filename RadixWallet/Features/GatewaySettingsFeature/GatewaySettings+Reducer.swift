@@ -116,7 +116,6 @@ struct GatewaySettings: Sendable, FeatureReducer {
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .savedGatewaysLoadedResult(.success(savedGateways)):
-
 			state.currentGateway = savedGateways.current
 			state.gatewayList = .init(gateways: .init(
 				uniqueElements: savedGateways.all.map {

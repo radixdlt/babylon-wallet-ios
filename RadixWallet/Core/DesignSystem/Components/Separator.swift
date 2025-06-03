@@ -35,7 +35,7 @@ private struct SeparatorModifier: ViewModifier {
 
 // MARK: - Separator
 struct Separator: View {
-	var color: Color = .app.gray4
+	var color: Color = .separator
 
 	var body: some View {
 		color

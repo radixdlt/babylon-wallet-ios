@@ -20,12 +20,10 @@ extension ReceivingAccount.View {
 		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 			VStack(alignment: .leading, spacing: .zero) {
 				account(viewStore)
-				Divider()
-					.frame(height: 1)
-					.background(Color.borderColor)
+				Separator()
 				assets(viewStore)
 			}
-			.roundedCorners(strokeColor: .borderColor)
+			.roundedCorners(strokeColor: .border)
 		}
 	}
 
@@ -43,7 +41,7 @@ extension ReceivingAccount.View {
 			if let account = viewStore.recipient {
 				AccountCard(kind: .display(addCornerRadius: false), account: account) {
 					removeAccountButton(viewStore)
-						.foregroundColor(.app.white)
+						.foregroundColor(.white)
 						.padding(.leading, .medium3)
 				}
 			} else {
@@ -53,7 +51,7 @@ extension ReceivingAccount.View {
 					} label: {
 						Label(L10n.AssetTransfer.ReceivingAccount.chooseAccountButton, asset: AssetResource.chooseAccount)
 							.font(.app.body1Header)
-							.foregroundColor(.app.blue2)
+							.foregroundColor(.textButton)
 							.flushedLeft
 							.padding(.vertical, .medium3)
 					}
@@ -63,7 +61,8 @@ extension ReceivingAccount.View {
 					}
 				}
 				.padding(.horizontal, .medium3)
-				.foregroundColor(.app.gray2)
+				.foregroundColor(.secondaryText)
+				.background(.primaryBackground)
 			}
 		}
 		.frame(height: .standardButtonHeight)
@@ -84,12 +83,12 @@ extension ReceivingAccount.View {
 				Text("+ " + L10n.AssetTransfer.ReceivingAccount.addAssetsButton)
 					.frame(height: .standardButtonHeight)
 					.frame(maxWidth: .infinity)
-					.foregroundColor(.app.blue2)
+					.foregroundColor(.textButton)
 					.font(.app.body1StandaloneLink)
 			}
 		}
 		.frame(maxWidth: .infinity)
 		.padding([.top, .horizontal], .medium3)
-		.background(Color.containerContentBackground)
+		.background(.secondaryBackground)
 	}
 }

@@ -34,14 +34,14 @@ extension EditPersonaEntry {
 					HStack {
 						Text(viewStore.kind.title)
 							.textStyle(.body1HighImportance)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(.primaryText)
 
 						Spacer()
 
 						if viewStore.isRequestedByDapp {
 							Text(L10n.EditPersona.requiredByDapp)
 								.textStyle(.body2Regular)
-								.foregroundColor(.app.gray2)
+								.foregroundColor(.secondaryText)
 								.multilineTextAlignment(.trailing)
 						} else {
 							// TODO: Clarify below

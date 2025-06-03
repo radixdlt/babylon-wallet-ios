@@ -99,9 +99,9 @@ struct ResourceBalanceButton: View {
 	private var background: Color {
 		switch appearance {
 		case .assetList:
-			.white
+			.primaryBackground
 		case .transactionReview:
-			.app.gray5
+			.secondaryBackground
 		}
 	}
 }

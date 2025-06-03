@@ -1,6 +1,7 @@
 // MARK: - Preferences
 
 struct Preferences: Sendable, FeatureReducer {
+	@Environment(\.colorScheme) var colorScheme
 	struct State: Sendable, Hashable {
 		var appPreferences: AppPreferences?
 		var exportLogsUrl: URL?
@@ -16,6 +17,7 @@ struct Preferences: Sendable, FeatureReducer {
 		case depositGuaranteesButtonTapped
 		case hiddenEntitiesButtonTapped
 		case hiddenAssetsButtonTapped
+		case themeSelectionButtonTapped
 		case gatewaysButtonTapped
 		case developerModeToogled(Bool)
 		case advancedLockToogled(Bool)
@@ -34,6 +36,7 @@ struct Preferences: Sendable, FeatureReducer {
 			case depositGuarantees(DefaultDepositGuarantees.State)
 			case hiddenEntities(HiddenEntities.State)
 			case hiddenAssets(HiddenAssets.State)
+			case themeSelection(ThemeSelection.State)
 			case gateways(GatewaySettings.State)
 		}
 
@@ -42,6 +45,7 @@ struct Preferences: Sendable, FeatureReducer {
 			case depositGuarantees(DefaultDepositGuarantees.Action)
 			case hiddenEntities(HiddenEntities.Action)
 			case hiddenAssets(HiddenAssets.Action)
+			case themeSelection(ThemeSelection.Action)
 			case gateways(GatewaySettings.Action)
 		}
 
@@ -55,6 +59,9 @@ struct Preferences: Sendable, FeatureReducer {
 			Scope(state: \.hiddenAssets, action: \.hiddenAssets) {
 				HiddenAssets()
 			}
+			Scope(state: \.themeSelection, action: \.themeSelection) {
+				ThemeSelection()
+			}
 			Scope(state: \.gateways, action: \.gateways) {
 				GatewaySettings()
 			}
@@ -64,6 +71,7 @@ struct Preferences: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.localAuthenticationClient) var localAuthenticationClient
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.userDefaults) var userDefaults
 
 	init() {}
 
@@ -95,6 +103,10 @@ struct Preferences: Sendable, FeatureReducer {
 
 		case .hiddenAssetsButtonTapped:
 			state.destination = .hiddenAssets(.init())
+			return .none
+
+		case .themeSelectionButtonTapped:
+			state.destination = .themeSelection(.init())
 			return .none
 
 		case .gatewaysButtonTapped:

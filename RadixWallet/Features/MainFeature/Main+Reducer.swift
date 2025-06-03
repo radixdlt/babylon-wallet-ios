@@ -5,16 +5,14 @@ struct Main: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		// MARK: - Components
 		var home: Home.State
+		var settings: Settings.State
+		var dAppsDirectory: DAppsDirectory.State
 
 		var isOnMainnet = true
 
 		// MARK: - Destination
 		@PresentationState
 		var destination: Destination.State?
-
-		init(home: Home.State) {
-			self.home = home
-		}
 	}
 
 	@CasePathable
@@ -25,29 +23,13 @@ struct Main: Sendable, FeatureReducer {
 	@CasePathable
 	enum ChildAction: Sendable, Equatable {
 		case home(Home.Action)
+		case settings(Settings.Action)
+		case dAppsDirectory(DAppsDirectory.Action)
 	}
 
 	@CasePathable
 	enum InternalAction: Sendable, Equatable {
 		case currentGatewayChanged(to: Gateway)
-	}
-
-	struct Destination: DestinationReducer {
-		@CasePathable
-		enum State: Sendable, Hashable {
-			case settings(Settings.State)
-		}
-
-		@CasePathable
-		enum Action: Sendable, Equatable {
-			case settings(Settings.Action)
-		}
-
-		var body: some ReducerOf<Self> {
-			Scope(state: \.settings, action: \.settings) {
-				Settings()
-			}
-		}
 	}
 
 	@Dependency(\.gatewaysClient) var gatewaysClient
@@ -64,13 +46,15 @@ struct Main: Sendable, FeatureReducer {
 		Scope(state: \.home, action: \.child.home) {
 			Home()
 		}
-		Reduce(core)
-			.ifLet(destinationPath, action: /Action.destination) {
-				Destination()
-			}
-	}
+		Scope(state: \.settings, action: \.child.settings) {
+			Settings()
+		}
+		Scope(state: \.dAppsDirectory, action: \.child.dAppsDirectory) {
+			DAppsDirectory()
+		}
 
-	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
+		Reduce(core)
+	}
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -134,17 +118,6 @@ struct Main: Sendable, FeatureReducer {
 			} catch {
 				loggerGlobal.notice("radixConnectClient.startNotifyingConnectorWithAccounts failed: \(error)")
 			}
-		}
-	}
-
-	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case .home(.delegate(.displaySettings)):
-			state.destination = .settings(.init())
-			return .none
-
-		default:
-			return .none
 		}
 	}
 
