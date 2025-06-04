@@ -754,8 +754,8 @@ internal enum L10n {
       internal static let enterManually = L10n.tr("Localizable", "assetTransfer_chooseReceivingAccount_enterManually", fallback: "Enter or scan an Account address or XRD domain")
       /// Invalid address
       internal static let invalidAddressError = L10n.tr("Localizable", "assetTransfer_chooseReceivingAccount_invalidAddressError", fallback: "Invalid address")
-      /// Choose Receiving Account
-      internal static let navigationTitle = L10n.tr("Localizable", "assetTransfer_chooseReceivingAccount_navigationTitle", fallback: "Choose Receiving Account")
+      /// Choose Transfer Recipient
+      internal static let navigationTitle = L10n.tr("Localizable", "assetTransfer_chooseReceivingAccount_navigationTitle", fallback: "Choose Transfer Recipient")
       /// Scan QR Code
       internal static let scanQRNavigationTitle = L10n.tr("Localizable", "assetTransfer_chooseReceivingAccount_scanQRNavigationTitle", fallback: "Scan QR Code")
     }
@@ -808,8 +808,8 @@ internal enum L10n {
     internal enum ReceivingAccount {
       /// Add assets
       internal static let addAssetsButton = L10n.tr("Localizable", "assetTransfer_receivingAccount_addAssetsButton", fallback: "Add assets")
-      /// Choose Account
-      internal static let chooseAccountButton = L10n.tr("Localizable", "assetTransfer_receivingAccount_chooseAccountButton", fallback: "Choose Account")
+      /// Choose Recipient
+      internal static let chooseAccountButton = L10n.tr("Localizable", "assetTransfer_receivingAccount_chooseAccountButton", fallback: "Choose Recipient")
     }
   }
   internal enum Authorization {
