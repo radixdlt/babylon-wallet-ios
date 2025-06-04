@@ -70,10 +70,10 @@ extension AccountCard where Bottom == EmptyView {
 		)
 	}
 
-	init(kind: Kind = .display, account: TransferRecipient, @ViewBuilder trailing: () -> Trailing) {
+	init(kind: Kind = .display, recipient: TransferRecipient, @ViewBuilder trailing: () -> Trailing) {
 		self.init(
 			kind: kind,
-			account: account.asDataSource,
+			account: recipient.asDataSource,
 			trailing: trailing,
 			bottom: { EmptyView() }
 		)
