@@ -1,6 +1,8 @@
 // MARK: - RadixNameServiceClient
-public struct RadixNameServiceClient: Sendable {}
+public struct RadixNameServiceClient: Sendable {
+	var resolveReceiverAccountForDomain: ResolveReceiverAccountForDomain
+}
 
 extension RadixNameServiceClient {
-	typealias ResolveReceiverAccountForDomain = (_ domain: RnsDomain) async throws -> RnsDomainConfiguredReceiver
+	typealias ResolveReceiverAccountForDomain = @Sendable (_ domain: RnsDomain) async throws -> RnsDomainConfiguredReceiver
 }

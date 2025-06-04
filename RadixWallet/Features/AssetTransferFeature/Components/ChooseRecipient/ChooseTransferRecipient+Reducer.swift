@@ -73,6 +73,7 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 		}
 	}
 
+	@Dependency(\.radixNameService) var radixNameService
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.errorQueue) var errorQueue
 
@@ -122,13 +123,7 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 				state.isDeterminingRnsDomainRecipient = true
 				return .run { send in
 					let result = await TaskResult {
-						let network = await gatewaysClient.getCurrentNetworkID()
-						let rns = try RadixNameService(
-							networkingDriver: URLSession.shared,
-							networkId: network
-						)
-
-						return try await rns.resolveReceiverAccountForDomain(domain: domain)
+						try await radixNameService.resolveReceiverAccountForDomain(domain)
 					}
 					return await send(.internal(.rnsDomainConfiguredRecieverResult(result)))
 				}
@@ -147,7 +142,7 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 
 		case let .rnsDomainConfiguredRecieverResult(.failure(error)):
 			state.isDeterminingRnsDomainRecipient = false
-			errorQueue.schedule(error)
+			errorQueue.schedule(DomainResolutionError(error: error))
 			return .none
 		}
 	}
@@ -164,6 +159,25 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 
 		default:
 			return .none
+		}
+	}
+}
+
+// MARK: - DomainResolutionError
+struct DomainResolutionError: LocalizedError {
+	let error: Swift.Error
+
+	var errorDescription: String? {
+		switch error as? CommonError {
+		case CommonError.GwMissingResponseItem?,
+		     CommonError.RnsUnauthenticDomain?,
+		     CommonError.RnsInvalidRecordContext?,
+		     CommonError.RnsInvalidDomainConfiguration?:
+			L10n.Error.Rns.unknownDomain
+		case CommonError.RnsUnsupportedNetwork?:
+			L10n.Error.TransactionFailure.network
+		default:
+			L10n.TransactionStatus.Failure.title
 		}
 	}
 }
