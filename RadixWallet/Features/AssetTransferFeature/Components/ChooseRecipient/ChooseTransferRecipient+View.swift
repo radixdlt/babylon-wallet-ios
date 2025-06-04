@@ -94,11 +94,12 @@ extension ChooseTransferRecipient {
 			WithPerceptionTracking {
 				NavigationStack {
 					ScrollView {
-						VStack(spacing: .medium2) {
-							Text(L10n.AssetTransfer.ChooseReceivingAccount.enterManually)
-								.textStyle(.body1Regular)
-								.foregroundColor(.primaryText)
+						Text(L10n.AssetTransfer.ChooseReceivingAccount.enterManually)
+							.textStyle(.body1Regular)
+							.foregroundColor(.primaryText)
+							.padding(.vertical, .medium3)
 
+						VStack(spacing: .medium2) {
 							addressField
 
 							if !store.chooseAccounts.availableAccounts.isEmpty {
@@ -113,7 +114,7 @@ extension ChooseTransferRecipient {
 							.opacity(store.canSelectOwnAccount ? 1.0 : 0.6)
 							.disabled(!store.canSelectOwnAccount)
 						}
-						.padding(.medium3)
+						.padding([.horizontal, .bottom], .medium3)
 					}
 					.background(.primaryBackground)
 					.destinations(with: store)
