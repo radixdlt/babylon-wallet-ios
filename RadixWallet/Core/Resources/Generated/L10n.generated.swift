@@ -744,20 +744,20 @@ internal enum L10n {
       internal static let navigationTitle = L10n.tr("Localizable", "assetTransfer_addAssets_navigationTitle", fallback: "Choose Asset(s) to Send")
     }
     internal enum ChooseReceivingAccount {
-      /// Enter Radix Account address
-      internal static let addressFieldPlaceholder = L10n.tr("Localizable", "assetTransfer_chooseReceivingAccount_addressFieldPlaceholder", fallback: "Enter Radix Account address")
+      /// Enter Radix Account address or XRD domain
+      internal static let addressFieldPlaceholder = L10n.tr("Localizable", "assetTransfer_chooseReceivingAccount_addressFieldPlaceholder", fallback: "Enter Radix Account address or XRD domain")
       /// Account already added
       internal static let alreadyAddedError = L10n.tr("Localizable", "assetTransfer_chooseReceivingAccount_alreadyAddedError", fallback: "Account already added")
       /// Or: Choose one of your own Accounts
       internal static let chooseOwnAccount = L10n.tr("Localizable", "assetTransfer_chooseReceivingAccount_chooseOwnAccount", fallback: "Or: Choose one of your own Accounts")
-      /// Enter or scan an Account address
-      internal static let enterManually = L10n.tr("Localizable", "assetTransfer_chooseReceivingAccount_enterManually", fallback: "Enter or scan an Account address")
+      /// Enter or scan an Account address or XRD domain
+      internal static let enterManually = L10n.tr("Localizable", "assetTransfer_chooseReceivingAccount_enterManually", fallback: "Enter or scan an Account address or XRD domain")
       /// Invalid address
       internal static let invalidAddressError = L10n.tr("Localizable", "assetTransfer_chooseReceivingAccount_invalidAddressError", fallback: "Invalid address")
       /// Choose Receiving Account
       internal static let navigationTitle = L10n.tr("Localizable", "assetTransfer_chooseReceivingAccount_navigationTitle", fallback: "Choose Receiving Account")
-      /// Scan Account QR Code
-      internal static let scanQRNavigationTitle = L10n.tr("Localizable", "assetTransfer_chooseReceivingAccount_scanQRNavigationTitle", fallback: "Scan Account QR Code")
+      /// Scan QR Code
+      internal static let scanQRNavigationTitle = L10n.tr("Localizable", "assetTransfer_chooseReceivingAccount_scanQRNavigationTitle", fallback: "Scan QR Code")
     }
     internal enum DepositStatus {
       /// Recipient does not accept these tokens
@@ -1739,6 +1739,10 @@ internal enum L10n {
       internal static func failedToCreateProfileFromSnapshot(_ p1: Any, _ p2: Any) -> String {
         return L10n.tr("Localizable", "error_profileLoad_failedToCreateProfileFromSnapshot", String(describing: p1), String(describing: p2), fallback: "Failed to import Radix Wallet backup, error: %@, version: %@")
       }
+    }
+    internal enum Rns {
+      /// This XRD domain does not exist, or is not associated to any account.
+      internal static let unknownDomain = L10n.tr("Localizable", "error_rns_unknownDomain", fallback: "This XRD domain does not exist, or is not associated to any account.")
     }
     internal enum TransactionFailure {
       /// Your current Ledger settings only allow signing of simple token transfers. Please either enable "verbose mode" (to see full transaction manifests) or "blind signing mode" (to enable signing of complex transaction manifest hashes) on your Ledger app device.
@@ -3777,8 +3781,8 @@ internal enum L10n {
   }
   internal enum ScanQR {
     internal enum Account {
-      /// Scan a QR code of a Radix Account address from another wallet or an exchange.
-      internal static let instructions = L10n.tr("Localizable", "scanQR_account_instructions", fallback: "Scan a QR code of a Radix Account address from another wallet or an exchange.")
+      /// Scan a QR code of a Radix Account address from another wallet or an exchange, or a QR code of an XRD domain.
+      internal static let instructions = L10n.tr("Localizable", "scanQR_account_instructions", fallback: "Scan a QR code of a Radix Account address from another wallet or an exchange, or a QR code of an XRD domain.")
     }
     internal enum ConnectorExtension {
       /// Go to **wallet.radixdlt.com** in your desktop browser.
