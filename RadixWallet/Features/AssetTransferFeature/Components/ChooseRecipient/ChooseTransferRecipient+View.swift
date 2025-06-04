@@ -143,6 +143,7 @@ extension ChooseTransferRecipient {
 				}
 			)
 			.autocorrectionDisabled()
+			.textInputAutocapitalization(.never)
 			.keyboardType(.alphabet)
 		}
 
