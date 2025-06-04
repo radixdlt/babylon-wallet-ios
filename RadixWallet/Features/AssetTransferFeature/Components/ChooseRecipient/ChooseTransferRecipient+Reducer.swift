@@ -74,7 +74,6 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.radixNameService) var radixNameService
-	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.errorQueue) var errorQueue
 
 	init() {}
@@ -95,7 +94,7 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .scanQRCode:
-			state.destination = .scanTransferRecipient(.init(kind: .transferRecipient))
+			state.destination = .scanTransferRecipient(.init(kind: .account))
 			return .none
 
 		case .closeButtonTapped:

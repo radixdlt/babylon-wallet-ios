@@ -76,6 +76,5 @@ extension ScanQR {
 		case connectorExtension
 		case account
 		case importOlympia
-		case transferRecipient
 	}
 }
