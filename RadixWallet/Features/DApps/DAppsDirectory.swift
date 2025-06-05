@@ -149,7 +149,10 @@ struct DAppsDirectory: Sendable, FeatureReducer {
 			let result = await TaskResult {
 				let dAppList = try await dAppsDirectoryClient.fetchDApps(forceRefresh)
 				let dAppDetails = try await onLedgerEntitiesClient
-					.getAssociatedDapps(dAppList.map(\.address))
+					.getAssociatedDapps(
+						dAppList.map(\.address),
+						cachingStrategy: forceRefresh ? .forceUpdate : .useCache
+					)
 					.asIdentified()
 
 				return dAppList.map { dApp in

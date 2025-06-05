@@ -109,7 +109,13 @@ extension GatewayAPI.ProgrammaticScryptoSborValue {
 		case let .preciseDecimal(content):
 			content.value.asDecimalDataField
 		case let .enum(content):
-			content.variantName.map { .enum(variant: $0) }
+			if content.typeName == "Option", content.variantName == "Some" {
+				content.fields.first.flatMap(\.fieldKind)
+			} else {
+				content.variantName.map {
+					.enum(variant: $0)
+				}
+			}
 		case let .nonFungibleLocalId(content):
 			content.value.asNonFungibleIDDataField
 		case let .own(content):

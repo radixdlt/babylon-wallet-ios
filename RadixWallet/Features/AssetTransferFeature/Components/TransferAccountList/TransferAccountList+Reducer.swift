@@ -56,20 +56,20 @@ struct TransferAccountList: Sendable, FeatureReducer {
 
 		@CasePathable
 		enum MainState: Sendable, Hashable {
-			case chooseAccount(ChooseReceivingAccount.State)
+			case chooseTransferReceiver(ChooseTransferRecipient.State)
 			case addAsset(AssetsView.State)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
-			case chooseAccount(ChooseReceivingAccount.Action)
+			case chooseTransferReceiver(ChooseTransferRecipient.Action)
 			case addAsset(AssetsView.Action)
 		}
 
 		var body: some ReducerOf<Self> {
 			Scope(state: \.state, action: \.self) {
-				Scope(state: \.chooseAccount, action: \.chooseAccount) {
-					ChooseReceivingAccount()
+				Scope(state: \.chooseTransferReceiver, action: \.chooseTransferReceiver) {
+					ChooseTransferRecipient()
 				}
 				Scope(state: \.addAsset, action: \.addAsset) {
 					AssetsView()
@@ -138,12 +138,12 @@ struct TransferAccountList: Sendable, FeatureReducer {
 		guard let id = state.destination?.id else { return .none }
 
 		switch presentedAction {
-		case let .chooseAccount(.delegate(.handleResult(recipient))):
+		case let .chooseTransferReceiver(.delegate(.handleResult(recipient))):
 			state.receivingAccounts[id: id]?.recipient = recipient
 			state.destination = nil
 			return signaturesStatusEffect(state, receivingAccountId: id)
 
-		case .chooseAccount(.delegate(.dismiss)):
+		case .chooseTransferReceiver(.delegate(.dismiss)):
 			state.destination = nil
 			return .none
 
@@ -228,7 +228,7 @@ private extension TransferAccountList {
 
 	func navigateToChooseAccounts(_ state: inout State, id: ReceivingAccount.State.ID) -> Effect<Action> {
 		let filteredAccounts = state.receivingAccounts.compactMap(\.recipient?.accountAddress) + [state.fromAccount.address]
-		let chooseAccount: ChooseReceivingAccount.State = .init(
+		let chooseAccount: ChooseTransferRecipient.State = .init(
 			networkID: state.fromAccount.networkID,
 			chooseAccounts: .init(
 				context: .assetTransfer,
@@ -238,7 +238,7 @@ private extension TransferAccountList {
 			)
 		)
 
-		state.destination = .init(id: id, state: .chooseAccount(chooseAccount))
+		state.destination = .init(id: id, state: .chooseTransferReceiver(chooseAccount))
 		return .none
 	}
 
@@ -305,9 +305,10 @@ private extension TransferAccountList {
 			let values = switch recipient {
 			case let .profileAccount(account):
 				await getStatusesForProfileAccount(accountForDisplay: account, assets: receivingAccount.assets)
-
 			case let .addressOfExternalAccount(account):
 				try await getStatusesForExternalAccount(account, resourceAddresses: resourceAddresses)
+			case let .rnsDomain(domain):
+				try await getStatusesForExternalAccount(domain.receiver, resourceAddresses: resourceAddresses)
 			}
 			await send(.internal(.setDepositStatus(accountId: receivingAccountId, values: values)))
 		} catch: { error, send in
