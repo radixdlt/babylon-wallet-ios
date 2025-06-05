@@ -123,6 +123,9 @@ struct AssetsView: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onFirstTask:
+			guard !state.isLoadingResources else {
+				return .none
+			}
 			state.isLoadingResources = true
 			state.accountPortfolio = .loading
 			return .run { [state] send in
@@ -140,6 +143,9 @@ struct AssetsView: Sendable, FeatureReducer {
 			return .none
 
 		case .pullToRefreshStarted:
+			guard !state.isRefreshing else {
+				return .none
+			}
 			state.isRefreshing = true
 			return fetchAccountPortfolio(state)
 
