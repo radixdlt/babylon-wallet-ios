@@ -91,19 +91,25 @@ extension TransactionClient {
 
 		@Sendable
 		func getAllFeePayerCandidates(refreshingBalances: Bool, accounts: Accounts) async throws -> NonEmpty<IdentifiedArrayOf<FeePayerCandidate>> {
-			let entities = try await onLedgerEntitiesClient.getAccounts(accounts.map(\.address), cachingStrategy: .forceUpdate)
+			let networkId = await gatewaysClient.getCurrentNetworkID()
+			let xrdAddress: ResourceAddress = .xrd(on: networkId)
+			let xrdVaults = await accounts.concurrentCompactMap { acc in
+				try? await gatewayAPIClient.getEntityFungibleResourceVaultsPage(.init(address: acc.address.address, resourceAddress: xrdAddress.address))
+			}
 
 			let allFeePayerCandidates = accounts.compactMap { account -> FeePayerCandidate? in
-				guard let entity = entities.first(where: { $0.address == account.address }) else {
+				guard let xrdVault = xrdVaults.first(where: { $0.address == account.address.address }) else {
 					assertionFailure("Failed to find account or no balance, this should never happen.")
 					return nil
 				}
 
-				guard let xrdBalance = entity.fungibleResources.xrdResource?.amount.exactAmount else {
+				guard let xrdBalanceRaw = xrdVault.items.first?.amount,
+				      let xrdBalance = try? Decimal192(xrdBalanceRaw)
+				else {
 					return nil
 				}
 
-				return FeePayerCandidate(account: account, xrdBalance: xrdBalance.nominalAmount)
+				return FeePayerCandidate(account: account, xrdBalance: xrdBalance)
 			}
 
 			guard let allCandidates = NonEmpty(rawValue: IdentifiedArray(uncheckedUniqueElements: allFeePayerCandidates)) else {
