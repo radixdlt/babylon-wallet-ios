@@ -16,6 +16,10 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 			}
 		}
 
+		var sanitizedManualTransferRecipient: String {
+			manualTransferRecipient.lowercased().trimmingWhitespacesAndNewlines()
+		}
+
 		var manualTransferRecipientFocused: Bool = false
 		var isDeterminingRnsDomainRecipient: Bool = false
 

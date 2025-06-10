@@ -15,25 +15,25 @@ extension ChooseTransferRecipient.State {
 	}
 
 	var validatedManualRecipientValidation: ManualRecipientValidation {
-		guard !manualTransferRecipient.isEmpty else {
+		guard !sanitizedManualTransferRecipient.isEmpty else {
 			return .invalidAccountAddress
 		}
 
-		if manualTransferRecipient.isRnsDomain {
+		if sanitizedManualTransferRecipient.isRnsDomain {
 			do {
-				let domain = try rnsDomainValidated(domain: manualTransferRecipient)
+				let domain = try rnsDomainValidated(domain: sanitizedManualTransferRecipient)
 				return .valid(.rnsDomain(domain))
 			} catch {
 				return .invalidRnsDomain
 			}
 		}
 
-		guard !chooseAccounts.filteredAccounts.contains(where: { $0.address == manualTransferRecipient })
+		guard !chooseAccounts.filteredAccounts.contains(where: { $0.address == sanitizedManualTransferRecipient })
 		else {
 			return .invalidAccountAddress
 		}
 		guard
-			let addressOnSomeNetwork = try? AccountAddress(validatingAddress: manualTransferRecipient)
+			let addressOnSomeNetwork = try? AccountAddress(validatingAddress: sanitizedManualTransferRecipient)
 		else {
 			return .invalidAccountAddress
 		}
