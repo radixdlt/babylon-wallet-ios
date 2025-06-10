@@ -38,6 +38,7 @@ extension Main {
 				if isOnMainnet {
 					dAppDirectoryTab
 				}
+				discoverTab
 				settingsTab
 			}
 			.toolbarBackground(.visible, for: .tabBar)
@@ -70,6 +71,15 @@ extension Main {
 				Label(L10n.HomePage.Tab.settings, image: .settings)
 			}
 		}
+
+		var discoverTab: some SwiftUI.View {
+			NavigationStack {
+				Discover.View(store: store.discover)
+			}
+			.tabItem {
+				Label("Discover", image: .settings)
+			}
+		}
 	}
 }
 
@@ -88,5 +98,9 @@ private extension StoreOf<Main> {
 
 	var dAppDirectory: StoreOf<DAppsDirectory> {
 		scope(state: \.dAppsDirectory, action: \.child.dAppsDirectory)
+	}
+
+	var discover: StoreOf<Discover> {
+		scope(state: \.discover, action: \.child.discover)
 	}
 }

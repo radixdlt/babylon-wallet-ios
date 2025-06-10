@@ -5,8 +5,9 @@ struct Main: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		// MARK: - Components
 		var home: Home.State
-		var settings: Settings.State
 		var dAppsDirectory: DAppsDirectory.State
+		var discover: Discover.State
+		var settings: Settings.State
 
 		var isOnMainnet = true
 
@@ -23,8 +24,9 @@ struct Main: Sendable, FeatureReducer {
 	@CasePathable
 	enum ChildAction: Sendable, Equatable {
 		case home(Home.Action)
-		case settings(Settings.Action)
 		case dAppsDirectory(DAppsDirectory.Action)
+		case discover(Discover.Action)
+		case settings(Settings.Action)
 	}
 
 	@CasePathable
@@ -46,11 +48,14 @@ struct Main: Sendable, FeatureReducer {
 		Scope(state: \.home, action: \.child.home) {
 			Home()
 		}
-		Scope(state: \.settings, action: \.child.settings) {
-			Settings()
-		}
 		Scope(state: \.dAppsDirectory, action: \.child.dAppsDirectory) {
 			DAppsDirectory()
+		}
+		Scope(state: \.discover, action: \.child.discover) {
+			Discover()
+		}
+		Scope(state: \.settings, action: \.child.settings) {
+			Settings()
 		}
 
 		Reduce(core)

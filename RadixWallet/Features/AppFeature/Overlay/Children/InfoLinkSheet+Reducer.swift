@@ -29,7 +29,7 @@ struct InfoLinkSheet: FeatureReducer {
 
 // MARK: InfoLinkSheet.GlossaryItem
 extension InfoLinkSheet {
-	enum GlossaryItem: String, Sendable {
+	enum GlossaryItem: String, Sendable, CaseIterable {
 		case tokens
 		case nfts
 		case networkstaking
