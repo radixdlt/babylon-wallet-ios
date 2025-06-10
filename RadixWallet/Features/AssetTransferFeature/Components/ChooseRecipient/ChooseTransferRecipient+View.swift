@@ -73,7 +73,7 @@ extension ChooseTransferRecipient.State {
 				return .error(L10n.AssetTransfer.ChooseReceivingAccount.alreadyAddedError)
 			}
 			return .none
-		case let .valid(.rnsDomain(domain)):
+		case .valid(.rnsDomain):
 			return .none
 		}
 	}
@@ -182,5 +182,6 @@ private extension View {
 			ScanQRCoordinator.View(store: $0)
 				.radixToolbar(title: L10n.AssetTransfer.ChooseReceivingAccount.scanQRNavigationTitle, alwaysVisible: false)
 		}
+		.alert(store: destinationStore.scope(state: \.domainResolutionErrorAlert, action: \.domainResolutionErrorAlert))
 	}
 }

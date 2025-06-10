@@ -1743,6 +1743,8 @@ internal enum L10n {
     internal enum Rns {
       /// This XRD domain does not exist, or is not associated to any account.
       internal static let unknownDomain = L10n.tr("Localizable", "error_rns_unknownDomain", fallback: "This XRD domain does not exist, or is not associated to any account.")
+      /// Visit XRD domains
+      internal static let unknownDomainButtonTitle = L10n.tr("Localizable", "error_rns_unknownDomainButtonTitle", fallback: "Visit XRD domains")
     }
     internal enum TransactionFailure {
       /// Your current Ledger settings only allow signing of simple token transfers. Please either enable "verbose mode" (to see full transaction manifests) or "blind signing mode" (to enable signing of complex transaction manifest hashes) on your Ledger app device.
