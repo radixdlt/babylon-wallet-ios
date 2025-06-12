@@ -5,6 +5,8 @@ import SwiftUI
 // MARK: - ChooseTransferRecipient
 @Reducer
 struct ChooseTransferRecipient: Sendable, FeatureReducer {
+	static let xrdDomainsHelp = URL(string: "https://docs.xrd.domains/#/wiki/records/namelets")!
+
 	@ObservableState
 	struct State: Sendable, Hashable {
 		var chooseAccounts: ChooseAccounts.State
@@ -14,6 +16,10 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 					chooseAccounts.selectedAccounts = nil
 				}
 			}
+		}
+
+		var sanitizedManualTransferRecipient: String {
+			manualTransferRecipient.lowercased().trimmingWhitespacesAndNewlines()
 		}
 
 		var manualTransferRecipientFocused: Bool = false
@@ -59,11 +65,13 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
 			case scanTransferRecipient(ScanQRCoordinator.State)
+			case domainResolutionErrorAlert(AlertState<DomainResolutionErrorAlert>)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
 			case scanTransferRecipient(ScanQRCoordinator.Action)
+			case domainResolutionErrorAlert(DomainResolutionErrorAlert)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -73,6 +81,7 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 		}
 	}
 
+	@Dependency(\.openURL) var openURL
 	@Dependency(\.radixNameService) var radixNameService
 	@Dependency(\.errorQueue) var errorQueue
 
@@ -141,8 +150,14 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 
 		case let .rnsDomainConfiguredRecieverResult(.failure(error)):
 			state.isDeterminingRnsDomainRecipient = false
-			errorQueue.schedule(DomainResolutionError(error: error))
-			return .none
+			switch error as? CommonError {
+			case CommonError.GwMissingResponseItem?:
+				state.destination = .domainResolutionErrorAlert(.domainResolutionErrorAlert)
+				return .none
+			default:
+				errorQueue.schedule(DomainResolutionError(error: error))
+				return .none
+			}
 		}
 	}
 
@@ -155,6 +170,11 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 
 			state.manualTransferRecipient = address
 			return .none
+
+		case .domainResolutionErrorAlert(.visitXrdDomain):
+			return .run { _ in
+				await openURL(Self.xrdDomainsHelp)
+			}
 
 		default:
 			return .none
@@ -184,5 +204,27 @@ struct DomainResolutionError: LocalizedError {
 extension String {
 	var isRnsDomain: Bool {
 		self.hasSuffix(".xrd")
+	}
+}
+
+enum DomainResolutionErrorAlert: Sendable, Hashable {
+	case okTapped
+	case visitXrdDomain
+}
+
+extension AlertState<DomainResolutionErrorAlert> {
+	static var domainResolutionErrorAlert: AlertState {
+		AlertState {
+			TextState(L10n.Common.errorAlertTitle)
+		} actions: {
+			ButtonState(role: .cancel, action: .okTapped) {
+				TextState(L10n.Common.ok)
+			}
+			ButtonState(action: .visitXrdDomain) {
+				TextState(L10n.Error.Rns.unknownDomainButtonTitle)
+			}
+		} message: {
+			TextState(L10n.Error.Rns.unknownDomain)
+		}
 	}
 }

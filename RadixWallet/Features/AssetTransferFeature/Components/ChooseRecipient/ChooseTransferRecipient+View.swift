@@ -15,25 +15,25 @@ extension ChooseTransferRecipient.State {
 	}
 
 	var validatedManualRecipientValidation: ManualRecipientValidation {
-		guard !manualTransferRecipient.isEmpty else {
+		guard !sanitizedManualTransferRecipient.isEmpty else {
 			return .invalidAccountAddress
 		}
 
-		if manualTransferRecipient.isRnsDomain {
+		if sanitizedManualTransferRecipient.isRnsDomain {
 			do {
-				let domain = try rnsDomainValidated(domain: manualTransferRecipient)
+				let domain = try rnsDomainValidated(domain: sanitizedManualTransferRecipient)
 				return .valid(.rnsDomain(domain))
 			} catch {
 				return .invalidRnsDomain
 			}
 		}
 
-		guard !chooseAccounts.filteredAccounts.contains(where: { $0.address == manualTransferRecipient })
+		guard !chooseAccounts.filteredAccounts.contains(where: { $0.address == sanitizedManualTransferRecipient })
 		else {
 			return .invalidAccountAddress
 		}
 		guard
-			let addressOnSomeNetwork = try? AccountAddress(validatingAddress: manualTransferRecipient)
+			let addressOnSomeNetwork = try? AccountAddress(validatingAddress: sanitizedManualTransferRecipient)
 		else {
 			return .invalidAccountAddress
 		}
@@ -73,7 +73,7 @@ extension ChooseTransferRecipient.State {
 				return .error(L10n.AssetTransfer.ChooseReceivingAccount.alreadyAddedError)
 			}
 			return .none
-		case let .valid(.rnsDomain(domain)):
+		case .valid(.rnsDomain):
 			return .none
 		}
 	}
@@ -182,5 +182,6 @@ private extension View {
 			ScanQRCoordinator.View(store: $0)
 				.radixToolbar(title: L10n.AssetTransfer.ChooseReceivingAccount.scanQRNavigationTitle, alwaysVisible: false)
 		}
+		.alert(store: destinationStore.scope(state: \.domainResolutionErrorAlert, action: \.domainResolutionErrorAlert))
 	}
 }

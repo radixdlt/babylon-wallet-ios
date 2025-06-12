@@ -10,7 +10,7 @@ struct ValidatedFeePayerCandidate: Sendable, Hashable, Identifiable {
 
 // MARK: - SelectFeePayer
 struct SelectFeePayer: Sendable, FeatureReducer {
-	typealias FeePayerCandidates = NonEmpty<IdentifiedArrayOf<FeePayerCandidate>>
+	typealias FeePayerCandidates = IdentifiedArrayOf<FeePayerCandidate>
 
 	struct State: Sendable, Hashable {
 		let reviewedTransaction: ReviewedTransaction
@@ -77,7 +77,7 @@ struct SelectFeePayer: Sendable, FeatureReducer {
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .feePayerCandidatesLoaded(.success(candidates)):
-			let validated = candidates.rawValue.map { candidate in
+			let validated = candidates.map { candidate in
 				ValidatedFeePayerCandidate(
 					candidate: candidate,
 					outcome: state.reviewedTransaction.validateFeePayer(candidate)
