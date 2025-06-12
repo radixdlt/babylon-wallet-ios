@@ -2537,14 +2537,20 @@ internal enum L10n {
       internal static let xrd = L10n.tr("Localizable", "infoLink_discoverDescription_xrd", fallback: "Native token for fees and transactions.")
     }
     internal enum DiscoverTitle {
-      /// Radix Network
-      internal static let accounts = L10n.tr("Localizable", "infoLink_discoverTitle_accounts", fallback: "Radix Network")
+      /// Accounts
+      internal static let accounts = L10n.tr("Localizable", "infoLink_discoverTitle_accounts", fallback: "Accounts")
+      /// Arculus Card
+      internal static let arculus = L10n.tr("Localizable", "infoLink_discoverTitle_arculus", fallback: "Arculus Card")
       /// Badges
       internal static let badges = L10n.tr("Localizable", "infoLink_discoverTitle_badges", fallback: "Badges")
       /// Asset Behaviors
       internal static let behaviors = L10n.tr("Localizable", "infoLink_discoverTitle_behaviors", fallback: "Asset Behaviors")
+      /// Biometrics/PIN
+      internal static let biometricspin = L10n.tr("Localizable", "infoLink_discoverTitle_biometricspin", fallback: "Biometrics/PIN")
       /// Bridging
       internal static let bridging = L10n.tr("Localizable", "infoLink_discoverTitle_bridging", fallback: "Bridging")
+      /// How Your Security Shield is Built
+      internal static let buildingshield = L10n.tr("Localizable", "infoLink_discoverTitle_buildingshield", fallback: "How Your Security Shield is Built")
       /// Stake Claim NFTs
       internal static let claimnfts = L10n.tr("Localizable", "infoLink_discoverTitle_claimnfts", fallback: "Stake Claim NFTs")
       /// √ Connect Button
@@ -2555,16 +2561,24 @@ internal enum L10n {
       internal static let dashboard = L10n.tr("Localizable", "infoLink_discoverTitle_dashboard", fallback: "Radix Dashboard")
       /// Decentralized Exchange (DEX)
       internal static let dex = L10n.tr("Localizable", "infoLink_discoverTitle_dex", fallback: "Decentralized Exchange (DEX)")
+      /// Emergency Fallback
+      internal static let emergencyfallback = L10n.tr("Localizable", "infoLink_discoverTitle_emergencyfallback", fallback: "Emergency Fallback")
       /// Gateways
       internal static let gateways = L10n.tr("Localizable", "infoLink_discoverTitle_gateways", fallback: "Gateways")
       /// Deposit Guarantees
       internal static let guarantees = L10n.tr("Localizable", "infoLink_discoverTitle_guarantees", fallback: "Deposit Guarantees")
+      /// Ledger Nano
+      internal static let ledgernano = L10n.tr("Localizable", "infoLink_discoverTitle_ledgernano", fallback: "Ledger Nano")
       /// Liquid Stake Unit
       internal static let liquidstakeunits = L10n.tr("Localizable", "infoLink_discoverTitle_liquidstakeunits", fallback: "Liquid Stake Unit")
       /// Network Staking
       internal static let networkstaking = L10n.tr("Localizable", "infoLink_discoverTitle_networkstaking", fallback: "Network Staking")
       /// Non-Fungible Token
       internal static let nfts = L10n.tr("Localizable", "infoLink_discoverTitle_nfts", fallback: "Non-Fungible Token")
+      /// Passphrases
+      internal static let passphrases = L10n.tr("Localizable", "infoLink_discoverTitle_passphrases", fallback: "Passphrases")
+      /// Passwords
+      internal static let passwords = L10n.tr("Localizable", "infoLink_discoverTitle_passwords", fallback: "Passwords")
       /// Paying Account
       internal static let payingaccount = L10n.tr("Localizable", "infoLink_discoverTitle_payingaccount", fallback: "Paying Account")
       /// Personas
@@ -2583,6 +2597,8 @@ internal enum L10n {
       internal static let radixnetwork = L10n.tr("Localizable", "infoLink_discoverTitle_radixnetwork", fallback: "Radix Network")
       /// Radix Wallet
       internal static let radixwallet = L10n.tr("Localizable", "infoLink_discoverTitle_radixwallet", fallback: "Radix Wallet")
+      /// Security Shields
+      internal static let securityshields = L10n.tr("Localizable", "infoLink_discoverTitle_securityshields", fallback: "Security Shields")
       /// Token
       internal static let tokens = L10n.tr("Localizable", "infoLink_discoverTitle_tokens", fallback: "Token")
       /// Transaction Fees

@@ -58,13 +58,13 @@ extension Discover.View {
 	var learnSection: some SwiftUI.View {
 		Section {
 			VStack(spacing: .small1) {
-				ForEach(store.learnItems) { item in
+				ForEach(store.learnItems.prefix(3)) { item in
 					Card(action: {
 						store.send(.view(.learnItemTapped(item)))
 					}) {
 						PlainListRow(
 							title: item.title,
-							subtitle: "Digital assets representing value or utility.",
+							subtitle: item.description,
 							accessory: nil,
 						) {
 							Image(item.icon)
@@ -79,7 +79,8 @@ extension Discover.View {
 			HStack {
 				Text("Learn about").textStyle(.body1Header)
 				Spacer()
-				Text("See More").textStyle(.body2Link)
+				Button("See More") {}
+					.buttonStyle(.blueText)
 			}
 		}
 	}

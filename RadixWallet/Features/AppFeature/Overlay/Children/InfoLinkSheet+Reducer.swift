@@ -68,7 +68,6 @@ extension InfoLinkSheet {
 		case securityshields
 		case buildingshield
 		case emergencyfallback
-		case nohardwaredevice
 	}
 }
 
@@ -101,6 +100,32 @@ extension InfoLinkSheet.GlossaryItem {
 			.fungibleTokens
 		case .xrd:
 			.xrd
+		case .personas:
+			.personas
+		case .dapps:
+			.authorizedDapps
+		case .guarantees:
+			.depositGuarantees
+		case .gateways:
+			.gateway
+		case .radixconnect:
+			.desktopLinkConnector
+		case .connectbutton:
+			.desktopLinkConnector
+		case .claimnfts:
+			.stakes
+		case .radixwallet:
+			.walletAppIcon
+		case .radixconnector:
+			.desktopLinkConnector
+		case .transfers:
+			.transfer
+		case .dashboard:
+			.authorizedDapps
+		case .possibledappcalls:
+			.authorizedDapps
+		case .ledgernano:
+			.ledgerFactor
 		default:
 			nil
 		}
@@ -184,8 +209,6 @@ extension InfoLinkSheet.GlossaryItem {
 			L10n.InfoLink.Glossary.buildingshield
 		case .emergencyfallback:
 			L10n.InfoLink.Glossary.emergencyfallback
-		case .nohardwaredevice:
-			"TODO" // TODO: update
 		}
 	}
 }

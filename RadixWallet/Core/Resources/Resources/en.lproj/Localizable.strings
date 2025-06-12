@@ -1697,6 +1697,7 @@ Code: %@";
 "infoLink_discoverTitle_buildingshield" = "How Your Security Shield is Built";
 "infoLink_discoverTitle_emergencyfallback" = "Emergency Fallback";
 "infoLink_discoverTitle_ledgernano" = "Ledger Nano";
+"infoLink_discoverTitle_biometricspin" = "Biometrics/PIN";
 "infoLink_discoverTitle_passphrases" = "Passphrases";
 "infoLink_discoverTitle_passwords" = "Passwords";
 "infoLink_discoverTitle_securityshields" = "Security Shields";
