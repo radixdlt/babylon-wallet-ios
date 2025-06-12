@@ -77,7 +77,7 @@ extension Main {
 				Discover.View(store: store.discover)
 			}
 			.tabItem {
-				Label("Discover", image: .settings)
+				Label("Discover", systemImage: "safari")
 			}
 		}
 	}

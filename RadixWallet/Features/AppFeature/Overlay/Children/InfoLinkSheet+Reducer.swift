@@ -3,7 +3,7 @@ import Foundation
 // MARK: - InfoLinkSheet
 struct InfoLinkSheet: FeatureReducer {
 	struct State: Sendable, Hashable {
-		let image: ImageAsset?
+		let image: ImageResource?
 		let text: String
 
 		init(glossaryItem: InfoLinkSheet.GlossaryItem) {
@@ -29,7 +29,7 @@ struct InfoLinkSheet: FeatureReducer {
 
 // MARK: InfoLinkSheet.GlossaryItem
 extension InfoLinkSheet {
-	enum GlossaryItem: String, Sendable, CaseIterable {
+	enum GlossaryItem: String, Sendable, CaseIterable, Identifiable {
 		case tokens
 		case nfts
 		case networkstaking
@@ -87,20 +87,20 @@ extension InfoLinkSheet.GlossaryItem {
 		self = item
 	}
 
-	var image: ImageAsset? {
+	var image: ImageResource? {
 		switch self {
 		case .nfts:
-			AssetResource.nft
+			.nft
 		case .networkstaking:
-			AssetResource.stakes
+			.stakes
 		case .badges:
-			AssetResource.iconPackageOwnerBadge
+			.iconPackageOwnerBadge
 		case .poolunits:
-			AssetResource.poolUnits
+			.poolUnits
 		case .tokens:
-			AssetResource.fungibleTokens
+			.fungibleTokens
 		case .xrd:
-			AssetResource.xrd
+			.xrd
 		default:
 			nil
 		}

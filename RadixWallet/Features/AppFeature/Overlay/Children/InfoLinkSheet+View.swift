@@ -37,7 +37,7 @@ extension InfoLinkSheet {
 					ScrollView {
 						VStack(spacing: .zero) {
 							if let image = viewStore.image {
-								Image(asset: image)
+								Image(image)
 									.resizable()
 									.aspectRatio(contentMode: .fit)
 									.frame(width: imageSize.width, height: imageSize.height)

@@ -16,70 +16,70 @@ extension Discover {
 					Separator()
 					ScrollView {
 						VStack(spacing: .medium1) {
-							Section {
-								VStack {
-									ForEach(0 ..< 5) { _ in
-										Card {
-											HStack {
-												Image(asset: AssetResource.stakes)
-
-												Spacer()
-												Image(asset: AssetResource.iconLinkOut)
-													.foregroundColor(.secondaryText)
-											}
-											.padding()
-										}
-									}
-								}
-							} header: {
-								HStack {
-									Text("Socials").textStyle(.body1Header)
-
-									Spacer()
-									Text("See More").textStyle(.body2Link)
-										.foregroundStyle(.textButton)
-								}
-							}
-
-							Section {
-								VStack {
-									ForEach(InfoLinkSheet.GlossaryItem.allCases) { _ in
-										Card {}
-									}
-								}
-							} header: {
-								HStack {
-									Text("Learn")
-										.textStyle(.body1Header)
-									Spacer()
-									Text("See More").textStyle(.body2Link)
-										.foregroundStyle(.textButton)
-								}
-							}
-
-							Section {
-								VStack {
-									ForEach(0 ..< 5) { idx in
-										Card {
-											PlainListRow(title: "\(idx)") {
-												EmptyView()
-											}
-										}
-									}
-								}
-							} header: {
-								HStack {
-									Text("Announcements").textStyle(.body1Header)
-									Spacer()
-									Text("See More").textStyle(.body2Link)
-										.foregroundStyle(.textButton)
-								}
-							}
+							socialsSection
+							learnSection
 						}
 						.padding()
 					}
 					.background(.secondaryBackground)
 				}
+			}
+		}
+	}
+}
+
+extension Discover.View {
+	@ViewBuilder
+	var socialsSection: some SwiftUI.View {
+		Section {
+			VStack(spacing: .small1) {
+				ForEach(store.socialLinks) { link in
+					Card(action: {
+						store.send(.view(.socialLinkTapped(link)))
+					}) {
+						PlainListRow(title: link.description, accessory: .iconLinkOut, icon: {
+							Image(link.platform.icon)
+								.resizable()
+								.scaledToFit()
+								.frame(.small)
+						})
+					}
+				}
+			}
+		} header: {
+			HStack {
+				Text("Socials").textStyle(.body1Header)
+				Spacer()
+			}
+		}
+	}
+
+	@ViewBuilder
+	var learnSection: some SwiftUI.View {
+		Section {
+			VStack(spacing: .small1) {
+				ForEach(store.learnItems) { item in
+					Card(action: {
+						store.send(.view(.learnItemTapped(item)))
+					}) {
+						PlainListRow(
+							title: item.title,
+							subtitle: "Digital assets representing value or utility.",
+							accessory: nil,
+						) {
+							Image(item.icon)
+								.resizable()
+								.scaledToFit()
+								.frame(.small)
+						}
+					}
+				}
+			}
+		} header: {
+			HStack {
+				Text("Learn about").textStyle(.body1Header)
+				Spacer()
+				Text("See More").textStyle(.body2Link)
 			}
 		}
 	}

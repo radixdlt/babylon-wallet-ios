@@ -2458,6 +2458,146 @@ internal enum L10n {
     internal static let title = L10n.tr("Localizable", "importOlympiaLedgerAccounts_title", fallback: "Verify With Ledger Device")
   }
   internal enum InfoLink {
+    internal enum DiscoverDescription {
+      /// Smart accounts for secure asset storage.
+      internal static let accounts = L10n.tr("Localizable", "infoLink_discoverDescription_accounts", fallback: "Smart accounts for secure asset storage.")
+      /// NFC-enabled hardware wallet in card format.
+      internal static let arculus = L10n.tr("Localizable", "infoLink_discoverDescription_arculus", fallback: "NFC-enabled hardware wallet in card format.")
+      /// Tokens or NFTs for authorization in dApps.
+      internal static let badges = L10n.tr("Localizable", "infoLink_discoverDescription_badges", fallback: "Tokens or NFTs for authorization in dApps.")
+      /// Rules defining token or NFT actions.
+      internal static let behaviors = L10n.tr("Localizable", "infoLink_discoverDescription_behaviors", fallback: "Rules defining token or NFT actions.")
+      /// Secure access using biometrics or PIN.
+      internal static let biometricspin = L10n.tr("Localizable", "infoLink_discoverDescription_biometricspin", fallback: "Secure access using biometrics or PIN.")
+      /// Move assets into or out of Radix.
+      internal static let bridging = L10n.tr("Localizable", "infoLink_discoverDescription_bridging", fallback: "Move assets into or out of Radix.")
+      /// Create multi-factor security for assets.
+      internal static let buildingshield = L10n.tr("Localizable", "infoLink_discoverDescription_buildingshield", fallback: "Create multi-factor security for assets.")
+      /// NFTs for pending unstake requests.
+      internal static let claimnfts = L10n.tr("Localizable", "infoLink_discoverDescription_claimnfts", fallback: "NFTs for pending unstake requests.")
+      /// Button to connect wallet to dApps.
+      internal static let connectbutton = L10n.tr("Localizable", "infoLink_discoverDescription_connectbutton", fallback: "Button to connect wallet to dApps.")
+      /// Decentralized apps interacting with your wallet.
+      internal static let dapps = L10n.tr("Localizable", "infoLink_discoverDescription_dapps", fallback: "Decentralized apps interacting with your wallet.")
+      /// Web dApp for network data and staking.
+      internal static let dashboard = L10n.tr("Localizable", "infoLink_discoverDescription_dashboard", fallback: "Web dApp for network data and staking.")
+      /// Instant token swaps via decentralized exchanges.
+      internal static let dex = L10n.tr("Localizable", "infoLink_discoverDescription_dex", fallback: "Instant token swaps via decentralized exchanges.")
+      /// Time-based recovery for lost factors.
+      internal static let emergencyfallback = L10n.tr("Localizable", "infoLink_discoverDescription_emergencyfallback", fallback: "Time-based recovery for lost factors.")
+      /// Connect your wallet to Radix networks.
+      internal static let gateways = L10n.tr("Localizable", "infoLink_discoverDescription_gateways", fallback: "Connect your wallet to Radix networks.")
+      /// Set minimum deposits to guard against fluctuations.
+      internal static let guarantees = L10n.tr("Localizable", "infoLink_discoverDescription_guarantees", fallback: "Set minimum deposits to guard against fluctuations.")
+      /// USB hardware wallet for secure transactions.
+      internal static let ledgernano = L10n.tr("Localizable", "infoLink_discoverDescription_ledgernano", fallback: "USB hardware wallet for secure transactions.")
+      /// Tokens representing staked XRD.
+      internal static let liquidstakeunits = L10n.tr("Localizable", "infoLink_discoverDescription_liquidstakeunits", fallback: "Tokens representing staked XRD.")
+      /// Stake XRD to secure the network and earn rewards.
+      internal static let networkstaking = L10n.tr("Localizable", "infoLink_discoverDescription_networkstaking", fallback: "Stake XRD to secure the network and earn rewards.")
+      /// Unique digital assets for art or collectibles.
+      internal static let nfts = L10n.tr("Localizable", "infoLink_discoverDescription_nfts", fallback: "Unique digital assets for art or collectibles.")
+      /// Manually entered 24-word seed phrase.
+      internal static let passphrases = L10n.tr("Localizable", "infoLink_discoverDescription_passphrases", fallback: "Manually entered 24-word seed phrase.")
+      /// Decentralized passwords for extra security.
+      internal static let passwords = L10n.tr("Localizable", "infoLink_discoverDescription_passwords", fallback: "Decentralized passwords for extra security.")
+      /// Account used to pay transaction fees.
+      internal static let payingaccount = L10n.tr("Localizable", "infoLink_discoverDescription_payingaccount", fallback: "Account used to pay transaction fees.")
+      /// Web3 identifiers for secure dApp authentication.
+      internal static let personas = L10n.tr("Localizable", "infoLink_discoverDescription_personas", fallback: "Web3 identifiers for secure dApp authentication.")
+      /// Tokens representing your share in liquidity pools.
+      internal static let poolunits = L10n.tr("Localizable", "infoLink_discoverDescription_poolunits", fallback: "Tokens representing your share in liquidity pools.")
+      /// Additional actions dApps might add.
+      internal static let possibledappcalls = L10n.tr("Localizable", "infoLink_discoverDescription_possibledappcalls", fallback: "Additional actions dApps might add.")
+      /// User-approved actions for dApps.
+      internal static let preauthorizations = L10n.tr("Localizable", "infoLink_discoverDescription_preauthorizations", fallback: "User-approved actions for dApps.")
+      /// Bridge your wallet with desktop dApps securely.
+      internal static let radixconnect = L10n.tr("Localizable", "infoLink_discoverDescription_radixconnect", fallback: "Bridge your wallet with desktop dApps securely.")
+      /// Browser extension linking wallet to dApps.
+      internal static let radixconnector = L10n.tr("Localizable", "infoLink_discoverDescription_radixconnector", fallback: "Browser extension linking wallet to dApps.")
+      /// Decentralized platform for secure asset ownership.
+      internal static let radixnetwork = L10n.tr("Localizable", "infoLink_discoverDescription_radixnetwork", fallback: "Decentralized platform for secure asset ownership.")
+      /// Mobile app for managing Radix assets.
+      internal static let radixwallet = L10n.tr("Localizable", "infoLink_discoverDescription_radixwallet", fallback: "Mobile app for managing Radix assets.")
+      /// Multi-factor protection for accounts and recovery.
+      internal static let securityshields = L10n.tr("Localizable", "infoLink_discoverDescription_securityshields", fallback: "Multi-factor protection for accounts and recovery.")
+      /// Digital assets representing value or utility.
+      internal static let tokens = L10n.tr("Localizable", "infoLink_discoverDescription_tokens", fallback: "Digital assets representing value or utility.")
+      /// Small XRD fee for network operations.
+      internal static let transactionfee = L10n.tr("Localizable", "infoLink_discoverDescription_transactionfee", fallback: "Small XRD fee for network operations.")
+      /// Instructions for moving assets on the network.
+      internal static let transactions = L10n.tr("Localizable", "infoLink_discoverDescription_transactions", fallback: "Instructions for moving assets on the network.")
+      /// Move tokens or NFTs between accounts.
+      internal static let transfers = L10n.tr("Localizable", "infoLink_discoverDescription_transfers", fallback: "Move tokens or NFTs between accounts.")
+      /// Nodes securing the Radix Network.
+      internal static let validators = L10n.tr("Localizable", "infoLink_discoverDescription_validators", fallback: "Nodes securing the Radix Network.")
+      /// Decentralized internet with user-owned assets.
+      internal static let web3 = L10n.tr("Localizable", "infoLink_discoverDescription_web3", fallback: "Decentralized internet with user-owned assets.")
+      /// Native token for fees and transactions.
+      internal static let xrd = L10n.tr("Localizable", "infoLink_discoverDescription_xrd", fallback: "Native token for fees and transactions.")
+    }
+    internal enum DiscoverTitle {
+      /// Radix Network
+      internal static let accounts = L10n.tr("Localizable", "infoLink_discoverTitle_accounts", fallback: "Radix Network")
+      /// Badges
+      internal static let badges = L10n.tr("Localizable", "infoLink_discoverTitle_badges", fallback: "Badges")
+      /// Asset Behaviors
+      internal static let behaviors = L10n.tr("Localizable", "infoLink_discoverTitle_behaviors", fallback: "Asset Behaviors")
+      /// Bridging
+      internal static let bridging = L10n.tr("Localizable", "infoLink_discoverTitle_bridging", fallback: "Bridging")
+      /// Stake Claim NFTs
+      internal static let claimnfts = L10n.tr("Localizable", "infoLink_discoverTitle_claimnfts", fallback: "Stake Claim NFTs")
+      /// √ Connect Button
+      internal static let connectbutton = L10n.tr("Localizable", "infoLink_discoverTitle_connectbutton", fallback: "√ Connect Button")
+      /// dApps
+      internal static let dapps = L10n.tr("Localizable", "infoLink_discoverTitle_dapps", fallback: "dApps")
+      /// Radix Dashboard
+      internal static let dashboard = L10n.tr("Localizable", "infoLink_discoverTitle_dashboard", fallback: "Radix Dashboard")
+      /// Decentralized Exchange (DEX)
+      internal static let dex = L10n.tr("Localizable", "infoLink_discoverTitle_dex", fallback: "Decentralized Exchange (DEX)")
+      /// Gateways
+      internal static let gateways = L10n.tr("Localizable", "infoLink_discoverTitle_gateways", fallback: "Gateways")
+      /// Deposit Guarantees
+      internal static let guarantees = L10n.tr("Localizable", "infoLink_discoverTitle_guarantees", fallback: "Deposit Guarantees")
+      /// Liquid Stake Unit
+      internal static let liquidstakeunits = L10n.tr("Localizable", "infoLink_discoverTitle_liquidstakeunits", fallback: "Liquid Stake Unit")
+      /// Network Staking
+      internal static let networkstaking = L10n.tr("Localizable", "infoLink_discoverTitle_networkstaking", fallback: "Network Staking")
+      /// Non-Fungible Token
+      internal static let nfts = L10n.tr("Localizable", "infoLink_discoverTitle_nfts", fallback: "Non-Fungible Token")
+      /// Paying Account
+      internal static let payingaccount = L10n.tr("Localizable", "infoLink_discoverTitle_payingaccount", fallback: "Paying Account")
+      /// Personas
+      internal static let personas = L10n.tr("Localizable", "infoLink_discoverTitle_personas", fallback: "Personas")
+      /// Pool Units
+      internal static let poolunits = L10n.tr("Localizable", "infoLink_discoverTitle_poolunits", fallback: "Pool Units")
+      /// Possible dApp Calls
+      internal static let possibledappcalls = L10n.tr("Localizable", "infoLink_discoverTitle_possibledappcalls", fallback: "Possible dApp Calls")
+      /// Pre-authorizations
+      internal static let preauthorizations = L10n.tr("Localizable", "infoLink_discoverTitle_preauthorizations", fallback: "Pre-authorizations")
+      /// Radix Connect
+      internal static let radixconnect = L10n.tr("Localizable", "infoLink_discoverTitle_radixconnect", fallback: "Radix Connect")
+      /// Radix Connector Browser Extension
+      internal static let radixconnector = L10n.tr("Localizable", "infoLink_discoverTitle_radixconnector", fallback: "Radix Connector Browser Extension")
+      /// Radix Network
+      internal static let radixnetwork = L10n.tr("Localizable", "infoLink_discoverTitle_radixnetwork", fallback: "Radix Network")
+      /// Radix Wallet
+      internal static let radixwallet = L10n.tr("Localizable", "infoLink_discoverTitle_radixwallet", fallback: "Radix Wallet")
+      /// Token
+      internal static let tokens = L10n.tr("Localizable", "infoLink_discoverTitle_tokens", fallback: "Token")
+      /// Transaction Fees
+      internal static let transactionfee = L10n.tr("Localizable", "infoLink_discoverTitle_transactionfee", fallback: "Transaction Fees")
+      /// Transactions
+      internal static let transactions = L10n.tr("Localizable", "infoLink_discoverTitle_transactions", fallback: "Transactions")
+      /// Asset Transfers
+      internal static let transfers = L10n.tr("Localizable", "infoLink_discoverTitle_transfers", fallback: "Asset Transfers")
+      /// Radix Network Validators
+      internal static let validators = L10n.tr("Localizable", "infoLink_discoverTitle_validators", fallback: "Radix Network Validators")
+      /// Web3
+      internal static let web3 = L10n.tr("Localizable", "infoLink_discoverTitle_web3", fallback: "Web3")
+      /// XRD Token
+      internal static let xrd = L10n.tr("Localizable", "infoLink_discoverTitle_xrd", fallback: "XRD Token")
+    }
     internal enum Glossary {
       /// ## Radix Accounts
       /// 
@@ -2801,7 +2941,7 @@ internal enum L10n {
       /// 
       /// Security Shields give users multi-factor access to their [Accounts](?glossaryAnchor=accounts) and [Personas](?glossaryAnchor=personas) while maintaining decentralization and full self-custody. They provide 2 critical functions. They allow users to rely on more than 1 security factor for regular access and for recoveries in the event that another security factor is lost.
       /// 
-      /// The process to create a Shield is simple and once it’s finished, it can be applied to Accounts and Personas on the [Radix Network](?glossaryAnchor=radixnetwork) itself, providing robust and reliable security without compromising true trustless decentralization. There are no central servers that hold your Security Shield or secret keys – on Radix, it’s all done on the blockchain directly, so you're always in control. It's "your keys, your crypto", but without being stuck with 1 key you can't change.
+      /// The process to create a Shield is simple and once it’s finished, it can be applied to Accounts and Personas on the [Radix Network](?glossaryAnchor=radixnetwork) itself, providing robust and reliable security without compromising true trustless decentralization. There are no central servers that hold your Security Shield or secret keys – on Radix, it’s all done on the blockchain directly, so you're always in control. It's "your keys, your crypto"; but without being stuck with 1 key you can't change.
       /// 
       /// ---
       /// 
@@ -2824,7 +2964,7 @@ internal enum L10n {
       /// You can choose the time period for your emergency fallback factor. Make sure you choose a time period long enough that you'll be likely to open your [Radix Wallet](?glossaryAnchor=radixwallet) and cancel the recovery if anyone ever steals 1 of your factors and attempts to take control of your Accounts and Personas.
       /// 
       /// Your Radix Wallet will help you build your Security Shield and once it’s finished, you’ll need to sign some transactions to apply it on the Radix Network to the Accounts and Personas of your choice.
-      internal static let securityshields = L10n.tr("Localizable", "infoLink_glossary_securityshields", fallback: "## Security Shields\n\nSecurity Shields give users multi-factor access to their [Accounts](?glossaryAnchor=accounts) and [Personas](?glossaryAnchor=personas) while maintaining decentralization and full self-custody. They provide 2 critical functions. They allow users to rely on more than 1 security factor for regular access and for recoveries in the event that another security factor is lost.\n\nThe process to create a Shield is simple and once it’s finished, it can be applied to Accounts and Personas on the [Radix Network](?glossaryAnchor=radixnetwork) itself, providing robust and reliable security without compromising true trustless decentralization. There are no central servers that hold your Security Shield or secret keys – on Radix, it’s all done on the blockchain directly, so you're always in control. It's \"your keys, your crypto\", but without being stuck with 1 key you can't change.\n\n---\n\nShields are made up of 2 groups of factors.\n\n**Regular Access**\n\nThis part of your Security Shield defines the factors you'll use for normal usage, like signing [transactions](?glossaryAnchor=transactions) to withdrawing assets from your Accounts.\n\nWhen choosing your factors for regular access, consider how often you’ll be using them. If it’s every day, choose ones you can access easily. A single factor can be used, but it's recommended to use more than one for additional security. For example, a [password](?glossaryAnchor=passwords) is an easy second factor to add security for more sensitive Accounts.\n\nFor convenience, you'll also choose a single factor you'll use to prove ownerhip – like when you log in to [dApps](?glossaryAnchor=dapps) or if they request access to your Accounts.\n\n**Recovery**\n\nThis part of your Security Shield is made up of the factors that help you recover access to shielded Accounts and Personas in the event that you lose access to them or want to transfer control. For example, if you move your wallet to a new phone, you'll use the Shield's recovery feature to change the biometrics/PIN factor to a new one on your new phone.\n\nYou'll need to choose 1 or more factors that can start a recovery and 1 or more factors that can confirm the recovery. In most cases, you'll start and confirm the recovery in a single step, but in the worst case, a timed \"emergency fallback\" will let you start a recovery with just 1 factor and confirm it after a safe delay.\n\nYou can choose the time period for your emergency fallback factor. Make sure you choose a time period long enough that you'll be likely to open your [Radix Wallet](?glossaryAnchor=radixwallet) and cancel the recovery if anyone ever steals 1 of your factors and attempts to take control of your Accounts and Personas.\n\nYour Radix Wallet will help you build your Security Shield and once it’s finished, you’ll need to sign some transactions to apply it on the Radix Network to the Accounts and Personas of your choice.")
+      internal static let securityshields = L10n.tr("Localizable", "infoLink_glossary_securityshields", fallback: "## Security Shields\n\nSecurity Shields give users multi-factor access to their [Accounts](?glossaryAnchor=accounts) and [Personas](?glossaryAnchor=personas) while maintaining decentralization and full self-custody. They provide 2 critical functions. They allow users to rely on more than 1 security factor for regular access and for recoveries in the event that another security factor is lost.\n\nThe process to create a Shield is simple and once it’s finished, it can be applied to Accounts and Personas on the [Radix Network](?glossaryAnchor=radixnetwork) itself, providing robust and reliable security without compromising true trustless decentralization. There are no central servers that hold your Security Shield or secret keys – on Radix, it’s all done on the blockchain directly, so you're always in control. It's \"your keys, your crypto\"; but without being stuck with 1 key you can't change.\n\n---\n\nShields are made up of 2 groups of factors.\n\n**Regular Access**\n\nThis part of your Security Shield defines the factors you'll use for normal usage, like signing [transactions](?glossaryAnchor=transactions) to withdrawing assets from your Accounts.\n\nWhen choosing your factors for regular access, consider how often you’ll be using them. If it’s every day, choose ones you can access easily. A single factor can be used, but it's recommended to use more than one for additional security. For example, a [password](?glossaryAnchor=passwords) is an easy second factor to add security for more sensitive Accounts.\n\nFor convenience, you'll also choose a single factor you'll use to prove ownerhip – like when you log in to [dApps](?glossaryAnchor=dapps) or if they request access to your Accounts.\n\n**Recovery**\n\nThis part of your Security Shield is made up of the factors that help you recover access to shielded Accounts and Personas in the event that you lose access to them or want to transfer control. For example, if you move your wallet to a new phone, you'll use the Shield's recovery feature to change the biometrics/PIN factor to a new one on your new phone.\n\nYou'll need to choose 1 or more factors that can start a recovery and 1 or more factors that can confirm the recovery. In most cases, you'll start and confirm the recovery in a single step, but in the worst case, a timed \"emergency fallback\" will let you start a recovery with just 1 factor and confirm it after a safe delay.\n\nYou can choose the time period for your emergency fallback factor. Make sure you choose a time period long enough that you'll be likely to open your [Radix Wallet](?glossaryAnchor=radixwallet) and cancel the recovery if anyone ever steals 1 of your factors and attempts to take control of your Accounts and Personas.\n\nYour Radix Wallet will help you build your Security Shield and once it’s finished, you’ll need to sign some transactions to apply it on the Radix Network to the Accounts and Personas of your choice.")
       /// ## Token
       /// 
       /// Token is the general term for any kind of web3 asset that you can hold in a crypto wallet.
