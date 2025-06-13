@@ -98,7 +98,7 @@ extension Discover {
 		let id: InfoLinkSheet.GlossaryItem
 		let icon: ImageResource
 		let title: String
-		let description: String
+		var description: String
 
 		init(glossaryItem: InfoLinkSheet.GlossaryItem) {
 			self.id = glossaryItem

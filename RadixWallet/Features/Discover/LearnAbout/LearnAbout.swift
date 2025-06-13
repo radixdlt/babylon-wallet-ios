@@ -7,6 +7,34 @@ extension Discover {
 			let learnItems: IdentifiedArrayOf<LearnItem>
 			var searchBarFocused: Bool = false
 			var searchTerm: String = ""
+
+			var displayedItems: IdentifiedArrayOf<LearnItem> {
+				guard !searchTerm.isEmpty else {
+					return learnItems
+				}
+
+				let searchTermWords = searchTerm.split(separator: " ")
+
+				let titleMatches = learnItems.filter {
+					$0.title.localizedCaseInsensitiveContains(searchTerm)
+				}
+
+				let descriptionMatches = learnItems.filter {
+					$0.description.localizedCaseInsensitiveContains(searchTerm)
+				}
+
+				let contentSearchTermMatches = learnItems.compactMap {
+					$0.id.string.localizedStandardContains(searchTerm)
+				}
+
+				let contentWordMatches = learnItems.filter { item in
+					searchTermWords.allSatisfy { word in
+						item.id.string.localizedCaseInsensitiveContains(word)
+					}
+				}
+
+				return titleMatches + descriptionMatches + contentSearchTermMatches + contentWordMatches
+			}
 		}
 
 		typealias Action = FeatureAction<Self>

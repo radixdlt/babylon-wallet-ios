@@ -25,7 +25,7 @@ extension Discover.LearnAbout.View {
 	func learnItemsView() -> some SwiftUI.View {
 		ScrollView {
 			VStack(spacing: .small1) {
-				ForEach(store.learnItems) { item in
+				ForEach(store.displayedItems) { item in
 					Card(action: {
 						store.send(.view(.learnItemTapped(item)))
 					}) {
