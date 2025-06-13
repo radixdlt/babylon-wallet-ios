@@ -23,7 +23,7 @@ extension Discover {
 					$0.description.localizedCaseInsensitiveContains(searchTerm)
 				}
 
-				let contentSearchTermMatches = learnItems.compactMap {
+				let contentSearchTermMatches = learnItems.filter {
 					$0.id.string.localizedStandardContains(searchTerm)
 				}
 
