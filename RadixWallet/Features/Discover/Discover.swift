@@ -3,7 +3,8 @@
 struct Discover: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
-		init() {}
+		@Presents
+		var destination: Destination.State? = nil
 	}
 
 	typealias Action = FeatureAction<Self>
@@ -12,13 +13,37 @@ struct Discover: Sendable, FeatureReducer {
 		case appeared
 		case socialLinkTapped(SocialLink)
 		case learnItemTapped(LearnItem)
+		case seeMoreLearnItemsTapped
+	}
+
+	struct Destination: DestinationReducer {
+		@CasePathable
+		enum State: Hashable, Sendable {
+			case learnAbout(LearnAbout.State)
+		}
+
+		@CasePathable
+		enum Action: Equatable, Sendable {
+			case learnAbout(LearnAbout.Action)
+		}
+
+		var body: some ReducerOf<Self> {
+			Scope(state: \.learnAbout, action: \.learnAbout) {
+				LearnAbout()
+			}
+		}
 	}
 
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
+
 	var body: some ReducerOf<Self> {
 		Reduce(core)
+			.ifLet(destinationPath, action: \.destination) {
+				Destination()
+			}
 	}
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
@@ -31,6 +56,9 @@ struct Discover: Sendable, FeatureReducer {
 			}
 		case let .learnItemTapped(item):
 			overlayWindowClient.showInfoLink(.init(glossaryItem: item.id))
+			return .none
+		case .seeMoreLearnItemsTapped:
+			state.destination = .learnAbout(.init(learnItems: state.learnItems))
 			return .none
 		}
 	}
@@ -66,7 +94,7 @@ extension Discover {
 		let url: URL
 	}
 
-	struct LearnItem: Identifiable, Equatable, Sendable {
+	struct LearnItem: Identifiable, Hashable, Equatable, Sendable {
 		let id: InfoLinkSheet.GlossaryItem
 		let icon: ImageResource
 		let title: String

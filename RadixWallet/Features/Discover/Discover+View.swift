@@ -23,6 +23,7 @@ extension Discover {
 					}
 					.background(.secondaryBackground)
 				}
+				.destinations(store: store)
 			}
 		}
 	}
@@ -79,9 +80,21 @@ extension Discover.View {
 			HStack {
 				Text("Learn about").textStyle(.body1Header)
 				Spacer()
-				Button("See More") {}
-					.buttonStyle(.blueText)
+				Button("See More") {
+					store.send(.view(.seeMoreLearnItemsTapped))
+				}
+				.buttonStyle(.blueText)
 			}
+		}
+	}
+}
+
+private extension View {
+	func destinations(store: StoreOf<Discover>) -> some View {
+		let destinationStore = store.scope(state: \.$destination, action: \.destination)
+
+		return navigationDestination(store: destinationStore.scope(state: \.learnAbout, action: \.learnAbout)) {
+			Discover.LearnAbout.View(store: $0)
 		}
 	}
 }
