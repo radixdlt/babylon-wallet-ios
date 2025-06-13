@@ -113,7 +113,7 @@ extension InfoLinkSheet.GlossaryItem {
 		case .connectbutton:
 			.desktopLinkConnector
 		case .claimnfts:
-			.stakes
+			.nft
 		case .radixwallet:
 			.walletAppIcon
 		case .radixconnector:
@@ -126,6 +126,14 @@ extension InfoLinkSheet.GlossaryItem {
 			.authorizedDapps
 		case .ledgernano:
 			.ledgerFactor
+		case .liquidstakeunits:
+			.fungibleTokens
+		case .validators:
+			.iconValidator
+		case .passphrases:
+			.passphraseFactor
+		case .biometricspin:
+			.deviceFactor
 		default:
 			nil
 		}
