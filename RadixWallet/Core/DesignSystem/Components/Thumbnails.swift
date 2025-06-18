@@ -169,13 +169,13 @@ extension Thumbnail {
 /// A helper view that handles the loading state, and potentially the error state
 struct LoadableImage<Placeholder: View>: View {
 	let url: URL?
-	let sizingBehaviour: LoadableImageSize
+	let sizingBehaviour: LoadableImageSize?
 	let placeholderBehaviour: LoadableImagePlaceholderBehaviour
 	let placeholder: Placeholder
 
 	init(
 		url: URL?,
-		size sizingBehaviour: LoadableImageSize,
+		size sizingBehaviour: LoadableImageSize?,
 		placeholders placeholderBehaviour: LoadableImagePlaceholderBehaviour = .default,
 		placeholder: () -> Placeholder
 	) {
@@ -186,9 +186,9 @@ struct LoadableImage<Placeholder: View>: View {
 			} else {
 				@Dependency(\.urlFormatterClient) var urlFormatterClient
 				switch sizingBehaviour {
-				case let .fixedSize(hitTargetSize, _):
+				case let .fixedSize(hitTargetSize, _)?:
 					self.url = urlFormatterClient.fixedSizeImage(url, Screen.pixelScale * hitTargetSize.frame)
-				case .flexible:
+				case .flexible?, .none:
 					self.url = urlFormatterClient.generalImage(url)
 				}
 			}
@@ -203,7 +203,7 @@ struct LoadableImage<Placeholder: View>: View {
 
 	init(
 		url: URL,
-		size sizingBehaviour: LoadableImageSize,
+		size sizingBehaviour: LoadableImageSize?,
 		placeholders placeholderBehaviour: LoadableImagePlaceholderBehaviour = .default
 	) where Placeholder == EmptyView {
 		self.init(url: url, size: sizingBehaviour, placeholders: placeholderBehaviour) {
@@ -233,11 +233,11 @@ struct LoadableImage<Placeholder: View>: View {
 	@ViewBuilder
 	private func imageView(image: NukeUI.Image, imageSize: CGSize?) -> some View {
 		switch sizingBehaviour {
-		case let .fixedSize(size, mode):
+		case let .fixedSize(size, mode)?:
 			image
 				.resizingMode(mode)
 				.frame(width: size.frame.width, height: size.frame.height)
-		case let .flexible(minAspect, maxAspect):
+		case let .flexible(minAspect, maxAspect)?:
 			if let imageSize {
 				let aspect = min(maxAspect, max(imageSize.width / imageSize.height, minAspect))
 				image
@@ -247,6 +247,8 @@ struct LoadableImage<Placeholder: View>: View {
 				image
 					.scaledToFill()
 			}
+		case .none:
+			image
 		}
 	}
 
@@ -254,8 +256,19 @@ struct LoadableImage<Placeholder: View>: View {
 	private var loadingView: some View {
 		switch placeholderBehaviour.loading {
 		case .shimmer:
-			Color.shimmer
-				.shimmer(active: true, config: .accountResourcesLoading)
+			switch sizingBehaviour {
+			case let .fixedSize(size, _):
+				Color.tertiaryBackground
+					.shimmer(active: true, config: .accountResourcesLoading)
+					.frame(width: size.frame.width, height: size.frame.height)
+			case let .flexible(_, maxAspect):
+				Color.tertiaryBackground
+					.shimmer(active: true, config: .accountResourcesLoading)
+					.aspectRatio(maxAspect, contentMode: .fill)
+			case nil:
+				Color.tertiaryBackground
+					.shimmer(active: true, config: .accountResourcesLoading)
+			}
 		case let .color(color):
 			color
 		case let .asset(imageAsset):
@@ -296,9 +309,9 @@ struct LoadableImage<Placeholder: View>: View {
 
 	private var brokenImageSize: (width: CGFloat?, height: CGFloat) {
 		switch sizingBehaviour {
-		case let .fixedSize(size, _):
+		case let .fixedSize(size, _)?:
 			(size.frame.width, size.frame.height)
-		case .flexible:
+		case .flexible?, .none:
 			(nil, .imagePlaceholderHeight)
 		}
 	}
@@ -316,6 +329,7 @@ struct LoadableImagePlaceholderBehaviour {
 	let brokenImage: BrokenImagePlaceholder
 
 	static let `default`: Self = .init()
+	static let shimmer: Self = .init(loading: .shimmer)
 
 	/// `standard` refers to the placeholder supplied when creating the `LoadableImage`
 	init(loading: LoadingPlaceholder = .color(.clear), brokenImage: BrokenImagePlaceholder = .brokenImage) {

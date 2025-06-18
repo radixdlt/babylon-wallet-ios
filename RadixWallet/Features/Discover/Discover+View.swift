@@ -10,16 +10,22 @@ extension Discover {
 				VStack(spacing: .zero) {
 					Text("Discover")
 						.foregroundColor(Color.primaryText)
-						.background(.primaryBackground)
 						.textStyle(.body1Header)
 						.padding(.vertical, .small1)
+						.frame(maxWidth: .infinity)
+						.background(.primaryBackground)
+
 					Separator()
+
 					ScrollView {
 						VStack(spacing: .medium1) {
+							blogPostsSection
 							socialsSection
+								.padding(.horizontal, .medium3)
 							learnSection
+								.padding(.horizontal, .medium3)
 						}
-						.padding()
+						.padding(.vertical, .medium3)
 					}
 					.background(.secondaryBackground)
 				}
@@ -38,7 +44,7 @@ extension Discover.View {
 					Card(action: {
 						store.send(.view(.socialLinkTapped(link)))
 					}) {
-						PlainListRow(title: link.description, accessory: .iconLinkOut, icon: {
+						PlainListRow(title: link.name, subtitle: link.description, accessory: .iconLinkOut, icon: {
 							Image(link.platform.icon)
 								.resizable()
 								.scaledToFit()
@@ -49,7 +55,7 @@ extension Discover.View {
 			}
 		} header: {
 			HStack {
-				Text("Socials").textStyle(.body1Header)
+				Text("Community").textStyle(.body1Header)
 				Spacer()
 			}
 		}
@@ -87,6 +93,23 @@ extension Discover.View {
 			}
 		}
 	}
+
+	@ViewBuilder
+	var blogPostsSection: some SwiftUI.View {
+		Section {
+			Discover.BlogPostsCarousel.View(store: store.scope(state: \.blogPostsCarousel, action: \.child.blogPostsCarousel))
+		} header: {
+			HStack {
+				Text("Blog posts").textStyle(.body1Header)
+				Spacer()
+				Button("See More") {
+					store.send(.view(.seeMoreBlogPostsTapped))
+				}
+				.buttonStyle(.blueText)
+			}
+			.padding(.horizontal, .medium3)
+		}
+	}
 }
 
 private extension View {
@@ -95,6 +118,9 @@ private extension View {
 
 		return navigationDestination(store: destinationStore.scope(state: \.learnAbout, action: \.learnAbout)) {
 			Discover.LearnAbout.View(store: $0)
+		}
+		.navigationDestination(store: destinationStore.scope(state: \.blogPosts, action: \.blogPosts)) {
+			Discover.AllBlogPosts.View(store: $0)
 		}
 	}
 }

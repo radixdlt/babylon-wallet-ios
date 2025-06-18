@@ -42,6 +42,7 @@ extension InfoLinkSheet {
 									.aspectRatio(contentMode: .fit)
 									.frame(width: imageSize.width, height: imageSize.height)
 									.padding(.bottom, .medium2)
+									.foregroundColor(Color.primaryText)
 							}
 
 							let parts = viewStore.parts
