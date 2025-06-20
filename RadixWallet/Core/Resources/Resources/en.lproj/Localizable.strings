@@ -552,6 +552,7 @@
 "common_close" = "Close";
 "common_hiddenAccountsOrPersonas" = "Hidden Accounts or Personas";
 "common_all" = "All";
+"common_searchHint" = "Search...";
 "error_dappRequest_invalidPersonaId" = "Invalid Persona specified by dApp";
 "error_dappRequest_invalidRequest" = "Invalid request";
 "error_profileLoad_decodingError" = "Failed to import Radix Wallet backup: %@";
