@@ -16,7 +16,7 @@ extension TransactionClient {
 
 	typealias MyInvolvedEntities = @Sendable (TransactionManifest) async throws -> MyEntitiesInvolvedInTransaction
 	typealias DetermineFeePayer = @Sendable (DetermineFeePayerRequest) async throws -> FeePayerSelectionResult?
-	typealias GetFeePayerCandidates = @Sendable (_ refreshingBalances: Bool) async throws -> NonEmpty<IdentifiedArrayOf<FeePayerCandidate>>
+	typealias GetFeePayerCandidates = @Sendable (_ refreshingBalances: Bool) async throws -> IdentifiedArrayOf<FeePayerCandidate>
 }
 
 extension DependencyValues {

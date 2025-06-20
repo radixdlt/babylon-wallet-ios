@@ -8,12 +8,12 @@ struct ReceivingAccount: Sendable, FeatureReducer {
 		typealias ID = UUID
 		let id = ID()
 
-		var recipient: AccountOrAddressOf?
+		var recipient: TransferRecipient?
 		var assets: IdentifiedArrayOf<ResourceAsset.State>
 		var canBeRemoved: Bool
 
 		init(
-			recipient: AccountOrAddressOf?,
+			recipient: TransferRecipient?,
 			assets: IdentifiedArrayOf<ResourceAsset.State>,
 			canBeRemovedWhenEmpty: Bool
 		) {
@@ -97,7 +97,7 @@ extension ReceivingAccount.State {
 	}
 }
 
-extension AccountOrAddressOf {
+extension TransferRecipient {
 	var isUserAccount: Bool {
 		guard case .profileAccount = self else {
 			return false

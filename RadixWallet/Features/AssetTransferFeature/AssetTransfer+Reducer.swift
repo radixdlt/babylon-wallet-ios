@@ -137,7 +137,7 @@ extension AssetTransfer {
 	private struct InvolvedFungibleResource: Identifiable {
 		struct PerAccountAmount: Identifiable {
 			var amount: Decimal192
-			let recipient: AccountOrAddressOf
+			let recipient: TransferRecipient
 			typealias ID = AccountAddress
 			var id: ID {
 				recipient.accountAddress
@@ -157,7 +157,7 @@ extension AssetTransfer {
 	private struct InvolvedNonFungibleResource: Identifiable {
 		struct PerAccountTokens: Identifiable {
 			var tokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>
-			let recipient: AccountOrAddressOf
+			let recipient: TransferRecipient
 			typealias ID = AccountAddress
 			var id: ID {
 				recipient.accountAddress
@@ -239,9 +239,9 @@ extension AssetTransfer {
 
 func useTryDepositOrAbort(
 	resource: ResourceAddress,
-	into receivingAccount: AccountOrAddressOf
+	into recipient: TransferRecipient
 ) async throws -> Bool {
-	if case let .profileAccount(value: userAccount) = receivingAccount {
+	if case let .profileAccount(value: userAccount) = recipient {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.accountsClient) var accountsClient
 		// Shall never fail, the account has been identified as present in Profile in an
