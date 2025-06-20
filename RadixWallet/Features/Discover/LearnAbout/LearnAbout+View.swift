@@ -24,27 +24,9 @@ extension Discover.LearnAbout.View {
 	@ViewBuilder
 	func learnItemsView() -> some SwiftUI.View {
 		ScrollView {
-			VStack(spacing: .small1) {
-				ForEach(store.displayedItems) { item in
-					Card(action: {
-						store.send(.view(.learnItemTapped(item)))
-					}) {
-						PlainListRow(
-							title: item.title,
-							subtitle: item.description,
-							accessory: nil,
-						) {
-							Image(item.icon)
-								.resizable()
-								.scaledToFit()
-								.frame(.small)
-						}
-					}
-				}
-			}
-			.padding(.horizontal, .medium3)
-			.padding(.vertical, .medium1)
-			.frame(maxWidth: .infinity)
+			Discover.LearnItemsList.View(store: store.scope(state: \.learnItemsList, action: \.child.learnItemsList))
+				.padding(.horizontal, .medium3)
+				.padding(.vertical, .medium1)
 		}
 		.background(.secondaryBackground)
 	}

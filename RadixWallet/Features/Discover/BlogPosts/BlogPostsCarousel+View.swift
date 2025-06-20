@@ -69,7 +69,7 @@ extension Discover.BlogPostsCarousel {
 		@ViewBuilder
 		private func postsView(_ posts: BlogPosts) -> some SwiftUI.View {
 			TabView(selection: $selectedCardIndex) {
-				ForEach(Array(posts.posts.prefix(3).enumerated()), id: \.offset) { idx, post in
+				ForEach(Array(posts.posts.prefix(Self.numberOfDisplayedBlogPosts).enumerated()), id: \.offset) { idx, post in
 					BlogPostCard(post: post, imageSizingBehavior: nil, dropShadow: false)
 						.padding(.horizontal, .medium3)
 						.tag(idx)

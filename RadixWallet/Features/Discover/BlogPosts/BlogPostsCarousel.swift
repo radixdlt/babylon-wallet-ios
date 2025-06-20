@@ -11,13 +11,15 @@ extension Discover {
 
 		enum ViewAction: Sendable, Equatable {
 			case task
+			case refreshButtonTapped
 		}
 
 		enum InternalAction: Sendable, Equatable {
-			case postsLoaded(BlogPosts)
+			case loadPostsResult(TaskResult<BlogPosts>)
 		}
 
 		@Dependency(\.blogPostsClient) var blogPostsClient
+		@Dependency(\.errorQueue) var errorQueue
 
 		var body: some ReducerOf<Self> {
 			Reduce(core)
@@ -26,21 +28,30 @@ extension Discover {
 		func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
 			case .task:
-				state.posts = .loading
-				return .run { send in
-					let posts = try await blogPostsClient.loadBlogPosts()
-					await send(.internal(.postsLoaded(posts)))
-				} catch: { err, _ in
-					print(err.localizedDescription)
+				guard !state.posts.isSuccess else {
+					return .none
 				}
+				return loadBlogPosts(state: &state)
+			case .refreshButtonTapped:
+				return loadBlogPosts(state: &state)
 			}
 		}
 
 		func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 			switch internalAction {
-			case let .postsLoaded(blogPosts):
-				state.posts = .success(blogPosts)
+			case let .loadPostsResult(result):
+				state.posts.refresh(from: .init(result: result))
 				return .none
+			}
+		}
+
+		func loadBlogPosts(state: inout State) -> Effect<Action> {
+			state.posts.refresh(from: .loading)
+			return .run { send in
+				let loadResult = await TaskResult { try await blogPostsClient.loadBlogPosts() }
+				await send(.internal(.loadPostsResult(loadResult)))
+			} catch: { error, _ in
+				errorQueue.schedule(error)
 			}
 		}
 	}

@@ -4,6 +4,7 @@ struct Discover: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
 		var blogPostsCarousel: BlogPostsCarousel.State = .init()
+		var learnItemsList: LearnItemsList.State = .withPreviewItems()
 		@Presents
 		var destination: Destination.State? = nil
 	}
@@ -12,7 +13,6 @@ struct Discover: Sendable, FeatureReducer {
 
 	enum ViewAction: Sendable, Equatable {
 		case socialLinkTapped(SocialLink)
-		case learnItemTapped(LearnItem)
 		case seeMoreLearnItemsTapped
 		case seeMoreBlogPostsTapped
 	}
@@ -20,6 +20,7 @@ struct Discover: Sendable, FeatureReducer {
 	@CasePathable
 	enum ChildAction: Sendable, Equatable {
 		case blogPostsCarousel(BlogPostsCarousel.Action)
+		case learnItemsList(LearnItemsList.Action)
 	}
 
 	struct Destination: DestinationReducer {
@@ -56,6 +57,10 @@ struct Discover: Sendable, FeatureReducer {
 			BlogPostsCarousel()
 		}
 
+		Scope(state: \.learnItemsList, action: \.child.learnItemsList) {
+			LearnItemsList()
+		}
+
 		Reduce(core)
 			.ifLet(destinationPath, action: \.destination) {
 				Destination()
@@ -68,11 +73,8 @@ struct Discover: Sendable, FeatureReducer {
 			return .run { _ in
 				await openURL(link.url)
 			}
-		case let .learnItemTapped(item):
-			overlayWindowClient.showInfoLink(.init(glossaryItem: item.id))
-			return .none
 		case .seeMoreLearnItemsTapped:
-			state.destination = .learnAbout(.init(learnItems: state.learnItems))
+			state.destination = .learnAbout(.init())
 			return .none
 		case .seeMoreBlogPostsTapped:
 			state.destination = .blogPosts(.init())

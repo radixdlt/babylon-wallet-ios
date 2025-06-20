@@ -5,37 +5,10 @@ extension Discover {
 	struct LearnAbout: Sendable, FeatureReducer {
 		@ObservableState
 		struct State: Sendable, Hashable {
-			let learnItems: IdentifiedArrayOf<LearnItem>
+			var learnItemsList: LearnItemsList.State = .withAllItems()
+
 			var searchBarFocused: Bool = false
 			var searchTerm: String = ""
-
-			var displayedItems: IdentifiedArrayOf<LearnItem> {
-				guard !searchTerm.isEmpty else {
-					return learnItems
-				}
-
-				let searchTermWords = searchTerm.split(separator: " ")
-
-				let titleMatches = learnItems.filter {
-					$0.title.localizedCaseInsensitiveContains(searchTerm)
-				}
-
-				let descriptionMatches = learnItems.filter {
-					$0.description.localizedCaseInsensitiveContains(searchTerm)
-				}
-
-				let contentSearchTermMatches = learnItems.filter {
-					$0.id.string.localizedStandardContains(searchTerm)
-				}
-
-				let contentWordMatches = learnItems.filter { item in
-					searchTermWords.allSatisfy { word in
-						item.id.string.localizedCaseInsensitiveContains(word)
-					}
-				}
-
-				return titleMatches + descriptionMatches + contentSearchTermMatches + contentWordMatches
-			}
 		}
 
 		typealias Action = FeatureAction<Self>
@@ -43,13 +16,21 @@ extension Discover {
 		@CasePathable
 		enum ViewAction: Sendable, Equatable {
 			case searchTermChanged(String)
-			case learnItemTapped(LearnItem)
 			case focusChanged(Bool)
+		}
+
+		@CasePathable
+		enum ChildAction: Sendable, Equatable {
+			case learnItemsList(LearnItemsList.Action)
 		}
 
 		@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 		var body: some ReducerOf<Self> {
+			Scope(state: \.learnItemsList, action: \.child.learnItemsList) {
+				LearnItemsList()
+			}
+
 			Reduce(core)
 		}
 
@@ -57,209 +38,44 @@ extension Discover {
 			switch viewAction {
 			case let .searchTermChanged(term):
 				state.searchTerm = term
-				return .none
-			case let .learnItemTapped(item):
-				overlayWindowClient.showInfoLink(.init(glossaryItem: item.id))
-				return .none
+				return updateDisplayedItems(state: &state)
+
 			case let .focusChanged(isFocused):
 				state.searchBarFocused = isFocused
 				return .none
 			}
 		}
-	}
-}
 
-extension Discover.State {
-	var learnItems: IdentifiedArrayOf<Discover.LearnItem> {
-		let unsupported: Set<InfoLinkSheet.GlossaryItem> = [
-			.arculus, .buildingshield, .emergencyfallback, .passwords, .securityshields,
-		]
-		return InfoLinkSheet.GlossaryItem.allCases
-			.filter {
-				!unsupported.contains($0)
+		func updateDisplayedItems(state: inout State) -> Effect<Action> {
+			let searchTerm = state.searchTerm
+			guard !searchTerm.isEmpty else {
+				state.learnItemsList.displayedItems = state.learnItemsList.learnItems
+				return .none
 			}
-			.map(Discover.LearnItem.init)
-			.shuffled()
-			.asIdentified()
-	}
-}
 
-extension Discover {
-	struct LearnItem: Identifiable, Hashable, Equatable, Sendable {
-		let id: InfoLinkSheet.GlossaryItem
-		let icon: ImageResource
-		let title: String
-		var description: String
+			let searchTermWords = state.searchTerm.split(separator: " ")
+			let allLearnItems = state.learnItemsList.learnItems
 
-		init(glossaryItem: InfoLinkSheet.GlossaryItem) {
-			self.id = glossaryItem
-			self.icon = glossaryItem.image ?? .info
-			self.title = glossaryItem.learnItemTitle
-			self.description = glossaryItem.learnItemDescription
-		}
-	}
-}
+			let titleMatches = allLearnItems.filter {
+				$0.title.localizedCaseInsensitiveContains(searchTerm)
+			}
 
-private extension InfoLinkSheet.GlossaryItem {
-	var learnItemTitle: String {
-		switch self {
-		case .tokens:
-			L10n.InfoLink.DiscoverTitle.tokens
-		case .nfts:
-			L10n.InfoLink.DiscoverTitle.nfts
-		case .networkstaking:
-			L10n.InfoLink.DiscoverTitle.networkstaking
-		case .personas:
-			L10n.InfoLink.DiscoverTitle.personas
-		case .dapps:
-			L10n.InfoLink.DiscoverTitle.dapps
-		case .guarantees:
-			L10n.InfoLink.DiscoverTitle.guarantees
-		case .badges:
-			L10n.InfoLink.DiscoverTitle.badges
-		case .poolunits:
-			L10n.InfoLink.DiscoverTitle.poolunits
-		case .gateways:
-			L10n.InfoLink.DiscoverTitle.gateways
-		case .radixconnect:
-			L10n.InfoLink.DiscoverTitle.radixconnect
-		case .transactionfee:
-			L10n.InfoLink.DiscoverTitle.transactionfee
-		case .behaviors:
-			L10n.InfoLink.DiscoverTitle.behaviors
-		case .claimnfts:
-			L10n.InfoLink.DiscoverTitle.claimnfts
-		case .liquidstakeunits:
-			L10n.InfoLink.DiscoverTitle.liquidstakeunits
-		case .radixnetwork:
-			L10n.InfoLink.DiscoverTitle.radixnetwork
-		case .accounts:
-			L10n.InfoLink.DiscoverTitle.accounts
-		case .radixwallet:
-			L10n.InfoLink.DiscoverTitle.radixwallet
-		case .transactions:
-			L10n.InfoLink.DiscoverTitle.transactions
-		case .dex:
-			L10n.InfoLink.DiscoverTitle.dex
-		case .validators:
-			L10n.InfoLink.DiscoverTitle.validators
-		case .radixconnector:
-			L10n.InfoLink.DiscoverTitle.radixconnector
-		case .connectbutton:
-			L10n.InfoLink.DiscoverTitle.connectbutton
-		case .xrd:
-			L10n.InfoLink.DiscoverTitle.xrd
-		case .web3:
-			L10n.InfoLink.DiscoverTitle.web3
-		case .transfers:
-			L10n.InfoLink.DiscoverTitle.transfers
-		case .dashboard:
-			L10n.InfoLink.DiscoverTitle.dashboard
-		case .bridging:
-			L10n.InfoLink.DiscoverTitle.bridging
-		case .payingaccount:
-			L10n.InfoLink.DiscoverTitle.payingaccount
-		case .preauthorizations:
-			L10n.InfoLink.DiscoverTitle.preauthorizations
-		case .possibledappcalls:
-			L10n.InfoLink.DiscoverTitle.possibledappcalls
-		case .biometricspin:
-			L10n.InfoLink.DiscoverTitle.biometricspin
-		case .ledgernano:
-			L10n.InfoLink.DiscoverTitle.ledgernano
-		case .passphrases:
-			L10n.InfoLink.DiscoverTitle.passphrases
-		case .arculus:
-			L10n.InfoLink.DiscoverTitle.arculus
-		case .passwords:
-			L10n.InfoLink.DiscoverTitle.passwords
-		case .securityshields:
-			L10n.InfoLink.DiscoverTitle.securityshields
-		case .buildingshield:
-			L10n.InfoLink.DiscoverTitle.buildingshield
-		case .emergencyfallback:
-			L10n.InfoLink.DiscoverTitle.emergencyfallback
-		}
-	}
+			let descriptionMatches = allLearnItems.filter {
+				$0.description.localizedCaseInsensitiveContains(searchTerm)
+			}
 
-	var learnItemDescription: String {
-		switch self {
-		case .tokens:
-			L10n.InfoLink.DiscoverDescription.tokens
-		case .nfts:
-			L10n.InfoLink.DiscoverDescription.nfts
-		case .networkstaking:
-			L10n.InfoLink.DiscoverDescription.networkstaking
-		case .personas:
-			L10n.InfoLink.DiscoverDescription.personas
-		case .dapps:
-			L10n.InfoLink.DiscoverDescription.dapps
-		case .guarantees:
-			L10n.InfoLink.DiscoverDescription.guarantees
-		case .badges:
-			L10n.InfoLink.DiscoverDescription.badges
-		case .poolunits:
-			L10n.InfoLink.DiscoverDescription.poolunits
-		case .gateways:
-			L10n.InfoLink.DiscoverDescription.gateways
-		case .radixconnect:
-			L10n.InfoLink.DiscoverDescription.radixconnect
-		case .transactionfee:
-			L10n.InfoLink.DiscoverDescription.transactionfee
-		case .behaviors:
-			L10n.InfoLink.DiscoverDescription.behaviors
-		case .claimnfts:
-			L10n.InfoLink.DiscoverDescription.claimnfts
-		case .liquidstakeunits:
-			L10n.InfoLink.DiscoverDescription.liquidstakeunits
-		case .radixnetwork:
-			L10n.InfoLink.DiscoverDescription.radixnetwork
-		case .accounts:
-			L10n.InfoLink.DiscoverDescription.accounts
-		case .radixwallet:
-			L10n.InfoLink.DiscoverDescription.radixwallet
-		case .transactions:
-			L10n.InfoLink.DiscoverDescription.transactions
-		case .dex:
-			L10n.InfoLink.DiscoverDescription.dex
-		case .validators:
-			L10n.InfoLink.DiscoverDescription.validators
-		case .radixconnector:
-			L10n.InfoLink.DiscoverDescription.radixconnector
-		case .connectbutton:
-			L10n.InfoLink.DiscoverDescription.connectbutton
-		case .xrd:
-			L10n.InfoLink.DiscoverDescription.xrd
-		case .web3:
-			L10n.InfoLink.DiscoverDescription.web3
-		case .transfers:
-			L10n.InfoLink.DiscoverDescription.transfers
-		case .dashboard:
-			L10n.InfoLink.DiscoverDescription.dashboard
-		case .bridging:
-			L10n.InfoLink.DiscoverDescription.bridging
-		case .payingaccount:
-			L10n.InfoLink.DiscoverDescription.payingaccount
-		case .preauthorizations:
-			L10n.InfoLink.DiscoverDescription.preauthorizations
-		case .possibledappcalls:
-			L10n.InfoLink.DiscoverDescription.possibledappcalls
-		case .biometricspin:
-			L10n.InfoLink.DiscoverDescription.biometricspin
-		case .ledgernano:
-			L10n.InfoLink.DiscoverDescription.ledgernano
-		case .passphrases:
-			L10n.InfoLink.DiscoverDescription.passphrases
-		case .arculus:
-			L10n.InfoLink.DiscoverDescription.arculus
-		case .passwords:
-			L10n.InfoLink.DiscoverDescription.passwords
-		case .securityshields:
-			L10n.InfoLink.DiscoverDescription.securityshields
-		case .buildingshield:
-			L10n.InfoLink.DiscoverDescription.buildingshield
-		case .emergencyfallback:
-			L10n.InfoLink.DiscoverDescription.emergencyfallback
+			let contentSearchTermMatches = allLearnItems.filter {
+				$0.id.string.localizedStandardContains(searchTerm)
+			}
+
+			let contentWordMatches = allLearnItems.filter { item in
+				searchTermWords.allSatisfy { word in
+					item.id.string.localizedCaseInsensitiveContains(word)
+				}
+			}
+
+			state.learnItemsList.displayedItems = titleMatches + descriptionMatches + contentSearchTermMatches + contentWordMatches
+			return .none
 		}
 	}
 }

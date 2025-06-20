@@ -11,11 +11,15 @@ extension Discover.AllBlogPosts {
 					loadable(
 						store.posts,
 						loadingView: loadingView,
+						errorView: errorView,
 						successContent: successView
 					)
 					.padding()
 				}
 				.onFirstTask { await store.send(.view(.task)).finish() }
+				.refreshable {
+					store.send(.view(.pullToRefreshStarted))
+				}
 			}
 			.background(.secondaryBackground)
 			.radixToolbar(title: "Blog Posts")
@@ -59,8 +63,10 @@ extension Discover.AllBlogPosts {
 					BlogPostCard(post: post, imageSizingBehavior: .flexible(minAspect: 1, maxAspect: 2), dropShadow: true)
 				}
 
-				Button("See all Blog Posts") {}
-					.buttonStyle(.url)
+				Button("See all Blog Posts") {
+					store.send(.view(.viewAllBlogPostsTapped))
+				}
+				.buttonStyle(.url)
 			}
 		}
 	}

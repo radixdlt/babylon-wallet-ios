@@ -64,24 +64,7 @@ extension Discover.View {
 	@ViewBuilder
 	var learnSection: some SwiftUI.View {
 		Section {
-			VStack(spacing: .small1) {
-				ForEach(store.learnItems.prefix(3)) { item in
-					Card(action: {
-						store.send(.view(.learnItemTapped(item)))
-					}) {
-						PlainListRow(
-							title: item.title,
-							subtitle: item.description,
-							accessory: nil,
-						) {
-							Image(item.icon)
-								.resizable()
-								.scaledToFit()
-								.frame(.small)
-						}
-					}
-				}
-			}
+			Discover.LearnItemsList.View(store: store.scope(state: \.learnItemsList, action: \.child.learnItemsList))
 		} header: {
 			HStack {
 				Text("Learn about").textStyle(.body1Header)
