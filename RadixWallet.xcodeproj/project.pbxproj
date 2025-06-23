@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -888,6 +888,7 @@
 		A08BBA752DB232D000534B67 /* LedgerHardwareDevices+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08BBA732DB232D000534B67 /* LedgerHardwareDevices+View.swift */; };
 		A08BBA762DB232D000534B67 /* LedgerHardwareDevices+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08BBA722DB232D000534B67 /* LedgerHardwareDevices+Reducer.swift */; };
 		A08BF04F2DDB67900065766A /* DAppsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08BF04E2DDB67900065766A /* DAppsListView.swift */; };
+		A099C5812E0974C100E4C628 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A099C5802E0974C100E4C628 /* Sargon */; };
 		A09F8FD62DEF4DAA00DB5614 /* RadixNameService+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09F8FD32DEF4DAA00DB5614 /* RadixNameService+Interface.swift */; };
 		A09F8FD72DEF4DAA00DB5614 /* RadixNameService+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09F8FD42DEF4DAA00DB5614 /* RadixNameService+Live.swift */; };
 		A09F8FD82DEF4DAA00DB5614 /* RadixNameService+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09F8FD52DEF4DAA00DB5614 /* RadixNameService+Test.swift */; };
@@ -2800,6 +2801,7 @@
 				48FFFAE12ADC220F00B2B213 /* Tagged in Frameworks */,
 				48FFFAD22ADC218400B2B213 /* Either in Frameworks */,
 				48FFFAA52ADC1F9600B2B213 /* AsyncAlgorithms in Frameworks */,
+				A099C5812E0974C100E4C628 /* Sargon in Frameworks */,
 				83BE7C532D51F40100AF5D28 /* Sargon in Frameworks */,
 				48FFFAF02ADC229900B2B213 /* AnyCodable in Frameworks */,
 				48FFFAF52ADC241A00B2B213 /* BitCollections in Frameworks */,
@@ -7728,6 +7730,7 @@
 				A0323FCF2DC0DCEB00CA31CE /* FirebaseCrashlytics */,
 				A04207F32DE9DDB600FE2947 /* Sargon */,
 				A06323E42DFAC29B00963A1F /* Sargon */,
+				A099C5802E0974C100E4C628 /* Sargon */,
 			);
 			productName = RadixWallet;
 			productReference = 48CFBC4F2ADC106300E77A5C /* Radix Wallet Dev.app */;
@@ -7791,7 +7794,7 @@
 				8318BB172BC8403800057BCB /* XCRemoteSwiftPackageReference "swift-custom-dump" */,
 				A0C673032DA6BD7F0071606B /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */,
 				A0323FCE2DC0DCEB00CA31CE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
-				A06323E32DFAC29B00963A1F /* XCLocalSwiftPackageReference "../sargon" */,
+				A099C57F2E0974C100E4C628 /* XCRemoteSwiftPackageReference "sargon" */,
 			);
 			productRefGroup = 48CFBC502ADC106300E77A5C /* Products */;
 			projectDirPath = "";
@@ -9781,13 +9784,6 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		A06323E32DFAC29B00963A1F /* XCLocalSwiftPackageReference "../sargon" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../sargon;
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCRemoteSwiftPackageReference section */
 		48FFFA972ADC1EEC00B2B213 /* XCRemoteSwiftPackageReference "AsyncExtensions" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -9981,6 +9977,14 @@
 				version = 11.12.0;
 			};
 		};
+		A099C57F2E0974C100E4C628 /* XCRemoteSwiftPackageReference "sargon" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/radixdlt/sargon";
+			requirement = {
+				kind = exactVersion;
+				version = 1.2.20;
+			};
+		};
 		A0C673032DA6BD7F0071606B /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/GhenadieVP/ScreenshotPreventing-iOS";
@@ -10166,6 +10170,11 @@
 		};
 		A08BBA6A2DAE973700534B67 /* Sargon */ = {
 			isa = XCSwiftPackageProductDependency;
+			productName = Sargon;
+		};
+		A099C5802E0974C100E4C628 /* Sargon */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A099C57F2E0974C100E4C628 /* XCRemoteSwiftPackageReference "sargon" */;
 			productName = Sargon;
 		};
 		A0C672FF2DA6BBEA0071606B /* ScreenshotPreventing */ = {

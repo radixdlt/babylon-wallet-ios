@@ -8,9 +8,9 @@ final class MainFeatureTests: TestCase {
 		// given
 		let store = TestStore(initialState: Main.State(
 			home: .previewValue,
-			settings: .init(),
 			dAppsDirectory: .init(),
-			discover: .init()
+			discover: .init(),
+			settings: .init()
 		)) {
 			Main()
 //				.dependency(\.userDefaults, .noop)
