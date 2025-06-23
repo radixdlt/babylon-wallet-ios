@@ -36,7 +36,7 @@ struct BlogPostCard: View {
 	}
 }
 
-extension UIApplication {
+private extension UIApplication {
 	var firstKeyWindow: UIWindow? {
 		UIApplication.shared.connectedScenes
 			.compactMap { $0 as? UIWindowScene }

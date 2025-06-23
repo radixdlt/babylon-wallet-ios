@@ -60,13 +60,13 @@ private func allLearnItems() -> IdentifiedArrayOf<Discover.LearnItemsList.LearnI
 extension Discover.LearnItemsList {
 	struct LearnItem: Identifiable, Hashable, Equatable, Sendable {
 		let id: InfoLinkSheet.GlossaryItem
-		let icon: ImageResource?
+		let icon: ImageSource
 		let title: String
 		var description: String
 
 		init(glossaryItem: InfoLinkSheet.GlossaryItem) {
 			self.id = glossaryItem
-			self.icon = glossaryItem.image
+			self.icon = glossaryItem.image ?? ImageSource.systemImage("info.circle")
 			self.title = glossaryItem.learnItemTitle
 			self.description = glossaryItem.learnItemDescription
 		}

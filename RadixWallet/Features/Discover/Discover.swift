@@ -5,6 +5,7 @@ struct Discover: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		var blogPostsCarousel: BlogPostsCarousel.State = .init()
 		var learnItemsList: LearnItemsList.State = .withPreviewItems()
+
 		@Presents
 		var destination: Destination.State? = nil
 	}
@@ -113,20 +114,20 @@ extension Discover.SocialLink {
 		[
 			.init(
 				platform: .x,
-				name: "Radix X Official",
-				description: "Follow the official Radix X for news, updates, and insights.",
+				name: L10n.Discover.SocialLinks.Twitter.title,
+				description: L10n.Discover.SocialLinks.Twitter.subtitle,
 				url: URL(string: "https://x.com/radixdlt")!
 			),
 			.init(
 				platform: .telegram,
-				name: "Radix Telegram Official",
-				description: "Join the Radix Telegram to chat, ask questions, and get updates.",
+				name: L10n.Discover.SocialLinks.Telegram.title,
+				description: L10n.Discover.SocialLinks.Telegram.subtitle,
 				url: URL(string: "https://t.me/radix_dlt")!
 			),
 			.init(
 				platform: .discord,
-				name: "Radix Discord Official",
-				description: L10n.Troubleshooting.Discord.subtitle,
+				name: L10n.Discover.SocialLinks.Discord.title,
+				description: L10n.Discover.SocialLinks.Discord.subtitle,
 				url: URL(string: "https://go.radixdlt.com/Discord")!
 			),
 		]

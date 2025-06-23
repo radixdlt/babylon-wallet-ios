@@ -29,12 +29,14 @@ extension Discover.BlogPostsCarousel {
 					.aspectRatio(contentMode: .fit)
 					.frame(.small)
 
-				Text("Failed to load blog posts")
+				Text(L10n.Discover.BlogPosts.Failure.title)
 					.foregroundStyle(.primaryText)
 					.textStyle(.body1Header)
 					.padding(.top, .medium3)
-				Button("Tap to refresh") {}
-					.buttonStyle(.secondaryRectangular)
+				Button(L10n.Discover.BlogPosts.Failure.Cta.button) {
+					store.send(.view(.refreshButtonTapped))
+				}
+				.buttonStyle(.secondaryRectangular)
 			}
 			.padding(.top, .medium3)
 			.frame(maxWidth: .infinity)

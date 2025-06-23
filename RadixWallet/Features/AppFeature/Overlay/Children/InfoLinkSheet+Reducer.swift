@@ -3,7 +3,7 @@ import Foundation
 // MARK: - InfoLinkSheet
 struct InfoLinkSheet: FeatureReducer {
 	struct State: Sendable, Hashable {
-		let image: ImageResource?
+		let image: ImageSource?
 		let text: String
 
 		init(glossaryItem: InfoLinkSheet.GlossaryItem) {
@@ -86,54 +86,52 @@ extension InfoLinkSheet.GlossaryItem {
 		self = item
 	}
 
-	var image: ImageResource? {
+	var image: ImageSource? {
 		switch self {
 		case .nfts:
-			.nft
+			.imageResource(.nft)
 		case .networkstaking:
-			.stakes
+			.imageResource(.stakes)
 		case .badges:
-			.iconPackageOwnerBadge
+			.imageResource(.iconPackageOwnerBadge)
 		case .poolunits:
-			.poolUnits
+			.imageResource(.poolUnits)
 		case .tokens:
-			.fungibleTokens
+			.imageResource(.fungibleTokens)
 		case .xrd:
-			.xrd
+			.imageResource(.xrd)
 		case .personas:
-			.personas
+			.imageResource(.personas)
 		case .dapps:
-			.authorizedDapps
+			.imageResource(.authorizedDapps)
 		case .guarantees:
-			.depositGuarantees
+			.imageResource(.depositGuarantees)
 		case .gateways:
-			.gateway
+			.imageResource(.gateway)
 		case .radixconnect:
-			.desktopLinkConnector
+			.imageResource(.desktopLinkConnector)
 		case .connectbutton:
-			.desktopLinkConnector
+			.imageResource(.desktopLinkConnector)
 		case .claimnfts:
-			.nft
+			.imageResource(.nft)
 		case .radixwallet:
-			.walletAppIcon
+			.imageResource(.walletAppIcon)
 		case .radixconnector:
-			.desktopLinkConnector
+			.imageResource(.desktopLinkConnector)
 		case .transfers:
-			.transfer
+			.systemImage("arrow.left.arrow.right")
 		case .dashboard:
-			.authorizedDapps
+			.imageResource(.authorizedDapps)
 		case .possibledappcalls:
-			.authorizedDapps
+			.imageResource(.authorizedDapps)
 		case .ledgernano:
-			.ledgerFactor
+			.imageResource(.ledgerFactor)
 		case .liquidstakeunits:
-			.fungibleTokens
-		case .validators:
-			.iconValidator
+			.imageResource(.fungibleTokens)
 		case .passphrases:
-			.passphraseFactor
+			.imageResource(.passphraseFactor)
 		case .biometricspin:
-			.deviceFactor
+			.imageResource(.deviceFactor)
 		default:
 			nil
 		}

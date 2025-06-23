@@ -1,9 +1,9 @@
 import SwiftUI
 
 // MARK: - ImageSource
-enum ImageSource {
+enum ImageSource: Hashable, Equatable, Sendable {
 	case imageResource(ImageResource)
-	case sytemImage(String)
+	case systemImage(String)
 }
 
 extension Image {
@@ -11,7 +11,7 @@ extension Image {
 		switch source {
 		case let .imageResource(imageResource):
 			self = .init(imageResource)
-		case let .sytemImage(name):
+		case let .systemImage(name):
 			self = .init(systemName: name)
 		}
 	}

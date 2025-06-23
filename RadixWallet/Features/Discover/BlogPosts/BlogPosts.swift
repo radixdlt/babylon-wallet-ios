@@ -8,7 +8,6 @@ extension Discover {
 		@ObservableState
 		struct State: Sendable, Hashable {
 			var posts: Loadable<BlogPosts> = .idle
-			init() {}
 		}
 
 		typealias Action = FeatureAction<Self>

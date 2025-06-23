@@ -13,7 +13,7 @@ extension Discover.LearnAbout {
 					Separator()
 					learnItemsView()
 				}
-				.radixToolbar(title: "Learn About")
+				.radixToolbar(title: L10n.Learn.title)
 				.background(.primaryBackground)
 			}
 		}
@@ -41,7 +41,7 @@ extension Discover.LearnAbout.View {
 
 	private func searchView() -> some SwiftUI.View {
 		AppTextField(
-			placeholder: "Search...",
+			placeholder: L10n.Common.searchHint,
 			text: $store.searchTerm.sending(\.view.searchTermChanged),
 			focus: .on(
 				true,

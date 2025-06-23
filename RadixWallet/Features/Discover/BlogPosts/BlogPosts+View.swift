@@ -22,7 +22,7 @@ extension Discover.AllBlogPosts {
 				}
 			}
 			.background(.secondaryBackground)
-			.radixToolbar(title: "Blog Posts")
+			.radixToolbar(title: L10n.BlogPosts.title)
 		}
 
 		@ViewBuilder
@@ -33,11 +33,11 @@ extension Discover.AllBlogPosts {
 					.aspectRatio(contentMode: .fit)
 					.frame(.small)
 
-				Text(L10n.DappDirectory.Error.heading)
+				Text(L10n.Discover.BlogPosts.Failure.title)
 					.foregroundStyle(.primaryText)
 					.textStyle(.body1Header)
 					.padding(.top, .medium3)
-				Text(L10n.DappDirectory.Error.message)
+				Text(L10n.Dsicover.BlogPosts.Failure.cta)
 					.foregroundStyle(.secondaryText)
 					.textStyle(.body1HighImportance)
 					.padding(.top, .small3)
@@ -63,7 +63,7 @@ extension Discover.AllBlogPosts {
 					BlogPostCard(post: post, imageSizingBehavior: .flexible(minAspect: 1, maxAspect: 2), dropShadow: true)
 				}
 
-				Button("See all Blog Posts") {
+				Button(L10n.Discover.BlogPosts.See.All.Blog.posts) {
 					store.send(.view(.viewAllBlogPostsTapped))
 				}
 				.buttonStyle(.url)

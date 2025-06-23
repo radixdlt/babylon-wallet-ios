@@ -8,7 +8,7 @@ extension Discover {
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				VStack(spacing: .zero) {
-					Text("Discover")
+					Text(L10n.Discover.title)
 						.foregroundColor(Color.primaryText)
 						.textStyle(.body1Header)
 						.padding(.vertical, .small1)
@@ -54,10 +54,9 @@ extension Discover.View {
 				}
 			}
 		} header: {
-			HStack {
-				Text("Community").textStyle(.body1Header)
-				Spacer()
-			}
+			sectionHeader(
+				title: L10n.Discover.CategoryCommunity.title
+			)
 		}
 	}
 
@@ -66,14 +65,10 @@ extension Discover.View {
 		Section {
 			Discover.LearnItemsList.View(store: store.scope(state: \.learnItemsList, action: \.child.learnItemsList))
 		} header: {
-			HStack {
-				Text("Learn about").textStyle(.body1Header)
-				Spacer()
-				Button("See More") {
-					store.send(.view(.seeMoreLearnItemsTapped))
-				}
-				.buttonStyle(.blueText)
-			}
+			sectionHeader(
+				title: L10n.Discover.CategoryLearn.title,
+				seeMoreAction: .seeMoreLearnItemsTapped
+			)
 		}
 	}
 
@@ -82,15 +77,26 @@ extension Discover.View {
 		Section {
 			Discover.BlogPostsCarousel.View(store: store.scope(state: \.blogPostsCarousel, action: \.child.blogPostsCarousel))
 		} header: {
-			HStack {
-				Text("Blog posts").textStyle(.body1Header)
-				Spacer()
-				Button("See More") {
-					store.send(.view(.seeMoreBlogPostsTapped))
+			sectionHeader(
+				title: L10n.Discover.CategoryBlogPosts.title,
+				seeMoreAction: .seeMoreBlogPostsTapped
+			)
+			.padding(.horizontal, .medium3)
+		}
+	}
+
+	@ViewBuilder
+	func sectionHeader(title: String, seeMoreAction: Discover.ViewAction? = nil) -> some SwiftUI.View {
+		HStack {
+			Text(title)
+				.textStyle(.body1Header)
+			Spacer()
+			if let seeMoreAction {
+				Button(L10n.Discover.SeeMore.button) {
+					store.send(.view(seeMoreAction))
 				}
 				.buttonStyle(.blueText)
 			}
-			.padding(.horizontal, .medium3)
 		}
 	}
 }

@@ -17,7 +17,7 @@ extension Discover.LearnItemsList {
 								subtitle: item.description,
 								accessory: nil,
 							) {
-								Image(source: item.icon.map(ImageSource.imageResource) ?? ImageSource.sytemImage("info.circle"))
+								Image(source: item.icon)
 									.resizable()
 									.scaledToFill()
 									.frame(.small)
