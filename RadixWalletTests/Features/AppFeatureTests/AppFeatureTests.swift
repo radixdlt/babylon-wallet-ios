@@ -15,7 +15,12 @@ final class AppFeatureTests: TestCase {
 	func test_removedWallet_whenWalletRemovedFromMainScreen_thenNavigateToOnboarding() async {
 		// given
 		let store = TestStore(
-			initialState: App.State(root: .main(.init(home: .init(), settings: .init(), dAppsDirectory: .init()))),
+			initialState: App.State(root: .main(.init(
+				home: .init(),
+				settings: .init(),
+				dAppsDirectory: .init(),
+				discover: .init()
+			))),
 			reducer: App.init
 		) {
 			$0.gatewaysClient.gatewaysValues = { AsyncLazySequence([.init(current: .mainnet)]).eraseToAnyAsyncSequence() }
