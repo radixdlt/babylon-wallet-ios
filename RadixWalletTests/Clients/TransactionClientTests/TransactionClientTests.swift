@@ -169,7 +169,7 @@ final class TransactionClientTests: TestCase {
 					manifest: TransactionManifest.sample,
 					accountWithdraws: [:]
 				),
-				allFeePayerCandidates: .init(rawValue: .init(uncheckedUniqueElements: allFeePayerCandidates))!,
+				feePayerCandidates: allFeePayerCandidates.asIdentified(),
 				involvedEntities: .init(
 					identitiesRequiringAuth: [],
 					accountsRequiringAuth: OrderedSet(signersAfterAnalysis),

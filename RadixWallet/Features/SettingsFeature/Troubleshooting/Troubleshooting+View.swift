@@ -64,7 +64,7 @@ extension Troubleshooting.View {
 				icon: .asset(.recovery),
 				action: .legacyImportButtonTapped
 			).valid(if: isLegacyImportEnabled),
-			.header(L10n.Troubleshooting.supportAndCommunity),
+			.header(L10n.Troubleshooting.support),
 			.model(
 				title: L10n.Troubleshooting.ContactSupport.title,
 				subtitle: L10n.Troubleshooting.ContactSupport.subtitle,

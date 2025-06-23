@@ -972,6 +972,10 @@ internal enum L10n {
       internal static let updateAccountMetadata = L10n.tr("Localizable", "biometrics_prompt_updateAccountMetadata", fallback: "Update account metadata.")
     }
   }
+  internal enum BlogPosts {
+    /// Blog Posts
+    internal static let title = L10n.tr("Localizable", "blogPosts_title", fallback: "Blog Posts")
+  }
   internal enum Common {
     /// Account
     internal static let account = L10n.tr("Localizable", "common_account", fallback: "Account")
@@ -1031,6 +1035,8 @@ internal enum L10n {
     internal static let retry = L10n.tr("Localizable", "common_retry", fallback: "Retry")
     /// Save
     internal static let save = L10n.tr("Localizable", "common_save", fallback: "Save")
+    /// Search...
+    internal static let searchHint = L10n.tr("Localizable", "common_searchHint", fallback: "Search...")
     /// Show Less
     internal static let showLess = L10n.tr("Localizable", "common_showLess", fallback: "Show Less")
     /// Show More
@@ -1602,6 +1608,74 @@ internal enum L10n {
       internal static let placeholder = L10n.tr("Localizable", "dappDirectory_search_placeholder", fallback: "Search for a dApp...")
     }
   }
+  internal enum Discover {
+    /// Discover
+    internal static let title = L10n.tr("Localizable", "discover_title", fallback: "Discover")
+    internal enum BlogPosts {
+      internal enum Failure {
+        /// Failed to load Blog Posts.
+        internal static let title = L10n.tr("Localizable", "discover_blogPosts_failure_title", fallback: "Failed to load Blog Posts.")
+        internal enum Cta {
+          /// Tap to refresh
+          internal static let button = L10n.tr("Localizable", "discover_blogPosts_failure_cta_button", fallback: "Tap to refresh")
+        }
+      }
+      internal enum See {
+        internal enum All {
+          internal enum Blog {
+            /// See all Blog Posts
+            internal static let posts = L10n.tr("Localizable", "discover_blogPosts_see_all_blog_posts", fallback: "See all Blog Posts")
+          }
+        }
+      }
+    }
+    internal enum CategoryBlogPosts {
+      /// Blog Posts
+      internal static let title = L10n.tr("Localizable", "discover_categoryBlogPosts_title", fallback: "Blog Posts")
+    }
+    internal enum CategoryCommunity {
+      /// Community
+      internal static let title = L10n.tr("Localizable", "discover_categoryCommunity_title", fallback: "Community")
+    }
+    internal enum CategoryLearn {
+      /// Learn About
+      internal static let title = L10n.tr("Localizable", "discover_categoryLearn_title", fallback: "Learn About")
+    }
+    internal enum SeeMore {
+      /// See More
+      internal static let button = L10n.tr("Localizable", "discover_seeMore_button", fallback: "See More")
+    }
+    internal enum SocialLinks {
+      internal enum Discord {
+        /// Connect to the official Radix Discord channel to join the community and ask for help.
+        internal static let subtitle = L10n.tr("Localizable", "discover_socialLinks_discord_subtitle", fallback: "Connect to the official Radix Discord channel to join the community and ask for help.")
+        /// Radix Discord Official
+        internal static let title = L10n.tr("Localizable", "discover_socialLinks_discord_title", fallback: "Radix Discord Official")
+      }
+      internal enum Telegram {
+        /// Join the Radix Telegram to chat, ask questions, and get updates.
+        internal static let subtitle = L10n.tr("Localizable", "discover_socialLinks_telegram_subtitle", fallback: "Join the Radix Telegram to chat, ask questions, and get updates.")
+        /// Radix Telegram Official
+        internal static let title = L10n.tr("Localizable", "discover_socialLinks_telegram_title", fallback: "Radix Telegram Official")
+      }
+      internal enum Twitter {
+        /// Follow the official Radix X for news, updates, and insights.
+        internal static let subtitle = L10n.tr("Localizable", "discover_socialLinks_twitter_subtitle", fallback: "Follow the official Radix X for news, updates, and insights.")
+        /// Radix X Official
+        internal static let title = L10n.tr("Localizable", "discover_socialLinks_twitter_title", fallback: "Radix X Official")
+      }
+    }
+    internal enum View {
+      internal enum All {
+        /// All dApps
+        internal static let dapps = L10n.tr("Localizable", "discover_view_all_dapps", fallback: "All dApps")
+      }
+      internal enum Approved {
+        /// Approved dApps
+        internal static let dapps = L10n.tr("Localizable", "discover_view_approved_dapps", fallback: "Approved dApps")
+      }
+    }
+  }
   internal enum DisplayMnemonics {
     /// Write Down this Seed Phrase
     internal static let backUpWarning = L10n.tr("Localizable", "displayMnemonics_backUpWarning", fallback: "Write Down this Seed Phrase")
@@ -1637,6 +1711,14 @@ internal enum L10n {
       /// Connected to Personas and %d Account
       internal static func one(_ p1: Int) -> String {
         return L10n.tr("Localizable", "displayMnemonics_connectedAccountsPersonasLabel_one", p1, fallback: "Connected to Personas and %d Account")
+      }
+    }
+  }
+  internal enum Dsicover {
+    internal enum BlogPosts {
+      internal enum Failure {
+        /// Pull to refresh
+        internal static let cta = L10n.tr("Localizable", "dsicover_blogPosts_failure_cta", fallback: "Pull to refresh")
       }
     }
   }
@@ -1743,6 +1825,8 @@ internal enum L10n {
     internal enum Rns {
       /// This XRD domain does not exist, or is not associated to any account.
       internal static let unknownDomain = L10n.tr("Localizable", "error_rns_unknownDomain", fallback: "This XRD domain does not exist, or is not associated to any account.")
+      /// Visit XRD domains
+      internal static let unknownDomainButtonTitle = L10n.tr("Localizable", "error_rns_unknownDomainButtonTitle", fallback: "Visit XRD domains")
     }
     internal enum TransactionFailure {
       /// Your current Ledger settings only allow signing of simple token transfers. Please either enable "verbose mode" (to see full transaction manifests) or "blind signing mode" (to enable signing of complex transaction manifest hashes) on your Ledger app device.
@@ -2167,6 +2251,8 @@ internal enum L10n {
     internal enum Tab {
       /// dApps
       internal static let dapps = L10n.tr("Localizable", "homePage_tab_dapps", fallback: "dApps")
+      /// Discover
+      internal static let discover = L10n.tr("Localizable", "homePage_tab_discover", fallback: "Discover")
       /// Settings
       internal static let settings = L10n.tr("Localizable", "homePage_tab_settings", fallback: "Settings")
       /// Wallet
@@ -3216,6 +3302,10 @@ internal enum L10n {
       /// Unknown deposits to this account may occur
       internal static let deposits = L10n.tr("Localizable", "interactionReview_unknown_deposits", fallback: "Unknown deposits to this account may occur")
     }
+  }
+  internal enum Learn {
+    /// Learn About
+    internal static let title = L10n.tr("Localizable", "learn_title", fallback: "Learn About")
   }
   internal enum LedgerHardwareDevices {
     /// Added
@@ -4900,8 +4990,8 @@ internal enum L10n {
     internal static let accountRecovery = L10n.tr("Localizable", "troubleshooting_accountRecovery", fallback: "Account Recovery")
     /// Reset Account
     internal static let resetAccount = L10n.tr("Localizable", "troubleshooting_resetAccount", fallback: "Reset Account")
-    /// Support and Community
-    internal static let supportAndCommunity = L10n.tr("Localizable", "troubleshooting_supportAndCommunity", fallback: "Support and Community")
+    /// Support
+    internal static let support = L10n.tr("Localizable", "troubleshooting_support", fallback: "Support")
     /// Troubleshooting
     internal static let title = L10n.tr("Localizable", "troubleshooting_title", fallback: "Troubleshooting")
     internal enum AccountScan {
@@ -4915,12 +5005,6 @@ internal enum L10n {
       internal static let subtitle = L10n.tr("Localizable", "troubleshooting_contactSupport_subtitle", fallback: "Connect directly with the Radix support team")
       /// Contact Support
       internal static let title = L10n.tr("Localizable", "troubleshooting_contactSupport_title", fallback: "Contact Support")
-    }
-    internal enum Discord {
-      /// Connect to the official Radix Discord channel to join the community and ask for help.
-      internal static let subtitle = L10n.tr("Localizable", "troubleshooting_discord_subtitle", fallback: "Connect to the official Radix Discord channel to join the community and ask for help.")
-      /// Discord
-      internal static let title = L10n.tr("Localizable", "troubleshooting_discord_title", fallback: "Discord")
     }
     internal enum FactoryReset {
       /// Restore your Radix wallet to its original state
