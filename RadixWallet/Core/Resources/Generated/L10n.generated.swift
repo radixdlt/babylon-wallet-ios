@@ -972,6 +972,10 @@ internal enum L10n {
       internal static let updateAccountMetadata = L10n.tr("Localizable", "biometrics_prompt_updateAccountMetadata", fallback: "Update account metadata.")
     }
   }
+  internal enum BlogPosts {
+    /// Blog Posts
+    internal static let title = L10n.tr("Localizable", "blogPosts_title", fallback: "Blog Posts")
+  }
   internal enum Common {
     /// Account
     internal static let account = L10n.tr("Localizable", "common_account", fallback: "Account")
@@ -1031,6 +1035,8 @@ internal enum L10n {
     internal static let retry = L10n.tr("Localizable", "common_retry", fallback: "Retry")
     /// Save
     internal static let save = L10n.tr("Localizable", "common_save", fallback: "Save")
+    /// Search...
+    internal static let searchHint = L10n.tr("Localizable", "common_searchHint", fallback: "Search...")
     /// Show Less
     internal static let showLess = L10n.tr("Localizable", "common_showLess", fallback: "Show Less")
     /// Show More
@@ -1602,6 +1608,74 @@ internal enum L10n {
       internal static let placeholder = L10n.tr("Localizable", "dappDirectory_search_placeholder", fallback: "Search for a dApp...")
     }
   }
+  internal enum Discover {
+    /// Discover
+    internal static let title = L10n.tr("Localizable", "discover_title", fallback: "Discover")
+    internal enum BlogPosts {
+      internal enum Failure {
+        /// Failed to load Blog Posts.
+        internal static let title = L10n.tr("Localizable", "discover_blogPosts_failure_title", fallback: "Failed to load Blog Posts.")
+        internal enum Cta {
+          /// Tap to refresh
+          internal static let button = L10n.tr("Localizable", "discover_blogPosts_failure_cta_button", fallback: "Tap to refresh")
+        }
+      }
+      internal enum See {
+        internal enum All {
+          internal enum Blog {
+            /// See all Blog Posts
+            internal static let posts = L10n.tr("Localizable", "discover_blogPosts_see_all_blog_posts", fallback: "See all Blog Posts")
+          }
+        }
+      }
+    }
+    internal enum CategoryBlogPosts {
+      /// Blog Posts
+      internal static let title = L10n.tr("Localizable", "discover_categoryBlogPosts_title", fallback: "Blog Posts")
+    }
+    internal enum CategoryCommunity {
+      /// Community
+      internal static let title = L10n.tr("Localizable", "discover_categoryCommunity_title", fallback: "Community")
+    }
+    internal enum CategoryLearn {
+      /// Learn About
+      internal static let title = L10n.tr("Localizable", "discover_categoryLearn_title", fallback: "Learn About")
+    }
+    internal enum SeeMore {
+      /// See More
+      internal static let button = L10n.tr("Localizable", "discover_seeMore_button", fallback: "See More")
+    }
+    internal enum SocialLinks {
+      internal enum Discord {
+        /// Connect to the official Radix Discord channel to join the community and ask for help.
+        internal static let subtitle = L10n.tr("Localizable", "discover_socialLinks_discord_subtitle", fallback: "Connect to the official Radix Discord channel to join the community and ask for help.")
+        /// Radix Discord Official
+        internal static let title = L10n.tr("Localizable", "discover_socialLinks_discord_title", fallback: "Radix Discord Official")
+      }
+      internal enum Telegram {
+        /// Join the Radix Telegram to chat, ask questions, and get updates.
+        internal static let subtitle = L10n.tr("Localizable", "discover_socialLinks_telegram_subtitle", fallback: "Join the Radix Telegram to chat, ask questions, and get updates.")
+        /// Radix Telegram Official
+        internal static let title = L10n.tr("Localizable", "discover_socialLinks_telegram_title", fallback: "Radix Telegram Official")
+      }
+      internal enum Twitter {
+        /// Follow the official Radix X for news, updates, and insights.
+        internal static let subtitle = L10n.tr("Localizable", "discover_socialLinks_twitter_subtitle", fallback: "Follow the official Radix X for news, updates, and insights.")
+        /// Radix X Official
+        internal static let title = L10n.tr("Localizable", "discover_socialLinks_twitter_title", fallback: "Radix X Official")
+      }
+    }
+    internal enum View {
+      internal enum All {
+        /// All dApps
+        internal static let dapps = L10n.tr("Localizable", "discover_view_all_dapps", fallback: "All dApps")
+      }
+      internal enum Approved {
+        /// Approved dApps
+        internal static let dapps = L10n.tr("Localizable", "discover_view_approved_dapps", fallback: "Approved dApps")
+      }
+    }
+  }
   internal enum DisplayMnemonics {
     /// Write Down this Seed Phrase
     internal static let backUpWarning = L10n.tr("Localizable", "displayMnemonics_backUpWarning", fallback: "Write Down this Seed Phrase")
@@ -1637,6 +1711,14 @@ internal enum L10n {
       /// Connected to Personas and %d Account
       internal static func one(_ p1: Int) -> String {
         return L10n.tr("Localizable", "displayMnemonics_connectedAccountsPersonasLabel_one", p1, fallback: "Connected to Personas and %d Account")
+      }
+    }
+  }
+  internal enum Dsicover {
+    internal enum BlogPosts {
+      internal enum Failure {
+        /// Pull to refresh
+        internal static let cta = L10n.tr("Localizable", "dsicover_blogPosts_failure_cta", fallback: "Pull to refresh")
       }
     }
   }
@@ -2169,6 +2251,8 @@ internal enum L10n {
     internal enum Tab {
       /// dApps
       internal static let dapps = L10n.tr("Localizable", "homePage_tab_dapps", fallback: "dApps")
+      /// Discover
+      internal static let discover = L10n.tr("Localizable", "homePage_tab_discover", fallback: "Discover")
       /// Settings
       internal static let settings = L10n.tr("Localizable", "homePage_tab_settings", fallback: "Settings")
       /// Wallet
@@ -2460,6 +2544,162 @@ internal enum L10n {
     internal static let title = L10n.tr("Localizable", "importOlympiaLedgerAccounts_title", fallback: "Verify With Ledger Device")
   }
   internal enum InfoLink {
+    internal enum DiscoverDescription {
+      /// Smart accounts for secure asset storage.
+      internal static let accounts = L10n.tr("Localizable", "infoLink_discoverDescription_accounts", fallback: "Smart accounts for secure asset storage.")
+      /// NFC-enabled hardware wallet in card format.
+      internal static let arculus = L10n.tr("Localizable", "infoLink_discoverDescription_arculus", fallback: "NFC-enabled hardware wallet in card format.")
+      /// Tokens or NFTs for authorization in dApps.
+      internal static let badges = L10n.tr("Localizable", "infoLink_discoverDescription_badges", fallback: "Tokens or NFTs for authorization in dApps.")
+      /// Rules defining token or NFT actions.
+      internal static let behaviors = L10n.tr("Localizable", "infoLink_discoverDescription_behaviors", fallback: "Rules defining token or NFT actions.")
+      /// Secure access using biometrics or PIN.
+      internal static let biometricspin = L10n.tr("Localizable", "infoLink_discoverDescription_biometricspin", fallback: "Secure access using biometrics or PIN.")
+      /// Move assets into or out of Radix.
+      internal static let bridging = L10n.tr("Localizable", "infoLink_discoverDescription_bridging", fallback: "Move assets into or out of Radix.")
+      /// Create multi-factor security for assets.
+      internal static let buildingshield = L10n.tr("Localizable", "infoLink_discoverDescription_buildingshield", fallback: "Create multi-factor security for assets.")
+      /// NFTs for pending unstake requests.
+      internal static let claimnfts = L10n.tr("Localizable", "infoLink_discoverDescription_claimnfts", fallback: "NFTs for pending unstake requests.")
+      /// Button to connect wallet to dApps.
+      internal static let connectbutton = L10n.tr("Localizable", "infoLink_discoverDescription_connectbutton", fallback: "Button to connect wallet to dApps.")
+      /// Decentralized apps interacting with your wallet.
+      internal static let dapps = L10n.tr("Localizable", "infoLink_discoverDescription_dapps", fallback: "Decentralized apps interacting with your wallet.")
+      /// Web dApp for network data and staking.
+      internal static let dashboard = L10n.tr("Localizable", "infoLink_discoverDescription_dashboard", fallback: "Web dApp for network data and staking.")
+      /// Instant token swaps via decentralized exchanges.
+      internal static let dex = L10n.tr("Localizable", "infoLink_discoverDescription_dex", fallback: "Instant token swaps via decentralized exchanges.")
+      /// Time-based recovery for lost factors.
+      internal static let emergencyfallback = L10n.tr("Localizable", "infoLink_discoverDescription_emergencyfallback", fallback: "Time-based recovery for lost factors.")
+      /// Connect your wallet to Radix networks.
+      internal static let gateways = L10n.tr("Localizable", "infoLink_discoverDescription_gateways", fallback: "Connect your wallet to Radix networks.")
+      /// Set minimum deposits to guard against fluctuations.
+      internal static let guarantees = L10n.tr("Localizable", "infoLink_discoverDescription_guarantees", fallback: "Set minimum deposits to guard against fluctuations.")
+      /// USB hardware wallet for secure transactions.
+      internal static let ledgernano = L10n.tr("Localizable", "infoLink_discoverDescription_ledgernano", fallback: "USB hardware wallet for secure transactions.")
+      /// Tokens representing staked XRD.
+      internal static let liquidstakeunits = L10n.tr("Localizable", "infoLink_discoverDescription_liquidstakeunits", fallback: "Tokens representing staked XRD.")
+      /// Stake XRD to secure the network and earn rewards.
+      internal static let networkstaking = L10n.tr("Localizable", "infoLink_discoverDescription_networkstaking", fallback: "Stake XRD to secure the network and earn rewards.")
+      /// Unique digital assets for art or collectibles.
+      internal static let nfts = L10n.tr("Localizable", "infoLink_discoverDescription_nfts", fallback: "Unique digital assets for art or collectibles.")
+      /// Manually entered 24-word seed phrase.
+      internal static let passphrases = L10n.tr("Localizable", "infoLink_discoverDescription_passphrases", fallback: "Manually entered 24-word seed phrase.")
+      /// Decentralized passwords for extra security.
+      internal static let passwords = L10n.tr("Localizable", "infoLink_discoverDescription_passwords", fallback: "Decentralized passwords for extra security.")
+      /// Account used to pay transaction fees.
+      internal static let payingaccount = L10n.tr("Localizable", "infoLink_discoverDescription_payingaccount", fallback: "Account used to pay transaction fees.")
+      /// Web3 identifiers for secure dApp authentication.
+      internal static let personas = L10n.tr("Localizable", "infoLink_discoverDescription_personas", fallback: "Web3 identifiers for secure dApp authentication.")
+      /// Tokens representing your share in liquidity pools.
+      internal static let poolunits = L10n.tr("Localizable", "infoLink_discoverDescription_poolunits", fallback: "Tokens representing your share in liquidity pools.")
+      /// Additional actions dApps might add.
+      internal static let possibledappcalls = L10n.tr("Localizable", "infoLink_discoverDescription_possibledappcalls", fallback: "Additional actions dApps might add.")
+      /// User-approved actions for dApps.
+      internal static let preauthorizations = L10n.tr("Localizable", "infoLink_discoverDescription_preauthorizations", fallback: "User-approved actions for dApps.")
+      /// Bridge your wallet with desktop dApps securely.
+      internal static let radixconnect = L10n.tr("Localizable", "infoLink_discoverDescription_radixconnect", fallback: "Bridge your wallet with desktop dApps securely.")
+      /// Browser extension linking wallet to dApps.
+      internal static let radixconnector = L10n.tr("Localizable", "infoLink_discoverDescription_radixconnector", fallback: "Browser extension linking wallet to dApps.")
+      /// Decentralized platform for secure asset ownership.
+      internal static let radixnetwork = L10n.tr("Localizable", "infoLink_discoverDescription_radixnetwork", fallback: "Decentralized platform for secure asset ownership.")
+      /// Mobile app for managing Radix assets.
+      internal static let radixwallet = L10n.tr("Localizable", "infoLink_discoverDescription_radixwallet", fallback: "Mobile app for managing Radix assets.")
+      /// Multi-factor protection for accounts and recovery.
+      internal static let securityshields = L10n.tr("Localizable", "infoLink_discoverDescription_securityshields", fallback: "Multi-factor protection for accounts and recovery.")
+      /// Digital assets representing value or utility.
+      internal static let tokens = L10n.tr("Localizable", "infoLink_discoverDescription_tokens", fallback: "Digital assets representing value or utility.")
+      /// Small XRD fee for network operations.
+      internal static let transactionfee = L10n.tr("Localizable", "infoLink_discoverDescription_transactionfee", fallback: "Small XRD fee for network operations.")
+      /// Instructions for moving assets on the network.
+      internal static let transactions = L10n.tr("Localizable", "infoLink_discoverDescription_transactions", fallback: "Instructions for moving assets on the network.")
+      /// Move tokens or NFTs between accounts.
+      internal static let transfers = L10n.tr("Localizable", "infoLink_discoverDescription_transfers", fallback: "Move tokens or NFTs between accounts.")
+      /// Nodes securing the Radix Network.
+      internal static let validators = L10n.tr("Localizable", "infoLink_discoverDescription_validators", fallback: "Nodes securing the Radix Network.")
+      /// Decentralized internet with user-owned assets.
+      internal static let web3 = L10n.tr("Localizable", "infoLink_discoverDescription_web3", fallback: "Decentralized internet with user-owned assets.")
+      /// Native token for fees and transactions.
+      internal static let xrd = L10n.tr("Localizable", "infoLink_discoverDescription_xrd", fallback: "Native token for fees and transactions.")
+    }
+    internal enum DiscoverTitle {
+      /// Accounts
+      internal static let accounts = L10n.tr("Localizable", "infoLink_discoverTitle_accounts", fallback: "Accounts")
+      /// Arculus Card
+      internal static let arculus = L10n.tr("Localizable", "infoLink_discoverTitle_arculus", fallback: "Arculus Card")
+      /// Badges
+      internal static let badges = L10n.tr("Localizable", "infoLink_discoverTitle_badges", fallback: "Badges")
+      /// Asset Behaviors
+      internal static let behaviors = L10n.tr("Localizable", "infoLink_discoverTitle_behaviors", fallback: "Asset Behaviors")
+      /// Biometrics/PIN
+      internal static let biometricspin = L10n.tr("Localizable", "infoLink_discoverTitle_biometricspin", fallback: "Biometrics/PIN")
+      /// Bridging
+      internal static let bridging = L10n.tr("Localizable", "infoLink_discoverTitle_bridging", fallback: "Bridging")
+      /// How Your Security Shield is Built
+      internal static let buildingshield = L10n.tr("Localizable", "infoLink_discoverTitle_buildingshield", fallback: "How Your Security Shield is Built")
+      /// Stake Claim NFTs
+      internal static let claimnfts = L10n.tr("Localizable", "infoLink_discoverTitle_claimnfts", fallback: "Stake Claim NFTs")
+      /// √ Connect Button
+      internal static let connectbutton = L10n.tr("Localizable", "infoLink_discoverTitle_connectbutton", fallback: "√ Connect Button")
+      /// dApps
+      internal static let dapps = L10n.tr("Localizable", "infoLink_discoverTitle_dapps", fallback: "dApps")
+      /// Radix Dashboard
+      internal static let dashboard = L10n.tr("Localizable", "infoLink_discoverTitle_dashboard", fallback: "Radix Dashboard")
+      /// Decentralized Exchange (DEX)
+      internal static let dex = L10n.tr("Localizable", "infoLink_discoverTitle_dex", fallback: "Decentralized Exchange (DEX)")
+      /// Emergency Fallback
+      internal static let emergencyfallback = L10n.tr("Localizable", "infoLink_discoverTitle_emergencyfallback", fallback: "Emergency Fallback")
+      /// Gateways
+      internal static let gateways = L10n.tr("Localizable", "infoLink_discoverTitle_gateways", fallback: "Gateways")
+      /// Deposit Guarantees
+      internal static let guarantees = L10n.tr("Localizable", "infoLink_discoverTitle_guarantees", fallback: "Deposit Guarantees")
+      /// Ledger Nano
+      internal static let ledgernano = L10n.tr("Localizable", "infoLink_discoverTitle_ledgernano", fallback: "Ledger Nano")
+      /// Liquid Stake Unit
+      internal static let liquidstakeunits = L10n.tr("Localizable", "infoLink_discoverTitle_liquidstakeunits", fallback: "Liquid Stake Unit")
+      /// Network Staking
+      internal static let networkstaking = L10n.tr("Localizable", "infoLink_discoverTitle_networkstaking", fallback: "Network Staking")
+      /// Non-Fungible Token
+      internal static let nfts = L10n.tr("Localizable", "infoLink_discoverTitle_nfts", fallback: "Non-Fungible Token")
+      /// Passphrases
+      internal static let passphrases = L10n.tr("Localizable", "infoLink_discoverTitle_passphrases", fallback: "Passphrases")
+      /// Passwords
+      internal static let passwords = L10n.tr("Localizable", "infoLink_discoverTitle_passwords", fallback: "Passwords")
+      /// Paying Account
+      internal static let payingaccount = L10n.tr("Localizable", "infoLink_discoverTitle_payingaccount", fallback: "Paying Account")
+      /// Personas
+      internal static let personas = L10n.tr("Localizable", "infoLink_discoverTitle_personas", fallback: "Personas")
+      /// Pool Units
+      internal static let poolunits = L10n.tr("Localizable", "infoLink_discoverTitle_poolunits", fallback: "Pool Units")
+      /// Possible dApp Calls
+      internal static let possibledappcalls = L10n.tr("Localizable", "infoLink_discoverTitle_possibledappcalls", fallback: "Possible dApp Calls")
+      /// Pre-authorizations
+      internal static let preauthorizations = L10n.tr("Localizable", "infoLink_discoverTitle_preauthorizations", fallback: "Pre-authorizations")
+      /// Radix Connect
+      internal static let radixconnect = L10n.tr("Localizable", "infoLink_discoverTitle_radixconnect", fallback: "Radix Connect")
+      /// Radix Connector Browser Extension
+      internal static let radixconnector = L10n.tr("Localizable", "infoLink_discoverTitle_radixconnector", fallback: "Radix Connector Browser Extension")
+      /// Radix Network
+      internal static let radixnetwork = L10n.tr("Localizable", "infoLink_discoverTitle_radixnetwork", fallback: "Radix Network")
+      /// Radix Wallet
+      internal static let radixwallet = L10n.tr("Localizable", "infoLink_discoverTitle_radixwallet", fallback: "Radix Wallet")
+      /// Security Shields
+      internal static let securityshields = L10n.tr("Localizable", "infoLink_discoverTitle_securityshields", fallback: "Security Shields")
+      /// Token
+      internal static let tokens = L10n.tr("Localizable", "infoLink_discoverTitle_tokens", fallback: "Token")
+      /// Transaction Fees
+      internal static let transactionfee = L10n.tr("Localizable", "infoLink_discoverTitle_transactionfee", fallback: "Transaction Fees")
+      /// Transactions
+      internal static let transactions = L10n.tr("Localizable", "infoLink_discoverTitle_transactions", fallback: "Transactions")
+      /// Asset Transfers
+      internal static let transfers = L10n.tr("Localizable", "infoLink_discoverTitle_transfers", fallback: "Asset Transfers")
+      /// Radix Network Validators
+      internal static let validators = L10n.tr("Localizable", "infoLink_discoverTitle_validators", fallback: "Radix Network Validators")
+      /// Web3
+      internal static let web3 = L10n.tr("Localizable", "infoLink_discoverTitle_web3", fallback: "Web3")
+      /// XRD Token
+      internal static let xrd = L10n.tr("Localizable", "infoLink_discoverTitle_xrd", fallback: "XRD Token")
+    }
     internal enum Glossary {
       /// ## Radix Accounts
       /// 
@@ -2509,10 +2749,10 @@ internal enum L10n {
       internal static let behaviors = L10n.tr("Localizable", "infoLink_glossary_behaviors", fallback: "## Asset Behaviors\n\nAsset behaviors define the rules that were placed on a [token](?glossaryAnchor=tokens) or [NFT](?glossaryAnchor=nfts) when it was created. They ensure all users know exactly what actions can be performed on any asset. And they’re labeled in everyday language so everyone can read them, understand them and know the nature of the asset they’re holding.\n\n---\n\nThe [Radix Network](?glossaryAnchor=radixnetwork) is built differently to all other blockchains. One of the great benefits of this is that assets – tokens and NFTs – are native to the ecosystem. So unlike on networks such as Ethereum, where tokens are not really tokens but just balances on a smart contract, assets on Radix act like real-life assets. With real-life assets of different kinds, you know who can create it, destory it, take it away from you or freeze it within your bank account. Similarly with Radix, you’ll always know how assets will behave and what someone can do to them.\n\nWhen anyone creates a token or NFT on Radix, there is a list of behaviors they can apply to them. Things like being able to increase the token’s supply, being able to change an NFT’s image and description, or being able to remove a token from someone’s account. There are plenty of valid reasons for why someone might want to do these things, but it’s always good to know if they can. \n\nJust tap into any token in the Radix Wallet to get a full list of its behaviors.\n\n[Learn more about the asset behaviors ↗](https://learn.radixdlt.com/article/what-are-radix-asset-behaviors)")
       /// ## Biometrics/PIN
       /// 
-      /// A biometrics/PIN factor is a 24-word seed phrase protected and accessed via your phone's biometrics or PIN security feature. Unlike most crypto wallets, there isn't a single seed phrase controlling all of your stuff – it's just 1 type of factor you can use to protect [Accounts](?glossaryAnchor=accounts) and [Personas](?glossaryAnchor=personas) or use as part of multi-factor [Security Shields](?glossaryAnchor=securityshields).
+      /// A biometrics/PIN factor is a 24-word seed phrase protected and accessed via your phone's biometrics or PIN security feature.
       /// 
-      /// Because this is the only kind of factor held on your phone, it won't automatically transfer if you move to a different phone with your [Radix Wallet](?glossaryAnchor=radixwallet). Using a Security Shield for your Accounts and Personas enables easy transfer of wallet control without having to write down and enter a seed phrase. If you create Accounts or Personas with a biometrics/PIN factor, and you don't apply a Security Shield, you'll need to enter the seed phrase to recover access on a different phone.
-      internal static let biometricspin = L10n.tr("Localizable", "infoLink_glossary_biometricspin", fallback: "## Biometrics/PIN\n\nA biometrics/PIN factor is a 24-word seed phrase protected and accessed via your phone's biometrics or PIN security feature. Unlike most crypto wallets, there isn't a single seed phrase controlling all of your stuff – it's just 1 type of factor you can use to protect [Accounts](?glossaryAnchor=accounts) and [Personas](?glossaryAnchor=personas) or use as part of multi-factor [Security Shields](?glossaryAnchor=securityshields).\n\nBecause this is the only kind of factor held on your phone, it won't automatically transfer if you move to a different phone with your [Radix Wallet](?glossaryAnchor=radixwallet). Using a Security Shield for your Accounts and Personas enables easy transfer of wallet control without having to write down and enter a seed phrase. If you create Accounts or Personas with a biometrics/PIN factor, and you don't apply a Security Shield, you'll need to enter the seed phrase to recover access on a different phone.")
+      /// Because this is the only kind of factor held on your phone, it won't automatically transfer if you move to a different phone with your [Radix Wallet](?glossaryAnchor=radixwallet). If you create Accounts or Personas with a biometrics/PIN factor you'll need to enter the seed phrase to recover access on a different phone.
+      internal static let biometricspin = L10n.tr("Localizable", "infoLink_glossary_biometricspin", fallback: "## Biometrics/PIN\n\nA biometrics/PIN factor is a 24-word seed phrase protected and accessed via your phone's biometrics or PIN security feature.\n\nBecause this is the only kind of factor held on your phone, it won't automatically transfer if you move to a different phone with your [Radix Wallet](?glossaryAnchor=radixwallet). If you create Accounts or Personas with a biometrics/PIN factor you'll need to enter the seed phrase to recover access on a different phone.")
       /// ## Bridging
       /// 
       /// Bridging is the process of getting assets into and out of the [Radix Network](?glossaryAnchor=radixnetwork). Assets on Radix can be held by your [Radix Wallet](?glossaryAnchor=radixnetwork), and used with [dApps](?glossaryAnchor=dapps) on Radix. There are a variety of dApps that provide bridging in different ways, for different assets.
@@ -2621,8 +2861,8 @@ internal enum L10n {
       /// 
       /// A Ledger Nano is a secure third-party "hardware wallet" cryptographic signing device popular with many crypto users. To use it, you need to connect it via USB to a computer with a linked [Radix Connector](?glossaryAnchor=radixconnector) browser extension. From here, you can approve signatures by following the Nano's on-screen instructions.
       /// 
-      /// Using a hardware signing device like a Ledger Nano provides strong security because it requires physical access to the device to use it. If you use it in a [Security Shields](?glossaryAnchor=securityshields), you can combine it with other factors you have so that even if the device is lost or stolen, your funds are safe and you can reconfigure the Shield to remove the lost device from it. No seed phrase backup needed.
-      internal static let ledgernano = L10n.tr("Localizable", "infoLink_glossary_ledgernano", fallback: "## Ledger Nano\n\nA Ledger Nano is a secure third-party \"hardware wallet\" cryptographic signing device popular with many crypto users. To use it, you need to connect it via USB to a computer with a linked [Radix Connector](?glossaryAnchor=radixconnector) browser extension. From here, you can approve signatures by following the Nano's on-screen instructions.\n\nUsing a hardware signing device like a Ledger Nano provides strong security because it requires physical access to the device to use it. If you use it in a [Security Shields](?glossaryAnchor=securityshields), you can combine it with other factors you have so that even if the device is lost or stolen, your funds are safe and you can reconfigure the Shield to remove the lost device from it. No seed phrase backup needed.")
+      /// Using a hardware signing device like a Ledger Nano provides strong security because it requires physical access to the device to use it. No seed phrase backup needed.
+      internal static let ledgernano = L10n.tr("Localizable", "infoLink_glossary_ledgernano", fallback: "## Ledger Nano\n\nA Ledger Nano is a secure third-party \"hardware wallet\" cryptographic signing device popular with many crypto users. To use it, you need to connect it via USB to a computer with a linked [Radix Connector](?glossaryAnchor=radixconnector) browser extension. From here, you can approve signatures by following the Nano's on-screen instructions.\n\nUsing a hardware signing device like a Ledger Nano provides strong security because it requires physical access to the device to use it. No seed phrase backup needed.")
       /// ## Liquid Stake Unit
       /// 
       /// A liquid stake unit (LSU) is a type of token within the [Radix Network](?glossaryAnchor=radixnetwork) that represents the amount of [XRD](?glossaryAnchor=xrd) a user has staked to a certain validator. LSUs are freely transferable in Radix’s DeFi ecosystem and can be traded as assets.
@@ -3062,6 +3302,10 @@ internal enum L10n {
       /// Unknown deposits to this account may occur
       internal static let deposits = L10n.tr("Localizable", "interactionReview_unknown_deposits", fallback: "Unknown deposits to this account may occur")
     }
+  }
+  internal enum Learn {
+    /// Learn About
+    internal static let title = L10n.tr("Localizable", "learn_title", fallback: "Learn About")
   }
   internal enum LedgerHardwareDevices {
     /// Added
@@ -4746,8 +4990,8 @@ internal enum L10n {
     internal static let accountRecovery = L10n.tr("Localizable", "troubleshooting_accountRecovery", fallback: "Account Recovery")
     /// Reset Account
     internal static let resetAccount = L10n.tr("Localizable", "troubleshooting_resetAccount", fallback: "Reset Account")
-    /// Support and Community
-    internal static let supportAndCommunity = L10n.tr("Localizable", "troubleshooting_supportAndCommunity", fallback: "Support and Community")
+    /// Support
+    internal static let support = L10n.tr("Localizable", "troubleshooting_support", fallback: "Support")
     /// Troubleshooting
     internal static let title = L10n.tr("Localizable", "troubleshooting_title", fallback: "Troubleshooting")
     internal enum AccountScan {
@@ -4761,12 +5005,6 @@ internal enum L10n {
       internal static let subtitle = L10n.tr("Localizable", "troubleshooting_contactSupport_subtitle", fallback: "Connect directly with the Radix support team")
       /// Contact Support
       internal static let title = L10n.tr("Localizable", "troubleshooting_contactSupport_title", fallback: "Contact Support")
-    }
-    internal enum Discord {
-      /// Connect to the official Radix Discord channel to join the community and ask for help.
-      internal static let subtitle = L10n.tr("Localizable", "troubleshooting_discord_subtitle", fallback: "Connect to the official Radix Discord channel to join the community and ask for help.")
-      /// Discord
-      internal static let title = L10n.tr("Localizable", "troubleshooting_discord_title", fallback: "Discord")
     }
     internal enum FactoryReset {
       /// Restore your Radix wallet to its original state
