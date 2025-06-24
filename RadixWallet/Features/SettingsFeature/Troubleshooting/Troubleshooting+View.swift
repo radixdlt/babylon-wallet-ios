@@ -72,13 +72,6 @@ extension Troubleshooting.View {
 				accessory: .iconLinkOut,
 				action: .contactSupportButtonTapped
 			),
-			.model(
-				title: L10n.Discover.SocialLinks.Discord.title,
-				subtitle: L10n.Discover.SocialLinks.Discord.subtitle,
-				icon: .asset(.discord),
-				accessory: .iconLinkOut,
-				action: .discordButtonTapped
-			),
 			.toggleModel(
 				icon: nil,
 				title: L10n.AppSettings.CrashReporting.title,

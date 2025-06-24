@@ -141,8 +141,9 @@ struct App: Sendable, FeatureReducer {
 	private func goToMain(state: inout State) -> Effect<Action> {
 		state.root = .main(.init(
 			home: .init(),
-			settings: .init(),
-			dAppsDirectory: .init()
+			dAppsDirectory: .init(),
+			discover: .init(),
+			settings: .init()
 		))
 		return .none
 	}

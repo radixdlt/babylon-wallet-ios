@@ -24,10 +24,10 @@ extension AddShieldBuilderSeedingFactors.AddFactorSource {
 								card(factorSource)
 							}
 
-							if store.showNoHardwareDeviceInfo {
-								InfoButton(.nohardwaredevice, label: L10n.InfoLink.Title.nohardwaredevice)
-									.padding(.vertical, .medium3)
-							}
+//							if store.showNoHardwareDeviceInfo {
+//								InfoButton(.nohardwaredevice, label: L10n.InfoLink.Title.nohardwaredevice)
+//									.padding(.vertical, .medium3)
+//							}
 						}
 
 						Spacer()

@@ -198,6 +198,7 @@ struct PlainListRowCore: View {
 					.minimumScaleFactor(0.8)
 					.textStyle(viewState.subtitleTextStyle)
 					.foregroundColor(viewState.subtitleForegroundColor)
+					.padding(.top, .small3)
 			}
 
 			if let detail = viewState.detail {

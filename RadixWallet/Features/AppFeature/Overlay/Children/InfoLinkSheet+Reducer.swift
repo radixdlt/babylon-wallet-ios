@@ -3,7 +3,7 @@ import Foundation
 // MARK: - InfoLinkSheet
 struct InfoLinkSheet: FeatureReducer {
 	struct State: Sendable, Hashable {
-		let image: ImageAsset?
+		let image: ImageSource?
 		let text: String
 
 		init(glossaryItem: InfoLinkSheet.GlossaryItem) {
@@ -29,7 +29,7 @@ struct InfoLinkSheet: FeatureReducer {
 
 // MARK: InfoLinkSheet.GlossaryItem
 extension InfoLinkSheet {
-	enum GlossaryItem: String, Sendable {
+	enum GlossaryItem: String, Sendable, CaseIterable, Identifiable {
 		case tokens
 		case nfts
 		case networkstaking
@@ -68,7 +68,6 @@ extension InfoLinkSheet {
 		case securityshields
 		case buildingshield
 		case emergencyfallback
-		case nohardwaredevice
 	}
 }
 
@@ -87,20 +86,52 @@ extension InfoLinkSheet.GlossaryItem {
 		self = item
 	}
 
-	var image: ImageAsset? {
+	var image: ImageSource? {
 		switch self {
 		case .nfts:
-			AssetResource.nft
+			.imageResource(.nft)
 		case .networkstaking:
-			AssetResource.stakes
+			.imageResource(.stakes)
 		case .badges:
-			AssetResource.iconPackageOwnerBadge
+			.imageResource(.iconPackageOwnerBadge)
 		case .poolunits:
-			AssetResource.poolUnits
+			.imageResource(.poolUnits)
 		case .tokens:
-			AssetResource.fungibleTokens
+			.imageResource(.fungibleTokens)
 		case .xrd:
-			AssetResource.xrd
+			.imageResource(.xrd)
+		case .personas:
+			.imageResource(.personas)
+		case .dapps:
+			.imageResource(.authorizedDapps)
+		case .guarantees:
+			.imageResource(.depositGuarantees)
+		case .gateways:
+			.imageResource(.gateway)
+		case .radixconnect:
+			.imageResource(.desktopLinkConnector)
+		case .connectbutton:
+			.imageResource(.desktopLinkConnector)
+		case .claimnfts:
+			.imageResource(.nft)
+		case .radixwallet:
+			.imageResource(.walletAppIcon)
+		case .radixconnector:
+			.imageResource(.desktopLinkConnector)
+		case .transfers:
+			.systemImage("arrow.left.arrow.right")
+		case .dashboard:
+			.imageResource(.authorizedDapps)
+		case .possibledappcalls:
+			.imageResource(.authorizedDapps)
+		case .ledgernano:
+			.imageResource(.ledgerFactor)
+		case .liquidstakeunits:
+			.imageResource(.fungibleTokens)
+		case .passphrases:
+			.imageResource(.passphraseFactor)
+		case .biometricspin:
+			.imageResource(.deviceFactor)
 		default:
 			nil
 		}
@@ -184,8 +215,6 @@ extension InfoLinkSheet.GlossaryItem {
 			L10n.InfoLink.Glossary.buildingshield
 		case .emergencyfallback:
 			L10n.InfoLink.Glossary.emergencyfallback
-		case .nohardwaredevice:
-			"TODO" // TODO: update
 		}
 	}
 }
