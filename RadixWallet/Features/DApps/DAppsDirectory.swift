@@ -3,21 +3,8 @@
 struct DAppsDirectory: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
-		typealias DApps = IdentifiedArrayOf<DApp>
-		struct DApp: Sendable, Hashable, Identifiable {
-			var id: DappDefinitionAddress {
-				dAppDefinitionAddress
-			}
-
-			let dAppDefinitionAddress: DappDefinitionAddress
-			let name: String
-			let thumbnail: URL?
-			let description: String?
-			let tags: IdentifiedArrayOf<DAppsDirectoryClient.DApp.Tag>
-		}
-
 		var searchBarFocused: Bool = false
-		var dApps: Loadable<DApps> = .idle
+		var dApps: Loadable<IdentifiedArrayOf<DAppsCategory>> = .idle
 		var searchTerm: String = ""
 		var filterTags: OrderedSet<DAppsDirectoryClient.DApp.Tag> = []
 
@@ -122,7 +109,14 @@ struct DAppsDirectory: Sendable, FeatureReducer {
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadedDApps(.success(dApps)):
-			state.dApps = .success(dApps)
+			let grouped = dApps.grouped(by: \.category)
+				.map { category, dApps in
+					State.DAppsCategory(category: category, dApps: dApps.asIdentified())
+				}
+				.sorted(by: \.category)
+				.asIdentified()
+
+			state.dApps = .success(grouped)
 			return .none
 		case let .loadedDApps(.failure(error)):
 			errorQueue.schedule(error)
@@ -162,7 +156,8 @@ struct DAppsDirectory: Sendable, FeatureReducer {
 						name: details?.metadata.name ?? dApp.name,
 						thumbnail: details?.metadata.iconURL,
 						description: details?.metadata.description,
-						tags: dApp.tags
+						tags: dApp.tags,
+						category: dApp.dAppCategory
 					)
 				}
 				.asIdentified()
@@ -174,9 +169,9 @@ struct DAppsDirectory: Sendable, FeatureReducer {
 }
 
 extension DAppsDirectory.State {
-	var displayedDApps: Loadable<DApps> {
-		dApps
-			.filter { dApp in
+	var displayedDApps: Loadable<IdentifiedArrayOf<DAppsCategory>> {
+		dApps.compactMapValue {
+			let filteredDapps = $0.dApps.filter { dApp in
 				guard !filterTags.isEmpty else {
 					return true
 				}
@@ -191,8 +186,39 @@ extension DAppsDirectory.State {
 					true
 				}
 			}
+			.asIdentified()
 
-			.map { $0.asIdentified() }
+			guard !filteredDapps.isEmpty else {
+				return nil
+			}
+
+			return DAppsCategory(category: $0.category, dApps: filteredDapps)
+		}
+		.map { $0.sorted(by: \.category).asIdentified() }
+	}
+
+	typealias DApps = IdentifiedArrayOf<DApp>
+	typealias DAppsCategories = IdentifiedArrayOf<DAppsCategory>
+	struct DApp: Sendable, Hashable, Identifiable {
+		var id: DappDefinitionAddress {
+			dAppDefinitionAddress
+		}
+
+		let dAppDefinitionAddress: DappDefinitionAddress
+		let name: String
+		let thumbnail: URL?
+		let description: String?
+		let tags: IdentifiedArrayOf<DAppsDirectoryClient.DApp.Tag>
+		let category: DAppsDirectoryClient.DApp.Category
+	}
+
+	struct DAppsCategory: Identifiable, Equatable, Hashable {
+		var id: DAppsDirectoryClient.DApp.Category {
+			category
+		}
+
+		let category: DAppsDirectoryClient.DApp.Category
+		let dApps: DApps
 	}
 }
 

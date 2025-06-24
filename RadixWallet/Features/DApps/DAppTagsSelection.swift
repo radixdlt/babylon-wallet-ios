@@ -48,6 +48,6 @@ extension DAppTagsSelection.State {
 
 extension DAppsDirectoryClient.DApp.Tag {
 	func asItemFilter(isActive: Bool) -> ItemFilter<Self> {
-		ItemFilter(id: self, icon: nil, label: self.rawValue, isActive: isActive)
+		ItemFilter(id: self, icon: nil, label: self.title, isActive: isActive)
 	}
 }

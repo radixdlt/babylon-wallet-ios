@@ -30,14 +30,16 @@ extension DAppsDirectory {
 						.foregroundColor(Color.primaryText)
 						.textStyle(.body1Header)
 					Spacer()
+				}
+				.padding(.horizontal, .medium3)
+
+				HStack {
+					searchView()
 					Button(asset: AssetResource.transactionHistoryFilterList) {
 						store.send(.view(.filtersTapped))
 					}
 				}
 				.padding(.horizontal, .medium3)
-
-				searchView()
-					.padding(.horizontal, .medium3)
 
 				if let filters = store.filterTags.asFilterItems.nilIfEmpty {
 					ScrollView(.horizontal) {
@@ -63,7 +65,7 @@ extension DAppsDirectory {
 		@ViewBuilder
 		func dAppsView() -> some SwiftUI.View {
 			ScrollView {
-				VStack(spacing: .small1) {
+				VStack(spacing: .medium1) {
 					loadable(
 						store.displayedDApps,
 						loadingView: loadingView,
@@ -103,21 +105,30 @@ extension DAppsDirectory {
 		}
 
 		@ViewBuilder
-		func loadedView(dApps: DAppsDirectory.State.DApps) -> some SwiftUI.View {
-			ForEach(dApps) { dApp in
-				Card {
-					store.send(.view(.didSelectDapp(dApp.id)))
-				} contents: {
-					VStack(alignment: .leading, spacing: .zero) {
-						PlainListRow(
-							context: .dappAndPersona,
-							title: dApp.name,
-							subtitle: dApp.description,
-							icon: {
-								Thumbnail(.dapp, url: dApp.thumbnail)
+		func loadedView(dAppsCategories: DAppsDirectory.State.DAppsCategories) -> some SwiftUI.View {
+			ForEach(dAppsCategories) { dAppCategory in
+				Section {
+					VStack(spacing: .small1) {
+						ForEach(dAppCategory.dApps) { dApp in
+							Card {
+								store.send(.view(.didSelectDapp(dApp.id)))
+							} contents: {
+								VStack(alignment: .leading, spacing: .zero) {
+									PlainListRow(
+										context: .dappAndPersona,
+										title: dApp.name,
+										subtitle: dApp.description,
+										icon: {
+											Thumbnail(.dapp, url: dApp.thumbnail)
+										}
+									)
+								}
 							}
-						)
+						}
 					}
+				} header: {
+					Text("\(dAppCategory.category.title)").textStyle(.sectionHeader)
+						.flushedLeft
 				}
 			}
 		}
@@ -181,5 +192,49 @@ private extension View {
 			.sheet(store: destinationStore.scope(state: \.tagSelection, action: \.tagSelection)) {
 				DAppTagsSelection.View(store: $0)
 			}
+	}
+}
+
+extension DAppsDirectoryClient.DApp.Category {
+	var title: String {
+		switch self {
+		case .defi:
+			"DeFi"
+		case .dao:
+			"DAO"
+		case .utility:
+			"Utility"
+		case .meme:
+			"Meme"
+		case .nft:
+			"NFT"
+		case .other:
+			"Other"
+		}
+	}
+}
+
+extension DAppsDirectoryClient.DApp.Tag {
+	var title: String {
+		switch self {
+		case .defi:
+			"DeFi"
+		case .dex:
+			"DEX"
+		case .token:
+			"Token"
+		case .trade:
+			"Trade"
+		case .marketplace:
+			"Marketplace"
+		case .nfts:
+			"NFTs"
+		case .lending:
+			"Lending"
+		case .tools:
+			"Tools"
+		case .dashboard:
+			"Dashboard"
+		}
 	}
 }

@@ -205,6 +205,19 @@ extension Loadable {
 			return .failure(error)
 		}
 	}
+    
+    func compactMapValue<ResultElement>(by predicate: (Value.Element) -> ResultElement?) -> Loadable<[ResultElement]> where Value: Sequence {
+        switch self {
+        case .idle:
+            return .idle
+        case .loading:
+            return .loading
+        case let .success(value):
+            return .success(value.compactMap(predicate))
+        case let .failure(error):
+            return .failure(error)
+        }
+    }
 
 	/// Transforms a Loadable<Wrapped?> to Loadable<Wrapped>?
 	func unwrap<Wrapped>() -> Loadable<Wrapped>? where Value == Wrapped? {

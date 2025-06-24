@@ -41,7 +41,8 @@ extension DAppsDirectoryClient.DApp: Codable {
 		self.tags = try container.decode([Result<Tag, DecodingError>].self, forKey: .tags)
 			.compactMap { try? $0.get() }
 			.asIdentified()
-		self.dAppCategory = try container.decodeIfPresent(Category.self, forKey: .dAppCategory) ?? .other
+		// Random temporary config, until backend returns category
+		self.dAppCategory = try container.decodeIfPresent(Category.self, forKey: .dAppCategory) ?? Category.allCases.shuffled().first!
 	}
 }
 
@@ -60,37 +61,12 @@ extension DAppsDirectoryClient.DApp {
 
 	enum Category: String, CaseIterable {
 		case defi
-		case dao
 		case utility
+		case dao
 		case nft
 		case meme
 
 		case other
-	}
-}
-
-extension DAppsDirectoryClient.DApp.Tag {
-	var title: String {
-		switch self {
-		case .defi:
-			"DeFi"
-		case .dex:
-			"DEX"
-		case .token:
-			"Token"
-		case .trade:
-			"Trade"
-		case .marketplace:
-			"Marketplace"
-		case .nfts:
-			"NFTs"
-		case .lending:
-			"Lending"
-		case .tools:
-			"Tools"
-		case .dashboard:
-			"Dashboard"
-		}
 	}
 }
 
@@ -120,6 +96,13 @@ extension DAppsDirectoryClient.DApp.Category: Codable {
 		} else {
 			self = .other
 		}
+	}
+}
+
+extension DAppsDirectoryClient.DApp.Category: Comparable {
+	static func < (lhs: Self, rhs: Self) -> Bool {
+		let allCases = Self.allCases
+		return allCases.firstIndex(of: lhs)! < allCases.firstIndex(of: rhs)!
 	}
 }
 

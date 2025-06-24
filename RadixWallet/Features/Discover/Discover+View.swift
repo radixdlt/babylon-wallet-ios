@@ -89,7 +89,7 @@ extension Discover.View {
 	func sectionHeader(title: String, seeMoreAction: Discover.ViewAction? = nil) -> some SwiftUI.View {
 		HStack {
 			Text(title)
-				.textStyle(.body1Header)
+				.textStyle(.sectionHeader)
 			Spacer()
 			if let seeMoreAction {
 				Button(L10n.Discover.SeeMore.button) {
