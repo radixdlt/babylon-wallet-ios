@@ -9,6 +9,7 @@ struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.accountLockersClient) var accountLockersClient
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.dAppsDirectoryClient) var dAppsDirectoryClient
 
 	typealias Store = StoreOf<Self>
 
@@ -16,9 +17,14 @@ struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 
 	// TODO: Add `@ObservableState` after migrating `DappDetails` to `ObservableState`
 	struct State: Sendable, Hashable {
-		var dApps: AuthorizedDapps = []
-		var thumbnails: [AuthorizedDapp.ID: URL] = [:]
-		var dappsWithClaims: [DappDefinitionAddress] = []
+		var filtering: DAppsFiltering.State = .init()
+		var dappsWithClaims: Set<DappDefinitionAddress> = []
+
+		var categorizedDApps: Loadable<DAppsDirectory.DAppsCategories> = .idle
+
+		var displayedDapps: Loadable<DAppsDirectory.DAppsCategories> {
+			categorizedDApps.filtered(filtering.searchTerm, filtering.filterTags)
+		}
 
 		@PresentationState
 		var destination: Destination.State? = nil
@@ -39,11 +45,13 @@ struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case loadedDapps(TaskResult<AuthorizedDapps>)
-		case loadedThumbnail(URL, dApp: AuthorizedDapp.ID)
-		case presentDappDetails(DappDetails.State)
-		case failedToGetDetailsOfDapp(id: AuthorizedDapp.ID)
+		case loadedDapps(TaskResult<DAppsDirectory.DApps>)
 		case setDappsWithClaims([DappDefinitionAddress])
+	}
+
+	@CasePathable
+	enum ChildAction: Sendable, Equatable {
+		case filtering(DAppsFiltering.Action)
 	}
 
 	// MARK: Destination
@@ -71,6 +79,10 @@ struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 	init() {}
 
 	var body: some ReducerOf<Self> {
+		Scope(state: \.filtering, action: \.child.filtering) {
+			DAppsFiltering()
+		}
+
 		Reduce(core)
 			.ifLet(destinationPath, action: \.destination) {
 				Destination()
@@ -82,59 +94,34 @@ struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			loadAuthorizedDapps()
+			return loadAuthorizedDapps(&state)
 				.merge(with: accountLockerClaimsEffect())
 
 		case let .didSelectDapp(dAppID):
-			.run { send in
-				let dApp = try await authorizedDappsClient.getDetailedDapp(dAppID)
-				let presentedDappState = DappDetails.State(dApp: dApp, context: .dAppsList)
-				await send(.internal(.presentDappDetails(presentedDappState)))
-			} catch: { error, send in
-				errorQueue.schedule(error)
-				await send(.internal(.failedToGetDetailsOfDapp(id: dAppID)))
-			}
+			state.destination = .presentedDapp(.init(dAppDefinitionAddress: dAppID))
+			return .none
 		}
 	}
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadedDapps(.success(dApps)):
-			state.dApps = dApps
-			return .run { send in
-				try await onLedgerEntitiesClient.getAssociatedDapps(dApps.map(\.id)).asyncForEach { dApp in
-					if let iconURL = dApp.metadata.iconURL {
-						await send(.internal(.loadedThumbnail(iconURL, dApp: dApp.address)))
-					}
+			let grouped = dApps.grouped(by: \.category)
+				.map { category, dApps in
+					DAppsDirectory.DAppsCategory(category: category, dApps: dApps.asIdentified())
 				}
-			}
+				.sorted(by: \.category)
+				.asIdentified()
 
-		case let .failedToGetDetailsOfDapp(dappId):
-			#if DEBUG
-			return .run { _ in
-				loggerGlobal.notice("DEBUG ONLY deleting authorized dapp since we failed to load detailed info about it")
-				try? await authorizedDappsClient.forgetAuthorizedDapp(dappId, nil)
-
-			}.concatenate(with: loadAuthorizedDapps())
-			#else
-			// FIXME: Should we have to handle this, this is a discrepancy bug..
+			state.categorizedDApps = .success(grouped)
 			return .none
-			#endif
 
 		case let .loadedDapps(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
 
-		case let .presentDappDetails(presentedDappState):
-			state.destination = .presentedDapp(presentedDappState)
-			return .none
-
-		case let .loadedThumbnail(thumbnail, dApp: id):
-			state.thumbnails[id] = thumbnail
-			return .none
-
 		case let .setDappsWithClaims(dappsWithClaims):
-			state.dappsWithClaims = dappsWithClaims
+			state.dappsWithClaims = Set(dappsWithClaims)
 			return .none
 		}
 	}
@@ -146,17 +133,44 @@ struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 				// TODO: Couldn't this simply be: state.destination = nil
 				await send(.destination(.dismiss))
 			}
-			.concatenate(with: loadAuthorizedDapps())
+			.concatenate(with: loadAuthorizedDapps(&state))
 
 		default:
 			.none
 		}
 	}
 
-	private func loadAuthorizedDapps() -> Effect<Action> {
-		.run { send in
+	private func loadAuthorizedDapps(_ state: inout State) -> Effect<Action> {
+		state.categorizedDApps.refresh(from: .loading)
+		return .run { send in
 			let result = await TaskResult {
-				try await authorizedDappsClient.getAuthorizedDapps()
+				let authorizedDapps = try await authorizedDappsClient.getAuthorizedDapps()
+				let dAppsList = await (try? dAppsDirectoryClient.fetchDApps(false)) ?? []
+				let dAppDetails = await (try? onLedgerEntitiesClient
+					.getAssociatedDapps(
+						authorizedDapps.map(\.dappDefinitionAddress),
+						cachingStrategy: .useCache
+					)
+					.asIdentified()) ?? []
+
+				let dApps = authorizedDapps.map { profileDApp in
+					let dAppTagsCategory = dAppsList[id: profileDApp.id]
+					let tags = dAppTagsCategory?.tags ?? []
+					let category = dAppTagsCategory?.dAppCategory ?? .other
+					let details = dAppDetails[id: profileDApp.id]
+
+					return DAppsDirectory.DApp(
+						dAppDefinitionAddress: profileDApp.dappDefinitionAddress,
+						name: details?.metadata.name ?? profileDApp.displayName ?? L10n.DAppRequest.Metadata.unknownName,
+						thumbnail: details?.metadata.iconURL,
+						description: details?.metadata.description,
+						tags: tags,
+						category: category
+					)
+				}
+				.asIdentified()
+
+				return dApps
 			}
 			await send(.internal(.loadedDapps(result)))
 		}

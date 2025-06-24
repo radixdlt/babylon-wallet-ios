@@ -25,7 +25,6 @@ struct Settings: Sendable, FeatureReducer {
 		case task
 		case securityCenterButtonTapped
 		case personasButtonTapped
-		case dappsButtonTapped
 		case connectorsButtonTapped
 		case preferencesButtonTapped
 		case troubleshootingButtonTapped
@@ -42,7 +41,6 @@ struct Settings: Sendable, FeatureReducer {
 		enum State: Sendable, Hashable {
 			case securityCenter(SecurityCenter.State)
 			case manageP2PLinks(P2PLinksFeature.State)
-			case authorizedDapps(AuthorizedDappsFeature.State)
 			case personas(PersonasCoordinator.State)
 			case preferences(Preferences.State)
 			case troubleshooting(Troubleshooting.State)
@@ -53,7 +51,6 @@ struct Settings: Sendable, FeatureReducer {
 		enum Action: Sendable, Equatable {
 			case securityCenter(SecurityCenter.Action)
 			case manageP2PLinks(P2PLinksFeature.Action)
-			case authorizedDapps(AuthorizedDappsFeature.Action)
 			case personas(PersonasCoordinator.Action)
 			case preferences(Preferences.Action)
 			case troubleshooting(Troubleshooting.Action)
@@ -66,9 +63,6 @@ struct Settings: Sendable, FeatureReducer {
 			}
 			Scope(state: \.manageP2PLinks, action: \.manageP2PLinks) {
 				P2PLinksFeature()
-			}
-			Scope(state: \.authorizedDapps, action: \.authorizedDapps) {
-				AuthorizedDappsFeature()
 			}
 			Scope(state: \.personas, action: \.personas) {
 				PersonasCoordinator()
@@ -116,10 +110,6 @@ struct Settings: Sendable, FeatureReducer {
 
 		case .personasButtonTapped:
 			state.destination = .personas(.init())
-			return .none
-
-		case .dappsButtonTapped:
-			state.destination = .authorizedDapps(.init())
 			return .none
 
 		case .connectorsButtonTapped:
