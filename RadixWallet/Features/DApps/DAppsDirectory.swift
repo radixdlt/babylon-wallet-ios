@@ -3,10 +3,8 @@
 struct DAppsDirectory: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
-		var searchBarFocused: Bool = false
+		var filtering: DAppsFiltering.State = .init()
 		var dApps: Loadable<IdentifiedArrayOf<DAppsCategory>> = .idle
-		var searchTerm: String = ""
-		var filterTags: OrderedSet<DAppsDirectoryClient.DApp.Tag> = []
 
 		@Presents
 		var destination: Destination.State? = nil
@@ -17,11 +15,7 @@ struct DAppsDirectory: Sendable, FeatureReducer {
 	@CasePathable
 	enum ViewAction: Sendable, Equatable {
 		case task
-		case searchTermChanged(String)
 		case didSelectDapp(State.DApp.ID)
-		case focusChanged(Bool)
-		case filtersTapped
-		case filterRemoved(DAppsDirectoryClient.DApp.Tag)
 		case pullToRefreshStarted
 	}
 
@@ -30,26 +24,25 @@ struct DAppsDirectory: Sendable, FeatureReducer {
 		case loadedDApps(TaskResult<State.DApps>)
 	}
 
+	@CasePathable
+	enum ChildAction: Sendable, Equatable {
+		case filtering(DAppsFiltering.Action)
+	}
+
 	struct Destination: DestinationReducer {
 		@CasePathable
 		enum State: Hashable, Sendable {
 			case presentedDapp(DappDetails.State)
-			case tagSelection(DAppTagsSelection.State)
 		}
 
 		@CasePathable
 		enum Action: Equatable, Sendable {
 			case presentedDapp(DappDetails.Action)
-			case tagSelection(DAppTagsSelection.Action)
 		}
 
 		var body: some ReducerOf<Self> {
 			Scope(state: \.presentedDapp, action: \.presentedDapp) {
 				DappDetails()
-			}
-
-			Scope(state: \.tagSelection, action: \.tagSelection) {
-				DAppTagsSelection()
 			}
 		}
 	}
@@ -61,6 +54,10 @@ struct DAppsDirectory: Sendable, FeatureReducer {
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	var body: some ReducerOf<Self> {
+		Scope(state: \.filtering, action: \.child.filtering) {
+			DAppsFiltering()
+		}
+
 		Reduce(core)
 			.ifLet(destinationPath, action: \.destination) {
 				Destination()
@@ -75,22 +72,6 @@ struct DAppsDirectory: Sendable, FeatureReducer {
 
 		case let .didSelectDapp(id):
 			state.destination = .presentedDapp(.init(dAppDefinitionAddress: id))
-			return .none
-
-		case let .searchTermChanged(searchTerm):
-			state.searchTerm = searchTerm.trimmingWhitespacesAndNewlines()
-			return .none
-
-		case let .focusChanged(isFocused):
-			state.searchBarFocused = isFocused
-			return .none
-
-		case .filtersTapped:
-			state.destination = .tagSelection(.init(selectedTags: state.filterTags))
-			return .none
-
-		case let .filterRemoved(tag):
-			state.filterTags.remove(tag)
 			return .none
 
 		case .pullToRefreshStarted:
@@ -124,16 +105,6 @@ struct DAppsDirectory: Sendable, FeatureReducer {
 				return .none
 			}
 			state.dApps = .failure(error)
-			return .none
-		}
-	}
-
-	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
-		switch presentedAction {
-		case let .tagSelection(.delegate(.selectedTags(tags))):
-			state.filterTags = tags
-			return .none
-		default:
 			return .none
 		}
 	}
@@ -172,16 +143,16 @@ extension DAppsDirectory.State {
 	var displayedDApps: Loadable<IdentifiedArrayOf<DAppsCategory>> {
 		dApps.compactMapValue {
 			let filteredDapps = $0.dApps.filter { dApp in
-				guard !filterTags.isEmpty else {
+				guard !filtering.filterTags.isEmpty else {
 					return true
 				}
 
-				return dApp.tags.contains { filterTags.contains($0) }
+				return dApp.tags.contains { filtering.filterTags.contains($0) }
 			}
 			.filter { dApp in
-				if !searchTerm.isEmpty {
-					dApp.name.range(of: searchTerm, options: .caseInsensitive) != nil ||
-						dApp.description?.range(of: searchTerm, options: .caseInsensitive) != nil
+				if !filtering.searchTerm.isEmpty {
+					dApp.name.range(of: filtering.searchTerm, options: .caseInsensitive) != nil ||
+						dApp.description?.range(of: filtering.searchTerm, options: .caseInsensitive) != nil
 				} else {
 					true
 				}

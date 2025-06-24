@@ -873,6 +873,10 @@
 		A03DD84B2DDD9150008F7723 /* DAppTagsSelection+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A03DD84A2DDD9150008F7723 /* DAppTagsSelection+View.swift */; };
 		A03DD84C2DDD9150008F7723 /* DAppTagsSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A03DD8492DDD9150008F7723 /* DAppTagsSelection.swift */; };
 		A04207F42DE9DDB600FE2947 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A04207F32DE9DDB600FE2947 /* Sargon */; };
+		A05AA1422E0AC06E00316B83 /* DAppsDirectory+AllDapps.swift in Sources */ = {isa = PBXBuildFile; fileRef = A05AA1402E0AC06E00316B83 /* DAppsDirectory+AllDapps.swift */; };
+		A05AA1432E0AC06E00316B83 /* DAppsDirectory+AllDapps+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A05AA1412E0AC06E00316B83 /* DAppsDirectory+AllDapps+View.swift */; };
+		A05AA1462E0AC13600316B83 /* DAppDirectory+Filtering+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A05AA1452E0AC13600316B83 /* DAppDirectory+Filtering+View.swift */; };
+		A05AA1472E0AC13600316B83 /* DAppDirectory+Filtering.swift in Sources */ = {isa = PBXBuildFile; fileRef = A05AA1442E0AC13600316B83 /* DAppDirectory+Filtering.swift */; };
 		A0600D372DCE02E000A2ADD3 /* AssetListSeparator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0600D362DCE02D300A2ADD3 /* AssetListSeparator.swift */; };
 		A0600D392DD35B2A00A2ADD3 /* DarkModeTintedImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0600D382DD35B2200A2ADD3 /* DarkModeTintedImage.swift */; };
 		A06323E52DFAC29B00963A1F /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A06323E42DFAC29B00963A1F /* Sargon */; };
@@ -2234,6 +2238,10 @@
 		A018C8742E0030C100461852 /* BlogPostsClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BlogPostsClient+Test.swift"; sourceTree = "<group>"; };
 		A03DD8492DDD9150008F7723 /* DAppTagsSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DAppTagsSelection.swift; sourceTree = "<group>"; };
 		A03DD84A2DDD9150008F7723 /* DAppTagsSelection+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DAppTagsSelection+View.swift"; sourceTree = "<group>"; };
+		A05AA1402E0AC06E00316B83 /* DAppsDirectory+AllDapps.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DAppsDirectory+AllDapps.swift"; sourceTree = "<group>"; };
+		A05AA1412E0AC06E00316B83 /* DAppsDirectory+AllDapps+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DAppsDirectory+AllDapps+View.swift"; sourceTree = "<group>"; };
+		A05AA1442E0AC13600316B83 /* DAppDirectory+Filtering.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DAppDirectory+Filtering.swift"; sourceTree = "<group>"; };
+		A05AA1452E0AC13600316B83 /* DAppDirectory+Filtering+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DAppDirectory+Filtering+View.swift"; sourceTree = "<group>"; };
 		A0600D362DCE02D300A2ADD3 /* AssetListSeparator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetListSeparator.swift; sourceTree = "<group>"; };
 		A0600D382DD35B2200A2ADD3 /* DarkModeTintedImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DarkModeTintedImage.swift; sourceTree = "<group>"; };
 		A06323E72DFC308200963A1F /* LearnAbout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearnAbout.swift; sourceTree = "<group>"; };
@@ -6350,6 +6358,10 @@
 				A0F223752DDC6C3600035389 /* DAppsDirectory+View.swift */,
 				A03DD8492DDD9150008F7723 /* DAppTagsSelection.swift */,
 				A03DD84A2DDD9150008F7723 /* DAppTagsSelection+View.swift */,
+				A05AA1402E0AC06E00316B83 /* DAppsDirectory+AllDapps.swift */,
+				A05AA1412E0AC06E00316B83 /* DAppsDirectory+AllDapps+View.swift */,
+				A05AA1442E0AC13600316B83 /* DAppDirectory+Filtering.swift */,
+				A05AA1452E0AC13600316B83 /* DAppDirectory+Filtering+View.swift */,
 			);
 			path = DApps;
 			sourceTree = "<group>";
@@ -8402,6 +8414,8 @@
 				A0D201722E057258009DA055 /* LearnItemsList.swift in Sources */,
 				5B2A0D812D358DBB0049C702 /* Signing.swift in Sources */,
 				5B2A0D822D358DBB0049C702 /* Signing+View.swift in Sources */,
+				A05AA1462E0AC13600316B83 /* DAppDirectory+Filtering+View.swift in Sources */,
+				A05AA1472E0AC13600316B83 /* DAppDirectory+Filtering.swift in Sources */,
 				A408165D2C7E0D08005E65B9 /* ValidatorCollectionItemEffectiveFeeFactor.swift in Sources */,
 				A40815762C7E0D08005E65B9 /* EntitySchemaCollectionItem.swift in Sources */,
 				48CFC5E32ADC10DA00E77A5C /* AttributedString+Extra.swift in Sources */,
@@ -9042,6 +9056,8 @@
 				48CFC4552ADC10DA00E77A5C /* CacheClient+Live.swift in Sources */,
 				48CFC3F32ADC10D900E77A5C /* PeerConnectionClient.swift in Sources */,
 				48CFC33E2ADC10D900E77A5C /* DappInteractionFlow+View.swift in Sources */,
+				A05AA1422E0AC06E00316B83 /* DAppsDirectory+AllDapps.swift in Sources */,
+				A05AA1432E0AC06E00316B83 /* DAppsDirectory+AllDapps+View.swift in Sources */,
 				48CFC3642ADC10D900E77A5C /* NonFungibleAssetList+View.swift in Sources */,
 				E7607DC32D439D7F0083B3A5 /* ChangeMainShield+View.swift in Sources */,
 				48CFC4102ADC10DA00E77A5C /* Functions.swift in Sources */,

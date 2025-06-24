@@ -5,6 +5,7 @@ extension DAppsDirectory {
 	struct View: SwiftUI.View {
 		@Perception.Bindable var store: StoreOf<DAppsDirectory>
 		@FocusState private var focusedField: Bool
+		@SwiftUI.State var selection: Int = 0
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
@@ -33,29 +34,17 @@ extension DAppsDirectory {
 				}
 				.padding(.horizontal, .medium3)
 
-				HStack {
-					searchView()
-					Button(asset: AssetResource.transactionHistoryFilterList) {
-						store.send(.view(.filtersTapped))
-					}
+				Picker("", selection: $selection) {
+					Text("All Dapps")
+						.tag(0)
+					Text("Approved Dapps")
+						.tag(1)
 				}
+				.tint(.primaryBackground)
+				.pickerStyle(.segmented)
 				.padding(.horizontal, .medium3)
 
-				if let filters = store.filterTags.asFilterItems.nilIfEmpty {
-					ScrollView(.horizontal) {
-						HStack {
-							ForEach(filters) { filter in
-								ItemFilterView(filter: filter, action: { _ in }, crossAction: { tag in
-									store.send(.view(.filterRemoved(tag)))
-								})
-							}
-
-							Spacer(minLength: 0)
-						}
-						.padding(.horizontal, .medium3)
-					}
-					.scrollIndicators(.hidden)
-				}
+				DAppsFiltering.View(store: store.scope(state: \.filtering, action: \.child.filtering))
 			}
 			.padding(.top, .small3)
 			.padding(.bottom, .small1)
@@ -153,25 +142,6 @@ extension DAppsDirectory {
 			.padding(.top, .huge1)
 			.frame(maxWidth: .infinity)
 		}
-
-		private func searchView() -> some SwiftUI.View {
-			AppTextField(
-				placeholder: L10n.DappDirectory.Search.placeholder,
-				text: $store.searchTerm.sending(\.view.searchTermChanged),
-				focus: .on(
-					true,
-					binding: $store.searchBarFocused.sending(\.view.focusChanged),
-					to: $focusedField
-				),
-				showClearButton: true,
-				innerAccessory: {
-					Image(systemName: "magnifyingglass")
-				}
-			)
-			.autocorrectionDisabled()
-			.keyboardType(.alphabet)
-			.disabled(!store.dApps.isSuccess)
-		}
 	}
 }
 
@@ -188,9 +158,6 @@ private extension View {
 		return
 			navigationDestination(store: destinationStore.scope(state: \.presentedDapp, action: \.presentedDapp)) {
 				DappDetails.View(store: $0)
-			}
-			.sheet(store: destinationStore.scope(state: \.tagSelection, action: \.tagSelection)) {
-				DAppTagsSelection.View(store: $0)
 			}
 	}
 }
