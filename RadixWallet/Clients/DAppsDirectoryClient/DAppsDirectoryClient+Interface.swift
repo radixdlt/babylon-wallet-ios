@@ -41,8 +41,7 @@ extension DAppsDirectoryClient.DApp: Codable {
 		self.tags = try container.decode([Result<Tag, DecodingError>].self, forKey: .tags)
 			.compactMap { try? $0.get() }
 			.asIdentified()
-		// Random temporary config, until backend returns category
-		self.dAppCategory = try container.decodeIfPresent(Category.self, forKey: .dAppCategory) ?? Category.allCases.shuffled().first!
+		self.dAppCategory = try container.decodeIfPresent(Category.self, forKey: .dAppCategory) ?? .other
 	}
 }
 

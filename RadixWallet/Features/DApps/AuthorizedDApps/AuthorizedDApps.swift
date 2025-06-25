@@ -98,7 +98,7 @@ struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 				.merge(with: accountLockerClaimsEffect())
 
 		case let .didSelectDapp(dAppID):
-			state.destination = .presentedDapp(.init(dAppDefinitionAddress: dAppID))
+			state.destination = .presentedDapp(.init(dAppDefinitionAddress: dAppID, context: .settings(.dAppsList)))
 			return .none
 		}
 	}
