@@ -113,6 +113,7 @@ struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 				.sorted(by: \.category)
 				.asIdentified()
 
+			state.filtering.allTags = OrderedSet(dApps.flatMap(\.tags).sorted())
 			state.categorizedDApps = .success(grouped)
 			return .none
 
@@ -155,17 +156,13 @@ struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 
 				let dApps = authorizedDapps.map { profileDApp in
 					let dAppTagsCategory = dAppsList[id: profileDApp.id]
-					let tags = dAppTagsCategory?.tags ?? []
-					let category = dAppTagsCategory?.dAppCategory ?? .other
 					let details = dAppDetails[id: profileDApp.id]
 
 					return DAppsDirectory.DApp(
-						dAppDefinitionAddress: profileDApp.dappDefinitionAddress,
-						name: details?.metadata.name ?? profileDApp.displayName ?? L10n.DAppRequest.Metadata.unknownName,
-						thumbnail: details?.metadata.iconURL,
-						description: details?.metadata.description,
-						tags: tags,
-						category: category
+						dAppDefinitionAddress: profileDApp.dAppDefinitionAddress,
+						dAppDetails: details,
+						dAppDirectoryDetails: dAppTagsCategory,
+						approvedDappName: profileDApp.displayName
 					)
 				}
 				.asIdentified()

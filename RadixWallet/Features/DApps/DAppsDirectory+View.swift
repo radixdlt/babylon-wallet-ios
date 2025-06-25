@@ -67,28 +67,3 @@ extension DAppsDirectoryClient.DApp.Category {
 		}
 	}
 }
-
-extension DAppsDirectoryClient.DApp.Tag {
-	var title: String {
-		switch self {
-		case .defi:
-			"DeFi"
-		case .dex:
-			"DEX"
-		case .token:
-			"Token"
-		case .trade:
-			"Trade"
-		case .marketplace:
-			"Marketplace"
-		case .nfts:
-			"NFTs"
-		case .lending:
-			"Lending"
-		case .tools:
-			"Tools"
-		case .dashboard:
-			"Dashboard"
-		}
-	}
-}

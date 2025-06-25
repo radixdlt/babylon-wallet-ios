@@ -47,7 +47,7 @@ extension DAppsDirectory {
 		let name: String
 		let thumbnail: URL?
 		let description: String?
-		let tags: IdentifiedArrayOf<DAppsDirectoryClient.DApp.Tag>
+		let tags: OrderedSet<OnLedgerTag>
 		let category: DAppsDirectoryClient.DApp.Category
 	}
 
@@ -61,8 +61,26 @@ extension DAppsDirectory {
 	}
 }
 
-extension OrderedSet<DAppsDirectoryClient.DApp.Tag> {
-	var asFilterItems: IdentifiedArrayOf<ItemFilter<DAppsDirectoryClient.DApp.Tag>> {
+extension DAppsDirectory.DApp {
+	init(
+		dAppDefinitionAddress: DappDefinitionAddress,
+		dAppDetails: OnLedgerEntity.AssociatedDapp?,
+		dAppDirectoryDetails: DAppsDirectoryClient.DApp?,
+		approvedDappName: String?
+	) {
+		self.dAppDefinitionAddress = dAppDefinitionAddress
+		self.name = dAppDetails?.metadata.name ?? approvedDappName ?? dAppDirectoryDetails?.name ?? L10n.DAppRequest.Metadata.unknownName
+		self.thumbnail = dAppDetails?.metadata.iconURL
+		self.description = dAppDetails?.metadata.description
+
+		let tags = dAppDetails?.metadata.tags.nilIfEmpty ?? dAppDirectoryDetails?.tags ?? []
+		self.tags = OrderedSet(tags.sorted())
+		self.category = dAppDirectoryDetails?.dAppCategory ?? .other
+	}
+}
+
+extension OrderedSet<OnLedgerTag> {
+	var asFilterItems: IdentifiedArrayOf<ItemFilter<OnLedgerTag>> {
 		self.elements.map {
 			$0.asItemFilter(isActive: true)
 		}.asIdentified()
@@ -70,7 +88,7 @@ extension OrderedSet<DAppsDirectoryClient.DApp.Tag> {
 }
 
 extension Loadable<DAppsDirectory.DAppsCategories> {
-	func filtered(_ searchTerm: String, _ tags: OrderedSet<DAppsDirectoryClient.DApp.Tag>) -> Self {
+	func filtered(_ searchTerm: String, _ tags: OrderedSet<OnLedgerTag>) -> Self {
 		compactMapValue {
 			let filteredDapps = $0.dApps.filter { dApp in
 				guard !tags.isEmpty else {

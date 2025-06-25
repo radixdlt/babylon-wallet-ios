@@ -5,7 +5,8 @@ struct DAppsFiltering: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		var searchBarFocused: Bool = false
 		var searchTerm: String = ""
-		var filterTags: OrderedSet<DAppsDirectoryClient.DApp.Tag> = []
+		var filterTags: OrderedSet<OnLedgerTag> = []
+		var allTags: OrderedSet<OnLedgerTag> = []
 
 		@Presents
 		var destination: Destination.State? = nil
@@ -18,7 +19,7 @@ struct DAppsFiltering: Sendable, FeatureReducer {
 		case searchTermChanged(String)
 		case focusChanged(Bool)
 		case filtersTapped
-		case filterRemoved(DAppsDirectoryClient.DApp.Tag)
+		case filterRemoved(OnLedgerTag)
 	}
 
 	struct Destination: DestinationReducer {
@@ -59,7 +60,7 @@ struct DAppsFiltering: Sendable, FeatureReducer {
 			return .none
 
 		case .filtersTapped:
-			state.destination = .tagSelection(.init(selectedTags: state.filterTags))
+			state.destination = .tagSelection(.init(selectedTags: state.filterTags, allTags: state.allTags))
 			return .none
 
 		case let .filterRemoved(tag):

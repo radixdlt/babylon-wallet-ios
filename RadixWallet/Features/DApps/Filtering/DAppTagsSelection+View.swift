@@ -8,13 +8,21 @@ extension DAppTagsSelection {
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				NavigationStack {
-					FlowLayout {
-						ItemFilterPickerView(filters: store.filterItems) { tag in
-							store.send(.view(.tagSelected(tag)))
+					ScrollView {
+						FlowLayout {
+							//                            ForEach(store.allTags, id: \.self) { tag in
+							//                                Button {
+							//                                    store.send(.view(.tagSelected(tag)))
+							//                                } label: {
+							//                                    AssetTagView(tag: tag)
+							//                                }
+							//                            }
+							ItemFilterPickerView(filters: store.filterItems) { tag in
+								store.send(.view(.tagSelected(tag)))
+							}
 						}
+						.padding(.medium1)
 					}
-					.padding(.medium1)
-					.presentationDetents([.fraction(0.33)])
 					.toolbar {
 						ToolbarItem(placement: .topBarLeading) {
 							CloseButton {

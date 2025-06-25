@@ -43,6 +43,17 @@ extension AuthorizedDappsFeature {
 															.padding(.horizontal, .medium1)
 															.padding(.bottom, .medium3)
 													}
+
+													if !dApp.tags.isEmpty {
+														FlowLayout {
+															ForEach(dApp.tags, id: \.self) {
+																AssetTagView(tag: $0)
+															}
+														}
+														.padding(.horizontal, .medium1)
+														.padding(.vertical, .medium3)
+														.background(.tertiaryBackground)
+													}
 												}
 											}
 										}

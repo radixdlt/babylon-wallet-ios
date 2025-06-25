@@ -24,6 +24,7 @@ extension DappDetails {
 		let tappablePersonas: Bool
 		let isDepositsVisible: Bool
 		let hasResources: Bool
+		let tags: [OnLedgerTag]
 	}
 }
 
@@ -136,7 +137,8 @@ private extension DappDetails.State {
 			showConfiguration: context != .general,
 			tappablePersonas: context == .settings(.dAppsList),
 			isDepositsVisible: authorizedDapp?.isDepositsVisible ?? true,
-			hasResources: resources?.isEmpty == false
+			hasResources: resources?.isEmpty == false,
+			tags: metadata?.tags ?? []
 		)
 	}
 
@@ -171,7 +173,7 @@ extension DappDetails.View {
 						Separator()
 					}
 
-					VStack(spacing: .medium3) {
+					VStack(alignment: .leading, spacing: .medium3) {
 						KeyValueView(key: L10n.AuthorizedDapps.DAppDetails.dAppDefinition) {
 							AddressView(.address(.account(viewStore.address)), imageColor: .secondaryText)
 						}
@@ -179,6 +181,8 @@ extension DappDetails.View {
 						if let domain = viewStore.domain {
 							KeyValueUrlView(key: L10n.AuthorizedDapps.DAppDetails.website, url: domain, isLocked: false)
 						}
+
+						AssetTagsView(tags: viewStore.tags)
 					}
 				}
 				.padding(.horizontal, .medium1)

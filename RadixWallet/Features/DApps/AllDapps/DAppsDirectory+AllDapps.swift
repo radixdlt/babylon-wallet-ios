@@ -105,6 +105,8 @@ extension DAppsDirectory {
 					.sorted(by: \.category)
 					.asIdentified()
 
+				state.filtering.allTags = OrderedSet(dApps.flatMap(\.tags).sorted())
+
 				state.dApps = .success(grouped)
 				return .none
 			case let .loadedDApps(.failure(error)):
@@ -130,13 +132,11 @@ extension DAppsDirectory {
 
 					return dAppList.map { dApp in
 						let details = dAppDetails[id: dApp.id]
-						return DApp(
+						return DAppsDirectory.DApp(
 							dAppDefinitionAddress: dApp.address,
-							name: details?.metadata.name ?? dApp.name,
-							thumbnail: details?.metadata.iconURL,
-							description: details?.metadata.description,
-							tags: dApp.tags,
-							category: dApp.dAppCategory
+							dAppDetails: details,
+							dAppDirectoryDetails: dApp,
+							approvedDappName: nil
 						)
 					}
 					.asIdentified()

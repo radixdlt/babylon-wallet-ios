@@ -3,7 +3,7 @@ import SwiftUI
 
 // MARK: - AssetTagsView
 struct AssetTagsView: View {
-	let tags: [AssetTag]
+	let tags: [OnLedgerTag]
 
 	var body: some View {
 		if !tags.isEmpty {
@@ -25,7 +25,7 @@ struct AssetTagsView: View {
 
 // MARK: - AssetTagView
 struct AssetTagView: View {
-	let tag: AssetTag
+	let tag: OnLedgerTag
 
 	var body: some View {
 		HStack(spacing: .small2) {
@@ -44,7 +44,7 @@ struct AssetTagView: View {
 	}
 }
 
-extension AssetTag {
+extension OnLedgerTag {
 	var name: String {
 		switch self {
 		case .officialRadix:

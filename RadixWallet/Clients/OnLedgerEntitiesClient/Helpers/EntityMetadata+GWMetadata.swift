@@ -293,7 +293,17 @@ extension [GatewayAPI.EntityMetadataItem] {
 }
 
 extension GatewayAPI.EntityMetadataCollection {
-	@Sendable func extractTags() -> [AssetTag] {
-		tags?.compactMap(NonEmptyString.init(rawValue:)).map(AssetTag.init) ?? []
+	@Sendable func extractTags() -> [OnLedgerTag] {
+		guard let tags else {
+			return []
+		}
+
+		let regex = try! Regex("^[A-Za-z0-9\\-]+$")
+
+		let filtered = tags.filter {
+			$0.contains(regex)
+		}
+
+		return filtered.compactMap(NonEmptyString.init(rawValue:)).map(OnLedgerTag.init)
 	}
 }

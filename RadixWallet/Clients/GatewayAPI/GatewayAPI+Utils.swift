@@ -88,7 +88,7 @@ extension Set<EntityMetadataKey> {
 	}
 
 	static var dappMetadataKeys: Set<EntityMetadataKey> {
-		let keys: Set<EntityMetadataKey> = [.name, .description, .iconURL, .claimedEntities, .claimedWebsites, .relatedWebsites, .dappDefinitions, .accountType]
+		let keys: Set<EntityMetadataKey> = [.name, .description, .iconURL, .claimedEntities, .claimedWebsites, .relatedWebsites, .dappDefinitions, .accountType, .tags]
 		assert(keys.count <= EntityMetadataKey.maxAllowedKeys)
 		return keys
 	}
