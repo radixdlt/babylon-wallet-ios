@@ -116,3 +116,14 @@ extension Loadable<DAppsDirectory.DAppsCategories> {
 		.map { $0.sorted(by: \.category).asIdentified() }
 	}
 }
+
+extension DAppsDirectory.DApps {
+	var groupedByCategory: DAppsDirectory.DAppsCategories {
+		self.grouped(by: \.category)
+			.map { category, dApps in
+				DAppsDirectory.DAppsCategory(category: category, dApps: dApps.asIdentified())
+			}
+			.sorted(by: \.category)
+			.asIdentified()
+	}
+}

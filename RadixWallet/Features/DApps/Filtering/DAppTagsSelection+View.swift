@@ -10,13 +10,6 @@ extension DAppTagsSelection {
 				NavigationStack {
 					ScrollView {
 						FlowLayout {
-							//                            ForEach(store.allTags, id: \.self) { tag in
-							//                                Button {
-							//                                    store.send(.view(.tagSelected(tag)))
-							//                                } label: {
-							//                                    AssetTagView(tag: tag)
-							//                                }
-							//                            }
 							ItemFilterPickerView(filters: store.filterItems) { tag in
 								store.send(.view(.tagSelected(tag)))
 							}

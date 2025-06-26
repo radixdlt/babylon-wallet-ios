@@ -304,6 +304,6 @@ extension GatewayAPI.EntityMetadataCollection {
 			$0.contains(regex)
 		}
 
-		return filtered.compactMap(NonEmptyString.init(rawValue:)).map(OnLedgerTag.init)
+		return filtered.map { $0.lowercased() }.compactMap(NonEmptyString.init(rawValue:)).map(OnLedgerTag.init)
 	}
 }

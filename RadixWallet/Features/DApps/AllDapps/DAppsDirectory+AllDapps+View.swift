@@ -35,8 +35,8 @@ extension DAppsDirectory.AllDapps {
 				VStack(spacing: .medium1) {
 					loadable(
 						store.displayedDApps,
-						loadingView: loadingView,
-						errorView: failedView,
+						loadingView: DAppsDirectory.loadingView,
+						errorView: DAppsDirectory.failedView,
 						successContent: loadedView
 					)
 				}
@@ -51,85 +51,10 @@ extension DAppsDirectory.AllDapps {
 		}
 
 		@ViewBuilder
-		func loadingView() -> some SwiftUI.View {
-			ForEach(0 ..< 10) { _ in
-				Card {
-					VStack(alignment: .leading, spacing: .zero) {
-						PlainListRow(
-							context: .dappAndPersona,
-							title: "placeholder",
-							subtitle: "placeholder placeholder placeholder placeholder placeholder placeholder placeholder",
-							accessory: nil,
-							icon: {
-								Thumbnail(.dapp, url: nil)
-							}
-						)
-						.redacted(reason: .placeholder)
-						.shimmer(active: true, config: .accountResourcesLoading)
-					}
-				}
-			}
-		}
-
-		@ViewBuilder
 		func loadedView(dAppsCategories: DAppsDirectory.DAppsCategories) -> some SwiftUI.View {
-			ForEach(dAppsCategories) { dAppCategory in
-				Section {
-					VStack(spacing: .small1) {
-						ForEach(dAppCategory.dApps) { dApp in
-							Card {
-								store.send(.view(.didSelectDapp(dApp.id)))
-							} contents: {
-								VStack(alignment: .leading, spacing: .zero) {
-									PlainListRow(
-										context: .dappAndPersona,
-										title: dApp.name,
-										subtitle: dApp.description,
-										icon: {
-											Thumbnail(.dapp, url: dApp.thumbnail)
-										}
-									)
-
-									if !dApp.tags.isEmpty {
-										FlowLayout {
-											ForEach(dApp.tags, id: \.self) {
-												AssetTagView(tag: $0)
-											}
-										}
-										.padding(.horizontal, .medium1)
-										.padding(.vertical, .medium3)
-										.background(.tertiaryBackground)
-									}
-								}
-							}
-						}
-					}
-				} header: {
-					Text("\(dAppCategory.category.title)").textStyle(.sectionHeader)
-						.flushedLeft
-				}
+			DAppsDirectory.loadedView(dAppsCategories: dAppsCategories) { dApp in
+				store.send(.view(.didSelectDapp(dApp.id)))
 			}
-		}
-
-		@ViewBuilder
-		func failedView(err: Error) -> some SwiftUI.View {
-			VStack(spacing: .zero) {
-				Image(systemName: "arrow.clockwise")
-					.resizable()
-					.aspectRatio(contentMode: .fit)
-					.frame(.small)
-
-				Text(L10n.DappDirectory.Error.heading)
-					.foregroundStyle(.primaryText)
-					.textStyle(.body1Header)
-					.padding(.top, .medium3)
-				Text(L10n.DappDirectory.Error.message)
-					.foregroundStyle(.secondaryText)
-					.textStyle(.body1HighImportance)
-					.padding(.top, .small3)
-			}
-			.padding(.top, .huge1)
-			.frame(maxWidth: .infinity)
 		}
 	}
 }

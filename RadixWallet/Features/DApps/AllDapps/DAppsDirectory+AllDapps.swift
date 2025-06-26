@@ -98,13 +98,7 @@ extension DAppsDirectory {
 		func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 			switch internalAction {
 			case let .loadedDApps(.success(dApps)):
-				let grouped = dApps.grouped(by: \.category)
-					.map { category, dApps in
-						DAppsCategory(category: category, dApps: dApps.asIdentified())
-					}
-					.sorted(by: \.category)
-					.asIdentified()
-
+				let grouped = dApps.groupedByCategory
 				state.filtering.allTags = OrderedSet(dApps.flatMap(\.tags).sorted())
 
 				state.dApps = .success(grouped)

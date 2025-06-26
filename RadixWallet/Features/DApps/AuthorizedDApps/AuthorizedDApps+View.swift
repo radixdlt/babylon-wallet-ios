@@ -1,8 +1,8 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - AuthorizedDappsFeature.View
-extension AuthorizedDappsFeature {
+// MARK: - DAppsDirectory.AuthorizedDappsFeature.View
+extension DAppsDirectory.AuthorizedDappsFeature {
 	@MainActor
 	struct View: SwiftUI.View {
 		private let store: Store
@@ -12,67 +12,90 @@ extension AuthorizedDappsFeature {
 		}
 
 		var body: some SwiftUI.View {
-			WithViewStore(store, observe: { $0 }) { viewStore in
-				DAppsFiltering.View(store: store.scope(state: \.filtering, action: \.child.filtering))
-					.padding(.top, .small3)
-					.padding(.bottom, .small1)
-					.background(.primaryBackground)
+			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+				VStack(spacing: .zero) {
+					DAppsFiltering.View(store: store.scope(state: \.filtering, action: \.child.filtering))
+						.padding(.top, .small3)
+						.padding(.bottom, .small1)
+						.background(.primaryBackground)
+					Separator()
+					loadable(
+						viewStore.displayedDapps,
+						loadingView: DAppsDirectory.loadingView,
+						errorView: DAppsDirectory.failedView,
+						successContent: {
+							loadedView(viewStore, categorizedDapps: $0)
+						}
+					)
+				}
+				.destinations(with: store)
+				.task {
+					viewStore.send(.task)
+				}
+			}
+		}
 
+		@ViewBuilder
+		func loadedView(
+			_ viewStore: ViewStore<DAppsDirectory.AuthorizedDappsFeature.State, DAppsDirectory.AuthorizedDappsFeature.ViewAction>,
+			categorizedDapps: DAppsDirectory.DAppsCategories
+		) -> some SwiftUI.View {
+			if categorizedDapps.isEmpty {
+				VStack {
+					Spacer()
+					Text(L10n.AuthorizedDapps.subtitle)
+						.textBlock
+					InfoButton(.dapps, label: L10n.InfoLink.Title.dapps)
+					Spacer()
+				}
+				.padding(.horizontal, .large2)
+				.frame(maxWidth: .infinity, alignment: .center)
+				.background(.secondaryBackground)
+			} else {
 				ScrollView {
-					VStack(alignment: .leading, spacing: .medium1) {
-						loadable(viewStore.displayedDapps) { categorizedDapps in
-							ForEach(categorizedDapps) { category in
-								Section {
-									VStack {
-										ForEach(category.dApps) { dApp in
-											Card {
-												viewStore.send(.view(.didSelectDapp(dApp.id)))
-											} contents: {
-												VStack(alignment: .leading, spacing: .zero) {
-													PlainListRow(
-														context: .dappAndPersona,
-														title: dApp.name,
-														subtitle: dApp.description,
-														icon: {
-															Thumbnail(.dapp, url: dApp.thumbnail)
-														}
-													)
-
-													if viewStore.dappsWithClaims.contains(dApp.id) {
-														StatusMessageView(text: L10n.AuthorizedDapps.pendingDeposit, type: .warning, useNarrowSpacing: true)
-															.padding(.horizontal, .medium1)
-															.padding(.bottom, .medium3)
-													}
-
-													if !dApp.tags.isEmpty {
-														FlowLayout {
-															ForEach(dApp.tags, id: \.self) {
-																AssetTagView(tag: $0)
-															}
-														}
-														.padding(.horizontal, .medium1)
-														.padding(.vertical, .medium3)
-														.background(.tertiaryBackground)
-													}
-												}
-											}
-										}
+					VStack(spacing: .medium1) {
+						ForEach(categorizedDapps) { category in
+							Section {
+								VStack(spacing: .small1) {
+									ForEach(category.dApps) { dApp in
+										dAppCard(viewStore, dApp: dApp)
 									}
-								} header: {
-									Text(category.category.title).textStyle(.sectionHeader)
-										.flushedLeft
 								}
+							} header: {
+								Text(category.category.title)
+									.textStyle(.sectionHeader)
+									.flushedLeft
 							}
 						}
 					}
-					.padding(.vertical, .small1)
 					.padding(.horizontal, .medium3)
+					.padding(.vertical, .medium1)
+					.frame(maxWidth: .infinity)
 				}
-				.frame(maxWidth: .infinity, alignment: .leading)
 				.background(.secondaryBackground)
-				.destinations(with: store)
-				.task {
-					viewStore.send(.view(.task))
+				.refreshable {
+					await viewStore.send(.pullToRefreshStarted).finish()
+				}
+			}
+		}
+
+		func dAppCard(
+			_ viewStore: ViewStore<DAppsDirectory.AuthorizedDappsFeature.State, DAppsDirectory.AuthorizedDappsFeature.ViewAction>,
+			dApp: DAppsDirectory.DApp
+		) -> some SwiftUI.View {
+			Card {
+				viewStore.send(.didSelectDapp(dApp.id))
+			} contents: {
+				VStack(alignment: .leading, spacing: .zero) {
+					PlainListRow(dApp: dApp)
+
+					if viewStore.dappsWithClaims.contains(dApp.id) {
+						StatusMessageView(text: L10n.AuthorizedDapps.pendingDeposit, type: .warning, useNarrowSpacing: true)
+							.padding(.horizontal, .medium1)
+							.padding(.bottom, .medium3)
+					}
+
+					DAppsDirectory.dAppTags(dApp)
 				}
 			}
 		}
@@ -81,15 +104,15 @@ extension AuthorizedDappsFeature {
 
 // MARK: - Extensions
 
-private extension StoreOf<AuthorizedDappsFeature> {
-	var destination: PresentationStoreOf<AuthorizedDappsFeature.Destination> {
+private extension StoreOf<DAppsDirectory.AuthorizedDappsFeature> {
+	var destination: PresentationStoreOf<DAppsDirectory.AuthorizedDappsFeature.Destination> {
 		scope(state: \.$destination, action: \.destination)
 	}
 }
 
 @MainActor
 private extension View {
-	func destinations(with store: StoreOf<AuthorizedDappsFeature>) -> some View {
+	func destinations(with store: StoreOf<DAppsDirectory.AuthorizedDappsFeature>) -> some View {
 		let destinationStore = store.destination
 		return navigationDestination(store: destinationStore.scope(state: \.presentedDapp, action: \.presentedDapp)) {
 			DappDetails.View(store: $0)
