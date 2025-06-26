@@ -18,32 +18,29 @@ extension DAppsDirectory.AuthorizedDappsFeature {
 						.padding(.top, .small3)
 						.padding(.bottom, .small1)
 						.background(.primaryBackground)
+						.disabled(!viewStore.hasAnyDApps)
 					Separator()
 
-					loadable(
-						viewStore.displayedDapps,
-						loadingView: {
-							ScrollView {
-								DAppsDirectory.loadingView()
-							}
-							.background(.secondaryBackground)
-							.refreshable {
-								await viewStore.send(.pullToRefreshStarted).finish()
-							}
-						},
-						errorView: { error in
-							ScrollView {
-								DAppsDirectory.failedView(err: error)
-							}
-							.background(.secondaryBackground)
-							.refreshable {
-								await viewStore.send(.pullToRefreshStarted).finish()
-							}
-						},
-						successContent: {
-							loadedView(viewStore, categorizedDapps: $0)
+					ScrollView {
+						VStack(spacing: .medium1) {
+							loadable(
+								viewStore.displayedDapps,
+								loadingView: DAppsDirectory.loadingView,
+								errorView: DAppsDirectory.failedView,
+								successContent: {
+									loadedView(viewStore, categorizedDapps: $0)
+								}
+							)
 						}
-					)
+						.padding(.horizontal, .medium3)
+						.padding(.vertical, .medium1)
+						.frame(maxWidth: .infinity)
+					}
+					.scrollDisabled(!viewStore.hasAnyDApps)
+					.background(.secondaryBackground)
+					.refreshable {
+						await viewStore.send(.pullToRefreshStarted).finish()
+					}
 				}
 				.destinations(with: store)
 				.task {
@@ -57,7 +54,7 @@ extension DAppsDirectory.AuthorizedDappsFeature {
 			_ viewStore: ViewStore<DAppsDirectory.AuthorizedDappsFeature.State, DAppsDirectory.AuthorizedDappsFeature.ViewAction>,
 			categorizedDapps: DAppsDirectory.DAppsCategories
 		) -> some SwiftUI.View {
-			if viewStore.categorizedDApps.wrappedValue?.isEmpty == true {
+			if !viewStore.hasAnyDApps {
 				VStack {
 					Spacer()
 					Text(L10n.AuthorizedDapps.subtitle)
@@ -66,23 +63,12 @@ extension DAppsDirectory.AuthorizedDappsFeature {
 					InfoButton(.dapps, label: L10n.InfoLink.Title.dapps)
 					Spacer()
 				}
+				.padding(.top, .huge1)
 				.padding(.horizontal, .large2)
-				.frame(maxWidth: .infinity, alignment: .center)
-				.background(.secondaryBackground)
+				.frame(maxWidth: .infinity)
 			} else {
-				ScrollView {
-					VStack(spacing: .medium1) {
-						DAppsDirectory.loadedView(dAppsCategories: categorizedDapps, dappsWithClaims: viewStore.dappsWithClaims) {
-							viewStore.send(.didSelectDapp($0.id))
-						}
-					}
-					.padding(.horizontal, .medium3)
-					.padding(.vertical, .medium1)
-					.frame(maxWidth: .infinity)
-				}
-				.background(.secondaryBackground)
-				.refreshable {
-					await viewStore.send(.pullToRefreshStarted).finish()
+				DAppsDirectory.loadedView(dAppsCategories: categorizedDapps, dappsWithClaims: viewStore.dappsWithClaims) {
+					viewStore.send(.didSelectDapp($0.id))
 				}
 			}
 		}

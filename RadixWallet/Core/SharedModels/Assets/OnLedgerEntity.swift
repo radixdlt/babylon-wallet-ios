@@ -143,6 +143,7 @@ extension OnLedgerEntity {
 		let iconURL: URL?
 		let infoURL: URL?
 		let tags: [OnLedgerTag]
+		let dAppCategory: DAppsDirectoryClient.DApp.Category?
 		let dappDefinitions: [AccountAddress]?
 		let dappDefinition: AccountAddress?
 		let validator: ValidatorAddress?
@@ -196,6 +197,7 @@ extension OnLedgerEntity {
 			iconURL: URL? = nil,
 			infoURL: URL? = nil,
 			tags: [OnLedgerTag] = [],
+			dAppCategory: DAppsDirectoryClient.DApp.Category? = nil,
 			dappDefinitions: [AccountAddress]? = nil,
 			dappDefinition: AccountAddress? = nil,
 			validator: ValidatorAddress? = nil,
@@ -215,6 +217,7 @@ extension OnLedgerEntity {
 			self.iconURL = iconURL
 			self.infoURL = infoURL
 			self.tags = tags
+			self.dAppCategory = dAppCategory
 			self.dappDefinitions = dappDefinitions
 			self.dappDefinition = dappDefinition
 			self.validator = validator

@@ -23,6 +23,10 @@ extension DAppsDirectory {
 
 			var categorizedDApps: Loadable<DAppsDirectory.DAppsCategories> = .idle
 
+			var hasAnyDApps: Bool {
+				categorizedDApps.wrappedValue?.isEmpty == false
+			}
+
 			var displayedDapps: Loadable<DAppsDirectory.DAppsCategories> {
 				categorizedDApps.filtered(filtering.searchTerm, filtering.filterTags)
 			}

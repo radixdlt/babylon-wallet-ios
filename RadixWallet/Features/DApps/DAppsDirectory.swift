@@ -75,7 +75,7 @@ extension DAppsDirectory.DApp {
 
 		let tags = dAppDetails?.metadata.tags.nilIfEmpty ?? dAppDirectoryDetails?.tags ?? []
 		self.tags = OrderedSet(tags.sorted())
-		self.category = dAppDirectoryDetails?.dAppCategory ?? .other
+		self.category = dAppDetails?.metadata.dAppCategory ?? dAppDirectoryDetails?.dAppCategory ?? .other
 	}
 }
 

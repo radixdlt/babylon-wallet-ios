@@ -8,6 +8,7 @@ extension OnLedgerEntity.Metadata {
 			iconURL: raw?.iconURL,
 			infoURL: raw?.infoURL,
 			tags: raw?.extractTags() ?? [],
+			dAppCategory: raw?.dAppCategory,
 			dappDefinitions: raw?.dappDefinitions?.compactMap { try? DappDefinitionAddress(validatingAddress: $0) },
 			dappDefinition: raw?.dappDefinition.flatMap { try? DappDefinitionAddress(validatingAddress: $0) },
 			validator: raw?.validator,
@@ -170,6 +171,12 @@ extension GatewayAPI.EntityMetadataCollection {
 
 	var tags: [String]? {
 		value(.tags)?.asStringCollection
+	}
+
+	var dAppCategory: DAppsDirectoryClient.DApp.Category? {
+		value(.dAppCategory)
+			.flatMap(\.asString?.localizedLowercase)
+			.flatMap(DAppsDirectoryClient.DApp.Category.init(rawValue:))
 	}
 
 	var iconURL: URL? {
