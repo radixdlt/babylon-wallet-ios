@@ -6,6 +6,7 @@ extension DAppsDirectory {
 		struct State: Sendable, Hashable {
 			var filtering: DAppsFiltering.State = .init()
 			var dApps: Loadable<IdentifiedArrayOf<DAppsCategory>> = .idle
+			var isOnMainnet = true
 
 			var displayedDApps: Loadable<DAppsDirectory.DAppsCategories> {
 				dApps.filtered(filtering.searchTerm, filtering.filterTags)
@@ -27,6 +28,7 @@ extension DAppsDirectory {
 		@CasePathable
 		enum InternalAction: Sendable, Equatable {
 			case loadedDApps(TaskResult<DApps>)
+			case currentGatewayChanged(to: Gateway)
 		}
 
 		@CasePathable
@@ -52,6 +54,7 @@ extension DAppsDirectory {
 			}
 		}
 
+		@Dependency(\.gatewaysClient) var gatewaysClient
 		@Dependency(\.dAppsDirectoryClient) var dAppsDirectoryClient
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 		@Dependency(\.errorQueue) var errorQueue
@@ -72,11 +75,9 @@ extension DAppsDirectory {
 		func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
 			case .task:
-				guard !state.dApps.isSuccess else {
-					return .none
-				}
-				state.dApps = .loading
-				return loadDapps()
+				state.dApps.refresh(from: .loading)
+				return loadDapps(state)
+					.merge(with: gatewayValuesEffect())
 
 			case let .didSelectDapp(id):
 				state.destination = .presentedDapp(.init(dAppDefinitionAddress: id))
@@ -91,7 +92,7 @@ extension DAppsDirectory {
 					state.dApps = .loading
 				}
 
-				return loadDapps(forceRefresh: true)
+				return loadDapps(state, forceRefresh: true)
 			}
 		}
 
@@ -110,11 +111,18 @@ extension DAppsDirectory {
 				}
 				state.dApps = .failure(error)
 				return .none
+			case let .currentGatewayChanged(currentGateway):
+				state.isOnMainnet = currentGateway.network.id == .mainnet
+				return .none
 			}
 		}
 
-		func loadDapps(forceRefresh: Bool = false) -> Effect<Action> {
-			.run { send in
+		func loadDapps(_ state: State, forceRefresh: Bool = false) -> Effect<Action> {
+			if state.dApps.isSuccess, !forceRefresh {
+				return .none
+			}
+
+			return .run { send in
 				let result = await TaskResult {
 					let dAppList = try await dAppsDirectoryClient.fetchDApps(forceRefresh)
 					let dAppDetails = try await onLedgerEntitiesClient
@@ -137,6 +145,16 @@ extension DAppsDirectory {
 				}
 
 				await send(.internal(.loadedDApps(result)))
+			}
+		}
+
+		private func gatewayValuesEffect() -> Effect<Action> {
+			.run { send in
+				for try await gateway in await gatewaysClient.currentGatewayValues() {
+					guard !Task.isCancelled else { return }
+					loggerGlobal.notice("Changed network to: \(gateway)")
+					await send(.internal(.currentGatewayChanged(to: gateway)))
+				}
 			}
 		}
 	}

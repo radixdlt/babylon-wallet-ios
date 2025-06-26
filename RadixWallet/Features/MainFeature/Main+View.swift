@@ -18,10 +18,10 @@ extension Main {
 		}
 
 		var body: some SwiftUI.View {
-			WithViewStore(store, observe: { $0 }) { viewStore in
+			WithViewStore(store, observe: { $0 }) { _ in
 				NavigationStack {
 					TabView {
-						tabs(isOnMainnet: viewStore.isOnMainnet)
+						tabs
 					}
 				}
 			}
@@ -32,12 +32,10 @@ extension Main {
 			.presentsDappInteractions()
 		}
 
-		func tabs(isOnMainnet: Bool) -> some SwiftUI.View {
+		var tabs: some SwiftUI.View {
 			Group {
 				walletTab
-				if isOnMainnet {
-					dAppDirectoryTab
-				}
+				dAppDirectoryTab
 				discoverTab
 				settingsTab
 			}

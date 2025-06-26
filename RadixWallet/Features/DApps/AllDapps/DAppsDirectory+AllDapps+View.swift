@@ -15,7 +15,7 @@ extension DAppsDirectory.AllDapps {
 				}
 				.background(.primaryBackground)
 				.destinations(with: store)
-				.onFirstTask {
+				.task { @MainActor in
 					await store.send(.view(.task)).finish()
 				}
 			}
@@ -31,22 +31,35 @@ extension DAppsDirectory.AllDapps {
 
 		@ViewBuilder
 		func dAppsView() -> some SwiftUI.View {
-			ScrollView {
-				VStack(spacing: .medium1) {
-					loadable(
-						store.displayedDApps,
-						loadingView: DAppsDirectory.loadingView,
-						errorView: DAppsDirectory.failedView,
-						successContent: loadedView
-					)
+			if store.isOnMainnet {
+				ScrollView {
+					VStack(spacing: .medium1) {
+						loadable(
+							store.displayedDApps,
+							loadingView: DAppsDirectory.loadingView,
+							errorView: DAppsDirectory.failedView,
+							successContent: loadedView
+						)
+					}
+					.padding(.horizontal, .medium3)
+					.padding(.vertical, .medium1)
+					.frame(maxWidth: .infinity)
 				}
-				.padding(.horizontal, .medium3)
-				.padding(.vertical, .medium1)
-				.frame(maxWidth: .infinity)
-			}
-			.background(.secondaryBackground)
-			.refreshable {
-				store.send(.view(.pullToRefreshStarted))
+				.background(.secondaryBackground)
+				.refreshable {
+					store.send(.view(.pullToRefreshStarted))
+				}
+			} else {
+				VStack {
+					Spacer()
+					Text("No available dApps on this network.")
+						.textBlock
+						.multilineTextAlignment(.center)
+					Spacer()
+				}
+				.padding(.horizontal, .large2)
+				.frame(maxWidth: .infinity, alignment: .center)
+				.background(.secondaryBackground)
 			}
 		}
 

@@ -90,28 +90,52 @@ extension OrderedSet<OnLedgerTag> {
 extension Loadable<DAppsDirectory.DAppsCategories> {
 	func filtered(_ searchTerm: String, _ tags: OrderedSet<OnLedgerTag>) -> Self {
 		compactMapValue {
-			let filteredDapps = $0.dApps.filter { dApp in
+			let filteredByTags = $0.dApps.filter { dApp in
 				guard !tags.isEmpty else {
 					return true
 				}
 
 				return dApp.tags.contains { tags.contains($0) }
 			}
-			.filter { dApp in
-				if !searchTerm.isEmpty {
-					dApp.name.range(of: searchTerm, options: .caseInsensitive) != nil ||
-						dApp.description?.range(of: searchTerm, options: .caseInsensitive) != nil
-				} else {
-					true
+
+			let searchTermWords = searchTerm.split(separator: " ")
+
+			let titleFullMatches = filteredByTags.filter {
+				$0.name.localizedCaseInsensitiveContains(searchTerm)
+			}
+
+			let descriptionFullMatches = filteredByTags.filter {
+				$0.description?.localizedCaseInsensitiveContains(searchTerm) ?? false
+			}
+
+			let titlePartialMatchs = filteredByTags.filter { dApp in
+				searchTermWords.allSatisfy { word in
+					dApp.name.localizedCaseInsensitiveContains(word)
 				}
 			}
-			.asIdentified()
 
-			guard !filteredDapps.isEmpty else {
+			let descriptionPartialMatches = filteredByTags.filter { dApp in
+				guard let description = dApp.description else {
+					return false
+				}
+				return searchTermWords.allSatisfy { word in
+					description.localizedCaseInsensitiveContains(word)
+				}
+			}
+
+			let tagMatches = filteredByTags.filter { dApp in
+				dApp.tags.contains {
+					$0.name == searchTerm
+				}
+			}
+
+			let matches = titleFullMatches + descriptionFullMatches + titlePartialMatchs + descriptionPartialMatches + tagMatches
+
+			guard !matches.isEmpty else {
 				return nil
 			}
 
-			return DAppsDirectory.DAppsCategory(category: $0.category, dApps: filteredDapps)
+			return DAppsDirectory.DAppsCategory(category: $0.category, dApps: matches)
 		}
 		.map { $0.sorted(by: \.category).asIdentified() }
 	}

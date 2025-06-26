@@ -19,10 +19,27 @@ extension DAppsDirectory.AuthorizedDappsFeature {
 						.padding(.bottom, .small1)
 						.background(.primaryBackground)
 					Separator()
+
 					loadable(
 						viewStore.displayedDapps,
-						loadingView: DAppsDirectory.loadingView,
-						errorView: DAppsDirectory.failedView,
+						loadingView: {
+							ScrollView {
+								DAppsDirectory.loadingView()
+							}
+							.background(.secondaryBackground)
+							.refreshable {
+								await viewStore.send(.pullToRefreshStarted).finish()
+							}
+						},
+						errorView: { error in
+							ScrollView {
+								DAppsDirectory.failedView(err: error)
+							}
+							.background(.secondaryBackground)
+							.refreshable {
+								await viewStore.send(.pullToRefreshStarted).finish()
+							}
+						},
 						successContent: {
 							loadedView(viewStore, categorizedDapps: $0)
 						}
@@ -40,11 +57,12 @@ extension DAppsDirectory.AuthorizedDappsFeature {
 			_ viewStore: ViewStore<DAppsDirectory.AuthorizedDappsFeature.State, DAppsDirectory.AuthorizedDappsFeature.ViewAction>,
 			categorizedDapps: DAppsDirectory.DAppsCategories
 		) -> some SwiftUI.View {
-			if categorizedDapps.isEmpty {
+			if viewStore.categorizedDApps.wrappedValue?.isEmpty == true {
 				VStack {
 					Spacer()
 					Text(L10n.AuthorizedDapps.subtitle)
 						.textBlock
+						.multilineTextAlignment(.center)
 					InfoButton(.dapps, label: L10n.InfoLink.Title.dapps)
 					Spacer()
 				}
@@ -54,18 +72,8 @@ extension DAppsDirectory.AuthorizedDappsFeature {
 			} else {
 				ScrollView {
 					VStack(spacing: .medium1) {
-						ForEach(categorizedDapps) { category in
-							Section {
-								VStack(spacing: .small1) {
-									ForEach(category.dApps) { dApp in
-										dAppCard(viewStore, dApp: dApp)
-									}
-								}
-							} header: {
-								Text(category.category.title)
-									.textStyle(.sectionHeader)
-									.flushedLeft
-							}
+						DAppsDirectory.loadedView(dAppsCategories: categorizedDapps, dappsWithClaims: viewStore.dappsWithClaims) {
+							viewStore.send(.didSelectDapp($0.id))
 						}
 					}
 					.padding(.horizontal, .medium3)

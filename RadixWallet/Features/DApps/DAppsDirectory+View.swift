@@ -73,7 +73,8 @@ extension DAppsDirectory {
 	@ViewBuilder
 	static func loadedView(
 		dAppsCategories: DAppsDirectory.DAppsCategories,
-		onDAppSelected: @escaping (DApp) -> Void
+		dappsWithClaims: Set<DappDefinitionAddress> = [],
+		onDAppSelected: @escaping (DApp) -> Void,
 	) -> some SwiftUI.View {
 		ForEach(dAppsCategories) { dAppCategory in
 			Section {
@@ -84,6 +85,13 @@ extension DAppsDirectory {
 						} contents: {
 							VStack(alignment: .leading, spacing: .zero) {
 								PlainListRow(dApp: dApp)
+
+								if dappsWithClaims.contains(dApp.id) {
+									StatusMessageView(text: L10n.AuthorizedDapps.pendingDeposit, type: .warning, useNarrowSpacing: true)
+										.padding(.horizontal, .medium1)
+										.padding(.bottom, .medium3)
+								}
+
 								DAppsDirectory.dAppTags(dApp)
 							}
 						}
@@ -152,7 +160,7 @@ extension DAppsDirectory {
 			}
 			.padding(.horizontal, .medium1)
 			.padding(.vertical, .medium3)
-			.background(.tertiaryBackground)
+			.background(.cardBackgroundSecondary)
 		}
 	}
 }
