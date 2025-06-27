@@ -30,13 +30,10 @@ extension DAppTagsSelection {
 						}
 					}
 					.footer {
-						WithControlRequirements(
-							store.selectedTags.nilIfEmpty,
-							forAction: { store.send(.view(.confirmTapped($0))) }
-						) { action in
-							Button(L10n.Common.confirm, action: action)
-								.buttonStyle(.primaryRectangular)
-						}
+						Button(L10n.Common.confirm, action: {
+							store.send(.view(.confirmTapped))
+						})
+						.buttonStyle(.primaryRectangular)
 					}
 					.radixToolbar(title: L10n.DappDirectory.Filters.title, alwaysVisible: false)
 				}
