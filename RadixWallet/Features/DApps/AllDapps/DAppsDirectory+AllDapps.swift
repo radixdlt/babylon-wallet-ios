@@ -8,6 +8,10 @@ extension DAppsDirectory {
 			var dApps: Loadable<IdentifiedArrayOf<DAppsCategory>> = .idle
 			var isOnMainnet = true
 
+			var isFilteringEnabled: Bool {
+				isOnMainnet && dApps.wrappedValue?.isEmpty == false
+			}
+
 			var displayedDApps: Loadable<DAppsDirectory.DAppsCategories> {
 				dApps.filtered(filtering.searchTerm, filtering.filterTags)
 			}

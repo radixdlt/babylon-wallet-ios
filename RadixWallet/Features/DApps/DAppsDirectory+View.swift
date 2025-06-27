@@ -33,9 +33,9 @@ extension DAppsDirectory {
 				.padding(.horizontal, .medium3)
 
 				Picker("", selection: $selection) {
-					Text("All Dapps")
+					Text(L10n.Discover.View.All.dapps)
 						.tag(0)
-					Text("Approved Dapps")
+					Text(L10n.Discover.View.Approved.dapps)
 						.tag(1)
 				}
 				.tint(.primaryBackground)
@@ -53,17 +53,17 @@ extension DAppsDirectoryClient.DApp.Category {
 	var title: String {
 		switch self {
 		case .defi:
-			"DeFi"
+			L10n.DappDirectory.CategoryDefi.title
 		case .dao:
-			"DAO"
+			L10n.DappDirectory.CategoryDao.title
 		case .utility:
-			"Utility"
+			L10n.DappDirectory.CategoryUtility.title
 		case .meme:
-			"Meme"
+			L10n.DappDirectory.CategoryMeme.title
 		case .nft:
-			"NFT"
+			L10n.DappDirectory.CategoryNFT.title
 		case .other:
-			"Other"
+			L10n.DappDirectory.CategoryOther.title
 		}
 	}
 }

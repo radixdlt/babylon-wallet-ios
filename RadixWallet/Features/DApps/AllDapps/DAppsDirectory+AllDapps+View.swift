@@ -26,6 +26,7 @@ extension DAppsDirectory.AllDapps {
 				.padding(.top, .small3)
 				.padding(.bottom, .small1)
 				.background(.primaryBackground)
+				.disabled(!store.isFilteringEnabled)
 		}
 
 		@ViewBuilder
@@ -51,7 +52,7 @@ extension DAppsDirectory.AllDapps {
 			} else {
 				VStack {
 					Spacer()
-					Text("No available dApps on this network.")
+					Text(L10n.DappDirectory.Empty.message)
 						.textBlock
 						.multilineTextAlignment(.center)
 					Spacer()
