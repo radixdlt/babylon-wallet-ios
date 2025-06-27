@@ -13,6 +13,7 @@ struct DAppTagsSelection: Sendable, FeatureReducer {
 		case tagSelected(OnLedgerTag)
 		case closeTapped
 		case clearAllTapped
+		case confirmTapped(OrderedSet<OnLedgerTag>)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -31,10 +32,15 @@ struct DAppTagsSelection: Sendable, FeatureReducer {
 			return .run { _ in await dismiss() }
 		case .clearAllTapped:
 			state.selectedTags.removeAll()
-			return .send(.delegate(.selectedTags(state.selectedTags)))
+			return .none
 		case let .tagSelected(tag):
 			state.selectedTags.toggle(tag)
-			return .send(.delegate(.selectedTags(state.selectedTags)))
+			return .none
+		case let .confirmTapped(tags):
+			return .run { send in
+				await send(.delegate(.selectedTags(tags)))
+				await dismiss()
+			}
 		}
 	}
 }

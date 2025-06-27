@@ -29,6 +29,15 @@ extension DAppTagsSelection {
 							.buttonStyle(.blueText)
 						}
 					}
+					.footer {
+						WithControlRequirements(
+							store.selectedTags.nilIfEmpty,
+							forAction: { store.send(.view(.confirmTapped($0))) }
+						) { action in
+							Button(L10n.Common.confirm, action: action)
+								.buttonStyle(.primaryRectangular)
+						}
+					}
 					.radixToolbar(title: L10n.DappDirectory.Filters.title, alwaysVisible: false)
 				}
 			}
