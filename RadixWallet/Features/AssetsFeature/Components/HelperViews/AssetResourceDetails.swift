@@ -72,7 +72,7 @@ struct AssetResourceDetailsSection: View {
 				}
 
 				loadable(viewState.tags) { _ in
-					AssetTagsView(tags: viewState.tags.wrappedValue ?? [])
+					OnLedgerTagsView(tags: viewState.tags.wrappedValue ?? [])
 				}
 
 				loadable(viewState.arbitraryDataFields) { arbitraryDataFields in

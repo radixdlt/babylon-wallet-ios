@@ -54,11 +54,11 @@ struct FlowLayout: Layout {
 			alignment: alignment
 		).offsets
 
-		let hidebSubviews = subviews.suffix(subviews.count - offsets.count)
+		let hidenSubviews = subviews.suffix(subviews.count - offsets.count)
 		let subviews = subviews.prefix(offsets.count)
 
-		for hidebSubview in hidebSubviews {
-			hidebSubview.place(at: .zero, proposal: .zero)
+		for hidenSubview in hidenSubviews {
+			hidenSubview.place(at: .zero, proposal: .zero)
 		}
 
 		for (offset, subview) in zip(offsets, subviews) {

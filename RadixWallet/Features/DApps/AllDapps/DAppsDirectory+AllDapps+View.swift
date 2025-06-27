@@ -3,8 +3,7 @@ import SwiftUI
 // MARK: - DAppsDirectory.AllDapps.View
 extension DAppsDirectory.AllDapps {
 	struct View: SwiftUI.View {
-		@Perception.Bindable var store: StoreOf<DAppsDirectory.AllDapps>
-		@SwiftUI.State var selection: Int = 0
+		let store: StoreOf<DAppsDirectory.AllDapps>
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {

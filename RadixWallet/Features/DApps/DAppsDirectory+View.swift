@@ -155,7 +155,7 @@ extension DAppsDirectory {
 		if !dApp.tags.isEmpty {
 			FlowLayout(rowsLimit: 2) {
 				ForEach(dApp.tags, id: \.self) {
-					AssetTagView(tag: $0)
+					OnLedgerTagView(tag: $0)
 				}
 			}
 			.padding(.horizontal, .medium1)

@@ -291,7 +291,7 @@
 		48CFC37A2ADC10D900E77A5C /* PoolUnitDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE592ADC10D800E77A5C /* PoolUnitDetails.swift */; };
 		48CFC37C2ADC10D900E77A5C /* PoolUnitDetails+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE5B2ADC10D800E77A5C /* PoolUnitDetails+View.swift */; };
 		48CFC37F2ADC10D900E77A5C /* PoolUnitsList+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE5E2ADC10D800E77A5C /* PoolUnitsList+View.swift */; };
-		48CFC3802ADC10D900E77A5C /* AssetTagsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE602ADC10D800E77A5C /* AssetTagsView.swift */; };
+		48CFC3802ADC10D900E77A5C /* OnLedgerTagsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE602ADC10D800E77A5C /* OnLedgerTagsView.swift */; };
 		48CFC3812ADC10D900E77A5C /* NFTHelperViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE612ADC10D800E77A5C /* NFTHelperViews.swift */; };
 		48CFC3822ADC10D900E77A5C /* AssetBehaviorsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE622ADC10D800E77A5C /* AssetBehaviorsView.swift */; };
 		48CFC3832ADC10D900E77A5C /* GeneralHelperViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE632ADC10D800E77A5C /* GeneralHelperViews.swift */; };
@@ -1681,7 +1681,7 @@
 		48CFBE592ADC10D800E77A5C /* PoolUnitDetails.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PoolUnitDetails.swift; sourceTree = "<group>"; };
 		48CFBE5B2ADC10D800E77A5C /* PoolUnitDetails+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PoolUnitDetails+View.swift"; sourceTree = "<group>"; };
 		48CFBE5E2ADC10D800E77A5C /* PoolUnitsList+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PoolUnitsList+View.swift"; sourceTree = "<group>"; };
-		48CFBE602ADC10D800E77A5C /* AssetTagsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetTagsView.swift; sourceTree = "<group>"; };
+		48CFBE602ADC10D800E77A5C /* OnLedgerTagsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OnLedgerTagsView.swift; sourceTree = "<group>"; };
 		48CFBE612ADC10D800E77A5C /* NFTHelperViews.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NFTHelperViews.swift; sourceTree = "<group>"; };
 		48CFBE622ADC10D800E77A5C /* AssetBehaviorsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetBehaviorsView.swift; sourceTree = "<group>"; };
 		48CFBE632ADC10D800E77A5C /* GeneralHelperViews.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeneralHelperViews.swift; sourceTree = "<group>"; };
@@ -4288,7 +4288,6 @@
 				A0600D362DCE02D300A2ADD3 /* AssetListSeparator.swift */,
 				5B80FCC52C298EEC008444F5 /* ArbitraryDataField */,
 				A462B5B52B90C4A900C26D20 /* ResourceBalance */,
-				48CFBE602ADC10D800E77A5C /* AssetTagsView.swift */,
 				48CFBE612ADC10D800E77A5C /* NFTHelperViews.swift */,
 				48CFBE622ADC10D800E77A5C /* AssetBehaviorsView.swift */,
 				48CFBE632ADC10D800E77A5C /* GeneralHelperViews.swift */,
@@ -5112,6 +5111,7 @@
 		48CFC0E52ADC10D900E77A5C /* DesignSystem */ = {
 			isa = PBXGroup;
 			children = (
+				48CFBE602ADC10D800E77A5C /* OnLedgerTagsView.swift */,
 				48CFC0E62ADC10D900E77A5C /* ControlRequirements.swift */,
 				48CFC0E72ADC10D900E77A5C /* ToggleView.swift */,
 				48CFC0E82ADC10D900E77A5C /* ControlState.swift */,
@@ -8511,7 +8511,7 @@
 				48CFC27B2ADC10D900E77A5C /* AppDelegate.swift in Sources */,
 				A408161F2C7E0D08005E65B9 /* StateEntitySchemaPageRequest.swift in Sources */,
 				48CFC2CD2ADC10D900E77A5C /* ReceivingAccount+View.swift in Sources */,
-				48CFC3802ADC10D900E77A5C /* AssetTagsView.swift in Sources */,
+				48CFC3802ADC10D900E77A5C /* OnLedgerTagsView.swift in Sources */,
 				48CFC3822ADC10D900E77A5C /* AssetBehaviorsView.swift in Sources */,
 				A408161D2C7E0D08005E65B9 /* StateEntityNonFungiblesPageRequestOptIns.swift in Sources */,
 				A40815E02C7E0D08005E65B9 /* ProgrammaticScryptoSborValueReference.swift in Sources */,

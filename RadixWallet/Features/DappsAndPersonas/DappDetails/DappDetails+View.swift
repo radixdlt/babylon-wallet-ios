@@ -182,7 +182,7 @@ extension DappDetails.View {
 							KeyValueUrlView(key: L10n.AuthorizedDapps.DAppDetails.website, url: domain, isLocked: false)
 						}
 
-						AssetTagsView(tags: viewStore.tags)
+						OnLedgerTagsView(tags: viewStore.tags)
 					}
 				}
 				.padding(.horizontal, .medium1)

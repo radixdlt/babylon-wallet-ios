@@ -305,12 +305,16 @@ extension GatewayAPI.EntityMetadataCollection {
 			return []
 		}
 
+		// Alphanumeric string with dashes as word separator
 		let regex = try! Regex("^[A-Za-z0-9\\-]+$")
 
 		let filtered = tags.filter {
 			$0.contains(regex)
 		}
 
-		return filtered.map { $0.lowercased() }.compactMap(NonEmptyString.init(rawValue:)).map(OnLedgerTag.init)
+		return filtered
+			.map { $0.lowercased() } // We allow tags to be defined with uppercase letters, but we always lowercase these.
+			.compactMap(NonEmptyString.init(rawValue:))
+			.map(OnLedgerTag.init)
 	}
 }

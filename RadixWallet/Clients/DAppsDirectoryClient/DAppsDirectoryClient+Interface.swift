@@ -78,14 +78,3 @@ extension DAppsDirectoryClient.DApp.Category: Comparable {
 		return allCases.firstIndex(of: lhs)! < allCases.firstIndex(of: rhs)!
 	}
 }
-
-extension Result: Decodable where Success: Decodable, Failure == DecodingError {
-	public init(from decoder: Decoder) throws {
-		do {
-			let container = try decoder.singleValueContainer()
-			self = try .success(container.decode(Success.self))
-		} catch let err as Failure {
-			self = .failure(err)
-		}
-	}
-}
