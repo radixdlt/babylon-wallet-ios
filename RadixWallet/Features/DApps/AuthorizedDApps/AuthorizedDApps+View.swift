@@ -39,7 +39,7 @@ extension DAppsDirectory.AuthorizedDappsFeature {
 					.scrollDisabled(!viewStore.hasAnyDApps)
 					.background(.secondaryBackground)
 					.refreshable {
-						await viewStore.send(.pullToRefreshStarted).finish()
+						viewStore.send(.pullToRefreshStarted)
 					}
 				}
 				.destinations(with: store)
