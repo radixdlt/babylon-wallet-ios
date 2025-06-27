@@ -37,11 +37,12 @@ extension InfoLinkSheet {
 					ScrollView {
 						VStack(spacing: .zero) {
 							if let image = viewStore.image {
-								Image(asset: image)
+								Image(source: image)
 									.resizable()
 									.aspectRatio(contentMode: .fit)
 									.frame(width: imageSize.width, height: imageSize.height)
 									.padding(.bottom, .medium2)
+									.foregroundColor(Color.primaryText)
 							}
 
 							let parts = viewStore.parts

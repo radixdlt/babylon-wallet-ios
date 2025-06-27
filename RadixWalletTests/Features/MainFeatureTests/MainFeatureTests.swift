@@ -6,7 +6,12 @@ import XCTest
 final class MainFeatureTests: TestCase {
 	func test_displayTestBanner() async {
 		// given
-		let store = TestStore(initialState: Main.State(home: .previewValue, settings: .init(), dAppsDirectory: .init())) {
+		let store = TestStore(initialState: Main.State(
+			home: .previewValue,
+			dAppsDirectory: .init(),
+			discover: .init(),
+			settings: .init()
+		)) {
 			Main()
 //				.dependency(\.userDefaults, .noop)
 				.dependency(\.cloudBackupClient, .noop)
