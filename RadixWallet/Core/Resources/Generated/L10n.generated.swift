@@ -1593,6 +1593,34 @@ internal enum L10n {
   internal enum DappDirectory {
     /// dApp Directory
     internal static let title = L10n.tr("Localizable", "dappDirectory_title", fallback: "dApp Directory")
+    internal enum CategoryDao {
+      /// Dao
+      internal static let title = L10n.tr("Localizable", "dappDirectory_categoryDao_title", fallback: "Dao")
+    }
+    internal enum CategoryDefi {
+      /// DeFi
+      internal static let title = L10n.tr("Localizable", "dappDirectory_categoryDefi_title", fallback: "DeFi")
+    }
+    internal enum CategoryMeme {
+      /// Meme
+      internal static let title = L10n.tr("Localizable", "dappDirectory_categoryMeme_title", fallback: "Meme")
+    }
+    internal enum CategoryNFT {
+      /// NFT
+      internal static let title = L10n.tr("Localizable", "dappDirectory_categoryNFT_title", fallback: "NFT")
+    }
+    internal enum CategoryOther {
+      /// Other
+      internal static let title = L10n.tr("Localizable", "dappDirectory_categoryOther_title", fallback: "Other")
+    }
+    internal enum CategoryUtility {
+      /// Utility
+      internal static let title = L10n.tr("Localizable", "dappDirectory_categoryUtility_title", fallback: "Utility")
+    }
+    internal enum Empty {
+      /// There are no dApps available on this network.
+      internal static let message = L10n.tr("Localizable", "dappDirectory_empty_message", fallback: "There are no dApps available on this network.")
+    }
     internal enum Error {
       /// Failed to load dApps.
       internal static let heading = L10n.tr("Localizable", "dappDirectory_error_heading", fallback: "Failed to load dApps.")
