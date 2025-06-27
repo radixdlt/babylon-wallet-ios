@@ -138,12 +138,6 @@ extension Settings.View {
 				action: .personasButtonTapped
 			),
 			.model(
-				title: L10n.WalletSettings.Dapps.title,
-				subtitle: L10n.WalletSettings.Dapps.subtitle,
-				icon: .asset(.authorizedDapps),
-				action: .dappsButtonTapped
-			),
-			.model(
 				title: L10n.WalletSettings.Connectors.title,
 				subtitle: L10n.WalletSettings.Connectors.subtitle,
 				icon: .asset(.desktopConnections),
@@ -183,10 +177,7 @@ extension Settings.View {
 
 private extension StoreOf<Settings> {
 	var destination: PresentationStoreOf<Settings.Destination> {
-		func scopeState(state: State) -> PresentationState<Settings.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
+		scope(state: \.$destination, action: \.destination)
 	}
 }
 
@@ -196,7 +187,6 @@ private extension View {
 		let destinationStore = store.destination
 		return securityCenter(with: destinationStore)
 			.manageP2PLinks(with: destinationStore)
-			.authorizedDapps(with: destinationStore)
 			.personas(with: destinationStore)
 			.preferences(with: destinationStore)
 			.troubleshooting(with: destinationStore)
@@ -214,12 +204,6 @@ private extension View {
 	private func manageP2PLinks(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.manageP2PLinks, action: \.manageP2PLinks)) {
 			P2PLinksFeature.View(store: $0)
-		}
-	}
-
-	private func authorizedDapps(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
-		navigationDestination(store: destinationStore.scope(state: \.authorizedDapps, action: \.authorizedDapps)) {
-			AuthorizedDappsFeature.View(store: $0)
 		}
 	}
 

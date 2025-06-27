@@ -8,6 +8,7 @@ extension OnLedgerEntity.Metadata {
 			iconURL: raw?.iconURL,
 			infoURL: raw?.infoURL,
 			tags: raw?.extractTags() ?? [],
+			dAppCategory: raw?.dAppCategory,
 			dappDefinitions: raw?.dappDefinitions?.compactMap { try? DappDefinitionAddress(validatingAddress: $0) },
 			dappDefinition: raw?.dappDefinition.flatMap { try? DappDefinitionAddress(validatingAddress: $0) },
 			validator: raw?.validator,
@@ -172,6 +173,12 @@ extension GatewayAPI.EntityMetadataCollection {
 		value(.tags)?.asStringCollection
 	}
 
+	var dAppCategory: DAppsDirectoryClient.DApp.Category? {
+		value(.dAppCategory)
+			.flatMap(\.asString?.localizedLowercase)
+			.flatMap(DAppsDirectoryClient.DApp.Category.init(rawValue:))
+	}
+
 	var iconURL: URL? {
 		value(.iconURL)?.asURL
 	}
@@ -293,7 +300,21 @@ extension [GatewayAPI.EntityMetadataItem] {
 }
 
 extension GatewayAPI.EntityMetadataCollection {
-	@Sendable func extractTags() -> [AssetTag] {
-		tags?.compactMap(NonEmptyString.init(rawValue:)).map(AssetTag.init) ?? []
+	@Sendable func extractTags() -> [OnLedgerTag] {
+		guard let tags else {
+			return []
+		}
+
+		// Alphanumeric string with dashes as word separator
+		let regex = try! Regex("^[A-Za-z0-9\\-]+$")
+
+		let filtered = tags.filter {
+			$0.contains(regex)
+		}
+
+		return filtered
+			.map { $0.lowercased() } // We allow tags to be defined with uppercase letters, but we always lowercase these.
+			.compactMap(NonEmptyString.init(rawValue:))
+			.map(OnLedgerTag.init)
 	}
 }

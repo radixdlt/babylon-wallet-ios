@@ -300,7 +300,7 @@ struct LoadableImage<Placeholder: View>: View {
 				Spacer(minLength: .small2)
 			}
 			.frame(width: brokenImageSize.width, height: brokenImageSize.height)
-			.background(.tertiaryBackground)
+			.background(.cardBackgroundSecondary)
 		case .standard:
 			placeholder
 				.frame(width: brokenImageSize.width, height: brokenImageSize.height)

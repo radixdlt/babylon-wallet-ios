@@ -1,9 +1,9 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - AssetTagsView
-struct AssetTagsView: View {
-	let tags: [AssetTag]
+// MARK: - OnLedgerTagsView
+struct OnLedgerTagsView: View {
+	let tags: [OnLedgerTag]
 
 	var body: some View {
 		if !tags.isEmpty {
@@ -14,7 +14,7 @@ struct AssetTagsView: View {
 
 				FlowLayout(spacing: .small2) {
 					ForEach(tags, id: \.self) { tag in
-						AssetTagView(tag: tag)
+						OnLedgerTagView(tag: tag)
 					}
 				}
 			}
@@ -23,9 +23,9 @@ struct AssetTagsView: View {
 	}
 }
 
-// MARK: - AssetTagView
-struct AssetTagView: View {
-	let tag: AssetTag
+// MARK: - OnLedgerTagView
+struct OnLedgerTagView: View {
+	let tag: OnLedgerTag
 
 	var body: some View {
 		HStack(spacing: .small2) {
@@ -44,7 +44,7 @@ struct AssetTagView: View {
 	}
 }
 
-extension AssetTag {
+extension OnLedgerTag {
 	var name: String {
 		switch self {
 		case .officialRadix:

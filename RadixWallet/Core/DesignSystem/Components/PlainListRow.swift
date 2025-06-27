@@ -36,6 +36,21 @@ struct PlainListRow<Icon: View, Accessory: View, Bottom: View>: View {
 		}
 
 		init(
+			rowCoreViewState: PlainListRowCore.ViewState,
+			accessory: ImageResource? = .chevronRight,
+			hints: [Hint.ViewState] = [],
+			isDisabled: Bool = false,
+			@ViewBuilder icon: () -> Icon,
+			@ViewBuilder bottom: () -> Bottom,
+		) where Accessory == Image {
+			self.accessory = accessory.map { Image($0) }
+			self.rowCoreViewState = rowCoreViewState
+			self.isDisabled = isDisabled
+			self.icon = icon()
+			self.bottom = bottom()
+		}
+
+		init(
 			_ content: AssetIcon.Content?,
 			rowCoreViewState: PlainListRowCore.ViewState,
 			accessory: ImageResource? = .chevronRight,
@@ -78,6 +93,17 @@ struct PlainListRow<Icon: View, Accessory: View, Bottom: View>: View {
 		@ViewBuilder icon: () -> Icon
 	) where Accessory == Image, Bottom == StackedHints {
 		self.viewState = ViewState(rowCoreViewState: .init(context: context, title: title, subtitle: subtitle), accessory: accessory, icon: icon)
+	}
+
+	init(
+		context: PlainListRowCore.ViewState.Context = .settings,
+		title: String?,
+		subtitle: String? = nil,
+		accessory: ImageResource? = .chevronRight,
+		@ViewBuilder icon: () -> Icon,
+		@ViewBuilder bottom: () -> Bottom
+	) where Accessory == Image {
+		self.viewState = ViewState(rowCoreViewState: .init(context: context, title: title, subtitle: subtitle), accessory: accessory, icon: icon, bottom: bottom)
 	}
 
 	init(

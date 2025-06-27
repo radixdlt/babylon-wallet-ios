@@ -71,12 +71,13 @@ struct DappDetails: Sendable, FeatureReducer {
 		// General
 		init(
 			dAppDefinitionAddress: DappDefinitionAddress,
+			context: Context = .general,
 			metadata: OnLedgerEntity.Metadata? = nil,
 			resources: Resources? = nil,
 			associatedDapps: [OnLedgerEntity.AssociatedDapp]? = nil,
 			destination: Destination.State? = nil
 		) {
-			self.context = .general
+			self.context = context
 			self.dAppDefinitionAddress = dAppDefinitionAddress
 			self.authorizedDapp = nil
 			self.personaList = .init() // TODO: Check reloading behaviour

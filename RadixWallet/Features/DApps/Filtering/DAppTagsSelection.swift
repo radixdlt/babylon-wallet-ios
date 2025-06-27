@@ -3,19 +3,20 @@
 struct DAppTagsSelection: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
-		var selectedTags: OrderedSet<DAppsDirectoryClient.DApp.Tag>
+		var selectedTags: OrderedSet<OnLedgerTag>
+		let allTags: OrderedSet<OnLedgerTag>
 	}
 
 	typealias Action = FeatureAction<Self>
 
 	enum ViewAction: Sendable, Equatable {
-		case tagSelected(DAppsDirectoryClient.DApp.Tag)
+		case tagSelected(OnLedgerTag)
 		case closeTapped
 		case clearAllTapped
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case selectedTags(OrderedSet<DAppsDirectoryClient.DApp.Tag>)
+		case selectedTags(OrderedSet<OnLedgerTag>)
 	}
 
 	@Dependency(\.dismiss) var dismiss
@@ -39,15 +40,15 @@ struct DAppTagsSelection: Sendable, FeatureReducer {
 }
 
 extension DAppTagsSelection.State {
-	var filterItems: IdentifiedArrayOf<ItemFilter<DAppsDirectoryClient.DApp.Tag>> {
-		DAppsDirectoryClient.DApp.Tag.allCases.map { tag in
+	var filterItems: IdentifiedArrayOf<ItemFilter<OnLedgerTag>> {
+		allTags.map { tag in
 			tag.asItemFilter(isActive: selectedTags.contains(tag))
 		}.asIdentified()
 	}
 }
 
-extension DAppsDirectoryClient.DApp.Tag {
+extension OnLedgerTag {
 	func asItemFilter(isActive: Bool) -> ItemFilter<Self> {
-		ItemFilter(id: self, icon: nil, label: self.rawValue, isActive: isActive)
+		ItemFilter(id: self, icon: nil, label: self.name, isActive: isActive)
 	}
 }
