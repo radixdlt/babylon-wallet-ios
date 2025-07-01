@@ -25,7 +25,7 @@ struct CreateAccountCoordinator: Sendable, FeatureReducer {
 
 		var shouldDisplayNavBar: Bool {
 			switch path.last {
-			case .nameAccount, .selectLedger:
+			case .nameAccount, .selectFactorSource:
 				true
 			case .completion:
 				false
@@ -39,14 +39,14 @@ struct CreateAccountCoordinator: Sendable, FeatureReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
 			case nameAccount(NameAccount.State)
-			case selectLedger(LedgerHardwareDevices.State)
+			case selectFactorSource(SelectFactorSource.State)
 			case completion(NewAccountCompletion.State)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
 			case nameAccount(NameAccount.Action)
-			case selectLedger(LedgerHardwareDevices.Action)
+			case selectFactorSource(SelectFactorSource.Action)
 			case completion(NewAccountCompletion.Action)
 		}
 
@@ -54,9 +54,11 @@ struct CreateAccountCoordinator: Sendable, FeatureReducer {
 			Scope(state: \.nameAccount, action: \.nameAccount) {
 				NameAccount()
 			}
-			Scope(state: \.selectLedger, action: \.selectLedger) {
-				LedgerHardwareDevices()
+
+			Scope(state: \.selectFactorSource, action: \.selectFactorSource) {
+				SelectFactorSource()
 			}
+
 			Scope(state: \.completion, action: \.completion) {
 				NewAccountCompletion()
 			}
@@ -119,17 +121,19 @@ extension CreateAccountCoordinator {
 
 	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .root(.nameAccount(.delegate(.proceed(accountName, useLedgerAsFactorSource)))):
+		case let .root(.nameAccount(.delegate(.proceed(accountName)))):
 			state.name = accountName
-			if useLedgerAsFactorSource {
-				state.path.append(.selectLedger(.init(context: .createHardwareAccount)))
-				return .none
-			} else {
-				return createAccount(state: &state, mode: .bdfs)
-			}
+			state.path.append(.selectFactorSource(.init()))
+			return .none
+//			if useLedgerAsFactorSource {
+//				state.path.append(.selectLedger(.init(context: .createHardwareAccount)))
+//				return .none
+//			} else {
+//				return createAccount(state: &state, mode: .bdfs)
+//			}
 
-		case let .path(.element(_, action: .selectLedger(.delegate(.choseLedger(ledger))))):
-			return createAccount(state: &state, mode: .specific(ledger.asGeneral))
+		case let .path(.element(_, action: .selectFactorSource(.delegate(.selectedFactorSource(fs))))):
+			return createAccount(state: &state, mode: .specific(fs.asGeneral))
 
 		case .path(.element(_, action: .completion(.delegate(.completed)))):
 			return .run { send in

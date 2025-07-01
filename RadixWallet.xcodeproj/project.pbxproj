@@ -873,6 +873,8 @@
 		A03DD84B2DDD9150008F7723 /* DAppTagsSelection+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A03DD84A2DDD9150008F7723 /* DAppTagsSelection+View.swift */; };
 		A03DD84C2DDD9150008F7723 /* DAppTagsSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A03DD8492DDD9150008F7723 /* DAppTagsSelection.swift */; };
 		A04207F42DE9DDB600FE2947 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A04207F32DE9DDB600FE2947 /* Sargon */; };
+		A04AA7E22E12E08B00F38E67 /* SelectFactorSource+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A04AA7E12E12E08B00F38E67 /* SelectFactorSource+View.swift */; };
+		A04AA7E32E12E08B00F38E67 /* SelectFactorSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = A04AA7E02E12E08B00F38E67 /* SelectFactorSource.swift */; };
 		A05AA1422E0AC06E00316B83 /* DAppsDirectory+AllDapps.swift in Sources */ = {isa = PBXBuildFile; fileRef = A05AA1402E0AC06E00316B83 /* DAppsDirectory+AllDapps.swift */; };
 		A05AA1432E0AC06E00316B83 /* DAppsDirectory+AllDapps+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A05AA1412E0AC06E00316B83 /* DAppsDirectory+AllDapps+View.swift */; };
 		A05AA1462E0AC13600316B83 /* DAppDirectory+Filtering+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A05AA1452E0AC13600316B83 /* DAppDirectory+Filtering+View.swift */; };
@@ -2237,6 +2239,8 @@
 		A018C8742E0030C100461852 /* BlogPostsClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BlogPostsClient+Test.swift"; sourceTree = "<group>"; };
 		A03DD8492DDD9150008F7723 /* DAppTagsSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DAppTagsSelection.swift; sourceTree = "<group>"; };
 		A03DD84A2DDD9150008F7723 /* DAppTagsSelection+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DAppTagsSelection+View.swift"; sourceTree = "<group>"; };
+		A04AA7E02E12E08B00F38E67 /* SelectFactorSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectFactorSource.swift; sourceTree = "<group>"; };
+		A04AA7E12E12E08B00F38E67 /* SelectFactorSource+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SelectFactorSource+View.swift"; sourceTree = "<group>"; };
 		A05AA1402E0AC06E00316B83 /* DAppsDirectory+AllDapps.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DAppsDirectory+AllDapps.swift"; sourceTree = "<group>"; };
 		A05AA1412E0AC06E00316B83 /* DAppsDirectory+AllDapps+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DAppsDirectory+AllDapps+View.swift"; sourceTree = "<group>"; };
 		A05AA1442E0AC13600316B83 /* DAppDirectory+Filtering.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DAppDirectory+Filtering.swift"; sourceTree = "<group>"; };
@@ -2956,6 +2960,7 @@
 		48CFBC602ADC10D800E77A5C /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				A04AA7DF2E12E04900F38E67 /* SelectFactorSource */,
 				A09F8FD92DF6E49700DB5614 /* Discover */,
 				A08BF0502DDB67E40065766A /* DApps */,
 				A08BBA742DB232D000534B67 /* LedgerHardwareDevices */,
@@ -6311,6 +6316,15 @@
 			path = BlogPostsClient;
 			sourceTree = "<group>";
 		};
+		A04AA7DF2E12E04900F38E67 /* SelectFactorSource */ = {
+			isa = PBXGroup;
+			children = (
+				A04AA7E02E12E08B00F38E67 /* SelectFactorSource.swift */,
+				A04AA7E12E12E08B00F38E67 /* SelectFactorSource+View.swift */,
+			);
+			path = SelectFactorSource;
+			sourceTree = "<group>";
+		};
 		A05AA1482E0AE07600316B83 /* Filtering */ = {
 			isa = PBXGroup;
 			children = (
@@ -8178,6 +8192,8 @@
 				48CFC2BE2ADC10D900E77A5C /* ImportMnemonicControllingAccounts.swift in Sources */,
 				5B92AAC42D2ED0BE00486A9B /* ChooseFactorSourceKind.swift in Sources */,
 				5B92AAC52D2ED0BE00486A9B /* ChooseFactorSourceKind+View.swift in Sources */,
+				A04AA7E22E12E08B00F38E67 /* SelectFactorSource+View.swift in Sources */,
+				A04AA7E32E12E08B00F38E67 /* SelectFactorSource.swift in Sources */,
 				5BB7C1762BC81F50001216EB /* ImportOlympiaNameLedger.swift in Sources */,
 				48CFC4022ADC10D900E77A5C /* KeychainClient+Interface.swift in Sources */,
 				48CFC44E2ADC10DA00E77A5C /* AppPreferencesClient+Interface.swift in Sources */,

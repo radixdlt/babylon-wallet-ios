@@ -60,11 +60,11 @@ extension CreateAccountCoordinator {
 							action: CreateAccountCoordinator.Path.Action.nameAccount,
 							then: { NameAccount.View(store: $0) }
 						)
-					case .selectLedger:
+					case .selectFactorSource:
 						CaseLet(
-							/CreateAccountCoordinator.Path.State.selectLedger,
-							action: CreateAccountCoordinator.Path.Action.selectLedger,
-							then: { LedgerHardwareDevices.View(store: $0) }
+							/CreateAccountCoordinator.Path.State.selectFactorSource,
+							action: CreateAccountCoordinator.Path.Action.selectFactorSource,
+							then: { SelectFactorSource.View(store: $0) }
 						)
 					case .completion:
 						CaseLet(
