@@ -124,7 +124,7 @@ extension OnLedgerEntity.Metadata {
 			symbol: newlyCreated.symbol,
 			description: newlyCreated.description,
 			iconURL: newlyCreated.iconUrl.map { URL(string: $0) } ?? nil,
-			tags: newlyCreated.tags.compactMap(NonEmptyString.init(rawValue:)).map(AssetTag.custom),
+			tags: newlyCreated.tags.compactMap(NonEmptyString.init(rawValue:)).map(OnLedgerTag.custom),
 			isComplete: false
 		)
 	}
@@ -142,7 +142,8 @@ extension OnLedgerEntity {
 		let description: String?
 		let iconURL: URL?
 		let infoURL: URL?
-		let tags: [AssetTag]
+		let tags: [OnLedgerTag]
+		let dAppCategory: DAppsDirectoryClient.DApp.Category?
 		let dappDefinitions: [AccountAddress]?
 		let dappDefinition: AccountAddress?
 		let validator: ValidatorAddress?
@@ -195,7 +196,8 @@ extension OnLedgerEntity {
 			description: String? = nil,
 			iconURL: URL? = nil,
 			infoURL: URL? = nil,
-			tags: [AssetTag] = [],
+			tags: [OnLedgerTag] = [],
+			dAppCategory: DAppsDirectoryClient.DApp.Category? = nil,
 			dappDefinitions: [AccountAddress]? = nil,
 			dappDefinition: AccountAddress? = nil,
 			validator: ValidatorAddress? = nil,
@@ -215,6 +217,7 @@ extension OnLedgerEntity {
 			self.iconURL = iconURL
 			self.infoURL = infoURL
 			self.tags = tags
+			self.dAppCategory = dAppCategory
 			self.dappDefinitions = dappDefinitions
 			self.dappDefinition = dappDefinition
 			self.validator = validator

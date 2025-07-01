@@ -56,6 +56,7 @@ enum EntityMetadataKey: String, CaseIterable, Sendable {
 	case symbol
 	case description
 	case tags
+	case dAppCategory = "dapp_category"
 	case iconURL = "icon_url"
 	case infoURL = "info_url"
 	case dappDefinition = "dapp_definition"
@@ -88,7 +89,7 @@ extension Set<EntityMetadataKey> {
 	}
 
 	static var dappMetadataKeys: Set<EntityMetadataKey> {
-		let keys: Set<EntityMetadataKey> = [.name, .description, .iconURL, .claimedEntities, .claimedWebsites, .relatedWebsites, .dappDefinitions, .accountType]
+		let keys: Set<EntityMetadataKey> = [.name, .description, .iconURL, .claimedEntities, .claimedWebsites, .relatedWebsites, .dappDefinitions, .accountType, .tags, .dAppCategory]
 		assert(keys.count <= EntityMetadataKey.maxAllowedKeys)
 		return keys
 	}

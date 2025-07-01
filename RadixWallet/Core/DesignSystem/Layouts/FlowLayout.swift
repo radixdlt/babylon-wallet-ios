@@ -3,23 +3,27 @@ struct FlowLayout: Layout {
 	let alignment: VerticalAlignment
 	let spacing: CGSize
 	let multilineAlignment: HorizontalAlignment
+	let rowsLimit: Int?
 
 	init(
 		alignment: VerticalAlignment = .center,
 		multilineAlignment: HorizontalAlignment = .leading,
-		spacing: CGFloat = 10
+		spacing: CGFloat = 10,
+		rowsLimit: Int? = nil
 	) {
-		self.init(alignment: alignment, multilineAlignment: multilineAlignment, spacing: .init(width: spacing, height: spacing))
+		self.init(alignment: alignment, multilineAlignment: multilineAlignment, spacing: .init(width: spacing, height: spacing), rowsLimit: rowsLimit)
 	}
 
 	init(
 		alignment: VerticalAlignment = .center,
 		multilineAlignment: HorizontalAlignment = .leading,
-		spacing: CGSize
+		spacing: CGSize,
+		rowsLimit: Int? = nil
 	) {
 		self.alignment = alignment
 		self.multilineAlignment = multilineAlignment
 		self.spacing = spacing
+		self.rowsLimit = rowsLimit
 	}
 
 	func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
@@ -50,6 +54,13 @@ struct FlowLayout: Layout {
 			alignment: alignment
 		).offsets
 
+		let hidenSubviews = subviews.suffix(subviews.count - offsets.count)
+		let subviews = subviews.prefix(offsets.count)
+
+		for hidenSubview in hidenSubviews {
+			hidenSubview.place(at: .zero, proposal: .zero)
+		}
+
 		for (offset, subview) in zip(offsets, subviews) {
 			subview.place(at: CGPoint(x: offset.x + bounds.minX, y: offset.y + bounds.minY), proposal: .init(width: proposal.width, height: nil))
 		}
@@ -64,6 +75,7 @@ struct FlowLayout: Layout {
 		var result: [CGRect] = []
 		var currentPosition: CGPoint = .zero
 		var currentLine: [CGRect] = []
+		var lineCount = 0
 
 		func flushLine() {
 			currentPosition.x = 0
@@ -90,11 +102,15 @@ struct FlowLayout: Layout {
 
 			currentPosition.y += union.height + spacing.height
 			currentLine.removeAll()
+			lineCount += 1
 		}
 
 		for dim in dimensions {
 			if currentPosition.x + dim.width > containerWidth {
 				flushLine()
+				if let rowsLimit, rowsLimit == lineCount {
+					break
+				}
 			}
 
 			currentLine.append(.init(x: currentPosition.x, y: -dim[alignment], width: dim.width, height: dim.height))

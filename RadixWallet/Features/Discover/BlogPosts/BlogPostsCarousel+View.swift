@@ -66,6 +66,8 @@ extension Discover.BlogPostsCarousel {
 					.frame(height: 240)
 				positionIndicator
 			}
+			.clipShape(RoundedRectangle(cornerRadius: .medium3))
+			.shadow(color: .shadow.opacity(0.26), radius: .medium3, x: .zero, y: .small2)
 		}
 
 		@ViewBuilder

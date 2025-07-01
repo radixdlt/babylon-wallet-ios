@@ -16,7 +16,7 @@ struct AssetResourceDetailsSection: View {
 		let divisibility: Loadable<UInt8?>?
 		let arbitraryDataFields: Loadable<[ArbitraryDataField]>
 		let behaviors: Loadable<[AssetBehavior]>
-		let tags: Loadable<[AssetTag]>
+		let tags: Loadable<[OnLedgerTag]>
 	}
 
 	var body: some View {
@@ -72,7 +72,7 @@ struct AssetResourceDetailsSection: View {
 				}
 
 				loadable(viewState.tags) { _ in
-					AssetTagsView(tags: viewState.tags.wrappedValue ?? [])
+					OnLedgerTagsView(tags: viewState.tags.wrappedValue ?? [])
 				}
 
 				loadable(viewState.arbitraryDataFields) { arbitraryDataFields in

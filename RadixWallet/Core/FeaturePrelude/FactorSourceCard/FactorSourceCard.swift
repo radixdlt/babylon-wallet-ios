@@ -170,7 +170,7 @@ struct FactorSourceCard: View {
 			}
 			.padding(.horizontal, .medium3)
 			.padding(.vertical, .small1)
-			.background(.tertiaryBackground)
+			.background(.cardBackgroundSecondary)
 		}
 
 		private var linkedTitle: String {
