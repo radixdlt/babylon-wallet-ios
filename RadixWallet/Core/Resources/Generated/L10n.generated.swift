@@ -829,10 +829,6 @@ internal enum L10n {
   internal enum AuthorizedDapps {
     /// A deposit from this dApp is available. Go to your Accounts to view and claim.
     internal static let pendingDeposit = L10n.tr("Localizable", "authorizedDapps_pendingDeposit", fallback: "A deposit from this dApp is available. Go to your Accounts to view and claim.")
-    /// These are the dApps that you have logged into using the Radix Wallet.
-    internal static let subtitle = L10n.tr("Localizable", "authorizedDapps_subtitle", fallback: "These are the dApps that you have logged into using the Radix Wallet.")
-    /// Approved dApps
-    internal static let title = L10n.tr("Localizable", "authorizedDapps_title", fallback: "Approved dApps")
     internal enum DAppDetails {
       /// dApp Definition
       internal static let dAppDefinition = L10n.tr("Localizable", "authorizedDapps_dAppDetails_dAppDefinition", fallback: "dApp Definition")
@@ -1593,9 +1589,13 @@ internal enum L10n {
   internal enum DappDirectory {
     /// dApp Directory
     internal static let title = L10n.tr("Localizable", "dappDirectory_title", fallback: "dApp Directory")
+    /// All dApps
+    internal static let viewAllDApps = L10n.tr("Localizable", "dappDirectory_viewAllDApps", fallback: "All dApps")
+    /// Connected dApps
+    internal static let viewConnectedDApps = L10n.tr("Localizable", "dappDirectory_viewConnectedDApps", fallback: "Connected dApps")
     internal enum CategoryDao {
-      /// Dao
-      internal static let title = L10n.tr("Localizable", "dappDirectory_categoryDao_title", fallback: "Dao")
+      /// DAO
+      internal static let title = L10n.tr("Localizable", "dappDirectory_categoryDao_title", fallback: "DAO")
     }
     internal enum CategoryDefi {
       /// DeFi
@@ -1616,6 +1616,12 @@ internal enum L10n {
     internal enum CategoryUtility {
       /// Utility
       internal static let title = L10n.tr("Localizable", "dappDirectory_categoryUtility_title", fallback: "Utility")
+    }
+    internal enum ConnectedDApps {
+      internal enum Empty {
+        /// These are the dApps that you have logged into using the Radix Wallet.
+        internal static let description = L10n.tr("Localizable", "dappDirectory_connectedDApps_empty_description", fallback: "These are the dApps that you have logged into using the Radix Wallet.")
+      }
     }
     internal enum Empty {
       /// There are no dApps available on this network.
@@ -1691,16 +1697,6 @@ internal enum L10n {
         internal static let subtitle = L10n.tr("Localizable", "discover_socialLinks_twitter_subtitle", fallback: "Follow the official Radix X for news, updates, and insights.")
         /// Radix X Official
         internal static let title = L10n.tr("Localizable", "discover_socialLinks_twitter_title", fallback: "Radix X Official")
-      }
-    }
-    internal enum View {
-      internal enum All {
-        /// All dApps
-        internal static let dapps = L10n.tr("Localizable", "discover_view_all_dapps", fallback: "All dApps")
-      }
-      internal enum Approved {
-        /// Approved dApps
-        internal static let dapps = L10n.tr("Localizable", "discover_view_approved_dapps", fallback: "Approved dApps")
       }
     }
   }
@@ -2767,14 +2763,14 @@ internal enum L10n {
       /// 
       /// ---
       /// 
-      /// The [Radix Network](?glossaryAnchor=radixnetwork) is built differently to all other blockchains. One of the great benefits of this is that assets – tokens and NFTs – are native to the ecosystem. So unlike on networks such as Ethereum, where tokens are not really tokens but just balances on a smart contract, assets on Radix act like real-life assets. With real-life assets of different kinds, you know who can create it, destory it, take it away from you or freeze it within your bank account. Similarly with Radix, you’ll always know how assets will behave and what someone can do to them.
+      /// The [Radix Network](?glossaryAnchor=radixnetwork) is built differently to all other blockchains. One of the great benefits of this is that assets – tokens and NFTs – are native to the ecosystem. So unlike on networks such as Ethereum, where tokens are not really tokens but just balances on a smart contract, assets on Radix act like real-life assets. With real-life assets of different kinds, you know who can create it, destroy it, take it away from you or freeze it within your bank account. Similarly with Radix, you’ll always know how assets will behave and what someone can do to them.
       /// 
       /// When anyone creates a token or NFT on Radix, there is a list of behaviors they can apply to them. Things like being able to increase the token’s supply, being able to change an NFT’s image and description, or being able to remove a token from someone’s account. There are plenty of valid reasons for why someone might want to do these things, but it’s always good to know if they can. 
       /// 
       /// Just tap into any token in the Radix Wallet to get a full list of its behaviors.
       /// 
       /// [Learn more about the asset behaviors ↗](https://learn.radixdlt.com/article/what-are-radix-asset-behaviors)
-      internal static let behaviors = L10n.tr("Localizable", "infoLink_glossary_behaviors", fallback: "## Asset Behaviors\n\nAsset behaviors define the rules that were placed on a [token](?glossaryAnchor=tokens) or [NFT](?glossaryAnchor=nfts) when it was created. They ensure all users know exactly what actions can be performed on any asset. And they’re labeled in everyday language so everyone can read them, understand them and know the nature of the asset they’re holding.\n\n---\n\nThe [Radix Network](?glossaryAnchor=radixnetwork) is built differently to all other blockchains. One of the great benefits of this is that assets – tokens and NFTs – are native to the ecosystem. So unlike on networks such as Ethereum, where tokens are not really tokens but just balances on a smart contract, assets on Radix act like real-life assets. With real-life assets of different kinds, you know who can create it, destory it, take it away from you or freeze it within your bank account. Similarly with Radix, you’ll always know how assets will behave and what someone can do to them.\n\nWhen anyone creates a token or NFT on Radix, there is a list of behaviors they can apply to them. Things like being able to increase the token’s supply, being able to change an NFT’s image and description, or being able to remove a token from someone’s account. There are plenty of valid reasons for why someone might want to do these things, but it’s always good to know if they can. \n\nJust tap into any token in the Radix Wallet to get a full list of its behaviors.\n\n[Learn more about the asset behaviors ↗](https://learn.radixdlt.com/article/what-are-radix-asset-behaviors)")
+      internal static let behaviors = L10n.tr("Localizable", "infoLink_glossary_behaviors", fallback: "## Asset Behaviors\n\nAsset behaviors define the rules that were placed on a [token](?glossaryAnchor=tokens) or [NFT](?glossaryAnchor=nfts) when it was created. They ensure all users know exactly what actions can be performed on any asset. And they’re labeled in everyday language so everyone can read them, understand them and know the nature of the asset they’re holding.\n\n---\n\nThe [Radix Network](?glossaryAnchor=radixnetwork) is built differently to all other blockchains. One of the great benefits of this is that assets – tokens and NFTs – are native to the ecosystem. So unlike on networks such as Ethereum, where tokens are not really tokens but just balances on a smart contract, assets on Radix act like real-life assets. With real-life assets of different kinds, you know who can create it, destroy it, take it away from you or freeze it within your bank account. Similarly with Radix, you’ll always know how assets will behave and what someone can do to them.\n\nWhen anyone creates a token or NFT on Radix, there is a list of behaviors they can apply to them. Things like being able to increase the token’s supply, being able to change an NFT’s image and description, or being able to remove a token from someone’s account. There are plenty of valid reasons for why someone might want to do these things, but it’s always good to know if they can. \n\nJust tap into any token in the Radix Wallet to get a full list of its behaviors.\n\n[Learn more about the asset behaviors ↗](https://learn.radixdlt.com/article/what-are-radix-asset-behaviors)")
       /// ## Biometrics/PIN
       /// 
       /// A biometrics/PIN factor is a 24-word seed phrase protected and accessed via your phone's biometrics or PIN security feature.
@@ -3009,8 +3005,8 @@ internal enum L10n {
       /// 
       /// In all of these cases, the dApp still needs you to approve and sign any interactions with your accounts and assets - the Radix Network guarantees it.
       /// 
-      /// Because the pre-authorization is provided back to the dApp, there is a time limit how long it lasts. Once this time limit is up, the pre-authorization expires and can't be used. A dApp will need to make a request for another one. You can see how long you have until your pre-authoirzation expires in the pre-authorization summary.
-      internal static let preauthorizations = L10n.tr("Localizable", "infoLink_glossary_preauthorizations", fallback: "## Pre-authorizations\n\nPre-authorizations are a way for a [dApp](?glossaryAnchor=dapps) to request your authorization to do something specific with your accounts and assets. When you approve a pre-authorization, it is provided to the dApp which can use it to create a [transaction](?glossaryAnchor=transactions) on the Radix Network.\n\n---\n\nA pre-authorization request looks very similar to a transaction request in your wallet. In both cases, you get to review exactly what's going to happen with your own accounts and assets.\n\nHowever, after you sign a pre-authorization, it is not submitted directly to the Radix Network like a transaction request. Instead, it is provided back to the dApp that requested it. The dApp can then include that pre-authorization in a transaction that it creates and submits.\n\nThis makes it possible for dApps to do helpful things, such as:\n\n• Pay the [transaction fees](?glossaryAnchor=transactionfee) for you.\n• Do transactions involving multiple people.\n• Mint a badge or NFT and directly deposit it to your account.\n\nIn all of these cases, the dApp still needs you to approve and sign any interactions with your accounts and assets - the Radix Network guarantees it.\n\nBecause the pre-authorization is provided back to the dApp, there is a time limit how long it lasts. Once this time limit is up, the pre-authorization expires and can't be used. A dApp will need to make a request for another one. You can see how long you have until your pre-authoirzation expires in the pre-authorization summary.")
+      /// Because the pre-authorization is provided back to the dApp, there is a time limit how long it lasts. Once this time limit is up, the pre-authorization expires and can't be used. A dApp will need to make a request for another one. You can see how long you have until your pre-authorization expires in the pre-authorization summary.
+      internal static let preauthorizations = L10n.tr("Localizable", "infoLink_glossary_preauthorizations", fallback: "## Pre-authorizations\n\nPre-authorizations are a way for a [dApp](?glossaryAnchor=dapps) to request your authorization to do something specific with your accounts and assets. When you approve a pre-authorization, it is provided to the dApp which can use it to create a [transaction](?glossaryAnchor=transactions) on the Radix Network.\n\n---\n\nA pre-authorization request looks very similar to a transaction request in your wallet. In both cases, you get to review exactly what's going to happen with your own accounts and assets.\n\nHowever, after you sign a pre-authorization, it is not submitted directly to the Radix Network like a transaction request. Instead, it is provided back to the dApp that requested it. The dApp can then include that pre-authorization in a transaction that it creates and submits.\n\nThis makes it possible for dApps to do helpful things, such as:\n\n• Pay the [transaction fees](?glossaryAnchor=transactionfee) for you.\n• Do transactions involving multiple people.\n• Mint a badge or NFT and directly deposit it to your account.\n\nIn all of these cases, the dApp still needs you to approve and sign any interactions with your accounts and assets - the Radix Network guarantees it.\n\nBecause the pre-authorization is provided back to the dApp, there is a time limit how long it lasts. Once this time limit is up, the pre-authorization expires and can't be used. A dApp will need to make a request for another one. You can see how long you have until your pre-authorization expires in the pre-authorization summary.")
       /// ## Radix Connect
       /// 
       /// Radix Connect is the technology that lets users connect their [Radix Wallet](?glossaryAnchor=radixwallet) to [dApps](?glossaryAnchor=dapps) in mobile or desktop web browsers – and even more places in the future.
@@ -3043,12 +3039,12 @@ internal enum L10n {
       /// 
       /// ---
       /// 
-      /// You can view and freely [transfer](?glossaryAnchor=transfers) your assets on the Radix Network using the [Radix Wallet](?glossaryAnchor=radixwallet) app. Applications built using the Radix Network’s capabilities (called [dApps](?glossaryAnchor=dapps) have the ability to interact with these assets and identities, letting you do things that weren't possible before on the web.
+      /// You can view and freely [transfer](?glossaryAnchor=transfers) your assets on the Radix Network using the [Radix Wallet](?glossaryAnchor=radixwallet) app. Applications built using the Radix Network’s capabilities (called [dApps](?glossaryAnchor=dapps)) have the ability to interact with these assets and identities, letting you do things that weren't possible before on the web.
       /// 
       /// [Visit the official Radix homepage](https://radixdlt.com) ↗
       /// 
       /// [Learn more about the Radix Network](https://learn.radixdlt.com/article/what-are-the-radix-public-network-and-radix-ledger) ↗
-      internal static let radixnetwork = L10n.tr("Localizable", "infoLink_glossary_radixnetwork", fallback: "## The Radix Network\n\nRadix is an open network that makes [web3](?glossaryAnchor=web3) possible. Think of the Radix Network as a public place on the internet where users can directly control their own digital assets, and where those assets can move effortlessly between users and applications – without relying on any company.\n\n---\n\nYou can view and freely [transfer](?glossaryAnchor=transfers) your assets on the Radix Network using the [Radix Wallet](?glossaryAnchor=radixwallet) app. Applications built using the Radix Network’s capabilities (called [dApps](?glossaryAnchor=dapps) have the ability to interact with these assets and identities, letting you do things that weren't possible before on the web.\n\n[Visit the official Radix homepage](https://radixdlt.com) ↗\n\n[Learn more about the Radix Network](https://learn.radixdlt.com/article/what-are-the-radix-public-network-and-radix-ledger) ↗")
+      internal static let radixnetwork = L10n.tr("Localizable", "infoLink_glossary_radixnetwork", fallback: "## The Radix Network\n\nRadix is an open network that makes [web3](?glossaryAnchor=web3) possible. Think of the Radix Network as a public place on the internet where users can directly control their own digital assets, and where those assets can move effortlessly between users and applications – without relying on any company.\n\n---\n\nYou can view and freely [transfer](?glossaryAnchor=transfers) your assets on the Radix Network using the [Radix Wallet](?glossaryAnchor=radixwallet) app. Applications built using the Radix Network’s capabilities (called [dApps](?glossaryAnchor=dapps)) have the ability to interact with these assets and identities, letting you do things that weren't possible before on the web.\n\n[Visit the official Radix homepage](https://radixdlt.com) ↗\n\n[Learn more about the Radix Network](https://learn.radixdlt.com/article/what-are-the-radix-public-network-and-radix-ledger) ↗")
       /// ## Radix Wallet
       /// 
       /// The Radix Wallet is an iOS and Android mobile app that is your gateway to the capabilities of the Radix Network.
@@ -3071,7 +3067,7 @@ internal enum L10n {
       /// 
       /// Security Shields give users multi-factor access to their [Accounts](?glossaryAnchor=accounts) and [Personas](?glossaryAnchor=personas) while maintaining decentralization and full self-custody. They provide 2 critical functions. They allow users to rely on more than 1 security factor for regular access and for recoveries in the event that another security factor is lost.
       /// 
-      /// The process to create a Shield is simple and once it’s finished, it can be applied to Accounts and Personas on the [Radix Network](?glossaryAnchor=radixnetwork) itself, providing robust and reliable security without compromising true trustless decentralization. There are no central servers that hold your Security Shield or secret keys – on Radix, it’s all done on the blockchain directly, so you're always in control. It's "your keys, your crypto"; but without being stuck with 1 key you can't change.
+      /// The process to create a Shield is simple and once it’s finished, it can be applied to Accounts and Personas on the [Radix Network](?glossaryAnchor=radixnetwork) itself, providing robust and reliable security without compromising true trustless decentralization. There are no central servers that hold your Security Shield or secret keys – on Radix, it’s all done on the blockchain directly, so you're always in control. It's "your keys, your crypto", but without being stuck with 1 key you can't change.
       /// 
       /// ---
       /// 
@@ -3094,7 +3090,7 @@ internal enum L10n {
       /// You can choose the time period for your emergency fallback factor. Make sure you choose a time period long enough that you'll be likely to open your [Radix Wallet](?glossaryAnchor=radixwallet) and cancel the recovery if anyone ever steals 1 of your factors and attempts to take control of your Accounts and Personas.
       /// 
       /// Your Radix Wallet will help you build your Security Shield and once it’s finished, you’ll need to sign some transactions to apply it on the Radix Network to the Accounts and Personas of your choice.
-      internal static let securityshields = L10n.tr("Localizable", "infoLink_glossary_securityshields", fallback: "## Security Shields\n\nSecurity Shields give users multi-factor access to their [Accounts](?glossaryAnchor=accounts) and [Personas](?glossaryAnchor=personas) while maintaining decentralization and full self-custody. They provide 2 critical functions. They allow users to rely on more than 1 security factor for regular access and for recoveries in the event that another security factor is lost.\n\nThe process to create a Shield is simple and once it’s finished, it can be applied to Accounts and Personas on the [Radix Network](?glossaryAnchor=radixnetwork) itself, providing robust and reliable security without compromising true trustless decentralization. There are no central servers that hold your Security Shield or secret keys – on Radix, it’s all done on the blockchain directly, so you're always in control. It's \"your keys, your crypto\"; but without being stuck with 1 key you can't change.\n\n---\n\nShields are made up of 2 groups of factors.\n\n**Regular Access**\n\nThis part of your Security Shield defines the factors you'll use for normal usage, like signing [transactions](?glossaryAnchor=transactions) to withdrawing assets from your Accounts.\n\nWhen choosing your factors for regular access, consider how often you’ll be using them. If it’s every day, choose ones you can access easily. A single factor can be used, but it's recommended to use more than one for additional security. For example, a [password](?glossaryAnchor=passwords) is an easy second factor to add security for more sensitive Accounts.\n\nFor convenience, you'll also choose a single factor you'll use to prove ownerhip – like when you log in to [dApps](?glossaryAnchor=dapps) or if they request access to your Accounts.\n\n**Recovery**\n\nThis part of your Security Shield is made up of the factors that help you recover access to shielded Accounts and Personas in the event that you lose access to them or want to transfer control. For example, if you move your wallet to a new phone, you'll use the Shield's recovery feature to change the biometrics/PIN factor to a new one on your new phone.\n\nYou'll need to choose 1 or more factors that can start a recovery and 1 or more factors that can confirm the recovery. In most cases, you'll start and confirm the recovery in a single step, but in the worst case, a timed \"emergency fallback\" will let you start a recovery with just 1 factor and confirm it after a safe delay.\n\nYou can choose the time period for your emergency fallback factor. Make sure you choose a time period long enough that you'll be likely to open your [Radix Wallet](?glossaryAnchor=radixwallet) and cancel the recovery if anyone ever steals 1 of your factors and attempts to take control of your Accounts and Personas.\n\nYour Radix Wallet will help you build your Security Shield and once it’s finished, you’ll need to sign some transactions to apply it on the Radix Network to the Accounts and Personas of your choice.")
+      internal static let securityshields = L10n.tr("Localizable", "infoLink_glossary_securityshields", fallback: "## Security Shields\n\nSecurity Shields give users multi-factor access to their [Accounts](?glossaryAnchor=accounts) and [Personas](?glossaryAnchor=personas) while maintaining decentralization and full self-custody. They provide 2 critical functions. They allow users to rely on more than 1 security factor for regular access and for recoveries in the event that another security factor is lost.\n\nThe process to create a Shield is simple and once it’s finished, it can be applied to Accounts and Personas on the [Radix Network](?glossaryAnchor=radixnetwork) itself, providing robust and reliable security without compromising true trustless decentralization. There are no central servers that hold your Security Shield or secret keys – on Radix, it’s all done on the blockchain directly, so you're always in control. It's \"your keys, your crypto\", but without being stuck with 1 key you can't change.\n\n---\n\nShields are made up of 2 groups of factors.\n\n**Regular Access**\n\nThis part of your Security Shield defines the factors you'll use for normal usage, like signing [transactions](?glossaryAnchor=transactions) to withdrawing assets from your Accounts.\n\nWhen choosing your factors for regular access, consider how often you’ll be using them. If it’s every day, choose ones you can access easily. A single factor can be used, but it's recommended to use more than one for additional security. For example, a [password](?glossaryAnchor=passwords) is an easy second factor to add security for more sensitive Accounts.\n\nFor convenience, you'll also choose a single factor you'll use to prove ownerhip – like when you log in to [dApps](?glossaryAnchor=dapps) or if they request access to your Accounts.\n\n**Recovery**\n\nThis part of your Security Shield is made up of the factors that help you recover access to shielded Accounts and Personas in the event that you lose access to them or want to transfer control. For example, if you move your wallet to a new phone, you'll use the Shield's recovery feature to change the biometrics/PIN factor to a new one on your new phone.\n\nYou'll need to choose 1 or more factors that can start a recovery and 1 or more factors that can confirm the recovery. In most cases, you'll start and confirm the recovery in a single step, but in the worst case, a timed \"emergency fallback\" will let you start a recovery with just 1 factor and confirm it after a safe delay.\n\nYou can choose the time period for your emergency fallback factor. Make sure you choose a time period long enough that you'll be likely to open your [Radix Wallet](?glossaryAnchor=radixwallet) and cancel the recovery if anyone ever steals 1 of your factors and attempts to take control of your Accounts and Personas.\n\nYour Radix Wallet will help you build your Security Shield and once it’s finished, you’ll need to sign some transactions to apply it on the Radix Network to the Accounts and Personas of your choice.")
       /// ## Token
       /// 
       /// Token is the general term for any kind of web3 asset that you can hold in a crypto wallet.
@@ -5059,12 +5055,6 @@ internal enum L10n {
       internal static let subtitle = L10n.tr("Localizable", "walletSettings_connectors_subtitle", fallback: "Connect to desktop through the Radix Connector browser extension")
       /// Linked Connectors
       internal static let title = L10n.tr("Localizable", "walletSettings_connectors_title", fallback: "Linked Connectors")
-    }
-    internal enum Dapps {
-      /// Manage the Radix dApps you're connected to
-      internal static let subtitle = L10n.tr("Localizable", "walletSettings_dapps_subtitle", fallback: "Manage the Radix dApps you're connected to")
-      /// Approved dApps
-      internal static let title = L10n.tr("Localizable", "walletSettings_dapps_title", fallback: "Approved dApps")
     }
     internal enum LinkToConnectorHeader {
       /// Link to Connector

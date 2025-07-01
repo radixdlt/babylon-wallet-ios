@@ -33,9 +33,9 @@ extension DAppsDirectory {
 				.padding(.horizontal, .medium3)
 
 				Picker("", selection: $selection) {
-					Text(L10n.Discover.View.All.dapps)
+					Text(L10n.DappDirectory.viewAllDApps)
 						.tag(0)
-					Text(L10n.Discover.View.Approved.dapps)
+					Text(L10n.DappDirectory.viewConnectedDApps)
 						.tag(1)
 				}
 				.tint(.primaryBackground)
@@ -153,7 +153,7 @@ extension DAppsDirectory {
 	@ViewBuilder
 	static func dAppTags(_ dApp: DApp) -> some SwiftUI.View {
 		if !dApp.tags.isEmpty {
-			FlowLayout(rowsLimit: 2) {
+			FlowLayout(rowsLimit: 1) {
 				ForEach(dApp.tags, id: \.self) {
 					OnLedgerTagView(tag: $0)
 				}
