@@ -4,6 +4,7 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
 		var factorSourcesCandidates: [FactorSource] = []
+
 		var selectedFactorSource: FactorSource?
 	}
 
@@ -35,6 +36,7 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return .run { send in
+				let result = try await factorSourcesClient.entititesLinkedToFactorSourceKinds([.device, .arculusCard, .ledgerHqHardwareWallet])
 				let factorSources = try await factorSourcesClient.getFactorSources().elements
 				await send(.internal(.setFactorSources(factorSources)))
 			} catch: { error, _ in

@@ -191,6 +191,14 @@ extension FactorSourcesClient {
 			try await SargonOS.shared.entitiesLinkedToFactorSource(factorSource: $0, profileToCheck: .current)
 		}
 	}
+
+	func entititesLinkedToFactorSourceKinds(_ kinds: Set<FactorSourceKind>) async throws
+		-> [(kind: FactorSourceKind, entities: [EntitiesLinkedToFactorSource])]
+	{
+		try await kinds.asyncMap { kind in
+			try await (kind, entitiesLinkedToFactorSourceKind(kind: kind))
+		}
+	}
 }
 
 // MARK: - UpdateFactorSourceLastUsedRequest
