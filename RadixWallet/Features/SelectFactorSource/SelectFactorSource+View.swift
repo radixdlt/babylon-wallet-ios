@@ -13,17 +13,23 @@ extension SelectFactorSource {
 						.padding(.bottom, .medium2)
 				}
 				.footer {
-					WithControlRequirements(
-						store.selectedFactorSource,
-						forAction: { store.send(.view(.continueButtonTapped($0))) }
-					) { action in
-						Button(L10n.Common.continue, action: action)
-							.buttonStyle(.primaryRectangular)
+					VStack(spacing: .medium3) {
+						Button("Add a new Security Factor", action: {})
+							.buttonStyle(.blueText)
+
+						WithControlRequirements(
+							store.selectedFactorSource,
+							forAction: { store.send(.view(.continueButtonTapped($0))) }
+						) { action in
+							Button(L10n.Common.continue, action: action)
+								.buttonStyle(.primaryRectangular)
+						}
 					}
 				}
 				.onFirstAppear {
 					store.send(.view(.appeared))
 				}
+				.background(.secondaryBackground)
 			}
 		}
 
@@ -65,21 +71,16 @@ extension SelectFactorSource {
 		}
 
 		private var topView: some SwiftUI.View {
-			VStack(spacing: .small1) {
-				Image(.pickShieldBuilderSeedingFactors)
-
+			VStack(spacing: .small3) {
 				Text("Select Security Factor")
 					.textStyle(.sheetTitle)
-					.padding(.horizontal, .medium3)
 
 				Text(markdown: "Choose the security factor you will use to create the new Account.", emphasizedColor: .primaryText, emphasizedFont: .app.body1Header)
 					.textStyle(.body1Regular)
-					.padding(.horizontal, .medium2)
-					.padding(.top, .medium3)
+					.lineSpacing(.zero)
 			}
 			.foregroundStyle(.primaryText)
 			.multilineTextAlignment(.center)
-			.padding(.bottom, .medium2)
 		}
 	}
 }
