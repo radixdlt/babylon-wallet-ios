@@ -1724,6 +1724,7 @@ Code: %@";
 "dappDirectory_categoryOther_title" = "Other";
 "dappDirectory_viewAllDApps" = "All dApps";
 "dappDirectory_viewConnectedDApps" = "Connected dApps";
+"dappDirectory_connectedDApps_empty_description" = "These are the dApps that you have logged into using the Radix Wallet.";
 "homePage_tab_discover" = "Discover";
 "discover_title" = "Discover";
 "discover_categoryLearn_title" = "Learn About";
