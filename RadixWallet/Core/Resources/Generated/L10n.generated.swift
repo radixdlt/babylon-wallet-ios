@@ -1617,6 +1617,12 @@ internal enum L10n {
       /// Utility
       internal static let title = L10n.tr("Localizable", "dappDirectory_categoryUtility_title", fallback: "Utility")
     }
+    internal enum ConnectedDApps {
+      internal enum Empty {
+        /// These are the dApps that you have logged into using the Radix Wallet.
+        internal static let description = L10n.tr("Localizable", "dappDirectory_connectedDApps_empty_description", fallback: "These are the dApps that you have logged into using the Radix Wallet.")
+      }
+    }
     internal enum Empty {
       /// There are no dApps available on this network.
       internal static let message = L10n.tr("Localizable", "dappDirectory_empty_message", fallback: "There are no dApps available on this network.")

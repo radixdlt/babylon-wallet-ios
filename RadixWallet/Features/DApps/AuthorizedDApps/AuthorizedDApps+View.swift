@@ -57,7 +57,7 @@ extension DAppsDirectory.AuthorizedDappsFeature {
 			if !viewStore.hasAnyDApps {
 				VStack {
 					Spacer()
-					Text(L10n.AuthorizedDapps.subtitle)
+					Text(L10n.DappDirectory.ConnectedDApps.Empty.description)
 						.textBlock
 						.multilineTextAlignment(.center)
 					InfoButton(.dapps, label: L10n.InfoLink.Title.dapps)
