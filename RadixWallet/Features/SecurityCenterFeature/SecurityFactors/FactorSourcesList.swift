@@ -37,7 +37,6 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 		case rowMessageTapped(State.Row)
 		case addButtonTapped
 		case continueButtonTapped(FactorSource)
-		case changeMainButtonTapped
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -57,7 +56,6 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			case displayMnemonic(DisplayMnemonic.State)
 			case enterMnemonic(ImportMnemonicsFlowCoordinator.State)
 			case addMnemonic(ImportMnemonic.State)
-			case changeMain(ChangeMainFactorSource.State)
 			case noP2PLink(AlertState<NoP2PLinkAlert>)
 			case addNewP2PLink(NewConnection.State)
 			case addNewLedger(AddLedgerFactorSource.State)
@@ -69,7 +67,6 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			case detail(FactorSourceDetail.Action)
 			case displayMnemonic(DisplayMnemonic.Action)
 			case enterMnemonic(ImportMnemonicsFlowCoordinator.Action)
-			case changeMain(ChangeMainFactorSource.Action)
 			case noP2PLink(NoP2PLinkAlert)
 			case addNewP2PLink(NewConnection.Action)
 			case addNewLedger(AddLedgerFactorSource.Action)
@@ -85,9 +82,6 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			}
 			Scope(state: \.enterMnemonic, action: \.enterMnemonic) {
 				ImportMnemonicsFlowCoordinator()
-			}
-			Scope(state: \.changeMain, action: \.changeMain) {
-				ChangeMainFactorSource()
 			}
 			Scope(state: \.addNewP2PLink, action: \.addNewP2PLink) {
 				NewConnection()
@@ -172,11 +166,6 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 				return performActionRequiringP2PEffect(.continueWithFactorsource(factorSource), in: &state)
 			}
 			return .send(.delegate(.selectedFactorSource(factorSource)))
-
-		case .changeMainButtonTapped:
-			let currentMain = state.main?.integrity.factorSource
-			state.destination = .changeMain(.init(kind: state.kind, currentMain: currentMain))
-			return .none
 		}
 	}
 
@@ -208,10 +197,6 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			return .none
 
 		case .displayMnemonic(.delegate(.backedUp)):
-			state.destination = nil
-			return entitiesEffect(state: state)
-
-		case .changeMain(.delegate(.updated)):
 			state.destination = nil
 			return entitiesEffect(state: state)
 
@@ -387,38 +372,6 @@ extension FactorSourcesList.State {
 		var id: FactorSourceID {
 			integrity.factorSource.id
 		}
-	}
-
-	var main: Row? {
-		switch context {
-		case .display:
-			rows.first(where: \.integrity.isExplicitMain)
-		case .selection:
-			nil
-		}
-	}
-
-	var others: [Row] {
-		let main = main
-		return rows
-			.filter { $0 != main }
-			.sorted(by: { left, right in
-				let lhs = left.integrity
-				let rhs = right.integrity
-				switch (lhs, rhs) {
-				case let (.device(lDevice), .device(rDevice)):
-					if lhs.isExplicitMain {
-						return true
-					} else if lDevice.factorSource.isBDFS, rDevice.factorSource.isBDFS {
-						return sort(lhs, rhs)
-					} else {
-						return lDevice.factorSource.isBDFS
-					}
-				default:
-					return sort(lhs, rhs)
-				}
-
-			})
 	}
 
 	private func sort(_ lhs: FactorSourceIntegrity, _ rhs: FactorSourceIntegrity) -> Bool {
