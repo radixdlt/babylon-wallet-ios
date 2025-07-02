@@ -13,17 +13,12 @@ extension SelectFactorSource {
 						.padding(.bottom, .medium2)
 				}
 				.footer {
-					VStack(spacing: .medium3) {
-						Button("Add a new Security Factor", action: {})
-							.buttonStyle(.blueText)
-
-						WithControlRequirements(
-							store.selectedFactorSource,
-							forAction: { store.send(.view(.continueButtonTapped($0))) }
-						) { action in
-							Button(L10n.Common.continue, action: action)
-								.buttonStyle(.primaryRectangular)
-						}
+					WithControlRequirements(
+						store.selectedFactorSource,
+						forAction: { store.send(.view(.continueButtonTapped($0))) }
+					) { action in
+						Button(L10n.Common.continue, action: action)
+							.buttonStyle(.primaryRectangular)
 					}
 				}
 				.onFirstAppear {
@@ -39,16 +34,17 @@ extension SelectFactorSource {
 				topView
 
 				Selection(
-					$store.selectedFactorSource.sending(\.view.selectedFactorSourceChanged),
-					from: store.factorSourcesCandidates
+					$store.selectedFactorSource.sending(\.view.rowTapped),
+					from: store.rows
 				) { item in
 					VStack {
-						let isFirstOfKind = store.factorSourcesCandidates.first(where: { $0.factorSourceKind == item.value.factorSourceKind }) == item.value
+						let kind = item.value.integrity.factorSource.kind
+						let isFirstOfKind = store.rows.first(where: { $0.integrity.factorSource.kind == kind }) == item.value
 						if isFirstOfKind {
 							VStack(alignment: .leading, spacing: .zero) {
-								Text(item.value.factorSourceKind.title)
+								Text(kind.title)
 									.textStyle(.body1HighImportance)
-								Text(item.value.factorSourceKind.details)
+								Text(kind.details)
 									.textStyle(.body1Regular)
 							}
 							.foregroundStyle(.secondaryText)
@@ -57,16 +53,23 @@ extension SelectFactorSource {
 						}
 
 						FactorSourceCard(
-							kind: .instance(factorSource: item.value, kind: .short(showDetails: false)),
-							mode: .selection(
-								type: .radioButton,
-								isSelected: item.isSelected
-							)
-						)
-						.embedInButton(when: item.action)
-						.buttonStyle(.inert)
+							kind: .instance(
+								factorSource: item.value.integrity.factorSource,
+								kind: .extended(linkedEntities: item.value.linkedEntities)
+							),
+							mode: .selection(type: .radioButton, isSelected: item.isSelected),
+							messages: item.value.messages
+						) { _ in
+							item.action()
+						}
+						.opacity(item.value.opacity)
+						.onTapGesture(perform: item.action)
 					}
 				}
+
+				Button("Add a new Security Factor", action: {})
+					.buttonStyle(.secondaryRectangular())
+					.padding(.top, .medium3)
 			}
 		}
 

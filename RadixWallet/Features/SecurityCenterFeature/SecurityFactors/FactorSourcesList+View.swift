@@ -49,7 +49,7 @@ extension FactorSourcesList {
 				.flushedLeft
 		}
 
-		private func card(_ row: State.Row) -> some SwiftUI.View {
+		private func card(_ row: Row) -> some SwiftUI.View {
 			FactorSourceCard(
 				kind: .instance(
 					factorSource: row.integrity.factorSource,
@@ -71,7 +71,7 @@ extension FactorSourcesList {
 			.opacity(row.opacity)
 		}
 
-		func mode(_ row: State.Row) -> FactorSourceCard.Mode {
+		func mode(_ row: Row) -> FactorSourceCard.Mode {
 			switch store.context {
 			case .display:
 				.display
@@ -106,7 +106,7 @@ private extension FactorSourcesList.State {
 	}
 }
 
-private extension FactorSourcesList.State.Row {
+extension FactorSourcesList.Row {
 	var messages: [FactorSourceCardDataSource.Message] {
 		switch status {
 		case .lostFactorSource:

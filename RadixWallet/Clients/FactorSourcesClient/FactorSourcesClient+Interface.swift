@@ -193,10 +193,10 @@ extension FactorSourcesClient {
 	}
 
 	func entititesLinkedToFactorSourceKinds(_ kinds: Set<FactorSourceKind>) async throws
-		-> [(kind: FactorSourceKind, entities: [EntitiesLinkedToFactorSource])]
+		-> [EntitiesLinkedToFactorSource]
 	{
-		try await kinds.asyncMap { kind in
-			try await (kind, entitiesLinkedToFactorSourceKind(kind: kind))
+		try await kinds.asyncFlatMap { kind in
+			try await entitiesLinkedToFactorSourceKind(kind: kind)
 		}
 	}
 }

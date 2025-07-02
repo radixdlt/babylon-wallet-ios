@@ -33,8 +33,8 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 
 	enum ViewAction: Sendable, Equatable {
 		case task
-		case rowTapped(State.Row)
-		case rowMessageTapped(State.Row)
+		case rowTapped(Row)
+		case rowMessageTapped(Row)
 		case addButtonTapped
 		case continueButtonTapped(FactorSource)
 	}
@@ -291,25 +291,10 @@ private extension FactorSourcesList {
 		let factorSourceIds = entities.map(\.integrity.factorSource.id)
 		let alreadySelectedFactorSourceIds = filterAlreadySelectedFactorSourceIds(state: state, factorSourceIds: factorSourceIds)
 		state.rows = entities.map { entity in
-			let accounts = entity.accounts + entity.hiddenAccounts
-			let personas = entity.personas
-			// Determine row status
-			let status: State.Row.Status = if problems.hasProblem9(accounts: accounts, personas: personas) {
-				.lostFactorSource
-			} else if problems.hasProblem3(accounts: accounts, personas: personas) {
-				.seedPhraseNotRecoverable
-			} else if entity.integrity.isMnemonicMarkedAsBackedUp {
-				.seedPhraseWrittenDown
-			} else {
-				// A way to reproduce this, is to restore a Wallet from a Profile without entering its seed phrase (so it creates a new one)
-				// and do not write down the new seed phrase nor create an entity. In such case, we don't want to show problem3 because the
-				// non-backed up factor source didn't create any entity. Yet, we don't want to show the success checkmark indicating the factor
-				// source was backed up.
-				.notBackedUp
-			}
+			let status = Row.Status(entity: entity, problems: problems)
 
 			// Determine row selectability
-			let selectability: State.Row.Selectability = if state.context == .display {
+			let selectability: Row.Selectability = if state.context == .display {
 				.selectable
 			} else if status == .lostFactorSource {
 				.unselectable
@@ -318,7 +303,7 @@ private extension FactorSourcesList {
 			} else {
 				.selectable
 			}
-			return State.Row(
+			return Row(
 				integrity: entity.integrity,
 				linkedEntities: entity.linkedEntities,
 				status: status,
@@ -362,7 +347,9 @@ extension FactorSourcesList.State {
 		case display
 		case selection(ChooseFactorSourceContext)
 	}
+}
 
+extension FactorSourcesList {
 	struct Row: Sendable, Hashable, Identifiable {
 		let integrity: FactorSourceIntegrity
 		let linkedEntities: FactorSourceCardDataSource.LinkedEntities
@@ -379,7 +366,28 @@ extension FactorSourcesList.State {
 	}
 }
 
-extension FactorSourcesList.State.Row {
+extension FactorSourcesList.Row.Status {
+	init(entity: EntitiesLinkedToFactorSource, problems: [SecurityProblem]) {
+		let accounts = entity.accounts + entity.hiddenAccounts
+		let personas = entity.personas
+		// Determine row status
+		self = if problems.hasProblem9(accounts: accounts, personas: personas) {
+			.lostFactorSource
+		} else if problems.hasProblem3(accounts: accounts, personas: personas) {
+			.seedPhraseNotRecoverable
+		} else if entity.integrity.isMnemonicMarkedAsBackedUp {
+			.seedPhraseWrittenDown
+		} else {
+			// A way to reproduce this, is to restore a Wallet from a Profile without entering its seed phrase (so it creates a new one)
+			// and do not write down the new seed phrase nor create an entity. In such case, we don't want to show problem3 because the
+			// non-backed up factor source didn't create any entity. Yet, we don't want to show the success checkmark indicating the factor
+			// source was backed up.
+			.notBackedUp
+		}
+	}
+}
+
+extension FactorSourcesList.Row {
 	enum Status: Sendable, Hashable {
 		/// User has lost access to the given factor source (`SecurityProblem.problem9`).
 		/// We will show an error message.
@@ -412,7 +420,7 @@ extension FactorSourcesList.State.Row {
 	}
 }
 
-private extension EntitiesLinkedToFactorSource {
+extension EntitiesLinkedToFactorSource {
 	var linkedEntities: FactorSourceCardDataSource.LinkedEntities {
 		.init(accounts: accounts, personas: personas, hasHiddenEntities: !hiddenAccounts.isEmpty || !hiddenPersonas.isEmpty)
 	}
