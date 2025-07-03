@@ -152,7 +152,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 		case .addButtonTapped:
 			switch state.kind {
 			case .device:
-				state.destination = .addFactorSource(.init(kind: state.kind))
+				state.destination = .addFactorSource(.init(mode: .preselectedKind(state.kind)))
 			case .ledgerHqHardwareWallet:
 				return performActionRequiringP2PEffect(.addLedger, in: &state)
 			default:

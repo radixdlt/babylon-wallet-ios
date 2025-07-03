@@ -12,6 +12,7 @@ extension SelectFactorSource {
 						.padding(.horizontal, .medium3)
 						.padding(.bottom, .medium2)
 				}
+				.destinations(store: store)
 				.footer {
 					WithControlRequirements(
 						store.selectedFactorSource,
@@ -67,9 +68,11 @@ extension SelectFactorSource {
 					}
 				}
 
-				Button("Add a new Security Factor", action: {})
-					.buttonStyle(.secondaryRectangular())
-					.padding(.top, .medium3)
+				Button("Add a new Security Factor") {
+					store.send(.view(.addSecurityFactorTapped))
+				}
+				.buttonStyle(.secondaryRectangular())
+				.padding(.top, .medium3)
 			}
 		}
 
@@ -84,6 +87,16 @@ extension SelectFactorSource {
 			}
 			.foregroundStyle(.primaryText)
 			.multilineTextAlignment(.center)
+		}
+	}
+}
+
+private extension View {
+	func destinations(store: StoreOf<SelectFactorSource>) -> some View {
+		let destinationStore = store.scope(state: \.$destination, action: \.destination)
+
+		return sheet(store: destinationStore.scope(state: \.addSecurityFactor, action: \.addSecurityFactor)) {
+			AddFactorSource.Coordinator.View(store: $0)
 		}
 	}
 }

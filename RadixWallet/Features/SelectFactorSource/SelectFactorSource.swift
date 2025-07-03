@@ -3,13 +3,15 @@
 struct SelectFactorSource: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
-		var factorSourcesCandidates: [FactorSource] = []
+		let kinds: [FactorSourceKind]
+
 		var rows: [FactorSourcesList.Row] = []
-
 		var selectedFactorSource: FactorSourcesList.Row?
+		var problems: [SecurityProblem]?
+		var entities: [EntitiesLinkedToFactorSource]?
 
-		fileprivate var problems: [SecurityProblem]?
-		fileprivate var entities: [EntitiesLinkedToFactorSource]?
+		@Presents
+		var destination: Destination.State? = nil
 	}
 
 	typealias Action = FeatureAction<Self>
@@ -17,12 +19,12 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 	@CasePathable
 	enum ViewAction: Sendable, Equatable {
 		case appeared
+		case addSecurityFactorTapped
 		case rowTapped(FactorSourcesList.Row?)
 		case continueButtonTapped(FactorSourcesList.Row)
 	}
 
 	enum InternalAction: Equatable, Sendable {
-		case setFactorSources([FactorSource])
 		case setSecurityProblems([SecurityProblem])
 		case setEntities([EntitiesLinkedToFactorSource])
 	}
@@ -31,12 +33,38 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 		case selectedFactorSource(FactorSource)
 	}
 
+	struct Destination: DestinationReducer {
+		@CasePathable
+		enum State: Hashable, Sendable {
+			case addSecurityFactor(AddFactorSource.Coordinator.State)
+		}
+
+		@CasePathable
+		enum Action: Equatable, Sendable {
+			case addSecurityFactor(AddFactorSource.Coordinator.Action)
+		}
+
+		var body: some ReducerOf<Self> {
+			Scope(state: \.addSecurityFactor, action: \.addSecurityFactor) {
+				AddFactorSource.Coordinator()
+					._printChanges()
+			}
+		}
+	}
+
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.securityCenterClient) var securityCenterClient
 	@Dependency(\.errorQueue) var errorQueue
 
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
+
+	init() {}
+
 	var body: some ReducerOf<Self> {
 		Reduce(core)
+			.ifLet(destinationPath, action: \.destination) {
+				Destination()
+			}
 	}
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
@@ -51,15 +79,15 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 
 		case let .continueButtonTapped(row):
 			return .send(.delegate(.selectedFactorSource(row.integrity.factorSource)))
+
+		case .addSecurityFactorTapped:
+			state.destination = .addSecurityFactor(.init(mode: .toSelectFromKinds(state.kinds)))
+			return .none
 		}
 	}
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .setFactorSources(factorSources):
-			state.factorSourcesCandidates = factorSources
-			return .none
-
 		case let .setSecurityProblems(problems):
 			state.problems = problems
 			setRows(state: &state)
@@ -68,6 +96,16 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 		case let .setEntities(entities):
 			state.entities = entities
 			setRows(state: &state)
+			return .none
+		}
+	}
+
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .addSecurityFactor(.delegate(.finished)):
+			state.destination = nil
+			return entitiesEffect(state: state)
+		default:
 			return .none
 		}
 	}

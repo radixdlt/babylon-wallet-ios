@@ -862,6 +862,10 @@
 		A00697CB2DB8D3A900810D36 /* DisplayMnemonic.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00697C92DB8D3A900810D36 /* DisplayMnemonic.swift */; };
 		A00697CC2DB8D3A900810D36 /* DisplayMnemonic+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00697CA2DB8D3A900810D36 /* DisplayMnemonic+View.swift */; };
 		A00697CF2DBA304F00810D36 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A00697CE2DBA304F00810D36 /* Sargon */; };
+		A00CC6D92E157978005278AE /* AddFactorSource-SelectKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00CC6D72E157978005278AE /* AddFactorSource-SelectKind.swift */; };
+		A00CC6DA2E157978005278AE /* AddFactorSoruce-SelectKind+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00CC6D82E157978005278AE /* AddFactorSoruce-SelectKind+View.swift */; };
+		A00CC6DD2E166043005278AE /* AddFactorSourceIntro+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00CC6DC2E166043005278AE /* AddFactorSourceIntro+View.swift */; };
+		A00CC6DE2E166043005278AE /* AddFactorSourceIntro.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00CC6DB2E166043005278AE /* AddFactorSourceIntro.swift */; };
 		A018C8702E002FC900461852 /* BlogPosts+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A018C86F2E002FC900461852 /* BlogPosts+View.swift */; };
 		A018C8712E002FC900461852 /* BlogPosts.swift in Sources */ = {isa = PBXBuildFile; fileRef = A018C86E2E002FC900461852 /* BlogPosts.swift */; };
 		A018C8752E0030C100461852 /* BlogPostsClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A018C8732E0030C100461852 /* BlogPostsClient+Live.swift */; };
@@ -1329,7 +1333,6 @@
 		E7392AC42D5F58C5002FABDA /* FactorSourcePreviewCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7392AC32D5F58C5002FABDA /* FactorSourcePreviewCard.swift */; };
 		E7392ACB2D6C7973002FABDA /* AddFactorSourceCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7392ACA2D6C7973002FABDA /* AddFactorSourceCoordinator.swift */; };
 		E7392ACD2D6C7978002FABDA /* AddFactorSourceCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7392ACC2D6C7978002FABDA /* AddFactorSourceCoordinator+View.swift */; };
-		E7392AD12D6C7BE7002FABDA /* AddFactorSource-IntroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7392AD02D6C7BE7002FABDA /* AddFactorSource-IntroView.swift */; };
 		E7392AD42D6CD022002FABDA /* AddFactorSource-DeviceSeedPhrase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7392AD32D6CD022002FABDA /* AddFactorSource-DeviceSeedPhrase.swift */; };
 		E7392AD62D6CD02A002FABDA /* AddFactorSource-DeviceSeedPhrase+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7392AD52D6CD02A002FABDA /* AddFactorSource-DeviceSeedPhrase+View.swift */; };
 		E7392AD82D6F18FB002FABDA /* DeviceMnemonicBuilder+SharedState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7392AD72D6F18FB002FABDA /* DeviceMnemonicBuilder+SharedState.swift */; };
@@ -2228,6 +2231,10 @@
 		83FDF7EB2AF260D600D9AA8B /* ProgrammaticScryptoSborValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValue.swift; sourceTree = "<group>"; };
 		A00697C92DB8D3A900810D36 /* DisplayMnemonic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayMnemonic.swift; sourceTree = "<group>"; };
 		A00697CA2DB8D3A900810D36 /* DisplayMnemonic+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DisplayMnemonic+View.swift"; sourceTree = "<group>"; };
+		A00CC6D72E157978005278AE /* AddFactorSource-SelectKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSource-SelectKind.swift"; sourceTree = "<group>"; };
+		A00CC6D82E157978005278AE /* AddFactorSoruce-SelectKind+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSoruce-SelectKind+View.swift"; sourceTree = "<group>"; };
+		A00CC6DB2E166043005278AE /* AddFactorSourceIntro.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFactorSourceIntro.swift; sourceTree = "<group>"; };
+		A00CC6DC2E166043005278AE /* AddFactorSourceIntro+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSourceIntro+View.swift"; sourceTree = "<group>"; };
 		A018C86E2E002FC900461852 /* BlogPosts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlogPosts.swift; sourceTree = "<group>"; };
 		A018C86F2E002FC900461852 /* BlogPosts+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BlogPosts+View.swift"; sourceTree = "<group>"; };
 		A018C8722E0030C100461852 /* BlogPostsClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BlogPostsClient+Interface.swift"; sourceTree = "<group>"; };
@@ -2695,7 +2702,6 @@
 		E7392AC32D5F58C5002FABDA /* FactorSourcePreviewCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FactorSourcePreviewCard.swift; sourceTree = "<group>"; };
 		E7392ACA2D6C7973002FABDA /* AddFactorSourceCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFactorSourceCoordinator.swift; sourceTree = "<group>"; };
 		E7392ACC2D6C7978002FABDA /* AddFactorSourceCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSourceCoordinator+View.swift"; sourceTree = "<group>"; };
-		E7392AD02D6C7BE7002FABDA /* AddFactorSource-IntroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSource-IntroView.swift"; sourceTree = "<group>"; };
 		E7392AD32D6CD022002FABDA /* AddFactorSource-DeviceSeedPhrase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSource-DeviceSeedPhrase.swift"; sourceTree = "<group>"; };
 		E7392AD52D6CD02A002FABDA /* AddFactorSource-DeviceSeedPhrase+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSource-DeviceSeedPhrase+View.swift"; sourceTree = "<group>"; };
 		E7392AD72D6F18FB002FABDA /* DeviceMnemonicBuilder+SharedState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeviceMnemonicBuilder+SharedState.swift"; sourceTree = "<group>"; };
@@ -6288,6 +6294,15 @@
 			path = DisplayMnemonic;
 			sourceTree = "<group>";
 		};
+		A00CC6DF2E166839005278AE /* SelectKind */ = {
+			isa = PBXGroup;
+			children = (
+				A00CC6D72E157978005278AE /* AddFactorSource-SelectKind.swift */,
+				A00CC6D82E157978005278AE /* AddFactorSoruce-SelectKind+View.swift */,
+			);
+			path = SelectKind;
+			sourceTree = "<group>";
+		};
 		A018C86B2E002F9100461852 /* BlogPosts */ = {
 			isa = PBXGroup;
 			children = (
@@ -7382,6 +7397,7 @@
 		E7392ACE2D6C7BD1002FABDA /* Children */ = {
 			isa = PBXGroup;
 			children = (
+				A00CC6DF2E166839005278AE /* SelectKind */,
 				A08BBA6C2DAF936D00534B67 /* Success */,
 				E7392ACF2D6C7BD7002FABDA /* Intro */,
 				E7392AD22D6CB282002FABDA /* DeviceSeedPhrase */,
@@ -7392,7 +7408,8 @@
 		E7392ACF2D6C7BD7002FABDA /* Intro */ = {
 			isa = PBXGroup;
 			children = (
-				E7392AD02D6C7BE7002FABDA /* AddFactorSource-IntroView.swift */,
+				A00CC6DB2E166043005278AE /* AddFactorSourceIntro.swift */,
+				A00CC6DC2E166043005278AE /* AddFactorSourceIntro+View.swift */,
 			);
 			path = Intro;
 			sourceTree = "<group>";
@@ -8096,6 +8113,8 @@
 				48CFC34F2ADC10D900E77A5C /* PersonaRow+View.swift in Sources */,
 				48CFC2FB2ADC10D900E77A5C /* NewPersonaCompletion+Reducer.swift in Sources */,
 				48CFC6222ADC10DA00E77A5C /* OnLedgerTag.swift in Sources */,
+				A00CC6DD2E166043005278AE /* AddFactorSourceIntro+View.swift in Sources */,
+				A00CC6DE2E166043005278AE /* AddFactorSourceIntro.swift in Sources */,
 				A40815992C7E0D08005E65B9 /* MetadataNonFungibleLocalIdValue.swift in Sources */,
 				A408157E2C7E0D08005E65B9 /* GatewayInfoResponseKnownTarget.swift in Sources */,
 				A4ECE2722BEEAFFC00468BF6 /* SecurityCenterClient+Interface.swift in Sources */,
@@ -8643,6 +8662,8 @@
 				48CFC47E2ADC10DA00E77A5C /* OverlayWindowClient+Live.swift in Sources */,
 				A408158B2C7E0D08005E65B9 /* MetadataDecimalArrayValue.swift in Sources */,
 				48CFC4722ADC10DA00E77A5C /* P2PLinksClient+Live.swift in Sources */,
+				A00CC6D92E157978005278AE /* AddFactorSource-SelectKind.swift in Sources */,
+				A00CC6DA2E157978005278AE /* AddFactorSoruce-SelectKind+View.swift in Sources */,
 				E703C0272D3F8D81006DF199 /* MultiPickerView.swift in Sources */,
 				A40815692C7E0D08005E65B9 /* BlueprintRoyaltyConfig.swift in Sources */,
 				A40815D42C7E0D08005E65B9 /* ProgrammaticScryptoSborValueEnum.swift in Sources */,
@@ -8825,7 +8846,6 @@
 				48CFC4592ADC10DA00E77A5C /* LedgerHardwareWalletClient+Interface.swift in Sources */,
 				5B27FBFD2CC7E6C1002975BE /* Sections.swift in Sources */,
 				5B27FBFE2CC7E6C1002975BE /* Sections+View.swift in Sources */,
-				E7392AD12D6C7BE7002FABDA /* AddFactorSource-IntroView.swift in Sources */,
 				E6F460132BDBE56800B122DB /* Stage2MigrateToSargon+RadixConnectModels+Logic.swift in Sources */,
 				4841614D2BCAD3D400D2B644 /* Stage1MigrateToSargon+MnemonicWithPassphrase.swift in Sources */,
 				48CFC5A82ADC10DA00E77A5C /* URLButtonStyle.swift in Sources */,

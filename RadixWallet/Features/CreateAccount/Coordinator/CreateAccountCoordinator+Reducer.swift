@@ -123,7 +123,7 @@ extension CreateAccountCoordinator {
 		switch childAction {
 		case let .root(.nameAccount(.delegate(.proceed(accountName)))):
 			state.name = accountName
-			state.path.append(.selectFactorSource(.init()))
+			state.path.append(.selectFactorSource(.init(kinds: [.device, .ledgerHqHardwareWallet, .arculusCard])))
 			return .none
 //			if useLedgerAsFactorSource {
 //				state.path.append(.selectLedger(.init(context: .createHardwareAccount)))
