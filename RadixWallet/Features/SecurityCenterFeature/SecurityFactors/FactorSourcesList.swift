@@ -436,26 +436,3 @@ private extension FactorSourceIntegrity {
 		}
 	}
 }
-
-// MARK: - NoP2PLinkAlert
-enum NoP2PLinkAlert: Sendable, Hashable {
-	case addNewP2PLinkTapped
-	case cancelTapped
-}
-
-extension AlertState<NoP2PLinkAlert> {
-	static var noP2Plink: AlertState {
-		AlertState {
-			TextState(L10n.LedgerHardwareDevices.LinkConnectorAlert.title)
-		} actions: {
-			ButtonState(role: .cancel, action: .cancelTapped) {
-				TextState(L10n.Common.cancel)
-			}
-			ButtonState(action: .addNewP2PLinkTapped) {
-				TextState(L10n.LedgerHardwareDevices.LinkConnectorAlert.continue)
-			}
-		} message: {
-			TextState(L10n.LedgerHardwareDevices.LinkConnectorAlert.message)
-		}
-	}
-}

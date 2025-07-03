@@ -32,8 +32,37 @@ extension AddFactorSource.Intro {
 					}
 					.buttonStyle(.primaryRectangular)
 				}
+				.destinations(with: store)
+				.task { @MainActor in
+					await store.send(.view(.task)).finish()
+				}
 			}
 		}
+	}
+}
+
+private extension StoreOf<AddFactorSource.Intro> {
+	var destination: PresentationStoreOf<AddFactorSource.Intro.Destination> {
+		scope(state: \.$destination, action: \.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<AddFactorSource.Intro>) -> some View {
+		let destinationStore = store.destination
+		return addNewP2PLinkSheet(with: destinationStore)
+			.noP2PLinkAlert(with: destinationStore)
+	}
+
+	private func addNewP2PLinkSheet(with destinationStore: PresentationStoreOf<AddFactorSource.Intro.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.addNewP2PLink, action: \.addNewP2PLink)) {
+			NewConnection.View(store: $0)
+		}
+	}
+
+	private func noP2PLinkAlert(with destinationStore: PresentationStoreOf<AddFactorSource.Intro.Destination>) -> some View {
+		alert(store: destinationStore.scope(state: \.noP2PLink, action: \.noP2PLink))
 	}
 }
 

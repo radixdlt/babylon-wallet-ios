@@ -47,7 +47,6 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 		var body: some ReducerOf<Self> {
 			Scope(state: \.addSecurityFactor, action: \.addSecurityFactor) {
 				AddFactorSource.Coordinator()
-					._printChanges()
 			}
 		}
 	}
