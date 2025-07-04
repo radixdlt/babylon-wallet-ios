@@ -133,7 +133,7 @@ extension CreateAccountCoordinator {
 //			}
 
 		case let .path(.element(_, action: .selectFactorSource(.delegate(.selectedFactorSource(fs))))):
-			return createAccount(state: &state, mode: .specific(fs.asGeneral))
+			return createAccount(state: &state, factorSource: fs)
 
 		case .path(.element(_, action: .completion(.delegate(.completed)))):
 			return .run { send in
@@ -159,18 +159,13 @@ extension CreateAccountCoordinator {
 		}
 	}
 
-	private func createAccount(state: inout State, mode: Mode) -> Effect<Action> {
+	private func createAccount(state: inout State, factorSource: FactorSource) -> Effect<Action> {
 		guard let name = state.name else {
 			fatalError("Name should be set before creating Account")
 		}
 		let displayName = DisplayName(nonEmpty: name)
 		return .run { [networkId = state.config.specificNetworkID] send in
-			let account = switch mode {
-			case .bdfs:
-				try await SargonOS.shared.createAccountWithBDFS(networkId: networkId, name: displayName)
-			case let .specific(factorSource):
-				try await SargonOS.shared.createAccount(factorSource: factorSource, networkId: networkId, name: displayName)
-			}
+			let account = try await SargonOS.shared.createAccount(factorSource: factorSource, networkId: networkId, name: displayName)
 
 			let updated = await getThirdPartyDepositSettings(account: account)
 			// TODO: Remove once this is implemented in Sargon (https://radixdlt.atlassian.net/browse/ABW-4147)

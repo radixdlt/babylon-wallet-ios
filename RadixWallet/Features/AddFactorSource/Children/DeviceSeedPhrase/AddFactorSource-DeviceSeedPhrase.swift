@@ -9,7 +9,7 @@ extension AddFactorSource {
 		struct State: Sendable, Hashable {
 			@Shared(.deviceMnemonicBuilder) var deviceMnemonicBuilder
 
-			var grid: ImportMnemonicGrid.State
+			var grid: ImportMnemonicGrid.State!
 			var isEnteringCustomSeedPhrase: Bool = false
 
 			var confirmButtonControlState: ControlState {
@@ -24,7 +24,12 @@ extension AddFactorSource {
 			@Presents
 			var destination: Destination.State? = nil
 
-			init(mnemonic: Mnemonic) {
+			init() {
+				$deviceMnemonicBuilder.withLock { builder in
+					builder = builder.generateNewMnemonic()
+				}
+
+				let mnemonic = try! Mnemonic(words: deviceMnemonicBuilder.getWords())
 				grid = .init(mnemonic: mnemonic)
 			}
 		}

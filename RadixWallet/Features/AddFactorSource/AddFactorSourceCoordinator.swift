@@ -66,10 +66,6 @@ extension AddFactorSource {
 
 		typealias Action = FeatureAction<Self>
 
-		enum ViewAction: Sendable, Equatable {
-			case continueButtonTapped
-		}
-
 		@CasePathable
 		enum ChildAction: Sendable, Equatable {
 			case root(Root.Action)
@@ -89,72 +85,46 @@ extension AddFactorSource {
 				.forEach(\.path, action: \.child.path)
 		}
 
-		func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
-			switch viewAction {
-			case .continueButtonTapped:
-				switch state.kind {
-				case .device:
-					state.$deviceMnemonicBuilder.withLock { builder in
-						builder = builder.generateNewMnemonic()
-					}
-					if let mnemonic = try? Mnemonic(words: state.deviceMnemonicBuilder.getWords()) {
-						state.path.append(.deviceSeedPhrase(.init(mnemonic: mnemonic)))
-					}
-				case .ledgerHqHardwareWallet, .offDeviceMnemonic, .arculusCard, .password:
-					break
-				case .none:
-					return .none
-				}
-
-				return .none
-			}
-		}
-
 		func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 			switch childAction {
 			case let .root(.selectKind(.delegate(.completed(selectedKind)))):
 				state.kind = selectedKind
 				state.path.append(.intro(.init(kind: selectedKind)))
 				return .none
+
 			case .root(.intro(.delegate(.completed))), .path(.element(id: _, action: .intro(.delegate(.completed)))):
-				switch state.kind {
-				case .device:
-					state.$deviceMnemonicBuilder.withLock { builder in
-						builder = builder.generateNewMnemonic()
-					}
-					if let mnemonic = try? Mnemonic(words: state.deviceMnemonicBuilder.getWords()) {
-						state.path.append(.deviceSeedPhrase(.init(mnemonic: mnemonic)))
-					}
-				case .ledgerHqHardwareWallet, .offDeviceMnemonic, .arculusCard, .password:
-					break
-				case .none:
-					return .none
-				}
+				state.path.append(.deviceSeedPhrase(.init()))
+				return .none
+
+			case let .root(.intro(.delegate(.completedWithLedgerTempFS(ledger)))),
+			     let .path(.element(id: _, action: .intro(.delegate(.completedWithLedgerTempFS(ledger))))):
+				state.path.append(.nameFactorSource(.init(factorSource: ledger.asGeneral)))
 
 				return .none
+
 			case let .path(.element(id: _, action: .deviceSeedPhrase(.delegate(.completed(withCustomSeedPhrase))))):
-				guard let kind = state.kind else {
-					return .none
-				}
-
 				if withCustomSeedPhrase {
-					state.path.append(.nameFactorSource(.init(kind: kind)))
+					state.path.append(.nameFactorSource(.init(factorSource: createDeviceFactorSource(state: state).asGeneral)))
 				} else {
-					state.path.append(.confirmSeedPhrase(.init(factorSourceKind: kind)))
+					state.path.append(.confirmSeedPhrase(.init(factorSourceKind: .device)))
 				}
 				return .none
-			case .path(.element(id: _, action: .confirmSeedPhrase(.delegate(.validated)))):
-				guard let kind = state.kind else {
-					return .none
-				}
 
-				state.path.append(.nameFactorSource(.init(kind: kind)))
+			case .path(.element(id: _, action: .confirmSeedPhrase(.delegate(.validated)))):
+				state.path.append(.nameFactorSource(.init(factorSource: createDeviceFactorSource(state: state).asGeneral)))
 				return .none
+
 			case .path(.element(id: _, action: .nameFactorSource(.delegate(.saved)))):
 				return .send(.delegate(.finished))
+
 			default:
 				return .none
 			}
+		}
+
+		func createDeviceFactorSource(state: State) -> DeviceFactorSource {
+			let mwp = state.deviceMnemonicBuilder.getMnemonicWithPassphrase()
+			return try! SargonOS.shared.createDeviceFactorSource(mnemonicWithPassphrase: mwp, factorType: .babylon(isMain: false))
 		}
 	}
 }

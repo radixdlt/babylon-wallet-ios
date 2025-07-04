@@ -15,7 +15,6 @@ extension AddFactorSource {
 
 		enum ActionRequiringP2P: Sendable, Hashable {
 			case addLedger
-			case continueWithFactorsource(FactorSource)
 		}
 
 		typealias Action = FeatureAction<Self>
@@ -27,12 +26,11 @@ extension AddFactorSource {
 
 		enum DelegateAction: Sendable, Equatable {
 			case completed
+			case completedWithLedgerTempFS(LedgerHardwareWalletFactorSource)
 		}
 
 		enum InternalAction: Sendable, Equatable {
 			case hasAConnectorExtension(Bool)
-			case receivedLedgerDeviceInfo(LedgerDeviceInfo)
-			case factorSourceAlreadyExsits(FactorSource)
 		}
 
 		struct Destination: DestinationReducer {
@@ -40,17 +38,23 @@ extension AddFactorSource {
 			enum State: Sendable, Hashable {
 				case noP2PLink(AlertState<NoP2PLinkAlert>)
 				case addNewP2PLink(NewConnection.State)
+				case hardwareFactorIdentification(AddFactorSource.IdentifyingFactor.State)
 			}
 
 			@CasePathable
 			enum Action: Sendable, Equatable {
 				case noP2PLink(NoP2PLinkAlert)
 				case addNewP2PLink(NewConnection.Action)
+				case hardwareFactorIdentification(AddFactorSource.IdentifyingFactor.Action)
 			}
 
 			var body: some ReducerOf<Self> {
 				Scope(state: \.addNewP2PLink, action: \.addNewP2PLink) {
 					NewConnection()
+				}
+
+				Scope(state: \.hardwareFactorIdentification, action: \.hardwareFactorIdentification) {
+					AddFactorSource.IdentifyingFactor()
 				}
 			}
 		}
@@ -82,22 +86,8 @@ extension AddFactorSource {
 						state.destination = .noP2PLink(.noP2Plink)
 						return .none
 					}
-					// Present identifying factor and call ledger client
-					return .run { send in
-						let info = try await ledgerHardwareWalletClient.getDeviceInfo()
-						let existingLedger = try await factorSourcesClient.getFactorSource(
-							id: FactorSourceID.hash(value: FactorSourceIdFromHash(kind: .ledgerHqHardwareWallet, body: Exactly32Bytes(bytes: info.id.data.data))),
-							as: LedgerHardwareWalletFactorSource.self
-						)
-
-						if let existingLedger {
-							await send(.internal(.factorSourceAlreadyExsits(existingLedger.asGeneral)))
-						} else {
-							await send(.internal(.receivedLedgerDeviceInfo(info)))
-						}
-					} catch: { error, _ in
-						errorQueue.schedule(error)
-					}
+					state.destination = .hardwareFactorIdentification(.init(kind: state.kind))
+					return .none
 				}
 				return .send(.delegate(.completed))
 			}
@@ -107,10 +97,6 @@ extension AddFactorSource {
 			switch internalAction {
 			case let .hasAConnectorExtension(hasCE):
 				state.hasAConnectorExtension = hasCE
-				return .none
-			case let .receivedLedgerDeviceInfo(ledgerDeviceInfo):
-				return .none
-			case let .factorSourceAlreadyExsits(fs):
 				return .none
 			}
 		}
@@ -138,6 +124,11 @@ extension AddFactorSource {
 						errorQueue.schedule(error)
 					}
 				}
+
+			case let .hardwareFactorIdentification(.delegate(.completedWithLedger(ledgerDeviceInfo))):
+				state.destination = nil
+				let fs = LedgerHardwareWalletFactorSource.from(device: ledgerDeviceInfo, name: "")
+				return .send(.delegate(.completedWithLedgerTempFS(fs)))
 
 			default:
 				return .none

@@ -1,13 +1,13 @@
+// MARK: - AddFactorSource.NameFactorSource
 extension AddFactorSource {
 	@Reducer
 	struct NameFactorSource: Sendable, FeatureReducer {
 		@ObservableState
 		struct State: Sendable, Hashable {
-			@Shared(.deviceMnemonicBuilder) var deviceMnemonicBuilder
-			let kind: FactorSourceKind
 			var name: String = ""
 			var sanitizedName: NonEmptyString?
 			var isAddingFactorSource: Bool = false
+			var factorSource: FactorSource
 
 			@Presents
 			var destination: Destination.State? = nil
@@ -69,13 +69,14 @@ extension AddFactorSource {
 				state.sanitizedName = NonEmpty(rawValue: name.trimmingWhitespacesAndNewlines())
 				return .none
 			case let .saveTapped(name):
-				let mwp = state.deviceMnemonicBuilder.getMnemonicWithPassphrase()
-				let fsId = state.deviceMnemonicBuilder.getFactorSourceId()
+				state.factorSource.setName(name)
 				state.isAddingFactorSource = true
-				return .run { send in
+				return .run { [factorSource = state.factorSource] send in
 					let result = await TaskResult {
-						_ = try await SargonOS.shared.addNewMnemonicFactorSource(factorSourceKind: .device, mnemonicWithPassphrase: mwp, name: name.rawValue)
-						try? userDefaults.addFactorSourceIDOfBackedUpMnemonic(fsId.extract())
+						_ = try await SargonOS.shared.addFactorSource(factorSource: factorSource)
+						if factorSource.factorSourceKind == .device {
+							try? userDefaults.addFactorSourceIDOfBackedUpMnemonic(factorSource.id.extract())
+						}
 						return EqVoid.instance
 					}
 					await send(.internal(.addFactorSourceResult(result)))
@@ -97,6 +98,28 @@ extension AddFactorSource {
 
 		func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
 			.send(.delegate(.saved))
+		}
+	}
+}
+
+extension FactorSource {
+	mutating func setName(_ name: NonEmptyString) {
+		switch self {
+		case var .device(value):
+			value.hint.label = name.stringValue
+			self = .device(value: value)
+		case var .ledger(value):
+			value.hint.label = name.stringValue
+			self = .ledger(value: value)
+		case var .offDeviceMnemonic(value):
+			value.hint.label = DisplayName(nonEmpty: name)
+			self = .offDeviceMnemonic(value: value)
+		case var .arculusCard(value):
+			value.hint.label = name.stringValue
+			self = .arculusCard(value: value)
+		case var .password(value):
+			value.hint.label = name.stringValue
+			self = .password(value: value)
 		}
 	}
 }
