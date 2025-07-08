@@ -138,6 +138,7 @@ struct Home: Sendable, FeatureReducer {
 	@Dependency(\.securityCenterClient) var securityCenterClient
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.accountLockersClient) var accountLockersClient
+	@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 	private let accountPortfoliosRefreshIntervalInSeconds = 300 // 5 minutes
 

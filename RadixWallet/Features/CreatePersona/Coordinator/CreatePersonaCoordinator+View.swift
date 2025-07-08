@@ -67,6 +67,13 @@ extension CreatePersonaCoordinator {
 							then: { EditPersona.View(store: $0) }
 						)
 
+					case .selectFactorSource:
+						CaseLet(
+							/CreatePersonaCoordinator.Path.State.selectFactorSource,
+							action: CreatePersonaCoordinator.Path.Action.selectFactorSource,
+							then: { SelectFactorSource.View(store: $0) }
+						)
+
 					case .step2_completion:
 						CaseLet(
 							/CreatePersonaCoordinator.Path.State.step2_completion,

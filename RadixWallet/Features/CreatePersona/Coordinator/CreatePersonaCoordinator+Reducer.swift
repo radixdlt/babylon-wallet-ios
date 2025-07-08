@@ -8,6 +8,8 @@ struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 		var path: StackState<Path.State> = .init()
 
 		let config: CreatePersonaConfig
+		var name: NonEmptyString!
+		var personaData: PersonaData!
 
 		init(
 			root: Path.State? = nil,
@@ -27,7 +29,7 @@ struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 
 		var shouldDisplayNavBar: Bool {
 			switch path.last {
-			case .step0_introduction, .step1_createPersona:
+			case .step0_introduction, .step1_createPersona, .selectFactorSource:
 				true
 			case .step2_completion:
 				false
@@ -42,6 +44,7 @@ struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 		enum State: Sendable, Hashable {
 			case step0_introduction
 			case step1_createPersona(EditPersona.State)
+			case selectFactorSource(SelectFactorSource.State)
 			case step2_completion(NewPersonaCompletion.State)
 		}
 
@@ -49,12 +52,16 @@ struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 		enum Action: Sendable, Equatable {
 			case step0_introduction
 			case step1_createPersona(EditPersona.Action)
+			case selectFactorSource(SelectFactorSource.Action)
 			case step2_completion(NewPersonaCompletion.Action)
 		}
 
 		var body: some ReducerOf<Self> {
 			Scope(state: \.step1_createPersona, action: \.step1_createPersona) {
 				EditPersona()
+			}
+			Scope(state: \.selectFactorSource, action: \.selectFactorSource) {
+				SelectFactorSource()
 			}
 			Scope(state: \.step2_completion, action: \.step2_completion) {
 				NewPersonaCompletion()
@@ -120,16 +127,34 @@ extension CreatePersonaCoordinator {
 		case
 			let .root(.step1_createPersona(.delegate(.personaInfoSet(name, personaData)))),
 			let .path(.element(_, action: .step1_createPersona(.delegate(.personaInfoSet(name, personaData))))):
-			createPersona(name: name, personaData: personaData)
+			state.name = name
+			state.personaData = personaData
+
+			state.path.append(.selectFactorSource(.init(kinds: [.device, .ledgerHqHardwareWallet, .arculusCard])))
+			return .none
+
+		case let .path(.element(_, action: .selectFactorSource(.delegate(.selectedFactorSource(fs))))):
+			let name = state.name
+			let personaData = state.personaData
+			return .run { send in
+				let persona = try await SargonOS.shared.createPersona(
+					factorSource: fs,
+					name: .init(nonEmpty: name!),
+					personaData: personaData
+				)
+				await send(.internal(.handlePersonaCreated(persona)))
+			} catch: { error, _ in
+				errorQueue.schedule(error)
+			}
 
 		case let .path(.element(_, action: .step2_completion(.delegate(.completed(persona))))):
-			.run { send in
+			return .run { send in
 				await send(.delegate(.completed(persona)))
 				await dismiss()
 			}
 
 		default:
-			.none
+			return .none
 		}
 	}
 
