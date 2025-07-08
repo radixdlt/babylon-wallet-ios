@@ -58,7 +58,6 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			case addMnemonic(ImportMnemonic.State)
 			case noP2PLink(AlertState<NoP2PLinkAlert>)
 			case addNewP2PLink(NewConnection.State)
-			case addNewLedger(AddLedgerFactorSource.State)
 			case addFactorSource(AddFactorSource.Coordinator.State)
 		}
 
@@ -69,7 +68,6 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			case enterMnemonic(ImportMnemonicsFlowCoordinator.Action)
 			case noP2PLink(NoP2PLinkAlert)
 			case addNewP2PLink(NewConnection.Action)
-			case addNewLedger(AddLedgerFactorSource.Action)
 			case addFactorSource(AddFactorSource.Coordinator.Action)
 		}
 
@@ -85,9 +83,6 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			}
 			Scope(state: \.addNewP2PLink, action: \.addNewP2PLink) {
 				NewConnection()
-			}
-			Scope(state: \.addNewLedger, action: \.addNewLedger) {
-				AddLedgerFactorSource()
 			}
 			Scope(state: \.addFactorSource, action: \.addFactorSource) {
 				AddFactorSource.Coordinator()
@@ -212,14 +207,9 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 
 		case let .addNewP2PLink(.delegate(newP2PAction)):
 			switch newP2PAction {
-			case let .newConnection(connectedClient):
+			case .newConnection:
 				state.destination = nil
-				return .run { _ in
-					try await radixConnectClient.updateOrAddP2PLink(connectedClient)
-				} catch: { error, _ in
-					loggerGlobal.error("Failed P2PLink, error \(error)")
-					errorQueue.schedule(error)
-				}
+				return .none
 			}
 
 		case .addFactorSource(.delegate(.finished)):
@@ -233,10 +223,8 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 
 	private func checkP2PLinkEffect() -> Effect<Action> {
 		.run { send in
-			for try await isConnected in await ledgerHardwareWalletClient.isConnectedToAnyConnectorExtension() {
-				guard !Task.isCancelled else { return }
-				await send(.internal(.hasAConnectorExtension(isConnected)))
-			}
+			let hasAConnectorExtension = await ledgerHardwareWalletClient.hasAnyLinkedConnector()
+			await send(.internal(.hasAConnectorExtension(hasAConnectorExtension)))
 		} catch: { error, _ in
 			loggerGlobal.error("failed to get links updates, error: \(error)")
 		}
@@ -255,7 +243,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 		// If we have a connection, we can proceed directly
 		switch action {
 		case .addLedger:
-			state.destination = .addNewLedger(.init())
+			state.destination = .addFactorSource(.init(mode: .preselectedKind(.ledgerHqHardwareWallet)))
 			return .none
 		case let .continueWithFactorsource(fs):
 			return .send(.delegate(.selectedFactorSource(fs)))
@@ -382,6 +370,16 @@ extension FactorSourcesList.Row.Status {
 			// and do not write down the new seed phrase nor create an entity. In such case, we don't want to show problem3 because the
 			// non-backed up factor source didn't create any entity. Yet, we don't want to show the success checkmark indicating the factor
 			// source was backed up.
+			.notBackedUp
+		}
+	}
+
+	init(problems: [SecurityProblem]) {
+		self = if problems.hasProblem9() {
+			.lostFactorSource
+		} else if problems.hasProblem3() {
+			.seedPhraseNotRecoverable
+		} else {
 			.notBackedUp
 		}
 	}

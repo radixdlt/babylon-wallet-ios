@@ -5,16 +5,10 @@ extension AddFactorSource {
 		@ObservableState
 		struct State: Sendable, Hashable {
 			let kind: FactorSourceKind
-
 			var hasAConnectorExtension: Bool = false
-			var pendingAction: ActionRequiringP2P? = nil
 
 			@Presents
 			var destination: Destination.State? = nil
-		}
-
-		enum ActionRequiringP2P: Sendable, Hashable {
-			case addLedger
 		}
 
 		typealias Action = FeatureAction<Self>
@@ -36,14 +30,12 @@ extension AddFactorSource {
 		struct Destination: DestinationReducer {
 			@CasePathable
 			enum State: Sendable, Hashable {
-				case noP2PLink(AlertState<NoP2PLinkAlert>)
 				case addNewP2PLink(NewConnection.State)
 				case hardwareFactorIdentification(AddFactorSource.IdentifyingFactor.State)
 			}
 
 			@CasePathable
 			enum Action: Sendable, Equatable {
-				case noP2PLink(NoP2PLinkAlert)
 				case addNewP2PLink(NewConnection.Action)
 				case hardwareFactorIdentification(AddFactorSource.IdentifyingFactor.Action)
 			}
@@ -83,7 +75,7 @@ extension AddFactorSource {
 			case .continueTapped:
 				if state.kind == .ledgerHqHardwareWallet {
 					guard state.hasAConnectorExtension else {
-						state.destination = .noP2PLink(.noP2Plink)
+						state.destination = .addNewP2PLink(.init(root: .ledgerConnectionIntro))
 						return .none
 					}
 					state.destination = .hardwareFactorIdentification(.init(kind: state.kind))
@@ -103,26 +95,11 @@ extension AddFactorSource {
 
 		func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 			switch presentedAction {
-			case let .noP2PLink(alertAction):
-				switch alertAction {
-				case .addNewP2PLinkTapped:
-					state.destination = .addNewP2PLink(.init())
-					return .none
-
-				case .cancelTapped:
-					return .none
-				}
-
 			case let .addNewP2PLink(.delegate(newP2PAction)):
 				switch newP2PAction {
-				case let .newConnection(connectedClient):
-					state.destination = nil
-					return .run { _ in
-						try await radixConnectClient.updateOrAddP2PLink(connectedClient)
-					} catch: { error, _ in
-						loggerGlobal.error("Failed P2PLink, error \(error)")
-						errorQueue.schedule(error)
-					}
+				case .newConnection:
+					state.destination = .hardwareFactorIdentification(.init(kind: .ledgerHqHardwareWallet))
+					return .none
 				}
 
 			case let .hardwareFactorIdentification(.delegate(.completedWithLedger(ledgerDeviceInfo))):
@@ -137,25 +114,11 @@ extension AddFactorSource {
 
 		private func checkP2PLinkEffect() -> Effect<Action> {
 			.run { send in
-				for try await isConnected in await ledgerHardwareWalletClient.isConnectedToAnyConnectorExtension() {
-					guard !Task.isCancelled else { return }
-					await send(.internal(.hasAConnectorExtension(isConnected)))
-				}
+				let hasAConnectorExtension = await ledgerHardwareWalletClient.hasAnyLinkedConnector()
+				await send(.internal(.hasAConnectorExtension(hasAConnectorExtension)))
 			} catch: { error, _ in
 				loggerGlobal.error("failed to get links updates, error: \(error)")
 			}
-		}
-
-		private func performActionRequiringP2PEffect(_ action: ActionRequiringP2P, in state: inout State) -> Effect<Action> {
-			// If we don't have a connection, we remember what we were trying to do and then ask if they want to link one
-			guard state.hasAConnectorExtension else {
-				state.pendingAction = action
-				state.destination = .noP2PLink(.noP2Plink)
-				return .none
-			}
-
-			state.pendingAction = nil
-			return .none
 		}
 	}
 }

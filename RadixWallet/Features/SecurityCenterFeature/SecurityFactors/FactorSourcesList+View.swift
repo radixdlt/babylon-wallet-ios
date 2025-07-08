@@ -143,7 +143,6 @@ private extension View {
 			.enterMnemonic(with: destinationStore)
 			.addNewP2PLinkSheet(with: destinationStore)
 			.noP2PLinkAlert(with: destinationStore)
-			.addNewLedgerSheet(with: destinationStore)
 			.addFactorSource(with: destinationStore)
 	}
 
@@ -162,12 +161,6 @@ private extension View {
 	private func enterMnemonic(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.enterMnemonic, action: \.enterMnemonic)) {
 			ImportMnemonicsFlowCoordinator.View(store: $0)
-		}
-	}
-
-	private func addNewLedgerSheet(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
-		sheet(store: destinationStore.scope(state: \.addNewLedger, action: \.addNewLedger)) {
-			AddLedgerFactorSource.View(store: $0)
 		}
 	}
 

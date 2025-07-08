@@ -190,12 +190,6 @@ extension DebugInspectFactorSourceView {
 		}
 		.foregroundColor(.primaryText)
 		.padding(.leading, leadingPadding)
-		.overlay {
-			if factorSource.isExplicitMain {
-				RoundedRectangle(cornerRadius: 4)
-					.stroke(.green, lineWidth: 10)
-			}
-		}
 	}
 }
 
@@ -215,8 +209,6 @@ struct DeviceFactorSouceView: View {
 	let deviceFactorSource: DeviceFactorSource
 	var isMain: Bool { deviceFactorSource.common.flags.contains(.main) }
 	var body: some View {
-		Labeled("Is Main?", value: isMain)
-			.fontWeight(.heavy)
 		Labeled("Name", value: deviceFactorSource.hint.label)
 		Labeled("Device Name", value: deviceFactorSource.hint.deviceName)
 		Labeled("Model", value: deviceFactorSource.hint.model)

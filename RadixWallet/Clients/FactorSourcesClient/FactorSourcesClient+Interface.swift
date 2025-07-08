@@ -3,10 +3,7 @@ import Sargon
 // MARK: - FactorSourcesClient
 struct FactorSourcesClient: Sendable {
 	var indicesOfEntitiesControlledByFactorSource: IndicesOfEntitiesControlledByFactorSource
-	var nextEntityIndexForFactorSource: NextEntityIndexForFactorSource
 	var getCurrentNetworkID: GetCurrentNetworkID
-	var getMainDeviceFactorSource: GetMainDeviceFactorSource
-	var createNewMainDeviceFactorSource: CreateNewMainDeviceFactorSource
 	var getFactorSources: GetFactorSources
 	var factorSourcesAsyncSequence: FactorSourcesAsyncSequence
 	var addPrivateHDFactorSource: AddPrivateHDFactorSource
@@ -20,11 +17,8 @@ struct FactorSourcesClient: Sendable {
 	init(
 		indicesOfEntitiesControlledByFactorSource: @escaping IndicesOfEntitiesControlledByFactorSource,
 		getCurrentNetworkID: @escaping GetCurrentNetworkID,
-		getMainDeviceFactorSource: @escaping GetMainDeviceFactorSource,
-		createNewMainDeviceFactorSource: @escaping CreateNewMainDeviceFactorSource,
 		getFactorSources: @escaping GetFactorSources,
 		factorSourcesAsyncSequence: @escaping FactorSourcesAsyncSequence,
-		nextEntityIndexForFactorSource: @escaping NextEntityIndexForFactorSource,
 		addPrivateHDFactorSource: @escaping AddPrivateHDFactorSource,
 		checkIfHasOlympiaFactorSourceForAccounts: @escaping CheckIfHasOlympiaFactorSourceForAccounts,
 		saveFactorSource: @escaping SaveFactorSource,
@@ -35,11 +29,8 @@ struct FactorSourcesClient: Sendable {
 	) {
 		self.indicesOfEntitiesControlledByFactorSource = indicesOfEntitiesControlledByFactorSource
 		self.getCurrentNetworkID = getCurrentNetworkID
-		self.getMainDeviceFactorSource = getMainDeviceFactorSource
-		self.createNewMainDeviceFactorSource = createNewMainDeviceFactorSource
 		self.getFactorSources = getFactorSources
 		self.factorSourcesAsyncSequence = factorSourcesAsyncSequence
-		self.nextEntityIndexForFactorSource = nextEntityIndexForFactorSource
 		self.addPrivateHDFactorSource = addPrivateHDFactorSource
 		self.checkIfHasOlympiaFactorSourceForAccounts = checkIfHasOlympiaFactorSourceForAccounts
 		self.saveFactorSource = saveFactorSource
@@ -87,10 +78,7 @@ struct IndicesUsedByFactorSource: Sendable, Hashable {
 // MARK: FactorSourcesClient.GetFactorSources
 extension FactorSourcesClient {
 	typealias IndicesOfEntitiesControlledByFactorSource = @Sendable (IndicesOfEntitiesControlledByFactorSourceRequest) async throws -> IndicesUsedByFactorSource
-	typealias NextEntityIndexForFactorSource = @Sendable (NextEntityIndexForFactorSourceRequest) async throws -> HdPathComponent
 	typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
-	typealias GetMainDeviceFactorSource = @Sendable () async throws -> DeviceFactorSource
-	typealias CreateNewMainDeviceFactorSource = @Sendable () async throws -> PrivateHierarchicalDeterministicFactorSource
 	typealias GetFactorSources = @Sendable () async throws -> FactorSources
 	typealias FactorSourcesAsyncSequence = @Sendable () async -> AnyAsyncSequence<FactorSources>
 	typealias AddPrivateHDFactorSource = @Sendable (AddPrivateHDFactorSourceRequest) async throws -> FactorSourceIDFromHash
@@ -140,10 +128,6 @@ struct GetSigningFactorsRequest: Sendable, Hashable {
 }
 
 extension FactorSourcesClient {
-	func createNewMainBDFS() async throws -> PrivateHierarchicalDeterministicFactorSource {
-		try await createNewMainDeviceFactorSource()
-	}
-
 	func getFactorSource(
 		id: FactorSourceID,
 		matching filter: @escaping (FactorSource) -> Bool = { _ in true }
@@ -251,16 +235,6 @@ struct SigningFactor: Sendable, Hashable, Identifiable {
 }
 
 extension FactorSourcesClient {
-	func saveNewMainBDFS(_ newMainBDFS: DeviceFactorSource) async throws {
-		let oldMainBDFSSources = try await getFactorSources(type: DeviceFactorSource.self).filter(\.isExplicitMainBDFS)
-
-		for oldMainBDFS in oldMainBDFSSources {
-			try await updateFactorSource(oldMainBDFS.removingMainFlag().asGeneral)
-		}
-
-		try await saveFactorSource(newMainBDFS.asGeneral)
-	}
-
 	@discardableResult
 	func addOnDeviceFactorSource(
 		privateHDFactorSource: PrivateHierarchicalDeterministicFactorSource,
@@ -284,12 +258,11 @@ extension FactorSourcesClient {
 	) async throws -> DeviceFactorSource {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 
-		let hostInfo = await SargonOS.shared.resolveHostInfo()
+		let hostInfo = SargonOS.shared.resolveHostInfo()
 		let factorSource = switch onDeviceMnemonicKind {
-		case let .babylon(isMain):
+		case .babylon:
 			DeviceFactorSource.babylon(
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
-				isMain: isMain,
 				hostInfo: hostInfo
 			)
 		case .olympia:

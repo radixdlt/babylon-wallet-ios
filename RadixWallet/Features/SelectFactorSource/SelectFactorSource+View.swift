@@ -65,6 +65,7 @@ extension SelectFactorSource {
 						}
 						.opacity(item.value.opacity)
 						.onTapGesture(perform: item.action)
+						.disabled(item.value.selectability == .unselectable)
 					}
 				}
 
@@ -97,6 +98,9 @@ private extension View {
 
 		return sheet(store: destinationStore.scope(state: \.addSecurityFactor, action: \.addSecurityFactor)) {
 			AddFactorSource.Coordinator.View(store: $0)
+		}
+		.sheet(store: destinationStore.scope(state: \.addNewP2PLink, action: \.addNewP2PLink)) {
+			NewConnection.View(store: $0)
 		}
 	}
 }

@@ -10,6 +10,8 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 		var problems: [SecurityProblem]?
 		var entities: [EntitiesLinkedToFactorSource]?
 
+		var hasAConnectorExtension: Bool = false
+
 		@Presents
 		var destination: Destination.State? = nil
 	}
@@ -27,6 +29,7 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 	enum InternalAction: Equatable, Sendable {
 		case setSecurityProblems([SecurityProblem])
 		case setEntities([EntitiesLinkedToFactorSource])
+		case hasAConnectorExtension(Bool)
 	}
 
 	enum DelegateAction: Equatable, Sendable {
@@ -37,22 +40,29 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 		@CasePathable
 		enum State: Hashable, Sendable {
 			case addSecurityFactor(AddFactorSource.Coordinator.State)
+			case addNewP2PLink(NewConnection.State)
 		}
 
 		@CasePathable
 		enum Action: Equatable, Sendable {
 			case addSecurityFactor(AddFactorSource.Coordinator.Action)
+			case addNewP2PLink(NewConnection.Action)
 		}
 
 		var body: some ReducerOf<Self> {
 			Scope(state: \.addSecurityFactor, action: \.addSecurityFactor) {
 				AddFactorSource.Coordinator()
 			}
+
+			Scope(state: \.addNewP2PLink, action: \.addNewP2PLink) {
+				NewConnection()
+			}
 		}
 	}
 
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.securityCenterClient) var securityCenterClient
+	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 	@Dependency(\.errorQueue) var errorQueue
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
@@ -71,12 +81,17 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 		case .appeared:
 			return securityProblemsEffect()
 				.merge(with: entitiesEffect(state: state))
+				.merge(with: checkP2PLinkEffect())
 
 		case let .rowTapped(factorSource):
 			state.selectedFactorSource = factorSource
 			return .none
 
 		case let .continueButtonTapped(row):
+			if row.integrity.factorSource.kind == .ledgerHqHardwareWallet, !state.hasAConnectorExtension {
+				state.destination = .addNewP2PLink(.init(root: .ledgerConnectionIntro))
+				return .none
+			}
 			return .send(.delegate(.selectedFactorSource(row.integrity.factorSource)))
 
 		case .addSecurityFactorTapped:
@@ -96,6 +111,10 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 			state.entities = entities
 			setRows(state: &state)
 			return .none
+
+		case let .hasAConnectorExtension(hasCE):
+			state.hasAConnectorExtension = hasCE
+			return .none
 		}
 	}
 
@@ -104,6 +123,12 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 		case .addSecurityFactor(.delegate(.finished)):
 			state.destination = nil
 			return entitiesEffect(state: state)
+		case .addNewP2PLink(.delegate(.newConnection)):
+			state.destination = nil
+			guard let selectedFactorSource = state.selectedFactorSource?.integrity.factorSource else {
+				return .none
+			}
+			return .send(.delegate(.selectedFactorSource(selectedFactorSource)))
 		default:
 			return .none
 		}
@@ -147,6 +172,15 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 			await send(.internal(.setEntities(result)))
 		} catch: { error, _ in
 			errorQueue.schedule(error)
+		}
+	}
+
+	private func checkP2PLinkEffect() -> Effect<Action> {
+		.run { send in
+			let hasAConnectorExtension = await ledgerHardwareWalletClient.hasAnyLinkedConnector()
+			await send(.internal(.hasAConnectorExtension(hasAConnectorExtension)))
+		} catch: { error, _ in
+			loggerGlobal.error("failed to get links updates, error: \(error)")
 		}
 	}
 }

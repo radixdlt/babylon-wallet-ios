@@ -913,6 +913,7 @@
 		A0D2016C2E05711E009DA055 /* Image+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0D2016B2E057118009DA055 /* Image+Extra.swift */; };
 		A0D201712E057258009DA055 /* LearnItemsList+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0D201702E057258009DA055 /* LearnItemsList+View.swift */; };
 		A0D201722E057258009DA055 /* LearnItemsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0D2016F2E057258009DA055 /* LearnItemsList.swift */; };
+		A0D47F3C2E1D1C3500D9F012 /* LinkAConnector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0D47F3B2E1D1BFE00D9F012 /* LinkAConnector.swift */; };
 		A0D742A52DD46C3F0062DB01 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A0D742A42DD46C3F0062DB01 /* GoogleService-Info.plist */; };
 		A0D742A92DD478FA0062DB01 /* ThemeSelection+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0D742A82DD478FA0062DB01 /* ThemeSelection+View.swift */; };
 		A0D742AA2DD478FA0062DB01 /* ThemeSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0D742A72DD478FA0062DB01 /* ThemeSelection.swift */; };
@@ -2275,6 +2276,7 @@
 		A0D2016B2E057118009DA055 /* Image+Extra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Image+Extra.swift"; sourceTree = "<group>"; };
 		A0D2016F2E057258009DA055 /* LearnItemsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearnItemsList.swift; sourceTree = "<group>"; };
 		A0D201702E057258009DA055 /* LearnItemsList+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LearnItemsList+View.swift"; sourceTree = "<group>"; };
+		A0D47F3B2E1D1BFE00D9F012 /* LinkAConnector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkAConnector.swift; sourceTree = "<group>"; };
 		A0D742A42DD46C3F0062DB01 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		A0D742A72DD478FA0062DB01 /* ThemeSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeSelection.swift; sourceTree = "<group>"; };
 		A0D742A82DD478FA0062DB01 /* ThemeSelection+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ThemeSelection+View.swift"; sourceTree = "<group>"; };
@@ -7422,6 +7424,7 @@
 		E7392ACF2D6C7BD7002FABDA /* Intro */ = {
 			isa = PBXGroup;
 			children = (
+				A0D47F3B2E1D1BFE00D9F012 /* LinkAConnector.swift */,
 				A00CC6DB2E166043005278AE /* AddFactorSourceIntro.swift */,
 				A00CC6DC2E166043005278AE /* AddFactorSourceIntro+View.swift */,
 			);
@@ -8590,6 +8593,7 @@
 				48CFC2A52ADC10D900E77A5C /* PersonaDetails+View.swift in Sources */,
 				48CFC5842ADC10DA00E77A5C /* SecureStorageClient+Interface.swift in Sources */,
 				48CFC6022ADC10DA00E77A5C /* P2P+LedgerHardwareWallet.swift in Sources */,
+				A0D47F3C2E1D1C3500D9F012 /* LinkAConnector.swift in Sources */,
 				48CFC46A2ADC10DA00E77A5C /* ImportLegacyWalletClient+Live.swift in Sources */,
 				5B1C4FD82BBB0C1E00B9436F /* AppsFlyerClient+Interface.swift in Sources */,
 				5B1C4FDA2BBB0DCF00B9436F /* AppsFlyerClient+Live.swift in Sources */,

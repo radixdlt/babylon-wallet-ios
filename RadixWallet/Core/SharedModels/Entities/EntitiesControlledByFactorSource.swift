@@ -88,17 +88,8 @@ extension EntitiesControlledByFactorSource {
 
 extension EntitiesControlledByFactorSource {
 	/// **B**abylon **D**evice **F**actor **S**ource
-	var isExplicitMainBDFS: Bool {
-		deviceFactorSource.isExplicitMainBDFS
-	}
-
-	/// **B**abylon **D**evice **F**actor **S**ource
 	var isBDFS: Bool {
 		deviceFactorSource.isBDFS
-	}
-
-	var isExplicitMain: Bool {
-		deviceFactorSource.isExplicitMain
 	}
 
 	var factorSourceID: FactorSourceIDFromHash {

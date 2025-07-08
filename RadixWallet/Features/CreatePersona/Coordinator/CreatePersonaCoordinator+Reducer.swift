@@ -145,9 +145,10 @@ extension CreatePersonaCoordinator {
 	}
 
 	private func createPersona(name: NonEmptyString, personaData: PersonaData) -> Effect<Action> {
-		.run { send in
-			let persona = try await SargonOS.shared.createPersonaWithBDFS(name: .init(nonEmpty: name), personaData: personaData)
-			await send(.internal(.handlePersonaCreated(persona)))
+		.run { _ in
+			fatalError("TODO")
+//			let persona = try await SargonOS.shared.createPersonaWithBDFS(name: .init(nonEmpty: name), personaData: personaData)
+//			await send(.internal(.handlePersonaCreated(persona)))
 		} catch: { error, _ in
 			errorQueue.schedule(error)
 		}

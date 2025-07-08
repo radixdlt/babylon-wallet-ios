@@ -4,12 +4,6 @@ import SwiftUI
 // MARK: - EntitiesControlledByFactorSource + Comparable
 extension EntitiesControlledByFactorSource: Comparable {
 	static func < (lhs: Self, rhs: Self) -> Bool {
-		if lhs.isExplicitMainBDFS {
-			return true
-		} else if rhs.isExplicitMainBDFS {
-			return false
-		}
-
 		if lhs.isBDFS {
 			return true
 		} else if rhs.isBDFS {
@@ -86,9 +80,6 @@ struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 
 	struct ToImport: Sendable, Equatable {
 		let factorSourcesControllingEntities: IdentifiedArrayOf<EntitiesControlledByFactorSource>
-
-		/// Profiles before App Version 1.2 did not have the `main` FactorSourceFlag on their BDFS.
-		let hasAnyBDFSExplicitlyMarkedMain: Bool
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -136,7 +127,6 @@ struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 						try await transportProfileClient.profileForExport()
 					}
 					let ents = try await deviceFactorSourceClient.controlledEntities(snapshot)
-					let hasAnyBDFSExplicitlyMarkedMain = ents.contains(where: \.isExplicitMain)
 					try? await clock.sleep(for: .milliseconds(200))
 					let factorSourcesControllingEntities: IdentifiedArrayOf<EntitiesControlledByFactorSource> = ents.compactMap { ent in
 						let hasAccessToMnemonic = secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(ent.factorSourceID)
@@ -148,8 +138,7 @@ struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 					}.asIdentified()
 
 					return ToImport(
-						factorSourcesControllingEntities: factorSourcesControllingEntities,
-						hasAnyBDFSExplicitlyMarkedMain: hasAnyBDFSExplicitlyMarkedMain
+						factorSourcesControllingEntities: factorSourcesControllingEntities
 					)
 				})))
 			}
@@ -174,25 +163,6 @@ struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 					isMainBDFS: false
 				)
 			}.asIdentified()
-			let explicitMainBDFSFactorSources = ents.filter(\.isExplicitMain)
-
-			if let explicitMain = explicitMainBDFSFactorSources.first {
-				mnemonicsLeftToImport[id: explicitMain.id]?.isMainBDFS = true
-				if explicitMainBDFSFactorSources.count > 1 {
-					assertionFailure("DISCREPANCY, more than one Main BDFS, this should not happen.")
-				}
-			} else {
-				// Did not find **explicit** `main` BDFS among mnemonics to import =>
-				// must check if we need to treat first Babylon device factor source as implicit main
-				if let firstBabylonDeviceFactorSource = ents.filter(\.isBDFS).first {
-					// Only if we dont have ANY **explicit** `main` we treat the first BDFS to import
-					// as implicit main (pre-1.2.0 version of the App BDFS (Profile)).
-					let treatAsImplicitMain = !toImport.hasAnyBDFSExplicitlyMarkedMain
-					mnemonicsLeftToImport[id: firstBabylonDeviceFactorSource.id]?.isMainBDFS = treatAsImplicitMain
-				} else {
-					loggerGlobal.notice("no mnemonics to import - probably you uninstalled the app with mnemonics still intact in Keychain")
-				}
-			}
 
 			state.mnemonicsLeftToImport = mnemonicsLeftToImport
 			return nextMnemonicIfNeeded(state: &state)
@@ -233,12 +203,7 @@ struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 
 		switch destination {
 		case let .importMnemonicControllingAccounts(substate):
-			if !substate.isMainBDFS {
-				return nextMnemonicIfNeeded(state: &state)
-			} else {
-				// Skipped a main bdfs by use of OS level gestures (thus bypassing warning)
-				return .send(.delegate(.finishedEarly(dueToFailure: true)))
-			}
+			return nextMnemonicIfNeeded(state: &state)
 		}
 	}
 

@@ -112,7 +112,6 @@ struct FactorSourceCard: View {
 				}
 			}
 		}
-		.background(.primaryBackground)
 	}
 
 	struct LinkedEntitesView: SwiftUI.View {

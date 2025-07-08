@@ -3,31 +3,23 @@ import SwiftUI
 
 extension ImportMnemonicControllingAccounts.State {
 	var viewState: ImportMnemonicControllingAccounts.ViewState {
-		.init(isMain: isMainBDFS)
+		.init()
 	}
 }
 
 // MARK: - ImportMnemonicControllingAccounts.View
 extension ImportMnemonicControllingAccounts {
 	struct ViewState: Equatable {
-		let isMain: Bool
-
 		var navigationTitle: String {
-			isMain
-				? L10n.RecoverSeedPhrase.Header.titleMain
-				: L10n.RecoverSeedPhrase.Header.titleOther
+			L10n.RecoverSeedPhrase.Header.titleOther
 		}
 
-		var subtitle: LocalizedStringKey {
-			.init(
-				isMain
-					? L10n.RecoverSeedPhrase.Header.subtitleMainSeedPhrase
-					: L10n.RecoverSeedPhrase.Header.subtitleOtherSeedPhrase
-			)
+		var subtitle: String {
+			L10n.RecoverSeedPhrase.Header.subtitleOtherSeedPhrase
 		}
 
 		var skipButtonTitle: String {
-			isMain ? L10n.RecoverSeedPhrase.noMainSeedPhraseButton : L10n.RecoverSeedPhrase.skipButton
+			L10n.RecoverSeedPhrase.skipButton
 		}
 	}
 

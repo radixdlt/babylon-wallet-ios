@@ -15,13 +15,10 @@ struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		@PresentationState
 		var destination: Destination.State? = nil
 
-		var isMainBDFS: Bool
-
 		init(
 			entitiesControlledByFactorSource ents: EntitiesControlledByFactorSource,
 			isMainBDFS: Bool
 		) {
-			self.isMainBDFS = isMainBDFS
 			self.entitiesControlledByFactorSource = ents
 
 			let accounts: IdentifiedArrayOf<Account>
@@ -136,12 +133,7 @@ struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 			return .none
 
 		case .skipButtonTapped:
-			if state.isMainBDFS {
-				state.destination = .confirmSkippingBDFS(.init())
-				return .none
-			} else {
-				return .send(.delegate(.skippedMnemonic(state.entitiesControlledByFactorSource.factorSourceID)))
-			}
+			return .send(.delegate(.skippedMnemonic(state.entitiesControlledByFactorSource.factorSourceID)))
 		}
 	}
 

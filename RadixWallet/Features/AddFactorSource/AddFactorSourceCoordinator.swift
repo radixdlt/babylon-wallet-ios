@@ -124,7 +124,7 @@ extension AddFactorSource {
 
 		func createDeviceFactorSource(state: State) -> DeviceFactorSource {
 			let mwp = state.deviceMnemonicBuilder.getMnemonicWithPassphrase()
-			return try! SargonOS.shared.createDeviceFactorSource(mnemonicWithPassphrase: mwp, factorType: .babylon(isMain: false))
+			return try! SargonOS.shared.createDeviceFactorSource(mnemonicWithPassphrase: mwp, factorType: .babylon)
 		}
 	}
 }

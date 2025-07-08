@@ -32,9 +32,9 @@ extension NewConnection {
 		}
 
 		private func root(
-			for store: StoreOf<NewConnection.Root>
+			for rootStore: StoreOf<NewConnection.Root>
 		) -> some SwiftUI.View {
-			SwitchStore(store) { state in
+			SwitchStore(rootStore) { state in
 				switch state {
 				case .localNetworkPermission:
 					CaseLet(
@@ -67,6 +67,16 @@ extension NewConnection {
 						/NewConnection.Root.State.nameConnection,
 						action: NewConnection.Root.Action.nameConnection,
 						then: { NewConnectionName.View(store: $0) }
+					)
+				case .ledgerConnectionIntro:
+					CaseLet(
+						/NewConnection.Root.State.ledgerConnectionIntro,
+						action: NewConnection.Root.Action.ledgerConnectionIntro,
+						then: { _ in
+							LinkAConnector {
+								store.send(.view(.ledgerConnectionIntroContinueTapped))
+							}
+						}
 					)
 				}
 			}

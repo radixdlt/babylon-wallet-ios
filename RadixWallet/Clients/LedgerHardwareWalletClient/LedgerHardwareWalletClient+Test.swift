@@ -11,7 +11,7 @@ extension LedgerHardwareWalletClient: TestDependencyKey {
 	static let previewValue = Self.noop
 
 	static let testValue = Self(
-		isConnectedToAnyConnectorExtension: unimplemented("\(Self.self).isConnectedToAnyConnectorExtension", placeholder: noop.isConnectedToAnyConnectorExtension),
+		hasAnyLinkedConnector: unimplemented("\(Self.self).hasAnyLinkedConnector", placeholder: noop.hasAnyLinkedConnector),
 		getDeviceInfo: unimplemented("\(Self.self).getDeviceInfo"),
 		derivePublicKeys: unimplemented("\(Self.self).derivePublicKeys"),
 		signTransaction: unimplemented("\(Self.self).signTransaction"),
@@ -21,7 +21,7 @@ extension LedgerHardwareWalletClient: TestDependencyKey {
 	)
 
 	static let noop = Self(
-		isConnectedToAnyConnectorExtension: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
+		hasAnyLinkedConnector: { false },
 		getDeviceInfo: {
 			.init(
 				id: try! .init(hex: "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"),
