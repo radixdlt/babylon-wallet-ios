@@ -4,6 +4,8 @@ extension AddFactorSource {
 	struct NameFactorSource: Sendable, FeatureReducer {
 		@ObservableState
 		struct State: Sendable, Hashable {
+			@Shared(.deviceMnemonicBuilder) var deviceMnemonicBuilder
+
 			var name: String = ""
 			var sanitizedName: NonEmptyString?
 			var isAddingFactorSource: Bool = false
@@ -71,11 +73,18 @@ extension AddFactorSource {
 			case let .saveTapped(name):
 				state.factorSource.setName(name)
 				state.isAddingFactorSource = true
+				let mwp = state.deviceMnemonicBuilder.getMnemonicWithPassphrase()
 				return .run { [factorSource = state.factorSource] send in
 					let result = await TaskResult {
-						_ = try await SargonOS.shared.addFactorSource(factorSource: factorSource)
 						if factorSource.factorSourceKind == .device {
+							_ = try await SargonOS.shared.addNewMnemonicFactorSource(
+								factorSourceKind: .device,
+								mnemonicWithPassphrase: mwp,
+								name: factorSource.name
+							)
 							try? userDefaults.addFactorSourceIDOfBackedUpMnemonic(factorSource.id.extract())
+						} else {
+							_ = try await SargonOS.shared.addFactorSource(factorSource: factorSource)
 						}
 						return EqVoid.instance
 					}

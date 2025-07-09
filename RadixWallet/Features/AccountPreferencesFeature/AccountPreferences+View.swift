@@ -5,7 +5,7 @@ extension AccountPreferences.State {
 	var viewState: AccountPreferences.ViewState {
 		.init(
 			account: account,
-			factorSource: factorSource,
+			factorSourceRow: factorSourceRow,
 			sections: {
 				var sections: [AccountPreferences.ViewState.Section] = [
 					.init(
@@ -47,7 +47,7 @@ extension AccountPreferences {
 	struct ViewState: Equatable {
 		typealias Section = PreferenceSection<AccountPreferences.Section, AccountPreferences.Section.SectionRow>.ViewState
 		let account: Account
-		let factorSource: FactorSourceIntegrity?
+		let factorSourceRow: FactorSourcesList.Row?
 		let sections: [Section]
 		let faucetButtonState: ControlState
 		let isOnMainnet: Bool
@@ -69,18 +69,24 @@ extension AccountPreferences {
 					header: {
 						VStack(alignment: .leading) {
 							AccountCard(account: viewStore.account)
-							if let factorSource = viewStore.factorSource {
+							if let factorSourceRow = viewStore.factorSourceRow {
 								Text("Secured with")
 									.textStyle(.body1HighImportance)
 									.foregroundColor(.secondaryText)
 									.padding(.top, .medium3)
 
-								FactorSourceCard(kind: .instance(factorSource: factorSource.factorSource, kind: .short(showDetails: false)), mode: .display)
-									.padding(.bottom, .medium3)
-									.onTapGesture {
-										viewStore.send(.factorSourceCardTapped)
-										// Open factor source details?
-									}
+								FactorSourceCard(
+									kind: .instance(
+										factorSource: factorSourceRow.integrity.factorSource,
+										kind: .extended
+									),
+									mode: .display,
+									messages: factorSourceRow.messages
+								)
+								.padding(.bottom, .medium3)
+								.onTapGesture {
+									viewStore.send(.factorSourceCardTapped)
+								}
 							}
 						}
 					},

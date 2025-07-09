@@ -231,7 +231,20 @@ extension FactorSourceCard {
 					isExpanded: isExpanded,
 					onAction: onAction
 				)
-			case let .extended(linkedEntities):
+			case .extended:
+				self = .init(
+					kind: kind,
+					mode: mode,
+					dataSource: .init(
+						icon: kind.factorSourceKind.icon,
+						title: factorSource.name,
+						lastUsedOn: factorSource.common.lastUsedOn,
+						messages: messages
+					),
+					isExpanded: isExpanded,
+					onAction: onAction
+				)
+			case let .withEntities(linkedEntities):
 				self = .init(
 					kind: kind,
 					mode: mode,
@@ -257,7 +270,8 @@ extension FactorSourceCard {
 
 		enum InstanceKind {
 			case short(showDetails: Bool)
-			case extended(linkedEntities: FactorSourceCardDataSource.LinkedEntities)
+			case extended
+			case withEntities(linkedEntities: FactorSourceCardDataSource.LinkedEntities)
 		}
 	}
 

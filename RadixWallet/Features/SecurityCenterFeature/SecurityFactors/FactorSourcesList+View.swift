@@ -53,7 +53,7 @@ extension FactorSourcesList {
 			FactorSourceCard(
 				kind: .instance(
 					factorSource: row.integrity.factorSource,
-					kind: .extended(linkedEntities: row.linkedEntities)
+					kind: .withEntities(linkedEntities: row.linkedEntities)
 				),
 				mode: mode(row),
 				messages: row.messages

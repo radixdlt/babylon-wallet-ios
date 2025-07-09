@@ -7,10 +7,17 @@ extension SelectFactorSource {
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
-				ScrollView {
-					coreView
-						.padding(.horizontal, .medium3)
-						.padding(.bottom, .medium2)
+				ScrollViewReader { scroll in
+					WithPerceptionTracking {
+						ScrollView {
+							coreView
+								.padding(.horizontal, .medium3)
+								.padding(.bottom, .medium2)
+						}
+						.onReceive(store.selectedFactorSourceId.publisher) { id in
+							scroll.scrollTo(id, anchor: .center)
+						}
+					}
 				}
 				.destinations(store: store)
 				.footer {
@@ -41,6 +48,7 @@ extension SelectFactorSource {
 					VStack {
 						sectionHeader(item)
 						card(item)
+							.tag(item.value.id)
 					}
 				}
 
@@ -73,7 +81,7 @@ extension SelectFactorSource {
 		private func card(_ item: SelectionItem<FactorSourcesList.Row>) -> some SwiftUI.View {
 			let kind = FactorSourceCard.Kind.instance(
 				factorSource: item.value.integrity.factorSource,
-				kind: .extended(linkedEntities: item.value.linkedEntities)
+				kind: .withEntities(linkedEntities: item.value.linkedEntities)
 			)
 			let mode = FactorSourceCard.Mode.selection(
 				type: .radioButton,

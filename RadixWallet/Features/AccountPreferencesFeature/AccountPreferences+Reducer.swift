@@ -5,7 +5,7 @@ import SwiftUI
 struct AccountPreferences: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		var account: Account
-		var factorSource: FactorSourceIntegrity?
+		var factorSourceRow: FactorSourcesList.Row?
 		var faucetButtonState: ControlState
 		var address: AccountAddress { account.address }
 		var isOnMainnet: Bool { account.networkID == .mainnet }
@@ -137,7 +137,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 			}
 
 		case .factorSourceCardTapped:
-			guard let integrity = state.factorSource else {
+			guard let integrity = state.factorSourceRow?.integrity else {
 				return .none
 			}
 			state.destination = .factorSourceDetail(.init(integrity: integrity))
@@ -178,7 +178,12 @@ struct AccountPreferences: Sendable, FeatureReducer {
 			}
 
 		case let .factorSourceLoaded(fs):
-			state.factorSource = fs
+			state.factorSourceRow = .init(
+				integrity: fs,
+				linkedEntities: .init(accounts: [], personas: [], hasHiddenEntities: false),
+				status: .init(integrity: fs),
+				selectability: .selectable
+			)
 			return .none
 		}
 	}

@@ -115,6 +115,10 @@ extension AddFactorSource {
 				return .none
 
 			case let .path(.element(id: _, action: .nameFactorSource(.delegate(.saved(fs))))):
+				// Reset
+				state.$deviceMnemonicBuilder.withLock { builder in
+					builder = DeviceMnemonicBuilder()
+				}
 				return .send(.delegate(.finished(fs)))
 
 			default:
