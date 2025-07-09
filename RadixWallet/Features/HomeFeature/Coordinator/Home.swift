@@ -65,6 +65,7 @@ struct Home: Sendable, FeatureReducer {
 		case showLinkConnectorIfNeeded
 		case setSecurityProblems([SecurityProblem])
 		case setAccountLockerClaims(ClaimsPerAccount)
+		case setFactorSources(FactorSources)
 	}
 
 	@CasePathable
@@ -300,6 +301,14 @@ struct Home: Sendable, FeatureReducer {
 				row.accountLockerClaims = claims[row.id] ?? []
 			}
 			return .none
+
+		case let .setFactorSources(factorSources):
+			state.accountRows.mutateAll { row in
+				if let fsId = row.accountWithInfo.account.unsecuredControllingFactorInstance?.factorSourceID {
+					row.factorSource = factorSources[id: fsId.asGeneral]
+				}
+			}
+			return .none
 		}
 	}
 
@@ -464,6 +473,15 @@ struct Home: Sendable, FeatureReducer {
 			for try await claims in await accountLockersClient.claims() {
 				guard !Task.isCancelled else { return }
 				await send(.internal(.setAccountLockerClaims(claims)))
+			}
+		}
+	}
+
+	private func factorSources() -> Effect<Action> {
+		.run { send in
+			for try await factorSources in await factorSourcesClient.factorSourcesAsyncSequence() {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.setFactorSources(factorSources)))
 			}
 		}
 	}

@@ -73,7 +73,7 @@ extension AddFactorSource {
 		}
 
 		enum DelegateAction: Sendable, Equatable {
-			case finished
+			case finished(FactorSource)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -114,8 +114,8 @@ extension AddFactorSource {
 				state.path.append(.nameFactorSource(.init(factorSource: createDeviceFactorSource(state: state).asGeneral)))
 				return .none
 
-			case .path(.element(id: _, action: .nameFactorSource(.delegate(.saved)))):
-				return .send(.delegate(.finished))
+			case let .path(.element(id: _, action: .nameFactorSource(.delegate(.saved(fs))))):
+				return .send(.delegate(.finished(fs)))
 
 			default:
 				return .none
@@ -124,7 +124,7 @@ extension AddFactorSource {
 
 		func createDeviceFactorSource(state: State) -> DeviceFactorSource {
 			let mwp = state.deviceMnemonicBuilder.getMnemonicWithPassphrase()
-			return try! SargonOS.shared.createDeviceFactorSource(mnemonicWithPassphrase: mwp, factorType: .babylon)
+			return SargonOS.shared.createDeviceFactorSource(mnemonicWithPassphrase: mwp, factorType: .babylon)
 		}
 	}
 }

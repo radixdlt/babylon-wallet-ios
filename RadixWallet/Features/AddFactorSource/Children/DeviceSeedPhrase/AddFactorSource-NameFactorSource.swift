@@ -36,7 +36,7 @@ extension AddFactorSource {
 		}
 
 		enum DelegateAction: Sendable, Equatable {
-			case saved
+			case saved(FactorSource)
 		}
 
 		struct Destination: DestinationReducer {
@@ -97,7 +97,7 @@ extension AddFactorSource {
 		}
 
 		func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
-			.send(.delegate(.saved))
+			.send(.delegate(.saved(state.factorSource)))
 		}
 	}
 }

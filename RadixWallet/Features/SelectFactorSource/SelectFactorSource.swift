@@ -6,7 +6,11 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 		let kinds: [FactorSourceKind]
 
 		var rows: [FactorSourcesList.Row] = []
-		var selectedFactorSource: FactorSourcesList.Row?
+		var selectedFactorSourceId: FactorSourceID?
+		var selectedFactorSource: FactorSourcesList.Row? {
+			rows.first(where: { $0.id == selectedFactorSourceId })
+		}
+
 		var problems: [SecurityProblem]?
 		var entities: [EntitiesLinkedToFactorSource]?
 
@@ -84,7 +88,7 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 				.merge(with: checkP2PLinkEffect())
 
 		case let .rowTapped(factorSource):
-			state.selectedFactorSource = factorSource
+			state.selectedFactorSourceId = factorSource?.id
 			return .none
 
 		case let .continueButtonTapped(row):
@@ -120,8 +124,9 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case .addSecurityFactor(.delegate(.finished)):
+		case let .addSecurityFactor(.delegate(.finished(fs))):
 			state.destination = nil
+			state.selectedFactorSourceId = fs.id
 			return entitiesEffect(state: state)
 		case .addNewP2PLink(.delegate(.newConnection)):
 			state.destination = nil

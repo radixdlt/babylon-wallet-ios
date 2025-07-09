@@ -81,7 +81,7 @@ extension AccountCard {
 		HStack(spacing: .small3) {
 			AddressView(account.ledgerIdentifiable)
 
-			if let tag = kind.tag {
+			ForEach(kind.tag, id: \.self) { tag in
 				Text("•")
 				Text(tag)
 			}
@@ -106,7 +106,7 @@ extension AccountCard {
 		/// Stacks the name and address vertically, while expecting more content on the trailing and bottom sections.
 		/// Its shape is clipped with a corner radius of 12.
 		/// Used for Home rows.
-		case home(tag: String?)
+		case home(tags: [String])
 
 		/// Stacks the name and address vertically, while expecting a view that allows selection on the trailing section.
 		/// Its shape is clipped with a corner radius of 12.
@@ -183,12 +183,12 @@ private extension AccountCard.Kind {
 		}
 	}
 
-	var tag: String? {
+	var tag: [String] {
 		switch self {
-		case let .home(tag):
-			tag
+		case let .home(tags):
+			tags
 		default:
-			nil
+			[]
 		}
 	}
 

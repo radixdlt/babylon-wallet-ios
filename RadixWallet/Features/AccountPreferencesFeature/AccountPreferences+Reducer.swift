@@ -5,6 +5,7 @@ import SwiftUI
 struct AccountPreferences: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		var account: Account
+		var factorSource: FactorSourceIntegrity?
 		var faucetButtonState: ControlState
 		var address: AccountAddress { account.address }
 		var isOnMainnet: Bool { account.networkID == .mainnet }
@@ -29,6 +30,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 		case hideAccountTapped
 		case deleteAccountTapped
 		case faucetButtonTapped
+		case factorSourceCardTapped
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -37,6 +39,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 		case callDone(updateControlState: WritableKeyPath<State, ControlState>, changeTo: ControlState = .enabled)
 		case refreshAccountCompleted(TaskResult<OnLedgerEntity.OnLedgerAccount>)
 		case hideLoader(updateControlState: WritableKeyPath<State, ControlState>)
+		case factorSourceLoaded(FactorSourceIntegrity)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -53,6 +56,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 			case devPreferences(DevAccountPreferences.State)
 			case hideAccount
 			case deleteAccount(DeleteAccountCoordinator.State)
+			case factorSourceDetail(FactorSourceDetail.State)
 		}
 
 		@CasePathable
@@ -62,6 +66,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 			case devPreferences(DevAccountPreferences.Action)
 			case hideAccount(ConfirmationAction)
 			case deleteAccount(DeleteAccountCoordinator.Action)
+			case factorSourceDetail(FactorSourceDetail.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -77,6 +82,9 @@ struct AccountPreferences: Sendable, FeatureReducer {
 			Scope(state: \.deleteAccount, action: \.deleteAccount) {
 				DeleteAccountCoordinator()
 			}
+			Scope(state: \.factorSourceDetail, action: \.factorSourceDetail) {
+				FactorSourceDetail()
+			}
 		}
 	}
 
@@ -87,6 +95,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 	init() {}
 
@@ -109,6 +118,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 				}
 			}
 			.merge(with: state.isOnMainnet ? .none : loadIsAllowedToUseFaucet(&state))
+			.merge(with: loadFactorSource(state: state))
 
 		case let .rowTapped(row):
 			return destination(for: row, &state)
@@ -125,6 +135,13 @@ struct AccountPreferences: Sendable, FeatureReducer {
 			return call(buttonState: \.faucetButtonState, into: &state) {
 				try await faucetClient.getFreeXRD(.init(recipientAccountAddress: $0))
 			}
+
+		case .factorSourceCardTapped:
+			guard let integrity = state.factorSource else {
+				return .none
+			}
+			state.destination = .factorSourceDetail(.init(integrity: integrity))
+			return .none
 		}
 	}
 
@@ -159,6 +176,10 @@ struct AccountPreferences: Sendable, FeatureReducer {
 				state[keyPath: controlStateKeyPath] = changeTo
 				return .none
 			}
+
+		case let .factorSourceLoaded(fs):
+			state.factorSource = fs
+			return .none
 		}
 	}
 
@@ -188,6 +209,19 @@ struct AccountPreferences: Sendable, FeatureReducer {
 			await send(.delegate(.accountHidden))
 		} catch: { error, _ in
 			errorQueue.schedule(error)
+		}
+	}
+
+	private func loadFactorSource(state: State) -> Effect<Action> {
+		guard let unsecuredFI = state.account.unsecuredControllingFactorInstance?.factorInstance else {
+			return .none
+		}
+
+		return .run { send in
+			if let fs = try? await factorSourcesClient.getFactorSource(of: unsecuredFI) {
+				let integrity = try await SargonOS.shared.factorSourceIntegrity(factorSource: fs)
+				await send(.internal(.factorSourceLoaded(integrity)))
+			}
 		}
 	}
 }

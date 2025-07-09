@@ -27,7 +27,7 @@ extension Home.AccountRow {
 			}
 		}
 
-		let tag: AccountTag?
+		let tags: [String]
 
 		let isLedgerAccount: Bool
 
@@ -80,7 +80,7 @@ extension Home.AccountRow {
 
 		var body: some SwiftUI.View {
 			WithViewStore(store, observe: ViewState.init, send: { .view($0) }) { viewStore in
-				AccountCard(kind: .home(tag: viewStore.tag?.display), account: viewStore.account) {
+				AccountCard(kind: .home(tags:), account: viewStore.account) {
 					if viewStore.showFiatWorth {
 						Spacer()
 						loadable(

@@ -5,6 +5,7 @@ extension AccountPreferences.State {
 	var viewState: AccountPreferences.ViewState {
 		.init(
 			account: account,
+			factorSource: factorSource,
 			sections: {
 				var sections: [AccountPreferences.ViewState.Section] = [
 					.init(
@@ -46,6 +47,7 @@ extension AccountPreferences {
 	struct ViewState: Equatable {
 		typealias Section = PreferenceSection<AccountPreferences.Section, AccountPreferences.Section.SectionRow>.ViewState
 		let account: Account
+		let factorSource: FactorSourceIntegrity?
 		let sections: [Section]
 		let faucetButtonState: ControlState
 		let isOnMainnet: Bool
@@ -64,7 +66,24 @@ extension AccountPreferences {
 				PreferencesList(
 					viewState: .init(sections: viewStore.sections),
 					onRowSelected: { _, rowId in viewStore.send(.rowTapped(rowId)) },
-					header: { AccountCard(account: viewStore.account) },
+					header: {
+						VStack(alignment: .leading) {
+							AccountCard(account: viewStore.account)
+							if let factorSource = viewStore.factorSource {
+								Text("Secured with")
+									.textStyle(.body1HighImportance)
+									.foregroundColor(.secondaryText)
+									.padding(.top, .medium3)
+
+								FactorSourceCard(kind: .instance(factorSource: factorSource.factorSource, kind: .short(showDetails: false)), mode: .display)
+									.padding(.bottom, .medium3)
+									.onTapGesture {
+										viewStore.send(.factorSourceCardTapped)
+										// Open factor source details?
+									}
+							}
+						}
+					},
 					footer: { footer(with: viewStore) }
 				)
 				.task {
@@ -141,6 +160,7 @@ private extension View {
 			.devAccountPreferences(with: destinationStore)
 			.hideAccount(with: destinationStore, store: store)
 			.deleteAccount(with: destinationStore, store: store)
+			.factorSourceDetails(with: destinationStore, store: store)
 	}
 
 	private func updateAccountLabel(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
@@ -172,6 +192,12 @@ private extension View {
 	private func deleteAccount(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>, store: StoreOf<AccountPreferences>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.deleteAccount, action: \.deleteAccount)) {
 			DeleteAccountCoordinator.View(store: $0)
+		}
+	}
+
+	private func factorSourceDetails(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>, store: StoreOf<AccountPreferences>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.factorSourceDetail, action: \.factorSourceDetail)) {
+			FactorSourceDetail.View(store: $0)
 		}
 	}
 }
