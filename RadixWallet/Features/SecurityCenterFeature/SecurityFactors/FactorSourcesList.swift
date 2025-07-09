@@ -142,6 +142,9 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			case .lostFactorSource:
 				state.destination = .enterMnemonic(.init())
 				return .none
+
+			case .none:
+				return .none
 			}
 
 		case .addButtonTapped:
@@ -341,7 +344,7 @@ extension FactorSourcesList {
 	struct Row: Sendable, Hashable, Identifiable {
 		let integrity: FactorSourceIntegrity
 		let linkedEntities: FactorSourceCardDataSource.LinkedEntities
-		let status: Status
+		let status: Status?
 		let selectability: Selectability
 
 		var id: FactorSourceID {
@@ -358,6 +361,7 @@ extension FactorSourcesList.Row.Status {
 	init(entity: EntitiesLinkedToFactorSource, problems: [SecurityProblem]) {
 		let accounts = entity.accounts + entity.hiddenAccounts
 		let personas = entity.personas
+
 		// Determine row status
 		self = if problems.hasProblem9(accounts: accounts, personas: personas) {
 			.lostFactorSource
@@ -374,13 +378,20 @@ extension FactorSourcesList.Row.Status {
 		}
 	}
 
-	init(problems: [SecurityProblem]) {
-		self = if problems.hasProblem9() {
-			.lostFactorSource
-		} else if problems.hasProblem3() {
-			.seedPhraseNotRecoverable
-		} else {
-			.notBackedUp
+	init?(integrity: FactorSourceIntegrity) {
+		switch integrity {
+		case let .device(deviceIntegrity):
+			if !deviceIntegrity.isMnemonicPresentInSecureStorage {
+				self = .lostFactorSource
+			} else if !deviceIntegrity.isMnemonicMarkedAsBackedUp {
+				self = .seedPhraseNotRecoverable
+			} else if deviceIntegrity.isMnemonicMarkedAsBackedUp {
+				self = .seedPhraseWrittenDown
+			} else {
+				return nil
+			}
+		default:
+			return nil
 		}
 	}
 }

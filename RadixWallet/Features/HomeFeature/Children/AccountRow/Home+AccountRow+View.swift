@@ -47,7 +47,7 @@ extension Home.AccountRow {
 			self.isLoadingResources = state.accountWithResources.isLoading
 			self.securityProblemsConfig = state.securityProblemsConfig
 
-			self.tag = .init(state: state)
+			self.tags = []
 			self.isLedgerAccount = state.isLedgerAccount
 			self.accountLockerClaims = state.accountLockerClaims
 
@@ -80,7 +80,7 @@ extension Home.AccountRow {
 
 		var body: some SwiftUI.View {
 			WithViewStore(store, observe: ViewState.init, send: { .view($0) }) { viewStore in
-				AccountCard(kind: .home(tags:), account: viewStore.account) {
+				AccountCard(kind: .home(tags: viewStore.tags), account: viewStore.account) {
 					if viewStore.showFiatWorth {
 						Spacer()
 						loadable(

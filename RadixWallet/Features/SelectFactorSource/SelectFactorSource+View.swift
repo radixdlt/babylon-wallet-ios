@@ -39,33 +39,8 @@ extension SelectFactorSource {
 					from: store.rows
 				) { item in
 					VStack {
-						let kind = item.value.integrity.factorSource.kind
-						let isFirstOfKind = store.rows.first(where: { $0.integrity.factorSource.kind == kind }) == item.value
-						if isFirstOfKind {
-							VStack(alignment: .leading, spacing: .zero) {
-								Text(kind.title)
-									.textStyle(.body1HighImportance)
-								Text(kind.details)
-									.textStyle(.body1Regular)
-							}
-							.foregroundStyle(.secondaryText)
-							.padding(.top, .medium3)
-							.flushedLeft
-						}
-
-						FactorSourceCard(
-							kind: .instance(
-								factorSource: item.value.integrity.factorSource,
-								kind: .extended(linkedEntities: item.value.linkedEntities)
-							),
-							mode: .selection(type: .radioButton, isSelected: item.isSelected),
-							messages: item.value.messages
-						) { _ in
-							item.action()
-						}
-						.opacity(item.value.opacity)
-						.onTapGesture(perform: item.action)
-						.disabled(item.value.selectability == .unselectable)
+						sectionHeader(item)
+						card(item)
 					}
 				}
 
@@ -75,6 +50,45 @@ extension SelectFactorSource {
 				.buttonStyle(.secondaryRectangular())
 				.padding(.top, .medium3)
 			}
+		}
+
+		@ViewBuilder
+		private func sectionHeader(_ item: SelectionItem<FactorSourcesList.Row>) -> some SwiftUI.View {
+			let kind = item.value.integrity.factorSource.kind
+			let isFirstOfKind = store.rows.first(where: { $0.integrity.factorSource.kind == kind }) == item.value
+			if isFirstOfKind {
+				VStack(alignment: .leading, spacing: .zero) {
+					Text(kind.title)
+						.textStyle(.body1HighImportance)
+					Text(kind.details)
+						.textStyle(.body1Regular)
+				}
+				.foregroundStyle(.secondaryText)
+				.padding(.top, .medium3)
+				.flushedLeft
+			}
+		}
+
+		@ViewBuilder
+		private func card(_ item: SelectionItem<FactorSourcesList.Row>) -> some SwiftUI.View {
+			let kind = FactorSourceCard.Kind.instance(
+				factorSource: item.value.integrity.factorSource,
+				kind: .extended(linkedEntities: item.value.linkedEntities)
+			)
+			let mode = FactorSourceCard.Mode.selection(
+				type: .radioButton,
+				isSelected: item.value.selectability == .unselectable ? false : item.isSelected
+			)
+
+			FactorSourceCard(
+				kind: kind,
+				mode: mode,
+				messages: item.value.messages
+			) { _ in
+				item.action()
+			}
+			.opacity(item.value.opacity)
+			.onTapGesture(perform: item.action)
 		}
 
 		private var topView: some SwiftUI.View {

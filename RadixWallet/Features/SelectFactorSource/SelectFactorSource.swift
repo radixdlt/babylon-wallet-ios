@@ -83,12 +83,14 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			return securityProblemsEffect()
-				.merge(with: entitiesEffect(state: state))
+			return entitiesEffect(state: state)
 				.merge(with: checkP2PLinkEffect())
 
-		case let .rowTapped(factorSource):
-			state.selectedFactorSourceId = factorSource?.id
+		case let .rowTapped(row):
+			guard row?.selectability != .unselectable else {
+				return .none
+			}
+			state.selectedFactorSourceId = row?.id
 			return .none
 
 		case let .continueButtonTapped(row):
@@ -140,11 +142,11 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 	}
 
 	func setRows(state: inout State) {
-		guard let problems = state.problems, let entities = state.entities else {
+		guard let entities = state.entities else {
 			return
 		}
 		state.rows = entities.map { entity in
-			let status = FactorSourcesList.Row.Status(entity: entity, problems: problems)
+			let status = FactorSourcesList.Row.Status(integrity: entity.integrity)
 			return FactorSourcesList.Row(
 				integrity: entity.integrity,
 				linkedEntities: entity.linkedEntities,
@@ -157,17 +159,6 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 			} else {
 				false
 			}
-		}
-	}
-
-	func securityProblemsEffect() -> Effect<Action> {
-		.run { send in
-			for try await problems in await securityCenterClient.problems(.securityFactors) {
-				guard !Task.isCancelled else { return }
-				await send(.internal(.setSecurityProblems(problems)))
-			}
-		} catch: { error, _ in
-			errorQueue.schedule(error)
 		}
 	}
 

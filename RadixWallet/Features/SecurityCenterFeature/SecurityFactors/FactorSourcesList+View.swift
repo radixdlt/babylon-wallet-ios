@@ -115,7 +115,7 @@ extension FactorSourcesList.Row {
 			[.init(text: L10n.FactorSources.List.seedPhraseNotRecoverable, type: .warning)]
 		case .seedPhraseWrittenDown:
 			[.init(text: L10n.FactorSources.List.seedPhraseWrittenDown, type: .success)]
-		case .notBackedUp:
+		case .notBackedUp, .none:
 			[]
 		}
 	}
