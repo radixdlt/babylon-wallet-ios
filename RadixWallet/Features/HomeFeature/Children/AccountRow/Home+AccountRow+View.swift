@@ -10,24 +10,7 @@ extension Home.AccountRow {
 		let securityProblemsConfig: EntitySecurityProblemsView.Config
 		let accountLockerClaims: [AccountLockerClaimDetails]
 
-		enum AccountTag: Int, Hashable, Identifiable, Sendable {
-			case ledgerBabylon
-			case ledgerLegacy
-			case legacySoftware
-			case dAppDefinition
-
-			init?(state: Home.AccountRow.State) {
-				switch (state.isDappDefinitionAccount, state.isLegacyAccount, state.isLedgerAccount) {
-				case (false, false, false): return nil
-				case (true, _, _): self = .dAppDefinition
-				case (false, true, true): self = .ledgerLegacy
-				case (false, true, false): self = .legacySoftware
-				case (false, false, true): self = .ledgerBabylon
-				}
-			}
-		}
-
-		let tags: [String]
+		let tags: [AccountCardTag]
 
 		let isLedgerAccount: Bool
 
@@ -47,7 +30,20 @@ extension Home.AccountRow {
 			self.isLoadingResources = state.accountWithResources.isLoading
 			self.securityProblemsConfig = state.securityProblemsConfig
 
-			self.tags = []
+			self.tags = {
+				var tags: [AccountCardTag] = []
+				if state.isDappDefinitionAccount {
+					tags.append(.dAppDefinition)
+				} else if state.isLegacyAccount {
+					tags.append(.legacy)
+				}
+
+				if let fs = state.factorSource {
+					tags.append(.factorSource(fs))
+				}
+
+				return tags
+			}()
 			self.isLedgerAccount = state.isLedgerAccount
 			self.accountLockerClaims = state.accountLockerClaims
 
@@ -353,21 +349,6 @@ private extension Home.AccountRow.ViewState {
 			.large2 + .small3
 		default:
 			.large1
-		}
-	}
-}
-
-extension Home.AccountRow.ViewState.AccountTag {
-	var display: String {
-		switch self {
-		case .dAppDefinition:
-			L10n.HomePage.AccountsTag.dAppDefinition
-		case .legacySoftware:
-			L10n.HomePage.AccountsTag.legacySoftware
-		case .ledgerLegacy:
-			L10n.HomePage.AccountsTag.ledgerLegacy
-		case .ledgerBabylon:
-			L10n.HomePage.AccountsTag.ledgerBabylon
 		}
 	}
 }
