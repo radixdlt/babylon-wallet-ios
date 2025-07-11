@@ -53,10 +53,10 @@ extension ProfileStore {
 		)
 	}
 
-	func importProfile(_ profileToImport: Profile, skippedMainBdfs: Bool) async throws {
+	func importProfile(_ profileToImport: Profile) async throws {
 		var profileToImport = profileToImport
 		profileToImport.changeCurrentToMainnetIfNeeded()
-		try await SargonOS.shared.importWallet(profile: profileToImport, bdfsSkipped: skippedMainBdfs)
+		try await SargonOS.shared.importWallet(profile: profileToImport, bdfsSkipped: false)
 	}
 
 	func deleteProfile() async throws {

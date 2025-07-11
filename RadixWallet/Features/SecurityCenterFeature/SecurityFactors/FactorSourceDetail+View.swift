@@ -128,8 +128,10 @@ private extension View {
 	}
 
 	private func importMnemonics(with destinationStore: PresentationStoreOf<FactorSourceDetail.Destination>) -> some View {
-		sheet(store: destinationStore.scope(state: \.importMnemonics, action: \.importMnemonics)) {
-			ImportMnemonicsFlowCoordinator.View(store: $0)
+		sheet(store: destinationStore.scope(state: \.importMnemonic, action: \.importMnemonic)) { store in
+			NavigationStack {
+				ImportMnemonicForFactorSource.View(store: store)
+			}
 		}
 	}
 

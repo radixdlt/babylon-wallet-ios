@@ -97,7 +97,7 @@ struct SecurityCenter: Sendable, FeatureReducer {
 				state.destination = .configurationBackup(.init())
 
 			case .problem9:
-				state.destination = .importMnemonics(.init())
+				state.destination = .importMnemonics(.init(profileToCheck: .current))
 			}
 			return .none
 

@@ -55,7 +55,6 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			case detail(FactorSourceDetail.State)
 			case displayMnemonic(DisplayMnemonic.State)
 			case enterMnemonic(ImportMnemonicsFlowCoordinator.State)
-			case addMnemonic(ImportMnemonic.State)
 			case noP2PLink(AlertState<NoP2PLinkAlert>)
 			case addNewP2PLink(NewConnection.State)
 			case addFactorSource(AddFactorSource.Coordinator.State)
@@ -140,7 +139,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 				}
 
 			case .lostFactorSource:
-				state.destination = .enterMnemonic(.init())
+				state.destination = .enterMnemonic(.init(profileToCheck: .current))
 				return .none
 
 			case .none:

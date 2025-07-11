@@ -187,7 +187,8 @@ extension FactorSourcesClient: DependencyKey {
 						else {
 							continue
 						}
-						guard (try? mnemonic.validatePublicKeys(of: softwareAccounts)) == true else {
+
+						guard (try? mnemonic.validatePublicKeys(of: softwareAccounts)) == nil else {
 							continue
 						}
 
