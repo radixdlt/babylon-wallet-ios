@@ -58,7 +58,7 @@ extension AddShieldBuilderSeedingFactors.AddFactorSource {
 			WithPerceptionTracking {
 				FactorSourceCard(
 					kind: .genericDescription(kind),
-					mode: .selection(type: .radioButton, isSelected: store.selected == kind),
+					mode: .selection(type: .radioButton, selectionEnabled: true, isSelected: store.selected == kind),
 					messages: self.messages(for: kind)
 				)
 				.onTapGesture {

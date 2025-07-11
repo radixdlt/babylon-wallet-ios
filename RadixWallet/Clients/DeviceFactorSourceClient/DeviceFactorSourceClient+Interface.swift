@@ -2,11 +2,6 @@ import Sargon
 
 // MARK: - DeviceFactorSourceClient
 struct DeviceFactorSourceClient: Sendable {
-	var isAccountRecoveryNeeded: IsAccountRecoveryNeeded
-
-	// FIXME: Find a better home for this...
-	var entitiesControlledByFactorSource: GetEntitiesControlledByFactorSource
-
 	/// Fetched accounts and personas on current network that are controlled by a device factor source, for every factor source in current profile
 	var controlledEntities: GetControlledEntities
 
@@ -20,10 +15,8 @@ struct DeviceFactorSourceClient: Sendable {
 
 // MARK: DeviceFactorSourceClient.onDeviceHDPublicKey
 extension DeviceFactorSourceClient {
-	typealias GetEntitiesControlledByFactorSource = @Sendable (DeviceFactorSource, Profile?) async throws -> EntitiesControlledByFactorSource
 	typealias GetControlledEntities = @Sendable (Profile?) async throws -> IdentifiedArrayOf<EntitiesControlledByFactorSource>
 
-	typealias IsAccountRecoveryNeeded = @Sendable () async throws -> Bool
 	typealias EntitiesInBadState = @Sendable () async throws -> AnyAsyncSequence<(withoutControl: AddressesOfEntitiesInBadState, unrecoverable: AddressesOfEntitiesInBadState)>
 	typealias DerivePublicKeys = @Sendable (KeyDerivationRequestPerFactorSource) async throws -> [HierarchicalDeterministicFactorInstance]
 }

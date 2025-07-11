@@ -7,6 +7,7 @@ import SwiftUI
 struct DisplayMnemonic: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
+		@Shared(.deviceMnemonicBuilder) var deviceMnemonicBuilder
 		let mnemonic: Mnemonic
 
 		let factorSourceID: FactorSourceIDFromHash
@@ -39,14 +40,14 @@ struct DisplayMnemonic: Sendable, FeatureReducer {
 		enum State: Sendable, Hashable {
 			case backupConfirmation(AlertState<Action.BackupConfirmation>)
 			case onContinueWarning(AlertState<Action.OnContinueWarning>)
-			case verifyMnemonic(VerifyMnemonic.State)
+			case verifyMnemonic(AddFactorSource.ConfirmSeedPhrase.State)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
 			case backupConfirmation(BackupConfirmation)
 			case onContinueWarning(OnContinueWarning)
-			case verifyMnemonic(VerifyMnemonic.Action)
+			case verifyMnemonic(AddFactorSource.ConfirmSeedPhrase.Action)
 
 			enum BackupConfirmation: Sendable, Hashable {
 				case userHasBackedUp
@@ -60,7 +61,7 @@ struct DisplayMnemonic: Sendable, FeatureReducer {
 
 		var body: some Reducer<State, Action> {
 			Scope(state: \.verifyMnemonic, action: \.verifyMnemonic) {
-				VerifyMnemonic()
+				AddFactorSource.ConfirmSeedPhrase()
 			}
 		}
 	}
@@ -104,7 +105,10 @@ struct DisplayMnemonic: Sendable, FeatureReducer {
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .backupConfirmation(.userHasBackedUp):
-			state.destination = .verifyMnemonic(.init(mnemonic: state.mnemonic))
+			state.$deviceMnemonicBuilder.withLock { builder in
+				builder = try! builder.createMnemonicFromWords(words: state.mnemonic.words.map(\.word))
+			}
+			state.destination = .verifyMnemonic(.init(factorSourceKind: .device))
 			return .none
 
 		case .backupConfirmation(.userHasNotBackedUp):
@@ -112,8 +116,12 @@ struct DisplayMnemonic: Sendable, FeatureReducer {
 				await dismiss()
 			}
 
-		case .verifyMnemonic(.delegate(.mnemonicVerified)):
+		case .verifyMnemonic(.delegate(.validated)):
 			let factorSourceID = state.factorSourceID
+			// Reset
+			state.$deviceMnemonicBuilder.withLock { builder in
+				builder = .init()
+			}
 			return .run { send in
 				try userDefaults.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
 				await send(.delegate(.backedUp(factorSourceID)))

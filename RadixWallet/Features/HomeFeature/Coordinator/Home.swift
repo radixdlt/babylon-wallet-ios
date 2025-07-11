@@ -15,6 +15,7 @@ struct Home: Sendable, FeatureReducer {
 		var accountRows: IdentifiedArrayOf<Home.AccountRow.State> = []
 		fileprivate var problems: [SecurityProblem] = []
 		fileprivate var claims: ClaimsPerAccount = [:]
+		fileprivate var factorSources: FactorSources = []
 
 		var showFiatWorth: Bool = true
 
@@ -65,6 +66,7 @@ struct Home: Sendable, FeatureReducer {
 		case showLinkConnectorIfNeeded
 		case setSecurityProblems([SecurityProblem])
 		case setAccountLockerClaims(ClaimsPerAccount)
+		case setFactorSources(FactorSources)
 	}
 
 	@CasePathable
@@ -138,6 +140,7 @@ struct Home: Sendable, FeatureReducer {
 	@Dependency(\.securityCenterClient) var securityCenterClient
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.accountLockersClient) var accountLockersClient
+	@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 	private let accountPortfoliosRefreshIntervalInSeconds = 300 // 5 minutes
 
@@ -192,6 +195,7 @@ struct Home: Sendable, FeatureReducer {
 			.merge(with: accountLockerClaimsEffect())
 			.merge(with: delayedMediumEffect(for: .internal(.showLinkConnectorIfNeeded)))
 			.merge(with: scheduleFetchAccountPortfoliosTimer(state))
+			.merge(with: factorSources())
 
 		case .onDisappear:
 			return .cancel(id: CancellableId.fetchAccountPortfolios)
@@ -226,7 +230,10 @@ struct Home: Sendable, FeatureReducer {
 				.map { account in
 					// Create new Home.AccountRow.State only if it wasn't present before. Otherwise, we keep the old row
 					// which probably has already loaded its resources & fiat worth.
-					state.accountRows.first(where: { $0.id == account.address }) ?? .init(account: account, problems: state.problems)
+					var row = state.accountRows.first(where: { $0.id == account.address }) ??
+						.init(account: account, problems: state.problems)
+					row.updateFactorSource(from: state.factorSources)
+					return row
 				}
 				.asIdentified()
 
@@ -297,6 +304,13 @@ struct Home: Sendable, FeatureReducer {
 			state.claims = claims
 			state.accountRows.mutateAll { row in
 				row.accountLockerClaims = claims[row.id] ?? []
+			}
+			return .none
+
+		case let .setFactorSources(factorSources):
+			state.factorSources = factorSources
+			state.accountRows.mutateAll { row in
+				row.updateFactorSource(from: factorSources)
 			}
 			return .none
 		}
@@ -464,6 +478,23 @@ struct Home: Sendable, FeatureReducer {
 				guard !Task.isCancelled else { return }
 				await send(.internal(.setAccountLockerClaims(claims)))
 			}
+		}
+	}
+
+	private func factorSources() -> Effect<Action> {
+		.run { send in
+			for try await factorSources in await factorSourcesClient.factorSourcesAsyncSequence() {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.setFactorSources(factorSources)))
+			}
+		}
+	}
+}
+
+extension Home.AccountRow.State {
+	mutating func updateFactorSource(from factorSources: FactorSources) {
+		if let fsId = accountWithInfo.account.unsecuredControllingFactorInstance?.factorSourceID {
+			factorSource = factorSources[id: fsId.asGeneral]
 		}
 	}
 }

@@ -2,10 +2,9 @@ import Foundation
 import Sargon
 
 extension MnemonicWithPassphrase {
-	@discardableResult
 	func validatePublicKeys(
 		of softwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
-	) throws -> Bool {
+	) throws {
 		guard validate(
 			publicKeys: softwareAccounts.map {
 				account in
@@ -17,12 +16,11 @@ extension MnemonicWithPassphrase {
 		) else {
 			throw ValidateMnemonicAgainstEntities.publicKeyMismatch
 		}
-		return true
 	}
 
 	func validatePublicKeys(
 		of accounts: some Collection<Account>
-	) throws -> Bool {
+	) throws {
 		guard validate(
 			publicKeys: accounts.flatMap { account in
 				account.virtualHierarchicalDeterministicFactorInstances.map(\.publicKey)
@@ -30,7 +28,6 @@ extension MnemonicWithPassphrase {
 		) else {
 			throw ValidateMnemonicAgainstEntities.publicKeyMismatch
 		}
-		return true
 	}
 }
 

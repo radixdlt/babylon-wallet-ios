@@ -3,29 +3,26 @@ import Sargon
 import SwiftUI
 
 // MARK: - CreateAccountCoordinator
+@Reducer
 struct CreateAccountCoordinator: Sendable, FeatureReducer {
+	@ObservableState
 	struct State: Sendable, Hashable {
-		var root: Path.State?
+		var root: Path.State
 		var path: StackState<Path.State> = .init()
 
 		let config: CreateAccountConfig
 		var name: NonEmptyString?
 
 		init(
-			root: Path.State? = nil,
 			config: CreateAccountConfig
 		) {
 			self.config = config
-			if let root {
-				self.root = root
-			} else {
-				self.root = .nameAccount(.init(config: config))
-			}
+			self.root = .nameAccount(.init(config: config))
 		}
 
 		var shouldDisplayNavBar: Bool {
 			switch path.last {
-			case .nameAccount, .selectLedger:
+			case .nameAccount, .selectFactorSource:
 				true
 			case .completion:
 				false
@@ -35,32 +32,13 @@ struct CreateAccountCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	struct Path: Sendable, Reducer {
-		@CasePathable
-		enum State: Sendable, Hashable {
-			case nameAccount(NameAccount.State)
-			case selectLedger(LedgerHardwareDevices.State)
-			case completion(NewAccountCompletion.State)
-		}
+	typealias Action = FeatureAction<Self>
 
-		@CasePathable
-		enum Action: Sendable, Equatable {
-			case nameAccount(NameAccount.Action)
-			case selectLedger(LedgerHardwareDevices.Action)
-			case completion(NewAccountCompletion.Action)
-		}
-
-		var body: some ReducerOf<Self> {
-			Scope(state: \.nameAccount, action: \.nameAccount) {
-				NameAccount()
-			}
-			Scope(state: \.selectLedger, action: \.selectLedger) {
-				LedgerHardwareDevices()
-			}
-			Scope(state: \.completion, action: \.completion) {
-				NewAccountCompletion()
-			}
-		}
+	@Reducer(state: .hashable, action: .equatable)
+	enum Path {
+		case nameAccount(NameAccount)
+		case selectFactorSource(SelectFactorSource)
+		case completion(NewAccountCompletion)
 	}
 
 	enum ViewAction: Sendable, Equatable {
@@ -94,13 +72,12 @@ struct CreateAccountCoordinator: Sendable, FeatureReducer {
 	init() {}
 
 	var body: some ReducerOf<Self> {
+		Scope(state: \.root, action: \.child.root) {
+			Path.nameAccount(.init())
+		}
+
 		Reduce(core)
-			.ifLet(\.root, action: \.child.root) {
-				Path()
-			}
-			.forEach(\.path, action: \.child.path) {
-				Path()
-			}
+			.forEach(\.path, action: \.child.path)
 	}
 }
 
@@ -119,17 +96,13 @@ extension CreateAccountCoordinator {
 
 	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .root(.nameAccount(.delegate(.proceed(accountName, useLedgerAsFactorSource)))):
+		case let .root(.nameAccount(.delegate(.proceed(accountName)))):
 			state.name = accountName
-			if useLedgerAsFactorSource {
-				state.path.append(.selectLedger(.init(context: .createHardwareAccount)))
-				return .none
-			} else {
-				return createAccount(state: &state, mode: .bdfs)
-			}
+			state.path.append(.selectFactorSource(.init(context: .createAccount)))
+			return .none
 
-		case let .path(.element(_, action: .selectLedger(.delegate(.choseLedger(ledger))))):
-			return createAccount(state: &state, mode: .specific(ledger.asGeneral))
+		case let .path(.element(_, action: .selectFactorSource(.delegate(.selectedFactorSource(fs))))):
+			return createAccount(state: &state, factorSource: fs)
 
 		case .path(.element(_, action: .completion(.delegate(.completed)))):
 			return .run { send in
@@ -155,18 +128,13 @@ extension CreateAccountCoordinator {
 		}
 	}
 
-	private func createAccount(state: inout State, mode: Mode) -> Effect<Action> {
+	private func createAccount(state: inout State, factorSource: FactorSource) -> Effect<Action> {
 		guard let name = state.name else {
 			fatalError("Name should be set before creating Account")
 		}
 		let displayName = DisplayName(nonEmpty: name)
 		return .run { [networkId = state.config.specificNetworkID] send in
-			let account = switch mode {
-			case .bdfs:
-				try await SargonOS.shared.createAccountWithBDFS(networkId: networkId, name: displayName)
-			case let .specific(factorSource):
-				try await SargonOS.shared.createAccount(factorSource: factorSource, networkId: networkId, name: displayName)
-			}
+			let account = try await SargonOS.shared.createAccount(factorSource: factorSource, networkId: networkId, name: displayName)
 
 			let updated = await getThirdPartyDepositSettings(account: account)
 			// TODO: Remove once this is implemented in Sargon (https://radixdlt.atlassian.net/browse/ABW-4147)

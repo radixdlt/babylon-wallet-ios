@@ -163,14 +163,9 @@ struct LedgerHardwareDevices: Sendable, FeatureReducer {
 
 		case let .addNewP2PLink(.delegate(newP2PAction)):
 			switch newP2PAction {
-			case let .newConnection(connectedClient):
+			case .newConnection:
 				state.destination = nil
-				return .run { _ in
-					try await radixConnectClient.updateOrAddP2PLink(connectedClient)
-				} catch: { error, _ in
-					loggerGlobal.error("Failed P2PLink, error \(error)")
-					errorQueue.schedule(error)
-				}
+				return .none
 			}
 
 		case let .addNewLedger(.delegate(newLedgerAction)):
@@ -205,10 +200,8 @@ struct LedgerHardwareDevices: Sendable, FeatureReducer {
 
 	private func checkP2PLinkEffect() -> Effect<Action> {
 		.run { send in
-			for try await isConnected in await ledgerHardwareWalletClient.isConnectedToAnyConnectorExtension() {
-				guard !Task.isCancelled else { return }
-				await send(.internal(.hasAConnectorExtension(isConnected)))
-			}
+			let hasAConnectorExtension = await ledgerHardwareWalletClient.hasAnyLinkedConnector()
+			await send(.internal(.hasAConnectorExtension(hasAConnectorExtension)))
 		} catch: { error, _ in
 			loggerGlobal.error("failed to get links updates, error: \(error)")
 		}

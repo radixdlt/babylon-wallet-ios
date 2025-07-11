@@ -2,7 +2,7 @@ import Sargon
 
 // MARK: - LedgerHardwareWalletClient
 struct LedgerHardwareWalletClient: Sendable {
-	var isConnectedToAnyConnectorExtension: IsConnectedToAnyConnectorExtension
+	var hasAnyLinkedConnector: HasAnyLinkedConnector
 	var getDeviceInfo: GetDeviceInfo
 	var derivePublicKeys: DerivePublicKeys
 	var signTransaction: SignTransaction
@@ -12,7 +12,7 @@ struct LedgerHardwareWalletClient: Sendable {
 }
 
 extension LedgerHardwareWalletClient {
-	typealias IsConnectedToAnyConnectorExtension = @Sendable () async -> AnyAsyncSequence<Bool>
+	typealias HasAnyLinkedConnector = @Sendable () async -> Bool
 	typealias GetDeviceInfo = @Sendable () async throws -> P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo
 	typealias DerivePublicKeys = @Sendable (DerivePublicKeysRequest) async throws -> [HierarchicalDeterministicFactorInstance]
 
