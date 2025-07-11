@@ -27,6 +27,7 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 		case appeared
 		case addSecurityFactorTapped
 		case rowTapped(FactorSourcesList.Row?)
+		case messageTapped(FactorSourcesList.Row)
 		case continueButtonTapped(FactorSourcesList.Row)
 	}
 
@@ -45,12 +46,16 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 		enum State: Hashable, Sendable {
 			case addSecurityFactor(AddFactorSource.Coordinator.State)
 			case addNewP2PLink(NewConnection.State)
+			case displayMnemonic(DisplayMnemonic.State)
+			case enterMnemonic(ImportMnemonicForFactorSource.State)
 		}
 
 		@CasePathable
 		enum Action: Equatable, Sendable {
 			case addSecurityFactor(AddFactorSource.Coordinator.Action)
 			case addNewP2PLink(NewConnection.Action)
+			case displayMnemonic(DisplayMnemonic.Action)
+			case enterMnemonic(ImportMnemonicForFactorSource.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -60,6 +65,14 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 
 			Scope(state: \.addNewP2PLink, action: \.addNewP2PLink) {
 				NewConnection()
+			}
+
+			Scope(state: \.displayMnemonic, action: \.displayMnemonic) {
+				DisplayMnemonic()
+			}
+
+			Scope(state: \.enterMnemonic, action: \.enterMnemonic) {
+				ImportMnemonicForFactorSource()
 			}
 		}
 	}
@@ -92,6 +105,27 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 			}
 			state.selectedFactorSourceId = row?.id
 			return .none
+
+		case let .messageTapped(row):
+			switch row.status {
+			case .seedPhraseWrittenDown, .notBackedUp:
+				return .none
+
+			case .seedPhraseNotRecoverable:
+				return exportMnemonic(integrity: row.integrity) {
+					state.destination = .displayMnemonic(.init(mnemonic: $0.mnemonicWithPassphrase.mnemonic, factorSourceID: $0.factorSourceID))
+				}
+
+			case .lostFactorSource:
+				state.destination = .enterMnemonic(.init(
+					deviceFactorSource: row.integrity.factorSource.asDevice!,
+					profileToCheck: .current
+				))
+				return .none
+
+			case .none:
+				return .none
+			}
 
 		case let .continueButtonTapped(row):
 			if row.integrity.factorSource.kind == .ledgerHqHardwareWallet, !state.hasAConnectorExtension {
@@ -136,6 +170,15 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 				return .none
 			}
 			return .send(.delegate(.selectedFactorSource(selectedFactorSource)))
+		case .displayMnemonic(.delegate(.backedUp)):
+			state.destination = nil
+			return entitiesEffect(state: state)
+		case .enterMnemonic(.delegate(.imported)):
+			state.destination = nil
+			return entitiesEffect(state: state)
+		case .enterMnemonic(.delegate):
+			state.destination = nil
+			return .none
 		default:
 			return .none
 		}

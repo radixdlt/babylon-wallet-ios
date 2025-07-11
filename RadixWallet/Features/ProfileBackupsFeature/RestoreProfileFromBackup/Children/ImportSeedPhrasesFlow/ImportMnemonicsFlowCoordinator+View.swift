@@ -25,6 +25,9 @@ extension ImportMnemonicsFlowCoordinator {
 					if let importMnemonicStore = destinationStore.scope(state: \.importMnemonic, action: \.importMnemonic) {
 						ImportMnemonicForFactorSource.View(store: importMnemonicStore)
 							.navigationBarBackButtonHidden()
+							.radixToolbar(title: "Enter Seed Phrase") {
+								// close action
+							}
 					}
 				}
 			}

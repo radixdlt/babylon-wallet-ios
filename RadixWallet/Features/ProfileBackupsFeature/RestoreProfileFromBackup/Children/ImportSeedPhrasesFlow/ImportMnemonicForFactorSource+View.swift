@@ -19,12 +19,6 @@ extension ImportMnemonicForFactorSource {
 					.padding(.medium3)
 				}
 				.background(.secondaryBackground)
-				.radixToolbar(
-					title: "Enter Seed Phrase",
-					closeAction: {
-						store.send(.view(.closeButtonTapped))
-					}
-				)
 				.task { @MainActor in
 					await store.send(.view(.task)).finish()
 				}

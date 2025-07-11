@@ -97,7 +97,7 @@ struct FactorSourceCard: View {
 			}
 			.flushedLeft
 
-			if case let .selection(type, isSelected) = mode {
+			if case let .selection(type, _, isSelected) = mode {
 				switch type {
 				case .radioButton:
 					RadioButton(
@@ -112,6 +112,7 @@ struct FactorSourceCard: View {
 				}
 			}
 		}
+		.opacity(mode.isDisabled ? 0.5 : 1)
 	}
 
 	struct LinkedEntitesView: SwiftUI.View {
@@ -277,8 +278,16 @@ extension FactorSourceCard {
 
 	enum Mode {
 		case display
-		case selection(type: SelectionType, isSelected: Bool)
+		case selection(type: SelectionType, selectionEnabled: Bool, isSelected: Bool)
 		case removal
+
+		var isDisabled: Bool {
+			if case let .selection(_, selectionEnabled, _) = self {
+				!selectionEnabled
+			} else {
+				false
+			}
+		}
 	}
 
 	enum SelectionType {

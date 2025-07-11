@@ -26,7 +26,7 @@ extension AddFactorSource.SelectKind {
 						) { item in
 							FactorSourceCard(
 								kind: .genericDescription(item.value),
-								mode: .selection(type: .radioButton, isSelected: item.isSelected),
+								mode: .selection(type: .radioButton, selectionEnabled: true, isSelected: item.isSelected),
 								messages: []
 							)
 							.onTapGesture(perform: item.action)

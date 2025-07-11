@@ -76,7 +76,11 @@ extension FactorSourcesList {
 			case .display:
 				.display
 			case .selection:
-				.selection(type: .radioButton, isSelected: store.selected == row || row.selectability == .alreadySelected)
+				.selection(
+					type: .radioButton,
+					selectionEnabled: true,
+					isSelected: store.selected == row || row.selectability == .alreadySelected
+				)
 			}
 		}
 	}

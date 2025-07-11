@@ -85,6 +85,7 @@ extension SelectFactorSource {
 			)
 			let mode = FactorSourceCard.Mode.selection(
 				type: .radioButton,
+				selectionEnabled: item.value.selectability == .selectable,
 				isSelected: item.value.selectability == .unselectable ? false : item.isSelected
 			)
 
@@ -92,10 +93,14 @@ extension SelectFactorSource {
 				kind: kind,
 				mode: mode,
 				messages: item.value.messages
-			) { _ in
-				item.action()
+			) { action in
+				switch action {
+				case .messageTapped:
+					store.send(.view(.messageTapped(item.value)))
+				case .removeTapped:
+					break
+				}
 			}
-			.opacity(item.value.opacity)
 			.onTapGesture(perform: item.action)
 		}
 
@@ -118,11 +123,36 @@ private extension View {
 	func destinations(store: StoreOf<SelectFactorSource>) -> some View {
 		let destinationStore = store.scope(state: \.$destination, action: \.destination)
 
-		return sheet(store: destinationStore.scope(state: \.addSecurityFactor, action: \.addSecurityFactor)) {
+		return addFactorSource(with: destinationStore)
+			.addP2PLink(with: destinationStore)
+			.displayMnemonic(with: destinationStore)
+			.enterMnemonic(with: destinationStore)
+	}
+
+	private func addFactorSource(with destinationStore: PresentationStoreOf<SelectFactorSource.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.addSecurityFactor, action: \.addSecurityFactor)) {
 			AddFactorSource.Coordinator.View(store: $0)
 		}
-		.sheet(store: destinationStore.scope(state: \.addNewP2PLink, action: \.addNewP2PLink)) {
+	}
+
+	private func addP2PLink(with destinationStore: PresentationStoreOf<SelectFactorSource.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.addNewP2PLink, action: \.addNewP2PLink)) {
 			NewConnection.View(store: $0)
+		}
+	}
+
+	private func displayMnemonic(with destinationStore: PresentationStoreOf<SelectFactorSource.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.displayMnemonic, action: \.displayMnemonic)) {
+			DisplayMnemonic.View(store: $0)
+		}
+	}
+
+	private func enterMnemonic(with destinationStore: PresentationStoreOf<SelectFactorSource.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.enterMnemonic, action: \.enterMnemonic)) {
+			ImportMnemonicForFactorSource.View(store: $0)
+				.radixToolbar(
+					title: "Enter Seed Phrase"
+				)
 		}
 	}
 }
