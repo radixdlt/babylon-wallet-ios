@@ -109,12 +109,23 @@ extension SelectFactorSource {
 				Text("Select Security Factor")
 					.textStyle(.sheetTitle)
 
-				Text(markdown: "Choose the security factor you will use to create the new Account.", emphasizedColor: .primaryText, emphasizedFont: .app.body1Header)
+				Text(markdown: description, emphasizedColor: .primaryText, emphasizedFont: .app.body1Header)
 					.textStyle(.body1Regular)
 					.lineSpacing(.zero)
 			}
 			.foregroundStyle(.primaryText)
 			.multilineTextAlignment(.center)
+		}
+
+		private var description: String {
+			switch store.context {
+			case .createAccount:
+				"Choose the security factor you will use to create the new Account."
+			case .createPersona:
+				"Choose the security factor you will use to create the new Persona."
+			case .accountRecovery:
+				"Choose the security factor you will use to Recover Accounts"
+			}
 		}
 	}
 }

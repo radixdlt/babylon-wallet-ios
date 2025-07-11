@@ -38,7 +38,6 @@ struct ImportMnemonicForFactorSource: Sendable, FeatureReducer {
 		case task
 		case skipButtonTapped
 		case confirmButtonTapped
-		case closeButtonTapped
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -53,7 +52,6 @@ struct ImportMnemonicForFactorSource: Sendable, FeatureReducer {
 	enum DelegateAction: Sendable, Hashable {
 		case skipped(DeviceFactorSource)
 		case imported(DeviceFactorSource)
-		case closed
 	}
 
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
@@ -112,9 +110,6 @@ struct ImportMnemonicForFactorSource: Sendable, FeatureReducer {
 			} catch: { err, _ in
 				errorQueue.schedule(err)
 			}
-
-		case .closeButtonTapped:
-			return .send(.delegate(.closed))
 		}
 	}
 

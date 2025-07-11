@@ -6,6 +6,7 @@ extension AddFactorSource {
 		struct State: Sendable, Hashable {
 			@Shared(.deviceMnemonicBuilder) var deviceMnemonicBuilder
 
+			let context: Context
 			var name: String = ""
 			var sanitizedName: NonEmptyString?
 			var isAddingFactorSource: Bool = false
@@ -59,6 +60,7 @@ extension AddFactorSource {
 
 		@Dependency(\.errorQueue) var errorQueue
 		@Dependency(\.userDefaults) var userDefaults
+		@Dependency(\.secureStorageClient) var secureStorageClient
 
 		var body: some ReducerOf<Self> {
 			Reduce(core)
@@ -76,16 +78,17 @@ extension AddFactorSource {
 				let mwp = state.deviceMnemonicBuilder.getMnemonicWithPassphrase()
 				return .run { [factorSource = state.factorSource] send in
 					let result = await TaskResult {
-						if factorSource.factorSourceKind == .device {
-							_ = try await SargonOS.shared.addNewMnemonicFactorSource(
-								factorSourceKind: .device,
-								mnemonicWithPassphrase: mwp,
-								name: factorSource.name
+						if let deviceFS = factorSource.asDevice {
+							try secureStorageClient.saveMnemonicForFactorSource(
+								.init(
+									mnemonicWithPassphrase: mwp,
+									factorSource: deviceFS
+								)
 							)
 							try? userDefaults.addFactorSourceIDOfBackedUpMnemonic(factorSource.id.extract())
-						} else {
-							_ = try await SargonOS.shared.addFactorSource(factorSource: factorSource)
 						}
+
+						_ = try await SargonOS.shared.addFactorSource(factorSource: factorSource)
 						return EqVoid.instance
 					}
 					await send(.internal(.addFactorSourceResult(result)))

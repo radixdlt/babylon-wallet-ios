@@ -130,7 +130,7 @@ extension CreatePersonaCoordinator {
 			state.name = name
 			state.personaData = personaData
 
-			state.path.append(.selectFactorSource(.init(kinds: [.device, .ledgerHqHardwareWallet, .arculusCard])))
+			state.path.append(.selectFactorSource(.init(context: .createPersona)))
 			return .none
 
 		case let .path(.element(_, action: .selectFactorSource(.delegate(.selectedFactorSource(fs))))):

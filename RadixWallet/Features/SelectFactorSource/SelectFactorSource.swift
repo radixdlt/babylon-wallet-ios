@@ -3,12 +3,27 @@
 struct SelectFactorSource: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
-		let kinds: [FactorSourceKind]
+		enum Context: Hashable {
+			case createAccount
+			case createPersona
+			case accountRecovery(isOlympia: Bool)
+		}
+
+		let context: Context
 
 		var rows: [FactorSourcesList.Row] = []
 		var selectedFactorSourceId: FactorSourceID?
 		var selectedFactorSource: FactorSourcesList.Row? {
 			rows.first(where: { $0.id == selectedFactorSourceId })
+		}
+
+		var kinds: [FactorSourceKind] {
+			switch context {
+			case .createAccount, .createPersona, .accountRecovery(false):
+				[.device, .ledgerHqHardwareWallet, .arculusCard]
+			case .accountRecovery(true):
+				[.device, .ledgerHqHardwareWallet]
+			}
 		}
 
 		var problems: [SecurityProblem]?
@@ -135,7 +150,15 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 			return .send(.delegate(.selectedFactorSource(row.integrity.factorSource)))
 
 		case .addSecurityFactorTapped:
-			state.destination = .addSecurityFactor(.init(mode: .toSelectFromKinds(state.kinds)))
+			let context: AddFactorSource.Context = switch state.context {
+			case .createAccount, .createPersona: .newFactorSource
+			case let .accountRecovery(isOlympia): .recoverFactorSource(isOlympia: isOlympia)
+			}
+
+			state.destination = .addSecurityFactor(.init(
+				mode: .toSelectFromKinds(state.kinds),
+				context: context
+			))
 			return .none
 		}
 	}
@@ -148,7 +171,14 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 			return .none
 
 		case let .setEntities(entities):
-			state.entities = entities
+			state.entities = entities.filter { entity in
+				switch state.context {
+				case .createAccount, .createPersona, .accountRecovery(false):
+					entity.integrity.factorSource.supportsBabylon
+				case .accountRecovery(true):
+					entity.integrity.factorSource.supportsOlympia
+				}
+			}
 			setRows(state: &state)
 			return .none
 

@@ -149,7 +149,12 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 		case .addButtonTapped:
 			switch state.kind {
 			case .device:
-				state.destination = .addFactorSource(.init(mode: .preselectedKind(state.kind)))
+				state.destination = .addFactorSource(
+					.init(
+						mode: .preselectedKind(state.kind),
+						context: .newFactorSource
+					)
+				)
 			case .ledgerHqHardwareWallet:
 				return performActionRequiringP2PEffect(.addLedger, in: &state)
 			default:
@@ -245,7 +250,10 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 		// If we have a connection, we can proceed directly
 		switch action {
 		case .addLedger:
-			state.destination = .addFactorSource(.init(mode: .preselectedKind(.ledgerHqHardwareWallet)))
+			state.destination = .addFactorSource(.init(
+				mode: .preselectedKind(.ledgerHqHardwareWallet),
+				context: .newFactorSource
+			))
 			return .none
 		case let .continueWithFactorsource(fs):
 			return .send(.delegate(.selectedFactorSource(fs)))

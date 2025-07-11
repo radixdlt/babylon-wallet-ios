@@ -11,6 +11,7 @@ extension AddFactorSource {
 
 			var grid: ImportMnemonicGrid.State!
 			var isEnteringCustomSeedPhrase: Bool = false
+			var context: Context
 
 			var confirmButtonControlState: ControlState {
 				switch status {
@@ -24,20 +25,26 @@ extension AddFactorSource {
 			@Presents
 			var destination: Destination.State? = nil
 
-			init() {
-				$deviceMnemonicBuilder.withLock { builder in
-					builder = builder.generateNewMnemonic()
-				}
+			init(context: Context) {
+				self.context = context
+				switch context {
+				case .newFactorSource:
+					$deviceMnemonicBuilder.withLock { builder in
+						builder = builder.generateNewMnemonic()
+					}
 
-				let mnemonic = try! Mnemonic(words: deviceMnemonicBuilder.getWords())
-				grid = .init(mnemonic: mnemonic)
+					let mnemonic = try! Mnemonic(words: deviceMnemonicBuilder.getWords())
+					grid = .init(mnemonic: mnemonic)
+				case let .recoverFactorSource(isOlympia):
+					isEnteringCustomSeedPhrase = true
+					grid = .init(count: .twentyFour, isWordCountFixed: !isOlympia)
+				}
 			}
 		}
 
 		typealias Action = FeatureAction<Self>
 
 		enum ViewAction: Sendable, Hashable {
-			case onFirstAppear
 			case confirmButtonTapped
 			case enterCustomSeedPhraseButtonTapped
 		}
@@ -86,14 +93,6 @@ extension AddFactorSource {
 
 		func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
-			case .onFirstAppear:
-				state.$deviceMnemonicBuilder.withLock { builder in
-					builder = builder.generateNewMnemonic()
-				}
-				if let mnemonic = try? Mnemonic(words: state.deviceMnemonicBuilder.getWords()) {
-					state.grid = .init(mnemonic: mnemonic)
-				}
-				return .none
 			case .confirmButtonTapped:
 				let isEnteringCustomSeedPhrase = state.isEnteringCustomSeedPhrase
 				if isEnteringCustomSeedPhrase {

@@ -3,24 +3,21 @@ import Sargon
 import SwiftUI
 
 // MARK: - CreateAccountCoordinator
+@Reducer
 struct CreateAccountCoordinator: Sendable, FeatureReducer {
+	@ObservableState
 	struct State: Sendable, Hashable {
-		var root: Path.State?
+		var root: Path.State
 		var path: StackState<Path.State> = .init()
 
 		let config: CreateAccountConfig
 		var name: NonEmptyString?
 
 		init(
-			root: Path.State? = nil,
 			config: CreateAccountConfig
 		) {
 			self.config = config
-			if let root {
-				self.root = root
-			} else {
-				self.root = .nameAccount(.init(config: config))
-			}
+			self.root = .nameAccount(.init(config: config))
 		}
 
 		var shouldDisplayNavBar: Bool {
@@ -35,34 +32,13 @@ struct CreateAccountCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	struct Path: Sendable, Reducer {
-		@CasePathable
-		enum State: Sendable, Hashable {
-			case nameAccount(NameAccount.State)
-			case selectFactorSource(SelectFactorSource.State)
-			case completion(NewAccountCompletion.State)
-		}
+	typealias Action = FeatureAction<Self>
 
-		@CasePathable
-		enum Action: Sendable, Equatable {
-			case nameAccount(NameAccount.Action)
-			case selectFactorSource(SelectFactorSource.Action)
-			case completion(NewAccountCompletion.Action)
-		}
-
-		var body: some ReducerOf<Self> {
-			Scope(state: \.nameAccount, action: \.nameAccount) {
-				NameAccount()
-			}
-
-			Scope(state: \.selectFactorSource, action: \.selectFactorSource) {
-				SelectFactorSource()
-			}
-
-			Scope(state: \.completion, action: \.completion) {
-				NewAccountCompletion()
-			}
-		}
+	@Reducer(state: .hashable, action: .equatable)
+	enum Path {
+		case nameAccount(NameAccount)
+		case selectFactorSource(SelectFactorSource)
+		case completion(NewAccountCompletion)
 	}
 
 	enum ViewAction: Sendable, Equatable {
@@ -96,13 +72,12 @@ struct CreateAccountCoordinator: Sendable, FeatureReducer {
 	init() {}
 
 	var body: some ReducerOf<Self> {
+		Scope(state: \.root, action: \.child.root) {
+			Path.nameAccount(.init())
+		}
+
 		Reduce(core)
-			.ifLet(\.root, action: \.child.root) {
-				Path()
-			}
-			.forEach(\.path, action: \.child.path) {
-				Path()
-			}
+			.forEach(\.path, action: \.child.path)
 	}
 }
 
@@ -123,14 +98,8 @@ extension CreateAccountCoordinator {
 		switch childAction {
 		case let .root(.nameAccount(.delegate(.proceed(accountName)))):
 			state.name = accountName
-			state.path.append(.selectFactorSource(.init(kinds: [.device, .ledgerHqHardwareWallet, .arculusCard])))
+			state.path.append(.selectFactorSource(.init(context: .createAccount)))
 			return .none
-//			if useLedgerAsFactorSource {
-//				state.path.append(.selectLedger(.init(context: .createHardwareAccount)))
-//				return .none
-//			} else {
-//				return createAccount(state: &state, mode: .bdfs)
-//			}
 
 		case let .path(.element(_, action: .selectFactorSource(.delegate(.selectedFactorSource(fs))))):
 			return createAccount(state: &state, factorSource: fs)

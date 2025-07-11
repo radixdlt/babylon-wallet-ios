@@ -26,7 +26,7 @@ extension ImportMnemonicsFlowCoordinator {
 						ImportMnemonicForFactorSource.View(store: importMnemonicStore)
 							.navigationBarBackButtonHidden()
 							.radixToolbar(title: "Enter Seed Phrase") {
-								// close action
+								store.send(.view(.closeButtonTapped))
 							}
 					}
 				}

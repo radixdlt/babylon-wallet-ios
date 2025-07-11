@@ -2,6 +2,11 @@ import ComposableArchitecture
 import Sargon
 
 extension AddFactorSource {
+	enum Context: Sendable, Hashable {
+		case newFactorSource
+		case recoverFactorSource(isOlympia: Bool)
+	}
+
 	@Reducer
 	struct Coordinator: Sendable, FeatureReducer {
 		@ObservableState
@@ -17,7 +22,9 @@ extension AddFactorSource {
 			var root: Root.State
 			var path: StackState<Path.State>
 
-			init(mode: Mode) {
+			let context: Context
+
+			init(mode: Mode, context: Context) {
 				switch mode {
 				case let .preselectedKind(factorSourceKind):
 					self.kind = factorSourceKind
@@ -26,6 +33,7 @@ extension AddFactorSource {
 					self.kind = nil
 					self.root = .selectKind(.init(kinds: kinds))
 				}
+				self.context = context
 				self.path = .init()
 			}
 		}
@@ -93,25 +101,25 @@ extension AddFactorSource {
 				return .none
 
 			case .root(.intro(.delegate(.completed))), .path(.element(id: _, action: .intro(.delegate(.completed)))):
-				state.path.append(.deviceSeedPhrase(.init()))
+				state.path.append(.deviceSeedPhrase(.init(context: state.context)))
 				return .none
 
 			case let .root(.intro(.delegate(.completedWithLedgerTempFS(ledger)))),
 			     let .path(.element(id: _, action: .intro(.delegate(.completedWithLedgerTempFS(ledger))))):
-				state.path.append(.nameFactorSource(.init(factorSource: ledger.asGeneral)))
+				state.path.append(.nameFactorSource(.init(context: state.context, factorSource: ledger.asGeneral)))
 
 				return .none
 
 			case let .path(.element(id: _, action: .deviceSeedPhrase(.delegate(.completed(withCustomSeedPhrase))))):
 				if withCustomSeedPhrase {
-					state.path.append(.nameFactorSource(.init(factorSource: createDeviceFactorSource(state: state).asGeneral)))
+					state.path.append(.nameFactorSource(.init(context: state.context, factorSource: createDeviceFactorSource(state: state).asGeneral)))
 				} else {
 					state.path.append(.confirmSeedPhrase(.init(factorSourceKind: .device)))
 				}
 				return .none
 
 			case .path(.element(id: _, action: .confirmSeedPhrase(.delegate(.validated)))):
-				state.path.append(.nameFactorSource(.init(factorSource: createDeviceFactorSource(state: state).asGeneral)))
+				state.path.append(.nameFactorSource(.init(context: state.context, factorSource: createDeviceFactorSource(state: state).asGeneral)))
 				return .none
 
 			case let .path(.element(id: _, action: .nameFactorSource(.delegate(.saved(fs))))):
@@ -128,7 +136,13 @@ extension AddFactorSource {
 
 		func createDeviceFactorSource(state: State) -> DeviceFactorSource {
 			let mwp = state.deviceMnemonicBuilder.getMnemonicWithPassphrase()
-			return SargonOS.shared.createDeviceFactorSource(mnemonicWithPassphrase: mwp, factorType: .babylon)
+			let factorType: DeviceFactorSourceType = switch state.context {
+			case .newFactorSource:
+				.babylon
+			case let .recoverFactorSource(isOlympia):
+				isOlympia ? .olympia : .babylon
+			}
+			return SargonOS.shared.createDeviceFactorSource(mnemonicWithPassphrase: mwp, factorType: factorType)
 		}
 	}
 }

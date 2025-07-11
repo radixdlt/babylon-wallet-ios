@@ -52,6 +52,7 @@ struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 
 	enum ViewAction: Sendable, Equatable {
 		case onFirstTask
+		case closeButtonTapped
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -93,6 +94,8 @@ struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 				errorQueue.schedule(error)
 				await send(.delegate(.finishedEarly(dueToFailure: true)))
 			}
+		case .closeButtonTapped:
+			.send(.delegate(.finishedEarly(dueToFailure: false)))
 		}
 	}
 
@@ -124,9 +127,6 @@ struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 				))
 			)
 			return .none
-
-		case .path(.element(id: _, action: .importMnemonic(.delegate(.closed)))):
-			return .send(.delegate(.finishedEarly(dueToFailure: false)))
 
 		default:
 			return .none

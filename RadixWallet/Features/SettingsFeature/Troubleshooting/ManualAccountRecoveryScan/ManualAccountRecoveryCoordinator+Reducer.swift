@@ -2,9 +2,11 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - ManualAccountRecoveryCoordinator
+@Reducer
 struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 	typealias Store = StoreOf<Self>
 
+	@ObservableState
 	struct State: Sendable, Hashable {
 		var path: StackState<Path.State> = .init()
 		var isMainnet: Bool = false
@@ -12,50 +14,27 @@ struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 		init() {}
 	}
 
+	typealias Action = FeatureAction<Self>
+
 	// MARK: - Path
 
-	struct Path: Sendable, Hashable, Reducer {
-		@CasePathable
-		enum State: Sendable, Hashable {
-			case seedPhrase(ManualAccountRecoverySeedPhrase.State)
-			case ledger(LedgerHardwareDevices.State)
-
-			case accountRecoveryScan(AccountRecoveryScanCoordinator.State)
-			case recoveryComplete(RecoverWalletControlWithBDFSComplete.State)
-		}
-
-		@CasePathable
-		enum Action: Sendable, Equatable {
-			case seedPhrase(ManualAccountRecoverySeedPhrase.Action)
-			case ledger(LedgerHardwareDevices.Action)
-
-			case accountRecoveryScan(AccountRecoveryScanCoordinator.Action)
-			case recoveryComplete(RecoverWalletControlWithBDFSComplete.Action)
-		}
-
-		var body: some ReducerOf<Self> {
-			Scope(state: \.seedPhrase, action: \.seedPhrase) {
-				ManualAccountRecoverySeedPhrase()
-			}
-			Scope(state: \.ledger, action: \.ledger) {
-				LedgerHardwareDevices()
-			}
-			Scope(state: \.accountRecoveryScan, action: \.accountRecoveryScan) {
-				AccountRecoveryScanCoordinator()
-			}
-			Scope(state: \.recoveryComplete, action: \.recoveryComplete) {
-				RecoverWalletControlWithBDFSComplete()
-			}
-		}
+	@Reducer(state: .hashable, action: .equatable)
+	enum Path {
+		case selectFactorSource(SelectFactorSource)
+		case seedPhrase(ManualAccountRecoverySeedPhrase)
+		case ledger(LedgerHardwareDevices)
+		case accountRecoveryScan(AccountRecoveryScanCoordinator)
+		case recoveryComplete(RecoverWalletControlWithBDFSComplete)
 	}
 
 	enum ViewAction: Sendable, Equatable {
 		case appeared
 		case closeButtonTapped
-		case useSeedPhraseTapped(isOlympia: Bool)
-		case useLedgerTapped(isOlympia: Bool)
+		case recoverBabylonAccountsTapped
+		case recoverOlympiaAccountsTapped
 	}
 
+	@CasePathable
 	enum ChildAction: Sendable, Equatable {
 		case path(StackActionOf<Path>)
 	}
@@ -65,7 +44,7 @@ struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case gotoAccountList
+		case completed
 	}
 
 	@Dependency(\.dismiss) var dismiss
@@ -73,9 +52,7 @@ struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
-			.forEach(\.path, action: /Action.child .. ChildAction.path) {
-				Path()
-			}
+			.forEach(\.path, action: \.child.path)
 	}
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
@@ -89,12 +66,12 @@ struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 		case .closeButtonTapped:
 			return .run { _ in await dismiss() }
 
-		case let .useSeedPhraseTapped(isOlympia):
-			state.path = .init([.seedPhrase(.init(isOlympia: isOlympia))])
+		case .recoverBabylonAccountsTapped:
+			state.path.append(.selectFactorSource(.init(context: .accountRecovery(isOlympia: false))))
 			return .none
 
-		case let .useLedgerTapped(isOlympia):
-			state.path = .init([.ledger(.init(context: .accountRecovery(olympia: isOlympia)))])
+		case .recoverOlympiaAccountsTapped:
+			state.path.append(.selectFactorSource(.init(context: .accountRecovery(isOlympia: true))))
 			return .none
 		}
 	}
@@ -118,12 +95,8 @@ struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 
 	private func reduce(into state: inout State, id: StackElementID, pathAction: Path.Action) -> Effect<Action> {
 		switch pathAction {
-		case let .seedPhrase(.delegate(.recover(factorSourceID, isOlympia))):
-			state.path.append(.accountRecoveryScan(.init(purpose: .addAccounts(factorSourceID: factorSourceID, olympia: isOlympia))))
-			return .none
-
-		case let .ledger(.delegate(.choseLedgerForRecovery(ledger, isOlympia: isOlympia))):
-			state.path.append(.accountRecoveryScan(.init(purpose: .addAccounts(factorSourceID: ledger.id, olympia: isOlympia))))
+		case let .selectFactorSource(.delegate(.selectedFactorSource(fs))):
+			state.path.append(.accountRecoveryScan(.init(purpose: .addAccounts(factorSourceID: fs.factorSourceID.extract()!, olympia: fs.supportsOlympia))))
 			return .none
 
 		case .accountRecoveryScan(.delegate(.dismissed)):
@@ -135,9 +108,7 @@ struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 			return .none
 
 		case .recoveryComplete(.delegate(.profileCreatedFromImportedBDFS)):
-			return .run { send in
-				await send(.delegate(.gotoAccountList))
-			}
+			return .send(.delegate(.completed))
 
 		default:
 			return .none
