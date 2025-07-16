@@ -72,6 +72,10 @@ struct CardCarousel: FeatureReducer, Sendable {
 			.run { _ in
 				await openURL(Constants.radquestURL)
 			}
+		case .joinRadixRewards:
+			.run { _ in
+				await openURL(Constants.radixRewardsURL)
+			}
 		case .connector:
 			.send(.delegate(.addConnector))
 		}
@@ -79,5 +83,6 @@ struct CardCarousel: FeatureReducer, Sendable {
 
 	private enum Constants {
 		static let radquestURL = URL(string: "https://radquest.io")!
+		static let radixRewardsURL = URL(string: "https://incentives-preview.radixdlt.com")!
 	}
 }

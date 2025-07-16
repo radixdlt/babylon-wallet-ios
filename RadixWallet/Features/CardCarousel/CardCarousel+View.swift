@@ -106,7 +106,7 @@ struct CarouselCardView: View {
 		switch card {
 		case .continueRadQuest, .startRadQuest:
 			95
-		case .dapp:
+		case .dapp, .joinRadixRewards:
 			85
 		case .connector:
 			106
@@ -123,6 +123,8 @@ struct CarouselCardView: View {
 			L10n.HomePageCarousel.ContinueOnDapp.title
 		case .connector:
 			L10n.HomePageCarousel.UseDappsOnDesktop.title
+		case .joinRadixRewards:
+			"Join Radix Rewards"
 		}
 	}
 
@@ -136,6 +138,8 @@ struct CarouselCardView: View {
 			L10n.HomePageCarousel.ContinueOnDapp.text
 		case .connector:
 			L10n.HomePageCarousel.UseDappsOnDesktop.text
+		case .joinRadixRewards:
+			"Earn weekly Season Points by engaging in genuine on-chain activities."
 		}
 	}
 
@@ -147,6 +151,10 @@ struct CarouselCardView: View {
 			cardBackground(.gradient(.carouselBackgroundRadquest))
 		case let .dapp(url):
 			cardBackground(.thumbnail(.dapp, url))
+		case .joinRadixRewards:
+			cardBackground(.thumbnail(
+				.dapp, URL(string: "https://assets.radixdlt.com/icons/scrypto-logo.png")!
+			))
 		case .connector:
 			cardBackground(.gradient(.carouselBackgroundConnect))
 		}
@@ -154,7 +162,7 @@ struct CarouselCardView: View {
 
 	private var showLinkIcon: Bool {
 		switch card {
-		case .startRadQuest:
+		case .startRadQuest, .joinRadixRewards:
 			true
 		case .continueRadQuest, .dapp, .connector:
 			false
