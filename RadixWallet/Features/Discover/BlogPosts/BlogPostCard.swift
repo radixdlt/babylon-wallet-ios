@@ -27,7 +27,7 @@ struct BlogPostCard: View {
 				}
 				.padding(.horizontal, .medium3)
 				.padding(.vertical, .small2)
-				.frame(height: 80)
+				.frame(height: 60)
 			}
 		}
 		.background(.primaryBackground)

@@ -224,6 +224,7 @@ struct LoadableImage<Placeholder: View>: View {
 					let _ = loggerGlobal.warning("Could not load thumbnail from \(url): \(error)")
 				}
 			}
+			.pipeline(.cachingPipeline)
 		} else {
 			placeholder
 		}
@@ -349,4 +350,20 @@ struct LoadableImagePlaceholderBehaviour {
 		case brokenImage
 		case standard
 	}
+}
+
+import Nuke
+
+extension ImagePipeline {
+	static let cachingPipeline: ImagePipeline = {
+		let dataCache = try! DataCache(name: "ImagesCache")
+		dataCache.sizeLimit = 100 * 1024 * 1024
+
+		let pipeline = ImagePipeline { config in
+			config.dataCache = dataCache
+			config.imageCache = ImageCache.shared
+		}
+
+		return pipeline
+	}()
 }

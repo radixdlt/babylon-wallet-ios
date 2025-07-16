@@ -16,6 +16,7 @@ enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
 	case showRelinkConnectorsAfterUpdate
 	case showRelinkConnectorsAfterProfileRestore
 	case homeCards
+	case dismissedHomeCards
 	case appLockMessageShown
 	case preferredTheme
 
@@ -245,6 +246,14 @@ extension UserDefaults.Dependency {
 
 	func setHomeCards(_ value: Data) {
 		set(data: value, key: .homeCards)
+	}
+
+	func getDismissedHomeCards() -> Data? {
+		data(key: .dismissedHomeCards)
+	}
+
+	func setDismissedHomeCards(_ value: Data) {
+		set(data: value, key: .dismissedHomeCards)
 	}
 
 	var appLockMessageShown: Bool {
