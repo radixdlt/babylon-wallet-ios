@@ -52,7 +52,6 @@ struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 
 	enum ViewAction: Sendable, Equatable {
 		case onFirstTask
-		case closeButtonTapped
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -94,8 +93,6 @@ struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 				errorQueue.schedule(error)
 				await send(.delegate(.finishedEarly(dueToFailure: true)))
 			}
-		case .closeButtonTapped:
-			.send(.delegate(.finishedEarly(dueToFailure: false)))
 		}
 	}
 
@@ -105,6 +102,7 @@ struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 			state.factorSourcesToImport = toImport
 			state.path.append(
 				.importMnemonic(.init(
+					isAllowedToSkip: true,
 					deviceFactorSource: state.factorSourcesToImport.removeFirst(),
 					profileToCheck: state.profileToCheck
 				))
@@ -115,13 +113,23 @@ struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case .path(.element(id: _, action: .importMnemonic(.delegate(.skipped)))):
+		case let .path(.element(id: _, action: .importMnemonic(.delegate(action)))):
+			switch action {
+			case .closed:
+				return .send(.delegate(.finishedEarly(dueToFailure: false)))
+			case let .imported(fs):
+				state.imported.insert(fs.id)
+			case .skipped:
+				break
+			}
+
 			guard !state.factorSourcesToImport.isEmpty else {
 				return .send(.delegate(.finishedImportingMnemonics(imported: state.imported)))
 			}
 
 			state.path.append(
 				.importMnemonic(.init(
+					isAllowedToSkip: true,
 					deviceFactorSource: state.factorSourcesToImport.removeFirst(),
 					profileToCheck: state.profileToCheck
 				))

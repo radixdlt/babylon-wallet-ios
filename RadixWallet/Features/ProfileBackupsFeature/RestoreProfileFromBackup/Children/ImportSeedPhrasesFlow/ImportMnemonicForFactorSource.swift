@@ -5,6 +5,7 @@ struct ImportMnemonicForFactorSource: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		let deviceFactorSource: DeviceFactorSource
 		let profileToCheck: ProfileToCheck
+		let isAllowedToSkip: Bool
 
 		var entitiesLinkedToFactorSource: Loadable<EntitiesLinkedToFactorSource> = .idle
 		var grid: ImportMnemonicGrid.State
@@ -22,7 +23,12 @@ struct ImportMnemonicForFactorSource: Sendable, FeatureReducer {
 			}
 		}
 
-		init(deviceFactorSource: DeviceFactorSource, profileToCheck: ProfileToCheck) {
+		init(
+			isAllowedToSkip: Bool = false,
+			deviceFactorSource: DeviceFactorSource,
+			profileToCheck: ProfileToCheck
+		) {
+			self.isAllowedToSkip = isAllowedToSkip
 			self.deviceFactorSource = deviceFactorSource
 			self.grid = .init(
 				count: deviceFactorSource.hint.mnemonicWordCount,
@@ -38,6 +44,7 @@ struct ImportMnemonicForFactorSource: Sendable, FeatureReducer {
 		case task
 		case skipButtonTapped
 		case confirmButtonTapped
+		case closeButtonTapped
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -52,6 +59,7 @@ struct ImportMnemonicForFactorSource: Sendable, FeatureReducer {
 	enum DelegateAction: Sendable, Hashable {
 		case skipped(DeviceFactorSource)
 		case imported(DeviceFactorSource)
+		case closed
 	}
 
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
@@ -110,6 +118,9 @@ struct ImportMnemonicForFactorSource: Sendable, FeatureReducer {
 			} catch: { err, _ in
 				errorQueue.schedule(err)
 			}
+
+		case .closeButtonTapped:
+			return .send(.delegate(.closed))
 		}
 	}
 

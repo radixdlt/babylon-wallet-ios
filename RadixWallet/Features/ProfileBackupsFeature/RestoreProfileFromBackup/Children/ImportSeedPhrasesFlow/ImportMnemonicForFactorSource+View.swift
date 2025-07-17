@@ -13,11 +13,19 @@ extension ImportMnemonicForFactorSource {
 						grid
 							.padding(.bottom, .medium3)
 
-						skipButton
+						if store.isAllowedToSkip {
+							skipButton
+						}
 						confirButton
 					}
 					.padding(.medium3)
 				}
+				.radixToolbar(
+					title: "Enter Seed Phrase",
+					closeAction: {
+						store.send(.view(.closeButtonTapped))
+					}
+				)
 				.background(.secondaryBackground)
 				.task { @MainActor in
 					await store.send(.view(.task)).finish()
@@ -27,18 +35,20 @@ extension ImportMnemonicForFactorSource {
 
 		private var factorSourceCard: some SwiftUI.View {
 			loadable(store.entitiesLinkedToFactorSource, successContent: { entitiesLinkedToFactorSource in
-				FactorSourceCard(
-					kind: .instance(
-						factorSource: entitiesLinkedToFactorSource.integrity.factorSource,
-						kind: .withEntities(linkedEntities: .init(
-							accounts: entitiesLinkedToFactorSource.accounts,
-							personas: entitiesLinkedToFactorSource.personas,
-							hasHiddenEntities: false
-						))
-					),
-					mode: .display,
-					isExpanded: false
-				)
+				WithPerceptionTracking {
+					FactorSourceCard(
+						kind: .instance(
+							factorSource: entitiesLinkedToFactorSource.integrity.factorSource,
+							kind: .withEntities(linkedEntities: .init(
+								accounts: entitiesLinkedToFactorSource.accounts,
+								personas: entitiesLinkedToFactorSource.personas,
+								hasHiddenEntities: false
+							))
+						),
+						mode: .display,
+						isExpanded: false
+					)
+				}
 			})
 		}
 

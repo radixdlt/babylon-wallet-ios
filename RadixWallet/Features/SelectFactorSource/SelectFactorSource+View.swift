@@ -159,11 +159,10 @@ private extension View {
 	}
 
 	private func enterMnemonic(with destinationStore: PresentationStoreOf<SelectFactorSource.Destination>) -> some View {
-		navigationDestination(store: destinationStore.scope(state: \.enterMnemonic, action: \.enterMnemonic)) {
-			ImportMnemonicForFactorSource.View(store: $0)
-				.radixToolbar(
-					title: "Enter Seed Phrase"
-				)
+		sheet(store: destinationStore.scope(state: \.enterMnemonic, action: \.enterMnemonic)) { store in
+			NavigationStack {
+				ImportMnemonicForFactorSource.View(store: store)
+			}
 		}
 	}
 }

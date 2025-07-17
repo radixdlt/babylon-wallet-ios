@@ -81,7 +81,15 @@ extension AccountPreferences {
 										kind: .extended
 									),
 									mode: .display,
-									messages: factorSourceRow.messages
+									messages: factorSourceRow.messages,
+									onAction: { action in
+										switch action {
+										case .messageTapped:
+											store.send(.view(.factorSourceMessageTapped(factorSourceRow)))
+										case .removeTapped:
+											break
+										}
+									}
 								)
 								.padding(.bottom, .medium3)
 								.onTapGesture {
@@ -150,10 +158,7 @@ extension AccountPreferences.View {
 
 private extension StoreOf<AccountPreferences> {
 	var destination: PresentationStoreOf<AccountPreferences.Destination> {
-		func scopeState(state: State) -> PresentationState<AccountPreferences.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
+		scope(state: \.$destination, action: \.destination)
 	}
 }
 
@@ -167,6 +172,8 @@ private extension View {
 			.hideAccount(with: destinationStore, store: store)
 			.deleteAccount(with: destinationStore, store: store)
 			.factorSourceDetails(with: destinationStore, store: store)
+			.displayMnemonic(with: destinationStore)
+			.enterMnemonic(with: destinationStore)
 	}
 
 	private func updateAccountLabel(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
@@ -204,6 +211,20 @@ private extension View {
 	private func factorSourceDetails(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>, store: StoreOf<AccountPreferences>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.factorSourceDetail, action: \.factorSourceDetail)) {
 			FactorSourceDetail.View(store: $0)
+		}
+	}
+
+	private func displayMnemonic(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.displayMnemonic, action: \.displayMnemonic)) {
+			DisplayMnemonic.View(store: $0)
+		}
+	}
+
+	private func enterMnemonic(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.enterMnemonic, action: \.enterMnemonic)) { store in
+			NavigationStack {
+				ImportMnemonicForFactorSource.View(store: store)
+			}
 		}
 	}
 }

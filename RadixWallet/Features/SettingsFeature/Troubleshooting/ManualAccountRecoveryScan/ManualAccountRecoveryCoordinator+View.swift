@@ -146,16 +146,6 @@ private extension ManualAccountRecoveryCoordinator.View {
 						SelectFactorSource.View(store: store)
 					}
 
-				case .seedPhrase:
-					if let store = store.scope(state: \.seedPhrase, action: \.seedPhrase) {
-						ManualAccountRecoverySeedPhrase.View(store: store)
-					}
-
-				case .ledger:
-					if let store = store.scope(state: \.ledger, action: \.ledger) {
-						LedgerHardwareDevices.View(store: store)
-					}
-
 				case .accountRecoveryScan:
 					if let store = store.scope(state: \.accountRecoveryScan, action: \.accountRecoveryScan) {
 						AccountRecoveryScanCoordinator.View(store: store)

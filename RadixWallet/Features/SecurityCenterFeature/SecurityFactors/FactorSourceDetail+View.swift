@@ -131,9 +131,6 @@ private extension View {
 		sheet(store: destinationStore.scope(state: \.importMnemonic, action: \.importMnemonic)) { store in
 			NavigationStack {
 				ImportMnemonicForFactorSource.View(store: store)
-					.radixToolbar(title: "Enter Seed Phrase") {
-						// close action
-					}
 			}
 		}
 	}

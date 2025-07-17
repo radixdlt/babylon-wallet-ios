@@ -133,8 +133,13 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 			return .run { send in
 				let integrity = try await SargonOs.shared.factorSourceIntegrity(factorSource: fs.asGeneral)
 				await send(.internal(.integrityUpdated(integrity)))
-			} catch: { _, _ in
+			} catch: { err, _ in
+				errorQueue.schedule(err)
 			}
+
+		case .importMnemonic(.delegate(.closed)):
+			state.destination = nil
+			return .none
 
 		default:
 			return .none

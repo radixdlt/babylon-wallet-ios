@@ -37,6 +37,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 		case rowMessageTapped(Row)
 		case addButtonTapped
 		case continueButtonTapped(FactorSource)
+		case closeEnterMnemonicButtonTapped
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -54,7 +55,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 		enum State: Sendable, Hashable {
 			case detail(FactorSourceDetail.State)
 			case displayMnemonic(DisplayMnemonic.State)
-			case enterMnemonic(ImportMnemonicsFlowCoordinator.State)
+			case enterMnemonic(ImportMnemonicForFactorSource.State)
 			case noP2PLink(AlertState<NoP2PLinkAlert>)
 			case addNewP2PLink(NewConnection.State)
 			case addFactorSource(AddFactorSource.Coordinator.State)
@@ -64,7 +65,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 		enum Action: Sendable, Equatable {
 			case detail(FactorSourceDetail.Action)
 			case displayMnemonic(DisplayMnemonic.Action)
-			case enterMnemonic(ImportMnemonicsFlowCoordinator.Action)
+			case enterMnemonic(ImportMnemonicForFactorSource.Action)
 			case noP2PLink(NoP2PLinkAlert)
 			case addNewP2PLink(NewConnection.Action)
 			case addFactorSource(AddFactorSource.Coordinator.Action)
@@ -78,7 +79,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 				DisplayMnemonic()
 			}
 			Scope(state: \.enterMnemonic, action: \.enterMnemonic) {
-				ImportMnemonicsFlowCoordinator()
+				ImportMnemonicForFactorSource()
 			}
 			Scope(state: \.addNewP2PLink, action: \.addNewP2PLink) {
 				NewConnection()
@@ -139,7 +140,10 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 				}
 
 			case .lostFactorSource:
-				state.destination = .enterMnemonic(.init(profileToCheck: .current))
+				guard let deviceFS = row.integrity.factorSource.asDevice else {
+					return .none
+				}
+				state.destination = .enterMnemonic(.init(deviceFactorSource: deviceFS, profileToCheck: .current))
 				return .none
 
 			case .none:
@@ -168,6 +172,10 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 				return performActionRequiringP2PEffect(.continueWithFactorsource(factorSource), in: &state)
 			}
 			return .send(.delegate(.selectedFactorSource(factorSource)))
+
+		case .closeEnterMnemonicButtonTapped:
+			state.destination = nil
+			return .none
 		}
 	}
 
@@ -191,11 +199,15 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case .enterMnemonic(.delegate):
+		case let .enterMnemonic(.delegate(action)):
 			// We don't care about which delegate action was executed, since any corresponding
 			// updates to the warnings will be handled by securityProblemsEffect.
 			// We just need to dismiss the destination.
 			state.destination = nil
+
+			if case .imported = action {
+				return entitiesEffect(state: state)
+			}
 			return .none
 
 		case .displayMnemonic(.delegate(.backedUp)):

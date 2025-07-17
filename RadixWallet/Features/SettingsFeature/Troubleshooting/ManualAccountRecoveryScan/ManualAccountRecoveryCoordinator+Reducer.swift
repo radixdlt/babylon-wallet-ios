@@ -21,8 +21,6 @@ struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 	@Reducer(state: .hashable, action: .equatable)
 	enum Path {
 		case selectFactorSource(SelectFactorSource)
-		case seedPhrase(ManualAccountRecoverySeedPhrase)
-		case ledger(LedgerHardwareDevices)
 		case accountRecoveryScan(AccountRecoveryScanCoordinator)
 		case recoveryComplete(RecoverWalletControlWithBDFSComplete)
 	}

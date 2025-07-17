@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -871,7 +871,6 @@
 		A018C8752E0030C100461852 /* BlogPostsClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A018C8732E0030C100461852 /* BlogPostsClient+Live.swift */; };
 		A018C8762E0030C100461852 /* BlogPostsClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A018C8722E0030C100461852 /* BlogPostsClient+Interface.swift */; };
 		A018C8772E0030C100461852 /* BlogPostsClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A018C8742E0030C100461852 /* BlogPostsClient+Test.swift */; };
-		A019F4BB2E17D54700325968 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A019F4BA2E17D54700325968 /* Sargon */; };
 		A0323FD02DC0DCEB00CA31CE /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = A0323FCF2DC0DCEB00CA31CE /* FirebaseCrashlytics */; };
 		A03DD84B2DDD9150008F7723 /* DAppTagsSelection+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A03DD84A2DDD9150008F7723 /* DAppTagsSelection+View.swift */; };
 		A03DD84C2DDD9150008F7723 /* DAppTagsSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A03DD8492DDD9150008F7723 /* DAppTagsSelection.swift */; };
@@ -896,8 +895,6 @@
 		A08BBA682DAE50CE00534B67 /* AddFactorSource-NameFactorSource+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08BBA672DAE50C700534B67 /* AddFactorSource-NameFactorSource+View.swift */; };
 		A08BBA6B2DAE973700534B67 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A08BBA6A2DAE973700534B67 /* Sargon */; };
 		A08BBA6E2DAF937D00534B67 /* AddFactorSource-SuccessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08BBA6D2DAF937400534B67 /* AddFactorSource-SuccessView.swift */; };
-		A08BBA752DB232D000534B67 /* LedgerHardwareDevices+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08BBA732DB232D000534B67 /* LedgerHardwareDevices+View.swift */; };
-		A08BBA762DB232D000534B67 /* LedgerHardwareDevices+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08BBA722DB232D000534B67 /* LedgerHardwareDevices+Reducer.swift */; };
 		A09F8FD62DEF4DAA00DB5614 /* RadixNameService+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09F8FD32DEF4DAA00DB5614 /* RadixNameService+Interface.swift */; };
 		A09F8FD72DEF4DAA00DB5614 /* RadixNameService+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09F8FD42DEF4DAA00DB5614 /* RadixNameService+Live.swift */; };
 		A09F8FD82DEF4DAA00DB5614 /* RadixNameService+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09F8FD52DEF4DAA00DB5614 /* RadixNameService+Test.swift */; };
@@ -1208,8 +1205,6 @@
 		A40816642C7E0D08005E65B9 /* ValidatorVaultItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A408154A2C7E0D08005E65B9 /* ValidatorVaultItem.swift */; };
 		A40816682C7F14D4005E65B9 /* InfoLinkSheet+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40816672C7F14D4005E65B9 /* InfoLinkSheet+Reducer.swift */; };
 		A408166A2C7F14F1005E65B9 /* InfoLinkSheet+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40816692C7F14F1005E65B9 /* InfoLinkSheet+View.swift */; };
-		A41266EF2B15578600EA38E9 /* ManualAccountRecoverySeedPhrase+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266EE2B15578600EA38E9 /* ManualAccountRecoverySeedPhrase+Reducer.swift */; };
-		A41266F12B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266F02B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift */; };
 		A41266F72B160F3F00EA38E9 /* ManualAccountRecoveryCoordinator+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266F62B160F3F00EA38E9 /* ManualAccountRecoveryCoordinator+Reducer.swift */; };
 		A41266F92B160F4C00EA38E9 /* ManualAccountRecoveryCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266F82B160F4C00EA38E9 /* ManualAccountRecoveryCoordinator+View.swift */; };
 		A41557502B757C5E0040AD4E /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = A415574F2B757C5E0040AD4E /* ComposableArchitecture */; };
@@ -2261,8 +2256,6 @@
 		A08BBA652DAE501300534B67 /* AddFactorSource-NameFactorSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSource-NameFactorSource.swift"; sourceTree = "<group>"; };
 		A08BBA672DAE50C700534B67 /* AddFactorSource-NameFactorSource+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSource-NameFactorSource+View.swift"; sourceTree = "<group>"; };
 		A08BBA6D2DAF937400534B67 /* AddFactorSource-SuccessView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSource-SuccessView.swift"; sourceTree = "<group>"; };
-		A08BBA722DB232D000534B67 /* LedgerHardwareDevices+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LedgerHardwareDevices+Reducer.swift"; sourceTree = "<group>"; };
-		A08BBA732DB232D000534B67 /* LedgerHardwareDevices+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LedgerHardwareDevices+View.swift"; sourceTree = "<group>"; };
 		A09F8FD32DEF4DAA00DB5614 /* RadixNameService+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RadixNameService+Interface.swift"; sourceTree = "<group>"; };
 		A09F8FD42DEF4DAA00DB5614 /* RadixNameService+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RadixNameService+Live.swift"; sourceTree = "<group>"; };
 		A09F8FD52DEF4DAA00DB5614 /* RadixNameService+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RadixNameService+Test.swift"; sourceTree = "<group>"; };
@@ -2568,8 +2561,6 @@
 		A408154A2C7E0D08005E65B9 /* ValidatorVaultItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValidatorVaultItem.swift; sourceTree = "<group>"; };
 		A40816672C7F14D4005E65B9 /* InfoLinkSheet+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InfoLinkSheet+Reducer.swift"; sourceTree = "<group>"; };
 		A40816692C7F14F1005E65B9 /* InfoLinkSheet+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InfoLinkSheet+View.swift"; sourceTree = "<group>"; };
-		A41266EE2B15578600EA38E9 /* ManualAccountRecoverySeedPhrase+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoverySeedPhrase+Reducer.swift"; sourceTree = "<group>"; };
-		A41266F02B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoverySeedPhrase+View.swift"; sourceTree = "<group>"; };
 		A41266F62B160F3F00EA38E9 /* ManualAccountRecoveryCoordinator+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoveryCoordinator+Reducer.swift"; sourceTree = "<group>"; };
 		A41266F82B160F4C00EA38E9 /* ManualAccountRecoveryCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoveryCoordinator+View.swift"; sourceTree = "<group>"; };
 		A41557522B7645E70040AD4E /* TransactionHistory+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionHistory+Reducer.swift"; sourceTree = "<group>"; };
@@ -2970,7 +2961,6 @@
 				A04AA7DF2E12E04900F38E67 /* SelectFactorSource */,
 				A09F8FD92DF6E49700DB5614 /* Discover */,
 				A08BF0502DDB67E40065766A /* DApps */,
-				A08BBA742DB232D000534B67 /* LedgerHardwareDevices */,
 				E7392AC92D68BE0E002FABDA /* AddFactorSource */,
 				E7607DD92D4CE2D20083B3A5 /* ChoosePersonas */,
 				E7607DC72D4A2ECD0083B3A5 /* ApplyShield */,
@@ -6394,15 +6384,6 @@
 			path = Success;
 			sourceTree = "<group>";
 		};
-		A08BBA742DB232D000534B67 /* LedgerHardwareDevices */ = {
-			isa = PBXGroup;
-			children = (
-				A08BBA722DB232D000534B67 /* LedgerHardwareDevices+Reducer.swift */,
-				A08BBA732DB232D000534B67 /* LedgerHardwareDevices+View.swift */,
-			);
-			path = LedgerHardwareDevices;
-			sourceTree = "<group>";
-		};
 		A08BF0502DDB67E40065766A /* DApps */ = {
 			isa = PBXGroup;
 			children = (
@@ -6754,8 +6735,6 @@
 		A41266ED2B15577200EA38E9 /* ManualAccountRecoveryScan */ = {
 			isa = PBXGroup;
 			children = (
-				A41266EE2B15578600EA38E9 /* ManualAccountRecoverySeedPhrase+Reducer.swift */,
-				A41266F02B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift */,
 				A41266F62B160F3F00EA38E9 /* ManualAccountRecoveryCoordinator+Reducer.swift */,
 				A41266F82B160F4C00EA38E9 /* ManualAccountRecoveryCoordinator+View.swift */,
 			);
@@ -8325,8 +8304,6 @@
 				A4DBBEB32C20305000D0A59E /* CardCarousel+Reducer.swift in Sources */,
 				48CFC2492ADC10D900E77A5C /* ResourcesList+View.swift in Sources */,
 				4813AFE22BC9A9AD0046BCAD /* Stage1MigrateToSargon+NetworkDefinition.swift in Sources */,
-				A08BBA752DB232D000534B67 /* LedgerHardwareDevices+View.swift in Sources */,
-				A08BBA762DB232D000534B67 /* LedgerHardwareDevices+Reducer.swift in Sources */,
 				A40816522C7E0D08005E65B9 /* TransactionSubmitRequest.swift in Sources */,
 				A40816012C7E0D08005E65B9 /* StateAccountLockersTouchedAtResponseItem.swift in Sources */,
 				5B3FDC112CF0B9DB0024BFAF /* InteractionInProgressView.swift in Sources */,
@@ -9138,7 +9115,6 @@
 				5BD1E6DF2D527C87004145D4 /* SpotCheck+View.swift in Sources */,
 				5BD1E6E02D527C87004145D4 /* SpotCheck.swift in Sources */,
 				5BBC43A92BBAC6B0005747B1 /* AppTextEditor.swift in Sources */,
-				A41266F12B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift in Sources */,
 				A00697CB2DB8D3A900810D36 /* DisplayMnemonic.swift in Sources */,
 				A00697CC2DB8D3A900810D36 /* DisplayMnemonic+View.swift in Sources */,
 				48CFC2652ADC10D900E77A5C /* EditPersonaAddEntryKinds.swift in Sources */,
@@ -9227,7 +9203,6 @@
 				48AE39E72B0CBEA800813CF3 /* SelectInactiveAccountsToAdd+View.swift in Sources */,
 				484161672BCADE2100D2B644 /* Stage1MigrateToSargon+FactorInstance.swift in Sources */,
 				48CFC5CA2ADC10DA00E77A5C /* FlowLayout.swift in Sources */,
-				A41266EF2B15578600EA38E9 /* ManualAccountRecoverySeedPhrase+Reducer.swift in Sources */,
 				48CFC5BE2ADC10DA00E77A5C /* RoundedCornerBackground.swift in Sources */,
 				A4F30C942C7CA71400F983D6 /* WithNavigationBar.swift in Sources */,
 				48AE39DD2B0CBE3900813CF3 /* AccountRecoveryScanCoordinator+View.swift in Sources */,
@@ -9848,13 +9823,6 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		A019F4B92E17D54700325968 /* XCLocalSwiftPackageReference "../sargon" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../sargon;
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCRemoteSwiftPackageReference section */
 		48FFFA972ADC1EEC00B2B213 /* XCRemoteSwiftPackageReference "AsyncExtensions" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -10053,7 +10021,7 @@
 			repositoryURL = "https://github.com/radixdlt/sargon";
 			requirement = {
 				kind = exactVersion;
-				version = 1.2.23;
+				version = 1.2.24;
 			};
 		};
 		A0C673032DA6BD7F0071606B /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */ = {
@@ -10223,10 +10191,6 @@
 			productName = Sargon;
 		};
 		A00697CE2DBA304F00810D36 /* Sargon */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Sargon;
-		};
-		A019F4BA2E17D54700325968 /* Sargon */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Sargon;
 		};

@@ -31,6 +31,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 		case deleteAccountTapped
 		case faucetButtonTapped
 		case factorSourceCardTapped
+		case factorSourceMessageTapped(FactorSourcesList.Row)
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -57,6 +58,8 @@ struct AccountPreferences: Sendable, FeatureReducer {
 			case hideAccount
 			case deleteAccount(DeleteAccountCoordinator.State)
 			case factorSourceDetail(FactorSourceDetail.State)
+			case displayMnemonic(DisplayMnemonic.State)
+			case enterMnemonic(ImportMnemonicForFactorSource.State)
 		}
 
 		@CasePathable
@@ -67,6 +70,8 @@ struct AccountPreferences: Sendable, FeatureReducer {
 			case hideAccount(ConfirmationAction)
 			case deleteAccount(DeleteAccountCoordinator.Action)
 			case factorSourceDetail(FactorSourceDetail.Action)
+			case displayMnemonic(DisplayMnemonic.Action)
+			case enterMnemonic(ImportMnemonicForFactorSource.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -84,6 +89,12 @@ struct AccountPreferences: Sendable, FeatureReducer {
 			}
 			Scope(state: \.factorSourceDetail, action: \.factorSourceDetail) {
 				FactorSourceDetail()
+			}
+			Scope(state: \.displayMnemonic, action: \.displayMnemonic) {
+				DisplayMnemonic()
+			}
+			Scope(state: \.enterMnemonic, action: \.enterMnemonic) {
+				ImportMnemonicForFactorSource()
 			}
 		}
 	}
@@ -142,6 +153,27 @@ struct AccountPreferences: Sendable, FeatureReducer {
 			}
 			state.destination = .factorSourceDetail(.init(integrity: integrity))
 			return .none
+
+		case let .factorSourceMessageTapped(row):
+			switch row.status {
+			case .seedPhraseWrittenDown, .notBackedUp:
+				return .none
+
+			case .seedPhraseNotRecoverable:
+				return exportMnemonic(integrity: row.integrity) {
+					state.destination = .displayMnemonic(.init(mnemonic: $0.mnemonicWithPassphrase.mnemonic, factorSourceID: $0.factorSourceID))
+				}
+
+			case .lostFactorSource:
+				state.destination = .enterMnemonic(.init(
+					deviceFactorSource: row.integrity.factorSource.asDevice!,
+					profileToCheck: .current
+				))
+				return .none
+
+			case .none:
+				return .none
+			}
 		}
 	}
 
@@ -202,6 +234,15 @@ struct AccountPreferences: Sendable, FeatureReducer {
 		case .hideAccount(.cancel):
 			state.destination = nil
 			return .none
+		case .enterMnemonic(.delegate(.closed)):
+			state.destination = nil
+			return .none
+		case .enterMnemonic(.delegate(.imported)):
+			state.destination = nil
+			return loadFactorSource(state: state)
+		case .displayMnemonic(.delegate(.backedUp)):
+			state.destination = nil
+			return loadFactorSource(state: state)
 		default:
 			return .none
 		}
