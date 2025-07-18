@@ -14,7 +14,7 @@ struct OnboardingCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case newProfileCreated
 	}
 

@@ -115,7 +115,7 @@ extension TransactionFee {
         static let signatureCost =                       try! Decimal192("0.01109974758")
         static let notarizingCost =                      try! Decimal192("0.0081393944")
         static let notarizingCostWhenNotaryIsSignatory = try! Decimal192("0.0084273944")
-        //    swiftformat:enable all
+		//    swiftformat:enable all
 
 		static func notarizingCost(_ notaryIsSignatory: Bool) -> Decimal192 {
 			notaryIsSignatory ? notarizingCostWhenNotaryIsSignatory : notarizingCost
