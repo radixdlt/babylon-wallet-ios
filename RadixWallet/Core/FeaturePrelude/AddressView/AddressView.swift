@@ -5,6 +5,7 @@ struct AddressView: View {
 	let isTappable: Bool
 	let imageColor: Color?
 	let isImageHidden: Bool
+	let format: AddressFormat
 	private let showLocalIdOnly: Bool
 
 	@Dependency(\.gatewaysClient) var gatewaysClient
@@ -16,12 +17,14 @@ struct AddressView: View {
 
 	init(
 		_ identifiable: LedgerIdentifiable,
+		format: AddressFormat = .default,
 		showLocalIdOnly: Bool = false,
 		isTappable: Bool = true,
 		imageColor: Color? = nil,
 		isImageHidden: Bool = false
 	) {
 		self.identifiable = identifiable
+		self.format = format
 		self.showLocalIdOnly = showLocalIdOnly
 		self.isTappable = isTappable
 		self.imageColor = imageColor
@@ -84,7 +87,9 @@ extension AddressView {
 				.foregroundStyle(.primaryText)
 
 			Text(formattedText)
-				.lineLimit(1)
+				.lineLimit(format == .full ? nil : 1)
+				.multilineTextAlignment(.leading)
+				.minimumScaleFactor(0.5)
 
 			if !isImageHidden {
 				if let imageColor {
@@ -120,9 +125,9 @@ extension AddressView {
 	private var formattedText: String {
 		switch (showLocalIdOnly, identifiable) {
 		case (true, let .address(.nonFungibleGlobalID(globalId))):
-			globalId.nonFungibleLocalId.formatted(.default)
+			globalId.nonFungibleLocalId.formatted(format)
 		default:
-			identifiable.formatted(.default)
+			identifiable.formatted(format)
 		}
 	}
 }
