@@ -255,7 +255,7 @@ struct DappDetails: Sendable, FeatureReducer {
 				let detailedPersona = dApp.detailedAuthorizedPersonas.asIdentified()[id: persona.id]
 			else { return .none }
 
-			let personaDetailsState = PersonaDetails.State(.dApp(dApp, persona: detailedPersona))
+			let personaDetailsState = PersonaDetails.State(persona: persona, .dApp(dApp, authorizedPersonaData: detailedPersona))
 			state.destination = .personaDetails(personaDetailsState)
 			return .none
 

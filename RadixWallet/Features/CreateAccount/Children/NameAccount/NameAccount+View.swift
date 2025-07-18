@@ -15,7 +15,6 @@ extension NameAccount {
 		let entityName: String
 		let sanitizedNameRequirement: SanitizedNameRequirement?
 		let hint: Hint.ViewState?
-		let useLedgerAsFactorSource: Bool
 
 		struct SanitizedNameRequirement: Equatable {
 			let sanitizedName: NonEmptyString
@@ -26,7 +25,6 @@ extension NameAccount {
 			self.titleText = state.isFirst ? L10n.CreateAccount.titleFirst : L10n.CreateAccount.titleNotFirst
 			self.subtitleText = L10n.CreateAccount.NameNewAccount.subtitle
 
-			self.useLedgerAsFactorSource = state.useLedgerAsFactorSource
 			self.entityName = state.inputtedName
 			if let sanitizedName = state.sanitizedName {
 				if sanitizedName.count > Account.nameMaxLength {
@@ -73,9 +71,6 @@ extension NameAccount {
 						)
 						.keyboardType(.asciiCapable)
 						.autocorrectionDisabled()
-						.padding(.bottom, .large3)
-
-						useLedgerAsFactorSource(with: viewStore)
 					}
 					.padding([.bottom, .horizontal], .medium1)
 				}
@@ -115,18 +110,5 @@ extension NameAccount.View {
 				.foregroundColor(.secondaryText)
 				.textStyle(.body1Regular)
 		}
-	}
-
-	private func useLedgerAsFactorSource(
-		with viewStore: ViewStoreOf<NameAccount>
-	) -> some SwiftUI.View {
-		ToggleView(
-			title: L10n.CreateEntity.NameNewEntity.ledgerTitle,
-			subtitle: L10n.CreateEntity.NameNewEntity.ledgerSubtitle,
-			isOn: viewStore.binding(
-				get: \.useLedgerAsFactorSource,
-				send: { .useLedgerAsFactorSourceToggled($0) }
-			)
-		)
 	}
 }

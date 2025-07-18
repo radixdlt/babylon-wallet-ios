@@ -10,6 +10,7 @@ struct PersonaDetails: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
+	@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 	init() {}
 
@@ -17,21 +18,15 @@ struct PersonaDetails: Sendable, FeatureReducer {
 
 	struct State: Sendable, Hashable {
 		var mode: Mode
+		var factorSourceRow: FactorSourcesList.Row?
 
 		enum Mode: Sendable, Hashable {
-			case general(Persona, dApps: IdentifiedArrayOf<DappInfo>)
+			case general(dApps: IdentifiedArrayOf<DappInfo>)
 
 			case dApp(
 				AuthorizedDappDetailed,
-				persona: AuthorizedPersonaDetailed
+				authorizedPersonaData: AuthorizedPersonaDetailed
 			)
-
-			var id: Persona.ID {
-				switch self {
-				case let .general(persona, _): persona.id
-				case let .dApp(_, persona: persona): persona.id
-				}
-			}
 		}
 
 		struct DappInfo: Sendable, Hashable, Identifiable {
@@ -49,11 +44,13 @@ struct PersonaDetails: Sendable, FeatureReducer {
 		@PresentationState
 		var destination: Destination.State? = nil
 
+		var persona: Persona
 		var identityAddress: IdentityAddress {
-			mode.id
+			persona.id
 		}
 
-		init(_ mode: Mode) {
+		init(persona: Persona, _ mode: Mode) {
+			self.persona = persona
 			self.mode = mode
 		}
 	}
@@ -67,6 +64,8 @@ struct PersonaDetails: Sendable, FeatureReducer {
 		case editAccountSharingTapped
 		case deauthorizePersonaTapped
 		case hidePersonaTapped
+		case factorSourceCardTapped
+		case factorSourceMessageTapped(FactorSourcesList.Row)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -76,32 +75,41 @@ struct PersonaDetails: Sendable, FeatureReducer {
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case editablePersonaFetched(Persona)
-		case reloaded(State.Mode)
+		case reloaded(Persona, State.Mode)
 		case dAppsUpdated(IdentifiedArrayOf<State.DappInfo>)
 		case callDone(updateControlState: WritableKeyPath<State, ControlState>, changeTo: ControlState)
 		case hideLoader(updateControlState: WritableKeyPath<State, ControlState>)
 		case dAppLoaded(AuthorizedDappDetailed)
+		case factorSourceLoaded(FactorSourceIntegrity)
 	}
 
 	// MARK: - Destination
 
 	struct Destination: DestinationReducer {
+		@CasePathable
 		enum State: Sendable, Hashable {
 			case editPersona(EditPersona.State)
 			case dAppDetails(DappDetails.State)
+			case factorSourceDetail(FactorSourceDetail.State)
+			case displayMnemonic(DisplayMnemonic.State)
+			case enterMnemonic(ImportMnemonicForFactorSource.State)
 
 			case confirmForgetAlert(AlertState<Action.ConfirmForgetAlert>)
 			case confirmHideAlert(AlertState<Action.ConfirmHideAlert>)
 		}
 
+		@CasePathable
 		enum Action: Sendable, Equatable {
 			case editPersona(EditPersona.Action)
 			case dAppDetails(DappDetails.Action)
+			case factorSourceDetail(FactorSourceDetail.Action)
+			case displayMnemonic(DisplayMnemonic.Action)
+			case enterMnemonic(ImportMnemonicForFactorSource.Action)
 
 			case confirmForgetAlert(ConfirmForgetAlert)
 			case confirmHideAlert(ConfirmHideAlert)
 
+			@CasePathable
 			enum ConfirmForgetAlert: Sendable, Equatable {
 				case confirmTapped
 				case cancelTapped
@@ -114,11 +122,20 @@ struct PersonaDetails: Sendable, FeatureReducer {
 		}
 
 		var body: some ReducerOf<Self> {
-			Scope(state: /State.editPersona, action: /Action.editPersona) {
+			Scope(state: \.editPersona, action: \.editPersona) {
 				EditPersona()
 			}
-			Scope(state: /State.dAppDetails, action: /Action.dAppDetails) {
+			Scope(state: \.dAppDetails, action: \.dAppDetails) {
 				DappDetails()
+			}
+			Scope(state: \.factorSourceDetail, action: \.factorSourceDetail) {
+				FactorSourceDetail()
+			}
+			Scope(state: \.displayMnemonic, action: \.displayMnemonic) {
+				DisplayMnemonic()
+			}
+			Scope(state: \.enterMnemonic, action: \.enterMnemonic) {
+				ImportMnemonicForFactorSource()
 			}
 		}
 	}
@@ -127,7 +144,7 @@ struct PersonaDetails: Sendable, FeatureReducer {
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(destinationPath, action: /Action.destination) {
+			.ifLet(destinationPath, action: \.destination) {
 				Destination()
 			}
 	}
@@ -137,10 +154,11 @@ struct PersonaDetails: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			guard case let .general(_, dApps) = state.mode else { return .none }
-			return .run { send in
+			let loadFSEffect = loadFactorSource(state: state)
+			guard case let .general(dApps) = state.mode else { return loadFSEffect }
+			return loadFSEffect.merge(with: .run { send in
 				await send(.internal(.dAppsUpdated(addingDappMetadata(to: dApps))))
-			}
+			})
 
 		case let .dAppTapped(dAppID):
 			return .run { send in
@@ -153,18 +171,13 @@ struct PersonaDetails: Sendable, FeatureReducer {
 
 		case .editPersonaTapped:
 			switch state.mode {
-			case let .general(persona, _):
-				return .send(.internal(.editablePersonaFetched(persona)))
-
-			case let .dApp(_, persona: persona):
-				return .run { send in
-					let persona = try await personasClient.getPersona(id: persona.id)
-					await send(.internal(.editablePersonaFetched(persona)))
-				} catch: { error, _ in
-					loggerGlobal.error("Could not get persona \(persona.id), error: \(error)")
-					errorQueue.schedule(error)
-				}
+			case .general:
+				state.destination = .editPersona(.init(mode: .edit(state.persona)))
+			case let .dApp(_, detailedPersona):
+				let required = Set(detailedPersona.sharedPersonaData.entries.map(\.value.discriminator))
+				state.destination = .editPersona(.init(mode: .dapp(persona: state.persona, requiredEntries: required)))
 			}
+			return .none
 
 		case .editAccountSharingTapped:
 			return .none
@@ -180,32 +193,50 @@ struct PersonaDetails: Sendable, FeatureReducer {
 
 			state.destination = .confirmHideAlert(.confirmHide)
 			return .none
+
+		case .factorSourceCardTapped:
+			guard let integrity = state.factorSourceRow?.integrity else {
+				return .none
+			}
+			state.destination = .factorSourceDetail(.init(integrity: integrity))
+			return .none
+
+		case let .factorSourceMessageTapped(row):
+			switch row.status {
+			case .seedPhraseWrittenDown, .notBackedUp:
+				return .none
+
+			case .seedPhraseNotRecoverable:
+				return exportMnemonic(integrity: row.integrity) {
+					state.destination = .displayMnemonic(.init(mnemonic: $0.mnemonicWithPassphrase.mnemonic, factorSourceID: $0.factorSourceID))
+				}
+
+			case .lostFactorSource:
+				state.destination = .enterMnemonic(.init(
+					deviceFactorSource: row.integrity.factorSource.asDevice!,
+					profileToCheck: .current
+				))
+				return .none
+
+			case .none:
+				return .none
+			}
 		}
 	}
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .editablePersonaFetched(persona):
-			switch state.mode {
-			case .general:
-				state.destination = .editPersona(.init(mode: .edit(persona)))
-			case let .dApp(_, detailedPersona):
-				let required = Set(detailedPersona.sharedPersonaData.entries.map(\.value.discriminator))
-				state.destination = .editPersona(.init(mode: .dapp(persona: persona, requiredEntries: required)))
-			}
-
-			return .none
-
 		case let .dAppsUpdated(updatedDapps):
-			guard case .general(let persona, var dApps) = state.mode else { return .none }
+			guard case var .general(dApps) = state.mode else { return .none }
 			for updatedDapp in updatedDapps where dApps.ids.contains(updatedDapp.id) {
 				dApps[id: updatedDapp.id] = updatedDapp
 			}
 
-			state.mode = .general(persona, dApps: dApps)
+			state.mode = .general(dApps: dApps)
 			return .none
 
-		case let .reloaded(mode):
+		case let .reloaded(persona, mode):
+			state.persona = persona
 			state.mode = mode
 			return .none
 
@@ -220,22 +251,31 @@ struct PersonaDetails: Sendable, FeatureReducer {
 		case let .dAppLoaded(dApp):
 			state.destination = .dAppDetails(.init(dApp: dApp, context: .personaDetails))
 			return .none
+
+		case let .factorSourceLoaded(fs):
+			state.factorSourceRow = .init(
+				integrity: fs,
+				linkedEntities: .init(accounts: [], personas: [], hasHiddenEntities: false),
+				status: .init(integrity: fs),
+				selectability: .selectable
+			)
+			return .none
 		}
 	}
 
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case let .editPersona(.delegate(.personaSaved(persona))):
-			guard persona.id == state.mode.id else { return .none }
-			return reloadEffect(mode: state.mode, notifyDelegate: true)
+		case .editPersona(.delegate(.personaSaved)):
+			state.destination = nil
+			return reloadEffect(state: state, notifyDelegate: true)
 
 		case .dAppDetails(.delegate(.dAppForgotten)):
 			state.destination = nil
-			return reloadEffect(mode: state.mode, notifyDelegate: false)
+			return reloadEffect(state: state, notifyDelegate: false)
 
 		case .confirmForgetAlert(.confirmTapped):
-			guard case let .dApp(dApp, persona: persona) = state.mode else { return .none }
-			let (personaID, dAppID, networkID) = (persona.id, dApp.dAppDefinitionAddress, dApp.networkId)
+			guard case let .dApp(dApp, authorizedPersonaData) = state.mode else { return .none }
+			let (personaID, dAppID, networkID) = (authorizedPersonaData.id, dApp.dAppDefinitionAddress, dApp.networkId)
 			return .run { send in
 				try await authorizedDappsClient.deauthorizePersonaFromDapp(personaID, dAppID, networkID)
 				await send(.delegate(.personaDeauthorized))
@@ -245,49 +285,61 @@ struct PersonaDetails: Sendable, FeatureReducer {
 			}
 
 		case .confirmHideAlert(.confirmTapped):
-			guard case let .general(persona, _) = state.mode else {
+			guard case .general = state.mode else {
 				return .none
 			}
-			return .run { send in
-				try await entitiesVisibilityClient.hidePersona(persona.id)
+			return .run { [id = state.persona.id] send in
+				try await entitiesVisibilityClient.hidePersona(id)
 				overlayWindowClient.scheduleHUD(.personaHidden)
 				await send(.delegate(.personaHidden))
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
 
+		case .enterMnemonic(.delegate(.closed)):
+			state.destination = nil
+			return .none
+
+		case .enterMnemonic(.delegate(.imported)):
+			state.destination = nil
+			return loadFactorSource(state: state)
+
+		case .displayMnemonic(.delegate(.backedUp)):
+			state.destination = nil
+			return loadFactorSource(state: state)
+
 		default:
 			return .none
 		}
 	}
 
-	private func reloadEffect(mode: State.Mode, notifyDelegate: Bool) -> Effect<Action> {
-		.run { send in
-			let updated = try await reload(in: mode)
-			await send(.internal(.reloaded(updated)))
+	private func reloadEffect(state: State, notifyDelegate: Bool) -> Effect<Action> {
+		.run { [id = state.persona.id, mode = state.mode] send in
+			let updatedPersona = try await personasClient.getPersona(id: id)
+			let updatedMode = try await reload(personaID: id, mode: mode)
+			await send(.internal(.reloaded(updatedPersona, updatedMode)))
 			if notifyDelegate {
-				await send(.delegate(.personaChanged(mode.id)))
+				await send(.delegate(.personaChanged(id)))
 			}
 		} catch: { error, _ in
 			loggerGlobal.error("Failed to reload, error: \(error)")
 		}
 	}
 
-	private func reload(in mode: State.Mode) async throws -> State.Mode {
+	private func reload(personaID: Persona.ID, mode: State.Mode) async throws -> State.Mode {
 		switch mode {
-		case let .dApp(dApp, persona: persona):
+		case let .dApp(dApp, auhtorizedPersonaData):
 			let updatedDapp = try await authorizedDappsClient.getDetailedDapp(dApp.dAppDefinitionAddress)
 			let identifiedDetailedAuthorizedPersonas = updatedDapp.detailedAuthorizedPersonas.asIdentified()
-			guard let updatedPersona = identifiedDetailedAuthorizedPersonas[id: persona.id] else {
-				throw ReloadError.personaNotPresentInDapp(persona.id, updatedDapp.dAppDefinitionAddress)
+			guard let updatedPersona = identifiedDetailedAuthorizedPersonas[id: auhtorizedPersonaData.id] else {
+				throw ReloadError.personaNotPresentInDapp(auhtorizedPersonaData.id, updatedDapp.dAppDefinitionAddress)
 			}
-			return .dApp(updatedDapp, persona: updatedPersona)
-		case let .general(oldPersona, _):
-			let persona = try await personasClient.getPersona(id: oldPersona.id)
-			let dApps = try await authorizedDappsClient.getDappsAuthorizedByPersona(oldPersona.id)
+			return .dApp(updatedDapp, authorizedPersonaData: updatedPersona)
+		case .general:
+			let dApps = try await authorizedDappsClient.getDappsAuthorizedByPersona(personaID)
 				.map(State.DappInfo.init)
 
-			return await .general(persona, dApps: addingDappMetadata(to: dApps.asIdentified()))
+			return await .general(dApps: addingDappMetadata(to: dApps.asIdentified()))
 		}
 	}
 
@@ -311,7 +363,7 @@ struct PersonaDetails: Sendable, FeatureReducer {
 		call: @escaping @Sendable (IdentityAddress) async throws -> Void
 	) -> Effect<Action> {
 		state[keyPath: buttonState] = .loading(.local)
-		return .run { [address = state.mode.id] send in
+		return .run { [address = state.identityAddress] send in
 			try await call(address)
 			await send(.internal(.callDone(updateControlState: buttonState, changeTo: onSuccess)))
 		} catch: { error, send in
@@ -324,6 +376,19 @@ struct PersonaDetails: Sendable, FeatureReducer {
 
 	enum ReloadError: Error {
 		case personaNotPresentInDapp(Persona.ID, AuthorizedDapp.ID)
+	}
+
+	private func loadFactorSource(state: State) -> Effect<Action> {
+		guard let unsecuredFI = state.persona.unsecuredControllingFactorInstance?.factorInstance else {
+			return .none
+		}
+
+		return .run { send in
+			if let fs = try? await factorSourcesClient.getFactorSource(of: unsecuredFI) {
+				let integrity = try await SargonOS.shared.factorSourceIntegrity(factorSource: fs)
+				await send(.internal(.factorSourceLoaded(integrity)))
+			}
+		}
 	}
 }
 

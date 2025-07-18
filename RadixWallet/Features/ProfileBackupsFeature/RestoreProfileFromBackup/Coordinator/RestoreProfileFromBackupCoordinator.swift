@@ -46,7 +46,7 @@ struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case profileImported(skippedAnyMnemonic: Bool)
+		case profileImported
 		case failedToImportProfileDueToMnemonics
 		case backToStartOfOnboarding
 		case profileCreatedFromImportedBDFS
@@ -97,14 +97,14 @@ struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .startImportMnemonicsFlow(profile):
-			state.destination = .importMnemonicsFlow(.init(context: .fromOnboarding(profile: profile)))
+			state.destination = .importMnemonicsFlow(.init(profileToCheck: .specific(profile)))
 			return .none
 		}
 	}
 
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case let .importMnemonicsFlow(.delegate(.finishedImportingMnemonics(skipList, _, skippedMainBdfs))):
+		case let .importMnemonicsFlow(.delegate(.finishedImportingMnemonics(importedFactorSourceIDs))):
 			loggerGlobal.notice("Starting import snapshot process...")
 			guard let profileSelection = state.profileSelection else {
 				preconditionFailure("Expected to have a profile")
@@ -112,19 +112,13 @@ struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 			return .run { send in
 				loggerGlobal.notice("Importing snapshot...")
 
-				let factorSourceIDs: Set<FactorSourceIDFromHash> = .init(
-					profileSelection.profile.factorSources.compactMap { $0.extract(DeviceFactorSource.self) }.map(\.id)
-				)
 				try await transportProfileClient.importProfile(
 					profileSelection.profile,
-					factorSourceIDs,
-					skippedMainBdfs,
+					importedFactorSourceIDs,
 					profileSelection.containsP2PLinks
 				)
 
-				await send(.delegate(.profileImported(
-					skippedAnyMnemonic: !skipList.isEmpty
-				)))
+				await send(.delegate(.profileImported))
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}

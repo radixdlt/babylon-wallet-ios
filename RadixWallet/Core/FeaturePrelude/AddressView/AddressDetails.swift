@@ -36,6 +36,7 @@ struct AddressDetails: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.accountsClient) var accountsClient
+	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.qrGeneratorClient) var qrGeneratorClient
 	@Dependency(\.pasteboardClient) var pasteboardClient
@@ -119,6 +120,8 @@ struct AddressDetails: Sendable, FeatureReducer {
 		switch address {
 		case let .account(address):
 			try await accountsClient.getAccountByAddress(address).displayName.rawValue
+		case let .identity(address):
+			try await personasClient.getPersona(id: address).displayName.rawValue
 		case let .resource(address):
 			try await onLedgerEntitiesClient.getResource(address).resourceTitle
 		case let .validator(address):

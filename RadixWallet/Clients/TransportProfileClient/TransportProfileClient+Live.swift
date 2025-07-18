@@ -10,9 +10,9 @@ extension TransportProfileClient: DependencyKey {
 		@Dependency(\.cloudBackupClient) var cloudBackupClient
 
 		return Self(
-			importProfile: { profile, factorSourceIDs, skippedMainBdfs, containsP2PLinks in
+			importProfile: { profile, factorSourceIDs, containsP2PLinks in
 				do {
-					try await profileStore.importProfile(profile, skippedMainBdfs: skippedMainBdfs)
+					try await profileStore.importProfile(profile)
 					let profile = await profileStore.profile()
 					if profile.appPreferences.security.isCloudProfileSyncEnabled {
 						try? await cloudBackupClient.claimProfileOnICloud(profile)

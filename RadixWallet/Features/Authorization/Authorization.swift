@@ -7,10 +7,7 @@ struct Authorization: Sendable, FeatureReducer {
 		var factorSourceAccess: FactorSourceAccess.State
 
 		init?(purpose: AuthorizationPurpose) {
-			guard let factorSource = try? SargonOS.shared.mainBdfs() else {
-				return nil
-			}
-			self.factorSourceAccess = .init(factorSource: factorSource.asGeneral, purpose: purpose.factorSourceAccessPurpose)
+			fatalError("Not implemented")
 		}
 	}
 

@@ -90,6 +90,7 @@ extension PickShieldBuilderSeedingFactors {
 							kind: .instance(factorSource: item.value, kind: .short(showDetails: false)),
 							mode: .selection(
 								type: .checkmark,
+								selectionEnabled: true,
 								isSelected: item.isSelected
 							)
 						)

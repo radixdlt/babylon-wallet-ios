@@ -4,7 +4,7 @@ import Sargon
 extension FactorSourceCommon {
 	static func new(
 		cryptoParameters: FactorSourceCryptoParameters
-	) throws -> Self {
+	) -> Self {
 		@Dependency(\.date) var date
 		return .init(
 			cryptoParameters: cryptoParameters,

@@ -15,7 +15,7 @@ extension ManualAccountRecoveryCoordinator {
 
 	@MainActor
 	struct View: SwiftUI.View {
-		private let store: Store
+		@Perception.Bindable var store: Store
 
 		init(store: Store) {
 			self.store = store
@@ -25,12 +25,14 @@ extension ManualAccountRecoveryCoordinator {
 
 extension ManualAccountRecoveryCoordinator.View {
 	var body: some View {
-		NavigationStackStore(
-			store.scope(state: \.path) { .child(.path($0)) }
-		) {
-			root()
-		} destination: {
-			PathView(store: $0)
+		WithPerceptionTracking {
+			NavigationStack(
+				path: $store.scope(state: \.path, action: \.child.path)
+			) {
+				root()
+			} destination: {
+				PathView(store: $0)
+			}
 		}
 	}
 
@@ -73,6 +75,7 @@ extension ManualAccountRecoveryCoordinator.View {
 
 			Text(L10n.AccountRecoveryScan.subtitle)
 				.textStyle(.body1Regular)
+				.multilineTextAlignment(.center)
 				.padding(.horizontal, .large2)
 		}
 	}
@@ -95,14 +98,8 @@ extension ManualAccountRecoveryCoordinator.View {
 				.padding(.horizontal, .large2)
 				.padding(.bottom, .large3)
 
-			Button(L10n.AccountRecoveryScan.seedPhraseButtonTitle) {
-				store.send(.view(.useSeedPhraseTapped(isOlympia: false)))
-			}
-			.padding(.horizontal, .medium3)
-			.padding(.bottom, .small1)
-
-			Button(L10n.AccountRecoveryScan.ledgerButtonTitle) {
-				store.send(.view(.useLedgerTapped(isOlympia: false)))
+			Button("Recover Babylon Accounts") {
+				store.send(.view(.recoverBabylonAccountsTapped))
 			}
 			.padding(.horizontal, .medium3)
 		}
@@ -121,14 +118,8 @@ extension ManualAccountRecoveryCoordinator.View {
 				.padding(.horizontal, .large2)
 				.padding(.bottom, .large3)
 
-			Button(L10n.AccountRecoveryScan.seedPhraseButtonTitle) {
-				store.send(.view(.useSeedPhraseTapped(isOlympia: true)))
-			}
-			.padding(.horizontal, .medium3)
-			.padding(.bottom, .small1)
-
-			Button(L10n.AccountRecoveryScan.ledgerButtonTitle) {
-				store.send(.view(.useLedgerTapped(isOlympia: true)))
+			Button("Recover Olympia Accounts") {
+				store.send(.view(.recoverOlympiaAccountsTapped))
 			}
 			.padding(.horizontal, .medium3)
 			.padding(.bottom, .medium1)
@@ -150,30 +141,20 @@ private extension ManualAccountRecoveryCoordinator.View {
 		var body: some View {
 			SwitchStore(store) { state in
 				switch state {
-				case .seedPhrase:
-					CaseLet(
-						/ManualAccountRecoveryCoordinator.Path.State.seedPhrase,
-						action: ManualAccountRecoveryCoordinator.Path.Action.seedPhrase,
-						then: { ManualAccountRecoverySeedPhrase.View(store: $0) }
-					)
-				case .ledger:
-					CaseLet(
-						/ManualAccountRecoveryCoordinator.Path.State.ledger,
-						action: ManualAccountRecoveryCoordinator.Path.Action.ledger,
-						then: { LedgerHardwareDevices.View(store: $0) }
-					)
+				case .selectFactorSource:
+					if let store = store.scope(state: \.selectFactorSource, action: \.selectFactorSource) {
+						SelectFactorSource.View(store: store)
+					}
+
 				case .accountRecoveryScan:
-					CaseLet(
-						/ManualAccountRecoveryCoordinator.Path.State.accountRecoveryScan,
-						action: ManualAccountRecoveryCoordinator.Path.Action.accountRecoveryScan,
-						then: { AccountRecoveryScanCoordinator.View(store: $0) }
-					)
+					if let store = store.scope(state: \.accountRecoveryScan, action: \.accountRecoveryScan) {
+						AccountRecoveryScanCoordinator.View(store: store)
+					}
+
 				case .recoveryComplete:
-					CaseLet(
-						/ManualAccountRecoveryCoordinator.Path.State.recoveryComplete,
-						action: ManualAccountRecoveryCoordinator.Path.Action.recoveryComplete,
-						then: { RecoverWalletControlWithBDFSComplete.View(store: $0) }
-					)
+					if let store = store.scope(state: \.recoveryComplete, action: \.recoveryComplete) {
+						RecoverWalletControlWithBDFSComplete.View(store: store)
+					}
 				}
 			}
 		}

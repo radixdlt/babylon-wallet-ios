@@ -26,17 +26,15 @@ struct Troubleshooting: Sendable, FeatureReducer {
 		case loadedIsLegacyImportEnabled(Bool)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
-		case goToAccountList
-	}
-
 	struct Destination: DestinationReducer {
+		@CasePathable
 		enum State: Sendable, Hashable {
 			case accountRecovery(ManualAccountRecoveryCoordinator.State)
 			case importOlympiaWallet(ImportOlympiaWalletCoordinator.State)
 			case factoryReset(FactoryReset.State)
 		}
 
+		@CasePathable
 		enum Action: Sendable, Equatable {
 			case accountRecovery(ManualAccountRecoveryCoordinator.Action)
 			case importOlympiaWallet(ImportOlympiaWalletCoordinator.Action)
@@ -44,13 +42,13 @@ struct Troubleshooting: Sendable, FeatureReducer {
 		}
 
 		var body: some ReducerOf<Self> {
-			Scope(state: /State.accountRecovery, action: /Action.accountRecovery) {
+			Scope(state: \.accountRecovery, action: \.accountRecovery) {
 				ManualAccountRecoveryCoordinator()
 			}
-			Scope(state: /State.importOlympiaWallet, action: /Action.importOlympiaWallet) {
+			Scope(state: \.importOlympiaWallet, action: \.importOlympiaWallet) {
 				ImportOlympiaWalletCoordinator()
 			}
-			Scope(state: /State.factoryReset, action: /Action.factoryReset) {
+			Scope(state: \.factoryReset, action: \.factoryReset) {
 				FactoryReset()
 			}
 		}
@@ -65,7 +63,7 @@ struct Troubleshooting: Sendable, FeatureReducer {
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(destinationPath, action: /Action.destination) {
+			.ifLet(destinationPath, action: \.destination) {
 				Destination()
 			}
 	}
@@ -121,16 +119,13 @@ struct Troubleshooting: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case .accountRecovery(.delegate(.gotoAccountList)):
-			return .send(.delegate(.goToAccountList))
+		case .accountRecovery(.delegate(.completed)):
+			state.destination = nil
+			return .none
 
-		case let .importOlympiaWallet(.delegate(.finishedMigration(goToAccountList))):
-			if goToAccountList {
-				return .send(.delegate(.goToAccountList))
-			} else {
-				state.destination = nil
-				return .none
-			}
+		case .importOlympiaWallet(.delegate(.finishedMigration)):
+			state.destination = nil
+			return .none
 
 		default:
 			return .none
