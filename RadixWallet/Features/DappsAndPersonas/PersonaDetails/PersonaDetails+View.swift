@@ -34,37 +34,6 @@ extension PersonaDetails.View {
 
 					InfoSection(store: store)
 
-					if let factorSourceRow = viewStore.factorSourceRow {
-						VStack(alignment: .leading, spacing: .medium2) {
-							Text("Secured with")
-								.textStyle(.body1HighImportance)
-								.foregroundColor(.secondaryText)
-								.padding(.horizontal, .medium1)
-
-							FactorSourceCard(
-								kind: .instance(
-									factorSource: factorSourceRow.integrity.factorSource,
-									kind: .extended
-								),
-								mode: .display,
-								messages: factorSourceRow.messages,
-								onAction: { action in
-									switch action {
-									case .messageTapped:
-										store.send(.view(.factorSourceMessageTapped(factorSourceRow)))
-									case .removeTapped:
-										break
-									}
-								}
-							)
-							.padding(.horizontal, .medium1)
-							.onTapGesture {
-								viewStore.send(.factorSourceCardTapped)
-							}
-						}
-						.padding(.top, .large3)
-					}
-
 					Button(L10n.AuthorizedDapps.PersonaDetails.editPersona) {
 						viewStore.send(.editPersonaTapped)
 					}
@@ -309,13 +278,15 @@ private extension PersonaDetails.State {
 			.init(
 				dAppInfo: dAppInfo,
 				personaName: persona.displayName.rawValue,
-				personaData: authorizedPersonaData.sharedPersonaData
+				personaData: authorizedPersonaData.sharedPersonaData,
+				factorSourceRow: factorSourceRow
 			)
 		case .general:
 			.init(
 				dAppInfo: nil,
 				personaName: persona.displayName.rawValue,
-				personaData: persona.personaData
+				personaData: persona.personaData,
+				factorSourceRow: factorSourceRow
 			)
 		}
 	}
@@ -339,6 +310,7 @@ extension PersonaDetails.View {
 			let fullName: String?
 			let emailAddresses: [String]?
 			let phoneNumbers: [String]?
+			let factorSourceRow: FactorSourcesList.Row?
 
 			struct DappInfo: Equatable {
 				let name: String
@@ -348,13 +320,15 @@ extension PersonaDetails.View {
 			init(
 				dAppInfo: DappInfo?,
 				personaName: String,
-				personaData: PersonaData?
+				personaData: PersonaData?,
+				factorSourceRow: FactorSourcesList.Row?
 			) {
 				self.dAppInfo = dAppInfo
 				self.personaName = personaName
 				self.fullName = personaData?.name?.value.formatted
 				self.emailAddresses = personaData?.emailAddresses.collection.map(\.value.email)
 				self.phoneNumbers = personaData?.phoneNumbers.collection.map(\.value.number)
+				self.factorSourceRow = factorSourceRow
 			}
 		}
 
@@ -364,6 +338,34 @@ extension PersonaDetails.View {
 			WithViewStore(store, observe: \.infoSectionViewState) { viewStore in
 				VStack(alignment: .leading, spacing: .medium1) {
 					VPair(heading: L10n.AuthorizedDapps.PersonaDetails.personaLabelHeading, item: viewStore.personaName)
+
+					Separator()
+
+					if let factorSourceRow = viewStore.factorSourceRow {
+						Text("Secured with")
+							.textStyle(.body1HighImportance)
+							.foregroundColor(.secondaryText)
+
+						FactorSourceCard(
+							kind: .instance(
+								factorSource: factorSourceRow.integrity.factorSource,
+								kind: .extended
+							),
+							mode: .display,
+							messages: factorSourceRow.messages,
+							onAction: { action in
+								switch action {
+								case .messageTapped:
+									viewStore.send(.view(.factorSourceMessageTapped(factorSourceRow)))
+								case .removeTapped:
+									break
+								}
+							}
+						)
+						.onTapGesture {
+							viewStore.send(.view(.factorSourceCardTapped))
+						}
+					}
 
 					Separator()
 

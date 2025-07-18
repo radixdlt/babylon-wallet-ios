@@ -75,10 +75,11 @@ extension AddFactorSource {
 			case let .saveTapped(name):
 				state.factorSource.setName(name)
 				state.isAddingFactorSource = true
-				let mwp = state.deviceMnemonicBuilder.getMnemonicWithPassphrase()
-				return .run { [factorSource = state.factorSource] send in
+
+				return .run { [factorSource = state.factorSource, builder = state.deviceMnemonicBuilder] send in
 					let result = await TaskResult {
 						if let deviceFS = factorSource.asDevice {
+							let mwp = builder.getMnemonicWithPassphrase()
 							try secureStorageClient.saveMnemonicForFactorSource(
 								.init(
 									mnemonicWithPassphrase: mwp,
