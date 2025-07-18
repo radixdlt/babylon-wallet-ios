@@ -2,9 +2,6 @@ import Sargon
 
 // MARK: - DeviceFactorSourceClient
 struct DeviceFactorSourceClient: Sendable {
-	/// Fetched accounts and personas on current network that are controlled by a device factor source, for every factor source in current profile
-	var controlledEntities: GetControlledEntities
-
 	/// The entities (`Accounts` & `Personas`) that are in bad state. This is, that either:
 	/// - their mnmemonic is missing (entity was imported but seed phrase never entered), or
 	/// - their mnmemonic is not backed up (entity was created but seed phrase never written down).
@@ -15,8 +12,6 @@ struct DeviceFactorSourceClient: Sendable {
 
 // MARK: DeviceFactorSourceClient.onDeviceHDPublicKey
 extension DeviceFactorSourceClient {
-	typealias GetControlledEntities = @Sendable (Profile?) async throws -> IdentifiedArrayOf<EntitiesControlledByFactorSource>
-
 	typealias EntitiesInBadState = @Sendable () async throws -> AnyAsyncSequence<(withoutControl: AddressesOfEntitiesInBadState, unrecoverable: AddressesOfEntitiesInBadState)>
 	typealias DerivePublicKeys = @Sendable (KeyDerivationRequestPerFactorSource) async throws -> [HierarchicalDeterministicFactorInstance]
 }
