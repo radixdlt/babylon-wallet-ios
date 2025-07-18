@@ -55,7 +55,7 @@ extension PersonaDetails.View {
 					} else {
 						IfLetStore(store.scope(state: \.dAppsSection, action: \.view)) {
 							DappsSection(store: $0)
-								.background(.secondaryBackground)
+								.background(.tertiaryBackground)
 						}
 
 						Button(L10n.AuthorizedDapps.PersonaDetails.hideThisPersona) {
@@ -72,7 +72,7 @@ extension PersonaDetails.View {
 				}
 			}
 		}
-		.background(.primaryBackground)
+		.background(.secondaryBackground)
 		.destinations(with: store)
 	}
 }

@@ -22,7 +22,7 @@ extension PersonaFeature {
 						viewStore.send(.tapped)
 					} contents: {
 						VStack(spacing: .zero) {
-							PlainListRow(personaName: viewStore.displayName, personaThumbnail: viewStore.thumbnail)
+							PlainListRow(personaName: viewStore.displayName, personaThumbnail: viewStore.thumbnail, tappable: tappable)
 							if showShield {
 								EntitySecurityProblemsView(config: viewStore.securityProblemsConfig) {
 									viewStore.send(.securityProblemsTapped)
@@ -34,7 +34,7 @@ extension PersonaFeature {
 					}
 				} else {
 					Card {
-						PlainListRow(personaName: viewStore.displayName, personaThumbnail: viewStore.thumbnail)
+						PlainListRow(personaName: viewStore.displayName, personaThumbnail: viewStore.thumbnail, tappable: tappable)
 					}
 				}
 			}
@@ -43,10 +43,11 @@ extension PersonaFeature {
 }
 
 extension PlainListRow where Accessory == Image, Bottom == StackedHints, Icon == Thumbnail {
-	init(personaName: String, personaThumbnail: URL?) {
+	init(personaName: String, personaThumbnail: URL?, tappable: Bool) {
 		self.init(
 			context: .dappAndPersona,
 			title: personaName,
+			accessory: tappable ? .chevronRight : nil,
 			icon: {
 				Thumbnail(.persona, url: personaThumbnail)
 			}
