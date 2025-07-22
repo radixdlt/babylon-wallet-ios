@@ -51,10 +51,8 @@ extension FactorSourceAccess.State {
 				return S.Arculus.signMessage
 			case .spotCheck, .proveOwnership, .encryptMessage:
 				return S.Arculus.message
-			case .updateFactorConfig, .deriveAccounts:
-				return S.Arculus.deriveKeysMessage
-			case .createAccountAuthorization, .createPersonaAuthorization:
-				fatalError("Not supported")
+			case .updateFactorConfig, .deriveAccounts, .createAccountAuthorization, .createPersonaAuthorization:
+				return L10n.Authorization.CreateEntity.message
 			}
 
 		case .password:

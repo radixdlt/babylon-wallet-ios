@@ -82,6 +82,9 @@ private extension Signing {
 			case let .ledger(ledger):
 				try await signLedger(purpose: purpose, ledger: ledger)
 
+			case let .arculusCard(arculus):
+				try await signArculus(purpose: purpose, arculus: arculus)
+
 			default:
 				fatalError("Not implemented")
 			}
@@ -89,6 +92,23 @@ private extension Signing {
 
 		} catch: { error, send in
 			await handleError(factorSource: factorSource, error: error, send: send)
+		}
+	}
+
+	func signArculus(purpose: State.Purpose, arculus: ArculusCardFactorSource) async throws -> Signatures {
+		switch purpose {
+		case let .transaction(input):
+			try await .transaction(SargonOS.shared.arculusCardSignTransaction(factorSource: arculus, pin: "123456", perTransaction: input.perTransaction))
+
+		case let .subintent(input):
+			try await .subintent(
+				SargonOS.shared.arculusCardSignSubintent(factorSource: arculus, pin: "123456", perTransaction: input.perTransaction)
+			)
+
+		case let .auth(input):
+			try await .auth(
+				SargonOS.shared.arculusCardSignAuth(factorSource: arculus, pin: "123456", perTransaction: input.perTransaction)
+			)
 		}
 	}
 

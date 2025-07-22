@@ -76,6 +76,9 @@ private extension DerivePublicKeys {
 					factorSourceId: input.factorSourceId
 				)
 
+			case let .arculusCard(arculus):
+				try await SargonOS.shared.arculusCardDerivePublicKeys(factorSource: arculus, paths: input.derivationPaths)
+
 			default:
 				fatalError("Not implemented")
 			}

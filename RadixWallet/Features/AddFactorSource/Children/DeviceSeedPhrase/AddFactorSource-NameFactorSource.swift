@@ -89,6 +89,11 @@ extension AddFactorSource {
 							try? userDefaults.addFactorSourceIDOfBackedUpMnemonic(factorSource.id.extract())
 						}
 
+						if let arculusFS = factorSource.asArculus {
+							let mwp = builder.getMnemonicWithPassphrase()
+							_ = try await SargonOS.shared.arculusConfigureCardWithMnemonic(mnemonic: mwp.mnemonic, pin: "123456")
+						}
+
 						_ = try await SargonOS.shared.addFactorSource(factorSource: factorSource)
 						return EqVoid.instance
 					}

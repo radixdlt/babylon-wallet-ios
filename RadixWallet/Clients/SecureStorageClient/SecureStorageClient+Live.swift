@@ -330,6 +330,8 @@ extension SecureStorageClient: DependencyKey {
 				keychainKey = activeProfileId.keychainKey
 			case let .deviceFactorSourceMnemonic(factorSourceId):
 				keychainKey = key(factorSourceID: factorSourceId)
+			case .arculusCardFactorSourcePin:
+				return false
 			}
 			return try keychainClient.contains(keychainKey)
 		}

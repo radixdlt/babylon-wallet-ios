@@ -20,7 +20,8 @@ extension AddFactorSource {
 
 		enum DelegateAction: Sendable, Equatable {
 			case completed
-			case completedWithLedgerTempFS(LedgerHardwareWalletFactorSource)
+			case completedWithLedgerDeviceInfo(LedgerDeviceInfo)
+			case completeWithArculusCardInfo(ArculusCardInfo)
 		}
 
 		enum InternalAction: Sendable, Equatable {
@@ -80,6 +81,9 @@ extension AddFactorSource {
 					}
 					state.destination = .hardwareFactorIdentification(.init(kind: state.kind))
 					return .none
+				} else if state.kind == .arculusCard {
+					state.destination = .hardwareFactorIdentification(.init(kind: state.kind))
+					return .none
 				}
 				return .send(.delegate(.completed))
 			}
@@ -104,8 +108,11 @@ extension AddFactorSource {
 
 			case let .hardwareFactorIdentification(.delegate(.completedWithLedger(ledgerDeviceInfo))):
 				state.destination = nil
-				let fs = LedgerHardwareWalletFactorSource.from(device: ledgerDeviceInfo, name: "")
-				return .send(.delegate(.completedWithLedgerTempFS(fs)))
+				return .send(.delegate(.completedWithLedgerDeviceInfo(ledgerDeviceInfo)))
+
+			case let .hardwareFactorIdentification(.delegate(.completedWithArculus(cardInfo))):
+				state.destination = nil
+				return .send(.delegate(.completeWithArculusCardInfo(cardInfo)))
 
 			default:
 				return .none

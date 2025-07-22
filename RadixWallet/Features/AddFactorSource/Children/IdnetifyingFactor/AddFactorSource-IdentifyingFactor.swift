@@ -25,6 +25,7 @@ extension AddFactorSource {
 
 		enum DelegateAction: Sendable, Equatable {
 			case completedWithLedger(LedgerDeviceInfo)
+			case completedWithArculus(ArculusCardInfo)
 		}
 
 		struct Destination: DestinationReducer {
@@ -63,8 +64,13 @@ extension AddFactorSource {
 				switch state.kind {
 				case .ledgerHqHardwareWallet:
 					getLedgerHardwareDeviceInfo()
+
 				case .arculusCard:
-					.none
+					.run { send in
+						let info = try await SargonOS.shared.arculusGetCardInfo()
+						await send(.delegate(.completedWithArculus(info)))
+					}
+
 				default:
 					.none
 				}
