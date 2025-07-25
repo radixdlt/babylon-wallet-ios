@@ -152,7 +152,7 @@ struct CarouselCardView: View {
 		case .connector:
 			L10n.HomePageCarousel.UseDappsOnDesktop.title
 		case .joinRadixRewards:
-			"Join Radix Rewards"
+			L10n.HomePageCarousel.JoinRadixRewards.title
 		}
 	}
 
@@ -167,7 +167,7 @@ struct CarouselCardView: View {
 		case .connector:
 			L10n.HomePageCarousel.UseDappsOnDesktop.text
 		case .joinRadixRewards:
-			"Earn weekly Season Points by engaging in genuine on-chain activities."
+			L10n.HomePageCarousel.JoinRadixRewards.text
 		}
 	}
 
