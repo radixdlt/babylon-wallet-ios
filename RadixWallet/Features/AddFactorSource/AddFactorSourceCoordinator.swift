@@ -16,7 +16,7 @@ extension AddFactorSource {
 				case toSelectFromKinds([FactorSourceKind])
 			}
 
-			@Shared(.deviceMnemonicBuilder) var deviceMnemonicBuilder
+			@Shared(.mnemonicBuilder) var mnemonicBuilder
 			var kind: FactorSourceKind?
 
 			var root: Root.State
@@ -101,7 +101,7 @@ extension AddFactorSource {
 				return .none
 
 			case .root(.intro(.delegate(.completed))), .path(.element(id: _, action: .intro(.delegate(.completed)))):
-				state.path.append(.deviceSeedPhrase(.init(context: state.context)))
+				state.path.append(.deviceSeedPhrase(.init(context: state.context, factorSourceKind: state.kind!)))
 				return .none
 
 			case let .root(.intro(.delegate(.completedWithLedgerDeviceInfo(ledger)))),
@@ -109,11 +109,6 @@ extension AddFactorSource {
 				let ledgerFS = LedgerHardwareWalletFactorSource.from(device: ledger, name: "")
 				state.path.append(.nameFactorSource(.init(context: state.context, factorSource: ledgerFS.asGeneral)))
 
-				return .none
-
-			case let .root(.intro(.delegate(.completeWithArculusCardInfo(arculus)))),
-			     let .path(.element(id: _, action: .intro(.delegate(.completeWithArculusCardInfo(arculus))))):
-				state.path.append(.deviceSeedPhrase(.init(context: state.context)))
 				return .none
 
 			case let .path(.element(id: _, action: .deviceSeedPhrase(.delegate(.completed(withCustomSeedPhrase))))):
@@ -130,8 +125,8 @@ extension AddFactorSource {
 
 			case let .path(.element(id: _, action: .nameFactorSource(.delegate(.saved(fs))))):
 				// Reset
-				state.$deviceMnemonicBuilder.withLock { builder in
-					builder = DeviceMnemonicBuilder()
+				state.$mnemonicBuilder.withLock { builder in
+					builder = MnemonicBuilder()
 				}
 				return .send(.delegate(.finished(fs)))
 
@@ -141,7 +136,7 @@ extension AddFactorSource {
 		}
 
 		func createFS(state: State) -> FactorSource {
-			let mwp = state.deviceMnemonicBuilder.getMnemonicWithPassphrase()
+			let mwp = state.mnemonicBuilder.getMnemonicWithPassphrase()
 
 			switch state.kind {
 			case .device:
@@ -154,7 +149,7 @@ extension AddFactorSource {
 				return SargonOS.shared.createDeviceFactorSource(mnemonicWithPassphrase: mwp, factorType: factorType).asGeneral
 
 			case .arculusCard:
-				let mwp = state.deviceMnemonicBuilder.getMnemonicWithPassphrase()
+				let mwp = state.mnemonicBuilder.getMnemonicWithPassphrase()
 				let fsId = newFactorSourceIdFromHashFromMnemonicWithPassphrase(factorSourceKind: .arculusCard, mnemonicWithPassphrase: mwp)
 				return ArculusCardFactorSource(id: fsId, common: .babylon(), hint: .init(label: "", model: .arculusColdStorageWallet)).asGeneral
 

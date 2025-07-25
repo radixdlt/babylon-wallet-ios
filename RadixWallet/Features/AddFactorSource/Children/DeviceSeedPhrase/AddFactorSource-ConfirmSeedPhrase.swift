@@ -6,7 +6,7 @@ extension AddFactorSource {
 	struct ConfirmSeedPhrase: Sendable, FeatureReducer {
 		@ObservableState
 		struct State: Sendable, Hashable {
-			@Shared(.deviceMnemonicBuilder) var deviceMnemonicBuilder
+			@Shared(.mnemonicBuilder) var mnemonicBuilder
 			let factorSourceKind: FactorSourceKind
 			var confirmationWords: OrderedDictionary<UInt16, String> = [:]
 
@@ -21,7 +21,7 @@ extension AddFactorSource {
 			init(factorSourceKind: FactorSourceKind) {
 				self.factorSourceKind = factorSourceKind
 
-				let indicesOfWordsToConfirm = deviceMnemonicBuilder.getIndicesInMnemonicOfWordsToConfirm()
+				let indicesOfWordsToConfirm = mnemonicBuilder.getIndicesInMnemonicOfWordsToConfirm()
 				self.confirmationWords =
 					indicesOfWordsToConfirm.reduce(into: OrderedDictionary<UInt16, String>()) { partialResult, idx in
 						partialResult[idx] = ""
@@ -53,7 +53,7 @@ extension AddFactorSource {
 			switch viewAction {
 			case .confirmButtonTapped:
 				state.focusField = nil
-				let outcome = state.deviceMnemonicBuilder.validateWords(wordsToConfirm: state.confirmationWords.asDictionary)
+				let outcome = state.mnemonicBuilder.validateWords(wordsToConfirm: state.confirmationWords.asDictionary)
 				switch outcome {
 				case .valid:
 					return .send(.delegate(.validated))
@@ -71,7 +71,7 @@ extension AddFactorSource {
 
 			#if DEBUG
 			case .debugFillTapped:
-				let seedPhraseWords = state.deviceMnemonicBuilder.getWords()
+				let seedPhraseWords = state.mnemonicBuilder.getWords()
 				for index in state.confirmationWords.keys {
 					state.confirmationWords[index] = seedPhraseWords[Int(index)].word
 				}

@@ -7,11 +7,12 @@ extension AddFactorSource {
 	struct DeviceSeedPhrase: Sendable, FeatureReducer {
 		@ObservableState
 		struct State: Sendable, Hashable {
-			@Shared(.deviceMnemonicBuilder) var deviceMnemonicBuilder
+			@Shared(.mnemonicBuilder) var mnemonicBuilder
 
 			var grid: ImportMnemonicGrid.State!
 			var isEnteringCustomSeedPhrase: Bool = false
 			var context: Context
+			let factorSourceKind: FactorSourceKind
 
 			var confirmButtonControlState: ControlState {
 				switch status {
@@ -25,15 +26,16 @@ extension AddFactorSource {
 			@Presents
 			var destination: Destination.State? = nil
 
-			init(context: Context) {
+			init(context: Context, factorSourceKind: FactorSourceKind) {
 				self.context = context
+				self.factorSourceKind = factorSourceKind
 				switch context {
 				case .newFactorSource:
-					$deviceMnemonicBuilder.withLock { builder in
+					$mnemonicBuilder.withLock { builder in
 						builder = builder.generateNewMnemonic()
 					}
 
-					let mnemonic = try! Mnemonic(words: deviceMnemonicBuilder.getWords())
+					let mnemonic = try! Mnemonic(words: mnemonicBuilder.getWords())
 					grid = .init(mnemonic: mnemonic)
 				case let .recoverFactorSource(isOlympia):
 					isEnteringCustomSeedPhrase = true
@@ -96,13 +98,13 @@ extension AddFactorSource {
 			case .confirmButtonTapped:
 				let isEnteringCustomSeedPhrase = state.isEnteringCustomSeedPhrase
 				if isEnteringCustomSeedPhrase {
-					state.$deviceMnemonicBuilder.withLock { builder in
+					state.$mnemonicBuilder.withLock { builder in
 						if let builderWithMnemonic = try? builder.createMnemonicFromWords(words: state.completedWords.map(\.word)) {
 							builder = builderWithMnemonic
 						}
 					}
 				}
-				let factorSourceId = state.deviceMnemonicBuilder.getFactorSourceId()
+				let factorSourceId = state.mnemonicBuilder.getFactorSourceId(kind: state.factorSourceKind)
 				return .run { send in
 					let isInUse = try await SargonOs.shared.isFactorSourceAlreadyInUse(factorSourceId: factorSourceId)
 					if isInUse {

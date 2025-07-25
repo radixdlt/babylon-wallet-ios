@@ -21,22 +21,25 @@ extension AddFactorSource {
 		enum InternalAction: Sendable, Equatable {
 			case receivedLedgerDeviceInfo(LedgerDeviceInfo)
 			case factorSourceAlreadyExsits(FactorSource)
+			case arculusCardValidation(ArculusMinFirmwareVersionRequirement)
 		}
 
 		enum DelegateAction: Sendable, Equatable {
 			case completedWithLedger(LedgerDeviceInfo)
-			case completedWithArculus(ArculusCardInfo)
+			case completedWithValidArculusCard
 		}
 
 		struct Destination: DestinationReducer {
 			@CasePathable
 			enum State: Sendable, Hashable {
 				case factorSourceAlreadyExists(AlertState<Never>)
+				case arculusInvalidFirmwareVersion(AlertState<Never>)
 			}
 
 			@CasePathable
 			enum Action: Sendable, Equatable {
 				case factorSourceAlreadyExists(Never)
+				case arculusInvalidFirmwareVersion(Never)
 			}
 
 			var body: some ReducerOf<Self> {
@@ -67,8 +70,8 @@ extension AddFactorSource {
 
 				case .arculusCard:
 					.run { send in
-						let info = try await SargonOS.shared.arculusGetCardInfo()
-						await send(.delegate(.completedWithArculus(info)))
+						let versionRequirement = try await SargonOS.shared.arculusCardValidateMinFirmwareVersion()
+						await send(.internal(.arculusCardValidation(versionRequirement)))
 					}
 
 				default:
@@ -87,6 +90,11 @@ extension AddFactorSource {
 				return .send(.delegate(.completedWithLedger(ledgerDeviceInfo)))
 			case let .factorSourceAlreadyExsits(fs):
 				state.destination = .factorSourceAlreadyExists(.factorSourceAlreadyExists(fs))
+				return .none
+			case .arculusCardValidation(.valid):
+				return .send(.delegate(.completedWithValidArculusCard))
+			case let .arculusCardValidation(.invalid(invalidVersion)):
+				state.destination = .factorSourceAlreadyExists(.arculusInvalidFirmwareVersion(invalidVersion))
 				return .none
 			}
 		}
@@ -117,6 +125,16 @@ extension AlertState<Never> {
 			TextState(L10n.AddLedgerDevice.AlreadyAddedAlert.title)
 		} message: {
 			TextState(L10n.AddLedgerDevice.AlreadyAddedAlert.message(fs.name))
+		}
+	}
+}
+
+extension AlertState<Never> {
+	static func arculusInvalidFirmwareVersion(_ version: String) -> AlertState {
+		AlertState {
+			TextState("Unsupported Arculus Card")
+		} message: {
+			TextState("Radix Wallet requires you to use card with min firmware version: \(version)")
 		}
 	}
 }
