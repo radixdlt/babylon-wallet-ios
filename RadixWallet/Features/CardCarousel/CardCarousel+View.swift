@@ -57,6 +57,19 @@ extension CardCarousel {
 	}
 }
 
+extension View {
+	public func gradientForeground(colors: [Color]) -> some View {
+		self.overlay(
+			LinearGradient(
+				colors: colors,
+				startPoint: .topLeading,
+				endPoint: .bottomTrailing
+			)
+		)
+		.mask(self)
+	}
+}
+
 // MARK: - CarouselCardView
 struct CarouselCardView: View {
 	let card: HomeCard
@@ -68,15 +81,22 @@ struct CarouselCardView: View {
 			Button(action: action) {
 				VStack(alignment: .leading, spacing: .small2) {
 					HStack(spacing: .small3 * 0.5) {
-						Text(title)
-							.textStyle(.body1Header)
-							.minimumScaleFactor(0.8)
+						if card == .joinRadixRewards {
+							Text(title)
+								.textStyle(.body1Header)
+								.minimumScaleFactor(0.8)
+								.gradientForeground(colors: [Color(hex: "FF43CA"), Color(hex: "20E4FF"), Color(hex: "21FFBE")])
+						} else {
+							Text(title)
+								.textStyle(.body1Header)
+								.minimumScaleFactor(0.8)
+						}
 
 						if showLinkIcon {
 							Image(.iconLinkOut)
 								.resizable()
 								.frame(.icon)
-								.foregroundStyle(.iconSecondary)
+								.foregroundStyle(card == .joinRadixRewards ? .white : .iconPrimary)
 						}
 					}
 
@@ -87,7 +107,7 @@ struct CarouselCardView: View {
 						.textStyle(.body2Regular)
 				}
 				.multilineTextAlignment(.leading)
-				.foregroundStyle(Color.primaryText)
+				.foregroundStyle(card == .joinRadixRewards ? .white : Color.primaryText)
 				.padding([.top, .leading], .medium2)
 				.padding(.trailing, trailingPadding)
 				.padding(.bottom, .small1)
@@ -98,7 +118,15 @@ struct CarouselCardView: View {
 				.background(.secondaryBackground)
 				.cornerRadius(.small1)
 			}
-			CloseButton(kind: .homeCard, action: closeAction)
+			Button(action: action) {
+				Image(.close)
+					.resizable()
+					.frame(.medium3)
+					.foregroundColor(nil)
+					.tint(card == .joinRadixRewards ? .white : .iconPrimary)
+					.padding(.small2)
+			}
+			.frame(.small, alignment: .topTrailing)
 		}
 	}
 
@@ -106,7 +134,7 @@ struct CarouselCardView: View {
 		switch card {
 		case .continueRadQuest, .startRadQuest:
 			95
-		case .dapp:
+		case .dapp, .joinRadixRewards:
 			85
 		case .connector:
 			106
@@ -123,6 +151,8 @@ struct CarouselCardView: View {
 			L10n.HomePageCarousel.ContinueOnDapp.title
 		case .connector:
 			L10n.HomePageCarousel.UseDappsOnDesktop.title
+		case .joinRadixRewards:
+			L10n.HomePageCarousel.JoinRadixRewards.title
 		}
 	}
 
@@ -136,6 +166,8 @@ struct CarouselCardView: View {
 			L10n.HomePageCarousel.ContinueOnDapp.text
 		case .connector:
 			L10n.HomePageCarousel.UseDappsOnDesktop.text
+		case .joinRadixRewards:
+			L10n.HomePageCarousel.JoinRadixRewards.text
 		}
 	}
 
@@ -147,6 +179,8 @@ struct CarouselCardView: View {
 			cardBackground(.gradient(.carouselBackgroundRadquest))
 		case let .dapp(url):
 			cardBackground(.thumbnail(.dapp, url))
+		case .joinRadixRewards:
+			cardBackground(.gradient(.rewards))
 		case .connector:
 			cardBackground(.gradient(.carouselBackgroundConnect))
 		}
@@ -154,7 +188,7 @@ struct CarouselCardView: View {
 
 	private var showLinkIcon: Bool {
 		switch card {
-		case .startRadQuest:
+		case .startRadQuest, .joinRadixRewards:
 			true
 		case .continueRadQuest, .dapp, .connector:
 			false
@@ -169,12 +203,18 @@ struct CarouselCardView: View {
 				.padding(.trailing, .medium2)
 				.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
 		case let .gradient(imageResource):
-			Image(imageResource)
-				.resizable()
-				.aspectRatio(contentMode: .fill)
-				.mask {
-					LinearGradient(colors: [.clear, Color.primaryBackground, Color.primaryBackground], startPoint: .leading, endPoint: .trailing)
-				}
+			if card == .joinRadixRewards {
+				Image(imageResource)
+					.resizable()
+					.aspectRatio(contentMode: .fill)
+			} else {
+				Image(imageResource)
+					.resizable()
+					.aspectRatio(contentMode: .fill)
+					.mask {
+						LinearGradient(colors: [.clear, Color.primaryBackground, Color.primaryBackground], startPoint: .leading, endPoint: .trailing)
+					}
+			}
 		}
 	}
 

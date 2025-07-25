@@ -26,7 +26,7 @@ struct ScanQR: Sendable, FeatureReducer {
 		#endif // sim
 	}
 
-	public typealias Action = FeatureAction<Self>
+	typealias Action = FeatureAction<Self>
 
 	@CasePathable
 	enum ViewAction: Sendable, Equatable {
