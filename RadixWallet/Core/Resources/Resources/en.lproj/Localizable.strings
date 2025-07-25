@@ -1322,6 +1322,8 @@ Code: %@";
 "homePageCarousel_useDappsOnDesktop_text" = "Connect to dApps on the big screen with Radix Connector.";
 "homePageCarousel_discoverRadixDapps_title" = "Discover Radix dApps";
 "homePageCarousel_discoverRadixDapps_text" = "Start digging into Web3 dApps on the Radix Ecosystem directory.";
+"homePageCarousel_joinRadixRewards_title" = "Join Radix Rewards";
+"homePageCarousel_joinRadixRewards_text" = "Earn weekly Season Points by engaging in genuine on-chain activities.";
 "scanQR_connectorExtension_instructions" = "Scan the QR code in the Radix Connector browser extension.";
 "scanQR_connectorExtension_disclosureTitle" = "Don\'t have the Radix Connector browser extension?";
 "scanQR_connectorExtension_disclosureItem1" = "Go to **wallet.radixdlt.com** in your desktop browser.";
