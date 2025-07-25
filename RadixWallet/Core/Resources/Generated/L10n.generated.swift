@@ -2308,6 +2308,12 @@ internal enum L10n {
       /// Discover Radix dApps
       internal static let title = L10n.tr("Localizable", "homePageCarousel_discoverRadixDapps_title", fallback: "Discover Radix dApps")
     }
+    internal enum JoinRadixRewards {
+      /// Earn weekly Season Points by engaging in genuine on-chain activities.
+      internal static let text = L10n.tr("Localizable", "homePageCarousel_joinRadixRewards_text", fallback: "Earn weekly Season Points by engaging in genuine on-chain activities.")
+      /// Join Radix Rewards
+      internal static let title = L10n.tr("Localizable", "homePageCarousel_joinRadixRewards_title", fallback: "Join Radix Rewards")
+    }
     internal enum RejoinRadquest {
       /// Continue your Radix journey in your browser. Tap to dismiss.
       internal static let text = L10n.tr("Localizable", "homePageCarousel_rejoinRadquest_text", fallback: "Continue your Radix journey in your browser. Tap to dismiss.")
