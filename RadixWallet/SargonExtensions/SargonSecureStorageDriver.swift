@@ -26,9 +26,6 @@ final class SargonSecureStorage: SecureStorageDriver {
 			}
 
 			return try secureStorageClient.loadProfileSnapshotData(activeProfileId)
-
-		case let .arculusCardFactorSourcePin(factorSourceId: factorSourceId):
-			return nil
 		}
 	}
 
@@ -85,9 +82,6 @@ final class SargonSecureStorage: SecureStorageDriver {
 					throw error
 				}
 			}
-
-		case let .arculusCardFactorSourcePin(factorSourceId: factorSourceId):
-			return
 		}
 	}
 
@@ -106,8 +100,6 @@ final class SargonSecureStorage: SecureStorageDriver {
 				profileID: activeProfileId,
 				keepInICloudIfPresent: true
 			)
-		case let .arculusCardFactorSourcePin(factorSourceId: factorSourceId):
-			break
 		}
 	}
 
