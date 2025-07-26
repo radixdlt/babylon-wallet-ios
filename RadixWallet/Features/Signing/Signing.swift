@@ -1,6 +1,7 @@
 // MARK: - Signing
 @Reducer
 struct Signing: Sendable, FeatureReducer {
+	@Dependency(\.arculusCardClient) var arculusCardClient
 	@ObservableState
 	struct State: Sendable, Hashable {
 		let purpose: Purpose
@@ -98,16 +99,16 @@ private extension Signing {
 	func signArculus(purpose: State.Purpose, arculus: ArculusCardFactorSource) async throws -> Signatures {
 		switch purpose {
 		case let .transaction(input):
-			try await .transaction(SargonOS.shared.arculusCardSignTransaction(factorSource: arculus, pin: "123456", perTransaction: input.perTransaction))
+			try await .transaction(arculusCardClient.signTransaction(arculus, "123456", input.perTransaction))
 
 		case let .subintent(input):
 			try await .subintent(
-				SargonOS.shared.arculusCardSignSubintent(factorSource: arculus, pin: "123456", perTransaction: input.perTransaction)
+				arculusCardClient.signSubintent(arculus, "123456", input.perTransaction)
 			)
 
 		case let .auth(input):
 			try await .auth(
-				SargonOS.shared.arculusCardSignAuth(factorSource: arculus, pin: "123456", perTransaction: input.perTransaction)
+				arculusCardClient.signAuth(arculus, "123456", input.perTransaction)
 			)
 		}
 	}
