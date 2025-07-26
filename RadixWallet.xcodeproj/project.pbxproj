@@ -887,6 +887,8 @@
 		A06323E92DFC308200963A1F /* LearnAbout+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A06323E82DFC308200963A1F /* LearnAbout+View.swift */; };
 		A06323EA2DFC308200963A1F /* LearnAbout.swift in Sources */ = {isa = PBXBuildFile; fileRef = A06323E72DFC308200963A1F /* LearnAbout.swift */; };
 		A0777B482E253E1E00E82892 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A0777B472E253E1E00E82892 /* Sargon */; };
+		A089D42F2E34F80600866A47 /* ArculusFactorSourceAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = A089D42D2E34F80600866A47 /* ArculusFactorSourceAccess.swift */; };
+		A089D4302E34F80600866A47 /* ArculusFactorSourceAccess+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A089D42E2E34F80600866A47 /* ArculusFactorSourceAccess+View.swift */; };
 		A08B33622E34EDEE003DADFE /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A08B33612E34EDEE003DADFE /* Sargon */; };
 		A08BBA602DAD49D500534B67 /* InteractionReview-ShieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08BBA5E2DAD49D500534B67 /* InteractionReview-ShieldView.swift */; };
 		A08BBA622DAE330700534B67 /* AddFactorSource-ConfirmSeedPhrase.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08BBA612DAE330700534B67 /* AddFactorSource-ConfirmSeedPhrase.swift */; };
@@ -2253,6 +2255,8 @@
 		A0600D382DD35B2200A2ADD3 /* DarkModeTintedImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DarkModeTintedImage.swift; sourceTree = "<group>"; };
 		A06323E72DFC308200963A1F /* LearnAbout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearnAbout.swift; sourceTree = "<group>"; };
 		A06323E82DFC308200963A1F /* LearnAbout+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LearnAbout+View.swift"; sourceTree = "<group>"; };
+		A089D42D2E34F80600866A47 /* ArculusFactorSourceAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArculusFactorSourceAccess.swift; sourceTree = "<group>"; };
+		A089D42E2E34F80600866A47 /* ArculusFactorSourceAccess+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ArculusFactorSourceAccess+View.swift"; sourceTree = "<group>"; };
 		A08BBA5E2DAD49D500534B67 /* InteractionReview-ShieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InteractionReview-ShieldView.swift"; sourceTree = "<group>"; };
 		A08BBA612DAE330700534B67 /* AddFactorSource-ConfirmSeedPhrase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSource-ConfirmSeedPhrase.swift"; sourceTree = "<group>"; };
 		A08BBA632DAE347E00534B67 /* AddFactorSource-ConfirmSeedPhrase+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSource-ConfirmSeedPhrase+View.swift"; sourceTree = "<group>"; };
@@ -6068,6 +6072,7 @@
 				5BB2C2472D36C66A00286B6B /* FactorSourceAccess+View.swift */,
 				5B83D2CE2D47F158007111B0 /* FactorSourceAccess+Models.swift */,
 				5BB2C24A2D36C9D200286B6B /* FactorSourceAccess+ViewState.swift */,
+				A089D42C2E34F7E500866A47 /* Arculus */,
 				5BC18AAF2D4BDB65008F25A5 /* OffDeviceMnemonic */,
 				5BFED6882D4A8C4E00380E7D /* Password */,
 			);
@@ -6374,6 +6379,15 @@
 				A0D201702E057258009DA055 /* LearnItemsList+View.swift */,
 			);
 			path = LearnAbout;
+			sourceTree = "<group>";
+		};
+		A089D42C2E34F7E500866A47 /* Arculus */ = {
+			isa = PBXGroup;
+			children = (
+				A089D42D2E34F80600866A47 /* ArculusFactorSourceAccess.swift */,
+				A089D42E2E34F80600866A47 /* ArculusFactorSourceAccess+View.swift */,
+			);
+			path = Arculus;
 			sourceTree = "<group>";
 		};
 		A08BBA5F2DAD49D500534B67 /* Shield */ = {
@@ -8700,6 +8714,8 @@
 				48CFC5D52ADC10DA00E77A5C /* TokenShadowModifier.swift in Sources */,
 				A40815902C7E0D08005E65B9 /* MetadataI32Value.swift in Sources */,
 				48CFC5F32ADC10DA00E77A5C /* Fonts.generated.swift in Sources */,
+				A089D42F2E34F80600866A47 /* ArculusFactorSourceAccess.swift in Sources */,
+				A089D4302E34F80600866A47 /* ArculusFactorSourceAccess+View.swift in Sources */,
 				48CFC27C2ADC10D900E77A5C /* HUD+Reducer.swift in Sources */,
 				48CFC5FC2ADC10DA00E77A5C /* Asset.swift in Sources */,
 				48CFC6572ADC10DB00E77A5C /* ProfileNetwork+Entity+Lookup.swift in Sources */,

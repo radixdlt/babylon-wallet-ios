@@ -33,13 +33,17 @@ extension AddFactorSource {
 			@CasePathable
 			enum State: Sendable, Hashable {
 				case factorSourceAlreadyExists(AlertState<Never>)
-				case arculusInvalidFirmwareVersion(AlertState<Never>)
+				case arculusInvalidFirmwareVersion(AlertState<Action.ArculusInvalidFirmwareVersion>)
 			}
 
 			@CasePathable
 			enum Action: Sendable, Equatable {
 				case factorSourceAlreadyExists(Never)
-				case arculusInvalidFirmwareVersion(Never)
+				case arculusInvalidFirmwareVersion(ArculusInvalidFirmwareVersion)
+
+				enum ArculusInvalidFirmwareVersion {
+					case ok
+				}
 			}
 
 			var body: some ReducerOf<Self> {
@@ -94,7 +98,18 @@ extension AddFactorSource {
 			case .arculusCardValidation(.valid):
 				return .send(.delegate(.completedWithValidArculusCard))
 			case let .arculusCardValidation(.invalid(invalidVersion)):
-				state.destination = .factorSourceAlreadyExists(.arculusInvalidFirmwareVersion(invalidVersion))
+				state.destination = .arculusInvalidFirmwareVersion(Self.arculusInvalidFirmwareVersion(invalidVersion))
+				return .none
+			}
+		}
+
+		func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+			switch presentedAction {
+			case .arculusInvalidFirmwareVersion(.ok):
+				state.destination = nil
+				return .run { _ in
+				}
+			default:
 				return .none
 			}
 		}
@@ -129,11 +144,16 @@ extension AlertState<Never> {
 	}
 }
 
-extension AlertState<Never> {
-	static func arculusInvalidFirmwareVersion(_ version: String) -> AlertState {
+extension AddFactorSource.IdentifyingFactor {
+	static func arculusInvalidFirmwareVersion(_ version: String) -> AlertState<Destination.Action.ArculusInvalidFirmwareVersion> {
 		AlertState {
 			TextState("Unsupported Arculus Card")
-		} message: {
+		} actions: {
+			ButtonState(action: .ok) {
+				TextState(L10n.Common.ok)
+			}
+		}
+		message: {
 			TextState("Radix Wallet requires you to use card with min firmware version: \(version)")
 		}
 	}

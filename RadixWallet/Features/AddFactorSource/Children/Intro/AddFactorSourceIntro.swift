@@ -73,15 +73,22 @@ extension AddFactorSource {
 				}
 				return .none
 			case .continueTapped:
-				if state.kind == .ledgerHqHardwareWallet {
+				switch state.kind {
+				case .ledgerHqHardwareWallet:
 					guard state.hasAConnectorExtension else {
 						state.destination = .addNewP2PLink(.init(root: .ledgerConnectionIntro))
 						return .none
 					}
 					state.destination = .hardwareFactorIdentification(.init(kind: state.kind))
 					return .none
+				case .arculusCard:
+					state.destination = .hardwareFactorIdentification(.init(kind: state.kind))
+					return .none
+				case .device:
+					return .send(.delegate(.completed))
+				default:
+					fatalError("Unhandled fs kind \(state.kind)")
 				}
-				return .send(.delegate(.completed))
 			}
 		}
 
