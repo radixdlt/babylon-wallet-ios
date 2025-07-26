@@ -16,7 +16,7 @@ extension AddFactorSource {
 				case toSelectFromKinds([FactorSourceKind])
 			}
 
-			@Shared(.deviceMnemonicBuilder) var deviceMnemonicBuilder
+			@Shared(.mnemonicBuilder) var mnemonicBuilder
 			var kind: FactorSourceKind?
 
 			var root: Root.State
@@ -101,31 +101,32 @@ extension AddFactorSource {
 				return .none
 
 			case .root(.intro(.delegate(.completed))), .path(.element(id: _, action: .intro(.delegate(.completed)))):
-				state.path.append(.deviceSeedPhrase(.init(context: state.context)))
+				state.path.append(.deviceSeedPhrase(.init(context: state.context, factorSourceKind: state.kind!)))
 				return .none
 
-			case let .root(.intro(.delegate(.completedWithLedgerTempFS(ledger)))),
-			     let .path(.element(id: _, action: .intro(.delegate(.completedWithLedgerTempFS(ledger))))):
-				state.path.append(.nameFactorSource(.init(context: state.context, factorSource: ledger.asGeneral)))
+			case let .root(.intro(.delegate(.completedWithLedgerDeviceInfo(ledger)))),
+			     let .path(.element(id: _, action: .intro(.delegate(.completedWithLedgerDeviceInfo(ledger))))):
+				let ledgerFS = LedgerHardwareWalletFactorSource.from(device: ledger, name: "")
+				state.path.append(.nameFactorSource(.init(context: state.context, factorSource: ledgerFS.asGeneral)))
 
 				return .none
 
 			case let .path(.element(id: _, action: .deviceSeedPhrase(.delegate(.completed(withCustomSeedPhrase))))):
 				if withCustomSeedPhrase {
-					state.path.append(.nameFactorSource(.init(context: state.context, factorSource: createDeviceFactorSource(state: state).asGeneral)))
+					state.path.append(.nameFactorSource(.init(context: state.context, factorSource: createFS(state: state))))
 				} else {
-					state.path.append(.confirmSeedPhrase(.init(factorSourceKind: .device)))
+					state.path.append(.confirmSeedPhrase(.init(factorSourceKind: state.kind!)))
 				}
 				return .none
 
 			case .path(.element(id: _, action: .confirmSeedPhrase(.delegate(.validated)))):
-				state.path.append(.nameFactorSource(.init(context: state.context, factorSource: createDeviceFactorSource(state: state).asGeneral)))
+				state.path.append(.nameFactorSource(.init(context: state.context, factorSource: createFS(state: state))))
 				return .none
 
 			case let .path(.element(id: _, action: .nameFactorSource(.delegate(.saved(fs))))):
 				// Reset
-				state.$deviceMnemonicBuilder.withLock { builder in
-					builder = DeviceMnemonicBuilder()
+				state.$mnemonicBuilder.withLock { builder in
+					builder = MnemonicBuilder()
 				}
 				return .send(.delegate(.finished(fs)))
 
@@ -134,15 +135,27 @@ extension AddFactorSource {
 			}
 		}
 
-		func createDeviceFactorSource(state: State) -> DeviceFactorSource {
-			let mwp = state.deviceMnemonicBuilder.getMnemonicWithPassphrase()
-			let factorType: DeviceFactorSourceType = switch state.context {
-			case .newFactorSource:
-				.babylon
-			case let .recoverFactorSource(isOlympia):
-				isOlympia ? .olympia : .babylon
+		func createFS(state: State) -> FactorSource {
+			let mwp = state.mnemonicBuilder.getMnemonicWithPassphrase()
+
+			switch state.kind {
+			case .device:
+				let factorType: DeviceFactorSourceType = switch state.context {
+				case .newFactorSource:
+					.babylon
+				case let .recoverFactorSource(isOlympia):
+					isOlympia ? .olympia : .babylon
+				}
+				return SargonOS.shared.createDeviceFactorSource(mnemonicWithPassphrase: mwp, factorType: factorType).asGeneral
+
+			case .arculusCard:
+				let mwp = state.mnemonicBuilder.getMnemonicWithPassphrase()
+				let fsId = newFactorSourceIdFromHashFromMnemonicWithPassphrase(factorSourceKind: .arculusCard, mnemonicWithPassphrase: mwp)
+				return ArculusCardFactorSource(id: fsId, common: .babylon(), hint: .init(label: "", model: .arculusColdStorageWallet)).asGeneral
+
+			default:
+				fatalError("Called with invalid kind")
 			}
-			return SargonOS.shared.createDeviceFactorSource(mnemonicWithPassphrase: mwp, factorType: factorType)
 		}
 	}
 }

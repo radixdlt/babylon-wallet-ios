@@ -2,9 +2,10 @@
 extension AddFactorSource {
 	@Reducer
 	struct NameFactorSource: Sendable, FeatureReducer {
+		@Dependency(\.arculusCardClient) var arculusCardClient
 		@ObservableState
 		struct State: Sendable, Hashable {
-			@Shared(.deviceMnemonicBuilder) var deviceMnemonicBuilder
+			@Shared(.mnemonicBuilder) var mnemonicBuilder
 
 			let context: Context
 			var name: String = ""
@@ -76,7 +77,7 @@ extension AddFactorSource {
 				state.factorSource.setName(name)
 				state.isAddingFactorSource = true
 
-				return .run { [factorSource = state.factorSource, builder = state.deviceMnemonicBuilder] send in
+				return .run { [factorSource = state.factorSource, builder = state.mnemonicBuilder] send in
 					let result = await TaskResult {
 						if let deviceFS = factorSource.asDevice {
 							let mwp = builder.getMnemonicWithPassphrase()
@@ -87,6 +88,11 @@ extension AddFactorSource {
 								)
 							)
 							try? userDefaults.addFactorSourceIDOfBackedUpMnemonic(factorSource.id.extract())
+						}
+
+						if let arculusFS = factorSource.asArculus {
+//							let mwp = builder.getMnemonicWithPassphrase()
+//							_ = try await arculusCardClient.configureCardWithMnemonic(mwp.mnemonic, "123456")
 						}
 
 						_ = try await SargonOS.shared.addFactorSource(factorSource: factorSource)

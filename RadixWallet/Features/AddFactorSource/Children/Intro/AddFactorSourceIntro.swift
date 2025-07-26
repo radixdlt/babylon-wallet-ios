@@ -20,7 +20,7 @@ extension AddFactorSource {
 
 		enum DelegateAction: Sendable, Equatable {
 			case completed
-			case completedWithLedgerTempFS(LedgerHardwareWalletFactorSource)
+			case completedWithLedgerDeviceInfo(LedgerDeviceInfo)
 		}
 
 		enum InternalAction: Sendable, Equatable {
@@ -73,15 +73,22 @@ extension AddFactorSource {
 				}
 				return .none
 			case .continueTapped:
-				if state.kind == .ledgerHqHardwareWallet {
+				switch state.kind {
+				case .ledgerHqHardwareWallet:
 					guard state.hasAConnectorExtension else {
 						state.destination = .addNewP2PLink(.init(root: .ledgerConnectionIntro))
 						return .none
 					}
 					state.destination = .hardwareFactorIdentification(.init(kind: state.kind))
 					return .none
+				case .arculusCard:
+					state.destination = .hardwareFactorIdentification(.init(kind: state.kind))
+					return .none
+				case .device:
+					return .send(.delegate(.completed))
+				default:
+					fatalError("Unhandled fs kind \(state.kind)")
 				}
-				return .send(.delegate(.completed))
 			}
 		}
 
@@ -104,8 +111,11 @@ extension AddFactorSource {
 
 			case let .hardwareFactorIdentification(.delegate(.completedWithLedger(ledgerDeviceInfo))):
 				state.destination = nil
-				let fs = LedgerHardwareWalletFactorSource.from(device: ledgerDeviceInfo, name: "")
-				return .send(.delegate(.completedWithLedgerTempFS(fs)))
+				return .send(.delegate(.completedWithLedgerDeviceInfo(ledgerDeviceInfo)))
+
+			case .hardwareFactorIdentification(.delegate(.completedWithValidArculusCard)):
+				state.destination = nil
+				return .send(.delegate(.completed))
 
 			default:
 				return .none

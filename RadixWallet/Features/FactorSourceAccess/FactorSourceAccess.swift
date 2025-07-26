@@ -12,6 +12,7 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 
 		var password: PasswordFactorSourceAccess.State?
 		var offDeviceMnemonic: OffDeviceMnemonicFactorSourceAccess.State?
+		var arculus: ArculusFactorSourceAccess.State?
 
 		var kind: FactorSourceKind {
 			id.kind
@@ -47,6 +48,7 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 	enum ChildAction: Sendable, Hashable {
 		case password(PasswordFactorSourceAccess.Action)
 		case offDeviceMnemonic(OffDeviceMnemonicFactorSourceAccess.Action)
+		case arculus(ArculusFactorSourceAccess.Action)
 	}
 
 	enum DelegateAction: Sendable, Hashable {
@@ -90,6 +92,9 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 			.ifLet(\.offDeviceMnemonic, action: \.child.offDeviceMnemonic) {
 				OffDeviceMnemonicFactorSourceAccess()
 			}
+			.ifLet(\.arculus, action: \.child.arculus) {
+				ArculusFactorSourceAccess()
+			}
 	}
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
@@ -130,7 +135,8 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 				return .send(.delegate(.perform(.ledger(value))))
 
 			case let .arculusCard(value):
-				return .send(.delegate(.perform(.arculusCard(value))))
+				state.arculus = .init()
+				return .none
 
 			case let .password(value):
 				state.password = .init(factorSource: value)
@@ -146,16 +152,6 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 				state.destination = .errorAlert(.noP2Plink)
 			}
 			return .none
-		}
-	}
-
-	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .offDeviceMnemonic(.delegate(.perform(factorSource))):
-			.send(.delegate(.perform(factorSource)))
-
-		default:
-			.none
 		}
 	}
 
