@@ -39,7 +39,7 @@ extension AddFactorSource {
 					grid = .init(mnemonic: mnemonic)
 				case let .recoverFactorSource(isOlympia):
 					isEnteringCustomSeedPhrase = true
-					grid = .init(count: .twentyFour, isWordCountFixed: !isOlympia)
+					grid = .init(count: .twentyFour, wordCounts: isOlympia ? Bip39WordCount.allCases : [])
 				}
 			}
 		}
@@ -116,7 +116,7 @@ extension AddFactorSource {
 					errorQueue.schedule(error)
 				}
 			case .enterCustomSeedPhraseButtonTapped:
-				state.grid = .init(count: .twentyFour, isWordCountFixed: true)
+				state.grid = .init(count: .twentyFour, wordCounts: state.factorSourceKind == .arculusCard ? [.twelve, .twentyFour] : [])
 				state.isEnteringCustomSeedPhrase = true
 				return .none
 			}

@@ -10,9 +10,9 @@ extension ImportMnemonicGrid {
 				VStack(spacing: .medium3) {
 					wordPicker
 
-					#if DEBUG
-					debugSection
-					#endif
+//					#if DEBUG
+//					debugSection
+//					#endif
 
 					LazyVGrid(columns: .init(repeating: .init(.flexible()), count: 3)) {
 						ForEachStore(store.scope(state: \.words, action: { .child(.word($0, $1)) })) {
@@ -30,7 +30,7 @@ extension ImportMnemonicGrid {
 
 		@ViewBuilder
 		private var wordPicker: some SwiftUI.View {
-			if !store.isWordCountFixed {
+			if !store.wordCounts.isEmpty {
 				VStack(spacing: .small1) {
 					let label = L10n.ImportMnemonic.numberOfWordsPicker
 					Text(label)
@@ -38,7 +38,7 @@ extension ImportMnemonicGrid {
 						.foregroundStyle(Color.primaryText)
 
 					Picker(label, selection: $store.wordCount.sending(\.view.wordCountChanged)) {
-						ForEach(BIP39WordCount.allCases, id: \.self) { wordCount in
+						ForEach(store.wordCounts, id: \.self) { wordCount in
 							Text("\(wordCount.rawValue)")
 								.textStyle(.body1Regular)
 						}

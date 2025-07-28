@@ -7,27 +7,27 @@ struct ImportMnemonicGrid: Sendable, FeatureReducer {
 
 		var words: Words
 		let language: BIP39Language
-		let isWordCountFixed: Bool
+		let wordCounts: [BIP39WordCount]
 
 		init(
 			count: Bip39WordCount,
 			language: BIP39Language = .english,
-			isWordCountFixed: Bool
+			wordCounts: [BIP39WordCount] = []
 		) {
 			self.words = []
 			self.language = language
-			self.isWordCountFixed = isWordCountFixed
+			self.wordCounts = wordCounts
 
 			changeWordCount(to: count)
 		}
 
 		init(
 			mnemonic: Mnemonic,
-			isWordCountFixed: Bool = true
+			wordCounts: [BIP39WordCount] = []
 		) {
 			self.words = Self.words(from: mnemonic)
 			self.language = mnemonic.language
-			self.isWordCountFixed = isWordCountFixed
+			self.wordCounts = wordCounts
 		}
 
 		var wordCount: BIP39WordCount {

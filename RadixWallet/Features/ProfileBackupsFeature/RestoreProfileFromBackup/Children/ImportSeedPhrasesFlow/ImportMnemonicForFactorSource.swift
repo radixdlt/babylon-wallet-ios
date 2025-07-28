@@ -31,8 +31,7 @@ struct ImportMnemonicForFactorSource: Sendable, FeatureReducer {
 			self.isAllowedToSkip = isAllowedToSkip
 			self.deviceFactorSource = deviceFactorSource
 			self.grid = .init(
-				count: deviceFactorSource.hint.mnemonicWordCount,
-				isWordCountFixed: true
+				count: deviceFactorSource.hint.mnemonicWordCount
 			)
 			self.profileToCheck = profileToCheck
 		}

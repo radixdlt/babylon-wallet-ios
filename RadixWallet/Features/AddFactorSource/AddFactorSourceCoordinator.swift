@@ -42,6 +42,7 @@ extension AddFactorSource {
 		enum Path {
 			case intro(AddFactorSource.Intro)
 			case deviceSeedPhrase(AddFactorSource.DeviceSeedPhrase)
+			case arculusEnterPIN(ArculusCreatePIN)
 			case confirmSeedPhrase(AddFactorSource.ConfirmSeedPhrase)
 			case nameFactorSource(AddFactorSource.NameFactorSource)
 		}
@@ -120,7 +121,8 @@ extension AddFactorSource {
 				return .none
 
 			case .path(.element(id: _, action: .confirmSeedPhrase(.delegate(.validated)))):
-				state.path.append(.nameFactorSource(.init(context: state.context, factorSource: createFS(state: state))))
+				state.path.append(.arculusEnterPIN(.init()))
+//				state.path.append(.nameFactorSource(.init(context: state.context, factorSource: createFS(state: state))))
 				return .none
 
 			case let .path(.element(id: _, action: .nameFactorSource(.delegate(.saved(fs))))):
