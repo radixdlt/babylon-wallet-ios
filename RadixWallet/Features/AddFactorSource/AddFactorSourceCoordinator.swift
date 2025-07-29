@@ -42,7 +42,7 @@ extension AddFactorSource {
 		enum Path {
 			case intro(AddFactorSource.Intro)
 			case deviceSeedPhrase(AddFactorSource.DeviceSeedPhrase)
-			case arculusEnterPIN(ArculusCreatePIN)
+			case arculusCreatePIN(ArculusCreatePIN)
 			case confirmSeedPhrase(AddFactorSource.ConfirmSeedPhrase)
 			case nameFactorSource(AddFactorSource.NameFactorSource)
 		}
@@ -114,15 +114,27 @@ extension AddFactorSource {
 
 			case let .path(.element(id: _, action: .deviceSeedPhrase(.delegate(.completed(withCustomSeedPhrase))))):
 				if withCustomSeedPhrase {
-					state.path.append(.nameFactorSource(.init(context: state.context, factorSource: createFS(state: state))))
+					if state.kind == .arculusCard {
+						state.path.append(.arculusCreatePIN(.init()))
+					} else {
+						state.path.append(.nameFactorSource(.init(context: state.context, factorSource: createFS(state: state))))
+					}
 				} else {
 					state.path.append(.confirmSeedPhrase(.init(factorSourceKind: state.kind!)))
 				}
 				return .none
 
 			case .path(.element(id: _, action: .confirmSeedPhrase(.delegate(.validated)))):
-				state.path.append(.arculusEnterPIN(.init()))
-//				state.path.append(.nameFactorSource(.init(context: state.context, factorSource: createFS(state: state))))
+				if state.kind == .arculusCard {
+					state.path.append(.arculusCreatePIN(.init()))
+				} else {
+					state.path.append(.nameFactorSource(.init(context: state.context, factorSource: createFS(state: state))))
+				}
+				return .none
+
+			case let .path(.element(id: _, action: .arculusCreatePIN(.delegate(.pinAdded(pin))))):
+				// pin has to be used somehow in name fs when adding fs?
+				state.path.append(.nameFactorSource(.init(context: state.context, factorSource: createFS(state: state))))
 				return .none
 
 			case let .path(.element(id: _, action: .nameFactorSource(.delegate(.saved(fs))))):

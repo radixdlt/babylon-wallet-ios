@@ -892,8 +892,10 @@
 		A089D4352E35342F00866A47 /* ArculusCardClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A089D4322E35342F00866A47 /* ArculusCardClient+Live.swift */; };
 		A089D4362E35342F00866A47 /* ArculusCardClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A089D4312E35342F00866A47 /* ArculusCardClient+Interface.swift */; };
 		A089D4372E35342F00866A47 /* ArculusCardClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A089D4332E35342F00866A47 /* ArculusCardClient+Test.swift */; };
-		A089DC942E37C0A600866A47 /* ArculusCreatePIN+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A089DC932E37C0A600866A47 /* ArculusCreatePIN+View.swift */; };
-		A089DC952E37C0A600866A47 /* ArculusCreatePIN.swift in Sources */ = {isa = PBXBuildFile; fileRef = A089DC922E37C0A600866A47 /* ArculusCreatePIN.swift */; };
+		A089DC942E37C0A600866A47 /* ArculusPINInput+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A089DC932E37C0A600866A47 /* ArculusPINInput+View.swift */; };
+		A089DC952E37C0A600866A47 /* ArculusPINInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = A089DC922E37C0A600866A47 /* ArculusPINInput.swift */; };
+		A089DC982E38864600866A47 /* ArculusCreatePIN+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A089DC972E38864600866A47 /* ArculusCreatePIN+View.swift */; };
+		A089DC992E38864600866A47 /* ArculusCreatePIN.swift in Sources */ = {isa = PBXBuildFile; fileRef = A089DC962E38864600866A47 /* ArculusCreatePIN.swift */; };
 		A08B33622E34EDEE003DADFE /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A08B33612E34EDEE003DADFE /* Sargon */; };
 		A08BBA602DAD49D500534B67 /* InteractionReview-ShieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08BBA5E2DAD49D500534B67 /* InteractionReview-ShieldView.swift */; };
 		A08BBA622DAE330700534B67 /* AddFactorSource-ConfirmSeedPhrase.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08BBA612DAE330700534B67 /* AddFactorSource-ConfirmSeedPhrase.swift */; };
@@ -2265,8 +2267,10 @@
 		A089D4312E35342F00866A47 /* ArculusCardClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ArculusCardClient+Interface.swift"; sourceTree = "<group>"; };
 		A089D4322E35342F00866A47 /* ArculusCardClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ArculusCardClient+Live.swift"; sourceTree = "<group>"; };
 		A089D4332E35342F00866A47 /* ArculusCardClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ArculusCardClient+Test.swift"; sourceTree = "<group>"; };
-		A089DC922E37C0A600866A47 /* ArculusCreatePIN.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArculusCreatePIN.swift; sourceTree = "<group>"; };
-		A089DC932E37C0A600866A47 /* ArculusCreatePIN+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ArculusCreatePIN+View.swift"; sourceTree = "<group>"; };
+		A089DC922E37C0A600866A47 /* ArculusPINInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArculusPINInput.swift; sourceTree = "<group>"; };
+		A089DC932E37C0A600866A47 /* ArculusPINInput+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ArculusPINInput+View.swift"; sourceTree = "<group>"; };
+		A089DC962E38864600866A47 /* ArculusCreatePIN.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArculusCreatePIN.swift; sourceTree = "<group>"; };
+		A089DC972E38864600866A47 /* ArculusCreatePIN+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ArculusCreatePIN+View.swift"; sourceTree = "<group>"; };
 		A08BBA5E2DAD49D500534B67 /* InteractionReview-ShieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InteractionReview-ShieldView.swift"; sourceTree = "<group>"; };
 		A08BBA612DAE330700534B67 /* AddFactorSource-ConfirmSeedPhrase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSource-ConfirmSeedPhrase.swift"; sourceTree = "<group>"; };
 		A08BBA632DAE347E00534B67 /* AddFactorSource-ConfirmSeedPhrase+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSource-ConfirmSeedPhrase+View.swift"; sourceTree = "<group>"; };
@@ -6414,8 +6418,10 @@
 		A089DC8D2E37AE3D00866A47 /* Arculus */ = {
 			isa = PBXGroup;
 			children = (
-				A089DC922E37C0A600866A47 /* ArculusCreatePIN.swift */,
-				A089DC932E37C0A600866A47 /* ArculusCreatePIN+View.swift */,
+				A089DC922E37C0A600866A47 /* ArculusPINInput.swift */,
+				A089DC932E37C0A600866A47 /* ArculusPINInput+View.swift */,
+				A089DC962E38864600866A47 /* ArculusCreatePIN.swift */,
+				A089DC972E38864600866A47 /* ArculusCreatePIN+View.swift */,
 			);
 			path = Arculus;
 			sourceTree = "<group>";
@@ -8561,8 +8567,8 @@
 				A0600D372DCE02E000A2ADD3 /* AssetListSeparator.swift in Sources */,
 				A408160B2C7E0D08005E65B9 /* StateEntityDetailsResponseItemAncestorIdentities.swift in Sources */,
 				A4DCCC522C2DA33300438A7B /* HomeCardsClient+Test.swift in Sources */,
-				A089DC942E37C0A600866A47 /* ArculusCreatePIN+View.swift in Sources */,
-				A089DC952E37C0A600866A47 /* ArculusCreatePIN.swift in Sources */,
+				A089DC942E37C0A600866A47 /* ArculusPINInput+View.swift in Sources */,
+				A089DC952E37C0A600866A47 /* ArculusPINInput.swift in Sources */,
 				A40815DA2C7E0D08005E65B9 /* ProgrammaticScryptoSborValueKind.swift in Sources */,
 				A408163F2C7E0D08005E65B9 /* TransactionConstructionResponse.swift in Sources */,
 				5B80FCC72C298F13008444F5 /* ArbitraryDataField+Models.swift in Sources */,
@@ -9063,6 +9069,8 @@
 				A462B5B42B8F25BC00C26D20 /* ResourceBalance.swift in Sources */,
 				E7392AD62D6CD02A002FABDA /* AddFactorSource-DeviceSeedPhrase+View.swift in Sources */,
 				E79DD1B12CE365CF00B1EB86 /* ChooseReceivingAccountOnDelete+Reducer.swift in Sources */,
+				A089DC982E38864600866A47 /* ArculusCreatePIN+View.swift in Sources */,
+				A089DC992E38864600866A47 /* ArculusCreatePIN.swift in Sources */,
 				48CFC5CF2ADC10DA00E77A5C /* LinearGradients.swift in Sources */,
 				48CFC3F82ADC10D900E77A5C /* IncomingMessage+Decoding.swift in Sources */,
 				83EE48E02B8F68B5006CE672 /* FiatWorth.swift in Sources */,
