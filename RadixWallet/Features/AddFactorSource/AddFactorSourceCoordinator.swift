@@ -23,12 +23,14 @@ extension AddFactorSource {
 			var path: StackState<Path.State>
 
 			let context: Context
+			var strategy: FactorSourceStrategy?
 
 			init(mode: Mode, context: Context) {
 				switch mode {
 				case let .preselectedKind(factorSourceKind):
 					self.kind = factorSourceKind
 					self.root = .intro(.init(kind: factorSourceKind))
+					self.strategy = .init(kind: factorSourceKind, context: context)
 				case let .toSelectFromKinds(kinds):
 					self.kind = nil
 					self.root = .selectKind(.init(kinds: kinds))
@@ -98,43 +100,8 @@ extension AddFactorSource {
 			switch childAction {
 			case let .root(.selectKind(.delegate(.completed(selectedKind)))):
 				state.kind = selectedKind
+				state.strategy = .init(kind: selectedKind, context: state.context)
 				state.path.append(.intro(.init(kind: selectedKind)))
-				return .none
-
-			case .root(.intro(.delegate(.completed))), .path(.element(id: _, action: .intro(.delegate(.completed)))):
-				state.path.append(.deviceSeedPhrase(.init(context: state.context, factorSourceKind: state.kind!)))
-				return .none
-
-			case let .root(.intro(.delegate(.completedWithLedgerDeviceInfo(ledger)))),
-			     let .path(.element(id: _, action: .intro(.delegate(.completedWithLedgerDeviceInfo(ledger))))):
-				let ledgerFS = LedgerHardwareWalletFactorSource.from(device: ledger, name: "")
-				state.path.append(.nameFactorSource(.init(context: state.context, factorSource: ledgerFS.asGeneral)))
-
-				return .none
-
-			case let .path(.element(id: _, action: .deviceSeedPhrase(.delegate(.completed(withCustomSeedPhrase))))):
-				if withCustomSeedPhrase {
-					if state.kind == .arculusCard {
-						state.path.append(.arculusCreatePIN(.init()))
-					} else {
-						state.path.append(.nameFactorSource(.init(context: state.context, factorSource: createFS(state: state))))
-					}
-				} else {
-					state.path.append(.confirmSeedPhrase(.init(factorSourceKind: state.kind!)))
-				}
-				return .none
-
-			case .path(.element(id: _, action: .confirmSeedPhrase(.delegate(.validated)))):
-				if state.kind == .arculusCard {
-					state.path.append(.arculusCreatePIN(.init()))
-				} else {
-					state.path.append(.nameFactorSource(.init(context: state.context, factorSource: createFS(state: state))))
-				}
-				return .none
-
-			case let .path(.element(id: _, action: .arculusCreatePIN(.delegate(.pinAdded(pin))))):
-				// pin has to be used somehow in name fs when adding fs?
-				state.path.append(.nameFactorSource(.init(context: state.context, factorSource: createFS(state: state))))
 				return .none
 
 			case let .path(.element(id: _, action: .nameFactorSource(.delegate(.saved(fs))))):
@@ -145,31 +112,148 @@ extension AddFactorSource {
 				return .send(.delegate(.finished(fs)))
 
 			default:
-				return .none
+				return state.strategy?.handleCompletion(childAction, &state) ?? .none
 			}
 		}
+	}
+}
 
-		func createFS(state: State) -> FactorSource {
+struct FactorSourceStrategy: Sendable, Hashable {
+	let kind: FactorSourceKind
+	let context: AddFactorSource.Context
+
+	let handleCompletion: @Sendable (AddFactorSource.Coordinator.ChildAction, inout AddFactorSource.Coordinator.State) -> Effect<AddFactorSource.Coordinator.Action>
+
+	func hash(into hasher: inout Hasher) {
+		hasher.combine(kind)
+		hasher.combine(context)
+	}
+
+	static func == (lhs: FactorSourceStrategy, rhs: FactorSourceStrategy) -> Bool {
+		lhs.kind == rhs.kind && lhs.context == rhs.context
+	}
+}
+
+extension FactorSourceStrategy {
+	init(kind: FactorSourceKind, context: AddFactorSource.Context) {
+		switch kind {
+		case .device:
+			self = Self.device(context: context)
+		case .ledgerHqHardwareWallet:
+			self = Self.ledger(context: context)
+		case .arculusCard:
+			self = Self.arculus(context: context)
+		default:
+			fatalError("Unsupported kind \(kind)")
+		}
+	}
+}
+
+extension FactorSourceStrategy {
+	static func device(context: AddFactorSource.Context) -> Self {
+		@Sendable
+		func createFactorSourceInput(state: AddFactorSource.Coordinator.State, context: AddFactorSource.Context) -> AddFactorSource.NameFactorSource.State.FactorSourceInput {
 			let mwp = state.mnemonicBuilder.getMnemonicWithPassphrase()
-
-			switch state.kind {
-			case .device:
-				let factorType: DeviceFactorSourceType = switch state.context {
-				case .newFactorSource:
-					.babylon
-				case let .recoverFactorSource(isOlympia):
-					isOlympia ? .olympia : .babylon
-				}
-				return SargonOS.shared.createDeviceFactorSource(mnemonicWithPassphrase: mwp, factorType: factorType).asGeneral
-
-			case .arculusCard:
-				let mwp = state.mnemonicBuilder.getMnemonicWithPassphrase()
-				let fsId = newFactorSourceIdFromHashFromMnemonicWithPassphrase(factorSourceKind: .arculusCard, mnemonicWithPassphrase: mwp)
-				return ArculusCardFactorSource(id: fsId, common: .babylon(), hint: .init(label: "", model: .arculusColdStorageWallet)).asGeneral
-
-			default:
-				fatalError("Called with invalid kind")
+			let factorType: DeviceFactorSourceType = switch context {
+			case .newFactorSource:
+				.babylon
+			case let .recoverFactorSource(isOlympia):
+				isOlympia ? .olympia : .babylon
 			}
+			return .device(
+				SargonOS.shared.createDeviceFactorSource(mnemonicWithPassphrase: mwp, factorType: factorType),
+				mwp
+			)
 		}
+
+		return Self(
+			kind: .device,
+			context: context,
+			handleCompletion: { action, state in
+				switch action {
+				case .root(.intro(.delegate(.completed))), .path(.element(id: _, action: .intro(.delegate(.completed)))):
+					state.path.append(.deviceSeedPhrase(.init(context: context, factorSourceKind: .device)))
+					return .none
+
+				case .path(.element(id: _, action: .deviceSeedPhrase(.delegate(.completed(let withCustomSeedPhrase))))):
+					if withCustomSeedPhrase {
+						state.path.append(.nameFactorSource(.init(context: context, factorSourceInput: createFactorSourceInput(state: state, context: context))))
+					} else {
+						state.path.append(.confirmSeedPhrase(.init(factorSourceKind: .device)))
+					}
+					return .none
+
+				case .path(.element(id: _, action: .confirmSeedPhrase(.delegate(.validated)))):
+					state.path.append(.nameFactorSource(.init(context: context, factorSourceInput: createFactorSourceInput(state: state, context: context))))
+					return .none
+
+				default:
+					return .none
+				}
+			}
+		)
+	}
+
+	static func arculus(context: AddFactorSource.Context) -> Self {
+		@Sendable
+		func createFactorSourceInput(state: AddFactorSource.Coordinator.State, context: AddFactorSource.Context, pin: String) -> AddFactorSource.NameFactorSource.State.FactorSourceInput {
+			let mwp = state.mnemonicBuilder.getMnemonicWithPassphrase()
+			let fsId = newFactorSourceIdFromHashFromMnemonicWithPassphrase(factorSourceKind: .arculusCard, mnemonicWithPassphrase: mwp)
+			return .arculus(
+				ArculusCardFactorSource(id: fsId, common: .babylon(), hint: .init(label: "", model: .arculusColdStorageWallet)),
+				mwp,
+				pin
+			)
+		}
+
+		return Self(
+			kind: .arculusCard,
+			context: context,
+			handleCompletion: { action, state in
+				switch action {
+				case .root(.intro(.delegate(.completed))), .path(.element(id: _, action: .intro(.delegate(.completed)))):
+					state.path.append(.deviceSeedPhrase(.init(context: context, factorSourceKind: .arculusCard)))
+					return .none
+
+				case .path(.element(id: _, action: .deviceSeedPhrase(.delegate(.completed(let withCustomSeedPhrase))))):
+					if withCustomSeedPhrase {
+						state.path.append(.arculusCreatePIN(.init()))
+					} else {
+						state.path.append(.confirmSeedPhrase(.init(factorSourceKind: .arculusCard)))
+					}
+					return .none
+
+				case .path(.element(id: _, action: .confirmSeedPhrase(.delegate(.validated)))):
+					state.path.append(.arculusCreatePIN(.init()))
+					return .none
+
+				case let .path(.element(id: _, action: .arculusCreatePIN(.delegate(.pinAdded(pin))))):
+					state.path.append(.nameFactorSource(.init(context: context, factorSourceInput: createFactorSourceInput(state: state, context: context, pin: pin))))
+					return .none
+
+				default:
+					return .none
+				}
+			}
+		)
+	}
+
+	static func ledger(context: AddFactorSource.Context) -> Self {
+		Self(
+			kind: .ledgerHqHardwareWallet,
+			context: context,
+			handleCompletion: { action, state in
+				switch action {
+				case let .root(.intro(.delegate(.completedWithLedgerDeviceInfo(ledger)))),
+				     let .path(.element(id: _, action: .intro(.delegate(.completedWithLedgerDeviceInfo(ledger))))):
+					let ledgerFS = LedgerHardwareWalletFactorSource.from(device: ledger, name: "")
+					state.path.append(.nameFactorSource(.init(context: context, factorSourceInput: .ledger(ledgerFS))))
+					return .none
+
+				default:
+					return .none
+				}
+			}
+		)
 	}
 }

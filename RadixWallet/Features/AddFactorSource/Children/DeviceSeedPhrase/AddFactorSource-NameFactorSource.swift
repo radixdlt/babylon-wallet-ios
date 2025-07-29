@@ -2,16 +2,30 @@
 extension AddFactorSource {
 	@Reducer
 	struct NameFactorSource: Sendable, FeatureReducer {
-		@Dependency(\.arculusCardClient) var arculusCardClient
 		@ObservableState
 		struct State: Sendable, Hashable {
-			@Shared(.mnemonicBuilder) var mnemonicBuilder
+			enum FactorSourceInput: Sendable, Hashable {
+				case device(DeviceFactorSource, MnemonicWithPassphrase)
+				case arculus(ArculusCardFactorSource, MnemonicWithPassphrase, String)
+				case ledger(LedgerHardwareWalletFactorSource)
+
+				var factorSource: FactorSource {
+					switch self {
+					case let .device(fs, _):
+						fs.asGeneral
+					case let .arculus(fs, _, _):
+						fs.asGeneral
+					case let .ledger(fs):
+						fs.asGeneral
+					}
+				}
+			}
 
 			let context: Context
 			var name: String = ""
 			var sanitizedName: NonEmptyString?
 			var isAddingFactorSource: Bool = false
-			var factorSource: FactorSource
+			var factorSourceInput: FactorSourceInput
 
 			@Presents
 			var destination: Destination.State? = nil
@@ -62,6 +76,7 @@ extension AddFactorSource {
 		@Dependency(\.errorQueue) var errorQueue
 		@Dependency(\.userDefaults) var userDefaults
 		@Dependency(\.secureStorageClient) var secureStorageClient
+		@Dependency(\.arculusCardClient) var arculusCardClient
 
 		var body: some ReducerOf<Self> {
 			Reduce(core)
@@ -74,28 +89,29 @@ extension AddFactorSource {
 				state.sanitizedName = NonEmpty(rawValue: name.trimmingWhitespacesAndNewlines())
 				return .none
 			case let .saveTapped(name):
-				state.factorSource.setName(name)
 				state.isAddingFactorSource = true
 
-				return .run { [factorSource = state.factorSource, builder = state.mnemonicBuilder] send in
+				return .run { [factorSourceInput = state.factorSourceInput] send in
 					let result = await TaskResult {
-						if let deviceFS = factorSource.asDevice {
-							let mwp = builder.getMnemonicWithPassphrase()
+						switch factorSourceInput {
+						case let .device(fs, mwp):
 							try secureStorageClient.saveMnemonicForFactorSource(
 								.init(
 									mnemonicWithPassphrase: mwp,
-									factorSource: deviceFS
+									factorSource: fs
 								)
 							)
-							try? userDefaults.addFactorSourceIDOfBackedUpMnemonic(factorSource.id.extract())
+							try? userDefaults.addFactorSourceIDOfBackedUpMnemonic(fs.id)
+
+						case let .arculus(_, mwp, pin):
+							_ = try await arculusCardClient.configureCardWithMnemonic(mwp.mnemonic, pin)
+
+						case .ledger:
+							break
 						}
 
-						if let arculusFS = factorSource.asArculus {
-//							let mwp = builder.getMnemonicWithPassphrase()
-//							_ = try await arculusCardClient.configureCardWithMnemonic(mwp.mnemonic, "123456")
-						}
+						_ = try await SargonOS.shared.addFactorSource(factorSource: factorSourceInput.factorSource)
 
-						_ = try await SargonOS.shared.addFactorSource(factorSource: factorSource)
 						return EqVoid.instance
 					}
 					await send(.internal(.addFactorSourceResult(result)))
@@ -116,7 +132,7 @@ extension AddFactorSource {
 		}
 
 		func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
-			.send(.delegate(.saved(state.factorSource)))
+			.send(.delegate(.saved(state.factorSourceInput.factorSource)))
 		}
 	}
 }
