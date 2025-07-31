@@ -1,16 +1,16 @@
-extension SharedKey where Self == InMemoryKey<DeviceMnemonicBuilder>.Default {
-	static var deviceMnemonicBuilder: Self {
-		Self[.inMemory("deviceMnemonicBuilder"), default: DeviceMnemonicBuilder()]
+extension SharedKey where Self == InMemoryKey<MnemonicBuilder>.Default {
+	static var mnemonicBuilder: Self {
+		Self[.inMemory("mnemonicBuilder"), default: MnemonicBuilder()]
 	}
 }
 
-extension Shared where Value == DeviceMnemonicBuilder {
+extension Shared where Value == MnemonicBuilder {
 	func initialize() {
 		withLock { sharedValue in
-			sharedValue = DeviceMnemonicBuilder()
+			sharedValue = MnemonicBuilder()
 		}
 	}
 }
 
-// MARK: - DeviceMnemonicBuilder + @unchecked Sendable
-extension DeviceMnemonicBuilder: @unchecked Sendable {}
+// MARK: - mnemonicBuilder + @unchecked Sendable
+extension MnemonicBuilder: @unchecked Sendable {}

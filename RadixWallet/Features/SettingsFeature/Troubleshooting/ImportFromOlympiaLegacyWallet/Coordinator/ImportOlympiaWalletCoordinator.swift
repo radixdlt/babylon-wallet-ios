@@ -391,7 +391,6 @@ struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 					text: L10n.ImportOlympiaAccounts.VerifySeedPhrase.keepSeedPhrasePrompt,
 					button: L10n.ImportOlympiaAccounts.VerifySeedPhrase.keepSeedPhrasePromptConfirmation
 				),
-				isWordCountFixed: true,
 				persistStrategy: nil,
 				wordCount: progress.previous.expectedMnemonicWordCount
 			))
@@ -411,15 +410,13 @@ struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 				of: progress.softwareAccountsToMigrate
 			)
 
-			return .run { send in
-				let hostInfo = await SargonOS.shared.resolveHostInfo()
-				let privateHDFactorSource = PrivateHierarchicalDeterministicFactorSource.olympia(
-					mnemonicWithPassphrase: mnemonicWithPassphrase,
-					hostInfo: hostInfo
-				)
+			let hostInfo = SargonOS.shared.resolveHostInfo()
+			let privateHDFactorSource = PrivateHierarchicalDeterministicFactorSource.olympia(
+				mnemonicWithPassphrase: mnemonicWithPassphrase,
+				hostInfo: hostInfo
+			)
 
-				await send(.internal(.createdOlympiaPrivateHDForAccounts(privateHDFactorSource, progress.softwareAccountsToMigrate)))
-			}
+			return .send(.internal(.createdOlympiaPrivateHDForAccounts(privateHDFactorSource, progress.softwareAccountsToMigrate)))
 		} catch {
 			errorQueue.schedule(error)
 			return .none

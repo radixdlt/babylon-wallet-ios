@@ -35,11 +35,11 @@ extension AddFactorSource.NameFactorSource {
 
 		var header: some SwiftUI.View {
 			VStack(spacing: .small2) {
-				Image(store.factorSource.kind.icon)
+				Image(store.factorSourceInput.factorSource.kind.icon)
 					.resizable()
 					.frame(.large)
 
-				Text(store.factorSource.kind.nameFactorTitle)
+				Text(store.factorSourceInput.factorSource.kind.nameFactorTitle)
 					.textStyle(.sheetTitle)
 			}
 			.foregroundStyle(Color.primaryText)

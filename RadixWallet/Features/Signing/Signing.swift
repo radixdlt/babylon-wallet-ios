@@ -1,6 +1,7 @@
 // MARK: - Signing
 @Reducer
 struct Signing: Sendable, FeatureReducer {
+	@Dependency(\.arculusCardClient) var arculusCardClient
 	@ObservableState
 	struct State: Sendable, Hashable {
 		let purpose: Purpose
@@ -82,6 +83,9 @@ private extension Signing {
 			case let .ledger(ledger):
 				try await signLedger(purpose: purpose, ledger: ledger)
 
+			case let .arculusCard(arculus, pin):
+				try await signArculus(purpose: purpose, arculus: arculus, pin: pin)
+
 			default:
 				fatalError("Not implemented")
 			}
@@ -89,6 +93,23 @@ private extension Signing {
 
 		} catch: { error, send in
 			await handleError(factorSource: factorSource, error: error, send: send)
+		}
+	}
+
+	func signArculus(purpose: State.Purpose, arculus: ArculusCardFactorSource, pin: String) async throws -> Signatures {
+		switch purpose {
+		case let .transaction(input):
+			try await .transaction(arculusCardClient.signTransaction(arculus, pin, input.perTransaction))
+
+		case let .subintent(input):
+			try await .subintent(
+				arculusCardClient.signSubintent(arculus, pin, input.perTransaction)
+			)
+
+		case let .auth(input):
+			try await .auth(
+				arculusCardClient.signAuth(arculus, pin, input.perTransaction)
+			)
 		}
 	}
 
