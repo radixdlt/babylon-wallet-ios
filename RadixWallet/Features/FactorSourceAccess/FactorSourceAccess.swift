@@ -135,8 +135,12 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 				return .send(.delegate(.perform(.ledger(value))))
 
 			case let .arculusCard(value):
-				state.arculus = .init()
-				return .none
+				if state.purpose == .signature {
+					state.arculus = .init(factorSource: value)
+					return .none
+				}
+				// Only signature requires user to provide a signature
+				return .send(.delegate(.perform(.arculusCard(value, ""))))
 
 			case let .password(value):
 				state.password = .init(factorSource: value)
@@ -152,6 +156,15 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 				state.destination = .errorAlert(.noP2Plink)
 			}
 			return .none
+		}
+	}
+
+	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+		switch childAction {
+		case let .arculus(.delegate(.perform(factorSource))):
+			.send(.delegate(.perform(factorSource)))
+		default:
+			.none
 		}
 	}
 
@@ -217,7 +230,7 @@ private extension FactorSource {
 		case let .ledger(value):
 			.ledger(value)
 		case let .arculusCard(value):
-			.arculusCard(value)
+			nil
 		case .offDeviceMnemonic, .password:
 			nil // User needs to manually input it
 		}

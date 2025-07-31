@@ -82,10 +82,12 @@ extension FactorSourceAccess.State {
 			return false
 		}
 		switch factorSource.kind {
-		case .device, .ledgerHqHardwareWallet, .arculusCard:
+		case .device, .ledgerHqHardwareWallet:
 			return true
 		case .password, .offDeviceMnemonic:
 			return false
+		case .arculusCard:
+			return self.purpose != .signature
 		}
 	}
 

@@ -7,11 +7,13 @@ extension ArculusFactorSourceAccess {
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
-				// TODO: implement
-				Text("Implement: ArculusFactorSourceAccess")
-					.background(Color.yellow)
-					.foregroundColor(.red)
-					.onAppear { store.send(.view(.appeared)) }
+				VStack {
+					ArculusPINInput.View(store: store.scope(state: \.pinInput, action: \.child.pinInput))
+					WithControlRequirements(store.pinInput.validatedPin, forAction: { store.send(.view(.pinAdded($0))) }) { action in
+						Button(L10n.Common.confirm, action: action)
+							.buttonStyle(.primaryRectangular)
+					}
+				}
 			}
 		}
 	}

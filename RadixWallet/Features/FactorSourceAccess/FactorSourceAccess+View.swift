@@ -24,7 +24,7 @@ extension FactorSourceAccess {
 		}
 
 		private var content: some SwiftUI.View {
-			VStack(spacing: .medium3) {
+			VStack(spacing: .small3) {
 				Image(.signingKey)
 					.foregroundColor(.iconTertiary)
 
@@ -77,6 +77,8 @@ extension FactorSourceAccess {
 				PasswordFactorSourceAccess.View(store: child)
 			} else if let child = store.offDeviceMnemonic {
 				OffDeviceMnemonicFactorSourceAccess.View(store: child)
+			} else if let child = store.arculus {
+				ArculusFactorSourceAccess.View(store: child)
 			}
 		}
 
@@ -106,6 +108,10 @@ private extension StoreOf<FactorSourceAccess> {
 
 	var offDeviceMnemonic: Store<OffDeviceMnemonicFactorSourceAccess.State, OffDeviceMnemonicFactorSourceAccess.Action>? {
 		scope(state: \.offDeviceMnemonic, action: \.child.offDeviceMnemonic)
+	}
+
+	var arculus: Store<ArculusFactorSourceAccess.State, ArculusFactorSourceAccess.Action>? {
+		scope(state: \.arculus, action: \.child.arculus)
 	}
 }
 

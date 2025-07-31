@@ -65,7 +65,7 @@ struct ArculusPINInput: Sendable, FeatureReducer {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Hashable {
 		case appeared
 		case enteredPINUpdated(String)
 	}

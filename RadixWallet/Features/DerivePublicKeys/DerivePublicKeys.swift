@@ -77,7 +77,7 @@ private extension DerivePublicKeys {
 					factorSourceId: input.factorSourceId
 				)
 
-			case let .arculusCard(arculus):
+			case let .arculusCard(arculus, _):
 				try await arculusCardClient.derivePublicKeys(arculus, input.derivationPaths)
 
 			default:

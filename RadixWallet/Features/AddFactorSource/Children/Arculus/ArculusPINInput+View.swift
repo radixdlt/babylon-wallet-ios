@@ -8,7 +8,7 @@ extension ArculusPINInput {
 			case confirmation
 		}
 
-		@FocusState private var isFocused: Bool
+		@FocusState private var inputFieldFocused: Bool
 		@Perception.Bindable var store: StoreOf<ArculusPINInput>
 
 		var body: some SwiftUI.View {
@@ -20,7 +20,7 @@ extension ArculusPINInput {
 						.background(Color.clear)
 						.accentColor(.clear)
 						.frame(width: .zero, height: .zero)
-						.focused($isFocused)
+						.focused($inputFieldFocused)
 
 					pinInputView(text: "Enter PIN", input: store.enteredPIN, isFocused: store.inputText.count < pinLength)
 
@@ -35,7 +35,7 @@ extension ArculusPINInput {
 				}
 				.padding()
 				.onAppear {
-					isFocused = true
+					inputFieldFocused = true
 				}
 			}
 		}
@@ -50,13 +50,18 @@ extension ArculusPINInput {
 					ForEach(0 ..< pinLength, id: \.self) { index in
 						ZStack {
 							RoundedRectangle(cornerRadius: 8)
-								.stroke(isFocused && index == input.count ? .textFieldFocusedBorder : Color.textFieldBorder, lineWidth: 1)
+								.stroke(isFocused && index == input.count ? .textFieldFocusedBorder : .textFieldBorder, lineWidth: 1)
+								.background(.textFieldBackground)
 								.frame(width: 42, height: 62)
-								.background(.tertiaryBackground)
+								.clipShape(RoundedRectangle(cornerRadius: 8))
 							Text(index < input.count ? "*" : "")
 						}
 					}
 				}
+			}
+			.contentShape(Rectangle())
+			.onTapGesture {
+				inputFieldFocused = true
 			}
 		}
 	}
