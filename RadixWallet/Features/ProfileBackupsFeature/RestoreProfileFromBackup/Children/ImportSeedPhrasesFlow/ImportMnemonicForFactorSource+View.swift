@@ -16,7 +16,7 @@ extension ImportMnemonicForFactorSource {
 						if store.isAllowedToSkip {
 							skipButton
 						}
-						confirButton
+						confirmButton
 					}
 					.padding(.medium3)
 				}
@@ -62,7 +62,7 @@ extension ImportMnemonicForFactorSource {
 			}
 		}
 
-		private var confirButton: some SwiftUI.View {
+		private var confirmButton: some SwiftUI.View {
 			Button(L10n.Common.confirm) {
 				store.send(.view(.confirmButtonTapped))
 			}

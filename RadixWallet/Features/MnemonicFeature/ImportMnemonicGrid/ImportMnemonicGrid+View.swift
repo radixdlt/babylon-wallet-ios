@@ -10,9 +10,9 @@ extension ImportMnemonicGrid {
 				VStack(spacing: .medium3) {
 					wordPicker
 
-//					#if DEBUG
-//					debugSection
-//					#endif
+					#if DEBUG
+					debugSection
+					#endif
 
 					LazyVGrid(columns: .init(repeating: .init(.flexible()), count: 3)) {
 						ForEachStore(store.scope(state: \.words, action: { .child(.word($0, $1)) })) {

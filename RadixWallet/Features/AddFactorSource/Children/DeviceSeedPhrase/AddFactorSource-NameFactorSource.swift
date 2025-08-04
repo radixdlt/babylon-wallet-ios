@@ -110,7 +110,10 @@ extension AddFactorSource {
 							break
 						}
 
-						_ = try await SargonOS.shared.addFactorSource(factorSource: factorSourceInput.factorSource)
+						var fs = factorSourceInput.factorSource
+						fs.setName(name)
+
+						_ = try await SargonOS.shared.addFactorSource(factorSource: fs)
 
 						return EqVoid.instance
 					}

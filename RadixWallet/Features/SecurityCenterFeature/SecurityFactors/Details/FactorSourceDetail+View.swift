@@ -37,6 +37,13 @@ extension FactorSourceDetail {
 //					.header(L10n.FactorSources.Detail.test),
 //					spotCheckRow(viewStore),
 				]
+			case .arculusCard:
+				[
+					.header(L10n.FactorSources.Detail.manage),
+					renameRow(),
+					changePinRow(),
+					forgotPinRow(),
+				]
 			default:
 				[
 					.header(L10n.FactorSources.Detail.manage),
@@ -82,11 +89,19 @@ extension FactorSourceDetail {
 			}
 		}
 
-		private func changePinRow(_ viewStore: ViewStore<FactorSourceDetail.State, FactorSourceDetail.ViewAction>) -> SettingsRow<FactorSourceDetail>.Kind {
+		private func changePinRow() -> SettingsRow<FactorSourceDetail>.Kind {
 			.model(
 				title: L10n.FactorSources.Detail.changePin,
 				icon: .asset(.create),
 				action: .changePinTapped
+			)
+		}
+
+		private func forgotPinRow() -> SettingsRow<FactorSourceDetail>.Kind {
+			.model(
+				title: "Forgot PIN",
+				icon: .asset(.create),
+				action: .forgotPinTapped
 			)
 		}
 	}
@@ -112,6 +127,8 @@ private extension View {
 		return rename(with: destinationStore)
 			.displayMnemonic(with: destinationStore)
 			.importMnemonics(with: destinationStore)
+			.arculusChangePIN(with: destinationStore)
+			.arculusForgotPIN(with: destinationStore)
 		// .spotCheckAlert(with: destinationStore)
 	}
 
@@ -124,6 +141,18 @@ private extension View {
 	private func displayMnemonic(with destinationStore: PresentationStoreOf<FactorSourceDetail.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.displayMnemonic, action: \.displayMnemonic)) {
 			DisplayMnemonic.View(store: $0)
+		}
+	}
+
+	private func arculusChangePIN(with destinationStore: PresentationStoreOf<FactorSourceDetail.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.arculusUpdatePIN, action: \.arculusUpdatePIN)) {
+			ArculusChangePIN.EnterOldPIN.View(store: $0)
+		}
+	}
+
+	private func arculusForgotPIN(with destinationStore: PresentationStoreOf<FactorSourceDetail.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.arculusForgotPIN, action: \.arculusForgotPIN)) {
+			ArculusForgotPIN.InputSeedPhrase.View(store: $0)
 		}
 	}
 

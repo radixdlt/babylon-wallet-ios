@@ -114,6 +114,26 @@ extension NFCSessionClient: SargonUniFFI.NfcTagDriver {
 
 				Card: \(arculusCardFactorSource.hint.label)
 				"""
+			case let .verifyingPin(arculusCardFactorSource):
+				session!.alertMessage = """
+				Verifying Card PIN
+
+				\(message)
+
+				Tap and hold this Arculus Card to your phone. This may take up to a minute.
+
+				Card: \(arculusCardFactorSource.hint.label)
+				"""
+			case let .configuringCardPin(arculusCardFactorSource):
+				session!.alertMessage = """
+				Configuring new Card PIN
+
+				\(message)
+
+				Tap and hold this Arculus Card to your phone. This may take up to a minute.
+
+				Card: \(arculusCardFactorSource.hint.label)
+				"""
 			}
 		}
 	}
@@ -177,6 +197,22 @@ extension NFCSessionClient {
 			case let .derivingPublicKeys(arculusCardFactorSource):
 				session.alertMessage = """
 				Updating Factor Config
+
+				Tap and hold this Arculus Card to your phone. This may take up to a minute.
+
+				Card: \(arculusCardFactorSource.hint.label)
+				"""
+			case let .verifyingPin(arculusCardFactorSource):
+				session.alertMessage = """
+				Verifying Card PIN
+
+				Tap and hold this Arculus Card to your phone. This may take up to a minute.
+
+				Card: \(arculusCardFactorSource.hint.label)
+				"""
+			case let .configuringCardPin(arculusCardFactorSource):
+				session.alertMessage = """
+				Configuring new Card PIN
 
 				Tap and hold this Arculus Card to your phone. This may take up to a minute.
 

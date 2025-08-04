@@ -1,5 +1,5 @@
 {
-  "originHash" : "24979948b97bd7a7a2529fe588e37f19a282dcd3eb3da019a30dd5e675cfe9e1",
+  "originHash" : "529af031ef9adb65a5b3712d6fd01254a6a67e6cbd3271214271a6c3e9ebc1e2",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -218,15 +218,6 @@
       }
     },
     {
-      "identity" : "sargon",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/radixdlt/sargon",
-      "state" : {
-        "revision" : "d844fed409c7a8405c60f002d4bf08f0d58ceb26",
-        "version" : "1.2.25"
-      }
-    },
-    {
       "identity" : "screenshotpreventing-ios",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/GhenadieVP/ScreenshotPreventing-iOS",
@@ -311,8 +302,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-dependencies",
       "state" : {
-        "revision" : "4c90d6b2b9bf0911af87b103bb40f41771891596",
-        "version" : "1.9.2"
+        "revision" : "eefcdaa88d2e2fd82e3405dfb6eb45872011a0b5",
+        "version" : "1.9.3"
       }
     },
     {
@@ -356,8 +347,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-log.git",
       "state" : {
-        "revision" : "3d8596ed08bd13520157f0355e35caed215ffbfa",
-        "version" : "1.6.3"
+        "revision" : "ce592ae52f982c847a4efc0dd881cc9eb32d29f2",
+        "version" : "1.6.4"
       }
     },
     {
@@ -383,8 +374,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-navigation",
       "state" : {
-        "revision" : "ae208d1a5cf33aee1d43734ea780a09ada6e2a21",
-        "version" : "2.3.1"
+        "revision" : "4e89284c1966538109dc783497405bc680e9bc96",
+        "version" : "2.4.0"
       }
     },
     {

@@ -8,6 +8,7 @@ extension FactorSourceAccess {
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				content
+					.background(.secondaryBackground)
 					.scrollableWithBottomSpacer()
 					.withNavigationBar {
 						store.send(.view(.closeButtonTapped))

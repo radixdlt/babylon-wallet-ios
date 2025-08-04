@@ -22,7 +22,7 @@ extension ArculusPINInput {
 						.frame(width: .zero, height: .zero)
 						.focused($inputFieldFocused)
 
-					pinInputView(text: "Enter PIN", input: store.enteredPIN, isFocused: store.inputText.count < pinLength)
+					pinInputView(text: "Enter new PIN", input: store.enteredPIN, isFocused: store.inputText.count < pinLength)
 
 					if store.shouldConfirmPIN {
 						VStack(alignment: .leading) {
@@ -48,14 +48,16 @@ extension ArculusPINInput {
 					.textStyle(.body1HighImportance)
 				HStack(spacing: 12) {
 					ForEach(0 ..< pinLength, id: \.self) { index in
-						ZStack {
-							RoundedRectangle(cornerRadius: 8)
-								.stroke(isFocused && index == input.count ? .textFieldFocusedBorder : .textFieldBorder, lineWidth: 1)
-								.background(.textFieldBackground)
-								.frame(width: 42, height: 62)
-								.clipShape(RoundedRectangle(cornerRadius: 8))
-							Text(index < input.count ? "*" : "")
-						}
+						Text(index < input.count ? "*" : "")
+							.frame(width: 42, height: 62)
+							.background(
+								RoundedRectangle(cornerRadius: .small2)
+									.stroke(isFocused && index == input.count ? .textFieldFocusedBorder : .textFieldBorder, lineWidth: 1)
+									.background(
+										RoundedRectangle(cornerRadius: .small2)
+											.fill(.textFieldBackground)
+									)
+							)
 					}
 				}
 			}

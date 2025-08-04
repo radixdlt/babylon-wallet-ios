@@ -281,3 +281,43 @@ private extension ImportMnemonicGrid.State {
 		)
 	}
 }
+
+extension ImportMnemonicGrid.State {
+	var mnemonicWithPassphrase: MnemonicWithPassphrase? {
+		guard let mnemonic = try? Mnemonic(words: completedWords) else {
+			return nil
+		}
+
+		return .init(mnemonic: mnemonic)
+	}
+
+	/// An enum describing the different errors that can take place from user's input.
+	enum Status: Sendable, Hashable {
+		/// User hasn't entered every word yet.
+		case incomplete
+
+		/// User has entered every word but a Mnemonic cannot be built from it (checksum fails).
+		case invalid
+
+		/// The entered mnemonic is complete (checksum succeeds)
+		case valid(MnemonicWithPassphrase)
+	}
+
+	var status: Status {
+		if !isComplete {
+			.incomplete
+		} else if let mnemonicWithPassphrase {
+			.valid(mnemonicWithPassphrase)
+		} else {
+			.invalid
+		}
+	}
+
+	var isComplete: Bool {
+		completedWords.count == words.count
+	}
+
+	var completedWords: [BIP39Word] {
+		words.compactMap(\.completeWord)
+	}
+}

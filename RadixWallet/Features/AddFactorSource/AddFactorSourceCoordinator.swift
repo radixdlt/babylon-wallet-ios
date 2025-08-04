@@ -43,7 +43,7 @@ extension AddFactorSource {
 		@Reducer(state: .hashable, action: .equatable)
 		enum Path {
 			case intro(AddFactorSource.Intro)
-			case deviceSeedPhrase(AddFactorSource.DeviceSeedPhrase)
+			case deviceSeedPhrase(AddFactorSource.InputSeedPhrase)
 			case arculusCreatePIN(ArculusCreatePIN)
 			case confirmSeedPhrase(AddFactorSource.ConfirmSeedPhrase)
 			case nameFactorSource(AddFactorSource.NameFactorSource)

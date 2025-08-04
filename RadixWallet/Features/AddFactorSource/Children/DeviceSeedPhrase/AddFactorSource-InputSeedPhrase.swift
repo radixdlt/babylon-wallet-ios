@@ -1,10 +1,10 @@
 import ComposableArchitecture
 import Sargon
 
-// MARK: - AddFactorSource.DeviceSeedPhrase
+// MARK: - AddFactorSource.InputSeedPhrase
 extension AddFactorSource {
 	@Reducer
-	struct DeviceSeedPhrase: Sendable, FeatureReducer {
+	struct InputSeedPhrase: Sendable, FeatureReducer {
 		@ObservableState
 		struct State: Sendable, Hashable {
 			@Shared(.mnemonicBuilder) var mnemonicBuilder
@@ -15,7 +15,7 @@ extension AddFactorSource {
 			let factorSourceKind: FactorSourceKind
 
 			var confirmButtonControlState: ControlState {
-				switch status {
+				switch grid.status {
 				case .incomplete, .invalid:
 					.disabled
 				case .valid:
@@ -99,7 +99,7 @@ extension AddFactorSource {
 				let isEnteringCustomSeedPhrase = state.isEnteringCustomSeedPhrase
 				if isEnteringCustomSeedPhrase {
 					state.$mnemonicBuilder.withLock { builder in
-						if let builderWithMnemonic = try? builder.createMnemonicFromWords(words: state.completedWords.map(\.word)) {
+						if let builderWithMnemonic = try? builder.createMnemonicFromWords(words: state.grid.completedWords.map(\.word)) {
 							builder = builderWithMnemonic
 						}
 					}
@@ -140,47 +140,7 @@ extension AddFactorSource {
 	}
 }
 
-private extension AddFactorSource.DeviceSeedPhrase.State {
-	var mnemonicWithPassphrase: MnemonicWithPassphrase? {
-		guard let mnemonic = try? Mnemonic(words: completedWords) else {
-			return nil
-		}
-
-		return .init(mnemonic: mnemonic)
-	}
-
-	/// An enum describing the different errors that can take place from user's input.
-	enum Status: Sendable, Hashable {
-		/// User hasn't entered every word yet.
-		case incomplete
-
-		/// User has entered every word but a Mnemonic cannot be built from it (checksum fails).
-		case invalid
-
-		/// The entered mnemonic is complete (checksum succeeds)
-		case valid(MnemonicWithPassphrase)
-	}
-
-	var status: Status {
-		if !isComplete {
-			.incomplete
-		} else if let mnemonicWithPassphrase {
-			.valid(mnemonicWithPassphrase)
-		} else {
-			.invalid
-		}
-	}
-
-	var isComplete: Bool {
-		completedWords.count == grid.words.count
-	}
-
-	var completedWords: [BIP39Word] {
-		grid.words.compactMap(\.completeWord)
-	}
-}
-
-extension AddFactorSource.DeviceSeedPhrase.Destination {
+extension AddFactorSource.InputSeedPhrase.Destination {
 	static let factorAlreadyInUseState: State = .factorAlreadyInUseAlert(.init(
 		title: {
 			TextState("Factor Already In Use")

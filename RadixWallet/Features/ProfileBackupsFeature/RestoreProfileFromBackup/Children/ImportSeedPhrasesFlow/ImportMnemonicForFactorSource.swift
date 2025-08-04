@@ -89,7 +89,7 @@ struct ImportMnemonicForFactorSource: Sendable, FeatureReducer {
 			return .send(.delegate(.skipped(state.deviceFactorSource)))
 
 		case .confirmButtonTapped:
-			guard let mnemonicWithPassphrase = state.mnemonicWithPassphrase,
+			guard let mnemonicWithPassphrase = state.grid.mnemonicWithPassphrase,
 			      let accounts = state.entitiesLinkedToFactorSource.wrappedValue?.allAccounts
 			else {
 				return .none
@@ -158,9 +158,9 @@ extension ImportMnemonicForFactorSource.State {
 	}
 
 	var status: Status {
-		if !isComplete {
+		if !grid.isComplete {
 			.incomplete
-		} else if let mnemonicWithPassphrase {
+		} else if let mnemonicWithPassphrase = grid.mnemonicWithPassphrase {
 			.readyForSpotCheck(mnemonicWithPassphrase)
 		} else {
 			.invalid
@@ -175,23 +175,6 @@ extension ImportMnemonicForFactorSource.State {
 		} else {
 			nil
 		}
-	}
-}
-
-private extension ImportMnemonicForFactorSource.State {
-	var mnemonicWithPassphrase: MnemonicWithPassphrase? {
-		guard let mnemonic = try? Mnemonic(words: completedWords) else {
-			return nil
-		}
-		return .init(mnemonic: mnemonic)
-	}
-
-	var isComplete: Bool {
-		completedWords.count == grid.words.count
-	}
-
-	var completedWords: [BIP39Word] {
-		grid.words.compactMap(\.completeWord)
 	}
 }
 

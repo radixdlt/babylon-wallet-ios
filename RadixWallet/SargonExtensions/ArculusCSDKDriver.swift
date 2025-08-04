@@ -181,11 +181,12 @@ final class ArculusCSDKDriver: SargonUniFFI.ArculusCsdkDriver {
 		}
 	}
 
-	func verifyPinResponse(wallet: SargonUniFFI.ArculusWalletPointer, response: Data) -> Int32 {
+	func verifyPinResponse(wallet: SargonUniFFI.ArculusWalletPointer, response: Data) -> ArculusVerifyPinResponse {
 		logData(response: response)
 		let response = response.toArray
 		var numberOfTries = 0
-		return ArculusCSDK.verifyPINResponse(walletPointer: wallet.toOpaquePointer(), response: response, responseLength: response.count, nbrOfTries: &numberOfTries)
+		let status = ArculusCSDK.verifyPINResponse(walletPointer: wallet.toOpaquePointer(), response: response, responseLength: response.count, nbrOfTries: &numberOfTries)
+		return ArculusVerifyPinResponse(status: status, numberOfTriesRemaining: Int8(numberOfTries))
 	}
 
 	func initEncryptedSessionRequest(wallet: SargonUniFFI.ArculusWalletPointer) -> Data? {
