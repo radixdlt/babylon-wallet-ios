@@ -57,7 +57,7 @@ extension AddFactorSource {
 		}
 
 		enum InternalAction: Sendable, Equatable {
-			case factorAlreadyInUse
+			case factorAlreadyInUse(FactorSource)
 		}
 
 		enum DelegateAction: Sendable, Hashable {
@@ -105,10 +105,20 @@ extension AddFactorSource {
 					}
 				}
 				let factorSourceId = state.mnemonicBuilder.getFactorSourceId(kind: state.factorSourceKind)
-				return .run { send in
-					let isInUse = try await SargonOs.shared.isFactorSourceAlreadyInUse(factorSourceId: factorSourceId)
-					if isInUse {
-						await send(.internal(.factorAlreadyInUse))
+				return .run { [kind = state.factorSourceKind, context = state.context] send in
+					let existingFactorSource = try SargonOs.shared.factorSources().first(where: { $0.id == factorSourceId })
+					if let existingFactorSource {
+						if kind == .device {
+							let newParamters = switch context {
+							case .newFactorSource, .recoverFactorSource(false):
+								FactorSourceCryptoParameters.babylon
+							case .recoverFactorSource(true):
+								FactorSourceCryptoParameters.olympia
+							}
+
+							try await SargonOs.shared.appendCryptoParametersToFactorSource(factorSourceId: factorSourceId, cryptoParameters: newParamters)
+						}
+						await send(.internal(.factorAlreadyInUse(existingFactorSource)))
 					} else {
 						await send(.delegate(.completed(withCustomSeedPhrase: isEnteringCustomSeedPhrase)))
 					}
@@ -124,8 +134,8 @@ extension AddFactorSource {
 
 		func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 			switch internalAction {
-			case .factorAlreadyInUse:
-				state.destination = Destination.factorAlreadyInUseState
+			case let .factorAlreadyInUse(fs):
+				state.destination = Destination.factorAlreadyInUseState(fs)
 				return .none
 			}
 		}
@@ -141,14 +151,19 @@ extension AddFactorSource {
 }
 
 extension AddFactorSource.InputSeedPhrase.Destination {
-	static let factorAlreadyInUseState: State = .factorAlreadyInUseAlert(.init(
-		title: {
-			TextState("Factor Already In Use")
-		},
-		actions: {
-			ButtonState(role: .cancel, action: .close) {
-				TextState("Close")
+	static func factorAlreadyInUseState(_ fs: FactorSource) -> State {
+		.factorAlreadyInUseAlert(.init(
+			title: {
+				TextState("Factor Already In Use")
+			},
+			actions: {
+				ButtonState(role: .cancel, action: .close) {
+					TextState("Ok")
+				}
+			},
+			message: {
+				TextState(fs.name)
 			}
-		}
-	))
+		))
+	}
 }
