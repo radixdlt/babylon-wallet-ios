@@ -8,6 +8,7 @@ extension Home {
 		struct State: Sendable, Hashable, Identifiable, AccountWithInfoHolder {
 			var id: AccountAddress { account.address }
 			var accountWithInfo: AccountWithInfo
+			var factorSource: FactorSource?
 
 			var accountWithResources: Loadable<OnLedgerEntity.OnLedgerAccount>
 			var showFiatWorth: Bool = true

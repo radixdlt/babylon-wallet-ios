@@ -106,7 +106,7 @@ private extension View {
 
 	private func verifyMnemonic(with destinationStore: PresentationStoreOf<DisplayMnemonic.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.verifyMnemonic, action: \.verifyMnemonic)) {
-			VerifyMnemonic.View(store: $0)
+			AddFactorSource.ConfirmSeedPhrase.View(store: $0)
 		}
 	}
 }

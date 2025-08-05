@@ -96,31 +96,6 @@ extension FactorSourcesClient: DependencyKey {
 			return factorSourceID
 		}
 
-		let getMainDeviceFactorSource: GetMainDeviceFactorSource = {
-			let sources = try await getFactorSources()
-				.filter { $0.factorSourceKind == .device }
-				.filter { !$0.supportsOlympia }
-				.map { try $0.extract(as: DeviceFactorSource.self) }
-
-			if let explicitMain = sources.first(where: { $0.isExplicitMain }) {
-				return explicitMain
-			} else {
-				if sources.count == 0 {
-					let errorMessage = "BAD IMPL found no babylon device factor source"
-					loggerGlobal.critical(.init(stringLiteral: errorMessage))
-					assertionFailure(errorMessage)
-					throw FactorSourceNotFound()
-				} else if sources.count > 1 {
-					let errorMessage = "BAD IMPL found more than 1 implicit main babylon device factor sources"
-					loggerGlobal.critical(.init(stringLiteral: errorMessage))
-					let dateSorted = sources.sorted(by: { $0.addedOn < $1.addedOn })
-					return dateSorted.first! // best we can do
-				} else {
-					return sources[0] // found implicit one
-				}
-			}
-		}
-
 		let getCurrentNetworkID: GetCurrentNetworkID = {
 			await profileStore.profile().networkID
 		}
@@ -178,87 +153,9 @@ extension FactorSourcesClient: DependencyKey {
 		return Self(
 			indicesOfEntitiesControlledByFactorSource: indicesOfEntitiesControlledByFactorSource,
 			getCurrentNetworkID: getCurrentNetworkID,
-			getMainDeviceFactorSource: getMainDeviceFactorSource,
-			createNewMainDeviceFactorSource: {
-				@Dependency(\.uuid) var uuid
-				@Dependency(\.date) var date
-				@Dependency(\.mnemonicClient) var mnemonicClient
-				@Dependency(\.secureStorageClient) var secureStorageClient
-
-				let mnemonicWithPassphrase = MnemonicWithPassphrase(
-					mnemonic: mnemonicClient.generate(
-						BIP39WordCount.twentyFour,
-						BIP39Language.english
-					)
-				)
-
-				loggerGlobal.info("Creating new main BDFS")
-
-				let hostInfo = await SargonOS.shared.resolveHostInfo()
-
-				let newBDFS = DeviceFactorSource.babylon(
-					mnemonicWithPassphrase: mnemonicWithPassphrase,
-					isMain: true,
-					hostInfo: hostInfo
-				)
-
-				assert(newBDFS.isExplicitMainBDFS)
-
-				loggerGlobal.info("Saving new main BDFS to Keychain only, we will NOT save it into Profile just yet.")
-
-				_ = try await addPrivateHDFactorSource(
-					.init(
-						privateHDFactorSource: .init(
-							mnemonicWithPassphrase: mnemonicWithPassphrase,
-							factorSource: newBDFS
-						),
-						onMnemonicExistsStrategy: .abort,
-						saveIntoProfile: false
-					)
-				)
-
-				return PrivateHierarchicalDeterministicFactorSource(
-					mnemonicWithPassphrase: mnemonicWithPassphrase,
-					factorSource: newBDFS
-				)
-			},
 			getFactorSources: getFactorSources,
 			factorSourcesAsyncSequence: {
 				await profileStore.factorSourcesValues()
-			},
-			nextEntityIndexForFactorSource: { request in
-				let mainBDFS = try await getMainDeviceFactorSource()
-				let factorSourceID = request.factorSourceID ?? mainBDFS.factorSourceID
-
-				/// We CANNOT just use `entitiesControlledByFactorSource.count` since it is possible that
-				/// some users from Radix Babylon Wallet version 1.0.0 created accounts not sarting at
-				/// index `0` (since we had global indexing, shared by all FactorSources...), lets say that
-				/// only one account is controlled by a FactorSource `X`, having index `1`, then if we were
-				/// to used `entitiesControlledByFactorSource.count` for "next index" then that would be...
-				/// the value `1` AGAIN! Which does not work. Instead we need to read out the last path
-				/// component (index!) of the derivation paths of `entitiesControlledByFactorSource` and
-				/// find the MAX value and +1 on that. This also ensures that we are NOT "gap filling",
-				/// meaning that we do not want to use index `0` even if it was not used, where `1` was used, so
-				/// next index should be `2`, not `0` (which was free). The rationale is that it would just be
-				/// confusing and messy (for us not the least). Best to always increase. But it is important
-				/// to know  AccountRecoveryScan SHOULD find these "gap entities"!
-				let indices = try await indicesOfEntitiesControlledByFactorSource(
-					.init(
-						entityKind: request.entityKind,
-						factorSourceID: factorSourceID,
-						derivationPathScheme: request.derivationPathScheme,
-						networkID: request.networkID
-					)
-				).indices
-
-				guard let max = indices.max() else {
-					return try! HdPathComponent(
-						localKeySpace: 0,
-						keySpace: .unsecurified(isHardened: true)
-					)
-				}
-				let nextIndex = HdPathComponent(globalKeySpace: max.indexInGlobalKeySpace() + 1)
-				return nextIndex
 			},
 			addPrivateHDFactorSource: addPrivateHDFactorSource,
 			checkIfHasOlympiaFactorSourceForAccounts: { wordCount, softwareAccounts -> FactorSourceIDFromHash? in
@@ -290,7 +187,8 @@ extension FactorSourcesClient: DependencyKey {
 						else {
 							continue
 						}
-						guard (try? mnemonic.validatePublicKeys(of: softwareAccounts)) == true else {
+
+						guard (try? mnemonic.validatePublicKeys(of: softwareAccounts)) == nil else {
 							continue
 						}
 

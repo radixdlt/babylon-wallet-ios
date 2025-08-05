@@ -33,11 +33,11 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 
 	enum ViewAction: Sendable, Equatable {
 		case task
-		case rowTapped(State.Row)
-		case rowMessageTapped(State.Row)
+		case rowTapped(Row)
+		case rowMessageTapped(Row)
 		case addButtonTapped
 		case continueButtonTapped(FactorSource)
-		case changeMainButtonTapped
+		case closeEnterMnemonicButtonTapped
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -55,12 +55,9 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 		enum State: Sendable, Hashable {
 			case detail(FactorSourceDetail.State)
 			case displayMnemonic(DisplayMnemonic.State)
-			case enterMnemonic(ImportMnemonicsFlowCoordinator.State)
-			case addMnemonic(ImportMnemonic.State)
-			case changeMain(ChangeMainFactorSource.State)
+			case enterMnemonic(ImportMnemonicForFactorSource.State)
 			case noP2PLink(AlertState<NoP2PLinkAlert>)
 			case addNewP2PLink(NewConnection.State)
-			case addNewLedger(AddLedgerFactorSource.State)
 			case addFactorSource(AddFactorSource.Coordinator.State)
 		}
 
@@ -68,11 +65,9 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 		enum Action: Sendable, Equatable {
 			case detail(FactorSourceDetail.Action)
 			case displayMnemonic(DisplayMnemonic.Action)
-			case enterMnemonic(ImportMnemonicsFlowCoordinator.Action)
-			case changeMain(ChangeMainFactorSource.Action)
+			case enterMnemonic(ImportMnemonicForFactorSource.Action)
 			case noP2PLink(NoP2PLinkAlert)
 			case addNewP2PLink(NewConnection.Action)
-			case addNewLedger(AddLedgerFactorSource.Action)
 			case addFactorSource(AddFactorSource.Coordinator.Action)
 		}
 
@@ -84,16 +79,10 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 				DisplayMnemonic()
 			}
 			Scope(state: \.enterMnemonic, action: \.enterMnemonic) {
-				ImportMnemonicsFlowCoordinator()
-			}
-			Scope(state: \.changeMain, action: \.changeMain) {
-				ChangeMainFactorSource()
+				ImportMnemonicForFactorSource()
 			}
 			Scope(state: \.addNewP2PLink, action: \.addNewP2PLink) {
 				NewConnection()
-			}
-			Scope(state: \.addNewLedger, action: \.addNewLedger) {
-				AddLedgerFactorSource()
 			}
 			Scope(state: \.addFactorSource, action: \.addFactorSource) {
 				AddFactorSource.Coordinator()
@@ -151,14 +140,25 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 				}
 
 			case .lostFactorSource:
-				state.destination = .enterMnemonic(.init())
+				guard let deviceFS = row.integrity.factorSource.asDevice else {
+					return .none
+				}
+				state.destination = .enterMnemonic(.init(deviceFactorSource: deviceFS, profileToCheck: .current))
+				return .none
+
+			case .none:
 				return .none
 			}
 
 		case .addButtonTapped:
 			switch state.kind {
 			case .device:
-				state.destination = .addFactorSource(.init(kind: state.kind))
+				state.destination = .addFactorSource(
+					.init(
+						mode: .preselectedKind(state.kind),
+						context: .newFactorSource
+					)
+				)
 			case .ledgerHqHardwareWallet:
 				return performActionRequiringP2PEffect(.addLedger, in: &state)
 			default:
@@ -173,9 +173,8 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 			}
 			return .send(.delegate(.selectedFactorSource(factorSource)))
 
-		case .changeMainButtonTapped:
-			let currentMain = state.main?.integrity.factorSource
-			state.destination = .changeMain(.init(kind: state.kind, currentMain: currentMain))
+		case .closeEnterMnemonicButtonTapped:
+			state.destination = nil
 			return .none
 		}
 	}
@@ -200,18 +199,18 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case .enterMnemonic(.delegate):
+		case let .enterMnemonic(.delegate(action)):
 			// We don't care about which delegate action was executed, since any corresponding
 			// updates to the warnings will be handled by securityProblemsEffect.
 			// We just need to dismiss the destination.
 			state.destination = nil
+
+			if case .imported = action {
+				return entitiesEffect(state: state)
+			}
 			return .none
 
 		case .displayMnemonic(.delegate(.backedUp)):
-			state.destination = nil
-			return entitiesEffect(state: state)
-
-		case .changeMain(.delegate(.updated)):
 			state.destination = nil
 			return entitiesEffect(state: state)
 
@@ -227,14 +226,9 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 
 		case let .addNewP2PLink(.delegate(newP2PAction)):
 			switch newP2PAction {
-			case let .newConnection(connectedClient):
+			case .newConnection:
 				state.destination = nil
-				return .run { _ in
-					try await radixConnectClient.updateOrAddP2PLink(connectedClient)
-				} catch: { error, _ in
-					loggerGlobal.error("Failed P2PLink, error \(error)")
-					errorQueue.schedule(error)
-				}
+				return .none
 			}
 
 		case .addFactorSource(.delegate(.finished)):
@@ -248,10 +242,8 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 
 	private func checkP2PLinkEffect() -> Effect<Action> {
 		.run { send in
-			for try await isConnected in await ledgerHardwareWalletClient.isConnectedToAnyConnectorExtension() {
-				guard !Task.isCancelled else { return }
-				await send(.internal(.hasAConnectorExtension(isConnected)))
-			}
+			let hasAConnectorExtension = await ledgerHardwareWalletClient.hasAnyLinkedConnector()
+			await send(.internal(.hasAConnectorExtension(hasAConnectorExtension)))
 		} catch: { error, _ in
 			loggerGlobal.error("failed to get links updates, error: \(error)")
 		}
@@ -270,7 +262,10 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 		// If we have a connection, we can proceed directly
 		switch action {
 		case .addLedger:
-			state.destination = .addNewLedger(.init())
+			state.destination = .addFactorSource(.init(
+				mode: .preselectedKind(.ledgerHqHardwareWallet),
+				context: .newFactorSource
+			))
 			return .none
 		case let .continueWithFactorsource(fs):
 			return .send(.delegate(.selectedFactorSource(fs)))
@@ -306,25 +301,10 @@ private extension FactorSourcesList {
 		let factorSourceIds = entities.map(\.integrity.factorSource.id)
 		let alreadySelectedFactorSourceIds = filterAlreadySelectedFactorSourceIds(state: state, factorSourceIds: factorSourceIds)
 		state.rows = entities.map { entity in
-			let accounts = entity.accounts + entity.hiddenAccounts
-			let personas = entity.personas
-			// Determine row status
-			let status: State.Row.Status = if problems.hasProblem9(accounts: accounts, personas: personas) {
-				.lostFactorSource
-			} else if problems.hasProblem3(accounts: accounts, personas: personas) {
-				.seedPhraseNotRecoverable
-			} else if entity.integrity.isMnemonicMarkedAsBackedUp {
-				.seedPhraseWrittenDown
-			} else {
-				// A way to reproduce this, is to restore a Wallet from a Profile without entering its seed phrase (so it creates a new one)
-				// and do not write down the new seed phrase nor create an entity. In such case, we don't want to show problem3 because the
-				// non-backed up factor source didn't create any entity. Yet, we don't want to show the success checkmark indicating the factor
-				// source was backed up.
-				.notBackedUp
-			}
+			let status = Row.Status(entity: entity, problems: problems)
 
 			// Determine row selectability
-			let selectability: State.Row.Selectability = if state.context == .display {
+			let selectability: Row.Selectability = if state.context == .display {
 				.selectable
 			} else if status == .lostFactorSource {
 				.unselectable
@@ -333,7 +313,7 @@ private extension FactorSourcesList {
 			} else {
 				.selectable
 			}
-			return State.Row(
+			return Row(
 				integrity: entity.integrity,
 				linkedEntities: entity.linkedEntities,
 				status: status,
@@ -377,11 +357,13 @@ extension FactorSourcesList.State {
 		case display
 		case selection(ChooseFactorSourceContext)
 	}
+}
 
+extension FactorSourcesList {
 	struct Row: Sendable, Hashable, Identifiable {
 		let integrity: FactorSourceIntegrity
 		let linkedEntities: FactorSourceCardDataSource.LinkedEntities
-		let status: Status
+		let status: Status?
 		let selectability: Selectability
 
 		var id: FactorSourceID {
@@ -389,44 +371,51 @@ extension FactorSourcesList.State {
 		}
 	}
 
-	var main: Row? {
-		switch context {
-		case .display:
-			rows.first(where: \.integrity.isExplicitMain)
-		case .selection:
-			nil
-		}
-	}
-
-	var others: [Row] {
-		let main = main
-		return rows
-			.filter { $0 != main }
-			.sorted(by: { left, right in
-				let lhs = left.integrity
-				let rhs = right.integrity
-				switch (lhs, rhs) {
-				case let (.device(lDevice), .device(rDevice)):
-					if lhs.isExplicitMain {
-						return true
-					} else if lDevice.factorSource.isBDFS, rDevice.factorSource.isBDFS {
-						return sort(lhs, rhs)
-					} else {
-						return lDevice.factorSource.isBDFS
-					}
-				default:
-					return sort(lhs, rhs)
-				}
-
-			})
-	}
-
 	private func sort(_ lhs: FactorSourceIntegrity, _ rhs: FactorSourceIntegrity) -> Bool {
 		lhs.factorSource.common.addedOn < rhs.factorSource.common.addedOn
 	}
 }
 
-extension FactorSourcesList.State.Row {
+extension FactorSourcesList.Row.Status {
+	init(entity: EntitiesLinkedToFactorSource, problems: [SecurityProblem]) {
+		let accounts = entity.accounts + entity.hiddenAccounts
+		let personas = entity.personas
+
+		// Determine row status
+		self = if problems.hasProblem9(accounts: accounts, personas: personas) {
+			.lostFactorSource
+		} else if problems.hasProblem3(accounts: accounts, personas: personas) {
+			.seedPhraseNotRecoverable
+		} else if entity.integrity.isMnemonicMarkedAsBackedUp {
+			.seedPhraseWrittenDown
+		} else {
+			// A way to reproduce this, is to restore a Wallet from a Profile without entering its seed phrase (so it creates a new one)
+			// and do not write down the new seed phrase nor create an entity. In such case, we don't want to show problem3 because the
+			// non-backed up factor source didn't create any entity. Yet, we don't want to show the success checkmark indicating the factor
+			// source was backed up.
+			.notBackedUp
+		}
+	}
+
+	init?(integrity: FactorSourceIntegrity) {
+		switch integrity {
+		case let .device(deviceIntegrity):
+			if !deviceIntegrity.isMnemonicPresentInSecureStorage {
+				self = .lostFactorSource
+			} else if !deviceIntegrity.isMnemonicMarkedAsBackedUp {
+				self = .seedPhraseNotRecoverable
+			} else if deviceIntegrity.isMnemonicMarkedAsBackedUp {
+				self = .seedPhraseWrittenDown
+			} else {
+				return nil
+			}
+		default:
+			return nil
+		}
+	}
+}
+
+extension FactorSourcesList.Row {
 	enum Status: Sendable, Hashable {
 		/// User has lost access to the given factor source (`SecurityProblem.problem9`).
 		/// We will show an error message.
@@ -459,7 +448,7 @@ extension FactorSourcesList.State.Row {
 	}
 }
 
-private extension EntitiesLinkedToFactorSource {
+extension EntitiesLinkedToFactorSource {
 	var linkedEntities: FactorSourceCardDataSource.LinkedEntities {
 		.init(accounts: accounts, personas: personas, hasHiddenEntities: !hiddenAccounts.isEmpty || !hiddenPersonas.isEmpty)
 	}
@@ -472,29 +461,6 @@ private extension FactorSourceIntegrity {
 			device.isMnemonicMarkedAsBackedUp
 		case .ledger, .offDeviceMnemonic, .arculusCard, .password:
 			false
-		}
-	}
-}
-
-// MARK: - NoP2PLinkAlert
-enum NoP2PLinkAlert: Sendable, Hashable {
-	case addNewP2PLinkTapped
-	case cancelTapped
-}
-
-extension AlertState<NoP2PLinkAlert> {
-	static var noP2Plink: AlertState {
-		AlertState {
-			TextState(L10n.LedgerHardwareDevices.LinkConnectorAlert.title)
-		} actions: {
-			ButtonState(role: .cancel, action: .cancelTapped) {
-				TextState(L10n.Common.cancel)
-			}
-			ButtonState(action: .addNewP2PLinkTapped) {
-				TextState(L10n.LedgerHardwareDevices.LinkConnectorAlert.continue)
-			}
-		} message: {
-			TextState(L10n.LedgerHardwareDevices.LinkConnectorAlert.message)
 		}
 	}
 }

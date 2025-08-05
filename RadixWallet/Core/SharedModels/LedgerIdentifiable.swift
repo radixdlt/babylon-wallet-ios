@@ -39,6 +39,7 @@ enum LedgerIdentifiable: Sendable {
 extension LedgerIdentifiable {
 	enum Address: Hashable, Sendable, Identifiable {
 		case account(AccountAddress)
+		case identity(IdentityAddress)
 		case package(PackageAddress)
 		case resource(ResourceAddress)
 		case resourcePool(PoolAddress)
@@ -55,6 +56,8 @@ extension LedgerIdentifiable {
 			switch self {
 			case let .account(accountAddress):
 				accountAddress.formatted(format)
+			case let .identity(identityAddress):
+				identityAddress.formatted(format)
 			case let .package(packageAddress):
 				packageAddress.formatted(format)
 			case let .resource(resourceAddress):
@@ -74,6 +77,8 @@ extension LedgerIdentifiable {
 			switch self {
 			case .account:
 				"account"
+			case .identity:
+				"identity"
 			case .package:
 				"package"
 			case .resource:
@@ -93,6 +98,8 @@ extension LedgerIdentifiable {
 			switch self {
 			case let .account(accountAddress):
 				accountAddress.id
+			case let .identity(identityAdress):
+				identityAdress.id
 			case let .package(packageAddress):
 				packageAddress.id
 			case let .resource(resourceAddress):
@@ -115,6 +122,8 @@ extension LedgerIdentifiable.Address {
 		switch address {
 		case let .account(accountAddress):
 			self = .account(accountAddress)
+		case let .identity(identityAddress):
+			self = .identity(identityAddress)
 		case let .resource(resourceAddress):
 			self = .resource(resourceAddress)
 		case let .pool(poolAddress):
