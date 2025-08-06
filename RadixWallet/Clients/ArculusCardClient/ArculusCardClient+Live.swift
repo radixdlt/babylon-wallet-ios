@@ -6,8 +6,7 @@ extension ArculusCardClient: DependencyKey {
 
 	static let liveValue: Self = .init(
 		validateMinFirmwareVersion: {
-			ArculusMinFirmwareVersionRequirement.valid
-			// try await SargonOS.shared.arculusCardValidateMinFirmwareVersion()
+			try await SargonOS.shared.arculusCardValidateMinFirmwareVersion()
 		},
 		derivePublicKeys: { factorSource, paths in
 			try await SargonOS.shared.arculusCardDerivePublicKeys(

@@ -3,7 +3,7 @@ import SwiftUI
 // MARK: - AddFactorSource.InputSeedPhrase.View
 extension AddFactorSource.InputSeedPhrase {
 	struct View: SwiftUI.View {
-		let store: StoreOf<AddFactorSource.InputSeedPhrase>
+		@Perception.Bindable var store: StoreOf<AddFactorSource.InputSeedPhrase>
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
@@ -35,6 +35,13 @@ extension AddFactorSource.InputSeedPhrase {
 				headerView
 
 				ImportMnemonicGrid.View(store: store.grid)
+				if store.advancedModeEnabled {
+					passphrase
+				}
+
+				if store.hasPassphrase {
+					modeToggleButton
+				}
 
 				if !store.isEnteringCustomSeedPhrase {
 					Button(L10n.NewBiometricFactor.SeedPhrase.enterCustomButton) {
@@ -75,6 +82,25 @@ extension AddFactorSource.InputSeedPhrase {
 			} else {
 				L10n.NewBiometricFactor.SeedPhrase.subtitle
 			}
+		}
+
+		private var passphrase: some SwiftUI.View {
+			AppTextField(
+				primaryHeading: .init(text: L10n.ImportMnemonic.passphrase, isProminent: true),
+				placeholder: L10n.ImportMnemonic.passphrasePlaceholder,
+				text: $store.bip39Passphrase.sending(\.view.passphraseChanged),
+				hint: .info(L10n.ImportMnemonic.passphraseHint)
+			)
+			.autocorrectionDisabled()
+		}
+
+		private var modeToggleButton: some SwiftUI.View {
+			Button(store.advancedModeEnabled ? L10n.ImportMnemonic.regularModeButton : L10n.ImportMnemonic.advancedModeButton) {
+				store.send(.view(.toggleModeButtonTapped))
+			}
+			.buttonStyle(.blueText)
+			.frame(height: .large1)
+			.padding(.bottom, .small2)
 		}
 	}
 }

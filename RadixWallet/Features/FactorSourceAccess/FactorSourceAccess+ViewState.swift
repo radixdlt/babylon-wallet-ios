@@ -87,7 +87,7 @@ extension FactorSourceAccess.State {
 		case .password, .offDeviceMnemonic:
 			return false
 		case .arculusCard:
-			return self.purpose != .signature
+			return !self.purpose.requiresSignature
 		}
 	}
 

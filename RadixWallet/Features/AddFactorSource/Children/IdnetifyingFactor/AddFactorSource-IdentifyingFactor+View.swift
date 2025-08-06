@@ -27,7 +27,7 @@ extension AddFactorSource.IdentifyingFactor {
 					Spacer()
 				}
 				.padding(.medium3)
-				.task { @MainActor in
+				.onFirstTask { @MainActor in
 					await store.send(.view(.task)).finish()
 				}
 				.destination(store: store)

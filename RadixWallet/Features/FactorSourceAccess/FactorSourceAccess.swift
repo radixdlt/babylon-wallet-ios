@@ -135,7 +135,7 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 				return .send(.delegate(.perform(.ledger(value))))
 
 			case let .arculusCard(value):
-				if state.purpose == .signature {
+				if state.purpose.requiresSignature {
 					state.arculus = .init(factorSource: value)
 					return .none
 				}

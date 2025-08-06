@@ -284,11 +284,11 @@ private extension ImportMnemonicGrid.State {
 
 extension ImportMnemonicGrid.State {
 	var mnemonicWithPassphrase: MnemonicWithPassphrase? {
-		guard let mnemonic = try? Mnemonic(words: completedWords) else {
-			return nil
-		}
+		mnemonic.map(MnemonicWithPassphrase.init)
+	}
 
-		return .init(mnemonic: mnemonic)
+	var mnemonic: Mnemonic? {
+		try? Mnemonic(words: completedWords)
 	}
 
 	/// An enum describing the different errors that can take place from user's input.

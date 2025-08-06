@@ -12,6 +12,10 @@ extension AddFactorSource {
 			var grid: ImportMnemonicGrid.State!
 			var isEnteringCustomSeedPhrase: Bool = false
 			var context: Context
+			var bip39Passphrase: String = ""
+			var advancedModeEnabled: Bool = false
+
+			let hasPassphrase: Bool
 			let factorSourceKind: FactorSourceKind
 
 			var confirmButtonControlState: ControlState {
@@ -31,6 +35,7 @@ extension AddFactorSource {
 				self.factorSourceKind = factorSourceKind
 				switch context {
 				case .newFactorSource:
+					hasPassphrase = false
 					$mnemonicBuilder.withLock { builder in
 						builder = builder.generateNewMnemonic()
 					}
@@ -39,6 +44,7 @@ extension AddFactorSource {
 					grid = .init(mnemonic: mnemonic)
 				case let .recoverFactorSource(isOlympia):
 					isEnteringCustomSeedPhrase = true
+					hasPassphrase = isOlympia
 					grid = .init(count: .twentyFour, wordCounts: isOlympia ? Bip39WordCount.allCases : [])
 				}
 			}
@@ -46,9 +52,12 @@ extension AddFactorSource {
 
 		typealias Action = FeatureAction<Self>
 
+		@CasePathable
 		enum ViewAction: Sendable, Hashable {
 			case confirmButtonTapped
 			case enterCustomSeedPhraseButtonTapped
+			case passphraseChanged(String)
+			case toggleModeButtonTapped
 		}
 
 		@CasePathable
@@ -125,9 +134,18 @@ extension AddFactorSource {
 				} catch: { error, _ in
 					errorQueue.schedule(error)
 				}
+
 			case .enterCustomSeedPhraseButtonTapped:
 				state.grid = .init(count: .twentyFour, wordCounts: state.factorSourceKind == .arculusCard ? [.twelve, .twentyFour] : [])
 				state.isEnteringCustomSeedPhrase = true
+				return .none
+
+			case .toggleModeButtonTapped:
+				state.advancedModeEnabled.toggle()
+				return .none
+
+			case let .passphraseChanged(passphrase):
+				state.bip39Passphrase = passphrase
 				return .none
 			}
 		}
