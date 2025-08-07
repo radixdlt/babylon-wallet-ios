@@ -228,6 +228,52 @@ extension FeatureReducer {
 	}
 }
 
+struct FailureToHandleSecurityProblem: Error {}
+
+extension FeatureReducer {
+	func handleSecurityProblem(_ problem: SecurityProblem, forEntity entity: AccountOrPersona) async throws -> SecurityProblemHandlerDestination {
+		@Dependency(\.secureStorageClient) var secureStorageClient
+		@Dependency(\.factorSourcesClient) var factorSourcesClient
+
+		let fsInstance = entity.unsecuredControllingFactorInstance!.factorInstance
+		let fsID: FactorSourceIdFromHash = try fsInstance.factorSourceID.extract()
+
+		switch problem {
+		case .problem3:
+			let mwp = try secureStorageClient.loadMnemonic(
+				factorSourceID: fsID,
+				notifyIfMissing: true
+			)
+
+			guard let mwp else {
+				throw FailureToHandleSecurityProblem()
+			}
+
+			return .displayMnemonic(.init(mnemonic: mwp.mnemonic, factorSourceID: fsID))
+
+		case .problem9:
+			let factorSource = try await factorSourcesClient.getFactorSource(of: fsInstance)?.asDevice
+
+			guard let factorSource else {
+				throw FailureToHandleSecurityProblem()
+			}
+			return .enterMnemonic(.init(
+				deviceFactorSource: factorSource,
+				profileToCheck: .current
+			))
+
+		default:
+			return .securityCenter(.init())
+		}
+	}
+}
+
+enum SecurityProblemHandlerDestination: Hashable, Sendable {
+	case displayMnemonic(DisplayMnemonic.State)
+	case enterMnemonic(ImportMnemonicForFactorSource.State)
+	case securityCenter(SecurityCenter.State)
+}
+
 extension FactorSourceIntegrity {
 	var factorSourceIdOfMnemonicToExport: FactorSourceIdFromHash? {
 		switch self {

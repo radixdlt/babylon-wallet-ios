@@ -45,12 +45,12 @@ struct PersonaFeature: Sendable, FeatureReducer {
 
 	enum ViewAction: Sendable, Equatable {
 		case tapped
-		case securityProblemsTapped
+		case securityProblemTapped(SecurityProblem)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
 		case openDetails
-		case openSecurityCenter
+		case handleSecurityProblem(SecurityProblem)
 	}
 
 	init() {}
@@ -59,8 +59,8 @@ struct PersonaFeature: Sendable, FeatureReducer {
 		switch viewAction {
 		case .tapped:
 			.send(.delegate(.openDetails))
-		case .securityProblemsTapped:
-			.send(.delegate(.openSecurityCenter))
+		case let .securityProblemTapped(problem):
+			.send(.delegate(.handleSecurityProblem(problem)))
 		}
 	}
 }

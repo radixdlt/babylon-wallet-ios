@@ -101,8 +101,8 @@ extension AccountDetails {
 				.padding(.horizontal, .small3)
 
 				VStack(spacing: .small2) {
-					EntitySecurityProblemsView(config: viewStore.securityProblemsConfig) {
-						viewStore.send(.securityProblemsTapped)
+					EntitySecurityProblemsView(config: viewStore.securityProblemsConfig) { problem in
+						viewStore.send(.securityProblemTapped(problem))
 					}
 
 					ForEachStatic(viewStore.accountLockerClaims) { details in

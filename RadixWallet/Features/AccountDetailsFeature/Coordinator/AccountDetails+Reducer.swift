@@ -35,7 +35,7 @@ struct AccountDetails: Sendable, FeatureReducer {
 		case transferButtonTapped
 		case historyButtonTapped
 		case showFiatWorthToggled
-		case securityProblemsTapped
+		case securityProblemTapped(SecurityProblem)
 		case accountLockerClaimTapped(AccountLockerClaimDetails)
 	}
 
@@ -52,9 +52,7 @@ struct AccountDetails: Sendable, FeatureReducer {
 		case accountUpdated(Account)
 		case setSecurityProblems([SecurityProblem])
 		case setAccountLockerClaims([AccountLockerClaimDetails])
-		case setDestinationDisplayMnemonic(DisplayMnemonic.State)
-		case setDestinationEnterMnemonic(ImportMnemonicForFactorSource.State)
-		case setDestinationSecurityCenter(SecurityCenter.State)
+		case presentSecurityProblemHandler(SecurityProblemHandlerDestination)
 	}
 
 	struct Destination: DestinationReducer {
@@ -198,8 +196,8 @@ struct AccountDetails: Sendable, FeatureReducer {
 				try await appPreferencesClient.toggleIsCurrencyAmountVisible()
 			}
 
-		case .securityProblemsTapped:
-			return handleSecurityProblems(&state)
+		case let .securityProblemTapped(problem):
+			return handleSpecificSecurityProblem(problem, state: &state)
 
 		case let .accountLockerClaimTapped(details):
 			return .run { _ in
@@ -220,13 +218,13 @@ struct AccountDetails: Sendable, FeatureReducer {
 		case let .setAccountLockerClaims(claims):
 			state.accountLockerClaims = claims
 			return .none
-		case let .setDestinationDisplayMnemonic(displayMnemonicState):
+		case let .presentSecurityProblemHandler(.displayMnemonic(displayMnemonicState)):
 			state.destination = .displayMnemonic(displayMnemonicState)
 			return .none
-		case let .setDestinationEnterMnemonic(enterMnemonicState):
+		case let .presentSecurityProblemHandler(.enterMnemonic(enterMnemonicState)):
 			state.destination = .enterMnemonic(enterMnemonicState)
 			return .none
-		case let .setDestinationSecurityCenter(securityCenterState):
+		case let .presentSecurityProblemHandler(.securityCenter(securityCenterState)):
 			state.destination = .securityCenter(securityCenterState)
 			return .none
 		}
@@ -298,6 +296,14 @@ struct AccountDetails: Sendable, FeatureReducer {
 			state.destination = nil
 			return sendStakeClaimTransaction(state.account.address, stakeClaims: [stakeClaim.intoSargon()])
 
+		case .displayMnemonic(.delegate(.backedUp)):
+			state.destination = nil
+			return .none
+
+		case .enterMnemonic(.delegate(.imported)):
+			state.destination = nil
+			return .none
+
 		default:
 			return .none
 		}
@@ -347,61 +353,9 @@ struct AccountDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	private func handleSecurityProblems(_ state: inout State) -> Effect<Action> {
-		let problems = state.securityProblemsConfig.problems
-		let accountAddress = state.account.address
-
-		// Find the specific security problem for this account
-		for problem in problems {
-			switch problem {
-			case let .problem3(addresses) where accountHasProblem(accountAddress, in: addresses):
-				return exportMnemonic(controlling: state.account) { mnemonic in
-					state.destination = .displayMnemonic(.init(
-						mnemonic: mnemonic.mnemonicWithPassphrase.mnemonic,
-						factorSourceID: mnemonic.factorSourceID
-					))
-				}
-
-			case let .problem9(addresses) where accountHasProblem(accountAddress, in: addresses):
-				return handleProblem9ForAccount(state.account)
-
-			default:
-				continue
-			}
-		}
-
-		// Fallback to security center if no specific action found
-		state.destination = .securityCenter(.init())
-		return .none
-	}
-
-	private func accountHasProblem(_ accountAddress: AccountAddress, in addresses: AddressesOfEntitiesInBadState) -> Bool {
-		addresses.accounts.contains(accountAddress) || addresses.hiddenAccounts.contains(accountAddress)
-	}
-
-	private func handleProblem9ForAccount(_ account: Account) -> Effect<Action> {
-		guard let factorInstance = account.unsecuredControllingFactorInstance?.factorInstance else {
-			return .run { send in
-				await send(.internal(.setDestinationSecurityCenter(.init())))
-			}
-		}
-
-		return .run { send in
-			do {
-				if let factorSource = try await factorSourcesClient.getFactorSource(of: factorInstance),
-				   let deviceFactorSource = factorSource.asDevice
-				{
-					await send(.internal(.setDestinationEnterMnemonic(.init(
-						deviceFactorSource: deviceFactorSource,
-						profileToCheck: .current
-					))))
-				} else {
-					await send(.internal(.setDestinationSecurityCenter(.init())))
-				}
-			} catch {
-				loggerGlobal.error("Failed to handle problem9: \(error), falling back to SecurityCenter")
-				await send(.internal(.setDestinationSecurityCenter(.init())))
-			}
+	private func handleSpecificSecurityProblem(_ problem: SecurityProblem, state: inout State) -> Effect<Action> {
+		.run { [account = state.account] send in
+			try await send(.internal(.presentSecurityProblemHandler(handleSecurityProblem(problem, forEntity: .accountEntity(account)))))
 		}
 	}
 }

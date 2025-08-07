@@ -334,13 +334,13 @@ struct Home: Sendable, FeatureReducer {
 			case .openDetails:
 				state.destination = .accountDetails(.init(accountWithInfo: accountRow.accountWithInfo, showFiatWorth: state.showFiatWorth))
 				return .none
-			case .openSecurityCenter:
-				state.destination = .securityCenter(.init())
+			case let .presentSecurityProblemHandler(.securityCenter(securityCenterState)):
+				state.destination = .securityCenter(securityCenterState)
 				return .none
-			case let .displayMnemonic(displayMnemonicState):
+			case let .presentSecurityProblemHandler(.displayMnemonic(displayMnemonicState)):
 				state.destination = .displayMnemonic(displayMnemonicState)
 				return .none
-			case let .enterMnemonic(enterMnemonicState):
+			case let .presentSecurityProblemHandler(.enterMnemonic(enterMnemonicState)):
 				state.destination = .enterMnemonic(enterMnemonicState)
 				return .none
 			}
@@ -374,6 +374,14 @@ struct Home: Sendable, FeatureReducer {
 				loggerGlobal.error("Failed P2PLink, error \(error)")
 				errorQueue.schedule(error)
 			}
+
+		case .displayMnemonic(.delegate(.backedUp)):
+			state.destination = nil
+			return .none
+
+		case .enterMnemonic(.delegate(.imported)):
+			state.destination = nil
+			return .none
 
 		default:
 			return .none
