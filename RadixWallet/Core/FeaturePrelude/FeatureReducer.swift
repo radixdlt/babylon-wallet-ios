@@ -228,7 +228,7 @@ extension FeatureReducer {
 	}
 }
 
-private extension FactorSourceIntegrity {
+extension FactorSourceIntegrity {
 	var factorSourceIdOfMnemonicToExport: FactorSourceIdFromHash? {
 		switch self {
 		case let .device(device):

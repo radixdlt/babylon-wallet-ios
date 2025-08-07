@@ -6,6 +6,7 @@ extension AddFactorSource {
 		@ObservableState
 		struct State: Sendable, Hashable {
 			let kind: FactorSourceKind
+			var initialTaskExecuted = false
 
 			@Presents
 			var destination: Destination.State? = nil
@@ -64,22 +65,16 @@ extension AddFactorSource {
 
 		func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
-			case .task, .retryButtonTapped:
-				switch state.kind {
-				case .ledgerHqHardwareWallet:
-					getLedgerHardwareDeviceInfo()
-
-				case .arculusCard:
-					.run { send in
-						let versionRequirement = try await arculusCardClient.validateMinFirmwareVersion()
-						await send(.internal(.arculusCardValidation(versionRequirement)))
-					}
-
-				default:
-					.none
+			case .task:
+				guard !state.initialTaskExecuted else {
+					return .none
 				}
+				state.initialTaskExecuted = true
+				return identifyFactor(kind: state.kind)
+			case .retryButtonTapped:
+				return identifyFactor(kind: state.kind)
 			case .closeButtonTapped:
-				.run { _ in
+				return .run { _ in
 					await dismiss()
 				}
 			}
@@ -117,6 +112,22 @@ extension AddFactorSource {
 				errorQueue.schedule(error)
 			}
 		}
+
+		func identifyFactor(kind: FactorSourceKind) -> Effect<Action> {
+			switch kind {
+			case .ledgerHqHardwareWallet:
+				getLedgerHardwareDeviceInfo()
+
+			case .arculusCard:
+				.run { send in
+					let versionRequirement = try await arculusCardClient.validateMinFirmwareVersion()
+					await send(.internal(.arculusCardValidation(versionRequirement)))
+				}
+
+			default:
+				.none
+			}
+		}
 	}
 }
 
@@ -128,10 +139,8 @@ extension AlertState<Never> {
 			TextState(L10n.AddLedgerDevice.AlreadyAddedAlert.message(fs.name))
 		}
 	}
-}
 
-extension AlertState<Never> {
-	static func arculusInvalidFirmwareVersion(_ version: String) -> AlertState<Never> {
+	static func arculusInvalidFirmwareVersion(_ version: String) -> AlertState {
 		AlertState {
 			TextState("Unsupported Arculus Card")
 		}

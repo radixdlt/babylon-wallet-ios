@@ -110,6 +110,8 @@ private extension View {
 			.relinkConnector(with: destinationStore)
 			.securityCenter(with: destinationStore)
 			.p2pLinks(with: destinationStore)
+			.displayMnemonic(with: destinationStore)
+			.enterMnemonic(with: destinationStore)
 	}
 
 	private func accountDetails(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
@@ -149,6 +151,20 @@ private extension View {
 	private func p2pLinks(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.p2pLinks, action: \.p2pLinks)) {
 			P2PLinksFeature.View(store: $0)
+		}
+	}
+
+	private func displayMnemonic(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.displayMnemonic, action: \.displayMnemonic)) {
+			DisplayMnemonic.View(store: $0)
+		}
+	}
+
+	private func enterMnemonic(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.enterMnemonic, action: \.enterMnemonic)) { store in
+			NavigationStack {
+				ImportMnemonicForFactorSource.View(store: store)
+			}
 		}
 	}
 }

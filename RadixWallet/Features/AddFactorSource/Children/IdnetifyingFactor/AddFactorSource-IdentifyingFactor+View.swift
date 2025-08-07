@@ -27,7 +27,7 @@ extension AddFactorSource.IdentifyingFactor {
 					Spacer()
 				}
 				.padding(.medium3)
-				.onFirstTask { @MainActor in
+				.task { @MainActor in
 					await store.send(.view(.task)).finish()
 				}
 				.destination(store: store)
@@ -46,12 +46,7 @@ extension AddFactorSource.IdentifyingFactor {
 private extension View {
 	func destination(store: StoreOf<AddFactorSource.IdentifyingFactor>) -> some View {
 		let destinationStore = store.scope(state: \.$destination, action: \.destination)
-		return factorSourceAlreadyExsits(with: destinationStore)
-			.arculusInvalidFirmwareVersion(with: destinationStore)
-	}
-
-	private func factorSourceAlreadyExsits(with destinationStore: PresentationStoreOf<AddFactorSource.IdentifyingFactor.Destination>) -> some View {
-		alert(store: destinationStore.scope(state: \.factorSourceAlreadyExists, action: \.factorSourceAlreadyExists))
+		return arculusInvalidFirmwareVersion(with: destinationStore)
 	}
 
 	private func arculusInvalidFirmwareVersion(with destinationStore: PresentationStoreOf<AddFactorSource.IdentifyingFactor.Destination>) -> some View {

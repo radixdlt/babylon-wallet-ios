@@ -52,6 +52,9 @@ struct AccountDetails: Sendable, FeatureReducer {
 		case accountUpdated(Account)
 		case setSecurityProblems([SecurityProblem])
 		case setAccountLockerClaims([AccountLockerClaimDetails])
+		case setDestinationDisplayMnemonic(DisplayMnemonic.State)
+		case setDestinationEnterMnemonic(ImportMnemonicForFactorSource.State)
+		case setDestinationSecurityCenter(SecurityCenter.State)
 	}
 
 	struct Destination: DestinationReducer {
@@ -66,6 +69,8 @@ struct AccountDetails: Sendable, FeatureReducer {
 			case stakeClaimDetails(NonFungibleTokenDetails.State)
 			case poolUnitDetails(PoolUnitDetails.State)
 			case securityCenter(SecurityCenter.State)
+			case displayMnemonic(DisplayMnemonic.State)
+			case enterMnemonic(ImportMnemonicForFactorSource.State)
 		}
 
 		@CasePathable
@@ -79,6 +84,8 @@ struct AccountDetails: Sendable, FeatureReducer {
 			case stakeClaimDetails(NonFungibleTokenDetails.Action)
 			case poolUnitDetails(PoolUnitDetails.Action)
 			case securityCenter(SecurityCenter.Action)
+			case displayMnemonic(DisplayMnemonic.Action)
+			case enterMnemonic(ImportMnemonicForFactorSource.Action)
 		}
 
 		var body: some Reducer<State, Action> {
@@ -109,6 +116,12 @@ struct AccountDetails: Sendable, FeatureReducer {
 			Scope(state: \.securityCenter, action: \.securityCenter) {
 				SecurityCenter()
 			}
+			Scope(state: \.displayMnemonic, action: \.displayMnemonic) {
+				DisplayMnemonic()
+			}
+			Scope(state: \.enterMnemonic, action: \.enterMnemonic) {
+				ImportMnemonicForFactorSource()
+			}
 		}
 	}
 
@@ -121,6 +134,8 @@ struct AccountDetails: Sendable, FeatureReducer {
 	@Dependency(\.securityCenterClient) var securityCenterClient
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 	@Dependency(\.accountLockersClient) var accountLockersClient
+	@Dependency(\.factorSourcesClient) var factorSourcesClient
+	@Dependency(\.secureStorageClient) var secureStorageClient
 
 	private let accountPortfolioRefreshIntervalInSeconds = 60
 
@@ -184,8 +199,7 @@ struct AccountDetails: Sendable, FeatureReducer {
 			}
 
 		case .securityProblemsTapped:
-			state.destination = .securityCenter(.init())
-			return .none
+			return handleSecurityProblems(&state)
 
 		case let .accountLockerClaimTapped(details):
 			return .run { _ in
@@ -205,6 +219,15 @@ struct AccountDetails: Sendable, FeatureReducer {
 			return .none
 		case let .setAccountLockerClaims(claims):
 			state.accountLockerClaims = claims
+			return .none
+		case let .setDestinationDisplayMnemonic(displayMnemonicState):
+			state.destination = .displayMnemonic(displayMnemonicState)
+			return .none
+		case let .setDestinationEnterMnemonic(enterMnemonicState):
+			state.destination = .enterMnemonic(enterMnemonicState)
+			return .none
+		case let .setDestinationSecurityCenter(securityCenterState):
+			state.destination = .securityCenter(securityCenterState)
 			return .none
 		}
 	}
@@ -320,6 +343,64 @@ struct AccountDetails: Sendable, FeatureReducer {
 			for try await claims in await accountLockersClient.accountClaims(state.account.address) {
 				guard !Task.isCancelled else { return }
 				await send(.internal(.setAccountLockerClaims(claims)))
+			}
+		}
+	}
+
+	private func handleSecurityProblems(_ state: inout State) -> Effect<Action> {
+		let problems = state.securityProblemsConfig.problems
+		let accountAddress = state.account.address
+
+		// Find the specific security problem for this account
+		for problem in problems {
+			switch problem {
+			case let .problem3(addresses) where accountHasProblem(accountAddress, in: addresses):
+				return exportMnemonic(controlling: state.account) { mnemonic in
+					state.destination = .displayMnemonic(.init(
+						mnemonic: mnemonic.mnemonicWithPassphrase.mnemonic,
+						factorSourceID: mnemonic.factorSourceID
+					))
+				}
+
+			case let .problem9(addresses) where accountHasProblem(accountAddress, in: addresses):
+				return handleProblem9ForAccount(state.account)
+
+			default:
+				continue
+			}
+		}
+
+		// Fallback to security center if no specific action found
+		state.destination = .securityCenter(.init())
+		return .none
+	}
+
+	private func accountHasProblem(_ accountAddress: AccountAddress, in addresses: AddressesOfEntitiesInBadState) -> Bool {
+		addresses.accounts.contains(accountAddress) || addresses.hiddenAccounts.contains(accountAddress)
+	}
+
+	private func handleProblem9ForAccount(_ account: Account) -> Effect<Action> {
+		guard let factorInstance = account.unsecuredControllingFactorInstance?.factorInstance else {
+			return .run { send in
+				await send(.internal(.setDestinationSecurityCenter(.init())))
+			}
+		}
+
+		return .run { send in
+			do {
+				if let factorSource = try await factorSourcesClient.getFactorSource(of: factorInstance),
+				   let deviceFactorSource = factorSource.asDevice
+				{
+					await send(.internal(.setDestinationEnterMnemonic(.init(
+						deviceFactorSource: deviceFactorSource,
+						profileToCheck: .current
+					))))
+				} else {
+					await send(.internal(.setDestinationSecurityCenter(.init())))
+				}
+			} catch {
+				loggerGlobal.error("Failed to handle problem9: \(error), falling back to SecurityCenter")
+				await send(.internal(.setDestinationSecurityCenter(.init())))
 			}
 		}
 	}

@@ -86,6 +86,8 @@ struct Home: Sendable, FeatureReducer {
 			case securityCenter(SecurityCenter.State)
 			case p2pLinks(P2PLinksFeature.State)
 			case dAppsDirectory(DAppsDirectory.State)
+			case displayMnemonic(DisplayMnemonic.State)
+			case enterMnemonic(ImportMnemonicForFactorSource.State)
 		}
 
 		@CasePathable
@@ -98,6 +100,8 @@ struct Home: Sendable, FeatureReducer {
 			case securityCenter(SecurityCenter.Action)
 			case p2pLinks(P2PLinksFeature.Action)
 			case dAppsDirectory(DAppsDirectory.Action)
+			case displayMnemonic(DisplayMnemonic.Action)
+			case enterMnemonic(ImportMnemonicForFactorSource.Action)
 
 			enum AcknowledgeJailbreakAlert: Sendable, Hashable {}
 		}
@@ -123,6 +127,12 @@ struct Home: Sendable, FeatureReducer {
 			}
 			Scope(state: \.dAppsDirectory, action: \.dAppsDirectory) {
 				DAppsDirectory()
+			}
+			Scope(state: \.displayMnemonic, action: \.displayMnemonic) {
+				DisplayMnemonic()
+			}
+			Scope(state: \.enterMnemonic, action: \.enterMnemonic) {
+				ImportMnemonicForFactorSource()
 			}
 		}
 	}
@@ -326,6 +336,12 @@ struct Home: Sendable, FeatureReducer {
 				return .none
 			case .openSecurityCenter:
 				state.destination = .securityCenter(.init())
+				return .none
+			case let .displayMnemonic(displayMnemonicState):
+				state.destination = .displayMnemonic(displayMnemonicState)
+				return .none
+			case let .enterMnemonic(enterMnemonicState):
+				state.destination = .enterMnemonic(enterMnemonicState)
 				return .none
 			}
 
