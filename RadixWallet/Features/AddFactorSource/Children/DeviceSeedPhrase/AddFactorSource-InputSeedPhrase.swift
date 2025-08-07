@@ -1,20 +1,25 @@
 import ComposableArchitecture
 import Sargon
 
-// MARK: - AddFactorSource.DeviceSeedPhrase
+// MARK: - AddFactorSource.InputSeedPhrase
 extension AddFactorSource {
 	@Reducer
-	struct DeviceSeedPhrase: Sendable, FeatureReducer {
+	struct InputSeedPhrase: Sendable, FeatureReducer {
 		@ObservableState
 		struct State: Sendable, Hashable {
-			@Shared(.deviceMnemonicBuilder) var deviceMnemonicBuilder
+			@Shared(.mnemonicBuilder) var mnemonicBuilder
 
 			var grid: ImportMnemonicGrid.State!
 			var isEnteringCustomSeedPhrase: Bool = false
 			var context: Context
+			var bip39Passphrase: String = ""
+			var advancedModeEnabled: Bool = false
+
+			let hasPassphrase: Bool
+			let factorSourceKind: FactorSourceKind
 
 			var confirmButtonControlState: ControlState {
-				switch status {
+				switch grid.status {
 				case .incomplete, .invalid:
 					.disabled
 				case .valid:
@@ -25,28 +30,34 @@ extension AddFactorSource {
 			@Presents
 			var destination: Destination.State? = nil
 
-			init(context: Context) {
+			init(context: Context, factorSourceKind: FactorSourceKind) {
 				self.context = context
+				self.factorSourceKind = factorSourceKind
 				switch context {
 				case .newFactorSource:
-					$deviceMnemonicBuilder.withLock { builder in
+					hasPassphrase = false
+					$mnemonicBuilder.withLock { builder in
 						builder = builder.generateNewMnemonic()
 					}
 
-					let mnemonic = try! Mnemonic(words: deviceMnemonicBuilder.getWords())
+					let mnemonic = try! Mnemonic(words: mnemonicBuilder.getWords())
 					grid = .init(mnemonic: mnemonic)
 				case let .recoverFactorSource(isOlympia):
 					isEnteringCustomSeedPhrase = true
-					grid = .init(count: .twentyFour, isWordCountFixed: !isOlympia)
+					hasPassphrase = isOlympia
+					grid = .init(count: .twentyFour, wordCounts: isOlympia ? Bip39WordCount.allCases : [])
 				}
 			}
 		}
 
 		typealias Action = FeatureAction<Self>
 
+		@CasePathable
 		enum ViewAction: Sendable, Hashable {
 			case confirmButtonTapped
 			case enterCustomSeedPhraseButtonTapped
+			case passphraseChanged(String)
+			case toggleModeButtonTapped
 		}
 
 		@CasePathable
@@ -55,7 +66,7 @@ extension AddFactorSource {
 		}
 
 		enum InternalAction: Sendable, Equatable {
-			case factorAlreadyInUse
+			case factorAlreadyInUse(FactorSource)
 		}
 
 		enum DelegateAction: Sendable, Hashable {
@@ -96,34 +107,53 @@ extension AddFactorSource {
 			case .confirmButtonTapped:
 				let isEnteringCustomSeedPhrase = state.isEnteringCustomSeedPhrase
 				if isEnteringCustomSeedPhrase {
-					state.$deviceMnemonicBuilder.withLock { builder in
-						if let builderWithMnemonic = try? builder.createMnemonicFromWords(words: state.completedWords.map(\.word)) {
+					state.$mnemonicBuilder.withLock { builder in
+						if let builderWithMnemonic = try? builder.createMnemonicFromWords(words: state.grid.completedWords.map(\.word)) {
 							builder = builderWithMnemonic
 						}
 					}
 				}
-				let factorSourceId = state.deviceMnemonicBuilder.getFactorSourceId()
-				return .run { send in
-					let isInUse = try await SargonOs.shared.isFactorSourceAlreadyInUse(factorSourceId: factorSourceId)
-					if isInUse {
-						await send(.internal(.factorAlreadyInUse))
+				let factorSourceId = state.mnemonicBuilder.getFactorSourceId(kind: state.factorSourceKind)
+				return .run { [kind = state.factorSourceKind, context = state.context] send in
+					let existingFactorSource = try SargonOs.shared.factorSources().first(where: { $0.id == factorSourceId })
+					if let existingFactorSource {
+						if kind == .device {
+							let newParamters = switch context {
+							case .newFactorSource, .recoverFactorSource(false):
+								FactorSourceCryptoParameters.babylon
+							case .recoverFactorSource(true):
+								FactorSourceCryptoParameters.olympia
+							}
+
+							try await SargonOs.shared.appendCryptoParametersToFactorSource(factorSourceId: factorSourceId, cryptoParameters: newParamters)
+						}
+						await send(.internal(.factorAlreadyInUse(existingFactorSource)))
 					} else {
 						await send(.delegate(.completed(withCustomSeedPhrase: isEnteringCustomSeedPhrase)))
 					}
 				} catch: { error, _ in
 					errorQueue.schedule(error)
 				}
+
 			case .enterCustomSeedPhraseButtonTapped:
-				state.grid = .init(count: .twentyFour, isWordCountFixed: true)
+				state.grid = .init(count: .twentyFour, wordCounts: state.factorSourceKind == .arculusCard ? [.twelve, .twentyFour] : [])
 				state.isEnteringCustomSeedPhrase = true
+				return .none
+
+			case .toggleModeButtonTapped:
+				state.advancedModeEnabled.toggle()
+				return .none
+
+			case let .passphraseChanged(passphrase):
+				state.bip39Passphrase = passphrase
 				return .none
 			}
 		}
 
 		func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 			switch internalAction {
-			case .factorAlreadyInUse:
-				state.destination = Destination.factorAlreadyInUseState
+			case let .factorAlreadyInUse(fs):
+				state.destination = Destination.factorAlreadyInUseState(fs)
 				return .none
 			}
 		}
@@ -138,55 +168,20 @@ extension AddFactorSource {
 	}
 }
 
-private extension AddFactorSource.DeviceSeedPhrase.State {
-	var mnemonicWithPassphrase: MnemonicWithPassphrase? {
-		guard let mnemonic = try? Mnemonic(words: completedWords) else {
-			return nil
-		}
-
-		return .init(mnemonic: mnemonic)
-	}
-
-	/// An enum describing the different errors that can take place from user's input.
-	enum Status: Sendable, Hashable {
-		/// User hasn't entered every word yet.
-		case incomplete
-
-		/// User has entered every word but a Mnemonic cannot be built from it (checksum fails).
-		case invalid
-
-		/// The entered mnemonic is complete (checksum succeeds)
-		case valid(MnemonicWithPassphrase)
-	}
-
-	var status: Status {
-		if !isComplete {
-			.incomplete
-		} else if let mnemonicWithPassphrase {
-			.valid(mnemonicWithPassphrase)
-		} else {
-			.invalid
-		}
-	}
-
-	var isComplete: Bool {
-		completedWords.count == grid.words.count
-	}
-
-	var completedWords: [BIP39Word] {
-		grid.words.compactMap(\.completeWord)
-	}
-}
-
-extension AddFactorSource.DeviceSeedPhrase.Destination {
-	static let factorAlreadyInUseState: State = .factorAlreadyInUseAlert(.init(
-		title: {
-			TextState("Factor Already In Use")
-		},
-		actions: {
-			ButtonState(role: .cancel, action: .close) {
-				TextState("Close")
+extension AddFactorSource.InputSeedPhrase.Destination {
+	static func factorAlreadyInUseState(_ fs: FactorSource) -> State {
+		.factorAlreadyInUseAlert(.init(
+			title: {
+				TextState("Factor Already In Use")
+			},
+			actions: {
+				ButtonState(role: .cancel, action: .close) {
+					TextState("Ok")
+				}
+			},
+			message: {
+				TextState(fs.name)
 			}
-		}
-	))
+		))
+	}
 }

@@ -35,7 +35,7 @@ struct AccountDetails: Sendable, FeatureReducer {
 		case transferButtonTapped
 		case historyButtonTapped
 		case showFiatWorthToggled
-		case securityProblemsTapped
+		case securityProblemTapped(SecurityProblem)
 		case accountLockerClaimTapped(AccountLockerClaimDetails)
 	}
 
@@ -52,6 +52,7 @@ struct AccountDetails: Sendable, FeatureReducer {
 		case accountUpdated(Account)
 		case setSecurityProblems([SecurityProblem])
 		case setAccountLockerClaims([AccountLockerClaimDetails])
+		case presentSecurityProblemHandler(SecurityProblemHandlerDestination)
 	}
 
 	struct Destination: DestinationReducer {
@@ -66,6 +67,8 @@ struct AccountDetails: Sendable, FeatureReducer {
 			case stakeClaimDetails(NonFungibleTokenDetails.State)
 			case poolUnitDetails(PoolUnitDetails.State)
 			case securityCenter(SecurityCenter.State)
+			case displayMnemonic(DisplayMnemonic.State)
+			case enterMnemonic(ImportMnemonicForFactorSource.State)
 		}
 
 		@CasePathable
@@ -79,6 +82,8 @@ struct AccountDetails: Sendable, FeatureReducer {
 			case stakeClaimDetails(NonFungibleTokenDetails.Action)
 			case poolUnitDetails(PoolUnitDetails.Action)
 			case securityCenter(SecurityCenter.Action)
+			case displayMnemonic(DisplayMnemonic.Action)
+			case enterMnemonic(ImportMnemonicForFactorSource.Action)
 		}
 
 		var body: some Reducer<State, Action> {
@@ -109,6 +114,12 @@ struct AccountDetails: Sendable, FeatureReducer {
 			Scope(state: \.securityCenter, action: \.securityCenter) {
 				SecurityCenter()
 			}
+			Scope(state: \.displayMnemonic, action: \.displayMnemonic) {
+				DisplayMnemonic()
+			}
+			Scope(state: \.enterMnemonic, action: \.enterMnemonic) {
+				ImportMnemonicForFactorSource()
+			}
 		}
 	}
 
@@ -121,6 +132,8 @@ struct AccountDetails: Sendable, FeatureReducer {
 	@Dependency(\.securityCenterClient) var securityCenterClient
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 	@Dependency(\.accountLockersClient) var accountLockersClient
+	@Dependency(\.factorSourcesClient) var factorSourcesClient
+	@Dependency(\.secureStorageClient) var secureStorageClient
 
 	private let accountPortfolioRefreshIntervalInSeconds = 60
 
@@ -183,9 +196,8 @@ struct AccountDetails: Sendable, FeatureReducer {
 				try await appPreferencesClient.toggleIsCurrencyAmountVisible()
 			}
 
-		case .securityProblemsTapped:
-			state.destination = .securityCenter(.init())
-			return .none
+		case let .securityProblemTapped(problem):
+			return handleSpecificSecurityProblem(problem, state: &state)
 
 		case let .accountLockerClaimTapped(details):
 			return .run { _ in
@@ -205,6 +217,15 @@ struct AccountDetails: Sendable, FeatureReducer {
 			return .none
 		case let .setAccountLockerClaims(claims):
 			state.accountLockerClaims = claims
+			return .none
+		case let .presentSecurityProblemHandler(.displayMnemonic(displayMnemonicState)):
+			state.destination = .displayMnemonic(displayMnemonicState)
+			return .none
+		case let .presentSecurityProblemHandler(.enterMnemonic(enterMnemonicState)):
+			state.destination = .enterMnemonic(enterMnemonicState)
+			return .none
+		case let .presentSecurityProblemHandler(.securityCenter(securityCenterState)):
+			state.destination = .securityCenter(securityCenterState)
 			return .none
 		}
 	}
@@ -275,6 +296,14 @@ struct AccountDetails: Sendable, FeatureReducer {
 			state.destination = nil
 			return sendStakeClaimTransaction(state.account.address, stakeClaims: [stakeClaim.intoSargon()])
 
+		case .displayMnemonic(.delegate(.backedUp)):
+			state.destination = nil
+			return .none
+
+		case .enterMnemonic(.delegate(.imported)):
+			state.destination = nil
+			return .none
+
 		default:
 			return .none
 		}
@@ -321,6 +350,12 @@ struct AccountDetails: Sendable, FeatureReducer {
 				guard !Task.isCancelled else { return }
 				await send(.internal(.setAccountLockerClaims(claims)))
 			}
+		}
+	}
+
+	private func handleSpecificSecurityProblem(_ problem: SecurityProblem, state: inout State) -> Effect<Action> {
+		.run { [account = state.account] send in
+			try await send(.internal(.presentSecurityProblemHandler(handleSecurityProblem(problem, forEntity: .accountEntity(account)))))
 		}
 	}
 }

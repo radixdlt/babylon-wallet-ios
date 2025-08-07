@@ -19,7 +19,7 @@ extension ImportMnemonic.State {
 	}
 
 	private var hideAdvancedMode: Bool {
-		isWordCountFixed
+		grid.wordCounts.isEmpty
 	}
 }
 

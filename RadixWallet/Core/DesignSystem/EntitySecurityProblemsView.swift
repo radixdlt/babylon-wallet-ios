@@ -1,13 +1,13 @@
 // MARK: - EntitySecurityProblemsView
 struct EntitySecurityProblemsView: SwiftUI.View {
 	let config: Config
-	let action: () -> Void
+	let action: (SecurityProblem) -> Void
 
 	var body: some View {
 		if !config.problems.isEmpty {
 			VStack(alignment: .leading, spacing: .small2) {
 				ForEach(config.problems) { problem in
-					Button(action: action) {
+					Button(action: { action(problem) }) {
 						switch config.kind {
 						case .account:
 							AccountBannerView(kind: .securityProblem(message: problem.accountCard))

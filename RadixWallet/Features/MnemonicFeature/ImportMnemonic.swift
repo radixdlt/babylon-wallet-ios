@@ -28,7 +28,6 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 			grid.words.compactMap(\.completeWord)
 		}
 
-		let isWordCountFixed: Bool
 		var isAdvancedMode: Bool = false
 
 		let header: Header?
@@ -84,7 +83,7 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 			warning: String? = nil,
 			showCloseButton: Bool = false,
 			warningOnContinue: OnContinueWarning? = nil,
-			isWordCountFixed: Bool,
+			wordCounts: [Bip39WordCount] = [],
 			persistStrategy: PersistStrategy?,
 			language: BIP39Language = .english,
 			wordCount: BIP39WordCount = .twelve,
@@ -95,8 +94,7 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 			self.isProgressing = false
 			self.persistStrategy = persistStrategy
 			self.showCloseButton = showCloseButton
-			self.grid = .init(count: wordCount, language: language, isWordCountFixed: isWordCountFixed)
-			self.isWordCountFixed = isWordCountFixed
+			self.grid = .init(count: wordCount, language: language, wordCounts: wordCounts)
 			self.bip39Passphrase = bip39Passphrase
 
 			self.header = header

@@ -26,5 +26,14 @@ extension FactorSourceAccess.State {
 
 		/// Authorization before creating a Persona.
 		case createPersonaAuthorization
+
+		var requiresSignature: Bool {
+			switch self {
+			case .signature, .proveOwnership:
+				true
+			default:
+				false
+			}
+		}
 	}
 }

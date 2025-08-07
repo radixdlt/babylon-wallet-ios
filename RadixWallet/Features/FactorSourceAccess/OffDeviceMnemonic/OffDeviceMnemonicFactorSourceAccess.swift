@@ -10,7 +10,7 @@ struct OffDeviceMnemonicFactorSourceAccess: Sendable, FeatureReducer {
 
 		init(factorSource: OffDeviceMnemonicFactorSource) {
 			self.factorSource = factorSource
-			self.grid = .init(count: factorSource.hint.wordCount, isWordCountFixed: true)
+			self.grid = .init(count: factorSource.hint.wordCount)
 		}
 
 		var confirmButtonControlState: ControlState {

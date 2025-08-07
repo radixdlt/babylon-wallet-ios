@@ -220,7 +220,9 @@ struct Splash: Sendable, FeatureReducer {
 							bundle: Bundle.main,
 							userDefaultsSuite: UserDefaults.Dependency.radixSuiteName,
 							unsafeStorageKeyMapping: .sargonOSMapping,
-							secureStorageDriver: SargonSecureStorage()
+							secureStorageDriver: SargonSecureStorage(),
+							arculuCSDKDriver: ArculusCSDKDriver(),
+							nftTagDriver: NFCSessionClient()
 						)
 					),
 					hostInteractor: SargonHostInteractor()

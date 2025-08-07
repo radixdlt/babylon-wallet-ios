@@ -86,6 +86,8 @@ struct Home: Sendable, FeatureReducer {
 			case securityCenter(SecurityCenter.State)
 			case p2pLinks(P2PLinksFeature.State)
 			case dAppsDirectory(DAppsDirectory.State)
+			case displayMnemonic(DisplayMnemonic.State)
+			case enterMnemonic(ImportMnemonicForFactorSource.State)
 		}
 
 		@CasePathable
@@ -98,6 +100,8 @@ struct Home: Sendable, FeatureReducer {
 			case securityCenter(SecurityCenter.Action)
 			case p2pLinks(P2PLinksFeature.Action)
 			case dAppsDirectory(DAppsDirectory.Action)
+			case displayMnemonic(DisplayMnemonic.Action)
+			case enterMnemonic(ImportMnemonicForFactorSource.Action)
 
 			enum AcknowledgeJailbreakAlert: Sendable, Hashable {}
 		}
@@ -123,6 +127,12 @@ struct Home: Sendable, FeatureReducer {
 			}
 			Scope(state: \.dAppsDirectory, action: \.dAppsDirectory) {
 				DAppsDirectory()
+			}
+			Scope(state: \.displayMnemonic, action: \.displayMnemonic) {
+				DisplayMnemonic()
+			}
+			Scope(state: \.enterMnemonic, action: \.enterMnemonic) {
+				ImportMnemonicForFactorSource()
 			}
 		}
 	}
@@ -324,8 +334,14 @@ struct Home: Sendable, FeatureReducer {
 			case .openDetails:
 				state.destination = .accountDetails(.init(accountWithInfo: accountRow.accountWithInfo, showFiatWorth: state.showFiatWorth))
 				return .none
-			case .openSecurityCenter:
-				state.destination = .securityCenter(.init())
+			case let .presentSecurityProblemHandler(.securityCenter(securityCenterState)):
+				state.destination = .securityCenter(securityCenterState)
+				return .none
+			case let .presentSecurityProblemHandler(.displayMnemonic(displayMnemonicState)):
+				state.destination = .displayMnemonic(displayMnemonicState)
+				return .none
+			case let .presentSecurityProblemHandler(.enterMnemonic(enterMnemonicState)):
+				state.destination = .enterMnemonic(enterMnemonicState)
 				return .none
 			}
 
@@ -358,6 +374,14 @@ struct Home: Sendable, FeatureReducer {
 				loggerGlobal.error("Failed P2PLink, error \(error)")
 				errorQueue.schedule(error)
 			}
+
+		case .displayMnemonic(.delegate(.backedUp)):
+			state.destination = nil
+			return .none
+
+		case .enterMnemonic(.delegate(.imported)):
+			state.destination = nil
+			return .none
 
 		default:
 			return .none

@@ -39,6 +39,8 @@ private extension View {
 		return createPersonaCoordinator(with: destinationStore)
 			.personaDetails(with: destinationStore)
 			.securityCenter(with: destinationStore)
+			.displayMnemonic(with: destinationStore)
+			.enterMnemonic(with: destinationStore)
 	}
 
 	private func createPersonaCoordinator(with destinationStore: PresentationStoreOf<PersonasCoordinator.Destination>) -> some View {
@@ -56,6 +58,20 @@ private extension View {
 	private func securityCenter(with destinationStore: PresentationStoreOf<PersonasCoordinator.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.securityCenter, action: \.securityCenter)) {
 			SecurityCenter.View(store: $0)
+		}
+	}
+
+	private func displayMnemonic(with destinationStore: PresentationStoreOf<PersonasCoordinator.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.displayMnemonic, action: \.displayMnemonic)) {
+			DisplayMnemonic.View(store: $0)
+		}
+	}
+
+	private func enterMnemonic(with destinationStore: PresentationStoreOf<PersonasCoordinator.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.enterMnemonic, action: \.enterMnemonic)) { store in
+			NavigationStack {
+				ImportMnemonicForFactorSource.View(store: store)
+			}
 		}
 	}
 }

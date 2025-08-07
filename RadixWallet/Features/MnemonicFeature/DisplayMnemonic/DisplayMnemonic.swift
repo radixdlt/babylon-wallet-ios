@@ -7,7 +7,7 @@ import SwiftUI
 struct DisplayMnemonic: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
-		@Shared(.deviceMnemonicBuilder) var deviceMnemonicBuilder
+		@Shared(.mnemonicBuilder) var mnemonicBuilder
 		let mnemonic: Mnemonic
 
 		let factorSourceID: FactorSourceIDFromHash
@@ -105,7 +105,7 @@ struct DisplayMnemonic: Sendable, FeatureReducer {
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .backupConfirmation(.userHasBackedUp):
-			state.$deviceMnemonicBuilder.withLock { builder in
+			state.$mnemonicBuilder.withLock { builder in
 				builder = try! builder.createMnemonicFromWords(words: state.mnemonic.words.map(\.word))
 			}
 			state.destination = .verifyMnemonic(.init(factorSourceKind: .device))
@@ -119,7 +119,7 @@ struct DisplayMnemonic: Sendable, FeatureReducer {
 		case .verifyMnemonic(.delegate(.validated)):
 			let factorSourceID = state.factorSourceID
 			// Reset
-			state.$deviceMnemonicBuilder.withLock { builder in
+			state.$mnemonicBuilder.withLock { builder in
 				builder = .init()
 			}
 			return .run { send in

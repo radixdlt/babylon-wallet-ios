@@ -8,7 +8,7 @@ extension Signing {
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				ZStack {
-					Color.primaryBackground
+					Color.secondaryBackground
 					FactorSourceAccess.View(store: store.factorSourceAccess)
 				}
 			}

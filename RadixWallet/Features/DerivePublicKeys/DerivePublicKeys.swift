@@ -1,6 +1,7 @@
 // MARK: - DerivePublicKeys
 @Reducer
 struct DerivePublicKeys: Sendable, FeatureReducer {
+	@Dependency(\.arculusCardClient) var arculusCardClient
 	@ObservableState
 	struct State: Sendable, Hashable {
 		let input: KeyDerivationRequestPerFactorSource
@@ -75,6 +76,9 @@ private extension DerivePublicKeys {
 					paths: input.derivationPaths,
 					factorSourceId: input.factorSourceId
 				)
+
+			case let .arculusCard(arculus, _):
+				try await arculusCardClient.derivePublicKeys(arculus, input.derivationPaths)
 
 			default:
 				fatalError("Not implemented")

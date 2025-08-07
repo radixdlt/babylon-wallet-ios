@@ -48,6 +48,8 @@ struct PersonasCoordinator: Sendable, FeatureReducer {
 			case createPersonaCoordinator(CreatePersonaCoordinator.State)
 			case personaDetails(PersonaDetails.State)
 			case securityCenter(SecurityCenter.State)
+			case displayMnemonic(DisplayMnemonic.State)
+			case enterMnemonic(ImportMnemonicForFactorSource.State)
 		}
 
 		@CasePathable
@@ -55,6 +57,8 @@ struct PersonasCoordinator: Sendable, FeatureReducer {
 			case createPersonaCoordinator(CreatePersonaCoordinator.Action)
 			case personaDetails(PersonaDetails.Action)
 			case securityCenter(SecurityCenter.Action)
+			case displayMnemonic(DisplayMnemonic.Action)
+			case enterMnemonic(ImportMnemonicForFactorSource.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -66,6 +70,12 @@ struct PersonasCoordinator: Sendable, FeatureReducer {
 			}
 			Scope(state: \.securityCenter, action: \.securityCenter) {
 				SecurityCenter()
+			}
+			Scope(state: \.displayMnemonic, action: \.displayMnemonic) {
+				DisplayMnemonic()
+			}
+			Scope(state: \.enterMnemonic, action: \.enterMnemonic) {
+				ImportMnemonicForFactorSource()
 			}
 		}
 	}
@@ -138,8 +148,16 @@ struct PersonasCoordinator: Sendable, FeatureReducer {
 				await send(.internal(.loadedPersonaDetails(personaDetailsState)))
 			}
 
-		case .personaList(.delegate(.openSecurityCenter)):
-			state.destination = .securityCenter(.init())
+		case let .personaList(.delegate(.presentSecurityProblemHandler(.securityCenter(securityCenterState)))):
+			state.destination = .securityCenter(securityCenterState)
+			return .none
+
+		case let .personaList(.delegate(.presentSecurityProblemHandler(.displayMnemonic(displayMnemonicState)))):
+			state.destination = .displayMnemonic(displayMnemonicState)
+			return .none
+
+		case let .personaList(.delegate(.presentSecurityProblemHandler(.enterMnemonic(enterMnemonicState)))):
+			state.destination = .enterMnemonic(enterMnemonicState)
 			return .none
 
 		default:
@@ -162,6 +180,14 @@ struct PersonasCoordinator: Sendable, FeatureReducer {
 			}
 
 		case .personaDetails(.delegate(.personaHidden)):
+			state.destination = nil
+			return .none
+
+		case .displayMnemonic(.delegate(.backedUp)):
+			state.destination = nil
+			return .none
+
+		case .enterMnemonic(.delegate(.imported)):
 			state.destination = nil
 			return .none
 
