@@ -30,7 +30,6 @@ extension AddFactorSource.IdentifyingFactor {
 				.task { @MainActor in
 					await store.send(.view(.task)).finish()
 				}
-				.destination(store: store)
 				.withNavigationBar {
 					store.send(.view(.closeButtonTapped))
 				}
@@ -39,18 +38,6 @@ extension AddFactorSource.IdentifyingFactor {
 				.presentationBackground(.blur)
 			}
 		}
-	}
-}
-
-@MainActor
-private extension View {
-	func destination(store: StoreOf<AddFactorSource.IdentifyingFactor>) -> some View {
-		let destinationStore = store.scope(state: \.$destination, action: \.destination)
-		return arculusInvalidFirmwareVersion(with: destinationStore)
-	}
-
-	private func arculusInvalidFirmwareVersion(with destinationStore: PresentationStoreOf<AddFactorSource.IdentifyingFactor.Destination>) -> some View {
-		alert(store: destinationStore.scope(state: \.arculusInvalidFirmwareVersion, action: \.arculusInvalidFirmwareVersion))
 	}
 }
 

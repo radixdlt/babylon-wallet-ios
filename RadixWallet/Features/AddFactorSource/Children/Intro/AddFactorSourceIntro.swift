@@ -32,12 +32,16 @@ extension AddFactorSource {
 			enum State: Sendable, Hashable {
 				case addNewP2PLink(NewConnection.State)
 				case hardwareFactorIdentification(AddFactorSource.IdentifyingFactor.State)
+				case factorSourceAlreadyExists(AlertState<Never>)
+				case arculusInvalidFirmwareVersion(AlertState<Never>)
 			}
 
 			@CasePathable
 			enum Action: Sendable, Equatable {
 				case addNewP2PLink(NewConnection.Action)
 				case hardwareFactorIdentification(AddFactorSource.IdentifyingFactor.Action)
+				case factorSourceAlreadyExists(Never)
+				case arculusInvalidFirmwareVersion(Never)
 			}
 
 			var body: some ReducerOf<Self> {
@@ -113,9 +117,19 @@ extension AddFactorSource {
 				state.destination = nil
 				return .send(.delegate(.completedWithLedgerDeviceInfo(ledgerDeviceInfo)))
 
-			case .hardwareFactorIdentification(.delegate(.completedWithValidArculusCard)):
+			case let .hardwareFactorIdentification(.delegate(.completedWithFactorSourceAlreadyExsits(fs))):
+				state.destination = .factorSourceAlreadyExists(.factorSourceAlreadyExists(fs))
+				return .none
+
+			case let .hardwareFactorIdentification(.delegate(.completedWithArculusCardValidation(validation))):
 				state.destination = nil
-				return .send(.delegate(.completed))
+				switch validation {
+				case let .invalid(version):
+					state.destination = .arculusInvalidFirmwareVersion(.arculusInvalidFirmwareVersion(version))
+					return .none
+				case .valid:
+					return delayedShortEffect(for: .delegate(.completed))
+				}
 
 			default:
 				return .none
@@ -152,6 +166,23 @@ extension AlertState<NoP2PLinkAlert> {
 			}
 		} message: {
 			TextState(L10n.LedgerHardwareDevices.LinkConnectorAlert.message)
+		}
+	}
+
+	static func factorSourceAlreadyExists(_ fs: FactorSource) -> AlertState {
+		AlertState {
+			TextState(L10n.AddLedgerDevice.AlreadyAddedAlert.title)
+		} message: {
+			TextState(L10n.AddLedgerDevice.AlreadyAddedAlert.message(fs.name))
+		}
+	}
+
+	static func arculusInvalidFirmwareVersion(_ version: String) -> AlertState {
+		AlertState {
+			TextState("Unsupported Arculus Card")
+		}
+		message: {
+			TextState("Radix Wallet requires you to use card with min firmware version: \(version)")
 		}
 	}
 }

@@ -20,33 +20,10 @@ extension AddFactorSource {
 			case retryButtonTapped
 		}
 
-		enum InternalAction: Sendable, Equatable {
-			case receivedLedgerDeviceInfo(LedgerDeviceInfo)
-			case factorSourceAlreadyExsits(FactorSource)
-			case arculusCardValidation(ArculusMinFirmwareVersionRequirement)
-		}
-
 		enum DelegateAction: Sendable, Equatable {
 			case completedWithLedger(LedgerDeviceInfo)
-			case completedWithValidArculusCard
-		}
-
-		struct Destination: DestinationReducer {
-			@CasePathable
-			enum State: Sendable, Hashable {
-				case factorSourceAlreadyExists(AlertState<Never>)
-				case arculusInvalidFirmwareVersion(AlertState<Never>)
-			}
-
-			@CasePathable
-			enum Action: Sendable, Equatable {
-				case factorSourceAlreadyExists(Never)
-				case arculusInvalidFirmwareVersion(Never)
-			}
-
-			var body: some ReducerOf<Self> {
-				EmptyReducer()
-			}
+			case completedWithFactorSourceAlreadyExsits(FactorSource)
+			case completedWithArculusCardValidation(ArculusMinFirmwareVersionRequirement)
 		}
 
 		@Dependency(\.errorQueue) var errorQueue
@@ -56,12 +33,7 @@ extension AddFactorSource {
 
 		var body: some ReducerOf<Self> {
 			Reduce(core)
-				.ifLet(destinationPath, action: \.destination) {
-					Destination()
-				}
 		}
-
-		private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 		func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
@@ -80,21 +52,6 @@ extension AddFactorSource {
 			}
 		}
 
-		func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
-			switch internalAction {
-			case let .receivedLedgerDeviceInfo(ledgerDeviceInfo):
-				return .send(.delegate(.completedWithLedger(ledgerDeviceInfo)))
-			case let .factorSourceAlreadyExsits(fs):
-				state.destination = .factorSourceAlreadyExists(.factorSourceAlreadyExists(fs))
-				return .none
-			case .arculusCardValidation(.valid):
-				return .send(.delegate(.completedWithValidArculusCard))
-			case let .arculusCardValidation(.invalid(invalidVersion)):
-				state.destination = .arculusInvalidFirmwareVersion(.arculusInvalidFirmwareVersion(invalidVersion))
-				return .none
-			}
-		}
-
 		func getLedgerHardwareDeviceInfo() -> Effect<Action> {
 			.run { send in
 				let info = try await ledgerHardwareWalletClient.getDeviceInfo()
@@ -104,9 +61,9 @@ extension AddFactorSource {
 				)
 
 				if let existingLedger {
-					await send(.internal(.factorSourceAlreadyExsits(existingLedger.asGeneral)))
+					await send(.delegate(.completedWithFactorSourceAlreadyExsits(existingLedger.asGeneral)))
 				} else {
-					await send(.internal(.receivedLedgerDeviceInfo(info)))
+					await send(.delegate(.completedWithLedger(info)))
 				}
 			} catch: { error, _ in
 				errorQueue.schedule(error)
@@ -121,7 +78,7 @@ extension AddFactorSource {
 			case .arculusCard:
 				.run { send in
 					let versionRequirement = try await arculusCardClient.validateMinFirmwareVersion()
-					await send(.internal(.arculusCardValidation(versionRequirement)))
+					await send(.delegate(.completedWithArculusCardValidation(versionRequirement)))
 				}
 
 			default:
