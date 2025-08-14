@@ -54,6 +54,7 @@ extension ArculusChangePIN {
 		}
 
 		@Dependency(\.errorQueue) var errorQueue
+		@Dependency(\.arculusCardClient) var arculusCardClient
 		private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 		var body: some ReducerOf<Self> {
@@ -71,7 +72,7 @@ extension ArculusChangePIN {
 			switch viewAction {
 			case let .pinAdded(pin):
 				.run { [fs = state.factorSource] send in
-					try await SargonOS.shared.verifyCardPin(factorSource: fs, pin: pin)
+					try await arculusCardClient.verifyPin(fs, pin)
 					await send(.internal(.pinVerified))
 				} catch: { error, _ in
 					switch error as? CommonError {

@@ -9,6 +9,8 @@ struct ArculusCardClient: Sendable {
 	var signSubintent: SignSubintent
 	var signAuth: SignAuth
 	var configureCardWithMnemonic: ConfigureCardWithMnemonic
+	var verifyPin: VerifyPin
+	var setPin: SetPin
 }
 
 extension ArculusCardClient {
@@ -40,6 +42,17 @@ extension ArculusCardClient {
 	typealias ConfigureCardWithMnemonic = @Sendable (
 		_ mnemonic: Mnemonic,
 		_ pin: String
+	) async throws -> Void
+
+	typealias VerifyPin = @Sendable (
+		_ factorSource: ArculusCardFactorSource,
+		_ pin: String
+	) async throws -> Void
+
+	typealias SetPin = @Sendable (
+		_ factorSource: ArculusCardFactorSource,
+		_ oldPIN: String,
+		_ newPIN: String
 	) async throws -> Void
 }
 

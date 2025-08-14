@@ -31,6 +31,7 @@ extension ArculusChangePIN {
 
 		@Dependency(\.errorQueue) var errorQueue
 		@Dependency(\.overlayWindowClient) var overlayWindowClient
+		@Dependency(\.arculusCardClient) var arculusCardClient
 
 		var body: some ReducerOf<Self> {
 			Scope(state: \.pinInput, action: \.child.pinInput) {
@@ -44,7 +45,7 @@ extension ArculusChangePIN {
 			switch viewAction {
 			case let .pinAdded(pin):
 				.run { [fs = state.factorSource, oldPIN = state.oldPIN] send in
-					try await SargonOS.shared.setCardPin(factorSource: fs, oldPin: oldPIN, newPin: pin)
+					try await arculusCardClient.setPin(fs, oldPIN, pin)
 					await overlayWindowClient.scheduleHUD(.succeeded)
 					await send(.delegate(.finished))
 				} catch: { error, _ in

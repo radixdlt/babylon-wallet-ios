@@ -40,6 +40,12 @@ extension ArculusCardClient: DependencyKey {
 				mnemonic: mnemonic,
 				pin: pin
 			)
+		},
+		verifyPin: { factorSource, pin in
+			try await SargonOS.shared.verifyCardPin(factorSource: factorSource, pin: pin)
+		},
+		setPin: { factorSource, oldPin, newPin in
+			try await SargonOS.shared.setCardPin(factorSource: factorSource, oldPin: oldPin, newPin: newPin)
 		}
 	)
 }

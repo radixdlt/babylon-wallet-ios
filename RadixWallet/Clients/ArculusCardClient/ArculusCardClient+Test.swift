@@ -8,7 +8,9 @@ extension ArculusCardClient {
 		signTransaction: unimplemented("\(Self.self).signTransaction"),
 		signSubintent: unimplemented("\(Self.self).signSubintent"),
 		signAuth: unimplemented("\(Self.self).signAuth"),
-		configureCardWithMnemonic: unimplemented("\(Self.self).configureCardWithMnemonic")
+		configureCardWithMnemonic: unimplemented("\(Self.self).configureCardWithMnemonic"),
+		verifyPin: unimplemented("\(Self.self).verifyPin"),
+		setPin: unimplemented("\(Self.self).setPin"),
 	)
 
 	static let noop = Self(
@@ -29,6 +31,10 @@ extension ArculusCardClient {
 		},
 		configureCardWithMnemonic: { _, _ in
 			// no-op
+		},
+		verifyPin: { _, _ in
+		},
+		setPin: { _, _, _ in
 		}
 	)
 }
