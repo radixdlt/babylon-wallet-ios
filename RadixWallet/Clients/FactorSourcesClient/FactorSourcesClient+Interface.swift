@@ -287,6 +287,6 @@ extension FactorSourcesClient {
 
 // MARK: - OnDeviceMnemonicKind
 enum OnDeviceMnemonicKind: Sendable, Hashable {
-	case babylon(isMain: Bool)
+	case babylon
 	case olympia
 }
