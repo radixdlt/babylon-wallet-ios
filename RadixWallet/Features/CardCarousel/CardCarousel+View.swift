@@ -96,7 +96,7 @@ struct CarouselCardView: View {
 							Image(.iconLinkOut)
 								.resizable()
 								.frame(.icon)
-								.foregroundStyle(.iconSecondary)
+								.foregroundStyle(card == .joinRadixRewards ? .white : .iconPrimary)
 						}
 					}
 
@@ -118,7 +118,15 @@ struct CarouselCardView: View {
 				.background(.secondaryBackground)
 				.cornerRadius(.small1)
 			}
-			CloseButton(kind: .homeCard, action: closeAction)
+			Button(action: action) {
+				Image(.close)
+					.resizable()
+					.frame(.medium3)
+					.foregroundColor(nil)
+					.tint(card == .joinRadixRewards ? .white : .iconPrimary)
+					.padding(.small2)
+			}
+			.frame(.small, alignment: .topTrailing)
 		}
 	}
 
@@ -144,7 +152,7 @@ struct CarouselCardView: View {
 		case .connector:
 			L10n.HomePageCarousel.UseDappsOnDesktop.title
 		case .joinRadixRewards:
-			"Join Radix Rewards"
+			L10n.HomePageCarousel.JoinRadixRewards.title
 		}
 	}
 
@@ -159,7 +167,7 @@ struct CarouselCardView: View {
 		case .connector:
 			L10n.HomePageCarousel.UseDappsOnDesktop.text
 		case .joinRadixRewards:
-			"Earn weekly Season Points by engaging in genuine on-chain activities."
+			L10n.HomePageCarousel.JoinRadixRewards.text
 		}
 	}
 
