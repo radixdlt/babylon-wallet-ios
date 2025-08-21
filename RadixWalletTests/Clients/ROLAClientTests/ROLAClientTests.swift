@@ -52,7 +52,7 @@ final class ROLAClientTests: TestCase {
 	}
 
 	override func tearDown() async throws {
-		sut = nil
+		sut = ROLAClient.liveValue
 		try await super.tearDown()
 	}
 

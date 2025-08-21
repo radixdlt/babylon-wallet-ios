@@ -207,7 +207,6 @@ struct FactorSourceCommonView: View {
 // MARK: - DeviceFactorSouceView
 struct DeviceFactorSouceView: View {
 	let deviceFactorSource: DeviceFactorSource
-	var isMain: Bool { deviceFactorSource.common.flags.contains(.main) }
 	var body: some View {
 		Labeled("Name", value: deviceFactorSource.hint.label)
 		Labeled("Device Name", value: deviceFactorSource.hint.deviceName)
