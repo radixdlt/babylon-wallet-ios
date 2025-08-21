@@ -4,6 +4,7 @@ extension ArculusForgotPIN {
 	struct EnterNewPIN: Sendable, FeatureReducer {
 		@ObservableState
 		struct State: Sendable, Hashable {
+			let factorSource: ArculusCardFactorSource
 			let mnemonic: Mnemonic
 			var createPIN: ArculusCreatePIN.State = .init()
 		}
@@ -32,8 +33,8 @@ extension ArculusForgotPIN {
 		func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 			switch childAction {
 			case let .createPIN(.delegate(.pinAdded(pin))):
-				.run { [mnemonic = state.mnemonic] send in
-					try await arculusCardClient.configureCardWithMnemonic(mnemonic, pin)
+				.run { [mnemonic = state.mnemonic, factorSource = state.factorSource] send in
+					try await arculusCardClient.restoreCardPin(factorSource, mnemonic, pin)
 					await send(.delegate(.finished))
 				} catch: { error, _ in
 					errorQueue.schedule(error)

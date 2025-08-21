@@ -24,6 +24,7 @@ extension AddFactorSource {
 		}
 
 		enum InternalAction: Sendable, Equatable {
+			case unsupportedArculusCardVersion(version: String)
 			case hasAConnectorExtension(Bool)
 		}
 
@@ -59,6 +60,7 @@ extension AddFactorSource {
 		@Dependency(\.errorQueue) var errorQueue
 		@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
+		@Dependency(\.arculusCardClient) var arculusCardClient
 
 		var body: some ReducerOf<Self> {
 			Reduce(core)
@@ -86,8 +88,15 @@ extension AddFactorSource {
 					state.destination = .hardwareFactorIdentification(.init(kind: state.kind))
 					return .none
 				case .arculusCard:
-					state.destination = .hardwareFactorIdentification(.init(kind: state.kind))
-					return .none
+					return .run { send in
+						let versionRequirement = try await arculusCardClient.validateMinFirmwareVersion()
+						switch versionRequirement {
+						case .valid:
+							await send(.delegate(.completed))
+						case let .invalid(version):
+							await send(.internal(.unsupportedArculusCardVersion(version: version)))
+						}
+					}
 				case .device:
 					return .send(.delegate(.completed))
 				default:
@@ -100,6 +109,9 @@ extension AddFactorSource {
 			switch internalAction {
 			case let .hasAConnectorExtension(hasCE):
 				state.hasAConnectorExtension = hasCE
+				return .none
+			case let .unsupportedArculusCardVersion(version):
+				state.destination = .arculusInvalidFirmwareVersion(.arculusInvalidFirmwareVersion(version))
 				return .none
 			}
 		}
@@ -122,11 +134,9 @@ extension AddFactorSource {
 				return .none
 
 			case let .hardwareFactorIdentification(.delegate(.completedWithArculusCardValidation(validation))):
-				state.destination = nil
 				switch validation {
 				case let .invalid(version):
-					state.destination = .arculusInvalidFirmwareVersion(.arculusInvalidFirmwareVersion(version))
-					return .none
+					return delayedShortEffect(for: .internal(.unsupportedArculusCardVersion(version: version)))
 				case .valid:
 					return delayedShortEffect(for: .delegate(.completed))
 				}

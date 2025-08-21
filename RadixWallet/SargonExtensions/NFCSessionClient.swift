@@ -7,6 +7,14 @@ extension NFCTagReaderSession: @unchecked @retroactive Sendable {}
 
 // MARK: - NFCSessionClient
 public actor NFCSessionClient {
+	static let supportedAIDs = Set([
+		"4A4E45545F4C5F010157",
+		"415243554C5553010157",
+		"4A4E45545F4C5F010141000000010001",
+		"4A4E45545F4C5F0101413C0000012C01",
+		"4A4E45545F4C5F010141900000012C01",
+	])
+
 	var delegate: NFCTagReaderSessionAsyncDelegate?
 	var session: NFCTagReaderSession?
 	var isoTag: NFCISO7816Tag?
@@ -45,7 +53,7 @@ extension NFCSessionClient: SargonUniFFI.NfcTagDriver {
 			try await refreshSessionIfNeed()
 			return try await self.isoTag!.sendCommand(data: command)
 		} catch {
-			print("======== Error from Command: \(error) ========")
+			loggerGlobal.error("======== Error from NFC Command: \(error) ========")
 			throw error
 		}
 	}
@@ -62,180 +70,140 @@ extension NFCSessionClient: SargonUniFFI.NfcTagDriver {
 		fatalError()
 	}
 
-	public func setMessage(message: String) async {
-		switch self.purpose! {
-		case let .arculus(arcPurpose):
-			switch arcPurpose {
-			case .identifyingCard:
-				session!.alertMessage = """
-				Identifying Card
-
-				Tap and hold this Arculus Card to your phone. This may take up to a minute.
-
-				"""
-			case .configuringCardMnemonic:
-				session!.alertMessage = """
-				Configuring the your arculus Card
-
-				Tap and hold this Arculus Card to your phone. This may take up to a minute.
-
-				"""
-			case let .signTransaction(arculusCardFactorSource):
-				session!.alertMessage = """
-				Signing Transaction
-
-				Tap and hold this Arculus Card to your phone. This may take up to a minute.
-
-				Card: \(arculusCardFactorSource.hint.label)
-				"""
-			case let .signPreAuth(arculusCardFactorSource):
-				session!.alertMessage = """
-				Signing Transaction
-
-				Tap and hold this Arculus Card to your phone. This may take up to a minute.
-
-				Card: \(arculusCardFactorSource.hint.label)
-				"""
-			case let .proveOwnership(arculusCardFactorSource):
-				session!.alertMessage = """
-				Signing Transaction
-
-				Tap and hold this Arculus Card to your phone. This may take up to a minute.
-
-				Card: \(arculusCardFactorSource.hint.label)
-				"""
-			case let .derivingPublicKeys(arculusCardFactorSource):
-				session!.alertMessage = """
-				Updating Factor Config
-
-				\(message)
-
-				Tap and hold this Arculus Card to your phone. This may take up to a minute.
-
-				Card: \(arculusCardFactorSource.hint.label)
-				"""
-			case let .verifyingPin(arculusCardFactorSource):
-				session!.alertMessage = """
-				Verifying Card PIN
-
-				\(message)
-
-				Tap and hold this Arculus Card to your phone. This may take up to a minute.
-
-				Card: \(arculusCardFactorSource.hint.label)
-				"""
-			case let .configuringCardPin(arculusCardFactorSource):
-				session!.alertMessage = """
-				Configuring new Card PIN
-
-				\(message)
-
-				Tap and hold this Arculus Card to your phone. This may take up to a minute.
-
-				Card: \(arculusCardFactorSource.hint.label)
-				"""
-			}
-		}
+	public func setProgress(progress: UInt8) async {
+		loggerGlobal.info("# NFC progress \(progress)")
+		setMessageFor(purpose: self.purpose!, progress: progress)
 	}
 }
 
 extension NFCSessionClient {
 	private func refreshSessionIfNeed() async throws {
 		if self.sessionStartTime.distance(to: .now) >= 40 {
-			print("========= Restarting session \(Date.now) ========== ")
+			loggerGlobal.info("========= Restarting NFC session \(Date.now) ========== ")
 			try await self.restartSession()
 		} else if self.sessionRenewTime.distance(to: .now) >= 10 {
-			print("========= Renewing session ========== ")
+			loggerGlobal.info("========= Renewing NFC session ========== ")
 			try await self.renewSession()
+		}
+	}
+
+	private func setMessageFor(purpose: NfcTagDriverPurpose, progress: UInt8?) {
+		let progress = if let progress {
+			"Progress: \(progress)%"
+		} else {
+			""
+		}
+
+		let nfcInstruction = "Tap and hold this Arculus Card to your phone. This may take up to a minute."
+
+		switch purpose {
+		case let .arculus(arcPurpose):
+			switch arcPurpose {
+			case .identifyingCard:
+				session!.alertMessage = """
+
+				Identifying Card
+
+				\(progress)
+
+				\(nfcInstruction)
+
+				"""
+			case .configuringCardMnemonic:
+				session!.alertMessage = """
+				Configuring the your arculus Card
+
+				\(progress)
+
+				\(nfcInstruction)
+
+				"""
+			case .signTransaction:
+				session!.alertMessage = """
+				Signing Transaction
+
+				\(progress)
+
+				\(nfcInstruction)
+
+				"""
+			case .signPreAuth:
+				session!.alertMessage = """
+				Signing Pre Authorization
+
+				\(progress)
+
+				\(nfcInstruction)
+
+				"""
+			case .proveOwnership:
+				session!.alertMessage = """
+				Proving Onwership
+
+				\(progress)
+
+				\(nfcInstruction)
+
+				"""
+			case .derivingPublicKeys:
+				session!.alertMessage = """
+				Deriving Public Keys
+
+				\(progress)
+
+				\(nfcInstruction)
+
+				"""
+			case .verifyingPin:
+				session!.alertMessage = """
+				Verifying Card PIN
+
+				\(progress)
+
+				\(nfcInstruction)
+
+				"""
+			case .configuringCardPin:
+				session!.alertMessage = """
+				Configuring new Card PIN
+
+				\(progress)
+
+				\(nfcInstruction)
+
+				"""
+			case .restoringCardPin:
+				session!.alertMessage = """
+				Restoring Card Pin
+
+				\(progress)
+
+				\(nfcInstruction)
+
+				"""
+			}
 		}
 	}
 
 	private func beginSession() async throws {
 		let delegate = NFCTagReaderSessionAsyncDelegate()
 		let session = NFCTagReaderSession(pollingOption: .iso14443, delegate: delegate, queue: .main)!
-		switch purpose {
-		case let .arculus(arcPurpose):
-			switch arcPurpose {
-			case .identifyingCard:
-				session.alertMessage = """
-				Identifying Card
-
-				Tap and hold this Arculus Card to your phone. This may take up to a minute.
-
-				"""
-			case .configuringCardMnemonic:
-				session.alertMessage = """
-				Configuring the your arculus Card
-
-				Tap and hold this Arculus Card to your phone. This may take up to a minute.
-
-				"""
-			case let .signTransaction(arculusCardFactorSource):
-				session.alertMessage = """
-				Signing Transaction
-
-				Tap and hold this Arculus Card to your phone. This may take up to a minute.
-
-				Card: \(arculusCardFactorSource.hint.label)
-				"""
-			case let .signPreAuth(arculusCardFactorSource):
-				session.alertMessage = """
-				Signing Transaction
-
-				Tap and hold this Arculus Card to your phone. This may take up to a minute.
-
-				Card: \(arculusCardFactorSource.hint.label)
-				"""
-			case let .proveOwnership(arculusCardFactorSource):
-				session.alertMessage = """
-				Signing Transaction
-
-				Tap and hold this Arculus Card to your phone. This may take up to a minute.
-
-				Card: \(arculusCardFactorSource.hint.label)
-				"""
-			case let .derivingPublicKeys(arculusCardFactorSource):
-				session.alertMessage = """
-				Updating Factor Config
-
-				Tap and hold this Arculus Card to your phone. This may take up to a minute.
-
-				Card: \(arculusCardFactorSource.hint.label)
-				"""
-			case let .verifyingPin(arculusCardFactorSource):
-				session.alertMessage = """
-				Verifying Card PIN
-
-				Tap and hold this Arculus Card to your phone. This may take up to a minute.
-
-				Card: \(arculusCardFactorSource.hint.label)
-				"""
-			case let .configuringCardPin(arculusCardFactorSource):
-				session.alertMessage = """
-				Configuring new Card PIN
-
-				Tap and hold this Arculus Card to your phone. This may take up to a minute.
-
-				Card: \(arculusCardFactorSource.hint.label)
-				"""
-			}
-		default:
-			break
-		}
 
 		self.session = session
 		self.delegate = delegate
+
+		setMessageFor(purpose: self.purpose!, progress: nil)
+
 		session.begin()
-		print("======== Session begin called \(Date.now)========")
+		loggerGlobal.info("======== Session begin called \(Date.now)========")
 		await self.setSesssionStartTime(date: .now)
 		await self.setSesssionRenewTime(date: .now)
-		print("======== Session begin connecting tag ========")
+		loggerGlobal.info("======== Session begin connecting tag ========")
 		let tag = try await connectTag()
 		await self.setIsoTag(tag: tag)
 	}
 
 	private func renewSession() async throws {
-		print("NFCSession renewing")
 		self.session!.restartPolling()
 		let tag = try await connectTag()
 		await self.setIsoTag(tag: tag)
@@ -259,12 +227,11 @@ extension NFCSessionClient {
 			}
 
 			guard let cardTag = tag, case let .iso7816(isoTag) = tag else {
-				await self.invalidateSession(error: "Unknown Arculus Card")
+				self.invalidateSession(error: "Unknown Arculus Card")
 				throw CommonError.NfcSessionUnknownTag
 			}
 
-			// TODO: Check against pre-configured ids in the info.plist
-			guard isoTag.initialSelectedAID == "415243554C5553010157" else {
+			guard Self.supportedAIDs.contains(isoTag.initialSelectedAID) else {
 				struct UnknownCardError: Error {}
 				self.invalidateSession(error: "Unknown Arculus Card")
 				throw CommonError.NfcSessionUnknownTag
@@ -298,7 +265,7 @@ extension NFCISO7816Tag {
 		let (response, statusBytesSW1, statusBytesSW2) = try await sendCommand(apdu: command)
 		let result = response + Data([statusBytesSW1]) + Data([statusBytesSW2])
 
-		print("# NFC request response for \(fun), request: \(data.hex), response: \(result.hex)")
+		loggerGlobal.info("# NFC request response for \(fun), request: \(data.hex), response: \(result.hex)")
 		return result
 	}
 
@@ -334,14 +301,16 @@ extension NFCTag: @unchecked @retroactive Sendable {}
 
 extension NFCTagReaderSessionAsyncDelegate: NFCTagReaderSessionDelegate {
 	func tagReaderSessionDidBecomeActive(_ session: NFCTagReaderSession) {
-		print("======== Session did become active ========")
+		loggerGlobal.info("======== Session did become active ========")
 		onSessionDidBecomeActiveContinuation.yield()
 	}
 
 	func tagReaderSession(_ session: NFCTagReaderSession, didInvalidateWithError error: any Error) {
-		let cancellationErrorCodes: [NFCReaderError.Code] = [.readerSessionInvalidationErrorSessionTimeout,
-		                                                     .readerSessionInvalidationErrorSessionTerminatedUnexpectedly,
-		                                                     .readerSessionInvalidationErrorUserCanceled]
+		let cancellationErrorCodes: [NFCReaderError.Code] = [
+			.readerSessionInvalidationErrorSessionTimeout,
+			.readerSessionInvalidationErrorSessionTerminatedUnexpectedly,
+			.readerSessionInvalidationErrorUserCanceled,
+		]
 
 		if let nfcError = error as? NFCReaderError {
 			let commonError = if cancellationErrorCodes.contains(nfcError.code) {
@@ -349,7 +318,7 @@ extension NFCTagReaderSessionAsyncDelegate: NFCTagReaderSessionDelegate {
 			} else {
 				CommonError.NfcSessionLostTagConnection
 			}
-			print("======== Error from delegate: \(error) ========")
+			loggerGlobal.error("======== Error from NFC delegate: \(error) ========")
 			onSessionDidBecomeActiveContinuation.finish(throwing: commonError)
 			onSessionTagDetectedContinuation.finish(throwing: commonError)
 		}

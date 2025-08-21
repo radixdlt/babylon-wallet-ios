@@ -52,7 +52,7 @@ extension FactorSourceAccess.State {
 			case .spotCheck, .proveOwnership, .encryptMessage:
 				return S.Arculus.message
 			case .updateFactorConfig, .deriveAccounts, .createAccountAuthorization, .createPersonaAuthorization:
-				return L10n.Authorization.CreateEntity.message
+				return S.Arculus.message
 			}
 
 		case .password:

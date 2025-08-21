@@ -9,6 +9,7 @@ extension ArculusCardClient {
 		signSubintent: unimplemented("\(Self.self).signSubintent"),
 		signAuth: unimplemented("\(Self.self).signAuth"),
 		configureCardWithMnemonic: unimplemented("\(Self.self).configureCardWithMnemonic"),
+		restoreCardPin: unimplemented("\(Self.self).recoverCardPin"),
 		verifyPin: unimplemented("\(Self.self).verifyPin"),
 		setPin: unimplemented("\(Self.self).setPin"),
 	)
@@ -31,6 +32,8 @@ extension ArculusCardClient {
 		},
 		configureCardWithMnemonic: { _, _ in
 			// no-op
+		},
+		restoreCardPin: { _, _, _ in
 		},
 		verifyPin: { _, _ in
 		},

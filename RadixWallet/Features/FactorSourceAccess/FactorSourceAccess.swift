@@ -230,7 +230,7 @@ private extension FactorSource {
 		case let .ledger(value):
 			.ledger(value)
 		case let .arculusCard(value):
-			nil
+			.arculusCard(value, "")
 		case .offDeviceMnemonic, .password:
 			nil // User needs to manually input it
 		}

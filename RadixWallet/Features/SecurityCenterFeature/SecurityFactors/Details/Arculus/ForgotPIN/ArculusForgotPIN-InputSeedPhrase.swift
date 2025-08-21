@@ -89,7 +89,7 @@ extension ArculusForgotPIN {
 		func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
 			case let .confirmButtonTapped(mnemonic):
-				state.destination = .configureNewPIN(.init(mnemonic: mnemonic))
+				state.destination = .configureNewPIN(.init(factorSource: state.factorSource, mnemonic: mnemonic))
 				return .none
 			}
 		}

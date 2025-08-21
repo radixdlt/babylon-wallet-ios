@@ -22,7 +22,7 @@ extension ArculusPINInput {
 						.frame(width: .zero, height: .zero)
 						.focused($inputFieldFocused)
 
-					pinInputView(text: "Enter new PIN", input: store.enteredPIN, isFocused: store.inputText.count < pinLength)
+					pinInputView(text: "Enter PIN", input: store.enteredPIN, isFocused: store.inputText.count < pinLength)
 
 					if store.shouldConfirmPIN {
 						VStack(alignment: .leading) {

@@ -6,6 +6,7 @@ extension ArculusCardClient: DependencyKey {
 
 	static let liveValue: Self = .init(
 		validateMinFirmwareVersion: {
+			// .valid
 			try await SargonOS.shared.arculusCardValidateMinFirmwareVersion()
 		},
 		derivePublicKeys: { factorSource, paths in
@@ -39,6 +40,13 @@ extension ArculusCardClient: DependencyKey {
 			_ = try await SargonOS.shared.arculusCardConfigureWithMnemonic(
 				mnemonic: mnemonic,
 				pin: pin
+			)
+		},
+		restoreCardPin: { factorSource, mnemonic, newPin in
+			try await SargonOS.shared.arculusCardRestorePin(
+				factorSource: factorSource,
+				mnemonic: mnemonic,
+				pin: newPin
 			)
 		},
 		verifyPin: { factorSource, pin in

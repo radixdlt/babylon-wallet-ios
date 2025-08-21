@@ -79,6 +79,7 @@ extension AddFactorSource {
 				.run { send in
 					let versionRequirement = try await arculusCardClient.validateMinFirmwareVersion()
 					await send(.delegate(.completedWithArculusCardValidation(versionRequirement)))
+					await dismiss()
 				}
 
 			default:
