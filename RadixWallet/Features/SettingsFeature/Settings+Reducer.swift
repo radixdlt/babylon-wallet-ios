@@ -140,15 +140,6 @@ struct Settings: Sendable, FeatureReducer {
 			return .none
 		}
 	}
-
-	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
-		switch presentedAction {
-		case .troubleshooting(.delegate(.goToAccountList)):
-			.run { _ in await dismiss() }
-		default:
-			.none
-		}
-	}
 }
 
 // MARK: Private

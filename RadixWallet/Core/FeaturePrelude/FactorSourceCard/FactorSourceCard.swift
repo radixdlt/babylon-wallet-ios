@@ -97,7 +97,7 @@ struct FactorSourceCard: View {
 			}
 			.flushedLeft
 
-			if case let .selection(type, isSelected) = mode {
+			if case let .selection(type, _, isSelected) = mode {
 				switch type {
 				case .radioButton:
 					RadioButton(
@@ -112,7 +112,7 @@ struct FactorSourceCard: View {
 				}
 			}
 		}
-		.background(.primaryBackground)
+		.opacity(mode.isDisabled ? 0.5 : 1)
 	}
 
 	struct LinkedEntitesView: SwiftUI.View {
@@ -232,7 +232,20 @@ extension FactorSourceCard {
 					isExpanded: isExpanded,
 					onAction: onAction
 				)
-			case let .extended(linkedEntities):
+			case .extended:
+				self = .init(
+					kind: kind,
+					mode: mode,
+					dataSource: .init(
+						icon: kind.factorSourceKind.icon,
+						title: factorSource.name,
+						lastUsedOn: factorSource.common.lastUsedOn,
+						messages: messages
+					),
+					isExpanded: isExpanded,
+					onAction: onAction
+				)
+			case let .withEntities(linkedEntities):
 				self = .init(
 					kind: kind,
 					mode: mode,
@@ -258,14 +271,23 @@ extension FactorSourceCard {
 
 		enum InstanceKind {
 			case short(showDetails: Bool)
-			case extended(linkedEntities: FactorSourceCardDataSource.LinkedEntities)
+			case extended
+			case withEntities(linkedEntities: FactorSourceCardDataSource.LinkedEntities)
 		}
 	}
 
 	enum Mode {
 		case display
-		case selection(type: SelectionType, isSelected: Bool)
+		case selection(type: SelectionType, selectionEnabled: Bool, isSelected: Bool)
 		case removal
+
+		var isDisabled: Bool {
+			if case let .selection(_, selectionEnabled, _) = self {
+				!selectionEnabled
+			} else {
+				false
+			}
+		}
 	}
 
 	enum SelectionType {

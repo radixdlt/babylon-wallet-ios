@@ -186,15 +186,9 @@ struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureReducer {
 
 		case let .addNewP2PLink(.delegate(addNewP2PLinkAction)):
 			switch addNewP2PLinkAction {
-			case let .newConnection(connectedClient):
+			case .newConnection:
 				state.destination = nil
-
-				return .run { _ in
-					try await radixConnectClient.updateOrAddP2PLink(connectedClient)
-				} catch: { error, _ in
-					loggerGlobal.error("Failed P2PLink, error \(error)")
-					errorQueue.schedule(error)
-				}
+				return .none
 			}
 
 		case let .nameLedger(.delegate(delegateAction)):
@@ -218,10 +212,8 @@ struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureReducer {
 extension ImportOlympiaLedgerAccountsAndFactorSources {
 	private func checkP2PLinkEffect() -> Effect<Action> {
 		.run { send in
-			for try await isConnected in await ledgerHardwareWalletClient.isConnectedToAnyConnectorExtension() {
-				guard !Task.isCancelled else { return }
-				await send(.internal(.hasAConnectorExtension(isConnected)))
-			}
+			let hasAConnectorExtension = await ledgerHardwareWalletClient.hasAnyLinkedConnector()
+			await send(.internal(.hasAConnectorExtension(hasAConnectorExtension)))
 		} catch: { error, _ in
 			loggerGlobal.error("failed to get links updates, error: \(error)")
 		}

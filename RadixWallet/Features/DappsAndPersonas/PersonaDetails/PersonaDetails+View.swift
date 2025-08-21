@@ -18,6 +18,7 @@ extension PersonaDetails {
 		let thumbnail: URL?
 		let personaName: String
 		let isDappPersona: Bool
+		let factorSourceRow: FactorSourcesList.Row?
 	}
 }
 
@@ -40,7 +41,7 @@ extension PersonaDetails.View {
 					.padding(.vertical, .large3)
 
 					if viewStore.isDappPersona {
-						IfLetStore(store.scope(state: \.accountSection, action: PersonaDetails.Action.view)) {
+						IfLetStore(store.scope(state: \.accountSection, action: \.view)) {
 							AccountSection(store: $0)
 								.background(.secondaryBackground)
 						}
@@ -52,9 +53,9 @@ extension PersonaDetails.View {
 						.padding([.horizontal, .top], .medium3)
 						.padding(.bottom, .large2)
 					} else {
-						IfLetStore(store.scope(state: \.dAppsSection, action: PersonaDetails.Action.view)) {
+						IfLetStore(store.scope(state: \.dAppsSection, action: \.view)) {
 							DappsSection(store: $0)
-								.background(.secondaryBackground)
+								.background(.tertiaryBackground)
 						}
 
 						Button(L10n.AuthorizedDapps.PersonaDetails.hideThisPersona) {
@@ -71,17 +72,14 @@ extension PersonaDetails.View {
 				}
 			}
 		}
-		.background(.primaryBackground)
+		.background(.secondaryBackground)
 		.destinations(with: store)
 	}
 }
 
 private extension StoreOf<PersonaDetails> {
 	var destination: PresentationStoreOf<PersonaDetails.Destination> {
-		func scopeState(state: State) -> PresentationState<PersonaDetails.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
+		scope(state: \.$destination, action: \.destination)
 	}
 }
 
@@ -91,42 +89,55 @@ private extension View {
 		let destinationStore = store.destination
 		return dAppDetails(with: destinationStore)
 			.editPersona(with: destinationStore)
+			.factorSourceDetails(with: destinationStore)
+			.displayMnemonic(with: destinationStore)
+			.enterMnemonic(with: destinationStore)
 			.confirmForgetAlert(with: destinationStore)
 			.confirmHideAlert(with: destinationStore)
 	}
 
 	private func dAppDetails(with destinationStore: PresentationStoreOf<PersonaDetails.Destination>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /PersonaDetails.Destination.State.dAppDetails,
-			action: PersonaDetails.Destination.Action.dAppDetails,
-			destination: { DappDetails.View(store: $0) }
-		)
+		navigationDestination(store: destinationStore.scope(state: \.dAppDetails, action: \.dAppDetails))
+			{ DappDetails.View(store: $0) }
 	}
 
 	private func editPersona(with destinationStore: PresentationStoreOf<PersonaDetails.Destination>) -> some View {
 		sheet(
-			store: destinationStore,
-			state: /PersonaDetails.Destination.State.editPersona,
-			action: PersonaDetails.Destination.Action.editPersona,
-			content: { EditPersona.View(store: $0) }
+			store: destinationStore.scope(state: \.editPersona, action: \.editPersona)
 		)
+			{ EditPersona.View(store: $0) }
 	}
 
 	private func confirmForgetAlert(with destinationStore: PresentationStoreOf<PersonaDetails.Destination>) -> some View {
 		alert(
-			store: destinationStore,
-			state: /PersonaDetails.Destination.State.confirmForgetAlert,
-			action: PersonaDetails.Destination.Action.confirmForgetAlert
+			store: destinationStore.scope(state: \.confirmForgetAlert, action: \.confirmForgetAlert)
 		)
 	}
 
 	private func confirmHideAlert(with destinationStore: PresentationStoreOf<PersonaDetails.Destination>) -> some View {
 		alert(
-			store: destinationStore,
-			state: /PersonaDetails.Destination.State.confirmHideAlert,
-			action: PersonaDetails.Destination.Action.confirmHideAlert
+			store: destinationStore.scope(state: \.confirmHideAlert, action: \.confirmHideAlert)
 		)
+	}
+
+	private func factorSourceDetails(with destinationStore: PresentationStoreOf<PersonaDetails.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.factorSourceDetail, action: \.factorSourceDetail)) {
+			FactorSourceDetail.View(store: $0)
+		}
+	}
+
+	private func displayMnemonic(with destinationStore: PresentationStoreOf<PersonaDetails.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.displayMnemonic, action: \.displayMnemonic)) {
+			DisplayMnemonic.View(store: $0)
+		}
+	}
+
+	private func enterMnemonic(with destinationStore: PresentationStoreOf<PersonaDetails.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.enterMnemonic, action: \.enterMnemonic)) { store in
+			NavigationStack {
+				ImportMnemonicForFactorSource.View(store: store)
+			}
+		}
 	}
 }
 
@@ -137,17 +148,13 @@ private extension PersonaDetails.State {
 		.init(
 			thumbnail: nil,
 			personaName: personaName,
-			isDappPersona: isDappPersona
+			isDappPersona: isDappPersona,
+			factorSourceRow: factorSourceRow
 		)
 	}
 
 	var personaName: String {
-		switch mode {
-		case let .general(persona, _):
-			persona.displayName.rawValue
-		case let .dApp(_, persona):
-			persona.displayName.rawValue
-		}
+		persona.displayName.rawValue
 	}
 
 	var isDappPersona: Bool {
@@ -221,7 +228,7 @@ extension PersonaDetails.View {
 extension PersonaDetails.State {
 	var dAppsSection: DappsSection? {
 		switch mode {
-		case let .general(_, dApps):
+		case let .general(dApps):
 			dApps.isEmpty ? nil : dApps
 		case .dApp:
 			nil
@@ -267,17 +274,19 @@ extension PersonaDetails.View {
 private extension PersonaDetails.State {
 	var infoSectionViewState: PersonaDetails.View.InfoSection.ViewState {
 		switch mode {
-		case let .dApp(_, persona: persona):
+		case let .dApp(_, authorizedPersonaData):
 			.init(
 				dAppInfo: dAppInfo,
 				personaName: persona.displayName.rawValue,
-				personaData: persona.sharedPersonaData
+				personaData: authorizedPersonaData.sharedPersonaData,
+				factorSourceRow: factorSourceRow
 			)
-		case let .general(persona, _):
+		case .general:
 			.init(
 				dAppInfo: nil,
 				personaName: persona.displayName.rawValue,
-				personaData: persona.personaData
+				personaData: persona.personaData,
+				factorSourceRow: factorSourceRow
 			)
 		}
 	}
@@ -301,6 +310,7 @@ extension PersonaDetails.View {
 			let fullName: String?
 			let emailAddresses: [String]?
 			let phoneNumbers: [String]?
+			let factorSourceRow: FactorSourcesList.Row?
 
 			struct DappInfo: Equatable {
 				let name: String
@@ -310,13 +320,15 @@ extension PersonaDetails.View {
 			init(
 				dAppInfo: DappInfo?,
 				personaName: String,
-				personaData: PersonaData?
+				personaData: PersonaData?,
+				factorSourceRow: FactorSourcesList.Row?
 			) {
 				self.dAppInfo = dAppInfo
 				self.personaName = personaName
 				self.fullName = personaData?.name?.value.formatted
 				self.emailAddresses = personaData?.emailAddresses.collection.map(\.value.email)
 				self.phoneNumbers = personaData?.phoneNumbers.collection.map(\.value.number)
+				self.factorSourceRow = factorSourceRow
 			}
 		}
 
@@ -326,6 +338,34 @@ extension PersonaDetails.View {
 			WithViewStore(store, observe: \.infoSectionViewState) { viewStore in
 				VStack(alignment: .leading, spacing: .medium1) {
 					VPair(heading: L10n.AuthorizedDapps.PersonaDetails.personaLabelHeading, item: viewStore.personaName)
+
+					Separator()
+
+					if let factorSourceRow = viewStore.factorSourceRow {
+						Text("Secured with")
+							.textStyle(.body1HighImportance)
+							.foregroundColor(.secondaryText)
+
+						FactorSourceCard(
+							kind: .instance(
+								factorSource: factorSourceRow.integrity.factorSource,
+								kind: .extended
+							),
+							mode: .display,
+							messages: factorSourceRow.messages,
+							onAction: { action in
+								switch action {
+								case .messageTapped:
+									viewStore.send(.view(.factorSourceMessageTapped(factorSourceRow)))
+								case .removeTapped:
+									break
+								}
+							}
+						)
+						.onTapGesture {
+							viewStore.send(.view(.factorSourceCardTapped))
+						}
+					}
 
 					Separator()
 

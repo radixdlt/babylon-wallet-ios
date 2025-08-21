@@ -1,13 +1,16 @@
+// MARK: - AddFactorSource.NameFactorSource
 extension AddFactorSource {
 	@Reducer
 	struct NameFactorSource: Sendable, FeatureReducer {
 		@ObservableState
 		struct State: Sendable, Hashable {
 			@Shared(.deviceMnemonicBuilder) var deviceMnemonicBuilder
-			let kind: FactorSourceKind
+
+			let context: Context
 			var name: String = ""
 			var sanitizedName: NonEmptyString?
 			var isAddingFactorSource: Bool = false
+			var factorSource: FactorSource
 
 			@Presents
 			var destination: Destination.State? = nil
@@ -36,7 +39,7 @@ extension AddFactorSource {
 		}
 
 		enum DelegateAction: Sendable, Equatable {
-			case saved
+			case saved(FactorSource)
 		}
 
 		struct Destination: DestinationReducer {
@@ -57,6 +60,7 @@ extension AddFactorSource {
 
 		@Dependency(\.errorQueue) var errorQueue
 		@Dependency(\.userDefaults) var userDefaults
+		@Dependency(\.secureStorageClient) var secureStorageClient
 
 		var body: some ReducerOf<Self> {
 			Reduce(core)
@@ -69,13 +73,23 @@ extension AddFactorSource {
 				state.sanitizedName = NonEmpty(rawValue: name.trimmingWhitespacesAndNewlines())
 				return .none
 			case let .saveTapped(name):
-				let mwp = state.deviceMnemonicBuilder.getMnemonicWithPassphrase()
-				let fsId = state.deviceMnemonicBuilder.getFactorSourceId()
+				state.factorSource.setName(name)
 				state.isAddingFactorSource = true
-				return .run { send in
+
+				return .run { [factorSource = state.factorSource, builder = state.deviceMnemonicBuilder] send in
 					let result = await TaskResult {
-						_ = try await SargonOS.shared.addNewMnemonicFactorSource(factorSourceKind: .device, mnemonicWithPassphrase: mwp, name: name.rawValue)
-						try? userDefaults.addFactorSourceIDOfBackedUpMnemonic(fsId.extract())
+						if let deviceFS = factorSource.asDevice {
+							let mwp = builder.getMnemonicWithPassphrase()
+							try secureStorageClient.saveMnemonicForFactorSource(
+								.init(
+									mnemonicWithPassphrase: mwp,
+									factorSource: deviceFS
+								)
+							)
+							try? userDefaults.addFactorSourceIDOfBackedUpMnemonic(factorSource.id.extract())
+						}
+
+						_ = try await SargonOS.shared.addFactorSource(factorSource: factorSource)
 						return EqVoid.instance
 					}
 					await send(.internal(.addFactorSourceResult(result)))
@@ -96,7 +110,29 @@ extension AddFactorSource {
 		}
 
 		func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
-			.send(.delegate(.saved))
+			.send(.delegate(.saved(state.factorSource)))
+		}
+	}
+}
+
+extension FactorSource {
+	mutating func setName(_ name: NonEmptyString) {
+		switch self {
+		case var .device(value):
+			value.hint.label = name.stringValue
+			self = .device(value: value)
+		case var .ledger(value):
+			value.hint.label = name.stringValue
+			self = .ledger(value: value)
+		case var .offDeviceMnemonic(value):
+			value.hint.label = DisplayName(nonEmpty: name)
+			self = .offDeviceMnemonic(value: value)
+		case var .arculusCard(value):
+			value.hint.label = name.stringValue
+			self = .arculusCard(value: value)
+		case var .password(value):
+			value.hint.label = name.stringValue
+			self = .password(value: value)
 		}
 	}
 }

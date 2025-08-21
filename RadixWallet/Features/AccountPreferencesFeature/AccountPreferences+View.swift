@@ -5,6 +5,7 @@ extension AccountPreferences.State {
 	var viewState: AccountPreferences.ViewState {
 		.init(
 			account: account,
+			factorSourceRow: factorSourceRow,
 			sections: {
 				var sections: [AccountPreferences.ViewState.Section] = [
 					.init(
@@ -46,6 +47,7 @@ extension AccountPreferences {
 	struct ViewState: Equatable {
 		typealias Section = PreferenceSection<AccountPreferences.Section, AccountPreferences.Section.SectionRow>.ViewState
 		let account: Account
+		let factorSourceRow: FactorSourcesList.Row?
 		let sections: [Section]
 		let faucetButtonState: ControlState
 		let isOnMainnet: Bool
@@ -64,7 +66,38 @@ extension AccountPreferences {
 				PreferencesList(
 					viewState: .init(sections: viewStore.sections),
 					onRowSelected: { _, rowId in viewStore.send(.rowTapped(rowId)) },
-					header: { AccountCard(account: viewStore.account) },
+					header: {
+						VStack(alignment: .leading) {
+							AccountCard(account: viewStore.account)
+							if let factorSourceRow = viewStore.factorSourceRow {
+								Text("Secured with")
+									.textStyle(.body1HighImportance)
+									.foregroundColor(.secondaryText)
+									.padding(.top, .medium3)
+
+								FactorSourceCard(
+									kind: .instance(
+										factorSource: factorSourceRow.integrity.factorSource,
+										kind: .extended
+									),
+									mode: .display,
+									messages: factorSourceRow.messages,
+									onAction: { action in
+										switch action {
+										case .messageTapped:
+											store.send(.view(.factorSourceMessageTapped(factorSourceRow)))
+										case .removeTapped:
+											break
+										}
+									}
+								)
+								.padding(.bottom, .medium3)
+								.onTapGesture {
+									viewStore.send(.factorSourceCardTapped)
+								}
+							}
+						}
+					},
 					footer: { footer(with: viewStore) }
 				)
 				.task {
@@ -125,10 +158,7 @@ extension AccountPreferences.View {
 
 private extension StoreOf<AccountPreferences> {
 	var destination: PresentationStoreOf<AccountPreferences.Destination> {
-		func scopeState(state: State) -> PresentationState<AccountPreferences.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
+		scope(state: \.$destination, action: \.destination)
 	}
 }
 
@@ -141,6 +171,9 @@ private extension View {
 			.devAccountPreferences(with: destinationStore)
 			.hideAccount(with: destinationStore, store: store)
 			.deleteAccount(with: destinationStore, store: store)
+			.factorSourceDetails(with: destinationStore, store: store)
+			.displayMnemonic(with: destinationStore)
+			.enterMnemonic(with: destinationStore)
 	}
 
 	private func updateAccountLabel(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
@@ -172,6 +205,26 @@ private extension View {
 	private func deleteAccount(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>, store: StoreOf<AccountPreferences>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.deleteAccount, action: \.deleteAccount)) {
 			DeleteAccountCoordinator.View(store: $0)
+		}
+	}
+
+	private func factorSourceDetails(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>, store: StoreOf<AccountPreferences>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.factorSourceDetail, action: \.factorSourceDetail)) {
+			FactorSourceDetail.View(store: $0)
+		}
+	}
+
+	private func displayMnemonic(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.displayMnemonic, action: \.displayMnemonic)) {
+			DisplayMnemonic.View(store: $0)
+		}
+	}
+
+	private func enterMnemonic(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.enterMnemonic, action: \.enterMnemonic)) { store in
+			NavigationStack {
+				ImportMnemonicForFactorSource.View(store: store)
+			}
 		}
 	}
 }

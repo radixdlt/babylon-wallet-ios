@@ -27,6 +27,7 @@ struct NewConnection: Sendable, FeatureReducer {
 
 	enum ViewAction: Sendable, Equatable {
 		case closeButtonTapped
+		case ledgerConnectionIntroContinueTapped
 	}
 
 	enum ChildAction: Sendable, Equatable {
@@ -48,6 +49,7 @@ struct NewConnection: Sendable, FeatureReducer {
 	struct Root: Sendable, Hashable, Reducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
+			case ledgerConnectionIntro
 			case localNetworkPermission(LocalNetworkPermission.State)
 			case scanQR(ScanQRCoordinator.State)
 			case nameConnection(NewConnectionName.State)
@@ -60,6 +62,7 @@ struct NewConnection: Sendable, FeatureReducer {
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
+			case ledgerConnectionIntro(Never)
 			case localNetworkPermission(LocalNetworkPermission.Action)
 			case scanQR(ScanQRCoordinator.Action)
 			case nameConnection(NewConnectionName.Action)
@@ -107,6 +110,7 @@ struct NewConnection: Sendable, FeatureReducer {
 	@Dependency(\.jsonDecoder) var jsonDecoder
 	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.dismiss) var dismiss
+	@Dependency(\.continuousClock) var continuousClock
 
 	init() {}
 
@@ -120,9 +124,12 @@ struct NewConnection: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
-			.run { _ in
+			return .run { _ in
 				await dismiss()
 			}
+		case .ledgerConnectionIntroContinueTapped:
+			state.root = .localNetworkPermission(.init())
+			return .none
 		}
 	}
 
@@ -176,6 +183,8 @@ struct NewConnection: Sendable, FeatureReducer {
 				await send(.internal(.establishConnectionResult(
 					TaskResult {
 						try await radixConnectClient.connectP2PLink(p2pLink)
+						try await radixConnectClient.updateOrAddP2PLink(p2pLink)
+						try await continuousClock.sleep(for: .seconds(1))
 						return p2pLink
 					}
 				)))

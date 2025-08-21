@@ -134,7 +134,7 @@ struct PersonasCoordinator: Sendable, FeatureReducer {
 			return .run { send in
 				let dApps = try await authorizedDappsClient.getDappsAuthorizedByPersona(persona.id)
 					.map(PersonaDetails.State.DappInfo.init)
-				let personaDetailsState = PersonaDetails.State(.general(persona, dApps: dApps.asIdentified()))
+				let personaDetailsState = PersonaDetails.State(persona: persona, .general(dApps: dApps.asIdentified()))
 				await send(.internal(.loadedPersonaDetails(personaDetailsState)))
 			}
 

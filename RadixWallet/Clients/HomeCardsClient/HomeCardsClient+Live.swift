@@ -47,8 +47,8 @@ extension HomeCardsClient: DependencyKey {
 	}()
 }
 
-// MARK: - HomeCardsManager + @unchecked Sendable
-extension HomeCardsManager: @unchecked Sendable {}
+// MARK: - HomeCardsManager + @unchecked @retroactive Sendable
+extension HomeCardsManager: @unchecked @retroactive Sendable {}
 
 // MARK: - HomeCardsStorage
 private final class HomeCardsStorage: Sargon.HomeCardsStorage {
@@ -60,6 +60,14 @@ private final class HomeCardsStorage: Sargon.HomeCardsStorage {
 
 	func loadCards() async throws -> Data? {
 		userDefaults.getHomeCards()
+	}
+
+	func saveDismissedCards(encodedCards: Data) async throws {
+		userDefaults.setDismissedHomeCards(encodedCards)
+	}
+
+	func loadDismissedCards() async throws -> SargonUniFFI.BagOfBytes? {
+		userDefaults.getDismissedHomeCards()
 	}
 }
 

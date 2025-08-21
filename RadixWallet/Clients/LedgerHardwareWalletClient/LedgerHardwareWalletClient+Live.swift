@@ -189,11 +189,9 @@ extension LedgerHardwareWalletClient: DependencyKey {
 		}
 
 		return Self(
-			isConnectedToAnyConnectorExtension: {
-				await radixConnectClient.getP2PLinksWithConnectionStatusUpdates()
-					.map { !$0.filter(\.hasAnyConnectedPeers).isEmpty }
-					.share()
-					.eraseToAnyAsyncSequence()
+			hasAnyLinkedConnector: {
+				let p2pLinks = await (try? radixConnectClient.getP2PLinks()) ?? []
+				return !p2pLinks.isEmpty
 			},
 			getDeviceInfo: {
 				try await makeRequest(

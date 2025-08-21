@@ -134,6 +134,28 @@ extension [SecurityProblem] {
 			}
 		}
 	}
+
+	func hasProblem9() -> Bool {
+		contains { problem in
+			switch problem {
+			case .problem9:
+				true
+			default:
+				false
+			}
+		}
+	}
+
+	func hasProblem3() -> Bool {
+		contains { problem in
+			switch problem {
+			case .problem3:
+				true
+			default:
+				false
+			}
+		}
+	}
 }
 
 private extension AddressesOfEntitiesInBadState {

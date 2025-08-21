@@ -9,15 +9,8 @@ extension FactorSourcesList {
 					VStack(spacing: .large3) {
 						header(store.kind.details)
 
-						if let main = store.main {
-							section(text: L10n.FactorSources.List.default, rows: [main], showChangeMain: !store.others.isEmpty)
-								.padding(.top, .medium3)
-
-							if !store.others.isEmpty {
-								section(text: L10n.FactorSources.List.others, rows: store.others)
-							}
-						} else {
-							section(text: nil, rows: store.others)
+						ForEachStatic(store.rows) { row in
+							card(row)
 						}
 
 						Button(store.addTitle) {
@@ -56,32 +49,11 @@ extension FactorSourcesList {
 				.flushedLeft
 		}
 
-		private func section(text: String?, rows: [State.Row], showChangeMain: Bool = false) -> some SwiftUI.View {
-			VStack(spacing: .small1) {
-				if let text {
-					HStack(spacing: .zero) {
-						header(text)
-						Spacer()
-						if showChangeMain {
-							Button(L10n.FactorSources.List.change) {
-								store.send(.view(.changeMainButtonTapped))
-							}
-							.buttonStyle(.primaryText())
-						}
-					}
-				}
-
-				ForEachStatic(rows) { row in
-					card(row)
-				}
-			}
-		}
-
-		private func card(_ row: State.Row) -> some SwiftUI.View {
+		private func card(_ row: Row) -> some SwiftUI.View {
 			FactorSourceCard(
 				kind: .instance(
 					factorSource: row.integrity.factorSource,
-					kind: .extended(linkedEntities: row.linkedEntities)
+					kind: .withEntities(linkedEntities: row.linkedEntities)
 				),
 				mode: mode(row),
 				messages: row.messages
@@ -99,12 +71,16 @@ extension FactorSourcesList {
 			.opacity(row.opacity)
 		}
 
-		func mode(_ row: State.Row) -> FactorSourceCard.Mode {
+		func mode(_ row: Row) -> FactorSourceCard.Mode {
 			switch store.context {
 			case .display:
 				.display
 			case .selection:
-				.selection(type: .radioButton, isSelected: store.selected == row || row.selectability == .alreadySelected)
+				.selection(
+					type: .radioButton,
+					selectionEnabled: true,
+					isSelected: store.selected == row || row.selectability == .alreadySelected
+				)
 			}
 		}
 	}
@@ -134,7 +110,7 @@ private extension FactorSourcesList.State {
 	}
 }
 
-private extension FactorSourcesList.State.Row {
+extension FactorSourcesList.Row {
 	var messages: [FactorSourceCardDataSource.Message] {
 		switch status {
 		case .lostFactorSource:
@@ -143,7 +119,7 @@ private extension FactorSourcesList.State.Row {
 			[.init(text: L10n.FactorSources.List.seedPhraseNotRecoverable, type: .warning)]
 		case .seedPhraseWrittenDown:
 			[.init(text: L10n.FactorSources.List.seedPhraseWrittenDown, type: .success)]
-		case .notBackedUp:
+		case .notBackedUp, .none:
 			[]
 		}
 	}
@@ -169,10 +145,8 @@ private extension View {
 		return detail(with: destinationStore)
 			.displayMnemonic(with: destinationStore)
 			.enterMnemonic(with: destinationStore)
-			.changeMain(with: destinationStore)
 			.addNewP2PLinkSheet(with: destinationStore)
 			.noP2PLinkAlert(with: destinationStore)
-			.addNewLedgerSheet(with: destinationStore)
 			.addFactorSource(with: destinationStore)
 	}
 
@@ -189,20 +163,10 @@ private extension View {
 	}
 
 	private func enterMnemonic(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
-		navigationDestination(store: destinationStore.scope(state: \.enterMnemonic, action: \.enterMnemonic)) {
-			ImportMnemonicsFlowCoordinator.View(store: $0)
-		}
-	}
-
-	private func changeMain(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
-		sheet(store: destinationStore.scope(state: \.changeMain, action: \.changeMain)) {
-			ChangeMainFactorSource.View(store: $0)
-		}
-	}
-
-	private func addNewLedgerSheet(with destinationStore: PresentationStoreOf<FactorSourcesList.Destination>) -> some View {
-		sheet(store: destinationStore.scope(state: \.addNewLedger, action: \.addNewLedger)) {
-			AddLedgerFactorSource.View(store: $0)
+		sheet(store: destinationStore.scope(state: \.enterMnemonic, action: \.enterMnemonic)) { store in
+			NavigationStack {
+				ImportMnemonicForFactorSource.View(store: store)
+			}
 		}
 	}
 
