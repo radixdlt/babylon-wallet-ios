@@ -115,6 +115,17 @@ extension AddFactorSource {
 				return state.strategy?.handleCompletion(childAction, &state) ?? .none
 			}
 		}
+
+		func createDeviceFactorSource(state: State) -> DeviceFactorSource {
+			let mwp = state.deviceMnemonicBuilder.getMnemonicWithPassphrase()
+			let factorType: DeviceFactorSourceType = switch state.context {
+			case .newFactorSource:
+				.babylon
+			case let .recoverFactorSource(isOlympia):
+				isOlympia ? .olympia : .babylon
+			}
+			return SargonOS.shared.createDeviceFactorSource(mnemonicWithPassphrase: mwp, factorType: factorType)
+		}
 	}
 }
 
