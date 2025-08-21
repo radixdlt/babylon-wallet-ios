@@ -156,9 +156,3 @@ extension Account {
 		return account
 	}
 }
-
-extension FactorSourcesClient {
-	func saveNew(mainBDFS: PrivateHierarchicalDeterministicFactorSource) async throws {
-		try await saveNewMainBDFS(mainBDFS.factorSource)
-	}
-}

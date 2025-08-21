@@ -236,7 +236,6 @@ extension PrivateHierarchicalDeterministicFactorSource {
 	) -> Self {
 		var bdfs = DeviceFactorSource.babylon(
 			mnemonicWithPassphrase: mnemonicWithPassphrase,
-			isMain: true,
 			hostInfo: .sample
 		)
 		bdfs.hint.model = model
