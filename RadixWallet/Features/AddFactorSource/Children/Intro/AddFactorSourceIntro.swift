@@ -96,6 +96,8 @@ extension AddFactorSource {
 						case let .invalid(version):
 							await send(.internal(.unsupportedArculusCardVersion(version: version)))
 						}
+					} catch: { error, _ in
+						errorQueue.schedule(error)
 					}
 				case .device:
 					return .send(.delegate(.completed))

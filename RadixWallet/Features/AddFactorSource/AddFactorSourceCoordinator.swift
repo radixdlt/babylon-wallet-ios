@@ -117,7 +117,7 @@ extension AddFactorSource {
 		}
 
 		func createDeviceFactorSource(state: State) -> DeviceFactorSource {
-			let mwp = state.deviceMnemonicBuilder.getMnemonicWithPassphrase()
+			let mwp = state.mnemonicBuilder.getMnemonicWithPassphrase()
 			let factorType: DeviceFactorSourceType = switch state.context {
 			case .newFactorSource:
 				.babylon

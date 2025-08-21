@@ -53,19 +53,23 @@ extension NFCSessionClient: SargonUniFFI.NfcTagDriver {
 			try await refreshSessionIfNeed()
 			return try await self.isoTag!.sendCommand(data: command)
 		} catch {
-			loggerGlobal.error("======== Error from NFC Command: \(error) ========")
-			throw error
+			throw CommonError.NfcSessionLostTagConnection
 		}
 	}
 
 	public func sendReceiveCommandChain(commands: [Data]) async throws -> Data {
 		try await refreshSessionIfNeed()
-		for (index, apdu) in commands.enumerated() {
-			let data = try await self.isoTag!.sendCommand(data: apdu)
+		do {
+			for (index, apdu) in commands.enumerated() {
+				let data = try await self.isoTag!.sendCommand(data: apdu)
 
-			if index == commands.count - 1 {
-				return data
+				if index == commands.count - 1 {
+					return data
+				}
 			}
+		} catch {
+			loggerGlobal.error("======== Error from NFC Command: \(error) ========")
+			throw CommonError.NfcSessionLostTagConnection
 		}
 		fatalError()
 	}
@@ -237,8 +241,12 @@ extension NFCSessionClient {
 				throw CommonError.NfcSessionUnknownTag
 			}
 
-			try await self.session!.connect(to: cardTag)
-			AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
+			do {
+				try await self.session!.connect(to: cardTag)
+				AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
+			} catch {
+				throw CommonError.NfcSessionLostTagConnection
+			}
 			return isoTag
 		}
 		throw CancellationError()
