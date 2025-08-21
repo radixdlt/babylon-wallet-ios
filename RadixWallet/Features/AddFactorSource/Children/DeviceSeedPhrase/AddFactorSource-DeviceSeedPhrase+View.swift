@@ -22,9 +22,6 @@ extension AddFactorSource.DeviceSeedPhrase {
 							.buttonStyle(.primaryRectangular)
 							.controlState(store.confirmButtonControlState)
 						}
-						.onFirstAppear {
-							store.send(.view(.onFirstAppear))
-						}
 						.background(Color.primaryBackground)
 					}
 				}
@@ -53,15 +50,31 @@ extension AddFactorSource.DeviceSeedPhrase {
 
 		private var headerView: some SwiftUI.View {
 			VStack(spacing: .medium2) {
-				Text(L10n.NewBiometricFactor.SeedPhrase.title)
+				Text(headerTitle)
 					.textStyle(.sheetTitle)
 
-				Text(L10n.NewBiometricFactor.SeedPhrase.subtitle)
+				Text(headerMessage)
 					.textStyle(.body1Regular)
 			}
 			.foregroundColor(Color.primaryText)
 			.multilineTextAlignment(.center)
 			.padding(.horizontal, .small2)
+		}
+
+		var headerTitle: String {
+			if store.isEnteringCustomSeedPhrase {
+				"Enter your BIP39 seed phrase"
+			} else {
+				L10n.NewBiometricFactor.SeedPhrase.title
+			}
+		}
+
+		var headerMessage: String {
+			if store.isEnteringCustomSeedPhrase {
+				"Enter your BIP39 seed phrase. Make sure it’s backed up securely and accessible only to you."
+			} else {
+				L10n.NewBiometricFactor.SeedPhrase.subtitle
+			}
 		}
 	}
 }

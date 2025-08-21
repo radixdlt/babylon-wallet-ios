@@ -5,8 +5,9 @@ extension LedgerHardwareWalletFactorSource {
 	static func from(
 		device: LedgerDeviceInfo,
 		name: String
-	) throws -> Self {
-		try model(
+	) -> Self {
+		// Crash intentionally to identify, to identify the highly improbable crash path
+		try! model(
 			.init(model: device.model),
 			name: name,
 			body: .init(bytes: device.id.data)
@@ -21,8 +22,8 @@ extension LedgerHardwareWalletFactorSource {
 		_ model: LedgerHardwareWalletModel,
 		name: String,
 		body: Exactly32Bytes
-	) throws -> Self {
-		try .init(
+	) -> Self {
+		.init(
 			id: .init(kind: .ledgerHqHardwareWallet, body: body),
 			common: .new(
 				// We MUST always save a Ledger with Babylon AND Olympia crypto parameters

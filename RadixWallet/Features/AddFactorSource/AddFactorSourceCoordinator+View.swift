@@ -12,7 +12,7 @@ extension AddFactorSource.Coordinator {
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				NavigationStack(path: $store.scope(state: \.path, action: \.child.path)) {
-					path(for: store.scope(state: \.root, action: \.child.root))
+					rootView(store: store.scope(state: \.root, action: \.child.root))
 						.toolbar {
 							ToolbarItem(placement: .navigationBarLeading) {
 								CloseButton {
@@ -27,11 +27,25 @@ extension AddFactorSource.Coordinator {
 		}
 
 		@ViewBuilder
+		private func rootView(store: StoreOf<AddFactorSource.Coordinator.Root>) -> some SwiftUI.View {
+			switch store.state {
+			case .intro:
+				if let store = store.scope(state: \.intro, action: \.intro) {
+					AddFactorSource.Intro.View(store: store)
+				}
+			case .selectKind:
+				if let store = store.scope(state: \.selectKind, action: \.selectKind) {
+					AddFactorSource.SelectKind.View(store: store)
+				}
+			}
+		}
+
+		@ViewBuilder
 		private func path(for store: StoreOf<AddFactorSource.Coordinator.Path>) -> some SwiftUI.View {
 			switch store.state {
 			case .intro:
-				AddFactorSource.IntroView(kind: self.store.kind) {
-					self.store.send(.view(.continueButtonTapped))
+				if let store = store.scope(state: \.intro, action: \.intro) {
+					AddFactorSource.Intro.View(store: store)
 				}
 			case .deviceSeedPhrase:
 				if let store = store.scope(state: \.deviceSeedPhrase, action: \.deviceSeedPhrase) {

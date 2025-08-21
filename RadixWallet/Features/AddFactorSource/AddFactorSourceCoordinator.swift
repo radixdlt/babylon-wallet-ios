@@ -2,85 +2,147 @@ import ComposableArchitecture
 import Sargon
 
 extension AddFactorSource {
+	enum Context: Sendable, Hashable {
+		case newFactorSource
+		case recoverFactorSource(isOlympia: Bool)
+	}
+
 	@Reducer
 	struct Coordinator: Sendable, FeatureReducer {
 		@ObservableState
 		struct State: Sendable, Hashable {
-			@Shared(.deviceMnemonicBuilder) var deviceMnemonicBuilder
-			let kind: FactorSourceKind
+			enum Mode {
+				case preselectedKind(FactorSourceKind)
+				case toSelectFromKinds([FactorSourceKind])
+			}
 
-			var root: Path.State = .intro
-			var path: StackState<Path.State> = .init()
+			@Shared(.deviceMnemonicBuilder) var deviceMnemonicBuilder
+			var kind: FactorSourceKind?
+
+			var root: Root.State
+			var path: StackState<Path.State>
+
+			let context: Context
+
+			init(mode: Mode, context: Context) {
+				switch mode {
+				case let .preselectedKind(factorSourceKind):
+					self.kind = factorSourceKind
+					self.root = .intro(.init(kind: factorSourceKind))
+				case let .toSelectFromKinds(kinds):
+					self.kind = nil
+					self.root = .selectKind(.init(kinds: kinds))
+				}
+				self.context = context
+				self.path = .init()
+			}
 		}
 
 		@Reducer(state: .hashable, action: .equatable)
 		enum Path {
-			case intro
+			case intro(AddFactorSource.Intro)
 			case deviceSeedPhrase(AddFactorSource.DeviceSeedPhrase)
 			case confirmSeedPhrase(AddFactorSource.ConfirmSeedPhrase)
 			case nameFactorSource(AddFactorSource.NameFactorSource)
 		}
 
-		typealias Action = FeatureAction<Self>
+		@Reducer
+		struct Root {
+			@CasePathable
+			@ObservableState
+			enum State: Hashable, Sendable {
+				case selectKind(AddFactorSource.SelectKind.State)
+				case intro(AddFactorSource.Intro.State)
+			}
 
-		enum ViewAction: Sendable, Equatable {
-			case continueButtonTapped
+			@CasePathable
+			enum Action: Equatable, Sendable {
+				case selectKind(AddFactorSource.SelectKind.Action)
+				case intro(AddFactorSource.Intro.Action)
+			}
+
+			var body: some ReducerOf<Self> {
+				Scope(state: \.selectKind, action: \.selectKind) {
+					AddFactorSource.SelectKind()
+				}
+
+				Scope(state: \.intro, action: \.intro) {
+					AddFactorSource.Intro()
+				}
+			}
 		}
+
+		typealias Action = FeatureAction<Self>
 
 		@CasePathable
 		enum ChildAction: Sendable, Equatable {
-			case root(Path.Action)
+			case root(Root.Action)
 			case path(StackActionOf<Path>)
 		}
 
 		enum DelegateAction: Sendable, Equatable {
-			case finished
+			case finished(FactorSource)
 		}
 
 		var body: some ReducerOf<Self> {
 			Scope(state: \.root, action: \.child.root) {
-				Path.intro
+				Root()
 			}
+
 			Reduce(core)
 				.forEach(\.path, action: \.child.path)
 		}
 
-		func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
-			switch viewAction {
-			case .continueButtonTapped:
-				switch state.kind {
-				case .device:
-					state.$deviceMnemonicBuilder.withLock { builder in
-						builder = builder.generateNewMnemonic()
-					}
-					if let mnemonic = try? Mnemonic(words: state.deviceMnemonicBuilder.getWords()) {
-						state.path.append(.deviceSeedPhrase(.init(mnemonic: mnemonic)))
-					}
-				case .ledgerHqHardwareWallet, .offDeviceMnemonic, .arculusCard, .password:
-					break
-				}
+		func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+			switch childAction {
+			case let .root(.selectKind(.delegate(.completed(selectedKind)))):
+				state.kind = selectedKind
+				state.path.append(.intro(.init(kind: selectedKind)))
+				return .none
 
+			case .root(.intro(.delegate(.completed))), .path(.element(id: _, action: .intro(.delegate(.completed)))):
+				state.path.append(.deviceSeedPhrase(.init(context: state.context)))
+				return .none
+
+			case let .root(.intro(.delegate(.completedWithLedgerTempFS(ledger)))),
+			     let .path(.element(id: _, action: .intro(.delegate(.completedWithLedgerTempFS(ledger))))):
+				state.path.append(.nameFactorSource(.init(context: state.context, factorSource: ledger.asGeneral)))
+
+				return .none
+
+			case let .path(.element(id: _, action: .deviceSeedPhrase(.delegate(.completed(withCustomSeedPhrase))))):
+				if withCustomSeedPhrase {
+					state.path.append(.nameFactorSource(.init(context: state.context, factorSource: createDeviceFactorSource(state: state).asGeneral)))
+				} else {
+					state.path.append(.confirmSeedPhrase(.init(factorSourceKind: .device)))
+				}
+				return .none
+
+			case .path(.element(id: _, action: .confirmSeedPhrase(.delegate(.validated)))):
+				state.path.append(.nameFactorSource(.init(context: state.context, factorSource: createDeviceFactorSource(state: state).asGeneral)))
+				return .none
+
+			case let .path(.element(id: _, action: .nameFactorSource(.delegate(.saved(fs))))):
+				// Reset
+				state.$deviceMnemonicBuilder.withLock { builder in
+					builder = DeviceMnemonicBuilder()
+				}
+				return .send(.delegate(.finished(fs)))
+
+			default:
 				return .none
 			}
 		}
 
-		func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-			switch childAction {
-			case let .path(.element(id: _, action: .deviceSeedPhrase(.delegate(.completed(withCustomSeedPhrase))))):
-				if withCustomSeedPhrase {
-					state.path.append(.nameFactorSource(.init(kind: state.kind)))
-				} else {
-					state.path.append(.confirmSeedPhrase(.init(factorSourceKind: state.kind)))
-				}
-				return .none
-			case .path(.element(id: _, action: .confirmSeedPhrase(.delegate(.validated)))):
-				state.path.append(.nameFactorSource(.init(kind: state.kind)))
-				return .none
-			case .path(.element(id: _, action: .nameFactorSource(.delegate(.saved)))):
-				return .send(.delegate(.finished))
-			default:
-				return .none
+		func createDeviceFactorSource(state: State) -> DeviceFactorSource {
+			let mwp = state.deviceMnemonicBuilder.getMnemonicWithPassphrase()
+			let factorType: DeviceFactorSourceType = switch state.context {
+			case .newFactorSource:
+				.babylon
+			case let .recoverFactorSource(isOlympia):
+				isOlympia ? .olympia : .babylon
 			}
+			return SargonOS.shared.createDeviceFactorSource(mnemonicWithPassphrase: mwp, factorType: factorType)
 		}
 	}
 }

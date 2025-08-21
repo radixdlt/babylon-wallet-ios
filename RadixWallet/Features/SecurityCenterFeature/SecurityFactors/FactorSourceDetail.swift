@@ -3,7 +3,7 @@
 struct FactorSourceDetail: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
-		let integrity: FactorSourceIntegrity
+		var integrity: FactorSourceIntegrity
 		var name: String
 		var lastUsed: Timestamp
 
@@ -31,25 +31,23 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 		// case spotCheckTapped
 	}
 
-//	enum InternalAction: Sendable, Hashable {
-//		case spotCheckResult(Bool)
-//	}
+	enum InternalAction: Sendable, Hashable {
+		case integrityUpdated(FactorSourceIntegrity)
+	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
 			case rename(RenameLabel.State)
 			case displayMnemonic(DisplayMnemonic.State)
-			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
-			// case spotCheckAlert(AlertState<Never>)
+			case importMnemonic(ImportMnemonicForFactorSource.State)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
 			case rename(RenameLabel.Action)
 			case displayMnemonic(DisplayMnemonic.Action)
-			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
-			// case spotCheckAlert(Never)
+			case importMnemonic(ImportMnemonicForFactorSource.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -59,8 +57,8 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 			Scope(state: \.displayMnemonic, action: \.displayMnemonic) {
 				DisplayMnemonic()
 			}
-			Scope(state: \.importMnemonics, action: \.importMnemonics) {
-				ImportMnemonicsFlowCoordinator()
+			Scope(state: \.importMnemonic, action: \.importMnemonic) {
+				ImportMnemonicForFactorSource()
 			}
 		}
 	}
@@ -69,7 +67,7 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(destinationPath, action: /Action.destination) {
+			.ifLet(destinationPath, action: \.destination) {
 				Destination()
 			}
 	}
@@ -88,23 +86,22 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 			}
 
 		case .enterSeedPhraseTapped:
-			state.destination = .importMnemonics(.init())
+			guard let deviceFS = state.integrity.factorSource.asDevice else {
+				return .none
+			}
+			state.destination = .importMnemonic(.init(deviceFactorSource: deviceFS, profileToCheck: .current))
 			return .none
 
 		case .changePinTapped:
 			return .none
-//		case .spotCheckTapped:
-//			return .run { [factorSource = state.factorSource] send in
-//				let result = try await SargonOS.shared.triggerSpotCheck(factorSource: factorSource)
-//				await send(.internal(.spotCheckResult(result)))
-//			} catch: { error, send in
-//				if error.isHostInteractionAborted {
-//					// Tapping on Close button is considered a failure
-//					await send(.internal(.spotCheckResult(false)))
-//				} else {
-//					errorQueue.schedule(error)
-//				}
-//			}
+		}
+	}
+
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case let .integrityUpdated(factorSourceIntegrity):
+			state.integrity = factorSourceIntegrity
+			return .none
 		}
 	}
 
@@ -127,7 +124,20 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 			state.destination = nil
 			return .none
 
-		case .displayMnemonic(.delegate), .importMnemonics(.delegate):
+		case .displayMnemonic(.delegate):
+			state.destination = nil
+			return .none
+
+		case let .importMnemonic(.delegate(.imported(fs))):
+			state.destination = nil
+			return .run { send in
+				let integrity = try await SargonOs.shared.factorSourceIntegrity(factorSource: fs.asGeneral)
+				await send(.internal(.integrityUpdated(integrity)))
+			} catch: { err, _ in
+				errorQueue.schedule(err)
+			}
+
+		case .importMnemonic(.delegate(.closed)):
 			state.destination = nil
 			return .none
 

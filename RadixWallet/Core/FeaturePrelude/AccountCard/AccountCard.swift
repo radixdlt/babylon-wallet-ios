@@ -81,14 +81,25 @@ extension AccountCard {
 		HStack(spacing: .small3) {
 			AddressView(account.ledgerIdentifiable)
 
-			if let tag = kind.tag {
+			ForEach(kind.tag, id: \.self) { tag in
 				Text("•")
-				Text(tag)
+				Text(tag.display)
+				if case let .factorSource(fs) = tag {
+					Image(fs.kind.icon)
+						.resizable()
+						.frame(.icon)
+				}
 			}
 		}
 		.foregroundColor(.app.whiteTransparent)
 		.textStyle(.body2HighImportance)
 	}
+}
+
+enum AccountCardTag: Hashable, Sendable {
+	case legacy
+	case dAppDefinition
+	case factorSource(FactorSource)
 }
 
 // MARK: AccountCard.Kind
@@ -106,7 +117,7 @@ extension AccountCard {
 		/// Stacks the name and address vertically, while expecting more content on the trailing and bottom sections.
 		/// Its shape is clipped with a corner radius of 12.
 		/// Used for Home rows.
-		case home(tag: String?)
+		case home(tags: [AccountCardTag])
 
 		/// Stacks the name and address vertically, while expecting a view that allows selection on the trailing section.
 		/// Its shape is clipped with a corner radius of 12.
@@ -183,12 +194,12 @@ private extension AccountCard.Kind {
 		}
 	}
 
-	var tag: String? {
+	var tag: [AccountCardTag] {
 		switch self {
-		case let .home(tag):
-			tag
+		case let .home(tags):
+			tags
 		default:
-			nil
+			[]
 		}
 	}
 
@@ -198,6 +209,19 @@ private extension AccountCard.Kind {
 			.zero
 		case let .selection(isSelected):
 			isSelected ? -0.1 : .zero
+		}
+	}
+}
+
+extension AccountCardTag {
+	var display: String {
+		switch self {
+		case .dAppDefinition:
+			L10n.HomePage.AccountsTag.dAppDefinition
+		case .legacy:
+			L10n.HomePage.AccountsTag.legacySoftware
+		case let .factorSource(fs):
+			fs.name
 		}
 	}
 }

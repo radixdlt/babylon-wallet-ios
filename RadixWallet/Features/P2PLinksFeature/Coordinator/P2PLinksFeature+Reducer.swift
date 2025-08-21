@@ -31,7 +31,6 @@ struct P2PLinksFeature: Sendable, FeatureReducer {
 
 	enum InternalAction: Sendable, Equatable {
 		case loadLinksResult(TaskResult<OrderedSet<P2PLink>>)
-		case saveNewConnectionResult(TaskResult<P2PLink>)
 		case deleteConnectionResult(TaskResult<P2PLink>)
 	}
 
@@ -114,14 +113,6 @@ struct P2PLinksFeature: Sendable, FeatureReducer {
 			errorQueue.schedule(error)
 			return .none
 
-		case let .saveNewConnectionResult(.failure(error)):
-			errorQueue.schedule(error)
-			return .none
-
-		case let .saveNewConnectionResult(.success(newConnection)):
-			state.links.updateOrAppend(newConnection)
-			return .none
-
 		case let .deleteConnectionResult(.success(p2pLink)):
 			state.links.remove(p2pLink)
 			return .none
@@ -136,14 +127,8 @@ struct P2PLinksFeature: Sendable, FeatureReducer {
 		switch presentedAction {
 		case let .newConnection(.delegate(.newConnection(connectedClient))):
 			state.destination = nil
-			return .run { send in
-				let result = await TaskResult {
-					try await radixConnectClient.updateOrAddP2PLink(connectedClient)
-				}
-				.map { connectedClient }
-
-				await send(.internal(.saveNewConnectionResult(result)))
-			}
+			state.links.updateOrAppend(connectedClient)
+			return .none
 
 		case let .removeConnection(.removeTapped(p2pLink)):
 			return .run { send in

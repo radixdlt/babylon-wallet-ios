@@ -14,26 +14,6 @@ extension DeviceFactorSourceClient: DependencyKey {
 		@Dependency(\.userDefaults) var userDefaults
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
-		let entitiesControlledByFactorSource: GetEntitiesControlledByFactorSource = { factorSource, maybeSnapshot in
-			let profileToCheck: ProfileToCheck = if let maybeSnapshot {
-				.specific(maybeSnapshot)
-			} else {
-				.current
-			}
-			let result = try await SargonOS.shared.entitiesLinkedToFactorSource(factorSource: factorSource.asGeneral, profileToCheck: profileToCheck)
-			guard case let .device(integrity) = result.integrity else {
-				struct UnexpectedFactorSource: Error {}
-				throw UnexpectedFactorSource()
-			}
-			return EntitiesControlledByFactorSource(
-				entities: result.accounts.map(AccountOrPersona.account) + result.personas.map(AccountOrPersona.persona),
-				hiddenEntities: result.hiddenAccounts.map(AccountOrPersona.account) + result.hiddenPersonas.map(AccountOrPersona.persona),
-				deviceFactorSource: factorSource,
-				isMnemonicPresentInKeychain: integrity.isMnemonicPresentInSecureStorage,
-				isMnemonicMarkedAsBackedUp: integrity.isMnemonicMarkedAsBackedUp
-			)
-		}
-
 		struct KeychainPresenceOfMnemonic: Sendable, Equatable {
 			let id: FactorSourceIDFromHash
 			let present: Bool
@@ -116,57 +96,6 @@ extension DeviceFactorSourceClient: DependencyKey {
 		}
 
 		return Self(
-			isAccountRecoveryNeeded: {
-				do {
-					let deviceFactorSource = try await factorSourcesClient.getFactorSources().babylonDeviceFactorSources().sorted(by: \.lastUsedOn).first
-
-					guard
-						let deviceFactorSource,
-						let mnemonicWithPassphrase = try secureStorageClient
-						.loadMnemonic(
-							factorSourceID: deviceFactorSource.id,
-							notifyIfMissing: false
-						)
-					else {
-						// Failed to find mnemonic for factor source
-						return true
-					}
-
-					let accountsControlledByMainDeviceFactorSource = try await accountsClient.getAccountsOnCurrentNetwork().filter {
-						$0.virtualHierarchicalDeterministicFactorInstances.contains(where: { $0.factorSourceID == deviceFactorSource.id })
-					}
-
-					do {
-						let hasControlOfAllAccounts = try mnemonicWithPassphrase.validatePublicKeys(of: accountsControlledByMainDeviceFactorSource.elements)
-						return !hasControlOfAllAccounts // if we dont have controll of ALL accounts, then recovery is needed.
-					} catch {
-						// Account recover needed
-						return true
-					}
-
-				} catch {
-					loggerGlobal.error("Failure during check if wallet needs account recovery: \(String(describing: error))")
-					if error is KeychainAccess.Status {
-						throw error
-					}
-					return true
-				}
-			},
-			entitiesControlledByFactorSource: entitiesControlledByFactorSource,
-			controlledEntities: { maybeOverridingSnapshot in
-				let sources: IdentifiedArrayOf<DeviceFactorSource> = try await {
-					// FIXME: Uh this aint pretty... but we are short on time.
-					if let overridingSnapshot = maybeOverridingSnapshot {
-						let profile = overridingSnapshot
-						return IdentifiedArrayOf(uniqueElements: profile.factorSources.compactMap { $0.extract(DeviceFactorSource.self) })
-					} else {
-						return try await factorSourcesClient.getFactorSources(type: DeviceFactorSource.self)
-					}
-				}()
-				return try await IdentifiedArrayOf(uniqueElements: sources.asyncMap {
-					try await entitiesControlledByFactorSource($0, maybeOverridingSnapshot)
-				})
-			},
 			entitiesInBadState: entitiesInBadState,
 			derivePublicKeys: derivePublicKeys
 		)

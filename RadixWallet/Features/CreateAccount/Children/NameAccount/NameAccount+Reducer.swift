@@ -6,18 +6,15 @@ struct NameAccount: Sendable, FeatureReducer {
 		var isFirst: Bool
 		var inputtedName: String
 		var sanitizedName: NonEmptyString?
-		var useLedgerAsFactorSource: Bool
 
 		init(
 			isFirst: Bool,
 			inputtedEntityName: String = "",
 			sanitizedName: NonEmptyString? = nil,
-			useLedgerAsFactorSource: Bool = false
 		) {
 			self.inputtedName = inputtedEntityName
 			self.sanitizedName = sanitizedName
 			self.isFirst = isFirst
-			self.useLedgerAsFactorSource = useLedgerAsFactorSource
 		}
 
 		init(config: CreateAccountConfig) {
@@ -28,11 +25,10 @@ struct NameAccount: Sendable, FeatureReducer {
 	enum ViewAction: Sendable, Equatable {
 		case confirmNameButtonTapped(NonEmptyString)
 		case textFieldChanged(String)
-		case useLedgerAsFactorSourceToggled(Bool)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case proceed(accountName: NonEmpty<String>, useLedgerAsFactorSource: Bool)
+		case proceed(accountName: NonEmpty<String>)
 	}
 
 	@Dependency(\.continuousClock) var clock
@@ -42,16 +38,11 @@ struct NameAccount: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case let .useLedgerAsFactorSourceToggled(useLedgerAsFactorSource):
-			state.useLedgerAsFactorSource = useLedgerAsFactorSource
-			return .none
-
 		case let .confirmNameButtonTapped(sanitizedName):
 			return
 				.resignFirstResponder
 					.concatenate(with: .send(.delegate(.proceed(
-						accountName: sanitizedName,
-						useLedgerAsFactorSource: state.useLedgerAsFactorSource
+						accountName: sanitizedName
 					))))
 
 		case let .textFieldChanged(inputtedName):
