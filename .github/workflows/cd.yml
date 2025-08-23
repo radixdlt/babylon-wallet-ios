@@ -119,10 +119,11 @@ jobs:
       - name: Auth for private SPM repo (single dependency)
         env:
           GH_PAT: ${{ secrets.WALLET_RADIX_BOT_PAT }}   # PAT with read access to radixdlt/arculus-ios-csdk
+          GIT_USER: ${{ env.WALLET_RADIX_BOT_USERNAME }}
         run: |
           # Support both with/without ".git" because Xcode/SPM may normalize either form
-          git config --global url."https://x-access-token:${GH_PAT}@github.com/radixdlt/arculus-ios-csdk".insteadOf "https://github.com/radixdlt/arculus-ios-csdk"
-          git config --global url."https://x-access-token:${GH_PAT}@github.com/radixdlt/arculus-ios-csdk.git".insteadOf "https://github.com/radixdlt/arculus-ios-csdk.git"
+          git config --global url."https://${GIT_USER}@github.com/radixdlt/arculus-ios-csdk".insteadOf "https://github.com/radixdlt/arculus-ios-csdk"
+          git config --global url."https://${GIT_USER}@github.com/radixdlt/arculus-ios-csdk.git".insteadOf "https://github.com/radixdlt/arculus-ios-csdk.git"
 
       - name: "Deploy"
         run: |
