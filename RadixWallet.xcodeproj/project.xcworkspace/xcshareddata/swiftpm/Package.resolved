@@ -1,5 +1,5 @@
 {
-  "originHash" : "24979948b97bd7a7a2529fe588e37f19a282dcd3eb3da019a30dd5e675cfe9e1",
+  "originHash" : "f1f4c7b37482622771f79a02a8d756153fb063fbd96d6efc1a802e68f7a64477",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -35,15 +35,6 @@
       "state" : {
         "revision" : "a22ea3af34d4631123bd54f55f95f7b7a9cd905f",
         "version" : "6.13.2"
-      }
-    },
-    {
-      "identity" : "arculus-ios-csdk",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/radixdlt/arculus-ios-csdk.git",
-      "state" : {
-        "branch" : "main",
-        "revision" : "df5ad2f7ec73323fe7fc94808583f9dfddb66204"
       }
     },
     {

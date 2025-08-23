@@ -1,0 +1,3 @@
+[submodule "arculus-ios-csdk"]
+	path = arculus-ios-csdk
+	url = https://github.com/radixdlt/arculus-ios-csdk
