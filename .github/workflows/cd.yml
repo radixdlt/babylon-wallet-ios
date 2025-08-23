@@ -122,8 +122,8 @@ jobs:
           GIT_USER: ${{ env.WALLET_RADIX_BOT_USERNAME }}
         run: |
           # Support both with/without ".git" because Xcode/SPM may normalize either form
-          git config --global url."https://${GIT_USER}@github.com/radixdlt/arculus-ios-csdk".insteadOf "https://github.com/radixdlt/arculus-ios-csdk"
-          git config --global url."https://${GIT_USER}@github.com/radixdlt/arculus-ios-csdk.git".insteadOf "https://github.com/radixdlt/arculus-ios-csdk.git"
+          git config --global url."https://${GH_PAT}@github.com/radixdlt/arculus-ios-csdk".insteadOf "https://github.com/radixdlt/arculus-ios-csdk"
+          git config --global url."https://${GH_PAT}@github.com/radixdlt/arculus-ios-csdk.git".insteadOf "https://github.com/radixdlt/arculus-ios-csdk.git"
 
       - name: "Deploy"
         run: |
