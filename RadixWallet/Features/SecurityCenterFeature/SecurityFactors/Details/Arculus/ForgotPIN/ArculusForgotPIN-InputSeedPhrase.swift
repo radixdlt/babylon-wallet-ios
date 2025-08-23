@@ -42,7 +42,7 @@ extension ArculusForgotPIN {
 
 		typealias Action = FeatureAction<Self>
 
-		enum ViewAction: Sendable, Equatable {
+		enum ViewAction: Sendable, Hashable {
 			case confirmButtonTapped(Mnemonic)
 		}
 
@@ -62,7 +62,7 @@ extension ArculusForgotPIN {
 			}
 
 			@CasePathable
-			enum Action: Sendable, Equatable {
+			enum Action: Sendable, Hashable {
 				case configureNewPIN(ArculusForgotPIN.EnterNewPIN.Action)
 			}
 

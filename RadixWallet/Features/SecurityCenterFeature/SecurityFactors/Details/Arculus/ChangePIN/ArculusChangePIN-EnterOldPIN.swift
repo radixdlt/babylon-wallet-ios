@@ -74,14 +74,7 @@ extension ArculusChangePIN {
 				.run { [fs = state.factorSource] send in
 					try await arculusCardClient.verifyPin(fs, pin)
 					await send(.internal(.pinVerified))
-				} catch: { error, _ in
-					switch error as? CommonError {
-					case .ArculusCardWrongPin:
-						break
-					default:
-						errorQueue.schedule(error)
-					}
-				}
+				} catch: { _, _ in }
 			}
 		}
 

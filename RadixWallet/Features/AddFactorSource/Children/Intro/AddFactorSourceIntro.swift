@@ -24,7 +24,7 @@ extension AddFactorSource {
 		}
 
 		enum InternalAction: Sendable, Equatable {
-			case unsupportedArculusCardVersion(version: String)
+			case handleArculusCardIdentification(ArculusMinFirmwareVersionRequirement)
 			case hasAConnectorExtension(Bool)
 		}
 
@@ -35,6 +35,7 @@ extension AddFactorSource {
 				case hardwareFactorIdentification(AddFactorSource.IdentifyingFactor.State)
 				case factorSourceAlreadyExists(AlertState<Never>)
 				case arculusInvalidFirmwareVersion(AlertState<Never>)
+				case arculusInstructions(AlertState<Action.ArculusInstructions>)
 			}
 
 			@CasePathable
@@ -43,6 +44,11 @@ extension AddFactorSource {
 				case hardwareFactorIdentification(AddFactorSource.IdentifyingFactor.Action)
 				case factorSourceAlreadyExists(Never)
 				case arculusInvalidFirmwareVersion(Never)
+				case arculusInstructions(ArculusInstructions)
+
+				enum ArculusInstructions {
+					case confirm
+				}
 			}
 
 			var body: some ReducerOf<Self> {
@@ -90,15 +96,8 @@ extension AddFactorSource {
 				case .arculusCard:
 					return .run { send in
 						let versionRequirement = try await arculusCardClient.validateMinFirmwareVersion()
-						switch versionRequirement {
-						case .valid:
-							await send(.delegate(.completed))
-						case let .invalid(version):
-							await send(.internal(.unsupportedArculusCardVersion(version: version)))
-						}
-					} catch: { error, _ in
-						errorQueue.schedule(error)
-					}
+						await send(.internal(.handleArculusCardIdentification(versionRequirement)))
+					} catch: { _, _ in }
 				case .device:
 					return .send(.delegate(.completed))
 				default:
@@ -112,8 +111,11 @@ extension AddFactorSource {
 			case let .hasAConnectorExtension(hasCE):
 				state.hasAConnectorExtension = hasCE
 				return .none
-			case let .unsupportedArculusCardVersion(version):
+			case let .handleArculusCardIdentification(.invalid(version)):
 				state.destination = .arculusInvalidFirmwareVersion(.arculusInvalidFirmwareVersion(version))
+				return .none
+			case .handleArculusCardIdentification(.valid):
+				state.destination = .arculusInstructions(.arculusInstructions())
 				return .none
 			}
 		}
@@ -135,13 +137,8 @@ extension AddFactorSource {
 				state.destination = .factorSourceAlreadyExists(.factorSourceAlreadyExists(fs))
 				return .none
 
-			case let .hardwareFactorIdentification(.delegate(.completedWithArculusCardValidation(validation))):
-				switch validation {
-				case let .invalid(version):
-					return delayedShortEffect(for: .internal(.unsupportedArculusCardVersion(version: version)))
-				case .valid:
-					return delayedShortEffect(for: .delegate(.completed))
-				}
+			case let .arculusInstructions(.confirm):
+				return .send(.delegate(.completed))
 
 			default:
 				return .none
@@ -180,21 +177,20 @@ extension AlertState<NoP2PLinkAlert> {
 			TextState(L10n.LedgerHardwareDevices.LinkConnectorAlert.message)
 		}
 	}
+}
 
-	static func factorSourceAlreadyExists(_ fs: FactorSource) -> AlertState {
+extension AlertState<AddFactorSource.Intro.Destination.Action.ArculusInstructions> {
+	static func arculusInstructions() -> Self {
 		AlertState {
-			TextState(L10n.AddLedgerDevice.AlreadyAddedAlert.title)
-		} message: {
-			TextState(L10n.AddLedgerDevice.AlreadyAddedAlert.message(fs.name))
+			TextState("Adding an Arculus Card")
 		}
-	}
-
-	static func arculusInvalidFirmwareVersion(_ version: String) -> AlertState {
-		AlertState {
-			TextState("Unsupported Arculus Card")
+		actions: {
+			ButtonState(role: .none, action: .confirm) {
+				TextState(L10n.Common.ok)
+			}
 		}
 		message: {
-			TextState("Radix Wallet requires you to use card with min firmware version: \(version)")
+			TextState("If your card already has a seed phrase set up, you can enter it in the next step or choose to replace it with a new one.")
 		}
 	}
 }

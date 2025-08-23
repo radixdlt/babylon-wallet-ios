@@ -22,6 +22,11 @@ public actor NFCSessionClient {
 
 	var sessionStartTime: Date = .now
 	var sessionRenewTime: Date = .now
+	var signingRequestWasTriggered: Bool = false
+
+	func setSigningRequestWasTriggered(_ trigger: Bool) {
+		self.signingRequestWasTriggered = trigger
+	}
 
 	func setIsoTag(tag: NFCISO7816Tag?) async {
 		self.isoTag = tag
@@ -39,6 +44,7 @@ public actor NFCSessionClient {
 // MARK: SargonUniFFI.NfcTagDriver
 extension NFCSessionClient: SargonUniFFI.NfcTagDriver {
 	public func startSession(purpose: NfcTagDriverPurpose) async throws {
+		self.signingRequestWasTriggered = false
 		self.purpose = purpose
 		try await self.beginSession()
 	}
@@ -49,16 +55,19 @@ extension NFCSessionClient: SargonUniFFI.NfcTagDriver {
 	}
 
 	public func sendReceive(command: Data) async throws -> Data {
+		try await refreshSessionIfNeed()
 		do {
-			try await refreshSessionIfNeed()
 			return try await self.isoTag!.sendCommand(data: command)
 		} catch {
+			await endSession(withFailure: CommonError.NfcSessionLostTagConnection)
 			throw CommonError.NfcSessionLostTagConnection
 		}
 	}
 
 	public func sendReceiveCommandChain(commands: [Data]) async throws -> Data {
+		self.setSigningRequestWasTriggered(true)
 		try await refreshSessionIfNeed()
+		loggerGlobal.info("======== Sending Command Chain ========")
 		do {
 			for (index, apdu) in commands.enumerated() {
 				let data = try await self.isoTag!.sendCommand(data: apdu)
@@ -69,6 +78,7 @@ extension NFCSessionClient: SargonUniFFI.NfcTagDriver {
 			}
 		} catch {
 			loggerGlobal.error("======== Error from NFC Command: \(error) ========")
+			await endSession(withFailure: CommonError.NfcSessionLostTagConnection)
 			throw CommonError.NfcSessionLostTagConnection
 		}
 		fatalError()
@@ -81,13 +91,34 @@ extension NFCSessionClient: SargonUniFFI.NfcTagDriver {
 }
 
 extension NFCSessionClient {
+	@discardableResult
 	private func refreshSessionIfNeed() async throws {
-		if self.sessionStartTime.distance(to: .now) >= 40 {
+		func delegateRefreshToSargonIfNeeded() throws {
+			guard signingRequestWasTriggered else {
+				return
+			}
+			self.setSigningRequestWasTriggered(false)
+			switch purpose {
+			case .arculus(.signTransaction), .arculus(.signPreAuth), .arculus(.proveOwnership):
+				// If the session is refreshed during the process of signing multiple payloads
+				// it is needed to delegate back to Sargon so that in can handle it accordingly.
+				// More specifically it is needed to re-verify the pin before sending the signing request.
+				// This fix is non-robust quick fix due to time limits. There should be a better mechanism
+				// allowing Sargon to tell if a given request needs to have special handling when a session is refreshed.
+				throw CommonError.NfcSessionRenewed
+			default:
+				break
+			}
+		}
+
+		if self.sessionStartTime.distance(to: .now) >= 30 {
 			loggerGlobal.info("========= Restarting NFC session \(Date.now) ========== ")
 			try await self.restartSession()
+			try delegateRefreshToSargonIfNeeded()
 		} else if self.sessionRenewTime.distance(to: .now) >= 10 {
 			loggerGlobal.info("========= Renewing NFC session ========== ")
 			try await self.renewSession()
+			try delegateRefreshToSargonIfNeeded()
 		}
 	}
 
@@ -98,13 +129,13 @@ extension NFCSessionClient {
 			""
 		}
 
-		let nfcInstruction = "Tap and hold this Arculus Card to your phone. This may take up to a minute."
+		let nfcInstruction = "Tap and hold your Arculus Card to your phone. Don't remove your card until the operation is complete 100% or an error is shown."
 
 		switch purpose {
 		case let .arculus(arcPurpose):
 			switch arcPurpose {
 			case .identifyingCard:
-				session!.alertMessage = """
+				session?.alertMessage = """
 
 				Identifying Card
 
@@ -114,8 +145,8 @@ extension NFCSessionClient {
 
 				"""
 			case .configuringCardMnemonic:
-				session!.alertMessage = """
-				Configuring the your arculus Card
+				session?.alertMessage = """
+				Configuring your arculus Card
 
 				\(progress)
 
@@ -123,7 +154,7 @@ extension NFCSessionClient {
 
 				"""
 			case .signTransaction:
-				session!.alertMessage = """
+				session?.alertMessage = """
 				Signing Transaction
 
 				\(progress)
@@ -132,8 +163,8 @@ extension NFCSessionClient {
 
 				"""
 			case .signPreAuth:
-				session!.alertMessage = """
-				Signing Pre Authorization
+				session?.alertMessage = """
+				Signing Pre-Authorization
 
 				\(progress)
 
@@ -141,7 +172,7 @@ extension NFCSessionClient {
 
 				"""
 			case .proveOwnership:
-				session!.alertMessage = """
+				session?.alertMessage = """
 				Proving Onwership
 
 				\(progress)
@@ -150,7 +181,7 @@ extension NFCSessionClient {
 
 				"""
 			case .derivingPublicKeys:
-				session!.alertMessage = """
+				session?.alertMessage = """
 				Deriving Public Keys
 
 				\(progress)
@@ -159,7 +190,7 @@ extension NFCSessionClient {
 
 				"""
 			case .verifyingPin:
-				session!.alertMessage = """
+				session?.alertMessage = """
 				Verifying Card PIN
 
 				\(progress)
@@ -168,7 +199,7 @@ extension NFCSessionClient {
 
 				"""
 			case .configuringCardPin:
-				session!.alertMessage = """
+				session?.alertMessage = """
 				Configuring new Card PIN
 
 				\(progress)
@@ -177,7 +208,7 @@ extension NFCSessionClient {
 
 				"""
 			case .restoringCardPin:
-				session!.alertMessage = """
+				session?.alertMessage = """
 				Restoring Card Pin
 
 				\(progress)
@@ -208,7 +239,7 @@ extension NFCSessionClient {
 	}
 
 	private func renewSession() async throws {
-		self.session!.restartPolling()
+		self.session?.restartPolling()
 		let tag = try await connectTag()
 		await self.setIsoTag(tag: tag)
 		await self.setSesssionRenewTime(date: .now)
@@ -216,7 +247,7 @@ extension NFCSessionClient {
 
 	private func restartSession() async throws {
 		self.invalidateSession(true)
-		try await ContinuousClock().sleep(for: .seconds(5))
+		try await ContinuousClock().sleep(for: .seconds(4))
 		try await self.beginSession()
 	}
 
@@ -242,9 +273,10 @@ extension NFCSessionClient {
 			}
 
 			do {
-				try await self.session!.connect(to: cardTag)
+				try await self.session?.connect(to: cardTag)
 				AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
 			} catch {
+				self.invalidateSession(error: "Failed to connect Card, please retry")
 				throw CommonError.NfcSessionLostTagConnection
 			}
 			return isoTag
@@ -254,9 +286,9 @@ extension NFCSessionClient {
 
 	private func invalidateSession(_ isComplete: Bool = false, error: String? = nil) {
 		if let err = error {
-			session!.invalidate(errorMessage: err)
+			session?.invalidate(errorMessage: err)
 		} else {
-			session!.invalidate()
+			session?.invalidate()
 		}
 		session = nil
 		delegate = nil
@@ -322,7 +354,7 @@ extension NFCTagReaderSessionAsyncDelegate: NFCTagReaderSessionDelegate {
 
 		if let nfcError = error as? NFCReaderError {
 			let commonError = if cancellationErrorCodes.contains(nfcError.code) {
-				CommonError.NfcSessionCancelled
+				CommonError.HostInteractionAborted
 			} else {
 				CommonError.NfcSessionLostTagConnection
 			}

@@ -871,6 +871,7 @@
 		A018C8752E0030C100461852 /* BlogPostsClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A018C8732E0030C100461852 /* BlogPostsClient+Live.swift */; };
 		A018C8762E0030C100461852 /* BlogPostsClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A018C8722E0030C100461852 /* BlogPostsClient+Interface.swift */; };
 		A018C8772E0030C100461852 /* BlogPostsClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A018C8742E0030C100461852 /* BlogPostsClient+Test.swift */; };
+		A0277E7D2E59FEEB006B9045 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A0277E7C2E59FEEB006B9045 /* Sargon */; };
 		A03194212E411A640015C231 /* ArculusForgotPIN-EnterNewPIN.swift in Sources */ = {isa = PBXBuildFile; fileRef = A031941F2E411A640015C231 /* ArculusForgotPIN-EnterNewPIN.swift */; };
 		A03194222E411A640015C231 /* ArculusForgotPIN-EnterNewPIN+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A03194202E411A640015C231 /* ArculusForgotPIN-EnterNewPIN+View.swift */; };
 		A0323FD02DC0DCEB00CA31CE /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = A0323FCF2DC0DCEB00CA31CE /* FirebaseCrashlytics */; };
@@ -888,6 +889,7 @@
 		A06323E52DFAC29B00963A1F /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A06323E42DFAC29B00963A1F /* Sargon */; };
 		A06323E92DFC308200963A1F /* LearnAbout+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A06323E82DFC308200963A1F /* LearnAbout+View.swift */; };
 		A06323EA2DFC308200963A1F /* LearnAbout.swift in Sources */ = {isa = PBXBuildFile; fileRef = A06323E72DFC308200963A1F /* LearnAbout.swift */; };
+		A070FA332E58482400CB9566 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A070FA322E58482400CB9566 /* Sargon */; };
 		A0777B482E253E1E00E82892 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A0777B472E253E1E00E82892 /* Sargon */; };
 		A0830CCE2E428E8700DF1F08 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A0830CCD2E428E8700DF1F08 /* Sargon */; };
 		A089D42F2E34F80600866A47 /* ArculusFactorSourceAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = A089D42D2E34F80600866A47 /* ArculusFactorSourceAccess.swift */; };
@@ -914,7 +916,6 @@
 		A09F8FDE2DF6E4C300DB5614 /* Discover+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09F8FDD2DF6E4C300DB5614 /* Discover+View.swift */; };
 		A09F8FDF2DF6E4C300DB5614 /* Discover.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09F8FDC2DF6E4C300DB5614 /* Discover.swift */; };
 		A0A53EBA2E54DAA500BE36FE /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A0A53EB92E54DAA500BE36FE /* Sargon */; };
-		A0A757082E572A890020778E /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A0A757072E572A890020778E /* Sargon */; };
 		A0C673002DA6BBEA0071606B /* ScreenshotPreventing in Frameworks */ = {isa = PBXBuildFile; productRef = A0C672FF2DA6BBEA0071606B /* ScreenshotPreventing */; };
 		A0C673022DA6BBEA0071606B /* ScreenshotPreventingSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = A0C673012DA6BBEA0071606B /* ScreenshotPreventingSwiftUI */; };
 		A0C673052DA6BD7F0071606B /* ScreenshotPreventing in Frameworks */ = {isa = PBXBuildFile; productRef = A0C673042DA6BD7F0071606B /* ScreenshotPreventing */; };
@@ -2824,11 +2825,12 @@
 				48FFFAAB2ADC1FE900B2B213 /* DependenciesAdditions in Frameworks */,
 				48FFFAA22ADC1F5D00B2B213 /* Algorithms in Frameworks */,
 				48FFFAC12ADC20C400B2B213 /* JSONPreview in Frameworks */,
+				A0277E7D2E59FEEB006B9045 /* Sargon in Frameworks */,
 				A08BBA6B2DAE973700534B67 /* Sargon in Frameworks */,
 				48FFFADB2ADC21E400B2B213 /* SwiftLogConsoleColors in Frameworks */,
 				48FFFADE2ADC21F500B2B213 /* FileLogging in Frameworks */,
 				48FFFACF2ADC216400B2B213 /* CollectionConcurrencyKit in Frameworks */,
-				A0A757082E572A890020778E /* Sargon in Frameworks */,
+				A070FA332E58482400CB9566 /* Sargon in Frameworks */,
 				A0F636BC2E3BA6890003B4C0 /* Sargon in Frameworks */,
 				48FFFAB12ADC203700B2B213 /* WebRTC in Frameworks */,
 				A0A53EBA2E54DAA500BE36FE /* Sargon in Frameworks */,
@@ -7891,7 +7893,8 @@
 				A0F636BB2E3BA6890003B4C0 /* Sargon */,
 				A0830CCD2E428E8700DF1F08 /* Sargon */,
 				A0A53EB92E54DAA500BE36FE /* Sargon */,
-				A0A757072E572A890020778E /* Sargon */,
+				A070FA322E58482400CB9566 /* Sargon */,
+				A0277E7C2E59FEEB006B9045 /* Sargon */,
 			);
 			productName = RadixWallet;
 			productReference = 48CFBC4F2ADC106300E77A5C /* Radix Wallet Dev.app */;
@@ -7956,7 +7959,7 @@
 				A0C673032DA6BD7F0071606B /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */,
 				A0323FCE2DC0DCEB00CA31CE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				A08D04882E2AA914000F62D5 /* XCRemoteSwiftPackageReference "arculus-ios-csdk" */,
-				A0A757062E572A890020778E /* XCRemoteSwiftPackageReference "sargon" */,
+				A0277E7B2E59FEEB006B9045 /* XCRemoteSwiftPackageReference "sargon" */,
 			);
 			productRefGroup = 48CFBC502ADC106300E77A5C /* Products */;
 			projectDirPath = "";
@@ -10153,6 +10156,14 @@
 				version = 1.3.2;
 			};
 		};
+		A0277E7B2E59FEEB006B9045 /* XCRemoteSwiftPackageReference "sargon" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/radixdlt/sargon";
+			requirement = {
+				kind = exactVersion;
+				version = 1.2.32;
+			};
+		};
 		A0323FCE2DC0DCEB00CA31CE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -10167,14 +10178,6 @@
 			requirement = {
 				branch = main;
 				kind = branch;
-			};
-		};
-		A0A757062E572A890020778E /* XCRemoteSwiftPackageReference "sargon" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/radixdlt/sargon";
-			requirement = {
-				kind = exactVersion;
-				version = 1.2.31;
 			};
 		};
 		A0C673032DA6BD7F0071606B /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */ = {
@@ -10347,6 +10350,11 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = Sargon;
 		};
+		A0277E7C2E59FEEB006B9045 /* Sargon */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A0277E7B2E59FEEB006B9045 /* XCRemoteSwiftPackageReference "sargon" */;
+			productName = Sargon;
+		};
 		A0323FCF2DC0DCEB00CA31CE /* FirebaseCrashlytics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A0323FCE2DC0DCEB00CA31CE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
@@ -10357,6 +10365,10 @@
 			productName = Sargon;
 		};
 		A06323E42DFAC29B00963A1F /* Sargon */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Sargon;
+		};
+		A070FA322E58482400CB9566 /* Sargon */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Sargon;
 		};
@@ -10379,11 +10391,6 @@
 		};
 		A0A53EB92E54DAA500BE36FE /* Sargon */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = Sargon;
-		};
-		A0A757072E572A890020778E /* Sargon */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A0A757062E572A890020778E /* XCRemoteSwiftPackageReference "sargon" */;
 			productName = Sargon;
 		};
 		A0C672FF2DA6BBEA0071606B /* ScreenshotPreventing */ = {

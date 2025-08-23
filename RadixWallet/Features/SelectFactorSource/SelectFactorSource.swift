@@ -227,10 +227,13 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 				selectability: status == .lostFactorSource ? .unselectable : .selectable
 			)
 		}.sorted { lhs, rhs in
-			if lhs.integrity.factorSource.kind == rhs.integrity.factorSource.kind {
-				lhs.integrity.factorSource.lastUsedOn > rhs.integrity.factorSource.lastUsedOn
+			let lhsFS: FactorSource = lhs.integrity.factorSource
+			let rhsFS: FactorSource = rhs.integrity.factorSource
+
+			if lhsFS.kind == rhsFS.kind {
+				return lhsFS.lastUsedOn > rhsFS.lastUsedOn
 			} else {
-				false
+				return lhsFS.kind.selectOrder < rhsFS.kind.selectOrder
 			}
 		}
 	}
@@ -250,6 +253,18 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 			await send(.internal(.hasAConnectorExtension(hasAConnectorExtension)))
 		} catch: { error, _ in
 			loggerGlobal.error("failed to get links updates, error: \(error)")
+		}
+	}
+}
+
+private extension FactorSourceKind {
+	var selectOrder: Int {
+		switch self {
+		case .device: 1
+		case .ledgerHqHardwareWallet: 2
+		case .arculusCard: 3
+		case .offDeviceMnemonic: 4
+		case .password: 5
 		}
 	}
 }

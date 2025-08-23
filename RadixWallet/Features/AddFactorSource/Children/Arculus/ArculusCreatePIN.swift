@@ -10,16 +10,16 @@ struct ArculusCreatePIN: Sendable, FeatureReducer {
 
 	typealias Action = FeatureAction<Self>
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Hashable {
 		case pinAdded(String)
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Hashable {
 		case pinInput(ArculusPINInput.Action)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Hashable {
 		case pinAdded(String)
 	}
 

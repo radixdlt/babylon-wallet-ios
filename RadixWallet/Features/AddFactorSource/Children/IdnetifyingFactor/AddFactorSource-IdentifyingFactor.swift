@@ -23,7 +23,6 @@ extension AddFactorSource {
 		enum DelegateAction: Sendable, Equatable {
 			case completedWithLedger(LedgerDeviceInfo)
 			case completedWithFactorSourceAlreadyExsits(FactorSource)
-			case completedWithArculusCardValidation(ArculusMinFirmwareVersionRequirement)
 		}
 
 		@Dependency(\.errorQueue) var errorQueue
@@ -74,13 +73,6 @@ extension AddFactorSource {
 			switch kind {
 			case .ledgerHqHardwareWallet:
 				getLedgerHardwareDeviceInfo()
-
-			case .arculusCard:
-				.run { send in
-					let versionRequirement = try await arculusCardClient.validateMinFirmwareVersion()
-					await send(.delegate(.completedWithArculusCardValidation(versionRequirement)))
-					await dismiss()
-				}
 
 			default:
 				.none

@@ -55,6 +55,7 @@ private extension View {
 			.hardwareFactorIdentificationSheeet(with: destinationStore)
 			.factorSourceAlreadyExsits(with: destinationStore)
 			.arculusInvalidFirmwareVersion(with: destinationStore)
+			.arculusInstructions(with: destinationStore)
 	}
 
 	private func addNewP2PLinkSheet(with destinationStore: PresentationStoreOf<AddFactorSource.Intro.Destination>) -> some View {
@@ -75,6 +76,10 @@ private extension View {
 
 	private func arculusInvalidFirmwareVersion(with destinationStore: PresentationStoreOf<AddFactorSource.Intro.Destination>) -> some View {
 		alert(store: destinationStore.scope(state: \.arculusInvalidFirmwareVersion, action: \.arculusInvalidFirmwareVersion))
+	}
+
+	private func arculusInstructions(with destinationStore: PresentationStoreOf<AddFactorSource.Intro.Destination>) -> some View {
+		alert(store: destinationStore.scope(state: \.arculusInstructions, action: \.arculusInstructions))
 	}
 }
 

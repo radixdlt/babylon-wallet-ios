@@ -12,11 +12,11 @@ extension ArculusForgotPIN {
 		typealias Action = FeatureAction<Self>
 
 		@CasePathable
-		enum ChildAction: Sendable, Equatable {
+		enum ChildAction: Sendable, Hashable {
 			case createPIN(ArculusCreatePIN.Action)
 		}
 
-		enum DelegateAction: Sendable, Equatable {
+		enum DelegateAction: Sendable, Hashable {
 			case finished
 		}
 
@@ -36,9 +36,7 @@ extension ArculusForgotPIN {
 				.run { [mnemonic = state.mnemonic, factorSource = state.factorSource] send in
 					try await arculusCardClient.restoreCardPin(factorSource, mnemonic, pin)
 					await send(.delegate(.finished))
-				} catch: { error, _ in
-					errorQueue.schedule(error)
-				}
+				} catch: { _, _ in }
 			default:
 				.none
 			}

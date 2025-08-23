@@ -48,9 +48,7 @@ extension ArculusChangePIN {
 					try await arculusCardClient.setPin(fs, oldPIN, pin)
 					await overlayWindowClient.scheduleHUD(.succeeded)
 					await send(.delegate(.finished))
-				} catch: { error, _ in
-					errorQueue.schedule(error)
-				}
+				} catch: { _, _ in }
 			}
 		}
 	}
