@@ -32,9 +32,6 @@ jobs:
 
     steps:
       - uses: RDXWorks-actions/checkout@main
-        with:
-          submodules: recursive
-          token: ${{ env.WALLET_RADIX_BOT_PAT }}
 
       - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
         with:
@@ -80,6 +77,7 @@ jobs:
 
       - uses: RDXWorks-actions/checkout@main
         with:
+          submodules: recursive
           token: ${{ env.WALLET_RADIX_BOT_PAT }}
 
       - name: Decode Firebase Crashlytics json
