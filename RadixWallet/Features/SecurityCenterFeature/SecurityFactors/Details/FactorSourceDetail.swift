@@ -28,6 +28,7 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 		case viewSeedPhraseTapped
 		case enterSeedPhraseTapped
 		case changePinTapped
+		case forgotPinTapped
 		// case spotCheckTapped
 	}
 
@@ -41,6 +42,8 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 			case rename(RenameLabel.State)
 			case displayMnemonic(DisplayMnemonic.State)
 			case importMnemonic(ImportMnemonicForFactorSource.State)
+			case arculusUpdatePIN(ArculusChangePIN.EnterOldPIN.State)
+			case arculusForgotPIN(ArculusForgotPIN.InputSeedPhrase.State)
 		}
 
 		@CasePathable
@@ -48,6 +51,8 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 			case rename(RenameLabel.Action)
 			case displayMnemonic(DisplayMnemonic.Action)
 			case importMnemonic(ImportMnemonicForFactorSource.Action)
+			case arculusUpdatePIN(ArculusChangePIN.EnterOldPIN.Action)
+			case arculusForgotPIN(ArculusForgotPIN.InputSeedPhrase.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -59,6 +64,12 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 			}
 			Scope(state: \.importMnemonic, action: \.importMnemonic) {
 				ImportMnemonicForFactorSource()
+			}
+			Scope(state: \.arculusUpdatePIN, action: \.arculusUpdatePIN) {
+				ArculusChangePIN.EnterOldPIN()
+			}
+			Scope(state: \.arculusForgotPIN, action: \.arculusForgotPIN) {
+				ArculusForgotPIN.InputSeedPhrase()
 			}
 		}
 	}
@@ -93,6 +104,17 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 			return .none
 
 		case .changePinTapped:
+			guard let arculusFS = state.integrity.factorSource.asArculus else {
+				return .none
+			}
+			state.destination = .arculusUpdatePIN(.init(factorSource: arculusFS))
+			return .none
+
+		case .forgotPinTapped:
+			guard let arculusFS = state.integrity.factorSource.asArculus else {
+				return .none
+			}
+			state.destination = .arculusForgotPIN(.init(factorSource: arculusFS))
 			return .none
 		}
 	}
@@ -104,18 +126,6 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 			return .none
 		}
 	}
-
-//	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
-//		switch internalAction {
-//		case .spotCheckResult(true):
-//			state.lastUsed = .init()
-//			state.destination = .spotCheckAlert(.spotCheckSuccess)
-//			return .none
-//		case .spotCheckResult(false):
-//			state.destination = .spotCheckAlert(.spotCheckFailure)
-//			return .none
-//		}
-//	}
 
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
@@ -138,6 +148,14 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 			}
 
 		case .importMnemonic(.delegate(.closed)):
+			state.destination = nil
+			return .none
+
+		case .arculusUpdatePIN(.delegate(.finished)):
+			state.destination = nil
+			return .none
+
+		case .arculusForgotPIN(.delegate(.finished)):
 			state.destination = nil
 			return .none
 

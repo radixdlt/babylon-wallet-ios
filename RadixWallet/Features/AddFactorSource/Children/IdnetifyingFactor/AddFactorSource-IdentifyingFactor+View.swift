@@ -26,10 +26,10 @@ extension AddFactorSource.IdentifyingFactor {
 
 					Spacer()
 				}
+				.padding(.medium3)
 				.task { @MainActor in
 					await store.send(.view(.task)).finish()
 				}
-				.destination(store: store)
 				.withNavigationBar {
 					store.send(.view(.closeButtonTapped))
 				}
@@ -38,18 +38,6 @@ extension AddFactorSource.IdentifyingFactor {
 				.presentationBackground(.blur)
 			}
 		}
-	}
-}
-
-@MainActor
-private extension View {
-	func destination(store: StoreOf<AddFactorSource.IdentifyingFactor>) -> some View {
-		let destinationStore = store.scope(state: \.$destination, action: \.destination)
-		return factorSourceAlreadyExsits(with: destinationStore)
-	}
-
-	private func factorSourceAlreadyExsits(with destinationStore: PresentationStoreOf<AddFactorSource.IdentifyingFactor.Destination>) -> some View {
-		alert(store: destinationStore.scope(state: \.factorSourceAlreadyExists, action: \.factorSourceAlreadyExists))
 	}
 }
 

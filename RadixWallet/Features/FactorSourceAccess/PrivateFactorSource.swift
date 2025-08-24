@@ -8,7 +8,7 @@ import Foundation
 enum PrivateFactorSource: Sendable, Hashable {
 	case device(DeviceFactorSource)
 	case ledger(LedgerHardwareWalletFactorSource)
-	case arculusCard(ArculusCardFactorSource)
+	case arculusCard(ArculusCardFactorSource, _ pin: String)
 	case offDeviceMnemonic(OffDeviceMnemonicFactorSource, MnemonicWithPassphrase)
 	case password(PasswordFactorSource, MnemonicWithPassphrase)
 }
@@ -20,7 +20,7 @@ extension PrivateFactorSource {
 			device.asGeneral
 		case let .ledger(ledger):
 			ledger.asGeneral
-		case let .arculusCard(arculusCard):
+		case let .arculusCard(arculusCard, _):
 			arculusCard.asGeneral
 		case let .offDeviceMnemonic(offDeviceMnemonic, _):
 			offDeviceMnemonic.asGeneral

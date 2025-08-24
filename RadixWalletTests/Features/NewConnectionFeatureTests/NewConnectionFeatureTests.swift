@@ -47,6 +47,7 @@ final class NewConnectionTests: TestCase {
 			publicKey: .sample,
 			displayName: connectionName
 		)
+		let clock = TestClock()
 		let store = TestStore(
 			// GIVEN initial state
 			initialState: NewConnection.State(
@@ -56,6 +57,8 @@ final class NewConnectionTests: TestCase {
 			reducer: NewConnection.init
 		) {
 			$0.radixConnectClient.connectP2PLink = { _ in }
+			$0.radixConnectClient.updateOrAddP2PLink = { _ in }
+			$0.continuousClock = clock
 		}
 
 		await store.send(.child(.root(.connectionApproval(.view(.continueButtonTapped)))))
@@ -79,6 +82,9 @@ final class NewConnectionTests: TestCase {
 			))
 			$0.connectionName = connectionName
 		}
+
+		await clock.advance(by: .seconds(1))
+
 		await store.receive(.internal(.establishConnectionResult(.success(p2pLink)))) {
 			$0.root = .nameConnection(.init(
 				isConnecting: false,
@@ -97,6 +103,7 @@ final class NewConnectionTests: TestCase {
 			publicKey: .sample,
 			displayName: connectionName
 		)
+		let clock = TestClock()
 		let store = TestStore(
 			// GIVEN initial state
 			initialState: NewConnection.State(
@@ -106,6 +113,8 @@ final class NewConnectionTests: TestCase {
 			reducer: NewConnection.init
 		) {
 			$0.radixConnectClient.connectP2PLink = { _ in }
+			$0.radixConnectClient.updateOrAddP2PLink = { _ in }
+			$0.continuousClock = clock
 		}
 
 		await store.send(.child(.root(.connectionApproval(.view(.continueButtonTapped)))))
@@ -118,6 +127,9 @@ final class NewConnectionTests: TestCase {
 			))
 			$0.connectionName = connectionName
 		}
+
+		await clock.advance(by: .seconds(1))
+
 		await store.receive(.internal(.establishConnectionResult(.success(p2pLink)))) {
 			$0.root = .connectionApproval(.init(
 				purpose: purpose,

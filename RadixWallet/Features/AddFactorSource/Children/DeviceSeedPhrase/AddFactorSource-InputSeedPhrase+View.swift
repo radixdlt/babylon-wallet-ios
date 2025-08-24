@@ -1,9 +1,9 @@
 import SwiftUI
 
-// MARK: - AddFactorSource.DeviceSeedPhrase.View
-extension AddFactorSource.DeviceSeedPhrase {
+// MARK: - AddFactorSource.InputSeedPhrase.View
+extension AddFactorSource.InputSeedPhrase {
 	struct View: SwiftUI.View {
-		let store: StoreOf<AddFactorSource.DeviceSeedPhrase>
+		@Perception.Bindable var store: StoreOf<AddFactorSource.InputSeedPhrase>
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
@@ -35,6 +35,13 @@ extension AddFactorSource.DeviceSeedPhrase {
 				headerView
 
 				ImportMnemonicGrid.View(store: store.grid)
+				if store.advancedModeEnabled {
+					passphrase
+				}
+
+				if store.hasPassphrase {
+					modeToggleButton
+				}
 
 				if !store.isEnteringCustomSeedPhrase {
 					Button(L10n.NewBiometricFactor.SeedPhrase.enterCustomButton) {
@@ -76,27 +83,46 @@ extension AddFactorSource.DeviceSeedPhrase {
 				L10n.NewBiometricFactor.SeedPhrase.subtitle
 			}
 		}
+
+		private var passphrase: some SwiftUI.View {
+			AppTextField(
+				primaryHeading: .init(text: L10n.ImportMnemonic.passphrase, isProminent: true),
+				placeholder: L10n.ImportMnemonic.passphrasePlaceholder,
+				text: $store.bip39Passphrase.sending(\.view.passphraseChanged),
+				hint: .info(L10n.ImportMnemonic.passphraseHint)
+			)
+			.autocorrectionDisabled()
+		}
+
+		private var modeToggleButton: some SwiftUI.View {
+			Button(store.advancedModeEnabled ? L10n.ImportMnemonic.regularModeButton : L10n.ImportMnemonic.advancedModeButton) {
+				store.send(.view(.toggleModeButtonTapped))
+			}
+			.buttonStyle(.blueText)
+			.frame(height: .large1)
+			.padding(.bottom, .small2)
+		}
 	}
 }
 
-private extension StoreOf<AddFactorSource.DeviceSeedPhrase> {
+private extension StoreOf<AddFactorSource.InputSeedPhrase> {
 	var grid: StoreOf<ImportMnemonicGrid> {
 		scope(state: \.grid, action: \.child.grid)
 	}
 
-	var destination: PresentationStoreOf<AddFactorSource.DeviceSeedPhrase.Destination> {
+	var destination: PresentationStoreOf<AddFactorSource.InputSeedPhrase.Destination> {
 		scope(state: \.$destination, action: \.destination)
 	}
 }
 
 @MainActor
 private extension View {
-	func destination(store: StoreOf<AddFactorSource.DeviceSeedPhrase>) -> some View {
+	func destination(store: StoreOf<AddFactorSource.InputSeedPhrase>) -> some View {
 		let destinationStore = store.destination
 		return factorAlreadyInUseAlert(with: destinationStore)
 	}
 
-	private func factorAlreadyInUseAlert(with destinationStore: PresentationStoreOf<AddFactorSource.DeviceSeedPhrase.Destination>) -> some View {
+	private func factorAlreadyInUseAlert(with destinationStore: PresentationStoreOf<AddFactorSource.InputSeedPhrase.Destination>) -> some View {
 		alert(store: destinationStore.scope(state: \.factorAlreadyInUseAlert, action: \.factorAlreadyInUseAlert))
 	}
 }

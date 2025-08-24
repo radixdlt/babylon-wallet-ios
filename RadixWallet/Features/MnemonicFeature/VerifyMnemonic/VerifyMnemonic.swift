@@ -101,6 +101,6 @@ struct VerifyMnemonic: Sendable, FeatureReducer {
 	}
 }
 
-private extension OverlayWindowClient.Item.HUD {
+extension OverlayWindowClient.Item.HUD {
 	static let succeeded = Self(text: L10n.ImportMnemonic.verificationSuccess)
 }

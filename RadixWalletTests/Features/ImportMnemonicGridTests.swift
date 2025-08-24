@@ -30,8 +30,7 @@ final class ImportMnemonicGridTests: TestCase {
 		let testClock = TestClock()
 		let store = TestStore(
 			initialState: ImportMnemonicGrid.State(
-				count: .twelve,
-				isWordCountFixed: false
+				count: .twelve
 			)
 		) {
 			ImportMnemonicGrid()
@@ -94,8 +93,7 @@ extension ImportMnemonicGridTests {
 		let testClock = TestClock()
 		let store = TestStore(
 			initialState: ImportMnemonicGrid.State(
-				count: mnemonic.wordCount,
-				isWordCountFixed: false
+				count: mnemonic.wordCount
 			)
 		) {
 			ImportMnemonicGrid()

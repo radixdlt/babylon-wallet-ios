@@ -46,7 +46,7 @@ struct PersonaList: Sendable, FeatureReducer {
 	enum DelegateAction: Sendable, Equatable {
 		case createNewPersona
 		case openDetails(Persona)
-		case openSecurityCenter
+		case presentSecurityProblemHandler(SecurityProblemHandlerDestination)
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -108,8 +108,13 @@ struct PersonaList: Sendable, FeatureReducer {
 				} catch: { error, _ in
 					errorQueue.schedule(error)
 				}
-			case .openSecurityCenter:
-				.send(.delegate(.openSecurityCenter))
+			case let .handleSecurityProblem(problem):
+				.run { send in
+					let persona = try await personasClient.getPersona(id: id)
+					try await send(.delegate(.presentSecurityProblemHandler(handleSecurityProblem(problem, forEntity: .personaEntity(persona)))))
+				} catch: { error, _ in
+					errorQueue.schedule(error)
+				}
 			}
 
 		case .persona:

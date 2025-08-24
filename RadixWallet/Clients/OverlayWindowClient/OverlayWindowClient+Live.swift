@@ -15,9 +15,24 @@ extension OverlayWindowClient: DependencyKey {
 		errorQueue.errors().map { error in
 			if let sargonError = error as? SargonError {
 				#if DEBUG
-				let message = error.localizedDescription
+				let message = switch sargonError {
+				case .NfcSessionLostTagConnection:
+					"Lost NFC Connection, please retry"
+				case .WrongArculusCard:
+					"Wrong Arculus Card was used, either it is a different card or the card has a different seed phrase configured"
+				default:
+					error.localizedDescription
+				}
 				#else
-				let message = L10n.Error.emailSupportMessage(sargonError.errorCode)
+
+				let message = switch sargonError {
+				case .NfcSessionLostTagConnection:
+					"Lost NFC Connection, please retry"
+				case .WrongArculusCard:
+					"Wrong Arculus Card was used, either it is a different card or the card has a different seed phrase configured"
+				default:
+					L10n.Error.emailSupportMessage(sargonError.errorCode)
+				}
 				#endif
 				return Item.Status.alert(.init(
 					title: { TextState(L10n.Common.errorAlertTitle) },

@@ -24,8 +24,8 @@ extension PersonaFeature {
 						VStack(spacing: .zero) {
 							PlainListRow(personaName: viewStore.displayName, personaThumbnail: viewStore.thumbnail, tappable: tappable)
 							if showShield {
-								EntitySecurityProblemsView(config: viewStore.securityProblemsConfig) {
-									viewStore.send(.securityProblemsTapped)
+								EntitySecurityProblemsView(config: viewStore.securityProblemsConfig) { problem in
+									viewStore.send(.securityProblemTapped(problem))
 								}
 								.padding(.horizontal, .medium1)
 								.padding(.bottom, .small1)

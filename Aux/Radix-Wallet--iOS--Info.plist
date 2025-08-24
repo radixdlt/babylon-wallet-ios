@@ -78,5 +78,15 @@
 	</array>
 	<key>RDX_ICLOUD_BACKUPS_CONTAINER</key>
 	<string>$(RDX_ICLOUD_BACKUPS_CONTAINER)</string>
+	<key>NFCReaderUsageDescription</key>
+	<string>NFC is used to authenticate with your hardware wallet and approve transactions securely.</string>
+	<key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
+	<array>
+		<string>4A4E45545F4C5F010157</string>
+		<string>415243554C5553010157</string>
+		<string>4A4E45545F4C5F010141000000010001</string>
+		<string>4A4E45545F4C5F0101413C0000012C01</string>
+		<string>4A4E45545F4C5F010141900000012C01</string>
+	</array>
 </dict>
 </plist>

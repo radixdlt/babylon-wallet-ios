@@ -2,9 +2,11 @@
 extension AddFactorSource {
 	@Reducer
 	struct IdentifyingFactor: Sendable, FeatureReducer {
+		@Dependency(\.arculusCardClient) var arculusCardClient
 		@ObservableState
 		struct State: Sendable, Hashable {
 			let kind: FactorSourceKind
+			var initialTaskExecuted = false
 
 			@Presents
 			var destination: Destination.State? = nil
@@ -18,29 +20,9 @@ extension AddFactorSource {
 			case retryButtonTapped
 		}
 
-		enum InternalAction: Sendable, Equatable {
-			case receivedLedgerDeviceInfo(LedgerDeviceInfo)
-			case factorSourceAlreadyExsits(FactorSource)
-		}
-
 		enum DelegateAction: Sendable, Equatable {
 			case completedWithLedger(LedgerDeviceInfo)
-		}
-
-		struct Destination: DestinationReducer {
-			@CasePathable
-			enum State: Sendable, Hashable {
-				case factorSourceAlreadyExists(AlertState<Never>)
-			}
-
-			@CasePathable
-			enum Action: Sendable, Equatable {
-				case factorSourceAlreadyExists(Never)
-			}
-
-			var body: some ReducerOf<Self> {
-				EmptyReducer()
-			}
+			case completedWithFactorSourceAlreadyExsits(FactorSource)
 		}
 
 		@Dependency(\.errorQueue) var errorQueue
@@ -50,38 +32,22 @@ extension AddFactorSource {
 
 		var body: some ReducerOf<Self> {
 			Reduce(core)
-				.ifLet(destinationPath, action: \.destination) {
-					Destination()
-				}
 		}
-
-		private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 		func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
-			case .task, .retryButtonTapped:
-				switch state.kind {
-				case .ledgerHqHardwareWallet:
-					getLedgerHardwareDeviceInfo()
-				case .arculusCard:
-					.none
-				default:
-					.none
+			case .task:
+				guard !state.initialTaskExecuted else {
+					return .none
 				}
+				state.initialTaskExecuted = true
+				return identifyFactor(kind: state.kind)
+			case .retryButtonTapped:
+				return identifyFactor(kind: state.kind)
 			case .closeButtonTapped:
-				.run { _ in
+				return .run { _ in
 					await dismiss()
 				}
-			}
-		}
-
-		func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
-			switch internalAction {
-			case let .receivedLedgerDeviceInfo(ledgerDeviceInfo):
-				return .send(.delegate(.completedWithLedger(ledgerDeviceInfo)))
-			case let .factorSourceAlreadyExsits(fs):
-				state.destination = .factorSourceAlreadyExists(.factorSourceAlreadyExists(fs))
-				return .none
 			}
 		}
 
@@ -94,12 +60,22 @@ extension AddFactorSource {
 				)
 
 				if let existingLedger {
-					await send(.internal(.factorSourceAlreadyExsits(existingLedger.asGeneral)))
+					await send(.delegate(.completedWithFactorSourceAlreadyExsits(existingLedger.asGeneral)))
 				} else {
-					await send(.internal(.receivedLedgerDeviceInfo(info)))
+					await send(.delegate(.completedWithLedger(info)))
 				}
 			} catch: { error, _ in
 				errorQueue.schedule(error)
+			}
+		}
+
+		func identifyFactor(kind: FactorSourceKind) -> Effect<Action> {
+			switch kind {
+			case .ledgerHqHardwareWallet:
+				getLedgerHardwareDeviceInfo()
+
+			default:
+				.none
 			}
 		}
 	}
@@ -111,6 +87,15 @@ extension AlertState<Never> {
 			TextState(L10n.AddLedgerDevice.AlreadyAddedAlert.title)
 		} message: {
 			TextState(L10n.AddLedgerDevice.AlreadyAddedAlert.message(fs.name))
+		}
+	}
+
+	static func arculusInvalidFirmwareVersion(_ version: String) -> AlertState {
+		AlertState {
+			TextState("Unsupported Arculus Card")
+		}
+		message: {
+			TextState("Radix Wallet requires you to use card with min firmware version: \(version)")
 		}
 	}
 }

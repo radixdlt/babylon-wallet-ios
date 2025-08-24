@@ -101,8 +101,8 @@ extension AccountDetails {
 				.padding(.horizontal, .small3)
 
 				VStack(spacing: .small2) {
-					EntitySecurityProblemsView(config: viewStore.securityProblemsConfig) {
-						viewStore.send(.securityProblemsTapped)
+					EntitySecurityProblemsView(config: viewStore.securityProblemsConfig) { problem in
+						viewStore.send(.securityProblemTapped(problem))
 					}
 
 					ForEachStatic(viewStore.accountLockerClaims) { details in
@@ -162,6 +162,8 @@ private extension View {
 			.stakeClaimDetails(with: destinationStore)
 			.poolUnitDetails(with: destinationStore)
 			.securityCenter(with: destinationStore)
+			.displayMnemonic(with: destinationStore)
+			.enterMnemonic(with: destinationStore)
 	}
 
 	private func preferences(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
@@ -215,6 +217,20 @@ private extension View {
 	private func securityCenter(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.securityCenter, action: \.securityCenter)) {
 			SecurityCenter.View(store: $0)
+		}
+	}
+
+	private func displayMnemonic(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.displayMnemonic, action: \.displayMnemonic)) {
+			DisplayMnemonic.View(store: $0)
+		}
+	}
+
+	private func enterMnemonic(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.enterMnemonic, action: \.enterMnemonic)) { store in
+			NavigationStack {
+				ImportMnemonicForFactorSource.View(store: store)
+			}
 		}
 	}
 }

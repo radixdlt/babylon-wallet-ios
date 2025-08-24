@@ -29,7 +29,7 @@ extension Home {
 
 		enum ViewAction: Sendable, Equatable {
 			case tapped
-			case securityProblemsTapped
+			case securityProblemTapped(SecurityProblem)
 			case accountLockerClaimTapped(AccountLockerClaimDetails)
 		}
 
@@ -40,20 +40,22 @@ extension Home {
 
 		enum DelegateAction: Sendable, Equatable {
 			case openDetails
-			case openSecurityCenter
+			case presentSecurityProblemHandler(SecurityProblemHandlerDestination)
 		}
 
 		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.userDefaults) var userDefaults
 		@Dependency(\.accountLockersClient) var accountLockersClient
+		@Dependency(\.factorSourcesClient) var factorSourcesClient
+		@Dependency(\.errorQueue) var errorQueue
 
 		func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
 			case .tapped:
 				.send(.delegate(.openDetails))
-			case .securityProblemsTapped:
-				.send(.delegate(.openSecurityCenter))
+			case let .securityProblemTapped(problem):
+				handleSpecificSecurityProblem(problem, account: state.account)
 			case let .accountLockerClaimTapped(details):
 				.run { _ in
 					try await accountLockersClient.claimContent(details)
@@ -76,6 +78,12 @@ extension Home {
 			case let .fiatWorthUpdated(fiatWorth):
 				state.totalFiatWorth.refresh(from: fiatWorth)
 				return .none
+			}
+		}
+
+		private func handleSpecificSecurityProblem(_ problem: SecurityProblem, account: Account) -> Effect<Action> {
+			.run { send in
+				try await send(.delegate(.presentSecurityProblemHandler(handleSecurityProblem(problem, forEntity: .accountEntity(account)))))
 			}
 		}
 	}

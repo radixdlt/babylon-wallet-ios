@@ -6,9 +6,12 @@ struct ImportMnemonicForFactorSource: Sendable, FeatureReducer {
 		let deviceFactorSource: DeviceFactorSource
 		let profileToCheck: ProfileToCheck
 		let isAllowedToSkip: Bool
+		let hasPassphrase: Bool
 
 		var entitiesLinkedToFactorSource: Loadable<EntitiesLinkedToFactorSource> = .idle
 		var grid: ImportMnemonicGrid.State
+		var bip39Passphrase: String = ""
+		var advancedModeEnabled: Bool = false
 		fileprivate var lastSpotCheckFailed = false
 
 		var confirmButtonControlState: ControlState {
@@ -30,9 +33,9 @@ struct ImportMnemonicForFactorSource: Sendable, FeatureReducer {
 		) {
 			self.isAllowedToSkip = isAllowedToSkip
 			self.deviceFactorSource = deviceFactorSource
+			self.hasPassphrase = deviceFactorSource.supportsOlympia && !deviceFactorSource.supportsBabylon
 			self.grid = .init(
-				count: deviceFactorSource.hint.mnemonicWordCount,
-				isWordCountFixed: true
+				count: deviceFactorSource.hint.mnemonicWordCount
 			)
 			self.profileToCheck = profileToCheck
 		}
@@ -40,8 +43,11 @@ struct ImportMnemonicForFactorSource: Sendable, FeatureReducer {
 
 	typealias Action = FeatureAction<Self>
 
+	@CasePathable
 	enum ViewAction: Sendable, Equatable {
 		case task
+		case passphraseChanged(String)
+		case toggleModeButtonTapped
 		case skipButtonTapped
 		case confirmButtonTapped
 		case closeButtonTapped
@@ -86,11 +92,15 @@ struct ImportMnemonicForFactorSource: Sendable, FeatureReducer {
 				await send(.internal(.entitieLinkedLoadResult(result)))
 			}
 
+		case .toggleModeButtonTapped:
+			state.advancedModeEnabled.toggle()
+			return .none
+
 		case .skipButtonTapped:
 			return .send(.delegate(.skipped(state.deviceFactorSource)))
 
 		case .confirmButtonTapped:
-			guard let mnemonicWithPassphrase = state.mnemonicWithPassphrase,
+			guard let mnemonicWithPassphrase = state.grid.mnemonicWithPassphrase,
 			      let accounts = state.entitiesLinkedToFactorSource.wrappedValue?.allAccounts
 			else {
 				return .none
@@ -121,6 +131,10 @@ struct ImportMnemonicForFactorSource: Sendable, FeatureReducer {
 
 		case .closeButtonTapped:
 			return .send(.delegate(.closed))
+
+		case let .passphraseChanged(passphrase):
+			state.bip39Passphrase = passphrase
+			return .none
 		}
 	}
 
@@ -159,9 +173,9 @@ extension ImportMnemonicForFactorSource.State {
 	}
 
 	var status: Status {
-		if !isComplete {
+		if !grid.isComplete {
 			.incomplete
-		} else if let mnemonicWithPassphrase {
+		} else if let mnemonicWithPassphrase = grid.mnemonicWithPassphrase {
 			.readyForSpotCheck(mnemonicWithPassphrase)
 		} else {
 			.invalid
@@ -176,23 +190,6 @@ extension ImportMnemonicForFactorSource.State {
 		} else {
 			nil
 		}
-	}
-}
-
-private extension ImportMnemonicForFactorSource.State {
-	var mnemonicWithPassphrase: MnemonicWithPassphrase? {
-		guard let mnemonic = try? Mnemonic(words: completedWords) else {
-			return nil
-		}
-		return .init(mnemonic: mnemonic)
-	}
-
-	var isComplete: Bool {
-		completedWords.count == grid.words.count
-	}
-
-	var completedWords: [BIP39Word] {
-		grid.words.compactMap(\.completeWord)
 	}
 }
 

@@ -51,10 +51,8 @@ extension FactorSourceAccess.State {
 				return S.Arculus.signMessage
 			case .spotCheck, .proveOwnership, .encryptMessage:
 				return S.Arculus.message
-			case .updateFactorConfig, .deriveAccounts:
-				return S.Arculus.deriveKeysMessage
-			case .createAccountAuthorization, .createPersonaAuthorization:
-				fatalError("Not supported")
+			case .updateFactorConfig, .deriveAccounts, .createAccountAuthorization, .createPersonaAuthorization:
+				return S.Arculus.message
 			}
 
 		case .password:
@@ -84,10 +82,12 @@ extension FactorSourceAccess.State {
 			return false
 		}
 		switch factorSource.kind {
-		case .device, .ledgerHqHardwareWallet, .arculusCard:
+		case .device, .ledgerHqHardwareWallet:
 			return true
 		case .password, .offDeviceMnemonic:
 			return false
+		case .arculusCard:
+			return !self.purpose.requiresSignature
 		}
 	}
 

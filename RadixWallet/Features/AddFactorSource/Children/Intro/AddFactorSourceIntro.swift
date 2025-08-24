@@ -20,10 +20,11 @@ extension AddFactorSource {
 
 		enum DelegateAction: Sendable, Equatable {
 			case completed
-			case completedWithLedgerTempFS(LedgerHardwareWalletFactorSource)
+			case completedWithLedgerDeviceInfo(LedgerDeviceInfo)
 		}
 
 		enum InternalAction: Sendable, Equatable {
+			case handleArculusCardIdentification(ArculusMinFirmwareVersionRequirement)
 			case hasAConnectorExtension(Bool)
 		}
 
@@ -32,12 +33,22 @@ extension AddFactorSource {
 			enum State: Sendable, Hashable {
 				case addNewP2PLink(NewConnection.State)
 				case hardwareFactorIdentification(AddFactorSource.IdentifyingFactor.State)
+				case factorSourceAlreadyExists(AlertState<Never>)
+				case arculusInvalidFirmwareVersion(AlertState<Never>)
+				case arculusInstructions(AlertState<Action.ArculusInstructions>)
 			}
 
 			@CasePathable
 			enum Action: Sendable, Equatable {
 				case addNewP2PLink(NewConnection.Action)
 				case hardwareFactorIdentification(AddFactorSource.IdentifyingFactor.Action)
+				case factorSourceAlreadyExists(Never)
+				case arculusInvalidFirmwareVersion(Never)
+				case arculusInstructions(ArculusInstructions)
+
+				enum ArculusInstructions {
+					case confirm
+				}
 			}
 
 			var body: some ReducerOf<Self> {
@@ -55,6 +66,7 @@ extension AddFactorSource {
 		@Dependency(\.errorQueue) var errorQueue
 		@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
+		@Dependency(\.arculusCardClient) var arculusCardClient
 
 		var body: some ReducerOf<Self> {
 			Reduce(core)
@@ -73,15 +85,24 @@ extension AddFactorSource {
 				}
 				return .none
 			case .continueTapped:
-				if state.kind == .ledgerHqHardwareWallet {
+				switch state.kind {
+				case .ledgerHqHardwareWallet:
 					guard state.hasAConnectorExtension else {
 						state.destination = .addNewP2PLink(.init(root: .ledgerConnectionIntro))
 						return .none
 					}
 					state.destination = .hardwareFactorIdentification(.init(kind: state.kind))
 					return .none
+				case .arculusCard:
+					return .run { send in
+						let versionRequirement = try await arculusCardClient.validateMinFirmwareVersion()
+						await send(.internal(.handleArculusCardIdentification(versionRequirement)))
+					} catch: { _, _ in }
+				case .device:
+					return .send(.delegate(.completed))
+				default:
+					fatalError("Unhandled fs kind \(state.kind)")
 				}
-				return .send(.delegate(.completed))
 			}
 		}
 
@@ -89,6 +110,12 @@ extension AddFactorSource {
 			switch internalAction {
 			case let .hasAConnectorExtension(hasCE):
 				state.hasAConnectorExtension = hasCE
+				return .none
+			case let .handleArculusCardIdentification(.invalid(version)):
+				state.destination = .arculusInvalidFirmwareVersion(.arculusInvalidFirmwareVersion(version))
+				return .none
+			case .handleArculusCardIdentification(.valid):
+				state.destination = .arculusInstructions(.arculusInstructions())
 				return .none
 			}
 		}
@@ -104,8 +131,14 @@ extension AddFactorSource {
 
 			case let .hardwareFactorIdentification(.delegate(.completedWithLedger(ledgerDeviceInfo))):
 				state.destination = nil
-				let fs = LedgerHardwareWalletFactorSource.from(device: ledgerDeviceInfo, name: "")
-				return .send(.delegate(.completedWithLedgerTempFS(fs)))
+				return .send(.delegate(.completedWithLedgerDeviceInfo(ledgerDeviceInfo)))
+
+			case let .hardwareFactorIdentification(.delegate(.completedWithFactorSourceAlreadyExsits(fs))):
+				state.destination = .factorSourceAlreadyExists(.factorSourceAlreadyExists(fs))
+				return .none
+
+			case let .arculusInstructions(.confirm):
+				return .send(.delegate(.completed))
 
 			default:
 				return .none
@@ -142,6 +175,22 @@ extension AlertState<NoP2PLinkAlert> {
 			}
 		} message: {
 			TextState(L10n.LedgerHardwareDevices.LinkConnectorAlert.message)
+		}
+	}
+}
+
+extension AlertState<AddFactorSource.Intro.Destination.Action.ArculusInstructions> {
+	static func arculusInstructions() -> Self {
+		AlertState {
+			TextState("Adding an Arculus Card")
+		}
+		actions: {
+			ButtonState(role: .none, action: .confirm) {
+				TextState(L10n.Common.ok)
+			}
+		}
+		message: {
+			TextState("If your card already has a seed phrase set up, you can enter it in the next step or choose to replace it with a new one.")
 		}
 	}
 }

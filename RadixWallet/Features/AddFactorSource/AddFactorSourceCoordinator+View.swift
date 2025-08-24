@@ -49,7 +49,11 @@ extension AddFactorSource.Coordinator {
 				}
 			case .deviceSeedPhrase:
 				if let store = store.scope(state: \.deviceSeedPhrase, action: \.deviceSeedPhrase) {
-					AddFactorSource.DeviceSeedPhrase.View(store: store)
+					AddFactorSource.InputSeedPhrase.View(store: store)
+				}
+			case .arculusCreatePIN:
+				if let store = store.scope(state: \.arculusCreatePIN, action: \.arculusCreatePIN) {
+					ArculusCreatePIN.View(store: store)
 				}
 			case .confirmSeedPhrase:
 				if let store = store.scope(state: \.confirmSeedPhrase, action: \.confirmSeedPhrase) {

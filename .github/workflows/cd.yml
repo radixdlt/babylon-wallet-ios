@@ -74,8 +74,10 @@ jobs:
           ssh-private-key: |
             ${{ env.SWIFT_SSH }}
             ${{ env.FASTLANE_MATCH_REPO_SSH_KEY }}
+
       - uses: RDXWorks-actions/checkout@main
         with:
+          submodules: recursive
           token: ${{ env.WALLET_RADIX_BOT_PAT }}
 
       - name: Decode Firebase Crashlytics json
