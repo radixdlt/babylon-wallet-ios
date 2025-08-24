@@ -50,7 +50,19 @@ extension NFCSessionClient: SargonUniFFI.NfcTagDriver {
 	}
 
 	public func endSession(withFailure: CommonError?) async {
-		self.invalidateSession(error: withFailure?.errorMessage)
+		let errorMessage = switch withFailure {
+		case let .ArculusCardWrongPin(numberOfRemainingTries):
+			if numberOfRemainingTries == 0 {
+				L10n.ArculusScan.CardBlockedError.message
+			} else {
+				L10n.ArculusDetails.VerifyPin.errorMessage(Int(numberOfRemainingTries))
+			}
+		case .NfcSessionLostTagConnection:
+			L10n.ArculusScan.LostTagError.message
+		default: withFailure?.errorMessage
+		}
+
+		self.invalidateSession(error: errorMessage)
 		await self.setIsoTag(tag: nil)
 	}
 
