@@ -404,6 +404,70 @@ internal enum L10n {
       internal static let text = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_text", fallback: "Choose if you want to allow third parties to directly deposit assets into your Account. Deposits that you approve yourself in your Radix Wallet are always accepted.")
     }
   }
+  internal enum AddArculus {
+    internal enum CreatePin {
+      /// Create
+      internal static let button = L10n.tr("Localizable", "addArculus_createPin_button", fallback: "Create")
+      /// Confirm PIN
+      internal static let confirmPinInputLabel = L10n.tr("Localizable", "addArculus_createPin_confirmPinInputLabel", fallback: "Confirm PIN")
+      /// Choose a 6-digit PIN for your Arculus Card. You’ll keep this PIN if you use this card with another wallet.
+      internal static let description = L10n.tr("Localizable", "addArculus_createPin_description", fallback: "Choose a 6-digit PIN for your Arculus Card. You’ll keep this PIN if you use this card with another wallet.")
+      /// Enter PIN
+      internal static let pinInputLabel = L10n.tr("Localizable", "addArculus_createPin_pinInputLabel", fallback: "Enter PIN")
+      /// Create New PIN
+      internal static let title = L10n.tr("Localizable", "addArculus_createPin_title", fallback: "Create New PIN")
+    }
+    internal enum FirmwareVersionError {
+      /// Minimum Firmware Required (%@)
+      internal static func message(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "addArculus_firmwareVersionError_message", String(describing: p1), fallback: "Minimum Firmware Required (%@)")
+      }
+    }
+  }
+  internal enum AddFactorSource {
+    /// Add a new Security Factor
+    internal static let addNewSecurityFactor = L10n.tr("Localizable", "addFactorSource_addNewSecurityFactor", fallback: "Add a new Security Factor")
+    /// Choose the security factor you will use to create the new Account.
+    internal static let chooseSecurityFactorToCreateAccount = L10n.tr("Localizable", "addFactorSource_chooseSecurityFactorToCreateAccount", fallback: "Choose the security factor you will use to create the new Account.")
+    /// Choose the security factor you will use to create the new Persona.
+    internal static let chooseSecurityFactorToCreatePersona = L10n.tr("Localizable", "addFactorSource_chooseSecurityFactorToCreatePersona", fallback: "Choose the security factor you will use to create the new Persona.")
+    /// Choose the security factor you will use to Recover Accounts
+    internal static let chooseSecurityFactorToRecover = L10n.tr("Localizable", "addFactorSource_chooseSecurityFactorToRecover", fallback: "Choose the security factor you will use to Recover Accounts")
+    /// Select Security Factor
+    internal static let selectSecurityFactor = L10n.tr("Localizable", "addFactorSource_selectSecurityFactor", fallback: "Select Security Factor")
+    internal enum Arculus {
+      /// Arculus Cards are hardware signing devices you tap to your phone to sign a transaction.
+      internal static let description = L10n.tr("Localizable", "addFactorSource_arculus_description", fallback: "Arculus Cards are hardware signing devices you tap to your phone to sign a transaction.")
+      /// Tap and hold the **Arculus Card** you want to use to your phone.
+      internal static let identifyingInstructions = L10n.tr("Localizable", "addFactorSource_arculus_identifyingInstructions", fallback: "Tap and hold the **Arculus Card** you want to use to your phone.")
+      /// Name your New Arculus Card
+      internal static let nameTitle = L10n.tr("Localizable", "addFactorSource_arculus_nameTitle", fallback: "Name your New Arculus Card")
+      /// Add a New Arculus Card
+      internal static let title = L10n.tr("Localizable", "addFactorSource_arculus_title", fallback: "Add a New Arculus Card")
+    }
+    internal enum Identifying {
+      /// Identifying Factor
+      internal static let title = L10n.tr("Localizable", "addFactorSource_identifying_title", fallback: "Identifying Factor")
+    }
+    internal enum Ledger {
+      /// Ledger Nanos are hardware signing devices you can connect to your Radix Wallet with a USB cable and computer.
+      internal static let description = L10n.tr("Localizable", "addFactorSource_ledger_description", fallback: "Ledger Nanos are hardware signing devices you can connect to your Radix Wallet with a USB cable and computer.")
+      /// Choose the **Ledger Nano** to use. Make sure it's connected to a computer with a linked Radix Connector browser extension.
+      internal static let identifyingInstructions = L10n.tr("Localizable", "addFactorSource_ledger_identifyingInstructions", fallback: "Choose the **Ledger Nano** to use. Make sure it's connected to a computer with a linked Radix Connector browser extension.")
+      /// Name your New Ledger Nano
+      internal static let nameTitle = L10n.tr("Localizable", "addFactorSource_ledger_nameTitle", fallback: "Name your New Ledger Nano")
+      /// Add a New Ledger Nano
+      internal static let title = L10n.tr("Localizable", "addFactorSource_ledger_title", fallback: "Add a New Ledger Nano")
+    }
+    internal enum SelectKind {
+      /// Add Security Factor
+      internal static let button = L10n.tr("Localizable", "addFactorSource_selectKind_button", fallback: "Add Security Factor")
+      /// Choose the Security Factor kind you want to add.
+      internal static let description = L10n.tr("Localizable", "addFactorSource_selectKind_description", fallback: "Choose the Security Factor kind you want to add.")
+      /// Add Security Factor
+      internal static let title = L10n.tr("Localizable", "addFactorSource_selectKind_title", fallback: "Add Security Factor")
+    }
+  }
   internal enum AddLedgerDevice {
     internal enum AddDevice {
       /// Let’s set up a Ledger hardware wallet device. You will be able to use it to create new Ledger-secured Accounts, or import Ledger-secured Accounts from the Radix Olympia Desktop Wallet.
@@ -576,6 +640,109 @@ internal enum L10n {
     internal enum LinkedConnectors {
       /// Linked Connectors
       internal static let title = L10n.tr("Localizable", "appSettings_linkedConnectors_title", fallback: "Linked Connectors")
+    }
+  }
+  internal enum ArculusDetails {
+    internal enum ChangePin {
+      /// Confirm PIN
+      internal static let confirmPinInputLabel = L10n.tr("Localizable", "arculusDetails_changePin_confirmPinInputLabel", fallback: "Confirm PIN")
+      /// Enter your new Arculus PIN
+      internal static let description = L10n.tr("Localizable", "arculusDetails_changePin_description", fallback: "Enter your new Arculus PIN")
+      /// Enter new PIN
+      internal static let newPinInputLabel = L10n.tr("Localizable", "arculusDetails_changePin_newPinInputLabel", fallback: "Enter new PIN")
+      /// Change PIN
+      internal static let title = L10n.tr("Localizable", "arculusDetails_changePin_title", fallback: "Change PIN")
+    }
+    internal enum ForgotPin {
+      /// Enter your Arculus seed phrase
+      internal static let description = L10n.tr("Localizable", "arculusDetails_forgotPin_description", fallback: "Enter your Arculus seed phrase")
+      /// Enter Seed Phrase
+      internal static let title = L10n.tr("Localizable", "arculusDetails_forgotPin_title", fallback: "Enter Seed Phrase")
+    }
+    internal enum VerifyPin {
+      /// Enter your current Arculus PIN
+      internal static let description = L10n.tr("Localizable", "arculusDetails_verifyPin_description", fallback: "Enter your current Arculus PIN")
+      /// Wrong PIN. Number of remaining tries: %d
+      internal static func errorMessage(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "arculusDetails_verifyPin_errorMessage", p1, fallback: "Wrong PIN. Number of remaining tries: %d")
+      }
+      /// Enter PIN
+      internal static let inputLabel = L10n.tr("Localizable", "arculusDetails_verifyPin_inputLabel", fallback: "Enter PIN")
+      /// Change PIN
+      internal static let title = L10n.tr("Localizable", "arculusDetails_verifyPin_title", fallback: "Change PIN")
+    }
+  }
+  internal enum ArculusScan {
+    /// Ready to Scan
+    internal static let heading = L10n.tr("Localizable", "arculusScan_heading", fallback: "Ready to Scan")
+    internal enum CardBlockedError {
+      /// Your card is blocked, to set a new PIN got through Forgot PIN recovery flow for your arculus.
+      internal static let message = L10n.tr("Localizable", "arculusScan_cardBlockedError_message", fallback: "Your card is blocked, to set a new PIN got through Forgot PIN recovery flow for your arculus.")
+    }
+    internal enum Instruction {
+      /// Hold your card flat against the back of the phone. Don’t move.
+      /// This may take up to a minute.
+      internal static let label = L10n.tr("Localizable", "arculusScan_instruction_label", fallback: "Hold your card flat against the back of the phone. Don’t move.\nThis may take up to a minute.")
+    }
+    internal enum LostTagError {
+      /// NFC Session lost the connection with the tag.
+      /// Please retry.
+      internal static let message = L10n.tr("Localizable", "arculusScan_lostTagError_message", fallback: "NFC Session lost the connection with the tag.\nPlease retry.")
+    }
+    internal enum NfcDisabled {
+      /// Please enable NFC in system settings to continue.
+      internal static let message = L10n.tr("Localizable", "arculusScan_nfcDisabled_message", fallback: "Please enable NFC in system settings to continue.")
+      /// Open Settings
+      internal static let positiveButton = L10n.tr("Localizable", "arculusScan_nfcDisabled_positiveButton", fallback: "Open Settings")
+      /// NFC is turned off
+      internal static let title = L10n.tr("Localizable", "arculusScan_nfcDisabled_title", fallback: "NFC is turned off")
+    }
+    internal enum Progress {
+      /// Progress: **%@**
+      internal static func label(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "arculusScan_progress_label", String(describing: p1), fallback: "Progress: **%@**")
+      }
+    }
+    internal enum PurposeConfiguringMnemonic {
+      /// Configuring your Arculus Card
+      internal static let label = L10n.tr("Localizable", "arculusScan_purposeConfiguringMnemonic_label", fallback: "Configuring your Arculus Card")
+    }
+    internal enum PurposeConfiguringPin {
+      /// Configuring new Card PIN
+      internal static let label = L10n.tr("Localizable", "arculusScan_purposeConfiguringPin_label", fallback: "Configuring new Card PIN")
+    }
+    internal enum PurposeDerivingKeys {
+      /// Updating Factor Config
+      internal static let label = L10n.tr("Localizable", "arculusScan_purposeDerivingKeys_label", fallback: "Updating Factor Config")
+    }
+    internal enum PurposeIdentifying {
+      /// Identifying Card
+      internal static let label = L10n.tr("Localizable", "arculusScan_purposeIdentifying_label", fallback: "Identifying Card")
+    }
+    internal enum PurposeProvingOwnership {
+      /// Signing Transaction
+      internal static let label = L10n.tr("Localizable", "arculusScan_purposeProvingOwnership_label", fallback: "Signing Transaction")
+    }
+    internal enum PurposeRestoringPin {
+      /// Restoring Card PIN
+      internal static let label = L10n.tr("Localizable", "arculusScan_purposeRestoringPin_label", fallback: "Restoring Card PIN")
+    }
+    internal enum PurposeSigningPreAuth {
+      /// Signing Transaction
+      internal static let label = L10n.tr("Localizable", "arculusScan_purposeSigningPreAuth_label", fallback: "Signing Transaction")
+    }
+    internal enum PurposeSigningTx {
+      /// Signing Transaction
+      internal static let label = L10n.tr("Localizable", "arculusScan_purposeSigningTx_label", fallback: "Signing Transaction")
+    }
+    internal enum PurposeVerifyingPin {
+      /// Verifying Card PIN
+      internal static let label = L10n.tr("Localizable", "arculusScan_purposeVerifyingPin_label", fallback: "Verifying Card PIN")
+    }
+    internal enum UnknownTagError {
+      /// NFC Session detected an unknown tag.
+      /// Please retry.
+      internal static let message = L10n.tr("Localizable", "arculusScan_unknownTagError_message", fallback: "NFC Session detected an unknown tag.\nPlease retry.")
     }
   }
   internal enum AssetDetails {
@@ -1021,6 +1188,8 @@ internal enum L10n {
     internal static let persona = L10n.tr("Localizable", "common_persona", fallback: "Persona")
     /// Pool
     internal static let pool = L10n.tr("Localizable", "common_pool", fallback: "Pool")
+    /// Processing Profile
+    internal static let processingProfile = L10n.tr("Localizable", "common_processingProfile", fallback: "Processing Profile")
     /// Public
     internal static let `public` = L10n.tr("Localizable", "common_public", fallback: "Public")
     /// Gateway access blocked due to exceeding rate limit. Please wait a few minutes to retry.
@@ -1033,12 +1202,16 @@ internal enum L10n {
     internal static let save = L10n.tr("Localizable", "common_save", fallback: "Save")
     /// Search...
     internal static let searchHint = L10n.tr("Localizable", "common_searchHint", fallback: "Search...")
+    /// Secured with
+    internal static let securedWith = L10n.tr("Localizable", "common_securedWith", fallback: "Secured with")
     /// Show Less
     internal static let showLess = L10n.tr("Localizable", "common_showLess", fallback: "Show Less")
     /// Show More
     internal static let showMore = L10n.tr("Localizable", "common_showMore", fallback: "Show More")
     /// Something Went Wrong
     internal static let somethingWentWrong = L10n.tr("Localizable", "common_somethingWentWrong", fallback: "Something Went Wrong")
+    /// Success
+    internal static let success = L10n.tr("Localizable", "common_success", fallback: "Success")
     /// Settings
     internal static let systemSettings = L10n.tr("Localizable", "common_systemSettings", fallback: "Settings")
     /// Unauthorized
@@ -1797,6 +1970,8 @@ internal enum L10n {
     }
   }
   internal enum EnterSeedPhrase {
+    /// Enter your BIP39 seed phrase
+    internal static let bip39Instruction = L10n.tr("Localizable", "enterSeedPhrase_bip39Instruction", fallback: "Enter your BIP39 seed phrase")
     /// Enter Babylon Seed Phrase
     internal static let titleBabylon = L10n.tr("Localizable", "enterSeedPhrase_titleBabylon", fallback: "Enter Babylon Seed Phrase")
     /// Enter Main Seed Phrase
@@ -1820,6 +1995,8 @@ internal enum L10n {
     internal static func emailSupportMessage(_ p1: Any) -> String {
       return L10n.tr("Localizable", "error_emailSupportMessage", String(describing: p1), fallback: "Please email support to automatically provide debugging info, and get assistance.\nCode: %@")
     }
+    /// Unknown Arculus Card
+    internal static let unknownArculusCard = L10n.tr("Localizable", "error_unknownArculusCard", fallback: "Unknown Arculus Card")
     internal enum AccountLabel {
       /// Account label required
       internal static let missing = L10n.tr("Localizable", "error_accountLabel_missing", fallback: "Account label required")
@@ -1907,6 +2084,10 @@ internal enum L10n {
       internal static let message = L10n.tr("Localizable", "factorSourceActions_arculus_message", fallback: "Tap and hold this **Arculus Card** to your phone.")
       /// Tap and hold this **Arculus Card** to your phone to sign.
       internal static let signMessage = L10n.tr("Localizable", "factorSourceActions_arculus_signMessage", fallback: "Tap and hold this **Arculus Card** to your phone to sign.")
+    }
+    internal enum ArculusEnterPin {
+      /// Enter card PIN
+      internal static let heading = L10n.tr("Localizable", "factorSourceActions_arculusEnterPin_heading", fallback: "Enter card PIN")
     }
     internal enum CreateKey {
       /// Creating Key
@@ -2045,6 +2226,8 @@ internal enum L10n {
       internal static let changePin = L10n.tr("Localizable", "factorSources_detail_changePin", fallback: "Change PIN")
       /// Enter seed phrase to recover use of this factor
       internal static let enterSeedPhrase = L10n.tr("Localizable", "factorSources_detail_enterSeedPhrase", fallback: "Enter seed phrase to recover use of this factor")
+      /// Forgot PIN
+      internal static let forgotPin = L10n.tr("Localizable", "factorSources_detail_forgotPin", fallback: "Forgot PIN")
       /// **Last used:** %@
       internal static func lastUsed(_ p1: Any) -> String {
         return L10n.tr("Localizable", "factorSources_detail_lastUsed", String(describing: p1), fallback: "**Last used:** %@")
@@ -2749,8 +2932,8 @@ internal enum L10n {
       /// 
       /// Arculus Cards are secure third-party "hardware wallet" cryptographic signing devices in a convenient credit card form factor. To use it, you only need to tap it to the NFC reader on your phone.
       /// 
-      /// Using a hardware signing device like an Arculus Card provides strong security because it requires physical access to the card to use it. If you use it in a [Security Shields](?glossaryAnchor=securityshields), you can combine it with other factors you have so that even if the card is lost or stolen, your funds are safe and you can reconfigure the Shield to remove the lost Arculus Card, and carry on as before. No seed phrase backup needed.
-      internal static let arculus = L10n.tr("Localizable", "infoLink_glossary_arculus", fallback: "## Arculus Card\n\nArculus Cards are secure third-party \"hardware wallet\" cryptographic signing devices in a convenient credit card form factor. To use it, you only need to tap it to the NFC reader on your phone.\n\nUsing a hardware signing device like an Arculus Card provides strong security because it requires physical access to the card to use it. If you use it in a [Security Shields](?glossaryAnchor=securityshields), you can combine it with other factors you have so that even if the card is lost or stolen, your funds are safe and you can reconfigure the Shield to remove the lost Arculus Card, and carry on as before. No seed phrase backup needed.")
+      /// Using a hardware signing device like an Arculus Card provides strong security because it requires physical access to the card to use it.
+      internal static let arculus = L10n.tr("Localizable", "infoLink_glossary_arculus", fallback: "## Arculus Card\n\nArculus Cards are secure third-party \"hardware wallet\" cryptographic signing devices in a convenient credit card form factor. To use it, you only need to tap it to the NFC reader on your phone.\n\nUsing a hardware signing device like an Arculus Card provides strong security because it requires physical access to the card to use it.")
       /// ## Badges
       /// 
       /// Radix Badges are tokens or NFTs that are used to prove their holder is authorized to claim something, access something or perform a certain action within the Radix Network. Any token on Radix can be used as a badge, but dApps may often create special tokens specifically for use as a badge.
@@ -3560,6 +3743,10 @@ internal enum L10n {
         return L10n.tr("Localizable", "newBiometricFactor_seedPhrase_wordLabel", p1, fallback: "Word %d")
       }
     }
+    internal enum SeedPhraseCustom {
+      /// Enter your BIP39 seed phrase. Make sure it's backed up securely and accessible only to you.
+      internal static let subtitle = L10n.tr("Localizable", "newBiometricFactor_seedPhraseCustom_subtitle", fallback: "Enter your BIP39 seed phrase. Make sure it's backed up securely and accessible only to you.")
+    }
   }
   internal enum NewFactor {
     internal enum Error {
@@ -3942,6 +4129,10 @@ internal enum L10n {
     }
   }
   internal enum RecoverWalletWithoutProfile {
+    /// Recover Babylon Accounts
+    internal static let recoverBabylonAccounts = L10n.tr("Localizable", "recoverWalletWithoutProfile_recoverBabylonAccounts", fallback: "Recover Babylon Accounts")
+    /// Recover Olympia Accounts
+    internal static let recoverOlympiaAccounts = L10n.tr("Localizable", "recoverWalletWithoutProfile_recoverOlympiaAccounts", fallback: "Recover Olympia Accounts")
     internal enum Complete {
       /// Continue
       internal static let continueButton = L10n.tr("Localizable", "recoverWalletWithoutProfile_complete_continueButton", fallback: "Continue")
