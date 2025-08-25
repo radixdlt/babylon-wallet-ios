@@ -1778,6 +1778,7 @@ Code: %@";
 "addArculus_createPin_confirmPinInputLabel" = "Confirm PIN";
 "addArculus_createPin_button" = "Create";
 "addArculus_firmwareVersionError_message" = "Minimum Firmware Required (%@)";
+"addArculus_seedPhraseInstructions_message" = "If your card already has a seed phrase set up, you can enter it in the next step or choose to replace it with a new one.";
 "arculusDetails_verifyPin_title" = "Change PIN";
 "arculusDetails_verifyPin_description" = "Enter your current Arculus PIN";
 "arculusDetails_verifyPin_inputLabel" = "Enter PIN";
