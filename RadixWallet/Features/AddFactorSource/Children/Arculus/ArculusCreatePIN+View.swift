@@ -26,7 +26,7 @@ extension ArculusCreatePIN {
 
 						Spacer()
 					}
-					.padding(.medium3)
+					.padding(.medium1)
 				}
 				.footer {
 					WithControlRequirements(store.pinInput.validatedPin, forAction: { store.send(.view(.pinAdded($0))) }) { action in

@@ -83,6 +83,6 @@ struct CardCarousel: FeatureReducer, Sendable {
 
 	private enum Constants {
 		static let radquestURL = URL(string: "https://radquest.io")!
-		static let radixRewardsURL = URL(string: "https://incentives-preview.radixdlt.com")!
+		static let radixRewardsURL = URL(string: "https://incentives.radixdlt.com/")!
 	}
 }

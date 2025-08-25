@@ -33,7 +33,6 @@ extension ArculusPINInput {
 						}
 					}
 				}
-				.padding()
 				.onAppear {
 					inputFieldFocused = true
 				}
@@ -46,7 +45,7 @@ extension ArculusPINInput {
 				Text(text)
 					.foregroundStyle(.primaryText)
 					.textStyle(.body1HighImportance)
-				HStack(spacing: 12) {
+				HStack {
 					ForEach(0 ..< pinLength, id: \.self) { index in
 						Text(index < input.count ? "*" : "")
 							.frame(width: 42, height: 62)
@@ -58,6 +57,9 @@ extension ArculusPINInput {
 											.fill(.textFieldBackground)
 									)
 							)
+						if index != pinLength - 1 {
+							Spacer()
+						}
 					}
 				}
 			}
