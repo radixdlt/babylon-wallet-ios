@@ -1794,7 +1794,7 @@ Code: %@";
 "arculusScan_heading" = "Ready to Scan";
 "arculusScan_purposeConfiguringMnemonic_label" = "Configuring your Arculus Card";
 "arculusScan_purposeConfiguringPin_label" = "Configuring new Card PIN";
-"arculusScan_purposeDerivingKeys_label" = "Updating Factor Config";
+"arculusScan_purposeDerivingKeys_label" = "Deriving Public Keys";
 "arculusScan_purposeIdentifying_label" = "Identifying Card";
 "arculusScan_purposeProvingOwnership_label" = "Signing Transaction";
 "arculusScan_purposeSigningPreAuth_label" = "Signing Transaction";
