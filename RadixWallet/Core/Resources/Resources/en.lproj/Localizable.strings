@@ -1801,7 +1801,7 @@ Code: %@";
 "arculusScan_purposeSigningTx_label" = "Signing Transaction";
 "arculusScan_purposeVerifyingPin_label" = "Verifying Card PIN";
 "arculusScan_purposeRestoringPin_label" = "Restoring Card PIN";
-"arculusScan_progress_label" = "Progress: **%@%**";
+"arculusScan_progress_label" = "Progress: **%@%%**";
 "arculusScan_instruction_label" = "Hold your card flat against the back of the phone. Don’t move.
 This may take up to a minute.";
 "arculusScan_nfcDisabled_title" = "NFC is turned off";
