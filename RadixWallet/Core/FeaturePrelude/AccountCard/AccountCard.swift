@@ -41,11 +41,11 @@ extension AccountCard {
 			switch kind.axis {
 			case .horizontal:
 				horizontalCore
+				Spacer(minLength: .zero)
+				trailing
 			case .vertical:
 				verticalCore
 			}
-			Spacer(minLength: .zero)
-			trailing
 		}
 	}
 
@@ -69,9 +69,14 @@ extension AccountCard {
 
 	private var verticalCore: some View {
 		VStack(alignment: .leading, spacing: .small2) {
-			Text(account.title)
-				.foregroundColor(.white)
-				.textStyle(.body1Header)
+			HStack {
+				Text(account.title)
+					.foregroundColor(.white)
+					.textStyle(.body1Header)
+
+				Spacer(minLength: .zero)
+				trailing
+			}
 
 			addressView
 		}
