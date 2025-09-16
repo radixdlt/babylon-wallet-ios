@@ -99,6 +99,9 @@ struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadedToImport(toImport):
+			guard !toImport.isEmpty else {
+				return .send(.delegate(.finishedImportingMnemonics(imported: [])))
+			}
 			state.factorSourcesToImport = toImport
 			state.path.append(
 				.importMnemonic(.init(
