@@ -56,7 +56,7 @@ struct DerivePublicKeys: Sendable, FeatureReducer {
 		case let .handleFactorInstances(factorInstances):
 			let factorSourceId = state.input.factorSourceId.asGeneral
 			return .send(.delegate(.finished(factorInstances)))
-				.merge(with: updateFactorSourceLastUsedEffect(factorSourceId: factorSourceId))
+			// .merge(with: updateFactorSourceLastUsedEffect(factorSourceId: factorSourceId))
 		}
 	}
 }

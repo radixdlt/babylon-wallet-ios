@@ -109,6 +109,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 		case notarizeResult(TaskResult<NotarizeTransactionResponse>)
 		case determineFeePayerResult(TaskResult<FeePayerSelectionResult?>)
 		case resetToApprovable
+		case showRawManifest(String)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -204,19 +205,22 @@ struct TransactionReview: Sendable, FeatureReducer {
 		case .approvalSliderSlid:
 			state.canApproveTX = false
 			state.printFeePayerInfo()
-			do {
-				let manifest = try transactionManifestWithWalletInstructionsAdded(state)
-				guard let reviewedTransaction = state.reviewedTransaction else {
-					assertionFailure("Expected reviewedTransaction")
-					return .none
-				}
+			guard let reviewedTransaction = state.reviewedTransaction else {
+				assertionFailure("Expected reviewedTransaction")
+				return .none
+			}
 
-				let tipPercentage: UInt16 = switch reviewedTransaction.transactionFee.mode {
-				case .normal:
-					0
-				case let .advanced(customization):
-					customization.tipPercentage
-				}
+			let tipPercentage: UInt16 = switch reviewedTransaction.transactionFee.mode {
+			case .normal:
+				0
+			case let .advanced(customization):
+				customization.tipPercentage
+			}
+
+			printSigners(reviewedTransaction)
+
+			return .run { [state = state] send in
+				let manifest = try await transactionManifestWithWalletInstructionsAdded(state)
 
 				let request = BuildTransactionIntentRequest(
 					networkID: reviewedTransaction.networkID,
@@ -225,20 +229,13 @@ struct TransactionReview: Sendable, FeatureReducer {
 					makeTransactionHeaderInput: MakeTransactionHeaderInput(tipPercentage: tipPercentage),
 					transactionSigners: reviewedTransaction.transactionSigners
 				)
-
-				#if DEBUG
-				printSigners(reviewedTransaction)
-				#endif
-
-				return .run { send in
-					await send(.internal(.buildTransactionIntentResult(TaskResult {
-						try await transactionClient.buildTransactionIntent(request)
-					})))
-				}
-			} catch {
+				await send(.internal(.buildTransactionIntentResult(TaskResult {
+					try await transactionClient.buildTransactionIntent(request)
+				})))
+			} catch: { error, _ in
 				loggerGlobal.critical("Failed to add instruction to add instructions to manifest, error: \(error)")
 				errorQueue.schedule(error)
-				return resetToApprovable(&state)
+				// return resetToApprovable(&state)
 			}
 		}
 	}
@@ -312,7 +309,6 @@ struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .buildTransactionIntentResult(.success(intent)):
 			return .run { [notary = state.ephemeralNotaryPrivateKey] send in
-				// TODO: Hardcoding `.primary` role, this will change once we have MFA
 				let signedIntent = try await SargonOS.shared.signTransaction(transactionIntent: intent, roleKind: .primary)
 				let notarizedTransaction = try await transactionClient.notarizeTransaction(
 					.init(
@@ -331,6 +327,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 			}
 
 		case let .notarizeResult(.success(notarizedTX)):
+			loggerGlobal.error("\(notarizedTX.notarized.signedIntent.intentSignatures.signatures)")
 			state.destination = .submitting(.init(
 				notarizedTX: notarizedTX,
 				inProgressDismissalDisabled: state.waitsForTransactionToBeComitted,
@@ -372,6 +369,10 @@ struct TransactionReview: Sendable, FeatureReducer {
 
 		case .resetToApprovable:
 			return resetToApprovable(&state)
+
+		case let .showRawManifest(manifest):
+			state.displayMode = .raw(manifest: manifest)
+			return .none
 		}
 	}
 
@@ -451,30 +452,33 @@ extension TransactionReview {
 	}
 
 	func showRawTransaction(_ state: inout State) -> Effect<Action> {
-		do {
-			let manifest = try transactionManifestWithWalletInstructionsAdded(state)
-			state.displayMode = .raw(manifest: manifest.instructionsString)
-		} catch {
+		.run { [state] send in
+			let manifest = try await transactionManifestWithWalletInstructionsAdded(state)
+			await send(.internal(.showRawManifest(manifest.instructionsString)))
+		} catch: { error, _ in
 			errorQueue.schedule(error)
 		}
-		return .none
 	}
 
-	func transactionManifestWithWalletInstructionsAdded(_ state: State) throws -> TransactionManifest {
+	func transactionManifestWithWalletInstructionsAdded(_ state: State) async throws -> TransactionManifest {
 		guard let reviewedTransaction = state.reviewedTransaction else {
 			struct MissingReviewedTransaction: Error {}
 			throw MissingReviewedTransaction()
 		}
 
-		var manifest = reviewedTransaction.transactionManifest
 		if case let .success(feePayerAccount) = reviewedTransaction.feePayer.unwrap()?.account {
-			manifest = reviewedTransaction.transactionManifest.modify(
-				lockFee: reviewedTransaction.transactionFee.totalFee.lockFee,
-				addressOfFeePayer: feePayerAccount.address
+			return try await SargonOS.shared.modifyTransactionManifestWithFeePayer(
+				transactionManifest: reviewedTransaction.transactionManifest,
+				feePayerAddress: feePayerAccount.address,
+				fee: reviewedTransaction.transactionFee.totalFee.lockFee,
+				guarantees: state.allGuarantees
+			)
+		} else {
+			return try await SargonOS.shared.modifyTransactionManifestWithoutFeePayer(
+				transactionManifest: reviewedTransaction.transactionManifest,
+				guarantees: state.allGuarantees
 			)
 		}
-
-		return try manifest.modify(addGuarantees: state.allGuarantees)
 	}
 
 	func determineFeePayer(_ state: State, reviewedTransaction: ReviewedTransaction) -> Effect<Action> {
@@ -785,7 +789,6 @@ private extension AlertState<Never> {
 	}
 }
 
-#if DEBUG
 func printSigners(_ reviewedTransaction: ReviewedTransaction) {
 	for (factorSourceKind, signingFactorsOfKind) in reviewedTransaction.signingFactors {
 		loggerGlobal.debug("🔮 ~~~ SIGNINGFACTORS OF KIND: \(factorSourceKind) #\(signingFactorsOfKind.count) many: ~~~")
@@ -802,7 +805,6 @@ func printSigners(_ reviewedTransaction: ReviewedTransaction) {
 		}
 	}
 }
-#endif // DEBUG
 
 #if DEBUG
 extension TransactionSigners {

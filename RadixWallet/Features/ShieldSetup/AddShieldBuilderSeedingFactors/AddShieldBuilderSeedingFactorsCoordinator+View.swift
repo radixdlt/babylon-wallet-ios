@@ -17,7 +17,7 @@ extension AddShieldBuilderSeedingFactors.Coordinator {
 							store.send(.view(.introButtonTapped))
 						}
 					case let .addFactor(store):
-						AddShieldBuilderSeedingFactors.AddFactorSource.View(store: store)
+						AddShieldBuilderSeedingFactors.SelectFactorSourceToAdd.View(store: store)
 					case .completion:
 						AddShieldBuilderSeedingFactors.CompletionView {
 							store.send(.view(.completionButtonTapped))
@@ -36,10 +36,7 @@ private extension StoreOf<AddShieldBuilderSeedingFactors.Coordinator> {
 	}
 
 	var destination: PresentationStoreOf<AddShieldBuilderSeedingFactors.Coordinator.Destination> {
-		func scopeState(state: State) -> PresentationState<AddShieldBuilderSeedingFactors.Coordinator.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
+		scope(state: \.$destination, action: \.destination)
 	}
 }
 
@@ -47,13 +44,13 @@ private extension StoreOf<AddShieldBuilderSeedingFactors.Coordinator> {
 private extension View {
 	func destinations(with store: StoreOf<AddShieldBuilderSeedingFactors.Coordinator>) -> some View {
 		let destinationStore = store.destination
-		return addLedger(with: destinationStore)
+		return addFactorSource(with: destinationStore)
 			.todo(with: destinationStore)
 	}
 
-	private func addLedger(with destinationStore: PresentationStoreOf<AddShieldBuilderSeedingFactors.Coordinator.Destination>) -> some View {
-		sheet(store: destinationStore.scope(state: \.addLedger, action: \.addLedger)) {
-			AddLedgerFactorSource.View(store: $0)
+	private func addFactorSource(with destinationStore: PresentationStoreOf<AddShieldBuilderSeedingFactors.Coordinator.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.addFactorSource, action: \.addFactorSource)) {
+			AddFactorSource.Coordinator.View(store: $0)
 		}
 	}
 

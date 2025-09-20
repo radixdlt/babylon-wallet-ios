@@ -91,8 +91,8 @@ struct ShieldsList: FeatureReducer, Sendable {
 
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case let .securityShieldsSetup(.delegate(.finished(shieldID))):
-			state.destination = .applyShield(.init(shieldID: shieldID))
+		case let .securityShieldsSetup(.delegate(.finished(securityStructure))):
+			state.destination = .applyShield(.init(securityStructure: securityStructure))
 			return shieldsEffect()
 		case .changeMain(.delegate(.updated)):
 			state.destination = nil

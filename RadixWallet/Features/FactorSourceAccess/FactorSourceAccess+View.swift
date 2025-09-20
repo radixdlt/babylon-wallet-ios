@@ -41,7 +41,7 @@ extension FactorSourceAccess {
 				card
 				retry
 				input
-				// skip
+				skip
 			}
 			.multilineTextAlignment(.center)
 			.padding(.horizontal, .large2)

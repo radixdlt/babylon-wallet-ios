@@ -20,6 +20,7 @@ extension InteractionReview {
 
 			var accountDepositSetting: InteractionReview.DepositSettingState? = nil
 			var accountDepositExceptions: InteractionReview.DepositExceptionsState? = nil
+			var shieldUpdate: InteractionReview.ShieldState? = nil
 
 			// The proofs are set here (within the resolve logic) but may be rendered and handled by the parent view, in the case they are placed outside the Sections (TransactionReview).
 			var proofs: Proofs.State? = nil
@@ -188,6 +189,7 @@ extension InteractionReview {
 				state.accountDepositExceptions = sections.accountDepositExceptions
 				state.proofs = sections.proofs
 				state.accountDeletion = sections.accountDeletion
+				state.shieldUpdate = sections.shieldUpdate
 				return .none
 			}
 		}

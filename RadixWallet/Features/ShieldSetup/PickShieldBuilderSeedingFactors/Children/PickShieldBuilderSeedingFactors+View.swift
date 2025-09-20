@@ -42,6 +42,7 @@ extension PickShieldBuilderSeedingFactors {
 						.animation(.default, value: store.statusMessageInfo?.type)
 						.animation(.default, value: store.shouldShowPasswordMessage)
 				}
+				.background(.secondaryBackground)
 				.footer {
 					Button(L10n.ShieldSetupSelectFactors.buildButtonTitle) {
 						store.send(.view(.continueButtonTapped))

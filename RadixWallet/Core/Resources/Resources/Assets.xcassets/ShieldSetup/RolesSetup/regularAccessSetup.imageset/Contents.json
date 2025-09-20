@@ -3,6 +3,16 @@
     {
       "filename" : "regularAccessSetup.pdf",
       "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "regularAccessSetupDark.pdf",
+      "idiom" : "universal"
     }
   ],
   "info" : {

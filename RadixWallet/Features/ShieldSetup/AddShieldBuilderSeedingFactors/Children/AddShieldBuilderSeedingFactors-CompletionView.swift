@@ -24,7 +24,7 @@ extension AddShieldBuilderSeedingFactors {
 			}
 			.foregroundStyle(.primaryText)
 			.multilineTextAlignment(.center)
-			.padding(.horizontal, .large2)
+			.background(.primaryBackground)
 			.footer {
 				Button(L10n.ShieldSetupPrepareFactors.Completion.button, action: action)
 					.buttonStyle(.primaryRectangular)

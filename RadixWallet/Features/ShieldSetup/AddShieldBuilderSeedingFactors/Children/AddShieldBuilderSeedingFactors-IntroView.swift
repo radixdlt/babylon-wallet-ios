@@ -17,7 +17,7 @@ extension AddShieldBuilderSeedingFactors {
 					Text(L10n.ShieldSetupPrepareFactors.Intro.subtitleBottom)
 				}
 				.textStyle(.body1Regular)
-				.padding(.horizontal, .medium3)
+				.padding(.horizontal, .small2)
 
 				InfoButton(.buildingshield, label: L10n.InfoLink.Title.buildingshield)
 
@@ -30,6 +30,7 @@ extension AddShieldBuilderSeedingFactors {
 				Button(L10n.ShieldSetupPrepareFactors.Intro.button, action: action)
 					.buttonStyle(.primaryRectangular)
 			}
+			.background(.primaryBackground)
 		}
 	}
 }

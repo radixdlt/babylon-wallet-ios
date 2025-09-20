@@ -5,7 +5,7 @@ extension ApplyShield {
 	struct Coordinator: Sendable, FeatureReducer {
 		@ObservableState
 		struct State: Sendable, Hashable {
-			let shieldID: SecurityStructureId
+			let securityStructure: SecurityStructureOfFactorSources
 			var selectedAccounts: [AccountAddress] = []
 			var selectedPersonas: [IdentityAddress] = []
 
@@ -13,11 +13,11 @@ extension ApplyShield {
 			var path: StackState<Path.State> = .init()
 
 			init(
-				shieldID: SecurityStructureId,
+				securityStructure: SecurityStructureOfFactorSources,
 				root: Path.State? = nil
 			) {
-				self.shieldID = shieldID
-				self.root = root ?? .intro(.init(shieldID: shieldID))
+				self.securityStructure = securityStructure
+				self.root = root ?? .intro(.init(shieldID: securityStructure.metadata.id))
 			}
 		}
 
@@ -62,12 +62,12 @@ extension ApplyShield {
 			switch viewAction {
 			case .applyButtonTapped:
 				let addresses: [AddressOfAccountOrPersona] = state.selectedAccounts.map { .account($0) } + state.selectedPersonas.map { .identity($0) }
-				return .run { [shieldID = state.shieldID] send in
-					let interaction = try await SargonOs.shared.makeInteractionForApplyingSecurityShield(securityShieldId: shieldID, addresses: addresses)
+				return .run { [securityStructure = state.securityStructure] send in
+					let manifest = try await SargonOs.shared.makeSetupSecurityShieldManifest(securityStructure: securityStructure, address: addresses.first!)
 
 					Task {
 						let result = await dappInteractionClient.addWalletInteraction(
-							.batchOfTransactions(interaction),
+							.transaction(.init(send: .init(transactionManifest: manifest))),
 							.shieldUpdate
 						)
 

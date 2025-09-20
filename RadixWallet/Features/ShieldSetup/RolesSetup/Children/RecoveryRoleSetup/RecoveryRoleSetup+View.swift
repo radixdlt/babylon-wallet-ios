@@ -59,6 +59,7 @@ extension RecoveryRoleSetup {
 						.animation(.default, value: store.recoveryFactors)
 						.animation(.default, value: store.confirmationFactors)
 				}
+				.background(.primaryBackground)
 				.radixToolbar(title: L10n.ShieldWizardRecovery.Step.title)
 				.footer {
 					Button(L10n.Common.continue) {
@@ -243,17 +244,17 @@ extension RecoveryRoleSetup {
 				}
 				.padding(.horizontal, .medium3)
 				.padding(.vertical, .small1)
-				.foregroundStyle(.primaryText)
+				.foregroundStyle(.white)
 				.background(.error)
 
 				VStack(spacing: .medium2) {
 					Text(
 						markdown: L10n.ShieldWizardRecovery.Fallback.subtitle,
-						emphasizedColor: .primaryText,
+						emphasizedColor: .black,
 						emphasizedFont: .app.body2Header
 					)
 					.textStyle(.body2Regular)
-					.foregroundStyle(.primaryText)
+					.foregroundStyle(.black)
 					.flushedLeft
 
 					Label(store.periodUntilAutoConfirm.title, asset: AssetResource.emergencyFallbackCalendar)
@@ -262,7 +263,7 @@ extension RecoveryRoleSetup {
 						.flushedLeft
 						.padding(.horizontal, .medium3)
 						.padding(.vertical, .small1)
-						.background(.primaryBackground)
+						.background(.white)
 						.roundedCorners(radius: .small2)
 						.cardShadow
 						.onTapGesture {
