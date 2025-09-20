@@ -108,7 +108,7 @@ extension InteractionReview {
 						note: L10n.TransactionReview.UpdateShield.primaryOverrideMessage
 					)
 
-					factorsList(viewState.primaryOverrideFactors)
+					factorsList(viewState.primaryOverrideFactors, combinationLabel: L10n.TransactionReview.UpdateShield.combinationLabel)
 				}
 
 				if let factorSource = viewState.authenticationSigningFactor {
@@ -156,7 +156,7 @@ extension InteractionReview {
 					note: L10n.TransactionReview.UpdateShield.nonPrimaryOverrideMessage
 				)
 
-				factorsList(viewState.recoveryFactors)
+				factorsList(viewState.recoveryFactors, combinationLabel: L10n.TransactionReview.UpdateShield.combinationLabel)
 			}
 		}
 
@@ -167,11 +167,11 @@ extension InteractionReview {
 					note: L10n.TransactionReview.UpdateShield.nonPrimaryOverrideMessage
 				)
 
-				factorsList(viewState.confirmationFactors)
+				factorsList(viewState.confirmationFactors, combinationLabel: L10n.TransactionReview.UpdateShield.combinationLabel)
 			}
 		}
 
-		private func factorsList(_ factorSources: [FactorSource]) -> some SwiftUI.View {
+		private func factorsList(_ factorSources: [FactorSource], combinationLabel: String? = nil) -> some SwiftUI.View {
 			VStack(spacing: .small2) {
 				ForEach(factorSources, id: \.self) { factorSource in
 					FactorSourceCard(
@@ -183,8 +183,8 @@ extension InteractionReview {
 					)
 
 					let isLastFactor = factorSource == factorSources.last
-					if !isLastFactor {
-						Text(L10n.TransactionReview.UpdateShield.combinationLabel)
+					if let combinationLabel, !isLastFactor {
+						Text(combinationLabel)
 							.textStyle(.body1Link)
 							.foregroundStyle(.primaryText)
 					}

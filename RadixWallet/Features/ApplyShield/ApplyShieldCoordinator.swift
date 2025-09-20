@@ -101,23 +101,24 @@ extension ApplyShield {
 			case .root(.intro(.delegate(.started))):
 				state.path.append(.chooseAccounts(.init(
 					chooseAccounts: .init(
-						context: .permission(.atLeast(1)),
-						canCreateNewAccount: false,
-						showSelectAllAccounts: true
+						context: .permission(.exactly(1)),
+						canCreateNewAccount: false
 					)
 				)))
 				return .none
 			case .root(.intro(.delegate(.skipped))):
 				return .send(.delegate(.skipped))
 			case let .path(.element(id: _, action: .chooseAccounts(.delegate(.finished(accounts))))):
+				if accounts.isEmpty {
+					state.path.append(.choosePersonas(.init(
+						choosePersonas: .init(
+							selectionRequirement: .exactly(1)
+						),
+						canBeSkipped: false
+					)))
+				}
 				state.selectedAccounts = accounts
-				state.path.append(.choosePersonas(.init(
-					choosePersonas: .init(
-						selectionRequirement: .atLeast(1),
-						showSelectAllPersonas: true
-					),
-					canBeSkipped: !accounts.isEmpty
-				)))
+				state.path.append(.completion)
 				return .none
 			case let .path(.element(id: _, action: .choosePersonas(.delegate(.finished(personas))))):
 				state.selectedPersonas = personas
