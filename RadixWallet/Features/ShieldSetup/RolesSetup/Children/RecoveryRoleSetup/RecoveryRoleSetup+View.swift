@@ -259,7 +259,7 @@ extension RecoveryRoleSetup {
 
 					Label(store.periodUntilAutoConfirm.title, asset: AssetResource.emergencyFallbackCalendar)
 						.textStyle(.body1Header)
-						.foregroundStyle(.primaryText)
+						.foregroundStyle(.black)
 						.flushedLeft
 						.padding(.horizontal, .medium3)
 						.padding(.vertical, .small1)

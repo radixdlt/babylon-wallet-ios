@@ -13,29 +13,22 @@ extension ApplyShield.Intro {
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
-				loadable(store.hasEnoughXRD) {
-					ProgressView()
-				} successContent: { _ in
-					coreView
-						.footer {
-							VStack(spacing: .medium2) {
-								Button(L10n.ShieldWizardApplyShield.ShieldCreated.applyButton) {
-									self.store.send(.view(.startApplyingButtonTapped))
-								}
-								.buttonStyle(.primaryRectangular)
-								.controlState(store.controlState)
-
-								Button(L10n.ShieldWizardApplyShield.ShieldCreated.skipButton) {
-									store.send(.view(.skipButtonTapped))
-								}
-								.buttonStyle(.primaryText())
-								.multilineTextAlignment(.center)
+				coreView
+					.footer {
+						VStack(spacing: .medium2) {
+							Button(L10n.ShieldWizardApplyShield.ShieldCreated.applyButton) {
+								self.store.send(.view(.startApplyingButtonTapped))
 							}
+							.buttonStyle(.primaryRectangular)
+							// .controlState(store.controlState)
+
+							Button(L10n.ShieldWizardApplyShield.ShieldCreated.skipButton) {
+								store.send(.view(.skipButtonTapped))
+							}
+							.buttonStyle(.primaryText())
+							.multilineTextAlignment(.center)
 						}
-				}
-				.onFirstAppear {
-					store.send(.view(.onFirstAppear))
-				}
+					}
 			}
 		}
 
@@ -68,16 +61,16 @@ extension ApplyShield.Intro {
 					.embedInContainer
 					.padding(.top, .small1)
 
-					if store.hasEnoughXRD.wrappedValue == false {
-						StatusMessageView(
-							text: L10n.ShieldWizardApplyShield.ShieldCreated.notEnoughXrd,
-							type: .warning,
-							useNarrowSpacing: true,
-							useSmallerFontSize: true
-						)
-						.padding(.horizontal, .medium3)
-						.padding(.top, .small2)
-					}
+//					if store.hasEnoughXRD.wrappedValue == false {
+//						StatusMessageView(
+//							text: L10n.ShieldWizardApplyShield.ShieldCreated.notEnoughXrd,
+//							type: .warning,
+//							useNarrowSpacing: true,
+//							useSmallerFontSize: true
+//						)
+//						.padding(.horizontal, .medium3)
+//						.padding(.top, .small2)
+//					}
 
 					Spacer()
 				}
@@ -85,6 +78,7 @@ extension ApplyShield.Intro {
 				.multilineTextAlignment(.center)
 				.padding([.horizontal, .bottom], .large2)
 			}
+			.background(.primaryBackground)
 		}
 	}
 }

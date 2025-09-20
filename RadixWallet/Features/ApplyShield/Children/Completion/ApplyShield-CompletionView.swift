@@ -25,6 +25,7 @@ extension ApplyShield {
 
 				Spacer()
 			}
+			.background(.primaryBackground)
 			.footer {
 				Button(L10n.ShieldWizardApplyShield.ApplyShield.saveButton, action: action)
 					.buttonStyle(.primaryRectangular)

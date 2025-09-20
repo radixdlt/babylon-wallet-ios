@@ -21,7 +21,7 @@ extension InteractionReview {
 		private var coreView: some SwiftUI.View {
 			entity
 			VStack(spacing: .medium3) {
-				factorsHeader
+				// factorsHeader
 				primaryRoleFactors
 				performShieldRecoveryFactors
 			}
@@ -174,7 +174,13 @@ extension InteractionReview {
 		private func factorsList(_ factorSources: [FactorSource]) -> some SwiftUI.View {
 			VStack(spacing: .small2) {
 				ForEach(factorSources, id: \.self) { factorSource in
-					FactorSourcePreviewCard(factorSource: factorSource)
+					FactorSourceCard(
+						kind: .instance(
+							factorSource: factorSource,
+							kind: .short(showDetails: false)
+						),
+						mode: .display
+					)
 
 					let isLastFactor = factorSource == factorSources.last
 					if !isLastFactor {
@@ -191,16 +197,16 @@ extension InteractionReview {
 			VStack(spacing: .small1) {
 				Text(L10n.TransactionReview.UpdateShield.confirmationDelayMessage)
 					.textStyle(.body1Regular)
-					.foregroundStyle(.primaryText)
+					.foregroundStyle(.black)
 					.flushedLeft
 
 				Label(viewState.periodUntilAutoConfirm.title, asset: AssetResource.emergencyFallbackCalendar)
 					.textStyle(.body1Link)
-					.foregroundStyle(.primaryText)
+					.foregroundStyle(.black)
 					.flushedLeft
 					.padding(.horizontal, .medium3)
 					.padding(.vertical, .medium3)
-					.background(.primaryBackground)
+					.background(.white)
 					.roundedCorners(strokeColor: .border, radius: .small2)
 			}
 			.padding(.medium3)
