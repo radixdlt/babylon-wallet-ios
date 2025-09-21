@@ -32,37 +32,38 @@ extension ChangeMainShield {
 
 		@MainActor
 		private var coreView: some SwiftUI.View {
-			VStack(spacing: .large2) {
-				Text(L10n.SecurityShields.ChangeMain.title)
-					.textStyle(.sheetTitle)
-					.padding(.horizontal, .medium3)
-
-				Text(L10n.SecurityShields.ChangeMain.subtitle)
-					.textStyle(.body1Regular)
-					.padding(.horizontal, .medium3)
-
-				VStack(spacing: .medium3) {
-					ForEachStatic(store.shields) { shield in
-						card(shield)
-					}
-				}
-
-				Spacer()
-			}
-			.foregroundStyle(.primaryText)
-			.multilineTextAlignment(.center)
+			Text("")
+//			VStack(spacing: .large2) {
+//				Text(L10n.SecurityShields.ChangeMain.title)
+//					.textStyle(.sheetTitle)
+//					.padding(.horizontal, .medium3)
+//
+//				Text(L10n.SecurityShields.ChangeMain.subtitle)
+//					.textStyle(.body1Regular)
+//					.padding(.horizontal, .medium3)
+//
+//				VStack(spacing: .medium3) {
+//					ForEachStatic(store.shields) { shield in
+//						card(shield)
+//					}
+//				}
+//
+//				Spacer()
+//			}
+//			.foregroundStyle(.primaryText)
+//			.multilineTextAlignment(.center)
 		}
 
-		private func card(_ shield: ShieldForDisplay) -> some SwiftUI.View {
-			WithPerceptionTracking {
-				ShieldCard(
-					shield: shield,
-					mode: .selection(isSelected: store.selected == shield)
-				)
-				.onTapGesture {
-					store.send(.view(.selected(shield)))
-				}
-			}
-		}
+//		private func card(_ shield: SecurityStructureOfFactorSources) -> some SwiftUI.View {
+//			WithPerceptionTracking {
+//				ShieldCard(
+//					shield: shield,
+//					mode: .selection(isSelected: store.selected == shield)
+//				)
+//				.onTapGesture {
+//					store.send(.view(.selected(shield)))
+//				}
+//			}
+//		}
 	}
 }

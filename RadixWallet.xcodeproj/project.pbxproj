@@ -916,6 +916,9 @@
 		A09F8FDE2DF6E4C300DB5614 /* Discover+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09F8FDD2DF6E4C300DB5614 /* Discover+View.swift */; };
 		A09F8FDF2DF6E4C300DB5614 /* Discover.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09F8FDC2DF6E4C300DB5614 /* Discover.swift */; };
 		A0A53EBA2E54DAA500BE36FE /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A0A53EB92E54DAA500BE36FE /* Sargon */; };
+		A0BA444C2E7F05AF00ED76E8 /* ShieldTemplateDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0BA444A2E7F05AF00ED76E8 /* ShieldTemplateDetails.swift */; };
+		A0BA444D2E7F05AF00ED76E8 /* ShieldTemplateDetails+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0BA444B2E7F05AF00ED76E8 /* ShieldTemplateDetails+View.swift */; };
+		A0BA44512E7F085D00ED76E8 /* SecurityStructureOfFactorSourcesView+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0BA444F2E7F085D00ED76E8 /* SecurityStructureOfFactorSourcesView+View.swift */; };
 		A0C673002DA6BBEA0071606B /* ScreenshotPreventing in Frameworks */ = {isa = PBXBuildFile; productRef = A0C672FF2DA6BBEA0071606B /* ScreenshotPreventing */; };
 		A0C673022DA6BBEA0071606B /* ScreenshotPreventingSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = A0C673012DA6BBEA0071606B /* ScreenshotPreventingSwiftUI */; };
 		A0C673052DA6BD7F0071606B /* ScreenshotPreventing in Frameworks */ = {isa = PBXBuildFile; productRef = A0C673042DA6BD7F0071606B /* ScreenshotPreventing */; };
@@ -2297,6 +2300,9 @@
 		A09F8FD52DEF4DAA00DB5614 /* RadixNameService+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RadixNameService+Test.swift"; sourceTree = "<group>"; };
 		A09F8FDC2DF6E4C300DB5614 /* Discover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Discover.swift; sourceTree = "<group>"; };
 		A09F8FDD2DF6E4C300DB5614 /* Discover+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Discover+View.swift"; sourceTree = "<group>"; };
+		A0BA444A2E7F05AF00ED76E8 /* ShieldTemplateDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldTemplateDetails.swift; sourceTree = "<group>"; };
+		A0BA444B2E7F05AF00ED76E8 /* ShieldTemplateDetails+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShieldTemplateDetails+View.swift"; sourceTree = "<group>"; };
+		A0BA444F2E7F085D00ED76E8 /* SecurityStructureOfFactorSourcesView+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityStructureOfFactorSourcesView+View.swift"; sourceTree = "<group>"; };
 		A0D201652E014893009DA055 /* BlogPostCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlogPostCard.swift; sourceTree = "<group>"; };
 		A0D201672E029394009DA055 /* BlogPostsCarousel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlogPostsCarousel.swift; sourceTree = "<group>"; };
 		A0D201682E029394009DA055 /* BlogPostsCarousel+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BlogPostsCarousel+View.swift"; sourceTree = "<group>"; };
@@ -7543,6 +7549,9 @@
 				E7607DBE2D4252470083B3A5 /* ShieldsList+View.swift */,
 				E7607DC02D439D780083B3A5 /* ChangeMainShield+Reducer.swift */,
 				E7607DC22D439D7F0083B3A5 /* ChangeMainShield+View.swift */,
+				A0BA444A2E7F05AF00ED76E8 /* ShieldTemplateDetails.swift */,
+				A0BA444B2E7F05AF00ED76E8 /* ShieldTemplateDetails+View.swift */,
+				A0BA444F2E7F085D00ED76E8 /* SecurityStructureOfFactorSourcesView+View.swift */,
 			);
 			path = ShieldsList;
 			sourceTree = "<group>";
@@ -8583,6 +8592,7 @@
 				A408160D2C7E0D08005E65B9 /* StateEntityDetailsResponseNonFungibleResourceDetails.swift in Sources */,
 				A408154C2C7E0D08005E65B9 /* CodableHelper.swift in Sources */,
 				48CFC3662ADC10D900E77A5C /* NonFungibleTokenDetails+Reducer.swift in Sources */,
+				A0BA44512E7F085D00ED76E8 /* SecurityStructureOfFactorSourcesView+View.swift in Sources */,
 				A48FD15F2B55E671009295E9 /* TrackedPoolInteraction.swift in Sources */,
 				E7607DE02D4CE3ED0083B3A5 /* ChoosePersonasForShield+View.swift in Sources */,
 				A47572042B29B4EE0059A95D /* IOSSecurityClient+Interface.swift in Sources */,
@@ -9379,6 +9389,8 @@
 				48CFC40E2ADC10DA00E77A5C /* InsecureRandomNumberGeneratorWithSeed.swift in Sources */,
 				5B813D0F2CFF218B001A291D /* AddShieldBuilderSeedingFactors-IntroView.swift in Sources */,
 				48D5F38F2BD8DDB9000DE964 /* DebugManageFactorSources+View.swift in Sources */,
+				A0BA444C2E7F05AF00ED76E8 /* ShieldTemplateDetails.swift in Sources */,
+				A0BA444D2E7F05AF00ED76E8 /* ShieldTemplateDetails+View.swift in Sources */,
 				A40815F82C7E0D08005E65B9 /* RoleKey.swift in Sources */,
 				48CFC4672ADC10DA00E77A5C /* AccountPortfoliosClient+Interface.swift in Sources */,
 				48CFC36A2ADC10D900E77A5C /* FungibleAssetListSection+Reducer.swift in Sources */,

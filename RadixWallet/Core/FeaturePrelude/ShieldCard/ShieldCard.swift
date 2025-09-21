@@ -3,7 +3,7 @@ import SwiftUI
 
 // MARK: - ShieldCard
 struct ShieldCard: View {
-	let shield: ShieldForDisplay
+	let shield: SecurityStructureOfFactorSources
 	let mode: Mode
 
 	var body: some View {
@@ -12,18 +12,24 @@ struct ShieldCard: View {
 
 	private var card: some View {
 		HStack(spacing: .small2) {
-			Image(shield.status.image)
+			Image(.shieldStatusApplied)
 				.resizable()
 				.frame(iconSize)
-				.padding(.vertical, iconVerticalPadding)
 
 			VStack(alignment: .leading, spacing: .small2) {
 				Text(shield.metadata.displayName.rawValue)
 					.textStyle(.body1Header)
 					.foregroundStyle(.primaryText)
 
-				if mode == .display {
-					displayInfo
+				FlowLayout {
+					ForEach(shield.allFactorSources) { fs in
+						HStack {
+							Text(fs.name)
+							Image(fs.kind.icon)
+								.resizable()
+								.frame(.icon)
+						}
+					}
 				}
 			}
 
@@ -37,8 +43,7 @@ struct ShieldCard: View {
 			}
 		}
 		.padding(.vertical, verticalPadding)
-		.padding(.leading, .medium2)
-		.padding(.trailing, .medium3)
+//		.padding(.horizontal, .small1)
 		.background(.primaryBackground)
 		.roundedCorners(radius: .small1)
 		.cardShadow
@@ -50,20 +55,30 @@ struct ShieldCard: View {
 				Text(L10n.SecurityShields.Assigned.title)
 					.textStyle(.body2HighImportance)
 
-				Text(assignedEntitiesText)
-					.textStyle(.body2Regular)
+//				Text(assignedEntitiesText)
+//					.textStyle(.body2Regular)
 			}
 			.foregroundStyle(.secondaryText)
-
-			if let statusMessage = shield.status.statusMessageInfo {
-				StatusMessageView(
-					text: statusMessage.text,
-					type: statusMessage.type,
-					useNarrowSpacing: true,
-					useSmallerFontSize: true
-				)
-			}
+//
+//			if let statusMessage = shield.status.statusMessageInfo {
+//				StatusMessageView(
+//					text: statusMessage.text,
+//					type: statusMessage.type,
+//					useNarrowSpacing: true,
+//					useSmallerFontSize: true
+//				)
+//			}
 		}
+	}
+}
+
+extension SecurityStructureOfFactorSources {
+	var allFactorSources: FactorSources {
+		matrixOfFactors.primaryRole.thresholdFactors +
+			matrixOfFactors.primaryRole.overrideFactors +
+			matrixOfFactors.recoveryRole.overrideFactors +
+			matrixOfFactors.confirmationRole.overrideFactors +
+			[authenticationSigningFactor]
 	}
 }
 
@@ -103,27 +118,27 @@ private extension ShieldCard {
 		}
 	}
 
-	private var assignedEntitiesText: String {
-		typealias Assigned = L10n.SecurityShields.Assigned
-		let accountsCount = Int(shield.numberOfLinkedAccounts)
-		let personasCount = Int(shield.numberOfLinkedPersonas)
-
-		var accountsString: String?
-		if accountsCount > 0 {
-			accountsString = accountsCount == 1 ? Assigned.accountSingular : Assigned.accountPlural(accountsCount)
-		}
-
-		var personasString: String?
-		if personasCount > 0 {
-			personasString = personasCount == 1 ? Assigned.personaSingular : Assigned.personaPlural(personasCount)
-		}
-
-		let entitiesText = [accountsString, personasString]
-			.compactMap { $0 }
-			.joined(separator: " • ")
-
-		return entitiesText.isEmpty ? L10n.Common.none : entitiesText
-	}
+//	private var assignedEntitiesText: String {
+//		typealias Assigned = L10n.SecurityShields.Assigned
+//		let accountsCount = Int(shield.numberOfLinkedAccounts)
+//		let personasCount = Int(shield.numberOfLinkedPersonas)
+//
+//		var accountsString: String?
+//		if accountsCount > 0 {
+//			accountsString = accountsCount == 1 ? Assigned.accountSingular : Assigned.accountPlural(accountsCount)
+//		}
+//
+//		var personasString: String?
+//		if personasCount > 0 {
+//			personasString = personasCount == 1 ? Assigned.personaSingular : Assigned.personaPlural(personasCount)
+//		}
+//
+//		let entitiesText = [accountsString, personasString]
+//			.compactMap { $0 }
+//			.joined(separator: " • ")
+//
+//		return entitiesText.isEmpty ? L10n.Common.none : entitiesText
+//	}
 }
 
 // MARK: - ShieldCardStatus

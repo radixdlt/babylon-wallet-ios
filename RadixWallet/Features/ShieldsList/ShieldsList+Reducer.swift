@@ -6,7 +6,7 @@ import Sargon
 struct ShieldsList: FeatureReducer, Sendable {
 	@ObservableState
 	struct State: Hashable, Sendable {
-		var shields: [ShieldForDisplay] = []
+		var shields: [SecurityStructureOfFactorSources] = []
 
 		@Presents
 		var destination: Destination.State? = nil
@@ -17,8 +17,8 @@ struct ShieldsList: FeatureReducer, Sendable {
 	@CasePathable
 	enum ViewAction: Equatable, Sendable {
 		case task
-		case changeMainButtonTapped
 		case createShieldButtonTapped
+		case shieldTapped(SecurityStructureId)
 	}
 
 	enum InternalAction: Equatable, Sendable {
@@ -33,26 +33,26 @@ struct ShieldsList: FeatureReducer, Sendable {
 		@CasePathable
 		enum State: Sendable, Hashable {
 			case securityShieldsSetup(ShieldSetupCoordinator.State)
-			case changeMain(ChangeMainShield.State)
 			case applyShield(ApplyShield.Coordinator.State)
+			case shieldTemplateDetails(ShieldTemplateDetails.State)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
 			case securityShieldsSetup(ShieldSetupCoordinator.Action)
-			case changeMain(ChangeMainShield.Action)
 			case applyShield(ApplyShield.Coordinator.Action)
+			case shieldTemplateDetails(ShieldTemplateDetails.Action)
 		}
 
 		var body: some ReducerOf<Self> {
 			Scope(state: \.securityShieldsSetup, action: \.securityShieldsSetup) {
 				ShieldSetupCoordinator()
 			}
-			Scope(state: \.changeMain, action: \.changeMain) {
-				ChangeMainShield()
-			}
 			Scope(state: \.applyShield, action: \.applyShield) {
 				ApplyShield.Coordinator()
+			}
+			Scope(state: \.shieldTemplateDetails, action: \.shieldTemplateDetails) {
+				ShieldTemplateDetails()
 			}
 		}
 	}
@@ -71,20 +71,16 @@ struct ShieldsList: FeatureReducer, Sendable {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			return shieldsEffect()
-		case .changeMainButtonTapped:
-			state.destination = .changeMain(.init(currentMain: state.main))
+			state.shields = try! SargonOS.shared.securityStructuresOfFactorSources()
 			return .none
 		case .createShieldButtonTapped:
 			state.destination = .securityShieldsSetup(.init())
 			return .none
-		}
-	}
-
-	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
-		switch internalAction {
-		case let .setShields(shields):
-			state.shields = shields
+		case let .shieldTapped(id):
+			let structure = try! SargonOs.shared.securityStructureOfFactorSourcesFromSecurityStructureOfFactorSourceIds(structureOfIds:
+				SargonOS.shared.securityStructureOfFactorSourceIdsBySecurityStructureId(shieldId: id)
+			)
+			state.destination = .shieldTemplateDetails(.init(structure: structure))
 			return .none
 		}
 	}
@@ -93,10 +89,8 @@ struct ShieldsList: FeatureReducer, Sendable {
 		switch presentedAction {
 		case let .securityShieldsSetup(.delegate(.finished(securityStructure))):
 			state.destination = .applyShield(.init(securityStructure: securityStructure))
-			return shieldsEffect()
-		case .changeMain(.delegate(.updated)):
-			state.destination = nil
-			return shieldsEffect()
+			state.shields = try! SargonOS.shared.securityStructuresOfFactorSources()
+			return .none
 		case .applyShield(.delegate(.skipped)),
 		     .applyShield(.delegate(.finished)):
 			state.destination = nil
@@ -106,12 +100,12 @@ struct ShieldsList: FeatureReducer, Sendable {
 		}
 	}
 
-	private func shieldsEffect() -> Effect<Action> {
-		.run { send in
-			let shields = try await SargonOS.shared.getShieldsForDisplay()
-			await send(.internal(.setShields(shields)))
-		} catch: { error, _ in
-			errorQueue.schedule(error)
-		}
-	}
+//	private func shieldsEffect() -> Effect<Action> {
+//		.run { send in
+	//            let shields = try await SargonOS.shared.securityStructuresOfFactorSources()
+//			await send(.internal(.setShields(shields)))
+//		} catch: { error, _ in
+//			errorQueue.schedule(error)
+//		}
+//	}
 }

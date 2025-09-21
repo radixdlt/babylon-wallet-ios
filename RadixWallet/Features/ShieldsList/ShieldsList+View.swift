@@ -1,15 +1,3 @@
-extension ShieldsList.State {
-	var main: ShieldForDisplay? {
-		shields.first(where: \.metadata.isMain)
-	}
-
-	var others: [ShieldForDisplay] {
-		let main = main
-		return shields
-			.filter { $0 != main }
-	}
-}
-
 // MARK: - ShieldsList.View
 extension ShieldsList {
 	struct View: SwiftUI.View {
@@ -22,6 +10,7 @@ extension ShieldsList {
 						.padding(.horizontal, .medium3)
 						.padding(.vertical, .large2)
 				}
+				.background(.secondaryBackground)
 				.radixToolbar(title: L10n.SecurityShields.title)
 				.task {
 					store.send(.view(.task))
@@ -33,16 +22,7 @@ extension ShieldsList {
 		@MainActor
 		private var coreView: some SwiftUI.View {
 			VStack(spacing: .medium3) {
-				if let main = store.main {
-					section(text: L10n.SecurityShields.default, rows: [main], showChangeMain: !store.others.isEmpty)
-
-					if !store.others.isEmpty {
-						section(text: L10n.SecurityShields.others, rows: store.others)
-							.padding(.top, .medium3)
-					}
-				} else {
-					section(text: nil, rows: store.others)
-				}
+				section(text: nil, rows: store.shields)
 
 				Button(L10n.SecurityShields.createShieldButton) {
 					store.send(.view(.createShieldButtonTapped))
@@ -62,23 +42,12 @@ extension ShieldsList {
 				.flushedLeft
 		}
 
-		private func section(text: String?, rows: [ShieldForDisplay], showChangeMain: Bool = false) -> some SwiftUI.View {
-			VStack(spacing: .small1) {
-				if let text {
-					HStack(spacing: .zero) {
-						header(text)
-						Spacer()
-						if showChangeMain {
-							Button(L10n.SecurityShields.change) {
-								store.send(.view(.changeMainButtonTapped))
-							}
-							.buttonStyle(.primaryText())
-						}
-					}
-				}
-
-				VStack(spacing: .medium3) {
-					ForEachStatic(rows) { row in
+		private func section(text: String?, rows: [SecurityStructureOfFactorSources], showChangeMain: Bool = false) -> some SwiftUI.View {
+			VStack(spacing: .medium3) {
+				ForEachStatic(rows) { row in
+					Button {
+						store.send(.view(.shieldTapped(row.metadata.id)))
+					} label: {
 						ShieldCard(shield: row, mode: .display)
 					}
 				}
@@ -89,10 +58,7 @@ extension ShieldsList {
 
 private extension StoreOf<ShieldsList> {
 	var destination: PresentationStoreOf<ShieldsList.Destination> {
-		func scopeState(state: State) -> PresentationState<ShieldsList.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
+		scope(state: \.$destination, action: \.destination)
 	}
 }
 
@@ -101,8 +67,8 @@ private extension View {
 	func destinations(with store: StoreOf<ShieldsList>) -> some View {
 		let destinationStore = store.destination
 		return securityShieldsSetup(with: destinationStore)
-			.changeMain(with: destinationStore)
 			.applyShield(with: destinationStore)
+			.shieldTemplateDetails(with: destinationStore)
 	}
 
 	private func securityShieldsSetup(with destinationStore: PresentationStoreOf<ShieldsList.Destination>) -> some View {
@@ -111,9 +77,9 @@ private extension View {
 		}
 	}
 
-	private func changeMain(with destinationStore: PresentationStoreOf<ShieldsList.Destination>) -> some View {
-		sheet(store: destinationStore.scope(state: \.changeMain, action: \.changeMain)) {
-			ChangeMainShield.View(store: $0)
+	private func shieldTemplateDetails(with destinationStore: PresentationStoreOf<ShieldsList.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.shieldTemplateDetails, action: \.shieldTemplateDetails)) {
+			ShieldTemplateDetails.View(store: $0)
 		}
 	}
 
