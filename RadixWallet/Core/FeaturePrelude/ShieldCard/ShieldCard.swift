@@ -29,6 +29,8 @@ struct ShieldCard: View {
 								.resizable()
 								.frame(.icon)
 						}
+						.foregroundStyle(.secondaryText)
+						.textStyle(.body2HighImportance)
 					}
 				}
 			}

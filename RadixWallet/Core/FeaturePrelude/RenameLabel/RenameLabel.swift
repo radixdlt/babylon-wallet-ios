@@ -85,6 +85,14 @@ struct RenameLabel: Sendable, FeatureReducer {
 				} catch: { error, _ in
 					errorQueue.schedule(error)
 				}
+
+			case let .shield(shield):
+				return .run { _ in
+					// let updated = try await SargonOS.shared.securityStru
+					// await send(.internal(.handleFactorSourceUpdate(updated)))
+				} catch: { error, _ in
+					errorQueue.schedule(error)
+				}
 			}
 
 		case let .focusChanged(value):
@@ -108,7 +116,7 @@ struct RenameLabel: Sendable, FeatureReducer {
 extension RenameLabel.State {
 	var status: Status {
 		switch kind {
-		case .account, .factorSource:
+		case .account, .factorSource, .shield:
 			guard let sanitizedLabel else {
 				return .empty
 			}
@@ -130,6 +138,7 @@ extension RenameLabel.State {
 		case account(Account)
 		case connector(P2PLink)
 		case factorSource(FactorSource, name: String)
+		case shield(SecurityStructureOfFactorSources)
 
 		fileprivate var label: String {
 			switch self {
@@ -139,6 +148,8 @@ extension RenameLabel.State {
 				connector.displayName
 			case let .factorSource(_, name):
 				name
+			case let .shield(shield):
+				shield.metadata.displayName.value
 			}
 		}
 	}

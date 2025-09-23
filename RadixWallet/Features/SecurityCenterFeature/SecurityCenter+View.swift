@@ -143,14 +143,16 @@ extension SecurityCenter {
 							.foregroundStyle(Color.secondaryText)
 							.textStyle(.body2Regular)
 
-						HStack(spacing: .zero) {
-							Image(actionRequired ? .error : .checkCircle)
-								.padding(.trailing, .small3)
+						if type != .securityShields {
+							HStack(spacing: .zero) {
+								Image(actionRequired ? .error : .checkCircle)
+									.padding(.trailing, .small3)
 
-							Text(status)
-								.textStyle(.body2HighImportance)
+								Text(status)
+									.textStyle(.body2HighImportance)
+							}
+							.foregroundStyle(actionRequired ? .warning : .app.green1)
 						}
-						.foregroundStyle(actionRequired ? .warning : .app.green1)
 					}
 
 					Spacer(minLength: .zero)

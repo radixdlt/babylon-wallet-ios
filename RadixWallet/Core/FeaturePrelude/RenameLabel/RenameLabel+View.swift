@@ -87,6 +87,8 @@ private extension RenameLabel.State.Kind {
 		case .account: L10n.RenameLabel.Account.title
 		case .connector: L10n.RenameLabel.Connector.title
 		case .factorSource: L10n.RenameLabel.FactorSource.title
+		case .shield:
+			"Rename Shield"
 		}
 	}
 
@@ -95,6 +97,7 @@ private extension RenameLabel.State.Kind {
 		case .account: L10n.RenameLabel.Account.subtitle
 		case .connector: L10n.RenameLabel.Connector.subtitle
 		case .factorSource: L10n.RenameLabel.FactorSource.subtitle
+		case .shield: ""
 		}
 	}
 
@@ -103,6 +106,7 @@ private extension RenameLabel.State.Kind {
 		case .account: L10n.RenameLabel.Account.empty
 		case .connector: L10n.RenameLabel.Connector.empty
 		case .factorSource: L10n.RenameLabel.FactorSource.empty
+		case .shield: ""
 		}
 	}
 
@@ -111,6 +115,7 @@ private extension RenameLabel.State.Kind {
 		case .account: L10n.RenameLabel.Account.tooLong
 		case .connector: ""
 		case .factorSource: L10n.RenameLabel.FactorSource.tooLong
+		case .shield: ""
 		}
 	}
 }

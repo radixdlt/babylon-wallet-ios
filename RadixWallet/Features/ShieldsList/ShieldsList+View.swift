@@ -12,8 +12,8 @@ extension ShieldsList {
 				}
 				.background(.secondaryBackground)
 				.radixToolbar(title: L10n.SecurityShields.title)
-				.task {
-					store.send(.view(.task))
+				.onAppear {
+					store.send(.view(.onAppear))
 				}
 				.destinations(with: store)
 			}

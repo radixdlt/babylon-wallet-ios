@@ -145,20 +145,20 @@ struct SecurityStructureOfFactorSourcesView: View {
 		VStack(spacing: .small1) {
 			Text(L10n.TransactionReview.UpdateShield.confirmationDelayMessage)
 				.textStyle(.body1Regular)
-				.foregroundStyle(.black)
+				.foregroundStyle(.primaryText)
 				.flushedLeft
 
 			Label(structure.matrixOfFactors.timeUntilDelayedConfirmationIsCallable.title, asset: AssetResource.emergencyFallbackCalendar)
 				.textStyle(.body1Link)
-				.foregroundStyle(.black)
+				.foregroundStyle(.primaryText)
 				.flushedLeft
 				.padding(.horizontal, .medium3)
 				.padding(.vertical, .medium3)
-				.background(.white)
+				.background(.primaryBackground)
 				.roundedCorners(strokeColor: .border, radius: .small2)
 		}
 		.padding(.medium3)
-		.background(.app.lightError)
+		.background(.lightError)
 		.frame(maxWidth: .infinity)
 		.roundedCorners(radius: .small1)
 	}

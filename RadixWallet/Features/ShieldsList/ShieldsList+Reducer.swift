@@ -16,7 +16,7 @@ struct ShieldsList: FeatureReducer, Sendable {
 
 	@CasePathable
 	enum ViewAction: Equatable, Sendable {
-		case task
+		case onAppear
 		case createShieldButtonTapped
 		case shieldTapped(SecurityStructureId)
 	}
@@ -70,16 +70,16 @@ struct ShieldsList: FeatureReducer, Sendable {
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .task:
+		case .onAppear:
 			state.shields = try! SargonOS.shared.securityStructuresOfFactorSources()
 			return .none
 		case .createShieldButtonTapped:
 			state.destination = .securityShieldsSetup(.init())
 			return .none
 		case let .shieldTapped(id):
-			let structure = try! SargonOs.shared.securityStructureOfFactorSourcesFromSecurityStructureOfFactorSourceIds(structureOfIds:
-				SargonOS.shared.securityStructureOfFactorSourceIdsBySecurityStructureId(shieldId: id)
-			)
+			guard let structure = state.shields.first(where: { $0.id == id }) else {
+				return .none
+			}
 			state.destination = .shieldTemplateDetails(.init(structure: structure))
 			return .none
 		}
