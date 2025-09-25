@@ -107,6 +107,9 @@ struct ShieldTemplateDetails: Sendable, FeatureReducer {
 			} catch: { err, _ in
 				errorQueue.schedule(err)
 			}
+		case .editShieldFactors(.delegate(.cancelled)):
+			state.destination = nil
+			return .none
 		default:
 			return .none
 		}
