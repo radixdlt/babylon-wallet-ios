@@ -129,6 +129,7 @@ extension AddFactorSource {
 	}
 }
 
+// MARK: - FactorSourceStrategy
 struct FactorSourceStrategy: Sendable, Hashable {
 	let kind: FactorSourceKind
 	let context: AddFactorSource.Context

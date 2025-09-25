@@ -223,6 +223,7 @@ extension TransactionHistoryFilters {
 	}
 }
 
+// MARK: - ItemFilterPickerView
 struct ItemFilterPickerView<ID: Hashable & Sendable>: SwiftUI.View {
 	let filters: IdentifiedArrayOf<ItemFilter<ID>>
 	let onAction: (ID) -> Void
@@ -234,6 +235,7 @@ struct ItemFilterPickerView<ID: Hashable & Sendable>: SwiftUI.View {
 	}
 }
 
+// MARK: - ItemFilter
 struct ItemFilter<ID: Hashable & Sendable>: Hashable, Sendable, Identifiable {
 	let id: ID
 	let icon: ImageResource?
@@ -245,6 +247,7 @@ struct ItemFilter<ID: Hashable & Sendable>: Hashable, Sendable, Identifiable {
 	}
 }
 
+// MARK: - ItemFilterView
 struct ItemFilterView<ID: Hashable & Sendable>: SwiftUI.View {
 	typealias Filter = ItemFilter<ID>
 

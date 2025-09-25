@@ -79,7 +79,7 @@ extension ChooseTransferRecipient.State {
 	}
 }
 
-// MARK: - ChooseReceivingAccount.View
+// MARK: - ChooseTransferRecipient.View
 extension ChooseTransferRecipient {
 	@MainActor
 	struct View: SwiftUI.View {

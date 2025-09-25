@@ -336,6 +336,7 @@ extension NFCISO7816Tag {
 
 import AsyncExtensions
 
+// MARK: - NFCTagReaderSessionAsyncDelegate
 final class NFCTagReaderSessionAsyncDelegate: NSObject {
 	let onSessionDidBecomeActive: AsyncThrowingStream<Void, Error>
 	private let onSessionDidBecomeActiveContinuation: AsyncThrowingStream<Void, Error>.Continuation
@@ -349,8 +350,10 @@ final class NFCTagReaderSessionAsyncDelegate: NSObject {
 	}
 }
 
+// MARK: - NFCTag + @unchecked @retroactive Sendable
 extension NFCTag: @unchecked @retroactive Sendable {}
 
+// MARK: - NFCTagReaderSessionAsyncDelegate + NFCTagReaderSessionDelegate
 extension NFCTagReaderSessionAsyncDelegate: NFCTagReaderSessionDelegate {
 	func tagReaderSessionDidBecomeActive(_ session: NFCTagReaderSession) {
 		loggerGlobal.info("======== Session did become active ========")

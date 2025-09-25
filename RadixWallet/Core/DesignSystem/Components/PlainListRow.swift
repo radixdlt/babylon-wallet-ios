@@ -41,7 +41,7 @@ struct PlainListRow<Icon: View, Accessory: View, Bottom: View>: View {
 			hints: [Hint.ViewState] = [],
 			isDisabled: Bool = false,
 			@ViewBuilder icon: () -> Icon,
-			@ViewBuilder bottom: () -> Bottom,
+			@ViewBuilder bottom: () -> Bottom
 		) where Accessory == Image {
 			self.accessory = accessory.map { Image($0) }
 			self.rowCoreViewState = rowCoreViewState
