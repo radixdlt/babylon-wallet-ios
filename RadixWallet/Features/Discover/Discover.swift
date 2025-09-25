@@ -90,6 +90,7 @@ extension Discover.State {
 	}
 }
 
+// MARK: - Discover.SocialLink
 extension Discover {
 	struct SocialLink: Identifiable, Equatable, Sendable {
 		var id: URL {

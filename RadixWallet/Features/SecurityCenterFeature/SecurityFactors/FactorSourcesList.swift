@@ -353,7 +353,7 @@ private extension FactorSourcesList {
 	}
 }
 
-// MARK: - DeviceFactorSourcesList.State.Row
+// MARK: - FactorSourcesList.State.Context
 extension FactorSourcesList.State {
 	enum Context: Sendable, Hashable {
 		case display

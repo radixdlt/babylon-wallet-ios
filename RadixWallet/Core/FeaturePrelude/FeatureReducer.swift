@@ -228,6 +228,7 @@ extension FeatureReducer {
 	}
 }
 
+// MARK: - FailureToHandleSecurityProblem
 struct FailureToHandleSecurityProblem: Error {}
 
 extension FeatureReducer {
@@ -268,6 +269,7 @@ extension FeatureReducer {
 	}
 }
 
+// MARK: - SecurityProblemHandlerDestination
 enum SecurityProblemHandlerDestination: Hashable, Sendable {
 	case displayMnemonic(DisplayMnemonic.State)
 	case enterMnemonic(ImportMnemonicForFactorSource.State)
