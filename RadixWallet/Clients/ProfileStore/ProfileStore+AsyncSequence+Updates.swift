@@ -3,8 +3,8 @@
 // MARK: Public
 extension ProfileStore {
 	/// The current network if any
-	func network() async throws -> ProfileNetwork {
-		let profile = await self.profile()
+	func network() throws -> ProfileNetwork {
+		let profile = self.profile()
 		return try profile.network(id: profile.networkID)
 	}
 

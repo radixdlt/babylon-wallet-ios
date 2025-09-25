@@ -250,20 +250,20 @@ extension RecoveryRoleSetup {
 				VStack(spacing: .medium2) {
 					Text(
 						markdown: L10n.ShieldWizardRecovery.Fallback.subtitle,
-						emphasizedColor: .black,
+						emphasizedColor: .primaryText,
 						emphasizedFont: .app.body2Header
 					)
 					.textStyle(.body2Regular)
-					.foregroundStyle(.black)
+					.foregroundStyle(.primaryText)
 					.flushedLeft
 
 					Label(store.periodUntilAutoConfirm.title, asset: AssetResource.emergencyFallbackCalendar)
 						.textStyle(.body1Header)
-						.foregroundStyle(.black)
+						.foregroundStyle(.primaryText)
 						.flushedLeft
 						.padding(.horizontal, .medium3)
 						.padding(.vertical, .small1)
-						.background(.white)
+						.background(.primaryBackground)
 						.roundedCorners(radius: .small2)
 						.cardShadow
 						.onTapGesture {
@@ -277,7 +277,7 @@ extension RecoveryRoleSetup {
 				}
 				.padding([.horizontal, .bottom], .medium3)
 				.padding(.top, .medium3)
-				.background(.app.lightError)
+				.background(.lightError)
 			}
 			.frame(maxWidth: .infinity)
 			.roundedCorners(radius: .small1)

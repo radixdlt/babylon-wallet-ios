@@ -25,9 +25,8 @@ extension ShieldTemplateDetails {
 						}
 					}
 					.padding([.horizontal, .bottom], .medium3)
-					.background(.white)
 				}
-				.background(.white)
+				.background(.primaryBackground)
 				.footer {
 					Button("Edit Factors") {
 						store.send(.view(.editFactorsTapped))
@@ -57,6 +56,7 @@ private extension View {
 		let destinationStore = store.destination
 		return editFactors(with: destinationStore)
 			.applyShield(with: destinationStore)
+			.updateShieldName(with: destinationStore)
 	}
 
 	private func editFactors(with destinationStore: PresentationStoreOf<ShieldTemplateDetails.Destination>) -> some View {
@@ -68,6 +68,12 @@ private extension View {
 	private func applyShield(with destinationStore: PresentationStoreOf<ShieldTemplateDetails.Destination>) -> some View {
 		fullScreenCover(store: destinationStore.scope(state: \.applyShield, action: \.applyShield)) {
 			ApplyShield.Coordinator.View(store: $0)
+		}
+	}
+
+	private func updateShieldName(with destinationStore: PresentationStoreOf<ShieldTemplateDetails.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.rename, action: \.rename)) {
+			RenameLabel.View(store: $0)
 		}
 	}
 }

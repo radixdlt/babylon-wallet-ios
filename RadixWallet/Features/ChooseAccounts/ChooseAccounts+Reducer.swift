@@ -17,7 +17,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 		var selectionRequirement: SelectionRequirement {
 			switch context {
-			case .assetTransfer:
+			case .assetTransfer, .applyShield:
 				.exactly(1)
 			case let .permission(selectionRequirement):
 				selectionRequirement
@@ -111,6 +111,17 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 						&& state.disabledAccounts.contains($1.address)
 				}
 				.asIdentified()
+
+			if state.context == .applyShield {
+				state.availableAccounts = state.availableAccounts.filter {
+					switch $0.securityState {
+					case .unsecured:
+						true
+					case .securified:
+						false
+					}
+				}
+			}
 			return .none
 
 		case let .loadAccountsResult(.failure(error)):
@@ -144,5 +155,6 @@ extension ChooseAccounts.State {
 	enum Context: Sendable, Hashable {
 		case assetTransfer
 		case permission(SelectionRequirement)
+		case applyShield
 	}
 }

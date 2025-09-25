@@ -116,6 +116,7 @@ extension ApplyShield {
 						),
 						canBeSkipped: false
 					)))
+					return .none
 				}
 				state.selectedAccounts = accounts
 				state.path.append(.completion)

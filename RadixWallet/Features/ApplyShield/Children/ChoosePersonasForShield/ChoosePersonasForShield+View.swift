@@ -24,8 +24,8 @@ extension ChoosePersonasForShield {
 					.padding(.bottom, .medium2)
 					.multilineTextAlignment(.center)
 					.foregroundStyle(.primaryText)
+					.background(.primaryBackground)
 				}
-				.background(.primaryBackground)
 				.footer {
 					VStack(spacing: .medium3) {
 						WithControlRequirements(
@@ -44,6 +44,7 @@ extension ChoosePersonasForShield {
 						}
 					}
 				}
+				.background(.primaryBackground)
 			}
 		}
 	}

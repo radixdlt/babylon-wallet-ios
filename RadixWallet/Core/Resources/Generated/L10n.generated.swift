@@ -4583,7 +4583,7 @@ internal enum L10n {
       /// Sign a transaction to apply your Shield to your Accounts and Personas.
       /// 
       /// You can use the same Shield for all of them or create multiple Shields.
-      internal static let subtitle = L10n.tr("Localizable", "shieldSetupOnboarding_applyShieldStep_subtitle", fallback: "Sign a transaction to apply your Shield to your Accounts and Personas.\n\nYou can use the same Shield for all of them or create multiple Shields.")
+      internal static let subtitle = L10n.tr("Localizable", "shieldSetupOnboarding_applyShieldStep_subtitle", fallback: "Sign a transaction to apply your Shield to your Account or Persona.\n\nYou can use the same Shield for your Accounts and Personas or create multiple Shields.")
       /// Apply your Shield to your Accounts and Personas
       internal static let title = L10n.tr("Localizable", "shieldSetupOnboarding_applyShieldStep_title", fallback: "Apply your Shield to your Accounts and Personas")
     }
@@ -4635,7 +4635,7 @@ internal enum L10n {
       /// A future wallet update will enable Shields without needing a hardware device.
       internal static let subtitleBottom = L10n.tr("Localizable", "shieldSetupPrepareFactors_intro_subtitleBottom", fallback: "A future wallet update will enable Shields without needing a hardware device.")
       /// You need at least **2 factors** to build a Security Shield. 1 of your factors must be a hardware device.
-      internal static let subtitleTop = L10n.tr("Localizable", "shieldSetupPrepareFactors_intro_subtitleTop", fallback: "You need at least **2 factors** to build a Security Shield. 1 of your factors must be a hardware device.")
+      internal static let subtitleTop = L10n.tr("Localizable", "shieldSetupPrepareFactors_intro_subtitleTop", fallback: "It is recommended to use at least **2 factors** to build a Security Shield, one of which is a hardware device.")
       /// Let’s Prepare your Factors
       internal static let title = L10n.tr("Localizable", "shieldSetupPrepareFactors_intro_title", fallback: "Let’s Prepare your Factors")
     }
@@ -4693,9 +4693,9 @@ internal enum L10n {
     }
     internal enum ChooseAccounts {
       /// Choose the Accounts you want to apply this Shield to.
-      internal static let subtitle = L10n.tr("Localizable", "shieldWizardApplyShield_chooseAccounts_subtitle", fallback: "Choose the Accounts you want to apply this Shield to.")
+      internal static let subtitle = L10n.tr("Localizable", "shieldWizardApplyShield_chooseAccounts_subtitle", fallback: "Choose the Account you want to apply this Shield to.")
       /// Choose Accounts
-      internal static let title = L10n.tr("Localizable", "shieldWizardApplyShield_chooseAccounts_title", fallback: "Choose Accounts")
+      internal static let title = L10n.tr("Localizable", "shieldWizardApplyShield_chooseAccounts_title", fallback: "Choose Account")
     }
     internal enum ChooseEntities {
       /// Deselect all
@@ -4707,13 +4707,13 @@ internal enum L10n {
     }
     internal enum ChoosePersonas {
       /// Choose the Personas you want to apply this Shield to.
-      internal static let subtitle = L10n.tr("Localizable", "shieldWizardApplyShield_choosePersonas_subtitle", fallback: "Choose the Personas you want to apply this Shield to.")
+      internal static let subtitle = L10n.tr("Localizable", "shieldWizardApplyShield_choosePersonas_subtitle", fallback: "Choose the Persona you want to apply this Shield to.")
       /// Choose Personas
-      internal static let title = L10n.tr("Localizable", "shieldWizardApplyShield_choosePersonas_title", fallback: "Choose Personas")
+      internal static let title = L10n.tr("Localizable", "shieldWizardApplyShield_choosePersonas_title", fallback: "Choose Persona")
     }
     internal enum ShieldCreated {
       /// Apply to Accounts and Personas
-      internal static let applyButton = L10n.tr("Localizable", "shieldWizardApplyShield_shieldCreated_applyButton", fallback: "Apply to Accounts and Personas")
+      internal static let applyButton = L10n.tr("Localizable", "shieldWizardApplyShield_shieldCreated_applyButton", fallback: "Apply to an Account or a Persona")
       /// To apply your Shield on the Radix Network, you’ll need to sign a transaction
       internal static let note = L10n.tr("Localizable", "shieldWizardApplyShield_shieldCreated_note", fallback: "To apply your Shield on the Radix Network, you’ll need to sign a transaction")
       /// Not enough XRD to pay transaction. Get some XRD tokens first to apply Shields.
@@ -4721,7 +4721,7 @@ internal enum L10n {
       /// Skip For Now
       internal static let skipButton = L10n.tr("Localizable", "shieldWizardApplyShield_shieldCreated_skipButton", fallback: "Skip For Now")
       /// Apply this Shield to Accounts and Personas. You can update it any time.
-      internal static let subtitle = L10n.tr("Localizable", "shieldWizardApplyShield_shieldCreated_subtitle", fallback: "Apply this Shield to Accounts and Personas. You can update it any time.")
+      internal static let subtitle = L10n.tr("Localizable", "shieldWizardApplyShield_shieldCreated_subtitle", fallback: "Apply this Shield to an Account or a Persona. You can update it any time.")
       /// %@ Created
       internal static func title(_ p1: Any) -> String {
         return L10n.tr("Localizable", "shieldWizardApplyShield_shieldCreated_title", String(describing: p1), fallback: "%@ Created")
@@ -4806,8 +4806,8 @@ internal enum L10n {
   }
   internal enum ShieldWizardRegularAccess {
     /// Factors required to withdraw assets from Accounts.
-    internal static let subtitle = L10n.tr("Localizable", "shieldWizardRegularAccess_subtitle", fallback: "Factors required to withdraw assets from Accounts.")
-    /// Regular Access
+    internal static let subtitle = L10n.tr("Localizable", "shieldWizardRegularAccess_subtitle", fallback: "Factors required to sign transactions")
+    /// Regular Accessa
     internal static let title = L10n.tr("Localizable", "shieldWizardRegularAccess_title", fallback: "Regular Access")
     internal enum Authentication {
       /// Single factor required to log in to dApps with Personas and prove ownership of Accounts.
@@ -5127,7 +5127,7 @@ internal enum L10n {
       /// Log In and Prove Ownership
       internal static let proveOwnerhipTitle = L10n.tr("Localizable", "transactionReview_updateShield_proveOwnerhipTitle", fallback: "Log In and Prove Ownership")
       /// Factors required to withdraw assets, log in to dApps and prove ownership.
-      internal static let regularAccessMessage = L10n.tr("Localizable", "transactionReview_updateShield_regularAccessMessage", fallback: "Factors required to withdraw assets, log in to dApps and prove ownership.")
+      internal static let regularAccessMessage = L10n.tr("Localizable", "transactionReview_updateShield_regularAccessMessage", fallback: "Factors required to sign transactions.")
       /// Regular Access
       internal static let regularAccessTitle = L10n.tr("Localizable", "transactionReview_updateShield_regularAccessTitle", fallback: "Regular Access")
       /// Update shield

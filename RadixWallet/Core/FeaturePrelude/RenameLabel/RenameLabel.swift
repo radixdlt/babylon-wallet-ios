@@ -87,9 +87,9 @@ struct RenameLabel: Sendable, FeatureReducer {
 				}
 
 			case let .shield(shield):
-				return .run { _ in
-					// let updated = try await SargonOS.shared.securityStru
-					// await send(.internal(.handleFactorSourceUpdate(updated)))
+				return .run { [kind = state.kind] send in
+					try await SargonOS.shared.renameSecurityStructure(securityStructureId: shield.metadata.id, name: .init(value: nonEmpty.rawValue))
+					await send(.delegate(.labelUpdated(kind)))
 				} catch: { error, _ in
 					errorQueue.schedule(error)
 				}

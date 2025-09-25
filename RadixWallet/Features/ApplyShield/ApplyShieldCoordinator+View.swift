@@ -42,7 +42,7 @@ extension ApplyShield.Coordinator {
 					ChoosePersonasForShield.View(store: store)
 				}
 			case .completion:
-				ApplyShield.CompletionView {
+				ApplyShield.CompletionView(factorSources: self.store.state.securityStructure.allFactorSources) {
 					self.store.send(.view(.applyButtonTapped))
 				}
 			}

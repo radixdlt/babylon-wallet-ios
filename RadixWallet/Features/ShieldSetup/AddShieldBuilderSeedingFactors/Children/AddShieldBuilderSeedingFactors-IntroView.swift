@@ -7,6 +7,7 @@ extension AddShieldBuilderSeedingFactors {
 		var body: some SwiftUI.View {
 			VStack(spacing: .large2) {
 				Image(.addShieldBuilderSeedingFactorsIntro)
+					.darkModeTinted()
 
 				Text(L10n.ShieldSetupPrepareFactors.Intro.title)
 					.textStyle(.sheetTitle)
@@ -14,7 +15,7 @@ extension AddShieldBuilderSeedingFactors {
 				VStack(spacing: .medium3) {
 					Text(markdown: L10n.ShieldSetupPrepareFactors.Intro.subtitleTop, emphasizedColor: .primaryText, emphasizedFont: .app.body1Header)
 
-					Text(L10n.ShieldSetupPrepareFactors.Intro.subtitleBottom)
+					// Text(L10n.ShieldSetupPrepareFactors.Intro.subtitleBottom)
 				}
 				.textStyle(.body1Regular)
 				.padding(.horizontal, .small2)

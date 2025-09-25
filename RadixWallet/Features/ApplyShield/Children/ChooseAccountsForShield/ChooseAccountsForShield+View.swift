@@ -36,7 +36,7 @@ extension ChooseAccountsForShield {
 								.buttonStyle(.primaryRectangular)
 						}
 
-						Button(L10n.ShieldWizardApplyShield.ChooseEntities.skipButton) {
+						Button("Choose Persona") {
 							viewStore.send(.view(.skipButtonTapped))
 						}
 						.buttonStyle(.primaryText())
