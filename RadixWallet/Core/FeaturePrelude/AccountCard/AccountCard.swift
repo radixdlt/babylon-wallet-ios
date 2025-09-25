@@ -101,13 +101,14 @@ extension AccountCard {
 	}
 }
 
+// MARK: - AccountCardTag
 enum AccountCardTag: Hashable, Sendable {
 	case legacy
 	case dAppDefinition
 	case factorSource(FactorSource)
 }
 
-// MARK: AccountCard.Kind
+// MARK: - AccountCard.Kind
 extension AccountCard {
 	enum Kind {
 		/// Stacks the name and address horizontally

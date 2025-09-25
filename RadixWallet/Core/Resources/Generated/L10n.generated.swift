@@ -423,6 +423,10 @@ internal enum L10n {
         return L10n.tr("Localizable", "addArculus_firmwareVersionError_message", String(describing: p1), fallback: "Minimum Firmware Required (%@)")
       }
     }
+    internal enum SeedPhraseInstructions {
+      /// If your card already has a seed phrase set up, you can enter it in the next step or choose to replace it with a new one.
+      internal static let message = L10n.tr("Localizable", "addArculus_seedPhraseInstructions_message", fallback: "If your card already has a seed phrase set up, you can enter it in the next step or choose to replace it with a new one.")
+    }
   }
   internal enum AddFactorSource {
     /// Add a new Security Factor
@@ -458,6 +462,22 @@ internal enum L10n {
       internal static let nameTitle = L10n.tr("Localizable", "addFactorSource_ledger_nameTitle", fallback: "Name your New Ledger Nano")
       /// Add a New Ledger Nano
       internal static let title = L10n.tr("Localizable", "addFactorSource_ledger_title", fallback: "Add a New Ledger Nano")
+    }
+    internal enum OffDeviceMnemonic {
+      /// Mnemonics are 12 to 24-word BIP39 seed phrases that you’ll need to enter in full every time you use this factor.
+      internal static let description = L10n.tr("Localizable", "addFactorSource_offDeviceMnemonic_description", fallback: "Mnemonics are 12 to 24-word BIP39 seed phrases that you’ll need to enter in full every time you use this factor.")
+      /// Name your New Mnemonic Seed Phrase
+      internal static let nameTitle = L10n.tr("Localizable", "addFactorSource_offDeviceMnemonic_nameTitle", fallback: "Name your New Mnemonic Seed Phrase")
+      /// Add a New Mnemonic Seed Phrase
+      internal static let title = L10n.tr("Localizable", "addFactorSource_offDeviceMnemonic_title", fallback: "Add a New Mnemonic Seed Phrase")
+    }
+    internal enum Password {
+      /// Passwords on Radix are decentralized and aren’t known or stored by anyone but you.
+      internal static let description = L10n.tr("Localizable", "addFactorSource_password_description", fallback: "Passwords on Radix are decentralized and aren’t known or stored by anyone but you.")
+      /// Name your New Password
+      internal static let nameTitle = L10n.tr("Localizable", "addFactorSource_password_nameTitle", fallback: "Name your New Password")
+      /// Add a New Password
+      internal static let title = L10n.tr("Localizable", "addFactorSource_password_title", fallback: "Add a New Password")
     }
     internal enum SelectKind {
       /// Add Security Factor
@@ -698,9 +718,9 @@ internal enum L10n {
       internal static let title = L10n.tr("Localizable", "arculusScan_nfcDisabled_title", fallback: "NFC is turned off")
     }
     internal enum Progress {
-      /// Progress: **%@**
+      /// Progress: **%@%%**
       internal static func label(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "arculusScan_progress_label", String(describing: p1), fallback: "Progress: **%@**")
+        return L10n.tr("Localizable", "arculusScan_progress_label", String(describing: p1), fallback: "Progress: **%@%%**")
       }
     }
     internal enum PurposeConfiguringMnemonic {
@@ -712,8 +732,8 @@ internal enum L10n {
       internal static let label = L10n.tr("Localizable", "arculusScan_purposeConfiguringPin_label", fallback: "Configuring new Card PIN")
     }
     internal enum PurposeDerivingKeys {
-      /// Updating Factor Config
-      internal static let label = L10n.tr("Localizable", "arculusScan_purposeDerivingKeys_label", fallback: "Updating Factor Config")
+      /// Deriving Public Keys
+      internal static let label = L10n.tr("Localizable", "arculusScan_purposeDerivingKeys_label", fallback: "Deriving Public Keys")
     }
     internal enum PurposeIdentifying {
       /// Identifying Card
@@ -1221,6 +1241,20 @@ internal enum L10n {
       internal static let text = L10n.tr("Localizable", "common_noMnemonicAlert_text", fallback: "The required seed phrase is missing. Please return to the account and begin the recovery process.")
       /// Could Not Complete
       internal static let title = L10n.tr("Localizable", "common_noMnemonicAlert_title", fallback: "Could Not Complete")
+    }
+  }
+  internal enum CommonSecurityShields {
+    /// Apply Shield
+    internal static let applyShield = L10n.tr("Localizable", "commonSecurityShields_applyShield", fallback: "Apply Shield")
+    /// Security Shield
+    internal static let securityShield = L10n.tr("Localizable", "commonSecurityShields_securityShield", fallback: "Security Shield")
+    /// View security shield details
+    internal static let securityShieldDetails = L10n.tr("Localizable", "commonSecurityShields_securityShieldDetails", fallback: "View security shield details")
+    /// Shielded
+    internal static let shielded = L10n.tr("Localizable", "commonSecurityShields_shielded", fallback: "Shielded")
+    internal enum Select {
+      /// Select Security Shield
+      internal static let title = L10n.tr("Localizable", "commonSecurityShields_select_title", fallback: "Select Security Shield")
     }
   }
   internal enum ConfigurationBackup {
@@ -2086,8 +2120,16 @@ internal enum L10n {
       internal static let signMessage = L10n.tr("Localizable", "factorSourceActions_arculus_signMessage", fallback: "Tap and hold this **Arculus Card** to your phone to sign.")
     }
     internal enum ArculusEnterPin {
-      /// Enter card PIN
-      internal static let heading = L10n.tr("Localizable", "factorSourceActions_arculusEnterPin_heading", fallback: "Enter card PIN")
+      /// Enter PIN
+      internal static let heading = L10n.tr("Localizable", "factorSourceActions_arculusEnterPin_heading", fallback: "Enter PIN")
+    }
+    internal enum ArculusForgotPin {
+      /// Forgot PIN
+      internal static let button = L10n.tr("Localizable", "factorSourceActions_arculusForgotPin_button", fallback: "Forgot PIN")
+    }
+    internal enum ArculusForgotPinInfo {
+      /// Go to your Arculus card security factor settings to reset the PIN
+      internal static let message = L10n.tr("Localizable", "factorSourceActions_arculusForgotPinInfo_message", fallback: "Go to your Arculus card security factor settings to reset the PIN")
     }
     internal enum CreateKey {
       /// Creating Key
@@ -2154,8 +2196,8 @@ internal enum L10n {
       internal static let title = L10n.tr("Localizable", "factorSourceActions_spotCheck_title", fallback: "Check Factor")
     }
     internal enum UpdatingFactorConfig {
-      /// Updating Factor Config
-      internal static let title = L10n.tr("Localizable", "factorSourceActions_updatingFactorConfig_title", fallback: "Updating Factor Config")
+      /// Deriving Public Keys
+      internal static let title = L10n.tr("Localizable", "factorSourceActions_updatingFactorConfig_title", fallback: "Deriving Public Keys")
     }
   }
   internal enum FactorSources {
@@ -2932,8 +2974,8 @@ internal enum L10n {
       /// 
       /// Arculus Cards are secure third-party "hardware wallet" cryptographic signing devices in a convenient credit card form factor. To use it, you only need to tap it to the NFC reader on your phone.
       /// 
-      /// Using a hardware signing device like an Arculus Card provides strong security because it requires physical access to the card to use it.
-      internal static let arculus = L10n.tr("Localizable", "infoLink_glossary_arculus", fallback: "## Arculus Card\n\nArculus Cards are secure third-party \"hardware wallet\" cryptographic signing devices in a convenient credit card form factor. To use it, you only need to tap it to the NFC reader on your phone.\n\nUsing a hardware signing device like an Arculus Card provides strong security because it requires physical access to the card to use it.")
+      /// Using a hardware signing device like an Arculus Card provides strong security because it requires physical access to the card to use it. If you use it in a [Security Shields](?glossaryAnchor=securityshields), you can combine it with other factors you have so that even if the card is lost or stolen, your funds are safe and you can reconfigure the Shield to remove the lost Arculus Card, and carry on as before. No seed phrase backup needed.
+      internal static let arculus = L10n.tr("Localizable", "infoLink_glossary_arculus", fallback: "## Arculus Card\n\nArculus Cards are secure third-party \"hardware wallet\" cryptographic signing devices in a convenient credit card form factor. To use it, you only need to tap it to the NFC reader on your phone.\n\nUsing a hardware signing device like an Arculus Card provides strong security because it requires physical access to the card to use it. If you use it in a [Security Shields](?glossaryAnchor=securityshields), you can combine it with other factors you have so that even if the card is lost or stolen, your funds are safe and you can reconfigure the Shield to remove the lost Arculus Card, and carry on as before. No seed phrase backup needed.")
       /// ## Badges
       /// 
       /// Radix Badges are tokens or NFTs that are used to prove their holder is authorized to claim something, access something or perform a certain action within the Radix Network. Any token on Radix can be used as a badge, but dApps may often create special tokens specifically for use as a badge.
@@ -4459,6 +4501,8 @@ internal enum L10n {
   internal enum SecurityShields {
     /// Accounts
     internal static let accounts = L10n.tr("Localizable", "securityShields_accounts", fallback: "Accounts")
+    /// Apply
+    internal static let apply = L10n.tr("Localizable", "securityShields_apply", fallback: "Apply")
     /// Change
     internal static let change = L10n.tr("Localizable", "securityShields_change", fallback: "Change")
     /// Create New Security Shield
@@ -4580,9 +4624,9 @@ internal enum L10n {
     /// Start
     internal static let startButtonTitle = L10n.tr("Localizable", "shieldSetupOnboarding_startButtonTitle", fallback: "Start")
     internal enum ApplyShieldStep {
-      /// Sign a transaction to apply your Shield to your Accounts and Personas.
+      /// Sign a transaction to apply your Shield to your Account or Persona.
       /// 
-      /// You can use the same Shield for all of them or create multiple Shields.
+      /// You can use the same Shield for your Accounts and Personas or create multiple Shields.
       internal static let subtitle = L10n.tr("Localizable", "shieldSetupOnboarding_applyShieldStep_subtitle", fallback: "Sign a transaction to apply your Shield to your Account or Persona.\n\nYou can use the same Shield for your Accounts and Personas or create multiple Shields.")
       /// Apply your Shield to your Accounts and Personas
       internal static let title = L10n.tr("Localizable", "shieldSetupOnboarding_applyShieldStep_title", fallback: "Apply your Shield to your Accounts and Personas")
@@ -4634,7 +4678,7 @@ internal enum L10n {
       internal static let button = L10n.tr("Localizable", "shieldSetupPrepareFactors_intro_button", fallback: "Start")
       /// A future wallet update will enable Shields without needing a hardware device.
       internal static let subtitleBottom = L10n.tr("Localizable", "shieldSetupPrepareFactors_intro_subtitleBottom", fallback: "A future wallet update will enable Shields without needing a hardware device.")
-      /// You need at least **2 factors** to build a Security Shield. 1 of your factors must be a hardware device.
+      /// It is recommended to use at least **2 factors** to build a Security Shield, one of which is a hardware device.
       internal static let subtitleTop = L10n.tr("Localizable", "shieldSetupPrepareFactors_intro_subtitleTop", fallback: "It is recommended to use at least **2 factors** to build a Security Shield, one of which is a hardware device.")
       /// Let’s Prepare your Factors
       internal static let title = L10n.tr("Localizable", "shieldSetupPrepareFactors_intro_title", fallback: "Let’s Prepare your Factors")
@@ -4684,17 +4728,19 @@ internal enum L10n {
   }
   internal enum ShieldWizardApplyShield {
     internal enum ApplyShield {
-      /// Save and Apply
-      internal static let saveButton = L10n.tr("Localizable", "shieldWizardApplyShield_applyShield_saveButton", fallback: "Save and Apply")
-      /// Now let’s save your Shield settings to your wallet and apply them on the Radix Network with a transaction.
-      internal static let subtitle = L10n.tr("Localizable", "shieldWizardApplyShield_applyShield_subtitle", fallback: "Now let’s save your Shield settings to your wallet and apply them on the Radix Network with a transaction.")
+      /// Apply
+      internal static let saveButton = L10n.tr("Localizable", "shieldWizardApplyShield_applyShield_saveButton", fallback: "Apply")
+      /// Now let’s apply your Shield on the Radix Network with a transaction. To prepare the transaction you’ll need to present the factors used to build your Shield
+      internal static let subtitle = L10n.tr("Localizable", "shieldWizardApplyShield_applyShield_subtitle", fallback: "Now let’s apply your Shield on the Radix Network with a transaction. To prepare the transaction you’ll need to present the factors used to build your Shield")
       /// Apply your Shield
       internal static let title = L10n.tr("Localizable", "shieldWizardApplyShield_applyShield_title", fallback: "Apply your Shield")
     }
     internal enum ChooseAccounts {
-      /// Choose the Accounts you want to apply this Shield to.
+      /// Choose Persona
+      internal static let skipButton = L10n.tr("Localizable", "shieldWizardApplyShield_chooseAccounts_skipButton", fallback: "Choose Persona")
+      /// Choose the Account you want to apply this Shield to.
       internal static let subtitle = L10n.tr("Localizable", "shieldWizardApplyShield_chooseAccounts_subtitle", fallback: "Choose the Account you want to apply this Shield to.")
-      /// Choose Accounts
+      /// Choose Account
       internal static let title = L10n.tr("Localizable", "shieldWizardApplyShield_chooseAccounts_title", fallback: "Choose Account")
     }
     internal enum ChooseEntities {
@@ -4706,13 +4752,13 @@ internal enum L10n {
       internal static let skipButton = L10n.tr("Localizable", "shieldWizardApplyShield_chooseEntities_skipButton", fallback: "Skip")
     }
     internal enum ChoosePersonas {
-      /// Choose the Personas you want to apply this Shield to.
+      /// Choose the Persona you want to apply this Shield to.
       internal static let subtitle = L10n.tr("Localizable", "shieldWizardApplyShield_choosePersonas_subtitle", fallback: "Choose the Persona you want to apply this Shield to.")
-      /// Choose Personas
+      /// Choose Persona
       internal static let title = L10n.tr("Localizable", "shieldWizardApplyShield_choosePersonas_title", fallback: "Choose Persona")
     }
     internal enum ShieldCreated {
-      /// Apply to Accounts and Personas
+      /// Apply to an Account or a Persona
       internal static let applyButton = L10n.tr("Localizable", "shieldWizardApplyShield_shieldCreated_applyButton", fallback: "Apply to an Account or a Persona")
       /// To apply your Shield on the Radix Network, you’ll need to sign a transaction
       internal static let note = L10n.tr("Localizable", "shieldWizardApplyShield_shieldCreated_note", fallback: "To apply your Shield on the Radix Network, you’ll need to sign a transaction")
@@ -4720,7 +4766,7 @@ internal enum L10n {
       internal static let notEnoughXrd = L10n.tr("Localizable", "shieldWizardApplyShield_shieldCreated_notEnoughXrd", fallback: "Not enough XRD to pay transaction. Get some XRD tokens first to apply Shields.")
       /// Skip For Now
       internal static let skipButton = L10n.tr("Localizable", "shieldWizardApplyShield_shieldCreated_skipButton", fallback: "Skip For Now")
-      /// Apply this Shield to Accounts and Personas. You can update it any time.
+      /// Apply this Shield to an Account or a Persona. You can update it any time.
       internal static let subtitle = L10n.tr("Localizable", "shieldWizardApplyShield_shieldCreated_subtitle", fallback: "Apply this Shield to an Account or a Persona. You can update it any time.")
       /// %@ Created
       internal static func title(_ p1: Any) -> String {
@@ -4805,9 +4851,9 @@ internal enum L10n {
     }
   }
   internal enum ShieldWizardRegularAccess {
-    /// Factors required to withdraw assets from Accounts.
-    internal static let subtitle = L10n.tr("Localizable", "shieldWizardRegularAccess_subtitle", fallback: "Factors required to sign transactions")
-    /// Regular Accessa
+    /// Factors required to sign transactions.
+    internal static let subtitle = L10n.tr("Localizable", "shieldWizardRegularAccess_subtitle", fallback: "Factors required to sign transactions.")
+    /// Regular Access
     internal static let title = L10n.tr("Localizable", "shieldWizardRegularAccess_title", fallback: "Regular Access")
     internal enum Authentication {
       /// Single factor required to log in to dApps with Personas and prove ownership of Accounts.
@@ -5126,7 +5172,7 @@ internal enum L10n {
       internal static let proveOwnerhipThreshold = L10n.tr("Localizable", "transactionReview_updateShield_proveOwnerhipThreshold", fallback: "Must present this factor")
       /// Log In and Prove Ownership
       internal static let proveOwnerhipTitle = L10n.tr("Localizable", "transactionReview_updateShield_proveOwnerhipTitle", fallback: "Log In and Prove Ownership")
-      /// Factors required to withdraw assets, log in to dApps and prove ownership.
+      /// Factors required to sign transactions.
       internal static let regularAccessMessage = L10n.tr("Localizable", "transactionReview_updateShield_regularAccessMessage", fallback: "Factors required to sign transactions.")
       /// Regular Access
       internal static let regularAccessTitle = L10n.tr("Localizable", "transactionReview_updateShield_regularAccessTitle", fallback: "Regular Access")

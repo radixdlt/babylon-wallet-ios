@@ -10,7 +10,7 @@ struct NameAccount: Sendable, FeatureReducer {
 		init(
 			isFirst: Bool,
 			inputtedEntityName: String = "",
-			sanitizedName: NonEmptyString? = nil,
+			sanitizedName: NonEmptyString? = nil
 		) {
 			self.inputtedName = inputtedEntityName
 			self.sanitizedName = sanitizedName

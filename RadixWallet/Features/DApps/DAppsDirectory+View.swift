@@ -74,7 +74,7 @@ extension DAppsDirectory {
 	static func loadedView(
 		dAppsCategories: DAppsDirectory.DAppsCategories,
 		dappsWithClaims: Set<DappDefinitionAddress> = [],
-		onDAppSelected: @escaping (DApp) -> Void,
+		onDAppSelected: @escaping (DApp) -> Void
 	) -> some SwiftUI.View {
 		ForEach(dAppsCategories) { dAppCategory in
 			Section {

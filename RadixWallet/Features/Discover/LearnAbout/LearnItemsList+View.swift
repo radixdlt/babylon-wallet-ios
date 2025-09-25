@@ -15,7 +15,7 @@ extension Discover.LearnItemsList {
 							PlainListRow(
 								title: item.title,
 								subtitle: item.description,
-								accessory: nil,
+								accessory: nil
 							) {
 								Image(source: item.icon)
 									.resizable()

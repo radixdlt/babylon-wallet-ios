@@ -42,6 +42,7 @@ func cApduSequenceToData(buf: UnsafePointer<ArculusCSDKAPDUSequence>) -> [Data] 
 	return dataArray
 }
 
+// MARK: - ArculusCSDKDriver
 final class ArculusCSDKDriver: SargonUniFFI.ArculusCsdkDriver {
 	func seedPhraseFromMnemonicSentence(wallet: SargonUniFFI.ArculusWalletPointer, mnemonicSentence: Data, passphrase: Data?) -> Data? {
 		buildCommand { len in

@@ -207,6 +207,7 @@ extension String {
 	}
 }
 
+// MARK: - DomainResolutionErrorAlert
 enum DomainResolutionErrorAlert: Sendable, Hashable {
 	case okTapped
 	case visitXrdDomain

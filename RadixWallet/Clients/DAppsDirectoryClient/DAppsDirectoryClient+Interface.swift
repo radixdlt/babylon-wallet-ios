@@ -26,6 +26,7 @@ extension DAppsDirectoryClient {
 	}
 }
 
+// MARK: - DAppsDirectoryClient.DApp + Codable
 extension DAppsDirectoryClient.DApp: Codable {
 	enum Key: CodingKey {
 		case name
@@ -47,6 +48,7 @@ extension DAppsDirectoryClient.DApp: Codable {
 	}
 }
 
+// MARK: - DAppsDirectoryClient.DApp.Category
 extension DAppsDirectoryClient.DApp {
 	enum Category: String, CaseIterable {
 		case defi
@@ -59,6 +61,7 @@ extension DAppsDirectoryClient.DApp {
 	}
 }
 
+// MARK: - DAppsDirectoryClient.DApp.Category + Codable
 extension DAppsDirectoryClient.DApp.Category: Codable {
 	init(from decoder: Decoder) throws {
 		let container = try decoder.singleValueContainer()
@@ -72,6 +75,7 @@ extension DAppsDirectoryClient.DApp.Category: Codable {
 	}
 }
 
+// MARK: - DAppsDirectoryClient.DApp.Category + Comparable
 extension DAppsDirectoryClient.DApp.Category: Comparable {
 	static func < (lhs: Self, rhs: Self) -> Bool {
 		let allCases = Self.allCases

@@ -12,5 +12,5 @@ extension Shared where Value == MnemonicBuilder {
 	}
 }
 
-// MARK: - mnemonicBuilder + @unchecked Sendable
+// MARK: - MnemonicBuilder + @unchecked Sendable
 extension MnemonicBuilder: @unchecked Sendable {}
