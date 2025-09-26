@@ -18,13 +18,13 @@ extension ApplyShield {
 					.foregroundStyle(.primaryText)
 					.multilineTextAlignment(.center)
 
-					VStack {
+					VStack(spacing: .medium3) {
 						ForEach(factorSources) { factorSource in
 							FactorSourceCard(kind: .instance(factorSource: factorSource, kind: .short(showDetails: false)), mode: .display)
 						}
 					}
 				}
-				.padding(.horizontal, .large2)
+				.padding([.horizontal, .bottom], .large2)
 			}
 			.background(.secondaryBackground)
 			.footer {

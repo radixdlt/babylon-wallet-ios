@@ -110,6 +110,12 @@ struct ShieldTemplateDetails: Sendable, FeatureReducer {
 		case .editShieldFactors(.delegate(.cancelled)):
 			state.destination = nil
 			return .none
+		case .applyShield(.delegate(.finished)):
+			state.destination = nil
+			return .none
+		case .applyShield(.delegate(.skipped)):
+			state.destination = nil
+			return .none
 		default:
 			return .none
 		}

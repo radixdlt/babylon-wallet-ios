@@ -72,7 +72,7 @@ extension FactorSourceAccess.State {
 			case .spotCheck, .proveOwnership, .encryptMessage, .updateFactorConfig, .deriveAccounts:
 				return S.OffDeviceMnemonic.message
 			case .createAccountAuthorization, .createPersonaAuthorization:
-				fatalError("Not supported")
+				return S.OffDeviceMnemonic.message
 			}
 		}
 	}

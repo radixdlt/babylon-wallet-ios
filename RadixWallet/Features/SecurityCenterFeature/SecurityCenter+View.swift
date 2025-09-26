@@ -1,6 +1,18 @@
 import ComposableArchitecture
 import SwiftUI
 
+extension SecurityCenter.State {
+	var kinds: [SecurityProblemKind] {
+		if isStokenet {
+			SecurityProblemKind.allCases
+		} else {
+			SecurityProblemKind.allCases.filter {
+				$0 != .securityShields
+			}
+		}
+	}
+}
+
 // MARK: - SecurityCenter.View
 extension SecurityCenter {
 	@MainActor
@@ -36,7 +48,7 @@ extension SecurityCenter {
 								}
 							}
 
-							ForEach(SecurityProblemKind.allCases, id: \.self) { type in
+							ForEach(viewStore.kinds, id: \.self) { type in
 								ProblemTypeCard(type: type, actionRequired: viewStore.actionsRequired.contains(type)) {
 									store.send(.view(.cardTapped(type)))
 								}

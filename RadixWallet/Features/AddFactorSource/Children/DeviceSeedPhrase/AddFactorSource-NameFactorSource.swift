@@ -8,6 +8,7 @@ extension AddFactorSource {
 				case device(DeviceFactorSource, MnemonicWithPassphrase)
 				case arculus(ArculusCardFactorSource, MnemonicWithPassphrase, String)
 				case ledger(LedgerHardwareWalletFactorSource)
+				case offDeviceMnemonic(OffDeviceMnemonicFactorSource, MnemonicWithPassphrase)
 
 				var factorSource: FactorSource {
 					switch self {
@@ -16,6 +17,8 @@ extension AddFactorSource {
 					case let .arculus(fs, _, _):
 						fs.asGeneral
 					case let .ledger(fs):
+						fs.asGeneral
+					case let .offDeviceMnemonic(fs, _):
 						fs.asGeneral
 					}
 				}
@@ -106,7 +109,7 @@ extension AddFactorSource {
 						case let .arculus(_, mwp, pin):
 							_ = try await arculusCardClient.configureCardWithMnemonic(mwp.mnemonic, pin)
 
-						case .ledger:
+						case .ledger, .offDeviceMnemonic:
 							break
 						}
 

@@ -163,6 +163,8 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 		switch childAction {
 		case let .arculus(.delegate(.perform(factorSource))):
 			.send(.delegate(.perform(factorSource)))
+		case let .offDeviceMnemonic(.delegate(.perform(factorSource))):
+			.send(.delegate(.perform(factorSource)))
 		default:
 			.none
 		}

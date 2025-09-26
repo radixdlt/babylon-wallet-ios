@@ -3,6 +3,7 @@ import ComposableArchitecture
 // MARK: - SecurityCenter
 struct SecurityCenter: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
+		var isStokenet: Bool = false
 		var problems: [SecurityProblem] = []
 		var actionsRequired: Set<SecurityProblemKind> {
 			Set(problems.map(\.kind))
@@ -70,6 +71,7 @@ struct SecurityCenter: Sendable, FeatureReducer {
 
 	enum InternalAction: Sendable, Equatable {
 		case setProblems([SecurityProblem])
+		case setIsStokenet(Bool)
 	}
 
 	var body: some ReducerOf<Self> {
@@ -82,11 +84,16 @@ struct SecurityCenter: Sendable, FeatureReducer {
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	@Dependency(\.securityCenterClient) var securityCenterClient
+	@Dependency(\.gatewaysClient) var gatewaysClient
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			return securityProblemsEffect()
+				.merge(with: .run { send in
+					let isStokenet = await gatewaysClient.getCurrentGateway().network.id == .stokenet
+					await send(.internal(.setIsStokenet(isStokenet)))
+				})
 
 		case let .problemTapped(problem):
 			switch problem {
@@ -127,6 +134,9 @@ struct SecurityCenter: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .setProblems(problems):
 			state.problems = problems
+			return .none
+		case let .setIsStokenet(isStokenet):
+			state.isStokenet = isStokenet
 			return .none
 		}
 	}
