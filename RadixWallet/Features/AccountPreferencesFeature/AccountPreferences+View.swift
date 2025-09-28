@@ -107,10 +107,12 @@ extension AccountPreferences.View {
 
 					Spacer()
 
-					Button("Apply Shield") {
-						store.send(.view(.applyShieldButtonTapped))
+					if !viewStore.isOnMainnet {
+						Button("Apply Shield") {
+							store.send(.view(.applyShieldButtonTapped))
+						}
+						.buttonStyle(.blueText)
 					}
-					.buttonStyle(.blueText)
 				}
 
 				FactorSourceCard(

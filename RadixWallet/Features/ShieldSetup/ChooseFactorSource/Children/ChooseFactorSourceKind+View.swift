@@ -33,7 +33,7 @@ extension ChooseFactorSourceKind {
 				model(kind: .arculusCard),
 				model(kind: .ledgerHqHardwareWallet),
 				.header(L10n.SecurityFactors.information),
-				model(kind: .password),
+				// model(kind: .password),
 				model(kind: .offDeviceMnemonic),
 			]
 		}

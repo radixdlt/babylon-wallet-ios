@@ -298,7 +298,7 @@ private extension PersonaDetails.State {
 		case let .dApp(_, authorizedPersonaData):
 			.init(
 				dAppInfo: dAppInfo,
-				personaName: persona.displayName.rawValue,
+				personaName: persona.displayName.rawValue, isOnStokenet: persona.networkId == .stokenet,
 				personaData: authorizedPersonaData.sharedPersonaData,
 				securityState: securityState
 			)
@@ -306,6 +306,7 @@ private extension PersonaDetails.State {
 			.init(
 				dAppInfo: nil,
 				personaName: persona.displayName.rawValue,
+				isOnStokenet: persona.networkId == .stokenet,
 				personaData: persona.personaData,
 				securityState: securityState
 			)
@@ -332,6 +333,7 @@ extension PersonaDetails.View {
 			let emailAddresses: [String]?
 			let phoneNumbers: [String]?
 			let securityState: PersonaDetails.State.SecurityState?
+			let isOnStokenet: Bool
 
 			struct DappInfo: Equatable {
 				let name: String
@@ -341,6 +343,7 @@ extension PersonaDetails.View {
 			init(
 				dAppInfo: DappInfo?,
 				personaName: String,
+				isOnStokenet: Bool,
 				personaData: PersonaData?,
 				securityState: PersonaDetails.State.SecurityState?
 			) {
@@ -350,6 +353,7 @@ extension PersonaDetails.View {
 				self.emailAddresses = personaData?.emailAddresses.collection.map(\.value.email)
 				self.phoneNumbers = personaData?.phoneNumbers.collection.map(\.value.number)
 				self.securityState = securityState
+				self.isOnStokenet = isOnStokenet
 			}
 		}
 
@@ -371,10 +375,12 @@ extension PersonaDetails.View {
 
 								Spacer()
 
-								Button("Apply Shield") {
-									store.send(.view(.applyShieldButtonTapped))
+								if viewStore.isOnStokenet {
+									Button("Apply Shield") {
+										store.send(.view(.applyShieldButtonTapped))
+									}
+									.buttonStyle(.blueText)
 								}
-								.buttonStyle(.blueText)
 							}
 
 							FactorSourceCard(

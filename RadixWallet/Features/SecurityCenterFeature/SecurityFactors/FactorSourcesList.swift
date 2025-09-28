@@ -152,15 +152,13 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 
 		case .addButtonTapped:
 			switch state.kind {
-			case .device, .arculusCard, .offDeviceMnemonic:
+			case .device, .arculusCard, .offDeviceMnemonic, .ledgerHqHardwareWallet:
 				state.destination = .addFactorSource(
 					.init(
 						mode: .preselectedKind(state.kind),
 						context: .newFactorSource
 					)
 				)
-			case .ledgerHqHardwareWallet:
-				return performActionRequiringP2PEffect(.addLedger, in: &state)
 			default:
 				assertionFailure("Unsupported factor source kind \(state.kind)")
 			}

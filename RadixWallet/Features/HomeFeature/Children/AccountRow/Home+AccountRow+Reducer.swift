@@ -6,9 +6,14 @@ import SwiftUI
 extension Home {
 	struct AccountRow: Sendable, FeatureReducer {
 		struct State: Sendable, Hashable, Identifiable, AccountWithInfoHolder {
+			enum SecurityState: Sendable, Hashable {
+				case unsecurified(FactorSource)
+				case securified
+			}
+
 			var id: AccountAddress { account.address }
 			var accountWithInfo: AccountWithInfo
-			var factorSource: FactorSource?
+			var securityState: SecurityState?
 
 			var accountWithResources: Loadable<OnLedgerEntity.OnLedgerAccount>
 			var showFiatWorth: Bool = true
@@ -43,11 +48,8 @@ extension Home {
 			case presentSecurityProblemHandler(SecurityProblemHandlerDestination)
 		}
 
-		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
-		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.userDefaults) var userDefaults
 		@Dependency(\.accountLockersClient) var accountLockersClient
-		@Dependency(\.factorSourcesClient) var factorSourcesClient
 		@Dependency(\.errorQueue) var errorQueue
 
 		func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {

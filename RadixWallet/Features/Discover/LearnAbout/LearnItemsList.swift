@@ -44,13 +44,7 @@ extension Discover {
 }
 
 private func allLearnItems() -> IdentifiedArrayOf<Discover.LearnItemsList.LearnItem> {
-	let unsupported: Set<InfoLinkSheet.GlossaryItem> = [
-		.arculus, .buildingshield, .emergencyfallback, .passwords, .securityshields,
-	]
-	return InfoLinkSheet.GlossaryItem.allCases
-		.filter {
-			!unsupported.contains($0)
-		}
+	InfoLinkSheet.GlossaryItem.allCases
 		.map(Discover.LearnItemsList.LearnItem.init)
 		.shuffled()
 		.asIdentified()

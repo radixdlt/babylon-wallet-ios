@@ -341,7 +341,7 @@ struct PersonaDetails: Sendable, FeatureReducer {
 		case .applyShield(.delegate(.finished)):
 			state.destination = nil
 			return .run { [address = state.persona.address] send in
-				_ = try await personasClient.personaUpdates(address).first()
+				_ = try await personasClient.personaUpdates(address).dropFirst().first()
 				await send(.internal(.reloadPersona))
 			}
 
